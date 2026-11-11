@@ -291,7 +291,17 @@ function viewport() {
   const scale = c.width / (Number(canvas.dataset?.viewWidth) || 960);
   const rail = document.getElementById('play-context');
   const railRect = rail && rail.offsetParent !== null ? rail.getBoundingClientRect() : null;
-  const right = railRect && railRect.left > c.left && railRect.left < c.right ? railRect.left : c.right;
+  let right = railRect && railRect.left > c.left && railRect.left < c.right ? railRect.left : c.right;
+  // The Modern Social drawer (open or as its rail) covers the canvas's right side: --inset-r is its
+  // width plus a gap from the root's right edge (js/ui/social-drawer.js). The client's location
+  // viewport never ran under its chrome, so the corner overlays go left of it.
+  let insetR = 0;
+  try {
+    insetR = parseFloat(globalThis.getComputedStyle?.(root)?.getPropertyValue?.('--inset-r')) || 0;
+  } catch {
+    insetR = 0;
+  }
+  if (insetR > 0) right = Math.min(right, Math.max(c.left, r.right - insetR));
   const pack = document.getElementById('pack-bar')?.getBoundingClientRect();
   const bottom = pack && pack.height > 0 && pack.top > c.top && pack.top < c.bottom ? pack.top : c.bottom;
   return { left: c.left - r.left, top: c.top - r.top, width: right - c.left, height: bottom - c.top, scale };
@@ -423,11 +433,14 @@ function drawInvite(now) {
   const inv = rt.invite;
   if (!inv) return;
   const ms = inviteMs(now);
-  const clip = portraitStateAt(ms);
-  if (!clip) {
+  // A vp_overlay fades in over 0.2 s and out over 0.4 s at the end of its duration
+  // (Announcement.as fade_in_sec / fade_out_sec, InWindowAnnouncementOverlay): the porthole and
+  // the bubble go together, the porthole holding loneliness_out's last frame while they fade.
+  if (ms < 0 || ms >= overlayLifeMs(LONELY_RULES.announceMs)) {
     closeInvite();
     return;
   }
+  const clip = portraitStateAt(Math.min(ms, LONELY_RULES.announceMs - 1));
   const node = el('lonely-invite', 'lonely-invite');
   const vp = viewport();
   if (!node || !vp) return;
@@ -439,6 +452,7 @@ function drawInvite(now) {
   const k = vp.scale;
   const box = inviteBox(STREET_SPIRIT_VARIANTS[inv.variant]?.loneliness);
   Object.assign(node.style, { left: `${vp.left}px`, top: `${vp.top}px`, width: `${vp.width}px`, height: `${vp.height}px` });
+  node.style.opacity = String(inv.hold ? 1 : overlayAlpha(ms, LONELY_RULES.announceMs));
   node.hidden = false;
   // The porthole: art_w = art_h = size; centre at vp_w - size/2 - x, size/2 + y.
   const size = box.size * k;

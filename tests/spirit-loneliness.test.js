@@ -47,7 +47,7 @@ import {
   spiritCryBox,
   spiritCrySheet,
 } from '../public/js/street-spirits.js?v=f9e88445';
-import { spiritLonelinessFeature } from '../public/js/features/spirit-loneliness-feature.js?v=c39253fa';
+import { spiritLonelinessFeature } from '../public/js/features/spirit-loneliness-feature.js?v=64885596';
 import { ROUTE_SOURCES } from '../public/js/map-routes.js?v=c7e7dc80';
 import { setStreetEcologyCatalog } from '../public/js/street-ecology.js?v=08076876';
 import { applyStreetIndex } from '../public/js/street-loader.js?v=18b181ad';
@@ -585,5 +585,22 @@ describe('feature', () => {
     spiritLonelinessFeature.onTick(16, 0, engine);
     assert.equal(spiritLonelinessFeature._state().event, null);
     assert.equal(engine.data.lonelyLast, 'picked:none');
+  });
+});
+
+describe('the invite overlays (porthole + bubble)', () => {
+  const src = read(join(dirname(fileURLToPath(import.meta.url)), '../public/js/features/spirit-loneliness-feature.js'));
+
+  it('sit left of the Modern Social drawer (--inset-r), as the client kept them inside the location viewport', () => {
+    const vp = src.slice(src.indexOf('function viewport()'), src.indexOf('function el('));
+    assert.match(vp, /--inset-r/);
+    assert.match(vp, /r\.right - insetR/);
+  });
+
+  it('fade in 0.2 s and out 0.4 s together, holding the out clip, as a vp_overlay (Announcement.as fade_in_sec / fade_out_sec)', () => {
+    const draw = src.slice(src.indexOf('function drawInvite('), src.indexOf('function showStreetOverlay('));
+    assert.match(draw, /overlayLifeMs\(LONELY_RULES\.announceMs\)/);
+    assert.match(draw, /overlayAlpha\(ms, LONELY_RULES\.announceMs\)/);
+    assert.match(draw, /portraitStateAt\(Math\.min\(ms, LONELY_RULES\.announceMs - 1\)\)/);
   });
 });
