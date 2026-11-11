@@ -37,6 +37,7 @@ import {
   namedAnimalLabel,
   namingVerbs,
   normalizeHusbandryPack,
+  ownGuanoDue,
   passiveGuano,
   queuePlops,
   releaseHogtied,
@@ -45,11 +46,11 @@ import {
   stepHogtie,
   stickPlaceState,
   takePlop,
-} from '../public/js/animal-husbandry.js?v=2d933bd6';
-import { pickerMaxCount, pickerOptionsFor, pickerTakesCount, listAnimalFeedOptions, createAnimalState } from '../public/js/animals.js?v=e01d2a8a';
-import { getVerbsFor, runVerb } from '../public/content.js?v=0c78b59c';
+} from '../public/js/animal-husbandry.js?v=7b3b3181';
+import { pickerMaxCount, pickerOptionsFor, pickerTakesCount, listAnimalFeedOptions, createAnimalState } from '../public/js/animals.js?v=07cfdcd8';
+import { getVerbsFor, runVerb } from '../public/content.js?v=afe3caa8';
 import { setStreetEcologyCatalog } from '../public/js/street-ecology.js?v=08076876';
-import { batterflyPlacementGroups, normalizeHusbandrySlot } from '../public/js/features/animal-husbandry-feature.js?v=fd08dd90';
+import { batterflyPlacementGroups, normalizeHusbandrySlot } from '../public/js/features/animal-husbandry-feature.js?v=7fb42521';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const publicDir = join(here, '../public');
@@ -93,6 +94,40 @@ describe('Batterflies and Guano (npc_batterfly.js)', () => {
     assert.equal(passiveGuano(state, t0 + BATTERFLY.passiveIntervalMs - 1, 0), 0);
     assert.equal(passiveGuano(state, t0 + 3 * BATTERFLY.passiveIntervalMs, 0), 3);
     assert.equal(passiveGuano(state, t0 + 20 * BATTERFLY.passiveIntervalMs, 8), 2);
+  });
+
+  it('online the hourly Guano is the server\'s pile: this page\'s clock pays what it owed before, once', () => {
+    const H = BATTERFLY.passiveIntervalMs;
+    const t0 = 50_000_000;
+    // Solo, or a server from before the shared pile: the page's own clock, as ever.
+    const solo = {};
+    assert.equal(ownGuanoDue(solo, t0, 0, false), 0);
+    assert.equal(ownGuanoDue(solo, t0 + 3 * H, 0, false), 3);
+    // Not known yet who keeps the street's Guano: nothing moves, the clock included.
+    const waiting = { passiveAt: t0 };
+    assert.equal(ownGuanoDue(waiting, t0 + 5 * H, 0, null), 0);
+    assert.equal(waiting.passiveAt, t0);
+    // The server took over two hours after this page's last Guano: those two still land, once.
+    const mine = { passiveAt: t0 };
+    const since = t0 + 2 * H + 1000;
+    assert.equal(ownGuanoDue(mine, t0 + 30 * H, 0, { since }), 2);
+    assert.equal(ownGuanoDue(mine, t0 + 31 * H, 0, { since }), 0);
+    assert.equal(ownGuanoDue(mine, t0 + 90 * H, 0, { since }), 0);
+    // Their own street cap still holds for what was owed.
+    const full = { passiveAt: t0 };
+    assert.equal(ownGuanoDue(full, t0 + 30 * H, 9, { since: t0 + 20 * H }), 1);
+    // A first visit after the server took over owes nothing, then or later.
+    const fresh = {};
+    assert.equal(ownGuanoDue(fresh, t0 + 40 * H, 0, { since }), 0);
+    assert.equal(ownGuanoDue(fresh, t0 + 50 * H, 0, { since }), 0);
+    // The page's own clock again (a server from before): it starts from now, not from the hours the server counted.
+    assert.equal(ownGuanoDue(mine, t0 + 90 * H + 10, 0, false), 0);
+    assert.equal(ownGuanoDue(mine, t0 + 91 * H + 10, 0, false), 1);
+    // Before the server's start by this page's clock (a clock a little behind): its own clock still runs.
+    const early = { passiveAt: t0 };
+    assert.equal(ownGuanoDue(early, t0 + H, 0, { since: t0 + 2 * H }), 1);
+    assert.equal(early.passiveAt, t0 + H);
+    assert.equal(ownGuanoDue({ passiveAt: t0 }, t0 + 9 * H, 0, { since: 0 }), 0);
   });
 
   it('lives where the live street pages listed Batterflies, as many as they did', () => {

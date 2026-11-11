@@ -54,6 +54,11 @@
  *   "n"), the server has the site take it first, a refusal shows "You don't
  *   have enough of that item.", and the go-ahead's op is applied once
  *   (ledgerReceipt) as the feed takes the food from the pack.
+ * - A Batterfly's hourly Guano (register G641): with a server that keeps it (the snapshot's "guano"),
+ *   one pile lies under each street Batterfly for everyone. animal-husbandry-feature draws the piles
+ *   (sharedGuano) and asks for one with the verb "pickup" on the Batterfly's id (sharedGuanoPick); the
+ *   answer's "take" goes into the pack once (sharedGuanoPicked), wherever the player stands by then.
+ *   With a server from before, each page keeps its own hourly clock as it always did.
  * - G605: a street Piggy captured (capture: Herdkeeping as "herd", the Pig Bait through the ledger,
  *   the server's roll) or poured with a Potion of Animal Youth (youth: the bottle's pour through the
  *   ledger, a Piglet on the ground for everyone) is gone for everyone until the next game day: the
@@ -120,6 +125,7 @@ import {
   applyTreeState,
   applyWoodState,
   createStreetCopy,
+  guanoPiles,
   nodeId,
   nodePerks,
   digSkill,
@@ -141,14 +147,14 @@ import {
   treeId,
   treeReady,
   treeSkill,
-} from '../street-objects.js?v=3f2d8a2c';
+} from '../street-objects.js?v=3e1098a9';
 import { ROCK_CATALOG } from '../mining.js?v=674ed39b';
 import { TRANT_META, trantStatusLabel } from '../trants.js?v=1b3c8ae3';
 import { quoteWoodTreeHarvest } from '../woodcutting.js?v=9a2039d1';
-import { animalStatusLabel, pickerMaxCount } from '../animals.js?v=e01d2a8a';
+import { animalStatusLabel, pickerMaxCount } from '../animals.js?v=07cfdcd8';
 import { highestAnimalKinshipRank, quoteAnimalKinship } from '../animal-kinship.js?v=f91347e9';
 import { animalPatrolRange, ANIMAL_BODY, TREE_FOOTPRINT } from '../street-ecology.js?v=08076876';
-import { INCUBATION, PIGGY_FEED, itemBaseCost, namedAnimalLabel, resetIncubation } from '../animal-husbandry.js?v=2d933bd6';
+import { INCUBATION, PIGGY_FEED, itemBaseCost, namedAnimalLabel, resetIncubation } from '../animal-husbandry.js?v=7b3b3181';
 import {
   applyCreatureState,
   batterflyAt,
@@ -175,7 +181,7 @@ import {
   dragonWalkAt,
   kittyWalkAt,
   walkerSpan,
-} from '../street-creatures.js?v=909163e7';
+} from '../street-creatures.js?v=af15b057';
 
 export const STREET_OBJECTS_FEATURE_ID = 'street-objects';
 const RECONCILE_MS = 250;
@@ -845,6 +851,19 @@ function answered(engine, msg, ok) {
   }
   lastAnswer = `${msg.id}:${msg.verb}:${ok ? 'ok' : msg.code || 'no'}`;
   publish(engine);
+  // The Guano under a Batterfly (sharedGuanoPick): the server gave this player the pile and credited
+  // it, so it goes into the pack once, even when the answer comes late or the player has walked on.
+  if (msg.verb === 'pickup') {
+    if (ok) engine.query?.('sharedGuanoPicked', Math.max(0, Math.floor(Number(msg.take) || 0)), engine);
+    else if (p) {
+      const line = String(msg.message || 'Not now.');
+      engine.toast?.(line, 2600);
+      engine.pushActivity?.(line);
+      engine.playSound?.('CLICK_FAILURE', { volume: 0.45 });
+    }
+    if (shared(engine)) reconcileAll(engine);
+    return;
+  }
   if (!p || copy.street !== engine.streetTsid) return;
   // G605: a Potion of Animal Youth poured on a street Piggy (sharedPigYouth): the bottle and the
   // poof are potions-feature's on the go-ahead; the Piglet comes as a shared ground stack.
@@ -1156,6 +1175,48 @@ export const streetObjectsFeature = {
   /** animal-husbandry-feature's name modal: a street Piggy's name asks the server (askName). */
   sharedAnimalName(target, value, engine) {
     return askName(engine, target, value);
+  },
+
+  /**
+   * animal-husbandry-feature: who keeps this street's hourly Batterfly Guano. { since, piles, spots }
+   * when the realtime server keeps one pile under each Batterfly for everyone (objects_guano.go):
+   * since is the Unix ms its clocks started, piles the Guano under each ({"batterfly:0": 3}) and
+   * spots each Batterfly's place, the same for everyone. False when this page's own clock runs as in
+   * solo (a server from before the shared pile, a street the server has no layout for, a site with
+   * no realtime). Null while that is not known yet (connecting, the snapshot not here): then
+   * neither clock moves, so nothing is made twice.
+   */
+  sharedGuano(engine) {
+    if (!engine || engine.mode !== 'multiplayer') return false;
+    const c = bind(engine);
+    if (!c) return null;
+    if (c.state === 'off') return false;
+    if (c.state !== 'online' || !copy.snap || copy.street !== engine.streetTsid) return null;
+    const piles = guanoPiles(copy);
+    return piles ? { since: copy.guano, piles, spots: copy.spots || {} } : false;
+  },
+
+  /**
+   * animal-husbandry-feature: pick up the Guano under a street Batterfly (target: the Batterfly).
+   * True when the server was asked (or refused for now: busy), null when the pile is not the
+   * server's. The answer runs sharedGuanoPicked with what it gave.
+   */
+  sharedGuanoPick(target, engine) {
+    const a = creatureOf(target);
+    if (!a || a.kind !== 'batterfly' || !shared(engine) || !guanoPiles(copy) || !copy.animals.has(a.id)) return null;
+    for (const p of pending.values()) {
+      if (p.id === a.id && !p.silent) {
+        engine.toast?.(COPY.busy, 1600);
+        return true;
+      }
+    }
+    reqSeq += 1;
+    if (!client.send('obj_act', actMessage({ req: reqSeq, id: a.id, verb: 'pickup' }))) {
+      engine.toast?.(COPY.connecting, 2400);
+      return true;
+    }
+    pending.set(reqSeq, { id: a.id, target, verbId: 'pickup', at: Date.now() });
+    return true;
   },
 
   /** Whether the server holds this street Piggy (animal-mood-feature leaves its ticks to it). */

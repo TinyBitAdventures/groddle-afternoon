@@ -373,7 +373,7 @@ describe('mail courier feature', () => {
   it('calls the frog with the source prompt once a letter is due, and waits in an instance', async () => {
     mock.timers.enable({ apis: ['Date'], now: 1_000_000 });
     try {
-      const { mailCourierFeature } = await import('../public/js/features/mail-courier-feature.js?v=431a3c1c');
+      const { mailCourierFeature } = await import('../public/js/features/mail-courier-feature.js?v=b0581f00');
       const st = createMailboxState();
       const prompts = [];
       let instance = false;

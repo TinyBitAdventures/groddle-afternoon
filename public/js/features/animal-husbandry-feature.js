@@ -5,7 +5,10 @@
  * - Batterflies on cave and cavern streets (one or two per street, see
  *   isBatterflyHabitat): Feed asks what and how many, food value in base
  *   cost releases Guano on the ground, and each Batterfly adds one Guano an
- *   hour while the street holds fewer than 10.
+ *   hour while the street holds fewer than 10. Online that hourly Guano is one
+ *   pile under each street Batterfly for everyone, kept by the realtime server
+ *   (register G641, objects_guano.go: guanoSharing, syncSharedPiles); Guano
+ *   from a feed, and any this page's own clock made before, stays the player's.
  * - Guano and Piggy Plop piles on the ground (Pick up; plops also Examine,
  *   Sniff, Taste). A Piggy fed 3+ crops (or any pumpkin) plops every 5 s.
  * - Chicken incubation watch: halfway bubble at 30 s, the hatchling at 60 s
@@ -48,7 +51,7 @@
  * (0.99 spares it) and &animaldeathfx=hold keeps the puff up for screenshots.
  * Canvas data:
  * husbandryDemo, husbandryLast, batterflyCount, batterflyStreetCount,
- * guanoOnStreet, plopsOnStreet, pendingPlops, packPlops, incubation,
+ * guanoOnStreet, guanoShared, guanoKeeper, plopsOnStreet, pendingPlops, packPlops, incubation,
  * extraAnimals, extraWalks, yardMachines, yardSticks, hogtied, namedAnimal, starvedPiggies,
  * yardStarved.
  */
@@ -59,7 +62,7 @@ import { nearestSurfaceY } from '../walk-surface.js?v=106bfdc5';
 import { displayTopOf, itemstackOverlayPoint, playSheetOverlay } from '../overlay-art.js?v=75c3ea34';
 import { SET_FREE, applySetFree, canSetFree, setFreeGoneLine, setFreePrompt } from '../animal-set-free.js?v=3b194fca';
 import { getGameDayKey } from '../game-day.js?v=edb00566';
-import { animalAnchorX, animalAnchorY, createAnimalState, resetAnimalDay, animalStatusLabel, listAnimalFeedOptions } from '../animals.js?v=e01d2a8a';
+import { animalAnchorX, animalAnchorY, createAnimalState, resetAnimalDay, animalStatusLabel, listAnimalFeedOptions } from '../animals.js?v=07cfdcd8';
 import {
   BABY_ANIMALS,
   BATTERFLY,
@@ -99,22 +102,22 @@ import {
   namedAnimalLabel,
   namingVerbs,
   normalizeHusbandryPack,
-  passiveGuano,
+  ownGuanoDue,
   pendingPlopCount,
   reconcilePackPlops,
   releaseHogtied,
   resetIncubation,
   stepHogtie,
   stickPlaceState,
-} from '../animal-husbandry.js?v=2d933bd6';
-import { batterflyBaseY, batterflyResponseFor, flightFloorFor } from '../street-creatures.js?v=909163e7';
+} from '../animal-husbandry.js?v=7b3b3181';
+import { batterflyBaseY, batterflyResponseFor, flightFloorFor } from '../street-creatures.js?v=af15b057';
 import { loseEnergy, shiftMetabolic } from '../metabolics.js?v=8504134e';
 import { textureFromUrl } from '../textures.js?v=f024bd6a';
 import { PIGGY_DEATH_DROPS, PIGGY_DEATH_PUFF, SAD_BABY, forcedRoll, isSadIn } from '../animal-mood.js?v=a49495fc';
-import { animalCrowdChanged, animalCrowdSad, animalPlaceIsDepressing, crowdLimit, smokePuff as sharedSmokePuff } from './animal-mood-feature.js?v=935ea6a8';
+import { animalCrowdChanged, animalCrowdSad, animalPlaceIsDepressing, crowdLimit, smokePuff as sharedSmokePuff } from './animal-mood-feature.js?v=a2c0499e';
 import { grantMoodXp } from '../mood-xp.js?v=958e7680';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
-import { followYardPath, freeYardSpot } from '../yard-wander.js?v=06a15d38';
+import { followYardPath, freeYardSpot } from '../yard-wander.js?v=1bb00dc5';
 
 export const HUSBANDRY_FEATURE_ID = 'animal-husbandry';
 export const BATTERFLY_GROUP = 'batterfly';
@@ -179,6 +182,8 @@ let pendingEnter = false;
 let generation = 0;
 let batterflies = []; // { key, sprite, target, state, baseX, baseY, phase, chewUntil }
 let piles = []; // { kind: 'guano'|'plop', row, sprite, target }
+let sharedPiles = new Map(); // online: the Guano under a street Batterfly, everyone's (key -> { key, count, sprite, target })
+let sharedGuanoAt = 0;
 let extras = []; // { row, sprite, target, drive } (their walks: js/yard-wander.js)
 let placed = []; // { kind: 'stick'|'machine', row, sprite, target }
 let lastAction = '';
@@ -405,6 +410,98 @@ function removePile(engine, pile) {
   else s.plops = s.plops.filter((p) => p !== pile.row);
   piles = piles.filter((p) => p !== pile);
   engine.unregister(pile.target);
+}
+
+// The hourly Guano: this page's own clock, or the street's shared piles (register G641)
+
+/**
+ * Who keeps this street's hourly Guano (register G641): false, this page's own clock (solo, or
+ * online with a realtime server from before the shared pile); { since, piles, spots }, the realtime
+ * server, one pile under each Batterfly for everyone (street-objects-feature sharedGuano); null,
+ * not known yet.
+ */
+function guanoSharing(engine) {
+  if (engine.mode !== 'multiplayer') return false;
+  const s = engine.query?.('sharedGuano', engine);
+  return s === undefined ? null : s;
+}
+
+/** This page's own hourly Guano for each Batterfly here (ownGuanoDue), dropped at xOf(batterfly). */
+function ownHourlyGuano(engine, t, xOf) {
+  const sharing = guanoSharing(engine);
+  if (sharing === null) return;
+  for (const b of batterflies) {
+    const n = ownGuanoDue(b.state, t, guanoOnStreet(engine), sharing);
+    if (n) dropGuano(engine, xOf(b), n);
+  }
+}
+
+function sharedPileLabel(count) {
+  return count > 1 ? `${count} Guano` : 'Guano';
+}
+
+function removeSharedPile(engine, key) {
+  const pile = sharedPiles.get(key);
+  if (!pile) return;
+  sharedPiles.delete(key);
+  engine.unregister(pile.target);
+}
+
+/**
+ * Online, with a server that keeps the hourly Guano: draw the pile under each street Batterfly as
+ * the server has it, the same for everyone there. With any other answer there are none.
+ */
+function syncSharedPiles(engine) {
+  const sharing = guanoSharing(engine);
+  const want = sharing ? sharing.piles || {} : {};
+  for (const b of batterflies) {
+    if (!/^batterfly:\d{1,2}$/.test(b.key)) continue;
+    const count = Math.floor(Number(want[b.key]) || 0);
+    const pile = sharedPiles.get(b.key);
+    if (count < 1) {
+      if (pile) removeSharedPile(engine, b.key);
+      continue;
+    }
+    if (pile) {
+      if (pile.count !== count) {
+        pile.count = count;
+        pile.target.label = sharedPileLabel(count);
+        addCountBadge(engine, pile.sprite, count);
+      }
+      continue;
+    }
+    // Under the Batterfly's spot, which the server gives every page alike.
+    const spot = sharing.spots?.[b.key];
+    const x = Array.isArray(spot) && Number.isFinite(Number(spot[0])) ? Number(spot[0]) : b.baseX;
+    const y = surfaceAt(engine, x, Array.isArray(spot) && Number.isFinite(Number(spot[1])) ? Number(spot[1]) : b.baseY + 150);
+    const spr = makeSprite(engine, ART.guano, { scale: 1, z: itemZ('guano', 1) });
+    spr.x = Math.round(x);
+    spr.y = Math.round(y) + 2;
+    spr._worldHitW = 40;
+    spr._worldHitH = 34;
+    addCountBadge(engine, spr, count);
+    const target = engine.register({
+      classId: 'guano',
+      featureId: HUSBANDRY_FEATURE_ID,
+      label: sharedPileLabel(count),
+      subtitle: 'Fertilizer, from a Batterfly',
+      sprite: spr,
+      sharedGuanoOf: b.key,
+    });
+    sharedPiles.set(b.key, { key: b.key, count, sprite: spr, target });
+  }
+  for (const key of [...sharedPiles.keys()]) {
+    if (!batterflies.some((b) => b.key === key)) removeSharedPile(engine, key);
+  }
+}
+
+/** Pick up on a shared pile: the server decides who has it (sharedGuanoPicked brings it in). */
+function pickSharedGuano(engine, pile) {
+  const b = batterflies.find((row) => row.key === pile.key);
+  const asked = b ? engine.query?.('sharedGuanoPick', b.target, engine) : null;
+  if (asked !== true) syncSharedPiles(engine);
+  lastAction = `pickup:shared:${pile.key}:${asked === true ? 'asked' : 'gone'}`;
+  publish(engine, true);
 }
 
 // —— Extra animals (released, grown, seeded) ——————————————————————————————
@@ -736,12 +833,9 @@ function spawnStreet(engine) {
     s.batterflies[key] ||= {};
     buildBatterfly(engine, key, pt.x, pt.y, s.batterflies[key]);
   });
-  // Passive guano for the time away.
-  const t = now();
-  for (const b of batterflies) {
-    const n = passiveGuano(b.state, t, guanoOnStreet(engine));
-    if (n) dropGuano(engine, b.baseX + ((b.key.length * 37) % 80) - 40, n);
-  }
+  // Passive guano for the time away. Online it waits for onTick, where it is known who keeps the
+  // street's Guano (the realtime server's word, guanoSharing).
+  if (engine.mode !== 'multiplayer') ownHourlyGuano(engine, now(), (b) => b.baseX + ((b.key.length * 37) % 80) - 40);
   for (const row of s.guano) buildPile(engine, 'guano', row);
   for (const row of s.plops) buildPile(engine, 'plop', row);
   // Named animals keep their names (getLabel) across visits and reloads.
@@ -1703,6 +1797,10 @@ function publish(engine, force = false) {
   engine.setData('batterflyCount', String(batterflies.length));
   engine.setData('batterflyStreetCount', String(batterflyCountForStreet(engine.street || {})));
   engine.setData('guanoOnStreet', String(guanoOnStreet(engine)));
+  // Online: the street's shared piles as this page draws them (batterfly:0=3,batterfly:1=1) and who keeps the hourly Guano.
+  engine.setData('guanoShared', [...sharedPiles.values()].map((p) => `${p.key}=${p.count}`).sort().join(','));
+  const sharing = batterflies.length ? guanoSharing(engine) : false;
+  engine.setData('guanoKeeper', sharing === null ? 'waiting' : sharing ? `server:${sharing.since}` : 'page');
   engine.setData('plopsOnStreet', String(s.plops.length));
   engine.setData('pendingPlops', String(pendingPlopCount()));
   engine.setData('packPlops', String(engine.inv.plop || 0));
@@ -1722,11 +1820,12 @@ function publish(engine, force = false) {
 }
 
 function clearEntities(engine) {
-  for (const list of [batterflies, piles, extras, placed]) {
+  for (const list of [batterflies, piles, extras, placed, [...sharedPiles.values()]]) {
     for (const e of list) if (e.target) engine.unregister(e.target);
   }
   batterflies = [];
   piles = [];
+  sharedPiles = new Map();
   extras = [];
   placed = [];
 }
@@ -1768,6 +1867,7 @@ export const animalHusbandryFeature = {
     generation += 1;
     batterflies = [];
     piles = [];
+    sharedPiles = new Map();
     extras = [];
     placed = [];
     spawnedFor = null;
@@ -1801,6 +1901,10 @@ export const animalHusbandryFeature = {
       incubationAt = nowMs + 250;
       watchIncubations(engine);
     }
+    if ((batterflies.length || sharedPiles.size) && nowMs >= sharedGuanoAt) {
+      sharedGuanoAt = nowMs + 250;
+      syncSharedPiles(engine);
+    }
     if (nowMs >= hogtieAt) {
       hogtieAt = nowMs + 1000;
       const step = stepHogtie(engine.inv, nowMs);
@@ -1811,10 +1915,7 @@ export const animalHusbandryFeature = {
       }
       if (step.escaped && !engine.transientInstance()) releasePiggyHere(engine, { escaped: true });
       // Passive guano while standing on a Batterfly street.
-      for (const b of batterflies) {
-        const n = passiveGuano(b.state, nowMs, guanoOnStreet(engine));
-        if (n) dropGuano(engine, b.sprite.x, n);
-      }
+      ownHourlyGuano(engine, nowMs, (b) => b.sprite.x);
     }
     if (nowMs >= yardAt) {
       yardAt = nowMs + 5000;
@@ -1932,6 +2033,11 @@ export const animalHusbandryFeature = {
       publish(engine, true);
       return true;
     }
+    const sharedPile = target.sharedGuanoOf ? sharedPiles.get(target.sharedGuanoOf) : null;
+    if (sharedPile && sharedPile.target === target) {
+      if (verb === 'pickup') pickSharedGuano(engine, sharedPile);
+      return true;
+    }
     const pile = piles.find((p) => p.target === target);
     if (pile) {
       if (verb === 'pickup') heliPick(engine, pile);
@@ -2019,6 +2125,25 @@ export const animalHusbandryFeature = {
   sharedNameLanded(target, name, engine) {
     if (!target || !name) return null;
     landName(engine, target, name);
+    return true;
+  },
+
+  /**
+   * street-objects-feature: the realtime server gave this player the Guano under a street Batterfly
+   * (objects_guano.go pickGuano, credited to the ledger as it answered): into the pack, once.
+   */
+  sharedGuanoPicked(n, engine) {
+    const count = Math.max(0, Math.floor(Number(n) || 0));
+    if (!count) return true;
+    engine.inv.guano = (engine.inv.guano || 0) + count;
+    if (engine.player) engine.floatText(engine.player.x, engine.player.y - 90, `+${count} ${itemLabel('guano', count)}`, 0x7dcea0);
+    engine.pushActivity(`You picked up ${count} ${itemLabel('guano', count)}.`);
+    emit(engine, 'guano:pickup', count);
+    lastAction = `pickup:guano:${count}`;
+    syncSharedPiles(engine);
+    engine.updateHud();
+    engine.save();
+    publish(engine, true);
     return true;
   },
 

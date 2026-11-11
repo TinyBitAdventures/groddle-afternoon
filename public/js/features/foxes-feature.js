@@ -88,7 +88,7 @@ import {
   stepFox,
 } from '../foxes.js?v=59323f35';
 import { FOX_FLURRY_COUNTER, foxLegFrom, foxOnLeg, igniteBaitXs, normalizeBaits, normalizeFoxes, preserveOverCapacity, serverId } from '../foxes-mp.js?v=5bbee4df';
-import { clockOffset } from '../street-creatures.js?v=909163e7';
+import { clockOffset } from '../street-creatures.js?v=af15b057';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
 
 export const FOX_FEATURE_ID = 'foxes';

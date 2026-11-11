@@ -248,6 +248,29 @@ export function passiveGuano(state, now, guanoOnStreet = 0) {
 }
 
 /**
+ * The hourly Guano this page's own clock owes one Batterfly, by who keeps the street's Guano
+ * (register G641; online the realtime server keeps one pile under each street Batterfly for
+ * everyone, groddle-afternoon-server objects_guano.go):
+ * - `sharing` false: this page does (solo, or a server from before the shared pile): passiveGuano.
+ * - `sharing` null: not known yet (online, the street's first word from the server has not come):
+ *   nothing moves, so nothing is made twice.
+ * - `sharing` { since }: the server has, since that Unix ms. What this page's clock had earned
+ *   before then still lands, once (a player's own Guano from before is kept until picked up);
+ *   from then on the clock only keeps time, so a return to the page's own clock starts from now
+ *   and never pays for hours the server counted.
+ */
+export function ownGuanoDue(state, now, guanoOnStreet = 0, sharing = false) {
+  if (sharing == null) return 0;
+  if (!sharing) return passiveGuano(state, now, guanoOnStreet);
+  const since = Number(sharing.since);
+  if (!(since > 0)) return 0;
+  const s = state || {};
+  const n = passiveGuano(s, Math.min(now, since), guanoOnStreet);
+  if (now > since) s.passiveAt = now;
+  return n;
+}
+
+/**
  * Cave streets: the Ilmenskie Caverns, Ilmenskie Deeps and Uralia hubs, plus
  * any street whose public or template name says cave, cavern, grotto, tunnel
  * or hollow (the item says "Found in caverns"). Seasonal outdoor things keep

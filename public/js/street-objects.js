@@ -38,7 +38,7 @@ import { TRANT_META, canHarvestTrant, fruitCapacityAt, resolveArborologyPackage 
 import { highestLightGreenThumbRank, quoteTrantCare } from './trant-care.js?v=9527ff03';
 import { RESOURCE_NODE_ALIASES, RESOURCE_NODE_CATALOG, resolveResourceSkillPackage } from './resource-nodes.js?v=7a77fd73';
 import { highestAnimalKinshipRank } from './animal-kinship.js?v=f91347e9';
-import { applyAnimalName, applyCreatureState, clockOffset, pathFrom } from './street-creatures.js?v=909163e7';
+import { applyAnimalName, applyCreatureState, clockOffset, pathFrom } from './street-creatures.js?v=af15b057';
 
 /** The resource-node classes whose stock is shared (the "N uses left, then regrows" nodes). */
 /**
@@ -410,7 +410,9 @@ export function createStreetCopy() {
   // pigTrips: the server walks street Piggies to food too (their state's "trip"); homes: each
   // Piggy's spot and walk ({"pig:0":[x, range]}) and trunks: the street's tree x, the numbers the
   // server walks it from (js/street-creatures.js piggyAt), so no page's planner can disagree.
-  return { street: '', snap: false, none: false, objs: new Map(), version: 0, creatures: false, pigPaths: false, pigTrips: false, homes: {}, trunks: null, animals: new Set(), spots: {}, offset: 0, clock: [] };
+  // guano: the server keeps the Batterflies' hourly Guano, one pile under each for everyone, its
+  // clocks running since this Unix ms (objects_guano.go); 0: each page's own clock, as before.
+  return { street: '', snap: false, none: false, objs: new Map(), version: 0, creatures: false, pigPaths: false, pigTrips: false, guano: 0, homes: {}, trunks: null, animals: new Set(), spots: {}, offset: 0, clock: [] };
 }
 
 /** Take one objs message; returns the ids it changed, or null when it is for another street. */
@@ -428,6 +430,8 @@ export function takeObjs(copy, msg, now = Date.now()) {
     copy.pigPaths = msg.pigpaths === true;
     // Slice 1 of research/plans/street-animals-shared.md: its walks to food are the server's too.
     copy.pigTrips = msg.pigtrips === true;
+    // The Batterflies' hourly Guano is the server's (objects_guano.go); a server from before says nothing.
+    copy.guano = Number.isFinite(Number(msg.guano)) && Number(msg.guano) > 0 ? Number(msg.guano) : 0;
     copy.homes = msg.homes && typeof msg.homes === 'object' ? msg.homes : {};
     copy.trunks = Array.isArray(msg.trunks) ? msg.trunks.map(Number).filter(Number.isFinite) : null;
     copy.animals = new Set(Array.isArray(msg.animals) ? msg.animals.filter((id) => typeof id === 'string') : []);
@@ -444,6 +448,20 @@ export function takeObjs(copy, msg, now = Date.now()) {
     ids.push(s.id);
   }
   return ids;
+}
+
+/**
+ * The Guano under each of the street's Batterflies as the server has it ({"batterfly:0": 3}; a
+ * Batterfly with none is left out), or null when this server does not share it (objects_guano.go).
+ */
+export function guanoPiles(copy) {
+  if (!copy?.snap || copy.none || !(copy.guano > 0)) return null;
+  const out = {};
+  for (const [id, row] of copy.objs) {
+    const n = Math.floor(Number(row?.state?.guano) || 0);
+    if (idKind(id) === 'batterfly' && n > 0) out[id] = n;
+  }
+  return out;
 }
 
 /** Take a single object's state (an obj_ok / obj_no answer). */

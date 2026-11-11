@@ -35,10 +35,10 @@ import {
   restAt,
   sharedCreatureLabel,
   walkerAt,
-} from '../public/js/street-creatures.js?v=909163e7';
-import { createStreetCopy, idKind, reconcile, takeObjs } from '../public/js/street-objects.js?v=3f2d8a2c';
-import { streetObjectsFeature } from '../public/js/features/street-objects-feature.js?v=ddc43409';
-import { FEATURES } from '../public/js/features/index.js?v=52cb0155';
+} from '../public/js/street-creatures.js?v=af15b057';
+import { actMessage, createStreetCopy, guanoPiles, idKind, reconcile, takeObjs } from '../public/js/street-objects.js?v=3e1098a9';
+import { streetObjectsFeature } from '../public/js/features/street-objects-feature.js?v=8124da77';
+import { FEATURES } from '../public/js/features/index.js?v=48de4ac7';
 import { GAME_EPOCH_MS } from '../public/js/game-day.js?v=edb00566';
 import { creatureRequests, setCreatureEcology, streetObjectLayout } from '../tools/build-realtime-objects.mjs';
 import { STREET_INDEX, applyStreetIndex, loadStreetDataFromFs } from '../public/js/street-loader.js?v=18b181ad';
@@ -248,7 +248,7 @@ describe('street animals: a Chicken\'s walk, turns and pauses (lane CHICKWALK)',
   });
 
   it('the art turns on the spot: the sprite is anchored under the bird (Chicken sheets are cut 27 px off centre)', async () => {
-    const { ANIMAL_ANCHOR_X, animalAnchorX } = await import('../public/js/animals.js?v=e01d2a8a');
+    const { ANIMAL_ANCHOR_X, animalAnchorX } = await import('../public/js/animals.js?v=07cfdcd8');
     assert.equal(animalAnchorX('npc_chicken'), 101 / 148);
     assert.equal(animalAnchorX('npc_piggy'), 0.5);
     assert.equal(animalAnchorX('npc_butterfly'), 0.5);
@@ -389,6 +389,7 @@ function rig({ mode = 'multiplayer' } = {}) {
     query(hook, t) {
       if (hook === 'realtimeClient') return client;
       if (hook === 'batterflyChew') { calls.push(['chew', t.husbandryKey]); return true; }
+      if (hook === 'sharedGuanoPicked') { calls.push(['guano', t]); return true; }
       return null;
     },
     executeVerb(target, verbId) {
@@ -509,6 +510,68 @@ describe('street animals: the feature', () => {
     assert.equal(r.bat.state.foodCounter, 0);
     // Too many: the pack says no before the server is asked.
     assert.equal(streetObjectsFeature.runVerbOverride(r.bat, 'feed:grain:99', r.engine), null);
+  });
+
+  it('the hourly Guano: one pile under each Batterfly, kept by a server that says so', () => {
+    // The copy: the server's start and its piles; a server from before says nothing.
+    const copy = createStreetCopy();
+    assert.equal(guanoPiles(copy), null);
+    takeObjs(copy, snap({ guano: 1_731_300_000_000, objs: [{ id: 'batterfly:0', food: 0, guano: 3 }, { id: 'batterfly:1', food: 2 }, { id: 'chicken:1', guano: 9 }] }));
+    assert.equal(copy.guano, 1_731_300_000_000);
+    assert.deepEqual(guanoPiles(copy), { 'batterfly:0': 3 });
+    takeObjs(copy, { t: 'objs', street: 'GSTREET', objs: [{ id: 'batterfly:0', food: 0 }] });
+    assert.deepEqual(guanoPiles(copy), {});
+    takeObjs(copy, snap({ objs: [{ id: 'batterfly:0', food: 0, guano: 3 }] }));
+    assert.equal(guanoPiles(copy), null, 'a server from before the shared pile');
+    assert.deepEqual(actMessage({ req: 4, id: 'batterfly:0', verb: 'pickup' }), { req: 4, id: 'batterfly:0', verb: 'pickup' });
+
+    // Solo: this page's own clock.
+    const solo = rig({ mode: 'solo' });
+    assert.equal(streetObjectsFeature.sharedGuano(solo.engine), false);
+    assert.equal(streetObjectsFeature.sharedGuanoPick(solo.bat, solo.engine), null);
+
+    // Online: not known until the street's snapshot comes, then the server's word.
+    const r = rig();
+    assert.equal(streetObjectsFeature.sharedGuano(r.engine), null, 'no snapshot yet: neither clock moves');
+    r.client.emit('msg:objs', snap({ guano: 1_731_300_000_000, spots: { 'batterfly:0': [700, 820] }, objs: [{ id: 'batterfly:0', food: 0, lag: 0, hold: 0, guano: 3 }] }));
+    streetObjectsFeature.onTick(16, 0, r.engine);
+    assert.deepEqual(streetObjectsFeature.sharedGuano(r.engine), { since: 1_731_300_000_000, piles: { 'batterfly:0': 3 }, spots: { 'batterfly:0': [700, 820] } });
+    // Pick up asks the server by the Batterfly's id; a second ask waits for the first.
+    assert.equal(streetObjectsFeature.sharedGuanoPick(r.bat, r.engine), true);
+    assert.deepEqual(r.sent.at(-1), { t: 'obj_act', req: 1, id: 'batterfly:0', verb: 'pickup' });
+    assert.equal(streetObjectsFeature.sharedGuanoPick(r.bat, r.engine), true);
+    assert.equal(r.sent.filter((m) => m.verb === 'pickup').length, 1);
+    // The answer: the pile into the pack once, and the pile is gone here.
+    r.client.emit('msg:obj_ok', { req: 1, id: 'batterfly:0', verb: 'pickup', take: 3, before: { id: 'batterfly:0', food: 0, guano: 3 }, obj: { id: 'batterfly:0', food: 0, lag: 0, hold: 0 } });
+    assert.deepEqual(r.calls.filter((c) => c[0] === 'guano'), [['guano', 3]]);
+    assert.deepEqual(streetObjectsFeature.sharedGuano(r.engine).piles, {});
+    assert.equal(r.calls.some((c) => c[0] === 'execute'), false, 'no local verb runs for a pickup');
+    // Someone else was first: the server's line, nothing into the pack.
+    r.client.emit('msg:objs', { t: 'objs', street: 'GSTREET', now: Date.now(), objs: [{ id: 'batterfly:0', food: 0, lag: 0, hold: 0, guano: 1 }] });
+    assert.equal(streetObjectsFeature.sharedGuanoPick(r.bat, r.engine), true);
+    r.client.emit('msg:obj_no', { req: 2, id: 'batterfly:0', verb: 'pickup', code: 'gone', message: 'Someone else picked that Guano up first.', obj: { id: 'batterfly:0', food: 0, lag: 0, hold: 0 } });
+    assert.deepEqual(r.calls.filter((c) => c[0] === 'guano'), [['guano', 3]]);
+    assert.equal(r.engine.toasts.at(-1), 'Someone else picked that Guano up first.');
+    // An answer that comes after the player walked on still brings the Guano in (the server credited it).
+    r.client.emit('msg:objs', { t: 'objs', street: 'GSTREET', now: Date.now(), objs: [{ id: 'batterfly:0', food: 0, lag: 0, hold: 0, guano: 2 }] });
+    assert.equal(streetObjectsFeature.sharedGuanoPick(r.bat, r.engine), true);
+    streetObjectsFeature.onStreetClear();
+    r.engine.streetTsid = 'GOTHER';
+    r.client.emit('msg:obj_ok', { req: 3, id: 'batterfly:0', verb: 'pickup', take: 2, obj: { id: 'batterfly:0', food: 0, lag: 0, hold: 0 } });
+    assert.deepEqual(r.calls.filter((c) => c[0] === 'guano'), [['guano', 3], ['guano', 2]]);
+
+    // A server from before the shared pile: the page's own clock, and no pickup is asked of it.
+    const old = rig();
+    old.client.emit('msg:objs', snap());
+    streetObjectsFeature.onTick(16, 0, old.engine);
+    assert.equal(streetObjectsFeature.sharedGuano(old.engine), false);
+    assert.equal(streetObjectsFeature.sharedGuanoPick(old.bat, old.engine), null);
+    assert.equal(old.sent.some((m) => m.verb === 'pickup'), false);
+    // A site with no realtime: the page's own clock. A socket still connecting: wait.
+    old.client.state = 'off';
+    assert.equal(streetObjectsFeature.sharedGuano(old.engine), false);
+    old.client.state = 'connecting';
+    assert.equal(streetObjectsFeature.sharedGuano(old.engine), null);
   });
 
   it('someone else\'s verb shows here: the squeeze, the milking, the chew', () => {
