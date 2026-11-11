@@ -5192,6 +5192,8 @@ function renderPackRow(box, slots, opts = {}) {
       opener.innerHTML = `<b>${s.bag.used}/${s.bag.capacity}</b><i aria-hidden="true"></i>`;
       // The modern bag button draws the opener as its fill bar; the tray's Options opens the bag's card.
       opener.style.setProperty('--pack-fill', String(s.bag.capacity ? Math.min(1, s.bag.used / s.bag.capacity) : 0));
+      // G656 (mr granberry's Ideas post): a full bag's bar reads full at a glance (Classic shows the count).
+      opener.classList.toggle('is-full', s.bag.capacity > 0 && s.bag.used >= s.bag.capacity);
       slot.appendChild(opener);
     } else if (!(s.isTool || opts.toolRow) || s.count > 1) {
       if (s.count < 2) slot.classList.add('is-single');

@@ -2884,6 +2884,8 @@ button.play-context-head:focus-visible {
 }
 .pack-bag-opener b,
 .pack-bag-opener i { display: none; }
+/* G656: full, in the accent, so 16 of 16 never looks like 15 of 16. */
+.pack-bag-opener.is-full { background: var(--accent); }
 .pack-slots .pack-slot.pack-bag.is-open { background: var(--surface-moss); transform: none; }
 .pack-slots .pack-slot.is-drop-target {
   background: var(--surface-moss);

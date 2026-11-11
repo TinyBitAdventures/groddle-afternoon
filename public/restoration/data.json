@@ -2752,9 +2752,14 @@
   "deployed": "2026-11-11"
  },
  "git": {
-  "commits": 1666,
+  "commits": 1667,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-11",
+    "kind": "fix",
+    "text": "Saying the next incantation line yourself waits for someone new, as in Glitch"
+   },
    {
     "date": "2026-11-11",
     "kind": "fix",
@@ -2869,14 +2874,9 @@
     "date": "2026-11-11",
     "kind": "fix",
     "text": "Real players chant the Incantations together"
-   },
-   {
-    "date": "2026-11-11",
-    "kind": "fix",
-    "text": "It's Educational II is offered after Part I, as the Greeterbot gave it"
    }
   ]
  },
- "tests": 811,
+ "tests": 812,
  "generatedAt": "2026-11-11"
 }
