@@ -112,6 +112,27 @@ describe('the boards\' words and links (groddle-afternoon-site src/CommunityText
     assert.match(php(`T::bodyHtml(${phpString('https://groddle.localhost/x')}, T::homeHosts('groddleafternoon.com'))`), /data-chat-link="away"/);
   });
 
+  it('a post draws basic Markdown, still escaped, and its snippets drop the marks', () => {
+    const md = (text) => php(`T::bodyHtml(${phpString(text)})`);
+    assert.equal(md('Hi **bold**, *it*, _it_, __b__, ~~x~~ and `c*d*` end'), '<p>Hi <strong>bold</strong>, <em>it</em>, <em>it</em>, <strong>b</strong>, <del>x</del> and <code>c*d*</code> end</p>');
+    // snake_case and lone or unpaired marks stay as typed.
+    assert.equal(md('snake_case_name and a * b and **open'), '<p>snake_case_name and a * b and **open</p>');
+    // Emphasis spans an address; the address keeps its underscores.
+    assert.match(md('**see https://example.com/a_b_c now**'), /^<p><strong>see <a [^>]*href="https:\/\/example\.com\/a_b_c"[^>]*>https:\/\/example\.com\/a_b_c<\/a> now<\/strong><\/p>$/);
+    // [words](link) passes readLink like a bare address, or stays as typed.
+    assert.match(md('[the map](https://groddleafternoon.com/encyclopedia/)'), /<a class="chat-link" data-chat-link="home" href="https:\/\/groddleafternoon\.com\/encyclopedia\/" rel="ugc">the map<\/a>/);
+    assert.equal(md('[bad](javascript:alert(1)) [x](ftp://a.b)'), '<p>[bad](javascript:alert(1)) [x](ftp://a.b)</p>');
+    assert.equal(md('- one\n* **two**\n\n1. first\n2) second\nafter'), '<ul><li>one</li><li><strong>two</strong></li></ul><ol><li>first</li><li>second</li></ol><p>after</p>');
+    assert.equal(md('> said *so*\n> twice\nme'), '<blockquote><p>said <em>so</em><br />twice</p></blockquote><p>me</p>');
+    assert.equal(md('```\n<b>raw</b> **no**\n```\nafter'), '<pre><code>&lt;b&gt;raw&lt;/b&gt; **no**</code></pre><p>after</p>');
+    assert.equal(md('```\nnot closed'), '<p>```<br />not closed</p>');
+    assert.equal(md('<script>x</script> **<i>y</i>**'), '<p>&lt;script&gt;x&lt;/script&gt; <strong>&lt;i&gt;y&lt;/i&gt;</strong></p>');
+    assert.equal(md('*a **b** c*'), '<p><em>a <strong>b</strong> c</em></p>');
+    assert.equal(php(`T::plain(${phpString('**Bold** [map](https://x.com) `code` and _it_\n- item')})`), 'Bold map code and it\nitem');
+    // Chat lines keep lineHtml: no Markdown there.
+    assert.equal(php(`T::lineHtml(${phpString('**hi**')}, T::HOME_HOSTS)`), '**hi**');
+  });
+
   it('titles and posts are cleaned and word-filtered when written; the limits refuse what is too much', () => {
     assert.equal(php(`T::title(${phpString('  Lost\n my  hat\u0007 you fuck  ')})`), 'Lost my hat you #!@$');
     assert.equal(php(`T::body(${phpString('  hi  \r\n\r\n\r\n\r\n\r\nthere\t!  ')})`), 'hi\n\n\nthere    !');
