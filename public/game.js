@@ -26954,6 +26954,14 @@ function handleBuffEvents(events = []) {
       if (event.classTsid === 'purple_flower') {
         pulsePurpleJunk();
         if (player) floatText(player.x, player.y - 78, '+1 iMG · zibblezibzob', 0xc070e8);
+      } else if (event.classTsid === 'well_fed_energy') {
+        // Report #207: Apple a Day's boost comes on its one tick, at the end (catalog_buffs.js 2816-2832,
+        // tick_duration 30 = duration, metabolics_add_energy 5); it landed with nothing to show for it.
+        const got = Number(event.effects?.energy) || 0;
+        pushActivity(got
+          ? { base: 'Apple a Day gives its energy boost', effects: event.effects }
+          : 'Apple a Day ends, but your energy is already full.');
+        if (player && got > 0) floatText(player.x, player.y - 76, `+${got} energy`);
       } else if (event.classTsid === 'hairball_flower' && event.effects?.energy) {
         pushActivity({ base: 'Hairball Rally takes its energetic toll', effects: event.effects });
         if (player) floatText(player.x, player.y - 76, `${event.effects.energy} energy`, 0xff8888);
