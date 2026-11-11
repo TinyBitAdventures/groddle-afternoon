@@ -20,11 +20,18 @@
  * out yet, and has gone). 19 potions have one: the eleven the Cauldron's quaffs and pours use,
  * the five Master Gardener potions, Tree Poison and its Antidote, and the Rook Balm. (Until
  * 2026-11-10 the game rocked the pack icon, and the Rook Balm's sheet was cut as 10 x 7 cells of
- * 88 px and never drawn.) Draught of Wisdom, Rocky Regeneration Solution and Alphabet Sauce have
- * the scene in their SWFs but no OGA sheet; they keep the rocking icon.
+ * 88 px and never drawn.)
+ *
+ * Draught of Wisdom (potion_xp), Rocky Regeneration Solution and Alphabet Sauce have the same
+ * scene in their SWFs (frames 3-77, 3-77 and 6-80) and no OGA sheet, so their sheets are drawn
+ * from the SWFs (tools/packed-sheets/build.py --render) in the box the recorded cells sit in:
+ * it starts 40 px left of and 32 px above the stage's corner, as the 15 recorded potions of
+ * their 52.8 x 59.4 stage do, and ends where the art ends. Measured, they come out as the
+ * family does: cells of 80 x 103 (Wisdom) and 80 x 105, the art from 19 px in, frames 1, 74 and
+ * 75 empty. All 22 pour alike.
  */
 
-import { PACKED_SHEETS } from './packed-sheets-data.js?v=32023e3a';
+import { PACKED_SHEETS } from './packed-sheets-data.js?v=192c6f15';
 
 /** The overlay's 2500 ms (and the effect's timer). */
 export const POTION_POUR_MS = 2500;

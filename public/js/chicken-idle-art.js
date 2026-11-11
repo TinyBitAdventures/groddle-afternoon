@@ -8,8 +8,8 @@
  * with no Chicken costs nothing; until a sheet is in, the bird holds the still it always had.
  */
 
-import { CHICKEN_IDLE_FPS, CHICKEN_IDLE_FRAMES, chickenIdleFrame, chickenIdleSheet, chickenPoseState } from './chicken-idles.js?v=2d5c6d41';
-import { createPackedLoader } from './packed-sheets.js?v=cb13ee62';
+import { CHICKEN_IDLE_FPS, CHICKEN_IDLE_FRAMES, chickenIdleFrame, chickenIdleSheet, chickenPoseState } from './chicken-idles.js?v=eef0279b';
+import { createPackedLoader } from './packed-sheets.js?v=da88fa23';
 
 const WALK_SPEED = 0.12;
 const IDLE_STATES = Object.keys(CHICKEN_IDLE_FRAMES);

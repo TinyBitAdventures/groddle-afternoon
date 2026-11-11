@@ -251,7 +251,7 @@ describe('Regional shrines wear their own art (33 classes, OGA CC0)', () => {
     const results = JSON.parse(readFileSync(join(root, 'tools/vector-sprites/results.json'), 'utf8'));
     assert.equal(manifest.jobs.length, 33);
     assert.equal(manifest.firstDraw, true);
-    const { HIRES_SPRITES } = await import('../public/js/sprite-hires.js?v=6b09d38f');
+    const { HIRES_SPRITES } = await import('../public/js/sprite-hires.js?v=dd5da64c');
     for (const row of variantFiles()) {
       const job = manifest.jobs.find((j) => j.sheets.some((sh) => sh.path === row.out));
       assert.ok(job, row.out);

@@ -280,7 +280,7 @@ print(json.dumps(out))`;
   });
 
   test('every sheet has a 3x render from npc_spinning_wheel.swf, matched to the 1x frame for frame', async () => {
-    const { HIRES_SPRITES, SPLIT_SPRITES, FIRST_DRAW_SPRITES } = await import('../public/js/sprite-hires.js?v=6b09d38f');
+    const { HIRES_SPRITES, SPLIT_SPRITES, FIRST_DRAW_SPRITES } = await import('../public/js/sprite-hires.js?v=dd5da64c');
     const results = JSON.parse(fs.readFileSync(path.join(root, 'tools/vector-sprites/results.json'), 'utf8'));
     const manifest = JSON.parse(fs.readFileSync(path.join(root, 'tools/vector-sprites/spinning-wheel.json'), 'utf8'));
     assert.deepEqual(

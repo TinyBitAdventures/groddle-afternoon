@@ -24,7 +24,12 @@ measured here, never trusted: the sheet must divide into fw x fh cells, and the 
 cells must hold art (all but those a row lists in `blank`: a frame Tiny Speck's recording left
 empty, which gets -1 in seq) and no cell after them.
 
+A row with `render` in place of `file` (the three potions Tiny Speck's dump has no sheet for) is
+drawn here from its SWF: see render_cells. Such a row is rebuilt only with --render (it needs
+glitch-items and FFDec); otherwise its shipped file is checked against results.json.
+
   python3.11 -I tools/packed-sheets/build.py            writes the sheets, results.json and the module
+  python3.11 -I tools/packed-sheets/build.py --render   the same, drawing the rendered rows again too
   python3.11 -I tools/packed-sheets/build.py --check    exit 1 when anything is stale. With the OGA
         dump beside the repo every sheet is rebuilt and compared pixel for pixel; without it the
         shipped files are checked against results.json (pixel hashes), and the module against it.
@@ -86,17 +91,94 @@ def measure(row):
     return cells, cols, rows
 
 
+ITEMS = None
+
+
+def items_dir():
+    """tinyspeck/glitch-items beside the repo (or in the audit folder), or None."""
+    for d in (os.environ.get('GLITCH_ITEMS'), os.path.join(os.path.dirname(SPIKE), 'glitch-items'), os.path.expanduser('~/Documents/glitch-audit/glitch-items')):
+        if d and os.path.isdir(d):
+            return d
+    return None
+
+
+def render_cells(row, work):
+    """A state Tiny Speck never recorded, drawn from its SWF the way their recordings sit.
+
+    row['render'] = { swf, start, frames, origin: [x, y] }: frames start..start+frames-1 of the root
+    timeline are exported by FFDec at zoom 3 from a copy with a padded stage (as
+    tools/world-art/render.py does), and each 1x cell is the 3:1 box downscale of one box of that
+    render. The box starts at `origin` from the authored stage's top left, where the recorded
+    potions' cells start (-40, -32: measured from the 15 recorded potions of this stage size against
+    their own SWFs), and runs right and down to the end of the art over all frames, as theirs do.
+    Returns (cells, cols, rows, measured).
+    """
+    import subprocess
+    import tempfile
+    from PIL import Image
+    sys.path.insert(0, os.path.join(SPIKE, 'tools'))
+    sys.path.insert(0, os.path.join(SPIKE, 'tools', 'icon-hires'))
+    import swfinfo  # noqa: E402
+    from java_path import JAVA  # noqa: E402
+    r = row['render']
+    src = os.path.join(items_dir(), r['swf'])
+    info = swfinfo.read(src)
+    x0, x1, y0, y1 = info['rect']
+    sw, sh = x1 - x0, y1 - y0
+    tmp = work or tempfile.mkdtemp(prefix='packed-render-')
+    src_dir = os.path.join(tmp, f"src-{row['name']}")
+    out_dir = os.path.join(tmp, f"out-{row['name']}")
+    os.makedirs(src_dir, exist_ok=True)
+    swfinfo.rewrite(src, os.path.join(src_dir, f"{row['name']}.swf"), pad=1.0)
+    first, n = r['start'], r['frames']
+    ffdec = os.path.expanduser('~/Documents/glitch-audit/tools/ffdec/ffdec.jar')
+    subprocess.run([JAVA, '-Djava.awt.headless=true', '-jar', ffdec, '-zoom', '3', '-ignorebackground',
+                    '-select', f'{first}-{first + n - 1}', '-format', 'frame:png', '-export', 'frame', out_dir, src_dir],
+                   capture_output=True, text=True, check=True)
+    frames = []
+    for k in range(n):
+        png = os.path.join(out_dir, f"{row['name']}.swf", f'{first + k}.png')
+        if not os.path.exists(png):
+            raise SystemExit(f"{row['set']} {row['name']}: FFDec gave no frame {first + k}")
+        frames.append(Image.open(png).convert('RGBA'))
+    # The padded stage starts one stage size left of and above the authored one.
+    ox, oy = round((sw + r['origin'][0]) * 3), round((sh + r['origin'][1]) * 3)
+    art = None
+    for f in frames:
+        bb = f.getchannel('A').getbbox()
+        if bb:
+            art = bb if art is None else (min(art[0], bb[0]), min(art[1], bb[1]), max(art[2], bb[2]), max(art[3], bb[3]))
+    if art[0] < ox or art[1] < oy:
+        raise SystemExit(f"{row['set']} {row['name']}: art starts at {art[:2]} (3x), before the cell's origin {(ox, oy)}")
+    cw, ch = -(-(art[2] - ox) // 3), -(-(art[3] - oy) // 3)
+    cells = []
+    for f in frames:
+        box = f.crop((ox, oy, ox + cw * 3, oy + ch * 3))
+        # A box filter on premultiplied colour: what a 3:1 downscale of the drawing is.
+        cells.append(box.convert('RGBa').resize((cw, ch), Image.BOX).convert('RGBA'))
+    blank = [k for k, c in enumerate(cells) if not c.getchannel('A').getbbox()]
+    cols = 11
+    measured = {'stage': [round(sw, 2), round(sh, 2)], 'origin': list(r['origin']), 'cell': [cw, ch], 'frames': n, 'blank': blank,
+                'art3x': [art[0] - ox, art[1] - oy, art[2] - ox, art[3] - oy], 'swf': r['swf'], 'swfFrames': [first, first + n - 1]}
+    return cells, cols, -(-n // cols), measured
+
+
 def clear_transparent(img):
     from PIL import Image
     blank = Image.new('RGBA', img.size, (0, 0, 0, 0))
     return Image.composite(img, blank, img.getchannel('A').point(lambda a: 255 if a else 0))
 
 
-def plan(row):
+def plan(row, work=None):
     """Pack one state. Returns (image, result row)."""
     from PIL import Image
-    cells, src_cols, src_rows = measure(row)
-    fw, fh = row['fw'], row['fh']
+    measured = None
+    if row.get('render'):
+        cells, src_cols, src_rows, measured = render_cells(row, work)
+        fw, fh = measured['cell']
+    else:
+        cells, src_cols, src_rows = measure(row)
+        fw, fh = row['fw'], row['fh']
     box = None
     for c in cells:
         bb = c.getchannel('A').getbbox()
@@ -132,9 +214,14 @@ def plan(row):
         'fw': w, 'fh': h, 'cols': cols, 'cells': n, 'frames': len(cells),
         'cell': [fw, fh], 'at': [x0, y0], 'fps': row.get('fps', 30), 'loop': bool(row.get('loop', False)),
         'seq': None if seq == list(range(len(cells))) else seq,
-        'oga': {'file': row['file'], 'size': [src_cols * fw, src_rows * fh], 'cols': src_cols, 'rows': src_rows, 'art': list(box)},
         'pixels': hashlib.sha256(out.tobytes()).hexdigest(),
     }
+    if measured:
+        # No recording of Tiny Speck's: the cells are this tool's own render of their SWF.
+        res['render'] = measured
+        res['frameList'] = [measured['swfFrames'][0] + k for k in first]
+    else:
+        res['oga'] = {'file': row['file'], 'size': [src_cols * fw, src_rows * fh], 'cols': src_cols, 'rows': src_rows, 'art': list(box)}
     if swf.get('start'):
         res['frameList'] = [swf['start'] + k for k in first]
     return out, res
@@ -165,9 +252,14 @@ def js_text(results):
     for name in sorted(sets):
         lines.append(f'  {json.dumps(name)}: Object.freeze({{')
         for r in sets[name]:
-            oga = r['oga']
-            lines.append(f"    // OGA {oga['file']}: {oga['size'][0]}x{oga['size'][1]}, {oga['cols']} x {oga['rows']} cells of "
-                         f"{r['cell'][0]}x{r['cell'][1]}, {r['frames']} frames, {r['cells']} distinct")
+            if r.get('render'):
+                m = r['render']
+                lines.append(f"    // Rendered from {os.path.basename(m['swf'])} frames {m['swfFrames'][0]}-{m['swfFrames'][1]} (no OGA sheet): cells of "
+                             f"{r['cell'][0]}x{r['cell'][1]}, {r['frames']} frames, {r['cells']} distinct")
+            else:
+                oga = r['oga']
+                lines.append(f"    // OGA {oga['file']}: {oga['size'][0]}x{oga['size'][1]}, {oga['cols']} x {oga['rows']} cells of "
+                             f"{r['cell'][0]}x{r['cell'][1]}, {r['frames']} frames, {r['cells']} distinct")
             seq = '' if r['seq'] is None else f", seq: Object.freeze({json.dumps(r['seq'], separators=(',', ':'))})"
             lines.append(f"    {json.dumps(r['name'])}: Object.freeze({{ path: '{r['path']}', fw: {r['fw']}, fh: {r['fh']}, cols: {r['cols']}, "
                          f"frames: {r['cells']}, plays: {r['frames']}, cell: Object.freeze([{r['cell'][0]}, {r['cell'][1]}]), "
@@ -181,6 +273,8 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--check', action='store_true')
     ap.add_argument('--only', default='')
+    ap.add_argument('--render', action='store_true', help='draw the rows rendered from a SWF again (needs glitch-items and FFDec)')
+    ap.add_argument('--work', default='')
     args = ap.parse_args()
     rows = json.load(open(MANIFEST))['sheets']
     old = {(r['set'], r['name']): r for r in (json.load(open(RESULTS))['sheets'] if os.path.exists(RESULTS) else [])}
@@ -189,7 +283,8 @@ def main():
     for row in rows:
         key = (row['set'], row['name'])
         out_path = os.path.join(PUBLIC, row['out'])
-        if AUDIT is None or (args.only and args.only not in f"{row['set']}/{row['name']}"):
+        rendered = bool(row.get('render'))
+        if (AUDIT is None and not rendered) or (rendered and not (args.render and items_dir())) or (args.only and args.only not in f"{row['set']}/{row['name']}"):
             # No dump here (a public clone), or not asked for: the shipped file against the last results.
             res = old.get(key)
             if not res:
@@ -199,7 +294,7 @@ def main():
                 stale.append(f"{row['out']}: missing or not the pixels in results.json")
             results.append(res)
             continue
-        img, res = plan(row)
+        img, res = plan(row, args.work or None)
         results.append(res)
         if args.check:
             if not os.path.exists(out_path) or shipped_hash(out_path) != res['pixels']:

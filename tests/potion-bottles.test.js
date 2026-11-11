@@ -19,10 +19,10 @@ import {
   potionBottleClasses,
   potionBottleSheet,
   potionPourSide,
-} from '../public/js/potion-bottles.js?v=5b0bdabe';
-import { PACKED_SHEETS } from '../public/js/packed-sheets-data.js?v=32023e3a';
-import { packedCell, packedDurationMs, packedFrameAt } from '../public/js/packed-sheets.js?v=cb13ee62';
-import { KEEP_SHEETS, itemOverlayPlacement, pcOverlayPoint } from '../public/js/item-overlay.js?v=99215179';
+} from '../public/js/potion-bottles.js?v=17925871';
+import { PACKED_SHEETS } from '../public/js/packed-sheets-data.js?v=192c6f15';
+import { packedCell, packedDurationMs, packedFrameAt } from '../public/js/packed-sheets.js?v=da88fa23';
+import { KEEP_SHEETS, itemOverlayPlacement, pcOverlayPoint } from '../public/js/item-overlay.js?v=37bde39e';
 import { POTIONS } from '../public/js/potions.js?v=4f4c996d';
 import { GARDEN_POTIONS } from '../public/js/master-garden.js?v=2953386a';
 import { TREE_ANTIDOTE, TREE_POISON } from '../public/js/tree-poison.js?v=5ceea244';
@@ -55,9 +55,16 @@ const SHEETS = {
   potion_tree_poison_antidote: [880, 721],
 };
 
+// The three with no OGA sheet, drawn from their SWFs: the cell they come out as, and the scene's frames.
+const RENDERED = {
+  potion_xp: { cell: [80, 103], swf: [3, 77] },
+  potion_rocky_regeneration_solution: { cell: [80, 105], swf: [3, 77] },
+  potion_alphabet_sauce: { cell: [80, 105], swf: [6, 80] },
+};
+
 describe('the source says where the bottle goes', { skip: existsSync(join(GSJS, 'potion_amorous_philtre.js')) ? false : 'clone tinyspeck/glitch-GameServerJS beside the repo' }, () => {
-  it('every one of the 19: a pour on its target (delta_y 20, mirrored and 10 px over when the target is left), else over you (-135, 60 x 60), 2500 ms', () => {
-    for (const cls of Object.keys(SHEETS)) {
+  it('every one of the 22: a pour on its target (delta_y 20, mirrored and 10 px over when the target is left), else over you (-135, 60 x 60), 2500 ms', () => {
+    for (const cls of [...Object.keys(SHEETS), ...Object.keys(RENDERED)]) {
       const src = readFileSync(join(GSJS, `${cls}.js`), 'utf8');
       assert.match(src, /if \(target\.x < pc\.x\)\{\s+var state = '-tool_animation';\s+var delta_x = 10;[\s\S]{0,120}?\}\s+else\{\s+var state = 'tool_animation';\s+var delta_x = -10;/, cls);
       assert.match(src, /type: 'itemstack_overlay',\s+itemstack_tsid: target\.tsid,\s+duration: 2500,\s+item_class: this\.class_tsid,\s+state: state,\s+locking: true,\s+delta_x: delta_x,\s+delta_y: 20,/, cls);
@@ -115,8 +122,8 @@ describe('the pour', () => {
 });
 
 describe('the sheets', () => {
-  it('are the 19 potions, each 11 x 7 cells with 72 drawn, as measured', () => {
-    assert.deepEqual(Object.keys(PACKED_SHEETS.potions).sort(), Object.keys(SHEETS).sort());
+  it('are the 19 recorded potions, each 11 x 7 cells with 72 drawn, as measured, and the three drawn from their SWFs', () => {
+    assert.deepEqual(Object.keys(PACKED_SHEETS.potions).sort(), [...Object.keys(SHEETS), ...Object.keys(RENDERED)].sort());
     const results = JSON.parse(readFileSync(join(root, 'tools/packed-sheets/results.json'), 'utf8')).sheets;
     for (const [cls, [w, h]] of Object.entries(SHEETS)) {
       const def = PACKED_SHEETS.potions[cls];
@@ -134,6 +141,40 @@ describe('the sheets', () => {
       // The SWF scene: root frames 3-77; packed cell i is frame 4 + i.
       assert.deepEqual(row.frameList, Array.from({ length: 72 }, (_, i) => 4 + i), cls);
     }
+  });
+
+  it('the three with no recording come out as the recorded ones do: the same box, the same empty frames, the same packing', () => {
+    const results = JSON.parse(readFileSync(join(root, 'tools/packed-sheets/results.json'), 'utf8')).sheets;
+    const manifest = JSON.parse(readFileSync(join(root, 'tools/packed-sheets/sheets.json'), 'utf8')).sheets;
+    for (const [cls, want] of Object.entries(RENDERED)) {
+      const row = results.find((r) => r.set === 'potions' && r.name === cls);
+      const def = PACKED_SHEETS.potions[cls];
+      assert.equal(row.oga, undefined, `${cls}: no OGA sheet`);
+      const m = row.render;
+      assert.equal(m.swf, `alchemy/${cls}/${cls}.swf`, cls);
+      assert.deepEqual(m.swfFrames, want.swf, cls);
+      // The box: 40 px left of and 32 px above the stage's corner, as the recorded potions of this stage size.
+      assert.deepEqual(m.origin, [-40, -32], cls);
+      assert.ok(Math.abs(m.stage[0] - 52.8) < 0.2 && Math.abs(m.stage[1] - 59.35) < 0.2, `${cls}: stage ${m.stage}`);
+      assert.deepEqual(m.cell, want.cell, cls);
+      assert.deepEqual([...def.cell], want.cell, cls);
+      assert.deepEqual([m.frames, def.plays, def.frames], [75, 75, 72], cls);
+      assert.deepEqual(m.blank, [0, 73, 74], cls);
+      // The art starts 19 px in (58 or 59 px at 3x) and at the top, as in every recorded 80 px cell.
+      assert.ok(m.art3x[0] >= 57 && m.art3x[0] <= 60 && m.art3x[1] <= 1, `${cls}: art ${m.art3x}`);
+      // The 80 px cell (240 at 3x) ends where the art ends, to the 1x pixel.
+      assert.ok(m.art3x[2] > 237 && m.art3x[2] <= 240, `${cls}: art ${m.art3x}`);
+      assert.ok(m.art3x[3] > want.cell[1] * 3 - 3 && m.art3x[3] <= want.cell[1] * 3, `${cls}: art ${m.art3x}`);
+      assert.deepEqual([def.fw, def.fh, def.cols, ...def.at], [63, want.cell[1], 11, 17, 0], cls);
+      assert.deepEqual([def.seq[0], def.seq[73], def.seq[74]], [-1, -1, -1], cls);
+      assert.deepEqual(def.seq.slice(1, 73), Array.from({ length: 72 }, (_, i) => i), cls);
+      assert.deepEqual([def.loop, def.fps], [true, 30], cls);
+      assert.deepEqual(row.frameList, Array.from({ length: 72 }, (_, i) => want.swf[0] + 1 + i), cls);
+      assert.deepEqual(manifest.find((r) => r.name === cls).render, { swf: m.swf, start: want.swf[0], frames: 75, origin: [-40, -32] }, cls);
+    }
+    // A recorded potion of the same stage for comparison: packed 63 px wide from 17 px in.
+    const rec = PACKED_SHEETS.potions.potion_tree_poison;
+    assert.deepEqual([rec.fw, rec.fh, rec.cols, ...rec.at, ...rec.cell], [63, 103, 11, 17, 0, 80, 103]);
   });
 
   it('each file is its packed grid, with a 3x twin three times its size that waits for its first draw', () => {
@@ -166,10 +207,11 @@ describe('the sheets', () => {
 });
 
 describe('where the game plays it', () => {
-  it('every potion the game lets you use has its bottle, but the three with no sheet', () => {
+  it('every potion the game lets you use has its bottle: all 22 pour alike', () => {
     const have = new Set(potionBottleClasses());
     const without = Object.keys(POTIONS).filter((cls) => !have.has(cls)).sort();
-    assert.deepEqual(without, ['potion_alphabet_sauce', 'potion_rocky_regeneration_solution', 'potion_xp']);
+    assert.deepEqual(without, []);
+    assert.equal(Object.keys(PACKED_SHEETS.potions).length, 22);
     for (const cls of [...Object.keys(GARDEN_POTIONS), TREE_POISON, TREE_ANTIDOTE, 'potion_rook_balm']) assert.ok(potionBottleSheet(cls), cls);
     assert.equal(potionBottleSheet('apple'), null);
   });

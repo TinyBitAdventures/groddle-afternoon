@@ -38,8 +38,8 @@
  */
 
 import { slugsFromEffects } from '../speech-slugs.js?v=130338f9';
-import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=d9a73bdc';
-import { followPath } from '../street-creatures.js?v=e0768d00';
+import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=59ca0e2b';
+import { followPath } from '../street-creatures.js?v=9da7fe66';
 import { landingY, nearestSurfaceY, walkSurfaceY } from '../walk-surface.js?v=106bfdc5';
 import { loadWildlifeCatalog, wildlifeCatalog, wildlifeFor } from '../wildlife.js?v=670c3a7f';
 import {
