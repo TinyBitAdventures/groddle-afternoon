@@ -127,7 +127,7 @@ describe('G554: a recipe opened from far down the list opens at its top', () => 
     assert.ok(tile.indexOf('setMakeScroll(0)') > tile.indexOf('renderMakePanel()'), 'set after the recipe is in');
   });
   it('Back returns to that place, after the list is back', () => {
-    const back = body.slice(body.indexOf("detail.querySelector('[data-make-back]')"), body.indexOf('const applyQty'));
+    const back = game.slice(game.indexOf('function makeNavBack('), game.indexOf('function makeGridKey('));
     assert.ok(back.indexOf('setMakeScroll(makeListScroll)') > back.indexOf('renderMakePanel()'));
   });
   it('a recipe redrawn while open keeps its scroll: only the tile resets it', () => {

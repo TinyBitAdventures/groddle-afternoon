@@ -2752,9 +2752,14 @@
   "deployed": "2026-11-11"
  },
  "git": {
-  "commits": 1651,
+  "commits": 1652,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-11",
+    "kind": "fix",
+    "text": "Contraband only goes to streets you can reach"
+   },
    {
     "date": "2026-11-11",
     "kind": "fix",
@@ -2869,11 +2874,6 @@
     "date": "2026-11-10",
     "kind": "improve",
     "text": "A Still rings its chime when it runs dry or fills up"
-   },
-   {
-    "date": "2026-11-10",
-    "kind": "improve",
-    "text": "A machine that finishes a job plays the machines' own ready beep, and the chime is the Still's"
    }
   ]
  },

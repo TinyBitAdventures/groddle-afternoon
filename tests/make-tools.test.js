@@ -190,7 +190,7 @@ describe('the window: tools first, a tool\'s screen with a way back, two searche
     assert.match(body, /toolsEl\.hidden = !showTools;/);
     assert.match(body, /renderMakeTools\(toolsEl, searchRecipes\('', \{ tool: 'all', \.\.\.known \}\), canMakeNow\)/);
     assert.match(body, /panel\.dataset\.makeView = inTool \? 'tool' : query \? 'search' : 'tools';/);
-    assert.match(body, /backEl\.hidden = !inTool;/);
+    assert.match(body, /backEl\.hidden = !inTool && !makeSelected;/);
   });
 
   it('the search stays in the open tool, and looks in every tool from the first screen', () => {
@@ -208,7 +208,9 @@ describe('the window: tools first, a tool\'s screen with a way back, two searche
     const back = game.slice(game.indexOf('function showMakeTools('), game.indexOf('function makeStepBack('));
     assert.match(back, /makeView = 'tools';/);
     assert.match(back, /setMakeScroll\(keepSearch \? 0 : makeToolsScroll\);/);
-    assert.match(game, /getElementById\('make-tools-back'\)\?\.addEventListener\('click', \(event\) => showMakeTools\(event\)\);/);
+    assert.match(game, /getElementById\('make-tools-back'\)\?\.addEventListener\('click', \(event\) => makeNavBack\(event\)\);/);
+    const nav = game.slice(game.indexOf('function makeNavBack('), game.indexOf('function makeGridKey('));
+    assert.match(nav, /if \(makeSelected\) \{[\s\S]*clearMakeFeedback\(\);\s*renderMakePanel\(\);\s*setMakeScroll\(makeListScroll\);[\s\S]*\}\s*showMakeTools\(event\);/);
     assert.match(game, /btn\.addEventListener\('click', \(event\) => openMakeTool\(t\.classTsid, event\)\);/);
   });
 
@@ -224,7 +226,10 @@ describe('the window: tools first, a tool\'s screen with a way back, two searche
 
   it('nothing about making changed: the recipe view, Make and the work are the same calls', () => {
     assert.match(body, /detail\.querySelector\('\[data-make-go\]'\)\?\.addEventListener\('click', \(\) => \{\s*runMakeCraft\(key, makeQty\);/);
-    assert.match(body, /<button type="button" class="btn-glitch-back" data-make-back>← Back<\/button>/);
+    // Austin 2026-11-11: one way back, the pill over the panel, named after where it goes.
+    assert.ok(!body.includes('data-make-back') && !game.includes('data-mr-back'), 'no second Back in the recipe or its result');
+    assert.match(body, /backEl\.hidden = !inTool && !makeSelected;/);
+    assert.match(body, /const to = makeSelected && inTool \? toolLabel : makeSelected && query \? 'Recipes' : 'Tools';/);
     assert.match(body, /tile\.className = 'make-tile'/);
     assert.match(body, /<span class="tile-label">\$\{recipe\.name\}<\/span>/);
   });
@@ -233,7 +238,7 @@ describe('the window: tools first, a tool\'s screen with a way back, two searche
     assert.match(style, /\n\.make-tool-grid \{ display: grid; grid-template-columns: repeat\(auto-fill, minmax\(150px, 1fr\)\);/);
     assert.match(style, /\[data-ui="modern"\] #make-panel \.make-tool-grid \{ grid-template-columns: repeat\(2, minmax\(0, 1fr\)\);/);
     assert.match(style, /\.make-tools\[hidden\],\n\.make-tools-back\[hidden\] \{ display: none; \}/);
-    assert.match(style, /\.make-card:has\(#make-detail:not\(\[hidden\]\), #make-progress:not\(\[hidden\]\), #make-result:not\(\[hidden\]\)\) \.make-tools-back \{ display: none; \}/);
+    assert.match(style, /\.make-card:has\(#make-progress:not\(\[hidden\]\)\) \.make-tools-back \{ display: none; \}/);
     assert.match(classic, /#make-panel \.make-nav \{ flex-direction: row;/, 'Classic: the way back beside the question');
     assert.match(style, /\[data-ui="modern"\] #make-panel \.make-tool-tile:focus-visible,/);
     assert.match(classic, /#make-panel \.make-tool-tile \{ min-height: calc\(46 \* var\(--cu\)\);/);
@@ -252,7 +257,8 @@ describe('the window: tools first, a tool\'s screen with a way back, two searche
     // a recipe and a result, which hide those rows, keep the shared rule.
     const shared = classic.indexOf(':is(#quest-panel, #projects-panel, #make-panel) .ui-sheet-body { flex: 1 1 auto; min-height: calc(200 * var(--cu));');
     assert.ok(shared > 0 && shared < at);
-    assert.match(classic, /#make-panel \.make-card:has\(#make-result:not\(\[hidden\]\), #make-detail:not\(\[hidden\]\)\) :is\(\.make-search-row, \.make-nav, \.make-question\) \{ display: none; \}/);
+    // The way back stays over a recipe and its result (Austin 2026-11-11); the search and the question go.
+    assert.match(classic, /#make-panel \.make-card:has\(#make-result:not\(\[hidden\]\), #make-detail:not\(\[hidden\]\)\) :is\(\.make-search-row, \.make-question\) \{ display: none; \}/);
     // The foot never shrinks and the window still clips at the game's height.
     assert.match(classic, /> :is\(\.side-card, \.make-card\) > \.ui-sheet-foot \{\n  flex: none;/);
     // The numbers: the window's two 20 margins, the head, the rows, the foot, and 20 to spare.

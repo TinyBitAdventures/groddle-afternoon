@@ -27364,7 +27364,6 @@ function showMakeResult(result, key) {
     <p class="mr-used">You used</p>
     <div class="mr-used-list">${usedHtml || '<span class="mr-used">—</span>'}</div>
     <div class="mr-actions">
-      <button type="button" class="btn-glitch-back" data-mr-back>Back to recipes</button>
       <button type="button" class="btn-glitch-primary" data-mr-more ${result.canMakeMore ? '' : 'disabled'}>
         Make more ${escapeHtml(result.recipeName)}
       </button>
@@ -27372,11 +27371,6 @@ function showMakeResult(result, key) {
     </div>`;
 
   playMachineHandOver(resEl.querySelector('[data-machine-art]'));
-  resEl.querySelector('[data-mr-back]')?.addEventListener('click', () => {
-    makeSelected = null;
-    clearMakeFeedback();
-    renderMakePanel();
-  });
   resEl.querySelector('[data-mr-done]')?.addEventListener('click', () => {
     clearMakeFeedback();
     closeMakePanel();
@@ -27456,23 +27450,27 @@ function showMakeTools(event = null, { keepSearch = false } = {}) {
   makeKeyFocus(event, keepSearch ? '#make-search' : `[data-make-tool="${recipeToolFor(from)}"]`);
 }
 
-/** One step back with Backspace: a recipe to its list, a tool to the tools. True when it went anywhere. */
+/** One step back with Backspace: a recipe or its result to its list, a tool to the tools. True when it went anywhere. */
 function makeStepBack() {
-  if (activeCraftSession || document.getElementById('make-result')?.hidden === false) return false;
-  const key = { detail: 0 };
+  if (activeCraftSession) return false;
+  if (!makeSelected && makeView !== 'tool') return false;
+  makeNavBack({ detail: 0 });
+  return true;
+}
+
+/** The pill over the panel (#make-tools-back) and Backspace: a recipe or its result back to the list, where it was; else the tools. */
+function makeNavBack(event = null) {
+  if (activeCraftSession) return;
   if (makeSelected) {
     const recipe = makeSelected;
     makeSelected = null;
+    clearMakeFeedback();
     renderMakePanel();
     setMakeScroll(makeListScroll);
-    makeKeyFocus(key, `[data-make-recipe="${recipe}"]`);
-    return true;
+    makeKeyFocus(event, `[data-make-recipe="${recipe}"]`);
+    return;
   }
-  if (makeView === 'tool') {
-    showMakeTools(key);
-    return true;
-  }
-  return false;
+  showMakeTools(event);
 }
 
 /** The arrow keys over the tool buttons or the recipe tiles, once one of them has focus (js/make-tools.js gridStep). */
@@ -27579,8 +27577,16 @@ function renderMakePanel() {
     if (inTool) panel.dataset.makeToolName = toolLabel;
     else delete panel.dataset.makeToolName;
   }
+  // Austin 2026-11-11: one way back, always the pill over the panel: a tool's list goes back to the
+  // tools; a recipe and its result go back to the list they came from, named after it.
   const backEl = document.getElementById('make-tools-back');
-  if (backEl) backEl.hidden = !inTool;
+  if (backEl) {
+    backEl.hidden = !inTool && !makeSelected;
+    // Where it goes: the tool's list, a search's results, or (a recipe opened from the pack) the tools.
+    const to = makeSelected && inTool ? toolLabel : makeSelected && query ? 'Recipes' : 'Tools';
+    backEl.innerHTML = `<span aria-hidden="true">←</span> ${escapeHtml(to)}`;
+    backEl.setAttribute('aria-label', `Back to ${to === 'Tools' ? 'the tools' : to === 'Recipes' ? 'the recipes' : `the ${to} recipes`} (Backspace)`);
+  }
 
   syncMakePanelIcon();
 
@@ -27694,7 +27700,6 @@ function renderMakePanel() {
         })
         .join('');
       detail.innerHTML = `
-        <button type="button" class="btn-glitch-back" data-make-back>← Back</button>
         ${outRows.length > 1
           ? `<div class="make-detail-icon make-detail-outs">${recipeOutputsHtml(outRows)}</div>`
           : `<div class="make-detail-icon"><img src="${itemIconUrl(outId)}" alt=""/></div>`}
@@ -27715,12 +27720,6 @@ function renderMakePanel() {
         </div>`;
       // restructure to match grid CSS (back spans full)
       detail.style.display = 'block';
-      detail.querySelector('[data-make-back]')?.addEventListener('click', (event) => {
-        makeSelected = null;
-        renderMakePanel();
-        setMakeScroll(makeListScroll);
-        makeKeyFocus(event, `[data-make-recipe="${key}"]`);
-      });
       const applyQty = (n) => {
         makeQty = Math.max(1, Math.min(maxMake || 1, n));
         const inp = detail.querySelector('[data-mq-val]');
@@ -27803,7 +27802,7 @@ function renderMakePanel() {
       renderMakePanel();
       setMakeScroll(0);
       makeKeyFocus(event, '[data-make-go]:not(:disabled)');
-      if (event.detail === 0 && !document.querySelector('#make-panel [data-make-go]:not(:disabled)')) makeKeyFocus(event, '[data-make-back]');
+      if (event.detail === 0 && !document.querySelector('#make-panel [data-make-go]:not(:disabled)')) makeKeyFocus(event, '#make-tools-back');
     });
     list.appendChild(tile);
   }
@@ -31499,7 +31498,7 @@ async function main() {
     else openMakePanel();
   });
   document.getElementById('make-close')?.addEventListener('click', closeMakePanel);
-  document.getElementById('make-tools-back')?.addEventListener('click', (event) => showMakeTools(event));
+  document.getElementById('make-tools-back')?.addEventListener('click', (event) => makeNavBack(event));
   // Once a tool button or a recipe tile has focus the arrows move between them (they walk otherwise, as
   // in every side sheet), and Backspace steps back: a recipe to its list, a tool to the tools.
   document.getElementById('make-panel')?.addEventListener('keydown', (event) => {

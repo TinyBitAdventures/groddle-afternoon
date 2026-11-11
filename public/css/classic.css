@@ -2149,7 +2149,8 @@
 /* Make's result as the client's (ref/video-2011-make-result.jpg): the item large on the left, then
    "Nice" in big green, "You made …", the energy and iMG as slug pills, "You used" and its stacks; the
    recipe list's search goes while a recipe or its result is showing. */
-:root[data-ui="classic"] #game-root #make-panel .make-card:has(#make-result:not([hidden]), #make-detail:not([hidden])) :is(.make-search-row, .make-nav, .make-question) { display: none; }
+/* The way back stays (Austin 2026-11-11: one pill over the panel, named after the list it returns to). */
+:root[data-ui="classic"] #game-root #make-panel .make-card:has(#make-result:not([hidden]), #make-detail:not([hidden])) :is(.make-search-row, .make-question) { display: none; }
 :root[data-ui="classic"] #game-root #make-panel #make-result:not([hidden]) {
   display: grid;
   grid-template-columns: calc(190 * var(--cu)) minmax(0, 1fr);

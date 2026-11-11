@@ -9108,7 +9108,8 @@ header.top-bar + .sub { display: none; }
   cursor: pointer;
 }
 .make-tools-back:hover { background: var(--surface-bright); }
-.make-card:has(#make-detail:not([hidden]), #make-progress:not([hidden]), #make-result:not([hidden])) .make-tools-back { display: none; }
+/* The way back stays over a recipe and its result (Austin 2026-11-11); only the work in progress hides it (Cancel there). */
+.make-card:has(#make-progress:not([hidden])) .make-tools-back { display: none; }
 /* A search over every tool names the tool under each recipe. */
 .make-tile .tile-tool { font-size: var(--fs-2xs); font-weight: 700; line-height: var(--lh-tight); color: var(--text-muted); }
 .make-search-row {
