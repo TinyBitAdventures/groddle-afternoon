@@ -30,7 +30,7 @@ import {
   rowFromServer,
   sharedSlice,
   topLine,
-} from '../public/js/street-jobs-mp.js?v=24a85415';
+} from '../public/js/street-jobs-mp.js?v=a0a54e60';
 import {
   isJobBuilt,
   jobStatus,
@@ -263,5 +263,21 @@ describe('the site ledger counts project records (src/LedgerMath.php)', () => {
     assert.match(src, /preg_match\('\/\^job-\[gr\]-\[a-z0-9-\]\{1,34\}\$\/', \$id\)/);
     const service = readFileSync(join(SITE_DIR, 'src/LedgerService.php'), 'utf8');
     assert.match(service, /public function project\(Request \$request\): Response\n    \{\n        \$this->signed\(\$request, self::PROJECT\);/);
+  });
+});
+
+describe('ticket 190: the final card of a shared project names your share', () => {
+  it('contributedKey is the key markContributed records', async () => {
+    const { contributedKey } = await import('../public/js/street-jobs-mp.js?v=a0a54e60');
+    const state = { phasesContributed: [] };
+    markContributed(state, 'job-g-123', 'job_street_baq_12');
+    assert.deepEqual(state.phasesContributed, [contributedKey('job-g-123', 'job_street_baq_12')]);
+  });
+
+  it('finishJob reads the server share for the phase just done and your own phase record, not only the row', () => {
+    const src = readFileSync(join(import.meta.dirname, '../public/js/features/street-jobs-feature.js'), 'utf8');
+    const fn = src.slice(src.indexOf('function finishJob('), src.indexOf('function finishJob(') + 2400);
+    assert.match(fn, /out\.phase\?\.classTsid === p\.classTsid && n0\(out\.participation\) > 0/);
+    assert.match(fn, /state\.phasesContributed \|\| \[\]\)\.includes\(mpContributedKey\(jobId, p\.classTsid\)\)/);
   });
 });

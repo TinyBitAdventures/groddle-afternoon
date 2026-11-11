@@ -234,8 +234,13 @@ export function remember(list, id) {
 }
 
 /** The player's own count of distinct phases contributed to (the group_count badges), as street-jobs.js record does. */
+/** The key markContributed records a phase under. */
+export function contributedKey(jobId, classTsid) {
+  return clean(`${jobId}-${classTsid}`);
+}
+
 export function markContributed(state, jobId, classTsid) {
-  const key = clean(`${jobId}-${classTsid}`);
+  const key = contributedKey(jobId, classTsid);
   const newPhase = !state.phasesContributed.includes(key);
   if (newPhase) state.phasesContributed.push(key);
   return { newPhase, distinctPhases: state.phasesContributed.length };

@@ -107,6 +107,7 @@ import {
   HALL_TEXT,
   MP_TEXT,
   applyWorld,
+  contributedKey as mpContributedKey,
   giveAfterSave,
   hallClock,
   isSharedJob,
@@ -122,7 +123,7 @@ import {
   rowFromServer,
   sharedSlice,
   topLine,
-} from '../street-jobs-mp.js?v=24a85415';
+} from '../street-jobs-mp.js?v=a0a54e60';
 import { grantMoodXp } from '../mood-xp.js?v=958e7680';
 import { createMinnAccount } from '../minn-account.js?v=8f2741cd';
 import { normalizeGroups } from '../groups.js?v=c9635d96';
@@ -758,10 +759,21 @@ function finishJob(engine, jobId, out, solo) {
   const def = phaseClass(catalog, jobId, 0).def;
   if (out.participant) engine.achievement(PARTICIPANT_COUNTER, 1);
   if (job.kind === 'restore') return finishRestore(engine, jobId, job, def, out);
+  // Shared (multiplayer): your share of each phase's base cost, as the source's text said it. The
+  // phase that just finished takes the server's own figure (project_reward participation): by the
+  // last phase the project's row may already be gone, and ticket 190's card said "You did not
+  // contribute" after the phase card had said 49%. An earlier phase also counts as yours when this
+  // player's own record has it (markContributed).
+  const sharedShare = (p) => {
+    if (out.phase?.classTsid === p.classTsid && n0(out.participation) > 0) return n0(out.participation);
+    return Math.round(phaseShare(state.jobs[jobId], p.classTsid, catalog.classes[p.classTsid], jobDivisor(job)) * 100);
+  };
   const contributions = contributionsText(job, catalog, {
-    mine: (p) => Boolean(state.jobs[jobId]?.mine?.[p.classTsid]),
-    // Shared (multiplayer): your share of each phase's base cost, as the source's text said it.
-    share: (p) => (shared(jobId) ? Math.round(phaseShare(state.jobs[jobId], p.classTsid, catalog.classes[p.classTsid], jobDivisor(job)) * 100) : 100),
+    mine: (p) =>
+      shared(jobId)
+        ? sharedShare(p) > 0 || (state.phasesContributed || []).includes(mpContributedKey(jobId, p.classTsid))
+        : Boolean(state.jobs[jobId]?.mine?.[p.classTsid]),
+    share: (p) => (shared(jobId) ? Math.max(1, sharedShare(p)) : 100),
   });
   if (job.kind === 'hall') return finishHall(engine, jobId, job, contributions, solo);
   teleportationFeature.grantScript(engine, arrivalFor(job));
