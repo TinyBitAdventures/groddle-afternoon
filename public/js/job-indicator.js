@@ -48,6 +48,9 @@ export const JOB_INDICATOR_LOOK = Object.freeze({
   // Read from the video (the sheet is lost): a bold teal, and a lighter one for the small line.
   textColor: 0x1d7d93,
   subColor: 0x4fa3b6,
+  // G656 (ours): the featured project's star, gold with a dark edge so it reads on any sky.
+  starColor: 0xffc933,
+  starEdge: 0x7a5200,
 });
 
 /** flipNext: hold 3 s, fade 0.5 s, and its second tween's half second; one round of both faces is 8 s. */
@@ -108,9 +111,11 @@ export function secondsUntil(until, now = Date.now()) {
  *   jobs_get_available skips it (locations/inc_jobs.js 463-467), so no bubble;
  * - delayed: the countdown, not clickable;
  * - otherwise "Project available", or the phase's percent flipping with it.
- * Returns { kind, main: [line] | [big, small], alt, percent, clickable, key }.
+ * Returns { kind, main: [line] | [big, small], alt, percent, clickable, featured, key }.
+ * `featured` (G656, ours: Glitch had no featured project) puts a small star on the bubble of the
+ * world's featured street project (js/featured-project.js).
  */
-export function jobIndicatorView(head, { phases = 1, perc = 0, now = Date.now() } = {}) {
+export function jobIndicatorView(head, { phases = 1, perc = 0, now = Date.now(), featured = false } = {}) {
   if (!head) return null;
   const st = head.status;
   if (st === 'done' || st === 'built' || st === 'cooldown') return null;
@@ -135,7 +140,8 @@ export function jobIndicatorView(head, { phases = 1, perc = 0, now = Date.now() 
   } else {
     view = { kind: 'available', main: [T.available], alt: '', percent: 0, clickable: true };
   }
-  view.key = `${view.kind}|${view.main.join('|')}|${view.alt}|${view.percent}`;
+  view.featured = Boolean(featured);
+  view.key = `${view.kind}|${view.main.join('|')}|${view.alt}|${view.percent}|${view.featured ? 'f' : ''}`;
   return view;
 }
 
@@ -171,7 +177,10 @@ export function createJobIndicator(PIXI, { onClick, textureFor } = {}) {
   fill.mask = fillMask;
   const main = new PIXI.Container();
   const alt = new PIXI.Container();
-  root.addChild(shadow, pill, fillMask, fill, main, alt);
+  // G656: the featured project's star, on the pill's left end.
+  const star = new PIXI.Graphics();
+  star.label = 'job-indicator-featured';
+  root.addChild(shadow, pill, fillMask, fill, main, alt, star);
   const iconTex = textureFor ? textureFor(JOB_INDICATOR_ICON) : null;
   const icon = (into) => {
     if (!iconTex) return null;
@@ -248,6 +257,17 @@ export function createJobIndicator(PIXI, { onClick, textureFor } = {}) {
         t.x = fx + textX;
         t.y += top + Math.round((h - m.h) / 2);
       }
+    }
+    star.clear();
+    star.visible = Boolean(v.featured);
+    if (v.featured) {
+      const pts = [];
+      for (let i = 0; i < 10; i += 1) {
+        const r = i % 2 ? 3.4 : 8;
+        const a = -Math.PI / 2 + (i * Math.PI) / 5;
+        pts.push(left + 3 + r * Math.cos(a), top + 1 + r * Math.sin(a));
+      }
+      star.poly(pts).fill({ color: L.starColor }).stroke({ color: L.starEdge, width: 1.2 });
     }
     alt.alpha = 0;
     main.alpha = 1;

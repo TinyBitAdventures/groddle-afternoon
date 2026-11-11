@@ -885,6 +885,11 @@ function createSession(engine, client) {
     chat.lines = [];
     chat.earlier = false;
     for (const raw of Array.isArray(msg.history) ? msg.history : []) {
+      // G656: the server's own notices (channels.go notice: the featured street project) are kept as notes.
+      if (raw?.note === true && raw.text) {
+        pushLine(chat.lines, { note: true, text: String(raw.text).slice(0, 200) });
+        continue;
+      }
       const line = chatLine(raw);
       if (line && !engine.query?.('realtimeHidden', line.id)) pushLine(chat.lines, line);
     }

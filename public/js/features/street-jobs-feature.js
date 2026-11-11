@@ -134,17 +134,19 @@ import { grantMoodXp } from '../mood-xp.js?v=958e7680';
 import { createMinnAccount } from '../minn-account.js?v=8f2741cd';
 import { normalizeGroups } from '../groups.js?v=c9635d96';
 import { frameTexture, sourceFromUrl, textureFromUrl } from '../textures.js?v=f024bd6a';
-import { createJobIndicator, jobIndicatorView, jobPerc } from '../job-indicator.js?v=e172dd30';
+import { createJobIndicator, jobIndicatorView, jobPerc } from '../job-indicator.js?v=f426edec';
 import { LOT_ART, LOT_CLASS, LOT_PLACEMENT, LOT_SIGN_BLOCKERS, LOT_SIGN_X, LOT_TEXT, floorYAt, lotFit, lotHeadline, lotVerb } from '../group-hall-lot.js?v=23e8fbd9';
 import { JOB_WORK_OVERLAY, jobWorkFloatPoint, jobWorkSoundKey, jobWorkToolScale, jobWorkToolSheet } from '../job-work-fx.js?v=ee7e10ca';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
 import { SIGN_ARMS, routeGraph } from '../map-routes.js?v=c7e7dc80';
 import { TELEPORTERS } from '../hidden-floors.js?v=732a2610';
 import { WINTRY_PORTAL_TELEPORTERS } from '../wintry-portal.js?v=1437deda';
-import { PROJECTS_TEXT, contributedJobs, mineTotal, projectList } from '../projects-tracker.js?v=8b529103';
-import { PROJECTS_PANEL_ID, buildProjectsPanel, renderProjects } from '../ui/projects-sheet.js?v=2fd516d0';
+import { PROJECTS_TEXT, contributedJobs, mineTotal, projectEntry, projectList } from '../projects-tracker.js?v=edd58b99';
+import { PROJECTS_PANEL_ID, buildProjectsPanel, renderProjects } from '../ui/projects-sheet.js?v=56d4acbc';
 import { SIDE_SHEET_IDS } from '../ui/panel-shell.js?v=e2abdf9e';
 import { trophyGotText } from '../home-trophies.js?v=2020b29b';
+import { FEATURED_TEXT, featuredChanged, featuredFromServer } from '../featured-project.js?v=31ce4607';
+import { renderFeaturedPill, renderFeaturedRow } from '../ui/featured-project.js?v=1d2fd2e9';
 import { GEM_HINTS, isGem } from '../gem-hints.js?v=4b65f7ac';
 
 export const STREET_JOBS_FEATURE_ID = 'street-jobs';
@@ -498,7 +500,7 @@ function indicatorView(head, now) {
   if (!head) return null;
   const job = jobDef(catalog, head.jobId);
   const reqs = phaseRequirements(state, catalog, head.jobId);
-  return jobIndicatorView(head, { phases: job?.phases?.length || 1, perc: jobPerc(reqs), now });
+  return jobIndicatorView(head, { phases: job?.phases?.length || 1, perc: jobPerc(reqs), now, featured: Boolean(featured && featured.jobId === head.jobId) });
 }
 
 /** Each frame: the bubbles' text (the countdown ticks each second), their flip, and the spirit's over its head. */
@@ -1829,6 +1831,24 @@ function createMp(engine, client) {
     }
     refresh();
   });
+  // G656: the world's featured street project (projects_featured.go), on every sync and when it changes or moves.
+  client.on('msg:project_featured', (msg) => {
+    clock(msg);
+    const next = featuredFromServer(msg, offset);
+    if (next) next.jobId = localOf(next.jobId);
+    const first = !s.featuredSeen;
+    s.featuredSeen = true;
+    const changed = featuredChanged(featured, next);
+    featured = next;
+    // A new one while you play is said once (the first sync only shows it).
+    if (changed && !first && featured) {
+      engine.toast(FEATURED_TEXT.toast(featured.label), 4200);
+      engine.pushActivity(FEATURED_TEXT.toast(featured.label));
+    }
+    drawFeatured(engine);
+    drawPlate(engine);
+    projectsChanged(engine);
+  });
   client.on('msg:project_given', (msg) => applyGiven(msg));
   client.on('msg:project_worked', (msg) => mpWorked(engine, msg));
   client.on('msg:project_reward', (msg) => {
@@ -2262,6 +2282,8 @@ function publish(engine) {
   engine.setData('streetJobGiver', !head ? '' : giving === giver ? 'spirit' : 'board');
   engine.setData('streetJobBubble', (giving === giver ? giver?.bubble : board?.bubble) || '');
   engine.setData('streetJobStatus', head?.status || '');
+  // G656: the giver's bubble carries the featured project's star.
+  engine.setData('streetJobFeatured', head && featured?.jobId === head.jobId ? '1' : '');
   if (head) {
     const job = jobDef(catalog, head.jobId);
     const reqs = phaseRequirements(state, catalog, head.jobId);
@@ -2306,6 +2328,8 @@ function publish(engine) {
  * Menu button, and a New mark in the panel until it closes (state.trackerSeen); nothing else is said.
  */
 const mineRows = new Map();
+/** G656: the featured street project (js/featured-project.js featuredFromServer), online only; null in solo. */
+let featured = null;
 const pj = { panel: null, btn: null, dot: null, open: false, sessionSeen: 0, sig: '', badge: -1, asked: 0, answered: false, openNeeds: new Set(), last: '', pack: '', packAt: 0 };
 
 /** The rows the panel reads: the save's in solo; online the server's list, then this page's live board rows. */
@@ -2350,13 +2374,62 @@ function trackerList(engine, seenAt) {
     // Ticket 81: each need says whether you can do it now (the board's rules: workCheck's tool and skill, what you carry).
     ctx: projectsCtx(engine),
   });
-  for (const e of [...list.active, ...list.done]) {
+  list.featured = featuredEntry(engine, seenAt);
+  for (const e of [...list.active, ...list.done, ...(list.featured ? [list.featured] : [])]) {
     if (known[e.jobId]?.partial) e.known = false;
     const where = streetMeta(e.place);
     e.placeLabel = where.label;
     e.placeTip = e.finished ? `A guided path to ${where.label}` : `A guided path to ${giverNoun(e.place, e.jobId) || 'the project board'} on ${where.label}`;
   }
   return list;
+}
+
+/**
+ * G656: the featured project's card for the Projects panel, whether or not you have put anything
+ * in: the server's row from project_featured (what it still needs, anywhere), with your own share
+ * from your list or this street's board.
+ */
+function featuredEntry(engine, seenAt) {
+  if (!mpMode || !featured || !catalog || !jobDef(catalog, featured.jobId)) return null;
+  const id = featured.jobId;
+  const own = mineRows.get(id) || state.jobs[id] || null;
+  const row = featured.row ? { ...rowFromServer(featured.row, mp?.offset || 0), mine: own?.mine || {} } : own;
+  const e = projectEntry(state, catalog, id, row, {
+    now: Date.now(),
+    opts: opts(),
+    seenAt,
+    closed: closedStreets(state, catalog, opts()),
+    labels: { item: (cls, n) => itemLabel(cls, n), skill: skillLabel, icon: itemIcon },
+    ctx: projectsCtx(engine),
+  });
+  if (e) e.featured = true;
+  return e;
+}
+
+/** G656: the pill under the street name and the Feat panel's row (js/ui/featured-project.js), multiplayer only. */
+function drawFeatured(engine) {
+  if (typeof document === 'undefined' || !document.getElementById) return;
+  const f = mpMode ? featured : null;
+  const onOpen = () => openFeatured(engine);
+  renderFeaturedPill(document, f, { onOpen, now: Date.now() });
+  renderFeaturedRow(document, f, { onOpen, now: Date.now() });
+  engine?.setData?.('featuredJob', f?.jobId || '');
+  engine?.setData?.('featuredPercent', f ? String(f.percent) : '');
+  engine?.setData?.('featuredLabel', f?.label || '');
+}
+
+/** A click on the pill or the row: the Projects panel on the featured project, its way there one click on. */
+function openFeatured(engine) {
+  if (!featured) return;
+  // The Feat panel is a side sheet too: the Projects panel takes its place.
+  const feat = document.getElementById('feat-panel');
+  if (feat && !feat.hidden) document.getElementById('feat-close')?.click();
+  if (!pj.open) openProjects(engine);
+  else renderProjectsPanel(engine);
+  const card = pj.panel?.querySelector(`[data-featured="1"]`);
+  card?.scrollIntoView?.({ block: 'nearest' });
+  card?.querySelector('[data-pj-act="route"]')?.focus?.();
+  engine.setData?.('featuredOpened', featured.jobId);
 }
 
 /** How many projects of yours finished since you last looked (the Menu's dot). */
@@ -2533,7 +2606,8 @@ function renderProjectsPanel(engine) {
   // Redraw only when something shown changed: a redraw would take the focus off a button.
   const sig = JSON.stringify([
     meta,
-    ...[...list.active, ...list.done].map((e) => [e.jobId, e.status, e.phase, Math.round(e.progress * 1000), e.known, e.isNew, e.doneAt ? agoMinute(e.doneAt) : 0, e.needs.map((n) => `${n.id}:${n.left}:${n.open}:${n.can}:${n.mark}`).join(','), e.shares.map((s) => Math.round(s.share * 100)).join(','), JSON.stringify(teleport(e)), e.place]),
+    list.featured ? `f:${list.featured.jobId}` : '',
+    ...[...(list.featured ? [list.featured] : []), ...list.active, ...list.done].map((e) => [e.jobId, e.status, e.phase, Math.round(e.progress * 1000), e.known, e.isNew, e.doneAt ? agoMinute(e.doneAt) : 0, e.needs.map((n) => `${n.id}:${n.left}:${n.open}:${n.can}:${n.mark}`).join(','), e.shares.map((s) => Math.round(s.share * 100)).join(','), JSON.stringify(teleport(e)), e.place]),
   ]);
   if (sig !== pj.sig) {
     pj.sig = sig;
@@ -2596,6 +2670,13 @@ export const streetJobsFeature = {
     if (state.trackerSeen == null) state.trackerSeen = Date.now();
     mountProjects(engine);
     load().then(() => projectsChanged(engine));
+    // G656: the Feat panel draws its own box when it opens; the featured row goes back under it.
+    const feat = mpMode && typeof document !== 'undefined' ? document.getElementById?.('feat-panel') : null;
+    if (feat && typeof MutationObserver === 'function') {
+      new MutationObserver(() => {
+        if (!feat.hidden) drawFeatured(engine);
+      }).observe(feat, { attributes: true, attributeFilter: ['hidden'] });
+    }
   },
 
   save() {

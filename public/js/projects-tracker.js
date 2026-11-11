@@ -43,6 +43,9 @@ export const PROJECTS_TEXT = Object.freeze({
   ready: 'You can do this',
   readySome: 'you can do now',
   haveNone: 'You have none',
+  // G656: the featured street project (js/featured-project.js), online only.
+  featured: 'Featured',
+  featuredCopy: 'The street project everyone is building together. It stays featured until it is built.',
   solo: `Solo amounts: 1/50 of the original totals.`,
   online: 'Shared amounts: 1/50 of the original totals.',
 });

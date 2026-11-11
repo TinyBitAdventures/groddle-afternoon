@@ -3068,3 +3068,13 @@
   font: var(--fs-classic-body)/var(--lh-tight) var(--font-classic-body);
 }
 :root[data-ui="classic"] .world-drop-tip.is-no { color: var(--c-classic-debuff); }
+/* G656 featured street project (js/ui/featured-project.js): the pill, the Feat panel row and the Projects card in the 2012 palette. */
+:root[data-ui="classic"] .featured-pill { top: var(--space-2); border: 1px solid color-mix(in srgb, var(--c-classic-ink) 37%, transparent); border-radius: 5px;
+  background: var(--c-classic-panel); color: var(--c-classic-text); box-shadow: 0 2px 4px color-mix(in srgb, var(--c-classic-ink) 15%, transparent); font-family: var(--font-classic-body); }
+:root[data-ui="classic"] .featured-pill .fp-star, :root[data-ui="classic"] .featured-row .fp-star { color: var(--c-classic-wear); }
+:root[data-ui="classic"] .featured-pill .fp-bar, :root[data-ui="classic"] .featured-row .fp-bar { border-radius: 0; background: var(--c-classic-wear-track); }
+:root[data-ui="classic"] .featured-pill .fp-bar i, :root[data-ui="classic"] .featured-row .fp-bar i { background: var(--c-classic-wear); }
+:root[data-ui="classic"] .featured-row { border-radius: 0; border-color: var(--c-classic-rule); background: var(--c-classic-well); color: var(--c-classic-text); font-family: var(--font-classic-body); }
+:root[data-ui="classic"] .featured-row .fp-open { color: var(--c-classic-wear); }
+:root[data-ui="classic"] .pj-card.is-featured { box-shadow: inset 0 0 0 2px var(--c-classic-wear); }
+:root[data-ui="classic"] .pj-featured-tag { border-radius: 0; background: var(--c-classic-wear); }

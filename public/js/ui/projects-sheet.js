@@ -15,9 +15,14 @@
  * [data-projects-list], cards [data-project=<job id>] with data-status and data-new,
  * [data-pj-act="route|teleport|map"], [data-pj-needs] with rows [data-need=<requirement id>] and
  * [data-can=yes|some|no] (ticket 81: whether you can do it now), #projects-meta, #projects-close.
+ *
+ * G656: online, the featured street project (js/featured-project.js) leads the list in a section
+ * of its own, [data-pj-section="featured"], its card [data-featured] with a Featured tag, whether
+ * or not you have put anything into it yet.
  */
 
-import { PROJECTS_TEXT as T, shareLine, statusLine } from '../projects-tracker.js?v=8b529103';
+import { PROJECTS_TEXT as T, shareLine, statusLine } from '../projects-tracker.js?v=edd58b99';
+import { featuredTag } from './featured-project.js?v=1d2fd2e9';
 
 export const PROJECTS_PANEL_ID = 'projects-panel';
 const ICON = 'assets/sprites/street-jobs/sign_stake.webp';
@@ -117,11 +122,13 @@ export function needRow(doc, n) {
 export function projectCard(doc, e, o = {}) {
   const now = o.now ?? Date.now();
   const card = el(doc, 'article', {
-    class: `pj-card${e.finished ? ' is-done' : ''}${e.isNew ? ' is-new' : ''}`,
-    dataset: { project: e.jobId, status: e.status, ...(e.isNew ? { new: '1' } : {}) },
+    class: `pj-card${e.finished ? ' is-done' : ''}${e.isNew ? ' is-new' : ''}${e.featured ? ' is-featured' : ''}`,
+    dataset: { project: e.jobId, status: e.status, ...(e.isNew ? { new: '1' } : {}), ...(e.featured ? { featured: '1' } : {}) },
   });
   const head = el(doc, 'div', { class: 'pj-head' });
-  const title = el(doc, 'h3', { class: 'pj-title' }, e.title);
+  const title = el(doc, 'h3', { class: 'pj-title' });
+  if (e.featured) title.append(featuredTag(doc), doc.createTextNode(' '));
+  title.append(doc.createTextNode(e.title));
   if (e.isNew) title.append(doc.createTextNode(' '), el(doc, 'span', { class: 'pj-new' }, T.newMark));
   head.append(title, el(doc, 'p', { class: 'pj-where' }, statusLine(e, now)));
   card.append(head);
@@ -181,10 +188,19 @@ export function renderProjects(doc, list, o = {}) {
   const now = o.now ?? Date.now();
   const scroll = box.parentElement?.scrollTop || 0;
   box.replaceChildren();
-  const active = list?.active || [];
+  const featured = list?.featured || null;
+  // The featured project shows once, at the top (G656).
+  const active = (list?.active || []).filter((e) => !featured || e.jobId !== featured.jobId);
   const done = list?.done || [];
+  if (featured) {
+    const sec = el(doc, 'section', { class: 'pj-section', dataset: { pjSection: 'featured' }, 'aria-label': T.featured });
+    sec.append(el(doc, 'h3', { class: 'pj-section-title' }, T.featured));
+    if (T.featuredCopy) sec.append(el(doc, 'p', { class: 'pj-note' }, T.featuredCopy));
+    sec.append(projectCard(doc, featured, { ...o, now }));
+    box.append(sec);
+  }
   if (!active.length && !done.length) {
-    box.append(el(doc, 'p', { class: 'pj-empty' }, T.empty));
+    if (!featured) box.append(el(doc, 'p', { class: 'pj-empty' }, T.empty));
   } else {
     const section = (name, rows, empty, kind) => {
       const sec = el(doc, 'section', { class: 'pj-section', dataset: { pjSection: kind }, 'aria-label': name });
