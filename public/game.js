@@ -28721,8 +28721,13 @@ function renderVendorList() {
     detail.innerHTML = '';
     detail.style.display = '';
   }
+  // The room a pop under the bottom row asked for goes with it (placeVendorPop).
+  list.style.paddingBottom = '';
   drawVendorTiles(list);
 }
+
+/** Space kept under a vendor pop once it is scrolled into view (px). */
+const VENDOR_POP_ROOM = 12;
 
 /** MPANELS: the modern skin's count popover sits under (or over) its tile on the shelf, its tail on it. */
 function placeVendorPop(list, detail) {
@@ -28730,6 +28735,7 @@ function placeVendorPop(list, detail) {
   list.querySelectorAll('.vendor-tile.is-asking').forEach((t) => t.classList.remove('is-asking'));
   const body = detail.offsetParent;
   if (!tile || !body) {
+    list.style.paddingBottom = '';
     detail.style.removeProperty('--pop-top');
     detail.style.removeProperty('--pop-tail');
     return;
@@ -28740,7 +28746,17 @@ function placeVendorPop(list, detail) {
   const top = tr.bottom - br.top + body.scrollTop + 8;
   detail.style.setProperty('--pop-top', `${Math.round(top)}px`);
   detail.style.setProperty('--pop-tail', `${Math.round(tr.left + tr.width / 2 - br.left - 12)}px`);
-  detail.scrollIntoView?.({ block: 'nearest' });
+  // Austin 2026-11-11: a pop under the bottom row showed cut off, the shelf having nothing left to
+  // scroll. Make room under the shelf for all of it, then scroll it whole into view with a little
+  // space below (offsetHeight is its laid-out size, not the size mid open animation).
+  const room = VENDOR_POP_ROOM;
+  const popBottom = top + detail.offsetHeight + room;
+  list.style.paddingBottom = '';
+  // The pop is positioned, so the shelf's own end is what can be pushed down (in the body's scroll space).
+  const short = popBottom - (list.offsetTop + list.offsetHeight);
+  if (short > 0) list.style.paddingBottom = `${Math.ceil(short)}px`;
+  const want = Math.max(body.scrollTop, popBottom - body.clientHeight);
+  if (want > body.scrollTop) body.scrollTo?.({ top: want, behavior: notifyView?.reducedMotion() ? 'auto' : 'smooth' });
   if (app?.canvas) app.canvas.dataset.vendorPop = `${vendorSelected}:${Math.round(top)}`;
 }
 

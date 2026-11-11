@@ -2752,9 +2752,14 @@
   "deployed": "2026-11-11"
  },
  "git": {
-  "commits": 1652,
+  "commits": 1653,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-11",
+    "kind": "improve",
+    "text": "Make has one way back, the pill over the panel, named after where it goes"
+   },
    {
     "date": "2026-11-11",
     "kind": "fix",
@@ -2869,11 +2874,6 @@
     "date": "2026-11-10",
     "kind": "fix",
     "text": "A lonely Street Spirit's call sits beside the Social drawer and fades away"
-   },
-   {
-    "date": "2026-11-10",
-    "kind": "improve",
-    "text": "A Still rings its chime when it runs dry or fills up"
    }
   ]
  },

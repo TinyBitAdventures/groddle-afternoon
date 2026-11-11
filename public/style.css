@@ -12451,6 +12451,9 @@ html.stage-pinned[data-ui="modern"] header.top-bar { left: calc(var(--sp-5) + va
 [data-ui="modern"] #vendor-panel .vendor-sell-drop.is-receipt { border-style: solid; border-color: var(--border-moss); background: var(--surface-moss); color: var(--text-moss); }
 [data-ui="modern"] #vendor-panel .vendor-sell-drop.is-receipt .vendor-drop-coin { color: var(--warn); }
 [data-ui="modern"] #vendor-panel .vendor-shelf {
+  /* Its full height in the scrolling body (a column flex item shrank and let its tiles overflow), so the
+     room placeVendorPop adds under it for a pop below the bottom row counts. */
+  flex-shrink: 0;
   grid-template-columns: repeat(auto-fill, minmax(72px, 1fr));
   gap: var(--space-2);
   min-height: 0;
