@@ -95,7 +95,7 @@ import { textureFromUrl } from '../textures.js?v=f024bd6a';
 import { QUOIN_SHEET, QUOIN_TYPES } from '../quoins.js?v=237c1d5d';
 import { gainMetabolic } from '../metabolics.js?v=8504134e';
 import { grantMoodXp } from '../mood-xp.js?v=958e7680';
-import { quoinShardGrabberSound, quoinShardSoundKey } from '../quoin-shards.js?v=25e0d8b4';
+import { quoinShardGrabberSound, quoinShardSoundKey } from '../quoin-shards.js?v=121156a0';
 import {
   MP_RACE_COURSES,
   MP_RACE_TEXT,

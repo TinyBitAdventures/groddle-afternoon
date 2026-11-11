@@ -2752,9 +2752,14 @@
   "deployed": "2026-11-11"
  },
  "git": {
-  "commits": 1647,
+  "commits": 1648,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-11",
+    "kind": "new",
+    "text": "Online, the street sees everyone's tool bubble while they work on a project"
+   },
    {
     "date": "2026-11-11",
     "kind": "new",
@@ -2869,11 +2874,6 @@
     "date": "2026-11-10",
     "kind": "improve",
     "text": "A machine that finishes a job rings Tiny Speck's own ready chime"
-   },
-   {
-    "date": "2026-11-10",
-    "kind": "new",
-    "text": "A Thank you reaction (🙏) on chat lines and the Community boards"
    }
   ]
  },

@@ -20,7 +20,7 @@ import {
   quoinShardSoundKey,
   quoinTypeShards,
   stackQuoinText,
-} from '../public/js/quoin-shards.js?v=25e0d8b4';
+} from '../public/js/quoin-shards.js?v=121156a0';
 import { QUOIN_TYPES, collectQuoin, createQuoinState, creditQuoinStat } from '../public/js/quoins.js?v=237c1d5d';
 import { SOUND_ALIASES, SOUND_FILES } from '../public/js/sound-keys.js?v=fb6ee553';
 
@@ -298,7 +298,8 @@ describe('a quoin\'s amount stays readable (report #181, QuoinAnimation.as)', ()
     assert.match(annc, /qa\.x = start_x;\s+qa\.y = start_y;[\s\S]{0,200}if \(this_is_the_quoin_getter\) \{[\s\S]{0,300}qa\.go\(0, delta, txt\);/);
     const fx = QUOIN_SHARD_FX;
     assert.deepEqual([fx.text, fx.circle, fx.textDelaySec, fx.textInSec, fx.textBobPx, fx.textBobSec, fx.textHoldSec, fx.textOutSec, fx.textRise, fx.circleInSec, fx.circleOutSec],
-      [24, 50, 0.4, 0.2, 2, 0.05, 1.5, 0.4, 40, 0.5, 0.5]);
+      // The words are 20 px, not the source's 24 (Austin 2026-11-11: too big in today's world view).
+      [20, 50, 0.4, 0.2, 2, 0.05, 1.5, 0.4, 40, 0.5, 0.5]);
   });
 });
 
@@ -348,7 +349,7 @@ describe('the collector\'s burst on the page (features/quoin-shards-feature.js q
   }
 
   async function setup() {
-    const { quoinShardsFeature } = await import('../public/js/features/quoin-shards-feature.js?v=f9bffa8e');
+    const { quoinShardsFeature } = await import('../public/js/features/quoin-shards-feature.js?v=f68df335');
     const PIXI = fakePixi();
     const data = {};
     const engine = { PIXI, fxLayer: new PIXI.Container(), setData: (k, v) => { data[k] = v; }, param: () => null };
@@ -359,14 +360,14 @@ describe('the collector\'s burst on the page (features/quoin-shards-feature.js q
     for (let t = 0; t < seconds - 1e-9; t += step) feature.onTick(step * 1000, 0, engine);
   };
 
-  it('draws the amount at the quoin, 15 px up, in 24 px words, for 2.8 s', async () => {
+  it('draws the amount at the quoin, 15 px up, in 20 px words, for 2.8 s', async () => {
     const { feature, engine, data } = await setup();
     const drawn = feature.quoinGotFx({ x: 400, y: 300, label: '+5 iMG' }, engine);
     assert.deepEqual([drawn.x, drawn.y], [400, 285]);
     assert.equal(data.quoinGotFx, '+5 iMG@400,285');
     const words = drawn.node.children.find((k) => k.text);
     assert.equal(words.text, '+5 iMG');
-    assert.equal(words.style.fontSize, 24);
+    assert.equal(words.style.fontSize, 20);
     assert.equal(words.style.fill, 0xffffff);
     tick(feature, engine, 0.3);
     assert.equal(words.scale.x, 0, 'no words for the first 0.4 s');

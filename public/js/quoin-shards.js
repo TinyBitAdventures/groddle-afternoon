@@ -56,7 +56,9 @@ export const QUOIN_SHARD_FX = Object.freeze({
   startLift: 15,
   smallText: 16,
   smallCircle: 34,
-  text: 24,
+  // QuoinAnimation.as 24 is 24 px on the 2012 1000x600 stage; drawn in today's larger world view it read
+  // too big, so ours is 20 (Austin 2026-11-11).
+  text: 20,
   circle: 50,
   circleInSec: 0.5,
   circleOutSec: 0.5,
@@ -76,7 +78,7 @@ export const QUOIN_SHARD_FX = Object.freeze({
   // Ours: the remake's longer lines ("Mood already full") are drawn no wider than this, and an
   // amount raised over one still showing sits a line above it.
   textMaxWidth: 280,
-  textLine: 26,
+  textLine: 22,
 });
 
 // The client's TSTweener uses Penner's easings.

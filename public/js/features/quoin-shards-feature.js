@@ -51,7 +51,7 @@ import {
   quoinShardGrabberSound,
   quoinTypeShards,
   stackQuoinText,
-} from '../quoin-shards.js?v=25e0d8b4';
+} from '../quoin-shards.js?v=121156a0';
 
 let fxRoot = null;
 const fxItems = [];
