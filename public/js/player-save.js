@@ -147,6 +147,10 @@ export function normalizeQuestSnapshot(seed = {}) {
   if (seed?.story?.greedyStreetSpirit) {
     story.greedyStreetSpirit = cleanScalarRecord(seed.story.greedyStreetSpirit);
   }
+  // Story quests a place offered (game.js offerLegalizeAtGate: a subway gate brings Legalize It).
+  if (seed?.story?.gates) {
+    story.gates = cleanScalarRecord(seed.story.gates);
+  }
   // When each quest was finished (G202: the shrine quest's minute before conversations).
   const doneAt = {};
   for (const [rawId, at] of Object.entries(seed?.doneAt || {})) {

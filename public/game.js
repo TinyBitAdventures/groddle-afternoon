@@ -501,7 +501,7 @@ import {
   parsePlayerSave,
   serializePlayerSave,
   restorePlayerSave,
-} from './js/player-save.js?v=8403daef';
+} from './js/player-save.js?v=6e4f7b37';
 import {
   HOME_INTERIOR_TSID,
   HOME_STREET_TSID,
@@ -16673,10 +16673,24 @@ function legalizeRealTarget(target) {
  * Back Alley, as the quest's onStarted instance was. True when it went.
  */
 function legalizeGateRefused() {
-  if (!legalizeOnRoute() || currentStreetTsid !== LEGALIZE_STATION_STREET) return false;
+  if (!legalizeOnRoute()) return offerLegalizeAtGate();
+  if (currentStreetTsid !== LEGALIZE_STATION_STREET) return false;
   if (legalizeRun.stage !== 'gregarious_departure') return false;
   handleLegalizeTarget({ classId: 'legalize_transit_gate', state: { legalizeState: legalizeRun, routeAction: 'depart_back_alley' } }, 'travel');
   return true;
+}
+
+/**
+ * subway_gate.js 150-161: a gate that turns away a player with no Card-Carrying Qualification (no
+ * badge, none in the pack) offers Legalize It there, and from then on it waits in the quest log.
+ */
+function offerLegalizeAtGate() {
+  if (questState.active?.[LEGALIZE_QUEST_ID] || questState.completed.includes(LEGALIZE_QUEST_ID)) return false;
+  if (achieveState.unlocked.includes(LEGALIZE_QUEST_ID) || countItem(inv, LEGALIZE_QUEST_ID) > 0) return false;
+  questState.story ||= {};
+  questState.story.gates = { ...(questState.story.gates || {}), legalize: true };
+  savePlayerState();
+  return openQuestDialogue(LEGALIZE_QUEST_ID, { kicker: 'A Red Button' });
 }
 
 function legalizeStageProgress(state = legalizeRun) {
@@ -25296,6 +25310,15 @@ function openQuestPanel() {
 
 /** quests.json teleportation_rescue_pig offerTriggers: the skill that brings Ilmenskie Jones's quest. */
 const ILMENSKIE_SKILL_ID = 'teleportation_4';
+/**
+ * What brought the other story quests in Glitch (Austin 2026-11-11: gate them as the original did,
+ * except the Museum of the Rook): Notice the Unnoticeable at 302 locations visited
+ * (players/inc_quests.js quests_enter_location), Four Letter Words at level 7 (quests.json
+ * letter_block_2 offerTriggers), and Legalize It at a subway gate that turns you away for want of
+ * papers (subway_gate.js 158 quests_offer; questState.story.gates.legalize records it).
+ */
+const PHANTOM_OFFER_LOCATIONS = 302;
+const FOUR_LETTER_OFFER_LEVEL = 7;
 
 const STORY_QUEST_IDS = [
   LEGALIZE_QUEST_ID,
@@ -25364,6 +25387,9 @@ function canOfferStoryQuest(classTsid) {
     }).ok && !winterWalkIsInstanced();
   }
   if (questState.completed.includes(classTsid)) return false;
+  if (classTsid === PHANTOM_QUEST_ID && groupLabelCount(achieveState, 'locations_visited') < PHANTOM_OFFER_LOCATIONS) return false;
+  if (classTsid === FOUR_LETTER_QUEST_ID && (Number(pc.level) || 0) < FOUR_LETTER_OFFER_LEVEL) return false;
+  if (classTsid === LEGALIZE_QUEST_ID && !questState.story?.gates?.legalize) return false;
   // Ticket 192: Teleportation IV's quest (inc_data_skills.js teleportation_4 quest_id; its offer
   // reads "using your newly acquired powers of Teleportation IV"), offered once that skill is learned.
   if (classTsid === ILMENSKIE_QUEST_ID) return (skillState.learned || []).includes(ILMENSKIE_SKILL_ID);
