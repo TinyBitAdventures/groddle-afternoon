@@ -2752,9 +2752,14 @@
   "deployed": "2026-11-11"
  },
  "git": {
-  "commits": 1667,
+  "commits": 1668,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-11",
+    "kind": "improve",
+    "text": "A full bag's bar turns the accent colour in the pack"
+   },
    {
     "date": "2026-11-11",
     "kind": "fix",
@@ -2869,11 +2874,6 @@
     "date": "2026-11-11",
     "kind": "fix",
     "text": "Cold Comfort asks for 60 seconds of meditation, as it counts"
-   },
-   {
-    "date": "2026-11-11",
-    "kind": "fix",
-    "text": "Real players chant the Incantations together"
    }
   ]
  },

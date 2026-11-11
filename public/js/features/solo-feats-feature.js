@@ -133,7 +133,7 @@ import {
   runFromServer,
   vogFor,
   youLine,
-} from '../feats-mp.js?v=b5e2f816';
+} from '../feats-mp.js?v=85549810';
 
 const POLL_MS = 500;
 /** How often an open panel redraws its "Opens again in" lines. */

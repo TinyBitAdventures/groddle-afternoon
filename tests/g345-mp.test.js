@@ -18,6 +18,7 @@ import { featTable } from '../tools/build-realtime-feats.mjs';
 import {
   APPLIED_KEEP,
   MP_ACTS,
+  MP_GOAL_PLAYERS_MAX,
   MP_ORDER,
   MP_PACE,
   RUN_MS,
@@ -27,6 +28,8 @@ import {
   goalLine,
   goalStatus,
   mpGoals,
+  mpGoalsFor,
+  mpShare,
   ordinal,
   remember,
   reportFor,
@@ -35,10 +38,10 @@ import {
   runAt,
   runFromServer,
   youLine,
-} from '../public/js/feats-mp.js?v=b5e2f816';
+} from '../public/js/feats-mp.js?v=85549810';
 import { FEAT_BY_ID, WIRED_FEATS, vogTextFor } from '../public/js/solo-feats.js?v=40f8c7b5';
 import { GAME_DAY_MS, GAME_EPOCH_MS } from '../public/js/game-day.js?v=edb00566';
-import { soloFeatsFeature } from '../public/js/features/solo-feats-feature.js?v=a2cfb6c2';
+import { soloFeatsFeature } from '../public/js/features/solo-feats-feature.js?v=82c729fe';
 
 const root = join(import.meta.dirname, '..');
 const feature = readFileSync(join(root, 'public/js/features/solo-feats-feature.js'), 'utf8');
@@ -61,6 +64,7 @@ describe('the server table (tools/build-realtime-feats.mjs)', () => {
       assert.equal(row.goal, f.goal * 3, id);
       assert.equal(row.bonus, row.goal * 2, id);
       assert.equal(row.super, row.goal * 3, id);
+      assert.equal(row.share, f.goal, `${id}: one sitting is a player's share (G656)`);
       assert.ok(row.pace.n > 0 && row.pace.everyMs > 0 && row.pace.burst > 0, id);
       assert.equal(row.title, f.title);
     }
@@ -73,6 +77,17 @@ describe('the server table (tools/build-realtime-feats.mjs)', () => {
     assert.deepEqual(t.reward.favor, [{ giant: 'all', points: 34 }]);
     assert.equal(t.reward.topPlaces, 26);
     assert.equal(t.reward.cigarPlaces, 30);
+    assert.equal(t.goalPlayersMax, MP_GOAL_PLAYERS_MAX);
+  });
+
+  it('scales the goals with yesterday\'s active players, never below the table (G656, #180)', () => {
+    assert.equal(mpShare('animal_love'), 50);
+    assert.deepEqual(mpGoalsFor('animal_love', 35), { goal: 1750, bonus: 3500, super: 5250 }); // 11-10's 35 players
+    assert.deepEqual(mpGoalsFor('animal_love', null), mpGoals('animal_love')); // unknown: the table's
+    assert.deepEqual(mpGoalsFor('animal_love', 0), mpGoals('animal_love'));
+    assert.deepEqual(mpGoalsFor('animal_love', 2), { goal: 150, bonus: 300, super: 450 }); // the floor
+    assert.deepEqual(mpGoalsFor('animal_love', 4), { goal: 200, bonus: 400, super: 600 });
+    assert.equal(mpGoalsFor('animal_love', 9999).goal, 50 * MP_GOAL_PLAYERS_MAX);
   });
 
   it('cites a pace for every wired Feat and acts only where the source fixes the amount', () => {
@@ -237,6 +252,21 @@ describe('the Feat feature in multiplayer (features/solo-feats-feature.js)', () 
     client.deliver({ t: 'feat_counted', feat: 'animal_love', run: 5348, n: 1, total: 1, mine: 1, place: 1 });
     assert.deepEqual(engine.calls.grant, ['down_to_the_wire']);
     assert.equal(engine.calls.data.mpFeat, 'animal_love:1/150:1:1');
+  });
+
+  it('shows the goals the server sent, not its own table (G656)', () => {
+    const client = fakeClient();
+    const engine = mpEngine(client);
+    soloFeatsFeature.init(engine);
+    soloFeatsFeature.restore({}, engine);
+    soloFeatsFeature.onStreetEnter({ tsid: engine.streetTsid }, engine);
+    const g = mpGoalsFor('animal_love', 35);
+    client.deliver({ t: 'feat_state', now: Date.now(), run: 5348, feat: 'animal_love', start: Date.now() - 1000, end: Date.now() + RUN_MS, total: 40, ...g, basis: 35, tier: 0, count: 3, mine: 0, place: 0, top: [] });
+    assert.equal(engine.calls.data.mpFeat, 'animal_love:40/1750:0:0');
+    // feat_progress carries no goals: the run keeps the server's.
+    client.deliver({ t: 'feat_progress', run: 5348, feat: 'animal_love', total: 1800, tier: 1, count: 4, top: [] });
+    assert.equal(engine.calls.data.mpFeat, 'animal_love:1800/1750:0:0');
+    assert.equal(goalLine(runFromServer({ feat: 'animal_love', total: 1800, ...g }, 0)), 'Minimum goal met! 1,700 more to meet the bonus goal.');
   });
 
   it('applies the first contribution\'s badges and the reward once, then acks', async () => {

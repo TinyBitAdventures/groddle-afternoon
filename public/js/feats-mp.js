@@ -42,7 +42,16 @@
  * web side). The rule here: the minimum goal is three players' sittings,
  * three times the solo personal goal (solo-feats.js PERSONAL GOALS: one
  * sitting of that Feat's activity); the bonus goal is twice the minimum and
- * the supermegabonus goal three times it, the blog's three steps.
+ * the supermegabonus goal three times it, the blog's three steps. Those are
+ * the table's goals (mpGoals) and the floor. The goals scale with yesterday's
+ * active players (register G656, report #180 "Perhaps the goals on the feats
+ * need to be increased"; Austin: "Scale with yesterday's active players"):
+ * when a run starts the realtime server sets its minimum to one sitting (the
+ * personal goal, mpShare) per player who signed in to the game the UTC day
+ * before, at most MP_GOAL_PLAYERS_MAX players and never below the table's
+ * minimum; bonus and supermegabonus stay 2x and 3x of it. With no full day
+ * counted yet the table's goals stand. The run's goals come in feat_state,
+ * and the panel and the vog_text's {remaining} use those, never this table.
  *
  * SCHEDULE. The source ran each Feat once on its own game_day, years apart.
  * Here the wired Feats take turns in game_day order, one a real day (the
@@ -83,6 +92,8 @@ export { QUICK_MS };
 export const MP_GOAL_SCALE = 3;
 export const MP_BONUS = 2;
 export const MP_SUPER = 3;
+/** GOALS (G656): yesterday's players count toward the minimum up to this many (a spike day cannot make tomorrow unreachable). */
+export const MP_GOAL_PLAYERS_MAX = 500;
 
 /** inc_feats.js 139-144: place <= 26 counts feats:top_26, 27 to 30 get The Cigar. */
 export const TOP_PLACES = 26;
@@ -147,6 +158,25 @@ export function mpGoals(featId) {
   const f = FEAT_BY_ID[featId];
   if (!f?.wired && !f?.mp) return null;
   const goal = f.goal * MP_GOAL_SCALE;
+  return { goal, bonus: goal * MP_BONUS, super: goal * MP_SUPER };
+}
+
+/** GOALS (G656): one player's share of the minimum, one sitting (the personal goal). */
+export function mpShare(featId) {
+  const f = FEAT_BY_ID[featId];
+  if (!f?.wired && !f?.mp) return 0;
+  return f.goal;
+}
+
+/**
+ * The goals the server sets for a run from yesterday's active players
+ * (feats.go runGoals): players unknown (null) or few keep the table's.
+ */
+export function mpGoalsFor(featId, players) {
+  const base = mpGoals(featId);
+  if (!base || players == null || !(Number(players) >= 0)) return base;
+  const goal = mpShare(featId) * Math.min(Math.floor(Number(players)), MP_GOAL_PLAYERS_MAX);
+  if (goal <= base.goal) return base;
   return { goal, bonus: goal * MP_BONUS, super: goal * MP_SUPER };
 }
 
