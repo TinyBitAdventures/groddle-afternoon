@@ -150,6 +150,17 @@ echo json_encode([
         'spaces' => TicketStore::subject("a \t  b"),
     ],
     'statusAfter' => [TicketStore::statusAfter('player'), TicketStore::statusAfter('admin')],
+    // Who closed it (Austin 2026-11-11): closed_by read back only on a closed row, and only a known role.
+    'closedBy' => [
+        'closers' => TicketStore::CLOSERS,
+        'fitsColumn' => max(array_map('strlen', TicketStore::CLOSERS)) <= 8,
+        'player' => TicketStore::closedBy(['status' => 'closed', 'closed_by' => 'player']),
+        'admin' => TicketStore::closedBy(['status' => 'closed', 'closed_by' => 'admin']),
+        'unknown' => TicketStore::closedBy(['status' => 'closed', 'closed_by' => null]),
+        'oldRow' => TicketStore::closedBy(['status' => 'closed']),
+        'reopened' => TicketStore::closedBy(['status' => 'open', 'closed_by' => 'player']),
+        'junk' => TicketStore::closedBy(['status' => 'closed', 'closed_by' => 'robot']),
+    ],
     'unread' => [
         'adminWroteNeverRead' => TicketStore::unreadFor($row('admin', null, null), 'player'),
         'adminWroteReadBefore' => TicketStore::unreadFor($row('admin', '2026-10-30 11:00:00', null), 'player'),

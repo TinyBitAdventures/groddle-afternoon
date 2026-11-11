@@ -908,6 +908,42 @@ describe('Working on it and Edit until read (ticket 49)', () => {
       assert.match(store, /self::statusAfter\(\$role, \$current\)/, 'a reply keeps a working report working');
     });
 
+    it('who closed it: closed_by and closed_at added, set by both Close routes, cleared on reopen, in the console\'s rows (Austin 2026-11-11)', () => {
+      const m = JSON.parse(src('minn.json'));
+      const t = m.tables.groddle_tickets;
+      assert.ok(t.includes('closed_by varchar(8) NULL DEFAULT NULL'), 'nullable: old closed reports stay unknown');
+      assert.ok(t.includes('closed_at datetime NULL DEFAULT NULL'));
+      // Additive: every earlier column still there, unchanged.
+      for (const col of ["status varchar(8) NOT NULL DEFAULT 'open'", 'legacy_post_id bigint(20) unsigned NULL DEFAULT NULL', 'admin_read_at datetime NULL DEFAULT NULL']) assert.ok(t.includes(col), col);
+      const [a, b, c] = m.version.split('.').map(Number);
+      assert.ok(a > 0 || b > 5 || (b === 5 && c >= 48), `schema version past 0.5.47: ${m.version}`);
+      // The player's Close is a withdrawal; the console's Close is an administrator's.
+      const player = src('src/Tickets.php');
+      const pclose = player.slice(player.indexOf('public function close('), player.indexOf('public function edit('));
+      assert.match(pclose, /\$store->setStatus\(\(int\) \$row\['id'\], TicketStore::CLOSED, time\(\), TicketStore::PLAYER\);/);
+      const admin = src('src/AdminTickets.php');
+      const aclose = admin.slice(admin.indexOf('public function close('), admin.indexOf('public function reopen('));
+      assert.match(aclose, /->setStatus\(\(int\) \$row\['id'\], TicketStore::CLOSED, time\(\), TicketStore::ADMIN\);/);
+      // Every other setStatus call names no closer: closing is the only status that keeps one.
+      const calls = [...`${player}\n${admin}`.matchAll(/->setStatus\(([^;]*)\);/g)].map((x) => x[1]);
+      assert.equal(calls.length, 4);
+      for (const call of calls) if (!/TicketStore::CLOSED/.test(call)) assert.doesNotMatch(call, /TicketStore::(PLAYER|ADMIN)\)$/, call);
+      const store = src('src/TicketStore.php');
+      const set = store.slice(store.indexOf('public function setStatus('), store.indexOf('public function editFirst('));
+      assert.match(set, /SET status = \?, updated_at = \?, closed_by = \?, closed_at = \? WHERE id = \?/);
+      assert.match(set, /\$closed && in_array\(\$by, self::CLOSERS, true\) \? \$by : null, \$closed \? \$at : null/, 'a status other than closed clears both');
+      // A message from either side opens a closed ticket again, and forgets who closed it.
+      const add = store.slice(store.indexOf('public function add('), store.indexOf('public function setStatus('));
+      assert.match(add, /\{\$read\} = \?, closed_by = NULL, closed_at = NULL WHERE id = \?/);
+      // The console's rows (list and thread both build them in row()); the player's Summary leaves it out.
+      const row = admin.slice(admin.indexOf('private function row('), admin.indexOf('private function ticket('));
+      assert.match(row, /'closedBy' => \$closedBy,/);
+      assert.match(row, /'closedAt' => /);
+      assert.match(admin, /"closedBy":"player"\|"admin"\|null/, 'the docblock lists it');
+      const summary = store.slice(store.indexOf('public static function summary('), store.indexOf('public static function messagesOut('));
+      assert.doesNotMatch(summary, /closed/);
+    });
+
     it('Edit: a player route through mine(), the new-message rules, a locked conditional write, 409 once read', () => {
       const php = src('src/Tickets.php');
       const edit = php.slice(php.indexOf('public function edit('), php.indexOf('private function thread('));
@@ -968,6 +1004,8 @@ describe('Working on it and Edit until read (ticket 49)', () => {
       ]);
       assert.equal(e.adminOut[0].body, 'Pigs float high');
       assert.deepEqual(e.adminOutNone[0].revisions, []);
+      // Who closed it: only a closed row's known role; old closed rows and reopened ones read null.
+      assert.deepEqual(out.closedBy, { closers: ['player', 'admin'], fitsColumn: true, player: 'player', admin: 'admin', unknown: null, oldRow: null, reopened: null, junk: null });
     });
 
     it('revisions: every edit keeps the text it replaces; administrators see the whole history (Austin 2026-11-02)', async () => {

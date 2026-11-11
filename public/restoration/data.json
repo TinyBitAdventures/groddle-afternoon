@@ -2752,9 +2752,14 @@
   "deployed": "2026-11-11"
  },
  "git": {
-  "commits": 1663,
+  "commits": 1664,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-11",
+    "kind": "fix",
+    "text": "With a window open, another window's key opens it in its place"
+   },
    {
     "date": "2026-11-11",
     "kind": "fix",
@@ -2869,11 +2874,6 @@
     "date": "2026-11-11",
     "kind": "fix",
     "text": "The Butler can be clicked when it stands in front of the house"
-   },
-   {
-    "date": "2026-11-10",
-    "kind": "improve",
-    "text": "Notice the Unnoticeable, Legalize It and Four Letter Words wait for what offered them in Glitch"
    }
   ]
  },
