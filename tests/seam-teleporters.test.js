@@ -8,7 +8,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { OPPIDAN_AVENUE_TSID, OPPIDAN_TELEPORTERS, SEAM_TELEPORTERS, seamTeleportersOn } from '../public/js/seam-teleporters.js?v=09d11340';
-import { inTeleporter } from '../public/js/hidden-floors.js?v=eb220641';
+import { inTeleporter } from '../public/js/hidden-floors.js?v=9a7afdf3';
 
 const spike = join(dirname(fileURLToPath(import.meta.url)), '..');
 const street = JSON.parse(readFileSync(join(spike, 'public/assets/streets', `${OPPIDAN_AVENUE_TSID}.json`), 'utf8'));

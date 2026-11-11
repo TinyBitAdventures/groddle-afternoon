@@ -33,8 +33,8 @@ import { createMinnAccount } from '../public/js/minn-account.js?v=8f2741cd';
 import { buddiesFeature } from '../public/js/features/buddies-feature.js?v=cea4455f';
 import { BUDDY_DESTINATION_TEXT, BUDDY_DESTINATION_VERB, buddyDestination, buddyFaceUrl, createFaceMemory } from '../public/js/buddy-list.js?v=b418f3f2';
 import { STREET_INDEX } from '../public/js/street-loader.js?v=18b181ad';
-import { FROM_LIST_VERBS, playerMenuRows } from '../public/js/ui/player-menu.js?v=def643ed';
-import { FEATURES } from '../public/js/features/index.js?v=e22439b2';
+import { FROM_LIST_VERBS, playerMenuRows } from '../public/js/ui/player-menu.js?v=448b308a';
+import { FEATURES } from '../public/js/features/index.js?v=8ad5619f';
 import { serverPath, sitePath, skipWithoutServer, skipWithoutSite } from '../tools/repos.mjs';
 
 const root = join(import.meta.dirname, '..');

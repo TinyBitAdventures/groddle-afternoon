@@ -13,7 +13,7 @@ import { readFileSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { populationForStreet, setStreetEcologyCatalog, RENDER_ANIMAL_CAPS, STREET_ANIMAL_CAPS } from '../public/js/street-ecology.js?v=08076876';
-import { batterflyCountForStreet } from '../public/js/animal-husbandry.js?v=0bb5de4a';
+import { batterflyCountForStreet } from '../public/js/animal-husbandry.js?v=f29ec924';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const catalog = JSON.parse(readFileSync(join(root, 'public/assets/content/street-ecology.json'), 'utf8'));

@@ -18,7 +18,7 @@
  */
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { JUMP_SPEED, NORMAL_BUFF, avatarFall } from '../public/js/avatar-step.js?v=e8e9581f';
+import { JUMP_SPEED, NORMAL_BUFF, avatarFall } from '../public/js/avatar-step.js?v=9cdca818';
 import { readFileSync, readdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';

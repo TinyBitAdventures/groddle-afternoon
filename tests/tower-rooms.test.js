@@ -39,7 +39,7 @@ import {
   flats,
 } from '../public/js/tower-challenge-rooms.js?v=7502a893';
 import { ladderTopDeck } from '../public/js/street-model.js?v=b6cb6a4e';
-import { GRAVITY, JUMP_SPEED, TERMINAL_VY, WALK_MAX, jumpApex } from '../public/js/avatar-step.js?v=e8e9581f';
+import { GRAVITY, JUMP_SPEED, TERMINAL_VY, WALK_MAX, jumpApex } from '../public/js/avatar-step.js?v=9cdca818';
 
 const spike = join(dirname(fileURLToPath(import.meta.url)), '..');
 const streets = join(spike, 'public/assets/streets');

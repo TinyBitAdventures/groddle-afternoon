@@ -16,7 +16,7 @@ import assert from 'node:assert/strict';
 import { readFileSync, readdirSync } from 'node:fs';
 import { describe, it } from 'node:test';
 
-import { applyPigState, applyTreeState, applyWoodState, createStreetCopy, stateFor, takeObjs } from '../public/js/street-objects.js?v=41398b2b';
+import { applyPigState, applyTreeState, applyWoodState, createStreetCopy, stateFor, takeObjs } from '../public/js/street-objects.js?v=8d217c17';
 import { serverPath, skipWithoutServer } from '../tools/repos.mjs';
 
 /** The state files: flag -> default file name beside -secret-file. */

@@ -48,7 +48,7 @@
  * card offers the way back here).
  */
 
-import { locationEventsApi } from './location-events-feature.js?v=0062e032';
+import { locationEventsApi } from './location-events-feature.js?v=d86a5941';
 import { collectQuoin, QUOIN_SHEET, QUOIN_TYPES } from '../quoins.js?v=237c1d5d';
 import {
   CARD_RETURN_TEXT,

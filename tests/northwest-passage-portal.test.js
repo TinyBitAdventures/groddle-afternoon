@@ -21,11 +21,11 @@ import { execFileSync } from 'node:child_process';
 import { dirname, join } from 'node:path';
 import { homedir } from 'node:os';
 import { barriersScreen, platformsScreen, worldToScreen, streetWidth } from '../public/js/street-model.js?v=b6cb6a4e';
-import { avatarGround, stepAvatar, JUMP_SPEED } from '../public/js/avatar-step.js?v=e8e9581f';
+import { avatarGround, stepAvatar, JUMP_SPEED } from '../public/js/avatar-step.js?v=9cdca818';
 import { rawTripleJumpMultiplier, scaledTripleJumpMultiplier, TRIPLE_JUMP_UPGRADES } from '../public/js/movement.js?v=b30f84eb';
 import { arrivalInTarget } from '../public/js/location-navigation.js?v=90fca5cc';
-import { inTeleporter, teleportersOn, PLAIN_JUMP_APEX } from '../public/js/hidden-floors.js?v=eb220641';
-import { hiddenFloorsFeature } from '../public/js/features/hidden-floors-feature.js?v=8475c970';
+import { inTeleporter, teleportersOn, PLAIN_JUMP_APEX } from '../public/js/hidden-floors.js?v=9a7afdf3';
+import { hiddenFloorsFeature } from '../public/js/features/hidden-floors-feature.js?v=ce4f75f0';
 import {
   NORTHWEST_PASSAGE_TSID,
   WINTRY_CAGE,

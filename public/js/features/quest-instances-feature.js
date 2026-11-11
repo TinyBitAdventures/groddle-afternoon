@@ -89,7 +89,7 @@ import {
 } from '../quest-instance.js?v=f0df88c3';
 import { FAMILIAR_GATES, QUEST_ROOMS, REMINISCE_ITEMS, ROOM_ITEMS, isBuiltRoom, questGiver, roomModulePath } from '../quest-rooms/catalog.js?v=d77d3d17';
 import * as kit from '../quest-rooms/kit.js?v=6ec6de2e';
-import { locationEventsApi } from './location-events-feature.js?v=0062e032';
+import { locationEventsApi } from './location-events-feature.js?v=d86a5941';
 import {
   acceptOffer,
   ensureQuestOfferState,
@@ -107,7 +107,7 @@ import { armPromptTimeout, promptTimeoutMs } from '../prompt-timeout.js?v=b38c97
 import { applyFamiliarLook, familiarLook } from '../familiar.js?v=5fd83250';
 import { collectQuoin, QUOIN_SHEET, QUOIN_TYPES } from '../quoins.js?v=237c1d5d';
 import { sourceFromUrl } from '../textures.js?v=f024bd6a';
-import { REMAKE_ROOM_PHYSICS } from '../avatar-step.js?v=e8e9581f';
+import { REMAKE_ROOM_PHYSICS } from '../avatar-step.js?v=9cdca818';
 
 let quoinFrames = null;
 function quoinTexture(PIXI, type) {
@@ -169,7 +169,7 @@ const ROOM_MODULES = {
   an_autumn_day: () => import('../quest-rooms/an-autumn-day.js?v=3ffa0cfe'),
   being_watched: () => import('../quest-rooms/being-watched.js?v=7a38b1f5'),
   back_alley: () => import('../quest-rooms/back-alley.js?v=ed2fa598'),
-  clubhouse: () => import('../quest-rooms/clubhouse.js?v=bc335b6e'),
+  clubhouse: () => import('../quest-rooms/clubhouse.js?v=c7835278'),
   light_perspective: () => import('../quest-rooms/light-perspective.js?v=e96ed2d2'),
   tile_puzzle: () => import('../quest-rooms/tile-puzzle.js?v=42d5075a'),
   operation_grow: () => import('../quest-rooms/operation-grow.js?v=a003eef8'),

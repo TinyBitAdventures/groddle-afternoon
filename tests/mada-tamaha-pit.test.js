@@ -15,9 +15,9 @@ import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { reachStreet } from '../public/js/builder/reach-graph.js?v=f1b86aeb';
+import { reachStreet } from '../public/js/builder/reach-graph.js?v=22368fd6';
 import { MADA_TAMAHA_TSID, NARAKA_TELEPORTERS, narakaTeleportersOn } from '../public/js/hell.js?v=33a46876';
-import { inTeleporter } from '../public/js/hidden-floors.js?v=eb220641';
+import { inTeleporter } from '../public/js/hidden-floors.js?v=9a7afdf3';
 
 const spike = join(dirname(fileURLToPath(import.meta.url)), '..');
 const street = JSON.parse(readFileSync(join(spike, 'public/assets/streets', `${MADA_TAMAHA_TSID}.json`), 'utf8'));

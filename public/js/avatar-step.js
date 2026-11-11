@@ -201,6 +201,9 @@ export function streetPhysicsFreeFall(body, buff, dt) {
  * A gap over a buried signpost is a hole to jump into (the Great Hole to Ix): fall, and never get
  * pulled back up onto the rim from below. `fallback` is the floor of a street with no lines.
  */
+/** How far under a line the feet may be and still be put on it (a seam or a slope's step). */
+export const UNDER_LINE_SLACK = 24;
+
 export function avatarGround(platforms, px, py, vy, { street = null, fallback = 0, bottom = null } = {}) {
   if (platforms?.length) {
     const hit = resolveGround(platforms, px, py, vy ?? 0, GROUND_SNAP);
@@ -219,7 +222,11 @@ export function avatarGround(platforms, px, py, vy, { street = null, fallback = 
       }
     }
     const hole = street ? buriedSignpostUnder(street, px, Infinity) : null;
-    if (best != null && py >= best - 80 && !(hole && py > best + 24)) return best;
+    // The near line is a floor only for feet at it or above it. Feet well under it are under a
+    // ledge, not on one (lines are one-way from above, as the client's): ticket 189, walking off
+    // the end of Greyving Grays' lower gut over its open shaft lifted the avatar 2,260 px up onto
+    // the only line at that x, the gut's upper bend.
+    if (best != null && py >= best - 80 && py <= best + UNDER_LINE_SLACK && !(hole && py > best + 24)) return best;
     if (hole) return worldToScreen(street, px, street.bounds?.b ?? 0).y;
     // `bottom`: the lowest line of the whole street when `platforms` is only the lines near x.
     return bottom ?? platforms.reduce((m, p) => Math.max(m, p.y1, p.y2), 0);

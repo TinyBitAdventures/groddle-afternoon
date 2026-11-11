@@ -21,7 +21,7 @@ import {
 import { VERB_RANGES } from '../public/js/verb-ranges-data.js?v=4d0a4515';
 import { OUT_OF_REACH_LINE } from '../public/js/reach.js?v=4187d746';
 import { createUserPath, stepUserPath } from '../public/js/user-path.js?v=8880557f';
-import { NORMAL_BUFF, avatarGround, stepAvatar, steerX } from '../public/js/avatar-step.js?v=e8e9581f';
+import { NORMAL_BUFF, avatarGround, stepAvatar, steerX } from '../public/js/avatar-step.js?v=9cdca818';
 import { groundBeneath, platformsScreen, barriersScreen, streetWidth } from '../public/js/street-model.js?v=b6cb6a4e';
 
 const root = join(import.meta.dirname, '..');
@@ -149,5 +149,23 @@ describe('game.js wiring', () => {
     assert.match(game, /function avatarStepOptions\(dt = 1\) \{\s*return \{\s*dt,\s*buff: combinedPhysics\(\),\s*platforms: streetPlatforms,\s*barriers: barriersScreen\(currentStreet\),\s*worldW: WORLD_W,/);
     assert.match(game, /stepAvatar\(player, \{\s*dt,\s*buff: combinedPhysics\(\),\s*platforms: streetPlatforms,\s*barriers: barriersScreen\(currentStreet\),\s*worldW: WORLD_W,/);
     assert.match(game, /const opts = \{ \.\.\.avatarStepOptions\(1\), ground: /);
+  });
+});
+
+describe('ticket 189: feet under a ledge are not put on it', () => {
+  it('walking off the end of a floor over an open shaft falls instead of rising onto a line far overhead', async () => {
+    const { avatarGround, UNDER_LINE_SLACK } = await import('../public/js/avatar-step.js?v=9cdca818');
+    // Greyving Grays, screen space: the lower gut floor ends at x 2509 (y 3731); at x 2560 the only
+    // standable line is the upper bend, 2,300 px over the feet.
+    const platforms = [
+      { id: 'floor', x1: 2443, y1: 3659, x2: 2509, y2: 3731, pc_perm: -1 },
+      { id: 'bend', x1: 2358, y1: 1470, x2: 2578, y2: 1408, pc_perm: -1 },
+      { id: 'shaft_floor', x1: 180, y1: 3993, x2: 454, y2: 3993, pc_perm: -1 },
+    ];
+    const floor = avatarGround(platforms, 2560, 3700, 1);
+    assert.ok(floor > 3700, `fell to ${floor}, not up to the bend`);
+    // A seam a few px over the feet still holds them (the slack).
+    const seam = [{ id: 'a', x1: 0, y1: 500, x2: 100, y2: 500, pc_perm: -1 }];
+    assert.equal(avatarGround(seam, 104, 500 + UNDER_LINE_SLACK - 4, 1), 500);
   });
 });

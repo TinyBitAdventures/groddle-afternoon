@@ -24,7 +24,7 @@ import {
   getToolCondition,
   setToolRemaining,
 } from '../public/js/tools.js?v=5f482998';
-import { getVerbsFor, runVerb } from '../public/content.js?v=531a6c8c';
+import { getVerbsFor, runVerb } from '../public/content.js?v=bb13a931';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const publicDir = path.join(root, 'public');

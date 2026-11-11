@@ -32,7 +32,7 @@ import { IM_VERB_ID } from '../player-im.js?v=da51888c';
 import { BUDDY_VERBS } from '../buddies.js?v=cff7bf6e';
 import { BUDDY_DESTINATION_VERB } from '../buddy-list.js?v=b418f3f2';
 import { VISIT_VERB } from '../neighbours-mp.js?v=f221f6e6';
-import { FOLLOW_STOP_VERB } from '../follow-mp.js?v=313c701f';
+import { FOLLOW_STOP_VERB } from '../follow-mp.js?v=5ac22b62';
 import { UNNAMED_PLAYER } from '../player-names.js?v=f9b78094';
 
 /** The feature that draws other players and owns their targets (features/party-feature.js PARTY_FEATURE_ID). */

@@ -11,7 +11,7 @@ import { join } from 'node:path';
 
 import { SLOPE_STICK, holdCloseToFloor, stickToSlope } from '../public/js/slope-walk.js?v=9af1e505';
 import { isStandable, platformYAt, platformsScreen, resolveGround } from '../public/js/street-model.js?v=b6cb6a4e';
-import { NORMAL_BUFF, avatarGround, stepAvatar } from '../public/js/avatar-step.js?v=e8e9581f';
+import { NORMAL_BUFF, avatarGround, stepAvatar } from '../public/js/avatar-step.js?v=9cdca818';
 import { convertLocationXml } from '../public/js/location-xml.js?v=a4db2433';
 import { avatarAnimState } from '../public/js/avatar-anims.js?v=fb921bf4';
 import { landingY } from '../public/js/walk-surface.js?v=106bfdc5';

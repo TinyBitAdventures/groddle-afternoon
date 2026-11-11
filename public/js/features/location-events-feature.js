@@ -51,7 +51,7 @@ import {
   runLocationEvent,
   streetOwner,
 } from '../location-events.js?v=05663361';
-import { JUMP_SPEED } from '../avatar-step.js?v=e8e9581f';
+import { JUMP_SPEED } from '../avatar-step.js?v=9cdca818';
 
 export const LOCATION_EVENTS_FEATURE_ID = 'location-events';
 const DATA_MS = 250;

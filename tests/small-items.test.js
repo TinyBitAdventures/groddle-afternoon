@@ -28,9 +28,9 @@ import {
   planBallHit,
   reconcileFortunes,
 } from '../public/js/small-items.js?v=78d0056a';
-import { smallItemsFeature } from '../public/js/features/small-items-feature.js?v=03453a2b';
-import { streetFurnitureFeature } from '../public/js/features/street-furniture-feature.js?v=66a8ba41';
-import { FEATURES } from '../public/js/features/index.js?v=e22439b2';
+import { smallItemsFeature } from '../public/js/features/small-items-feature.js?v=b407a3d9';
+import { streetFurnitureFeature } from '../public/js/features/street-furniture-feature.js?v=87214e9e';
+import { FEATURES } from '../public/js/features/index.js?v=8ad5619f';
 import { countItem } from '../public/js/inventory.js?v=60dfc9ca';
 import { pickWoodTool, quoteWoodTreeHarvest, harvestWoodTree, woodToolLabel } from '../public/js/woodcutting.js?v=9a2039d1';
 import { TOOL_CONDITION_CATALOG, createToolConditionState, getToolCondition, setToolRemaining } from '../public/js/tools.js?v=5f482998';
