@@ -183,8 +183,11 @@ const ALIASES = {
  * client-url (the Flash client's own default url) or filename (an SFX key matched
  * by name only, wired where the game plays the key and the file fits). Installed
  * byte for byte by tools/sound/install-sounds-zip.mjs; their own origin, so the
- * Wayback counts stay what the Wayback gave.
+ * Wayback counts stay what the Wayback gave. A row may carry `gainDb` with the
+ * file's measured `peakDb`: the sound board plays that key that many dB up or
+ * down (SOUND_GAINS), so a file far off its set's level ships untouched.
  */
+const MAX_LIFTED_PEAK_DB = -6;
 const ZIP_MAP = JSON.parse(readFileSync(join(root, 'tools/sound/sounds-zip-map.json'), 'utf8'));
 const SOUNDS_ZIP = {};
 for (const row of ZIP_MAP.files) {
@@ -199,6 +202,12 @@ for (const row of ZIP_MAP.files) {
     ...(row.sameAs ? { why: `the zip's ${row.zip} is ${row.sameAs.split('/').pop()} byte for byte` } : {}),
     ...(row.why ? { why: row.why } : {}),
   };
+  if (row.gainDb !== undefined) {
+    if (!Number.isFinite(row.gainDb) || !Number.isFinite(row.peakDb) || !row.gainWhy) throw new Error(`${row.key}: gainDb needs the file's measured peakDb and a gainWhy`);
+    if (row.peakDb + row.gainDb > MAX_LIFTED_PEAK_DB) throw new Error(`${row.key}: ${row.gainDb} dB on a ${row.peakDb} dB peak passes ${MAX_LIFTED_PEAK_DB} dB`);
+    if (row.sameAs) throw new Error(`${row.key}: a gain belongs on the row that ships the file`);
+    Object.assign(SOUNDS_ZIP[row.key], { gainDb: row.gainDb, peakDb: row.peakDb, gainWhy: row.gainWhy });
+  }
 }
 for (const [alias, target] of Object.entries(ZIP_MAP.aliases)) {
   if (ALIASES[alias]) throw new Error(`alias ${alias} mapped twice`);
@@ -587,7 +596,7 @@ for (const [key, row] of Object.entries(SOUNDS_ZIP)) {
     throw new Error(`${key}: ${row.zipFile} is not its music_map url ${entry.url}`);
   }
   Object.assign(entry, { file: row.file, origin: 'sounds-zip', zipFile: row.zipFile, zipMd5: row.zipMd5, zipMatch: row.match,
-    why: row.why, doubt: row.doubt });
+    why: row.why, doubt: row.doubt, gainDb: row.gainDb, peakDb: row.peakDb, gainWhy: row.gainWhy });
   if (row.url) entry.url = row.url;
   if (!existsSync(join(PUBLIC, row.file))) throw new Error(`missing Sounds.zip file ${row.file} (run tools/sound/install-sounds-zip.mjs)`);
 }
@@ -640,6 +649,7 @@ for (const key of [...keys.keys()].sort((a, b) => a.localeCompare(b))) {
     ...(row.doubt ? { doubt: row.doubt } : {}),
     ...(row.mirrorSource ? { mirrorSource: row.mirrorSource, mirrorFile: row.mirrorFile } : {}),
     ...(row.zipFile ? { zipFile: row.zipFile, zipMd5: row.zipMd5, zipMatch: row.zipMatch } : {}),
+    ...(row.gainDb !== undefined ? { gainDb: row.gainDb, peakDb: row.peakDb, gainWhy: row.gainWhy } : {}),
     ...(row.fit && !row.source ? { fit: row.fit } : {}),
     ...(ALIASES[key] ? { alias: ALIASES[key] } : {}),
     ...(dead ? { dead: 'commented out in the final client', commentedOut: row.commentedOut } : {}),
@@ -653,6 +663,8 @@ for (const [alias, target] of Object.entries(ALIASES)) {
 
 const files = {};
 for (const [key, row] of Object.entries(catalog)) if (row.file) files[key] = row.file;
+const gains = {};
+for (const [key, row] of Object.entries(catalog)) if (row.file && row.gainDb) gains[key] = row.gainDb;
 const counts = {
   keys: Object.keys(catalog).length,
   original: Object.values(catalog).filter((r) => r.category !== 'remake' && r.origin !== 'overlay-fla').length,
@@ -691,6 +703,9 @@ export const SOUND_FILES = Object.freeze(${JSON.stringify(files, null, 2)});
 
 /** Keys that borrow another key's recovered file. */
 export const SOUND_ALIASES = Object.freeze(${JSON.stringify(ALIASES, null, 2)});
+
+/** Key → dB the sound board adds when it plays that key's file (the file ships at its own level). */
+export const SOUND_GAINS = Object.freeze(${JSON.stringify(gains, null, 2)});
 
 /** Key → catalog category, for synth recipe selection without the JSON. */
 export const SOUND_CATEGORIES = Object.freeze(${JSON.stringify(Object.fromEntries(Object.entries(catalog).map(([k, r]) => [k, r.category])))});

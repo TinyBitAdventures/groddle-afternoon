@@ -246,7 +246,7 @@
     { "item": "sfx", "file": "esquibeth symbol glow.mp3", "sameAs": "WATERFALL_SYMBOL_GLOW", "evidence": "r 0.995 with the c2 file" },
     { "item": "sfx", "file": "esquibeth-rock disappears.mp3", "sameAs": "ROCKS_DISAPPEAR", "evidence": "r 0.988 with the c2 file" },
     { "item": "sfx", "file": "still-collect.mp3", "sameAs": "COLLECT", "evidence": "r 0.978 with the c2 file 1322173667-Collect_1.3.mp3 (Sounds.zip), 11 dB louder; STILL_COLLECT plays the c2 file since 2026-11-10" },
-    { "item": "sfx", "file": "still-ready.mp3", "sameAs": "READY", "evidence": "r 0.981 with the c2 file 1322173657-Ready_1.1.mp3 (Sounds.zip), 8.4 dB louder; STILL_READY plays the c2 file since 2026-11-10" },
+    { "item": "sfx", "file": "still-ready.mp3", "sameAs": "STILL_READY", "evidence": "r 0.981 with the c2 file 1322173657-Ready_1.1.mp3 (Sounds.zip), 8.4 dB louder; STILL_READY plays the c2 file since 2026-11-10" },
     { "item": "sfx", "file": "flitterbug collision.mp3", "sameAs": "FLITTERBUG_COLLISION", "evidence": "r 0.999" },
     { "item": "sfx", "file": "new quest alert.mp3", "sameAs": "QUEST_ADDED", "evidence": "r 0.974" },
     { "item": "sfx", "file": "petrified rock.mp3", "sameAs": "PETRIFIED_ROCK", "evidence": "r 0.969 with the c2 file" },

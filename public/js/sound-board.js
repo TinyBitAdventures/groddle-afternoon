@@ -9,10 +9,14 @@
  * mute gain. The client defaulted SFX and music both to 0.6
  * (SoundManager.DEFAULT_SFX_VOLUME); the remake's BGM sits at 0.26, so the SFX
  * bus defaults to 0.7 to keep the same balance (?sfxvol=0..1 overrides).
+ *
+ * A key may carry a gain of its own (SOUND_GAINS, dB, from the file's row in
+ * tools/sound/sounds-zip-map.json): its file plays that much louder or softer
+ * wherever the key is played, the sound test included, and ships untouched.
  */
 
-import { SOUND_ALIASES, SOUND_CATEGORIES, SOUND_FILES } from './sound-keys.js?v=df36f0cf';
-import { playSynthRecipe, recipeForKey } from './synth-sfx.js?v=920944cd';
+import { SOUND_ALIASES, SOUND_CATEGORIES, SOUND_FILES, SOUND_GAINS } from './sound-keys.js?v=fb6ee553';
+import { playSynthRecipe, recipeForKey } from './synth-sfx.js?v=c30a1709';
 import { legacySoundKey } from './sound-moments.js?v=52ad523c';
 
 export const DEFAULT_SFX_VOLUME = 0.7;
@@ -24,13 +28,15 @@ const MAX_VOICES = 14;
 /**
  * Resolve a key (or legacy id) to what would play.
  * @param {string} name
- * @returns {{ key: string, file: string|null, recipe: string|null, category: string }}
+ * @returns {{ key: string, file: string|null, recipe: string|null, category: string, gainDb: number }}
  */
 export function resolveSound(name) {
   const key = legacySoundKey(name);
   const category = SOUND_CATEGORIES[key] || '';
-  const file = SOUND_FILES[key] || SOUND_FILES[SOUND_ALIASES[key]] || null;
-  return { key, file, recipe: recipeForKey(key, category), category };
+  // The gain belongs to the file: a key that borrows a file plays it at that file's level.
+  const owner = SOUND_FILES[key] ? key : SOUND_ALIASES[key];
+  const file = SOUND_FILES[owner] || null;
+  return { key, file, recipe: recipeForKey(key, category), category, gainDb: (file && SOUND_GAINS[owner]) || 0 };
 }
 
 /**
@@ -103,11 +109,12 @@ export function createSoundBoard(host) {
     return handle;
   }
 
-  function voiceGain(ctx, volumeScale) {
+  function voiceGain(ctx, volumeScale, gainDb = 0) {
     const out = output();
     if (!out) return null;
     const g = ctx.createGain();
-    g.gain.value = Math.max(0, Math.min(2, volumeScale));
+    // The caller's volume stays within 0..2; a key's own gain (a file lifted to its set's level) is on top.
+    g.gain.value = Math.max(0, Math.min(2, volumeScale)) * 10 ** (gainDb / 20);
     g.connect(out.bus);
     return g;
   }
@@ -126,7 +133,7 @@ export function createSoundBoard(host) {
 
   function playBuffer(resolved, buffer, opts) {
     const ctx = host.getContext();
-    const gain = voiceGain(ctx, opts.volume ?? 0.8);
+    const gain = voiceGain(ctx, opts.volume ?? 0.8, resolved.gainDb);
     if (!gain) return null;
     const src = ctx.createBufferSource();
     src.buffer = buffer;

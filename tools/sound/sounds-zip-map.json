@@ -1060,11 +1060,14 @@
   },
   {
    "key": "READY",
-   "zip": "1322173657-Ready_1.1.mp3",
-   "md5": "f1d531c34b66a6e6a3e938296d68cb60",
+   "zip": "1302286275-ready_30.mp3",
+   "md5": "4a8a45dd6053e04c09808828ee3ea2df",
    "match": "filename",
-   "why": "players/inc_making.js:830: a machine's job is done (home machines, machine rooms, a machine used from the pack). Uploaded 2011-11-24, ten seconds before Collect_1.3 (COLLECT).",
-   "doubt": "Name match only: the sounds XML is lost. The first machine set (2011-04) has its own take, 1302286275-ready_30.mp3 (0.2 s, very quiet), and the composer's later sound-effects release titles this recording as the Still's ready chime (STILL_READY, items/still.js:413). Which take the last XML gave READY is not known."
+   "why": "players/inc_making.js:830: a machine's job is done (home machines, machine rooms, a machine used from the pack). The file is the first machine set's own (uploaded 2011-04-08 with chassis1, engine1, plates1 and collect, all named <key>_30.mp3), and a fan table of the server's files calls it \"Machine ready for use\". A double beep, 0.19 s of sound after 0.29 s of silence.",
+   "doubt": "Name match only: the sounds XML is lost. A later file, 1322173657-Ready_1.1.mp3 (2011-11, 2.6 s), has the same name; the composer's later sound-effects release titles that one as the Still's ready chime, so it plays as STILL_READY (items/still.js:413) and not here. Which of the two the last XML gave READY is not known.",
+   "gainDb": 20,
+   "peakDb": -32.2,
+   "gainWhy": "The file peaks at -32.2 dB, 20 dB under the rest of its set (chassis1 -11.8, engine1 -12.4, plates1 -12.0). The bytes ship untouched; the sound board plays the key 20 dB up (peak -12.2 dB, loudest 100 ms -21.2 dB against engine1 -22.1 and chassis1 -22.9)."
   },
   {
    "key": "ROOK_HALL_VO_1",

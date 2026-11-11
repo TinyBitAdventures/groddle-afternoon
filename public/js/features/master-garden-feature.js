@@ -44,7 +44,7 @@ import {
   usePotion,
 } from '../master-garden.js?v=2953386a';
 import { rollDropTable } from '../drop-tables.js?v=16e12632';
-import { payDrop } from './drops-feature.js?v=e6eb3ff4';
+import { payDrop } from './drops-feature.js?v=4152401d';
 import { textureFromUrl } from '../textures.js?v=f024bd6a';
 import { playPotionBottle } from '../potion-bottle-fx.js?v=92e8f667';
 import { copyFromLedger, keepsCopies, verbCopy } from '../copy-charges.js?v=4ffa1c1e';

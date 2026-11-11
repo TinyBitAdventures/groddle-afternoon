@@ -4,15 +4,15 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { SOUND_ALIASES, SOUND_FILES, SOUND_KEY_COUNTS } from '../public/js/sound-keys.js?v=df36f0cf';
+import { SOUND_ALIASES, SOUND_FILES, SOUND_GAINS, SOUND_KEY_COUNTS } from '../public/js/sound-keys.js?v=fb6ee553';
 import {
   SYNTH_KEY_RECIPES,
   SYNTH_RECIPE_NAMES,
   SYNTH_RECIPES,
   playSynthRecipe,
   recipeForKey,
-} from '../public/js/synth-sfx.js?v=920944cd';
-import { createSoundBoard, resolveSound } from '../public/js/sound-board.js?v=1a35b1da';
+} from '../public/js/synth-sfx.js?v=c30a1709';
+import { createSoundBoard, resolveSound } from '../public/js/sound-board.js?v=3b2df993';
 import {
   LEGACY_SFX_KEYS,
   actionLoopFor,
@@ -246,18 +246,24 @@ describe('sound moments', () => {
     for (const key of Object.values(LEGACY_SFX_KEYS)) assert.ok(catalog.keys[key], key);
   });
 
-  test('a machine that finishes a job rings READY, Tiny Speck\'s own chime; the countdowns keep theirs under GAME_GO', () => {
+  test('a machine that finishes a job plays READY, the machine set\'s own file; the countdowns keep theirs under GAME_GO', () => {
     // players/inc_making.js:827-830: announce_sound('READY') for making_type machine, wherever it stands.
     for (const machine of ['woodworker', 'fuelmaker', 'metalmaker', 'blockmaker']) assert.equal(soundForMakingDone(machine), 'READY', machine);
     for (const tool of ['frying_pan', 'knife_and_board', 'still', '', undefined]) assert.equal(soundForMakingDone(tool), 'CRAFT_DONE', String(tool));
     const ready = catalog.keys.READY;
     assert.equal(ready.file, 'assets/audio/sfx/READY.mp3');
     assert.equal(ready.origin, 'sounds-zip');
-    assert.equal(ready.zipFile, '1322173657-Ready_1.1.mp3');
+    // The first machine set's own "ready" (2011-04, beside chassis1 and engine1), not the later chime of the same name.
+    assert.equal(ready.zipFile, '1302286275-ready_30.mp3');
     assert.match(ready.sources.join(' '), /inc_making\.js:830/);
-    // The take is matched by name only, and the catalog says so.
-    assert.match(ready.doubt, /ready_30/);
+    // The take is matched by name only, and the catalog says so and names the other file.
+    assert.match(ready.doubt, /Ready_1\.1/);
     assert.equal(resolveSound('READY').file, 'assets/audio/sfx/READY.mp3');
+    // The later chime is the Still's alone.
+    assert.equal(catalog.keys.STILL_READY.zipFile, '1322173657-Ready_1.1.mp3');
+    assert.notEqual(fs.readFileSync(path.join(pub, SOUND_FILES.READY)).length, fs.readFileSync(path.join(pub, SOUND_FILES.STILL_READY)).length);
+    // Cold, it falls back to the short beep it resembles, never the chime.
+    assert.equal(resolveSound('READY').recipe, 'go');
     const feature = (name) => fs.readFileSync(path.join(pub, 'js/features', name), 'utf8');
     for (const name of ['home-machines-feature.js', 'machine-rooms-feature.js']) assert.match(feature(name), /playSound\?\.\('READY'/, name);
     assert.match(fs.readFileSync(path.join(pub, 'game.js'), 'utf8'), /soundForMakingDone\(record\.recipe\?\.tool\)/);
@@ -270,6 +276,22 @@ describe('sound moments', () => {
     assert.equal(catalog.keys.GAME_GO.file, undefined);
     assert.equal(recipeForKey('GAME_GO'), 'go');
     assert.equal(resolveSound('GAME_GO').recipe, 'go');
+  });
+
+  test('a key\'s own gain: READY ships at Tiny Speck\'s level and plays 20 dB up, nothing else is lifted', () => {
+    assert.deepEqual({ ...SOUND_GAINS }, { READY: 20 });
+    const ready = catalog.keys.READY;
+    assert.equal(ready.gainDb, 20);
+    assert.equal(ready.peakDb, -32.2);
+    assert.match(ready.gainWhy, /bytes ship untouched/);
+    // A lifted file stays clear of clipping, by its measured peak.
+    for (const [key, row] of Object.entries(catalog.keys)) {
+      if (row.gainDb === undefined) continue;
+      assert.ok(SOUND_FILES[key], `${key}: a gain needs its own file`);
+      assert.ok(row.peakDb + row.gainDb <= -6, `${key}: ${row.peakDb} + ${row.gainDb} dB`);
+    }
+    assert.equal(resolveSound('READY').gainDb, 20);
+    for (const key of ['STILL_READY', 'CHASSIS1', 'COLLECT', 'GAME_GO', 'NOT_A_KEY']) assert.equal(resolveSound(key).gainDb, 0, key);
   });
 
   test('every literal key played in the game is catalogued and audible', () => {
@@ -345,6 +367,25 @@ describe('sound board', () => {
     assert.equal(loop.key, 'PICK');
     assert.equal(played.at(-1), 'PICK:file');
     loop.stop();
+  });
+
+  test('a key with a gain of its own plays its file that much louder, on top of the caller\'s volume', async () => {
+    const h = host();
+    const gains = [];
+    const createGain = h.ctx.createGain.bind(h.ctx);
+    h.ctx.createGain = () => { const g = createGain(); gains.push(g); return g; };
+    await h.board.preload(['READY', 'CHASSIS1']);
+    assert.equal(h.board.play('READY', { volume: 0.55 }).kind, 'file');
+    // 0.55 from the caller, times 10 (20 dB).
+    assert.ok(Math.abs(gains.at(-1).gain.value - 5.5) < 1e-9, String(gains.at(-1).gain.value));
+    assert.equal(h.board.play('CHASSIS1', { volume: 0.8 }).kind, 'file');
+    assert.equal(gains.at(-1).gain.value, 0.8);
+    // The synth stand-in is not lifted: the gain belongs to the file.
+    h.tick(100);
+    const before = gains.length;
+    assert.equal(h.board.play('READY', { volume: 0.55, synth: true }).kind, 'synth');
+    // The voice's own gain node is the first one the play makes; the recipe's nodes follow.
+    assert.equal(gains[before].gain.value, 1);
   });
 
   test('throttles exact repeats but allows multiples on request', () => {

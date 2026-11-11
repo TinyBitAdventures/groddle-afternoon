@@ -13,8 +13,8 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createInventory, countItem } from '../public/js/inventory.js?v=60dfc9ca';
 import { copyForVerb, createToolConditionState, setCopyTag } from '../public/js/tools.js?v=5f482998';
-import { resolveSound } from '../public/js/sound-board.js?v=1a35b1da';
-import { SOUND_ALIASES, SOUND_FILES } from '../public/js/sound-keys.js?v=df36f0cf';
+import { resolveSound } from '../public/js/sound-board.js?v=3b2df993';
+import { SOUND_ALIASES, SOUND_FILES } from '../public/js/sound-keys.js?v=fb6ee553';
 import { supplyFeature } from '../public/js/features/supply-feature.js?v=b16b4654';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -88,9 +88,10 @@ describe('the Still\'s sounds', () => {
   it('the Still\'s collect and ready keys play the server\'s own takes, not the archive.org copies', () => {
     for (const [key, target, zip, sha] of [
       ['STILL_COLLECT', 'COLLECT', '1322173667-Collect_1.3.mp3', 'c699227f04c1cd1f'],
-      ['STILL_READY', 'READY', '1322173657-Ready_1.1.mp3', '6eed2b3d673052cf'],
+      ['STILL_READY', null, '1322173657-Ready_1.1.mp3', '6eed2b3d673052cf'],
     ]) {
-      // Its own file again, now the server's bytes: the same bytes as the machines' key plays.
+      // Its own file again, now the server's bytes. Collect is the same bytes as the machines' key plays;
+      // the ready chime is the Still's alone (the machines play their own set's file).
       assert.equal(SOUND_ALIASES[key], undefined, key);
       assert.equal(SOUND_FILES[key], `assets/audio/sfx/${key}.mp3`, key);
       assert.equal(resolveSound(key).file, `assets/audio/sfx/${key}.mp3`);
@@ -99,11 +100,15 @@ describe('the Still\'s sounds', () => {
       assert.equal(catalog[key].zipMatch, 'same-take', key);
       assert.match(catalog[key].why, /this take, [\d.]+ dB louder \(r 0\.9\d+\)/, key);
       assert.ok(sha256(SOUND_FILES[key]).startsWith(sha), `${key} sha256`);
-      assert.equal(sha256(SOUND_FILES[key]), sha256(SOUND_FILES[target]), `${key} and ${target}`);
-      assert.equal(zipMap.files.find((r) => r.key === key).md5, zipMap.files.find((r) => r.key === target).md5);
+      if (target) {
+        assert.equal(sha256(SOUND_FILES[key]), sha256(SOUND_FILES[target]), `${key} and ${target}`);
+        assert.equal(zipMap.files.find((r) => r.key === key).md5, zipMap.files.find((r) => r.key === target).md5);
+      } else {
+        assert.notEqual(sha256(SOUND_FILES[key]), sha256(SOUND_FILES.READY));
+      }
       // The archive.org copy is accounted for as a duplicate of the server's file.
       assert.ok(!archiveMap.files.some((f) => f.key === key), `${key} is still an archive.org install`);
-      const dup = archiveMap.duplicates.find((f) => f.sameAs === target && /^still-/.test(f.file));
+      const dup = archiveMap.duplicates.find((f) => f.sameAs === (target || key) && /^still-/.test(f.file));
       assert.ok(dup, `${key}: no duplicate row`);
       assert.match(dup.evidence, /r 0\.9\d+ with the c2 file/);
     }

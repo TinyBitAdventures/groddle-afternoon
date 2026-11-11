@@ -786,7 +786,7 @@ const KEY_RECIPES = {
   COUNT_DOWN: 'beep',
   GAME_STARTING_SOON: 'beep',
   GAME_GO: 'go',
-  READY: 'chime',
+  READY: 'go',
   YOU_WIN: 'win',
   YOU_TAKE_CROWN: 'win',
   YOU_LOSE: 'lose',
