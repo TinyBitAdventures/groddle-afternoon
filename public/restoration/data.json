@@ -2752,9 +2752,14 @@
   "deployed": "2026-11-11"
  },
  "git": {
-  "commits": 1644,
+  "commits": 1645,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-11",
+    "kind": "fix",
+    "text": "The street's top and bottom hold you, /stuck clears event physics, and Fernucopia's shaft flies"
+   },
    {
     "date": "2026-11-11",
     "kind": "fix",
@@ -2869,11 +2874,6 @@
     "date": "2026-11-10",
     "kind": "improve",
     "text": "Powders puff from their jar, the Plank swings at whoever is splanked, and a Batterfly turns to look at you"
-   },
-   {
-    "date": "2026-11-10",
-    "kind": "improve",
-    "text": "Your Scraper and Shovel are seen at work on Barnacles, Ice Nubbins, Dirt Piles and Peat"
    }
   ]
  },

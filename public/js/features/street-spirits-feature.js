@@ -103,7 +103,7 @@ import {
 import { acceptOffer, npcQuestOffers, questStatus } from '../quest-offers.js?v=9c53455c';
 import { getQuestCatalog } from '../content-catalogs.js?v=10b118dd';
 import { questRoomConverse } from './quest-instances-feature.js?v=f47bc58f';
-import { SPIRIT_REMINISCE_TEXT, isStreetSpiritClass, spiritReminisceOffers, withReminisceVerb } from '../spirit-reminisce.js?v=305e3895';
+import { SPIRIT_REMINISCE_TEXT, isStreetSpiritClass, spiritReminisceOffers, withReminisceVerb } from '../spirit-reminisce.js?v=af43c271';
 import { questDoneAt } from '../quests.js?v=2b882eb6';
 
 export const STREET_SPIRITS_FEATURE_ID = 'street-spirits';
@@ -572,7 +572,7 @@ function openReminisce(engine, target) {
 export const streetSpiritsFeature = {
   id: STREET_SPIRITS_FEATURE_ID,
 
-  /** G562: the reminisce verb, first in a spirit's menu while it has a repeat to offer (else not shown). */
+  /** G562: the reminisce verb, after Browse goods in a spirit's menu while it has a repeat to offer (else not shown). */
   decorateVerbs(target, verbs, engine) {
     if (!isStreetSpiritClass(target?.classId)) return null;
     const offers = reminisceOffers(engine, target);

@@ -20,7 +20,7 @@ import {
   isStreetSpiritClass,
   spiritReminisceOffers,
   withReminisceVerb,
-} from '../public/js/spirit-reminisce.js?v=305e3895';
+} from '../public/js/spirit-reminisce.js?v=af43c271';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const gsjs = join(root, '../glitch-GameServerJS');
@@ -71,8 +71,10 @@ describe('G562: the reminisce verb', () => {
     const verbs = [{ id: 'browse', sort: 10 }, { id: 'talk_to', sort: 20 }];
     assert.equal(withReminisceVerb(verbs, []), null, 'no offer: the verb is not in the menu (state null)');
     const menu = withReminisceVerb(verbs, ['winter_walk_part2']);
-    assert.deepEqual(menu.map((v) => v.id), ['reminisce', 'browse', 'talk_to']);
-    assert.equal(menu[0].enabled, true);
+    // Browse goods stays first and the default (Austin 2026-11-11); reminisce follows it.
+    assert.deepEqual(menu.map((v) => v.id), ['browse', 'reminisce', 'talk_to']);
+    assert.equal(menu[1].enabled, true);
+    assert.deepEqual(withReminisceVerb([{ id: 'talk_to' }], ['winter_walk_part2']).map((v) => v.id), ['reminisce', 'talk_to'], 'a spirit that sells nothing: first');
     assert.equal(withReminisceVerb(menu, ['winter_walk_part2']), null, 'never added twice');
     assert.ok(isStreetSpiritClass('street_spirit_groddle') && isStreetSpiritClass('street_spirit_groceries') && isStreetSpiritClass('street_spirit'));
     assert.ok(!isStreetSpiritClass('npc_piggy'));

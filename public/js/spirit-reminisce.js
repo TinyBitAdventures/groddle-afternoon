@@ -38,12 +38,16 @@ export const SPIRIT_REPEAT_AFTER = Object.freeze({
   an_autumn_day_part2: '',
 });
 
-/** The verb row (street_spirit.js 207-217). First in the menu, as sort_on 51 put it. */
+/**
+ * The verb row (street_spirit.js 207-217). The source's sort_on 51 put it first, but a spirit
+ * that sells is visited to shop, so Browse goods stays first and the menu's default (Austin
+ * 2026-11-11); reminisce comes right after it.
+ */
 export const REMINISCE_VERB = Object.freeze({
   id: 'reminisce',
   label: 'reminisce',
   tooltip: 'A remembering',
-  sort: 5,
+  sort: 15,
 });
 
 /** npc_quests.js offerQuests 315-329 and street_spirit_groddle.js 22-23. */
@@ -79,7 +83,9 @@ export function spiritReminisceOffers({ canOffer, done } = {}) {
 export function withReminisceVerb(verbs, offers) {
   if (!Array.isArray(verbs) || !offers?.length || verbs.some((v) => v?.id === REMINISCE_VERB.id)) return null;
   const row = { ...REMINISCE_VERB, enabled: true };
-  return [row, ...verbs];
+  const browse = verbs.findIndex((v) => v?.id === 'browse');
+  if (browse < 0) return [row, ...verbs];
+  return [...verbs.slice(0, browse + 1), row, ...verbs.slice(browse + 1)];
 }
 
 /**
