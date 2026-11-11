@@ -3183,7 +3183,7 @@
 {"s":"buffs","id":"sneezing_fit","n":"Sneezing Fit","g":"Buffs","st":"source","ic":"assets/sprites/icons/bean_plain.webp","h":"encyclopedia/buffs/sneezing_fit/"},
 {"s":"buffs","id":"soil_appreciation_loam_in_time_period","n":"Many Shovels Make Something-Something Loam","g":"Quest timers","st":"source","ic":"assets/sprites/icons/loam.webp","h":"encyclopedia/buffs/soil_appreciation_loam_in_time_period/"},
 {"s":"buffs","id":"sophisticated_feeling","n":"Sophisticated Feeling","g":"Buffs","st":"source","ic":"assets/sprites/icons/cosmapolitan.webp","h":"encyclopedia/buffs/sophisticated_feeling/"},
-{"s":"buffs","id":"stuffed","n":"Stuffed","g":"Debuffs","st":"missing","ic":"assets/ui/quest-book.webp","h":"encyclopedia/buffs/stuffed/"},
+{"s":"buffs","id":"stuffed","n":"Stuffed","g":"Debuffs","st":"source","ic":"assets/ui/quest-book.webp","h":"encyclopedia/buffs/stuffed/"},
 {"s":"buffs","id":"sugar_crash","n":"Sugar Crash","g":"Debuffs","st":"source","ic":"assets/ui/quest-book.webp","h":"encyclopedia/buffs/sugar_crash/"},
 {"s":"buffs","id":"sugar_rush","n":"Sugar Rush","g":"Buffs","st":"source","ic":"assets/sprites/icons/birch_candy.webp","h":"encyclopedia/buffs/sugar_rush/"},
 {"s":"buffs","id":"super_pooped","n":"Super Pooped","g":"Debuffs","st":"source","ic":"assets/ui/quest-book.webp","h":"encyclopedia/buffs/super_pooped/"},

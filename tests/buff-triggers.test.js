@@ -23,7 +23,7 @@ import {
   smallEnlightenmentSeconds,
   smeltItDealtItFreeSmelts,
 } from '../public/js/buff-triggers.js?v=a3093922';
-import { MIRRORED_BUFFS, buffTriggersFeature } from '../public/js/features/buff-triggers-feature.js?v=3e8823a4';
+import { MIRRORED_BUFFS, buffTriggersFeature } from '../public/js/features/buff-triggers-feature.js?v=e59a6ef2';
 import { meditationFeature } from '../public/js/features/meditation-feature.js?v=5114e225';
 import { teleportationFeature } from '../public/js/features/teleportation-feature.js?v=e867c103';
 import { rookAttackFeature } from '../public/js/features/rook-attack-feature.js?v=588b18f0';
@@ -31,14 +31,16 @@ import { rubeFeature } from '../public/js/features/rube-feature.js?v=2636c9e3';
 import { smugglingFeature } from '../public/js/features/smuggling-feature.js?v=09004f2e';
 import { normalizeHusbandryPack } from '../public/js/animal-husbandry.js?v=7b3b3181';
 import {
+  BUFF_ITEM_CATALOG,
   activateBuffItem,
   applyBuff,
+  buffEndableByHand,
   buffPhysics,
   createBuffState,
   hasBuff,
   removeBuff,
   tickBuffs,
-} from '../public/js/buffs.js?v=036fee53';
+} from '../public/js/buffs.js?v=819cb342';
 import { getSkillPackageOverride, skillPackageDetails } from '../public/js/skill-packages.js?v=bfb87281';
 import { miningProfile } from '../public/js/mining.js?v=674ed39b';
 import { resolveAnimalKinshipPackage } from '../public/js/animal-kinship.js?v=f91347e9';
@@ -541,6 +543,71 @@ describe('systems with their own timer show the source buff', () => {
     const engine = makeEngine({ wornArticle: () => 'none' });
     engine.sync();
     assert.ok(engine.hasBuff('nekkid'));
+  });
+});
+
+describe('Stuffed follows the day\'s eating limit (include/food.js 157-164; report #186)', () => {
+  it('shows while the limit holds, held so it cannot be ended, and goes when the limit does', () => {
+    let until = T0 + 3_600_000;
+    const engine = makeEngine({ stuffedUntil: () => until });
+    // game.js applies it at the eat that met the limit; the mirror then holds it.
+    engine.applyBuff('stuffed', { durationSec: 3600 });
+    engine.sync();
+    const row = engine.buffRow('stuffed');
+    assert.equal(row.heldBy, 'buff-triggers');
+    assert.equal(row.expiresAt, until);
+    assert.equal(buffEndableByHand(row), false);
+    // The new day (or a bigger tank) lifts the limit: the buff goes with it.
+    until = 0;
+    engine.sync();
+    assert.equal(engine.hasBuff('stuffed'), false);
+  });
+
+  it('comes back, without a second "kicks in", for a save that has the limit and no buff', () => {
+    const engine = makeEngine({ stuffedUntil: () => T0 + 600_000 });
+    const quiet = [];
+    const apply = engine.applyBuff;
+    engine.applyBuff = (id, opts = {}) => { quiet.push([id, opts.quiet === true]); return apply(id, opts); };
+    assert.equal(engine.hasBuff('stuffed'), false);
+    engine.sync();
+    assert.equal(engine.hasBuff('stuffed'), true);
+    assert.deepEqual(quiet, [['stuffed', true]]);
+    assert.equal(engine.buffRow('stuffed').expiresAt, T0 + 600_000);
+    // A reload keeps it: the feature's slice comes back and the limit still holds.
+    const slice = buffTriggersFeature.save();
+    buffTriggersFeature._reset();
+    buffTriggersFeature.restore(slice);
+    engine.sync();
+    assert.equal(engine.hasBuff('stuffed'), true);
+    assert.ok(MIRRORED_BUFFS.includes('stuffed'));
+  });
+
+  it('game.js reads the limit from the food state, to the next game day', () => {
+    const game = readFileSync(join(root, 'game.js'), 'utf8');
+    assert.match(game, /stuffedUntil\(\) \{\s*const t = Date\.now\(\);\s*return foodFullness\(foodState, energyCap\(\)\)\.stuffed \? t \+ msUntilNewDay\(t\) : 0;/);
+  });
+});
+
+describe('End effect in the Buffs panel (BuffUI.as has no click; the control is the remake\'s)', () => {
+  it('is offered for the pack effects the panel starts and nothing else', () => {
+    const buffs = JSON.parse(readFileSync(join(root, 'assets/content/buffs.json'), 'utf8'));
+    const fromPack = new Set(Object.values(BUFF_ITEM_CATALOG).map((r) => r.buffId));
+    assert.deepEqual([...fromPack].sort(), ['crumbly_thoughts', 'gandlevery_charge', 'gift_of_gab', 'hairball_dash', 'hairball_flower', 'high_jumper', 'purple_flower', 'rookswort', 'rubeweed', 'silvertongue', 'yellow_crumb_flower']);
+    for (const id of Object.keys(buffs)) {
+      assert.equal(buffEndableByHand({ classTsid: id }), fromPack.has(id), id);
+      assert.equal(buffEndableByHand({ classTsid: id, heldBy: 'x' }), false, `${id} held`);
+    }
+    // Debuffs and cooldowns run their course: no early Hungover payout, no skipped cooldown.
+    for (const id of ['stuffed', 'buff_hungover', 'sugar_crash', 'no_no_powder_crash', 'beta_item_cooldown', 'fecundity_cooldown', 'purpled_out', 'buff_buzzed']) {
+      assert.equal(buffEndableByHand({ classTsid: id }), false, id);
+    }
+    assert.equal(buffEndableByHand(null), false);
+  });
+
+  it('the panel asks that rule before it draws the button', () => {
+    const game = readFileSync(join(root, 'game.js'), 'utf8');
+    assert.match(game, /if \(buffEndableByHand\(b\)\) \{\s*const btn = document\.createElement\('button'\);/);
+    assert.doesNotMatch(game, /if \(!b\.heldBy\) \{/);
   });
 });
 

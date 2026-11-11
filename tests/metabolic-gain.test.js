@@ -151,14 +151,15 @@ describe('prompts, VOGs and the buffs tray', () => {
     assert.match(src, /import \{ hellFeature \} from '\.\/hell-feature\.js\?v=[0-9a-f]{8}';/);
     assert.match(read('js/features/index.js'), /hell-feature\.js\?v=[0-9a-f]{8}/);
     assert.match(src, /'pooped',\s*'super_pooped',\s*\]\);/);
-    assert.match(src, /const QUIET_MIRRORS = new Set\(\['pooped', 'super_pooped'\]\);/);
+    assert.match(src, /const QUIET_MIRRORS = new Set\(\['pooped', 'super_pooped', 'stuffed'\]\);/);
     assert.match(src, /mirror\(engine, kind, poopedKind === kind \? Number\(hell\.pooped\?\.expiresAt\) \|\| 0 : 0\);/);
   });
 
   it('a debuff with no item shows the bang, and a held buff has no End button', () => {
     assert.ok(existsSync(join(pub, 'assets/ui/buff-debuff.svg')));
     assert.match(game, /return row\?\.def\?\.isDebuff \? 'assets\/ui\/buff-debuff\.svg' : 'assets\/sprites\/icons\/apple\.webp';/);
-    assert.match(game, /if \(!b\.heldBy\) \{\s*const btn = document\.createElement\('button'\);/);
+    assert.match(game, /if \(buffEndableByHand\(b\)\) \{\s*const btn = document\.createElement\('button'\);/);
+    assert.match(read('js/buffs.js'), /return Boolean\(row\) && !row\.heldBy && ITEM_BUFF_IDS\.has\(row\.classTsid\);/);
     const catalog = JSON.parse(read('assets/content/buffs.json'));
     for (const id of ['pooped', 'super_pooped']) {
       assert.equal(catalog[id].isDebuff, true, id);

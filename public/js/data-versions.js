@@ -243,7 +243,7 @@
       "assets/streets/GUVVV3FU2FC38SK.json": "b4f1b950",
       "assets/streets/index.json": "68c54aca",
       "contribute/data.json": "e25ce0e0",
-      "encyclopedia/search.json": "d5e466b1",
+      "encyclopedia/search.json": "1c6e896e",
       "landing/card-explore.webp": "7a2c1124",
       "landing/full/card-explore.webp": "cbce4e96",
       "restoration/shots/interrogation.webp": "4778b1b1",

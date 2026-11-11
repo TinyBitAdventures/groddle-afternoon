@@ -14,7 +14,7 @@ import { INVENTORY_DB } from '../tools/catalog/build.mjs';
 import { loadEncyclopedia } from '../tools/encyclopedia/data.mjs';
 import { DEV_BUFFS, durationWords } from '../tools/encyclopedia/buffs.mjs';
 import { CONSUME_BUFFS, QUEST_TIMER_BUFFS } from '../public/js/buff-triggers.js?v=a3093922';
-import { BUFF_ITEM_CATALOG } from '../public/js/buffs.js?v=036fee53';
+import { BUFF_ITEM_CATALOG } from '../public/js/buffs.js?v=819cb342';
 
 const pub = join(import.meta.dirname, '..', 'public');
 const dir = join(pub, 'encyclopedia', 'buffs');
@@ -60,11 +60,30 @@ describe('the Buffs section', () => {
 
   it('marks what the remake gives, what only multiplayer gives and what nothing gave', { skip }, () => {
     const status = (id) => d.entries.get(`buffs:${id}`).status;
-    for (const id of ['caffeine_buzz', 'high_jumper', 'pooped', 'get_a_rasher', 'nekkid']) assert.equal(status(id), 'source', id);
+    for (const id of ['caffeine_buzz', 'high_jumper', 'pooped', 'get_a_rasher', 'nekkid', 'stuffed']) assert.equal(status(id), 'source', id);
     for (const id of ['charades', 'glitch_train', 'sneezing', 'play_musicblocks']) assert.equal(status(id), 'multiplayer', id);
-    for (const id of ['stuffed', 'zen', 'bad_mood']) assert.equal(status(id), 'missing', id);
+    for (const id of ['zen', 'bad_mood', 'real_bummer']) assert.equal(status(id), 'missing', id);
     for (const id of ['rooked_recovery', 'crusher_invincibility', 'tickle_me_emo']) assert.equal(status(id), 'unbuilt_original', id);
-    assert.match(page('stuffed'), /<span class="pill st-missing">/);
+    assert.match(page('zen'), /<span class="pill st-missing">/);
+    assert.doesNotMatch(page('stuffed'), /st-missing|Not in the remake yet/);
+  });
+
+  it('calls no buff missing that the game gives (report #186: Stuffed was)', { skip }, () => {
+    // The status is a hand table (buffs.mjs CAUSES): it goes stale when a buff is built later.
+    const js = [];
+    const walk = (p) => {
+      for (const x of readdirSync(p, { withFileTypes: true })) {
+        if (x.isDirectory()) { if (x.name !== 'vendor') walk(join(p, x.name)); } else if (x.name.endsWith('.js')) js.push(readFileSync(join(p, x.name), 'utf8'));
+      }
+    };
+    walk(join(pub, 'js'));
+    js.push(readFileSync(join(pub, 'game.js'), 'utf8'));
+    const src = js.join('\n');
+    const missing = [...d.entries.values()].filter((x) => x.section === 'buffs' && x.status === 'missing').map((x) => x.id).sort();
+    assert.deepEqual(missing, ['bad_mood', 'real_bummer', 'zen']);
+    const gives = (id) => new RegExp(`(?:applyBuff\\(|mirror\\(engine, |restart\\(engine, )['"]${id}['"]`).test(src);
+    assert.ok(gives('stuffed') && gives('kukubee_winter_negative'), 'the check finds a buff the game applies');
+    for (const id of missing) assert.ok(!gives(id), `the game applies ${id}: it is not missing`);
   });
 
   it('prints Tiny Speck\'s words, the duration and the kind', { skip }, () => {

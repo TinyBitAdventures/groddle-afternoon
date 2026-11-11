@@ -13,13 +13,15 @@
  *    line you get, the remake's effect words).
  *  - CAUSES below: every other buff, from the remake code that applies it
  *    (and GSJS where the remake does not), checked by hand on 2026-11-05.
+ *    A row marked missing goes stale when the buff is built later (Stuffed
+ *    did, report #186): tests/encyclopedia-buffs.test.js looks for that.
  *
  * Refs: rel 'causes' to the items, creatures, people, quests and places that
  * give a buff (not drawn back on those pages yet); rel 'after' to the buff it
  * follows, drawn back on that buff's page as "What comes after".
  */
 import { BUFF_ICONS, BUFF_END_MESSAGES, BUFF_TICK_MESSAGES, CONSUME_BUFFS, GANDLEVERY_MUNCH, KUKUBEE_WINTER_TSIDS, QUEST_TIMER_BUFFS } from '../../public/js/buff-triggers.js?v=a3093922';
-import { BUFF_ITEM_CATALOG } from '../../public/js/buffs.js?v=036fee53';
+import { BUFF_ITEM_CATALOG } from '../../public/js/buffs.js?v=819cb342';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { esc, fmt, orList, tsHtml } from './parts.mjs';
@@ -87,10 +89,10 @@ const CAUSES = {
   teleportation_cooldown: { say: 'Teleporting with energy, or with a {teleportation_script} that costs energy.', status: 'source' },
   moonwalk: { say: 'One of the powers of {special_item_that_only_beta_testers_get}.', status: 'source' },
   nekkid: { say: 'Wearing no coat, shirt, pants, dress or skirt.', status: 'source' },
+  stuffed: { say: 'Eating more than your daily limit of food. It lasts until the new day.', status: 'source' },
   // Not in the remake yet: the original gave them.
   bad_mood: { say: 'Bumping into a {animals:npc_juju_bandit}: half the time it gives you this, half the time {buffs:real_bummer}.', status: 'missing' },
   real_bummer: { say: 'Bumping into a {animals:npc_juju_bandit}: half the time it gives you this, half the time {buffs:bad_mood}.', status: 'missing' },
-  stuffed: { say: 'Eating more than your daily limit of food. It lasts until the new day.', status: 'missing' },
   zen: { say: 'Getting all the energy meditation can give you in one game day. It lasts until the new day.', status: 'missing' },
   // Nothing in Tiny Speck's game gave these to players.
   arbito_bonus: { say: 'Nothing gave it: it only ever starts itself.', status: 'unbuilt_original' },

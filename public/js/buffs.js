@@ -122,6 +122,21 @@ export const BUFF_ITEM_CATALOG = Object.freeze({
   },
 });
 
+const ITEM_BUFF_IDS = new Set(Object.values(BUFF_ITEM_CATALOG).map((item) => item.buffId));
+
+/**
+ * Whether the Buffs panel offers End effect (or Cancel) on a buff. Glitch had
+ * no such control: BuffUI.as only brightens a bar under the pointer (269-277)
+ * and buffs_remove is the server's. It is the remake's own, for the effects
+ * this panel starts from the pack (BUFF_ITEM_CATALOG: Spinach, the herbs and
+ * their Essences). Every other buff runs its course as it did (live report
+ * #186: Stuffed could be ended while the eating limit stayed), and so does a
+ * buff another system holds (G213).
+ */
+export function buffEndableByHand(row) {
+  return Boolean(row) && !row.heldBy && ITEM_BUFF_IDS.has(row.classTsid);
+}
+
 /**
  * Munch/imbibe conditions shared by the two Yellow Crumb items: a skill must
  * be studying and not already at maximum acceleration

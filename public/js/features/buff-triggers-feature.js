@@ -20,6 +20,7 @@
  * - A Cold Place / A Hearty Feeling on the three Kukubee winter streets.
  * - Nekkid! while no coat, shirt, pants, dress or skirt is worn.
  * - Pooped and Super Pooped while js/hell.js holds them (G213).
+ * - Stuffed while the day's eating limit holds (js/food.js; report #186).
  *
  * QA: ?autostart=1&fresh=1&resetgame=1&buffdemo=1 puts one of each
  * consumable in the pack (&buffautoplay=<class> drinks or eats it;
@@ -83,12 +84,13 @@ export const MIRRORED_BUFFS = Object.freeze([
   'hog_tie',
   'piggy_capture_cooldown',
   'nekkid',
+  'stuffed',
   'pooped',
   'super_pooped',
 ]);
 
-/** Mirrors whose system already spoke (Pooped's own prompt): no "kicks in" line. */
-const QUIET_MIRRORS = new Set(['pooped', 'super_pooped']);
+/** Mirrors whose system already spoke (Pooped's own prompt, the eat that stuffed you): no "kicks in" line. */
+const QUIET_MIRRORS = new Set(['pooped', 'super_pooped', 'stuffed']);
 
 let engineRef = null;
 let lastSync = 0;
@@ -326,6 +328,10 @@ function syncMirrors(engine) {
   mirror(engine, 'hog_tie', countItem(engine.inv, HOGTIED_PIGGY) > 0);
   mirror(engine, 'piggy_capture_cooldown', husbandryPack()?.captureCooldownUntil);
   mirror(engine, 'nekkid', typeof engine.wornArticle === 'function' && isNekkid((type) => engine.wornArticle(type)));
+  // include/food.js 157-164: over the day's food limit, Stuffed to the next game day. The limit
+  // is js/food.js's count, so the buff follows it: it cannot be ended while eating is refused,
+  // and it comes back for a save that has the limit without the buff (report #186).
+  mirror(engine, 'stuffed', engine.stuffedUntil?.() || 0);
   // G213: Pooped / Super Pooped are timed buffs to the next game day (inc_metabolics.js
   // 141-155 buffs_apply(..., { duration: remaining }), catalog_buffs.js 1689-1713,
   // 2619-2647); js/hell.js keeps them in the hell state, so show that here.

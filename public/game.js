@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=afe3caa8';
 import { createErrorOnce, createFeatureHost } from './js/feature-host.js?v=127e0a3c';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=4f753fd8';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=ad4dcd1c';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -438,6 +438,7 @@ import {
   applyBuff,
   extendBuff,
   removeBuff,
+  buffEndableByHand,
   listActiveBuffs,
   listPendingBuffs,
   hasBuff,
@@ -450,7 +451,7 @@ import {
   formatBuffRemaining,
   consumeRewardBuff,
   studyBuffBlockReason,
-} from './js/buffs.js?v=036fee53';
+} from './js/buffs.js?v=819cb342';
 import { grantMoodXp, moodXpMultiplierFor, setMoodXpEnv } from './js/mood-xp.js?v=958e7680';
 import {
   loadContentCatalogs,
@@ -12045,6 +12046,14 @@ const engine = {
     if (res.ok && quiet) updateHud();
     else if (res.ok) handleBuffEvents([{ type: 'activated', classTsid, buff: res.buff, effects: res.effects || {} }]);
     return res;
+  },
+  /**
+   * include/food.js 157-164: Stuffed runs from the eat that met the day's limit to the next game
+   * day. The time that day begins while the limit holds, else 0 (buff-triggers mirrors it).
+   */
+  stuffedUntil() {
+    const t = Date.now();
+    return foodFullness(foodState, energyCap()).stuffed ? t + msUntilNewDay(t) : 0;
   },
   /** buffs_remove: end a running buff now. */
   removeBuff(classTsid) {
@@ -26621,8 +26630,9 @@ function renderBuffsPanel() {
         <img src="${escapeHtml(buffIconUrl(b))}" alt="" />
         <div><div class="q-title">${escapeHtml(b.def.name)}</div><div class="buff-time">${waiting ? 'Begins' : 'Remaining'} ${escapeHtml(formatBuffRemaining(b, now))}</div></div>
       </div><div class="q-req">${escapeHtml(hellBuffDesc(b.def.classTsid, b.def.desc))}</div>`;
-    // G213: a buff another system holds (Pooped, cooldowns) cannot be ended here; it would come straight back.
-    if (!b.heldBy) {
+    // Only the pack effects this panel starts can be ended here (buffs.js buffEndableByHand): Glitch
+    // let no buff be ended by hand, and one another system holds (G213) would come straight back.
+    if (buffEndableByHand(b)) {
       const btn = document.createElement('button');
       btn.type = 'button';
       btn.className = 'content-action-btn';
