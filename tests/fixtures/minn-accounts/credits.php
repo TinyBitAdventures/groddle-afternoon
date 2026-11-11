@@ -42,6 +42,11 @@ $full = [
     ContributeCredits::entry(['id' => 600, 'points' => 1, 'reports' => 1], '', 7, null, null),
 ];
 
+$crowd = static fn (int $n): array => array_map(
+    static fn (int $i): array => ContributeCredits::entry(['id' => 700 + $i, 'points' => 40 - $i, 'reports' => 1], 'Tester ' . $i, $i % 2 === 0 ? 9 : 2, 'tester-' . $i, $i % 4 === 0 ? '2026-11-03 10:00:00' : null),
+    range(1, $n)
+);
+
 echo json_encode([
     'kinds' => ReportCredits::KINDS,
     'cap' => ReportCredits::CAP,
@@ -78,4 +83,7 @@ echo json_encode([
     'drawEmpty' => ContributeCredits::draw([], 'Points <a href="/x/">come</a> from <script>reports</script>.'),
     'drawEmptyWords' => ContributeCredits::draw([], '', 'Be the first.'),
     'drawFull' => ContributeCredits::draw($full, 'How points work.'),
+    'drawTen' => ContributeCredits::draw($crowd(10), 'How.'),
+    'drawEleven' => ContributeCredits::draw($crowd(11), 'How.'),
+    'drawThirteen' => ContributeCredits::draw($crowd(13), 'How.'),
 ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE), "\n";

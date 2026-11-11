@@ -264,6 +264,44 @@ describe('the site keeps a score per report (groddle-afternoon-site)', { skip: s
     assert.match(full, /<p class="cc-how">How points work\.<\/p><\/div>$/);
   });
 
+  it('keeps the board to ten and puts every other tester behind View more, in a pop-up (Austin 2026-11-10)', { skip: (!hasPhp && 'no php') || noEngine }, () => {
+    const dir = mkdtempSync(join(tmpdir(), 'credits-php-'));
+    let out;
+    try {
+      writeFileSync(join(dir, 'totals.json'), JSON.stringify(TOTALS));
+      out = JSON.parse(execFileSync('php', [join(root, 'tests/fixtures/minn-accounts/credits.php'), engine, SITE_DIR, join(dir, 'totals.json')], { encoding: 'utf8' }));
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+    }
+    const rowsIn = (html) => [...html.matchAll(/<li class="cc-row[^"]*">[\s\S]*?<\/li>/g)].map((m) => m[0]);
+    const rank = (row) => Number(/<span class="cc-rank" aria-hidden="true">(\d+)<\/span>/.exec(row)[1]);
+    // Ten or fewer: no button, no pop-up.
+    assert.equal(rowsIn(out.drawTen).length, 10);
+    assert.doesNotMatch(out.drawTen, /cc-more|popover/);
+    assert.doesNotMatch(out.drawFull, /cc-more|popover/);
+    // Eleven: one more, in the singular.
+    assert.match(out.drawEleven, /<button type="button" class="cc-more-open" popovertarget="cc-more">View 1 more tester<\/button>/);
+    // Thirteen: ten on the board, three in the pop-up, ranks carrying on, the how line last.
+    const html = out.drawThirteen;
+    const [board, pop] = html.split('<div class="cc-pop"');
+    assert.deepEqual(rowsIn(board).map(rank), [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+    assert.deepEqual(rowsIn(pop).map(rank), [11, 12, 13]);
+    assert.match(board, /<p class="cc-more"><button type="button" class="cc-more-open" popovertarget="cc-more">View 3 more testers<\/button><\/p>$/);
+    assert.match(pop, /^ id="cc-more" popover role="dialog" aria-labelledby="cc-more-title">/);
+    assert.match(pop, /<h3 class="cc-pop-title" id="cc-more-title">More testers<\/h3>/);
+    assert.match(pop, /<button type="button" class="cc-pop-close" popovertarget="cc-more" popovertargetaction="hide" aria-label="Close">/);
+    assert.match(pop, /<ol class="cc-list cc-list-more" role="list" start="11" aria-label="More testers by points">/);
+    assert.doesNotMatch(rowsIn(pop).join(''), /cc-top/, 'only the first three are marked');
+    assert.match(rowsIn(pop)[1], /<a class="cc-name" href="\/players\/tester-12\/">Tester 12<\/a>/, 'a public page links from the pop-up too');
+    assert.match(html, /<\/ol><\/div><p class="cc-how">How\.<\/p><\/div>$/);
+    assert.doesNotMatch(html, /<script/, 'the pop-up is the browser\'s own popover: no script');
+    // The board asks for everyone ranked; draw does the cutting.
+    assert.match(src('src/ContributeCredits.php'), /ReportCredits::rank\(\(new ReportCredits\(\$db\)\)->totals\(\), PHP_INT_MAX\)/);
+    const css = src('style.css');
+    assert.match(css, /\.cc-pop \{[^}]*max-height: min\(80vh, 720px\);[^}]*overflow: auto;/);
+    assert.match(css, /\.cc-list\.cc-list-more \{ grid-template-columns: minmax\(0, 1fr\);/);
+  });
+
   it('styles the board from the site\'s tokens, both themes, 1440 and 390 wide', () => {
     const css = src('style.css');
     const ours = css.slice(css.indexOf('/* The testers board'));
