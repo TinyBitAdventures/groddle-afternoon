@@ -67,3 +67,20 @@ describe('the Butler keeps the source\'s post (PORCH)', () => {
     assert.match(read('features/neighbours-mp-feature.js'), /layout\.houseX \+ butlerPostRx\(b\.post\)/);
   });
 });
+
+describe('report 174: the Butler can be clicked in the doorway', () => {
+  it("its click box is the pose's own, smaller than the house door's", async () => {
+    const { butlerHitSize } = await import('../public/js/features/butler-feature.js?fresh=butler-hit');
+    const rig = JSON.parse(readFileSync(new URL('../public/assets/butler-rig/butler.json', import.meta.url), 'utf8'));
+    const stand = butlerHitSize(rig, 'idle0');
+    assert.deepEqual(stand, { w: 76, h: 107 });
+    // homes-feature.js: the door's hit area is 92 by 150; a click takes the smallest box under it.
+    assert.ok(stand.w * stand.h < 92 * 150);
+    // The canvas that fits every pose is far bigger; that is what lost to the door.
+    const all = Object.values(rig.box).reduce((a, b) => [Math.min(a[0], b[0]), Math.min(a[1], b[1]), Math.max(a[2], b[2]), Math.max(a[3], b[3])]);
+    assert.ok((all[2] - all[0]) * (all[3] - all[1]) > 92 * 150);
+    assert.equal(butlerHitSize(rig, 'no_such_clip').w, stand.w);
+    const src = readFileSync(new URL('../public/js/features/butler-feature.js', import.meta.url), 'utf8');
+    assert.match(src, /v\.clip = clip;\n  fitHitBox\(v, clip\);/);
+  });
+});

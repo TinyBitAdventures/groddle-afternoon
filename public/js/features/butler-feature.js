@@ -74,7 +74,7 @@ import { towerApi } from './home-tower-feature.js?v=f574b637';
 import { levelInfoForXp } from '../progression.js?v=33462eaa';
 import { frameTexture, sourceFromUrl, textureFromUrl } from '../textures.js?v=f024bd6a';
 import { NEIGHBOURS, NEIGHBOUR_ITEMS, neighbourById } from '../neighbours.js?v=161fc2e5';
-import { BUTLER_RIG_SCALE, ButlerPainter, butlerRigNow, loadButlerRig, paintPortrait, portraitUrl } from '../butler-rig.js?v=dca8f3ad';
+import { BUTLER_FEET, BUTLER_RIG_SCALE, ButlerPainter, butlerRigNow, loadButlerRig, paintPortrait, portraitUrl } from '../butler-rig.js?v=dca8f3ad';
 import { acceptOffer, declineOffer, npcQuestOffers, questStatus } from '../quest-offers.js?v=9c53455c';
 import { getQuestCatalog } from '../content-catalogs.js?v=10b118dd';
 import { displayTopOf, itemstackOverlayPoint, playSheetOverlay } from '../overlay-art.js?v=75c3ea34';
@@ -317,10 +317,31 @@ function drawRig(v) {
   if (rigArt.painter.draw(v.clip, Math.floor(v.rig.t))) rigArt.source.update();
 }
 
+/**
+ * Report 174: the Butler's click box is its pose's own (the rig's box for the clip, feet at
+ * BUTLER_FEET), not the canvas that fits every pose (dance, fall, jump: about 175 by 173 px). A
+ * click picks the smallest box under it (game.js pickInteractableAt), so the whole canvas lost to
+ * the house door's 92 by 150 and the Butler could not be clicked in the doorway. Centred on the
+ * feet (the art turns round, game.js spriteWorldHitBox anchors 0.5, 1).
+ */
+export function butlerHitSize(rig, clip) {
+  const b = rig?.box?.[clip] || rig?.box?.idle0;
+  if (!b) return null;
+  return { w: Math.max(Math.abs(b[0]), Math.abs(b[2])) * 2, h: Math.max(1, BUTLER_FEET.y - b[1]) };
+}
+
+function fitHitBox(v, clip) {
+  const size = v?.rig ? butlerHitSize(butlerRigNow(), clip) : null;
+  if (!size || !v.container || v.container.destroyed) return;
+  v.container._worldHitW = size.w;
+  v.container._worldHitH = size.h;
+}
+
 function setClip(engine, clip, { loop = BUTLER_LOOPERS.includes(clip), then = null } = {}) {
   const v = view?.butler;
   if (!v || v.anim.destroyed) return;
   v.clip = clip;
+  fitHitBox(v, clip);
   const done = loop ? null : () => {
     if (then) then();
     else restClip(engine);
