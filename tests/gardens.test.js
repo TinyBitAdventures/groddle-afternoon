@@ -56,7 +56,7 @@ import {
   GARDEN_NO_DRY_PLOTS_LINE,
 } from '../public/js/garden.js?v=788f2dbb';
 import { getVerbsFor, runVerb } from '../public/content.js?v=50ca835b';
-import { plotPieces } from '../public/js/garden-view.js?v=3683a26f';
+import { plotPieces } from '../public/js/garden-view.js?v=04fe8467';
 import { plotsFor } from '../public/js/master-garden.js?v=3b5ec3c3';
 import {
   createInventory,

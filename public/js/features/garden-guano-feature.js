@@ -24,6 +24,7 @@
  */
 
 import { FERTILIZE_TEXT, GARDEN_FERTILIZER, SEED_CATALOG, fertilizeCheck, seedDropCheck } from '../garden.js?v=788f2dbb';
+import { nearestPlotIndex } from '../garden-view.js?v=04fe8467';
 
 export const GARDEN_GUANO_FEATURE_ID = 'garden-guano';
 const VERB = 'fertilize';
@@ -94,7 +95,9 @@ function plotAt(engine, event) {
   if (!rect?.width || !engine.entityLayer) return null;
   const k = (engine.camera?.w || 960) / rect.width;
   const p = engine.entityLayer.toLocal(new engine.PIXI.Point((event.clientX - rect.left) * k, (event.clientY - rect.top) * k));
-  return (engine.interactables || []).find((t) => t.classId === 'garden_plot' && plotHit(t, p.x, p.y)) || null;
+  // Report #204: the back row's reach overlaps the row in front; the plot whose base is under the pointer (js/garden-view.js).
+  const plots = (engine.interactables || []).filter((t) => t.classId === 'garden_plot' && plotHit(t, p.x, p.y));
+  return plots[nearestPlotIndex(plots.map((t) => t.sprite), p.x, p.y)] || null;
 }
 
 function endDrag(engine) {

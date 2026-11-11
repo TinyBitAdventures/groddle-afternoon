@@ -27,7 +27,7 @@ import {
   restoreJobId,
   restoreRewardMultiplier,
   usesLeft,
-} from '../public/js/home-cultivation.js?v=9571e110';
+} from '../public/js/home-cultivation.js?v=65b4382a';
 import {
   cancelJob,
   contributeItems,
@@ -48,7 +48,7 @@ import {
   rekeyRocks,
   rockItems,
   soilKeyMap,
-} from '../public/js/features/homes-feature.js?v=9acc3f21';
+} from '../public/js/features/homes-feature.js?v=ce3fb83c';
 
 const root = join(import.meta.dirname, '..', 'public');
 const catalog = JSON.parse(readFileSync(join(root, 'assets/content/street-jobs.json'), 'utf8'));

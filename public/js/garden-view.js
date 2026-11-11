@@ -124,6 +124,41 @@ export function gardenLayout({ cols = 4, rows = 2, style = 'none', scale = GARDE
 }
 
 /**
+ * Report #204: which plot a pointer means when several plot cells take it. A
+ * cell's point is the bottom centre of its base (`x`, `y`); `_gardenHitW` x
+ * `_gardenBaseH` is the base as drawn (`_gardenHitH` when no base height is
+ * kept), without the back row's reach over its plant. Rows are only
+ * plot_height + PLOT_PADD_TOP apart (GardenView.as build, 14 px at 0.7), so the
+ * padded hit boxes of three rows overlap. The original hit-tested each plot's
+ * own drawn view (GardenView.as 139-162: one GardenPlotView per plot, each with
+ * its own ROLL_OVER and CLICK, 142-144), so the plot whose base is under the
+ * pointer wins here: the least distance outside a base (0 inside), then the
+ * nearest base centre in base widths and heights. Above the back row only the
+ * back row's base is near, so its reach over its plant still works.
+ * @param {{ x: number, y: number, _gardenHitW?: number, _gardenHitH?: number, _gardenBaseH?: number }[]} cells
+ * @returns {number} the index of the plot meant, or -1 with no cells
+ */
+export function nearestPlotIndex(cells, px, py) {
+  let best = -1;
+  let bestOut = Infinity;
+  let bestMid = Infinity;
+  (cells || []).forEach((cell, i) => {
+    const w = Math.abs(cell?._gardenHitW || PLOT_W);
+    const h = Math.abs(cell?._gardenBaseH || cell?._gardenHitH || PLOT_H);
+    const dx = px - cell.x;
+    const dy = py - (cell.y - h / 2);
+    const out = Math.hypot(Math.max(0, Math.abs(dx) - w / 2), Math.max(0, Math.abs(dy) - h / 2));
+    const mid = Math.hypot(dx / w, dy / h);
+    if (out < bestOut - 1e-9 || (Math.abs(out - bestOut) <= 1e-9 && mid < bestMid)) {
+      best = i;
+      bestOut = out;
+      bestMid = mid;
+    }
+  });
+  return best;
+}
+
+/**
  * Half the drawn width of a garden (bed and plot bases), rounded up: what a home
  * cultivation keeps clear around its x (js/home-cultivation.js footprint).
  */

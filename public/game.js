@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=50ca835b';
 import { createErrorOnce, createFeatureHost } from './js/feature-host.js?v=06bb8b74';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=246f53be';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=59339f20';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -631,7 +631,8 @@ import {
   plantSeedChoices,
   PLANT_PICK_TITLE,
 } from './js/garden.js?v=788f2dbb';
-import { GARDEN_SCALE, PLOT_H as GARDEN_PLOT_H, PLOT_W as GARDEN_PLOT_W, gardenFrame, gardenLayout, gardenStyle, plotPieces } from './js/garden-view.js?v=3683a26f';
+import { GARDEN_SCALE, PLOT_H as GARDEN_PLOT_H, PLOT_W as GARDEN_PLOT_W, gardenFrame, gardenLayout, gardenStyle, plotPieces } from './js/garden-view.js?v=04fe8467';
+import { nearestPlotIndex } from './js/garden-view.js?v=04fe8467';
 import {
   ROCK_CATALOG,
   createMineRock,
@@ -7260,6 +7261,13 @@ function pickInteractableAt(worldX, worldY) {
   }
   if (!hits.length) return null;
   hits.sort((a, b) => a.area - b.area);
+  // Report #204: padded plot boxes overlap the rows beside them (rows 14 px apart, GardenView.as
+  // 159-160), and by area the back row (its reach) always lost and the middle row won ties. Among
+  // the plots hit, the one whose base is under the pointer (js/garden-view.js nearestPlotIndex).
+  if (hits[0].t.classId === 'garden_plot') {
+    const plots = hits.filter((h) => h.t.classId === 'garden_plot').map((h) => h.t);
+    return plots[nearestPlotIndex(plots.map((t) => t.sprite), worldX, worldY)] || hits[0].t;
+  }
   return hits[0].t;
 }
 
@@ -29220,6 +29228,8 @@ function spawnGarden(opts = {}) {
     cell.y = top + plotPos.y + layout.plotH;
     cell.zIndex = itemZ('garden_plot', 9 + plotPos.r * 0.3);
     cell._gardenHitW = layout.plotW;
+    // The base alone (nearestPlotIndex picks among overlapping plots by it); the hit box adds the back row's reach.
+    cell._gardenBaseH = layout.plotH;
     cell._gardenHitH = layout.plotH + (plotPos.r === 1 ? GARDEN_BACK_ROW_REACH : 0);
     cell.hitArea = new PIXI.Rectangle(-cell._gardenHitW / 2, -cell._gardenHitH, cell._gardenHitW, cell._gardenHitH);
     entityLayer.addChild(cell);

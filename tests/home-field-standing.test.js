@@ -17,7 +17,7 @@ import { describe, it } from 'node:test';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { HOME_LIMITS } from '../public/js/homes-catalog.js?v=10ac34b6';
-import { createCultivationState, homeStreetLayout } from '../public/js/home-cultivation.js?v=9571e110';
+import { createCultivationState, homeStreetLayout } from '../public/js/home-cultivation.js?v=65b4382a';
 import { EXTERIOR_STYLES, INTERIOR_STYLES, streetLook, yardLook } from '../public/js/home-styles.js?v=13fe0aaa';
 import {
   FIELD_DEPTH,
@@ -26,7 +26,7 @@ import {
   nearFeetY,
   streetNearSkip,
   towerDoorway,
-} from '../public/js/features/homes-feature.js?v=9acc3f21';
+} from '../public/js/features/homes-feature.js?v=ce3fb83c';
 
 const read = (rel) => readFileSync(join(import.meta.dirname, '..', 'public', 'js', rel), 'utf8');
 const FIREBOG = ['firebog_1_high', 'firebog_1b_high', 'firebog_3_high', 'firebog_4_high', 'firebog_2_high', 'firebog_4a_high'];

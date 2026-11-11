@@ -2752,9 +2752,14 @@
   "deployed": "2026-11-11"
  },
  "git": {
-  "commits": 1658,
+  "commits": 1659,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-11",
+    "kind": "fix",
+    "text": "Trophies stand on wall shelves, as they could in Glitch"
+   },
    {
     "date": "2026-11-11",
     "kind": "new",
@@ -2869,14 +2874,9 @@
     "date": "2026-11-10",
     "kind": "fix",
     "text": "Ilmenskie Jones and the Sealed Cavern waits for Teleportation IV"
-   },
-   {
-    "date": "2026-11-10",
-    "kind": "fix",
-    "text": "A shared street project's last card shows your share instead of \"You did not contribute\""
    }
   ]
  },
- "tests": 807,
+ "tests": 808,
  "generatedAt": "2026-11-11"
 }

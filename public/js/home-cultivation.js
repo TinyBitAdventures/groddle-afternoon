@@ -81,7 +81,7 @@ import {
   signpostX,
   streetFixtures,
 } from './home-street-fixtures.js?v=bad831a1';
-import { gardenHalfWidth } from './garden-view.js?v=3683a26f';
+import { gardenHalfWidth } from './garden-view.js?v=04fe8467';
 
 export const YARD_SEGMENT_W = 150;
 /** The house, porch and mailbox stand on a fixed lot between the yards. */
