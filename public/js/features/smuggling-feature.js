@@ -74,13 +74,14 @@ import {
   giveEncounter,
   isSmugglerStreet,
   receiveConversation,
+  redirectDestination,
   routeTo,
   sameStreet,
   smugglerTouches,
   sourceKey,
   spawnOffset,
   sparedBySignpost,
-} from '../smuggling.js?v=8eccf20d';
+} from '../smuggling.js?v=ab6ee12a';
 import { frameTexture, sourceFromUrl, textureFromUrl } from '../textures.js?v=f024bd6a';
 import { grantMoodXp } from '../mood-xp.js?v=958e7680';
 
@@ -158,6 +159,51 @@ function streetHub(tsid) {
   const meta = STREET_INDEX.streets?.[indexKey(tsid)];
   return { hubId: meta?.hubId || '', hubName: meta?.hubName || '' };
 }
+
+/**
+ * Austin's ruling 2026-11-11 ("Pick only open streets"): whether the player can reach a street
+ * now. The reach the On hold quests use (street-jobs-feature streetsReachable: open roads from
+ * where you stand, the starter street and the streets opened for you), else, while the ways
+ * load, not under construction (closedRoads, the predicate behind the map's barricades). Null
+ * when neither is known yet: the pick stands, and steerRun checks it again later.
+ */
+function openTest(engine) {
+  const forms = (t) => {
+    const s = String(t || '');
+    const key = indexKey(s);
+    return [s, `G${s.slice(1)}`, `L${s.slice(1)}`, key].filter(Boolean);
+  };
+  const reach = engine.query?.('streetsReachable', engine);
+  if (reach && typeof reach.has === 'function') return (t) => forms(t).some((f) => reach.has(f));
+  const closed = engine.query?.('closedRoads', engine);
+  if (!Array.isArray(closed)) return null;
+  const shut = new Set(closed.flatMap(forms));
+  return (t) => !forms(t).some((f) => shut.has(f));
+}
+
+/**
+ * A run bound for a street still closed (a save from before the ruling, or a pick made before the
+ * roads loaded) moves to an open one, and says so. Moving beats waiting: while you carry the
+ * package you cannot teleport or ride the subway and a Deimaginator may wait on every street, so
+ * a run held for a project could pin you for days. Returns true when it moved.
+ */
+function steerRun(engine) {
+  if (!state.run || engine.param?.('smugglingdemo')) return false;
+  const was = state.run.destination;
+  const next = redirectDestination(state.run, { resolve: indexKey, open: openTest(engine), rng });
+  if (!next) return false;
+  state.run.destination = next;
+  const text = TEXT.redirected(streetLabel(was), streetLabel(next));
+  last = text;
+  engine.pushActivity?.(text);
+  const shared = engine.query?.('mapRoute', 'get', null, engine);
+  if (shared?.source === 'smuggling') engine.query?.('mapRoute', 'set', { to: next, source: 'smuggling', quest: SMUGGLING_QUEST }, engine);
+  engine.save?.();
+  renderHud(engine);
+  publish(engine);
+  return true;
+}
+let lastSteer = 0;
 
 function questActive(engine) {
   return Boolean(engine.questState?.active?.[SMUGGLING_QUEST]);
@@ -345,7 +391,7 @@ function startRun(engine, from) {
   const res = acceptOffer(engine.questState, SMUGGLING_QUEST, questCtx(engine));
   if (!res.ok) return false;
   if (countItem(engine.inv, CONTRABAND) < 1) addItem(engine.inv, CONTRABAND, 1);
-  const destination = chooseDestination(from, { resolve: indexKey, rng });
+  const destination = chooseDestination(from, { resolve: indexKey, open: openTest(engine), rng });
   state.run = { from: sourceKey(from), destination, startedAt: Date.now() };
   state.started += 1;
   engine.pushActivity?.(`New quest: Warm and Smuggly`);
@@ -464,6 +510,7 @@ async function revealDestination(engine, kind) {
   // bubble's pointer has the familiar to point at (the 2012 header had no rock).
   await questRoomConverse(engine, { title: 'Warm and Smuggly', kicker: 'Magic Rock', beats, look: 'vog', width: 500 });
   await loadGraph();
+  steerRun(engine);
   renderHud(engine);
   if (!state.run) return;
   const hub = streetHub(state.run.destination);
@@ -1090,6 +1137,7 @@ export const smugglingFeature = {
   onStreetEnter(street, engine) {
     clearStreet(engine);
     reconcile(engine);
+    steerRun(engine);
     cleanSeen(state);
     demoSetup(engine);
     if (demoDone && engine.param?.('smugglingdemo')) {
@@ -1148,6 +1196,11 @@ export const smugglingFeature = {
       lastPublish = now;
       publish(engine);
     }
+    // The roads load after the first street (or a project opens one): a closed destination moves then.
+    if (state.run && !talking && now - lastSteer > 2000) {
+      lastSteer = now;
+      steerRun(engine);
+    }
     // A package that left the pack another way (a reload, a trade) ends the run.
     if (state.run && !talking && countItem(engine.inv, CONTRABAND) < 1 && !receiver?.received && deim?.state !== 'caught') {
       failRun(engine, TEXT.lostFail);
@@ -1197,6 +1250,7 @@ export const smugglingFeature = {
     if (classTsid !== CONTRABAND || !state.run) return false;
     if (verbId === 'check_address') {
       loadGraph().then(() => {
+        steerRun(engine);
         const path = route(engine);
         if (!path || streetBlocked(engine)) {
           engine.pushActivity?.(TEXT.offPath);
@@ -1243,5 +1297,6 @@ export const smugglingFeature = {
     last = '';
     talking = false;
     demoDone = false;
+    lastSteer = 0;
   },
 };

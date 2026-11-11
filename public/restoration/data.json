@@ -2752,9 +2752,14 @@
   "deployed": "2026-11-11"
  },
  "git": {
-  "commits": 1650,
+  "commits": 1651,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-11",
+    "kind": "fix",
+    "text": "Vendors won't buy a bag with things still in it"
+   },
    {
     "date": "2026-11-11",
     "kind": "improve",
@@ -2869,14 +2874,9 @@
     "date": "2026-11-10",
     "kind": "improve",
     "text": "A machine that finishes a job plays the machines' own ready beep, and the chime is the Still's"
-   },
-   {
-    "date": "2026-11-10",
-    "kind": "improve",
-    "text": "The Still has its sounds: the hopper lid on Distill, its chime on Collect"
    }
   ]
  },
- "tests": 805,
+ "tests": 806,
  "generatedAt": "2026-11-11"
 }

@@ -143,6 +143,8 @@ export const TEXT = Object.freeze({
   dropTip: 'Dropping this is probably a bad idea',
   checkTip: "Remind yourself of this package's destination",
   offPath: 'Hmm. You seem to be off the path right now. Your contraband is temporarily confused about where it needs to go.',
+  /** Remake (ruling 2026-11-11): a run whose street is still closed moves to an open one. */
+  redirected: (from, to) => `Change of plans: the road to ${from} isn't built yet, so your contact will meet you on ${to} instead.`,
   teleport: "That fragile Contraband won't survive teleportation.",
   subway: "I'm sorry: public transportation is not available to those engaging in journeys of dubious purpose.",
   needTool: 'You need some sort of tool to help you out. You dig?',
@@ -392,13 +394,39 @@ export function cleanSeen(state, now = Date.now()) {
  * setSmugglingDestination: a random destination for the starting street,
  * else a default. `resolve(tsid)` maps a source TSID to a playable street
  * (null when the remake lacks it); unplayable picks are skipped.
+ *
+ * Austin's ruling 2026-11-11 ("Pick only open streets"): `open(tsid)`, when
+ * given, says whether the player can reach that street now (street-jobs-feature
+ * streetsReachable, else not in closedRoads). Glitch had every street open, so
+ * contraband.js never checked; the remake keeps 684 street-project streets
+ * closed in a fresh world, and 47 of the map's 49 destinations stand on them
+ * (East Spice sent you to Soggy Bottoms). Order: an open street from the start's
+ * own list, else an open default (Hechey Track, the starter street, is one),
+ * else the source's pick as before (only when nothing at all is open).
+ * `exclude`: a destination to skip (the one a run is moving away from).
  */
-export function chooseDestination(fromTsid, { resolve = (t) => t, rng = Math.random } = {}) {
+export function chooseDestination(fromTsid, { resolve = (t) => t, open = null, exclude = '', rng = Math.random } = {}) {
   const key = sourceKey(fromTsid);
-  const pool = (DESTINATIONS[key] || DEFAULT_DESTINATIONS).filter((t) => resolve(t) && sourceKey(t) !== key);
-  const list = pool.length ? pool : DEFAULT_DESTINATIONS.filter((t) => resolve(t) && sourceKey(t) !== key);
-  if (!list.length) return null;
+  const skip = exclude ? sourceKey(exclude) : '';
+  const playable = (t) => resolve(t) && sourceKey(t) !== key && sourceKey(t) !== skip;
+  const ok = (t) => playable(t) && (!open || open(t));
+  const pool = (DESTINATIONS[key] || DEFAULT_DESTINATIONS).filter(ok);
+  const list = pool.length ? pool : DEFAULT_DESTINATIONS.filter(ok);
+  if (!list.length) return open ? chooseDestination(fromTsid, { resolve, exclude, rng }) : null;
   return list[Math.min(list.length - 1, Math.floor(rng() * list.length))];
+}
+
+/**
+ * A run already carrying the package to a street the player cannot reach yet
+ * (a save from before the ruling, or a pick made before the roads loaded): the
+ * contact moves to an open street from the same lists, the way chooseDestination
+ * picks one. Returns the new destination, or null when the run can stand (its
+ * street is open, reach is unknown, or no open street is left to move to).
+ */
+export function redirectDestination(run, { resolve = (t) => t, open = null, rng = Math.random } = {}) {
+  if (!run?.destination || typeof open !== 'function' || open(run.destination)) return null;
+  const next = chooseDestination(run.from, { resolve, open, exclude: run.destination, rng });
+  return next && open(next) ? next : null;
 }
 
 /** Street-index TSIDs use G for L (street-loader.js); compare on the source L form. */
