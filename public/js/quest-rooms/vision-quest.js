@@ -111,6 +111,9 @@ function attachKeys(ctx) {
   if (listeners || typeof window === 'undefined') return;
   const down = (e) => {
     if (!ctx.run || ctx.dialogOpen() || ctx.cardOpen()) return;
+    // Ticket 193: typing in chat, a bug report or any other field is not a key press for the room
+    // (the game's own Camera Mode skips them too, camera-mode-feature.js).
+    if (e.target?.closest?.('input, textarea, select, [contenteditable="true"], [contenteditable=""]')) return;
     const k = e.key;
     if (k === 'c' || k === 'C') {
       e.stopImmediatePropagation();

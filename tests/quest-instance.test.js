@@ -222,7 +222,7 @@ describe('Color Unblocking (color_unblocking)', () => {
 
 describe('Vision Quest (vision_quest)', () => {
   it('uses the archived Institute street and the six source objects', async () => {
-    const mod = await import('../public/js/quest-rooms/vision-quest.js?v=e81febef');
+    const mod = await import('../public/js/quest-rooms/vision-quest.js?v=b3cf089b');
     assert.equal(mod.STREET, 'GNV1T7PCUM53T25');
     assert.deepEqual(Object.keys(mod.OBJECTS).sort(), ['lemburger', 'npc_crab', 'npc_piggy', 'pumpkin', 'rock_sparkly_1', 'trant_fruit']);
     assert.equal(mod.WRONG_THINGS.length, 7);
@@ -397,7 +397,7 @@ describe('G311: a failed room quest is Try again in the quest log', () => {
   };
 
   it('a run lost to a reload marks a startable quest failed, not a retry prompt', async () => {
-    const { questInstancesFeature } = await import('../public/js/features/quest-instances-feature.js?v=48c20a87');
+    const { questInstancesFeature } = await import('../public/js/features/quest-instances-feature.js?v=86e9130c');
     const { ensureQuestOfferState } = await import('../public/js/quest-offers.js?v=9c53455c');
     assert.equal(getQuestCatalog().mental_block?.needsStart, true);
     assert.notEqual(getQuestCatalog().help_juju_bandits?.needsStart, true, 'no onStarted in GSJS');
@@ -461,7 +461,7 @@ describe('G313: failed room quests the source removes', () => {
   });
 
   it('a reload removes a source-removed quest and its offers, and keeps the prompt for the three', async () => {
-    const { questInstancesFeature } = await import('../public/js/features/quest-instances-feature.js?v=48c20a87');
+    const { questInstancesFeature } = await import('../public/js/features/quest-instances-feature.js?v=86e9130c');
     const { questStatus } = await import('../public/js/quest-offers.js?v=9c53455c');
     const t = Date.now() - 60_000;
     questInstancesFeature.restore({ memory: {}, retry: { tower_quest: t, le_miserable_part_2: t, smuggle_the_smuggler_part2: t } });
@@ -489,7 +489,7 @@ describe('G313: failed room quests the source removes', () => {
   });
 
   it('has no map card', async () => {
-    const { questInstancesFeature } = await import('../public/js/features/quest-instances-feature.js?v=48c20a87');
+    const { questInstancesFeature } = await import('../public/js/features/quest-instances-feature.js?v=86e9130c');
     assert.equal(questInstancesFeature.mapCards, undefined);
     const src = readFileSync(join(root, 'public/js/features/quest-instances-feature.js'), 'utf8');
     assert.doesNotMatch(src, /Unfinished quest places/);
@@ -510,7 +510,7 @@ describe('#107: a choice dialog can be dismissed', () => {
   const src = readFileSync(join(root, 'public/js/features/quest-instances-feature.js'), 'utf8');
 
   it('Escape and a click outside make the cancel choice (ChoicesDialog.as _escKeyHandler: cancel_value first)', async () => {
-    const { cancelChoice } = await import('../public/js/features/quest-instances-feature.js?v=48c20a87');
+    const { cancelChoice } = await import('../public/js/features/quest-instances-feature.js?v=86e9130c');
     const memories = [{ label: 'Four Letter Words', value: 'letter_block_2' }, { label: 'Hog Haul', value: 'hogtie_piggies' }, { label: 'Never mind', value: '', cancel: true }];
     assert.equal(cancelChoice(memories), '');
     assert.equal(cancelChoice([{ label: 'Stay', value: 'stay', cancel: true }, { label: 'Leave', value: 'leave' }]), 'stay');
@@ -536,5 +536,13 @@ describe('#107: a choice dialog can be dismissed', () => {
     const css = readFileSync(join(root, 'public/style.css'), 'utf8');
     assert.match(css, /\.quest-dialogue-card\.qi-pinned \{\n  display: flex;\n  flex-direction: column;\n  overflow: hidden;\n\}/);
     assert.match(css, /\.qi-choice-list \{[^}]*overflow-y: auto;/);
+  });
+});
+
+describe('ticket 193: the Vision Quest room leaves typing alone', () => {
+  it('its C key skips input fields, as the game Camera Mode does', () => {
+    const src = readFileSync(join(dirname(fileURLToPath(import.meta.url)), '../public/js/quest-rooms/vision-quest.js'), 'utf8');
+    const attach = src.slice(src.indexOf('function attachKeys('), src.indexOf("if (k === 'c' || k === 'C')"));
+    assert.match(attach, /e\.target\?\.closest\?\.\('input, textarea, select, \[contenteditable="true"\]/);
   });
 });

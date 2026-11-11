@@ -159,7 +159,7 @@ const ROOM_MODULES = {
   rainbow_run: () => import('../quest-rooms/rainbow-run.js?v=d73899b1'),
   top_of_tree: () => import('../quest-rooms/top-of-tree.js?v=0a18a565'),
   color_unblocking: () => import('../quest-rooms/color-unblocking.js?v=8f5912c1'),
-  vision_quest: () => import('../quest-rooms/vision-quest.js?v=e81febef'),
+  vision_quest: () => import('../quest-rooms/vision-quest.js?v=b3cf089b'),
   kids_room: () => import('../quest-rooms/kids-room.js?v=b9d8e3c6'),
   rube_yard: () => import('../quest-rooms/rube-yard.js?v=97270307'),
   le_miserable: () => import('../quest-rooms/le-miserable.js?v=e6342bfd'),
