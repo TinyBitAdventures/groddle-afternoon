@@ -17,7 +17,7 @@ import { describe, it } from 'node:test';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { HOME_LIMITS } from '../public/js/homes-catalog.js?v=10ac34b6';
-import { createCultivationState, homeStreetLayout } from '../public/js/home-cultivation.js?v=65b4382a';
+import { createCultivationState, homeStreetLayout } from '../public/js/home-cultivation.js?v=f1242621';
 import { EXTERIOR_STYLES, streetLook } from '../public/js/home-styles.js?v=13fe0aaa';
 import { NEIGHBOURS, neighbourLayout } from '../public/js/neighbours.js?v=161fc2e5';
 import { SCENE_STYLES, propPlan } from '../public/js/features/neighbour-scene.js?v=15d683af';
@@ -31,7 +31,7 @@ import {
   streetNearSkip,
   streetTrimSpots,
   towerDoorway,
-} from '../public/js/features/homes-feature.js?v=4403e9be';
+} from '../public/js/features/homes-feature.js?v=bfff8c31';
 
 const read = (rel) => readFileSync(join(import.meta.dirname, '..', 'public', 'js', rel), 'utf8');
 const maxLeft = HOME_LIMITS.MAX_FRONTYARD_LEFT_SEGMENTS - HOME_LIMITS.START_FRONTYARD_LEFT_SEGMENTS;
@@ -135,8 +135,8 @@ describe('the home street keeps its doorways clear of scenery (PORCH)', () => {
 
   it('draws the street from those spots (the house, the Tower and a visitor alike)', () => {
     const src = read('features/homes-feature.js');
-    assert.match(src, /for \(const spot of streetTrimSpots\(style, layout, houseStyle\)\)/);
+    assert.match(src, /for \(const spot of streetTrimSpots\(style, layout, houseStyle, \{ move: movers\.trim \}\)\)/);
     assert.match(src, /skipNear: streetNearSkip\(layout, \{ towerX: towerFootX\(cult\) \}\)/);
-    assert.match(src, /for \(const spot of landscapeNearSpots\(style, seed, width, skipNear, \{ lot \}\)\)/);
+    assert.match(src, /for \(const spot of landscapeNearSpots\(style, seed, width, skipNear, \{ lot, move: moveNear \}\)\)/);
   });
 });

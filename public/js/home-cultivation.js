@@ -341,6 +341,21 @@ export function footprint(protoClass) {
 }
 
 /**
+ * YARDBUSH: what each cultivation covers, in world x ({ id, x1, x2 }), every kind and size,
+ * worn-out protos and the Tower too: `halfOf(row)` either side of its spot (by default its
+ * spacing footprint; the street's front fringe passes the drawn art's half width,
+ * features/homes-feature.js cultivationArtHalf, and moves aside from it: fringeMover). PURE.
+ */
+export function cultivationSpans(state, halfOf = (row) => footprint(row.protoClass)) {
+  const { houseX } = homeStreetLayout(state);
+  return (state?.items || []).map((row) => {
+    const x = houseX + row.rx;
+    const half = halfOf(row);
+    return { id: row.id, x1: x - half, x2: x + half };
+  });
+}
+
+/**
  * The signpost post's half width on the ground (homes-feature makeHomeSignpost: signpost_post.png
  * is 43 wide). GATESIGN2: it is the street's one post now; the way-out post that stood 110 px right
  * of it (and the World Gate's pole before that) is gone, and its ground is free again.

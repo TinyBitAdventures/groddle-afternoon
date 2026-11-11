@@ -190,8 +190,11 @@ import {
   cultivateDemoYard,
   cultivationChoices,
   cultivationDef,
+  cultivationSpans,
+  dispatcherRx,
   expandYard,
   footprint,
+  groundFixtures,
   hiveFireflySpots,
   homeStreetLayout,
   lifespanLeft,
@@ -203,9 +206,9 @@ import {
   quoteYardExpansion,
   removeCultivation,
   towerItem,
-} from '../home-cultivation.js?v=65b4382a';
+} from '../home-cultivation.js?v=f1242621';
 import { PROTO_DEPLETED_ART } from '../home-proto-art.js?v=9309e9f3';
-import { DISPATCHER_TEXT, MOVABLE_FIXTURES, MOVABLE_FIXTURE_IDS, dispatcherAway, fixtureFits, fixtureText, savedFixtureRx, signpostX } from '../home-street-fixtures.js?v=bad831a1';
+import { DISPATCHER_HALF, DISPATCHER_TEXT, MOVABLE_FIXTURES, MOVABLE_FIXTURE_IDS, dispatcherAway, fixtureFits, fixtureText, savedFixtureRx, signpostX } from '../home-street-fixtures.js?v=bad831a1';
 import { displayTopOf, itemstackOverlayPoint, overlayAlpha, overlayLifeMs, playPoofIn, trackOverlay } from '../overlay-art.js?v=75c3ea34';
 import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=59ca0e2b';
 import { fadeInNewNear } from '../poof-fade.js?v=8984abd1';
@@ -903,12 +906,15 @@ function interiorBackground(engine, opts = {}) {
   if (opts.yard) {
     root.sortableChildren = true;
     house.zIndex = 0;
+    // YARDBUSH: the front fringe steps aside from the back yard's cultivations as the street's does.
+    const moveNear = fringeMover(cultivationSpans(backCult, cultivationArtHalf), { minX: 0, maxX: x0, blocked: (x) => x > x0 - 90 });
     const land = drawLandscape(engine, root, yardLook(shownYardStyle(engine)), `yard:${shownYardStyle(engine)}`, {
       width,
       groundY: BACK_YARD_GROUND_Y,
       lift: YARD_LIFT,
       // grass and plants stop short of the way into the house
       skipNear: (x) => x > x0 - 90,
+      moveNear,
       // The yard runs left from the house: what stands in its field is counted from there.
       lot: { left: x0, right: null },
     });
@@ -1544,9 +1550,11 @@ export function houseFront(layout, houseStyle = 'meadow') {
  * (PLANTS): the sprites line up leftwards from the house's front (houseFront) with the doorway
  * gap, side by side, and only those that fit before the yard's own planting (the lot edge where
  * the `near` row stops, streetNearSkip) stay; the rest are not drawn. None stands on the house
- * front, so the door, its mat and the house's own art stay in view. PURE (world x).
+ * front, so the door, its mat and the house's own art stay in view. YARDBUSH: the border is front
+ * fringe too (its feet in front of the walk line); `move` (fringeMover) steps a sprite over a
+ * cultivation aside, or drops it (null). The others keep their spots. PURE (world x).
  */
-export function streetTrimSpots(look, layout, houseStyle = 'meadow') {
+export function streetTrimSpots(look, layout, houseStyle = 'meadow', { move = null } = {}) {
   const front = houseFront(layout, houseStyle);
   const stop = layout.lotLeft + 40;
   let edge = front.x1 - DOORWAY_GAP;
@@ -1554,10 +1562,120 @@ export function streetTrimSpots(look, layout, houseStyle = 'meadow') {
   (look?.trim || []).forEach((meta, i) => {
     const half = (meta.w * meta.scale) / 2;
     if (edge - 2 * half < stop) return;
-    out.push({ meta, x: edge - half, half, flip: i % 2 === 1 });
+    const x = move ? move(edge - half, half, meta) : edge - half;
     edge -= 2 * half;
+    if (x != null) out.push({ meta, x, half, flip: i % 2 === 1 });
   });
   return out;
+}
+
+/**
+ * YARDBUSH (Austin 2026-11-11: a Crop Garden in his yard had the street's flowering bushes
+ * poking out at both ends and from behind its middle; "they should either go in front of the
+ * garden or be moved to the left/right of the garden"). In Glitch a cultivation was an
+ * itemstack: the server put it down at x, y (locations/inc_cultivation.js cultivation_purchase
+ * 113-160: apiPutItemIntoPosition, the decos untouched), the client's placement ranges kept it
+ * off other cultivations and signposts only, never decos (ContiguousPlatformLineSet.as
+ * calculateRanges 73-133), and every middleground deco lay in the layer's bitmap under all the
+ * item holders (MiddleGroundRenderer.as setupEndShapes 111-171: BG_ITEM, NRM_ITEM, FG_ITEM come
+ * after it). So a deco standing behind a garden was simply covered by it; the yard's front row of
+ * bushes stood in a band well below where items stand (2012 housing demo, JPJgjWNX1vE 1:06-1:20),
+ * clear of them. Our front fringe stands 22 px in front of the walk line (nearFeetY) yet draws
+ * behind the cultivations (zIndex -30), so over one it pokes out under the bed's front edge.
+ * Drawing it in front instead would cover the plots a player clicks, so it moves aside
+ * (fringeMover). A front-fringe piece (no `inField`) is covered when its middle (FRINGE_CORE of
+ * its width: the outer edges are leaf tips and clear margin) is over a cultivation's drawn art
+ * (`spans`: cultivationSpans with cultivationArtHalf). What stands in the field (`inField`) is
+ * behind the walk line and stays, covered as Glitch covered it. PURE.
+ */
+export const FRINGE_CORE = 0.5;
+/** YARDBUSH: the clear ground a moved fringe piece keeps from the cultivation's art. */
+export const FRINGE_GAP = 8;
+/** YARDBUSH: how far a fringe piece may move; past that it is not drawn. */
+export const FRINGE_REACH = 300;
+
+export function frontFringeCovered(spans = []) {
+  return (px, half = 0, item = null) => {
+    if (Number.isFinite(item?.inField)) return false;
+    const core = half * FRINGE_CORE;
+    return spans.some((s) => px + core > s.x1 && px - core < s.x2);
+  };
+}
+
+/**
+ * YARDBUSH: where a front-fringe piece stands with the cultivations (`spans`) in the yard: where
+ * it was when it is not covered (frontFringeCovered); else just outside the art of the
+ * cultivation it is most over (FRINGE_GAP clear), on the side its middle is nearer, or the other
+ * side; or null (not drawn) when neither is within FRINGE_REACH, inside minX..maxX, clear of every
+ * cultivation (with the gap) and not `blocked(x, half, item)` (the house lot, a doorway, a post or
+ * fixture). A piece of a `group` is never pulled from its group: it is not drawn. Pure and from
+ * the saved yard only, so every visitor sees the owner's street as the owner does.
+ */
+export function fringeMover(spans = [], { blocked = () => false, minX = -Infinity, maxX = Infinity, gap = FRINGE_GAP, reach = FRINGE_REACH } = {}) {
+  const covered = frontFringeCovered(spans);
+  const clear = (x, half, item) => x - half >= minX && x + half <= maxX
+    && !spans.some((s) => x + half + gap > s.x1 && x - half - gap < s.x2)
+    && !blocked(x, half, item);
+  return (px, half = 0, item = null) => {
+    if (!covered(px, half, item)) return px;
+    if (item?.group) return null;
+    const core = half * FRINGE_CORE;
+    const overlap = (s) => Math.min(px + core, s.x2) - Math.max(px - core, s.x1);
+    const s = spans.reduce((best, span) => (!best || overlap(span) > overlap(best) ? span : best), null);
+    const left = s.x1 - gap - half;
+    const right = s.x2 + gap + half;
+    const sides = px <= (s.x1 + s.x2) / 2 ? [left, right] : [right, left];
+    return sides.find((x) => Math.abs(x - px) <= reach && clear(x, half, item)) ?? null;
+  };
+}
+
+/** Pixel art widths: patches.js soil sprites (patch-dirty.webp 115 px), mining's rocks at 0.85. */
+const PATCH_SOIL_W = 115;
+const ROCK_DRAW_SCALE = 0.85;
+
+/**
+ * YARDBUSH: half the width a cultivation is drawn at, for the front fringe (not its spacing
+ * footprint, which is wider for a Patch or a rock): a garden's bed (footprint is the drawn bed,
+ * js/garden-view.js), the Tower's chassis, a rock's sheet frame (spawnMineRock / rockStill), a
+ * pod's art (POD_ART), a Patch's soil (a tree on it rises from that), a worn-out item's or a peat
+ * bog's or dirt pile's proto art (js/home-proto-art.js). PURE.
+ */
+export function cultivationArtHalf(row) {
+  const def = cultivationDef(row?.protoClass);
+  if (!def) return 0;
+  const proto = PROTO_DEPLETED_ART[def.protoClass];
+  if (row.depleted && proto) return proto[3] / 2;
+  if (def.kind === 'garden') return footprint(def.protoClass);
+  if (def.kind === 'tower') return def.width / 2;
+  if (def.kind === 'rock') return ((ROCK_CATALOG[rockClassFor(row.endClass)] || ROCK_CATALOG.rock_metal_1).frameWidth * ROCK_DRAW_SCALE) / 2;
+  if (def.art && POD_ART[def.art]) return POD_ART[def.art].w / 2;
+  if (def.kind === 'patch') return PATCH_SOIL_W / 2;
+  return proto ? proto[3] / 2 : footprint(def.protoClass);
+}
+
+/**
+ * YARDBUSH: the home street's front-fringe movers (fringeMover) from its saved yard: `near` for
+ * the grass and plants along the yard (kept off the house lot and a Tower's doorway,
+ * streetNearSkip), `trim` for the border by the house (kept off the house front); both off the
+ * signpost's post, the Magic Rock, the Butler Box, a moved Mailbox and the Mail Dispatcher
+ * (groundFixtures, dispatcherRx) and on the street. PURE.
+ */
+export function homeFringeMovers(state, { houseStyle = 'meadow' } = {}) {
+  const layout = homeStreetLayout(state);
+  const spans = cultivationSpans(state, cultivationArtHalf);
+  const fixtures = groundFixtures(layout, state);
+  const disp = dispatcherRx(state);
+  if (disp != null) fixtures.push({ id: 'dispatcher', x1: layout.houseX + disp - DISPATCHER_HALF, x2: layout.houseX + disp + DISPATCHER_HALF });
+  const front = houseFront(layout, houseStyle);
+  const coreOn = (x, half, z) => x + half * FRINGE_CORE > z.x1 && x - half * FRINGE_CORE < z.x2;
+  const onFixture = (x, half) => fixtures.some((f) => coreOn(x, half, f));
+  const lotOrTower = streetNearSkip(layout, { towerX: towerFootX(state) });
+  const bounds = { minX: 0, maxX: layout.width };
+  return {
+    spans,
+    near: fringeMover(spans, { ...bounds, blocked: (x, half, item) => lotOrTower(x, half, item) || onFixture(x, half) }),
+    trim: fringeMover(spans, { ...bounds, blocked: (x, half) => coreOn(x, half, front) || onFixture(x, half) }),
+  };
 }
 
 /** The street's Tower's foot in world x (its cultivation's spot), or null. */
@@ -1569,7 +1687,8 @@ function towerFootX(state) {
 /**
  * Where the street's own grass, flowers and plants may grow (drawLandscape's `skipNear`): off
  * the house lot, and no sprite over a Tower's doorway (`towerX`, its foot, when there is one).
- * Cultivations a player planted are not scenery and are never moved. PURE.
+ * Cultivations a player planted are not scenery and are never moved; the front fringe steps
+ * aside from them instead (homeFringeMovers, YARDBUSH). PURE.
  */
 export function streetNearSkip(layout, { towerX = null } = {}) {
   const tower = Number.isFinite(towerX) ? towerDoorway(towerX) : null;
@@ -1593,7 +1712,8 @@ export function nearFeetY(item, groundY, depth = FIELD_DEPTH) {
  * The street style's `near` row along the ground (grass, flowers, plants; with `inField`, the
  * trunks, huts, ledges and tufts standing in the field): each sprite's x, half width, flip
  * and feet (`back`: its `inField` clamped to the field, or null for the front fringe),
- * skipping where `skip(px, half)` says.
+ * skipping where `skip(px, half, item)` says, then placed where `move(px, half, item)` says
+ * (YARDBUSH fringeMover: aside from a cultivation, or null: not drawn).
  *
  * The front fringe repeats from the street's left end, as it always has. A piece in the
  * field is counted from the house lot outward when the caller names the lot (`lot`: its left
@@ -1606,7 +1726,7 @@ export function nearFeetY(item, groundY, depth = FIELD_DEPTH) {
  * order, a nearer trunk covers a farther ledge), then the front fringe in the recipe's order.
  * PURE; drawLandscape draws these.
  */
-export function landscapeNearSpots(style, seed, width, skip = () => false, { lot = null } = {}) {
+export function landscapeNearSpots(style, seed, width, skip = () => false, { lot = null, move = null } = {}) {
   const out = [];
   const gone = new Set();
   const depth = fieldDepth(style);
@@ -1624,14 +1744,21 @@ export function landscapeNearSpots(style, seed, width, skip = () => false, { lot
     /** One sprite of the row at x (before its jitter), the i-th of its run `tag`. */
     const place = (x, i, tag) => {
       const jx = item.jitter ? (hash01(`${seed}:near:${key}:${tag}${i}`) - 0.5) * item.jitter * 2 : 0;
-      const px = x + jx;
+      let px = x + jx;
       const part = item.group ? `${item.group}:${tag}${i}` : null;
       const row = pickAlt(item, `${seed}:near:${item.s}:${tag}${i + 1}:alt`);
       const half = (row.w * row.scale) / 2;
-      if (skip(px, half)) {
+      if (skip(px, half, item)) {
         if (part) gone.add(part);
         return;
       }
+      // YARDBUSH: the front fringe steps aside from a cultivation, or is not drawn (fringeMover).
+      const moved = move ? move(px, half, item) : px;
+      if (moved == null) {
+        if (part) gone.add(part);
+        return;
+      }
+      px = moved;
       out.push({ item, row, x: px, half, flip: hash01(`${item.s}:${tag}${i + 1}`) > 0.5, back, part });
     };
     if (back == null || !lot) {
@@ -1775,7 +1902,7 @@ export function landscapeGeometry(look, groundY) {
  * deeper field's rise (landscapeGeometry). Returns the parallax update for
  * bgLayer.updateParallax.
  */
-function drawLandscape(engine, root, style, seed, { width, groundY, lift, skipNear = () => false, lot = null }) {
+function drawLandscape(engine, root, style, seed, { width, groundY, lift, skipNear = () => false, moveNear = null, lot = null }) {
   const { fieldTop, rise } = landscapeGeometry(style, groundY);
   const { PIXI } = engine;
   const sky = new PIXI.Sprite(gradientTexture(PIXI, ...style.sky));
@@ -1869,7 +1996,7 @@ function drawLandscape(engine, root, style, seed, { width, groundY, lift, skipNe
   const near = new PIXI.Container();
   near.zIndex = -30;
   const depth = groundY - fieldTop;
-  for (const spot of landscapeNearSpots(style, seed, width, skipNear, { lot })) {
+  for (const spot of landscapeNearSpots(style, seed, width, skipNear, { lot, move: moveNear })) {
     const row = spot.row;
     if (row.tint == null && style.nearTint != null) row.tint = style.nearTint;
     near.addChild(decoSprite(PIXI, row, spot.x, nearFeetY(spot.item, groundY, depth), spot.flip));
@@ -1893,14 +2020,19 @@ function streetBackground(engine, styleKey, houseStyle = 'meadow') {
   const seed = style.seed || styleKey;
   const layout = homeStreetLayout(cult);
   const width = layout.width;
+  // YARDBUSH: the front fringe steps aside from the cultivations (the owner's, for a visitor:
+  // withOwnersHome swaps `cult`).
+  const movers = homeFringeMovers(cult, { houseStyle });
   const root = new PIXI.Container();
   root.sortableChildren = true;
   const land = drawLandscape(engine, root, style, seed, {
     width,
     groundY: STREET_GROUND_Y,
     lift: STREET_LIFT,
-    // Grass, flowers and plants along the yard, kept off the house lot and a Tower's doorway.
+    // Grass, flowers and plants along the yard, kept off the house lot and a Tower's doorway,
+    // the front fringe aside from the cultivations (YARDBUSH).
     skipNear: streetNearSkip(layout, { towerX: towerFootX(cult) }),
+    moveNear: movers.near,
     // What stands in the field is counted from the house lot outward (landscapeNearSpots).
     lot: { left: layout.lotLeft, right: layout.lotRight },
   });
@@ -1915,11 +2047,12 @@ function streetBackground(engine, styleKey, houseStyle = 'meadow') {
   house.zIndex = -20;
   house.homeLayout = { k: 'house', s: HOUSES[houseStyle] ? houseStyle : 'meadow' };
   root.addChild(house);
-  // A planted border along the front of the house, from its left corner, clear of the doorway (PORCH).
+  // A planted border along the front of the house, from its left corner, clear of the doorway
+  // (PORCH) and of the cultivations (YARDBUSH).
   const trim = new PIXI.Container();
   trim.zIndex = -19;
   const { doorX, signX } = houseFixtureX(layout, houseStyle);
-  for (const spot of streetTrimSpots(style, layout, houseStyle)) {
+  for (const spot of streetTrimSpots(style, layout, houseStyle, { move: movers.trim })) {
     const row = style.nearTint != null && spot.meta.tint == null ? { ...spot.meta, tint: style.nearTint } : spot.meta;
     trim.addChild(decoSprite(PIXI, row, spot.x, STREET_GROUND_Y + 20, spot.flip));
   }

@@ -17,7 +17,7 @@ import { describe, it } from 'node:test';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { HOME_LIMITS } from '../public/js/homes-catalog.js?v=10ac34b6';
-import { createCultivationState, homeStreetLayout } from '../public/js/home-cultivation.js?v=65b4382a';
+import { createCultivationState, homeStreetLayout } from '../public/js/home-cultivation.js?v=f1242621';
 import { EXTERIOR_STYLES, INTERIOR_STYLES, streetLook, yardLook } from '../public/js/home-styles.js?v=13fe0aaa';
 import {
   FIELD_DEPTH,
@@ -26,7 +26,7 @@ import {
   nearFeetY,
   streetNearSkip,
   towerDoorway,
-} from '../public/js/features/homes-feature.js?v=4403e9be';
+} from '../public/js/features/homes-feature.js?v=bfff8c31';
 
 const read = (rel) => readFileSync(join(import.meta.dirname, '..', 'public', 'js', rel), 'utf8');
 const FIREBOG = ['firebog_1_high', 'firebog_1b_high', 'firebog_3_high', 'firebog_4_high', 'firebog_2_high', 'firebog_4a_high'];
@@ -385,7 +385,7 @@ describe('pieces in the field are laid out from the house lot (landscapeNearSpot
 
   it('is drawn behind the house and the street\'s own things, from the lot the street and the yard name', () => {
     const src = read('features/homes-feature.js');
-    assert.match(src, /for \(const spot of landscapeNearSpots\(style, seed, width, skipNear, \{ lot \}\)\) \{[\s\S]{0,260}near\.addChild\(decoSprite\(PIXI, row, spot\.x, nearFeetY\(spot\.item, groundY, depth\), spot\.flip\)\);/);
+    assert.match(src, /for \(const spot of landscapeNearSpots\(style, seed, width, skipNear, \{ lot, move: moveNear \}\)\) \{[\s\S]{0,260}near\.addChild\(decoSprite\(PIXI, row, spot\.x, nearFeetY\(spot\.item, groundY, depth\), spot\.flip\)\);/);
     assert.match(src, /near\.zIndex = -30;/);
     assert.match(src, /house\.zIndex = -20;/);
     assert.match(src, /lot: \{ left: layout\.lotLeft, right: layout\.lotRight \},/);
