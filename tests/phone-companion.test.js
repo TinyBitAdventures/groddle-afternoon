@@ -184,10 +184,11 @@ describe('play/phone/ (the companion page)', () => {
     for (const name of used) assert.ok(name in core, `account.${name} is not in js/minn-account-core.js`);
   });
 
-  it('stays small: everything it loads before a panel opens is under 240 KB', () => {
+  // 250 KB from 240 (2026-11-11): site/theme.js gained the Analytics pageview beacon (about 1 KB).
+  it('stays small: everything it loads before a panel opens is under 250 KB', () => {
     const files = ['play/phone/index.html', 'play/phone/phone.css', 'site/theme.js', 'site/site-nav.css', 'favicon.svg', ...graph];
     const bytes = files.reduce((n, f) => n + statSync(join(pub, f)).size, 0);
-    assert.ok(bytes < 240 * 1024, `${bytes} bytes`);
+    assert.ok(bytes < 250 * 1024, `${bytes} bytes`);
   });
 
   it('signs in with the game\'s own forms and the /play/online/ gate\'s session check', () => {

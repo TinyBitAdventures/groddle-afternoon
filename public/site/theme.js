@@ -396,11 +396,9 @@
   else check();
 })();
 
-// Pageviews for the console's Analytics tab (Austin 2026-11-11; groddle-afternoon-site src/Analytics.php). The pages
-// come from Kinsta's cache, where the site's PHP never runs, so this script counts them: one beacon a page load with
-// the page's path and nothing else (no query, no hash, no id, no cookie set). Not sent from a browser that has been
-// an administrator's (the Console link's hint, below), an automated one, the console or Minn Admin; a prerendered
-// page counts when it is shown.
+// Pageviews for the console's Analytics tab (site src/Analytics.php): pages come from Kinsta's cache, so one beacon a
+// load with the path only (no query, hash, id or cookie). Not from an administrator's or automated browser, the
+// console or Minn Admin; a prerendered page counts when shown.
 (() => {
   const URL = '/wp-json/groddle/v1/hit';
   function send() {

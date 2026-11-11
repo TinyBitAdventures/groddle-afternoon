@@ -2752,9 +2752,14 @@
   "deployed": "2026-11-11"
  },
  "git": {
-  "commits": 1654,
+  "commits": 1656,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-11",
+    "kind": "new",
+    "text": "Website pages count themselves for the console's Analytics tab"
+   },
    {
     "date": "2026-11-11",
     "kind": "fix",
@@ -2869,11 +2874,6 @@
     "date": "2026-11-10",
     "kind": "fix",
     "text": "A shared street project's last card shows your share instead of \"You did not contribute\""
-   },
-   {
-    "date": "2026-11-10",
-    "kind": "fix",
-    "text": "Walking off a ledge over a drop falls instead of jumping up onto a ledge far overhead"
    }
   ]
  },
