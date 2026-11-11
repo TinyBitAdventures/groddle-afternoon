@@ -169,6 +169,15 @@ describe('Incantations between real players (multiplayer, 2026-11-11)', () => {
     assert.equal(submitIncantation(state, 'hmm', 'Bo', 4).reason, 'other-chat');
   });
 
+  it('online your own line reads with your name, and a first contribution that closes a chain still says it is complete', () => {
+    const game = readFileSync(join(publicRoot, 'game.js'), 'utf8');
+    const fn = game.slice(game.indexOf('function featSpeakerName('), game.indexOf('function sayLocalChat('));
+    assert.match(fn, /return name === 'Ur' \? features\.query\('playerChatName', engine\) \|\| 'Ur' : name;/);
+    assert.match(fn, /result\.activityLine\.replace\(\/\^Ur \/, `\$\{featSpeakerName\('Ur'\)\} `\)/);
+    assert.match(fn, /\n    \}\n[^\n]*\n    if \(result\.chainCompleted\) \{\s*toast\(`Chain complete! \$\{result\.chainParticipants\.map\(featSpeakerName\)/);
+    assert.ok(!fn.includes('} else if (result.chainCompleted)'), 'not hidden behind the first contribution');
+  });
+
   it('the realtime feature hands other players\' Local lines to the chain', () => {
     const realtime = readFileSync(join(publicRoot, 'js', 'features', 'realtime-feature.js'), 'utf8');
     assert.match(realtime, /\(engine\.hearLocal \|\| engine\.chatLine\)\?\.\(name, text/);

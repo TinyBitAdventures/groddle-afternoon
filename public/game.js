@@ -26111,8 +26111,17 @@ function showLocalChatBubble(participant, message, { feat = false, mine = false,
   });
 }
 
+/** The chain's 'Ur' (this player) as others see them: the name played under online (location.js 4531: pc.linkifyLabel()). */
+function featSpeakerName(name) {
+  return name === 'Ur' ? features.query('playerChatName', engine) || 'Ur' : name;
+}
+
 function handleFeatResult(result, participant) {
-  if (result.activityLine) pushActivity(result.activityLine);
+  // Online your own line reads with your name, as everyone else's does (not "Ur got one point").
+  const activityLine = result.participant === 'Ur' && result.activityLine
+    ? result.activityLine.replace(/^Ur /, `${featSpeakerName('Ur')} `)
+    : result.activityLine;
+  if (activityLine) pushActivity(activityLine);
   if (result.broken) {
     playSfx('alert', { volume: 0.4, rate: 0.72 });
     assistedFeatChain = null;
@@ -26136,8 +26145,10 @@ function handleFeatResult(result, participant) {
         `Your incantation counted toward “${INCANTATION_FEAT_TITLE}”.`,
         4200
       );
-    } else if (result.chainCompleted) {
-      toast(`Chain complete! ${result.chainParticipants.join(', ')} scored six points.`, 3800);
+    }
+    // A first contribution can close a chain too: it is still complete (and the assisted chain done).
+    if (result.chainCompleted) {
+      toast(`Chain complete! ${result.chainParticipants.map(featSpeakerName).join(', ')} scored six points.`, 3800);
       assistedFeatChain = null;
     }
     app.canvas.dataset.featStep = String(result.step);
