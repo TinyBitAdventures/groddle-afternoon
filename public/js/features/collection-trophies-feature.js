@@ -10,8 +10,8 @@
  */
 import { addItem, countItem, ensureItem } from '../inventory.js?v=60dfc9ca';
 import { getAchievementCatalog } from '../content-catalogs.js?v=10b118dd';
-import { trophyGotText } from '../home-trophies.js?v=309fd6c7';
-import { COLLECTION_TROPHIES, COUNTED_ON_ARRIVAL, HELD_AT_ONCE, collectionClasses, heldChanges, planCollectionTrophies } from '../collection-trophies.js?v=69205984';
+import { trophyGotText } from '../home-trophies.js?v=2020b29b';
+import { COLLECTION_TROPHIES, COUNTED_ON_ARRIVAL, HELD_AT_ONCE, collectionClasses, heldChanges, planCollectionTrophies } from '../collection-trophies.js?v=3760d603';
 
 const CHECK_MS = 1000;
 let given = [];

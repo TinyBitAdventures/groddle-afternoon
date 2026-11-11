@@ -12,7 +12,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { STUCK_TEXT, bareCommand, slashPlan } from '../public/js/slash-commands.js?v=8533e143';
-import { STUCK_HINT_DWELL_MS, onTrapFloor, slashCommandsFeature, trapLinesOn } from '../public/js/features/slash-commands-feature.js?v=5c302cd0';
+import { STUCK_HINT_DWELL_MS, onTrapFloor, slashCommandsFeature, trapLinesOn } from '../public/js/features/slash-commands-feature.js?v=e5dea0a6';
 import { STREET_TRAPS } from '../public/js/street-traps-data.js?v=b2911c49';
 import { TRAP_JUMPS, renderTraps, trapLinesOf } from '../tools/ecology/build-street-traps.mjs';
 import { reachStreet, streetBuff } from '../public/js/builder/reach-graph.js?v=22368fd6';

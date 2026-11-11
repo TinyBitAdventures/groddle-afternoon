@@ -93,7 +93,7 @@ import {
   expireSolo,
   tankOf,
   TAKEN_KEEP,
-} from '../home-machines.js?v=1bd74ede';
+} from '../home-machines.js?v=678606c5';
 import { CALL_PLAYER_LINES, MACHINE_HITBOX, MACHINE_SKILLS, collectLine, machineJobMs, machineMadeLine, runningSoundKey, takeJobIngredients } from '../machine-rooms.js?v=b1cbd62b';
 import { MACHINE_ART_SHEETS, LOW_FUEL_BUBBLE_MS, LOW_FUEL_LINE, isLowFuel, machineFrame, machineSheetDef, roomMachineState } from '../machine-art.js?v=608f7257';
 import { FUEL_CELL, FUEL_PER_CELL, MAX_FUEL } from '../machines.js?v=39290298';
@@ -106,7 +106,7 @@ import { readVisitScene } from '../neighbours-mp.js?v=fc5f0670';
 import { saveStore } from '../save-store.js?v=8839ba7b';
 import { textureFromUrl } from '../textures.js?v=f024bd6a';
 import { createSheetLoader } from '../sprite-sheets.js?v=59ca0e2b';
-import { STREET_GROUND_Y, homesFeature } from './homes-feature.js?v=b959a88e';
+import { STREET_GROUND_Y, homesFeature } from './homes-feature.js?v=09265442';
 import { payAltarBonus } from './machine-rooms-feature.js?v=8485041c';
 import { worldToScreen } from '../street-model.js?v=b6cb6a4e';
 import { nearestSurfaceY } from '../walk-surface.js?v=106bfdc5';

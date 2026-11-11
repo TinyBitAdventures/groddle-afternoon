@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=69b550bf';
 import { createErrorOnce, createFeatureHost } from './js/feature-host.js?v=06bb8b74';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=347b1b13';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=6669debc';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -477,7 +477,8 @@ import {
   removeItem,
   isToolItem,
 } from './js/inventory.js?v=60dfc9ca';
-import { TROPHY_FIND_TEXT, trophyOfBadge } from './js/home-trophies.js?v=309fd6c7';
+import { TROPHY_FIND_TEXT, trophyOfBadge } from './js/home-trophies.js?v=2020b29b';
+import { HELD_AT_ONCE, HELD_AT_ONCE_TEXT } from './js/collection-trophies.js?v=3760d603';
 import { PACK_COPY, isBagClass, isElementClass, unitRankAt } from './js/pack-slots.js?v=6cf9f397';
 import { hasPouch } from './js/elemental-pouch.js?v=ceefa97a';
 import { createPackRow, mountPackClearance, packBandRange, packCountText, packSearchEntries, packSlotTip } from './js/ui/pack-row.js?v=65c0f180';
@@ -26364,6 +26365,14 @@ function renderAchievePanel() {
       const itemLabel = ITEM_CATALOG[c.name]?.label || '';
       r.textContent = `${achievementConditionLabel(c, itemLabel)}: ${c.current} / ${c.num}`;
       body.appendChild(r);
+    }
+    // inc_achievements.js 520-544: these count what is in the pack at one time, so say so (report #199).
+    if (!row.redacted && !row.unlocked && HELD_AT_ONCE.includes(tsid)) {
+      const held = document.createElement('div');
+      held.className = 'badge-category';
+      held.dataset.badgeHeldAtOnce = '1';
+      held.textContent = HELD_AT_ONCE_TEXT;
+      body.appendChild(held);
     }
     card.appendChild(body);
     box.appendChild(card);

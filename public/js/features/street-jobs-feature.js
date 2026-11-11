@@ -136,7 +136,7 @@ import { WINTRY_PORTAL_TELEPORTERS } from '../wintry-portal.js?v=1437deda';
 import { PROJECTS_TEXT, contributedJobs, mineTotal, projectList } from '../projects-tracker.js?v=e1f51caf';
 import { PROJECTS_PANEL_ID, buildProjectsPanel, renderProjects } from '../ui/projects-sheet.js?v=972ce850';
 import { SIDE_SHEET_IDS } from '../ui/panel-shell.js?v=e2abdf9e';
-import { trophyGotText } from '../home-trophies.js?v=309fd6c7';
+import { trophyGotText } from '../home-trophies.js?v=2020b29b';
 import { GEM_HINTS, isGem } from '../gem-hints.js?v=4b65f7ac';
 
 export const STREET_JOBS_FEATURE_ID = 'street-jobs';

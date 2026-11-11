@@ -14,6 +14,8 @@
  * panel shows what you hold now and the badge comes with the last one in hand.
  */
 export const HELD_AT_ONCE = Object.freeze(['collection_gems', 'collection_fruits', 'collection_gasses', 'collection_bubbles', 'collection_spices', 'collection_all_emblems']);
+/** The badge list's hint for HELD_AT_ONCE: a count of the pack, so shelves and storage do not count. */
+export const HELD_AT_ONCE_TEXT = 'Carry one of each in your pack at the same time. Ones on shelves or in storage do not count.';
 
 /**
  * Cubimal figures reach the pack by trade, gift and mail too, not only from a box (game.js), so

@@ -138,7 +138,7 @@ import { playOverlay } from '../overlays.js?v=605c12ff';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
 import { MAIL_POST_SENDER } from '../mailbox.js?v=a3e833ba';
 import { filterText } from '../word-filter.js?v=9a7a7ebb';
-import { trophyGotText } from '../home-trophies.js?v=309fd6c7';
+import { trophyGotText } from '../home-trophies.js?v=2020b29b';
 
 export const SEASONS_FEATURE_ID = 'seasons';
 const LANTERN_GROUP = 'seasons:lantern';

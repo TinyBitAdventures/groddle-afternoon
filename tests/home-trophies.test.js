@@ -9,7 +9,7 @@ import assert from 'node:assert/strict';
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { TROPHY_DECOR, TROPHY_FIND_TEXT, TROPHY_WHERE_TEXT, trophyGotText, isTrophyDecor, placedTrophies, trophyOfBadge } from '../public/js/home-trophies.js?v=309fd6c7';
+import { TROPHY_DECOR, TROPHY_FIND_TEXT, TROPHY_WHERE_TEXT, trophyGotText, isTrophyDecor, placedTrophies, trophyOfBadge } from '../public/js/home-trophies.js?v=2020b29b';
 import {
   createHomeDecorState,
   displayDeposit,
@@ -21,7 +21,7 @@ import {
   normalizeHomeDecorState,
   pickUpFurniture,
   placeFurniture,
-} from '../public/js/home-decor.js?v=d6fabb62';
+} from '../public/js/home-decor.js?v=b2831539';
 import { cabinetRefusal } from '../public/js/home-storage.js?v=121f1897';
 import { canSellClass } from '../public/js/home-street-mp.js?v=c51bb4f7';
 import { filterTiles, furniturePane, trayFilters } from '../public/js/ui/home-builder.js?v=b71acd91';
@@ -29,11 +29,11 @@ import { hasUpgrades, upgradeVerb } from '../public/js/furniture-upgrades.js?v=a
 import { NO_SLOT_CLASSES } from '../public/js/pack-slots-data.js?v=800f664c';
 import { layoutPack, takesNoSlot } from '../public/js/pack-slots.js?v=6cf9f397';
 import { WORLD_ART } from '../public/js/world-art-list.js?v=2d47f296';
-import { homeTrophyCount, isTrophyClass } from '../public/js/features/item-verbs-feature.js?v=d67b6524';
-import { homesFeature } from '../public/js/features/homes-feature.js?v=b959a88e';
+import { homeTrophyCount, isTrophyClass } from '../public/js/features/item-verbs-feature.js?v=864d9c54';
+import { homesFeature } from '../public/js/features/homes-feature.js?v=09265442';
 import { planStreetTrophies } from '../public/js/street-jobs.js?v=68562ef0';
 import { planEggTrophy } from '../public/js/seasons.js?v=1978c3f3';
-import { collectionTrophiesFeature as collection } from '../public/js/features/collection-trophies-feature.js?v=a54215da';
+import { collectionTrophiesFeature as collection } from '../public/js/features/collection-trophies-feature.js?v=2507feab';
 import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=10b118dd';
 import { applyAchievementProgress, createAchievementState } from '../public/js/achievements.js?v=2e4aa9cb';
 
