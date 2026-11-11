@@ -25290,6 +25290,9 @@ function openQuestPanel() {
   }
 }
 
+/** quests.json teleportation_rescue_pig offerTriggers: the skill that brings Ilmenskie Jones's quest. */
+const ILMENSKIE_SKILL_ID = 'teleportation_4';
+
 const STORY_QUEST_IDS = [
   LEGALIZE_QUEST_ID,
   ILMENSKIE_QUEST_ID,
@@ -25357,6 +25360,9 @@ function canOfferStoryQuest(classTsid) {
     }).ok && !winterWalkIsInstanced();
   }
   if (questState.completed.includes(classTsid)) return false;
+  // Ticket 192: Teleportation IV's quest (inc_data_skills.js teleportation_4 quest_id; its offer
+  // reads "using your newly acquired powers of Teleportation IV"), offered once that skill is learned.
+  if (classTsid === ILMENSKIE_QUEST_ID) return (skillState.learned || []).includes(ILMENSKIE_SKILL_ID);
   if (classTsid === LEGALIZE_QUEST_ID) return !legalizeIsInstanced();
   if (classTsid === REMEMBER_QUEST_ID) {
     return questState.completed.includes(PHANTOM_QUEST_ID) && countItem(inv, FADED_HEART_ID) > 0;

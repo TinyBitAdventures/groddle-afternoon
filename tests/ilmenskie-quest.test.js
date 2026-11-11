@@ -72,3 +72,13 @@ test('client ships original clean art, map teleportation, rescue verbs, and QA r
   assert.match(content, /npc_piggy_explorer/);
   assert.match(css, /\.map-quest-teleport/);
 });
+
+test('the story-quest offer waits for teleportation_4, the skill whose quest it is (quests.json offerTriggers)', async () => {
+    const src = fs.readFileSync(new URL('../public/game.js', import.meta.url), 'utf8');
+    const quests = JSON.parse(fs.readFileSync(new URL('../public/assets/content/quests.json', import.meta.url), 'utf8'));
+    const def = (quests.quests || quests).teleportation_rescue_pig;
+    assert.deepEqual(def.offerTriggers, [{ type: 'skill', skill: 'teleportation_4' }]);
+    assert.match(src, /const ILMENSKIE_SKILL_ID = 'teleportation_4';/);
+    const fn = src.slice(src.indexOf('function canOfferStoryQuest('), src.indexOf('function appendStoryQuestOffers('));
+    assert.match(fn, /classTsid === ILMENSKIE_QUEST_ID\) return \(skillState\.learned \|\| \[\]\)\.includes\(ILMENSKIE_SKILL_ID\)/);
+});
