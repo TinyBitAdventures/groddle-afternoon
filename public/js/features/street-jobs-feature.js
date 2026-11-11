@@ -1051,11 +1051,11 @@ function workCtx(engine) {
  * bubble, 40x40, the tool's tool_animation, delta_y -110), drawn in front of the street on the fx
  * layer like the Focusing Orb's meditation (meditation-feature zIndex 40). js/job-work-fx.js.
  */
-function workToolFx(engine, tool) {
+function toolBubble(engine, tool, label) {
   const { PIXI } = engine;
   const root = new PIXI.Container();
   root.zIndex = 40;
-  root.label = 'job-work-tool';
+  root.label = label;
   const { width: w, height: h } = JOB_WORK_OVERLAY;
   const r = Math.round(Math.max(w, h) / 2 + 9);
   const bubble = new PIXI.Graphics();
@@ -1083,11 +1083,84 @@ function workToolFx(engine, tool) {
   }
   art.anchor.set(0.5);
   root.addChild(art);
+  return root;
+}
+
+/** Your own tool bubble, over your avatar for the run of units. */
+function workToolFx(engine, tool) {
+  const root = toolBubble(engine, tool, 'job-work-tool');
   root.x = engine.player.x;
   root.y = engine.player.y + JOB_WORK_OVERLAY.deltaY;
   (engine.fxLayer || engine.entityLayer).addChild(root);
-  engine.setData?.('jobWorkTool', `${tool}:${sheet ? 'animation' : 'icon'}`);
+  engine.setData?.('jobWorkTool', `${tool}:${jobWorkToolSheet(tool) ? 'animation' : 'icon'}`);
   return root;
+}
+
+/*
+ * The other workers' tool bubbles (gap 2, research/street-projects-audit-2026-11-11.md). Glitch sent
+ * each worker's pc_overlay to everyone else on the street (items/include/jobs.js startJobWork 293-307,
+ * apiSendAnnouncementX(anncx, pc)) and took it down the same way (cancelJobWork 435-438). The tool's
+ * sound went to the worker alone (pc.announce_sound, jobs.js 308), so the street sees these and hears
+ * nothing. The realtime server relays one start and one stop per run (projects_crew.go project_working,
+ * and project_workers on arriving).
+ */
+/** Over the remote avatar's name plate, as the meditation bubble (meditation-feature.js 483 BUBBLE_DY). */
+const CREW_BUBBLE_DY = -186;
+let crewToolSet = null;
+
+/** The tools the catalog's work asks for (workGear): the only classes a remote bubble draws. */
+function crewTools() {
+  if (crewToolSet || !catalog) return crewToolSet || new Set();
+  crewToolSet = new Set();
+  for (const cls of Object.values(catalog.classes || {})) {
+    for (const r of cls.requirements || []) {
+      if (r.type !== 'work') continue;
+      for (const t of r.classIds?.length ? r.classIds : [r.classId]) if (t) crewToolSet.add(String(t));
+    }
+  }
+  return crewToolSet;
+}
+
+function crewNote(engine) {
+  engine.setData?.('jobCrewTools', [...(mp?.crew?.entries() || [])].map(([id, c]) => `${id}:${c.tool}`).join(','));
+}
+
+function crewSet(engine, id, tool) {
+  if (!mp?.crew || !id || id === n0(mp.client.me?.id)) return;
+  const was = mp.crew.get(id);
+  if (was && was.tool === tool) return;
+  crewDrop(id);
+  if (tool && crewTools().has(tool)) mp.crew.set(id, { tool, sprite: null });
+  crewNote(engine);
+}
+
+function crewDrop(id) {
+  const c = mp?.crew?.get(id);
+  if (!c) return;
+  if (c.sprite && !c.sprite.destroyed) c.sprite.destroy({ children: true });
+  mp.crew.delete(id);
+}
+
+/** Each frame: a bubble over each remote worker, made when its avatar is here, following it. */
+function tickCrew(engine) {
+  if (!mp?.crew?.size || !engine.PIXI) return;
+  const remotes = globalThis.groddleRealtime?.remotes;
+  const layer = engine.fxLayer || engine.entityLayer;
+  for (const [id, c] of mp.crew) {
+    const root = remotes?.get?.(id)?.root;
+    const live = c.sprite && !c.sprite.destroyed && c.sprite.parent === layer;
+    if (!root || root.destroyed) {
+      if (live) c.sprite.destroy({ children: true });
+      c.sprite = null;
+      continue;
+    }
+    if (!live) {
+      c.sprite = toolBubble(engine, c.tool, 'job-crew-tool');
+      layer.addChild(c.sprite);
+    }
+    c.sprite.x = root.x;
+    c.sprite.y = root.y + CREW_BUBBLE_DY;
+  }
 }
 
 /** A work unit's float, beside the bubble and away from the board's Enter hint. */
@@ -1123,6 +1196,8 @@ function startWork(engine, jobId, rid, maxUnits = Infinity) {
     req: check.req,
     cls: jobDef(catalog, jobId).phases[state.jobs[jobId]?.phase || 0]?.classTsid || '',
   };
+  // Gap 2: the street sees your bubble for the run (projects_crew.go), one start and one stop.
+  if (work.mp) mp?.client?.send?.('project_work_start', { job: wireOf(jobId), req: rid, tool: check.tool });
   engine.pushActivity(`You start to ${check.req.verb} with your ${itemLabel(check.tool)}.`);
   // Step back to the street so the work is visible; the board reopens the panel.
   closePanel();
@@ -1141,6 +1216,7 @@ function stopWork(engine, reason, left = null) {
   const w = work;
   work = null;
   if (w.toolSprite && !w.toolSprite.destroyed) w.toolSprite.destroy({ children: true });
+  if (w.mp) mp?.client?.send?.('project_work_stop');
   w.sound?.stop?.();
   const req = phaseRequirements(state, catalog, w.jobId).find((r) => r.id === w.rid);
   if (reason) engine.prompt({ kicker: 'Street Project', title: 'Work stopped', text: reason });
@@ -1760,6 +1836,17 @@ function createMp(engine, client) {
     if (pj.open) askMine();
   });
   client.on('msg:project_expired', (msg) => applyExpired(msg));
+  // Gap 2: the other workers' tool bubbles (tickCrew).
+  s.crew = new Map(); // id -> { tool, sprite }
+  client.on('msg:project_working', (msg) => crewSet(engine, n0(msg.id), String(msg.tool || '')));
+  client.on('msg:project_workers', (msg) => {
+    for (const row of Array.isArray(msg.list) ? msg.list : []) crewSet(engine, n0(row?.id), String(row?.tool || ''));
+  });
+  client.on('roster', ({ players } = {}) => {
+    const here = new Set((players || []).map((p) => n0(p?.id)));
+    for (const id of [...s.crew.keys()]) if (!here.has(id)) crewDrop(id);
+    crewNote(engine);
+  });
   client.on('error', ({ code, message } = {}) => {
     if (code !== 'project' || !message) return;
     s.giving = null;
@@ -1895,6 +1982,7 @@ function createMp(engine, client) {
       s.claiming = null;
       renderPanel(engine);
     }
+    tickCrew(engine);
     // A hall's clock on the open panel, once a minute.
     if (panel && !panel.hidden && jobDef(catalog, panelJobId)?.kind === 'hall' && now - (s.clockAt || 0) > 30000) {
       s.clockAt = now;
