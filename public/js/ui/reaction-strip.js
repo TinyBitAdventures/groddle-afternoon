@@ -4,7 +4,7 @@
  *
  * - an "add reaction" button (a face with a plus), shown while the line is hovered or has the
  *   keyboard, always focusable: "React to mr granberry's message". It opens the picker.
- * - the picker: the seven reactions in a row (role menu, each a menuitemcheckbox checked when it is
+ * - the picker: the reactions in a row (role menu, each a menuitemcheckbox checked when it is
  *   yours already). Left and Right (or Up and Down, Home, End) move, Enter or Space picks, Escape or a
  *   click elsewhere closes; the keyboard goes back to the button it came from.
  * - chips under the words, one a reaction with its count ("👍 2"): a click puts yours on or takes it
@@ -16,7 +16,7 @@
  * showing that line in place (their words are never touched, so a selection in them stays). A chip
  * keeps its node while its reaction stays, so the keyboard stays on it after a toggle.
  */
-import { REACTIONS, addLabel, chipLabel, chipTip, isMine, pickerMove, reactionOf, sameReactions } from '../chat-reactions.js?v=d65d555b';
+import { REACTIONS, addLabel, chipLabel, chipTip, isMine, pickerMove, reactionOf, sameReactions } from '../chat-reactions.js?v=38460172';
 
 const SVG_NS = 'http://www.w3.org/2000/svg';
 
@@ -172,7 +172,7 @@ export function createReactionUI({ doc = globalThis.document, win = globalThis, 
     const line = row.getBoundingClientRect?.() || null;
     const vw = win.innerWidth || 0;
     const vh = win.innerHeight || 0;
-    const w = node.offsetWidth || 7 * 34;
+    const w = node.offsetWidth || REACTIONS.length * 34;
     const h = node.offsetHeight || 40;
     let left = (r.right || 0) - w;
     if (line && line.width) left = Math.min(Math.max(left, line.left), line.right - w);

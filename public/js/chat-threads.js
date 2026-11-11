@@ -10,7 +10,7 @@
  * reaction key (js/chat-reactions.js): "l:<lid>" for a channel or group line, "im:<player>:<line id>"
  * for an IM line. A reply is never a thread of its own.
  */
-import { parseKey } from './chat-reactions.js?v=d65d555b';
+import { parseKey } from './chat-reactions.js?v=38460172';
 
 /** The words the threads use. */
 export const THREAD_TEXT = Object.freeze({

@@ -91,16 +91,16 @@
  */
 import { colorizeAmounts } from '../notify-view.js?v=5a43a760';
 import { bindContextTrigger, MORE_KEYS_LABEL } from './context-menu.js?v=79326483';
-import { IM_VERB_ID } from '../player-im.js?v=23463a96';
+import { IM_VERB_ID } from '../player-im.js?v=da51888c';
 import { selectionCovers } from './context-guard.js?v=0f71ac17';
 import { appendLinkedText, linkifyTextNodes } from '../chat-links.js?v=b717fac7';
 import { bindChatInput } from './chat-input.js?v=72d000ac';
 import { createNodeCache, pressLeavesKeys, reconcileChildren, uniqueKeys } from './keyed-nodes.js?v=9ab4de5c';
-import { createReactionUI } from './reaction-strip.js?v=5118c23b';
-import { sameWords } from '../chat-reactions.js?v=d65d555b';
-import { THREAD_TEXT, mergeReplies, normalSummary, summaryText } from '../chat-threads.js?v=42954351';
+import { createReactionUI } from './reaction-strip.js?v=3de815f3';
+import { sameWords } from '../chat-reactions.js?v=38460172';
+import { THREAD_TEXT, mergeReplies, normalSummary, summaryText } from '../chat-threads.js?v=f1b1fbcc';
 import { createFaceMemory } from '../buddy-list.js?v=b418f3f2';
-import { DELETE_CONFIRM_FOCUS, DELETE_TEXT, deleteConfirmRows } from '../chat-delete.js?v=ce1da244';
+import { DELETE_CONFIRM_FOCUS, DELETE_TEXT, deleteConfirmRows } from '../chat-delete.js?v=c55a1043';
 
 export const SOCIAL_STORE_KEY = 'groddle-social-drawer';
 /** The drawer opens by default at this window width and up (the mock's 1440 rule). */

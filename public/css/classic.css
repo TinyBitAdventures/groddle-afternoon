@@ -1658,7 +1658,8 @@
   background: color-mix(in srgb, var(--c-classic-panel) 95%, transparent);
   box-shadow: 0 2px 1px color-mix(in srgb, var(--c-classic-ink) 60%, transparent);
 }
-:root[data-ui="classic"] .react-pick { width: calc(28 * var(--cu)); height: calc(26 * var(--cu)); border: 1px solid transparent; border-radius: 3px; }
+/* Eight in a row inside a chat line's column (216u, less the 12 px scrollbar): 8 x 24u + the padding = 198u. */
+:root[data-ui="classic"] .react-pick { width: calc(24 * var(--cu)); height: calc(26 * var(--cu)); border: 1px solid transparent; border-radius: 3px; }
 :root[data-ui="classic"] .react-pick .react-glyph { font-size: var(--fs-classic-pane); }
 :root[data-ui="classic"] .react-pick:is(:hover, :focus-visible) { outline: none; background: var(--c-classic-verb-hi); border-color: var(--c-classic-verb-edge); }
 :root[data-ui="classic"] .react-pick[aria-checked="true"] { background: var(--c-classic-input-hi); border-color: var(--c-classic-input-hi-border); box-shadow: none; }

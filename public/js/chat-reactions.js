@@ -10,8 +10,11 @@
  * an id (solo, notes, the Butler, a server from before reactions) have no reactions. Speech bubbles
  * over avatars never show them.
  *
- * The set is fixed and small; the server takes nothing else. Six are the system's emoji (text, no art)
+ * The set is fixed and small; the server takes nothing else. Seven are the system's emoji (text, no art)
  * and one is Tiny Speck's own "Hi" sign (assets/sprites/hi-signs, CC0), as players said hi all day.
+ * "Thank you" (the folded hands) came on 2026-11-10, Austin's ask, between Hooray and the Hi sign. A
+ * page from before a reaction was added leaves it out of a line's chips (normalReactions keeps known
+ * keys only), and a server from before it refuses it in words (error "react"), so the set can grow.
  */
 
 /** The reactions, in the order they show: key (the server's word), glyph (text; '' for art), label. */
@@ -22,6 +25,7 @@ export const REACTIONS = Object.freeze([
   Object.freeze({ key: 'wow', glyph: '😮', label: 'Surprised' }),
   Object.freeze({ key: 'sad', glyph: '😢', label: 'Sad' }),
   Object.freeze({ key: 'tada', glyph: '🎉', label: 'Hooray' }),
+  Object.freeze({ key: 'thanks', glyph: '🙏', label: 'Thank you' }),
   Object.freeze({ key: 'hi', glyph: '', label: 'Hi', art: 'assets/sprites/hi-signs/hi_hi_1@3x.webp' }),
 ]);
 

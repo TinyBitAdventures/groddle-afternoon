@@ -23,7 +23,7 @@
  * the Social drawer's Chats list, under Private, noted Buddy or Player.
  */
 
-import { imKey } from './chat-reactions.js?v=d65d555b';
+import { imKey } from './chat-reactions.js?v=38460172';
 
 /** A conversation's id in the Social drawer: im:<player id>. */
 export const IM_PREFIX = 'im:';

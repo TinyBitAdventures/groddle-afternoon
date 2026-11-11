@@ -19,10 +19,10 @@ import { pathToFileURL } from 'node:url';
 import { SITE_DIR, sitePath, skipWithoutSite } from '../tools/repos.mjs';
 import { reactionsFile, reactionsJson } from '../tools/build-reactions.mjs';
 import { linkSegments } from '../public/js/chat-links.js?v=b717fac7';
-import { NAMES_SHOWN, REACTIONS } from '../public/js/chat-reactions.js?v=d65d555b';
+import { NAMES_SHOWN, REACTIONS } from '../public/js/chat-reactions.js?v=38460172';
 import { NOTICE_MAX, communityNoticeHtml, communityNoticesFrom, normalCommunityNotice } from '../public/js/community-notices.js?v=f676c372';
 import { EARLIER_MAX, WEB_TAG, chatLine, historyKey, mergeEarlier, oldestLid, shownName } from '../public/js/groups.js?v=c9635d96';
-import { mergeEarlierIms, oldestAt } from '../public/js/player-im.js?v=23463a96';
+import { mergeEarlierIms, oldestAt } from '../public/js/player-im.js?v=da51888c';
 import { communityMpFeature, createCommunitySession } from '../public/js/features/community-mp-feature.js?v=7ad7355e';
 
 const root = join(import.meta.dirname, '..');
@@ -150,6 +150,35 @@ describe('the boards\' words and links (groddle-afternoon-site src/CommunityText
     const names = Array.from({ length: NAMES_SHOWN + 2 }, (_, i) => `P${i}`);
     assert.equal(php(`T::reactionLabel('like', ${JSON.stringify(names).replace(/"/g, "'")})`), `Thumbs up: ${names.slice(0, NAMES_SHOWN).join(', ')} and 2 others`);
     assert.deepEqual(php("[T::isReaction('hi'), T::isReaction('nope'), T::isReaction(1)]"), [true, false, false]);
+  });
+
+  it('Thank you is in the boards\' set: between Hooray and the Hi sign, labelled, kept by its key', () => {
+    const keys = Object.keys(php('array_map(fn ($r) => $r[1], T::reactions())'));
+    assert.deepEqual(keys.slice(-3), ['tada', 'thanks', 'hi']);
+    assert.equal(php("T::isReaction('thanks')"), true);
+    assert.equal(php("T::reactionLabel('thanks', ['Ada', 'Bo'])"), 'Thank you: Ada and Bo');
+    assert.equal(php("T::reactionLabel('thanks', [])"), 'Thank you');
+    // Kept by its key: the boards' column is varchar(12), a chat line's set is JSON text.
+    const tables = JSON.parse(readFileSync(sitePath('minn.json'), 'utf8')).tables;
+    assert.ok(tables.groddle_community_reactions.includes('reaction varchar(12) NOT NULL'));
+    for (const r of REACTIONS) assert.ok(r.key.length <= 12, r.key);
+    assert.equal(php(`ChatHistory::reactionsJson([['e' => 'thanks', 'by' => [7, 9]], ['e' => 'someday', 'by' => [7]]])`), '[{"e":"thanks","by":[7,9]}]', 'a key the site does not know is not kept');
+    assert.deepEqual(php(`ChatHistory::reactionsOut('[{"e":"hi","by":[9]},{"e":"thanks","by":[7]},{"e":"someday","by":[7]}]', [7 => 'Ada', 9 => 'Bo'], [])`), [{ e: 'thanks', by: [{ id: 7, name: 'Ada' }] }, { e: 'hi', by: [{ id: 9, name: 'Bo' }] }]);
+  });
+
+  it('the boards\' picker fits a phone: eight in a row at 390 px, smaller buttons on the narrowest', () => {
+    const css = readFileSync(sitePath('community/community.css'), 'utf8');
+    const picker = /\n\.cpicker \{[^}]*\}/.exec(css)[0];
+    const button = /\n\.cpicker button \{[^}]*\}/.exec(css)[0];
+    const n = REACTIONS.length;
+    const row = (w, gap, pad) => n * w + (n - 1) * gap + 2 * pad + 2;
+    const wide = row(Number(/width: (\d+)px/.exec(button)[1]), Number(/gap: (\d+)px/.exec(picker)[1]), Number(/padding: (\d+)px/.exec(picker)[1]));
+    // community.js keeps 8 px to each side of the window.
+    assert.ok(wide <= 390 - 16, `${wide} px at 390`);
+    const m = /@media \(max-width: (\d+)px\) \{\s*\.cpicker \{ gap: (\d+)px; padding: (\d+)px; \}\s*\.cpicker button \{ width: (\d+)px; height: \d+px; \}\s*\}/.exec(css);
+    assert.ok(m, 'the narrow rule');
+    assert.ok(wide <= Number(m[1]) + 1 - 16, 'the full row fits every window wider than the rule');
+    assert.ok(row(Number(m[4]), Number(m[2]), Number(m[3])) <= 320 - 16, 'and the small row fits 320 px');
   });
 });
 

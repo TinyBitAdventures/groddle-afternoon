@@ -9987,10 +9987,13 @@ html[data-street-cards] .notify-notices { visibility: hidden; }
   background: var(--surface-card);
   box-shadow: var(--shadow-2);
 }
+/* Eight in a row must stay inside a line's column of the 300 px drawer, also beside a scrollbar that
+   takes room (about 263 px then): 8 x 28 + 7 gaps of 2 + the padding and border = 248 px. A touch screen's
+   scrollbar takes no room, so there each keeps its 32 px to press (280 px, inside the drawer). */
 .react-pick {
   display: grid;
   place-items: center;
-  width: 32px;
+  width: 28px;
   height: 32px;
   padding: 0;
   border: 0;
@@ -9999,6 +10002,7 @@ html[data-street-cards] .notify-notices { visibility: hidden; }
   cursor: pointer;
 }
 .react-pick .react-glyph { font-size: var(--fs-xl); }
+@media (hover: none) { .react-pick { width: 32px; } }
 .react-pick:hover { background: var(--surface-parchment); }
 .react-pick[aria-checked="true"] { background: var(--accent-soft); box-shadow: inset 0 0 0 1px var(--accent); }
 .react-pick:focus-visible { outline: 2px solid var(--focus); outline-offset: 1px; }

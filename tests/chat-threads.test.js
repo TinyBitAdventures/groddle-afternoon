@@ -19,12 +19,12 @@ import {
   siteKey,
   summaryText,
   threadTarget,
-} from '../public/js/chat-threads.js?v=42954351';
-import { mountSocialDrawer } from '../public/js/ui/social-drawer.js?v=82bcf45b';
+} from '../public/js/chat-threads.js?v=f1b1fbcc';
+import { mountSocialDrawer } from '../public/js/ui/social-drawer.js?v=2aa33a1a';
 import { createNotifier } from '../public/js/notify.js?v=1fb97b21';
-import { chatThreadsFeature, replyLine } from '../public/js/features/chat-threads-feature.js?v=a1049d64';
+import { chatThreadsFeature, replyLine } from '../public/js/features/chat-threads-feature.js?v=364b4ec1';
 import { ACTIVE_EVERY_MS, activeDue, presenceMpFeature } from '../public/js/features/presence-mp-feature.js?v=21272297';
-import { channelOpts, normalLine } from '../public/js/player-im.js?v=23463a96';
+import { channelOpts, normalLine } from '../public/js/player-im.js?v=da51888c';
 import { SETTINGS_COPY, mountPresenceSetting } from '../public/js/account-forms.js?v=318b6815';
 import { memoryStore, page } from './social-fake-dom.js';
 

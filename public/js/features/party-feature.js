@@ -46,7 +46,7 @@ import {
   partyCommand,
 } from '../party.js?v=7615aab8';
 import { appendLinkedText } from '../chat-links.js?v=b717fac7';
-import { lineKey } from '../chat-reactions.js?v=d65d555b';
+import { lineKey } from '../chat-reactions.js?v=38460172';
 import { UNNAMED_PLAYER } from '../player-names.js?v=f9b78094';
 
 export const PARTY_FEATURE_ID = 'party';

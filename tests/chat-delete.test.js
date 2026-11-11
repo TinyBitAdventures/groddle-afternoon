@@ -20,7 +20,7 @@ import { readFileSync } from 'node:fs';
 import { pathToFileURL } from 'node:url';
 import { HAS_SITE, serverPath, sitePath, skipWithoutServer, skipWithoutSite } from '../tools/repos.mjs';
 import { dropLid } from '../public/js/groups.js?v=c9635d96';
-import { deletedSummary } from '../public/js/features/chat-threads-feature.js?v=a1049d64';
+import { deletedSummary } from '../public/js/features/chat-threads-feature.js?v=364b4ec1';
 
 const src = (f) => readFileSync(sitePath(f), 'utf8');
 const game = (f) => readFileSync(new URL(`../public/js/${f}`, import.meta.url), 'utf8');
@@ -95,7 +95,7 @@ describe('/chat/\'s Delete line (community/chat-pure.js, chat-menus.js, chat-app
   it('only an administrator\'s page is marked, and the asset key moved with the files', () => {
     const pages = src('src/CommunityPages.php');
     assert.match(pages, /\(\(\$viewer\['admin'\] \?\? false\) \? ' data-chat-admin="1"' : ''\)/);
-    assert.match(pages, /public const ASSET_KEY = 'community-12';/);
+    assert.match(pages, /public const ASSET_KEY = 'community-13';/);
   });
 });
 

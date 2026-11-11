@@ -23,11 +23,11 @@ import {
   reactFrame,
   sameWords,
   whoText,
-} from '../public/js/chat-reactions.js?v=d65d555b';
-import { mountSocialDrawer } from '../public/js/ui/social-drawer.js?v=82bcf45b';
+} from '../public/js/chat-reactions.js?v=38460172';
+import { mountSocialDrawer } from '../public/js/ui/social-drawer.js?v=2aa33a1a';
 import { createNotifier } from '../public/js/notify.js?v=1fb97b21';
-import { chatReactionsFeature } from '../public/js/features/chat-reactions-feature.js?v=96309267';
-import { drawerLine, normalLine } from '../public/js/player-im.js?v=23463a96';
+import { chatReactionsFeature } from '../public/js/features/chat-reactions-feature.js?v=704d27da';
+import { drawerLine, normalLine } from '../public/js/player-im.js?v=da51888c';
 import { chatLine } from '../public/js/groups.js?v=c9635d96';
 import { FakeEl, FakeText, memoryStore, page } from './social-fake-dom.js';
 import { serverPath, skipWithoutServer } from '../tools/repos.mjs';
@@ -36,9 +36,12 @@ const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const read = (p) => readFileSync(join(root, p), 'utf8');
 
 describe('reactions: the rules and the words', () => {
-  it('a small fixed set: six emoji as text and Tiny Speck\'s Hi sign', () => {
-    assert.deepEqual(REACTIONS.map((r) => r.key), ['like', 'heart', 'laugh', 'wow', 'sad', 'tada', 'hi']);
-    assert.deepEqual(REACTIONS.filter((r) => r.glyph).map((r) => r.glyph), ['👍', '❤️', '😂', '😮', '😢', '🎉']);
+  it('a small fixed set: seven emoji as text and Tiny Speck\'s Hi sign', () => {
+    assert.deepEqual(REACTIONS.map((r) => r.key), ['like', 'heart', 'laugh', 'wow', 'sad', 'tada', 'thanks', 'hi']);
+    assert.deepEqual(REACTIONS.filter((r) => r.glyph).map((r) => r.glyph), ['👍', '❤️', '😂', '😮', '😢', '🎉', '🙏']);
+    assert.deepEqual(REACTIONS.find((r) => r.key === 'thanks'), { key: 'thanks', glyph: '🙏', label: 'Thank you' }, 'after Hooray, before the Hi sign');
+    // The site keeps a reaction's key in varchar(12) (groddle-afternoon-site minn.json groddle_community_reactions).
+    assert.ok(REACTIONS.every((r) => /^[a-z]{1,12}$/.test(r.key)));
     const hi = REACTIONS.find((r) => r.key === 'hi');
     assert.equal(hi.glyph, '');
     assert.match(hi.art, /^assets\/sprites\/hi-signs\/hi_hi_1@3x\.webp$/);
@@ -56,6 +59,8 @@ describe('reactions: the rules and the words', () => {
     for (const bad of ['', 'l:', 'l:x', 'im:9', 'party:1', 'l:-1', null]) assert.equal(parseKey(bad), null, String(bad));
     assert.deepEqual(reactFrame('l:42', 'heart', true), { t: 'react', payload: { line: 42, e: 'heart', on: true } });
     assert.deepEqual(reactFrame('im:9:12', 'hi', false), { t: 'im_react', payload: { with: 9, line: 12, e: 'hi', on: false } });
+    assert.deepEqual(reactFrame('l:42', 'thanks', true), { t: 'react', payload: { line: 42, e: 'thanks', on: true } });
+    assert.deepEqual(reactFrame('im:9:12', 'thanks', false), { t: 'im_react', payload: { with: 9, line: 12, e: 'thanks', on: false } });
     assert.equal(reactFrame('l:42', 'shrug', true), null, 'only the set');
     assert.equal(reactFrame('nope', 'like', true), null);
   });
@@ -71,6 +76,17 @@ describe('reactions: the rules and the words', () => {
     assert.deepEqual(got, [{ key: 'like', by: [{ id: 2, name: 'Bo' }] }, { key: 'hi', by: [{ id: 3, name: 'Cy' }] }]);
     assert.deepEqual(normalReactions(null), []);
     assert.deepEqual(normalReactions([{ e: 'like', by: 'x' }]), []);
+    // Thank you sits between Hooray and the Hi sign, whatever order the server sends.
+    const thanks = normalReactions([{ e: 'hi', by: [{ id: 3, name: 'Cy' }] }, { e: 'thanks', by: [{ id: 2, name: 'Bo' }] }, { e: 'tada', by: [{ id: 4, name: 'Di' }] }]);
+    assert.deepEqual(thanks.map((c) => c.key), ['tada', 'thanks', 'hi']);
+  });
+
+  it('a reaction this page does not know (a newer server\'s) is left out, the rest of the line\'s stay', () => {
+    const raw = [{ e: 'like', by: [{ id: 2, name: 'Bo' }] }, { e: 'someday', by: [{ id: 2, name: 'Bo' }] }, { e: 'hi', by: [{ id: 3, name: 'Cy' }] }];
+    assert.deepEqual(normalReactions(raw).map((c) => c.key), ['like', 'hi']);
+    assert.deepEqual(normalReactions([{ e: 'someday', by: [{ id: 2, name: 'Bo' }] }]), []);
+    assert.equal(chipLabel({ key: 'someday', by: [{ id: 2, name: 'Bo' }] }, 7), '');
+    assert.equal(chipTip({ key: 'someday', by: [{ id: 2, name: 'Bo' }] }, 7), '');
   });
 
   it('labels read as the brief asks: "👍 2, you and mr granberry"', () => {
@@ -79,6 +95,10 @@ describe('reactions: the rules and the words', () => {
     assert.equal(chipLabel(chip, 99), '👍 2, Ada and mr granberry');
     assert.equal(chipTip(chip, 7), 'Thumbs up: You and mr granberry');
     assert.equal(chipLabel({ key: 'hi', by: [{ id: 3, name: 'Cy' }] }, 7), 'Hi 1, Cy');
+    const thanks = { key: 'thanks', by: [{ id: 54, name: 'mr granberry' }, { id: 7, name: 'Ada' }] };
+    assert.equal(chipLabel(thanks, 7), '🙏 2, you and mr granberry');
+    assert.equal(chipTip(thanks, 7), 'Thank you: You and mr granberry');
+    assert.equal(chipTip(thanks, 99), 'Thank you: mr granberry and Ada');
     assert.equal(whoText([{ id: 1, name: 'A' }, { id: 2, name: 'B' }, { id: 3, name: 'C' }], 0), 'A, B and C');
     const many = Array.from({ length: 12 }, (_, i) => ({ id: i + 1, name: `P${i + 1}` }));
     assert.equal(whoText(many, 0), 'P1, P2, P3, P4, P5, P6, P7 and 5 others');
@@ -89,12 +109,13 @@ describe('reactions: the rules and the words', () => {
 
   it('the picker\'s keys wrap; other keys do not move it', () => {
     assert.equal(pickerMove(0, 'ArrowRight'), 1);
-    assert.equal(pickerMove(6, 'ArrowRight'), 0);
-    assert.equal(pickerMove(0, 'ArrowLeft'), 6);
+    assert.equal(pickerMove(6, 'ArrowRight'), 7);
+    assert.equal(pickerMove(REACTIONS.length - 1, 'ArrowRight'), 0);
+    assert.equal(pickerMove(0, 'ArrowLeft'), REACTIONS.length - 1);
     assert.equal(pickerMove(3, 'ArrowDown'), 4);
     assert.equal(pickerMove(3, 'ArrowUp'), 2);
     assert.equal(pickerMove(4, 'Home'), 0);
-    assert.equal(pickerMove(1, 'End'), 6);
+    assert.equal(pickerMove(1, 'End'), REACTIONS.length - 1);
     assert.equal(pickerMove(1, 'a'), -1);
     assert.equal(sameWords(' hi  there ', 'hi there'), true);
     assert.equal(sameWords('hi', 'ho'), false);
@@ -236,6 +257,38 @@ describe('reactions: the Social drawer', () => {
     assert.deepEqual(r.sent, [['l:100', 'heart', false], ['l:100', 'wow', true]]);
   });
 
+  it('Thank you: picked from the set, its chip draws like the others and a click takes yours off again', () => {
+    r.sent.length = 0;
+    r.drawer.reactions.set('l:100', []);
+    const row = r.rows()[0];
+    row.querySelector('[data-react-add]').dispatch('click', { detail: 1 });
+    const pick = r.t.game.querySelector('[data-react-pick="thanks"]');
+    assert.equal(pick.getAttribute('aria-checked'), 'false');
+    pick.dispatch('click', { detail: 1 });
+    assert.deepEqual(r.sent, [['l:100', 'thanks', true]]);
+    // The server says it is on: one chip, yours, between Hooray and the Hi sign.
+    r.drawer.reactions.set('l:100', [{ key: 'tada', by: [{ id: 9, name: 'Fi' }] }, { key: 'thanks', by: [{ id: 7, name: 'Ada' }] }, { key: 'hi', by: [{ id: 9, name: 'Fi' }] }]);
+    const strip = row.querySelector('[data-react-strip]');
+    assert.deepEqual(strip.children.map((c) => c.getAttribute('data-react-chip')), ['tada', 'thanks', 'hi']);
+    const chip = strip.querySelector('[data-react-chip="thanks"]');
+    assert.equal(chip.textContent, '🙏1');
+    assert.equal(chip.getAttribute('aria-label'), '🙏 1, you');
+    assert.equal(chip.getAttribute('aria-pressed'), 'true');
+    assert.ok(chip.classList.contains('is-mine'));
+    assert.ok(chip.querySelector('.react-glyph') && !chip.querySelector('.react-glyph-thanks'), 'an emoji as text, no art');
+    assert.equal(chip.dataset.reactWho, 'Thank you: You');
+    // The picker shows it as yours; the chip takes it off.
+    row.querySelector('[data-react-add]').dispatch('click', { detail: 1 });
+    assert.equal(r.t.game.querySelector('[data-react-pick="thanks"]').getAttribute('aria-checked'), 'true');
+    r.drawer.reactions.closePicker();
+    chip.click();
+    assert.deepEqual(r.sent.at(-1), ['l:100', 'thanks', false]);
+    r.drawer.reactions.set('l:100', [{ key: 'tada', by: [{ id: 9, name: 'Fi' }] }, { key: 'hi', by: [{ id: 9, name: 'Fi' }] }]);
+    assert.equal(strip.querySelector('[data-react-chip="thanks"]'), null);
+    // As the line was, for the tests after this one.
+    r.drawer.reactions.set('l:100', [{ key: 'heart', by: [{ id: 7, name: 'Ada' }] }, { key: 'wow', by: [{ id: 54, name: 'mr granberry' }] }]);
+  });
+
   it('the picker: opens from the keys on its first pick, arrows move, Escape closes and gives the keys back', () => {
     r.sent.length = 0;
     const row = r.rows()[0];
@@ -258,8 +311,13 @@ describe('reactions: the Social drawer', () => {
     assert.equal(globalThis.document.activeElement, items[1]);
     key('ArrowLeft');
     key('ArrowLeft');
-    assert.equal(globalThis.document.activeElement, items[6], 'wraps');
-    assert.equal(items[6].getAttribute('tabindex'), '0');
+    assert.equal(items.length, 8);
+    assert.equal(globalThis.document.activeElement, items[7], 'wraps');
+    assert.equal(items[7].getAttribute('data-react-pick'), 'hi', 'the Hi sign stays last');
+    assert.equal(items[6].getAttribute('data-react-pick'), 'thanks');
+    assert.equal(items[6].getAttribute('aria-label'), 'Thank you');
+    assert.equal(items[6].textContent, '🙏');
+    assert.equal(items[7].getAttribute('tabindex'), '0');
     assert.equal(items[0].getAttribute('tabindex'), '-1');
     key('Escape');
     assert.equal(r.t.game.querySelector('[data-react-picker]'), null, 'closed');
@@ -290,9 +348,9 @@ describe('reactions: the Social drawer', () => {
     assert.equal(picker.style.left, '1200px', 'not past the column\'s left edge (over the world)');
     assert.equal(picker.style.top, '256px', 'above the button');
     r.drawer.reactions.closePicker();
-    add.rect = { left: 1450, right: 1470, top: 20, bottom: 38, width: 20, height: 18 };
+    add.rect = { left: 1458, right: 1478, top: 20, bottom: 38, width: 20, height: 18 };
     add.dispatch('click', { detail: 1 });
-    assert.equal(r.t.game.querySelector('[data-react-picker]').style.left, `${1470 - 7 * 34}px`);
+    assert.equal(r.t.game.querySelector('[data-react-picker]').style.left, `${1478 - REACTIONS.length * 34}px`, 'its right edge at the button\'s');
     assert.equal(r.t.game.querySelector('[data-react-picker]').style.top, '42px', 'under it at the top');
     r.drawer.reactions.closePicker();
     row.rect = add.rect = { left: 0, top: 0, right: 0, bottom: 0, width: 0, height: 0 };
@@ -428,6 +486,43 @@ describe('reactions: the feature and the socket', () => {
     client.emit('error', { code: 'react', message: 'That line is too old to react to now.' });
     assert.equal(toasts.at(-1), 'That line is too old to react to now.');
   });
+
+  it('Thank you over the socket: sent by its key, drawn when the server says so, taken off again', () => {
+    r.drawer.select('local');
+    r.drawer.push('local', { name: 'Bo', text: 'have a cherry', playerId: 9, rk: 'l:800' });
+    const row = r.rows().at(-1);
+    row.querySelector('[data-react-add]').dispatch('click', { detail: 1 });
+    r.t.game.querySelector('[data-react-pick="thanks"]').click();
+    assert.deepEqual(client.frames.at(-1), { t: 'react', line: 800, e: 'thanks', on: true });
+    client.emit('msg:reacted', { t: 'reacted', line: 800, r: [{ e: 'thanks', by: [{ id: 7, name: 'Ada' }, { id: 9, name: 'Bo' }] }] });
+    const chip = row.querySelector('[data-react-chip="thanks"]');
+    assert.equal(chip.getAttribute('aria-label'), '🙏 2, you and Bo');
+    assert.equal(chip.getAttribute('aria-pressed'), 'true');
+    chip.click();
+    assert.deepEqual(client.frames.at(-1), { t: 'react', line: 800, e: 'thanks', on: false });
+    client.emit('msg:reacted', { t: 'reacted', line: 800, r: [{ e: 'thanks', by: [{ id: 9, name: 'Bo' }] }] });
+    assert.equal(chip.getAttribute('aria-label'), '🙏 1, Bo');
+    assert.equal(chip.getAttribute('aria-pressed'), 'false');
+  });
+
+  it('mixed versions: a server from before a reaction refuses it in words; one this page does not know is left out', () => {
+    // An older server (reactions.go validReaction): the error is a toast, the line keeps what it had.
+    const before = r.drawer.reactions.get('l:800');
+    client.emit('error', { code: 'react', message: 'That is not a reaction the game has.' });
+    assert.equal(toasts.at(-1), 'That is not a reaction the game has.');
+    assert.deepEqual(r.drawer.reactions.get('l:800'), before);
+    // A newer server's reaction on a line, an IM line and a channel's history: nothing is drawn for it, nothing throws.
+    client.emit('msg:reacted', { t: 'reacted', line: 800, r: [{ e: 'someday', by: [{ id: 9, name: 'Bo' }] }, { e: 'like', by: [{ id: 9, name: 'Bo' }] }] });
+    assert.deepEqual(r.drawer.reactions.get('l:800').map((c) => c.key), ['like']);
+    assert.deepEqual(r.rows().at(-1).querySelector('[data-react-strip]').children.map((c) => c.getAttribute('data-react-chip')), ['like']);
+    client.emit('msg:reacted', { t: 'reacted', line: 800, r: [{ e: 'someday', by: [{ id: 9, name: 'Bo' }] }] });
+    assert.deepEqual(r.drawer.reactions.get('l:800'), []);
+    assert.equal(r.rows().at(-1).querySelector('[data-react-strip]').hidden, true);
+    client.emit('msg:im_reacted', { t: 'im_reacted', with: 9, line: 12, r: [{ e: 'someday', by: [{ id: 9, name: 'Bo' }] }] });
+    assert.deepEqual(r.drawer.reactions.get('im:9:12'), []);
+    client.emit('msg:channel_joined', { channel: 'global', history: [{ id: 9, name: 'Bo', text: 'c', at: 3, lid: 602, r: [{ e: 'someday', by: [{ id: 9, name: 'Bo' }] }] }] });
+    assert.deepEqual(r.drawer.reactions.get('l:602'), []);
+  });
 });
 
 describe('reactions: both skins\' styles', () => {
@@ -438,6 +533,30 @@ describe('reactions: both skins\' styles', () => {
     assert.match(css, /\.react-add, \.react-strip, \.react-pick \{ -webkit-user-select: none; user-select: none; \}/);
     assert.match(css, /\.social-msg\.can-react:focus-within > \.react-add/, 'the button shows when the line has the keyboard');
     assert.match(css, /hi_hi_1@3x\.webp/);
+  });
+
+  it('the picker\'s row fits a chat line\'s column in both skins, beside a scrollbar too', () => {
+    const n = REACTIONS.length;
+    const px = (rule, prop) => Number(new RegExp(`${prop}: (\\d+)px`).exec(rule)?.[1]);
+    // Modern: the drawer is --drawer-w wide; a line's column is that less the border, the log's padding
+    // (--sp-6 a side) and a thin scrollbar where one takes room (11 px).
+    const css = read('public/style.css');
+    const drawer = Number(/--drawer-w: (\d+)px/.exec(css)[1]);
+    const rem = (name) => Number(new RegExp(`--${name}: ([\\d.]+)rem`).exec(css)[1]) * 16;
+    const pick = px(/\n\.react-pick \{[^}]*\}/.exec(css)[0], 'width');
+    assert.match(/\n\.react-picker \{[^}]*\}/.exec(css)[0], /gap: var\(--sp-1\);\s*padding: var\(--sp-2\);\s*border: 1px/);
+    const row = (w) => n * w + (n - 1) * rem('sp-1') + 2 * rem('sp-2') + 2;
+    const column = drawer - 2 - 2 * rem('sp-6');
+    assert.ok(row(pick) <= column - 11, `Modern: ${row(pick)} px in ${column - 11}`);
+    // A touch screen (no scrollbar room taken) keeps wider buttons, still inside the drawer.
+    const touch = Number(/@media \(hover: none\) \{ \.react-pick \{ width: (\d+)px; \} \}/.exec(css)[1]);
+    assert.ok(touch >= 32 && row(touch) <= drawer - 2, `touch: ${row(touch)} px in ${drawer - 2}`);
+    // Classic: a line's column is 216u wide (measured at 1280 x 860: 254 px at 1.175 px a unit), the
+    // scrollbar 12 px at any size; the smallest window has 1 px a unit.
+    const classic = read('public/css/classic.css');
+    const cpick = Number(/\.react-pick \{ width: calc\((\d+) \* var\(--cu\)\)/.exec(classic)[1]);
+    const cpad = Number(/\.react-picker \{\s*gap: 0;\s*padding: calc\((\d+) \* var\(--cu\)\)/.exec(classic)[1]);
+    assert.ok(n * cpick + 2 * cpad <= 216 - 12, `Classic: ${n * cpick + 2 * cpad}u in ${216 - 12}`);
   });
 
   it('Classic restyles them under its root only, in the client\'s chat dress', () => {

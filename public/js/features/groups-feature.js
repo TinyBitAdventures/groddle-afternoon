@@ -88,8 +88,8 @@ import {
   writeMemory,
 } from '../groups.js?v=c9635d96';
 import { appendLinkedText } from '../chat-links.js?v=b717fac7';
-import { lineKey as reactKey } from '../chat-reactions.js?v=d65d555b';
-import { DELETE_TEXT, deletableChannel, lineLidOf, mayDelete } from '../chat-delete.js?v=ce1da244';
+import { lineKey as reactKey } from '../chat-reactions.js?v=38460172';
+import { DELETE_TEXT, deletableChannel, lineLidOf, mayDelete } from '../chat-delete.js?v=c55a1043';
 import { UNNAMED_PLAYER } from '../player-names.js?v=f9b78094';
 
 export const GROUPS_FEATURE_ID = 'groups';

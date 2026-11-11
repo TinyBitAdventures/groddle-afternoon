@@ -13,7 +13,7 @@ import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { requireSite, sitePath } from './repos.mjs';
-import { NAMES_SHOWN, REACTIONS } from '../public/js/chat-reactions.js?v=d65d555b';
+import { NAMES_SHOWN, REACTIONS } from '../public/js/chat-reactions.js?v=38460172';
 
 /** The set as the site reads it: key, glyph, label and art (a site path, '' for none) in the chat's order. */
 export function reactionsJson() {

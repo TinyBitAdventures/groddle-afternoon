@@ -18,7 +18,7 @@
  *   chat_deleted then takes the line (and its thread's replies with it) away for everyone
  *   (features/groups-feature.js, features/chat-threads-feature.js).
  */
-import { parseKey } from './chat-reactions.js?v=d65d555b';
+import { parseKey } from './chat-reactions.js?v=38460172';
 
 /** The words (no em-dashes: tests/chat-admin.test.js). */
 export const DELETE_TEXT = Object.freeze({
