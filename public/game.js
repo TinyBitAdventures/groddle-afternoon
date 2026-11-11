@@ -26259,6 +26259,26 @@ function gatherFeatChain() {
   }
 }
 
+/**
+ * Report #206: with a window open, another window's key opens that one in its place, as its
+ * top-bar button does (TSMainView.as 733-870: each key toggled its own dialog whatever else was
+ * open). Null for a key that is no window's, or whose window is the one open (it closes it).
+ */
+function panelSwapOpener(e) {
+  if (e.repeat || e.ctrlKey || e.metaKey || e.altKey) return null;
+  if ((e.key === 'g' || e.key === 'G' || isPlainKey(e, 'm')) && !isMapOpen()) {
+    return document.body.classList.contains('nx-hide-map') ? null : () => openMap();
+  }
+  if ((e.key === 'q' || e.key === 'Q') && !isQuestOpen()) return () => openQuestPanel();
+  if ((e.key === 'b' || e.key === 'B') && !isAchieveOpen()) return () => openAchievePanel();
+  if ((e.key === 'h' || e.key === 'H') && !isFeatOpen()) return () => openFeatPanel();
+  if (isPlainKey(e, 'k') && !isSkillsOpen()) return () => openSkillsPanel();
+  if ((e.key === 'y' || e.key === 'Y') && !isBuffsOpen()) return () => openBuffsPanel();
+  if (isPlainKey(e, 'n') && !isMakeOpen()) return () => openMakePanel();
+  if (isPlainKey(e, 'p') && !isProjectsOpen()) return () => features.query('projectsPanel', 'open', engine);
+  return null;
+}
+
 function renderFeatPanel() {
   const chain = document.getElementById('feat-chain');
   const status = featStatus(featState);
@@ -31240,6 +31260,13 @@ async function main() {
         keys.delete(e.key);
         mapZoom.step(mapZoomKey);
       }
+      // Report #206: another window's key opens it in the Map's place (panelSwapOpener).
+      const swapFromMap = panelSwapOpener(e);
+      if (swapFromMap) {
+        e.preventDefault();
+        keys.delete(e.key);
+        swapFromMap();
+      }
       return;
     }
     if (
@@ -31257,6 +31284,15 @@ async function main() {
       isAvatarOpen() ||
       isShrineOpen()
     ) {
+      // Report #206: from a side sheet or a store, another window's key opens it in this one's place,
+      // as its top-bar button does; a modal panel (mail, home, garden, looks, shrine) keeps its keys.
+      const swapTo = isMailboxOpen() || isHomePanelOpen() || isGardenOpen() || isAvatarOpen() || isShrineOpen() ? null : panelSwapOpener(e);
+      if (swapTo) {
+        e.preventDefault();
+        keys.delete(e.key);
+        swapTo();
+        return;
+      }
       if (e.key === 'q' || e.key === 'Q') closeQuestPanel();
       // Ticket 81: P closes the Projects panel it opened.
       if (isPlainKey(e, 'p') && !e.repeat) closeProjectsPanel();

@@ -325,8 +325,9 @@ describe('Projects panel wiring', () => {
   it('P opens it and closes it, and P is free in the house keys; the Menu row and the ? sheet name it', () => {
     assert.match(game, /if \(isPlainKey\(e, 'p'\) && !e\.repeat\) features\.query\('projectsPanel', 'open', engine\);/);
     assert.match(game, /if \(isPlainKey\(e, 'p'\) && !e\.repeat\) closeProjectsPanel\(\);/);
-    // No other plain P in the game's keys.
-    assert.equal((game.match(/isPlainKey\(e, 'p'\)/g) || []).length, 2);
+    // No other plain P in the game's keys (the third: panelSwapOpener, P opening Projects in another window's place, report #206).
+    assert.equal((game.match(/isPlainKey\(e, 'p'\)/g) || []).length, 3);
+    assert.match(game, /if \(isPlainKey\(e, 'p'\) && !isProjectsOpen\(\)\) return \(\) => features\.query\('projectsPanel', 'open', engine\);/);
     assert.ok(!/e\.key === 'p'|e\.key === 'P'/.test(game));
     assert.deepEqual(MENU_ROWS['projects-btn'], { group: 'world', rank: 2, key: 'P' });
     const keys = Object.values(MENU_ROWS).filter((r) => r.key === 'P' && !r.mod);

@@ -185,7 +185,7 @@ describe('MAPZOOM: the wiring', () => {
   });
 
   it('= + - 0 zoom the Map while it is open; the world zoom keeps them everywhere else', () => {
-    assert.match(game, /if \(e\.key === 'g' \|\| e\.key === 'G' \|\| isPlainKey\(e, 'm'\)\) closeMap\(\);\n[^\n]*\n      const mapZoomKey = zoomKeyAction\(e\);\n      if \(mapZoomKey && mapZoom\) \{\n        e\.preventDefault\(\);\n        keys\.delete\(e\.key\);\n        mapZoom\.step\(mapZoomKey\);\n      \}\n      return;/);
+    assert.match(game, /if \(e\.key === 'g' \|\| e\.key === 'G' \|\| isPlainKey\(e, 'm'\)\) closeMap\(\);\n[^\n]*\n      const mapZoomKey = zoomKeyAction\(e\);\n      if \(mapZoomKey && mapZoom\) \{\n        e\.preventDefault\(\);\n        keys\.delete\(e\.key\);\n        mapZoom\.step\(mapZoomKey\);\n      \}\n(?:[\s\S]{0,320}?swapFromMap\(\);\n      \}\n)?      return;/);
     // The world zoom's own branch is after the Map's early return, so it never runs with the Map open.
     assert.ok(game.indexOf('mapZoom.step(mapZoomKey)') < game.indexOf('stepWorldZoom(zoomKey);'));
   });
