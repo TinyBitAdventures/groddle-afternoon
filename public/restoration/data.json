@@ -2752,9 +2752,14 @@
   "deployed": "2026-11-11"
  },
  "git": {
-  "commits": 1648,
+  "commits": 1649,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-11",
+    "kind": "improve",
+    "text": "A quoin's amount draws a little smaller, 20 px"
+   },
    {
     "date": "2026-11-11",
     "kind": "new",
@@ -2869,11 +2874,6 @@
     "date": "2026-11-10",
     "kind": "improve",
     "text": "Machine parts clunk on and off one by one, in Tiny Speck's own sounds"
-   },
-   {
-    "date": "2026-11-10",
-    "kind": "improve",
-    "text": "A machine that finishes a job rings Tiny Speck's own ready chime"
    }
   ]
  },

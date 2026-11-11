@@ -27026,8 +27026,12 @@ function renderMakeProgressStage(record) {
   const outRows = recipeOutputRows(recipe);
   const outputHtml = outRows.length > 1
     ? recipeOutputsHtml(outRows, { className: 'mp-outputs', prefix: '×' })
-    : `<img class="mp-output" src="${itemIconUrl(outRows[0]?.classTsid)}" alt="" />
-        <b>×${outRows[0]?.qty || 1}</b>`;
+    // Austin 2026-11-11: the count is a badge on the output, as on the ingredients, and only past one
+    // (a "×1" beside it pushed the stage off centre).
+    : `<span class="mp-output-item">
+        <img class="mp-output" src="${itemIconUrl(outRows[0]?.classTsid)}" alt="" />
+        ${(outRows[0]?.qty || 1) > 1 ? `<b>${outRows[0].qty}</b>` : ''}
+      </span>`;
   const toolIcon =TOOL_CATALOG[recipe.tool]?.icon || itemIconUrl(recipe.tool);
   // The stand-in doing the work (dullite.js:124-133): a Grand Ol' Grinder swings its own tool_animation.
   const toolInUse = recipeToolInUse(inv, recipe.tool, record.opts?.toolState || toolState, recipe.toolWear || 1);

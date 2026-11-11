@@ -4027,7 +4027,24 @@ button.play-context-head:focus-visible {
   animation: make-output-pulse 0.8s ease-in-out infinite alternate;
 }
 .make-progress .mp-arrow { color: var(--c-sand-67b); font-size: var(--fs-2xl); }
-.make-progress .mp-output-wrap b { font-size: var(--fs-sm); }
+.make-progress .mp-output-item {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+}
+.make-progress .mp-output-item b {
+  position: absolute;
+  right: -2px;
+  bottom: 0;
+  min-width: 17px;
+  height: 17px;
+  display: grid;
+  place-items: center;
+  border-radius: var(--radius-md);
+  background: var(--c-sand-44);
+  color: var(--text-inverse);
+  font-size: var(--fs-2xs);
+}
 .make-progress .mp-unit-row {
   display: flex;
   justify-content: space-between;
