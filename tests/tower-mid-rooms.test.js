@@ -7,7 +7,7 @@
  */
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { GRAVITY, JUMP_SPEED, WALK_MAX } from '../public/js/avatar-step.js?v=9cdca818';
+import { GRAVITY, JUMP_SPEED, WALK_MAX } from '../public/js/avatar-step.js?v=43b1182e';
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -34,7 +34,7 @@ import {
 import { greet, greeterAction, midTowerFeature } from '../public/js/features/mid-tower-feature.js?v=5603dda6';
 import { towerRoomsFeature } from '../public/js/features/tower-rooms-feature.js?v=22a9d42e';
 import { populationForStreet } from '../public/js/street-ecology.js?v=08076876';
-import { reachStreet } from '../public/js/builder/reach-graph.js?v=22368fd6';
+import { reachStreet } from '../public/js/builder/reach-graph.js?v=d03eeab1';
 
 const spike = join(dirname(fileURLToPath(import.meta.url)), '..');
 const streets = join(spike, 'public/assets/streets');

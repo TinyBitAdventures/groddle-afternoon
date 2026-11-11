@@ -48,7 +48,7 @@
  * card offers the way back here).
  */
 
-import { locationEventsApi } from './location-events-feature.js?v=d86a5941';
+import { locationEventsApi } from './location-events-feature.js?v=0cda70ed';
 import { collectQuoin, QUOIN_SHEET, QUOIN_TYPES } from '../quoins.js?v=237c1d5d';
 import {
   CARD_RETURN_TEXT,
@@ -125,6 +125,12 @@ function patchStreet(street) {
       (street.platforms ||= []).push(row);
     }
   }
+  // A source line whose permeability shuts the way its own street's script sends you
+  // (`platformPerms`, each with its `why`): Fernucopia's exit-ledge underside (report #198).
+  for (const fix of def.platformPerms || []) {
+    const pl = (street.platforms || []).find((row) => row.id === fix.id);
+    if (pl && 'pc_perm' in fix) pl.pc_perm = fix.pc_perm;
+  }
   const mg = (street.layers || []).find((layer) => layer.id === 'middleground');
   for (const deco of def.decos || []) {
     if (mg && !mg.decos.some((d) => d.id === deco.id)) {
@@ -141,7 +147,47 @@ locationEventsApi.register({
     const def = defFor(street?.tsid);
     return Boolean(def?.instance && engine?.heldInstance?.() === def.instance);
   },
+  // /stuck (location-events-feature stuck): let go of a tube ceiling and a beam's pull, and
+  // re-arm every one-shot launch pad, so the spot you are put back on works again.
+  stuck: (engine) => puzzleStuck(engine),
 });
+
+/**
+ * One-shot launch pads (`rearm`: { flag, event, x0, x1, y0, y1, why }): the street's script
+ * sets `flag` when the pad fires and clears it only on player_enter, so a launch that falls
+ * short could not be tried again without leaving the street (report #198, Fernucopia's
+ * whistle stand, jet_pack_01's jetpack_once). Once the avatar has been in the air since the
+ * pad fired and stands again inside the region, `event` re-arms it (clears the flag, shows the
+ * pad); step off and back on to fly again.
+ */
+function stepRearm(engine, p) {
+  for (const r of run.def.rearm || []) {
+    if (!locationEventsApi.flag(r.flag)) {
+      run.rearmAir.delete(r.flag);
+      continue;
+    }
+    if (!p.onGround) {
+      run.rearmAir.add(r.flag);
+      continue;
+    }
+    if (!run.rearmAir.has(r.flag) || p.x < r.x0 || p.x > r.x1 || p.y < r.y0 || p.y > r.y1) continue;
+    run.rearmAir.delete(r.flag);
+    locationEventsApi.fire(engine, r.event);
+  }
+}
+
+/** /stuck on a puzzle street: no ceiling hold, no pull, every pad re-armed. */
+function puzzleStuck(engine) {
+  if (!run || !runsHere(engine, run.def)) return false;
+  run.pinned = false;
+  run.pull = null;
+  run.prevY = engine.player?.y ?? null;
+  for (const r of run.def.rearm || []) {
+    if (locationEventsApi.flag(r.flag)) locationEventsApi.fire(engine, r.event);
+  }
+  run.rearmAir = new Set();
+  return true;
+}
 
 /** May this entry run now? Plain entries off instances; instance entries only inside their own. */
 function runsHere(engine, def) {
@@ -348,6 +394,11 @@ function syncSigns(engine) {
 }
 
 function startRun(engine, street, def) {
+  // patchStreet's `platformPerms` on the live lines too, for a street that arrived before the data.
+  for (const fix of def.platformPerms || []) {
+    const live = (engine.platforms || []).find((pl) => pl.id === fix.id);
+    if (live && 'pcPerm' in live) live.pcPerm = fix.pc_perm == null ? null : Number(fix.pc_perm);
+  }
   run = {
     tsid: key(street.tsid),
     def,
@@ -367,6 +418,7 @@ function startRun(engine, street, def) {
     bubbleViews: [],
     pull: null,
     toasted: new Set(),
+    rearmAir: new Set(),
     prevY: null,
     pinned: false,
     arrivalChecked: false,
@@ -548,6 +600,7 @@ function stepRun(engine) {
   run.bestX = Math.max(run.bestX, p.x);
   const height = avatarHeight(p);
   if (!stepInverted(engine, p, height)) clampCeiling(engine, p, height);
+  stepRearm(engine, p);
   if (!run.arrivalChecked) {
     run.arrivalChecked = true;
     // Where the avatar arrived decides which way the street runs (the gut

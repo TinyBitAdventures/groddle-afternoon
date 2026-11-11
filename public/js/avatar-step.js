@@ -243,11 +243,13 @@ export function avatarGround(platforms, px, py, vy, { street = null, fallback = 
  *
  * @param {{ x:number, y:number, vx:number, vy:number, onGround?:boolean }} body
  * @param {{ dt?:number, buff?:object, platforms:object[], barriers?:object[], worldW:number,
- *   bodyScale?:number, ceilings?:boolean, ground:(x:number, y:number, vy:number) => number }} ctx
+ *   worldH?:number, bodyScale?:number, ceilings?:boolean, ground:(x:number, y:number, vy:number) => number }} ctx
  *   `platforms` are screen-space lines (platformsScreen); `ground` is the floor resolve
- *   (avatarGround over the same lines); `ceilings` false when a feature owns the street's ceilings.
+ *   (avatarGround over the same lines); `ceilings` false when a feature owns the street's ceilings;
+ *   `worldH` the street's height (bounds b - t): when given, the avatar stays between its top and
+ *   bottom (streetTopBottom).
  */
-export function stepAvatar(body, { dt = 1, buff = NORMAL_BUFF, platforms, barriers = [], worldW, bodyScale = 1, ceilings = true, ground }) {
+export function stepAvatar(body, { dt = 1, buff = NORMAL_BUFF, platforms, barriers = [], worldW, worldH = 0, bodyScale = 1, ceilings = true, ground }) {
   // On the floor before this frame's move (a jump in handleInput already left it).
   const wasGrounded = body.onGround === true;
   avatarFall(body, buff, dt);
@@ -286,6 +288,34 @@ export function stepAvatar(body, { dt = 1, buff = NORMAL_BUFF, platforms, barrie
     body.onGround = true;
   } else if (body.y < floor - 2) {
     body.onGround = false;
+  }
+  if (worldH > 0) streetTopBottom(body, { worldH, floor, gravity: buff.gravity ?? 1, headReach: head.reach });
+  return body;
+}
+
+/**
+ * The street's top and bottom. The client kept the avatar's feet between location.t and
+ * location.b every frame (AvatarPhysicsHandler.as setAndBoundPositionOnSelf 470-480, called at
+ * 813), so reversed gravity with nothing over you pressed you against the top of the street
+ * instead of carrying you off it (report #194: Organish Chute's top-left drop has no line over
+ * it, and the avatar rose forever). Feet stop at the top (screen y 0) as the client's did; while
+ * gravity is reversed the head stops there instead, a ceiling the avatar stays in view under, so
+ * Space can flip it back down. Feet never go below the bottom unless a line there holds them
+ * lower (Tumble Rd 4's floor sits 34 px under its b). Mutates `body`.
+ * @param {{ x:number, y:number, vy:number, onGround?:boolean }} body
+ * @param {{ worldH:number, floor?:number, gravity?:number, headReach?:number }} bounds
+ */
+export function streetTopBottom(body, { worldH, floor = -Infinity, gravity = 1, headReach = 0 }) {
+  const top = gravity < 0 ? Math.max(0, headReach) : 0;
+  if (body.y < top) {
+    body.y = top;
+    if (body.vy < 0) body.vy = 0;
+  }
+  const bottom = Math.max(worldH, Number.isFinite(floor) ? floor : -Infinity);
+  if (body.y > bottom) {
+    body.y = bottom;
+    if (body.vy > 0) body.vy = 0;
+    body.onGround = gravity >= 0;
   }
   return body;
 }

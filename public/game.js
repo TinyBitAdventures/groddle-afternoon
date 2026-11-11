@@ -2,9 +2,9 @@
  * Groddle Afternoon — original street geometry + layered decos
  * PixiJS 8 · locations-xml streets · CoU PNG decos · quests/items
  */
-import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=5719e569';
+import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=29f2e034';
 import { createErrorOnce, createFeatureHost } from './js/feature-host.js?v=06bb8b74';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=c722098f';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=f0cf4df9';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -482,8 +482,8 @@ import { HELD_AT_ONCE, HELD_AT_ONCE_TEXT } from './js/collection-trophies.js?v=3
 import { PACK_COPY, isBagClass, isElementClass, unitRankAt } from './js/pack-slots.js?v=6cf9f397';
 import { hasPouch } from './js/elemental-pouch.js?v=ceefa97a';
 import { createPackRow, mountPackClearance, packBandRange, packCountText, packSearchEntries, packSlotTip } from './js/ui/pack-row.js?v=65c0f180';
-import { listAnimalFeedOptions } from './js/animals.js?v=968d7c3c';
-import { pickerMaxCount, pickerOptionsFor, pickerTakesCount } from './js/animals.js?v=968d7c3c';
+import { listAnimalFeedOptions } from './js/animals.js?v=af1ee6f4';
+import { pickerMaxCount, pickerOptionsFor, pickerTakesCount } from './js/animals.js?v=af1ee6f4';
 import {
   createDroppedItemState,
   parseDroppedItemState,
@@ -516,7 +516,7 @@ import {
   imagineHome,
   isHomePlaceTsid,
 } from './js/homes.js?v=631ab6b8';
-import { HOME_MACHINE, offerHomeTicket, renderTicketMachine } from './js/home-ticket.js?v=8b478184';
+import { HOME_MACHINE, offerHomeTicket, renderTicketMachine } from './js/home-ticket.js?v=2e4a6130';
 import {
   MAIL_COMPANIONS,
   archiveMail,
@@ -788,7 +788,7 @@ import { facingScaleX, facingFromVelocity } from './js/avatar.js?v=c4da73ea';
 import { AFK_TIMEOUT_MS, ANIMS, ANIM_FPS, EMOTIONS, EMOTION_MS, IDLE_SHEETS, RANDOM_IDLE_MS, RANDOM_IDLE_WAIT_MS, animForState, avatarAnimState, createIdleClock, crowdScaleX, idleSheetFor } from './js/avatar-anims.js?v=fb921bf4';
 import { landingY, stackRestY, walkSurfaceY } from './js/walk-surface.js?v=106bfdc5';
 import { holdCloseToFloor } from './js/slope-walk.js?v=9af1e505';
-import { JUMP_SPEED, MAX_TICK_FRAMES, WALK_MAX, avatarGround, coastX, frameSteps, stepAvatar, steerAccel, steerX, streetPhysicsExtras } from './js/avatar-step.js?v=9cdca818';
+import { JUMP_SPEED, MAX_TICK_FRAMES, WALK_MAX, avatarGround, coastX, frameSteps, stepAvatar, steerAccel, steerX, streetPhysicsExtras } from './js/avatar-step.js?v=43b1182e';
 import { createUserPath, stepUserPath } from './js/user-path.js?v=8880557f';
 import { FAILED_LINE, inVerbReach, movingLine, verbRange, walkOverEnd, walkOverGoalX } from './js/walk-over.js?v=db80ba07';
 import { hellBuffDesc, isInHell } from './js/hell.js?v=33a46876';
@@ -846,7 +846,7 @@ import {
   createAnimalState,
   resetAnimalDay,
   animalStatusLabel,
-} from './js/animals.js?v=968d7c3c';
+} from './js/animals.js?v=af1ee6f4';
 import {
   ensureWoodTreeState,
   pickWoodTool,
@@ -954,7 +954,7 @@ import {
   ANIMAL_PATROL,
   nearestPlacementGap,
 } from './js/street-ecology.js?v=08076876';
-import { CHICKEN_PAUSE, chickenPauseRoll, easeToward, flightFloorAt, flightFloorFor, flyerLift } from './js/street-creatures.js?v=0bb408e1';
+import { CHICKEN_PAUSE, chickenPauseRoll, easeToward, flightFloorAt, flightFloorFor, flyerLift } from './js/street-creatures.js?v=01751dcd';
 import { chickenPose, chickenIdleSheetsAsked } from './js/chicken-idle-art.js?v=108c4357';
 import { chickenWaitPose } from './js/chicken-idles.js?v=eef0279b';
 import { itemOverlayStats } from './js/item-overlay.js?v=37bde39e';
@@ -1003,7 +1003,7 @@ import { ENCYCLOPEDIA_MENU_LABEL, createEncyclopedia, isEncyclopediaKey } from '
 import { EAT_PICK_TEXT, bestFoodIndex, eatChoices, eatTip } from './js/eat-pick.js?v=8fb763d0';
 import { installHeldKeyGuard, isMacPlatform } from './js/held-keys.js?v=98b96620';
 import { signpostArmRows, worldContextAction } from './js/world-context-menu.js?v=f3f48805';
-import { blockedPlayerVerbs, listPlayerTarget, opensPlayerMenu, playerMenuRows } from './js/ui/player-menu.js?v=3d4a199d';
+import { blockedPlayerVerbs, listPlayerTarget, opensPlayerMenu, playerMenuRows } from './js/ui/player-menu.js?v=40ebd5f4';
 import { forgetTexture, frameTexture, isFailed, isLoaded, onFailed, onLoaded, textureFromUrl, whenLoaded } from './js/textures.js?v=f024bd6a';
 import { FALLBACK_MAX as WORLD_ART_FALLBACK_MAX, worldArtFor } from './js/world-art.js?v=0729bf92';
 import { sceneAnim, syncAnim } from './js/deco-anim.js?v=aa35e023';
@@ -14915,6 +14915,13 @@ function followWalkFloor(spr, dt = 1) {
   spr.y += Math.abs(d) <= most ? d : Math.sign(d) * most;
 }
 
+/** The street's height (bounds b - t) for stepAvatar's top and bottom (report #194), 0 for none. */
+function streetWorldH() {
+  const b = currentStreet?.bounds;
+  const h = b ? Number(b.b) - Number(b.t) : 0;
+  return Number.isFinite(h) && h > 0 ? h : 0;
+}
+
 /** The street's options for js/avatar-step.js stepAvatar, as physics() passes them (keep the two alike), for the walk-over's dry run. */
 function avatarStepOptions(dt = 1) {
   return {
@@ -14923,6 +14930,7 @@ function avatarStepOptions(dt = 1) {
     platforms: streetPlatforms,
     barriers: barriersScreen(currentStreet),
     worldW: WORLD_W,
+    worldH: streetWorldH(),
     // The avatar's collision height (80 px) shrinks with a street's pc_scale.
     bodyScale: features.query('avatarBodyScale', engine) ?? 1,
     // Puzzle streets with reversible gravity run their own ceilings (features/puzzles-feature.js).
@@ -14958,6 +14966,8 @@ function physics(dt) {
       platforms: streetPlatforms,
       barriers: barriersScreen(currentStreet),
       worldW: WORLD_W,
+      // The street's top and bottom (AvatarPhysicsHandler.as setAndBoundPositionOnSelf; report #194).
+      worldH: streetWorldH(),
       // The avatar's collision height (80 px) shrinks with a street's pc_scale.
       bodyScale: features.query('avatarBodyScale', engine) ?? 1,
       // Puzzle streets with reversible gravity run their own ceilings (features/puzzles-feature.js).

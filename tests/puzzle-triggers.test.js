@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { NORMAL_BUFF, WALK_MAX, flatJump } from '../public/js/avatar-step.js?v=9cdca818';
+import { NORMAL_BUFF, WALK_MAX, flatJump } from '../public/js/avatar-step.js?v=43b1182e';
 import {
   SOURCE_PHYSICS,
   completionReward,
@@ -198,7 +198,7 @@ describe('location-events trigger API', () => {
   });
 
   test('without a strict hook, a platform only lost boxes switch back stays walkable', async () => {
-    const { locationEventsFeature, locationEventsApi } = await import('../public/js/features/location-events-feature.js?v=d86a5941');
+    const { locationEventsFeature, locationEventsApi } = await import('../public/js/features/location-events-feature.js?v=0cda70ed');
     const street = make();
     const engine = fakeEngine(street);
     locationEventsFeature.onStreetEnter(street, engine);
@@ -208,7 +208,7 @@ describe('location-events trigger API', () => {
   });
 
   test('a strict hook runs the scripts as written and restart re-applies them', async () => {
-    const { locationEventsFeature, locationEventsApi } = await import('../public/js/features/location-events-feature.js?v=d86a5941');
+    const { locationEventsFeature, locationEventsApi } = await import('../public/js/features/location-events-feature.js?v=0cda70ed');
     let strict = false;
     locationEventsApi.register({ strict: (s) => strict && s.tsid === 'GTESTPUZZLE0001' });
     const street = make();

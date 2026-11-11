@@ -1609,6 +1609,29 @@
     "source": "quests/puzzle_level_color_blockage.js (Color Unblocking), the shipped quest built from these colour levels"
    },
    "completion": "Every light out and every gate open. Nice flying.",
+   "platformPerms": [
+    {
+     "id": "plat_1336677223326",
+     "pc_perm": 0,
+     "why": "Underside of the exit ledge over the shaft (source x 2146-2298, y -801; screen x 4646-4798, y 199), pc_perm 1 (solid from below). With its neighbour it lids the whole shaft (x 4646-4997; wall_1336677223360 at x 4649 closes the left side, y 200-724, and the ledge's top plat_1336677223298 is only 46 px above), so the whistle stand's blast stopped the head at y 199 and dropped the player back down (report #198). The street's own art says the blast goes up here: the Spacebar to Fly! sign (groddle_sign_blank_1339202979221, x 4823) and the upward WindFog gust (x 4824, r -90) stand in this shaft under the exit door (x 4908). Soft (0) lets the blast carry you up through the underside and the one-way ledge to land on it; nothing else reaches it from below."
+    },
+    {
+     "id": "plat_1336677223328",
+     "pc_perm": 0,
+     "why": "The same underside's right half (source x 2298-2497, y -801/-799; screen x 4798-4997, y 199-201), pc_perm 1; see plat_1336677223326."
+    }
+   ],
+   "rearm": [
+    {
+     "flag": "jetpack_once",
+     "event": "rearm_jet_pack_01",
+     "x0": 4626,
+     "x1": 5000,
+     "y0": 900,
+     "y1": 960,
+     "why": "jet_pack_01 sets jetpack_once and only player_enter clears it, so a launch that fell short left the stand dead until you left the street (report #198). Back on the shaft floor (plat_1336677223327, x 4626-4999, y 955) after a flight, rearm_jet_pack_01 clears it and shows the stand again: step off and on to fly again."
+    }
+   ],
    "triggers": [
     {
      "id": "light_stairs",
@@ -1725,7 +1748,7 @@
       "hide_blast_01"
      ],
      "toast": "Tap Space to fly up the shaft!",
-     "why": "whistle_stand_forcefield_placeholder (x=4801, bottom y 1020, 87x128) on the shaft floor (plat 3327, y 955), the deco jet_pack_01 hides: spring_01 launches (gravity x-2.2 for 1.3 s) and gives 4.8 s of jetpack strokes up to the exit ledge; blast_01 shows the WindFog gust at x 4824."
+     "why": "whistle_stand_forcefield_placeholder (x=4801, bottom y 1020, 87x128) on the shaft floor (plat 3327, y 955), the deco jet_pack_01 hides: spring_01 launches (gravity x-2.2 for 1.3 s) and gives 4.8 s of jetpack strokes up through the exit ledge's underside (softened, see platformPerms) onto the ledge; blast_01 shows the WindFog gust at x 4824. One flight per arming (jetpack_once); see rearm."
     },
     {
      "id": "exit_ledge",
@@ -1854,7 +1877,21 @@
      "type": "xp",
      "amount": 3
     }
-   ]
+   ],
+   "events": {
+    "rearm_jet_pack_01": [
+     {
+      "type": "flag_clear",
+      "flag": "jetpack_once"
+     },
+     {
+      "type": "deco_show",
+      "deco": "whistle_stand_forcefield_placeholder_1337117138424",
+      "fade": 200
+     }
+    ]
+   },
+   "eventsWhy": "rearm_jet_pack_01 is the remake's own (report #198): player_enter's flag_clear jetpack_once and deco_show of the stand, run when you are back on the shaft floor after a flight (see rearm) and by /stuck."
   },
   "GHVP6H0KT403N8A": {
    "name": "Piryan",

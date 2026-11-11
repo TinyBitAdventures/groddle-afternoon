@@ -2752,9 +2752,14 @@
   "deployed": "2026-11-11"
  },
  "git": {
-  "commits": 1643,
+  "commits": 1644,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-11",
+    "kind": "fix",
+    "text": "A Seedling a visitor pets into a tree shows as the tree"
+   },
    {
     "date": "2026-11-11",
     "kind": "fix",
@@ -2869,14 +2874,9 @@
     "date": "2026-11-10",
     "kind": "improve",
     "text": "Your Scraper and Shovel are seen at work on Barnacles, Ice Nubbins, Dirt Piles and Peat"
-   },
-   {
-    "date": "2026-11-10",
-    "kind": "fix",
-    "text": "Fiber, the seven herb seeds and the butterfly hair clip pieces lie on the ground as themselves"
    }
   ]
  },
- "tests": 800,
+ "tests": 801,
  "generatedAt": "2026-11-11"
 }

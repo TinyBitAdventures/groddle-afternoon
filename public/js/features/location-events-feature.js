@@ -51,7 +51,7 @@ import {
   runLocationEvent,
   streetOwner,
 } from '../location-events.js?v=05663361';
-import { JUMP_SPEED } from '../avatar-step.js?v=9cdca818';
+import { JUMP_SPEED } from '../avatar-step.js?v=43b1182e';
 
 export const LOCATION_EVENTS_FEATURE_ID = 'location-events';
 const DATA_MS = 250;
@@ -447,7 +447,8 @@ function demoStep(engine, now) {
 export const locationEventsApi = {
   /**
    * hook: { strict(street, engine) -> true when the street's triggers are rebuilt,
-   *         instance(street, engine) -> true to run its scripts while a transient instance holds it }.
+   *         instance(street, engine) -> true to run its scripts while a transient instance holds it,
+   *         stuck(engine) -> put back its own state after /stuck (optional) }.
    */
   register(hook) {
     if (hook && !streetHooks.includes(hook)) streetHooks.push(hook);
@@ -469,6 +470,20 @@ export const locationEventsApi = {
   },
   /** Simulation clock (ms): the one event timers and physics use. */
   clock: () => clock,
+  /**
+   * /stuck (features/slash-commands-feature.js): drop the event physics on the player (a gut
+   * tube's reversed gravity, a launch's jetpack, Purplysa's pads) so the spot you are put back
+   * on is not one you float off again (report #194), then let each hook put back its own state
+   * (`hook.stuck(engine)`: puzzles-feature re-arms one-shot launch pads, report #198).
+   * Answers how many physics params were dropped.
+   */
+  stuck(engine) {
+    if (!current) return 0;
+    const dropped = Object.keys(current.runtime.physics || {}).length;
+    current.runtime.physics = {};
+    for (const hook of streetHooks) hook.stuck?.(engine);
+    return dropped;
+  },
   /**
    * Re-enter the current street's scripts (a hook's data arrived after the
    * street did): put back platforms the first run switched off, then run the

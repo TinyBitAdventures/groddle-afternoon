@@ -24,8 +24,8 @@ import {
 } from '../public/js/street-ecology.js?v=08076876';
 import { placementRequests, streetEcology } from '../tools/build-realtime-quoins.mjs';
 import { UNREACHED_JUMP, UNREACHED_JUMPS, overlapRuns, unreachedFloorsOf, unreachedJump } from '../tools/ecology/build-unreached-floors.mjs';
-import { NORMAL_BUFF, jumpApex } from '../public/js/avatar-step.js?v=9cdca818';
-import { jumpArc, streetWorld } from '../public/js/builder/reach-graph.js?v=22368fd6';
+import { NORMAL_BUFF, jumpApex } from '../public/js/avatar-step.js?v=43b1182e';
+import { jumpArc, streetWorld } from '../public/js/builder/reach-graph.js?v=d03eeab1';
 import { shippedArrivals } from '../tools/builder/calibrate.mjs';
 import { shippedStreetFiles } from '../tools/builder/validator-context.mjs';
 

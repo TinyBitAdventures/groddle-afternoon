@@ -40,7 +40,7 @@ import {
   expireDeEmbiggenify,
   findSmallWorthless,
 } from '../public/js/de-embiggenify.js?v=db347ac1';
-import { jumpApex, NORMAL_BUFF } from '../public/js/avatar-step.js?v=9cdca818';
+import { jumpApex, NORMAL_BUFF } from '../public/js/avatar-step.js?v=43b1182e';
 import { SOURCE_PHYSICS, triggerHit } from '../public/js/puzzle-triggers.js?v=facc2c29';
 import { barriersScreen, blockBarrierCrossing } from '../public/js/street-model.js?v=b6cb6a4e';
 

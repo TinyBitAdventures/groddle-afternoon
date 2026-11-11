@@ -13,10 +13,10 @@ import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { reachStreet, streetBuff } from '../public/js/builder/reach-graph.js?v=22368fd6';
+import { reachStreet, streetBuff } from '../public/js/builder/reach-graph.js?v=d03eeab1';
 import { CAVE_PIT_TELEPORTERS, LEVEL_3_WEST_TELEPORTER, LEVEL_3_WEST_TSID, cavePitTeleportersOn } from '../public/js/cave-pit.js?v=81e62950';
-import { inTeleporter } from '../public/js/hidden-floors.js?v=9a7afdf3';
-import { hiddenFloorsFeature } from '../public/js/features/hidden-floors-feature.js?v=ce4f75f0';
+import { inTeleporter } from '../public/js/hidden-floors.js?v=732a2610';
+import { hiddenFloorsFeature } from '../public/js/features/hidden-floors-feature.js?v=4d84bfb4';
 
 const spike = join(dirname(fileURLToPath(import.meta.url)), '..');
 const street = JSON.parse(readFileSync(join(spike, 'public/assets/streets', `${LEVEL_3_WEST_TSID}.json`), 'utf8'));

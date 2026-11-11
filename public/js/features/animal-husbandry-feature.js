@@ -62,7 +62,7 @@ import { nearestSurfaceY } from '../walk-surface.js?v=106bfdc5';
 import { displayTopOf, itemstackOverlayPoint, playSheetOverlay } from '../overlay-art.js?v=75c3ea34';
 import { SET_FREE, applySetFree, canSetFree, setFreeGoneLine, setFreePrompt } from '../animal-set-free.js?v=3b194fca';
 import { getGameDayKey } from '../game-day.js?v=edb00566';
-import { animalAnchorX, animalAnchorY, createAnimalState, resetAnimalDay, animalStatusLabel, listAnimalFeedOptions } from '../animals.js?v=968d7c3c';
+import { animalAnchorX, animalAnchorY, createAnimalState, resetAnimalDay, animalStatusLabel, listAnimalFeedOptions } from '../animals.js?v=af1ee6f4';
 import {
   BABY_ANIMALS,
   BATTERFLY,
@@ -109,15 +109,15 @@ import {
   resetIncubation,
   stepHogtie,
   stickPlaceState,
-} from '../animal-husbandry.js?v=f29ec924';
-import { batterflyBaseY, batterflyResponseFor, flightFloorFor } from '../street-creatures.js?v=0bb408e1';
+} from '../animal-husbandry.js?v=d4869bf0';
+import { batterflyBaseY, batterflyResponseFor, flightFloorFor } from '../street-creatures.js?v=01751dcd';
 import { loseEnergy, shiftMetabolic } from '../metabolics.js?v=8504134e';
 import { textureFromUrl } from '../textures.js?v=f024bd6a';
 import { PIGGY_DEATH_DROPS, PIGGY_DEATH_PUFF, SAD_BABY, forcedRoll, isSadIn } from '../animal-mood.js?v=a49495fc';
-import { animalCrowdChanged, animalCrowdSad, animalPlaceIsDepressing, crowdLimit, smokePuff as sharedSmokePuff } from './animal-mood-feature.js?v=b1ca01bf';
+import { animalCrowdChanged, animalCrowdSad, animalPlaceIsDepressing, crowdLimit, smokePuff as sharedSmokePuff } from './animal-mood-feature.js?v=4fb7b7b9';
 import { grantMoodXp } from '../mood-xp.js?v=958e7680';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
-import { followYardPath, freeYardSpot } from '../yard-wander.js?v=0317472d';
+import { followYardPath, freeYardSpot } from '../yard-wander.js?v=d3d2960c';
 import { showsChickenIdle, yardChickenPose } from '../chicken-idle-art.js?v=108c4357';
 import { chickenWaitPose } from '../chicken-idles.js?v=eef0279b';
 import { PACKED_SHEETS } from '../packed-sheets-data.js?v=192c6f15';

@@ -24,7 +24,9 @@
  * - /stuck (the remake's own; js/slash-commands.js STUCK_TEXT, REMAKE_COMMANDS):
  *   back to where you arrived on this street (engine.stuckReturn: the signpost
  *   or door you came through, else the street's own arrival), standing on the
- *   floor, or at home to the door (house, home street or tower floor). Once
+ *   floor, with the street's event physics dropped and its launch pads re-armed
+ *   (location-events-feature stuck: reports #194, #198), or at home to the door
+ *   (house, home street or tower floor). Once
  *   every 5 minutes (saved, so a reload does not reset it); refused with its
  *   reason in a race, a timed quest room or a Paradise course (Leave), dead in
  *   Hell (the grapes), or busy. Online it is a move on the same street like any
@@ -53,8 +55,9 @@
  */
 
 import { BUTLER_STRINGS } from '../butler.js?v=4a4b82a2';
-import { butlerApi } from './butler-feature.js?v=1862c926';
+import { butlerApi } from './butler-feature.js?v=d2a8865c';
 import { hellFeature } from './hell-feature.js?v=ba4199c6';
+import { locationEventsApi } from './location-events-feature.js?v=0cda70ed';
 import { towerApi } from './home-tower-feature.js?v=f574b637';
 import { platformYAt, platformsScreen } from '../street-model.js?v=b6cb6a4e';
 import { COMMAND_HELP_INTRO, STUCK_COOLDOWN_MS, STUCK_TEXT, bareCommand, commandHelpLines, commandHint, isCommandHelp, misplacedCommand, slashPlan, strayLetterCommand, unknownLine } from '../slash-commands.js?v=8533e143';
@@ -202,6 +205,9 @@ async function stuck(engine, plan) {
     publish(engine);
     return;
   }
+  // Put back on the street's arrival with its event physics dropped (a gut tube's reversed
+  // gravity, a launch's jetpack) and its launch pads re-armed: reports #194, #198.
+  if (plan.stuck === 'arrival') locationEventsApi.stuck(engine);
   stuckAt = now();
   activity(engine, plan.stuck === 'arrival' ? STUCK_TEXT.done : STUCK_TEXT.doneHome);
   last = `/stuck:${plan.stuck === 'arrival' ? result.from || 'arrival' : plan.stuck}`;
