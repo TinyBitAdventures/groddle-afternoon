@@ -259,6 +259,9 @@ describe('every page that runs scripts loads the map and the hook first', () => 
     assert.deepEqual([...theme.matchAll(/\bfetch\s*\(([^,)]+)/g)].map((m) => m[1].trim()), ['`${PATH}me`']);
     assert.match(theme, /const PATH = '\/console\/';/);
     assert.doesNotMatch(theme, /\.src\s*=|new Image\b/);
+    // The Analytics tab's pageview beacon (groddle-afternoon-site src/Analytics.php) is the one other request.
+    assert.deepEqual([...theme.matchAll(/sendBeacon\s*\(([^,)]+)/g)].map((m) => m[1].trim()), ['URL']);
+    assert.match(theme, /const URL = '\/wp-json\/groddle\/v1\/hit';/);
   });
 
   it('js/data-versions.js then js/data-urls.js come before every script with a src and every module', () => {

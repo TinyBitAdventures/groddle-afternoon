@@ -395,3 +395,23 @@
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', check);
   else check();
 })();
+
+// Pageviews for the console's Analytics tab (Austin 2026-11-11; groddle-afternoon-site src/Analytics.php). The pages
+// come from Kinsta's cache, where the site's PHP never runs, so this script counts them: one beacon a page load with
+// the page's path and nothing else (no query, no hash, no id, no cookie set). Not sent from a browser that has been
+// an administrator's (the Console link's hint, below), an automated one, the console or Minn Admin; a prerendered
+// page counts when it is shown.
+(() => {
+  const URL = '/wp-json/groddle/v1/hit';
+  function send() {
+    try {
+      if (typeof navigator === 'undefined' || typeof navigator.sendBeacon !== 'function' || navigator.webdriver) return;
+      if (localStorage.getItem('groddle-console') === '1') return;
+      const path = String(location.pathname || '/');
+      if (/^\/(console|minn-admin|wp-admin)(\/|$)/.test(path)) return;
+      navigator.sendBeacon(URL, JSON.stringify({ p: path.slice(0, 300) }));
+    } catch { /* storage or beacons blocked: not counted */ }
+  }
+  if (typeof document !== 'undefined' && document.prerendering) document.addEventListener('prerenderingchange', send, { once: true });
+  else send();
+})();

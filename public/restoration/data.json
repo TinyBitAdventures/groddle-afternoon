@@ -2752,9 +2752,14 @@
   "deployed": "2026-11-11"
  },
  "git": {
-  "commits": 1653,
+  "commits": 1654,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-11",
+    "kind": "fix",
+    "text": "A vendor's popover for a bottom-row item shows whole"
+   },
    {
     "date": "2026-11-11",
     "kind": "improve",
@@ -2869,14 +2874,9 @@
     "date": "2026-11-10",
     "kind": "fix",
     "text": "Walking off a ledge over a drop falls instead of jumping up onto a ledge far overhead"
-   },
-   {
-    "date": "2026-11-10",
-    "kind": "fix",
-    "text": "A lonely Street Spirit's call sits beside the Social drawer and fades away"
    }
   ]
  },
- "tests": 806,
+ "tests": 807,
  "generatedAt": "2026-11-11"
 }
