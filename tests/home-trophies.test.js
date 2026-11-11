@@ -16,12 +16,17 @@ import {
   displayRefusal,
   flipFurniture,
   furnitureDef,
+  INTERIOR,
   isFurniture,
   listPlaceable,
+  moveFurniture,
   normalizeHomeDecorState,
   pickUpFurniture,
   placeFurniture,
-} from '../public/js/home-decor.js?v=b2aecf76';
+  renderOrder,
+  stackSurfaceAt,
+  surfaceHeight,
+} from '../public/js/home-decor.js?v=b48dbc95';
 import { cabinetRefusal } from '../public/js/home-storage.js?v=121f1897';
 import { canSellClass } from '../public/js/home-street-mp.js?v=727bf13e';
 import { filterTiles, furniturePane, trayFilters } from '../public/js/ui/home-builder.js?v=b71acd91';
@@ -29,8 +34,8 @@ import { hasUpgrades, upgradeVerb } from '../public/js/furniture-upgrades.js?v=a
 import { NO_SLOT_CLASSES } from '../public/js/pack-slots-data.js?v=800f664c';
 import { layoutPack, takesNoSlot } from '../public/js/pack-slots.js?v=6b8393a1';
 import { WORLD_ART } from '../public/js/world-art-list.js?v=2d47f296';
-import { homeTrophyCount, isTrophyClass } from '../public/js/features/item-verbs-feature.js?v=049dd3db';
-import { homesFeature } from '../public/js/features/homes-feature.js?v=c816cf8d';
+import { homeTrophyCount, isTrophyClass } from '../public/js/features/item-verbs-feature.js?v=715d7a34';
+import { homesFeature } from '../public/js/features/homes-feature.js?v=9acc3f21';
 import { planStreetTrophies } from '../public/js/street-jobs.js?v=94f8d250';
 import { planEggTrophy } from '../public/js/seasons.js?v=1978c3f3';
 import { collectionTrophiesFeature as collection } from '../public/js/features/collection-trophies-feature.js?v=2507feab';
@@ -153,6 +158,65 @@ describe('placing one and picking it back up', () => {
     const sdb = placeFurniture(decor, inv, 'bag_furniture_sdb', { x: 500 });
     assert.equal(displayDeposit(decor, inv, sdb.item.id, GEM, 1).ok, false);
     assert.equal(inv[GEM], 1);
+  });
+});
+
+describe('report #203: a trophy on a wall shelf (HandOfDecorator.as 960-965, 2222-2223; items/furniture_shelf.js 387)', () => {
+  const shelfTop = (shelf) => shelf.y - surfaceHeight('furniture_shelf', shelf.upgradeId);
+
+  it('goes on the shelf under the pointer, the line ordinary items rest on', () => {
+    const decor = createHomeDecorState();
+    const inv = { furniture_shelf: 1, [GEM]: 1 };
+    const shelf = placeFurniture(decor, inv, 'furniture_shelf', { x: 400, y: 420 }).item;
+    const gem = placeFurniture(decor, inv, GEM, { x: 410, y: shelfTop(shelf) - 30 }).item;
+    assert.equal(gem.on, shelf.id);
+    assert.equal(gem.y, shelfTop(shelf));
+    assert.deepEqual(stackSurfaceAt(decor, 410, shelfTop(shelf) - 30), { x: 410, y: gem.y, on: shelf.id }, 'the same rest as a dropped stack');
+    // Drawn over the shelf (wall pieces draw before floor-slot pieces).
+    const order = renderOrder(decor).map((r) => r.id);
+    assert.ok(order.indexOf(gem.id) > order.indexOf(shelf.id));
+  });
+
+  it('under the shelf it goes to the table or the floor below the pointer', () => {
+    const decor = createHomeDecorState();
+    const inv = { furniture_shelf: 1, furniture_table: 1, [GEM]: 2 };
+    const shelf = placeFurniture(decor, inv, 'furniture_shelf', { x: 600, y: 380 }).item;
+    const table = placeFurniture(decor, inv, 'furniture_table', { x: 600, y: INTERIOR.floorY }).item;
+    const tableTop = table.y - surfaceHeight('furniture_table', table.upgradeId);
+    assert.ok(tableTop > shelfTop(shelf) + 40, 'the table stands well under the shelf');
+    const onTable = placeFurniture(decor, inv, GEM, { x: 600, y: shelf.y + 20 }).item;
+    assert.equal(onTable.on, table.id);
+    assert.equal(onTable.y, tableTop);
+    moveFurniture(decor, onTable.id, { x: 600, y: shelfTop(shelf) - 10 });
+    assert.equal(onTable.on, shelf.id, 'moved up onto the shelf');
+    moveFurniture(decor, onTable.id, { x: 900, y: 300 });
+    assert.equal(onTable.on, null, 'nothing under it: the floor');
+    assert.equal(onTable.y, INTERIOR.floorY);
+  });
+
+  it('moves with the shelf, comes back with it, and keeps its place through a save', () => {
+    const decor = createHomeDecorState();
+    const inv = { furniture_shelf: 1, [GEM]: 1 };
+    const shelf = placeFurniture(decor, inv, 'furniture_shelf', { x: 400, y: 420 }).item;
+    const gem = placeFurniture(decor, inv, GEM, { x: 380, y: shelfTop(shelf) - 5 }).item;
+    const again = reload(decor);
+    const back = again.placed.find((r) => r.id === gem.id);
+    assert.deepEqual({ x: back.x, y: back.y, on: back.on }, { x: gem.x, y: gem.y, on: shelf.id });
+    moveFurniture(decor, shelf.id, { x: 520, y: 380 });
+    assert.equal(gem.x, 500);
+    assert.equal(gem.y, shelfTop(shelf));
+    assert.equal(gem.on, shelf.id);
+    const up = pickUpFurniture(decor, shelf.id);
+    assert.deepEqual(up.lifted.sort(), ['furniture_shelf', GEM].sort());
+    assert.equal(copies(decor, inv, GEM), 1);
+  });
+
+  it('table decor furniture still stands only on floor pieces (its placement sets, no wall shelf)', () => {
+    const decor = createHomeDecorState();
+    const inv = { furniture_shelf: 1, furniture_tabledeco: 1 };
+    const shelf = placeFurniture(decor, inv, 'furniture_shelf', { x: 400, y: 420 }).item;
+    const deco = placeFurniture(decor, inv, 'furniture_tabledeco', { x: 400, y: shelfTop(shelf) - 10 }).item;
+    assert.equal(deco.on, null);
   });
 });
 

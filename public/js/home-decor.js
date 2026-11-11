@@ -514,13 +514,15 @@ export function surfaceUnder(state, x, excludeId = null) {
  * x stays inside the room's placement span. Positions are room x and world y.
  * @returns {{ x: number, y: number, on: number|null }}
  */
-export function stackSurfaceAt(state, x, y, { give = 24 } = {}) {
+export function stackSurfaceAt(state, x, y, { give = 24, exclude = null } = {}) {
   const room = placementRoom(state);
   const px = Math.round(Math.max(room.start + 12, Math.min(room.end - 12, finite(x, room.start))));
   const py = finite(y, INTERIOR.floorY);
+  // A piece being moved never lands on itself or on what rests on it.
+  const skip = exclude != null ? new Set([Number(exclude), ...riders(state, exclude).map((row) => row.id)]) : null;
   let best = null;
   for (const row of state.placed) {
-    if (row.slot === 'ceiling' || row.slot === 'rug') continue;
+    if (row.slot === 'ceiling' || row.slot === 'rug' || skip?.has(row.id)) continue;
     const h = surfaceHeight(row.classTsid, row.upgradeId);
     if (!h) continue;
     const half = furnitureSize(row.classTsid, row.upgradeId).w / 2 - 6;
@@ -629,6 +631,16 @@ export function snapPlacement(state, classTsid, at = {}, excludeId = null, upgra
   if (def.slot === 'ceiling') return { x, y: INTERIOR.ceilingY, slot: 'ceiling', on: null };
   if (def.slot === 'rug') return { x, y: INTERIOR.floorY + 18, slot: 'rug', on: null };
   if (def.tabletop) {
+    // Report #203: a trophy is an ordinary item (items/trophy_gem.js 179 is_trophy, 186-189 tags
+    // trophy/no_trade, no no_shelf), set down by HandOfDecorator.as 2222-2223
+    // calculateTargetPlatformLineForRegStackFromPt on getPlatsSolidFromTopForItems (960-965), which
+    // keeps a wall shelf's item plat (items/furniture_shelf.js 387 platform_item_perm -1). So it takes
+    // the stack rule: the nearest surface under the pointer, wall shelves too, else the floor.
+    // With no pointer y (a scripted place) it keeps the floor-standing host under x below.
+    if (isTrophyDecor(classTsid) && Number.isFinite(Number(at.y))) {
+      const rest = stackSurfaceAt(state, x, Number(at.y), { exclude: excludeId });
+      return { x, y: rest.y, slot: 'floor', on: rest.on };
+    }
     const host = surfaceUnder(state, x, excludeId);
     if (host && host.id !== excludeId) {
       return { x, y: host.y - surfaceHeight(host.classTsid, host.upgradeId), slot: 'floor', on: host.id };
