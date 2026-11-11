@@ -2748,13 +2748,48 @@
   ]
  },
  "release": {
-  "game": "0.31.0",
-  "deployed": "2026-11-10"
+  "game": "0.31.1",
+  "deployed": "2026-11-11"
  },
  "git": {
-  "commits": 1626,
+  "commits": 1634,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-10",
+    "kind": "improve",
+    "text": "Notice the Unnoticeable, Legalize It and Four Letter Words wait for what offered them in Glitch"
+   },
+   {
+    "date": "2026-11-10",
+    "kind": "fix",
+    "text": "The Herb Gardens streets of Chakra Phool, Jethimadh and Shimla Mirch grow herbs in every bed"
+   },
+   {
+    "date": "2026-11-10",
+    "kind": "fix",
+    "text": "Typing a C in chat or a bug report no longer opens Camera Mode in the Institute of Ocular Testing"
+   },
+   {
+    "date": "2026-11-10",
+    "kind": "fix",
+    "text": "Ilmenskie Jones and the Sealed Cavern waits for Teleportation IV"
+   },
+   {
+    "date": "2026-11-10",
+    "kind": "fix",
+    "text": "A shared street project's last card shows your share instead of \"You did not contribute\""
+   },
+   {
+    "date": "2026-11-10",
+    "kind": "fix",
+    "text": "Walking off a ledge over a drop falls instead of jumping up onto a ledge far overhead"
+   },
+   {
+    "date": "2026-11-10",
+    "kind": "fix",
+    "text": "A lonely Street Spirit's call sits beside the Social drawer and fades away"
+   },
    {
     "date": "2026-11-10",
     "kind": "improve",
@@ -2839,41 +2874,6 @@
     "date": "2026-11-10",
     "kind": "fix",
     "text": "Solo: Guano a Batterfly left while you were away no longer stands twice"
-   },
-   {
-    "date": "2026-11-10",
-    "kind": "new",
-    "text": "Online, a Batterfly's hourly Guano is one pile on the street for everyone"
-   },
-   {
-    "date": "2026-11-10",
-    "kind": "improve",
-    "text": "A quoin's amount stays up long enough to read, as it did in Glitch"
-   },
-   {
-    "date": "2026-11-10",
-    "kind": "improve",
-    "text": "The house's Expand button says what it needs when it is off"
-   },
-   {
-    "date": "2026-11-10",
-    "kind": "fix",
-    "text": "Classic: the Make window's footer is whole in a low window"
-   },
-   {
-    "date": "2026-11-10",
-    "kind": "fix",
-    "text": "The machineartdemo QA route opens Make again"
-   },
-   {
-    "date": "2026-11-10",
-    "kind": "improve",
-    "text": "The Fox's line when brushed stays up 3.5 seconds, as it did in Glitch"
-   },
-   {
-    "date": "2026-11-10",
-    "kind": "fix",
-    "text": "A Garden Gnome keeps its place beside the house when the home street grows"
    }
   ]
  },
