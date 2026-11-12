@@ -10762,6 +10762,17 @@ html.stage-pinned[data-ui="modern"] header.top-bar { left: calc(var(--sp-5) + va
   right: 0; left: auto; width: 420px; max-width: calc(100vw - 2 * var(--hud-inset));
   display: grid; grid-template-columns: 1fr 1fr; column-gap: var(--space-2); gap: 0 var(--space-2); min-width: 0;
 }
+/* The mobile QA (2026-11-12): on a short screen the Menu ran past the bottom and under the pack row,
+   so Settings (Zoom, night tint, the street map) could not be reached. It stops above the pack row
+   (72 px with its air) and scrolls. */
+@media (max-height: 760px) {
+  [data-ui="modern"] .top-bar .more-list {
+    max-height: calc(100dvh - var(--hud-h) - 16px - 80px);
+    overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch;
+  }
+}
+/* A phone: rows are thumb targets. */
+:root.touch-phone[data-ui="modern"] .top-bar .more-list .chrome-btn { min-height: 44px; }
 [data-ui="modern"] .top-bar .more-list[hidden],
 [data-ui="modern"] .hud-pop[hidden],
 [data-ui="modern"] .top-bar .player-menu[hidden],
