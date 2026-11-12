@@ -2752,9 +2752,14 @@
   "deployed": "2026-11-11"
  },
  "git": {
-  "commits": 1700,
+  "commits": 1701,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-12",
+    "kind": "fix",
+    "text": "Grimssea Hollow's larger fungus stays sharp, and the signpost keys test follows the Map key change"
+   },
    {
     "date": "2026-11-12",
     "kind": "fix",
@@ -2869,11 +2874,6 @@
     "date": "2026-11-11",
     "kind": "fix",
     "text": "Classic no longer resizes the game on hover, and the iMG count fits"
-   },
-   {
-    "date": "2026-11-11",
-    "kind": "fix",
-    "text": "Ladders and ledges line up with their art on streets narrower than a wide window"
    }
   ]
  },
