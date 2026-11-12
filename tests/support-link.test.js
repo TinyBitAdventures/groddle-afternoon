@@ -9,7 +9,7 @@ import { describe, it } from 'node:test';
 import { readFileSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { MENU_ROWS, menuRowFor } from '../public/js/ui/topbar.js?v=40469965';
+import { MENU_ROWS, menuRowFor } from '../public/js/ui/topbar.js?v=5673fa58';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const read = (p) => readFileSync(join(root, p), 'utf8');

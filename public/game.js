@@ -988,7 +988,7 @@ import { installHiresIcons } from './js/icon-hires.js?v=165dbd6e';
 import { installHiresDecos } from './js/deco-hires.js?v=e5e3f453';
 import { loadAudioLevels, loadMutedPreference, saveAudioLevel, saveMutedPreference } from './js/audio-pref.js?v=6fe817bc';
 import { createAudioBuses, fadeGain } from './js/audio-buses.js?v=af167b54';
-import { installTopBar, renderTopBar } from './js/ui/topbar.js?v=40469965';
+import { installTopBar, renderTopBar } from './js/ui/topbar.js?v=5673fa58';
 import { focusBack, installFocusReturn, lastInput } from './js/ui/focus-return.js?v=da190597';
 import { installContextGuard } from './js/ui/context-guard.js?v=0f71ac17';
 import { QUOIN_FRAME_BOB, advanceQuoinClock, quoinBobBetweenFrames } from './js/quoin-motion.js?v=ea0bd408';
@@ -26974,6 +26974,7 @@ function updateSkillChrome(now = Date.now()) {
     button.textContent = 'Skills';
     button.title = 'Skills (K)';
     button.classList.remove('is-studying');
+    if (chip) delete chip.dataset.progress;
     if (chip) paintIdleSkillChip(chip, availableSkillCount(now));
     return;
   }
@@ -26983,6 +26984,8 @@ function updateSkillChrome(now = Date.now()) {
   button.textContent = `Study · ${remaining}`;
   button.title = `${name}: ${remaining} remaining`;
   button.classList.add('is-studying');
+  // PHONEBAR: the phone's Menu button rings this share (js/ui/topbar.js installPhoneRows).
+  if (chip) chip.dataset.progress = String(Math.round(active.progress * 1000) / 1000);
   if (chip) paintStudyChip(chip, active.classTsid, name, remaining);
 }
 

@@ -11059,6 +11059,63 @@ html.stage-pinned[data-ui="modern"] header.top-bar { left: calc(var(--sp-5) + va
   [data-ui="modern"] .top-bar .hud-actions #more-btn { order: -1; flex: none; }
   [data-ui="modern"] .top-bar #study-chip { flex: 0 1 auto; min-width: 64px; overflow: hidden; text-overflow: ellipsis; }
 }
+/* PHONEBAR (Austin 2026-11-12, on his iPhone): a phone's right pill holds three buttons, Quests,
+   Report a problem and the Menu, each a 44 px target, upright and sideways. The study pill, Make,
+   Map, Imagination, Mail and Sound open from the Menu (js/ui/topbar.js installPhoneRows: its first
+   rows, the Now group), and a thin ring round the Menu button shows the skill being learned. The
+   tutorial's rules hold: where it hides the actions, Sound alone stays on the bar, as on a computer. */
+:root.touch-phone[data-ui="modern"] .top-bar .hud-actions #study-chip,
+:root.touch-phone[data-ui="modern"] .top-bar .hud-actions #make-btn,
+:root.touch-phone[data-ui="modern"] .top-bar .hud-actions #map-btn,
+:root.touch-phone[data-ui="modern"] .top-bar .hud-actions #imagination-btn,
+:root.touch-phone[data-ui="modern"] .top-bar .hud-actions #mail-btn,
+:root.touch-phone[data-ui="modern"] .top-bar .hud-actions #sound-btn,
+:root.touch-phone[data-ui="modern"] .top-bar .hud-actions .hud-div { display: none; }
+:root.touch-phone[data-ui="modern"] body.nx-hide-actions .top-bar .hud-actions #sound-btn { display: inline-grid; }
+:root.touch-phone[data-ui="modern"] .top-bar .hud-actions { gap: 0; padding: 0 var(--space-1); }
+:root.touch-phone[data-ui="modern"] .top-bar .hud-actions #quest-btn,
+:root.touch-phone[data-ui="modern"] .top-bar .hud-actions #bug-btn,
+:root.touch-phone[data-ui="modern"] .top-bar .hud-actions #more-btn,
+:root.touch-phone[data-ui="modern"] .top-bar .hud-actions #sound-btn { order: 0; flex: none; width: var(--slot); height: var(--slot); }
+[data-ui="modern"] .top-bar #more-btn .menu-study-ring { display: none; }
+:root.touch-phone[data-ui="modern"] .top-bar #more-btn[data-study-ring] .menu-study-ring {
+  display: block; position: absolute; top: 3px; left: 3px; width: calc(100% - 6px); height: calc(100% - 6px);
+  transform: rotate(-90deg); pointer-events: none; overflow: visible;
+}
+[data-ui="modern"] .top-bar #more-btn .menu-study-ring .msr-track { fill: none; stroke: var(--border); stroke-width: 1.5; }
+[data-ui="modern"] .top-bar #more-btn .menu-study-ring .msr-fill {
+  fill: none; stroke: var(--accent); stroke-width: 2; stroke-linecap: round;
+  transition: stroke-dasharray var(--motion-med) var(--ease-out);
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-ui="modern"] .top-bar #more-btn .menu-study-ring .msr-fill { transition: none; }
+}
+:root.touch-phone[data-ui="modern"] .more-list .menu-group[data-menu-group="now"]:not([hidden]) {
+  grid-column: 1 / -1; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0 var(--space-1);
+  margin-bottom: var(--space-1); padding-bottom: var(--space-2); border-bottom: 1px solid var(--border);
+}
+:root.touch-phone[data-ui="modern"] .more-list .menu-group[data-menu-group="now"] .menu-group-label { display: none; }
+:root.touch-phone[data-ui="modern"] .more-list #menu-study-btn { grid-column: 1 / -1; }
+:root.touch-phone[data-ui="modern"] .more-list #menu-study-btn .menu-study-name { flex: none; }
+:root.touch-phone[data-ui="modern"] .more-list #menu-study-btn .menu-study-detail { flex: 0 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--text-muted); }
+:root.touch-phone[data-ui="modern"] .more-list #menu-study-btn .menu-study-detail:not(:empty)::before { content: "· " / ""; }
+:root.touch-phone[data-ui="modern"] .more-list #menu-study-btn.is-studying .menu-study-detail { color: var(--accent); }
+:root.touch-phone[data-ui="modern"] .more-list .menu-row-note { margin-left: auto; color: var(--text-muted); font-size: var(--fs-s); }
+/* Skills is the Now group's first row there. */
+:root.touch-phone[data-ui="modern"] .more-list #skills-btn { display: none; }
+/* Report a problem over an open window (features/bug-report-feature.js #bug-btn-lift, outside the
+   bar): drawn as the bar's own button, its icon and its red count, not a bordered box with a "1". */
+[data-ui="modern"] #bug-btn-lift { display: inline-grid; place-items: center; padding: 0; border: 0; box-shadow: none; }
+[data-ui="modern"] #bug-btn-lift img { width: 21px; height: auto; }
+[data-ui="modern"] #bug-btn-lift .hud-badge {
+  position: absolute; top: -4px; right: -4px; display: inline-grid; place-items: center; box-sizing: border-box;
+  min-width: 18px; height: 18px; padding: 0 5px; margin: 0; border: 0; border-radius: var(--radius-pill);
+  font-size: var(--fs-xs); font-weight: var(--fw-heavy); line-height: var(--lh-none);
+  color: var(--c-white); background: var(--danger); box-shadow: 0 0 0 2px var(--surface-raised); pointer-events: none;
+}
+/* The tutorial's hidden Map and currants stay hidden in the Menu too (features/newxp-feature.js). */
+[data-ui="modern"] body.nx-hide-map .more-list #menu-map-btn,
+[data-ui="modern"] body.nx-hide-currants .more-list #menu-currants { display: none; }
 /* —— end PAPER —— */
 /* The quest pill (player report 37; features/quest-plate-feature.js, js/quest-plate.js): in a quest
    place the nameplate shows the quest on one line, at its own place and height. The room's card

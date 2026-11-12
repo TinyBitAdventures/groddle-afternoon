@@ -11,6 +11,10 @@
  *   badge, Sound (Effects and Music sliders, Mute, and the world Zoom) and the Menu,
  *   regrouped into Me, World, Social (multiplayer only) and Settings (with Zoom and Night tint).
  *
+ * On a phone (html.touch-phone, Modern; Austin 2026-11-12) the right pill holds only Quests,
+ * Report a problem and the Menu: the skill being learned, Make, Mail and Sound open from the
+ * Menu's first rows (installPhoneRows), and the Menu button rings the study's progress.
+ *
  * Tooltips with key caps replace the bar's native titles. Everything here is
  * scoped to <html data-ui="modern"> in style.css, and the game state stays in
  * game.js: it calls renderTopBar() from updateHud and installTopBar() once.
@@ -47,13 +51,17 @@ export const MENU_ROWS = Object.freeze({
   'buffs-btn': { group: 'me', rank: 4, key: 'Y' },
   'avatar-btn': { group: 'me', rank: 5, key: 'L' },
   // A narrow window (fitTopActions): the bar's Quests, Make and Map, when they no longer fit on it.
+  // `phone`: where the row goes on a phone instead (PHONE_MENU_GROUP, installPhoneRows).
   'menu-quest-btn': { group: 'world', rank: -3, key: 'Q' },
-  'menu-make-btn': { group: 'world', rank: -2, key: 'N' },
+  'menu-make-btn': { group: 'world', rank: -2, key: 'N', phone: { group: 'now', rank: 1 } },
   'menu-map-btn': { group: 'world', rank: -1, key: 'M' },
   // A narrow window (style.css, under 760 px: every phone): the bar has no room for Mail and
   // Imagination, so the Menu carries them (installNarrowRows).
   'menu-imagination-btn': { group: 'me', rank: -1, key: 'X' },
-  'menu-mail-btn': { group: 'world', rank: -4 },
+  'menu-mail-btn': { group: 'world', rank: -4, phone: { group: 'now', rank: 2 } },
+  // A phone only (installPhoneRows): the skill being learned (or how many are ready), and Sound.
+  'menu-study-btn': { group: 'now', rank: 0, key: 'K' },
+  'menu-sound-btn': { group: 'now', rank: 3 },
   'home-btn': { group: 'world', rank: 0 },
   'feat-btn': { group: 'world', rank: 1, key: 'H' },
   // Ticket 81: the Projects panel (features/street-jobs-feature.js).
@@ -76,9 +84,33 @@ export const MENU_ROWS = Object.freeze({
   'signout-btn': { group: 'settings', rank: 3 },
 });
 
-/** A Menu row's place: { group, rank, key?, mod? } (unknown rows go last in World). */
-export function menuRowFor(id) {
-  return MENU_ROWS[id] || { group: 'world', rank: 99 };
+/** A Menu row's place: { group, rank, key?, mod? } (unknown rows go last in World); `phone` takes a row's phone place. */
+export function menuRowFor(id, { phone = false } = {}) {
+  const row = MENU_ROWS[id] || { group: 'world', rank: 99 };
+  if (!row.phone) return row;
+  const { phone: there, ...rest } = row;
+  return phone ? { ...rest, ...there } : rest;
+}
+
+/** A phone's first Menu group (installMenu adds it there only): the study, Make, Mail and Sound. */
+export const PHONE_MENU_GROUP = Object.freeze({ id: 'now', label: 'Now' });
+
+/** The phone bar: the phone gate's device (game.js adds html.touch-phone) in the Modern skin. */
+export function phoneBar(doc) {
+  const root = doc?.documentElement;
+  return Boolean(root?.classList?.contains('touch-phone') && root.dataset?.ui === 'modern');
+}
+
+/**
+ * PURE: the phone Menu's study row (Austin 2026-11-12): "learning <name> · 1:53" while a skill is
+ * learned, "5 available" with skills ready, nothing else. `chip` is what the bar's study pill
+ * holds (game.js paintStudyChip): { hidden, skill, name, short }.
+ */
+export function studyRowDetail({ hidden = true, skill = '', name = '', short = '' } = {}) {
+  const left = String(short).trim();
+  if (hidden || !left) return '';
+  if (skill) return `learning ${name || 'a skill'} · ${left}`;
+  return `${left} available`;
 }
 
 /** A ring's stroke-dasharray for a share of 0..1 (pathLength 100). */
@@ -325,6 +357,8 @@ export function popoverLeft({ center, w, lo, hi, clearL = null, clearR = null })
 function popover(doc, btn, pop, { onOpen, clear = false } = {}) {
   if (!btn || !pop) return { close() {}, isOpen: () => false };
   const isOpen = () => !pop.hidden;
+  // A button the bar does not draw (Sound on a phone, opened from the Menu): under the Menu button.
+  const anchor = () => (btn.getClientRects().length ? btn : doc.getElementById('more-btn') || btn);
   /** With `clear`: the free width between an open side sheet (--inset-l) and the Social drawer (--inset-r). */
   const free = () => {
     const root = clear ? doc.getElementById('game-root') : null;
@@ -338,7 +372,7 @@ function popover(doc, btn, pop, { onOpen, clear = false } = {}) {
   };
   const place = () => {
     const bar = pop.offsetParent?.getBoundingClientRect?.() || { left: 0, top: 0, right: doc.documentElement.clientWidth };
-    const r = btn.getBoundingClientRect();
+    const r = anchor().getBoundingClientRect();
     const w = pop.offsetWidth;
     const right = Math.min(bar.right, doc.documentElement.clientWidth);
     const left = popoverLeft({ center: r.left + r.width / 2, w, lo: bar.left + 4, hi: right - w - 4, ...free() });
@@ -349,7 +383,7 @@ function popover(doc, btn, pop, { onOpen, clear = false } = {}) {
     pop.hidden = true;
     btn.setAttribute('aria-expanded', 'false');
     // Esc: back to the button after a keyboard open, to the world after a click (focus-return.js).
-    if (back) focusBack(btn, { doc });
+    if (back) focusBack(anchor(), { doc });
   };
   const open = () => {
     pop.hidden = false;
@@ -450,7 +484,8 @@ function installMenu(doc) {
   // A row is a button or a link (Support the game opens a page in its own tab).
   const ROW = 'button, a[href]';
   const groups = new Map();
-  for (const g of MENU_GROUPS) {
+  const phone = Boolean(doc.documentElement?.classList?.contains('touch-phone'));
+  for (const g of phone ? [PHONE_MENU_GROUP, ...MENU_GROUPS] : MENU_GROUPS) {
     let box = list.querySelector(`[data-menu-group="${g.id}"]`);
     if (!box) {
       box = doc.createElement('div');
@@ -459,13 +494,15 @@ function installMenu(doc) {
       box.setAttribute('role', 'group');
       box.setAttribute('aria-label', g.label);
       box.innerHTML = `<div class="menu-group-label" aria-hidden="true">${g.label}</div>`;
-      list.append(box);
+      if (g === PHONE_MENU_GROUP) list.prepend(box);
+      else list.append(box);
     }
     groups.set(g.id, box);
   }
   const sync = () => {
+    const onPhone = phoneBar(doc);
     for (const btn of list.querySelectorAll(ROW)) {
-      const row = menuRowFor(btn.id);
+      const row = menuRowFor(btn.id, { phone: onPhone });
       if (btn.dataset.menuRank !== String(row.rank)) btn.dataset.menuRank = String(row.rank);
       if (row.key && btn.dataset.key !== row.key) btn.dataset.key = row.key;
       if (row.mod && btn.dataset.keyMod !== row.mod) btn.dataset.keyMod = row.mod;
@@ -483,6 +520,8 @@ function installMenu(doc) {
   };
   sync();
   new MutationObserver(sync).observe(list, { childList: true, subtree: true });
+  // A phone switching skins moves Make and Mail between Now and World.
+  if (phone) new MutationObserver(sync).observe(doc.documentElement, { attributes: true, attributeFilter: ['data-ui'] });
   list.addEventListener('keydown', (e) => {
     if (!['ArrowDown', 'ArrowUp', 'Home', 'End'].includes(e.key)) return;
     const rows = [...list.querySelectorAll(ROW + ', input[type="range"], input[type="checkbox"]')].filter((b) => b.getClientRects().length && !b.disabled);
@@ -792,6 +831,8 @@ function fitTopActions(doc) {
   };
   // Classic lays its own bar out (classic.css): nothing moves there.
   if (doc.documentElement.dataset.ui !== 'modern') return apply([]);
+  // A phone: Quests stays on the bar; the study, Map and Make are always in the Menu (style.css).
+  if (phoneBar(doc)) return apply(['chip', 'map', 'make']);
   apply(pickTopOverflow((steps) => {
     apply(steps);
     return actionsFit(doc, pill);
@@ -878,6 +919,78 @@ function installNarrowRows(doc) {
   if (watch.length && typeof MutationObserver === 'function') {
     const mo = new MutationObserver(sync);
     for (const el of watch) mo.observe(el, { attributes: true, childList: true, characterData: true, subtree: true });
+  }
+}
+
+/**
+ * PHONEBAR (Austin 2026-11-12, his iPhone): the right pill holds Quests, Report a problem and the
+ * Menu (style.css), so the Menu's first rows carry the rest: "Skills · learning <name> · 1:53"
+ * (or "Skills · 5 available", or Skills) opening Skills, then Make and Mail (their narrow rows,
+ * moved to Now by menuRowFor) and Sound, which opens the Sound popover under the Menu button.
+ * A thin ring round the Menu button shows the study's progress (game.js data-progress on the
+ * study pill). Rows click the bar's own buttons, so the game's handlers stay one.
+ */
+function installPhoneRows(doc) {
+  const list = doc.getElementById('more-list');
+  const now = list?.querySelector('[data-menu-group="now"]');
+  const more = doc.getElementById('more-btn');
+  if (!now || !more) return;
+  const chip = doc.getElementById('study-chip');
+  const sound = doc.getElementById('sound-btn');
+  const row = (id, html, click) => {
+    const b = doc.createElement('button');
+    b.type = 'button';
+    b.id = id;
+    b.className = 'chrome-btn menu-phone-row';
+    b.innerHTML = html;
+    b.addEventListener('click', () => {
+      more.click();
+      click();
+    });
+    now.append(b);
+    return b;
+  };
+  const study = row('menu-study-btn', '<span class="menu-study-name">Skills</span><span class="menu-study-detail"></span>', () => doc.getElementById('skills-btn')?.click());
+  const soundRow = row('menu-sound-btn', '<span>Sound</span><span class="menu-row-note" hidden>Off</span>', () => sound?.click());
+  const ring = doc.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  ring.setAttribute('class', 'menu-study-ring');
+  ring.setAttribute('viewBox', '0 0 36 36');
+  ring.setAttribute('aria-hidden', 'true');
+  ring.innerHTML = '<circle class="msr-track" cx="18" cy="18" r="16.5" /><circle class="msr-fill" cx="18" cy="18" r="16.5" pathLength="100" stroke-dasharray="0 100" />';
+  more.append(ring);
+  const sync = () => {
+    const on = phoneBar(doc);
+    const learning = Boolean(on && chip && !chip.hidden && chip.dataset.skill);
+    const detail = on && chip ? studyRowDetail({
+      hidden: chip.hidden,
+      skill: chip.dataset.skill || '',
+      name: chip.dataset.tip || '',
+      short: chip.querySelector('.study-chip-short')?.textContent || '',
+    }) : '';
+    setText(study.querySelector('.menu-study-detail'), detail);
+    study.classList.toggle('is-studying', learning);
+    const label = detail ? `Skills, ${detail}` : 'Skills';
+    if (study.getAttribute('aria-label') !== label) study.setAttribute('aria-label', label);
+    const muted = sound?.dataset.muted === 'true';
+    const note = soundRow.querySelector('.menu-row-note');
+    if (note.hidden === muted) note.hidden = !muted;
+    // Off a phone (Classic, a skin switch) the rows go: the bar draws the pill and Sound there.
+    if (study.hidden === on) study.hidden = !on;
+    if (soundRow.hidden === on) soundRow.hidden = !on;
+    const share = learning ? Number(chip.dataset.progress) : NaN;
+    const showRing = learning && Number.isFinite(share);
+    if (showRing) ring.querySelector('.msr-fill').setAttribute('stroke-dasharray', ringDash(share));
+    if (showRing) more.dataset.studyRing = '';
+    else delete more.dataset.studyRing;
+    const tip = learning ? `Menu. Learning ${chip.dataset.tip || 'a skill'}, ${chip.querySelector('.study-chip-short')?.textContent || ''} left` : 'Menu';
+    if (more.getAttribute('aria-label') !== tip) more.setAttribute('aria-label', tip);
+  };
+  sync();
+  if (typeof MutationObserver === 'function') {
+    const mo = new MutationObserver(sync);
+    if (chip) mo.observe(chip, { attributes: true, childList: true, characterData: true, subtree: true });
+    if (sound) mo.observe(sound, { attributes: true, attributeFilter: ['data-muted'] });
+    mo.observe(doc.documentElement, { attributes: true, attributeFilter: ['data-ui'] });
   }
 }
 
@@ -1171,6 +1284,7 @@ export function installTopBar(doc, opts = {}) {
   trackPillWidths(doc);
   installTopOverflow(doc);
   installNarrowRows(doc);
+  installPhoneRows(doc);
   doc.getElementById('low-energy-btn')?.addEventListener('click', (e) => {
     e.stopPropagation();
     doc.querySelector('.top-bar .meta-pill.energy')?.click();

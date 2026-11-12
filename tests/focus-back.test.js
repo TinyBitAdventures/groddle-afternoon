@@ -189,7 +189,8 @@ test('the windows that give focus back on close all go through focusBack', () =>
   assert.match(shell, /focusBack\(opener\?\.isConnected \? opener : null, \{ doc \}\)/);
   assert.doesNotMatch(shell, /opener\.focus/);
   const topbar = read('public/js/ui/topbar.js');
-  assert.match(topbar, /if \(back\) focusBack\(btn, \{ doc \}\);/);
+  // A popover whose button the bar does not draw (Sound on a phone) gives focus to the Menu button.
+  assert.match(topbar, /if \(back\) focusBack\(anchor\(\), \{ doc \}\);/);
   assert.match(read('public/js/ui/imagination-hub.js'), /focusBack\(back, \{ doc \}\)/);
   assert.match(read('public/js/ui/reports-sheet.js'), /if \(back\) focusBack\(back, \{ doc \}\);/);
   assert.match(read('public/js/classic/classic-hub.js'), /focusBack\(back, \{ doc \}\)/);
