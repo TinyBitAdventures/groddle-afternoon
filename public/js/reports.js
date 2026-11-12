@@ -6,7 +6,7 @@
  * (a stale one is fetched again once, as js/minn-account-core.js does).
  *
  * A ticket: { id, status: open|answered|working|closed, subject, createdAt, updatedAt,
- * lastMessageAt, lastAuthor: player|admin, unread }; a message: { id, author:
+ * lastMessageAt, lastAuthor: player|admin, unread, adminReplied }; a message: { id, author:
  * player|admin, body, at, edited }. Who wrote is a role: an administrator is never named.
  *
  * Ticket 49 (2026-11-02, a player's two ideas): Working on it is a status an
@@ -88,6 +88,9 @@ export const REPORT_TEXT = Object.freeze({
   // Austin 2026-11-03: the picture opens over the game (js/ui/picture-lightbox.js), named for screen readers.
   pictureLabel: 'Report picture',
   sentNoPicture: 'Thanks! Your message was sent, without the picture.',
+  // #225 (Friendly, 2026-11-12): a report an administrator replied to keeps a tag, closed or not.
+  replied: 'Has a reply',
+  repliedHint: 'An administrator replied to this report',
 });
 
 /**
@@ -210,9 +213,19 @@ const fold = (x) => String(x ?? '').normalize('NFKD').replace(/[\u0300-\u036f]/g
 export function matchesReport(t, query) {
   const words = fold(query).split(/\s+/).filter(Boolean);
   if (!words.length) return true;
-  const hay = `${fold(t?.subject)} ${fold(STATUS_WORDS[t?.status] || t?.status)}`;
+  const hay = `${fold(t?.subject)} ${fold(STATUS_WORDS[t?.status] || t?.status)}${showsReplied(t) ? ` ${fold(REPORT_TEXT.replied)}` : ''}`;
   const id = String(Number(t?.id) || '');
   return words.every((w) => hay.includes(w) || (id && w.replace(/^#/, '') === id));
+}
+
+/**
+ * #225 (Friendly, 2026-11-12): whether a report's row carries the Has a reply tag. The site's
+ * adminReplied (an administrator wrote in it at some point) stays after the report closes, so a
+ * closed report that was answered reads apart from one closed with no reply. Answered already
+ * says so in its chip, so it has no tag.
+ */
+export function showsReplied(t) {
+  return t?.adminReplied === true && t.status !== 'answered';
 }
 
 /** The report a #report=<id> link names (the reply email's link), or 0. */

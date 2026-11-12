@@ -161,6 +161,15 @@ echo json_encode([
         'reopened' => TicketStore::closedBy(['status' => 'open', 'closed_by' => 'player']),
         'junk' => TicketStore::closedBy(['status' => 'closed', 'closed_by' => 'robot']),
     ],
+    // #225: adminReplied, from the admin_replied column find() and listFor() add (MySQL gives '1' or '0').
+    'adminReplied' => (static function () use ($row): array {
+        $base = ['id' => 5, 'status' => 'closed', 'subject' => 'Pigs', 'created_at' => '2026-10-30 12:00:00', 'updated_at' => '2026-10-30 12:00:00'] + $row('player', null, null);
+        return [
+            'replied' => TicketStore::summary($base + ['admin_replied' => '1'], 'player')['adminReplied'],
+            'none' => TicketStore::summary($base + ['admin_replied' => '0'], 'player')['adminReplied'],
+            'missing' => TicketStore::summary($base, 'player')['adminReplied'],
+        ];
+    })(),
     'unread' => [
         'adminWroteNeverRead' => TicketStore::unreadFor($row('admin', null, null), 'player'),
         'adminWroteReadBefore' => TicketStore::unreadFor($row('admin', '2026-10-30 11:00:00', null), 'player'),

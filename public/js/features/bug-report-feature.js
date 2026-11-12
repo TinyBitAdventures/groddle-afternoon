@@ -463,6 +463,8 @@ const STYLE = `
 [data-ui="modern"] #bug-report-panel .reports-chip { flex: none; padding: 1px var(--space-2); border-radius: var(--radius-pill); background: var(--surface-sunken); color: var(--text-muted); font-size: var(--fs-xs); font-weight: var(--fw-heavy); line-height: var(--lh-tight); }
 [data-ui="modern"] #bug-report-panel .reports-chip.is-open { background: var(--accent-soft); color: var(--accent); }
 [data-ui="modern"] #bug-report-panel .reports-chip.is-answered { color: var(--status-good); }
+/* #225: Has a reply, on a report an administrator answered (closed or not): an outline tag beside the status chip. */
+[data-ui="modern"] #bug-report-panel .reports-replied { flex: none; padding: 0 var(--space-2); border: 1px solid var(--status-good); border-radius: var(--radius-pill); color: var(--status-good); font-size: var(--fs-xs); font-weight: var(--fw-bold); line-height: var(--lh-tight); white-space: nowrap; }
 /* Ticket 49: Working on it, an administrator's mark. */
 [data-ui="modern"] #bug-report-panel .reports-chip.is-working { background: color-mix(in srgb, var(--status-warn) 24%, transparent); color: var(--warn); }
 [data-ui="modern"] #bug-report-panel .reports-empty { margin: var(--space-4) 0; color: var(--text-muted); line-height: var(--lh-body); text-align: center; }

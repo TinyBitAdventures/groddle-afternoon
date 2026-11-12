@@ -50,7 +50,7 @@
  * #reports-filter [data-reports-filter] (the search box, shown from REPORT_FILTER_MIN reports), [data-reports-no-match];
  * ticket 115: [data-reports-tabs] (role tablist) with tabs #reports-tab-<all|open|answered|working|closed>
  * [data-reports-tab=<tab>] carrying data-count and data-unread, #reports-tabpanel [data-reports-tabpanel],
- * [data-reports-tab-empty].
+ * [data-reports-tab-empty]; #225: [data-reports-replied] (Has a reply, js/reports.js showsReplied) on a row.
  *
  * Ticket 115 (Friendly, 2026-11-06): the list has tabs, All and each status with how many it holds,
  * and a red count on a tab holding a reply you have not read. A real tablist: one tab in the Tab
@@ -58,7 +58,7 @@
  * site's order (js/reports.js sortReports): unread first, then answered, open, working, closed.
  */
 
-import { REPORT_FILTER_MIN, REPORT_MAX, REPORT_TABS, REPORT_TEXT as T, STATUS_WORDS, canEditFirst, inTab, matchesReport, pictureRefused, pictureSrc, refusalWords, sortReports, tabCounts, tabLabel, ticketLine, unreadCount, whenWords } from '../reports.js?v=d6df7b91';
+import { REPORT_FILTER_MIN, REPORT_MAX, REPORT_TABS, REPORT_TEXT as T, STATUS_WORDS, canEditFirst, inTab, matchesReport, pictureRefused, pictureSrc, refusalWords, showsReplied, sortReports, tabCounts, tabLabel, ticketLine, unreadCount, whenWords } from '../reports.js?v=0985b56d';
 import { focusBack } from './focus-return.js?v=da190597';
 import { lightboxLink } from './picture-lightbox.js?v=0d2814c8';
 
@@ -286,12 +286,15 @@ export function mountReportsSheet({ doc = globalThis.document, host, api, contex
     drawTabs();
     list.replaceChildren(...shown.map((t) => {
       const li = e('li', { class: 'reports-row', 'data-ticket': t.id, 'data-unread': t.unread ? '1' : null });
-      const btn = e('button', { type: 'button', class: 'reports-row-btn', 'aria-label': `${t.subject}, ${STATUS_WORDS[t.status] || t.status}${t.unread ? `, ${T.unreadDot}` : ''}` });
+      const replied = showsReplied(t);
+      const btn = e('button', { type: 'button', class: 'reports-row-btn', 'aria-label': `${t.subject}, ${STATUS_WORDS[t.status] || t.status}${replied ? `, ${T.replied}` : ''}${t.unread ? `, ${T.unreadDot}` : ''}` });
       const top = e('span', { class: 'reports-row-top' });
       if (t.unread) top.append(e('span', { class: 'reports-dot', title: T.unreadDot, 'aria-hidden': 'true' }));
       top.append(e('span', { class: 'reports-subject' }, t.subject || T.sheet));
       const c = e('span');
       chip(c, t.status);
+      // #225: an administrator replied to it, even if it has closed since.
+      if (replied) top.append(e('span', { class: 'reports-replied', 'data-reports-replied': '', title: T.repliedHint, 'aria-hidden': 'true' }, T.replied));
       top.append(c);
       btn.append(top, e('span', { class: 'reports-line' }, ticketLine(t, now())));
       btn.addEventListener('click', () => openTicket(t.id));
