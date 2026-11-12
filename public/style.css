@@ -11856,6 +11856,17 @@ html.stage-pinned[data-ui="modern"] header.top-bar { left: calc(var(--sp-5) + va
   line-height: var(--lh-tight);
   animation: ui-sheet-in var(--motion-med) var(--ease-out);
 }
+/* A short screen (the mobile QA, 2026-11-12: a phone held sideways, 343 px): a sheet that stopped above
+   the pack row was 213 px tall and showed one quest, half a vendor tile, and the vendor's count row
+   under its tabs. Up to 500 px tall the sheet runs to the floor; the pack row steps right of it
+   (js/ui/pack-row.js mountPackClearance, from the sheet's --inset-l). */
+@media (max-height: 500px) {
+  [data-ui="modern"] #game-root .ui-sheet:not(.ui-sheet-center),
+  [data-ui="modern"] #game-root #achieve-panel,
+  [data-ui="modern"] #game-root #skills-panel,
+  [data-ui="modern"] #game-root #buffs-panel { max-height: calc(100% - var(--hud-h) - 6px - 8px); }
+}
+
 [data-ui="modern"] #game-root .ui-sheet[hidden],
 [data-ui="modern"] #game-root #achieve-panel[hidden],
 [data-ui="modern"] #game-root #skills-panel[hidden],
