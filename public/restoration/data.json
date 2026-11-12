@@ -2752,9 +2752,59 @@
   "deployed": "2026-11-12"
  },
  "git": {
-  "commits": 1760,
+  "commits": 1772,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-12",
+    "kind": "fix",
+    "text": "Password managers take the game's account forms for a sign-in and a sign-up"
+   },
+   {
+    "date": "2026-11-12",
+    "kind": "improve",
+    "text": "The featured project says what it still needs before the trip there"
+   },
+   {
+    "date": "2026-11-12",
+    "kind": "fix",
+    "text": "A result's floating words draw over the speech balloon, not behind it"
+   },
+   {
+    "date": "2026-11-12",
+    "kind": "fix",
+    "text": "A bag shows its own name in the tray, in a cabinet and on the ground, and keeps its sort"
+   },
+   {
+    "date": "2026-11-12",
+    "kind": "fix",
+    "text": "Shared project work wears the tool each unit actually used"
+   },
+   {
+    "date": "2026-11-12",
+    "kind": "fix",
+    "text": "Logging in at 0 energy on a new game day refills before any croak"
+   },
+   {
+    "date": "2026-11-12",
+    "kind": "fix",
+    "text": "The 11 Paradise tickets a day count in game days"
+   },
+   {
+    "date": "2026-11-12",
+    "kind": "fix",
+    "text": "An Apple gives 5 energy and no mood, as Glitch's did"
+   },
+   {
+    "date": "2026-11-12",
+    "kind": "fix",
+    "text": "The ledger tests cover waiting level-ups and cards, and bug reports name the calling line"
+   },
+   {
+    "date": "2026-11-12",
+    "kind": "fix",
+    "text": "The server's object layout includes each street upgrade's animals and rocks"
+   },
    {
     "date": "2026-11-12",
     "kind": "fix",
@@ -2824,59 +2874,9 @@
     "date": "2026-11-12",
     "kind": "fix",
     "text": "The loading card sits in the middle of a phone's screen"
-   },
-   {
-    "date": "2026-11-12",
-    "kind": "fix",
-    "text": "The award card fits a phone: centred upright, its button on screen sideways"
-   },
-   {
-    "date": "2026-11-12",
-    "kind": "improve",
-    "text": "Your characters open from the save cloud; the corner chip is gone"
-   },
-   {
-    "date": "2026-11-12",
-    "kind": "fix",
-    "text": "Home street and back-yard scenery draws crisp on Retina screens"
-   },
-   {
-    "date": "2026-11-12",
-    "kind": "fix",
-    "text": "A tap on a phone no longer leaves a tooltip standing"
-   },
-   {
-    "date": "2026-11-12",
-    "kind": "fix",
-    "text": "On a phone a double tap, pinch, pull down or long press on the UI no longer zooms, reloads or selects the page"
-   },
-   {
-    "date": "2026-11-12",
-    "kind": "fix",
-    "text": "On a phone chat, pack search and every typing field are 16 px, so iOS does not zoom into them"
-   },
-   {
-    "date": "2026-11-12",
-    "kind": "improve",
-    "text": "A phone reads \"Tap anywhere...\" on announcements and gets a start card without the Keys list"
-   },
-   {
-    "date": "2026-11-12",
-    "kind": "fix",
-    "text": "Notices keep clear of the top bar's pills and the tutorial pill; on a phone the pill waits behind open sheets"
-   },
-   {
-    "date": "2026-11-12",
-    "kind": "fix",
-    "text": "On a short screen the award screen's button can be reached"
-   },
-   {
-    "date": "2026-11-12",
-    "kind": "fix",
-    "text": "iOS shows the Upgrades cards' fronts, not their backs mirrored"
    }
   ]
  },
- "tests": 882,
+ "tests": 890,
  "generatedAt": "2026-11-12"
 }
