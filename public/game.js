@@ -483,6 +483,7 @@ import {
 import { TROPHY_FIND_TEXT, trophyOfBadge } from './js/home-trophies.js?v=2020b29b';
 import { HELD_AT_ONCE, HELD_AT_ONCE_TEXT } from './js/collection-trophies.js?v=3760d603';
 import { PACK_COPY, isBagClass, isElementClass, ownBagLabel, unitRankAt } from './js/pack-slots.js?v=4a36968a';
+import { FLOAT_TEXT_Z, SPEECH_BUBBLE_Z } from './js/fx-z.js?v=18dda7e3';
 import { hasPouch } from './js/elemental-pouch.js?v=ceefa97a';
 import { createPackRow, mountPackClearance, packBandRange, packCountText, packSearchEntries, packSlotTip } from './js/ui/pack-row.js?v=f27cf531';
 import { listAnimalFeedOptions } from './js/animals.js?v=f44dd15a';
@@ -7822,7 +7823,7 @@ function showSpeechBubble(target, speech) {
   }
   bubble.pivot.set(width / 2, height + 11);
   bubble.alpha = 0;
-  bubble.zIndex = 99999;
+  bubble.zIndex = SPEECH_BUBBLE_Z;
   bubble.eventMode = 'none';
   bubble._speechFx = {
     target,
@@ -8067,6 +8068,8 @@ function floatText(x, y, text, color = 0xfff4d6, opts = {}) {
   }
   float.x = x; float.y = placed; float._life = 0; float._vy = notifyView?.reducedMotion() ? 0 : -0.7;
   if (Number(opts.life) > 0) float._fade = Number(opts.life);
+  // Ticket 245: over a speech balloon (js/fx-z.js), which used to hide the words.
+  float.zIndex = FLOAT_TEXT_Z;
   fxLayer.addChild(float);
   recentFloats.push({ x, y: placed, t: now, key, sprite: float });
   return float;
@@ -8088,6 +8091,17 @@ function quoinGotText(x, y, text, color = 0xffffff) {
   while (recentFloats.length && now - recentFloats[0].t > 1500) recentFloats.shift();
   recentFloats.push({ x: drawn.x, y: drawn.y, t: now, key: floatKey(words), sprite: drawn.node });
   return drawn.node;
+}
+
+const RESULT_FLOAT_RISE = 50;
+const RESULT_FLOAT_UNDER_SPEECH = 12;
+/**
+ * Where a verb's result words start over its target (a garden plot, a tree): 50 px up, or, while
+ * the target's own speech balloon is up, at its feet (ticket 245), since a short target's balloon
+ * tail hangs about 50 px up, so the words began right under it. They rise from there over it.
+ */
+function resultFloatY(target, speaking = false) {
+  return target.sprite.y - (speaking ? RESULT_FLOAT_UNDER_SPEECH : RESULT_FLOAT_RISE);
 }
 
 function burst(x, y, color = 0xffe066, n = 10) {
@@ -9409,7 +9423,7 @@ function executeVerb(target, verbId) {
     // Report 121: a worn tool's plain reason shows beside the plot's talkback.
     const showLine = (!spoke || result.toastWithSpeech) && toastLine !== reactionText;
     if (result.ok && verbChangedSomething(result.effects) && target.sprite && !target.sprite.destroyed) {
-      if (showLine) floatText(target.sprite.x, target.sprite.y - 50, toastLine, 0xfff4d6, { life: 110 });
+      if (showLine) floatText(target.sprite.x, resultFloatY(target, spoke || Boolean(reactionText)), toastLine, 0xfff4d6, { life: 110 });
       logGain(feedLine);
     } else {
       if (showLine) toast(toastLine, 3200);
@@ -9419,7 +9433,7 @@ function executeVerb(target, verbId) {
   (result.msgs || []).forEach((m, i) => {
     if (i === 0) return; // already toasted / fed above
     if (reactionText && m === reactionText) return; // rendered in a wrapped speech bubble
-    floatText(target.sprite.x, target.sprite.y - 50 - i * 16, m, 0xfff4d6);
+    floatText(target.sprite.x, resultFloatY(target, spoke || Boolean(reactionText)) - i * 16, m, 0xfff4d6);
   });
   // Floating metabolic deltas, unless the answer's slugs already show them
   // (the client's slugs fly to the stats instead, SlugAnimator.as).

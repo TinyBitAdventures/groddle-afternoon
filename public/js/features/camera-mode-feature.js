@@ -34,8 +34,9 @@
  * cameraEyeballSent.
  */
 
-import { textureFromUrl } from '../textures.js?v=92ec53cd';
-import { OVERLAY_BUBBLE_URL, OVERLAY_USES, overlayBubbleBox, playOverlay } from '../overlays.js?v=4e81f749';
+import { textureFromUrl } from '../textures.js?v=f024bd6a';
+import { OVERLAY_BUBBLE_URL, OVERLAY_USES, overlayBubbleBox, playOverlay } from '../overlays.js?v=605c12ff';
+import { SPEECH_BUBBLE_Z } from '../fx-z.js?v=18dda7e3';
 
 export const CAMERA_FEATURE_ID = 'camera-mode';
 /** getCameraAbilities: range without Eyeballery, px from the avatar. */
@@ -92,7 +93,7 @@ export function playEyeballing(engine, at, alive = null) {
     bubble.height = box.h;
     bubble.alpha = 0;
     bubble.eventMode = 'none';
-    bubble.zIndex = 99999;
+    bubble.zIndex = SPEECH_BUBBLE_Z;
     bubble.label = 'overlay:eyeballing-bubble';
     engine.fxLayer?.addChild(bubble);
   }

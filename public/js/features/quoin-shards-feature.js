@@ -39,6 +39,7 @@
  */
 
 import { QUOIN_TYPES, creditQuoinStat, quoinClassAmount } from '../quoins.js?v=7e0dec6d';
+import { FLOAT_TEXT_Z } from '../fx-z.js?v=18dda7e3';
 import {
   COMPANION_QUOIN_RULES,
   QUOIN_SHARD_FX,
@@ -71,7 +72,8 @@ function ensureRoot(engine) {
   fxRoot = new engine.PIXI.Container();
   fxRoot.label = 'quoinShardFx';
   fxRoot.eventMode = 'none';
-  fxRoot.zIndex = 60;
+  // Ticket 245: a quoin's amount reads over a speech balloon, as game.js floatText does.
+  fxRoot.zIndex = FLOAT_TEXT_Z;
   layer.addChild(fxRoot);
   return fxRoot;
 }
