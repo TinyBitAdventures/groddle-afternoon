@@ -16,9 +16,9 @@ import {
   singReward,
   singLifeFor,
   wisdomPool,
-} from '../public/js/animal-flattery.js?v=63001f58';
-import { setMetabolicGainGate } from '../public/js/metabolics.js?v=8504134e';
-import { getVerbsFor, runVerb } from '../public/content.js?v=86dcdcde';
+} from '../public/js/animal-flattery.js?v=9700115b';
+import { setMetabolicGainGate } from '../public/js/metabolics.js?v=1383e6fd';
+import { getVerbsFor, runVerb } from '../public/content.js?v=172fd167';
 import { getGameDayKey } from '../public/js/game-day.js?v=cf9afac0';
 
 const here = dirname(fileURLToPath(import.meta.url));

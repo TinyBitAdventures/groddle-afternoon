@@ -20,7 +20,7 @@ import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 
 import { CHECKLIST, GROUPS, STATUS } from './restoration/checklist.mjs';
-import { QUEST_ROOMS, BUILT_ROOMS } from '../public/js/quest-rooms/catalog.js?v=d77d3d17';
+import { QUEST_ROOMS, BUILT_ROOMS } from '../public/js/quest-rooms/catalog.js?v=87636ba5';
 import { skillAuditTable } from '../public/js/skill-tree.js?v=e399b9ca';
 import { HUB_MAP_STREETS } from '../public/js/hub-maps-data.js?v=ffe222f1';
 import { IMAGINATION_UPGRADES } from '../public/js/imagination-data.js?v=4a85e7fe';
@@ -30,7 +30,7 @@ import { playFor, playHref } from './restoration/play-links.mjs';
 import { DESIGNERS, DESIGNER_LEVELS, TEXT_LEVELS } from './restoration/designer-levels.mjs';
 import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=10b118dd';
 import { ROOM_NOTES } from './restoration/rooms.mjs';
-import { parseQuestConversation } from '../public/js/quests.js?v=2951073f';
+import { parseQuestConversation } from '../public/js/quests.js?v=40c71a37';
 import { seasonsData } from './restoration/seasons.mjs';
 import { HAS_SERVER, HAS_SITE, SERVER_DIR, SITE_DIR } from './repos.mjs';
 

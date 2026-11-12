@@ -32,7 +32,7 @@ import {
   visitRookMuseumExhibit,
 } from '../public/js/rook-museum.js?v=825ff833';
 
-import { applyRewards, paidRewardBits } from '../public/js/quests.js?v=2951073f';
+import { applyRewards, paidRewardBits } from '../public/js/quests.js?v=40c71a37';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 

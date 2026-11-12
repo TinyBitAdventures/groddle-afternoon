@@ -45,7 +45,7 @@
  * }
  */
 
-import { ensureItem } from './inventory.js?v=2bd5b93e';
+import { ensureItem } from './inventory.js?v=f49c8998';
 import { GAME_DAY_MS, getGameDayKey, getGameDayStartMs } from './game-day.js?v=cf9afac0';
 import { giantDisplayName } from './giant-names.js?v=0e295891';
 

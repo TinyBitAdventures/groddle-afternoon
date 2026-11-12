@@ -445,7 +445,6 @@
 {"s":"items","id":"grendalinunin","n":"Grendalinunin","st":"source","ic":"assets/sprites/icons/grendalinunin.webp","h":"encyclopedia/items/grendalinunin/"},
 {"s":"items","id":"grilled_cheese","n":"Grilled Cheese","st":"source","ic":"assets/sprites/icons/grilled_cheese.webp","h":"encyclopedia/items/grilled_cheese/"},
 {"s":"items","id":"groddlene","n":"Groddlene","st":"source","ic":"assets/sprites/icons/groddlene.webp","h":"encyclopedia/items/groddlene/"},
-{"s":"items","id":"group_hall_lot_marker","n":"Group Location Marker","st":"source","ic":"","h":"encyclopedia/items/group_hall_lot_marker/"},
 {"s":"items","id":"guano","n":"Guano","st":"source","ic":"assets/sprites/icons/guano.webp","h":"encyclopedia/items/guano/"},
 {"s":"items","id":"gurly_drink","n":"Gurly Drink","st":"source","ic":"assets/sprites/icons/gurly_drink.webp","h":"encyclopedia/items/gurly_drink/"},
 {"s":"items","id":"hairball_flower","n":"Hairball Flower","st":"source","ic":"assets/sprites/icons/hairball_flower.webp","h":"encyclopedia/items/hairball_flower/"},

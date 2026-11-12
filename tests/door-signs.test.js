@@ -16,7 +16,7 @@ import { homedir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { DOOR_SALE_ART, doorSaleArt } from '../public/js/door-sign-art.js?v=69daffff';
-import { NEIGHBOURS } from '../public/js/neighbours.js?v=caec2f76';
+import { NEIGHBOURS } from '../public/js/neighbours.js?v=781ad57f';
 
 const spike = join(dirname(fileURLToPath(import.meta.url)), '..');
 const pub = join(spike, 'public');

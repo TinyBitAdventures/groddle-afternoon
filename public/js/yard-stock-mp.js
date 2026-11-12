@@ -53,9 +53,9 @@
  *   7); the owner's own catches pay nothing (inc_cultivation.js:171).
  */
 
-import { cultivationDef, hiveFireflySpots } from './home-cultivation.js?v=f1242621';
-import { createMineRock, tickMineRock } from './mining.js?v=881c40fe';
-import { createResourceNode, getResourceNodeDef, normalizeResourceNode, regrowDelayMs, tickResourceNode } from './resource-nodes.js?v=e8971a67';
+import { cultivationDef, hiveFireflySpots } from './home-cultivation.js?v=1e2d2b2d';
+import { createMineRock, tickMineRock } from './mining.js?v=6ba1b868';
+import { createResourceNode, getResourceNodeDef, normalizeResourceNode, regrowDelayMs, tickResourceNode } from './resource-nodes.js?v=9b20788d';
 
 /** The node classes a visitor may use on a home street (HOMES2: the hive's Fireflies too). */
 export const STOCK_NODE_CLASSES = Object.freeze(['peat_1', 'dirt_pile', 'mortar_barnacle', 'jellisac', 'npc_firefly']);

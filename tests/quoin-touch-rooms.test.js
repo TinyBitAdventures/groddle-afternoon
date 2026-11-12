@@ -8,9 +8,9 @@ import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-import { quoinTouches } from '../public/js/quoins.js?v=7e0dec6d';
-import { PARADISE_COURSES, PARADISE_STAR_COURSES, paradisePickupTouches, paradiseQuoinScale } from '../public/js/paradise-flight.js?v=6d8739e1';
-import { touchesQuoin } from '../public/js/quest-rooms/kit.js?v=4e007609';
+import { quoinTouches } from '../public/js/quoins.js?v=61be601c';
+import { PARADISE_COURSES, PARADISE_STAR_COURSES, paradisePickupTouches, paradiseQuoinScale } from '../public/js/paradise-flight.js?v=fdc76095';
+import { touchesQuoin } from '../public/js/quest-rooms/kit.js?v=57af0d8f';
 
 const root = join(import.meta.dirname, '..');
 const read = (rel) => readFileSync(join(root, rel), 'utf8');

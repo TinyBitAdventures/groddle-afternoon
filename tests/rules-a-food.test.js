@@ -8,9 +8,9 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 
-import { CONSUME_FLAVOUR_LINES, getItemUseInfo, useItem } from '../public/js/inventory.js?v=2bd5b93e';
-import { useItemMany } from '../public/js/eat-many.js?v=f2dba300';
-import { moodScaledXp } from '../public/js/mood-xp.js?v=958e7680';
+import { CONSUME_FLAVOUR_LINES, getItemUseInfo, useItem } from '../public/js/inventory.js?v=f49c8998';
+import { useItemMany } from '../public/js/eat-many.js?v=9d9c92b7';
+import { moodScaledXp } from '../public/js/mood-xp.js?v=22648ec0';
 
 const game = fs.readFileSync(new URL('../public/game.js', import.meta.url), 'utf8');
 

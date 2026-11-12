@@ -15,7 +15,7 @@ import {
 import {
   quoteTrantCare,
   performTrantCare,
-} from './js/trant-care.js?v=1a452321';
+} from './js/trant-care.js?v=b4c09d17';
 import {
   listPlantableSeeds,
   waterAllPlots,
@@ -35,8 +35,8 @@ import {
   GARDEN_FERTILIZE_MS,
   fertilizeCheck,
   fertilizePlot,
-} from './js/garden.js?v=17d048df';
-import { firstWorkingTool, HOE_TOOLS, WATERING_CAN_TOOLS } from './js/tools.js?v=5f482998';
+} from './js/garden.js?v=92436baf';
+import { firstWorkingTool, HOE_TOOLS, WATERING_CAN_TOOLS } from './js/tools.js?v=62b37c51';
 import { miningGemHint } from './js/gem-hints.js?v=4b65f7ac';
 import {
   ROCK_CATALOG,
@@ -50,33 +50,33 @@ import {
   noPickLine,
   rockStatusLabel,
   ensureMiningItems,
-} from './js/mining.js?v=862548f1';
+} from './js/mining.js?v=6ba1b868';
 import { takeToolChoice } from './js/tool-choice.js?v=e0dcb60e';
 import {
   ANIMAL_CLASS_IDS,
   ensureAnimalState,
   listAnimalFeedOptions,
   feedAnimal,
-} from './js/animals.js?v=1cc34c7e';
+} from './js/animals.js?v=cc51a34b';
 import {
   quoteAnimalKinship,
   ANIMAL_KINSHIP_CLICK_REFUSALS,
   performAnimalKinship,
   highestAnimalKinshipRank,
-} from './js/animal-kinship.js?v=ee58cc20';
+} from './js/animal-kinship.js?v=ffe074b2';
 import {
   MUSICBLOCK_CATALOG,
   collectMusicblock,
   isMusicblock,
-} from './js/musicblocks.js?v=51fa975b';
+} from './js/musicblocks.js?v=765ac56d';
 import { nextDialogue, formatSpokenLine } from './js/dialogue.js?v=fcfed1af';
 import {
   ensureWoodTreeState,
   quoteWoodTreeHarvest,
   harvestWoodTree,
   woodTreeStatusLabel,
-} from './js/woodcutting.js?v=d7d876f0';
-import { findWorkingRookTool } from './js/rook-woods.js?v=9621a723';
+} from './js/woodcutting.js?v=2fdc8fc5';
+import { findWorkingRookTool } from './js/rook-woods.js?v=738634d9';
 import {
   HERDKEEPING,
   INCUBATION,
@@ -86,15 +86,15 @@ import {
   namingVerbs,
   queuePlops,
   startIncubation,
-} from './js/animal-husbandry.js?v=7929bf5e';
-import { loseEnergy, metabolicGain, moodMax } from './js/metabolics.js?v=8504134e';
-import { SET_FREE, setFreeVerbState } from './js/animal-set-free.js?v=3b194fca';
-import { BUTTER_UP, SING_TO, butterUpVerbState, butterUpChicken, singToVerbState, singToButterfly } from './js/animal-flattery.js?v=63001f58';
-import { levelInfoForXp } from './js/progression.js?v=33462eaa';
+} from './js/animal-husbandry.js?v=3017f786';
+import { loseEnergy, metabolicGain, moodMax } from './js/metabolics.js?v=1383e6fd';
+import { SET_FREE, setFreeVerbState } from './js/animal-set-free.js?v=55ad2f83';
+import { BUTTER_UP, SING_TO, butterUpVerbState, butterUpChicken, singToVerbState, singToButterfly } from './js/animal-flattery.js?v=9700115b';
+import { levelInfoForXp } from './js/progression.js?v=72b2b22a';
 import { getGameDayKey } from './js/game-day.js?v=cf9afac0';
 import { PACK_COPY, isElementClass } from './js/pack-slots.js?v=4a36968a';
 import { hasPouch } from './js/elemental-pouch.js?v=ceefa97a';
-import { ITEM_CATALOG, countItem } from './js/inventory.js?v=2bd5b93e';
+import { ITEM_CATALOG, countItem } from './js/inventory.js?v=f49c8998';
 import { slugsFromEffects } from './js/speech-slugs.js?v=130338f9';
 import { animalResponseKey, failureResponseKey, trantCareResponseKey, rockResponseKey, verbResponse } from './js/verb-responses.js?v=3ceb8a8c';
 

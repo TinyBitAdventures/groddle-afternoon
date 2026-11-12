@@ -24,16 +24,16 @@ import {
   sniffNoNo,
   sprinkleHallowed,
   usePowderCharge,
-} from '../public/js/powders.js?v=fbbbc0d8';
-import { powdersFeature } from '../public/js/features/powders-feature.js?v=32b8db62';
+} from '../public/js/powders.js?v=4ed5ad28';
+import { powdersFeature } from '../public/js/features/powders-feature.js?v=0e7cc337';
 import {
   applyAchievementProgress,
   createAchievementState,
   getAchievementProgress,
   seedAchievementNearCompletion,
-} from '../public/js/achievements.js?v=552ecb19';
-import { createShrineState, donateToShrine, quoteShrineDonation } from '../public/js/shrines.js?v=21cad7cb';
-import { applyBuff, createBuffState, tickBuffs } from '../public/js/buffs.js?v=fd309a67';
+} from '../public/js/achievements.js?v=e4e5edd0';
+import { createShrineState, donateToShrine, quoteShrineDonation } from '../public/js/shrines.js?v=a190faea';
+import { applyBuff, createBuffState, tickBuffs } from '../public/js/buffs.js?v=c499cf1a';
 import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=10b118dd';
 
 const publicRoot = join(dirname(fileURLToPath(import.meta.url)), '../public');

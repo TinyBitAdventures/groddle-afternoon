@@ -11,11 +11,11 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { createInventory, countItem } from '../public/js/inventory.js?v=2bd5b93e';
-import { createToolConditionState, getToolCondition } from '../public/js/tools.js?v=5f482998';
-import { RECIPE_CATALOG, craftRecipe, loadRecipeCatalogFromFile } from '../public/js/making.js?v=a6b3716c';
-import { BUREAUCRACY_ITEMS, CARD_BADGE, buyDocument, clerkOffers } from '../public/js/bureaucracy.js?v=34629a6c';
-import { phaseRequirements, normalizeStreetJobState, contributeItems } from '../public/js/street-jobs.js?v=94f8d250';
+import { createInventory, countItem } from '../public/js/inventory.js?v=f49c8998';
+import { createToolConditionState, getToolCondition } from '../public/js/tools.js?v=62b37c51';
+import { RECIPE_CATALOG, craftRecipe, loadRecipeCatalogFromFile } from '../public/js/making.js?v=5338cc7e';
+import { BUREAUCRACY_ITEMS, CARD_BADGE, buyDocument, clerkOffers } from '../public/js/bureaucracy.js?v=b71fdd01';
+import { phaseRequirements, normalizeStreetJobState, contributeItems } from '../public/js/street-jobs.js?v=87fd5c87';
 import { loadRetiredItems, retireRequirement } from '../tools/retired-items.mjs';
 import { obtainableItems } from '../tools/job-obtainable.mjs';
 

@@ -21,7 +21,7 @@
  * follows, drawn back on that buff's page as "What comes after".
  */
 import { BUFF_ICONS, BUFF_END_MESSAGES, BUFF_TICK_MESSAGES, CONSUME_BUFFS, GANDLEVERY_MUNCH, KUKUBEE_WINTER_TSIDS, QUEST_TIMER_BUFFS } from '../../public/js/buff-triggers.js?v=a3093922';
-import { BUFF_ITEM_CATALOG } from '../../public/js/buffs.js?v=fd309a67';
+import { BUFF_ITEM_CATALOG } from '../../public/js/buffs.js?v=c499cf1a';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { esc, fmt, orList, tsHtml } from './parts.mjs';

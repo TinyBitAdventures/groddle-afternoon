@@ -47,11 +47,11 @@
  * street the server doesn't share keep the save's own plots, as before.
  */
 
-import { ensureItem } from '../inventory.js?v=2bd5b93e';
+import { ensureItem } from '../inventory.js?v=f49c8998';
 import { isItemFloor, platformYAt } from '../street-model.js?v=b6cb6a4e';
 import { getStreetEcologyCatalog, streetEcologyAliases } from '../street-ecology.js?v=f27417a8';
 import { trantFootAnchorY, trantStatusLabel } from '../trants.js?v=4d6f5593';
-import { woodTreeStatusLabel } from '../woodcutting.js?v=d7d876f0';
+import { woodTreeStatusLabel } from '../woodcutting.js?v=2fdc8fc5';
 import {
   GROWN_TREE_LABELS,
   SEASONED_BEANS,
@@ -71,11 +71,11 @@ import {
   soilSpawnClasses,
   soilSpritePaths,
   tickPlot,
-} from '../patches.js?v=e034b56d';
+} from '../patches.js?v=5f333fdb';
 import { frameTexture, isLoaded, onFailed, onLoaded, textureFromUrl } from '../textures.js?v=92ec53cd';
 import { HOE_TOOLS, firstWorkingTool } from '../tools.js?v=62b37c51';
 import { slugsFromEffects } from '../speech-slugs.js?v=130338f9';
-import { plotSignature, replayRng } from '../shared-patches.js?v=b675a257';
+import { plotSignature, replayRng } from '../shared-patches.js?v=c9773d7b';
 
 export const PATCHES_FEATURE_ID = 'patches';
 export const SOIL_GROUP_PREFIX = 'soil:';

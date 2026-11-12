@@ -56,7 +56,7 @@
  */
 
 import { textureFromUrl } from '../textures.js?v=92ec53cd';
-import { butlerApi } from '../features/butler-feature.js?v=fc941161';
+import { butlerApi } from '../features/butler-feature.js?v=3cfc249f';
 
 // source: questInstanceLocation(..., 5*60) -> instances_schedule_exit_prompt (a prompt, not a clock).
 export const EXIT_PROMPT_MS = 5 * 60 * 1000;

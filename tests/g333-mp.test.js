@@ -39,8 +39,8 @@ import {
   splitEnded,
   suggestedPrice,
   unitPrice,
-} from '../public/js/auctions.js?v=278dc46a';
-import { auctionsFeature } from '../public/js/features/auctions-feature.js?v=e70d17c2';
+} from '../public/js/auctions.js?v=0b1fff76';
+import { auctionsFeature } from '../public/js/features/auctions-feature.js?v=eb7eda6b';
 import { normalizeMailboxState } from '../public/js/mailbox.js?v=a3e833ba';
 import { MULTIPLAYER_QUESTS, MULTIPLAYER_QUESTS_LEFT_OUT, offerableMultiplayerQuest } from '../public/js/quests-mp.js?v=1fc5ff58';
 import { auctionJson } from '../tools/build-auctions.mjs';

@@ -17,16 +17,16 @@ import path from 'node:path';
 import test from 'node:test';
 import { fileURLToPath } from 'node:url';
 
-import { performTrantCare, trantFruitCycle } from '../public/js/trant-care.js?v=1a452321';
+import { performTrantCare, trantFruitCycle } from '../public/js/trant-care.js?v=b4c09d17';
 import {
   createTrantState,
   fruitCapacityAt,
   fruitProductionAt,
   setTrantTables,
 } from '../public/js/trants.js?v=4d6f5593';
-import { fertilizeTree } from '../public/js/powders.js?v=fbbbc0d8';
-import { createPlot, growTree, resetPlotDay, reviveDeadTree } from '../public/js/patches.js?v=e034b56d';
-import { createToolConditionState } from '../public/js/tools.js?v=5f482998';
+import { fertilizeTree } from '../public/js/powders.js?v=4ed5ad28';
+import { createPlot, growTree, resetPlotDay, reviveDeadTree } from '../public/js/patches.js?v=5f333fdb';
+import { createToolConditionState } from '../public/js/tools.js?v=62b37c51';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const publicDir = path.join(root, 'public');

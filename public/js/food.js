@@ -10,7 +10,7 @@
  */
 
 import { GAME_DAY_MS } from './game-day.js?v=cf9afac0';
-import { ITEM_CATALOG } from './inventory.js?v=2bd5b93e';
+import { ITEM_CATALOG } from './inventory.js?v=f49c8998';
 
 export const FOOD_VARIETY_UPGRADE = 'food_variety_bonus';
 export const FOOD_ENERGY_LIMIT_MULTIPLIER = 20;

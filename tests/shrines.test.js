@@ -17,7 +17,7 @@ import {
   quoteShrineDonation,
   resetShrineDay,
   shrineFillQty,
-} from '../public/js/shrines.js?v=21cad7cb';
+} from '../public/js/shrines.js?v=a190faea';
 import { GIANT_NAMES, giantDisplayName } from '../public/js/giant-names.js?v=0e295891';
 
 const publicRoot = join(import.meta.dirname, '..', 'public');
@@ -155,8 +155,8 @@ describe('shrine official art and client wiring', () => {
   });
 
   it('follows the source donation rules: level cap, capped bonus, favor accounting, emblem iMG', async () => {
-    const { donationXpLimit, EMBLEM_XP } = await import('../public/js/shrines.js?v=21cad7cb');
-    const { XP_FOR_LEVEL } = await import('../public/js/progression.js?v=33462eaa');
+    const { donationXpLimit, EMBLEM_XP } = await import('../public/js/shrines.js?v=a190faea');
+    const { XP_FOR_LEVEL } = await import('../public/js/progression.js?v=72b2b22a');
     // stats_donation_xp_limit: 250 to level 5, 500 to 10, then a share of the level's interval.
     assert.equal(donationXpLimit(0), 250);
     assert.equal(donationXpLimit(XP_FOR_LEVEL[6]), 500); // level 8
@@ -231,8 +231,8 @@ describe('Giant names players read (report #102)', () => {
 
   it('the favor, dice, grave and emblem lines say Tii', async () => {
     const { capitalizeGiant } = await import('../public/js/secret-spots.js?v=59a37384');
-    const { dieOutcome } = await import('../public/js/item-verbs-more.js?v=f495e9e8');
-    const { graveRecognitionText } = await import('../public/js/hell.js?v=816e231d');
+    const { dieOutcome } = await import('../public/js/item-verbs-more.js?v=97cd58a8');
+    const { graveRecognitionText } = await import('../public/js/hell.js?v=07cc312d');
     const { emblemVerbCheck } = await import('../public/js/giant-icons.js?v=0d6b4965');
     assert.equal(capitalizeGiant('ti'), 'Tii');
     assert.equal(dieOutcome({ mood: 100, energy: 100 }, 'ti').line, 'rolled "Tii"');

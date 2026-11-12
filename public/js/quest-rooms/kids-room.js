@@ -29,8 +29,8 @@
  * friend Bear is its teddy and friend Thing the pink tall guy at the tea table.
  */
 
-import { applyRewards } from '../quests.js?v=2951073f';
-import { ITEM_CATALOG, isToolItem } from '../inventory.js?v=2bd5b93e';
+import { applyRewards } from '../quests.js?v=40c71a37';
+import { ITEM_CATALOG, isToolItem } from '../inventory.js?v=f49c8998';
 import { frameTexture, isLoaded, onLoaded, sourceFromUrl } from '../textures.js?v=92ec53cd';
 import { playPoofIn } from '../overlay-art.js?v=a6561207';
 import { KIDS_ROOM_FLOOR, KIDS_ROOM_H, KIDS_ROOM_W, buildKidsRoomScene } from '../kids-room-scene.js?v=180ba8b6';

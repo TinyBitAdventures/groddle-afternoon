@@ -36,13 +36,13 @@ import {
   skillSpeedInfo,
   spendEmblemOnStudy,
   spendFavorOnStudy,
-} from '../public/js/shrines.js?v=21cad7cb';
+} from '../public/js/shrines.js?v=a190faea';
 import { emblemUnlockSkillFor } from '../public/js/skill-tree.js?v=e399b9ca';
 import { studyGiantsLine } from '../public/js/skills-panel.js?v=f5279b3d';
-import { EMITTED_EVENTS, routeQuestEvent, acceptOffer, requirementRoute } from '../public/js/quest-offers.js?v=d76abcd0';
-import { createQuestState } from '../public/js/quests.js?v=2951073f';
+import { EMITTED_EVENTS, routeQuestEvent, acceptOffer, requirementRoute } from '../public/js/quest-offers.js?v=956218ac';
+import { createQuestState } from '../public/js/quests.js?v=40c71a37';
 import { getQuestCatalog } from '../public/js/content-catalogs.js?v=10b118dd';
-import { normalizeShrineState } from '../public/js/shrines.js?v=21cad7cb';
+import { normalizeShrineState } from '../public/js/shrines.js?v=a190faea';
 
 const root = join(import.meta.dirname, '..', 'public');
 

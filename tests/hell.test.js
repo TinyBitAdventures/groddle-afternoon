@@ -60,14 +60,14 @@ import {
   shouldWarnLowEnergy,
   squishGrape,
   wineDrinkConditions,
-} from '../public/js/hell.js?v=816e231d';
-import { ITEM_CATALOG } from '../public/js/inventory.js?v=2bd5b93e';
+} from '../public/js/hell.js?v=07cc312d';
+import { ITEM_CATALOG } from '../public/js/inventory.js?v=f49c8998';
 import { GAME_DAY_MS, getGameDayKey, getGameDayStartMs } from '../public/js/game-day.js?v=cf9afac0';
 import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=10b118dd';
 import {
   applyAchievementProgress,
   createAchievementState,
-} from '../public/js/achievements.js?v=552ecb19';
+} from '../public/js/achievements.js?v=e4e5edd0';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const publicRoot = join(here, '../public');

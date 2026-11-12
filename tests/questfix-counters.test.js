@@ -10,7 +10,7 @@ import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { loadContentCatalogsFromDir, resetContentCatalogs } from '../public/js/content-catalogs.js?v=10b118dd';
-import { createQuestState } from '../public/js/quests.js?v=2951073f';
+import { createQuestState } from '../public/js/quests.js?v=40c71a37';
 import {
   acceptOffer,
   routeQuestEvent,
@@ -28,23 +28,23 @@ import {
   PURPLE_JOURNEY_STREETS,
   COLD_COMFORT,
   COLD_COMFORT_LEAVE_TEXT,
-} from '../public/js/quest-offers.js?v=d76abcd0';
-import { createResourceNode, harvestResourceNode } from '../public/js/resource-nodes.js?v=e8971a67';
-import { createPlot, performPlotVerb } from '../public/js/patches.js?v=e034b56d';
-import { createToolConditionState } from '../public/js/tools.js?v=5f482998';
-import { performEmotionalBearAction, createEmotionalBearState } from '../public/js/emotional-bear.js?v=8d027fe0';
+} from '../public/js/quest-offers.js?v=956218ac';
+import { createResourceNode, harvestResourceNode } from '../public/js/resource-nodes.js?v=9b20788d';
+import { createPlot, performPlotVerb } from '../public/js/patches.js?v=5f333fdb';
+import { createToolConditionState } from '../public/js/tools.js?v=62b37c51';
+import { performEmotionalBearAction, createEmotionalBearState } from '../public/js/emotional-bear.js?v=172f393b';
 import {
   questVerbsFeature,
   slatherVerb,
   SLATHER_VERB,
   SLATHER_COPY,
-} from '../public/js/features/quest-verbs-feature.js?v=a1b47519';
-import { onOwnYard } from '../public/js/features/quest-offers-feature.js?v=07ab9ba0';
+} from '../public/js/features/quest-verbs-feature.js?v=ad2a0910';
+import { onOwnYard } from '../public/js/features/quest-offers-feature.js?v=3d3728c2';
 import {
   giveCubimalVerb,
   GIVE_CUBIMAL_VERB,
   CUBIMAL_GIFT_RESPONSES,
-} from '../public/js/features/quest-verbs-feature.js?v=a1b47519';
+} from '../public/js/features/quest-verbs-feature.js?v=ad2a0910';
 import { createFeatureHost } from '../public/js/feature-host.js?v=06bb8b74';
 
 const here = dirname(fileURLToPath(import.meta.url));

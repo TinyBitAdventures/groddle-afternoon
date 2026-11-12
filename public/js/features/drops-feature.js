@@ -34,8 +34,8 @@
  *     dropTable, dropLast, dropRolls, dropHits, dropAutoplay.
  */
 
-import { addItem, ensureItem, ITEM_CATALOG } from '../inventory.js?v=2bd5b93e';
-import { emblemCostFor } from '../shrines.js?v=21cad7cb';
+import { addItem, ensureItem, ITEM_CATALOG } from '../inventory.js?v=f49c8998';
+import { emblemCostFor } from '../shrines.js?v=a190faea';
 import {
   DROP_ITEMS,
   DROP_TABLES,

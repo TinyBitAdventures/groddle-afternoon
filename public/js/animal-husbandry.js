@@ -34,12 +34,12 @@
  *   (rolled with the shared js/drop-tables.js runDropTable).
  */
 
-import { ITEM_CATALOG, ensureItem, getItemUseInfo } from './inventory.js?v=2bd5b93e';
-import { DROP_TABLES, applyDropResult, rollDropTable } from './drop-tables.js?v=16e12632';
-import { loseEnergy, loseMood, metabolicGain, moodMax } from './metabolics.js?v=8504134e';
-import { grantMoodXp } from './mood-xp.js?v=958e7680';
-import { musicblockItemMeta } from './musicblocks.js?v=51fa975b';
-import { isEnchantedForest } from './enchanted-forests.js?v=22ff871e';
+import { ITEM_CATALOG, ensureItem, getItemUseInfo } from './inventory.js?v=f49c8998';
+import { DROP_TABLES, applyDropResult, rollDropTable } from './drop-tables.js?v=8bcf111f';
+import { loseEnergy, loseMood, metabolicGain, moodMax } from './metabolics.js?v=1383e6fd';
+import { grantMoodXp } from './mood-xp.js?v=22648ec0';
+import { musicblockItemMeta } from './musicblocks.js?v=765ac56d';
+import { isEnchantedForest } from './enchanted-forests.js?v=dc045a4b';
 import { isSymphoniousTsid } from './symphonious-maximus.js?v=345ad437';
 import { isMissingFloorTsid } from './hidden-floors.js?v=732a2610';
 import { stationByTsid } from './subway.js?v=44d1a09f';

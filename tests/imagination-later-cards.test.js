@@ -22,8 +22,8 @@ import {
   rollSlothBonusSnails,
   taskLimitMultiplier,
 } from '../public/js/imagination-effects.js?v=70169933';
-import { createInventory, countItem } from '../public/js/inventory.js?v=2bd5b93e';
-import { createToolConditionState, getToolCondition, setToolRemaining } from '../public/js/tools.js?v=5f482998';
+import { createInventory, countItem } from '../public/js/inventory.js?v=f49c8998';
+import { createToolConditionState, getToolCondition, setToolRemaining } from '../public/js/tools.js?v=62b37c51';
 import {
   DEFAULT_TASK_LIMIT,
   RECIPE_CATALOG,
@@ -32,7 +32,7 @@ import {
   loadRecipeCatalogFromFile,
   makingSkillAdjustments,
   recipeTaskLimit,
-} from '../public/js/making.js?v=a6b3716c';
+} from '../public/js/making.js?v=5338cc7e';
 import {
   assemblyCheck,
   assemblyEnergy,
@@ -43,7 +43,7 @@ import {
   finishMachineWork,
   startAssembly,
   startDisassembly,
-} from '../public/js/machines.js?v=590a7d4a';
+} from '../public/js/machines.js?v=112d1492';
 import {
   finishMeditation,
   levitationMinEnergy,
@@ -54,11 +54,11 @@ import {
 } from '../public/js/meditation.js?v=96f23682';
 import { skillPackageDetails } from '../public/js/skill-packages.js?v=bfb87281';
 import { strikeDamageFor } from '../public/js/rook-attack.js?v=c12e825f';
-import { createMineRock, mineRock, tickMineRock } from '../public/js/mining.js?v=881c40fe';
-import { runTransform, shuckDetails } from '../public/js/item-transforms.js?v=157435ae';
-import { brushFox, createFox, foxFiberRange } from '../public/js/foxes.js?v=4be3e46c';
-import { soundForMakingTool } from '../public/js/sound-moments.js?v=52ad523c';
-import { supplyFeature } from '../public/js/features/supply-feature.js?v=2a7f0ae8';
+import { createMineRock, mineRock, tickMineRock } from '../public/js/mining.js?v=6ba1b868';
+import { runTransform, shuckDetails } from '../public/js/item-transforms.js?v=07b416a3';
+import { brushFox, createFox, foxFiberRange } from '../public/js/foxes.js?v=3470f86b';
+import { soundForMakingTool } from '../public/js/sound-moments.js?v=c57351b3';
+import { supplyFeature } from '../public/js/features/supply-feature.js?v=f4a69cd2';
 
 const SPIKE = join(dirname(fileURLToPath(import.meta.url)), '..', 'public');
 const seq = (...values) => {

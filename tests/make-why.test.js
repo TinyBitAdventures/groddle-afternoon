@@ -10,9 +10,9 @@ import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { RECIPE_CATALOG, TOOL_CATALOG, canCraft, ensureMakingItems, listMakingTools, loadRecipeCatalogFromFile, makeEmptyLine, makePanelIcon, recipeBlockedLine } from '../public/js/making.js?v=a6b3716c';
-import { createInventory } from '../public/js/inventory.js?v=2bd5b93e';
-import { createToolConditionState, setToolRemaining } from '../public/js/tools.js?v=5f482998';
+import { RECIPE_CATALOG, TOOL_CATALOG, canCraft, ensureMakingItems, listMakingTools, loadRecipeCatalogFromFile, makeEmptyLine, makePanelIcon, recipeBlockedLine } from '../public/js/making.js?v=5338cc7e';
+import { createInventory } from '../public/js/inventory.js?v=f49c8998';
+import { createToolConditionState, setToolRemaining } from '../public/js/tools.js?v=62b37c51';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const game = readFileSync(join(root, 'public/game.js'), 'utf8');

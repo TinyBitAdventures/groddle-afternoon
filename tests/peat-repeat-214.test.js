@@ -13,9 +13,9 @@ import { describe, it } from 'node:test';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-import { COPY } from '../public/js/street-objects.js?v=c36a40da';
-import { streetObjectsFeature } from '../public/js/features/street-objects-feature.js?v=e5632d85';
-import { createResourceNode, harvestResourceNode, resourceNodeVerbs } from '../public/js/resource-nodes.js?v=e8971a67';
+import { COPY } from '../public/js/street-objects.js?v=2a0856d8';
+import { streetObjectsFeature } from '../public/js/features/street-objects-feature.js?v=490a396a';
+import { createResourceNode, harvestResourceNode, resourceNodeVerbs } from '../public/js/resource-nodes.js?v=9b20788d';
 
 const root = join(import.meta.dirname, '..');
 const read = (rel) => readFileSync(join(root, rel), 'utf8');

@@ -1353,13 +1353,13 @@
  "quests": {
   "total": 445,
   "story": 245,
-  "playable": 194,
+  "playable": 193,
   "buckets": [
    {
     "id": "playable",
     "label": "Playable",
     "note": "Offered and finishable in the remake.",
-    "count": 194
+    "count": 193
    },
    {
     "id": "job",
@@ -1383,7 +1383,7 @@
     "id": "retired",
     "label": "Retired before shutdown",
     "note": "Tests, removed features, broken or unreachable in the original.",
-    "count": 24
+    "count": 25
    },
    {
     "id": "tutorial",
@@ -2752,9 +2752,59 @@
   "deployed": "2026-11-12"
  },
  "git": {
-  "commits": 1814,
+  "commits": 1826,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-12",
+    "kind": "fix",
+    "text": "The Energy Tank card fills mood too, low mood always warns, and the new day keeps Glitch's holds"
+   },
+   {
+    "date": "2026-11-12",
+    "kind": "fix",
+    "text": "Teleporting costs a share of your own energy tank, a Teleportation Point saves in your home, and a gone script's refund is iMG only"
+   },
+   {
+    "date": "2026-11-12",
+    "kind": "fix",
+    "text": "Level-ups follow Glitch: no refill while dead, mood only while Super Pooped, XP stops at 60, and the street hears it online"
+   },
+   {
+    "date": "2026-11-12",
+    "kind": "fix",
+    "text": "Rainbow Run quoins pay past the day's limit, Top of the Tree's stay put at it, and a quoin shows what it gave"
+   },
+   {
+    "date": "2026-11-12",
+    "kind": "fix",
+    "text": "A Tinkertool repairs itself, and a worn one repairs tick by tick until it breaks"
+   },
+   {
+    "date": "2026-11-12",
+    "kind": "fix",
+    "text": "Rocks, nodes and their tools follow Glitch: a Metal Rock takes a Fancy Pick, the dragged tool is the one that wears, and every use that started is paid"
+   },
+   {
+    "date": "2026-11-12",
+    "kind": "fix",
+    "text": "Street projects ask \"How many?\", pay every helper at the end, and count restorations as Glitch did"
+   },
+   {
+    "date": "2026-11-12",
+    "kind": "fix",
+    "text": "Quests that could never finish: Hubba Dubba Hugs leaves, the Herb Gardens visit and Sparkly of Interest count, timers wait while you are away"
+   },
+   {
+    "date": "2026-11-12",
+    "kind": "fix",
+    "text": "The donation that fills a Giant's favor gives the emblem, and favor from anywhere stops at the emblem target"
+   },
+   {
+    "date": "2026-11-12",
+    "kind": "fix",
+    "text": "The Encyclopedia names where the door keys come from and leaves out the group hall's lot marker"
+   },
    {
     "date": "2026-11-12",
     "kind": "fix",
@@ -2824,59 +2874,9 @@
     "date": "2026-11-12",
     "kind": "fix",
     "text": "A Master Gardener pour on a shared bed says too tired only when you are"
-   },
-   {
-    "date": "2026-11-12",
-    "kind": "fix",
-    "text": "Meditation says the energy it really gave, Jump lifts a levitating phone, and a short session no longer pins the Meditation Station"
-   },
-   {
-    "date": "2026-11-12",
-    "kind": "fix",
-    "text": "The Faded Heart remembers only on haunt streets, as in Glitch, and keeps working after its quest"
-   },
-   {
-    "date": "2026-11-12",
-    "kind": "fix",
-    "text": "A failed backup restore no longer stops the solo game saving"
-   },
-   {
-    "date": "2026-11-12",
-    "kind": "fix",
-    "text": "A phone held upright sends the same landscape home street to the profile as a computer"
-   },
-   {
-    "date": "2026-11-12",
-    "kind": "fix",
-    "text": "The Giants' shrine pages stay in the Encyclopedia"
-   },
-   {
-    "date": "2026-11-12",
-    "kind": "new",
-    "text": "The public Known gaps page's data, builder and Minn page"
-   },
-   {
-    "date": "2026-11-12",
-    "kind": "new",
-    "text": "The award card's quest book is a sharp redraw of Tiny Speck's"
-   },
-   {
-    "date": "2026-11-12",
-    "kind": "new",
-    "text": "A phone pinches the street to zoom; the pack row scrolls, signpost arms take a finger, the street name shows"
-   },
-   {
-    "date": "2026-11-12",
-    "kind": "fix",
-    "text": "Jellisacs sit in the rock holes, Peat Bogs lie flat, and every Herb Gardens planter box grows herbs"
-   },
-   {
-    "date": "2026-11-12",
-    "kind": "fix",
-    "text": "A summons or invite prompt answers over an open quest card, and prompts with no speaker drop the Magic Rock heading"
    }
   ]
  },
- "tests": 905,
+ "tests": 910,
  "generatedAt": "2026-11-12"
 }

@@ -48,7 +48,7 @@ import { platformYNear } from '../location-navigation.js?v=90fca5cc';
 import { hasRaceDispenser } from '../races.js?v=ab22a079';
 import { OVERLAY_USES, locationRect, playCountdownArt, playWindowOverlay } from '../overlays.js?v=4e81f749';
 import { textureFromUrl } from '../textures.js?v=92ec53cd';
-import { grantMoodXp } from '../mood-xp.js?v=958e7680';
+import { grantMoodXp } from '../mood-xp.js?v=22648ec0';
 import { saveStore } from '../save-store.js?v=04420633';
 
 const PIG_CLASS = 'test_game_starter';

@@ -50,7 +50,7 @@
  * Solo is untouched.
  */
 
-import { addItem, countItem, ensureItem, removeItem, ITEM_CATALOG, itemIcon } from '../inventory.js?v=2bd5b93e';
+import { addItem, countItem, ensureItem, removeItem, ITEM_CATALOG, itemIcon } from '../inventory.js?v=f49c8998';
 import { teleportEnergyCost } from '../teleportation.js?v=e95cf7cb';
 import {
   PARTY_GUESTS,
@@ -82,7 +82,7 @@ import {
   teleporterPhase,
 } from '../party-spaces.js?v=dcc45819';
 import { frameTexture, sourceFromUrl, textureFromUrl } from '../textures.js?v=92ec53cd';
-import { loseEnergy } from '../metabolics.js?v=8504134e';
+import { loseEnergy } from '../metabolics.js?v=1383e6fd';
 import { MP_PARTY_TEXT, MP_SPACE_STREET_RE, kickVerb, mpActivationBlock, normalizeSpace, partyFromSpace } from '../party-spaces-mp.js?v=3821c723';
 
 export const PARTY_FEATURE_ID = 'party-spaces';

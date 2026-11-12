@@ -17,7 +17,7 @@ import { existsSync, readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { MUSICBLOCK_CATALOG, MUSICBLOCK_SERIES, MUSICBLOCK_MONTH_MS, MUSICBLOCK_REPLAY_MS, createMusicblockState, playMusicblock } from '../../public/js/musicblocks.js?v=51fa975b';
+import { MUSICBLOCK_CATALOG, MUSICBLOCK_SERIES, MUSICBLOCK_MONTH_MS, MUSICBLOCK_REPLAY_MS, createMusicblockState, playMusicblock } from '../../public/js/musicblocks.js?v=765ac56d';
 import { GAME_DAY_MS } from '../../public/js/game-day.js?v=cf9afac0';
 import { ITEM_BASE_COSTS } from '../../public/js/store-catalog.js?v=74b56af3';
 

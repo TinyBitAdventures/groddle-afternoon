@@ -21,12 +21,12 @@ import {
 import { NOSTALGIA_BOOT_STREETS } from '../public/js/ancestral-nostalgia-data.js?v=0adb9184';
 import { BOOT_SOURCE_TSIDS, buildRows, render } from '../tools/build-ancestral-nostalgia.mjs';
 import { ancestralClock, stealChanceForSeconds } from '../public/js/juju-bandits.js?v=6cf92f4f';
-import { applyBuff, createBuffState, hasBuff, removeBuff } from '../public/js/buffs.js?v=fd309a67';
+import { applyBuff, createBuffState, hasBuff, removeBuff } from '../public/js/buffs.js?v=c499cf1a';
 import { getBuffCatalog, loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=10b118dd';
 import { IMAGINATION_UPGRADES, buildDeck, upgradeStatus } from '../public/js/imagination.js?v=1bdfd77c';
 import { isOfferedInRemake, remakeStatus } from '../public/js/imagination-remake.js?v=c37ad887';
 import { POTION_TEXT, ancestralCheck } from '../public/js/potions.js?v=4f4c996d';
-import { FEATURES } from '../public/js/features/index.js?v=2f165ad4';
+import { FEATURES } from '../public/js/features/index.js?v=a77fee37';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const GSJS = join(root, '../glitch-GameServerJS');

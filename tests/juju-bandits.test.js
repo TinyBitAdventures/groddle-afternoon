@@ -31,10 +31,10 @@ import {
   stealChanceForSeconds,
   withinReach,
 } from '../public/js/juju-bandits.js?v=6cf92f4f';
-import { DROP_TABLES } from '../public/js/drop-tables.js?v=16e12632';
-import { REMAKE_QUEST_NPCS } from '../public/js/quest-offers.js?v=d76abcd0';
-import { OFFER_OVERRIDES } from '../public/js/quest-rooms/catalog.js?v=d77d3d17';
-import { FEATURES } from '../public/js/features/index.js?v=2f165ad4';
+import { DROP_TABLES } from '../public/js/drop-tables.js?v=8bcf111f';
+import { REMAKE_QUEST_NPCS } from '../public/js/quest-offers.js?v=956218ac';
+import { OFFER_OVERRIDES } from '../public/js/quest-rooms/catalog.js?v=87636ba5';
+import { FEATURES } from '../public/js/features/index.js?v=a77fee37';
 import { remakeStatus } from '../public/js/imagination-remake.js?v=c37ad887';
 
 const spike = join(dirname(fileURLToPath(import.meta.url)), '..');

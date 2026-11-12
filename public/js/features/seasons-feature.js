@@ -31,12 +31,12 @@
  *     pack), seasonTrophy, seasonPlaced.
  */
 
-import { addItem, countItem, ensureItem, removeItem, registerItemUse, ITEM_CATALOG } from '../inventory.js?v=2bd5b93e';
+import { addItem, countItem, ensureItem, removeItem, registerItemUse, ITEM_CATALOG } from '../inventory.js?v=f49c8998';
 import { dametimeParts, getGameDayKey } from '../game-day.js?v=cf9afac0';
-import { setSeasonalSeedCheck as setGardenSeasonGate } from '../garden.js?v=17d048df';
-import { setSeasonalSeedCheck as setMasterGardenSeasonGate } from '../garden.js?v=17d048df';
-import { setSeasonalRecipeCheck } from '../making.js?v=a6b3716c';
-import { getToolCondition, copyForVerb, copyTag, migrateClassTag, setCopyTag, takeToolCopy } from '../tools.js?v=5f482998';
+import { setSeasonalSeedCheck as setGardenSeasonGate } from '../garden.js?v=92436baf';
+import { setSeasonalSeedCheck as setMasterGardenSeasonGate } from '../garden.js?v=92436baf';
+import { setSeasonalRecipeCheck } from '../making.js?v=5338cc7e';
+import { getToolCondition, copyForVerb, copyTag, migrateClassTag, setCopyTag, takeToolCopy } from '../tools.js?v=62b37c51';
 
 /*
  * Each lit pumpkin's phrases are its own (pumpkin_lit_*.js this.phrases, 380-391, at most 3), kept
@@ -73,12 +73,12 @@ function takePumpkin(engine, cls, copy) {
 }
 import { landingY, nearestSurfaceY } from '../walk-surface.js?v=106bfdc5';
 import { isStandable } from '../street-model.js?v=b6cb6a4e';
-import { isBatterflyHabitat } from '../animal-husbandry.js?v=7929bf5e';
-import { emblemCostFor } from '../shrines.js?v=21cad7cb';
-import { rollDropTable } from '../drop-tables.js?v=16e12632';
+import { isBatterflyHabitat } from '../animal-husbandry.js?v=3017f786';
+import { emblemCostFor } from '../shrines.js?v=a190faea';
+import { rollDropTable } from '../drop-tables.js?v=8bcf111f';
 import { openNoteView, noteViewOpen } from '../note-view.js?v=eca7de52';
-import { payDrop } from './drops-feature.js?v=fc237a8b';
-import { fireflyJarCounts, setFireflyJar } from './resource-nodes-feature.js?v=451781d3';
+import { payDrop } from './drops-feature.js?v=29255d3b';
+import { fireflyJarCounts, setFireflyJar } from './resource-nodes-feature.js?v=2cc2384a';
 import { SEASON_DATA } from '../seasons-data.js?v=b5174bc9';
 import {
   CANDY_CLASSES,

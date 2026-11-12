@@ -18,10 +18,10 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { loadContentCatalogsFromDir, resetContentCatalogs } from '../public/js/content-catalogs.js?v=10b118dd';
-import { assignQuest, createQuestState } from '../public/js/quests.js?v=2951073f';
-import { createAchievementState } from '../public/js/achievements.js?v=552ecb19';
-import { countItem, createInventory } from '../public/js/inventory.js?v=2bd5b93e';
-import { createPlayerSave, restorePlayerSave } from '../public/js/player-save.js?v=03381399';
+import { assignQuest, createQuestState } from '../public/js/quests.js?v=40c71a37';
+import { createAchievementState } from '../public/js/achievements.js?v=e4e5edd0';
+import { countItem, createInventory } from '../public/js/inventory.js?v=f49c8998';
+import { createPlayerSave, restorePlayerSave } from '../public/js/player-save.js?v=cfc8af81';
 import { STATION_X, stationScreen, surfaceStation } from '../public/js/subway.js?v=44d1a09f';
 import {
   LEGALIZE_BACK_ALLEY_TSID,
@@ -36,7 +36,7 @@ import {
   ensureLegalizeWayBack,
   legalizeReloadLocation,
   legalizeWayBack,
-} from '../public/js/legalize-it.js?v=62ab57ac';
+} from '../public/js/legalize-it.js?v=0649416e';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const game = fs.readFileSync(path.join(root, 'public/game.js'), 'utf8');

@@ -93,21 +93,21 @@ import {
   expireSolo,
   tankOf,
   TAKEN_KEEP,
-} from '../home-machines.js?v=adb7fb43';
-import { CALL_PLAYER_LINES, MACHINE_HITBOX, MACHINE_SKILLS, collectLine, machineJobMs, machineMadeLine, runningSoundKey, takeJobIngredients } from '../machine-rooms.js?v=1b76a98c';
+} from '../home-machines.js?v=5d556192';
+import { CALL_PLAYER_LINES, MACHINE_HITBOX, MACHINE_SKILLS, collectLine, machineJobMs, machineMadeLine, runningSoundKey, takeJobIngredients } from '../machine-rooms.js?v=38a8d973';
 import { MACHINE_ART_SHEETS, LOW_FUEL_BUBBLE_MS, LOW_FUEL_LINE, isLowFuel, machineFrame, machineSheetDef, roomMachineState } from '../machine-art.js?v=93e29c2d';
-import { FUEL_CELL, FUEL_PER_CELL, MAX_FUEL } from '../machines.js?v=590a7d4a';
-import { ITEM_CATALOG, addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=2bd5b93e';
-import { receiveToolCopy, takeToolCopy } from '../tools.js?v=5f482998';
-import { RECIPE_CATALOG } from '../making.js?v=a6b3716c';
+import { FUEL_CELL, FUEL_PER_CELL, MAX_FUEL } from '../machines.js?v=112d1492';
+import { ITEM_CATALOG, addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=f49c8998';
+import { receiveToolCopy, takeToolCopy } from '../tools.js?v=62b37c51';
+import { RECIPE_CATALOG } from '../making.js?v=5338cc7e';
 import { getSkillCatalog } from '../content-catalogs.js?v=10b118dd';
-import { createBackYardState, homeStreetLayout, normalizeCultivationState } from '../home-cultivation.js?v=f1242621';
-import { readVisitScene } from '../neighbours-mp.js?v=8d032640';
+import { createBackYardState, homeStreetLayout, normalizeCultivationState } from '../home-cultivation.js?v=1e2d2b2d';
+import { readVisitScene } from '../neighbours-mp.js?v=f469e970';
 import { saveStore } from '../save-store.js?v=04420633';
 import { textureFromUrl } from '../textures.js?v=92ec53cd';
 import { createSheetLoader } from '../sprite-sheets.js?v=32c58aef';
-import { STREET_GROUND_Y, homesFeature } from './homes-feature.js?v=38327b85';
-import { payAltarBonus } from './machine-rooms-feature.js?v=a2c71b37';
+import { STREET_GROUND_Y, homesFeature } from './homes-feature.js?v=9deee49e';
+import { payAltarBonus } from './machine-rooms-feature.js?v=bec7e1c5';
 import { worldToScreen } from '../street-model.js?v=b6cb6a4e';
 import { nearestSurfaceY } from '../walk-surface.js?v=106bfdc5';
 

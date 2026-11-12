@@ -68,12 +68,12 @@
  * waiting, or kept when no teller was in range).
  */
 
-import { addItem, ensureItem } from '../inventory.js?v=2bd5b93e';
-import { isPoisoned } from '../tree-poison.js?v=5ceea244';
+import { addItem, ensureItem } from '../inventory.js?v=f49c8998';
+import { isPoisoned } from '../tree-poison.js?v=0cfbc3fb';
 import { GREEDY_ACTS, GREEDY_STREET_SPIRIT_QUEST_ID, canOfferGreedyFirst } from '../greedy-street-spirit.js?v=4d19b0e9';
-import { questStatus } from '../quest-offers.js?v=d76abcd0';
-import { questDoneAt } from '../quests.js?v=2951073f';
-import { grantMoodXp } from '../mood-xp.js?v=958e7680';
+import { questStatus } from '../quest-offers.js?v=956218ac';
+import { questDoneAt } from '../quests.js?v=40c71a37';
+import { grantMoodXp } from '../mood-xp.js?v=22648ec0';
 import { CONVERSATIONS, TELLERS } from '../conversations-data.js?v=f11b7e02';
 import {
   CONVERSATION_RULES,

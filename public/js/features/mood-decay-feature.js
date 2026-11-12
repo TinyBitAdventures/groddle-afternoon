@@ -33,9 +33,9 @@ import {
 } from '../mood-decay.js?v=49175993';
 import { loseMood, moodMax } from '../metabolics.js?v=1383e6fd';
 import { GENTLE_ISLAND_TSIDS, isNewxpSceneTsid } from '../newxp.js?v=45ae5f37';
-import { homesFeature } from './homes-feature.js?v=38327b85';
-import { newxpFeature } from './newxp-feature.js?v=4300277b';
-import { meditationFeature } from './meditation-feature.js?v=58fe00b1';
+import { homesFeature } from './homes-feature.js?v=9deee49e';
+import { newxpFeature } from './newxp-feature.js?v=ccb2447e';
+import { meditationFeature } from './meditation-feature.js?v=6bbcb224';
 
 export const MOOD_DECAY_FEATURE_ID = 'mood-decay';
 const BEAM_ME_DOWN_TSID = 'PUZZLESCENE_BEAM_ME_DOWN';

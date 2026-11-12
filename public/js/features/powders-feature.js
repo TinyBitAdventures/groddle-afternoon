@@ -91,10 +91,10 @@
  *   powderCharges, powderNoNo, powderTreesGrown.
  */
 
-import { addItem, countItem, removeItem } from '../inventory.js?v=2bd5b93e';
+import { addItem, countItem, removeItem } from '../inventory.js?v=f49c8998';
 import { getGameDayKey } from '../game-day.js?v=cf9afac0';
-import { isPooped } from '../hell.js?v=816e231d';
-import { metabolicGain, moodMax, loseEnergy, loseMood } from '../metabolics.js?v=8504134e';
+import { isPooped } from '../hell.js?v=07cc312d';
+import { metabolicGain, moodMax, loseEnergy, loseMood } from '../metabolics.js?v=1383e6fd';
 import {
   POWDERS,
   POWDER_TEXT,
@@ -111,14 +111,14 @@ import {
   sniffNoNo,
   sprinkleHallowed,
   usePowderCharge,
-} from '../powders.js?v=fbbbc0d8';
-import { itemVerbAchievementCounters } from '../item-verbs.js?v=1e20fa7d';
-import { copyChargesLeft, copyFromLedger, keepsCopies, spendCopyCharge, verbCopy } from '../copy-charges.js?v=7b1d0bd9';
-import { migrateClassValue } from '../tools.js?v=5f482998';
-import { DEAD_TRANT_CLASSES } from '../patches.js?v=e034b56d';
-import { COPY as SHARED_PATCH_COPY } from '../shared-patches.js?v=b675a257';
-import { hellFeature } from './hell-feature.js?v=c528dffe';
-import { grantMoodXp } from '../mood-xp.js?v=958e7680';
+} from '../powders.js?v=4ed5ad28';
+import { itemVerbAchievementCounters } from '../item-verbs.js?v=994d3d4f';
+import { copyChargesLeft, copyFromLedger, keepsCopies, spendCopyCharge, verbCopy } from '../copy-charges.js?v=e4ead2c7';
+import { migrateClassValue } from '../tools.js?v=62b37c51';
+import { DEAD_TRANT_CLASSES } from '../patches.js?v=5f333fdb';
+import { COPY as SHARED_PATCH_COPY } from '../shared-patches.js?v=c9773d7b';
+import { hellFeature } from './hell-feature.js?v=facbdc94';
+import { grantMoodXp } from '../mood-xp.js?v=22648ec0';
 import { displayTopOf, playSheetOverlay } from '../overlay-art.js?v=a6561207';
 import { pcOverlayPoint, playItemOverlay } from '../item-overlay.js?v=97ed2ba0';
 import { POWDER_SHAKE, powderShakerSheet } from '../powder-shakers.js?v=fcd18855';

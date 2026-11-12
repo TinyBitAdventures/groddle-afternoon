@@ -3,7 +3,7 @@
  * pack verbs with the card, one at a time (scraper.js 70-128, super_scraper.js). The setting is
  * pc.partyScraping in the save; js/resource-nodes.js reads it.
  */
-import { partyScrapingVerb, runPartyScrapingVerb, SCRAPER_TOOLS } from '../resource-nodes.js?v=e8971a67';
+import { partyScrapingVerb, runPartyScrapingVerb, SCRAPER_TOOLS } from '../resource-nodes.js?v=9b20788d';
 
 export const partyScrapingFeature = {
   id: 'party-scraping',

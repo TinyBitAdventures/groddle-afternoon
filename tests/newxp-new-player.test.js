@@ -16,12 +16,12 @@ import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-import { newPlayerInventory, newPlayerStats } from '../public/js/new-player.js?v=d9fa4f61';
-import { createInventory } from '../public/js/inventory.js?v=2bd5b93e';
-import { PARADISE_TICKET_IDS } from '../public/js/paradise-flight.js?v=6d8739e1';
-import { createPlayerSave, parsePlayerSave, restorePlayerSave, serializePlayerSave, normalizePlayerSnapshot } from '../public/js/player-save.js?v=03381399';
+import { newPlayerInventory, newPlayerStats } from '../public/js/new-player.js?v=f76dcbaf';
+import { createInventory } from '../public/js/inventory.js?v=f49c8998';
+import { PARADISE_TICKET_IDS } from '../public/js/paradise-flight.js?v=fdc76095';
+import { createPlayerSave, parsePlayerSave, restorePlayerSave, serializePlayerSave, normalizePlayerSnapshot } from '../public/js/player-save.js?v=cfc8af81';
 import { cloudsLayout, SCENE_TSIDS, GENTLE_ISLAND } from '../public/js/newxp.js?v=45ae5f37';
-import { newxpFeature, __newxpTest, cloudEdge, cloudStepOff, cloudStepOffAny, CLOUD_BODY_DEPTH, CLOUD_EDGE_CLEAR, CLOUD_END_PUFFS } from '../public/js/features/newxp-feature.js?v=4300277b';
+import { newxpFeature, __newxpTest, cloudEdge, cloudStepOff, cloudStepOffAny, CLOUD_BODY_DEPTH, CLOUD_EDGE_CLEAR, CLOUD_END_PUFFS } from '../public/js/features/newxp-feature.js?v=ccb2447e';
 
 const root = join(import.meta.dirname, '..');
 const read = (rel) => readFileSync(join(root, rel), 'utf8');

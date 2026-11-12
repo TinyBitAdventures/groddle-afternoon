@@ -9,7 +9,7 @@
  * - items/wood_tree.js: Wood Tree tending gates
  */
 
-import { TOOL_CONDITION_CATALOG, WATERING_CAN_TOOLS, canUseTool, firstWorkingTool, useToolCondition } from './tools.js?v=5f482998';
+import { TOOL_CONDITION_CATALOG, WATERING_CAN_TOOLS, canUseTool, firstWorkingTool, useToolCondition } from './tools.js?v=62b37c51';
 import { fruitCapacityAt, fruitProductionAt } from './trants.js?v=4d6f5593';
 import { scaledToolWear, toolWearMultiplier } from './imagination-effects.js?v=70169933';
 import { metabolicGain, moodMax, loseEnergy, loseMood } from './metabolics.js?v=1383e6fd';

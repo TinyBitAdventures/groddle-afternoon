@@ -27,7 +27,7 @@
  * (street_spirit_groceries and the rest), so they do not take one yet.
  */
 
-import { addItem, removeItem, countItem } from '../inventory.js?v=2bd5b93e';
+import { addItem, removeItem, countItem } from '../inventory.js?v=f49c8998';
 import { OVERLAY_USES, playOverlay } from '../overlays.js?v=4e81f749';
 import { displayTopOf, itemstackOverlayPoint } from '../overlay-art.js?v=a6561207';
 

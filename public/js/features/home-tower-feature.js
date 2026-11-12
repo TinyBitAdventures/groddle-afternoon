@@ -49,9 +49,9 @@
  */
 
 import { playOverlay } from '../overlays.js?v=4e81f749';
-import { ITEM_CATALOG, countItem, ensureItem, itemIcon } from '../inventory.js?v=2bd5b93e';
-import { canUseTool, useToolCondition } from '../tools.js?v=5f482998';
-import { acceptOffer, npcQuestOffers } from '../quest-offers.js?v=d76abcd0';
+import { ITEM_CATALOG, countItem, ensureItem, itemIcon } from '../inventory.js?v=f49c8998';
+import { canUseTool, useToolCondition } from '../tools.js?v=62b37c51';
+import { acceptOffer, npcQuestOffers } from '../quest-offers.js?v=956218ac';
 import { getQuestCatalog } from '../content-catalogs.js?v=10b118dd';
 import { XP_FOR_LEVEL } from '../progression.js?v=72b2b22a';
 import {

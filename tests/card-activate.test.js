@@ -12,10 +12,10 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { loadContentCatalogsFromDir, resetContentCatalogs } from '../public/js/content-catalogs.js?v=10b118dd';
-import { assignQuest, createQuestState } from '../public/js/quests.js?v=2951073f';
-import { createAchievementState } from '../public/js/achievements.js?v=552ecb19';
-import { addItem, countItem, createInventory } from '../public/js/inventory.js?v=2bd5b93e';
-import { buyDocument } from '../public/js/bureaucracy.js?v=34629a6c';
+import { assignQuest, createQuestState } from '../public/js/quests.js?v=40c71a37';
+import { createAchievementState } from '../public/js/achievements.js?v=e4e5edd0';
+import { addItem, countItem, createInventory } from '../public/js/inventory.js?v=f49c8998';
+import { buyDocument } from '../public/js/bureaucracy.js?v=b71fdd01';
 import {
   LEGALIZE_ALREADY_HAVE,
   LEGALIZE_CARD_ID,
@@ -25,7 +25,7 @@ import {
   ensureLegalizeState,
   legalizeOnAccepted,
   qualificationVerb,
-} from '../public/js/legalize-it.js?v=62ab57ac';
+} from '../public/js/legalize-it.js?v=0649416e';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 

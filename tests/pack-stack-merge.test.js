@@ -17,7 +17,7 @@ import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-import { ITEM_CATALOG, isToolItem, removeItem } from '../public/js/inventory.js?v=2bd5b93e';
+import { ITEM_CATALOG, isToolItem, removeItem } from '../public/js/inventory.js?v=f49c8998';
 import { PACK_CAPACITY, layoutPack, moveStack, stackMaxOf } from '../public/js/pack-slots.js?v=4a36968a';
 
 const root = join(import.meta.dirname, '..');

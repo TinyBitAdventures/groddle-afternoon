@@ -17,9 +17,9 @@ import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { ITEM_CATALOG, isToolItem, removeItem } from '../public/js/inventory.js?v=2bd5b93e';
+import { ITEM_CATALOG, isToolItem, removeItem } from '../public/js/inventory.js?v=f49c8998';
 import { PACK_CAPACITY, layoutPack } from '../public/js/pack-slots.js?v=4a36968a';
-import { bagsFeature } from '../public/js/features/bags-feature.js?v=faf7b587';
+import { bagsFeature } from '../public/js/features/bags-feature.js?v=b61da5c5';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const OPTS = { capacity: PACK_CAPACITY, catalog: ITEM_CATALOG, isTool: isToolItem, order: Object.keys(ITEM_CATALOG) };

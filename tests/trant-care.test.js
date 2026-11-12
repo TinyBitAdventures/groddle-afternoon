@@ -11,7 +11,7 @@ import {
   resolveTrantCarePackage,
   quoteTrantCare,
   performTrantCare,
-} from '../public/js/trant-care.js?v=1a452321';
+} from '../public/js/trant-care.js?v=b4c09d17';
 import {
   createTrantState,
   livingTrantPlanForStreet,
@@ -23,8 +23,8 @@ import {
   createToolConditionState,
   getToolCondition,
   setToolRemaining,
-} from '../public/js/tools.js?v=5f482998';
-import { getVerbsFor, runVerb } from '../public/content.js?v=86dcdcde';
+} from '../public/js/tools.js?v=62b37c51';
+import { getVerbsFor, runVerb } from '../public/content.js?v=172fd167';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const publicDir = path.join(root, 'public');
