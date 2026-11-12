@@ -108,5 +108,7 @@ describe('placement', () => {
     const jump = block.match(/\.touch-jump \{[^}]*width: (\d+)px; height: (\d+)px;/);
     assert.ok(Number(jump[1]) >= 44 && Number(jump[2]) >= 44);
     assert.match(block, /touch-action: none/);
+    // The start card (z-world, under the HUD) hides them until it closes.
+    assert.match(block, /#game-root:has\(> #overlay:not\(\.hidden\)\) \.touch-controls \{ display: none; \}/);
   });
 });

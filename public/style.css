@@ -1467,6 +1467,8 @@ kbd {
   .start-actions:has([data-nx-skipstart]) #start-customize-btn { grid-column: 1; grid-row: auto; }
   .start-actions .nx-start p { grid-row: auto; order: 1; }
 }
+  [data-ui="modern"] #game-root:has(> #overlay:not(.hidden)) :is(.pack-bar, .street-nameplate) { visibility: hidden; }
+}
 
 #hud {
   display: grid;
@@ -13619,6 +13621,8 @@ html.stage-pinned[data-ui="modern"] header.top-bar { left: calc(var(--sp-5) + va
   -webkit-user-select: none; user-select: none; -webkit-touch-callout: none;
 }
 body.is-booting .touch-controls { display: none; }
+/* The start card (z-world) is under the HUD: the stick and Jump wait until it closes. */
+#game-root:has(> #overlay:not(.hidden)) .touch-controls { display: none; }
 .touch-stick {
   position: absolute; bottom: 0;
   left: max(var(--sp-4), env(safe-area-inset-left, 0px));
