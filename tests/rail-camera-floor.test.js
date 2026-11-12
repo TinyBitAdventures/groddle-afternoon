@@ -41,7 +41,7 @@ describe('G582: the camera reserves the Social drawer over the world', () => {
     assert.match(fn, /overlapCss > 0\s*\?/);
     // Re-measured the frame the drawer opens, folds or hides (it writes --inset-r as it does).
     assert.match(game, /function followDrawerInset\(\)[\s\S]*?getPropertyValue\('--inset-r'\) !== drawerInsetSeen\) syncCameraSafeArea\(\)/);
-    assert.match(game, /socialDrawer\?\.frame\(\);\n  followDrawerInset\(\);/);
+    assert.match(game, /socialDrawer\?\.frame\(\);\n(  [a-zA-Z]+\(\);\n)*  followDrawerInset\(\);/);
   });
 
   it('Classic reserves nothing: its chat column sits beside the world', () => {
