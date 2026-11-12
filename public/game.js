@@ -4,11 +4,11 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=5d55594c';
 import { createErrorOnce, createFeatureHost } from './js/feature-host.js?v=06bb8b74';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=eafd7025';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=d13a4db7';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl, drawTileArt } from './js/enter-chooser.js?v=4a3ea327';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
-import { createVogOverlay } from './js/vog-overlay.js?v=d137399c';
+import { createVogOverlay } from './js/vog-overlay.js?v=31dcbbae';
 import { createPromptStack } from './js/prompt-stack.js?v=f7ca1ed0';
 import { createWindowStack } from './js/window-stack.js?v=a7104f02';
 import { HOG_HAUL_SPLASH, createGameSplash, splashFor } from './js/game-splash.js?v=f60a5067';
@@ -799,7 +799,7 @@ import { landingY, stackRestY, walkSurfaceY } from './js/walk-surface.js?v=106bf
 import { holdCloseToFloor } from './js/slope-walk.js?v=9af1e505';
 import { JUMP_SPEED, MAX_TICK_FRAMES, WALK_MAX, avatarGround, coastX, frameSteps, stepAvatar, steerAccel, steerX, streetPhysicsExtras } from './js/avatar-step.js?v=43b1182e';
 import { createUserPath, stepUserPath } from './js/user-path.js?v=8880557f';
-import { climbGoalStep, installTouchControls, isPhoneDevice, touchPrompt, touchTapPlan } from './js/touch-controls.js?v=89321eeb';
+import { TOUCH_JUMP_EVENT, climbGoalStep, installTouchControls, isPhoneDevice, touchPrompt, touchTapPlan } from './js/touch-controls.js?v=b6071ea4';
 import { installPinchZoom } from './js/touch-pinch.js?v=6cd34a65';
 import { FAILED_LINE, inVerbReach, movingLine, verbRange, walkOverEnd, walkOverGoals } from './js/walk-over.js?v=277ab977';
 import { hellBuffDesc, isInHell } from './js/hell.js?v=87b075a8';
@@ -32234,7 +32234,10 @@ async function main() {
       root: document.getElementById('game-root') || document.body,
       press: (k) => keys.add(k),
       release: (k) => keys.delete(k),
-      jump: () => queueJump(jumpState, movementNow()),
+      jump: () => {
+        queueJump(jumpState, movementNow());
+        window.dispatchEvent(new CustomEvent(TOUCH_JUMP_EVENT));
+      },
       // A quick tap on the stick's corner on a thing behind it (an animal under it) is a tap on that thing.
       tapThrough: (x, y) => {
         const b = app.canvas.getBoundingClientRect();

@@ -9,7 +9,8 @@ import assert from 'node:assert/strict';
 import { createFeatureHost } from '../public/js/feature-host.js?v=06bb8b74';
 import { createInventory, countItem } from '../public/js/inventory.js?v=5be47371';
 import { bindToolInventory, createToolConditionState } from '../public/js/tools.js?v=5f482998';
-import { meditationFeature } from '../public/js/features/meditation-feature.js?v=60d4c43c';
+import { levitateHint, meditationFeature } from '../public/js/features/meditation-feature.js?v=36624ab9';
+import { TOUCH_JUMP_EVENT } from '../public/js/touch-controls.js?v=b6071ea4';
 import { teleportationFeature } from '../public/js/features/teleportation-feature.js?v=bf2b1aab';
 
 function fakeEngine(overrides = {}) {
@@ -97,6 +98,34 @@ describe('meditation feature', () => {
     assert.equal(verbs.find((v) => v.id === 'radiate').enabled, false);
     assert.equal(meditationFeature.runPackVerb('focusing_orb', 'radiate', engine), true);
     assert.deepEqual(engine.toasts, ["There's nobody near enough for you to radiate."]);
+  });
+});
+
+describe('levitation on a phone', () => {
+  it('the Jump button lifts in the air like Space, and the toast names Jump on a phone', () => {
+    assert.equal(levitateHint(true), 'Levitating! Tap Jump in the air to float higher.');
+    assert.equal(levitateHint(false), 'Levitating! Tap Space in the air to float higher.');
+    const listeners = {};
+    const prevWindow = globalThis.window;
+    globalThis.window = { addEventListener: (type, fn) => { (listeners[type] ||= []).push(fn); } };
+    try {
+      const engine = fakeEngine({ learned: ['meditativearts_1', 'meditativearts_2', 'meditativearts_3', 'levitation_1'] });
+      engine.physics = () => ({ jump: 1 });
+      meditationFeature.init(engine);
+      meditationFeature.restore({ levitateUntil: Date.now() + 60_000 });
+      assert.ok(listeners[TOUCH_JUMP_EVENT]?.length, 'the feature listens for the touch Jump');
+      engine.player.onGround = false;
+      engine.player.vy = 2;
+      for (const fn of listeners[TOUCH_JUMP_EVENT]) fn();
+      assert.ok(engine.player.vy < 0, 'a touch Jump in the air lifts');
+      const lifted = engine.player.vy;
+      engine.player.vy = 2;
+      for (const fn of listeners.keydown) fn({ key: ' ', repeat: false });
+      assert.equal(engine.player.vy, lifted, 'the same lift Space gives');
+    } finally {
+      globalThis.window = prevWindow;
+      meditationFeature.restore({});
+    }
   });
 });
 

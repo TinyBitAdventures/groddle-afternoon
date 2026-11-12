@@ -29,8 +29,8 @@ import {
   FOCUS_POCUS_QUEST,
   bestFocusGain,
   focusPocusHint,
-} from '../public/js/meditation.js?v=f0c00590';
-import { meditationFeature } from '../public/js/features/meditation-feature.js?v=60d4c43c';
+} from '../public/js/meditation.js?v=96f23682';
+import { meditationFeature } from '../public/js/features/meditation-feature.js?v=36624ab9';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const CONTENT = join(here, '../public/assets/content');
@@ -223,6 +223,10 @@ describe('Focus Pocus through the Focusing Orb verbs', () => {
     assert.equal(engine.pc.energy, 0);
     assert.ok(!calls.events.some(([c]) => c === 'meditation_gain_24'));
     assert.equal(done(calls), false);
+    // focusing_orb.js 821-826: the end line reads what the gate let through.
+    const end = calls.activity.find((l) => l.includes('That was relaxing.'));
+    assert.match(end, /\+0 energy/);
+    assert.doesNotMatch(end, /\+[1-9]\d* energy/);
   });
 
   it('says nothing about Focus Pocus off the quest, or once a focus reached 24', () => {

@@ -18,7 +18,7 @@ import {
   knobOffset,
   stickKeys,
   touchTapPlan,
-} from '../public/js/touch-controls.js?v=89321eeb';
+} from '../public/js/touch-controls.js?v=b6071ea4';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const game = readFileSync(join(root, 'public/game.js'), 'utf8');
@@ -67,7 +67,7 @@ describe('the stick', () => {
     assert.ok(k.x > 0 && k.y > 0);
   });
   it('holds the same keys a keyboard does, and Jump queues the Space key\'s jump', () => {
-    assert.match(game, /press: \(k\) => keys\.add\(k\),\s*release: \(k\) => keys\.delete\(k\),\s*jump: \(\) => queueJump\(jumpState, movementNow\(\)\),/);
+    assert.match(game, /press: \(k\) => keys\.add\(k\),\s*release: \(k\) => keys\.delete\(k\),\s*jump: \(\) => \{\s*queueJump\(jumpState, movementNow\(\)\);\s*window\.dispatchEvent\(new CustomEvent\(TOUCH_JUMP_EVENT\)\);\s*\},/);
     assert.match(mod, /press\(' '\);\s*jump\(\);/);
   });
 });

@@ -23,7 +23,7 @@ import {
   refusalText,
 } from '../public/js/player-im.js?v=da51888c';
 import { playerImFeature } from '../public/js/features/player-im-feature.js?v=c672a934';
-import { FEATURES } from '../public/js/features/index.js?v=eafd7025';
+import { FEATURES } from '../public/js/features/index.js?v=d13a4db7';
 import { mountSocialDrawer } from '../public/js/ui/social-drawer.js?v=9e7d9382';
 import { createNotifier } from '../public/js/notify.js?v=1fb97b21';
 import { memoryStore, page } from './social-fake-dom.js';
@@ -106,7 +106,7 @@ describe('IMs: wiring', () => {
   });
 
   it('a meditation breaks on an IM from someone else, unless Tune Out The Chatter (player.js 1851-1858)', async () => {
-    const { imInterrupts, chatInterrupts } = await import('../public/js/radiance-mp.js?v=86e14962');
+    const { imInterrupts, chatInterrupts } = await import('../public/js/radiance-mp.js?v=b3137af4');
     assert.equal(imInterrupts([]), true);
     assert.equal(imInterrupts(['meditative_arts_less_distraction']), false);
     assert.equal(chatInterrupts(['meditative_arts_less_distraction']), true);

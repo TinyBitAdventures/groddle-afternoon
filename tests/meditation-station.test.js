@@ -11,7 +11,7 @@ import {
   normalizeStationState,
   recordStationSession,
   stationMessage,
-} from '../public/js/meditation-station.js?v=75b2cbf1';
+} from '../public/js/meditation-station.js?v=24e033d8';
 
 const root = join(import.meta.dirname, '..', 'public');
 
@@ -50,6 +50,18 @@ describe('Meditation Station', () => {
     assert.equal(r.wrongStreet, true);
     assert.equal(r.days, 1);
     assert.match(stationMessage(r), /Your meditation station is Empty Via 5/);
+  });
+
+  it('a short first session never pins the station: the next street takes over until a day counts', () => {
+    let r = practise(normalizeStationState(), 10, 20, 'GIF1Q3IQM7122SP');
+    assert.equal(r.state.tsid, 'GIF1Q3IQM7122SP');
+    r = practise(r.state, 30, 30);
+    assert.equal(r.wrongStreet, false);
+    assert.equal(r.state.tsid, 'GA5101HF7F429V5');
+    assert.equal(r.state.todaySeconds, 30, 'seconds on the old street do not carry over');
+    r = practise(r.state, 30, 30);
+    assert.equal(r.counted, true);
+    assert.equal(r.days, 1);
   });
 
   it('starts over after more than 6 game days, wherever you meditate next', () => {

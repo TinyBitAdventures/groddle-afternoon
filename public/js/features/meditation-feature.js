@@ -49,7 +49,7 @@ import {
   normalizeStationState,
   recordStationSession,
   stationMessage,
-} from '../meditation-station.js?v=75b2cbf1';
+} from '../meditation-station.js?v=24e033d8';
 import {
   FOCUS_POCUS_FLAG,
   FOCUS_POCUS_NEED,
@@ -66,11 +66,12 @@ import {
   isLevitating,
   listOrbVerbs,
   meditationChatter,
+  meditationEndMessage,
   normalizeMeditationState,
   rollMeditationDay,
   startLevitation,
   startMeditation,
-} from '../meditation.js?v=f0c00590';
+} from '../meditation.js?v=96f23682';
 import { energyMax, metabolicGain, moodMax, loseEnergy, loseMood } from '../metabolics.js?v=8504134e';
 import { levitationCards } from '../imagination-effects.js?v=70169933';
 import { applyPhysicsAdjustments, physicsMultipliers } from '../location-events.js?v=05663361';
@@ -78,6 +79,7 @@ import { sourceFromUrl } from '../textures.js?v=92ec53cd';
 import { denseSprite } from '../sprite-dense.js?v=2a0ce07a';
 import { rainbowSound, showRainbow } from '../overlays.js?v=4e81f749';
 import { moodScaledXp } from '../mood-xp.js?v=958e7680';
+import { TOUCH_JUMP_EVENT, isPhoneDevice } from '../touch-controls.js?v=b6071ea4';
 import { createMinnAccount } from '../minn-account.js?v=c15f0ecf';
 import { getSkillPackageOverride } from '../skill-packages.js?v=bfb87281';
 import {
@@ -97,7 +99,7 @@ import {
   radiationRank,
   radiatorEnd,
   radiatorLine,
-} from '../radiance-mp.js?v=86e14962';
+} from '../radiance-mp.js?v=b3137af4';
 
 export const MEDITATION_FEATURE_ID = 'meditation';
 /** metabolics_get_max_energy: the energy tank (100 plus Energy Tank cards). */
@@ -357,7 +359,10 @@ function end(engine, reason = 'timer', at = Date.now()) {
     pc.imagination = (pc.imagination || 0) + imgTotal;
     pc.xp = (pc.xp || 0) + imgTotal;
   }
-  engine.pushActivity(out.message);
+  // The line says what the gate let through (focusing_orb.js 821-829).
+  engine.pushActivity(energy === out.energy && mood === out.mood
+    ? out.message
+    : meditationEndMessage(out.opener, done, { mood, energy, img: out.img, imgBonus: out.imgBonus || 0 }));
   if (out.imgBonus) {
     const name = out.imgBonusCard === 'meditative_arts_imagination' ? 'Enlightenment' : 'Focused Imagination';
     engine.pushActivity(`${name}: a flash of insight. +${out.imgBonus} iMG`);
@@ -430,21 +435,31 @@ function levitate(engine) {
   // G289: metabolics_lose_energy, nothing lost while dead (inc_metabolics.js 108-122).
   loseEnergy(engine.pc, out.energyCost);
   engine.pushActivity(out.message);
-  engine.toast('Levitating! Tap Space in the air to float higher.', 2400);
+  engine.toast(levitateHint(isPhoneDevice()), 2400);
   engine.updateHud();
   engine.save();
   publish(engine, true);
   return true;
 }
 
+/** The levitation toast: a phone has no Space key, its Jump button lifts (TOUCH_JUMP_EVENT). */
+export function levitateHint(phone = false) {
+  return `Levitating! Tap ${phone ? 'Jump' : 'Space'} in the air to float higher.`;
+}
+
 /** levitation_by_meditation jetpack: a jump press in the air lifts you again. */
-function onKeyDown(event) {
+function liftInAir() {
   const engine = engineRef;
-  if (!engine?.started || event.repeat || !JUMP_KEYS.has(event.key)) return;
+  if (!engine?.started) return;
   if (!isLevitating(state, Date.now()) || engine.busy()) return;
   const player = engine.player;
   if (!player || player.onGround) return;
   player.vy = Math.min(player.vy, -7.4 * levitationPhysics(engine).jump);
+}
+
+function onKeyDown(event) {
+  if (event.repeat || !JUMP_KEYS.has(event.key)) return;
+  liftInAir();
 }
 
 function demoSetup(engine) {
@@ -939,6 +954,8 @@ export const meditationFeature = {
       stackMax: ORB_ITEM.stackMax,
     });
     window.addEventListener('keydown', onKeyDown);
+    // TOUCH: the phone's Jump button lifts the same way Space does.
+    window.addEventListener(TOUCH_JUMP_EVENT, liftInAir);
     publish(engine, true);
   },
 

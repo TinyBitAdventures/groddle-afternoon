@@ -51,7 +51,7 @@ import {
   sessionPackage,
   startLevitation,
   startMeditation,
-} from '../public/js/meditation.js?v=f0c00590';
+} from '../public/js/meditation.js?v=96f23682';
 import { skillPackageDetails } from '../public/js/skill-packages.js?v=bfb87281';
 import { strikeDamageFor } from '../public/js/rook-attack.js?v=c12e825f';
 import { createMineRock, mineRock, tickMineRock } from '../public/js/mining.js?v=12a6f1bd';

@@ -506,15 +506,8 @@ export function finishMeditation(state, session, ctx = {}) {
   };
   const reachedZen = !zen && hasZen(s, ctx.dayKey, tank);
 
-  let message = `${pick(MEDITATION_TEXT.end, rng)} That was relaxing.`;
-  // The source adds the card bonus to the standing and focus-energy lines only.
-  if (session.kind === 'standing') {
-    message += ` +${moodGained} mood, +${energyGained} energy, +${imgGained + imgBonusGained} iMG`;
-  } else if (session.focus === 'energy') {
-    message += ` +${energyGained} energy, +${imgGained + imgBonusGained} iMG`;
-  } else {
-    message += ` +${moodGained} mood, +${imgGained} iMG`;
-  }
+  const opener = pick(MEDITATION_TEXT.end, rng);
+  const message = meditationEndMessage(opener, session, { mood: moodGained, energy: energyGained, img: imgGained, imgBonus: imgBonusGained });
 
   // Quest counters / flags and the focusing_orb:meditation_time badge (minutes).
   const events = [];
@@ -544,9 +537,27 @@ export function finishMeditation(state, session, ctx = {}) {
     zen,
     reachedZen,
     sound: full ? 'MEDITATION_SUCCESS' : 'HORRIBLE_SOUND',
+    opener,
     message,
     events,
   };
+}
+
+/**
+ * focusing_orb.js 821-829: the end line is built from what metabolics_add_energy and _mood
+ * returned, so a gain the dead or Super Pooped gate refused reads +0. The source adds the card
+ * bonus to the standing and focus-energy lines only.
+ */
+export function meditationEndMessage(opener, session, { mood = 0, energy = 0, img = 0, imgBonus = 0 } = {}) {
+  let message = `${opener} That was relaxing.`;
+  if (session.kind === 'standing') {
+    message += ` +${mood} mood, +${energy} energy, +${img + imgBonus} iMG`;
+  } else if (session.focus === 'energy') {
+    message += ` +${energy} energy, +${img + imgBonus} iMG`;
+  } else {
+    message += ` +${mood} mood, +${img} iMG`;
+  }
+  return message;
 }
 
 /**

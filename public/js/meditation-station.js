@@ -6,8 +6,9 @@
  * requirement (counter meditation_time, 60), which any minute of meditation
  * anywhere satisfies; the server never tracked the street or the days. The
  * remake runs the quest as written:
- *  - the first street you meditate on while the quest is active becomes your
- *    station;
+ *  - the first street where you meditate 60 seconds in a game day while the
+ *    quest is active becomes your station (a shorter session elsewhere before
+ *    that day counts does not pin the station);
  *  - a game day counts once you have meditated 60 seconds there that day
  *    (sessions add up);
  *  - more than 6 game days between counted days breaks the practice: the count
@@ -55,6 +56,10 @@ export function recordStationSession(prev, { tsid, label = '', seconds = 0, day 
     // Practice broken: start again, wherever you are now.
     s = normalizeStationState({});
     out.reset = true;
+  }
+  if (s.tsid && s.tsid !== at && s.days === 0) {
+    // No day has counted yet, so nothing is pinned: the station moves here.
+    s = normalizeStationState({});
   }
   if (s.tsid && s.tsid !== at) {
     return { state: s, ...out, wrongStreet: true, days: s.days, done: s.days >= STATION_DAYS };

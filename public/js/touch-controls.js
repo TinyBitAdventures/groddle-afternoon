@@ -22,6 +22,12 @@ export const STICK_DEAD = 12;
 /** Past this ratio of one axis to the other, the stick holds that axis alone (a ladder climb never hops off). */
 export const STICK_AXIS_LOCK = 1.7;
 
+/**
+ * game.js sends this window event on each Jump press, so a rule that reads the Space key's edge
+ * in the air (the levitation lift, js/features/meditation-feature.js) hears Jump too.
+ */
+export const TOUCH_JUMP_EVENT = 'groddle:touch-jump';
+
 /** The phone gate's device (play/index.html): only a phone gets the touch controls. */
 export function isPhoneDevice(win = globalThis) {
   return win?.GRODDLE_DEVICE === 'phone';
