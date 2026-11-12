@@ -3139,6 +3139,13 @@
 :root[data-ui="classic"] .social-drawer .social-find-input:focus-visible { outline: none; box-shadow: 0 0 0 2px var(--c-classic-focus); }
 /* === end activity-find === */
 
+/* === reportsmenu (lane) === */
+/* REPORTSMENU (js/ui/report-row-menu.js): a report row's menu sits in the Reports window, whose layer lets
+   presses through outside its card; the menu takes them, and its rows keep the 2012 highlight, not the window's ring. */
+:root[data-ui="classic"] #bug-report-panel .ctx-menu { pointer-events: auto; }
+:root[data-ui="classic"] #bug-report-panel .ctx-menu .verb-choice:focus-visible { box-shadow: none; }
+/* === end reportsmenu === */
+
 /* == TICKETS == Reports (js/ui/reports-sheet.js, online only) as a 2012 window: the Quest Log's frame
    (Dialog.as, WindowBorder.as, BigDialog.as) centred in the viewport, the white head with its 20 px
    title and the red cross, the grey well between two rules, the white footer with the minor buttons;

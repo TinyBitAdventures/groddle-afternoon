@@ -2752,9 +2752,14 @@
   "deployed": "2026-11-12"
  },
  "git": {
-  "commits": 1722,
+  "commits": 1723,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-12",
+    "kind": "new",
+    "text": "Report rows open a right-click menu for quick actions"
+   },
    {
     "date": "2026-11-12",
     "kind": "improve",
@@ -2869,14 +2874,9 @@
     "date": "2026-11-12",
     "kind": "fix",
     "text": "The newest arrow or A/D you press steers, so a key the game still thinks is held never freezes you"
-   },
-   {
-    "date": "2026-11-12",
-    "kind": "fix",
-    "text": "The Butler's Leave it button stays in view under a long pick list"
    }
   ]
  },
- "tests": 854,
+ "tests": 855,
  "generatedAt": "2026-11-12"
 }

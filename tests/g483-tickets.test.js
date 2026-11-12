@@ -16,9 +16,9 @@ import { homedir } from 'node:os';
 import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { SITE_DIR, sitePath, skipWithoutSite } from '../tools/repos.mjs';
-import { REPORT_MAX, REPORT_PICTURE, REPORT_TEXT, STATUS_WORDS, UNREAD_POLL_MS, base64Size, canEditFirst, createReportsApi, pictureRefused, pictureSize, pictureSrc, refusalWords, reportFromHash, ticketLine, unreadCount, whenWords } from '../public/js/reports.js?v=342441b9';
-import { mountReportsSheet } from '../public/js/ui/reports-sheet.js?v=120accc0';
-import { BUG_TEXT, badgeFor, bugReportFeature, capturePicture } from '../public/js/features/bug-report-feature.js?v=5f2124b7';
+import { REPORT_MAX, REPORT_PICTURE, REPORT_TEXT, STATUS_WORDS, UNREAD_POLL_MS, base64Size, canEditFirst, createReportsApi, pictureRefused, pictureSize, pictureSrc, refusalWords, reportFromHash, ticketLine, unreadCount, whenWords } from '../public/js/reports.js?v=751c111c';
+import { mountReportsSheet } from '../public/js/ui/reports-sheet.js?v=d1f07c11';
+import { BUG_TEXT, badgeFor, bugReportFeature, capturePicture } from '../public/js/features/bug-report-feature.js?v=d93d29dc';
 
 const root = join(import.meta.dirname, '..');
 const read = (p) => readFileSync(join(root, p), 'utf8');
@@ -530,7 +530,7 @@ describe('the site (groddle-afternoon-site)', { skip: skipWithoutSite }, () => {
   it('a player reaches only their own tickets: every route that names one reads it through mine()', () => {
     const php = src('src/Tickets.php');
     const routes = [...php.matchAll(/#\[Route\(Method::(\w+), '([^']+)', policy: new Policy\(Access::(\w+)\)\)\]\s*public function (\w+)\(([^)]*)\): Response\s*\{([\s\S]*?)\n    \}/g)];
-    assert.deepEqual(routes.map((r) => `${r[1]} ${r[2]}`), ['Get /groddle/v1/tickets', 'Get /groddle/v1/tickets/unread', 'Get /groddle/v1/tickets/{id:\\d+}', 'Post /groddle/v1/tickets', 'Post /groddle/v1/tickets/{id:\\d+}/messages', 'Post /groddle/v1/tickets/{id:\\d+}/close', 'Post /groddle/v1/tickets/{id:\\d+}/edit']);
+    assert.deepEqual(routes.map((r) => `${r[1]} ${r[2]}`), ['Get /groddle/v1/tickets', 'Get /groddle/v1/tickets/unread', 'Get /groddle/v1/tickets/{id:\\d+}', 'Post /groddle/v1/tickets', 'Post /groddle/v1/tickets/{id:\\d+}/messages', 'Post /groddle/v1/tickets/{id:\\d+}/close', 'Post /groddle/v1/tickets/{id:\\d+}/edit', 'Post /groddle/v1/tickets/{id:\\d+}/unread']);
     for (const r of routes) {
       assert.equal(r[3], 'SignedIn', r[2]);
       if (r[2].includes('{id')) assert.match(r[6], /\$row = \$this->mine\(\$me, \(int\) \$id\);/, `${r[2]} goes through mine()`);

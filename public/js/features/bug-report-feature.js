@@ -60,8 +60,8 @@
  * window.groddleBugReport.open('list'|'new'), .openTicket(id), .refresh() in multiplayer.
  */
 
-import { createReportsApi, REPORT_PICTURE, REPORT_TEXT, UNREAD_POLL_MS, base64Size, pictureSize, reportFromHash } from '../reports.js?v=342441b9';
-import { mountReportsSheet } from '../ui/reports-sheet.js?v=120accc0';
+import { createReportsApi, REPORT_PICTURE, REPORT_TEXT, UNREAD_POLL_MS, base64Size, pictureSize, reportFromHash } from '../reports.js?v=751c111c';
+import { mountReportsSheet } from '../ui/reports-sheet.js?v=d1f07c11';
 
 export const BUG_REPORT_FEATURE_ID = 'bug-report';
 
@@ -437,6 +437,8 @@ const STYLE = `
 [data-ui="modern"] #bug-report-panel .reports-btn.is-quiet:hover { background: var(--surface-hover); }
 [data-ui="modern"] #bug-report-panel :is(button, textarea):focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
 [data-ui="modern"] #bug-report-panel button:disabled { opacity: 0.55; cursor: default; }
+/* REPORTSMENU: a row's menu (js/ui/report-row-menu.js) keeps the shared menu's ring inside its rows. */
+[data-ui="modern"] #bug-report-panel .ctx-menu .vm-row:focus-visible { outline-offset: -2px; }
 [data-ui="modern"] #bug-report-panel .reports-body { display: flex; flex-direction: column; padding-top: var(--space-2); scrollbar-width: auto; scrollbar-color: auto; }
 [data-ui="modern"] #bug-report-panel .reports-body::-webkit-scrollbar { width: 10px; }
 [data-ui="modern"] #bug-report-panel .reports-body::-webkit-scrollbar-track { background: var(--surface-sunken); border-radius: var(--radius-pill); }
@@ -580,6 +582,8 @@ function createSession(engine, errors) {
     capture: ({ ui = false, world = null } = {}) => (ui ? capturePictureWithUi(engine, document, REPORT_PICTURE, world?.frame) : capturePicture(engine)),
     toast: (t, ms) => engine.toast?.(t, ms),
     opener: () => btn,
+    // REPORTSMENU: the rows' menu (js/ui/report-row-menu.js) names itself in the canvas data.
+    setData: (k, v) => engine.setData?.(k, v),
     onState: ({ state, view, unread, last }) => {
       engine.setData?.('bugReport', state);
       engine.setData?.('bugReportLast', last);
@@ -643,11 +647,15 @@ function createSession(engine, errors) {
   document.addEventListener('visibilitychange', () => { if (!document.hidden) poll(); });
 
   // A reply email's link: /play/online/#report=<id> opens that thread once.
-  const linked = reportFromHash(globalThis.location?.hash);
-  if (linked) {
+  // REPORTSMENU: the rows' Copy link gives the same link; pasted into this tab, only the hash changes.
+  const openLinked = () => {
+    const linked = reportFromHash(globalThis.location?.hash);
+    if (!linked) return;
     try { history.replaceState(history.state, '', location.pathname + location.search); } catch { /* the hash stays */ }
     sheet.openTicket(linked);
-  }
+  };
+  openLinked();
+  globalThis.addEventListener?.('hashchange', openLinked);
 
   return { ...sheet, placeLift, stop: () => { clearInterval(timer); clearInterval(liftTimer); }, get state() { return sheet.state; }, get view() { return sheet.view; }, get unread() { return sheet.unread; } };
 }

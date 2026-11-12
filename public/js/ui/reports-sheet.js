@@ -56,11 +56,17 @@
  * and a red count on a tab holding a reply you have not read. A real tablist: one tab in the Tab
  * order, the arrow keys, Home and End move between them (and show them). The list itself is in the
  * site's order (js/reports.js sortReports): unread first, then answered, open, working, closed.
+ *
+ * REPORTSMENU (Austin 2026-11-12): each row has a menu (js/ui/report-row-menu.js): right-click, a
+ * long press, or Shift+F10 or the Menu key on a focused row; Open, Add a message (Reopen when
+ * closed), Close report, Mark as read or unread, Copy link. Up and Down (Home, End) move between
+ * the rows, Enter opens one. A redrawn list keeps the focused row focused.
  */
 
-import { REPORT_FILTER_MIN, REPORT_MAX, REPORT_TABS, REPORT_TEXT as T, STATUS_WORDS, canEditFirst, inTab, matchesReport, pictureRefused, pictureSrc, refusalWords, showsReplied, sortReports, tabCounts, tabLabel, ticketLine, unreadCount, whenWords } from '../reports.js?v=342441b9';
+import { REPORT_FILTER_MIN, REPORT_MAX, REPORT_TABS, REPORT_TEXT as T, STATUS_WORDS, canEditFirst, inTab, matchesReport, pictureRefused, pictureSrc, refusalWords, showsReplied, sortReports, tabCounts, tabLabel, ticketLine, unreadCount, whenWords } from '../reports.js?v=751c111c';
 import { focusBack } from './focus-return.js?v=da190597';
 import { lightboxLink } from './picture-lightbox.js?v=0d2814c8';
+import { REPORT_MENU_TEXT, bindReportRowMenu, copyText, reportLink } from './report-row-menu.js?v=cab07ec1';
 
 /** How long Send waits for a picture still drawing before it sends the world-only one (ms). */
 export const PICTURE_WAIT_MS = 6000;
@@ -91,9 +97,10 @@ function el(doc, tag, attrs = {}, text = '') {
 /**
  * @param {{ doc?: Document, host: HTMLElement, api: ReturnType<import('../reports.js').createReportsApi>,
  *   context?: () => object, capture?: () => ({ url: string, width: number, height: number }|null|Promise<object|null>), onState?: (s: { state: string, view: string, unread: number, ticket: number, last: string }) => void,
- *   toast?: (text: string, ms?: number) => void, opener?: () => HTMLElement|null, now?: () => number, pictureWait?: number }} opts
+ *   toast?: (text: string, ms?: number) => void, opener?: () => HTMLElement|null, now?: () => number, pictureWait?: number,
+ *   setData?: (k: string, v: string) => void }} opts  setData: the rows' menu's QA data (canvas data contextMenu, reportMenu).
  */
-export function mountReportsSheet({ doc = globalThis.document, host, api, context = () => ({}), capture = () => null, onState = () => {}, toast = () => {}, opener = () => null, now = () => Date.now(), pictureWait = PICTURE_WAIT_MS, uiIdle = UI_IDLE_MS } = {}) {
+export function mountReportsSheet({ doc = globalThis.document, host, api, context = () => ({}), capture = () => null, onState = () => {}, toast = () => {}, opener = () => null, now = () => Date.now(), pictureWait = PICTURE_WAIT_MS, uiIdle = UI_IDLE_MS, setData = () => {} } = {}) {
   let state = 'closed';
   let view = 'list';
   let tickets = [];
@@ -281,13 +288,17 @@ export function mountReportsSheet({ doc = globalThis.document, host, api, contex
     filter.hidden = tickets.length < REPORT_FILTER_MIN && !filter.value;
     const q = filter.hidden ? '' : filter.value.trim();
     const shown = shownTickets();
+    // REPORTSMENU: the row with focus keeps it through the redraw (an action from its menu, a refresh).
+    const focusedLi = doc.activeElement?.closest?.('.reports-row');
+    const focusedId = Number(focusedLi?.dataset?.ticket) || 0;
+    const focusedAt = focusedId ? [...list.children].indexOf(focusedLi) : -1;
     noMatch.hidden = !(q && tickets.length && !shown.length);
     tabEmpty.hidden = !(!q && tickets.length && !shown.length);
     drawTabs();
     list.replaceChildren(...shown.map((t) => {
       const li = e('li', { class: 'reports-row', 'data-ticket': t.id, 'data-unread': t.unread ? '1' : null });
       const replied = showsReplied(t);
-      const btn = e('button', { type: 'button', class: 'reports-row-btn', 'aria-label': `${t.subject}, ${STATUS_WORDS[t.status] || t.status}${replied ? `, ${T.replied}` : ''}${t.unread ? `, ${T.unreadDot}` : ''}` });
+      const btn = e('button', { type: 'button', class: 'reports-row-btn', 'aria-haspopup': 'menu', 'aria-keyshortcuts': 'Shift+F10', 'aria-label': `${t.subject}, ${STATUS_WORDS[t.status] || t.status}${replied ? `, ${T.replied}` : ''}${t.unread ? `, ${T.unreadDot}` : ''}` });
       const top = e('span', { class: 'reports-row-top' });
       if (t.unread) top.append(e('span', { class: 'reports-dot', title: T.unreadDot, 'aria-hidden': 'true' }));
       top.append(e('span', { class: 'reports-subject' }, t.subject || T.sheet));
@@ -302,6 +313,17 @@ export function mountReportsSheet({ doc = globalThis.document, host, api, contex
       return li;
     }));
     empty.hidden = tickets.length > 0 || loading;
+    if (focusedId && list.contains?.(doc.activeElement) === false) {
+      // Gone from this tab (closed under Open): the row now in its place, else the tab, else the title.
+      const btns = list.querySelectorAll?.('.reports-row-btn') || [];
+      const to = rowBtn(focusedId) || btns[Math.min(focusedAt, btns.length - 1)] || (tabs.hidden ? null : tabBtns.get(tab)) || title;
+      to?.focus?.({ preventScroll: true });
+    }
+  }
+
+  /** REPORTSMENU: a report's row button as drawn now, or null. */
+  function rowBtn(id) {
+    return list.querySelector?.(`[data-ticket="${Number(id)}"] .reports-row-btn`) || null;
   }
 
   function drawThread() {
@@ -361,6 +383,7 @@ export function mountReportsSheet({ doc = globalThis.document, host, api, contex
   }
 
   function show(next) {
+    if (next !== 'list') rowMenu.close();
     view = next;
     listView.hidden = view !== 'list';
     threadView.hidden = view !== 'thread';
@@ -599,6 +622,7 @@ export function mountReportsSheet({ doc = globalThis.document, host, api, contex
 
   function close() {
     if (state === 'sending') return;
+    rowMenu.close();
     closePicture();
     stopIdle();
     state = 'closed';
@@ -779,6 +803,88 @@ export function mountReportsSheet({ doc = globalThis.document, host, api, contex
     }
   }
 
+  /** A ticket the site answered with, put in the list in its row's place. */
+  function keepTicket(next) {
+    if (!next?.id) return;
+    const row = tickets.find((t) => t.id === next.id);
+    if (row) Object.assign(row, next);
+    if (ticket?.id === next.id) ticket = { ...ticket, ...next };
+  }
+
+  /** REPORTSMENU: the row menu's actions (js/ui/report-row-menu.js), on the report `t` as the list holds it. */
+  async function rowAction(id, t) {
+    const M = REPORT_MENU_TEXT;
+    if (state !== 'open' || !t?.id) return;
+    if (id === 'open') { openTicket(t.id); return; }
+    if (id === 'reply' || id === 'reopen') {
+      await openTicket(t.id);
+      if (view !== 'thread' || ticket?.id !== t.id) return;
+      // The body is the one scroller (ticket 21): after the thread's own scroll to the newest message,
+      // it brings the reply box into sight.
+      const raf = globalThis.requestAnimationFrame || ((f) => setTimeout(f, 16));
+      raf(() => setTimeout(() => {
+        const r = reply.getBoundingClientRect?.();
+        const b = body.getBoundingClientRect?.();
+        if (r && b && r.bottom > b.bottom) body.scrollTop += r.bottom - b.bottom + 8;
+        reply.focus({ preventScroll: true });
+      }, 0));
+      if (id === 'reopen') say(M.reopenHint);
+      return;
+    }
+    if (id === 'copy') {
+      const url = reportLink(t.id, doc.defaultView?.location || globalThis.location);
+      if (url && (await copyText(url, doc))) say(M.copied);
+      else say(M.copyFailed(url), true);
+      return;
+    }
+    try {
+      if (id === 'close') {
+        const r = await api.close(t.id);
+        keepTicket(r?.ticket);
+        drawList();
+        say(T.closedDone);
+      } else if (id === 'read') {
+        // Opening a report is what reads it (GET tickets/{id}); the thread itself is not shown.
+        const r = await api.thread(t.id);
+        keepTicket(r?.ticket || { ...t, unread: false });
+        setUnread(unreadCount(tickets));
+        drawList();
+        say(M.readDone);
+      } else if (id === 'unread') {
+        const r = await api.markUnread(t.id);
+        keepTicket(r?.ticket);
+        setUnread(Number.isFinite(r?.unread) ? r.unread : unreadCount(tickets));
+        drawList();
+        say(M.unreadDone);
+      }
+    } catch (err) {
+      say(refusalWords(err), true);
+    }
+  }
+
+  const rowMenu = bindReportRowMenu({
+    doc,
+    host: panel,
+    list,
+    ticketOf: (id) => tickets.find((t) => t.id === id) || null,
+    rowFor: (id) => rowBtn(id),
+    onPick: (id, t) => rowAction(id, t),
+    setData,
+  });
+
+  // REPORTSMENU: Up and Down (Home, End) go from row to row; Enter (a row is a button) opens it.
+  list.addEventListener('keydown', (ev) => {
+    const at = ev.target?.closest?.('.reports-row-btn');
+    if (!at || ev.altKey || ev.ctrlKey || ev.metaKey || ev.shiftKey) return;
+    const btns = [...(list.querySelectorAll?.('.reports-row-btn') || [])];
+    const i = btns.indexOf(at);
+    if (i < 0) return;
+    const next = { ArrowDown: Math.min(btns.length - 1, i + 1), ArrowUp: Math.max(0, i - 1), Home: 0, End: btns.length - 1 }[ev.key];
+    if (next === undefined) return;
+    ev.preventDefault();
+    btns[next].focus({ preventScroll: false });
+  });
+
   // Typing here is not walking: keys stay in the sheet (as the old form's did).
   for (const kind of ['keydown', 'keyup', 'keypress']) {
     panel.addEventListener(kind, (ev) => {
@@ -848,6 +954,8 @@ export function mountReportsSheet({ doc = globalThis.document, host, api, contex
     get state() { return state; },
     get view() { return view; },
     get unread() { return unread; },
+    /** REPORTSMENU: a row's menu (QA): open(id, { at, keys }), close(), ticket(). */
+    rowMenu,
     /** The picture's lightbox while it is open (js/ui/picture-lightbox.js), else null. */
     get lightbox() { return lightbox?.open ? lightbox : null; },
   };

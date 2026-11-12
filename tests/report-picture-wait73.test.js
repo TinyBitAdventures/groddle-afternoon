@@ -7,9 +7,9 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { UI_IDLE_MS, mountReportsSheet, previewWhich } from '../public/js/ui/reports-sheet.js?v=120accc0';
-import { REPORT_TEXT as T } from '../public/js/reports.js?v=342441b9';
-import { capturePicture, captureFrame, standardStyleNames, viewRows } from '../public/js/features/bug-report-feature.js?v=5f2124b7';
+import { UI_IDLE_MS, mountReportsSheet, previewWhich } from '../public/js/ui/reports-sheet.js?v=d1f07c11';
+import { REPORT_TEXT as T } from '../public/js/reports.js?v=751c111c';
+import { capturePicture, captureFrame, standardStyleNames, viewRows } from '../public/js/features/bug-report-feature.js?v=d93d29dc';
 
 const root = join(import.meta.dirname, '..');
 const read = (p) => readFileSync(join(root, p), 'utf8');

@@ -18,7 +18,7 @@ import { dirname, join, relative, resolve } from 'node:path';
 import vm from 'node:vm';
 import { sitePath, skipWithoutSite } from '../tools/repos.mjs';
 import { createMinnAccount } from '../public/js/minn-account.js?v=c15f0ecf';
-import { REPORT_PICTURE } from '../public/js/reports.js?v=342441b9';
+import { REPORT_PICTURE } from '../public/js/reports.js?v=751c111c';
 import {
   DEVICE_KEY,
   PHONE_TEXT,
@@ -35,7 +35,7 @@ import {
   snippetOf,
   unreadLetters,
   whereWords,
-} from '../public/js/phone/companion-data.js?v=f920e291';
+} from '../public/js/phone/companion-data.js?v=d05fd33d';
 
 const pub = join(import.meta.dirname, '..', 'public');
 const read = (p) => readFileSync(join(pub, p), 'utf8');

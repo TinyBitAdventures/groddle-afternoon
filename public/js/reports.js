@@ -321,5 +321,7 @@ export function createReportsApi({ baseUri, fetch: fetchFn = globalThis.fetch?.b
     close: (id) => call(`tickets/${Number(id)}/close`, { method: 'POST' }),
     /** { ticket, messages, editable }: new words for the report's first message, until an administrator reads it. */
     edit: (id, message) => call(`tickets/${Number(id)}/edit`, { method: 'POST', body: { message } }),
+    /** { ticket, unread }: the new reply dot back on a report an administrator wrote in last (the list's menu, js/ui/report-row-menu.js). */
+    markUnread: (id) => call(`tickets/${Number(id)}/unread`, { method: 'POST' }),
   };
 }
