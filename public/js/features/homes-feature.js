@@ -217,9 +217,9 @@ import { TOWER_CHASSIS, TOWER_CONFIG, TOWER_DOOR_DX, TOWER_GEO, TOWER_PROTO, nor
 import { drawTowerElevator, drawTowerExit, towerApi, visitorTowerView } from './home-tower-feature.js?v=f574b637';
 import { pieceUrl, roomPieces, surfaceAt, swatchPiece, wallTargetAt } from '../home-wallpaper.js?v=f1969400';
 import { wantsHiresDecos } from '../deco-hires.js?v=9877af94';
-import { resourceNodesFeature } from './resource-nodes-feature.js?v=76204e31';
-import { patchesFeature } from './patches-feature.js?v=3b1f207e';
-import { GROWN_TREE_LABELS, createPlot, growTree, plotLabel } from '../patches.js?v=7604d7f2';
+import { resourceNodesFeature } from './resource-nodes-feature.js?v=41cadcfe';
+import { patchesFeature } from './patches-feature.js?v=5d9c8add';
+import { GROWN_TREE_LABELS, createPlot, growTree, plotLabel } from '../patches.js?v=41ddb3a0';
 import { WOTD_DEPLETE_MS, WOTD_TEXT, nearestPourTarget, pourButton, pourConditions, pourConfirmText } from '../wine-pour.js?v=6daa23a7';
 import { WOTD_TOOL, pourApproach, pourDropTip } from '../wine-pour-fx.js?v=364e22d2';
 import { XP_FOR_LEVEL } from '../progression.js?v=33462eaa';

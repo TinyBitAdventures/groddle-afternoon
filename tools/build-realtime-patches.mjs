@@ -64,11 +64,11 @@ import {
   WOOD_TREE_MATURITY_MAP,
   maturityGrowChance,
   plantingHub,
-} from '../public/js/patches.js?v=7604d7f2';
+} from '../public/js/patches.js?v=41ddb3a0';
 import { ARBOROLOGY_HARVEST, TRANT_META } from '../public/js/trants.js?v=1b3c8ae3';
 import { TRANT_CARE_PACKAGES } from '../public/js/trant-care.js?v=9527ff03';
-import { WOOD_TREE_HARVEST } from '../public/js/woodcutting.js?v=9a2039d1';
-import { soilCountsForStreet, soilSpawnPlan } from '../public/js/features/patches-feature.js?v=3b1f207e';
+import { WOOD_TREE_HARVEST } from '../public/js/woodcutting.js?v=5235a01a';
+import { soilCountsForStreet, soilSpawnPlan } from '../public/js/features/patches-feature.js?v=5d9c8add';
 import { isZoneTsid } from '../public/js/zone-streets.js?v=b40010d5';
 import { creatureRequests, setCreatureEcology } from './build-realtime-objects.mjs';
 

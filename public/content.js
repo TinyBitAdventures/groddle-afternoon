@@ -53,7 +53,7 @@ import {
   ensureAnimalState,
   listAnimalFeedOptions,
   feedAnimal,
-} from './js/animals.js?v=6a9c5420';
+} from './js/animals.js?v=4e488834';
 import {
   quoteAnimalKinship,
   performAnimalKinship,
@@ -70,7 +70,7 @@ import {
   quoteWoodTreeHarvest,
   harvestWoodTree,
   woodTreeStatusLabel,
-} from './js/woodcutting.js?v=9a2039d1';
+} from './js/woodcutting.js?v=5235a01a';
 import { findWorkingRookTool } from './js/rook-woods.js?v=9621a723';
 import {
   HERDKEEPING,
@@ -81,7 +81,7 @@ import {
   namingVerbs,
   queuePlops,
   startIncubation,
-} from './js/animal-husbandry.js?v=03bf65c2';
+} from './js/animal-husbandry.js?v=42d43e2b';
 import { loseEnergy, metabolicGain, moodMax } from './js/metabolics.js?v=8504134e';
 import { SET_FREE, setFreeVerbState } from './js/animal-set-free.js?v=3b194fca';
 import { BUTTER_UP, SING_TO, butterUpVerbState, butterUpChicken, singToVerbState, singToButterfly } from './js/animal-flattery.js?v=63001f58';

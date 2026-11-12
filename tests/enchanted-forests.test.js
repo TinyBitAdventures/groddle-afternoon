@@ -32,18 +32,18 @@ import {
   petEnchantedSeedling,
   polylineY,
   seedlingRemainingMs,
-} from '../public/js/enchanted-forests.js?v=d986bff5';
+} from '../public/js/enchanted-forests.js?v=22ff871e';
 import {
   WOOD_TREE_HARVEST,
   harvestWoodTree,
   plankYieldForMaturity,
   quoteWoodTreeHarvest,
   woodTreeStatusLabel,
-} from '../public/js/woodcutting.js?v=9a2039d1';
-import { noteWoodTreeCare } from '../public/js/patches.js?v=7604d7f2';
-import { isTreeTarget } from '../public/js/features/tree-death-feature.js?v=a8032746';
-import { enchantedForestFeature, hollowTrees, treeScreenSpots } from '../public/js/features/enchanted-forest-feature.js?v=f145d193';
-import { FEATURES } from '../public/js/features/index.js?v=4472591f';
+} from '../public/js/woodcutting.js?v=5235a01a';
+import { noteWoodTreeCare } from '../public/js/patches.js?v=41ddb3a0';
+import { isTreeTarget } from '../public/js/features/tree-death-feature.js?v=26beb5b3';
+import { enchantedForestFeature, hollowTrees, treeScreenSpots } from '../public/js/features/enchanted-forest-feature.js?v=86abd23a';
+import { FEATURES } from '../public/js/features/index.js?v=1f70bb1f';
 
 const spike = join(dirname(fileURLToPath(import.meta.url)), '..');
 const streets = join(spike, 'public/assets/streets');

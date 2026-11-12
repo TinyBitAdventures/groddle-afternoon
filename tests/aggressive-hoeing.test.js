@@ -9,10 +9,10 @@ import { readFileSync, existsSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { AGGRESSIVE_HOEING_VERBS, aggressiveHoeingVerb, clearPlot, createGarden, gardenActionProfile, getPlot, runAggressiveHoeingVerb } from '../public/js/garden.js?v=788f2dbb';
-import { plotVerbs, resolveTendPackage } from '../public/js/patches.js?v=7604d7f2';
+import { plotVerbs, resolveTendPackage } from '../public/js/patches.js?v=41ddb3a0';
 import { createToolConditionState, setToolRemaining, getToolCondition } from '../public/js/tools.js?v=5f482998';
 import { createInventory } from '../public/js/inventory.js?v=60dfc9ca';
-import { getVerbsFor, runVerb } from '../public/content.js?v=5e5c70c4';
+import { getVerbsFor, runVerb } from '../public/content.js?v=9f222124';
 import { normalizePlayerSnapshot } from '../public/js/player-save.js?v=a7d1da05';
 import { aggressiveHoeingFeature as feature } from '../public/js/features/aggressive-hoeing-feature.js?v=b8440eb4';
 

@@ -19,7 +19,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 import * as kit from '../public/js/quest-rooms/kit.js?v=6ec6de2e';
-import { BARS_X, BARS_WALL, FLOOR, PART_3, PATCH_X, SPAWN, W, cellBarriers, room } from '../public/js/quest-rooms/penalty.js?v=3a2c1ec4';
+import { BARS_X, BARS_WALL, FLOOR, PART_3, PATCH_X, SPAWN, W, cellBarriers, room } from '../public/js/quest-rooms/penalty.js?v=0d4d0299';
 
 describe('1. the bars stop you', () => {
   it('a wall just inside the bars, floor to roof, that the engine reads (pc_perm -1)', () => {

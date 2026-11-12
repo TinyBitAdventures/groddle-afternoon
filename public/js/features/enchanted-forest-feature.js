@@ -33,8 +33,8 @@
 import { slugsFromEffects } from '../speech-slugs.js?v=130338f9';
 import { worldToScreen } from '../street-model.js?v=b6cb6a4e';
 import { frameTexture, textureFromUrl } from '../textures.js?v=f024bd6a';
-import { ensureWoodTreeState, resetWoodTreeDay, woodTreeStatusLabel } from '../woodcutting.js?v=9a2039d1';
-import { noteWoodTreeCare } from '../patches.js?v=7604d7f2';
+import { ensureWoodTreeState, resetWoodTreeDay, woodTreeStatusLabel } from '../woodcutting.js?v=5235a01a';
+import { noteWoodTreeCare } from '../patches.js?v=41ddb3a0';
 import {
   ENCHANTED_FORESTS,
   ENCHANTED_WOOD_TREE,
@@ -46,7 +46,7 @@ import {
   normalizeEnchantedTree,
   petEnchantedSeedling,
   seedlingStatusLabel,
-} from '../enchanted-forests.js?v=d986bff5';
+} from '../enchanted-forests.js?v=22ff871e';
 
 export const ENCHANTED_FEATURE_ID = 'enchanted-forest';
 const SEEDLING_URL = 'assets/sprites/soil/patch-seedling@3x.webp';

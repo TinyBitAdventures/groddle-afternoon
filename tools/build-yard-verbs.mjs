@@ -53,12 +53,12 @@ import { requireSite, sitePath } from './repos.mjs';
 export const OUT = sitePath('data', 'yard-verbs.json');
 
 export async function yardVerbsJson() {
-  const { YARD_POOL, YARD_AK_ITEMS } = await import('../public/js/yard-verbs-mp.js?v=4c8f70d9');
+  const { YARD_POOL, YARD_AK_ITEMS } = await import('../public/js/yard-verbs-mp.js?v=c9d8bb4b');
   const { ANIMAL_KINSHIP_PACKAGES } = await import('../public/js/animal-kinship.js?v=f91347e9');
   const { ARBOROLOGY_HARVEST, TRANT_META } = await import('../public/js/trants.js?v=1b3c8ae3');
-  const { SEASONED_BEANS, SEEDLING_GROW_UPGRADES, SOIL_SKILL_PACKAGES, SOIL_TIMERS } = await import('../public/js/patches.js?v=7604d7f2');
-  const { WOOD_TREE_HARVEST } = await import('../public/js/woodcutting.js?v=9a2039d1');
-  const { ENCHANTED_WOOD_TREE } = await import('../public/js/enchanted-forests.js?v=d986bff5');
+  const { SEASONED_BEANS, SEEDLING_GROW_UPGRADES, SOIL_SKILL_PACKAGES, SOIL_TIMERS } = await import('../public/js/patches.js?v=41ddb3a0');
+  const { WOOD_TREE_HARVEST } = await import('../public/js/woodcutting.js?v=5235a01a');
+  const { ENCHANTED_WOOD_TREE } = await import('../public/js/enchanted-forests.js?v=22ff871e');
   const beans = Object.keys(SEASONED_BEANS).sort().map((id) => `${JSON.stringify(id)}:${JSON.stringify(SEASONED_BEANS[id].trantClass)}`);
   const grow = Object.keys(SEEDLING_GROW_UPGRADES).map((id) => `${JSON.stringify(id)}:{"minMs":${SEEDLING_GROW_UPGRADES[id].minMinutes * 60000},"level":${SEEDLING_GROW_UPGRADES[id].growLevel}}`);
   const ak = Object.keys(ANIMAL_KINSHIP_PACKAGES).sort().map((key) => `${JSON.stringify(key)}:[${ANIMAL_KINSHIP_PACKAGES[key].map((r) => `{"l":${r.intervalLimit},"b":${r.bonusAmount}}`).join(',')}]`);
