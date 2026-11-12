@@ -19,7 +19,7 @@ import {
   unlearnCancelPrompt,
   skillsEscStep,
   skillIconUrl,
-} from '../public/js/classic/classic-skills.js?v=58322192';
+} from '../public/js/classic/classic-skills.js?v=04186695';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const read = (p) => readFileSync(join(root, p), 'utf8');
@@ -115,9 +115,9 @@ describe('the study header (ImaginationSkillsUI.as 401-460)', () => {
 });
 
 describe('details and Esc (ImaginationSkillDetailsUI.as, ImgMenuView.as 653-666)', () => {
-  it('Esc steps back: details to the list, the list to the hub', () => {
-    assert.equal(skillsEscStep('detail'), 'list');
-    assert.equal(skillsEscStep('list'), 'hub');
+  it('Esc steps back: details to the grid, the grid to the hub (the table: tests/classic-skills-grid.test.js)', () => {
+    assert.equal(skillsEscStep('detail'), 'grid');
+    assert.equal(skillsEscStep('grid'), 'hub');
   });
 
   it('one skill open at a time through the panel\'s own hook, which Modern never calls', () => {
@@ -128,13 +128,13 @@ describe('details and Esc (ImaginationSkillDetailsUI.as, ImgMenuView.as 653-666)
     assert.doesNotMatch(read('public/js/features/unlearning-feature.js'), /openOnlySkillInPanel/);
   });
 
-  it('a row opens its details; Back to Skills and Start learning return to the list', () => {
+  it('a card opens its details; Back to Skills and Start learning return to it', () => {
     const src = read('public/js/classic/classic-skills.js');
     assert.match(src, /'Back to Skills'/);
     assert.match(src, /closest\?\.\('\.skill-row-head'\)/);
     assert.match(src, /e\.stopPropagation\(\);/, 'the row does not open in place');
     assert.match(src, /pendingStart && h\.kind !== 'none'/, 'started: back to the list (onAPIComplete)');
-    assert.match(src, /hub\.open\(\)/, 'the list steps back to the hub');
+    assert.match(src, /hub\.open\(\)/, 'the grid steps back to the hub');
     assert.match(src, /topWindow\(doc, win\) !== panel/, 'a dialog over Skills keeps its own Esc');
     assert.match(src, /window\.addEventListener\('keydown', [^]*?, true\);/, 'ahead of the game\'s keys');
   });

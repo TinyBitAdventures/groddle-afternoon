@@ -894,6 +894,15 @@
   --c-classic-skill-unlearn-tip-bottom: #4e989a;  /* the study bar: ImaginationSkillsUI.as 120-125, 200-211 */
   --c-classic-skill-name: #545454;   /* imagination_skills_name_link hoverColor fallback, ImaginationSkillsUI.as 141 */
   --c-classic-skill-cancel: #044051; /* imagination_skills_cancel hoverColor fallback, 146 */
+  --c-classic-skill-ring: #5ccbef;   /* PROPOSED, from photo emdot_at_glitch_5947049425: the table's "can learn" ring */
+  --c-classic-skill-tick: #5aa816;   /* PROPOSED, same photo: a learned tile's tick */
+  --c-classic-skill-cat-animals: #e2ded8;      /* PROPOSED, same photo: the table's tile tints by kind (stone) */
+  --c-classic-skill-cat-growing: #d6b088;      /* PROPOSED, same photo (wood) */
+  --c-classic-skill-cat-gathering: #d4eef5;    /* PROPOSED, same photo (ice) */
+  --c-classic-skill-cat-cooking: #f3cd6a;      /* PROPOSED, same photo (crate) */
+  --c-classic-skill-cat-alchemy: #a6dc84;      /* PROPOSED, same photo (bubbles) */
+  --c-classic-skill-cat-industrial: #c4dfe2;   /* PROPOSED, same photo (metal) */
+  --c-classic-skill-cat-intellectual: #ecdfba; /* PROPOSED, same photo (scroll) */
   /* classic:end */
   /* Classic type: the 2012 faces (VAG Rounded, Helvetica) are proprietary, so Nunito 800 stands in for
      titles, names, labels and big numbers, and the system Helvetica/Arial stack carries body text. The

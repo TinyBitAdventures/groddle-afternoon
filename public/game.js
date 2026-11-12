@@ -1027,7 +1027,7 @@ import { SLUG_ANIMATION, SLUG_LAYOUT, SLUG_STYLES, SLUG_TARGETS, drawSlugIcon, f
 import { filterText } from './js/word-filter.js?v=9a7a7ebb'; // the remake's own word filter
 import { arrangeMapCards, fitMapExtras } from './js/map-extras.js?v=9f38c312'; // the Map's Shortcuts
 // The interface skin (js/classic/ui-mode.js) sets <html data-ui> as it loads: before main(), so before the boot cover lifts.
-import { installInterfaceSettings } from './js/classic/classic-prefs.js?v=9227d667';
+import { installInterfaceSettings } from './js/classic/classic-prefs.js?v=e88d87be';
 
 /** @type {object|null} assets/maps/index.json */
 let mapIndexCache = null;
@@ -12911,6 +12911,26 @@ const engine = {
       .map((id) => skillTreeEntry(skillState, id, ctx, now))
       .filter((entry) => entry && (entry.status === 'available' || entry.status === 'studying' || entry.status === 'paused'))
       .map((entry) => ({ classTsid: entry.classTsid, name: entry.title, seconds: entry.seconds, status: entry.status }));
+  },
+  /**
+   * Classic Skills: every skill with its state, for the card grid (skills_can_learn with
+   * include_unlearned, inc_skills.js 1815-1849) and the full skill table (family, rank, category).
+   */
+  skillsAll(now = Date.now()) {
+    const ctx = { ...skillStudyContext(), unlearning: features.query('skillUnlearning', engine) };
+    return Object.keys(getSkillCatalog())
+      .map((id) => skillTreeEntry(skillState, id, ctx, now))
+      .filter(Boolean)
+      .map((entry) => ({
+        classTsid: entry.classTsid,
+        name: entry.title,
+        family: entry.def.name || entry.title,
+        level: Number(entry.def.level) || 0,
+        categoryId: entry.def.categoryId,
+        reqs: entry.def.reqSkills || [],
+        seconds: entry.seconds,
+        status: entry.status,
+      }));
   },
   /** Classic Skills: the skill being learned and the one being unlearned (ImaginationSkillsUI.as updateSkillTraining 401-460). */
   skillStudyNow(now = Date.now()) {

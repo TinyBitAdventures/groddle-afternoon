@@ -31,7 +31,7 @@
 import { uiState, onUiModeChange, readUiCache, writeUiCache } from './ui-mode.js?v=11da9030';
 import { classicArtUrl } from './classic-art.js?v=5f713e7d';
 import { focusBack } from '../ui/focus-return.js?v=da190597';
-import { skillsCloud, skillIconUrl, CLOUD_ICONS_ROW } from './classic-skills.js?v=58322192';
+import { skillsCloud, skillIconUrl, CLOUD_ICONS_ROW } from './classic-skills.js?v=04186695';
 
 /** The clouds, in the client's two rows (ImgMenuView.as 343-415). */
 export const HUB_CLOUDS = Object.freeze([

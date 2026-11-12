@@ -2599,13 +2599,226 @@
 :root[data-ui="classic"] #game-root #skills-panel[data-classic-skills="detail"] #skills-body .skill-row.is-open > .skill-row-head { cursor: default; }
 :root[data-ui="classic"] #game-root #skills-panel[data-classic-skills="detail"] #skills-body .skill-row.is-open .skill-row-name { font-size: calc(var(--fs-classic-window) * var(--cu-n, 1)); }
 :root[data-ui="classic"] #game-root #skills-panel[data-classic-skills="detail"] :is(#skills-body, .classic-skill-back) { animation: classic-skills-in 0.3s linear; }
-:root[data-ui="classic"] #game-root #skills-panel[data-classic-skills="list"] :is(#skills-body, .classic-skills-study) { animation: classic-skills-back 0.3s linear; }
+:root[data-ui="classic"] #game-root #skills-panel:is([data-classic-skills="grid"], [data-classic-skills="table"]) :is(.classic-skills-grid, .classic-skills-table, .classic-skills-study) { animation: classic-skills-back 0.3s linear; }
 @keyframes classic-skills-in { from { opacity: 0; } }
 @keyframes classic-skills-back { from { opacity: 0; } }
 @media (prefers-reduced-motion: reduce) {
-  :root[data-ui="classic"] #game-root #skills-panel :is(#skills-body, .classic-skill-back, .classic-skills-study),
+  :root[data-ui="classic"] #game-root #skills-panel :is(#skills-body, .classic-skill-back, .classic-skills-study, .classic-skills-grid, .classic-skills-table),
   :root[data-ui="classic"] #game-root #skills-panel [data-study="fast"] .classic-skills-arrows { animation: none; }
 }
+
+/* The skills screen is the client's 650 wide (the 630 study bar plus the scroller's 20, ImaginationSkillsUI.as
+   PROGRESS_MAX_W 57, refresh 324-332), so three 205 cards fit across (max_w, 529). */
+:root[data-ui="classic"] #game-root #skills-panel > .side-card { width: min(calc(690 * var(--cu)), 100%); }
+:root[data-ui="classic"] #game-root #skills-panel :is(.classic-skills-grid, .classic-skills-table)[hidden] { display: none; }
+:root[data-ui="classic"] #game-root #skills-panel:is([data-classic-skills="grid"], [data-classic-skills="table"]) :is(#skills-meta, #skills-body) { display: none; }
+:root[data-ui="classic"] #game-root #skills-panel :is(.classic-skills-grid, .classic-skills-table) {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  padding-bottom: calc(15 * var(--cu));
+  border-bottom: 1px solid var(--c-classic-rule);
+}
+
+/* The grid (ImaginationSkillsUI.as showSkills 526-632): 205 x 58 cards, 7 apart, 12 between rows, three
+   across. A card is the 44 icon 7 in, its name and time beside it (ImaginationSkillElementUI.as 52-82).
+   The client drew them black at .4 (.6 over, .2 when it can't be learned, 23-25) on the dark imagination
+   sky; on the light well the same steps are an ink tint at 10, 15 and 5 per cent. */
+:root[data-ui="classic"] #game-root #skills-panel .classic-skills-grid:not([hidden]) {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, calc(205 * var(--cu))));
+  justify-content: center;
+  align-content: start;
+  gap: calc(12 * var(--cu)) calc(7 * var(--cu));
+  padding-top: calc(4 * var(--cu));
+}
+:root[data-ui="classic"] #game-root #skills-panel :is(.classic-skills-card, .classic-skills-more) {
+  display: flex;
+  align-items: center;
+  gap: calc(7 * var(--cu));
+  min-width: 0;
+  height: calc(58 * var(--cu));
+  padding: calc(7 * var(--cu));
+  border: 0;
+  border-radius: calc(5 * var(--cu));
+  background: color-mix(in srgb, var(--c-classic-ink) 10%, transparent);
+  color: var(--c-classic-skill-name);
+  text-align: left;
+  cursor: pointer;
+}
+:root[data-ui="classic"] #game-root #skills-panel .classic-skills-card[data-can="no"],
+:root[data-ui="classic"] #game-root #skills-panel .classic-skills-more { background: color-mix(in srgb, var(--c-classic-ink) 5%, transparent); }
+:root[data-ui="classic"] #game-root #skills-panel :is(.classic-skills-card, .classic-skills-more):is(:hover, :focus-visible) { background: color-mix(in srgb, var(--c-classic-ink) 15%, transparent); outline: none; }
+:root[data-ui="classic"] #game-root #skills-panel :is(.classic-skills-card, .classic-skills-more):focus-visible { box-shadow: 0 0 0 2px var(--c-classic-focus); }
+:root[data-ui="classic"] #game-root #skills-panel .classic-skills-card-icon { position: relative; flex: none; width: calc(44 * var(--cu)); height: calc(44 * var(--cu)); }
+:root[data-ui="classic"] #game-root #skills-panel .classic-skills-card-icon > img:first-child {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-view-box: inset(76px 51px 109px 54px);
+}
+/* Over a card, the icon's blue glow (blue2px_GlowA, 87-89); a locked one is grey at .7, whole when over (151-158). */
+:root[data-ui="classic"] #game-root #skills-panel .classic-skills-card:is(:hover, :focus-visible) .classic-skills-card-icon > img:first-child { filter: drop-shadow(0 0 calc(2 * var(--cu)) var(--c-classic-skill-ring)); }
+:root[data-ui="classic"] #game-root #skills-panel .classic-skills-card[data-can="no"] .classic-skills-card-icon > img:first-child { filter: grayscale(1); opacity: 0.7; }
+:root[data-ui="classic"] #game-root #skills-panel .classic-skills-card[data-can="no"]:is(:hover, :focus-visible) .classic-skills-card-icon > img:first-child { opacity: 1; }
+/* lock_small at the icon's corner: 44 - its width + 4 across, 44 - its height + 7 down (125-131). */
+:root[data-ui="classic"] #game-root #skills-panel .classic-skills-card-lock {
+  position: absolute;
+  left: calc(21 * var(--cu));
+  top: calc(21 * var(--cu));
+  width: calc(27 * var(--cu));
+  height: calc(30 * var(--cu));
+}
+:root[data-ui="classic"] #game-root #skills-panel .classic-skills-card-words { display: flex; flex-direction: column; min-width: 0; }
+:root[data-ui="classic"] #game-root #skills-panel .classic-skills-card-name {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  opacity: 0.8;
+  font: 800 calc(var(--fs-classic-row) * var(--cu-n, 1))/var(--lh-tight) var(--font-classic-title);
+}
+:root[data-ui="classic"] #game-root #skills-panel .classic-skills-card-time {
+  opacity: 0.5;
+  font: 700 calc(var(--fs-classic-body) * var(--cu-n, 1))/var(--lh-tight) var(--font-classic-body);
+}
+:root[data-ui="classic"] #game-root #skills-panel .classic-skills-card:is(:hover, :focus-visible) :is(.classic-skills-card-name, .classic-skills-card-time) { opacity: 1; }
+:root[data-ui="classic"] #game-root #skills-panel .classic-skills-card[data-can="no"] .classic-skills-card-name { opacity: 0.5; }
+:root[data-ui="classic"] #game-root #skills-panel .classic-skills-card[data-can="no"]:is(:hover, :focus-visible) :is(.classic-skills-card-name, .classic-skills-card-time) { opacity: 0.8; }
+/* "...And N More. See full skill table": the rest of the row, its two parts on two lines in one card's room (595-612). */
+:root[data-ui="classic"] #game-root #skills-panel .classic-skills-more {
+  grid-column: span var(--span, 3);
+  flex-wrap: wrap;
+  justify-content: center;
+  align-content: center;
+  gap: 0 0.3em;
+  text-align: center;
+  font: 800 calc(var(--fs-classic-row) * var(--cu-n, 1))/var(--lh-tight) var(--font-classic-title);
+}
+:root[data-ui="classic"] #game-root #skills-panel .classic-skills-more[data-br="yes"] { flex-direction: column; }
+:root[data-ui="classic"] #game-root #skills-panel .classic-skills-more-lead { opacity: 0.7; }
+:root[data-ui="classic"] #game-root #skills-panel .classic-skills-more-link { color: var(--c-classic-link); }
+:root[data-ui="classic"] #game-root #skills-panel .classic-skills-more:is(:hover, :focus-visible) .classic-skills-more-link { text-decoration: underline; }
+:root[data-ui="classic"] #game-root #skills-panel .classic-skills-empty {
+  grid-column: 1 / -1;
+  margin: calc(10 * var(--cu)) 0 0;
+  color: var(--c-classic-title);
+  text-align: center;
+  font: 800 calc(var(--fs-classic-row-title) * var(--cu-n, 1))/var(--lh-tight) var(--font-classic-title);
+}
+
+/* The full skill table. OUR READING of the web site's "Table o' skills" (Emdot's Flickr photo 5947049425;
+   not in the client source): square tiles, the family's picture with its letters (the Tiny Speck skill art;
+   letters alone where it has none) and the rank raised, one column per
+   family with its ranks downward, the families of a kind side by side (the kind's name over them is
+   ours), a green tick when learned, a cyan ring when it can be learned now, faded when locked. The
+   one in study has the ring and the study bar's green filling along its foot (ours). */
+:root[data-ui="classic"] #game-root #skills-panel .classic-skills-table:not([hidden]) {
+  display: flex;
+  flex-wrap: wrap;
+  align-content: flex-start;
+  align-items: flex-start;
+  gap: calc(14 * var(--cu)) calc(22 * var(--cu));
+}
+:root[data-ui="classic"] #game-root #skills-panel .classic-skills-table-head {
+  position: sticky;
+  top: 0;
+  z-index: var(--z-raised);
+  display: flex;
+  flex: 1 0 100%;
+  align-items: center;
+  gap: calc(16 * var(--cu));
+  padding: calc(2 * var(--cu)) 0 calc(6 * var(--cu));
+  background: var(--c-classic-well);
+}
+:root[data-ui="classic"] #game-root #skills-panel .classic-skills-table-title {
+  margin: 0 0 0 auto;
+  color: var(--c-classic-title);
+  font: 800 calc(var(--fs-classic-row-title) * var(--cu-n, 1))/var(--lh-tight) var(--font-classic-title);
+}
+:root[data-ui="classic"] #game-root #skills-panel .classic-skills-cat-name {
+  margin: 0 0 calc(5 * var(--cu));
+  color: var(--c-classic-text);
+  opacity: 0.7;
+  font: 800 calc(var(--fs-classic-body) * var(--cu-n, 1))/var(--lh-tight) var(--font-classic-title);
+}
+:root[data-ui="classic"] #game-root #skills-panel :is(.classic-skills-cols, .classic-skills-col) { display: flex; gap: calc(4 * var(--cu)); }
+:root[data-ui="classic"] #game-root #skills-panel .classic-skills-cols { align-items: flex-start; }
+:root[data-ui="classic"] #game-root #skills-panel .classic-skills-col { flex-direction: column; }
+:root[data-ui="classic"] #game-root #skills-panel .classic-skills-tile {
+  position: relative;
+  display: grid;
+  place-content: center;
+  grid-auto-flow: column;
+  width: calc(36 * var(--cu));
+  height: calc(36 * var(--cu));
+  padding: 0;
+  overflow: hidden;
+  border: 0;
+  border-radius: calc(5 * var(--cu));
+  background: var(--tile, var(--c-classic-skill-frame));
+  box-shadow: inset 0 -2px 0 color-mix(in srgb, var(--c-classic-ink) 15%, transparent);
+  color: var(--c-classic-skill-name);
+  font: 800 calc(var(--fs-classic-body) * var(--cu-n, 1))/1 var(--font-classic-title);
+  cursor: pointer;
+}
+:root[data-ui="classic"] #game-root #skills-panel .classic-skills-tile sup { font-size: 0.7em; line-height: 0; vertical-align: 0.5em; }
+:root[data-ui="classic"] #game-root #skills-panel .classic-skills-tile[data-art="yes"] { background: none; box-shadow: none; }
+:root[data-ui="classic"] #game-root #skills-panel .classic-skills-tile-art {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-view-box: inset(76px 51px 109px 54px);
+}
+/* On a picture the rank sits in the top right corner, where the photo's icons painted it. */
+:root[data-ui="classic"] #game-root #skills-panel .classic-skills-tile[data-art="yes"] sup {
+  position: absolute;
+  top: calc(3 * var(--cu));
+  right: calc(3 * var(--cu));
+  padding: 0 calc(2 * var(--cu));
+  border-radius: calc(3 * var(--cu));
+  background: color-mix(in srgb, var(--c-classic-panel) 80%, transparent);
+  z-index: var(--z-raised);
+  font-size: 0.75em;
+  line-height: 1.1;
+  vertical-align: baseline;
+}
+:root[data-ui="classic"] #game-root #skills-panel [data-cat="animals"] .classic-skills-tile { --tile: var(--c-classic-skill-cat-animals); }
+:root[data-ui="classic"] #game-root #skills-panel [data-cat="growing"] .classic-skills-tile { --tile: var(--c-classic-skill-cat-growing); }
+:root[data-ui="classic"] #game-root #skills-panel [data-cat="gathering"] .classic-skills-tile { --tile: var(--c-classic-skill-cat-gathering); }
+:root[data-ui="classic"] #game-root #skills-panel [data-cat="cooking"] .classic-skills-tile { --tile: var(--c-classic-skill-cat-cooking); }
+:root[data-ui="classic"] #game-root #skills-panel [data-cat="alchemy"] .classic-skills-tile { --tile: var(--c-classic-skill-cat-alchemy); }
+:root[data-ui="classic"] #game-root #skills-panel [data-cat="industrial"] .classic-skills-tile { --tile: var(--c-classic-skill-cat-industrial); }
+:root[data-ui="classic"] #game-root #skills-panel [data-cat="intellectual"] .classic-skills-tile { --tile: var(--c-classic-skill-cat-intellectual); }
+:root[data-ui="classic"] #game-root #skills-panel .classic-skills-tile[data-state="locked"] { opacity: 0.4; }
+:root[data-ui="classic"] #game-root #skills-panel .classic-skills-tile:is([data-state="learnable"], [data-state="studying"]) { outline: 2px solid var(--c-classic-skill-ring); outline-offset: -2px; }
+:root[data-ui="classic"] #game-root #skills-panel .classic-skills-tile[data-state="unlearning"] { outline: 2px solid var(--c-classic-skill-unlearn-bottom); outline-offset: -2px; }
+:root[data-ui="classic"] #game-root #skills-panel .classic-skills-tile[data-state="learned"]::after {
+  content: "";
+  position: absolute;
+  z-index: var(--z-raised);
+  right: calc(5 * var(--cu));
+  bottom: calc(6 * var(--cu));
+  width: calc(5 * var(--cu));
+  height: calc(10 * var(--cu));
+  border: solid var(--c-classic-skill-tick);
+  border-width: 0 calc(3 * var(--cu)) calc(3 * var(--cu)) 0;
+  transform: rotate(45deg);
+}
+:root[data-ui="classic"] #game-root #skills-panel .classic-skills-tile[data-state="studying"]::after {
+  content: "";
+  position: absolute;
+  z-index: var(--z-raised);
+  left: 2px;
+  bottom: 2px;
+  width: calc((100% - 4px) * var(--p, 0));
+  height: calc(4 * var(--cu));
+  background: linear-gradient(180deg, var(--c-classic-skill-learn-top), var(--c-classic-skill-learn-bottom));
+}
+:root[data-ui="classic"] #game-root #skills-panel .classic-skills-tile:is(:hover, :focus-visible) { opacity: 1; filter: brightness(1.06); }
+:root[data-ui="classic"] #game-root #skills-panel .classic-skills-tile:focus-visible { outline: 2px solid var(--c-classic-focus); outline-offset: 1px; }
 
 /* The bar's study chip names the whole skill (36-world-while-learning: "Animal Kinsh... II" was cut at 16
    letters): the name game.js keeps whole in data-tip, cut only past the room before the location. */
