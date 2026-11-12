@@ -281,11 +281,10 @@ export function createTrantState(classTsid, opts = {}) {
  * @param {object} arbor  from resolveArborologyPackage
  */
 export function canHarvestTrant(state, arbor) {
-  if (!state || state.maturity < 3) {
-    return { ok: false, reason: 'This tree is too small to harvest.', limit: arbor.intervalLimit };
-  }
-  if ((state.fruitCount || 0) <= 0) {
-    return { ok: false, reason: "There's nothing to pick, cowboy.", limit: arbor.intervalLimit };
+  // trant_fruit.js harvest conditions 496-503: no maturity gate, the fruit first (fruitCapMap
+  // is 0 below maturity 4, so a young tree says this too), then the per-day limit.
+  if (!state || (state.fruitCount || 0) <= 0) {
+    return { ok: false, reason: "There's nothing to pick, cowboy!", limit: arbor.intervalLimit };
   }
   if ((state.harvestsToday || 0) >= arbor.intervalLimit) {
     return {

@@ -33,8 +33,8 @@
  *    trants.js die() / wood_tree.js onDie for a tree grown in a plot.
  */
 
-import { createTrantState, fruitCapacityAt, resetTrantDay } from './trants.js?v=1b3c8ae3';
-import { ensureWoodTreeState, resetWoodTreeDay } from './woodcutting.js?v=5235a01a';
+import { createTrantState, fruitCapacityAt, resetTrantDay } from './trants.js?v=4d6f5593';
+import { WOOD_TREE_MATURITY_MAP, ensureWoodTreeState, resetWoodTreeDay } from './woodcutting.js?v=d7d876f0';
 import { canUseTool, useToolCondition } from './tools.js?v=5f482998';
 import { musicblockItemMeta } from './musicblocks.js?v=6b93f6ec';
 import { grantMoodXp } from './mood-xp.js?v=958e7680';
@@ -154,8 +154,8 @@ export const SOIL_TIMERS = Object.freeze({
 /** trants.js initTrant */
 export const GROWN_TRANT_START = Object.freeze({ maturity: 1, health: 7 });
 
-/** wood_tree.js maturityMap: pettings and waterings needed at maturity 1..6. */
-export const WOOD_TREE_MATURITY_MAP = Object.freeze([2, 3, 4, 5, 6, 0]);
+/** wood_tree.js maturityMap: pettings and waterings needed at maturity 1..6 (js/woodcutting.js). */
+export { WOOD_TREE_MATURITY_MAP };
 
 /** catalog_drop_tables.js (cumulative 0-100 thresholds; first row >= roll wins). */
 export const SOIL_DROP_TABLES = Object.freeze({
@@ -686,6 +686,22 @@ function growLivingTree(tree, now, rng) {
     }
   }
   if (guard >= SOIL_TIMERS.maxCatchUpCycles) tree.lastCycleAt = now;
+  return grew;
+}
+
+/**
+ * A street trant's own maturity clock (include/trants.js onInterval 627-631 runs
+ * onMaturityCycle every maturity_cycle minutes, 823-883 the grow chance by health):
+ * the same rolls as a tree grown in a Patch, caught up after time away (GSJS
+ * timers ran with nobody there). The clock lives on the state (cycleAt); a tree
+ * with none starts it now, so an older save never grows in a burst. Returns the
+ * maturities gained.
+ */
+export function growStreetTrant(state, classId, now = Date.now(), rng = Math.random) {
+  if (!state || classId === 'wood_tree') return 0;
+  const holder = { state, classId, lastCycleAt: Number(state.cycleAt) > 0 ? Number(state.cycleAt) : now };
+  const grew = growLivingTree(holder, now, rng);
+  state.cycleAt = holder.lastCycleAt;
   return grew;
 }
 

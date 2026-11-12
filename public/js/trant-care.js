@@ -10,7 +10,7 @@
  */
 
 import { TOOL_CONDITION_CATALOG, WATERING_CAN_TOOLS, canUseTool, firstWorkingTool, useToolCondition } from './tools.js?v=5f482998';
-import { fruitCapacityAt, fruitProductionAt } from './trants.js?v=1b3c8ae3';
+import { fruitCapacityAt, fruitProductionAt } from './trants.js?v=4d6f5593';
 import { scaledToolWear, toolWearMultiplier } from './imagination-effects.js?v=70169933';
 import { metabolicGain, moodMax, loseEnergy, loseMood } from './metabolics.js?v=8504134e';
 import { grantMoodXp } from './mood-xp.js?v=958e7680';
@@ -82,9 +82,15 @@ export function quoteTrantCare(state, classId, kind, ctx = {}) {
   }
   const flag = kind === 'water' ? 'watered' : 'petted';
   let toolId = null;
-  if (state[flag]) {
-    return { ok: false, reason: 'daily', msg: `This tree was already ${flag} today.`, profile };
-  }
+  // trant_fruit.js 552 / 611 and wood_tree.js 525 / 564: the tree's own refusal. The water
+  // verb asks for the can first (trant_fruit.js 603-609, wood_tree.js 559-562).
+  const unwanted = () => ({
+    ok: false,
+    reason: 'daily',
+    msg: `I don't want to be ${flag}${classId === 'wood_tree' ? ' right now' : ''}!`,
+    profile,
+  });
+  if (kind === 'pet' && state[flag]) return unwanted();
   if (kind === 'water') {
     const can = firstWorkingTool(ctx.tools, ctx.inv, WATERING_CAN_TOOLS, profile.toolWear);
     if (!can.owned) {
@@ -95,16 +101,12 @@ export function quoteTrantCare(state, classId, kind, ctx = {}) {
     if (!tool.ok) {
       return { ok: false, reason: 'tool_broken', msg: 'Sadly, your Watering Can is too worn out.', profile, tool, toolId };
     }
+    if (state[flag]) return unwanted();
   }
   const energy = Math.max(0, Number(ctx.pc?.energy) || 0);
-  // inc_skill_packages.js startSkillPackage refuses at energy <= cost.
+  // inc_skill_packages.js 177-178 runSkillPackage refuses at energy <= cost.
   if (energy <= profile.energyCost) {
-    return {
-      ok: false,
-      reason: 'energy',
-      msg: `You need ${profile.energyCost} energy to ${kind} this tree.`,
-      profile,
-    };
+    return { ok: false, reason: 'energy', msg: "You're too tired to do that.", profile };
   }
   return { ok: true, profile, flag, toolId, toolLabel: TOOL_CONDITION_CATALOG[toolId]?.label || null };
 }

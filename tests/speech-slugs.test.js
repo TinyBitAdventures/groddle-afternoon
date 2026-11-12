@@ -37,7 +37,7 @@ import { buildVerbResponses, render } from '../tools/build-verb-responses.mjs';
 import { runVerb } from '../public/content.js?v=2d1f01bb';
 import { createAnimalState } from '../public/js/animals.js?v=9b48173d';
 import { createToolConditionState } from '../public/js/tools.js?v=5f482998';
-import { setTrantTables, createTrantState } from '../public/js/trants.js?v=1b3c8ae3';
+import { setTrantTables, createTrantState } from '../public/js/trants.js?v=4d6f5593';
 import { createMineRock } from '../public/js/mining.js?v=12a6f1bd';
 import { createInventory } from '../public/js/inventory.js?v=5be47371';
 

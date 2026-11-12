@@ -34,6 +34,12 @@ export function pickWoodTool(inv = {}, toolState = {}, wear = WOOD_TREE_HARVEST.
   return owned.find((id) => canUseTool(toolState, id, wear).ok) || owned[0] || null;
 }
 
+/**
+ * wood_tree.js onLoad maturityMap (889-896): the pettings and waterings a tree at
+ * maturity 1..6 needs before it grows one (onTendComplete 1006-1007).
+ */
+export const WOOD_TREE_MATURITY_MAP = Object.freeze([2, 3, 4, 5, 6, 0]);
+
 export const WOOD_TREE_HARVEST = Object.freeze({
   durationMs: 4000,
   energyCost: 20,
@@ -77,6 +83,11 @@ export function ensureWoodTreeState(state = {}) {
   state.totalHarvests = whole(state.totalHarvests, 0);
   state.petted = state.petted === true;
   state.watered = state.watered === true;
+  // A street tree's petted_count / watered_count (noteWoodCare); Patch and hollow trees count on the plot.
+  if (state.carePets != null || state.careWaters != null) {
+    state.carePets = whole(state.carePets, 0);
+    state.careWaters = whole(state.careWaters, 0);
+  }
   if (state.enchanted !== true) delete state.enchanted;
   delete state.harvest_count;
   delete state.harvested;
@@ -134,7 +145,8 @@ export function quoteWoodTreeHarvest(state, inv = {}, pc = {}, toolState = {}) {
     return {
       ok: false,
       reason: 'hatchet',
-      msg: "You can't just pluck planks from a tree. You need a Hatchet.",
+      // wood_tree.js:678.
+      msg: "You can't just pluck planks from a tree! You need something to gently extract them with. A hatchet, maybe?",
     };
   }
   const energyCost = woodier?.energyCost ?? WOOD_TREE_HARVEST.energyCost;
@@ -194,6 +206,11 @@ export function harvestWoodTree(state, inv = {}, pc = {}, toolState = {}) {
   } else {
     s.harvestCount = 1;
   }
+  // endHarvest 783-786: a tree that lives on starts its care counts over.
+  if (s.maturity > 0 && (s.carePets || s.careWaters)) {
+    s.carePets = 0;
+    s.careWaters = 0;
+  }
 
   return {
     ok: true,
@@ -208,6 +225,33 @@ export function harvestWoodTree(state, inv = {}, pc = {}, toolState = {}) {
     line: harvestLine(maturityBefore, s.totalHarvests - 1),
     source: WOOD_TREE_SOURCE,
   };
+}
+
+/**
+ * A street Wood Tree's care growth, at the moment a pet or water lands
+ * (wood_tree.js onTendComplete 955-1010): each one counts (petted_count,
+ * watered_count); once the tree has been both petted and watered and both counts
+ * reach maturityMap[m-1], it grows one maturity and both counts start over
+ * (plusMaturity 1091-1095). Trees grown in Patches and in the hollows count on
+ * their plot instead (js/patches.js noteWoodTreeCare). Returns 'grew', true
+ * (counted) or false (a cleared tree: onDie is on its way).
+ */
+export function noteWoodCare(state, kind) {
+  const s = ensureWoodTreeState(state || {});
+  if (s.maturity <= 0 || (kind !== 'pet' && kind !== 'water')) return false;
+  s.carePets = whole(s.carePets, 0) + (kind === 'pet' ? 1 : 0);
+  s.careWaters = whole(s.careWaters, 0) + (kind === 'water' ? 1 : 0);
+  if (s.petted && s.watered && s.maturity < 6) {
+    const need = WOOD_TREE_MATURITY_MAP[s.maturity - 1];
+    if (s.carePets >= need && s.careWaters >= need) {
+      s.maturity += 1;
+      s.harvestCount = 0;
+      s.carePets = 0;
+      s.careWaters = 0;
+      return 'grew';
+    }
+  }
+  return true;
 }
 
 export function resetWoodTreeDay(state = {}) {

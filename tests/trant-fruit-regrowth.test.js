@@ -17,7 +17,7 @@ import path from 'node:path';
 import test from 'node:test';
 import { fileURLToPath } from 'node:url';
 
-import { performTrantCare, trantFruitCycle } from '../public/js/trant-care.js?v=9527ff03';
+import { performTrantCare, trantFruitCycle } from '../public/js/trant-care.js?v=1a452321';
 import {
   createTrantState,
   fruitCapacityAt,

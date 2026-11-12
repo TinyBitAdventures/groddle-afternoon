@@ -11,11 +11,11 @@ import {
   canHarvestTrant,
   harvestTrant,
   maturityLabel,
-} from './js/trants.js?v=1b3c8ae3';
+} from './js/trants.js?v=4d6f5593';
 import {
   quoteTrantCare,
   performTrantCare,
-} from './js/trant-care.js?v=9527ff03';
+} from './js/trant-care.js?v=1a452321';
 import {
   listPlantableSeeds,
   waterAllPlots,
@@ -70,7 +70,7 @@ import {
   quoteWoodTreeHarvest,
   harvestWoodTree,
   woodTreeStatusLabel,
-} from './js/woodcutting.js?v=5235a01a';
+} from './js/woodcutting.js?v=d7d876f0';
 import { findWorkingRookTool } from './js/rook-woods.js?v=9621a723';
 import {
   HERDKEEPING,
@@ -734,10 +734,15 @@ export function getVerbsFor(target, ctx) {
     });
     if (classId === 'wood_tree') {
       const harvest = quoteWoodTreeHarvest(s, inv, pc, ctx.tools || {});
-      add('harvest', 'harvest', {
+      // wood_tree.js 442-466 / 474-490: a wee tree (maturity 1) offers "Harvest and Clear"
+      // in place of harvest, with the warning; the id stays harvest (same handler, doHarvest).
+      const wee = Number(s.maturity) === 1;
+      add('harvest', wee ? 'Harvest and Clear' : 'harvest', {
         sort: 30,
         energy: harvest.energyCost || 20,
-        tooltip: harvest.ok
+        tooltip: wee
+          ? 'Harvesting this wee tree will also kill it!'
+          : harvest.ok
           ? `Extract ${harvest.plankYield} planks with your ${harvest.toolLabel || 'Hatchet'} · ${harvest.hatchetWear} condition`
           : `${harvestTooltip(classId)} · Hatchet required`,
         enabled: harvest.ok,
@@ -1421,19 +1426,15 @@ export function runVerb(target, verbId, ctx) {
     const learned = ctx.skills?.learned || ctx.learned || [];
     const upgrades = ctx.imaginationUpgrades || pc.imaginationUpgrades || [];
     const arbor = resolveArborologyPackage(learned);
-    // Energy check before mutating tree (harvestTrant is not pure)
-    if ((pc.energy || 0) < arbor.energyCost) {
-      return {
-        ok: false,
-        msgs: [
-          `You don't have enough energy (need ${arbor.energyCost}, have ${Math.floor(pc.energy || 0)}).`,
-        ],
-        effects,
-      };
-    }
+    // include/trants.js performHarvest 233-243: the fruit and the day's limit first, then
+    // runSkillPackage's energy check, which refuses at energy <= cost (inc_skill_packages.js 177-178),
+    // so a harvest never takes the last of your energy. harvestTrant is not pure: check before it.
     const gate = canHarvestTrant(s, arbor);
     if (!gate.ok) {
       return { ok: false, msgs: [gate.reason || 'Cannot harvest.'], effects };
+    }
+    if ((pc.energy || 0) <= arbor.energyCost) {
+      return { ok: false, msgs: ["You're too tired to do that."], effects };
     }
     const result = harvestTrant(
       s,

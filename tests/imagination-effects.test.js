@@ -24,7 +24,7 @@ import { createInventory, countItem, ensureItem } from '../public/js/inventory.j
 import { createMineRock, miningProfile, mineRock, smeltMetalRocks } from '../public/js/mining.js?v=12a6f1bd';
 import { craftRecipe, makingSkillAdjustments } from '../public/js/making.js?v=39f79aaa';
 import { createToolConditionState, getToolCondition, repairToolCondition, setToolRemaining } from '../public/js/tools.js?v=5f482998';
-import { quoteWoodTreeHarvest } from '../public/js/woodcutting.js?v=5235a01a';
+import { quoteWoodTreeHarvest } from '../public/js/woodcutting.js?v=d7d876f0';
 import { resolveAnimalKinshipPackage } from '../public/js/animal-kinship.js?v=f91347e9';
 import { createGarden, getPlot, plantPlot, plotKey } from '../public/js/garden.js?v=37209241';
 import { vendorBuy, vendorSell, vendorBuyUnitPrice } from '../public/js/vendor.js?v=5207195b';

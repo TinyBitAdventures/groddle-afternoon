@@ -50,8 +50,8 @@
 import { ensureItem } from '../inventory.js?v=5be47371';
 import { isItemFloor, platformYAt } from '../street-model.js?v=b6cb6a4e';
 import { getStreetEcologyCatalog, streetEcologyAliases } from '../street-ecology.js?v=f27417a8';
-import { trantFootAnchorY, trantStatusLabel } from '../trants.js?v=1b3c8ae3';
-import { woodTreeStatusLabel } from '../woodcutting.js?v=5235a01a';
+import { trantFootAnchorY, trantStatusLabel } from '../trants.js?v=4d6f5593';
+import { woodTreeStatusLabel } from '../woodcutting.js?v=d7d876f0';
 import {
   GROWN_TREE_LABELS,
   SEASONED_BEANS,

@@ -73,9 +73,11 @@ describe('trant harvest (GSJS-extracted)', () => {
   });
 
   it('cannot harvest empty or too-small trees', () => {
-    const small = createTrantState('trant_egg', { maturity: 2, health: 8, fruitCount: 10 });
+    // trant_fruit.js 496-503: no maturity gate; below maturity 4 the tree holds no fruit.
+    const small = createTrantState('trant_egg', { maturity: 2, health: 8 });
     const arbor = ARBOROLOGY_HARVEST.no_skill;
-    assert.equal(canHarvestTrant(small, arbor).ok, false);
+    assert.equal(small.fruitCount, 0);
+    assert.deepEqual([canHarvestTrant(small, arbor).ok, canHarvestTrant(small, arbor).reason], [false, "There's nothing to pick, cowboy!"]);
     const empty = createTrantState('trant_egg', { maturity: 7, health: 8, fruitCount: 0 });
     assert.equal(canHarvestTrant(empty, arbor).ok, false);
   });

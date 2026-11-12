@@ -392,7 +392,7 @@ export const REFUSAL_LINES = Object.freeze({
   enough: "That's enough, thnx.",
   small: 'This tree is too small to harvest.',
   weak: 'This tree is too weak to be trantsformed',
-  empty: "There's nothing to pick, cowboy.",
+  empty: "There's nothing to pick, cowboy!",
   daily_limit: 'You can only harvest from this tree once per game day.',
   not_wanted: 'This tree was already looked after today.',
   cleared: 'This Wood Tree has been cleared.',

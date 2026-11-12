@@ -111,7 +111,7 @@ import {
   sniffNoNo,
   sprinkleHallowed,
   usePowderCharge,
-} from '../powders.js?v=397984f7';
+} from '../powders.js?v=fbbbc0d8';
 import { itemVerbAchievementCounters } from '../item-verbs.js?v=1e20fa7d';
 import { copyChargesLeft, copyFromLedger, keepsCopies, spendCopyCharge, verbCopy } from '../copy-charges.js?v=627150dc';
 import { migrateClassValue } from '../tools.js?v=5f482998';

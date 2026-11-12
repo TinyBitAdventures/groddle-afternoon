@@ -97,7 +97,9 @@ describe('a tree in a shared Patch: the page\'s rules', () => {
     assert.equal(sharedTreeReady(state, 'trant_spice', 'harvest', ctx), true, 'no fruit and five harvests here: the server decides');
     assert.equal(sharedTreeReady(state, 'trant_spice', 'water', { ...ctx, inv: {} }), false, 'no watering can');
     assert.equal(sharedTreeReady(state, 'trant_spice', 'pet', { ...ctx, pc: { energy: 1 } }), false, 'too tired');
-    assert.equal(sharedTreeReady({ ...state, maturity: 2 }, 'trant_spice', 'harvest', ctx), false, 'too small');
+    // trant_fruit.js 496-503 has no maturity gate: a young tree's fruit (none) is the server's word.
+    assert.equal(sharedTreeReady({ ...state, maturity: 2 }, 'trant_spice', 'harvest', ctx), true, 'no size gate');
+    assert.equal(sharedTreeReady(state, 'trant_spice', 'harvest', { ...ctx, pc: { energy: 5 } }), false, 'exactly the cost: too tired');
     assert.equal(sharedTreeReady(state, 'trant_spice', 'talk_to', ctx), false);
     const wood = { maturity: 4, harvestCount: 0, harvestedToday: true };
     assert.equal(sharedTreeReady(wood, 'wood_tree', 'harvest', { ...ctx, inv: { hatchet: 1 } }), true, 'harvested today is the server\'s word');

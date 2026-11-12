@@ -766,7 +766,8 @@ import {
   maturityLabel,
   trantStatusLabel,
   trantFootAnchorY,
-} from './js/trants.js?v=1b3c8ae3';
+} from './js/trants.js?v=4d6f5593';
+import { growStreetTrant } from './js/patches.js?v=264d8967';
 import {
   runStreetTransition,
   showAwardScreen,
@@ -864,11 +865,12 @@ import {
 } from './js/animals.js?v=9b48173d';
 import {
   ensureWoodTreeState,
+  noteWoodCare,
   pickWoodTool,
   resetWoodTreeDay,
   woodToolLabel,
   woodTreeStatusLabel,
-} from './js/woodcutting.js?v=5235a01a';
+} from './js/woodcutting.js?v=d7d876f0';
 import {
   GIANTS,
   createShrineState,
@@ -896,7 +898,7 @@ import {
 } from './js/shrines.js?v=e1a6111f';
 import { shrineSheet, shrineVariantFor } from './js/shrine-variants.js?v=7f11c97d';
 import { giantDisplayName } from './js/giant-names.js?v=0e295891';
-import { shrinePowderOptions, shrinePowderAchievementCounters } from './js/powders.js?v=397984f7';
+import { shrinePowderOptions, shrinePowderAchievementCounters } from './js/powders.js?v=fbbbc0d8';
 import {
   GAMESHOW_TICKET_ID,
   applySpinningWheelReward,
@@ -9502,6 +9504,14 @@ function executeVerb(target, verbId) {
       app.canvas.dataset.trantCareClass = target.classId;
       app.canvas.dataset.trantCareTool = wateredWith;
     }
+    // wood_tree.js onTendComplete 1006-1015: a street Wood Tree grows by care (Patch and hollow
+    // trees count on their plot). Online the server holds a street tree's maturity.
+    if (result.ok && target.classId === 'wood_tree' && !target.grownFromBean && Number.isInteger(target.treeIndex)
+      && GAME_MODE !== 'multiplayer'
+      && noteWoodCare(target.state, baseVerb) === 'grew') {
+      emitGameEvent('trants_healed:wood_tree');
+      if (target.state.maturity === 6) engine.achievement('wood_tree:maxed', 1);
+    }
     if (target.classId === 'wood_tree') {
       refreshWoodTreeVisual(target);
     } else if (TRANT_META[target.classId] && target.state) {
@@ -13655,6 +13665,8 @@ function spawnTrees(spots) {
     } else {
       trantState = createTrantState(classId, { maturity: maturity ?? 7, health: health ?? 8 });
       if (savedTree?.state) Object.assign(trantState, savedTree.state, { classTsid: classId });
+      // The maturity cycles it ran while you were away (online the server holds street trees).
+      if (GAME_MODE !== 'multiplayer') growStreetTrant(trantState, classId);
       tex = textureForTrant(classId, trantState.maturity);
     }
     if (!tex) return;
@@ -13700,6 +13712,18 @@ function spawnTrees(spots) {
   });
   streetState.trees.length = plan.length;
   return list;
+}
+
+/**
+ * include/trants.js onMaturityCycle (823-883): this street's trants grow on their own
+ * clock (js/patches.js growStreetTrant). Online the server holds street trees.
+ */
+function growStreetTrants(now = Date.now()) {
+  if (GAME_MODE === 'multiplayer') return;
+  for (const target of interactables) {
+    if (!TRANT_META[target?.classId] || target.grownFromBean || !Number.isInteger(target.treeIndex) || !target.state) continue;
+    if (growStreetTrant(target.state, target.classId, now) > 0) engine.refreshTreeVisual(target);
+  }
 }
 
 function refreshWoodTreeVisual(target) {
@@ -33102,6 +33126,7 @@ async function main() {
     if (newDayCheckAccum > 300) {
       newDayCheckAccum = 0;
       if (!isScreenFxBlocking()) maybeNewDay();
+      growStreetTrants();
     }
 
     if (!menuTarget && !currentAction && !isScreenFxBlocking()) {

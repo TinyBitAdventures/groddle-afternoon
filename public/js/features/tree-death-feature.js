@@ -25,7 +25,9 @@
  * `tree:<index>`), so the dead tree clears with a Hatchet into a Patch you
  * tend and plant (js/patches.js). Trees grown in Patches die in their plot
  * (`patchesFeature.killTree`). Nothing respawns a dead street tree: only a
- * planted bean brings a tree back, as in the source.
+ * planted bean brings a tree back, as in the source. A street Wood Tree chopped
+ * to maturity 0 dies the same way two seconds later, with no Planks
+ * (wood_tree.js endHarvest 779-781, onDie 858-868).
  *
  * Multiplayer (G334): a street tree is everyone's. A pour that lands on one
  * asks the realtime server first (street-objects-feature sharedObjectVerb;
@@ -459,6 +461,30 @@ function killTree(engine, target, opts = {}) {
   return result;
 }
 
+/** wood_tree.js endHarvest 779-781: onDie two seconds after a harvest takes the last maturity. */
+export const WOOD_CLEARED_TO_PATCH_MS = 2000;
+const clearedSeen = new Map();
+
+/**
+ * A street Wood Tree chopped to maturity 0 becomes a Patch (wood_tree.js onDie 858-868,
+ * replaceWith('patch'); no Planks, it was not poisoned) that you tend and plant. `now` null:
+ * a tree already cleared when the street loads (older saves) goes at once. Online the server
+ * holds the tree, and its word does this for everyone (sharedTreeDied).
+ */
+function fellClearedWoodTrees(engine, now = null) {
+  let felled = 0;
+  for (const target of [...(engine.interactables || [])]) {
+    if (target?.classId !== 'wood_tree' || target.grownFromBean || !Number.isInteger(target.treeIndex)) continue;
+    if (!isTreeTarget(target) || Number(target.state.maturity) > 0 || isPoisoned(target.state) || sharedTree(engine, target)) continue;
+    const at = clearedSeen.get(target) ?? (now == null ? -Infinity : now);
+    clearedSeen.set(target, at);
+    if (now != null && now - at < WOOD_CLEARED_TO_PATCH_MS) continue;
+    clearedSeen.delete(target);
+    if (killTree(engine, target, { planks: false })) felled += 1;
+  }
+  return felled;
+}
+
 /** Street trees that already died here stay gone (their plot is the patches feature's). */
 function hideReplacedTrees(engine) {
   const slot = engine.streetSlot(TREE_DEATH_FEATURE_ID);
@@ -637,6 +663,8 @@ export const treeDeathFeature = {
 
   onStreetEnter(street, engine) {
     hideReplacedTrees(engine);
+    clearedSeen.clear();
+    fellClearedWoodTrees(engine);
     // Poison timers keep running while the street is away (apiSetTimer('die')).
     // A shared street tree's death is the server's word (sharedTreeDied).
     const now = Date.now();
@@ -674,6 +702,7 @@ export const treeDeathFeature = {
     if (autoplay) tickAutoplay(engine, now);
     if (now - lastScanAt < SCAN_MS) return;
     lastScanAt = now;
+    fellClearedWoodTrees(engine, now);
     let changed = false;
     for (const target of [...(engine.interactables || [])]) {
       if (!isTreeTarget(target) || !isPoisoned(target.state)) continue;
@@ -794,7 +823,9 @@ export const treeDeathFeature = {
     autoplay = null;
     for (const h of overlays.values()) h.stop();
     overlays.clear();
+    clearedSeen.clear();
   },
   _killTree: killTree,
+  _fellClearedWoodTrees: fellClearedWoodTrees,
   _completePour: completePour,
 };

@@ -11,14 +11,14 @@ import {
   resolveTrantCarePackage,
   quoteTrantCare,
   performTrantCare,
-} from '../public/js/trant-care.js?v=9527ff03';
+} from '../public/js/trant-care.js?v=1a452321';
 import {
   createTrantState,
   livingTrantPlanForStreet,
   LIVING_TRANT_CLASS_IDS,
   setTrantTables,
   trantStatusLabel,
-} from '../public/js/trants.js?v=1b3c8ae3';
+} from '../public/js/trants.js?v=4d6f5593';
 import {
   createToolConditionState,
   getToolCondition,

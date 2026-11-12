@@ -13,7 +13,7 @@ import {
   quoteWoodTreeHarvest,
   resetWoodTreeDay,
   woodTreeStatusLabel,
-} from '../public/js/woodcutting.js?v=5235a01a';
+} from '../public/js/woodcutting.js?v=d7d876f0';
 import {
   TOOL_CONDITION_CATALOG,
   createToolConditionState,

@@ -199,9 +199,10 @@ export function treeReady(state, classId, verbId, { inv, pc, learned = [], tools
   if (!state || !TRANT_META[classId]) return false;
   if (verbId === 'harvest') {
     const arbor = resolveArborologyPackage(learned);
-    if ((Number(pc?.energy) || 0) < arbor.energyCost) return false;
+    // inc_skill_packages.js 177-178: refused at energy <= cost.
+    if ((Number(pc?.energy) || 0) <= arbor.energyCost) return false;
     // Fruit is the server's call (it may have more than this copy shows); the
-    // size and the player's own harvests today are local.
+    // player's own harvests today are local.
     return canHarvestTrant({ ...state, fruitCount: Math.max(1, Number(state.fruitCount) || 0) }, arbor).ok;
   }
   if (verbId !== 'pet' && verbId !== 'water') return false;

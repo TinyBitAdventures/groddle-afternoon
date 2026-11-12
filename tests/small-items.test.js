@@ -32,7 +32,7 @@ import { smallItemsFeature } from '../public/js/features/small-items-feature.js?
 import { streetFurnitureFeature } from '../public/js/features/street-furniture-feature.js?v=9ecb3094';
 import { FEATURES } from '../public/js/features/index.js?v=15306d46';
 import { countItem } from '../public/js/inventory.js?v=5be47371';
-import { pickWoodTool, quoteWoodTreeHarvest, harvestWoodTree, woodToolLabel } from '../public/js/woodcutting.js?v=5235a01a';
+import { pickWoodTool, quoteWoodTreeHarvest, harvestWoodTree, woodToolLabel } from '../public/js/woodcutting.js?v=d7d876f0';
 import { TOOL_CONDITION_CATALOG, createToolConditionState, getToolCondition, setToolRemaining } from '../public/js/tools.js?v=5f482998';
 import { HOG_HAUL_GAME_ID, HOG_HAUL_TICKET, RACE_STORE_ITEMS } from '../public/js/races.js?v=ab22a079';
 import { racesFeature } from '../public/js/features/races-feature.js?v=371def00';
