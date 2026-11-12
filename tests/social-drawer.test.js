@@ -28,7 +28,7 @@ import {
   splitChat,
   withTimeLines,
   writeChoice,
-} from '../public/js/ui/social-drawer.js?v=61ebf621';
+} from '../public/js/ui/social-drawer.js?v=bb35acd9';
 import { createNotifier } from '../public/js/notify.js?v=1fb97b21';
 import { resolveTokens } from './css-tokens.js';
 
@@ -64,8 +64,12 @@ describe('the Social drawer: rules', () => {
     assert.equal(TIME_GAP_MS, 5 * 60 * 1000);
     const t0 = new Date(2026, 9, 29, 9, 31).getTime();
     const lines = [{ at: t0 }, { at: t0 + 60_000 }, { at: t0 + 9 * 60_000 }, { at: t0 + 10 * 60_000 }];
-    const out = withTimeLines(lines);
-    assert.deepEqual(out.map((x) => x.sep || 'line'), ['9:31 AM', 'line', 'line', '9:40 AM', 'line', 'line']);
+    const out = withTimeLines(lines, undefined, undefined, t0);
+    assert.deepEqual(out.map((x) => x.sep || 'line'), ['Today · 9:31 AM', 'line', 'line', '9:40 AM', 'line', 'line']);
+    // Austin 2026-11-12: a log past midnight names each day at its first time line.
+    const late = new Date(2026, 9, 28, 22, 23).getTime();
+    const days = withTimeLines([{ at: late }, { at: t0 - 9 * 3600_000 }, { at: t0 }], undefined, undefined, t0);
+    assert.deepEqual(days.filter((x) => x.sep).map((x) => x.sep), ['Yesterday · 10:23 PM', 'Today · 12:31 AM', '9:31 AM']);
     assert.equal(clockLabel(new Date(2026, 9, 29, 0, 5).getTime()), '12:05 AM');
     assert.equal(clockLabel(new Date(2026, 9, 29, 13, 0).getTime()), '1:00 PM');
   });

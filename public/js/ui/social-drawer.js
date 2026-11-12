@@ -227,16 +227,37 @@ export function clockLabel(ms) {
   return `${((h + 11) % 12) + 1}:${String(d.getMinutes()).padStart(2, '0')} ${h < 12 ? 'AM' : 'PM'}`;
 }
 
+const dayKeyOf = (ms) => {
+  const d = new Date(ms);
+  return `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
+};
+
+/** "Today", "Yesterday", "Wednesday, Nov 11" (and the year when it isn't this one). */
+export function dayLabel(ms, now = Date.now()) {
+  if (dayKeyOf(ms) === dayKeyOf(now)) return 'Today';
+  if (dayKeyOf(ms) === dayKeyOf(now - 86400000)) return 'Yesterday';
+  const o = { weekday: 'long', month: 'short', day: 'numeric' };
+  if (new Date(ms).getFullYear() !== new Date(now).getFullYear()) o.year = 'numeric';
+  return new Date(ms).toLocaleDateString([], o);
+}
+
 /**
  * Items with a time line before the first and before each that comes TIME_GAP_MS
- * or more after the one before: [{ sep: '9:31 AM' }, item, item, { sep: '9:40 AM' }, ...].
+ * or more after the one before: [{ sep: 'Today · 9:31 AM' }, item, item, { sep: '9:40 AM' }, ...].
+ * Austin 2026-11-12: the first time line of each day names the day, so a log that runs past
+ * midnight says which day its lines are from.
  */
-export function withTimeLines(items, atOf = (x) => x.at, gap = TIME_GAP_MS) {
+export function withTimeLines(items, atOf = (x) => x.at, gap = TIME_GAP_MS, now = Date.now()) {
   const out = [];
   let last = null;
+  let lastDay = '';
   for (const it of items) {
     const at = Number(atOf(it)) || 0;
-    if (last === null || at - last >= gap) out.push({ sep: clockLabel(at) });
+    const day = dayKeyOf(at);
+    if (day !== lastDay) {
+      out.push({ sep: `${dayLabel(at, now)} · ${clockLabel(at)}` });
+      lastDay = day;
+    } else if (last === null || at - last >= gap) out.push({ sep: clockLabel(at) });
     last = at;
     out.push(it);
   }
