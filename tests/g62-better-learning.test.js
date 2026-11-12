@@ -217,7 +217,7 @@ describe('G62 Better Learning quests and street work', () => {
       const without = workCheck(state, jobs, jobId, req.id, ctx([]));
       assert.equal(without.ok, false, `${cls} without the skill`);
       assert.equal(without.canHire, true);
-      assert.match(without.msg, /skill/);
+      assert.match(without.msg, /^You don't know /); // quest.js get_status 972-975
       assert.equal(workCheck(state, jobs, jobId, req.id, ctx([skill])).ok, true, `${cls} with ${skill}`);
     }
     // The group hall phase stays multiplayer (a group claims the hall).

@@ -14,6 +14,9 @@
 import { phaseBaseCost } from './street-jobs.js?v=94f8d250';
 import { UNNAMED_PLAYER } from './player-names.js?v=f9b78094';
 
+/** items/include/jobs.js getJobLeaderboard: the top ten. */
+export const LEADERBOARD_SIZE = 10;
+
 /** Ids a save remembers as applied (the site's LedgerMath::PROJECT_APPLIED_KEEP). */
 export const APPLIED_KEEP = 64;
 
@@ -160,7 +163,8 @@ export function rowFromServer(row, offset = 0) {
     option: row?.option ? clean(row.option) : null,
     held: counts(row?.held),
     votes: counts(row?.votes),
-    top: (Array.isArray(row?.top) ? row.top : []).slice(0, 5).map((c) => ({ id: whole(c?.id), name: String(c?.name || UNNAMED_PLAYER).slice(0, 40), cost: whole(c?.cost) })),
+    top: (Array.isArray(row?.top) ? row.top : []).slice(0, LEADERBOARD_SIZE).map((c) => ({ id: whole(c?.id), name: String(c?.name || UNNAMED_PLAYER).slice(0, 40), cost: whole(c?.cost) })),
+    me: row?.me && typeof row.me === 'object' ? { position: whole(row.me.position), cost: whole(row.me.cost) } : null,
     count: whole(row?.count),
     ...(row?.hall ? { hall: hallFromServer(row.hall, offset) } : {}),
   };
@@ -249,10 +253,28 @@ export function markContributed(state, jobId, classTsid) {
 /** "Ada 59%, Bo 41%": the phase's top contributors by their share of its total base cost. */
 export function topLine(row, def, divisor) {
   const total = phaseBaseCost(def, divisor) || 1;
-  const top = row?.top || [];
+  const top = (row?.top || []).slice(0, 5);
   if (!top.length) return '';
   const more = whole(row?.count) > top.length ? ` and ${whole(row.count) - top.length} more` : '';
-  return `${top.map((c) => `${c.name} ${Math.round((c.cost / total) * 100)}%`).join(', ')}${more}`;
+  return `${top.map((c) => `${c.name} ${Math.round((c.cost / total) * 10000) / 100}%`).join(', ')}${more}`;
+}
+
+/**
+ * The job dialog's Leaderboard (items/include/jobs.js getJobLeaderboard 524-560, LeaderboardUI.as):
+ * the current phase's top ten by base cost with each share of the phase's total to two decimals, and
+ * your own place when you contributed (row.me, the server's; else found in the list).
+ */
+export function leaderboard(row, def, divisor, meId = 0) {
+  const total = phaseBaseCost(def, divisor) || 1;
+  const pct = (cost) => Math.round((whole(cost) / total) * 10000) / 100;
+  const top = (row?.top || []).slice(0, LEADERBOARD_SIZE).map((c, i) => ({ position: i + 1, id: whole(c.id), name: c.name, contributions: pct(c.cost) }));
+  let me = null;
+  if (row?.me && whole(row.me.position) > 0) me = { position: whole(row.me.position), contributions: pct(row.me.cost) };
+  else {
+    const mine = top.find((t) => meId && t.id === meId);
+    if (mine) me = { position: mine.position, contributions: mine.contributions };
+  }
+  return { top, me };
 }
 
 /** The share of a phase this player put in, from its row's mine (per phase class). */

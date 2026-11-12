@@ -30,6 +30,7 @@ import {
   rowFromServer,
   sharedSlice,
   topLine,
+  leaderboard,
 } from '../public/js/street-jobs-mp.js?v=25efcadf';
 import {
   isJobBuilt,
@@ -148,7 +149,14 @@ describe('the shared board (js/street-jobs-mp.js)', () => {
   it('words the top contributors and your share by base cost (quest.js getTotalBasecost)', () => {
     const total = phaseBaseCost(def, 50);
     const row = rowFromServer({ mine: { [CLS]: Math.round(total * 0.25) }, top: [{ id: 2, name: 'Bo', cost: Math.round(total * 0.75) }, { id: 1, name: 'Ada', cost: Math.round(total * 0.25) }], count: 3 });
-    assert.equal(topLine(row, def, 50), 'Bo 75%, Ada 25% and 1 more');
+    // Two decimals, as Glitch's leaderboard printed them (items/include/jobs.js getJobLeaderboard 543).
+    const pct = (c) => Math.round((c / total) * 10000) / 100;
+    assert.equal(topLine(row, def, 50), `Bo ${pct(Math.round(total * 0.75))}%, Ada ${pct(Math.round(total * 0.25))}% and 1 more`);
+    // The board's Leaderboard: the top ten and your place (row.me from the server, else found in the list).
+    const board = leaderboard({ ...row, me: { position: 2, cost: Math.round(total * 0.25) } }, def, 50, 1);
+    assert.deepEqual(board.top.map((t) => [t.position, t.name, t.contributions]), [[1, 'Bo', pct(Math.round(total * 0.75))], [2, 'Ada', pct(Math.round(total * 0.25))]]);
+    assert.deepEqual(board.me, { position: 2, contributions: pct(Math.round(total * 0.25)) });
+    assert.deepEqual(leaderboard(row, def, 50, 1).me, { position: 2, contributions: pct(Math.round(total * 0.25)) });
     assert.ok(Math.abs(phaseShare(row, CLS, def, 50) - 0.25) < 0.001);
   });
 
@@ -277,7 +285,9 @@ describe('ticket 190: the final card of a shared project names your share', () =
   it('finishJob reads the server share for the phase just done and your own phase record, not only the row', () => {
     const src = readFileSync(join(import.meta.dirname, '../public/js/features/street-jobs-feature.js'), 'utf8');
     const fn = src.slice(src.indexOf('function finishJob('), src.indexOf('function finishJob(') + 2400);
-    assert.match(fn, /out\.phase\?\.classTsid === p\.classTsid && n0\(out\.participation\) > 0/);
+    assert.match(fn, /out\.phase\?\.classTsid === p\.classTsid && Number\(out\.participation\) > 0/);
+    // The server now names every phase's share (projects.go sharesOf), so an earlier-phase helper's card is right too.
+    assert.match(fn, /out\.shares\?\.\[p\.classTsid\]/);
     assert.match(fn, /state\.phasesContributed \|\| \[\]\)\.includes\(mpContributedKey\(jobId, p\.classTsid\)\)/);
   });
 });

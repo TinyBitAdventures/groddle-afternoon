@@ -129,7 +129,8 @@ const HOME_STREET_TSID = 'RH_HOME_EXT';
 const HOME_INTERIOR_TSID = 'RH_HOME_INT';
 /** items/include/jobs.js startJobWork unit_duration. */
 const WORK_UNIT_MS = 1500;
-const WALK_AWAY_PX = 260;
+/** items/include/jobs.js acceptJobWork 369-373: work stops only when you leave the location. */
+const LEFT_TEXT = 'You left the location.';
 
 let tower = createTowerState();
 let bridge = null;
@@ -204,6 +205,7 @@ function workCtx(engine) {
     energy: engine.pc.energy,
     toolOk: (tool, wear) => canUseTool(engine.toolState, tool, wear).ok,
     useTool: (tool, wear) => useToolCondition(engine.toolState, tool, wear),
+    itemName: (cls) => itemLabel(cls),
   };
 }
 
@@ -574,7 +576,7 @@ async function goToFloor(engine, floor, via = 'elevator') {
 }
 
 async function leaveTower(engine) {
-  if (work) stopWork(engine, '');
+  if (work) stopWork(engine, LEFT_TEXT);
   closePanel();
   const x = bridge?.towerWorldX?.();
   tower.floor = null;
@@ -604,7 +606,7 @@ function startWork(engine, rid) {
   icon.scale.set(0.8);
   icon.zIndex = 40;
   engine.entityLayer.addChild(icon);
-  work = { rid, jobId: project.jobId, units: 0, energy: 0, nextAt: Date.now() + unitMs(), anchorX: engine.player.x, toolSprite: icon, tool: check.tool };
+  work = { rid, jobId: project.jobId, units: 0, energy: 0, nextAt: Date.now() + unitMs(), toolSprite: icon, tool: check.tool };
   engine.pushActivity(`You start to ${check.req.verb} with your ${itemLabel(check.tool)}.`);
   closePanel();
   publish(engine, true);
@@ -617,7 +619,16 @@ function stopWork(engine, reason) {
   work = null;
   if (w.toolSprite && !w.toolSprite.destroyed) w.toolSprite.destroy();
   if (reason) engine.prompt({ kicker: 'Tower Project', title: 'Work stopped', text: reason });
-  else if (w.units) engine.pushActivity(`You worked ${w.units} units on the ${TOWER_JOBS[w.jobId].title} project (${w.energy} energy).`);
+  // items/include/jobs.js cancelJobWork 451-455: the same thank-you as every project's.
+  const project = activeProject(tower);
+  const req = project?.jobId === w.jobId ? projectRequirements(w.jobId, project.got).find((r) => r.id === w.rid) : null;
+  if (w.units) {
+    const remaining = req ? Math.max(0, req.need - req.got) : 0;
+    const text = `Thanks! You contributed ${w.units} units of the ${w.units + remaining} we need right now. It took ${(w.units * WORK_UNIT_MS) / 1000} seconds and used ${w.energy} energy.`;
+    const target = streetView?.target;
+    if (target && engine.say) engine.say(target, text, 5000);
+    else engine.pushActivity(text);
+  }
   publish(engine, true);
 }
 
@@ -627,10 +638,6 @@ function tickWork(engine, now) {
   if (work.toolSprite && !work.toolSprite.destroyed && p) {
     work.toolSprite.x = p.x;
     work.toolSprite.y = p.y - 96 + Math.sin(now / 120) * 4;
-  }
-  if (p && Math.abs(p.x - work.anchorX) > WALK_AWAY_PX) {
-    stopWork(engine, 'You walked away from the project.');
-    return;
   }
   if (now < work.nextAt) return;
   work.nextAt = Math.max(work.nextAt + unitMs(), now + (fast() ? 0 : unitMs() / 2));
@@ -697,7 +704,8 @@ function completeProject(engine) {
     finishTower(tower);
     bridge?.markBuilt?.();
     setFlag(engine, BUILD_A_TOWER.buildFlag);
-    engine.pushActivity('Your Tower is finished. Step inside!');
+    // players/inc_jobs.js 466-468: job_cult_tower's line (it pays no iMG, so nothing follows).
+    engine.pushActivity('The Tower project on your home street has completed.');
   } else {
     endExpansion(tower);
     engine.pushActivity(`Your Tower now has ${tower.floors} floors.`);
@@ -1485,7 +1493,7 @@ export const homeTowerFeature = {
   },
 
   onStreetClear(engine) {
-    if (work) stopWork(engine, '');
+    if (work) stopWork(engine, LEFT_TEXT);
     closePanel();
     streetView = null;
     floorView = null;

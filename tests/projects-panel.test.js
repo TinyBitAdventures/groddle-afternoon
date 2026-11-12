@@ -426,10 +426,11 @@ describe('ticket 81 (Friendly, 2026-11-06): each need reads task first, with its
       assert.equal(workCheck(state, catalog, PALSA, req.id, { ...ctx, energy: Infinity }, NOW).ok, ok);
       assert.equal(needCan(req, ctx, labels).can === 'yes', ok);
     }
-    // workCheck reads the same gear (its messages are unchanged).
+    // workCheck reads the same gear; its words are quest.js get_status 966-976's.
     assert.deepEqual(workGear(req, { inv: { pick: 2 }, learned: [] }), { tools: ['pick'], held: ['pick'], tool: 'pick', missingSkill: true });
-    assert.equal(workCheck(state, catalog, PALSA, req.id, { inv: {}, learned: [] }, NOW).msg, 'You need a pick.');
-    assert.equal(workCheck(state, catalog, PALSA, req.id, { inv: { pick: 1 }, learned: [] }, NOW).msg, 'You need the skill this work asks for.');
+    assert.equal(workCheck(state, catalog, PALSA, req.id, { inv: {}, learned: [] }, NOW).msg, "You don't have a working pick.");
+    assert.equal(workCheck(state, catalog, PALSA, req.id, { inv: {}, learned: [], itemName: () => 'Pick' }, NOW).msg, "You don't have a working Pick.");
+    assert.equal(workCheck(state, catalog, PALSA, req.id, { inv: { pick: 1 }, learned: [], skillName: () => 'Mining IV' }, NOW).msg, "You don't know Mining IV.");
   });
 
   it('items and currants: what you carry against what is left', () => {

@@ -302,6 +302,61 @@ export function contributionsText(job, catalog, { mine, share }) {
     .join(' ');
 }
 
+/** A share of a phase as Glitch printed it (quest.js expandText 261: Math.round(x * 10000) / 100). */
+export const sharePercent = (share) => Math.round((Number(share) || 0) * 10000) / 100;
+
+/**
+ * Rewards.convertToString (glitch-client Rewards.as 54-96): "150 iMG, 20 mood, and 5 favor with all of
+ * the giants." in the order of Reward.as REWARD_TYPES (xp, mood, energy, currants, favor, items,
+ * drop tables); a drop table is named without a count. `parts` is [[amount, word]], amount null for a
+ * drop table.
+ */
+export function rewardWords(parts) {
+  const list = parts.filter(([n]) => n === null || Number(n));
+  return list
+    .map(([n, word], i) => {
+      const head = `${n === null ? '' : `${Number(n).toLocaleString('en-US')} `}${word}`;
+      if (i < list.length - 1) return `${head}${list.length > 2 ? ', ' : ' '}`;
+      return `${list.length > 1 ? 'and ' : ''}${head}.`;
+    })
+    .join('');
+}
+
+/**
+ * The job dialog's rewards (JobDialog.as showRewards 713-742): "All contributors will split: ..." and
+ * "The top N% of players will also split: ..." (performance_percent) or "The top N players will also
+ * get: ..." (performance_cutoff; "The top player" for one). A restoration shows none (713-717). The
+ * split pool is the class rewards at the job's amounts (over its divisor, as every share is paid);
+ * the performance rewards are whole. names: { giant(id), drop(tableId) }.
+ */
+export function jobRewardsText(job, def, names = {}) {
+  if (!job || !def || job.kind === 'restore' || job.kind === 'hall') return null;
+  const d = jobDivisor(job);
+  const giant = (g) => (g === 'all' ? 'all of the giants' : names.giant ? names.giant(g) : g);
+  const scaled = (n) => Math.round((Number(n) || 0) / d);
+  const r = def.rewards || {};
+  const all = rewardWords([
+    [scaled(r.xp), 'iMG'],
+    [scaled(r.mood), 'mood'],
+    [scaled(r.energy), 'energy'],
+    [scaled(r.currants), 'currants'],
+    ...(r.favor || []).map((f) => [scaled(f.points), `favor with ${giant(f.giant)}`]),
+  ]);
+  const p = def.performance || {};
+  const perf = rewardWords([
+    [p.xp || 0, 'iMG'],
+    [p.mood || 0, 'mood'],
+    [p.energy || 0, 'energy'],
+    ...(p.dropTables || []).map((id) => [null, names.drop ? names.drop(id) : id]),
+  ]);
+  const pct = Number(def.performancePercent) || 0;
+  const cut = Number(def.performanceCutoff) || 0;
+  let top = '';
+  if (perf && pct > 0) top = `The top ${pct}% of players will also split: ${perf}`;
+  else if (perf && cut > 0) top = `The top ${cut !== 1 ? `${cut} players` : 'player'} will also get: ${perf}`;
+  return { all: all ? `All contributors will split: ${all}` : '', top };
+}
+
 const ORDINALS = ['first', 'second', 'third', 'fourth', 'fifth', 'sixth'];
 export const phaseOrdinal = (index) => ORDINALS[index] || `${index + 1}th`;
 
@@ -339,6 +394,12 @@ export function phaseRequirements(state, catalog, jobId, index = null) {
   });
   for (const r of reqs) r.open = !r.done && r.group <= currentReqGroup(reqs, r.bucket);
   return reqs;
+}
+
+/** JobDialog.as updateProgress 655-661: "N.N% complete", whole at 0 and 100. */
+export function percentCompleteText(perc) {
+  const p = Math.max(0, Math.min(1, Number(perc) || 0));
+  return `${p !== 0 && p !== 1 ? (p * 100).toFixed(1) : p * 100}% complete`;
 }
 
 /** quest.js getCurrentReqGroup: the lowest group in the bucket not yet complete. */
@@ -397,8 +458,10 @@ export function jobStatus(state, catalog, jobId, now = Date.now(), opts = {}) {
   const phase = row?.phase || 0;
   if (row?.readyAt && row.readyAt > now) return { status: 'delayed', phase, until: row.readyAt };
   const started = Boolean(row?.startedAt);
-  if (!started && job.kind === 'street') {
-    const offering = opts.street || job.connecting[0];
+  // locations/inc_jobs.js jobs_get_available 457-461: a street or upgrade project not yet done (type 1 or 2,
+  // started or not) is not offered for 30 minutes after the street's last such project finished.
+  if (job.kind === 'street' || job.kind === 'upgrade') {
+    const offering = opts.street || (job.kind === 'upgrade' ? job.street : job.connecting?.[0]);
     const last = state.streetDone[offering] || 0;
     if (last && now - last < STREET_JOB_COOLDOWN_MS) {
       return { status: 'cooldown', phase, until: last + STREET_JOB_COOLDOWN_MS };
@@ -438,11 +501,19 @@ function canContribute(state, catalog, jobId, now) {
   return { ok: false, status, msg: msg || 'This project is not open.' };
 }
 
+/**
+ * Does a contribution to this project count toward the project badges? quest.js 1434: a type 5 job
+ * (a home restoration, the house's Build a New Floor, the Tower) adds no job_contributions, and
+ * 1671: it has no winners and no job_phase_winner count.
+ */
+export const countsForBadges = (job) => Boolean(job) && job.kind !== 'restore';
+
 function record(state, catalog, jobId, classTsid, baseCost, now, { hired = false } = {}) {
   const row = rowFor(state, jobId);
   if (!row.startedAt) row.startedAt = now;
   row.mine[classTsid] = (row.mine[classTsid] || 0) + baseCost;
   if (hired) row.hired[classTsid] = (row.hired[classTsid] || 0) + baseCost;
+  if (!countsForBadges(jobDef(catalog, jobId))) return { newPhase: false, distinctPhases: state.phasesContributed.length };
   const key = clean(`${jobId}-${classTsid}`);
   const newPhase = !state.phasesContributed.includes(key);
   if (newPhase) state.phasesContributed.push(key);
@@ -465,7 +536,8 @@ export function contributeItems(state, catalog, jobId, classId, count, inv, now 
   if (!req) return { ok: false, msg: 'Nothing here needs that right now.' };
   const have = whole(inv?.[classId]);
   const amount = Math.min(whole(count), have, req.need - req.got);
-  if (amount <= 0) return { ok: false, msg: `You have no ${classId.replace(/_/g, ' ')} to give.` };
+  // JobDetailsUI.as 191-199: "But! You don't have any."
+  if (amount <= 0) return { ok: false, msg: "You don't have any." };
   inv[classId] = have - amount;
   const row = rowFor(state, jobId);
   row.got[req.id] = req.got + amount;
@@ -505,8 +577,23 @@ export function workGear(req, ctx = {}) {
 }
 
 /**
+ * The first open work requirement of the current phase that takes `tool` (quest.js find_work
+ * 1501-1514: work runs with a tool, and each unit goes to the first requirement still open for it).
+ * Returns its id, or ''.
+ */
+export function findWork(state, catalog, jobId, tool, except = '') {
+  const req = phaseRequirements(state, catalog, jobId).find(
+    (r) => r.type === 'work' && r.open && r.id !== except && (r.classIds?.length ? r.classIds.includes(tool) : r.classId === tool),
+  );
+  return req ? req.id : '';
+}
+
+/**
  * Can the player do one unit of this work requirement themselves?
- * ctx: { inv, learned: string[], energy, toolOk(classTsid, wear) -> bool }
+ * ctx: { inv, learned: string[], energy, toolOk(classTsid, wear) -> bool, itemName(cls), skillName(id), tick }
+ * The board's words are quest.js get_status 966-976 ("You don't have a working <tool>.", "You don't know
+ * <skill>."); a unit while working (ctx.tick) checks energy first and words a lost tool as
+ * items/include/jobs.js acceptJobWork 382-393 does.
  */
 export function workCheck(state, catalog, jobId, rid, ctx = {}, now = Date.now()) {
   const gate = canContribute(state, catalog, jobId, now);
@@ -514,13 +601,16 @@ export function workCheck(state, catalog, jobId, rid, ctx = {}, now = Date.now()
   const req = phaseRequirements(state, catalog, jobId).find((r) => r.id === rid && r.type === 'work');
   if (!req) return { ok: false, msg: 'There is no such work.' };
   if (!req.open) return { ok: false, req, msg: req.done ? "There's no more work left to do." : 'Finish the earlier steps first.' };
-  const { tools, held, tool, missingSkill } = workGear(req, ctx);
+  const { tools, tool, missingSkill } = workGear(req, ctx);
   const canHire = !tool || missingSkill;
-  if (!held.length) return { ok: false, req, canHire, msg: `You need a ${tools[0].replace(/_/g, ' ')}.` };
-  if (!tool) return { ok: false, req, canHire, msg: "You don't have the necessary working tool." };
-  if (missingSkill) return { ok: false, req, canHire, tool, msg: 'You need the skill this work asks for.' };
   const energy = ctx.energy ?? ctx.pc?.energy;
-  if (whole(energy) <= req.energy) return { ok: false, req, tool, canHire: false, msg: "You don't have enough energy to continue." };
+  const tired = whole(energy) <= req.energy;
+  const itemName = (cls) => (ctx.itemName ? ctx.itemName(cls) : String(cls).replace(/_/g, ' '));
+  const skillName = (id) => (ctx.skillName ? ctx.skillName(id) : String(id).replace(/_/g, ' '));
+  if (ctx.tick && tired) return { ok: false, req, tool, canHire: false, msg: "You don't have enough energy to continue." };
+  if (!tool) return { ok: false, req, canHire, msg: ctx.tick ? "You don't have the necessary working tool." : `You don't have a working ${itemName(tools[0])}.` };
+  if (missingSkill) return { ok: false, req, canHire, tool, msg: `You don't know ${skillName(req.skill)}.` };
+  if (tired) return { ok: false, req, tool, canHire: false, msg: "You don't have enough energy to continue." };
   return { ok: true, req, tool, canHire: false };
 }
 
@@ -529,7 +619,7 @@ export function workCheck(state, catalog, jobId, rid, ctx = {}, now = Date.now()
  * on pc and calls ctx.useTool(classTsid, wear) for wear.
  */
 export function applyWorkUnit(state, catalog, jobId, rid, ctx = {}, now = Date.now()) {
-  const check = workCheck(state, catalog, jobId, rid, { ...ctx, energy: ctx.pc?.energy }, now);
+  const check = workCheck(state, catalog, jobId, rid, { ...ctx, energy: ctx.pc?.energy, tick: true }, now);
   if (!check.ok) return check;
   const { req, tool } = check;
   // G289: metabolics_lose_energy, nothing lost while dead (inc_metabolics.js 108-122).
@@ -662,9 +752,11 @@ export function settlePhase(state, catalog, jobId, now = Date.now(), rng = Math.
     else if (drop.currants) performance.currants += drop.currants;
     else if (drop.favor) performance.favor.push(drop.favor);
   }
-  state.phaseWins += 1;
+  // quest.js 1671: a type 5 job (restore) has no winners and no job_phase_winner count.
+  if (countsForBadges(job)) state.phaseWins += 1;
   const finalPhase = index >= job.phases.length - 1;
-  const participation = Math.round(share * 100);
+  // quest.js expandText 261 {job_participation}: two decimals.
+  const participation = sharePercent(share);
   const out = {
     ok: true,
     jobId,

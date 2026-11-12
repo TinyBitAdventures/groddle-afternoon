@@ -119,7 +119,11 @@ describe('the street project\'s work bubble counts the last unit (report 111)', 
     }
   });
 
-  const workButton = () => body.all().find((n) => n.dataset?.sjAct === 'work' && !n.disabled);
+  // JobDetailsUI.as's "How many?" starts at 1: Max asks for every unit left (QuantityPicker.as 150-152).
+  const workButton = () => {
+    body.all().find((n) => n.dataset?.sjQtyMax === 'work' && !n.disabled)?.fire('click');
+    return body.all().find((n) => n.dataset?.sjAct === 'work' && !n.disabled);
+  };
   const bubble = () => said.find((t) => t.startsWith('Thanks! You contributed'));
 
   it('solo: two units of the two needed', async () => {

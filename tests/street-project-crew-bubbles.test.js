@@ -138,6 +138,7 @@ describe('street project work: the other workers\' tool bubbles (gap 2)', () => 
     streetJobsFeature.onStreetEnter(engine.street, engine);
     await wait(5);
     projectApi.open(engine, JOB);
+    body.all().find((n) => n.dataset?.sjQtyMax === 'work' && !n.disabled)?.fire('click');
     body.all().find((n) => n.dataset?.sjAct === 'work' && !n.disabled).fire('click');
     assert.ok(streetJobsFeature._state().work?.mp, 'shared work');
     assert.deepEqual(sent('project_work_start'), [{ t: 'project_work_start', job: JOB, req: WORK.id, tool: 'hatchet' }]);

@@ -657,7 +657,8 @@ export function contributeItems(jobId, got, classId, count, inv) {
   if (!req) return { ok: false, msg: 'Nothing here needs that right now.' };
   const have = whole(inv?.[classId]);
   const amount = Math.min(whole(count), have, req.need - req.got);
-  if (amount <= 0) return { ok: false, msg: `You have no ${classId.replace(/_/g, ' ')} to give.` };
+  // JobDetailsUI.as 191-199: "But! You don't have any."
+  if (amount <= 0) return { ok: false, msg: "You don't have any." };
   inv[classId] = have - amount;
   got[req.id] = req.got + amount;
   return { ok: true, amount, req, baseCost: amount * req.baseCost, complete: projectComplete(jobId, got) };
@@ -675,15 +676,21 @@ export function workCheck(jobId, got, rid, ctx = {}) {
   const tools = req.classIds?.length ? req.classIds : [req.classId];
   const held = tools.filter((t) => whole(ctx.inv?.[t]) > 0);
   const tool = held.find((t) => (ctx.toolOk ? ctx.toolOk(t, req.wear) : true)) || null;
-  if (!held.length) return { ok: false, req, msg: `You need a ${tools[0].replace(/_/g, ' ')}.` };
-  if (!tool) return { ok: false, req, msg: "You don't have the necessary working tool." };
-  if (whole(ctx.energy) <= req.energy) return { ok: false, req, tool, msg: "You don't have enough energy to continue." };
+  // quest.js get_status 966-970: "You don't have a working <tool>." (ctx.itemName names it); a unit while
+  // working (ctx.tick) checks energy first and says what items/include/jobs.js acceptJobWork 382-393 says.
+  const tired = whole(ctx.energy) <= req.energy;
+  if (ctx.tick && tired) return { ok: false, req, tool, msg: "You don't have enough energy to continue." };
+  if (!tool) {
+    if (ctx.tick) return { ok: false, req, msg: "You don't have the necessary working tool." };
+    return { ok: false, req, msg: `You don't have a working ${ctx.itemName ? ctx.itemName(tools[0]) : tools[0].replace(/_/g, ' ')}.` };
+  }
+  if (tired) return { ok: false, req, tool, msg: "You don't have enough energy to continue." };
   return { ok: true, req, tool };
 }
 
 /** One 1.5 s unit: energy, tool wear (ctx.useTool), +1 on the requirement. */
 export function applyWorkUnit(jobId, got, rid, ctx = {}) {
-  const check = workCheck(jobId, got, rid, { ...ctx, energy: ctx.pc?.energy });
+  const check = workCheck(jobId, got, rid, { ...ctx, energy: ctx.pc?.energy, tick: true });
   if (!check.ok) return check;
   const { req, tool } = check;
   // G289: metabolics_lose_energy, nothing lost while dead (inc_metabolics.js 108-122).

@@ -104,6 +104,11 @@ import {
   cancelJob,
   jobDivisor,
   upgradeOption,
+  findWork,
+  countsForBadges,
+  sharePercent,
+  percentCompleteText,
+  jobRewardsText,
 } from '../street-jobs.js?v=94f8d250';
 import { PAPERS_BADGE } from '../subway.js?v=44d1a09f';
 import { gainMetabolic, loseEnergy } from '../metabolics.js?v=8504134e';
@@ -130,6 +135,7 @@ import {
   rowFromServer,
   sharedSlice,
   topLine,
+  leaderboard,
 } from '../street-jobs-mp.js?v=25efcadf';
 import { grantMoodXp } from '../mood-xp.js?v=958e7680';
 import { createMinnAccount } from '../minn-account.js?v=c15f0ecf';
@@ -160,7 +166,10 @@ const FLORA_ART = Object.freeze({
   bushes: ['bush_1', 'bush_2'],
 });
 const FLORA_COUNT = 6;
-const WALK_AWAY_PX = 260;
+/** items/include/jobs.js acceptJobWork 369-373: work stops only when you leave the street. */
+const LEFT_TEXT = 'You left the location.';
+/** quest.js onJobComplete 1652-1656: these type 5 jobs count no cultivation_projects_restored. */
+const NOT_A_RESTORATION = (cls) => cls === 'job_proto_door' || cls === 'job_cult_tower' || String(cls || '').startsWith('job_tower_floor_');
 
 let catalog = null;
 let streetIndex = null;
@@ -957,7 +966,8 @@ function finishPhase(engine, jobId) {
   const paid = payout(engine, out.rewards);
   const paidPerformance = payout(engine, out.performance);
   grantItems(engine, out.performance.items);
-  engine.achievement(PHASE_WINNER_COUNTER, 1);
+  // quest.js 1671, 1715-1719: a type 5 job (restore) has no top five.
+  if (countsForBadges(job)) engine.achievement(PHASE_WINNER_COUNTER, 1);
   const bits = [...rewardBits(paid), ...rewardBits(paidPerformance)];
   const solo = job.kind === 'restore'
     ? ''
@@ -1006,16 +1016,20 @@ function finishJob(engine, jobId, out, solo) {
   // last phase the project's row may already be gone, and ticket 190's card said "You did not
   // contribute" after the phase card had said 49%. An earlier phase also counts as yours when this
   // player's own record has it (markContributed).
+  // The server's project_reward / completion names your share of every phase (shares, two decimals as
+  // quest.js expandText 261 printed {job_participation}); an older message falls back to the row.
   const sharedShare = (p) => {
-    if (out.phase?.classTsid === p.classTsid && n0(out.participation) > 0) return n0(out.participation);
-    return Math.round(phaseShare(state.jobs[jobId], p.classTsid, catalog.classes[p.classTsid], jobDivisor(job)) * 100);
+    const named = out.shares?.[p.classTsid];
+    if (named != null) return Math.max(0, Number(named) || 0);
+    if (out.phase?.classTsid === p.classTsid && Number(out.participation) > 0) return Number(out.participation);
+    return sharePercent(phaseShare(state.jobs[jobId], p.classTsid, catalog.classes[p.classTsid], jobDivisor(job)));
   };
   const contributions = contributionsText(job, catalog, {
     mine: (p) =>
       shared(jobId)
-        ? sharedShare(p) > 0 || (state.phasesContributed || []).includes(mpContributedKey(jobId, p.classTsid))
+        ? (out.shares ? out.shares[p.classTsid] != null : sharedShare(p) > 0 || (state.phasesContributed || []).includes(mpContributedKey(jobId, p.classTsid)))
         : Boolean(state.jobs[jobId]?.mine?.[p.classTsid]),
-    share: (p) => (shared(jobId) ? Math.max(1, sharedShare(p)) : 100),
+    share: (p) => (shared(jobId) ? sharedShare(p) : 100),
   });
   if (job.kind === 'hall') return finishHall(engine, jobId, job, contributions, solo);
   teleportationFeature.grantScript(engine, arrivalFor(job));
@@ -1076,16 +1090,23 @@ function finishRestore(engine, jobId, job, def, out) {
   const where = hooks?.place || 'on your home street';
   const name = phaseTitle(job, job.phases[0], def);
   const xp = Number(out?.rewards?.xp) || 0;
+  const cls = job.phases[0]?.classTsid;
+  // quest.js 1652-1656: the player whose contribution finished a restoration (not the Door, the Tower or a
+  // Tower floor) counts one cultivation_projects_restored (Cultivation Nurturer, Restorer of Stuff, Make Do
+  // and Mender). Online the server names that player (finisher).
+  if (!NOT_A_RESTORATION(cls) && (!shared(jobId) || out?.finisher === true)) engine.achievement(`cultivation_projects_restored:${jobId}`, 1);
   const text = `The ${name} restoration project ${where} has completed.${xp ? ` Since you contributed, you got ${xp.toLocaleString()} imagination.` : ''}`;
-  engine.pushActivity(text);
+  // quest.js 1734: the Door's Build a New Floor sends no completion line.
+  if (cls !== 'job_proto_door') engine.pushActivity(text);
   let after = '';
   try {
     after = hooks?.onDone?.(engine, { jobId, out, job }) || '';
   } catch (err) {
     console.warn('restore onDone', err);
   }
-  const steps = [{ text, response: 'View Rewards' }];
   const done = plainText(def.completion || '');
+  if (cls === 'job_proto_door') return { title: name, steps: [{ text: [done, after].filter(Boolean).join(' ') || name, response: 'OK' }] };
+  const steps = [{ text, response: 'View Rewards' }];
   steps.push({ text: [done, after].filter(Boolean).join(' '), response: 'OK' });
   return { title: `${name} restored`, steps };
 }
@@ -1116,6 +1137,8 @@ function workCtx(engine) {
     energy: engine.pc.energy,
     toolOk: (tool, wear) => canUseTool(engine.toolState, tool, wear).ok,
     useTool: (tool, wear) => useToolCondition(engine.toolState, tool, wear),
+    itemName: (cls) => itemLabel(cls),
+    skillName: (id) => skillLabel(id),
   };
 }
 
@@ -1259,7 +1282,7 @@ function startWork(engine, jobId, rid, maxUnits = Infinity) {
     energy: 0,
     startedAt: Date.now(),
     nextAt: Date.now() + WORK_UNIT_MS,
-    anchorX: engine.player.x,
+    street: engine.streetTsid,
     toolSprite: fx,
     sound: jobWorkSoundKey(check.tool) ? engine.playSoundLoop?.(jobWorkSoundKey(check.tool), { volume: 0.5 }) || null : null,
     tool: check.tool,
@@ -1284,7 +1307,7 @@ function startWork(engine, jobId, rid, maxUnits = Infinity) {
  * so the copy had not counted the last unit yet and the bubble said "2 of the 3" for a need of 2.
  * Glitch counted the unit before it spoke (items/include/jobs.js 453).
  */
-function stopWork(engine, reason, left = null) {
+function stopWork(engine, reason, left = null, { quiet = false } = {}) {
   if (!work) return;
   const w = work;
   work = null;
@@ -1295,7 +1318,8 @@ function stopWork(engine, reason, left = null) {
   if (reason) engine.prompt({ kicker: 'Street Project', title: 'Work stopped', text: reason });
   const sayTo = external.get(w.jobId)?.target?.() || giverFor(w.jobId)?.target;
   const known = Number.isFinite(left);
-  if ((req || known) && sayTo && w.units) {
+  // quiet: items/include/jobs.js cancelJobWork 434-435 thanks only while a step for the tool is left.
+  if (!quiet && (req || known) && sayTo && w.units) {
     const remaining = known ? Math.max(0, left) : Math.max(0, req.need - req.got);
     engine.say(
       sayTo,
@@ -1314,8 +1338,8 @@ function tickWork(engine, now) {
     work.toolSprite.x = p.x;
     work.toolSprite.y = p.y + JOB_WORK_OVERLAY.deltaY;
   }
-  if (Math.abs(p.x - work.anchorX) > WALK_AWAY_PX) {
-    stopWork(engine, 'You walked away from the project.');
+  if (work.street && engine.streetTsid !== work.street) {
+    stopWork(engine, LEFT_TEXT, null, { quiet: true });
     return;
   }
   if (work.mp) {
@@ -1326,6 +1350,7 @@ function tickWork(engine, now) {
   work.nextAt += WORK_UNIT_MS;
   if (work.nextAt < now) work.nextAt = now + WORK_UNIT_MS;
   const jobId = work.jobId;
+  if (!retargetWork()) return;
   const res = applyWorkUnit(state, catalog, jobId, work.rid, workCtx(engine));
   if (!res.ok) {
     stopWork(engine, res.msg);
@@ -1343,11 +1368,33 @@ function tickWork(engine, now) {
     finishPhase(engine, jobId);
     return;
   }
-  if (res.left <= 0 || work.units >= work.maxUnits) {
+  // items/include/jobs.js acceptJobWork 340-344: the run ends at its count; a step done before then
+  // hands the next unit to the next open step for the same tool (find_work).
+  if (work.units >= work.maxUnits || (res.left <= 0 && !findWork(state, catalog, jobId, work.tool))) {
     stopWork(engine, '', res.left);
     return;
   }
   if (panel && !panel.hidden) renderPanel(engine);
+}
+
+/**
+ * items/include/jobs.js acceptJobWork 355-360 and quest.js find_work 1501-1514: each unit goes to the
+ * first open step of the phase that takes the tool you work with; when none is left (someone else
+ * finished it) the work stops without a word. False when it stopped.
+ */
+function retargetWork() {
+  if (!work) return false;
+  const rid = findWork(state, catalog, work.jobId, work.tool);
+  if (!rid) {
+    if (engineRef) stopWork(engineRef, '', null, { quiet: true });
+    else work = null;
+    return false;
+  }
+  if (rid !== work.rid) {
+    work.rid = rid;
+    work.req = phaseRequirements(state, catalog, work.jobId).find((r) => r.id === rid) || work.req;
+  }
+  return true;
 }
 
 /* ------------------------------------------------------------------ */
@@ -1394,6 +1441,19 @@ const PANEL_CSS = `
 .sj-hall .combo .combo-toggle{border:0;background:transparent;padding:0;border-radius:var(--radius-round)}
 .sj-hall .combo-input{padding-right:1.9rem;background:var(--surface-bright);color:inherit;box-shadow:none}
 .sj-others button{font:inherit;font-size:var(--fs-sm);background:none;border:0;color:var(--c-blue-51);cursor:pointer;padding:0;text-decoration:underline}
+.sj-perc{font-size:var(--fs-sm);font-weight:400;color:var(--c-sand-51b);white-space:nowrap}
+.sj-qty{display:flex;align-items:center;gap:.2rem;flex-wrap:wrap;justify-content:flex-end}
+.sj-qty label{font-size:var(--fs-xs);color:var(--c-sand-56);margin-right:.15rem}
+.sj-qty input{width:4.2em;font:inherit;font-size:var(--fs-sm);padding:.2rem .25rem;border-radius:var(--radius-sm);border:1px solid var(--c-sand-83);background:var(--surface-bright);color:inherit;text-align:center}
+.sj-req .sj-qty button[data-sj-qty-step]{padding:.15rem .4rem;min-width:1.7em}
+.sj-req small.sj-but{color:var(--c-umber-45)}
+.sj-rewards{margin:var(--sp-4) 0 0;font-size:var(--fs-sm);color:var(--c-sand-39)}
+.sj-rewards b{color:var(--c-sand-33)}
+.sj-board{margin:var(--sp-4) 0 0;font-size:var(--fs-sm);color:var(--c-sand-39)}
+.sj-board b{display:block;color:var(--c-sand-33)}
+.sj-board ol{margin:.15rem 0 0;padding-left:var(--sp-9)}
+.sj-board li.is-me,.sj-board p.is-me{font-weight:700;color:var(--c-umber-41)}
+.sj-board p{margin:.15rem 0 0}
 @media (max-width:480px){.sj-options{grid-template-columns:1fr}.sj-req{grid-template-columns:28px 1fr}.sj-req .sj-acts{grid-column:1/-1}}
 `;
 
@@ -1415,8 +1475,10 @@ function ensurePanel() {
     <p class="sj-desc" data-sj-desc></p>
     <div class="sj-options" data-sj-options hidden></div>
     <div class="sj-hall" data-sj-hall hidden></div>
-    <div class="sj-phase"><span data-sj-phase></span><div class="sj-bar"><i data-sj-bar></i></div></div>
+    <div class="sj-phase"><span data-sj-phase></span><div class="sj-bar"><i data-sj-bar></i></div><small class="sj-perc" data-sj-perc></small></div>
     <ul class="sj-reqs" data-sj-reqs></ul>
+    <p class="sj-rewards" data-sj-rewards hidden></p>
+    <div class="sj-board" data-sj-board hidden></div>
     <p class="sj-status" data-sj-status></p>
     <div class="sj-others" data-sj-others hidden></div>
   </div>`;
@@ -1443,9 +1505,89 @@ function openPanel(engine, jobId) {
     loadHallGroups(engine);
   }
   if (panelJobId !== jobId) hallConfirm = '';
+  // JobDetailsUI.as 131: the picker starts at 1 each time it shows.
+  if (panelJobId !== jobId || panel.hidden) pickQty.clear();
   panelJobId = jobId;
   panel.hidden = false;
   renderPanel(engine);
+}
+
+/** What the "How many?" pickers hold while the panel is open: `${jobId}:${rid}` -> count. */
+const pickQty = new Map();
+
+/**
+ * JobDetailsUI.as's QuantityPicker (63-75: min 1, a Max button) and its Contribute button: from 1 to
+ * `max` (what you have and the step still needs, 216), starting at 1 (131). `go(n)` contributes n.
+ * Nothing to give (max 0) shows the picker greyed out and Contribute off.
+ */
+function qtyPicker({ jobId, rid, act, max, busy, go }) {
+  const key = `${jobId}:${rid}`;
+  const top = Math.max(0, Math.floor(Number(max) || 0));
+  const box = el('span', { class: 'sj-qty', dataset: { sjQty: act } });
+  const label = el('label', {}, 'How many?');
+  const input = el('input', { type: 'number', min: '1', max: String(Math.max(1, top)), inputmode: 'numeric', 'aria-label': 'How many?' });
+  const minus = el('button', { type: 'button', 'aria-label': 'Fewer', dataset: { sjQtyStep: '-' } }, '−');
+  const plus = el('button', { type: 'button', 'aria-label': 'More', dataset: { sjQtyStep: '+' } }, '+');
+  const maxBtn = el('button', { type: 'button', dataset: { sjQtyMax: act } }, 'Max');
+  const goBtn = el('button', { type: 'button', class: 'primary', dataset: { sjAct: act } }, 'Contribute');
+  const set = (v) => {
+    const n = top ? Math.max(1, Math.min(top, Math.floor(Number(v)) || 1)) : 1;
+    pickQty.set(key, n);
+    input.value = String(n);
+    minus.disabled = !top || n <= 1;
+    plus.disabled = !top || n >= top;
+    return n;
+  };
+  set(pickQty.get(key) || 1);
+  input.disabled = maxBtn.disabled = !top;
+  goBtn.disabled = !top || busy;
+  minus.addEventListener('click', () => set((pickQty.get(key) || 1) - 1));
+  plus.addEventListener('click', () => set((pickQty.get(key) || 1) + 1));
+  maxBtn.addEventListener('click', () => set(top));
+  input.addEventListener('change', () => set(input.value));
+  goBtn.addEventListener('click', () => {
+    const n = set(input.value || pickQty.get(key) || 1);
+    pickQty.set(key, 1);
+    go(n);
+  });
+  box.append(label, minus, input, plus, maxBtn, goBtn);
+  return box;
+}
+
+/**
+ * The dialog's rewards (JobDialog.as showRewards 713-742) and Leaderboard (763-770, LeaderboardUI.as;
+ * items/include/jobs.js getJobLeaderboard 524-560: the top ten, two-decimal shares, your place). A
+ * restoration or the house's floor shows neither (JobDialog.as 348-357, 715), a group hall no rewards.
+ */
+function renderRewardsAndBoard(engine, jobId, job, def, row, status) {
+  const rewardsBox = panel.querySelector('[data-sj-rewards]');
+  const boardBox = panel.querySelector('[data-sj-board]');
+  rewardsBox.replaceChildren();
+  boardBox.replaceChildren();
+  const live = status.status === 'active' || status.status === 'open';
+  const words = live ? jobRewardsText(job, def, { giant: giantDisplayName, drop: (id) => catalog.drops?.[id]?.name || id }) : null;
+  rewardsBox.hidden = !words?.all && !words?.top;
+  if (words?.all) rewardsBox.append(el('span', {}, words.all));
+  if (words?.top) rewardsBox.append(el('br'), el('span', {}, words.top));
+  const divisor = jobDivisor(job);
+  let board = null;
+  if (live && job.kind !== 'restore') {
+    if (shared(jobId)) board = leaderboard(row, def, divisor, n0(mp?.client?.me?.id));
+    else {
+      const mine = n0(row.mine?.[def && job.phases[row.phase || 0]?.classTsid]);
+      board = leaderboard(mine ? { top: [{ id: 1, name: 'You', cost: mine }] } : {}, def, divisor, 1);
+    }
+  }
+  boardBox.hidden = !board?.top?.length;
+  if (!board?.top?.length) return;
+  boardBox.append(el('b', {}, 'Leaderboard'));
+  const ol = el('ol');
+  for (const t of board.top) {
+    const li = el('li', { class: board.me?.position === t.position ? 'is-me' : '' }, `${t.name} ${t.contributions}%`);
+    ol.append(li);
+  }
+  boardBox.append(ol);
+  if (board.me && board.me.position > board.top.length) boardBox.append(el('p', { class: 'is-me' }, `You: ${board.me.position}. ${board.me.contributions}%`));
 }
 
 function closePanel() {
@@ -1521,10 +1663,11 @@ function renderPanel(engine) {
   const reqs = status.status === 'done' || status.status === 'built'
     ? phaseRequirements(state, catalog, jobId, job.phases.length - 1)
     : phaseRequirements(state, catalog, jobId);
-  const need = reqs.reduce((s, r) => s + r.need, 0) || 1;
-  const got = reqs.reduce((s, r) => s + r.got, 0);
+  // JobDialog.as updateProgress 655-661 and quest.js 1012: by base cost, "N.N% complete".
+  const perc = status.status === 'done' ? 1 : jobPerc(reqs);
   q('[data-sj-phase]').textContent = `Phase ${Math.min(job.phases.length, status.phase + 1)} of ${job.phases.length}: ${phaseTitle(job, pcx.phase, def)}`;
-  q('[data-sj-bar]').style.width = `${Math.round((status.status === 'done' ? 1 : got / need) * 100)}%`;
+  q('[data-sj-bar]').style.width = `${Math.round(perc * 1000) / 10}%`;
+  q('[data-sj-perc]').textContent = percentCompleteText(perc);
 
   const list = q('[data-sj-reqs]');
   list.replaceChildren();
@@ -1556,20 +1699,15 @@ function renderPanel(engine) {
     // G617: how gems are found, under a gem ask still open (the remake's own line; no source).
     if (r.type === 'item' && isGem(r.classId) && !r.done) text.append(el('small', { class: 'sj-hint', dataset: { sjHint: 'gems' } }, GEM_HINTS.project));
     const acts = el('div', { class: 'sj-acts' });
+    // JobDetailsUI.as 63-75, 131, 216: "How many?", from 1 to what you have and the step still needs, 1 to start, Max.
+    const left = Math.max(0, r.need - r.got - (shared(jobId) ? n0(row.held?.[r.id]) : 0));
     if (open && r.open) {
       if (r.type === 'item') {
-        const have = countItem(engine.inv, r.classId);
-        const n = Math.min(have, r.need - r.got);
-        const b = el('button', { type: 'button', class: 'primary', dataset: { sjAct: 'give' } }, n ? `Add ${n}` : 'Add');
-        b.disabled = !n || Boolean(mp?.giving);
-        b.addEventListener('click', () => doGive(engine, jobId, r.classId, n));
-        acts.append(b);
+        const max = Math.min(countItem(engine.inv, r.classId), left);
+        acts.append(qtyPicker({ jobId, rid: r.id, act: 'give', max, busy: Boolean(mp?.giving), go: (n) => doGive(engine, jobId, r.classId, n) }));
       } else if (r.type === 'currants') {
-        const n = Math.min(engine.pc.currants || 0, r.need - r.got);
-        const b = el('button', { type: 'button', class: 'primary', dataset: { sjAct: 'currants' } }, n ? `Give ${n.toLocaleString()}` : 'Give');
-        b.disabled = !n || Boolean(mp?.giving);
-        b.addEventListener('click', () => doCurrants(engine, jobId, n));
-        acts.append(b);
+        const max = Math.min(n0(engine.pc.currants), left);
+        acts.append(qtyPicker({ jobId, rid: r.id, act: 'currants', max, busy: Boolean(mp?.giving), go: (n) => doCurrants(engine, jobId, n) }));
       } else if (r.type === 'work') {
         const busy = work && work.jobId === jobId && work.rid === r.id;
         if (busy) {
@@ -1578,11 +1716,11 @@ function renderPanel(engine) {
           acts.append(b);
         } else {
           const check = workCheck(state, catalog, jobId, r.id, ctx);
-          const b = el('button', { type: 'button', class: 'primary', dataset: { sjAct: 'work' } }, 'Work');
-          b.disabled = !check.ok;
-          b.title = check.ok ? `${r.need - r.got} units, ${(WORK_UNIT_MS / 1000).toFixed(1)}s each` : check.msg;
-          b.addEventListener('click', () => startWork(engine, jobId, r.id));
-          acts.append(b);
+          const picker = qtyPicker({ jobId, rid: r.id, act: 'work', max: check.ok ? left : 0, busy: false, go: (n) => startWork(engine, jobId, r.id, n) });
+          picker.title = check.ok ? `${left} units, ${(WORK_UNIT_MS / 1000).toFixed(1)}s each` : check.msg;
+          acts.append(picker);
+          // JobDetailsUI.as 165-167: "But! <the reason>" when you can't do this work.
+          if (!check.ok) text.append(el('small', { class: 'sj-but', dataset: { sjBut: r.id } }, `But! ${check.msg}`));
           if (check.canHire && !shared(jobId)) {
             const quote = hireQuote(state, catalog, jobId, r.id);
             const h = el('button', { type: 'button', dataset: { sjAct: 'hire' } }, `Hire a hand · ${quote.cost.toLocaleString()}c`);
@@ -1600,6 +1738,8 @@ function renderPanel(engine) {
     list.append(li);
   }
 
+  renderRewardsAndBoard(engine, jobId, job, def, row, status);
+
   const statusLine = q('[data-sj-status]');
   const mins = (t) => Math.max(1, Math.ceil((t - Date.now()) / 60000));
   statusLine.textContent = {
@@ -1611,8 +1751,8 @@ function renderPanel(engine) {
     open: `Solo amounts: 1/${SOLO_DIVISOR} of the original multiplayer totals. Every contribution counts toward this phase.`,
   }[status.status];
   if (shared(jobId) && (status.status === 'active' || status.status === 'open')) {
-    const top = topLine(row, def, jobDivisor(job));
-    statusLine.textContent = `${MP_TEXT.note}${top ? ` Top contributors: ${top}.` : ' Nobody has put anything in yet.'}${work ? ` Working: ${work.units} units so far.` : ''}`;
+    // The Leaderboard below names the contributors (items/include/jobs.js getJobLeaderboard).
+    statusLine.textContent = `${MP_TEXT.note}${row.top?.length ? '' : ' Nobody has put anything in yet.'}${work ? ` Working: ${work.units} units so far.` : ''}`;
   }
   if (job.kind === 'hall' && status.status === 'done') statusLine.textContent = `${HALL_TEXT.owned(hall?.group?.name || 'A group')} ${HALL_TEXT.noStreet}`;
   else if (unclaimed) statusLine.textContent = MP_TEXT.note;
@@ -1888,10 +2028,8 @@ function createMp(engine, client) {
     state.jobs[jobId] = rowFromServer(msg.row, offset);
     // Ticket 81: the Projects panel follows the board for a project of yours.
     if (mineRows.has(jobId) || mineTotal(state.jobs[jobId]) > 0) mineRows.set(jobId, state.jobs[jobId]);
-    if (work?.mp && work.jobId === jobId && !work.awaiting) {
-      const req = phaseRequirements(state, catalog, jobId).find((r) => r.id === work.rid);
-      if (!req || !req.open) stopWork(engine, '');
-    }
+    // Someone else finished the step you work on: the next open one for your tool, else a quiet stop (retargetWork).
+    if (work?.mp && work.jobId === jobId && !work.awaiting) retargetWork();
     refresh();
   });
   // G656: the world's featured street project (projects_featured.go), on every sync and when it changes or moves.
@@ -1970,7 +2108,8 @@ function createMp(engine, client) {
       s.claiming = null;
       engine.pushActivity(HALL_TEXT.paid(n0(msg.currants)));
     } else {
-      const rec = markContributed(state, jobId, String(msg.cls || ''));
+      // quest.js 1434: a restoration (type 5) adds no job_contributions.
+      const rec = countsForBadges(jobDef(catalog, jobId)) ? markContributed(state, jobId, String(msg.cls || '')) : { newPhase: false };
       if (rec.newPhase) for (const badge of contributionBadgesReached(rec.distinctPhases)) engine.grantAchievement(badge);
       engine.pushActivity(c ? `You contributed ${n0(n)} ${itemLabel(c, n0(n))}.` : `You contributed ${n0(msg.currants).toLocaleString()} currants.`);
     }
@@ -2002,8 +2141,8 @@ function createMp(engine, client) {
       const paid = payout(engine, parts.rewards);
       const paidPerformance = payout(engine, parts.performance);
       grantItems(engine, parts.performance.items);
-      // quest.js 1715-1719: the top five get a job_phase_winner count.
-      if (msg.top5) {
+      // quest.js 1715-1719: the top five get a job_phase_winner count (1671: never for a restoration).
+      if (msg.top5 && countsForBadges(job)) {
         engine.achievement(PHASE_WINNER_COUNTER, 1);
         state.phaseWins += 1;
       }
@@ -2013,7 +2152,10 @@ function createMp(engine, client) {
         def: pc.def,
         // HOMES3: a shared restoration's award names the iMG it paid (finishRestore).
         rewards: paid,
-        participation: n0(msg.participation),
+        participation: Math.max(0, Number(msg.participation) || 0),
+        // Your share of every phase (projects.go shares), and whether your contribution finished it (finisher).
+        shares: msg.shares && typeof msg.shares === 'object' ? msg.shares : null,
+        finisher: msg.finisher === true,
         finalPhase: msg.final === true,
         phaseCount: job.phases.length,
         participant: n0(msg.phases) >= 4,
@@ -2086,7 +2228,7 @@ function mpGive(engine, jobId, what) {
   if (!req) return engine.toast(money ? 'No currants are needed right now.' : 'Nothing here needs that right now.'), false;
   const have = money ? n0(engine.pc.currants) : countItem(engine.inv, what.classId);
   const n = Math.min(n0(money ? what.currants : what.n), have, req.need - req.got - n0(state.jobs[jobId]?.held?.[req.id]));
-  if (n <= 0) return engine.toast(money ? 'You do not have any currants to give.' : `You have no ${String(what.classId).replace(/_/g, ' ')} to give.`), false;
+  if (n <= 0) return engine.toast(money ? 'You do not have any currants to give.' : "You don't have any."), false;
   const payload = { job: wireOf(jobId), req: req.id, option: mpChoice[jobId] || '' };
   if (money) payload.currants = n;
   else payload.n = n;
@@ -2137,7 +2279,8 @@ function mpTickWork(engine, now) {
     return;
   }
   if (now < work.nextAt) return;
-  const check = workCheck(state, catalog, work.jobId, work.rid, workCtx(engine));
+  if (!retargetWork()) return;
+  const check = workCheck(state, catalog, work.jobId, work.rid, { ...workCtx(engine), tick: true });
   if (!check.ok) {
     stopWork(engine, check.msg);
     return;
@@ -2164,13 +2307,19 @@ function mpWorked(engine, msg) {
   work.energy += req.energy;
   workFloat(engine, `+1 ${req.verbPast}`);
   if (wear?.msg) engine.pushActivity(wear.msg);
-  const rec = markContributed(state, work.jobId, work.cls);
+  const rec = countsForBadges(jobDef(catalog, work.jobId)) ? markContributed(state, work.jobId, work.cls) : { newPhase: false };
   if (rec.newPhase) for (const badge of contributionBadgesReached(rec.distinctPhases)) engine.grantAchievement(badge);
   engine.updateHud();
   drawPlate(engine);
-  if (n0(msg.left) <= 0 || work.units >= work.maxUnits) {
+  // The row may not have counted this unit yet (report 111), so a finished step is passed over by id.
+  const next = n0(msg.left) <= 0 ? findWork(state, catalog, work.jobId, work.tool, work.rid) : work.rid;
+  if (work.units >= work.maxUnits || !next) {
     stopWork(engine, '', n0(msg.left));
     return;
+  }
+  if (next !== work.rid) {
+    work.rid = next;
+    work.req = phaseRequirements(state, catalog, work.jobId).find((r) => r.id === next) || work.req;
   }
   if (panel && !panel.hidden) renderPanel(engine);
 }
@@ -2836,7 +2985,7 @@ export const streetJobsFeature = {
 
   onStreetClear(engine) {
     generation += 1;
-    if (work) stopWork(engine, '');
+    if (work) stopWork(engine, LEFT_TEXT, null, { quiet: true });
     if (panel) panel.hidden = true;
     if (board?.sprite && !board.sprite.destroyed) board.sprite.destroy({ children: true });
     board = null;
@@ -3108,11 +3257,10 @@ export const projectApi = {
   },
   status: (jobId) => (catalog && catalog.jobs[jobId] ? jobStatus(state, catalog, jobId, Date.now(), opts()) : null),
   inProgress: (jobId) => jobInProgress(state, jobId),
+  /** quest.js get_status 1012: how far along by base cost, as the bubble and the dialog's bar read it. */
   percent(jobId) {
     if (!catalog?.jobs?.[jobId]) return 0;
-    const reqs = phaseRequirements(state, catalog, jobId);
-    const need = reqs.reduce((sum, r) => sum + r.need, 0) || 1;
-    return reqs.reduce((sum, r) => sum + r.got, 0) / need;
+    return jobPerc(phaseRequirements(state, catalog, jobId));
   },
   requirements: (jobId) => (catalog?.jobs?.[jobId] ? phaseRequirements(state, catalog, jobId) : []),
   open(engine, jobId) {
