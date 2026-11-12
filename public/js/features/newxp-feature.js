@@ -125,7 +125,7 @@ import {
   vogPages,
   tutorialNameDefault,
   TUTORIAL_NAME_MAX,
-} from '../newxp.js?v=554cfdda';
+} from '../newxp.js?v=a551e661';
 import { ITEM_CATALOG, addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=60dfc9ca';
 import { QUOIN_SHEET, QUOIN_TYPES, qrazyRewardForLevel } from '../quoins.js?v=7e0dec6d';
 import { soundForQuoin } from '../sound-moments.js?v=52ad523c';
@@ -139,7 +139,7 @@ import { frameTexture, onLoaded, sourceFromUrl, textureFromUrl, whenLoaded } fro
 import { upgradeSource } from '../sprite-hires.js?v=dd5da64c';
 import { grantMoodXp } from '../mood-xp.js?v=958e7680';
 import { displayTopOf, itemstackOverlayPoint, playPoofIn, playSheetOverlay, poofInAlpha } from '../overlay-art.js?v=75c3ea34';
-import { HOME_MACHINE } from '../home-ticket.js?v=5fa5dc08';
+import { HOME_MACHINE } from '../home-ticket.js?v=9b031faa';
 import { animalAnchorX, animalAnchorY, createAnimalState } from '../animals.js?v=4e488834';
 import {
   AK_ANIMALS,
@@ -2549,7 +2549,10 @@ function bagShopProfile(engine = null) {
     color: 0xc79a4a,
     label: 'Cheap Bag Vendor',
     desc: 'Bags, cheap.',
-    buyMultiplier: 0.66,
+    // She buys nothing back: Glitch's Bag Vendor (catalog_stores.js 1573-1580, store 24: Generic Bags
+    // at 500, buy_multiplier 0; inc_stores.js storeSell 301-307 "You can't sell that item."). At 0.66
+    // she paid 594 (round(900 x 0.66), bag_generic base_cost) for a bag she sold for 500, a loop.
+    buyMultiplier: 0,
     offers: [{ classTsid: 'bag_generic', label: 'Generic Bag', get cost() { return price(); }, get buyPrice() { return price(); } }],
   };
 }

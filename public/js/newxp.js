@@ -414,7 +414,8 @@ export function training2MeterFull(value, max) {
 }
 // newbie_island.js revealCurrants2: stats_add_currants(978).
 export const ISLAND_CURRANTS = 978;
-// The cheap bag vendor's prices are lost; the rock says "about 500 currants each".
+// The rock says "about 500 currants each"; Glitch's Bag Vendor sold Generic Bags at 500 and bought
+// nothing back (catalog_stores.js 1573-1580, store 24, buy_multiplier 0; features/newxp-feature.js).
 export const CHEAP_BAG_PRICE = 500;
 export const BAGS_NEEDED = 2;
 

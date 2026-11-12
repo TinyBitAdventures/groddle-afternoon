@@ -260,7 +260,7 @@ import {
   ROCK_VERB_IDS,
 } from '../magic-rock-home.js?v=c07b2327';
 import { getGameDayKey } from '../game-day.js?v=188ef3fa';
-import { HOME_TICKET, HOME_TICKET_CLASS } from '../home-ticket.js?v=5fa5dc08';
+import { HOME_TICKET, HOME_TICKET_CLASS } from '../home-ticket.js?v=9b031faa';
 import { MIN_GROUND_CLEARANCE, yCamOffsetAnchor } from '../movement.js?v=b30f84eb';
 import { takeFromHouse } from '../ledger-house.js?v=b34f5c89';
 import { storagePickupLock } from '../home-storage.js?v=121f1897';

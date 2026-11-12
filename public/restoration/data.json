@@ -2752,9 +2752,14 @@
   "deployed": "2026-11-11"
  },
  "git": {
-  "commits": 1687,
+  "commits": 1688,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-12",
+    "kind": "new",
+    "text": "The character builder shows picture tiles, and Reset goes back to your saved look"
+   },
    {
     "date": "2026-11-12",
     "kind": "new",
@@ -2869,14 +2874,9 @@
     "date": "2026-11-11",
     "kind": "fix",
     "text": "Clicking a garden plot picks the plot under the pointer, every row"
-   },
-   {
-    "date": "2026-11-11",
-    "kind": "fix",
-    "text": "Trophies stand on wall shelves, as they could in Glitch"
    }
   ]
  },
- "tests": 832,
+ "tests": 833,
  "generatedAt": "2026-11-12"
 }
