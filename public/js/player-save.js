@@ -1,9 +1,9 @@
 /** Persistent player systems + per-street world snapshot. */
-import { normalizeShrineState } from './shrines.js?v=2707c79f';
+import { normalizeShrineState } from './shrines.js?v=fa059603';
 import { normalizeQuoinState } from './quoins.js?v=237c1d5d';
 import { normalizeToolConditionState, syncToolCopies } from './tools.js?v=5f482998';
 import { normalizeSkillState } from './skills.js?v=4542bdf9';
-import { normalizeFoodState } from './food.js?v=441bc419';
+import { normalizeFoodState } from './food.js?v=5b61ffcb';
 import { createGhostQuestState } from './ghost-quest.js?v=37adc842';
 import { normalizeParadiseState } from './paradise-flight.js?v=6e0f92a5';
 import { normalizeFeatSnapshot } from './feats.js?v=f6c3b551';

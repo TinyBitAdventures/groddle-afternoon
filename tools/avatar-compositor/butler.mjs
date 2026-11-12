@@ -39,7 +39,7 @@ import { fileURLToPath } from 'node:url';
 import { displayListAt, readSwf } from './swf.mjs';
 import { exportShapes } from './shapes.mjs';
 import { flattenPart, flattenSprite, mul, roundMatrix, shapeIds } from './rig.mjs';
-import { BUTLER_OPTIONS } from '../../public/js/butler.js?v=4a4b82a2';
+import { BUTLER_OPTIONS } from '../../public/js/butler.js?v=ab2609f7';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(HERE, '../..');

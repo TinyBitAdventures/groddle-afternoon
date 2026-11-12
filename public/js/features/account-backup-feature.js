@@ -31,8 +31,8 @@
 
 import { createMinnAccount } from '../minn-account.js?v=8f2741cd';
 import { mountAccountForms, mountAccountSettings, mountPresenceSetting } from '../account-forms.js?v=318b6815';
-import { createBrowserSaveStore, freezeSoloSaves, restoreSoloSave, saveStore, savedAtOf, soloSaveSnapshot } from '../save-store.js?v=8839ba7b';
-import { formatGameDayLabel } from '../game-day.js?v=edb00566';
+import { createBrowserSaveStore, freezeSoloSaves, restoreSoloSave, saveStore, savedAtOf, soloSaveSnapshot } from '../save-store.js?v=0abb8cf1';
+import { formatGameDayLabel } from '../game-day.js?v=188ef3fa';
 import { multiplayerEntryUrl } from '../game-mode.js?v=1ecf2899';
 import { quietSession } from '../online-boot.js?v=19450640';
 

@@ -65,7 +65,7 @@
  * Canvas data: hiMpLast, hiBoard (sign:count,...), hiBoardOpen, hiYesterday.
  */
 
-import { butlerApi } from './butler-feature.js?v=7d7abdb0';
+import { butlerApi } from './butler-feature.js?v=c92fc7ea';
 import { metabolicGain, moodMax } from '../metabolics.js?v=8504134e';
 import { frameTexture, sourceFromUrl } from '../textures.js?v=f024bd6a';
 import {
@@ -100,7 +100,7 @@ import {
   setButlerHiVariant,
   setPlayerHiVariant,
   stepMissile,
-} from '../hi-signs.js?v=b90c7d7e';
+} from '../hi-signs.js?v=38e4a5d4';
 import {
   BOARD_POLL_MS,
   BOARD_TEXT,
@@ -115,7 +115,7 @@ import {
   recordLine,
   yesterdayLine,
   yourSignLine,
-} from '../hi-signs-mp.js?v=f4ee6c35';
+} from '../hi-signs-mp.js?v=9ea1b8b6';
 
 /** An art URL with its content key (js/data-urls.js groddleDataUrl); as it is in Node and on a page without the map. */
 const keyedArt = (url) => (typeof globalThis.groddleDataUrl === 'function' ? globalThis.groddleDataUrl(url) : url);

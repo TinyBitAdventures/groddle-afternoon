@@ -212,14 +212,14 @@ import { DISPATCHER_HALF, DISPATCHER_TEXT, MOVABLE_FIXTURES, MOVABLE_FIXTURE_IDS
 import { displayTopOf, itemstackOverlayPoint, overlayAlpha, overlayLifeMs, playPoofIn, trackOverlay } from '../overlay-art.js?v=75c3ea34';
 import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=59ca0e2b';
 import { fadeInNewNear } from '../poof-fade.js?v=8984abd1';
-import { projectApi } from './street-jobs-feature.js?v=7313ca96';
+import { projectApi } from './street-jobs-feature.js?v=1600b6f3';
 import { TOWER_CHASSIS, TOWER_CONFIG, TOWER_DOOR_DX, TOWER_GEO, TOWER_PROTO, normalizeTowerState } from '../home-tower.js?v=087df38f';
 import { drawTowerElevator, drawTowerExit, towerApi, visitorTowerView } from './home-tower-feature.js?v=f574b637';
 import { pieceUrl, roomPieces, surfaceAt, swatchPiece, wallTargetAt } from '../home-wallpaper.js?v=f1969400';
 import { wantsHiresDecos } from '../deco-hires.js?v=9877af94';
-import { resourceNodesFeature } from './resource-nodes-feature.js?v=919c844b';
-import { patchesFeature } from './patches-feature.js?v=57265519';
-import { GROWN_TREE_LABELS, createPlot, growTree, plotLabel } from '../patches.js?v=ff90c37d';
+import { resourceNodesFeature } from './resource-nodes-feature.js?v=b7fe7f6b';
+import { patchesFeature } from './patches-feature.js?v=3946144c';
+import { GROWN_TREE_LABELS, createPlot, growTree, plotLabel } from '../patches.js?v=7604d7f2';
 import { WOTD_DEPLETE_MS, WOTD_TEXT, nearestPourTarget, pourButton, pourConditions, pourConfirmText } from '../wine-pour.js?v=6daa23a7';
 import { WOTD_TOOL, pourApproach, pourDropTip } from '../wine-pour-fx.js?v=364e22d2';
 import { XP_FOR_LEVEL } from '../progression.js?v=33462eaa';
@@ -259,7 +259,7 @@ import {
   rockVerbs,
   ROCK_VERB_IDS,
 } from '../magic-rock-home.js?v=c07b2327';
-import { getGameDayKey } from '../game-day.js?v=edb00566';
+import { getGameDayKey } from '../game-day.js?v=188ef3fa';
 import { HOME_TICKET, HOME_TICKET_CLASS } from '../home-ticket.js?v=2e4a6130';
 import { MIN_GROUND_CLEARANCE, yCamOffsetAnchor } from '../movement.js?v=b30f84eb';
 import { takeFromHouse } from '../ledger-house.js?v=b34f5c89';

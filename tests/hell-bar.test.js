@@ -12,7 +12,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { assertStreetGeometry } from '../public/js/street-model.js?v=b6cb6a4e';
 import { arrivalInTarget } from '../public/js/location-navigation.js?v=90fca5cc';
-import { canTeleport, createHellState, enforceHellOnEnter, HELL_BAR, HELL_BARTENDER, isInHell, noteNarakaVisit } from '../public/js/hell.js?v=33a46876';
+import { canTeleport, createHellState, enforceHellOnEnter, HELL_BAR, HELL_BARTENDER, isInHell, noteNarakaVisit } from '../public/js/hell.js?v=bf9c87ce';
 import { HELL_BAR_FILES } from '../public/js/hell-bar-art.js?v=fc723c41';
 import {
   BARTENDER,
@@ -37,10 +37,10 @@ import {
   isHellBarTsid,
   pickBartenderLine,
   talkStateFor,
-} from '../public/js/hell-bar.js?v=954af363';
-import { hellBarFeature } from '../public/js/features/hell-bar-feature.js?v=42b5983c';
-import { hellFeature } from '../public/js/features/hell-feature.js?v=ba4199c6';
-import { FEATURES } from '../public/js/features/index.js?v=d35f9547';
+} from '../public/js/hell-bar.js?v=a34649a3';
+import { hellBarFeature } from '../public/js/features/hell-bar-feature.js?v=b6c452e8';
+import { hellFeature } from '../public/js/features/hell-feature.js?v=aa67fca8';
+import { FEATURES } from '../public/js/features/index.js?v=22516513';
 
 const spike = join(dirname(fileURLToPath(import.meta.url)), '..');
 const pub = join(spike, 'public');

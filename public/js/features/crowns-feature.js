@@ -59,13 +59,13 @@ import {
   tickCrowns,
 } from '../game-of-crowns.js?v=e32f35f5';
 import { RACE_RIVALS } from '../races.js?v=ab22a079';
-import { mayhemHoldsArena } from './mayhem-feature.js?v=3ecdedc4';
+import { mayhemHoldsArena } from './mayhem-feature.js?v=489cc7ee';
 import { wallsScreen } from '../street-model.js?v=b6cb6a4e';
 import { addItem, countItem, removeItem } from '../inventory.js?v=60dfc9ca';
 import { textureFromUrl } from '../textures.js?v=f024bd6a';
 import { grantMoodXp } from '../mood-xp.js?v=958e7680';
 import { CROWNS_SPLASH, splashFor } from '../game-splash.js?v=ea0433a7';
-import { saveStore } from '../save-store.js?v=8839ba7b';
+import { saveStore } from '../save-store.js?v=0abb8cf1';
 import {
   CROWNS_MP_TEXT,
   crownHolderPos,

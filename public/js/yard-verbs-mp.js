@@ -37,17 +37,17 @@
  * an animal or tree carries the visitor's uses today, never the owner's.
  */
 
-import { createAnimalState } from './animals.js?v=af1ee6f4';
+import { createAnimalState } from './animals.js?v=ad056c3a';
 import { petPiggy } from './animal-mood.js?v=a49495fc';
 import { trantFruitCycle } from './trant-care.js?v=9527ff03';
 import { fruitCapacityAt, resetTrantDay } from './trants.js?v=1b3c8ae3';
 import { ensureWoodTreeState } from './woodcutting.js?v=9a2039d1';
-import { GROWN_TREE_LABELS, SEASONED_BEANS, SOIL_TIMERS, growTree, seedlingTimings } from './patches.js?v=ff90c37d';
-import { GAME_DAY_MS, GAME_EPOCH_MS } from './game-day.js?v=edb00566';
-import { isNodeId, isRockId } from './yard-stock-mp.js?v=296b54b9';
-import { STICK_ANIMAL } from './yard-wander.js?v=d3d2960c';
+import { GROWN_TREE_LABELS, SEASONED_BEANS, SOIL_TIMERS, growTree, seedlingTimings } from './patches.js?v=7604d7f2';
+import { GAME_DAY_MS, GAME_EPOCH_MS } from './game-day.js?v=188ef3fa';
+import { isNodeId, isRockId } from './yard-stock-mp.js?v=20321aa5';
+import { STICK_ANIMAL } from './yard-wander.js?v=26ad3668';
 import { normalizeYardMachines } from './yard-fixtures-mp.js?v=dd022fe8';
-import { capYardAnimals, yardClassCap } from './animal-crowding.js?v=78ad8fa9';
+import { capYardAnimals, yardClassCap } from './animal-crowding.js?v=4d01d7c9';
 import { HOUSE_LOT_W, YARD_SEGMENT_W } from './home-cultivation.js?v=f1242621';
 import { HOME_LIMITS } from './homes-catalog.js?v=10ac34b6';
 

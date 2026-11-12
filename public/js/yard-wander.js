@@ -38,8 +38,8 @@
  * moment longer after (YARD_LINGER_MS); then it walks back onto its path.
  */
 
-import { GAME_EPOCH_MS } from './game-day.js?v=edb00566';
-import { chickenPauseRoll, seededRandom } from './street-creatures.js?v=01751dcd';
+import { GAME_EPOCH_MS } from './game-day.js?v=188ef3fa';
+import { chickenPauseRoll, seededRandom } from './street-creatures.js?v=55c7cd29';
 
 /** Speeds (px/s), pauses and windows per class. */
 export const YARD_WANDER = Object.freeze({

@@ -26,11 +26,11 @@ import {
   refreshBoardPins,
 } from '../public/js/street-furniture.js?v=55131f49';
 import { UNNAMED_PLAYER, playerNameOr } from '../public/js/player-names.js?v=f9b78094';
-import { listPlayerTarget } from '../public/js/ui/player-menu.js?v=40ebd5f4';
+import { listPlayerTarget } from '../public/js/ui/player-menu.js?v=0b385652';
 import { BUDDY_TEXT, normalizeList } from '../public/js/buddies.js?v=cff7bf6e';
-import { youLine } from '../public/js/feats-mp.js?v=85549810';
+import { youLine } from '../public/js/feats-mp.js?v=2ce21608';
 import { fillName } from '../public/js/foxes.js?v=59323f35';
-import { APPEARANCE_PRESETS, BODY_STYLES } from '../public/js/character-builder.js?v=3c78a868';
+import { APPEARANCE_PRESETS, BODY_STYLES } from '../public/js/character-builder.js?v=b676305c';
 import { boardsData } from '../tools/build-realtime-boards.mjs';
 import { sitePath, skipWithoutSite } from '../tools/repos.mjs';
 

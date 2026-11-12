@@ -35,9 +35,9 @@
  */
 
 import { addItem, countItem, ensureItem } from '../inventory.js?v=60dfc9ca';
-import { getGameDayKey } from '../game-day.js?v=edb00566';
+import { getGameDayKey } from '../game-day.js?v=188ef3fa';
 import { XP_FOR_LEVEL } from '../progression.js?v=33462eaa';
-import { emblemCostFor } from '../shrines.js?v=2707c79f';
+import { emblemCostFor } from '../shrines.js?v=fa059603';
 import { giantDisplayName } from '../giant-names.js?v=0e295891';
 import { landingY } from '../walk-surface.js?v=106bfdc5';
 import {

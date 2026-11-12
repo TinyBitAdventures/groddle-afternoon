@@ -56,8 +56,8 @@
  * player did; letters that come by post stay in the mailbox.
  */
 
-import { getGameDayKey } from './game-day.js?v=edb00566';
-import { normalizeButlerHi } from './hi-signs.js?v=b90c7d7e';
+import { getGameDayKey } from './game-day.js?v=188ef3fa';
+import { normalizeButlerHi } from './hi-signs.js?v=38e4a5d4';
 import { filterText } from './word-filter.js?v=9a7a7ebb';
 
 /** classProps and onCreate numbers. */

@@ -27,7 +27,7 @@
  */
 
 import { addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=60dfc9ca';
-import { getGameDayKey } from '../game-day.js?v=edb00566';
+import { getGameDayKey } from '../game-day.js?v=188ef3fa';
 import { quoinDailyLimitFor } from '../quoins.js?v=237c1d5d';
 import { XP_FOR_LEVEL } from '../progression.js?v=33462eaa';
 import {
@@ -58,7 +58,7 @@ import { brainCapacityRescale, skillTimeFactor } from '../imagination-effects.js
 import { betterLearningDiscount } from '../better-learning.js?v=044ff9ff';
 import { rescaleStudiesForLearningModifier } from '../skills.js?v=4542bdf9';
 import { isOfferedInRemake, isOfferedOnline, remakeStatus } from '../imagination-remake.js?v=c37ad887';
-import { hellFeature } from './hell-feature.js?v=ba4199c6';
+import { hellFeature } from './hell-feature.js?v=aa67fca8';
 
 const ART = 'assets/imagination/cards/';
 const UI = 'assets/imagination/ui/';

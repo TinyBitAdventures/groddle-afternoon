@@ -164,6 +164,11 @@ function entriesOf(value) {
  * the save (groddle-afternoon-site src/Ledger.php, G335: what the site could
  * not account for was taken out of the stored save) goes to
  * onLedger({ corrected: { items, currants }, text }).
+ *
+ * Writes are counted: mark() is the number of the first write that holds
+ * everything set so far, and written the newest write the site accepted, so
+ * written >= mark() says a change is in the stored save even when more
+ * changes keep the state from ever settling on "saved" (savedThrough).
  */
 export function createSaveSync({
   url,
@@ -190,6 +195,8 @@ export function createSaveSync({
   let failures = 0;
   let nonceRetried = false;
   let seq = 0;
+  let started = 0; // writes begun (flush; not the keepalive copies beside one)
+  let landed = 0; // the newest of them the site accepted
   let takingOver = false;
   let yielding = false;
   let current = { version, nonce, confirmedAt };
@@ -294,6 +301,8 @@ export function createSaveSync({
     dirty = false;
     firstDirtyAt = 0;
     const text = takingOver ? body({ takeover: true, since: current.confirmedAt || null }) : body();
+    started += 1;
+    const number = started;
     setState('saving');
     inFlight = (async () => {
       let outcome;
@@ -304,6 +313,8 @@ export function createSaveSync({
       }
       inFlight = null;
       if (outcome === 'ok') {
+        // A superseded answer is ok too: a newer copy of this page's is in already.
+        landed = Math.max(landed, number);
         takingOver = false;
         if (dirty && !yielding) {
           setState('pending');
@@ -382,6 +393,10 @@ export function createSaveSync({
     takeover,
     retry,
     yieldTo,
+    /** The first write that holds everything set so far: the next one while a change waits, else the last begun (0: the loaded save). */
+    mark: () => (dirty ? started + 1 : started),
+    /** The newest write the site accepted (see mark). */
+    get written() { return landed; },
     get state() { return state; },
     get version() { return current.version; },
     get nonce() { return current.nonce; },
@@ -485,6 +500,9 @@ export function createMultiplayerSaveStore(opts = {}) {
     },
     /** Writes any pending change now; resolves to the save state. */
     flush: (o) => sync.flush(o),
+    /** The write that will hold everything set so far, and the newest the site accepted (savedThrough). */
+    mark: () => sync.mark(),
+    get written() { return sync.written; },
     /** Keeps this window's game over a copy saved elsewhere (state conflict or elsewhere). */
     takeover: () => sync.takeover(),
     /** Writes again after the site refused a write (state error). */
@@ -501,6 +519,40 @@ export function createMultiplayerSaveStore(opts = {}) {
     snapshot: () => Object.fromEntries(entries),
     player: boot.player || null,
   });
+}
+
+/** The save states savedThrough gives up on: stopped until the player acts, or offline (the write will retry by itself). */
+const SAVED_THROUGH_STOPS = Object.freeze(['conflict', 'elsewhere', 'signed-out', 'error', 'offline']);
+
+/**
+ * Writes the save now and resolves true once a write holding everything set
+ * so far has landed (the site accepted it), false when the save stopped or
+ * went offline first. Call it right after the change is set (engine.save()).
+ * A busy save is fine: changes made after this one may keep the state on
+ * "pending" for as long as the game plays, and only a write begun after the
+ * change counts, so true means the change is in the stored save. That is what
+ * an ack of a server's owed message needs (street-jobs-feature.js persist; the
+ * server sends it again until the ack, so a crash before this never loses it).
+ * A store without write counting (solo, or none loaded) waits for "saved" as
+ * before; one that never writes resolves true.
+ */
+export async function savedThrough(store, { tries = 6 } = {}) {
+  if (typeof store?.flush !== 'function') return true;
+  const counted = typeof store.mark === 'function' && Number.isInteger(store.written);
+  const need = counted ? store.mark() : 0;
+  const done = () => (counted ? store.written >= need : store.state === 'saved');
+  for (let i = 0; i < tries; i += 1) {
+    if (counted && done()) return true;
+    let st;
+    try {
+      st = await store.flush();
+    } catch {
+      return false;
+    }
+    if (done()) return true;
+    if (SAVED_THROUGH_STOPS.includes(store.state || st)) return false;
+  }
+  return done();
 }
 
 export function createSaveStore(mode = GAME_MODE, opts = {}) {

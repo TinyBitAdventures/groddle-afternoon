@@ -7,7 +7,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { GAME_DAY_MS } from '../public/js/game-day.js?v=edb00566';
+import { GAME_DAY_MS } from '../public/js/game-day.js?v=188ef3fa';
 import {
   FOOD_VARIETY_UPGRADE,
   FOOD_ENERGY_LIMIT_MULTIPLIER,
@@ -23,7 +23,7 @@ import {
   recordFoodEat,
   resetFoodDay,
   foodBonusStatus,
-} from '../public/js/food.js?v=441bc419';
+} from '../public/js/food.js?v=5b61ffcb';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const publicRoot = join(here, '../public');

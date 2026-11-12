@@ -55,9 +55,9 @@ import { ecologyForStreet } from '../street-ecology.js?v=08076876';
 import { worldToScreen } from '../street-model.js?v=b6cb6a4e';
 import { signArmWidth } from '../street-render.js?v=1876e623';
 import { getSkillCatalog } from '../content-catalogs.js?v=10b118dd';
-import { GIANTS } from '../shrines.js?v=2707c79f';
+import { GIANTS } from '../shrines.js?v=fa059603';
 import { giantDisplayName } from '../giant-names.js?v=0e295891';
-import { teleportationFeature } from './teleportation-feature.js?v=e867c103';
+import { teleportationFeature } from './teleportation-feature.js?v=176a9c17';
 import {
   SOLO_DIVISOR,
   WORK_UNIT_MS,
@@ -108,7 +108,7 @@ import { PAPERS_BADGE } from '../subway.js?v=44d1a09f';
 import { gainMetabolic, loseEnergy } from '../metabolics.js?v=8504134e';
 import { closuresInTheWay, holdNote, placeIndex, questHold, questStoryKey, reachableStreets } from '../quest-reach.js?v=a206bc33';
 import { getQuestCatalog as questCatalog } from '../content-catalogs.js?v=10b118dd';
-import { saveStore } from '../save-store.js?v=8839ba7b';
+import { saveStore, savedThrough } from '../save-store.js?v=0abb8cf1';
 import {
   HALL_TEXT,
   MP_TEXT,
@@ -1704,27 +1704,19 @@ function doHire(engine, jobId, rid) {
 /* ------------------------------------------------------------------ */
 
 const n0 = (v) => Math.max(0, Math.floor(Number(v) || 0));
-const BLOCKED_SAVES = new Set(['conflict', 'elsewhere', 'signed-out', 'error', 'offline']);
 /** A give the server has not answered is let go after this (its answer still applies when it comes). */
 const GIVE_WAIT_MS = 20000;
 const WORK_WAIT_MS = 6000;
 
-/** Writes the save now and waits for it to land (as trade-feature persist): true once saved. */
+/**
+ * Writes the save now and waits for a write holding this change to land: true once the site has
+ * accepted one (the ack of a project_given / project_reward waits on it, so the server keeps
+ * sending the message until its effect is in a stored save). Not "saved": a player whose game
+ * keeps changing never sees that state, and their acks never went (2026-11-11, 68 owed).
+ */
 async function persist(engine) {
   engine.save?.();
-  if (typeof saveStore?.flush !== 'function') return true;
-  for (let i = 0; i < 6; i += 1) {
-    let st;
-    try {
-      st = await saveStore.flush();
-    } catch {
-      return false;
-    }
-    const now = saveStore.state || st;
-    if (now === 'saved') return true;
-    if (BLOCKED_SAVES.has(now)) return false;
-  }
-  return saveStore.state === 'saved';
+  return savedThrough(saveStore);
 }
 
 function ensureMp(engine) {

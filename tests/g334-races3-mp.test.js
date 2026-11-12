@@ -20,7 +20,7 @@ import { pendingQuestOffers } from '../public/js/quest-offers.js?v=9c53455c';
 import { MP_RACE_QUESTS, MULTIPLAYER_QUESTS, offerableMultiplayerQuest } from '../public/js/quests-mp.js?v=1fc5ff58';
 import { questOffersFeature } from '../public/js/features/quest-offers-feature.js?v=db81cdfe';
 import { HUB_MAP_STREETS } from '../public/js/hub-maps-data.js?v=ffe222f1';
-import { HELL_LOCATION } from '../public/js/hell.js?v=33a46876';
+import { HELL_LOCATION } from '../public/js/hell.js?v=bf9c87ce';
 import { HOG_MP_COURSE } from '../public/js/hog-haul-mp.js?v=67f873fe';
 import { CROWNS_TICKET } from '../public/js/game-of-crowns.js?v=e32f35f5';
 import { economyCredits } from '../tools/build-economy.mjs';
@@ -161,7 +161,7 @@ describe('the dead do not race', () => {
   });
 
   it('a race_match that reaches a dead page is left at once (races-feature)', async () => {
-    const { racesFeature } = await import('../public/js/features/races-feature.js?v=58e94ae1');
+    const { racesFeature } = await import('../public/js/features/races-feature.js?v=a7bdc827');
     const client = fakeClient(7);
     const toasts = [];
     const engine = {
@@ -253,7 +253,7 @@ describe('a Game of Crowns reload asks the server, and the dead stay out (crowns
   });
 
   it('solo still gives a ticket back on a street change', async () => {
-    const { crownsFeature } = await import('../public/js/features/crowns-feature.js?v=a29fd3bf');
+    const { crownsFeature } = await import('../public/js/features/crowns-feature.js?v=92c6a78a');
     const engine = { mode: 'solo', inv: {}, query: () => null, toast() {}, updateHud() {}, param: () => null, instanceHold: null, setData() {} };
     crownsFeature.restore({ pendingTicket: CROWNS_TICKET }, engine);
     crownsFeature.onStreetEnter({ tsid: 'GA5' }, engine);

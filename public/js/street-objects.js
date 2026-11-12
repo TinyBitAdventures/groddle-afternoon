@@ -36,9 +36,9 @@ import { ROCK_CATALOG, findWorkingPick, miningProfile, miningToolWear } from './
 import { MINING_EXPERT_UPGRADES } from './imagination-effects.js?v=70169933';
 import { TRANT_META, canHarvestTrant, fruitCapacityAt, resolveArborologyPackage } from './trants.js?v=1b3c8ae3';
 import { highestLightGreenThumbRank, quoteTrantCare } from './trant-care.js?v=9527ff03';
-import { RESOURCE_NODE_ALIASES, RESOURCE_NODE_CATALOG, resolveResourceSkillPackage } from './resource-nodes.js?v=7a77fd73';
+import { RESOURCE_NODE_ALIASES, RESOURCE_NODE_CATALOG, resolveResourceSkillPackage } from './resource-nodes.js?v=817d1e54';
 import { highestAnimalKinshipRank } from './animal-kinship.js?v=f91347e9';
-import { applyAnimalName, applyCreatureState, clockOffset, pathFrom } from './street-creatures.js?v=01751dcd';
+import { applyAnimalName, applyCreatureState, clockOffset, pathFrom } from './street-creatures.js?v=55c7cd29';
 
 /** The resource-node classes whose stock is shared (the "N uses left, then regrows" nodes). */
 /**

@@ -21,7 +21,7 @@
  */
 
 import { UPDATE_TEXT, blockingUi, buildUrl, createUpdateCheck, ownBuild, saveThenReload } from '../update-check.js?v=814a78ec';
-import { saveStore } from '../save-store.js?v=8839ba7b';
+import { saveStore } from '../save-store.js?v=0abb8cf1';
 
 export const UPDATE_READY_FEATURE_ID = 'update-ready';
 /** How often the pill looks for blocking UI while an update waits. */

@@ -26,7 +26,7 @@
  * The state here is per player, saved by features/qurazy-feature.js.
  */
 
-import { GAME_DAY_MS, GAME_EPOCH_MS } from './game-day.js?v=edb00566';
+import { GAME_DAY_MS, GAME_EPOCH_MS } from './game-day.js?v=188ef3fa';
 
 /** location.js 255: no more than this many found a game day (first visits aside). */
 export const QURAZY_DAILY_MAX = 5;

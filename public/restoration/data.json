@@ -2752,9 +2752,14 @@
   "deployed": "2026-11-11"
  },
  "git": {
-  "commits": 1671,
+  "commits": 1672,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-11",
+    "kind": "fix",
+    "text": "Apple a Day's end-of-buff energy boost shows when it lands"
+   },
    {
     "date": "2026-11-11",
     "kind": "new",
@@ -2869,11 +2874,6 @@
     "date": "2026-11-11",
     "kind": "fix",
     "text": "Plant asks which seed, and a seed dropped on a plot plants it"
-   },
-   {
-    "date": "2026-11-11",
-    "kind": "fix",
-    "text": "The Emotional Bear's emotes pick from the players on the street online"
    }
   ]
  },

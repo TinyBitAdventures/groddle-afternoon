@@ -29,15 +29,16 @@ import {
   restoreSoloSave,
   saveStore,
   savedAtOf,
+  savedThrough,
   soloSaveSnapshot,
-} from '../public/js/save-store.js?v=8839ba7b';
+} from '../public/js/save-store.js?v=0abb8cf1';
 import { HANDOFF_KEY, claimCharacter, leaveHandoff, listenForClaims, takeHandoff } from '../public/js/save-claim.js?v=30cf5250';
 import { SITE_DIR, skipWithoutSite } from '../tools/repos.mjs';
 import { spawnSync } from 'node:child_process';
 import { AUDIO_MUTED_KEY } from '../public/js/audio-pref.js?v=6fe817bc';
-import { STORAGE_KEY as APPEARANCE_KEY, APPEARANCE_PRESETS, appearanceToJson, loadAppearance, saveAppearance } from '../public/js/character-builder.js?v=3c78a868';
-import { getGameDayKey, getLastNewDayKey, getLastNewDayTs, resetGameDayClock, setLastNewDayTs } from '../public/js/game-day.js?v=edb00566';
-import { createPlayerSave, parsePlayerSave, serializePlayerSave } from '../public/js/player-save.js?v=774f5b50';
+import { STORAGE_KEY as APPEARANCE_KEY, APPEARANCE_PRESETS, appearanceToJson, loadAppearance, saveAppearance } from '../public/js/character-builder.js?v=b676305c';
+import { getGameDayKey, getLastNewDayKey, getLastNewDayTs, resetGameDayClock, setLastNewDayTs } from '../public/js/game-day.js?v=188ef3fa';
+import { createPlayerSave, parsePlayerSave, serializePlayerSave } from '../public/js/player-save.js?v=a7d1da05';
 
 const pub = join(import.meta.dirname, '..', 'public');
 const read = (rel) => readFileSync(join(pub, rel), 'utf8');
@@ -764,6 +765,95 @@ describe('one window never conflicts with itself (ticket 21)', () => {
     await timers.tick(2000);
     await timers.tick(2000);
     assert.equal(sync.state, 'conflict', 'without a writer, a lost answer still reads as someone else\'s save');
+  });
+});
+
+describe('a change is in the stored save (savedThrough: the owed-message ack, 2026-11-11)', () => {
+  // Live: a player owed 68 project messages never acked one. The ack waited for the save state
+  // "saved" within 6 writes, and their game changed during every write, so the state was
+  // "pending" after each one. What the ack needs is a write begun after the change, landed.
+  const make = (site, extra = {}) => {
+    const timers = fakeTimers();
+    const ev = eventScope();
+    let busy = 0;
+    let store;
+    // The game keeps playing: something changes while each write is on its way.
+    const fetch = async (url, init) => {
+      const res = await site.fn(url, init);
+      if (extra.busy !== false) store.set('location', `busy-${++busy}`);
+      return res;
+    };
+    store = createMultiplayerSaveStore({ boot: { ...BOOT, writer: 'aaaa1111bbbb2222' }, scope: ev.scope, fetch, timers, now: timers.now, debounceMs: 2000, maxWaitMs: 10000 });
+    return { store, timers, ...ev };
+  };
+  const reward = (store) => store.set('playerState', '{"savedAt":6,"reward":"job-r-1"}');
+  const settled = async (p) => {
+    let done = false;
+    p.then(() => { done = true; });
+    for (let i = 0; i < 20; i++) await Promise.resolve();
+    return done;
+  };
+
+  it('a busy save that never reaches "saved" still says so once the write holding the change lands', async () => {
+    const site = fakeSite();
+    const releaseFirst = site.hold(1);
+    const releaseSecond = site.hold(2);
+    const { store, states } = make(site);
+    store.set('location', 'before');
+    const first = store.flush(); // a write begun before the reward: it does not hold it
+    reward(store);
+    const acked = savedThrough(store);
+    releaseFirst();
+    await first;
+    assert.equal(await settled(acked), false, 'the write that was on its way when the reward came does not count');
+    assert.equal(site.calls.length, 2, 'the next write went at once');
+    assert.equal(site.calls[1].data.entries.playerState, '{"savedAt":6,"reward":"job-r-1"}');
+    releaseSecond();
+    assert.equal(await acked, true);
+    assert.equal(site.row.data.entries.playerState, '{"savedAt":6,"reward":"job-r-1"}', 'the stored save holds it');
+    assert.equal(store.state, 'pending', 'and the state never settled');
+    assert.ok(!states.slice(states.indexOf('saving')).includes('saved'), 'not once since the reward');
+    assert.ok(store.written >= 2);
+  });
+
+  it('is never true before a write holding the change lands', async () => {
+    const site = fakeSite();
+    site.lose(1);
+    const { store, timers } = make(site);
+    reward(store);
+    assert.equal(await savedThrough(store), false, 'the write was lost: offline, no ack');
+    assert.equal(store.written, 0);
+    await timers.tick(2000); // the store retries by itself
+    assert.equal(site.row.data.entries.playerState, '{"savedAt":6,"reward":"job-r-1"}');
+    assert.equal(await savedThrough(store), true, 'the next try (the resent message) finds it written');
+  });
+
+  it('a save that stopped (someone else saved) says no', async () => {
+    const site = fakeSite();
+    site.claim('cccc3333dddd4444');
+    const { store } = make(site);
+    reward(store);
+    assert.equal(await savedThrough(store), false);
+    assert.equal(store.state, 'elsewhere');
+  });
+
+  it('nothing new to write and the last write in: true at once, no write', async () => {
+    const site = fakeSite();
+    const { store } = make(site, { busy: false });
+    reward(store);
+    assert.equal(await savedThrough(store), true);
+    const writes = site.calls.length;
+    assert.equal(await savedThrough(store), true, 'an already-applied message (sent again) acks too');
+    assert.equal(site.calls.length, writes);
+    assert.equal(await savedThrough({ state: 'saved' }), true, 'a store that never writes');
+  });
+
+  it('street projects ack only through it (features/street-jobs-feature.js persist)', () => {
+    const src = read('js/features/street-jobs-feature.js');
+    assert.match(src, /async function persist\(engine\) \{\n {2}engine\.save\?\.\(\);\n {2}return savedThrough\(saveStore\);\n\}/);
+    for (const line of src.split('\n').filter((l) => l.includes("send('project_ack'"))) {
+      assert.ok(/await persist\(engine\)|if \(ok\)|project_expired|client\.send\('project_ack', \{ id \}\);$/.test(line), line);
+    }
   });
 });
 

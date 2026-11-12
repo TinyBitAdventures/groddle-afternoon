@@ -30,8 +30,8 @@ import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { requireServer, serverPath } from './repos.mjs';
-import { FEAT_BY_ID, SOLO_FEATS } from '../public/js/solo-feats.js?v=40f8c7b5';
-import { GAME_DAY_MS } from '../public/js/game-day.js?v=edb00566';
+import { FEAT_BY_ID, SOLO_FEATS } from '../public/js/solo-feats.js?v=e068b60a';
+import { GAME_DAY_MS } from '../public/js/game-day.js?v=188ef3fa';
 import {
   CIGAR_PLACES,
   LARGE_PLACES,
@@ -50,7 +50,7 @@ import {
   epicSizes,
   mpGoals,
   mpShare,
-} from '../public/js/feats-mp.js?v=85549810';
+} from '../public/js/feats-mp.js?v=2ce21608';
 
 export const OUT_SERVER = serverPath('data', 'feats.json');
 
