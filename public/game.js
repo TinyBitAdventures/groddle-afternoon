@@ -810,6 +810,7 @@ import {
   appearanceCacheKey,
 } from './js/character-builder.js?v=ee3228bd';
 import { clearPresetActive, leavingDialogOpen, renderEmoteTests, renderFaceDims, renderPresetGroups, renderStarterPicker, showLeavingDialog } from './js/avatar-builder-ui.js?v=4e57b8c5';
+import { NONE_TYPES, createTileArt, focusIn, pickPart, refocus, renderPartSwitch, renderPartTiles, tileJob } from './js/avatar-tiles.js?v=a05b7d4f';
 import {
   loadAmbientMusicConfig,
   resolveAmbientTheme,
@@ -11202,7 +11203,8 @@ const VECTOR_BUILDER_TABS = [['fresh', 'Start fresh'], ['hair', 'Hair'], ['face'
 /** Which article types each vector tab edits, with section titles. */
 const VECTOR_TAB_TYPES = {
   hair: [['hair', 'Hair style']],
-  face: [['eyes', 'Eyes'], ['mouth', 'Mouth'], ['nose', 'Nose'], ['ears', 'Ears']],
+  // Vanity's features tabs in their order (VanityModel.as feature_tabs_sortA), one at a time.
+  face: [['eyes', 'Eyes'], ['nose', 'Nose'], ['mouth', 'Mouth'], ['ears', 'Ears']],
   top: [['shirt', 'Top'], ['dress', 'Dress']],
   coat: [['coat', 'Coat']],
   bottom: [['pants', 'Trousers'], ['skirt', 'Skirt']],
@@ -11321,6 +11323,7 @@ function sectionTitle(text) {
 function renderVectorControls(box) {
   // Keep the list's scroll while picking within a tab; a new tab starts at the top.
   const keepScroll = box.dataset.tab === avatarBuilderSlot ? box.scrollTop : 0;
+  const keepFocus = focusIn(box);
   box.dataset.tab = avatarBuilderSlot;
   box.dataset.mode = 'parts';
   box.innerHTML = '';
@@ -11340,6 +11343,7 @@ function renderVectorControls(box) {
   }
   if (tab === 'skin' || tab === 'hair') {
     if (tab === 'hair') renderStyleChips(box, 'hair', 'Hair style');
+    refocus(box, keepFocus);
     const slot = tab;
     box.appendChild(sectionTitle(tab === 'skin' ? 'Skin colour' : 'Hair colour'));
     const row = document.createElement('div');
@@ -11360,96 +11364,53 @@ function renderVectorControls(box) {
     box.appendChild(row);
     return;
   }
-  for (const [type, title] of VECTOR_TAB_TYPES[tab] || []) renderStyleChips(box, type, title);
+  const parts = VECTOR_TAB_TYPES[tab] || [];
+  if (parts.length > 1) {
+    // Several parts in one tab: a switch, and one part's tiles at a time.
+    const asked = avatarTabPart.get(tab);
+    const active = parts.some(([t]) => t === asked) ? asked : (parts.find(([t]) => vectorPartName(t) !== 'none') || parts[0])[0];
+    renderPartSwitch(box, { parts, active, onPick: (t) => { avatarTabPart.set(tab, t); renderAvatarSwatches(); } });
+    const [type, title] = parts.find(([t]) => t === active);
+    renderStyleChips(box, type, title, { titled: false });
+  } else {
+    for (const [type, title] of parts) renderStyleChips(box, type, title);
+  }
   box.scrollTop = keepScroll;
+  refocus(box, keepFocus);
 }
 
-/** Long wardrobe lists show this many styles (plus the one worn) until "Show all" or a search. */
-const VECTOR_CHIP_PAGE = 24;
-/** Per article type, kept across re-renders: { q: search text, all: list expanded }. */
+/** Per article type, kept across re-renders: { q: search text, page, seen } (js/avatar-tiles.js pageFor). */
 const vectorChipState = new Map();
+/** The part shown in a tab of several (Face, Top, Bottom). */
+const avatarTabPart = new Map();
+/** The parts' pictures (js/avatar-tiles.js): painted a page at a time, a few ms a frame, and kept. */
+let avatarTileArt = null;
 
 /**
- * Search box and "Show all" for a long style row: filters the chips in
- * place (label or article name), keeping the worn style and None visible.
+ * One part's picture tiles (Vanity's features pane, js/avatar-tiles.js), paged, each
+ * the part on the player's look; then the worn article's colourways.
  */
-function addChipFinder(box, row, type, title, total) {
-  const state = vectorChipState.get(type) || { q: '', all: false };
-  vectorChipState.set(type, state);
-  const search = document.createElement('input');
-  search.type = 'search';
-  search.className = 'avatar-search';
-  search.placeholder = `Search ${total} ${title.toLowerCase()} styles`;
-  search.setAttribute('aria-label', `Search ${title.toLowerCase()} styles`);
-  search.value = state.q;
-  search.dataset.type = type;
-  const more = document.createElement('button');
-  more.type = 'button';
-  more.className = 'avatar-style-chip avatar-more-chip';
-  const empty = document.createElement('p');
-  empty.className = 'avatar-note';
-  empty.textContent = 'No style matches that.';
-  const apply = () => {
-    const q = state.q.trim().toLowerCase();
-    let index = 0;
-    let shown = 0;
-    let hidden = 0;
-    row.querySelectorAll('.avatar-style-chip[data-name]').forEach((chip) => {
-      const none = chip.dataset.name === 'none';
-      const i = none ? -1 : index++;
-      const match = q
-        ? chip.textContent.toLowerCase().includes(q) || chip.dataset.name.toLowerCase().includes(q)
-        : none || state.all || chip.classList.contains('active') || i < VECTOR_CHIP_PAGE;
-      chip.hidden = !match;
-      if (match) shown += 1;
-      else hidden += 1;
-    });
-    more.hidden = Boolean(q) || (!state.all && !hidden);
-    more.textContent = state.all ? 'Show fewer' : `Show all ${total}`;
-    empty.hidden = !q || shown > 0;
-    row.dataset.shown = String(shown);
-  };
-  search.addEventListener('input', () => { state.q = search.value; apply(); });
-  more.addEventListener('click', () => { state.all = !state.all; apply(); });
-  box.insertBefore(search, row);
-  row.appendChild(more);
-  box.insertBefore(empty, row.nextSibling);
-  apply();
-}
-
-/** Style chips for one article type, then the chosen article's colourways. */
-function renderStyleChips(box, type, title) {
+function renderStyleChips(box, type, title, { titled = true } = {}) {
   const items = avatarCatalog.types[type] || [];
   if (!items.length) return;
-  box.appendChild(sectionTitle(title));
-  const row = document.createElement('div');
-  row.className = 'avatar-style-row';
+  if (titled) box.appendChild(sectionTitle(title));
   const current = vectorPartName(type);
-  const optional = ['hat', 'coat', 'dress', 'skirt', 'nose', 'ears'].includes(type);
-  const options = optional ? [{ name: 'none', label: 'None' }, ...items] : items;
-  for (const item of options) {
-    const btn = document.createElement('button');
-    btn.type = 'button';
-    btn.className = 'avatar-style-chip';
-    btn.textContent = item.label;
-    btn.dataset.type = type;
-    btn.dataset.name = item.name;
-    if (item.name === current) btn.classList.add('active');
-    btn.addEventListener('click', () => setVectorFields((v) => {
-      v.outfit = v.outfit || {};
-      v.outfit[type] = item.name;
-      if (v.variant) delete v.variant[type];
-      if (v.tint) delete v.tint[type];
-      // A dress replaces top and trousers; a skirt replaces trousers (AvatarSwf: skirt excludes dress).
-      if (type === 'dress' && item.name !== 'none') { v.outfit.skirt = 'none'; v.outfit.pants = 'none'; v.outfit.shirt = 'none'; }
-      if (type === 'skirt' && item.name !== 'none') { v.outfit.pants = 'none'; v.outfit.dress = 'none'; }
-      if ((type === 'shirt' || type === 'pants') && item.name !== 'none') v.outfit.dress = 'none';
-      if (type === 'pants' && item.name !== 'none') v.outfit.skirt = 'none';
-    }));
-    row.appendChild(btn);
-  }
-  box.appendChild(row);
-  if (items.length > VECTOR_CHIP_PAGE) addChipFinder(box, row, type, title, items.length);
+  const options = NONE_TYPES.includes(type) ? [{ name: 'none', label: 'None' }, ...items] : items;
+  const state = vectorChipState.get(type) || {};
+  vectorChipState.set(type, state);
+  avatarTileArt ||= createTileArt();
+  const vector = playerAppearance.vector || {};
+  const catalog = avatarCatalog;
+  const dpr = Math.min(2, window.devicePixelRatio || 1);
+  renderPartTiles(box, {
+    type,
+    title,
+    options,
+    worn: current,
+    state,
+    onPick: (name) => setVectorFields((v) => pickPart(v, type, name)),
+    draw: (canvas, name, cssPx) => avatarTileArt.request(canvas, tileJob(vector, type, name, current, catalog, Math.round(cssPx * dpr))),
+  });
   const item = catalogItem(avatarCatalog, type, current);
   if (type === 'hat' && item && vectorPartName('hair') !== 'none' && !avatarCatalog.hatHair?.[item.name]?.includes(vectorPartName('hair'))) {
     const note = document.createElement('p');
@@ -32165,7 +32126,9 @@ async function main() {
     paintAvatarPreview();
   });
   document.getElementById('avatar-reset')?.addEventListener('click', () => {
-    playerAppearance = createDefaultAppearance();
+    // Back to the look last saved, not the default (Vanity.as doReset 910-915: ava_config_saved).
+    playerAppearance = wornAppearance;
+    clearPresetActive(document.getElementById('avatar-presets'));
     renderAvatarBuilder();
     paintAvatarPreview();
   });

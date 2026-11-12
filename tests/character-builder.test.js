@@ -141,9 +141,11 @@ describe('UI wiring', () => {
     assert.ok(css.includes('avatar-swatch'));
   });
 
-  it('long wardrobe lists get a search box and Show all', () => {
+  it('long wardrobe lists get a search box and pages (picture tiles, tests/avatar-picture-tiles.test.js)', () => {
     const game = readFileSync(join(__dirname, '../public/game.js'), 'utf8');
-    for (const s of ['addChipFinder', 'VECTOR_CHIP_PAGE', 'vectorChipState', 'avatar-search', 'avatar-more-chip']) assert.ok(game.includes(s), s);
+    for (const s of ['renderPartTiles', 'vectorChipState']) assert.ok(game.includes(s), s);
+    const tiles = readFileSync(join(__dirname, '../public/js/avatar-tiles.js'), 'utf8');
+    for (const s of ['TILE_PAGE', 'avatar-search', 'avatar-pager', 'avatar-page-next']) assert.ok(tiles.includes(s), s);
     const css = readFileSync(join(__dirname, '../public/style.css'), 'utf8');
     assert.ok(css.includes('.avatar-search') && css.includes('.avatar-style-chip[hidden]'));
   });

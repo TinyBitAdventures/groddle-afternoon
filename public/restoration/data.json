@@ -2752,9 +2752,14 @@
   "deployed": "2026-11-11"
  },
  "git": {
-  "commits": 1686,
+  "commits": 1687,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-12",
+    "kind": "new",
+    "text": "Classic Skills open on the 2012 card grid, with the full skill table behind it"
+   },
    {
     "date": "2026-11-12",
     "kind": "improve",
@@ -2869,14 +2874,9 @@
     "date": "2026-11-11",
     "kind": "fix",
     "text": "Trophies stand on wall shelves, as they could in Glitch"
-   },
-   {
-    "date": "2026-11-11",
-    "kind": "new",
-    "text": "Website pages count themselves for the console's Analytics tab"
    }
   ]
  },
- "tests": 831,
+ "tests": 832,
  "generatedAt": "2026-11-12"
 }
