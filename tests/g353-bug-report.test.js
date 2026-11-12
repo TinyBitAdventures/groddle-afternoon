@@ -10,7 +10,7 @@ import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { BUG_TEXT, MAX_MESSAGE, benignError, bugReportFeature, buildKey, rememberError, reportContext } from '../public/js/features/bug-report-feature.js?v=bada835a';
+import { BUG_TEXT, MAX_MESSAGE, benignError, bugReportFeature, buildKey, pageErrorLine, rememberError, reportContext } from '../public/js/features/bug-report-feature.js?v=0ef95c18';
 import { createMinnAccount } from '../public/js/minn-account.js?v=c15f0ecf';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -40,7 +40,24 @@ describe('Report a bug (G353)', () => {
     rememberError(list, 'x'.repeat(900));
     assert.equal(list.length, 10);
     assert.equal(list[0], 'Error 5 at game.js:5');
-    assert.equal(list.at(-1).length, 300);
+    assert.equal(list.at(-1).length, 600);
+  });
+
+  it('keeps a page error\'s message and five stack frames, so the calling line shows (report #246)', () => {
+    const frames = Array.from({ length: 9 }, (_, i) => `    at f${i} (https://groddleafternoon.com/js/features/a-feature.js?v=0123abcd:${100 + i}:7)`);
+    const err = { stack: ["TypeError: Cannot read properties of null (reading 'x')", ...frames].join('\n') };
+    const saved = Object.getOwnPropertyDescriptor(globalThis, 'location');
+    Object.defineProperty(globalThis, 'location', { value: { origin: 'https://groddleafternoon.com' }, configurable: true });
+    try {
+      const line = rememberError([], pageErrorLine({ error: err }))[0];
+      assert.match(line, /^TypeError: Cannot read properties of null \(reading 'x'\) at f0 \(\/js\/features\/a-feature\.js\?v=0123abcd:100:7\)/);
+      assert.match(line, /at f4 \(\/js\/features\/a-feature\.js\?v=0123abcd:104:7\)$/, 'five frames, the page origin left out');
+      assert.doesNotMatch(line, /f5/);
+      assert.ok(line.length <= 600);
+    } finally {
+      if (saved) Object.defineProperty(globalThis, 'location', saved);
+      else delete globalThis.location;
+    }
   });
 
   it('leaves the browser\'s ResizeObserver notice out of the errors (ticket 98)', () => {

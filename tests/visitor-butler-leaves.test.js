@@ -25,7 +25,7 @@ import { join } from 'node:path';
 
 import { neighboursMpFeature } from '../public/js/features/neighbours-mp-feature.js?v=f5cf6f95';
 import { createErrorOnce, createFeatureHost, reportPageError } from '../public/js/feature-host.js?v=06bb8b74';
-import { pageErrorLine, rememberError } from '../public/js/features/bug-report-feature.js?v=bada835a';
+import { pageErrorLine, rememberError } from '../public/js/features/bug-report-feature.js?v=0ef95c18';
 import { Display, FakeEl, fakePixi } from './fake-scene.js';
 
 const root = join(import.meta.dirname, '..');
@@ -201,9 +201,9 @@ describe('one throw no longer stops the game loop (report 116)', () => {
       reportPageError('neighbours-mp.onTick', err);
       assert.deepEqual(fired, [err], 'reportError fires the window error event (the console shows it too)');
       const list = rememberError([], pageErrorLine({ error: err, message: err.message }));
-      assert.deepEqual(list, ['neighbours-mp.onTick: greeting@https://groddleafternoon.com/js/features/neighbours-mp-feature.js:589:18 tickButler@https://groddleafternoon.com/js/features/neighbours-mp-feature.js:606:25']);
+      assert.deepEqual(list, ['neighbours-mp.onTick: greeting@https://groddleafternoon.com/js/features/neighbours-mp-feature.js:589:18 tickButler@https://groddleafternoon.com/js/features/neighbours-mp-feature.js:606:25 onTick@x']);
       // An uncaught error reads as before.
-      assert.equal(pageErrorLine({ error: { stack: 'a\nb\nc' } }), 'a b');
+      assert.equal(pageErrorLine({ error: { stack: 'a\nb\nc' } }), 'a b c', 'the message and up to five frames (report #246)');
       assert.equal(pageErrorLine({ message: 'Script error.' }), 'Script error.');
     } finally {
       if (saved.reportError === undefined) delete globalThis.reportError;

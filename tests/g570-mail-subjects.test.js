@@ -102,7 +102,7 @@ describe('G570: subjects on the game\'s own letters', () => {
 });
 
 describe('G570: the site titles its letters from nobody (src/LedgerMail.php subject)', { skip: !HAS_SITE ? 'no groddle-afternoon-site checkout' : !hasPhp ? 'no php' : false }, () => {
-  const php = (body) => JSON.parse(execFileSync('php', ['-r', `foreach (['Economy', 'LedgerMath', 'WordFilter', 'LedgerGift', 'LedgerMail', 'GardenPayout', 'PatchPayout'] as $c) require ${JSON.stringify(SITE_DIR)} . "/src/$c.php"; use Groddle\\Minn\\LedgerMail as M; use Groddle\\Minn\\GardenPayout as P; use Groddle\\Minn\\PatchPayout as Q; ${body}`]).toString());
+  const php = (body) => JSON.parse(execFileSync('php', ['-r', `foreach (['Economy', 'LedgerMath', 'WordFilter', 'LedgerGift', 'LedgerMail', 'GardenPayout', 'PatchPayout', 'LedgerRefund'] as $c) require ${JSON.stringify(SITE_DIR)} . "/src/$c.php"; use Groddle\\Minn\\LedgerMail as M; use Groddle\\Minn\\GardenPayout as P; use Groddle\\Minn\\PatchPayout as Q; ${body}`]).toString());
 
   it('the gardens payout\'s crops are "Your garden crops"; a player\'s letter has no subject', () => {
     const out = php(`echo json_encode([

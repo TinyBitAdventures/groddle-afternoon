@@ -179,24 +179,84 @@ describe('exact credits once per character (LedgerMath::credits, check)', { skip
     assert.deepEqual(forged.rows, []);
   });
 
-  it('credits at most LEVELS_DAILY level-ups a day, and the next one on a later day', () => {
+  it('credits at most LEVELS_DAILY paying level-ups a day; the next waits, kept in the save, never clamped (report #246)', () => {
     const reward = currantRewardForLevel(10);
     const busy = { ...base, lvlday: { level: 3 } };
     const today = write(ledger, busy, save({ currants: 500 + reward, level: 10, xp: XP_FOR_LEVEL[8] }));
-    assert.equal(today.reconciled.clamped.currants, reward);
-    assert.deepEqual(today.credits.detail, { later: { level: 10 } });
-    const tomorrow = write(counts({}, 500), base, save({ currants: 500 + reward, level: 10, xp: XP_FOR_LEVEL[8] }));
+    assert.deepEqual(today.reconciled.clamped, none, 'the pack keeps the level\'s currants');
+    assert.equal(today.after.currants, 500, 'but the ledger has not credited them yet');
+    assert.deepEqual(today.held, counts({}, reward));
+    assert.deepEqual(today.rows, [['level', 'level', 10], ['lvlwait', '10', reward]]);
+    // A later day's count credits the waiting level: the ledger and the save agree, nothing is paid twice.
+    const waiting = { ...base, level: { level: 10 }, lvlwait: { 10: reward } };
+    const tomorrow = write(counts({}, 500), waiting, save({ currants: 500 + reward, level: 10, xp: XP_FOR_LEVEL[8] }));
     assert.deepEqual(tomorrow.reconciled.clamped, none);
+    assert.equal(tomorrow.after.currants, 500 + reward);
+    assert.deepEqual(tomorrow.rows, [['lvlwait', '10', 0], ['lvlday', 'level', 1]]);
+    const paid = { ...base, level: { level: 10 }, lvlwait: { 10: 0 }, lvlday: { level: 1 } };
+    assert.deepEqual(write(counts({}, 500 + reward), paid, save({ currants: 500 + reward, level: 10, xp: XP_FOR_LEVEL[8] })).credits.goods, none, 'credited once');
   });
 
-  it('an imagination card hands out its ticket, at most CARD_DAILY of one card a day', () => {
+  it('a level-35 save after three level-ups that day keeps its 61,860 currants (report #246)', () => {
+    assert.equal(currantRewardForLevel(35), 61_860);
+    assert.equal(ECON.credits.levels['35'], 61_860);
+    // Levels 26 to 34 pay nothing, so they take no place in the day's count.
+    let credited = { ...base, level: { level: 25 } };
+    let ledgerNow = counts({}, 500);
+    for (const level of [26, 27, 28]) {
+      const w = write(ledgerNow, credited, save({ currants: 500, level, xp: XP_FOR_LEVEL[level - 2] }));
+      assert.deepEqual(w.reconciled.clamped, none);
+      assert.deepEqual(w.rows, [['level', 'level', level]], `level ${level} takes no place in the count`);
+      credited = { ...credited, level: { level } };
+    }
+    const w35 = write(ledgerNow, { ...credited, level: { level: 34 } }, save({ currants: 500 + 61_860, level: 35, xp: XP_FOR_LEVEL[33] }));
+    assert.deepEqual(w35.reconciled.clamped, none);
+    assert.equal(w35.credits.goods.currants, 61_860, 'credited at once: the count was not used up');
+    // Even when the day's count is used up by paying levels, the currants stay in the pack.
+    const full = write(ledgerNow, { ...credited, level: { level: 34 }, lvlday: { level: 3 } }, save({ currants: 500 + 61_860, level: 35, xp: XP_FOR_LEVEL[33] }));
+    assert.deepEqual(full.reconciled.clamped, none);
+    assert.deepEqual(full.held, counts({}, 61_860));
+    ledgerNow = full.after;
+    // The next write that day sees the same: still kept, still not in the ledger.
+    const again = write(ledgerNow, { ...credited, level: { level: 35 }, lvlday: { level: 3 }, lvlwait: { 35: 61_860 } }, save({ currants: 500 + 61_860, level: 35, xp: XP_FOR_LEVEL[33] }));
+    assert.deepEqual(again.reconciled.clamped, none);
+    assert.equal(again.after.currants, 500);
+  });
+
+  it('a forged level (xp below its threshold) is still refused, waiting or not', () => {
+    const forged = save({ currants: 500 + 61_860, level: 35, xp: XP_FOR_LEVEL[33] - 1 });
+    for (const credited of [{ ...base, level: { level: 34 } }, { ...base, level: { level: 34 }, lvlday: { level: 3 } }]) {
+      const w = write(ledger, credited, forged);
+      assert.equal(w.reconciled.clamped.currants, 61_860);
+      assert.deepEqual(w.rows, []);
+      assert.deepEqual(w.held, none);
+    }
+    // A waiting level covers only its own currants: more than that is clamped as before.
+    const over = write(ledger, { ...base, level: { level: 34 }, lvlday: { level: 3 } }, save({ currants: 500 + 61_860 + 10_000, level: 35, xp: XP_FOR_LEVEL[33] }));
+    assert.equal(over.reconciled.clamped.currants, 10_000);
+    // Spending a waiting level's currants refunds nothing into the budget (only a real credit later does).
+    const spent = write(ledger, { ...base, level: { level: 35 }, lvlday: { level: 3 }, lvlwait: { 35: 61_860 } }, save({ currants: 500, level: 35, xp: XP_FOR_LEVEL[33] }));
+    assert.equal(spent.reconciled.budget, 0);
+    assert.deepEqual(spent.held, none);
+  });
+
+  it('an imagination card hands out its ticket, at most CARD_DAILY of one card a day; a purchase past it keeps its ticket', () => {
     const one = write(ledger, base, save({ currants: 500, inv: { paradise_ticket_cloud_rings: 1 }, cards: { ticket_to_paradise_cloud_rings: 1 } }));
     assert.deepEqual(one.reconciled.clamped, none);
     assert.deepEqual(one.rows, [['cardday', 'ticket_to_paradise_cloud_rings', 1], ['card', 'ticket_to_paradise_cloud_rings', 1]]);
+    // A fourth purchase the same day: the ticket stays in the pack, waiting for a later day's count.
+    const busy = { ...base, card: { ticket_to_paradise_beam_me_down: 3 }, cardday: { ticket_to_paradise_beam_me_down: 3 } };
+    const fourth = write(counts({ paradise_ticket_beam_me_down: 3 }, 500), busy, save({ currants: 500, inv: { paradise_ticket_beam_me_down: 4 }, cards: { ticket_to_paradise_beam_me_down: 4 } }));
+    assert.deepEqual(fourth.reconciled.clamped, none);
+    assert.deepEqual(fourth.held, counts({ paradise_ticket_beam_me_down: 1 }));
+    assert.deepEqual(fourth.after.items, { paradise_ticket_beam_me_down: 3 });
+    const next = write(fourth.after, { ...base, card: { ticket_to_paradise_beam_me_down: 3 }, cardday: {} }, save({ currants: 500, inv: { paradise_ticket_beam_me_down: 4 }, cards: { ticket_to_paradise_beam_me_down: 4 } }));
+    assert.deepEqual(next.reconciled.clamped, none);
+    assert.deepEqual(next.after.items, { paradise_ticket_beam_me_down: 4 }, 'credited once, on the later day');
+    // A forged pile: three credited, CARD_WAIT kept waiting, the rest clamped (no budget here).
     const forged = write(ledger, base, save({ currants: 500, inv: { paradise_ticket_cloud_rings: 50 }, cards: { ticket_to_paradise_cloud_rings: 50 } }));
-    assert.deepEqual(forged.reconciled.clamped, counts({ paradise_ticket_cloud_rings: 47 }));
-    const tomorrow = { ...base, card: { ticket_to_paradise_cloud_rings: 3 }, cardday: {} };
-    assert.deepEqual(write(counts({ paradise_ticket_cloud_rings: 3 }, 500), tomorrow, save({ currants: 500, inv: { paradise_ticket_cloud_rings: 50 }, cards: { ticket_to_paradise_cloud_rings: 50 } })).reconciled.clamped, counts({ paradise_ticket_cloud_rings: 44 }));
+    assert.deepEqual(forged.reconciled.clamped, counts({ paradise_ticket_cloud_rings: 17 }));
+    assert.deepEqual(forged.after.items, { paradise_ticket_cloud_rings: 3 });
   });
 });
 

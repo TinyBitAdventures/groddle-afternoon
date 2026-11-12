@@ -81,9 +81,13 @@ export const BUG_TEXT = Object.freeze({
   failed: REPORT_TEXT.failed,
 });
 
-/** As the site keeps them (BugReports.php MAX_MESSAGE, MAX_ERRORS). */
+/** As the site keeps them (BugReports.php MAX_MESSAGE, MAX_ERRORS, MAX_ERROR). */
 export const MAX_MESSAGE = 4000;
 const MAX_ERRORS = 10;
+const MAX_ERROR = 600;
+
+/** Stack frames a page error keeps below its message (report #246: the top frame alone never named the calling line). */
+export const STACK_FRAMES = 5;
 
 /**
  * The browser's own ResizeObserver notice (ticket 98): a layout loop it settled itself, not a
@@ -100,7 +104,7 @@ export function benignError(text) {
 
 /** The page's last errors, newest last, each cut short; browser notices (benignError) left out. */
 export function rememberError(list, text) {
-  const line = String(text || '').replace(/\s+/g, ' ').trim().slice(0, 300);
+  const line = String(text || '').replace(/\s+/g, ' ').trim().slice(0, MAX_ERROR);
   if (!line || benignError(line)) return list;
   list.push(line);
   if (list.length > MAX_ERRORS) list.splice(0, list.length - MAX_ERRORS);
@@ -108,13 +112,18 @@ export function rememberError(list, text) {
 }
 
 /**
- * One line for the report form from a window 'error' event: the stack's first two lines (or the
- * message), led by where the game caught it when it did (feature-host reportPageError: report 116,
- * a feature's per-frame throw is caught and the game goes on, so its id is the useful part).
+ * One line for the report form from a window 'error' event: the stack's message line and up to
+ * STACK_FRAMES frames below it (or the message), each frame's address without the page's origin so
+ * five fit in MAX_ERROR, led by where the game caught it when it did (feature-host reportPageError:
+ * report 116, a feature's per-frame throw is caught and the game goes on, so its id is the useful part).
  */
 export function pageErrorLine(e) {
   const where = typeof e?.error?.groddleWhere === 'string' && e.error.groddleWhere ? `${e.error.groddleWhere}: ` : '';
-  const line = e?.error?.stack?.split('\n').slice(0, 2).join(' ') || e?.message || '';
+  const stack = typeof e?.error?.stack === 'string' ? e.error.stack : '';
+  const origin = globalThis.location?.origin;
+  const frames = stack.split('\n').slice(0, STACK_FRAMES + 1)
+    .map((f) => (origin && origin !== 'null' ? f.split(origin).join('') : f).trim()).filter(Boolean);
+  const line = frames.join(' ') || e?.message || '';
   return line ? where + line : '';
 }
 
