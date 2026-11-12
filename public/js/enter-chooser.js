@@ -250,6 +250,60 @@ export function trimmedIconUrl(canvas) {
   }
 }
 
+/** A tile picture's edge in CSS px (style.css .feed-picker-choice img). */
+export const TILE_ICON_CSS = 50;
+
+/**
+ * The resolution that draws a thing's art at its tile's real pixel size: the art (the trimmed box,
+ * not the frame round it) fills TILE_ICON_CSS at the device pixel ratio (1 to 3). Capped so a
+ * drawn frame of `frameMax` local units stays at most `maxCanvas` px on its longer side.
+ */
+export function tileArtResolution(artMax, frameMax = artMax, { dpr = 1, size = TILE_ICON_CSS, maxResolution = 4, maxCanvas = 1024 } = {}) {
+  if (!(artMax > 0)) return 1;
+  const ratio = Math.max(1, Math.min(3, Number(dpr) || 1));
+  const cap = frameMax > 0 ? maxCanvas / frameMax : maxResolution;
+  return Math.max(0.05, Math.min(maxResolution, (size * ratio) / artMax, cap));
+}
+
+/**
+ * Report 2026-11-12 (a young Bean Tree's tile was blocky): a thing as drawn, sharp at its tile's
+ * size. A frame often carries wide empty margins (a trant cell is about 270 units tall at every
+ * growth stage, a young tree a few dozen rows at its foot), so a resolution picked from the frame
+ * drew the art a few px across and the tile stretched it. Two passes: a small one finds the art
+ * in the frame, then only the art is drawn, at the resolution that fills the tile at the device
+ * pixel ratio (the texture's own 3x copy, js/sprite-hires.js, is what the renderer samples).
+ * `extract({ resolution, frame })` draws the thing's local `frame` (all of it when absent) to a
+ * canvas; `bounds` is its local bounds. Returns a canvas cropped to the art, or null.
+ */
+export function drawTileArt({ extract, bounds, dpr = 1, size = TILE_ICON_CSS, probe = 256 } = {}) {
+  const frameMax = Math.max(Number(bounds?.width) || 0, Number(bounds?.height) || 0);
+  if (!(frameMax > 0) || typeof extract !== 'function') return null;
+  const res0 = Math.min(1, probe / frameMax);
+  const first = extract({ resolution: res0 });
+  const box = first && boxOf(first);
+  if (!box) return null;
+  // The art in local units, a probe pixel wider each side (rounding), kept inside the bounds.
+  const pad = 1 / res0;
+  const x0 = Math.max(bounds.x, bounds.x + box.x / res0 - pad);
+  const y0 = Math.max(bounds.y, bounds.y + box.y / res0 - pad);
+  const x1 = Math.min(bounds.x + bounds.width, bounds.x + (box.x + box.width) / res0 + pad);
+  const y1 = Math.min(bounds.y + bounds.height, bounds.y + (box.y + box.height) / res0 + pad);
+  const frame = { x: x0, y: y0, width: Math.max(1, x1 - x0), height: Math.max(1, y1 - y0) };
+  // The resolution from the art's own size (the padding aside), so the art itself fills the tile.
+  const artMax = Math.max(box.width, box.height) / res0;
+  const resolution = tileArtResolution(artMax, Math.max(frame.width, frame.height), { dpr, size });
+  return extract({ resolution, frame }) || null;
+}
+
+function boxOf(canvas) {
+  try {
+    const ctx = canvas.getContext('2d');
+    return ctx ? alphaBox(ctx.getImageData(0, 0, canvas.width, canvas.height).data, canvas.width, canvas.height) : null;
+  } catch (_) {
+    return null;
+  }
+}
+
 const MOVE_KEYS = new Set(['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'w', 'W', 'a', 'A', 's', 'S', 'd', 'D']);
 const CHOOSE_KEYS = new Set(['Enter', ' ', 'e', 'E']);
 

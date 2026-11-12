@@ -4,8 +4,8 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=4f923e2b';
 import { createErrorOnce, createFeatureHost } from './js/feature-host.js?v=06bb8b74';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=58124286';
-import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=4bb63350';
+import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl, drawTileArt } from './js/enter-chooser.js?v=4a3ea327';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
 import { createVogOverlay } from './js/vog-overlay.js?v=c2a9cc07';
@@ -9645,10 +9645,19 @@ function enterChoiceIcon(choice) {
   const art = spr.texture && (!spr.children?.length || badged) ? new PIXI.Sprite(spr.texture) : spr;
   try {
     if (art !== spr) art.anchor.copyFrom(spr.anchor);
+    // Drawn at the tile's real pixel size (enter-chooser.js drawTileArt): the art found in its
+    // frame first, so a young tree in a tall trant cell is not a few px stretched to 50.
     const b = art.getLocalBounds();
-    const max = Math.max(b.width, b.height);
-    if (!(max > 0)) return null;
-    return trimmedIconUrl(app.renderer.extract.canvas({ target: art, resolution: Math.min(2, 100 / max) }));
+    const drawn = drawTileArt({
+      bounds: { x: b.x, y: b.y, width: b.width, height: b.height },
+      dpr: window.devicePixelRatio || 1,
+      extract: ({ resolution, frame }) => app.renderer.extract.canvas({
+        target: art,
+        resolution,
+        ...(frame ? { frame: new PIXI.Rectangle(frame.x, frame.y, frame.width, frame.height) } : {}),
+      }),
+    });
+    return drawn ? trimmedIconUrl(drawn) : null;
   } catch (_) {
     return null;
   } finally {

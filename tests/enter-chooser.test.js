@@ -16,7 +16,7 @@ import {
   itemSortValue,
   orderChoices,
   planEnter,
-} from '../public/js/enter-chooser.js?v=3990ddea';
+} from '../public/js/enter-chooser.js?v=4a3ea327';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const game = readFileSync(join(here, '../public/game.js'), 'utf8');
@@ -198,7 +198,7 @@ describe('client source', { skip: !existsSync(client) && 'glitch-client not besi
 
 describe('tile art crop', () => {
   it('finds the drawn box in an RGBA buffer', async () => {
-    const { alphaBox } = await import('../public/js/enter-chooser.js?v=3990ddea');
+    const { alphaBox } = await import('../public/js/enter-chooser.js?v=4a3ea327');
     const w = 4;
     const h = 3;
     const rgba = new Uint8ClampedArray(w * h * 4);
@@ -206,5 +206,96 @@ describe('tile art crop', () => {
     rgba[(2 * w + 1) * 4 + 3] = 255;
     assert.deepEqual(alphaBox(rgba, w, h), { x: 1, y: 1, width: 2, height: 2 });
     assert.equal(alphaBox(new Uint8ClampedArray(w * h * 4), w, h), null);
+  });
+});
+
+// Report 2026-11-12: a young Bean Tree's tile was blocky. Its trant cell is about 270 units tall
+// at every stage and the young tree a few dozen rows at its foot; the resolution came from the
+// cell, so the art was drawn a few px across and the 50 px tile stretched it.
+describe('tile art at the tile\'s pixel size', () => {
+  /** A fake extract: a thing whose art is the local box `art` inside `bounds`, drawn at a resolution. */
+  function fakeThing(bounds, art) {
+    const calls = [];
+    const extract = ({ resolution, frame }) => {
+      calls.push({ resolution, frame });
+      const f = frame || bounds;
+      const width = Math.max(1, Math.ceil(f.width * resolution));
+      const height = Math.max(1, Math.ceil(f.height * resolution));
+      const data = new Uint8ClampedArray(width * height * 4);
+      for (let y = 0; y < height; y++) {
+        for (let x = 0; x < width; x++) {
+          const lx = f.x + (x + 0.5) / resolution;
+          const ly = f.y + (y + 0.5) / resolution;
+          if (lx >= art.x && lx < art.x + art.width && ly >= art.y && ly < art.y + art.height) data[(y * width + x) * 4 + 3] = 255;
+        }
+      }
+      return { width, height, getContext: () => ({ getImageData: () => ({ data }) }) };
+    };
+    return { extract, calls };
+  }
+
+  it('fills the tile at the device pixel ratio, from the art and not the frame', async () => {
+    const { tileArtResolution, TILE_ICON_CSS } = await import('../public/js/enter-chooser.js?v=4a3ea327');
+    assert.equal(TILE_ICON_CSS, 50);
+    assert.equal(tileArtResolution(50, 50, { dpr: 2 }), 2);
+    assert.equal(tileArtResolution(100, 100, { dpr: 3 }), 1.5);
+    // A DPR past 3 draws as 3; under 1 as 1.
+    assert.equal(tileArtResolution(50, 50, { dpr: 4 }), 3);
+    assert.equal(tileArtResolution(50, 50, { dpr: 0.5 }), 1);
+    // Tiny art is capped at 4x, and a large frame keeps the drawing at most 1024 px.
+    assert.equal(tileArtResolution(5, 5, { dpr: 2 }), 4);
+    assert.equal(tileArtResolution(20, 900, { dpr: 3 }), 1024 / 900);
+    assert.equal(tileArtResolution(0), 1);
+  });
+
+  it('draws a young tree (small art at the foot of a tall cell) sharp: art px >= tile px', async () => {
+    const { drawTileArt, alphaBox } = await import('../public/js/enter-chooser.js?v=4a3ea327');
+    // A trant cell, anchored at its foot: 220 x 270 units; the young tree 40 x 45 at the bottom.
+    const bounds = { x: -110, y: -270, width: 220, height: 270 };
+    const art = { x: -18, y: -59, width: 40, height: 45 };
+    const { extract, calls } = fakeThing(bounds, art);
+    const canvas = drawTileArt({ extract, bounds, dpr: 2 });
+    assert.ok(canvas);
+    // The second pass draws only the art's box, at the resolution that makes it 100 px (50 CSS at 2x).
+    assert.equal(calls.length, 2);
+    assert.equal(calls[0].frame, undefined);
+    const { frame, resolution } = calls[1];
+    assert.ok(frame.x <= art.x && frame.y <= art.y, 'the art is inside the frame drawn');
+    assert.ok(frame.x + frame.width >= art.x + art.width && frame.y + frame.height >= art.y + art.height);
+    assert.ok(frame.width < 60 && frame.height < 60, 'only the art, not the cell');
+    const box = alphaBox(canvas.getContext('2d').getImageData().data, canvas.width, canvas.height);
+    assert.ok(Math.max(box.width, box.height) >= 96, `art drawn ${box.width}x${box.height} px for a 100 px tile`);
+    assert.ok(Math.max(canvas.width, canvas.height) <= 112);
+    // The old resolution, min(2, 100 / the frame's longer side), drew the same tree 17 px tall.
+    const old = Math.min(2, 100 / 270);
+    assert.ok(Math.round(art.height * old) < 20);
+    assert.ok(resolution > old * 5);
+  });
+
+  it('keeps a thing that fills its frame (a MoeBot) at the same sharpness', async () => {
+    const { drawTileArt } = await import('../public/js/enter-chooser.js?v=4a3ea327');
+    const bounds = { x: -30, y: -80, width: 60, height: 80 };
+    const { extract, calls } = fakeThing(bounds, bounds);
+    const canvas = drawTileArt({ extract, bounds, dpr: 2 });
+    assert.ok(canvas.height >= 100 && canvas.height <= 106);
+    // The art's own height (the probe's box) makes 100 px; the frame drawn has a pixel of margin.
+    assert.ok(calls[1].resolution >= 100 / 82 && calls[1].resolution <= 100 / 79, String(calls[1].resolution));
+  });
+
+  it('returns null for nothing drawn or no bounds', async () => {
+    const { drawTileArt } = await import('../public/js/enter-chooser.js?v=4a3ea327');
+    const bounds = { x: 0, y: 0, width: 10, height: 10 };
+    assert.equal(drawTileArt({ extract: fakeThing(bounds, { x: 0, y: 0, width: 0, height: 0 }).extract, bounds }), null);
+    assert.equal(drawTileArt({ extract: () => null, bounds: { x: 0, y: 0, width: 0, height: 0 } }), null);
+    assert.equal(drawTileArt({ bounds }), null);
+  });
+
+  it('game.js draws each tile through drawTileArt at the device pixel ratio', () => {
+    const at = game.indexOf('function enterChoiceIcon(');
+    const icon = game.slice(at, game.indexOf('\n}\n', at));
+    assert.match(icon, /drawTileArt\(\{/);
+    assert.match(icon, /dpr: window\.devicePixelRatio \|\| 1/);
+    assert.match(icon, /frame: new PIXI\.Rectangle\(frame\.x, frame\.y, frame\.width, frame\.height\)/);
+    assert.doesNotMatch(icon, /100 \/ max/, 'no resolution from the frame size');
   });
 });
