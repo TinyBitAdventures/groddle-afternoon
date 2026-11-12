@@ -2752,9 +2752,14 @@
   "deployed": "2026-11-11"
  },
  "git": {
-  "commits": 1693,
+  "commits": 1694,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-12",
+    "kind": "fix",
+    "text": "Winter Walk motes can't be farmed by leaving, pay Glitch's quoin amounts, and each street opens with you on its spawn"
+   },
    {
     "date": "2026-11-12",
     "kind": "fix",
@@ -2869,14 +2874,9 @@
     "date": "2026-11-11",
     "kind": "fix",
     "text": "Saying the next incantation line yourself waits for someone new, as in Glitch"
-   },
-   {
-    "date": "2026-11-11",
-    "kind": "fix",
-    "text": "Yard plants step aside for a garden instead of poking through it"
    }
   ]
  },
- "tests": 836,
+ "tests": 838,
  "generatedAt": "2026-11-12"
 }

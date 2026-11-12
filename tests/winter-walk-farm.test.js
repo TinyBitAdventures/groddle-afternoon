@@ -27,7 +27,7 @@ import {
   ensureWinterWalkStory,
   failInterruptedWinterWalk,
   noteWinterWalkEnd,
-} from '../public/js/winter-walk.js?v=9961c35f';
+} from '../public/js/winter-walk.js?v=b07450d2';
 import { OFFER_OVERRIDES, QUEST_ROOMS, isBuiltRoom } from '../public/js/quest-rooms/catalog.js?v=d77d3d17';
 
 const root = join(import.meta.dirname, '..');
@@ -101,8 +101,9 @@ describe('game.js runs Winter Walk by those rules', () => {
 
   it('pays a mote as an iMG quoin that counts toward, and stops at, the daily quoin limit', () => {
     const body = fn('collectWinterWalkMote');
-    assert.match(body, /quoinState\.collectedToday >= quoinState\.dailyLimit[\s\S]*?return false;/);
-    assert.match(body, /collectQuoin\(quoinState, 'xp', pc, \{ amount: result\.amount \}\)/);
+    assert.match(body, /entry\.kind !== 'qurazy' && quoinState\.collectedToday >= quoinState\.dailyLimit[\s\S]*?return false;/);
+    // #220: the mote's own kind ('xp', or the return's Qurazy).
+    assert.match(body, /collectQuoin\(quoinState, result\.kind, pc, \{ amount: result\.amount \}\)/);
     assert.doesNotMatch(body, /grantMoodXp\(/);
   });
 });

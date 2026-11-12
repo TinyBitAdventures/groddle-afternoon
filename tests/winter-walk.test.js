@@ -20,7 +20,7 @@ import {
   winterWalkObjective,
   winterWalkProgress,
   winterWalkRemainingMs,
-} from '../public/js/winter-walk.js?v=9961c35f';
+} from '../public/js/winter-walk.js?v=b07450d2';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const publicDir = path.join(here, '..', 'public');
@@ -34,12 +34,13 @@ test('Winter Walk uses the source timer, quest id, and first-run ice reward', ()
   assert.equal(WINTER_HAVEN_STREET_ID, 'GIFNNTRK1073PQ6');
 });
 
-test('motes are stage-bound, unique, and reproduce visible iMG moments', () => {
+test('motes are stage-bound, unique, and pay the benefits behind the recorded iMG moments', () => {
   const state = createWinterWalkState({ now: 1000 });
   assert.equal(collectWinterMote(state, 'haven', 0, 1100).reason, 'wrong_stage');
-  assert.equal(collectWinterMote(state, 'surface', 0, 1100).amount, 120);
+  // #220: Lily's +120 and +3000 carried her x1.2 mood bonus; the benefit is 100 and 2500.
+  assert.equal(collectWinterMote(state, 'surface', 0, 1100).amount, 100);
   assert.equal(collectWinterMote(state, 'surface', 0, 1200).reason, 'already_collected');
-  assert.equal(collectWinterMote(state, 'surface', 2, 1300).amount, 3000);
+  assert.equal(collectWinterMote(state, 'surface', 2, 1300).amount, 2500);
   assert.deepEqual(winterWalkProgress(state), {
     collected: 2,
     total: Object.values(WINTER_MOTE_REWARDS).reduce(
@@ -47,7 +48,7 @@ test('motes are stage-bound, unique, and reproduce visible iMG moments', () => {
       0
     ),
   });
-  assert.equal(state.imgEarned, 3120);
+  assert.equal(state.imgEarned, 2600);
 });
 
 test('route returns from the haven to the snowy finale and rewards only the first run', () => {
@@ -58,9 +59,10 @@ test('route returns from the haven to the snowy finale and rewards only the firs
   assert.equal(finishWinterWalk(first, 1500).reason, 'wrong_stage');
   assert.equal(returnToWinterWalk(first, 2000).ok, true);
   assert.match(winterWalkObjective(first), /last winter motes/);
-  assert.equal(collectWinterMote(first, 'return', 0, 2100).amount, 1098);
-  assert.equal(collectWinterMote(first, 'return', 1, 2200).amount, 600);
-  assert.equal(collectWinterMote(first, 'return', 2, 2300).amount, 720);
+  // #220: the white +1098 was a level-60 Qurazy (915 x1.2); +600 and +720 were 500 and 600 x1.2.
+  assert.equal(collectWinterMote(first, 'return', 0, 2100).kind, 'qurazy');
+  assert.equal(collectWinterMote(first, 'return', 1, 2200).amount, 500);
+  assert.equal(collectWinterMote(first, 'return', 2, 2300).amount, 600);
   const done = finishWinterWalk(first, 2400);
   assert.equal(done.ok, true);
   assert.equal(done.iceReward, 23);

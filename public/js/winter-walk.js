@@ -81,6 +81,8 @@ export function noteWinterWalkEnd(questState, { repeat = false, outcome = 'faile
   if (outcome === 'complete') {
     if (repeat) story.repeatCompletedAt = now;
     else story.firstCompletedAt = now;
+    // #220: a finished run is over; the next walk has every mote again.
+    if (story.runs) delete story.runs[repeat ? WINTER_WALK_REPEAT_QUEST_ID : WINTER_WALK_QUEST_ID];
   } else if (repeat) {
     story.repeatFailedAt = now;
   }
@@ -103,16 +105,73 @@ export function failInterruptedWinterWalk(questState, now = Date.now()) {
   return failed;
 }
 
+/**
+ * #220: what each mote gives before the player's quoin multiplier and mood bonus. The motes are
+ * quoins with a fixed benefit (items/quoin.js 165), multiplied by the player's quoin multiplier
+ * (171-174) and then the mood bonus (184, inc_stats.js stats_add_xp 271, stats_xp_apply_bonus
+ * 559-562: up to x1.2). The amounts are Lily Linguistic's recording (2Xko9Hy-cLE, 2012-12-06:
+ * +3000, +120, +600, +720 and a white +1098), which already carried her x1.2 mood bonus at
+ * multiplier 1: the table held those shown amounts, and the game then applied the player's own
+ * multiplier and mood again (Friendly at x6: 120 -> 864, 3000 -> 19,800). The white +1098 was a
+ * Qurazy quoin: 915 is qurazy_rewards[59], Lily's level 60 (config_base.js 263-323), x1.2; it is
+ * level-scaled and takes no multiplier (quoin.js 207-210), but the table paid 1098 x the
+ * multiplier (7,906 at x6). That mote is now a Qurazy (WINTER_MOTE_KINDS).
+ */
 export const WINTER_MOTE_REWARDS = Object.freeze({
-  surface: Object.freeze([120, 120, 3000, 120, 120, 240]),
-  haven: Object.freeze([120, 120, 120, 240, 120, 120]),
-  return: Object.freeze([1098, 600, 720]),
+  surface: Object.freeze([100, 100, 2500, 100, 100, 200]),
+  haven: Object.freeze([100, 100, 100, 200, 100, 100]),
+  return: Object.freeze([0, 500, 600]),
 });
+
+/** The kind of quoin each mote is ('xp' unless listed): a Qurazy pays by level (quoins.js qrazyRewardForLevel). */
+export const WINTER_MOTE_KINDS = Object.freeze({
+  return: Object.freeze(['qurazy', 'xp', 'xp']),
+});
+
+export function winterMoteKind(stage, index) {
+  return WINTER_MOTE_KINDS[stage]?.[index] || 'xp';
+}
+
+const MOTE_STAGES = ['surface', 'haven', 'return'];
+
+function moteList(stage, list) {
+  const n = WINTER_MOTE_REWARDS[stage].length;
+  const out = [...new Set((Array.isArray(list) ? list : []).map((v) => Math.floor(Number(v))))]
+    .filter((i) => Number.isInteger(i) && i >= 0 && i < n);
+  return out.sort((a, b) => a - b);
+}
+
+/**
+ * #220 (Friendly): a walk left or timed out was offered again with every mote back, so the motes
+ * could be taken over and over until the daily quoin limit. A run now lasts until the walk is
+ * finished: the motes taken in it are kept in the quest save (story.winterWalk.runs[questId])
+ * and a retry does not spawn them again. Finishing the walk clears the run, so the next repeat
+ * starts with every mote, as the first walk did.
+ */
+export function winterWalkRun(questState, { repeat = false } = {}) {
+  const story = ensureWinterWalkStory(questState);
+  const id = repeat ? WINTER_WALK_REPEAT_QUEST_ID : WINTER_WALK_QUEST_ID;
+  story.runs = story.runs && typeof story.runs === 'object' ? story.runs : {};
+  const run = story.runs[id] && typeof story.runs[id] === 'object' ? story.runs[id] : {};
+  const collected = run.collected && typeof run.collected === 'object' ? run.collected : {};
+  run.collected = Object.fromEntries(MOTE_STAGES.map((stage) => [stage, moteList(stage, collected[stage])]));
+  story.runs[id] = run;
+  return run;
+}
+
+/** Notes a mote taken in this run (kept until the walk is finished). */
+export function noteWinterMoteTaken(questState, { repeat = false, stage, index } = {}) {
+  if (!WINTER_MOTE_REWARDS[stage]) return null;
+  const run = winterWalkRun(questState, { repeat });
+  run.collected[stage] = moteList(stage, [...run.collected[stage], index]);
+  return run;
+}
 
 export function createWinterWalkState({
   now = Date.now(),
   sourceLocation = null,
   repeat = false,
+  run = null,
 } = {}) {
   return {
     status: 'surface',
@@ -127,7 +186,12 @@ export function createWinterWalkState({
           y: Number(sourceLocation.y) || 0,
         }
       : null,
-    collected: { surface: [], haven: [] },
+    // A retry of an unfinished run starts without the motes it already took (#220).
+    collected: {
+      surface: moteList('surface', run?.collected?.surface),
+      haven: moteList('haven', run?.collected?.haven),
+      return: moteList('return', run?.collected?.return),
+    },
     imgEarned: 0,
   };
 }
@@ -160,12 +224,12 @@ export function collectWinterMote(state, stage, index, now = Date.now()) {
   const i = Math.floor(Number(index));
   const rewards = WINTER_MOTE_REWARDS[stage];
   if (i < 0 || i >= rewards.length) return { ok: false, reason: 'invalid_mote', state };
-  if (state.collected[stage].includes(i)) return { ok: false, reason: 'already_collected', state };
+  if ((state.collected[stage] ||= []).includes(i)) return { ok: false, reason: 'already_collected', state };
   const amount = rewards[i];
   state.collected[stage].push(i);
   state.collected[stage].sort((a, b) => a - b);
   state.imgEarned += amount;
-  return { ok: true, reason: 'collected', amount, state };
+  return { ok: true, reason: 'collected', amount, kind: winterMoteKind(stage, i), state };
 }
 
 export function enterWinterHaven(state, now = Date.now()) {

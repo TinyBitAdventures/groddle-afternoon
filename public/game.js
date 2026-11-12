@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=9f222124';
 import { createErrorOnce, createFeatureHost } from './js/feature-host.js?v=06bb8b74';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=7a7bf0f5';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=b3607753';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -146,12 +146,15 @@ import {
   expireWinterWalk,
   failInterruptedWinterWalk,
   finishWinterWalk,
+  noteWinterMoteTaken,
   noteWinterWalkEnd,
   returnToWinterWalk,
+  winterMoteKind,
   winterWalkObjective,
   winterWalkProgress,
   winterWalkRemainingMs,
-} from './js/winter-walk.js?v=9961c35f';
+  winterWalkRun,
+} from './js/winter-walk.js?v=b07450d2';
 import {
   SUMMERS_DAY_ANNEX_BOWL,
   SUMMERS_DAY_ANNEX_FLOOR_Y,
@@ -3278,7 +3281,9 @@ async function streetTripTo(tsid, opts = {}) {
   const loadingImg = resolveLoadingImg(tsid);
 
   if (!useFx || !el) {
-    return enterStreet(tsid, opts);
+    const arrived = await enterStreet(tsid, opts);
+    opts.arrive?.(arrived);
+    return arrived;
   }
   // Loading card (G89): visits so far and the last one, read before this entry counts.
   // Saves from before the history was kept: a street locations_visited already lists counts once.
@@ -3307,6 +3312,8 @@ async function streetTripTo(tsid, opts = {}) {
     }),
     onMid: async () => {
       data = await enterStreet(tsid, { ...opts, quiet: true });
+      // #215: a scene places the avatar (opts.arrive) before the card lifts, so the first frame shown has it there.
+      opts.arrive?.(data);
     },
   });
   playSound('STREET_LOADED', { volume: 0.32 });
@@ -18295,7 +18302,8 @@ function spawnWinterMotes(stage) {
   winterWalkMotes = [];
   points.forEach((point, index) => {
     if (winterWalkState?.collected?.[stage]?.includes(index)) return;
-    const sprite = new PIXI.AnimatedSprite(quoinFrames('xp'));
+    const kind = winterMoteKind(stage, index);
+    const sprite = new PIXI.AnimatedSprite(quoinFrames(kind));
     sprite.anchor.set(0.5);
     sprite.animationSpeed = 0.28;
     sprite.loop = true;
@@ -18306,13 +18314,14 @@ function spawnWinterMotes(stage) {
     sprite.baseY = point.y - 62 - (index % 2) * 26;
     sprite.y = sprite.baseY;
     sprite.phase = index * 1.37;
-    sprite.tint = index === 2 && stage === 'surface' ? 0xe0a8ff : 0xc58cff;
+    // The Qurazy keeps its own white art (Lily's recording); the iMG motes glow purple.
+    if (kind !== 'qurazy') sprite.tint = index === 2 && stage === 'surface' ? 0xe0a8ff : 0xc58cff;
     sprite.zIndex = 42;
     const glow = new PIXI.Graphics();
     glow.circle(0, 0, index === 2 && stage === 'surface' ? 30 : 23).fill({ color: 0x9b5de5, alpha: index === 2 && stage === 'surface' ? 0.34 : 0.2 });
     sprite.addChildAt(glow, 0);
     entityLayer.addChild(sprite);
-    winterWalkMotes.push({ stage, index, amount: rewards[index], sprite });
+    winterWalkMotes.push({ stage, index, kind, amount: rewards[index], sprite });
   });
   return winterWalkMotes;
 }
@@ -18500,15 +18509,17 @@ async function startWinterWalk(opts = {}) {
       now: Date.now(),
       sourceLocation: winterWalkSourceLocation,
       repeat,
+      // #220: a retry of an unfinished walk leaves out the motes already taken in it.
+      run: winterWalkRun(questState, { repeat }),
     });
     winterWalkAutoNextAt = 0;
     savePlayerLocation(winterWalkSourceLocation);
     await enterStreetWithTransition(WINTER_WALK_STREET_ID, {
       useTransition: opts.useTransition !== false,
       quiet: true,
+      arrive: () => winterWalkState && setupWinterWalkStage('surface'),
     });
     savePlayerLocation(winterWalkSourceLocation);
-    setupWinterWalkStage('surface');
     pushActivity('Winter Walk: cross the snowy path, then climb through Winter Haven.');
     toast('Five minutes. Follow the winter motes.', 3200);
     return winterWalkState;
@@ -18522,8 +18533,9 @@ async function startWinterWalk(opts = {}) {
 
 function collectWinterWalkMote(entry) {
   if (!entry?.sprite || entry.collected || !winterWalkState) return false;
-  // The motes are iMG quoins in a place that keeps the daily quoin limit (items/quoin.js 159, 236-237).
-  if (quoinState.collectedToday >= quoinState.dailyLimit) return false;
+  // The motes are iMG quoins in a place that keeps the daily quoin limit (items/quoin.js 159, 236-237);
+  // a Qurazy is outside it (159).
+  if (entry.kind !== 'qurazy' && quoinState.collectedToday >= quoinState.dailyLimit) return false;
   const result = collectWinterMote(
     winterWalkState,
     entry.stage,
@@ -18532,8 +18544,11 @@ function collectWinterWalkMote(entry) {
   );
   if (!result.ok) return false;
   entry.collected = true;
-  // The motes are iMG quoins (items/quoin.js 184): the quoin multiplier and the mood bonus apply, and each counts today.
-  const quoin = collectQuoin(quoinState, 'xp', pc, { amount: result.amount });
+  // #220: kept with the quest until the walk is finished, so leaving and retrying does not bring it back.
+  noteWinterMoteTaken(questState, { repeat: winterWalkState.repeat, stage: entry.stage, index: entry.index });
+  // The motes are iMG quoins (items/quoin.js 184): the quoin multiplier and the mood bonus apply, and each
+  // counts today; the Qurazy pays by level with no multiplier (207-210) and does not count.
+  const quoin = collectQuoin(quoinState, result.kind, pc, { amount: result.amount });
   const amount = quoin.ok ? quoin.actual : 0;
   winterWalkState.imgEarned += amount - result.amount;
   // inc_stats.js stats_add_quoins_today 686-699, as a street quoin does (grabWorldQuoin).
@@ -18541,12 +18556,14 @@ function collectWinterWalkMote(entry) {
   const { x, y } = entry.sprite;
   if (entry.sprite.parent) entry.sprite.parent.removeChild(entry.sprite);
   if (!entry.sprite.destroyed) entry.sprite.destroy({ children: true });
-  playSfx('quoin', { volume: result.amount >= 1000 ? 0.8 : 0.56, rate: result.amount >= 1000 ? 1.18 : 1.04 });
+  const big = result.amount >= 1000 || result.kind === 'qurazy';
+  playSfx('quoin', { volume: big ? 0.8 : 0.56, rate: big ? 1.18 : 1.04 });
   floatText(x, y - 18, `+${amount.toLocaleString()} iMG`, 0xc98dff);
-  burst(x, y, 0xb873ed, result.amount >= 1000 ? 26 : 13);
+  burst(x, y, 0xb873ed, big ? 26 : 13);
   pushActivity(`A winter mote sparkles into imagination. +${amount.toLocaleString()} iMG.`);
   renderWinterWalkHud();
   updateHud();
+  savePlayerState();
   return true;
 }
 
@@ -18558,10 +18575,12 @@ async function enterWinterHavenStage() {
   if (winterWalkPortal?.state) winterWalkPortal.state.active = false;
   keys.clear();
   try {
-    await enterStreetWithTransition(WINTER_HAVEN_STREET_ID, { quiet: true });
+    await enterStreetWithTransition(WINTER_HAVEN_STREET_ID, {
+      quiet: true,
+      arrive: () => winterWalkState && setupWinterWalkStage('haven'),
+    });
     if (!winterWalkState) return false;
     savePlayerLocation(winterWalkSourceLocation);
-    setupWinterWalkStage('haven');
     pushActivity('You descend into Winter Haven. The exit ladder waits above.');
     toast('Winter Haven: climb to the EXIT sign.', 2800);
     return true;
@@ -18578,10 +18597,12 @@ async function reenterWinterWalkStage() {
   if (winterWalkPortal?.state) winterWalkPortal.state.active = false;
   keys.clear();
   try {
-    await enterStreetWithTransition(WINTER_WALK_STREET_ID, { quiet: true });
+    await enterStreetWithTransition(WINTER_WALK_STREET_ID, {
+      quiet: true,
+      arrive: () => winterWalkState && setupWinterWalkStage('return'),
+    });
     if (!winterWalkState) return false;
     savePlayerLocation(winterWalkSourceLocation);
-    setupWinterWalkStage('return');
     pushActivity('You climb back into Winter Walk. Three bright motes mark the way home.');
     toast('Winter Walk: gather the last motes and follow the light.', 3200);
     return true;
