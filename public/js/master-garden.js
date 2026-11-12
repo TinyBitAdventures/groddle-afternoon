@@ -293,6 +293,16 @@ export function potionTendGarden(garden, action, inv, pc, ctx = {}) {
  * the player is too tired). A pour on a shared public bed tells the realtime server this number
  * (groddle-afternoon-server gardens_potions.go "n"), so the server works the same plots.
  */
+/**
+ * master_garden.js 120-122: "You're too tired to do that." only when energy is at or under the
+ * action's cost; with energy left and no plot to work, the bottle's own noTarget line answers.
+ */
+export function potionTooTired(garden, action, pc, ctx = {}) {
+  const type = garden?.gardenType === 'herb' ? 'herb' : 'default';
+  const cost = Number(mgDetails(type, action, ctx.learned, ctx.upgrades)?.energy_cost) || 0;
+  return cost > 0 && (Number(pc?.energy) || 0) <= cost;
+}
+
 export function potionPlotCount(garden, action, inv, pc, ctx = {}) {
   const type = garden?.gardenType === 'herb' ? 'herb' : 'default';
   const details = mgDetails(type, action, ctx.learned, ctx.upgrades);

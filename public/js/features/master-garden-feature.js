@@ -39,10 +39,11 @@ import {
   createPotionState,
   plotsFor,
   potionPlotCount,
+  potionTooTired,
   potionTendGarden,
   potionUsesLeft,
   usePotion,
-} from '../master-garden.js?v=2cd0c59d';
+} from '../master-garden.js?v=e699ce82';
 import { rollDropTable } from '../drop-tables.js?v=16e12632';
 import { payDrop } from './drops-feature.js?v=8220fd90';
 import { textureFromUrl } from '../textures.js?v=92ec53cd';
@@ -190,7 +191,7 @@ function finishPour(engine) {
     const n = potionPlotCount(garden, potion.action, engine.inv, engine.pc, ctx);
     if (!n) {
       engine.playSound?.('CLICK_FAILURE', { volume: 0.5 });
-      return say(engine, `You tried to pour a ${potion.label}. ${engine.pc?.energy > 0 ? "You're too tired to do that." : potion.noTarget}`, false);
+      return say(engine, `You tried to pour a ${potion.label}. ${potionTooTired(garden, potion.action, engine.pc, ctx) ? "You're too tired to do that." : potion.noTarget}`, false);
     }
     const k = keepsCopies(engine, pour.potionClass) ? verbCopy(engine, pour.potionClass, pour.copy) : null;
     const mod = potion.action === 'plant' ? 1 - gardenGrowModifier(garden.gardenType === 'herb' ? 'herb' : 'default', upgrades(engine)) : undefined;

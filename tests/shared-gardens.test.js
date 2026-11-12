@@ -13,8 +13,8 @@ import { describe, it } from 'node:test';
 import { SEED_CATALOG, createGarden, harvestPlot, plantPlot, tickGarden, waterAllPlots, waterPlot } from '../public/js/garden.js?v=37209241';
 import { GARDEN_LOCK_MS, LOCK_LINE, SHARED_GARDEN_STREETS, applyPlot, isSharedGardenStreet, localPlot, lockedFor, parsePlotId, plotId, rollPasses } from '../public/js/shared-gardens.js?v=c1f90bc0';
 import { sharedGardensFeature } from '../public/js/features/shared-gardens-feature.js?v=0259921f';
-import { FEATURES } from '../public/js/features/index.js?v=d13a4db7';
-import { mgDetails, potionPlotCount } from '../public/js/master-garden.js?v=2cd0c59d';
+import { FEATURES } from '../public/js/features/index.js?v=52ba9e76';
+import { mgDetails, potionPlotCount, potionTooTired } from '../public/js/master-garden.js?v=e699ce82';
 // A fresh pick's save waits for the server's receipt (GRANT_SAVE_DELAY_MS): the tests wait it out.
 const settle = () => new Promise((res) => setTimeout(res, 2700));
 import { HAS_SITE, SITE_DIR, serverPath, sitePath, skipWithoutServer } from '../tools/repos.mjs';
@@ -246,6 +246,17 @@ describe('Master Gardener potions on a shared bed (slice 2)', () => {
     const cost = Number(mgDetails('default', 'water', ctx.learned, []).energy_cost) || 0;
     if (cost > 0) assert.equal(potionPlotCount(g, 'water', {}, { energy: cost * 3 + 1 }, ctx), 3, 'it stops when too tired');
     assert.equal(potionPlotCount(g, 'water', {}, pc, { learned: [], upgrades: [] }) >= 0, true);
+  });
+
+  it('a pour that finds no plot says too tired only when energy is at or under the cost (master_garden.js 120-122)', () => {
+    const g = createGarden({ cols: 4, rows: 2 });
+    const ctx = { learned: ['mastergardener_1', 'croppery_1'], upgrades: [] };
+    const cost = Number(mgDetails('default', 'hoe', ctx.learned, []).energy_cost) || 0;
+    assert.ok(cost > 0);
+    assert.equal(potionTooTired(g, 'hoe', { energy: 1000 }, ctx), false, 'energy left: the bottle says there is nothing to clear');
+    assert.equal(potionTooTired(g, 'hoe', { energy: cost }, ctx), true);
+    const feature = readFileSync(new URL('../public/js/features/master-garden-feature.js', import.meta.url), 'utf8');
+    assert.match(feature, /potionTooTired\(garden, potion\.action, engine\.pc, ctx\) \? "You're too tired to do that\." : potion\.noTarget/);
   });
 
   it('the pour asks the server with the plots, the bottle, the seed; its go-ahead lands the pour and the grants', async (t) => {
