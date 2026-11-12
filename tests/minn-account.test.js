@@ -22,7 +22,7 @@ import { FORM_COPY, SETTINGS_COPY, resetLinkFrom } from '../public/js/account-fo
 import { restoreNeedsAsking, sizeLabel, slotForNewBackup, accountBackupFeature } from '../public/js/features/account-backup-feature.js?v=29998316';
 import { FEATURES } from '../public/js/features/index.js?v=2daf96e7';
 import { multiplayerEntryUrl } from '../public/js/game-mode.js?v=1ecf2899';
-import { SAVE_ENTRY_NAMES, createMultiplayerSaveStore } from '../public/js/save-store.js?v=5b167c14';
+import { SAVE_ENTRY_NAMES, createMultiplayerSaveStore } from '../public/js/save-store.js?v=04420633';
 import { HAS_SITE, SITE_DIR, serverPath, skipWithoutServer, skipWithoutSite } from '../tools/repos.mjs';
 
 const root = join(import.meta.dirname, '..');
@@ -293,6 +293,10 @@ describe('online-boot', () => {
     assert.deepEqual(two.buttons.map(([c]) => c), ['load', 'keep'], 'loading the other save first; keeping this one replaces it');
     assert.equal(two.lines.length, 3, 'when each was saved, and what keeping does');
     assert.deepEqual(saveAlertFor('elsewhere', { by: 'window' }).buttons.map(([c]) => c), ['load'], 'a tab that saved and stood down only offers to play here');
+    // Offline, the last write failed: the alert never says this tab saved (messages audit, unconfirmed list).
+    assert.match(saveAlertFor('elsewhere', { by: 'window' }).body, /this tab saved your game and stopped/);
+    assert.match(saveAlertFor('elsewhere', { by: 'window', unsaved: true }).body, /^You opened your character in another tab, so this tab stopped\. Its last change could not be saved\./);
+    assert.match(readFileSync(new URL('../public/js/save-store.js', import.meta.url), 'utf8'), /const unsaved = dirty;[\s\S]{0,240}\.\.\.\(unsaved \? \{ unsaved: true \} : \{\}\)/);
     assert.deepEqual(saveAlertFor('error', { message: 'Too big.' }).lines, ['Too big.']);
     const words = JSON.stringify(SAVE_ALERT_COPY, (k, v) => (typeof v === 'function' ? v('7:24 PM') : v));
     assert.ok(!words.includes('—') && !/glitch/i.test(words), 'plain copy');

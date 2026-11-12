@@ -161,7 +161,7 @@ describe('quest room kit', () => {
 
 describe('Rainbow Run (numismatic_hustle)', () => {
   it('has the source 30-second, 30-coin rules and enough coins on reachable ledges', async () => {
-    const mod = await import('../public/js/quest-rooms/rainbow-run.js?v=b90035c2');
+    const mod = await import('../public/js/quest-rooms/rainbow-run.js?v=3d7f08a4');
     assert.equal(mod.RUN_MS, 30_000);
     assert.equal(mod.COINS_NEEDED, 30);
     const coins = mod.rainbowCoins();

@@ -8,8 +8,8 @@
 import { beforeEach, describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { createHellState, croak, hellNewDay, shouldCroak } from '../public/js/hell.js?v=87b075a8';
-import { GAME_DAY_MS, getGameDayStartMs, newDayPending, setLastNewDayTs } from '../public/js/game-day.js?v=a7e262aa';
+import { createHellState, croak, hellNewDay, shouldCroak } from '../public/js/hell.js?v=9828025b';
+import { GAME_DAY_MS, getGameDayStartMs, newDayPending, setLastNewDayTs } from '../public/js/game-day.js?v=cf9afac0';
 
 const store = new Map();
 globalThis.localStorage = {

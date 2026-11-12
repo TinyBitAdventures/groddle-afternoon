@@ -34,17 +34,17 @@ import {
   useToolCondition,
 } from '../public/js/tools.js?v=5f482998';
 import { ITEM_CATALOG, addItem, createInventory, ensureItem, isToolItem, removeItem } from '../public/js/inventory.js?v=5be47371';
-import { createPlayerSave, restorePlayerSave } from '../public/js/player-save.js?v=73f3592a';
+import { createPlayerSave, restorePlayerSave } from '../public/js/player-save.js?v=1e709909';
 import { layoutPack, unitPlaces } from '../public/js/pack-slots.js?v=4a36968a';
 import { bagsFeature } from '../public/js/features/bags-feature.js?v=9ea775b6';
 import { VENDOR_PROFILES, vendorBuy, vendorSell } from '../public/js/vendor.js?v=5207195b';
-import { createResourceNode, harvestResourceNode, ensureResourceItems } from '../public/js/resource-nodes.js?v=24968e1f';
+import { createResourceNode, harvestResourceNode, ensureResourceItems } from '../public/js/resource-nodes.js?v=e3833110';
 import {
   fireflyJarCounts,
   fireflyJarInUse,
   resourceNodesFeature,
   setFireflyJar,
-} from '../public/js/features/resource-nodes-feature.js?v=435b011f';
+} from '../public/js/features/resource-nodes-feature.js?v=17a1f5c0';
 import { toolBreakEvents } from '../public/js/quest-offers.js?v=ecd7c1d7';
 
 const root = join(import.meta.dirname, '..');

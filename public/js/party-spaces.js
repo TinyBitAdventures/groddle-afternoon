@@ -78,7 +78,8 @@ export const PARTY_TEXT = Object.freeze({
   expired: 'Our Party Space expired.',
   alreadyExpired: 'Sorry, but the party space has already expired.',
   noEnergy: "You don't have enough energy for that.",
-  joinLater: "If you'd like to join the Party Space later, you can do so from the Party Chat menu above.",
+  // inc_party.js 505 pointed at the Party Chat pane's join; ours is the Map's Join party card.
+  joinLater: "If you'd like to join the Party Space later, open the Map and choose Join party.",
   atmLabel: 'Party ATM',
   atmDesc: "The party don't stop 'til I walk in.",
   atmTooltip: 'Make moar party longer',

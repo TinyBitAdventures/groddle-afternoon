@@ -16,7 +16,7 @@ import { PROMPT_ROLL_OUT_MS, armPromptTimeout, promptTimeoutMs, timeoutChoice } 
 import { STREET_CARD_GONE, STREET_CARD_UP, cardHidesKey, cardPausedTimeout, installStreetCardKeyGuard, streetCardUp } from '../public/js/screen-fx.js?v=2e975a82';
 import { hellFeature } from '../public/js/features/hell-feature.js?v=b9770c5a';
 import { questOffersFeature } from '../public/js/features/quest-offers-feature.js?v=7c77bd57';
-import { HELL_ENTRY_PROMPT_TIMEOUT_MS, HELL_TEXT } from '../public/js/hell.js?v=87b075a8';
+import { HELL_ENTRY_PROMPT_TIMEOUT_MS, HELL_TEXT } from '../public/js/hell.js?v=9828025b';
 import { createQuestState } from '../public/js/quests.js?v=2951073f';
 
 const spike = join(dirname(fileURLToPath(import.meta.url)), '..');

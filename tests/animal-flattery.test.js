@@ -18,8 +18,8 @@ import {
   wisdomPool,
 } from '../public/js/animal-flattery.js?v=63001f58';
 import { setMetabolicGainGate } from '../public/js/metabolics.js?v=8504134e';
-import { getVerbsFor, runVerb } from '../public/content.js?v=5d55594c';
-import { getGameDayKey } from '../public/js/game-day.js?v=a7e262aa';
+import { getVerbsFor, runVerb } from '../public/content.js?v=2d1f01bb';
+import { getGameDayKey } from '../public/js/game-day.js?v=cf9afac0';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const gs = (p) => readFileSync(join(here, '../../glitch-GameServerJS', p), 'utf8');

@@ -29,10 +29,10 @@ import { HAS_SERVER, HAS_SITE, SITE_DIR, serverPath, sitePath } from '../tools/r
 import { bagLabel } from '../public/js/bag-names.js?v=22391c55';
 import { BAG_DEFS, PACK_CAPACITY, layoutPack, normalizePrefs, ownBagLabel, renameBag } from '../public/js/pack-slots.js?v=4a36968a';
 import { ITEM_CATALOG, isToolItem } from '../public/js/inventory.js?v=5be47371';
-import { nameAnimal, namedAnimalLabel } from '../public/js/animal-husbandry.js?v=6599e6f6';
+import { nameAnimal, namedAnimalLabel } from '../public/js/animal-husbandry.js?v=0772cd08';
 import { kittyLabel, nameKitty } from '../public/js/heli-kitties.js?v=8fbe314a';
 import { nameCubimal } from '../public/js/cubimals.js?v=abd91c78';
-import { createButlerState, renameButler, teachButler } from '../public/js/butler.js?v=cc7772b7';
+import { createButlerState, renameButler, teachButler } from '../public/js/butler.js?v=a660e585';
 import { cleanTowerName } from '../public/js/home-tower.js?v=087df38f';
 import { PENMANSHIP_SKILL, editNote, writePaperNote } from '../public/js/street-furniture.js?v=55131f49';
 import { MAIL_COMPANIONS, createMailboxState, sendMail } from '../public/js/mailbox.js?v=a3e833ba';
@@ -40,7 +40,7 @@ import { teachPhrase } from '../public/js/seasons.js?v=1978c3f3';
 import { cleanCaption } from '../public/js/snaps.js?v=55d4c257';
 import { sauceLabel, sauceStreetLine } from '../public/js/potions.js?v=4f4c996d';
 import { groupNameProblem } from '../public/js/groups.js?v=c9635d96';
-import { characterNameProblem } from '../public/js/account-forms.js?v=559c1263';
+import { characterNameProblem } from '../public/js/account-forms.js?v=29e9e2c3';
 
 const ROOT = join(import.meta.dirname, '..');
 const read = (rel) => readFileSync(join(ROOT, rel), 'utf8');

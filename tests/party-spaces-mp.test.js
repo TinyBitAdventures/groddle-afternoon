@@ -15,10 +15,10 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { execFileSync, spawnSync } from 'node:child_process';
 
-import { MP_PARTY_TEXT, MP_SPACE_STREET_RE, kickVerb, mpActivationBlock, normalizeSpace, partyFromSpace } from '../public/js/party-spaces-mp.js?v=c4d5dd0c';
-import { PARTY_PACKS, PARTY_SPACES, PARTY_TEXT, normalizePartyRecord } from '../public/js/party-spaces.js?v=0bfad685';
-import { partySpacesFeature } from '../public/js/features/party-spaces-feature.js?v=d7ab9d4e';
-import { sharedStreet } from '../public/js/features/realtime-feature.js?v=411a239d';
+import { MP_PARTY_TEXT, MP_SPACE_STREET_RE, kickVerb, mpActivationBlock, normalizeSpace, partyFromSpace } from '../public/js/party-spaces-mp.js?v=3821c723';
+import { PARTY_PACKS, PARTY_SPACES, PARTY_TEXT, normalizePartyRecord } from '../public/js/party-spaces.js?v=dcc45819';
+import { partySpacesFeature } from '../public/js/features/party-spaces-feature.js?v=3a984373';
+import { sharedStreet } from '../public/js/features/realtime-feature.js?v=93fe0fe9';
 import { HAS_SERVER, HAS_SITE, SITE_DIR, serverPath, sitePath } from '../tools/repos.mjs';
 
 const root = join(import.meta.dirname, '..');

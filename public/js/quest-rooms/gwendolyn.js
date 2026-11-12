@@ -1807,7 +1807,8 @@ export const room = {
       if (!chainBroken(qs)) return;
       resetChain(qs);
       wctx.quest(TASK).fail();
-      wctx.activity("You left the vision quest. Gwendolyn's Task starts over; the Magic Rock can take you back.");
+      // npc_gwendolyn.js 215-233: only Gwendolyn offers it again (as onLeave above says).
+      wctx.activity("You left the vision quest, so Gwendolyn's Task is gone from your log. Gwendolyn can give it to you again in Room 23.");
       wctx.save();
     },
   },

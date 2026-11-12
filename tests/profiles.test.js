@@ -23,7 +23,7 @@ import { createMinnAccount } from '../public/js/minn-account.js?v=c15f0ecf';
 import { FEATURES } from '../public/js/features/index.js?v=2daf96e7';
 import { SITE_DIR, skipWithoutSite } from '../tools/repos.mjs';
 import { loadContentCatalogsFromDir, getSkillCatalog } from '../public/js/content-catalogs.js?v=10b118dd';
-import { skillTitle } from '../public/js/skill-tree.js?v=faa54b90';
+import { skillTitle } from '../public/js/skill-tree.js?v=e399b9ca';
 import { skillArtFor } from '../public/js/familiar.js?v=bafd7139';
 import { CARD_ART_LAYERS } from '../public/js/imagination-data.js?v=4a85e7fe';
 

@@ -61,8 +61,8 @@ import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=32c58aef';
 import { nearestSurfaceY } from '../walk-surface.js?v=106bfdc5';
 import { displayTopOf, itemstackOverlayPoint, playSheetOverlay } from '../overlay-art.js?v=a6561207';
 import { SET_FREE, applySetFree, canSetFree, setFreeGoneLine, setFreePrompt } from '../animal-set-free.js?v=3b194fca';
-import { getGameDayKey } from '../game-day.js?v=a7e262aa';
-import { animalAnchorX, animalAnchorY, createAnimalState, resetAnimalDay, animalStatusLabel, listAnimalFeedOptions } from '../animals.js?v=14659b5c';
+import { getGameDayKey } from '../game-day.js?v=cf9afac0';
+import { animalAnchorX, animalAnchorY, createAnimalState, resetAnimalDay, animalStatusLabel, listAnimalFeedOptions } from '../animals.js?v=9b48173d';
 import {
   BABY_ANIMALS,
   BATTERFLY,
@@ -109,15 +109,15 @@ import {
   resetIncubation,
   stepHogtie,
   stickPlaceState,
-} from '../animal-husbandry.js?v=6599e6f6';
-import { batterflyBaseY, batterflyResponseFor, flightFloorFor } from '../street-creatures.js?v=aac7e93d';
+} from '../animal-husbandry.js?v=0772cd08';
+import { batterflyBaseY, batterflyResponseFor, flightFloorFor } from '../street-creatures.js?v=f6037a1c';
 import { loseEnergy, shiftMetabolic } from '../metabolics.js?v=8504134e';
 import { textureFromUrl } from '../textures.js?v=92ec53cd';
 import { PIGGY_DEATH_DROPS, PIGGY_DEATH_PUFF, SAD_BABY, forcedRoll, isSadIn } from '../animal-mood.js?v=a49495fc';
-import { animalCrowdChanged, animalCrowdSad, animalPlaceIsDepressing, crowdLimit, smokePuff as sharedSmokePuff } from './animal-mood-feature.js?v=8e800186';
+import { animalCrowdChanged, animalCrowdSad, animalPlaceIsDepressing, crowdLimit, smokePuff as sharedSmokePuff } from './animal-mood-feature.js?v=20b4a406';
 import { grantMoodXp } from '../mood-xp.js?v=958e7680';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
-import { followYardPath, freeYardSpot } from '../yard-wander.js?v=d6698d34';
+import { followYardPath, freeYardSpot } from '../yard-wander.js?v=d3fe7032';
 import { showsChickenIdle, yardChickenPose } from '../chicken-idle-art.js?v=c46b17d5';
 import { chickenWaitPose } from '../chicken-idles.js?v=eef0279b';
 import { PACKED_SHEETS } from '../packed-sheets-data.js?v=192c6f15';
@@ -1844,8 +1844,10 @@ function placeHere(engine, classTsid) {
     s.machines.push(row);
     buildPlaced(engine, 'machine', row);
     const count = s.machines.filter((m) => m.classTsid === classTsid).length;
-    if (count >= 10) engine.pushActivity('WARNING: You have so many collectors now that you are freaking the animals out a bit. You shouldn\'t add any more, for sure!');
-    else if (count >= 5) engine.pushActivity('Warning: Too many collectors can confuse the animals and make collection less efficient.');
+    // butterfly_milker.js 80-83 says milkers, meat_collector.js 80-83 collectors; piggy_feeder.js never warns.
+    const many = classTsid === 'butterfly_milker' ? 'milkers' : classTsid === 'piggy_feeder' ? '' : 'collectors';
+    if (many && count >= 10) engine.pushActivity(`WARNING: You have so many ${many} now that you are freaking the animals out a bit. You shouldn't add any more, for sure!`);
+    else if (many && count >= 5) engine.pushActivity(`Warning: Too many ${many} can confuse the animals and make collection less efficient.`);
   }
   engine.pushActivity(`You placed the ${itemLabel(classTsid)}.`);
   lastAction = `placed:${classTsid}`;

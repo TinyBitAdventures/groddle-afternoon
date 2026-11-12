@@ -38,10 +38,10 @@ import {
   runAt,
   runFromServer,
   youLine,
-} from '../public/js/feats-mp.js?v=29462dce';
-import { FEAT_BY_ID, WIRED_FEATS, vogTextFor } from '../public/js/solo-feats.js?v=b0061e3f';
-import { GAME_DAY_MS, GAME_EPOCH_MS } from '../public/js/game-day.js?v=a7e262aa';
-import { soloFeatsFeature } from '../public/js/features/solo-feats-feature.js?v=671b3abb';
+} from '../public/js/feats-mp.js?v=62dfc05e';
+import { FEAT_BY_ID, WIRED_FEATS, vogTextFor } from '../public/js/solo-feats.js?v=7410af7d';
+import { GAME_DAY_MS, GAME_EPOCH_MS } from '../public/js/game-day.js?v=cf9afac0';
+import { soloFeatsFeature } from '../public/js/features/solo-feats-feature.js?v=32531b64';
 
 const root = join(import.meta.dirname, '..');
 const feature = readFileSync(join(root, 'public/js/features/solo-feats-feature.js'), 'utf8');

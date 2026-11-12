@@ -2,7 +2,7 @@
  * Groddle Afternoon — original street geometry + layered decos
  * PixiJS 8 · locations-xml streets · CoU PNG decos · quests/items
  */
-import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=5d55594c';
+import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=2d1f01bb';
 import { createErrorOnce, createFeatureHost } from './js/feature-host.js?v=06bb8b74';
 import { FEATURES, questFlagsFeature } from './js/features/index.js?v=2daf96e7';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl, drawTileArt } from './js/enter-chooser.js?v=4a3ea327';
@@ -343,6 +343,7 @@ import {
   PARADISE_COURSES,
   PARADISE_DAILY_LIMIT,
   PARADISE_TICKET_IDS,
+  resetParadiseDay,
   PARADISE_STAR_COURSES,
   paradisePickupTouches,
   paradiseQuoinScale,
@@ -376,7 +377,7 @@ import {
   slipTerrainY,
   starlitMoonPlainAlpha,
   starlitRevealAlpha,
-} from './js/paradise-flight.js?v=381f0dcd';
+} from './js/paradise-flight.js?v=6d8739e1';
 import { paradiseControls, resolveParadiseCourseAlias } from './js/paradise-courses.js?v=b466613b';
 import {
   buildParadiseCourseArt,
@@ -435,9 +436,9 @@ import {
   canLearnSkill,
   listLearnedSkills,
 } from './js/skills.js?v=4542bdf9';
-import { skillTitle, skillTreeCounts, skillTreeEntry, spendEmblemForSkill, studyPillName } from './js/skill-tree.js?v=faa54b90';
+import { skillTitle, skillTreeCounts, skillTreeEntry, spendEmblemForSkill, studyPillName } from './js/skill-tree.js?v=e399b9ca';
 import { CARD_ART_LAYERS } from './js/imagination-data.js?v=4a85e7fe';
-import { renderSkillTreePanel, focusSkillInPanel } from './js/skills-panel.js?v=4de079e9';
+import { renderSkillTreePanel, focusSkillInPanel } from './js/skills-panel.js?v=f5279b3d';
 import {
   createBuffState,
   applyBuff,
@@ -488,8 +489,8 @@ import { PACK_COPY, isBagClass, isElementClass, ownBagLabel, unitRankAt } from '
 import { FLOAT_TEXT_Z, SPEECH_BUBBLE_Z } from './js/fx-z.js?v=18dda7e3';
 import { hasPouch } from './js/elemental-pouch.js?v=ceefa97a';
 import { createPackRow, mountPackClearance, packBandRange, packCountText, packSearchEntries, packSlotTip } from './js/ui/pack-row.js?v=64e4a567';
-import { listAnimalFeedOptions } from './js/animals.js?v=14659b5c';
-import { pickerMaxCount, pickerOptionsFor, pickerTakesCount } from './js/animals.js?v=14659b5c';
+import { listAnimalFeedOptions } from './js/animals.js?v=9b48173d';
+import { pickerMaxCount, pickerOptionsFor, pickerTakesCount } from './js/animals.js?v=9b48173d';
 import {
   createDroppedItemState,
   parseDroppedItemState,
@@ -508,7 +509,7 @@ import {
   parsePlayerSave,
   serializePlayerSave,
   restorePlayerSave,
-} from './js/player-save.js?v=73f3592a';
+} from './js/player-save.js?v=1e709909';
 import {
   HOME_INTERIOR_TSID,
   HOME_STREET_TSID,
@@ -705,7 +706,7 @@ import {
   getGameDayKey,
   timestampForGameHour,
   msUntilNewDay,
-} from './js/game-day.js?v=a7e262aa';
+} from './js/game-day.js?v=cf9afac0';
 import {
   FOOD_VARIETY_UPGRADE,
   createFoodState,
@@ -715,7 +716,7 @@ import {
   canEatFood,
   recordFoodEat,
   resetFoodDay,
-} from './js/food.js?v=ee8ae9d3';
+} from './js/food.js?v=abdc9bf9';
 import {
   consumeTakesCount,
   consumeCountCap,
@@ -725,7 +726,7 @@ import {
   limitCountCap,
   useItemMany,
   recordFoodEatMany,
-} from './js/eat-many.js?v=a7017fb7';
+} from './js/eat-many.js?v=b8a287e1';
 import {
   TRIPLE_JUMP_UPGRADES,
   createJumpState,
@@ -803,7 +804,7 @@ import { createUserPath, stepUserPath } from './js/user-path.js?v=8880557f';
 import { TOUCH_JUMP_EVENT, climbGoalStep, installTouchControls, isPhoneDevice, touchPrompt, touchTapPlan } from './js/touch-controls.js?v=b6071ea4';
 import { installPinchZoom } from './js/touch-pinch.js?v=6cd34a65';
 import { FAILED_LINE, inVerbReach, movingLine, verbRange, walkOverEnd, walkOverGoals } from './js/walk-over.js?v=277ab977';
-import { hellBuffDesc, isInHell } from './js/hell.js?v=87b075a8';
+import { hellBuffDesc, isInHell } from './js/hell.js?v=9828025b';
 import { climbBobY, ladderAnimState, ladderSwap } from './js/ladder-anim.js?v=a8b327a0';
 import { VECTOR_AVATAR } from './js/avatar-vector-sheets.js?v=ad801376';
 import { createNpcGlitchKit } from './js/npc-glitch.js?v=810e1841';
@@ -818,7 +819,7 @@ import {
   APPEARANCE_PRESETS,
   PRESET_GROUPS,
   appearanceCacheKey,
-} from './js/character-builder.js?v=3db864ee';
+} from './js/character-builder.js?v=e1afc3ca';
 import { clearPresetActive, leavingDialogOpen, renderEmoteTests, renderFaceDims, renderPresetGroups, renderStarterPicker, showLeavingDialog } from './js/avatar-builder-ui.js?v=4e57b8c5';
 import { NONE_TYPES, createTileArt, focusIn, pickPart, refocus, renderPartSwitch, renderPartTiles, tileJob } from './js/avatar-tiles.js?v=a05b7d4f';
 import {
@@ -841,7 +842,7 @@ import {
   planMusicblockDrop,
   playMusicblock,
   starterMusicblocks,
-} from './js/musicblocks.js?v=e520f853';
+} from './js/musicblocks.js?v=6b93f6ec';
 import {
   VENDOR_PROFILES,
   selectVendorProfile,
@@ -860,7 +861,7 @@ import {
   createAnimalState,
   resetAnimalDay,
   animalStatusLabel,
-} from './js/animals.js?v=14659b5c';
+} from './js/animals.js?v=9b48173d';
 import {
   ensureWoodTreeState,
   pickWoodTool,
@@ -892,7 +893,7 @@ import {
   favorRelationNote,
   emblemRelationNote,
   formatSpeedUpTime,
-} from './js/shrines.js?v=00901da6';
+} from './js/shrines.js?v=e1a6111f';
 import { shrineSheet, shrineVariantFor } from './js/shrine-variants.js?v=7f11c97d';
 import { giantDisplayName } from './js/giant-names.js?v=0e295891';
 import { shrinePowderOptions, shrinePowderAchievementCounters } from './js/powders.js?v=397984f7';
@@ -905,7 +906,7 @@ import {
   spinMeResponse,
   spinningWheelPhase,
   startSpinningWheel,
-} from './js/spinning-wheel.js?v=45dd7a6d';
+} from './js/spinning-wheel.js?v=830b043a';
 import {
   CUBIMAL_PACKAGE_IDS,
   cubimalCollectionProgress,
@@ -970,11 +971,11 @@ import {
   ANIMAL_PATROL,
   nearestPlacementGap,
 } from './js/street-ecology.js?v=f27417a8';
-import { CHICKEN_PAUSE, chickenPauseRoll, easeToward, flightFloorAt, flightFloorFor, flyerLift } from './js/street-creatures.js?v=aac7e93d';
+import { CHICKEN_PAUSE, chickenPauseRoll, easeToward, flightFloorAt, flightFloorFor, flyerLift } from './js/street-creatures.js?v=f6037a1c';
 import { chickenPose, chickenIdleSheetsAsked } from './js/chicken-idle-art.js?v=c46b17d5';
 import { chickenWaitPose } from './js/chicken-idles.js?v=eef0279b';
 import { itemOverlayStats } from './js/item-overlay.js?v=97ed2ba0';
-import { isCrowdSad } from './js/animal-crowding.js?v=e30d5f57';
+import { isCrowdSad } from './js/animal-crowding.js?v=0ffb4ced';
 import { createSoundBoard, DEFAULT_SFX_VOLUME, watchButtonClicks, watchPanelSounds } from './js/sound-board.js?v=3b2df993';
 import {
   actionLoopFor,
@@ -1019,7 +1020,7 @@ import { ENCYCLOPEDIA_MENU_LABEL, createEncyclopedia, isEncyclopediaKey } from '
 import { EAT_PICK_TEXT, bestFoodIndex, eatChoices, eatTip } from './js/eat-pick.js?v=8fb763d0';
 import { heldDirection, installHeldKeyGuard, isMacPlatform } from './js/held-keys.js?v=a28eb293';
 import { oneClickChoice, signpostArmRows, worldContextAction } from './js/world-context-menu.js?v=2a64801e';
-import { blockedPlayerVerbs, listPlayerTarget, opensPlayerMenu, playerMenuRows } from './js/ui/player-menu.js?v=1b8de1ef';
+import { blockedPlayerVerbs, listPlayerTarget, opensPlayerMenu, playerMenuRows } from './js/ui/player-menu.js?v=eed1abdb';
 import { forgetTexture, frameTexture, isFailed, isLoaded, onFailed, onLoaded, textureFromUrl, whenLoaded } from './js/textures.js?v=92ec53cd';
 import { FALLBACK_MAX as WORLD_ART_FALLBACK_MAX, worldArtFor } from './js/world-art.js?v=0729bf92';
 import { sceneAnim, syncAnim } from './js/deco-anim.js?v=0de84a64';
@@ -1027,10 +1028,10 @@ import { revealStartCard, whenSceneDrawn } from './js/start-backdrop.js?v=8510d5
 import { cancelAllOverlays, playPoofIn, setOverlayResolution } from './js/overlay-art.js?v=a6561207';
 import * as textureUrls from './js/textures.js?v=92ec53cd';
 import { installPixiFixes } from './js/pixi-fixes.js?v=173fb649';
-import { hidesChatBubble } from './js/hi-signs.js?v=32194768';
+import { hidesChatBubble } from './js/hi-signs.js?v=f365ab8d';
 // Multiplayer phase 1: the mode flag and the save interface every save read/write goes through.
 import { GAME_MODE, isSolo } from './js/game-mode.js?v=1ecf2899';
-import { saveStore } from './js/save-store.js?v=5b167c14';
+import { saveStore } from './js/save-store.js?v=04420633';
 import { grantSoloStarterItems, isNewMultiplayerPlayer, newPlayerInventory, newPlayerStats } from './js/new-player.js?v=d9fa4f61';
 import { SPEECH_HOLD_MARGIN, clearSpeechOfBox, deepestSpeechTip, giveArtHeight, holdSpeechSide, hudColumnBox, limitSpeechShift, limitSpeechTip, placeSpeechTail, placeSpeechTip, slideOffAvatars, speechBubbleOutline, speechOffsetFor, speechTipOnSide } from './js/speech-placement.js?v=09802fc5';
 import { shrineDonationResponseKey, verbResponse } from './js/verb-responses.js?v=3ceb8a8c';
@@ -1039,7 +1040,7 @@ import { SLUG_ANIMATION, SLUG_LAYOUT, SLUG_STYLES, SLUG_TARGETS, drawSlugIcon, f
 import { filterText } from './js/word-filter.js?v=9a7a7ebb'; // the remake's own word filter
 import { arrangeMapCards, fitMapExtras } from './js/map-extras.js?v=9f38c312'; // the Map's Shortcuts
 // The interface skin (js/classic/ui-mode.js) sets <html data-ui> as it loads: before main(), so before the boot cover lifts.
-import { installInterfaceSettings } from './js/classic/classic-prefs.js?v=1d37a9b0';
+import { installInterfaceSettings } from './js/classic/classic-prefs.js?v=97b28f51';
 
 /** @type {object|null} assets/maps/index.json */
 let mapIndexCache = null;
@@ -4496,7 +4497,9 @@ function renderPackPopover(classTsid, anchor = null) {
         disabled: !bearReminisceQuote?.ok,
         reason: bearReminisceQuote?.reason === 'cooldown'
           ? 'The Bear needs an hour before reminiscing again.'
-          : 'First hear the bedtime story from a Piggy.',
+          : bearReminisceQuote?.reason === 'active'
+            ? 'You are reminiscing right now.'
+            : 'First hear the bedtime story from a Piggy.',
       }
     : null;
   const isBearAccessory = classTsid === 'lips' || classTsid === 'moon';
@@ -9505,7 +9508,7 @@ function executeVerb(target, verbId) {
       target.subtitle = trantStatusLabel(target.state, TRANT_META[target.classId]);
     }
     if (result.trantCare?.toolUse?.broke) {
-      toast(`${result.trantCare.toolUse.msg} Repair it with the Tinkertool.`, 4200);
+      toast(result.trantCare.toolUse.msg, 4200); // tinkertool.js 528: Glitch said only that it broke
     }
   }
 
@@ -9577,7 +9580,7 @@ function executeVerb(target, verbId) {
       app.canvas.dataset.woodYield = String(result.woodHarvest?.plankYield || 0);
       app.canvas.dataset.hatchetRemaining = String(condition.remaining);
       app.canvas.dataset.woodTool = woodTool;
-      if (condition.broken) toast(`Ooops! You done broke your ${woodToolLabel(woodTool)}. Repair it with the Tinkertool.`, 4200);
+      if (condition.broken) toast(`Ooops! You done broke your ${woodToolLabel(woodTool)}.`, 4200); // tinkertool.js 528
     }
     if (result.animalChanged && target.state) {
       target.subtitle = animalStatusLabel(target.classId, target.state);
@@ -22532,7 +22535,7 @@ async function returnFromParadise({ expired = false, abandon = false } = {}) {
     savePlayerLocation(destination);
     savePlayerState();
     if (app?.canvas) app.canvas.dataset.paradiseStatus = finalStatus;
-    if (expired) toast('Your four minutes in Paradise are up. Another ticket can take you back.', 4500);
+    if (expired) toast(`Your four minutes in Paradise are up. ${paradiseWayBack()}`, 4500);
     else if (abandon) toast('You leave Paradise and return to Ur.', 3200);
     updateHud();
     return true;
@@ -22564,6 +22567,17 @@ function completeParadiseAtExit() {
   return true;
 }
 
+/**
+ * paradise_ticket_cloud_rings.js 154-155: eleven tickets a game day, so after the eleventh the way
+ * back waits for the next game day.
+ */
+function paradiseWayBack() {
+  resetParadiseDay(paradiseState);
+  return paradiseState.ticketsToday >= PARADISE_DAILY_LIMIT
+    ? 'That was your last ticket today. Another ticket can take you back next game day.'
+    : 'Another ticket can take you back.';
+}
+
 function confirmLeaveParadise() {
   if (!paradiseIsInstanced()) return;
   openScriptedQuestDialogue({
@@ -22571,7 +22585,7 @@ function confirmLeaveParadise() {
     kicker: 'Leave Paradise?',
     cancelable: true,
     beats: [{
-      text: 'This private Paradise will dissolve behind you, but another ticket can bring you back.',
+      text: `This private Paradise will dissolve behind you. ${paradiseWayBack()}`,
       response: 'Return to Ur',
     }],
     onComplete: () => returnFromParadise({ abandon: true }),

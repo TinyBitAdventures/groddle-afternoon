@@ -2,7 +2,7 @@
 
 import { EXTRA_PARADISE_COURSES } from './paradise-courses.js?v=b466613b';
 import { qrazyRewardForLevel, quoinTouches } from './quoins.js?v=7e0dec6d';
-import { getGameDayKey } from './game-day.js?v=a7e262aa';
+import { getGameDayKey } from './game-day.js?v=cf9afac0';
 
 export const PARADISE_DURATION_MS = 4 * 60 * 1000;
 export const PARADISE_DAILY_LIMIT = 11;

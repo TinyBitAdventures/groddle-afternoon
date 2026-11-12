@@ -24,8 +24,8 @@ import {
   woodTreeSide,
 } from '../public/js/pack-tree-verbs.js?v=bfcb87be';
 import { packTreeVerbsFeature, runPackTreeVerb } from '../public/js/features/pack-tree-verbs-feature.js?v=8fdf7e0b';
-import { getVerbsFor } from '../public/content.js?v=5d55594c';
-import { plotVerbs } from '../public/js/patches.js?v=525b2236';
+import { getVerbsFor } from '../public/content.js?v=2d1f01bb';
+import { plotVerbs } from '../public/js/patches.js?v=342baf43';
 import { createToolConditionState, setToolRemaining } from '../public/js/tools.js?v=5f482998';
 import { FEATURES } from '../public/js/features/index.js?v=2daf96e7';
 

@@ -840,8 +840,9 @@ export const SETTINGS_COPY = Object.freeze({
   presence: {
     title: 'Appear offline',
     label: 'Appear offline',
-    help: "You won't show as online to anyone, buddies included. You can still chat, and your lines show your name.",
-    on: "You appear offline. Nobody sees you online, buddies included.",
+    // Server presence.go: only the online lists leave you out; a street's players still see you (hub.go).
+    help: "You won't show in anyone's online lists, buddies included. Players on the same street still see you. You can still chat, and your lines show your name.",
+    on: "You appear offline. You're out of everyone's online lists, buddies included; players on your street still see you.",
     off: 'You show as online again.',
     failed: "That didn't change. Try again in a moment.",
   },

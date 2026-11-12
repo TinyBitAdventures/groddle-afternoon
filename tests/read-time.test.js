@@ -13,7 +13,7 @@ import { fileURLToPath } from 'node:url';
 import { READ_MAX_MS, READ_MIN_MS, READ_PER_WORD_MS, bubbleMs, holdMs, readMs, wordCount } from '../public/js/read-time.js?v=be140198';
 import { NOTICE_KEEP_MS, createNotifier } from '../public/js/notify.js?v=1fb97b21';
 import { MEDITATION_TEXT } from '../public/js/meditation.js?v=96f23682';
-import { BUTLER_STRINGS, ownerGreeting } from '../public/js/butler.js?v=cc7772b7';
+import { BUTLER_STRINGS, ownerGreeting } from '../public/js/butler.js?v=a660e585';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const read = (p) => readFileSync(join(ROOT, p), 'utf8');
@@ -99,7 +99,8 @@ describe('the Butler greeting', () => {
 describe('the meditation lines', () => {
   const src = read('public/js/features/meditation-feature.js');
   it('still raise the end line, the insight line and the zen toast in that order', () => {
-    const a = src.indexOf('engine.pushActivity(out.message);');
+    // The end line says what the gain gate let through (focusing_orb.js 821-829).
+    const a = src.indexOf('engine.pushActivity(energy === out.energy && mood === out.mood');
     const b = src.indexOf('engine.pushActivity(`${name}: a flash of insight. +${out.imgBonus} iMG`);');
     const c = src.indexOf('engine.toast(MEDITATION_TEXT.zenReached, 3600);');
     assert.ok(a > 0 && b > a && c > b);

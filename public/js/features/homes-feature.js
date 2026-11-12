@@ -212,15 +212,15 @@ import { DISPATCHER_HALF, DISPATCHER_TEXT, MOVABLE_FIXTURES, MOVABLE_FIXTURE_IDS
 import { displayTopOf, itemstackOverlayPoint, overlayAlpha, overlayLifeMs, playPoofIn, trackOverlay } from '../overlay-art.js?v=a6561207';
 import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=32c58aef';
 import { fadeInNewNear } from '../poof-fade.js?v=904e02fe';
-import { projectApi } from './street-jobs-feature.js?v=2959c22c';
+import { projectApi } from './street-jobs-feature.js?v=c4f6c040';
 import { TOWER_CHASSIS, TOWER_CONFIG, TOWER_DOOR_DX, TOWER_GEO, TOWER_PROTO, normalizeTowerState } from '../home-tower.js?v=087df38f';
 import { drawTowerElevator, drawTowerExit, towerApi, visitorTowerView } from './home-tower-feature.js?v=4ec55e06';
 import { pieceUrl, roomPieces, surfaceAt, swatchPiece, wallTargetAt } from '../home-wallpaper.js?v=f1969400';
 import { maxTextureSizeOf, sharpDeco, wantsHiresDecos } from '../deco-hires.js?v=f59e60d3';
 import { SHARP_DECOS } from '../deco-sharp-list.js?v=a2424923';
-import { resourceNodesFeature } from './resource-nodes-feature.js?v=435b011f';
-import { patchesFeature } from './patches-feature.js?v=962cc631';
-import { GROWN_TREE_LABELS, createPlot, growTree, plotLabel } from '../patches.js?v=525b2236';
+import { resourceNodesFeature } from './resource-nodes-feature.js?v=17a1f5c0';
+import { patchesFeature } from './patches-feature.js?v=0d114881';
+import { GROWN_TREE_LABELS, createPlot, growTree, plotLabel } from '../patches.js?v=342baf43';
 import { WOTD_DEPLETE_MS, WOTD_TEXT, nearestPourTarget, pourButton, pourConditions, pourConfirmText } from '../wine-pour.js?v=6daa23a7';
 import { WOTD_TOOL, pourApproach, pourDropTip } from '../wine-pour-fx.js?v=364e22d2';
 import { XP_FOR_LEVEL } from '../progression.js?v=33462eaa';
@@ -260,7 +260,7 @@ import {
   rockVerbs,
   ROCK_VERB_IDS,
 } from '../magic-rock-home.js?v=c07b2327';
-import { getGameDayKey } from '../game-day.js?v=a7e262aa';
+import { getGameDayKey } from '../game-day.js?v=cf9afac0';
 import { HOME_TICKET, HOME_TICKET_CLASS } from '../home-ticket.js?v=6a19977b';
 import { MIN_GROUND_CLEARANCE, yCamOffsetAnchor } from '../movement.js?v=b30f84eb';
 import { takeFromHouse } from '../ledger-house.js?v=b34f5c89';

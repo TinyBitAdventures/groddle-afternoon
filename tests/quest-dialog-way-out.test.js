@@ -26,9 +26,9 @@ import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=1
 import { createQuestState } from '../public/js/quests.js?v=2951073f';
 import { markOffered, waitingOffers } from '../public/js/quest-offers.js?v=ecd7c1d7';
 import { questOffersFeature, EMERGENCY_SNOOZE_MS } from '../public/js/features/quest-offers-feature.js?v=7c77bd57';
-import { hellTicketsFeature } from '../public/js/features/hell-tickets-feature.js?v=42222f0d';
-import { hellFeature } from '../public/js/features/hell-feature.js?v=b9770c5a';
-import { HELL_LOCATION, createHellState, croak } from '../public/js/hell.js?v=87b075a8';
+import { hellTicketsFeature } from '../public/js/features/hell-tickets-feature.js?v=ee258bd1';
+import { hellFeature } from '../public/js/features/hell-feature.js?v=480cdd11';
+import { HELL_LOCATION, createHellState, croak } from '../public/js/hell.js?v=9828025b';
 
 const root = join(import.meta.dirname, '..');
 const read = (rel) => readFileSync(join(root, rel), 'utf8');

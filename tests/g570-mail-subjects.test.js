@@ -93,7 +93,7 @@ describe('G570: subjects on the game\'s own letters', () => {
 
   it('subjects are plain and short (no em-dash, no trademark)', () => {
     const all = [...Object.values(MAIL_SUBJECTS), ...['purchased', 'cancelled', 'expired'].map(mailSubject), PLAYER_MAIL_TEXT.returnedSubject,
-      'A special delivery', 'A gift from the Yeti', 'Mail on every street', 'Thank you', 'Your note', 'I stopped by', 'Your garden crops', 'Your Patch tree is shared', 'Your Patch beans'];
+      'A special delivery', 'A gift from the Yeti', 'Mail on every street', 'Thank you', 'Your note', 'I stopped by', 'Your garden crops', 'Your Patch tree is shared', 'Your Patch Seedling is shared', 'Your Patch beans'];
     for (const s of all) {
       assert.doesNotMatch(s, /—|Glitch/, s);
       assert.ok(s.length <= 30, s);
@@ -116,9 +116,12 @@ describe('G570: the site titles its letters from nobody (src/LedgerMail.php subj
     const patches = php(`echo json_encode([
       'refund' => M::subject(['from_id' => 0, 'text' => Q::REFUND_TEXT]),
       'win' => M::subject(['from_id' => 0, 'text' => Q::WIN_START . 'Your Fruit Tree on Pental Leave is now a shared Patch tree.']),
+      'seedling' => M::subject(['from_id' => 0, 'text' => Q::WIN_START . sprintf(Q::WIN_SEEDLING, 'Bean Tree', 'Pental Leave')]),
       'player' => M::subject(['from_id' => 7, 'text' => Q::REFUND_TEXT]),
+      'gone' => sprintf(M::TEXT_RETURN_GONE, 'Someone'),
     ]);`);
-    assert.deepEqual(patches, { refund: 'Your Patch beans', win: 'Your Patch tree is shared', player: null });
+    // Messages audit: a Seedling winner's letter is about a Seedling; a letter to a deleted player names nobody.
+    assert.deepEqual(patches, { refund: 'Your Patch beans', win: 'Your Patch tree is shared', seedling: 'Your Patch Seedling is shared', player: null, gone: 'Your letter came back: there is nobody at that address any more. Here are your things.' });
     const src = readFileSync(join(SITE_DIR, 'src/LedgerMail.php'), 'utf8');
     assert.match(src, /if \(\(\$subject = self::subject\(\$r\)\) !== null\) \{\n\s+\$letter\['subject'\] = \$subject;/);
   });

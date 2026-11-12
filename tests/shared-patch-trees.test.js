@@ -36,7 +36,7 @@ import { powdersFeature, runPowder } from '../public/js/features/powders-feature
 import { streetObjectsFeature } from '../public/js/features/street-objects-feature.js?v=a15d9885';
 import { rookKeyFor } from '../public/js/rook-attack.js?v=c12e825f';
 import { rookedFromServer, syncKeys } from '../public/js/rook-mp.js?v=0b9056b1';
-import { runVerb } from '../public/content.js?v=5d55594c';
+import { runVerb } from '../public/content.js?v=2d1f01bb';
 import { isPoisoned, POISON_DURATION_MS, TREE_ANTIDOTE, TREE_POISON } from '../public/js/tree-poison.js?v=5ceea244';
 import { getStreetEcologyCatalog, setStreetEcologyCatalog } from '../public/js/street-ecology.js?v=f27417a8';
 

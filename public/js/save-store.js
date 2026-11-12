@@ -405,8 +405,10 @@ export function createSaveSync({
     } catch { /* offline: the other window loads what the site has */ }
     yielding = false;
     if (!SAVE_STOPPED.includes(state)) {
+      // The last change still unwritten (offline): the alert must not say it saved.
+      const unsaved = dirty;
       clear();
-      setState('elsewhere', { by: 'window', confirmedAt: current.confirmedAt, ...detail });
+      setState('elsewhere', { by: 'window', confirmedAt: current.confirmedAt, ...detail, ...(unsaved ? { unsaved: true } : {}) });
     }
     return state;
   }

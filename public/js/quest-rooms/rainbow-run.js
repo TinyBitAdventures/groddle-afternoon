@@ -125,7 +125,8 @@ export const room = {
   onLeave(ctx, outcome) {
     ctx.data.stopMusic?.();
     if (outcome !== 'complete') {
-      ctx.activity('My Grandma has more Hustle than that. Ask the Magic Rock if you want to try again.');
+      // locations/location.js 386: the retry is the quest log's Try again.
+      ctx.activity('My Grandma has more Hustle than that. Open your quest log if you want to try again.');
     }
     return { leaveFlag: 'left_rainbow_run' };
   },

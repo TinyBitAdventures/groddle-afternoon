@@ -290,7 +290,8 @@ export const SKILL_REMAKE_NOTES = Object.freeze({
   },
   Teleportation: {
     status: 'live',
-    note: 'Lets you set teleport points and teleport from the Map. Higher ranks add more points, cost less energy and raise daily limits.',
+    // inc_teleportation.js 957-967: map teleports start at Teleportation IV.
+    note: 'Lets you set teleport points and teleport to them. Teleportation IV adds teleporting from the Map. Higher ranks add more points, cost less energy and raise daily limits.',
   },
   Penpersonship: {
     status: 'live',

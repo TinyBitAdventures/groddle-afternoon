@@ -15,7 +15,7 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import { join } from 'node:path';
-import { getVerbsFor } from '../public/content.js?v=5d55594c';
+import { getVerbsFor } from '../public/content.js?v=2d1f01bb';
 import { SIGN_FIRST_ARM_Y, SIGN_POST_W, SIGN_SCALE } from '../public/js/street-render.js?v=47697d4c';
 import { WAY_OUT_ARM, WAY_OUT_HIT, wayOutTarget } from '../public/js/features/homes-feature.js?v=f9ba2f06';
 import { FRIENDS_HIT_H } from '../public/js/features/home-street-mp-feature.js?v=94a0f1b5';
@@ -32,7 +32,7 @@ import {
 import { DISPATCHER_TEXT, SIGNPOST, dispatcherDefaultRx, dispatcherFits, signpostX, streetFixtures } from '../public/js/home-street-fixtures.js?v=bad831a1';
 import { sceneSignMarks } from '../public/js/ui/street-minimap.js?v=6c530941';
 import { HUB_TILES, hubTileBackground, hubTileForKey, hubTileState } from '../public/js/ui/imagination-hub.js?v=51fa371f';
-import { HUB_CLOUDS, placeClouds } from '../public/js/classic/classic-hub.js?v=bbc5ed25';
+import { HUB_CLOUDS, placeClouds } from '../public/js/classic/classic-hub.js?v=63748454';
 
 const root = join(import.meta.dirname, '..');
 const pub = join(root, 'public');

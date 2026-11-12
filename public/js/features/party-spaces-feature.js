@@ -80,10 +80,10 @@ import {
   stackAvailable,
   startParty,
   teleporterPhase,
-} from '../party-spaces.js?v=0bfad685';
+} from '../party-spaces.js?v=dcc45819';
 import { frameTexture, sourceFromUrl, textureFromUrl } from '../textures.js?v=92ec53cd';
 import { loseEnergy } from '../metabolics.js?v=8504134e';
-import { MP_PARTY_TEXT, MP_SPACE_STREET_RE, kickVerb, mpActivationBlock, normalizeSpace, partyFromSpace } from '../party-spaces-mp.js?v=c4d5dd0c';
+import { MP_PARTY_TEXT, MP_SPACE_STREET_RE, kickVerb, mpActivationBlock, normalizeSpace, partyFromSpace } from '../party-spaces-mp.js?v=3821c723';
 
 export const PARTY_FEATURE_ID = 'party-spaces';
 const HOLD = 'party';

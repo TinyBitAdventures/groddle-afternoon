@@ -20,7 +20,7 @@ import {
 } from '../public/js/metabolics.js?v=8504134e';
 import { applyBuff, createBuffState, tickBuffs } from '../public/js/buffs.js?v=819cb342';
 import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=10b118dd';
-import { HELL_TEXT, metabolicGate, normalizeHellState } from '../public/js/hell.js?v=87b075a8';
+import { HELL_TEXT, metabolicGate, normalizeHellState } from '../public/js/hell.js?v=9828025b';
 import { BUTTER_UP, butterUpChicken } from '../public/js/animal-flattery.js?v=63001f58';
 import { SET_FREE, applySetFree } from '../public/js/animal-set-free.js?v=3b194fca';
 import { applyVerbReward, getVerbReward } from '../public/js/verb-rewards.js?v=d3ce41d5';

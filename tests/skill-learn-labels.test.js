@@ -9,7 +9,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { loadContentCatalogsFromDir, resetContentCatalogs } from '../public/js/content-catalogs.js?v=10b118dd';
-import { learnButtonText, studyBarKind } from '../public/js/skills-panel.js?v=4de079e9';
+import { learnButtonText, studyBarKind } from '../public/js/skills-panel.js?v=f5279b3d';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const pub = join(here, '../public');

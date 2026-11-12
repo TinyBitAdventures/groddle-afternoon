@@ -17,7 +17,7 @@ import { execFileSync } from 'node:child_process';
 import { join } from 'node:path';
 import { homedir } from 'node:os';
 
-import { FORM_COPY, TURNSTILE_SCRIPT, createAccountRequests } from '../public/js/account-forms.js?v=559c1263';
+import { FORM_COPY, TURNSTILE_SCRIPT, createAccountRequests } from '../public/js/account-forms.js?v=29e9e2c3';
 import { HAS_SITE, SITE_DIR, skipWithoutSite } from '../tools/repos.mjs';
 
 const root = join(import.meta.dirname, '..');

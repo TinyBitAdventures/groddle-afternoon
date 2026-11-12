@@ -28,7 +28,7 @@
  */
 
 import { createMinnAccountCore } from './minn-account-core.js?v=63758d34';
-import { FORM_COPY, characterNameProblem, mountAccountForms, resetLinkFrom, verifyLinkFrom } from './account-forms.js?v=559c1263';
+import { FORM_COPY, characterNameProblem, mountAccountForms, resetLinkFrom, verifyLinkFrom } from './account-forms.js?v=29e9e2c3';
 import { claimCharacter, newWriterId, takeHandoff } from './save-claim.js?v=30cf5250';
 import { gateFor, quietSession, suspendedNow } from './online-session.js?v=6f1348c8';
 
@@ -64,6 +64,8 @@ export const SAVE_ALERT_COPY = {
   yielded: {
     title: 'Playing in another tab',
     body: 'You opened your character in another tab, so this tab saved your game and stopped. Play there, or come back here.',
+    // The final save failed (offline): nothing here says it saved.
+    unsavedBody: 'You opened your character in another tab, so this tab stopped. Its last change could not be saved. Play there, or come back here.',
   },
   // Another window of this browser switched character (the site's 409 character_changed): nothing more saves here.
   character: {
@@ -106,7 +108,7 @@ function clockTime(iso) {
  */
 export function saveAlertFor(state, detail = {}) {
   const C = SAVE_ALERT_COPY;
-  if (state === 'elsewhere' && detail.by === 'window') return { ...C.yielded, lines: [], buttons: [['load', C.here]] };
+  if (state === 'elsewhere' && detail.by === 'window') return { ...C.yielded, ...(detail.unsaved ? { body: C.yielded.unsavedBody } : {}), lines: [], buttons: [['load', C.here]] };
   if (state === 'elsewhere' && detail.by === 'character') {
     const mine = clockTime(detail.confirmedAt);
     return { ...C.character, lines: mine ? [C.lastSaved(mine)] : [], buttons: [['choose', C.choose]] };

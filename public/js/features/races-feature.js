@@ -89,7 +89,7 @@ import { runStreetTransition } from '../screen-fx.js?v=2e975a82';
 import { CROWNS_STREET, CROWNS_TICKET, CROWNS_TITLE } from '../game-of-crowns.js?v=e32f35f5';
 import { HOG_HAUL_STREET_ID } from '../hog-haul.js?v=50d2e072';
 import { QUOIN_GRAB_SPLASH, RACE_SPLASH, splashFor } from '../game-splash.js?v=f60a5067';
-import { crownsMpChallenge, startCrowns } from './crowns-feature.js?v=1ccd78e2';
+import { crownsMpChallenge, startCrowns } from './crowns-feature.js?v=28e9c767';
 import { startHogHaulMp } from './hog-haul-mp-feature.js?v=d5bd1087';
 import { textureFromUrl } from '../textures.js?v=92ec53cd';
 import { QUOIN_SHEET, QUOIN_TYPES } from '../quoins.js?v=7e0dec6d';
@@ -394,7 +394,7 @@ function renderStore(engine) {
     const owned = on ? countItem(engine.inv, row.classTsid) : 0;
     const full = owned >= RACE_TICKET_STACK;
     const poor = (engine.pc.currants || 0) < row.cost;
-    const why = !on ? 'Not in this remake yet' : full ? 'Your pack holds 5' : poor ? 'Not enough currants' : '';
+    const why = !on ? 'Not in this remake yet' : full ? 'You can carry 5 of each ticket' : poor ? 'Not enough currants' : '';
     return `<li class="${on ? '' : 'is-off'}">
       <img src="${TICKET_ICON_DIR}${row.classTsid}.webp" alt="" />
       <span><b>${escapeHtml(row.label)}</b><small>${on ? escapeHtml(raceDesc(raceId)) : 'Not in this remake yet.'}${owned ? ` · ${owned} in pack` : ''}</small></span>
@@ -417,7 +417,8 @@ function buyTicket(classTsid, engine) {
   const raceId = ticketRaceId(classTsid);
   if (!raceId || !playable(raceId)) return false;
   if (countItem(engine.inv, classTsid) >= RACE_TICKET_STACK) {
-    engine.toast('Your pack can only hold five of those.');
+    // The remake's own cap (js/races.js RACE_TICKET_STACK): the pack itself has room for more.
+    engine.toast('You can carry five of each race ticket.');
     return false;
   }
   if ((engine.pc.currants || 0) < RACE_TICKET_PRICE) {

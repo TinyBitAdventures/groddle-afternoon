@@ -27,16 +27,16 @@ import { ensureVendorItems, VENDOR_PROFILES } from '../public/js/vendor.js?v=520
 import { ensureMakingItems } from '../public/js/making.js?v=39f79aaa';
 import { ensureMiningItems } from '../public/js/mining.js?v=12a6f1bd';
 import { ensureGardenItems } from '../public/js/garden.js?v=37209241';
-import { ensureMusicblockItems } from '../public/js/musicblocks.js?v=e520f853';
-import { ensureSpinningWheelItems } from '../public/js/spinning-wheel.js?v=45dd7a6d';
+import { ensureMusicblockItems } from '../public/js/musicblocks.js?v=6b93f6ec';
+import { ensureSpinningWheelItems } from '../public/js/spinning-wheel.js?v=830b043a';
 import { ensureCubimalItems } from '../public/js/cubimals.js?v=abd91c78';
-import { ensureHellItems } from '../public/js/hell.js?v=87b075a8';
+import { ensureHellItems } from '../public/js/hell.js?v=9828025b';
 import { ensureFoxItems } from '../public/js/foxes.js?v=910cf549';
 import { STORE_CATALOG } from '../public/js/store-catalog.js?v=74b56af3';
 import { IMAGINATION_UPGRADES } from '../public/js/imagination-data.js?v=4a85e7fe';
 import { remakeStatus } from '../public/js/imagination-remake.js?v=c37ad887';
 import { HOTKEYS_FOOTER, HOTKEYS_TITLE, hotkeySections } from '../public/js/client-hotkeys.js?v=31d1891d';
-import { SKILL_REMAKE_NOTES } from '../public/js/skill-tree.js?v=faa54b90';
+import { SKILL_REMAKE_NOTES } from '../public/js/skill-tree.js?v=e399b9ca';
 
 /**
  * Strings the AST scan finds that no player reads, each with why. Keep this

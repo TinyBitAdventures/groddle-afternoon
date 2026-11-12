@@ -47,7 +47,7 @@ import { masterGardenFeature } from '../public/js/features/master-garden-feature
 import { itemVerbsMoreFeature } from '../public/js/features/item-verbs-more-feature.js?v=e203b4c6';
 import { supplyFeature } from '../public/js/features/supply-feature.js?v=79a59bf4';
 import { cubimalRaceFeature } from '../public/js/features/cubimal-race-feature.js?v=b82c6d28';
-import { seasonsFeature } from '../public/js/features/seasons-feature.js?v=af03f1dd';
+import { seasonsFeature } from '../public/js/features/seasons-feature.js?v=60c4e3a2';
 
 const root = join(import.meta.dirname, '..');
 

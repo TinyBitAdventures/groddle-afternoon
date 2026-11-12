@@ -29,10 +29,10 @@ import {
   recordLine,
   yesterdayLine,
   yourSignLine,
-} from '../public/js/hi-signs-mp.js?v=db0698df';
-import { HI_VARIANTS, HI_VARIANT_COLORS, HI_VARIANT_NAMES, hiDay } from '../public/js/hi-signs.js?v=32194768';
-import { hiSignsFeature } from '../public/js/features/hi-signs-feature.js?v=c6c8df7d';
-import { powdersFeature, runPowder } from '../public/js/features/powders-feature.js?v=b60f440c';
+} from '../public/js/hi-signs-mp.js?v=09fa6076';
+import { HI_VARIANTS, HI_VARIANT_COLORS, HI_VARIANT_NAMES, hiDay } from '../public/js/hi-signs.js?v=f365ab8d';
+import { hiSignsFeature } from '../public/js/features/hi-signs-feature.js?v=21064088';
+import { powdersFeature, runPowder } from '../public/js/features/powders-feature.js?v=1f096f37';
 import { addItem, countItem } from '../public/js/inventory.js?v=5be47371';
 import { applyAchievementProgress, createAchievementState, getAchievementProgress, seedAchievementNearCompletion } from '../public/js/achievements.js?v=552ecb19';
 import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=10b118dd';
