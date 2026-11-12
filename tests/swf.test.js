@@ -252,7 +252,7 @@ describe('Game (items/game_box.js)', () => {
 
 describe('G311: a move takes play_glitch down (cancelAllOverlaysWeCan 193-215)', () => {
   it('the pc_overlay goes with the street and is not sent again; the play still pays', async () => {
-    const { cancelAllOverlays, liveOverlayCount } = await import('../public/js/overlay-art.js?v=75c3ea34');
+    const { cancelAllOverlays, liveOverlayCount } = await import('../public/js/overlay-art.js?v=a6561207');
     cancelAllOverlays();
     swfFeature._reset();
     const engine = fakeEngine(); // no Pixi layer: the announcement is tracked all the same

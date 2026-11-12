@@ -32,7 +32,7 @@ import { createAnimalState } from '../public/js/animals.js?v=7e27e9d2';
 import { GAME_DAY_MS, getGameDayStartMs } from '../public/js/game-day.js?v=f88e6e16';
 import { advanceYard, capturePiggy, createMachine, normalizeHusbandryPack } from '../public/js/animal-husbandry.js?v=0b701ee7';
 import { getVerbsFor } from '../public/content.js?v=4f923e2b';
-import { animalCrowdChanged, animalMoodFeature, crowdLimit } from '../public/js/features/animal-mood-feature.js?v=989d27c0';
+import { animalCrowdChanged, animalMoodFeature, crowdLimit } from '../public/js/features/animal-mood-feature.js?v=c178cc24';
 
 const GSJS = join(homedir(), 'Documents/glitch-audit/glitch-GameServerJS');
 const fixed = (v) => () => v;

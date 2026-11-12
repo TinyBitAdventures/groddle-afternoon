@@ -23,10 +23,10 @@
  * sheet marked `keep` is one another module draws from too, and is left alone.
  */
 
-import { OVERLAY_FADE, overlayAlpha, overlayLifeMs, trackOverlay } from './overlay-art.js?v=75c3ea34';
-import { cutPackedFrames, packedFrameAt } from './packed-sheets.js?v=dadad463';
+import { OVERLAY_FADE, overlayAlpha, overlayLifeMs, trackOverlay } from './overlay-art.js?v=a6561207';
+import { cutPackedFrames, packedFrameAt } from './packed-sheets.js?v=5a0493ce';
 import { upgradeSource } from './sprite-hires.js?v=d4cce9f9';
-import { forgetTexture, loadTexture, whenLoaded } from './textures.js?v=f024bd6a';
+import { forgetTexture, loadTexture, whenLoaded } from './textures.js?v=92ec53cd';
 
 /** Decoded sheets kept after their overlay ends. */
 export const KEEP_SHEETS = 2;

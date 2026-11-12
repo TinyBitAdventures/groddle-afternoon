@@ -186,7 +186,7 @@ describe('NPC Glitch rig (js/npc-glitch.js)', () => {
     globalThis.PIXI = PIXI;
     globalThis.Image = FakeImage;
     globalThis.document = { createElement: () => ({ width: 0, height: 0, getContext: () => ({ drawImage() {} }) }) };
-    K = await import('../public/js/npc-glitch.js?v=f69f68a0');
+    K = await import('../public/js/npc-glitch.js?v=810e1841');
   });
   after(() => {
     for (const [k, v] of Object.entries(saved)) globalThis[k] = v;

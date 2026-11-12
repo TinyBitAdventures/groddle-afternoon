@@ -67,7 +67,7 @@
 
 import { butlerApi } from './butler-feature.js?v=49a2938b';
 import { metabolicGain, moodMax } from '../metabolics.js?v=8504134e';
-import { frameTexture, sourceFromUrl } from '../textures.js?v=f024bd6a';
+import { frameTexture, sourceFromUrl } from '../textures.js?v=92ec53cd';
 import {
   HI,
   HI_BUTLER_ID,

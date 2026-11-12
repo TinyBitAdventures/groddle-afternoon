@@ -113,6 +113,31 @@ async function rasteriseSvg(url, { width, height, scale } = {}) {
   return canvas;
 }
 
+/**
+ * A raster image decoded and drawn at width x height (a far street layer's sharp copy, sized for a
+ * nearer placement, loaded at the far need: js/deco-hires.js sharpDeco). The GPU only ever holds
+ * the smaller copy.
+ */
+async function resizeImage(url, { width, height }) {
+  const img = await decodeImage(url);
+  const w = Math.max(1, Math.round(width));
+  const h = Math.max(1, Math.round(height));
+  if (typeof createImageBitmap === 'function') {
+    try {
+      return await createImageBitmap(img, { resizeWidth: w, resizeHeight: h, resizeQuality: 'high' });
+    } catch {
+      // Older engines: the canvas below.
+    }
+  }
+  const canvas = document.createElement('canvas');
+  canvas.width = w;
+  canvas.height = h;
+  const ctx = canvas.getContext('2d');
+  ctx.imageSmoothingQuality = 'high';
+  ctx.drawImage(img, 0, 0, w, h);
+  return canvas;
+}
+
 function createSource(url, opts) {
   const PIXI = pixi();
   const resolution = opts.resolution || resolutionOfUrl(url);
@@ -125,7 +150,7 @@ function createSource(url, opts) {
   });
   const state = { url, loaded: false, failed: false, promise: null };
   source[LOAD] = state;
-  state.promise = (isSvg(url) ? rasteriseSvg(url, opts) : decodeImage(url)).then(
+  state.promise = (isSvg(url) ? rasteriseSvg(url, opts) : opts.width > 0 && opts.height > 0 ? resizeImage(url, opts) : decodeImage(url)).then(
     (image) => {
       if (source.destroyed) return source;
       source.resource = image;

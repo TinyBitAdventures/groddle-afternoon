@@ -88,7 +88,7 @@ import {
   wayBackFrom,
 } from '../quest-instance.js?v=f0df88c3';
 import { FAMILIAR_GATES, QUEST_ROOMS, REMINISCE_ITEMS, ROOM_ITEMS, isBuiltRoom, questGiver, roomModulePath } from '../quest-rooms/catalog.js?v=d77d3d17';
-import * as kit from '../quest-rooms/kit.js?v=934fd7b6';
+import * as kit from '../quest-rooms/kit.js?v=4e007609';
 import { locationEventsApi } from './location-events-feature.js?v=0cda70ed';
 import {
   acceptOffer,
@@ -106,7 +106,7 @@ import { HOME_INTERIOR_TSID, HOME_STREET_TSID } from '../homes.js?v=631ab6b8';
 import { armPromptTimeout, promptTimeoutMs } from '../prompt-timeout.js?v=b38c9757';
 import { applyFamiliarLook, familiarLook } from '../familiar.js?v=5fd83250';
 import { collectQuoin, QUOIN_SHEET, QUOIN_TYPES } from '../quoins.js?v=7e0dec6d';
-import { sourceFromUrl } from '../textures.js?v=f024bd6a';
+import { sourceFromUrl } from '../textures.js?v=92ec53cd';
 import { REMAKE_ROOM_PHYSICS } from '../avatar-step.js?v=43b1182e';
 
 let quoinFrames = null;
@@ -156,7 +156,7 @@ let rubeTraded = false;
  * BUILT_ROOMS: a new room gets a line here.
  */
 const ROOM_MODULES = {
-  rainbow_run: () => import('../quest-rooms/rainbow-run.js?v=f78366fc'),
+  rainbow_run: () => import('../quest-rooms/rainbow-run.js?v=b90035c2'),
   top_of_tree: () => import('../quest-rooms/top-of-tree.js?v=0a18a565'),
   color_unblocking: () => import('../quest-rooms/color-unblocking.js?v=c40e4d28'),
   vision_quest: () => import('../quest-rooms/vision-quest.js?v=b3cf089b'),

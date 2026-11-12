@@ -31,9 +31,9 @@
 
 import { applyRewards } from '../quests.js?v=2b882eb6';
 import { ITEM_CATALOG, isToolItem } from '../inventory.js?v=60dfc9ca';
-import { frameTexture, isLoaded, onLoaded, sourceFromUrl } from '../textures.js?v=f024bd6a';
-import { playPoofIn } from '../overlay-art.js?v=75c3ea34';
-import { KIDS_ROOM_FLOOR, KIDS_ROOM_H, KIDS_ROOM_W, buildKidsRoomScene } from '../kids-room-scene.js?v=8b19357c';
+import { frameTexture, isLoaded, onLoaded, sourceFromUrl } from '../textures.js?v=92ec53cd';
+import { playPoofIn } from '../overlay-art.js?v=a6561207';
+import { KIDS_ROOM_FLOOR, KIDS_ROOM_H, KIDS_ROOM_W, buildKidsRoomScene } from '../kids-room-scene.js?v=180ba8b6';
 
 const W = KIDS_ROOM_W;
 const H = KIDS_ROOM_H;

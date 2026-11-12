@@ -39,8 +39,8 @@
  * the quest in with the source completion text.
  */
 
-import { onLoaded } from '../textures.js?v=f024bd6a';
-import { sceneAnim } from '../deco-anim.js?v=ffba91bc';
+import { onLoaded } from '../textures.js?v=92ec53cd';
+import { sceneAnim } from '../deco-anim.js?v=0de84a64';
 
 export const QUEST = 'stale_but_necessary';
 /**

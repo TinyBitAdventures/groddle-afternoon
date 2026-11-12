@@ -214,12 +214,12 @@ import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=b251d081';
 import { fadeInNewNear } from '../poof-fade.js?v=8984abd1';
 import { projectApi } from './street-jobs-feature.js?v=ead5b648';
 import { TOWER_CHASSIS, TOWER_CONFIG, TOWER_DOOR_DX, TOWER_GEO, TOWER_PROTO, normalizeTowerState } from '../home-tower.js?v=087df38f';
-import { drawTowerElevator, drawTowerExit, towerApi, visitorTowerView } from './home-tower-feature.js?v=9fc08ca4';
+import { drawTowerElevator, drawTowerExit, towerApi, visitorTowerView } from './home-tower-feature.js?v=daf014b6';
 import { pieceUrl, roomPieces, surfaceAt, swatchPiece, wallTargetAt } from '../home-wallpaper.js?v=f1969400';
-import { maxTextureSizeOf, sharpDeco, wantsHiresDecos } from '../deco-hires.js?v=9ea9c4f3';
+import { maxTextureSizeOf, sharpDeco, wantsHiresDecos } from '../deco-hires.js?v=f59e60d3';
 import { SHARP_DECOS } from '../deco-sharp-list.js?v=a2424923';
-import { resourceNodesFeature } from './resource-nodes-feature.js?v=cf18ca3b';
-import { patchesFeature } from './patches-feature.js?v=d405f1a4';
+import { resourceNodesFeature } from './resource-nodes-feature.js?v=55fb520d';
+import { patchesFeature } from './patches-feature.js?v=df56eea7';
 import { GROWN_TREE_LABELS, createPlot, growTree, plotLabel } from '../patches.js?v=61abc5fe';
 import { WOTD_DEPLETE_MS, WOTD_TEXT, nearestPourTarget, pourButton, pourConditions, pourConfirmText } from '../wine-pour.js?v=6daa23a7';
 import { WOTD_TOOL, pourApproach, pourDropTip } from '../wine-pour-fx.js?v=364e22d2';
@@ -240,9 +240,9 @@ import {
   yardStyleChoices,
   yardStyleFor,
 } from '../home-styles.js?v=13fe0aaa';
-import { frameTexture, isLoaded, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js?v=f024bd6a';
+import { frameTexture, isLoaded, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js?v=92ec53cd';
 import { FALLBACK_MAX as WORLD_ART_FALLBACK_MAX, worldArtFor } from '../world-art.js?v=0729bf92';
-import { oneArmSignpost } from '../street-render.js?v=e68ca1b4';
+import { oneArmSignpost } from '../street-render.js?v=4b7ef978';
 import { ROCK_CATALOG } from '../mining.js?v=674ed39b';
 import {
   HOUSE_SIGN,

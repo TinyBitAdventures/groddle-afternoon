@@ -34,8 +34,8 @@
  * cameraEyeballSent.
  */
 
-import { textureFromUrl } from '../textures.js?v=f024bd6a';
-import { OVERLAY_BUBBLE_URL, OVERLAY_USES, overlayBubbleBox, playOverlay } from '../overlays.js?v=605c12ff';
+import { textureFromUrl } from '../textures.js?v=92ec53cd';
+import { OVERLAY_BUBBLE_URL, OVERLAY_USES, overlayBubbleBox, playOverlay } from '../overlays.js?v=4e81f749';
 
 export const CAMERA_FEATURE_ID = 'camera-mode';
 /** getCameraAbilities: range without Eyeballery, px from the avatar. */

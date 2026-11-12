@@ -9,8 +9,8 @@
  * updateParallax(camX, camY) for the far layers.
  */
 
-import { textureFromUrl } from './textures.js?v=f024bd6a';
-import { playSheetOverlay } from './overlay-art.js?v=75c3ea34';
+import { textureFromUrl } from './textures.js?v=92ec53cd';
+import { playSheetOverlay } from './overlay-art.js?v=a6561207';
 
 const DECO_DIR = 'assets/decos/groddle/';
 

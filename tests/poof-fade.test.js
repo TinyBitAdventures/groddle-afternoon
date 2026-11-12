@@ -10,8 +10,8 @@ import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { fadeInNewNear, layerCentreX, newChildrenNear } from '../public/js/poof-fade.js?v=8984abd1';
-import { POOF_IN } from '../public/js/overlay-art.js?v=75c3ea34';
+import { fadeInNewNear, layerCentreX, newChildrenNear } from '../public/js/poof-fade.js?v=904e02fe';
+import { POOF_IN } from '../public/js/overlay-art.js?v=a6561207';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const clientPath = join(here, '../../glitch-client/com/tinyspeck/engine/view/itemstack/LocationItemstackView.as');

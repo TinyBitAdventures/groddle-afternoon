@@ -117,29 +117,42 @@ export function isSharpDeco(url) {
 export const FAR_SHARP_BUDGET_BYTES = 96 * 1024 * 1024;
 
 /**
+ * The slack a street's far copies may take (js/street-render.js farSharp): SHARP_SLACK first, then
+ * coarser in eighth-octave steps up to twice it, until every far and blurred copy the street wants
+ * fits FAR_SHARP_BUDGET_BYTES (the last step admits the most magnified first, as before). Every
+ * far copy then draws at one density, and none is left at its 2x file while another takes 20 MB:
+ * Ilmenskie at R 4 wanted 202 MB at SHARP_SLACK and fits at 2.06 (78 MB, all 26 copies).
+ */
+export const FAR_SLACKS = Object.freeze([0, 1, 2, 3, 4, 5, 6, 7, 8].map((k) => SHARP_SLACK * 2 ** (k / 8)));
+
+/**
  * The sharp copy of a deco PNG URL to draw at `scale` backing px per view px, or null when the
  * file decoUrl's route picks (2x, or 3x above HIRES_DECO_SCALE; always 2x behind the
  * middleground) is already enough. The list's s, sf and sb are the largest view px per logical px
  * over a deco's near, far and blurred placements that need it; 0 means that kind of layer keeps
  * the usual file.
  * - near: `scale` / SHARP_SLACK texels per view px, over the 2x or 3x file;
- * - `far: true` (behind the middleground): the same, over the 2x file those layers load;
+ * - `far: true` (behind the middleground): `scale` / `farSlack` (SHARP_SLACK unless the street's
+ *   budget asks for less, FAR_SLACKS), over the 2x file those layers load. A WebP sized for a
+ *   nearer placement loads downscaled to that need (`?r=` in its URL, width x height): a far
+ *   layer never holds texels it cannot show;
  * - `blurDensity` (a blurred layer: js/street-render.js blurBakeResolution): its bake's texels per
  *   view px, which keeps nothing finer;
  * - `per` (a home street or back-yard landscape, js/features/homes-feature.js, or a quest room's
  *   deco, js/quest-rooms/kit.js): this placement's own view px per logical px, in place of the
  *   list's s, sf or sb; near rules otherwise. Every home look and quest room placement that needs
  *   a copy is in the list (its sh).
- * Returns { url, kind, bytes, need, base, w, h } (w x h the logical size) and for svg { width, height, resolution }:
+ * Returns { url, kind, bytes, need, base, w, h } (w x h the logical size) and for svg or a downscaled
+ * far WebP { width, height, resolution }:
  * - webp: <name>@<res>x.webp (resolution from the name, logical size unchanged)
  * - svg: <name>.svg?r=<res>, rasterised at width x height (js/textures.js textureFromUrl(url,
  *   { raw: true, width, height, resolution })); res is the need rounded up to an SVG_STEP and
  *   capped at maxSide on the longest side and SVG_MAX_PIXELS.
  * @param {string} url
  * @param {number} scale renderer.resolution
- * @param {{ maxSide?: number, bigTextures?: boolean, far?: boolean, blurDensity?: number, per?: number }} [opts]
+ * @param {{ maxSide?: number, bigTextures?: boolean, far?: boolean, farSlack?: number, blurDensity?: number, per?: number }} [opts]
  */
-export function sharpDeco(url, scale, { maxSide = SVG_MAX_SIDE, bigTextures = false, far = false, blurDensity = 0, per: own = 0 } = {}) {
+export function sharpDeco(url, scale, { maxSide = SVG_MAX_SIDE, bigTextures = false, far = false, farSlack = SHARP_SLACK, blurDensity = 0, per: own = 0 } = {}) {
   const m = DECO_PNG.exec(String(url || ''));
   if (!m) return null;
   const [, dir, name] = m;
@@ -151,13 +164,21 @@ export function sharpDeco(url, scale, { maxSide = SVG_MAX_SIDE, bigTextures = fa
   const base = three ? 1.5 : 1;
   const per = own > 0 ? own : blurDensity > 0 ? sb : far ? sf : s;
   if (!per) return null;
-  const need = blurDensity > 0 ? blurDensity * per : (R * per) / SHARP_SLACK;
+  const need = blurDensity > 0 ? blurDensity * per : (R * per) / (far && !own ? Math.max(SHARP_SLACK, farSlack) : SHARP_SLACK);
   if (need <= base) return null;
+  const stepUp = SVG_STEP ** Math.ceil(Math.log(need) / Math.log(SVG_STEP) - 1e-9);
   if (kind === 'webp') {
     if (!(res > base)) return null;
+    // A far placement's need below the file's own density: the file, downscaled when loaded.
+    const down = far && !own && !blurDensity ? Math.round(Math.max(base, stepUp) * 1000) / 1000 : 0;
+    if (down > base && down < res) {
+      const width = Math.max(1, Math.round(w * down));
+      const height = Math.max(1, Math.round(h * down));
+      return { url: `${dir}${name}@${res}x.webp?r=${down}`, kind, width, height, resolution: width / w, bytes: width * height * 4, need, base, w, h };
+    }
     return { url: `${dir}${name}@${res}x.webp`, kind, bytes: Math.round(w * res) * Math.round(h * res) * 4, need, base, w, h };
   }
-  let r = SVG_STEP ** Math.ceil(Math.log(need) / Math.log(SVG_STEP) - 1e-9);
+  let r = stepUp;
   r = Math.min(r, Math.min(maxSide, SVG_MAX_SIDE) / Math.max(w, h), Math.sqrt(SVG_MAX_PIXELS / (w * h)));
   if (r <= base) return null;
   r = Math.round(r * 1000) / 1000;

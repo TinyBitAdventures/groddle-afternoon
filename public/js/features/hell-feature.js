@@ -61,7 +61,7 @@ import {
 } from '../hell.js?v=33923da7';
 import { getGameDayKey } from '../game-day.js?v=f88e6e16';
 import { countItem, removeItem } from '../inventory.js?v=60dfc9ca';
-import { frameTexture, sourceFromUrl } from '../textures.js?v=f024bd6a';
+import { frameTexture, sourceFromUrl } from '../textures.js?v=92ec53cd';
 
 const GRAPE_SCALE = 0.8;
 const GRAVE_GIANTS = new Set(HELL_SPRITES.graveside.giants);

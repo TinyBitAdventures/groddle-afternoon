@@ -12,9 +12,9 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { SHARP_DECOS } from '../public/js/deco-sharp-list.js?v=a2424923';
 import { HIRES_DECOS } from '../public/js/deco-hires-list.js?v=60fcf361';
-import { FAR_SHARP_BUDGET_BYTES, SHARP_SLACK, SVG_MAX_PIXELS, SVG_MAX_SIDE, admitSharp, isSharpDeco, sharpDeco } from '../public/js/deco-hires.js?v=9ea9c4f3';
-import { resolutionOfUrl } from '../public/js/textures.js?v=f024bd6a';
-import { landscapeArt } from '../public/js/features/homes-feature.js?v=de2b2131';
+import { FAR_SHARP_BUDGET_BYTES, FAR_SLACKS, SHARP_SLACK, SVG_MAX_PIXELS, SVG_MAX_SIDE, admitSharp, isSharpDeco, sharpDeco } from '../public/js/deco-hires.js?v=f59e60d3';
+import { resolutionOfUrl } from '../public/js/textures.js?v=92ec53cd';
+import { landscapeArt } from '../public/js/features/homes-feature.js?v=e2fd83b4';
 import { EXTERIOR_STYLES, INTERIOR_STYLES, streetLook, yardLook } from '../public/js/home-styles.js?v=13fe0aaa';
 import { layoutArtPath } from '../public/js/home-layout.js?v=dfd9f9f6';
 
@@ -225,7 +225,7 @@ describe('street-render draws sharp copies on the sharp layers', () => {
       }
     };
     globalThis.document = { createElement: () => ({ width: 0, height: 0, getContext: () => ({ drawImage() {} }) }) };
-    const { buildStreetView } = await import('../public/js/street-render.js?v=e68ca1b4');
+    const { buildStreetView } = await import('../public/js/street-render.js?v=4b7ef978');
     const handlers = {};
     const renderer = {
       resolution: 1,
@@ -271,7 +271,7 @@ describe('street-render draws sharp copies on the sharp layers', () => {
   });
 
   it('far layers: sharp copies within the street budget, the rest on their 2x files', async () => {
-    const { buildStreetView } = await import('../public/js/street-render.js?v=e68ca1b4');
+    const { buildStreetView } = await import('../public/js/street-render.js?v=4b7ef978');
     const manifest = new Set(JSON.parse(readFileSync(join(root, 'public/assets/decos/manifest.json'), 'utf8')));
     const renderer = { resolution: 3.9, gl: { MAX_TEXTURE_SIZE: 1, getParameter: () => 8192 }, generateTexture: () => null, on() {}, off() {} };
     for (const tsid of ['GA95U14319524O9', 'GHFC3I4EKMI20JD', 'GA9117J18492SRS']) {
@@ -281,12 +281,18 @@ describe('street-render draws sharp copies on the sharp layers', () => {
       const midZ = s.layers.find((l) => l.id === 'middleground')?.z ?? 0;
       const farLabels = new Set(s.layers.filter((l) => (l.z ?? 0) < midZ).map((l) => l.id));
       const far = view.children.filter((c) => farLabels.has(c.label)).flatMap((lc) => lc.children || []);
-      const picks = [];
-      for (const l of s.layers.filter((l) => farLabels.has(l.id) && l.hidden !== true)) {
-        for (const d of l.decos || []) picks.push(sharpDeco(url(manifest.has(d.sprite) ? d.sprite : d.sprite), 3.9, { far: true, bigTextures: true }));
+      // The finest far slack (FAR_SLACKS) at which every far copy fits the budget, else the coarsest.
+      let picks = [];
+      let admitted = new Set();
+      for (const farSlack of FAR_SLACKS) {
+        picks = [];
+        for (const l of s.layers.filter((l) => farLabels.has(l.id) && l.hidden !== true)) {
+          for (const d of l.decos || []) picks.push(sharpDeco(url(manifest.has(d.sprite) ? d.sprite : d.sprite), 3.9, { far: true, farSlack, bigTextures: true }));
+        }
+        admitted = admitSharp(picks);
+        if (picks.every((p) => !p || admitted.has(p.url))) break;
       }
-      const admitted = admitSharp(picks);
-      const sharpUrls = new Set(far.map((c) => c.texture?.label).filter((l) => /\.svg\?r=|@(?!1\.5x)[\d.]+x\.webp$/.test(l || '')));
+      const sharpUrls = new Set(far.map((c) => c.texture?.label).filter((l) => /\.svg\?r=|@(?!1\.5x)[\d.]+x\.webp(\?r=[\d.]+)?$/.test(l || '')));
       for (const u of sharpUrls) assert.ok(admitted.has(u), `${tsid}: ${u} not admitted`);
       let cost = 0;
       for (const u of admitted) {

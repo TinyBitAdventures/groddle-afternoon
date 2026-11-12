@@ -11,10 +11,10 @@ import {
   pickConnection,
 } from './street-model.js?v=b6cb6a4e';
 import { availableStreetTsids } from './street-loader.js?v=18b181ad';
-import { frameTexture, isLoaded, onFailed, onLoaded, textureFromUrl } from './textures.js?v=f024bd6a';
-import { admitSharp, decoUrl, isSharpDeco, maxTextureSizeOf, sharpDeco, NEW_DECOS } from './deco-hires.js?v=9ea9c4f3';
+import { frameTexture, isLoaded, onFailed, onLoaded, textureFromUrl } from './textures.js?v=92ec53cd';
+import { admitSharp, decoUrl, FAR_SLACKS, isSharpDeco, maxTextureSizeOf, sharpDeco, NEW_DECOS } from './deco-hires.js?v=f59e60d3';
 import { LADDER_TILE_Z, ladderTilePieces } from './ladder-tiling.js?v=4f9e07fa';
-import { attachAnim, isAnimatedDeco, setAnimSource, setDecoTexture, syncAnim } from './deco-anim.js?v=ffba91bc';
+import { attachAnim, isAnimatedDeco, setAnimSource, setDecoTexture, syncAnim } from './deco-anim.js?v=0de84a64';
 import { drawnLayerOffset, layerScreenDir } from './camera-feel.js?v=e668afc5';
 
 const DECO_BASE = 'assets/decos/groddle/';
@@ -2520,10 +2520,13 @@ export function buildStreetView(street, PIXI, opts = {}) {
   // its bake was made from.
   const renderer = opts.renderer;
   const bigTextures = () => (maxTextureSizeOf(renderer) || 4096) >= 8192;
-  const sharpPick = (url, far = false, blur = 0) => (renderer
+  /** The far copies' slack this street affords at the renderer's resolution now (farSharp). */
+  let farSlack = FAR_SLACKS[0];
+  const sharpPick = (url, far = false, blur = 0, slack = farSlack) => (renderer
     ? sharpDeco(url, renderer.resolution || 1, {
       bigTextures: bigTextures(),
       far,
+      farSlack: slack,
       blurDensity: blur > 0 ? blurBakeResolution(blur, renderer.resolution) : 0,
     })
     : null);
@@ -2532,9 +2535,13 @@ export function buildStreetView(street, PIXI, opts = {}) {
   const animClock = performance.now();
   const animViews = [];
   const animates = (deco, art) => Boolean(PIXI.AnimatedSprite) && isAnimatedDeco(deco, art);
-  /** The far and blurred sharp copies this street can afford at the renderer's resolution now. */
+  /**
+   * The far and blurred sharp copies this street can afford at the renderer's resolution now: at
+   * the finest far slack (FAR_SLACKS) where all of them fit the budget, else the coarsest, most
+   * magnified first. Sets farSlack.
+   */
   const farSharp = () => {
-    const picks = [];
+    const wanted = [];
     const mz = (street.layers || []).findIndex((layer) => layer.id === 'middleground');
     const mlz = mz < 0 ? null : (street.layers[mz].z ?? mz);
     (street.layers || []).forEach((layer, li) => {
@@ -2544,13 +2551,21 @@ export function buildStreetView(street, PIXI, opts = {}) {
       if (!far && !blur) return;
       for (const deco of layer.decos || []) {
         const url = `${decoBase}${decoArt(deco, available)}.png`;
-        if (isSharpDeco(url) && !animates(deco, decoArt(deco, available))) picks.push(sharpPick(url, far, blur));
+        if (isSharpDeco(url) && !animates(deco, decoArt(deco, available))) wanted.push([url, far, blur]);
       }
     });
-    return admitSharp(picks);
+    let admitted = new Set();
+    for (const slack of FAR_SLACKS) {
+      const picks = wanted.map(([url, far, blur]) => sharpPick(url, far, blur, slack));
+      admitted = admitSharp(picks);
+      farSlack = slack;
+      if (picks.every((p) => !p || admitted.has(p.url))) break;
+    }
+    return admitted;
   };
   let farAdmitted = farSharp();
-  const sharpTexture = (pick) => textureFromUrl(pick.url, pick.kind === 'svg'
+  // An SVG, or a far WebP downscaled to its need, draws at width x height; other WebPs as they are.
+  const sharpTexture = (pick) => textureFromUrl(pick.url, pick.width
     ? { raw: true, width: pick.width, height: pick.height, resolution: pick.resolution }
     : { raw: true });
   /** @type {{ spr: any, url: string, pick: any, size: () => void }[]} */

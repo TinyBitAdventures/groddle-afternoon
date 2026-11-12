@@ -10,8 +10,8 @@
  *
  * No DOM; Pixi only through the Graphics handed in.
  */
-import { geoShape, permName, dashes, wallSides, shapeBounds } from './geometry-handles.js?v=ad87fd0d';
-import { normaliseEmitter } from '../street-effects.js?v=f2bafca0';
+import { geoShape, permName, dashes, wallSides, shapeBounds } from './geometry-handles.js?v=7df39820';
+import { normaliseEmitter } from '../street-effects.js?v=36b4139d';
 
 export const OVERLAY_COLOURS = Object.freeze({
   Floor: 0x3ddc84, Roof: 0xffb020, Soft: 0x7cc4ff, Hard: 0xff5a5a, wall: 0xe879f9, ladder: 0x22d3ee, post: 0xfde047,

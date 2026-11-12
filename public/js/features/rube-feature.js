@@ -22,7 +22,7 @@
 
 import { ITEM_CATALOG, ensureItem } from '../inventory.js?v=60dfc9ca';
 import { getGameDayKey } from '../game-day.js?v=f88e6e16';
-import { hellFeature } from './hell-feature.js?v=5ec5ef80';
+import { hellFeature } from './hell-feature.js?v=630ef674';
 import { landingY, walkSurfaceY } from '../walk-surface.js?v=106bfdc5';
 import {
   RUBE_CLASS,
@@ -44,7 +44,7 @@ import {
   rubeTalk,
   streetCanHostRube,
 } from '../rube.js?v=0b98cc11';
-import { frameTexture, isLoaded, onLoaded, sourceFromUrl } from '../textures.js?v=f024bd6a';
+import { frameTexture, isLoaded, onLoaded, sourceFromUrl } from '../textures.js?v=92ec53cd';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
 
 export const RUBE_FEATURE_ID = 'rube';

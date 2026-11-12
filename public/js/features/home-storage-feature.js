@@ -45,7 +45,7 @@ import { announceCharacterChanged, characterHeaders, characterOf, isCharacterCha
 import { ITEM_CATALOG, addItem, countItem, ensureItem, itemIcon, removeItem } from '../inventory.js?v=60dfc9ca';
 import { displayRefusal, furnitureDef, furnitureSize, isFurniture } from '../home-decor.js?v=b48dbc95';
 import { pieceLabel } from '../furniture-upgrades.js?v=a3788c0d';
-import { textureFromUrl } from '../textures.js?v=f024bd6a';
+import { textureFromUrl } from '../textures.js?v=92ec53cd';
 import { stackMaxOf, isBagClass } from '../pack-slots.js?v=6b8393a1';
 import { ELEMENT_CLASSES, NO_BAG_CLASSES, NO_SLOT_CLASSES } from '../pack-slots-data.js?v=800f664c';
 import { TOOL_CONDITION_CATALOG, copyTagKind, copyTags, receiveToolCopy, setCopyTag, takeToolCopy } from '../tools.js?v=5f482998';

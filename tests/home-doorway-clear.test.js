@@ -20,7 +20,7 @@ import { HOME_LIMITS } from '../public/js/homes-catalog.js?v=10ac34b6';
 import { createCultivationState, homeStreetLayout } from '../public/js/home-cultivation.js?v=f1242621';
 import { EXTERIOR_STYLES, streetLook } from '../public/js/home-styles.js?v=13fe0aaa';
 import { NEIGHBOURS, neighbourLayout } from '../public/js/neighbours.js?v=161fc2e5';
-import { SCENE_STYLES, propPlan } from '../public/js/features/neighbour-scene.js?v=520bbe3e';
+import { SCENE_STYLES, propPlan } from '../public/js/features/neighbour-scene.js?v=dd4514b0';
 import {
   DOORWAY_GAP,
   HOUSE_STYLE_KEYS,

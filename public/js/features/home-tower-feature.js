@@ -48,7 +48,7 @@
  *   towerWork, towerAutoplay, towerSecrets, towerRock, towerVisited, towerTopY (street).
  */
 
-import { playOverlay } from '../overlays.js?v=605c12ff';
+import { playOverlay } from '../overlays.js?v=4e81f749';
 import { ITEM_CATALOG, countItem, ensureItem, itemIcon } from '../inventory.js?v=60dfc9ca';
 import { canUseTool, useToolCondition } from '../tools.js?v=5f482998';
 import { acceptOffer, npcQuestOffers } from '../quest-offers.js?v=9c53455c';
@@ -113,10 +113,10 @@ import {
   towerSpotsFor,
   workCheck,
 } from '../home-tower.js?v=087df38f';
-import { textureFromUrl } from '../textures.js?v=f024bd6a';
+import { textureFromUrl } from '../textures.js?v=92ec53cd';
 import { denseSprite } from '../sprite-dense.js?v=2a0ce07a';
 import { pieceUrl } from '../home-wallpaper.js?v=f1969400';
-import { wantsHiresDecos } from '../deco-hires.js?v=9ea9c4f3';
+import { wantsHiresDecos } from '../deco-hires.js?v=f59e60d3';
 import { WOTD_TEXT } from '../wine-pour.js?v=6daa23a7';
 
 /** 3x tower pieces where the screen has more than 2.25 backing pixels per world pixel. */
