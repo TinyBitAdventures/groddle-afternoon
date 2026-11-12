@@ -13761,4 +13761,6 @@ body.is-booting .touch-controls { display: none; }
 }
 :root.touch-phone[data-ui="modern"] :is(.glitch-modal-card, .side-card, .ui-sheet, [role="dialog"]) { max-width: calc(100vw - 8px); box-sizing: border-box; }
 :root.touch-phone[data-ui="modern"] body { overflow-x: hidden; }
+/* The tutorial's pill (top left) waits while a sheet or window is open: it covered their titles. */
+:root.touch-phone[data-ui="modern"]:has(#game-root :is(.ui-sheet, .side-panel, .glitch-modal, .map-panel):not([hidden])) #newxp-pill { visibility: hidden; }
 /* —— end TOUCH PANELS —— */

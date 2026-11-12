@@ -318,6 +318,13 @@ export function mountNotifyView(notifier, { root, setData = () => {}, logButtonH
     // The buff strip (top left) on a narrow screen.
     const buffs = relRect(document.getElementById('buff-strip'), rr);
     if (buffs) blockers.push(buffs);
+    // The mobile QA (2026-11-12): with no street name above them (the tutorial hides it) the notices
+    // sat at the top over the top bar's pills and the tutorial pill. On a wide window they fit between
+    // the pills and never meet them; on a narrow one they go under whatever they would cover.
+    for (const sel of ['#hud-stats', 'header.top-bar .top-actions', '#newxp-pill']) {
+      const r = relRect(document.querySelector(sel), rr);
+      if (r) blockers.push(r);
+    }
     const dialogs = [];
     for (const d of root.querySelectorAll('[role="dialog"]')) {
       // Interaction menus (the verb menu, the Enter chooser, the item pickers: .verb-menu) step aside
