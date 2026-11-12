@@ -1756,13 +1756,16 @@ function buildGroundSkirt(PIXI, renderer, root, grounds, W, sourceH, depthPx, gr
     // G582: the band's last `pad` px, flipped about the street's right end, down the same tiles.
     const pad = Math.max(0, Math.min(Math.ceil(Number(rightPad) || 0), Math.floor(W)));
     if (pad > 0 && band > 0) {
-      const rt = PIXI.RenderTexture.create({ width: pad, height: band, resolution: res });
-      renderer.render({ container: shell, target: rt, transform: new PIXI.Matrix(1, 0, 0, 1, -(W - pad), -top), clear: true });
+      // Whole texels ending on the street's end (edgeMirrorTexels): a texture Pixi rounded down
+      // would stop short of the end, flipped, and leave a gap there.
+      const padW = wholeTexels(pad, res) / res;
+      const rt = PIXI.RenderTexture.create({ width: padW, height: band, resolution: res });
+      renderer.render({ container: shell, target: rt, transform: new PIXI.Matrix(1, 0, 0, 1, -(W - padW), -top), clear: true });
       textures.push(rt);
       for (const tile of skirtTiles(depth, band)) {
         const spr = new PIXI.Sprite(rt);
         spr.scale.x = -1;
-        spr.x = W + pad;
+        spr.x = W + padW;
         if (tile.flip) {
           spr.scale.y = -1;
           spr.y = sourceH + tile.y + band;
@@ -1993,31 +1996,71 @@ export function edgeMirrorWidths({ layerW, parallax = true, streetW, vpW, maxIns
   return { left: fit(left), right: fit(right) };
 }
 
+/** EDGE MIRROR: how far in from a layer's end its art may stop and still be mirrored about its own edge. */
+export const EDGE_MIRROR_SNAP = 2;
+
 /**
  * PURE (EDGE MIRROR): the column of a layer one end's strip mirrors, in the layer's coordinates.
  * 'right' takes the last `width` px and flips them about the layer's end (x = layerW), 'left' the
- * first `width` px about x = 0, so the art at the end meets its own reflection. The strip runs from
- * the highest art box crossing the column to the lowest, no lower than `bottom` (below a layer's
- * bottom is the ground skirt's). Returns { side, x0, y0, w, h, at } (`at`: the x of the copy drawn
- * with scale.x -1) or null when no art crosses the column.
+ * first `width` px about x = 0, so the art at the end meets its own reflection. Art that stops a
+ * hair short of the end (Grimssea Hollow's bark, centred on a 1125 px street, starts at x = 0.5) is
+ * flipped about its own edge instead (`end`, within EDGE_MIRROR_SNAP px), else the half pixel
+ * there and its reflection left a 1 px gap down the whole street. The strip runs from the highest
+ * art box crossing the column to the lowest, no lower than `bottom` (below a layer's bottom is the
+ * ground skirt's). Returns { side, x0, y0, w, h, at, end } (`at`: the x of the copy drawn with
+ * scale.x -1, `end`: the x it is flipped about) or null when no art crosses the column.
  */
 export function edgeMirrorStrip(side, width, layerW, boxes, bottom = Infinity) {
   const w = Math.max(0, Math.floor(Number(width) || 0));
   if (!w || !(layerW > 0)) return null;
-  const x0 = side === 'right' ? layerW - w : 0;
-  const x1 = x0 + w;
+  const right = side === 'right';
+  const c0 = right ? layerW - w : 0;
+  const c1 = c0 + w;
   let y0 = Infinity;
   let y1 = -Infinity;
+  let outer = right ? -Infinity : Infinity;
   for (const b of boxes || []) {
-    if (!b || b.x1 <= x0 || b.x0 >= x1 || b.y1 <= b.y0) continue;
+    if (!b || b.x1 <= c0 || b.x0 >= c1 || b.y1 <= b.y0) continue;
     y0 = Math.min(y0, b.y0);
     y1 = Math.max(y1, b.y1);
+    outer = right ? Math.max(outer, b.x1) : Math.min(outer, b.x0);
   }
   y1 = Math.min(y1, bottom);
   if (!(y1 > y0)) return null;
   y0 = Math.floor(y0);
   y1 = Math.ceil(y1);
-  return { side, x0, y0, w, h: y1 - y0, at: side === 'right' ? layerW + w : 0 };
+  const short = right ? layerW - outer : outer;
+  const end = short > 0 && short <= EDGE_MIRROR_SNAP ? outer : right ? layerW : 0;
+  return { side, x0: right ? end - w : end, y0, w, h: y1 - y0, at: right ? end + w : end, end };
+}
+
+/**
+ * PURE (EDGE MIRROR, the right-end seam, Middle Arbor 2026-11-12): a strip's render texture in whole
+ * texels, laid so its seam edge sits exactly on the layer's end. Pixi rounds a render texture to
+ * whole pixels (TextureSource.resize: Math.round(width x resolution)) and sizes the sprite by that,
+ * so at a resolution where w x res rounded down (sky 324 px at 1.52: 492.48 to 492) the strip came
+ * out 0.32 px short; drawn flipped from `at` (its far side) it stopped short of the end and left a
+ * thin gap all the way down the layer, the sky gradient showing through. The texels are rounded up
+ * instead, and the column rendered is the last `width` px before the strip's `end` (right) or the
+ * first after it (left; `end` is the layer's end, or its art's edge, edgeMirrorStrip), so the edge
+ * texel is the art at the end whatever the rounding.
+ * Returns { width, height, pixelWidth, pixelHeight, x0, at }: the texture's size (whole texels over
+ * res), the layer x rendered at the texture's left edge, and the x of the sprite drawn with scale.x -1.
+ */
+export function edgeMirrorTexels(strip, layerW, res = 1) {
+  const r = Number(res) > 0 ? Number(res) : 1;
+  const pixelWidth = wholeTexels(strip.w, r);
+  const pixelHeight = wholeTexels(strip.h, r);
+  const width = pixelWidth / r;
+  const height = pixelHeight / r;
+  const right = strip.side === 'right';
+  const end = Number.isFinite(strip.end) ? strip.end : right ? layerW : 0;
+  return { width, height, pixelWidth, pixelHeight, x0: right ? end - width : end, at: right ? end + width : end };
+}
+
+/** PURE (EDGE MIRROR): the whole texels covering `size` px at `res` (a hair under an integer keeps it). */
+export function wholeTexels(size, res = 1) {
+  return Math.max(1, Math.ceil((Number(size) || 0) * (Number(res) > 0 ? Number(res) : 1) - 1e-6));
 }
 
 /** PURE (EDGE MIRROR): the strips' render resolution: the renderer's (2 at most), lowered to fit `budget`. */
@@ -2050,12 +2093,13 @@ function layerArtBoxes(PIXI, lc) {
  * tiles and recoloured copies there baked, nothing culled), the layer alone in a throwaway parent
  * (as buildGroundSkirt does), then put it back where it was.
  */
-function renderEdgeStrip(PIXI, renderer, root, lc, strip, boxes, res) {
-  const x1 = strip.x0 + strip.w;
-  const y1 = strip.y0 + strip.h;
+function renderEdgeStrip(PIXI, renderer, root, lc, strip, boxes, res, texels) {
+  const x0 = texels.x0;
+  const x1 = x0 + texels.width;
+  const y1 = strip.y0 + texels.height;
   const unculled = [];
   for (const b of boxes) {
-    if (b.x1 <= strip.x0 || b.x0 >= x1 || b.y1 <= strip.y0 || b.y0 >= y1) continue;
+    if (b.x1 <= x0 || b.x0 >= x1 || b.y1 <= strip.y0 || b.y0 >= y1) continue;
     const child = b.child;
     if (child.blurTile && root.blurStats) bakeBlurTile(child.blurTile, root.blurStats);
     else if (child.recolour && !child.recolour.entry.texture && root.recolourCache) ensureRecoloured(PIXI, renderer, root.recolourCache, child);
@@ -2069,9 +2113,9 @@ function renderEdgeStrip(PIXI, renderer, root, lc, strip, boxes, res) {
   shell.addChild(lc);
   lc.x = 0;
   lc.y = 0;
-  const rt = PIXI.RenderTexture.create({ width: strip.w, height: strip.h, resolution: res });
+  const rt = PIXI.RenderTexture.create({ width: texels.width, height: texels.height, resolution: res });
   try {
-    renderer.render({ container: shell, target: rt, transform: new PIXI.Matrix(1, 0, 0, 1, -strip.x0, -strip.y0), clear: true });
+    renderer.render({ container: shell, target: rt, transform: new PIXI.Matrix(1, 0, 0, 1, -texels.x0, -strip.y0), clear: true });
   } finally {
     lc.x = home.x;
     lc.y = home.y;
@@ -2151,14 +2195,15 @@ export function attachEdgeMirrors(PIXI, renderer, root, layers, W, sourceH, inse
     const views = new Map();
     for (const s of strips) {
       const lc = s.plan.lc;
+      const texels = edgeMirrorTexels(s, s.plan.lw, res);
       let rt;
       try {
-        rt = renderEdgeStrip(PIXI, renderer, root, lc, s, s.boxes, res);
+        rt = renderEdgeStrip(PIXI, renderer, root, lc, s, s.boxes, res, texels);
       } catch {
         continue;
       }
       state.textures.push(rt);
-      state.bytes += Math.ceil(s.w * res) * Math.ceil(s.h * res) * 4;
+      state.bytes += texels.pixelWidth * texels.pixelHeight * 4;
       let view = views.get(lc);
       if (!view) {
         view = new PIXI.Container();
@@ -2176,7 +2221,7 @@ export function attachEdgeMirrors(PIXI, renderer, root, layers, W, sourceH, inse
       }
       const spr = new PIXI.Sprite(rt);
       spr.scale.x = -1;
-      spr.x = s.at;
+      spr.x = texels.at;
       spr.y = s.y0;
       spr.edgeSide = s.side;
       spr.edgeLayerW = s.plan.lw;

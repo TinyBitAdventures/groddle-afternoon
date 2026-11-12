@@ -65,7 +65,9 @@ describe('G582: the camera reserves the Social drawer over the world', () => {
   it('the ground skirt runs on past the right end, mirrored about it', () => {
     const render = read('public/js/street-render.js');
     assert.match(render, /function buildGroundSkirt\([^)]*rightPad = 0\)/);
-    assert.match(render, /spr\.scale\.x = -1;\n\s*spr\.x = W \+ pad;/);
+    // Whole texels ending on the end (edgeMirrorTexels' rule): a rounded-down texture left a gap there.
+    assert.match(render, /const padW = wholeTexels\(pad, res\) \/ res;/);
+    assert.match(render, /spr\.scale\.x = -1;\n\s*spr\.x = W \+ padW;/);
     for (const part of ['base.rect(0, sourceH, fullW', 'fade.width = fullW', 'shade.width = fullW', 'deep.rect(0, sourceH + fadeDepth, fullW']) {
       assert.ok(render.includes(part), part);
     }

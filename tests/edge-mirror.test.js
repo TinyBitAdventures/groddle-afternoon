@@ -15,9 +15,11 @@ import {
   attachEdgeMirrors,
   edgeMirrorResolution,
   edgeMirrorStrip,
+  edgeMirrorTexels,
   edgeMirrorWidths,
   parallaxLayerOffset,
-} from '../public/js/street-render.js?v=052b204a';
+  wholeTexels,
+} from '../public/js/street-render.js?v=3bc17de1';
 import { cameraTargetX } from '../public/js/movement.js?v=b30f84eb';
 
 describe('edge mirror widths', () => {
@@ -76,7 +78,7 @@ describe('edge mirror strip geometry', () => {
 
   it('takes the last px and flips them about the end, so the edge pixels meet', () => {
     const s = edgeMirrorStrip('right', 444, 6000, boxes, 1200);
-    assert.deepEqual(s, { side: 'right', x0: 5556, y0: 100, w: 444, h: 1100, at: 6444 });
+    assert.deepEqual(s, { side: 'right', x0: 5556, y0: 100, w: 444, h: 1100, at: 6444, end: 6000 });
     // Drawn with scale.x -1 at `at`, the point d px left of the end lands d px right of it.
     const screen = (x) => s.at - (x - s.x0);
     for (const d of [0, 1, 100, 444]) assert.equal(screen(6000 - d), 6000 + d);
@@ -84,10 +86,31 @@ describe('edge mirror strip geometry', () => {
 
   it('flips the first px about x = 0 at the left end', () => {
     const s = edgeMirrorStrip('left', 150, 6000, boxes, 1200);
-    assert.deepEqual(s, { side: 'left', x0: 0, y0: 600, w: 150, h: 100, at: 0 });
+    assert.deepEqual(s, { side: 'left', x0: 0, y0: 600, w: 150, h: 100, at: 0, end: 0 });
     const screen = (x) => s.at - (x - s.x0);
     assert.equal(screen(0), 0);
     assert.equal(screen(150), -150);
+  });
+
+  it('flips art that stops a hair short of the end about its own edge (Grimssea Hollow bark at x 0.5)', () => {
+    // A 1125 px street with its bark centred at 563: the art runs 0.5 to 1125.5.
+    const bark = [{ x0: 0.5, y0: 0, x1: 1125.5, y1: 2250 }];
+    const left = edgeMirrorStrip('left', 111, 1125, bark);
+    assert.equal(left.end, 0.5);
+    assert.equal(left.x0, 0.5);
+    assert.equal(left.at, 0.5);
+    // Overhanging the right end: flipped about the layer's end (and clipped there).
+    assert.equal(edgeMirrorStrip('right', 111, 1125, bark).end, 1125);
+    // Short of the right end by under EDGE_MIRROR_SNAP: about the art's edge.
+    const r = edgeMirrorStrip('right', 100, 6000, [{ x0: 5000, y0: 0, x1: 5998.6, y1: 100 }]);
+    assert.equal(r.end, 5998.6);
+    assert.equal(r.x0, 5898.6);
+    assert.equal(r.at, 6098.6);
+    const t = edgeMirrorTexels(r, 6000, 1.52);
+    assert.ok(Math.abs(t.at - Math.round(t.width * 1.52) / 1.52 - 5998.6) < 1e-6);
+    // Art that stops well short is a real gap at the end, mirrored as drawn.
+    assert.equal(edgeMirrorStrip('right', 100, 6000, [{ x0: 5000, y0: 0, x1: 5990, y1: 100 }]).end, 6000);
+    assert.equal(edgeMirrorStrip('left', 100, 6000, [{ x0: 5, y0: 0, x1: 90, y1: 100 }]).end, 0);
   });
 
   it('has nothing to draw where no art crosses the column', () => {
@@ -103,6 +126,48 @@ describe('edge mirror strip geometry', () => {
     const res = edgeMirrorResolution(big, 2);
     assert.ok(res < 2 && res >= 0.5);
     assert.ok(big.reduce((n, s) => n + s.w * s.h, 0) * res * res * 4 <= EDGE_MIRROR_BYTES);
+  });
+});
+
+describe('edge mirror seam (Middle Arbor, 2026-11-12: a thin light line at the right end)', () => {
+  // Pixi sizes a render texture in whole pixels (TextureSource.resize) and a sprite by that.
+  const pixiWidth = (width, res) => Math.round(width * res) / res;
+
+  it('the old texture came out short at a resolution that rounded down (the gap)', () => {
+    // Middle Arbor at 910 css px on a 2x screen: sky strip 324 px at 1.52 is 492.48 texels, 492 kept.
+    assert.ok(pixiWidth(324, 1.52) < 324);
+    // Drawn flipped from its far side (at = end + w), it stopped 0.32 px short of the end.
+    assert.ok(6000 + 324 - pixiWidth(324, 1.52) - 6000 > 0.3);
+  });
+
+  it('meets the end exactly at every resolution and width, and never comes out short', () => {
+    const resolutions = [];
+    for (let r = 0.5; r <= 2.0001; r += 0.05) resolutions.push(r, r / 1.25, r / 1.25 / 1.25);
+    for (const res of resolutions) {
+      for (let w = 1; w <= 900; w += 1) {
+        for (const lw of [6000, 4700, 5400.5]) {
+          const right = edgeMirrorTexels({ side: 'right', w, h: 977 }, lw, res);
+          const drawn = pixiWidth(right.width, res);
+          assert.equal(Math.round(right.width * res), right.pixelWidth, `res ${res} w ${w}`);
+          assert.ok(drawn >= w - 1e-9, `res ${res} w ${w}: ${drawn} short`);
+          // The sprite, scale.x -1 at `at`, spans [at - drawn, at]: its seam edge on the end.
+          assert.ok(Math.abs(right.at - drawn - lw) < 1e-6, `res ${res} w ${w} lw ${lw}: seam at ${right.at - drawn}`);
+          // The texture's right edge is the layer's end: the texel at the seam is the end's art.
+          assert.ok(Math.abs(right.x0 + drawn - lw) < 1e-6);
+          const left = edgeMirrorTexels({ side: 'left', w, h: 977 }, lw, res);
+          assert.equal(left.x0, 0);
+          assert.equal(left.at, 0);
+          assert.ok(pixiWidth(left.width, res) >= w - 1e-9);
+        }
+      }
+    }
+  });
+
+  it('keeps a width already on whole texels and rounds the rest up', () => {
+    assert.equal(wholeTexels(428, 1.75), 749);
+    assert.equal(wholeTexels(428, 1.8), 771);
+    assert.equal(wholeTexels(324, 1.52), 493);
+    assert.equal(wholeTexels(0.2, 1), 1);
   });
 });
 
@@ -247,6 +312,32 @@ describe('edge mirror lifecycle', () => {
     root.destroy({ children: true });
     assert.ok(made.every((t) => t.destroyed));
     assert.equal(root.edgeMirrorStats().textures, 0);
+  });
+
+  it('renders whole texels ending on the layer end and draws the strip from there (no seam at 1.9)', async () => {
+    const { PIXI, made } = fakePixi();
+    const renders = [];
+    const renderer = { resolution: 1.9, render: (o) => renders.push(o) };
+    const root = new PIXI.Container();
+    const ground = new PIXI.Container();
+    ground.label = 'middleground';
+    const spr = new PIXI.Sprite({ orig: { width: 400, height: 200 }, source: {} });
+    spr.x = 5600;
+    spr.y = 900;
+    ground.addChild(spr);
+    root.addChild(ground);
+    attachEdgeMirrors(PIXI, renderer, root, [ground], 6000, 1200, () => 0.42);
+    root.edgeMirrorFrame(5000, 1000);
+    await tick();
+    const [rt] = made;
+    const res = rt.resolution;
+    // 444 px at 1.9 is 843.6 texels: Pixi would keep 844 (fine) but 1.8 or 1.52 lose the last.
+    assert.ok(Number.isInteger(Math.round(rt.width * res)) && Math.abs(rt.width * res - Math.round(rt.width * res)) < 1e-6);
+    assert.ok(rt.width >= 444);
+    // The column rendered ends at the layer's end, and the flipped sprite's seam edge sits on it.
+    assert.ok(Math.abs(-renders[0].transform.m[4] + rt.width - 6000) < 1e-6);
+    const strip = ground.edgeMirror.children[0];
+    assert.ok(Math.abs(strip.x - rt.width - 6000) < 1e-6);
   });
 
   it('builds nothing on a wide street where nothing covers the world (Classic)', async () => {

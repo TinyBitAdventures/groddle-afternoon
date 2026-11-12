@@ -2752,9 +2752,14 @@
   "deployed": "2026-11-11"
  },
  "git": {
-  "commits": 1699,
+  "commits": 1700,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-12",
+    "kind": "fix",
+    "text": "No thin light line where a street's art meets its mirror past the end"
+   },
    {
     "date": "2026-11-12",
     "kind": "fix",
@@ -2869,11 +2874,6 @@
     "date": "2026-11-11",
     "kind": "fix",
     "text": "Ladders and ledges line up with their art on streets narrower than a wide window"
-   },
-   {
-    "date": "2026-11-11",
-    "kind": "fix",
-    "text": "Project gifts and rewards are confirmed once a save holding them is accepted"
    }
   ]
  },
