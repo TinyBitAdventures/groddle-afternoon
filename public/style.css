@@ -1467,6 +1467,12 @@ kbd {
   .start-actions:has([data-nx-skipstart]) #start-customize-btn { grid-column: 1; grid-row: auto; }
   .start-actions .nx-start p { grid-row: auto; order: 1; }
 }
+/* A short screen (the mobile QA, 2026-11-12: an iPhone SE sideways, 320 px tall): the card kept 72 px
+   for the pack and two bars' worth for the top, and Skip to Ur and Customize look first sat under the
+   pack row, where a tap hit the pack. While the card is up the pack and the street's name wait (nothing
+   in the pack acts before Start; the card has its own title), and the card takes the height under the top bar. */
+@media (max-height: 500px) {
+  [data-ui="modern"] #overlay { padding-top: calc(var(--hud-h) + var(--sp-4)); padding-bottom: var(--sp-4); }
   [data-ui="modern"] #game-root:has(> #overlay:not(.hidden)) :is(.pack-bar, .street-nameplate) { visibility: hidden; }
 }
 
