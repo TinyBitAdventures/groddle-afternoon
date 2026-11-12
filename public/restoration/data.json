@@ -2752,9 +2752,14 @@
   "deployed": "2026-11-12"
  },
  "git": {
-  "commits": 1705,
+  "commits": 1706,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-12",
+    "kind": "new",
+    "text": "Alternate characters in the game: pick one on the start card, Switch character, and no write lands on another character"
+   },
    {
     "date": "2026-11-12",
     "kind": "improve",
@@ -2869,14 +2874,9 @@
     "date": "2026-11-12",
     "kind": "fix",
     "text": "No more stuck players: the second tutorial bag, the smuggler's hole and the Ancestral Lands kick"
-   },
-   {
-    "date": "2026-11-11",
-    "kind": "improve",
-    "text": "Classic Skills step one level at a time, with the 2012 study bar"
    }
   ]
  },
- "tests": 844,
+ "tests": 846,
  "generatedAt": "2026-11-12"
 }

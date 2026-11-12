@@ -381,7 +381,7 @@ describe('the site routes (groddle-afternoon-site AdminConsole, AdminConsolePage
   it('the theme serves the console\'s script and styles, keyed', () => {
     assert.ok(existsSync(sitePath('console/console.js')));
     assert.ok(existsSync(sitePath('console/console.css')));
-    assert.match(readFileSync(sitePath('src/AdminConsolePage.php'), 'utf8'), /ASSET_KEY = 'skin-6'/);
+    assert.match(readFileSync(sitePath('src/AdminConsolePage.php'), 'utf8'), /ASSET_KEY = 'skin-7'/);
     const css = readFileSync(sitePath('console/console.css'), 'utf8');
     for (const token of ['--surface', '--border', '--fg', '--muted', '--track', '--row-line']) assert.match(css, new RegExp(`var\\(${token}\\)`), token);
   });
@@ -392,7 +392,8 @@ describe('the realtime server (groddle-afternoon-server admin.go)', { skip: skip
     const src = readFileSync(serverPath('admin.go'), 'utf8');
     for (const call of ['online', 'message', 'boot', 'ban', 'unban', 'bans', 'give', 'refill']) assert.match(src, new RegExp(`serviceHandlers\\["${call}"\\] = `), call);
     assert.doesNotMatch(src, /r\.Handle\(/, 'no socket kinds');
-    assert.match(readFileSync(serverPath('main.go'), 'utf8'), /if s\.hub\.Banned\(claims\.Sub\) \{/);
+    // Alternate characters (server 039e2c8): a ban on the character or its login refuses the ticket.
+    assert.match(readFileSync(serverPath('main.go'), 'utf8'), /if s\.hub\.Banned\(claims\.Sub\) \|\| s\.hub\.Banned\(claims\.Acct\) \{/);
     assert.match(readFileSync(serverPath('admin_test.go'), 'utf8'), /9MY3KNwUctqbzzlpAAxyoTdMJzr9DOkqYm5bW0LQN-Y/);
   });
 });

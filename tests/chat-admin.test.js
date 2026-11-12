@@ -368,7 +368,7 @@ describe('the site: me says admin; the delete route stays administrators only (s
     const { logWords } = await import(`${new URL(`file://${sitePath('console/console.js')}`).href}`);
     assert.equal(logWords({ kind: 'chat_delete', delivery: 'live', player: { id: 7, name: 'Ada' }, detail: { where: 'Live Help', text: '', cleared: true } }), 'deleted Ada\'s line in Live Help (its words were cleared after 30 days)');
     assert.equal(logWords({ kind: 'chat_delete', delivery: 'live', player: { id: 7, name: 'Ada' }, detail: { where: 'Live Help', text: 'oops' } }), 'deleted Ada\'s line in Live Help: “oops”');
-    assert.match(readFileSync(sitePath('src/AdminConsolePage.php'), 'utf8'), /ASSET_KEY = 'skin-6'/);
+    assert.match(readFileSync(sitePath('src/AdminConsolePage.php'), 'utf8'), /ASSET_KEY = 'skin-7'/);
   });
 });
 
