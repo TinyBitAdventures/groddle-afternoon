@@ -13518,6 +13518,11 @@ html.stage-pinned[data-ui="modern"] header.top-bar { left: calc(var(--sp-5) + va
 [data-ui="modern"] #vendor-panel .vendor-detail.count-pop .qty-row { flex-wrap: wrap; margin-top: var(--space-2); }
 [data-ui="modern"] #vendor-panel .vendor-detail.count-pop .qty-row .btn-glitch-primary { flex: 1 0 100%; margin-top: var(--space-1); }
 [data-ui="modern"] #vendor-panel .vendor-detail.count-pop .count-pop-esc { margin: var(--space-2) 0 0; }
+/* A phone held sideways (the mobile QA, 2026-11-12: a 138 px shelf): the pop drops its price line
+   (the Buy button says it) so the count row and Buy fit the shelf together. */
+@media (max-height: 500px) {
+  :root.touch-phone[data-ui="modern"] #vendor-panel .vendor-detail.count-pop .vendor-detail-body p { display: none; }
+}
 @media (prefers-reduced-motion: reduce) {
   [data-ui="modern"] :is(#feed-picker .feed-picker-card, #vendor-panel .vendor-detail.count-pop) { animation: none; }
 }

@@ -29071,6 +29071,10 @@ function renderVendorList() {
 
 /** Space kept under a vendor pop once it is scrolled into view (px). */
 const VENDOR_POP_ROOM = 12;
+/** How much of the tile shows above its pop when the two do not fit the shelf together (px). */
+const VENDOR_POP_PEEK = 28;
+/** The least room kept above a pop that comes first (its tail), px. */
+const VENDOR_POP_EDGE = 8;
 
 /** MPANELS: the modern skin's count popover sits under (or over) its tile on the shelf, its tail on it. */
 function placeVendorPop(list, detail) {
@@ -29103,6 +29107,13 @@ function placeVendorPop(list, detail) {
   const tileTop = tr.top - br.top + body.scrollTop - room;
   let want = Math.max(body.scrollTop, popBottom - body.clientHeight);
   if (tileTop < want) want = Math.max(0, tileTop);
+  // A short shelf (a phone, the mobile QA 2026-11-12): the tile and its pop did not fit together and
+  // the count row (minus, the count, plus, Max) sat out of view under the Buy and Sell tabs, so a tap
+  // on plus switched tabs. Then the pop comes first: its top always shows (the tile's foot peeking
+  // above it when there is room), and as much of its foot (the Buy button) as fits.
+  if (popBottom - tileTop > body.clientHeight) {
+    want = Math.max(0, Math.min(top - VENDOR_POP_EDGE, Math.max(top - VENDOR_POP_PEEK, popBottom - body.clientHeight)));
+  }
   if (Math.abs(want - body.scrollTop) > 1) body.scrollTo?.({ top: want, behavior: notifyView?.reducedMotion() ? 'auto' : 'smooth' });
   if (app?.canvas) app.canvas.dataset.vendorPop = `${vendorSelected}:${Math.round(top)}`;
 }
