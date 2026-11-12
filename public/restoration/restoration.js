@@ -8,7 +8,7 @@
  * there, and a part whose block is not on the page is skipped.
  */
 
-import { dametimeParts } from '../js/game-day.js?v=188ef3fa';
+import { dametimeParts } from '../js/game-day.js?v=f88e6e16';
 
 const $ = (sel, root = document) => root.querySelector(sel);
 const el = (tag, attrs = {}, ...kids) => {

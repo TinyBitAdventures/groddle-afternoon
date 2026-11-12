@@ -20,7 +20,7 @@ import {
   spinningWheelPhase,
   startSpinningWheel,
   wheelPrizeTier,
-} from '../public/js/spinning-wheel.js?v=d2161544';
+} from '../public/js/spinning-wheel.js?v=9605bed2';
 import {
   ITEM_CATALOG,
   createInventory,
@@ -29,7 +29,7 @@ import {
 import {
   createShrineState,
   donateToShrine,
-} from '../public/js/shrines.js?v=fa059603';
+} from '../public/js/shrines.js?v=ec26da05';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 

@@ -29,12 +29,12 @@ import { createMineRock, mineRock, MINING_COSTS } from '../public/js/mining.js?v
 import { VENDOR_PROFILES, vendorBuy } from '../public/js/vendor.js?v=fd4bd725';
 import { harvestWoodTree } from '../public/js/woodcutting.js?v=5235a01a';
 import { createGarden, plantPlot, waterPlot } from '../public/js/garden.js?v=788f2dbb';
-import { createPlayerSave, normalizePlayerSave } from '../public/js/player-save.js?v=350cb5f8';
+import { createPlayerSave, normalizePlayerSave } from '../public/js/player-save.js?v=abeddbbf';
 import { createDroppedItemState, dropInventoryStack, pickupDroppedStack } from '../public/js/world-items.js?v=da2bb7a1';
 import { layoutPack, unitPlaces, unitRankAt } from '../public/js/pack-slots.js?v=6b8393a1';
 import { toolBreakEvents } from '../public/js/quest-offers.js?v=9c53455c';
 import { performAnimalKinship } from '../public/js/animal-kinship.js?v=f91347e9';
-import { createAnimalState } from '../public/js/animals.js?v=4e488834';
+import { createAnimalState } from '../public/js/animals.js?v=7e27e9d2';
 
 const remaining = (tools, cls) => toolCopies(tools, cls).map((c) => c.remaining);
 

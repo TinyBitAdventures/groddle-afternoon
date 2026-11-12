@@ -30,7 +30,7 @@ import {
   bestFocusGain,
   focusPocusHint,
 } from '../public/js/meditation.js?v=f0c00590';
-import { meditationFeature } from '../public/js/features/meditation-feature.js?v=16a2d75c';
+import { meditationFeature } from '../public/js/features/meditation-feature.js?v=29b46ca0';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const CONTENT = join(here, '../public/assets/content');

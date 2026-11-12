@@ -12,7 +12,7 @@ import { spawnSync } from 'node:child_process';
 import { existsSync, readFileSync } from 'node:fs';
 import { after, before, describe, it } from 'node:test';
 
-import { createPlot, performPlotVerb } from '../public/js/patches.js?v=41ddb3a0';
+import { createPlot, performPlotVerb } from '../public/js/patches.js?v=61abc5fe';
 import {
   BUSY_LINE,
   COPY,
@@ -33,10 +33,10 @@ import {
   sharedPatchesOn,
   soilRolls,
   stripSharedPlots,
-} from '../public/js/shared-patches.js?v=4ab46688';
-import { sharedPatchesFeature } from '../public/js/features/shared-patches-feature.js?v=f7a46644';
-import { patchesFeature, soilSpawnPlan } from '../public/js/features/patches-feature.js?v=5d9c8add';
-import { FEATURES } from '../public/js/features/index.js?v=bb7ba28a';
+} from '../public/js/shared-patches.js?v=ac409c57';
+import { sharedPatchesFeature } from '../public/js/features/shared-patches-feature.js?v=a213c7e5';
+import { patchesFeature, soilSpawnPlan } from '../public/js/features/patches-feature.js?v=d405f1a4';
+import { FEATURES } from '../public/js/features/index.js?v=ed630928';
 import { getStreetEcologyCatalog, setStreetEcologyCatalog } from '../public/js/street-ecology.js?v=26dabe26';
 import { HAS_SERVER, serverPath } from '../tools/repos.mjs';
 

@@ -82,8 +82,10 @@ describe('the Play page chooses: sign in, or Play solo (Austin 2026-10-26)', () 
     const boot = read('js/online-boot.js');
     assert.match(boot, /title: 'Or play solo',\n\s+body: 'Your own scrap of Ur, saved in this browser\. No account needed\.',\n\s+button: 'Play solo',/);
     assert.match(boot, /if \(state === 'signed-out'\) \{\n\s+const solo = el\('section', \{ class: 'online-solo'/);
-    assert.match(boot, /if \(!continuedHere\(\)\) \{\n\s+showGate\(gate, 'choose'/);
-    assert.match(boot, /name \? `Play as \$\{name\}` : 'Play'/);
+    // Once a tab, per character (alternate characters, 2026-11-12): another tab's switch shows the card again.
+    assert.match(boot, /if \(!continuedHere\(session\.player\?\.id\)\) \{\n\s+const characters = await account\.characters\(\)\.catch\(\(\) => null\);\n\s+showGate\(gate, 'choose'/);
+    assert.match(boot, /play: \(name\) => `Play as \$\{name\}`/);
+    assert.match(boot, /c\.name \? CHARACTER_COPY\.play\(c\.name\) : 'Play'/);
     assert.match(boot, /const onSignedIn = \(\) => \{\n\s*markContinued\(\);\n\s*if \(verifyLinkFrom\(location\.hash\)\) history\.replaceState\(history\.state, '', location\.pathname\);\n\s*boot\(\);\n\s*\};/);
   });
 

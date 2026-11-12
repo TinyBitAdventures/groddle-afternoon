@@ -12,13 +12,17 @@
  * somewhere else (never reconnect), 4003 bad or used ticket (fetch a new one
  * and retry), 4008 too slow (reconnect), 4010 an administrator signed you out
  * and 4011 this account is suspended (groddle-afternoon-server admin.go:
- * neither reconnects).
+ * neither reconnects), 4012 another character of this login came online
+ * (alternate characters, Austin 2026-11-12: one character of a login online
+ * at a time; never reconnect).
  *
  * States: 'idle' (not started), 'connecting', 'online', 'offline' (retrying
  * with backoff), 'replaced' (4001, stopped), 'signed-out' (the ticket route
  * said 401, stopped), 'off' (503: the site has no realtime, stopped),
  * 'booted' (4010, stopped for this page), 'suspended' (4011, or the ticket
- * route's 403 groddle_suspended, stopped), 'stopped' (stop() was called).
+ * route's 403 groddle_suspended, stopped), 'other-character' (4012, or the
+ * ticket route's 409 character_changed: another character of this login
+ * plays now, stopped), 'stopped' (stop() was called).
  */
 import { UNNAMED_PLAYER } from './player-names.js?v=f9b78094';
 
@@ -29,6 +33,8 @@ export const CLOSE_SLOW = 4008;
 export const CLOSE_BOOTED = 4010;
 /** The account is suspended (the console's ban); nothing reconnects. */
 export const CLOSE_BANNED = 4011;
+/** Another character of this login came online (a second window switched character); nothing reconnects. */
+export const CLOSE_OTHER_CHARACTER = 4012;
 /** Our own close for a socket that went quiet (no frame for QUIET_MS). */
 export const CLOSE_QUIET = 4000;
 
@@ -223,7 +229,7 @@ export function createRealtimeClient({
   }
 
   async function connect() {
-    if (['replaced', 'signed-out', 'off', 'booted', 'suspended', 'stopped'].includes(state)) return;
+    if (['replaced', 'signed-out', 'off', 'booted', 'suspended', 'other-character', 'stopped'].includes(state)) return;
     const gen = ++generation;
     setState('connecting');
     let t;
@@ -234,6 +240,7 @@ export function createRealtimeClient({
       if (err?.status === 401) return stopFor('signed-out');
       if (err?.status === 503) return stopFor('off');
       if (err?.status === 403 && err?.code === 'groddle_suspended') return stopFor('suspended');
+      if (err?.status === 409 && err?.code === 'character_changed') return stopFor('other-character');
       return retryLater();
     }
     if (gen !== generation) return;
@@ -277,6 +284,7 @@ export function createRealtimeClient({
     if (code === CLOSE_REPLACED) return setState('replaced', { code });
     if (code === CLOSE_BOOTED) return setState('booted', { code });
     if (code === CLOSE_BANNED) return setState('suspended', { code });
+    if (code === CLOSE_OTHER_CHARACTER) return setState('other-character', { code });
     if (state === 'stopped') return;
     if (code === CLOSE_TICKET && ticketRetries < 2) {
       // A used or expired ticket: a new one straight away (twice, then back off).

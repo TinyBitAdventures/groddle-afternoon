@@ -19,13 +19,13 @@ import assert from 'node:assert/strict';
 import { resolveTokens } from './css-tokens.js';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { accountBackupFeature } from '../public/js/features/account-backup-feature.js?v=496ec380';
-import { homeStreetMpFeature } from '../public/js/features/home-street-mp-feature.js?v=49024ccb';
-import { yardVerbsMpFeature } from '../public/js/features/yard-verbs-mp-feature.js?v=a3cc8858';
+import { accountBackupFeature } from '../public/js/features/account-backup-feature.js?v=aeb7b804';
+import { homeStreetMpFeature } from '../public/js/features/home-street-mp-feature.js?v=e003a0d6';
+import { yardVerbsMpFeature } from '../public/js/features/yard-verbs-mp-feature.js?v=8a82be66';
 import { homePoolMpFeature } from '../public/js/features/home-pool-mp-feature.js?v=575920f2';
-import { qurazyFeature, resetQurazyFeatureForTests } from '../public/js/features/qurazy-feature.js?v=1854c182';
-import { QURAZY_SPAWN_LINE } from '../public/js/qurazy.js?v=a219d5dc';
-import { QURAZY_PLACEMENT_GROUP } from '../public/js/features/qurazy-feature.js?v=1854c182';
+import { qurazyFeature, resetQurazyFeatureForTests } from '../public/js/features/qurazy-feature.js?v=376b1617';
+import { QURAZY_SPAWN_LINE } from '../public/js/qurazy.js?v=72c4005a';
+import { QURAZY_PLACEMENT_GROUP } from '../public/js/features/qurazy-feature.js?v=376b1617';
 import { hubMapArtNote, hubMapSubtitle, questLogSummary } from '../public/js/panel-copy.js?v=3243b9b2';
 
 const root = join(import.meta.dirname, '..');
@@ -142,7 +142,7 @@ describe('solo asks no rest-nonce (the console 400)', () => {
       assert.match(read(rel), /engine\?\.mode !== 'multiplayer'|engine\?\.mode === 'multiplayer'/, rel);
     }
     assert.match(read('public/js/features/account-backup-feature.js'), /const session = await quietSession\(account\);/);
-    assert.match(read('public/js/features/account-backup-feature.js'), /import \{ quietSession \} from '\.\.\/online-boot\.js\?v=[0-9a-f]{8}';/);
+    assert.match(read('public/js/features/account-backup-feature.js'), /import \{ markContinued, quietSession \} from '\.\.\/online-boot\.js\?v=[0-9a-f]{8}';/);
     assert.match(read('public/js/features/index.js'), /account-backup-feature\.js\?v=[0-9a-f]{8}'/);
   });
 });

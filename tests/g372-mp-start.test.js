@@ -18,8 +18,8 @@ import assert from 'node:assert/strict';
 import { resolveTokens } from './css-tokens.js';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { quietSession } from '../public/js/online-boot.js?v=19450640';
-import { createMinnAccount } from '../public/js/minn-account.js?v=8f2741cd';
+import { quietSession } from '../public/js/online-boot.js?v=ef90a7af';
+import { createMinnAccount } from '../public/js/minn-account.js?v=460de12b';
 import { buildOnlinePage, ONLINE_BOOT_SRC } from '../tools/play-online/build.mjs';
 
 const root = join(import.meta.dirname, '..');
@@ -106,7 +106,7 @@ describe('G322: /play/online/ signed out asks no rest-nonce', () => {
 
   it('boot() asks quietSession, and the page loads online-boot under its new key', () => {
     const boot = read('public/js/online-boot.js');
-    const body = boot.slice(boot.indexOf('async function boot()'), boot.indexOf('async function enter('));
+    const body = boot.slice(boot.indexOf('async function boot('), boot.indexOf('async function enter('));
     assert.match(body, /const session = await quietSession\(account\);/);
     assert.doesNotMatch(body, /account\.session\(\)/);
     assert.match(ONLINE_BOOT_SRC, /^js\/online-boot\.js\?v=[0-9a-f]{8}$/);

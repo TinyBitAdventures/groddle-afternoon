@@ -41,7 +41,7 @@
 
 import { QUOIN_TYPES, creditQuoinStat } from '../quoins.js?v=7e0dec6d';
 import { quoinShardGrabberSound, quoinShardSoundKey } from '../quoin-shards.js?v=121156a0';
-import { LOCAL_STATES, SHARD_STATS, createSharedQuoinBook, fxShards, normalizeGrab, shardFor, statusOf } from '../shared-quoins.js?v=98d9f115';
+import { LOCAL_STATES, SHARD_STATS, createSharedQuoinBook, fxShards, normalizeGrab, shardFor, statusOf } from '../shared-quoins.js?v=89d7b201';
 
 export const SHARED_QUOINS_FEATURE_ID = 'shared-quoins';
 /** Status goes out on a change, and at least this often while on a street. */

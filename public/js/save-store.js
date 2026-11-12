@@ -29,6 +29,7 @@
 
 import { GAME_MODE, MULTIPLAYER } from './game-mode.js?v=1ecf2899';
 import { leaveHandoff, listenForClaims, newWriterId } from './save-claim.js?v=30cf5250';
+import { CHARACTER_CHANGED_EVENT, characterHeaders, characterId, isCharacterChanged } from './character-guard.js?v=510034a7';
 
 export { newWriterId };
 
@@ -169,6 +170,12 @@ function entriesOf(value) {
  * everything set so far, and written the newest write the site accepted, so
  * written >= mark() says a change is in the stored save even when more
  * changes keep the state from ever settling on "saved" (savedThrough).
+ *
+ * Alternate characters (2026-11-12): every write, the nonce retry's too, names the character
+ * this page plays (character, X-Groddle-Character). The site's 409 character_changed (another
+ * tab of this browser switched character) stops the page for good: state elsewhere with
+ * by: 'character', and neither takeover() nor retry() writes again, so a write can never land
+ * on another character. characterChanged() does the same when another call heard it first.
  */
 export function createSaveSync({
   url,
@@ -176,6 +183,7 @@ export function createSaveSync({
   nonceUrl = '',
   version = 0,
   writer = '',
+  character = 0,
   confirmedAt = null,
   payload,
   fetch: fetchFn = globalThis.fetch?.bind(globalThis),
@@ -202,6 +210,9 @@ export function createSaveSync({
   let current = { version, nonce, confirmedAt };
   let lastError = null;
   let refused = {};
+  /** Another character is signed in now: this page never writes again. */
+  let characterGone = false;
+  const playing = characterId(character);
   const blocked = () => SAVE_STOPPED.includes(state) || yielding;
   const setState = (next, detail = {}) => {
     if (next === state && !detail.force) return;
@@ -251,7 +262,7 @@ export function createSaveSync({
       credentials: 'same-origin',
       cache: 'no-store',
       keepalive: Boolean(keepalive) && text.length <= KEEPALIVE_LIMIT,
-      headers: { 'Content-Type': 'application/json', 'X-WP-Nonce': current.nonce },
+      headers: { 'Content-Type': 'application/json', 'X-WP-Nonce': current.nonce, ...characterHeaders(playing) },
       body: text,
     });
   }
@@ -272,6 +283,10 @@ export function createSaveSync({
       return 'ok';
     }
     lastError = { status: res.status, code: data?.code || '', message: typeof data?.message === 'string' ? data.message : '' };
+    if (isCharacterChanged(res.status, data)) {
+      characterGone = true;
+      return 'character';
+    }
     if (res.status === 409) {
       current.serverVersion = Number(data?.data?.version) || 0;
       refused = { serverVersion: current.serverVersion, otherUpdatedAt: data?.data?.updatedAt || null, otherSavedAt: Number(data?.data?.savedAt) || 0 };
@@ -312,6 +327,14 @@ export function createSaveSync({
         outcome = 'offline';
       }
       inFlight = null;
+      if (characterGone) {
+        // Stopped while this write was out: it may have landed (it named this page's character), but nothing follows it.
+        if (outcome === 'ok') landed = Math.max(landed, number);
+        takingOver = false;
+        clear();
+        if (state !== 'elsewhere') setState('elsewhere', { by: 'character', confirmedAt: current.confirmedAt });
+        return state;
+      }
       if (outcome === 'ok') {
         // A superseded answer is ok too: a newer copy of this page's is in already.
         landed = Math.max(landed, number);
@@ -355,7 +378,7 @@ export function createSaveSync({
    * claiming the save back (the other window then stops writing and says so).
    */
   function takeover() {
-    if (!['conflict', 'elsewhere'].includes(state) || yielding) return Promise.resolve(state);
+    if (!['conflict', 'elsewhere'].includes(state) || yielding || characterGone) return Promise.resolve(state);
     takingOver = true;
     dirty = true;
     state = 'pending';
@@ -363,7 +386,7 @@ export function createSaveSync({
   }
   /** "Try again" after the site refused a write (error): the next write goes now. */
   function retry() {
-    if (state !== 'error') return Promise.resolve(state);
+    if (state !== 'error' || characterGone) return Promise.resolve(state);
     state = 'pending';
     dirty = true;
     return flush();
@@ -387,12 +410,24 @@ export function createSaveSync({
     }
     return state;
   }
+  /** Another call heard the site's character_changed: stop writing now, as a refused write would. */
+  function characterChanged() {
+    if (characterGone) return state;
+    characterGone = true;
+    clear();
+    takingOver = false;
+    setState('elsewhere', { by: 'character', confirmedAt: current.confirmedAt, force: true });
+    return state;
+  }
   return {
     changed,
     flush,
     takeover,
     retry,
     yieldTo,
+    characterChanged,
+    /** The character every write names (0: none). */
+    get character() { return playing; },
     /** The first write that holds everything set so far: the next one while a change waits, else the last begun (0: the loaded save). */
     mark: () => (dirty ? started + 1 : started),
     /** The newest write the site accepted (see mark). */
@@ -449,6 +484,7 @@ export function createMultiplayerSaveStore(opts = {}) {
     nonceUrl: boot.nonceUrl || '',
     version: Number.isInteger(boot.version) ? boot.version : 0,
     writer,
+    character: boot.player?.id,
     confirmedAt: typeof boot.updatedAt === 'string' ? boot.updatedAt : null,
     payload: () => ({ kind: MULTIPLAYER_SAVE_KIND, format: SAVE_FORMAT, entries: Object.fromEntries(entries) }),
     fetch: opts.fetch ?? scope?.fetch?.bind(scope),
@@ -470,6 +506,8 @@ export function createMultiplayerSaveStore(opts = {}) {
       if (e?.detail?.choice === 'keep') sync.takeover();
       else if (e?.detail?.choice === 'retry') sync.retry();
     });
+    // Another call of this page (mail, an auction, the realtime ticket) heard that another character is signed in.
+    scope.addEventListener(CHARACTER_CHANGED_EVENT, () => { sync.characterChanged(); });
   }
   // Another tab of this browser opening the same character asks this one to save and stand down first.
   const claims = listenForClaims({ scope, player: boot.player?.id, writer, onClaim: () => sync.yieldTo() });

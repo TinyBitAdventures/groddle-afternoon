@@ -40,6 +40,7 @@
  * here), hsPiles, hsRestores (shared restoration ids here), hsLast.
  */
 
+import { announceCharacterChanged, characterHeaders, characterOf, isCharacterChanged } from '../character-guard.js?v=510034a7';
 import { ITEM_CATALOG, addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=60dfc9ca';
 import { RECIPE_CATALOG, isRecipeCatalogReady, setRecipeCatalog } from '../making.js?v=86fd3231';
 import { furnitureDef, furnitureScale, furnitureSize } from '../home-decor.js?v=b48dbc95';
@@ -52,11 +53,11 @@ import { NOTE_POLE_CONTAINERS, NOTE_POLE_PARTS, NOTE_POLE_SIGN_Y } from '../note
 import { textureFromUrl } from '../textures.js?v=f024bd6a';
 import { addSignBoard, signArmWidth, signLabel } from '../street-render.js?v=2e521905';
 import { openNotePicker, openNoteView } from '../note-view.js?v=eca7de52';
-import { homeStreetName, possessive, readVisitScene } from '../neighbours-mp.js?v=9f99de95';
-import { BACK_YARD_GROUND_Y, SIGN_PROMPT_LIFT, STREET_GROUND_Y, homesFeature, visitorHomeState } from './homes-feature.js?v=f361927d';
-import { projectApi } from './street-jobs-feature.js?v=b9706163';
-import { saveStore } from '../save-store.js?v=0abb8cf1';
-import { giveCarriedNote, takeCarriedNote, writtenCarriedNotes } from './street-furniture-feature.js?v=e9f52f88';
+import { homeStreetName, possessive, readVisitScene } from '../neighbours-mp.js?v=02c23c07';
+import { BACK_YARD_GROUND_Y, SIGN_PROMPT_LIFT, STREET_GROUND_Y, homesFeature, visitorHomeState } from './homes-feature.js?v=a0a1121b';
+import { projectApi } from './street-jobs-feature.js?v=a532a3af';
+import { saveStore } from '../save-store.js?v=89422a9c';
+import { giveCarriedNote, takeCarriedNote, writtenCarriedNotes } from './street-furniture-feature.js?v=021aa7f3';
 import {
   GOOD_NEIGHBOUR_AT,
   GOOD_NEIGHBOUR_COUNTER,
@@ -88,7 +89,7 @@ import {
   saleVerbs,
   signpostArms,
   signpostCandidates,
-} from '../home-street-mp.js?v=02b57a1c';
+} from '../home-street-mp.js?v=7ed1ff6a';
 
 export { HOME_STREET_MP_ID };
 
@@ -157,9 +158,11 @@ function createSite() {
     } catch { /* the answer below stands */ }
     return false;
   }
+  // Alternate characters: the sales and boxes this collects name the character this page plays (js/character-guard.js).
+  const character = characterOf(globalThis);
   async function call(path, { method = 'GET', body } = {}) {
     for (let attempt = 0; attempt < 2; attempt += 1) {
-      const headers = {};
+      const headers = { ...characterHeaders(character) };
       if (nonce) headers['X-WP-Nonce'] = nonce;
       if (body !== undefined) headers['Content-Type'] = 'application/json';
       let res;
@@ -173,6 +176,7 @@ function createSite() {
       let data = null;
       try { data = await res.json(); } catch { /* not JSON */ }
       if (res.status === 403 && data?.code === 'rest_cookie_invalid_nonce' && attempt === 0 && (await refresh())) continue;
+      if (character && isCharacterChanged(res.status, data)) announceCharacterChanged(globalThis, { character, path });
       if (!res.ok) throw Object.assign(new Error(typeof data?.message === 'string' ? data.message : T.failed), { status: res.status, code: data?.code || '' });
       return data;
     }

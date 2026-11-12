@@ -8,8 +8,8 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { LIGHTBOX_FIT, LIGHTBOX_PAN_STEP, LIGHTBOX_TEXT, fitPicture, lightboxFocusTarget, lightboxLink, openLightbox, plainClick, zoomScroll } from '../public/js/ui/picture-lightbox.js?v=0d2814c8';
-import { mountReportsSheet } from '../public/js/ui/reports-sheet.js?v=2c01d19d';
-import { REPORT_TEXT } from '../public/js/reports.js?v=df024080';
+import { mountReportsSheet } from '../public/js/ui/reports-sheet.js?v=0f67e69f';
+import { REPORT_TEXT } from '../public/js/reports.js?v=d6df7b91';
 
 const root = join(import.meta.dirname, '..');
 const read = (p) => readFileSync(join(root, p), 'utf8');

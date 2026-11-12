@@ -38,13 +38,13 @@
 
 import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=59ca0e2b';
 import { addItem, countItem, ensureItem, registerItemUse, removeItem } from '../inventory.js?v=60dfc9ca';
-import { MUSICBLOCK_CATALOG, ensureMusicblockItems } from '../musicblocks.js?v=3a7893f4';
+import { MUSICBLOCK_CATALOG, ensureMusicblockItems } from '../musicblocks.js?v=4b2e589f';
 import { energyMax, loseMood, metabolicGain, moodMax, shiftMetabolic } from '../metabolics.js?v=8504134e';
 import { grantMoodXp } from '../mood-xp.js?v=958e7680';
 import { slugsFromEffects } from '../speech-slugs.js?v=130338f9';
-import { getGameDayKey } from '../game-day.js?v=188ef3fa';
+import { getGameDayKey } from '../game-day.js?v=f88e6e16';
 import { cleanQuestMarkup } from '../quests.js?v=2b882eb6';
-import { followPath } from '../street-creatures.js?v=1ee77084';
+import { followPath } from '../street-creatures.js?v=cef735cd';
 import { walkSurfaceY } from '../walk-surface.js?v=106bfdc5';
 import { isStandable } from '../street-model.js?v=b6cb6a4e';
 import {
@@ -77,7 +77,7 @@ import {
   musicblocksInPack,
   normalizeCrabMemory,
   playToday,
-} from '../crabs.js?v=3084ea41';
+} from '../crabs.js?v=1db99d1b';
 
 const ART = 'assets/sprites/crabs/';
 /** OGA npc_crab sheets: 131x129 cells, 6 columns; populated counts measured. */

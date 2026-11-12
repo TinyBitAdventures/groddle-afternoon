@@ -46,7 +46,7 @@
  */
 
 import { ensureItem } from './inventory.js?v=60dfc9ca';
-import { GAME_DAY_MS, getGameDayKey, getGameDayStartMs } from './game-day.js?v=188ef3fa';
+import { GAME_DAY_MS, getGameDayKey, getGameDayStartMs } from './game-day.js?v=f88e6e16';
 import { giantDisplayName } from './giant-names.js?v=0e295891';
 
 export const HELL_STATE_VERSION = 1;

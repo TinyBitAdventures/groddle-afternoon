@@ -17,7 +17,14 @@
  *
  * This module never imports js/save-store.js: /play/online/ uses it to
  * fetch the save BEFORE the store (and game.js) loads.
+ *
+ * Alternate characters (2026-11-12): every call names the character the page plays in the
+ * X-Groddle-Character header (js/character-guard.js; by default the multiplayer boot data's
+ * player, so each feature's account sends it with no change of its own). The site's 409
+ * character_changed is announced on the page, which stops writing.
  */
+
+import { announceCharacterChanged, characterHeaders, characterId, characterOf, isCharacterChanged } from './character-guard.js?v=510034a7';
 
 /** Where the account lives, from the page's base URI (the site root: play pages set <base>). */
 export function minnUrls(baseUri) {
@@ -38,16 +45,18 @@ const NONCE = /^[0-9a-f]{10}$/;
  * The account and what the game's own calls are built on: { account, call, post, refusal, signedIn,
  * failed, buddyCall, refreshNonce }.
  *
- * @param {{ baseUri: string, fetch?: typeof fetch, nonce?: string }} opts
+ * @param {{ baseUri: string, fetch?: typeof fetch, nonce?: string, character?: number }} opts
  *   nonce: a REST nonce already in hand (the multiplayer boot data), so the
- *   first call needs no admin-ajax round trip.
+ *   first call needs no admin-ajax round trip. character: the user id this page plays
+ *   (X-Groddle-Character), by default the boot data's player; 0 sends none.
  */
-export function accountParts({ baseUri, fetch: fetchFn = globalThis.fetch?.bind(globalThis), nonce: givenNonce = '' } = {}) {
+export function accountParts({ baseUri, fetch: fetchFn = globalThis.fetch?.bind(globalThis), nonce: givenNonce = '', character: givenCharacter = characterOf(globalThis) } = {}) {
   const urls = minnUrls(baseUri);
   let nonce = NONCE.test(String(givenNonce)) ? String(givenNonce) : '';
+  let character = characterId(givenCharacter);
 
   async function call(path, { method = 'GET', body, keepalive = false } = {}) {
-    const headers = {};
+    const headers = { ...characterHeaders(character) };
     if (nonce) headers['X-WP-Nonce'] = nonce;
     if (body !== undefined) headers['Content-Type'] = 'application/json';
     const res = await fetchFn(urls.api + path, {
@@ -62,6 +71,7 @@ export function accountParts({ baseUri, fetch: fetchFn = globalThis.fetch?.bind(
     if (fresh) nonce = fresh;
     let data = null;
     try { data = await res.json(); } catch { /* not JSON: no Minn here */ }
+    if (character && isCharacterChanged(res.status, data)) announceCharacterChanged(globalThis, { character, path });
     return { status: res.status, ok: res.ok, data };
   }
 
@@ -138,6 +148,14 @@ export function accountParts({ baseUri, fetch: fetchFn = globalThis.fetch?.bind(
     urls,
 
     get nonce() { return nonce; },
+
+    /** The character this page's calls name (X-Groddle-Character), 0 for none. */
+    get character() { return character; },
+
+    /** Names another character on the calls from now on (the start card, once it knows who is signed in). */
+    useCharacter(id) {
+      character = characterId(id);
+    },
 
     /**
      * Who is playing: { minn, signedIn, player, backups, account, admin? }. minn is false when
@@ -247,6 +265,50 @@ export function accountParts({ baseUri, fetch: fetchFn = globalThis.fetch?.bind(
       const r = await post('session', undefined, 'DELETE');
       nonce = '';
       return { ok: r.ok };
+    },
+
+    /**
+     * The login's characters (groddle/v1/characters): { login, current, limit, canCreate,
+     * nextCreateAt, characters: [{ id, name, level, lastPlayedAt, retired, first }] }.
+     * Throws with .status and .code on a refusal (401 signed out).
+     */
+    async characters() {
+      return buddyCall('Loading your characters', 'characters');
+    },
+
+    /**
+     * A new character on this login: { ok: true, character } or a refusal { ok: false, code,
+     * message, fields } (422 the name, with fields.name in the sign-up's words; 409 the limit;
+     * 429 one a day). It is not played yet: playCharacter(id) does that.
+     */
+    async createCharacter(name) {
+      const r = await post('characters', { name: String(name ?? '').trim().replace(/\s+/g, ' ') });
+      return r.ok && r.data?.character ? { ok: true, character: r.data.character } : { ...refusal(r), status: r.status };
+    },
+
+    /**
+     * Signs this browser in as another character of the login: { ok: true } with the new
+     * session's nonce in hand and the calls naming that character, or a refusal.
+     */
+    async playCharacter(id) {
+      const r = await post(`characters/${Number(id)}/play`, {});
+      if (!r.ok || r.data?.ok !== true) return { ...refusal(r), status: r.status };
+      nonce = NONCE.test(String(r.data.nonce || '')) ? String(r.data.nonce) : '';
+      if (!nonce) await refreshNonce();
+      character = characterId(id);
+      return { ok: true };
+    },
+
+    /** Retires an extra character (hidden, kept, restorable): { ok } or a refusal. */
+    async retireCharacter(id) {
+      const r = await post(`characters/${Number(id)}/retire`, {});
+      return r.ok ? { ok: true } : refusal(r);
+    },
+
+    /** Brings a retired character back: { ok } or a refusal. */
+    async restoreCharacter(id) {
+      const r = await post(`characters/${Number(id)}/restore`, {});
+      return r.ok ? { ok: true } : refusal(r);
     },
 
     /**

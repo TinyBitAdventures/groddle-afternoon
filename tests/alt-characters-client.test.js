@@ -1,0 +1,363 @@
+/**
+ * Alternate characters, the game's side (Austin's rulings of 2026-11-12; the site's contract:
+ * groddle/v1/characters, characters/{id}/play, the X-Groddle-Character header and its 409
+ * character_changed; the realtime server's close 4012). The start card's choices
+ * (js/online-boot.js), the account's character calls (js/minn-account-core.js), the header on
+ * every write and the stop on 409 (js/character-guard.js, js/save-store.js), the realtime
+ * client's 4012 (js/realtime-client.js, js/features/realtime-feature.js) and Menu > Switch
+ * character (js/features/account-backup-feature.js). The browser check with stubbed routes is
+ * tools/qa/alt-characters-check.mjs.
+ */
+import assert from 'node:assert/strict';
+import { describe, it } from 'node:test';
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+
+import { CHARACTER_CHANGED, CHARACTER_CHANGED_EVENT, CHARACTER_HEADER, characterHeaders, characterOf, isCharacterChanged } from '../public/js/character-guard.js?v=510034a7';
+import { createMinnAccountCore } from '../public/js/minn-account-core.js?v=74c75177';
+import { createSaveSync } from '../public/js/save-store.js?v=89422a9c';
+import { CLOSE_OTHER_CHARACTER, createRealtimeClient } from '../public/js/realtime-client.js?v=cda54c6e';
+import { OTHER_CHARACTER_TEXT, statusText } from '../public/js/features/realtime-feature.js?v=562a84fb';
+import { CHARACTER_COPY, SAVE_ALERT_COPY, characterChoices, continuesAs, createRefusalText, saveAlertFor } from '../public/js/online-boot.js?v=ef90a7af';
+import { LOCAL_STATES } from '../public/js/shared-quoins.js?v=89d7b201';
+import { menuRowFor } from '../public/js/ui/topbar.js?v=e00f6c81';
+
+const root = join(import.meta.dirname, '..');
+const read = (rel) => readFileSync(join(root, rel), 'utf8');
+const code = (rel) => read(rel).replace(/\/\*[\s\S]*?\*\/|\/\/[^\n]*/g, '');
+const flush = () => new Promise((r) => setImmediate(r));
+const BASE = 'https://groddle.localhost/';
+
+/** A fetch that answers from a list and records each request's url, method and headers. */
+function scripted(answers) {
+  const seen = [];
+  const queue = [...answers];
+  const fn = async (url, init = {}) => {
+    seen.push({ url: String(url), method: init.method || 'GET', headers: { ...(init.headers || {}) }, body: init.body });
+    const a = queue.shift() || { status: 200, body: {} };
+    return { status: a.status, ok: a.status >= 200 && a.status < 300, headers: { get: (h) => (h === 'X-WP-Nonce' ? a.nonce || null : null) }, json: async () => a.body, text: async () => (typeof a.body === 'string' ? a.body : JSON.stringify(a.body)) };
+  };
+  return { fn, seen };
+}
+
+/** Catches the page events a module dispatches on globalThis for the length of fn. */
+async function hearing(fn) {
+  const heard = [];
+  const had = { dispatchEvent: globalThis.dispatchEvent, CustomEvent: globalThis.CustomEvent };
+  globalThis.dispatchEvent = (e) => heard.push(e);
+  globalThis.CustomEvent ??= class extends Event { constructor(type, init = {}) { super(type); this.detail = init.detail; } };
+  try {
+    await fn();
+  } finally {
+    if (had.dispatchEvent) globalThis.dispatchEvent = had.dispatchEvent;
+    else delete globalThis.dispatchEvent;
+  }
+  return heard;
+}
+
+describe('character-guard: the header and the refusal', () => {
+  it('names a positive whole id only, and reads the boot data\'s player', () => {
+    assert.equal(CHARACTER_HEADER, 'X-Groddle-Character');
+    assert.deepEqual(characterHeaders(54), { 'X-Groddle-Character': '54' });
+    for (const bad of [0, -1, 1.5, 'x', null, undefined]) assert.deepEqual(characterHeaders(bad), {}, String(bad));
+    assert.equal(characterOf({ GRODDLE_MP_BOOT: { player: { id: 61 } } }), 61);
+    assert.equal(characterOf({}), 0, 'solo and the phone send none');
+  });
+
+  it('is the site\'s 409 character_changed and nothing else', () => {
+    assert.equal(CHARACTER_CHANGED, 'character_changed');
+    assert.equal(isCharacterChanged(409, { code: 'character_changed' }), true);
+    assert.equal(isCharacterChanged(409, { code: 'groddle_save_elsewhere' }), false);
+    assert.equal(isCharacterChanged(403, { code: 'character_changed' }), false);
+  });
+});
+
+describe('the account: characters and the header on every call', () => {
+  it('sends the header once it knows the character, and none before', async () => {
+    const { fn, seen } = scripted([{ status: 200, body: {} }, { status: 200, body: {} }]);
+    const account = createMinnAccountCore({ baseUri: BASE, fetch: fn, nonce: 'abcdef0123' });
+    assert.equal(account.character, 0);
+    await account.presence();
+    assert.equal(seen[0].headers['X-Groddle-Character'], undefined);
+    account.useCharacter(54);
+    await account.playerMail();
+    assert.equal(seen[1].headers['X-Groddle-Character'], '54');
+  });
+
+  it('takes the character from the multiplayer boot data by default (every feature\'s own account)', async () => {
+    globalThis.GRODDLE_MP_BOOT = { player: { id: 61, name: 'Ada' } };
+    try {
+      const { fn, seen } = scripted([{ status: 200, body: {} }]);
+      const account = createMinnAccountCore({ baseUri: BASE, fetch: fn, nonce: 'abcdef0123' });
+      await account.playerMail();
+      assert.equal(seen[0].headers['X-Groddle-Character'], '61');
+    } finally {
+      delete globalThis.GRODDLE_MP_BOOT;
+    }
+  });
+
+  it('a 409 character_changed is announced on the page', async () => {
+    const { fn } = scripted([{ status: 409, body: { code: 'character_changed', message: 'x' } }]);
+    const account = createMinnAccountCore({ baseUri: BASE, fetch: fn, nonce: 'abcdef0123', character: 54 });
+    const heard = await hearing(async () => {
+      await assert.rejects(account.playerMail(), (e) => e.status === 409 && e.code === 'character_changed');
+    });
+    assert.deepEqual(heard.map((e) => e.type), [CHARACTER_CHANGED_EVENT]);
+  });
+
+  it('lists, makes, plays, retires and restores by the contract\'s routes', async () => {
+    const list = { login: 54, current: 54, limit: 3, canCreate: true, nextCreateAt: null, characters: [{ id: 54, name: 'Ada', level: 7, lastPlayedAt: 1, retired: false, first: true }] };
+    const { fn, seen } = scripted([
+      { status: 200, body: list },
+      { status: 201, body: { character: { id: 77, name: 'Bo', level: 1, lastPlayedAt: null, retired: false, first: false } } },
+      { status: 200, body: { ok: true, nonce: '0123456789' }, nonce: 'aaaaaaaaaa' },
+      { status: 200, body: { ok: true } },
+      { status: 200, body: { ok: true } },
+    ]);
+    const account = createMinnAccountCore({ baseUri: BASE, fetch: fn, nonce: 'abcdef0123', character: 54 });
+    assert.deepEqual(await account.characters(), list);
+    const made = await account.createCharacter('  Bo  ');
+    assert.equal(made.ok, true);
+    assert.equal(made.character.id, 77);
+    assert.deepEqual(JSON.parse(seen[1].body), { name: 'Bo' });
+    assert.deepEqual(await account.playCharacter(77), { ok: true });
+    assert.equal(account.nonce, '0123456789', 'the new session\'s nonce from the answer');
+    assert.equal(account.character, 77, 'the calls name the new character from now on');
+    assert.equal(seen[2].headers['X-Groddle-Character'], '54', 'the play call names the one signed in');
+    await account.retireCharacter(77);
+    await account.restoreCharacter(77);
+    assert.deepEqual(seen.map((s) => `${s.method} ${s.url.replace(`${BASE}wp-json/groddle/v1/`, '')}`), [
+      'GET characters', 'POST characters', 'POST characters/77/play', 'POST characters/77/retire', 'POST characters/77/restore',
+    ]);
+    assert.equal(seen[4].headers['X-Groddle-Character'], '77');
+  });
+
+  it('a refused new character keeps its status and the name\'s own words', async () => {
+    const { fn } = scripted([
+      { status: 422, body: { code: 'groddle_invalid', message: 'Someone already has that name. Try another.', fields: { name: 'Someone already has that name. Try another.' } } },
+      { status: 409, body: { code: 'characters_limit', message: 'x' } },
+      { status: 429, body: { code: 'characters_daily', message: 'x' } },
+    ]);
+    const account = createMinnAccountCore({ baseUri: BASE, fetch: fn, nonce: 'abcdef0123', character: 54 });
+    const name = await account.createCharacter('Ada');
+    assert.equal(name.ok, false);
+    assert.equal(createRefusalText(name), 'Someone already has that name. Try another.');
+    assert.equal(createRefusalText(await account.createCharacter('Bo')), 'You have 3 characters.');
+    assert.equal(createRefusalText(await account.createCharacter('Cy')), 'You can make another character tomorrow.');
+  });
+});
+
+describe('the start card\'s choices (online-boot characterChoices)', () => {
+  const ada = { id: 54, name: 'Ada', level: 12, lastPlayedAt: 100, retired: false, first: true };
+  const bo = { id: 77, name: 'Bo', level: 3, lastPlayedAt: 200, retired: false, first: false };
+  const cy = { id: 80, name: 'Cy', level: 1, lastPlayedAt: null, retired: false, first: false };
+  const session = (id, name) => ({ player: { id, name } });
+
+  it('one character: its row, and a fresh one on offer', () => {
+    const c = characterChoices({ current: 54, limit: 3, canCreate: true, nextCreateAt: null, characters: [ada] }, session(54, 'Ada'));
+    assert.deepEqual(c.rows, [{ id: 54, name: 'Ada', level: 12, current: true }]);
+    assert.deepEqual(c.create, { can: true, note: '', limit: 3 });
+  });
+
+  it('two characters: the one signed in first, then the rest as the site lists them', () => {
+    const c = characterChoices({ current: 77, limit: 3, canCreate: false, nextCreateAt: 1_900_000_000, characters: [ada, bo] }, session(77, 'Bo'));
+    assert.deepEqual(c.rows.map((r) => [r.name, r.current]), [['Bo', true], ['Ada', false]]);
+    assert.equal(c.create.can, false);
+    assert.equal(c.create.note, 'You can make another character tomorrow.');
+  });
+
+  it('three characters: no fresh one, said plainly; a retired one waits apart', () => {
+    const c = characterChoices({ current: 54, limit: 3, canCreate: false, nextCreateAt: null, characters: [ada, bo, cy] }, session(54, 'Ada'));
+    assert.equal(c.rows.length, 3);
+    assert.equal(c.create.note, 'You have 3 characters.');
+    const r = characterChoices({ current: 54, limit: 3, canCreate: false, characters: [ada, { ...bo, retired: true }, cy] }, session(54, 'Ada'));
+    assert.deepEqual(r.rows.map((x) => x.name), ['Ada', 'Cy']);
+    assert.deepEqual(r.retired.map((x) => x.name), ['Bo']);
+    assert.equal(r.create.note, 'You have 3 characters.', 'a retired character still counts');
+  });
+
+  it('no list (an older site, or it failed): the signed-in character alone, no fresh one', () => {
+    const c = characterChoices(null, session(54, 'Ada'));
+    assert.deepEqual(c.rows, [{ id: 54, name: 'Ada', level: null, current: true }]);
+    assert.equal(c.create, null);
+  });
+
+  it('the words are plain, no em-dashes', () => {
+    assert.equal(CHARACTER_COPY.play('Ada'), 'Play as Ada');
+    assert.equal(CHARACTER_COPY.level(12), 'Level 12');
+    assert.equal(CHARACTER_COPY.fresh, 'Start a fresh character');
+    const words = JSON.stringify(CHARACTER_COPY, (k, v) => (typeof v === 'function' ? v('Ada') : v));
+    assert.doesNotMatch(words, /—/);
+    assert.doesNotMatch(code('public/js/online-boot.js'), /—/);
+  });
+
+  it('a tab goes straight in only as the character it played (or whoever, just signed in)', () => {
+    assert.equal(continuesAs('54', 54), true);
+    assert.equal(continuesAs('54', 77), false, 'another tab switched: the card shows');
+    assert.equal(continuesAs('*', 77), true);
+    assert.equal(continuesAs('1', 54), false, 'the old one-for-all mark shows the card once');
+    assert.equal(continuesAs(null, 54), false);
+  });
+
+  it('the card offers Start a fresh character, Play solo and Not <name>? Sign out, and boots again after a switch', () => {
+    const src = read('public/js/online-boot.js');
+    assert.match(src, /const r = await account\.playCharacter\(id\);\n\s*if \(r\.ok\) \{\n\s*onSwitched\?\.\(id\);/);
+    assert.match(src, /onSwitched: \(id\) => \{ markContinued\(id\); boot\(\{ account \}\); \}/);
+    assert.match(src, /const made = await account\.createCharacter\(name\);/);
+    assert.match(src, /await switchTo\(id, String\(made\.character\.name \|\| name\)\);/, 'made, then played');
+    assert.match(src, /const problem = characterNameProblem\(name\);/, 'the sign-up\'s own name rules first');
+    assert.match(src, /name \? `Not \$\{name\}\? Sign out` : 'Sign out'/);
+    assert.match(src, /account\.useCharacter\(session\.player\?\.id\);/);
+  });
+});
+
+describe('the save: the header on every write, and a stop on character_changed', () => {
+  function syncWith(answers, opts = {}) {
+    const { fn, seen } = scripted(answers);
+    const states = [];
+    const sync = createSaveSync({ url: `${BASE}wp-json/groddle/v1/save`, nonce: 'abcdef0123', nonceUrl: `${BASE}nonce`, writer: 'abcd1234abcd1234', character: 54, payload: () => ({ entries: {} }), fetch: fn, onState: (s, d) => states.push([s, d]), timers: { setTimeout: () => 0, clearTimeout: () => {} }, ...opts });
+    return { sync, seen, states };
+  }
+
+  it('names the character on a write and on the stale-nonce retry', async () => {
+    const { sync, seen } = syncWith([
+      { status: 403, body: { code: 'rest_cookie_invalid_nonce' } },
+      { status: 200, body: '0123456789' },
+      { status: 200, body: { version: 5, updatedAt: '2026-11-12T10:00:00Z' } },
+    ]);
+    sync.changed();
+    await sync.flush();
+    const writes = seen.filter((s) => s.method === 'PUT');
+    assert.equal(writes.length, 2);
+    for (const w of writes) assert.equal(w.headers['X-Groddle-Character'], '54');
+    assert.equal(sync.state, 'saved');
+  });
+
+  it('a 409 character_changed stops the page for good: no keep, no retry, no more writes', async () => {
+    const { sync, seen, states } = syncWith([{ status: 409, body: { code: 'character_changed' } }]);
+    sync.changed();
+    await sync.flush();
+    assert.equal(sync.state, 'elsewhere');
+    assert.equal(states.at(-1)[1].by, 'character');
+    await sync.takeover();
+    await sync.retry();
+    sync.changed();
+    await sync.flush();
+    await sync.flush({ keepalive: true });
+    assert.equal(seen.length, 1, 'nothing more was sent');
+  });
+
+  it('another call heard it first: the save stops without a write, and a write in flight never turns it back', async () => {
+    let release;
+    const gate = new Promise((r) => { release = r; });
+    const seen = [];
+    const fetch = async (url, init) => {
+      seen.push(init);
+      await gate;
+      return { status: 200, ok: true, headers: { get: () => null }, json: async () => ({ version: 5, updatedAt: '2026-11-12T10:00:00Z' }) };
+    };
+    const sync = createSaveSync({ url: 'x', nonce: 'abcdef0123', character: 54, payload: () => ({}), fetch, timers: { setTimeout: () => 0, clearTimeout: () => {} } });
+    sync.changed();
+    const out = sync.flush();
+    await flush();
+    sync.characterChanged();
+    assert.equal(sync.state, 'elsewhere');
+    release();
+    await out;
+    assert.equal(sync.state, 'elsewhere');
+    sync.changed();
+    await sync.flush();
+    assert.equal(seen.length, 1);
+  });
+
+  it('the store listens for the page\'s character_changed, and the alert offers Choose a character', () => {
+    assert.match(read('public/js/save-store.js'), /scope\.addEventListener\(CHARACTER_CHANGED_EVENT, \(\) => \{ sync\.characterChanged\(\); \}\);/);
+    assert.match(read('public/js/save-store.js'), /character: boot\.player\?\.id,/);
+    const alert = saveAlertFor('elsewhere', { by: 'character' });
+    assert.equal(alert.title, 'Playing in another window', 'the existing playing-elsewhere state');
+    assert.equal(alert.body, SAVE_ALERT_COPY.character.body);
+    assert.deepEqual(alert.buttons, [['choose', 'Choose a character']]);
+    assert.match(read('public/js/online-boot.js'), /if \(choice === 'choose'\) markContinued\(false\);\n\s*location\.reload\(\);/);
+  });
+
+  it('the home sales and boxes helpers name the character too', () => {
+    for (const rel of ['public/js/features/home-storage-feature.js', 'public/js/features/home-street-mp-feature.js']) {
+      const src = read(rel);
+      assert.match(src, /const headers = \{ \.\.\.characterHeaders\(character\) \};/, rel);
+      assert.match(src, /if \(character && isCharacterChanged\(res\.status, data\)\) announceCharacterChanged\(globalThis, \{ character, path \}\);/, rel);
+    }
+  });
+});
+
+describe('realtime: close 4012, another character plays now', () => {
+  function client(ticket) {
+    const made = [];
+    class Sock {
+      constructor() { this.readyState = 0; this.sent = []; made.push(this); }
+      send(d) { this.sent.push(JSON.parse(d)); }
+      close() { this.readyState = 3; }
+    }
+    const timers = [];
+    const c = createRealtimeClient({ ticket, baseUri: BASE, WebSocket: Sock, setTimeout: (fn, ms) => timers.push({ fn, ms }), clearTimeout: () => {}, now: () => 0, random: () => 0.5 });
+    return { c, made, timers };
+  }
+
+  it('stops and never reconnects', async () => {
+    let asked = 0;
+    const { c, made, timers } = client(async () => { asked += 1; return { ticket: 't', path: '/ws' }; });
+    c.start();
+    await flush();
+    const ws = made[0];
+    ws.readyState = 1;
+    ws.onopen();
+    ws.onmessage({ data: JSON.stringify({ t: 'hello', you: { id: 54, name: 'Ada' } }) });
+    ws.readyState = 3;
+    ws.onclose({ code: CLOSE_OTHER_CHARACTER });
+    assert.equal(CLOSE_OTHER_CHARACTER, 4012);
+    assert.equal(c.state, 'other-character');
+    for (const t of timers.splice(0)) t.fn();
+    await flush();
+    assert.equal(asked, 1);
+    assert.equal(made.length, 1);
+  });
+
+  it('the ticket route\'s 409 character_changed stops it the same way', async () => {
+    const { c, made } = client(async () => { throw Object.assign(new Error('no'), { status: 409, code: 'character_changed' }); });
+    c.start();
+    await flush();
+    assert.equal(c.state, 'other-character');
+    assert.equal(made.length, 0);
+  });
+
+  it('says so in the exact words, and shared things go back to local rules', () => {
+    assert.equal(OTHER_CHARACTER_TEXT.note, "You're playing as another character in another window.");
+    assert.equal(statusText('other-character'), 'Playing as another character');
+    assert.ok(LOCAL_STATES.has('other-character'));
+    const src = read('public/js/features/realtime-feature.js');
+    assert.match(src, /if \(state === 'other-character'\) \{\n\s*addLog\(\{ note: true, text: OTHER_CHARACTER_TEXT\.note \}\);/);
+    for (const rel of ['public/js/features/street-objects-feature.js', 'public/js/features/shared-patches-feature.js', 'public/js/features/shared-gardens-feature.js']) {
+      assert.match(read(rel), /'replaced', 'other-character', 'stopped'/, rel);
+    }
+  });
+});
+
+describe('Menu > Switch character (account-backup-feature)', () => {
+  const src = read('public/js/features/account-backup-feature.js');
+
+  it('sits beside Sign out, in the Menu and the Account panel', () => {
+    assert.match(src, /id: 'switch-character-btn'/);
+    assert.match(src, /list\.append\(acct, swap, btn\);/);
+    assert.match(src, /'data-account-switch-character': ''/);
+    assert.match(src, /actions\.append\(swap, out\);/);
+    assert.deepEqual(menuRowFor('switch-character-btn'), { group: 'settings', rank: 2 });
+    assert.ok(menuRowFor('signout-btn').rank > menuRowFor('switch-character-btn').rank);
+  });
+
+  it('saves first, forgets this tab\'s character, then goes to the start card', () => {
+    const body = src.slice(src.indexOf('async function switchCharacter('), src.indexOf('/** Multiplayer\'s Account panel'));
+    const order = ['engine.save?.()', 'await saveStore.flush?.(); await saveStore.flush?.();', 'markContinued(false);', 'location.href = account.urls.online;'].map((s) => body.indexOf(s));
+    assert.ok(order.every((i) => i > 0), String(order));
+    assert.deepEqual([...order].sort((a, b) => a - b), order);
+    assert.doesNotMatch(body, /signOut/, 'the session stays');
+  });
+});

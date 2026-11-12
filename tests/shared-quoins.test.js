@@ -23,8 +23,8 @@ import {
   normalizeSync,
   shardFor,
   statusOf,
-} from '../public/js/shared-quoins.js?v=98d9f115';
-import { sharedQuoinsFeature } from '../public/js/features/shared-quoins-feature.js?v=c75498d5';
+} from '../public/js/shared-quoins.js?v=89d7b201';
+import { sharedQuoinsFeature } from '../public/js/features/shared-quoins-feature.js?v=8a7aef48';
 import {
   QUOIN_SHARD_FLOOR,
   QUOIN_SHARD_NEAR,

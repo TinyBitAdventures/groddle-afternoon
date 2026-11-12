@@ -70,7 +70,7 @@ import { addItem, countItem, ITEM_CATALOG, itemIcon } from '../inventory.js?v=60
 import { JOB_WORK_OVERLAY, jobWorkToolScale, jobWorkToolSheet } from '../job-work-fx.js?v=ee7e10ca';
 import { frameTexture, sourceFromUrl, textureFromUrl } from '../textures.js?v=f024bd6a';
 import { gardenGrowModifier } from '../imagination-effects.js?v=70169933';
-import { saveStore } from '../save-store.js?v=0abb8cf1';
+import { saveStore } from '../save-store.js?v=89422a9c';
 import {
   LOCK_LINE,
   SHARED_GARDEN_STREETS,
@@ -94,7 +94,7 @@ const APPLIED_KEEP = 100;
  * is there pays for it from the earning budget, which an earner who spent theirs would see clamped.
  */
 const GRANT_SAVE_DELAY_MS = 2500;
-const LOCAL_STATES = new Set(['off', 'signed-out', 'replaced', 'stopped']);
+const LOCAL_STATES = new Set(['off', 'signed-out', 'replaced', 'other-character', 'stopped']);
 const BLOCKED_SAVES = new Set(['conflict', 'elsewhere', 'signed-out', 'error', 'offline']);
 const COPY = Object.freeze({
   connecting: 'The street is still connecting. Try again in a moment.',

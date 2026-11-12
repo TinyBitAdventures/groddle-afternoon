@@ -19,6 +19,9 @@
  * password, each with the current password; Your profile, from
  * profiles-feature) and Sign out: the save is
  * written first, then the session ends and the page goes back to the gate.
+ * Beside Sign out, Switch character (alternate characters, Austin 2026-11-12):
+ * the save is written first, then the tab forgets its character and goes back
+ * to the start card, which lists the login's characters (js/online-boot.js).
  *
  * Off in practice copies (?practice=1 swaps the storage) and on a plain
  * static server (no account routes answer).
@@ -29,12 +32,12 @@
  * QA: /play/ on groddle.localhost, Menu, Account; /play/online/, Menu, Sign out.
  */
 
-import { createMinnAccount } from '../minn-account.js?v=8f2741cd';
+import { createMinnAccount } from '../minn-account.js?v=460de12b';
 import { mountAccountForms, mountAccountSettings, mountPresenceSetting } from '../account-forms.js?v=318b6815';
-import { createBrowserSaveStore, freezeSoloSaves, restoreSoloSave, saveStore, savedAtOf, soloSaveSnapshot } from '../save-store.js?v=0abb8cf1';
-import { formatGameDayLabel } from '../game-day.js?v=188ef3fa';
+import { createBrowserSaveStore, freezeSoloSaves, restoreSoloSave, saveStore, savedAtOf, soloSaveSnapshot } from '../save-store.js?v=89422a9c';
+import { formatGameDayLabel } from '../game-day.js?v=f88e6e16';
 import { multiplayerEntryUrl } from '../game-mode.js?v=1ecf2899';
-import { quietSession } from '../online-boot.js?v=19450640';
+import { markContinued, quietSession } from '../online-boot.js?v=ef90a7af';
 
 /** Which slot a new backup goes to: the first empty one, else the oldest (which then needs a yes). */
 export function slotForNewBackup(backups, slots) {
@@ -351,7 +354,32 @@ async function signOutMultiplayer(engine, account, button) {
   location.href = account.urls.online;
 }
 
-/** Multiplayer's Account panel: who you play as, your email and password, Sign out. */
+/** The words of Switch character (plain remake copy, no em-dashes). */
+export const SWITCH_COPY = Object.freeze({
+  button: 'Switch character',
+  title: 'Save and go back to pick another character',
+  busy: 'Saving…',
+});
+
+/**
+ * Back to the start card to play another character of this login: the save is written first (as
+ * Sign out does), then this tab forgets its character (online-boot CONTINUE_KEY) so the card shows.
+ * The session stays: the card's Play as <name> signs in as the one picked.
+ */
+async function switchCharacter(engine, account, button) {
+  if (button) {
+    button.disabled = true;
+    button.textContent = SWITCH_COPY.busy;
+  }
+  try { engine.save?.(); } catch { /* the store writes what it has */ }
+  // Twice: a write already in flight resolves the first, the newest change goes in the second.
+  try { await saveStore.flush?.(); await saveStore.flush?.(); } catch { /* the card loads what the site has */ }
+  markContinued(false);
+  engine.setData?.('accountSession', 'switching');
+  location.href = account.urls.online;
+}
+
+/** Multiplayer's Account panel: who you play as, your email and password, Switch character, Sign out. */
 function createMultiplayerPanel(engine, account) {
   if (!document.getElementById('account-backup-css')) {
     const style = el('style', { id: 'account-backup-css' });
@@ -395,16 +423,18 @@ function createMultiplayerPanel(engine, account) {
       panel.append(profile);
       if (!engine.query?.('accountProfile', profile, engine)) profile.remove();
       const actions = el('div', { class: 'account-actions' });
+      const swap = el('button', { type: 'button', class: 'alt', 'data-account-switch-character': '' }, SWITCH_COPY.button);
+      swap.addEventListener('click', () => switchCharacter(engine, account, swap));
       const out = el('button', { type: 'button', class: 'alt', 'data-account-signout': '' }, 'Sign out');
       out.addEventListener('click', () => signOutMultiplayer(engine, account, out));
-      actions.append(out);
+      actions.append(swap, out);
       panel.append(actions);
       panel.querySelector('input')?.focus();
     },
   };
 }
 
-/** Multiplayer's Menu: Account (email, password) and Sign out, once the save is written. */
+/** Multiplayer's Menu: Account (email, password), Switch character and Sign out, once the save is written. */
 function installSignOut(engine) {
   const list = document.getElementById('more-list');
   if (!list) return;
@@ -412,9 +442,11 @@ function installSignOut(engine) {
   const panel = createMultiplayerPanel(engine, account);
   const acct = el('button', { id: 'account-btn', type: 'button', class: 'chrome-btn', title: 'Your email and password' }, 'Account');
   acct.addEventListener('click', () => { panel.open(); });
+  const swap = el('button', { id: 'switch-character-btn', type: 'button', class: 'chrome-btn', title: SWITCH_COPY.title }, SWITCH_COPY.button);
+  swap.addEventListener('click', () => switchCharacter(engine, account, swap));
   const btn = el('button', { id: 'signout-btn', type: 'button', class: 'chrome-btn', title: 'Save, sign out and go back to the sign-in' }, 'Sign out');
   btn.addEventListener('click', () => signOutMultiplayer(engine, account, btn));
-  list.append(acct, btn);
+  list.append(acct, swap, btn);
 }
 
 export const accountBackupFeature = {

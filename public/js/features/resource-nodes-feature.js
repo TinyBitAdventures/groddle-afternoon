@@ -61,7 +61,7 @@ import { ITEM_CATALOG, addItem, countItem } from '../inventory.js?v=60dfc9ca';
 import { setToolRemaining, toolCopies } from '../tools.js?v=5f482998';
 import { isItemFloor, platformYAt } from '../street-model.js?v=b6cb6a4e';
 import { hiresSpriteUrl } from '../sprite-hires.js?v=dd5da64c';
-import { rollResourceNodeDrop } from './drops-feature.js?v=0d11750e';
+import { rollResourceNodeDrop } from './drops-feature.js?v=faf37e97';
 import { slugsFromEffects } from '../speech-slugs.js?v=130338f9';
 import { resourceNodeResponseKey, verbResponse } from '../verb-responses.js?v=3ceb8a8c';
 import { rollSlothBonusSnails } from '../imagination-effects.js?v=70169933';
@@ -91,7 +91,7 @@ import {
   starterResourceTools,
   swimmingSalmonCount,
   tickResourceNode,
-} from '../resource-nodes.js?v=817d1e54';
+} from '../resource-nodes.js?v=dffdfa11';
 import { frameTexture as sheetFrameTexture, loadTexture, textureFromUrl } from '../textures.js?v=f024bd6a';
 import { acceptOffer, markOffered, npcQuestOffers, putOffOffer, questStatus } from '../quest-offers.js?v=9c53455c';
 import { OVERLAY_USES, playOverlay } from '../overlays.js?v=605c12ff';
@@ -100,8 +100,8 @@ import { playItemOverlay } from '../item-overlay.js?v=37bde39e';
 import { nodeToolOverlay, nodeToolSheet } from '../node-tools.js?v=cf9012f1';
 import { vpSequence } from '../quest-rooms/vp-overlay.js?v=75d28bfb';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
-import { salmonSwimAt } from '../street-creatures.js?v=1ee77084';
-import { GAME_EPOCH_MS } from '../game-day.js?v=188ef3fa';
+import { salmonSwimAt } from '../street-creatures.js?v=cef735cd';
+import { GAME_EPOCH_MS } from '../game-day.js?v=f88e6e16';
 
 export const RESOURCE_FEATURE_ID = 'resource-nodes';
 export const RESOURCE_GROUP_PREFIX = 'resource:';

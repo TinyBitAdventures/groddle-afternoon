@@ -61,7 +61,7 @@
  * profilePages (id:public|none, the players looked up).
  */
 
-import { createMinnAccount } from '../minn-account.js?v=8f2741cd';
+import { createMinnAccount } from '../minn-account.js?v=460de12b';
 import { drawListFor, loadCatalog, paintItems, prepareLook } from '../avatar-compositor.js?v=8b20791a';
 import { drawListBounds } from '../avatar-rig.js?v=b67f0da8';
 import { lookKey, resolveLook } from '../avatar-looks.js?v=76eb9653';
@@ -70,8 +70,8 @@ import {
   PICTURE_RESOLUTION, PROFILE_COPY, PROFILE_PAGE_VERB,
   aboutCounter, profilePagePath, profilePageVerb, avatarKeyOf, base64Bytes, homeKeyOf, homeSizes, imageBase64, pngBase64, shouldUpload, stillTransform,
 } from '../profiles.js?v=054ca723';
-import { homeLayoutJson, homeLayoutKeyOf, HOME_LAYOUT_LIMITS } from '../home-layout.js?v=b40d61ec';
-import { collectHomeLayout } from '../home-layout-scene.js?v=458339c9';
+import { homeLayoutJson, homeLayoutKeyOf, HOME_LAYOUT_LIMITS } from '../home-layout.js?v=7c412d0a';
+import { collectHomeLayout } from '../home-layout-scene.js?v=e815fdc0';
 
 export const PROFILES_FEATURE_ID = 'profiles';
 

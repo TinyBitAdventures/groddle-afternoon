@@ -10,12 +10,12 @@ import { describe, it } from 'node:test';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-import { createRealtimeClient, CORE_KINDS } from '../public/js/realtime-client.js?v=342dae8e';
-import { TYPING_EVERY_MS, TYPING_MS, typingCounts, typingDotAlpha } from '../public/js/features/realtime-feature.js?v=8ce73ca1';
+import { createRealtimeClient, CORE_KINDS } from '../public/js/realtime-client.js?v=cda54c6e';
+import { TYPING_EVERY_MS, TYPING_MS, typingCounts, typingDotAlpha } from '../public/js/features/realtime-feature.js?v=562a84fb';
 import { BUTLER_IM_TEXT, BUTLER_IM_VERBS, HELP_AGAIN_MS, commandHelp, imDelayMs, imLine, imText, normalizeImPrefs, parseButlerIm } from '../public/js/butler-im.js?v=44783638';
-import { butlerImFeature, BUTLER_TAB } from '../public/js/features/butler-im-feature.js?v=55ade553';
-import { slashCommandsFeature } from '../public/js/features/slash-commands-feature.js?v=07f22a39';
-import { FEATURES } from '../public/js/features/index.js?v=bb7ba28a';
+import { butlerImFeature, BUTLER_TAB } from '../public/js/features/butler-im-feature.js?v=6efb3ab9';
+import { slashCommandsFeature } from '../public/js/features/slash-commands-feature.js?v=8e4b9a92';
+import { FEATURES } from '../public/js/features/index.js?v=ed630928';
 
 const root = join(import.meta.dirname, '..');
 const read = (rel) => readFileSync(join(root, rel), 'utf8');
@@ -183,7 +183,7 @@ describe('G367 the Butler IM: the feature', () => {
     // tick(1000) this used to take on the real clock, and one Jeeves line was missing.
     t.mock.timers.enable({ apis: ['setTimeout', 'Date'], now: 1_000_000 });
     t.mock.method(Math, 'random', () => 0.999);
-    const { butlerApi } = await import('../public/js/features/butler-feature.js?v=a26f942b');
+    const { butlerApi } = await import('../public/js/features/butler-feature.js?v=cac1d1b0');
     t.mock.method(butlerApi, 'owned', () => true);
     t.mock.method(butlerApi, 'label', () => 'Jeeves');
     const streetSaid = [];
@@ -238,7 +238,7 @@ describe('G367 the Butler IM: the feature', () => {
     // The delays are spaced by Date.now while the timers keep their own clock: under load the two
     // drift apart, and a slow first IM once showed after a quick second one (full suite 2026-11-04).
     t.mock.timers.enable({ apis: ['setTimeout'] });
-    const { butlerApi } = await import('../public/js/features/butler-feature.js?v=a26f942b');
+    const { butlerApi } = await import('../public/js/features/butler-feature.js?v=cac1d1b0');
     t.mock.method(butlerApi, 'owned', () => true);
     t.mock.method(butlerApi, 'label', () => 'Jeeves');
     let clock = 1_000_000;

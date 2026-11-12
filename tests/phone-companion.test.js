@@ -17,8 +17,8 @@ import { existsSync, readFileSync, statSync } from 'node:fs';
 import { dirname, join, relative, resolve } from 'node:path';
 import vm from 'node:vm';
 import { sitePath, skipWithoutSite } from '../tools/repos.mjs';
-import { createMinnAccount } from '../public/js/minn-account.js?v=8f2741cd';
-import { REPORT_PICTURE } from '../public/js/reports.js?v=df024080';
+import { createMinnAccount } from '../public/js/minn-account.js?v=460de12b';
+import { REPORT_PICTURE } from '../public/js/reports.js?v=d6df7b91';
 import {
   DEVICE_KEY,
   PHONE_TEXT,
@@ -35,7 +35,7 @@ import {
   snippetOf,
   unreadLetters,
   whereWords,
-} from '../public/js/phone/companion-data.js?v=014d5e9e';
+} from '../public/js/phone/companion-data.js?v=133c3949';
 
 const pub = join(import.meta.dirname, '..', 'public');
 const read = (p) => readFileSync(join(pub, p), 'utf8');
@@ -173,7 +173,7 @@ describe('play/phone/ (the companion page)', () => {
   it('loads the account\'s core only, and every call its pages make is in the core', async () => {
     assert.ok(graph.includes('js/minn-account-core.js'), graph.join(' '));
     assert.ok(!graph.includes('js/minn-account.js'), 'the game-only calls stay out of the phone');
-    const { createMinnAccountCore } = await import('../public/js/minn-account-core.js?v=c7629a9d');
+    const { createMinnAccountCore } = await import('../public/js/minn-account-core.js?v=74c75177');
     const core = createMinnAccountCore({ baseUri: 'https://groddle.localhost/', fetch: async () => ({}) });
     const used = new Set();
     for (const f of ['js/phone/companion.js', 'js/account-forms.js', 'js/online-boot.js', 'js/phone/companion-data.js']) {
@@ -194,7 +194,9 @@ describe('play/phone/ (the companion page)', () => {
   it('signs in with the game\'s own forms and the /play/online/ gate\'s session check', () => {
     const js = read('js/phone/companion.js');
     assert.match(js, /import \{ mountAccountForms, resetLinkFrom, verifyLinkFrom \} from '\.\.\/account-forms\.js\?v=/);
-    assert.match(js, /import \{ gateFor, quietSession, suspendedNow \} from '\.\.\/online-boot\.js\?v=/);
+    // The gate's session check alone (js/online-session.js), not the gate's card (js/online-boot.js re-exports it).
+    assert.match(js, /import \{ gateFor, quietSession, suspendedNow \} from '\.\.\/online-session\.js\?v=/);
+    assert.ok(!graph.includes('js/online-boot.js'), 'the start card stays out of the phone');
     assert.match(js, /mountAccountForms\(host, \{\n\s*account,\n\s*start: location\.hash === '#new' \? 'signup' : 'signin',\n\s*reset: resetLinkFrom\(location\.hash\),\n\s*verify: verifyLinkFrom\(location\.hash\),/);
     assert.match(js, /reports = createReportsApi\(\{ baseUri: doc\.baseURI, nonce: account\.nonce \}\);/, 'the ticket calls carry the signed-in nonce');
     assert.match(js, /await account\.signOut\(\)/);

@@ -57,13 +57,13 @@
  */
 
 import { chatBubbleText } from '../ui/chat-input.js?v=72d000ac';
-import { createMinnAccount } from '../minn-account.js?v=8f2741cd';
-import { EMOTES, createRealtimeClient, createTrack, pushSample, sampleTrack } from '../realtime-client.js?v=342dae8e';
+import { createMinnAccount } from '../minn-account.js?v=460de12b';
+import { EMOTES, createRealtimeClient, createTrack, pushSample, sampleTrack } from '../realtime-client.js?v=cda54c6e';
 import { ANIM_FPS, EMOTION_MS, animForState, crowdScaleX } from '../avatar-anims.js?v=fb921bf4';
 import { redrawFrame } from '../avatar-pack.js?v=d8fba962';
 import { movedLine } from '../admin-teleport.js?v=fa56e8df';
 import { ADMIN_TEXT, applyAdminGive, applyAdminRefill, showAdminMessage, showBooted } from '../admin-console-mp.js?v=265b9fc2';
-import { saveStore } from '../save-store.js?v=0abb8cf1';
+import { saveStore } from '../save-store.js?v=89422a9c';
 import { STREET_INDEX } from '../street-loader.js?v=18b181ad';
 import { appendLinkedText } from '../chat-links.js?v=b717fac7';
 import { lineKey } from '../chat-reactions.js?v=38460172';
@@ -119,6 +119,15 @@ export function typingDotAlpha(i, t) {
   return Math.floor(t / 220) % 3 === i ? 1 : 0.35;
 }
 
+/**
+ * Close code 4012 (alternate characters, Austin 2026-11-12): another character of this login came
+ * online, here or on another device, so this window's Glitch left the streets and does not come back.
+ */
+export const OTHER_CHARACTER_TEXT = Object.freeze({
+  state: 'Playing as another character',
+  note: "You're playing as another character in another window.",
+});
+
 /** The pill's words for a client state (plain remake copy, no em-dashes). */
 export function statusText(state, { here = 0, attempt = 0 } = {}) {
   switch (state) {
@@ -126,6 +135,7 @@ export function statusText(state, { here = 0, attempt = 0 } = {}) {
     case 'connecting': return attempt > 0 ? 'Offline, retrying' : 'Connecting';
     case 'offline': return 'Offline, retrying';
     case 'replaced': return 'Playing somewhere else';
+    case 'other-character': return OTHER_CHARACTER_TEXT.state;
     case 'signed-out': return 'Signed out';
     case 'off': return 'Others are off on this site';
     case 'booted': return ADMIN_TEXT.stateBooted;
@@ -189,7 +199,7 @@ const STYLE = `
 .mp-state { display: inline-flex; align-items: center; gap: var(--sp-3); padding: 0.2rem 0.55rem; border-radius: var(--radius-pill); color: var(--c-green-34); background: color-mix(in srgb, var(--surface-moss) 94%, transparent); box-shadow: var(--shadow-1); }
 .mp-state::before { content: ''; width: 7px; height: 7px; border-radius: var(--radius-round); background: var(--c-gold-76); }
 .mp-state[data-state="online"]::before { background: var(--c-lime-67); }
-.mp-state[data-state="offline"]::before, .mp-state[data-state="replaced"]::before, .mp-state[data-state="signed-out"]::before, .mp-state[data-state="stopped"]::before, .mp-state[data-state="booted"]::before, .mp-state[data-state="suspended"]::before { background: var(--c-red-59); }
+.mp-state[data-state="offline"]::before, .mp-state[data-state="replaced"]::before, .mp-state[data-state="signed-out"]::before, .mp-state[data-state="stopped"]::before, .mp-state[data-state="booted"]::before, .mp-state[data-state="suspended"]::before, .mp-state[data-state="other-character"]::before { background: var(--c-red-59); }
 .mp-state[data-state="off"]::before { background: var(--c-sand-67); }
 .mp-bar button { font: inherit; border: 0; border-radius: var(--radius-pill); padding: 0.2rem var(--sp-5); cursor: pointer; color: var(--text-heading); background: color-mix(in srgb, var(--surface-card) 92%, transparent); box-shadow: var(--shadow-1); }
 .mp-bar button[aria-pressed="true"] { background: var(--c-mauve-93); }
@@ -542,6 +552,10 @@ function createSession(engine) {
       engine.toast?.(line, 5200);
     }
     if (state === 'signed-out') addLog({ note: true, text: 'You are signed out, so others cannot see you. Log in again to rejoin.' });
+    if (state === 'other-character') {
+      addLog({ note: true, text: OTHER_CHARACTER_TEXT.note });
+      engine.toast?.(OTHER_CHARACTER_TEXT.note, 5200);
+    }
     // A ticket refused for a suspended account (no booted message came first): say so once.
     if (state === 'suspended' && !bootedSaid) {
       bootedSaid = true;

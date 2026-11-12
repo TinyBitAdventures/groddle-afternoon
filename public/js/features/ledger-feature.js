@@ -18,7 +18,7 @@
  */
 
 import { countItem, removeItem } from '../inventory.js?v=60dfc9ca';
-import { LEDGER_CORRECTED_EVENT } from '../save-store.js?v=0abb8cf1';
+import { LEDGER_CORRECTED_EVENT } from '../save-store.js?v=89422a9c';
 
 export const LEDGER_FEATURE_ID = 'ledger';
 

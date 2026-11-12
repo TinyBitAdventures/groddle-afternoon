@@ -54,16 +54,16 @@
  *     slashLine (the last line shown).
  */
 
-import { BUTLER_STRINGS } from '../butler.js?v=ab2609f7';
-import { butlerApi } from './butler-feature.js?v=a26f942b';
-import { hellFeature } from './hell-feature.js?v=aa67fca8';
+import { BUTLER_STRINGS } from '../butler.js?v=0a345ccc';
+import { butlerApi } from './butler-feature.js?v=cac1d1b0';
+import { hellFeature } from './hell-feature.js?v=5ec5ef80';
 import { locationEventsApi } from './location-events-feature.js?v=0cda70ed';
 import { towerApi } from './home-tower-feature.js?v=72ea85c9';
 import { platformYAt, platformsScreen } from '../street-model.js?v=b6cb6a4e';
 import { COMMAND_HELP_INTRO, STUCK_COOLDOWN_MS, STUCK_TEXT, bareCommand, commandHelpLines, commandHint, isCommandHelp, misplacedCommand, slashPlan, strayLetterCommand, unknownLine } from '../slash-commands.js?v=8533e143';
 import { parseTp, runTeleportCommand, TP_TEXT } from '../admin-teleport.js?v=fa56e8df';
-import { minnUrls } from '../minn-account.js?v=8f2741cd';
-import { saveStore } from '../save-store.js?v=0abb8cf1';
+import { minnUrls } from '../minn-account.js?v=460de12b';
+import { saveStore } from '../save-store.js?v=89422a9c';
 import { STREET_INDEX } from '../street-loader.js?v=18b181ad';
 
 export const SLASH_COMMANDS_FEATURE_ID = 'slash-commands';

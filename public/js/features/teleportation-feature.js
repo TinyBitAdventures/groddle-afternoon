@@ -34,7 +34,7 @@
  */
 
 import { addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=60dfc9ca';
-import { getGameDayKey } from '../game-day.js?v=188ef3fa';
+import { getGameDayKey } from '../game-day.js?v=f88e6e16';
 import { canUseTool, copyForVerb, copyTag, copyTags, setCopyTag, takeToolCopy, useToolCondition } from '../tools.js?v=5f482998';
 import {
   PAPER_CLASS,

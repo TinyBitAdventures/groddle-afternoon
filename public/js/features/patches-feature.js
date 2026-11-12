@@ -71,11 +71,11 @@ import {
   soilSpawnClasses,
   soilSpritePaths,
   tickPlot,
-} from '../patches.js?v=41ddb3a0';
+} from '../patches.js?v=61abc5fe';
 import { frameTexture, isLoaded, onFailed, onLoaded, textureFromUrl } from '../textures.js?v=f024bd6a';
 import { HOE_TOOLS, firstWorkingTool } from '../tools.js?v=5f482998';
 import { slugsFromEffects } from '../speech-slugs.js?v=130338f9';
-import { plotSignature, replayRng } from '../shared-patches.js?v=4ab46688';
+import { plotSignature, replayRng } from '../shared-patches.js?v=ac409c57';
 
 export const PATCHES_FEATURE_ID = 'patches';
 export const SOIL_GROUP_PREFIX = 'soil:';

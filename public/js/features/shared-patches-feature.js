@@ -71,8 +71,8 @@
  */
 
 import { addItem, countItem, ITEM_CATALOG } from '../inventory.js?v=60dfc9ca';
-import { saveStore } from '../save-store.js?v=0abb8cf1';
-import { patchesFeature } from './patches-feature.js?v=5d9c8add';
+import { saveStore } from '../save-store.js?v=89422a9c';
+import { patchesFeature } from './patches-feature.js?v=d405f1a4';
 import {
   COPY,
   GRANT_CLASSES,
@@ -97,7 +97,7 @@ import {
   sharedTreeReady,
   sharedTreeSkill,
   TRANTSFORM_VERB,
-} from '../shared-patches.js?v=4ab46688';
+} from '../shared-patches.js?v=ac409c57';
 
 export const SHARED_PATCHES_FEATURE_ID = 'shared-patches';
 const REQUEST_TIMEOUT_MS = 8000;
@@ -110,7 +110,7 @@ const TEND_LOCK_MS = 10000;
  * outbox (credits.go, batched), and a save that shows the items first pays them from the budget.
  */
 const GRANT_SAVE_DELAY_MS = 2500;
-const LOCAL_STATES = new Set(['off', 'signed-out', 'replaced', 'stopped']);
+const LOCAL_STATES = new Set(['off', 'signed-out', 'replaced', 'other-character', 'stopped']);
 const BLOCKED_SAVES = new Set(['conflict', 'elsewhere', 'signed-out', 'error', 'offline']);
 /** The soil verbs this feature asks about (tree verbs stay the page's until lane 3). */
 const SOIL_VERBS = new Set(['tend', 'dig', 'plant', 'pet', 'clear']);

@@ -3,7 +3,7 @@
  * touch-only tablets land here from /play/online/ and /play/ (their
  * #phone-gate script), because the game is more than a phone tab holds. It
  * signs the player in with the game's own forms (js/account-forms.js, the
- * /play/online/ gate's flow: js/online-boot.js quietSession, suspendedNow),
+ * /play/online/ gate's flow: js/online-session.js quietSession, suspendedNow),
  * then shows three tabs over the routes the game already uses
  * (js/phone/companion-data.js): Reports (read, reply, close, write a new one
  * with a photo), Mail (read only) and Friends (who is playing and where).
@@ -20,11 +20,11 @@
  * [data-friend=<id>], #pc-report-text, #pc-photo, #pc-reply-text.
  */
 
-import { createMinnAccountCore } from '../minn-account-core.js?v=c7629a9d';
+import { createMinnAccountCore } from '../minn-account-core.js?v=74c75177';
 import { mountAccountForms, resetLinkFrom, verifyLinkFrom } from '../account-forms.js?v=318b6815';
-import { gateFor, quietSession, suspendedNow } from '../online-boot.js?v=19450640';
-import { REPORT_MAX, REPORT_TEXT, STATUS_WORDS, createReportsApi, pictureRefused, pictureSrc, refusalWords, reportFromHash, ticketLine, unreadCount, whenWords } from '../reports.js?v=df024080';
-import { DEVICE_KEY, PHONE_TEXT as T, POLL_MS, createPresenceApi, fitPhoto, friendsView, fullGameHref, itemNamesFrom, itemWords, mailRows, mailboxFromSave, mergePlayerMail, phoneContext, unreadLetters } from './companion-data.js?v=014d5e9e';
+import { gateFor, quietSession, suspendedNow } from '../online-session.js?v=6f1348c8';
+import { REPORT_MAX, REPORT_TEXT, STATUS_WORDS, createReportsApi, pictureRefused, pictureSrc, refusalWords, reportFromHash, ticketLine, unreadCount, whenWords } from '../reports.js?v=d6df7b91';
+import { DEVICE_KEY, PHONE_TEXT as T, POLL_MS, createPresenceApi, fitPhoto, friendsView, fullGameHref, itemNamesFrom, itemWords, mailRows, mailboxFromSave, mergePlayerMail, phoneContext, unreadLetters } from './companion-data.js?v=133c3949';
 
 const doc = globalThis.document;
 

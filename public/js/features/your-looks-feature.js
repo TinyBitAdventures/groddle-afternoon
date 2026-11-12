@@ -30,7 +30,7 @@ import {
   YOUR_LOOKS_KEEP_MS, YOUR_LOOKS_TEXT, cleanLook, createYourLooks, normalizeYourLooks, noteWear, pastLooks,
   recordLook, removeLook, totalLine, wearLook,
 } from '../your-looks.js?v=89b5ca2e';
-import { APPEARANCE_PRESETS } from '../character-builder.js?v=ee3228bd';
+import { APPEARANCE_PRESETS } from '../character-builder.js?v=91805f9c';
 
 export const YOUR_LOOKS_FEATURE_ID = 'your-looks';
 

@@ -41,6 +41,7 @@
  * open one), hstLast.
  */
 
+import { announceCharacterChanged, characterHeaders, characterOf, isCharacterChanged } from '../character-guard.js?v=510034a7';
 import { ITEM_CATALOG, addItem, countItem, ensureItem, itemIcon, removeItem } from '../inventory.js?v=60dfc9ca';
 import { displayRefusal, furnitureDef, furnitureSize, isFurniture } from '../home-decor.js?v=b48dbc95';
 import { pieceLabel } from '../furniture-upgrades.js?v=a3788c0d';
@@ -49,9 +50,9 @@ import { stackMaxOf, isBagClass } from '../pack-slots.js?v=6b8393a1';
 import { ELEMENT_CLASSES, NO_BAG_CLASSES, NO_SLOT_CLASSES } from '../pack-slots-data.js?v=800f664c';
 import { TOOL_CONDITION_CATALOG, copyTagKind, copyTags, receiveToolCopy, setCopyTag, takeToolCopy } from '../tools.js?v=5f482998';
 import { scriptFromTag, scriptLabel } from '../teleportation.js?v=1050225e';
-import { possessive, readVisitScene } from '../neighbours-mp.js?v=9f99de95';
-import { saveStore } from '../save-store.js?v=0abb8cf1';
-import { homesFeature } from './homes-feature.js?v=f361927d';
+import { possessive, readVisitScene } from '../neighbours-mp.js?v=02c23c07';
+import { saveStore } from '../save-store.js?v=89422a9c';
+import { homesFeature } from './homes-feature.js?v=a0a1121b';
 import {
   SDB_PRICE_MAX,
   STORAGE_TEXT as T,
@@ -334,9 +335,11 @@ function createSite() {
     } catch { /* the answer below stands */ }
     return false;
   }
+  // Alternate characters: the sales and boxes this collects name the character this page plays (js/character-guard.js).
+  const character = characterOf(globalThis);
   async function call(path, { method = 'GET', body } = {}) {
     for (let attempt = 0; attempt < 2; attempt += 1) {
-      const headers = {};
+      const headers = { ...characterHeaders(character) };
       if (nonce) headers['X-WP-Nonce'] = nonce;
       if (body !== undefined) headers['Content-Type'] = 'application/json';
       let res;
@@ -350,6 +353,7 @@ function createSite() {
       let data = null;
       try { data = await res.json(); } catch { /* not JSON */ }
       if (res.status === 403 && data?.code === 'rest_cookie_invalid_nonce' && attempt === 0 && (await refresh())) continue;
+      if (character && isCharacterChanged(res.status, data)) announceCharacterChanged(globalThis, { character, path });
       if (!res.ok) throw Object.assign(new Error(typeof data?.message === 'string' ? data.message : T.failed), { status: res.status, code: data?.code || '' });
       return data;
     }

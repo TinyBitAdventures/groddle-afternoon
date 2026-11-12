@@ -18,12 +18,12 @@ import {
   limitCountCap,
   useItemMany,
   recordFoodEatMany,
-} from '../public/js/eat-many.js?v=1a3f04f9';
+} from '../public/js/eat-many.js?v=3caea674';
 import { CANDY_CLASSES, CANDY_DAILY_MAX, PIE_DAILY_MAX, SOURCE_LINES, dailyEatLimit, pieEatGate } from '../public/js/seasons.js?v=1978c3f3';
-import { seasonsFeature } from '../public/js/features/seasons-feature.js?v=89ad1a58';
-import { getGameDayKey } from '../public/js/game-day.js?v=188ef3fa';
+import { seasonsFeature } from '../public/js/features/seasons-feature.js?v=ed856bcc';
+import { getGameDayKey } from '../public/js/game-day.js?v=f88e6e16';
 import { createInventory, getItemUseInfo, registerItemUse, useItem, countItem } from '../public/js/inventory.js?v=60dfc9ca';
-import { FOOD_VARIETY_UPGRADE, createFoodState, recordFoodEat } from '../public/js/food.js?v=5b61ffcb';
+import { FOOD_VARIETY_UPGRADE, createFoodState, recordFoodEat } from '../public/js/food.js?v=796377d2';
 
 const root = join(import.meta.dirname, '..');
 const gsjs = join(root, '../glitch-GameServerJS');

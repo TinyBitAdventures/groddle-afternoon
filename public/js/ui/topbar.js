@@ -67,7 +67,9 @@ export const MENU_ROWS = Object.freeze({
   'keys-btn': { group: 'social', rank: 4, mod: 'Shift', key: 'K' },
   'multiplayer-btn': { group: 'settings', rank: 0 },
   'account-btn': { group: 'settings', rank: 1 },
-  'signout-btn': { group: 'settings', rank: 2 },
+  // Alternate characters (2026-11-12): beside Sign out.
+  'switch-character-btn': { group: 'settings', rank: 2 },
+  'signout-btn': { group: 'settings', rank: 3 },
 });
 
 /** A Menu row's place: { group, rank, key?, mod? } (unknown rows go last in World). */

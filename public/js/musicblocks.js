@@ -7,7 +7,7 @@
  */
 
 import { addItem, countItem, ensureItem } from './inventory.js?v=60dfc9ca';
-import { GAME_DAY_MS } from './game-day.js?v=188ef3fa';
+import { GAME_DAY_MS } from './game-day.js?v=f88e6e16';
 import { metabolicGain, moodMax, loseEnergy } from './metabolics.js?v=8504134e';
 import { grantMoodXp } from './mood-xp.js?v=958e7680';
 import { SOUND_ALIASES, SOUND_FILES } from './sound-keys.js?v=fb6ee553';

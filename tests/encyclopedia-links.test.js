@@ -25,10 +25,10 @@ import {
   encyclopediaSearchHref,
   isEncyclopediaKey,
 } from '../public/js/encyclopedia-links.js?v=eebc2a5d';
-import { GIANTS } from '../public/js/shrines.js?v=fa059603';
+import { GIANTS } from '../public/js/shrines.js?v=ec26da05';
 import { VENDOR_PROFILES } from '../public/js/vendor.js?v=fd4bd725';
 import { CLIENT_KEY_TABLE, clientKeyAction } from '../public/js/client-hotkeys.js?v=31d1891d';
-import { MENU_ROWS } from '../public/js/ui/topbar.js?v=3cddf1a0';
+import { MENU_ROWS } from '../public/js/ui/topbar.js?v=e00f6c81';
 import { questCardMenuRows } from '../public/js/ui/quest-sheet.js?v=ccaa43a8';
 import { ISLAND_CONFIRM, ISLAND_LINES } from '../public/js/newxp.js?v=a551e661';
 

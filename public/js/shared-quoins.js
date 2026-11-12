@@ -23,7 +23,7 @@
  */
 
 /** Realtime client states that will not come back by themselves: quoins go back to solo rules. */
-export const LOCAL_STATES = Object.freeze(new Set(['off', 'signed-out', 'replaced', 'stopped']));
+export const LOCAL_STATES = Object.freeze(new Set(['off', 'signed-out', 'replaced', 'other-character', 'stopped']));
 
 export const CLAIM_WAIT_MS = 3000;
 export const RECLAIM_MS = 1200;

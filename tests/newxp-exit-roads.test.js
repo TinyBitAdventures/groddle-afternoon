@@ -20,7 +20,7 @@ import { join } from 'node:path';
 
 import { NEWXP_EXITS, GENTLE_ISLAND, indexTsid, normalizeNewxpSave } from '../public/js/newxp.js?v=a551e661';
 import { closedStreets, normalizeStreetJobState } from '../public/js/street-jobs.js?v=94f8d250';
-import { newxpFeature, __newxpTest, exitLeadsHome, pickOpenExit } from '../public/js/features/newxp-feature.js?v=61e9ebd3';
+import { newxpFeature, __newxpTest, exitLeadsHome, pickOpenExit } from '../public/js/features/newxp-feature.js?v=44f8edb5';
 
 const root = join(import.meta.dirname, '..');
 const read = (rel) => readFileSync(join(root, rel), 'utf8');

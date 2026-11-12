@@ -82,6 +82,32 @@ const ONLINE_STYLE = `  <style>
     .online-gate .online-solo { margin-top: var(--sp-9); padding-top: var(--sp-7); border-top: 1px solid color-mix(in srgb, var(--c-green-42) 20%, transparent); }
     .online-gate .online-solo h3 { margin: 0 0 var(--sp-2); font-size: var(--fs-lg); }
     .online-gate .online-solo p { margin: 0; }
+    /* A login's characters (alternate characters, Austin 2026-11-12): a row each, a fresh one, the retired ones small. */
+    .online-gate .online-characters { list-style: none; margin: 0; padding: 0; }
+    .online-gate button.online-alt { width: 100%; border: 0; font: inherit; font-weight: 700; cursor: pointer; }
+    .online-gate .online-character { display: flex; align-items: baseline; justify-content: space-between; gap: var(--sp-5); text-align: left; }
+    .online-gate .online-character-name { min-width: 0; overflow-wrap: anywhere; }
+    .online-gate .online-character-level { flex: none; font-size: var(--fs-sm); font-weight: 600; opacity: 0.8; }
+    .online-gate .online-fresh-form { display: grid; gap: var(--sp-2); margin-top: var(--sp-7); padding-top: var(--sp-6); border-top: 1px solid color-mix(in srgb, var(--c-green-42) 20%, transparent); }
+    .online-gate .online-fresh-form[hidden], .online-gate .online-alt[hidden] { display: none; }
+    .online-gate .online-fresh-form h3 { margin: 0; font-size: var(--fs-lg); }
+    .online-gate .online-fresh-form p { margin: 0 0 var(--sp-3); }
+    .online-gate .online-fresh-form label { font-weight: 700; color: var(--c-lime-31); }
+    .online-gate .online-fresh-form input { box-sizing: border-box; width: 100%; padding: var(--sp-5) 0.7rem; border-radius: var(--radius-md); border: 2px solid var(--c-lime-85c); background: var(--surface-bright); color: var(--c-sage-27); font: inherit; font-size: var(--fs-lg); }
+    .online-gate .online-fresh-form input:focus { outline: none; border-color: var(--c-orange-68); box-shadow: 0 0 0 3px color-mix(in srgb, var(--c-orange-68) 22%, transparent); }
+    .online-gate .online-fresh-form input[aria-invalid="true"] { border-color: var(--c-red-59); }
+    .online-gate .online-fresh-form small { color: var(--text-moss); font-size: var(--fs-md); }
+    .online-gate .online-fresh-error { color: var(--text-danger); font-weight: 600; }
+    .online-gate .online-fresh-error:empty { display: none; }
+    .online-gate .online-fresh-form .online-play { margin-top: var(--sp-4); }
+    .online-gate .online-fresh-note { margin: var(--sp-5) 0 0; text-align: center; font-weight: 600; color: var(--text-moss); }
+    .online-gate .online-characters-status { margin: var(--sp-4) 0 0; text-align: center; font-weight: 600; color: var(--text-moss); }
+    .online-gate .online-characters-status:empty { display: none; }
+    .online-gate .online-characters-status[data-tone="bad"] { color: var(--text-danger); }
+    .online-gate .online-retired { margin-top: var(--sp-6); text-align: center; font-size: var(--fs-sm); color: var(--text-moss); }
+    .online-gate .online-retired summary { cursor: pointer; font-weight: 700; text-decoration: underline; }
+    .online-gate .online-retired .online-home { margin-top: var(--sp-3); }
+    .online-gate button:disabled { opacity: 0.6; cursor: default; }
     /* The multiplayer save state (js/save-store.js groddle:save-state). */
     .save-pill {
       position: fixed; left: 10px; bottom: 10px; z-index: calc(var(--z-notice) + 10); display: flex; gap: 0.45rem; align-items: center;

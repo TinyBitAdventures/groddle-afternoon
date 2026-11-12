@@ -20,7 +20,7 @@ import { execFileSync } from 'node:child_process';
 import { join } from 'node:path';
 import { homedir } from 'node:os';
 
-import { createMinnAccount } from '../public/js/minn-account.js?v=8f2741cd';
+import { createMinnAccount } from '../public/js/minn-account.js?v=460de12b';
 import { FORM_COPY, fillCopy, signUpOutcome, verifyLinkFrom, verifyOutcome, resetLinkFrom } from '../public/js/account-forms.js?v=318b6815';
 import { HAS_SITE, SITE_DIR, skipWithoutSite } from '../tools/repos.mjs';
 

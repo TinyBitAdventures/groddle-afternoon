@@ -27,7 +27,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import vm from 'node:vm';
 import { GSJS } from '../catalog/build.mjs';
-import { EMBLEM_FAVOR_COST, EMBLEM_FAVOR_INCREMENT, FAVOR_STUDY_SECONDS, GIANTS as REMAKE_GIANTS } from '../../public/js/shrines.js?v=fa059603';
+import { EMBLEM_FAVOR_COST, EMBLEM_FAVOR_INCREMENT, FAVOR_STUDY_SECONDS, GIANTS as REMAKE_GIANTS } from '../../public/js/shrines.js?v=ec26da05';
 import { ICONIZE_COUNT } from '../../public/js/giant-icons.js?v=0d6b4965';
 import { GIANT_ICON_DATA } from '../../public/js/giant-icons-data.js?v=5026b09c';
 import { esc, fmt, tsHtml } from './parts.mjs';

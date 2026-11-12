@@ -20,7 +20,7 @@ import {
   saveNightTint,
   worldTintOpacity,
 } from '../public/js/night-tint.js?v=1dfc9c89';
-import { daylightState, timestampForGameHour } from '../public/js/game-day.js?v=188ef3fa';
+import { daylightState, timestampForGameHour } from '../public/js/game-day.js?v=f88e6e16';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const read = (p) => readFileSync(join(root, p), 'utf8');

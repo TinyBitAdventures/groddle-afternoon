@@ -42,10 +42,10 @@ import {
   waterPlot,
   wetPlot,
 } from '../public/js/garden.js?v=788f2dbb';
-import { normalizeGardenSnapshot } from '../public/js/player-save.js?v=350cb5f8';
+import { normalizeGardenSnapshot } from '../public/js/player-save.js?v=abeddbbf';
 import { normalizeFeatureSlices } from '../public/js/feature-host.js?v=06bb8b74';
 import { applyPlot, localPlot, GARDEN_LOCK_MS } from '../public/js/shared-gardens.js?v=443ea35a';
-import { applyTendAct } from '../public/js/neighbours-mp.js?v=9f99de95';
+import { applyTendAct } from '../public/js/neighbours-mp.js?v=02c23c07';
 import { potionTendGarden } from '../public/js/master-garden.js?v=3b5ec3c3';
 import { HAS_SITE, SITE_DIR } from '../tools/repos.mjs';
 

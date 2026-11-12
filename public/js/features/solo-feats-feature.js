@@ -86,7 +86,7 @@
  */
 
 import { addItem } from '../inventory.js?v=60dfc9ca';
-import { GAME_DAY_MS, getGameDayKey } from '../game-day.js?v=188ef3fa';
+import { GAME_DAY_MS, getGameDayKey } from '../game-day.js?v=f88e6e16';
 import {
   CAP_OWNERS,
   COMPLETE_BUTTON,
@@ -114,11 +114,11 @@ import {
   resetPending,
   streakCheck,
   takePending,
-} from '../solo-feats.js?v=e068b60a';
-import { saveStore } from '../save-store.js?v=0abb8cf1';
+} from '../solo-feats.js?v=6380f15d';
+import { saveStore } from '../save-store.js?v=89422a9c';
 import { gainMetabolic } from '../metabolics.js?v=8504134e';
 import { grantMoodXp } from '../mood-xp.js?v=958e7680';
-import { GIANTS } from '../shrines.js?v=fa059603';
+import { GIANTS } from '../shrines.js?v=ec26da05';
 import {
   MP_TEXT,
   endedLine,
@@ -133,7 +133,7 @@ import {
   runFromServer,
   vogFor,
   youLine,
-} from '../feats-mp.js?v=2ce21608';
+} from '../feats-mp.js?v=ec26df14';
 
 const POLL_MS = 500;
 /** How often an open panel redraws its "Opens again in" lines. */

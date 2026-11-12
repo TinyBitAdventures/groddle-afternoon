@@ -25,14 +25,14 @@ import {
   sprinkleHallowed,
   usePowderCharge,
 } from '../public/js/powders.js?v=397984f7';
-import { powdersFeature } from '../public/js/features/powders-feature.js?v=122c5305';
+import { powdersFeature } from '../public/js/features/powders-feature.js?v=bb52a788';
 import {
   applyAchievementProgress,
   createAchievementState,
   getAchievementProgress,
   seedAchievementNearCompletion,
 } from '../public/js/achievements.js?v=2e4aa9cb';
-import { createShrineState, donateToShrine, quoteShrineDonation } from '../public/js/shrines.js?v=fa059603';
+import { createShrineState, donateToShrine, quoteShrineDonation } from '../public/js/shrines.js?v=ec26da05';
 import { applyBuff, createBuffState, tickBuffs } from '../public/js/buffs.js?v=819cb342';
 import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=10b118dd';
 
