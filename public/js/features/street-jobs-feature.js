@@ -2145,6 +2145,9 @@ function mpTickWork(engine, now) {
   }
   work.awaiting = now;
   work.nextAt = now + WORK_UNIT_MS;
+  // Ticket 242: the tool this unit uses (the first one may have broken and a requirement that
+  // takes both variants goes on with the other), so its wear lands on that tool.
+  work.unitTool = check.tool;
 }
 
 function mpWorked(engine, msg) {
@@ -2153,7 +2156,7 @@ function mpWorked(engine, msg) {
   const req = work.req;
   // items/include/jobs.js acceptJobWork: the unit's energy and tool wear (G289 loseEnergy).
   loseEnergy(engine.pc, req.energy);
-  const wear = useToolCondition(engine.toolState, work.tool, req.wear);
+  const wear = useToolCondition(engine.toolState, work.unitTool || work.tool, req.wear);
   work.units += 1;
   work.energy += req.energy;
   workFloat(engine, `+1 ${req.verbPast}`);
