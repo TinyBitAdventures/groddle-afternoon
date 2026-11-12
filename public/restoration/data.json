@@ -2752,9 +2752,29 @@
   "deployed": "2026-11-12"
  },
  "git": {
-  "commits": 1778,
+  "commits": 1782,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-12",
+    "kind": "improve",
+    "text": "PixiJS 8.23.0 replaces 8.22.0"
+   },
+   {
+    "date": "2026-11-12",
+    "kind": "fix",
+    "text": "A party invite stays up when you're too tired to go, so you can eat and then join"
+   },
+   {
+    "date": "2026-11-12",
+    "kind": "fix",
+    "text": "A rooked animal's Revive says how many have helped, not 3/3 before the third dose"
+   },
+   {
+    "date": "2026-11-12",
+    "kind": "new",
+    "text": "Reports say \"Read by the team\" once an administrator opens your report"
+   },
    {
     "date": "2026-11-12",
     "kind": "fix",
@@ -2854,29 +2874,9 @@
     "date": "2026-11-12",
     "kind": "fix",
     "text": "On a phone the pack row, the stick and Jump step away while the on-screen keyboard is up"
-   },
-   {
-    "date": "2026-11-12",
-    "kind": "fix",
-    "text": "On a phone a tap on an animal opens its menu, under the stick too, and the tap is not a choice in it"
-   },
-   {
-    "date": "2026-11-12",
-    "kind": "fix",
-    "text": "On a phone the vendor's count row and Buy stay in view under the Buy and Sell tabs"
-   },
-   {
-    "date": "2026-11-12",
-    "kind": "fix",
-    "text": "On a phone a notice never stands one letter wide beside a side sheet, and the drawer no longer peeks out behind one"
-   },
-   {
-    "date": "2026-11-12",
-    "kind": "fix",
-    "text": "The loading card sits in the middle of a phone's screen"
    }
   ]
  },
- "tests": 891,
+ "tests": 892,
  "generatedAt": "2026-11-12"
 }

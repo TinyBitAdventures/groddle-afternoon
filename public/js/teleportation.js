@@ -12,6 +12,10 @@
  * - items/teleportation_script.js use(): Teleportation I unless imbued;
  *   can_teleport(skip_skill); energy cost then a cooldown; one-way, consumed;
  *   a vanished destination refunds 100 iMG.
+ * - Summons (Teleportation V): teleportation_can_summon 729-835, teleportation_summon
+ *   618-704 and teleportation_get_max_summons 969-976. The request, the prompt and the
+ *   move are multiplayer (js/summon-mp.js, groddle-afternoon-server summon.go); the
+ *   summoner's own checks and payment are here.
  *
  * Each script keeps its own destination, as its own copy (js/tools.js row.tags, kind "script",
  * js/copy-tags.js): teleportation_script.js has stackmax 1 and instance props, and setTarget 298-319
@@ -186,6 +190,7 @@ export function normalizeTeleportState(seed = {}) {
     cooldownUntil: Number(s.cooldownUntil) > 0 ? Number(s.cooldownUntil) : 0,
     dayKey: typeof s.dayKey === 'string' ? s.dayKey : '',
     mapTeleportsToday: count(s.mapTeleportsToday),
+    summonsToday: count(s.summonsToday),
     totals: { plain: count(totals.plain), script: count(totals.script), set: count(totals.set), map: count(totals.map) },
     scripts,
     looseScripts,
@@ -198,6 +203,7 @@ export function rollTeleportDay(state, dayKey) {
   if (dayKey && s.dayKey !== dayKey) {
     s.dayKey = dayKey;
     s.mapTeleportsToday = 0;
+    s.summonsToday = 0; // teleportation_reset_counters 32-39: free_summons_today = 0
   }
   return s;
 }
@@ -500,4 +506,81 @@ export function adoptScripts(state, tags = []) {
   s.scripts = [];
   s.looseScripts = pool;
   return { state: s, tags: out, adopted, unknown };
+}
+
+/* ------------------------------------------------------------------ */
+/* Summons (Teleportation V)                                           */
+/* ------------------------------------------------------------------ */
+
+/**
+ * teleportation_get_max_summons 969-976: Teleportation V gives [2, -1], two a game day paid
+ * with energy and any number more with Teleportation Tokens. The remake has no tokens, so two.
+ */
+export const SUMMONS_PER_DAY = 2;
+
+/** The summoner's lines (inc_teleportation.js can_teleport 126-295 and can_summon 729-835). */
+export const SUMMON_CHECK_TEXT = Object.freeze({
+  pooped: 'You are too Pooped to teleport. Eat something first!', // 158
+  contraband: "That fragile Contraband won't survive teleportation.", // 165
+  rooked: 'You are still under the effects of a Rook attack.', // 290
+  one: 'You can only summon one player at a time.', // 736
+  here: "You can't summon people here.", // 794
+  them: "You can't summon them here.", // 803
+  // 812 when the paid summonses ran out too; with no tokens here, two energy summonses a day are all.
+  outToday: 'You cannot summon anymore today.',
+});
+
+/** teleportation_get_max_summons: two a game day from Teleportation V, none before. */
+export function maxSummons(learned = []) {
+  return has(learned, 'teleportation_5') ? SUMMONS_PER_DAY : 0;
+}
+
+/**
+ * teleportation_can_summon for the summoner's own side: can_teleport (already teleporting,
+ * dead, Pooped, Contraband, the skill, the cooldown, a Rook attack), one summons at a time,
+ * the day's two, and the energy (more than the cost, as every teleport here). The place and
+ * the target are the server's (summon.go) and the target's game's.
+ * @param {{ learned?: string[], now?: number, energy?: number, tank?: number, teleporting?: boolean,
+ *   dead?: boolean, pooped?: boolean, contraband?: boolean, rooked?: boolean, asking?: boolean,
+ *   place?: '' | 'here' | 'them' }} ctx
+ * @returns {{ ok: boolean, error?: string, energyCost: number|null }}
+ */
+export function canSummon(state, ctx = {}) {
+  const s = normalizeTeleportState(state);
+  const now = ctx.now ?? Date.now();
+  const energyCost = teleportEnergyCost(ctx.learned, ctx.tank || DEFAULT_TANK);
+  const no = (error) => ({ ok: false, error, energyCost });
+  if (ctx.teleporting) return no(TELEPORT_TEXT.already);
+  if (ctx.dead) return no(TELEPORT_TEXT.dead);
+  if (ctx.pooped) return no(SUMMON_CHECK_TEXT.pooped);
+  if (ctx.contraband) return no(SUMMON_CHECK_TEXT.contraband);
+  if (!has(ctx.learned, 'teleportation_1')) return no(TELEPORT_TEXT.noSkill);
+  if (s.cooldownUntil > now) return no(TELEPORT_TEXT.cooldown);
+  if (ctx.rooked) return no(SUMMON_CHECK_TEXT.rooked);
+  if (ctx.asking) return no(SUMMON_CHECK_TEXT.one);
+  if (ctx.place === 'here') return no(SUMMON_CHECK_TEXT.here);
+  if (ctx.place === 'them') return no(SUMMON_CHECK_TEXT.them);
+  if (s.summonsToday >= maxSummons(ctx.learned)) return no(SUMMON_CHECK_TEXT.outToday);
+  if ((ctx.energy ?? 0) <= energyCost) return no(TELEPORT_TEXT.energy);
+  return { ok: true, energyCost };
+}
+
+/**
+ * teleportation_summon 618-704 for the summoner, once the target said yes: can_summon again
+ * (627), one of the day's summonses and its energy (634-638), the cooldown (678, energy summonses
+ * out of the street only: a Party Space's summons sets none) and the summoner's counter (679).
+ * @param {object} ctx canSummon's, with `party` for a summons into a Party Space
+ */
+export function paySummon(state, ctx = {}) {
+  const gate = canSummon(state, { ...ctx, asking: false });
+  if (!gate.ok) return gate;
+  const s = normalizeTeleportState(state);
+  s.summonsToday += 1;
+  if (!ctx.party) s.cooldownUntil = (ctx.now ?? Date.now()) + TELEPORT_COOLDOWN_SECONDS * 1000;
+  return {
+    ok: true,
+    state: s,
+    energyCost: gate.energyCost,
+    events: [{ counter: 'teleportation_others:summoner', amount: 1 }],
+  };
 }

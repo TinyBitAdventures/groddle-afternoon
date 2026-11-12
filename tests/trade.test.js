@@ -29,8 +29,8 @@ import {
   tradeCommand,
   untradeableReason,
 } from '../public/js/trade.js?v=ce0373e5';
-import { tradeFeature } from '../public/js/features/trade-feature.js?v=d076c11e';
-import { FEATURES } from '../public/js/features/index.js?v=b4f84c1a';
+import { tradeFeature } from '../public/js/features/trade-feature.js?v=e2d3d46b';
+import { FEATURES } from '../public/js/features/index.js?v=7b71d7eb';
 import { serverPath, skipWithoutServer } from '../tools/repos.mjs';
 import { GSJS } from '../tools/build-realtime-trade.mjs';
 

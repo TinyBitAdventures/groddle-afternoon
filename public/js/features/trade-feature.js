@@ -42,7 +42,7 @@
 
 import { ITEM_CATALOG, addItem, countItem, itemIcon, listPackSlots, removeItem } from '../inventory.js?v=5be47371';
 import { TOOL_CONDITION_CATALOG, copyTagKind, copyTags, leavingToolWear, moveToolCopy, receiveToolCopies, receiveToolCopy, setCopyTag, setToolRemaining, toolCopies } from '../tools.js?v=5f482998';
-import { scriptFromTag, scriptLabel } from '../teleportation.js?v=1050225e';
+import { scriptFromTag, scriptLabel } from '../teleportation.js?v=e95cf7cb';
 import { saveStore } from '../save-store.js?v=89422a9c';
 import { playOverlay } from '../overlays.js?v=4e81f749';
 import {

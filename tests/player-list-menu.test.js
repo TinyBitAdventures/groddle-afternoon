@@ -7,7 +7,7 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { FROM_LIST_VERBS, PLAYER_TARGET_FEATURE, listPlayerTarget, opensPlayerMenu, playerMenuRows } from '../public/js/ui/player-menu.js?v=9aa8920e';
+import { FROM_LIST_VERBS, PLAYER_TARGET_FEATURE, listPlayerTarget, opensPlayerMenu, playerMenuRows } from '../public/js/ui/player-menu.js?v=047ec27e';
 import { PROFILE_PAGE_VERB } from '../public/js/profiles.js?v=054ca723';
 import { IM_VERB_ID } from '../public/js/player-im.js?v=da51888c';
 import { BUDDY_VERBS } from '../public/js/buddies.js?v=cff7bf6e';
@@ -52,7 +52,8 @@ describe('the player from a list (js/ui/player-menu.js)', () => {
 
   it('away from you: only the rows that work at a distance, in the world menu\'s order', () => {
     assert.deepEqual(playerMenuRows(WORLD).map((r) => r.label), ['Open Profile Page', 'Invite to Party', 'IM', 'Visit Home Street', 'Add to Friends', 'Block']);
-    assert.deepEqual([...FROM_LIST_VERBS].sort(), [PROFILE_PAGE_VERB, 'party_invite', IM_VERB_ID, VISIT_VERB.id, 'buddy_destination', ...Object.values(BUDDY_VERBS)].sort());
+    // Summon <name> (Teleportation V) was the server's row, so Glitch's list menu kept it (main.js 3661-3715).
+    assert.deepEqual([...FROM_LIST_VERBS].sort(), [PROFILE_PAGE_VERB, 'party_invite', IM_VERB_ID, VISIT_VERB.id, 'buddy_destination', 'mp_summon', ...Object.values(BUDDY_VERBS)].sort());
   });
 
   it('on your street: every row of the world menu (Give, Trade, Follow too)', () => {

@@ -12,7 +12,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { FakeEl, memoryStore, page } from './social-fake-dom.js';
-import { BLOCKED_PLAYER_VERBS, blockedPlayerVerbs, playerMenuRows } from '../public/js/ui/player-menu.js?v=9aa8920e';
+import { BLOCKED_PLAYER_VERBS, blockedPlayerVerbs, playerMenuRows } from '../public/js/ui/player-menu.js?v=047ec27e';
 import { BUDDY_VERBS } from '../public/js/buddies.js?v=cff7bf6e';
 import { FOLLOW_STOP_VERB } from '../public/js/follow-mp.js?v=ec738df5';
 import { PROFILE_PAGE_VERB } from '../public/js/profiles.js?v=054ca723';

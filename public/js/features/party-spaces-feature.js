@@ -51,7 +51,7 @@
  */
 
 import { addItem, countItem, ensureItem, removeItem, ITEM_CATALOG, itemIcon } from '../inventory.js?v=5be47371';
-import { teleportEnergyCost } from '../teleportation.js?v=1050225e';
+import { teleportEnergyCost } from '../teleportation.js?v=e95cf7cb';
 import {
   PARTY_GUESTS,
   PARTY_PACKS,
@@ -1595,6 +1595,22 @@ export const partySpacesFeature = {
    */
   noStartingQuests(engine) {
     return onPartyStreet(engine) ? true : null;
+  },
+
+  /**
+   * Summons (features/summon-mp-feature.js, inc_teleportation.js 682-687): 'here' is whether you
+   * stand in your party's live space in multiplayer (a summons may come from one); 'enter' takes a
+   * summoned member in, as party_enter_space did (the space's own arrival point), once the
+   * server's party_space has named it. null in solo.
+   */
+  summonPartySpace(action, engine) {
+    if (!isMp(engine)) return null;
+    if (action === 'here') return mpOnSpace(engine);
+    if (action !== 'enter') return null;
+    const p = party();
+    if (!p?.mp || !space() || !partyAlive(p) || mpOnSpace(engine)) return false;
+    enterParty(engine);
+    return true;
   },
 
   /** realtime-feature sharedStreet: in multiplayer a space's members share its hub street (PARTY_<id>). */

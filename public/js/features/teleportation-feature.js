@@ -16,8 +16,14 @@
  * - The jump plays a one-second shimmer (the source hit1 animation before
  *   teleportToLocationDelayed), then engine.enter() lands on the saved x/y.
  *
+ * - Summons (Teleportation V, multiplayer): js/summon-mp.js and
+ *   features/summon-mp-feature.js ask here (teleportSummon): 'check' is the
+ *   summoner's teleportation_can_summon, 'pay' spends one of the day's two and
+ *   its energy once the target said yes, 'arrive' is the target's shimmer and
+ *   landing beside the summoner.
+ *
  * Source gaps: Teleportation Tokens were a paid web currency, so token map
- * teleports, imbuing and summons are not offered. The remake's Map already
+ * teleports, imbuing and the summonses past the day's two are not offered. The remake's Map already
  * travels freely between loaded streets, so Teleportation IV's map teleports
  * add nothing there; IV's new power here is writing scripts. The script's
  * free-text note is not collected.
@@ -30,7 +36,8 @@
  * script, travels away and reads it home.
  * &teleportfx=hold freezes the departure shimmer for a screenshot.
  * Canvas data: teleportRank, teleportPoints, teleportCooldown, teleportPhase,
- * teleportLast, teleportScripts (each copy's street, - for one with none), teleportEnergyCost.
+ * teleportLast, teleportScripts (each copy's street, - for one with none), teleportEnergyCost,
+ * teleportSummons (summonses today).
  */
 
 import { addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=5be47371';
@@ -46,11 +53,13 @@ import {
   adoptScripts,
   canCreateScript,
   canMapTeleport,
+  canSummon,
   createScript,
   listTargets,
   mapTeleport,
   maxTargets,
   normalizeTeleportState,
+  paySummon,
   rollTeleportDay,
   scriptFromTag,
   scriptLabel,
@@ -60,7 +69,7 @@ import {
   teleportRank,
   teleportToPoint,
   useScript,
-} from '../teleportation.js?v=1050225e';
+} from '../teleportation.js?v=e95cf7cb';
 import { loseEnergy } from '../metabolics.js?v=8504134e';
 
 export const TELEPORT_FEATURE_ID = 'teleportation';
@@ -124,6 +133,48 @@ function jumpCtx(engine) {
   };
 }
 
+/**
+ * The summoner's side of teleportation_can_summon (js/teleportation.js canSummon): dead, Pooped,
+ * Contraband, a Rook attack, and where they stand: a quest room or any place the game holds them
+ * in, but a Party Space (main.js:3899), is "You can't summon people here." (776-797), a home
+ * "You can't summon them here." (799-806; a summons carries no home pass).
+ */
+function summonCtx(engine, opts = {}) {
+  const partyHere = engine.query?.('summonPartySpace', 'here', engine) === true;
+  const place = engine.homeContext?.().inHome ? 'them' : engine.transientInstance() && !partyHere ? 'here' : '';
+  return {
+    ...jumpCtx(engine),
+    dead: engine.query?.('isDead') === true,
+    pooped: Boolean(engine.hasBuff?.('pooped')),
+    contraband: Boolean(engine.hasBuff?.('dont_get_caught')),
+    rooked: Boolean(engine.hasBuff?.('rooked_recovery')),
+    asking: Boolean(opts.asking),
+    place,
+    party: Boolean(opts.party),
+  };
+}
+
+/** The summoned player's side of teleportation_summon 673-676: the hit1 shimmer, then the summoner's street. */
+function arriveSummoned(engine, opts = {}) {
+  const tsid = String(opts.street || '');
+  if (!tsid || pending || arrival || !engine.streetExists(tsid)) return false;
+  const x = Number(opts.x);
+  const y = Number(opts.y);
+  const target = {
+    tsid,
+    label: String(opts.label || tsid),
+    hubName: '',
+    ...(Number.isFinite(x) && Number.isFinite(y) ? { x: Math.round(x), y: Math.round(y) } : {}),
+  };
+  engine.closeMap();
+  engine.setData('teleportLast', `summoned:${tsid}`);
+  // 676: achievements_increment('teleportation_others', 'summonee').
+  pending = { target, events: [{ counter: 'teleportation_others:summonee', amount: 1 }], label: placeLabel(target), startedAt: Date.now() };
+  pending.fx = buildWarpFx(engine);
+  publish(engine);
+  return true;
+}
+
 /** Every script's own words, in pack order (none held: no row is made for them). */
 function heldTags(engine) {
   return engine.toolState && countItem(engine.inv, SCRIPT_CLASS) > 0 ? copyTags(engine.toolState, SCRIPT_CLASS) : [];
@@ -168,6 +219,7 @@ function publish(engine) {
   engine.setData('teleportPhase', pending ? 'warp' : arrival ? 'arriving' : 'idle');
   engine.setData('teleportScripts', heldTags(engine).map((t) => t?.tsid || '-').join(','));
   engine.setData('teleportEnergyCost', String(teleportEnergyCost(learned(engine), TANK) ?? 0));
+  engine.setData('teleportSummons', String(state.summonsToday || 0));
   if (engine.param('teleportdemo')) engine.setData('teleportDemo', demo.stage);
 }
 
@@ -675,6 +727,33 @@ export const teleportationFeature = {
     }
     if (action === 'go') return teleportFromMap(engine, opts);
     return null;
+  },
+
+  /**
+   * Summons (js/summon-mp.js, features/summon-mp-feature.js):
+   * 'check' -> { ok, error, energyCost, rank } for Summon <name> (opts.asking: one is out already);
+   * 'pay' -> pays the summons the target said yes to (opts.name, opts.party), { ok, error, energyCost };
+   * 'arrive' -> the summoned player's shimmer and landing on opts.street at opts.x / opts.y.
+   */
+  teleportSummon(action, opts = {}, engine) {
+    const rank = teleportRank(learned(engine));
+    if (action === 'check') return { ...canSummon(state, summonCtx(engine, opts)), rank };
+    if (action === 'arrive') return arriveSummoned(engine, opts);
+    if (action !== 'pay') return null;
+    const out = paySummon(state, summonCtx(engine, opts));
+    if (!out.ok) {
+      engine.pushActivity(out.error);
+      return { ok: false, error: out.error, energyCost: out.energyCost };
+    }
+    state = out.state;
+    // 637: metabolics_lose_energy (G289: nothing lost while dead).
+    if (out.energyCost) loseEnergy(engine.pc, out.energyCost);
+    for (const event of out.events) engine.achievement(event.counter, event.amount);
+    engine.updateHud();
+    engine.setData('teleportLast', `summon:e${out.energyCost || 0}`);
+    engine.save();
+    publish(engine);
+    return { ok: true, energyCost: out.energyCost };
   },
 
   /**

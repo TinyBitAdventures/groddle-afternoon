@@ -49,10 +49,10 @@ import { textureFromUrl } from '../textures.js?v=92ec53cd';
 import { ownBagLabel, stackMaxOf, isBagClass } from '../pack-slots.js?v=4a36968a';
 import { ELEMENT_CLASSES, NO_BAG_CLASSES, NO_SLOT_CLASSES } from '../pack-slots-data.js?v=800f664c';
 import { TOOL_CONDITION_CATALOG, copyTagKind, copyTags, receiveToolCopy, setCopyTag, takeToolCopy } from '../tools.js?v=5f482998';
-import { scriptFromTag, scriptLabel } from '../teleportation.js?v=1050225e';
+import { scriptFromTag, scriptLabel } from '../teleportation.js?v=e95cf7cb';
 import { possessive, readVisitScene } from '../neighbours-mp.js?v=7dc15891';
 import { saveStore } from '../save-store.js?v=89422a9c';
-import { homesFeature } from './homes-feature.js?v=05d8f43e';
+import { homesFeature } from './homes-feature.js?v=9adb87fc';
 import {
   SDB_PRICE_MAX,
   STORAGE_TEXT as T,

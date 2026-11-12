@@ -11,6 +11,7 @@
  *   Follow, the pack emotes too).
  * - Anywhere else: the rows that work at a distance, as Glitch's list menu kept them: Open Profile
  *   Page, Invite to Party, IM, Visit Home Street, Add to / Remove from Friends, Block / Un-Block,
+ *   Summon <name> (Teleportation V: the server's row, main.js 3661-3715, so the list menu kept it),
  *   and the remake's Set as Destination for a buddy on a public street (report #178, js/buddy-list.js).
  *   The rows are the features' own (engine.targetVerbs on a target built from the id and the name),
  *   so their labels, tips and reasons are the world menu's.
@@ -33,6 +34,7 @@ import { BUDDY_VERBS } from '../buddies.js?v=cff7bf6e';
 import { BUDDY_DESTINATION_VERB } from '../buddy-list.js?v=b418f3f2';
 import { VISIT_VERB } from '../neighbours-mp.js?v=7dc15891';
 import { FOLLOW_STOP_VERB } from '../follow-mp.js?v=ec738df5';
+import { SUMMON_VERB } from '../summon-mp.js?v=42c1557d';
 import { UNNAMED_PLAYER } from '../player-names.js?v=f9b78094';
 
 /** The feature that draws other players and owns their targets (features/party-feature.js PARTY_FEATURE_ID). */
@@ -49,6 +51,7 @@ export const FROM_LIST_VERBS = Object.freeze([
   BUDDY_VERBS.remove,
   BUDDY_VERBS.ignore,
   BUDDY_VERBS.unignore,
+  SUMMON_VERB,
 ]);
 
 /**
