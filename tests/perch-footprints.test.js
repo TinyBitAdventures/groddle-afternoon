@@ -27,10 +27,10 @@ import {
   populationForStreet,
   setStreetEcologyCatalog,
   streetReservedSpots,
-} from '../public/js/street-ecology.js?v=26dabe26';
+} from '../public/js/street-ecology.js?v=f27417a8';
 import { placementRequests } from '../tools/build-realtime-objects.mjs';
 import { SHRINE_SHEETS } from '../public/js/shrine-variants.js?v=7f11c97d';
-import { adoptedPlan } from '../public/js/features/patches-feature.js?v=702bd776';
+import { adoptedPlan } from '../public/js/features/patches-feature.js?v=92f12bc2';
 import { createPlot } from '../public/js/patches.js?v=d63423c9';
 import { serverPath, skipWithoutServer } from '../tools/repos.mjs';
 
@@ -59,8 +59,9 @@ describe('the footprints', () => {
     // the vendor 422 px x 0.25; a shrine cell 151 px x 0.78; rocks 92-114 px at 0.85; a Piggy's feet and
     // body (60) and a Chicken's (38) each with its patrol both ways (lane DOORCLEAR); a resting Butterfly's cell.
     assert.equal(TREE_FOOTPRINT, 180);
-    // A planned Mortar Barnacle (player report #210): its blister art and a little floor round it.
-    assert.deepEqual({ ...PLACEMENT_FOOTPRINTS }, { trees: 180, gardens: 280, vendor: 106, shrine: 118, rocks: 100, piggies: 240, chickens: 238, butterflies: 48, 'resource:mortar_barnacle': 60 });
+    // A planned Mortar Barnacle (player report #210): its blister art and a little floor round it; a planned
+    // Jellisac's sack and a Peat Bog's whole mound (reports #249, #250).
+    assert.deepEqual({ ...PLACEMENT_FOOTPRINTS }, { trees: 180, gardens: 280, vendor: 106, shrine: 118, rocks: 100, piggies: 240, chickens: 238, butterflies: 48, 'resource:mortar_barnacle': 60, 'resource:jellisac': 60, 'resource:peat_1': 180 });
     assert.equal(PERCH_DROP_PX, 150);
     const game = readFileSync(join(root, 'public/game.js'), 'utf8');
     assert.match(game, /trantDisplayScale\(tex, \{ targetH: 210, maxScale: 1 \}\)/);
@@ -201,7 +202,8 @@ describe('the archived streets', () => {
     // with doors, ladder feet and signposts kept clear (lane DOORCLEAR) 4 trees, 26 shrines, 192 rocks, 3 vendors;
     // with every rock the files name (G399, 51 more, up to 16 a street) 15 more of the rocks perch: 212 rocks, 4 vendors;
     // with shrines and vendors kept out from behind front decos (2026-11-08) 216 rocks, 26 shrines, 5 vendors, 4 trees.
-    assert.ok(perched <= 255, JSON.stringify(perchedBy));
+    // Reports #249, #250: planned Peat Bogs lie on ledges as Glitch's did (10) and one Jellisac sits on a long upper deck.
+    assert.ok(perched <= 270, JSON.stringify(perchedBy));
     // A walking animal never perches while a floor has room: none do (38 Piggies, 658 Chickens before).
     assert.equal((perchedBy.piggies || 0) + (perchedBy.chickens || 0), 0, JSON.stringify(perchedBy));
   });

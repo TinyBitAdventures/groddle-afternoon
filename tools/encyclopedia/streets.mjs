@@ -184,7 +184,7 @@ export async function addStreets(d, { inventory, picture, slug }) {
         tsid: g, place: place.key, anchor: map ? `L${g.slice(1)}` : '', onMap: Boolean(map), starter: g === home,
         store: pop.vendor ? vendor.selectVendorProfile(g, '', { rocks: pop.rockClasses.length, store: row.store }).key : null,
         npcStores: npcVendors.map((c) => ({ cls: c, store: npcStore(c) })).filter((v) => v.store),
-        giant: pop.giantId || null, gardens: pop.gardens, interiorWhy: ecoRow?.interiorWhy || '', empty: Boolean(pop.sourceEmpty),
+        giant: pop.giantId || null, gardens: pop.gardens + (pop.gardenBoxes || 0), interiorWhy: ecoRow?.interiorWhy || '', empty: Boolean(pop.sourceEmpty),
         here: [...here].sort((a, b) => KIND_ORDER.indexOf(kindOf(a[0])) - KIND_ORDER.indexOf(kindOf(b[0])) || b[1] - a[1] || a[0].localeCompare(b[0])),
         signposts: (signs.streets?.[g] || []).filter((t) => t !== g),
         doors: (signs.doors?.[g] || []).map((to) => ({ to, key: doorKey(to) })),

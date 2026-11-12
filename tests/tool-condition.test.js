@@ -19,14 +19,14 @@ import {
   createGarden,
   plantPlot,
   waterPlot,
-} from '../public/js/garden.js?v=489cda8f';
+} from '../public/js/garden.js?v=37209241';
 import {
   createMineRock,
   mineRock,
   MINING_COSTS,
 } from '../public/js/mining.js?v=12a6f1bd';
 import { craftRecipe } from '../public/js/making.js?v=2cd473f3';
-import { createPlayerSave, normalizePlayerSave } from '../public/js/player-save.js?v=cf585ed2';
+import { createPlayerSave, normalizePlayerSave } from '../public/js/player-save.js?v=ae3205a3';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const publicDir = path.join(here, '..', 'public');

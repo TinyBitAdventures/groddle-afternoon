@@ -34,7 +34,7 @@ import {
   GARDEN_FERTILIZE_MS,
   fertilizeCheck,
   fertilizePlot,
-} from './js/garden.js?v=489cda8f';
+} from './js/garden.js?v=37209241';
 import { firstWorkingTool, HOE_TOOLS, WATERING_CAN_TOOLS } from './js/tools.js?v=5f482998';
 import { miningGemHint } from './js/gem-hints.js?v=4b65f7ac';
 import {
@@ -53,7 +53,7 @@ import {
   ensureAnimalState,
   listAnimalFeedOptions,
   feedAnimal,
-} from './js/animals.js?v=f44dd15a';
+} from './js/animals.js?v=c944b0a6';
 import {
   quoteAnimalKinship,
   performAnimalKinship,
@@ -81,7 +81,7 @@ import {
   namingVerbs,
   queuePlops,
   startIncubation,
-} from './js/animal-husbandry.js?v=aa65a582';
+} from './js/animal-husbandry.js?v=0c6dec4a';
 import { loseEnergy, metabolicGain, moodMax } from './js/metabolics.js?v=8504134e';
 import { SET_FREE, setFreeVerbState } from './js/animal-set-free.js?v=3b194fca';
 import { BUTTER_UP, SING_TO, butterUpVerbState, butterUpChicken, singToVerbState, singToButterfly } from './js/animal-flattery.js?v=63001f58';

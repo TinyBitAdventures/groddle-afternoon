@@ -1064,9 +1064,45 @@ export function streetGardenBed(tsid, index) {
   return { bed: 'herb', gardenType: 'herb', cols: 3 };
 }
 
-/** A bed key's kind: herb2 is an herb bed. */
+/**
+ * A street bed's key: default, herb, or herb2..herb9 (a Herb Gardens street's other herb beds: its
+ * second planned bed before report #252, now one per planter box, street-ecology.js streetGardenBoxBeds).
+ */
+export const BED_KEY_RE = /^(default|herb[2-9]?)$/;
+
+/** A bed key's kind: herb2..herb9 are herb beds. */
 export function bedKind(bed) {
-  return bed === 'herb' || bed === 'herb2' ? 'herb' : 'default';
+  return /^herb[2-9]?$/.test(String(bed || '')) ? 'herb' : 'default';
+}
+
+/**
+ * Report #252: a saved street bed laid out again at another size (the Herb Gardens beds moved into
+ * their planter boxes: herb2 from four plots by two to a 3x4 box). New plots come in empty; a plot
+ * past the new size goes only when it is bare (clean, nothing sown), and one holding anything keeps
+ * the bed big enough for it, so no seed, shoot or crop is ever lost. Mutates; true when it changed.
+ */
+export function fitGardenToBed(garden, cols, rows, now = Date.now()) {
+  if (!garden?.plots || !(cols >= 1) || !(rows >= 1)) return false;
+  if (garden.cols === cols && garden.rows === rows) return false;
+  let wantCols = cols;
+  let wantRows = rows;
+  for (const [key, plot] of Object.entries(garden.plots)) {
+    const [c, r] = key.split('-').map(Number);
+    if ((c > cols || r > rows) && plot && (plot.state !== 'clean' || plot.seed)) {
+      wantCols = Math.max(wantCols, c);
+      wantRows = Math.max(wantRows, r);
+    }
+  }
+  for (const key of Object.keys(garden.plots)) {
+    const [c, r] = key.split('-').map(Number);
+    if (c > wantCols || r > wantRows) delete garden.plots[key];
+  }
+  for (let r = 1; r <= wantRows; r++) {
+    for (let c = 1; c <= wantCols; c++) garden.plots[plotKey(c, r)] ||= createEmptyPlot(now);
+  }
+  garden.cols = wantCols;
+  garden.rows = wantRows;
+  return true;
 }
 
 export function createGarden(opts = {}) {

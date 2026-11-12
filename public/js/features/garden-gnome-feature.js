@@ -23,7 +23,7 @@
  * teach(value). Canvas: gnomes (id@x:state:dir:phrases per gnome here, ';'), gnomePlace, gnomeLast.
  */
 import { addItem, countItem, removeItem } from '../inventory.js?v=5be47371';
-import { readVisitScene } from '../neighbours-mp.js?v=7dc15891';
+import { readVisitScene } from '../neighbours-mp.js?v=b850715d';
 import { frameTexture, sourceFromUrl } from '../textures.js?v=92ec53cd';
 import { GNOME_ART, GNOME_ART_DIR } from '../garden-gnome-art.js?v=994b7c76';
 import { filterText } from '../word-filter.js?v=9a7a7ebb';

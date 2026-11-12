@@ -31,7 +31,7 @@
  * growModifier, pace, wetPace }. Growth uses js/garden.js plotStageMs (sowPlot sets the plot's clock).
  */
 
-import { SEED_CATALOG, applyFertilizer, sowPlot, wetPlot, stageElapsedMs } from './garden.js?v=489cda8f';
+import { SEED_CATALOG, applyFertilizer, sowPlot, wetPlot, stageElapsedMs } from './garden.js?v=37209241';
 import { gardenGrowModifier } from './imagination-effects.js?v=70169933';
 import { skillPackageDetails } from './skill-packages.js?v=bfb87281';
 import { metabolicGain, moodMax, loseEnergy } from './metabolics.js?v=8504134e';

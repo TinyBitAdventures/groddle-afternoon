@@ -42,7 +42,7 @@ import {
   listBuyOffers,
   listSellOffers,
   createVendorSellQuote,
-} from '../public/js/vendor.js?v=592caaf1';
+} from '../public/js/vendor.js?v=5207195b';
 import {
   buildMapGraph,
   buildHubMapView,

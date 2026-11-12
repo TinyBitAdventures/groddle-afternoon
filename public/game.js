@@ -2,7 +2,7 @@
  * Groddle Afternoon — original street geometry + layered decos
  * PixiJS 8 · locations-xml streets · CoU PNG decos · quests/items
  */
-import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=ac1912e3';
+import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=968c90a7';
 import { createErrorOnce, createFeatureHost } from './js/feature-host.js?v=06bb8b74';
 import { FEATURES, questFlagsFeature } from './js/features/index.js?v=929c82e9';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl, drawTileArt } from './js/enter-chooser.js?v=4a3ea327';
@@ -486,8 +486,8 @@ import { PACK_COPY, isBagClass, isElementClass, ownBagLabel, unitRankAt } from '
 import { FLOAT_TEXT_Z, SPEECH_BUBBLE_Z } from './js/fx-z.js?v=18dda7e3';
 import { hasPouch } from './js/elemental-pouch.js?v=ceefa97a';
 import { createPackRow, mountPackClearance, packBandRange, packCountText, packSearchEntries, packSlotTip } from './js/ui/pack-row.js?v=f27cf531';
-import { listAnimalFeedOptions } from './js/animals.js?v=f44dd15a';
-import { pickerMaxCount, pickerOptionsFor, pickerTakesCount } from './js/animals.js?v=f44dd15a';
+import { listAnimalFeedOptions } from './js/animals.js?v=c944b0a6';
+import { pickerMaxCount, pickerOptionsFor, pickerTakesCount } from './js/animals.js?v=c944b0a6';
 import {
   createDroppedItemState,
   parseDroppedItemState,
@@ -506,7 +506,7 @@ import {
   parsePlayerSave,
   serializePlayerSave,
   restorePlayerSave,
-} from './js/player-save.js?v=cf585ed2';
+} from './js/player-save.js?v=ae3205a3';
 import {
   HOME_INTERIOR_TSID,
   HOME_STREET_TSID,
@@ -610,6 +610,7 @@ import { groupMakingTools, makeToolCounts, makeToolCountLine, makeToolSpokenLine
 import { LOW_FUEL_LINE, craftSessionElapsedMs, isLowFuel, isMachineArt, machineArtHtml, packMakeState, playMachineHandOver, setMachineArtFrame } from './js/machine-art.js?v=93e29c2d';
 import {
   createGarden,
+  fitGardenToBed,
   streetGardenBed,
   tickGarden,
   plantPlot,
@@ -635,7 +636,7 @@ import {
   hasHoe,
   plantSeedChoices,
   PLANT_PICK_TITLE,
-} from './js/garden.js?v=489cda8f';
+} from './js/garden.js?v=37209241';
 import { GARDEN_SCALE, PLOT_H as GARDEN_PLOT_H, PLOT_W as GARDEN_PLOT_W, gardenFrame, gardenLayout, gardenStyle, plotPieces } from './js/garden-view.js?v=04fe8467';
 import { nearestPlotIndex } from './js/garden-view.js?v=04fe8467';
 import {
@@ -658,7 +659,7 @@ import {
   ensureStreetIndex,
   resolveIndexTsid,
 } from './js/street-loader.js?v=18b181ad';
-import { showDraftBanner, startDraftPlay } from './js/builder/draft-play.js?v=d9bc9e05';
+import { showDraftBanner, startDraftPlay } from './js/builder/draft-play.js?v=e419c862';
 import {
   ladderTopDeck,
   groundBeneath,
@@ -849,14 +850,14 @@ import {
   vendorSellUnitPrice,
   vendorBuyUnitPrice,
   VENDOR_BAG_HOLDS,
-} from './js/vendor.js?v=592caaf1';
+} from './js/vendor.js?v=5207195b';
 import {
   animalAnchorX,
   animalAnchorY,
   createAnimalState,
   resetAnimalDay,
   animalStatusLabel,
-} from './js/animals.js?v=f44dd15a';
+} from './js/animals.js?v=c944b0a6';
 import {
   ensureWoodTreeState,
   pickWoodTool,
@@ -961,11 +962,12 @@ import {
   populationForStreet,
   planStreetPlacements,
   streetReservedSpots,
+  streetGardenBoxBeds,
   animalPatrolRange,
   ANIMAL_PATROL,
   nearestPlacementGap,
-} from './js/street-ecology.js?v=26dabe26';
-import { CHICKEN_PAUSE, chickenPauseRoll, easeToward, flightFloorAt, flightFloorFor, flyerLift } from './js/street-creatures.js?v=389b5500';
+} from './js/street-ecology.js?v=f27417a8';
+import { CHICKEN_PAUSE, chickenPauseRoll, easeToward, flightFloorAt, flightFloorFor, flyerLift } from './js/street-creatures.js?v=5ce0fbf3';
 import { chickenPose, chickenIdleSheetsAsked } from './js/chicken-idle-art.js?v=c46b17d5';
 import { chickenWaitPose } from './js/chicken-idles.js?v=eef0279b';
 import { itemOverlayStats } from './js/item-overlay.js?v=97ed2ba0';
@@ -24437,6 +24439,10 @@ async function enterStreet(tsid, opts = {}) {
       bed: bed.bed,
     });
   });
+  // Report #252: a Herb Gardens street's beds, one in each planter box (the box is the bed: style none).
+  streetGardenBoxBeds(data, currentStreetPopulation).forEach((bed) => {
+    spawnGarden({ x: bed.x, y: bed.y, cols: bed.cols, rows: bed.rows, gardenType: bed.gardenType, bed: bed.bed, style: 'none' });
+  });
   spawnMineRocks(currentStreetPopulation.rockClasses, placement('rocks'));
 
   if (player) {
@@ -29531,6 +29537,8 @@ function spawnGarden(opts = {}) {
     createGarden({ cols, rows, gardenType, bed: bedKey });
   if (!opts.detached && !sharedGarden) {
     if (bedKey !== gardenType) garden.bed = bedKey;
+    // Report #252: a saved street bed laid out at a new size keeps every plot holding something.
+    if (opts.cols && opts.rows && !opts.garden) fitGardenToBed(garden, opts.cols, opts.rows);
     streetState.gardens[bedKey] = garden;
   }
   // Growth continues while the player is away or the browser is closed.
@@ -32778,7 +32786,7 @@ async function main() {
   }
   // Garden talkback QA (js/garden-talk-qa.js): ?gardentalkdemo=herb|crop.
   if (new URLSearchParams(location.search).has('gardentalkdemo')) {
-    import('./js/garden-talk-qa.js?v=7e27697e').then((m) => m.runGardenTalkDemo({ engine, executeVerb, params: new URLSearchParams(location.search) }));
+    import('./js/garden-talk-qa.js?v=aacc2be3').then((m) => m.runGardenTalkDemo({ engine, executeVerb, params: new URLSearchParams(location.search) }));
   }
   // MEMQA (ticket 21, Safari's memory reload in Naraka): ?memqa=1 lets a probe walk streets through the
   // real street trip (tools/qa/street-memory.mjs). Solo pages only: online pages drop their params.

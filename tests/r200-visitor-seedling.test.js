@@ -18,7 +18,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 import { GROWN_TREE_LABELS, SOIL_TIMERS, performPlotVerb, plotVerbs } from '../public/js/patches.js?v=d63423c9';
-import { allowedVerbs, applyYardAct, growIfReady, visitorTreeState } from '../public/js/yard-verbs-mp.js?v=82048a76';
+import { allowedVerbs, applyYardAct, growIfReady, visitorTreeState } from '../public/js/yard-verbs-mp.js?v=08bbc3f9';
 import { GAME_DIR, HAS_SITE, SITE_DIR } from '../tools/repos.mjs';
 
 const gsjs = join(GAME_DIR, '..', 'glitch-GameServerJS');

@@ -37,7 +37,7 @@ import {
   tendAct,
   tendCounters,
   tendedText,
-} from '../public/js/neighbours-mp.js?v=7dc15891';
+} from '../public/js/neighbours-mp.js?v=b850715d';
 import { createButlerState, giveGiftTo, newestVisit, nextHandover, normalizeButlerState, packagesAndMessagesForOwner, recordVisitor, setGift, visitorsReport } from '../public/js/butler.js?v=1370b711';
 import { GARDEN_SPEEDUP, SEED_CATALOG as GARDEN_SEEDS, createGarden, tickGarden } from '../public/js/garden.js?v=489cda8f';
 import { butlerApi } from '../public/js/features/butler-feature.js?v=27e8d678';

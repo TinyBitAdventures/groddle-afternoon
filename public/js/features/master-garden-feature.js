@@ -29,7 +29,7 @@
 
 import { TOOL_CONDITION_CATALOG, migrateClassValue } from '../tools.js?v=5f482998';
 import { ITEM_CATALOG, countItem, ensureItem } from '../inventory.js?v=5be47371';
-import { SEED_CATALOG, listPlantableSeeds } from '../garden.js?v=489cda8f';
+import { SEED_CATALOG, listPlantableSeeds } from '../garden.js?v=37209241';
 import {
   GARDEN_POTIONS,
   MASTER_GARDENER,
@@ -42,7 +42,7 @@ import {
   potionTendGarden,
   potionUsesLeft,
   usePotion,
-} from '../master-garden.js?v=7cb423d9';
+} from '../master-garden.js?v=2cd0c59d';
 import { rollDropTable } from '../drop-tables.js?v=16e12632';
 import { payDrop } from './drops-feature.js?v=2cd8ff9b';
 import { textureFromUrl } from '../textures.js?v=92ec53cd';

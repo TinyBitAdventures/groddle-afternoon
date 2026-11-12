@@ -18,10 +18,10 @@ import { join } from 'node:path';
 
 import { STREET_INDEX, applyStreetIndex, loadStreetDataFromFs, setZoneStreetsShown } from '../public/js/street-loader.js?v=18b181ad';
 import { platformsScreen, streetWidth } from '../public/js/street-model.js?v=b6cb6a4e';
-import { ecologyForStreet, planStreetPlacements, populationForStreet, setStreetEcologyCatalog, streetReservedSpots } from '../public/js/street-ecology.js?v=26dabe26';
-import { resourceSpawnPlan } from '../public/js/features/resource-nodes-feature.js?v=3882cabb';
-import { FEATURES } from '../public/js/features/index.js?v=929c82e9';
-import { streetGardenBed } from '../public/js/garden.js?v=489cda8f';
+import { ecologyForStreet, planStreetPlacements, populationForStreet, setStreetEcologyCatalog, streetGardenBoxBeds, streetReservedSpots } from '../public/js/street-ecology.js?v=f27417a8';
+import { resourceSpawnPlan } from '../public/js/features/resource-nodes-feature.js?v=8d31666e';
+import { FEATURES } from '../public/js/features/index.js?v=df7d471c';
+import { streetGardenBed } from '../public/js/garden.js?v=37209241';
 import { isZoneTsid } from '../public/js/zone-streets.js?v=b40010d5';
 import { serverPath, skipWithoutServer } from '../tools/repos.mjs';
 
@@ -118,7 +118,7 @@ describe('the page lays out each street where the realtime server checks reach',
       } catch {
         continue;
       }
-      const { placement, nodes } = clientLayout(data, core, nodesFeature);
+      const { population, placement, nodes } = clientLayout(data, core, nodesFeature);
       const want = objects[tsid] || {};
       const bad = [];
       const rows = (kind, group, dy = 2) => {
@@ -147,11 +147,19 @@ describe('the page lays out each street where the realtime server checks reach',
         if (differs(byKey.get(key), x, y)) bad.push(`node:${key} page ${at(byKey.get(key))} server ${x},${y}`);
       }
       // Shared public gardens (gardens.go): each bed's key (its plot ids), width and spot by the page's bed index.
+      // Report #252: then the beds in a Herb Gardens street's planter boxes (game.js: x, y as they are, rows from the box).
       const beds = placement('gardens');
-      for (const [index, [key, cols, , x, y]] of (gardens[tsid] || []).entries()) {
+      const boxed = streetGardenBoxBeds(data, population);
+      for (const [index, [key, cols, rows, x, y]] of (gardens[tsid] || []).entries()) {
+        if (index >= beds.length) {
+          const b = boxed[index - beds.length];
+          if (!b || differs({ x: b.x, y: b.y - 2 }, x, y) || b.bed !== key || b.cols !== cols || b.rows !== rows) bad.push(`garden ${index} page ${b?.bed} ${b?.cols}x${b?.rows} at ${b?.x},${b?.y} server ${key} ${cols}x${rows} at ${x},${y}`);
+          continue;
+        }
         const bed = streetGardenBed(tsid, index);
         if (differs(beds[index], x, y) || bed.bed !== key || bed.cols !== cols) bad.push(`garden ${index} page ${bed.bed} ${bed.cols} at ${at(beds[index])} server ${key} ${cols} at ${x},${y}`);
       }
+      if ((gardens[tsid] || []).length && (gardens[tsid] || []).length !== beds.length + boxed.length) bad.push(`gardens: page ${beds.length + boxed.length} server ${(gardens[tsid] || []).length}`);
       if (bad.length) drift.push(`${tsid} ${data.label}: ${bad.slice(0, 4).join('; ')}${bad.length > 4 ? ` (+${bad.length - 4})` : ''}`);
       checked += 1;
     }

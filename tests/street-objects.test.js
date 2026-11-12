@@ -46,7 +46,7 @@ import { createResourceNode } from '../public/js/resource-nodes.js?v=9db2fcee';
 import { createTrantState, fruitCapacityAt, setTrantTables } from '../public/js/trants.js?v=1b3c8ae3';
 import { placementRequests, ruleTables, streetObjectLayout } from '../tools/build-realtime-objects.mjs';
 import { STREET_INDEX, applyStreetIndex, loadStreetDataFromFs } from '../public/js/street-loader.js?v=18b181ad';
-import { PLANNED_NODE_CAPS, measuredNodeSpots, setStreetEcologyCatalog } from '../public/js/street-ecology.js?v=26dabe26';
+import { PLANNED_NODE_CAPS, measuredNodeSpots, setStreetEcologyCatalog } from '../public/js/street-ecology.js?v=f27417a8';
 import { serverPath, skipWithoutServer } from '../tools/repos.mjs';
 
 const root = join(import.meta.dirname, '..');
@@ -500,20 +500,30 @@ describe('street objects: the server\'s layout', () => {
     assert.equal(count(data.streets.GHFA15VS0UC3ITS.nodes, 'ice_knob'), row('GHFA15VS0UC3ITS').counts.ice_knob);
     assert.equal(count(data.streets.GTJ12E6VSFQ1V4E.nodes, 'jellisac'), row('GTJ12E6VSFQ1V4E').counts.jellisac);
     assert.equal(count(data.streets.GA9154LI9R22R7A.rocks, 'rock_sparkly_1'), row('GA9154LI9R22R7A').counts.rock_sparkly_1);
-    // Two streets have too few spots for theirs (the planner runs out, not a cap): they never had them.
+    // A street with too few spots for its nodes (the planner runs out, not a cap) never had them.
     const short = [];
+    const steadyShort = [];
     for (const [tsid, street] of Object.entries(data.streets)) {
       const counts = row(tsid)?.counts || {};
-      for (const cls of ['ice_knob', 'jellisac', 'dirt_pile', 'peat_1']) {
+      for (const cls of ['ice_knob', 'dirt_pile']) {
         if (count(street.nodes, cls) < (counts[cls] || 0)) short.push(tsid);
       }
-      // Player report #210: every measured barnacle, then at most PLANNED_NODE_CAPS planned on a steady floor.
-      const measured = Math.min(counts.mortar_barnacle || 0, measuredNodeSpots(tsid)?.mortar_barnacle?.length || 0);
-      const barnacles = count(street.nodes, 'mortar_barnacle');
-      assert.ok(barnacles >= measured, `${tsid} keeps its ${measured} measured barnacles`);
-      assert.ok(barnacles <= measured + Math.min((counts.mortar_barnacle || 0) - measured, PLANNED_NODE_CAPS.mortar_barnacle), tsid);
+      // Player reports #210, #249, #250: every measured barnacle, Jellisac and Peat Bog, then at most
+      // PLANNED_NODE_CAPS planned on a steady floor (none where no steady floor has the room).
+      for (const cls of ['mortar_barnacle', 'jellisac', 'peat_1']) {
+        const measured = Math.min(counts[cls] || 0, measuredNodeSpots(tsid)?.[cls]?.length || 0);
+        const n = count(street.nodes, cls);
+        const most = measured + Math.min((counts[cls] || 0) - measured, PLANNED_NODE_CAPS[cls]);
+        assert.ok(n >= measured, `${tsid} keeps its ${measured} measured ${cls}`);
+        assert.ok(n <= most, `${tsid} ${cls}`);
+        if (cls !== 'mortar_barnacle' && n < most) steadyShort.push(`${tsid} ${cls}`);
+      }
     }
-    assert.deepEqual([...new Set(short)].sort(), ['GA94KO5CFQA2V4Q', 'GDOVCSE5H2R2L24']);
+    assert.deepEqual([...new Set(short)].sort(), ['GDOVCSE5H2R2L24']);
+    // The other street that ran out (GA94KO5CFQA2V4Q's one Peat Bog) is now a steady-floor miss, below.
+    assert.ok(steadyShort.includes('GA94KO5CFQA2V4Q peat_1'), steadyShort.join(', '));
+    // The few planned Jellisacs and Peat Bogs no steady floor has room for are left out, not hung in the air.
+    assert.ok(steadyShort.length <= 12, steadyShort.join(', '));
   });
 
   it('matches the data file the server embeds', { skip: skipWithoutServer }, async () => {

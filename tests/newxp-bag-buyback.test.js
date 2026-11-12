@@ -12,8 +12,8 @@ import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 import { CHEAP_BAG_PRICE, cheapBagPrice } from '../public/js/newxp.js?v=45ae5f37';
-import { __newxpTest } from '../public/js/features/newxp-feature.js?v=9a7fe18a';
-import { vendorBuy, vendorSell, vendorSellValue } from '../public/js/vendor.js?v=592caaf1';
+import { __newxpTest } from '../public/js/features/newxp-feature.js?v=83ffcda0';
+import { vendorBuy, vendorSell, vendorSellValue } from '../public/js/vendor.js?v=5207195b';
 import { createInventory, countItem } from '../public/js/inventory.js?v=5be47371';
 
 const GSJS = join(import.meta.dirname, '..', '..', 'glitch-GameServerJS');

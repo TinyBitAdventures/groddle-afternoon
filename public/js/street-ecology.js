@@ -6,6 +6,7 @@
 import { avatarHeadReach, groundBeneath, isItemSolid, isStandable, platformYAt, worldToScreen } from './street-model.js?v=b6cb6a4e';
 import { behindFloor } from './reach.js?v=4187d746';
 import { BARNACLE_SPOTS } from './barnacle-spots-data.js?v=cea3daec';
+import { JELLISAC_SPOTS, PEAT_SPOTS } from './node-spots-data.js?v=4984e395';
 
 export const STREET_ECOLOGY_URL = 'assets/content/street-ecology.json?v=official-ecology-6';
 
@@ -139,14 +140,25 @@ export const RESOURCE_NODE_CAPS = Object.freeze({
  * snaps did not show are planned on a floor, as are all of a street with no snap, and of those the
  * planner seats at most PLANNED_NODE_CAPS: a floor is never where the original had them, so an
  * invented row of 13 along the ground is worse than a few.
+ *
+ * Player reports #249 and #250: Jellisacs and Peat Bogs were set by hand too (jellisac.js and
+ * peat_base.js obey_physics false). Every Jellisac on Vuoksi Vale sat in a dark hole in the rock
+ * face, and Peat Bogs lay flat on floors and ledges; the planner hung one Jellisac on a ledge in
+ * mid-air and laid a Peat Bog along Ratin Jot Jog's root. They have measured spots the same way
+ * (assets/content/node-spots.json from tools/snap-placements/nodes.py), and the planned rest keep
+ * to steady floors (STEADY_FLOOR_GROUPS) and these caps.
  */
 export const PLANNED_NODE_CAPS = Object.freeze({
   mortar_barnacle: 6,
+  jellisac: 4,
+  peat_1: 3,
 });
 
 /** Measured spots per class: { [class]: { [G tsid]: [[x, y, variant number], ...] } } (street px). */
 export const MEASURED_NODE_SPOTS = Object.freeze({
   mortar_barnacle: Object.freeze({ variantPrefix: 'blister', streets: BARNACLE_SPOTS }),
+  jellisac: Object.freeze({ variantPrefix: 'jellySack', streets: JELLISAC_SPOTS }),
+  peat_1: Object.freeze({ variantPrefix: 'peat', streets: PEAT_SPOTS }),
 });
 
 /**
@@ -467,6 +479,10 @@ export function populationForStreet(tsid, entry, { starter = false } = {}) {
     vendor = true;
     shrine = true;
   }
+  // Report #252: on the Herb Gardens streets every Garden the file names is a bed in a planter box
+  // (streetGardenBoxBeds), none is planned.
+  const gardenBoxes = !starter && isGardenBoxStreet(tsid) ? whole(entry?.counts?.garden) : 0;
+  if (gardenBoxes) gardens = 0;
 
   return {
     // No row here means the starter street without its catalog row (the
@@ -481,6 +497,7 @@ export function populationForStreet(tsid, entry, { starter = false } = {}) {
     treeClasses,
     rockClasses,
     gardens,
+    ...(gardenBoxes ? { gardenBoxes } : {}),
     vendor,
     shrine,
     // Feature-built rows (private instances such as party spaces) may pin
@@ -551,6 +568,10 @@ export const PLACEMENT_FOOTPRINTS = Object.freeze({
   butterflies: 48,
   // Player report #210: a planned Mortar Barnacle's blister art (32-39 px a frame) and a little floor round it.
   'resource:mortar_barnacle': 60,
+  // Reports #249, #250: a Jellisac's sack (40-47 px a frame), and a Peat Bog's mound (peat1-3 frames
+  // 166-211 px, the opaque mound about 160-190) lying whole on its floor.
+  'resource:jellisac': 60,
+  'resource:peat_1': 180,
 });
 
 /**
@@ -558,11 +579,19 @@ export const PLACEMENT_FOOTPRINTS = Object.freeze({
  * Froughtful Fen's decks. A group here only takes a floor no steeper than `maxSlope` (rise over run)
  * and never a ledge (a run shorter than `ledgeRun` px) with another floor under it (a perch,
  * PERCH_DROP_PX); with no such spot left, or none with its footprint's room, it is not placed
- * (planStreetPlacements: no fallback). Barnacles only:
- * the other nodes keep the plain rule.
+ * (planStreetPlacements: no fallback).
+ *
+ * Reports #249, #250: planned Jellisacs and Peat Bogs (the ones the snaps do not show) keep to
+ * steady floors too, and neither end of the thing may hang over air: `edgeDrop` is the most the
+ * floor under either end of its footprint may fall away below its spot (footOverAir), so a Peat Bog
+ * laid on a 0.5 root with its low end 38 px over air, or a Jellisac at a ledge's lip, is out. A Peat
+ * Bog lies flat (no slope over 0.15), on a ledge as readily as on the floor (Glitch had them on
+ * ledges: no ledge rule). The other nodes keep the plain rule.
  */
 export const STEADY_FLOOR_GROUPS = Object.freeze({
   'resource:mortar_barnacle': Object.freeze({ maxSlope: 0.4, ledgeRun: 240 }),
+  'resource:jellisac': Object.freeze({ maxSlope: 0.25, ledgeRun: 240, edgeDrop: 12 }),
+  'resource:peat_1': Object.freeze({ maxSlope: 0.15, ledgeRun: 0, edgeDrop: 12 }),
 });
 
 /** PURE: whether a planner spot (buildPlatformCandidates) is a floor a STEADY_FLOOR_GROUPS rule takes. */
@@ -570,6 +599,31 @@ export function steadyFloor(candidate, rule) {
   if (!rule) return true;
   if ((candidate?.slope || 0) > rule.maxSlope) return false;
   return !((candidate?.under || 0) > 0 && (candidate?.run || 0) < rule.ledgeRun);
+}
+
+/** How far above a surface may stand over an edge and still count as under it (a step up). */
+export const EDGE_STEP_UP_PX = 60;
+
+/**
+ * PURE: how far the floor falls away under the worse end of a thing `half` px each side of a spot
+ * (screen px; Infinity when an end has no floor under it at all). Only lines items rest on
+ * (isItemSolid) count, and a surface up to EDGE_STEP_UP_PX over the spot is one
+ * the end sits against (0 drop).
+ */
+export function footOverAir(platforms, spot, half) {
+  let worst = 0;
+  for (const dx of [-half, half]) {
+    const x = spot.x + dx;
+    let best = null;
+    for (const line of platforms || []) {
+      if (!isItemSolid(line)) continue;
+      const py = platformYAt(line, x, 0);
+      if (py == null || py < spot.y - EDGE_STEP_UP_PX) continue;
+      if (best == null || py < best) best = py;
+    }
+    worst = Math.max(worst, best == null ? Infinity : Math.max(0, best - spot.y));
+  }
+  return worst;
 }
 /** Groups that need their room but may sit on a perch as readily as on a floor. */
 export const PERCHING_GROUPS = Object.freeze(['butterflies']);
@@ -667,8 +721,106 @@ export function streetReservedSpots(street) {
     const w = Number(ladder.w) > 0 ? Number(ladder.w) : 50;
     out.push({ ...foot, key: `ladder:${ladder.id}`, clearance: Math.round(w / 2), block: box(foot.x, foot.y, w, Math.min(ladder.h, LADDER_FOOT_PX)) });
   }
+  // Report #252: a Herb Gardens street's planter boxes hold its beds, kept clear as a planned bed is.
+  if (isGardenBoxStreet(street?.tsid)) {
+    streetGardenBoxes(street).forEach((b, index) => {
+      out.push({ x: b.x, y: b.y, key: `garden-box:${index}`, clearance: 165, block: box(b.x, b.y, b.w, b.h) });
+    });
+  }
   out.push(...frontDecoCovers(street));
   return out;
+}
+
+/**
+ * Report #252: the three Herb Gardens streets, where each location file lists exactly as many
+ * "Garden" items as the street has firebog planter boxes (Chakra Phool 8, Shimla Mirch 7,
+ * Jethimadh 5), and players' snaps of 2012 show herbs growing in every box. Each Garden was a bed
+ * in a box, so there the beds go in the boxes and none is planned (populationForStreet
+ * `gardenBoxes`, the cap of two planned beds lifted).
+ */
+export const GARDEN_BOX_STREETS = Object.freeze(['GA95U14319524O9', 'GA97L62229522GS', 'GA99U5PI39524GN']);
+
+/**
+ * The planter box decos (decos/groddle/firebog_planter_box_<rows>x<cols>): a box named RxC holds R
+ * rows of C plots (the snaps: the 1x3 boxes one row of three, 2x3 two rows of three, 3x4 twelve herbs
+ * in three rows; garden_new.js width = plots across, height = plots deep). `soilFront` is how far
+ * above the deco's foot the soil's front edge is, as a share of its height (the art measured at its
+ * street size: 27 of 48, 26 of 64, 24 of 73 px); a bed's front plots stand on it (garden-view.js
+ * plots 16 px deep, 14 a row: one, two and three rows fill the 18, 35 and 46 px of soil).
+ */
+export const PLANTER_BOXES = Object.freeze({
+  firebog_planter_box_1x3: Object.freeze({ rows: 1, cols: 3, soilFront: 27 / 48 }),
+  firebog_planter_box_2x3: Object.freeze({ rows: 2, cols: 3, soilFront: 26 / 64 }),
+  firebog_planter_box_3x4: Object.freeze({ rows: 3, cols: 4, soilFront: 24 / 73 }),
+});
+
+export function isGardenBoxStreet(tsid) {
+  const body = String(tsid || '').slice(1);
+  return Boolean(body) && GARDEN_BOX_STREETS.some((t) => t.slice(1) === body);
+}
+
+/**
+ * PURE: a street's planter boxes, left to right, in screen px: { x, y (the deco's foot), w, h, rows,
+ * cols, bedY (where the bed's front plots stand), sprite }. Middleground decos are in world space.
+ */
+export function streetGardenBoxes(street) {
+  const out = [];
+  for (const layer of street?.layers || []) {
+    if (layer?.name !== 'middleground' && layer?.id !== 'middleground') continue;
+    for (const d of layer.decos || []) {
+      const spec = PLANTER_BOXES[d?.sprite];
+      if (!spec || d.hidden || !Number.isFinite(d.x) || !Number.isFinite(d.y)) continue;
+      const p = street.bounds ? worldToScreen(street, d.x, d.y) : { x: d.x, y: d.y };
+      const h = Number(d.h) || 48;
+      out.push({ x: p.x, y: p.y, w: Number(d.w) || 250, h, rows: spec.rows, cols: spec.cols, bedY: p.y - Math.round(spec.soilFront * h) + 1, sprite: d.sprite });
+    }
+  }
+  return out.sort((a, b) => a.x - b.x || a.y - b.y);
+}
+
+/**
+ * The keys of the two beds the planner laid on these streets before report #252 (garden.js
+ * streetGardenBed: herb2 four plots across, herb three, two rows each). Their plots, and any crops
+ * growing in them, move into the smallest boxes that hold every one of their plots (on all three
+ * streets herb2 goes to a 3x4 box and herb to a 2x3, so no plot is left out); the other boxes are
+ * herb3, herb4... left to right.
+ */
+export const LEGACY_BOX_BEDS = Object.freeze([
+  Object.freeze({ bed: 'herb2', cols: 4, rows: 2 }),
+  Object.freeze({ bed: 'herb', cols: 3, rows: 2 }),
+]);
+
+/**
+ * PURE: the beds in a street's planter boxes (report #252), left to right:
+ * [{ bed, gardenType: 'herb', cols, rows, x, y, box }], x the box's centre and y where the bed's
+ * front plots stand (game.js spawnGarden's origin, style none: the box is the bed). [] elsewhere.
+ */
+export function streetGardenBoxBeds(street, population) {
+  const count = whole(population?.gardenBoxes);
+  if (!count) return [];
+  const boxes = streetGardenBoxes(street).slice(0, count);
+  const keys = new Array(boxes.length).fill(null);
+  for (const legacy of LEGACY_BOX_BEDS) {
+    let pick = -1;
+    boxes.forEach((b, i) => {
+      if (keys[i]) return;
+      const fits = b.cols >= legacy.cols && b.rows >= legacy.rows;
+      const best = pick < 0 ? null : boxes[pick];
+      const bestFits = best && best.cols >= legacy.cols && best.rows >= legacy.rows;
+      if (pick < 0 || (fits && !bestFits) || (fits === bestFits && (fits ? b.cols * b.rows < best.cols * best.rows : b.cols * b.rows > best.cols * best.rows))) pick = i;
+    });
+    if (pick >= 0) keys[pick] = legacy.bed;
+  }
+  let next = 3;
+  return boxes.map((b, i) => ({
+    bed: keys[i] || `herb${next++}`,
+    gardenType: 'herb',
+    cols: b.cols,
+    rows: b.rows,
+    x: b.x,
+    y: b.bedY,
+    box: b,
+  }));
 }
 
 /** The smallest deco on a layer in front of the player that can hide a tree, rock or Piggy (px). */
@@ -1046,7 +1198,8 @@ function scaledDistance(a, b, verticalScale = 1.75) {
  * When no free spot has the room the thing still goes down, on the roomiest spots
  * left, and the plan lists it under `fallbacks` ({ key, index, room, footprint }).
  * Every placed point carries its spot's `room`. A STEADY_FLOOR_GROUPS group (planned Mortar
- * Barnacles, player report #210) takes no steep ramp and no short ledge, and no fallback: one
+ * Barnacles, Jellisacs and Peat Bogs, player reports #210, #249, #250) takes no steep ramp and no
+ * short ledge, nor (with an `edgeDrop`) a spot with an end of it over air, and no fallback: one
  * with no such spot that has its room is left out.
  *
  * Reserved spots that carry a `block` (streetReservedSpots: doors, ladder feet,
@@ -1080,6 +1233,7 @@ export function planStreetPlacements(
   const perches = [];
   const blocked = [];
   const hiddenCache = new Map();
+  const edgeCache = new Map();
 
   for (const request of requests || []) {
     const count = whole(request?.count, 0, 40);
@@ -1091,6 +1245,14 @@ export function planStreetPlacements(
       : PLACEMENT_FOOTPRINTS[request.key] || 0;
     const perching = request?.perch === true || PERCHING_GROUPS.includes(request.key);
     const steady = STEADY_FLOOR_GROUPS[request.key] || null;
+    // Reports #249, #250: a steady group with an edgeDrop also keeps both ends of its footprint over a floor.
+    const steadyAt = (candidate) => {
+      if (!steadyFloor(candidate, steady)) return false;
+      if (!Number.isFinite(steady?.edgeDrop)) return true;
+      const k = `${candidate.id}:${footprint}`;
+      if (!edgeCache.has(k)) edgeCache.set(k, footOverAir(platforms, candidate, footprint / 2));
+      return edgeCache.get(k) <= steady.edgeDrop;
+    };
     const walker = Boolean(ANIMAL_PATROL[request.key]);
     const height = Number.isFinite(request?.height) ? Math.max(0, request.height) : PLACEMENT_HEIGHTS[request.key] || 0;
     // The fixture each spot would cover for this request (null: clear); the arrival covers nothing.
@@ -1108,7 +1270,7 @@ export function planStreetPlacements(
       if (footprint > 0) {
         let clearNeed = -1;
         for (const candidate of candidates) {
-          if (used.has(candidate.id) || candidate.item === false || !steadyFloor(candidate, steady)) continue;
+          if (used.has(candidate.id) || candidate.item === false || !steadyAt(candidate)) continue;
           const room = Math.min(footprint, candidate.room || 0);
           need = Math.max(need, room);
           if (!covers.has(candidate.id)) clearNeed = Math.max(clearNeed, room);
@@ -1124,7 +1286,7 @@ export function planStreetPlacements(
       for (const candidate of candidates) {
         if (used.has(candidate.id)) continue;
         if (!avatar && candidate.item === false) continue;
-        if (!steadyFloor(candidate, steady)) continue;
+        if (!steadyAt(candidate)) continue;
         if (need > 0 && (candidate.room || 0) < need) continue;
         const nearest = occupied.length
           ? Math.min(...occupied.map((other) => {

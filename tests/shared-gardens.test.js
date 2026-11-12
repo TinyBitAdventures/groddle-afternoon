@@ -68,7 +68,9 @@ describe('the server\'s data and growth agree with the game', { skip: skipWithou
     const data = JSON.parse(readFileSync(serverPath('data', 'gardens.json'), 'utf8'));
     assert.deepEqual(Object.keys(data.streets).sort(), [...SHARED_GARDEN_STREETS].sort());
     const plots = Object.values(data.streets).flat().reduce((n, b) => n + b[1] * b[2], 0);
-    assert.equal(plots, 140, '20 beds, 140 plots');
+    // Report #252: the three Herb Gardens streets' 20 planter boxes hold 117 plots (their old two planned beds 42).
+    assert.equal(Object.values(data.streets).flat().length, 34, '34 beds');
+    assert.equal(plots, 215, '215 plots');
     for (const [id, s] of Object.entries(SEED_CATALOG)) {
       assert.deepEqual(data.rules.seeds[id], [s.gardenType === 'herb' ? 'herb' : 'default', s.grow1Ms, s.grow2Ms, s.cropId, s.produces], id);
       assert.deepEqual(data.rules.legacy.seeds[id], [Math.max(4000, s.grow1H * 8000), Math.max(4000, s.grow2H * 8000)], id);
@@ -105,7 +107,7 @@ describe('the feature', () => {
     assert.ok(ids.indexOf('shared-gardens') < ids.indexOf('street-objects'));
     const game = read('public/game.js');
     assert.match(game, /features\.query\('sharedGardenFor', bedKey, \{ cols, rows \}, engine\)/);
-    assert.match(game, /if \(!opts\.detached && !sharedGarden\) \{\n    if \(bedKey !== gardenType\) garden\.bed = bedKey;\n    streetState\.gardens\[bedKey\] = garden;/);
+    assert.match(game, /if \(!opts\.detached && !sharedGarden\) \{\n    if \(bedKey !== gardenType\) garden\.bed = bedKey;\n[^\n]*\n    if \(opts\.cols && opts\.rows && !opts\.garden\) fitGardenToBed\(garden, opts\.cols, opts\.rows\);\n    streetState\.gardens\[bedKey\] = garden;/);
     assert.match(game, /const refusedNow = features\.query\('verbRefusedNow', target, verb\.id, engine\);\s*if \(refusedNow\) \{\s*toast\(refusedNow, 2600\);\s*pushActivity\(refusedNow\);\s*playSound\('CLICK_FAILURE'/);
     assert.match(game, /sharedGarden: Boolean\(sharedGrant\?\.garden\)/);
     const content = read('public/content.js');
@@ -427,7 +429,7 @@ function rig({ street = COMMUNITY }) {
 
 describe('report 188: the Herb Gardens streets grow herbs in both beds', () => {
   it('streetGardenBed gives two herb beds there (herb2, herb) and crop then herb everywhere else', async () => {
-    const { HERB_GARDEN_STREETS, bedKind, streetGardenBed } = await import('../public/js/garden.js?v=489cda8f');
+    const { HERB_GARDEN_STREETS, bedKind, streetGardenBed } = await import('../public/js/garden.js?v=37209241');
     assert.deepEqual([...HERB_GARDEN_STREETS].sort(), ['GA95U14319524O9', 'GA97L62229522GS', 'GA99U5PI39524GN']);
     for (const tsid of HERB_GARDEN_STREETS) {
       assert.deepEqual(streetGardenBed(tsid, 0), { bed: 'herb2', gardenType: 'herb', cols: 4 });
@@ -444,13 +446,16 @@ describe('report 188: the Herb Gardens streets grow herbs in both beds', () => {
   it('herb2 plot ids round-trip, and the save keeps an herb2 bed', async () => {
     assert.equal(plotId('herb2', '4-2'), 'herb2:4-2');
     assert.deepEqual(parsePlotId('herb2:4-2'), { bed: 'herb2', key: '4-2' });
-    assert.equal(parsePlotId('herb3:1-1'), null);
-    const { gardenBedKey } = await import('../public/js/shared-gardens.js?v=443ea35a');
+    // Report #252: one herb bed per planter box, herb2..herb9.
+    assert.deepEqual(parsePlotId('herb3:1-1'), { bed: 'herb3', key: '1-1' });
+    assert.equal(parsePlotId('herb10:1-1'), null);
+    assert.equal(parsePlotId('herb1:1-1'), null);
+    const { gardenBedKey } = await import('../public/js/shared-gardens.js?v=c1f90bc0');
     assert.equal(gardenBedKey(createGarden({ gardenType: 'herb', bed: 'herb2' })), 'herb2');
     assert.equal(gardenBedKey(createGarden({ gardenType: 'herb' })), 'herb');
     assert.equal(gardenBedKey(createGarden({})), 'default');
     const src = readFileSync(new URL('../public/js/player-save.js', import.meta.url), 'utf8');
-    assert.match(src, /for \(const type of \['default', 'herb', 'herb2'\]\)/);
+    assert.match(src, /for \(const type of \['default', 'herb', 'herb2', 'herb3', 'herb4', 'herb5', 'herb6', 'herb7', 'herb8', 'herb9'\]\)/);
   });
 
   it('game.js lays the street beds out by streetGardenBed and keeps each under its own key', () => {

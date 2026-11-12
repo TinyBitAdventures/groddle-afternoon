@@ -298,8 +298,8 @@ export function normalizeGardenSnapshot(seed = {}) {
 
 function normalizeStreetSnapshot(seed = {}) {
   const gardens = {};
-  // herb2: the second herb bed of a Herb Gardens street (garden.js streetGardenBed).
-  for (const type of ['default', 'herb', 'herb2']) {
+  // herb2..herb9: a Herb Gardens street's other herb beds (garden.js BED_KEY_RE; report #252: one per planter box).
+  for (const type of ['default', 'herb', 'herb2', 'herb3', 'herb4', 'herb5', 'herb6', 'herb7', 'herb8', 'herb9']) {
     if (seed?.gardens?.[type]) gardens[type] = normalizeGardenSnapshot(seed.gardens[type]);
   }
   const trees = (Array.isArray(seed?.trees) ? seed.trees : []).slice(0, 40).map((row) => ({

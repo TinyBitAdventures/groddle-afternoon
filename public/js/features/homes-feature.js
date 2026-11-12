@@ -218,8 +218,8 @@ import { drawTowerElevator, drawTowerExit, towerApi, visitorTowerView } from './
 import { pieceUrl, roomPieces, surfaceAt, swatchPiece, wallTargetAt } from '../home-wallpaper.js?v=f1969400';
 import { maxTextureSizeOf, sharpDeco, wantsHiresDecos } from '../deco-hires.js?v=f59e60d3';
 import { SHARP_DECOS } from '../deco-sharp-list.js?v=a2424923';
-import { resourceNodesFeature } from './resource-nodes-feature.js?v=3882cabb';
-import { patchesFeature } from './patches-feature.js?v=702bd776';
+import { resourceNodesFeature } from './resource-nodes-feature.js?v=8d31666e';
+import { patchesFeature } from './patches-feature.js?v=92f12bc2';
 import { GROWN_TREE_LABELS, createPlot, growTree, plotLabel } from '../patches.js?v=d63423c9';
 import { WOTD_DEPLETE_MS, WOTD_TEXT, nearestPourTarget, pourButton, pourConditions, pourConfirmText } from '../wine-pour.js?v=6daa23a7';
 import { WOTD_TOOL, pourApproach, pourDropTip } from '../wine-pour-fx.js?v=364e22d2';

@@ -41,7 +41,7 @@ import {
   woodTreeStatusLabel,
 } from '../public/js/woodcutting.js?v=5235a01a';
 import { noteWoodTreeCare } from '../public/js/patches.js?v=d63423c9';
-import { isTreeTarget } from '../public/js/features/tree-death-feature.js?v=688ddb47';
+import { isTreeTarget } from '../public/js/features/tree-death-feature.js?v=ca9bac36';
 import { enchantedForestFeature, hollowTrees, treeScreenSpots } from '../public/js/features/enchanted-forest-feature.js?v=e98eef5e';
 import { FEATURES } from '../public/js/features/index.js?v=929c82e9';
 
