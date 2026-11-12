@@ -513,6 +513,8 @@ function installTooltips(doc, scopes) {
   const show = (el) => {
     const text = el.dataset.tip;
     if (!text || el.getAttribute('aria-expanded') === 'true' || !el.getClientRects().length) return;
+    // data-tip-only="modern": the control draws its own hover in the other skin (Classic's mood share, energy line, study card).
+    if (el.dataset.tipOnly && el.dataset.tipOnly !== doc.documentElement.dataset.ui) return;
     const keys = (el.dataset.key || '').split(' ').filter(Boolean);
     const icon = el.dataset.tipIcon ? `<img class="hud-tip-icon" src="${esc(el.dataset.tipIcon)}" alt="" width="40" height="40">` : '';
     tip.innerHTML = `${icon}<span>${esc(text)}${el.dataset.sub ? ` <span class="hud-tip-sub">· ${esc(el.dataset.sub)}</span>` : ''}</span>${keys.map((k) => `<span class="kcap">${esc(k)}</span>`).join('')}`;
@@ -521,7 +523,11 @@ function installTooltips(doc, scopes) {
     const vw = doc.documentElement.clientWidth;
     const x = Math.max(6, Math.min(vw - tip.offsetWidth - 6, r.left + r.width / 2 - tip.offsetWidth / 2));
     tip.style.left = `${Math.round(x)}px`;
-    tip.style.top = `${Math.round(r.bottom + 8)}px`;
+    // Below the control, or above it where the window ends (report #208: never past the viewport).
+    const vh = doc.documentElement.clientHeight;
+    const below = r.bottom + 8;
+    const y = below + tip.offsetHeight > vh - 6 ? Math.max(6, r.top - 8 - tip.offsetHeight) : below;
+    tip.style.top = `${Math.round(y)}px`;
     tip.classList.add('is-on');
     current = el;
   };

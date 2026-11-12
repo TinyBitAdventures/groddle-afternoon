@@ -529,7 +529,47 @@
   text-shadow: 0 1px 0 var(--c-classic-panel);
   white-space: nowrap;
 }
-:root[data-ui="classic"] .top-bar .hud-img #stat-img::after { content: "i"; margin-left: 1px; font-size: var(--fs-classic-body); }
+/* The "i" after the count (PlayerInfoUI.as 151-153, 779-780: its own field, drawn at the count's width - 2),
+   with a little air so it reads as the unit, not a clipped digit (report #208). The count has commas
+   (classic-topbar.js imgCountText) and room for "999,999i" before the Quests button. */
+:root[data-ui="classic"] .top-bar .hud-img #stat-img::after { content: "i"; margin-left: calc(2 * var(--cu)); font-size: var(--fs-classic-body); }
+
+/* The bar's tooltip (js/ui/topbar.js #hud-tip) in the client's pale yellow tip (TipDisplayManager),
+   fixed under the control. Unstyled, it fell at the foot of the page, the page grew a scrollbar (on
+   Windows one with width) and the game re-fitted on every hover (report #208). */
+:root[data-ui="classic"] .hud-tip {
+  position: fixed;
+  z-index: calc(var(--z-notice) + 20);
+  display: flex;
+  align-items: center;
+  gap: calc(4 * var(--cu));
+  max-width: calc(100vw - 12px);
+  padding: calc(3 * var(--cu)) calc(6 * var(--cu));
+  border: 1px solid color-mix(in srgb, var(--c-classic-ink) 37%, transparent);
+  border-radius: calc(4 * var(--cu));
+  background: var(--c-classic-tip);
+  box-shadow: 0 1px 2px color-mix(in srgb, var(--c-classic-ink) 15%, transparent);
+  color: var(--c-classic-text);
+  font: var(--fs-classic-body)/var(--lh-tight) var(--font-classic-body);
+  white-space: nowrap;
+  pointer-events: none;
+}
+:root[data-ui="classic"] .hud-tip[hidden] { display: none; }
+:root[data-ui="classic"] .hud-tip .hud-tip-sub { opacity: 0.8; }
+:root[data-ui="classic"] .hud-tip .hud-tip-icon { display: none; }
+:root[data-ui="classic"] .hud-tip .kcap {
+  display: inline-grid;
+  place-items: center;
+  min-width: calc(14 * var(--cu));
+  padding: 0 calc(3 * var(--cu));
+  border: 1px solid color-mix(in srgb, var(--c-classic-ink) 30%, transparent);
+  border-radius: 3px;
+  color: var(--c-classic-title);
+  font: 800 var(--fs-classic-count)/var(--lh-snug) var(--font-classic-title);
+}
+/* The game fills the window and the page never scrolls (style.css STAGE): in Classic nothing that
+   lands past the window may give it a scrollbar either (report #208). */
+:root[data-ui="classic"]:not(.stage-pinned) { overflow: hidden; }
 
 /* The player menu: slides down from behind the ear to y 55, #e6ecee, bottom-right radius 7
    (PlayerInfoUI.as 253-298, PlayerStatsUI.as). */
@@ -612,22 +652,25 @@
 :root[data-ui="classic"] .top-bar .more-menu > #more-btn { position: static; }
 :root[data-ui="classic"] .top-bar :is(.hud-actions > .chrome-btn, .more-menu > #more-btn):is(:hover, :focus-visible) { color: var(--c-classic-link); background: color-mix(in srgb, var(--c-classic-panel) 60%, transparent); }
 :root[data-ui="classic"] .top-bar :is(.hud-actions > .chrome-btn, .more-menu > #more-btn) svg { width: calc(18 * var(--cu)); height: calc(18 * var(--cu)); }
-:root[data-ui="classic"] .top-bar #quest-btn { left: calc(var(--cvx) + 205 * var(--cu)); }
-:root[data-ui="classic"] .top-bar #make-btn { left: calc(var(--cvx) + 231 * var(--cu)); }
-:root[data-ui="classic"] .top-bar #map-btn { left: calc(var(--cvx) + 257 * var(--cu)); }
-:root[data-ui="classic"] .top-bar #mail-btn { left: calc(var(--cvx) + 283 * var(--cu)); }
-:root[data-ui="classic"] .top-bar .hud-actions .more-menu { left: calc(var(--cvx) + 309 * var(--cu)); }
-:root[data-ui="classic"] .top-bar #study-chip { left: calc(var(--cvx) + 337 * var(--cu)); width: auto; padding: 0 calc(6 * var(--cu)); color: var(--c-classic-link); font: 800 var(--fs-classic-body)/var(--lh-none) var(--font-classic-title); }
+/* The game's buttons start --cf-hdr-x: 28 u right of the old spot, so a six-digit iMG count ("999,999i")
+   clears the Quests button at the smallest stage (u = 1 px; report #208). */
+:root[data-ui="classic"] .top-bar { --cf-hdr-x: calc(var(--cvx) + 28 * var(--cu)); }
+:root[data-ui="classic"] .top-bar #quest-btn { left: calc(var(--cf-hdr-x) + 205 * var(--cu)); }
+:root[data-ui="classic"] .top-bar #make-btn { left: calc(var(--cf-hdr-x) + 231 * var(--cu)); }
+:root[data-ui="classic"] .top-bar #map-btn { left: calc(var(--cf-hdr-x) + 257 * var(--cu)); }
+:root[data-ui="classic"] .top-bar #mail-btn { left: calc(var(--cf-hdr-x) + 283 * var(--cu)); }
+:root[data-ui="classic"] .top-bar .hud-actions .more-menu { left: calc(var(--cf-hdr-x) + 309 * var(--cu)); }
+:root[data-ui="classic"] .top-bar #study-chip { left: calc(var(--cf-hdr-x) + 337 * var(--cu)); width: auto; padding: 0 calc(6 * var(--cu)); color: var(--c-classic-link); font: 800 var(--fs-classic-body)/var(--lh-none) var(--font-classic-title); }
 /* Update ready (js/features/update-ready-feature.js): where the study chip sits, after the Menu; a running study moves along. */
 :root[data-ui="classic"] .top-bar .hud-actions > .update-ready-btn {
-  position: absolute; top: calc(9 * var(--cu)); left: calc(var(--cvx) + 337 * var(--cu));
+  position: absolute; top: calc(9 * var(--cu)); left: calc(var(--cf-hdr-x) + 337 * var(--cu));
   display: inline-flex; align-items: center; gap: calc(4 * var(--cu)); width: auto; height: calc(21 * var(--cu));
   margin: 0; padding: 0 calc(7 * var(--cu)); border: 1px solid var(--c-classic-link); border-radius: calc(11 * var(--cu));
   background: color-mix(in srgb, var(--c-classic-panel) 85%, transparent); box-shadow: none;
   color: var(--c-classic-link); font: 800 var(--fs-classic-body)/var(--lh-none) var(--font-classic-title); white-space: nowrap; cursor: pointer;
 }
 :root[data-ui="classic"] .top-bar .hud-actions > .update-ready-btn:is(:hover, :focus-visible) { background: var(--c-classic-panel); }
-:root[data-ui="classic"] .top-bar .hud-actions:has(> .update-ready-btn:not([hidden])) > #study-chip { left: calc(var(--cvx) + 458 * var(--cu)); }
+:root[data-ui="classic"] .top-bar .hud-actions:has(> .update-ready-btn:not([hidden])) > #study-chip { left: calc(var(--cf-hdr-x) + 458 * var(--cu)); }
 :root[data-ui="classic"] .top-bar #study-chip .study-chip-label { max-width: calc(150 * var(--cu)); }
 /* Its hover card (game.js paintStudyChip) in the pack tooltip's dress. */
 :root[data-ui="classic"] .top-bar #study-chip .study-chip-card {

@@ -12,7 +12,7 @@ import { fileURLToPath } from 'node:url';
 
 import { ZOOM_FIXED_NOTE, ZOOM_KEYS_HINT, createWorldZoom, zoomKeyToast } from '../public/js/world-zoom.js?v=1d0c0cfb';
 import { zoomMovesStage, sceneViewWidthCap, sceneViewCap, MIN_PACK_HEIGHT } from '../public/js/location-view.js?v=f1f922b4';
-import { zoomSlider } from '../public/js/ui/topbar.js?v=8f8adaa1';
+import { zoomSlider } from '../public/js/ui/topbar.js?v=341cb471';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const read = (rel) => fs.readFileSync(path.join(root, rel), 'utf8');

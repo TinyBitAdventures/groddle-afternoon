@@ -2752,9 +2752,14 @@
   "deployed": "2026-11-11"
  },
  "git": {
-  "commits": 1674,
+  "commits": 1675,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-11",
+    "kind": "fix",
+    "text": "Ladders and ledges line up with their art on streets narrower than a wide window"
+   },
    {
     "date": "2026-11-11",
     "kind": "fix",
@@ -2869,14 +2874,9 @@
     "date": "2026-11-11",
     "kind": "fix",
     "text": "The street's top and bottom hold you, /stuck clears event physics, and Fernucopia's shaft flies"
-   },
-   {
-    "date": "2026-11-11",
-    "kind": "fix",
-    "text": "A Seedling a visitor pets into a tree shows as the tree"
    }
   ]
  },
- "tests": 815,
+ "tests": 816,
  "generatedAt": "2026-11-11"
 }

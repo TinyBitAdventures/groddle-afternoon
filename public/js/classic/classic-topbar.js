@@ -60,6 +60,26 @@ export function dateLines(label, fallbackTime = '') {
   return { day: m[3].trim(), time: `${m[1]} ${m[2].toLowerCase()}`, date: m[4].trim() };
 }
 
+/**
+ * PURE: the iMG count as the 2012 client wrote it, with commas (PlayerInfoUI.as 767-779,
+ * StringUtil.formatNumberWithCommas): "2263" -> "2,263". Idempotent ("2,263" stays); anything
+ * that is not a whole number passes through.
+ */
+export function imgCountText(value) {
+  const s = String(value ?? '').trim();
+  const digits = s.replace(/,/g, '');
+  if (!/^-?\d+$/.test(digits)) return s;
+  const neg = digits.startsWith('-');
+  const body = (neg ? digits.slice(1) : digits).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  return `${neg ? '-' : ''}${body}`;
+}
+
+/** PURE: what #stat-img shows: the count with commas in Classic, the game's plain digits in Modern. */
+export function imgStatShown(text, classic) {
+  const now = String(text ?? '');
+  return classic ? imgCountText(now) : now.replace(/,/g, '');
+}
+
 /** PURE: "80/100" from the energy ring's tooltip ("Energy 80/100"). */
 export function energyText(tip) {
   const m = /(\d[\d,]*)\s*\/\s*(\d[\d,]*)/.exec(String(tip || ''));
@@ -163,6 +183,18 @@ export function installClassicTopbar({ doc = globalThis.document, win = globalTh
 
   const classic = () => uiState().mode === 'classic';
 
+  // These draw their own hover in Classic (the mood share, the energy line, the study card), so the
+  // bar's tooltip (js/ui/topbar.js) shows for them in Modern only.
+  for (const n of [moodBtn, energyBtn, doc.getElementById('study-chip')]) if (n) n.dataset.tipOnly = 'modern';
+
+  // The iMG count with commas in Classic (report #208), back to the game's plain digits in Modern.
+  const imgStat = doc.getElementById('stat-img');
+  function syncImg() {
+    if (!imgStat) return;
+    const want = imgStatShown(imgStat.textContent, classic());
+    if (want !== imgStat.textContent) imgStat.textContent = want;
+  }
+
   function syncVitals() {
     if (!classic()) return;
     const e = shareFromDash(doc.getElementById('bar-energy')?.getAttribute('stroke-dasharray'));
@@ -232,7 +264,7 @@ export function installClassicTopbar({ doc = globalThis.document, win = globalTh
     stats.append(dt, dd);
   }
 
-  const sync = () => { syncVitals(); syncDate(); syncVolume(); };
+  const sync = () => { syncVitals(); syncDate(); syncVolume(); syncImg(); };
 
   if (typeof win.MutationObserver === 'function') {
     const mo = new win.MutationObserver(sync);
@@ -241,6 +273,8 @@ export function installClassicTopbar({ doc = globalThis.document, win = globalTh
       if (n) mo.observe(n, { attributes: true, characterData: true, childList: true, subtree: true });
     }
     if (energyBtn) mo.observe(energyBtn, { attributes: true, attributeFilter: ['data-tip', 'aria-label'] });
+    // The game writes the count (game.js stat-img); the commas go in before the frame paints.
+    if (imgStat) new win.MutationObserver(syncImg).observe(imgStat, { characterData: true, childList: true, subtree: true });
     const menu = doc.getElementById('player-menu');
     if (menu) new win.MutationObserver(syncQuoins).observe(menu, { childList: true, subtree: true, attributes: true, attributeFilter: ['hidden'] });
   }
@@ -283,6 +317,7 @@ export function installClassicTopbar({ doc = globalThis.document, win = globalTh
     // Inline display, not [hidden]: an SVG has no hidden property, and Modern has no rule for these.
     for (const n of added) n.style.display = on ? '' : 'none';
     syncName();
+    syncImg();
     if (on) {
       sync();
       syncFace();
