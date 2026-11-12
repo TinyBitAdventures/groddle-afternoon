@@ -2752,9 +2752,19 @@
   "deployed": "2026-11-12"
  },
  "git": {
-  "commits": 1751,
+  "commits": 1753,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-12",
+    "kind": "improve",
+    "text": "A phone has no street map and shows no key letters; the Map's head, a vendor's head and the shrine's Learn Faster? fit"
+   },
+   {
+    "date": "2026-11-12",
+    "kind": "new",
+    "text": "A phone's top bar shows Quests, Report and the Menu; the rest opens from the Menu"
+   },
    {
     "date": "2026-11-12",
     "kind": "fix",
@@ -2864,19 +2874,9 @@
     "date": "2026-11-12",
     "kind": "improve",
     "text": "Panels on a phone: close buttons are 44 px targets, no window wider than the screen"
-   },
-   {
-    "date": "2026-11-12",
-    "kind": "improve",
-    "text": "The character builder on a phone keeps the preview, Random, Reset and Save in view"
-   },
-   {
-    "date": "2026-11-12",
-    "kind": "improve",
-    "text": "The tutorial and the world's hints speak touch on a phone"
    }
   ]
  },
- "tests": 875,
+ "tests": 877,
  "generatedAt": "2026-11-12"
 }
