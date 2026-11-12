@@ -787,13 +787,28 @@ export function repairEnergyRefusal(quote, pc) {
 }
 
 /**
- * Why the Tinkertool can't do a repair: broken (the source's line, tinkertool.js 139), or not
- * enough left in it for the repair's ticks (each tick wears it one, tinkertool.js onTick 419).
+ * Why no Tinkertool can do a repair (pick.js repair conditions 168-175: a working one, isWorking,
+ * is one with a point left). A Tinkertool repairs itself, so this is only ever another tool's.
  */
-export function tinkertoolRefusal(check, ticks) {
-  const c = check?.condition;
-  if (!c || c.broken) return 'This Tinkertool has become broken, and must be repaired.';
-  return `Your Tinkertool is too worn for this repair: it has ${c.remaining} left and this repair takes ${Math.max(1, Math.floor(Number(ticks) || 1))}.`;
+export function tinkertoolRefusal() {
+  return 'You need a Tinkertool to repair this.';
+}
+
+/**
+ * The Tinkertool that does a repair: a Tinkertool repairs itself (pick.js repair handler 302-306:
+ * `tinkertool = this`, even a broken one, with Tinkering III), any other tool takes the first
+ * working Tinkertool in pack order (findFirst isWorking, 297-299).
+ * Returns { self, copy, points } or null when there is none.
+ */
+export function repairingTinkertool(state, classTsid, quote = null) {
+  if (classTsid === 'tinkertool') {
+    const c = quote?.condition || getToolCondition(state, 'tinkertool');
+    return { self: true, copy: c.copy, points: c.remaining };
+  }
+  if (!state || (state.inv && heldCount(state, 'tinkertool') < 1)) return null;
+  const copies = toolCopies(state, 'tinkertool');
+  const at = copies.findIndex((c) => c.remaining >= 1);
+  return at >= 0 ? { self: false, copy: at, points: copies[at].remaining } : null;
 }
 
 /**
@@ -819,35 +834,60 @@ function repairDurationMs(seconds) {
 }
 
 /**
- * PURE: how far a repair gets on the energy the player has (tinkertool.js onTick 405-445). Each
- * one-second tick repairs the rank's points while energy is above the two-tick cost; every other
- * tick pays that cost; the repair ends when energy is at or under it, keeping what it fixed.
- * The verb needs more than the cost plus one to start (repair conditions, line 83-85).
- * Returns { ok, points, energy (spent), ticks (that repaired: the Tinkertool's wear), full, durationMs }.
+ * PURE: how far a repair gets (tinkertool.js onTick 405-455). Each one-second tick, while energy is
+ * above the two-tick cost, repairs the rank's points and wears the Tinkertool doing it one point
+ * (this.use()); every other tick pays that cost; the repair ends when energy is at or under it,
+ * when the tool is whole, or when the Tinkertool breaks (!isWorking), keeping what it fixed.
+ * opts.tinkertool: the points left in the Tinkertool doing it (none given: enough); opts.self: a
+ * Tinkertool repairing itself, whose own points rise and wear in the same tick (so a whole one
+ * ends one short of full, as the source's did). The verb needs more than the cost plus one to
+ * start (repair conditions, pick.js 193-196).
+ * Returns { ok, points (the repaired tool's change), energy (spent), ticks (that repaired: the
+ * Tinkertool's wear), full, broke (the Tinkertool broke), durationMs }.
  */
-export function toolRepairPlan(quote, energy) {
+export function toolRepairPlan(quote, energy, opts = {}) {
   if (!quote?.ok) return { ok: false, reason: quote?.reason || 'quote', points: 0, energy: 0, ticks: 0, full: false };
   const cost = Math.max(1, Number(quote.energyPerTwoTicks) || 1);
   let e = Math.max(0, Number(energy) || 0);
   if (e <= cost + 1) return { ok: false, reason: 'energy', points: 0, energy: 0, ticks: 0, full: false };
   const perTick = quote.tinkering.repairPerSecond;
-  let points = 0;
+  const cap = Number(quote.condition.capacity) || 0;
+  const start = Math.max(0, Number(quote.condition.remaining) || 0);
+  const self = opts.self === true;
+  let tink = Number.isFinite(Number(opts.tinkertool)) ? Math.max(0, Number(opts.tinkertool)) : Infinity;
+  let have = start;
   let spent = 0;
   let ticks = 0;
+  let broke = false;
   for (let t = 1; t <= 10000; t += 1) {
+    let missing = null;
     if (e > cost) {
-      points = Math.min(quote.missing, points + perTick);
-      ticks += 1;
+      have = Math.min(cap, have + perTick);
+      missing = cap - have;
+      // this.use(): one point, if the Tinkertool has one (tool_base use 583-600).
+      if (self) {
+        if (have >= 1) {
+          have -= 1;
+          ticks += 1;
+          if (have <= 0) broke = true;
+        }
+      } else if (tink >= 1) {
+        tink -= 1;
+        ticks += 1;
+        if (tink <= 0) broke = true;
+      }
     }
     if (t % 2 === 1) {
       if (e <= cost) break;
       e -= cost;
       spent += cost;
     }
-    if (points >= quote.missing) break;
+    if (missing === 0) break;
     if (e <= cost) break;
+    if ((self ? have : tink) < 1) break;
   }
-  return { ok: true, points, energy: spent, ticks, full: points >= quote.missing, durationMs: repairDurationMs(ticks) };
+  const points = have - start;
+  return { ok: true, points, energy: spent, ticks, full: have >= cap, broke, durationMs: repairDurationMs(ticks) };
 }
 
 /**
@@ -885,32 +925,29 @@ export function mostWornToolCopy(state, classTsid) {
   return at;
 }
 
-/** Commit a quoted full repair atomically. Inventory presence is supplied by the caller. */
+/**
+ * Commit a repair (tinkertool.js startRepair, onTick, endRepair), as far as the energy and the
+ * Tinkertool doing it go. Inventory presence is supplied by the caller (opts.hasTinkertool).
+ */
 export function repairToolCondition(state, classTsid, pc, opts = {}) {
   const quote = quoteToolRepair(state, classTsid, opts.learned || [], opts);
   if (!quote.ok) return quote;
-  if (opts.hasTinkertool !== true && classTsid !== 'tinkertool') {
-    return { ok: false, reason: 'tinkertool', quote, msg: 'You need a working Tinkertool to repair this.' };
+  const self = classTsid === 'tinkertool';
+  if (!self && opts.hasTinkertool !== true) {
+    return { ok: false, reason: 'tinkertool', quote, msg: tinkertoolRefusal() };
   }
-  if (classTsid === 'tinkertool' && opts.hasSpareTinkertool !== true) {
-    return { ok: false, reason: 'spare_tinkertool', quote, msg: 'A Tinkertool needs another working Tinkertool for this repair.' };
-  }
+  const tinker = repairingTinkertool(state, classTsid, quote);
+  if (!tinker) return { ok: false, reason: 'tinkertool', quote, msg: tinkertoolRefusal() };
   // tinkertool.js onTick: the repair runs while the energy lasts and keeps what it fixed.
-  const plan = toolRepairPlan(quote, pc?.energy);
+  const plan = toolRepairPlan(quote, pc?.energy, { self, tinkertool: tinker.points });
   if (!plan.ok) {
     return { ok: false, reason: 'energy', quote, msg: repairEnergyRefusal(quote, pc) };
-  }
-  // The Tinkertool doing the repair is another copy when the one repaired is a Tinkertool itself.
-  const tinkerOpts = classTsid === 'tinkertool' ? { copy: spareTinkertoolIndex(state, quote.condition.copy, plan.ticks) } : {};
-  const tinkerCheck = canUseTool(state, 'tinkertool', plan.ticks, tinkerOpts);
-  if (!tinkerCheck.ok) {
-    return { ok: false, reason: 'tinkertool_broken', quote, msg: tinkertoolRefusal(tinkerCheck, plan.ticks) };
   }
   const target = ensureToolCondition(state, classTsid);
   // tinkertool.js 435: each tick is metabolics_lose_energy; 368 reports what was used.
   const energyUsed = loseEnergy(pc, plan.energy);
   const capacity = quote.condition.capacity;
-  const after = Math.min(capacity, quote.condition.remaining + plan.points);
+  const after = Math.max(0, Math.min(capacity, quote.condition.remaining + plan.points));
   target.copies[quote.condition.copy] = after;
   const full = after >= capacity;
   // tinkertool.js endRepair 346-364: the badge and quest counters count a finished repair only.
@@ -919,7 +956,16 @@ export function repairToolCondition(state, classTsid, pc, opts = {}) {
     state.totalRepairs = (state.totalRepairs || 0) + 1;
   }
   settleRow(target, TOOL_CONDITION_CATALOG[classTsid]);
-  const tinkertoolUse = useToolCondition(state, 'tinkertool', plan.ticks, tinkerOpts);
+  let tinkertoolUse = null;
+  if (self) {
+    // Its own wear is in `after` already (it rose and wore in each tick).
+    target.uses = (target.uses || 0) + plan.ticks;
+    state.totalUses = (state.totalUses || 0) + plan.ticks;
+    if (plan.broke) state.totalBreaks = (state.totalBreaks || 0) + 1;
+    tinkertoolUse = { ok: true, classTsid, copy: quote.condition.copy, wear: plan.ticks, remaining: after, broke: plan.broke, msg: plan.broke ? 'Ooops! You done broke your Tinkertool.' : '' };
+  } else if (plan.ticks > 0) {
+    tinkertoolUse = useToolCondition(state, 'tinkertool', plan.ticks, { copy: tinker.copy });
+  }
   // Tink Happy Thoughts (tinkertool.js:419): each repair tick adds mood equal
   // to that tick's Tinkertool wear, so the whole repair adds the full wear.
   let moodGained = 0;
@@ -933,6 +979,8 @@ export function repairToolCondition(state, classTsid, pc, opts = {}) {
   const said = full
     ? `You fixed the ${quote.condition.label} up just perfect.`
     : `You repaired the ${quote.condition.label} to ${Math.floor((after / capacity) * 100)} percent.`;
+  // tool_base doBreak: the Tinkertool that broke doing it.
+  const broke = tinkertoolUse?.broke ? ` ${tinkertoolUse.msg}` : '';
   return {
     ok: true,
     full,
@@ -941,7 +989,7 @@ export function repairToolCondition(state, classTsid, pc, opts = {}) {
     remaining: after,
     tinkertoolUse,
     moodGained,
-    msg: `${said} You spent ${energyUsed} energy.`,
+    msg: `${said} You spent ${energyUsed} energy.${broke}`,
   };
 }
 
@@ -954,16 +1002,6 @@ function repairCopyIndex(state, classTsid, opts = {}) {
   if (Number.isInteger(n) && n >= 0 && n < row.copies.length) return n;
   const at = row.copies.findIndex((r) => r < def.capacity);
   return at >= 0 ? at : 0;
-}
-
-/** A working Tinkertool other than copy `not` (repairing a Tinkertool takes a spare one). */
-function spareTinkertoolIndex(state, not, wear = 1) {
-  const row = ensureToolCondition(state, 'tinkertool');
-  const cost = points(wear);
-  const at = row.copies.findIndex((r, i) => i !== not && r >= cost);
-  if (at >= 0) return at;
-  const any = row.copies.findIndex((_, i) => i !== not);
-  return any >= 0 ? any : not;
 }
 
 /**

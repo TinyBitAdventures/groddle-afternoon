@@ -553,6 +553,7 @@ import {
   repairEnergyRefusal,
   repairTip as repairTipText,
   tinkertoolRefusal,
+  repairingTinkertool,
   toolWornBaseCost,
   mostWornToolCopy,
   keepsOwnStack,
@@ -4312,23 +4313,17 @@ function beginToolRepair(classTsid, copy = null) {
     toast(msg);
     return false;
   }
-  if (countItem(inv, 'tinkertool') < 1) {
-    toast('You need a working Tinkertool to repair this.');
+  // A Tinkertool repairs itself (Tinkering III); any other tool takes the first working one
+  // (pick.js repair handler 296-306, tools.js repairingTinkertool).
+  const tinker = countItem(inv, 'tinkertool') >= 1 ? repairingTinkertool(toolState, classTsid, quote) : null;
+  if (!tinker) {
+    toast(tinkertoolRefusal());
     return false;
   }
-  if (classTsid === 'tinkertool' && countItem(inv, 'tinkertool') < 2) {
-    toast('A Tinkertool needs another working Tinkertool for this repair.');
-    return false;
-  }
-  // tinkertool.js onTick: the repair goes as far as the energy does (tools.js toolRepairPlan).
-  const plan = toolRepairPlan(quote, pc.energy);
+  // tinkertool.js onTick: the repair goes as far as the energy and the Tinkertool do (tools.js toolRepairPlan).
+  const plan = toolRepairPlan(quote, pc.energy, { self: tinker.self, tinkertool: tinker.points });
   if (!plan.ok) {
     toast(repairEnergyRefusal(quote, pc), 4200);
-    return false;
-  }
-  const tinkerCheck = canUseTool(toolState, 'tinkertool', plan.ticks);
-  if (!tinkerCheck.ok) {
-    toast(tinkertoolRefusal(tinkerCheck, plan.ticks), 4200);
     return false;
   }
 
@@ -4342,7 +4337,6 @@ function beginToolRepair(classTsid, copy = null) {
       copy: quote.condition.copy,
       learned: skillState.learned || [],
       hasTinkertool: countItem(inv, 'tinkertool') >= 1,
-      hasSpareTinkertool: countItem(inv, 'tinkertool') >= 2,
     });
     if (!result.ok) {
       toast(result.msg || 'The repair could not be finished.');
@@ -4547,16 +4541,14 @@ function renderPackPopover(classTsid, anchor = null) {
   const repairQuote = toolCondition?.tracked && toolCondition.needsRepair && toolCondition.repairable
     ? quoteToolRepair(toolState, classTsid, skillState.learned || [], { copy: toolCondition.copy })
     : null;
-  const hasRepairTool = countItem(inv, 'tinkertool') >= (classTsid === 'tinkertool' ? 2 : 1);
-  // How far the player's energy takes the repair (tinkertool.js onTick: it stops when energy runs low).
-  const repairPlan = repairQuote?.ok ? toolRepairPlan(repairQuote, pc.energy) : null;
-  const repairTinkertoolReady = repairPlan?.ok
-    ? canUseTool(toolState, 'tinkertool', repairPlan.ticks).ok
-    : false;
+  // A Tinkertool repairs itself; any other tool needs a working one (tools.js repairingTinkertool).
+  const repairTinker = repairQuote?.ok && countItem(inv, 'tinkertool') >= 1 ? repairingTinkertool(toolState, classTsid, repairQuote) : null;
+  const hasRepairTool = Boolean(repairTinker);
+  // How far the repair gets (tinkertool.js onTick: it stops when energy runs low or the Tinkertool breaks).
+  const repairPlan = repairQuote?.ok && repairTinker ? toolRepairPlan(repairQuote, pc.energy, { self: repairTinker.self, tinkertool: repairTinker.points }) : null;
   const canRepair = Boolean(
     repairQuote?.ok &&
     hasRepairTool &&
-    repairTinkertoolReady &&
     repairPlan?.ok &&
     !activeToolRepair
   );
@@ -4571,11 +4563,9 @@ function renderPackPopover(classTsid, anchor = null) {
       ? 'You need a Tinkertool to repair this.'
       : !repairPlan?.ok
         ? repairEnergyRefusal(repairQuote, pc)
-        : !repairTinkertoolReady
-          ? tinkertoolRefusal(canUseTool(toolState, 'tinkertool', repairPlan.ticks), repairPlan.ticks)
-          : activeToolRepair
-            ? 'Finish the current repair first.'
-            : '';
+        : activeToolRepair
+          ? 'Finish the current repair first.'
+          : '';
   const repairTip = repairTipText(repairQuote, repairPlan, pc);
   // The kind line under the name: the tool's wear, the food's fullness today, the bear's state.
   // A Firefly Jar's line is what it holds (firefly_jar.js getLabel 337-338: "Firefly Jar (3/7)").
@@ -9708,9 +9698,6 @@ function executeVerb(target, verbId) {
     if (!achievementEvents.some((event) => event.counter === verbEvent)) emitGameEvent(verbEvent, 1, verbDetail);
     // Tree quest counters the badge events leave out (wood trees, super and last harvests, healing).
     for (const row of worldVerbQuestEvents(target, verbId, result)) emitGameEvent(row.event, row.amount, verbDetail);
-    // Sparkly of Interest / Another Simple Sample: the Sparkly mined on this street (quest-offers.js routes).
-    const sparklyMined = verbId === 'mine' ? Number(result.effects?.items?.sparkly) || 0 : 0;
-    if (sparklyMined > 0 && currentStreet?.label) emitGameEvent(`sparkly_mined_in:${streetEventSlug(currentStreet.label)}`, sparklyMined);
     // Ticket 68: a plot planted, watered, cleared or picked by hand counts like include/garden.js
     // (Tater 'n' Mater, Shucks To Be You, the garden badges), at home, on a street, solo or online.
     if (result.gardenPlot) {
@@ -9721,6 +9708,9 @@ function executeVerb(target, verbId) {
     if (ROCK_CATALOG[target.classId] && verbId === 'mine' && target.state?.rock?.depleted) {
       emitGameEvent(`rocks_depleted:${target.classId}`);
     }
+    // Sparkly of Interest / Another Simple Sample: the Sparkly mined on this street (quest-offers.js routes).
+    const sparklyMined = verbId === 'mine' ? Number(result.effects?.items?.sparkly) || 0 : 0;
+    if (sparklyMined > 0 && currentStreet?.label) emitGameEvent(`sparkly_mined_in:${streetEventSlug(currentStreet.label)}`, sparklyMined);
 
     // anim hooks
     if (!verbAnimationAlreadyStarted) playVerbStartAnimation(target, result.anim);
@@ -27709,11 +27699,6 @@ function grinderPackRoom(cls, n) {
 /**
  * Barnacle talc the Grinder made but the pack can't carry falls to the ground
  * at the player's feet (players/inc_items.js 314-316, location.createItem at
-/** A street's name as quest events carry it ("Neva Neva" -> neva_neva). */
-function streetEventSlug(label) {
-  return String(label || '').toLowerCase().replace(/[^a-z0-9]+/g, '_');
-}
-
  * y - 29); where nothing can be set down, the pack takes it as before.
  */
 function dropGrinderRemainder(dropped) {
@@ -27722,6 +27707,11 @@ function dropGrinderRemainder(dropped) {
     const res = player && currentStreetTsid ? engine.dropWorldStack(cls, n, player.x, player.y - GRINDER_DROP_RISE) : null;
     if (!res?.ok) addItem(inv, cls, n);
   }
+}
+
+/** A street's name as quest events carry it ("Neva Neva" -> neva_neva). */
+function streetEventSlug(label) {
+  return String(label || '').toLowerCase().replace(/[^a-z0-9]+/g, '_');
 }
 
 /** One made unit's game events and badge counters (the panel's session and room machines, G175). */

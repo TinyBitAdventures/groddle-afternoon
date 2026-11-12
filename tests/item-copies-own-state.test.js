@@ -180,7 +180,7 @@ describe('a verb on the item you chose acts on that one (two Tinkertools, one in
     const game = read('game.js');
     assert.match(game, /function takeChosenStack\(classTsid, n, \{ copy = null, place = null, wait \} = \{\}\)/);
     assert.match(game, /beforeRemove: \(\) => \{\n\s*takeChosenStack\(classTsid, 1, \{ copy \}\);\n\s*takeToolCopy\(toolState, classTsid, \{ copy \}\);/);
-    assert.match(game, /takeChosenStack\(shrineSelected, 1, \{ copy: toolCopy \}\);/);
+    assert.match(game, /takeChosenStack\(classTsid, 1, \{ copy: toolCopy \}\);/);
     assert.match(game, /stageVendorSell\(classTsid, copy, place, bag\);/);
     assert.match(game, /vendorDragPlace = inLayout \? \{ cls: s\.classTsid, container: s\.container, index: s\.index \} : null;/);
     assert.match(game, /if \(dropCopy != null\) takeToolCopy\(toolState, classTsid, \{ copy: dropCopy \}\);/);
@@ -305,15 +305,22 @@ describe('a repair refused for energy says why, with the numbers', () => {
     assert.doesNotMatch(tip, /—/);
   });
 
-  it('repairToolCondition and the pack use the same words; a worn Tinkertool says how worn', () => {
+  it('repairToolCondition and the pack use the same words; a worn Tinkertool repairs until it breaks', () => {
     const { tools } = fancy();
     const r = repairToolCondition(tools, 'fancy_pick', { energy: 5, energyMax: 100 }, { learned: ['tinkering_1'], hasTinkertool: true });
     assert.equal(r.ok, false);
     assert.match(r.msg, /needs more than 9 energy, and you have 5\.$/);
+    // tinkertool.js onTick 405-455: three ticks of 3 points, the Tinkertool one point a tick, then it breaks.
     setToolRemaining(tools, 'tinkertool', 3);
-    assert.equal(tinkertoolRefusal(canUseTool(tools, 'tinkertool', 10), 10), 'Your Tinkertool is too worn for this repair: it has 3 left and this repair takes 10.');
-    setToolRemaining(tools, 'tinkertool', 0);
-    assert.equal(tinkertoolRefusal(canUseTool(tools, 'tinkertool', 10), 10), 'This Tinkertool has become broken, and must be repaired.');
+    const pc = { energy: 100, energyMax: 100 };
+    const worn = repairToolCondition(tools, 'fancy_pick', pc, { learned: ['tinkering_1'], hasTinkertool: true });
+    assert.equal(worn.ok, true, worn.msg);
+    assert.equal(worn.remaining, 9);
+    assert.equal(worn.msg, 'You repaired the Fancy Pick to 4 percent. You spent 16 energy. Ooops! You done broke your Tinkertool.');
+    assert.equal(canUseTool(tools, 'tinkertool', 1).ok, false);
+    // No working Tinkertool: pick.js repair conditions 172-174.
+    assert.equal(tinkertoolRefusal(), 'You need a Tinkertool to repair this.');
+    assert.equal(repairToolCondition(tools, 'fancy_pick', pc, { learned: ['tinkering_1'], hasTinkertool: true }).msg, 'You need a Tinkertool to repair this.');
     const game = read('game.js');
     assert.match(game, /\? repairEnergyRefusal\(repairQuote, pc\)/);
     assert.match(game, /toast\(repairEnergyRefusal\(quote, pc\), 4200\);/);

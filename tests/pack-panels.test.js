@@ -65,7 +65,7 @@ describe('the open bag follows a repair (Austin 2026-11-01: its wear bar changed
   });
 
   it('a repair, a use and a break with the bag open redraw its tray; nothing else does', () => {
-    const inv = { hoe: 1, cherry: 4 };
+    const inv = { hoe: 1, cherry: 4, tinkertool: 1 };
     const tools = bindToolInventory(createToolConditionState(), inv);
     setToolRemaining(tools, 'hoe', 3);
     const packRowSignature = signatureWith(tools);

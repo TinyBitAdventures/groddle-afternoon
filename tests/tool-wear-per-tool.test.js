@@ -96,15 +96,24 @@ describe('ticket 12: each tool wears on its own', () => {
     assert.equal(inv.pick, 2);
   });
 
-  it('a Tinkertool repairing a Tinkertool wears the spare, not the one mended', () => {
+  it('a Tinkertool repairs itself, even a broken one, and the other is untouched (pick.js 302-306)', () => {
     const { tools } = kit({ tinkertool: 2 });
-    setToolRemaining(tools, 'tinkertool', 10, { copy: 0 });
+    setToolRemaining(tools, 'tinkertool', 0, { copy: 0 });
     const pc = { energy: 1000 };
-    const done = repairToolCondition(tools, 'tinkertool', pc, { copy: 0, learned: ['tinkering_3'], hasTinkertool: true, hasSpareTinkertool: true });
+    const done = repairToolCondition(tools, 'tinkertool', pc, { copy: 0, learned: ['tinkering_3'], hasTinkertool: true });
     assert.equal(done.ok, true, done.msg);
-    const [mended, spare] = remaining(tools, 'tinkertool');
-    assert.equal(mended, 200);
-    assert.equal(spare, 200 - done.quote.tinkertoolWear);
+    const [mended, other] = remaining(tools, 'tinkertool');
+    // Each tick it gains 12 and wears 1 (repair, then this.use()): it ends one point short of full.
+    assert.equal(mended, 199);
+    assert.equal(other, 200);
+    assert.equal(done.msg.startsWith('You repaired the Tinkertool to 99 percent.'), true);
+    // One Tinkertool is enough.
+    const alone = kit({ tinkertool: 1 }).tools;
+    setToolRemaining(alone, 'tinkertool', 50);
+    assert.equal(repairToolCondition(alone, 'tinkertool', { energy: 1000 }, { learned: ['tinkering_3'], hasTinkertool: true }).ok, true);
+    // Below Tinkering III it can't (pick.js 181-185).
+    setToolRemaining(alone, 'tinkertool', 50);
+    assert.equal(repairToolCondition(alone, 'tinkertool', { energy: 1000 }, { learned: ['tinkering_2'], hasTinkertool: true }).reason, 'self_skill');
   });
 
   it('every wearing tool: a Hatchet, a Watering Can and a Butterfly Lotion tube each wear alone', () => {

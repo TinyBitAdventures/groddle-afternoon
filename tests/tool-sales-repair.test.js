@@ -121,7 +121,7 @@ describe('repairing as far as the energy goes (tinkertool.js onTick)', () => {
   it('the game counts badges and quests on a finished repair only, and the 15-second flag on any', () => {
     const game = read('game.js');
     assert.match(game, /if \(result\.full\) emitGameEvent\(`tool_repaired:\$\{classTsid\}`\);/);
-    assert.match(game, /const plan = toolRepairPlan\(quote, pc\.energy\);/);
+    assert.match(game, /const plan = toolRepairPlan\(quote, pc\.energy, \{ self: tinker\.self, tinkertool: tinker\.points \}\);/);
   });
 });
 
