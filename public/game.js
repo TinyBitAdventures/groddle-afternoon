@@ -32368,6 +32368,11 @@ async function main() {
     if (params.has('awardqdemo') && Number.isFinite(awardQDemoMs)) {
       setTimeout(() => engine.grantAchievement(params.get('awardqbadge') || 'betterthanlousy_douser'), Math.max(0, awardQDemoMs));
     }
+    // QA: &awardquestdemo=<ms> shows a quest-complete award that long after the start (the quest book art).
+    const awardQuestDemoMs = Number(params.get('awardquestdemo'));
+    if (params.has('awardquestdemo') && Number.isFinite(awardQuestDemoMs)) {
+      setTimeout(() => enqueueAward({ kind: 'quest', title: 'Quest complete', body: 'A preview of the quest award.' }), Math.max(0, awardQuestDemoMs));
+    }
     if (params.has('newday')) {
       await maybeNewDay({ force: true });
     } else {
