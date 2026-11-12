@@ -1008,7 +1008,10 @@ body {
   z-index: calc(var(--z-modal) + 20);
   display: grid;
   place-items: center;
-  padding: var(--sp-12);
+  /* One column the screen's own width (Austin's iPhone, 2026-11-12: the card's 92vw was wider than
+     the room inside this padding, so the auto column grew past the screen and the card sat right). */
+  grid-template-columns: minmax(0, 1fr);
+  padding: var(--sp-12) var(--sp-8);
   background:
     radial-gradient(circle at 50% 38%, color-mix(in srgb, var(--surface-moss) 96%, transparent), color-mix(in srgb, var(--c-lime-87) 98%, transparent) 48%, var(--c-lime-85) 100%);
 }
@@ -1020,7 +1023,7 @@ body.is-booting #wrap ~ * { visibility: hidden; }
   display: flex;
   align-items: center;
   gap: var(--sp-8);
-  width: min(410px, 92vw);
+  width: min(410px, 100%);
   padding: var(--sp-9) var(--sp-10);
   border: 1px solid color-mix(in srgb, var(--c-lime-51b) 38%, transparent);
   border-radius: var(--radius-3xl);
