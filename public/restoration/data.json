@@ -2752,9 +2752,14 @@
   "deployed": "2026-11-11"
  },
  "git": {
-  "commits": 1689,
+  "commits": 1690,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-12",
+    "kind": "fix",
+    "text": "Winter Haven has its floor behind your feet"
+   },
    {
     "date": "2026-11-12",
     "kind": "fix",
@@ -2869,14 +2874,9 @@
     "date": "2026-11-11",
     "kind": "fix",
     "text": "Your incantation reads with your name online, and a first line that closes a chain says so"
-   },
-   {
-    "date": "2026-11-11",
-    "kind": "new",
-    "text": "A street's art carries on past its ends, mirrored"
    }
   ]
  },
- "tests": 833,
+ "tests": 834,
  "generatedAt": "2026-11-12"
 }
