@@ -844,26 +844,26 @@ function makeContext(engine) {
       spr.phase = (x % 97) / 15;
       return spr;
     },
-    /** Pay one quoin through the normal economy (ignoreLimit: Paradise-style bypass). */
+    /**
+     * Pay one quoin through the normal economy. items/quoin.js 159, 236: `ignoreLimit` (the
+     * rainbow_run instance) skips the day's limit and is not counted toward it; `uncounted`
+     * alone (an ignore_quoin_limit place, Top of the Tree) is not counted but still stops at it.
+     */
     collectQuoin(type, x, y, opts = {}) {
       const state = engine.quoinState;
-      let result;
-      if (opts.ignoreLimit && state) {
-        const limit = state.dailyLimit;
-        const today = state.collectedToday;
-        state.dailyLimit = Infinity;
-        result = collectQuoin(state, type, engine.pc, opts);
-        state.dailyLimit = limit;
-        state.collectedToday = today;
-      } else {
-        result = collectQuoin(state, type, engine.pc, opts);
-      }
+      const result = collectQuoin(state, type, engine.pc, {
+        ...opts,
+        skipLimit: Boolean(opts.ignoreLimit),
+        uncounted: Boolean(opts.ignoreLimit || opts.uncounted),
+      });
       const lab = QUOIN_TYPES[result.resolvedTypeId || type]?.label || 'iMG';
       if (result.hitLimit) engine.announceQuoinLimit?.(result.dailyLimit);
       if (result.ok) {
-        // Report #181: the amount as a street quoin shows it (game.js quoinGotText).
-        if (result.amount && engine.quoinGotText) engine.quoinGotText(x, y, `+${result.amount} ${lab}`, '#ffffff');
-        else if (result.amount) engine.floatText(x, y - 16, `+${result.amount} ${lab}`, '#ffffff');
+        // Report #181: the amount as a street quoin shows it (game.js quoinGotText); iMG after
+        // the mood bonus (items/quoin.js 205 amount = actual), energy and mood as the quoin's own.
+        const shown = ['xp', 'qurazy'].includes(result.resolvedTypeId) ? result.actual : result.amount;
+        if (shown && engine.quoinGotText) engine.quoinGotText(x, y, `+${shown} ${lab}`, '#ffffff');
+        else if (shown) engine.floatText(x, y - 16, `+${shown} ${lab}`, '#ffffff');
         engine.playSound(`QUOIN_${String(result.typeId || 'xp').toUpperCase()}`, { volume: 0.5 });
       } else if (result.reason === 'daily_limit') {
         // Ticket 94: a quest room keeps the limit as a street does (items/quoin.js 159: only games,

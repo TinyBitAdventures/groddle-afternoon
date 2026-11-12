@@ -268,10 +268,12 @@ export const room = {
       if (q.taken || !q.spr || q.spr.destroyed) continue;
       q.spr.y = q.y + Math.sin(t * 2.6 + q.x / 60) * 6;
       // Ticket 37: the street quoin's own box (kit.js touchesQuoin, items/quoin.js onPlayerCollision 156).
+      // items/quoin.js 159: an ignore_quoin_limit place still stops at the day's limit (the quoin
+      // stays put), and 236: below it the quoin is not counted toward it.
       if (ctx.kit.touchesQuoin(ctx, q)) {
+        if (!ctx.collectQuoin(q.type, q.x, q.y, { uncounted: true })?.ok) continue;
         q.taken = true;
         q.spr.visible = false;
-        ctx.collectQuoin(q.type, q.x, q.y, { ignoreLimit: true });
       }
     }
     // The rock nags if no Spinach has been activated yet.

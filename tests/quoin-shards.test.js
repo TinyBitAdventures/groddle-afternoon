@@ -414,7 +414,7 @@ describe('the collector\'s burst on the page (features/quoin-shards-feature.js q
     assert.match(feature, /if \(burst\.own\) continue;/);
     // Quest-room quoins show it the same way.
     const rooms = read('js/features/quest-instances-feature.js');
-    assert.match(rooms, /if \(result\.amount && engine\.quoinGotText\) engine\.quoinGotText\(x, y, `\+\$\{result\.amount\} \$\{lab\}`, '#ffffff'\);/);
+    assert.match(rooms, /if \(shown && engine\.quoinGotText\) engine\.quoinGotText\(x, y, `\+\$\{shown\} \$\{lab\}`, '#ffffff'\);/);
   });
 });
 

@@ -14558,8 +14558,9 @@ function quoinResultCopy(result) {
   if (result.blocked) return `+0 ${result.resolvedTypeId}`;
   if (result.resolvedTypeId === 'xp') return `+${amount} iMG`;
   if (result.resolvedTypeId === 'qurazy') return `Qurazy! +${amount} iMG`;
-  if (result.resolvedTypeId === 'energy') return amount ? `+${amount} energy` : 'Energy already full';
-  if (result.resolvedTypeId === 'mood') return amount ? `+${amount} mood` : 'Mood already full';
+  // items/quoin.js 245-248: the coin shows the quoin's own amount (delta: amount), full meter or not.
+  if (result.resolvedTypeId === 'energy') return `+${result.amount} energy`;
+  if (result.resolvedTypeId === 'mood') return `+${result.amount} mood`;
   if (result.resolvedTypeId === 'currants') return `+${amount} currants`;
   if (result.resolvedTypeId === 'favor') {
     const giant = GIANTS[result.giantId];

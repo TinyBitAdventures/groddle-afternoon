@@ -466,7 +466,8 @@ function tickQuoins(engine) {
       q.sprite.destroy();
       if (res.ok) {
         const lab = QUOIN_TYPES[res.resolvedTypeId || q.type]?.label || 'iMG';
-        engine.floatText?.(q.x, q.y - 16, `+${res.amount} ${lab}`, '#ffffff');
+        // items/quoin.js 205: an iMG quoin shows what landed after the mood bonus.
+        engine.floatText?.(q.x, q.y - 16, `+${['xp', 'qurazy'].includes(res.resolvedTypeId) ? res.actual : res.amount} ${lab}`, '#ffffff');
         engine.playSound?.(`QUOIN_${String(res.typeId || 'xp').toUpperCase()}`, { volume: 0.5 });
       }
       engine.refreshPack?.();

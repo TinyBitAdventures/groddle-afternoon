@@ -338,7 +338,10 @@ export function collectQuoin(state, typeId, pc, opts = {}) {
   const normalized = normalizeQuoinState(state);
   Object.assign(state, normalized);
   const originalType = QUOIN_TYPES[typeId] ? typeId : 'xp';
-  if (originalType !== 'qurazy' && state.collectedToday >= state.dailyLimit) {
+  // items/quoin.js 159: games, races, the rainbow_run instance and Paradise skip the limit
+  // (opts.skipLimit); 236: those and ignore_quoin_limit places (Top of the Tree) do not count
+  // toward it (opts.uncounted), while an ignore_quoin_limit place still stops at it.
+  if (originalType !== 'qurazy' && !opts.skipLimit && state.collectedToday >= state.dailyLimit) {
     return { ok: false, reason: 'daily_limit', dailyCount: state.collectedToday, dailyLimit: state.dailyLimit };
   }
 
@@ -406,7 +409,7 @@ export function collectQuoin(state, typeId, pc, opts = {}) {
   state.byType[resolvedType] = (state.byType[resolvedType] || 0) + 1;
   if (originalType === 'qurazy') {
     state.qurazyFound += 1;
-  } else {
+  } else if (!opts.uncounted) {
     state.collectedToday += 1;
     state.dailyByType[resolvedType] = (state.dailyByType[resolvedType] || 0) + 1;
   }
@@ -425,7 +428,7 @@ export function collectQuoin(state, typeId, pc, opts = {}) {
     dailyCount: state.collectedToday,
     dailyLimit: state.dailyLimit,
     // inc_stats.js 686: the quoin that makes the count equal the limit; only that one.
-    hitLimit: originalType !== 'qurazy' && state.collectedToday === state.dailyLimit,
+    hitLimit: originalType !== 'qurazy' && !opts.uncounted && state.collectedToday === state.dailyLimit,
     giantId,
     quoinClass: classAmount !== null ? className : null,
     acceleration: resolvedType === 'time' ? acceleration : null,

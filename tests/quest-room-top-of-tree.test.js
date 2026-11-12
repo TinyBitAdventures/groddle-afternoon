@@ -44,5 +44,6 @@ test('the climb has no clock: the 2*60 exit delay is "Are you stuck?", and time 
   assert.equal(mod.CLIMB_MS, undefined);
   const src = fs.readFileSync(path.join(root, 'public/js/quest-rooms/top-of-tree.js'), 'utf8');
   assert.doesNotMatch(src, /ctx\.extend\(|\+20 seconds/);
-  assert.match(src, /ctx\.collectQuoin\(q\.type, q\.x, q\.y, \{ ignoreLimit: true \}\);/);
+  // items/quoin.js 159, 236: not counted toward the day's limit, but it still stops there (the quoin stays).
+  assert.match(src, /if \(!ctx\.collectQuoin\(q\.type, q\.x, q\.y, \{ uncounted: true \}\)\?\.ok\) continue;/);
 });

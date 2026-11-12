@@ -248,7 +248,8 @@ function takeQuoins(engine) {
     if (view?.spr && !view.spr.destroyed) view.spr.visible = false;
     const label = QUOIN_TYPES[result.resolvedTypeId || q.type]?.label || 'iMG';
     if (result.ok) {
-      engine.floatText(q.x, q.y - 16, `+${result.amount} ${label}`, '#ffffff');
+      // items/quoin.js 205: an iMG quoin shows what landed after the mood bonus.
+      engine.floatText(q.x, q.y - 16, `+${['xp', 'qurazy'].includes(result.resolvedTypeId) ? result.actual : result.amount} ${label}`, '#ffffff');
       engine.playSound(`QUOIN_${String(result.typeId || 'xp').toUpperCase()}`, { volume: 0.5 });
     }
     engine.updateHud();
