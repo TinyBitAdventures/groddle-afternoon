@@ -17,7 +17,7 @@ import { mkdirSync, readFileSync, writeFileSync, statSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { execFileSync } from 'node:child_process';
-import { expandCatalog, resolveLook } from '../../public/js/avatar-looks.js?v=64fab53e';
+import { expandCatalog, resolveLook } from '../../public/js/avatar-looks.js?v=76eb9653';
 import { withPage } from './build.mjs';
 
 const HERE = dirname(fileURLToPath(import.meta.url));

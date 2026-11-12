@@ -3741,6 +3741,65 @@ button.play-context-head:focus-visible {
   opacity: 0.6;
   margin: 0.45rem 0 0;
 }
+/* From the 2012 Vanity page (js/avatar-builder-ui.js): the mirror's emote tests under the preview,
+   the face sliders (Size / Height / Width) on the Face tab, and the unsaved-changes question. */
+.avatar-emotes {
+  display: flex;
+  justify-content: center;
+  gap: var(--sp-2);
+}
+.avatar-emote {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-round);
+  background: var(--surface-card);
+  color: var(--text-moss);
+  cursor: pointer;
+}
+.avatar-emote:hover { border-color: var(--status-good); background: var(--surface-moss); }
+.avatar-emote:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+.avatar-dims {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(104px, 1fr));
+  gap: var(--sp-3) var(--sp-5);
+  margin: var(--sp-4) 0 0;
+  padding: var(--sp-4) var(--sp-5);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-lg);
+  background: var(--surface-card);
+}
+.avatar-panel:not([data-tab="face"]) .avatar-dims { display: none; }
+.avatar-dims-part { display: flex; flex-direction: column-reverse; gap: var(--sp-1); }
+.avatar-dims-name { font-size: var(--fs-xs); font-weight: 800; text-transform: uppercase; letter-spacing: 0.04em; color: var(--c-sand-44); }
+.avatar-dims-sliders { display: flex; flex-direction: column; gap: var(--sp-1); }
+.avatar-dim { display: grid; grid-template-columns: 3.4em 1fr; align-items: center; gap: var(--sp-2); font-size: var(--fs-xs); font-weight: 700; color: var(--text); }
+.avatar-dim-label { grid-column: 1; grid-row: 1; }
+.avatar-dim-range { grid-column: 2; grid-row: 1; width: 100%; min-width: 0; margin: 0; accent-color: var(--status-good); }
+.avatar-leaving[hidden] { display: none; }
+.avatar-leaving {
+  position: absolute;
+  inset: 0;
+  z-index: var(--z-raised);
+  display: grid;
+  place-items: center;
+  padding: var(--sp-6);
+  background: color-mix(in srgb, var(--c-grey-94) 70%, transparent);
+}
+.avatar-leaving-card {
+  max-width: 360px;
+  padding: var(--sp-6) var(--sp-7);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-lg);
+  background: var(--surface-parchment);
+  box-shadow: var(--shadow-3);
+}
+.avatar-leaving-title { margin: 0 0 var(--sp-2); font-size: var(--fs-md); font-weight: 800; }
+.avatar-leaving-body { margin: 0 0 var(--sp-5); font-size: var(--fs-sm); }
+.avatar-leaving-actions { display: flex; flex-wrap: wrap; gap: var(--sp-3); justify-content: flex-end; }
 .btn-secondary {
   margin-top: 0.45rem;
   background: transparent;

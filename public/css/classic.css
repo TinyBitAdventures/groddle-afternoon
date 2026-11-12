@@ -3121,3 +3121,259 @@
 :root[data-ui="classic"] .featured-row .fp-open { color: var(--c-classic-wear); }
 :root[data-ui="classic"] .pj-card.is-featured { box-shadow: inset 0 0 0 2px var(--c-classic-wear); }
 :root[data-ui="classic"] .pj-featured-tag { border-radius: 0; background: var(--c-classic-wear); }
+
+/* === Classic vanity (lane) === */
+/* The character builder as the 2012 Vanity page (the 2012 client's Vanity.as, VanityModel.as 70-136,
+   VanityMirror.as, DimsPane.as 35-48), restyled in place: the parts tabs and their pane on the left,
+   the mirror column (195 wide) with its four emote tests over it and Reset and Save under it in the
+   middle, Your looks down the right, the Size / Height / Width sliders below the parts. The page
+   had the whole window, so the builder takes the whole world cell. The layout boxes give their
+   children to the card's grid (display: contents); every id and hook stays. */
+:root[data-ui="classic"] #avatar-panel:not([hidden]) {
+  inset: 0;
+  bottom: 0;
+  padding: calc(8 * var(--cu));
+  background: color-mix(in srgb, var(--c-classic-page) 60%, transparent);
+  color: var(--c-classic-text);
+  font: var(--fs-classic-body)/var(--lh-normal) var(--font-classic-body);
+}
+/* The page stood alone: the tutorial's pill waits behind it. */
+:root[data-ui="classic"]:has(#avatar-panel:not([hidden])) #newxp-pill { visibility: hidden; }
+:root[data-ui="classic"] #avatar-panel .avatar-card {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) calc(196 * var(--cu)) calc(236 * var(--cu));
+  grid-template-rows: auto auto auto auto minmax(0, 1fr);
+  grid-template-areas:
+    "head     head    head"
+    "tabs     emotes  looks"
+    "swatches mirror  looks"
+    "swatches actions looks"
+    "dims     presets looks";
+  gap: calc(6 * var(--cu)) calc(14 * var(--cu));
+  box-sizing: border-box;
+  width: min(calc(960 * var(--cu)), 100%);
+  max-width: none;
+  height: 100%;
+  max-height: 100%;
+  margin: 0;
+  padding: 0 calc(16 * var(--cu)) calc(12 * var(--cu));
+  overflow: auto;
+  border: 0;
+  border-radius: 4px;
+  background: var(--c-classic-panel);
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--c-classic-ink) 37%, transparent),
+    0 0 1px 7px color-mix(in srgb, var(--c-classic-ink) 15%, transparent);
+  animation: classic-fade 0.2s linear;
+}
+:root[data-ui="classic"] #avatar-panel :is(.avatar-builder-layout, .avatar-preview-col, .avatar-controls-col) { display: contents; }
+:root[data-ui="classic"] #avatar-panel :is(.panel-meta, .avatar-hint) { display: none; }
+/* The head: the window title, the red cross in its white square (Dialog.as 221-243). */
+:root[data-ui="classic"] #avatar-panel .avatar-card > :first-child {
+  grid-area: head;
+  display: flex;
+  align-items: center;
+  min-height: calc(35 * var(--cu));
+  margin: 0;
+  padding: calc(8 * var(--cu)) calc(40 * var(--cu)) 0 calc(4 * var(--cu));
+}
+:root[data-ui="classic"] #avatar-panel .avatar-card > :first-child h2 { margin: 0; color: var(--c-classic-title); font: 800 calc(var(--fs-classic-window) * var(--cu-n, 1))/var(--lh-tight) var(--font-classic-title); }
+:root[data-ui="classic"] #avatar-panel #avatar-close {
+  position: absolute;
+  top: calc(6 * var(--cu));
+  right: calc(10 * var(--cu));
+  width: 30px;
+  height: 30px;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  border: 0;
+  border-radius: 0;
+  background: var(--c-classic-panel);
+  box-shadow: none;
+  color: transparent;
+  font-size: 0;
+  cursor: pointer;
+}
+:root[data-ui="classic"] #avatar-panel #avatar-close::before,
+:root[data-ui="classic"] #avatar-panel #avatar-close::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 14px;
+  height: 3px;
+  background: var(--c-classic-close);
+  transform: translate(-50%, -50%) rotate(45deg);
+}
+:root[data-ui="classic"] #avatar-panel #avatar-close::after { transform: translate(-50%, -50%) rotate(-45deg); }
+:root[data-ui="classic"] #avatar-panel #avatar-close:hover { box-shadow: inset 0 0 6px var(--c-classic-close-hover); }
+:root[data-ui="classic"] #avatar-panel :is(button, input):focus-visible { outline: 2px solid var(--c-classic-focus); outline-offset: 1px; }
+/* The parts tabs: link-blue words, the chosen one joined to its pane (Vanity's features tabs). */
+:root[data-ui="classic"] #avatar-panel .avatar-tabs { grid-area: tabs; align-self: end; display: flex; flex-wrap: wrap; gap: 0; margin: 0; }
+:root[data-ui="classic"] #avatar-panel .avatar-tab {
+  margin: 0;
+  padding: calc(6 * var(--cu)) calc(8 * var(--cu));
+  border: 0;
+  border-radius: 4px 4px 0 0;
+  background: none;
+  color: var(--c-classic-link);
+  font: 800 var(--fs-classic-body)/var(--lh-tight) var(--font-classic-title);
+  cursor: pointer;
+}
+:root[data-ui="classic"] #avatar-panel .avatar-tab:hover { color: var(--c-classic-contact-hover); }
+:root[data-ui="classic"] #avatar-panel .avatar-tab.active { background: var(--c-classic-page); color: var(--c-classic-title); }
+:root[data-ui="classic"] #avatar-panel .avatar-swatches,
+:root[data-ui="classic"] #avatar-panel .avatar-swatches[data-mode="parts"] {
+  grid-area: swatches;
+  contain: size; /* a long parts list scrolls in the pane; the mirror column sets the rows */
+  min-height: 0;
+  max-height: none;
+  margin: 0;
+  padding: calc(10 * var(--cu)) calc(12 * var(--cu));
+  overflow-y: auto;
+  border: 0;
+  border-radius: 0 4px 4px 4px;
+  background: var(--c-classic-page);
+}
+:root[data-ui="classic"] #avatar-panel .avatar-section-title { color: var(--c-classic-tab-off); font: 800 var(--fs-classic-count)/var(--lh-normal) var(--font-classic-title); letter-spacing: 0.04em; }
+:root[data-ui="classic"] #avatar-panel :is(.avatar-style-chip, .avatar-preset-chip) {
+  padding: calc(2 * var(--cu)) calc(7 * var(--cu));
+  border: 1px solid var(--c-classic-title-rule);
+  border-radius: 3px;
+  background: var(--c-classic-panel);
+  color: var(--c-classic-text);
+  font: 700 var(--fs-classic-count)/var(--lh-normal) var(--font-classic-body);
+}
+:root[data-ui="classic"] #avatar-panel :is(.avatar-style-chip, .avatar-preset-chip):hover { border-color: var(--c-classic-contact-hover); background: var(--c-classic-panel); color: var(--c-classic-title); }
+/* The chosen part: the orange ring of Vanity's selected button (features_bt_border_sel). */
+:root[data-ui="classic"] #avatar-panel :is(.avatar-style-chip, .avatar-preset-chip).active { border-color: var(--c-classic-contact-hover); background: var(--c-classic-panel); box-shadow: inset 0 0 0 1px var(--c-classic-contact-hover); color: var(--c-classic-title); }
+:root[data-ui="classic"] #avatar-panel .avatar-more-chip { border-style: dashed; color: var(--c-classic-link); }
+:root[data-ui="classic"] #avatar-panel .avatar-search {
+  min-height: calc(25 * var(--cu));
+  padding: 0 calc(8 * var(--cu));
+  border: 1px solid var(--c-classic-input-border);
+  border-radius: 3px;
+  background: var(--c-classic-input);
+  color: var(--c-classic-text);
+  font: var(--fs-classic-body) var(--font-classic-body);
+}
+:root[data-ui="classic"] #avatar-panel .avatar-search:is(:hover, :focus) { border-color: var(--c-classic-input-hi-border); background: var(--c-classic-input-hi); box-shadow: none; outline: none; }
+:root[data-ui="classic"] #avatar-panel .avatar-palette { grid-template-columns: repeat(auto-fill, minmax(calc(26 * var(--cu)), 1fr)); gap: calc(6 * var(--cu)); }
+:root[data-ui="classic"] #avatar-panel .avatar-swatch { border: 1px solid var(--c-classic-panel); border-radius: 3px; box-shadow: 0 0 0 1px var(--c-classic-title-rule); transform: none; }
+:root[data-ui="classic"] #avatar-panel .avatar-swatch.active { border-color: var(--c-classic-panel); box-shadow: 0 0 0 2px var(--c-classic-contact-hover); }
+:root[data-ui="classic"] #avatar-panel .avatar-note { color: var(--c-classic-offline); opacity: 1; }
+:root[data-ui="classic"] #avatar-panel .avatar-starter-label { color: var(--c-classic-text); }
+:root[data-ui="classic"] #avatar-panel .avatar-starter-arrow { border-color: var(--c-classic-btn-minor-border); background: var(--c-classic-panel); color: var(--c-classic-link); }
+:root[data-ui="classic"] #avatar-panel .avatar-starter-dot { border-color: var(--c-classic-btn-minor-border); background: var(--c-classic-panel); }
+:root[data-ui="classic"] #avatar-panel .avatar-starter-dot.active { border-color: var(--c-classic-contact-hover); background: var(--c-classic-contact-hover); }
+:root[data-ui="classic"] #avatar-panel .avatar-starter-group + .avatar-starter-group { border-top-color: var(--c-classic-rule); }
+:root[data-ui="classic"] #avatar-panel .avatar-reimagined-tag { background: var(--c-classic-tip); color: var(--c-classic-text); }
+/* The mirror: Vanity's mirror column, a tan frame round the glass (the frame was a bitmap, not reused). */
+:root[data-ui="classic"] #avatar-panel #avatar-preview {
+  grid-area: mirror;
+  justify-self: center;
+  box-sizing: border-box;
+  width: calc(180 * var(--cu));
+  height: calc(236 * var(--cu));
+  border: calc(7 * var(--cu)) solid var(--c-classic-verb-edge);
+  border-radius: 4px;
+  background: linear-gradient(160deg, var(--c-classic-panel) 0%, var(--c-classic-well) 60%, var(--c-classic-page) 100%);
+  box-shadow: inset 0 0 0 1px var(--c-classic-rule);
+}
+/* The four tests over the mirror, with the orange "Test" note pointing at them (VanityMirror.as 83-117). */
+:root[data-ui="classic"] #avatar-panel .avatar-emotes { grid-area: emotes; align-self: end; justify-content: center; align-items: center; gap: calc(6 * var(--cu)); }
+:root[data-ui="classic"] #avatar-panel .avatar-emotes::before { content: "Test"; display: inline-block; margin-right: calc(2 * var(--cu)); color: var(--c-classic-contact-hover); font: italic 800 var(--fs-classic-body)/1 var(--font-classic-title); transform: rotate(-12deg); }
+:root[data-ui="classic"] #avatar-panel .avatar-emote { width: calc(30 * var(--cu)); height: calc(30 * var(--cu)); border: 1px solid var(--c-classic-link); border-radius: 50%; background: var(--c-classic-panel); color: var(--c-classic-link); }
+:root[data-ui="classic"] #avatar-panel .avatar-emote:hover { border-color: var(--c-classic-contact-hover); background: var(--c-classic-panel); color: var(--c-classic-contact-hover); }
+/* Reset and Save under the mirror as minor buttons, Save the widest (VanityMirror.as 119-133: 144 x 34). */
+:root[data-ui="classic"] #avatar-panel .avatar-actions { grid-area: actions; display: flex; flex-wrap: wrap; justify-content: center; gap: calc(6 * var(--cu)); margin: 0; }
+:root[data-ui="classic"] #avatar-panel :is(.avatar-actions, .avatar-leaving-actions) button {
+  min-height: calc(26 * var(--cu));
+  margin: 0;
+  padding: 0 calc(12 * var(--cu));
+  border: 1px solid var(--c-classic-btn-minor-border);
+  border-radius: 4px;
+  background: linear-gradient(180deg, var(--c-classic-btn-minor-top), var(--c-classic-btn-minor-bottom));
+  box-shadow: none;
+  color: var(--c-classic-btn-minor-label);
+  font: 800 var(--fs-classic-button)/1 var(--font-classic-title);
+  cursor: pointer;
+}
+:root[data-ui="classic"] #avatar-panel :is(.avatar-actions, .avatar-leaving-actions) button:hover { background: linear-gradient(180deg, var(--c-classic-panel), var(--c-classic-btn-minor-top)); color: var(--c-classic-title); }
+:root[data-ui="classic"] #avatar-panel #avatar-apply { order: -1; flex: 1 0 100%; min-height: calc(34 * var(--cu)); max-width: calc(144 * var(--cu)); }
+/* The presets under the mirror, smaller: Looks / Starter / Costumes as tabs, then the chips. */
+:root[data-ui="classic"] #avatar-panel .avatar-presets { grid-area: presets; align-self: start; max-width: none; min-height: 0; max-height: 100%; overflow-y: auto; gap: calc(4 * var(--cu)); }
+:root[data-ui="classic"] #avatar-panel .avatar-preset-groups { padding: 0; border: 0; border-bottom: 1px solid var(--c-classic-rule); border-radius: 0; background: none; }
+:root[data-ui="classic"] #avatar-panel .avatar-preset-group { padding: calc(2 * var(--cu)) calc(6 * var(--cu)); border-radius: 0; background: none; box-shadow: none; color: var(--c-classic-link); font: 800 var(--fs-classic-count)/var(--lh-normal) var(--font-classic-title); }
+:root[data-ui="classic"] #avatar-panel .avatar-preset-group.active { background: none; box-shadow: inset 0 -2px 0 var(--c-classic-link); color: var(--c-classic-title); }
+:root[data-ui="classic"] #avatar-panel .avatar-preset-row { gap: calc(4 * var(--cu)); }
+/* Size / Height / Width: upright sliders in groups, the part's name under each (DimsPane.as: 12 x 87, 40 apart). */
+:root[data-ui="classic"] #avatar-panel .avatar-dims {
+  grid-area: dims;
+  display: flex;
+  justify-content: space-around;
+  align-items: start;
+  gap: calc(8 * var(--cu));
+  margin: 0;
+  padding: calc(6 * var(--cu)) 0 0;
+  border: 0;
+  border-radius: 0;
+  background: none;
+}
+:root[data-ui="classic"] #avatar-panel .avatar-dims-part { flex-direction: column; align-items: center; gap: calc(4 * var(--cu)); }
+:root[data-ui="classic"] #avatar-panel .avatar-dims-sliders { flex-direction: row; gap: calc(14 * var(--cu)); }
+:root[data-ui="classic"] #avatar-panel .avatar-dim { display: flex; flex-direction: column; align-items: center; gap: calc(3 * var(--cu)); color: var(--c-classic-text); font: 700 var(--fs-classic-count)/1 var(--font-classic-body); }
+:root[data-ui="classic"] #avatar-panel .avatar-dim-range {
+  writing-mode: vertical-lr;
+  direction: rtl;
+  width: calc(14 * var(--cu));
+  height: calc(87 * var(--cu));
+  accent-color: var(--c-classic-link);
+  cursor: pointer;
+}
+:root[data-ui="classic"] #avatar-panel .avatar-dims-name { color: var(--c-classic-link); font: 800 var(--fs-classic-body)/1 var(--font-classic-title); letter-spacing: 0; text-transform: none; }
+/* Your looks down the right, in the parts pane's colour, the pictures two across. */
+:root[data-ui="classic"] #avatar-panel .your-looks {
+  grid-area: looks;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  margin: calc(8 * var(--cu)) 0 0;
+  padding: calc(10 * var(--cu));
+  border: 0;
+  border-radius: 4px;
+  background: var(--c-classic-page);
+}
+:root[data-ui="classic"] #avatar-panel .your-looks-title { color: var(--c-classic-title); font: 800 var(--fs-classic-row-title)/var(--lh-tight) var(--font-classic-title); }
+:root[data-ui="classic"] #avatar-panel :is(.your-looks-total, .your-looks-note) { color: var(--c-classic-text); font-family: var(--font-classic-body); }
+:root[data-ui="classic"] #avatar-panel .your-looks-row {
+  flex: 1 1 auto;
+  display: grid;
+  grid-template-columns: repeat(2, 100px);
+  justify-content: center;
+  align-content: start;
+  gap: calc(8 * var(--cu));
+  min-height: 0;
+  margin: calc(6 * var(--cu)) 0 0;
+  padding: calc(2 * var(--cu));
+  overflow: hidden auto;
+}
+:root[data-ui="classic"] #avatar-panel .your-look-wear { border: 1px solid var(--c-classic-title-rule); border-radius: 4px; background: var(--c-classic-panel); }
+:root[data-ui="classic"] #avatar-panel .your-look-wear:hover { border-color: var(--c-classic-contact-hover); }
+:root[data-ui="classic"] #avatar-panel .your-look-remove { border-color: var(--c-classic-btn-minor-border); border-radius: 4px; background: linear-gradient(180deg, var(--c-classic-btn-minor-top), var(--c-classic-btn-minor-bottom)); color: var(--c-classic-btn-minor-label); }
+:root[data-ui="classic"] #avatar-panel .your-looks-confirm { border-color: var(--c-classic-rule); border-radius: 4px; background: var(--c-classic-panel); }
+/* Leaving with unsaved changes: the Vanity dialog over the page (LeavingVanityDialog.as). */
+:root[data-ui="classic"] #avatar-panel .avatar-leaving { background: color-mix(in srgb, var(--c-classic-panel) 80%, transparent); }
+:root[data-ui="classic"] #avatar-panel .avatar-leaving-card {
+  border: 0;
+  border-radius: 4px;
+  background: var(--c-classic-panel);
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--c-classic-ink) 37%, transparent),
+    0 0 1px 7px color-mix(in srgb, var(--c-classic-ink) 15%, transparent);
+}
+:root[data-ui="classic"] #avatar-panel .avatar-leaving-title { color: var(--c-classic-title); font: 800 var(--fs-classic-row-title)/var(--lh-tight) var(--font-classic-title); }
+:root[data-ui="classic"] #avatar-panel .avatar-leaving-body { color: var(--c-classic-text); font: var(--fs-classic-row)/var(--lh-normal) var(--font-classic-body); }
+/* === end Classic vanity === */

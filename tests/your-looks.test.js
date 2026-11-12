@@ -9,11 +9,11 @@ import { fileURLToPath } from 'node:url';
 import {
   YOUR_LOOKS_KEEP_MS, YOUR_LOOKS_MAX, YOUR_LOOKS_TEXT, cleanLook, createYourLooks, findLook, lookId,
   normalizeYourLooks, noteWear, pastLooks, recordLook, removeLook, totalLine, wearLook,
-} from '../public/js/your-looks.js?v=fd9949a4';
+} from '../public/js/your-looks.js?v=89b5ca2e';
 import { createFeatureHost } from '../public/js/feature-host.js?v=06bb8b74';
-import { yourLooksFeature, YOUR_LOOKS_FEATURE_ID } from '../public/js/features/your-looks-feature.js?v=bf069e9c';
+import { yourLooksFeature, YOUR_LOOKS_FEATURE_ID } from '../public/js/features/your-looks-feature.js?v=75e4085c';
 import { createPlayerSave, parsePlayerSave, serializePlayerSave } from '../public/js/player-save.js?v=a7d1da05';
-import { APPEARANCE_PRESETS } from '../public/js/character-builder.js?v=b676305c';
+import { APPEARANCE_PRESETS } from '../public/js/character-builder.js?v=ee3228bd';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const read = (f) => readFileSync(join(root, f), 'utf8');

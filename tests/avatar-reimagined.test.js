@@ -8,8 +8,8 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { expandCatalog } from '../public/js/avatar-looks.js?v=64fab53e';
-import { REIMAGINED_TAG, decorateWardrobe, installReimaginedTags, isReimagined, reimaginedNote } from '../public/js/avatar-reimagined.js?v=44752d2c';
+import { expandCatalog } from '../public/js/avatar-looks.js?v=76eb9653';
+import { REIMAGINED_TAG, decorateWardrobe, installReimaginedTags, isReimagined, reimaginedNote } from '../public/js/avatar-reimagined.js?v=a6f56800';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const catalog = expandCatalog(JSON.parse(readFileSync(join(root, 'public/assets/avatar/catalog.json'), 'utf8')));

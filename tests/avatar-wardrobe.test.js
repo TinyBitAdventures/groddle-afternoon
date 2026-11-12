@@ -8,7 +8,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { articleColors, expandCatalog, randomVectorFields, resolveLook } from '../public/js/avatar-looks.js?v=64fab53e';
+import { articleColors, expandCatalog, randomVectorFields, resolveLook } from '../public/js/avatar-looks.js?v=76eb9653';
 import { CORE_FRAMES } from '../public/js/avatar-anims.js?v=fb921bf4';
 import { MORPH_ID_BASE, morphOfShapeId, morphShapeId } from '../tools/avatar-compositor/rig.mjs';
 import { morphShapeAt, parseMorphSvg } from '../tools/avatar-compositor/shapes.mjs';

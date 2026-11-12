@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=5e5c70c4';
 import { createErrorOnce, createFeatureHost } from './js/feature-host.js?v=06bb8b74';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=1ebe7220';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=b8e1a346';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -786,7 +786,7 @@ import {
   planSignpostTravel,
 } from './js/travel.js?v=7fd6e363';
 import { facingScaleX, facingFromVelocity } from './js/avatar.js?v=c4da73ea';
-import { AFK_TIMEOUT_MS, ANIMS, ANIM_FPS, EMOTIONS, EMOTION_MS, IDLE_SHEETS, RANDOM_IDLE_MS, RANDOM_IDLE_WAIT_MS, animForState, avatarAnimState, createIdleClock, crowdScaleX, idleSheetFor } from './js/avatar-anims.js?v=fb921bf4';
+import { AFK_TIMEOUT_MS, ANIMS, ANIM_FPS, CORE_FRAMES, EMOTIONS, EMOTION_MS, IDLE_SHEETS, RANDOM_IDLE_MS, RANDOM_IDLE_WAIT_MS, animForState, avatarAnimState, createIdleClock, crowdScaleX, idleSheetFor } from './js/avatar-anims.js?v=fb921bf4';
 import { landingY, stackRestY, walkSurfaceY } from './js/walk-surface.js?v=106bfdc5';
 import { holdCloseToFloor } from './js/slope-walk.js?v=9af1e505';
 import { JUMP_SPEED, MAX_TICK_FRAMES, WALK_MAX, avatarGround, coastX, frameSteps, stepAvatar, steerAccel, steerX, streetPhysicsExtras } from './js/avatar-step.js?v=43b1182e';
@@ -795,10 +795,10 @@ import { FAILED_LINE, inVerbReach, movingLine, verbRange, walkOverEnd, walkOverG
 import { hellBuffDesc, isInHell } from './js/hell.js?v=bf9c87ce';
 import { climbBobY, ladderAnimState, ladderSwap } from './js/ladder-anim.js?v=a8b327a0';
 import { VECTOR_AVATAR } from './js/avatar-vector-sheets.js?v=ad801376';
-import { createNpcGlitchKit } from './js/npc-glitch.js?v=339e1872';
-import { bakeIdleSheet, bakeLook, bakeSheet, loadCatalog as loadAvatarCatalog, paintPreview as paintVectorPreview, prepareLook } from './js/avatar-compositor.js?v=02e642c7';
+import { createNpcGlitchKit } from './js/npc-glitch.js?v=f69f68a0';
+import { bakeIdleSheet, bakeLook, bakeSheet, loadCatalog as loadAvatarCatalog, paintPreview as paintVectorPreview, prepareIdle, prepareLook } from './js/avatar-compositor.js?v=8b20791a';
 import { LATE_SHEETS, anchorSheetFrames, ensureAnimSheets, ensureLateSheet, fillPackAnims, packComplete, redrawFrame, showsStandIn } from './js/avatar-pack.js?v=d8fba962';
-import { catalogItem, lookKey, randomVectorFields, resolveLook, variantSwatch } from './js/avatar-looks.js?v=64fab53e';
+import { catalogItem, lookKey, randomVectorFields, resolveLook, variantSwatch } from './js/avatar-looks.js?v=76eb9653';
 import {
   createDefaultAppearance,
   loadAppearance,
@@ -807,8 +807,8 @@ import {
   APPEARANCE_PRESETS,
   PRESET_GROUPS,
   appearanceCacheKey,
-} from './js/character-builder.js?v=b676305c';
-import { clearPresetActive, renderPresetGroups, renderStarterPicker } from './js/avatar-builder-ui.js?v=be72005c';
+} from './js/character-builder.js?v=ee3228bd';
+import { clearPresetActive, leavingDialogOpen, renderEmoteTests, renderFaceDims, renderPresetGroups, renderStarterPicker, showLeavingDialog } from './js/avatar-builder-ui.js?v=4e57b8c5';
 import {
   loadAmbientMusicConfig,
   resolveAmbientTheme,
@@ -11141,8 +11141,53 @@ function closeAvatarPanel() {
   const wasOpen = Boolean(panel && !panel.hidden);
   if (panel) panel.hidden = true;
   stopAvatarPreviewLoop();
+  avatarPreviewEmote = null;
+  const leaving = panel?.querySelector('.avatar-leaving');
+  if (leaving) leaving.hidden = true;
   // LOOKHOLD: the builder from the start card closing lets the held screens go.
   if (wasOpen) releaseStartLookHold();
+}
+
+/** Vanity.as areChanges: the builder's draft is not the look worn (the last one saved). */
+function avatarLookDirty() {
+  return appearanceCacheKey(playerAppearance) !== appearanceCacheKey(wornAppearance);
+}
+
+/**
+ * The player's ways out of the builder (its close, Esc, L, the look button, a click beside it):
+ * with unsaved changes they ask first (Vanity.as onTextLinkClick, LeavingVanityDialog.as
+ * makeForUnsaved). Asked again while the question is up, it means Stay here.
+ */
+function askCloseAvatarPanel() {
+  const panel = document.getElementById('avatar-panel');
+  if (!panel || panel.hidden) return;
+  if (leavingDialogOpen(panel)) {
+    panel.querySelector('.avatar-leaving').hidden = true;
+    if (app?.canvas) app.canvas.dataset.avatarLeaving = 'stayed';
+    return;
+  }
+  if (!avatarLookDirty()) {
+    closeAvatarPanel();
+    return;
+  }
+  if (app?.canvas) app.canvas.dataset.avatarLeaving = 'asked';
+  showLeavingDialog(panel, {
+    onStay: () => {
+      if (app?.canvas) app.canvas.dataset.avatarLeaving = 'stayed';
+      document.getElementById('avatar-apply')?.focus();
+    },
+    onSave: () => {
+      if (app?.canvas) app.canvas.dataset.avatarLeaving = 'saved';
+      commitAvatarAppearance();
+    },
+    onLeave: () => {
+      if (app?.canvas) app.canvas.dataset.avatarLeaving = 'discarded';
+      // The draft goes; the look worn stays (Vanity left the page unsaved).
+      playerAppearance = wornAppearance;
+      clearPresetActive(document.getElementById('avatar-presets'));
+      closeAvatarPanel();
+    },
+  });
 }
 
 /** Builder tabs: Tiny Speck's starter picker, then the vector Glitch's parts. */
@@ -11192,7 +11237,49 @@ function renderAvatarBuilder() {
   });
   const meta = document.querySelector('#avatar-panel .panel-meta');
   if (meta) meta.textContent = 'Pick hair, face, clothes and colours from the original wardrobe. Saved on this device.';
+  const panel = document.getElementById('avatar-panel');
+  if (panel) panel.dataset.tab = avatarBuilderSlot;
+  mountAvatarVanity();
   renderAvatarSwatches();
+  renderAvatarDims();
+}
+
+/**
+ * From the 2012 Vanity page: the mirror's emote tests (under the preview) and the face sliders
+ * (after the builder's two columns). Modern shows the sliders on the Face tab; Classic lays the
+ * panel out as Vanity's columns (css/classic.css).
+ */
+function mountAvatarVanity() {
+  const panel = document.getElementById('avatar-panel');
+  if (!panel || panel.dataset.vanity) return;
+  panel.dataset.vanity = '1';
+  const canvas = document.getElementById('avatar-preview');
+  if (canvas) {
+    const emotes = document.createElement('div');
+    emotes.className = 'avatar-emotes';
+    renderEmoteTests(emotes, { onPlay: playAvatarPreviewEmote });
+    canvas.after(emotes);
+  }
+  const layout = panel.querySelector('.avatar-builder-layout');
+  if (layout) {
+    const dims = document.createElement('div');
+    dims.id = 'avatar-dims';
+    dims.className = 'avatar-dims';
+    layout.after(dims);
+  }
+}
+
+/** The sliders show the draft's face (each change saves with the look, as its other parts do). */
+function renderAvatarDims() {
+  const dims = document.getElementById('avatar-dims');
+  if (!dims) return;
+  const look = avatarCatalog ? resolveLook(playerAppearance.vector, avatarCatalog) : null;
+  renderFaceDims(dims, {
+    face: look?.face || playerAppearance.vector?.face || {},
+    onChange: (key, value) => setVectorFields((v) => {
+      v.face = { ...(v.face || {}), [key]: value };
+    }),
+  });
 }
 
 function renderAvatarSwatches() {
@@ -11207,6 +11294,7 @@ function setVectorFields(mutate) {
   playerAppearance = normalizeAppearance({ ...playerAppearance, bodyStyle: 'vector', vector: v });
   clearPresetActive(document.getElementById('avatar-presets'));
   renderAvatarSwatches();
+  renderAvatarDims();
   paintAvatarPreview();
 }
 
@@ -11387,6 +11475,20 @@ function renderStyleChips(box, type, title) {
 // —— Builder preview ——
 let avatarPreviewRun = 0;
 let avatarPreviewTimer = 0;
+/** An emote test playing in the preview (Vanity.as doAnimation): { anim, frames, i, idle }. */
+let avatarPreviewEmote = null;
+
+/**
+ * The mirror's test buttons: the look plays the emote once at the sheets' 30 fps, then walks on.
+ * idle3 needs the idle frames (prepareIdle), loaded on its first test.
+ */
+function playAvatarPreviewEmote(anim) {
+  const frames = ANIMS[anim];
+  if (!frames?.length) return;
+  avatarPreviewEmote = { anim, frames, i: 0, idle: frames.some((fn) => !CORE_FRAMES.includes(fn)) };
+  const canvas = document.getElementById('avatar-preview');
+  if (canvas) canvas.dataset.previewEmote = anim;
+}
 
 function stopAvatarPreviewLoop() {
   avatarPreviewRun += 1;
@@ -11416,14 +11518,35 @@ async function paintVectorAvatarPreview(canvas) {
   if (run !== avatarPreviewRun) return;
   const frames = ANIMS.walk2x;
   let i = 0;
+  let tick = 0;
+  const paint = (fn) => {
+    paintVectorPreview(prep, canvas, fn, { pad: 8 * dpr, boundsFrame: 801 });
+    canvas.dataset.previewFrame = String(fn);
+  };
+  // 30 ticks a second: an emote test paints each one, the walk every other (15 fps, as before).
   const step = () => {
     if (run !== avatarPreviewRun) return;
-    paintVectorPreview(prep, canvas, avatarPreviewWalking ? frames[i % frames.length] : 801, { pad: 8 * dpr, boundsFrame: 801 });
-    canvas.dataset.previewFrame = String(avatarPreviewWalking ? frames[i % frames.length] : 801);
+    const emote = avatarPreviewEmote;
+    if (emote) {
+      if (emote.idle && !prep.idleReady) {
+        prep.idleLoading ??= prepareIdle(prep).catch(() => { avatarPreviewEmote = null; });
+        return;
+      }
+      paint(emote.frames[emote.i]);
+      emote.i += 1;
+      if (emote.i >= emote.frames.length) {
+        avatarPreviewEmote = null;
+        delete canvas.dataset.previewEmote;
+      }
+      return;
+    }
+    tick += 1;
+    if (tick % 2 === 0) return;
+    paint(avatarPreviewWalking ? frames[i % frames.length] : 801);
     i += 1;
   };
   step();
-  avatarPreviewTimer = setInterval(step, 1000 / 15);
+  avatarPreviewTimer = setInterval(step, 1000 / 30);
 }
 /** The preview walks unless reduced motion is asked for. */
 const avatarPreviewWalking = !(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
@@ -25869,7 +25992,7 @@ const PANEL_CLOSERS = Object.freeze({
   'projects-panel': () => closeProjectsPanel(),
   'make-panel': () => closeMakePanel(),
   'garden-panel': () => closeGardenPanel(),
-  'avatar-panel': () => closeAvatarPanel(),
+  'avatar-panel': () => askCloseAvatarPanel(),
   'shrine-panel': () => closeShrinePanel(),
 });
 
@@ -31197,7 +31320,7 @@ async function main() {
       closeProjectsPanel();
       closeMakePanel();
       closeGardenPanel();
-      closeAvatarPanel();
+      askCloseAvatarPanel();
       closeShrinePanel();
     }
     if (!state.started) return;
@@ -31326,7 +31449,7 @@ async function main() {
       if (e.key === 'y' || e.key === 'Y') closeBuffsPanel();
       // N only: C is Camera Mode's, never Make's (TSMainView.as cKeyHandler 790-800).
       if (isPlainKey(e, 'n')) closeMakePanel();
-      if (isPlainKey(e, 'l')) closeAvatarPanel();
+      if (isPlainKey(e, 'l')) askCloseAvatarPanel();
       // VENDORKEY: V closes the store it opened.
       if (isPlainKey(e, 'v') && isVendorOpen()) closeVendor();
       // A side sheet sits beside the world: walking, jumping, Enter and E (and the number keys, with
@@ -31967,12 +32090,12 @@ async function main() {
       beginGame();
       return;
     }
-    if (isAvatarOpen()) closeAvatarPanel();
+    if (isAvatarOpen()) askCloseAvatarPanel();
     else openAvatarPanel();
   });
-  document.getElementById('avatar-close')?.addEventListener('click', closeAvatarPanel);
+  document.getElementById('avatar-close')?.addEventListener('click', askCloseAvatarPanel);
   document.getElementById('avatar-panel')?.addEventListener('click', (e) => {
-    if (e.target?.id === 'avatar-panel') closeAvatarPanel();
+    if (e.target?.id === 'avatar-panel') askCloseAvatarPanel();
   });
   document.getElementById('avatar-random')?.addEventListener('click', () => {
     // A random look from the wardrobe (once the catalog is in).

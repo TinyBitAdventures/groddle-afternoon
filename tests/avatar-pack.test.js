@@ -18,9 +18,9 @@ import {
   LATE_SHEETS, anchorSheetFrames, ensureAnimSheets, ensureLateSheet, fillPackAnims, lateSheetsForAnim, packComplete, redrawFrame, sheetsForAnim, showsStandIn, standInFrame,
 } from '../public/js/avatar-pack.js?v=d8fba962';
 import { ANIMS, CORE_SHEETS, FALL_LOOP, SHEET_FRAMES, animForState, frameRef } from '../public/js/avatar-anims.js?v=fb921bf4';
-import { SHEET_ORDER, bakeLook, bakeSheet } from '../public/js/avatar-compositor.js?v=02e642c7';
+import { SHEET_ORDER, bakeLook, bakeSheet } from '../public/js/avatar-compositor.js?v=8b20791a';
 import { expandRig, lookMatrices, slotAssignments } from '../public/js/avatar-rig.js?v=b67f0da8';
-import { expandCatalog, resolveLook } from '../public/js/avatar-looks.js?v=64fab53e';
+import { expandCatalog, resolveLook } from '../public/js/avatar-looks.js?v=76eb9653';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const pub = join(root, 'public');

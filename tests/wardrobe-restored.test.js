@@ -11,7 +11,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { expandCatalog, resolveLook } from '../public/js/avatar-looks.js?v=64fab53e';
+import { expandCatalog, resolveLook } from '../public/js/avatar-looks.js?v=76eb9653';
 import { SLOT_PARTS } from '../public/js/avatar-rig.js?v=b67f0da8';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');

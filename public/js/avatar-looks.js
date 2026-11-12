@@ -17,6 +17,33 @@ export const LOOK_TYPES = Object.freeze(['hair', 'hat', 'eyes', 'mouth', 'nose',
 /** Types a look may leave empty. */
 export const OPTIONAL_TYPES = Object.freeze(['hat', 'coat', 'dress', 'skirt', 'hair', 'shirt', 'pants', 'shoes', 'nose', 'ears']);
 
+/**
+ * The face sliders: Vanity's groups and order (glitch-client DimsPane.as 35-48), their labels
+ * (VanityModel.as dims_name_map) and the 2012 client's ranges (the game page's ava_settings,
+ * 2012-04-27). Heights and widths were whole pixels there ("int"), scales a number. `def` is the
+ * rig's value for a look that never set one (js/avatar-rig.js faceNumbers).
+ */
+export const FACE_DIMS = Object.freeze([
+  { part: 'eyes', label: 'Eyes', settings: [
+    { key: 'eye_scale', label: 'Size', min: 0.65, max: 1.2, step: 0.01, def: 1 },
+    { key: 'eye_height', label: 'Height', min: -5, max: 5, step: 1, def: 0 },
+    { key: 'eye_dist', label: 'Width', min: -3, max: 2, step: 1, def: 0 },
+  ] },
+  { part: 'nose', label: 'Nose', settings: [
+    { key: 'nose_scale', label: 'Size', min: 0.65, max: 1.45, step: 0.01, def: 1 },
+    { key: 'nose_height', label: 'Height', min: -5, max: 6, step: 1, def: 0 },
+  ] },
+  { part: 'mouth', label: 'Mouth', settings: [
+    { key: 'mouth_scale', label: 'Size', min: 0.75, max: 1.45, step: 0.01, def: 1 },
+    { key: 'mouth_height', label: 'Height', min: -3, max: 4, step: 1, def: 0 },
+  ] },
+  { part: 'ears', label: 'Ears', settings: [
+    { key: 'ears_scale', label: 'Size', min: 0.6, max: 1.2, step: 0.01, def: 1 },
+    { key: 'ears_height', label: 'Height', min: -4, max: 1, step: 1, def: 0 },
+  ] },
+].map((g) => Object.freeze({ ...g, settings: Object.freeze(g.settings.map((d) => Object.freeze(d))) })));
+const FACE_DIM_BY_KEY = new Map(FACE_DIMS.flatMap((g) => g.settings.map((d) => [d.key, d])));
+
 const HEX = /^[0-9a-f]{6}$/i;
 export const cleanHex = (v) => {
   const s = String(v ?? '').replace(/^#/, '').toLowerCase();
@@ -99,7 +126,9 @@ export function normalizeVectorFields(raw = {}, catalog = null) {
   }
   for (const k of ['eye_scale', 'eye_dist', 'eye_height', 'nose_scale', 'nose_height', 'mouth_scale', 'mouth_height', 'ears_scale', 'ears_height']) {
     const n = Number(raw.face?.[k]);
-    if (Number.isFinite(n)) out.face[k] = Math.max(-5, Math.min(5, n));
+    // -5..5, or the slider's wider 2012 range (nose_height went to 6).
+    const dim = FACE_DIM_BY_KEY.get(k);
+    if (Number.isFinite(n)) out.face[k] = Math.max(Math.min(-5, dim.min), Math.min(Math.max(5, dim.max), n));
   }
   return out;
 }

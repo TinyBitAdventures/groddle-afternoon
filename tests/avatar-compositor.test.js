@@ -15,8 +15,8 @@ import {
 } from '../public/js/avatar-rig.js?v=b67f0da8';
 import {
   COLOR_FIELDS, articleColors, expandCatalog, lookKey, normalizeVectorFields, randomVectorFields, resolveLook, vectorFieldsFromColors,
-} from '../public/js/avatar-looks.js?v=64fab53e';
-import { SHEET_ORDER, bakeLook } from '../public/js/avatar-compositor.js?v=02e642c7';
+} from '../public/js/avatar-looks.js?v=76eb9653';
+import { SHEET_ORDER, bakeLook } from '../public/js/avatar-compositor.js?v=8b20791a';
 import { CORE_FRAMES, IDLE_FRAMES, IDLE_SHEETS, SHEET_FRAMES } from '../public/js/avatar-anims.js?v=fb921bf4';
 import { VECTOR_AVATAR, VECTOR_AVATAR_HIRES } from '../public/js/avatar-vector-sheets.js?v=ad801376';
 import { FIRST_DRAW_SPRITES, HIRES_SPRITES } from '../public/js/sprite-hires.js?v=dd5da64c';

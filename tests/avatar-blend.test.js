@@ -10,7 +10,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { flattenSprite } from '../tools/avatar-compositor/rig.mjs';
 import { drawListBounds, expandRig, frameDrawList, lookMatrices, slotAssignments } from '../public/js/avatar-rig.js?v=b67f0da8';
-import { expandCatalog, resolveLook } from '../public/js/avatar-looks.js?v=64fab53e';
+import { expandCatalog, resolveLook } from '../public/js/avatar-looks.js?v=76eb9653';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const DATA = join(ROOT, 'public/assets/avatar');

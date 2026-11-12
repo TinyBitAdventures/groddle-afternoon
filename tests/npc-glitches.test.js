@@ -10,7 +10,7 @@ import assert from 'node:assert/strict';
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { catalogItem, expandCatalog } from '../public/js/avatar-looks.js?v=64fab53e';
+import { catalogItem, expandCatalog } from '../public/js/avatar-looks.js?v=76eb9653';
 import {
   NPC_GLITCH_ROSTER,
   buildNpcLooks,
@@ -22,7 +22,7 @@ import {
   npcIdFor,
   npcIdleTiming,
   npcLookFields,
-} from '../public/js/npc-glitch-looks.js?v=664e5f24';
+} from '../public/js/npc-glitch-looks.js?v=4971d6eb';
 import { NPC_GLITCH_HIRES, NPC_GLITCH_SHEETS } from '../public/js/npc-glitch-sheets.js?v=1163dc99';
 import { IDLES_TO_RANDOM, SHEET_FRAMES } from '../public/js/avatar-anims.js?v=fb921bf4';
 
@@ -186,7 +186,7 @@ describe('NPC Glitch rig (js/npc-glitch.js)', () => {
     globalThis.PIXI = PIXI;
     globalThis.Image = FakeImage;
     globalThis.document = { createElement: () => ({ width: 0, height: 0, getContext: () => ({ drawImage() {} }) }) };
-    K = await import('../public/js/npc-glitch.js?v=339e1872');
+    K = await import('../public/js/npc-glitch.js?v=f69f68a0');
   });
   after(() => {
     for (const [k, v] of Object.entries(saved)) globalThis[k] = v;

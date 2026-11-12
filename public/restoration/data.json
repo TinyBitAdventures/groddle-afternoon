@@ -2752,9 +2752,14 @@
   "deployed": "2026-11-11"
  },
  "git": {
-  "commits": 1676,
+  "commits": 1677,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-11",
+    "kind": "fix",
+    "text": "Mortar Barnacles sit on the walls where Glitch had them"
+   },
    {
     "date": "2026-11-11",
     "kind": "fix",
@@ -2869,14 +2874,9 @@
     "date": "2026-11-11",
     "kind": "new",
     "text": "Street Spirits give street projects with Glitch's bubble, and Group Halls build on their roped lot"
-   },
-   {
-    "date": "2026-11-11",
-    "kind": "improve",
-    "text": "Browse goods stays first in a street spirit's menu when it can reminisce"
    }
   ]
  },
- "tests": 817,
+ "tests": 818,
  "generatedAt": "2026-11-11"
 }

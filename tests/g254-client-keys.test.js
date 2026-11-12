@@ -232,7 +232,7 @@ describe('G254: game.js wiring', () => {
 
   it('Shift+K and Shift+L never close a panel the plain keys close', () => {
     assert.match(keys, /if \(isPlainKey\(e, 'k'\)\) closeSkillsPanel\(\);/);
-    assert.match(keys, /if \(isPlainKey\(e, 'l'\)\) closeAvatarPanel\(\);/);
+    assert.match(keys, /if \(isPlainKey\(e, 'l'\)\) askCloseAvatarPanel\(\);/);
     assert.doesNotMatch(keys, /e\.key === 'k' \|\| e\.key === 'K'\) closeSkillsPanel/);
   });
 

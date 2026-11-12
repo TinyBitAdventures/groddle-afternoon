@@ -43,7 +43,7 @@ import { loadGsjsAvatarData, loadHatHairMap } from './gsjs.mjs';
 import { ARTICLE_LABELS } from './labels.mjs';
 import { ARTICLE_CONTAINERS, SLOT_PARTS } from '../../public/js/avatar-rig.js?v=b67f0da8';
 import { CORE_FRAMES, IDLE_FRAMES } from '../../public/js/avatar-anims.js?v=fb921bf4';
-import { COLOR_FIELDS, expandCatalog, resolveLook } from '../../public/js/avatar-looks.js?v=64fab53e';
+import { COLOR_FIELDS, expandCatalog, resolveLook } from '../../public/js/avatar-looks.js?v=76eb9653';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(HERE, '../..');

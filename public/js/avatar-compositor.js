@@ -15,7 +15,7 @@
  */
 import { CORE_FRAMES, IDLE_FRAMES, SHEET_FRAMES } from './avatar-anims.js?v=fb921bf4';
 import { applyCM, drawListBounds, expandRig, transformBounds, frameDrawList, lookMatrices, mergeIdleArticle, mergeIdleRig, slotAssignments } from './avatar-rig.js?v=b67f0da8';
-import { expandCatalog } from './avatar-looks.js?v=64fab53e';
+import { expandCatalog } from './avatar-looks.js?v=76eb9653';
 
 export const AVATAR_DATA_DIR = 'assets/avatar/';
 /** Widest sheet row at 3x (px); taller sheets wrap into rows. */
