@@ -124,6 +124,26 @@ export function reachableStreets({ graph = {}, free = {}, shut = [], starts = []
 }
 
 /**
+ * Live report 212 (2026-11-12): the street of `reach` (the open world) nearest `from` by roads,
+ * counting every road whether it is built yet or not (`graph`, plus `free` ways), so a pick that
+ * lands past a closed road moves to the closest street still joined to the rest of Ur. `from`
+ * itself when it is in reach; null when nothing in reach connects to it. `skip(tsid)` passes over
+ * streets that will not do as a landing (the walk goes on through them).
+ */
+export function nearestReached({ graph = {}, free = {}, reach, from = '', skip = null } = {}) {
+  const start = G(from);
+  if (!start || !reach || typeof reach.has !== 'function') return null;
+  const seen = new Set([start]);
+  const queue = [start];
+  for (let i = 0; i < queue.length; i += 1) {
+    const at = queue[i];
+    if (reach.has(at) && !skip?.(at)) return at;
+    for (const to of [...(graph[at] || []), ...(free[at] || [])]) if (!seen.has(to)) (seen.add(to), queue.push(to));
+  }
+  return null;
+}
+
+/**
  * The street projects to build, in order, on the way from the starts to any of `targets`: the
  * fewest of them (0-1 search, entering a closed street costs one, as openWayHome), where a
  * closed street can only be entered from one of its project board streets (`boards`: street ->

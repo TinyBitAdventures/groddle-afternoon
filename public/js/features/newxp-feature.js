@@ -58,6 +58,7 @@ import {
   BAGS_NEEDED,
   BAG_REMINDER_MS,
   CHEAP_BAG_PRICE,
+  cheapBagPrice,
   FIRST_SKILLS,
   GENTLE_ISLAND,
   GENTLE_ISLAND_TSIDS,
@@ -124,7 +125,7 @@ import {
   vogPages,
   tutorialNameDefault,
   TUTORIAL_NAME_MAX,
-} from '../newxp.js?v=72a5d3da';
+} from '../newxp.js?v=554cfdda';
 import { ITEM_CATALOG, addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=60dfc9ca';
 import { QUOIN_SHEET, QUOIN_TYPES, qrazyRewardForLevel } from '../quoins.js?v=237c1d5d';
 import { soundForQuoin } from '../sound-moments.js?v=52ad523c';
@@ -138,7 +139,7 @@ import { frameTexture, onLoaded, sourceFromUrl, textureFromUrl, whenLoaded } fro
 import { upgradeSource } from '../sprite-hires.js?v=dd5da64c';
 import { grantMoodXp } from '../mood-xp.js?v=958e7680';
 import { displayTopOf, itemstackOverlayPoint, playPoofIn, playSheetOverlay, poofInAlpha } from '../overlay-art.js?v=75c3ea34';
-import { HOME_MACHINE } from '../home-ticket.js?v=2e4a6130';
+import { HOME_MACHINE } from '../home-ticket.js?v=5fa5dc08';
 import { animalAnchorX, animalAnchorY, createAnimalState } from '../animals.js?v=6a9c5420';
 import {
   AK_ANIMALS,
@@ -2534,8 +2535,13 @@ async function islandRockScript(engine, t, rock) {
   }
 }
 
-/** The cheap bag vendor (Progress Way): Generic Bags at the rock's "about 500". */
-function bagShopProfile() {
+/**
+ * The cheap bag vendor (Progress Way): Generic Bags at the rock's "about 500", or for what you
+ * have left once you are short of that (newxp.js cheapBagPrice, live report 218). The price is
+ * read each time the shelf draws or a bag is bought, so it follows your purse.
+ */
+function bagShopProfile(engine = null) {
+  const price = () => (engine?.pc && engine.questState?.active?.buy_two_bags ? cheapBagPrice(engine.pc.currants, bagsBought(engine)) : CHEAP_BAG_PRICE);
   return {
     key: 'newxp_bags',
     id: 'street_spirit_bags',
@@ -2544,7 +2550,7 @@ function bagShopProfile() {
     label: 'Cheap Bag Vendor',
     desc: 'Bags, cheap.',
     buyMultiplier: 0.66,
-    offers: [{ classTsid: 'bag_generic', label: 'Generic Bag', cost: CHEAP_BAG_PRICE, buyPrice: CHEAP_BAG_PRICE }],
+    offers: [{ classTsid: 'bag_generic', label: 'Generic Bag', get cost() { return price(); }, get buyPrice() { return price(); } }],
   };
 }
 
@@ -3992,7 +3998,7 @@ export const newxpFeature = {
       return true;
     }
     if (target?.classId === 'newxp_bag_vendor' && verbId === 'buy') {
-      engine.openShop(bagShopProfile());
+      engine.openShop(bagShopProfile(engine));
       return true;
     }
     if (target?.classId === 'newxp_flamingo' && verbId === 'talk') return true;
@@ -4008,7 +4014,7 @@ export const newxpFeature = {
 
   runVerbOverride(target, verbId, engine) {
     if (verbId !== 'newxp_buy_bags') return null;
-    engine.openShop(bagShopProfile());
+    engine.openShop(bagShopProfile(engine));
     return true;
   },
 

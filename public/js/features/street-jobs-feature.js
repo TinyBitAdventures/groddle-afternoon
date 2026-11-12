@@ -106,7 +106,7 @@ import {
 } from '../street-jobs.js?v=94f8d250';
 import { PAPERS_BADGE } from '../subway.js?v=44d1a09f';
 import { gainMetabolic, loseEnergy } from '../metabolics.js?v=8504134e';
-import { closuresInTheWay, holdNote, placeIndex, questHold, questStoryKey, reachableStreets } from '../quest-reach.js?v=a206bc33';
+import { closuresInTheWay, holdNote, nearestReached, placeIndex, questHold, questStoryKey, reachableStreets } from '../quest-reach.js?v=6cec222d';
 import { getQuestCatalog as questCatalog } from '../content-catalogs.js?v=10b118dd';
 import { saveStore, savedThrough } from '../save-store.js?v=0abb8cf1';
 import {
@@ -265,6 +265,35 @@ function questReach(engine) {
   }
   return reachCache;
 }
+/**
+ * Live report 212 (2026-11-12): the open world, the streets the starter street reaches by the roads
+ * as they stand (never from where you stand, which may be a pocket the roads have not reached), and
+ * the street of it nearest `tsid`. Teleports that pick a street from Glitch's lists (the Ancestral
+ * Lands' do_baqala_boot) ask it, so they never set you down past a road still being built.
+ * `skipHubs`: hubs that will not do as a landing (the kick never lands in the Savanna it sends
+ * you from). Null while the roads load.
+ */
+let openWorldCache = { key: '', reach: null, free: null };
+function openStreetNear(tsid, engine, { skipHubs = [] } = {}) {
+  if (!catalog || !streetIndex?.default) return null;
+  if (!waysReady) {
+    loadWays();
+    return null;
+  }
+  const papers = (engine?.unlockedAchievements || []).includes(PAPERS_BADGE);
+  let done = 0;
+  for (const row of Object.values(state.jobs)) if (row?.doneAt) done += 1;
+  const key = `${state.grandfathered.length}|${done}|${papers ? 1 : 0}|${demo?.jobId || ''}`;
+  if (openWorldCache.key !== key) {
+    const terms = wayHomeTerms({ starter: streetIndex.default, free: waysReady.free, rails: waysReady.rails, papers });
+    const shut = new Set(closedStreets(state, catalog, opts()));
+    openWorldCache = { key, free: terms.free, reach: reachableStreets({ graph: waysReady.graph, free: terms.free, shut, starts: [streetIndex.default] }) };
+  }
+  const hubs = new Set((skipHubs || []).map(String));
+  const skip = hubs.size ? (t) => hubs.has(String(streetIndex.streets?.[t]?.hubId ?? '')) : null;
+  return nearestReached({ graph: waysReady.graph, free: openWorldCache.free, reach: openWorldCache.reach, from: tsid, skip });
+}
+
 /** Each project street's board streets (street-jobs.json connecting), G tsids. */
 let boardsMap = null;
 function boardsOf() {
@@ -2860,6 +2889,11 @@ export const streetJobsFeature = {
    */
   streetsReachable(engine) {
     return questReach(engine)?.reach || null;
+  },
+
+  /** Report 212: the open-world street nearest `tsid` (itself when open), or null while the roads load. */
+  openStreetNear(tsid, engine, options) {
+    return openStreetNear(tsid, engine, options);
   },
 
   streetUnderConstruction(tsid, engine) {

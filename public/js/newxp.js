@@ -417,6 +417,21 @@ export const ISLAND_CURRANTS = 978;
 // The cheap bag vendor's prices are lost; the rock says "about 500 currants each".
 export const CHEAP_BAG_PRICE = 500;
 export const BAGS_NEEDED = 2;
+
+/**
+ * What the cheap bag vendor asks for the next bag while Enlarge Yer Slots runs (live report 218,
+ * 2026-11-12: a new player bought one bag, had 493 currants left, and the Progress Way gate held
+ * him; Gentle Island has nothing that pays currants, so he could never buy the second). The rock's
+ * "about 500" while you have that much, so the first bag costs what it always did; short of it,
+ * she lets the rest go for what you have, shared between the bags still wanted. Never more than
+ * you hold, so the tutorial cannot strand anyone, and a save already stuck can buy on its next visit.
+ */
+export function cheapBagPrice(currants, bought = 0) {
+  const have = Math.max(0, Math.floor(Number(currants) || 0));
+  const left = Math.max(1, BAGS_NEEDED - Math.max(0, Math.floor(Number(bought) || 0)));
+  if (have >= CHEAP_BAG_PRICE) return CHEAP_BAG_PRICE;
+  return Math.floor(have / left);
+}
 // location.js: leave_gentle_island flag 15 s after reaching a real street.
 export const LEAVE_FLAG_DELAY_MS = 15_000;
 // players/inc_newxp.js newxpQuestReminder: every 5 minutes.

@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=5e5c70c4';
 import { createErrorOnce, createFeatureHost } from './js/feature-host.js?v=06bb8b74';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=7cd747d7';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=6139d079';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -516,7 +516,7 @@ import {
   imagineHome,
   isHomePlaceTsid,
 } from './js/homes.js?v=631ab6b8';
-import { HOME_MACHINE, offerHomeTicket, renderTicketMachine } from './js/home-ticket.js?v=2e4a6130';
+import { HOME_MACHINE, offerHomeTicket, renderTicketMachine } from './js/home-ticket.js?v=5fa5dc08';
 import {
   MAIL_COMPANIONS,
   archiveMail,
@@ -3183,6 +3183,10 @@ function conversationCardOpen() {
   for (const d of root.querySelectorAll('[role="dialog"]')) {
     // Interaction menus (.verb-menu: the verb menu, Enter chooser, pickers) have their own gate (3384).
     if (d.hidden || GATED_DIALOG_IDS.has(d.id) || d.classList.contains('glitch-modal') || d.classList.contains('verb-menu')) continue;
+    // Report 213: the prompt stack's prompts (js/prompt-stack.js, PromptView.as) are not modal and the
+    // client's queue never waited on them; an "Are you stuck?" left up held a quest's award, and the
+    // Smuggler's crawl with it, for good.
+    if (d.classList.contains('game-prompt')) continue;
     if (d.closest('[hidden]') || !d.getClientRects().length) continue;
     if (getComputedStyle(d).visibility === 'hidden') continue;
     return true;

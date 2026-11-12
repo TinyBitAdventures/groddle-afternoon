@@ -69,6 +69,7 @@ import {
   ancestralSeconds,
   ancestralTick,
   isSavannaHub,
+  SAVANNA_HUBS,
   jujuAnchor,
   jujuCurse,
   jujuLine,
@@ -89,8 +90,9 @@ import {
   giveBaqalaTime,
   nostalgiaLimitSeconds,
   pickBootTarget,
+  openBootTarget,
   resetBaqalaTimes,
-} from '../ancestral-nostalgia.js?v=5adf3c9d';
+} from '../ancestral-nostalgia.js?v=3d97122d';
 import { NOSTALGIA_BOOT_STREETS } from '../ancestral-nostalgia-data.js?v=0adb9184';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
 
@@ -259,7 +261,11 @@ function bootTarget(engine) {
   const forced = engine.param?.('nostalgiadest');
   const rows = forced ? NOSTALGIA_BOOT_STREETS.filter((r) => r.tsid === forced || r.source === forced) : [];
   const exists = (tsid) => (typeof engine?.streetExists === 'function' ? engine.streetExists(tsid) : true);
-  return pickBootTarget(rows.length ? rows : NOSTALGIA_BOOT_STREETS, { exists });
+  const pick = pickBootTarget(rows.length ? rows : NOSTALGIA_BOOT_STREETS, { exists });
+  if (!pick || rows.length) return pick;
+  // Report 212: never past a road still being built; the open street nearest Glitch's pick instead.
+  const near = engine.query?.('openStreetNear', pick.tsid, engine, { skipHubs: SAVANNA_HUBS }) ?? null;
+  return openBootTarget(pick, near && exists(near) ? near : null, NOSTALGIA_BOOT_STREETS);
 }
 
 function showNostalgiaPrompt(engine, text, onChoice = null) {

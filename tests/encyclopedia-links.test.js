@@ -30,7 +30,7 @@ import { VENDOR_PROFILES } from '../public/js/vendor.js?v=fd4bd725';
 import { CLIENT_KEY_TABLE, clientKeyAction } from '../public/js/client-hotkeys.js?v=31d1891d';
 import { MENU_ROWS } from '../public/js/ui/topbar.js?v=341cb471';
 import { questCardMenuRows } from '../public/js/ui/quest-sheet.js?v=ccaa43a8';
-import { ISLAND_CONFIRM, ISLAND_LINES } from '../public/js/newxp.js?v=72a5d3da';
+import { ISLAND_CONFIRM, ISLAND_LINES } from '../public/js/newxp.js?v=554cfdda';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const PUB = join(here, '../public');

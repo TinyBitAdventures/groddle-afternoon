@@ -114,6 +114,24 @@ export function resetBaqalaTimes(clock) {
   return clock;
 }
 
+/**
+ * Live report 212 (2026-11-12): do_baqala_boot's 26 streets are all street projects, closed on a
+ * fresh world (Kajuu, Andra, Tamila, Besara), so the kick could set you down on a street whose every
+ * road is still being built. The pick stands when it is open; otherwise the open-world street
+ * nearest it by roads (`near`, street-jobs-feature openStreetNear) takes its place: one of the 26
+ * at its own arrival point when it is one, else the street's own arrival. `near` null (the roads
+ * not loaded, or nothing open joins it) keeps Glitch's pick.
+ */
+export function openBootTarget(pick, near, streets = [], { arrivalRoll = Math.random() } = {}) {
+  if (!pick || !near || near === pick.tsid) return pick;
+  const row = streets.find((s) => s && s.tsid === near && s.arrivals?.length);
+  if (row) {
+    const [x, y] = row.arrivals[Math.min(row.arrivals.length - 1, Math.floor(arrivalRoll * row.arrivals.length))];
+    return { tsid: row.tsid, label: row.label, arrive: { x, y }, movedFrom: pick.tsid };
+  }
+  return { tsid: near, label: '', arrive: null, movedFrom: pick.tsid };
+}
+
 /** One of the do_baqala_boot streets (rows from js/ancestral-nostalgia-data.js), then one of its incoming arrivals. */
 export function pickBootTarget(streets = [], { streetRoll = Math.random(), arrivalRoll = Math.random(), exists = () => true } = {}) {
   const pool = streets.filter((s) => s && s.arrivals?.length && exists(s.tsid));

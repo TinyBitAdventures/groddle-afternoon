@@ -128,6 +128,16 @@ export function cellPlatforms(kit) {
   return [kit.plat(0, FLOOR, W, FLOOR, 'invisible', { id: 'pen_floor' })];
 }
 
+/**
+ * Live report 213 (2026-11-12): nothing stopped you at the bars, so you could walk out past them to
+ * the trunk at the room's right edge (x 1376 in the report), under the Social panel and out of
+ * sight. A wall (pc_perm -1, as an-autumn-day.js mainBarriers) just inside the bars, floor to roof.
+ */
+export const BARS_WALL = Object.freeze({ id: 'pen_bars', x: BARS_X - 14, y: FLOOR - 480, h: 480, pc_perm: -1 });
+export function cellBarriers() {
+  return [{ ...BARS_WALL }];
+}
+
 /** Which beat the cell is on, from the three quests' states. */
 export function cellStep(q) {
   if (q.part1Active) return 'talk';
@@ -271,28 +281,44 @@ function digCounter() {
   return req?.name || DIG_COUNTER;
 }
 
+/**
+ * Live report 213 (2026-11-12): the crawl faded the avatar out (`sinking`) and then stopped short of
+ * leaving, so the player stood in the cell invisible with no way on. Whatever goes wrong after the
+ * fade (a throw in the turn-in or the conversation), the crawl still ends by leaving the cell: once
+ * part 3 is turned in the room is solved, and the leave restores the avatar (onLeave).
+ */
 async function crawl(ctx) {
   if (ctx.data.crawling) return;
   ctx.data.crawling = true;
-  const v = ctx.data.vendor;
-  // "After you.": the Smuggler goes first.
-  ctx.data.vendorGoal = PATCH_X;
-  for (let i = 0; i < 80 && v && !v.destroyed && Math.abs(v.x - PATCH_X) > 8; i++) await ctx.wait(100);
-  if (v && !v.destroyed) {
-    for (let a = 1; a > 0; a -= 0.1) {
-      v.alpha = Math.max(0, a);
-      v.y = FLOOR + (1 - a) * 30;
-      await ctx.wait(60);
+  let solved = false;
+  try {
+    const v = ctx.data.vendor;
+    // "After you.": the Smuggler goes first.
+    ctx.data.vendorGoal = PATCH_X;
+    for (let i = 0; i < 80 && v && !v.destroyed && Math.abs(v.x - PATCH_X) > 8; i++) await ctx.wait(100);
+    if (v && !v.destroyed) {
+      for (let a = 1; a > 0; a -= 0.1) {
+        if (v.destroyed) break;
+        v.alpha = Math.max(0, a);
+        v.y = FLOOR + (1 - a) * 30;
+        await ctx.wait(60);
+      }
+      if (!v.destroyed) v.visible = false;
     }
-    v.visible = false;
+    ctx.place(PATCH_X, FLOOR);
+    ctx.data.sinking = true;
+    await ctx.wait(700);
+    await ctx.quest(PART_3).turnIn();
+    ctx.solve();
+    solved = true;
+    await ctx.converse({ title: questName(PART_3), kicker: 'Magic Rock', text: FREE_TEXT });
+  } catch (err) {
+    console.warn('penalty crawl', err);
+    if (!solved && !ctx.quest(PART_3).active()) ctx.solve();
+  } finally {
+    ctx.data.sinking = false;
+    ctx.leave({ transition: ctx.fx() });
   }
-  ctx.place(PATCH_X, FLOOR);
-  ctx.data.sinking = true;
-  await ctx.wait(700);
-  await ctx.quest(PART_3).turnIn();
-  ctx.solve();
-  await ctx.converse({ title: questName(PART_3), kicker: 'Magic Rock', text: FREE_TEXT });
-  ctx.leave({ transition: ctx.fx() });
 }
 
 export const room = {
@@ -350,6 +376,7 @@ export const room = {
       height: H,
       background: root,
       platforms: cellPlatforms(kit),
+      barriers: cellBarriers(),
       spawn: { ...SPAWN },
     };
   },
@@ -457,7 +484,7 @@ export const room = {
       } else {
         vendorClip(ctx, 'idle');
       }
-    } else if (v && ctx.data.talking && p) {
+    } else if (v && !v.destroyed && ctx.data.talking && p) {
       v.scale.x = p.x < v.x ? -1 : 1;
     }
     if (ctx.data.sinking && p) p.alpha = Math.max(0, (p.alpha ?? 1) - dtMs / 600);
