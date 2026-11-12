@@ -110,6 +110,8 @@ export function stageElapsedMs(plot, now = Date.now()) {
 
 /** Water a plot: restart a paused stage clock and the watering's dry timer (GARDEN_WATER_MS). */
 export function wetPlot(plot, now = Date.now()) {
+  // A watering poured on the old 12-hour clock with more left than a new one gives keeps it.
+  if (plot.wet && plotWaterLeftMs(plot, now) > GARDEN_WATER_MS) return;
   if (!plot.wet) plot.stageStartedAt = now;
   plot.wet = true;
   plot.wetAt = now;
@@ -1219,9 +1221,8 @@ export function seedInSeason(seedId) {
  */
 export function listPlantableSeeds(inv, gardenType = 'default') {
   ensureGardenItems();
-  const want = gardenType === 'herb' ? 'herb' : 'default';
   return Object.values(SEED_CATALOG).filter(
-    (s) => s.gardenType === want && countItem(inv, s.seedId) > 0 && seedInSeason(s.seedId)
+    (s) => seedFitsGarden(s, gardenType) && countItem(inv, s.seedId) > 0 && seedInSeason(s.seedId)
   );
 }
 
@@ -1236,7 +1237,7 @@ export function pickSeedToPlant(inv, preferSeedId, gardenType = 'default') {
   if (
     preferSeedId &&
     SEED_CATALOG[preferSeedId] &&
-    SEED_CATALOG[preferSeedId].gardenType === want &&
+    seedFitsGarden(SEED_CATALOG[preferSeedId], want) &&
     countItem(inv, preferSeedId) > 0 &&
     seedInSeason(preferSeedId)
   ) {
@@ -1298,7 +1299,9 @@ export function seedDropCheck(plot, seedId, gardenType = 'default') {
 export function seedFitsGarden(seed, gardenType) {
   if (!seed) return false;
   const want = gardenType === 'herb' ? 'herb' : 'default';
-  return seed.gardenType === want;
+  // seed_pumpkin.js 134-140 tags it both seed and herb_seed, so it plants in either bed
+  // (GardenView.as 500 lists herb_seed items for an herb bed; potion_garden_plant.js 666).
+  return seed.gardenType === want || seed.seedId === 'seed_pumpkin';
 }
 
 function spendEnergy(pc, cost) {
@@ -1325,7 +1328,8 @@ export function plantPlot(garden, key, inv, pc, seedId, opts = {}) {
   const plot = getPlot(garden, key);
   if (!plot) return { ok: false, reason: 'plot', msgs: ['No such plot.'] };
   if (plot.state !== 'clean') {
-    return { ok: false, reason: 'state', msgs: ['That plot is not ready to plant.'] };
+    // include/garden.js 441-446.
+    return { ok: false, reason: 'state', msgs: ['Oops. You need to clean that plot first.'] };
   }
   const gType = garden.gardenType || 'default';
   // #197: a seed chosen by name (the Plant menu's choice, a seed dropped on the plot) is that seed
@@ -1390,7 +1394,8 @@ export function plantPlot(garden, key, inv, pc, seedId, opts = {}) {
     seedId: seed.seedId,
     cropId: seed.cropId,
     profile,
-    msgs: [`You planted ${seed.label} in plot ${key}.`],
+    // include/garden.js 410: the seed's name_plural.
+    msgs: [`You planted some ${seedPlural(seed)}.`],
     speech: actionTalkback(garden, 'plant', opts, { energy: cost, ...got }),
     effects: profile.legacy
       ? { energy: -cost }
@@ -1405,13 +1410,21 @@ export function plantPlot(garden, key, inv, pc, seedId, opts = {}) {
  * wet soil under it (GardenPlotView.buildPlot 'wet'/'dry'). A wet empty plot starts a seed
  * growing at once.
  */
-export function plotNeedsWater(plot) {
-  return Boolean(plot) && !plot.wet;
+export function plotNeedsWater(plot, now = Date.now(), garden = null) {
+  if (!plot) return false;
+  if (!plot.wet) return true;
+  // A shared bed's water is the realtime server's (gardens.go water), a neighbour's the site's
+  // (HomeTending.php refuse): both water dry plots only.
+  if (garden?.shared || garden?.dryOnly) return false;
+  // GardenView.as 540-543 and master_garden.js 1185-1196: a plot takes water again once it has
+  // lost garden_water_threshold (config_prod.js 41: one hour) of its 12-hour watering; never
+  // when a new watering would leave it less than it has.
+  return plotWaterLeftMs(plot, now) < Math.min(plotWaterMs(plot), GARDEN_WATER_MS) - GARDEN_HOUR_MS;
 }
 
-/** Whether any plot in the garden is dry (potion_garden_water.js getValidTargets). */
-export function gardenNeedsWater(garden) {
-  return Object.values(garden?.plots || {}).some(plotNeedsWater);
+/** Whether any plot in the garden takes water (potion_garden_water.js getValidTargets). */
+export function gardenNeedsWater(garden, now = Date.now()) {
+  return Object.values(garden?.plots || {}).some((plot) => plotNeedsWater(plot, now, garden));
 }
 
 /** potion_garden_water.js onPour, when no plot is dry. */
@@ -1428,7 +1441,7 @@ export const GARDEN_NO_DRY_PLOTS_LINE = "Oops, there aren't any dry plots here."
 export function waterPlot(garden, key, pc, opts = {}) {
   const plot = getPlot(garden, key);
   if (!plot) return { ok: false, reason: 'plot', msgs: ['No such plot.'] };
-  if (plot.wet) {
+  if (!plotNeedsWater(plot, opts.now ?? Date.now(), garden)) {
     return { ok: false, reason: 'wet', msgs: ['That plot is already wet.'] };
   }
   const requireTool = opts.requireTool !== false;
@@ -1493,7 +1506,8 @@ export function harvestPlot(garden, key, inv, pc, opts = {}) {
   const plot = getPlot(garden, key);
   if (!plot) return { ok: false, reason: 'plot', msgs: ['No such plot.'] };
   if (plot.state !== 'crop' || !plot.seed) {
-    return { ok: false, reason: 'state', msgs: ['Nothing ready to harvest.'] };
+    // include/garden.js 597-605.
+    return { ok: false, reason: 'state', msgs: ['Oops. There is nothing there to pick.'] };
   }
   const seed = SEED_CATALOG[plot.seed];
   if (!seed) {
@@ -1502,7 +1516,8 @@ export function harvestPlot(garden, key, inv, pc, opts = {}) {
   const profile = gardenActionProfile(garden.gardenType, 'harvest', opts.learned, opts.upgrades);
   const cost = profile.energy;
   if ((pc.energy || 0) <= cost) {
-    return { ok: false, reason: 'energy', msgs: [`Need ${cost} energy (have ${Math.floor(pc.energy || 0)}).`] };
+    // include/garden.js 461-465.
+    return { ok: false, reason: 'energy', msgs: ["You're too tired to do that."] };
   }
   const rng = opts.rng || Math.random;
   if (!rollSucceeds(profile, opts)) {
@@ -1566,7 +1581,7 @@ export function harvestPlot(garden, key, inv, pc, opts = {}) {
     superHarvest: bonus > 0,
     profile,
     msgs: [
-      `You harvested ${n}× ${seed.cropLabel}.`,
+      pickedLine(seed, n),
       ...(bonus ? [`Super Harvest! +${bonus}× ${seed.cropLabel}.`] : []),
     ],
     speech: actionTalkback(garden, 'harvest', opts, { energy: cost, ...got }),
@@ -1577,6 +1592,28 @@ export function harvestPlot(garden, key, inv, pc, opts = {}) {
       items: { [seed.cropId]: n + bonus },
     },
   };
+}
+
+/**
+ * The crops' name_plural (glitch-GameServerJS items/<crop>.js 6) where it is not the label plus s.
+ */
+export const CROP_PLURALS = Object.freeze({
+  spinach: 'Spinach',
+  tomato: 'Tomatoes',
+  corn: 'Corn',
+  potato: 'Potatoes',
+  rice: 'Rice',
+  broccoli: 'Broccoli',
+  rubeweed: 'Sprigs of Rubeweed',
+  rookswort: 'Sprigs of Rookswort',
+  silvertongue: 'Sprigs of Silvertongue',
+  gandlevery: 'Sprigs of Gandlevery',
+});
+
+/** include/garden.js 518-522: "You picked some Potatoes." (more than one) or "You picked an Onion." */
+export function pickedLine(seed, n) {
+  if (n > 1) return `You picked some ${CROP_PLURALS[seed.cropId] || `${seed.cropLabel}s`}.`;
+  return `You picked ${/^[aeiou]/i.test(seed.cropLabel) ? 'an' : 'a'} ${seed.cropLabel}.`;
 }
 
 /**
@@ -1591,7 +1628,8 @@ export function clearPlot(garden, key, pc, opts = {}) {
   const plot = getPlot(garden, key);
   if (!plot) return { ok: false, reason: 'plot', msgs: ['No such plot.'] };
   if (plot.state !== 'dirty') {
-    return { ok: false, reason: 'state', msgs: ['That plot does not need clearing.'] };
+    // include/garden.js 331-336.
+    return { ok: false, reason: 'state', msgs: ["Oops. Don't need no hoeing."] };
   }
   const requireTool = opts.requireTool !== false;
   if (requireTool && opts.inv && !hasHoe(opts.inv)) {
@@ -1626,7 +1664,8 @@ export function clearPlot(garden, key, pc, opts = {}) {
     reason: 'cleared',
     plotKey: key,
     profile,
-    msgs: ['You cleared a plot. Ready to plant.', ...(toolUse?.broke ? [toolUse.msg] : [])],
+    // include/garden.js 279.
+    msgs: ['You cleaned a plot.', ...(toolUse?.broke ? [toolUse.msg] : [])],
     speech: actionTalkback(garden, 'clear', opts, { energy: cost, ...got }),
     effects: profile.legacy
       ? { energy: -cost }
@@ -1778,7 +1817,7 @@ export function fertilizePlot(garden, key, inv, opts = {}) {
  * @param {{ now?: number, inv?: import('./inventory.js').Inventory, requireTool?: boolean }} [opts]
  */
 export function waterAllPlots(garden, pc, opts = {}) {
-  if (!gardenNeedsWater(garden)) {
+  if (!gardenNeedsWater(garden, opts.now ?? Date.now())) {
     return { ok: false, watered: 0, reason: 'none', msgs: [GARDEN_NO_DRY_PLOTS_LINE] };
   }
   const requireTool = opts.requireTool !== false;

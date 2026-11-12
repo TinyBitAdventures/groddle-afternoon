@@ -10,7 +10,7 @@ import { execFileSync, spawnSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import { describe, it } from 'node:test';
 
-import { SEED_CATALOG, createGarden, harvestPlot, plantPlot, tickGarden, waterAllPlots, waterPlot } from '../public/js/garden.js?v=37209241';
+import { SEED_CATALOG, createGarden, harvestPlot, plantPlot, tickGarden, waterAllPlots, waterPlot } from '../public/js/garden.js?v=659d2332';
 import { GARDEN_LOCK_MS, LOCK_LINE, SHARED_GARDEN_STREETS, applyPlot, isSharedGardenStreet, localPlot, lockedFor, parsePlotId, plotId, rollPasses } from '../public/js/shared-gardens.js?v=c1f90bc0';
 import { sharedGardensFeature } from '../public/js/features/shared-gardens-feature.js?v=cf189816';
 import { FEATURES } from '../public/js/features/index.js?v=15306d46';
@@ -440,7 +440,7 @@ function rig({ street = COMMUNITY }) {
 
 describe('report 188: the Herb Gardens streets grow herbs in both beds', () => {
   it('streetGardenBed gives two herb beds there (herb2, herb) and crop then herb everywhere else', async () => {
-    const { HERB_GARDEN_STREETS, bedKind, streetGardenBed } = await import('../public/js/garden.js?v=37209241');
+    const { HERB_GARDEN_STREETS, bedKind, streetGardenBed } = await import('../public/js/garden.js?v=659d2332');
     assert.deepEqual([...HERB_GARDEN_STREETS].sort(), ['GA95U14319524O9', 'GA97L62229522GS', 'GA99U5PI39524GN']);
     for (const tsid of HERB_GARDEN_STREETS) {
       assert.deepEqual(streetGardenBed(tsid, 0), { bed: 'herb2', gardenType: 'herb', cols: 4 });

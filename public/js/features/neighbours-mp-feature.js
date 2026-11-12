@@ -101,7 +101,7 @@ import { runStreetTransition } from '../screen-fx.js?v=2e975a82';
 import { STREET_INDEX } from '../street-loader.js?v=18b181ad';
 import { ITEM_CATALOG, addItem, countItem, listPackItemSlots, removeItem } from '../inventory.js?v=5be47371';
 import { cultivationDef, homeStreetLayout } from '../home-cultivation.js?v=f1242621';
-import { tickGarden } from '../garden.js?v=37209241';
+import { tickGarden } from '../garden.js?v=659d2332';
 import { BUTLER_RIG_SCALE, ButlerPainter, butlerRigNow, loadButlerRig } from '../butler-rig.js?v=86bb97ad';
 import { BUTLER, BUTLER_INFO, butlerInfoText, butlerPostRx, normalizeButlerParts } from '../butler.js?v=a660e585';
 import { butlerApi } from './butler-feature.js?v=a0631653';
@@ -441,6 +441,8 @@ function createSession(engine, client) {
       const item = (st.items || []).find((it) => cultivationDef(it.protoClass)?.kind === 'garden' && !it.depleted && Math.abs(houseX + it.rx - (e.sprite?.x ?? NaN)) < 2);
       if (!item || !e.state?.garden) continue;
       const herb = cultivationDef(item.protoClass)?.gardenType === 'herb';
+      // The site waters a neighbour's dry plots only (HomeTending.php refuse): js/garden.js plotNeedsWater.
+      e.state.garden.dryOnly = true;
       beds.set(e, { yard, id: String(item.id), herb, snap: plotsSnapshot(e.state.garden) });
     }
     return beds;

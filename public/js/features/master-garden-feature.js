@@ -29,7 +29,7 @@
 
 import { TOOL_CONDITION_CATALOG, migrateClassValue } from '../tools.js?v=5f482998';
 import { ITEM_CATALOG, countItem, ensureItem } from '../inventory.js?v=5be47371';
-import { SEED_CATALOG, listPlantableSeeds } from '../garden.js?v=37209241';
+import { SEED_CATALOG, listPlantableSeeds } from '../garden.js?v=659d2332';
 import {
   GARDEN_POTIONS,
   MASTER_GARDENER,
@@ -253,6 +253,8 @@ function applyPour(engine, { potionClass, seedId, target, copy }, { use = null }
   engine.achievement?.(`potions_used:${potionClass}`, 1);
   for (const [cropId, qty] of Object.entries(res.items || {})) {
     engine.achievement?.(`${garden.gardenType === 'herb' ? 'herb_harvest' : 'garden_harvest'}:${cropId}`, qty);
+    // master_garden.js 599: onions_harvested (A Beltful of Onions), the bonus included.
+    if (cropId === 'onion') engine.achievement?.('onions_harvested', qty);
   }
   // G448: include/garden.js 486-505: an herb garden's Super Harvest counts super_harvest_herb.
   if (res.superHarvest && garden.gardenType === 'herb') {

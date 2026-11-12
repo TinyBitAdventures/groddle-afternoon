@@ -31,7 +31,7 @@
  * growModifier, pace, wetPace }. Growth uses js/garden.js plotStageMs (sowPlot sets the plot's clock).
  */
 
-import { SEED_CATALOG, applyFertilizer, sowPlot, wetPlot, stageElapsedMs } from './garden.js?v=37209241';
+import { SEED_CATALOG, applyFertilizer, plotNeedsWater, seedFitsGarden, sowPlot, wetPlot, stageElapsedMs } from './garden.js?v=659d2332';
 import { gardenGrowModifier } from './imagination-effects.js?v=70169933';
 import { skillPackageDetails } from './skill-packages.js?v=bfb87281';
 import { metabolicGain, moodMax, loseEnergy } from './metabolics.js?v=8504134e';
@@ -115,10 +115,10 @@ export function mgDetails(gardenType, action, learned = [], upgrades = []) {
 const plotsOf = (garden) => Object.entries(garden?.plots || {});
 
 /** Plots a potion would act on (getValidTargets' per-potion test). */
-export function plotsFor(garden, action) {
+export function plotsFor(garden, action, now = Date.now()) {
   return plotsOf(garden).filter(([, p]) => {
-    // G537: doesPlotNeedWater (master_garden.js 1185) asks only whether the plot is dry.
-    if (action === 'water') return !p.wet;
+    // G537 + master_garden.js doesPlotNeedWater 1185-1196: dry, or down an hour of its water.
+    if (action === 'water') return plotNeedsWater(p, now, garden);
     if (action === 'hoe') return p.state === 'dirty';
     if (action === 'plant') return p.state === 'clean';
     if (action === 'pick') return p.state === 'crop' && p.seed;
@@ -137,15 +137,38 @@ export function canPour(potionClass, garden, ctx = {}) {
   if (!garden || !plotsFor(garden, potion.action).length) return { ok: false, msg: potion.noTarget };
   if (potion.action === 'plant') {
     const seed = SEED_CATALOG[ctx.seedId];
-    const want = garden.gardenType === 'herb' ? 'herb' : 'default';
-    if (!seed || seed.gardenType !== want || !(Number(ctx.inv?.[ctx.seedId]) > 0)) {
-      return { ok: false, msg: want === 'herb' ? 'You need herb seeds for this garden.' : 'You need crop seeds for this garden.' };
+    // potion_garden_plant.js 446-451: no seed for this bed in the pack.
+    if (!seedFitsGarden(seed, garden.gardenType) || !(Number(ctx.inv?.[ctx.seedId]) > 0)) {
+      return { ok: false, msg: "You don't have anything to plant!" };
     }
   }
-  const details = mgDetails(garden.gardenType, potion.action, ctx.learned, ctx.upgrades) || {};
-  const plots = Object.keys(garden.plots || {}).length;
-  if ((ctx.energy || 0) <= (Number(details.energy_cost) || 0) * plots) return { ok: false, msg: "You don't have enough energy to do that!" };
+  const pkgAction = POUR_PRICE[potion.action]?.pkg || potion.action;
+  const details = mgDetails(garden.gardenType, pkgAction, ctx.learned, ctx.upgrades) || {};
+  if ((ctx.energy || 0) <= (Number(details.energy_cost) || 0) * pricedPlots(garden, potion.action)) {
+    return { ok: false, msg: "You don't have enough energy to do that!" };
+  }
   return { ok: true };
+}
+
+/**
+ * The plots each pour's energy check prices, and the package it prices them at:
+ * water every plot (potion_garden_water.js 543), hoe the dirty ones
+ * (potion_garden_clear.js 543-553), plant the clean ones (potion_garden_plant.js
+ * 600-609), pick the ripe ones at the plant package (potion_garden_harvest.js
+ * 540-557), fertilize every plot (its package costs nothing).
+ */
+const POUR_PRICE = Object.freeze({
+  water: Object.freeze({ state: null }),
+  hoe: Object.freeze({ state: 'dirty' }),
+  plant: Object.freeze({ state: 'clean' }),
+  pick: Object.freeze({ state: 'crop', pkg: 'plant' }),
+  fertilize: Object.freeze({ state: null }),
+});
+
+function pricedPlots(garden, action) {
+  const state = POUR_PRICE[action]?.state;
+  const plots = Object.values(garden?.plots || {});
+  return state ? plots.filter((p) => p?.state === state).length : plots.length;
 }
 
 /** The garden-wide drop chance after water/plant/hoe (0 when the size has none). */
@@ -239,7 +262,7 @@ export function potionTendGarden(garden, action, inv, pc, ctx = {}) {
       if (!(Number(inv?.[ctx.seedId]) > 0)) break;
       if (plot.state !== 'clean') continue;
       const seed = SEED_CATALOG[ctx.seedId];
-      if (!seed || seed.gardenType !== type) break;
+      if (!seedFitsGarden(seed, type)) break;
       if (!pay()) break;
       inv[ctx.seedId] -= 1;
       if (inv[ctx.seedId] <= 0) delete inv[ctx.seedId];

@@ -837,7 +837,8 @@ export const COUNTER_ROUTES = Object.freeze([
   { system: 'help-mine', counter: 'help_mine', event: 'help_mine', note: 'mining a rock a companion is working (include/mining.js 501-505)' },
   // gardens + herbs (garden.js)
   { system: 'garden', counter: 'garden_harvest_{a}', event: 'garden_harvest:{a}' },
-  { system: 'garden', counter: 'onions_harvested', event: 'garden_harvest:onion' },
+  // include/garden.js 514: onions_harvested counts num + bonus_items (the Super Harvest too).
+  { system: 'garden', counter: 'onions_harvested', event: 'onions_harvested' },
   { system: 'garden', counter: 'super_harvest_herb', event: 'herb_super_harvest:{a}' },
   { system: 'garden', counter: 'seeds_extracted', event: 'herb_seeds_extracted:{a}' },
   // G444: include/garden.js 390-392 and 537-541: these two count only once the quest holds 6 seeds
@@ -1016,6 +1017,7 @@ export const EMITTED_EVENTS = Object.freeze([
   { event: 'skill_learned:{a}' },
   { event: 'tool_repaired:{a}' },
   { event: 'garden_harvest:{a}' },
+  { event: 'onions_harvested', note: 'quest-offers.js gardenPlotEvents: Onions picked, the Super Harvest bonus included' },
   { event: 'herb_harvest:{a}' },
   { event: 'mail_sent' },
   { event: 'street_first_visit:{a}' },
@@ -1307,11 +1309,12 @@ export function worldVerbQuestEvents(target, verbId, result = {}) {
  *   an herb seed also counts herb_seed_planted:<seed> (388-392: herb_seeds_planted, and Shucks
  *   To Be You's count), and in a garden that is not a home's, herb_seeds_planted_for_others
  *   (394-396: not a POL; a neighbour's garden is counted by features/neighbours-mp-feature.js).
- * - harvest: garden_harvest:<crop> or herb_harvest:<crop> by the crops picked (532: Tater 'n'
- *   Mater, Crops a-Planty, A Beltful of Onions; herbs: Shucks To Be You), garden_plots_picked
- *   (533), and an herb garden's Super Harvest herb_super_harvest:<crop> (503-505).
+ * - harvest: garden_harvest:<crop> or herb_harvest:<crop> by the base crops picked, no Super
+ *   Harvest bonus (532: Tater 'n' Mater, Crops a-Planty; herbs: Shucks To Be You), Onions with
+ *   the bonus as onions_harvested (514: A Beltful of Onions), garden_plots_picked (533), and an
+ *   herb garden's Super Harvest herb_super_harvest:<crop> (503-505).
  * The Master Gardener potions send their own (features/master-garden-feature.js).
- * @param {{ verb: string, gardenType?: string, home?: boolean, seedId?: string, cropId?: string, count?: number, superHarvest?: boolean }} plot
+ * @param {{ verb: string, gardenType?: string, home?: boolean, seedId?: string, cropId?: string, count?: number, baseCount?: number, superHarvest?: boolean }} plot
  * @param {string} label  the garden's badge label (`<street>_<type>`, as master-garden-feature)
  * @returns {{ event: string, amount: number }[]}
  */
@@ -1332,7 +1335,10 @@ export function gardenPlotEvents(plot, label = 'street') {
     }
   }
   if (verb === 'harvest' && plot.cropId) {
-    out.push({ event: `${herb ? 'herb_harvest' : 'garden_harvest'}:${plot.cropId}`, amount: Math.max(1, Math.floor(Number(plot.count) || 1)) });
+    const picked = Math.max(1, Math.floor(Number(plot.count) || 1));
+    const base = Number.isFinite(Number(plot.baseCount)) && Number(plot.baseCount) > 0 ? Math.floor(Number(plot.baseCount)) : picked;
+    out.push({ event: `${herb ? 'herb_harvest' : 'garden_harvest'}:${plot.cropId}`, amount: base });
+    if (plot.cropId === 'onion') out.push({ event: 'onions_harvested', amount: picked });
     out.push({ event: `garden_plots_picked:${tag}`, amount: 1 });
     if (herb && plot.superHarvest) out.push({ event: `herb_super_harvest:${plot.cropId}`, amount: 1 });
   }

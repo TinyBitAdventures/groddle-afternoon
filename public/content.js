@@ -29,12 +29,13 @@ import {
   hasHoe,
   plotStatusLabel,
   gardenNeedsWater,
+  plotNeedsWater,
   GARDEN_NO_DRY_PLOTS_LINE,
   GARDEN_FERTILIZER,
   GARDEN_FERTILIZE_MS,
   fertilizeCheck,
   fertilizePlot,
-} from './js/garden.js?v=37209241';
+} from './js/garden.js?v=659d2332';
 import { firstWorkingTool, HOE_TOOLS, WATERING_CAN_TOOLS } from './js/tools.js?v=5f482998';
 import { miningGemHint } from './js/gem-hints.js?v=4b65f7ac';
 import {
@@ -916,7 +917,8 @@ export function getVerbsFor(target, ctx) {
     }
     // G537: a dry empty plot takes water too (GardenView: a click on a dry plot with nothing in
     // it waters it), so a seed planted there grows at once.
-    if ((st === 'seeds' || st === 'shoots' || st === 'clean') && !plot?.wet) {
+    // GardenView.as 540-543: a wet plot takes water again once it has lost an hour of its watering.
+    if ((st === 'seeds' || st === 'shoots' || st === 'clean') && plotNeedsWater(plot, Date.now(), garden)) {
       add('water', 'water', {
         sort: st === 'clean' ? 20 : 10,
         energy: gardenCost('water'),
@@ -1686,6 +1688,7 @@ export function runVerb(target, verbId, ctx) {
         seedId: r.seedId || null,
         cropId: r.cropId || null,
         count: r.count || 0,
+        baseCount: r.baseCount || 0,
         superHarvest: Boolean(r.superHarvest),
       },
       // garden_new.js talkback: the plot answers with a line and the slugs.

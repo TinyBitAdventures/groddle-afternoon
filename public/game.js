@@ -639,7 +639,7 @@ import {
   hasHoe,
   plantSeedChoices,
   PLANT_PICK_TITLE,
-} from './js/garden.js?v=37209241';
+} from './js/garden.js?v=659d2332';
 import { GARDEN_SCALE, PLOT_H as GARDEN_PLOT_H, PLOT_W as GARDEN_PLOT_W, gardenFrame, gardenLayout, gardenStyle, plotPieces } from './js/garden-view.js?v=04fe8467';
 import { nearestPlotIndex } from './js/garden-view.js?v=04fe8467';
 import {
@@ -855,7 +855,7 @@ import {
   vendorSellUnitPrice,
   vendorBuyUnitPrice,
   VENDOR_BAG_HOLDS,
-} from './js/vendor.js?v=5207195b';
+} from './js/vendor.js?v=dc29268a';
 import {
   animalAnchorX,
   animalAnchorY,
@@ -30239,7 +30239,7 @@ function runGardenPlotAction(key, action) {
   }
   // include/garden.js counters (ticket 68: the same ones the plot menus send).
   const plotTarget = gardens.find((t) => t.state?.garden === activeGarden);
-  const plotEvents = gardenPlotEvents({ verb: action, gardenType: activeGarden.gardenType, home: Boolean(plotTarget?.state?.detached), seedId: r.seedId, cropId: r.cropId, count: r.count, superHarvest: r.superHarvest }, currentStreet?.tsid || 'street');
+  const plotEvents = gardenPlotEvents({ verb: action, gardenType: activeGarden.gardenType, home: Boolean(plotTarget?.state?.detached), seedId: r.seedId, cropId: r.cropId, count: r.count, baseCount: r.baseCount, superHarvest: r.superHarvest }, currentStreet?.tsid || 'street');
   for (const row of plotEvents) announceAchievementUpdates(applyAchievementProgress(achieveState, row.event, row.amount, pc));
   if (r.effects) {
     pushActivity({
@@ -32919,7 +32919,7 @@ async function main() {
   }
   // Garden talkback QA (js/garden-talk-qa.js): ?gardentalkdemo=herb|crop.
   if (new URLSearchParams(location.search).has('gardentalkdemo')) {
-    import('./js/garden-talk-qa.js?v=aacc2be3').then((m) => m.runGardenTalkDemo({ engine, executeVerb, params: new URLSearchParams(location.search) }));
+    import('./js/garden-talk-qa.js?v=51991c33').then((m) => m.runGardenTalkDemo({ engine, executeVerb, params: new URLSearchParams(location.search) }));
   }
   // MEMQA (ticket 21, Safari's memory reload in Naraka): ?memqa=1 lets a probe walk streets through the
   // real street trip (tools/qa/street-memory.mjs). Solo pages only: online pages drop their params.

@@ -65,7 +65,7 @@ import {
   listPackToolSlots,
   isToolItem,
 } from '../public/js/inventory.js?v=5be47371';
-import { DEFAULT_VENDOR, vendorBuy } from '../public/js/vendor.js?v=5207195b';
+import { DEFAULT_VENDOR, vendorBuy } from '../public/js/vendor.js?v=dc29268a';
 import { HAS_SITE, SITE_DIR } from '../tools/repos.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -529,7 +529,8 @@ describe('G537: Water all waters every dry plot, an empty one too', () => {
 
   it('a bed with no dry plot greys the verb with the reason and spends nothing', () => {
     const garden = createGarden({ cols: 2, rows: 1, now: 0 });
-    for (const key of listPlotKeys(garden)) Object.assign(getPlot(garden, key), { wet: true, wetAt: 0 });
+    // Freshly watered: a plot takes water again only once it has lost an hour (GardenView.as 540-543).
+    for (const key of listPlotKeys(garden)) Object.assign(getPlot(garden, key), { wet: true, wetAt: Date.now() });
     assert.equal(gardenNeedsWater(garden), false);
     const inv = createInventory({ watering_can: 1 });
     const pc = { energy: 80, mood: 40, imagination: 0, xp: 0 };
@@ -552,7 +553,7 @@ describe('G537: Water all waters every dry plot, an empty one too', () => {
     const target = { classId: 'garden_plot', state: { garden, plot, plotKey: '1-1' } };
     const verbs = getVerbsFor(target, ctxFor(pc, inv)).map((v) => v.id);
     assert.deepEqual(verbs, ['plant', 'water']);
-    assert.equal(waterPlot(garden, '1-1', pc, { now: 0, inv, rng: () => 0 }).ok, true);
+    assert.equal(waterPlot(garden, '1-1', pc, { now: Date.now(), inv, rng: () => 0 }).ok, true);
     assert.equal(plot.wet, true);
     assert.deepEqual(getVerbsFor(target, ctxFor(pc, inv)).map((v) => v.id), ['plant']);
     assert.equal(plantPlot(garden, '1-1', inv, pc, 'seed_spinach', { now: 0 }).ok, true);
