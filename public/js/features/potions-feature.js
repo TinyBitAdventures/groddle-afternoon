@@ -80,7 +80,7 @@ import { furnitureSize } from '../home-decor.js?v=bbf43c44';
 import { playPotionBottle } from '../potion-bottle-fx.js?v=85e8687c';
 import { textureFromUrl, sourceFromUrl, frameTexture } from '../textures.js?v=92ec53cd';
 import { POTION_ART } from '../potion-art.js?v=27ccc756';
-import { levelInfoForXp, XP_FOR_LEVEL } from '../progression.js?v=33462eaa';
+import { levelInfoForXp, XP_FOR_LEVEL } from '../progression.js?v=72b2b22a';
 import { overlayOrStandIn } from '../overlay-stand-in.js?v=d1649432';
 import { playPoofIn, playSheetOverlay } from '../overlay-art.js?v=a6561207';
 import {

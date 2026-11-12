@@ -29,8 +29,8 @@
  * is not wired here (see the header of js/patches.js).
  */
 
-import { loseMood, metabolicGain } from './metabolics.js?v=8504134e';
-import { chargesLeft, useCharge } from './tools.js?v=5f482998';
+import { loseMood, metabolicGain } from './metabolics.js?v=1383e6fd';
+import { chargesLeft, useCharge } from './tools.js?v=62b37c51';
 
 export const TREE_POISON = 'potion_tree_poison';
 export const TREE_ANTIDOTE = 'potion_tree_poison_antidote';

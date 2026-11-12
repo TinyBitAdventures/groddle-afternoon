@@ -10,10 +10,10 @@
  * stack where `class_tsid == 'hatchet' || class_tsid == 'class_axe'`.
  */
 
-import { canUseTool, useToolCondition } from './tools.js?v=5f482998';
+import { canUseTool, useToolCondition } from './tools.js?v=62b37c51';
 import { woodHarvestOverrides } from './imagination-effects.js?v=70169933';
-import { ENCHANTED_WOOD_TREE } from './enchanted-forests.js?v=22ff871e';
-import { loseEnergy } from './metabolics.js?v=8504134e';
+import { ENCHANTED_WOOD_TREE } from './enchanted-forests.js?v=dc045a4b';
+import { loseEnergy } from './metabolics.js?v=1383e6fd';
 
 export const WOOD_TREE_SOURCE = 'tinyspeck/glitch-GameServerJS CC0';
 

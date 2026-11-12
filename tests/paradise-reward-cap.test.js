@@ -8,8 +8,8 @@ import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { setMetabolicGainGate } from '../public/js/metabolics.js?v=8504134e';
-import { creditMetabolicReward } from '../public/js/quoins.js?v=7e0dec6d';
+import { setMetabolicGainGate } from '../public/js/metabolics.js?v=1383e6fd';
+import { creditMetabolicReward } from '../public/js/quoins.js?v=61be601c';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const game = readFileSync(join(here, '../public/game.js'), 'utf8');

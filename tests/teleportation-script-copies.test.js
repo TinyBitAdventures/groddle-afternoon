@@ -32,7 +32,7 @@ import {
   setCopyTag,
   syncToolCopies,
   takeToolCopy,
-} from '../public/js/tools.js?v=5f482998';
+} from '../public/js/tools.js?v=62b37c51';
 import {
   SCRIPT_CLASS,
   SCRIPT_ITEM,
@@ -48,8 +48,8 @@ import {
 import { teleportationFeature as feature } from '../public/js/features/teleportation-feature.js?v=179d8bb9';
 import { cleanContents, createDroppedItemState, dropInventoryStack, pickupDroppedStack, placeDroppedBag } from '../public/js/world-items.js?v=b4795798';
 import { cabinetPut, cabinetTake, cleanHeldList, normalizeContents } from '../public/js/home-storage.js?v=b0225465';
-import { normalizeGroundStack, normalizeItem } from '../public/js/drops-mp.js?v=ec6a135d';
-import { goodsWithHeldTags, normalizeGoods } from '../public/js/trade.js?v=ce0373e5';
+import { normalizeGroundStack, normalizeItem } from '../public/js/drops-mp.js?v=84c9e767';
+import { goodsWithHeldTags, normalizeGoods } from '../public/js/trade.js?v=139dd264';
 
 const root = join(import.meta.dirname, '..');
 const A = { tsid: 'GA5101HF7F429V5', x: 100, y: -68, label: 'Hechey Track', hubId: '58', hubName: 'Groddle Forest' };

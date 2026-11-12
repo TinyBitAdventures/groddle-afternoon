@@ -152,7 +152,7 @@ import {
   visitSceneTsid,
 } from '../neighbours-mp.js?v=8d032640';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
-import { elevatorStops, towerLabel } from '../home-tower.js?v=087df38f';
+import { elevatorStops, towerLabel } from '../home-tower.js?v=d33a67e4';
 
 export const NEIGHBOURS_MP_FEATURE_ID = 'neighbours-mp';
 const OWN_VERBS = new Set([VISIT_VERB.id, KEY_VERB.id, 'neighbour_noop']);

@@ -12,7 +12,7 @@ import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import * as kit from '../public/js/quest-rooms/kit.js?v=4e007609';
+import * as kit from '../public/js/quest-rooms/kit.js?v=57af0d8f';
 import { loadContentCatalogsFromDir, getQuestCatalog } from '../public/js/content-catalogs.js?v=10b118dd';
 import { acceptOffer, ensureQuestOfferState, npcQuestOffers, pendingQuestOffers, turnInQuest } from '../public/js/quest-offers.js?v=d76abcd0';
 import { XP_FOR_LEVEL } from '../public/js/progression.js?v=33462eaa';

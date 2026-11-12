@@ -9,10 +9,10 @@
  * QA: canvas data packToolVerbs (the buttons the last tool shows, `id:state`), packToolLast.
  */
 
-import { countItem } from '../inventory.js?v=5be47371';
-import { getToolCondition } from '../tools.js?v=5f482998';
-import { ROCK_CATALOG, knowsMining } from '../mining.js?v=12a6f1bd';
-import { chooseTool } from '../tool-choice.js?v=00000000';
+import { countItem } from '../inventory.js?v=54d08d52';
+import { getToolCondition } from '../tools.js?v=62b37c51';
+import { ROCK_CATALOG, knowsMining } from '../mining.js?v=862548f1';
+import { chooseTool } from '../tool-choice.js?v=e0dcb60e';
 import {
   findCloseTarget,
   isPackTool,
@@ -21,7 +21,7 @@ import {
   packToolCondition,
   packToolVerbIds,
   planPackToolVerb,
-} from '../pack-tool-verbs.js?v=00000000';
+} from '../pack-tool-verbs.js?v=479afbd9';
 
 export const PACK_TOOL_VERBS_FEATURE_ID = 'pack-tool-verbs';
 

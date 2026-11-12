@@ -64,7 +64,7 @@ import { mayhemHoldsArena } from './mayhem-feature.js?v=3e1f4ed9';
 import { wallsScreen } from '../street-model.js?v=b6cb6a4e';
 import { addItem, countItem, removeItem } from '../inventory.js?v=2bd5b93e';
 import { textureFromUrl } from '../textures.js?v=92ec53cd';
-import { grantMoodXp } from '../mood-xp.js?v=958e7680';
+import { grantMoodXp } from '../mood-xp.js?v=22648ec0';
 import { CROWNS_SPLASH, splashFor } from '../game-splash.js?v=f60a5067';
 import { saveStore } from '../save-store.js?v=04420633';
 import {

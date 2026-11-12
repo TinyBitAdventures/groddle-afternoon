@@ -46,7 +46,7 @@ import {
   normalizeEnchantedTree,
   petEnchantedSeedling,
   seedlingStatusLabel,
-} from '../enchanted-forests.js?v=22ff871e';
+} from '../enchanted-forests.js?v=dc045a4b';
 
 export const ENCHANTED_FEATURE_ID = 'enchanted-forest';
 const SEEDLING_URL = 'assets/sprites/soil/patch-seedling@3x.webp';

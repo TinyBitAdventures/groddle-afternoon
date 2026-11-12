@@ -41,7 +41,7 @@ import {
   TOOL_CONDITION_CATALOG,
   createToolConditionState,
   getToolCondition,
-} from '../public/js/tools.js?v=5f482998';
+} from '../public/js/tools.js?v=62b37c51';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const publicRoot = join(here, '../public');

@@ -19,7 +19,7 @@ import {
   unlearnCheck,
   unlearnSeconds,
   unlearnStatus,
-} from '../public/js/unlearning.js?v=72d5ffe2';
+} from '../public/js/unlearning.js?v=20672dff';
 import { remakeStatus } from '../public/js/imagination-remake.js?v=c37ad887';
 
 const root = join(import.meta.dirname, '..', 'public');

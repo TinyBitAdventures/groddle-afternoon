@@ -28,12 +28,12 @@ import {
   setCopyTag,
   setToolRemaining,
   toolCopies,
-} from '../public/js/tools.js?v=5f482998';
+} from '../public/js/tools.js?v=62b37c51';
 import { COPY_TAG_RULES, cleanCopyTagOf } from '../public/js/copy-tags.js?v=7eec7d48';
-import { goodsWithHeldTags, normalizeGoods, normalizeSlice, sameGoods, settleDone } from '../public/js/trade.js?v=ce0373e5';
-import { giftEffects, normalizeGift, normalizeGiftsSlice, wrapBox } from '../public/js/gifts.js?v=3b8ab24e';
-import { dropEffect, normalizeGroundStack, normalizeItem } from '../public/js/drops-mp.js?v=ec6a135d';
-import { normalizeListing } from '../public/js/auctions.js?v=278dc46a';
+import { goodsWithHeldTags, normalizeGoods, normalizeSlice, sameGoods, settleDone } from '../public/js/trade.js?v=139dd264';
+import { giftEffects, normalizeGift, normalizeGiftsSlice, wrapBox } from '../public/js/gifts.js?v=d28f78e8';
+import { dropEffect, normalizeGroundStack, normalizeItem } from '../public/js/drops-mp.js?v=84c9e767';
+import { normalizeListing } from '../public/js/auctions.js?v=0b1fff76';
 import { cabinetMove, cabinetPut, cabinetTake, normalizeContents } from '../public/js/home-storage.js?v=b0225465';
 import { CUBIMAL_NAMING } from '../public/js/cubimals.js?v=3a284648';
 import { FAVOR_GIANTS } from '../public/js/potions.js?v=4f4c996d';

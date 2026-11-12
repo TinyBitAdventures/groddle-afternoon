@@ -18,8 +18,8 @@
 import { addItem, countItem, ensureItem } from './inventory.js?v=2bd5b93e';
 import { canUseTool, useToolCondition } from './tools.js?v=5f482998';
 import { foxBrushingCard, scaledToolWear } from './imagination-effects.js?v=70169933';
-import { grantMoodXp } from './mood-xp.js?v=958e7680';
-import { loseEnergy } from './metabolics.js?v=8504134e';
+import { grantMoodXp } from './mood-xp.js?v=22648ec0';
+import { loseEnergy } from './metabolics.js?v=1383e6fd';
 
 export const FOX_ID = 'npc_fox';
 export const FOX_RANGER_ID = 'npc_fox_ranger';

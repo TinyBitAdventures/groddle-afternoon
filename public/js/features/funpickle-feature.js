@@ -36,7 +36,7 @@
 
 import { ITEM_CATALOG, addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=2bd5b93e';
 import { ITEM_BASE_COSTS } from '../store-catalog.js?v=74b56af3';
-import { shiftMetabolic } from '../metabolics.js?v=8504134e';
+import { shiftMetabolic } from '../metabolics.js?v=1383e6fd';
 import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=32c58aef';
 import { frameTexture, sourceFromUrl, textureFromUrl } from '../textures.js?v=92ec53cd';
 import { landingY, nearestSurfaceY } from '../walk-surface.js?v=106bfdc5';

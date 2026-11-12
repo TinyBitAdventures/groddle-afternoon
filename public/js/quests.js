@@ -12,7 +12,7 @@
 
 import { getQuestCatalog } from './content-catalogs.js?v=10b118dd';
 import { questRewardModifier } from './imagination-effects.js?v=70169933';
-import { metabolicGain, moodMax } from './metabolics.js?v=8504134e';
+import { metabolicGain, moodMax } from './metabolics.js?v=1383e6fd';
 import { giantDisplayName } from './giant-names.js?v=0e295891';
 
 /**

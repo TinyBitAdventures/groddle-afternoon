@@ -69,12 +69,12 @@ import { obtainableItems } from './job-obtainable.mjs';
 import { DROP_TABLES } from '../public/js/drop-tables-data.js?v=c51a6400';
 import { CUBIMAL_PACKAGE_IDS, CUBIMAL_SERIES } from '../public/js/cubimals.js?v=3a284648';
 import { ARTIFACT_MAP, ARTIFACT_NECKLACES } from '../public/js/artifacts.js?v=fc419ecf';
-import { XP_FOR_LEVEL, currantRewardForLevel } from '../public/js/progression.js?v=33462eaa';
+import { XP_FOR_LEVEL, currantRewardForLevel } from '../public/js/progression.js?v=72b2b22a';
 import { IMAGINATION_UPGRADES } from '../public/js/imagination-data.js?v=4a85e7fe';
 import { SPINDLE_TOOLS } from '../public/js/making.js?v=a6b3716c';
 import { creditedMultiplayerQuests } from '../public/js/quests-mp.js?v=1fc5ff58';
 import { FURNITURE_STARTER_KIT } from '../public/js/homes-catalog.js?v=10ac34b6';
-import { GIANTS } from '../public/js/shrines.js?v=e2755fac';
+import { GIANTS } from '../public/js/shrines.js?v=f7628817';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 export const OUT = sitePath('data', 'economy.json');

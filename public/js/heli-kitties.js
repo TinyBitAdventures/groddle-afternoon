@@ -10,8 +10,8 @@
  * Those hidden verbs are listed in KITTY_SOURCE_HIDDEN_VERBS and never shown.
  */
 
-import { metabolicGain, moodMax, loseEnergy } from './metabolics.js?v=8504134e';
-import { grantMoodXp } from './mood-xp.js?v=958e7680';
+import { metabolicGain, moodMax, loseEnergy } from './metabolics.js?v=1383e6fd';
+import { grantMoodXp } from './mood-xp.js?v=22648ec0';
 import { filterText } from './word-filter.js?v=9a7a7ebb';
 export const KITTY_ID = 'npc_kitty_chicken';
 export const KITTY_LABEL = 'Heli Kitty';

@@ -50,7 +50,7 @@ import { CROWNS_STREET } from '../game-of-crowns.js?v=e32f35f5';
 import { HOG_HAUL_STREET_ID } from '../hog-haul.js?v=50d2e072';
 import { isRaceSceneTsid } from '../races.js?v=ab22a079';
 import { WINTER_HAVEN_STREET_ID, WINTER_WALK_STREET_ID } from '../winter-walk.js?v=b07450d2';
-import { ROOK_WOODS_STREET_ID } from '../rook-woods.js?v=9621a723';
+import { ROOK_WOODS_STREET_ID } from '../rook-woods.js?v=738634d9';
 import { questSceneTsid } from '../quest-instance.js?v=f0df88c3';
 
 export const ITEM_VERBS_FEATURE_ID = 'item-verbs';

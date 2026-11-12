@@ -49,7 +49,7 @@
  */
 
 import { locationEventsApi } from './location-events-feature.js?v=0cda70ed';
-import { collectQuoin, QUOIN_SHEET, QUOIN_TYPES } from '../quoins.js?v=7e0dec6d';
+import { collectQuoin, QUOIN_SHEET, QUOIN_TYPES } from '../quoins.js?v=61be601c';
 import {
   CARD_RETURN_TEXT,
   PUZZLE_DATA_URL,
@@ -67,7 +67,7 @@ import {
   showExitDoor,
   stepTriggers,
 } from '../puzzle-triggers.js?v=facc2c29';
-import { energyMax, metabolicGain, moodMax } from '../metabolics.js?v=8504134e';
+import { energyMax, metabolicGain, moodMax } from '../metabolics.js?v=1383e6fd';
 import { isLoaded, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js?v=92ec53cd';
 
 export const PUZZLES_FEATURE_ID = 'puzzles';

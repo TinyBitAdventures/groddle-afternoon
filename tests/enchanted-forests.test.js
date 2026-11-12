@@ -32,7 +32,7 @@ import {
   petEnchantedSeedling,
   polylineY,
   seedlingRemainingMs,
-} from '../public/js/enchanted-forests.js?v=22ff871e';
+} from '../public/js/enchanted-forests.js?v=dc045a4b';
 import {
   WOOD_TREE_HARVEST,
   harvestWoodTree,

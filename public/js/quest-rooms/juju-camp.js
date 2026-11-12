@@ -42,7 +42,7 @@
  */
 
 import { onLoaded, textureFromUrl } from '../textures.js?v=92ec53cd';
-import { loseMood } from '../metabolics.js?v=8504134e';
+import { loseMood } from '../metabolics.js?v=1383e6fd';
 import { JUJU_CAMP_FILES } from '../juju-camp-art.js?v=4aa81c05';
 
 const Q1 = 'help_juju_bandits';

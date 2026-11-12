@@ -17,7 +17,7 @@ import { describe, it } from 'node:test';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { HOME_LIMITS } from '../public/js/homes-catalog.js?v=10ac34b6';
-import { createCultivationState, homeStreetLayout } from '../public/js/home-cultivation.js?v=f1242621';
+import { createCultivationState, homeStreetLayout } from '../public/js/home-cultivation.js?v=1e2d2b2d';
 import { EXTERIOR_STYLES, streetLook } from '../public/js/home-styles.js?v=13fe0aaa';
 import { NEIGHBOURS, neighbourLayout } from '../public/js/neighbours.js?v=caec2f76';
 import { SCENE_STYLES, propPlan } from '../public/js/features/neighbour-scene.js?v=ec36fd01';

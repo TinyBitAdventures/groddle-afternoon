@@ -9,7 +9,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, it } from 'node:test';
 
-import { KINDNESS_AMOUNT, PLAYER_VERBS, RANDOM_KINDNESS, VERB_TEXT, kindnessStat, doerSide } from '../public/js/player-verbs-mp.js?v=c82b7e0f';
+import { KINDNESS_AMOUNT, PLAYER_VERBS, RANDOM_KINDNESS, VERB_TEXT, kindnessStat, doerSide } from '../public/js/player-verbs-mp.js?v=4d0315f5';
 import { OVERLAY_USES } from '../public/js/overlays.js?v=4e81f749';
 import { TOOL_CONDITION_CATALOG } from '../public/js/tools.js?v=5f482998';
 import { playerVerbsMpFeature } from '../public/js/features/player-verbs-mp-feature.js?v=1490c58a';

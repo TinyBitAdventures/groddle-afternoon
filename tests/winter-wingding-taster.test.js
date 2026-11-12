@@ -12,7 +12,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { DROP_TABLES, DROP_ITEMS } from '../public/js/drop-tables-data.js?v=c51a6400';
-import { rollDropTable } from '../public/js/drop-tables.js?v=16e12632';
+import { rollDropTable } from '../public/js/drop-tables.js?v=8bcf111f';
 import { CRACKER } from '../public/js/seasons.js?v=1978c3f3';
 import { PARTY_PACKS, PARTY_SPACES, isPartyPack, partyPackDurationSeconds } from '../public/js/party-spaces.js?v=dcc45819';
 

@@ -32,9 +32,9 @@ import {
   QUEST_ROOMS,
   builtInstanceQuests,
   roomModulePath,
-} from '../public/js/quest-rooms/catalog.js?v=d77d3d17';
+} from '../public/js/quest-rooms/catalog.js?v=87636ba5';
 import { loadContentCatalogsFromDir, getQuestCatalog } from '../public/js/content-catalogs.js?v=10b118dd';
-import * as kit from '../public/js/quest-rooms/kit.js?v=4e007609';
+import * as kit from '../public/js/quest-rooms/kit.js?v=57af0d8f';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -184,7 +184,7 @@ describe('Rainbow Run (numismatic_hustle)', () => {
 
 describe('The High Jumper (top_of_tree)', () => {
   it('asks "Are you stuck?" after the source two minutes, and has branches only Spinach can reach', async () => {
-    const mod = await import('../public/js/quest-rooms/top-of-tree.js?v=0a18a565');
+    const mod = await import('../public/js/quest-rooms/top-of-tree.js?v=992d5cad');
     assert.equal(mod.EXIT_PROMPT_MS, 120_000);
     assert.equal(mod.room.exitPromptMs, 120_000);
     assert.equal(mod.room.durationMs, 0);
@@ -205,7 +205,7 @@ describe('The High Jumper (top_of_tree)', () => {
 
 describe('Color Unblocking (color_unblocking)', () => {
   it('opens a path with the four solution switches and keeps the orange bridge', async () => {
-    const mod = await import('../public/js/quest-rooms/color-unblocking.js?v=39a00d86');
+    const mod = await import('../public/js/quest-rooms/color-unblocking.js?v=7fede2d1');
     const layout = mod.colorLayout();
     const on = mod.colorsAfter(layout.solution);
     for (const color of ['red', 'blue', 'green', 'purple']) assert.ok(!on.has(color), `${color} cleared`);
@@ -269,7 +269,7 @@ describe('The Wrizzards and The Rube (rube_yard)', () => {
   });
 
   it('registers the Play Cube for the pack catalog', async () => {
-    const { ROOM_ITEMS } = await import('../public/js/quest-rooms/catalog.js?v=d77d3d17');
+    const { ROOM_ITEMS } = await import('../public/js/quest-rooms/catalog.js?v=87636ba5');
     assert.equal(ROOM_ITEMS.play_cube.label, 'Play Cube');
     assert.equal(ROOM_ITEMS.play_cube.stackMax, 1);
     assert.equal(ROOM_ITEMS.play_cube.sellable, false);
@@ -346,7 +346,7 @@ describe('Le Misérable (le_miserable)', () => {
 
 describe('G99: the retry prompt names whoever offered the quest', () => {
   it('questGiver: NPC and pack-item givers, the Magic Rock for familiar offers', async () => {
-    const { questGiver, FAMILIAR_GATES, GIVER_LABELS } = await import('../public/js/quest-rooms/catalog.js?v=d77d3d17');
+    const { questGiver, FAMILIAR_GATES, GIVER_LABELS } = await import('../public/js/quest-rooms/catalog.js?v=87636ba5');
     const quests = JSON.parse(readFileSync(new URL('../public/assets/content/quests.json', import.meta.url), 'utf8'));
     const def = (id) => (Array.isArray(quests) ? quests : quests.quests || Object.values(quests)).find((q) => (q.classTsid || q.id) === id);
     assert.deepEqual(questGiver(def('join_club')), { npc: 'bag_butler', label: 'Butler' });

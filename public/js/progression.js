@@ -5,7 +5,7 @@
  * point balance; gameplay rewards normally increase both values together.
  */
 
-import { metabolicGain } from './metabolics.js?v=8504134e';
+import { metabolicGain } from './metabolics.js?v=1383e6fd';
 
 /** Cumulative XP thresholds for levels 2 through 60. */
 export const XP_FOR_LEVEL = Object.freeze([

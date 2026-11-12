@@ -21,8 +21,8 @@ import {
 } from './inventory.js?v=2bd5b93e';
 import { GRINDER_TOOLS, canUseTool, firstWorkingTool, useToolCondition } from './tools.js?v=5f482998';
 import { skillPackageDetails } from './skill-packages.js?v=bfb87281';
-import { grantMoodXp } from './mood-xp.js?v=958e7680';
-import { loseEnergy } from './metabolics.js?v=8504134e';
+import { grantMoodXp } from './mood-xp.js?v=22648ec0';
+import { loseEnergy } from './metabolics.js?v=1383e6fd';
 import { GEM_ITEMS, MEGA_ROCK_CHUNKS, megaRockChance, miningExpertBonus, rollGemSmall, smeltingOverrides } from './imagination-effects.js?v=70169933';
 
 /**

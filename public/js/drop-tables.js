@@ -16,8 +16,8 @@
 
 import { DROP_ITEMS, DROP_TABLES } from './drop-tables-data.js?v=c51a6400';
 import { skillPackageDetails } from './skill-packages.js?v=bfb87281';
-import { grantMoodXp } from './mood-xp.js?v=958e7680';
-import { metabolicGain } from './metabolics.js?v=8504134e';
+import { grantMoodXp } from './mood-xp.js?v=22648ec0';
+import { metabolicGain } from './metabolics.js?v=1383e6fd';
 import { giantDisplayName } from './giant-names.js?v=0e295891';
 
 export { DROP_ITEMS, DROP_TABLES };

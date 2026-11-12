@@ -5,12 +5,12 @@ import assert from 'node:assert/strict';
 import { describe, it, afterEach } from 'node:test';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { collectQuoin, createQuoinState } from '../public/js/quoins.js?v=7e0dec6d';
-import { MAX_XP, XP_FOR_LEVEL, reconcilePlayerProgression } from '../public/js/progression.js?v=33462eaa';
-import { loseMood, setMetabolicGainGate, setMoodLossNotice } from '../public/js/metabolics.js?v=8504134e';
-import { gameDayIndex } from '../public/js/musicblocks.js?v=182d0a4e';
+import { collectQuoin, createQuoinState } from '../public/js/quoins.js?v=61be601c';
+import { MAX_XP, XP_FOR_LEVEL, reconcilePlayerProgression } from '../public/js/progression.js?v=72b2b22a';
+import { loseMood, setMetabolicGainGate, setMoodLossNotice } from '../public/js/metabolics.js?v=1383e6fd';
+import { gameDayIndex } from '../public/js/musicblocks.js?v=f1bf2ad6';
 import { GAME_EPOCH_MS, GAME_DAY_MS } from '../public/js/game-day.js?v=84569fa2';
-import { levelUpStreetLine } from '../public/js/features/level-up-mp-feature.js';
+import { levelUpStreetLine } from '../public/js/features/level-up-mp-feature.js?v=22659e6d';
 
 const pub = (...p) => readFileSync(join(import.meta.dirname, '..', 'public', ...p), 'utf8');
 

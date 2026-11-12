@@ -11,7 +11,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { BUTLER, butlerPostRx, createButler, createButlerState, normalizeButlerState } from '../public/js/butler.js?v=a660e585';
 import { HOME_LIMITS } from '../public/js/homes-catalog.js?v=10ac34b6';
-import { createCultivationState, homeStreetLayout } from '../public/js/home-cultivation.js?v=f1242621';
+import { createCultivationState, homeStreetLayout } from '../public/js/home-cultivation.js?v=1e2d2b2d';
 import { BUTLER_BOX, STREET_ROCK } from '../public/js/home-street-fixtures.js?v=bad831a1';
 import { HOUSE_STYLE_KEYS, houseDoorway } from '../public/js/features/homes-feature.js?v=38327b85';
 

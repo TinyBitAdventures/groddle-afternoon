@@ -87,8 +87,8 @@ import {
   stuckPromptDue,
   wayBackFrom,
 } from '../quest-instance.js?v=f0df88c3';
-import { FAMILIAR_GATES, QUEST_ROOMS, REMINISCE_ITEMS, ROOM_ITEMS, isBuiltRoom, questGiver, roomModulePath } from '../quest-rooms/catalog.js?v=d77d3d17';
-import * as kit from '../quest-rooms/kit.js?v=4e007609';
+import { FAMILIAR_GATES, QUEST_ROOMS, REMINISCE_ITEMS, ROOM_ITEMS, isBuiltRoom, questGiver, roomModulePath } from '../quest-rooms/catalog.js?v=87636ba5';
+import * as kit from '../quest-rooms/kit.js?v=57af0d8f';
 import { locationEventsApi } from './location-events-feature.js?v=0cda70ed';
 import {
   acceptOffer,
@@ -105,7 +105,7 @@ import { runStreetTransition } from '../screen-fx.js?v=2e975a82';
 import { HOME_INTERIOR_TSID, HOME_STREET_TSID } from '../homes.js?v=631ab6b8';
 import { armPromptTimeout, promptTimeoutMs } from '../prompt-timeout.js?v=fba1669f';
 import { applyFamiliarLook, familiarLook } from '../familiar.js?v=bafd7139';
-import { collectQuoin, QUOIN_SHEET, QUOIN_TYPES } from '../quoins.js?v=7e0dec6d';
+import { collectQuoin, QUOIN_SHEET, QUOIN_TYPES } from '../quoins.js?v=61be601c';
 import { sourceFromUrl } from '../textures.js?v=92ec53cd';
 import { REMAKE_ROOM_PHYSICS } from '../avatar-step.js?v=43b1182e';
 
@@ -163,9 +163,9 @@ const ROOM_MODULES = {
   kids_room: () => import('../quest-rooms/kids-room.js?v=b10fcb3f'),
   rube_yard: () => import('../quest-rooms/rube-yard.js?v=3be3257c'),
   le_miserable: () => import('../quest-rooms/le-miserable.js?v=7995949d'),
-  juju_camp: () => import('../quest-rooms/juju-camp.js?v=1f27d7ea'),
-  picto_pattern: () => import('../quest-rooms/picto-pattern.js?v=ec9f39bb'),
-  radiant_glare: () => import('../quest-rooms/radiant-glare.js?v=0658e06c'),
+  juju_camp: () => import('../quest-rooms/juju-camp.js?v=a8e3f4f2'),
+  picto_pattern: () => import('../quest-rooms/picto-pattern.js?v=43f6a2f2'),
+  radiant_glare: () => import('../quest-rooms/radiant-glare.js?v=4aacb084'),
   an_autumn_day: () => import('../quest-rooms/an-autumn-day.js?v=bffa2879'),
   being_watched: () => import('../quest-rooms/being-watched.js?v=227cc8dd'),
   back_alley: () => import('../quest-rooms/back-alley.js?v=b0fa555c'),

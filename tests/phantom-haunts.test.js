@@ -26,7 +26,7 @@ import {
 } from '../public/js/ghost-quest.js?v=5f3cc133';
 import { createQuestState } from '../public/js/quests.js?v=2951073f';
 import { loadContentCatalogsFromDir, resetContentCatalogs, getQuestCatalog } from '../public/js/content-catalogs.js?v=10b118dd';
-import { SUBWAY_STREETS, closedStreets, initializeStreetJobs, normalizeStreetJobState } from '../public/js/street-jobs.js?v=94f8d250';
+import { SUBWAY_STREETS, closedStreets, initializeStreetJobs, normalizeStreetJobState } from '../public/js/street-jobs.js?v=87fd5c87';
 import { routeGraph } from '../public/js/map-routes.js?v=c7e7dc80';
 import { TELEPORTERS } from '../public/js/hidden-floors.js?v=732a2610';
 import { WINTRY_PORTAL_TELEPORTERS } from '../public/js/wintry-portal.js?v=1437deda';

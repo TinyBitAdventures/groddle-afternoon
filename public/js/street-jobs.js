@@ -52,7 +52,7 @@
 
 export const SOLO_DIVISOR = 50;
 import { SUBWAY_LINE } from './subway-line.js?v=d74b3ee0';
-import { loseEnergy } from './metabolics.js?v=8504134e';
+import { loseEnergy } from './metabolics.js?v=1383e6fd';
 /** items/include/jobs.js startJobWork unit_duration. */
 export const WORK_UNIT_MS = 1500;
 /** locations/inc_jobs.js jobs_get_available: 30 * 60 seconds. */

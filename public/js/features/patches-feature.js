@@ -73,7 +73,7 @@ import {
   tickPlot,
 } from '../patches.js?v=e034b56d';
 import { frameTexture, isLoaded, onFailed, onLoaded, textureFromUrl } from '../textures.js?v=92ec53cd';
-import { HOE_TOOLS, firstWorkingTool } from '../tools.js?v=5f482998';
+import { HOE_TOOLS, firstWorkingTool } from '../tools.js?v=62b37c51';
 import { slugsFromEffects } from '../speech-slugs.js?v=130338f9';
 import { plotSignature, replayRng } from '../shared-patches.js?v=b675a257';
 

@@ -14,7 +14,7 @@ import {
   createActivityLog,
   appendActivity,
   VERB_REWARDS,
-} from '../public/js/verb-rewards.js?v=d3ce41d5';
+} from '../public/js/verb-rewards.js?v=202a9e37';
 import {
   RECIPE_CATALOG,
   TOOL_CATALOG,

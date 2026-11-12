@@ -10,8 +10,8 @@ import { existsSync, readFileSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import * as kit from '../public/js/quest-rooms/kit.js?v=4e007609';
-import { QUEST_ROOMS, roomModulePath } from '../public/js/quest-rooms/catalog.js?v=d77d3d17';
+import * as kit from '../public/js/quest-rooms/kit.js?v=57af0d8f';
+import { QUEST_ROOMS, roomModulePath } from '../public/js/quest-rooms/catalog.js?v=87636ba5';
 import { loadContentCatalogsFromDir, getQuestCatalog } from '../public/js/content-catalogs.js?v=10b118dd';
 import { acceptOffer, ensureQuestOfferState, questStatus, turnInQuest } from '../public/js/quest-offers.js?v=d76abcd0';
 import { gwendolynOffers } from '../public/js/gwendolyn-room-23.js?v=46e417b9';

@@ -61,7 +61,7 @@ import {
   unwrapGrowl,
   unwrapPack,
   wrapBox,
-} from '../gifts.js?v=3b8ab24e';
+} from '../gifts.js?v=d28f78e8';
 import { UNNAMED_PLAYER } from '../player-names.js?v=f9b78094';
 
 export const GIFTS_FEATURE_ID = 'gifts';

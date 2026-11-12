@@ -3,8 +3,8 @@
  * Simplified conditions/handlers for the Groddle spike.
  */
 
-import { getVerbReward, applyVerbReward, formatActivityLine } from './js/verb-rewards.js?v=d3ce41d5';
-import { grantMoodXp } from './js/mood-xp.js?v=958e7680';
+import { getVerbReward, applyVerbReward, formatActivityLine } from './js/verb-rewards.js?v=202a9e37';
+import { grantMoodXp } from './js/mood-xp.js?v=22648ec0';
 import {
   TRANT_META,
   resolveArborologyPackage,
@@ -50,8 +50,8 @@ import {
   noPickLine,
   rockStatusLabel,
   ensureMiningItems,
-} from './js/mining.js?v=12a6f1bd';
-import { takeToolChoice } from './js/tool-choice.js?v=00000000';
+} from './js/mining.js?v=862548f1';
+import { takeToolChoice } from './js/tool-choice.js?v=e0dcb60e';
 import {
   ANIMAL_CLASS_IDS,
   ensureAnimalState,

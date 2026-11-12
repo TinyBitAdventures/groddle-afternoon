@@ -83,7 +83,7 @@ import {
   sparedBySignpost,
 } from '../smuggling.js?v=ab6ee12a';
 import { frameTexture, sourceFromUrl, textureFromUrl } from '../textures.js?v=92ec53cd';
-import { grantMoodXp } from '../mood-xp.js?v=958e7680';
+import { grantMoodXp } from '../mood-xp.js?v=22648ec0';
 
 export const SMUGGLING_FEATURE_ID = 'smuggling';
 const ART = 'assets/sprites/smuggling/';

@@ -69,8 +69,8 @@ import {
 } from '../giant-icons.js?v=0d6b4965';
 import { textureFromUrl } from '../textures.js?v=92ec53cd';
 import { playSheetOverlay } from '../overlay-art.js?v=a6561207';
-import { grantMoodXp } from '../mood-xp.js?v=958e7680';
-import { energyMax, metabolicGain, moodMax } from '../metabolics.js?v=8504134e';
+import { grantMoodXp } from '../mood-xp.js?v=22648ec0';
+import { energyMax, metabolicGain, moodMax } from '../metabolics.js?v=1383e6fd';
 import { CONVERSATION_RULES, adoptLegacyTalks, conversationRecord, hasCompleted, toldRecord } from '../conversations.js?v=7cbdfea4';
 import { TELLERS } from '../conversations-data.js?v=f11b7e02';
 import { itemZ } from '../item-bands.js?v=e98b10bc';

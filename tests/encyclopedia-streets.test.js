@@ -18,7 +18,7 @@ import { waysFromStart } from '../tools/encyclopedia/streets.mjs';
 import { GSJS_GIVER_HOW, sourcesOf } from '../tools/encyclopedia/where-to-find.mjs';
 import { VENDOR_PROFILES, selectVendorProfile } from '../public/js/vendor.js?v=900d86d9';
 import { ecologyForStreet, populationForStreet } from '../public/js/street-ecology.js?v=f27417a8';
-import { closedStreets, initializeStreetJobs, normalizeStreetJobState } from '../public/js/street-jobs.js?v=94f8d250';
+import { closedStreets, initializeStreetJobs, normalizeStreetJobState } from '../public/js/street-jobs.js?v=87fd5c87';
 
 const spike = join(import.meta.dirname, '..');
 const pub = join(spike, 'public');

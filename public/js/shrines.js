@@ -11,7 +11,7 @@
  * spend_points, emblem_base doSpend. See quoteFavorSpend / quoteEmblemSpend.
  */
 
-import { levelInfoForXp } from './progression.js?v=33462eaa';
+import { levelInfoForXp } from './progression.js?v=72b2b22a';
 import {
   ITEM_CATALOG,
   addItem,
@@ -28,7 +28,7 @@ import { grantMoodXp } from './mood-xp.js?v=958e7680';
 import { getSkillCatalog } from './content-catalogs.js?v=10b118dd';
 import { accelerateActiveStudy, getActiveStudy, maxStudyAcceleration } from './skills.js?v=4542bdf9';
 import { emblemUnlockSkillFor } from './skill-tree.js?v=faa54b90';
-import { NO_DONATE_CLASSES } from './shrine-no-donate-data.js?v=00000000';
+import { NO_DONATE_CLASSES } from './shrine-no-donate-data.js?v=1a3b042f';
 
 export { NO_DONATE_CLASSES };
 

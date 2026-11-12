@@ -23,7 +23,7 @@
 
 import { getSkillCatalog } from './content-catalogs.js?v=10b118dd';
 import { SKILL_POINTS_PER_SECOND, pauseSkillStudy, listStudyQueue } from './skills.js?v=4542bdf9';
-import { retireDeadQuests } from './retired-quests.js?v=00000000';
+import { retireDeadQuests } from './retired-quests.js?v=61758261';
 
 export const UNLEARN_CARD = 'unlearning_ability';
 

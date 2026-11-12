@@ -27,8 +27,8 @@
  *    while you were away are announced once (800-806).
  */
 
-import { formatStack } from './gifts.js?v=3b8ab24e';
-import { cleanCopyTag } from './tools.js?v=5f482998';
+import { formatStack } from './gifts.js?v=d28f78e8';
+import { cleanCopyTag } from './tools.js?v=62b37c51';
 
 export const AUCTION_SENDER = 'Auction Fulfillment and Logistics Corporation';
 /** Our save slice keeps this many announced sales. */

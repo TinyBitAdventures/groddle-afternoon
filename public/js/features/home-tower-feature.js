@@ -53,7 +53,7 @@ import { ITEM_CATALOG, countItem, ensureItem, itemIcon } from '../inventory.js?v
 import { canUseTool, useToolCondition } from '../tools.js?v=5f482998';
 import { acceptOffer, npcQuestOffers } from '../quest-offers.js?v=d76abcd0';
 import { getQuestCatalog } from '../content-catalogs.js?v=10b118dd';
-import { XP_FOR_LEVEL } from '../progression.js?v=33462eaa';
+import { XP_FOR_LEVEL } from '../progression.js?v=72b2b22a';
 import {
   BUILD_A_TOWER,
   ELEVATOR_MARK,
@@ -112,7 +112,7 @@ import {
   towerSecretText,
   towerSpotsFor,
   workCheck,
-} from '../home-tower.js?v=087df38f';
+} from '../home-tower.js?v=d33a67e4';
 import { textureFromUrl } from '../textures.js?v=92ec53cd';
 import { denseSprite } from '../sprite-dense.js?v=2a0ce07a';
 import { pieceUrl } from '../home-wallpaper.js?v=f1969400';

@@ -22,9 +22,9 @@
 import { ITEM_CATALOG } from '../inventory.js?v=2bd5b93e';
 import { listAnimalFeedOptions } from '../animals.js?v=1cc34c7e';
 import { isBagClass } from '../pack-slots.js?v=4a36968a';
-import { dropFor, dropTip } from '../world-drop.js?v=f162fb0e';
-import { canUseTool } from '../tools.js?v=5f482998';
-import { chooseTool } from '../tool-choice.js?v=00000000';
+import { dropFor, dropTip } from '../world-drop.js?v=98c01a74';
+import { canUseTool } from '../tools.js?v=62b37c51';
+import { chooseTool } from '../tool-choice.js?v=e0dcb60e';
 
 export const WORLD_DROP_FEATURE_ID = 'world-drop';
 

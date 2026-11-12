@@ -7,7 +7,7 @@ import { readFileSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { loadContentCatalogsFromDir, resetContentCatalogs, getQuestCatalog } from '../public/js/content-catalogs.js?v=10b118dd';
-import { createQuestState, listQuestLog } from '../public/js/quests.js?v=2b882eb6';
+import { createQuestState, listQuestLog } from '../public/js/quests.js?v=672f0bbe';
 import {
   acceptOffer,
   ensureQuestOfferState,
@@ -18,9 +18,9 @@ import {
   routeQuestEvent,
   tickQuestTimers,
   HERB_GARDEN_STREETS,
-} from '../public/js/quest-offers.js?v=9c53455c';
-import { retireDeadQuests, retiredQuestLine } from '../public/js/retired-quests.js';
-import { questRemovedBy } from '../public/js/unlearning.js';
+} from '../public/js/quest-offers.js?v=095c3353';
+import { retireDeadQuests, retiredQuestLine } from '../public/js/retired-quests.js?v=61758261';
+import { questRemovedBy } from '../public/js/unlearning.js?v=20672dff';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const CONTENT = join(ROOT, 'public/assets/content');

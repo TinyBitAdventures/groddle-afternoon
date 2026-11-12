@@ -46,7 +46,7 @@ import { RECIPE_CATALOG, isRecipeCatalogReady, setRecipeCatalog } from '../makin
 import { furnitureDef, furnitureScale, furnitureSize } from '../home-decor.js?v=bbf43c44';
 import { isStorageClass, storageHasContents } from '../home-storage.js?v=b0225465';
 import { pieceLabel } from '../furniture-upgrades.js?v=a3788c0d';
-import { cultivationDef, homeStreetLayout } from '../home-cultivation.js?v=f1242621';
+import { cultivationDef, homeStreetLayout } from '../home-cultivation.js?v=1e2d2b2d';
 import { signpostX as fixtureSignpostX } from '../home-street-fixtures.js?v=bad831a1';
 import { PROTO_DEPLETED_ART } from '../home-proto-art.js?v=9309e9f3';
 import { NOTE_POLE_CONTAINERS, NOTE_POLE_PARTS, NOTE_POLE_SIGN_Y } from '../note-pole-art.js?v=fbda2f8a';

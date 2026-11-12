@@ -17,7 +17,7 @@
  *   activity says so.
  */
 
-import { metabolicGain, moodMax, loseEnergy } from './metabolics.js?v=8504134e';
+import { metabolicGain, moodMax, loseEnergy } from './metabolics.js?v=1383e6fd';
 
 export const SET_FREE = Object.freeze({
   verb: 'set free',

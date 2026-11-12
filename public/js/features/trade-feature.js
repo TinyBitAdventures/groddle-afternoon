@@ -69,7 +69,7 @@ import {
   tradeCommand,
   untradeableReason,
   goodsWithHeldTags,
-} from '../trade.js?v=ce0373e5';
+} from '../trade.js?v=139dd264';
 import { UNNAMED_PLAYER } from '../player-names.js?v=f9b78094';
 
 export const TRADE_FEATURE_ID = 'trade';

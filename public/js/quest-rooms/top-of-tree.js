@@ -23,7 +23,7 @@
  * flared root base, and the place's own name.
  */
 
-import { metabolicGain } from '../metabolics.js?v=8504134e';
+import { metabolicGain } from '../metabolics.js?v=1383e6fd';
 import { packSlotFor } from '../pack-slot-qa.js?v=1d74bf2d';
 
 export const TREE_W = 1400;

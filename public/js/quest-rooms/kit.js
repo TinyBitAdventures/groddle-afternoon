@@ -10,7 +10,7 @@
  */
 
 import { frameTexture, isLoaded, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js?v=92ec53cd';
-import { quoinTouches } from '../quoins.js?v=7e0dec6d';
+import { quoinTouches } from '../quoins.js?v=61be601c';
 import { sharpRoomDeco } from '../deco-hires.js?v=f59e60d3';
 
 export const DECO_DIR = 'assets/decos/groddle/';

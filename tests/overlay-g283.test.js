@@ -14,7 +14,7 @@ import { createHash } from 'node:crypto';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { readZip } from '../tools/avatar-compositor/xfl.mjs';
-import { setMetabolicGainGate } from '../public/js/metabolics.js?v=8504134e';
+import { setMetabolicGainGate } from '../public/js/metabolics.js?v=1383e6fd';
 import {
   SET_FREE,
   applySetFree,

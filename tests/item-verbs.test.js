@@ -15,7 +15,7 @@ import {
   crunchIce,
   itemVerbButton,
   runItemVerb,
-} from '../public/js/item-verbs.js?v=1e20fa7d';
+} from '../public/js/item-verbs.js?v=994d3d4f';
 import {
   HAIRBALL_DASH_MIN,
   homeTrophyCount,

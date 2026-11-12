@@ -13,7 +13,7 @@ import {
   rollDropTable,
   rollPackageDrop,
   tableItemOdds,
-} from '../public/js/drop-tables.js?v=16e12632';
+} from '../public/js/drop-tables.js?v=8bcf111f';
 import { remakeStatus } from '../public/js/imagination-remake.js?v=c37ad887';
 
 const seq = (...vals) => {

@@ -22,8 +22,8 @@ import {
   planStreetQuoins,
   rollMysteryKind,
   streetQuoinClass,
-} from '../public/js/quoins.js?v=7e0dec6d';
-import { setMetabolicGainGate } from '../public/js/metabolics.js?v=8504134e';
+} from '../public/js/quoins.js?v=61be601c';
+import { setMetabolicGainGate } from '../public/js/metabolics.js?v=1383e6fd';
 import { CHECKLIST } from '../tools/restoration/checklist.mjs';
 
 const root = join(import.meta.dirname, '..');

@@ -121,8 +121,8 @@ import {
   sendCarriedToMailbox,
   sendDueToMailbox,
 } from '../mail-courier.js?v=68125101';
-import { AUCTION_SENDER, mailSubject, mailText } from '../auctions.js?v=278dc46a';
-import { formatStack } from '../gifts.js?v=3b8ab24e';
+import { AUCTION_SENDER, mailSubject, mailText } from '../auctions.js?v=0b1fff76';
+import { formatStack } from '../gifts.js?v=d28f78e8';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
 
 export const MAIL_COURIER_FEATURE_ID = 'mail-courier';

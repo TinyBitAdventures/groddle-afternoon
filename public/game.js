@@ -133,7 +133,7 @@ import {
 } from './js/legalize-it.js?v=62ab57ac';
 import { HALL, HALL_LAYOUT, HALL_QUESTIONS } from './js/bureaucratic-hall.js?v=a0bc6317';
 import { STATION_X, stationArrival, stationScreen, surfaceStation } from './js/subway.js?v=44d1a09f';
-import { ALLEY, SHADY, drawAlley, inEnteredBox } from './js/quest-rooms/back-alley-set.js?v=e1bdc47e';
+import { ALLEY, SHADY, drawAlley, inEnteredBox } from './js/quest-rooms/back-alley-set.js?v=609d9c3c';
 import {
   WINTER_HAVEN_STREET_ID,
   WINTER_MOTE_REWARDS,
@@ -233,7 +233,7 @@ import {
   rookEggStateForProgress,
   rookWoodsObjective,
   rookWoodsRemainingMs,
-} from './js/rook-woods.js?v=9621a723';
+} from './js/rook-woods.js?v=738634d9';
 import {
   ROOK_HALL_QUEST_ID,
   ROOK_HALL_START_QUEST_ID,
@@ -303,7 +303,7 @@ import {
   listEmotionalBearActions,
   performEmotionalBearAction,
   upgradeEmotionalBear,
-} from './js/emotional-bear.js?v=8d027fe0';
+} from './js/emotional-bear.js?v=172f393b';
 import {
   LAST_FEAT_STREET_IDS,
   LAST_FEAT_STREET_LABELS,
@@ -570,7 +570,7 @@ import {
   setCopyTag,
   migrateClassValue,
   brokenToolIcon,
-} from './js/tools.js?v=5f482998';
+} from './js/tools.js?v=62b37c51';
 import {
   listRecipes,
   listRecipesForTool,
@@ -757,7 +757,7 @@ import {
   levelInfoForXp,
   reconcilePlayerProgression,
   formatLevelProgress,
-} from './js/progression.js?v=33462eaa';
+} from './js/progression.js?v=72b2b22a';
 import {
   TRANT_META,
   setTrantTables,
@@ -952,7 +952,7 @@ import {
   creditQuoinStat,
   creditMetabolicReward,
   streetQuoinPoints,
-} from './js/quoins.js?v=7e0dec6d';
+} from './js/quoins.js?v=61be601c';
 import {
   buildHubMapView,
   mapClickTravel,
@@ -1000,8 +1000,8 @@ import {
   soundForGameEvent,
   soundForQuoin,
   soundForVerb,
-} from './js/sound-moments.js?v=52ad523c';
-import { loseMood, moodMax, setMetabolicGainGate, setMetabolicLossGate, setMoodLossNotice } from './js/metabolics.js?v=8504134e';
+} from './js/sound-moments.js?v=c57351b3';
+import { loseMood, moodMax, setMetabolicGainGate, setMetabolicLossGate, setMoodLossNotice } from './js/metabolics.js?v=1383e6fd';
 import { MOOD_DECAY_TEXT } from './js/mood-decay.js?v=49175993';
 import { installHiresIcons } from './js/icon-hires.js?v=165dbd6e';
 import { installHiresDecos } from './js/deco-hires.js?v=f59e60d3';
@@ -33053,7 +33053,7 @@ async function main() {
     },
   };
   if (new URLSearchParams(location.search).has('soundtest')) {
-    import('./js/sound-test.js?v=5a9d22cb').then((m) => m.openSoundTest({ document, playSound, board: () => audio.board, unmute: async () => {
+    import('./js/sound-test.js?v=372afc9c').then((m) => m.openSoundTest({ document, playSound, board: () => audio.board, unmute: async () => {
       state.muted = false;
       if (audio.ctx?.state === 'suspended') {
         try { await audio.ctx.resume(); } catch (_) { /* opt-in */ }

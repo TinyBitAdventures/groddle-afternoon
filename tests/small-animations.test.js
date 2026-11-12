@@ -17,7 +17,7 @@ import { POWDERS } from '../public/js/powders.js?v=fbbbc0d8';
 import { PACKED_SHEETS } from '../public/js/packed-sheets-data.js?v=192c6f15';
 import { packedCell, packedDurationMs, packedFrameAt } from '../public/js/packed-sheets.js?v=5a0493ce';
 import { itemOverlayPlacement } from '../public/js/item-overlay.js?v=97ed2ba0';
-import { PLAYER_VERBS } from '../public/js/player-verbs-mp.js?v=c82b7e0f';
+import { PLAYER_VERBS } from '../public/js/player-verbs-mp.js?v=4d0315f5';
 import { imageSize } from '../tools/image-size.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');

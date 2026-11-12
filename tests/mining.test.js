@@ -40,9 +40,9 @@ import {
   craftRecipe,
   ensureMakingItems,
   TOOL_CATALOG,
-} from '../public/js/making.js?v=2cd473f3';
-import { DEFAULT_VENDOR, vendorBuy } from '../public/js/vendor.js?v=5207195b';
-import { bindToolInventory, createToolConditionState, getToolCondition, toolCopies } from '../public/js/tools.js?v=5f482998';
+} from '../public/js/making.js?v=3c76e0da';
+import { DEFAULT_VENDOR, vendorBuy } from '../public/js/vendor.js?v=d73773ff';
+import { bindToolInventory, createToolConditionState, getToolCondition, toolCopies } from '../public/js/tools.js?v=62b37c51';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const SPIKE = join(__dirname, '../public');

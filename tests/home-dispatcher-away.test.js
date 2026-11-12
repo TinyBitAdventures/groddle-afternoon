@@ -22,7 +22,7 @@ import {
   placementCheck,
   putAwayDispatcher,
   putOutDispatcher,
-} from '../public/js/home-cultivation.js?v=f1242621';
+} from '../public/js/home-cultivation.js?v=1e2d2b2d';
 import {
   DISPATCHER_HALF,
   DISPATCHER_TEXT,

@@ -19,7 +19,7 @@ import { after, before, describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { execFileSync, spawnSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
-import { homeStreetOwner, isPublicStreet, isSharedStreet, normalizeGroundStack, shareReason, stackAt } from '../public/js/drops-mp.js?v=ec6a135d';
+import { homeStreetOwner, isPublicStreet, isSharedStreet, normalizeGroundStack, shareReason, stackAt } from '../public/js/drops-mp.js?v=84c9e767';
 import { dropsMpFeature } from '../public/js/features/drops-mp-feature.js?fresh=homedrops';
 import { homeStreetMpFeature } from '../public/js/features/home-street-mp-feature.js?v=1f7449b1';
 import { sharedHomeStreet } from '../public/js/neighbours-mp.js?v=8d032640';

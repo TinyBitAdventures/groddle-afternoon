@@ -21,7 +21,7 @@ import {
   quoinTypeShards,
   stackQuoinText,
 } from '../public/js/quoin-shards.js?v=121156a0';
-import { QUOIN_TYPES, collectQuoin, createQuoinState, creditQuoinStat } from '../public/js/quoins.js?v=7e0dec6d';
+import { QUOIN_TYPES, collectQuoin, createQuoinState, creditQuoinStat } from '../public/js/quoins.js?v=61be601c';
 import { SOUND_ALIASES, SOUND_FILES } from '../public/js/sound-keys.js?v=fb6ee553';
 
 const here = import.meta.dirname;
@@ -349,7 +349,7 @@ describe('the collector\'s burst on the page (features/quoin-shards-feature.js q
   }
 
   async function setup() {
-    const { quoinShardsFeature } = await import('../public/js/features/quoin-shards-feature.js?v=6cf9f74f');
+    const { quoinShardsFeature } = await import('../public/js/features/quoin-shards-feature.js?v=86bfb0ce');
     const PIXI = fakePixi();
     const data = {};
     const engine = { PIXI, fxLayer: new PIXI.Container(), setData: (k, v) => { data[k] = v; }, param: () => null };

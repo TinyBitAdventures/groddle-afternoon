@@ -92,9 +92,9 @@ import { QUOIN_GRAB_SPLASH, RACE_SPLASH, splashFor } from '../game-splash.js?v=f
 import { crownsMpChallenge, startCrowns } from './crowns-feature.js?v=06c72f6f';
 import { startHogHaulMp } from './hog-haul-mp-feature.js?v=d5bd1087';
 import { textureFromUrl } from '../textures.js?v=92ec53cd';
-import { QUOIN_SHEET, QUOIN_TYPES } from '../quoins.js?v=7e0dec6d';
-import { gainMetabolic } from '../metabolics.js?v=8504134e';
-import { grantMoodXp } from '../mood-xp.js?v=958e7680';
+import { QUOIN_SHEET, QUOIN_TYPES } from '../quoins.js?v=61be601c';
+import { gainMetabolic } from '../metabolics.js?v=1383e6fd';
+import { grantMoodXp } from '../mood-xp.js?v=22648ec0';
 import { quoinShardGrabberSound, quoinShardSoundKey } from '../quoin-shards.js?v=121156a0';
 import {
   MP_RACE_COURSES,

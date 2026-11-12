@@ -43,9 +43,9 @@ import {
   normalizeSceneSave,
   sceneTsid,
 } from '../puzzle-scenes.js?v=c47b9319';
-import { metabolicGain, moodMax } from '../metabolics.js?v=8504134e';
+import { metabolicGain, moodMax } from '../metabolics.js?v=1383e6fd';
 import { frameTexture, isLoaded, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js?v=92ec53cd';
-import { grantMoodXp } from '../mood-xp.js?v=958e7680';
+import { grantMoodXp } from '../mood-xp.js?v=22648ec0';
 
 export const PUZZLE_SCENES_FEATURE_ID = 'puzzle-scenes';
 const TICKET = 'paradise_ticket_beam_me_down';

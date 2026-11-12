@@ -69,7 +69,7 @@ export async function yardVerbsJson() {
   const { ROCK_CATALOG } = await import('../public/js/mining.js?v=881c40fe');
   const { RESOURCE_NODE_CATALOG } = await import('../public/js/resource-nodes.js?v=e8971a67');
   const { CULTIVATION_CLASSES } = await import('../public/js/homes-catalog.js?v=10ac34b6');
-  const { LIFESPAN_STEP, MAX_LIFE_STEPS } = await import('../public/js/home-cultivation.js?v=f1242621');
+  const { LIFESPAN_STEP, MAX_LIFE_STEPS } = await import('../public/js/home-cultivation.js?v=1e2d2b2d');
   const allPool = { ...YARD_POOL, ...STOCK_POOL };
   const pool = Object.keys(allPool).sort().map((key) => `${JSON.stringify(key)}:${allPool[key]}`);
   const rocks = Object.keys(ROCK_CATALOG).sort().map((id) => {
@@ -95,7 +95,7 @@ export async function yardVerbsJson() {
   });
   const { POPULATION_CONTROLS, CROWD_CARDS, YARD_CAP_OURS, YARD_CAP_SCAN } = await import('../public/js/animal-crowding.js?v=0ffb4ced');
   const { HOME_LIMITS } = await import('../public/js/homes-catalog.js?v=10ac34b6');
-  const { YARD_SEGMENT_W, HOUSE_LOT_W } = await import('../public/js/home-cultivation.js?v=f1242621');
+  const { YARD_SEGMENT_W, HOUSE_LOT_W } = await import('../public/js/home-cultivation.js?v=1e2d2b2d');
   const controls = Object.keys(POPULATION_CONTROLS).sort().map((id) => `${JSON.stringify(id)}:[${POPULATION_CONTROLS[id].perWidth},${POPULATION_CONTROLS[id].minMax},${POPULATION_CONTROLS[id].maxMax}]`);
   const cards = CROWD_CARDS.map((c) => `[${JSON.stringify(c.id)},${c.share}]`);
   const crowd = `{"controls":{${controls.join(',')}},"cards":[${cards.join(',')}],"ours":${YARD_CAP_OURS},"scan":${YARD_CAP_SCAN},"street":{"segment":${YARD_SEGMENT_W},"lot":${HOUSE_LOT_W},"left":[${HOME_LIMITS.START_FRONTYARD_LEFT_SEGMENTS},${HOME_LIMITS.MAX_FRONTYARD_LEFT_SEGMENTS}],"right":[${HOME_LIMITS.START_FRONTYARD_RIGHT_SEGMENTS},${HOME_LIMITS.MAX_FRONTYARD_RIGHT_SEGMENTS}]}}`;

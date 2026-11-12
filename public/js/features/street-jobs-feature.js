@@ -109,7 +109,7 @@ import {
   sharePercent,
   percentCompleteText,
   jobRewardsText,
-} from '../street-jobs.js?v=94f8d250';
+} from '../street-jobs.js?v=87fd5c87';
 import { PAPERS_BADGE } from '../subway.js?v=44d1a09f';
 import { gainMetabolic, loseEnergy } from '../metabolics.js?v=8504134e';
 import { closuresInTheWay, holdNote, nearestReached, placeIndex, questHold, questStoryKey, reachableStreets } from '../quest-reach.js?v=b9a87215';
@@ -136,8 +136,8 @@ import {
   sharedSlice,
   topLine,
   leaderboard,
-} from '../street-jobs-mp.js?v=25efcadf';
-import { grantMoodXp } from '../mood-xp.js?v=958e7680';
+} from '../street-jobs-mp.js?v=6f005ede';
+import { grantMoodXp } from '../mood-xp.js?v=22648ec0';
 import { createMinnAccount } from '../minn-account.js?v=c15f0ecf';
 import { normalizeGroups } from '../groups.js?v=c9635d96';
 import { frameTexture, sourceFromUrl, textureFromUrl } from '../textures.js?v=92ec53cd';
@@ -148,8 +148,8 @@ import { itemZ } from '../item-bands.js?v=e98b10bc';
 import { SIGN_ARMS, routeGraph } from '../map-routes.js?v=c7e7dc80';
 import { TELEPORTERS } from '../hidden-floors.js?v=732a2610';
 import { WINTRY_PORTAL_TELEPORTERS } from '../wintry-portal.js?v=1437deda';
-import { PROJECTS_TEXT, contributedJobs, mineTotal, projectEntry, projectList } from '../projects-tracker.js?v=edd58b99';
-import { PROJECTS_PANEL_ID, buildProjectsPanel, renderProjects } from '../ui/projects-sheet.js?v=4b62e271';
+import { PROJECTS_TEXT, contributedJobs, mineTotal, projectEntry, projectList } from '../projects-tracker.js?v=289c02e8';
+import { PROJECTS_PANEL_ID, buildProjectsPanel, renderProjects } from '../ui/projects-sheet.js?v=2ebce480';
 import { SIDE_SHEET_IDS } from '../ui/panel-shell.js?v=06a0d3fe';
 import { trophyGotText } from '../home-trophies.js?v=2020b29b';
 import { FEATURED_TEXT, featuredChanged, featuredFromServer, featuredNeedsLine } from '../featured-project.js?v=3cc0565c';

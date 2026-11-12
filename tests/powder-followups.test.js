@@ -16,7 +16,7 @@ import { HEADSPACE_SCENE, itemVerbsFeature, inGameLocation } from '../public/js/
 import { ROOK_WOODS_STREET_ID } from '../public/js/rook-woods.js?v=9621a723';
 import { INSTANCES as GWENDOLYN_INSTANCES, ROOM_ID as GWENDOLYN_ROOM } from '../public/js/quest-rooms/gwendolyn.js?v=fc056caa';
 import { questSceneTsid } from '../public/js/quest-instance.js?v=f0df88c3';
-import { GAME_CHEAT_BLOCKS, SPINACH_TEXT, gameCheatBlock } from '../public/js/item-verbs.js?v=1e20fa7d';
+import { GAME_CHEAT_BLOCKS, SPINACH_TEXT, gameCheatBlock } from '../public/js/item-verbs.js?v=994d3d4f';
 import { CROWNS_STREET } from '../public/js/game-of-crowns.js?v=e32f35f5';
 import { HOG_HAUL_STREET_ID } from '../public/js/hog-haul.js?v=50d2e072';
 import { raceSceneTsid } from '../public/js/races.js?v=ab22a079';

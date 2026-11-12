@@ -43,7 +43,7 @@ import { ITEM_CATALOG } from '../public/js/inventory.js?v=2bd5b93e';
 import { loadRecipeCatalogFromFile } from '../public/js/making.js?v=a6b3716c';
 import { SHRINE_ITEM_BASE_COSTS, donationValueFor, giantForStreet } from '../public/js/shrines.js?v=21cad7cb';
 import { ITEM_BASE_COSTS } from '../public/js/store-catalog.js?v=74b56af3';
-import { TOOL_CONDITION_CATALOG } from '../public/js/tools.js?v=5f482998';
+import { TOOL_CONDITION_CATALOG } from '../public/js/tools.js?v=62b37c51';
 import { placementRequests } from './build-realtime-objects.mjs';
 import { streetIsRookable } from '../public/js/rook-attack.js?v=c12e825f';
 import { rebuiltRoomEcology } from '../public/js/rebuilt-rooms.js?v=8c2eaf24';

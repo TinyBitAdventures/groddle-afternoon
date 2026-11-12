@@ -38,7 +38,7 @@ import {
   unlearnCheck,
   unlearnSkillName,
   unlearnStatus,
-} from '../unlearning.js?v=72d5ffe2';
+} from '../unlearning.js?v=20672dff';
 
 export const UNLEARNING_FEATURE_ID = 'unlearning';
 

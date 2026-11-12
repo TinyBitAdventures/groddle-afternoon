@@ -17,10 +17,10 @@ import {
   setToolRemaining,
   takeToolCopy,
   useToolCondition,
-} from './tools.js?v=5f482998';
+} from './tools.js?v=62b37c51';
 import { SKILL_PACKAGES, getSkillPackageOverride, skillPackageDetails } from './skill-packages.js?v=bfb87281';
-import { loseEnergy, metabolicGain, moodMax } from './metabolics.js?v=8504134e';
-import { grantMoodXp } from './mood-xp.js?v=958e7680';
+import { loseEnergy, metabolicGain, moodMax } from './metabolics.js?v=1383e6fd';
+import { grantMoodXp } from './mood-xp.js?v=22648ec0';
 import { petPiggy, piggyNibbleRefusal } from './animal-mood.js?v=a49495fc';
 
 export const ANIMAL_KINSHIP_RANK_IDS = Object.freeze(
