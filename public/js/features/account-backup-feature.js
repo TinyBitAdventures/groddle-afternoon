@@ -39,8 +39,8 @@ import { mountAccountForms, mountAccountSettings, mountPresenceSetting } from '.
 import { createBrowserSaveStore, freezeSoloSaves, restoreSoloSave, saveStore, savedAtOf, soloSaveSnapshot, thawSoloSaves } from '../save-store.js?v=5b167c14';
 import { formatGameDayLabel } from '../game-day.js?v=a7e262aa';
 import { multiplayerEntryUrl } from '../game-mode.js?v=1ecf2899';
-import { markContinued, quietSession } from '../online-boot.js?v=733c6af0';
-import { installCharacterSwitcher } from '../character-switcher.js?v=b048a8bd';
+import { markContinued, quietSession } from '../online-boot.js?v=8f0af4f1';
+import { installCharacterSwitcher } from '../character-switcher.js?v=6f67e3a0';
 
 /** Which slot a new backup goes to: the first empty one, else the oldest (which then needs a yes). */
 export function slotForNewBackup(backups, slots) {

@@ -12,14 +12,15 @@ import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
+import { SITE_DIR, skipWithoutSite } from '../tools/repos.mjs';
 
 import { CHARACTER_CHANGED, CHARACTER_CHANGED_EVENT, CHARACTER_HEADER, characterHeaders, characterOf, isCharacterChanged } from '../public/js/character-guard.js?v=510034a7';
 import { createMinnAccountCore } from '../public/js/minn-account-core.js?v=63758d34';
 import { createSaveSync } from '../public/js/save-store.js?v=5b167c14';
 import { CLOSE_OTHER_CHARACTER, createRealtimeClient } from '../public/js/realtime-client.js?v=cda54c6e';
 import { OTHER_CHARACTER_TEXT, statusText } from '../public/js/features/realtime-feature.js?v=411a239d';
-import { CHARACTER_COPY, FRESH_HASH, SAVE_ALERT_COPY, characterChoices, continuesAs, createRefusalText, saveAlertFor } from '../public/js/online-boot.js?v=733c6af0';
-import { SWITCHER_COPY, STYLE as SWITCHER_STYLE, cardUrl, popoverPlace, switcherChoices } from '../public/js/character-switcher.js?v=b048a8bd';
+import { CHARACTER_COPY, FRESH_HASH, SAVE_ALERT_COPY, characterChoices, continuesAs, createRefusalText, saveAlertFor } from '../public/js/online-boot.js?v=8f0af4f1';
+import { SWITCHER_COPY, STYLE as SWITCHER_STYLE, cardUrl, popoverPlace, switcherChoices } from '../public/js/character-switcher.js?v=6f67e3a0';
 import { LOCAL_STATES } from '../public/js/shared-quoins.js?v=89d7b201';
 import { menuRowFor } from '../public/js/ui/topbar.js?v=04d7482c';
 
@@ -143,8 +144,8 @@ describe('the account: characters and the header on every call', () => {
     const name = await account.createCharacter('Ada');
     assert.equal(name.ok, false);
     assert.equal(createRefusalText(name), 'Someone already has that name. Try another.');
-    assert.equal(createRefusalText(await account.createCharacter('Bo')), 'You have 3 characters.');
-    assert.equal(createRefusalText(await account.createCharacter('Cy')), 'You can make another character tomorrow.');
+    assert.equal(createRefusalText(await account.createCharacter('Bo')), 'You can have 3 characters, and a retired one keeps its place for 30 days after you retire it.');
+    assert.equal(createRefusalText(await account.createCharacter('Cy')), 'You can make one new character a day. Try again tomorrow.');
   });
 });
 
@@ -164,7 +165,7 @@ describe('the start card\'s choices (online-boot characterChoices)', () => {
     const c = characterChoices({ current: 77, limit: 3, canCreate: false, nextCreateAt: 1_900_000_000, characters: [ada, bo] }, session(77, 'Bo'));
     assert.deepEqual(c.rows.map((r) => [r.name, r.current]), [['Bo', true], ['Ada', false]]);
     assert.equal(c.create.can, false);
-    assert.equal(c.create.note, 'You can make another character tomorrow.');
+    assert.equal(c.create.note, 'You can make one new character a day. Try again tomorrow.');
   });
 
   it('three characters: no fresh one, said plainly; a retired one waits apart', () => {
@@ -174,7 +175,23 @@ describe('the start card\'s choices (online-boot characterChoices)', () => {
     const r = characterChoices({ current: 54, limit: 3, canCreate: false, characters: [ada, { ...bo, retired: true }, cy] }, session(54, 'Ada'));
     assert.deepEqual(r.rows.map((x) => x.name), ['Ada', 'Cy']);
     assert.deepEqual(r.retired.map((x) => x.name), ['Bo']);
-    assert.equal(r.create.note, 'You have 3 characters.', 'a retired character still counts');
+    assert.equal(r.create.note, 'You can have 3 characters, and a retired one keeps its place for 30 days after you retire it.', 'a retired character still holds its place, said so');
+  });
+
+  it('the site\'s refusal picks the line: a held place, or the one a day (messages audit, Characters)', () => {
+    const held = characterChoices({ current: 54, limit: 3, canCreate: false, nextCreateAt: 1_900_000_000, refusal: 'character_limit', characters: [ada, { ...bo, retired: true }, cy] }, session(54, 'Ada'));
+    assert.equal(held.create.note, 'You can have 3 characters, and a retired one keeps its place for 30 days after you retire it.');
+    // Three rows, one retired long ago (no longer counted), a character made today: the day rule.
+    const daily = characterChoices({ current: 54, limit: 3, canCreate: false, nextCreateAt: 1_900_000_000, refusal: 'character_daily', characters: [ada, { ...bo, retired: true }, cy] }, session(54, 'Ada'));
+    assert.equal(daily.create.note, 'You can make one new character a day. Try again tomorrow.');
+    const older = characterChoices({ current: 54, limit: 3, canCreate: false, nextCreateAt: 1_900_000_000, characters: [ada, { ...bo, retired: true }, cy] }, session(54, 'Ada'));
+    assert.equal(older.create.note, 'You can make one new character a day. Try again tomorrow.', 'an older site: the wait it names');
+  });
+
+  it('the site\'s characters list says why it refuses', { skip: skipWithoutSite }, () => {
+    const site = readFileSync(join(SITE_DIR, 'src', 'CharacterRoutes.php'), 'utf8');
+    assert.match(site, /'refusal' => \$banned \? 'groddle_suspended' : \(\$refusal\['code'\] \?\? null\),/);
+    assert.match(site, /A retired character keeps its place for 30 days\./);
   });
 
   it('no list (an older site, or it failed): the signed-in character alone, no fresh one', () => {
@@ -197,7 +214,7 @@ describe('the start card\'s choices (online-boot characterChoices)', () => {
   it('the retire question says plainly what happens, in the card (never window.confirm)', () => {
     assert.equal(CHARACTER_COPY.retire, 'Retire');
     assert.equal(CHARACTER_COPY.retireLabel('Bo'), 'Retire Bo');
-    assert.equal(CHARACTER_COPY.retireAsk('Bo'), "Retire Bo? They'll be hidden from this list. You can bring them back from Retired characters, and their name stays theirs for 30 days.");
+    assert.equal(CHARACTER_COPY.retireAsk('Bo'), "Retire Bo? They'll be hidden from this list. You can bring them back from Retired characters. For 30 days their name stays theirs and they still count toward your 3 characters.");
     const src = code('public/js/online-boot.js');
     assert.doesNotMatch(src, /\bconfirm\(/);
     const body = src.slice(src.indexOf('function appendRetire('), src.indexOf('function appendCharacters('));

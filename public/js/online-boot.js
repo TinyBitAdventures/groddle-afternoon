@@ -217,13 +217,15 @@ export const CHARACTER_COPY = Object.freeze({
   cancel: 'Cancel',
   making: 'Making your character…',
   switching: (name) => `Switching to ${name}…`,
-  tomorrow: 'You can make another character tomorrow.',
+  tomorrow: 'You can make one new character a day. Try again tomorrow.',
   atLimit: (n) => `You have ${n} characters.`,
+  // site src/Logins.php counted: a retired character keeps its place for its 30 day name hold.
+  heldPlace: (n) => `You can have ${n} characters, and a retired one keeps its place for 30 days after you retire it.`,
   retired: 'Retired characters',
   restore: (name) => `Restore ${name}`,
   retire: 'Retire',
   retireLabel: (name) => `Retire ${name}`,
-  retireAsk: (name) => `Retire ${name}? They'll be hidden from this list. You can bring them back from Retired characters, and their name stays theirs for 30 days.`,
+  retireAsk: (name) => `Retire ${name}? They'll be hidden from this list. You can bring them back from Retired characters. For 30 days their name stays theirs and they still count toward your ${CHARACTER_LIMIT} characters.`,
   retiring: (name) => `Retiring ${name}…`,
   failed: "That didn't work. Try again in a moment.",
 });
@@ -263,7 +265,15 @@ export function characterChoices(list, session) {
   const live = all.filter((c) => c.retired !== true).map(row);
   const limit = Number.isInteger(list.limit) && list.limit > 0 ? list.limit : CHARACTER_LIMIT;
   const can = list.canCreate === true;
-  const note = can ? '' : all.length >= limit ? CHARACTER_COPY.atLimit(limit) : CHARACTER_COPY.tomorrow;
+  // The site's own reason (refusal) when it gives one; an older site: live characters at the
+  // limit, then the one-a-day wait (nextCreateAt), then a retired character still holding its place.
+  const reason = typeof list.refusal === 'string' ? list.refusal
+    : live.length >= limit ? 'character_limit'
+      : list.nextCreateAt ? 'character_daily' : 'character_limit';
+  const note = can ? ''
+    : reason === 'character_daily' ? CHARACTER_COPY.tomorrow
+      : reason === 'character_limit' ? (live.length >= limit ? CHARACTER_COPY.atLimit(limit) : CHARACTER_COPY.heldPlace(limit))
+        : reason === 'groddle_suspended' ? 'This account is suspended.' : CHARACTER_COPY.failed;
   return {
     rows: [...live.filter((r) => r.current), ...live.filter((r) => !r.current)],
     retired: all.filter((c) => c.retired === true).map(row),
@@ -274,7 +284,7 @@ export function characterChoices(list, session) {
 /** The words for a refused new character (account.createCharacter): the name's own words, the limit, or one a day. */
 export function createRefusalText(r, limit = CHARACTER_LIMIT) {
   if (r?.status === 422 || r?.fields?.name) return String(r?.fields?.name || r?.message || CHARACTER_COPY.failed);
-  if (r?.status === 409) return CHARACTER_COPY.atLimit(limit);
+  if (r?.status === 409) return CHARACTER_COPY.heldPlace(limit);
   if (r?.status === 429) return CHARACTER_COPY.tomorrow;
   return String(r?.message || CHARACTER_COPY.failed);
 }

@@ -29,7 +29,7 @@ import { fileURLToPath } from 'node:url';
 import { SITE_DIR, sitePath, skipWithoutSite } from '../tools/repos.mjs';
 import { DELETE_CONFIRM_FOCUS, DELETE_TEXT, deletableChannel, deleteConfirmRows, lineLidOf, mayDelete } from '../public/js/chat-delete.js?v=c55a1043';
 import { createMinnAccount } from '../public/js/minn-account.js?v=c15f0ecf';
-import { bootDataFrom } from '../public/js/online-boot.js?v=733c6af0';
+import { bootDataFrom } from '../public/js/online-boot.js?v=8f0af4f1';
 import { mountSocialDrawer } from '../public/js/ui/social-drawer.js?v=9e7d9382';
 import { createNotifier } from '../public/js/notify.js?v=1fb97b21';
 import { FakeEl, memoryStore, page } from './social-fake-dom.js';

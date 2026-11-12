@@ -19,7 +19,7 @@
  * The popover lives on the body (fixed, placed from the cloud's box) so the pack row's band, its
  * hidden tutorial state and Classic's restyled band never clip or hide it.
  */
-import { CHARACTER_COPY, FRESH_HASH, characterChoices } from './online-boot.js?v=733c6af0';
+import { CHARACTER_COPY, FRESH_HASH, characterChoices } from './online-boot.js?v=8f0af4f1';
 
 /** The switcher's words (plain remake copy, no em-dashes). */
 export const SWITCHER_COPY = Object.freeze({

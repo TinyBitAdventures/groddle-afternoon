@@ -19,7 +19,7 @@ import assert from 'node:assert/strict';
 import { resolveTokens } from './css-tokens.js';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { accountBackupFeature } from '../public/js/features/account-backup-feature.js?v=89405a3e';
+import { accountBackupFeature } from '../public/js/features/account-backup-feature.js?v=29998316';
 import { homeStreetMpFeature } from '../public/js/features/home-street-mp-feature.js?v=cdf253eb';
 import { yardVerbsMpFeature } from '../public/js/features/yard-verbs-mp-feature.js?v=240eafeb';
 import { homePoolMpFeature } from '../public/js/features/home-pool-mp-feature.js?v=575920f2';

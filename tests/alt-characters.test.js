@@ -81,7 +81,7 @@ describe('alternate characters on a throwaway database', { skip: skipDb }, () =>
   it('GET characters: the caller\'s login only, with the contract\'s keys', () => {
     assert.equal(r.list.status, 200);
     const b = r.list.body;
-    assert.deepEqual(Object.keys(b), ['login', 'current', 'limit', 'canCreate', 'nextCreateAt', 'characters']);
+    assert.deepEqual(Object.keys(b), ['login', 'current', 'limit', 'canCreate', 'nextCreateAt', 'refusal', 'characters']);
     assert.equal(b.login, 10);
     assert.equal(b.current, 11);
     assert.equal(b.limit, 3);
