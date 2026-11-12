@@ -2752,9 +2752,29 @@
   "deployed": "2026-11-12"
  },
  "git": {
-  "commits": 1789,
+  "commits": 1794,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-12",
+    "kind": "fix",
+    "text": "A phone held upright sends the same landscape home street to the profile as a computer"
+   },
+   {
+    "date": "2026-11-12",
+    "kind": "fix",
+    "text": "The Giants' shrine pages stay in the Encyclopedia"
+   },
+   {
+    "date": "2026-11-12",
+    "kind": "new",
+    "text": "The public Known gaps page's data, builder and Minn page"
+   },
+   {
+    "date": "2026-11-12",
+    "kind": "new",
+    "text": "The award card's quest book is a sharp redraw of Tiny Speck's"
+   },
    {
     "date": "2026-11-12",
     "kind": "new",
@@ -2854,26 +2874,6 @@
     "date": "2026-11-12",
     "kind": "fix",
     "text": "Far street layers fit every sharp copy in their budget on desktop"
-   },
-   {
-    "date": "2026-11-12",
-    "kind": "fix",
-    "text": "Winter Walk and Winter Haven floors draw their spots round and crisp"
-   },
-   {
-    "date": "2026-11-12",
-    "kind": "fix",
-    "text": "Fireflies fly at 3x on Retina screens"
-   },
-   {
-    "date": "2026-11-12",
-    "kind": "fix",
-    "text": "Home-street houses, Firebog's ground fronts and Grimssea's bark knot draw crisp on Retina screens"
-   },
-   {
-    "date": "2026-11-12",
-    "kind": "fix",
-    "text": "Quest rooms draw their decos from the sharp copies on Retina screens"
    }
   ]
  },
