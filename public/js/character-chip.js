@@ -17,7 +17,7 @@
  * is drawn. Placement lives in one block of STYLE ("Placement") so the phone HUD can move it.
  * Closed it sits under panels; open, over the pack (pack-bar is --z-panel + 10).
  */
-import { CHARACTER_COPY, FRESH_HASH, characterChoices } from './online-boot.js?v=665579bb';
+import { CHARACTER_COPY, FRESH_HASH, characterChoices } from './online-boot.js?v=52b9027b';
 
 /** The chip's words (plain remake copy, no em-dashes). */
 export const CHIP_COPY = Object.freeze({

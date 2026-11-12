@@ -17,8 +17,8 @@ import { existsSync, readFileSync, statSync } from 'node:fs';
 import { dirname, join, relative, resolve } from 'node:path';
 import vm from 'node:vm';
 import { sitePath, skipWithoutSite } from '../tools/repos.mjs';
-import { createMinnAccount } from '../public/js/minn-account.js?v=460de12b';
-import { REPORT_PICTURE } from '../public/js/reports.js?v=cf6f169c';
+import { createMinnAccount } from '../public/js/minn-account.js?v=c15f0ecf';
+import { REPORT_PICTURE } from '../public/js/reports.js?v=342441b9';
 import {
   DEVICE_KEY,
   PHONE_TEXT,
@@ -35,7 +35,7 @@ import {
   snippetOf,
   unreadLetters,
   whereWords,
-} from '../public/js/phone/companion-data.js?v=17e2014c';
+} from '../public/js/phone/companion-data.js?v=f920e291';
 
 const pub = join(import.meta.dirname, '..', 'public');
 const read = (p) => readFileSync(join(pub, p), 'utf8');
@@ -173,7 +173,7 @@ describe('play/phone/ (the companion page)', () => {
   it('loads the account\'s core only, and every call its pages make is in the core', async () => {
     assert.ok(graph.includes('js/minn-account-core.js'), graph.join(' '));
     assert.ok(!graph.includes('js/minn-account.js'), 'the game-only calls stay out of the phone');
-    const { createMinnAccountCore } = await import('../public/js/minn-account-core.js?v=74c75177');
+    const { createMinnAccountCore } = await import('../public/js/minn-account-core.js?v=63758d34');
     const core = createMinnAccountCore({ baseUri: 'https://groddle.localhost/', fetch: async () => ({}) });
     const used = new Set();
     for (const f of ['js/phone/companion.js', 'js/account-forms.js', 'js/online-boot.js', 'js/phone/companion-data.js']) {

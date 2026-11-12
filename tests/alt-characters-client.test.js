@@ -14,12 +14,12 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 import { CHARACTER_CHANGED, CHARACTER_CHANGED_EVENT, CHARACTER_HEADER, characterHeaders, characterOf, isCharacterChanged } from '../public/js/character-guard.js?v=510034a7';
-import { createMinnAccountCore } from '../public/js/minn-account-core.js?v=74c75177';
+import { createMinnAccountCore } from '../public/js/minn-account-core.js?v=63758d34';
 import { createSaveSync } from '../public/js/save-store.js?v=89422a9c';
 import { CLOSE_OTHER_CHARACTER, createRealtimeClient } from '../public/js/realtime-client.js?v=cda54c6e';
-import { OTHER_CHARACTER_TEXT, statusText } from '../public/js/features/realtime-feature.js?v=562a84fb';
-import { CHARACTER_COPY, FRESH_HASH, SAVE_ALERT_COPY, characterChoices, continuesAs, createRefusalText, saveAlertFor } from '../public/js/online-boot.js?v=665579bb';
-import { CHIP_COPY, STYLE as CHIP_STYLE, cardUrl, chipChoices } from '../public/js/character-chip.js?v=12b8f02c';
+import { OTHER_CHARACTER_TEXT, statusText } from '../public/js/features/realtime-feature.js?v=4fe86726';
+import { CHARACTER_COPY, FRESH_HASH, SAVE_ALERT_COPY, characterChoices, continuesAs, createRefusalText, saveAlertFor } from '../public/js/online-boot.js?v=52b9027b';
+import { CHIP_COPY, STYLE as CHIP_STYLE, cardUrl, chipChoices } from '../public/js/character-chip.js?v=8f0af78b';
 import { LOCAL_STATES } from '../public/js/shared-quoins.js?v=89d7b201';
 import { menuRowFor } from '../public/js/ui/topbar.js?v=e00f6c81';
 

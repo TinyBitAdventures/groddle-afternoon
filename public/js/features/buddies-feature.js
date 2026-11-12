@@ -53,7 +53,7 @@
  * buddiesLast (the last notice); window.groddleBuddies.
  */
 
-import { createMinnAccount } from '../minn-account.js?v=460de12b';
+import { createMinnAccount } from '../minn-account.js?v=c15f0ecf';
 import { bindContextTrigger } from '../ui/context-menu.js?v=79326483';
 import { STREET_INDEX } from '../street-loader.js?v=18b181ad';
 import { BUDDY_DESTINATION_TEXT, BUDDY_DESTINATION_VERB, buddyDestination, buddyFaceUrl } from '../buddy-list.js?v=b418f3f2';

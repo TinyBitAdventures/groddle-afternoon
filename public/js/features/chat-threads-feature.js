@@ -26,7 +26,7 @@ import { THREAD_TEXT, replyFrame, siteKey, threadTarget } from '../chat-threads.
 import { chatLine, shownName } from '../groups.js?v=c9635d96';
 import { drawerLine, normalLine } from '../player-im.js?v=da51888c';
 import { imKey, lineKey, normalReactions } from '../chat-reactions.js?v=38460172';
-import { createMinnAccount } from '../minn-account.js?v=460de12b';
+import { createMinnAccount } from '../minn-account.js?v=c15f0ecf';
 
 export const CHAT_THREADS_FEATURE_ID = 'chat-threads';
 

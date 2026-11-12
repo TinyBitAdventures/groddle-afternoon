@@ -100,6 +100,9 @@ export function accountParts({ baseUri, fetch: fetchFn = globalThis.fetch?.bind(
       if (r.status === 403 && r.data?.code === 'rest_cookie_invalid_nonce') {
         if (!(await refreshNonce())) nonce = '';
         r = await call(path, { method, body });
+      } else if (r.status === 401 && r.data?.code === 'rest_not_logged_in' && !nonce && (await refreshNonce())) {
+        // Made before this helper had a nonce (the Menu and the character chip): the site saw no sign-in.
+        r = await call(path, { method, body });
       }
     } catch {
       return { status: 0, ok: false, data: { code: 'offline', message: 'The Groddle site is not answering. Try again in a moment.' } };
@@ -134,6 +137,8 @@ export function accountParts({ baseUri, fetch: fetchFn = globalThis.fetch?.bind(
         throw Object.assign(new Error('The Groddle site is not answering'), { status: 0, code: 'offline', message: 'The Groddle site is not answering. Try again in a moment.' });
       }
       if (r.status === 403 && r.data?.code === 'rest_cookie_invalid_nonce' && attempt === 0 && (await refreshNonce())) continue;
+      // A call made before this helper had a nonce goes out signed out (401 rest_not_logged_in): fetch one and try once more.
+      if (r.status === 401 && r.data?.code === 'rest_not_logged_in' && attempt === 0 && (await refreshNonce())) continue;
       break;
     }
     if (!r.ok) {

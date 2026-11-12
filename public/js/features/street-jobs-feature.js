@@ -131,7 +131,7 @@ import {
   topLine,
 } from '../street-jobs-mp.js?v=25efcadf';
 import { grantMoodXp } from '../mood-xp.js?v=958e7680';
-import { createMinnAccount } from '../minn-account.js?v=460de12b';
+import { createMinnAccount } from '../minn-account.js?v=c15f0ecf';
 import { normalizeGroups } from '../groups.js?v=c9635d96';
 import { frameTexture, sourceFromUrl, textureFromUrl } from '../textures.js?v=f024bd6a';
 import { createJobIndicator, jobIndicatorTip, jobIndicatorView, jobPerc } from '../job-indicator.js?v=05498227';

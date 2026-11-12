@@ -23,9 +23,9 @@ import { after, before, describe, it } from 'node:test';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-import { neighboursMpFeature } from '../public/js/features/neighbours-mp-feature.js?v=dd3885dc';
+import { neighboursMpFeature } from '../public/js/features/neighbours-mp-feature.js?v=166803e7';
 import { createErrorOnce, createFeatureHost, reportPageError } from '../public/js/feature-host.js?v=06bb8b74';
-import { pageErrorLine, rememberError } from '../public/js/features/bug-report-feature.js?v=a70386ef';
+import { pageErrorLine, rememberError } from '../public/js/features/bug-report-feature.js?v=5f2124b7';
 import { Display, FakeEl, fakePixi } from './fake-scene.js';
 
 const root = join(import.meta.dirname, '..');

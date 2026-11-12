@@ -4,7 +4,7 @@
  * and start from it, so the phone (tests/phone-companion.test.js, 240 KB) never loads them.
  * createMinnAccount() answers one object with both.
  */
-import { accountParts, minnUrls } from './minn-account-core.js?v=74c75177';
+import { accountParts, minnUrls } from './minn-account-core.js?v=63758d34';
 
 export { minnUrls };
 
