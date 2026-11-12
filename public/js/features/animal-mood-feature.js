@@ -109,9 +109,9 @@ import { HOG_HAUL_STREET_ID } from '../hog-haul.js?v=50d2e072';
 import { TRANT_META, trantStatusLabel } from '../trants.js?v=1b3c8ae3';
 import { animalStatusLabel } from '../animals.js?v=c944b0a6';
 import { quoteAnimalKinship } from '../animal-kinship.js?v=f91347e9';
-import { captureVerbState, isFoodItem, itemLabel } from '../animal-husbandry.js?v=aa65a582';
+import { captureVerbState, isFoodItem, itemLabel } from '../animal-husbandry.js?v=0c6dec4a';
 import { ROOK_SHEETS, rookAttackFeature } from './rook-attack-feature.js?v=c41be919';
-import { ANIMAL_BODY, ANIMAL_PATROL, TREE_FOOTPRINT } from '../street-ecology.js?v=26dabe26';
+import { ANIMAL_BODY, ANIMAL_PATROL, TREE_FOOTPRINT } from '../street-ecology.js?v=f27417a8';
 import {
   CHECK_ON_REMOVE,
   CROWD_CLASSES,

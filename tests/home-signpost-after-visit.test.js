@@ -17,9 +17,9 @@
 import assert from 'node:assert/strict';
 import { after, before, describe, it } from 'node:test';
 
-import { homeStreetMpFeature } from '../public/js/features/home-street-mp-feature.js?v=d002ce40';
-import { homesFeature } from '../public/js/features/homes-feature.js?v=9adb87fc';
-import { visitSceneTsid } from '../public/js/neighbours-mp.js?v=7dc15891';
+import { homeStreetMpFeature } from '../public/js/features/home-street-mp-feature.js?v=3ec33570';
+import { homesFeature } from '../public/js/features/homes-feature.js?v=5f953f63';
+import { visitSceneTsid } from '../public/js/neighbours-mp.js?v=b850715d';
 import { Display, FakeEl, fakePixi } from './fake-scene.js';
 
 const ME = { id: 1, name: 'Bo' };

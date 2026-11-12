@@ -10,11 +10,11 @@ import { execFileSync, spawnSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import { describe, it } from 'node:test';
 
-import { SEED_CATALOG, createGarden, harvestPlot, plantPlot, tickGarden, waterAllPlots, waterPlot } from '../public/js/garden.js?v=489cda8f';
-import { GARDEN_LOCK_MS, LOCK_LINE, SHARED_GARDEN_STREETS, applyPlot, isSharedGardenStreet, localPlot, lockedFor, parsePlotId, plotId, rollPasses } from '../public/js/shared-gardens.js?v=443ea35a';
-import { sharedGardensFeature } from '../public/js/features/shared-gardens-feature.js?v=bab455c1';
-import { FEATURES } from '../public/js/features/index.js?v=929c82e9';
-import { mgDetails, potionPlotCount } from '../public/js/master-garden.js?v=7cb423d9';
+import { SEED_CATALOG, createGarden, harvestPlot, plantPlot, tickGarden, waterAllPlots, waterPlot } from '../public/js/garden.js?v=37209241';
+import { GARDEN_LOCK_MS, LOCK_LINE, SHARED_GARDEN_STREETS, applyPlot, isSharedGardenStreet, localPlot, lockedFor, parsePlotId, plotId, rollPasses } from '../public/js/shared-gardens.js?v=c1f90bc0';
+import { sharedGardensFeature } from '../public/js/features/shared-gardens-feature.js?v=5b0ce5cf';
+import { FEATURES } from '../public/js/features/index.js?v=a4eddbfc';
+import { mgDetails, potionPlotCount } from '../public/js/master-garden.js?v=2cd0c59d';
 // A fresh pick's save waits for the server's receipt (GRANT_SAVE_DELAY_MS): the tests wait it out.
 const settle = () => new Promise((res) => setTimeout(res, 2700));
 import { HAS_SITE, SITE_DIR, serverPath, sitePath, skipWithoutServer } from '../tools/repos.mjs';

@@ -2752,9 +2752,29 @@
   "deployed": "2026-11-12"
  },
  "git": {
-  "commits": 1782,
+  "commits": 1786,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-12",
+    "kind": "fix",
+    "text": "Jellisacs sit in the rock holes, Peat Bogs lie flat, and every Herb Gardens planter box grows herbs"
+   },
+   {
+    "date": "2026-11-12",
+    "kind": "fix",
+    "text": "A summons or invite prompt answers over an open quest card, and prompts with no speaker drop the Magic Rock heading"
+   },
+   {
+    "date": "2026-11-12",
+    "kind": "new",
+    "text": "Teleportation V summons a friend to where you stand, a Party Space too"
+   },
+   {
+    "date": "2026-11-12",
+    "kind": "improve",
+    "text": "The phone page opens with a Load the full game anyway button"
+   },
    {
     "date": "2026-11-12",
     "kind": "improve",
@@ -2854,29 +2874,9 @@
     "date": "2026-11-12",
     "kind": "fix",
     "text": "Homes, the meditation orb and quest-room animations see the real render density"
-   },
-   {
-    "date": "2026-11-12",
-    "kind": "improve",
-    "text": "A phone has no street map and shows no key letters; the Map's head, a vendor's head and the shrine's Learn Faster? fit"
-   },
-   {
-    "date": "2026-11-12",
-    "kind": "new",
-    "text": "A phone's top bar shows Quests, Report and the Menu; the rest opens from the Menu"
-   },
-   {
-    "date": "2026-11-12",
-    "kind": "fix",
-    "text": "A phone held sideways shows the whole street name under the pills, not \"H...\""
-   },
-   {
-    "date": "2026-11-12",
-    "kind": "fix",
-    "text": "On a phone the pack row, the stick and Jump step away while the on-screen keyboard is up"
    }
   ]
  },
- "tests": 892,
+ "tests": 893,
  "generatedAt": "2026-11-12"
 }
