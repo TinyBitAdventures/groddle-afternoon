@@ -2748,13 +2748,18 @@
   ]
  },
  "release": {
-  "game": "0.33.2",
-  "deployed": "2026-11-11"
+  "game": "0.34.0",
+  "deployed": "2026-11-12"
  },
  "git": {
-  "commits": 1701,
+  "commits": 1702,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-12",
+    "kind": "fix",
+    "text": "The level builder's deco catalog and style profiles follow Winter Haven's floor"
+   },
    {
     "date": "2026-11-12",
     "kind": "fix",
@@ -2869,11 +2874,6 @@
     "date": "2026-11-11",
     "kind": "fix",
     "text": "Mortar Barnacles sit on the walls where Glitch had them"
-   },
-   {
-    "date": "2026-11-11",
-    "kind": "fix",
-    "text": "Classic no longer resizes the game on hover, and the iMG count fits"
    }
   ]
  },
