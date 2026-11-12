@@ -8,7 +8,7 @@
  * this tool is the agent's side, in three steps, and never writes to a site
  * without being told to:
  *
- *   read   GETs the site's tickets (admin/tickets, then each closed or answered
+ *   read   GETs the site's tickets (admin/tickets, every page: readAllTickets; then each closed or answered
  *          thread) and its scores (admin/credits, when the site has them) and
  *          writes <out>/tickets.json and a draft <out>/proposals.json: every
  *          closed or answered report nobody has scored yet, with the commits in
@@ -203,11 +203,51 @@ async function client(args) {
   return { site, rest: (m, r, b) => minn.rest(m, r, b).catch((e) => { throw Object.assign(e, { status: Number(/: (\d{3}) /.exec(e.message)?.[1]) || 0 }); }) };
 }
 
+/**
+ * Every ticket in admin/tickets, a page at a time (site 3c79b40: the list holds TicketStore::LIST_MAX,
+ * 200, from `offset`, with `more` while a later page holds some and `total`). Pages until more is false,
+ * so no report past the first 200 is missed. A site from before paging ignores offset and sends no
+ * total: then the first page is all there is to read, with a warning. A ticket on two pages (the list
+ * moved between reads) is kept once. `rest(method, route)` as client()'s.
+ * @returns {Promise<{ tickets: object[], total: number|null, pages: number, paged: boolean }>}
+ */
+export async function readAllTickets(rest, { warn = (m) => console.warn(m), maxPages = 500 } = {}) {
+  const tickets = [];
+  const seen = new Set();
+  let total = null;
+  let pages = 0;
+  for (let offset = 0; pages < maxPages;) {
+    const page = await rest('GET', `/groddle/v1/admin/tickets?status=all${offset ? `&offset=${offset}` : ''}`);
+    pages += 1;
+    const rows = Array.isArray(page?.tickets) ? page.tickets : [];
+    let added = 0;
+    for (const t of rows) {
+      if (seen.has(t?.id)) continue;
+      seen.add(t?.id);
+      tickets.push(t);
+      added += 1;
+    }
+    if (Number.isFinite(page?.total)) total = page.total;
+    if (!page?.more) return { tickets, total, pages, paged: total !== null };
+    if (total === null) {
+      warn('the site has more tickets than one list holds and does not page admin/tickets (no total, no offset): only the first page was read');
+      return { tickets, total, pages, paged: false };
+    }
+    if (!rows.length || !added) {
+      warn(`admin/tickets sent no new tickets at offset ${offset}: stopped with ${tickets.length} of ${total}`);
+      return { tickets, total, pages, paged: true };
+    }
+    offset += rows.length;
+  }
+  warn(`stopped after ${maxPages} pages of admin/tickets`);
+  return { tickets, total, pages, paged: total !== null };
+}
+
 async function read(args) {
   const out = resolve(args.out || '.');
   const api = await client(args);
-  const list = await api.rest('GET', '/groddle/v1/admin/tickets?status=all');
-  if (list.more) console.warn('the site has more tickets than one list holds; only the first page was read');
+  const list = await readAllTickets((m, r, b) => api.rest(m, r, b));
+  if (list.total !== null && list.tickets.length < list.total) console.warn(`read ${list.tickets.length} of the site's ${list.total} tickets`);
   let scored = new Set();
   try {
     scored = new Set(((await api.rest('GET', '/groddle/v1/admin/credits')).credits || []).map((c) => c.ticket));

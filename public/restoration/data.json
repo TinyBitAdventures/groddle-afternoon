@@ -2752,9 +2752,29 @@
   "deployed": "2026-11-12"
  },
  "git": {
-  "commits": 1706,
+  "commits": 1712,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-12",
+    "kind": "fix",
+    "text": "Report credits read every page of the site's tickets, not only the first 200"
+   },
+   {
+    "date": "2026-11-12",
+    "kind": "improve",
+    "text": "A click runs the one-click verb of Glitch's one-click items, as Glitch did (G661)"
+   },
+   {
+    "date": "2026-11-12",
+    "kind": "improve",
+    "text": "Activity has a search box: a magnifying glass that filters its lines, Esc clears it (#223)"
+   },
+   {
+    "date": "2026-11-12",
+    "kind": "improve",
+    "text": "Reports marks a report an administrator replied to, even after it closes (#225)"
+   },
    {
     "date": "2026-11-12",
     "kind": "new",
@@ -2854,29 +2874,9 @@
     "date": "2026-11-12",
     "kind": "improve",
     "text": "Grimssea Hollow's shelves, ladders and door re-measured from Cleops's 2012 snap"
-   },
-   {
-    "date": "2026-11-12",
-    "kind": "new",
-    "text": "\"Support the game\" in the Menu and on the start card"
-   },
-   {
-    "date": "2026-11-12",
-    "kind": "fix",
-    "text": "The Home Street Selection Machine shows its choices as rows, not clipped circles"
-   },
-   {
-    "date": "2026-11-12",
-    "kind": "fix",
-    "text": "Peat can't be dug twice, Winter Walk motes collect on foot, the crystal takes a full jar, and M closes the Map"
-   },
-   {
-    "date": "2026-11-12",
-    "kind": "fix",
-    "text": "No more stuck players: the second tutorial bag, the smuggler's hole and the Ancestral Lands kick"
    }
   ]
  },
- "tests": 846,
+ "tests": 850,
  "generatedAt": "2026-11-12"
 }

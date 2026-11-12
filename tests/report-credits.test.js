@@ -17,7 +17,7 @@ import { homedir, tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { HAS_SITE, SITE_DIR, sitePath, skipWithoutSite } from '../tools/repos.mjs';
-import { CAP, EXCLUDED, KINDS, citedTickets, cookieHeader, isLocal, pointsFor, proposalProblems, proposalsMarkdown, rank, totalsFrom } from '../tools/reports/credits.mjs';
+import { CAP, EXCLUDED, KINDS, citedTickets, cookieHeader, isLocal, pointsFor, proposalProblems, proposalsMarkdown, rank, readAllTickets, totalsFrom } from '../tools/reports/credits.mjs';
 import { BANDS, THANKS_LEAD, contributeContent, thanksBand, withCredits } from '../tools/contribute/to-minn.mjs';
 
 const root = join(import.meta.dirname, '..');
@@ -331,5 +331,71 @@ describe('the site keeps a score per report (groddle-afternoon-site)', { skip: s
     assert.equal(mod.creditWords({ points: 1, kind: 'partial_or_clue', by: 'admin' }), '1 point, Partial fix or clue');
     assert.equal(mod.logWords({ kind: 'credit', player: { name: 'Ada' }, detail: { subject: 'Pigs', points: 0, kind: 'none', by: 'admin' }, delivery: 'stored' }), 'scored Ada\'s report “Pigs”: 0 points, No change');
     for (const w of Object.values(mod.CREDIT_WORDS)) assert.doesNotMatch(w, /—/);
+  });
+});
+
+// Site 3c79b40: admin/tickets pages by 200 from offset and says total; credits reads every page.
+describe('credits read: every page of admin/tickets (readAllTickets)', () => {
+  const site = (n, { paging = true, per = 200 } = {}) => {
+    const all = Array.from({ length: n }, (_, i) => ({ id: n - i, status: 'closed' }));
+    const calls = [];
+    const rest = async (method, route) => {
+      calls.push(route);
+      const offset = paging ? Number(/[?&]offset=(\d+)/.exec(route)?.[1] || 0) : 0;
+      const rows = all.slice(offset, offset + per);
+      return paging ? { tickets: rows, more: offset + per < n, total: n } : { tickets: rows, more: per < n };
+    };
+    return { rest, calls };
+  };
+
+  it('pages with offset until more is false, so reports past the first 200 count', async () => {
+    const { rest, calls } = site(418);
+    const warned = [];
+    const r = await readAllTickets(rest, { warn: (m) => warned.push(m) });
+    assert.equal(r.tickets.length, 418);
+    assert.equal(r.total, 418);
+    assert.equal(r.pages, 3);
+    assert.deepEqual(calls, ['/groddle/v1/admin/tickets?status=all', '/groddle/v1/admin/tickets?status=all&offset=200', '/groddle/v1/admin/tickets?status=all&offset=400']);
+    assert.equal(new Set(r.tickets.map((t) => t.id)).size, 418);
+    assert.deepEqual(warned, []);
+  });
+
+  it('one page when it all fits', async () => {
+    const { rest, calls } = site(12);
+    const r = await readAllTickets(rest, { warn: () => assert.fail('no warning') });
+    assert.equal(r.tickets.length, 12);
+    assert.equal(calls.length, 1);
+  });
+
+  it('a site without paging (no total): the first page, with a warning, and no loop', async () => {
+    const { rest, calls } = site(230, { paging: false });
+    const warned = [];
+    const r = await readAllTickets(rest, { warn: (m) => warned.push(m) });
+    assert.equal(r.tickets.length, 200);
+    assert.equal(r.paged, false);
+    assert.equal(calls.length, 1);
+    assert.match(warned[0], /does not page admin\/tickets/);
+  });
+
+  it('a ticket on two pages (the list moved) is kept once; a page with nothing new stops it', async () => {
+    let n = 0;
+    const rest = async (m, route) => {
+      n += 1;
+      if (n === 1) return { tickets: [{ id: 3 }, { id: 2 }], more: true, total: 3 };
+      if (n === 2) return { tickets: [{ id: 2 }, { id: 1 }], more: true, total: 3 };
+      return { tickets: [{ id: 1 }], more: true, total: 3 };
+    };
+    const warned = [];
+    const r = await readAllTickets(rest, { warn: (m) => warned.push(m) });
+    assert.deepEqual(r.tickets.map((t) => t.id), [3, 2, 1]);
+    assert.equal(n, 3);
+    assert.match(warned[0], /no new tickets at offset 4/);
+  });
+
+  it('read() uses it', () => {
+    const src = readFileSync(join(root, 'tools/reports/credits.mjs'), 'utf8');
+    const body = src.slice(src.indexOf('async function read(args)'), src.indexOf('function load('));
+    assert.match(body, /const list = await readAllTickets\(/);
+    assert.doesNotMatch(body, /\?status=all'\)/);
   });
 });
