@@ -60,6 +60,19 @@ function reducedMotion() {
 /** Screens and the start card own the screen: notices wait under them (not zones). */
 const SCREEN_DIALOG_IDS = ['award-screen', 'new-day-screen', 'giant-screen-panel', 'overlay'];
 
+/** The narrowest stack worth showing (px): under it the notices wait instead of standing in a sliver. */
+export const NOTICE_MIN_W = 240;
+
+/**
+ * PURE: whether the width a side sheet and the drawer (or its rail) leave is too narrow for the
+ * notices (Austin's iPhone, 2026-11-12: beside the Skills sheet a notice stood one letter wide down
+ * the right edge). Then they wait, their clocks stopped, until the sheet closes; a wide window
+ * never meets it.
+ */
+export function noRoomBeside(rootW, room, minW = NOTICE_MIN_W) {
+  return Number(room) > 0 && Number(rootW) - 24 - Number(room) < minW;
+}
+
 /**
  * PURE: whether a [role=dialog] is a zone the notices keep off and the interaction menus step
  * aside from (a feature's conversation card). Not the Activity log, the menus themselves, the
@@ -405,6 +418,12 @@ export function mountNotifyView(notifier, { root, setData = () => {}, logButtonH
     const w = stack.offsetWidth;
     if (!h) {
       place = { dy: 0, wait: false };
+      shownBox = null;
+      return;
+    }
+    // A phone's side sheet leaves a sliver: the notices wait instead of standing one letter wide in it.
+    if (noRoomBeside(zones.rootW, room)) {
+      place = { dy: 0, wait: true };
       shownBox = null;
       return;
     }

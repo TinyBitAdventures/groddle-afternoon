@@ -122,6 +122,12 @@ export function mountPanelShell({ root, sheets, setData = () => {}, onChange = (
   return {
     /** The open side sheet's id, or "". */
     open: () => openSide,
+    /** Closes the open side sheet (its own closer), if one is open; open() says "" at once after. */
+    closeOpen() {
+      const s = byId.get(openSide);
+      if (s && shown(s.id)) s.close?.();
+      sync();
+    },
     /** The width the open side sheet takes on the left, with its gap (0 when none is open, and in a
      *  skin that pins --inset-l, as Classic does: its panels sit in the world cell). */
     insetLeft: () => {

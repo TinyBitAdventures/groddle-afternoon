@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=4f923e2b';
 import { createErrorOnce, createFeatureHost } from './js/feature-host.js?v=06bb8b74';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=62b383f2';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=3715829f';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl, drawTileArt } from './js/enter-chooser.js?v=4a3ea327';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -997,10 +997,10 @@ import { denseSprite } from './js/sprite-dense.js?v=2a0ce07a';
 import { wholeStatAmounts, wholeEffects } from './js/stat-text.js?v=f96d8fd3';
 import { createNotifier, effectTokens, floatKey, offerCardDrop, stackFloat, tokenText } from './js/notify.js?v=1fb97b21';
 import { bubbleMs } from './js/read-time.js?v=be140198';
-import { mountNotifyView } from './js/notify-view.js?v=6f04e967';
-import { mountSocialDrawer } from './js/ui/social-drawer.js?v=2937929e';
+import { mountNotifyView } from './js/notify-view.js?v=f40de936';
+import { mountSocialDrawer } from './js/ui/social-drawer.js?v=0d237e7e';
 import { bindChatLinks } from './js/chat-links.js?v=b717fac7';
-import { SIDE_SHEET_IDS, bindTabs, inSideSheet, mountPanelShell, sheetKeyToWorld } from './js/ui/panel-shell.js?v=e2abdf9e';
+import { SIDE_SHEET_IDS, bindTabs, inSideSheet, mountPanelShell, sheetKeyToWorld } from './js/ui/panel-shell.js?v=06a0d3fe';
 import { createQuestSheet, failedQuestPin, questLogNeedsSwap, questStep } from './js/ui/quest-sheet.js?v=ccaa43a8';
 import { createQuestTracker } from './js/ui/quest-tracker.js?v=445303df';
 import { bindContextTrigger, createContextMenu, isContextMenuKey as isMenuKey, MORE_KEYS_LABEL } from './js/ui/context-menu.js?v=79326483';
@@ -2891,6 +2891,22 @@ function toast(msg, ms = 3000) {
   notify.notice(wholeStatAmounts(msg), { ms });
 }
 
+/**
+ * On a phone a side sheet and the Social drawer never share the screen (Austin's iPhone, 2026-11-12:
+ * the drawer opened over Skills and peeked out beside the sheet): the one opened last stays. The
+ * drawer closes without changing the player's stored choice.
+ */
+let sheetDrawerSeen = { sheet: '', drawer: false };
+function oneSheetOrDrawer() {
+  const sheet = panelShell?.open() || '';
+  const drawer = Boolean(socialDrawer?.isOpen());
+  const was = sheetDrawerSeen;
+  sheetDrawerSeen = { sheet, drawer };
+  if (!sheet || !drawer || !TOUCH_PHONE || document.documentElement.dataset.ui === 'classic') return;
+  if (!was.drawer) panelShell.closeOpen();
+  else socialDrawer.present(false);
+}
+
 /** Once a frame: the notices' clocks, their zones and why they wait (a screen owns the screen). */
 function tickNotices() {
   const modal = Boolean(openGlitchModal());
@@ -2900,6 +2916,7 @@ function tickNotices() {
   notifyView?.frame(performance.now(), { hold, dropBefore: notifyModalSince });
   keepOfferCardClear();
   socialDrawer?.frame();
+  oneSheetOrDrawer();
   followDrawerInset();
 }
 
