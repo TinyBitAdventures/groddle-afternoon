@@ -1,0 +1,34 @@
+{
+  "note": "Player names the coverage register mentions (its live reports, snaps, recordings and forum leads), as the first 16 hex of the sha256 of each word, so this public file never spells them. any: the lower-case word, matched whatever its case; exact: the word as written (names that are also ordinary words). tests/gaps-page.test.js and tools/gaps/build-data.mjs refuse any of them on the Known gaps page. To add one: node tools/gaps/build-data.mjs --hash=<name>.",
+  "any": [
+    "2b7441b7f68944ff",
+    "371d2c446621dd34",
+    "3d291169e510a385",
+    "40561f549afdc2cf",
+    "4674309091fa4ce0",
+    "533c338d07a545b6",
+    "6949dd378d63ff33",
+    "6b315abd405b462c",
+    "7f360772911ee8dc",
+    "8f2c75226867476a",
+    "8fede8b84b3e77a8",
+    "95c4a9139020185f",
+    "9886d10aeffa10d7",
+    "a18250db56f58fcc",
+    "b088e8ab2fedc765",
+    "b0ec8edd0285e3e1",
+    "c29471f70ccd86cd",
+    "cd74cb83f77d68c7",
+    "cd8028c53afbf333",
+    "ceca98b6ef3ca451",
+    "e1fc45f7880e0505",
+    "e41f6e27aa732a67",
+    "f0656e8e48e547aa"
+  ],
+  "exact": [
+    "0b5ca70068b050eb",
+    "17d09496b125c3b9",
+    "397423500c32c55a",
+    "f15833fd5b62ffb0"
+  ]
+}

@@ -131,6 +131,8 @@ function restorationTypes(leaf) {
     'restoration-lost': data('lost', 'Restoration lost systems', 'The systems that cannot come back, with why.'),
     'restoration-legend': data('legend', 'Restoration tag legend', 'What each status tag means.'),
     'restoration-stamp': data('stamp', 'Restoration stamp', 'When data.json was generated, from how many commits and test files.'),
+    // The Known gaps page (/restoration/gaps/, tools/gaps): drawn from gaps.json by the site's src/RestorationGaps.php, in parts so the page's words sit between them.
+    'restoration-gaps': { ...data('gaps', 'Restoration known gaps', 'The Known gaps page\'s list from gaps.json: the counts, the gaps by area with their state, the differences on purpose, or what Glitch never built.', { part: { type: 'string', enum: ['all', 'summary', 'list', 'purpose', 'ideas'], default: 'all' } }), keywords: ['restoration', 'gaps', 'report'] },
   };
 }
 

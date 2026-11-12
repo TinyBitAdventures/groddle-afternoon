@@ -79,6 +79,8 @@ export function restorationContent() {
         group('div', '', null, [
           h(3, 'Gone for good'),
           data('lost'),
+          // The Known gaps page (tools/gaps/to-minn.mjs LINK, which --link adds to a page made before it).
+          p('gaps-link', 'What is still missing or not right yet, and what is being fixed now: <a href="/restoration/gaps/">Known gaps</a>.'),
           p('note', 'Solo play adapts what needed other players where it works (races against rival Glitches, Feats with companions, street projects with a hired hand). Multiplayer brings back the shared street: chat, parties, races, trading and Rook fights. What neither can bring back is listed here.'),
         ]),
         group('div', '', null, [h(3, 'How to read the tags'), data('legend')]),

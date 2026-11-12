@@ -1,0 +1,126 @@
+{
+  "note": "The public Known gaps page (/restoration/gaps/): which gaps players see, in our own plain words. id is a coverage register row (G...) whose State the builder reads, or our own id (F... being fixed, P... on purpose) for items with no row. show: lost (no source survived; a fix still wins), purpose (a deliberate difference; always shown as On purpose), fixing (being fixed; commits, once landed, turn it into Fixed). commits: game:, site: or server: hashes that fix it, when the register row cites none. Never a player's name, a quote from a player, a file path or an em-dash. tools/gaps/build-data.mjs writes public/restoration/gaps.json from this.",
+  "gaps": [
+    { "id": "G10", "area": "Quest rooms", "text": "Most of Glitch's private quest rooms and Jethimadh Tower rooms left no map behind. Each one is rebuilt by hand from players' recordings and snaps, and some may never come back." },
+    { "id": "G682", "area": "Quest rooms", "text": "The EZ Cookin' practice street and the Talking 'bout Soil Appreciation room are not built yet, so those quests play without their rooms." },
+    { "id": "G472", "area": "Quest rooms", "text": "On the Winter Walk you cannot knock the icicles down yet." },
+    { "id": "G660", "area": "Quest rooms", "text": "The Winter Walk's motes no longer come back when you leave the walk, and they pay Glitch's amounts.", "report": 220 },
+    { "id": "G638", "area": "Quest rooms", "text": "Stepping into a quest room from the Ancestral Lands pauses the visit timer, as Glitch did." },
+
+    { "id": "F11", "area": "Quests", "show": "fixing", "text": "Chasing Hubba Dubba Hugs is offered but cannot be finished, and Tend to Your Community never ticks its Herb Gardens step." },
+    { "id": "F12", "area": "Quests", "show": "fixing", "text": "The counters on Sparkly of Interest and Another Simple Sample never move, some quest timers keep running while you are away, and Walk Toward the Light opens at a level instead of after Glitch's upgrades." },
+    { "id": "F13", "area": "Quests", "show": "fixing", "text": "A few quest reward lines show a fixed amount instead of what was really paid." },
+
+    { "id": "G351", "area": "Streets", "text": "A few named streets, such as Celestial Strum and Coulcairn, have no map and no layout anywhere we have found." },
+    { "id": "G678", "area": "Streets", "text": "In Thornfad Layers, the letter or heart that shows over your head by the locked door is not drawn yet." },
+    { "id": "G679", "area": "Streets", "text": "Some street effects seen in old recordings are still to come: the notes and heart on Lotha Harte, the firefly jars in Koulato Cluster, the gravity flips in Duodenal Browns and the herb gift on five streets." },
+    { "id": "G681", "area": "Streets", "text": "Teleporters that work by walking into them have not all been checked yet." },
+
+    { "id": "G680", "area": "World", "text": "The six named vendors stand still instead of walking about, the Still has one look instead of four, and a few dropped items have no picture on the ground." },
+    { "id": "G670", "area": "World", "text": "Mokkar Mill shows only one of its seven Jellisacs." },
+    { "id": "G669", "area": "World", "text": "Jellisacs and Peat Bogs stand where the 2012 snaps show them, and every Herb Gardens planter box is an herb bed.", "report": 249 },
+    { "id": "G164", "area": "World", "text": "The small dark figure on the Hell Bar's counter, and the bar's own music, are still unidentified." },
+    { "id": "G651", "area": "World", "text": "Unused Tiny Speck animations are in: Chickens peck and pause, potions pour from their own bottles, and tools show at the rocks and barnacles you work." },
+
+    { "id": "G471", "area": "Map", "text": "There is no world map or subway map view yet, and GO buttons do not take the colour of the region they lead to." },
+
+    { "id": "G11", "area": "Sounds", "show": "lost", "text": "Some of Glitch's sounds and tunes were never archived anywhere, so they play a simple stand-in." },
+    { "id": "G22", "area": "Sounds", "show": "lost", "text": "An early take of Esquibeth's waterfall song has no surviving copy." },
+    { "id": "G636", "area": "Sounds", "text": "Short lines from animals and characters stay up for Glitch's own times, such as three seconds for a Yum!" },
+
+    { "id": "G271", "area": "Quoins", "show": "lost", "text": "Where Glitch put the Qurazy quoin markers was never archived, so each street picks its own spot." },
+    { "id": "G647", "area": "Quoins", "text": "Quoins in races, puzzle rooms, the Purple journey and the winter motes still pop with a short float instead of Glitch's full burst.", "report": 181 },
+    { "id": "F14", "area": "Quoins", "show": "fixing", "text": "Rainbow Run and Top of the Tree quoins vanish without paying once you reach the daily quoin limit." },
+
+    { "id": "G174", "area": "Items", "show": "lost", "text": "A few dozen items in the encyclopedia have no icon, because their art was never archived." },
+    { "id": "G412", "area": "Items", "text": "Rare items from the Penalty Box shop are not numbered and do not stay tied to their first owner yet." },
+
+    { "id": "G223", "area": "Homes", "text": "Some house styles are still to come, including more interior and back yard styles. The Coral Caves style waits for its art to turn up." },
+    { "id": "G48", "area": "Homes", "show": "lost", "text": "The name sign on a player tower and the lettering of its floor numbers have no free source, so they look different from Glitch." },
+    { "id": "G640", "area": "Homes", "text": "Visitors see the owner's Garden Gnomes, Magic Sticks and animal machines on a home street." },
+    { "id": "G643", "area": "Homes", "text": "A key-holder walking into another player's house no longer gets a page error." },
+
+    { "id": "G634", "area": "Shrines and favor", "text": "The donation window opens at a useful amount, as Glitch's did, instead of at 1.", "report": 168 },
+    { "id": "G635", "area": "Shrines and favor", "text": "An open bag no longer covers the donation window.", "report": 168 },
+    { "id": "G637", "area": "Shrines and favor", "text": "The favor display stays up when any Giant has your favor, so the Favor with the Giants panel can be opened from anywhere.", "report": 170 },
+    { "id": "F15", "area": "Shrines and favor", "show": "fixing", "text": "The donation that fills a Giant's favor gives no emblem, later donations use up the day's limit for nothing, and there is no warning before you go over it." },
+    { "id": "F16", "area": "Shrines and favor", "show": "fixing", "text": "Favor filled outside a donation gives no prompt to collect the emblem, and some favor can go past the cap." },
+
+    { "id": "F17", "area": "Street projects", "show": "fixing", "text": "Street projects never ask how many to give, and online helpers from an earlier phase get no completion card or reward." },
+    { "id": "F18", "area": "Street projects", "show": "fixing", "text": "Work stops when you walk a short way off, the panel shows no rewards or leaderboard, and some refusals show raw names." },
+    { "id": "F19", "area": "Street projects", "show": "fixing", "text": "Cultivation Nurturer, Restorer of Stuff and Make Do and Mender cannot be earned." },
+    { "id": "G653", "area": "Street projects", "text": "Talking to a Street Spirit opens its street project, as in Glitch." },
+
+    { "id": "F20", "area": "Mining and tools", "show": "fixing", "text": "A plain Pick can mine Metal Rock, dragging a Pick onto a rock wears a different pick, and Rubeweed does not raise the gem chance." },
+    { "id": "F21", "area": "Mining and tools", "show": "fixing", "text": "Online, only the first of two players on one rock or node is paid, and Ice has no Help scrape." },
+    { "id": "F22", "area": "Mining and tools", "show": "fixing", "text": "Picks, Shovels and Scrapers have no verbs in the pack, and the Tinkertool cannot repair itself or mend a tool bit by bit when it is worn." },
+
+    { "id": "F23", "area": "Trees and gardens", "show": "fixing", "text": "Harvesting a tree with exactly the energy it costs can croak you, and street Wood Trees never grow back after chopping." },
+    { "id": "F24", "area": "Trees and gardens", "show": "fixing", "text": "Street fruit trees never grow bigger, Wood Trees take care only once a day, and a tiny Wood Tree does not warn that harvesting will clear it." },
+    { "id": "F25", "area": "Trees and gardens", "show": "fixing", "text": "Garden potions ask for far too much energy, a plot that is still a little wet cannot be topped up, and pouring on a shared Master Garden can say you are too tired when you are not." },
+
+    { "id": "G642", "area": "Animals", "text": "Chickens squawk and flutter off when you walk into them." },
+    { "id": "G676", "area": "Animals", "text": "Reviving a rooked animal counts the real helpers, and a party invite stays up while you eat to get your energy back.", "report": 251 },
+    { "id": "F26", "area": "Animals", "show": "fixing", "text": "In solo you can squeeze a Chicken that is sitting on your egg, and Super Animal Harvest does not give its Bacon chance." },
+
+    { "id": "F27", "area": "Food, buffs and making", "show": "fixing", "text": "Drinks give the same iMG whatever your mood, you can drink while dead and lose the drink, and a Rasher of Bacon cannot be eaten." },
+    { "id": "F28", "area": "Food, buffs and making", "show": "fixing", "text": "Buffs keep running while the game is closed and can vanish on reload without their end effect." },
+    { "id": "F29", "area": "Food, buffs and making", "show": "fixing", "text": "Making pays iMG with no daily limit per recipe, and every Test Tube mix is known from the start instead of found by experimenting." },
+    { "id": "F30", "area": "Food, buffs and making", "show": "fixing", "text": "Meditation can say you gained energy right after saying you are too pooped, and a short first session can stick the Meditation Station." },
+
+    { "id": "F31", "area": "Levels and imagination", "show": "fixing", "text": "Levelling up while Super Pooped or dead refills you, the Energy Tank card fills energy but not mood, and online nobody hears that you levelled up." },
+    { "id": "F32", "area": "Levels and imagination", "show": "fixing", "text": "The Faded Heart's Remember counts haunts on streets that have none, and hints at a later story that does not exist." },
+
+    { "id": "F33", "area": "Teleportation", "show": "fixing", "text": "Teleporting works out its energy cost from a 100-energy tank, and you cannot save a Teleportation Point in your own home." },
+    { "id": "G668", "area": "Teleportation", "text": "Teleportation V cannot summon a player into a home yet." },
+    { "id": "G666", "area": "Teleportation", "text": "Teleportation V can summon another player to your street or your Party Space." },
+
+    { "id": "F34", "area": "Messages", "show": "fixing", "text": "A few messages point to the wrong place: retrying Gwendolyn's Task or Rainbow Run, joining a Party Space later, skipping the tutorial online, and teleporting from the Map before you have the rank for it." },
+    { "id": "G318", "area": "Messages", "text": "Some lines the characters say are still in our own words while the original lines are checked." },
+
+    { "id": "G641", "area": "Multiplayer", "text": "A note left on the ground stays private to you. In Glitch anyone could read it." },
+    { "id": "F35", "area": "Multiplayer", "show": "fixing", "text": "Appear offline still shows you to players on the same street." },
+    { "id": "F36", "area": "Multiplayer", "show": "fixing", "text": "A neighbour's note can say they have not read yours right after they replied." },
+    { "id": "G675", "area": "Multiplayer", "text": "A summons or invite can be answered while a quest card is open." },
+
+    { "id": "G663", "area": "Phones", "text": "On some phones, big streets can still use too much memory and close the game. A lighter mode for phones is planned." },
+    { "id": "G673", "area": "Phones", "text": "Zoomed in on a phone, your Glitch sits high in the view." },
+    { "id": "G674", "area": "Phones", "text": "A second finger on the movement stick moves it." },
+    { "id": "F37", "area": "Phones", "show": "fixing", "text": "Some tips still name keys a phone does not have, such as Space to float higher or to fly in Paradise." },
+    { "id": "G672", "area": "Phones", "text": "On a phone you can pinch the street to zoom, scroll the pack row and tap signpost arms." },
+
+    { "id": "G659", "area": "Classic", "text": "In Classic, the Wardrobe is not its own window yet, and new players do not get the 2012 arrow picker for their look." },
+
+    { "id": "G686", "area": "Accounts and saving", "text": "You cannot rename your own character yet. An administrator can do it for you." },
+    { "id": "F38", "area": "Accounts and saving", "show": "fixing", "text": "The character card can miscount a retired character, and a blocked sign-up says to try again tomorrow when the wait is longer." },
+    { "id": "F39", "area": "Accounts and saving", "show": "fixing", "text": "After a failed restore of a backup, the solo game could stop saving until you reloaded." },
+    { "id": "G665", "area": "Accounts and saving", "text": "A bug report says Read by the team once an administrator has opened it." },
+
+    { "id": "G45", "area": "Trees and gardens", "show": "purpose", "text": "Trees take one pet and one water a game day and never die of neglect. Glitch wanted care about every hour, which would wilt every tree overnight here." },
+    { "id": "G639", "area": "Trees and gardens", "show": "purpose", "text": "Crops and herbs grow about ten times faster than in Glitch, and mining and rock regrowth are sped up to match." },
+    { "id": "G667", "area": "Teleportation", "show": "purpose", "text": "Glitch sold Teleportation tokens for real money. Nothing is for sale here, so there are no tokens, and Teleportation V gives two summons a day." },
+    { "id": "P1", "area": "Street projects", "show": "purpose", "text": "Street projects ask for a fiftieth of Glitch's amounts and pay a fiftieth of its rewards, in solo and online." },
+    { "id": "P2", "area": "Quoins", "show": "purpose", "text": "The daily quoin limit is Glitch's usual one. In its last days Glitch lifted the limit for the end of the world; the remake keeps the normal limit." },
+    { "id": "P3", "area": "Solo play", "show": "purpose", "text": "Solo play stands in for other players where it can: rival Glitches in races, companions in Feats and when helping to mine or dig, and a hired hand on street projects." },
+    { "id": "G35", "area": "Rook", "show": "purpose", "text": "Anyone can fight the Rook. Glitch asked for Martial Imagination before you could stun it." },
+    { "id": "G151", "area": "Food, buffs and making", "show": "purpose", "text": "Rubeweed gives Luck of the Rube, which raises your chances, rather than guaranteed lucky harvests." },
+    { "id": "P4", "area": "Food, buffs and making", "show": "purpose", "text": "Machines burn fuel from their own tank instead of taking Fuel Cells from your pack." },
+    { "id": "P5", "area": "Food, buffs and making", "show": "purpose", "text": "A Plain Crystal takes one Firefly Jar and a little energy, not the seven jars Glitch's recipe asked for.", "report": 219 },
+    { "id": "G63", "area": "Animals", "show": "purpose", "text": "Street Piggies never starve to death. Only a Piggy you own can, if you leave it hungry." },
+    { "id": "G82", "area": "Animals", "show": "purpose", "text": "Animals that leave a crowded street come back the next game day. In Glitch they were gone for good." },
+    { "id": "G152", "area": "Items", "show": "purpose", "text": "When your pack is full, a tree's harvest goes to your Magic Rock. In Glitch it stayed on the tree." },
+    { "id": "G28", "area": "Sounds", "show": "purpose", "text": "A few original sounds survive only in copies we are not free to share, so they keep a stand-in." },
+
+    { "id": "G128", "area": "Badges", "text": "Badges Tiny Speck defined but never let anyone earn, such as Homesteader and The Speedhermit." },
+    { "id": "G129", "area": "Rook", "text": "Ways to fight back against the Rook that were planned and never finished, such as a hug or a kiss leaving it open to attack." },
+    { "id": "G130", "area": "Quests", "text": "A handful of quests Tiny Speck started and never finished or never offered." },
+    { "id": "G131", "area": "Levels and imagination", "text": "Imagination cards that Glitch listed but that did nothing, such as Heisenberg and Potent Potions." },
+    { "id": "G132", "area": "Items", "text": "Artifacts with no recipe to put them together, and other items nothing in Glitch ever gave out." },
+    { "id": "G683", "area": "Items", "text": "More items nothing gave out: cabinets, trophy cases, a Beachball, a Paper Plane, party packs and more." },
+    { "id": "G684", "area": "World", "text": "Characters only the Craftybot's catalog names, such as the Blimp, the Catch-Me-Ghost and the Letter Blocks." },
+    { "id": "G145", "area": "World", "text": "Mountaineering: a climb for a party of five or more, with a permit, that was never finished." },
+    { "id": "G146", "area": "Homes", "text": "Garden upgrades that were written but never switched on." },
+    { "id": "G360", "area": "Wardrobe", "text": "Two bracelets that exist in the art but that nobody could ever wear." },
+    { "id": "G400", "area": "Homes", "text": "Nine wallpapers, floors and ceilings, such as the starry sky set, that were made but never put in the shop." }
+  ]
+}
