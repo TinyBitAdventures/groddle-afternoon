@@ -13768,4 +13768,11 @@ body.is-booting .touch-controls { display: none; }
 /* iOS zooms the page into a focused field under 16 px (the mobile QA, 2026-11-12: chat and pack search
    were 13 px, and the zoom stayed). On a phone every typing field is 16 px (--fs-lg). */
 :root.touch-phone :is(input:not([type="range"], [type="checkbox"], [type="radio"], [type="button"], [type="submit"]), textarea, select) { font-size: var(--fs-lg) !important; }
+/* The page is a game on a phone (the mobile QA, 2026-11-12): a double tap or a pinch on the HUD,
+   the pack or a panel zoomed the page, a pull down could reload it (Chrome on Android), and a long
+   press selected HUD words or opened the iOS callout. Panels still scroll (pan), typing fields and
+   the chat and activity logs still select. */
+:root.touch-phone, :root.touch-phone body { overscroll-behavior: none; }
+:root.touch-phone body { touch-action: pan-x pan-y; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent; }
+:root.touch-phone :is(input, textarea, select, [contenteditable="true"], [contenteditable=""], .activity-log, .social-log, #local-chat-log) { -webkit-user-select: text; user-select: text; -webkit-touch-callout: default; }
 /* —— end TOUCH PANELS —— */
