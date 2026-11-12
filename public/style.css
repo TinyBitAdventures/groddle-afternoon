@@ -1420,6 +1420,8 @@ kbd {
 
 /* The keys: keycap + label rows in three headed groups (Move and Do in one column, Open in the other). */
 .start-keys { padding: var(--sp-9) var(--sp-10) var(--sp-8); border-radius: var(--radius-xl); background: var(--surface-parchment); }
+/* A phone has no keys (the mobile QA, 2026-11-12: the list took about 705 px of an upright iPhone). */
+:root.touch-phone .start-keys { display: none; }
 .start-key-groups { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: var(--sp-10); row-gap: var(--sp-8); }
 .start-key-move { grid-column: 1; grid-row: 1; }
 .start-key-do { grid-column: 1; grid-row: 2; }

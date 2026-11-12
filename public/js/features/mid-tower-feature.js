@@ -56,6 +56,7 @@ import {
   boxToScreen,
   midTowerRoomByTsid,
 } from '../tower-mid-rooms.js?v=678fdc50';
+import { touchWords } from '../touch-controls.js?v=17e862bb';
 import { CLICK_ANYWHERE, HALL, HALL_ART, HALL_ART_ROOT, HALL_BUTTON_CLASS, HALL_WIDGET, WALL_BUTTON } from '../hall-rejected-concepts.js?v=30e5a21e';
 
 export const MID_TOWER_FEATURE_ID = 'mid-tower';
@@ -324,7 +325,7 @@ function announce(engine, text) {
     overlayEl.setAttribute('aria-live', 'polite');
     overlayEl.style.cssText = 'position:absolute;inset:0;z-index:86;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;cursor:pointer;text-align:center;padding:0 16px';
     overlayEl.innerHTML = `<p style="margin:0;max-width:520px;font:900 clamp(1.4rem,4vw,2.3rem)/1.15 Nunito,'Trebuchet MS',sans-serif;color:#fff;text-shadow:0 2px 0 #2a2a2a,0 0 14px rgba(0,0,0,.6)"></p>
-      <span style="font:800 .8rem Nunito,sans-serif;color:#fff;text-shadow:0 1px 2px #000">&#9656; ${CLICK_ANYWHERE}</span>`;
+      <span style="font:800 .8rem Nunito,sans-serif;color:#fff;text-shadow:0 1px 2px #000">&#9656; ${touchWords(CLICK_ANYWHERE)}</span>`;
     overlayHost().appendChild(overlayEl);
   }
   overlayEl.querySelector('p').textContent = text;

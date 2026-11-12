@@ -28,6 +28,8 @@
  *   cancelAllOverlaysWeCan, so a street change drops it (no done_payload).
  */
 
+import { touchWords } from './touch-controls.js?v=17e862bb';
+
 export const VOG_WIDTH = 500;
 export const VOG_FADE_COLOR = '#000000';
 export const VOG_FADE_ALPHA = 0.3;
@@ -126,7 +128,8 @@ export function createVogOverlay(opts) {
     line.className = 'vog-line';
     const advanceLabel = doc.createElement('span');
     advanceLabel.className = 'vog-advance';
-    advanceLabel.textContent = VOG_ADVANCE_LABEL;
+    // TOUCH: a phone reads "Tap anywhere..." (js/touch-controls.js touchWords).
+    advanceLabel.textContent = touchWords(VOG_ADVANCE_LABEL);
     box.appendChild(line);
     box.appendChild(advanceLabel);
     root.appendChild(box);

@@ -94,6 +94,15 @@ export function touchPrompt(want) {
 }
 
 /**
+ * PURE: an advance or prompt line in a phone's words: "Click anywhere" (the VOG lines, the tutorial's
+ * overlays, the Hall of Rejected Concepts) is a tap there. `touch` false returns the text as given.
+ */
+export function touchWords(text, touch = isPhoneDevice()) {
+  const s = String(text ?? '');
+  return touch ? s.replace(/\bClick anywhere/g, 'Tap anywhere').replace(/\bclick anywhere/g, 'tap anywhere') : s;
+}
+
+/**
  * Builds the stick and the Jump button into `root` (the game's wrap) and wires them.
  * press(key) / release(key): the held keys (game.js `keys`); jump(): a jump's edge.
  * Returns { el, releaseAll, destroy }.

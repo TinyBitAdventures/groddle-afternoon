@@ -8,7 +8,7 @@ import { FEATURES, questFlagsFeature } from './js/features/index.js?v=45359e1d';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl, drawTileArt } from './js/enter-chooser.js?v=4a3ea327';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
-import { createVogOverlay } from './js/vog-overlay.js?v=c2a9cc07';
+import { createVogOverlay } from './js/vog-overlay.js?v=2d13dd77';
 import { createPromptStack } from './js/prompt-stack.js?v=f8aea2cf';
 import { createWindowStack } from './js/window-stack.js?v=a7104f02';
 import { HOG_HAUL_SPLASH, createGameSplash, splashFor } from './js/game-splash.js?v=ea0433a7';
@@ -795,7 +795,7 @@ import { landingY, stackRestY, walkSurfaceY } from './js/walk-surface.js?v=106bf
 import { holdCloseToFloor } from './js/slope-walk.js?v=9af1e505';
 import { JUMP_SPEED, MAX_TICK_FRAMES, WALK_MAX, avatarGround, coastX, frameSteps, stepAvatar, steerAccel, steerX, streetPhysicsExtras } from './js/avatar-step.js?v=43b1182e';
 import { createUserPath, stepUserPath } from './js/user-path.js?v=8880557f';
-import { climbGoalStep, installTouchControls, isPhoneDevice, touchPrompt, touchTapPlan } from './js/touch-controls.js?v=9621609b';
+import { climbGoalStep, installTouchControls, isPhoneDevice, touchPrompt, touchTapPlan } from './js/touch-controls.js?v=17e862bb';
 import { FAILED_LINE, inVerbReach, movingLine, verbRange, walkOverEnd, walkOverGoals } from './js/walk-over.js?v=277ab977';
 import { hellBuffDesc, isInHell } from './js/hell.js?v=33923da7';
 import { climbBobY, ladderAnimState, ladderSwap } from './js/ladder-anim.js?v=a8b327a0';
@@ -1855,6 +1855,8 @@ function installPlayerMenu() {
  */
 /** TOUCH: the phone gate's phone (js/touch-controls.js): touch controls and the upright stage (js/location-view.js). */
 const TOUCH_PHONE = isPhoneDevice(window);
+// html.touch-phone from the first paint (the start card's Keys list and the phone CSS), not only once the controls are built.
+if (TOUCH_PHONE) document.documentElement.classList.add('touch-phone');
 const RENDER_CAP = resolutionCap({ device: window.GRODDLE_DEVICE, density: new URLSearchParams(location.search).get('density') });
 
 /** Device px per CSS px the art may pick its files by: a capped phone keeps the 1x sheets. */

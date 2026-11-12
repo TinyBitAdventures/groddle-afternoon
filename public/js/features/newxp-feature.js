@@ -159,7 +159,7 @@ import {
   createAkState,
 } from '../skillquest-ak.js?v=397a9d19';
 import { filterText } from '../word-filter.js?v=9a7a7ebb';
-import { phoneScreenFrame, safeAreaInsets } from '../touch-controls.js?v=9621609b';
+import { phoneScreenFrame, safeAreaInsets, touchWords } from '../touch-controls.js?v=17e862bb';
 
 export const NEWXP_FEATURE_ID = 'newxp';
 /** newxp_training1.js 705-706 slothRemove: deleteWithPoof, then hideTree 0.5 s later. */
@@ -518,7 +518,7 @@ async function vog(t, text, { holdMs = null } = {}) {
   ensureUi();
   for (const page of vogPages(text)) {
     alive(t);
-    ui.vog.innerHTML = `<div class="nx-vog-body">${page}<small>Click anywhere…</small></div>`;
+    ui.vog.innerHTML = `<div class="nx-vog-body">${page}<small>${touchWords('Click anywhere…')}</small></div>`;
     ui.vog.hidden = false;
     engineRef.setData('newxpVog', plain(page).slice(0, 80));
     const ms = holdMs ?? Math.max(2600, page.length * 70);
