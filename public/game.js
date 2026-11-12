@@ -6165,12 +6165,18 @@ function updateHud() {
     if (levelUpdate.currants) rewardBits.push(`${levelUpdate.currants.toLocaleString()} currants`);
     if (levelUpdate.favor) rewardBits.push(`${levelUpdate.favor} favor with every Giant`);
     const rewardText = rewardBits.length ? ` You also received ${rewardBits.join(' and ')}.` : '';
-    const activity = `Woo! You reached level ${levelUpdate.toLevel}. Energy and mood refilled.${rewardText}`;
+    // inc_stats.js 373: the activity line, word for word.
+    const activity = `Woo! you've reached level ${levelUpdate.toLevel}!!!`;
     logMoment(activity);
     enqueueAward({
+    // 363-370: dead, nothing refills; Super Pooped, only mood.
+    const refilled = levelUpdate.energyAdded > 0 || levelUpdate.moodAdded > 0
+      ? (levelUpdate.energyAdded > 0 && levelUpdate.moodAdded > 0 ? 'Energy and mood completely refilled.'
+        : levelUpdate.moodAdded > 0 ? 'Mood completely refilled.' : 'Energy completely refilled.')
+      : '';
       kind: 'level',
       title: `Level ${levelUpdate.toLevel}`,
-      body: `Energy and mood completely refilled.${rewardText}`,
+      body: `${refilled}${rewardText}`.trim(),
       subtitle: levelUpdate.levelsGained.length > 1
         ? `${levelUpdate.levelsGained.length} levels gained`
         : 'Onwards and upwards!',

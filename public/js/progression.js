@@ -5,6 +5,8 @@
  * point balance; gameplay rewards normally increase both values together.
  */
 
+import { metabolicGain } from './metabolics.js?v=8504134e';
+
 /** Cumulative XP thresholds for levels 2 through 60. */
 export const XP_FOR_LEVEL = Object.freeze([
   400, 1091, 2180, 3795, 6085, 9219, 13393, 18826, 25766, 34490,
@@ -16,6 +18,9 @@ export const XP_FOR_LEVEL = Object.freeze([
   10126733, 11056241, 12054692, 13126080, 14274570, 15504507,
   16820419, 18227022, 19729227, 21332145, 23041093,
 ]);
+
+/** Level 60's threshold: lifetime XP goes no higher (inc_stats.js 4-6). */
+export const MAX_XP = XP_FOR_LEVEL[XP_FOR_LEVEL.length - 1];
 
 const clamp01 = (value) => Math.max(0, Math.min(1, value));
 
@@ -84,6 +89,8 @@ export function favorRewardForLevel(level) {
  * @param {{ energyTop?: number, moodTop?: number }} [opts]
  */
 export function reconcilePlayerProgression(pc, opts = {}) {
+  // inc_stats.js 4-6, 338: XP stops at level 60's threshold (the prop's top); only iMG grows past it.
+  if (pc && Number(pc.xp) > MAX_XP) pc.xp = MAX_XP;
   const info = levelInfoForXp(pc?.xp || 0);
   if (!pc) return { leveledUp: false, fromLevel: info.level, toLevel: info.level, info };
 
@@ -115,8 +122,13 @@ export function reconcilePlayerProgression(pc, opts = {}) {
   const moodTop = Math.max(0, Number(opts.moodTop) || Number(pc.energyMax) || 100);
   const beforeEnergy = Number(pc.energy) || 0;
   const beforeMood = Number(pc.mood) || 0;
-  pc.energy = energyTop;
-  pc.mood = moodTop;
+  // inc_stats.js 363-370: nothing refills while dead; metabolics_set_energy / _mood go through
+  // metabolics_add_*, so Super Pooped refuses the energy ("...but you're super pooped!") and
+  // keeps the mood (inc_metabolics.js 40-53, 79-86).
+  // Mood's gate refuses only the dead, so it reads "alive" without a word (the source never asks then).
+  const alive = metabolicGain('mood', { quiet: true }).ok;
+  if (alive && beforeEnergy < energyTop && metabolicGain('energy').ok) pc.energy = energyTop;
+  if (alive && beforeMood < moodTop) pc.mood = moodTop;
   pc.currants = (Number(pc.currants) || 0) + currants;
 
   return {
@@ -126,8 +138,8 @@ export function reconcilePlayerProgression(pc, opts = {}) {
     levelsGained,
     currants,
     favor,
-    energyAdded: energyTop - beforeEnergy,
-    moodAdded: moodTop - beforeMood,
+    energyAdded: (Number(pc.energy) || 0) - beforeEnergy,
+    moodAdded: (Number(pc.mood) || 0) - beforeMood,
     info,
   };
 }
