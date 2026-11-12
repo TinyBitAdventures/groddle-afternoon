@@ -22,7 +22,7 @@ import {
   vitalRing,
   volumeLevel,
   soundChannelToggle,
-} from '../public/js/ui/topbar.js?v=d3aad119';
+} from '../public/js/ui/topbar.js?v=40469965';
 
 import { GIANTS, canClaimEmblem, createShrineState, emblemCostFor, favorDisplayGiant, favorPanelRows, giantForStreet } from '../public/js/shrines.js?v=ec26da05';
 
@@ -60,9 +60,13 @@ describe('top bar helpers', () => {
     assert.equal(favorChip(null), null);
     assert.equal(favorChip({ name: 'Spriggan', points: 0, target: 1000 }), null, 'no chip that only says 0');
     // The nameplate: centred on the window while it fits, else in the room between the pills.
-    assert.deepEqual(nameplateLeft({ rootW: 1280, plateW: 300, left: 400, right: 990 }), { x: 490, room: 574 });
-    assert.deepEqual(nameplateLeft({ rootW: 1280, plateW: 300, left: 537, right: 990 }), { x: 545, room: 437 });
+    assert.deepEqual(nameplateLeft({ rootW: 1280, plateW: 300, left: 400, right: 990 }), { x: 490, room: 574, under: false });
+    assert.deepEqual(nameplateLeft({ rootW: 1280, plateW: 300, left: 537, right: 990 }), { x: 545, room: 437, under: false });
     assert.equal(nameplateLeft({ rootW: 1280, plateW: 300, left: 300, right: 700 }).x, 392);
+    // Squeezed (a phone held sideways in Chrome, 812 px: 96 px between the pills): under them.
+    assert.equal(nameplateLeft({ rootW: 812, plateW: 185, left: 276, right: 388 }).under, true);
+    assert.equal(nameplateLeft({ rootW: 812, plateW: 90, left: 276, right: 388 }).under, false, 'a plate that fits stays');
+    assert.equal(nameplateLeft({ rootW: 1000, plateW: 400, left: 276, right: 700 }).under, false, 'a wide room only ellipsizes');
     assert.deepEqual(mailText(2), { sub: '2 unread', label: 'Mail, 2 unread' });
     assert.deepEqual(mailText(0), { sub: 'No new mail', label: 'Mail' });
     assert.equal(volumeLevel('35'), 35);

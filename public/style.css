@@ -10981,6 +10981,8 @@ html.stage-pinned[data-ui="modern"] header.top-bar { left: calc(var(--sp-5) + va
 }
 /* Placed by js/ui/topbar.js: centred on the window unless a pill is in the way. */
 [data-ui="modern"] .street-nameplate.is-placed { left: var(--plate-x); transform: none; }
+/* Squeezed between the pills (a phone held sideways, js/ui/topbar.js nameplateLeft): under them, centred. */
+[data-ui="modern"] .street-nameplate.is-placed.is-under { top: calc(var(--hud-h) + var(--space-2)); left: 50%; transform: translateX(-50%); max-width: calc(100% - 2 * var(--hud-inset)); }
 [data-ui="modern"] .street-nameplate #street-name { flex: 0 1 auto; min-width: 2em; overflow: hidden; text-overflow: ellipsis; }
 [data-ui="modern"] .street-nameplate .street-name-street { font-weight: var(--fw-heavy); }
 [data-ui="modern"] .street-nameplate .street-time-divider { margin: 0; color: var(--text-muted); }

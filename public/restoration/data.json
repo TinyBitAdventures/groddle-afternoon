@@ -2752,9 +2752,44 @@
   "deployed": "2026-11-12"
  },
  "git": {
-  "commits": 1744,
+  "commits": 1751,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-12",
+    "kind": "fix",
+    "text": "A phone held sideways shows the whole street name under the pills, not \"H...\""
+   },
+   {
+    "date": "2026-11-12",
+    "kind": "fix",
+    "text": "On a phone the pack row, the stick and Jump step away while the on-screen keyboard is up"
+   },
+   {
+    "date": "2026-11-12",
+    "kind": "fix",
+    "text": "On a phone a tap on an animal opens its menu, under the stick too, and the tap is not a choice in it"
+   },
+   {
+    "date": "2026-11-12",
+    "kind": "fix",
+    "text": "On a phone the vendor's count row and Buy stay in view under the Buy and Sell tabs"
+   },
+   {
+    "date": "2026-11-12",
+    "kind": "fix",
+    "text": "On a phone a notice never stands one letter wide beside a side sheet, and the drawer no longer peeks out behind one"
+   },
+   {
+    "date": "2026-11-12",
+    "kind": "fix",
+    "text": "The loading card sits in the middle of a phone's screen"
+   },
+   {
+    "date": "2026-11-12",
+    "kind": "fix",
+    "text": "The award card fits a phone: centred upright, its button on screen sideways"
+   },
    {
     "date": "2026-11-12",
     "kind": "improve",
@@ -2839,44 +2874,9 @@
     "date": "2026-11-12",
     "kind": "improve",
     "text": "The tutorial and the world's hints speak touch on a phone"
-   },
-   {
-    "date": "2026-11-12",
-    "kind": "new",
-    "text": "Report rows open a right-click menu for quick actions"
-   },
-   {
-    "date": "2026-11-12",
-    "kind": "improve",
-    "text": "Something to eat keeps back what a running making still needs"
-   },
-   {
-    "date": "2026-11-12",
-    "kind": "fix",
-    "text": "The top bar's popovers open over an open side sheet, so you can eat while making"
-   },
-   {
-    "date": "2026-11-12",
-    "kind": "fix",
-    "text": "The character chip loads your characters"
-   },
-   {
-    "date": "2026-11-12",
-    "kind": "fix",
-    "text": "Opening Reports no longer moves the popups under it"
-   },
-   {
-    "date": "2026-11-12",
-    "kind": "fix",
-    "text": "The Enter chooser draws each thing sharp at its tile's real size (a young Bean Tree was blocky)"
-   },
-   {
-    "date": "2026-11-12",
-    "kind": "new",
-    "text": "Retire a character from the start card, and a character chip to switch from anywhere"
    }
   ]
  },
- "tests": 871,
+ "tests": 875,
  "generatedAt": "2026-11-12"
 }

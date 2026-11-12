@@ -686,13 +686,20 @@ function installLocationLink(doc) {
  * moves into the room between the pills, and past that it gives way (ellipsis). It lives in
  * #game-root (the notices, the Qurazy banner and speech bubbles measure it there).
  */
-export function nameplateLeft({ rootLeft = 0, rootW, plateW, left, right, gap = 8 }) {
+export function nameplateLeft({ rootLeft = 0, rootW, plateW, left, right, gap = 8, naturalW = plateW }) {
   const min = left - rootLeft + gap;
   const max = right - rootLeft - gap - plateW;
   const ideal = (rootW - plateW) / 2;
   const room = right - left - 2 * gap;
-  return { x: Math.round(Math.max(min, Math.min(ideal, max))), room: Math.max(0, Math.floor(room)) };
+  // A phone held sideways (Austin's iPhone in Chrome, 2026-11-12, about 812 px): the room between the
+  // pills was 96 px and the plate read "H... · 2:19". Squeezed under PLATE_UNDER_ROOM it drops under
+  // the pills instead, centred, as a narrow window's does (style.css .street-nameplate.is-under).
+  const under = room < PLATE_UNDER_ROOM && Number(naturalW) > room;
+  return { x: Math.round(Math.max(min, Math.min(ideal, max))), room: Math.max(0, Math.floor(room)), under };
 }
+
+/** Less room than this between the pills, and a plate that does not fit it, drops under them (px). */
+export const PLATE_UNDER_ROOM = 200;
 
 function trackPillWidths(doc) {
   const leftPill = doc.getElementById('hud-stats');
@@ -708,10 +715,14 @@ function trackPillWidths(doc) {
     const l = leftPill.getBoundingClientRect();
     const r = rightPill.getBoundingClientRect();
     plate.style.maxWidth = '';
-    const spot = nameplateLeft({ rootLeft: rr.left, rootW: rr.width, plateW: plate.offsetWidth, left: l.right, right: r.left });
+    // Its own width, not the width the room left it last time.
+    plate.style.setProperty('--plate-room', `${Math.round(rr.width)}px`);
+    const naturalW = plate.offsetWidth;
+    const spot = nameplateLeft({ rootLeft: rr.left, rootW: rr.width, plateW: naturalW, left: l.right, right: r.left, naturalW });
     plate.style.setProperty('--plate-room', `${spot.room}px`);
     plate.style.setProperty('--plate-x', `${spot.x}px`);
     plate.classList.add('is-placed');
+    if (plate.classList.contains('is-under') !== spot.under) plate.classList.toggle('is-under', spot.under);
     busy = false;
   };
   const ro = new ResizeObserver(() => requestAnimationFrame(sync));
