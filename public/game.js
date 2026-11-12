@@ -792,7 +792,7 @@ import { landingY, stackRestY, walkSurfaceY } from './js/walk-surface.js?v=106bf
 import { holdCloseToFloor } from './js/slope-walk.js?v=9af1e505';
 import { JUMP_SPEED, MAX_TICK_FRAMES, WALK_MAX, avatarGround, coastX, frameSteps, stepAvatar, steerAccel, steerX, streetPhysicsExtras } from './js/avatar-step.js?v=43b1182e';
 import { createUserPath, stepUserPath } from './js/user-path.js?v=8880557f';
-import { FAILED_LINE, inVerbReach, movingLine, verbRange, walkOverEnd, walkOverGoalX } from './js/walk-over.js?v=db80ba07';
+import { FAILED_LINE, inVerbReach, movingLine, verbRange, walkOverEnd, walkOverGoals } from './js/walk-over.js?v=277ab977';
 import { hellBuffDesc, isInHell } from './js/hell.js?v=bf9c87ce';
 import { climbBobY, ladderAnimState, ladderSwap } from './js/ladder-anim.js?v=a8b327a0';
 import { VECTOR_AVATAR } from './js/avatar-vector-sheets.js?v=ad801376';
@@ -8984,10 +8984,7 @@ function requestVerb(target, verb, { label = '', run = null } = {}) {
   const go = run || (() => beginVerbAction(target, verb));
   if (!target?.sprite || target.sprite.destroyed || !player || !verb) return go();
   if (verbReachFrom(target, verb.id)) return go();
-  const range = verbWalkRange(target, verb.id) ?? 300;
-  const box = spriteWorldHitBox(target.sprite, 0);
-  const goalX = walkOverGoalX({ targetX: box ? (box.left + box.right) / 2 : target.sprite.x, targetW: box ? box.right - box.left : 0, fromX: player.x, range });
-  const ahead = goalX == null ? null : dryRunWalk(goalX);
+  const { goalX, ahead } = walkOverStop(target, verb.id, verbWalkRange(target, verb.id) ?? 300);
   if (!ahead || !verbReachFrom(target, verb.id, ahead)) {
     toast(FAILED_LINE, 2600);
     pushActivity(FAILED_LINE);
@@ -9004,13 +9001,27 @@ function requestVerb(target, verb, { label = '', run = null } = {}) {
   return true;
 }
 
+/**
+ * Where a walk-over heads and where its dry run stops: the first of walkOverGoals' stops (your side,
+ * then the thing's other side, report #232) whose stop has the thing in reach, else the first one's.
+ */
+function walkOverStop(target, verbId, range = 300) {
+  const box = spriteWorldHitBox(target.sprite, 0);
+  const goals = walkOverGoals({ targetX: box ? (box.left + box.right) / 2 : target.sprite.x, targetW: box ? box.right - box.left : 0, fromX: player.x, range });
+  let first = null;
+  for (const goalX of goals) {
+    const ahead = dryRunWalk(goalX);
+    if (ahead && verbReachFrom(target, verbId, ahead)) return { goalX, ahead };
+    first ||= { goalX, ahead };
+  }
+  return first || { goalX: null, ahead: null };
+}
+
 /** AvatarController.endPath: every end but a new street (or a menu, a scene, a new walk) measures again. */
 /** A click on a thing behind a floor: whether a walk-over (at the usual 300 px) would get it in reach. */
 function walkOverReaches(target) {
   if (!target?.sprite || target.sprite.destroyed || !player) return false;
-  const box = spriteWorldHitBox(target.sprite, 0);
-  const goalX = walkOverGoalX({ targetX: box ? (box.left + box.right) / 2 : target.sprite.x, targetW: box ? box.right - box.left : 0, fromX: player.x });
-  const ahead = goalX == null ? null : dryRunWalk(goalX);
+  const { ahead } = walkOverStop(target, 'use');
   return Boolean(ahead) && verbReachFrom(target, 'use', ahead);
 }
 

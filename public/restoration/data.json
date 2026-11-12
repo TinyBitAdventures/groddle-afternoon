@@ -2752,9 +2752,19 @@
   "deployed": "2026-11-11"
  },
  "git": {
-  "commits": 1690,
+  "commits": 1693,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-12",
+    "kind": "fix",
+    "text": "A thing your side can't reach behind a floor is reached from its other side, and a test holds every street's layout to the server's"
+   },
+   {
+    "date": "2026-11-12",
+    "kind": "fix",
+    "text": "Mail can carry what Glitch let you mail, such as CrabPod Headphones"
+   },
    {
     "date": "2026-11-12",
     "kind": "fix",
@@ -2864,19 +2874,9 @@
     "date": "2026-11-11",
     "kind": "fix",
     "text": "Yard plants step aside for a garden instead of poking through it"
-   },
-   {
-    "date": "2026-11-11",
-    "kind": "fix",
-    "text": "With a window open, another window's key opens it in its place"
-   },
-   {
-    "date": "2026-11-11",
-    "kind": "fix",
-    "text": "Your incantation reads with your name online, and a first line that closes a chain says so"
    }
   ]
  },
- "tests": 834,
+ "tests": 836,
  "generatedAt": "2026-11-12"
 }

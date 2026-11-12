@@ -26,6 +26,8 @@
  * - A thing the walk can never reach (behind a floor from wherever the walk stops: a plant in
  *   the cave under you, a tree up on a ledge) is refused at once with the client's line,
  *   instead of walking under it first (game.js simulates the walk with js/avatar-step.js).
+ *   When the stop on your side is behind a floor, the walk goes round to the thing's other
+ *   side instead, if that one reaches it (walkOverGoals, report #232).
  * - Online, the realtime server's own reach (street-objects.js inObjectReach) must hold
  *   too when the verb runs; a walk-over always ends well inside it.
  */
@@ -80,6 +82,23 @@ export function walkOverGoalX({ targetX, targetW = 0, fromX, range = DEFAULT_VER
   const most = Math.max(0, Math.min((Math.max(0, Number(targetW) || 0) / 2) + HALF_AVATAR, range - PATH_END_ALLOWANCE));
   const offset = Math.min(Math.abs(from - x) * 0.5, most);
   return from < x ? x - offset : x + offset;
+}
+
+/**
+ * PURE: the stops a walk-over tries, in order: walkOverGoalX's on your side, then the thing's
+ * other side, as far past its middle as walkOverGoalX would stop short of it (half its width + 30,
+ * inside the range). Player report #232 (Hechey Track): the herb bed's front left plot lies under
+ * the hump you stand on, behind that floor from every stop on your side and in reach from its
+ * other side, so "Could not get close enough :(" came while the avatar stood on it. The original
+ * had no floor test and walked to one stop only.
+ */
+export function walkOverGoals({ targetX, targetW = 0, fromX, range = DEFAULT_VERB_RANGE }) {
+  const near = walkOverGoalX({ targetX, targetW, fromX, range });
+  if (near == null) return [];
+  const x = Number(targetX);
+  const most = Math.max(0, Math.min((Math.max(0, Number(targetW) || 0) / 2) + HALF_AVATAR, range - PATH_END_ALLOWANCE));
+  const far = (Number(fromX) || 0) < x ? x + most : x - most;
+  return Math.abs(far - near) < 1 ? [near] : [near, far];
 }
 
 /**

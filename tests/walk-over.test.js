@@ -17,12 +17,13 @@ import {
   verbRange,
   walkOverEnd,
   walkOverGoalX,
-} from '../public/js/walk-over.js?v=db80ba07';
+  walkOverGoals,
+} from '../public/js/walk-over.js?v=277ab977';
 import { VERB_RANGES } from '../public/js/verb-ranges-data.js?v=4d0a4515';
-import { OUT_OF_REACH_LINE } from '../public/js/reach.js?v=4187d746';
+import { OUT_OF_REACH_LINE, avatarHitBox, behindFloor } from '../public/js/reach.js?v=4187d746';
 import { createUserPath, stepUserPath } from '../public/js/user-path.js?v=8880557f';
 import { NORMAL_BUFF, avatarGround, stepAvatar, steerX } from '../public/js/avatar-step.js?v=43b1182e';
-import { groundBeneath, platformsScreen, barriersScreen, streetWidth } from '../public/js/street-model.js?v=b6cb6a4e';
+import { avatarHeadReach, groundBeneath, platformsScreen, barriersScreen, streetWidth } from '../public/js/street-model.js?v=b6cb6a4e';
 
 const root = join(import.meta.dirname, '..');
 const game = readFileSync(join(root, 'public/game.js'), 'utf8');
@@ -80,6 +81,32 @@ describe('the walk (moveAvatarToLIVandDoVerbOrAction, AvatarController.beginPath
     assert.equal(walkOverGoalX({ targetX: NaN, fromX: 0 }), null);
   });
 
+  it('report #232: your side first, then the thing\'s other side as far past its middle', () => {
+    assert.deepEqual(walkOverGoals({ targetX: 1000, targetW: 100, fromX: 200 }), [920, 1080]);
+    assert.deepEqual(walkOverGoals({ targetX: 1000, targetW: 100, fromX: 1100 }), [1050, 920]);
+    assert.deepEqual(walkOverGoals({ targetX: 1000, targetW: 600, fromX: 0, range: 150 }), [870, 1130]);
+    // Hechey Track's front left herb plot (box 3159-3215) from where the player stood.
+    assert.deepEqual(walkOverGoals({ targetX: 3187, targetW: 56, fromX: 3173 }), [3180, 3245]);
+    assert.deepEqual(walkOverGoals({ targetX: NaN, fromX: 0 }), []);
+  });
+
+  it('report #232: Hechey Track\'s front left herb plot is behind the hump from your side, in reach from its other side', () => {
+    const street = JSON.parse(readFileSync(join(root, 'public/assets/streets/GLI2V0UN7RD1T2J.json'), 'utf8'));
+    const platforms = platformsScreen(street);
+    // The herb bed (data/gardens.json herb at 3261.5) draws plot 1-2 here (game.js spriteWorldHitBox, measured in the game).
+    const plot = { left: 3159, right: 3215, top: 831, bottom: 847 };
+    const behindFrom = (x) => {
+      const feet = groundBeneath(platforms, x, 700, 0);
+      const body = { x, y: feet.y - avatarHeadReach(1).reach / 2 };
+      return behindFloor(platforms, body, plot, { x: 3187, y: 847 }, { feetY: feet.y, hitBox: avatarHitBox(x, feet.y, 1) });
+    };
+    const [near, far] = walkOverGoals({ targetX: 3187, targetW: 56, fromX: 3173 });
+    assert.equal(Math.round(groundBeneath(platforms, 3173, 700, 0).y), 811, 'the player stood on the hump\'s slope');
+    assert.equal(behindFrom(3173), true);
+    assert.equal(behindFrom(near), true, 'the only stop before: "Could not get close enough :("');
+    assert.equal(behindFrom(far), false);
+  });
+
   it('every end but a new street, a menu or a new walk measures again', () => {
     for (const r of ['arrived', 'key', 'jump', 'wall']) assert.equal(walkOverEnd(r), 'measure', r);
     for (const r of ['street', 'held', 'game', 'replaced', 'gone']) assert.equal(walkOverEnd(r), 'drop', r);
@@ -131,7 +158,10 @@ describe('game.js wiring', () => {
 
   it('in reach runs at once; else a dry run of the walk, then the walk or the refusal', () => {
     assert.match(game, /if \(verbReachFrom\(target, verb\.id\)\) return go\(\);/);
-    assert.match(game, /const ahead = goalX == null \? null : dryRunWalk\(goalX\);\s*if \(!ahead \|\| !verbReachFrom\(target, verb\.id, ahead\)\) \{\s*toast\(FAILED_LINE/);
+    assert.match(game, /const \{ goalX, ahead \} = walkOverStop\(target, verb\.id, verbWalkRange\(target, verb\.id\) \?\? 300\);\s*if \(!ahead \|\| !verbReachFrom\(target, verb\.id, ahead\)\) \{\s*toast\(FAILED_LINE/);
+    // Report #232: each of walkOverGoals' stops is dry run; the first that reaches is taken.
+    assert.match(game, /function walkOverStop\(target, verbId, range = 300\) \{[\s\S]{0,300}walkOverGoals\(\{[\s\S]{0,200}for \(const goalX of goals\) \{\s*const ahead = dryRunWalk\(goalX\);\s*if \(ahead && verbReachFrom\(target, verbId, ahead\)\) return \{ goalX, ahead \};/);
+    assert.match(game, /function walkOverReaches\(target\) \{[\s\S]{0,120}walkOverStop\(target, 'use'\)/);
     assert.match(game, /avatarWalk\.verbWalk = \{ target, verb, go, street: currentStreetTsid \};/);
     assert.match(game, /function dryRunWalk\(goalX\) \{[\s\S]{0,700}stepUserPath\(path[\s\S]{0,300}stepAvatar\(body, opts\)/);
   });
