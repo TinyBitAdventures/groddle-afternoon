@@ -2752,9 +2752,14 @@
   "deployed": "2026-11-11"
  },
  "git": {
-  "commits": 1681,
+  "commits": 1682,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-12",
+    "kind": "fix",
+    "text": "Peat can't be dug twice, Winter Walk motes collect on foot, the crystal takes a full jar, and M closes the Map"
+   },
    {
     "date": "2026-11-12",
     "kind": "fix",
@@ -2869,14 +2874,9 @@
     "date": "2026-11-11",
     "kind": "fix",
     "text": "Vendors won't buy a bag with things still in it"
-   },
-   {
-    "date": "2026-11-11",
-    "kind": "improve",
-    "text": "The making stage shows the output's count as a badge, and none for one"
    }
   ]
  },
- "tests": 826,
+ "tests": 827,
  "generatedAt": "2026-11-12"
 }

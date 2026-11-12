@@ -12746,7 +12746,7 @@ html.stage-pinned[data-ui="modern"] header.top-bar { left: calc(var(--sp-5) + va
   border-radius: var(--radius-xs);
 }
 /* The buttons inside: the shell's pills (primary in the accent, the rest raised). */
-[data-ui="modern"] :is(#home-panel, #mail-panel) :is(.home-body, .mail-reader, .mail-head-actions) button:not(.verb-menu-x):not(.mail-row):not(.combo-toggle) {
+[data-ui="modern"] :is(#home-panel, #mail-panel) :is(.home-body, .mail-reader, .mail-head-actions) button:not(.verb-menu-x):not(.mail-row):not(.combo-toggle):not(.home-style) {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -12763,9 +12763,9 @@ html.stage-pinned[data-ui="modern"] header.top-bar { left: calc(var(--sp-5) + va
   font-weight: var(--fw-heavy);
   cursor: pointer;
 }
-[data-ui="modern"] :is(#home-panel, #mail-panel) :is(.home-body, .mail-reader, .mail-head-actions) button.btn-glitch-primary:not(.verb-menu-x):not(.mail-row):not(.combo-toggle) { border-color: var(--accent); background: var(--accent); color: var(--accent-text); }
-[data-ui="modern"] :is(#home-panel, #mail-panel) :is(.home-body, .mail-reader, .mail-head-actions) button:not(.verb-menu-x):not(.mail-row):not(.combo-toggle):hover:not(:disabled) { background: var(--surface-hover); }
-[data-ui="modern"] :is(#home-panel, #mail-panel) :is(.home-body, .mail-reader, .mail-head-actions) button.btn-glitch-primary:not(.verb-menu-x):not(.mail-row):not(.combo-toggle):hover:not(:disabled) { background: var(--accent-hover); }
+[data-ui="modern"] :is(#home-panel, #mail-panel) :is(.home-body, .mail-reader, .mail-head-actions) button.btn-glitch-primary:not(.verb-menu-x):not(.mail-row):not(.combo-toggle):not(.home-style) { border-color: var(--accent); background: var(--accent); color: var(--accent-text); }
+[data-ui="modern"] :is(#home-panel, #mail-panel) :is(.home-body, .mail-reader, .mail-head-actions) button:not(.verb-menu-x):not(.mail-row):not(.combo-toggle):not(.home-style):hover:not(:disabled) { background: var(--surface-hover); }
+[data-ui="modern"] :is(#home-panel, #mail-panel) :is(.home-body, .mail-reader, .mail-head-actions) button.btn-glitch-primary:not(.verb-menu-x):not(.mail-row):not(.combo-toggle):not(.home-style):hover:not(:disabled) { background: var(--accent-hover); }
 [data-ui="modern"] :is(#home-panel, #mail-panel) button:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
 [data-ui="modern"] :is(#home-panel, #mail-panel) button:disabled { border-color: var(--border); background: var(--surface-sunken); color: var(--text-muted); cursor: not-allowed; }
 /* Home: the owned card and the ticket machine. */
@@ -12777,7 +12777,14 @@ html.stage-pinned[data-ui="modern"] header.top-bar { left: calc(var(--sp-5) + va
 [data-ui="modern"] #home-panel :is(.home-owned-actions, .home-purchase-bar, .home-ticket) { flex-wrap: wrap; gap: var(--space-2); margin-top: var(--space-4); padding: var(--space-3); border: 1px solid var(--border); border-radius: var(--radius-m); background: var(--surface-raised); }
 [data-ui="modern"] #home-panel .home-owned-meta { color: var(--text-muted); font-size: var(--fs-s); }
 [data-ui="modern"] #home-panel :is(.home-ticket-copy span, .home-purchase-copy span, .home-intro) { color: var(--text-muted); font-size: var(--fs-s); }
-[data-ui="modern"] #home-panel .home-style { border-radius: var(--radius-m); }
+/* The Selection Machine's choices (Austin 2026-11-11): option rows, never the shell's pills above
+   (they made three clipped circles): the style's swatch, then "Pick <Style> Style" over its line. */
+[data-ui="modern"] #home-panel .home-style-grid { grid-template-columns: 1fr; gap: var(--space-2); margin-top: var(--space-3); }
+[data-ui="modern"] #home-panel .home-style { display: grid; grid-template-columns: 44px 1fr; align-items: center; column-gap: var(--space-3); row-gap: 2px; min-height: 0; padding: var(--space-2) var(--space-3); overflow: hidden; border: 1px solid var(--border-strong); border-radius: var(--radius-m); background: var(--surface-raised); box-shadow: none; color: var(--text); font: inherit; text-align: left; cursor: pointer; }
+[data-ui="modern"] #home-panel .home-style:hover:not(:disabled) { border-color: var(--home-accent, var(--accent)); background: var(--surface-hover); box-shadow: none; }
+[data-ui="modern"] #home-panel .home-style-visual { grid-row: 1 / span 2; width: 44px; height: 44px; border-radius: var(--radius-s); }
+[data-ui="modern"] #home-panel .home-style strong { grid-column: 2; align-self: end; padding: 0; color: var(--text); font-size: var(--fs-m); font-weight: var(--fw-heavy); line-height: var(--lh-tight); }
+[data-ui="modern"] #home-panel .home-style span:last-child { grid-column: 2; align-self: start; padding: 0; color: var(--text-muted); font-size: var(--fs-s); line-height: var(--lh-body); }
 /* Mail: the folders as the shell's tabs, the list and the letter side by side. */
 [data-ui="modern"] #mail-panel .mail-head-actions { flex: none; gap: var(--space-2); }
 [data-ui="modern"] #mail-panel .mail-tabs { flex: none; padding: 3px; background: var(--surface-sunken); }
