@@ -19,7 +19,7 @@ import {
   salmonReleaseConditions,
   swimmingSalmonCount,
   tickResourceNode,
-} from '../public/js/resource-nodes.js?v=db9c69bd';
+} from '../public/js/resource-nodes.js?v=9db2fcee';
 import { MOOD_XP_SOURCES } from '../public/js/mood-xp.js?v=958e7680';
 import { resourceNodesFeature } from '../public/js/features/resource-nodes-feature.js?v=55fb520d';
 import { eventIncrements } from '../public/js/solo-feats.js?v=6380f15d';

@@ -92,8 +92,8 @@
  */
 
 import { addItem, countItem, removeItem } from '../inventory.js?v=5be47371';
-import { getGameDayKey } from '../game-day.js?v=f88e6e16';
-import { isPooped } from '../hell.js?v=6a0c61bf';
+import { getGameDayKey } from '../game-day.js?v=84569fa2';
+import { isPooped } from '../hell.js?v=cd6ed74f';
 import { metabolicGain, moodMax, loseEnergy, loseMood } from '../metabolics.js?v=8504134e';
 import {
   POWDERS,
@@ -131,7 +131,7 @@ import {
   powderCaughtLine,
   powderRefusedLine,
   powderRefusedSound,
-} from '../hi-signs-mp.js?v=8feacf48';
+} from '../hi-signs-mp.js?v=b61d4ff2';
 
 export const POWDERS_FEATURE_ID = 'powders';
 

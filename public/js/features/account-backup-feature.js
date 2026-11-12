@@ -37,7 +37,7 @@
 import { createMinnAccount } from '../minn-account.js?v=c15f0ecf';
 import { mountAccountForms, mountAccountSettings, mountPresenceSetting } from '../account-forms.js?v=318b6815';
 import { createBrowserSaveStore, freezeSoloSaves, restoreSoloSave, saveStore, savedAtOf, soloSaveSnapshot } from '../save-store.js?v=89422a9c';
-import { formatGameDayLabel } from '../game-day.js?v=f88e6e16';
+import { formatGameDayLabel } from '../game-day.js?v=84569fa2';
 import { multiplayerEntryUrl } from '../game-mode.js?v=1ecf2899';
 import { markContinued, quietSession } from '../online-boot.js?v=4ea71073';
 import { installCharacterSwitcher } from '../character-switcher.js?v=305b1f12';

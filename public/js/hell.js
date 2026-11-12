@@ -46,7 +46,7 @@
  */
 
 import { ensureItem } from './inventory.js?v=5be47371';
-import { GAME_DAY_MS, getGameDayKey, getGameDayStartMs } from './game-day.js?v=f88e6e16';
+import { GAME_DAY_MS, getGameDayKey, getGameDayStartMs } from './game-day.js?v=84569fa2';
 import { giantDisplayName } from './giant-names.js?v=0e295891';
 
 export const HELL_STATE_VERSION = 1;
@@ -680,11 +680,14 @@ export function canCroak(state, ctx = {}) {
  * No-No Powder buff, then croak() guards apply.
  * @param {{ energy:number, activeBuffs?:string[] }} pc
  * @param {object} state
- * @param {{ streetTsid?:string, hubId?:string, now?:number, locked?:boolean }} [ctx]
+ * A pending new game day comes first (player.js 187 checkNewGameDay runs at login before
+ * anything else): its refill lands, so a player who logged out at 0 does not croak on arrival.
+ * @param {{ streetTsid?:string, hubId?:string, now?:number, locked?:boolean, newDayPending?:boolean }} [ctx]
  */
 export function shouldCroak(pc, state, ctx = {}) {
   const now = num(ctx.now, Date.now());
   if (num(pc?.energy) > 0) return false;
+  if (ctx.newDayPending) return false;
   if (deathsTodayFor(state, now)) return false;
   if (hasPcBuff(pc, 'no_no_powder')) return false;
   return canCroak(state, { ...ctx, pc }).ok;
@@ -1072,7 +1075,10 @@ export function hellNewDay(state, pc = {}, now = Date.now(), opts = {}) {
   if (s.isDead && s.croakDayKey && s.croakDayKey !== today) {
     resurrection = resurrect(s, pc, now, opts);
     s = resurrection.state;
-    effects.push(...resurrection.effects);
+    // checkNewGameDay resurrects, then its timer runs doNewDay a second later (player.js 862-865,
+    // 891-895): the new day's full tanks stand, not the 10% a squished way out gives. The caller
+    // (game.js maybeNewDay) has already refilled, so the resurrection sets no metabolics.
+    effects.push(...resurrection.effects.filter((effect) => effect.type !== 'metabolics'));
   }
   if (s.deathsDayKey && s.deathsDayKey !== today) {
     s = { ...s, deathsToday: 0, deathsDayKey: today };

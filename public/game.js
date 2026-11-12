@@ -2,7 +2,7 @@
  * Groddle Afternoon — original street geometry + layered decos
  * PixiJS 8 · locations-xml streets · CoU PNG decos · quests/items
  */
-import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=b10c2fcc';
+import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=38cb7c54';
 import { createErrorOnce, createFeatureHost } from './js/feature-host.js?v=06bb8b74';
 import { FEATURES, questFlagsFeature } from './js/features/index.js?v=c61eaf66';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl, drawTileArt } from './js/enter-chooser.js?v=4a3ea327';
@@ -374,7 +374,7 @@ import {
   slipTerrainY,
   starlitMoonPlainAlpha,
   starlitRevealAlpha,
-} from './js/paradise-flight.js?v=8056a720';
+} from './js/paradise-flight.js?v=f8ef1e8f';
 import { resolveParadiseCourseAlias } from './js/paradise-courses.js?v=1a5d0aa7';
 import {
   buildParadiseCourseArt,
@@ -485,8 +485,8 @@ import { HELD_AT_ONCE, HELD_AT_ONCE_TEXT } from './js/collection-trophies.js?v=3
 import { PACK_COPY, isBagClass, isElementClass, unitRankAt } from './js/pack-slots.js?v=6b8393a1';
 import { hasPouch } from './js/elemental-pouch.js?v=ceefa97a';
 import { createPackRow, mountPackClearance, packBandRange, packCountText, packSearchEntries, packSlotTip } from './js/ui/pack-row.js?v=f27cf531';
-import { listAnimalFeedOptions } from './js/animals.js?v=d21a2fd4';
-import { pickerMaxCount, pickerOptionsFor, pickerTakesCount } from './js/animals.js?v=d21a2fd4';
+import { listAnimalFeedOptions } from './js/animals.js?v=f44dd15a';
+import { pickerMaxCount, pickerOptionsFor, pickerTakesCount } from './js/animals.js?v=f44dd15a';
 import {
   createDroppedItemState,
   parseDroppedItemState,
@@ -505,7 +505,7 @@ import {
   parsePlayerSave,
   serializePlayerSave,
   restorePlayerSave,
-} from './js/player-save.js?v=00f88199';
+} from './js/player-save.js?v=cf585ed2';
 import {
   HOME_INTERIOR_TSID,
   HOME_STREET_TSID,
@@ -690,6 +690,7 @@ import {
 import {
   GAME_DAY_MS,
   shouldFireNewDay,
+  newDayPending,
   setLastNewDayTs,
   resetGameDayClock,
   applyNewDayRefill,
@@ -700,7 +701,7 @@ import {
   getGameDayKey,
   timestampForGameHour,
   msUntilNewDay,
-} from './js/game-day.js?v=f88e6e16';
+} from './js/game-day.js?v=84569fa2';
 import {
   FOOD_VARIETY_UPGRADE,
   createFoodState,
@@ -710,7 +711,7 @@ import {
   canEatFood,
   recordFoodEat,
   resetFoodDay,
-} from './js/food.js?v=c6507620';
+} from './js/food.js?v=1b39e06a';
 import {
   consumeTakesCount,
   consumeCountCap,
@@ -720,7 +721,7 @@ import {
   limitCountCap,
   useItemMany,
   recordFoodEatMany,
-} from './js/eat-many.js?v=deddd20c';
+} from './js/eat-many.js?v=17aa2d7f';
 import {
   TRIPLE_JUMP_UPGRADES,
   createJumpState,
@@ -797,7 +798,7 @@ import { JUMP_SPEED, MAX_TICK_FRAMES, WALK_MAX, avatarGround, coastX, frameSteps
 import { createUserPath, stepUserPath } from './js/user-path.js?v=8880557f';
 import { climbGoalStep, installTouchControls, isPhoneDevice, touchPrompt, touchTapPlan } from './js/touch-controls.js?v=89321eeb';
 import { FAILED_LINE, inVerbReach, movingLine, verbRange, walkOverEnd, walkOverGoals } from './js/walk-over.js?v=277ab977';
-import { hellBuffDesc, isInHell } from './js/hell.js?v=6a0c61bf';
+import { hellBuffDesc, isInHell } from './js/hell.js?v=cd6ed74f';
 import { climbBobY, ladderAnimState, ladderSwap } from './js/ladder-anim.js?v=a8b327a0';
 import { VECTOR_AVATAR } from './js/avatar-vector-sheets.js?v=ad801376';
 import { createNpcGlitchKit } from './js/npc-glitch.js?v=810e1841';
@@ -835,7 +836,7 @@ import {
   planMusicblockDrop,
   playMusicblock,
   starterMusicblocks,
-} from './js/musicblocks.js?v=87a34689';
+} from './js/musicblocks.js?v=182d0a4e';
 import {
   VENDOR_PROFILES,
   selectVendorProfile,
@@ -854,7 +855,7 @@ import {
   createAnimalState,
   resetAnimalDay,
   animalStatusLabel,
-} from './js/animals.js?v=d21a2fd4';
+} from './js/animals.js?v=f44dd15a';
 import {
   ensureWoodTreeState,
   pickWoodTool,
@@ -886,7 +887,7 @@ import {
   favorRelationNote,
   emblemRelationNote,
   formatSpeedUpTime,
-} from './js/shrines.js?v=15cd8b43';
+} from './js/shrines.js?v=e2755fac';
 import { shrineSheet, shrineVariantFor } from './js/shrine-variants.js?v=7f11c97d';
 import { giantDisplayName } from './js/giant-names.js?v=0e295891';
 import { shrinePowderOptions, shrinePowderAchievementCounters } from './js/powders.js?v=397984f7';
@@ -899,7 +900,7 @@ import {
   spinMeResponse,
   spinningWheelPhase,
   startSpinningWheel,
-} from './js/spinning-wheel.js?v=82259b39';
+} from './js/spinning-wheel.js?v=69ae9fe7';
 import {
   CUBIMAL_PACKAGE_IDS,
   cubimalCollectionProgress,
@@ -1020,7 +1021,7 @@ import { revealStartCard, whenSceneDrawn } from './js/start-backdrop.js?v=8510d5
 import { cancelAllOverlays, playPoofIn, setOverlayResolution } from './js/overlay-art.js?v=a6561207';
 import * as textureUrls from './js/textures.js?v=92ec53cd';
 import { installPixiFixes } from './js/pixi-fixes.js?v=173fb649';
-import { hidesChatBubble } from './js/hi-signs.js?v=09029975';
+import { hidesChatBubble } from './js/hi-signs.js?v=fabb2c6b';
 // Multiplayer phase 1: the mode flag and the save interface every save read/write goes through.
 import { GAME_MODE, isSolo } from './js/game-mode.js?v=1ecf2899';
 import { saveStore } from './js/save-store.js?v=89422a9c';
@@ -12953,6 +12954,8 @@ const engine = {
   travelGate: (tsid, meta) => features.travelGate(tsid, engine, meta),
   /** Every feature's metabolic gate, e.g. the dead gain no energy. */
   metabolicGate: (stat, direction) => features.metabolicGate(stat, direction, engine),
+  /** A new game day waits for maybeNewDay (Hell holds a croak until its refill lands). */
+  newDayPending: (now) => newDayPending(now),
   openMap: (hubId, opts) => openMap(hubId, opts),
   closeMap: () => closeMap(),
   /** Ticket 81: the content panels close (Classic's Projects window opens alone, as Quests does). */

@@ -61,13 +61,13 @@
  * yardApplied (acts applied to my home), yardSent (acts the site took).
  */
 
-import { performPlotVerb, plotArtPath, plotLabel, plotStatusLabel, plotVerbs } from '../patches.js?v=fa07c1b4';
+import { performPlotVerb, plotArtPath, plotLabel, plotStatusLabel, plotVerbs } from '../patches.js?v=d63423c9';
 import { trantStatusLabel } from '../trants.js?v=1b3c8ae3';
 import { woodTreeStatusLabel } from '../woodcutting.js?v=5235a01a';
 import { animalAnchorX, animalAnchorY, animalStatusLabel } from '../animals.js?v=7e27e9d2';
 import { frameTexture, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js?v=92ec53cd';
 import { homeStreetLayout, normalizeCultivationState } from '../home-cultivation.js?v=f1242621';
-import { readVisitScene } from '../neighbours-mp.js?v=746c4832';
+import { readVisitScene } from '../neighbours-mp.js?v=7dc15891';
 import { saveStore } from '../save-store.js?v=89422a9c';
 import { STREET_GROUND_Y, homesFeature, wearHomeCultivation } from './homes-feature.js?v=b7791aed';
 import { patchesFeature, treeFrameUrl } from './patches-feature.js?v=df56eea7';
@@ -87,7 +87,7 @@ import {
   treeSnapshot,
   visitorAnimalState,
   visitorTreeState,
-} from '../yard-verbs-mp.js?v=d398d463';
+} from '../yard-verbs-mp.js?v=82048a76';
 import { yardFixtureRows, yardFixtureVerbs, yardFixturesKey } from '../yard-fixtures-mp.js?v=dd022fe8';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
 import { followYardPath, stickForClass } from '../yard-wander.js?v=69bfdbdb';
@@ -107,7 +107,7 @@ import {
   normalizeStockView,
   visitorNode,
   visitorRock,
-} from '../yard-stock-mp.js?v=edf11583';
+} from '../yard-stock-mp.js?v=7d026743';
 
 export { YARD_VERBS_MP_ID };
 

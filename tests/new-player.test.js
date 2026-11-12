@@ -17,7 +17,7 @@ import {
 } from '../public/js/new-player.js?v=d9fa4f61';
 import { createBrowserSaveStore, createMultiplayerSaveStore, createSaveStore } from '../public/js/save-store.js?v=89422a9c';
 import { createInventory } from '../public/js/inventory.js?v=5be47371';
-import { normalizePlayerSnapshot, parsePlayerSave, restorePlayerSave } from '../public/js/player-save.js?v=00f88199';
+import { normalizePlayerSnapshot, parsePlayerSave, restorePlayerSave } from '../public/js/player-save.js?v=cf585ed2';
 import { createQuoinState } from '../public/js/quoins.js?v=7e0dec6d';
 import { createShrineState } from '../public/js/shrines.js?v=15cd8b43';
 import { PARADISE_COURSES, PARADISE_TICKET_IDS } from '../public/js/paradise-flight.js?v=c7acd7a2';

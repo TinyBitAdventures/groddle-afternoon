@@ -472,6 +472,8 @@ export const hellFeature = {
       streetTsid: engine.streetTsid,
       hubId: engine.street?.hubId || '',
       now,
+      // Ticket 238: a new day waiting at login refills first (game.js maybeNewDay).
+      newDayPending: engine.newDayPending?.(now) === true,
     })) {
       lastEnergy = null;
       doCroak(engine);

@@ -62,7 +62,7 @@ import { addItem, countItem, ensureItem, removeItem, ITEM_CATALOG } from '../inv
 import { bindCountField, countKeyValue, countStepMarkup } from '../ui/count-chooser.js?v=5bc894c8';
 import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=32c58aef';
 import { landingY, nearestSurfaceY } from '../walk-surface.js?v=106bfdc5';
-import { donationValueFor } from '../shrines.js?v=15cd8b43';
+import { donationValueFor } from '../shrines.js?v=e2755fac';
 import { giantDisplayName } from '../giant-names.js?v=0e295891';
 import { TRANT_META, trantStatusLabel } from '../trants.js?v=1b3c8ae3';
 import {

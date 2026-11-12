@@ -29,7 +29,7 @@ import {
   piggyTwiceDailyTick,
   piggyWalkSpeed,
 } from '../public/js/animal-mood.js?v=a49495fc';
-import { createAnimalState, animalStatusLabel, resetAnimalDay } from '../public/js/animals.js?v=d21a2fd4';
+import { createAnimalState, animalStatusLabel, resetAnimalDay } from '../public/js/animals.js?v=f44dd15a';
 import { performAnimalKinship } from '../public/js/animal-kinship.js?v=f91347e9';
 import { advanceYard, capturePiggy, captureVerbState, feedPiggyStack, normalizeHusbandryPack } from '../public/js/animal-husbandry.js?v=0b701ee7';
 import { getVerbsFor, runVerb } from '../public/content.js?v=4f923e2b';

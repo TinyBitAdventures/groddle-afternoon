@@ -33,7 +33,7 @@ import {
   receivedLine,
   sharedHomeStreet,
   visitSceneTsid,
-} from '../public/js/neighbours-mp.js?v=746c4832';
+} from '../public/js/neighbours-mp.js?v=7dc15891';
 import { createMinnAccount } from '../public/js/minn-account.js?v=c15f0ecf';
 import { homesFeature, visitorHomeScene, visitorHomeState } from '../public/js/features/homes-feature.js?v=b7791aed';
 import { neighboursMpApi, neighboursMpFeature } from '../public/js/features/neighbours-mp-feature.js?v=f5cf6f95';

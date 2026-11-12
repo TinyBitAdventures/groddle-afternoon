@@ -89,7 +89,7 @@ import {
   saleVerbs,
   signpostArms,
   signpostCandidates,
-} from '../home-street-mp.js?v=99cd96aa';
+} from '../home-street-mp.js?v=ccc2c76b';
 
 export { HOME_STREET_MP_ID };
 

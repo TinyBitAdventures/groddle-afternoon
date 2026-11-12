@@ -7,7 +7,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { ITEM_CATALOG, createInventory, getItemUseInfo, registerItemUse } from '../public/js/inventory.js?v=5be47371';
 import { VENDOR_PROFILES, vendorBuy, vendorSell } from '../public/js/vendor.js?v=592caaf1';
-import { canEatFood, createFoodState } from '../public/js/food.js?v=c6507620';
+import { canEatFood, createFoodState } from '../public/js/food.js?v=1b39e06a';
 
 const root = join(import.meta.dirname, '..');
 const game = (f) => readFileSync(join(root, 'public', f), 'utf8').replace(/\\'/g, "'").replace(/\\"/g, '"');

@@ -70,7 +70,7 @@ import {
   takeVisitorDelivery,
   teachButler,
   visitorsReport,
-} from '../public/js/butler.js?v=0a345ccc';
+} from '../public/js/butler.js?v=1370b711';
 import { canOptIn, stoneVog, STONE_TEXT } from '../public/js/street-furniture.js?v=55131f49';
 import { NEIGHBOURS, neighbourById, normalizeNeighbourState, visitorLetter } from '../public/js/neighbours.js?v=161fc2e5';
 import { butlerApi, butlerFeature } from '../public/js/features/butler-feature.js?v=002f6959';

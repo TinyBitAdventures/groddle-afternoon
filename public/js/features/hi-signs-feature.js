@@ -100,7 +100,7 @@ import {
   setButlerHiVariant,
   setPlayerHiVariant,
   stepMissile,
-} from '../hi-signs.js?v=09029975';
+} from '../hi-signs.js?v=fabb2c6b';
 import {
   BOARD_POLL_MS,
   BOARD_TEXT,
@@ -115,7 +115,7 @@ import {
   recordLine,
   yesterdayLine,
   yourSignLine,
-} from '../hi-signs-mp.js?v=8feacf48';
+} from '../hi-signs-mp.js?v=b61d4ff2';
 
 /** An art URL with its content key (js/data-urls.js groddleDataUrl); as it is in Node and on a page without the map. */
 const keyedArt = (url) => (typeof globalThis.groddleDataUrl === 'function' ? globalThis.groddleDataUrl(url) : url);

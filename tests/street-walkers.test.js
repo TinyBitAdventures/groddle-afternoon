@@ -22,7 +22,7 @@ import {
   kittyWalkAt,
   pathTime,
   walkerSpan,
-} from '../public/js/street-creatures.js?v=729480c4';
+} from '../public/js/street-creatures.js?v=389b5500';
 import { KITTY_MOTION, KITTY_PAUSE_CHOICES, KITTY_PET } from '../public/js/heli-kitties.js?v=8fbe314a';
 import { CRAB_WALK } from '../public/js/crabs.js?v=d97eda71';
 import { GAME_EPOCH_MS } from '../public/js/game-day.js?v=f88e6e16';

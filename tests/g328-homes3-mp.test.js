@@ -38,7 +38,7 @@ import {
   saleVerbs,
   signpostArms,
   signpostCandidates,
-} from '../public/js/home-street-mp.js?v=99cd96aa';
+} from '../public/js/home-street-mp.js?v=ccc2c76b';
 import { NOTE_POLE_CONTAINERS, NOTE_POLE_PARTS, NOTE_POLE_SIGN_Y } from '../public/js/note-pole-art.js?v=fbda2f8a';
 import { isSharedJob } from '../public/js/street-jobs-mp.js?v=25efcadf';
 import { homeStreetMpFeature } from '../public/js/features/home-street-mp-feature.js?v=46a58896';

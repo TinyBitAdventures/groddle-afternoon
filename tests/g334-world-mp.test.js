@@ -26,10 +26,10 @@ import {
   stateFor,
   streetPigIndex,
   takeObjs,
-} from '../public/js/street-objects.js?v=6fc1bf6f';
+} from '../public/js/street-objects.js?v=7a16545b';
 import { HELP_DIG_COUNTER, HELP_DIG_LABEL, digHelpFrom, helpDigMessage, othersDigging } from '../public/js/help-dig.js?v=7b8a9733';
 import { MULTIPLAYER_QUESTS, MULTIPLAYER_QUESTS_LEFT_OUT, creditedMultiplayerQuests, offerableMultiplayerQuest } from '../public/js/quests-mp.js?v=1fc5ff58';
-import { createResourceNode, harvestResourceNode } from '../public/js/resource-nodes.js?v=db9c69bd';
+import { createResourceNode, harvestResourceNode } from '../public/js/resource-nodes.js?v=9db2fcee';
 import { isPoisoned, TREE_ANTIDOTE, TREE_POISON, BOTANY_SKILL } from '../public/js/tree-poison.js?v=5ceea244';
 import { treeDeathFeature } from '../public/js/features/tree-death-feature.js?v=b8c04443';
 import { patchesFeature } from '../public/js/features/patches-feature.js?v=df56eea7';

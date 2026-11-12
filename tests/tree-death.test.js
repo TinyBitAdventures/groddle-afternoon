@@ -39,7 +39,7 @@ import {
   treeDeathOutcome,
   useBottle,
 } from '../public/js/tree-poison.js?v=5ceea244';
-import { createPlot, killPlotTree, performPlotVerb, growTree } from '../public/js/patches.js?v=fa07c1b4';
+import { createPlot, killPlotTree, performPlotVerb, growTree } from '../public/js/patches.js?v=d63423c9';
 import { createFeatureHost } from '../public/js/feature-host.js?v=06bb8b74';
 import { FEATURES } from '../public/js/features/index.js?v=c61eaf66';
 import { adoptedPlan } from '../public/js/features/patches-feature.js?v=df56eea7';

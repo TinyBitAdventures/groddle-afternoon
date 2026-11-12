@@ -34,7 +34,7 @@ import {
   imgRewards,
   rewardsCap,
 } from '../public/js/magic-rock-home.js?v=c07b2327';
-import { getGameDayKey } from '../public/js/game-day.js?v=f88e6e16';
+import { getGameDayKey } from '../public/js/game-day.js?v=84569fa2';
 
 const spike = join(import.meta.dirname, '..');
 const GS = join(spike, '../glitch-GameServerJS');

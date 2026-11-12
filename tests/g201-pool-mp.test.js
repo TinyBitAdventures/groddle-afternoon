@@ -20,7 +20,7 @@ import { homePoolMpFeature } from '../public/js/features/home-pool-mp-feature.js
 import { CULTIVATION_REWARDS_CAP, imgRewards, imgRewardLine } from '../public/js/magic-rock-home.js?v=c07b2327';
 import { DROP_TEXT, eatenStack, normalizeGroundStack, pigAnimalKey } from '../public/js/drops-mp.js?v=ec6a135d';
 import { dropsMpFeature } from '../public/js/features/drops-mp-feature.js?v=361c149d';
-import { GAME_DAY_MS, GAME_EPOCH_MS, getGameDayKey } from '../public/js/game-day.js?v=f88e6e16';
+import { GAME_DAY_MS, GAME_EPOCH_MS, getGameDayKey } from '../public/js/game-day.js?v=84569fa2';
 import { normalizeToolConditionState } from '../public/js/tools.js?v=5f482998';
 import { tradeTable } from '../tools/build-realtime-trade.mjs';
 import { HAS_SERVER, HAS_SITE, SITE_DIR, serverPath, sitePath } from '../tools/repos.mjs';

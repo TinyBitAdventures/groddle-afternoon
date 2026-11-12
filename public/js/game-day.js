@@ -235,6 +235,21 @@ export function shouldFireNewDay(now = Date.now(), dayMs = GAME_DAY_MS) {
   return lastKey !== getGameDayKey(now);
 }
 
+/**
+ * Whether a new game day waits to be run (pure: unlike shouldFireNewDay it never seeds the clock).
+ * Glitch ran checkNewGameDay first at login (players/player.js 187, 854-879), so nothing on the
+ * new day happened before its refill; the croak check holds while this is true.
+ */
+export function newDayPending(now = Date.now()) {
+  let lastKey = getLastNewDayKey();
+  if (!lastKey) {
+    const legacyTs = getLastNewDayTs();
+    if (!legacyTs) return false;
+    lastKey = getGameDayKey(legacyTs);
+  }
+  return lastKey !== getGameDayKey(now);
+}
+
 export function applyNewDayRefill(pc, caps = {}) {
   const eMax = caps.energyMax ?? Math.max(100, Number(pc.energyMax) || 100);
   const mMax = caps.moodMax ?? eMax;

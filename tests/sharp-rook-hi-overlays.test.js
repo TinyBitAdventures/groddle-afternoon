@@ -173,7 +173,7 @@ test('the 3x covers the Rook, its halo and the hi signs where they are drawn; th
   assert.ok(haloAt <= 1, `the halo draws ${haloAt.toFixed(2)}`);
   // The hi signs are drawn at 1 in the street (no scale anywhere in the feature).
   assert.doesNotMatch(read('js/features/hi-signs-feature.js'), /\.scale\.set\(|\.scale\s*=[^=]/);
-  const { HI_VARIANTS, hiArtSheet } = await import('../public/js/hi-signs.js?v=09029975');
+  const { HI_VARIANTS, hiArtSheet } = await import('../public/js/hi-signs.js?v=fabb2c6b');
   for (const v of HI_VARIANTS) {
     for (const kind of ['still', 'hi', 'bonus']) {
       const at = stage / density(hiArtSheet(v, kind).url);

@@ -83,7 +83,7 @@ import {
 } from '../public/js/street-ecology.js?v=26dabe26';
 import { ROCK_CATALOG } from '../public/js/mining.js?v=12a6f1bd';
 import { MEGA_ROCK_CHANCE, MEGA_ROCK_CHUNKS } from '../public/js/imagination-effects.js?v=70169933';
-import { RESOURCE_NODE_CATALOG, RESOURCE_SKILL_PACKAGES } from '../public/js/resource-nodes.js?v=db9c69bd';
+import { RESOURCE_NODE_CATALOG, RESOURCE_SKILL_PACKAGES } from '../public/js/resource-nodes.js?v=9db2fcee';
 import { ARBOROLOGY_HARVEST, TRANT_META } from '../public/js/trants.js?v=1b3c8ae3';
 import { TRANT_CARE_PACKAGES } from '../public/js/trant-care.js?v=9527ff03';
 import { ANIMAL_KINSHIP_PACKAGES } from '../public/js/animal-kinship.js?v=f91347e9';
@@ -95,10 +95,10 @@ import { BATTERFLY_GROUP, batterflyPlacementGroups } from '../public/js/features
 import { hasRaceDispenser } from '../public/js/races.js?v=ab22a079';
 import { setWildlifeCatalog, wildlifeFor } from '../public/js/wildlife.js?v=670c3a7f';
 import { boardSpotRow, furnitureFor, furniturePlacementGroups } from '../public/js/street-furniture.js?v=55131f49';
-import { INCUBATION } from '../public/js/animal-husbandry.js?v=81f8fd5e';
-import { SHARED_NODE_CLASSES, freshTreePlan } from '../public/js/street-objects.js?v=6fc1bf6f';
-import { PIGGY_TRIP } from '../public/js/street-creatures.js?v=729480c4';
-import { CRAB_PLACEMENT_KEY, CRAB_WALK, crabPlacementGroups } from '../public/js/crabs.js?v=d97eda71';
+import { INCUBATION } from '../public/js/animal-husbandry.js?v=aa65a582';
+import { SHARED_NODE_CLASSES, freshTreePlan } from '../public/js/street-objects.js?v=7a16545b';
+import { PIGGY_TRIP } from '../public/js/street-creatures.js?v=389b5500';
+import { CRAB_PLACEMENT_KEY, CRAB_WALK, crabPlacementGroups } from '../public/js/crabs.js?v=5d17a3d1';
 import { KITTY_PET } from '../public/js/heli-kitties.js?v=8fbe314a';
 import { FIRE_DRAGON_PLACEMENT_KEY, FIRE_DRAGON_WALK, fireDragonPlacementGroups } from '../public/js/fire-dragon.js?v=b7f3d751';
 import { isZoneTsid } from '../public/js/zone-streets.js?v=b40010d5';

@@ -29,10 +29,10 @@ import { HAS_SERVER, HAS_SITE, SITE_DIR, serverPath, sitePath } from '../tools/r
 import { bagLabel } from '../public/js/bag-names.js?v=22391c55';
 import { BAG_DEFS, PACK_CAPACITY, layoutPack, normalizePrefs, renameBag } from '../public/js/pack-slots.js?v=6b8393a1';
 import { ITEM_CATALOG, isToolItem } from '../public/js/inventory.js?v=5be47371';
-import { nameAnimal, namedAnimalLabel } from '../public/js/animal-husbandry.js?v=81f8fd5e';
+import { nameAnimal, namedAnimalLabel } from '../public/js/animal-husbandry.js?v=aa65a582';
 import { kittyLabel, nameKitty } from '../public/js/heli-kitties.js?v=8fbe314a';
 import { nameCubimal } from '../public/js/cubimals.js?v=abd91c78';
-import { createButlerState, renameButler, teachButler } from '../public/js/butler.js?v=0a345ccc';
+import { createButlerState, renameButler, teachButler } from '../public/js/butler.js?v=1370b711';
 import { cleanTowerName } from '../public/js/home-tower.js?v=087df38f';
 import { PENMANSHIP_SKILL, editNote, writePaperNote } from '../public/js/street-furniture.js?v=55131f49';
 import { MAIL_COMPANIONS, createMailboxState, sendMail } from '../public/js/mailbox.js?v=a3e833ba';

@@ -25,7 +25,7 @@ import {
   RESOURCE_NODE_CATALOG,
   RESOURCE_NODE_CLASS_IDS,
   createResourceNode,
-} from '../public/js/resource-nodes.js?v=db9c69bd';
+} from '../public/js/resource-nodes.js?v=9db2fcee';
 import { createFeatureHost, normalizeFeatureSlices } from '../public/js/feature-host.js?v=06bb8b74';
 import { populationForStreet, planStreetPlacements } from '../public/js/street-ecology.js?v=26dabe26';
 import { STORE_CATALOG } from '../public/js/store-catalog.js?v=74b56af3';

@@ -11,8 +11,8 @@ import { fileURLToPath } from 'node:url';
 import { loadContentCatalogsFromDir, resetContentCatalogs, getQuestCatalog } from '../public/js/content-catalogs.js?v=10b118dd';
 import { createQuestState } from '../public/js/quests.js?v=2b882eb6';
 import { classifyQuests, eventCounters, isEventEmitted, questRoutingReport, requirementRoute } from '../public/js/quest-offers.js?v=9c53455c';
-import { HELL_LOCATION, HELL_QUESTS, createHellState, croak } from '../public/js/hell.js?v=6a0c61bf';
-import { PANKA_TSID, HELL_BAR_TSID } from '../public/js/hell-bar.js?v=0bd1add2';
+import { HELL_LOCATION, HELL_QUESTS, createHellState, croak } from '../public/js/hell.js?v=cd6ed74f';
+import { PANKA_TSID, HELL_BAR_TSID } from '../public/js/hell-bar.js?v=9d852ed3';
 import {
   GRAVE_VISIT,
   GRAVE_VISITORS,
