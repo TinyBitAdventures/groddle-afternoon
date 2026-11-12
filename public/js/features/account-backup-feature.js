@@ -22,7 +22,7 @@
  * Beside Sign out, Switch character (alternate characters, Austin 2026-11-12):
  * the save is written first, then the tab forgets its character and goes back
  * to the start card, which lists the login's characters (js/online-boot.js).
- * The character chip (js/character-chip.js) does the same from a face in the corner that
+ * The save cloud opens Your characters (js/character-switcher.js), which does the same and
  * stays on screen in the tutorial, where the Menu is hidden.
  *
  * Off in practice copies (?practice=1 swaps the storage) and on a plain
@@ -39,8 +39,8 @@ import { mountAccountForms, mountAccountSettings, mountPresenceSetting } from '.
 import { createBrowserSaveStore, freezeSoloSaves, restoreSoloSave, saveStore, savedAtOf, soloSaveSnapshot } from '../save-store.js?v=89422a9c';
 import { formatGameDayLabel } from '../game-day.js?v=f88e6e16';
 import { multiplayerEntryUrl } from '../game-mode.js?v=1ecf2899';
-import { markContinued, quietSession } from '../online-boot.js?v=52b9027b';
-import { installCharacterChip } from '../character-chip.js?v=8f0af78b';
+import { markContinued, quietSession } from '../online-boot.js?v=4ea71073';
+import { installCharacterSwitcher } from '../character-switcher.js?v=305b1f12';
 
 /** Which slot a new backup goes to: the first empty one, else the oldest (which then needs a yes). */
 export function slotForNewBackup(backups, slots) {
@@ -444,21 +444,16 @@ async function saveNow(engine) {
   await saveStore.flush?.();
 }
 
-/** How often the chip's face is drawn again (cached by look: a new look shows within this). */
-const CHIP_FACE_MS = 5000;
-
-/** Multiplayer's Menu: Account (email, password), Switch character and Sign out, once the save is written; and the character chip. */
+/** Multiplayer's Menu: Account (email, password), Switch character and Sign out, once the save is written; and Your characters on the save cloud. */
 function installSignOut(engine) {
   const account = createMinnAccount({ baseUri: document.baseURI });
-  // The chip in the corner (every multiplayer player: it is also where a second character starts).
-  const chip = installCharacterChip({
+  // The save cloud opens Your characters (every multiplayer player: it is also where a second character starts).
+  installCharacterSwitcher({
     account,
     engine,
     save: () => saveNow(engine),
     markContinued,
-    face: () => Promise.resolve(engine.lookPortrait?.(engine.playerAppearance?.vector)),
   });
-  if (chip) setInterval(() => { chip.refreshFace(); }, CHIP_FACE_MS);
   const list = document.getElementById('more-list');
   if (!list) return;
   const panel = createMultiplayerPanel(engine, account);

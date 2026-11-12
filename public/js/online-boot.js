@@ -228,7 +228,7 @@ export const CHARACTER_COPY = Object.freeze({
   failed: "That didn't work. Try again in a moment.",
 });
 
-/** The start card opened on its fresh character form (js/character-chip.js Start a fresh character). */
+/** The start card opened on its fresh character form (js/character-switcher.js Start a fresh character). */
 export const FRESH_HASH = '#fresh';
 
 /** The most characters a login has when the site does not say (Austin 2026-11-12). */
@@ -585,11 +585,15 @@ function mountSavePill(player) {
   const pill = el('div', { id: 'save-pill', class: 'save-pill', role: 'status', 'aria-live': 'polite', 'data-state': 'saved' });
   // In the pack only the cloud shows (its dot is the state) and the words are its tooltip: words
   // that changed length ("Saved", "Saving…") made the whole pack row change width (Austin 2026-10-30).
+  // The cloud is a button: in multiplayer it opens Your characters (js/character-switcher.js, Austin 2026-11-12).
+  const cloud = el('button', { type: 'button', class: 'save-pill-btn' });
   const icon = el('span', { class: 'save-pill-icon', 'aria-hidden': 'true' });
   icon.innerHTML = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 18h10a4 4 0 0 0 .6-7.96A6 6 0 0 0 6.2 9.1 4.5 4.5 0 0 0 7 18z"/></svg>';
-  pill.append(icon, el('span', { class: 'save-pill-who' }, who), el('span', { class: 'save-pill-state' }, PILL_TEXT.saved));
+  cloud.append(icon);
+  pill.append(cloud, el('span', { class: 'save-pill-who' }, who), el('span', { class: 'save-pill-state' }, PILL_TEXT.saved));
   const tip = (text) => {
     pill.dataset.tip = `${who} · ${text}`;
+    cloud.setAttribute('aria-label', pill.dataset.tip);
   };
   tip(PILL_TEXT.saved);
   // In the pack's own corner under its hint, so it never covers the slots and the award and
@@ -600,13 +604,11 @@ function mountSavePill(player) {
     // The one-row pack: the cloud is the row's last button, beside search (Austin 2026-10-30).
     row.insertBefore(pill, hint);
     pill.classList.add('in-pack', 'in-row');
-    pill.tabIndex = 0;
   } else if (hint?.parentNode) {
     const side = el('div', { class: 'pack-side' });
     hint.parentNode.insertBefore(side, hint);
     side.append(hint, pill);
     pill.classList.add('in-pack');
-    pill.tabIndex = 0;
   } else {
     document.body.append(pill);
   }

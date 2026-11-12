@@ -3148,6 +3148,12 @@
 :root[data-ui="classic"] #bug-report-panel .ctx-menu .verb-choice:focus-visible { box-shadow: none; }
 /* === end reportsmenu === */
 
+/* === cloud (lane) === */
+/* The save cloud alone in the tutorial (js/character-switcher.js: the pack band is hidden, the cloud that opens
+   Your characters stays where it sits), on a pack slot's own panel and ring. */
+:root[data-ui="classic"]:not([data-home-builder]) body.nx-hide-pack:not(:has(#overlay:not(.hidden))) #pack-row > .save-pill.in-row:not([data-state="conflict"]):not([data-state="signed-out"]) { background: var(--c-classic-panel); box-shadow: 0 0 0 1px var(--c-classic-slot-ring); }
+/* === end cloud === */
+
 /* == TICKETS == Reports (js/ui/reports-sheet.js, online only) as a 2012 window: the Quest Log's frame
    (Dialog.as, WindowBorder.as, BigDialog.as) centred in the viewport, the white head with its 20 px
    title and the red cross, the grey well between two rules, the white footer with the minor buttons;

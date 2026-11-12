@@ -18,8 +18,8 @@ import { createMinnAccountCore } from '../public/js/minn-account-core.js?v=63758
 import { createSaveSync } from '../public/js/save-store.js?v=89422a9c';
 import { CLOSE_OTHER_CHARACTER, createRealtimeClient } from '../public/js/realtime-client.js?v=cda54c6e';
 import { OTHER_CHARACTER_TEXT, statusText } from '../public/js/features/realtime-feature.js?v=4fe86726';
-import { CHARACTER_COPY, FRESH_HASH, SAVE_ALERT_COPY, characterChoices, continuesAs, createRefusalText, saveAlertFor } from '../public/js/online-boot.js?v=52b9027b';
-import { CHIP_COPY, STYLE as CHIP_STYLE, cardUrl, chipChoices } from '../public/js/character-chip.js?v=8f0af78b';
+import { CHARACTER_COPY, FRESH_HASH, SAVE_ALERT_COPY, characterChoices, continuesAs, createRefusalText, saveAlertFor } from '../public/js/online-boot.js?v=4ea71073';
+import { SWITCHER_COPY, STYLE as SWITCHER_STYLE, cardUrl, popoverPlace, switcherChoices } from '../public/js/character-switcher.js?v=305b1f12';
 import { LOCAL_STATES } from '../public/js/shared-quoins.js?v=89d7b201';
 import { menuRowFor } from '../public/js/ui/topbar.js?v=5db7241b';
 
@@ -388,18 +388,18 @@ describe('Menu > Switch character (account-backup-feature)', () => {
   });
 });
 
-describe('the character chip (js/character-chip.js)', () => {
+describe('Your characters on the save cloud (js/character-switcher.js)', () => {
   const ada = { id: 54, name: 'Ada', level: 12, lastPlayedAt: 100, retired: false, first: true };
   const bo = { id: 77, name: 'Bo', level: 3, lastPlayedAt: 200, retired: false, first: false };
-  const chip = code('public/js/character-chip.js');
+  const sw = code('public/js/character-switcher.js');
 
   it('lists the one playing first and marked, the others to switch to, retired ones left to the card', () => {
-    const c = chipChoices({ current: 77, limit: 3, canCreate: true, characters: [ada, bo, { id: 80, name: 'Cy', level: 1, retired: true, first: false }] }, { id: 77, name: 'Bo' });
+    const c = switcherChoices({ current: 77, limit: 3, canCreate: true, characters: [ada, bo, { id: 80, name: 'Cy', level: 1, retired: true, first: false }] }, { id: 77, name: 'Bo' });
     assert.deepEqual(c.rows, [{ id: 77, name: 'Bo', level: 3, current: true }, { id: 54, name: 'Ada', level: 12, current: false }]);
     assert.deepEqual(c.fresh, { can: true, note: '' });
-    const full = chipChoices({ current: 54, limit: 3, canCreate: false, characters: [ada, bo, { ...bo, id: 80, name: 'Cy' }] }, { id: 54, name: 'Ada' });
+    const full = switcherChoices({ current: 54, limit: 3, canCreate: false, characters: [ada, bo, { ...bo, id: 80, name: 'Cy' }] }, { id: 54, name: 'Ada' });
     assert.equal(full.fresh.note, 'You have 3 characters.');
-    const none = chipChoices(null, { id: 54, name: 'Ada' });
+    const none = switcherChoices(null, { id: 54, name: 'Ada' });
     assert.deepEqual(none.rows.map((r) => [r.name, r.current]), [['Ada', true]], 'no list: the one playing alone');
     assert.equal(none.fresh, null);
   });
@@ -412,45 +412,67 @@ describe('the character chip (js/character-chip.js)', () => {
     const boot = read('public/js/online-boot.js');
     assert.match(boot, /const fresh = location\.hash === FRESH_HASH;\n\s*if \(fresh\) history\.replaceState/);
     assert.match(boot, /if \(startFresh\) \{\n\s*open\.hidden = true;\n\s*form\.hidden = false;/);
-    assert.match(chip, /win\.history\.replaceState\(win\.history\.state, '', to\.href\);\n\s*win\.location\.reload\(\);/, 'a hash alone never reloads');
+    assert.match(sw, /win\.history\.replaceState\(win\.history\.state, '', to\.href\);\n\s*win\.location\.reload\(\);/, 'a hash alone never reloads');
   });
 
   it('Switch saves first, then plays the other, then loads the game as it; refusals said plainly', () => {
-    const body = chip.slice(chip.indexOf('async function switchTo('), chip.indexOf('function draw('));
+    const body = sw.slice(sw.indexOf('async function switchTo('), sw.indexOf('function draw('));
     const order = ['await save();', 'await account.playCharacter(row.id);', 'markContinued(row.id);', 'goToCard('].map((x) => body.indexOf(x));
     assert.ok(order.every((i) => i > 0), String(order));
     assert.deepEqual([...order].sort((a, b) => a - b), order);
     assert.match(body, /say\(r\?\.message \|\| CHARACTER_COPY\.failed, true\);/);
-    const leave = chip.slice(chip.indexOf('async function leaveFor('), chip.indexOf('async function switchTo('));
+    const leave = sw.slice(sw.indexOf('async function leaveFor('), sw.indexOf('async function switchTo('));
     assert.ok(leave.indexOf('await save();') < leave.indexOf('markContinued(false);'), 'Start a fresh character and Manage save first, then show the card');
   });
 
-  it('is a button with a popover: named, expanded state, Escape, the game\'s keys kept out', () => {
-    assert.match(chip, /'aria-haspopup': 'dialog', 'aria-expanded': 'false', 'aria-controls': 'character-chip-pop'/);
-    assert.match(chip, /role: 'dialog', 'aria-label': CHIP_COPY\.title/);
-    assert.match(chip, /e\.stopPropagation\(\);\n\s*if \(e\.key === 'Escape'\) close\(\);/);
-    assert.equal(CHIP_COPY.label('Bo'), 'Playing as Bo. Your characters');
-    assert.equal(CHIP_COPY.fresh, CHARACTER_COPY.fresh);
-    assert.equal(CHIP_COPY.manage, 'Manage characters');
-    assert.doesNotMatch(JSON.stringify(CHIP_COPY, (k, v) => (typeof v === 'function' ? v('Ada') : v)), /—/);
-    assert.doesNotMatch(chip, /—/);
+  it('the cloud is the button: named by its save words, expanded state, Escape, the game\'s keys kept out', () => {
+    assert.match(sw, /const btn = pill\?\.querySelector\?\.\('\.save-pill-btn'\);/);
+    assert.match(sw, /btn\.setAttribute\('aria-haspopup', 'dialog'\);\n\s*btn\.setAttribute\('aria-expanded', 'false'\);\n\s*btn\.setAttribute\('aria-controls', 'character-switcher'\);/);
+    assert.match(sw, /role: 'dialog', 'aria-label': SWITCHER_COPY\.title/);
+    assert.match(sw, /btn\.setAttribute\('aria-label', SWITCHER_COPY\.label\(pill\.dataset\.tip \|\| ''\)\);/, 'the tooltip\'s words name it, kept current');
+    assert.match(sw, /if \(e\.key === 'Enter' \|\| e\.key === ' '\) e\.stopPropagation\(\);/, 'Enter opens it, not chat');
+    assert.match(sw, /pop\.addEventListener\('keydown', \(e\) => \{\n\s*e\.stopPropagation\(\);\n\s*if \(e\.key === 'Escape'\) close\(\);/);
+    assert.equal(SWITCHER_COPY.label('Playing as Bo · Saved'), 'Playing as Bo · Saved. Your characters');
+    assert.equal(SWITCHER_COPY.fresh, CHARACTER_COPY.fresh);
+    assert.equal(SWITCHER_COPY.manage, 'Manage characters');
+    assert.doesNotMatch(JSON.stringify(SWITCHER_COPY, (k, v) => (typeof v === 'function' ? v('Ada') : v)), /—/);
+    assert.doesNotMatch(read('public/js/character-switcher.js'), /—/);
   });
 
-  it('sits in one placement block, safe-area aware, 44 px on touch, over the tutorial', () => {
-    const place = CHIP_STYLE.slice(CHIP_STYLE.indexOf('Placement'), CHIP_STYLE.indexOf('== end placement =='));
-    assert.match(place, /\.character-chip \{ position: fixed; left: calc\(var\(--hud-inset\) \+ env\(safe-area-inset-left, 0px\)\); bottom: calc\(var\(--hud-inset\) \+ env\(safe-area-inset-bottom, 0px\)\);/);
-    assert.match(place, /@media \(pointer: coarse\) \{ \.character-chip-btn \{ --chip-size: 44px; \} \}/);
-    assert.match(place, /:root\[data-ui="classic"\] \.character-chip \{/);
-    assert.doesNotMatch(CHIP_STYLE, /#[0-9a-f]{3,8}\b|rgba?\(/i, 'colours are tokens');
-    assert.doesNotMatch(CHIP_STYLE, /font-size:\s*\d|z-index:\s*\d/, 'type sizes and layers are tokens');
+  it('the save state the cloud shows is the popover\'s top line', () => {
+    assert.match(sw, /saveLine\.dataset\.state = pill\.dataset\.state \|\| 'saved';\n\s*saveLine\.textContent = pill\.querySelector\('\.save-pill-state'\)\?\.textContent \|\| '';/);
+    assert.match(sw, /pop\.replaceChildren\(saveLine, el\(doc, 'h2', \{\}, SWITCHER_COPY\.title\)\);/);
+    assert.match(sw, /attributeFilter: \['data-tip', 'data-state'\]/, 'follows the pill while open');
   });
 
-  it('every multiplayer page gets it, beside Menu > Switch character (kept)', () => {
+  it('opens above the cloud, right edges together, held inside a 402 px phone', () => {
+    assert.deepEqual(popoverPlace({ top: 744, right: 720 }, { width: 288, viewW: 1280, viewH: 800 }), { left: 432, bottom: 64, maxHeight: 728 });
+    // The cloud near the left edge: the popover slides right to stay inside.
+    assert.deepEqual(popoverPlace({ top: 668, right: 205 }, { width: 288, viewW: 1280, viewH: 800 }).left, 8);
+    // A phone: never wider than the window less its margins.
+    const phone = popoverPlace({ top: 816, right: 285 }, { width: 400, viewW: 402, viewH: 874 });
+    assert.equal(phone.left, 8);
+    assert.ok(phone.left + Math.min(400, 402 - 16) <= 402 - 8);
+    assert.match(SWITCHER_STYLE, /width: min\(18rem, calc\(100vw - 2 \* var\(--hud-inset\)\)\)/);
+    assert.match(SWITCHER_STYLE, /@media \(pointer: coarse\) \{ \.character-switcher :is\(\.character-switcher-switch, \.character-switcher-more button\) \{ min-height: 44px; \} \}/);
+    assert.doesNotMatch(SWITCHER_STYLE, /#[0-9a-f]{3,8}\b|rgba?\(/i, 'colours are tokens');
+    assert.doesNotMatch(SWITCHER_STYLE, /font-size:\s*\d|z-index:\s*\d/, 'type sizes and layers are tokens');
+  });
+
+  it('the tutorial hides the pack row, not the cloud: it stays where the row sits, on its own card', () => {
+    assert.match(read('public/js/features/newxp-feature.js'), /body\.nx-hide-pack #pack-bar\{visibility:hidden\}/, 'the rule the cloud answers');
+    assert.match(SWITCHER_STYLE, /:root:not\(\[data-home-builder\]\) body\.nx-hide-pack:not\(:has\(#overlay:not\(\.hidden\)\)\) #pack-row > \.save-pill\.in-row \{ visibility: visible; \}/);
+    assert.match(read('public/css/classic.css'), /:root\[data-ui="classic"\]:not\(\[data-home-builder\]\) body\.nx-hide-pack:not\(:has\(#overlay:not\(\.hidden\)\)\) #pack-row > \.save-pill\.in-row:not\(\[data-state="conflict"\]\):not\(\[data-state="signed-out"\]\) \{ background: var\(--c-classic-panel\);/, 'Classic\'s own card');
+  });
+
+  it('every multiplayer page hangs it on the cloud, beside Menu > Switch character (kept); no corner chip', () => {
     const src = read('public/js/features/account-backup-feature.js');
     const install = src.slice(src.indexOf('function installSignOut('), src.indexOf('export const accountBackupFeature'));
-    assert.match(install, /const chip = installCharacterChip\(\{/);
-    assert.ok(install.indexOf('installCharacterChip(') < install.indexOf("getElementById('more-list')"), 'the chip does not wait on the Menu');
-    assert.match(install, /face: \(\) => Promise\.resolve\(engine\.lookPortrait\?\.\(engine\.playerAppearance\?\.vector\)\)/);
+    assert.match(install, /installCharacterSwitcher\(\{/);
+    assert.ok(install.indexOf('installCharacterSwitcher(') < install.indexOf("getElementById('more-list')"), 'it does not wait on the Menu');
     assert.match(install, /id: 'switch-character-btn'/);
+    assert.doesNotMatch(src, /installCharacterChip|character-chip|lookPortrait/);
+    assert.match(sw, /if \(!doc\?\.body \|\| !account \|\| !btn/, 'no cloud (solo), no switcher');
+    assert.match(src, /if \(engine\.mode === 'multiplayer'\) \{\n\s*installSignOut\(engine\);/, 'multiplayer only');
   });
 });

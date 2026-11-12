@@ -16,11 +16,11 @@ import { join } from 'node:path';
 import { homedir } from 'node:os';
 
 import { createMinnAccount, minnUrls } from '../public/js/minn-account.js?v=c15f0ecf';
-import { GATE_COPY, JUJU_BOSS_GATES, SAVE_ALERT_COPY, bootDataFrom, deliverHandoff, gateFor, saveAlertFor } from '../public/js/online-boot.js?v=52b9027b';
+import { GATE_COPY, JUJU_BOSS_GATES, SAVE_ALERT_COPY, bootDataFrom, deliverHandoff, gateFor, saveAlertFor } from '../public/js/online-boot.js?v=4ea71073';
 import { SAVE_STOPPED } from '../public/js/save-store.js?v=89422a9c';
 import { FORM_COPY, SETTINGS_COPY, resetLinkFrom } from '../public/js/account-forms.js?v=318b6815';
-import { restoreNeedsAsking, sizeLabel, slotForNewBackup, accountBackupFeature } from '../public/js/features/account-backup-feature.js?v=28c98dab';
-import { FEATURES } from '../public/js/features/index.js?v=7d4458df';
+import { restoreNeedsAsking, sizeLabel, slotForNewBackup, accountBackupFeature } from '../public/js/features/account-backup-feature.js?v=152a9ca0';
+import { FEATURES } from '../public/js/features/index.js?v=62b383f2';
 import { multiplayerEntryUrl } from '../public/js/game-mode.js?v=1ecf2899';
 import { SAVE_ENTRY_NAMES, createMultiplayerSaveStore } from '../public/js/save-store.js?v=89422a9c';
 import { HAS_SITE, SITE_DIR, serverPath, skipWithoutServer, skipWithoutSite } from '../tools/repos.mjs';

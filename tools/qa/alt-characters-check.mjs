@@ -15,11 +15,13 @@
  * 4012 (the words, no reconnect); the Account panel's Switch character and Menu > Switch
  * character back to the card; Retire on an extra character (never the first or the one signed
  * in), its in-card confirmation, Cancel, a refusal in the site's words, retired then restored;
- * the character chip (js/character-chip.js) in the tutorial and past it: always on screen, clear
- * of the top bar, the tutorial pill, the sound button and the pack, its name on hover, the
- * popover by mouse and keyboard, Switch (save first, then play, then in as the other), Start a
- * fresh character (the card's form open) and Manage characters (the card).
- * Shots in Modern and Classic. One Chrome at a time (tools/qa/browser.mjs openBrowser takes the lock).
+ * Your characters on the save cloud (js/character-switcher.js) in the tutorial and past it: the
+ * cloud always on screen (alone where the pack row sits while the tutorial hides the row), clear of
+ * the top bar, the tutorial pill, the sound button and a phone's stick and Jump, its tooltip on
+ * hover, the popover above it with the save state on top, by mouse and keyboard, Switch (save
+ * first, then play, then in as the other), Start a fresh character (the card's form open) and
+ * Manage characters (the card); on a 402 px phone the cloud is a 44 px target and the popover fits.
+ * Shots in Modern and Classic, and a phone. One Chrome at a time (tools/qa/browser.mjs openBrowser takes the lock).
  */
 import { mkdirSync } from 'node:fs';
 import { join } from 'node:path';
@@ -30,8 +32,8 @@ const ROOT = join(import.meta.dirname, '..', '..');
 const arg = (name, fallback) => process.argv.find((a) => a.startsWith(`--${name}=`))?.slice(name.length + 3) ?? fallback;
 const PORT = Number(arg('port', 8847));
 const SHOTS = arg('shots', '');
-/** --only=cards,fresh,switch,write,realtime,retire,chip runs those parts alone; --ui=modern|classic one skin. */
-const ONLY = new Set(arg('only', 'cards,fresh,switch,write,realtime,retire,chip').split(','));
+/** --only=cards,fresh,switch,write,realtime,retire,cloud,phone runs those parts alone; --ui=modern|classic one skin. */
+const ONLY = new Set(arg('only', 'cards,fresh,switch,write,realtime,retire,cloud,phone').split(','));
 const UIS = arg('ui', 'modern,classic').split(',');
 if (SHOTS) mkdirSync(SHOTS, { recursive: true });
 
@@ -50,21 +52,30 @@ const PAST_TUTORIAL = {
   },
 };
 
-/** The chip's box and every HUD part it overlaps (the top bar, the tutorial pill, the sound button, the pack, the save pill). */
-const chipClear = (page) => page.evaluate(() => {
-  const chip = document.querySelector('[data-character-chip-button]');
-  const box = chip?.getBoundingClientRect();
-  if (!box || !box.width) return { shown: false, hits: [] };
+const CLOUD = '#save-pill .save-pill-btn';
+/** The cloud's box, whether it shows (and takes a tap at its middle), and every HUD part it overlaps (the top bar, the tutorial pill, the sound button, the stick and Jump). */
+const cloudClear = (page) => page.evaluate((sel0) => {
+  const cloud = document.querySelector(sel0);
+  const box = cloud?.getBoundingClientRect();
+  if (!box || !box.width || getComputedStyle(cloud).visibility === 'hidden') return { shown: false, hits: [] };
+  const top = document.elementFromPoint(box.x + box.width / 2, box.y + box.height / 2);
   const hits = [];
-  for (const sel of ['.top-bar', '#sound-btn', '[data-nx-label]', '#pack-row', '.save-pill', '.quest-tracker', '#social-rail', '.social-drawer']) {
+  for (const sel of ['.top-bar', '#sound-btn', '[data-nx-label]', '.quest-tracker', '#social-rail', '.social-drawer', '.touch-stick', '.touch-jump']) {
     for (const n of document.querySelectorAll(sel)) {
       const r = n.getBoundingClientRect();
       if (!r.width || !n.getClientRects().length || getComputedStyle(n).visibility === 'hidden') continue;
       if (r.left < box.right && box.left < r.right && r.top < box.bottom && box.top < r.bottom) hits.push(sel);
     }
   }
-  return { shown: true, hits, box: { x: Math.round(box.x), y: Math.round(box.y), w: Math.round(box.width) } };
-});
+  return { shown: true, tappable: Boolean(top && cloud.contains(top)), hits, box: { x: Math.round(box.x), y: Math.round(box.y), w: Math.round(box.width), h: Math.round(box.height) } };
+}, CLOUD);
+/** The popover's box against the cloud's and the window. */
+const popPlace = (page) => page.evaluate((sel0) => {
+  const p = document.querySelector('[data-character-switcher-pop]').getBoundingClientRect();
+  const c = document.querySelector(sel0).getBoundingClientRect();
+  const w = document.documentElement.clientWidth;
+  return { above: p.bottom <= c.top + 1, inside: p.left >= 0 && p.right <= w && p.top >= 0, w: Math.round(p.width), left: Math.round(p.left), right: Math.round(p.right), view: w };
+}, CLOUD);
 
 let failures = 0;
 const ok = (cond, what) => {
@@ -154,9 +165,15 @@ function fakeSocketScript(closeAfterMs) {
   })();`;
 }
 
-async function newContext(browser, { ui = 'modern', socket = null } = {}) {
-  const ctx = await browser.newContext({ viewport: { width: 1280, height: 800 } });
-  await ctx.addInitScript((u) => { try { localStorage.setItem('groddle.ui', u); } catch {} }, ui);
+/** An iPhone 16 Pro sized phone (402 x 874) that took the full game (the phone gate's "Load the full game anyway"). */
+const PHONE = {
+  viewport: { width: 402, height: 874 }, deviceScaleFactor: 3, isMobile: true, hasTouch: true,
+  userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1',
+};
+
+async function newContext(browser, { ui = 'modern', socket = null, phone = false } = {}) {
+  const ctx = await browser.newContext(phone ? PHONE : { viewport: { width: 1280, height: 800 } });
+  await ctx.addInitScript((u) => { try { localStorage.setItem('groddle.ui', u); localStorage.setItem('groddle-play-device', 'full'); } catch {} }, ui);
   if (socket) await ctx.addInitScript(socket);
   return ctx;
 }
@@ -390,8 +407,9 @@ try {
       await ctx.close();
     }
 
-    // The character chip: in the tutorial (the Menu hidden) and past it, then Switch, Start a fresh character, Manage.
-    if (ONLY.has('chip')) {
+    // Your characters on the save cloud: in the tutorial (the pack row and the Menu hidden) and past it, then
+    // Switch, Start a fresh character, Manage.
+    if (ONLY.has('cloud')) {
       for (const seeded of [false, true]) {
         const where = seeded ? 'street' : 'tutorial';
         const ctx = await newContext(browser, { ui });
@@ -400,60 +418,93 @@ try {
         const page = await ctx.newPage();
         await page.goto(CARD);
         await page.click('[data-online-continue]');
-        ok(await intoGame(page), `${ui} chip ${where}: in the game`);
+        ok(await intoGame(page), `${ui} cloud ${where}: in the game`);
         await page.waitForTimeout(1500);
-        const clear = await chipClear(page);
-        ok(clear.shown && clear.hits.length === 0, `${ui} chip ${where}: shown, clear of the HUD (${JSON.stringify(clear)})`);
-        await page.waitForFunction(() => document.querySelector('.character-chip-face')?.dataset.face === 'avatar', null, { timeout: 10000 }).catch(() => {});
-        ok((await page.$eval('.character-chip-face', (e) => e.dataset.face || '')) === 'avatar', `${ui} chip ${where}: the face is the avatar`);
-        await page.hover('[data-character-chip-button]');
+        const clear = await cloudClear(page);
+        ok(clear.shown && clear.tappable && clear.hits.length === 0, `${ui} cloud ${where}: shown, takes a click, clear of the HUD (${JSON.stringify(clear)})`);
+        ok(!(await page.$('[data-character-chip]')), `${ui} cloud ${where}: no corner chip`);
+        await page.hover(CLOUD);
         await page.waitForTimeout(250);
-        const label = await page.$eval('.character-chip-name', (e) => [e.textContent, getComputedStyle(e).opacity]);
-        ok(label[0] === 'Ada' && label[1] === '1', `${ui} chip ${where}: the name on hover (${label})`);
-        await shot(page, `chip-${where}-${ui}`);
-        await page.click('[data-character-chip-button]');
-        await page.waitForSelector('[data-character-chip-switch]');
-        const popRows = await page.$$eval('[data-character-chip-row]', (ls) => ls.map((l) => l.innerText.replace(/\s+/g, ' ').trim()));
-        ok(popRows.join('|') === 'Ada Level 12 Playing|Bo Level 3 Switch', `${ui} chip ${where}: rows ${popRows.join(', ')}`);
-        const extras = await page.$$eval('[data-character-chip-fresh], [data-character-chip-manage]', (bs) => bs.map((b) => b.textContent));
-        ok(extras.join('|') === 'Start a fresh character|Manage characters', `${ui} chip ${where}: ${extras.join(', ')}`);
+        const tip = await page.$eval('#save-pill', (e) => [getComputedStyle(e, '::after').content, getComputedStyle(e, '::after').opacity]);
+        ok(tip[0] === '"Playing as Ada · Saved"' && tip[1] === '1', `${ui} cloud ${where}: the tooltip on hover (${tip})`);
+        await shot(page, `cloud-${where}-${ui}`);
+        await page.click(CLOUD);
+        await page.waitForSelector('[data-character-switcher-switch]');
+        const top = await page.$eval('[data-character-switcher-pop] > :first-child', (e) => [e.hasAttribute('data-character-switcher-save'), e.textContent, e.dataset.state]);
+        ok(top[0] && top[1] === 'Saved' && top[2] === 'saved', `${ui} cloud ${where}: the save state on top (${top})`);
+        const popRows = await page.$$eval('[data-character-switcher-row]', (ls) => ls.map((l) => l.innerText.replace(/\s+/g, ' ').trim()));
+        ok(popRows.join('|') === 'Ada Level 12 Playing|Bo Level 3 Switch', `${ui} cloud ${where}: rows ${popRows.join(', ')}`);
+        const extras = await page.$$eval('[data-character-switcher-fresh], [data-character-switcher-manage]', (bs) => bs.map((b) => b.textContent));
+        ok(extras.join('|') === 'Start a fresh character|Manage characters', `${ui} cloud ${where}: ${extras.join(', ')}`);
+        const placed = await popPlace(page);
+        ok(placed.above && placed.inside, `${ui} cloud ${where}: the popover above the cloud, inside the window (${JSON.stringify(placed)})`);
+        const tipGone = await page.$eval('#save-pill', (e) => getComputedStyle(e, '::after').display);
+        ok(tipGone === 'none', `${ui} cloud ${where}: no tooltip over the open popover (${tipGone})`);
         const focus = await page.evaluate(() => document.activeElement?.getAttribute('aria-label'));
-        ok(focus === 'Switch to Bo', `${ui} chip ${where}: focus on Switch (${focus})`);
-        await shot(page, `chip-pop-${where}-${ui}`);
+        ok(focus === 'Switch to Bo', `${ui} cloud ${where}: focus on Switch (${focus})`);
+        await shot(page, `cloud-pop-${where}-${ui}`);
         await page.keyboard.press('Escape');
-        const closed = await page.evaluate(() => [document.querySelector('[data-character-chip-pop]').hidden, document.activeElement?.hasAttribute('data-character-chip-button')]);
-        ok(closed[0] && closed[1], `${ui} chip ${where}: Escape closes it, focus back on the chip`);
+        const closed = await page.evaluate((sel0) => [document.querySelector('[data-character-switcher-pop]').hidden, document.activeElement === document.querySelector(sel0), document.querySelector(sel0).getAttribute('aria-expanded')], CLOUD);
+        ok(closed[0] && closed[1] && closed[2] === 'false', `${ui} cloud ${where}: Escape closes it, focus back on the cloud (${closed})`);
         if (seeded) {
-          // Keyboard: Enter on the chip, then Manage characters.
+          // Keyboard: Enter on the cloud, then Manage characters.
           await page.keyboard.press('Enter');
-          await page.waitForSelector('[data-character-chip-manage]');
-          await page.focus('[data-character-chip-manage]');
+          await page.waitForSelector('[data-character-switcher-manage]');
+          await page.focus('[data-character-switcher-manage]');
           await page.keyboard.press('Enter');
           await page.waitForSelector('[data-online-characters] button.online-character', { timeout: 20000 });
-          ok((await rows(page)).length === 2, `${ui} chip manage: the start card`);
+          ok((await rows(page)).length === 2, `${ui} cloud manage: the start card`);
           await ctx.close();
           continue;
         }
         // Switch to Bo: saved first, then the play call naming Ada, then in as Bo.
         const before = log.length;
-        await page.click('[data-character-chip-button]');
-        await page.click('[data-character-chip-switch="77"]');
-        await page.waitForFunction(() => document.getElementById('online-gate')?.hidden === false || document.querySelector('[data-character-chip-button]')?.getAttribute('aria-label')?.includes('Bo'), null, { timeout: 30000 }).catch(() => {});
-        ok(await intoGame(page), `${ui} chip switch: in the game again`);
+        await page.click(CLOUD);
+        await page.click('[data-character-switcher-switch="77"]');
+        await page.waitForFunction((sel0) => document.getElementById('online-gate')?.hidden === false || document.querySelector(sel0)?.getAttribute('aria-label')?.includes('Bo'), CLOUD, { timeout: 30000 }).catch(() => {});
+        ok(await intoGame(page), `${ui} cloud switch: in the game again`);
         const after = log.slice(before);
         // Saved first: any write as Ada goes in before the play call, none after it.
         const playAt = after.findIndex((l) => l.path === 'characters/77/play');
         const lateAda = after.slice(playAt + 1).filter((l) => l.method === 'PUT' && l.header === '54').length;
-        ok(playAt >= 0 && after[playAt].header === '54' && lateAda === 0, `${ui} chip switch: play naming Ada, no write as Ada after it (${playAt}, ${lateAda})`);
-        const now = await page.$eval('[data-character-chip-button]', (b) => b.getAttribute('aria-label'));
-        ok(state.current === 77 && now === 'Playing as Bo. Your characters', `${ui} chip switch: playing as Bo (${now})`);
+        ok(playAt >= 0 && after[playAt].header === '54' && lateAda === 0, `${ui} cloud switch: play naming Ada, no write as Ada after it (${playAt}, ${lateAda})`);
+        const now = await page.$eval(CLOUD, (b) => b.getAttribute('aria-label'));
+        ok(state.current === 77 && now === 'Playing as Bo · Saved. Your characters', `${ui} cloud switch: playing as Bo (${now})`);
         // Start a fresh character: the card with its form open.
-        await page.click('[data-character-chip-button]');
-        await page.click('[data-character-chip-fresh]');
+        await page.click(CLOUD);
+        await page.click('[data-character-switcher-fresh]');
         await page.waitForSelector('[data-online-fresh-form]:not([hidden])', { timeout: 20000 });
         const fresh = await page.evaluate(() => [document.activeElement?.id, location.hash]);
-        ok(fresh[0] === 'online-fresh-name' && fresh[1] === '', `${ui} chip fresh: the card's form, the name box focused (${fresh})`);
-        await shot(page, `chip-fresh-${ui}`);
+        ok(fresh[0] === 'online-fresh-name' && fresh[1] === '', `${ui} cloud fresh: the card's form, the name box focused (${fresh})`);
+        await shot(page, `cloud-fresh-${ui}`);
+        await ctx.close();
+      }
+    }
+
+    // A 402 px phone: the cloud a 44 px target clear of the stick and Jump (the tutorial and the street), a tap opens a
+    // popover that fits.
+    if (ONLY.has('phone')) {
+      for (const seeded of [false, true]) {
+        const where = seeded ? 'street' : 'tutorial';
+        const ctx = await newContext(browser, { ui, phone: true });
+        const state = { current: 54, characters: [{ ...ADA }, { ...BO }], canCreate: false, createAnswers: [], puts: 0, seeded };
+        await stubSite(ctx, state);
+        const page = await ctx.newPage();
+        await page.goto(CARD);
+        await page.tap('[data-online-continue]');
+        ok(await intoGame(page), `${ui} phone ${where}: in the game`);
+        await page.waitForTimeout(1500);
+        const clear = await cloudClear(page);
+        ok(clear.shown && clear.tappable && clear.hits.length === 0 && clear.box.w >= 44 && clear.box.h >= 44, `${ui} phone ${where}: a 44 px cloud, clear of the HUD (${JSON.stringify(clear)})`);
+        await page.tap(CLOUD);
+        await page.waitForSelector('[data-character-switcher-switch]');
+        const placed = await popPlace(page);
+        ok(placed.above && placed.inside, `${ui} phone ${where}: the popover fits above the cloud (${JSON.stringify(placed)})`);
+        const note = await page.$eval('[data-character-switcher-fresh-note]', (e) => e.textContent).catch(() => '');
+        ok(note === 'You can make another character tomorrow.', `${ui} phone ${where}: ${note}`);
+        await shot(page, `phone-pop-${where}-${ui}`);
+        await page.tap('#game-root canvas', { position: { x: 200, y: 200 } }).catch(() => {});
+        ok(await page.$eval('[data-character-switcher-pop]', (e) => e.hidden), `${ui} phone ${where}: a tap elsewhere closes it`);
         await ctx.close();
       }
     }

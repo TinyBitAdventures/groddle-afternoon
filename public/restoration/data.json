@@ -2752,9 +2752,14 @@
   "deployed": "2026-11-12"
  },
  "git": {
-  "commits": 1743,
+  "commits": 1744,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-12",
+    "kind": "improve",
+    "text": "Your characters open from the save cloud; the corner chip is gone"
+   },
    {
     "date": "2026-11-12",
     "kind": "fix",
@@ -2869,11 +2874,6 @@
     "date": "2026-11-12",
     "kind": "new",
     "text": "Retire a character from the start card, and a character chip to switch from anywhere"
-   },
-   {
-    "date": "2026-11-12",
-    "kind": "fix",
-    "text": "Choosing Sell on an item scrolls the vendor's shelf up to it too"
    }
   ]
  },
