@@ -18,7 +18,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { walkUpSignpostStreet } from '../public/js/ladder-top-signposts.js?v=046013b4';
 import { navigableSignposts, signpostNear, worldToScreen } from '../public/js/street-model.js?v=b6cb6a4e';
-import { SIGN_MAX_ARMS, setSignpostKeys } from '../public/js/street-render.js?v=3bc17de1';
+import { SIGN_MAX_ARMS, setSignpostKeys } from '../public/js/street-render.js?v=2e521905';
 import { hotkeySections, hotkeyText } from '../public/js/client-hotkeys.js?v=31d1891d';
 
 const spike = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -93,7 +93,8 @@ describe('signpost arm keys: the keys', () => {
   it('1 to 9 take the arm with that number after the menus and panels, before the map key', () => {
     const at = game.indexOf('if (!e.repeat && !e.shiftKey && signpostArmKey(e.key)) {');
     assert.ok(at > 0);
-    assert.ok(at < game.indexOf("if (e.key === 'g' || e.key === 'G' || isPlainKey(e, 'm')) {"), 'before the map key');
+    // The key that opens the Map (since #206 another such line closes an open Map, earlier in the handler).
+    assert.ok(at < game.indexOf("if (!document.body.classList.contains('nx-hide-map')) openMap();"), 'before the map key');
     assert.ok(at > game.indexOf('if (verbMenuKey(document.getElementById(\'verb-menu\'), e)) {'), 'a verb menu keeps 1 to 9');
     // The world's keydown returns at once for a field (typing never travels).
     assert.match(game, /window\.addEventListener\('keydown', \(e\) => \{\n\s*if \(e\.target\?\.matches\?\.\('input, textarea, select, \[contenteditable="true"\]'\)\) \{/);

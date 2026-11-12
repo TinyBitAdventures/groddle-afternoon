@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=9f222124';
 import { createErrorOnce, createFeatureHost } from './js/feature-host.js?v=06bb8b74';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=9fea1330';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=bb7ba28a';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -657,7 +657,7 @@ import {
   ensureStreetIndex,
   resolveIndexTsid,
 } from './js/street-loader.js?v=18b181ad';
-import { showDraftBanner, startDraftPlay } from './js/builder/draft-play.js?v=b29e6c31';
+import { showDraftBanner, startDraftPlay } from './js/builder/draft-play.js?v=02cabf0d';
 import {
   ladderTopDeck,
   groundBeneath,
@@ -686,7 +686,7 @@ import {
   setSignpostHover,
   setSignpostKeys,
   signpostBoardAt,
-} from './js/street-render.js?v=3bc17de1';
+} from './js/street-render.js?v=2e521905';
 import {
   GAME_DAY_MS,
   shouldFireNewDay,
@@ -984,7 +984,7 @@ import {
 } from './js/sound-moments.js?v=52ad523c';
 import { loseMood, moodMax, setMetabolicGainGate, setMetabolicLossGate } from './js/metabolics.js?v=8504134e';
 import { installHiresIcons } from './js/icon-hires.js?v=165dbd6e';
-import { installHiresDecos } from './js/deco-hires.js?v=9877af94';
+import { installHiresDecos } from './js/deco-hires.js?v=9fd4ee86';
 import { loadAudioLevels, loadMutedPreference, saveAudioLevel, saveMutedPreference } from './js/audio-pref.js?v=6fe817bc';
 import { createAudioBuses, fadeGain } from './js/audio-buses.js?v=af167b54';
 import { installTopBar, renderTopBar } from './js/ui/topbar.js?v=3cddf1a0';
@@ -1014,7 +1014,7 @@ import { signpostArmRows, worldContextAction } from './js/world-context-menu.js?
 import { blockedPlayerVerbs, listPlayerTarget, opensPlayerMenu, playerMenuRows } from './js/ui/player-menu.js?v=0b385652';
 import { forgetTexture, frameTexture, isFailed, isLoaded, onFailed, onLoaded, textureFromUrl, whenLoaded } from './js/textures.js?v=f024bd6a';
 import { FALLBACK_MAX as WORLD_ART_FALLBACK_MAX, worldArtFor } from './js/world-art.js?v=0729bf92';
-import { sceneAnim, syncAnim } from './js/deco-anim.js?v=aa35e023';
+import { sceneAnim, syncAnim } from './js/deco-anim.js?v=c421b62e';
 import { revealStartCard, whenSceneDrawn } from './js/start-backdrop.js?v=8510d51e';
 import { cancelAllOverlays, playPoofIn, setOverlayResolution } from './js/overlay-art.js?v=75c3ea34';
 import * as textureUrls from './js/textures.js?v=f024bd6a';
