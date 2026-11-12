@@ -212,11 +212,12 @@ import { DISPATCHER_HALF, DISPATCHER_TEXT, MOVABLE_FIXTURES, MOVABLE_FIXTURE_IDS
 import { displayTopOf, itemstackOverlayPoint, overlayAlpha, overlayLifeMs, playPoofIn, trackOverlay } from '../overlay-art.js?v=75c3ea34';
 import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=59ca0e2b';
 import { fadeInNewNear } from '../poof-fade.js?v=8984abd1';
-import { projectApi } from './street-jobs-feature.js?v=06035a81';
+import { projectApi } from './street-jobs-feature.js?v=ab8f4936';
 import { TOWER_CHASSIS, TOWER_CONFIG, TOWER_DOOR_DX, TOWER_GEO, TOWER_PROTO, normalizeTowerState } from '../home-tower.js?v=087df38f';
-import { drawTowerElevator, drawTowerExit, towerApi, visitorTowerView } from './home-tower-feature.js?v=72ea85c9';
+import { drawTowerElevator, drawTowerExit, towerApi, visitorTowerView } from './home-tower-feature.js?v=652c5467';
 import { pieceUrl, roomPieces, surfaceAt, swatchPiece, wallTargetAt } from '../home-wallpaper.js?v=f1969400';
-import { wantsHiresDecos } from '../deco-hires.js?v=9fd4ee86';
+import { maxTextureSizeOf, sharpDeco, wantsHiresDecos } from '../deco-hires.js?v=e5e3f453';
+import { SHARP_DECOS } from '../deco-sharp-list.js?v=9ebccaeb';
 import { resourceNodesFeature } from './resource-nodes-feature.js?v=0d173b95';
 import { patchesFeature } from './patches-feature.js?v=d405f1a4';
 import { GROWN_TREE_LABELS, createPlot, growTree, plotLabel } from '../patches.js?v=61abc5fe';
@@ -241,7 +242,7 @@ import {
 } from '../home-styles.js?v=13fe0aaa';
 import { frameTexture, isLoaded, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js?v=f024bd6a';
 import { FALLBACK_MAX as WORLD_ART_FALLBACK_MAX, worldArtFor } from '../world-art.js?v=0729bf92';
-import { oneArmSignpost } from '../street-render.js?v=2e521905';
+import { oneArmSignpost } from '../street-render.js?v=e14dcc06';
 import { ROCK_CATALOG } from '../mining.js?v=674ed39b';
 import {
   HOUSE_SIGN,
@@ -1823,13 +1824,91 @@ function decoUrl(name) {
   return name.endsWith('.svg') ? `${DECO}${name}` : `${DECO}${name}.png`;
 }
 
-function decoSprite(PIXI, item, x, y, flip = false) {
-  const spr = new PIXI.Sprite(textureFromUrl(decoUrl(item.s)));
+/**
+ * The file a landscape deco draws from at `R` backing px per view px (js/render-density.js):
+ * its sharp copy where the screen needs more texels than the 2x/3x file has (js/deco-hires.js
+ * sharpDeco at this placement's own view px per logical px: an SVG rasterised at the need, or a
+ * WebP sized for the largest home placement, tools/deco-pipeline/sharp.py sh), else that file.
+ * Silent Orbit's craters are earthdot_grp_2 at 1.6x its 2x file: 6.4 backing px per texel on a
+ * Retina window, so the art's hard-edged ellipses came out blurred. A `.svg` item (Toxic Moon's
+ * moon_asset_plain) draws as its deco too: the hand-exported SVG has no viewBox and rasterised at
+ * its own 90 px. A phone's R of 1 never needs a copy.
+ * @returns {{ url: string, opts?: object }}
+ */
+export function landscapeArt(item, R, { bigTextures = false } = {}) {
+  const name = String(item.s).replace(/\.svg$/, '');
+  const url = `${DECO}${name}.png`;
+  const logical = SHARP_DECOS.get(name)?.[2];
+  const per = logical ? (item.w * item.scale) / logical : item.scale;
+  const pick = sharpDeco(url, R, { per, bigTextures });
+  if (!pick) return { url };
+  if (pick.kind === 'svg') return { url: pick.url, opts: { raw: true, width: pick.width, height: pick.height, resolution: pick.resolution } };
+  return { url: pick.url, opts: { raw: true } };
+}
+
+/** A landscape deco's box: its drawn size, flips and anchor (again after a texture swap). */
+function sizeDecoSprite(spr, item, flip) {
   spr.anchor.set(0.5, item.hang ? 0 : 1);
   spr.width = item.w * item.scale;
   spr.height = item.h * item.scale;
   if (flip && !item.noFlip) spr.scale.x *= -1;
   if (item.flipY) spr.scale.y *= -1;
+}
+
+/**
+ * Landscape deco sprites at the renderer's density, swapped for the copy the new density needs
+ * when the renderer's resolution changes (a window dragged to another screen, a resize), as
+ * js/street-render.js refreshSharpDecos does for streets. Stops when `root` is destroyed.
+ */
+function landscapeArtist(engine, root) {
+  const renderer = engine?.app?.renderer;
+  const density = () => renderer?.resolution || 1;
+  const big = () => (maxTextureSizeOf(renderer) || 4096) >= 8192;
+  /** @type {{ spr: any, item: any, flip: boolean, url: string }[]} */
+  const views = [];
+  const sprite = (PIXI, item, x, y, flip = false) => {
+    const art = landscapeArt(item, density(), { bigTextures: big() });
+    const spr = decoSprite(PIXI, item, x, y, flip, textureFromUrl(art.url, art.opts));
+    views.push({ spr, item, flip, url: art.url });
+    return spr;
+  };
+  if (typeof renderer?.on === 'function') {
+    let last = renderer.resolution;
+    let timer = null;
+    const refresh = () => {
+      for (const view of views) {
+        if (view.spr.destroyed) continue;
+        const art = landscapeArt(view.item, density(), { bigTextures: big() });
+        if (art.url === view.url) continue;
+        view.url = art.url;
+        const tex = textureFromUrl(art.url, art.opts);
+        onLoaded(tex, () => {
+          if (view.spr.destroyed || view.url !== art.url) return;
+          view.spr.texture = tex;
+          sizeDecoSprite(view.spr, view.item, view.flip);
+        });
+      }
+    };
+    const onResize = () => {
+      if (renderer.resolution === last) return;
+      last = renderer.resolution;
+      clearTimeout(timer);
+      timer = setTimeout(() => {
+        if (!root.destroyed) refresh();
+      }, 250);
+    };
+    renderer.on('resize', onResize);
+    root.once('destroyed', () => {
+      clearTimeout(timer);
+      renderer.off?.('resize', onResize);
+    });
+  }
+  return { sprite };
+}
+
+function decoSprite(PIXI, item, x, y, flip = false, texture = null) {
+  const spr = new PIXI.Sprite(texture || textureFromUrl(decoUrl(item.s)));
+  sizeDecoSprite(spr, item, flip);
   if (item.tint != null) spr.tint = item.tint;
   if (item.alpha != null) spr.alpha = item.alpha;
   spr.x = x;
@@ -1905,6 +1984,7 @@ export function landscapeGeometry(look, groundY) {
 function drawLandscape(engine, root, style, seed, { width, groundY, lift, skipNear = () => false, moveNear = null, lot = null }) {
   const { fieldTop, rise } = landscapeGeometry(style, groundY);
   const { PIXI } = engine;
+  const artist = landscapeArtist(engine, root);
   const sky = new PIXI.Sprite(gradientTexture(PIXI, ...style.sky));
   sky.zIndex = -100;
   // The profile's diorama (js/home-layout-scene.js) draws these from their colours.
@@ -1950,7 +2030,7 @@ function drawLandscape(engine, root, style, seed, { width, groundY, lift, skipNe
         const jx = item.jitter ? (hash01(`${seed}:${li}:${item.s}:${i}`) - 0.5) * item.jitter * 2 : 0;
         const row = pickAlt(item, `${seed}:${li}:${item.s}:${i}:alt`);
         if (row.tint == null && layer.tint != null) row.tint = layer.tint;
-        lc.addChild(decoSprite(PIXI, row, x + jx, item.y + lift - (item.hang || item.flipY ? 0 : rise), hash01(`${item.s}:${i}:flip`) > 0.5));
+        lc.addChild(artist.sprite(PIXI, row, x + jx, item.y + lift - (item.hang || item.flipY ? 0 : rise), hash01(`${item.s}:${i}:flip`) > 0.5));
         i += 1;
       }
     }
@@ -1999,11 +2079,12 @@ function drawLandscape(engine, root, style, seed, { width, groundY, lift, skipNe
   for (const spot of landscapeNearSpots(style, seed, width, skipNear, { lot, move: moveNear })) {
     const row = spot.row;
     if (row.tint == null && style.nearTint != null) row.tint = style.nearTint;
-    near.addChild(decoSprite(PIXI, row, spot.x, nearFeetY(spot.item, groundY, depth), spot.flip));
+    near.addChild(artist.sprite(PIXI, row, spot.x, nearFeetY(spot.item, groundY, depth), spot.flip));
   }
   root.addChild(near);
 
   return {
+    artist,
     update(camX, camY, vpW, skyH) {
       sky.x = camX;
       sky.y = camY;
@@ -2054,7 +2135,7 @@ function streetBackground(engine, styleKey, houseStyle = 'meadow') {
   const { doorX, signX } = houseFixtureX(layout, houseStyle);
   for (const spot of streetTrimSpots(style, layout, houseStyle, { move: movers.trim })) {
     const row = style.nearTint != null && spot.meta.tint == null ? { ...spot.meta, tint: style.nearTint } : spot.meta;
-    trim.addChild(decoSprite(PIXI, row, spot.x, STREET_GROUND_Y + 20, spot.flip));
+    trim.addChild(land.artist.sprite(PIXI, row, spot.x, STREET_GROUND_Y + 20, spot.flip));
   }
   root.addChild(trim);
 

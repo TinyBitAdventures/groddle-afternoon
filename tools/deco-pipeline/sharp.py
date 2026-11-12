@@ -8,7 +8,8 @@ of 171 x 573, about 6x magnified on a 4x backing store. This tool finds those an
 sized to the need, from the same CC0 bundle SWF (tinyspeck/glitch-locations; FFDec reads it, never
 runs it).
 
-Measure (no rendering): every drawn deco on every street in index.json, middleground and the
+Measure (no rendering): every drawn deco on every street in index.json, and every deco a home
+street or back-yard style draws (js/home-styles-data.js looks, home_placements), middleground and the
 layers drawn in front of it (layers behind it load the 2x file on purpose, js/street-render.js;
 blurred layers bake at reduced resolution; hidden layers never draw). Parallax and T_ layers are
 only offset, never scaled, so a deco's w x h is its on-screen size in view px. The renderer draws
@@ -193,6 +194,38 @@ def placements(plan):
     return out
 
 
+HOME_STYLES_JS = os.path.join(PUBLIC, 'js', 'home-styles-data.js')
+
+
+def home_placements(plan):
+    """Every deco a built home street or back-yard look draws (js/features/homes-feature.js
+    drawLandscape: parallax layers, the field's near row and the street's trim). Those sprites load
+    the deco's usual file (3x where it has one) on every layer and are never blurred or recoloured
+    by a matrix, so all count as near; w x h is item w x h x scale in view px. A `.svg` item (a
+    hand-exported SVG) is measured as its deco. Same dicts as placements(), cls 'home'."""
+    out = []
+    for line in open(HOME_STYLES_JS, encoding='utf-8'):
+        line = line.strip()
+        if not line.startswith('{"key"'):
+            continue
+        row = json.loads(line.rstrip(','))
+        look = row.get('look')
+        if not row.get('built') or not look:
+            continue
+        groups = [(f'layer {i}', l.get('items') or []) for i, l in enumerate(look.get('layers') or [])]
+        groups += [('near', look.get('near') or []), ('trim', look.get('trim') or [])]
+        for layer, items in groups:
+            for it in items:
+                for v in [it] + [dict(it, **a) for a in it.get('alts') or []]:
+                    sp = re.sub(r'\.svg$', '', v['s'])
+                    if sp not in plan:
+                        continue
+                    k = float(v.get('scale') or 1)
+                    out.append(dict(sprite=sp, tsid=row['key'], street=f"home style {row['label']}", layer=layer, cls='home',
+                                    blurred=False, blur=0, gain=1.0, w=round(v['w'] * k, 2), h=round(v['h'] * k, 2), sized=True))
+    return out
+
+
 def edge_score(path):
     """99th percentile of the largest premultiplied channel step to the right/lower neighbour (0-255)
     over covered pixels; a centre crop of at most 2048 px keeps texel steps for big files."""
@@ -225,7 +258,7 @@ def measure(plan, old=None):
     S = SETTINGS
     old_edges = {r['name']: r for r in ((old or {}).get('decos') or []) + ((old or {}).get('skipped') or []) + ((old or {}).get('soft') or [])}
     by = collections.defaultdict(list)
-    for p in placements(plan):
+    for p in placements(plan) + home_placements(plan):
         by[p['sprite']].append(p)
     rows = []
     for sp, ps in by.items():
@@ -233,7 +266,7 @@ def measure(plan, old=None):
         L = row['size2']
         path, f3 = shipped_file(row)
         for p in ps:
-            p['kind'] = 'blur' if p['blurred'] else 'far' if p['cls'] == 'far' else 'near'
+            p['kind'] = 'home' if p['cls'] == 'home' else 'blur' if p['blurred'] else 'far' if p['cls'] == 'far' else 'near'
             avail = L if p['cls'] == 'far' else f3
             dens = blur_bake_res(p['blur'], S['R']) if p['blurred'] else S['R']
             p['ratio'] = round(max(p['w'] * dens / avail[0], p['h'] * dens / avail[1]), 3)
@@ -242,8 +275,10 @@ def measure(plan, old=None):
         near = [p for p in ps if p['kind'] == 'near']
         front = max([p['ratio'] for p in near if p['cls'] == 'front'] or [0])
         near_blurry = bool(near) and (max(p['ratio'] for p in near) >= S['ratio_min'] or front >= S['front_min'])
-        other = [p for p in ps if p['kind'] != 'near' and p['ratio'] >= S['ratio_min']]
-        if not near_blurry and not other:
+        other = [p for p in ps if p['kind'] not in ('near', 'home') and p['ratio'] >= S['ratio_min']]
+        home = [p for p in ps if p['kind'] == 'home']
+        home_blurry = any(p['ratio'] >= S['ratio_min'] for p in home)
+        if not near_blurry and not other and not home_blurry:
             continue
         fsha = row.get('sha3') if row.get('hires') else row.get('sha2')
         o = old_edges.get(sp)
@@ -251,10 +286,13 @@ def measure(plan, old=None):
         counted = [p for p in other if edge * p['gain'] >= S['edge_min']]
         if near_blurry and edge >= S['edge_min']:
             counted += near
-        pool = counted or (near if near_blurry else other)
+        if home_blurry and edge >= S['edge_min']:
+            counted += home
+        pool = counted or (near if near_blurry else other or home)
         worst = max(pool, key=lambda p: p['ratio'])
         sf = max([p['scale'] for p in counted if p['kind'] == 'far'] or [0])
         sb = max([p['scale'] for p in counted if p['kind'] == 'blur'] or [0])
+        sh = max([p['scale'] for p in counted if p['kind'] == 'home'] or [0])
         bneed = max([p['scale'] * p['dens'] for p in counted if p['kind'] == 'blur'] or [0])
         r = dict(name=sp, ratio=worst['ratio'], front=front, placements=len(ps),
                  over=sum(1 for p in pool if p['ratio'] >= S['ratio_min']),
@@ -262,7 +300,7 @@ def measure(plan, old=None):
                  file=os.path.basename(path if worst['cls'] != 'far' else path.replace('@1.5x.webp', '.webp')),
                  texels=(L if worst['cls'] == 'far' else f3), need=[round(worst['w'] * worst['dens']), round(worst['h'] * worst['dens'])],
                  s=round(max([max(p['w'] / L[0], p['h'] / L[1]) for p in near] or [0]), 4) if near_blurry and edge >= S['edge_min'] else 0,
-                 sf=round(sf, 4), sb=round(sb, 4), bneed=round(bneed, 4), size2=L,
+                 sf=round(sf, 4), sb=round(sb, 4), sh=round(sh, 4), bneed=round(bneed, 4), size2=L,
                  counted=bool(counted), unsized=sum(1 for p in counted if not p['sized']), source=row['mode'] == 'swf',
                  edge=edge, edge_of=fsha)
         rows.append(r)
@@ -416,7 +454,7 @@ def webp_res(r, base):
     file the game already loads (`base`: 1.5 with a 3x file, else 1). Never 1.5: that name is the
     3x file's."""
     L = r['size2']
-    need = max(r['s'] * SETTINGS['target'], r.get('sf', 0) * SETTINGS['target'], r.get('bneed', 0))
+    need = max(r['s'] * SETTINGS['target'], r.get('sf', 0) * SETTINGS['target'], r.get('sh', 0) * SETTINGS['target'], r.get('bneed', 0))
     res = math.ceil(need * 4 - 1e-6) / 4
     cap = SETTINGS['webp_max_side'] / max(L)
     if res > cap:
@@ -447,7 +485,7 @@ def cmd_build(args):
                  and (o['kind'] != 'webp' or o.get('res') == webp_res(r, 1.5 if prow.get('hires') else 1)))
         if o and (only and r['name'] not in only or fresh):
             keep.append(dict(o, ratio=r['ratio'], front=r['front'], placements=r['placements'], over=r['over'], worst=r['worst'],
-                             s=r['s'], sf=r['sf'], sb=r['sb'], bneed=r['bneed']))
+                             s=r['s'], sf=r['sf'], sb=r['sb'], sh=r['sh'], bneed=r['bneed']))
             continue
         if only and r['name'] not in only:
             continue
@@ -588,7 +626,7 @@ def build_chunk(work, chunk, args):
     for r in chunk:
         if not r.get('kind'):
             continue
-        keep = ('name', 'kind', 's', 'sf', 'sb', 'bneed', 'size2', 'ratio', 'front', 'placements', 'over', 'worst', 'edge', 'edge_of', 'swf_sha',
+        keep = ('name', 'kind', 's', 'sf', 'sb', 'sh', 'bneed', 'size2', 'ratio', 'front', 'placements', 'over', 'worst', 'edge', 'edge_of', 'swf_sha',
                 'key', 'svg_check', 'why', 'res', 'size', 'bytes', 'sha', 'lossless', 'err')
         out.append({k: r[k] for k in keep if k in r and r[k] is not None})
     return out
@@ -601,14 +639,17 @@ def js_text(p):
     ents = []
     for r in rows:
         v = [r['kind'], r['s'], r['size2'][0], r['size2'][1], r.get('res', 0) if r['kind'] == 'webp' else 0, r.get('sf', 0), r.get('sb', 0)]
+        if r.get('sh'):
+            v.append(r['sh'])
         ents.append(json.dumps([r['name'], v], separators=(',', ':')))
     return (
         '/**\n'
         ' * Street decos some street draws much larger than their 2x/3x WebPs (tools/deco-pipeline/sharp.py):\n'
-        ' * name -> [kind, s, w, h, res, sf, sb]. kind "svg": assets/decos/groddle/<name>.svg, rasterised at\n'
+        ' * name -> [kind, s, w, h, res, sf, sb, sh?]. kind "svg": assets/decos/groddle/<name>.svg, rasterised at\n'
         " * the screen's need; \"webp\": <name>@<res>x.webp (res 0 for svg). s, sf, sb: the largest view px per\n"
         ' * logical px over its near, far (behind the middleground) and blurred placements that need it\n'
-        ' * (0: none, that kind keeps the 2x/3x file); w x h the logical size (the 2x file).\n'
+        ' * (0: none, that kind keeps the 2x/3x file); w x h the logical size (the 2x file). sh, only when\n'
+        ' * a home street or back-yard look needs it: the same over those (js/features/homes-feature.js).\n'
         ' * Generated by sharp.py; do not edit by hand.\n'
         ' */\n'
         'export const SHARP_DECOS = new Map([\n' + ',\n'.join(ents) + '\n]);\n'
@@ -644,7 +685,7 @@ def cmd_check(args):
             problems.append(f'{n}: SWF changed since the sharp build')
         if r['kind'] == 'webp' and n in want and r.get('res') != webp_res(want[n], 1.5 if prow.get('hires') else 1):
             problems.append(f'{n}: built at res {r.get("res")}, the rule now gives {webp_res(want[n], 1.5 if prow.get("hires") else 1)}')
-        for k in ('s', 'sf', 'sb', 'bneed'):
+        for k in ('s', 'sf', 'sb', 'sh', 'bneed'):
             if n in want and abs(want[n][k] - r.get(k, 0)) > 1e-6:
                 problems.append(f'{n}: placements changed ({k} {r.get(k, 0)} -> {want[n][k]})')
         for f in out_files(r):

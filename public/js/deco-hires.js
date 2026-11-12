@@ -24,7 +24,7 @@ import { NEW_DECOS, NEW_DECOS_HIRES } from './deco-new-list.js?v=eadb6e8c';
 
 /** A published zone's new art (gz_ decos, js/deco-new-list.js): drawn like library decos. */
 export { NEW_DECOS };
-import { SHARP_DECOS } from './deco-sharp-list.js?v=7c5ae40e';
+import { SHARP_DECOS } from './deco-sharp-list.js?v=9ebccaeb';
 
 const DECO_PNG = /^(.*?(?:^|\/)assets\/decos\/groddle\/)([^/?#]+)\.png([?#].*)?$/;
 
@@ -121,7 +121,10 @@ export const FAR_SHARP_BUDGET_BYTES = 96 * 1024 * 1024;
  * - near: `scale` / SHARP_SLACK texels per view px, over the 2x or 3x file;
  * - `far: true` (behind the middleground): the same, over the 2x file those layers load;
  * - `blurDensity` (a blurred layer: js/street-render.js blurBakeResolution): its bake's texels per
- *   view px, which keeps nothing finer.
+ *   view px, which keeps nothing finer;
+ * - `per` (a home street or back-yard landscape, js/features/homes-feature.js): this placement's
+ *   own view px per logical px, in place of the list's s, sf or sb; near rules otherwise. Every
+ *   home look placement that needs a copy is in the list (its sh).
  * Returns { url, kind, bytes, need, base, w, h } (w x h the logical size) and for svg { width, height, resolution }:
  * - webp: <name>@<res>x.webp (resolution from the name, logical size unchanged)
  * - svg: <name>.svg?r=<res>, rasterised at width x height (js/textures.js textureFromUrl(url,
@@ -129,9 +132,9 @@ export const FAR_SHARP_BUDGET_BYTES = 96 * 1024 * 1024;
  *   capped at maxSide on the longest side and SVG_MAX_PIXELS.
  * @param {string} url
  * @param {number} scale renderer.resolution
- * @param {{ maxSide?: number, bigTextures?: boolean, far?: boolean, blurDensity?: number }} [opts]
+ * @param {{ maxSide?: number, bigTextures?: boolean, far?: boolean, blurDensity?: number, per?: number }} [opts]
  */
-export function sharpDeco(url, scale, { maxSide = SVG_MAX_SIDE, bigTextures = false, far = false, blurDensity = 0 } = {}) {
+export function sharpDeco(url, scale, { maxSide = SVG_MAX_SIDE, bigTextures = false, far = false, blurDensity = 0, per: own = 0 } = {}) {
   const m = DECO_PNG.exec(String(url || ''));
   if (!m) return null;
   const [, dir, name] = m;
@@ -141,7 +144,7 @@ export function sharpDeco(url, scale, { maxSide = SVG_MAX_SIDE, bigTextures = fa
   const R = Number(scale) || 1;
   const three = !far && wantsHiresDecos(R) && (HIRES_DECOS.has(name) || (bigTextures && HIRES_DECOS_BIG.has(name)));
   const base = three ? 1.5 : 1;
-  const per = blurDensity > 0 ? sb : far ? sf : s;
+  const per = own > 0 ? own : blurDensity > 0 ? sb : far ? sf : s;
   if (!per) return null;
   const need = blurDensity > 0 ? blurDensity * per : (R * per) / SHARP_SLACK;
   if (need <= base) return null;

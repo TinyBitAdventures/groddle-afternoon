@@ -135,13 +135,14 @@ function assetPath(url) {
  * PURE: the 1x asset path a texture was loaded from, as the site serves it,
  * or null when it is none of Tiny Speck's art files. The loader's routes are
  * undone (js/textures.js addUrlRoute): a deco asked for as `<name>.png` ships
- * as `<name>.webp` (js/deco-hires.js; `@1.5x` is its twin), a 3x sprite sheet
- * is its HIRES_SPRITES key, a 3x icon its 1x `.webp`.
+ * as `<name>.webp` (js/deco-hires.js; `@1.5x` is its twin, and a landscape's
+ * sharp copy, `<name>@<res>x.webp` or `<name>.svg`, is the same deco), a 3x
+ * sprite sheet is its HIRES_SPRITES key, a 3x icon its 1x `.webp`.
  */
 export function layoutArtPath(url) {
   let s = assetPath(url);
   if (!s) return null;
-  const deco = /^(assets\/decos\/groddle\/[^/]+?)(?:@1\.5x)?\.(png|webp)$/.exec(s);
+  const deco = /^(assets\/decos\/groddle\/[^/]+?)(?:@\d+(?:\.\d+)?x)?\.(png|webp|svg)$/.exec(s);
   if (deco) s = `${deco[1]}.webp`;
   else if (SPRITE_1X.has(s)) s = SPRITE_1X.get(s);
   else {

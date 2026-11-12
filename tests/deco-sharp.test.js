@@ -10,10 +10,13 @@ import { execFileSync } from 'node:child_process';
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { SHARP_DECOS } from '../public/js/deco-sharp-list.js?v=7c5ae40e';
+import { SHARP_DECOS } from '../public/js/deco-sharp-list.js?v=9ebccaeb';
 import { HIRES_DECOS } from '../public/js/deco-hires-list.js?v=2c460d64';
-import { FAR_SHARP_BUDGET_BYTES, SHARP_SLACK, SVG_MAX_PIXELS, SVG_MAX_SIDE, admitSharp, isSharpDeco, sharpDeco } from '../public/js/deco-hires.js?v=9fd4ee86';
+import { FAR_SHARP_BUDGET_BYTES, SHARP_SLACK, SVG_MAX_PIXELS, SVG_MAX_SIDE, admitSharp, isSharpDeco, sharpDeco } from '../public/js/deco-hires.js?v=e5e3f453';
 import { resolutionOfUrl } from '../public/js/textures.js?v=f024bd6a';
+import { landscapeArt } from '../public/js/features/homes-feature.js?v=31112ce4';
+import { EXTERIOR_STYLES, INTERIOR_STYLES, streetLook, yardLook } from '../public/js/home-styles.js?v=13fe0aaa';
+import { layoutArtPath } from '../public/js/home-layout.js?v=7e614897';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const decoDir = join(root, 'public/assets/decos/groddle');
@@ -38,13 +41,14 @@ describe('sharp deco files', () => {
   it('lists exactly the plan rows and ships each one', () => {
     assert.ok(SHARP_DECOS.size > 500, `${SHARP_DECOS.size} sharp decos`);
     assert.deepEqual([...SHARP_DECOS.keys()].sort(), [...rows.keys()].sort());
-    for (const [name, [kind, s, w, h, res, sf, sb]] of SHARP_DECOS) {
+    for (const [name, [kind, s, w, h, res, sf, sb, sh = 0]] of SHARP_DECOS) {
       const r = rows.get(name);
       assert.equal(kind, r.kind, name);
       assert.equal(s, r.s, name);
       assert.equal(sf, r.sf || 0, name);
       assert.equal(sb, r.sb || 0, name);
-      assert.ok(s > 0 || sf > 0 || sb > 0, `${name} is needed somewhere`);
+      assert.equal(sh, r.sh || 0, name);
+      assert.ok(s > 0 || sf > 0 || sb > 0 || sh > 0, `${name} is needed somewhere`);
       assert.deepEqual([w, h], r.size2, name);
       if (kind === 'svg') {
         const svg = readFileSync(join(decoDir, `${name}.svg`), 'utf8');
@@ -221,7 +225,7 @@ describe('street-render draws sharp copies on the sharp layers', () => {
       }
     };
     globalThis.document = { createElement: () => ({ width: 0, height: 0, getContext: () => ({ drawImage() {} }) }) };
-    const { buildStreetView } = await import('../public/js/street-render.js?v=2e521905');
+    const { buildStreetView } = await import('../public/js/street-render.js?v=e14dcc06');
     const handlers = {};
     const renderer = {
       resolution: 1,
@@ -267,7 +271,7 @@ describe('street-render draws sharp copies on the sharp layers', () => {
   });
 
   it('far layers: sharp copies within the street budget, the rest on their 2x files', async () => {
-    const { buildStreetView } = await import('../public/js/street-render.js?v=2e521905');
+    const { buildStreetView } = await import('../public/js/street-render.js?v=e14dcc06');
     const manifest = new Set(JSON.parse(readFileSync(join(root, 'public/assets/decos/manifest.json'), 'utf8')));
     const renderer = { resolution: 3.9, gl: { MAX_TEXTURE_SIZE: 1, getParameter: () => 8192 }, generateTexture: () => null, on() {}, off() {} };
     for (const tsid of ['GA95U14319524O9', 'GHFC3I4EKMI20JD', 'GA9117J18492SRS']) {
@@ -297,5 +301,77 @@ describe('street-render draws sharp copies on the sharp layers', () => {
       assert.ok(view.sharpStats().farAdmitted === admitted.size);
       view.destroy();
     }
+  });
+});
+
+describe('home street and back-yard landscapes (homes-feature landscapeArt)', () => {
+  const item = (look, name) => {
+    for (const row of [...(look.near || []), ...(look.trim || []), ...(look.layers || []).flatMap((l) => l.items || [])]) if (row.s === name) return row;
+    return null;
+  };
+
+  it("Silent Orbit's craters (earthdot_grp_2 at 1.6) take a copy sized for a Retina window", () => {
+    const r = rows.get('earthdot_grp_2');
+    assert.equal(r.worst.street, 'home style Silent Orbit');
+    assert.equal(r.sh, 1.6);
+    // Silent Orbit is a back-yard style (Austin's screenshot: Your House, the yard left of it).
+    const crater = item(yardLook('_moon__high'), 'earthdot_grp_2');
+    assert.equal(crater.scale, 1.6);
+    const [kind, , w, , res] = SHARP_DECOS.get('earthdot_grp_2');
+    assert.equal(kind, 'webp');
+    // target 3 texels per view px at 1.6 view px per logical px: 4.8, in quarter steps.
+    assert.equal(res, 5);
+    const art = landscapeArt(crater, 4);
+    assert.equal(art.url, 'assets/decos/groddle/earthdot_grp_2@5x.webp');
+    assert.deepEqual(art.opts, { raw: true });
+    // The drawn crater (736 view px) on a 4x backing store: 2944 px from 2300 texels, under SHARP_SLACK.
+    assert.ok((crater.w * crater.scale * 4) / (w * res) <= SHARP_SLACK);
+    // Even at 1 backing px per view px (a phone, js/render-density.js) the 2x file is magnified 1.6x.
+    assert.equal(landscapeArt(crater, 1).url, 'assets/decos/groddle/earthdot_grp_2@5x.webp');
+    // A deco the look draws at about half its 2x file keeps that file at a phone's 1.
+    const grass = item(yardLook('_moon__high'), 'gravel_2') || item(streetLook('meadow_ext_default_high'), 'plant_grass_2');
+    assert.ok(grass && !landscapeArt(grass, 1).opts, `${grass?.s} at R 1`);
+  });
+
+  it('an SVG copy rasterises at the need, logical size unchanged', () => {
+    const tree = item(streetLook('uralia_2_high'), 'bck_tree_3');
+    const art = landscapeArt(tree, 4);
+    assert.match(art.url, /^assets\/decos\/groddle\/bck_tree_3\.svg\?r=[\d.]+$/);
+    const [, , w] = SHARP_DECOS.get('bck_tree_3');
+    assert.ok(Math.abs(art.opts.width / art.opts.resolution - w) < 1e-9);
+    assert.ok(art.opts.resolution >= (4 * tree.scale) / SHARP_SLACK - 1e-3);
+  });
+
+  it("Toxic Moon's hand SVG moon draws as its deco (no 90 px raster)", () => {
+    const moon = item(streetLook('_moon_high'), 'moon_asset_plain.svg');
+    assert.ok(landscapeArt(moon, 4).url.startsWith('assets/decos/groddle/moon_asset_plain'));
+    assert.doesNotMatch(landscapeArt(moon, 4).url, /\.svg/);
+  });
+
+  it('every blurry hard-edged deco a built look draws has its copy at R 4', () => {
+    const notSharp = new Set([...sharpPlan.soft, ...sharpPlan.skipped].map((r) => r.name));
+    const seen = new Set();
+    for (const row of [...EXTERIOR_STYLES, ...INTERIOR_STYLES]) {
+      if (!row.built || !row.look) continue;
+      const look = row.look;
+      const items = [...(look.near || []), ...(look.trim || []), ...(look.layers || []).flatMap((l) => l.items || [])].flatMap((it) => [it, ...(it.alts || []).map((a) => ({ ...it, ...a }))]);
+      for (const it of items) {
+        const name = it.s.replace(/\.svg$/, '');
+        const logical = SHARP_DECOS.get(name)?.[2] ?? it.w;
+        const per = (it.w * it.scale) / logical;
+        // sharp.py: ratio = view px x R over the texels of the file loaded (3x where there is one).
+        const ratio = (4 * per) / (HIRES_DECOS.has(name) ? 1.5 : 1);
+        if (ratio < sharpPlan.settings.ratio_min || notSharp.has(name)) continue;
+        assert.ok(rows.get(name)?.sh >= per - 1e-3, `${row.label}: ${name} at ${per} is in the sharp list`);
+        assert.notEqual(landscapeArt(it, 4).url, `assets/decos/groddle/${name}.png`, `${row.label}: ${name}`);
+        seen.add(name);
+      }
+    }
+    assert.ok(seen.has('earthdot_grp_2') && seen.size > 40, `${seen.size} sharp landscape decos`);
+  });
+
+  it('the home layout records a sharp copy as its deco', () => {
+    assert.equal(layoutArtPath('assets/decos/groddle/earthdot_grp_2@5x.webp'), 'assets/decos/groddle/earthdot_grp_2.webp');
+    assert.equal(layoutArtPath('assets/decos/groddle/bck_tree_3.svg?r=2.828'), 'assets/decos/groddle/bck_tree_3.webp');
   });
 });

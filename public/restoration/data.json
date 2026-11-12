@@ -2752,9 +2752,14 @@
   "deployed": "2026-11-12"
  },
  "git": {
-  "commits": 1741,
+  "commits": 1743,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-12",
+    "kind": "fix",
+    "text": "Home street and back-yard scenery draws crisp on Retina screens"
+   },
    {
     "date": "2026-11-12",
     "kind": "fix",
@@ -2869,11 +2874,6 @@
     "date": "2026-11-12",
     "kind": "fix",
     "text": "Choosing Sell on an item scrolls the vendor's shelf up to it too"
-   },
-   {
-    "date": "2026-11-12",
-    "kind": "improve",
-    "text": "The Social drawer names the day at each day's first time line"
    }
   ]
  },
