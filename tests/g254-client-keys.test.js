@@ -226,7 +226,7 @@ describe('G254: game.js wiring', () => {
   });
 
   it('M opens and closes the map beside G, not while Gentle Island hides it', () => {
-    assert.match(keys, /if \(e\.key === 'g' \|\| e\.key === 'G' \|\| isPlainKey\(e, 'm'\)\) closeMap\(\);/);
+    assert.match(keys, /if \(e\.key === 'g' \|\| e\.key === 'G' \|\| isPlainKey\(e, 'm'\)\) \{\n\s+closeMap\(\);\n\s+return;/); // #206: and stops there
     assert.match(keys, /if \(e\.key === 'g' \|\| e\.key === 'G' \|\| isPlainKey\(e, 'm'\)\) \{[\s\S]{0,400}if \(!document\.body\.classList\.contains\('nx-hide-map'\)\) openMap\(\);/);
   });
 

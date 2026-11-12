@@ -822,6 +822,7 @@ function sharedVerbOn(engine, target, verbId) {
     return {
       id: nodeId(n.key),
       ready: () => n.ready(verbId),
+      reason: () => n.reason?.(verbId) || '',
       perks: nodePerks(n.classTsid, verbId, { upgrades }),
       // A Dirt Pile's dig: the server rolls its Loam drop from the skill (objects.go digHelp).
       skill: n.classTsid === 'dirt_pile' && verbId === 'dig' ? digSkill(learned, upgrades) : '',
@@ -979,6 +980,27 @@ function ask(engine, target, verbId) {
 }
 
 /**
+ * game.js beginVerbAction, before the swing (#214): a shared verb still waiting on the server's
+ * answer for the same object does not start again, and one the player's own side now refuses (the
+ * day's harvest of a Peat Bog, landed with that answer) is refused before the swing with its line,
+ * as Glitch checked a verb's conditions before its handler ran (peat_1.js harvest conditions).
+ * Null when the verb is local or may start.
+ */
+function refusedNow(engine, target, verbId) {
+  if (engine.mode !== 'multiplayer' || target?.yardVisit) return null;
+  if (grant && grant.target === target && grant.verbId === verbId) return null;
+  const c = bind(engine);
+  if (!c || LOCAL_STATES.has(c.state) || !roomIsStreet(engine, c)) return null;
+  const verb = sharedVerbOn(engine, target, verbId);
+  if (!verb || !shared(engine)) return null;
+  for (const p of pending.values()) {
+    if (p.id === verb.id && !p.silent) return COPY.busy;
+  }
+  if (verb.ready()) return null;
+  return verb.reason?.() || null;
+}
+
+/**
  * game.js beginVerbAction, before the swing: a rock, tree or node the server would refuse as too
  * far when the verb lands (objects.go handleAct "far") is refused now with the server's line, so
  * the swing never plays for nothing (player report 33). Null when the verb is local or in reach.
@@ -1121,6 +1143,11 @@ export const streetObjectsFeature = {
     if (engine?.mode !== 'multiplayer') return;
     dirtyAll = true;
     reapplyAt = Date.now() + 3000;
+  },
+
+  /** game.js beginVerbAction: a verb on an object still waiting on the server, or now refused, does not swing (#214). */
+  verbRefusedNow(target, verbId, engine) {
+    return refusedNow(engine, target, verbId);
   },
 
   /** game.js executeVerb: a shared verb asks the server before it lands. */

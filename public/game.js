@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=5e5c70c4';
 import { createErrorOnce, createFeatureHost } from './js/feature-host.js?v=06bb8b74';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=6139d079';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=4472591f';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -578,6 +578,7 @@ import {
   makePanelIcon,
   recipeToolFor,
   recipeBlockedLine,
+  recipeInputHave,
   createCraftSession,
   advanceCraftSession,
   cancelCraftSession,
@@ -598,7 +599,7 @@ import {
   recipeTaskLimit,
   recipeToolInUse,
   pluralizeItem,
-} from './js/making.js?v=4e72bb4b';
+} from './js/making.js?v=86fd3231';
 import { outputIconsHtml, outputsPhrase, recipeOutputRows } from './js/ui/recipe-outputs.js?v=73e19baf';
 import { MAKE_TOOL_SHEETS } from './js/make-tool-sheets.js?v=6f758e09';
 import { groupMakingTools, makeToolCounts, makeToolCountLine, makeToolSpokenLine, makeOpeningTool, gridStep } from './js/make-tools.js?v=3e4818c0';
@@ -18698,13 +18699,17 @@ function updateWinterWalk(dt) {
     returnFromWinterWalk({ expired: true });
     return;
   }
+  // #215/#216: the motes are iMG quoins, taken by the body's box on the drawn coin as street
+  // quoins are (items/quoin.js onPlayerCollision; js/quoins.js quoinTouches), not a 48 px circle
+  // 28 px over the feet that missed the motes hung 88 px up unless you jumped.
+  const moteBody = features.query('avatarBodyScale', engine) ?? 1;
   for (const entry of winterWalkMotes) {
     if (entry.collected || !entry.sprite?.parent) continue;
     entry.sprite.phase += 0.05 * dt;
     entry.sprite.y = entry.sprite.baseY + Math.sin(entry.sprite.phase) * 8;
     const pulse = 1 + Math.sin(entry.sprite.phase * 1.5) * 0.075;
     entry.sprite.scale.set(entry.sprite.baseScale * pulse);
-    if (!menuTarget && Math.hypot(entry.sprite.x - player.x, entry.sprite.y - (player.y - 28)) < 48) {
+    if (!menuTarget && quoinTouches(entry.sprite, player.x, player.y, { scale: moteBody, quoinScale: entry.sprite.baseScale })) {
       collectWinterWalkMote(entry);
     }
   }
@@ -27186,6 +27191,8 @@ function recipeMakesLine(recipe) {
 
 function recipeInputLabel(recipe, input) {
   const label = ITEM_CATALOG[input.classTsid]?.label || input.classTsid;
+  // #219: the Crystalmalizing Chamber's jar is a full one, kept (crystallizer.js 287-290).
+  if (input.full > 0) return `full ${label}`;
   if (recipe?.tool === 'fruit_changing_machine' && input.classTsid === 'cherry') {
     return input.qty === 1 ? 'Cherry' : 'Cherries';
   }
@@ -27900,7 +27907,7 @@ function renderMakePanel() {
         if (!check.ok) return 0;
         let m = recipeTaskLimit(recipe, pc.imaginationUpgrades);
         for (const inp of recipe.inputs || []) {
-          m = Math.min(m, Math.floor(countItem(inv, inp.classTsid) / inp.qty));
+          m = Math.min(m, Math.floor(recipeInputHave(inv, inp, opts.toolState) / inp.qty));
         }
         const energyEach = recipeEnergyCost(recipe, skillState.learned, pc.imaginationUpgrades);
         // The batch needs energy strictly above its cost (inc_making.js).
@@ -27910,7 +27917,7 @@ function renderMakePanel() {
       makeQty = Math.max(1, Math.min(makeQty, Math.max(1, maxMake || 1)));
       const inputsHtml = (recipe.inputs || [])
         .map((i) => {
-          const have = countItem(inv, i.classTsid);
+          const have = recipeInputHave(inv, i, opts.toolState);
           const lab = recipeInputLabel(recipe, i);
           return `<div class="q-req"><img src="${itemIconUrl(i.classTsid)}" alt="" width="22" height="22" style="vertical-align:middle;margin-right:4px"/> <strong>${i.qty} ${lab}</strong> · you have ${have}</div>`;
         })
@@ -31423,7 +31430,11 @@ async function main() {
     }
     if (isMapOpen()) {
       // G254: M closes it too (TSMainView.as mKeyHandler 733-741, toggleHubMapDialog).
-      if (e.key === 'g' || e.key === 'G' || isPlainKey(e, 'm')) closeMap();
+      // Report #206 follow-up: and stops there, so the swap below never sees the Map shut and opens it again.
+      if (e.key === 'g' || e.key === 'G' || isPlainKey(e, 'm')) {
+        closeMap();
+        return;
+      }
       // MAPZOOM: the world zoom's keys zoom the Map while it is open (= or + in, - out, 0 the whole region).
       const mapZoomKey = zoomKeyAction(e);
       if (mapZoomKey && mapZoom) {

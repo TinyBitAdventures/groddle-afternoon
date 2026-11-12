@@ -1422,6 +1422,13 @@ export function slothsChewing(list, now = Date.now()) {
   return (list || []).filter((e) => e?.classTsid === 'npc_sloth' && Number(e.node?.busyUntil) > now).length;
 }
 
+/** A shared node's verb with the stock left to the realtime server: tools, skills, energy, daily limits. */
+function ownSide(engine, entity, verbId) {
+  const def = getResourceNodeDef(entity.classTsid);
+  const full = { ...entity.node, units: def?.stock?.max ?? entity.node.units, depleted: false, petted: false, watered: false };
+  return resourceNodeVerbs(full, engine.inv, engine.pc, verbContext(engine, entity)).find((v) => v.id === verbId) || null;
+}
+
 function performVerb(engine, entity, verbId) {
   const result = harvestResourceNode(entity.node, engine.inv, engine.pc, verbContext(engine, entity, verbId));
   applyResult(engine, entity, result);
@@ -1862,9 +1869,12 @@ export const resourceNodesFeature = {
       target: entity.target,
       refresh: () => refreshEntity(engine, entity),
       ready(verbId) {
-        const def = getResourceNodeDef(entity.classTsid);
-        const full = { ...entity.node, units: def?.stock?.max ?? entity.node.units, depleted: false, petted: false, watered: false };
-        return resourceNodeVerbs(full, engine.inv, engine.pc, verbContext(engine, entity)).find((v) => v.id === verbId)?.enabled === true;
+        return ownSide(engine, entity, verbId)?.enabled === true;
+      },
+      /** #214: why the player's own side says no (a used daily limit: "You can't harvest this peat more than once per game day."). */
+      reason(verbId) {
+        const verb = ownSide(engine, entity, verbId);
+        return verb && !verb.enabled ? String(verb.message || '') : '';
       },
     }));
   },

@@ -17,7 +17,7 @@ import {
   ensureItem,
   registerItemUse,
 } from './inventory.js?v=60dfc9ca';
-import { GRINDER_TOOLS, TOOL_CONDITION_CATALOG, brokenToolIcon, canUseTool, firstWorkingTool, useToolCondition } from './tools.js?v=5f482998';
+import { GRINDER_TOOLS, TOOL_CONDITION_CATALOG, brokenToolIcon, canUseTool, firstWorkingTool, setToolRemaining, toolCopies, useToolCondition } from './tools.js?v=5f482998';
 import { getSkillPackageOverride, highestSkillLevel, skillPackageDetails } from './skill-packages.js?v=bfb87281';
 import {
   adjustedTaskLimit,
@@ -919,8 +919,10 @@ export function recipeBlockedLine(recipe, check, ctx = {}) {
       return `You need to get the ${ctx.achievementName?.(check.achievement) || check.achievement} achievement.`;
     case 'ingredients': {
       const inputs = recipe?.inputs || [];
-      const missing = inputs.filter((i) => countItem(ctx.inv, i.classTsid) < i.qty).length;
+      const missing = inputs.filter((i) => recipeInputHave(ctx.inv, i, ctx.toolState) < i.qty).length;
       if (missing > 1 && missing === inputs.length) return "You're missing all of the ingredients!";
+      // #219: only the jar is short (crystallizer.js 290).
+      if (check.full && missing <= 1) return FULL_JAR_LINE;
       return `You're missing ${missing > 1 ? `${missing} ingredients` : 'an ingredient'}!`;
     }
     default:
@@ -944,6 +946,35 @@ export function makePanelIcon(tool, inv, toolState = null, atStation = false) {
     broken: Boolean(brokenSrc),
   };
 }
+
+/**
+ * #219: an input the recipe fills from rather than uses up, `full` (a Firefly Jar holding 7
+ * Fireflies, kept and emptied): crystallizer.js crystalmalize 285-294 needs one full jar and 7
+ * Barnacle Talc, onCrystalizeComplete 393-401 sets that jar's num_flies to 0 and keeps it.
+ * How many of an input the pack can give: full copies for such an input (their contents are the
+ * tools' points, js/tools.js firefly_jar), else the count.
+ */
+export function recipeInputHave(inv, input, toolState = null) {
+  const have = countItem(inv, input?.classTsid);
+  if (!(input?.full > 0) || !toolState) return have;
+  return Math.min(have, toolCopies(toolState, input.classTsid).filter((c) => c.remaining >= input.full).length);
+}
+
+/** The full copies a unit empties (the first in pack order, as pc.findFirst). */
+function emptyFullInputs(recipe, toolState) {
+  if (!toolState) return;
+  for (const input of recipe.inputs || []) {
+    if (!(input.full > 0)) continue;
+    for (let k = 0; k < input.qty; k += 1) {
+      const copy = toolCopies(toolState, input.classTsid).findIndex((c) => c.remaining >= input.full);
+      if (copy < 0) break;
+      setToolRemaining(toolState, input.classTsid, 0, { copy });
+    }
+  }
+}
+
+/** crystallizer.js 290: the line when no jar is full. */
+export const FULL_JAR_LINE = 'You need a full Firefly Jar.';
 
 export function canCraft(inv, recipe, opts = {}) {
   if (!recipe) return { ok: false, reason: 'unknown' };
@@ -1017,13 +1048,15 @@ export function canCraft(inv, recipe, opts = {}) {
   }
 
   for (const inp of recipe.inputs || []) {
-    if (countItem(inv, inp.classTsid) < inp.qty) {
+    const have = recipeInputHave(inv, inp, opts.toolState);
+    if (have < inp.qty) {
       return {
         ok: false,
         reason: 'ingredients',
         missing: inp.classTsid,
         need: inp.qty,
-        have: countItem(inv, inp.classTsid),
+        have,
+        ...(inp.full > 0 ? { full: inp.full, msg: FULL_JAR_LINE } : {}),
       };
     }
   }
@@ -1087,7 +1120,7 @@ export function craftRecipe(inv, pc, recipeKey, opts = {}) {
       return {
         ok: false,
         reason: 'ingredients',
-        msgs: [`Need ${check.need}× ${label} (have ${check.have}).`],
+        msgs: [check.full ? check.msg : `Need ${check.need}× ${label} (have ${check.have}).`],
       };
     }
     return { ok: false, reason: check.reason, msgs: ['Cannot craft.'] };
@@ -1147,11 +1180,14 @@ export function craftRecipe(inv, pc, recipeKey, opts = {}) {
   const beforeXp = pc.xp;
 
   for (const inp of recipe.inputs || []) {
+    // #219: a full jar stays in the pack; its Fireflies go into the crystal.
+    if (inp.full > 0) continue;
     if (!removeItem(inv, inp.classTsid, inp.qty)) {
       Object.assign(inv, beforeInv);
       return { ok: false, reason: 'ingredients', msgs: ['Not enough ingredients.'] };
     }
   }
+  emptyFullInputs(recipe, opts.toolState);
 
   // inc_making.js 1530: metabolics_lose_energy(energy_cost) (nothing while dead).
   const energyLost = loseEnergy(pc, cost);
@@ -1424,7 +1460,7 @@ export function buildCraftBatchResult(inv, pc, recipeKey, made, qtyRequested = m
   const extras = batchExtras?.recipeKey === recipeKey ? batchExtras : null;
   // What landed after the mood bonus (craftRecipe sums it per unit).
   const xp = Number.isFinite(extras?.xp) ? extras.xp : (recipe.xpReward || 0) * count;
-  const used = (recipe.inputs || []).map((input) => ({
+  const used = (recipe.inputs || []).filter((input) => !(input.full > 0)).map((input) => ({
     classTsid: input.classTsid,
     qty: input.qty * count,
     remain: countItem(inv, input.classTsid),

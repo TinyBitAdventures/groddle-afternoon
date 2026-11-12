@@ -32,7 +32,7 @@ import {
   loadRecipeCatalogFromFile,
   makingSkillAdjustments,
   recipeTaskLimit,
-} from '../public/js/making.js?v=4e72bb4b';
+} from '../public/js/making.js?v=86fd3231';
 import {
   assemblyCheck,
   assemblyEnergy,

@@ -70,7 +70,7 @@ import { CUBIMAL_PACKAGE_IDS, CUBIMAL_SERIES } from '../public/js/cubimals.js?v=
 import { ARTIFACT_MAP, ARTIFACT_NECKLACES } from '../public/js/artifacts.js?v=fc419ecf';
 import { XP_FOR_LEVEL, currantRewardForLevel } from '../public/js/progression.js?v=33462eaa';
 import { IMAGINATION_UPGRADES } from '../public/js/imagination-data.js?v=4a85e7fe';
-import { SPINDLE_TOOLS } from '../public/js/making.js?v=4e72bb4b';
+import { SPINDLE_TOOLS } from '../public/js/making.js?v=86fd3231';
 import { creditedMultiplayerQuests } from '../public/js/quests-mp.js?v=1fc5ff58';
 import { FURNITURE_STARTER_KIT } from '../public/js/homes-catalog.js?v=10ac34b6';
 
@@ -162,7 +162,8 @@ export function economyTransforms(tradeable) {
   const recipes = content('recipes.json');
   for (const key of Object.keys(recipes).sort()) {
     const r = recipes[key];
-    const i = counts(r.inputs);
+    // #219: a full Firefly Jar the Crystalmalizing Chamber empties stays in the pack (input.full).
+    const i = counts((r.inputs || []).filter((row) => !(row.full > 0)));
     const o = counts(r.outputs);
     add(`recipe:${key}`, i, o);
     // spindle.js:425 Spellbound Spindle: the whole spin comes out as String.

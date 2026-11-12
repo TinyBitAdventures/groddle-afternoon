@@ -9810,7 +9810,7 @@
     "id": "304",
     "name": "Plain Crystal",
     "tool": "crystallizer",
-    "energyCost": 134,
+    "energyCost": 10,
     "xpReward": 0,
     "waitMs": 5000,
     "inputs": [
@@ -9820,7 +9820,8 @@
       },
       {
         "classTsid": "firefly_jar",
-        "qty": 7
+        "qty": 1,
+        "full": 7
       }
     ],
     "outputs": [
@@ -9835,7 +9836,7 @@
     "toolWear": 25,
     "taskLimit": 1,
     "learnt": 2,
-    "source": "catalog_recipes.js recipes[\"304\"]"
+    "source": "catalog_recipes.js recipes[\"304\"] for the tool, wear and time; inputs and energy from the live verb, crystallizer.js crystalmalize 274-327 (one full Firefly Jar, kept and emptied, and 7 Barnacle Talc; onCrystalizeComplete 389-401) and the crystallizing skill package (energy_cost 10): recipe 304's own verb, crystalize, was switched off (conditions return state null, 349-351) (#219)"
   },
   "batterfly_bar": {
     "id": "305",

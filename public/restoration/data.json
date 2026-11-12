@@ -2752,9 +2752,14 @@
   "deployed": "2026-11-11"
  },
  "git": {
-  "commits": 1680,
+  "commits": 1681,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-12",
+    "kind": "fix",
+    "text": "No more stuck players: the second tutorial bag, the smuggler's hole and the Ancestral Lands kick"
+   },
    {
     "date": "2026-11-11",
     "kind": "improve",
@@ -2869,14 +2874,9 @@
     "date": "2026-11-11",
     "kind": "improve",
     "text": "The making stage shows the output's count as a badge, and none for one"
-   },
-   {
-    "date": "2026-11-11",
-    "kind": "improve",
-    "text": "A quoin's amount draws a little smaller, 20 px"
    }
   ]
  },
- "tests": 822,
+ "tests": 826,
  "generatedAt": "2026-11-12"
 }

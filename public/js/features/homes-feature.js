@@ -170,7 +170,7 @@ import {
   swatchFilters,
   trayFilters,
 } from '../ui/home-builder.js?v=b71acd91';
-import { RECIPE_CATALOG } from '../making.js?v=4e72bb4b';
+import { RECIPE_CATALOG } from '../making.js?v=86fd3231';
 import {
   createBackYardState,
   fixtureObstacles,
@@ -217,7 +217,7 @@ import { TOWER_CHASSIS, TOWER_CONFIG, TOWER_DOOR_DX, TOWER_GEO, TOWER_PROTO, nor
 import { drawTowerElevator, drawTowerExit, towerApi, visitorTowerView } from './home-tower-feature.js?v=f574b637';
 import { pieceUrl, roomPieces, surfaceAt, swatchPiece, wallTargetAt } from '../home-wallpaper.js?v=f1969400';
 import { wantsHiresDecos } from '../deco-hires.js?v=9877af94';
-import { resourceNodesFeature } from './resource-nodes-feature.js?v=b181c45f';
+import { resourceNodesFeature } from './resource-nodes-feature.js?v=76204e31';
 import { patchesFeature } from './patches-feature.js?v=3b1f207e';
 import { GROWN_TREE_LABELS, createPlot, growTree, plotLabel } from '../patches.js?v=7604d7f2';
 import { WOTD_DEPLETE_MS, WOTD_TEXT, nearestPourTarget, pourButton, pourConditions, pourConfirmText } from '../wine-pour.js?v=6daa23a7';
