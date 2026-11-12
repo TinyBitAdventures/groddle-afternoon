@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=5d55594c';
 import { createErrorOnce, createFeatureHost } from './js/feature-host.js?v=06bb8b74';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=54b6ee44';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=cdc84ed3';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl, drawTileArt } from './js/enter-chooser.js?v=4a3ea327';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -376,13 +376,13 @@ import {
   slipTerrainY,
   starlitMoonPlainAlpha,
   starlitRevealAlpha,
-} from './js/paradise-flight.js?v=0a71a6af';
-import { resolveParadiseCourseAlias } from './js/paradise-courses.js?v=1a5d0aa7';
+} from './js/paradise-flight.js?v=381f0dcd';
+import { paradiseControls, resolveParadiseCourseAlias } from './js/paradise-courses.js?v=b466613b';
 import {
   buildParadiseCourseArt,
   paradiseCoursePreloadUrls,
   paradiseCourseRuntime,
-} from './js/paradise-course-runtime.js?v=b5961535';
+} from './js/paradise-course-runtime.js?v=14a56bae';
 import {
   createAchievementState,
   applyAchievementProgress as applyAchievementProgressRaw,
@@ -508,7 +508,7 @@ import {
   parsePlayerSave,
   serializePlayerSave,
   restorePlayerSave,
-} from './js/player-save.js?v=ad26356b';
+} from './js/player-save.js?v=73f3592a';
 import {
   HOME_INTERIOR_TSID,
   HOME_STREET_TSID,
@@ -1019,7 +1019,7 @@ import { ENCYCLOPEDIA_MENU_LABEL, createEncyclopedia, isEncyclopediaKey } from '
 import { EAT_PICK_TEXT, bestFoodIndex, eatChoices, eatTip } from './js/eat-pick.js?v=8fb763d0';
 import { heldDirection, installHeldKeyGuard, isMacPlatform } from './js/held-keys.js?v=a28eb293';
 import { oneClickChoice, signpostArmRows, worldContextAction } from './js/world-context-menu.js?v=2a64801e';
-import { blockedPlayerVerbs, listPlayerTarget, opensPlayerMenu, playerMenuRows } from './js/ui/player-menu.js?v=0093af1c';
+import { blockedPlayerVerbs, listPlayerTarget, opensPlayerMenu, playerMenuRows } from './js/ui/player-menu.js?v=93332dba';
 import { forgetTexture, frameTexture, isFailed, isLoaded, onFailed, onLoaded, textureFromUrl, whenLoaded } from './js/textures.js?v=92ec53cd';
 import { FALLBACK_MAX as WORLD_ART_FALLBACK_MAX, worldArtFor } from './js/world-art.js?v=0729bf92';
 import { sceneAnim, syncAnim } from './js/deco-anim.js?v=0de84a64';
@@ -1027,7 +1027,7 @@ import { revealStartCard, whenSceneDrawn } from './js/start-backdrop.js?v=8510d5
 import { cancelAllOverlays, playPoofIn, setOverlayResolution } from './js/overlay-art.js?v=a6561207';
 import * as textureUrls from './js/textures.js?v=92ec53cd';
 import { installPixiFixes } from './js/pixi-fixes.js?v=173fb649';
-import { hidesChatBubble } from './js/hi-signs.js?v=6c285700';
+import { hidesChatBubble } from './js/hi-signs.js?v=32194768';
 // Multiplayer phase 1: the mode flag and the save interface every save read/write goes through.
 import { GAME_MODE, isSolo } from './js/game-mode.js?v=1ecf2899';
 import { saveStore } from './js/save-store.js?v=5b167c14';
@@ -8626,6 +8626,8 @@ function showFeedPickerQty(food) {
   if (grid) grid.hidden = Boolean(food);
   const hint = document.getElementById('feed-picker-hint');
   if (hint) {
+    // TOUCH: a phone has no Enter, arrow keys or Esc.
+    hint.hidden = TOUCH_PHONE;
     hint.textContent = food
       ? 'Enter confirms · arrow keys change how many · Esc cancels'
       : 'Enter selects · arrow keys move · Esc cancels';
@@ -15816,7 +15818,9 @@ function spawnPhantomQuestEncounter() {
     const first = encounter.found === 0;
     pushActivity(
       first
-        ? 'You feel a chill. Something half-imagined is nearby. Click the faint shape, or stand by it and press Enter, to notice it.'
+        ? (TOUCH_PHONE
+          ? 'You feel a chill. Something half-imagined is nearby. Tap the faint shape to notice it.'
+          : 'You feel a chill. Something half-imagined is nearby. Click the faint shape, or stand by it and press Enter, to notice it.')
         : 'You feel a chill. Something half-imagined is nearby.'
     );
     if (app?.canvas) app.canvas.dataset.ghostHint = first ? 'first' : 'chill';
@@ -22075,9 +22079,7 @@ function renderParadiseFlightHud() {
   if (icon) icon.src = `assets/sprites/icons/${course.ticketId}.webp`;
   if (title) title.textContent = course.name;
   if (controls) {
-    controls.textContent = course.controls || (course.movement === 'slide'
-      ? 'Arrows build speed · Spacebar jumps'
-      : 'Spacebar to fly · arrows to steer');
+    controls.textContent = paradiseControls(course, TOUCH_PHONE).controls;
   }
   if (timer) {
     timer.textContent = `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, '0')}`;
@@ -22323,9 +22325,7 @@ async function startParadiseFlight(courseId, opts = {}) {
       loadParadiseVisualAssets(course),
     ]);
     await transitionIntoParadise(course, points, opts.useTransition !== false);
-    const controls = course.controlsHint || (course.movement === 'slide'
-      ? 'Use the arrows to build speed. Spacebar jumps.'
-      : 'Spacebar to fly. Arrow keys steer.');
+    const controls = paradiseControls(course, TOUCH_PHONE).hint;
     pushActivity(`${course.name}: ${controls} ${course.objective}.`);
     toast(controls, 3600);
     return paradiseRun;

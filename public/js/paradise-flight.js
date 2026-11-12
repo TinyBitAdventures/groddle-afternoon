@@ -1,6 +1,6 @@
 /** Source-authored Ticket to Paradise economy and reusable flight-course state. */
 
-import { EXTRA_PARADISE_COURSES } from './paradise-courses.js?v=1a5d0aa7';
+import { EXTRA_PARADISE_COURSES } from './paradise-courses.js?v=b466613b';
 import { qrazyRewardForLevel, quoinTouches } from './quoins.js?v=7e0dec6d';
 import { getGameDayKey } from './game-day.js?v=a7e262aa';
 

@@ -24,7 +24,7 @@
  */
 
 import { SEED_CATALOG, applyFertilizer, sowPlot, wetPlot } from './garden.js?v=37209241';
-import { normalizeParcelBox } from './butler.js?v=d9449207';
+import { normalizeParcelBox } from './butler.js?v=8232e2c7';
 import { normalizeVisitGnomes } from './garden-gnome.js?v=d9f8e52b';
 
 /** The realtime server's street for a player's home street (homes.go). */

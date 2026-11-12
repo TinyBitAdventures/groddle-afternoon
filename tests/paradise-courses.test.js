@@ -19,7 +19,7 @@ import {
   resolveParadiseCourseAlias,
   stepParadiseBody,
   usesParadiseBody,
-} from '../public/js/paradise-courses.js?v=1a5d0aa7';
+} from '../public/js/paradise-courses.js?v=b466613b';
 import {
   PARADISE_COURSES,
   PARADISE_DAILY_LIMIT,
@@ -32,7 +32,7 @@ import {
   paradisePickupTouches,
   paradiseTicketCost,
   resolveParadiseReward,
-} from '../public/js/paradise-flight.js?v=0a71a6af';
+} from '../public/js/paradise-flight.js?v=381f0dcd';
 import { QURAZY_REWARDS } from '../public/js/quoins.js?v=7e0dec6d';
 import { remakeStatus } from '../public/js/imagination-remake.js?v=c37ad887';
 

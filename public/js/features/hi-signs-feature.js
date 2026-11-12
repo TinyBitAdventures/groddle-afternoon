@@ -65,7 +65,8 @@
  * Canvas data: hiMpLast, hiBoard (sign:count,...), hiBoardOpen, hiYesterday.
  */
 
-import { butlerApi } from './butler-feature.js?v=c31e4382';
+import { isPhoneDevice } from '../touch-controls.js?v=b6071ea4';
+import { butlerApi } from './butler-feature.js?v=61f6e9e6';
 import { metabolicGain, moodMax } from '../metabolics.js?v=8504134e';
 import { frameTexture, sourceFromUrl } from '../textures.js?v=92ec53cd';
 import {
@@ -100,7 +101,7 @@ import {
   setButlerHiVariant,
   setPlayerHiVariant,
   stepMissile,
-} from '../hi-signs.js?v=6c285700';
+} from '../hi-signs.js?v=32194768';
 import {
   BOARD_POLL_MS,
   BOARD_TEXT,
@@ -115,7 +116,7 @@ import {
   recordLine,
   yesterdayLine,
   yourSignLine,
-} from '../hi-signs-mp.js?v=4d1e326f';
+} from '../hi-signs-mp.js?v=db0698df';
 
 /** An art URL with its content key (js/data-urls.js groddleDataUrl); as it is in Node and on a page without the map. */
 const keyedArt = (url) => (typeof globalThis.groddleDataUrl === 'function' ? globalThis.groddleDataUrl(url) : url);
@@ -559,7 +560,7 @@ function sayHiHint(engine) {
   }
   butlerWaiting = false;
   if (hiHintDue(p)) {
-    butlerApi.hiSay(engine, HI_TEXT.hint, HI.BUTLER_BUBBLE_MS);
+    butlerApi.hiSay(engine, isPhoneDevice() ? HI_TEXT.hintTouch : HI_TEXT.hint, HI.BUTLER_BUBBLE_MS);
     lastMsg = 'butler:hint';
     publish(engine, true);
   }
@@ -948,7 +949,7 @@ function renderBoard(engine) {
     board.more = !board.more;
     renderBoard(engine);
   });
-  const parts = [close, el('h2', '', BOARD_TEXT.title), you, el('p', '', BOARD_TEXT.instruct), more];
+  const parts = [close, el('h2', '', BOARD_TEXT.title), you, el('p', '', isPhoneDevice() ? BOARD_TEXT.instructTouch : BOARD_TEXT.instruct), more];
   if (board.more) parts.push(el('p', 'hi-desc', BOARD_TEXT.desc));
   const list = el('ol');
   list.setAttribute('aria-label', 'Signs today');

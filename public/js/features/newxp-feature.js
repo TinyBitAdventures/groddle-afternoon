@@ -159,7 +159,7 @@ import {
   createAkState,
 } from '../skillquest-ak.js?v=397a9d19';
 import { filterText } from '../word-filter.js?v=9a7a7ebb';
-import { phoneScreenFrame, safeAreaInsets, touchWords } from '../touch-controls.js?v=b6071ea4';
+import { isPhoneDevice, phoneScreenFrame, safeAreaInsets, touchWords } from '../touch-controls.js?v=b6071ea4';
 
 export const NEWXP_FEATURE_ID = 'newxp';
 /** newxp_training1.js 705-706 slothRemove: deleteWithPoof, then hideTree 0.5 s later. */
@@ -1802,7 +1802,7 @@ async function runTraining2(t) {
   // food_wait_eat: the slot callout and the nagging.
   setStep('food_wait_eat');
   // "Eat This" / "Drink This": glitch-client graphics/callout_eat.png and callout_drink.png; the rest is remake copy.
-  instruction(`Eat This: click the ${ITEM_LABEL(firstPick.classTsid)} in your pack, then Eat`);
+  instruction(`Eat This: ${isPhoneDevice() ? 'tap' : 'click'} the ${ITEM_LABEL(firstPick.classTsid)} in your pack, then Eat`);
   let nag = 0;
   let nagAt = Date.now() + 3000;
   await until(t, () => {
@@ -1856,7 +1856,7 @@ async function runTraining2(t) {
   clearInstruction();
   await overlay(t, { title: LINES.firstDrink, button: 'OK' });
   setStep('drink_wait_drink');
-  instruction(`Drink This: click the ${ITEM_LABEL(drinkPick.classTsid)} in your pack, then Drink`);
+  instruction(`Drink This: ${isPhoneDevice() ? 'tap' : 'click'} the ${ITEM_LABEL(drinkPick.classTsid)} in your pack, then Drink`);
   setTimeout(() => { if (run?.stage === 'training2' && !run.data.drank) say(db, LINES.t2DrinkIt, 3000); }, 2000);
   await until(t, () => {
     if (inBox(L.boxes.leave_drink, P().x, P().y)) {

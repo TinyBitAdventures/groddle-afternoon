@@ -59,7 +59,7 @@ export const PHONE_TEXT = Object.freeze({
   photoAlt: 'The photo going with your report',
   mailNote: 'Reading here changes nothing in your game. Collect items at your mailbox there.',
   mailEmpty: 'No letters yet.',
-  mailNoSave: 'Your mailbox opens once you have played online on a computer.',
+  mailNoSave: 'Your mailbox opens once you have played online.',
   mailFrom: (who) => `From ${who}`,
   mailBack: 'Back to your mail',
   mailItem: (n, name) => (n > 1 ? `${n} × ${name}` : name),

@@ -20,7 +20,7 @@
  * engine.mode === 'multiplayer' and the realtime client first.
  */
 
-import { HI_VARIANTS, HI_VARIANT_NAMES, isHiVariant } from './hi-signs.js?v=6c285700';
+import { HI_VARIANTS, HI_VARIANT_NAMES, isHiVariant } from './hi-signs.js?v=32194768';
 
 /** HiLeaderboard.as poll(): every 60 s while the panel is open. */
 export const BOARD_POLL_MS = 60_000;
@@ -33,6 +33,8 @@ export const BUTLER_INFECT = 'infect';
 export const BOARD_TEXT = Object.freeze({
   title: 'Hi sign leaderboard',
   instruct: 'Press "5" to say hi!',
+  // TOUCH: a phone has no 5 key; a chat line that is just "hi" says hi (hi-signs-feature onSubmit).
+  instructTouch: 'Type hi in chat to say hi!',
   more: 'Show more info',
   less: 'Show less info',
   desc: 'You can say a quick hi to people in Glitch by hitting the "5" key. Every game day in Glitch, you\'ll get a new "hi" sign. You can get one randomly assigned by saying hi before anyone says hi to you. If someone says hi to you first, you get their "hi" sign. The leaderboard below shows how many people have each sign today.',

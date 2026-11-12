@@ -138,7 +138,7 @@ import {
   takeVisitorDelivery,
   teachButler,
   visitorsReport,
-} from '../butler.js?v=d9449207';
+} from '../butler.js?v=8232e2c7';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
 import { holdMs } from '../read-time.js?v=be140198';
 import { createItemPicker } from '../ui/item-picker.js?v=fbe3c3df';

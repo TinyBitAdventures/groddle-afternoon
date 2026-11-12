@@ -46,6 +46,7 @@
  * the door glow sits, G200).
  */
 
+import { isPhoneDevice } from '../touch-controls.js?v=b6071ea4';
 import { STREET_INDEX } from '../street-loader.js?v=18b181ad';
 import { SUBWAY_STREETS } from '../street-jobs.js?v=94f8d250';
 import { STATIONS, isCarTsid, stationByTsid } from '../subway.js?v=44d1a09f';
@@ -944,7 +945,7 @@ function mapCard(engine) {
     head = quest.title;
     lines.push(quest.text);
   } else {
-    lines.push(pickMode ? 'Click a street to set it as your destination.' : 'No destination set.');
+    lines.push(pickMode ? `${isPhoneDevice() ? 'Tap' : 'Click'} a street to set it as your destination.` : 'No destination set.');
   }
   card.dataset.mapRouteQuest = quest ? quest.source : '';
   const body = `${lead}<div class="map-route-body">${head ? `<strong>${esc(head)}</strong><br>` : ''}${lines.map((l) => `<span>${esc(l)}</span>`).join('<br>')}</div>`;

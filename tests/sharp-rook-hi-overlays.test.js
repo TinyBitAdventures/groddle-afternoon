@@ -76,7 +76,7 @@ function sheets() {
 
 test('the Rook, its halo and every hi sign keep their frames, cells and timings', async () => {
   const { ROOK_SHEETS, ROOKED_HALO } = await import('../public/js/features/rook-attack-feature.js?v=5ed2c389');
-  const { HI_ART, HI_ART_CELLS, HI_VARIANTS, hiArtSheet } = await import('../public/js/hi-signs.js?v=6c285700');
+  const { HI_ART, HI_ART_CELLS, HI_VARIANTS, hiArtSheet } = await import('../public/js/hi-signs.js?v=32194768');
   const rows = new Map(sheets().map((s) => [s.path, s]));
   assert.equal(rows.size, 2 + 3 * HI_VARIANTS.length);
   assert.equal(HI_VARIANTS.length, 11);
@@ -173,7 +173,7 @@ test('the 3x covers the Rook, its halo and the hi signs where they are drawn; th
   assert.ok(haloAt <= 1, `the halo draws ${haloAt.toFixed(2)}`);
   // The hi signs are drawn at 1 in the street (no scale anywhere in the feature).
   assert.doesNotMatch(read('js/features/hi-signs-feature.js'), /\.scale\.set\(|\.scale\s*=[^=]/);
-  const { HI_VARIANTS, hiArtSheet } = await import('../public/js/hi-signs.js?v=6c285700');
+  const { HI_VARIANTS, hiArtSheet } = await import('../public/js/hi-signs.js?v=32194768');
   for (const v of HI_VARIANTS) {
     for (const kind of ['still', 'hi', 'bonus']) {
       const at = stage / density(hiArtSheet(v, kind).url);

@@ -55,7 +55,7 @@ describe('the Phantom echo on a cold spot', () => {
 
   it('tells a first-time hunter to click the shape or press Enter, once the shape can be read', () => {
     const spawn = fn('spawnPhantomQuestEncounter');
-    assert.match(spawn, /const first = encounter\.found === 0;\n\s+pushActivity\(\n\s+first\n\s+\? 'You feel a chill\. Something half-imagined is nearby\. Click the faint shape, or stand by it and press Enter, to notice it\.'\n\s+: 'You feel a chill\. Something half-imagined is nearby\.'/);
+    assert.match(spawn, /const first = encounter\.found === 0;\n\s+pushActivity\(\n\s+first\n\s+\? \(TOUCH_PHONE\n\s+\? 'You feel a chill\. Something half-imagined is nearby\. Tap the faint shape to notice it\.'\n\s+: 'You feel a chill\. Something half-imagined is nearby\. Click the faint shape, or stand by it and press Enter, to notice it\.'\)\n\s+: 'You feel a chill\. Something half-imagined is nearby\.'/);
     // Said once, when the shape is readable (after the street's arrival lines), not at spawn.
     assert.match(spawn, /if \(encounter\.kind !== 'echo' \|\| target\.state\.announced \|\| phantomTarget !== target\) return;\n\s+target\.state\.announced = true;/);
     assert.match(spawn, /sprite\.onFrameChange = \(frame\) => \{[\s\S]*?announceEcho\(\);\n\s+\};/);

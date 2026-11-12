@@ -128,6 +128,8 @@ export const HI_TEXT = Object.freeze({
     'Hello, Hi-master.',
   ]),
   hint: "Do you like saying 'Hi'? It's as easy as pressing '5' (when the focus is on the game, not in chat). Every day you get a new sign --- hands, bats, flowers, birds, cubes, etc. --- if you find someone with the same sign, you both get a bonus and you get honest mood out of it, once per day.",
+  // TOUCH: the same Butler line on a phone, which has no 5 key.
+  hintTouch: "Do you like saying 'Hi'? It's as easy as typing hi in local chat. Every day you get a new sign --- hands, bats, flowers, birds, cubes, etc. --- if you find someone with the same sign, you both get a bonus and you get honest mood out of it, once per day.",
 });
 
 /**

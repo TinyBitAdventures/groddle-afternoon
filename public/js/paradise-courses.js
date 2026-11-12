@@ -361,6 +361,9 @@ export const EXTRA_PARADISE_COURSES = Object.freeze({
     completion: 'You bounced all the way to the top. The way home is open!',
     controls: 'Arrows steer · land on clouds to bounce · hold Spacebar for more',
     controlsHint: 'Clouds bounce you upward. Arrow keys steer; hold Spacebar as you land for a bigger bounce.',
+    // TOUCH: a phone has the stick and Jump, not arrow keys and a Spacebar.
+    touchControls: 'The stick steers · land on clouds to bounce · hold Jump for more',
+    touchControlsHint: 'Clouds bounce you upward. The stick steers; hold Jump as you land for a bigger bounce.',
     prompt: 'BOUNCE UP THE CLOUDS!',
     palette: Object.freeze([0x5ea9d2, 0x86c4e0, 0xb2e0ee, 0xdcf3f8]),
     transitionColors: Object.freeze([0x5ea9d2, 0xdcf3f8]),
@@ -396,6 +399,9 @@ export const EXTRA_PARADISE_COURSES = Object.freeze({
     completion: "Whether you're big or small, scaling mountains is some tough business! Congratulations! You made it!",
     controls: 'Arrows walk · Spacebar jumps · mind the clouds',
     controlsHint: 'Arrow keys walk, Spacebar jumps. Try not to fall down into the clouds!',
+    // TOUCH: a phone has the stick and Jump, not arrow keys and a Spacebar.
+    touchControls: 'The stick walks · Jump jumps · mind the clouds',
+    touchControlsHint: 'The stick walks, Jump jumps. Try not to fall down into the clouds!',
     prompt: 'JUMP FROM CRAG TO CRAG!',
     palette: Object.freeze([0x3d98cc, 0x74b7db, 0xadd5e6, 0xe2eef1]),
     transitionColors: Object.freeze([0x3d98cc, 0xe2eef1]),
@@ -435,6 +441,9 @@ export const EXTRA_PARADISE_COURSES = Object.freeze({
     completion: 'You floated right out of the abyss. The way home is open!',
     controls: 'Spacebar swims up · arrows steer',
     controlsHint: 'Jump to float up: each Spacebar press is a swim stroke. Arrow keys steer.',
+    // TOUCH: a phone has the stick and Jump, not arrow keys and a Spacebar.
+    touchControls: 'Jump swims up · the stick steers',
+    touchControlsHint: 'Jump to float up: each Jump press is a swim stroke. The stick steers.',
     prompt: 'JUMP TO FLOAT UP!',
     // Clearer teal-blue water, sampled from a player's Snap (research/wayback/raw/snaps/
     // paradise_abysmal_thrill/, G79: #0c2134 to #233849 mid-depth, never black).
@@ -471,6 +480,9 @@ export const EXTRA_PARADISE_COURSES = Object.freeze({
     completion: 'Up to the nest and all the way back down. The way home is open!',
     controls: 'Arrows walk · Spacebar jumps',
     controlsHint: 'Arrow keys walk, Spacebar jumps. Climb the branches to the nest, then drop down the far side.',
+    // TOUCH: a phone has the stick and Jump, not arrow keys and a Spacebar.
+    touchControls: 'The stick walks · Jump jumps',
+    touchControlsHint: 'The stick walks, Jump jumps. Climb the branches to the nest, then drop down the far side.',
     prompt: 'CLIMB TO THE TALL!',
     palette: Object.freeze([0x5aaee0, 0x2d5a3b, 0x1a3522, 0x0d1c10]),
     transitionColors: Object.freeze([0x1a3522, 0x5aaee0]),
@@ -510,6 +522,9 @@ export const EXTRA_PARADISE_COURSES = Object.freeze({
     completion: 'Fluffy. Like marshmallows and cotton candy. The way home is open!',
     controls: 'Arrows steer · hold Spacebar to bounce higher',
     controlsHint: 'The cloud floor bounces you along. Arrow keys steer; hold Spacebar as you land to bounce higher.',
+    // TOUCH: a phone has the stick and Jump, not arrow keys and a Spacebar.
+    touchControls: 'The stick steers · hold Jump to bounce higher',
+    touchControlsHint: 'The cloud floor bounces you along. The stick steers; hold Jump as you land to bounce higher.',
     prompt: 'BOUNCE ALONG THE CLOUD!',
     palette: Object.freeze([0x8b76b6, 0xb49ac4, 0xdcb4bb, 0xefcfb6]),
     transitionColors: Object.freeze([0x8b76b6, 0xefcfb6]),
@@ -578,6 +593,9 @@ export const EXTRA_PARADISE_COURSES = Object.freeze({
     completion: 'You rode the wind all the way across. The way home is open!',
     controls: 'The wind carries you · Spacebar rises · Down dives · arrows speed or slow',
     controlsHint: 'The wind carries you right. Hold Spacebar to ride upward, Down to dive; arrows speed up or hold back.',
+    // TOUCH: a phone has the stick and Jump, not arrow keys and a Spacebar.
+    touchControls: 'The wind carries you · Jump rises · stick down dives · stick left or right speeds or slows',
+    touchControlsHint: 'The wind carries you right. Hold Jump to ride upward, push the stick down to dive; left or right speeds up or holds back.',
     prompt: 'GLIDE RIGHT ON THE WIND!',
     palette: Object.freeze([0x2b8bce, 0x60b0df, 0xa4d4ec, 0xdff1f8]),
     transitionColors: Object.freeze([0x2b8bce, 0xdff1f8]),
@@ -624,6 +642,9 @@ export const EXTRA_PARADISE_COURSES = Object.freeze({
     completionSound: 'CLOUD_DROP_2_INTRO',
     controls: 'Arrows steer · hold Spacebar to float · Down dives',
     controlsHint: 'Step off the cloud and fall. Arrow keys steer, hold Spacebar to float, Down to dive. Missed a quoin? The Back to Top door on the landing takes you up for another plunge.',
+    // TOUCH: a phone has the stick and Jump, not arrow keys and a Spacebar.
+    touchControls: 'The stick steers · hold Jump to float · stick down dives',
+    touchControlsHint: 'Step off the cloud and fall. The stick steers, hold Jump to float, push the stick down to dive. Missed a quoin? The Back to Top door on the landing takes you up for another plunge.',
     prompt: 'STEP OFF AND PLUNGE!',
     // Card art sky (mint) at the top to the Snap's cream-gold landing sky.
     palette: Object.freeze([0xc4f0e2, 0xd4ecc9, 0xe7e3ba, 0xefe0b5]),
@@ -660,6 +681,9 @@ export const EXTRA_PARADISE_COURSES = Object.freeze({
     completion: "It's the little things that make life great, champ. The way home is open!",
     controls: 'The draught lifts you · Spacebar rises faster · Down sinks',
     controlsHint: 'Jump into the draught and it lifts you. Spacebar rises faster, Down sinks, arrows steer.',
+    // TOUCH: a phone has the stick and Jump, not arrow keys and a Spacebar.
+    touchControls: 'The draught lifts you · Jump rises faster · stick down sinks',
+    touchControlsHint: 'Jump into the draught and it lifts you. Hold Jump to rise faster, push the stick down to sink, the stick steers.',
     prompt: 'JUMP INTO THE DRAUGHT!',
     palette: Object.freeze([0x7a6cb0, 0xa394cd, 0xc8b8de, 0xe9ddef]),
     transitionColors: Object.freeze([0x7a6cb0, 0xe9ddef]),
@@ -874,4 +898,22 @@ export function stepParadiseBody(course, body, input = {}, dt = 1) {
 
 export function paradiseCourseTicketDescription(courseDef) {
   return courseDef?.ticketDesc || '';
+}
+
+/**
+ * The controls line (HUD) and hint (toast and activity) for a course; `touch` is a phone
+ * (window.GRODDLE_DEVICE === 'phone'), which reads the stick and Jump, not the keys.
+ */
+export function paradiseControls(course, touch = false) {
+  const slide = course?.movement === 'slide';
+  if (touch) {
+    return {
+      controls: course?.touchControls || (slide ? 'The stick builds speed · Jump jumps' : 'Hold Jump to fly · the stick steers'),
+      hint: course?.touchControlsHint || (slide ? 'Use the stick to build speed. Jump jumps.' : 'Hold Jump to fly. The stick steers.'),
+    };
+  }
+  return {
+    controls: course?.controls || (slide ? 'Arrows build speed · Spacebar jumps' : 'Spacebar to fly · arrows to steer'),
+    hint: course?.controlsHint || (slide ? 'Use the arrows to build speed. Spacebar jumps.' : 'Spacebar to fly. Arrow keys steer.'),
+  };
 }

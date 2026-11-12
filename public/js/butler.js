@@ -57,7 +57,7 @@
  */
 
 import { getGameDayKey } from './game-day.js?v=a7e262aa';
-import { normalizeButlerHi } from './hi-signs.js?v=6c285700';
+import { normalizeButlerHi } from './hi-signs.js?v=32194768';
 import { filterText } from './word-filter.js?v=9a7a7ebb';
 
 /** classProps and onCreate numbers. */
