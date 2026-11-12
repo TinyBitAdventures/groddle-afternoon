@@ -997,7 +997,7 @@ import { wholeStatAmounts, wholeEffects } from './js/stat-text.js?v=f96d8fd3';
 import { createNotifier, effectTokens, floatKey, offerCardDrop, stackFloat, tokenText } from './js/notify.js?v=1fb97b21';
 import { bubbleMs } from './js/read-time.js?v=be140198';
 import { mountNotifyView } from './js/notify-view.js?v=5a43a760';
-import { mountSocialDrawer } from './js/ui/social-drawer.js?v=61ebf621';
+import { mountSocialDrawer } from './js/ui/social-drawer.js?v=bb35acd9';
 import { bindChatLinks } from './js/chat-links.js?v=b717fac7';
 import { SIDE_SHEET_IDS, bindTabs, inSideSheet, mountPanelShell, sheetKeyToWorld } from './js/ui/panel-shell.js?v=e2abdf9e';
 import { createQuestSheet, failedQuestPin, questLogNeedsSwap, questStep } from './js/ui/quest-sheet.js?v=ccaa43a8';
@@ -29009,8 +29009,12 @@ function placeVendorPop(list, detail) {
   // The pop is positioned, so the shelf's own end is what can be pushed down (in the body's scroll space).
   const short = popBottom - (list.offsetTop + list.offsetHeight);
   if (short > 0) list.style.paddingBottom = `${Math.ceil(short)}px`;
-  const want = Math.max(body.scrollTop, popBottom - body.clientHeight);
-  if (want > body.scrollTop) body.scrollTo?.({ top: want, behavior: notifyView?.reducedMotion() ? 'auto' : 'smooth' });
+  // Report 236 (mr granberry): a tile above the view (Sell from the pack on an item higher up the shelf)
+  // scrolls up into view too. The tile comes first; then as much of the pop under it as fits.
+  const tileTop = tr.top - br.top + body.scrollTop - room;
+  let want = Math.max(body.scrollTop, popBottom - body.clientHeight);
+  if (tileTop < want) want = Math.max(0, tileTop);
+  if (Math.abs(want - body.scrollTop) > 1) body.scrollTo?.({ top: want, behavior: notifyView?.reducedMotion() ? 'auto' : 'smooth' });
   if (app?.canvas) app.canvas.dataset.vendorPop = `${vendorSelected}:${Math.round(top)}`;
 }
 

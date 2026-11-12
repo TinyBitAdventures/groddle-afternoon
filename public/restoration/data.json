@@ -2752,9 +2752,14 @@
   "deployed": "2026-11-12"
  },
  "git": {
-  "commits": 1712,
+  "commits": 1713,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-12",
+    "kind": "fix",
+    "text": "Players in the tutorial see no street project status"
+   },
    {
     "date": "2026-11-12",
     "kind": "fix",
@@ -2869,14 +2874,9 @@
     "date": "2026-11-12",
     "kind": "improve",
     "text": "Quoins hang where players snapped them in 2012, each its own kind"
-   },
-   {
-    "date": "2026-11-12",
-    "kind": "improve",
-    "text": "Grimssea Hollow's shelves, ladders and door re-measured from Cleops's 2012 snap"
    }
   ]
  },
- "tests": 851,
+ "tests": 852,
  "generatedAt": "2026-11-12"
 }
