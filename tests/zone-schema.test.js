@@ -141,7 +141,7 @@ describe('the deco catalog (tools/builder/deco-catalog.mjs, assets/content/deco-
     assert.equal(bush.family, 'bush');
     assert.equal(bush.source, 'groddle1.swf#bush_3');
     assert.ok(bush.placements > 10000 && bush.layers.middleground > 1000 && bush.hubs.length === 5);
-    assert.equal(cat.decos.filter((d) => d.hires).length, 2336);
+    assert.equal(cat.decos.filter((d) => d.hires).length, 2340); // + 4 with 3x files from the sharpness round (Firebog ground fronts, 2026-11-12)
     assert.equal(cat.decos.filter((d) => d.animated).length > 0, true);
   });
 
