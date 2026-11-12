@@ -12,7 +12,7 @@ import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { setMetabolicGainGate } from '../public/js/metabolics.js?v=8504134e';
-import { createInventory, useItem } from '../public/js/inventory.js?v=5be47371';
+import { createInventory, useItem } from '../public/js/inventory.js?v=2bd5b93e';
 import { ITEM_VERBS, crunchIce, runItemVerb } from '../public/js/item-verbs.js?v=1e20fa7d';
 import { performAnimalKinship } from '../public/js/animal-kinship.js?v=f91347e9';
 import { createAnimalState } from '../public/js/animals.js?v=9b48173d';
@@ -72,13 +72,14 @@ describe('drinks (inventory.js useItem)', () => {
     const pc = { energy: 2, mood: 40, energyMax: 100 };
     const r = useItem(createInventory({ orange_juice: 1 }), pc, 'orange_juice');
     assert.equal(pc.energy, 2);
-    assert.equal(r.effects.mood, 8);
+    assert.equal(r.effects.mood, 20);
   });
 
-  it('with the gate open the juice gives its 15 energy and 8 mood', () => {
+  // orange_juice.js drink_energy 15, drink_mood 20.
+  it('with the gate open the juice gives its 15 energy and 20 mood', () => {
     const pc = { energy: 40, mood: 40, energyMax: 100 };
     const r = useItem(createInventory({ orange_juice: 1 }), pc, 'orange_juice');
-    assert.deepEqual([r.effects.energy, r.effects.mood], [15, 8]);
+    assert.deepEqual([r.effects.energy, r.effects.mood], [15, 20]);
   });
 });
 

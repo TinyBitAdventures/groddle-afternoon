@@ -43,7 +43,7 @@
  * window.groddleDrops.
  */
 
-import { ITEM_CATALOG, addItem, countItem, removeItem } from '../inventory.js?v=5be47371';
+import { ITEM_CATALOG, addItem, countItem, removeItem } from '../inventory.js?v=2bd5b93e';
 import { TOOL_CONDITION_CATALOG, leavingCopyTag, leavingToolWear, receiveToolCopy, takeToolCopy } from '../tools.js?v=5f482998';
 import { createMinnAccount } from '../minn-account.js?v=c15f0ecf';
 import { saveStore } from '../save-store.js?v=04420633';

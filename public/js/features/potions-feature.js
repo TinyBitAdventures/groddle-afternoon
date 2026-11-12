@@ -141,7 +141,7 @@ import { homesFeature } from './homes-feature.js?v=1ab67b46';
 import { streetTreeIndex } from './tree-death-feature.js?v=f22d217e';
 import { questRoomConverse } from './quest-instances-feature.js?v=c2d4b97a';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
-import { copyChargesLeft, copyFromLedger, keepsCopies, spendCopyCharge, verbCopy } from '../copy-charges.js?v=627150dc';
+import { copyChargesLeft, copyFromLedger, keepsCopies, spendCopyCharge, verbCopy } from '../copy-charges.js?v=7b1d0bd9';
 import { copyTag, migrateClassTag, migrateClassValue, setCopyTag, toolCopies } from '../tools.js?v=5f482998';
 
 export const POTIONS_FEATURE_ID = 'potions';

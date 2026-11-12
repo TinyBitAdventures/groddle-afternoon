@@ -28,7 +28,7 @@
  * buffTriggerOverrides, buffTriggerMirrors, buffColdTicks.
  */
 
-import { addItem, countItem, removeItem } from '../inventory.js?v=5be47371';
+import { addItem, countItem, removeItem } from '../inventory.js?v=2bd5b93e';
 import {
   BUBBLE_MEDITATION_PACKAGES,
   BUFF_END_MESSAGES,

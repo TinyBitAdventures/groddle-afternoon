@@ -23,7 +23,7 @@
  *     smallItemsBallX.
  */
 
-import { ITEM_CATALOG, addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=5be47371';
+import { ITEM_CATALOG, addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=2bd5b93e';
 import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=32c58aef';
 import { nearestSurfaceY } from '../walk-surface.js?v=106bfdc5';
 import { openNoteView, openNotePicker } from '../note-view.js?v=eca7de52';

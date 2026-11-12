@@ -33,7 +33,7 @@
  *   purpleRoom, purpleScions, purpleQuoins, purpleLast, purpleVog.
  */
 
-import { addItem, countItem, ITEM_CATALOG, removeItem } from '../inventory.js?v=5be47371';
+import { addItem, countItem, ITEM_CATALOG, removeItem } from '../inventory.js?v=2bd5b93e';
 import { shiftMetabolic } from '../metabolics.js?v=8504134e';
 import { collectQuoin, QUOIN_SHEET, QUOIN_TYPES, quoinTouches } from '../quoins.js?v=7e0dec6d';
 import { frameTexture, sourceFromUrl } from '../textures.js?v=92ec53cd';

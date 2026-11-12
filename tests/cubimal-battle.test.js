@@ -31,9 +31,9 @@ import {
   nextLevelAmount,
   ownedBattleLabel,
   rollBattleStrike,
-} from '../public/js/cubimal-battle.js?v=425968d0';
-import { ensureCubimalItems } from '../public/js/cubimals.js?v=abd91c78';
-import { addItem, countItem, createInventory } from '../public/js/inventory.js?v=5be47371';
+} from '../public/js/cubimal-battle.js?v=5ad120a0';
+import { ensureCubimalItems } from '../public/js/cubimals.js?v=3a284648';
+import { addItem, countItem, createInventory } from '../public/js/inventory.js?v=2bd5b93e';
 import { bindToolInventory, copyTags, createToolConditionState, setCopyTag } from '../public/js/tools.js?v=5f482998';
 import { cleanCopyTagOf } from '../public/js/copy-tags.js?v=7eec7d48';
 import { FEATURES } from '../public/js/features/index.js?v=15306d46';

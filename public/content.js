@@ -35,7 +35,7 @@ import {
   GARDEN_FERTILIZE_MS,
   fertilizeCheck,
   fertilizePlot,
-} from './js/garden.js?v=659d2332';
+} from './js/garden.js?v=17d048df';
 import { firstWorkingTool, HOE_TOOLS, WATERING_CAN_TOOLS } from './js/tools.js?v=5f482998';
 import { miningGemHint } from './js/gem-hints.js?v=4b65f7ac';
 import {
@@ -48,7 +48,7 @@ import {
   findWorkingPick,
   rockStatusLabel,
   ensureMiningItems,
-} from './js/mining.js?v=12a6f1bd';
+} from './js/mining.js?v=881c40fe';
 import {
   ANIMAL_CLASS_IDS,
   ensureAnimalState,
@@ -91,7 +91,7 @@ import { levelInfoForXp } from './js/progression.js?v=33462eaa';
 import { getGameDayKey } from './js/game-day.js?v=cf9afac0';
 import { PACK_COPY, isElementClass } from './js/pack-slots.js?v=4a36968a';
 import { hasPouch } from './js/elemental-pouch.js?v=ceefa97a';
-import { ITEM_CATALOG, countItem } from './js/inventory.js?v=5be47371';
+import { ITEM_CATALOG, countItem } from './js/inventory.js?v=2bd5b93e';
 import { slugsFromEffects } from './js/speech-slugs.js?v=130338f9';
 import { animalResponseKey, failureResponseKey, trantCareResponseKey, rockResponseKey, verbResponse } from './js/verb-responses.js?v=3ceb8a8c';
 

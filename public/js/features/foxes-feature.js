@@ -48,7 +48,7 @@
  */
 
 import { slugsFromEffects } from '../speech-slugs.js?v=130338f9';
-import { addItem, countItem, removeItem } from '../inventory.js?v=5be47371';
+import { addItem, countItem, removeItem } from '../inventory.js?v=2bd5b93e';
 import { getToolCondition } from '../tools.js?v=5f482998';
 import { worldToScreen } from '../street-model.js?v=b6cb6a4e';
 import { OVERLAY_USES, playOverlay } from '../overlays.js?v=4e81f749';

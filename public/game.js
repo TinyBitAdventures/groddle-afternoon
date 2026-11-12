@@ -482,7 +482,7 @@ import {
   addItem,
   removeItem,
   isToolItem,
-} from './js/inventory.js?v=5be47371';
+} from './js/inventory.js?v=2bd5b93e';
 import { TROPHY_FIND_TEXT, trophyOfBadge } from './js/home-trophies.js?v=2020b29b';
 import { HELD_AT_ONCE, HELD_AT_ONCE_TEXT } from './js/collection-trophies.js?v=3760d603';
 import { PACK_COPY, isBagClass, isElementClass, ownBagLabel, unitRankAt } from './js/pack-slots.js?v=4a36968a';
@@ -503,7 +503,7 @@ import {
   pickupDroppedStack,
   placeDroppedBag,
   takeDroppedRecord,
-} from './js/world-items.js?v=792e1606';
+} from './js/world-items.js?v=b4795798';
 import {
   createPlayerSave,
   parsePlayerSave,
@@ -523,7 +523,7 @@ import {
   imagineHome,
   isHomePlaceTsid,
 } from './js/homes.js?v=631ab6b8';
-import { HOME_MACHINE, offerHomeTicket, renderTicketMachine } from './js/home-ticket.js?v=6a19977b';
+import { HOME_MACHINE, offerHomeTicket, renderTicketMachine } from './js/home-ticket.js?v=b4222b3c';
 import {
   MAIL_COMPANIONS,
   archiveMail,
@@ -639,7 +639,7 @@ import {
   hasHoe,
   plantSeedChoices,
   PLANT_PICK_TITLE,
-} from './js/garden.js?v=659d2332';
+} from './js/garden.js?v=17d048df';
 import { GARDEN_SCALE, PLOT_H as GARDEN_PLOT_H, PLOT_W as GARDEN_PLOT_W, gardenFrame, gardenLayout, gardenStyle, plotPieces } from './js/garden-view.js?v=04fe8467';
 import { nearestPlotIndex } from './js/garden-view.js?v=04fe8467';
 import {
@@ -654,7 +654,7 @@ import {
   STARTER_MINING_SKILLS,
   findWorkingPick,
   miningToolWear,
-} from './js/mining.js?v=12a6f1bd';
+} from './js/mining.js?v=881c40fe';
 import {
   loadStreetData,
   STREET_INDEX,
@@ -767,7 +767,7 @@ import {
   trantStatusLabel,
   trantFootAnchorY,
 } from './js/trants.js?v=4d6f5593';
-import { growStreetTrant } from './js/patches.js?v=264d8967';
+import { growStreetTrant } from './js/patches.js?v=796e43db';
 import {
   runStreetTransition,
   showAwardScreen,
@@ -855,7 +855,7 @@ import {
   vendorSellUnitPrice,
   vendorBuyUnitPrice,
   VENDOR_BAG_HOLDS,
-} from './js/vendor.js?v=dc29268a';
+} from './js/vendor.js?v=900d86d9';
 import {
   animalAnchorX,
   animalAnchorY,
@@ -917,7 +917,7 @@ import {
   ensureCubimalItems,
   openCubimalPackage,
   setCubimalFree,
-} from './js/cubimals.js?v=abd91c78';
+} from './js/cubimals.js?v=3a284648';
 import {
   STOOT_DOLL_BUBBLE_MS,
   STOOT_DOLL_ID,
@@ -4166,6 +4166,10 @@ function getPackUseInfo(classTsid) {
     };
   }
   const info = getItemUseInfo(classTsid);
+  // orange_juice.js 112-115 (every drink's conditions) and include/food.js 14: greyed while dead, kept.
+  if (info.usable && playerIsDead() && (info.kind === 'drink' || info.effects?.energy)) {
+    return { ...info, usable: false, showDisabled: true, reason: DEAD_CONSUME_LINE };
+  }
   if (!info.usable || !info.effects?.energy || info.kind === 'drink') return info;
   const quote = quoteFoodVarietyBonus(
     foodState,
@@ -6405,6 +6409,11 @@ function usePackItem(classTsid, count = 1) {
   const isFood = Boolean(
     ordinaryInfo?.usable && ordinaryInfo.effects?.energy && ordinaryInfo.kind !== 'drink'
   );
+  // orange_juice.js 112-115, include/food.js 14: no drinking or eating while dead; it stays in the pack.
+  if (ordinaryInfo?.usable && (ordinaryInfo.kind === 'drink' || isFood) && playerIsDead()) {
+    toast(DEAD_CONSUME_LINE);
+    return;
+  }
   if (isFood) {
     const deadGate = features.metabolicGate('energy', 'gain', engine);
     if (!deadGate.ok) {
@@ -6475,7 +6484,7 @@ function usePackItem(classTsid, count = 1) {
   const fullnessSuffix = foodResult?.fullness?.stuffed
     ? ' You are stuffed. You can’t eat any more today.' // G318: the stuffed buff's prompt (catalog_buffs.js 2565)
     : foodResult?.fullness?.percent >= 75
-      ? " You're getting quite full."
+      ? ' You are getting quite full and won’t be able to eat much more today.' // include/food.js 165-174
       : foodResult?.fullness?.percent >= 50
         ? ' You are starting to feel kinda full.'
         : '';
@@ -6485,6 +6494,8 @@ function usePackItem(classTsid, count = 1) {
   } else {
     pushActivity(r.msgs[0]);
   }
+  // The item's own line after the eat (cheese_stinky.js 409, pi.js 112, milk_butterfly.js 291-299, ...).
+  if (r.flavour) pushActivity(r.flavour);
   if (player) {
     floatText(
       player.x,
@@ -22376,6 +22387,9 @@ function studyBuffContext(now = Date.now()) {
 }
 
 /** Hell's own state (hell-feature isDead): the source's pc.is_dead. */
+/** orange_juice.js 112-115 and include/food.js 14: Drink and Eat greyed while dead. */
+const DEAD_CONSUME_LINE = 'You are dead :(';
+
 function playerIsDead() {
   return features.query('isDead', engine) === true;
 }
@@ -32921,7 +32935,7 @@ async function main() {
   }
   // Garden talkback QA (js/garden-talk-qa.js): ?gardentalkdemo=herb|crop.
   if (new URLSearchParams(location.search).has('gardentalkdemo')) {
-    import('./js/garden-talk-qa.js?v=51991c33').then((m) => m.runGardenTalkDemo({ engine, executeVerb, params: new URLSearchParams(location.search) }));
+    import('./js/garden-talk-qa.js?v=842ffb63').then((m) => m.runGardenTalkDemo({ engine, executeVerb, params: new URLSearchParams(location.search) }));
   }
   // MEMQA (ticket 21, Safari's memory reload in Naraka): ?memqa=1 lets a probe walk streets through the
   // real street trip (tools/qa/street-memory.mjs). Solo pages only: online pages drop their params.

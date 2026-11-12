@@ -30,9 +30,10 @@
  * daily limit leaves (limitCountCap; the feature runs its rule for each one).
  */
 
-import { ITEM_CATALOG, countItem, getItemUseInfo, removeItem, useItem } from './inventory.js?v=5be47371';
+import { CONSUME_FLAVOUR_LINES, ITEM_CATALOG, countItem, getItemUseInfo, removeItem, useItem } from './inventory.js?v=2bd5b93e';
 import { loseEnergy, loseMood, metabolicGain, moodMax } from './metabolics.js?v=8504134e';
-import { quoteFoodVarietyBonus, foodFullness } from './food.js?v=abdc9bf9';
+import { grantMoodXp } from './mood-xp.js?v=958e7680';
+import { quoteFoodVarietyBonus, foodFullness } from './food.js?v=08103198';
 
 /**
  * Eat and drink verbs marked "is_single": 1 in GSJS items/*.js (verbs.eat:
@@ -232,14 +233,20 @@ export function useItemMany(inv, pc, classTsid, count = 1) {
     addEnergy();
     addMood();
   }
+  // include/drink.js 108-111: one stats_add_xp(count * drink_xp, false), with the mood bonus.
   if (info.effects.xp > 0) {
-    const xp = info.effects.xp * n;
-    pc.imagination = (pc.imagination || 0) + xp;
-    pc.xp = (pc.xp || 0) + xp;
-    effects.xp = xp;
+    const xp = grantMoodXp(pc, info.effects.xp * n);
+    if (xp) effects.xp = xp;
   }
   // item.js buildVerbMessage: "You ate 3 Meats." / "You drank 2 Orange Juices."
-  return { ok: true, count: n, msgs: [`You ${info.kind === 'drink' ? 'drank' : 'ate'} ${n} ${plural}.`], effects };
+  return {
+    ok: true,
+    count: n,
+    msgs: [`You ${info.kind === 'drink' ? 'drank' : 'ate'} ${n} ${plural}.`],
+    effects,
+    // The item's own line after the eat, once (useItem's flavour).
+    ...(CONSUME_FLAVOUR_LINES[classTsid] ? { flavour: CONSUME_FLAVOUR_LINES[classTsid] } : {}),
+  };
 }
 
 /**

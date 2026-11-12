@@ -31,9 +31,9 @@
  *   itemVerbLast, itemVerbBuzz, itemVerbDash.
  */
 
-import { addItem, countItem, removeItem } from '../inventory.js?v=5be47371';
+import { addItem, countItem, removeItem } from '../inventory.js?v=2bd5b93e';
 import { moodMax } from '../metabolics.js?v=8504134e';
-import { listDroppedStacks } from '../world-items.js?v=792e1606';
+import { listDroppedStacks } from '../world-items.js?v=b4795798';
 import {
   GARLIC_EAT_COUNTER,
   ITEM_VERBS,

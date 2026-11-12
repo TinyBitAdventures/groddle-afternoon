@@ -113,7 +113,7 @@ import {
   usePowderCharge,
 } from '../powders.js?v=fbbbc0d8';
 import { itemVerbAchievementCounters } from '../item-verbs.js?v=1e20fa7d';
-import { copyChargesLeft, copyFromLedger, keepsCopies, spendCopyCharge, verbCopy } from '../copy-charges.js?v=627150dc';
+import { copyChargesLeft, copyFromLedger, keepsCopies, spendCopyCharge, verbCopy } from '../copy-charges.js?v=7b1d0bd9';
 import { migrateClassValue } from '../tools.js?v=5f482998';
 import { DEAD_TRANT_CLASSES } from '../patches.js?v=342baf43';
 import { COPY as SHARED_PATCH_COPY } from '../shared-patches.js?v=49082d75';

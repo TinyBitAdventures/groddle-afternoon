@@ -7,6 +7,7 @@
 
 /** Canonical icon path for a class_tsid (OGA iconic extract). */
 import { loseEnergy, loseMood, metabolicGain, moodMax } from './metabolics.js?v=8504134e';
+import { grantMoodXp } from './mood-xp.js?v=958e7680';
 export function itemIcon(classTsid) {
   if (!classTsid) return 'assets/sprites/icons/apple.webp';
   return `assets/sprites/icons/${classTsid}.webp`;
@@ -77,33 +78,51 @@ for (const [cls, plural] of Object.entries({
   bun: 'Buns', sammich: 'Sammiches', waffles: 'Waffles',
 })) ITEM_CATALOG[cls].namePlural = plural;
 
+/*
+ * Eats and drinks before assets/content/making-items.json loads (game.js registerItemUse replaces
+ * each at boot with the same numbers): a food's energy is base_cost x energy_factor (include/food.js
+ * 214), a drink's classProps drink_mood / drink_energy / drink_xp (include/drink.js).
+ */
 const ITEM_USE_CATALOG = {
   // items/apple.js 16 base_cost 5 x energy_factor 1 (include/food.js 214): 5 energy, no mood.
   // The Apple a Day buff (apple.js 252) adds 5 more after 30 s (buffs.js well_fed_energy).
   apple: { verb: 'Eat', energy: 5, message: 'You ate an Apple.' },
-  cherry: { verb: 'Eat', mood: 8, message: 'You ate a Cherry.' },
-  grain: { verb: 'Eat', energy: 5, message: 'You ate a Grain.' },
-  milk_butterfly: {
-    verb: 'Drink',
-    energy: 8,
-    mood: 12,
-    message: 'You drank a Butterfly Milk.',
-  },
-  sammich: { verb: 'Eat', energy: 25, mood: 10, message: 'You ate a Sammich.' },
-  bun: { verb: 'Eat', energy: 12, mood: 4, message: 'You ate a Bun.' },
-  flour: { verb: 'Eat', energy: 3, message: 'You ate a Flour.' },
-  orange_juice: { verb: 'Drink', energy: 15, mood: 8, message: 'You drank an Orange Juice.' },
-  lemon_juice: { verb: 'Drink', energy: 15, mood: 8, message: 'You drank a Lemon Juice.' },
-  fruity_juice: { verb: 'Drink', energy: 15, mood: 8, message: 'You drank a Fruity Juice.' },
-  bubble_tea: { verb: 'Drink', energy: 18, mood: 12, message: 'You drank a Bubble Tea.' },
-  fried_egg: { verb: 'Eat', energy: 14, mood: 6, message: 'You ate a Fried Egg.' },
-  green_eggs: { verb: 'Eat', energy: 14, mood: 6, message: 'You ate a Green Egg.' },
+  cherry: { verb: 'Eat', energy: 1, message: 'You ate a Cherry.' }, // cherry.js base_cost 1
+  grain: { verb: 'Eat', energy: 1, message: 'You ate a Grain.' }, // grain.js base_cost 1
+  milk_butterfly: { verb: 'Drink', kind: 'drink', mood: 6, message: 'You drank a Butterfly Milk.' }, // drink_mood 6
+  sammich: { verb: 'Eat', energy: 29, message: 'You ate a Sammich.' }, // sammich.js base_cost 29
+  bun: { verb: 'Eat', energy: 9, message: 'You ate a Bun.' }, // bun.js base_cost 9
+  flour: { verb: 'Eat', energy: 7, message: 'You ate a Flour.' }, // flour.js base_cost 7
+  orange_juice: { verb: 'Drink', kind: 'drink', energy: 15, mood: 20, message: 'You drank an Orange Juice.' },
+  lemon_juice: { verb: 'Drink', kind: 'drink', energy: 10, mood: -5, xp: 10, message: 'You drank a Lemon Juice.' },
+  fruity_juice: { verb: 'Drink', kind: 'drink', mood: 20, message: 'You drank a Fruity Juice.' },
+  bubble_tea: { verb: 'Drink', kind: 'drink', energy: 10, mood: 30, xp: 10, message: 'You drank a Bubble Tea.' },
+  fried_egg: { verb: 'Eat', energy: 11, message: 'You ate a Fried Egg.' }, // fried_egg.js base_cost 11
+  green_eggs: { verb: 'Eat', energy: 12, message: 'You ate a Green Egg.' }, // green_eggs.js base_cost 12
   waffles: {
     verb: 'Eat',
     energy: 185,
     message: 'You ate a Waffle.',
   },
+  // Neither is a recipe input or output, so making-items.json leaves them out: bacon.js 16, 23
+  // (base_cost 20 x energy_factor 5, the Piggy nibble's drop) and sesame_oil.js 16, 23 (4 x 1).
+  bacon: { verb: 'Eat', energy: 100, message: 'You ate a Rasher of Bacon.' },
+  sesame_oil: { verb: 'Eat', energy: 4, message: 'You ate a Sesame Oil.' },
 };
+
+/**
+ * The line some foods and drinks add after the eat (each item's handler sendActivity):
+ * cheese_stinky.js 409, cheese_very_stinky.js 392, cheese_very_very_stinky.js 354, pi.js 112,
+ * milk_butterfly.js 291-299, pumpkin_ale.js 120.
+ */
+export const CONSUME_FLAVOUR_LINES = Object.freeze({
+  cheese_stinky: 'Stinky Cheese? Not bad. Would have been better with some stinky crackers, though.',
+  cheese_very_stinky: 'After all the hubbub about the very stinky cheese, its actual stinkiness is a little anti-climactic.',
+  cheese_very_very_stinky: "In addition to dazzling your friends with your intestinal fortitude, you also reap the very, very stinky cheese's bounteous nutritional benefits.",
+  pi: 'You suddenly feel as though you have 3141 digits, and yet, you feel strangely incomplete.',
+  milk_butterfly: 'Butterfly milk has the delicate effervescence of a thousand butterfly farts dancing on your tongue.',
+  pumpkin_ale: 'The full moon and yard of vegetab-ale casts a spell on you. My, what a thriller!',
+});
 
 /**
  * Pack-facing effect preview for an item. This is also the single source used
@@ -458,10 +477,11 @@ export function useItem(inv, pc, classTsid) {
     addEnergy();
     addMood();
   }
+  // include/drink.js 108-111: stats_add_xp(count * drink_xp, false) takes the mood bonus
+  // (inc_stats.js 270-271, 559-570), after the mood the drink gave.
   if (info.effects.xp > 0) {
-    pc.imagination = (pc.imagination || 0) + info.effects.xp;
-    pc.xp = (pc.xp || 0) + info.effects.xp;
-    effects.xp = info.effects.xp;
+    const xp = grantMoodXp(pc, info.effects.xp);
+    if (xp) effects.xp = xp;
   }
-  return { ok: true, msgs: [info.message], effects };
+  return { ok: true, msgs: [info.message], effects, ...(CONSUME_FLAVOUR_LINES[classTsid] ? { flavour: CONSUME_FLAVOUR_LINES[classTsid] } : {}) };
 }

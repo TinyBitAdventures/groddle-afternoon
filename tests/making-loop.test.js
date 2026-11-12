@@ -49,7 +49,7 @@ import {
   listPackItemSlots,
   listPackToolSlots,
   listPackRows,
-} from '../public/js/inventory.js?v=5be47371';
+} from '../public/js/inventory.js?v=2bd5b93e';
 import {
   buildActivitySegments,
   activitySegmentsToHtml,

@@ -66,7 +66,7 @@ import { tradeTable } from './build-realtime-trade.mjs';
 import { ITEM_BASE_COSTS } from '../public/js/store-catalog.js?v=74b56af3';
 import { obtainableItems } from './job-obtainable.mjs';
 import { DROP_TABLES } from '../public/js/drop-tables-data.js?v=c51a6400';
-import { CUBIMAL_PACKAGE_IDS, CUBIMAL_SERIES } from '../public/js/cubimals.js?v=abd91c78';
+import { CUBIMAL_PACKAGE_IDS, CUBIMAL_SERIES } from '../public/js/cubimals.js?v=3a284648';
 import { ARTIFACT_MAP, ARTIFACT_NECKLACES } from '../public/js/artifacts.js?v=fc419ecf';
 import { XP_FOR_LEVEL, currantRewardForLevel } from '../public/js/progression.js?v=33462eaa';
 import { IMAGINATION_UPGRADES } from '../public/js/imagination-data.js?v=4a85e7fe';

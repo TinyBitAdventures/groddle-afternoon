@@ -47,7 +47,7 @@
  * street the server doesn't share keep the save's own plots, as before.
  */
 
-import { ensureItem } from '../inventory.js?v=5be47371';
+import { ensureItem } from '../inventory.js?v=2bd5b93e';
 import { isItemFloor, platformYAt } from '../street-model.js?v=b6cb6a4e';
 import { getStreetEcologyCatalog, streetEcologyAliases } from '../street-ecology.js?v=f27417a8';
 import { trantFootAnchorY, trantStatusLabel } from '../trants.js?v=4d6f5593';

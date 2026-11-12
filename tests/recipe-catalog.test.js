@@ -30,7 +30,7 @@ import {
   countItem,
   getItemUseInfo,
   useItem,
-} from '../public/js/inventory.js?v=5be47371';
+} from '../public/js/inventory.js?v=2bd5b93e';
 import {
   FOOD_VARIETY_UPGRADE,
   createFoodState,
@@ -250,8 +250,9 @@ describe('source food and drink metabolics', () => {
     const pc = { energy: 50, mood: 50, imagination: 0, xp: 0 };
     const r = useItem(inv, pc, 'lemon_juice');
     assert.equal(r.ok, true);
-    assert.deepEqual(r.effects, { energy: 10, mood: -5, xp: 10 });
-    assert.deepEqual([pc.energy, pc.mood, pc.imagination], [60, 45, 10]);
+    // include/drink.js 108-111: the 10 drink_xp takes the mood bonus at 45 mood (x0.8, inc_stats.js 559-570).
+    assert.deepEqual(r.effects, { energy: 10, mood: -5, xp: 8 });
+    assert.deepEqual([pc.energy, pc.mood, pc.imagination], [60, 45, 8]);
     const happy = { energy: 50, mood: 100 };
     const refused = useItem(inv, happy, 'orange_juice');
     assert.equal(refused.ok, false);

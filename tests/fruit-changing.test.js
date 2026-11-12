@@ -23,7 +23,7 @@ import {
   countItem,
   createInventory,
   listPackToolSlots,
-} from '../public/js/inventory.js?v=5be47371';
+} from '../public/js/inventory.js?v=2bd5b93e';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const publicRoot = join(here, '../public');

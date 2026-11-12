@@ -38,7 +38,7 @@ import { homeTrophyCount, isTrophyClass } from '../public/js/features/item-verbs
 import { homesFeature } from '../public/js/features/homes-feature.js?v=1ab67b46';
 import { planStreetTrophies } from '../public/js/street-jobs.js?v=94f8d250';
 import { planEggTrophy } from '../public/js/seasons.js?v=1978c3f3';
-import { collectionTrophiesFeature as collection } from '../public/js/features/collection-trophies-feature.js?v=6dbc852b';
+import { collectionTrophiesFeature as collection } from '../public/js/features/collection-trophies-feature.js?v=6e08009c';
 import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=10b118dd';
 import { applyAchievementProgress, createAchievementState } from '../public/js/achievements.js?v=552ecb19';
 

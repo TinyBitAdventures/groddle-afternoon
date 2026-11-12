@@ -90,7 +90,7 @@
  *   mailParcels, mailCourierLast, mailCourierDelivered, mailCourierAutoplay.
  */
 
-import { ITEM_CATALOG, itemIcon } from '../inventory.js?v=5be47371';
+import { ITEM_CATALOG, itemIcon } from '../inventory.js?v=2bd5b93e';
 import { frameTexture, sourceFromUrl } from '../textures.js?v=92ec53cd';
 import { questRoomConverse } from './quest-instances-feature.js?v=c2d4b97a';
 import { hellFeature } from './hell-feature.js?v=480cdd11';

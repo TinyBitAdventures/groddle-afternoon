@@ -11,12 +11,12 @@ import { createHash } from 'node:crypto';
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { createInventory, countItem } from '../public/js/inventory.js?v=5be47371';
+import { createInventory, countItem } from '../public/js/inventory.js?v=2bd5b93e';
 import { bindToolInventory, copyForVerb, copyTags, createToolConditionState, setCopyTag } from '../public/js/tools.js?v=5f482998';
 import { resolveSound } from '../public/js/sound-board.js?v=3b2df993';
 import { SOUND_ALIASES, SOUND_FILES } from '../public/js/sound-keys.js?v=fb6ee553';
-import { supplyFeature } from '../public/js/features/supply-feature.js?v=79a59bf4';
-import { STILL, advanceStill, createStillState, stillStopsAt } from '../public/js/machines.js?v=301212d7';
+import { supplyFeature } from '../public/js/features/supply-feature.js?v=2a7f0ae8';
+import { STILL, advanceStill, createStillState, stillStopsAt } from '../public/js/machines.js?v=590a7d4a';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const PUB = join(ROOT, 'public');

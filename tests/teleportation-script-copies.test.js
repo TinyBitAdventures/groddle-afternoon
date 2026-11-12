@@ -12,7 +12,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 import { SITE_DIR, skipWithoutServer, skipWithoutSite, SERVER_DIR } from '../tools/repos.mjs';
-import { addItem, countItem, createInventory, ensureItem, ITEM_CATALOG } from '../public/js/inventory.js?v=5be47371';
+import { addItem, countItem, createInventory, ensureItem, ITEM_CATALOG } from '../public/js/inventory.js?v=2bd5b93e';
 import {
   TOOL_CONDITION_CATALOG,
   bindToolInventory,

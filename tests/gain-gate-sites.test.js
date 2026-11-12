@@ -91,9 +91,10 @@ describe('drink order (inventory.js useItem)', () => {
   it('food still asks for energy first', () => {
     refuse('energy', 'mood');
     const pc = { energy: 40, mood: 40, energyMax: 100 };
+    // sammich.js: base_cost 29 x energy_factor 1, energy only (include/food.js 214).
     const r = useItem(createInventory({ sammich: 1 }), pc, 'sammich');
     assert.equal(r.ok, true);
-    assert.deepEqual(asked, ['energy', 'mood']);
+    assert.deepEqual(asked, ['energy']);
     assert.deepEqual([pc.energy, pc.mood], [40, 40]);
   });
 });

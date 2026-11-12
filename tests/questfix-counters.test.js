@@ -44,7 +44,7 @@ import {
   giveCubimalVerb,
   GIVE_CUBIMAL_VERB,
   CUBIMAL_GIFT_RESPONSES,
-} from '../public/js/features/quest-verbs-feature.js?v=c2b5a04e';
+} from '../public/js/features/quest-verbs-feature.js?v=a1b47519';
 import { createFeatureHost } from '../public/js/feature-host.js?v=06bb8b74';
 
 const here = dirname(fileURLToPath(import.meta.url));

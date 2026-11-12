@@ -26,13 +26,13 @@ import {
   starterMiningTools,
   miningVendorOffers,
   STARTER_MINING_SKILLS,
-} from '../public/js/mining.js?v=12a6f1bd';
+} from '../public/js/mining.js?v=881c40fe';
 import {
   createInventory,
   countItem,
   listPackToolSlots,
   isToolItem,
-} from '../public/js/inventory.js?v=5be47371';
+} from '../public/js/inventory.js?v=2bd5b93e';
 import {
   loadRecipeCatalogFromFile,
   listRecipesForTool,

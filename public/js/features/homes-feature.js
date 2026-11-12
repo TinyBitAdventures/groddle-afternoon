@@ -99,8 +99,8 @@
  *       (=restorehold stops on the proto, =restoreaward on the award)
  */
 
-import { countItem, ensureItem, ITEM_CATALOG, removeItem } from '../inventory.js?v=5be47371';
-import { pickupCountTitle } from '../world-items.js?v=792e1606';
+import { countItem, ensureItem, ITEM_CATALOG, removeItem } from '../inventory.js?v=2bd5b93e';
+import { pickupCountTitle } from '../world-items.js?v=b4795798';
 import { createCountChooser } from '../ui/count-chooser.js?v=5bc894c8';
 import { isBagClass } from '../pack-slots.js?v=4a36968a';
 import { createCombobox } from '../combobox.js?v=d43209e8';
@@ -243,7 +243,7 @@ import {
 import { frameTexture, isLoaded, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js?v=92ec53cd';
 import { FALLBACK_MAX as WORLD_ART_FALLBACK_MAX, worldArtFor } from '../world-art.js?v=0729bf92';
 import { oneArmSignpost } from '../street-render.js?v=47697d4c';
-import { ROCK_CATALOG } from '../mining.js?v=12a6f1bd';
+import { ROCK_CATALOG } from '../mining.js?v=881c40fe';
 import {
   HOUSE_SIGN,
   IMG_BUBBLE_MS,

@@ -24,8 +24,8 @@ import { HELL_TEXT, metabolicGate, normalizeHellState } from '../public/js/hell.
 import { BUTTER_UP, butterUpChicken } from '../public/js/animal-flattery.js?v=63001f58';
 import { SET_FREE, applySetFree } from '../public/js/animal-set-free.js?v=3b194fca';
 import { applyVerbReward, getVerbReward } from '../public/js/verb-rewards.js?v=d3ce41d5';
-import { createInventory, countItem } from '../public/js/inventory.js?v=5be47371';
-import { startAssembly, startDisassembly } from '../public/js/machines.js?v=301212d7';
+import { createInventory, countItem } from '../public/js/inventory.js?v=2bd5b93e';
+import { startAssembly, startDisassembly } from '../public/js/machines.js?v=590a7d4a';
 import { createToolConditionState, repairToolCondition, setToolRemaining } from '../public/js/tools.js?v=5f482998';
 import { smeltMetalRocks } from '../public/js/mining.js?v=12a6f1bd';
 import { craftRecipe } from '../public/js/making.js?v=39f79aaa';

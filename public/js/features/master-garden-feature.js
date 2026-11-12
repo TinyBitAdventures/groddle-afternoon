@@ -28,8 +28,8 @@
  */
 
 import { TOOL_CONDITION_CATALOG, migrateClassValue } from '../tools.js?v=5f482998';
-import { ITEM_CATALOG, countItem, ensureItem } from '../inventory.js?v=5be47371';
-import { SEED_CATALOG, listPlantableSeeds } from '../garden.js?v=659d2332';
+import { ITEM_CATALOG, countItem, ensureItem } from '../inventory.js?v=2bd5b93e';
+import { SEED_CATALOG, listPlantableSeeds } from '../garden.js?v=17d048df';
 import {
   GARDEN_POTIONS,
   MASTER_GARDENER,
@@ -48,7 +48,7 @@ import { rollDropTable } from '../drop-tables.js?v=16e12632';
 import { payDrop } from './drops-feature.js?v=eb1d8eb4';
 import { textureFromUrl } from '../textures.js?v=92ec53cd';
 import { playPotionBottle } from '../potion-bottle-fx.js?v=85e8687c';
-import { copyFromLedger, keepsCopies, verbCopy } from '../copy-charges.js?v=627150dc';
+import { copyFromLedger, keepsCopies, verbCopy } from '../copy-charges.js?v=7b1d0bd9';
 import { gardenGrowModifier } from '../imagination-effects.js?v=70169933';
 
 export const MASTER_GARDEN_FEATURE_ID = 'master-garden';

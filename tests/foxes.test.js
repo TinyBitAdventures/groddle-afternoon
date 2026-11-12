@@ -30,9 +30,9 @@ import {
   rangerGreeting,
   splitConversation,
   stepFox,
-} from '../public/js/foxes.js?v=910cf549';
+} from '../public/js/foxes.js?v=4be3e46c';
 import { createToolConditionState, getToolCondition } from '../public/js/tools.js?v=5f482998';
-import { ITEM_CATALOG } from '../public/js/inventory.js?v=5be47371';
+import { ITEM_CATALOG } from '../public/js/inventory.js?v=2bd5b93e';
 import { getAchievementCatalog, loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=10b118dd';
 import {
   inReach,

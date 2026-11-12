@@ -34,7 +34,7 @@
  *   (rolled with the shared js/drop-tables.js runDropTable).
  */
 
-import { ITEM_CATALOG, ensureItem, getItemUseInfo } from './inventory.js?v=5be47371';
+import { ITEM_CATALOG, ensureItem, getItemUseInfo } from './inventory.js?v=2bd5b93e';
 import { DROP_TABLES, applyDropResult, rollDropTable } from './drop-tables.js?v=16e12632';
 import { loseEnergy, loseMood, metabolicGain, moodMax } from './metabolics.js?v=8504134e';
 import { grantMoodXp } from './mood-xp.js?v=958e7680';

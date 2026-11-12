@@ -81,7 +81,7 @@ import {
   setStreetEcologyCatalog,
   streetReservedSpots,
 } from '../public/js/street-ecology.js?v=f27417a8';
-import { ROCK_CATALOG } from '../public/js/mining.js?v=12a6f1bd';
+import { ROCK_CATALOG } from '../public/js/mining.js?v=881c40fe';
 import { MEGA_ROCK_CHANCE, MEGA_ROCK_CHUNKS } from '../public/js/imagination-effects.js?v=70169933';
 import { RESOURCE_NODE_CATALOG, RESOURCE_SKILL_PACKAGES } from '../public/js/resource-nodes.js?v=e3833110';
 import { ARBOROLOGY_HARVEST, TRANT_META } from '../public/js/trants.js?v=1b3c8ae3';

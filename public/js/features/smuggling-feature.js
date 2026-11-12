@@ -36,7 +36,7 @@
  *     smugDeim, smugLast, smugCounts, smugAutoplay.
  */
 
-import { addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=5be47371';
+import { addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=2bd5b93e';
 import { canUseTool } from '../tools.js?v=5f482998';
 import { acceptOffer, ensureQuestOfferState, turnInQuest } from '../quest-offers.js?v=ecd7c1d7';
 import { parseQuestConversation } from '../quests.js?v=2951073f';

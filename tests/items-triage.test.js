@@ -8,8 +8,8 @@ import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { ITEM_CATALOG, createInventory, countItem } from '../public/js/inventory.js?v=5be47371';
-import { listTransformVerbs, runTransform, transformEdges } from '../public/js/item-transforms.js?v=a57c16bc';
+import { ITEM_CATALOG, createInventory, countItem } from '../public/js/inventory.js?v=2bd5b93e';
+import { listTransformVerbs, runTransform, transformEdges } from '../public/js/item-transforms.js?v=157435ae';
 import { obtainableItems } from '../tools/job-obtainable.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');

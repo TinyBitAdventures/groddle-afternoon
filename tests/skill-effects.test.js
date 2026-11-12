@@ -20,7 +20,7 @@ import {
   mineRock,
   createMineRock,
   crushOre,
-} from '../public/js/mining.js?v=12a6f1bd';
+} from '../public/js/mining.js?v=881c40fe';
 import {
   createGarden,
   gardenActionProfile,
@@ -30,7 +30,7 @@ import {
   clearPlot,
   SEED_CATALOG,
   GARDEN_HARVEST_FAILED_LINES,
-} from '../public/js/garden.js?v=659d2332';
+} from '../public/js/garden.js?v=17d048df';
 import {
   loadRecipeCatalogFromFile,
   ensureMakingItems,

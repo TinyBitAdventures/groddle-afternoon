@@ -33,8 +33,8 @@ import {
   rollCubimalRace,
   sanitizeCubimalName,
   setCubimalFree,
-} from '../public/js/cubimals.js?v=abd91c78';
-import { addItem, countItem, createInventory } from '../public/js/inventory.js?v=5be47371';
+} from '../public/js/cubimals.js?v=3a284648';
+import { addItem, countItem, createInventory } from '../public/js/inventory.js?v=2bd5b93e';
 import { bindToolInventory, copyTags, createToolConditionState } from '../public/js/tools.js?v=5f482998';
 import { applyAchievementProgress, createAchievementState } from '../public/js/achievements.js?v=552ecb19';
 import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=10b118dd';

@@ -57,7 +57,7 @@
  * last release: released:respawned|new:<key>, or failed:<reason>).
  */
 
-import { ITEM_CATALOG, addItem, countItem } from '../inventory.js?v=5be47371';
+import { ITEM_CATALOG, addItem, countItem } from '../inventory.js?v=2bd5b93e';
 import { setToolRemaining, toolCopies } from '../tools.js?v=5f482998';
 import { isItemFloor, platformYAt } from '../street-model.js?v=b6cb6a4e';
 import { hiresSpriteUrl } from '../sprite-hires.js?v=d4cce9f9';

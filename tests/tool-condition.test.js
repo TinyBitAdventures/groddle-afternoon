@@ -14,12 +14,12 @@ import {
   repairToolCondition,
   setToolRemaining,
 } from '../public/js/tools.js?v=5f482998';
-import { createInventory } from '../public/js/inventory.js?v=5be47371';
+import { createInventory } from '../public/js/inventory.js?v=2bd5b93e';
 import {
   createGarden,
   plantPlot,
   waterPlot,
-} from '../public/js/garden.js?v=659d2332';
+} from '../public/js/garden.js?v=17d048df';
 import {
   createMineRock,
   mineRock,

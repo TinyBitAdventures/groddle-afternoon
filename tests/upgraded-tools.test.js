@@ -40,7 +40,7 @@ import {
   getToolCondition,
   setToolRemaining,
 } from '../public/js/tools.js?v=5f482998';
-import { crushOre } from '../public/js/mining.js?v=12a6f1bd';
+import { crushOre } from '../public/js/mining.js?v=881c40fe';
 import { MAKE_TOOL_SHEETS } from '../public/js/make-tool-sheets.js?v=6f758e09';
 import { clearPlot, createGarden, getPlot, hasHoe, hasWateringCan, plantPlot, waterPlot } from '../public/js/garden.js?v=37209241';
 import { performTrantCare, quoteTrantCare } from '../public/js/trant-care.js?v=9527ff03';

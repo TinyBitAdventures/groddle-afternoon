@@ -58,7 +58,7 @@
  */
 
 import { slugsFromEffects } from '../speech-slugs.js?v=130338f9';
-import { addItem, countItem, ensureItem, removeItem, ITEM_CATALOG } from '../inventory.js?v=5be47371';
+import { addItem, countItem, ensureItem, removeItem, ITEM_CATALOG } from '../inventory.js?v=2bd5b93e';
 import { bindCountField, countKeyValue, countStepMarkup } from '../ui/count-chooser.js?v=5bc894c8';
 import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=32c58aef';
 import { landingY, nearestSurfaceY } from '../walk-surface.js?v=106bfdc5';
@@ -125,7 +125,7 @@ import {
   syncObjs,
 } from '../rook-mp.js?v=0b9056b1';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
-import { copyChargesLeft, copyFromLedger, keepsCopies, spendCopyCharge, verbCopy } from '../copy-charges.js?v=627150dc';
+import { copyChargesLeft, copyFromLedger, keepsCopies, spendCopyCharge, verbCopy } from '../copy-charges.js?v=7b1d0bd9';
 import { migrateClassValue } from '../tools.js?v=5f482998';
 import { playPotionBottle } from '../potion-bottle-fx.js?v=85e8687c';
 import { feedZone, placeRookBadge, unionBox } from '../rook-badge-place.js?v=2bb00dfd';

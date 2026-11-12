@@ -6,7 +6,7 @@
  * This module keeps that loop deterministic and persistence-friendly without
  * coupling it to Pixi or DOM state.
  */
-import { addItem, ITEM_CATALOG, removeItem } from './inventory.js?v=5be47371';
+import { addItem, ITEM_CATALOG, removeItem } from './inventory.js?v=2bd5b93e';
 import { canRenameBag, cleanBagName } from './bag-names.js?v=22391c55';
 import { bagKeep } from './pack-slots.js?v=4a36968a';
 import { ITEM_PLURALS } from './item-plurals-data.js?v=62e96051';

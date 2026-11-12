@@ -8,7 +8,7 @@ import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { createInventory, countItem } from '../public/js/inventory.js?v=5be47371';
+import { createInventory, countItem } from '../public/js/inventory.js?v=2bd5b93e';
 import { createToolConditionState, getToolCondition } from '../public/js/tools.js?v=5f482998';
 import {
   MACHINE_ASSEMBLIES,
@@ -29,7 +29,7 @@ import { VENDOR_PROFILES } from '../public/js/vendor.js?v=5207195b';
 import { SEED_CATALOG } from '../public/js/garden.js?v=37209241';
 import { obtainableItems } from '../tools/job-obtainable.mjs';
 import { supplyReport } from '../tools/supply-report.mjs';
-import { supplyFeature } from '../public/js/features/supply-feature.js?v=79a59bf4';
+import { supplyFeature } from '../public/js/features/supply-feature.js?v=2a7f0ae8';
 
 const SPIKE = join(dirname(fileURLToPath(import.meta.url)), '..', 'public');
 const ENGINEER = ['engineering_1'];

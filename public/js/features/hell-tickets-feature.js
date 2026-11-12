@@ -38,7 +38,7 @@
  * hellTicketWine, hellTicketVisits.
  */
 
-import { addItem, countItem, removeItem } from '../inventory.js?v=5be47371';
+import { addItem, countItem, removeItem } from '../inventory.js?v=2bd5b93e';
 import { OVERLAY_USES, playWindowOverlay } from '../overlays.js?v=4e81f749';
 import { acceptOffer, ensureQuestOfferState, markOffered } from '../quest-offers.js?v=ecd7c1d7';
 import { getQuestCatalog } from '../content-catalogs.js?v=10b118dd';

@@ -5,7 +5,7 @@
  */
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { createGarden, GARDEN_SPEEDUP, SEED_CATALOG } from '../public/js/garden.js?v=659d2332';
+import { createGarden, GARDEN_SPEEDUP, SEED_CATALOG } from '../public/js/garden.js?v=17d048df';
 import {
   GARDEN_POTIONS,
   POTION_USES,

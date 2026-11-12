@@ -42,7 +42,7 @@
  */
 
 import { announceCharacterChanged, characterHeaders, characterOf, isCharacterChanged } from '../character-guard.js?v=510034a7';
-import { ITEM_CATALOG, addItem, countItem, ensureItem, itemIcon, removeItem } from '../inventory.js?v=5be47371';
+import { ITEM_CATALOG, addItem, countItem, ensureItem, itemIcon, removeItem } from '../inventory.js?v=2bd5b93e';
 import { displayRefusal, furnitureDef, furnitureSize, isFurniture } from '../home-decor.js?v=bbf43c44';
 import { pieceLabel } from '../furniture-upgrades.js?v=a3788c0d';
 import { textureFromUrl } from '../textures.js?v=92ec53cd';
