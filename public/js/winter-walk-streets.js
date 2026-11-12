@@ -86,6 +86,25 @@ export const WINTER_REPEAT_SOURCE_TSIDS = Object.freeze({ walk: 'LIFNBTGUQJ739MC
 export const WINTER_WALK_START = Object.freeze({ x: -2875, y: -81 });
 
 const deco = (sprite, x, y, w, h, z, extra = {}) => ({ sprite, x: Math.round(x), y: Math.round(y), w: Math.round(w), h: Math.round(h), z, r: 0, ...extra });
+
+/** dirt_platform_long's art (its 2x file, px): a flat fill with round spots. */
+const DIRT = Object.freeze({ sprite: 'dirt_platform_long', w: 2452, h: 184 });
+
+/**
+ * A floor plane of dirt_platform_long, `w` wide from `bottom - h` to `bottom` (x the centre):
+ * rows of the strip at its own aspect, overlapping a fifth, rather than one strip stretched
+ * 2.7-5.8x tall, which drew its spots as soft smears at 5-7 device px per texel (the
+ * low-resolution audit of 2026-11-12). The fill is one colour, so the rows read as one plane;
+ * the top row's edge is the plane's top. Returns the decos, top row last.
+ */
+function dirtPlane(x, bottom, w, h, z, extra = {}) {
+  const rh = (w * DIRT.h) / DIRT.w;
+  const n = h <= rh ? 1 : Math.ceil((h - rh) / (rh * 0.8)) + 1;
+  const step = n > 1 ? (h - rh) / (n - 1) : 0;
+  const rows = [];
+  for (let i = 0; i < n; i += 1) rows.push(deco(DIRT.sprite, x, bottom - i * step, w, Math.min(h, rh), z + i, extra));
+  return rows;
+}
 const countDecos = (layers) => layers.reduce((n, l) => n + (l.decos?.length || 0), 0);
 
 /** A deterministic 0..1 from an integer (the builder's --check must be stable). */
@@ -291,7 +310,9 @@ function walkGroundDecos() {
   const ox = -WB.l;
   const oy = -WB.t;
   for (let x = WB.l - 300; x < WB.r + 600; x += 1100) {
-    out.push(deco('dirt_platform_long', x + ox, 60 + oy, 1500, 250, z++, (x / 1100) % 2 ? { flip: true } : {}));
+    const rows = dirtPlane(x + ox, 60 + oy, 1500, 250, z, (x / 1100) % 2 ? { flip: true } : {});
+    out.push(...rows);
+    z += rows.length;
   }
   // Snow lying on the floor (the pictures: big pale patches, scattered splotches).
   for (let x = WB.l + 80, i = 0; x < WB.r; x += 330 + rnd(i + 61) * 260, i += 1) {
@@ -381,7 +402,9 @@ function walkFrontGroundDecos() {
   const ox = -WB.l;
   const oy = -WB.t;
   for (let x = WB.l - 300, i = 0; x < WB.r + 600; x += 1100, i += 1) {
-    out.push(deco('dirt_platform_long', x + ox, 470 + oy, 1500, 530, z++, i % 2 ? { flip: true } : {}));
+    const rows = dirtPlane(x + ox, 470 + oy, 1500, 530, z, i % 2 ? { flip: true } : {});
+    out.push(...rows);
+    z += rows.length;
   }
   return out;
 }
@@ -656,7 +679,11 @@ function havenBackFloorDecos() {
   let z = 0;
   const ox = -HB.l;
   const oy = -HB.t;
-  for (let x = HB.l - 300, i = 0; x < HB.r + 700; x += 1100, i += 1) out.push(deco('dirt_platform_long', x + ox, HG + 140 + oy, 1500, 250, z++, i % 2 ? {} : { flip: true }));
+  for (let x = HB.l - 300, i = 0; x < HB.r + 700; x += 1100, i += 1) {
+    const rows = dirtPlane(x + ox, HG + 140 + oy, 1500, 250, z, i % 2 ? {} : { flip: true });
+    out.push(...rows);
+    z += rows.length;
+  }
   return out;
 }
 
@@ -666,7 +693,11 @@ function havenFloorDecos() {
   let z = 0;
   const ox = -HB.l;
   const oy = -HB.t;
-  for (let x = HB.l - 300, i = 0; x < HB.r + 700; x += 1100, i += 1) out.push(deco('dirt_platform_long', x + ox, 480 + oy, 1500, 530, z++, i % 2 ? { flip: true } : {}));
+  for (let x = HB.l - 300, i = 0; x < HB.r + 700; x += 1100, i += 1) {
+    const rows = dirtPlane(x + ox, 480 + oy, 1500, 530, z, i % 2 ? { flip: true } : {});
+    out.push(...rows);
+    z += rows.length;
+  }
   return out;
 }
 

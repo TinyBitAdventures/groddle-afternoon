@@ -23,7 +23,7 @@
 
 import { isRebuiltRoomTsid, rebuiltRoomEcology } from '../rebuilt-rooms.js?v=8c2eaf24';
 import { isLouiseVillaTsid, louiseVillaEcology } from '../louise-pasture-villa.js?v=9d267f7e';
-import { WINTER_WALK_BOUNDS, WINTER_WALK_CAPTION, WINTER_WALK_TSID, winterStreetEcology } from '../winter-walk-streets.js?v=bdf0d11e';
+import { WINTER_WALK_BOUNDS, WINTER_WALK_CAPTION, WINTER_WALK_TSID, winterStreetEcology } from '../winter-walk-streets.js?v=175da229';
 
 export const REBUILT_ROOMS_FEATURE_ID = 'rebuilt-rooms';
 

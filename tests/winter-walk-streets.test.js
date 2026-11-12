@@ -36,8 +36,8 @@ import {
   WINTER_WALK_TSID,
   isWinterStreetTsid,
   winterStreetEcology,
-} from '../public/js/winter-walk-streets.js?v=bdf0d11e';
-import { rebuiltRoomsFeature } from '../public/js/features/rebuilt-rooms-feature.js?v=07d6db6a';
+} from '../public/js/winter-walk-streets.js?v=175da229';
+import { rebuiltRoomsFeature } from '../public/js/features/rebuilt-rooms-feature.js?v=426e7b2a';
 import { reachStreet } from '../public/js/builder/reach-graph.js?v=d03eeab1';
 
 const spike = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -241,11 +241,13 @@ describe('Winter Haven after the snaps', () => {
       assert.ok(layer.z < 0 && at < s.layers.findIndex((l) => l.id === 'middleground'), `${s.label}: behind the walk line`);
       assert.equal(layer.w, s.bounds.r - s.bounds.l, `${s.label}: street-wide, no parallax`);
       const feet = feetY - s.bounds.t;
+      // The plane is rows of its strip at the strip's own aspect (dirtPlane), overlapping.
       for (let x = 0; x <= s.bounds.r - s.bounds.l; x += 25) {
-        const d = layer.decos.find((o) => Math.abs(o.x - x) <= o.w / 2);
-        assert.ok(d, `${s.label}: floor behind x ${x + s.bounds.l}`);
-        assert.ok(d.y - d.h <= feet - 100, `${s.label}: its top at least 100 px above the feet at ${x + s.bounds.l}`);
-        assert.ok(d.y >= feet + 100, `${s.label}: it runs on under the front floor at ${x + s.bounds.l}`);
+        const ds = layer.decos.filter((o) => Math.abs(o.x - x) <= o.w / 2).sort((a, b) => b.y - a.y);
+        assert.ok(ds.length, `${s.label}: floor behind x ${x + s.bounds.l}`);
+        for (let i = 1; i < ds.length; i += 1) assert.ok(ds[i].y >= ds[i - 1].y - ds[i - 1].h, `${s.label}: rows overlap at ${x + s.bounds.l}`);
+        assert.ok(Math.min(...ds.map((d) => d.y - d.h)) <= feet - 100, `${s.label}: its top at least 100 px above the feet at ${x + s.bounds.l}`);
+        assert.ok(Math.max(...ds.map((d) => d.y)) >= feet + 100, `${s.label}: it runs on under the front floor at ${x + s.bounds.l}`);
       }
       return layer;
     };

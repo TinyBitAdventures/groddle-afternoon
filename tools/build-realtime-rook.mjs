@@ -47,7 +47,7 @@ import { TOOL_CONDITION_CATALOG } from '../public/js/tools.js?v=5f482998';
 import { placementRequests } from './build-realtime-objects.mjs';
 import { streetIsRookable } from '../public/js/rook-attack.js?v=c12e825f';
 import { rebuiltRoomEcology } from '../public/js/rebuilt-rooms.js?v=8c2eaf24';
-import { winterStreetEcology } from '../public/js/winter-walk-streets.js?v=bdf0d11e';
+import { winterStreetEcology } from '../public/js/winter-walk-streets.js?v=175da229';
 import { isZoneTsid } from '../public/js/zone-streets.js?v=b40010d5';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
