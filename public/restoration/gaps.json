@@ -39,9 +39,9 @@
     }
   },
   "counts": {
-    "fixing": 29,
+    "fixing": 2,
     "known": 22,
-    "unreleased": 6,
+    "unreleased": 33,
     "fixed": 11,
     "lost": 5,
     "purpose": 14,
@@ -87,17 +87,17 @@
         {
           "id": "F11",
           "text": "Chasing Hubba Dubba Hugs is offered but cannot be finished, and Tend to Your Community never ticks its Herb Gardens step.",
-          "state": "fixing"
+          "state": "unreleased"
         },
         {
           "id": "F12",
           "text": "The counters on Sparkly of Interest and Another Simple Sample never move, some quest timers keep running while you are away, and Walk Toward the Light opens at a level instead of after Glitch's upgrades.",
-          "state": "fixing"
+          "state": "unreleased"
         },
         {
           "id": "F13",
           "text": "A few quest reward lines show a fixed amount instead of what was really paid.",
-          "state": "fixing"
+          "state": "unreleased"
         }
       ]
     },
@@ -193,15 +193,15 @@
       "name": "Quoins",
       "items": [
         {
-          "id": "F14",
-          "text": "Rainbow Run and Top of the Tree quoins vanish without paying once you reach the daily quoin limit.",
-          "state": "fixing"
-        },
-        {
           "id": "G647",
           "text": "Quoins in races, puzzle rooms, the Purple journey and the winter motes still pop with a short float instead of Glitch's full burst.",
           "report": 181,
           "state": "known"
+        },
+        {
+          "id": "F14",
+          "text": "Rainbow Run and Top of the Tree quoins vanish without paying once you reach the daily quoin limit.",
+          "state": "unreleased"
         },
         {
           "id": "G271",
@@ -258,12 +258,12 @@
         {
           "id": "F15",
           "text": "The donation that fills a Giant's favor gives no emblem, later donations use up the day's limit for nothing, and there is no warning before you go over it.",
-          "state": "fixing"
+          "state": "unreleased"
         },
         {
           "id": "F16",
           "text": "Favor filled outside a donation gives no prompt to collect the emblem, and some favor can go past the cap.",
-          "state": "fixing"
+          "state": "unreleased"
         },
         {
           "id": "G634",
@@ -294,17 +294,17 @@
         {
           "id": "F17",
           "text": "Street projects never ask how many to give, and online helpers from an earlier phase get no completion card or reward.",
-          "state": "fixing"
+          "state": "unreleased"
         },
         {
           "id": "F18",
           "text": "Work stops when you walk a short way off, the panel shows no rewards or leaderboard, and some refusals show raw names.",
-          "state": "fixing"
+          "state": "unreleased"
         },
         {
           "id": "F19",
           "text": "Cultivation Nurturer, Restorer of Stuff and Make Do and Mender cannot be earned.",
-          "state": "fixing"
+          "state": "unreleased"
         },
         {
           "id": "G653",
@@ -320,17 +320,17 @@
         {
           "id": "F20",
           "text": "A plain Pick can mine Metal Rock, dragging a Pick onto a rock wears a different pick, and Rubeweed does not raise the gem chance.",
-          "state": "fixing"
+          "state": "unreleased"
         },
         {
           "id": "F21",
           "text": "Online, only the first of two players on one rock or node is paid, and Ice has no Help scrape.",
-          "state": "fixing"
+          "state": "unreleased"
         },
         {
           "id": "F22",
           "text": "Picks, Shovels and Scrapers have no verbs in the pack, and the Tinkertool cannot repair itself or mend a tool bit by bit when it is worn.",
-          "state": "fixing"
+          "state": "unreleased"
         }
       ]
     },
@@ -338,19 +338,19 @@
       "name": "Trees and gardens",
       "items": [
         {
-          "id": "F23",
-          "text": "Harvesting a tree with exactly the energy it costs can croak you, and street Wood Trees never grow back after chopping.",
-          "state": "fixing"
-        },
-        {
           "id": "F24",
           "text": "Street fruit trees never grow bigger, Wood Trees take care only once a day, and a tiny Wood Tree does not warn that harvesting will clear it.",
           "state": "fixing"
         },
         {
+          "id": "F23",
+          "text": "Harvesting a tree with exactly the energy it costs can croak you, and street Wood Trees never grow back after chopping.",
+          "state": "unreleased"
+        },
+        {
           "id": "F25",
           "text": "Garden potions ask for far too much energy, a plot that is still a little wet cannot be topped up, and pouring on a shared Master Garden can say you are too tired when you are not.",
-          "state": "fixing"
+          "state": "unreleased"
         }
       ]
     },
@@ -358,14 +358,14 @@
       "name": "Animals",
       "items": [
         {
-          "id": "F26",
-          "text": "In solo you can squeeze a Chicken that is sitting on your egg, and Super Animal Harvest does not give its Bacon chance.",
-          "state": "fixing"
-        },
-        {
           "id": "G676",
           "text": "Reviving a rooked animal counts the real helpers, and a party invite stays up while you eat to get your energy back.",
           "report": 251,
+          "state": "unreleased"
+        },
+        {
+          "id": "F26",
+          "text": "In solo you can squeeze a Chicken that is sitting on your egg, and Super Animal Harvest does not give its Bacon chance.",
           "state": "unreleased"
         },
         {
@@ -380,24 +380,24 @@
       "name": "Food, buffs and making",
       "items": [
         {
-          "id": "F27",
-          "text": "Drinks give the same iMG whatever your mood, you can drink while dead and lose the drink, and a Rasher of Bacon cannot be eaten.",
-          "state": "fixing"
-        },
-        {
-          "id": "F28",
-          "text": "Buffs keep running while the game is closed and can vanish on reload without their end effect.",
-          "state": "fixing"
-        },
-        {
           "id": "F29",
           "text": "Making pays iMG with no daily limit per recipe, and every Test Tube mix is known from the start instead of found by experimenting.",
           "state": "fixing"
         },
         {
+          "id": "F27",
+          "text": "Drinks give the same iMG whatever your mood, you can drink while dead and lose the drink, and a Rasher of Bacon cannot be eaten.",
+          "state": "unreleased"
+        },
+        {
+          "id": "F28",
+          "text": "Buffs keep running while the game is closed and can vanish on reload without their end effect.",
+          "state": "unreleased"
+        },
+        {
           "id": "F30",
           "text": "Meditation can say you gained energy right after saying you are too pooped, and a short first session can stick the Meditation Station.",
-          "state": "fixing"
+          "state": "unreleased"
         }
       ]
     },
@@ -407,12 +407,12 @@
         {
           "id": "F31",
           "text": "Levelling up while Super Pooped or dead refills you, the Energy Tank card fills energy but not mood, and online nobody hears that you levelled up.",
-          "state": "fixing"
+          "state": "unreleased"
         },
         {
           "id": "F32",
           "text": "The Faded Heart's Remember counts haunts on streets that have none, and hints at a later story that does not exist.",
-          "state": "fixing"
+          "state": "unreleased"
         }
       ]
     },
@@ -420,14 +420,14 @@
       "name": "Teleportation",
       "items": [
         {
-          "id": "F33",
-          "text": "Teleporting works out its energy cost from a 100-energy tank, and you cannot save a Teleportation Point in your own home.",
-          "state": "fixing"
-        },
-        {
           "id": "G668",
           "text": "Teleportation V cannot summon a player into a home yet.",
           "state": "known"
+        },
+        {
+          "id": "F33",
+          "text": "Teleporting works out its energy cost from a 100-energy tank, and you cannot save a Teleportation Point in your own home.",
+          "state": "unreleased"
         },
         {
           "id": "G666",
@@ -440,14 +440,14 @@
       "name": "Messages",
       "items": [
         {
-          "id": "F34",
-          "text": "A few messages point to the wrong place: retrying Gwendolyn's Task or Rainbow Run, joining a Party Space later, skipping the tutorial online, and teleporting from the Map before you have the rank for it.",
-          "state": "fixing"
-        },
-        {
           "id": "G318",
           "text": "Some lines the characters say are still in our own words while the original lines are checked.",
           "state": "known"
+        },
+        {
+          "id": "F34",
+          "text": "A few messages point to the wrong place: retrying Gwendolyn's Task or Rainbow Run, joining a Party Space later, skipping the tutorial online, and teleporting from the Map before you have the rank for it.",
+          "state": "unreleased"
         }
       ]
     },
@@ -455,19 +455,19 @@
       "name": "Multiplayer",
       "items": [
         {
+          "id": "G641",
+          "text": "A note left on the ground stays private to you. In Glitch anyone could read it.",
+          "state": "known"
+        },
+        {
           "id": "F35",
           "text": "Appear offline still shows you to players on the same street.",
-          "state": "fixing"
+          "state": "unreleased"
         },
         {
           "id": "F36",
           "text": "A neighbour's note can say they have not read yours right after they replied.",
-          "state": "fixing"
-        },
-        {
-          "id": "G641",
-          "text": "A note left on the ground stays private to you. In Glitch anyone could read it.",
-          "state": "known"
+          "state": "unreleased"
         },
         {
           "id": "G675",
@@ -479,11 +479,6 @@
     {
       "name": "Phones",
       "items": [
-        {
-          "id": "F37",
-          "text": "Some tips still name keys a phone does not have, such as Space to float higher or to fly in Paradise.",
-          "state": "fixing"
-        },
         {
           "id": "G663",
           "text": "On some phones, big streets can still use too much memory and close the game. A lighter mode for phones is planned.",
@@ -498,6 +493,11 @@
           "id": "G674",
           "text": "A second finger on the movement stick moves it.",
           "state": "known"
+        },
+        {
+          "id": "F37",
+          "text": "Some tips still name keys a phone does not have, such as Space to float higher or to fly in Paradise.",
+          "state": "unreleased"
         },
         {
           "id": "G672",
@@ -520,19 +520,19 @@
       "name": "Accounts and saving",
       "items": [
         {
+          "id": "G686",
+          "text": "You cannot rename your own character yet. An administrator can do it for you.",
+          "state": "known"
+        },
+        {
           "id": "F38",
           "text": "The character card can miscount a retired character, and a blocked sign-up says to try again tomorrow when the wait is longer.",
-          "state": "fixing"
+          "state": "unreleased"
         },
         {
           "id": "F39",
           "text": "After a failed restore of a backup, the solo game could stop saving until you reloaded.",
-          "state": "fixing"
-        },
-        {
-          "id": "G686",
-          "text": "You cannot rename your own character yet. An administrator can do it for you.",
-          "state": "known"
+          "state": "unreleased"
         },
         {
           "id": "G665",

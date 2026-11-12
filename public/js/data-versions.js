@@ -420,7 +420,7 @@
       "encyclopedia/search.json": "b98a0dc9",
       "landing/card-explore.webp": "7a2c1124",
       "landing/full/card-explore.webp": "cbce4e96",
-      "restoration/gaps.json": "3203036f",
+      "restoration/gaps.json": "2ec965cd",
       "restoration/shots/interrogation.webp": "4778b1b1",
     },
   };
