@@ -987,7 +987,7 @@ import { installHiresIcons } from './js/icon-hires.js?v=165dbd6e';
 import { installHiresDecos } from './js/deco-hires.js?v=9fd4ee86';
 import { loadAudioLevels, loadMutedPreference, saveAudioLevel, saveMutedPreference } from './js/audio-pref.js?v=6fe817bc';
 import { createAudioBuses, fadeGain } from './js/audio-buses.js?v=af167b54';
-import { installTopBar, renderTopBar } from './js/ui/topbar.js?v=e00f6c81';
+import { installTopBar, renderTopBar } from './js/ui/topbar.js?v=ab9f6a0c';
 import { focusBack, installFocusReturn, lastInput } from './js/ui/focus-return.js?v=da190597';
 import { installContextGuard } from './js/ui/context-guard.js?v=0f71ac17';
 import { QUOIN_FRAME_BOB, advanceQuoinClock, quoinBobBetweenFrames } from './js/quoin-motion.js?v=ea0bd408';
@@ -1472,6 +1472,8 @@ function installMoreMenu() {
   });
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && !list.hidden) {
+      // The popover over an open sheet closes first, never the sheet with it (the game's Esc is on window).
+      e.stopPropagation();
       setOpen(false);
       // The Menu button after a keyboard open, the world after a click (js/ui/focus-return.js).
       focusBack(btn);
@@ -1808,7 +1810,10 @@ function installVitalsMenu() {
     if (!menu.hidden && !e.target.closest('#vitals-menu, .meta-pill.energy, .meta-pill.mood, #low-energy-btn')) close();
   });
   document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && !menu.hidden) close(true);
+    if (e.key !== 'Escape' || menu.hidden) return;
+    // Over an open sheet (Make, Quests) Esc closes the menu only, never the sheet and its making.
+    e.stopPropagation();
+    close(true);
   });
 }
 
@@ -1834,6 +1839,7 @@ function installPlayerMenu() {
   });
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && !menu.hidden) {
+      e.stopPropagation();
       setOpen(false);
       focusBack(btn);
     }

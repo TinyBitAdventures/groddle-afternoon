@@ -117,12 +117,12 @@
   --z-raised: 1;    /* a part lifted inside its own component */
   --z-world: 5;     /* drawn over the world: tints, the verb menu */
   --z-hud: 12;      /* nameplate, tracker, feed, buffs, chat dock */
-  --z-hud-pop: calc(var(--z-hud) + 16); /* the top bar while its Menu, Sound or eat menu is open: over the Social drawer (z-hud + 14) */
-  --z-hud-pop-under: calc(var(--z-hud) + 15); /* notices and world announcements while a top bar popover is open: one under the lifted bar, still over the Social drawer */
   --z-overlay: 32;  /* world announcements (the Qurazy banner): over the HUD, under every panel */
   --z-overlay: 32;  /* world announcements (the Qurazy banner): over the HUD, under every panel */
   --z-quest-hud: calc(var(--z-overlay) + 1); /* a quest's progress card (Legalize It): over the HUD, under every panel, menu, form and dialog */
   --z-panel: 35;    /* side panels, Map, modals, the pack */
+  --z-hud-pop: calc(var(--z-panel) + 12); /* the top bar while one of its popovers is open: over the Social drawer, the side sheets, Make, the vendor, the Map and the pack (z-panel + 10) */
+  --z-hud-pop-under: calc(var(--z-panel) + 11); /* notices while a top bar popover is open: one under the lifted bar, still over every sheet */
   --z-notice: 50;   /* toasts, popovers, player menu, tutorial pills */
   --z-dialog: 70;   /* windows and quest HUDs over panels */
   --z-screen: 80;   /* full-screen moments: transitions, awards, new day */
@@ -11441,22 +11441,23 @@ html.stage-pinned[data-ui="modern"] header.top-bar { left: calc(var(--sp-5) + va
 }
 /* —— end HUB —— */
 
-/* —— HUB: top bar popovers over the Social drawer (both skins) —— */
+/* —— HUB: top bar popovers over the Social drawer and the side sheets (both skins) —— */
 /* The top bar is its own stacking layer (--z-hud), under the open Social drawer or Classic's chat
-   column (--z-hud + 14) where they meet: at 1440 px and up the Menu and the Sound popover drop from
-   the bar's right end onto the drawer (in Classic the Sound popover onto the chat column), and
-   their lower rows took no clicks. While one of the bar's popovers (the Menu, Sound, the eat menu, favor)
-   is open, the bar lifts to --z-hud-pop; the rest of the time it stays under the drawer. */
-#wrap > header.top-bar:has(#more-list:not([hidden]), #sound-pop:not([hidden]), #vitals-menu:not([hidden]), #favor-pop:not([hidden])) {
+   column (--z-hud + 14) and under every side sheet (--z-panel): the Menu and the Sound popover
+   dropped from the bar's right end onto the drawer, and "Something to eat" and the player card
+   dropped from the rings onto an open Quests or Make sheet, where they could not be clicked: no
+   eating while a making ran (Austin 2026-11-12). While one of the bar's popovers (the Menu, Sound,
+   the eat menu, the player card, favor) is open, the bar lifts to --z-hud-pop, over the drawer,
+   the sheets, the vendor, the Map and the pack; menus, windows and award screens (--z-notice and
+   up) still cover it. The rest of the time it stays under them all. */
+#wrap > header.top-bar:has(#more-list:not([hidden]), #sound-pop:not([hidden]), #vitals-menu:not([hidden]), #player-menu:not([hidden]), #favor-pop:not([hidden])) {
   z-index: var(--z-hud-pop);
 }
-/* G637: for the seconds they show, a notice (--z-notice) and a world announcement (--z-overlay, the
-   Qurazy banner) drew over an open popover of the bar, and a notice's card took its clicks. The bar
-   cannot lift over them: side panels, windows and award screens (--z-panel and up) must go on
-   covering it. So while one of the bar's popovers is open, those two layers drop to one under the
-   lifted bar (--z-hud-pop-under) and go back when it closes; nothing else moves. */
-#wrap:has(> header.top-bar :is(#more-list, #sound-pop, #vitals-menu, #favor-pop):not([hidden])) > #game-root > canvas.overlay-art,
-#wrap:has(> header.top-bar :is(#more-list, #sound-pop, #vitals-menu, #favor-pop):not([hidden])) > #game-root .notify-notices {
+/* G637: for the seconds they show, a notice (--z-notice) drew over an open popover of the bar and
+   its card took the popover's clicks. While one of the bar's popovers is open the notices drop to
+   one under the lifted bar (--z-hud-pop-under), still over every sheet, and go back when it closes.
+   A world announcement (the Qurazy banner, --z-overlay) is under the lifted bar already. */
+#wrap:has(> header.top-bar :is(#more-list, #sound-pop, #vitals-menu, #player-menu, #favor-pop):not([hidden])) > #game-root .notify-notices {
   z-index: var(--z-hud-pop-under);
 }
 /* —— end HUB top bar layer —— */

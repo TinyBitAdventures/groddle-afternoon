@@ -301,10 +301,9 @@ export function renderTopBar(doc, state = {}) {
 /**
  * PURE: a popover's left edge. Centred under its button at `center`, kept inside the bar
  * (`lo` to `hi`, the popover's left edge) and, with `clearL` / `clearR` given, clear of an open
- * side sheet and the Social drawer: the sheet's layer (--z-panel) is over the lifted bar
- * (--z-hud-pop), so a popover that reached under it was covered. Where the free width is
- * narrower than the popover it stays clear of the sheet and laps over the drawer's edge (the
- * lifted bar is drawn over the drawer).
+ * side sheet and the Social drawer, so neither hides the other's rows (the lifted bar,
+ * --z-hud-pop, is drawn over both). Where the free width is narrower than the popover it stays
+ * clear of the sheet and laps over the drawer's edge.
  */
 export function popoverLeft({ center, w, lo, hi, clearL = null, clearR = null }) {
   let min = lo;
