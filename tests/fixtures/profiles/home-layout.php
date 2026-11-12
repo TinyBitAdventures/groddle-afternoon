@@ -225,6 +225,24 @@ $wide = $withStreet(function (&$l): void {
 });
 $out['wideBytes'] = strlen(json_encode($wide));
 
+// HOMESHOT: a street sent from an upright phone (a 560 x 972 view, the sky with the pack's 132 px
+// under it) draws in the landscape frame; a landscape one is drawn as it came.
+$tall = $withStreet(function (&$l): void {
+    $l['w'] = 560;
+    $l['h'] = 972;
+    $l['cx'] = 1200;
+    $l['layers'][0]['draw'][0] = ['sky' => ['#a6effa', '#eafcfb'], 'x' => 0, 'y' => 0, 'w' => 560, 'h' => 1104];
+});
+$tallKept = HomeLayout::accept($tall, $root);
+$out['tallFramed'] = HomeLayout::framed($tallKept);
+$out['tallHtml'] = HomeLayout::render($tallKept, ['owner' => 'Zz Tall', 'root' => $root, 'avatar' => null]);
+$out['wideUnchanged'] = HomeLayout::framed($keptStreet) === $keptStreet;
+// Version 1 has only its view: a tall one is cut to the frame's shape from its foot up.
+$out['tallV1'] = HomeLayout::framed(['v' => 1, 'w' => 560, 'h' => 972, 'art' => [], 'draw' => [
+    ['sky' => ['#a6effa'], 'x' => 0, 'y' => 0, 'w' => 560, 'h' => 1104],
+    ['col' => '#5c3b25', 'x' => 0, 'y' => 870, 'w' => 560, 'h' => 102],
+], 'spots' => [['k' => 'door', 'b' => [100, 720, 92, 150]]]]);
+
 // Split 3x sheets: the frame drawn from its part on high-density screens, the 1x sheet below.
 $split = [
     'v' => 1, 'w' => 960, 'h' => 476,

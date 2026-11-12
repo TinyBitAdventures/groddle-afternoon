@@ -13,7 +13,8 @@
  * plain objects; `collectHomeLayout(engine)` is the game's call.
  */
 import { AVATAR_STILL } from './profiles.js?v=054ca723';
-import { buildHomeLayout, describeHomeThing, splitFrameToSheet } from './home-layout.js?v=c3e852f2';
+import { buildHomeLayout, describeHomeThing, homeViewFrame, splitFrameToSheet } from './home-layout.js?v=304971c0';
+import { sceneViewCap } from './location-view.js?v=9747e89a';
 
 /** The URL a texture source was loaded from (js/textures.js labels sources with it), or ''. */
 function sourceUrl(source) {
@@ -138,10 +139,24 @@ export function walkHomeScene(root, io) {
 }
 
 /**
+ * HOMESHOT: the frame the home street is taken in on this street (js/home-layout.js
+ * homeViewFrame), or null where the game cannot move its camera there (engine.viewAt).
+ */
+export function homeFrameFor(engine) {
+  const cam = engine?.camera;
+  if (!cam || typeof engine.viewAt !== 'function') return null;
+  const sw = Number(engine.worldW) || cam.w;
+  return homeViewFrame({ camX: cam.x, camW: cam.w, sw, worldH: Number(engine.streetView?.worldH) || cam.h, sceneHeight: sceneViewCap(engine.streetView) });
+}
+
+/**
  * The manifest of the home street (null before the renderer starts): version
- * 1, the location view's crop as engine.snapshotView draws the picture; or,
- * with `street`, version 2, the whole street (engine.worldW) with the view the
- * player has now as its starting frame, every layer in its own coordinates.
+ * 1, the frame's crop; or, with `street`, version 2, the whole street
+ * (engine.worldW) with the frame as its starting view, every layer in its own
+ * coordinates. HOMESHOT: the frame is homeViewFrame (a computer's view at the
+ * default zoom, centred where the player's view is), and the stage is walked
+ * with the camera there (engine.viewAt), so an upright phone, a pinch or a
+ * small window sends what a computer would.
  */
 export function collectHomeLayout(engine, { street = false } = {}) {
   const PIXI = engine?.PIXI;
@@ -163,7 +178,9 @@ export function collectHomeLayout(engine, { street = false } = {}) {
   for (const t of engine.interactables || []) {
     if (t?.sprite && !t.sprite.destroyed && !targets.has(t.sprite)) targets.set(t.sprite, t);
   }
-  const { draw, spots } = walkHomeScene(world, {
+  const sw = Number(engine.worldW) || cam.w;
+  const frame = homeFrameFor(engine) || { x: cam.x, y: cam.y, w: cam.w, h: cam.h };
+  const walk = () => walkHomeScene(world, {
     targets,
     player: engine.player,
     skip: new Set([engine.fxLayer].filter(Boolean)),
@@ -181,5 +198,6 @@ export function collectHomeLayout(engine, { street = false } = {}) {
       return points.map((p) => m.apply(p, new PIXI.Point()));
     },
   });
-  return buildHomeLayout({ w: cam.w, h: cam.h, draw, spots, street: street ? { sw: Number(engine.worldW) || cam.w, camX: cam.x } : null });
+  const { draw, spots } = typeof engine.viewAt === 'function' ? engine.viewAt(frame, walk) : walk();
+  return buildHomeLayout({ w: frame.w, h: frame.h, draw, spots, street: street ? { sw, camX: frame.x } : null });
 }

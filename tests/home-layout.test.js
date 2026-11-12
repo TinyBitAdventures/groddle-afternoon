@@ -16,9 +16,11 @@ import { homedir } from 'node:os';
 
 import {
   HOME_LAYOUT_ART_ROOTS, HOME_LAYOUT_KINDS, HOME_LAYOUT_LIMITS, HOME_LAYOUT_TEXTS, HOME_LAYOUT_VERSION,
-  boxFromCorners, buildHomeLayout, describeHomeThing, hexColour, homeLayoutJson, homeLayoutKeyOf, layoutArtPath, splitFrameToSheet,
-} from '../public/js/home-layout.js?v=c3e852f2';
-import { walkHomeScene } from '../public/js/home-layout-scene.js?v=c567ee6c';
+  HOME_FRAME_WINDOW, boxFromCorners, buildHomeLayout, describeHomeThing, hexColour, homeLayoutJson, homeLayoutKeyOf, homeViewFrame, layoutArtPath, splitFrameToSheet,
+} from '../public/js/home-layout.js?v=304971c0';
+import { collectHomeLayout, walkHomeScene } from '../public/js/home-layout-scene.js?v=153ee4f5';
+import { phoneStage, stageFor } from '../public/js/location-view.js?v=9747e89a';
+import { STREET_WORLD_H } from '../public/js/features/homes-feature.js?v=4889ae38';
 import { AVATAR_STILL, homeKeyOf } from '../public/js/profiles.js?v=054ca723';
 import { HIRES_SPRITES, SPLIT_SPRITES } from '../public/js/sprite-hires.js?v=d4cce9f9';
 import { HOUSE_STYLE_KEYS } from '../public/js/features/homes-feature.js?v=4889ae38';
@@ -236,6 +238,157 @@ describe('the stage walk (walkHomeScene)', () => {
   });
 });
 
+// HOMESHOT (Austin 2026-11-12, groddleafternoon.com/players/aeghor/ after a visit on an iPhone held
+// upright): the profile drew a tall, narrow slice of the home street. The layout and the picture are
+// now taken in the frame a computer shows, whatever the device.
+describe('the frame a home street is taken in (homeViewFrame, HOMESHOT)', () => {
+  const SW = 3000;
+  const iphone = phoneStage({ width: 393, height: 852 - 56, sceneWidth: SW, sceneHeight: STREET_WORLD_H });
+  const pinched = phoneStage({ width: 393, height: 852 - 56, sceneWidth: SW, sceneHeight: STREET_WORLD_H, closeup: 1 });
+  const desk = stageFor({ width: 1280, height: 800 - 56, sceneWidth: SW, sceneHeight: STREET_WORLD_H });
+
+  it('is a computer\'s view at the default zoom, the same on an upright phone, pinched or not', () => {
+    assert.ok(iphone.viewH > iphone.viewW, `the phone's own view is portrait (${iphone.viewW} x ${iphone.viewH})`);
+    assert.deepEqual(HOME_FRAME_WINDOW, { w: 1680, h: 852 });
+    const centre = 1500;
+    const at = (v) => homeViewFrame({ camX: centre - v.viewW / 2, camW: v.viewW, sw: SW, worldH: STREET_WORLD_H });
+    const want = { x: 660, y: STREET_WORLD_H - 720, w: 1680, h: 720 };
+    assert.deepEqual(at(iphone), want);
+    assert.deepEqual(at(pinched), want);
+    assert.deepEqual(at(desk), want);
+    assert.deepEqual(at({ viewW: 1156, viewH: 408 }), want, 'a phone held sideways');
+    assert.ok(want.w / want.h > 2, 'landscape');
+  });
+
+  it('stays inside the street, and a street narrower than the window magnifies as a computer\'s does', () => {
+    assert.equal(homeViewFrame({ camX: 0, camW: 560, sw: SW, worldH: STREET_WORLD_H }).x, 0);
+    assert.equal(homeViewFrame({ camX: SW - 560, camW: 560, sw: SW, worldH: STREET_WORLD_H }).x, SW - 1680);
+    const narrow = homeViewFrame({ camX: 0, camW: 560, sw: 1200, worldH: STREET_WORLD_H });
+    assert.deepEqual(narrow, { x: 0, y: STREET_WORLD_H - 476, w: 1200, h: 476 });
+    assert.ok(narrow.w / narrow.h > 2);
+    const short = homeViewFrame({ camX: 0, camW: 960, sw: SW, worldH: 500 });
+    assert.equal(short.y, 0, 'a scene shorter than the frame starts at its top');
+  });
+
+  // A fake engine over a tiny translation-only display tree, its camera moved as game.js moves it
+  // (engine.viewAt: world at -frame, homes-feature's land.update on the parallax layers and sky).
+  const fakeEngine = (viewW, viewH, camX) => {
+    class Sprite {}
+    class Point {
+      constructor(x = 0, y = 0) {
+        this.x = x;
+        this.y = y;
+      }
+    }
+    class Matrix {
+      constructor(tx = 0, ty = 0) {
+        this.tx = tx;
+        this.ty = ty;
+      }
+      clone() { return new Matrix(this.tx, this.ty); }
+      invert() { return new Matrix(-this.tx, -this.ty); }
+      prepend(m) { return new Matrix(this.tx + m.tx, this.ty + m.ty); }
+      apply(p, out = new Point()) {
+        out.x = p.x + this.tx;
+        out.y = p.y + this.ty;
+        return out;
+      }
+    }
+    const nodeOf = (n, children = []) => {
+      Object.assign(n, { alpha: 1, visible: true, children });
+      n.x ??= 0;
+      n.y ??= 0;
+      for (const c of children) c.parent = n;
+      n.getGlobalTransform = () => {
+        let x = 0;
+        let y = 0;
+        for (let p = n; p; p = p.parent) {
+          x += p.x;
+          y += p.y;
+        }
+        return new Matrix(x, y);
+      };
+      n.getLocalBounds = () => n.bounds || { x: 0, y: 0, width: 0, height: 0 };
+      return n;
+    };
+    const art = (url, x, y, w, h, extra = {}) => nodeOf(Object.assign(new Sprite(), { x, y, bounds: { x: 0, y: 0, width: w, height: h }, texture: { source: { label: url, width: w, height: h }, frame: null }, ...extra }));
+    const sky = nodeOf({ homeLayoutSky: [0xa6effa, 0xeafcfb], bounds: { x: 0, y: 0, width: 1, height: 1 } });
+    const hills = nodeOf({ parallaxF: 0.4 }, [art('assets/decos/groddle/hill_1.webp', 100, 500, 400, 200), art('assets/decos/groddle/hill_1.webp', 1300, 500, 400, 200)]);
+    const field = nodeOf({ homeLayoutFills: [[-50, 700, SW + 100, 210, 0x6f8f3a, 1]] });
+    const house = art('assets/homes/house_meadow.webp', 1300, 420, 420, 460, { homeLayout: { k: 'house', s: 'meadow' } });
+    const bush = art('assets/decos/groddle/bush_3.webp', 2200, 800, 120, 80);
+    const roof = art('assets/decos/groddle/cloud_1.webp', 1400, 40, 200, 80);
+    const bg = nodeOf({ worldH: STREET_WORLD_H }, [sky, hills, field, house, bush, roof]);
+    bg.updateParallax = (x, y, w, h, skyH = h) => {
+      sky.x = x;
+      sky.y = y;
+      sky.bounds = { x: 0, y: 0, width: w, height: skyH };
+      hills.x = x * (1 - hills.parallaxF);
+    };
+    const entities = nodeOf({});
+    const world = nodeOf({}, [bg, entities]);
+    const stage = nodeOf({}, [world]);
+    const camY = Math.max(0, Math.min(STREET_WORLD_H - viewH, 870 - 0.75 * viewH));
+    world.x = -camX;
+    world.y = -camY;
+    bg.updateParallax(camX, camY, viewW, viewH, viewH + 132);
+    const engine = {
+      PIXI: { Sprite, Point, Matrix },
+      stage,
+      entityLayer: entities,
+      streetView: bg,
+      worldW: SW,
+      interactables: [],
+      get camera() { return { x: -world.x, y: -world.y, w: viewW, h: viewH }; },
+      viewAt(frame, fn) {
+        const was = { x: world.x, y: world.y };
+        world.x = -frame.x;
+        world.y = -frame.y;
+        bg.updateParallax(frame.x, frame.y, frame.w, frame.h, frame.h + 132);
+        try {
+          return fn();
+        } finally {
+          world.x = was.x;
+          world.y = was.y;
+          bg.updateParallax(-world.x, -world.y, viewW, viewH, viewH + 132);
+        }
+      },
+    };
+    return { engine, world, sky };
+  };
+
+  it('a phone-sized capture sends exactly the layout a computer sends (collectHomeLayout)', () => {
+    const centre = 1500;
+    const phone = fakeEngine(iphone.viewW, iphone.viewH, centre - iphone.viewW / 2);
+    const close = fakeEngine(pinched.viewW, pinched.viewH, centre - pinched.viewW / 2);
+    const computer = fakeEngine(desk.viewW, desk.viewH, centre - desk.viewW / 2);
+    const fromPhone = collectHomeLayout(phone.engine, { street: true });
+    assert.deepEqual([fromPhone.w, fromPhone.h, fromPhone.sw, fromPhone.cx], [1680, 720, SW, 660]);
+    assert.deepEqual(collectHomeLayout(close.engine, { street: true }), fromPhone);
+    assert.deepEqual(collectHomeLayout(computer.engine, { street: true }), fromPhone);
+    assert.deepEqual(collectHomeLayout(phone.engine), collectHomeLayout(computer.engine), 'version 1 too');
+    // The sky fills the frame (and the pack's allowance under it), as on a computer.
+    assert.deepEqual(fromPhone.layers[0], { f: 0, draw: [{ sky: ['#a6effa', '#eafcfb'], x: 0, y: 0, w: 1680, h: 852 }] });
+    // The house's foot on the frame's ground; the cloud above a computer's view is left out.
+    const house = fromPhone.spots.find((sp) => sp.k === 'house');
+    assert.deepEqual(house.b, [1300, 420 - 252, 420, 460]);
+    assert.ok(!fromPhone.art.includes('assets/decos/groddle/cloud_1.webp'));
+    // The camera goes back where the player had it.
+    assert.deepEqual([phone.world.x, phone.world.y], [-(centre - iphone.viewW / 2), -Math.max(0, Math.min(STREET_WORLD_H - iphone.viewH, 870 - 0.75 * iphone.viewH))]);
+    assert.equal(phone.sky.bounds.width, iphone.viewW);
+  });
+
+  it('game.js moves the camera to the frame and back, and the picture uses the same frame', () => {
+    const game = read('public/game.js');
+    assert.match(game, /viewAt\(frame, fn\) \{\n\s*if \(!world \|\| !frame\) return fn\(\);/);
+    assert.match(game, /bgLayer\?\.updateParallax\?\.\(frame\.x, frame\.y, frame\.w, frame\.h, frame\.h \+ PACK_VIEW_RESERVE, parallaxSnap\(\)\);/);
+    assert.match(game, /bgLayer\?\.updateParallax\?\.\(-world\.x, -world\.y, VIEW_W, LOCATION_VIEW_H, VIEW_H, parallaxSnap\(\)\);\n\s*bgLayer\?\.cullDecos\?\.\(-world\.x, -world\.y, VIEW_W, VIEW_H\);\n\s*\}\n\s*\},/);
+    assert.match(game, /return frame \? engine\.viewAt\(frame, \(\) => shot\(frame\.w, frame\.h\)\) : shot\(VIEW_W, LOCATION_VIEW_H\);/);
+    const profiles = read('public/js/features/profiles-feature.js');
+    assert.match(profiles, /const frame = homeFrameFor\(engine\);\n\s*const view = engine\.snapshotView\?\.\(\{ resolution: HOME_RESOLUTION, \.\.\.\(frame \? \{ frame \} : \{\}\) \}\);/);
+  });
+});
+
 describe('the game sends it (features/profiles-feature.js and the tags)', () => {
   const src = read('public/js/features/profiles-feature.js');
   it('sends the layout at the picture\'s settled moment, only to a site that takes layouts, in multiplayer only', () => {
@@ -364,6 +517,35 @@ describe('the site side (groddle-afternoon-site src/HomeLayout.php)', { skip: sk
     assert.doesNotMatch(out.dispatcherHtml, /Mail Dispatcher/);
     assert.equal((out.dispatcherHtml.match(/fake_left/g) || []).length, 1, 'only the loose frame is drawn, not the dispatcher spot\'s');
     assert.match(site('style.css'), /@media \(min-resolution: 1\.5dppx\), \(-webkit-min-device-pixel-ratio: 1\.5\) \{\n\s*\.home-diorama \.hd-stage \.hd-lo \{ display: none; \}\n\s*\.home-diorama \.hd-stage \.hd-hi \{ display: block; \}/);
+  });
+
+  // HOMESHOT (Austin 2026-11-12): a layout sent from an upright phone before the game took every
+  // layout in homeViewFrame draws in the landscape frame, not as a tall slice.
+  it('draws a tall layout (an upright phone\'s) in the landscape frame, foot kept, centred where it was (php)', { skip: !existsSync(join(engine, 'src/Minn/Autoloader.php')) && 'Minn Engine not found (set MINN_ENGINE_DIR)' }, () => {
+    let out;
+    try {
+      out = JSON.parse(execFileSync('php', [join(root, 'tests/fixtures/profiles/home-layout.php'), engine, SITE_DIR], { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 }));
+    } catch (err) {
+      if (err.code === 'ENOENT') return;
+      throw err;
+    }
+    if (out.gd === 'no') return;
+    assert.deepEqual([Number(constant('FRAME_W')), Number(constant('FRAME_H'))], [HOME_FRAME_WINDOW.w, HOME_FRAME_WINDOW.h - 132], 'the game\'s frame on a home street');
+    assert.deepEqual(homeViewFrame({ camX: 0, camW: 560, sw: 2670, worldH: 972 }), { x: 0, y: 252, w: 1680, h: 720 });
+    const t = out.tallFramed;
+    assert.deepEqual([t.w, t.h, t.sw, t.cx], [1680, 720, 2670, 640], 'centred where the phone\'s view was: 1200 + 280 - 840');
+    assert.deepEqual(t.layers[0].draw[0], { x: 0, y: 0, w: 1680, h: 852, sky: ['#a6effa', '#eafcfb'] }, 'the sky fills the frame and the allowance under it');
+    assert.equal(t.layers[1].draw[0].y, 200 - 252, 'everything moves up by what was cut off the top');
+    assert.deepEqual(t.spots[1].b, [670, 150 - 252, 70, 197]);
+    assert.match(out.tallHtml, /data-w="1680" data-sw="2670" data-cx="640" style="aspect-ratio:1680 \/ 720;--w:1680;--cam:640"/);
+    assert.equal(out.wideUnchanged, true, 'a landscape layout is drawn as it came');
+    const v1 = out.tallV1;
+    assert.deepEqual([v1.w, v1.h], [560, 240], 'version 1 has only its view: cut to the shape');
+    assert.deepEqual(v1.draw[1], { col: '#5c3b25', x: 0, y: 870 - 732, w: 560, h: 102 });
+    assert.deepEqual(v1.spots[0].b, [100, 720 - 732, 92, 150]);
+    // The picture: a tall one is cut to the same shape, its foot kept.
+    assert.match(site('src/PlayerPages.php'), /if \(\$w < \$h \* HomeLayout::MIN_ASPECT\) \{\n\s*\$attrs \.= ' class="profile-home-tall"';/);
+    assert.match(site('style.css'), /\.profile-home img\.profile-home-tall \{ aspect-ratio: 1680 \/ 720; object-fit: cover; object-position: 50% 100%; \}/);
   });
 
   it('every other sprite with a 3x render ships it beside the 1x file, where the site looks (HomeLayout::artFile)', () => {

@@ -20,7 +20,7 @@ import {
   aboutCounter, aboutLength, avatarKeyOf, base64Bytes, cleanAbout, homeKeyOf, homeSizes, imageBase64, pngBase64, profileSlug, shortHash, shouldUpload, stillTransform,
 } from '../public/js/profiles.js?v=054ca723';
 import { createMinnAccount } from '../public/js/minn-account.js?v=c15f0ecf';
-import { FEATURES } from '../public/js/features/index.js?v=d9b28ed9';
+import { FEATURES } from '../public/js/features/index.js?v=abf1f974';
 import { SITE_DIR, skipWithoutSite } from '../tools/repos.mjs';
 import { loadContentCatalogsFromDir, getSkillCatalog } from '../public/js/content-catalogs.js?v=10b118dd';
 import { skillTitle } from '../public/js/skill-tree.js?v=faa54b90';
@@ -183,7 +183,7 @@ describe('the profiles feature', () => {
     f.onTick(16, 0, engine);
     assert.equal(f.accountProfile({}, engine), null);
     // Only the QA hook (&homelayoutdemo=1, reads the stage, sends nothing) comes before the multiplayer gate.
-    assert.match(src, /init\(engine\) \{\n\s*\/\/ QA[^\n]*\n\s*if \(engine\.param\?\.\('homelayoutdemo'\)[^\n]*\n\s*if \(engine\.mode !== 'multiplayer'/);
+    assert.match(src, /init\(engine\) \{\n\s*\/\/ QA[^\n]*\n\s*\/\/ [^\n]*\n\s*if \(engine\.param\?\.\('homelayoutdemo'\)[^\n]*\{\n[\s\S]*?\n    \}\n\s*if \(engine\.mode !== 'multiplayer'/);
     assert.match(src, /onTick\(dtMs, now, engine\) \{\n\s*if \(!state \|\| engine\.mode !== 'multiplayer'/);
   });
 
@@ -196,10 +196,10 @@ describe('the profiles feature', () => {
     assert.match(src, /from '\.\.\/avatar-compositor\.js\?v=[0-9a-f]{8}'/, 'the same module instance game.js uses');
     assert.match(src, /s\.account\.uploadAvatar\(pictures\)/);
     assert.match(src, /s\.account\.uploadHome\(\{ key, home \}\)/);
-    assert.match(src, /engine\.snapshotView\?\.\(\{ resolution: HOME_RESOLUTION \}\)/);
-    assert.match(read('public/game.js'), /snapshotView\(\{ resolution = 1 \} = \{\}\) \{\n\s*if \(!app\?\.renderer \|\| !app\.stage\) return null;/);
+    assert.match(src, /engine\.snapshotView\?\.\(\{ resolution: HOME_RESOLUTION, \.\.\.\(frame \? \{ frame \} : \{\}\) \}\)/);
+    assert.match(read('public/game.js'), /snapshotView\(\{ resolution = 1, frame = null \} = \{\}\) \{\n\s*if \(!app\?\.renderer \|\| !app\.stage\) return null;/);
     // The Pixi stage only: the HUD (top bar, pack, chat) is DOM, never in the picture.
-    assert.match(read('public/game.js'), /app\.renderer\.extract\.canvas\(\{ target: app\.stage, frame: new PIXI\.Rectangle\(0, 0, VIEW_W, LOCATION_VIEW_H\), resolution \}\)/);
+    assert.match(read('public/game.js'), /app\.renderer\.extract\.canvas\(\{ target: app\.stage, frame: new PIXI\.Rectangle\(0, 0, w, h\), resolution \}\)/);
   });
 
   it('writes WebP, and JPEG where the canvas cannot (Safari hands back a PNG for WebP)', () => {

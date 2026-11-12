@@ -13,15 +13,16 @@
  *   game's own compositor (js/avatar-compositor.js), at 2x, whenever the
  *   look differs from the one the site holds, while the character saves to
  *   the site (not after a save conflict or a sign-out).
- * - The home street, as the player sees it: the view drawn by the renderer
- *   (engine.snapshotView, the Pixi stage only, so none of the HUD) at 2x
+ * - The home street, as a computer shows it: the frame drawn by the renderer
+ *   (engine.snapshotView, the Pixi stage only, so none of the HUD; HOMESHOT:
+ *   js/home-layout.js homeViewFrame, the same on a phone held upright) at 2x
  *   after a few settled seconds on their own home street, when the site has
  *   none or the home's key moved on (its style, or six hours: decorating
  *   shows the next visit). Up to 1920 wide as WebP, or JPEG where the
  *   browser cannot write WebP (profiles.js HOME_*). The website's profile
  *   header was a panorama of the home street (homes/.../header-*.jpg).
  * - The home street as a layout (js/home-layout.js, js/home-layout-scene.js):
- *   the same settled moment, what is drawn in the view read off the stage
+ *   the same settled moment, what is drawn in that frame read off the stage
  *   (each image's art and box, the sky and field, the things on it), sent
  *   to profile/home-layout so the page draws a diorama from the game's own
  *   art. Sent when the site has none, or the layout's key moved on (the
@@ -29,9 +30,10 @@
  *   and only to a site that answers with a homeLayout field, so the game
  *   can go live before the site. A site whose answer lists 2 in
  *   homeLayoutVersions gets version 2: the whole street in parallax layers,
- *   starting at this view, which the page pans along like Camera Mode
+ *   starting at that frame, which the page pans along like Camera Mode
  *   (groddle-afternoon-site players/home-pan.js); else version 1, the view.
- *   QA in solo: &homelayoutdemo=1 gives window.groddleHomeLayout() (the
+ *   QA in solo: &homelayoutdemo=1 gives window.groddleHomeShot() (the
+ *   picture's frame as a canvas) and window.groddleHomeLayout() (the
  *   whole street now; ({ street: false }) for the view).
  * - The description: Menu > Account gets "Your profile" (a text box with a
  *   character count, Save, and "See your profile"), through the
@@ -70,8 +72,8 @@ import {
   PICTURE_RESOLUTION, PROFILE_COPY, PROFILE_PAGE_VERB,
   aboutCounter, profilePagePath, profilePageVerb, avatarKeyOf, base64Bytes, homeKeyOf, homeSizes, imageBase64, pngBase64, shouldUpload, stillTransform,
 } from '../profiles.js?v=054ca723';
-import { homeLayoutJson, homeLayoutKeyOf, HOME_LAYOUT_LIMITS } from '../home-layout.js?v=c3e852f2';
-import { collectHomeLayout } from '../home-layout-scene.js?v=c567ee6c';
+import { homeLayoutJson, homeLayoutKeyOf, HOME_LAYOUT_LIMITS } from '../home-layout.js?v=304971c0';
+import { collectHomeLayout, homeFrameFor } from '../home-layout-scene.js?v=153ee4f5';
 
 export const PROFILES_FEATURE_ID = 'profiles';
 
@@ -296,12 +298,14 @@ async function encodeCanvas(canvas, type) {
 }
 
 /**
- * The home street as the player sees it: the view at 2x, the widest size
- * that fits the site's limit, as WebP (JPEG where the browser cannot write
- * WebP). { b64, type, w, h, bytes } or null.
+ * The home street as a computer shows it: the layout's frame (HOMESHOT,
+ * home-layout-scene homeFrameFor; an upright phone's view was a tall slice)
+ * at 2x, the widest size that fits the site's limit, as WebP (JPEG where the
+ * browser cannot write WebP). { b64, type, w, h, bytes } or null.
  */
 async function drawHome(engine) {
-  const view = engine.snapshotView?.({ resolution: HOME_RESOLUTION });
+  const frame = homeFrameFor(engine);
+  const view = engine.snapshotView?.({ resolution: HOME_RESOLUTION, ...(frame ? { frame } : {}) });
   if (!view?.width || !view?.height) return null;
   try {
     for (const { w, h } of homeSizes(view.width, view.height)) {
@@ -501,8 +505,15 @@ export const profilesFeature = {
   id: PROFILES_FEATURE_ID,
 
   init(engine) {
-    // QA (solo too): &homelayoutdemo=1 reads the home street's layout off the stage; nothing is sent.
-    if (engine.param?.('homelayoutdemo') && typeof window !== 'undefined') window.groddleHomeLayout = (opts = { street: true }) => collectHomeLayout(engine, opts);
+    // QA (solo too): &homelayoutdemo=1 reads the home street's layout off the stage, and
+    // groddleHomeShot() draws the home picture's frame (HOMESHOT) to a canvas; nothing is sent.
+    if (engine.param?.('homelayoutdemo') && typeof window !== 'undefined') {
+      window.groddleHomeLayout = (opts = { street: true }) => collectHomeLayout(engine, opts);
+      window.groddleHomeShot = () => {
+        const frame = homeFrameFor(engine);
+        return { frame, canvas: engine.snapshotView?.({ resolution: 1, ...(frame ? { frame } : {}) }) || null };
+      };
+    }
     if (engine.mode !== 'multiplayer' || typeof document === 'undefined' || globalThis.groddlePractice === true) return;
     state = create(engine);
   },

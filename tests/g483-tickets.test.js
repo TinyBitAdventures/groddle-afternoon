@@ -364,7 +364,8 @@ describe('a picture of the game with a report (Austin 2026-10-30)', () => {
     // With the game's UI ticked (the default), the page too (tests/report-ui-picture.test.js).
     assert.match(f, /capture: \(\{ ui = false, world = null \} = \{\}\) => \(ui \? capturePictureWithUi\(engine, document, REPORT_PICTURE, world\?\.frame\) : capturePicture\(engine\)\),/);
     // snapshotView (profiles, snaps) is the stage inside the location view (the pack strip below it left out).
-    assert.match(read('public/game.js'), /snapshotView\(\{ resolution = 1 \} = \{\}\) \{[\s\S]*?app\.renderer\.extract\.canvas\(\{ target: app\.stage, frame: new PIXI\.Rectangle\(0, 0, VIEW_W, LOCATION_VIEW_H\), resolution \}\)/);
+    // HOMESHOT: with a frame (the home street's, js/home-layout.js homeViewFrame), that frame instead.
+    assert.match(read('public/game.js'), /snapshotView\(\{ resolution = 1, frame = null \} = \{\}\) \{[\s\S]*?const shot = \(w, h\) => app\.renderer\.extract\.canvas\(\{ target: app\.stage, frame: new PIXI\.Rectangle\(0, 0, w, h\), resolution \}\);\n\s*return frame \? engine\.viewAt\(frame, \(\) => shot\(frame\.w, frame\.h\)\) : shot\(VIEW_W, LOCATION_VIEW_H\);/);
   });
 
   function pictureApi({ refusePicture = false } = {}) {

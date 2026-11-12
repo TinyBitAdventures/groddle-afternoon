@@ -20,7 +20,7 @@ import { GATE_COPY, JUJU_BOSS_GATES, SAVE_ALERT_COPY, bootDataFrom, deliverHando
 import { SAVE_STOPPED } from '../public/js/save-store.js?v=89422a9c';
 import { FORM_COPY, SETTINGS_COPY, resetLinkFrom } from '../public/js/account-forms.js?v=559c1263';
 import { restoreNeedsAsking, sizeLabel, slotForNewBackup, accountBackupFeature } from '../public/js/features/account-backup-feature.js?v=246b4b86';
-import { FEATURES } from '../public/js/features/index.js?v=d9b28ed9';
+import { FEATURES } from '../public/js/features/index.js?v=abf1f974';
 import { multiplayerEntryUrl } from '../public/js/game-mode.js?v=1ecf2899';
 import { SAVE_ENTRY_NAMES, createMultiplayerSaveStore } from '../public/js/save-store.js?v=89422a9c';
 import { HAS_SITE, SITE_DIR, serverPath, skipWithoutServer, skipWithoutSite } from '../tools/repos.mjs';

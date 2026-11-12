@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=968c90a7';
 import { createErrorOnce, createFeatureHost } from './js/feature-host.js?v=06bb8b74';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=d9b28ed9';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=abf1f974';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl, drawTileArt } from './js/enter-chooser.js?v=4a3ea327';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -12611,16 +12611,41 @@ const engine = {
    * The view as the player sees it (the stage inside the location's view),
    * drawn to a new canvas: the home picture on a multiplayer profile
    * (features/profiles-feature.js, G338). Null before the renderer starts.
+   * HOMESHOT: with `frame` ({ x, y, w, h } in world px, viewAt), that frame instead of the view.
    */
-  snapshotView({ resolution = 1 } = {}) {
+  snapshotView({ resolution = 1, frame = null } = {}) {
     if (!app?.renderer || !app.stage) return null;
     // The "Enter: choose" prompt is a hint to the player, not part of the street.
     const hint = prompt?.visible;
     if (prompt) prompt.visible = false;
     try {
-      return app.renderer.extract.canvas({ target: app.stage, frame: new PIXI.Rectangle(0, 0, VIEW_W, LOCATION_VIEW_H), resolution });
+      const shot = (w, h) => app.renderer.extract.canvas({ target: app.stage, frame: new PIXI.Rectangle(0, 0, w, h), resolution });
+      return frame ? engine.viewAt(frame, () => shot(frame.w, frame.h)) : shot(VIEW_W, LOCATION_VIEW_H);
     } finally {
       if (prompt) prompt.visible = hint;
+    }
+  },
+  /**
+   * HOMESHOT (Austin 2026-11-12, an iPhone held upright sent its profile a tall, narrow slice of
+   * the home street): `fn()` with the camera on a world frame { x, y, w, h }, the parallax layers
+   * and sky set for it as a view that size would set them, then the camera put back. Nothing is
+   * drawn to the screen between, so the player never sees it move. The home street's layout and
+   * picture are taken in the frame a computer shows (js/home-layout.js homeViewFrame).
+   */
+  viewAt(frame, fn) {
+    if (!world || !frame) return fn();
+    const was = { x: world.x, y: world.y };
+    world.x = -frame.x;
+    world.y = -frame.y;
+    bgLayer?.updateParallax?.(frame.x, frame.y, frame.w, frame.h, frame.h + PACK_VIEW_RESERVE, parallaxSnap());
+    bgLayer?.cullDecos?.(frame.x, frame.y, frame.w, frame.h + PACK_VIEW_RESERVE);
+    try {
+      return fn();
+    } finally {
+      world.x = was.x;
+      world.y = was.y;
+      bgLayer?.updateParallax?.(-world.x, -world.y, VIEW_W, LOCATION_VIEW_H, VIEW_H, parallaxSnap());
+      bgLayer?.cullDecos?.(-world.x, -world.y, VIEW_W, VIEW_H);
     }
   },
   /**

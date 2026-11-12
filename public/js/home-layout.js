@@ -16,7 +16,7 @@
  * Manifest, version 1 (the site validates every field again and keeps only
  * its normalized copy; numbers are view px, the picture's crop at 1x):
  *
- *   { v: 1, w, h,                        the stage: the location view (VIEW_W x LOCATION_VIEW_H)
+ *   { v: 1, w, h,                        the stage: homeViewFrame (a computer's view, any device)
  *     art: [path, ...],                  1x asset paths under assets/ (the site adds a @3x/@1.5x twin)
  *     draw: [entry, ...],                painter's order, back to front, one of:
  *       { sky: [#rgb, ...], x, y, w, h }              the sky gradient, top to bottom
@@ -43,6 +43,7 @@ import { CULTIVATION_CLASSES } from './homes-catalog.js?v=10ac34b6';
 import { TOWER_CHASSIS, TOWER_PROTO } from './home-tower.js?v=087df38f';
 import { GROWN_TREE_LABELS } from './patches.js?v=d63423c9';
 import { shortHash } from './profiles.js?v=054ca723';
+import { MIN_PACK_HEIGHT, VIEW_CEIL_H, VIEW_MAX_W, stageFor } from './location-view.js?v=9747e89a';
 
 export const HOME_LAYOUT_VERSION = 1;
 
@@ -100,6 +101,32 @@ export const HOME_LAYOUT_ART_ROOTS = Object.freeze(['assets/decos/', 'assets/spr
  * holds the same table (src/HomeLayout.php TEXTS) and writes the words itself.
  */
 export const HOME_LAYOUT_TEXTS = Object.freeze({ way_out: 'Back to Ur' });
+
+/**
+ * HOMESHOT (Austin 2026-11-12: after a visit on an iPhone held upright, the profile drew a tall,
+ * narrow slice of the home street): the window a computer at the default zoom (Wide) shows the
+ * street through, VIEW_MAX_W x VIEW_CEIL_H, the largest view drawn 1:1 (js/location-view.js).
+ */
+export const HOME_FRAME_WINDOW = Object.freeze({ w: VIEW_MAX_W, h: VIEW_CEIL_H + MIN_PACK_HEIGHT });
+
+/**
+ * PURE (HOMESHOT): the frame the home street's layout and picture are taken in, { x, y, w, h } in
+ * world px: the view stageFor gives HOME_FRAME_WINDOW on this scene (1680 x 720 on a home street;
+ * a street narrower than that magnifies as a computer's does), whatever this device's window,
+ * orientation, zoom or density. Centred where the player's view is centred (camX + camW / 2), held
+ * inside the street, its foot on the scene's foot (the field and soil, where a computer's camera
+ * rests while the avatar stands on the street).
+ */
+export function homeViewFrame({ camX = 0, camW = 0, sw, worldH, sceneHeight = worldH } = {}) {
+  const view = stageFor({ width: HOME_FRAME_WINDOW.w, height: HOME_FRAME_WINDOW.h, sceneWidth: sw, sceneHeight, zoom: 0 });
+  const street = Number(sw) > 0 ? Math.round(Number(sw)) : view.viewW;
+  const w = Math.max(1, Math.min(view.viewW, street));
+  const h = view.viewH;
+  const centre = (Number(camX) || 0) + (Number(camW) || 0) / 2;
+  const x = Math.max(0, Math.min(street - w, Math.round(centre - w / 2)));
+  const y = Number(worldH) > h ? Math.round(Number(worldH) - h) : 0;
+  return { x, y, w, h };
+}
 
 /** New art (gz_ decos, made animals) is not Tiny Speck's: it never goes on a profile. */
 const NOT_TINY_SPECK = /(^|\/)gz_|^assets\/sprites\/made\//;
