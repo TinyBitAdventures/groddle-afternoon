@@ -20,10 +20,10 @@
  * focus goes back where it was. Its modern look is the <style> below; Classic
  * restyles it in public/css/classic.css.
  */
-import { CLASSIC, MODERN, onUiModeChange, setUiMode, setUiSize, uiState } from './ui-mode.js?v=f1f33f66';
-import { CLASSIC_MIN_W, CLASSIC_MIN_H } from './classic-layout.js?v=9be132b9';
-import { installClassicChrome } from './classic-chrome.js?v=56cbaa56';
-import { ZOOM_KEYS_HINT, clampZoom, onZoomChange, setWorldZoom, worldZoom, zoomLabel, zoomValueText } from '../world-zoom.js?v=1d0c0cfb';
+import { CLASSIC, MODERN, onUiModeChange, setUiMode, setUiSize, uiState } from './ui-mode.js?v=1db965c7';
+import { CLASSIC_MIN_W, CLASSIC_MIN_H } from './classic-layout.js?v=0633a2a6';
+import { installClassicChrome } from './classic-chrome.js?v=f31dae18';
+import { ZOOM_KEYS_HINT, clampZoom, onZoomChange, setWorldZoom, worldZoom, zoomLabel, zoomValueText } from '../world-zoom.js?v=34c2cf14';
 import { NIGHT_TINT_HINT, NIGHT_TINT_LABEL, nightTintOn, onNightTintChange, setNightTint } from '../night-tint.js?v=1dfc9c89';
 import { STREET_MAP_HINT, STREET_MAP_LABEL, onStreetMapChange, setStreetMap, streetMapOn } from '../ui/street-minimap.js?v=6c530941';
 import { focusBack } from '../ui/focus-return.js?v=da190597';

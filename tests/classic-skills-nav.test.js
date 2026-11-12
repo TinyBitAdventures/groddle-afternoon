@@ -19,7 +19,7 @@ import {
   unlearnCancelPrompt,
   skillsEscStep,
   skillIconUrl,
-} from '../public/js/classic/classic-skills.js?v=37dae8e4';
+} from '../public/js/classic/classic-skills.js?v=507b3988';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const read = (p) => readFileSync(join(root, p), 'utf8');

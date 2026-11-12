@@ -2752,9 +2752,14 @@
   "deployed": "2026-11-12"
  },
  "git": {
-  "commits": 1786,
+  "commits": 1788,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-12",
+    "kind": "new",
+    "text": "A phone pinches the street to zoom; the pack row scrolls, signpost arms take a finger, the street name shows"
+   },
    {
     "date": "2026-11-12",
     "kind": "fix",
@@ -2869,14 +2874,9 @@
     "date": "2026-11-12",
     "kind": "fix",
     "text": "Quest rooms draw their decos from the sharp copies on Retina screens"
-   },
-   {
-    "date": "2026-11-12",
-    "kind": "fix",
-    "text": "Homes, the meditation orb and quest-room animations see the real render density"
    }
   ]
  },
- "tests": 893,
+ "tests": 894,
  "generatedAt": "2026-11-12"
 }
