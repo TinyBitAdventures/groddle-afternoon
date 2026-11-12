@@ -12,7 +12,7 @@ import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { bagLeavesLast, giveBag, layoutPack, takeBag, unitPlaces } from '../public/js/pack-slots.js?v=6b8393a1';
+import { bagLeavesLast, giveBag, layoutPack, takeBag, unitPlaces } from '../public/js/pack-slots.js?v=4a36968a';
 import {
   createDroppedItemState,
   dropInventoryStack,
@@ -20,7 +20,7 @@ import {
   placeDroppedBag,
   serializeDroppedItemState,
   takeDroppedRecord,
-} from '../public/js/world-items.js?v=c308d8f4';
+} from '../public/js/world-items.js?v=792e1606';
 import { bindToolInventory, createToolConditionState, pickToolCopies, placeToolCopies, toolCopies } from '../public/js/tools.js?v=5f482998';
 
 const root = join(import.meta.dirname, '..');
@@ -163,8 +163,9 @@ describe('game.js and the bags feature', () => {
   });
 
   it('picking it up asks for room for the bag with its contents', () => {
-    // A named bag, empty or not, comes back up whole too (it keeps its name: tests/bag-rename.test.js).
-    assert.match(game, /if \(target\?\.state\?\.contents\?\.length \|\| target\?\.state\?\.name\) return pickupDroppedBag\(target\);/);
+    // A named or sorted bag, empty or not, comes back up whole too (it keeps its name and sort:
+    // tests/bag-rename.test.js, tests/bag-names-travel.test.js).
+    assert.match(game, /if \(target\?\.state\?\.contents\?\.length \|\| target\?\.state\?\.name \|\| target\?\.state\?\.sort\) return pickupDroppedBag\(target\);/);
     assert.match(bags, /packBagRoom\(cls, contents, engine\)/);
   });
 });

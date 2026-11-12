@@ -27,7 +27,7 @@ import { WORD_FILTER } from '../public/js/word-filter-list.js?v=20da9845';
 import { VECTORS, wordFilterOutputs } from '../tools/build-word-filter.mjs';
 import { HAS_SERVER, HAS_SITE, SITE_DIR, serverPath, sitePath } from '../tools/repos.mjs';
 import { bagLabel } from '../public/js/bag-names.js?v=22391c55';
-import { BAG_DEFS, PACK_CAPACITY, layoutPack, normalizePrefs, renameBag } from '../public/js/pack-slots.js?v=6b8393a1';
+import { BAG_DEFS, PACK_CAPACITY, layoutPack, normalizePrefs, ownBagLabel, renameBag } from '../public/js/pack-slots.js?v=4a36968a';
 import { ITEM_CATALOG, isToolItem } from '../public/js/inventory.js?v=5be47371';
 import { nameAnimal, namedAnimalLabel } from '../public/js/animal-husbandry.js?v=aa65a582';
 import { kittyLabel, nameKitty } from '../public/js/heli-kitties.js?v=8fbe314a';
@@ -232,7 +232,9 @@ describe('the game filters what players name and write', () => {
     assert.equal(named.bags[key].name, 'shit stash');
     assert.equal(named.bags[key].label, '#!@$ stash');
     const game = read('public/game.js');
-    assert.match(game, /label: filterText\(stack\.name\)/, 'a dropped bag on the street');
+    // ownBagLabel (js/pack-slots.js) shows the name through bagLabel, so the filter holds on the street.
+    assert.match(game, /ownBagLabel\(stack\.classTsid, stack, ''\)/, 'a dropped bag on the street');
+    assert.equal(ownBagLabel('bag_bigger', { name: 'shit stash' }, 'Bigger Bag'), '#!@$ stash');
     const feat = read('public/js/features/bags-feature.js');
     assert.match(feat, /const shown = bagLabel\(current, ''\);[\s\S]*value: shown,[\s\S]*onSubmit: \(typed\) => onName\(shown && typed === shown \? current : typed\)/);
   });

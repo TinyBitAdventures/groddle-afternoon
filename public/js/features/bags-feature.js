@@ -103,6 +103,7 @@ import {
   arrangeIntoBags,
   BAG_SORTS,
   BAG_SORT_COPY,
+  bagKeep,
   bagLeavesLast,
   bagSort,
   canMagicSort,
@@ -123,7 +124,7 @@ import {
   unitOrder,
   unitPlaces,
   unitRankAt,
-} from '../pack-slots.js?v=6b8393a1';
+} from '../pack-slots.js?v=4a36968a';
 import { TOOL_CONDITION_CATALOG, moveToolCopy, pickToolCopies, placeToolCopies } from '../tools.js?v=5f482998';
 import { createMinnAccount } from '../minn-account.js?v=c15f0ecf';
 import { BAG_NAME_MAX, BAG_RENAME_COPY, bagLabel, canRenameBag, cleanBagName, renamedTo } from '../bag-names.js?v=22391c55';
@@ -833,9 +834,10 @@ export const bagsFeature = {
   /**
    * A drop of a bag with things in it (game.js dropPackBag): the bag the player chose
    * leaves the pack with all it holds, as in the source (pack-slots.js takeBag).
-   * Returns { ok, cls, contents: [{ cls, count, points?, tags? }], name? }; the inventory and the
-   * arrangement have changed (tools' wear goes with them in `points`, the bag's name in `name`).
-   * An empty bag goes this way too when it has a name, so the name goes down with it.
+   * Returns { ok, cls, contents: [{ cls, count, points?, tags? }], name?, sort?, sortNamed? }; the
+   * inventory and the arrangement have changed (tools' wear goes with them in `points`, the bag's
+   * name in `name`, its specialization in `sort`). An empty bag goes this way too when it has a
+   * name or a sort, so they go down with it.
    */
   packTakeBag(key, engine) {
     if (!engine?.inv) return { ok: false, reason: 'missing' };
@@ -875,7 +877,7 @@ export const bagsFeature = {
     takes = [];
     if (slice.open === String(key)) slice.open = '';
     engine.setData?.('packLast', `bag_out:${res.cls}:${contents.length}`);
-    return { ok: true, cls: res.cls, contents, ...(res.name ? { name: res.name } : {}) };
+    return { ok: true, cls: res.cls, contents, ...(res.name ? { name: res.name } : {}), ...bagKeep(res.cls, res) };
   },
 
   /** An empty bag's drop (shared or not) takes the bag the player chose (pack-slots.js bagLeavesLast). */
@@ -906,14 +908,15 @@ export const bagsFeature = {
 
   /**
    * A pick up of a bag with things in it (or with a name): the bag comes back with them inside
-   * (pack-slots.js giveBag), its tools keep their wear and it keeps its name. Returns { ok, key } or
+   * (pack-slots.js giveBag), its tools keep their wear and it keeps its name and sort (`keep`:
+   * { sort, sortNamed } as packTakeBag gave them). Returns { ok, key } or
    * { ok: false, reason: 'full' }; on ok the inventory holds the bag and its contents.
    */
-  packGiveBag(cls, contents, engine, name = '') {
+  packGiveBag(cls, contents, engine, name = '', keep = {}) {
     if (!engine?.inv) return { ok: false, reason: 'missing' };
     const o = opts();
     const list = (contents || []).map((c) => ({ cls: c.classTsid || c.cls, count: c.count, points: c.points, tags: c.tags }));
-    const res = giveBag(engine.inv, slice.prefs, String(cls || ''), list, o, cleanBagName(name));
+    const res = giveBag(engine.inv, slice.prefs, String(cls || ''), list, o, cleanBagName(name), keep || {});
     if (!res.ok) return res;
     addItem(engine.inv, String(cls), 1);
     for (const c of list) addItem(engine.inv, c.cls, c.count);

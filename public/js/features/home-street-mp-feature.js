@@ -43,8 +43,8 @@
 import { announceCharacterChanged, characterHeaders, characterOf, isCharacterChanged } from '../character-guard.js?v=510034a7';
 import { ITEM_CATALOG, addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=5be47371';
 import { RECIPE_CATALOG, isRecipeCatalogReady, setRecipeCatalog } from '../making.js?v=2cd473f3';
-import { furnitureDef, furnitureScale, furnitureSize } from '../home-decor.js?v=b48dbc95';
-import { isStorageClass, storageHasContents } from '../home-storage.js?v=121f1897';
+import { furnitureDef, furnitureScale, furnitureSize } from '../home-decor.js?v=bbf43c44';
+import { isStorageClass, storageHasContents } from '../home-storage.js?v=b0225465';
 import { pieceLabel } from '../furniture-upgrades.js?v=a3788c0d';
 import { cultivationDef, homeStreetLayout } from '../home-cultivation.js?v=f1242621';
 import { signpostX as fixtureSignpostX } from '../home-street-fixtures.js?v=bad831a1';

@@ -39,8 +39,8 @@ import {
   setSdbPrice,
   storageHasContents,
   storagePickupLock,
-} from '../public/js/home-storage.js?v=121f1897';
-import { createHomeDecorState, normalizeHomeDecorState, pickUpFurniture } from '../public/js/home-decor.js?v=b48dbc95';
+} from '../public/js/home-storage.js?v=b0225465';
+import { createHomeDecorState, normalizeHomeDecorState, pickUpFurniture } from '../public/js/home-decor.js?v=bbf43c44';
 import { takeFromHouse } from '../public/js/ledger-house.js?v=b34f5c89';
 import { SITE_DIR, skipWithoutSite } from '../tools/repos.mjs';
 
@@ -352,7 +352,7 @@ describe('#108: a bag goes into a cabinet whole and comes back whole (CabinetDia
     const feature = readFileSync(join(import.meta.dirname, '../public/js/features/home-storage-feature.js'), 'utf8');
     assert.match(feature, /put: \(\{ cls, count, copy, slot, bag \}\) => cabinetPutFromPack\(engine, cls, count, \{ slot, copy, bag \}\)/);
     assert.match(feature, /const res = engine\.query\?\.\('packTakeBag', bag\.key, engine\);/);
-    assert.match(feature, /const res = engine\.query\('packGiveBag', cls, contents, engine, out\.name \|\| ''\);/);
+    assert.match(feature, /const res = engine\.query\('packGiveBag', cls, contents, engine, out\.name \|\| '', \{ sort: out\.sort, sortNamed: out\.sortNamed \}\);/);
     // An empty bag: the one chosen leaves, not another of its class.
     assert.match(feature, /if \(held\) engine\.query\?\.\('packBagLeaves', held\.key\);/);
     // A key-holder moves only empty bags.

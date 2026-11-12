@@ -66,7 +66,8 @@
  *    its bags fill up the first ones in slot order (stackUp; apiInventoryStackUp
  *    was also Java: "Finds all partial stacks in all your bags and cleans them up").
  *  A sort is kept on the bag's row, so it saves with the player; a bag that is
- *  dropped and picked up comes back unsorted (only its player-given name goes with it).
+ *  dropped or put in a cabinet takes its sort and its name with it (bagKeep), as the
+ *  source's bag itemstack did, and comes back with both.
  *
  * prefs = { bags: [{ key, cls, name?, sort?, sortNamed? }], place: { pack: [entry], <bagKey>: [cls] }, n: { pack: [count], <bagKey>: [count] } }
  *   pack entries are a class (one stack) or '@<bagKey>' (a bag in that slot);
@@ -169,6 +170,29 @@ export function sortTakes(sortId, cls, opts = {}) {
 /** The words a sorted bag is called when the sort gave its name. */
 export function sortName(sortId) {
   return bagSort(sortId)?.name || '';
+}
+
+/**
+ * A bag's specialization as it travels out of the pack and back (a drop, a cabinet): the sort and
+ * whether the sort gave the name (bag.js doSpecialize 796-799 sets user_name only then). In the
+ * source both are on the bag itemstack, so they go wherever the bag goes. Returns {} for none.
+ */
+export function bagKeep(cls, raw = {}) {
+  if (!canSpecializeBag(cls) || !bagSort(raw?.sort)) return {};
+  const name = canRenameBag(cls) ? cleanBagName(raw?.name) : '';
+  return { sort: String(raw.sort), ...(!name && raw?.sortNamed === true ? { sortNamed: true } : {}) };
+}
+
+/**
+ * A bag's label anywhere it shows (getLabel 592-598): its own name, else the sort's name when the
+ * sort gave it, else the class label. rec: { name?, sort?, sortNamed? } (a pack row, a dropped
+ * stack, a cabinet slot).
+ */
+export function ownBagLabel(cls, rec = {}, classLabel = '') {
+  const name = canRenameBag(cls) ? cleanBagName(rec?.name) : '';
+  if (name) return bagLabel(name, classLabel);
+  const keep = bagKeep(cls, rec);
+  return keep.sortNamed ? sortName(keep.sort) : String(classLabel || '');
 }
 
 /** The player-facing words, from the source where it has them. */
@@ -918,9 +942,9 @@ export function arrangeIntoBags(inv, mint, opts = {}, keep = null) {
  * apiPutItemIntoPosition), and takeable_drop_conditions lets a bag go down with
  * things in it unless one of them is soulbound (104-135, 122-130).
  * key: the bag the player chose (prefs bag key). Returns { ok, cls, contents:
- * [{ cls, count }], prefs, name? } (prefs: the arrangement once the bag and its
+ * [{ cls, count }], prefs, name?, sort?, sortNamed? } (prefs: the arrangement once the bag and its
  * contents are out; the caller takes cls and each content's count from the
- * inventory; name: the bag's own, which goes with it), or { ok: false, reason }.
+ * inventory; name and sort: the bag's own, which go with it), or { ok: false, reason }.
  */
 export function takeBag(inv, prefs, key, opts = {}) {
   const layout = layoutPack(inv, prefs, opts);
@@ -936,7 +960,7 @@ export function takeBag(inv, prefs, key, opts = {}) {
   }
   delete next.place[box.key];
   delete next.n[box.key];
-  return { ok: true, cls: box.cls, contents, prefs: next, ...(box.name ? { name: box.name } : {}) };
+  return { ok: true, cls: box.cls, contents, prefs: next, ...(box.name ? { name: box.name } : {}), ...bagKeep(box.cls, box) };
 }
 
 /**
@@ -984,11 +1008,12 @@ export function saleBags(inv, prefs, cls, opts = {}, chosen = '') {
  * bags; with none free it goes in place of the leftmost stack it can hold, which
  * goes in with it (the arrival rule, arrivalSlot). contents: [{ cls, count }] as
  * takeBag gave them. inv is the inventory before the bag and its contents are
- * added. name: the bag's own (takeBag gave it), which it keeps. Returns { ok, key,
+ * added. name: the bag's own (takeBag gave it), which it keeps; keep: its sort
+ * ({ sort, sortNamed }, takeBag gave it too). Returns { ok, key,
  * prefs } (the caller adds the counts), or { ok: false, reason: 'full' } when it
  * can't fit without anything going to the magic rock.
  */
-export function giveBag(inv, prefs, cls, contents = [], opts = {}, name = '') {
+export function giveBag(inv, prefs, cls, contents = [], opts = {}, name = '', keep = {}) {
   if (!isBagClass(cls)) return { ok: false, reason: 'not_bag' };
   const def = BAG_DEFS[cls];
   const capacity = Math.max(1, Math.floor(opts.capacity ?? PACK_CAPACITY));
@@ -999,7 +1024,8 @@ export function giveBag(inv, prefs, cls, contents = [], opts = {}, name = '') {
     .map((c) => ({ cls: String(c?.cls || ''), count: Math.max(0, Math.floor(Number(c?.count) || 0)) }))
     .filter((c) => c.cls && c.count > 0);
   const own = canRenameBag(cls) ? cleanBagName(name) : '';
-  next.bags.push(own ? { key, cls, name: own } : { key, cls });
+  // Its sort comes back with it (bagKeep), and the sort's name when the sort gave it.
+  next.bags.push({ key, cls, ...(own ? { name: own } : {}), ...bagKeep(cls, { ...keep, name: own }) });
   next.place[key] = list.map((c) => c.cls);
   next.n[key] = list.map((c) => c.count);
   const lastBag = next.place.pack.reduce((last, e, i) => (e.startsWith('@') ? i : last), -1);

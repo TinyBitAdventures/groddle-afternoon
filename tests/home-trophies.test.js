@@ -26,13 +26,13 @@ import {
   renderOrder,
   stackSurfaceAt,
   surfaceHeight,
-} from '../public/js/home-decor.js?v=b48dbc95';
-import { cabinetRefusal } from '../public/js/home-storage.js?v=121f1897';
+} from '../public/js/home-decor.js?v=bbf43c44';
+import { cabinetRefusal } from '../public/js/home-storage.js?v=b0225465';
 import { canSellClass } from '../public/js/home-street-mp.js?v=ccc2c76b';
 import { filterTiles, furniturePane, trayFilters } from '../public/js/ui/home-builder.js?v=b71acd91';
 import { hasUpgrades, upgradeVerb } from '../public/js/furniture-upgrades.js?v=a3788c0d';
 import { NO_SLOT_CLASSES } from '../public/js/pack-slots-data.js?v=800f664c';
-import { layoutPack, takesNoSlot } from '../public/js/pack-slots.js?v=6b8393a1';
+import { layoutPack, takesNoSlot } from '../public/js/pack-slots.js?v=4a36968a';
 import { WORLD_ART } from '../public/js/world-art-list.js?v=2d47f296';
 import { homeTrophyCount, isTrophyClass } from '../public/js/features/item-verbs-feature.js?v=c3e8bb0e';
 import { homesFeature } from '../public/js/features/homes-feature.js?v=b7791aed';

@@ -8,6 +8,7 @@
  */
 import { addItem, ITEM_CATALOG, removeItem } from './inventory.js?v=5be47371';
 import { canRenameBag, cleanBagName } from './bag-names.js?v=22391c55';
+import { bagKeep } from './pack-slots.js?v=4a36968a';
 import { ITEM_PLURALS } from './item-plurals-data.js?v=62e96051';
 
 export const WORLD_ITEM_STATE_VERSION = 1;
@@ -100,6 +101,8 @@ function cleanRecord(row, streetTsid, fallbackId) {
   const contents = count === 1 ? cleanContents(row?.contents) : null;
   // A named bag is one bag too, and keeps its name (items/bag_bigger.js getLabel 592-598; js/bag-names.js).
   const name = count === 1 && canRenameBag(classTsid) ? cleanBagName(row?.name) : '';
+  // Its specialization too (pack-slots.js bagKeep): the source's bag carried it.
+  const keep = count === 1 ? bagKeep(classTsid, row) : {};
   return {
     id,
     streetTsid,
@@ -112,6 +115,7 @@ function cleanRecord(row, streetTsid, fallbackId) {
     ...(tags ? { tags } : {}),
     ...(contents ? { contents } : {}),
     ...(name ? { name } : {}),
+    ...keep,
     // In a house: the placed piece (its id in that room's decor) the stack rests on (js/home-decor.js settleStacks).
     ...(Number.isInteger(row?.on) && row.on > 0 ? { on: row.on } : {}),
   };
@@ -197,7 +201,7 @@ export function dropInventoryStack(state, inv, streetTsid, classTsid, requested,
   const mergeRadius = Math.max(0, finite(opts.mergeRadius, DEFAULT_MERGE_RADIUS));
   const merge = opts.merge !== false
     ? rows
-      .filter((row) => row.classTsid === item && !row.contents && !row.name)
+      .filter((row) => row.classTsid === item && !row.contents && !row.name && !row.sort)
       .map((row) => ({ row, distance: Math.hypot(row.x - x, row.y - y) }))
       .filter((candidate) => candidate.distance <= mergeRadius)
       .sort((a, b) => a.distance - b.distance)[0]?.row
@@ -284,7 +288,8 @@ export function pickupCountTitle(classTsid) {
 /**
  * Put a bag down with what it held (the pack already gave them up: bags-feature
  * packTakeBag). It never merges: each bag is its own thing on the ground.
- * opts.name: the bag's own name, which it keeps on the ground (an empty named bag goes down this way too).
+ * opts.name: the bag's own name, which it keeps on the ground (an empty named bag goes down this way too);
+ * opts.sort and opts.sortNamed: its specialization, which it keeps too.
  */
 export function placeDroppedBag(state, streetTsid, classTsid, contents, position = {}, opts = {}) {
   const street = cleanStreetTsid(streetTsid);
@@ -304,6 +309,7 @@ export function placeDroppedBag(state, streetTsid, classTsid, contents, position
   };
   const name = canRenameBag(item) ? cleanBagName(opts.name) : '';
   if (name) stack.name = name;
+  Object.assign(stack, bagKeep(item, { name, sort: opts.sort, sortNamed: opts.sortNamed }));
   rows.push(stack);
   return { ok: true, count: 1, stack: { ...stack }, merged: false };
 }

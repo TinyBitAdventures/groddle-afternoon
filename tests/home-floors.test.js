@@ -34,8 +34,8 @@ import {
   quoteHouseUnexpand,
   unexpandHouseFloors,
   wallExpandItems,
-} from '../public/js/home-floors.js?v=809748a3';
-import { createHomeDecorState, placeFurniture } from '../public/js/home-decor.js?v=b48dbc95';
+} from '../public/js/home-floors.js?v=c2341814';
+import { createHomeDecorState, placeFurniture } from '../public/js/home-decor.js?v=bbf43c44';
 import { FURNITURE_CATALOG, FURNITURE_STORE } from '../public/js/homes-catalog.js?v=10ac34b6';
 import { furnitureStoreProfile } from '../public/js/features/homes-feature.js?v=b7791aed';
 

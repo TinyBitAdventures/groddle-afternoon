@@ -52,8 +52,8 @@ import {
   HOME_TEXTURE_CONFIGS,
 } from './homes-catalog.js?v=10ac34b6';
 import { cleanHistory, cleanUpgradeId, upgradeArt, upgradeRow } from './furniture-upgrades.js?v=a3788c0d';
-import { SDB_COUNT_MAX, SDB_PRICE_MAX, isCabinetClass, normalizeContents, storagePickupLock } from './home-storage.js?v=121f1897';
-import { stackMaxOf } from './pack-slots.js?v=6b8393a1';
+import { SDB_COUNT_MAX, SDB_PRICE_MAX, isCabinetClass, normalizeContents, storagePickupLock } from './home-storage.js?v=b0225465';
+import { stackMaxOf } from './pack-slots.js?v=4a36968a';
 
 export const SEGMENT_W = 150;
 /** Room geometry version stored with the house (2 = source 150 px segments). */

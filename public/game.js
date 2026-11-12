@@ -2,7 +2,7 @@
  * Groddle Afternoon — original street geometry + layered decos
  * PixiJS 8 · locations-xml streets · CoU PNG decos · quests/items
  */
-import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=38cb7c54';
+import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=ac1912e3';
 import { createErrorOnce, createFeatureHost } from './js/feature-host.js?v=06bb8b74';
 import { FEATURES, questFlagsFeature } from './js/features/index.js?v=c61eaf66';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl, drawTileArt } from './js/enter-chooser.js?v=4a3ea327';
@@ -482,7 +482,7 @@ import {
 } from './js/inventory.js?v=5be47371';
 import { TROPHY_FIND_TEXT, trophyOfBadge } from './js/home-trophies.js?v=2020b29b';
 import { HELD_AT_ONCE, HELD_AT_ONCE_TEXT } from './js/collection-trophies.js?v=3760d603';
-import { PACK_COPY, isBagClass, isElementClass, unitRankAt } from './js/pack-slots.js?v=6b8393a1';
+import { PACK_COPY, isBagClass, isElementClass, ownBagLabel, unitRankAt } from './js/pack-slots.js?v=4a36968a';
 import { hasPouch } from './js/elemental-pouch.js?v=ceefa97a';
 import { createPackRow, mountPackClearance, packBandRange, packCountText, packSearchEntries, packSlotTip } from './js/ui/pack-row.js?v=f27cf531';
 import { listAnimalFeedOptions } from './js/animals.js?v=f44dd15a';
@@ -499,7 +499,7 @@ import {
   pickupDroppedStack,
   placeDroppedBag,
   takeDroppedRecord,
-} from './js/world-items.js?v=c308d8f4';
+} from './js/world-items.js?v=792e1606';
 import {
   createPlayerSave,
   parsePlayerSave,
@@ -5226,7 +5226,8 @@ function renderPackRow(box, slots, opts = {}) {
     slot.dataset.tsid = s.classTsid;
     slot.dataset.packCount = String(s.count);
     if (toolCondition?.tracked && s.copy != null) slot.dataset.packCopy = String(s.copy);
-    slot.dataset.packName = shownLabel;
+    // A bag's caption is its own label (items/bag_bigger.js getLabel 592-598: its name, or its sort's).
+    slot.dataset.packName = s.bag?.label || shownLabel;
     if (s.inBag) slot.dataset.packInBag = s.inBag.label;
     // Ticket 43: a tool drags onto an open vendor too (any vendor bought tools, tool_base.js getBaseCost);
     // onto another player it stays put, as before (giving one is the Give window's).
@@ -13838,14 +13839,16 @@ function spawnDroppedItemStack(stack) {
 
   entityLayer.addChild(spr);
   droppedItemSprites.push(spr);
-  // A named bag goes by its own name, its class first on the subtitle (items/bag_bigger.js getLabel 592-598).
-  const named = stack.name ? { label: filterText(stack.name), kind: item.label || stack.classTsid } : features.query('itemDisplayName', stack.classTsid, null, engine, Array.isArray(stack.tags) ? stack.tags[0] : null);
+  // A named bag goes by its own name (or its sort's, when the sort gave it), its class first on the
+  // subtitle (items/bag_bigger.js getLabel 592-598).
+  const ownBag = stack.name || (stack.sortNamed && stack.sort) ? ownBagLabel(stack.classTsid, stack, '') : '';
+  const named = ownBag ? { label: ownBag, kind: item.label || stack.classTsid } : features.query('itemDisplayName', stack.classTsid, null, engine, Array.isArray(stack.tags) ? stack.tags[0] : null);
   register({
     classId: 'dropped_item',
     label: named?.label || item.label || stack.classTsid,
     subtitle: `${named ? `${named.kind} · ` : ''}${stack.subtitle || (stack.contents?.length
       ? `Dropped bag · ${stack.contents.length} ${stack.contents.length === 1 ? 'stack' : 'stacks'} inside`
-      : stack.name ? 'Dropped bag · nothing inside' : `Dropped stack · ${stack.count} in this pile`)}`,
+      : stack.name || stack.sort ? 'Dropped bag · nothing inside' : `Dropped stack · ${stack.count} in this pile`)}`,
     sprite: spr,
     state: {
       id: stack.id,
@@ -13854,6 +13857,7 @@ function spawnDroppedItemStack(stack) {
       label: named?.label || item.label || stack.classTsid,
       ...(stack.contents?.length ? { contents: stack.contents.map((c) => ({ ...c })) } : {}),
       ...(stack.name ? { name: stack.name } : {}),
+      ...(stack.sort ? { sort: stack.sort, ...(stack.sortNamed ? { sortNamed: true } : {}) } : {}),
       ...(stack.shared ? { shared: true } : {}),
     },
     worldItemId: stack.id,
@@ -14055,7 +14059,7 @@ function dropPackBag(classTsid, key) {
     dropPackItem(classTsid, 1);
     return;
   }
-  if (!box.slots.length && !box.name) {
+  if (!box.slots.length && !box.name && !box.sort) {
     features.query('packBagLeaves', bagKey, engine);
     dropPackItem(classTsid, 1);
     return;
@@ -14073,10 +14077,10 @@ function dropPackBag(classTsid, key) {
     toast('Could not drop that item.');
     return;
   }
-  const result = placeDroppedBag(droppedItemState, droppedStacksTsid(), classTsid, res.contents, { x, y }, { now: Date.now(), name: res.name || '' });
+  const result = placeDroppedBag(droppedItemState, droppedStacksTsid(), classTsid, res.contents, { x, y }, { now: Date.now(), name: res.name || '', sort: res.sort, sortNamed: res.sortNamed });
   saveDroppedItems();
   refreshDroppedWorldItems();
-  const label = filterText(res.name || '') || ITEM_CATALOG[classTsid]?.label || classTsid.replace(/_/g, ' ');
+  const label = ownBagLabel(classTsid, res, ITEM_CATALOG[classTsid]?.label || classTsid.replace(/_/g, ' '));
   const line = `You dropped 1× ${label}.`;
   toast(line);
   pushActivity(line);
@@ -14107,7 +14111,7 @@ function pickupDroppedBag(target) {
     refreshDroppedWorldItems();
     return false;
   }
-  const res = features.query('packGiveBag', record.classTsid, record.contents || [], engine, record.name || '');
+  const res = features.query('packGiveBag', record.classTsid, record.contents || [], engine, record.name || '', { sort: record.sort, sortNamed: record.sortNamed });
   if (!res?.ok) {
     // It didn't fit after all: it stays where it was.
     (droppedItemState.streets[tsid] ||= []).push(record);
@@ -14117,7 +14121,7 @@ function pickupDroppedBag(target) {
     return false;
   }
   saveDroppedItems();
-  const label = filterText(record.name || '') || ITEM_CATALOG[record.classTsid]?.label || record.classTsid.replace(/_/g, ' ');
+  const label = ownBagLabel(record.classTsid, record, ITEM_CATALOG[record.classTsid]?.label || record.classTsid.replace(/_/g, ' '));
   const line = `You picked up 1× ${label}.`;
   toast(line);
   pushActivity(line);
@@ -14179,7 +14183,7 @@ function refusePickup(line) {
 }
 
 function pickupDroppedWorldItem(target, requested = Infinity) {
-  if (target?.state?.contents?.length || target?.state?.name) return pickupDroppedBag(target);
+  if (target?.state?.contents?.length || target?.state?.name || target?.state?.sort) return pickupDroppedBag(target);
   // G152 (takeable.js:76-79, 84-93): a full pack refuses the stack; a part that fits is taken, the rest stays down.
   const wantClass = target?.state?.classTsid;
   // #139: an element stack left on the ground (v0.20.0-v0.23.0) goes straight into a pouch; packRoom

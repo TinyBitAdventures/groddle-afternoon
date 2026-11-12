@@ -213,13 +213,19 @@ function cleanSlot(raw, stackmax = () => Infinity) {
     if (held) out.contents = held;
     const name = typeof raw.name === 'string' ? raw.name.slice(0, 64).trim() : '';
     if (name) out.name = name;
+    // Its specialization (js/pack-slots.js bagKeep checks the sort when the bag comes back out).
+    const sort = cleanKey(raw.sort);
+    if (sort) {
+      out.sort = sort;
+      if (raw.sortNamed === true && !name) out.sortNamed = true;
+    }
   }
   return out;
 }
 
 /** Whether a slot is a bag with something in it or a name of its own (it moves whole, #108). */
 export function slotHoldsBag(slot) {
-  return Boolean(slot && (slot.contents?.length || slot.name));
+  return Boolean(slot && (slot.contents?.length || slot.name || slot.sort));
 }
 
 /** A stored copy's words as the pack kept them (JSON-safe and small), else null. */
@@ -307,18 +313,25 @@ export function cabinetRoom(slots, cls, max, slot = null) {
  * Puts up to `n` of `cls` in: into `slot` when named (an inventory move to a
  * slot, CabinetDialog onPackDragComplete), else topping up stacks of the class
  * first, then the first empty slots (bag.js addItemStack 191-232). `points`
- * is each tool's wear, in order. A bag with things in it or a name (`contents`,
- * `name`, #108) goes alone into an empty slot. Mutates `slots`; returns how
+ * is each tool's wear, in order. A bag with things in it, a name or a sort (`contents`,
+ * `name`, #108; `sort`, `sortNamed`) goes alone into an empty slot. Mutates `slots`; returns how
  * many went in.
  */
-export function cabinetPut(slots, cls, n, { slot = null, max = Infinity, points = null, tags = null, contents = null, name = '' } = {}) {
+export function cabinetPut(slots, cls, n, { slot = null, max = Infinity, points = null, tags = null, contents = null, name = '', sort = '', sortNamed = false } = {}) {
   const held = cleanHeldList(contents);
   const own = typeof name === 'string' ? name.slice(0, 64).trim() : '';
-  if (held || own) {
+  const sorted = cleanKey(sort);
+  if (held || own || sorted) {
     if (whole(n) < 1) return 0;
     const at = Number.isInteger(slot) ? slot : slots.indexOf(null);
     if (at < 0 || at >= slots.length || slots[at]) return 0;
-    slots[at] = { classTsid: cls, count: 1, ...(held ? { contents: held } : {}), ...(own ? { name: own } : {}) };
+    slots[at] = {
+      classTsid: cls,
+      count: 1,
+      ...(held ? { contents: held } : {}),
+      ...(own ? { name: own } : {}),
+      ...(sorted ? { sort: sorted, ...(sortNamed === true && !own ? { sortNamed: true } : {}) } : {}),
+    };
     return 1;
   }
   let left = whole(n);
@@ -370,7 +383,7 @@ export function cabinetTake(slots, cls, n, { slot = null } = {}) {
     const s = slots[slot];
     if (s.classTsid !== cls || !left) return { taken: 0, points };
     slots[slot] = null;
-    return { taken: 1, points, ...(s.contents ? { contents: s.contents } : {}), ...(s.name ? { name: s.name } : {}) };
+    return { taken: 1, points, ...(s.contents ? { contents: s.contents } : {}), ...(s.name ? { name: s.name } : {}), ...(s.sort ? { sort: s.sort, ...(s.sortNamed ? { sortNamed: true } : {}) } : {}) };
   }
   const takeAt = (i) => {
     const s = slots[i];

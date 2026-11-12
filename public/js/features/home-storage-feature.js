@@ -43,10 +43,10 @@
 
 import { announceCharacterChanged, characterHeaders, characterOf, isCharacterChanged } from '../character-guard.js?v=510034a7';
 import { ITEM_CATALOG, addItem, countItem, ensureItem, itemIcon, removeItem } from '../inventory.js?v=5be47371';
-import { displayRefusal, furnitureDef, furnitureSize, isFurniture } from '../home-decor.js?v=b48dbc95';
+import { displayRefusal, furnitureDef, furnitureSize, isFurniture } from '../home-decor.js?v=bbf43c44';
 import { pieceLabel } from '../furniture-upgrades.js?v=a3788c0d';
-import { textureFromUrl } from '../textures.js?v=92ec53cd';
-import { stackMaxOf, isBagClass } from '../pack-slots.js?v=6b8393a1';
+import { textureFromUrl } from '../textures.js?v=f024bd6a';
+import { ownBagLabel, stackMaxOf, isBagClass } from '../pack-slots.js?v=4a36968a';
 import { ELEMENT_CLASSES, NO_BAG_CLASSES, NO_SLOT_CLASSES } from '../pack-slots-data.js?v=800f664c';
 import { TOOL_CONDITION_CATALOG, copyTagKind, copyTags, receiveToolCopy, setCopyTag, takeToolCopy } from '../tools.js?v=5f482998';
 import { scriptFromTag, scriptLabel } from '../teleportation.js?v=1050225e';
@@ -79,7 +79,7 @@ import {
   sdbVerbs,
   setSdbPrice,
   slotsUsed,
-} from '../home-storage.js?v=121f1897';
+} from '../home-storage.js?v=b0225465';
 import {
   closeStorageWindow,
   openCabinetWindow,
@@ -88,7 +88,7 @@ import {
   openPriceDialog,
   openStoreDialog,
   storageWindowKind,
-} from '../ui/storage-windows.js?v=7e3bf03b';
+} from '../ui/storage-windows.js?v=680de940';
 
 export const HOME_STORAGE_ID = 'home-storage';
 export const CLASS_STORAGE = 'home_storage';
@@ -451,7 +451,9 @@ function itemView(cls, slot = null) {
   const cap = TOOL_CONDITION_CATALOG[cls]?.capacity;
   // A Teleportation Script in a slot goes by its street (teleportation_script.js getLabel 254-260).
   const script = copyTagKind(cls) === 'script' ? scriptFromTag(slot?.tags?.[0]) : null;
-  return { label: script ? scriptLabel(script) : labelOf(cls), plural: pluralOf(cls), icon: iconOf(cls), wear: cap ? (points) => (Array.isArray(points) && points.length ? Math.max(0, Math.min(1, Number(points[0]) / cap)) : null) : null };
+  // A bag in a slot goes by its own name, or its sort's (items/bag_bigger.js getLabel 592-598).
+  const label = script ? scriptLabel(script) : isBagClass(cls) && slot ? ownBagLabel(cls, slot, labelOf(cls)) : labelOf(cls);
+  return { label, plural: pluralOf(cls), icon: iconOf(cls), wear: cap ? (points) => (Array.isArray(points) && points.length ? Math.max(0, Math.min(1, Number(points[0]) / cap)) : null) : null };
 }
 
 function openCabinet(engine, uid, { owner = 0 } = {}) {
@@ -531,7 +533,7 @@ function cabinetPutBag(engine, row, cls, bag, slot) {
     return 0;
   }
   const contents = (res.contents || []).map((c) => ({ classTsid: c.cls, count: c.count, ...(Array.isArray(c.points) ? { points: c.points } : {}), ...(Array.isArray(c.tags) ? { tags: c.tags } : {}) }));
-  cabinetPut(row.contents, cls, 1, { slot: at, contents, name: res.name || '' });
+  cabinetPut(row.contents, cls, 1, { slot: at, contents, name: res.name || '', sort: res.sort || '', sortNamed: res.sortNamed === true });
   engine.refreshPack?.();
   engine.playSound?.('ITEM_DROP', { volume: 0.45 });
   win.slots = row.contents;
@@ -549,7 +551,7 @@ function cabinetPutFromPack(engine, cls, count, { slot = null, copy = null, bag 
   }
   // #108: a bag goes in whole, with what it holds (the owner's own cabinet); a key-holder moves empty bags only.
   const held = isBagClass(cls) ? packBag(engine, cls, bag) : null;
-  if (held && (held.box.slots?.length || held.box.name)) {
+  if (held && (held.box.slots?.length || held.box.name || held.box.sort)) {
     if (win.owner) {
       win.handle.note(T.ownerBags, true);
       return 0;
@@ -630,7 +632,7 @@ function cabinetTakeToPack(engine, slot, n) {
     if (!out.taken) return 0;
     ensureItem(cls);
     for (const c of contents) ensureItem(c.cls);
-    const res = engine.query('packGiveBag', cls, contents, engine, out.name || '');
+    const res = engine.query('packGiveBag', cls, contents, engine, out.name || '', { sort: out.sort, sortNamed: out.sortNamed });
     if (!res?.ok) {
       // It didn't fit after all: it stays in its slot, as it was.
       row.contents[slot] = keep;

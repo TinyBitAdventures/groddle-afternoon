@@ -33,7 +33,7 @@
 
 import { addItem, countItem, removeItem } from '../inventory.js?v=5be47371';
 import { moodMax } from '../metabolics.js?v=8504134e';
-import { listDroppedStacks } from '../world-items.js?v=c308d8f4';
+import { listDroppedStacks } from '../world-items.js?v=792e1606';
 import {
   GARLIC_EAT_COUNTER,
   ITEM_VERBS,

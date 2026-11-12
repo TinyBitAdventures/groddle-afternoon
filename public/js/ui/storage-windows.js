@@ -265,7 +265,7 @@ export function openCabinetWindow(opts) {
       return;
     }
     pick.hidden = false;
-    const meta = item(s.classTsid);
+    const meta = item(s.classTsid, s);
     let n = s.count;
     const render = () => {
       pick.replaceChildren();

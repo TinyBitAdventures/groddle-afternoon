@@ -21,7 +21,7 @@
 
 import { ITEM_CATALOG } from '../inventory.js?v=5be47371';
 import { listAnimalFeedOptions } from '../animals.js?v=f44dd15a';
-import { isBagClass } from '../pack-slots.js?v=6b8393a1';
+import { isBagClass } from '../pack-slots.js?v=4a36968a';
 import { dropFor, dropTip } from '../world-drop.js?v=f162fb0e';
 
 export const WORLD_DROP_FEATURE_ID = 'world-drop';
