@@ -41,12 +41,12 @@ import {
   reopenDueFeats,
   reopenText,
   reopensAt,
-} from '../public/js/solo-feats.js?v=28331e6c';
-import { DAY_NAMES, GAME_DAY_MS } from '../public/js/game-day.js?v=84569fa2';
-import { soloFeatsFeature } from '../public/js/features/solo-feats-feature.js?v=188d518a';
-import { FEATURES } from '../public/js/features/index.js?v=abf1f974';
-import { createPlayerSave, parsePlayerSave, serializePlayerSave } from '../public/js/player-save.js?v=ae3205a3';
-import { createResourceNode, harvestResourceNode } from '../public/js/resource-nodes.js?v=9db2fcee';
+} from '../public/js/solo-feats.js?v=b0061e3f';
+import { DAY_NAMES, GAME_DAY_MS } from '../public/js/game-day.js?v=a7e262aa';
+import { soloFeatsFeature } from '../public/js/features/solo-feats-feature.js?v=671b3abb';
+import { FEATURES } from '../public/js/features/index.js?v=eafd7025';
+import { createPlayerSave, parsePlayerSave, serializePlayerSave } from '../public/js/player-save.js?v=a161d3e8';
+import { createResourceNode, harvestResourceNode } from '../public/js/resource-nodes.js?v=24968e1f';
 
 const ROOT = join(import.meta.dirname, '..');
 const GSJS = join(ROOT, '..', 'glitch-GameServerJS');

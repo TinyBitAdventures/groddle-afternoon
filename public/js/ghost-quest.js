@@ -419,11 +419,27 @@ export function grantFadedHeart(questState, inv) {
   return { ok: true, classTsid: FADED_HEART_ID, count: inv[FADED_HEART_ID] };
 }
 
+/**
+ * faded_heart.js 66-73: Remember works only on a street with a phantom_glitch spawner, the
+ * haunting streets of phantom_glitch.js (OFFICIAL_PHANTOM_HAUNTS), plus the stand-ins this
+ * player's own hunt used (#145).
+ */
+export function isPhantomHauntStreet(streetTsid, story = {}) {
+  const ids = aliasCandidates(streetTsid);
+  if (!ids[0]) return false;
+  const own = uniqueIds(story?.hauntStreets);
+  return ids.some((id) => OFFICIAL_PHANTOM_HAUNTS.includes(id) || own.includes(id));
+}
+
+/**
+ * faded_heart.js 50-104 + remember_ghosts_1.js 65-71: on a haunt street the heart always
+ * plays the memory (15 s apart); it counts toward Remember the Rememberable only while that
+ * quest is active and only once per street. `counted` says whether this one counted.
+ */
 export function rememberWithFadedHeart(questState, inv, streetTsid, now = Date.now()) {
   const story = createGhostQuestState(questState?.story?.phantom);
   const street = cleanId(streetTsid);
   if ((Number(inv?.[FADED_HEART_ID]) || 0) < 1) return { ok: false, reason: 'no_heart' };
-  if (!questState?.active?.[REMEMBER_QUEST_ID]) return { ok: false, reason: 'inactive' };
   if (now < story.memoryCooldownUntil) {
     return {
       ok: false,
@@ -431,15 +447,16 @@ export function rememberWithFadedHeart(questState, inv, streetTsid, now = Date.n
       remainingMs: story.memoryCooldownUntil - now,
     };
   }
-  if (story.rememberedStreets.includes(street)) {
-    return { ok: false, reason: 'already_remembered' };
-  }
-  story.rememberedStreets.push(street);
+  if (!isPhantomHauntStreet(street, story)) return { ok: false, reason: 'not_haunt' };
+  const active = Boolean(questState?.active?.[REMEMBER_QUEST_ID]);
+  const counted = active && !story.rememberedStreets.includes(street);
+  if (counted) story.rememberedStreets.push(street);
   story.memoryCooldownUntil = now + HEART_MEMORY_COOLDOWN_MS;
   questState.story ||= {};
   questState.story.phantom = story;
   return {
     ok: true,
+    counted,
     remembered: story.rememberedStreets.length,
     remaining: Math.max(0, REMEMBER_HAUNT_COUNT - story.rememberedStreets.length),
     cooldownUntil: story.memoryCooldownUntil,

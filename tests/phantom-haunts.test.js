@@ -23,15 +23,15 @@ import {
   noticePhantom,
   phantomHauntPool,
   phantomPlaceNeed,
-} from '../public/js/ghost-quest.js?v=37adc842';
+} from '../public/js/ghost-quest.js?v=5f3cc133';
 import { createQuestState } from '../public/js/quests.js?v=2b882eb6';
 import { loadContentCatalogsFromDir, resetContentCatalogs, getQuestCatalog } from '../public/js/content-catalogs.js?v=10b118dd';
 import { SUBWAY_STREETS, closedStreets, initializeStreetJobs, normalizeStreetJobState } from '../public/js/street-jobs.js?v=94f8d250';
 import { routeGraph } from '../public/js/map-routes.js?v=c7e7dc80';
 import { TELEPORTERS } from '../public/js/hidden-floors.js?v=732a2610';
 import { WINTRY_PORTAL_TELEPORTERS } from '../public/js/wintry-portal.js?v=1437deda';
-import { placeIndex, questHold, questStoryNeeds, reachableStreets } from '../public/js/quest-reach.js?v=6cec222d';
-import { streetJobsFeature } from '../public/js/features/street-jobs-feature.js?v=7ff6d995';
+import { placeIndex, questHold, questStoryNeeds, reachableStreets } from '../public/js/quest-reach.js?v=142e85c9';
+import { streetJobsFeature } from '../public/js/features/street-jobs-feature.js?v=03dfc0c8';
 
 const root = join(import.meta.dirname, '..');
 const PUB = join(root, 'public');

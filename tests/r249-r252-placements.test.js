@@ -37,7 +37,7 @@ import { resourcePlacementGroups, resourceSpawnPlan } from '../public/js/feature
 import { JELLISAC_SPOTS, PEAT_SPOTS } from '../public/js/node-spots-data.js?v=4984e395';
 import { bedKind, createGarden, fitGardenToBed, plantPlot } from '../public/js/garden.js?v=37209241';
 import { bedKey, parsePlotId } from '../public/js/shared-gardens.js?v=c1f90bc0';
-import { normalizeGardenSnapshot } from '../public/js/player-save.js?v=a97f5a0e';
+import { normalizeGardenSnapshot } from '../public/js/player-save.js?v=a161d3e8';
 import { serverPath, skipWithoutServer } from '../tools/repos.mjs';
 
 const root = join(import.meta.dirname, '..');

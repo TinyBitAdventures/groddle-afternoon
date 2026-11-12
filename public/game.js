@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=5d55594c';
 import { createErrorOnce, createFeatureHost } from './js/feature-host.js?v=06bb8b74';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=abf1f974';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=eafd7025';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl, drawTileArt } from './js/enter-chooser.js?v=4a3ea327';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -56,7 +56,8 @@ import {
   noticePhantom,
   grantFadedHeart,
   rememberWithFadedHeart,
-} from './js/ghost-quest.js?v=37adc842';
+  isPhantomHauntStreet,
+} from './js/ghost-quest.js?v=5f3cc133';
 import {
   HOG_HAUL_QUEST_ID,
   HOG_HAUL_STREET_ID,
@@ -506,7 +507,7 @@ import {
   parsePlayerSave,
   serializePlayerSave,
   restorePlayerSave,
-} from './js/player-save.js?v=a97f5a0e';
+} from './js/player-save.js?v=a161d3e8';
 import {
   HOME_INTERIOR_TSID,
   HOME_STREET_TSID,
@@ -4098,19 +4099,17 @@ function getPackUseInfo(classTsid) {
     };
   }
   if (classTsid === FADED_HEART_ID) {
+    // faded_heart.js 50-73: Remember works on haunt streets, 15 s apart, quest or no quest.
     const story = ghostQuestStory();
     const active = Boolean(questState.active?.[REMEMBER_QUEST_ID]);
     const cooldownMs = Math.max(0, story.memoryCooldownUntil - Date.now());
-    const rememberedHere = story.rememberedStreets.includes(currentStreetTsid);
-    const reason = !active
-      ? 'The heart is quiet. A later ghost story may wake it.'
-      : cooldownMs > 0
-        ? `The memory is still forming for ${Math.ceil(cooldownMs / 1000)}s.`
-        : rememberedHere
-          ? 'You have already remembered this street.'
-          : '';
+    const reason = cooldownMs > 0
+      ? 'You must wait a little while before remembering more.'
+      : !isPhantomHauntStreet(currentStreetTsid, story)
+        ? "You can't remember anything in connection with this place."
+        : '';
     return {
-      usable: active && !reason,
+      usable: !reason,
       verb: 'Remember',
       effects: {},
       message: 'Dredge up memories of the past.',
@@ -15957,13 +15956,11 @@ function rememberFadedHeartInWorld() {
     Date.now()
   );
   if (!result.ok) {
-    const message = result.reason === 'inactive'
-      ? 'The Faded Heart is quiet. A later ghost story may wake it.'
-      : result.reason === 'cooldown'
-        ? `You must wait ${Math.ceil(result.remainingMs / 1000)}s before remembering more.`
-        : result.reason === 'already_remembered'
-          ? "You can't remember anything new in connection with this place."
-          : 'You do not have the Faded Heart.';
+    const message = result.reason === 'cooldown'
+      ? 'You must wait a little while before remembering more.'
+      : result.reason === 'not_haunt'
+        ? "You can't remember anything in connection with this place."
+        : 'You do not have the Faded Heart.';
     toast(message, 3200);
     renderPackPopover(FADED_HEART_ID);
     return;
@@ -15975,6 +15972,12 @@ function rememberFadedHeartInWorld() {
   // point, under the decos, for 15 s (js/overlays.js), not the 2012 item's appear sheet.
   playOverlay(PIXI, 'phantom_glitch', { layer: entityLayer, at: () => ({ x: point.x, y: point.y + 2 }), durationMs: 15_000, zIndex: -10 });
   if (app?.canvas) app.canvas.dataset.ghostMemoryArt = 'phantom_glitch';
+  // faded_heart.js 95-102: the memory always plays; only a new haunt counts for the quest.
+  if (!result.counted) {
+    pushActivity('You remembered the half-forgotten Glitch.');
+    showGhostVignette('You remembered the half-forgotten Glitch.');
+    return;
+  }
   pushActivity(
     `The Faded Heart remembered this place. ${result.remembered}/13 new haunts found.`
   );

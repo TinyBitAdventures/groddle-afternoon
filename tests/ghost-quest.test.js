@@ -25,7 +25,8 @@ import {
   phantomAnimationDurationMs,
   grantFadedHeart,
   rememberWithFadedHeart,
-} from '../public/js/ghost-quest.js?v=37adc842';
+  isPhantomHauntStreet,
+} from '../public/js/ghost-quest.js?v=5f3cc133';
 import { createQuestState, parseQuestConversation } from '../public/js/quests.js?v=2b882eb6';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -176,35 +177,48 @@ describe('Phantom Glitch sheets', () => {
 });
 
 describe('Remember the Rememberable', () => {
-  it('counts one remembrance per street with the original 15-second cooldown', () => {
+  // faded_heart.js 66-73, 95-102; remember_ghosts_1.js 65-71.
+  const HAUNT_A = 'LCRHITPKONL1T7J';
+  const HAUNT_B = 'GLIF6R3R9GE1GQB';
+  it('counts one remembrance per haunt street with the original 15-second cooldown', () => {
     const quests = createQuestState();
     quests.active[REMEMBER_QUEST_ID] = { progress: {}, startedAt: 1 };
     quests.story.phantom = createGhostQuestState({ heartGranted: true });
     const inv = { faded_heart: 1 };
-    const first = rememberWithFadedHeart(quests, inv, 'STREET_A', 1_000);
+    const first = rememberWithFadedHeart(quests, inv, HAUNT_A, 1_000);
     assert.equal(first.ok, true);
+    assert.equal(first.counted, true);
     assert.equal(first.remembered, 1);
 
-    const cooling = rememberWithFadedHeart(quests, inv, 'STREET_B', 1_001);
+    const cooling = rememberWithFadedHeart(quests, inv, HAUNT_B, 1_001);
     assert.equal(cooling.reason, 'cooldown');
     assert.equal(cooling.remainingMs, HEART_MEMORY_COOLDOWN_MS - 1);
 
-    const duplicate = rememberWithFadedHeart(
-      quests,
-      inv,
-      'STREET_A',
-      1_000 + HEART_MEMORY_COOLDOWN_MS
-    );
-    assert.equal(duplicate.reason, 'already_remembered');
+    // A street already remembered plays the memory again without counting.
+    const again = rememberWithFadedHeart(quests, inv, HAUNT_A, 1_000 + HEART_MEMORY_COOLDOWN_MS);
+    assert.equal(again.ok, true);
+    assert.equal(again.counted, false);
+    assert.equal(again.remembered, 1);
 
-    const second = rememberWithFadedHeart(
-      quests,
-      inv,
-      'STREET_B',
-      1_000 + HEART_MEMORY_COOLDOWN_MS
-    );
+    const second = rememberWithFadedHeart(quests, inv, HAUNT_B, 1_000 + 2 * HEART_MEMORY_COOLDOWN_MS);
     assert.equal(second.ok, true);
+    assert.equal(second.counted, true);
     assert.equal(second.remembered, 2);
+  });
+
+  it('works only on a haunt street, and still plays after the quest without counting', () => {
+    const quests = createQuestState();
+    quests.story.phantom = createGhostQuestState({ heartGranted: true, hauntStreets: ['GSTANDIN1'] });
+    const inv = { faded_heart: 1 };
+    assert.equal(rememberWithFadedHeart(quests, inv, 'STREET_A', 1_000).reason, 'not_haunt');
+    assert.equal(isPhantomHauntStreet('GSTANDIN1', quests.story.phantom), true, "the player's own stand-in haunt counts");
+    const after = rememberWithFadedHeart(quests, inv, HAUNT_A, 1_000);
+    assert.equal(after.ok, true, 'no quest active: the memory still plays');
+    assert.equal(after.counted, false);
+    assert.equal(after.remembered, 0);
+    const game = fs.readFileSync(path.join(root, 'public/game.js'), 'utf8');
+    assert.doesNotMatch(game, /later ghost story/);
+    assert.match(game, /You can't remember anything in connection with this place\./);
   });
 });
 
