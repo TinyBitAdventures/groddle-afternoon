@@ -49,7 +49,15 @@
  * What differs from a solo layout, on purpose (as tools/build-realtime-quoins.mjs):
  * no saved-arrival reservation (that one is per player; in multiplayer game.js
  * leaves it out so everyone's street matches) and no feature ecology overrides
- * (those streets are private instances, never shared).
+ * (those streets are private instances, never shared), except a street
+ * upgrade's: the street-jobs feature answers ecologyOverride with
+ * js/street-jobs.js upgradeEcologyEntry once the street's upgrade project is
+ * built (the shared world's, the server's projects.go), which adds animals
+ * and rocks and can give the street a shrine, so every planned spot after them
+ * moves. Each upgrade option whose layout differs is written beside the
+ * street's own as upgrades[option id], and the server lays the street out
+ * from it once that upgrade is built (player report #222/#232: Nightshade
+ * Woods' Chickens and Piggies stood elsewhere on the server).
  *
  * Run from the game repo root:
  *   node tools/build-realtime-objects.mjs
@@ -94,6 +102,7 @@ import { CRAB_PLACEMENT_KEY, CRAB_WALK, crabPlacementGroups } from '../public/js
 import { KITTY_PET } from '../public/js/heli-kitties.js?v=8fbe314a';
 import { FIRE_DRAGON_PLACEMENT_KEY, FIRE_DRAGON_WALK, fireDragonPlacementGroups } from '../public/js/fire-dragon.js?v=b7f3d751';
 import { isZoneTsid } from '../public/js/zone-streets.js?v=b40010d5';
+import { upgradeEcologyEntry } from '../public/js/street-jobs.js?v=94f8d250';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const streetsDir = join(root, 'public/assets/streets');
@@ -263,6 +272,33 @@ export function streetObjectLayout(data, { starter = false, ecology = ecologyFor
   return { rocks, trees, nodes, pigs, trunks, sad, chickens, butterflies, batterflies, kitties, crabs, dragons };
 }
 
+const LAYOUT_KEYS = ['rocks', 'trees', 'nodes', 'pigs', 'chickens', 'butterflies', 'batterflies', 'kitties', 'crabs', 'dragons'];
+
+/** A layout as its data row: the non-empty lists, trunks and sad. */
+function layoutRow(layout) {
+  const row = {};
+  for (const key of LAYOUT_KEYS) if (layout[key].length) row[key] = layout[key];
+  if (layout.trunks.length) row.trunks = layout.trunks;
+  if (layout.sad) row.sad = true;
+  return row;
+}
+
+/**
+ * Each upgrade option of a street (street-jobs.json upgrades[tsid].options) whose layout differs
+ * from the street's own, by option id: the street-jobs feature's ecologyOverride once the upgrade
+ * is built (upgradeEcologyEntry over the street's ecology row, as game.js enterStreet plans it).
+ */
+export function upgradeLayouts(data, options, { starter = false } = {}) {
+  const base = JSON.stringify(layoutRow(streetObjectLayout(data, { starter })));
+  const out = {};
+  for (const option of options || []) {
+    if (!option?.id) continue;
+    const row = layoutRow(streetObjectLayout(data, { starter, ecology: upgradeEcologyEntry(ecologyForStreet(data.tsid), option) }));
+    if (JSON.stringify(row) !== base) out[option.id] = row;
+  }
+  return out;
+}
+
 /** The rule numbers the server applies, from the game's own tables. */
 export function ruleTables(trantTables) {
   const rocks = {};
@@ -333,8 +369,9 @@ async function main() {
   setStreetEcologyCatalog(ecology);
   setCreatureEcology(ecology);
   const trantTables = JSON.parse(await readFile(join(root, 'public/assets/content/trants.json'), 'utf8'));
+  const jobs = JSON.parse(await readFile(join(root, 'public/assets/content/street-jobs.json'), 'utf8'));
   const streets = {};
-  const totals = { rocks: 0, trees: 0, nodes: 0, pigs: 0, chickens: 0, butterflies: 0, batterflies: 0, kitties: 0, crabs: 0, dragons: 0 };
+  const totals = { rocks: 0, trees: 0, nodes: 0, pigs: 0, chickens: 0, butterflies: 0, batterflies: 0, kitties: 0, crabs: 0, dragons: 0, upgrades: 0 };
   // A published zone's streets (GZ) are solo only (docs/level-builder/spec.md 15, Q6): never shared.
   for (const tsid of Object.keys(index.streets).filter((t) => !isZoneTsid(t)).sort()) {
     let data;
@@ -344,21 +381,21 @@ async function main() {
       console.warn(`skip ${tsid}: ${err.message}`);
       continue;
     }
-    const layout = streetObjectLayout(data, { starter: data.tsid === STREET_INDEX.default });
-    const keys = ['rocks', 'trees', 'nodes', 'pigs', 'chickens', 'butterflies', 'batterflies', 'kitties', 'crabs', 'dragons'];
-    if (!keys.some((key) => layout[key].length)) continue;
-    const row = {};
-    for (const key of keys) {
-      if (layout[key].length) row[key] = layout[key];
-      totals[key] += layout[key].length;
+    const starter = data.tsid === STREET_INDEX.default;
+    const layout = streetObjectLayout(data, { starter });
+    const upgrades = upgradeLayouts(data, jobs.upgrades?.[data.tsid]?.options, { starter });
+    if (!LAYOUT_KEYS.some((key) => layout[key].length) && !Object.keys(upgrades).length) continue;
+    for (const key of LAYOUT_KEYS) totals[key] += layout[key].length;
+    const row = layoutRow(layout);
+    if (Object.keys(upgrades).length) {
+      row.upgrades = upgrades;
+      totals.upgrades += Object.keys(upgrades).length;
     }
-    if (layout.trunks.length) row.trunks = layout.trunks;
-    if (layout.sad) row.sad = true;
     streets[data.tsid] = row;
   }
   const out = {
-    about: 'Shared street objects for objects.go in groddle-afternoon-server. Generated by tools/build-realtime-objects.mjs from public/assets/streets, street-ecology.json, trants.json and the game modules; do not edit by hand.',
-    format: 'streets[tsid] = { rocks: [[i, class, x, y]], trees: [[i, class, x, y, maturity, health]], nodes: [[key, class, x, y]], pigs: [[i, x, y, range]], trunks?: [x], chickens: [[i, x, y]], butterflies: [[i, x, y, fly]], batterflies: [[i, x, y]], kitties: [[i, x, y]], crabs: [[i, x, y]], dragons: [[i, x, y]], sad?: true }',
+    about: 'Shared street objects for objects.go in groddle-afternoon-server. Generated by tools/build-realtime-objects.mjs from public/assets/streets, street-ecology.json, street-jobs.json (upgrades), trants.json and the game modules; do not edit by hand.',
+    format: 'streets[tsid] = { rocks: [[i, class, x, y]], trees: [[i, class, x, y, maturity, health]], nodes: [[key, class, x, y]], pigs: [[i, x, y, range]], trunks?: [x], chickens: [[i, x, y]], butterflies: [[i, x, y, fly]], batterflies: [[i, x, y]], kitties: [[i, x, y]], crabs: [[i, x, y]], dragons: [[i, x, y]], sad?: true, upgrades?: { [option id]: the same row without upgrades, the layout once that street upgrade is built } }',
     rules: ruleTables(trantTables),
     streets,
   };
@@ -374,7 +411,7 @@ async function main() {
   }
   await mkdir(dirname(outPath), { recursive: true });
   await writeFile(outPath, text);
-  console.log(`${Object.keys(streets).length} streets, ${totals.rocks} rocks, ${totals.trees} trees, ${totals.nodes} nodes, ${totals.pigs} pigs, ${totals.chickens} chickens, ${totals.butterflies} butterflies, ${totals.batterflies} batterflies, ${totals.kitties} kitties, ${totals.crabs} crabs, ${totals.dragons} dragons -> ${outPath}`);
+  console.log(`${Object.keys(streets).length} streets, ${totals.rocks} rocks, ${totals.trees} trees, ${totals.nodes} nodes, ${totals.pigs} pigs, ${totals.chickens} chickens, ${totals.butterflies} butterflies, ${totals.batterflies} batterflies, ${totals.kitties} kitties, ${totals.crabs} crabs, ${totals.dragons} dragons, ${totals.upgrades} street upgrade layouts -> ${outPath}`);
 }
 
 if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) await main();
