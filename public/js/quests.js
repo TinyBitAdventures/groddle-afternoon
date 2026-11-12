@@ -229,8 +229,27 @@ export function completeQuest(state, classTsid, pc = null, now = Date.now()) {
 
   const rewards = { ...(def.rewards || {}) };
   // Fit for a King I-V: +2% to +10% on top of any reward buff (inc_quests.js:844).
-  applyRewards(pc, rewards, { bonus: questRewardModifier(pc?.imaginationUpgrades) });
-  return { ok: true, reason: 'completed', rewards, def };
+  const paid = {};
+  applyRewards(pc, rewards, { bonus: questRewardModifier(pc?.imaginationUpgrades), paid });
+  return { ok: true, reason: 'completed', rewards, paid, def };
+}
+
+/**
+ * The amounts a quest really paid (completeQuest's `paid`: reward buffs and Fit for a King
+ * included, a gain the dead / Super Pooped gate refused or the tank cap cut left out), as
+ * "+N iMG" chips. `giantName(id)` names a Giant.
+ */
+export function paidRewardBits(paid, giantName = (g) => g) {
+  const bits = [];
+  if (!paid) return bits;
+  if (paid.xp) bits.push(`+${paid.xp} iMG`);
+  if (paid.currants) bits.push(`+${paid.currants} currants`);
+  if (paid.energy) bits.push(`+${paid.energy} energy`);
+  if (paid.mood) bits.push(`+${paid.mood} mood`);
+  for (const f of paid.favor || []) {
+    if (f.points) bits.push(`+${f.points} favor with ${f.giant === 'all' ? 'every Giant' : giantName(f.giant)}`);
+  }
+  return bits;
 }
 
 /**
@@ -267,9 +286,20 @@ export function applyRewards(pc, rewards, opts = {}) {
     points: scaled(entry.points),
   }));
   const favorPoints = favorRewards.reduce((sum, entry) => sum + entry.points, 0);
+  const paid = opts.paid && typeof opts.paid === 'object' ? opts.paid : null;
+  const energyBefore = Number(pc.energy) || 0;
+  const moodBefore = Number(pc.mood) || 0;
   // G213: metabolics_add_energy / _mood refuse a gain while dead or Super Pooped (js/metabolics.js).
   if (energy && metabolicGain('energy').ok) pc.energy = Math.min(Math.max(100, Number(pc.energyMax) || 100), (pc.energy || 0) + energy);
   if (mood && metabolicGain('mood').ok) pc.mood = Math.min(moodMax(pc), (pc.mood || 0) + mood);
+  if (paid) {
+    // What landed: metabolics_add_* returns the change after the cap (inc_metabolics.js 55-76).
+    paid.energy = Math.max(0, (Number(pc.energy) || 0) - energyBefore);
+    paid.mood = Math.max(0, (Number(pc.mood) || 0) - moodBefore);
+    paid.xp = xp;
+    paid.currants = currants;
+    paid.favor = favorRewards.filter((entry) => entry.points);
+  }
   if (xp) {
     pc.imagination = (pc.imagination || 0) + xp;
     pc.xp = (pc.xp || 0) + xp;

@@ -53,7 +53,7 @@
  */
 
 import { addItem, removeItem, countItem } from '../inventory.js?v=5be47371';
-import { acceptOffer, npcQuestOffers, questStatus } from '../quest-offers.js?v=9c53455c';
+import { acceptOffer, npcQuestOffers, questStatus } from '../quest-offers.js?v=ecd7c1d7';
 import { groundBeneath, isItemSolid, platformYAt, platformsScreen } from '../street-model.js?v=b6cb6a4e';
 import { sheetFrames } from '../quest-rooms/kit.js?v=4e007609';
 import {

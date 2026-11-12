@@ -32,6 +32,8 @@ import {
   visitRookMuseumExhibit,
 } from '../public/js/rook-museum.js?v=825ff833';
 
+import { applyRewards, paidRewardBits } from '../public/js/quests.js?v=2951073f';
+
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
 test('Museum of the Rook preserves the two-part production quest contract', () => {
@@ -247,4 +249,18 @@ test("report 191: It's Educational II has its own offer after Part I, as the Gre
   assert.match(fn, /completeQuest\(questState, ROOK_HALL_START_QUEST_ID, pc\);\n      \}\n      offerPartTwo\(\);/);
   // Part II is never assigned without its offer being accepted.
   assert.equal((fn.match(/assignQuest\(questState, ROOK_HALL_QUEST_ID/g) || []).length, 1);
+});
+
+test('quest reward lines say what was paid, buffs included (rook_hall.js 55-57, de_embiggenify_part2.js 52-60, greedy_street_spirit.js 90-97)', () => {
+  const pc = { energy: 100, mood: 90, moodMax: 100, xp: 0, imagination: 0, currants: 0, rewardMultiplier: 2, giantFavor: {} };
+  const paid = {};
+  applyRewards(pc, { xp: 400, mood: 150, favor: { 0: { giant: 'pot', points: 100 } } }, { paid });
+  assert.equal(paid.xp, 800, 'a reward buff doubles it');
+  assert.equal(paid.mood, pc.mood - 90, 'mood paid stops at the cap');
+  assert.deepEqual(paidRewardBits(paid, (g) => g === 'pot' ? 'Pot' : g), ['+800 iMG', `+${paid.mood} mood`, '+200 favor with Pot']);
+  assert.deepEqual(paidRewardBits(null), []);
+  const game = fs.readFileSync(path.join(root, 'public/game.js'), 'utf8');
+  assert.doesNotMatch(game, /\+400 iMG|\+200 iMG, \+200 currants|\+100 favor with Pot/);
+  assert.match(game, /paidRewardBits\(completed\.paid, giantDisplayName\)/);
+  assert.match(game, /paidRewardBits\(result\.paid, giantDisplayName\)/);
 });

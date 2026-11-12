@@ -93,7 +93,7 @@ import {
   tickResourceNode,
 } from '../resource-nodes.js?v=24968e1f';
 import { frameTexture as sheetFrameTexture, loadTexture, textureFromUrl } from '../textures.js?v=92ec53cd';
-import { acceptOffer, markOffered, npcQuestOffers, putOffOffer, questStatus } from '../quest-offers.js?v=9c53455c';
+import { acceptOffer, markOffered, npcQuestOffers, putOffOffer, questStatus } from '../quest-offers.js?v=ecd7c1d7';
 import { OVERLAY_USES, playOverlay } from '../overlays.js?v=4e81f749';
 import { OVERLAY_FADE, displayTopOf, itemstackOverlayPoint } from '../overlay-art.js?v=a6561207';
 import { playItemOverlay } from '../item-overlay.js?v=97ed2ba0';

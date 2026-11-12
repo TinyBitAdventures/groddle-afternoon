@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=5d55594c';
 import { createErrorOnce, createFeatureHost } from './js/feature-host.js?v=06bb8b74';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=d13a4db7';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=54b6ee44';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl, drawTileArt } from './js/enter-chooser.js?v=4a3ea327';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -32,12 +32,13 @@ import {
   parseQuestConversation,
   cleanQuestMarkup,
   questDoneAt,
-} from './js/quests.js?v=2b882eb6';
+  paidRewardBits,
+} from './js/quests.js?v=2951073f';
 // Quest copy is Flash htmlText: <b>/<i>/<br> drawn as formatting, the rest dropped, never innerHTML.
 import { questRequirementText, renderQuestText, withQuestMarkup } from './js/quest-text.js?v=7f5d761c';
 // G267: the world-verb quest counters skip offer-system quests; old saves drop the boot Moloko quest.
-import { dropSpiritRepeatOffers, SPIRIT_REPEAT_QUESTS } from './js/spirit-reminisce.js?v=af43c271';
-import { dropBootStarterQuests, questMoveNote, routesCounter, worldVerbQuestEvents, gardenPlotEvents, makingUnitQuestEvents, shrineDonationQuestEvents } from './js/quest-offers.js?v=9c53455c';
+import { dropSpiritRepeatOffers, SPIRIT_REPEAT_QUESTS } from './js/spirit-reminisce.js?v=1fe46932';
+import { dropBootStarterQuests, questMoveNote, routesCounter, worldVerbQuestEvents, gardenPlotEvents, makingUnitQuestEvents, shrineDonationQuestEvents } from './js/quest-offers.js?v=ecd7c1d7';
 import {
   PHANTOM_QUEST_ID,
   REMEMBER_QUEST_ID,
@@ -129,7 +130,7 @@ import {
   qualificationVerb,
   requestLegalizeQualification,
   travelToGregarious,
-} from './js/legalize-it.js?v=a3a9ad2e';
+} from './js/legalize-it.js?v=70d110d3';
 import { HALL, HALL_LAYOUT, HALL_QUESTIONS } from './js/bureaucratic-hall.js?v=a0bc6317';
 import { STATION_X, stationArrival, stationScreen, surfaceStation } from './js/subway.js?v=44d1a09f';
 import { ALLEY, SHADY, drawAlley, inEnteredBox } from './js/quest-rooms/back-alley-set.js?v=e1bdc47e';
@@ -398,7 +399,7 @@ import {
   consumeAchievementCounters,
   resetAchievementCounter,
   purchaseAchievementUpdates,
-} from './js/achievements.js?v=2e4aa9cb';
+} from './js/achievements.js?v=552ecb19';
 import {
   applyStreetVisit,
   topUpCompletists,
@@ -507,7 +508,7 @@ import {
   parsePlayerSave,
   serializePlayerSave,
   restorePlayerSave,
-} from './js/player-save.js?v=a161d3e8';
+} from './js/player-save.js?v=ad26356b';
 import {
   HOME_INTERIOR_TSID,
   HOME_STREET_TSID,
@@ -18299,7 +18300,7 @@ function completeGreedyStreetSpiritWithPiggy(target) {
     text: completion,
     durationMs: 7200,
   });
-  pushActivity(`${completion} +1 Emotional Bear · +100 favor with Pot.`);
+  pushActivity(`${completion} ${['+1 Emotional Bear', ...paidRewardBits(result.paid, giantDisplayName)].join(' · ')}.`);
   toast('Quest complete · Emotional Bear acquired!', 4600);
   playSfx('quest', { volume: 0.74, rate: 1.05 });
   if (app?.canvas) {
@@ -20656,10 +20657,12 @@ function finishRookMuseumQuest() {
   const completed = active ? completeQuest(questState, ROOK_HALL_QUEST_ID, pc) : null;
   playSfx('quest', { volume: 0.7 });
   // A return visit (hall_repeat) reviews the exhibits without a second reward.
-  pushActivity(completed?.ok ? 'You completed It’s Educational II. +400 iMG.' : 'You reviewed the Museum of the Rook.');
-  toast(completed?.ok ? 'Museum training complete · +400 iMG' : 'Museum review complete', 4200);
+  // rook_hall.js 55-57: the line says what was paid (reward buffs and Fit for a King included).
+  const paidBits = completed?.ok ? paidRewardBits(completed.paid, giantDisplayName) : [];
+  pushActivity(completed?.ok ? `You completed It’s Educational II.${paidBits.length ? ` ${paidBits.join(', ')}.` : ''}` : 'You reviewed the Museum of the Rook.');
+  toast(completed?.ok ? ['Museum training complete', ...paidBits].join(' · ') : 'Museum review complete', 4200);
   if (app?.canvas) {
-    app.canvas.dataset.rookMuseumReward = '400';
+    app.canvas.dataset.rookMuseumReward = String(completed?.paid?.xp || 0);
     app.canvas.dataset.rookMuseumQuestCompleted = completed?.ok ? '1' : '0';
   }
   if (completed?.ok) {
@@ -21074,10 +21077,15 @@ function finishDeEmbiggenifyQuest() {
     : null;
   if (completed?.ok) addItem(inv, EMOTIONAL_BEAR_ID, 1);
   playSfx('quest', { volume: 0.72 });
-  pushActivity('You completed De-Embiggenify II. +200 iMG, +200 currants, +50 mood, +1 Emotional Bear.');
-  toast('Emotional Bear received · +200 iMG · +200 currants', 4600);
+  // de_embiggenify_part2.js 52-60: the line says what was paid, and nothing when no part 2 was active.
+  if (completed?.ok) {
+    const paidBits = paidRewardBits(completed.paid, giantDisplayName);
+    pushActivity(`You completed De-Embiggenify II. ${[...paidBits, '+1 Emotional Bear'].join(', ')}.`);
+    toast(['Emotional Bear received', ...paidBits.filter((b) => / (iMG|currants)$/.test(b))].join(' · '), 4600);
+  }
   if (app?.canvas) {
-    app.canvas.dataset.deEmbiggenifyReward = '200-img,200-currants,50-mood,1-emotional-bear';
+    const p = completed?.paid || {};
+    app.canvas.dataset.deEmbiggenifyReward = completed?.ok ? `${p.xp || 0}-img,${p.currants || 0}-currants,${p.mood || 0}-mood,1-emotional-bear` : 'none';
     app.canvas.dataset.deEmbiggenifyQuestCompleted = completed?.ok ? '1' : '0';
   }
   if (completed?.ok) {

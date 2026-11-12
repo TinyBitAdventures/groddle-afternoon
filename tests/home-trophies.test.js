@@ -34,13 +34,13 @@ import { hasUpgrades, upgradeVerb } from '../public/js/furniture-upgrades.js?v=a
 import { NO_SLOT_CLASSES } from '../public/js/pack-slots-data.js?v=800f664c';
 import { layoutPack, takesNoSlot } from '../public/js/pack-slots.js?v=4a36968a';
 import { WORLD_ART } from '../public/js/world-art-list.js?v=2d47f296';
-import { homeTrophyCount, isTrophyClass } from '../public/js/features/item-verbs-feature.js?v=d14f5f7f';
-import { homesFeature } from '../public/js/features/homes-feature.js?v=5fda5f34';
+import { homeTrophyCount, isTrophyClass } from '../public/js/features/item-verbs-feature.js?v=c30a5b0e';
+import { homesFeature } from '../public/js/features/homes-feature.js?v=4e8a703f';
 import { planStreetTrophies } from '../public/js/street-jobs.js?v=94f8d250';
 import { planEggTrophy } from '../public/js/seasons.js?v=1978c3f3';
 import { collectionTrophiesFeature as collection } from '../public/js/features/collection-trophies-feature.js?v=6dbc852b';
 import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=10b118dd';
-import { applyAchievementProgress, createAchievementState } from '../public/js/achievements.js?v=2e4aa9cb';
+import { applyAchievementProgress, createAchievementState } from '../public/js/achievements.js?v=552ecb19';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const GS = join(here, '../../glitch-GameServerJS');

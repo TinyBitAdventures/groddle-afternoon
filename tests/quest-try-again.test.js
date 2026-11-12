@@ -21,8 +21,8 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { loadContentCatalogsFromDir, resetContentCatalogs } from '../public/js/content-catalogs.js?v=10b118dd';
-import { createQuestState } from '../public/js/quests.js?v=2b882eb6';
-import { acceptOffer, markOffered, questStatus, tickQuestTimers } from '../public/js/quest-offers.js?v=9c53455c';
+import { createQuestState } from '../public/js/quests.js?v=2951073f';
+import { acceptOffer, markOffered, questStatus, tickQuestTimers } from '../public/js/quest-offers.js?v=ecd7c1d7';
 import {
   ALREADY_DOING_TIP,
   NO_STARTING_QUESTS_TIP,
@@ -30,7 +30,7 @@ import {
   retryTimedQuest,
   showWaitingOffer,
   startBlockedReason,
-} from '../public/js/features/quest-offers-feature.js?v=539f62b3';
+} from '../public/js/features/quest-offers-feature.js?v=7c77bd57';
 
 const PUBLIC = join(dirname(fileURLToPath(import.meta.url)), '../public');
 const read = (p) => readFileSync(join(PUBLIC, p), 'utf8');

@@ -23,7 +23,7 @@ import { phoneStage, stageFor } from '../public/js/location-view.js?v=9747e89a';
 import { STREET_WORLD_H } from '../public/js/features/homes-feature.js?v=4889ae38';
 import { AVATAR_STILL, homeKeyOf } from '../public/js/profiles.js?v=054ca723';
 import { HIRES_SPRITES, SPLIT_SPRITES } from '../public/js/sprite-hires.js?v=d4cce9f9';
-import { HOUSE_STYLE_KEYS } from '../public/js/features/homes-feature.js?v=5fda5f34';
+import { HOUSE_STYLE_KEYS } from '../public/js/features/homes-feature.js?v=4e8a703f';
 import { SITE_DIR, skipWithoutSite } from '../tools/repos.mjs';
 
 const root = join(import.meta.dirname, '..');

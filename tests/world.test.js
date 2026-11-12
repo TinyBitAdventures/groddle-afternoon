@@ -21,7 +21,7 @@ import {
   completeQuest,
   getQuestProgress,
   QUEST_CATALOG,
-} from '../public/js/quests.js?v=2b882eb6';
+} from '../public/js/quests.js?v=2951073f';
 import {
   createInventory,
   addItem,

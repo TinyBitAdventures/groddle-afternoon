@@ -43,7 +43,7 @@ import { energyMax, loseMood, metabolicGain, moodMax, shiftMetabolic } from '../
 import { grantMoodXp } from '../mood-xp.js?v=958e7680';
 import { slugsFromEffects } from '../speech-slugs.js?v=130338f9';
 import { getGameDayKey } from '../game-day.js?v=a7e262aa';
-import { cleanQuestMarkup } from '../quests.js?v=2b882eb6';
+import { cleanQuestMarkup } from '../quests.js?v=2951073f';
 import { followPath } from '../street-creatures.js?v=aac7e93d';
 import { walkSurfaceY } from '../walk-surface.js?v=106bfdc5';
 import { isStandable } from '../street-model.js?v=b6cb6a4e';

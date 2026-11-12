@@ -27,8 +27,8 @@ import {
   studyBuffBlockReason,
 } from '../public/js/buffs.js?v=819cb342';
 import { accelerateActiveStudy, createSkillState, getStudyStatus, startSkillStudy } from '../public/js/skills.js?v=4542bdf9';
-import { applyRewards } from '../public/js/quests.js?v=2b882eb6';
-import { normalizeBuffSnapshot } from '../public/js/player-save.js?v=a161d3e8';
+import { applyRewards } from '../public/js/quests.js?v=2951073f';
+import { normalizeBuffSnapshot } from '../public/js/player-save.js?v=ad26356b';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '../public');
 
