@@ -374,7 +374,7 @@ import {
   slipTerrainY,
   starlitMoonPlainAlpha,
   starlitRevealAlpha,
-} from './js/paradise-flight.js?v=c7acd7a2';
+} from './js/paradise-flight.js?v=8056a720';
 import { resolveParadiseCourseAlias } from './js/paradise-courses.js?v=1a5d0aa7';
 import {
   buildParadiseCourseArt,
@@ -505,7 +505,7 @@ import {
   parsePlayerSave,
   serializePlayerSave,
   restorePlayerSave,
-} from './js/player-save.js?v=0f400596';
+} from './js/player-save.js?v=00f88199';
 import {
   HOME_INTERIOR_TSID,
   HOME_STREET_TSID,

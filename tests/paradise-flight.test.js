@@ -37,7 +37,7 @@ import {
   slipTerrainY,
   starlitMoonPlainAlpha,
   starlitRevealAlpha,
-} from '../public/js/paradise-flight.js?v=c7acd7a2';
+} from '../public/js/paradise-flight.js?v=8056a720';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const publicDir = path.join(here, '..', 'public');

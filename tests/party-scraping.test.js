@@ -16,7 +16,7 @@ import {
   runPartyScrapingVerb,
 } from '../public/js/resource-nodes.js?v=db9c69bd';
 import { createToolConditionState } from '../public/js/tools.js?v=5f482998';
-import { normalizePlayerSnapshot } from '../public/js/player-save.js?v=0f400596';
+import { normalizePlayerSnapshot } from '../public/js/player-save.js?v=00f88199';
 import { partyScrapingFeature as feature } from '../public/js/features/party-scraping-feature.js?v=52b9af29';
 
 const GS = join(dirname(fileURLToPath(import.meta.url)), '../../glitch-GameServerJS');

@@ -2,6 +2,7 @@
 
 import { EXTRA_PARADISE_COURSES } from './paradise-courses.js?v=1a5d0aa7';
 import { qrazyRewardForLevel, quoinTouches } from './quoins.js?v=7e0dec6d';
+import { getGameDayKey } from './game-day.js?v=f88e6e16';
 
 export const PARADISE_DURATION_MS = 4 * 60 * 1000;
 export const PARADISE_DAILY_LIMIT = 11;
@@ -308,9 +309,16 @@ function cleanIndexes(value, max) {
     .sort((a, b) => a - b);
 }
 
+/**
+ * The day the 11-a-day ticket limit counts in. Glitch's paradise_ticket.js 154 reads
+ * stats_get_daily_counter, whose counters reset when current_day_key() changes
+ * (players/inc_achievements.js 14-19, common.js 22): the game day, four real hours.
+ * The "game-" prefix keeps an older save's calendar key ("2026-11-12") from ever
+ * matching, so its count cannot hold the new day's tickets back.
+ */
 export function paradiseDayKey(now = Date.now()) {
-  const date = new Date(now);
-  return Number.isFinite(date.getTime()) ? date.toISOString().slice(0, 10) : '1970-01-01';
+  const time = Number(now);
+  return `game-${getGameDayKey(Number.isFinite(time) ? time : 0)}`;
 }
 
 export function normalizeParadiseState(seed = {}, now = Date.now()) {
