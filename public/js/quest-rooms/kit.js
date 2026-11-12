@@ -11,6 +11,7 @@
 
 import { frameTexture, isLoaded, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js?v=f024bd6a';
 import { quoinTouches } from '../quoins.js?v=7e0dec6d';
+import { sharpRoomDeco } from '../deco-hires.js?v=cad0b32d';
 
 export const DECO_DIR = 'assets/decos/groddle/';
 export const ICON_DIR = 'assets/sprites/icons/';
@@ -85,10 +86,13 @@ export function sceneRoot(PIXI, width, height) {
 /** A recovered deco, bottom-centre anchored by default. */
 export function deco(PIXI, name, x, y, opts = {}) {
   // Decos are asked for as .png (js/deco-hires.js routes them to their WebP); every other folder ships lossless WebP.
+  // A deco drawn larger than its file takes its sharp copy at the screen's density, as streets do.
   const dir = opts.dir || DECO_DIR;
-  const spr = new PIXI.Sprite(textureFromUrl(`${dir}${name}.${dir.includes('assets/decos/') ? 'png' : 'webp'}`));
-  spr.anchor.set(opts.ax ?? 0.5, opts.ay ?? 1);
+  const url = `${dir}${name}.${dir.includes('assets/decos/') ? 'png' : 'webp'}`;
   const s = opts.scale ?? 1;
+  const sharp = sharpRoomDeco(url, Math.max(Math.abs(s), Math.abs(opts.sy ?? s)));
+  const spr = new PIXI.Sprite(sharp ? textureFromUrl(sharp.url, sharp.opts) : textureFromUrl(url));
+  spr.anchor.set(opts.ax ?? 0.5, opts.ay ?? 1);
   spr.scale.set(opts.flip ? -s : s, opts.sy ?? s);
   spr.x = x;
   spr.y = y;

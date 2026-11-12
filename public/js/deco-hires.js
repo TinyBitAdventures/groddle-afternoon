@@ -24,7 +24,7 @@ import { NEW_DECOS, NEW_DECOS_HIRES } from './deco-new-list.js?v=eadb6e8c';
 
 /** A published zone's new art (gz_ decos, js/deco-new-list.js): drawn like library decos. */
 export { NEW_DECOS };
-import { SHARP_DECOS } from './deco-sharp-list.js?v=9ebccaeb';
+import { SHARP_DECOS } from './deco-sharp-list.js?v=6bd649ff';
 
 const DECO_PNG = /^(.*?(?:^|\/)assets\/decos\/groddle\/)([^/?#]+)\.png([?#].*)?$/;
 
@@ -63,6 +63,9 @@ export function maxTextureSizeOf(renderer) {
   }
 }
 
+/** The renderer installHiresDecos was given: quest rooms (js/quest-rooms/kit.js) pick sharp copies at its density. */
+let routeRenderer = () => null;
+
 /**
  * Route every deco PNG URL in js/textures.js to its WebP, at 3x when the screen needs it.
  * `renderer()` returns the Pixi renderer (or nothing yet): its resolution is the effective scale
@@ -73,6 +76,7 @@ export function maxTextureSizeOf(renderer) {
  * @param {{ renderer?: () => any }} [opts]
  */
 export function installHiresDecos(textures, { renderer = () => null } = {}) {
+  routeRenderer = renderer;
   let hires = false;
   let maxSize = null;
   const route = (url) => {
@@ -122,9 +126,10 @@ export const FAR_SHARP_BUDGET_BYTES = 96 * 1024 * 1024;
  * - `far: true` (behind the middleground): the same, over the 2x file those layers load;
  * - `blurDensity` (a blurred layer: js/street-render.js blurBakeResolution): its bake's texels per
  *   view px, which keeps nothing finer;
- * - `per` (a home street or back-yard landscape, js/features/homes-feature.js): this placement's
- *   own view px per logical px, in place of the list's s, sf or sb; near rules otherwise. Every
- *   home look placement that needs a copy is in the list (its sh).
+ * - `per` (a home street or back-yard landscape, js/features/homes-feature.js, or a quest room's
+ *   deco, js/quest-rooms/kit.js): this placement's own view px per logical px, in place of the
+ *   list's s, sf or sb; near rules otherwise. Every home look and quest room placement that needs
+ *   a copy is in the list (its sh).
  * Returns { url, kind, bytes, need, base, w, h } (w x h the logical size) and for svg { width, height, resolution }:
  * - webp: <name>@<res>x.webp (resolution from the name, logical size unchanged)
  * - svg: <name>.svg?r=<res>, rasterised at width x height (js/textures.js textureFromUrl(url,
@@ -180,4 +185,24 @@ export function admitSharp(picks, budget = FAR_SHARP_BUDGET_BYTES) {
     out.add(p.url);
   }
   return out;
+}
+
+/**
+ * A quest-room deco's sharp copy (js/quest-rooms/kit.js deco): the placement draws the deco at
+ * `per` view px per logical px, so it takes the copy sharpDeco picks for that at the renderer's
+ * density now, as a street's middleground does; null keeps the usual 2x/3x file (always before
+ * the renderer starts, and at a phone's 1 for a deco drawn at about half its 2x file).
+ * Returns { url, opts } for js/textures.js textureFromUrl.
+ * @param {string} url the deco's .png URL
+ * @param {number} per
+ */
+export function sharpRoomDeco(url, per) {
+  const r = routeRenderer();
+  if (!r || !(per > 0)) return null;
+  const pick = sharpDeco(url, r.resolution || 1, { per, bigTextures: (maxTextureSizeOf(r) || 4096) >= 8192 });
+  if (!pick) return null;
+  return {
+    url: pick.url,
+    opts: pick.kind === 'svg' ? { raw: true, width: pick.width, height: pick.height, resolution: pick.resolution } : { raw: true },
+  };
 }

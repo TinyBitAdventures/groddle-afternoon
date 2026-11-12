@@ -8,8 +8,9 @@ of 171 x 573, about 6x magnified on a 4x backing store. This tool finds those an
 sized to the need, from the same CC0 bundle SWF (tinyspeck/glitch-locations; FFDec reads it, never
 runs it).
 
-Measure (no rendering): every drawn deco on every street in index.json, and every deco a home
-street or back-yard style draws (js/home-styles-data.js looks, home_placements), middleground and the
+Measure (no rendering): every drawn deco on every street in index.json, every deco a home
+street or back-yard style draws (js/home-styles-data.js looks, home_placements) and every deco a
+rebuilt quest room draws with js/quest-rooms/kit.js deco() (room_placements), middleground and the
 layers drawn in front of it (layers behind it load the 2x file on purpose, js/street-render.js;
 blurred layers bake at reduced resolution; hidden layers never draw). Parallax and T_ layers are
 only offset, never scaled, so a deco's w x h is its on-screen size in view px. The renderer draws
@@ -226,6 +227,98 @@ def home_placements(plan):
     return out
 
 
+QUEST_ROOMS = os.path.join(PUBLIC, 'js', 'quest-rooms')
+NUM = re.compile(r'^-?\d+(?:\.\d+)?$')
+
+
+def _call_args(text, start):
+    """The top-level arguments of the call whose '(' is at text[start], or None."""
+    depth, args, cur, i, quote = 0, [], [], start, None
+    while i < len(text):
+        c = text[i]
+        if quote:
+            cur.append(c)
+            if c == '\\':
+                cur.append(text[i + 1])
+                i += 1
+            elif c == quote:
+                quote = None
+        elif c in '\'"`':
+            quote = c
+            cur.append(c)
+        elif c in '([{':
+            depth += 1
+            if depth > 1:
+                cur.append(c)
+        elif c in ')]}':
+            depth -= 1
+            if depth == 0:
+                args.append(''.join(cur).strip())
+                return args
+            cur.append(c)
+        elif c == ',' and depth == 1:
+            args.append(''.join(cur).strip())
+            cur = []
+        else:
+            cur.append(c)
+        i += 1
+    return None
+
+
+def _room_scale(expr):
+    """A kit.deco scale written in the room's source: a number, a number over a number, or
+    `a + (i % n) * b` (its largest value, i up to n - 1); None for anything else."""
+    expr = (expr or '').strip()
+    if NUM.match(expr):
+        return float(expr)
+    m = re.match(r'^(\d+(?:\.\d+)?)\s*/\s*(\d+(?:\.\d+)?)$', expr)
+    if m:
+        return float(m.group(1)) / float(m.group(2))
+    m = re.match(r'^(\d+(?:\.\d+)?)\s*\+\s*\(\w+ % (\d+)\)\s*\*\s*(\d+(?:\.\d+)?)$', expr)
+    if m:
+        return float(m.group(1)) + (int(m.group(2)) - 1) * float(m.group(3))
+    m = re.match(r'^[\w.% ]+\?\s*(\d+(?:\.\d+)?)\s*:\s*(\d+(?:\.\d+)?)$', expr)
+    if m:
+        return max(float(m.group(1)), float(m.group(2)))
+    return None
+
+
+def room_placements(plan):
+    """Every deco a rebuilt quest room draws with js/quest-rooms/kit.js deco() (js/deco-hires.js
+    sharpRoomDeco picks its copy for the placement's own scale, as homes do): the deco names are
+    the string literals of the call's name argument, its scale and sy the options' (1 when left
+    out); a scale the source computes at run time is not measured. Rooms draw their world at one
+    view px per world px and never blur a deco, so all count as near; same dicts as placements(),
+    cls 'home' (the list's sh is the largest of home and room placements)."""
+    out = []
+    for fn in sorted(os.listdir(QUEST_ROOMS)):
+        if not fn.endswith('.js') or fn == 'kit.js':
+            continue
+        text = open(os.path.join(QUEST_ROOMS, fn), encoding='utf-8').read()
+        for m in re.finditer(r'\bkit\.deco\(', text):
+            args = _call_args(text, m.end() - 1)
+            if not args or len(args) < 2:
+                continue
+            names = re.findall(r"'([A-Za-z0-9_]+)'", args[1])
+            opts = args[4] if len(args) > 4 else ''
+            if 'dir:' in opts:
+                continue
+            sm = re.search(r'\bscale:\s*([^,}]+)', opts)
+            ym = re.search(r'\bsy:\s*([^,}]+)', opts)
+            k = _room_scale(sm.group(1)) if sm else 1.0
+            ky = _room_scale(ym.group(1)) if ym else k
+            if k is None or ky is None:
+                continue
+            line = text.count('\n', 0, m.start()) + 1
+            for sp in names:
+                if sp not in plan:
+                    continue
+                L = plan[sp]['size2']
+                out.append(dict(sprite=sp, tsid=f'{fn}:{line}', street=f'quest room {fn[:-3]}', layer='room', cls='home',
+                                blurred=False, blur=0, gain=1.0, w=round(L[0] * abs(k), 2), h=round(L[1] * abs(ky), 2), sized=True))
+    return out
+
+
 def edge_score(path):
     """99th percentile of the largest premultiplied channel step to the right/lower neighbour (0-255)
     over covered pixels; a centre crop of at most 2048 px keeps texel steps for big files."""
@@ -258,7 +351,7 @@ def measure(plan, old=None):
     S = SETTINGS
     old_edges = {r['name']: r for r in ((old or {}).get('decos') or []) + ((old or {}).get('skipped') or []) + ((old or {}).get('soft') or [])}
     by = collections.defaultdict(list)
-    for p in placements(plan) + home_placements(plan):
+    for p in placements(plan) + home_placements(plan) + room_placements(plan):
         by[p['sprite']].append(p)
     rows = []
     for sp, ps in by.items():
@@ -649,7 +742,8 @@ def js_text(p):
         " * the screen's need; \"webp\": <name>@<res>x.webp (res 0 for svg). s, sf, sb: the largest view px per\n"
         ' * logical px over its near, far (behind the middleground) and blurred placements that need it\n'
         ' * (0: none, that kind keeps the 2x/3x file); w x h the logical size (the 2x file). sh, only when\n'
-        ' * a home street or back-yard look needs it: the same over those (js/features/homes-feature.js).\n'
+        ' * a home street or back-yard look (js/features/homes-feature.js) or a quest room (js/quest-rooms/kit.js)\n'
+        ' * needs it: the same over those.\n'
         ' * Generated by sharp.py; do not edit by hand.\n'
         ' */\n'
         'export const SHARP_DECOS = new Map([\n' + ',\n'.join(ents) + '\n]);\n'
