@@ -42,7 +42,7 @@ describe('the boards\' words box grows (Bugs thread 6)', { skip: skipWithoutSite
     assert.match(js, /const fit = grow\(field\);/, 'the reply box');
     assert.match(js.slice(js.indexOf('function editPost(')), /grow\(field\);/, 'an edit');
     assert.match(src('src/CommunityPages.php'), /<textarea class="ctext cx-field" id="cthread-body"/);
-    assert.match(src('src/CommunityPages.php'), /public const ASSET_KEY = 'community-14';/);
+    assert.match(src('src/CommunityPages.php'), /public const ASSET_KEY = 'community-15';/);
   });
 });
 
@@ -66,5 +66,16 @@ describe('topics show their starter\'s picture (Bugs thread 8)', () => {
     // The picture is the one posts show (public profile only), drawn as the chat app's buddies are.
     assert.match(src('src/Community.php'), /'tile' => \$public && \$at !== null \? Profiles::imageUrl\(\$id, 'tile', \$at\) : null,/);
     assert.match(src('community/community.css'), /\.cx-av img \{ width: 100%; height: 100%; border-radius: 50%; object-fit: cover;/);
+  });
+});
+
+describe('the website chat names the day where it changes (Austin 2026-11-12)', { skip: skipWithoutSite }, () => {
+  it('puts a day line before the first line of each day', () => {
+    const app = src('community/chat-app.js');
+    assert.match(app, /function dayLabel\(ms, now = Date\.now\(\)\)/);
+    assert.match(app, /return 'Today';/);
+    assert.match(app, /return 'Yesterday';/);
+    assert.match(app, /if \(day !== lastDay\) \{/);
+    assert.match(src('community/community.css'), /\.cx-day \{/);
   });
 });
