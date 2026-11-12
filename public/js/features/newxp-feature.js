@@ -159,6 +159,7 @@ import {
   createAkState,
 } from '../skillquest-ak.js?v=397a9d19';
 import { filterText } from '../word-filter.js?v=9a7a7ebb';
+import { phoneScreenFrame, safeAreaInsets } from '../touch-controls.js?v=9621609b';
 
 export const NEWXP_FEATURE_ID = 'newxp';
 /** newxp_training1.js 705-706 slothRemove: deleteWithPoof, then hideTree 0.5 s later. */
@@ -431,7 +432,9 @@ function positionBubbles() {
   if (thumbs?.height > 0) instrTop = Math.min(instrTop, thumbs.top - ui.instr.offsetHeight - 8);
   ui.instr.style.top = `${instrTop}px`;
   // Under the energy, mood and level (#hud-stats), never over them (player report 2026-11-01).
-  const pill = tutorialPillSpot(r, document.querySelector('#hud-stats')?.getBoundingClientRect());
+  // TOUCH: a phone's pill keeps to the screen's top-left, inside the safe area (js/touch-controls.js).
+  const frame = globalThis.GRODDLE_DEVICE === 'phone' ? phoneScreenFrame(window.innerWidth, window.innerHeight, safeAreaInsets(document)) : r;
+  const pill = tutorialPillSpot(frame, document.querySelector('#hud-stats')?.getBoundingClientRect());
   ui.pill.style.left = `${pill.left}px`;
   ui.pill.style.top = `${pill.top}px`;
 }

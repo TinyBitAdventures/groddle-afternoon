@@ -209,3 +209,34 @@ export function installTouchControls({ root, press, release, jump, doc = globalT
     },
   };
 }
+
+
+let insetProbe = null;
+/** The screen's safe-area insets in CSS px (env(safe-area-inset-*); 0 where there are none). */
+export function safeAreaInsets(doc = globalThis.document) {
+  const zero = { top: 0, right: 0, bottom: 0, left: 0 };
+  if (!doc?.body) return zero;
+  if (!insetProbe || !insetProbe.isConnected) {
+    insetProbe = doc.createElement('div');
+    insetProbe.setAttribute('aria-hidden', 'true');
+    insetProbe.style.cssText = 'position:fixed;left:0;top:0;width:0;height:0;visibility:hidden;pointer-events:none;'
+      + 'padding:env(safe-area-inset-top,0px) env(safe-area-inset-right,0px) env(safe-area-inset-bottom,0px) env(safe-area-inset-left,0px)';
+    doc.body.appendChild(insetProbe);
+  }
+  const cs = doc.defaultView?.getComputedStyle?.(insetProbe);
+  if (!cs) return zero;
+  const px = (v) => Number.parseFloat(v) || 0;
+  return { top: px(cs.paddingTop), right: px(cs.paddingRight), bottom: px(cs.paddingBottom), left: px(cs.paddingLeft) };
+}
+
+/**
+ * PURE: the box a phone's screen-anchored pills (the tutorial's "Tutorial · <stage>") measure from:
+ * the screen inside its safe area, never the stage's letterboxed top.
+ */
+export function phoneScreenFrame(width, height, safe = {}) {
+  const l = Number(safe.left) || 0;
+  const t = Number(safe.top) || 0;
+  const r = Number(safe.right) || 0;
+  const b = Number(safe.bottom) || 0;
+  return { left: l, top: t, width: Math.max(0, width - l - r), height: Math.max(0, height - t - b) };
+}

@@ -18,7 +18,7 @@ const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const pub = join(root, 'public');
 
 async function stageScale() {
-  const { stageFor } = await import('../public/js/location-view.js?v=f1f922b4');
+  const { stageFor } = await import('../public/js/location-view.js?v=57e8e487');
   // Original zoom on a 2560 x 1440 monitor (the game area under the top bar), CSS px per world px.
   return stageFor({ width: 2560, height: 1360, sceneWidth: 4000, sceneHeight: 1000, zoom: 1 }).scale;
 }

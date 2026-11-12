@@ -59,6 +59,12 @@ export const VIEW_HOLD_H = 1000;
  */
 export const ORIGINAL_VIEW_W = 1000;
 export const ORIGINAL_VIEW_H = 600;
+/**
+ * TOUCH PORTRAIT (Austin 2026-11-12, an iPhone held upright): the narrowest view an upright phone
+ * shows (phoneStage). Under it a short scene (a room, a home) keeps a band above the canvas
+ * instead of magnifying to a keyhole.
+ */
+export const PHONE_PORTRAIT_MIN_VIEW_W = 560;
 /** The remake's smallest view: its old fixed 408 px, inside the source's 400-600. */
 export const VIEW_FLOOR_H = 408;
 /** Before the page can be measured (boot, tests): the smallest view. */
@@ -197,11 +203,13 @@ export function stageFor({
   sceneHeight,
   pinnedHeight,
   zoom = 0,
+  phone = false,
 } = {}) {
   const W = finite(width);
   const H = finite(height);
   const pack = finite(packReserve, MIN_PACK_HEIGHT);
   const pinned = finite(pinnedHeight);
+  if (phone && !(pinned > 0) && W > 0 && H > W) return phoneStage({ width: W, height: H, packReserve: pack, sceneWidth, sceneHeight });
   if (pinned > 0 || !(W > 0) || !(H > 0)) {
     const viewW = LOCATION_VIEW_W;
     const viewH = locationViewHeightFor({ forced: pinned > 0 ? pinned : NaN, sceneHeight });
@@ -236,4 +244,32 @@ export function stageFor({
     cssHeight: held ? (viewH + pack) * scale : H,
     pinned: false,
   };
+}
+
+/**
+ * PURE (TOUCH PORTRAIT): the stage of an upright phone (the phone gate's phone, a window taller
+ * than wide). The width floor that keeps a computer's view 960 px wide drew a portrait iPhone's
+ * street as a 0.41x strip under a 400 px band of sky (Austin 2026-11-12). Here the scene's height
+ * fits the screen's instead: the view is the scene's own height (VIEW_FLOOR_H to VIEW_HOLD_H, the
+ * whole of nearly every street), the canvas fills the window and the view is as wide as that
+ * leaves (675 px on a 393 x 659 iPhone, against 1156 x 408 sideways). A scene so short the view
+ * would be narrower than PHONE_PORTRAIT_MIN_VIEW_W holds that width and keeps a band above, as a
+ * tall window always did; a scene narrower than the view magnifies to fill it. Zoom does not
+ * apply (the Wide and Original ends come out the same).
+ */
+export function phoneStage({ width, height, packReserve = MIN_PACK_HEIGHT, sceneWidth, sceneHeight } = {}) {
+  const W = finite(width);
+  const H = finite(height);
+  const pack = finite(packReserve, MIN_PACK_HEIGHT);
+  const sh = finite(sceneHeight);
+  const fitH = Math.min(VIEW_HOLD_H, Math.max(VIEW_FLOOR_H, sh > 0 ? Math.floor(sh) : VIEW_HOLD_H));
+  let scale = Math.min(H / (fitH + pack), W / PHONE_PORTRAIT_MIN_VIEW_W);
+  const sw = finite(sceneWidth);
+  if (sw > 0) scale = Math.max(scale, W / sw);
+  scale = Math.min(scale, H / (VIEW_FLOOR_H + pack));
+  const viewW = Math.round(W / scale);
+  const room = Math.floor(H / scale + 1e-6) - pack;
+  const viewH = Math.max(VIEW_FLOOR_H, Math.min(room, fitH));
+  const held = viewH < room;
+  return { scale, viewW, viewH, canvasH: viewH + pack, cssWidth: W, cssHeight: held ? (viewH + pack) * scale : H, pinned: false, phone: true };
 }

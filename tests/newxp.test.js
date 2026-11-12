@@ -686,6 +686,8 @@ describe('tutorial pill (player report 2026-11-01)', () => {
     assert.deepEqual(tutorialPillSpot(canvas, { left: 0, top: 0, right: 0, bottom: 0, width: 0, height: 0 }), { left: 10, top: 10 });
     assert.deepEqual(tutorialPillSpot(canvas, { left: 900, top: 4, right: 1200, bottom: 48, width: 300, height: 44 }), { left: 10, top: 10 });
     assert.deepEqual(tutorialPillSpot(canvas, null), { left: 10, top: 10 });
-    assert.match(readFileSync(join(ROOT, 'js/features/newxp-feature.js'), 'utf8'), /tutorialPillSpot\(r, document\.querySelector\('#hud-stats'\)\?\.getBoundingClientRect\(\)\)/);
+    assert.match(readFileSync(join(ROOT, 'js/features/newxp-feature.js'), 'utf8'), /tutorialPillSpot\(frame, document\.querySelector\('#hud-stats'\)\?\.getBoundingClientRect\(\)\)/);
+    // TOUCH (Austin 2026-11-12): a phone measures from the screen's safe area, never the stage's letterboxed top.
+    assert.match(readFileSync(join(ROOT, 'js/features/newxp-feature.js'), 'utf8'), /const frame = globalThis\.GRODDLE_DEVICE === 'phone' \? phoneScreenFrame\(window\.innerWidth, window\.innerHeight, safeAreaInsets\(document\)\) : r;/);
   });
 });

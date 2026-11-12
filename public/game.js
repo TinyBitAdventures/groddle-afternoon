@@ -773,12 +773,12 @@ import {
 import { momentMoreText } from './js/ui/moment-card.js?v=68e10b61';
 import { CHAT_MAX_CHARS, chatBubbleText } from './js/ui/chat-input.js?v=72d000ac';
 // HUB: the hub is the Modern skin's; Classic owns X in its skin (js/classic/classic-hub.js).
-import { MODERN, onUiModeChange, uiState } from './js/classic/ui-mode.js?v=11da9030';
+import { MODERN, onUiModeChange, uiState } from './js/classic/ui-mode.js?v=f1f33f66';
 // ZOOM: the world zoom (a device preference) and Classic's frame scale under it; both load before main().
 import { worldZoom, setWorldZoom, stepWorldZoom, onZoomChange, zoomKeyAction, zoomKeyToast, zoomFixed, setZoomFixed, onZoomFixedChange } from './js/world-zoom.js?v=1d0c0cfb';
 import { nightTint, nightTintOn, onNightTintChange, worldTintOpacity } from './js/night-tint.js?v=1dfc9c89';
 import { streetMapSetting, toggleStreetMap } from './js/ui/street-minimap.js?v=fa31d398';
-import './js/classic/classic-zoom.js?v=3e4e5747';
+import './js/classic/classic-zoom.js?v=70273032';
 import { mountImaginationHub } from './js/ui/imagination-hub.js?v=51fa371f';
 import { newDayBubble, shuffleNewDayMessages, waitForScreenGates } from './js/screen-queue.js?v=cf0132c0';
 import { applyFamiliarLook, familiarCardHeading, familiarLook, skillArtFor, skillLearnedActivity } from './js/familiar.js?v=5fd83250';
@@ -795,7 +795,7 @@ import { landingY, stackRestY, walkSurfaceY } from './js/walk-surface.js?v=106bf
 import { holdCloseToFloor } from './js/slope-walk.js?v=9af1e505';
 import { JUMP_SPEED, MAX_TICK_FRAMES, WALK_MAX, avatarGround, coastX, frameSteps, stepAvatar, steerAccel, steerX, streetPhysicsExtras } from './js/avatar-step.js?v=43b1182e';
 import { createUserPath, stepUserPath } from './js/user-path.js?v=8880557f';
-import { climbGoalStep, installTouchControls, isPhoneDevice, touchPrompt, touchTapPlan } from './js/touch-controls.js?v=4b7e0a03';
+import { climbGoalStep, installTouchControls, isPhoneDevice, touchPrompt, touchTapPlan } from './js/touch-controls.js?v=9621609b';
 import { FAILED_LINE, inVerbReach, movingLine, verbRange, walkOverEnd, walkOverGoals } from './js/walk-over.js?v=277ab977';
 import { hellBuffDesc, isInHell } from './js/hell.js?v=33923da7';
 import { climbBobY, ladderAnimState, ladderSwap } from './js/ladder-anim.js?v=a8b327a0';
@@ -1032,7 +1032,7 @@ import { SLUG_ANIMATION, SLUG_LAYOUT, SLUG_STYLES, SLUG_TARGETS, drawSlugIcon, f
 import { filterText } from './js/word-filter.js?v=9a7a7ebb'; // the remake's own word filter
 import { arrangeMapCards, fitMapExtras } from './js/map-extras.js?v=9f38c312'; // the Map's Shortcuts
 // The interface skin (js/classic/ui-mode.js) sets <html data-ui> as it loads: before main(), so before the boot cover lifts.
-import { installInterfaceSettings } from './js/classic/classic-prefs.js?v=e88d87be';
+import { installInterfaceSettings } from './js/classic/classic-prefs.js?v=beaa2488';
 
 /** @type {object|null} assets/maps/index.json */
 let mapIndexCache = null;
@@ -1898,6 +1898,8 @@ function stageArgs() {
     packReserve: PACK_VIEW_RESERVE,
     sceneWidth: sceneViewWidthCap(bgLayer, WORLD_W),
     sceneHeight,
+    // TOUCH PORTRAIT: an upright phone fits the scene's height to the screen (location-view phoneStage).
+    phone: TOUCH_PHONE,
   };
 }
 
