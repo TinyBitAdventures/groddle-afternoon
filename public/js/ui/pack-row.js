@@ -229,6 +229,20 @@ export function createPackRow({ document: doc = globalThis.document, setData = (
     for (const [key, value] of [['Overflow', state.overflow ? '1' : '0'], ['ScrollLeft', String(Math.round(state.left))], ['ScrollMax', String(Math.round(state.max))]]) {
       setData(`packItem${key}`, value);
     }
+    refreshScrollEdges();
+  }
+
+  /**
+   * PACKSCROLL (a phone, style.css): the bags and stacks scroll together in #pack-scroll, so its
+   * edges fade where there is more (is-over: more to the right; is-scrolled: more to the left).
+   */
+  function refreshScrollEdges() {
+    const box = $('pack-scroll');
+    if (!box) return;
+    const state = packPagerState(box);
+    box.classList.toggle('is-over', state.overflow && state.canForward);
+    box.classList.toggle('is-scrolled', state.overflow && state.canBack);
+    box.dataset.packOverflow = state.overflow ? '1' : '0';
   }
 
   function slotStep(box) {
@@ -457,6 +471,8 @@ export function createPackRow({ document: doc = globalThis.document, setData = (
     // Decoration Mode's Pack tab scrolls the bags and stacks together (#pack-scroll, js/ui/home-builder.js
     // renderDock): the tooltip goes and a stack's menu follows its slot, as on the row's own scroll.
     $('pack-scroll')?.addEventListener('scroll', () => { hideTip(); onScroll(); }, { passive: true });
+    // PACKSCROLL (a phone): its edges fade where there is more.
+    $('pack-scroll')?.addEventListener('scroll', refreshScrollEdges, { passive: true });
     box?.addEventListener('wheel', (event) => {
       const state = packPagerState(box);
       if (!state.overflow || Math.abs(event.deltaY) <= Math.abs(event.deltaX)) return;

@@ -688,7 +688,7 @@ import {
   setSignpostHover,
   setSignpostKeys,
   signpostBoardAt,
-} from './js/street-render.js?v=4b7ef978';
+} from './js/street-render.js?v=47697d4c';
 import {
   GAME_DAY_MS,
   shouldFireNewDay,
@@ -747,7 +747,7 @@ import { easeCameraAxis } from './js/camera-feel.js?v=e668afc5';
 import { renderResolution, resolutionCap, RESOLUTION_STEP } from './js/render-density.js?v=20f9f1ee';
 // g458: low energy and mood turn amber and red, and a click offers something from the pack.
 import { makingNeeds, vitalMenuEmpty, vitalMenuHeading, vitalSnacks } from './js/vitals.js?v=85a51302';
-import { DEFAULT_VP_H, LOCATION_VIEW_W, VIEW_CEIL_H, stageFor, sceneViewCap, sceneViewWidthCap, zoomMovesStage } from './js/location-view.js?v=57e8e487';
+import { DEFAULT_VP_H, LOCATION_VIEW_W, VIEW_CEIL_H, stageFor, sceneViewCap, sceneViewWidthCap, zoomMovesStage, phoneZoomSpan } from './js/location-view.js?v=9747e89a';
 import {
   levelInfoForXp,
   reconcilePlayerProgression,
@@ -776,12 +776,12 @@ import {
 import { momentMoreText } from './js/ui/moment-card.js?v=68e10b61';
 import { CHAT_MAX_CHARS, chatBubbleText } from './js/ui/chat-input.js?v=72d000ac';
 // HUB: the hub is the Modern skin's; Classic owns X in its skin (js/classic/classic-hub.js).
-import { MODERN, onUiModeChange, uiState } from './js/classic/ui-mode.js?v=f1f33f66';
+import { MODERN, onUiModeChange, uiState } from './js/classic/ui-mode.js?v=1db965c7';
 // ZOOM: the world zoom (a device preference) and Classic's frame scale under it; both load before main().
-import { worldZoom, setWorldZoom, stepWorldZoom, onZoomChange, zoomKeyAction, zoomKeyToast, zoomFixed, setZoomFixed, onZoomFixedChange } from './js/world-zoom.js?v=1d0c0cfb';
+import { worldZoom, setWorldZoom, stepWorldZoom, onZoomChange, zoomKeyAction, zoomKeyToast, zoomFixed, setZoomFixed, onZoomFixedChange, phoneZoom } from './js/world-zoom.js?v=34c2cf14';
 import { nightTint, nightTintOn, onNightTintChange, worldTintOpacity } from './js/night-tint.js?v=1dfc9c89';
 import { streetMapSetting, toggleStreetMap } from './js/ui/street-minimap.js?v=6c530941';
-import './js/classic/classic-zoom.js?v=70273032';
+import './js/classic/classic-zoom.js?v=48d35c85';
 import { mountImaginationHub } from './js/ui/imagination-hub.js?v=51fa371f';
 import { newDayBubble, shuffleNewDayMessages, waitForScreenGates } from './js/screen-queue.js?v=cf0132c0';
 import { applyFamiliarLook, familiarCardHeading, familiarLook, skillArtFor, skillLearnedActivity } from './js/familiar.js?v=bafd7139';
@@ -799,6 +799,7 @@ import { holdCloseToFloor } from './js/slope-walk.js?v=9af1e505';
 import { JUMP_SPEED, MAX_TICK_FRAMES, WALK_MAX, avatarGround, coastX, frameSteps, stepAvatar, steerAccel, steerX, streetPhysicsExtras } from './js/avatar-step.js?v=43b1182e';
 import { createUserPath, stepUserPath } from './js/user-path.js?v=8880557f';
 import { climbGoalStep, installTouchControls, isPhoneDevice, touchPrompt, touchTapPlan } from './js/touch-controls.js?v=89321eeb';
+import { installPinchZoom } from './js/touch-pinch.js?v=6cd34a65';
 import { FAILED_LINE, inVerbReach, movingLine, verbRange, walkOverEnd, walkOverGoals } from './js/walk-over.js?v=277ab977';
 import { hellBuffDesc, isInHell } from './js/hell.js?v=cd6ed74f';
 import { climbBobY, ladderAnimState, ladderSwap } from './js/ladder-anim.js?v=a8b327a0';
@@ -992,7 +993,7 @@ import { installHiresIcons } from './js/icon-hires.js?v=165dbd6e';
 import { installHiresDecos } from './js/deco-hires.js?v=f59e60d3';
 import { loadAudioLevels, loadMutedPreference, saveAudioLevel, saveMutedPreference } from './js/audio-pref.js?v=6fe817bc';
 import { createAudioBuses, fadeGain } from './js/audio-buses.js?v=af167b54';
-import { installTopBar, renderTopBar } from './js/ui/topbar.js?v=5673fa58';
+import { installTopBar, renderTopBar } from './js/ui/topbar.js?v=04d7482c';
 import { focusBack, installFocusReturn, lastInput } from './js/ui/focus-return.js?v=da190597';
 import { installContextGuard } from './js/ui/context-guard.js?v=0f71ac17';
 import { QUOIN_FRAME_BOB, advanceQuoinClock, quoinBobBetweenFrames } from './js/quoin-motion.js?v=ea0bd408';
@@ -1906,12 +1907,25 @@ function stageArgs() {
     sceneHeight,
     // TOUCH PORTRAIT: an upright phone fits the scene's height to the screen (location-view phoneStage).
     phone: TOUCH_PHONE,
+    // PHONE ZOOM: its own close-up level on top (a pinch; Modern only: Classic's frame keeps its own rule).
+    closeup: phoneCloseup(),
   };
 }
 
 function measureStage() {
   // ZOOM (js/world-zoom.js): Wide (0) to Original (1), this device's choice.
   return stageFor({ ...stageArgs(), zoom: worldZoom() });
+}
+
+/** PHONE ZOOM (js/world-zoom.js phoneZoom): the close-up level the upright phone stage draws at. */
+function phoneCloseup() {
+  return TOUCH_PHONE && modernUi() && PINNED_VIEW_H <= 0 ? phoneZoom.get() : 0;
+}
+
+/** PHONE ZOOM: how much closer the closest level draws on this street (1: it cannot, as sideways). */
+function phoneZoomSpanHere() {
+  if (!TOUCH_PHONE || !modernUi() || PINNED_VIEW_H > 0) return 1;
+  return phoneZoomSpan(stageArgs());
 }
 
 /**
@@ -1935,6 +1949,7 @@ function syncLocationViewHeight({ keepFraming = false } = {}) {
   const before = { viewW: VIEW_W, camX: camTarget };
   const stage = measureStage();
   setZoomFixed(streetZoomFixed());
+  if (TOUCH_PHONE) phoneZoom.setFixed(phoneZoomSpanHere() <= 1.005);
   const root = document.getElementById('game-root');
   if (root && !stage.pinned) {
     // Only a view held under the window's height (a portrait phone) leaves a band above the canvas.
@@ -1962,6 +1977,7 @@ function syncLocationViewHeight({ keepFraming = false } = {}) {
     app.canvas.dataset.locationViewportHeight = String(LOCATION_VIEW_H);
     app.canvas.dataset.viewWidth = String(VIEW_W);
     app.canvas.dataset.stageScale = STAGE_SCALE.toFixed(3);
+    if (TOUCH_PHONE) app.canvas.dataset.phoneZoom = String(phoneZoom.get());
   }
   // CameraMan scales y_cam_offset with loc_vp_h: the avatar keeps its share of the view.
   if (world && Number.isFinite(camY)) {
@@ -1999,12 +2015,29 @@ function applyWorldZoom() {
   syncLocationViewHeight({ keepFraming: true });
   syncRenderResolution();
   if (app?.canvas) app.canvas.dataset.worldZoom = String(worldZoom());
+  if (app?.canvas && TOUCH_PHONE) app.canvas.dataset.phoneZoom = String(phoneZoom.get());
   try {
     zoomRelaying = true;
     window.dispatchEvent(new Event('resize'));
   } finally {
     zoomRelaying = false;
   }
+}
+
+/** SIGNTAP: how far (CSS px) outside a signpost arm's board a phone's tap still takes it. */
+const SIGN_TOUCH_PAD_PX = 14;
+
+/**
+ * SIGNTAP (Austin 2026-11-12 on his iPhone: "It's a bit hard to hit the street signs"): the arm
+ * nearest a phone's tap within SIGN_TOUCH_PAD_PX of its board (js/street-render.js signpostBoardAt
+ * pad), unless something other than that arm's own post is under the finger (an animal, a tree).
+ */
+function touchSignBoard(sx, sy) {
+  const near = signpostBoardAt(signViewsHere(), sx, sy, { pad: SIGN_TOUCH_PAD_PX / (STAGE_SCALE || 1) });
+  if (!near) return null;
+  const under = pickInteractableAt(sx, sy);
+  if (under && under !== near.board?.target && under.sprite !== near.view) return null;
+  return near;
 }
 
 /** G582: the most of the view the camera reserves at the right (street-render's edge mirrors cover it). */
@@ -30220,6 +30253,8 @@ async function main() {
   });
   // ZOOM: the Menu, the Sound popover, Preferences and the = - 0 keys all land here.
   onZoomChange(() => applyWorldZoom());
+  // PHONE ZOOM: a pinch on the street (js/touch-pinch.js) and the phone Menu's slider.
+  if (TOUCH_PHONE) phoneZoom.onChange(() => applyWorldZoom());
   // NIGHT TINT: the Menu's switch and Preferences land here; the tint eases to its new strength.
   onNightTintChange(() => updateDametimeChrome());
   // Pixi renders filters at resolution 1 by default. The street colour matrix
@@ -32072,7 +32107,21 @@ async function main() {
   });
   app.canvas.addEventListener('pointerleave', clearSignpostBoardHover);
 
+  // PINCH (js/touch-pinch.js): on a phone a touch on the street acts when it lifts as a tap, so two
+  // fingers zoom (the phone zoom) and never open a menu or walk; synthetic presses act at once.
+  const worldPinch = TOUCH_PHONE ? installPinchZoom({
+    canvas: app.canvas,
+    tap: (e) => worldPress(e),
+    getLevel: () => phoneZoom.get(),
+    setLevel: (z) => { if (modernUi()) phoneZoom.set(z); },
+    span: () => phoneZoomSpanHere(),
+    setData: (k, v) => setCanvasData(k, v),
+  }) : null;
   app.canvas.addEventListener('pointerdown', (e) => {
+    if (worldPinch?.defer(e)) return;
+    worldPress(e);
+  });
+  function worldPress(e) {
     if (!state.started || menuTarget || isMapOpen() || isScreenFxBlocking()) return;
     // Player report 23: only the main button acts on the world. The client's right click was its
     // Flash menu, "A game by Tiny Speck" (BootStrap.as 38-55, TSMainView.as 207), never a verb menu.
@@ -32088,7 +32137,9 @@ async function main() {
 
     // Each road-name board owns its own hover/click target; the post and the
     // other destination arms are deliberately inert for this click.
-    const signBoard = signpostBoardAt(signViewsHere(), sx, sy);
+    // SIGNTAP (phone): a finger is wider than a pointer, so an arm takes a tap a little outside its board.
+    const signBoard = signpostBoardAt(signViewsHere(), sx, sy)
+      || (TOUCH_PHONE && e.pointerType === 'touch' ? touchSignBoard(sx, sy) : null);
     // FRIENDPOST: a scene post's arm (the home street's signpost) runs its own verb.
     if (signBoard?.board?.scene) {
       takeSceneArm(signBoard);
@@ -32148,7 +32199,7 @@ async function main() {
       // TOUCH: a tap on empty street walks there, or climbs the tapped ladder.
       touchTapStreet(sx, sy);
     }
-  });
+  }
   // TOUCH: the phone's stick and Jump (js/touch-controls.js) hold the same keys a keyboard does.
   if (TOUCH_PHONE) {
     installTouchControls({
@@ -32842,9 +32893,11 @@ async function main() {
   // Phase 2 (js/ui/topbar.js): the modern bar's tooltips, Menu groups, Sound popover and pills.
   // Enter stays the world's: a mouse click on a HUD control hands focus back (js/ui/focus-return.js).
   installFocusReturn(document);
+  // PHONE ZOOM: on a phone the bar's Zoom slider moves the phone's close-up level (js/world-zoom.js).
+  const hudZoom = TOUCH_PHONE ? phoneZoom : { get: worldZoom, set: setWorldZoom, onChange: onZoomChange, fixed: zoomFixed, onFixedChange: onZoomFixedChange };
   installTopBar(document, {
     audio: { levels: () => ({ ...audioLevels }), setLevel: setAudioLevel },
-    zoom: { get: worldZoom, set: setWorldZoom, onChange: onZoomChange, fixed: zoomFixed, onFixedChange: onZoomFixedChange },
+    zoom: hudZoom,
     nightTint,
     streetMap: streetMapSetting,
     favor: { rows: () => favorPanelRows(shrineState, favorGiantHere()?.id || null) },

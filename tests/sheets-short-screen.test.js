@@ -10,7 +10,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { packRowClearance } from '../public/js/ui/pack-row.js?v=f27cf531';
+import { packRowClearance } from '../public/js/ui/pack-row.js?v=64e4a567';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const css = readFileSync(join(root, 'public/style.css'), 'utf8');

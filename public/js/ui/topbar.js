@@ -22,7 +22,7 @@
  */
 import { vitalLevel, vitalTitle } from '../vitals.js?v=85a51302';
 import { loadAudioRestore, saveAudioRestore } from '../audio-pref.js?v=6fe817bc';
-import { ZOOM_FIXED_NOTE, ZOOM_KEYS_HINT, clampZoom, zoomLabel, zoomValueText } from '../world-zoom.js?v=1d0c0cfb';
+import { PHONE_ZOOM_ENDS, PHONE_ZOOM_HINT, ZOOM_FIXED_NOTE, ZOOM_KEYS_HINT, clampZoom, phoneZoomLabel, phoneZoomValueText, zoomLabel, zoomValueText } from '../world-zoom.js?v=34c2cf14';
 import { NIGHT_TINT_HINT, NIGHT_TINT_LABEL } from '../night-tint.js?v=1dfc9c89';
 import { STREET_MAP_HINT, STREET_MAP_LABEL } from './street-minimap.js?v=6c530941';
 import { focusBack } from './focus-return.js?v=da190597';
@@ -62,6 +62,8 @@ export const MENU_ROWS = Object.freeze({
   // A phone only (installPhoneRows): the skill being learned (or how many are ready), and Sound.
   'menu-study-btn': { group: 'now', rank: 0, key: 'K' },
   'menu-sound-btn': { group: 'now', rank: 3 },
+  // A phone only (js/ui/featured-project.js renderFeaturedMenuRow): the featured street project, in place of its pill.
+  'menu-featured-btn': { group: 'now', rank: 4 },
   'home-btn': { group: 'world', rank: 0 },
   'feat-btn': { group: 'world', rank: 1, key: 'H' },
   // Ticket 81: the Projects panel (features/street-jobs-feature.js).
@@ -1080,8 +1082,12 @@ function installSound(doc, audio) {
  * and the keys under it (ZOOM_KEYS_HINT). On a street that looks the same at every zoom
  * (`zoom.fixed()`, #149) the slider is disabled and the line under it says so (ZOOM_FIXED_NOTE).
  * `where` names it for QA (data-zoom-control). Returns the row and a draw().
+ * PHONE ZOOM: a phone's zoom (`zoom.phone`, js/world-zoom.js phoneZoom) goes from the whole street to
+ * the closest, and the line under it says to pinch (a phone has no keys).
  */
 export function zoomSlider(doc, zoom, { id, where, className = 'hud-slider hud-zoom' }) {
+  const phone = Boolean(zoom?.phone);
+  const hint = phone ? PHONE_ZOOM_HINT : ZOOM_KEYS_HINT;
   const row = doc.createElement('div');
   row.className = className;
   row.dataset.zoomControl = where;
@@ -1096,23 +1102,24 @@ export function zoomSlider(doc, zoom, { id, where, className = 'hud-slider hud-z
   const ends = doc.createElement('span');
   ends.id = `${id}-ends`;
   ends.className = 'hud-zoom-ends';
-  ends.innerHTML = '<span>Wide</span><span>Original</span>';
+  const [near, far] = phone ? PHONE_ZOOM_ENDS : ['Wide', 'Original'];
+  ends.innerHTML = `<span>${near}</span><span>${far}</span>`;
   // The keys that do the same from anywhere in the game (world-zoom.js zoomKeyAction).
   const keys = doc.createElement('p');
   keys.id = `${id}-keys`;
   keys.className = 'hud-zoom-keys';
-  keys.textContent = ZOOM_KEYS_HINT;
+  keys.textContent = hint;
   row.append(label, input, out, ends, keys);
   const draw = () => {
     const z = clampZoom(zoom?.get?.());
     const fixed = Boolean(zoom?.fixed?.());
     if (doc.activeElement !== input) input.value = String(Math.round(z * 100));
-    setText(out, zoomLabel(z));
-    input.setAttribute('aria-valuetext', zoomValueText(z));
+    setText(out, phone ? phoneZoomLabel(z) : zoomLabel(z));
+    input.setAttribute('aria-valuetext', phone ? phoneZoomValueText(z) : zoomValueText(z));
     input.disabled = fixed;
     if (fixed) row.dataset.zoomFixed = '';
     else delete row.dataset.zoomFixed;
-    setText(keys, fixed ? ZOOM_FIXED_NOTE : ZOOM_KEYS_HINT);
+    setText(keys, fixed ? ZOOM_FIXED_NOTE : hint);
   };
   input.addEventListener('input', () => {
     zoom?.set?.(clampZoom(Number(input.value) / 100));

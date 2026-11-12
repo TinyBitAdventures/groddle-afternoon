@@ -102,22 +102,55 @@ export function nextZoom(z, action) {
   return v;
 }
 
-export function loadZoom(storage) {
+export function loadZoom(storage, key = ZOOM_STORAGE_KEY, fallback = ZOOM_DEFAULT) {
   try {
-    return clampZoom(storage?.getItem(ZOOM_STORAGE_KEY) ?? null);
+    const raw = storage?.getItem(key) ?? null;
+    return raw === null || raw === '' ? fallback : clampZoom(raw);
   } catch {
-    return ZOOM_DEFAULT;
+    return fallback;
   }
 }
 
-export function saveZoom(z, storage) {
+export function saveZoom(z, storage, key = ZOOM_STORAGE_KEY) {
   try {
     const v = clampZoom(z);
     // Every choice is kept, Wide too: an empty slot reads as the default (Original).
-    storage?.setItem(ZOOM_STORAGE_KEY, String(v));
+    storage?.setItem(key, String(v));
   } catch {
     /* the level just won't be remembered */
   }
+}
+
+/**
+ * PHONE ZOOM (Austin 2026-11-12 on his iPhone: "It's a bit hard to hit the street signs. Maybe
+ * zooming feature would be all it needs?"): an upright phone (js/location-view.js phoneStage)
+ * already fits the whole street's height to the screen, so Wide and Original draw the same there.
+ * Its own level goes the other way, closer: 0 is that whole-street view (where a phone starts), 1
+ * the closest, a 408 px tall view (VIEW_FLOOR_H, the smallest any room was tuned for), about twice
+ * as big on a 1000 px street. Same model as the world zoom (0 to 1, continuous, geometric), its
+ * own slot on the device, never in a save; a two-finger pinch on the street moves it
+ * (js/touch-pinch.js), as does the Menu's Zoom slider on a phone.
+ */
+export const PHONE_ZOOM_STORAGE_KEY = 'groddle.zoom.phone';
+export const PHONE_ZOOM_DEFAULT = 0;
+/** The phone slider's ends and the line under it (no keys on a phone). */
+export const PHONE_ZOOM_ENDS = Object.freeze(['Whole street', 'Closest']);
+export const PHONE_ZOOM_HINT = 'Pinch the street with two fingers to zoom.';
+
+/** PURE: the phone level's live label. */
+export function phoneZoomLabel(z) {
+  const v = clampZoom(z);
+  if (v <= 0) return PHONE_ZOOM_ENDS[0];
+  if (v >= 1) return PHONE_ZOOM_ENDS[1];
+  return `${Math.round(v * 100)}%`;
+}
+
+/** PURE: the words a screen reader hears for a phone level. */
+export function phoneZoomValueText(z) {
+  const v = clampZoom(z);
+  if (v <= 0) return 'Whole street';
+  if (v >= 1) return 'Closest';
+  return `${Math.round(v * 100)}% of the way from the whole street to the closest`;
 }
 
 /**
@@ -125,9 +158,9 @@ export function saveZoom(z, storage) {
  * set() stores the level, tells onZoomChange listeners (the stage, the sliders) and
  * sends `groddle:zoom` on the window.
  */
-export function createWorldZoom({ win = globalThis, storage } = {}) {
+export function createWorldZoom({ win = globalThis, storage, key = ZOOM_STORAGE_KEY, fallback = ZOOM_DEFAULT } = {}) {
   const store = storage !== undefined ? storage : (() => { try { return win?.localStorage; } catch { return null; } })();
-  let level = loadZoom(store);
+  let level = loadZoom(store, key, fallback);
   let fixed = false;
   const listeners = new Set();
   const fixedListeners = new Set();
@@ -153,7 +186,7 @@ export function createWorldZoom({ win = globalThis, storage } = {}) {
       if (v === level) return level;
       const before = level;
       level = v;
-      saveZoom(v, store);
+      saveZoom(v, store, key);
       for (const fn of [...listeners]) {
         try { fn(v, before); } catch (err) { console.error(err); }
       }
@@ -165,7 +198,7 @@ export function createWorldZoom({ win = globalThis, storage } = {}) {
     step(action) {
       // FIXED: a key changes nothing on this street, so the level (this device's choice for every street) stays.
       if (fixed) return level;
-      return this.set(nextZoom(level, action));
+      return this.set(action === 'reset' ? fallback : nextZoom(level, action));
     },
     onChange(fn) {
       listeners.add(fn);
@@ -183,3 +216,15 @@ export const onZoomChange = (fn) => zoom.onChange(fn);
 export const zoomFixed = () => zoom.fixed();
 export const setZoomFixed = (f) => zoom.setFixed(f);
 export const onZoomFixedChange = (fn) => zoom.onFixedChange(fn);
+
+const phone = createWorldZoom({ key: PHONE_ZOOM_STORAGE_KEY, fallback: PHONE_ZOOM_DEFAULT });
+/** PHONE ZOOM: this phone's close-up level, 0 (the whole street) to 1 (the closest); the same API as the world zoom. */
+export const phoneZoom = Object.freeze({
+  phone: true,
+  get: () => phone.get(),
+  set: (z) => phone.set(z),
+  onChange: (fn) => phone.onChange(fn),
+  fixed: () => phone.fixed(),
+  setFixed: (f) => phone.setFixed(f),
+  onFixedChange: (fn) => phone.onFixedChange(fn),
+});

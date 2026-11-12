@@ -14,6 +14,8 @@ import { FEATURED_TEXT as T, featuredLabel, featuredPillText, featuredStatus, fe
 
 export const FEATURED_PILL_ID = 'featured-project-pill';
 export const FEATURED_ROW_ID = 'featured-project-row';
+/** PHONE (Austin 2026-11-12): the Menu's row that stands in for the pill on a phone. */
+export const FEATURED_MENU_ID = 'menu-featured-btn';
 const STAR = 'm6 .8 1.6 3.3 3.6.5-2.6 2.5.6 3.6L6 9 2.8 10.7l.6-3.6L.8 4.6l3.6-.5z';
 
 const STYLE = `
@@ -23,6 +25,7 @@ const STYLE = `
   font: var(--fw-bold) var(--fs-xs)/var(--lh-tight) var(--font-ui); white-space: nowrap; cursor: pointer; pointer-events: auto; }
 .featured-pill[hidden] { display: none; }
 body.nx-tutorial .featured-pill, body.nx-tutorial .featured-row { display: none; }
+body.nx-tutorial #menu-featured-btn { display: none; }
 .featured-pill:hover { border-color: var(--accent); }
 .featured-pill:focus-visible { outline: none; box-shadow: var(--shadow-2), 0 0 0 2px var(--focus); }
 .featured-pill .fp-star, .featured-row .fp-star { flex: none; width: 0.95em; height: 0.95em; color: var(--accent); }
@@ -124,7 +127,52 @@ export function renderFeaturedPill(doc, f, o = {}) {
   pill.title = o.needs ? `${T.pillTip} ${o.needs}.` : T.pillTip;
   pill.setAttribute('aria-label', `${featuredLabel(f, o.now)}${o.needs ? ` ${o.needs}.` : ''}`);
   pill.hidden = Boolean(o.hide);
+  renderFeaturedMenuRow(doc, o.hide ? null : f, o);
   return pill;
+}
+
+/**
+ * PHONE (Austin 2026-11-12 on his iPhone): the pill covered the street's name under the top bar, so a
+ * phone shows no pill (style.css PHONE6) and the Menu's first group carries it instead: "Featured:
+ * Tuntsa Coze · 92%" with its bar, opening the same Projects card. Made in #more-list (js/ui/topbar.js
+ * MENU_ROWS places it in the phone's Now group); shown only on a phone in Modern, by style.css.
+ * @param {Document} doc
+ * @param {object|null} f
+ * @param {{ onOpen?: Function, now?: number, needs?: string }} o
+ */
+export function renderFeaturedMenuRow(doc, f, o = {}) {
+  const list = doc.getElementById?.('more-list');
+  // Computers and tablets keep the pill and never get the row.
+  if (!list || !doc.documentElement?.classList?.contains('touch-phone')) return null;
+  let row = doc.getElementById(FEATURED_MENU_ID);
+  if (!row) {
+    row = doc.createElement('button');
+    row.type = 'button';
+    row.id = FEATURED_MENU_ID;
+    row.className = 'chrome-btn menu-phone-row menu-featured-row';
+    row.hidden = true;
+    row.addEventListener('click', () => {
+      const more = doc.getElementById('more-btn');
+      if (more && !list.hidden) more.click();
+      row._onOpen?.();
+    });
+    list.append(row);
+  }
+  row._onOpen = o.onOpen;
+  if (!f) {
+    row.hidden = true;
+    row.dataset.featuredJob = '';
+    return row;
+  }
+  const sig = `${f.jobId}|${f.label}|${f.percent}`;
+  if (row.dataset.sig !== sig) {
+    row.dataset.sig = sig;
+    row.replaceChildren(starIcon(doc), span(doc, 'fp-text', featuredPillText(f)), bar(doc, f.percent));
+  }
+  row.dataset.featuredJob = f.jobId;
+  row.setAttribute('aria-label', `${featuredLabel(f, o.now)}${o.needs ? ` ${o.needs}.` : ''}`);
+  row.hidden = false;
+  return row;
 }
 
 /**

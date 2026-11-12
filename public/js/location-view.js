@@ -169,6 +169,18 @@ export function zoomMovesStage(args = {}) {
 }
 
 /**
+ * PURE (PHONE ZOOM): how much closer the closest phone zoom draws than the phone's own view, for
+ * stageFor's arguments (1 when it cannot magnify: a sideways phone, a pinned page, a short room).
+ */
+export function phoneZoomSpan(args = {}) {
+  if (!args.phone || finite(args.pinnedHeight) > 0) return 1;
+  const near = stageFor({ ...args, closeup: 1 });
+  const far = stageFor({ ...args, closeup: 0 });
+  if (!near.phone || !far.phone || !(far.scale > 0)) return 1;
+  return near.scale / far.scale;
+}
+
+/**
  * The stage for a window (g458, Austin's UI audit): how many CSS px one world
  * px takes (scale) and the view that buys, in world px.
  *
@@ -204,12 +216,13 @@ export function stageFor({
   pinnedHeight,
   zoom = 0,
   phone = false,
+  closeup = 0,
 } = {}) {
   const W = finite(width);
   const H = finite(height);
   const pack = finite(packReserve, MIN_PACK_HEIGHT);
   const pinned = finite(pinnedHeight);
-  if (phone && !(pinned > 0) && W > 0 && H > W) return phoneStage({ width: W, height: H, packReserve: pack, sceneWidth, sceneHeight });
+  if (phone && !(pinned > 0) && W > 0 && H > W) return phoneStage({ width: W, height: H, packReserve: pack, sceneWidth, sceneHeight, closeup });
   if (pinned > 0 || !(W > 0) || !(H > 0)) {
     const viewW = LOCATION_VIEW_W;
     const viewH = locationViewHeightFor({ forced: pinned > 0 ? pinned : NaN, sceneHeight });
@@ -256,8 +269,13 @@ export function stageFor({
  * would be narrower than PHONE_PORTRAIT_MIN_VIEW_W holds that width and keeps a band above, as a
  * tall window always did; a scene narrower than the view magnifies to fill it. Zoom does not
  * apply (the Wide and Original ends come out the same).
+ *
+ * PHONE ZOOM: `closeup` (0 to 1, js/world-zoom.js phoneZoom, a pinch) magnifies from that view
+ * (0) to the closest the floors allow (1: a VIEW_FLOOR_H view filling the screen's height),
+ * geometrically like the world zoom; the camera then scrolls the street up and down as a
+ * computer's does. Fewer world px are drawn, never bigger textures (js/render-density.js).
  */
-export function phoneStage({ width, height, packReserve = MIN_PACK_HEIGHT, sceneWidth, sceneHeight } = {}) {
+export function phoneStage({ width, height, packReserve = MIN_PACK_HEIGHT, sceneWidth, sceneHeight, closeup = 0 } = {}) {
   const W = finite(width);
   const H = finite(height);
   const pack = finite(packReserve, MIN_PACK_HEIGHT);
@@ -266,7 +284,10 @@ export function phoneStage({ width, height, packReserve = MIN_PACK_HEIGHT, scene
   let scale = Math.min(H / (fitH + pack), W / PHONE_PORTRAIT_MIN_VIEW_W);
   const sw = finite(sceneWidth);
   if (sw > 0) scale = Math.max(scale, W / sw);
-  scale = Math.min(scale, H / (VIEW_FLOOR_H + pack));
+  const top = H / (VIEW_FLOOR_H + pack);
+  scale = Math.min(scale, top);
+  const c = Math.min(1, Math.max(0, finite(closeup, 0)));
+  if (c > 0 && top > scale) scale *= (top / scale) ** c;
   const viewW = Math.round(W / scale);
   const room = Math.floor(H / scale + 1e-6) - pack;
   const viewH = Math.max(VIEW_FLOOR_H, Math.min(room, fitH));

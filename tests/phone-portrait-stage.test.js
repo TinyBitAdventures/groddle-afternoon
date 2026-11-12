@@ -10,7 +10,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { MIN_PACK_HEIGHT, PHONE_PORTRAIT_MIN_VIEW_W, VIEW_FLOOR_H, VIEW_HOLD_H, phoneStage, stageFor } from '../public/js/location-view.js?v=57e8e487';
+import { MIN_PACK_HEIGHT, PHONE_PORTRAIT_MIN_VIEW_W, VIEW_FLOOR_H, VIEW_HOLD_H, phoneStage, stageFor } from '../public/js/location-view.js?v=9747e89a';
 import { phoneScreenFrame } from '../public/js/touch-controls.js?v=89321eeb';
 import { tutorialPillSpot } from '../public/js/newxp.js?v=45ae5f37';
 

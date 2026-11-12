@@ -34,7 +34,7 @@
  * The parts added here are hidden unless Classic is on (hidden attributes, kept in step with the
  * interface), and the rules for them are in css/classic.css's "Classic skills" block.
  */
-import { uiState, onUiModeChange } from './ui-mode.js?v=f1f33f66';
+import { uiState, onUiModeChange } from './ui-mode.js?v=1db965c7';
 import { focusSkillInPanel, openOnlySkillInPanel, skillPanelUiState } from '../skills-panel.js?v=4de079e9';
 import { formatStudyTime } from '../skills.js?v=4542bdf9';
 import { SKILL_CATEGORIES, SKILL_CATEGORY_ORDER } from '../skill-tree.js?v=faa54b90';

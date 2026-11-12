@@ -53,7 +53,7 @@ import { ITEM_CATALOG, addItem, countItem, ensureItem, itemIcon, packStamp, remo
 import { canUseTool, useToolCondition } from '../tools.js?v=5f482998';
 import { ecologyForStreet } from '../street-ecology.js?v=f27417a8';
 import { worldToScreen } from '../street-model.js?v=b6cb6a4e';
-import { signArmWidth } from '../street-render.js?v=4b7ef978';
+import { signArmWidth } from '../street-render.js?v=47697d4c';
 import { getSkillCatalog } from '../content-catalogs.js?v=10b118dd';
 import { GIANTS } from '../shrines.js?v=e2755fac';
 import { giantDisplayName } from '../giant-names.js?v=0e295891';
@@ -142,11 +142,11 @@ import { SIGN_ARMS, routeGraph } from '../map-routes.js?v=c7e7dc80';
 import { TELEPORTERS } from '../hidden-floors.js?v=732a2610';
 import { WINTRY_PORTAL_TELEPORTERS } from '../wintry-portal.js?v=1437deda';
 import { PROJECTS_TEXT, contributedJobs, mineTotal, projectEntry, projectList } from '../projects-tracker.js?v=edd58b99';
-import { PROJECTS_PANEL_ID, buildProjectsPanel, renderProjects } from '../ui/projects-sheet.js?v=e1d49852';
+import { PROJECTS_PANEL_ID, buildProjectsPanel, renderProjects } from '../ui/projects-sheet.js?v=4b62e271';
 import { SIDE_SHEET_IDS } from '../ui/panel-shell.js?v=06a0d3fe';
 import { trophyGotText } from '../home-trophies.js?v=2020b29b';
 import { FEATURED_TEXT, featuredChanged, featuredFromServer, featuredNeedsLine } from '../featured-project.js?v=3cc0565c';
-import { renderFeaturedPill, renderFeaturedRow } from '../ui/featured-project.js?v=d4b01f4f';
+import { renderFeaturedPill, renderFeaturedRow } from '../ui/featured-project.js?v=46c958b3';
 import { GEM_HINTS, isGem } from '../gem-hints.js?v=4b65f7ac';
 
 export const STREET_JOBS_FEATURE_ID = 'street-jobs';

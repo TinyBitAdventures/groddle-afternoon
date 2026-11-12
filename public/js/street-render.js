@@ -460,16 +460,22 @@ export function setSignpostHover(g, on, boardIndex = null) {
 /**
  * Hit-test one destination board in world/Pixi coordinates. The post and other
  * arms deliberately do not count, matching the original per-destination UI.
+ * SIGNTAP: `pad` (world px, a phone's tap) also takes a point that far outside a
+ * board, the nearest board winning; 0 (a pointer) is the board's own box only.
  * @param {any[]} signViews
  * @param {number} worldX
  * @param {number} worldY
+ * @param {{ pad?: number }} [opts]
  */
-export function signpostBoardAt(signViews, worldX, worldY) {
+export function signpostBoardAt(signViews, worldX, worldY, { pad = 0 } = {}) {
+  const reach = Math.max(0, Number(pad) || 0);
+  let best = null;
   for (const view of [...(signViews || [])].reverse()) {
     if (!view || view.destroyed) continue;
     const scale = Number(view.signScale) || 1;
     const holderX = (Number(worldX) - (Number(view.x) || 0)) / scale;
     const holderY = (Number(worldY) - (Number(view.y) || 0)) / scale;
+    const slack = reach / scale;
     for (const board of [...(view.signBoards || [])].reverse()) {
       const dx = holderX - (Number(board.x) || 0);
       const dy = holderY - (Number(board.y) || 0);
@@ -479,13 +485,12 @@ export function signpostBoardAt(signViews, worldX, worldY) {
       const localX = dx * cos + dy * sin;
       const localY = -dx * sin + dy * cos;
       const hit = board.hitArea;
-      if (
-        hit &&
-        localX >= hit.x &&
-        localX <= hit.x + hit.width &&
-        localY >= hit.y &&
-        localY <= hit.y + hit.height
-      ) {
+      if (!hit) continue;
+      // How far outside the board the point is (0 inside), in the board's own px.
+      const ox = Math.max(hit.x - localX, 0, localX - (hit.x + hit.width));
+      const oy = Math.max(hit.y - localY, 0, localY - (hit.y + hit.height));
+      const off = Math.hypot(ox, oy);
+      if (off === 0) {
         return {
           view,
           board,
@@ -493,9 +498,10 @@ export function signpostBoardAt(signViews, worldX, worldY) {
           connection: board.connection,
         };
       }
+      if (off <= slack && (!best || off * scale < best.off)) best = { off: off * scale, view, board };
     }
   }
-  return null;
+  return best ? { view: best.view, board: best.board, index: best.board.index, connection: best.board.connection } : null;
 }
 
 /** Load list of available deco basenames (no .png). */

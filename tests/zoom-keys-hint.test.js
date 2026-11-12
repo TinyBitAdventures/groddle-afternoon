@@ -16,8 +16,8 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { ZOOM_KEYS_HINT, createWorldZoom, nextZoom, zoomKeyAction, zoomKeyToast } from '../public/js/world-zoom.js?v=1d0c0cfb';
-import { zoomSlider } from '../public/js/ui/topbar.js?v=5673fa58';
+import { ZOOM_KEYS_HINT, createWorldZoom, nextZoom, zoomKeyAction, zoomKeyToast } from '../public/js/world-zoom.js?v=34c2cf14';
+import { zoomSlider } from '../public/js/ui/topbar.js?v=04d7482c';
 import { hotkeySections, hotkeyText } from '../public/js/client-hotkeys.js?v=31d1891d';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');

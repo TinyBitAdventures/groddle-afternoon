@@ -19,10 +19,10 @@ import {
   loadZoom,
   saveZoom,
   createWorldZoom,
-} from '../public/js/world-zoom.js?v=1d0c0cfb';
-import { stageFor, ORIGINAL_VIEW_W, ORIGINAL_VIEW_H, LOCATION_VIEW_W, VIEW_FLOOR_H, MIN_PACK_HEIGHT } from '../public/js/location-view.js?v=57e8e487';
-import { classicLayout, classicScale, classicZoomScale, chromeWidth, railFor } from '../public/js/classic/classic-layout.js?v=9be132b9';
-import { classicZoomVar } from '../public/js/classic/classic-zoom.js?v=70273032';
+} from '../public/js/world-zoom.js?v=34c2cf14';
+import { stageFor, ORIGINAL_VIEW_W, ORIGINAL_VIEW_H, LOCATION_VIEW_W, VIEW_FLOOR_H, MIN_PACK_HEIGHT } from '../public/js/location-view.js?v=9747e89a';
+import { classicLayout, classicScale, classicZoomScale, chromeWidth, railFor } from '../public/js/classic/classic-layout.js?v=0633a2a6';
+import { classicZoomVar } from '../public/js/classic/classic-zoom.js?v=48d35c85';
 import { hotkeySections, clientKeyAction } from '../public/js/client-hotkeys.js?v=31d1891d';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');

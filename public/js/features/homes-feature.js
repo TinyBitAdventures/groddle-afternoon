@@ -242,7 +242,7 @@ import {
 } from '../home-styles.js?v=13fe0aaa';
 import { frameTexture, isLoaded, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js?v=92ec53cd';
 import { FALLBACK_MAX as WORLD_ART_FALLBACK_MAX, worldArtFor } from '../world-art.js?v=0729bf92';
-import { oneArmSignpost } from '../street-render.js?v=4b7ef978';
+import { oneArmSignpost } from '../street-render.js?v=47697d4c';
 import { ROCK_CATALOG } from '../mining.js?v=12a6f1bd';
 import {
   HOUSE_SIGN,

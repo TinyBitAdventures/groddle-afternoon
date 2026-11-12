@@ -124,7 +124,7 @@ describe('FRIENDPOST: each arm of the home street\'s signpost is its own sign', 
 
   it('a click or tap on an arm runs that arm\'s verb as the menu would (walking over first); the post keeps its menu', () => {
     const down = game.slice(game.indexOf("app.canvas.addEventListener('pointerdown'"), game.indexOf('async function beginGame()'));
-    assert.match(down, /const signBoard = signpostBoardAt\(signViewsHere\(\), sx, sy\);\n\s*\/\/ FRIENDPOST[^\n]*\n\s*if \(signBoard\?\.board\?\.scene\) \{\n\s*takeSceneArm\(signBoard\);\n\s*return;/);
+    assert.match(down, /const signBoard = signpostBoardAt\(signViewsHere\(\), sx, sy\)(?:\n\s*\|\|[^\n]*touchSignBoard\(sx, sy\)[^\n]*\))?;\n\s*\/\/ FRIENDPOST[^\n]*\n\s*if \(signBoard\?\.board\?\.scene\) \{\n\s*takeSceneArm\(signBoard\);\n\s*return;/);
     // Not a mouse-only path: touch and pen reach it (only a mouse's other buttons are left out).
     assert.match(down, /if \(e\.pointerType === 'mouse' && e\.button !== 0\) return;/);
     // Anything else on the post (pickInteractableAt) opens its verb menu.

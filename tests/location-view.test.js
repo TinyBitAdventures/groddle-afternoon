@@ -20,7 +20,7 @@ import {
   sceneViewCap,
   sceneViewWidthCap,
   stageFor,
-} from '../public/js/location-view.js?v=57e8e487';
+} from '../public/js/location-view.js?v=9747e89a';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const client = path.resolve(root, '..', 'glitch-client', 'com', 'tinyspeck', 'engine');

@@ -36,7 +36,7 @@
  * Addresses: #draft=<id>&street=<key> opens a draft's street, #view=<tsid> a shipped street.
  * QA: window.groddleBuilderQA (state, with the effects' stats; camera, matchView, select, anchorOf, selectGeo, geoHandles).
  */
-import { buildStreetView, loadDecoManifest, loadSignpostTextures, DECO_TWINS, flashBlurSize } from '../street-render.js?v=4b7ef978';
+import { buildStreetView, loadDecoManifest, loadSignpostTextures, DECO_TWINS, flashBlurSize } from '../street-render.js?v=47697d4c';
 import { worldToScreen, platformsScreen, isStandable, streetWidth, streetHeight, navigableSignposts } from '../street-model.js?v=b6cb6a4e';
 import { ensureStreetIndex, STREET_INDEX, resolveIndexTsid } from '../street-loader.js?v=18b181ad';
 import { loadStreetEcologyCatalog, ecologyForStreet } from '../street-ecology.js?v=f27417a8';

@@ -11,7 +11,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { tokensOf, searchDecos, facetCounts, passesFacets, sizeClass, drawnSize, hubPlacements, newArtRows, thumbUrl, decoFor, textScore, queryWords, NEW_ART_BUNDLE } from '../public/js/builder/deco-search.js?v=fda9b16b';
 import { TEMPLATES, newStreet, newStreetOps, groundStrip, templateLayers, gradientFrom, hslHex, filtersFor, nextHubId, newHub, nextMapLine, mapWithStreet, mapWithoutStreet, profileOf, tallLayerHeight, FLOOR_Y, MAP_W, MAP_H } from '../public/js/builder/templates.js?v=f5eaea9c';
-import { parallaxLayerOffset } from '../public/js/street-render.js?v=4b7ef978';
+import { parallaxLayerOffset } from '../public/js/street-render.js?v=47697d4c';
 import { populationWith, plannedSpots, moveMapLine, mapForStreets, spotGroup } from '../public/js/builder/editor-zone.js?v=fea64d11';
 import { intakeBody, base64Of } from '../public/js/builder/editor-picker.js?v=724352b6';
 import { streetWithEdits, editsOn, linkEdit, streetStats } from '../public/js/builder/zone.js?v=332c559e';

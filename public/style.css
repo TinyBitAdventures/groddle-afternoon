@@ -13919,3 +13919,42 @@ body.is-booting .touch-controls { display: none; }
    counts and "tap a street" read in full. */
 :root.touch-phone[data-ui="modern"] #map-panel .map-card.map-hub > .map-sub { padding-right: var(--space-4); white-space: normal; text-overflow: clip; }
 /* end PHONEKEYS */
+
+/* PHONE6 (Austin 2026-11-12, on his iPhone; html.touch-phone, the phone gate's device): the pack
+   row scrolls, the street's name shows, Cultivate and Change Style sit under it, prompts clear the
+   stick and Jump. Computers and tablets never match. */
+/* PACKSCROLL: sixteen bags ran the row off the right edge, so the rest of the pack, the count and
+   search could not be reached. The bags and stacks scroll together in #pack-scroll (the box Decoration
+   Mode's tray already scrolls), with momentum and a snap to each slot; the count and search stay at the
+   row's end; an edge fades where there is more (js/ui/pack-row.js refreshScrollEdges). A sideways
+   swipe scrolls, a tap still selects, a still hold still lifts a stack to drag (game.js setupPackDrops). */
+:root.touch-phone #game-root #pack-bar:not([data-hb-dock]) .pack-scroll {
+  display: flex; flex: 0 1 auto; align-items: center; align-self: stretch; gap: var(--sp-2); min-width: 0;
+  overflow-x: auto; overflow-y: hidden; -webkit-overflow-scrolling: touch; overscroll-behavior-x: contain;
+  scroll-snap-type: x proximity; scrollbar-width: none; touch-action: pan-x;
+}
+:root.touch-phone #game-root #pack-bar:not([data-hb-dock]) .pack-scroll::-webkit-scrollbar { display: none; }
+:root.touch-phone #game-root #pack-bar:not([data-hb-dock]) .pack-scroll .pack-slots.pack-items {
+  flex: none; overflow: visible; margin: 0; padding: 0; -webkit-mask-image: none; mask-image: none;
+}
+:root.touch-phone #game-root #pack-bar:not([data-hb-dock]) .pack-scroll .pack-slot { scroll-snap-align: start; touch-action: pan-x; }
+:root.touch-phone #game-root #pack-bar:not([data-hb-dock]) .pack-pager { display: none; }
+:root.touch-phone #game-root #pack-bar:not([data-hb-dock]) .pack-scroll.is-over { -webkit-mask-image: linear-gradient(90deg, var(--c-black) 86%, transparent); mask-image: linear-gradient(90deg, var(--c-black) 86%, transparent); }
+:root.touch-phone #game-root #pack-bar:not([data-hb-dock]) .pack-scroll.is-scrolled { -webkit-mask-image: linear-gradient(90deg, transparent, var(--c-black) 10%); mask-image: linear-gradient(90deg, transparent, var(--c-black) 10%); }
+:root.touch-phone #game-root #pack-bar:not([data-hb-dock]) .pack-scroll.is-over.is-scrolled { -webkit-mask-image: linear-gradient(90deg, transparent, var(--c-black) 10%, var(--c-black) 86%, transparent); mask-image: linear-gradient(90deg, transparent, var(--c-black) 10%, var(--c-black) 86%, transparent); }
+/* FEATURED: the featured project's pill covered the street's name ("Shiltrigg Tiers · 9:42 PM"). A
+   phone shows the name; the project is the Menu's row instead (js/ui/featured-project.js
+   renderFeaturedMenuRow) and the Feat panel's (H) as before. */
+:root.touch-phone[data-ui="modern"] #featured-project-pill { display: none; }
+#menu-featured-btn { display: none; }
+:root.touch-phone[data-ui="modern"] .more-list #menu-featured-btn:not([hidden]) { display: flex; grid-column: 1 / -1; align-items: center; gap: var(--space-2); min-width: 0; }
+:root.touch-phone[data-ui="modern"] .more-list #menu-featured-btn .fp-star { flex: none; width: 1em; height: 1em; color: var(--accent); }
+:root.touch-phone[data-ui="modern"] .more-list #menu-featured-btn .fp-text { flex: 0 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+:root.touch-phone[data-ui="modern"] .more-list #menu-featured-btn .fp-bar { flex: none; width: 3rem; height: 0.35rem; margin-left: auto; border-radius: var(--radius-pill); background: var(--border); overflow: hidden; }
+:root.touch-phone[data-ui="modern"] .more-list #menu-featured-btn .fp-bar i { display: block; height: 100%; width: var(--p, 0%); background: var(--accent); }
+/* HOME: Cultivate and Change Style sat over the street's name; they go under it, with room. */
+:root.touch-phone[data-ui="modern"] #game-root .homes-modes { top: calc(2 * var(--hud-h) + var(--space-2) + var(--space-3)); }
+/* PROMPTS: a prompt (a Street Spirit's "set that as your destination?") sat over the stick and Jump;
+   on a phone the stack starts above them (js/touch-controls.js: the stick's 132 px corner over the pack). */
+:root.touch-phone #game-root .prompt-stack { bottom: calc(var(--pack-live-height, 72px) + env(safe-area-inset-bottom, 0px) + 132px + var(--space-2)); }
+/* end PHONE6 */

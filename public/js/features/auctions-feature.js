@@ -47,7 +47,7 @@ import { scriptFromTag, scriptLabel } from '../teleportation.js?v=e95cf7cb';
 import { TOOL_CONDITION_CATALOG, copyTagKind, leavingCopyTag, leavingToolWear, receiveToolCopy } from '../tools.js?v=5f482998';
 import { createMinnAccount } from '../minn-account.js?v=c15f0ecf';
 import { saveStore } from '../save-store.js?v=89422a9c';
-import { createItemPicker } from '../ui/item-picker.js?v=15513c80';
+import { createItemPicker } from '../ui/item-picker.js?v=fbe3c3df';
 import {
   AUCTION_TEXT as T,
   DEFAULT_RULES,
