@@ -13625,3 +13625,60 @@ body.is-booting .touch-controls { display: none; }
   .touch-jump.is-held { transform: none; }
 }
 /* —— end TOUCH —— */
+
+/* —— TOUCH BUILDER —— the character builder on a phone (Modern; Austin 2026-11-12: "User can't hit
+   random and see what's happening. They have to scroll up to see the random results"). game.js
+   mountAvatarVanity puts the preview, its emotes and Random, Reset and Save in .avatar-stage; the
+   head and that box stay in view while the wardrobe scrolls. Upright: the box under the head.
+   Sideways: two panes, the box down the left. The builder takes the pack's room (no pack while
+   you dress). */
+:root.touch-phone[data-ui="modern"] #avatar-panel { bottom: 0; }
+:root.touch-phone[data-ui="modern"] #avatar-panel .avatar-card {
+  width: calc(100vw - 16px); max-width: 720px; max-height: calc(100% - 12px);
+  padding: 0 var(--sp-6) var(--sp-6);
+  box-sizing: border-box;
+}
+:root.touch-phone[data-ui="modern"] #avatar-panel .glitch-modal-head {
+  position: sticky; top: 0; z-index: calc(var(--z-raised) + 1);
+  height: 48px; box-sizing: border-box; margin: 0; flex-wrap: nowrap;
+  background: var(--c-grey-94);
+}
+:root.touch-phone[data-ui="modern"] #avatar-panel .glitch-modal-head h2 { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: var(--fs-xl); }
+:root.touch-phone[data-ui="modern"] #avatar-panel :is(.panel-meta, .avatar-hint) { display: none; }
+:root.touch-phone[data-ui="modern"] #avatar-panel .avatar-stage {
+  position: sticky; top: 48px; z-index: var(--z-raised);
+  display: grid; grid-template-columns: auto minmax(0, 1fr); grid-template-areas: "pic emotes" "pic actions";
+  gap: var(--sp-4) var(--sp-6); align-items: center;
+  padding: 0 0 var(--sp-4); margin: 0 0 var(--sp-4);
+  border-bottom: 1px solid var(--border-grey);
+  background: var(--c-grey-94);
+}
+/* !important: #game-root canvas and the 560 px rule size every canvas in the root with it. */
+:root.touch-phone[data-ui="modern"] #avatar-panel .avatar-stage #avatar-preview { grid-area: pic; width: 100px !important; height: 143px !important; }
+:root.touch-phone[data-ui="modern"] #avatar-panel .avatar-stage .avatar-emotes { grid-area: emotes; justify-content: flex-start; }
+:root.touch-phone[data-ui="modern"] #avatar-panel .avatar-stage .avatar-actions { grid-area: actions; justify-content: flex-start; }
+:root.touch-phone[data-ui="modern"] #avatar-panel .avatar-stage :is(.avatar-emote, .avatar-actions button) { min-height: 40px; }
+:root.touch-phone[data-ui="modern"] #avatar-panel .avatar-stage .avatar-emote { width: 40px; }
+@media (orientation: landscape) {
+  :root.touch-phone[data-ui="modern"] #avatar-panel .avatar-card {
+    display: grid; grid-template-columns: 148px minmax(0, 1fr); column-gap: var(--sp-6); align-content: start;
+  }
+  :root.touch-phone[data-ui="modern"] #avatar-panel .avatar-card > * { grid-column: 2; }
+  :root.touch-phone[data-ui="modern"] #avatar-panel .avatar-card > .avatar-leaving { grid-column: 1 / -1; }
+  :root.touch-phone[data-ui="modern"] #avatar-panel .avatar-stage {
+    grid-column: 1; grid-row: 1 / span 40; align-self: start; top: 0;
+    grid-template-columns: 1fr; grid-template-areas: "pic" "emotes" "actions"; justify-items: center;
+    padding: var(--sp-4) 0; margin: 0; border-bottom: 0;
+  }
+  :root.touch-phone[data-ui="modern"] #avatar-panel .avatar-stage :is(.avatar-emotes, .avatar-actions) { justify-content: center; }
+  :root.touch-phone[data-ui="modern"] #avatar-panel .avatar-stage #avatar-preview { width: 84px !important; height: 120px !important; }
+  :root.touch-phone[data-ui="modern"] #avatar-panel .avatar-stage .avatar-emotes { flex-wrap: wrap; gap: var(--sp-1); }
+  :root.touch-phone[data-ui="modern"] #avatar-panel .avatar-stage .avatar-emote { width: 32px; min-height: 32px; height: 32px; }
+  :root.touch-phone[data-ui="modern"] #avatar-panel .avatar-stage .avatar-actions { gap: var(--sp-2); }
+  :root.touch-phone[data-ui="modern"] #avatar-panel .avatar-stage .avatar-actions button { min-height: 36px; padding-inline: var(--sp-3); }
+}
+/* The pack waits while you dress (it sat over the wardrobe's last row sideways). */
+:root.touch-phone[data-ui="modern"]:has(#avatar-panel:not([hidden])) .pack-bar { visibility: hidden; }
+/* The tutorial's pill waits behind the builder, as Classic's does. */
+:root.touch-phone[data-ui="modern"]:has(#avatar-panel:not([hidden])) #newxp-pill { visibility: hidden; }
+/* —— end TOUCH BUILDER —— */

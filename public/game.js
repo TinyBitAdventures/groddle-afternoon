@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=4f923e2b';
 import { createErrorOnce, createFeatureHost } from './js/feature-host.js?v=06bb8b74';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=d95b6070';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=ffd57e51';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl, drawTileArt } from './js/enter-chooser.js?v=4a3ea327';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -744,7 +744,7 @@ import { easeCameraAxis } from './js/camera-feel.js?v=e668afc5';
 import { renderResolution, resolutionCap, RESOLUTION_STEP } from './js/render-density.js?v=20f9f1ee';
 // g458: low energy and mood turn amber and red, and a click offers something from the pack.
 import { makingNeeds, vitalMenuEmpty, vitalMenuHeading, vitalSnacks } from './js/vitals.js?v=85a51302';
-import { DEFAULT_VP_H, LOCATION_VIEW_W, VIEW_CEIL_H, stageFor, sceneViewCap, sceneViewWidthCap, zoomMovesStage } from './js/location-view.js?v=f1f922b4';
+import { DEFAULT_VP_H, LOCATION_VIEW_W, VIEW_CEIL_H, stageFor, sceneViewCap, sceneViewWidthCap, zoomMovesStage } from './js/location-view.js?v=57e8e487';
 import {
   levelInfoForXp,
   reconcilePlayerProgression,
@@ -11357,6 +11357,16 @@ function mountAvatarVanity() {
     dims.id = 'avatar-dims';
     dims.className = 'avatar-dims';
     layout.after(dims);
+  }
+  // TOUCH (Austin 2026-11-12: "User can't hit random and see what's happening"): on a phone the
+  // preview, its emotes and Random, Reset and Save share one box that stays in view while the
+  // wardrobe scrolls (style.css TOUCH BUILDER); Classic gives the box's children back to its grid.
+  const actions = panel.querySelector('.avatar-actions');
+  if (TOUCH_PHONE && canvas && layout && actions) {
+    const stage = document.createElement('div');
+    stage.className = 'avatar-stage';
+    layout.before(stage);
+    stage.append(canvas, ...panel.querySelectorAll('.avatar-emotes'), actions);
   }
 }
 

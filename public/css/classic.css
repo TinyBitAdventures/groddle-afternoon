@@ -2880,6 +2880,8 @@
   animation: classic-fade 0.2s linear;
 }
 :root[data-ui="classic"] #avatar-panel :is(.avatar-builder-layout, .avatar-preview-col, .avatar-controls-col) { display: contents; }
+/* TOUCH BUILDER (game.js mountAvatarVanity): a phone's .avatar-stage (the mirror, its tests, the actions) gives them back too. */
+:root[data-ui="classic"] #avatar-panel .avatar-stage { display: contents; }
 :root[data-ui="classic"] #avatar-panel :is(.panel-meta, .avatar-hint) { display: none; }
 /* The head: the window title, the red cross in its white square (Dialog.as 221-243). */
 :root[data-ui="classic"] #avatar-panel .avatar-card > :first-child {
