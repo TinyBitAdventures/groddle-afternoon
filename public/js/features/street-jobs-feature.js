@@ -142,11 +142,11 @@ import { SIGN_ARMS, routeGraph } from '../map-routes.js?v=c7e7dc80';
 import { TELEPORTERS } from '../hidden-floors.js?v=732a2610';
 import { WINTRY_PORTAL_TELEPORTERS } from '../wintry-portal.js?v=1437deda';
 import { PROJECTS_TEXT, contributedJobs, mineTotal, projectEntry, projectList } from '../projects-tracker.js?v=edd58b99';
-import { PROJECTS_PANEL_ID, buildProjectsPanel, renderProjects } from '../ui/projects-sheet.js?v=e32a73d1';
+import { PROJECTS_PANEL_ID, buildProjectsPanel, renderProjects } from '../ui/projects-sheet.js?v=e1d49852';
 import { SIDE_SHEET_IDS } from '../ui/panel-shell.js?v=06a0d3fe';
 import { trophyGotText } from '../home-trophies.js?v=2020b29b';
-import { FEATURED_TEXT, featuredChanged, featuredFromServer } from '../featured-project.js?v=31ce4607';
-import { renderFeaturedPill, renderFeaturedRow } from '../ui/featured-project.js?v=2cf77d29';
+import { FEATURED_TEXT, featuredChanged, featuredFromServer, featuredNeedsLine } from '../featured-project.js?v=3cc0565c';
+import { renderFeaturedPill, renderFeaturedRow } from '../ui/featured-project.js?v=d4b01f4f';
 import { GEM_HINTS, isGem } from '../gem-hints.js?v=4b65f7ac';
 
 export const STREET_JOBS_FEATURE_ID = 'street-jobs';
@@ -2474,8 +2474,11 @@ function drawFeatured(engine) {
   if (typeof document === 'undefined' || !document.getElementById) return;
   const f = mpMode ? featured : null;
   const onOpen = () => openFeatured(engine);
-  renderFeaturedPill(document, f, { onOpen, now: Date.now() });
-  renderFeaturedRow(document, f, { onOpen, now: Date.now() });
+  // Ticket 240: the row (and the pill's tip) say what is left, from the Projects panel's own entry.
+  const needs = f && engine ? featuredNeedsLine(featuredEntry(engine, Number(state.trackerSeen) || 0)) : '';
+  renderFeaturedPill(document, f, { onOpen, now: Date.now(), needs });
+  renderFeaturedRow(document, f, { onOpen, now: Date.now(), needs });
+  engine?.setData?.('featuredNeeds', needs);
   engine?.setData?.('featuredJob', f?.jobId || '');
   engine?.setData?.('featuredPercent', f ? String(f.percent) : '');
   engine?.setData?.('featuredLabel', f?.label || '');
@@ -2487,6 +2490,9 @@ function openFeatured(engine) {
   // The Feat panel is a side sheet too: the Projects panel takes its place.
   const feat = document.getElementById('feat-panel');
   if (feat && !feat.hidden) document.getElementById('feat-close')?.click();
+  // Ticket 240: its needs open, so what is left shows without another click.
+  pj.openNeeds.add(featured.jobId);
+  pj.sig = '';
   if (!pj.open) openProjects(engine);
   else renderProjectsPanel(engine);
   const card = pj.panel?.querySelector(`[data-featured="1"]`);

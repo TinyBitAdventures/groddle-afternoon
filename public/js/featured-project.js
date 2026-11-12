@@ -24,6 +24,7 @@ export const FEATURED_TEXT = Object.freeze({
   toast: (label) => `New featured street project: ${label}.`,
   pillTip: 'The featured street project. Click for its details and the way there.',
   waiting: 'Opens soon',
+  needs: 'Needs',
 });
 
 const whole = (v) => Math.max(0, Math.floor(Number(v) || 0));
@@ -96,3 +97,18 @@ export function featuredLabel(f, now = Date.now()) {
   if (!f) return '';
   return `${FEATURED_TEXT.heading}: ${f.label}. ${featuredWhere(f)}. ${featuredStatus(f, now)}.`;
 }
+
+/**
+ * Ticket 240: what is left, in one line, so a player can tell before travelling whether they can
+ * help: the first need of the phase you can do now ("Needs: Clear with a Pick (Mining IV) · 7
+ * units, and 2 more"). `entry` is the Projects panel's entry for it (js/projects-tracker.js
+ * projectEntry: needs with their needLine words). '' when it is not known or nothing is left.
+ */
+export function featuredNeedsLine(entry) {
+  if (!entry || entry.known === false || entry.finished) return '';
+  const open = (entry.needs || []).filter((n) => n.open && n.text);
+  if (!open.length) return '';
+  const more = open.length - 1;
+  return `${FEATURED_TEXT.needs}: ${open[0].text}${more ? `, and ${more} more` : ''}`;
+}
+

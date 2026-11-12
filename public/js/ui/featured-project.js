@@ -10,7 +10,7 @@
  * QA hooks: #featured-project-pill [data-featured-job], #featured-project-row [data-featured-job].
  */
 
-import { FEATURED_TEXT as T, featuredLabel, featuredPillText, featuredStatus, featuredWhere } from '../featured-project.js?v=31ce4607';
+import { FEATURED_TEXT as T, featuredLabel, featuredPillText, featuredStatus, featuredWhere } from '../featured-project.js?v=3cc0565c';
 
 export const FEATURED_PILL_ID = 'featured-project-pill';
 export const FEATURED_ROW_ID = 'featured-project-row';
@@ -41,6 +41,7 @@ body.nx-tutorial .featured-pill, body.nx-tutorial .featured-row { display: none;
 .featured-row .fp-sub { grid-column: 2; color: var(--text-muted); font-size: var(--fs-xs); }
 .featured-row .fp-bar { grid-column: 2; height: 0.35rem; border-radius: var(--radius-pill); background: var(--border); overflow: hidden; }
 .featured-row .fp-bar i { display: block; height: 100%; width: var(--p, 0%); background: var(--accent); }
+.featured-row .fp-needs { grid-column: 2; font-size: var(--fs-xs); color: var(--text); }
 .featured-row .fp-open { grid-column: 2; font-size: var(--fs-xs); font-weight: var(--fw-bold); color: var(--accent); }
 .pj-card.is-featured { box-shadow: inset 0 0 0 2px var(--accent); }
 .pj-featured-tag { display: inline-flex; align-items: center; gap: 0.2em; margin-right: var(--space-1); padding: 0 var(--space-2); border-radius: var(--radius-pill);
@@ -91,7 +92,7 @@ function span(doc, cls, text) {
  * The pill over the world: made once in #game-root, filled with `f` (hidden when null).
  * @param {Document} doc
  * @param {object|null} f featuredFromServer's answer
- * @param {{ onOpen?: Function, now?: number }} o
+ * @param {{ onOpen?: Function, now?: number, needs?: string }} o
  */
 export function renderFeaturedPill(doc, f, o = {}) {
   const root = doc.getElementById('game-root');
@@ -119,8 +120,9 @@ export function renderFeaturedPill(doc, f, o = {}) {
     pill.replaceChildren(starIcon(doc), span(doc, 'fp-text', featuredPillText(f)), bar(doc, f.percent));
   }
   pill.dataset.featuredJob = f.jobId;
-  pill.title = T.pillTip;
-  pill.setAttribute('aria-label', featuredLabel(f, o.now));
+  // Ticket 240: what is left rides on the pill's tip and name (the pill itself stays short for phones).
+  pill.title = o.needs ? `${T.pillTip} ${o.needs}.` : T.pillTip;
+  pill.setAttribute('aria-label', `${featuredLabel(f, o.now)}${o.needs ? ` ${o.needs}.` : ''}`);
   pill.hidden = Boolean(o.hide);
   return pill;
 }
@@ -129,7 +131,7 @@ export function renderFeaturedPill(doc, f, o = {}) {
  * The Feat panel's row (H): under the shared Feat, made again when the Feat panel draws its own box.
  * @param {Document} doc
  * @param {object|null} f
- * @param {{ onOpen?: Function, now?: number }} o
+ * @param {{ onOpen?: Function, now?: number, needs?: string }} o
  */
 export function renderFeaturedRow(doc, f, o = {}) {
   const body = doc.querySelector('#feat-panel .ui-sheet-body') || doc.querySelector('#feat-panel .feat-card');
@@ -159,10 +161,12 @@ export function renderFeaturedRow(doc, f, o = {}) {
     span(doc, 'fp-title', f.label),
     span(doc, 'fp-sub', `${featuredWhere(f)}. ${featuredStatus(f, o.now)}.`),
     bar(doc, f.percent),
+    // Ticket 240: what is left, before the trip there.
+    ...(o.needs ? [span(doc, 'fp-needs', o.needs)] : []),
     span(doc, 'fp-open', `${T.open} (P)`),
   );
   row.dataset.featuredJob = f.jobId;
-  row.setAttribute('aria-label', featuredLabel(f, o.now));
+  row.setAttribute('aria-label', `${featuredLabel(f, o.now)}${o.needs ? ` ${o.needs}.` : ''}`);
   row.hidden = false;
   return row;
 }
