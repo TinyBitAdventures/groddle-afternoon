@@ -190,7 +190,11 @@ const STYLE = `
 .keys-panel .keys-note { min-height: 1.4em; margin-top: var(--sp-5); font-weight: 600; color: var(--c-lime-49); }
 .keys-panel .keys-note[data-tone="bad"] { color: var(--text-danger); }
 .keys-panel textarea { box-sizing: border-box; width: 100%; min-height: 5.5rem; margin: var(--sp-3) 0; padding: 0.45rem 0.55rem; border-radius: var(--radius-md); border: 2px solid var(--c-sand-86); font: inherit; resize: vertical; background: var(--surface-bright); color: var(--c-sand-28); }
-.keys-panel .butler-actions { display: flex; flex-wrap: wrap; gap: var(--sp-4); justify-content: flex-end; margin-top: var(--sp-3); }
+/* Report 227: the buttons stay in view at the foot of a long pick list (the panel scrolls, they do not). */
+.keys-panel .butler-actions { display: flex; flex-wrap: wrap; gap: var(--sp-4); justify-content: flex-end; align-items: center;
+  position: sticky; bottom: calc(-1 * var(--sp-9)); z-index: var(--z-raised);
+  margin: var(--sp-3) calc(-1 * var(--sp-9)) calc(-1 * var(--sp-9)); padding: var(--sp-5) var(--sp-9) var(--sp-9);
+  background: var(--surface-card); box-shadow: 0 -6px 6px -6px color-mix(in srgb, var(--c-sand-28) 30%, transparent); }
 .keys-panel .butler-stacks { display: grid; grid-template-columns: repeat(auto-fill, minmax(5.4rem, 1fr)); gap: var(--sp-3); }
 .keys-panel .butler-stacks button { display: grid; justify-items: center; gap: var(--sp-1); padding: var(--sp-3) var(--sp-2); border: 0; border-radius: var(--radius-md); background: var(--surface-parchment); color: var(--c-sand-28); font: inherit; font-size: var(--fs-base); cursor: pointer; }
 .keys-panel .butler-stacks button[aria-pressed="true"] { box-shadow: inset 0 0 0 2px var(--c-lime-60); background: var(--surface-moss); }
