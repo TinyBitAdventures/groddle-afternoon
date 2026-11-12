@@ -266,9 +266,10 @@ p { margin: 0; }
 
 /* —— the note and footer —— */
 .pc-note { padding: 14px 16px; display: grid; gap: 8px; font-size: 0.92rem; }
-.pc-full { font-size: 0.85rem; color: var(--muted); }
-.pc-full a { color: var(--muted); }
-.pc-full .pc-hint { display: block; font-size: 0.8rem; }
+.pc-play { gap: 8px; }
+.pc-play-title { margin: 0; font-size: 1.05rem; }
+.pc-full { display: grid; gap: 8px; justify-items: start; margin: 0; font-size: 0.85rem; color: var(--muted); }
+.pc-full .pc-hint { display: block; font-size: 0.85rem; }
 .pc-foot { text-align: center; font-size: 0.85rem; color: var(--muted); padding: 0 16px calc(20px + env(safe-area-inset-bottom)); }
 .pc-foot a { color: var(--muted); }
 

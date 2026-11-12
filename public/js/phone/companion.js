@@ -24,7 +24,7 @@ import { createMinnAccountCore } from '../minn-account-core.js?v=63758d34';
 import { mountAccountForms, resetLinkFrom, verifyLinkFrom } from '../account-forms.js?v=559c1263';
 import { gateFor, quietSession, suspendedNow } from '../online-session.js?v=6f1348c8';
 import { REPORT_MAX, REPORT_TEXT, STATUS_WORDS, createReportsApi, pictureRefused, pictureSrc, refusalWords, reportFromHash, ticketLine, unreadCount, whenWords } from '../reports.js?v=fa6c662a';
-import { DEVICE_KEY, PHONE_TEXT as T, POLL_MS, createPresenceApi, fitPhoto, friendsView, fullGameHref, itemNamesFrom, itemWords, mailRows, mailboxFromSave, mergePlayerMail, phoneContext, unreadLetters } from './companion-data.js?v=9246f5c5';
+import { DEVICE_KEY, PHONE_TEXT as T, POLL_MS, createPresenceApi, fitPhoto, friendsView, fullGameHref, itemNamesFrom, itemWords, mailRows, mailboxFromSave, mergePlayerMail, phoneContext, unreadLetters } from './companion-data.js?v=b71d5c93';
 
 const doc = globalThis.document;
 
@@ -49,29 +49,39 @@ function storeSet(value) {
   } catch { /* private windows: this visit only */ }
 }
 
-/** The note under the panels: played on a computer, the home page, and the way into the game anyway. */
+/** The way into the full game, at the top of the page (experimental phone play, 2026-11-12: players missed it at the bottom). */
+function mountPlay(host) {
+  const play = el('section', { class: 'pc-card pc-play', 'aria-label': T.playTitle });
+  play.append(el('h2', { class: 'pc-play-title' }, T.playTitle));
+  const full = el('p', { class: 'pc-full' });
+  if (storeGet() === 'full') {
+    // Opened by hand on a device that chose the game: offer the way back.
+    const back = el('button', { type: 'button', class: 'pc-linkish', 'data-phone-use-page': '' }, T.useThisPage);
+    back.addEventListener('click', () => { storeSet(''); mountFull(full); });
+    const go = el('a', { href: fullGameHref(location.search), class: 'pc-button', 'data-phone-full': '' }, T.full);
+    const hint = el('span', { class: 'pc-hint' }, `${T.fullRemembered} `);
+    hint.append(back);
+    full.append(go, hint);
+  } else {
+    mountFull(full);
+  }
+  play.append(full);
+  host.append(play);
+}
+
+/** The note under the panels: best on a computer, and the home page. */
 function mountNote(host) {
   const note = el('aside', { class: 'pc-note', 'aria-label': 'About this page' });
   const p = el('p');
   p.append(el('strong', {}, T.computer), ` ${T.computerMore} `);
   p.append(el('a', { href: './' }, T.home));
   note.append(p);
-  const full = el('p', { class: 'pc-full' });
-  if (storeGet() === 'full') {
-    // Opened by hand on a device that chose the game: offer the way back.
-    const back = el('button', { type: 'button', class: 'pc-linkish', 'data-phone-use-page': '' }, T.useThisPage);
-    back.addEventListener('click', () => { storeSet(''); mountFull(full); });
-    full.append(el('span', {}, `${T.fullRemembered} `), back);
-  } else {
-    mountFull(full);
-  }
-  note.append(full);
   host.append(note);
 }
 
 function mountFull(host) {
   const href = fullGameHref(location.search);
-  const a = el('a', { href, 'data-phone-full': '' }, T.full);
+  const a = el('a', { href, class: 'pc-button', 'data-phone-full': '' }, T.full);
   a.addEventListener('click', () => storeSet('full'));
   host.replaceChildren(a, el('span', { class: 'pc-hint' }, T.fullHint));
 }
@@ -91,6 +101,7 @@ function start() {
   app = doc.getElementById('phone-app');
   gate = el('section', { class: 'pc-card pc-gate', 'aria-live': 'polite' });
   home = el('section', { class: 'pc-home', hidden: true });
+  mountPlay(app);
   app.append(gate, home);
   mountNote(app);
   account = createMinnAccountCore({ baseUri: doc.baseURI });
