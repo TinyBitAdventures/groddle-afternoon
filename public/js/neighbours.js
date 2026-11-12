@@ -64,7 +64,7 @@ export const NEIGHBOURS = Object.freeze([
     props: ['bench', 'flower_bush_5', 'groddle_flower_2'],
     chore: 'garden',
     doorNote: { title: 'Back soon!', text: 'Gone to the Fruit Tree festival. If the tomatoes look thirsty, they are. Thank you, whoever you are!' },
-    thanks: { text: 'Somebody watered my tomatoes! They have never looked so pleased with themselves. Please take one, they insisted.', attachment: ITEM('tomato', 3) },
+    thanks: { text: 'Somebody watered my tomatoes! They have never looked so pleased with themselves. Please take some, they insisted.', attachment: ITEM('tomato', 3) },
     visitor: 'I popped by your home street while you were out. Your mailbox is very handsome. I left you a few cherries.',
     visitorGift: ITEM('cherry', 5),
   }),
@@ -79,7 +79,7 @@ export const NEIGHBOURS = Object.freeze([
     gifts: [ITEM('mushroom', 2), ITEM('honey', 1), ITEM('plum', 3), ITEM('bun', 1)],
     doorNote: { title: 'Out foraging', text: 'Left a little something on the porch for whoever wanders by. Don\'t tell the Rook.' },
     thanks: { text: 'You found my porch present! I do love it when somebody does. Here is a spare jar for the walk home.', attachment: ITEM('honey', 1) },
-    visitor: 'Knock knock! Nobody home, so I left a mushroom on your step. It is a good mushroom. It has a nice attitude.',
+    visitor: 'Knock knock! Nobody home, so I left two mushrooms on your step. They are good mushrooms. They have a nice attitude.',
     visitorGift: ITEM('mushroom', 2),
   }),
   Object.freeze({
@@ -104,7 +104,7 @@ export const NEIGHBOURS = Object.freeze([
     props: ['lantern', 'bush_1', 'groddle_grass_1'],
     chore: 'lanterns',
     doorNote: { title: 'Probably napping', text: 'Fell asleep at the shrine again, probably. If it gets dark, light my lanterns so I can find my way home.' },
-    thanks: { text: 'I woke up at the shrine and there was my house, glowing like a birthday cake. I found my way straight home. Have a bun, young one.', attachment: ITEM('bun', 2) },
+    thanks: { text: 'I woke up at the shrine and there was my house, glowing like a birthday cake. I found my way straight home. Have two buns, young one.', attachment: ITEM('bun', 2) },
     visitor: 'I came to visit and nodded off on your doorstep. Lovely doorstep. Very restful. I left you a potato for your trouble.',
     visitorGift: ITEM('potato', 1),
   }),
@@ -117,8 +117,8 @@ export const NEIGHBOURS = Object.freeze([
     props: ['mushrooms', 'grass_solid', 'background_bottletree_silhouette'],
     chore: 'garden',
     doorNote: { title: 'Shh', text: 'The spores are sleeping. Please water them gently. They are grumpy when woken, but grumpier when dry.' },
-    thanks: { text: 'My spores woke up happy, which has never once happened before. I don\'t know what you did. Please do it again. A mushroom for you.', attachment: ITEM('mushroom', 3) },
-    visitor: 'I walked through your home street at dusk. It glows nicely. Mine glows more, but yours glows with heart. Here is a plum.',
+    thanks: { text: 'My spores woke up happy, which has never once happened before. I don\'t know what you did. Please do it again. Some mushrooms for you.', attachment: ITEM('mushroom', 3) },
+    visitor: 'I walked through your home street at dusk. It glows nicely. Mine glows more, but yours glows with heart. Here are two plums.',
     visitorGift: ITEM('plum', 2),
   }),
   Object.freeze({
@@ -282,7 +282,7 @@ export function doChore(state, neighbour, pc, ctx = {}) {
 export function postNoteVerb(state, neighbour, ctx = {}) {
   const base = { id: 'post_note', label: 'Post a note', tooltip: `Leave ${neighbour.first} a note` };
   if (whole(ctx.carried) < 1) return { ...base, enabled: false, reason: 'You have no notes to post!' };
-  if (state.posted[neighbour.id] === ctx.dayKey) return { ...base, enabled: false, reason: `${neighbour.first} hasn't read your last note yet.` };
+  if (state.posted[neighbour.id] === ctx.dayKey) return { ...base, enabled: false, reason: `${neighbour.first} already has a note from you today. Post another next game day.` };
   return { ...base, enabled: true, reason: '' };
 }
 

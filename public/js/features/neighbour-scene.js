@@ -7,7 +7,7 @@
  * neighbour by a stable hash.
  */
 
-import { NEIGHBOUR_SCENE, hash01, neighbourLayout } from '../neighbours.js?v=161fc2e5';
+import { NEIGHBOUR_SCENE, hash01, neighbourLayout } from '../neighbours.js?v=caec2f76';
 import { textureFromUrl } from '../textures.js?v=92ec53cd';
 import { sharpRoomDeco } from '../deco-hires.js?v=f59e60d3';
 

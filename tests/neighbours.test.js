@@ -27,8 +27,8 @@ import {
   postNoteVerb,
   recordVisit,
   visitorLetter,
-} from '../public/js/neighbours.js?v=161fc2e5';
-import { SCENE_DECO_SIZES, SCENE_STYLES, neighbourPlatforms, propPlan } from '../public/js/features/neighbour-scene.js?v=dd4514b0';
+} from '../public/js/neighbours.js?v=caec2f76';
+import { SCENE_DECO_SIZES, SCENE_STYLES, neighbourPlatforms, propPlan } from '../public/js/features/neighbour-scene.js?v=ec36fd01';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..', 'public');
 const DECO = join(root, 'assets/decos/groddle');
@@ -191,5 +191,18 @@ describe('saved state', () => {
     assert.equal(s.lastId, '');
     assert.equal(s.returnTo, null);
     assert.deepEqual(normalizeNeighbourState({ returnTo: { tsid: 'GLI2V0UN7RD1T2J', x: 3, y: 4 } }).returnTo, { tsid: 'GLI2V0UN7RD1T2J', x: 3, y: 4 });
+  });
+});
+
+describe('neighbour letters say what they hold (messages audit, Neighbours)', () => {
+  it('a letter names one thing only when one arrives, and a second note waits for the next game day', () => {
+    const one = /\b(a|an|one) (mushroom|plum|bun|tomato)\b|take one\b/i;
+    for (const n of NEIGHBOURS) {
+      if (n.visitorGift.count > 1) assert.doesNotMatch(n.visitor, one, n.id);
+      if (n.thanks.attachment.count > 1) assert.doesNotMatch(n.thanks.text, one, n.id);
+    }
+    const state = { posted: { dorrit: 'D1' } };
+    const v = postNoteVerb(state, NEIGHBOURS.find((n) => n.id === 'dorrit'), { carried: 1, dayKey: 'D1' });
+    assert.equal(v.reason, 'Dorrit already has a note from you today. Post another next game day.');
   });
 });
