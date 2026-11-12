@@ -12,10 +12,10 @@
  */
 
 /**
- * Tiny Speck's quest book (graphics/quest_book.png, 86x58) never goes above 80% opacity: the 2012
- * client drew it over a white cloud. Over the card's ray burst the rays showed through its pages,
- * so the card uses a copy with its alpha divided by 0.8 (magick quest-book.png -channel A
- * -fx "min(1,u/0.8)"), the same pixels made solid.
+ * The award card's quest book (2026-11-12, Austin: "ship it if it matches"): a faithful 6x redraw
+ * of Tiny Speck's graphics/quest_book.png (86x58), made solid so the card's rays don't show through
+ * its pages; at 86x58 its outline overlaps the original's by 96%. Made art, listed with its
+ * provenance in tools/provenance/made-sprites.json (quest_book_award). Classic keeps the original.
  */
 const QUEST_BOOK_SOLID = 'assets/ui/quest-book-solid.webp';
 

@@ -85,7 +85,7 @@ import {
   renderRaceCourse,
 } from '../race-render.js?v=285b6285';
 import { addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=5be47371';
-import { runStreetTransition } from '../screen-fx.js?v=bfed8fb0';
+import { runStreetTransition } from '../screen-fx.js?v=2e975a82';
 import { CROWNS_STREET, CROWNS_TICKET, CROWNS_TITLE } from '../game-of-crowns.js?v=e32f35f5';
 import { HOG_HAUL_STREET_ID } from '../hog-haul.js?v=50d2e072';
 import { QUOIN_GRAB_SPLASH, RACE_SPLASH, splashFor } from '../game-splash.js?v=f60a5067';

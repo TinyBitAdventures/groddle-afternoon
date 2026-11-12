@@ -9,7 +9,7 @@
 
 import { ACHIEVEMENT_DROP, ACHIEVEMENT_ROCK_WH, achievementBubbleText, easeOutBounce, mountPetRock } from './familiar.js?v=bafd7139';
 import { formatLoadingTime, ordinal } from './exploration.js?v=68f27989';
-import { isModernSkin, momentArt, momentArtShape, rewardChips } from './ui/moment-card.js?v=68e10b61';
+import { isModernSkin, momentArt, momentArtShape, rewardChips } from './ui/moment-card.js?v=df448740';
 
 /**
  * Street-load timings (seconds).

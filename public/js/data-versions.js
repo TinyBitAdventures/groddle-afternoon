@@ -414,6 +414,7 @@
       "assets/streets/GUVNHLCRGEA3VAS.json": "b458bb21",
       "assets/streets/GUVVV3FU2FC38SK.json": "b4f1b950",
       "assets/streets/index.json": "510258a1",
+      "assets/ui/quest-book-solid.webp": "a53d6aca",
       "assets/ui/quest_bubble_active.png": "2de1b09a",
       "contribute/data.json": "e25ce0e0",
       "encyclopedia/search.json": "7aac489d",

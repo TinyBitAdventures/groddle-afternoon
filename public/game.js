@@ -4,12 +4,12 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=968c90a7';
 import { createErrorOnce, createFeatureHost } from './js/feature-host.js?v=06bb8b74';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=3f4eca98';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=d9b28ed9';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl, drawTileArt } from './js/enter-chooser.js?v=4a3ea327';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
 import { createVogOverlay } from './js/vog-overlay.js?v=d137399c';
-import { createPromptStack } from './js/prompt-stack.js?v=14009a48';
+import { createPromptStack } from './js/prompt-stack.js?v=f7ca1ed0';
 import { createWindowStack } from './js/window-stack.js?v=a7104f02';
 import { HOG_HAUL_SPLASH, createGameSplash, splashFor } from './js/game-splash.js?v=f60a5067';
 import {
@@ -772,8 +772,8 @@ import {
   streetCardUp,
   STREET_CARD_UP,
   POL_OWNER_SIZE,
-} from './js/screen-fx.js?v=bfed8fb0';
-import { momentMoreText } from './js/ui/moment-card.js?v=68e10b61';
+} from './js/screen-fx.js?v=2e975a82';
+import { momentMoreText } from './js/ui/moment-card.js?v=df448740';
 import { CHAT_MAX_CHARS, chatBubbleText } from './js/ui/chat-input.js?v=72d000ac';
 // HUB: the hub is the Modern skin's; Classic owns X in its skin (js/classic/classic-hub.js).
 import { MODERN, onUiModeChange, uiState } from './js/classic/ui-mode.js?v=1db965c7';
@@ -785,7 +785,7 @@ import './js/classic/classic-zoom.js?v=48d35c85';
 import { mountImaginationHub } from './js/ui/imagination-hub.js?v=51fa371f';
 import { newDayBubble, shuffleNewDayMessages, waitForScreenGates } from './js/screen-queue.js?v=cf0132c0';
 import { applyFamiliarLook, familiarCardHeading, familiarLook, skillArtFor, skillLearnedActivity } from './js/familiar.js?v=bafd7139';
-import { armPromptTimeout, promptTimeoutMs } from './js/prompt-timeout.js?v=72b6e62d';
+import { armPromptTimeout, promptTimeoutMs } from './js/prompt-timeout.js?v=fba1669f';
 import {
   planTravel,
   listMapDestinations,
