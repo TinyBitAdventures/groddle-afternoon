@@ -212,12 +212,12 @@ import { DISPATCHER_HALF, DISPATCHER_TEXT, MOVABLE_FIXTURES, MOVABLE_FIXTURE_IDS
 import { displayTopOf, itemstackOverlayPoint, overlayAlpha, overlayLifeMs, playPoofIn, trackOverlay } from '../overlay-art.js?v=75c3ea34';
 import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=59ca0e2b';
 import { fadeInNewNear } from '../poof-fade.js?v=8984abd1';
-import { projectApi } from './street-jobs-feature.js?v=8b267ff1';
+import { projectApi } from './street-jobs-feature.js?v=ead5b648';
 import { TOWER_CHASSIS, TOWER_CONFIG, TOWER_DOOR_DX, TOWER_GEO, TOWER_PROTO, normalizeTowerState } from '../home-tower.js?v=087df38f';
-import { drawTowerElevator, drawTowerExit, towerApi, visitorTowerView } from './home-tower-feature.js?v=ccb8bfdc';
+import { drawTowerElevator, drawTowerExit, towerApi, visitorTowerView } from './home-tower-feature.js?v=9fc08ca4';
 import { pieceUrl, roomPieces, surfaceAt, swatchPiece, wallTargetAt } from '../home-wallpaper.js?v=f1969400';
-import { maxTextureSizeOf, sharpDeco, wantsHiresDecos } from '../deco-hires.js?v=cad0b32d';
-import { SHARP_DECOS } from '../deco-sharp-list.js?v=6bd649ff';
+import { maxTextureSizeOf, sharpDeco, wantsHiresDecos } from '../deco-hires.js?v=9ea9c4f3';
+import { SHARP_DECOS } from '../deco-sharp-list.js?v=a2424923';
 import { resourceNodesFeature } from './resource-nodes-feature.js?v=0d173b95';
 import { patchesFeature } from './patches-feature.js?v=d405f1a4';
 import { GROWN_TREE_LABELS, createPlot, growTree, plotLabel } from '../patches.js?v=61abc5fe';
@@ -242,7 +242,7 @@ import {
 } from '../home-styles.js?v=13fe0aaa';
 import { frameTexture, isLoaded, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js?v=f024bd6a';
 import { FALLBACK_MAX as WORLD_ART_FALLBACK_MAX, worldArtFor } from '../world-art.js?v=0729bf92';
-import { oneArmSignpost } from '../street-render.js?v=6ce3fc08';
+import { oneArmSignpost } from '../street-render.js?v=e68ca1b4';
 import { ROCK_CATALOG } from '../mining.js?v=674ed39b';
 import {
   HOUSE_SIGN,
@@ -2120,11 +2120,8 @@ function streetBackground(engine, styleKey, houseStyle = 'meadow') {
 
   // The house, centred on its lot
   const h = HOUSES[houseStyle] || HOUSES.meadow;
-  const house = new PIXI.Sprite(textureFromUrl(`${DECO}${h.path}.png`));
-  house.anchor.set(0.5, 1);
-  house.scale.set(h.scale);
-  house.x = layout.houseX;
-  house.y = STREET_GROUND_Y + 14;
+  // Through the landscape artist: its sharp copy at the screen's density (tools/deco-pipeline/sharp.py house_placements).
+  const house = land.artist.sprite(PIXI, { s: h.path, w: h.w, h: h.h, scale: h.scale }, layout.houseX, STREET_GROUND_Y + 14);
   house.zIndex = -20;
   house.homeLayout = { k: 'house', s: HOUSES[houseStyle] ? houseStyle : 'meadow' };
   root.addChild(house);

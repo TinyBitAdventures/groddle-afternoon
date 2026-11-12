@@ -19,12 +19,12 @@
  * the largest placement; js/street-render.js asks sharpDeco() for them on the layers that are
  * drawn sharp (middleground and in front of it, unblurred).
  */
-import { HIRES_DECOS, HIRES_DECOS_BIG } from './deco-hires-list.js?v=2c460d64';
+import { HIRES_DECOS, HIRES_DECOS_BIG } from './deco-hires-list.js?v=60fcf361';
 import { NEW_DECOS, NEW_DECOS_HIRES } from './deco-new-list.js?v=eadb6e8c';
 
 /** A published zone's new art (gz_ decos, js/deco-new-list.js): drawn like library decos. */
 export { NEW_DECOS };
-import { SHARP_DECOS } from './deco-sharp-list.js?v=6bd649ff';
+import { SHARP_DECOS } from './deco-sharp-list.js?v=a2424923';
 
 const DECO_PNG = /^(.*?(?:^|\/)assets\/decos\/groddle\/)([^/?#]+)\.png([?#].*)?$/;
 

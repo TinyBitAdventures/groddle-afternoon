@@ -79,6 +79,18 @@ FFDEC = audit.FFDEC
 # DoorView.as 234-235 only does for a numbered door. The For Sale art is door-signs.py's.
 HIDDEN_BY_DEFAULT = ('sign',)
 
+# Decos that ship the SWF render although it differs from the old PNG and --svgcheck does not pass
+# (FFDec's SVG export loses some multiply strata and overlay highlights). Firebog's ground fronts: their siblings with the same multiply/overlay structure
+# (front_ground_2, _3, _set_3) already ship FFDec's raster, which draws them like those.
+SWF_WINS = {
+    'front_ground_1': 'the old PNG draws the overlay highlight columns opaque (its siblings and FFDec do not)',
+    'front_ground_set_1': "the old PNG is the same art about 10 px lower and 3% taller than the SWF's stage",
+    'front_ground_set_2': "the old PNG is front_ground_set_1's art",
+    # Grimssea Hollow's bark: FFDec's raster and SVG agree but for anti-aliasing on a 25 px wide
+    # deco (alpha 6.2 against svg_alpha 5).
+    'tree_knot_01b_et1': 'the old PNG is the same knot drawn wider and blockier',
+}
+
 SETTINGS = {
     'version': 1,
     'zoom': 3,              # FFDec zoom for the render both sizes come from (more for denser PNGs)
@@ -348,7 +360,7 @@ def expect_swf(row):
     """Would the current thresholds ship this built row's SWF render? (None: not measured.)"""
     if row.get('diff') is None:
         return None
-    return same_art(row['diff']) or bool(row.get('svg_ok'))
+    return same_art(row['diff']) or bool(row.get('svg_ok')) or row.get('name') in SWF_WINS
 
 
 def inputs_key(name, mode, swf_sha, src_sha, svg_ok=None, hidden=None):
@@ -413,14 +425,16 @@ def process(work, d, render_png, plan_row_extra):
     d['diff'] = [c, a]
     d['shift'] = best_shift(src, img2)
     same = same_art(d['diff'])
-    if not same and not d.get('svg_ok'):
+    if not same and not d.get('svg_ok') and n not in SWF_WINS:
         # Differs from the PNG: keep the PNG until --svgcheck shows FFDec's renders agree.
         d['mode'] = 'png'
         d['reason'] = 'differs: SWF render differs from the PNG (run --svgcheck)'
         d['no_hires'] = 'png'
         d['size3'] = None
         return emit_png(work, d, src)
-    if not same:
+    if not same and n in SWF_WINS and not d.get('svg_ok'):
+        d['reason'] = 'corrected: ' + SWF_WINS[n]
+    elif not same:
         d['reason'] = 'corrected: the bundle SWF differs from the old PNG; FFDec raster and SVG agree'
     else:
         d['reason'] = 'swf'

@@ -9,6 +9,7 @@
 
 import { NEIGHBOUR_SCENE, hash01, neighbourLayout } from '../neighbours.js?v=161fc2e5';
 import { textureFromUrl } from '../textures.js?v=f024bd6a';
+import { sharpRoomDeco } from '../deco-hires.js?v=9ea9c4f3';
 
 const DECO = 'assets/decos/groddle/';
 /** The widest view the parallax layers must cover (js/location-view.js: 1680, wider on ultrawide windows). */
@@ -264,7 +265,9 @@ export function buildNeighbourBackground(PIXI, neighbour) {
   root.addChild(near);
 
   const h = neighbour.house;
-  const house = new PIXI.Sprite(textureFromUrl(`${DECO}${h.path}.png`));
+  // Its sharp copy at the screen's density where it has one (tools/deco-pipeline/sharp.py house_placements).
+  const sharp = sharpRoomDeco(`${DECO}${h.path}.png`, h.scale);
+  const house = new PIXI.Sprite(sharp ? textureFromUrl(sharp.url, sharp.opts) : textureFromUrl(`${DECO}${h.path}.png`));
   house.anchor.set(0.5, 1);
   house.width = h.w * h.scale;
   house.height = h.h * h.scale;

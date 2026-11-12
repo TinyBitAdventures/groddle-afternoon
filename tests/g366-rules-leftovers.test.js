@@ -31,7 +31,7 @@ import { applyBuff, createBuffState } from '../public/js/buffs.js?v=819cb342';
 import { BUFF_ICONS, QUEST_TIMER_BUFFS } from '../public/js/buff-triggers.js?v=a3093922';
 import { EMERGENCY_RETRY_MS } from '../public/js/features/quest-offers-feature.js?v=db81cdfe';
 import { QUOIN_CLASSES, quoinClassAmount, quoinRespawnMs } from '../public/js/quoins.js?v=7e0dec6d';
-import { COIN_BACK_MS, COIN_CLASS, COIN_TYPE, room as rainbowRoom } from '../public/js/quest-rooms/rainbow-run.js?v=d07b80cc';
+import { COIN_BACK_MS, COIN_CLASS, COIN_TYPE, room as rainbowRoom } from '../public/js/quest-rooms/rainbow-run.js?v=f78366fc';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const PUBLIC = join(ROOT, 'public');

@@ -10,7 +10,8 @@ runs it).
 
 Measure (no rendering): every drawn deco on every street in index.json, every deco a home
 street or back-yard style draws (js/home-styles-data.js looks, home_placements) and every deco a
-rebuilt quest room draws with js/quest-rooms/kit.js deco() (room_placements), middleground and the
+rebuilt quest room draws with js/quest-rooms/kit.js deco() (room_placements), the house on a home or
+neighbour's street (house_placements), middleground and the
 layers drawn in front of it (layers behind it load the 2x file on purpose, js/street-render.js;
 blurred layers bake at reduced resolution; hidden layers never draw). Parallax and T_ layers are
 only offset, never scaled, so a deco's w x h is its on-screen size in view px. The renderer draws
@@ -27,6 +28,8 @@ Format, decided per deco by measurement against FFDec's raster render:
   has no embedded bitmaps and matches the raster render (`svg_rgb`, `svg_alpha`, `svg_bad`):
   FFDec's SVG export drops some placement colour transforms (alpha) and draws masks differently.
   Bytes are tiny; the game rasterises it at the screen's need (js/deco-hires.js sharpDeco).
+- aligned webp (ALIGN_TO_PNG): a deco kept as its PNG only because the PNG frames the same art a
+  few px off the SWF's stage gets the raster render registered onto the PNG's frame.
 - webp: otherwise the raster render sized to `target` texels per view px at the largest near
   placement, <name>@<res>x.webp (res texels per logical px, steps of 0.25, longest side at most
   `webp_max_side`), encoded like build.py.
@@ -227,6 +230,26 @@ def home_placements(plan):
     return out
 
 
+HOUSE_FILES = (os.path.join(PUBLIC, 'js', 'features', 'homes-feature.js'), os.path.join(PUBLIC, 'js', 'neighbours.js'))
+HOUSE_ROW = re.compile(r"path: '(door_asset_house_\w+)', w: (\d+(?:\.\d+)?), h: (\d+(?:\.\d+)?), scale: (\d+(?:\.\d+)?)")
+
+
+def house_placements(plan):
+    """The house on a home street (homes-feature.js HOUSES, drawn through its landscape artist) and
+    on a neighbour's street (neighbours.js, features/neighbour-scene.js): w x h x scale in view px,
+    near, cls 'home'."""
+    out = []
+    for path in HOUSE_FILES:
+        text = open(path, encoding='utf-8').read()
+        for m in HOUSE_ROW.finditer(text):
+            sp, w, h, k = m.group(1), float(m.group(2)), float(m.group(3)), float(m.group(4))
+            if sp not in plan:
+                continue
+            out.append(dict(sprite=sp, tsid=f'{os.path.basename(path)}:{text.count(chr(10), 0, m.start()) + 1}', street=f'home house {sp}',
+                            layer='house', cls='home', blurred=False, blur=0, gain=1.0, w=round(w * k, 2), h=round(h * k, 2), sized=True))
+    return out
+
+
 QUEST_ROOMS = os.path.join(PUBLIC, 'js', 'quest-rooms')
 NUM = re.compile(r'^-?\d+(?:\.\d+)?$')
 
@@ -351,7 +374,7 @@ def measure(plan, old=None):
     S = SETTINGS
     old_edges = {r['name']: r for r in ((old or {}).get('decos') or []) + ((old or {}).get('skipped') or []) + ((old or {}).get('soft') or [])}
     by = collections.defaultdict(list)
-    for p in placements(plan) + home_placements(plan) + room_placements(plan):
+    for p in placements(plan) + home_placements(plan) + house_placements(plan) + room_placements(plan):
         by[p['sprite']].append(p)
     rows = []
     for sp, ps in by.items():
@@ -394,7 +417,7 @@ def measure(plan, old=None):
                  texels=(L if worst['cls'] == 'far' else f3), need=[round(worst['w'] * worst['dens']), round(worst['h'] * worst['dens'])],
                  s=round(max([max(p['w'] / L[0], p['h'] / L[1]) for p in near] or [0]), 4) if near_blurry and edge >= S['edge_min'] else 0,
                  sf=round(sf, 4), sb=round(sb, 4), sh=round(sh, 4), bneed=round(bneed, 4), size2=L,
-                 counted=bool(counted), unsized=sum(1 for p in counted if not p['sized']), source=row['mode'] == 'swf',
+                 counted=bool(counted), unsized=sum(1 for p in counted if not p['sized']), source=row['mode'] == 'swf' or sp in ALIGN_TO_PNG,
                  edge=edge, edge_of=fsha)
         rows.append(r)
     rows.sort(key=lambda r: -r['ratio'])
@@ -417,6 +440,52 @@ def classify(rows, plan):
         else:
             cand.append(r)
     return cand, skipped, soft
+
+
+# ---------- aligned copies ----------
+
+# Decos kept as their old PNG (build.py: the SWF render differs) only because the PNG frames the
+# same art a few px off the SWF's stage. Their copy is the SWF render registered onto the PNG's
+# frame (fit_to_png), so it lines up with the 2x file, its For Sale sign variants and every
+# position measured on it; shipped only when the registered render matches the PNG (same_art).
+ALIGN_TO_PNG = {
+    'door_asset_house_medium_03': "the PNG frames the art 12 px right of the SWF's stage",
+    'door_asset_house_large_05': "the PNG frames the art 4 px right of the SWF's stage",
+}
+
+
+def _profile_fit(a, b):
+    """(s, d): b's profile mapped by p = s * r + d onto a's with the least mean difference."""
+    p = np.arange(len(a), dtype=np.float64)
+    r = np.arange(len(b), dtype=np.float64)
+    best = None
+    for s in np.arange(0.95, 1.0501, 0.0025):
+        for d in np.arange(-40, 40.01, 0.5):
+            e = float(np.abs(a - np.interp((p - d) / s, r, b, left=0, right=0)).mean())
+            if best is None or e < best[0] - 1e-9:
+                best = (e, float(s), float(d))
+    return round(best[1], 4), best[2]
+
+
+def fit_to_png(render, stage, zoom, src):
+    """[sx, dx, sy, dy] in the PNG's px: where the render's stage, resampled to the PNG's size,
+    lands on the PNG (alpha profiles along each axis)."""
+    base = build.stage_resample(render, stage, zoom, src.size)
+    a = np.asarray(src, dtype=np.float32)[..., 3]
+    b = np.asarray(base, dtype=np.float32)[..., 3]
+    sx, dx = _profile_fit(a.sum(axis=0), b.sum(axis=0))
+    sy, dy = _profile_fit(a.sum(axis=1), b.sum(axis=1))
+    return [sx, dx, sy, dy]
+
+
+def aligned_resample(render, stage, zoom, logical, fit, size, pad=256):
+    """The render resampled to `size` over the PNG's frame (`logical` px) by `fit`."""
+    sx, dx, sy, dy = fit
+    kx, ky = stage[0] * zoom / logical[0], stage[1] * zoom / logical[1]
+    big = Image.new('RGBA', (render.width + 2 * pad, render.height + 2 * pad), (0, 0, 0, 0))
+    big.paste(render, (pad, pad))
+    box = (-dx / sx * kx + pad, -dy / sy * ky + pad, (logical[0] - dx) / sx * kx + pad, (logical[1] - dy) / sy * ky + pad)
+    return big.resize(tuple(size), Image.LANCZOS, box=box)
 
 
 # ---------- SVG ----------
@@ -582,7 +651,8 @@ def cmd_build(args):
             continue
         if only and r['name'] not in only:
             continue
-        r['_swf'] = audit.swf_path(prow['swf'], work, index)
+        # In the state the client drew it by default (build.py HIDDEN_BY_DEFAULT: no For Sale sign).
+        r['_swf'] = build.default_state(audit.swf_path(prow['swf'], work, index), work)[0]
         r['base'] = 1.5 if prow.get('hires') else 1
         r['stage'] = prow['stage']
         todo.append(r)
@@ -650,7 +720,7 @@ def build_chunk(work, chunk, args):
     jobs = []
     for r in chunk:
         text = svgs.get(r['name'])
-        r['_svg'] = tidy_svg(text, r['stage']) if text and r['name'] not in HAND_SVGS else None
+        r['_svg'] = tidy_svg(text, r['stage']) if text and r['name'] not in HAND_SVGS and r['name'] not in ALIGN_TO_PNG else None
         if r['_svg'] and r['name'] in refs:
             p = os.path.join(cdir, r['name'] + '.svg')
             open(p, 'w').write(r['_svg'])
@@ -681,7 +751,8 @@ def build_chunk(work, chunk, args):
                 os.remove(os.path.join(OUT, f))
         else:
             r['kind'] = 'webp'
-            r['why'] = 'bitmap or not plain vector' if not r['_svg'] else 'SVG differs from the raster render'
+            r['why'] = ('aligned: ' + ALIGN_TO_PNG[r['name']] if r['name'] in ALIGN_TO_PNG
+                        else 'bitmap or not plain vector' if not r['_svg'] else 'SVG differs from the raster render')
             webps.append(r)
     # WebP fallbacks: the raster render sized to the need.
     g2 = collections.defaultdict(list)
@@ -700,7 +771,18 @@ def build_chunk(work, chunk, args):
                     r['kind'] = None
                     r['why'] = 'FFDec produced no frame'
                     continue
-                img = build.stage_resample(build.load(found[r['name']]), r['stage'], z, r['size'])
+                ren = build.load(found[r['name']])
+                if r['name'] in ALIGN_TO_PNG:
+                    src = build.load(build.src_png(r['name']))
+                    r['fit'] = fit_to_png(ren, r['stage'], z, src)
+                    r['aligned_diff'] = list(build.compare(aligned_resample(ren, r['stage'], z, r['size2'], r['fit'], src.size), src))
+                    if not build.same_art(r['aligned_diff']):
+                        r['kind'] = None
+                        r['why'] = f"aligned render still differs from the PNG {r['aligned_diff']}"
+                        continue
+                    img = aligned_resample(ren, r['stage'], z, r['size2'], r['fit'], r['size'])
+                else:
+                    img = build.stage_resample(ren, r['stage'], z, r['size'])
                 dst = os.path.join(OUT, f"{r['name']}@{r['res']:g}x.webp")
                 for f in os.listdir(OUT):
                     if f.startswith(r['name'] + '@') and f.endswith('x.webp') and f not in (r['name'] + '@1.5x.webp', os.path.basename(dst)):
@@ -720,7 +802,7 @@ def build_chunk(work, chunk, args):
         if not r.get('kind'):
             continue
         keep = ('name', 'kind', 's', 'sf', 'sb', 'sh', 'bneed', 'size2', 'ratio', 'front', 'placements', 'over', 'worst', 'edge', 'edge_of', 'swf_sha',
-                'key', 'svg_check', 'why', 'res', 'size', 'bytes', 'sha', 'lossless', 'err')
+                'key', 'svg_check', 'why', 'fit', 'aligned_diff', 'res', 'size', 'bytes', 'sha', 'lossless', 'err')
         out.append({k: r[k] for k in keep if k in r and r[k] is not None})
     return out
 

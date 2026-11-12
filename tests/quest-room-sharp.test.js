@@ -16,7 +16,7 @@ const rows = new Map(plan.decos.map((r) => [r.name, r]));
 const url = (name) => `assets/decos/groddle/${name}.png`;
 
 async function withRenderer(resolution, fn) {
-  const hires = await import('../public/js/deco-hires.js?v=cad0b32d');
+  const hires = await import('../public/js/deco-hires.js?v=9ea9c4f3');
   const renderer = { resolution, gl: { MAX_TEXTURE_SIZE: 1, getParameter: () => 16384 } };
   hires.installHiresDecos({ addUrlRoute() {} }, { renderer: () => renderer });
   try {
@@ -43,7 +43,7 @@ test("the Penalty Cell's trunk and bars take their sharp copies at R 4 and keep 
 });
 
 test('no sharp copy before the renderer starts, nor for a file outside the deco folder', async () => {
-  const { sharpRoomDeco } = await import('../public/js/deco-hires.js?v=cad0b32d');
+  const { sharpRoomDeco } = await import('../public/js/deco-hires.js?v=9ea9c4f3');
   assert.equal(sharpRoomDeco(url('penaltybox_trunk'), 0.62), null);
   await withRenderer(4, ({ sharpRoomDeco: pick }) => {
     assert.equal(pick('assets/sprites/icons/apple.webp', 2), null);
@@ -59,7 +59,7 @@ test('kit.deco asks for the sharp copy at its own scale and keeps the sprite at 
 });
 
 test('sharp.py measures the quest rooms: every hard-edged blurry room deco has its copy', async () => {
-  const { HIRES_DECOS } = await import('../public/js/deco-hires-list.js?v=2c460d64');
+  const { HIRES_DECOS } = await import('../public/js/deco-hires-list.js?v=60fcf361');
   const out = execFileSync('/opt/homebrew/bin/python3.11', ['-I', '-c', [
     'import sys, json',
     "sys.argv = ['x']",

@@ -120,12 +120,12 @@ import {
   recordVisit,
   visitorLetter,
 } from '../neighbours.js?v=161fc2e5';
-import { buildNeighbourBackground, neighbourLoadingColors, neighbourPlatforms } from './neighbour-scene.js?v=15d683af';
+import { buildNeighbourBackground, neighbourLoadingColors, neighbourPlatforms } from './neighbour-scene.js?v=520bbe3e';
 import { closeNoteView, noteViewOpen, openBoardView, openNotePicker, openNoteView, openReportView } from '../note-view.js?v=eca7de52';
 import { BOARD_MP_TEXT, boardByline } from '../boards-mp.js?v=6e2613b2';
 import { textureFromUrl } from '../textures.js?v=f024bd6a';
-import { butlerApi } from './butler-feature.js?v=8820eb67';
-import { neighboursMpApi } from './neighbours-mp-feature.js?v=21f2e6a5';
+import { butlerApi } from './butler-feature.js?v=64ac64e4';
+import { neighboursMpApi } from './neighbours-mp-feature.js?v=846ba2a0';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
 import { MAIL_POST_SENDER } from '../mailbox.js?v=a3e833ba';
 
