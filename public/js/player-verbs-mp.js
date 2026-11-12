@@ -267,9 +267,9 @@ const REPLAY_MS = 4 * 60 * 60 * 1000;
 /**
  * A block another player played for you (musicblock 161-215, play_for):
  * the iMG your heard map earns (before the mood bonus), the lines, and
- * heardAt updated. dayOf(ts) is the game day index.
+ * heardAt updated. dayOf(ts) is the game day index (days start at the game epoch, 1238562000 s).
  */
-export function hearMusicblock(heardAt, classTsid, { now = Date.now(), from = 'Somebody', dayOf = (t) => Math.floor(t / (4 * 60 * 60 * 1000)) } = {}) {
+export function hearMusicblock(heardAt, classTsid, { now = Date.now(), from = 'Somebody', dayOf = (t) => Math.floor((t - 1_238_562_000_000) / (4 * 60 * 60 * 1000)) } = {}) {
   const map = heardAt && typeof heardAt === 'object' ? heardAt : {};
   const prev = map[classTsid];
   const lines = [];

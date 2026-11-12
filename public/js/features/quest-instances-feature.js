@@ -1510,6 +1510,11 @@ export const questInstancesFeature = {
     return run || entering ? true : null;
   },
 
+  /** players/player.js 866-873: a new day waits while you are in Esquibeth's waterfalls. */
+  holdNewDay() {
+    return run && String(run.questId || '').startsWith('last_pilgrimage_of_esquibeth') ? true : null;
+  },
+
   travelGate(tsid, engine, meta = {}) {
     if (!run || meta?.bypass) return null;
     return { ok: false, msg: room?.travelText || "You can't travel from here. Use Leave to go back." };

@@ -61,6 +61,17 @@ export function metabolicLoss(stat, { quiet = false } = {}) {
   return gate && gate.ok === false ? { ok: false, msg: gate.msg || null } : { ok: true, msg: null };
 }
 
+let moodLossNotice = null;
+
+/**
+ * inc_metabolics.js 205-213: after a mood loss at or under 50% (20%) of the tank the player reads
+ * "Your mood is getting low..." ("very low!"). fn(pc) says it; the idle loss passes noWarn and
+ * says it once per crossing itself (js/mood-decay.js moodWarningFor).
+ */
+export function setMoodLossNotice(fn) {
+  moodLossNotice = typeof fn === 'function' ? fn : null;
+}
+
 function spend(pc, stat, amount, opts) {
   const x = Math.max(0, Number(amount) || 0);
   if (!pc || !x) return 0;
@@ -68,6 +79,7 @@ function spend(pc, stat, amount, opts) {
   const before = Math.max(0, Number(pc[stat]) || 0);
   // Property.apiDec stops at the bottom (eleven-server src/model/Property.js).
   pc[stat] = Math.max(0, before - x);
+  if (stat === 'mood' && !opts?.noWarn && moodLossNotice) moodLossNotice(pc);
   return before - pc[stat];
 }
 

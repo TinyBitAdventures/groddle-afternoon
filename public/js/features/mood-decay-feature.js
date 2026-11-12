@@ -83,7 +83,7 @@ export function runMoodDecayMinute(engine) {
   });
   if (res.loss > 0) {
     // player.js 829: metabolics_lose_mood(mood_loss, 1), quiet (G300).
-    loseMood(pc, res.loss, { quiet: true });
+    loseMood(pc, res.loss, { quiet: true, noWarn: true });
     const warning = moodWarningFor(res.percent, (pc.mood / top) * 100);
     if (warning) engine.pushActivity?.(warning);
     engine.updateHud?.();

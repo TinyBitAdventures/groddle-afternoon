@@ -47,15 +47,15 @@
  * window.groddlePlayerVerbs in multiplayer.
  */
 
-import { countItem, removeItem } from '../inventory.js?v=2bd5b93e';
-import { gainMetabolic, loseEnergy, loseMood } from '../metabolics.js?v=8504134e';
-import { grantMoodXp } from '../mood-xp.js?v=958e7680';
-import { ensureQuestOfferState } from '../quest-offers.js?v=d76abcd0';
-import { getMusicblock, isMusicblock } from '../musicblocks.js?v=51fa975b';
+import { countItem, removeItem } from '../inventory.js?v=f49c8998';
+import { gainMetabolic, loseEnergy, loseMood } from '../metabolics.js?v=1383e6fd';
+import { grantMoodXp } from '../mood-xp.js?v=22648ec0';
+import { ensureQuestOfferState } from '../quest-offers.js?v=956218ac';
+import { gameDayIndex, getMusicblock, isMusicblock } from '../musicblocks.js?v=765ac56d';
 import { GAME_DAY_MS } from '../game-day.js?v=cf9afac0';
 import { playSheetOverlay } from '../overlay-art.js?v=a6561207';
 import { showRainbow, rainbowSound } from '../overlays.js?v=4e81f749';
-import { copyFromLedger, spendCopyCharge } from '../copy-charges.js?v=7b1d0bd9';
+import { copyFromLedger, spendCopyCharge } from '../copy-charges.js?v=e4ead2c7';
 import {
   BEAR,
   CHARADES_BUFF,
@@ -81,7 +81,7 @@ import {
   normalizeVerbsSlice,
   targetSide,
   underTheInfluence,
-} from '../player-verbs-mp.js?v=c82b7e0f';
+} from '../player-verbs-mp.js?v=4d0315f5';
 import { UNNAMED_PLAYER } from '../player-names.js?v=f9b78094';
 
 export const PLAYER_VERBS_FEATURE_ID = 'player-verbs-mp';
@@ -370,7 +370,7 @@ function createSession(engine, client) {
     if (verbId === 'play_for') {
       const block = String(m.block || '');
       if (isMusicblock(block)) {
-        const heard = hearMusicblock(engine.musicblockHeard?.() || {}, block, { now: Date.now(), from: from.name, dayOf: (t) => Math.floor(Math.max(0, t) / GAME_DAY_MS) });
+        const heard = hearMusicblock(engine.musicblockHeard?.() || {}, block, { now: Date.now(), from: from.name, dayOf: gameDayIndex });
         const xp = heard.xp ? grantMoodXp(player, heard.xp) : 0;
         const label = engine.playMusicblockAudio?.(block) || getMusicblock(block)?.label || 'a musicblock';
         const fx = [mood ? `+${mood} mood` : '', xp ? `+${xp} iMG` : ''].filter(Boolean).join(', ');

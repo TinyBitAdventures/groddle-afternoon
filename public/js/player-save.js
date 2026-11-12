@@ -1,17 +1,17 @@
 /** Persistent player systems + per-street world snapshot. */
-import { normalizeShrineState } from './shrines.js?v=21cad7cb';
-import { normalizeQuoinState } from './quoins.js?v=7e0dec6d';
-import { normalizeToolConditionState, syncToolCopies } from './tools.js?v=5f482998';
+import { normalizeShrineState } from './shrines.js?v=a190faea';
+import { normalizeQuoinState } from './quoins.js?v=61be601c';
+import { normalizeToolConditionState, syncToolCopies } from './tools.js?v=62b37c51';
 import { normalizeSkillState } from './skills.js?v=4542bdf9';
-import { normalizeFoodState } from './food.js?v=007ef0c8';
+import { normalizeFoodState } from './food.js?v=353b90ed';
 import { createGhostQuestState } from './ghost-quest.js?v=5f3cc133';
-import { normalizeParadiseState } from './paradise-flight.js?v=6d8739e1';
+import { normalizeParadiseState } from './paradise-flight.js?v=fdc76095';
 import { normalizeFeatSnapshot } from './feats.js?v=f6c3b551';
-import { normalizeEmotionalBearState } from './emotional-bear.js?v=8d027fe0';
+import { normalizeEmotionalBearState } from './emotional-bear.js?v=172f393b';
 import { normalizeHomeState } from './homes.js?v=631ab6b8';
 import { normalizeMailboxState } from './mailbox.js?v=a3e833ba';
 import { normalizeFeatureSlices } from './feature-host.js?v=06bb8b74';
-import { normalizeQuestOfferState } from './quest-offers.js?v=d76abcd0';
+import { normalizeQuestOfferState } from './quest-offers.js?v=956218ac';
 
 export const PLAYER_SAVE_VERSION = 7;
 
@@ -125,6 +125,9 @@ export function normalizePlayerSnapshot(seed = {}, fallback = PLAYER_DEFAULTS) {
     ...(source.recipeXpToday && typeof source.recipeXpToday.day === 'string'
       ? { recipeXpToday: { day: source.recipeXpToday.day, recipes: Object.fromEntries(Object.entries(cleanScalarRecord(source.recipeXpToday.recipes)).filter(([, v]) => typeof v === 'number' && v >= 0)) } }
       : {}),
+    // Seconds played in all (player.js getTimePlayed), for the New Day screen's hour (game.js notePlayedTime).
+    ...(source.playedSeconds != null && Number.isFinite(Number(source.playedSeconds))
+      ? { playedSeconds: clamp(Math.round(Number(source.playedSeconds) * 10) / 10, 0, 1e9) } : {}),
   };
 }
 

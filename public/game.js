@@ -1001,7 +1001,8 @@ import {
   soundForQuoin,
   soundForVerb,
 } from './js/sound-moments.js?v=52ad523c';
-import { loseMood, moodMax, setMetabolicGainGate, setMetabolicLossGate } from './js/metabolics.js?v=8504134e';
+import { loseMood, moodMax, setMetabolicGainGate, setMetabolicLossGate, setMoodLossNotice } from './js/metabolics.js?v=8504134e';
+import { MOOD_DECAY_TEXT } from './js/mood-decay.js?v=49175993';
 import { installHiresIcons } from './js/icon-hires.js?v=165dbd6e';
 import { installHiresDecos } from './js/deco-hires.js?v=f59e60d3';
 import { loadAudioLevels, loadMutedPreference, saveAudioLevel, saveMutedPreference } from './js/audio-pref.js?v=6fe817bc';
@@ -6168,12 +6169,12 @@ function updateHud() {
     // inc_stats.js 373: the activity line, word for word.
     const activity = `Woo! you've reached level ${levelUpdate.toLevel}!!!`;
     logMoment(activity);
-    enqueueAward({
     // 363-370: dead, nothing refills; Super Pooped, only mood.
     const refilled = levelUpdate.energyAdded > 0 || levelUpdate.moodAdded > 0
       ? (levelUpdate.energyAdded > 0 && levelUpdate.moodAdded > 0 ? 'Energy and mood completely refilled.'
         : levelUpdate.moodAdded > 0 ? 'Mood completely refilled.' : 'Energy completely refilled.')
       : '';
+    enqueueAward({
       kind: 'level',
       title: `Level ${levelUpdate.toLevel}`,
       body: `${refilled}${rewardText}`.trim(),
@@ -13365,6 +13366,14 @@ setMetabolicGainGate((stat, { quiet = false } = {}) => {
   if (gate?.ok === false && !quiet && gate.msg) pushActivity(gate.msg);
   return gate;
 });
+// inc_metabolics.js 205-213: every mood loss at or under 50% / 20% of the tank warns (not while
+// dead or under Walking Dead); the idle loss keeps its once-a-crossing line (mood-decay-feature).
+setMoodLossNotice((who) => {
+  if (who !== pc || features.query('isDead', engine) === true || hasBuff(buffState, 'walking_dead', Date.now())) return;
+  const percent = ((Number(pc.mood) || 0) / moodMax(pc)) * 100;
+  if (percent <= 20) pushActivity(MOOD_DECAY_TEXT.veryLow);
+  else if (percent <= 50) pushActivity(MOOD_DECAY_TEXT.low);
+});
 // G289: losses too (metabolics_lose_energy 108-122, metabolics_lose_mood 180-194): none while dead
 // or in the first two tutorial scenes; verb costs spend through js/metabolics.js loseEnergy.
 setMetabolicLossGate((stat, { quiet = false } = {}) => {
@@ -14858,12 +14867,38 @@ function resolveSavedLocation(saved) {
  * (js/screen-fx.js showNewDayScreen; BaseScreenView.as 171-173, 224-226).
  * @param {{ force?: boolean }} [opts]
  */
+/** player.js 905: the New Day screen waits for an hour played in all (getTimePlayed, time_played). */
+const NEW_DAY_SCREEN_PLAYED_S = 3600;
+let playedTickAt = 0;
+
+/**
+ * Time played, in seconds, kept on the player (pc.playedSeconds). A save from before it was kept
+ * reads as an hour (it has played), a new player starts at 0 (js/new-player.js). The poll runs
+ * every 5 s; a longer gap (the page asleep) counts 10 s at most.
+ */
+function notePlayedTime(now = Date.now()) {
+  if (!state.started) return;
+  if (playedTickAt) {
+    const s = Math.min(10, Math.max(0, (now - playedTickAt) / 1000));
+    pc.playedSeconds = Math.min(1e9, Math.round(((Number(pc.playedSeconds ?? NEW_DAY_SCREEN_PLAYED_S) || 0) + s) * 10) / 10);
+  }
+  playedTickAt = now;
+}
+
 async function maybeNewDay(opts = {}) {
   if (newDayBusy || !state.started) return false;
   if (!opts.force && !shouldFireNewDay()) return false;
+  // player.js 866-873: the new day waits while you are in Esquibeth's waterfalls (checked again on the next poll).
+  if (!opts.force && features.query('holdNewDay', engine) === true) return false;
   newDayBusy = true;
-  const el = document.getElementById('new-day-screen');
-  const refill = applyNewDayRefill(pc, { energyMax: energyCap(), moodMax: moodMax(pc) });
+  // player.js 893-897: energy and mood refill only once the intro is done (has_done_intro), and
+  // 905: the New Day screen only for a player with an hour played in all who has done it; else the day turns quietly.
+  const introDone = features.query('tutorialRunning', engine) !== true;
+  const showScreen = opts.force || (introDone && (Number(pc.playedSeconds ?? NEW_DAY_SCREEN_PLAYED_S) || 0) >= NEW_DAY_SCREEN_PLAYED_S);
+  const el = showScreen ? document.getElementById('new-day-screen') : null;
+  const refill = introDone
+    ? applyNewDayRefill(pc, { energyMax: energyCap(), moodMax: moodMax(pc) })
+    : { energyGained: 0, moodGained: 0, energyBefore: pc.energy, moodBefore: pc.mood };
   // doNewDay drops the mining gem-drop overrides.
   pc.miningDropScale = {};
   setLastNewDayTs(Date.now());
@@ -14882,7 +14917,7 @@ async function maybeNewDay(opts = {}) {
   resetStreetCollectiblesForNewDay();
   features.newDay(Date.now(), engine);
   updateHud();
-  pushActivity(
+  if (showScreen) pushActivity(
     `A new day: energy refilled (+${Math.round(refill.energyGained)}) · mood restored` +
       (trantN ? ` · ${trantN} tree${trantN === 1 ? '' : 's'} ready for care` : '') +
       (animalN ? ` · ${animalN} animal${animalN === 1 ? '' : 's'} ready for care` : '') +
@@ -14905,7 +14940,7 @@ async function maybeNewDay(opts = {}) {
       await showNewDayScreen(el);
     }, { requiresFocus: false });
     showNewDayBubble(refill);
-  } else {
+  } else if (showScreen) {
     toast('A new day: energy refilled!', 4000);
     playSfx('newDay', { volume: 0.75 });
   }
@@ -33234,6 +33269,7 @@ async function main() {
     newDayCheckAccum += dt;
     if (newDayCheckAccum > 300) {
       newDayCheckAccum = 0;
+      notePlayedTime();
       if (!isScreenFxBlocking()) maybeNewDay();
       growStreetTrants();
     }

@@ -86,7 +86,8 @@ export function isNewMultiplayerPlayer(mode, store) {
 
 /** A fresh pc object for game.js: the source stats and no imagination upgrades. */
 export function newPlayerStats() {
-  return { ...NEW_PLAYER_STATS, imaginationUpgrades: [] };
+  // playedSeconds: a new player's time played starts at 0 (game.js notePlayedTime; player.js 905).
+  return { ...NEW_PLAYER_STATS, imaginationUpgrades: [], playedSeconds: 0 };
 }
 
 /**

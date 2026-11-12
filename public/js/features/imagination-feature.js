@@ -144,13 +144,22 @@ function ctxFor(engine = engineRef) {
  */
 const offeredInMultiplayer = isOfferedOnline;
 
-/** Keep the player's tank in step with purchased Energy Tank cards. */
+/**
+ * Keep the player's tank in step with purchased Energy Tank cards. A new card refills
+ * (inc_imagination.js 140-142, metabolics_recalc_limits 266-289): energy AND mood set to the new
+ * top (apiSet, past any gate), unless you are dead, when neither is.
+ */
 function syncEnergyTank(engine = engineRef, refill = false) {
   const pc = engine?.pc;
   if (!pc) return;
   pc.energyMax = energyMax(engine);
-  if (refill) pc.energy = pc.energyMax;
-  else if (pc.energy > pc.energyMax) pc.energy = pc.energyMax;
+  if (refill && !hellFeature.isDead?.()) {
+    pc.energy = pc.energyMax;
+    pc.mood = pc.energyMax;
+  } else {
+    if (pc.energy > pc.energyMax) pc.energy = pc.energyMax;
+    if (pc.mood > pc.energyMax) pc.mood = pc.energyMax;
+  }
 }
 
 function dayKey() {

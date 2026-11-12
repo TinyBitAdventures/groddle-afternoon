@@ -6,10 +6,10 @@
  * was last heard. The tunes are Tiny Speck's CC0 recordings (sound-key catalog).
  */
 
-import { addItem, countItem, ensureItem } from './inventory.js?v=2bd5b93e';
-import { GAME_DAY_MS } from './game-day.js?v=cf9afac0';
-import { metabolicGain, moodMax, loseEnergy } from './metabolics.js?v=8504134e';
-import { grantMoodXp } from './mood-xp.js?v=958e7680';
+import { addItem, countItem, ensureItem } from './inventory.js?v=f49c8998';
+import { GAME_DAY_MS, GAME_EPOCH_MS } from './game-day.js?v=cf9afac0';
+import { metabolicGain, moodMax, loseEnergy } from './metabolics.js?v=1383e6fd';
+import { grantMoodXp } from './mood-xp.js?v=22648ec0';
 import { SOUND_ALIASES, SOUND_FILES } from './sound-keys.js?v=fb6ee553';
 
 export const MUSICBLOCK_MONTH_MS = Math.round(30.5 * 24 * 60 * 60 * 1000);
@@ -278,8 +278,12 @@ export function collectMusicblock(state, inv, classTsid, streetTsid) {
   };
 }
 
-function gameDayIndex(timestamp) {
-  return Math.floor(Math.max(0, timestamp) / GAME_DAY_MS);
+/**
+ * The game day a time falls in (musicblock_d_green_01.js 177-200, 329-345: today_key from
+ * current_gametime(), whose days start at the game epoch, 1238562000, an hour past a 4 h mark).
+ */
+export function gameDayIndex(timestamp) {
+  return Math.floor((Math.max(0, timestamp) - GAME_EPOCH_MS) / GAME_DAY_MS);
 }
 
 /**
