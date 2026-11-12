@@ -54,7 +54,7 @@ const ALL_SECTIONS = [
   streetsSection,
   storesSection,
   // Imagination upgrades, recipes, buffs, feats and street projects, Giants (tools/encyclopedia/sections.mjs).
-  ...MORE_SECTIONS.map(({ key, label, one, noun, blurb, groupWord, sample, css, cardCount, scoreMore }) => ({ key, label, one, noun, blurb, groupWord, sample, css, cardCount, scoreMore })),
+  ...MORE_SECTIONS.map(({ key, label, one, noun, blurb, groupWord, sample, css, cardCount, scoreMore, tilePic }) => ({ key, label, one, noun, blurb, groupWord, sample, css, cardCount, scoreMore, tilePic })),
 ];
 export const SECTIONS = ALL_SECTIONS.filter((s) => BUILT_SECTIONS.includes(s.key));
 

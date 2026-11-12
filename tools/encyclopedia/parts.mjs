@@ -60,22 +60,25 @@ export function pathOf(key) {
  */
 export function makeParts(p, info, nameOf = () => null) {
   const href = (key) => `${p}${pathOf(key)}`;
-  const img = (pic, cls = 'ency-ic', size = 48) => {
+  const img = (pic, cls = 'ency-ic', size = 48, alt = '') => {
     if (!pic) return `<span class="${cls} cat-ph" aria-hidden="true"></span>`;
     const scale = Math.min(pic.hi ? 3 : 2, size / Math.max(pic.w, pic.h));
     const w = Math.max(1, Math.round(pic.w * scale));
     const h = Math.max(1, Math.round(pic.h * scale));
     const srcset = pic.hi ? ` srcset="${p}${esc(pic.src)} 1x, ${p}${esc(pic.hi)} 3x"` : '';
-    return `<img class="${cls}" src="${p}${esc(pic.src)}"${srcset} alt="" width="${w}" height="${h}" loading="lazy" decoding="async" />`;
+    return `<img class="${cls}" src="${p}${esc(pic.src)}"${srcset} alt="${esc(alt)}" width="${w}" height="${h}" loading="lazy" decoding="async" />`;
   };
-  /** A small picture card for one thing. opts: sub (a short line), n (a count), anchor (#id), title. */
+  /**
+   * A small picture card for one thing. opts: sub (a short line), n (a count), anchor (#id), title,
+   * pic and size (another picture than the entry's icon, drawn up to size px), cls (a class on the card).
+   */
   const tile = (key, opts = {}) => {
     const it = info(key);
     const name = opts.name || it?.name || nameOf(key) || key.slice(key.indexOf(':') + 1);
     const n = opts.n && Number(opts.n) !== 1 ? `<span class="ency-n">×${esc(fmt(opts.n))}</span>` : '';
     const sub = opts.sub ? ` <span class="ency-tile-sub">${opts.sub}</span>` : '';
-    const body = `<span class="ency-tile-pic">${img(it?.icon, 'ency-ic', 48)}${n}</span> <span class="ency-tile-name">${esc(name)}${sub ? sep() : ''}</span>${sub}`;
-    const st = it?.status && !inRemake(it.status) ? ' ency-tile-out' : '';
+    const body = `<span class="ency-tile-pic">${img(opts.pic || it?.icon, 'ency-ic', opts.size || 48)}${n}</span> <span class="ency-tile-name">${esc(name)}${sub ? sep() : ''}</span>${sub}`;
+    const st = `${it?.status && !inRemake(it.status) ? ' ency-tile-out' : ''}${opts.cls ? ` ${opts.cls}` : ''}`;
     return it
       ? `<li><a class="ency-tile${st}" href="${href(key)}${opts.anchor ? `#${esc(opts.anchor)}` : ''}">${body}</a></li>`
       : `<li><span class="ency-tile ency-tile-plain">${body}</span></li>`;

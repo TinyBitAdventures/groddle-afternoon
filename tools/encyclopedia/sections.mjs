@@ -7,6 +7,8 @@
  *   groupWord                the section list's filter label ("Kind")
  *   sample                   the entry whose picture its home card shows
  *   css                      an extra stylesheet for its pages, or ''
+ *   tilePic(e)               optional: the section list's card picture as tile
+ *                            options ({ pic, size, cls }), when not the icon
  *   add(ctx)                 adds its entries (ctx: data.mjs loadEncyclopedia's
  *                            add, entries, items, keyOf, nameOf, picture,
  *                            itemIcon, recipes, skills, ecology)

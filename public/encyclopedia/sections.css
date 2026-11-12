@@ -21,3 +21,38 @@
 .ency-card-hero {
   width: 132px;
 }
+
+/*
+ * A Giant's portrait (tools/encyclopedia/giants.mjs): Tiny Speck's painting on its own
+ * gradient, so the frame is the picture's edge, not a padded box. Tall, as the panels are.
+ */
+.cat-hero-frame.ency-giant-frame {
+  width: 180px;
+  height: auto;
+  padding: 0;
+  overflow: hidden;
+}
+.ency-giant-portrait {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+/* Its card in the Giants list: the portrait, small, above the name. */
+.ency-tile-portrait {
+  grid-template-rows: 120px auto 1fr;
+}
+.ency-tile-portrait .ency-tile-pic {
+  width: 74px;
+  height: 120px;
+}
+.ency-tile-portrait .ency-ic {
+  max-width: 74px;
+  max-height: 120px;
+  border-radius: 6px;
+}
+@media (max-width: 520px) {
+  .cat-hero-frame.ency-giant-frame { width: 112px; height: auto; padding: 0; }
+  .ency-tile-portrait { grid-template-rows: 100px auto 1fr; }
+  .ency-tile-portrait .ency-tile-pic { width: 62px; height: 100px; }
+  .ency-tile-portrait .ency-ic { max-width: 62px; max-height: 100px; }
+}

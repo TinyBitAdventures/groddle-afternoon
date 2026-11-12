@@ -37,6 +37,13 @@ their own module, listed in `tools/encyclopedia/sections.mjs`, which says what a
 module exports; data.mjs and build.mjs register the list. The old `/giants/`
 address answers a 301 to the Giants section (the site repo's `src/MovedPages.php`).
 
+Each Giant's page shows its portrait beside the name, and the Giants list shows it
+small on each card (Austin 2026-11-12); the Giant's Icon stays its picture in
+links, chips and search. The portraits are Tiny Speck's CC0 `Giants_All.ai`
+(glitch-items), cut, not drawn, by `tools/giants/portraits.py` into
+`assets/sprites/giant-portraits/`, whose `SOURCE.txt` records the source, the
+licence and each file's sha256 (`--check` compares them).
+
 The catalog moved from `/items/` into the encyclopedia on 2026-11-02 (Austin:
 "for consistency" with the other sections). The old addresses keep working:
 the site repo's `src/MovedPages.php` answers `/items/` and everything under it

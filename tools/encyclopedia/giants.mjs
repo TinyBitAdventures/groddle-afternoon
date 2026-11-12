@@ -15,6 +15,11 @@
  *  - street-ecology.json `giantId`: the remake's streets with a shrine (read
  *    from each archived street's shrine), linked to the region pages that list them.
  *
+ * Pictures: each Giant's portrait (the page's hero and its card in the section
+ * list) is cut from Tiny Speck's CC0 Giants_All.ai by tools/giants/portraits.py
+ * (assets/sprites/giant-portraits/, provenance in SOURCE.txt beside them). The
+ * Giant's Icon stays its picture everywhere small: links, chips and search.
+ *
  * The old /giants/ addresses answer a 301 to this section (the site repo's
  * src/MovedPages.php).
  */
@@ -57,6 +62,7 @@ export function gsjsVar(file, name) {
 }
 
 const iconOf = (g) => `assets/sprites/giant-icons/icon_${g === 'ti' ? 'tii' : g}.webp`;
+export const portraitOf = (g) => `assets/sprites/giant-portraits/${g}.webp`;
 
 function add({ add: addEntry, entries, items, picture, ecology }) {
   // Street tsid -> the region page that lists it.
@@ -73,7 +79,7 @@ function add({ add: addEntry, entries, items, picture, ecology }) {
     const first = `achievements/first_${id}_emblem.js`;
     const unlock = `achievements/emblem_skill_unlock_${id}_1.js`;
     const e = addEntry('giants', id, {
-      name: remake.name, status: 'source', register: '', group: 'Giants of Ur', icon: picture(iconOf(id)),
+      name: remake.name, status: 'source', register: '', group: 'Giants of Ur', icon: picture(iconOf(id)), portrait: picture(portraitOf(id)),
       desc: i.desc,
       giant: {
         giantOf: i.giant_of, followers: i.followers, personality: i.personality, listedSkills: Object.keys(i.skills || {}),
@@ -108,7 +114,8 @@ function page(e, P, { info, d, uniqBy, kit }) {
   const achs = [`achievements:first_${e.id}_emblem`, `achievements:emblem_skill_unlock_${e.id}_1`].filter((k) => info(k)).map((k) => P.tile(k));
   const favor = `<p>Donating at a shrine earns favor with its Giant. At ${fmt(EMBLEM_FAVOR_COST)} favor the shrine gives you an Emblem of ${esc(e.name)}, and each Emblem after that takes ${fmt(EMBLEM_FAVOR_INCREMENT)} favor more than the one before. ${fmt(ICONIZE_COUNT)} Emblems of one Giant make an Icon.</p>`;
   const others = uniqBy([...(d.back.get(e.key) || [])], (b) => b.from).filter((b) => !b.from.startsWith('giants:')).map((b) => P.tile(b.from));
-  return `${entryHead(e, P, { subline: esc(`Giant of ${g.giantOf}`) })}
+  const hero = e.portrait ? P.img(e.portrait, 'cat-hero-icon ency-giant-portrait', 300, `Tiny Speck’s portrait of ${e.name}, Giant of ${g.giantOf}`) : '';
+  return `${entryHead(e, P, { subline: esc(`Giant of ${g.giantOf}`), hero, frame: hero ? 'ency-giant-frame' : '' })}
   <main>
     <section class="band cat-original" aria-labelledby="orig-h">
       <div class="wrap">
@@ -116,7 +123,7 @@ function page(e, P, { info, d, uniqBy, kit }) {
         <div class="cat-cols">
           <div>
             <div class="cat-desc">${paras(tsHtml(e.desc, linkFor))}</div>
-            <p class="cat-source">From Tiny Speck’s game code.</p>
+            <p class="cat-source">From Tiny Speck’s game code.${e.portrait ? ` The portrait is Tiny Speck’s own painting of ${esc(e.name)}.` : ''}</p>
           </div>
           <dl class="cat-facts">
             <dt>Giant of</dt><dd>${esc(g.giantOf)}</dd>
@@ -136,7 +143,9 @@ ${band('remake-h', 'In the remake', `<div class="cat-remake-body"><p class="cat-
 }
 
 export const SECTION = {
-  key: 'giants', label: 'Giants', one: 'giant', groupWord: 'Kind', sample: 'giants:alph', css: '',
+  key: 'giants', label: 'Giants', one: 'giant', groupWord: 'Kind', sample: 'giants:alph', css: 'encyclopedia/sections.css',
   blurb: 'The eleven Giants of Ur: what each one is the Giant of, their shrines, the skills they favor and their Emblems and Icons.',
+  // The section list shows each Giant's portrait, small.
+  tilePic: (e) => (e.portrait ? { pic: e.portrait, size: 120, cls: 'ency-tile-portrait' } : null),
   add, page,
 };

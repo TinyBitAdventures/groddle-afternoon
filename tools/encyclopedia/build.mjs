@@ -138,7 +138,7 @@ function soundTiles(key, P, backOf, uniqBy, test = () => true) {
   return uniqBy(backOf(key, (b) => b.from.startsWith('sounds:') && test(b)), (b) => b.from).map((b) => P.tile(b.from));
 }
 
-function entryHead(e, P, { kickerExtra = '', subline = '', hero = '' } = {}) {
+function entryHead(e, P, { kickerExtra = '', subline = '', hero = '', frame = '' } = {}) {
   const sec = SECTION[e.section];
   const pic = hero || (e.icon ? P.img(e.icon, 'cat-hero-icon', 144) : '<span class="cat-hero-icon cat-ph" aria-hidden="true"></span>');
   const caption = e.icon?.caption || e.iconCaption || '';
@@ -149,7 +149,7 @@ function entryHead(e, P, { kickerExtra = '', subline = '', hero = '' } = {}) {
     <div class="wrap">
       <p class="kicker"><a href="../../">Groddle Encyclopedia</a> · <a href="../">${esc(sec.label)}</a>${e.group && e.group !== sec.label && e.group !== `${sec.label} of Ur` ? ` · ${esc(e.group)}` : ''}${kickerExtra}</p>
       <div class="cat-hero">
-        <div class="cat-hero-frame">${pic}</div>
+        <div class="cat-hero-frame${frame ? ` ${frame}` : ''}">${pic}</div>
         <div>
           <h1>${esc(e.name)}</h1>
           <p class="cat-plural">${subline || '&nbsp;'}</p>
@@ -735,7 +735,8 @@ function sectionIndex(sec, list, info, nameOf) {
   const groups = [...new Set(list.map((e) => e.group))];
   const inCount = list.filter((e) => inRemake(e.status)).length;
   const groupHtml = groups.map((g) => {
-    const rows = list.filter((e) => e.group === g).map((e) => P.tile(e.key, { sub: `<span class="cat-st st-${esc(e.status)}">${esc(statusLabel(e.status))}</span>${neverReleased(e.key) ? ` ${neverReleasedTag()}` : ''}` }).replace('<li>', `<li data-name="${esc(e.name.toLowerCase())}">`));
+    // A section's tilePic draws its cards with another picture than the entry's icon (the Giants' portraits).
+    const rows = list.filter((e) => e.group === g).map((e) => P.tile(e.key, { sub: `<span class="cat-st st-${esc(e.status)}">${esc(statusLabel(e.status))}</span>${neverReleased(e.key) ? ` ${neverReleasedTag()}` : ''}`, ...(sec.tilePic?.(e) || {}) }).replace('<li>', `<li data-name="${esc(e.name.toLowerCase())}">`));
     return `<section class="ency-group" aria-label="${esc(g)}" data-group="${esc(g)}"><h2>${esc(g)} <span class="count">${fmt(rows.length)}</span></h2>${P.tiles(rows, 'ency-grid')}</section>`;
   }).join('\n      ');
   const body = `

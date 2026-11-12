@@ -1,0 +1,24 @@
+Giants' portraits
+=================
+
+Source   tinyspeck/glitch-items giants/Giants_All.ai (commit 9a64021, blob 46578eee6786402538ab5a12385c83604d1238ef)
+Licence  CC0 1.0 (Tiny Speck's public domain dedication, glitch-items README.md)
+Made by  tools/giants/portraits.py: the file's one PDF page rasterised at 40 dpi (pdftoppm), each of
+         its eleven panels cropped and scaled to 360 px wide, WebP quality 82. Cut, not drawn or
+         generated: every pixel is Tiny Speck's painting.
+Matched  each panel to its Giant by the same painting on that Giant's Icon (PANEL_ORDER in the script).
+Used by  the Encyclopedia's Giants pages (tools/encyclopedia/giants.mjs): each Giant's hero and its
+         card in the section list.
+
+Files
+  alph.webp  sha256 3118265d699a5003817a9b1629366338f5f00b0ba47eb4b8dcabb381986e5290
+  cosma.webp  sha256 69f543a972bb1b80078a447ef15178a16ba12f6ed9628bb10156b5426c4b5802
+  friendly.webp  sha256 2bad0d2513b5703476144b819a44e1ad54bad5d57b42340a4b5a10d89082ff3c
+  grendaline.webp  sha256 31e5c0da6df873dd93655049d4806bac5fe4de0df313c8fd87f47d69cfe57c1d
+  humbaba.webp  sha256 f8d5f5cf09107f52993912adc9809fa5a052b5da0e2b35b2379d5ed77652c8ac
+  lem.webp  sha256 bf1ee8d4d64a0ef7c86e9b7e01a6ad0ec3d07bf12a6f247bfbe778e51d8c991e
+  mab.webp  sha256 e42382e920d9335edf71ca77b027027fc8bed190d562f3dee8f11785338c31e2
+  pot.webp  sha256 0d9ffbdab869962697b25981939bb073b40ca58d5e85f92bb405f0690cf3ca3d
+  spriggan.webp  sha256 63b57d3558f8451fb28d606cb57933650f08bae8eae0e85418e42605d77de1d5
+  ti.webp  sha256 9a7a7a60c80734a2021c2b2fc5099e6fee778a9ed06d4e9ef522ec231051d1d0
+  zille.webp  sha256 ab20178d91ca8ad2caf4aea9ced92bec1b466ef7c7642519048fb20cbad19231
