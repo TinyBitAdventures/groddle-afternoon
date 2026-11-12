@@ -2748,13 +2748,18 @@
   ]
  },
  "release": {
-  "game": "0.33.0",
+  "game": "0.33.1",
   "deployed": "2026-11-11"
  },
  "git": {
-  "commits": 1672,
+  "commits": 1673,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-11",
+    "kind": "fix",
+    "text": "Project gifts and rewards are confirmed once a save holding them is accepted"
+   },
    {
     "date": "2026-11-11",
     "kind": "fix",
@@ -2869,11 +2874,6 @@
     "date": "2026-11-11",
     "kind": "fix",
     "text": "A Seedling a visitor pets into a tree shows as the tree"
-   },
-   {
-    "date": "2026-11-11",
-    "kind": "fix",
-    "text": "Plant asks which seed, and a seed dropped on a plot plants it"
    }
   ]
  },
