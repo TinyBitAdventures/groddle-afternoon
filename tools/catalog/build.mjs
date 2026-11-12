@@ -513,6 +513,7 @@ export function readQuestTimers(gsjs = GSJS) {
 /** Remake files that hand items out (inventory evidence `addItem at js/...`), named for players. */
 const FEATURE_NAMES = {
   'doors': 'the locked doors and their keys',
+  'door-keys': 'the door keys lying on their streets',
   'party-spaces': 'the Party Spaces',
   'street-jobs': 'street projects',
   'juju-camp': 'the Juju camp quest',
