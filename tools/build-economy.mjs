@@ -66,11 +66,11 @@ import { tradeTable } from './build-realtime-trade.mjs';
 import { ITEM_BASE_COSTS } from '../public/js/store-catalog.js?v=74b56af3';
 import { obtainableItems } from './job-obtainable.mjs';
 import { DROP_TABLES } from '../public/js/drop-tables-data.js?v=c51a6400';
-import { CUBIMAL_PACKAGE_IDS, CUBIMAL_SERIES } from '../public/js/cubimals.js?v=5e340c94';
+import { CUBIMAL_PACKAGE_IDS, CUBIMAL_SERIES } from '../public/js/cubimals.js?v=abd91c78';
 import { ARTIFACT_MAP, ARTIFACT_NECKLACES } from '../public/js/artifacts.js?v=fc419ecf';
 import { XP_FOR_LEVEL, currantRewardForLevel } from '../public/js/progression.js?v=33462eaa';
 import { IMAGINATION_UPGRADES } from '../public/js/imagination-data.js?v=4a85e7fe';
-import { SPINDLE_TOOLS } from '../public/js/making.js?v=86fd3231';
+import { SPINDLE_TOOLS } from '../public/js/making.js?v=2cd473f3';
 import { creditedMultiplayerQuests } from '../public/js/quests-mp.js?v=1fc5ff58';
 import { FURNITURE_STARTER_KIT } from '../public/js/homes-catalog.js?v=10ac34b6';
 

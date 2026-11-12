@@ -46,9 +46,9 @@ import {
   stepHogtie,
   stickPlaceState,
   takePlop,
-} from '../public/js/animal-husbandry.js?v=0b701ee7';
-import { pickerMaxCount, pickerOptionsFor, pickerTakesCount, listAnimalFeedOptions, createAnimalState } from '../public/js/animals.js?v=7e27e9d2';
-import { getVerbsFor, runVerb } from '../public/content.js?v=4f923e2b';
+} from '../public/js/animal-husbandry.js?v=81f8fd5e';
+import { pickerMaxCount, pickerOptionsFor, pickerTakesCount, listAnimalFeedOptions, createAnimalState } from '../public/js/animals.js?v=d21a2fd4';
+import { getVerbsFor, runVerb } from '../public/content.js?v=b10c2fcc';
 import { setStreetEcologyCatalog } from '../public/js/street-ecology.js?v=26dabe26';
 import { batterflyPlacementGroups, normalizeHusbandrySlot } from '../public/js/features/animal-husbandry-feature.js?v=92e6c660';
 

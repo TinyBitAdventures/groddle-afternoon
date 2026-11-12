@@ -22,7 +22,7 @@ import {
   rollSlothBonusSnails,
   taskLimitMultiplier,
 } from '../public/js/imagination-effects.js?v=70169933';
-import { createInventory, countItem } from '../public/js/inventory.js?v=60dfc9ca';
+import { createInventory, countItem } from '../public/js/inventory.js?v=5be47371';
 import { createToolConditionState, getToolCondition, setToolRemaining } from '../public/js/tools.js?v=5f482998';
 import {
   DEFAULT_TASK_LIMIT,
@@ -32,7 +32,7 @@ import {
   loadRecipeCatalogFromFile,
   makingSkillAdjustments,
   recipeTaskLimit,
-} from '../public/js/making.js?v=86fd3231';
+} from '../public/js/making.js?v=2cd473f3';
 import {
   assemblyCheck,
   assemblyEnergy,
@@ -43,7 +43,7 @@ import {
   finishMachineWork,
   startAssembly,
   startDisassembly,
-} from '../public/js/machines.js?v=39290298';
+} from '../public/js/machines.js?v=301212d7';
 import {
   finishMeditation,
   levitationMinEnergy,
@@ -54,9 +54,9 @@ import {
 } from '../public/js/meditation.js?v=f0c00590';
 import { skillPackageDetails } from '../public/js/skill-packages.js?v=bfb87281';
 import { strikeDamageFor } from '../public/js/rook-attack.js?v=c12e825f';
-import { createMineRock, mineRock, tickMineRock } from '../public/js/mining.js?v=674ed39b';
-import { runTransform, shuckDetails } from '../public/js/item-transforms.js?v=c439eb33';
-import { brushFox, createFox, foxFiberRange } from '../public/js/foxes.js?v=59323f35';
+import { createMineRock, mineRock, tickMineRock } from '../public/js/mining.js?v=12a6f1bd';
+import { runTransform, shuckDetails } from '../public/js/item-transforms.js?v=a57c16bc';
+import { brushFox, createFox, foxFiberRange } from '../public/js/foxes.js?v=910cf549';
 import { soundForMakingTool } from '../public/js/sound-moments.js?v=52ad523c';
 import { supplyFeature } from '../public/js/features/supply-feature.js?v=654cbb5c';
 

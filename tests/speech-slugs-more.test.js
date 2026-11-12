@@ -18,7 +18,7 @@ import {
   verbResponse,
 } from '../public/js/verb-responses.js?v=3ceb8a8c';
 import { VERB_RESPONSE_POOLS } from '../public/js/verb-responses-data.js?v=0b948684';
-import { runVerb } from '../public/content.js?v=4f923e2b';
+import { runVerb } from '../public/content.js?v=b10c2fcc';
 import { setTrantTables, createTrantState } from '../public/js/trants.js?v=1b3c8ae3';
 import { setMetabolicLossGate } from '../public/js/metabolics.js?v=8504134e';
 import { createResourceNode, harvestResourceNode } from '../public/js/resource-nodes.js?v=dffdfa11';

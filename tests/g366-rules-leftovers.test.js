@@ -24,12 +24,12 @@ import { fileURLToPath } from 'node:url';
 
 import { loadContentCatalogsFromDir, resetContentCatalogs } from '../public/js/content-catalogs.js?v=10b118dd';
 import { worldVerbAchievementCounters } from '../public/js/achievements.js?v=2e4aa9cb';
-import { createAnimalState, resetAnimalDay } from '../public/js/animals.js?v=7e27e9d2';
+import { createAnimalState, resetAnimalDay } from '../public/js/animals.js?v=d21a2fd4';
 import { createQuestState } from '../public/js/quests.js?v=2b882eb6';
 import { acceptOffer, routeQuestEvent } from '../public/js/quest-offers.js?v=9c53455c';
 import { applyBuff, createBuffState } from '../public/js/buffs.js?v=819cb342';
 import { BUFF_ICONS, QUEST_TIMER_BUFFS } from '../public/js/buff-triggers.js?v=a3093922';
-import { EMERGENCY_RETRY_MS } from '../public/js/features/quest-offers-feature.js?v=db81cdfe';
+import { EMERGENCY_RETRY_MS } from '../public/js/features/quest-offers-feature.js?v=539f62b3';
 import { QUOIN_CLASSES, quoinClassAmount, quoinRespawnMs } from '../public/js/quoins.js?v=7e0dec6d';
 import { COIN_BACK_MS, COIN_CLASS, COIN_TYPE, room as rainbowRoom } from '../public/js/quest-rooms/rainbow-run.js?v=b90035c2';
 

@@ -47,11 +47,11 @@
  * window.groddlePlayerVerbs in multiplayer.
  */
 
-import { countItem, removeItem } from '../inventory.js?v=60dfc9ca';
+import { countItem, removeItem } from '../inventory.js?v=5be47371';
 import { gainMetabolic, loseEnergy, loseMood } from '../metabolics.js?v=8504134e';
 import { grantMoodXp } from '../mood-xp.js?v=958e7680';
 import { ensureQuestOfferState } from '../quest-offers.js?v=9c53455c';
-import { getMusicblock, isMusicblock } from '../musicblocks.js?v=4b2e589f';
+import { getMusicblock, isMusicblock } from '../musicblocks.js?v=87a34689';
 import { GAME_DAY_MS } from '../game-day.js?v=f88e6e16';
 import { playSheetOverlay } from '../overlay-art.js?v=a6561207';
 import { showRainbow, rainbowSound } from '../overlays.js?v=4e81f749';

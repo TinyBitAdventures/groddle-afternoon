@@ -39,7 +39,7 @@
  *     data-supply-permits).
  */
 
-import { ITEM_CATALOG, addItem, countItem, ensureItem } from '../inventory.js?v=60dfc9ca';
+import { ITEM_CATALOG, addItem, countItem, ensureItem } from '../inventory.js?v=5be47371';
 import { getToolCondition, copyForVerb, copyTag, copyTags, migrateClassTag, setCopyTag } from '../tools.js?v=5f482998';
 import {
   MACHINE_ASSEMBLIES,
@@ -64,8 +64,8 @@ import {
   stillEtaSeconds,
   stillRoom,
   stillStopsAt,
-} from '../machines.js?v=39290298';
-import { HERB_SEEDS, ITEM_TRANSFORMS, listTransformVerbs, runTransform, transformVerbCount } from '../item-transforms.js?v=c439eb33';
+} from '../machines.js?v=301212d7';
+import { HERB_SEEDS, ITEM_TRANSFORMS, listTransformVerbs, runTransform, transformVerbCount } from '../item-transforms.js?v=a57c16bc';
 import {
   BUREAUCRACY_ITEMS,
   HALL_STREETS,

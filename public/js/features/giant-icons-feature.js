@@ -34,10 +34,10 @@
  *     iconOfferCollisions (walk-ins that offered instead of bestowing).
  */
 
-import { addItem, countItem, ensureItem } from '../inventory.js?v=60dfc9ca';
+import { addItem, countItem, ensureItem } from '../inventory.js?v=5be47371';
 import { getGameDayKey } from '../game-day.js?v=f88e6e16';
 import { XP_FOR_LEVEL } from '../progression.js?v=33462eaa';
-import { emblemCostFor } from '../shrines.js?v=ec26da05';
+import { emblemCostFor } from '../shrines.js?v=15cd8b43';
 import { giantDisplayName } from '../giant-names.js?v=0e295891';
 import { landingY } from '../walk-surface.js?v=106bfdc5';
 import {

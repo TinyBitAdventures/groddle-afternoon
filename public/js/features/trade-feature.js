@@ -40,7 +40,7 @@
  * endRequest, acceptRequest).
  */
 
-import { ITEM_CATALOG, addItem, countItem, itemIcon, listPackSlots, removeItem } from '../inventory.js?v=60dfc9ca';
+import { ITEM_CATALOG, addItem, countItem, itemIcon, listPackSlots, removeItem } from '../inventory.js?v=5be47371';
 import { TOOL_CONDITION_CATALOG, copyTagKind, copyTags, leavingToolWear, moveToolCopy, receiveToolCopies, receiveToolCopy, setCopyTag, setToolRemaining, toolCopies } from '../tools.js?v=5f482998';
 import { scriptFromTag, scriptLabel } from '../teleportation.js?v=1050225e';
 import { saveStore } from '../save-store.js?v=89422a9c';

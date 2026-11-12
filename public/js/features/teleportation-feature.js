@@ -33,7 +33,7 @@
  * teleportLast, teleportScripts (each copy's street, - for one with none), teleportEnergyCost.
  */
 
-import { addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=60dfc9ca';
+import { addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=5be47371';
 import { getGameDayKey } from '../game-day.js?v=f88e6e16';
 import { canUseTool, copyForVerb, copyTag, copyTags, setCopyTag, takeToolCopy, useToolCondition } from '../tools.js?v=5f482998';
 import {

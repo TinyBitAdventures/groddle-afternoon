@@ -43,8 +43,8 @@ import { OVERLAY_USES, playWindowOverlay } from '../overlays.js?v=4e81f749';
 import { acceptOffer, ensureQuestOfferState, markOffered } from '../quest-offers.js?v=9c53455c';
 import { getQuestCatalog } from '../content-catalogs.js?v=10b118dd';
 import { parseQuestConversation } from '../quests.js?v=2b882eb6';
-import { HELL_LOCATION, HELL_QUESTS, isInHell, isInHellOne } from '../hell.js?v=33923da7';
-import { BARTENDER, PANKA_DOOR, PANKA_TSID, isHellBarTsid } from '../hell-bar.js?v=3bb36cb2';
+import { HELL_LOCATION, HELL_QUESTS, isInHell, isInHellOne } from '../hell.js?v=6a0c61bf';
+import { BARTENDER, PANKA_DOOR, PANKA_TSID, isHellBarTsid } from '../hell-bar.js?v=0bd1add2';
 import {
   GRAVE_VISIT,
   HELL_HOLE_ACCEPTED_TEXT,

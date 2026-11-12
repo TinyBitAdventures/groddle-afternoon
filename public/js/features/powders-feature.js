@@ -91,9 +91,9 @@
  *   powderCharges, powderNoNo, powderTreesGrown.
  */
 
-import { addItem, countItem, removeItem } from '../inventory.js?v=60dfc9ca';
+import { addItem, countItem, removeItem } from '../inventory.js?v=5be47371';
 import { getGameDayKey } from '../game-day.js?v=f88e6e16';
-import { isPooped } from '../hell.js?v=33923da7';
+import { isPooped } from '../hell.js?v=6a0c61bf';
 import { metabolicGain, moodMax, loseEnergy, loseMood } from '../metabolics.js?v=8504134e';
 import {
   POWDERS,
@@ -113,7 +113,7 @@ import {
   usePowderCharge,
 } from '../powders.js?v=397984f7';
 import { itemVerbAchievementCounters } from '../item-verbs.js?v=1e20fa7d';
-import { copyChargesLeft, copyFromLedger, keepsCopies, spendCopyCharge, verbCopy } from '../copy-charges.js?v=4ffa1c1e';
+import { copyChargesLeft, copyFromLedger, keepsCopies, spendCopyCharge, verbCopy } from '../copy-charges.js?v=627150dc';
 import { migrateClassValue } from '../tools.js?v=5f482998';
 import { DEAD_TRANT_CLASSES } from '../patches.js?v=61abc5fe';
 import { COPY as SHARED_PATCH_COPY } from '../shared-patches.js?v=ac409c57';

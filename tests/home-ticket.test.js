@@ -19,8 +19,8 @@ import {
   rockTicketBeats,
   ticketCount,
   useHomeTicket,
-} from '../public/js/home-ticket.js?v=3739f724';
-import { ITEM_CATALOG } from '../public/js/inventory.js?v=60dfc9ca';
+} from '../public/js/home-ticket.js?v=6a19977b';
+import { ITEM_CATALOG } from '../public/js/inventory.js?v=5be47371';
 import { createHomeState } from '../public/js/homes.js?v=631ab6b8';
 
 const spike = join(import.meta.dirname, '..');

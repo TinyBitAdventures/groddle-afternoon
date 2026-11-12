@@ -12,9 +12,9 @@ import { loadContentCatalogsFromDir, getAchievementCatalog } from '../public/js/
 import { applyAchievementProgress, createAchievementState, getAchievementProgress, resetAchievementCounter, unlockAchievement } from '../public/js/achievements.js?v=2e4aa9cb';
 import { COLLECTION_TROPHIES, COUNTED_ON_ARRIVAL, HELD_AT_ONCE, HELD_AT_ONCE_TEXT, collectionClasses, heldChanges, planCollectionTrophies } from '../public/js/collection-trophies.js?v=3760d603';
 import { TROPHY_WHERE_TEXT } from '../public/js/home-trophies.js?v=2020b29b';
-import { ITEM_CATALOG } from '../public/js/inventory.js?v=60dfc9ca';
-import { vendorSellValue } from '../public/js/vendor.js?v=fd4bd725';
-import { collectionTrophiesFeature as feature } from '../public/js/features/collection-trophies-feature.js?v=2507feab';
+import { ITEM_CATALOG } from '../public/js/inventory.js?v=5be47371';
+import { vendorSellValue } from '../public/js/vendor.js?v=592caaf1';
+import { collectionTrophiesFeature as feature } from '../public/js/features/collection-trophies-feature.js?v=6dbc852b';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const GS = join(here, '../../glitch-GameServerJS');

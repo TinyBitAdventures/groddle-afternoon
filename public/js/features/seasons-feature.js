@@ -31,11 +31,11 @@
  *     pack), seasonTrophy, seasonPlaced.
  */
 
-import { addItem, countItem, ensureItem, removeItem, registerItemUse, ITEM_CATALOG } from '../inventory.js?v=60dfc9ca';
+import { addItem, countItem, ensureItem, removeItem, registerItemUse, ITEM_CATALOG } from '../inventory.js?v=5be47371';
 import { dametimeParts, getGameDayKey } from '../game-day.js?v=f88e6e16';
-import { setSeasonalSeedCheck as setGardenSeasonGate } from '../garden.js?v=788f2dbb';
-import { setSeasonalSeedCheck as setMasterGardenSeasonGate } from '../garden.js?v=788f2dbb';
-import { setSeasonalRecipeCheck } from '../making.js?v=86fd3231';
+import { setSeasonalSeedCheck as setGardenSeasonGate } from '../garden.js?v=489cda8f';
+import { setSeasonalSeedCheck as setMasterGardenSeasonGate } from '../garden.js?v=489cda8f';
+import { setSeasonalRecipeCheck } from '../making.js?v=2cd473f3';
 import { getToolCondition, copyForVerb, copyTag, migrateClassTag, setCopyTag, takeToolCopy } from '../tools.js?v=5f482998';
 
 /*
@@ -73,8 +73,8 @@ function takePumpkin(engine, cls, copy) {
 }
 import { landingY, nearestSurfaceY } from '../walk-surface.js?v=106bfdc5';
 import { isStandable } from '../street-model.js?v=b6cb6a4e';
-import { isBatterflyHabitat } from '../animal-husbandry.js?v=0b701ee7';
-import { emblemCostFor } from '../shrines.js?v=ec26da05';
+import { isBatterflyHabitat } from '../animal-husbandry.js?v=81f8fd5e';
+import { emblemCostFor } from '../shrines.js?v=15cd8b43';
 import { rollDropTable } from '../drop-tables.js?v=16e12632';
 import { openNoteView, noteViewOpen } from '../note-view.js?v=eca7de52';
 import { payDrop } from './drops-feature.js?v=faf37e97';

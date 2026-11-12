@@ -21,7 +21,7 @@
  *   energyMax).
  */
 
-import { addItem } from './inventory.js?v=60dfc9ca';
+import { addItem } from './inventory.js?v=5be47371';
 import { energyMax, moodMax } from './metabolics.js?v=8504134e';
 
 export const ADMIN_TEXT_MAX = 500;

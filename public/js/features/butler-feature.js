@@ -67,7 +67,7 @@
  *   butlerDialog, butlerLast, butlerVisitors, butlerAutoplay.
  */
 
-import { ITEM_CATALOG, addItem, countItem, ensureItem, itemIcon, listPackItemSlots, removeItem } from '../inventory.js?v=60dfc9ca';
+import { ITEM_CATALOG, addItem, countItem, ensureItem, itemIcon, listPackItemSlots, removeItem } from '../inventory.js?v=5be47371';
 import { homeStreetLayout, towerItem } from '../home-cultivation.js?v=f1242621';
 import { homesFeature } from './homes-feature.js?v=b7791aed';
 import { towerApi } from './home-tower-feature.js?v=daf014b6';

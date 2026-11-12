@@ -12,7 +12,7 @@ import { spawnSync } from 'node:child_process';
 import { existsSync, readFileSync } from 'node:fs';
 import { after, before, describe, it } from 'node:test';
 
-import { createPlot, performPlotVerb } from '../public/js/patches.js?v=61abc5fe';
+import { createPlot, performPlotVerb } from '../public/js/patches.js?v=fa07c1b4';
 import {
   BUSY_LINE,
   COPY,

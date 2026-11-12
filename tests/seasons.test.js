@@ -256,7 +256,7 @@ describe('Egg Hunt and Pi Day', () => {
   it('is the source mechanic: Egg Plants pet with lgt_egg_plant_pet, five equally likely eggs, all year', async () => {
     const { SKILL_PACKAGES } = await import('../public/js/skill-packages-data.js?v=cb4e9ab3');
     const { DROP_TABLES } = await import('../public/js/drop-tables-data.js?v=c51a6400');
-    const { packageForEvent } = await import('../public/js/features/drops-feature.js?v=faf37e97');
+    const { packageForEvent } = await import('../public/js/features/drops-feature.js?v=326e64de');
     assert.equal(packageForEvent(`${EGG_HUNT.pet.trant}:pet`, {}), EGG_HUNT.pet.package);
     const pkg = SKILL_PACKAGES[EGG_HUNT.pet.package];
     assert.deepEqual(Object.values(pkg.skills).map((s) => [s.drop_class_id, s.drop_chance]), [[EGG_HUNT.pet.table, 10], [EGG_HUNT.pet.table, 15], [EGG_HUNT.pet.table, 20], [EGG_HUNT.pet.table, 30]]);

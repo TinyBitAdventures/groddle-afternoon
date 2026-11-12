@@ -78,7 +78,9 @@ for (const [cls, plural] of Object.entries({
 })) ITEM_CATALOG[cls].namePlural = plural;
 
 const ITEM_USE_CATALOG = {
-  apple: { verb: 'Eat', energy: 10, mood: 5, message: 'You ate an Apple.' },
+  // items/apple.js 16 base_cost 5 x energy_factor 1 (include/food.js 214): 5 energy, no mood.
+  // The Apple a Day buff (apple.js 252) adds 5 more after 30 s (buffs.js well_fed_energy).
+  apple: { verb: 'Eat', energy: 5, message: 'You ate an Apple.' },
   cherry: { verb: 'Eat', mood: 8, message: 'You ate a Cherry.' },
   grain: { verb: 'Eat', energy: 5, message: 'You ate a Grain.' },
   milk_butterfly: {
@@ -142,12 +144,6 @@ export function getItemUseInfo(classTsid) {
 }
 
 /**
- * Item uses whose numbers predate the GSJS import and are pinned by the pack
- * preview tests (ui-systems/world). Source: apple.js base_cost 5 → 5 energy.
- */
-const PINNED_ITEM_USES = new Set(['apple']);
-
-/**
  * Register (or refresh) an eat/drink use from GSJS metabolics.
  * Food: energy = round(base_cost × energy_factor) (include/food.js).
  * Drink: drink_mood / drink_energy / drink_xp (include/drink.js).
@@ -158,7 +154,6 @@ const PINNED_ITEM_USES = new Set(['apple']);
  */
 export function registerItemUse(classTsid, def, opts = {}) {
   if (!classTsid || !def) return false;
-  if (PINNED_ITEM_USES.has(classTsid) && ITEM_USE_CATALOG[classTsid]) return false;
   const kind = def.kind === 'drink' ? 'drink' : 'food';
   const verb = def.verb || (kind === 'drink' ? 'Drink' : 'Eat');
   const label = opts.label || ITEM_CATALOG[classTsid]?.label || classTsid.replace(/_/g, ' ');

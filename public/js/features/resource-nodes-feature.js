@@ -57,7 +57,7 @@
  * last release: released:respawned|new:<key>, or failed:<reason>).
  */
 
-import { ITEM_CATALOG, addItem, countItem } from '../inventory.js?v=60dfc9ca';
+import { ITEM_CATALOG, addItem, countItem } from '../inventory.js?v=5be47371';
 import { setToolRemaining, toolCopies } from '../tools.js?v=5f482998';
 import { isItemFloor, platformYAt } from '../street-model.js?v=b6cb6a4e';
 import { hiresSpriteUrl } from '../sprite-hires.js?v=d4cce9f9';
@@ -100,7 +100,7 @@ import { playItemOverlay } from '../item-overlay.js?v=97ed2ba0';
 import { nodeToolOverlay, nodeToolSheet } from '../node-tools.js?v=cf9012f1';
 import { vpSequence } from '../quest-rooms/vp-overlay.js?v=2123f2b1';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
-import { salmonSwimAt } from '../street-creatures.js?v=cef735cd';
+import { salmonSwimAt } from '../street-creatures.js?v=729480c4';
 import { GAME_EPOCH_MS } from '../game-day.js?v=f88e6e16';
 
 export const RESOURCE_FEATURE_ID = 'resource-nodes';

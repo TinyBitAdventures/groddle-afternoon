@@ -100,7 +100,7 @@ import {
 } from '../quest-offers.js?v=9c53455c';
 import { parseQuestConversation } from '../quests.js?v=2b882eb6';
 import { getQuestCatalog } from '../content-catalogs.js?v=10b118dd';
-import { addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=60dfc9ca';
+import { addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=5be47371';
 import { runStreetTransition } from '../screen-fx.js?v=81177be4';
 import { HOME_INTERIOR_TSID, HOME_STREET_TSID } from '../homes.js?v=631ab6b8';
 import { armPromptTimeout, promptTimeoutMs } from '../prompt-timeout.js?v=b38c9757';

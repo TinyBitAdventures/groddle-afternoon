@@ -50,7 +50,7 @@
  * Solo is untouched.
  */
 
-import { addItem, countItem, ensureItem, removeItem, ITEM_CATALOG, itemIcon } from '../inventory.js?v=60dfc9ca';
+import { addItem, countItem, ensureItem, removeItem, ITEM_CATALOG, itemIcon } from '../inventory.js?v=5be47371';
 import { teleportEnergyCost } from '../teleportation.js?v=1050225e';
 import {
   PARTY_GUESTS,

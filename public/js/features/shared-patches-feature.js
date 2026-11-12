@@ -70,7 +70,7 @@
  * count(c), me(), dev(opts) for a server started with GRODDLE_PATCHES_DEV=1.
  */
 
-import { addItem, countItem, ITEM_CATALOG } from '../inventory.js?v=60dfc9ca';
+import { addItem, countItem, ITEM_CATALOG } from '../inventory.js?v=5be47371';
 import { saveStore } from '../save-store.js?v=89422a9c';
 import { patchesFeature } from './patches-feature.js?v=df56eea7';
 import {
@@ -97,7 +97,7 @@ import {
   sharedTreeReady,
   sharedTreeSkill,
   TRANTSFORM_VERB,
-} from '../shared-patches.js?v=ac409c57';
+} from '../shared-patches.js?v=caf1f888';
 
 export const SHARED_PATCHES_FEATURE_ID = 'shared-patches';
 const REQUEST_TIMEOUT_MS = 8000;

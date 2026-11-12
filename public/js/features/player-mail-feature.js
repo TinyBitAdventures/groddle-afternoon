@@ -36,7 +36,7 @@
  * sent); window.groddlePlayerMail in multiplayer.
  */
 
-import { ITEM_CATALOG, addItem, countItem, removeItem } from '../inventory.js?v=60dfc9ca';
+import { ITEM_CATALOG, addItem, countItem, removeItem } from '../inventory.js?v=5be47371';
 import { TOOL_CONDITION_CATALOG, leavingCopyTag, leavingToolWear, receiveToolCopy } from '../tools.js?v=5f482998';
 import { createMinnAccount } from '../minn-account.js?v=c15f0ecf';
 import { ITEM_BASE_COSTS } from '../store-catalog.js?v=74b56af3';

@@ -17,7 +17,7 @@ import { CHARACTER_CHANGED, CHARACTER_CHANGED_EVENT, CHARACTER_HEADER, character
 import { createMinnAccountCore } from '../public/js/minn-account-core.js?v=63758d34';
 import { createSaveSync } from '../public/js/save-store.js?v=89422a9c';
 import { CLOSE_OTHER_CHARACTER, createRealtimeClient } from '../public/js/realtime-client.js?v=cda54c6e';
-import { OTHER_CHARACTER_TEXT, statusText } from '../public/js/features/realtime-feature.js?v=4fe86726';
+import { OTHER_CHARACTER_TEXT, statusText } from '../public/js/features/realtime-feature.js?v=c864854a';
 import { CHARACTER_COPY, FRESH_HASH, SAVE_ALERT_COPY, characterChoices, continuesAs, createRefusalText, saveAlertFor } from '../public/js/online-boot.js?v=4ea71073';
 import { SWITCHER_COPY, STYLE as SWITCHER_STYLE, cardUrl, popoverPlace, switcherChoices } from '../public/js/character-switcher.js?v=305b1f12';
 import { LOCAL_STATES } from '../public/js/shared-quoins.js?v=89d7b201';

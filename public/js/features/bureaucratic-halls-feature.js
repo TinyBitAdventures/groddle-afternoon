@@ -56,8 +56,8 @@
  *   confirm, done, left), hallStep, hallHelper, hallBuff, hallRefusals, hallClerks.
  */
 
-import { LEGALIZE_CLERKS } from '../legalize-it.js?v=b5645cb6';
-import { addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=60dfc9ca';
+import { LEGALIZE_CLERKS } from '../legalize-it.js?v=a3a9ad2e';
+import { addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=5be47371';
 import { loseEnergy, loseMood } from '../metabolics.js?v=8504134e';
 import { acceptOffer, ensureQuestOfferState, markOffered, questMoveNote, questStatus } from '../quest-offers.js?v=9c53455c';
 import { getQuestCatalog } from '../content-catalogs.js?v=10b118dd';

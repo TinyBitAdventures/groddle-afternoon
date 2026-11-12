@@ -35,9 +35,9 @@ import {
   toolCopies,
   useCharge,
 } from '../public/js/tools.js?v=5f482998';
-import { addItem, countItem, createInventory, removeItem } from '../public/js/inventory.js?v=60dfc9ca';
-import { copyFromLedger, spendCopyCharge } from '../public/js/copy-charges.js?v=4ffa1c1e';
-import { createDroppedItemState, dropInventoryStack, pickupDroppedStack } from '../public/js/world-items.js?v=da2bb7a1';
+import { addItem, countItem, createInventory, removeItem } from '../public/js/inventory.js?v=5be47371';
+import { copyFromLedger, spendCopyCharge } from '../public/js/copy-charges.js?v=627150dc';
+import { createDroppedItemState, dropInventoryStack, pickupDroppedStack } from '../public/js/world-items.js?v=c308d8f4';
 import { useBottle, bottleUsesLeft } from '../public/js/tree-poison.js?v=5ceea244';
 import { usePotion as useGardenPotion, potionUsesLeft as gardenUsesLeft } from '../public/js/master-garden.js?v=3b5ec3c3';
 import { potionsFeature, usePotionNow } from '../public/js/features/potions-feature.js?v=dc7ce7f4';

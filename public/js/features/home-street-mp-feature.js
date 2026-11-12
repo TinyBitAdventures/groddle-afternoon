@@ -41,8 +41,8 @@
  */
 
 import { announceCharacterChanged, characterHeaders, characterOf, isCharacterChanged } from '../character-guard.js?v=510034a7';
-import { ITEM_CATALOG, addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=60dfc9ca';
-import { RECIPE_CATALOG, isRecipeCatalogReady, setRecipeCatalog } from '../making.js?v=86fd3231';
+import { ITEM_CATALOG, addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=5be47371';
+import { RECIPE_CATALOG, isRecipeCatalogReady, setRecipeCatalog } from '../making.js?v=2cd473f3';
 import { furnitureDef, furnitureScale, furnitureSize } from '../home-decor.js?v=b48dbc95';
 import { isStorageClass, storageHasContents } from '../home-storage.js?v=121f1897';
 import { pieceLabel } from '../furniture-upgrades.js?v=a3788c0d';
@@ -89,7 +89,7 @@ import {
   saleVerbs,
   signpostArms,
   signpostCandidates,
-} from '../home-street-mp.js?v=7ed1ff6a';
+} from '../home-street-mp.js?v=99cd96aa';
 
 export { HOME_STREET_MP_ID };
 

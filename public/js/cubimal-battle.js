@@ -59,7 +59,7 @@
  * waits until picked up.
  */
 
-import { cubimalArticle, cubimalInfo, isCubimal } from './cubimals.js?v=5e340c94';
+import { cubimalArticle, cubimalInfo, isCubimal } from './cubimals.js?v=abd91c78';
 
 export const CUBIMAL_BATTLE = Object.freeze({
   /** Verb order as the source file lists them (all sort_on 50). */

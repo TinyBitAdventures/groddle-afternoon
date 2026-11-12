@@ -19,8 +19,8 @@ import {
   listPackRows,
   isToolItem,
   getItemUseInfo,
-} from '../public/js/inventory.js?v=60dfc9ca';
-import { starterToolsInventory, ensureMakingItems } from '../public/js/making.js?v=86fd3231';
+} from '../public/js/inventory.js?v=5be47371';
+import { starterToolsInventory, ensureMakingItems } from '../public/js/making.js?v=2cd473f3';
 import {
   createQuestState,
   assignQuest,
@@ -42,7 +42,7 @@ import {
   listBuyOffers,
   listSellOffers,
   createVendorSellQuote,
-} from '../public/js/vendor.js?v=fd4bd725';
+} from '../public/js/vendor.js?v=592caaf1';
 import {
   buildMapGraph,
   buildHubMapView,
@@ -122,7 +122,8 @@ describe('pack / inventory', () => {
     const preview = getItemUseInfo('apple');
     assert.equal(preview.usable, true);
     assert.equal(preview.verb, 'Eat');
-    assert.deepEqual(preview.effects, { energy: 10, mood: 5 });
+    // Glitch's apple: base_cost 5 x energy_factor 1 = 5 energy, no mood (items/apple.js, include/food.js 214).
+    assert.deepEqual(preview.effects, { energy: 5 });
     const inv = createInventory({ apple: 1, butterfly_lotion: 0 });
     const pc = { energy: 40, mood: 40 };
     const used = useItem(inv, pc, 'apple');

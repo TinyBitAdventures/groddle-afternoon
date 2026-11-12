@@ -26,7 +26,7 @@
  * imgLast, imgShuffled, imgAutoplay, imgBrain, imgEnergyMax.
  */
 
-import { addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=60dfc9ca';
+import { addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=5be47371';
 import { getGameDayKey } from '../game-day.js?v=f88e6e16';
 import { quoinDailyLimitFor } from '../quoins.js?v=7e0dec6d';
 import { XP_FOR_LEVEL } from '../progression.js?v=33462eaa';

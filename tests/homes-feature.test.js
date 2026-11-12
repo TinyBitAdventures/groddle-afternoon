@@ -21,7 +21,7 @@ import {
 } from '../public/js/features/homes-feature.js?v=b7791aed';
 import { WALLPAPER_MAPS } from '../public/js/home-wallpaper-art.js?v=9f8473e6';
 import { HOME_TEXTURE_CONFIGS } from '../public/js/homes-catalog.js?v=10ac34b6';
-import { canPlantBean } from '../public/js/patches.js?v=61abc5fe';
+import { canPlantBean } from '../public/js/patches.js?v=fa07c1b4';
 import { TOWER_PART_CHOICES, TOWER_STYLES, composeTower, towerBounds } from '../public/js/home-tower.js?v=087df38f';
 import { MIN_GROUND_CLEARANCE, cameraTargetY, cameraWorldHeightForGround, yCamOffsetAnchor } from '../public/js/movement.js?v=b30f84eb';
 import { INTERIOR } from '../public/js/home-decor.js?v=b48dbc95';

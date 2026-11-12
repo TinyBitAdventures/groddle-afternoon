@@ -20,16 +20,16 @@ import {
   spinningWheelPhase,
   startSpinningWheel,
   wheelPrizeTier,
-} from '../public/js/spinning-wheel.js?v=9605bed2';
+} from '../public/js/spinning-wheel.js?v=82259b39';
 import {
   ITEM_CATALOG,
   createInventory,
   listPackItemSlots,
-} from '../public/js/inventory.js?v=60dfc9ca';
+} from '../public/js/inventory.js?v=5be47371';
 import {
   createShrineState,
   donateToShrine,
-} from '../public/js/shrines.js?v=ec26da05';
+} from '../public/js/shrines.js?v=15cd8b43';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 

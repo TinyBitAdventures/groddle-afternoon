@@ -24,7 +24,7 @@
  * boardLast; window.groddleBoards.
  */
 
-import { countItem, removeItem } from '../inventory.js?v=60dfc9ca';
+import { countItem, removeItem } from '../inventory.js?v=5be47371';
 import { createMinnAccount } from '../minn-account.js?v=c15f0ecf';
 import { saveStore } from '../save-store.js?v=89422a9c';
 import { BOARD_MP_TEXT, BOARD_NOTE_ID, boardFrom, carriedFromBoard, normalizeBoardNote, normalizeMineBoard, pinPayload, sameWords } from '../boards-mp.js?v=6e2613b2';

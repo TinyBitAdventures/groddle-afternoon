@@ -23,9 +23,9 @@ import {
   relabelWeeHarvest,
   woodTreeSide,
 } from '../public/js/pack-tree-verbs.js?v=bfcb87be';
-import { packTreeVerbsFeature, runPackTreeVerb } from '../public/js/features/pack-tree-verbs-feature.js?v=af1f6393';
-import { getVerbsFor } from '../public/content.js?v=4f923e2b';
-import { plotVerbs } from '../public/js/patches.js?v=61abc5fe';
+import { packTreeVerbsFeature, runPackTreeVerb } from '../public/js/features/pack-tree-verbs-feature.js?v=8fdf7e0b';
+import { getVerbsFor } from '../public/content.js?v=b10c2fcc';
+import { plotVerbs } from '../public/js/patches.js?v=fa07c1b4';
 import { createToolConditionState, setToolRemaining } from '../public/js/tools.js?v=5f482998';
 import { FEATURES } from '../public/js/features/index.js?v=c61eaf66';
 

@@ -115,7 +115,7 @@ import {
 import { PEAT_TEXT, retireSoloPeatQuest } from '../peat-quest.js?v=c7baea41';
 import { parseQuestConversation } from '../quests.js?v=2b882eb6';
 import { questRequirementText, renderQuestText, withQuestMarkup } from '../quest-text.js?v=7f5d761c';
-import { addItem, removeItem, countItem } from '../inventory.js?v=60dfc9ca';
+import { addItem, removeItem, countItem } from '../inventory.js?v=5be47371';
 import { getQuestCatalog } from '../content-catalogs.js?v=10b118dd';
 
 const OFFER_CHECK_MS = 30_000;

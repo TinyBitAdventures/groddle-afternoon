@@ -68,13 +68,13 @@
  *   &potionlevel=<n> sets your level for the Draught of Wisdom.
  */
 
-import { addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=60dfc9ca';
+import { addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=5be47371';
 import { getGameDayKey } from '../game-day.js?v=f88e6e16';
 import { metabolicGain, moodMax } from '../metabolics.js?v=8504134e';
 import { quoinDailyLimitFor } from '../quoins.js?v=7e0dec6d';
-import { emblemCostFor } from '../shrines.js?v=ec26da05';
-import { GROWN_TREE_LABELS, trantsformPlotTree } from '../patches.js?v=61abc5fe';
-import { COPY as SHARED_PATCH_COPY } from '../shared-patches.js?v=ac409c57';
+import { emblemCostFor } from '../shrines.js?v=15cd8b43';
+import { GROWN_TREE_LABELS, trantsformPlotTree } from '../patches.js?v=fa07c1b4';
+import { COPY as SHARED_PATCH_COPY } from '../shared-patches.js?v=caf1f888';
 import { isPoisoned } from '../tree-poison.js?v=5ceea244';
 import { furnitureSize } from '../home-decor.js?v=b48dbc95';
 import { playPotionBottle } from '../potion-bottle-fx.js?v=85e8687c';
@@ -141,7 +141,7 @@ import { homesFeature } from './homes-feature.js?v=b7791aed';
 import { streetTreeIndex } from './tree-death-feature.js?v=b8c04443';
 import { questRoomConverse } from './quest-instances-feature.js?v=d5c35ffc';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
-import { copyChargesLeft, copyFromLedger, keepsCopies, spendCopyCharge, verbCopy } from '../copy-charges.js?v=4ffa1c1e';
+import { copyChargesLeft, copyFromLedger, keepsCopies, spendCopyCharge, verbCopy } from '../copy-charges.js?v=627150dc';
 import { copyTag, migrateClassTag, migrateClassValue, setCopyTag, toolCopies } from '../tools.js?v=5f482998';
 
 export const POTIONS_FEATURE_ID = 'potions';

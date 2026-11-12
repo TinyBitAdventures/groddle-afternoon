@@ -44,7 +44,7 @@ import { streetJobsFeature } from '../public/js/features/street-jobs-feature.js?
 import { createAchievementState, applyAchievementProgress } from '../public/js/achievements.js?v=2e4aa9cb';
 import { applyRewards } from '../public/js/quests.js?v=2b882eb6';
 import { loadContentCatalogsFromDir, resetContentCatalogs } from '../public/js/content-catalogs.js?v=10b118dd';
-import { addItem, countItem } from '../public/js/inventory.js?v=60dfc9ca';
+import { addItem, countItem } from '../public/js/inventory.js?v=5be47371';
 import { obtainableItems } from '../tools/job-obtainable.mjs';
 import { TROPHY_WHERE_TEXT } from '../public/js/home-trophies.js?v=2020b29b';
 

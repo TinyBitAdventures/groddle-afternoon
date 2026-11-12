@@ -33,7 +33,7 @@
  * giftDrag (none|dragging|over:<id>); window.groddleGifts.
  */
 
-import { ITEM_CATALOG, addItem, countItem, ensureItem, itemIcon, listPackSlots, removeItem } from '../inventory.js?v=60dfc9ca';
+import { ITEM_CATALOG, addItem, countItem, ensureItem, itemIcon, listPackSlots, removeItem } from '../inventory.js?v=5be47371';
 import { TOOL_CONDITION_CATALOG, copyTag, copyTagKind, copyTags, leavingCopyTag, leavingToolWear, receiveToolCopy, takeToolCopy } from '../tools.js?v=5f482998';
 import { scriptFromTag, scriptLabel } from '../teleportation.js?v=1050225e';
 import { unitRankAt } from '../pack-slots.js?v=6b8393a1';

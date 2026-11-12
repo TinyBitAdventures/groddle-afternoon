@@ -11,7 +11,7 @@ import { createHash } from 'node:crypto';
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { createInventory, countItem } from '../public/js/inventory.js?v=60dfc9ca';
+import { createInventory, countItem } from '../public/js/inventory.js?v=5be47371';
 import { bindToolInventory, copyForVerb, copyTags, createToolConditionState, setCopyTag } from '../public/js/tools.js?v=5f482998';
 import { resolveSound } from '../public/js/sound-board.js?v=3b2df993';
 import { SOUND_ALIASES, SOUND_FILES } from '../public/js/sound-keys.js?v=fb6ee553';

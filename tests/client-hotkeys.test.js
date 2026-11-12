@@ -12,7 +12,7 @@ import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { teleportationFeature } from '../public/js/features/teleportation-feature.js?v=b3761e3c';
+import { teleportationFeature } from '../public/js/features/teleportation-feature.js?v=88443d6e';
 
 const PUBLIC = join(dirname(fileURLToPath(import.meta.url)), '../public');
 const read = (p) => readFileSync(join(PUBLIC, p), 'utf8');

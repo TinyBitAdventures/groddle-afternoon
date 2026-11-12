@@ -35,7 +35,7 @@ import { loadContentCatalogsFromDir, getQuestCatalog, getAchievementCatalog } fr
 import { createQuestState } from '../public/js/quests.js?v=2b882eb6';
 import { pendingQuestOffers } from '../public/js/quest-offers.js?v=9c53455c';
 import { MULTIPLAYER_QUESTS, MULTIPLAYER_QUESTS_LEFT_OUT, creditedMultiplayerQuests } from '../public/js/quests-mp.js?v=1fc5ff58';
-import { questsMpFeature } from '../public/js/features/quests-mp-feature.js?v=97657d4c';
+import { questsMpFeature } from '../public/js/features/quests-mp-feature.js?v=11a87516';
 import { economyCredits } from '../tools/build-economy.mjs';
 import { tradeTable } from '../tools/build-realtime-trade.mjs';
 

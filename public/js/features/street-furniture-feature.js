@@ -40,7 +40,7 @@
 import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=32c58aef';
 import { nearestSurfaceY } from '../walk-surface.js?v=106bfdc5';
 import { loadWildlifeCatalog, wildlifeCatalog } from '../wildlife.js?v=670c3a7f';
-import { ITEM_CATALOG, addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=60dfc9ca';
+import { ITEM_CATALOG, addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=5be47371';
 import { canUseTool, useToolCondition } from '../tools.js?v=5f482998';
 import { getGameDayKey } from '../game-day.js?v=f88e6e16';
 import { runStreetTransition } from '../screen-fx.js?v=81177be4';

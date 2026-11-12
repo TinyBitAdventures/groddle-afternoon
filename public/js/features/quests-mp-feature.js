@@ -42,7 +42,7 @@ import {
   routeQuestEvent,
   turnInQuest,
 } from '../quest-offers.js?v=9c53455c';
-import { addItem, removeItem, countItem } from '../inventory.js?v=60dfc9ca';
+import { addItem, removeItem, countItem } from '../inventory.js?v=5be47371';
 import { getQuestCatalog } from '../content-catalogs.js?v=10b118dd';
 import {
   MP_FACTS,

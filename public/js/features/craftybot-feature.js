@@ -49,7 +49,7 @@
  *   craftybotPanel, craftybotLast, craftybotAutoplay.
  */
 
-import { ITEM_CATALOG, addItem, countItem, ensureItem, itemIcon, removeItem } from '../inventory.js?v=60dfc9ca';
+import { ITEM_CATALOG, addItem, countItem, ensureItem, itemIcon, removeItem } from '../inventory.js?v=5be47371';
 import { canUseTool, getToolCondition, setToolRemaining } from '../tools.js?v=5f482998';
 import { MAKING_TOOL_SKILLS, listRecipes, recipeKnown, TOOL_CATALOG } from '../making.js?v=86fd3231';
 import { listDroppedStacks } from '../world-items.js?v=da2bb7a1';

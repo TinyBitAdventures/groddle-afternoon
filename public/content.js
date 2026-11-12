@@ -34,7 +34,7 @@ import {
   GARDEN_FERTILIZE_MS,
   fertilizeCheck,
   fertilizePlot,
-} from './js/garden.js?v=788f2dbb';
+} from './js/garden.js?v=489cda8f';
 import { firstWorkingTool, HOE_TOOLS, WATERING_CAN_TOOLS } from './js/tools.js?v=5f482998';
 import { miningGemHint } from './js/gem-hints.js?v=4b65f7ac';
 import {
@@ -47,13 +47,13 @@ import {
   findWorkingPick,
   rockStatusLabel,
   ensureMiningItems,
-} from './js/mining.js?v=674ed39b';
+} from './js/mining.js?v=12a6f1bd';
 import {
   ANIMAL_CLASS_IDS,
   ensureAnimalState,
   listAnimalFeedOptions,
   feedAnimal,
-} from './js/animals.js?v=7e27e9d2';
+} from './js/animals.js?v=d21a2fd4';
 import {
   quoteAnimalKinship,
   performAnimalKinship,
@@ -63,7 +63,7 @@ import {
   MUSICBLOCK_CATALOG,
   collectMusicblock,
   isMusicblock,
-} from './js/musicblocks.js?v=4b2e589f';
+} from './js/musicblocks.js?v=87a34689';
 import { nextDialogue, formatSpokenLine } from './js/dialogue.js?v=fcfed1af';
 import {
   ensureWoodTreeState,
@@ -81,7 +81,7 @@ import {
   namingVerbs,
   queuePlops,
   startIncubation,
-} from './js/animal-husbandry.js?v=0b701ee7';
+} from './js/animal-husbandry.js?v=81f8fd5e';
 import { loseEnergy, metabolicGain, moodMax } from './js/metabolics.js?v=8504134e';
 import { SET_FREE, setFreeVerbState } from './js/animal-set-free.js?v=3b194fca';
 import { BUTTER_UP, SING_TO, butterUpVerbState, butterUpChicken, singToVerbState, singToButterfly } from './js/animal-flattery.js?v=63001f58';
@@ -89,7 +89,7 @@ import { levelInfoForXp } from './js/progression.js?v=33462eaa';
 import { getGameDayKey } from './js/game-day.js?v=f88e6e16';
 import { PACK_COPY, isElementClass } from './js/pack-slots.js?v=6b8393a1';
 import { hasPouch } from './js/elemental-pouch.js?v=ceefa97a';
-import { ITEM_CATALOG, countItem } from './js/inventory.js?v=60dfc9ca';
+import { ITEM_CATALOG, countItem } from './js/inventory.js?v=5be47371';
 import { slugsFromEffects } from './js/speech-slugs.js?v=130338f9';
 import { animalResponseKey, failureResponseKey, trantCareResponseKey, rockResponseKey, verbResponse } from './js/verb-responses.js?v=3ceb8a8c';
 

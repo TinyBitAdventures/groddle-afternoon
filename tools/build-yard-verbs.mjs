@@ -53,10 +53,10 @@ import { requireSite, sitePath } from './repos.mjs';
 export const OUT = sitePath('data', 'yard-verbs.json');
 
 export async function yardVerbsJson() {
-  const { YARD_POOL, YARD_AK_ITEMS } = await import('../public/js/yard-verbs-mp.js?v=3dd5a476');
+  const { YARD_POOL, YARD_AK_ITEMS } = await import('../public/js/yard-verbs-mp.js?v=d398d463');
   const { ANIMAL_KINSHIP_PACKAGES } = await import('../public/js/animal-kinship.js?v=f91347e9');
   const { ARBOROLOGY_HARVEST, TRANT_META } = await import('../public/js/trants.js?v=1b3c8ae3');
-  const { SEASONED_BEANS, SEEDLING_GROW_UPGRADES, SOIL_SKILL_PACKAGES, SOIL_TIMERS } = await import('../public/js/patches.js?v=61abc5fe');
+  const { SEASONED_BEANS, SEEDLING_GROW_UPGRADES, SOIL_SKILL_PACKAGES, SOIL_TIMERS } = await import('../public/js/patches.js?v=fa07c1b4');
   const { WOOD_TREE_HARVEST } = await import('../public/js/woodcutting.js?v=5235a01a');
   const { ENCHANTED_WOOD_TREE } = await import('../public/js/enchanted-forests.js?v=22ff871e');
   const beans = Object.keys(SEASONED_BEANS).sort().map((id) => `${JSON.stringify(id)}:${JSON.stringify(SEASONED_BEANS[id].trantClass)}`);
@@ -65,9 +65,9 @@ export async function yardVerbsJson() {
   const arbor = Object.values(ARBOROLOGY_HARVEST).map((r) => `{"skill":${JSON.stringify(r.skillId)},"l":${r.intervalLimit},"b":${r.bonusAmount}}`);
   const dig = Object.entries(SOIL_SKILL_PACKAGES.dig_patch).map(([id, r]) => `{"skill":${JSON.stringify(id === 'no_skill' ? null : id)},"b":${r.bonus_amount}}`);
   const fruit = Object.keys(TRANT_META).sort().map((id) => `${JSON.stringify(id)}:${JSON.stringify(TRANT_META[id].fruitClass)}`);
-  const { STOCK_POOL, STOCK_NODE_CLASSES, STOCK_NODE_VERBS, STOCK_NODE_YIELD, ROCK_RESPAWN_MS } = await import('../public/js/yard-stock-mp.js?v=6914a16b');
-  const { ROCK_CATALOG } = await import('../public/js/mining.js?v=674ed39b');
-  const { RESOURCE_NODE_CATALOG } = await import('../public/js/resource-nodes.js?v=dffdfa11');
+  const { STOCK_POOL, STOCK_NODE_CLASSES, STOCK_NODE_VERBS, STOCK_NODE_YIELD, ROCK_RESPAWN_MS } = await import('../public/js/yard-stock-mp.js?v=edf11583');
+  const { ROCK_CATALOG } = await import('../public/js/mining.js?v=12a6f1bd');
+  const { RESOURCE_NODE_CATALOG } = await import('../public/js/resource-nodes.js?v=db9c69bd');
   const { CULTIVATION_CLASSES } = await import('../public/js/homes-catalog.js?v=10ac34b6');
   const { LIFESPAN_STEP, MAX_LIFE_STEPS } = await import('../public/js/home-cultivation.js?v=f1242621');
   const allPool = { ...YARD_POOL, ...STOCK_POOL };
@@ -85,7 +85,7 @@ export async function yardVerbsJson() {
     return `${JSON.stringify(id)}:{"verb":${JSON.stringify(STOCK_NODE_VERBS[id])},"min":${st.min},"max":${st.max},"initial":${st.initial},"ready":${st.harvestableAt},"after":${st.afterHarvest ?? 'null'},"consume":${st.consume ?? 1},"regrow":[${regrow.join(',')}],"yield":${JSON.stringify(STOCK_NODE_YIELD[id])},"daily":${lim}}`;
   });
   const { FIREFLY_HIVE } = await import('../public/js/home-cultivation.js?v=f1242621');
-  const { FIREFLY_JAR_FULL } = await import('../public/js/yard-stock-mp.js?v=6914a16b');
+  const { FIREFLY_JAR_FULL } = await import('../public/js/yard-stock-mp.js?v=edf11583');
   const cult = Object.keys(CULTIVATION_CLASSES).sort().filter((id) => ['rock', 'node', 'hive'].includes(CULTIVATION_CLASSES[id].kind)).map((id) => {
     const d = CULTIVATION_CLASSES[id];
     const ns = (d.nodes || []).map((n) => [String(n.classTsid).startsWith('peat_') ? 'peat_1' : n.classTsid, n.dx, n.dy]);

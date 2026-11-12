@@ -64,9 +64,9 @@
  * treeGuilt, treeDeaths, treePoisonAutoplay.
  */
 
-import { copyFromLedger, keepsCopies } from '../copy-charges.js?v=4ffa1c1e';
+import { copyFromLedger, keepsCopies } from '../copy-charges.js?v=627150dc';
 import { migrateClassValue } from '../tools.js?v=5f482998';
-import { ITEM_CATALOG, ensureItem } from '../inventory.js?v=60dfc9ca';
+import { ITEM_CATALOG, ensureItem } from '../inventory.js?v=5be47371';
 import { moodMax } from '../metabolics.js?v=8504134e';
 import { plantChoices } from '../patches.js?v=61abc5fe';
 import { textureFromUrl } from '../textures.js?v=92ec53cd';

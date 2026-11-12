@@ -21,7 +21,7 @@
  *     the Hatchet shows, `id:state`), packTreeLast.
  */
 
-import { countItem } from '../inventory.js?v=60dfc9ca';
+import { countItem } from '../inventory.js?v=5be47371';
 import { getToolCondition } from '../tools.js?v=5f482998';
 import {
   PACK_TREE_REACH,

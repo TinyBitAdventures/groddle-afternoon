@@ -11,7 +11,7 @@ import { createHash } from 'node:crypto';
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { createInventory, countItem } from '../public/js/inventory.js?v=60dfc9ca';
+import { createInventory, countItem } from '../public/js/inventory.js?v=5be47371';
 import { createToolConditionState } from '../public/js/tools.js?v=5f482998';
 import {
   MACHINE_ASSEMBLIES,
@@ -23,7 +23,7 @@ import {
   machineWorkSounds,
   startAssembly,
   startDisassembly,
-} from '../public/js/machines.js?v=39290298';
+} from '../public/js/machines.js?v=301212d7';
 import { resolveSound } from '../public/js/sound-board.js?v=3b2df993';
 import { SOUND_ALIASES, SOUND_FILES } from '../public/js/sound-keys.js?v=fb6ee553';
 import { supplyFeature } from '../public/js/features/supply-feature.js?v=654cbb5c';

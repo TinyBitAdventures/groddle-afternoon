@@ -25,7 +25,7 @@ import { BUTLER_STRINGS } from '../public/js/butler.js?v=0a345ccc';
 import { butlerFeature } from '../public/js/features/butler-feature.js?v=002f6959';
 import { FEATURES } from '../public/js/features/index.js?v=c61eaf66';
 import { createFeatureHost } from '../public/js/feature-host.js?v=06bb8b74';
-import { countItem } from '../public/js/inventory.js?v=60dfc9ca';
+import { countItem } from '../public/js/inventory.js?v=5be47371';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const gsjs = join(root, '..', 'glitch-GameServerJS');
