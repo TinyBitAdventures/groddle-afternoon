@@ -57,6 +57,9 @@ export const MENU_ROWS = Object.freeze({
   'snaps-btn': { group: 'world', rank: 3 },
   // ENCYC (js/encyclopedia-links.js): the Encyclopedia's home page in its own tab; I opens it on what you look at.
   'encyclopedia-btn': { group: 'world', rank: 4, key: 'I' },
+  // A link, not a button: the site's /contribute/ page (GitHub Sponsors) in its own tab, last in
+  // World (after rows with no place of their own, such as Interface, at 99).
+  'support-btn': { group: 'world', rank: 100 },
   'buddies-btn': { group: 'social', rank: 0 },
   'groups-btn': { group: 'social', rank: 1 },
   'auctions-btn': { group: 'social', rank: 2 },
@@ -439,6 +442,8 @@ function installFavor(doc, favor) {
 function installMenu(doc) {
   const list = doc.getElementById('more-list');
   if (!list) return;
+  // A row is a button or a link (Support the game opens a page in its own tab).
+  const ROW = 'button, a[href]';
   const groups = new Map();
   for (const g of MENU_GROUPS) {
     let box = list.querySelector(`[data-menu-group="${g.id}"]`);
@@ -454,7 +459,7 @@ function installMenu(doc) {
     groups.set(g.id, box);
   }
   const sync = () => {
-    for (const btn of list.querySelectorAll('button')) {
+    for (const btn of list.querySelectorAll(ROW)) {
       const row = menuRowFor(btn.id);
       if (btn.dataset.menuRank !== String(row.rank)) btn.dataset.menuRank = String(row.rank);
       if (row.key && btn.dataset.key !== row.key) btn.dataset.key = row.key;
@@ -463,7 +468,7 @@ function installMenu(doc) {
       if (btn.parentElement !== box) box.append(btn);
     }
     for (const box of groups.values()) {
-      const rows = [...box.querySelectorAll(':scope > button')];
+      const rows = [...box.querySelectorAll(':scope > :is(button, a[href])')];
       const sorted = [...rows].sort((x, y) => Number(x.dataset.menuRank) - Number(y.dataset.menuRank));
       if (sorted.some((btn, i) => btn !== rows[i])) for (const btn of sorted) box.append(btn);
       // A group can hold a control that is not a button (Settings' Zoom slider).
@@ -475,7 +480,7 @@ function installMenu(doc) {
   new MutationObserver(sync).observe(list, { childList: true, subtree: true });
   list.addEventListener('keydown', (e) => {
     if (!['ArrowDown', 'ArrowUp', 'Home', 'End'].includes(e.key)) return;
-    const rows = [...list.querySelectorAll('button, input[type="range"], input[type="checkbox"]')].filter((b) => b.getClientRects().length && !b.disabled);
+    const rows = [...list.querySelectorAll(ROW + ', input[type="range"], input[type="checkbox"]')].filter((b) => b.getClientRects().length && !b.disabled);
     if (!rows.length) return;
     e.preventDefault();
     e.stopPropagation();
@@ -489,7 +494,7 @@ function installMenu(doc) {
     if (e.key !== 'ArrowDown') return;
     e.preventDefault();
     if (list.hidden) btn.click();
-    list.querySelector('button')?.focus();
+    list.querySelector(ROW)?.focus();
   });
 }
 

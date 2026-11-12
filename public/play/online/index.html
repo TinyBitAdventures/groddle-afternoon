@@ -66,11 +66,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="robots" content="noindex" />
   <title>Groddle Afternoon · Multiplayer</title>
-    <link rel="stylesheet" href="style.css?v=4809a9d3" />
+    <link rel="stylesheet" href="style.css?v=3a02f8d8" />
   <!-- The UI font, self-hosted (style.css @font-face; OFL in assets/fonts/nunito/): the roman latin file, before first paint. -->
   <link rel="preload" href="assets/fonts/nunito/nunito-roman-latin.woff2" as="font" type="font/woff2" crossorigin />
   <!-- The Classic interface (js/classic/ui-mode.js sets <html data-ui="classic">); every rule is scoped to it. -->
-  <link rel="stylesheet" href="css/classic.css?v=44e97ab8" />
+  <link rel="stylesheet" href="css/classic.css?v=f2cdefc7" />
   <!-- Content keys for data and art URLs (js/data-urls.js): before every other script. -->
   <script src="js/data-versions.js?v=8243a7c6"></script>
   <script src="js/data-urls.js?v=523668ca"></script>
@@ -259,6 +259,7 @@
               <button id="home-btn" type="button" class="chrome-btn home-chrome-btn" title="Home">Home</button>
               <button id="feat-btn" type="button" class="chrome-btn feat-chrome-btn" title="Current Feat (H)">Feat</button>
               <button id="encyclopedia-btn" type="button" class="chrome-btn" title="Encyclopedia (I), opens in a new tab">Encyclopedia</button>
+              <a id="support-btn" class="chrome-btn" href="contribute/" target="_blank" rel="noopener" title="Support the game, opens in a new tab">Support the game</a>
             </div>
             <div class="menu-group" data-menu-group="social" role="group" aria-label="Social" hidden><div class="menu-group-label" aria-hidden="true">Social</div></div>
             <div class="menu-group" data-menu-group="settings" role="group" aria-label="Settings" hidden><div class="menu-group-label" aria-hidden="true">Settings</div></div>
@@ -329,7 +330,7 @@
             </div>
             <p class="start-keys-foot">Hold <kbd>?</kbd> for every key</p>
           </section>
-          <p class="fine">A <a href="https://tinybitadventures.com">fan remake</a> of Tiny Speck’s Glitch · <a href="credits/">Credits</a> · <a href="privacy-policy/">Privacy</a></p>
+          <p class="fine">A <a href="https://tinybitadventures.com">fan remake</a> of Tiny Speck’s Glitch · <a href="credits/">Credits</a> · <a href="privacy-policy/">Privacy</a> · <a href="contribute/" target="_blank" rel="noopener">Support the game</a></p>
         </div>
       </div>
 
@@ -1109,6 +1110,6 @@
   <!-- Password managers skip the game's own boxes (chat, searches, names); the account forms keep autofill. -->
   <script type="module" src="js/no-autofill.js?v=6a1a4382"></script>
   <!-- game.js loads once the multiplayer save is in memory (js/online-boot.js). -->
-  <script type="module" id="online-boot" src="js/online-boot.js?v=19450640" data-game="game.js?v=f7c0aaaf"></script>
+  <script type="module" id="online-boot" src="js/online-boot.js?v=19450640" data-game="game.js?v=74bd962d"></script>
 </body>
 </html>

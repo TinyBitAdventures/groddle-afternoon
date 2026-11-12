@@ -332,7 +332,7 @@ describe('the start card layout', () => {
   });
 
   it('keeps the fine print, plain copy and no other Glitch', () => {
-    assert.match(card, /<p class="fine">A <a href="https:\/\/tinybitadventures\.com">fan remake<\/a> of Tiny Speck’s Glitch · <a href="credits\/">Credits<\/a> · <a href="privacy-policy\/">Privacy<\/a><\/p>\s*<\/div>\s*<\/div>/, 'last in the card');
+    assert.match(card, /<p class="fine">A <a href="https:\/\/tinybitadventures\.com">fan remake<\/a> of Tiny Speck’s Glitch · <a href="credits\/">Credits<\/a> · <a href="privacy-policy\/">Privacy<\/a> · <a href="contribute\/" target="_blank" rel="noopener">Support the game<\/a><\/p>\s*<\/div>\s*<\/div>/, 'last in the card');
     const copy = text(card.replace(/<!--[\s\S]*?-->/g, ''));
     assert.doesNotMatch(copy, /—/);
     assert.equal(copy.match(/Glitch/g).length, 1, 'only the fine print names it');

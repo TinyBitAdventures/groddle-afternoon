@@ -271,7 +271,7 @@ describe('5. the start card', () => {
   it('the credit line names the remake and links Credits (Austin 2026-10-28) and Privacy (2026-10-29)', () => {
     for (const page of ['public/play/index.html', 'public/play/online/index.html']) {
       const html = read(page);
-      assert.match(html, /<p class="fine">A <a href="https:\/\/tinybitadventures\.com">fan remake<\/a> of Tiny Speck’s Glitch · <a href="credits\/">Credits<\/a> · <a href="privacy-policy\/">Privacy<\/a><\/p>/, page);
+      assert.match(html, /<p class="fine">A <a href="https:\/\/tinybitadventures\.com">fan remake<\/a> of Tiny Speck’s Glitch · <a href="credits\/">Credits<\/a> · <a href="privacy-policy\/">Privacy<\/a> · <a href="contribute\/" target="_blank" rel="noopener">Support the game<\/a><\/p>/, page);
       assert.doesNotMatch(html, /remake experiment/, page);
     }
   });

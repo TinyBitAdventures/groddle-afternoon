@@ -2354,6 +2354,8 @@ body.nx-hide-mood.nx-hide-energy .meta-vitals { visibility: hidden; }
 }
 .more-list .chrome-btn:hover,
 .more-list .chrome-btn:focus-visible { border-color: var(--c-slate-78); }
+/* A Menu row that is a link (Support the game): sized and drawn as the button rows are. */
+.more-list a.chrome-btn { display: block; box-sizing: border-box; text-decoration: none; }
 .mute-btn { display: inline-flex; align-items: center; justify-content: center; padding-inline: var(--sp-3); }
 .mute-btn svg { display: block; }
 .mute-btn[aria-pressed="true"] .mute-waves,

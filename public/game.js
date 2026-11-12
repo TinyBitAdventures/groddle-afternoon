@@ -982,7 +982,7 @@ import { installHiresIcons } from './js/icon-hires.js?v=165dbd6e';
 import { installHiresDecos } from './js/deco-hires.js?v=9877af94';
 import { loadAudioLevels, loadMutedPreference, saveAudioLevel, saveMutedPreference } from './js/audio-pref.js?v=6fe817bc';
 import { createAudioBuses, fadeGain } from './js/audio-buses.js?v=af167b54';
-import { installTopBar, renderTopBar } from './js/ui/topbar.js?v=341cb471';
+import { installTopBar, renderTopBar } from './js/ui/topbar.js?v=3cddf1a0';
 import { focusBack, installFocusReturn, lastInput } from './js/ui/focus-return.js?v=da190597';
 import { installContextGuard } from './js/ui/context-guard.js?v=0f71ac17';
 import { QUOIN_FRAME_BOB, advanceQuoinClock, quoinBobBetweenFrames } from './js/quoin-motion.js?v=ea0bd408';
@@ -1459,7 +1459,8 @@ function installMoreMenu() {
   };
   btn.addEventListener('click', () => setOpen(list.hidden));
   list.addEventListener('click', (e) => {
-    if (e.target.closest('button')) setOpen(false);
+    // A pick closes it, a link too (Support the game opens its page in a new tab).
+    if (e.target.closest('button, a[href]')) setOpen(false);
   });
   document.addEventListener('pointerdown', (e) => {
     if (!list.hidden && !e.target.closest('.more-menu')) setOpen(false);

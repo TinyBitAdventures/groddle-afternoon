@@ -2752,9 +2752,14 @@
   "deployed": "2026-11-11"
  },
  "git": {
-  "commits": 1682,
+  "commits": 1683,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-12",
+    "kind": "fix",
+    "text": "The Home Street Selection Machine shows its choices as rows, not clipped circles"
+   },
    {
     "date": "2026-11-12",
     "kind": "fix",
@@ -2869,14 +2874,9 @@
     "date": "2026-11-11",
     "kind": "fix",
     "text": "Contraband only goes to streets you can reach"
-   },
-   {
-    "date": "2026-11-11",
-    "kind": "fix",
-    "text": "Vendors won't buy a bag with things still in it"
    }
   ]
  },
- "tests": 827,
+ "tests": 828,
  "generatedAt": "2026-11-12"
 }

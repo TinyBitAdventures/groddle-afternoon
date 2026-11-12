@@ -2621,6 +2621,11 @@
 }
 /* === end Classic skills === */
 
+/* === support-link (lane) === */
+/* Support the game is a link row in the Menu: the type and colour the button rows take from `.top-bar button`. */
+:root[data-ui="classic"] .top-bar #more-list a.chrome-btn { font-family: var(--font-classic-body); color: var(--c-classic-text); }
+/* === end support-link === */
+
 /* == TICKETS == Reports (js/ui/reports-sheet.js, online only) as a 2012 window: the Quest Log's frame
    (Dialog.as, WindowBorder.as, BigDialog.as) centred in the viewport, the white head with its 20 px
    title and the red cross, the grey well between two rules, the white footer with the minor buttons;
