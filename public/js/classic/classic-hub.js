@@ -19,7 +19,8 @@
  * to world the street you are on, both from the game's own view snapshot (engine.snapshotView). The
  * home street is captured while you are on it and kept on this device; until the first visit the
  * cloud stays bare. At home the home cloud reads "Back to world" and the world cloud dims and reads "Go home", as
- * ImgMenuHome / ImgMenuBackToWorld did.
+ * ImgMenuHome / ImgMenuBackToWorld did. The Skills cloud carries up to five skills you could learn
+ * and "N available" under it (ImgMenuSkills.as 109-160; classic-skills.js skillsCloud).
  * Opening fades the hub in over .4 s and each cloud in .2 s, .1 s apart, each with its CLOUD1-7
  * sound, after IMAGINATION_OPEN; closing plays IMAGINATION_CLOSE (ImgMenuView.as 151-300).
  *
@@ -30,6 +31,7 @@
 import { uiState, onUiModeChange, readUiCache, writeUiCache } from './ui-mode.js?v=11da9030';
 import { classicArtUrl } from './classic-art.js?v=5f713e7d';
 import { focusBack } from '../ui/focus-return.js?v=da190597';
+import { skillsCloud, skillIconUrl, CLOUD_ICONS_ROW } from './classic-skills.js?v=58322192';
 
 /** The clouds, in the client's two rows (ImgMenuView.as 343-415). */
 export const HUB_CLOUDS = Object.freeze([
@@ -143,6 +145,11 @@ function createHub(doc, win, { engine = null, avatarPortrait = null } = {}) {
     // What sat on the cloud (the skill book, the quest book, the upgrade cards; ImgMenuElement.as).
     if (c.icon) cloud.append(el(doc, 'img', { class: 'classic-hub-icon', src: classicArtUrl(c.icon), alt: '' }));
     b.append(el(doc, 'span', { class: 'classic-hub-title' }, c.title), cloud);
+    // Skills: up to five skills you could learn on the cloud and "N available" under it (ImgMenuSkills.as 109-160).
+    if (c.id === 'skills') {
+      cloud.append(el(doc, 'span', { class: 'classic-hub-skills', hidden: true }));
+      b.append(el(doc, 'span', { class: 'classic-hub-sub', hidden: true }));
+    }
     b.addEventListener('click', () => pick(c.id));
     rows[c.row - 1].append(b);
     buttons.push(b);
@@ -203,6 +210,25 @@ function createHub(doc, win, { engine = null, avatarPortrait = null } = {}) {
       setPic('looks', (await avatarPortrait?.()) || null);
     } catch { setPic('looks', null); }
   }
+  /** The Skills cloud's icons and count, asked for each time the hub opens (ImgMenuSkills.show). */
+  function refreshSkills() {
+    const b = cloudOf('skills');
+    const box = b?.querySelector('.classic-hub-skills');
+    const sub = b?.querySelector('.classic-hub-sub');
+    if (!box || !sub) return;
+    let shown = null;
+    try {
+      if (typeof engine?.skillsLearnable === 'function') {
+        shown = skillsCloud({ learnable: engine.skillsLearnable(), ...(engine.skillStudyNow?.() || {}) });
+      }
+    } catch { shown = null; }
+    box.replaceChildren(...(shown?.icons || []).map((id) => el(doc, 'img', { src: skillIconUrl(id), alt: '' })));
+    box.style.setProperty('--n', String(Math.min(CLOUD_ICONS_ROW, shown?.icons.length || 1)));
+    box.hidden = !shown?.icons.length;
+    sub.textContent = shown?.sub || '';
+    sub.hidden = !shown;
+    b.setAttribute('aria-label', shown ? `Skills, ${shown.sub}` : 'Skills');
+  }
 
   const click = (id) => doc.getElementById(id)?.click();
   const key = (init) => win.dispatchEvent(new win.KeyboardEvent('keydown', { bubbles: true, ...init }));
@@ -228,6 +254,7 @@ function createHub(doc, win, { engine = null, avatarPortrait = null } = {}) {
       if (!box.hidden) return;
       returnFocus = doc.activeElement;
       refreshPictures();
+      refreshSkills();
       box.hidden = false;
       sound('IMAGINATION_OPEN');
       buttons.forEach((b, i) => win.setTimeout(() => { if (!box.hidden) sound(`CLOUD${i + 1}`); }, 100 * i));

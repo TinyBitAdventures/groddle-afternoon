@@ -32,7 +32,7 @@ import {
 import { DISPATCHER_TEXT, SIGNPOST, dispatcherDefaultRx, dispatcherFits, signpostX, streetFixtures } from '../public/js/home-street-fixtures.js?v=bad831a1';
 import { sceneSignMarks } from '../public/js/ui/street-minimap.js?v=fa31d398';
 import { HUB_TILES, hubTileBackground, hubTileForKey, hubTileState } from '../public/js/ui/imagination-hub.js?v=51fa371f';
-import { HUB_CLOUDS, placeClouds } from '../public/js/classic/classic-hub.js?v=ddd2c64f';
+import { HUB_CLOUDS, placeClouds } from '../public/js/classic/classic-hub.js?v=e0c667fc';
 
 const root = join(import.meta.dirname, '..');
 const pub = join(root, 'public');

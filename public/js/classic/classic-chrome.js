@@ -10,7 +10,8 @@ import { installClassicTopbar } from './classic-topbar.js?v=cf57371e';
 import { installClassicGrowl } from './classic-growl.js?v=97aac2d9';
 import { installClassicPanes } from './classic-panes.js?v=00a26706';
 import { installClassicPack } from './classic-pack.js?v=72334891';
-import { installClassicHub } from './classic-hub.js?v=ddd2c64f';
+import { installClassicHub } from './classic-hub.js?v=e0c667fc';
+import { installClassicSkills } from './classic-skills.js?v=58322192';
 
 let installed = null;
 
@@ -24,6 +25,8 @@ export function installClassicChrome({ doc = globalThis.document, win = globalTh
     pack: installClassicPack({ doc }),
     hub: installClassicHub({ doc, win, engine, avatarPortrait }),
   };
+  // Skills steps back to the hub (classic-skills.js).
+  installed.skills = installClassicSkills({ doc, win, engine, hub: installed.hub });
   // QA: the quest-complete box, a Magic Rock conversation and a plain NPC prompt on demand,
   // through the game's own award queue and scripted dialogue.
   win.groddleClassicQA = {

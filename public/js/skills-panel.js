@@ -73,6 +73,17 @@ export function focusSkillInPanel(classTsid) {
   ui.focus = classTsid;
 }
 
+/**
+ * Classic (js/classic/classic-skills.js): the 2012 client showed one skill at a time, in its own
+ * details view (ImaginationSkillsUI.as showSkillDetails 376-393), so Classic keeps one row open, or
+ * none, and redraws the panel in `box` when it is drawn. Modern never calls this.
+ */
+export function openOnlySkillInPanel(classTsid, box = null) {
+  ui.expanded = new Set(classTsid && getSkillCatalog()[classTsid] ? [classTsid] : []);
+  ui.confirmUnlearn = null;
+  if (box?._skillTreeArgs) renderSkillTreePanel({ ...box._skillTreeArgs, now: Date.now() });
+}
+
 function buildToolbar(box, rerender) {
   const bar = el('div', 'skill-tree-toolbar');
   const search = el('input', 'skill-tree-search');

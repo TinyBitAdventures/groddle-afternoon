@@ -878,6 +878,22 @@
   --c-classic-dialog-text: #c4d1d1;       /* FROM FRAME, same frame: the box's body text */
   --c-classic-qty-text: #495e5e;          /* the quantity picker's number (code default): QuantityPickerSpecial.as:344 */
   --c-classic-qty-ring: #e1c38d;          /* its 2 px focus ring (code default): InteractionMenu.as 612-713 */
+  --c-classic-skill-frame: #cfd0d0;  /* the study bar: ImaginationSkillsUI.as 120-125, 200-211 */
+  --c-classic-skill-frame-edge: #b6b7b7;  /* the study bar: ImaginationSkillsUI.as 120-125, 200-211 */
+  --c-classic-skill-learn-top: #afca2f;  /* the study bar: ImaginationSkillsUI.as 120-125, 200-211 */
+  --c-classic-skill-learn-bottom: #95b101;  /* the study bar: ImaginationSkillsUI.as 120-125, 200-211 */
+  --c-classic-skill-learn-tip-top: #9db52e;  /* the study bar: ImaginationSkillsUI.as 120-125, 200-211 */
+  --c-classic-skill-learn-tip-bottom: #879f08;  /* the study bar: ImaginationSkillsUI.as 120-125, 200-211 */
+  --c-classic-skill-fast-top: #f5e242;  /* the study bar: ImaginationSkillsUI.as 120-125, 200-211 */
+  --c-classic-skill-fast-bottom: #d79305;  /* the study bar: ImaginationSkillsUI.as 120-125, 200-211 */
+  --c-classic-skill-fast-tip-top: #b38b00;  /* the study bar: ImaginationSkillsUI.as 120-125, 200-211 */
+  --c-classic-skill-fast-tip-bottom: #9a7802;  /* the study bar: ImaginationSkillsUI.as 120-125, 200-211 */
+  --c-classic-skill-unlearn-top: #75c1c2;  /* the study bar: ImaginationSkillsUI.as 120-125, 200-211 */
+  --c-classic-skill-unlearn-bottom: #42a5a8;  /* the study bar: ImaginationSkillsUI.as 120-125, 200-211 */
+  --c-classic-skill-unlearn-tip-top: #4d9899;  /* the study bar: ImaginationSkillsUI.as 120-125, 200-211 */
+  --c-classic-skill-unlearn-tip-bottom: #4e989a;  /* the study bar: ImaginationSkillsUI.as 120-125, 200-211 */
+  --c-classic-skill-name: #545454;   /* imagination_skills_name_link hoverColor fallback, ImaginationSkillsUI.as 141 */
+  --c-classic-skill-cancel: #044051; /* imagination_skills_cancel hoverColor fallback, 146 */
   /* classic:end */
   /* Classic type: the 2012 faces (VAG Rounded, Helvetica) are proprietary, so Nunito 800 stands in for
      titles, names, labels and big numbers, and the system Helvetica/Arial stack carries body text. The

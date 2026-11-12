@@ -2752,9 +2752,19 @@
   "deployed": "2026-11-11"
  },
  "git": {
-  "commits": 1677,
+  "commits": 1679,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-11",
+    "kind": "improve",
+    "text": "Classic Skills step one level at a time, with the 2012 study bar"
+   },
+   {
+    "date": "2026-11-11",
+    "kind": "improve",
+    "text": "Classic's character builder takes the 2012 Vanity layout, with sliders and emote tests"
+   },
    {
     "date": "2026-11-11",
     "kind": "fix",
@@ -2864,19 +2874,9 @@
     "date": "2026-11-11",
     "kind": "improve",
     "text": "A quoin's amount draws a little smaller, 20 px"
-   },
-   {
-    "date": "2026-11-11",
-    "kind": "new",
-    "text": "Online, the street sees everyone's tool bubble while they work on a project"
-   },
-   {
-    "date": "2026-11-11",
-    "kind": "new",
-    "text": "Street Spirits give street projects with Glitch's bubble, and Group Halls build on their roped lot"
    }
   ]
  },
- "tests": 818,
+ "tests": 819,
  "generatedAt": "2026-11-11"
 }

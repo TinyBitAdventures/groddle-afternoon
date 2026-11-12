@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=5e5c70c4';
 import { createErrorOnce, createFeatureHost } from './js/feature-host.js?v=06bb8b74';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=b8e1a346';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=7cd747d7';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -430,9 +430,9 @@ import {
   canLearnSkill,
   listLearnedSkills,
 } from './js/skills.js?v=4542bdf9';
-import { skillTitle, skillTreeCounts, spendEmblemForSkill, studyPillName } from './js/skill-tree.js?v=faa54b90';
+import { skillTitle, skillTreeCounts, skillTreeEntry, spendEmblemForSkill, studyPillName } from './js/skill-tree.js?v=faa54b90';
 import { CARD_ART_LAYERS } from './js/imagination-data.js?v=4a85e7fe';
-import { renderSkillTreePanel, focusSkillInPanel } from './js/skills-panel.js?v=cef381ab';
+import { renderSkillTreePanel, focusSkillInPanel } from './js/skills-panel.js?v=4de079e9';
 import {
   createBuffState,
   applyBuff,
@@ -1025,7 +1025,7 @@ import { SLUG_ANIMATION, SLUG_LAYOUT, SLUG_STYLES, SLUG_TARGETS, drawSlugIcon, f
 import { filterText } from './js/word-filter.js?v=9a7a7ebb'; // the remake's own word filter
 import { arrangeMapCards, fitMapExtras } from './js/map-extras.js?v=9f38c312'; // the Map's Shortcuts
 // The interface skin (js/classic/ui-mode.js) sets <html data-ui> as it loads: before main(), so before the boot cover lifts.
-import { installInterfaceSettings } from './js/classic/classic-prefs.js?v=65c09ed7';
+import { installInterfaceSettings } from './js/classic/classic-prefs.js?v=9227d667';
 
 /** @type {object|null} assets/maps/index.json */
 let mapIndexCache = null;
@@ -12892,6 +12892,28 @@ const engine = {
       .sort((a, b) => b.pausedAt - a.pausedAt)
       .map((row) => ({ classTsid: row.classTsid, name: skillTitle(catalog[row.classTsid]) || row.classTsid, left: formatStudyTime(row.remainingSeconds) }));
     return { classTsid, name: skillTitle(def) || def.name || classTsid, learned: def.learned || '', next, paused };
+  },
+  /**
+   * Classic Skills (js/classic/classic-skills.js): the skills you could learn now, as the iMG hub's
+   * Skills cloud counted them (ImgMenuSkills.as 133-151; inc_skills.js skills_learnable_list 1815-1849:
+   * every skill not yet learned whose requirements are met, the one in study included).
+   */
+  skillsLearnable(now = Date.now()) {
+    const ctx = { ...skillStudyContext(), unlearning: features.query('skillUnlearning', engine) };
+    return Object.keys(getSkillCatalog())
+      .map((id) => skillTreeEntry(skillState, id, ctx, now))
+      .filter((entry) => entry && (entry.status === 'available' || entry.status === 'studying' || entry.status === 'paused'))
+      .map((entry) => ({ classTsid: entry.classTsid, name: entry.title, seconds: entry.seconds, status: entry.status }));
+  },
+  /** Classic Skills: the skill being learned and the one being unlearned (ImaginationSkillsUI.as updateSkillTraining 401-460). */
+  skillStudyNow(now = Date.now()) {
+    const active = getActiveStudy(skillState, now);
+    const unlearning = features.query('skillUnlearning', engine)?.active || null;
+    const row = (r, name) => ({ classTsid: r.classTsid, name, remainingSeconds: r.remainingSeconds, progress: r.progress });
+    return {
+      learning: active ? { ...row(active, skillTitle(getSkillCatalog()[active.classTsid]) || active.classTsid), isAccelerated: Boolean(active.isAccelerated) } : null,
+      unlearning: unlearning ? row(unlearning, unlearning.name || unlearning.classTsid) : null,
+    };
   },
   /** Open the Skills panel, focused on one skill when given (G218). */
   openSkillTree(classTsid = '') {
