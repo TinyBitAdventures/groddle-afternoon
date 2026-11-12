@@ -1989,5 +1989,60 @@
   "mp": "game 34f7f6856b, server fa3c6f5",
   "mpReason": "peat-quest.js + objects_peat.go: the server judges the shared bog; takes four players (two with the upgrade), so solo no longer offers it (Austin 2026-11-07)",
   "register": "G451"
+ },
+ "npc:npc_shrine_alph": {
+  "status": "source",
+  "reason": "spawned on every shrine street by game.js spawnShrine (placement('shrine'), street-ecology shrine cell); the regional firebog/ix/uralia files are its variants, so the base-class rule must not exclude it (2026-11-12: the placements change moved the spawn call out of the detector's view)",
+  "register": "G590"
+ },
+ "npc:npc_shrine_cosma": {
+  "status": "source",
+  "reason": "spawned on every shrine street by game.js spawnShrine (placement('shrine'), street-ecology shrine cell); the regional firebog/ix/uralia files are its variants, so the base-class rule must not exclude it (2026-11-12: the placements change moved the spawn call out of the detector's view)",
+  "register": "G590"
+ },
+ "npc:npc_shrine_friendly": {
+  "status": "source",
+  "reason": "spawned on every shrine street by game.js spawnShrine (placement('shrine'), street-ecology shrine cell); the regional firebog/ix/uralia files are its variants, so the base-class rule must not exclude it (2026-11-12: the placements change moved the spawn call out of the detector's view)",
+  "register": "G590"
+ },
+ "npc:npc_shrine_grendaline": {
+  "status": "source",
+  "reason": "spawned on every shrine street by game.js spawnShrine (placement('shrine'), street-ecology shrine cell); the regional firebog/ix/uralia files are its variants, so the base-class rule must not exclude it (2026-11-12: the placements change moved the spawn call out of the detector's view)",
+  "register": "G590"
+ },
+ "npc:npc_shrine_humbaba": {
+  "status": "source",
+  "reason": "spawned on every shrine street by game.js spawnShrine (placement('shrine'), street-ecology shrine cell); the regional firebog/ix/uralia files are its variants, so the base-class rule must not exclude it (2026-11-12: the placements change moved the spawn call out of the detector's view)",
+  "register": "G590"
+ },
+ "npc:npc_shrine_lem": {
+  "status": "source",
+  "reason": "spawned on every shrine street by game.js spawnShrine (placement('shrine'), street-ecology shrine cell); the regional firebog/ix/uralia files are its variants, so the base-class rule must not exclude it (2026-11-12: the placements change moved the spawn call out of the detector's view)",
+  "register": "G590"
+ },
+ "npc:npc_shrine_mab": {
+  "status": "source",
+  "reason": "spawned on every shrine street by game.js spawnShrine (placement('shrine'), street-ecology shrine cell); the regional firebog/ix/uralia files are its variants, so the base-class rule must not exclude it (2026-11-12: the placements change moved the spawn call out of the detector's view)",
+  "register": "G590"
+ },
+ "npc:npc_shrine_pot": {
+  "status": "source",
+  "reason": "spawned on every shrine street by game.js spawnShrine (placement('shrine'), street-ecology shrine cell); the regional firebog/ix/uralia files are its variants, so the base-class rule must not exclude it (2026-11-12: the placements change moved the spawn call out of the detector's view)",
+  "register": "G590"
+ },
+ "npc:npc_shrine_spriggan": {
+  "status": "source",
+  "reason": "spawned on every shrine street by game.js spawnShrine (placement('shrine'), street-ecology shrine cell); the regional firebog/ix/uralia files are its variants, so the base-class rule must not exclude it (2026-11-12: the placements change moved the spawn call out of the detector's view)",
+  "register": "G590"
+ },
+ "npc:npc_shrine_ti": {
+  "status": "source",
+  "reason": "spawned on every shrine street by game.js spawnShrine (placement('shrine'), street-ecology shrine cell); the regional firebog/ix/uralia files are its variants, so the base-class rule must not exclude it (2026-11-12: the placements change moved the spawn call out of the detector's view)",
+  "register": "G590"
+ },
+ "npc:npc_shrine_zille": {
+  "status": "source",
+  "reason": "spawned on every shrine street by game.js spawnShrine (placement('shrine'), street-ecology shrine cell); the regional firebog/ix/uralia files are its variants, so the base-class rule must not exclude it (2026-11-12: the placements change moved the spawn call out of the detector's view)",
+  "register": "G590"
  }
 }
