@@ -157,7 +157,7 @@ function drawDark(ctx) {
     const rod = new PIXI.Graphics();
     rod.rect(-3, -h - 600, 6, 600 + 8).fill(0x1c1c20);
     // The set plays its own lit, flickering screen and glow, each on its own clock.
-    const tv = sceneAnim(PIXI, TV.sprite, 0, 0, { scale: m.s, clock: performance.now() - i * 190, resolution: ctx.engine?.app?.renderer?.resolution });
+    const tv = sceneAnim(PIXI, TV.sprite, 0, 0, { scale: m.s, clock: performance.now() - i * 190, resolution: ctx.engine?.resolution });
     c.addChild(rod, tv);
     world.addChild(c);
     return { ...m, c, tv, dir: 1, turn: 1, phase: kit.hash01(`tv${i}`) * 6 };

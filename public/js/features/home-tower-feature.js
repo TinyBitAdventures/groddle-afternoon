@@ -121,7 +121,7 @@ import { WOTD_TEXT } from '../wine-pour.js?v=6daa23a7';
 
 /** 3x tower pieces where the screen has more than 2.25 backing pixels per world pixel. */
 function hires(engine) {
-  return wantsHiresDecos(engine?.app?.renderer?.resolution || globalThis.devicePixelRatio || 1);
+  return wantsHiresDecos(engine?.resolution || 1);
 }
 
 export const HOME_TOWER_FEATURE_ID = 'home-tower';
@@ -426,8 +426,8 @@ function currentFloor() {
 export const BENCH_ART = 'assets/sprites/home-tower/tower_expander.webp';
 export const BENCH_SCALE = 1.25;
 function benchTexture(engine) {
-  const dpr = engine?.app?.renderer?.resolution || globalThis.devicePixelRatio || 1;
-  const dense = denseSprite(BENCH_ART, BENCH_SCALE * dpr * Math.max(1, (globalThis.innerWidth || 960) / 960));
+  // The renderer's resolution already counts the window's stretch over the 960 px view.
+  const dense = denseSprite(BENCH_ART, BENCH_SCALE * (engine?.resolution || 1));
   return textureFromUrl(dense?.parts.length === 1 ? dense.parts[0][0] : BENCH_ART);
 }
 

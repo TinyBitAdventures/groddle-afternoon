@@ -214,7 +214,7 @@ import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=59ca0e2b';
 import { fadeInNewNear } from '../poof-fade.js?v=8984abd1';
 import { projectApi } from './street-jobs-feature.js?v=fe96e9c0';
 import { TOWER_CHASSIS, TOWER_CONFIG, TOWER_DOOR_DX, TOWER_GEO, TOWER_PROTO, normalizeTowerState } from '../home-tower.js?v=087df38f';
-import { drawTowerElevator, drawTowerExit, towerApi, visitorTowerView } from './home-tower-feature.js?v=652c5467';
+import { drawTowerElevator, drawTowerExit, towerApi, visitorTowerView } from './home-tower-feature.js?v=2d3c0d67';
 import { pieceUrl, roomPieces, surfaceAt, swatchPiece, wallTargetAt } from '../home-wallpaper.js?v=f1969400';
 import { maxTextureSizeOf, sharpDeco, wantsHiresDecos } from '../deco-hires.js?v=e5e3f453';
 import { SHARP_DECOS } from '../deco-sharp-list.js?v=9ebccaeb';
@@ -779,8 +779,8 @@ const towerBridge = {
 // ---------------------------------------------------------------------------
 
 /** Back-buffer pixels per world pixel (render-density.js) above which the 3x pieces load. */
-function wantsHiresPieces(engine) {
-  const scale = engine?.app?.renderer?.resolution || globalThis.devicePixelRatio || 1;
+export function wantsHiresPieces(engine) {
+  const scale = engine?.resolution || 1;
   return wantsHiresDecos(scale);
 }
 
@@ -1861,7 +1861,7 @@ function sizeDecoSprite(spr, item, flip) {
  * js/street-render.js refreshSharpDecos does for streets. Stops when `root` is destroyed.
  */
 function landscapeArtist(engine, root) {
-  const renderer = engine?.app?.renderer;
+  const renderer = engine?.renderer;
   const density = () => renderer?.resolution || 1;
   const big = () => (maxTextureSizeOf(renderer) || 4096) >= 8192;
   /** @type {{ spr: any, item: any, flip: boolean, url: string }[]} */

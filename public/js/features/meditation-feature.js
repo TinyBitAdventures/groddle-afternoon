@@ -193,7 +193,7 @@ function orbTextures(engine) {
   const { PIXI } = engine;
   // Held at ORB_HELD_SIZE (80) over 40 px cells: its 4x render (js/sprite-dense.js, one file in the
   // same grid; js/textures.js reads resolution 4 from the name) when that is 1.5+ device px per texel.
-  const pxPerTexel = (ORB_HELD_SIZE / ORB_TOOL_SHEET.frameW) * (engine.app?.renderer?.resolution || globalThis.devicePixelRatio || 1);
+  const pxPerTexel = (ORB_HELD_SIZE / ORB_TOOL_SHEET.frameW) * (engine.resolution || 1);
   const dense = denseSprite(ORB_TOOL_SHEET.url, pxPerTexel);
   const base = sourceFromUrl(dense?.parts.length === 1 ? dense.parts[0][0] : ORB_TOOL_SHEET.url);
   orbFrames = [];

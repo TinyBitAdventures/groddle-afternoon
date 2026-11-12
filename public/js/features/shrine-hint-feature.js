@@ -79,7 +79,7 @@ function ensureUi() {
 
 async function showVog(engine, text) {
   const el = ensureUi();
-  const r = engine.app?.canvas?.getBoundingClientRect?.() || document.querySelector('canvas')?.getBoundingClientRect();
+  const r = engine.canvas?.getBoundingClientRect?.() || document.querySelector('canvas')?.getBoundingClientRect();
   if (r) Object.assign(el.style, { left: `${r.left}px`, top: `${r.top}px`, width: `${r.width}px`, height: `${r.height}px` });
   for (const page of vogPages(text)) {
     el.textContent = page;
@@ -179,7 +179,7 @@ function hexToRgba(hex, alpha) {
 function showGiantScreen(engine, screen, giantId) {
   if (typeof document === 'undefined') return Promise.resolve('');
   const el = ensureLoveUi();
-  const r = engine.app?.canvas?.getBoundingClientRect?.() || document.querySelector('canvas')?.getBoundingClientRect();
+  const r = engine.canvas?.getBoundingClientRect?.() || document.querySelector('canvas')?.getBoundingClientRect();
   if (r) Object.assign(el.style, { left: `${r.left}px`, top: `${r.top}px`, width: `${r.width}px`, height: `${r.height}px` });
   el.style.background = hexToRgba(screen.bg, screen.alpha);
   el.querySelector('.gs-art').src = `assets/sprites/icons/emblem_${giantId}@3x.webp`;

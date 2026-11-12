@@ -663,7 +663,7 @@ function drawFeelingRoom(ctx, feeling) {
   drawFence(g, 1260, 1390, FLOOR);
   world.addChild(g);
   // The Comfort Snaps: the girl sits at the bench's left end, behind its back.
-  if (warm) world.addChild(sceneAnim(PIXI, GIRL.deco, lay.bench.x + GIRL.dx, FLOOR + 1, { scale: GIRL.scale, resolution: ctx.engine?.app?.renderer?.resolution }));
+  if (warm) world.addChild(sceneAnim(PIXI, GIRL.deco, lay.bench.x + GIRL.dx, FLOOR + 1, { scale: GIRL.scale, resolution: ctx.engine?.resolution }));
   world.addChild(bench(PIXI, kit, lay.bench.x, lay.bench.y));
   const exit = wordText(PIXI, 'exit', { size: 16, weight: '800', fill: 0x2a1a14 });
   exit.x = lay.exit.x;
@@ -735,7 +735,7 @@ export function leafColumns(count, frozen) {
 
 function makeLeaves(ctx, layer, count, frozen) {
   const now = performance.now();
-  const resolution = ctx.engine?.app?.renderer?.resolution;
+  const resolution = ctx.engine?.resolution;
   return leafColumns(count, frozen).map((c) => layer.addChild(sceneAnim(ctx.PIXI, c.deco, c.x, c.bottom, {
     scale: 0.5, flip: c.flip, clock: now - c.phase, hold: c.hold, resolution,
   })));

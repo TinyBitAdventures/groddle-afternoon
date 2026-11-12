@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=4f923e2b';
 import { createErrorOnce, createFeatureHost } from './js/feature-host.js?v=06bb8b74';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=8d128623';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=bf93b8bb';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl, drawTileArt } from './js/enter-chooser.js?v=4a3ea327';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -12547,6 +12547,10 @@ const engine = {
   /** The Pixi stage, for screen-space layers above the world. */
   get stage() {
     return app?.stage || null;
+  },
+  /** The game's Pixi canvas (shrine hints place themselves over it), or null before boot. */
+  get canvas() {
+    return app?.canvas || null;
   },
   /** The Pixi renderer (MINIMAP: the street map's snapshot of the street, js/ui/street-minimap.js). */
   get renderer() {
