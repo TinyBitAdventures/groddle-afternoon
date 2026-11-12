@@ -11160,6 +11160,9 @@ html.stage-pinned[data-ui="modern"] header.top-bar { left: calc(var(--sp-5) + va
 [data-ui="modern"] .award-screen[data-kind="level"],
 [data-ui="modern"] .award-screen[data-paged="true"] {
   place-items: center;
+  /* One column the screen's own width (Austin's iPhone, 2026-11-12: the card's 460 px least width
+     made an auto column wider than a 402 px phone, so the card sat right and ran off the edge). */
+  grid-template-columns: minmax(0, 1fr);
   padding: calc(var(--hud-h) + var(--space-5)) var(--space-4) var(--space-4);
   box-sizing: border-box;
   background: var(--scrim-strong);
@@ -11169,7 +11172,7 @@ html.stage-pinned[data-ui="modern"] header.top-bar { left: calc(var(--sp-5) + va
 [data-ui="modern"] .award-screen[data-paged="true"] .award-card {
   position: relative;
   width: var(--moment-w);
-  max-width: calc(100% - 2 * var(--space-4));
+  max-width: 100%;
   min-height: 0;
   box-sizing: border-box;
   margin-top: calc(var(--moment-burst) * 0.5);
@@ -11184,19 +11187,6 @@ html.stage-pinned[data-ui="modern"] header.top-bar { left: calc(var(--sp-5) + va
   text-shadow: none;
 }
 [data-ui="modern"] .award-screen.is-visible .award-card { animation: momentIn 320ms var(--ease-out) both; }
-/* A short screen (the mobile QA, 2026-11-12: a phone held sideways, 343 px): the card's button ("Yeah!
-   I am!") sat under the bottom edge and nothing scrolled. Up to 500 px tall the art and its burst come
-   in at half size and the screen scrolls from its top, so the button can always be reached. */
-@media (max-height: 500px) {
-  [data-ui="modern"] .award-screen { --moment-burst: 96px; --moment-art: 80px; --moment-art-book: 72px; }
-  [data-ui="modern"] .award-screen,
-  [data-ui="modern"] .award-screen[data-kind="quest"],
-  [data-ui="modern"] .award-screen[data-kind="level"],
-  [data-ui="modern"] .award-screen[data-paged="true"] {
-    place-items: start center; overflow-y: auto; overscroll-behavior: contain;
-    padding-top: calc(var(--hud-h) + var(--space-2));
-  }
-}
 @keyframes momentIn { from { opacity: 0; transform: translateY(10px) scale(0.92); } }
 /* The art and its burst: 192 px, two thirds of it above the card's top edge. */
 [data-ui="modern"] .award-screen .award-badge,
@@ -11377,6 +11367,45 @@ html.stage-pinned[data-ui="modern"] header.top-bar { left: calc(var(--sp-5) + va
   [data-ui="modern"] .award-screen.is-visible .award-card,
   [data-ui="modern"] .award-screen .award-badge,
   [data-ui="modern"] .award-screen .award-badge::before { animation: none; }
+}
+/* The card always fits the screen (Austin's iPhone, 2026-11-12): it is never taller than the room
+   under its burst, and only the body text scrolls (inside the card), so the title and the button
+   always show. Before, a long body or a short screen put the button under the bottom edge. */
+[data-ui="modern"] .award-screen .award-card,
+[data-ui="modern"] .award-screen[data-paged="true"] .award-card {
+  display: flex; flex-direction: column;
+  max-height: calc(100% - var(--moment-burst) * 0.5);
+}
+[data-ui="modern"] .award-screen .award-card > * { flex-shrink: 0; }
+[data-ui="modern"] .award-screen .award-body,
+[data-ui="modern"] .award-screen[data-paged="true"] .award-body {
+  flex: 0 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain; touch-action: pan-y;
+}
+/* A short screen (the mobile QA, 2026-11-12: a phone held sideways, 343 px; Austin's iPhone in Chrome
+   sideways, about 320 px): the card's button ("Yeah! I am!") sat under the bottom edge and the screen
+   did not scroll. Up to 500 px tall: smaller art and burst, tighter spacing, no room kept for the HUD
+   (the scrim covers it). */
+@media (max-height: 500px) {
+  [data-ui="modern"] .award-screen { --moment-burst: 72px; --moment-art: 60px; --moment-art-book: 54px; }
+  [data-ui="modern"] .award-screen,
+  [data-ui="modern"] .award-screen[data-kind="quest"],
+  [data-ui="modern"] .award-screen[data-kind="level"],
+  [data-ui="modern"] .award-screen[data-paged="true"] {
+    place-items: center;
+    padding: var(--space-2) var(--space-4);
+  }
+  [data-ui="modern"] .award-screen .award-card,
+  [data-ui="modern"] .award-screen[data-paged="true"] .award-card { padding: var(--space-3) var(--space-5) var(--space-4); }
+  [data-ui="modern"] .award-screen .award-badge,
+  [data-ui="modern"] .award-screen[data-paged="true"] .award-badge { margin: calc(var(--space-3) * -1 - var(--moment-burst) * 0.5) auto var(--space-1); }
+  [data-ui="modern"] .award-screen .award-badge::before { inset: -20px; }
+  [data-ui="modern"] .award-screen .award-title,
+  [data-ui="modern"] .award-screen[data-paged="true"] .award-title { margin: 2px 0 var(--space-1); font-size: var(--fs-4xl); }
+  [data-ui="modern"] .award-screen .award-body,
+  [data-ui="modern"] .award-screen[data-paged="true"] .award-body { margin-bottom: var(--space-2); font-size: var(--fs-lg); }
+  [data-ui="modern"] .award-screen .award-next,
+  [data-ui="modern"] .award-screen[data-okin="true"] .award-next,
+  [data-ui="modern"] .award-screen[data-paged="true"] .award-next { margin-top: var(--space-3); }
 }
 /* —— HUB: Imagination hub —— */
 /* X (js/ui/imagination-hub.js): seven round tiles in an arc over the avatar, the world dimmed
