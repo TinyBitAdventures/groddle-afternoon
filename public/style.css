@@ -13682,3 +13682,14 @@ body.is-booting .touch-controls { display: none; }
 /* The tutorial's pill waits behind the builder, as Classic's does. */
 :root.touch-phone[data-ui="modern"]:has(#avatar-panel:not([hidden])) #newxp-pill { visibility: hidden; }
 /* —— end TOUCH BUILDER —— */
+
+/* —— TOUCH PANELS —— sheets and windows on a phone (html.touch-phone, Modern): a close button a
+   thumb can hit (44 px, Apple's least target) and nothing wider than the screen. The buttons keep
+   their own look; min-width and min-height only grow the target. */
+:root.touch-phone[data-ui="modern"] :is(.verb-menu-x, .ui-sheet-x, .fam-close, .rook-museum-exhibit-close, .award-close, .pack-search-close, .route-gps-x, .activity-log-close, .race-store-close, .hb-close, .keys-close, .account-close, .prefs-close, .buddies-close, .social-x, .trade-x, .gift-x, .auc-x, .hst-x, .hs-close, .grp-close, .fu-close) {
+  min-width: 44px; min-height: 44px;
+  -webkit-tap-highlight-color: transparent;
+}
+:root.touch-phone[data-ui="modern"] :is(.glitch-modal-card, .side-card, .ui-sheet, [role="dialog"]) { max-width: calc(100vw - 8px); box-sizing: border-box; }
+:root.touch-phone[data-ui="modern"] body { overflow-x: hidden; }
+/* —— end TOUCH PANELS —— */
