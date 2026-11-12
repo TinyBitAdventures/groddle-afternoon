@@ -13571,3 +13571,57 @@ html.stage-pinned[data-ui="modern"] header.top-bar { left: calc(var(--sp-5) + va
 }
 .map-icon-tip[hidden] { display: none; }
 /* —— end MAPICONS —— */
+
+/* —— TOUCH —— a phone's controls (js/touch-controls.js; only when the phone gate names a phone,
+   html.touch-phone): the stick bottom left, Jump bottom right, above the pack row and outside the
+   safe area, under every panel (z-hud), so a sheet or a card covers them. */
+.touch-controls {
+  position: absolute; z-index: var(--z-hud);
+  left: 0; right: 0;
+  bottom: calc(var(--pack-live-height, 72px) + env(safe-area-inset-bottom, 0px));
+  height: 0;
+  pointer-events: none;
+  -webkit-user-select: none; user-select: none; -webkit-touch-callout: none;
+}
+body.is-booting .touch-controls { display: none; }
+.touch-stick {
+  position: absolute; bottom: 0;
+  left: max(var(--sp-4), env(safe-area-inset-left, 0px));
+  width: 132px; height: 132px;
+  pointer-events: auto; touch-action: none;
+}
+.touch-stick-base {
+  position: absolute; left: 50%; top: 50%;
+  width: 92px; height: 92px; margin: -46px 0 0 -46px;
+  border-radius: var(--radius-round);
+  background: color-mix(in srgb, var(--surface-card) 38%, transparent);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--surface-card) 70%, transparent), var(--shadow-1);
+  opacity: 0.72;
+  transition: opacity var(--motion-fast);
+}
+.touch-stick.is-held .touch-stick-base { opacity: 1; }
+.touch-stick-knob {
+  position: absolute; left: 50%; top: 50%;
+  width: 44px; height: 44px; margin: -22px 0 0 -22px;
+  border-radius: var(--radius-round);
+  background: var(--surface-card);
+  box-shadow: 0 0 0 1px var(--border-strong), var(--shadow-2);
+}
+.touch-jump {
+  position: absolute; bottom: var(--sp-6);
+  right: max(var(--sp-6), env(safe-area-inset-right, 0px));
+  width: 76px; height: 76px; padding: 0;
+  border: 0; border-radius: var(--radius-round);
+  background: color-mix(in srgb, var(--surface-card) 82%, transparent);
+  color: var(--text);
+  box-shadow: 0 0 0 2px var(--border-strong), var(--shadow-2);
+  font: var(--fw-heavy) var(--fs-base)/var(--lh-none) var(--font-ui);
+  pointer-events: auto; touch-action: none; cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.touch-jump.is-held { background: var(--surface-moss); transform: scale(0.94); }
+@media (prefers-reduced-motion: reduce) {
+  .touch-stick-base { transition: none; }
+  .touch-jump.is-held { transform: none; }
+}
+/* —— end TOUCH —— */

@@ -795,6 +795,7 @@ import { landingY, stackRestY, walkSurfaceY } from './js/walk-surface.js?v=106bf
 import { holdCloseToFloor } from './js/slope-walk.js?v=9af1e505';
 import { JUMP_SPEED, MAX_TICK_FRAMES, WALK_MAX, avatarGround, coastX, frameSteps, stepAvatar, steerAccel, steerX, streetPhysicsExtras } from './js/avatar-step.js?v=43b1182e';
 import { createUserPath, stepUserPath } from './js/user-path.js?v=8880557f';
+import { climbGoalStep, installTouchControls, isPhoneDevice, touchTapPlan } from './js/touch-controls.js?v=48e63295';
 import { FAILED_LINE, inVerbReach, movingLine, verbRange, walkOverEnd, walkOverGoals } from './js/walk-over.js?v=277ab977';
 import { hellBuffDesc, isInHell } from './js/hell.js?v=33923da7';
 import { climbBobY, ladderAnimState, ladderSwap } from './js/ladder-anim.js?v=a8b327a0';
@@ -1852,6 +1853,8 @@ function installPlayerMenu() {
  * phone gate's window.GRODDLE_DEVICE), so a phone tab stays clear of iOS's memory limit.
  * QA: `?density=<n>` caps at n (4 lifts the phone cap), `?density=auto` keeps the device's own.
  */
+/** TOUCH: the phone gate's phone (js/touch-controls.js): touch controls and the upright stage (js/location-view.js). */
+const TOUCH_PHONE = isPhoneDevice(window);
 const RENDER_CAP = resolutionCap({ device: window.GRODDLE_DEVICE, density: new URLSearchParams(location.search).get('density') });
 
 /** Device px per CSS px the art may pick its files by: a capped phone keeps the 1x sheets. */
@@ -2155,7 +2158,8 @@ let streetArrival = null;
 /** Climb state: original Glitch walls and ladders */
 // regrabLock: AvatarController gets on a ladder on an Up/Down key press, not a held key; after leaving
 // one, a still-held Up/Down must not pull the avatar straight back on.
-let climb = { active: false, wall: null, regrabLock: false };
+// goalY (TOUCH, js/touch-controls.js): a tapped ladder climbs to that height with no key held.
+let climb = { active: false, wall: null, regrabLock: false, goalY: null };
 let homeMailboxTarget = null;
 let homeDoorTarget = null;
 let homeReturnTarget = null;
@@ -2532,11 +2536,41 @@ function endUserWalk(reason) {
     finishVerbWalk(w.verbWalk, reason);
     return;
   }
+  // TOUCH: at a tapped ladder, get on and climb to where it was tapped.
+  if (w.ladderGoalY != null && (reason === 'arrived' || reason === 'wall')) climbTappedLadder(w.ladderGoalY);
   // AvatarController.endPath 156-165: beside the player you walked to, their menu opens.
   if (reason === 'arrived' && w.kind === 'player' && w.id && !menuTarget) {
     const them = interactables.find((t) => t?.classId === 'pc_remote' && String(t.playerId) === w.id);
     if (them && withinReach(them, 100)) openVerbMenu(them);
   }
+}
+
+/** TOUCH: on a ladder in reach, get on it and climb toward goalY (handleInput climbGoalStep). */
+function climbTappedLadder(goalY) {
+  const hit = player ? findClimbWallNear(streetWalls, player.x, player.y, 40) : null;
+  if (!hit) return false;
+  if (!climb.active) startClimb(hit);
+  climb.goalY = goalY;
+  setCanvasData('touchClimb', String(Math.round(goalY)));
+  return true;
+}
+
+/**
+ * TOUCH: a phone's tap on the street that picked no thing (the canvas's pointerdown): a ladder
+ * climbs to the tapped height, anything else walks to the tapped x (js/user-path.js).
+ */
+function touchTapStreet(x, y) {
+  if (!player || !state.started) return false;
+  const ladder = findClimbWallNear(streetWalls, x, y, 30);
+  const plan = touchTapPlan(x, y, ladder);
+  setCanvasData('touchTap', `${plan.kind}:${Math.round(plan.x)}`);
+  if (plan.kind === 'ladder') {
+    if (Math.abs(player.x - plan.x) < 28 && climbTappedLadder(plan.goalY)) return true;
+    if (!startUserWalk({ kind: 'point', x: plan.x, y: plan.goalY })) return false;
+    avatarWalk.ladderGoalY = plan.goalY;
+    return true;
+  }
+  return startUserWalk({ kind: 'point', x: plan.x, y: plan.y });
 }
 
 /** handleInput: -1 / 1 while the walk steers left / right, 0 once it is over (it faces then). */
@@ -11831,6 +11865,7 @@ function stopClimb({ jumpOff = false, side = 0, jumpVelocity = JUMP_SPEED, maxSp
   if (!climb.active && !player?.climbing) return;
   climb.active = false;
   climb.wall = null;
+  climb.goalY = null;
   // Every way off (bottom, top ledge, sideways, jump) waits for Up/Down to be
   // released before a ladder can be grabbed again; handleInput clears it.
   climb.regrabLock = true;
@@ -14914,8 +14949,15 @@ function handleInput() {
   const heldSide = keyed ? heldDirection(keys) : 0;
   let left = heldSide < 0;
   let right = heldSide > 0;
-  const up = keyed && (keys.has('ArrowUp') || keys.has('w') || keys.has('W'));
-  const down = keyed && (keys.has('ArrowDown') || keys.has('s') || keys.has('S'));
+  let up = keyed && (keys.has('ArrowUp') || keys.has('w') || keys.has('W'));
+  let down = keyed && (keys.has('ArrowDown') || keys.has('s') || keys.has('S'));
+  // TOUCH: a tapped ladder climbs to its height until a key or the stick takes over.
+  if (climb.active && climb.goalY != null) {
+    const step = climbGoalStep(climb.goalY, player.y, { held: left || right || up || down });
+    if (step === 'up') up = true;
+    else if (step === 'down') down = true;
+    else climb.goalY = null;
+  }
   if ((left || right) && (recentInteractionTarget || hoverTarget)) forgetInteractionFocus();
   if (avatarWalk && !climb.active) {
     const steer = avatarWalkSteer(left || right || up || down);
@@ -32019,8 +32061,20 @@ async function main() {
         return;
       }
       openVerbMenu(best);
+    } else if (TOUCH_PHONE && e.pointerType === 'touch') {
+      // TOUCH: a tap on empty street walks there, or climbs the tapped ladder.
+      touchTapStreet(sx, sy);
     }
   });
+  // TOUCH: the phone's stick and Jump (js/touch-controls.js) hold the same keys a keyboard does.
+  if (TOUCH_PHONE) {
+    installTouchControls({
+      root: document.getElementById('game-root') || document.body,
+      press: (k) => keys.add(k),
+      release: (k) => keys.delete(k),
+      jump: () => queueJump(jumpState, movementNow()),
+    });
+  }
   // RIGHTCLICK (js/world-context-menu.js): a right-click (Ctrl+click on a Mac, a long press on Android)
   // opens the thing's verb menu, as a left click does; on a one-click thing its full menu; on a
   // signpost's arm the post's arms. The browser's menu never opens over the world (js/ui/context-guard.js).
