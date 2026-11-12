@@ -37,8 +37,8 @@
  */
 
 import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=32c58aef';
-import { addItem, countItem, ensureItem, registerItemUse, removeItem } from '../inventory.js?v=60dfc9ca';
-import { MUSICBLOCK_CATALOG, ensureMusicblockItems } from '../musicblocks.js?v=4b2e589f';
+import { addItem, countItem, ensureItem, registerItemUse, removeItem } from '../inventory.js?v=5be47371';
+import { MUSICBLOCK_CATALOG, ensureMusicblockItems } from '../musicblocks.js?v=182d0a4e';
 import { energyMax, loseMood, metabolicGain, moodMax, shiftMetabolic } from '../metabolics.js?v=8504134e';
 import { grantMoodXp } from '../mood-xp.js?v=958e7680';
 import { slugsFromEffects } from '../speech-slugs.js?v=130338f9';

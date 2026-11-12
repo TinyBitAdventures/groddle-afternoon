@@ -34,7 +34,7 @@ import { copyForVerb, copyTag, setCopyTag, takeToolCopy } from '../tools.js?v=5f
 import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=32c58aef';
 import { landingY, walkSurfaceY } from '../walk-surface.js?v=106bfdc5';
 import { displayTopOf, itemstackOverlayPoint, playSheetOverlay } from '../overlay-art.js?v=a6561207';
-import { CUBIMAL_RACE, cubimalArticle, cubimalInfo, cubimalRaceSheet } from '../cubimals.js?v=5e340c94';
+import { CUBIMAL_RACE, cubimalArticle, cubimalInfo, cubimalRaceSheet } from '../cubimals.js?v=abd91c78';
 import {
   CUBIMAL_BATTLE,
   battleStyleOfVerb,

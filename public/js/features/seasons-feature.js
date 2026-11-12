@@ -77,8 +77,8 @@ import { isBatterflyHabitat } from '../animal-husbandry.js?v=aa65a582';
 import { emblemCostFor } from '../shrines.js?v=e2755fac';
 import { rollDropTable } from '../drop-tables.js?v=16e12632';
 import { openNoteView, noteViewOpen } from '../note-view.js?v=eca7de52';
-import { payDrop } from './drops-feature.js?v=faf37e97';
-import { fireflyJarCounts, setFireflyJar } from './resource-nodes-feature.js?v=55fb520d';
+import { payDrop } from './drops-feature.js?v=2cd8ff9b';
+import { fireflyJarCounts, setFireflyJar } from './resource-nodes-feature.js?v=3882cabb';
 import { SEASON_DATA } from '../seasons-data.js?v=b5174bc9';
 import {
   CANDY_CLASSES,

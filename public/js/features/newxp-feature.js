@@ -140,8 +140,8 @@ import { frameTexture, onLoaded, sourceFromUrl, textureFromUrl, whenLoaded } fro
 import { upgradeSource } from '../sprite-hires.js?v=d4cce9f9';
 import { grantMoodXp } from '../mood-xp.js?v=958e7680';
 import { displayTopOf, itemstackOverlayPoint, playPoofIn, playSheetOverlay, poofInAlpha } from '../overlay-art.js?v=a6561207';
-import { HOME_MACHINE } from '../home-ticket.js?v=3739f724';
-import { animalAnchorX, animalAnchorY, createAnimalState } from '../animals.js?v=7e27e9d2';
+import { HOME_MACHINE } from '../home-ticket.js?v=6a19977b';
+import { animalAnchorX, animalAnchorY, createAnimalState } from '../animals.js?v=f44dd15a';
 import {
   AK_ANIMALS,
   AK_BUBBLE,

@@ -34,7 +34,7 @@ import {
 import { mayhemData } from '../tools/build-realtime-mayhem.mjs';
 import { CROWNS_START_POINTS, CROWNS_STREET } from '../public/js/game-of-crowns.js?v=e32f35f5';
 import { OVERLAY_USES } from '../public/js/overlays.js?v=4e81f749';
-import { sharedStreet } from '../public/js/features/realtime-feature.js?v=4fe86726';
+import { sharedStreet } from '../public/js/features/realtime-feature.js?v=c864854a';
 import { HAS_SERVER, serverPath, sitePath, skipWithoutServer, skipWithoutSite } from '../tools/repos.mjs';
 
 const root = join(import.meta.dirname, '..');
@@ -284,7 +284,7 @@ describe('solo has no Math Mayhem', () => {
     assert.doesNotMatch(feature, /placementGroups/, 'no street plan changes, solo or online');
   });
   it('leaves Game of Crowns its arena when no Math Mayhem game holds it', async () => {
-    const { crownsFeature } = await import('../public/js/features/crowns-feature.js?v=c35db685');
+    const { crownsFeature } = await import('../public/js/features/crowns-feature.js?v=cb69905f');
     assert.deepEqual(crownsFeature.labelFor('CROWNS_00000000000000A1'), { street: 'Game of Crowns', hub: '', hubId: 'it_game' });
   });
 });

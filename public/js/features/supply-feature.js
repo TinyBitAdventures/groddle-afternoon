@@ -74,7 +74,7 @@ import {
   clerkOffers,
   completePapers,
   completePapersCheck,
-} from '../bureaucracy.js?v=130394fd';
+} from '../bureaucracy.js?v=bed2faed';
 import { frameTexture, sourceFromUrl } from '../textures.js?v=92ec53cd';
 import { setMetalMakingMusic } from '../sound-moments.js?v=52ad523c';
 import { itemZ } from '../item-bands.js?v=e98b10bc';

@@ -34,8 +34,8 @@
  * cameraEyeballSent.
  */
 
-import { textureFromUrl } from '../textures.js?v=f024bd6a';
-import { OVERLAY_BUBBLE_URL, OVERLAY_USES, overlayBubbleBox, playOverlay } from '../overlays.js?v=605c12ff';
+import { textureFromUrl } from '../textures.js?v=92ec53cd';
+import { OVERLAY_BUBBLE_URL, OVERLAY_USES, overlayBubbleBox, playOverlay } from '../overlays.js?v=4e81f749';
 import { SPEECH_BUBBLE_Z } from '../fx-z.js?v=18dda7e3';
 
 export const CAMERA_FEATURE_ID = 'camera-mode';

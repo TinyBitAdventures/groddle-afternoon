@@ -20,7 +20,7 @@
 
 import { addItem, countItem } from '../inventory.js?v=5be47371';
 import { ensureToolCondition } from '../tools.js?v=5f482998';
-import { MACHINE_SKILLS } from '../machine-rooms.js?v=b1cbd62b';
+import { MACHINE_SKILLS } from '../machine-rooms.js?v=6dc55180';
 import { freezeMachineState, isMachineArt } from '../machine-art.js?v=93e29c2d';
 import { packSlotFor } from '../pack-slot-qa.js?v=1d74bf2d';
 

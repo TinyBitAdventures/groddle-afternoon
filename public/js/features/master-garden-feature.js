@@ -44,10 +44,10 @@ import {
   usePotion,
 } from '../master-garden.js?v=7cb423d9';
 import { rollDropTable } from '../drop-tables.js?v=16e12632';
-import { payDrop } from './drops-feature.js?v=faf37e97';
+import { payDrop } from './drops-feature.js?v=2cd8ff9b';
 import { textureFromUrl } from '../textures.js?v=92ec53cd';
 import { playPotionBottle } from '../potion-bottle-fx.js?v=85e8687c';
-import { copyFromLedger, keepsCopies, verbCopy } from '../copy-charges.js?v=4ffa1c1e';
+import { copyFromLedger, keepsCopies, verbCopy } from '../copy-charges.js?v=627150dc';
 import { gardenGrowModifier } from '../imagination-effects.js?v=70169933';
 
 export const MASTER_GARDEN_FEATURE_ID = 'master-garden';

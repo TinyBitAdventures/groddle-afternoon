@@ -115,9 +115,9 @@ import {
 import { itemVerbAchievementCounters } from '../item-verbs.js?v=1e20fa7d';
 import { copyChargesLeft, copyFromLedger, keepsCopies, spendCopyCharge, verbCopy } from '../copy-charges.js?v=627150dc';
 import { migrateClassValue } from '../tools.js?v=5f482998';
-import { DEAD_TRANT_CLASSES } from '../patches.js?v=61abc5fe';
-import { COPY as SHARED_PATCH_COPY } from '../shared-patches.js?v=ac409c57';
-import { hellFeature } from './hell-feature.js?v=630ef674';
+import { DEAD_TRANT_CLASSES } from '../patches.js?v=d63423c9';
+import { COPY as SHARED_PATCH_COPY } from '../shared-patches.js?v=d74846b0';
+import { hellFeature } from './hell-feature.js?v=5aadb484';
 import { grantMoodXp } from '../mood-xp.js?v=958e7680';
 import { displayTopOf, playSheetOverlay } from '../overlay-art.js?v=a6561207';
 import { pcOverlayPoint, playItemOverlay } from '../item-overlay.js?v=97ed2ba0';

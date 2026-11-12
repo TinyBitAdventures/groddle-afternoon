@@ -51,10 +51,10 @@
 
 import { ITEM_CATALOG, addItem, countItem, ensureItem, itemIcon, removeItem } from '../inventory.js?v=5be47371';
 import { canUseTool, getToolCondition, setToolRemaining } from '../tools.js?v=5f482998';
-import { MAKING_TOOL_SKILLS, listRecipes, recipeKnown, TOOL_CATALOG } from '../making.js?v=86fd3231';
-import { listDroppedStacks } from '../world-items.js?v=da2bb7a1';
-import { BACK_YARD_GROUND_Y, homesFeature } from './homes-feature.js?v=b7791aed';
-import { cabinetTake, isCabinetClass } from '../home-storage.js?v=121f1897';
+import { MAKING_TOOL_SKILLS, listRecipes, recipeKnown, TOOL_CATALOG } from '../making.js?v=2cd473f3';
+import { listDroppedStacks } from '../world-items.js?v=792e1606';
+import { BACK_YARD_GROUND_Y, homesFeature } from './homes-feature.js?v=05d8f43e';
+import { cabinetTake, isCabinetClass } from '../home-storage.js?v=b0225465';
 import {
   CRAFTYBOT,
   CRAFTYBOT_BOX,

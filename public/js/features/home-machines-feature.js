@@ -93,11 +93,11 @@ import {
   expireSolo,
   tankOf,
   TAKEN_KEEP,
-} from '../home-machines.js?v=c2ef4d43';
-import { CALL_PLAYER_LINES, MACHINE_HITBOX, MACHINE_SKILLS, collectLine, machineJobMs, machineMadeLine, runningSoundKey, takeJobIngredients } from '../machine-rooms.js?v=b1cbd62b';
+} from '../home-machines.js?v=f5409d27';
+import { CALL_PLAYER_LINES, MACHINE_HITBOX, MACHINE_SKILLS, collectLine, machineJobMs, machineMadeLine, runningSoundKey, takeJobIngredients } from '../machine-rooms.js?v=6dc55180';
 import { MACHINE_ART_SHEETS, LOW_FUEL_BUBBLE_MS, LOW_FUEL_LINE, isLowFuel, machineFrame, machineSheetDef, roomMachineState } from '../machine-art.js?v=93e29c2d';
-import { FUEL_CELL, FUEL_PER_CELL, MAX_FUEL } from '../machines.js?v=39290298';
-import { ITEM_CATALOG, addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=60dfc9ca';
+import { FUEL_CELL, FUEL_PER_CELL, MAX_FUEL } from '../machines.js?v=301212d7';
+import { ITEM_CATALOG, addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=5be47371';
 import { receiveToolCopy, takeToolCopy } from '../tools.js?v=5f482998';
 import { RECIPE_CATALOG } from '../making.js?v=2cd473f3';
 import { getSkillCatalog } from '../content-catalogs.js?v=10b118dd';
@@ -106,8 +106,8 @@ import { readVisitScene } from '../neighbours-mp.js?v=7dc15891';
 import { saveStore } from '../save-store.js?v=89422a9c';
 import { textureFromUrl } from '../textures.js?v=92ec53cd';
 import { createSheetLoader } from '../sprite-sheets.js?v=32c58aef';
-import { STREET_GROUND_Y, homesFeature } from './homes-feature.js?v=b7791aed';
-import { payAltarBonus } from './machine-rooms-feature.js?v=66ad74aa';
+import { STREET_GROUND_Y, homesFeature } from './homes-feature.js?v=05d8f43e';
+import { payAltarBonus } from './machine-rooms-feature.js?v=4c3db7ff';
 import { worldToScreen } from '../street-model.js?v=b6cb6a4e';
 import { nearestSurfaceY } from '../walk-surface.js?v=106bfdc5';
 

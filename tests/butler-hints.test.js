@@ -13,11 +13,11 @@ import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { BUTLER_HINTS, createButlerState, pickHint } from '../public/js/butler.js?v=0a345ccc';
-import { ownerHintCtx } from '../public/js/features/butler-feature.js?v=002f6959';
-import { countHouseVisit, homesFeature } from '../public/js/features/homes-feature.js?v=b7791aed';
-import { homeTowerFeature, towerApi } from '../public/js/features/home-tower-feature.js?v=daf014b6';
-import { slashCommandsFeature } from '../public/js/features/slash-commands-feature.js?v=82384917';
+import { BUTLER_HINTS, createButlerState, pickHint } from '../public/js/butler.js?v=1370b711';
+import { ownerHintCtx } from '../public/js/features/butler-feature.js?v=109ec459';
+import { countHouseVisit, homesFeature } from '../public/js/features/homes-feature.js?v=05d8f43e';
+import { homeTowerFeature, towerApi } from '../public/js/features/home-tower-feature.js?v=11f8941a';
+import { slashCommandsFeature } from '../public/js/features/slash-commands-feature.js?v=1979f378';
 import { createFeatureHost } from '../public/js/feature-host.js?v=06bb8b74';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
