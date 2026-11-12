@@ -1,0 +1,50 @@
+{
+  "note": "The words players read in the Made for Groddle section of /restoration/ (tools/made-art/build-data.mjs), one piece per entry of tools/provenance/made-sprites.json. In facts, {tool} is the provenance's tool, {overlap} the outline overlap its cut records, {w} and {h} the original's size in pixels.",
+  "pieces": [
+    {
+      "id": "quest_book_award",
+      "name": "Quest book",
+      "caption": "The open book on the card you see when you finish a quest. Tiny Speck drew it only {w} by {h} pixels, which turned soft and blurry when the card showed it large, so it was redrawn bigger to match the original as closely as possible.",
+      "display": { "w": 258, "h": 174 },
+      "image": {
+        "label": "Redrawn for Groddle",
+        "alt": "The redrawn quest book: an open book with cream pages, a red cover and an orange bookmark, sharp at this size."
+      },
+      "original": {
+        "file": "public/assets/ui/quest-book.webp",
+        "kind": "original",
+        "label": "Tiny Speck's original, {w} by {h} pixels, shown at the same size",
+        "alt": "Tiny Speck's quest book, enlarged so its pixels show: the same open book, blocky and soft.",
+        "pixelated": true
+      },
+      "facts": [
+        { "label": "How it was made", "text": "Redrawn by an image model ({tool}) under Austin's direction, with Tiny Speck's own {w} by {h} book enlarged twelve times as the guide." },
+        { "label": "How it was checked", "text": "Shrunk back down to {w} by {h} pixels, its outline overlaps the original's by {overlap}." },
+        { "label": "In the game", "text": "The card for a finished quest in the Modern look. The Classic look keeps Tiny Speck's original book." }
+      ]
+    },
+    {
+      "id": "npc_fire_dragon_walk",
+      "name": "Fire Dragon",
+      "caption": "The first animal made for Groddle rather than restored: a small fire dragon that roams a street and can be petted. It is not from Glitch, so there was no original to copy. It was drawn in the style of Tiny Speck's animals and walks with the Piggy's stride.",
+      "display": { "w": 240, "h": 152 },
+      "image": {
+        "label": "The Fire Dragon's walk",
+        "alt": "A small orange fire dragon with a flame on its tail, walking to the right.",
+        "sheet": { "cols": 8, "rows": 1, "frames": 8, "fps": 10 }
+      },
+      "original": {
+        "file": "public/assets/sprites/npc_piggy__x1_walk_png_1354829432@3x.webp",
+        "kind": "guide",
+        "label": "What it was made from: Tiny Speck's Piggy walk, the stride guide",
+        "alt": "Tiny Speck's Piggy, mid step.",
+        "sheet": { "cols": 8, "rows": 3, "frames": 24 }
+      },
+      "facts": [
+        { "label": "How it was made", "text": "Drawn by an image model ({tool}) under Austin's direction. Its look started from Tiny Speck's Piggy and Chicken walks, and its eight steps follow every third frame of the Piggy's walk." },
+        { "label": "How it was checked", "text": "Austin picked this walk, the third attempt at it. Each of its frames is lined up on the dragon's snout and feet, so the steps hold steady as it walks." },
+        { "label": "In the game", "text": "On streets the level builder gives them, up to three to a street. Each one can be petted once a game day." }
+      ]
+    }
+  ]
+}

@@ -75,8 +75,8 @@ describe('Groddle on Minn (groddle-afternoon-site, a block theme that is also an
     for (const d of dirs) {
       const type = JSON.parse(readFileSync(join(ext, 'blocks', d, 'block.json'), 'utf8'));
       assert.equal(type.name, `groddle/${d}`);
-      // The Known gaps list is its own page's block (src/RestorationGaps.php, tests/gaps-page.test.js).
-      if (d.startsWith('restoration-') && d !== 'restoration-gaps') assert.match(restoration, new RegExp(`\\$section\\('${d.slice('restoration-'.length)}'`), d);
+      // The Known gaps list is its own page's block (src/RestorationGaps.php, tests/gaps-page.test.js); Made for Groddle has its own drawer (src/RestorationMade.php, tests/made-art.test.js).
+      if (d.startsWith('restoration-') && d !== 'restoration-gaps' && d !== 'restoration-made') assert.match(restoration, new RegExp(`\\$section\\('${d.slice('restoration-'.length)}'`), d);
       else assert.match(sources, new RegExp(`\\$minn->block\\('blocks/${d}'`), d);
       if (type.parent) assert.ok(declared.includes(type.parent[0]), `${d}'s parent is a declared block`);
       if (type.allowedBlocks) assert.deepEqual(type.example.innerBlocks.map((b) => b.name), type.allowedBlocks, `${d} inserts with a child to edit`);
@@ -94,7 +94,7 @@ describe('Groddle on Minn (groddle-afternoon-site, a block theme that is also an
     for (const d of sections) assert.equal(content.split(`<!-- wp:groddle/${d}`).length - 1, 1, `${d} is on the page once`);
     // Every jump link lands on a band, each band's heading carries the id its section is labelled by.
     const bands = [...content.matchAll(/<section class="wp-block-group band[^"]*" id="([a-z]+)">/g)].map((m) => m[1]);
-    assert.deepEqual(bands, ['street', 'systems', 'numbers', 'rooms', 'designers', 'seasons', 'recent', 'honest']);
+    assert.deepEqual(bands, ['street', 'systems', 'numbers', 'rooms', 'designers', 'seasons', 'recent', 'honest', 'made']);
     for (const [, id] of content.matchAll(/<a href="#([a-z]+)">/g)) assert.ok(bands.includes(id), id);
     for (const id of bands) assert.match(content, new RegExp(`<h2 class="wp-block-heading" id="${id}-h">`));
     // The page is published at /restoration/ and wins over the built file there; its template is declared.

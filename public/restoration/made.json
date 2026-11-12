@@ -1,0 +1,107 @@
+{
+  "note": "Written by tools/made-art/build-data.mjs from tools/provenance/made-sprites.json and tools/made-art/pieces.json. Edit those, never this file.",
+  "pieces": [
+    {
+      "id": "quest_book_award",
+      "anchor": "made-quest-book",
+      "name": "Quest book",
+      "made": "2026-11-12",
+      "madeLabel": "12 November 2026",
+      "caption": "The open book on the card you see when you finish a quest. Tiny Speck drew it only 86 by 58 pixels, which turned soft and blurry when the card showed it large, so it was redrawn bigger to match the original as closely as possible.",
+      "display": {
+        "w": 258,
+        "h": 174
+      },
+      "image": {
+        "src": "/assets/ui/quest-book-solid.webp",
+        "w": 516,
+        "h": 348,
+        "label": "Redrawn for Groddle",
+        "alt": "The redrawn quest book: an open book with cream pages, a red cover and an orange bookmark, sharp at this size."
+      },
+      "original": {
+        "src": "/assets/ui/quest-book.webp",
+        "w": 86,
+        "h": 58,
+        "kind": "original",
+        "alt": "Tiny Speck's quest book, enlarged so its pixels show: the same open book, blocky and soft.",
+        "pixelated": true,
+        "label": "Tiny Speck's original, 86 by 58 pixels, shown at the same size"
+      },
+      "facts": [
+        {
+          "label": "How it was made",
+          "text": "Redrawn by an image model (GPT Image 2.6 Sunburst) under Austin's direction, with Tiny Speck's own 86 by 58 book enlarged twelve times as the guide."
+        },
+        {
+          "label": "How it was checked",
+          "text": "Shrunk back down to 86 by 58 pixels, its outline overlaps the original's by 96%."
+        },
+        {
+          "label": "In the game",
+          "text": "The card for a finished quest in the Modern look. The Classic look keeps Tiny Speck's original book."
+        },
+        {
+          "label": "Licence",
+          "text": "Dedicated to the public domain under CC0 1.0, like the Tiny Speck art it comes from."
+        }
+      ]
+    },
+    {
+      "id": "npc_fire_dragon_walk",
+      "anchor": "made-fire-dragon",
+      "name": "Fire Dragon",
+      "made": "2026-11-02",
+      "madeLabel": "2 November 2026",
+      "caption": "The first animal made for Groddle rather than restored: a small fire dragon that roams a street and can be petted. It is not from Glitch, so there was no original to copy. It was drawn in the style of Tiny Speck's animals and walks with the Piggy's stride.",
+      "display": {
+        "w": 240,
+        "h": 152
+      },
+      "image": {
+        "src": "/assets/sprites/made/fire-dragon/npc_fire_dragon_walk@3x.webp",
+        "w": 360,
+        "h": 228,
+        "sheet": {
+          "cols": 8,
+          "rows": 1,
+          "frames": 8,
+          "fps": 10
+        },
+        "label": "The Fire Dragon's walk",
+        "alt": "A small orange fire dragon with a flame on its tail, walking to the right."
+      },
+      "original": {
+        "src": "/assets/sprites/npc_piggy__x1_walk_png_1354829432@3x.webp",
+        "w": 264,
+        "h": 186,
+        "sheet": {
+          "cols": 8,
+          "rows": 3,
+          "frames": 24
+        },
+        "kind": "guide",
+        "alt": "Tiny Speck's Piggy, mid step.",
+        "label": "What it was made from: Tiny Speck's Piggy walk, the stride guide"
+      },
+      "facts": [
+        {
+          "label": "How it was made",
+          "text": "Drawn by an image model (GPT Image 2.5 Sunburst) under Austin's direction. Its look started from Tiny Speck's Piggy and Chicken walks, and its eight steps follow every third frame of the Piggy's walk."
+        },
+        {
+          "label": "How it was checked",
+          "text": "Austin picked this walk, the third attempt at it. Each of its frames is lined up on the dragon's snout and feet, so the steps hold steady as it walks."
+        },
+        {
+          "label": "In the game",
+          "text": "On streets the level builder gives them, up to three to a street. Each one can be petted once a game day."
+        },
+        {
+          "label": "Licence",
+          "text": "Dedicated to the public domain under CC0 1.0, like the Tiny Speck art it comes from."
+        }
+      ]
+    }
+  ]
+}

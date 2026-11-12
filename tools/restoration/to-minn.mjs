@@ -24,6 +24,16 @@ export const group = (tag, cls, id, inner) => block('group', { ...(tag === 'div'
 const data = (name, attrs) => `<!-- wp:groddle/restoration-${name}${attrs ? ' ' + attrJson(attrs) : ''} /-->`;
 const band = (id, alt, title, inner) => group('section', `band${alt ? ' band-alt' : ''}`, id, [group('div', 'wrap', null, [h(2, title, { id: `${id}-h` }), ...inner])]);
 
+/**
+ * The Made for Groddle band: art made for the remake rather than restored,
+ * drawn from made.json (tools/made-art); tools/made-art/to-minn.mjs adds it
+ * to a page made before it.
+ */
+export const madeBand = () => band('made', true, 'Made for Groddle', [
+  p('section-lead', 'Almost everything in Groddle Afternoon is Tiny Speck’s own art, which they gave to everyone under CC0. A few pieces were made for the remake: where nothing usable survived, where the original was too small to show well, or where the game gained something new. Each one is listed here, beside what it came from, with how it was made.'),
+  data('made'),
+]);
+
 /** The page's blocks: the built page's words, around its data sections. */
 export function restorationContent() {
   const jump = [
@@ -86,6 +96,7 @@ export function restorationContent() {
         group('div', '', null, [h(3, 'How to read the tags'), data('legend')]),
       ]),
     ]),
+    madeBand(),
     group('div', 'wrap report-foot', null, [
       data('stamp'),
       p('', 'Screenshots are from the remake itself; recordings were used only as reference.'),
