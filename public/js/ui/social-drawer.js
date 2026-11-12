@@ -83,6 +83,12 @@
  * every conversation and thread (a moderator's purge: chat_purged, features/chat-purge-feature.js).
  * Nothing in the drawer reports an IM: no IM's words go to moderation (Austin 2026-11-09).
  *
+ * FIND (#223, Friendly 2026-11-12): the Activity tab has a magnifying glass in the drawer's head. It opens a
+ * search box over the log ([data-social-find-bar], #social-find-input) that shows only the entries whose
+ * words hold every word typed (any case, accents folded: activityMatches); Esc in the box clears it and
+ * closes it, and the keys go back to the game. Leaving Activity clears it too. Only the drawer's own
+ * Activity log is searched (Modern, and Classic where the drawer's Activity view is the pane).
+ *
  * QA: canvas data socialThread (chat|key of the thread open, or ''), socialThreadReplies (how many it
  * shows), socialOpen (open|rail), socialTab (the tab selected: activity, local, global,
  * buddies or chats), socialChat (the conversation open in Chats, or ''), socialTabs (the row),
@@ -187,8 +193,32 @@ const ICONS = {
   trash: '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 6h12M8 6V4.5h4V6M5.5 6l.8 10h7.4l.8-10M8.5 9v4.5M11.5 9v4.5"/></svg>',
   back: '<svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="m7.5 3-3 3 3 3"/></svg>',
   buddies: '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true" focusable="false"><circle cx="9" cy="7" r="3"/><path d="M3.5 16.5c.6-3 2.8-4.7 5.5-4.7 1.2 0 2.3.3 3.2 1M15 11.5v5M12.5 14h5"/></svg>',
+  find: '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" aria-hidden="true" focusable="false"><circle cx="8.5" cy="8.5" r="5"/><path d="m12.3 12.3 4.2 4.2"/></svg>',
   send: '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M3.5 10 16.5 4l-4 12-2.5-5z"/></svg>',
 };
+
+/** #223: the Activity search's words. */
+export const FIND_TEXT = Object.freeze({
+  open: 'Search Activity',
+  label: 'Search Activity',
+  placeholder: 'Search Activity',
+  none: (q) => `Nothing in Activity matches “${q}”.`,
+});
+
+/** Lower case, accents folded, tags and runs of space taken out: what the Activity search compares. */
+export function foldFind(s) {
+  return String(s ?? '').replace(/<[^>]*>/g, ' ').replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#39;/g, "'")
+    .toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\s+/g, ' ').trim();
+}
+
+/** #223: whether an Activity entry holds every word of the query (its words, or its markup's text). An empty query matches all. */
+export function activityMatches(entry, query) {
+  const words = foldFind(query).split(' ').filter(Boolean);
+  if (!words.length) return true;
+  if (!entry || entry.sep) return false;
+  const hay = foldFind(`${entry.text ?? ''} ${entry.html ?? ''}`);
+  return words.every((w) => hay.includes(w));
+}
 
 /** "9:31 AM": the scrollback's time lines and the Activity entries' times. */
 export function clockLabel(ms) {
@@ -591,7 +621,14 @@ export function mountSocialDrawer({
   const title = el('h2', { id: 'social-title', class: 'social-title' }, online ? 'Social' : 'Activity');
   const collapseBtn = el('button', { type: 'button', class: 'social-x', 'data-social-collapse': '', 'aria-controls': 'social-body', 'aria-expanded': 'true' });
   collapseBtn.innerHTML = ICONS.collapse;
-  head.append(title, collapseBtn);
+  // #223: the Activity search's magnifying glass (shown on Activity only) and its box, over the log.
+  const findBtn = el('button', { type: 'button', class: 'social-x social-find-btn', 'data-social-find': '', 'aria-controls': 'social-find', 'aria-expanded': 'false', 'aria-label': FIND_TEXT.open, title: FIND_TEXT.open });
+  findBtn.innerHTML = ICONS.find;
+  const findBar = el('div', { id: 'social-find', class: 'social-find', role: 'search', 'data-social-find-bar': '' });
+  const findInput = el('input', { id: 'social-find-input', class: 'social-find-input', type: 'search', autocomplete: 'off', spellcheck: 'false', placeholder: FIND_TEXT.placeholder, 'aria-label': FIND_TEXT.label, 'data-social-find-input': '' });
+  findBar.innerHTML = ICONS.find;
+  findBar.append(findInput);
+  head.append(title, findBtn, collapseBtn);
   const status = el('div', { class: 'social-status', 'data-social-status': '' });
   const presence = el('button', { type: 'button', class: 'social-presence', 'data-social-presence': '' });
   /** The realtime feature's state pill and its Play here button live here. */
@@ -629,6 +666,8 @@ export function mountSocialDrawer({
   if (!online) status.hidden = true;
 
   // —— State ——
+  /** #223: the Activity search: open or not, and what it holds. */
+  let findOpen = false;
   // `tab` is what the view shows: a fixed tab, CHATS_TAB (the list) or a conversation (in Chats).
   const CHATS_VIEW = Object.freeze({ id: CHATS_TAB, kind: 'chats', label: 'Chats', compose: false, header: null, lines: [] });
   function current() {
@@ -1140,7 +1179,12 @@ export function mountSocialDrawer({
     const atEnd = log.scrollHeight - log.scrollTop - log.clientHeight < 24;
     renderConvHead(t);
     const th = thread && thread.chat === t.id ? thread : null;
-    const headNode = th ? threadHead : t.header;
+    // #223: the search belongs to Activity: anywhere else it is cleared and its glass hidden.
+    const finding = t.kind === 'activity' && !th;
+    if (!finding && findOpen) shutFind();
+    findBtn.hidden = !finding;
+    findBtn.setAttribute('aria-expanded', findOpen ? 'true' : 'false');
+    const headNode = th ? threadHead : finding && findOpen ? findBar : t.header;
     if (th) threadBack.setAttribute('aria-label', THREAD_TEXT.backLabel(t.label));
     // The same head stays put (moving it would drop the keyboard from a button in it).
     if (viewHead.firstChild !== headNode || viewHead.childNodes?.length > 1) viewHead.replaceChildren(...(headNode ? [headNode] : []));
@@ -1154,10 +1198,13 @@ export function mountSocialDrawer({
       nodes = own;
       log.setAttribute('aria-live', 'polite');
     } else if (t.kind === 'activity') {
-      const entries = notifier.entries;
+      const query = findOpen ? findInput.value.trim() : '';
+      const entries = query ? notifier.entries.filter((e) => activityMatches(e, query)) : notifier.entries;
       nodes = entries.length
         ? keyedRows(entries, { atOf: (e) => e.at, keyOf: entryKey, make: activityNode, cache: cacheFor('log') })
-        : [el('p', { class: 'social-empty' }, t.empty)];
+        : [el('p', { class: 'social-empty', 'data-social-find-none': query ? '' : null }, query ? FIND_TEXT.none(query) : t.empty)];
+      if (query) log.dataset.socialFind = String(entries.length);
+      else delete log.dataset.socialFind;
       log.setAttribute('aria-live', 'off');
     } else if (t.kind === 'buddies') {
       nodes = renderBuddies();
@@ -1529,6 +1576,38 @@ export function mountSocialDrawer({
     e.preventDefault();
     // Onto Chats from another tab: the list (a conversation you left open there is a click away).
     select(all[to], { focus: true });
+  });
+
+  // #223: the Activity search. The glass opens the box (the caret in it) or, open, clears and closes it;
+  // typing filters the log; Esc clears and closes it and gives the keys back to the game.
+  function shutFind() {
+    findOpen = false;
+    findInput.value = '';
+    delete log.dataset.socialFind;
+  }
+  findBtn.addEventListener('click', () => {
+    if (findOpen) {
+      shutFind();
+      render();
+      return;
+    }
+    findOpen = true;
+    render();
+    findInput.focus?.({ preventScroll: true });
+  });
+  findInput.addEventListener('input', () => {
+    log.dataset.jump = '1';
+    render();
+  });
+  findInput.addEventListener('keydown', (e) => {
+    if (e.key !== 'Escape') return;
+    e.preventDefault?.();
+    e.stopPropagation();
+    shutFind();
+    log.dataset.jump = '1';
+    render();
+    findInput.blur?.();
+    findBtn.blur?.();
   });
 
   // Keys pressed in the drawer stay in it (a focused tab or button never walks the avatar),

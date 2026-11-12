@@ -10397,6 +10397,14 @@ button.social-buddy-what { margin: 0; padding: 0; border: 0; background: none; c
   scrollbar-width: thin;
 }
 .social-drawer #local-chat-input::placeholder { color: var(--text-muted); opacity: 1; }
+/* #223: the Activity search (js/ui/social-drawer.js FIND): a glass in the head, a box over the log. */
+.social-find-btn[hidden] { display: none; }
+.social-find-btn[aria-expanded="true"] { background: var(--surface-parchment); color: var(--text); }
+.social-find { position: relative; display: flex; align-items: center; padding-bottom: var(--sp-2); }
+.social-find > svg { position: absolute; left: var(--sp-4); width: 15px; height: 15px; color: var(--text-muted); pointer-events: none; }
+.social-find-input { flex: 1 1 auto; box-sizing: border-box; min-width: 0; height: 32px; margin: 0; padding: 0 var(--sp-4) 0 calc(var(--sp-4) + 22px); border: 1px solid var(--border-strong); border-radius: var(--radius-pill); background: var(--surface-bright); color: var(--text); font: inherit; font-size: var(--fs-md); }
+.social-find-input::placeholder { color: var(--text-muted); opacity: 1; }
+.social-find-input:focus-visible { outline: none; border-color: var(--focus, var(--c-sky-57)); }
 .social-drawer #local-chat-input:focus-visible { border-color: var(--focus, var(--c-sky-57)); }
 .social-drawer #local-chat-form .social-send {
   display: grid;

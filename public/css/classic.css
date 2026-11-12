@@ -3127,6 +3127,18 @@
 :root[data-ui="classic"] .top-bar #more-list a.chrome-btn { font-family: var(--font-classic-body); color: var(--c-classic-text); }
 /* === end support-link === */
 
+/* === activity-find (lane) === */
+/* #223: the Activity search as a 2012 field: the chat input's box, the glass in the pane's title row. */
+:root[data-ui="classic"] .social-drawer .social-find-btn { width: calc(22 * var(--cu)); height: calc(22 * var(--cu)); border-radius: var(--radius-xs); color: var(--c-classic-link); }
+:root[data-ui="classic"] .social-drawer .social-find-btn svg { width: calc(14 * var(--cu)); height: calc(14 * var(--cu)); }
+:root[data-ui="classic"] .social-drawer .social-find-btn:is(:hover, [aria-expanded="true"]) { background: var(--c-classic-input-hi); color: var(--c-classic-title); }
+:root[data-ui="classic"] .social-drawer .social-find { padding: calc(4 * var(--cu)) 0; }
+:root[data-ui="classic"] .social-drawer .social-find > svg { left: calc(5 * var(--cu)); width: calc(12 * var(--cu)); height: calc(12 * var(--cu)); color: var(--c-classic-offline); }
+:root[data-ui="classic"] .social-drawer .social-find-input { height: calc(25 * var(--cu)); padding: 0 calc(5 * var(--cu)) 0 calc(21 * var(--cu)); border: 1px solid var(--c-classic-input-border); border-radius: 0; background: var(--c-classic-input); color: var(--c-classic-text); font: var(--fs-classic-body)/var(--lh-normal) var(--font-classic-body); }
+:root[data-ui="classic"] .social-drawer .social-find-input:is(:hover, :focus) { border-color: var(--c-classic-input-hi-border); background: var(--c-classic-input-hi); }
+:root[data-ui="classic"] .social-drawer .social-find-input:focus-visible { outline: none; box-shadow: 0 0 0 2px var(--c-classic-focus); }
+/* === end activity-find === */
+
 /* == TICKETS == Reports (js/ui/reports-sheet.js, online only) as a 2012 window: the Quest Log's frame
    (Dialog.as, WindowBorder.as, BigDialog.as) centred in the viewport, the white head with its 20 px
    title and the red cross, the grey well between two rules, the white footer with the minor buttons;
