@@ -75,8 +75,10 @@ describe('the game wiring', () => {
   });
 
   it('the main button still acts; a right press or a Mac Ctrl+click never does', () => {
-    const at = game.indexOf("app.canvas.addEventListener('pointerdown', (e) => {");
-    const press = game.slice(at, game.indexOf('\n  });', at));
+    // The canvas's pointerdown hands the press to worldPress (a phone's pinch may hold it first).
+    assert.match(game, /app\.canvas\.addEventListener\('pointerdown', \(e\) => \{[\s\S]{0,120}worldPress\(e\);/);
+    const at = game.indexOf('function worldPress(e) {');
+    const press = game.slice(at, game.indexOf('\n  }\n', at));
     assert.match(press, /if \(e\.pointerType === 'mouse' && e\.button !== 0\) return;/);
     assert.match(press, /if \(e\.pointerType === 'mouse' && e\.ctrlKey && MAC_CTRL_CLICK\) return;/);
     assert.match(press, /e\.timeStamp === worldCtxMenu\?\.closedByPressAt\(\)/);

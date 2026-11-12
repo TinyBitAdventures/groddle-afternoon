@@ -122,7 +122,9 @@ describe('held keys (report 23)', () => {
   });
 
   it('a right or middle click does nothing to the world (BootStrap.as 38-55)', () => {
-    assert.match(game, /app\.canvas\.addEventListener\('pointerdown', \(e\) => \{\n[^\n]*\n[\s\S]{0,300}if \(e\.pointerType === 'mouse' && e\.button !== 0\) return;/);
+    // The canvas's pointerdown hands a press to worldPress (a phone's pinch may hold it first, js/touch-pinch.js).
+    assert.match(game, /app\.canvas\.addEventListener\('pointerdown', \(e\) => \{[\s\S]{0,120}worldPress\(e\);/);
+    assert.match(game, /function worldPress\(e\) \{\n[^\n]*\n[\s\S]{0,300}if \(e\.pointerType === 'mouse' && e\.button !== 0\) return;/);
   });
 });
 

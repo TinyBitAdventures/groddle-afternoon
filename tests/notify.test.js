@@ -401,7 +401,7 @@ describe('big moments wait behind dialogs and panels (screen queue)', () => {
     for (const re of [
       /logMoment\(`Badge earned: /,
       /logMoment\(\n\s+`Quest complete: /,
-      /logMoment\(activity\);\n\s+enqueueAward\(\{\n\s+kind: 'level'/,
+      /logMoment\(activity\);\n[\s\S]{0,600}?enqueueAward\(\{\n\s+kind: 'level'/,
       /logMoment\(skillLearnedActivity\(/,
       /logMoment\(`The Shrine grants you an Emblem/,
     ]) assert.match(game, re);

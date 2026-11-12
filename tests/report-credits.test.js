@@ -304,7 +304,7 @@ describe('the site keeps a score per report (groddle-afternoon-site)', { skip: s
 
   it('styles the board from the site\'s tokens, both themes, 1440 and 390 wide', () => {
     const css = src('style.css');
-    const ours = css.slice(css.indexOf('/* The testers board'));
+    const ours = css.slice(css.indexOf('/* The testers board'), css.indexOf('/* The Known gaps page') > 0 ? css.indexOf('/* The Known gaps page') : undefined); // later pages' own sections follow
     assert.ok(ours.length > 1000);
     const tokens = new Set([...readFileSync(join(root, 'public/restoration/restoration.css'), 'utf8').matchAll(/(--[a-z-]+):/g)].map((m) => m[1]));
     for (const [, name] of ours.matchAll(/var\((--[a-z-]+)/g)) assert.ok(tokens.has(name), name);

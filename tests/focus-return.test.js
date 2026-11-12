@@ -57,7 +57,7 @@ test('installed: a frame after the click, a control still holding focus is blurr
 
 test('game.js installs it once, before the top bar', () => {
   const game = readFileSync(join(import.meta.dirname, '../public/game.js'), 'utf8');
-  assert.match(game, /installFocusReturn\(document\);\n\s+installTopBar\(document,/);
+  assert.match(game, /installFocusReturn\(document\);\n(?:[^\n]*\n){0,4}\s+installTopBar\(document,/);
 });
 
 // Austin 2026-11-03: click Mute in the Sound popover, and Space toggled it again instead of jumping.

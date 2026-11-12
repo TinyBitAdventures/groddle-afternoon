@@ -164,7 +164,7 @@ describe('the site draws the ledger and the shrine (groddle-afternoon-site src/C
 
   it('styles it from the site\'s tokens, both themes, and its art from the game', { skip: skipWithoutSite }, () => {
     const css = readFileSync(sitePath('style.css'), 'utf8');
-    const ours = css.slice(css.indexOf('/* The Contribute page'));
+    const ours = css.slice(css.indexOf('/* The Contribute page'), css.indexOf('/* The Known gaps page') > 0 ? css.indexOf('/* The Known gaps page') : undefined); // later pages' own sections follow
     assert.ok(ours.length > 2000);
     const tokens = new Set([...readFileSync(join(root, 'public/restoration/restoration.css'), 'utf8').matchAll(/(--[a-z-]+):/g)].map((m) => m[1]));
     const local = new Set(['--u', '--x', '--b', '--w', '--fw', '--fh', '--sheet']);
