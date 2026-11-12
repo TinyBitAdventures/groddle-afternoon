@@ -452,12 +452,13 @@ import {
   getBuffItemInfo,
   listBuffItemsInPack,
   tickBuffs,
+  resumeBuffsAfterAway,
   buffPhysics,
   buffedRandom,
   formatBuffRemaining,
   consumeRewardBuff,
   studyBuffBlockReason,
-} from './js/buffs.js?v=819cb342';
+} from './js/buffs.js?v=fd309a67';
 import { grantMoodXp, moodXpMultiplierFor, setMoodXpEnv } from './js/mood-xp.js?v=958e7680';
 import {
   loadContentCatalogs,
@@ -14690,6 +14691,9 @@ function persistentSystems() {
   };
 }
 
+/** Buff events from the time away (rehydrateSavedBuffs), shown with the first frame's. */
+let bootBuffEvents = [];
+
 function rehydrateSavedBuffs() {
   const catalog = getBuffCatalog();
   const now = Date.now();
@@ -14705,6 +14709,9 @@ function rehydrateSavedBuffs() {
       row.nextTickAt = Math.max(now, row.appliedAt || now) + def.tickDuration * 1000;
     }
   }
+  // inc_buffs.js buffs_login: frozen buffs carry on, offline ones fire what they missed and end
+  // (js/buffs.js resumeBuffsAfterAway); their lines show on the first frame.
+  bootBuffEvents = resumeBuffsAfterAway(buffState, pc, now);
   const active = listActiveBuffs(buffState, now);
   const ids = new Set(active.map((row) => row.classTsid));
   pc.activeBuffs = active.map((row) => row.classTsid);
@@ -33097,7 +33104,7 @@ async function main() {
     buffTickAccum += dt;
     if (buffTickAccum >= 24) {
       buffTickAccum = 0;
-      handleBuffEvents(tickBuffs(buffState, pc, Date.now()));
+      handleBuffEvents([...bootBuffEvents.splice(0), ...tickBuffs(buffState, pc, Date.now())]);
     }
 
     skillTickAccum += dt;

@@ -209,6 +209,8 @@ export function normalizeBuffSnapshot(seed = {}) {
     active,
     totalActivated: Math.max(0, Math.floor(finite(seed?.totalActivated, 0))),
     ticksApplied: Math.max(0, Math.floor(finite(seed?.ticksApplied, 0))),
+    // js/buffs.js resumeBuffsAfterAway: when the buffs last ran (the logout).
+    ...(finite(seed?.seenAt, 0) > 0 ? { seenAt: Math.floor(finite(seed.seenAt, 0)) } : {}),
   };
 }
 

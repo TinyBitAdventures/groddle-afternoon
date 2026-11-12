@@ -188,6 +188,8 @@ export function createBuffState(seed = {}) {
     active: { ...(seed?.active || {}) },
     totalActivated: Math.max(0, Math.floor(Number(seed?.totalActivated) || 0)),
     ticksApplied: Math.max(0, Math.floor(Number(seed?.ticksApplied) || 0)),
+    // The last moment the game ran its buffs (tickBuffs): the logout resumeBuffsAfterAway measures from.
+    ...(Number(seed?.seenAt) > 0 ? { seenAt: Math.floor(Number(seed.seenAt)) } : {}),
   };
 }
 
@@ -508,8 +510,41 @@ export function extendBuff(state, classTsid, ms, now = Date.now()) {
   return { ok: true, buff: row };
 }
 
+/**
+ * players/inc_buffs.js buffs_logout / buffs_login: at logout the buffs freeze, and at login
+ * every event of a buff that is not is_offline ('on', 243-250) moves on by the time away
+ * (40-70), so it carries on where it stopped; an is_offline buff ('off') ran on, and its
+ * past ticks fire now, then buffs_remove with its on_remove (260-320; Smashed's Hungover,
+ * Hungover's +10 mood +10 energy). `state.seenAt` (tickBuffs) is the logout. A save from
+ * before seenAt has nothing to move; its runs-out still fire their end. Returns tickBuffs'
+ * events.
+ */
+export function resumeBuffsAfterAway(state, pc, now = Date.now()) {
+  const catalog = getBuffCatalog();
+  const seenAt = Number(state?.seenAt);
+  const away = Number.isFinite(seenAt) && seenAt > 0 ? Math.max(0, now - seenAt) : 0;
+  for (const [classTsid, row] of Object.entries(activeRows(state))) {
+    const def = catalog[classTsid];
+    if (!def) continue;
+    const tickMs = (Number(def.tickDuration) || 0) * SECOND;
+    if (!def.isOffline) {
+      if (!away) continue;
+      for (const key of ['appliedAt', 'expiresAt', 'nextTickAt']) {
+        if (Number.isFinite(row[key]) && row[key] > seenAt) row[key] += away;
+      }
+    } else if (row.expiresAt == null && tickMs > 0 && row.nextTickAt != null && row.nextTickAt < now - tickMs) {
+      // buffs_fire_timer 271-279: a buff that ticks forever fires once and goes on from now.
+      row.nextTickAt = now;
+    }
+  }
+  return tickBuffs(state, pc, now, { catchUp: Infinity });
+}
+
 /** Advance delayed starts, exact catalog ticks, and expiration. */
-export function tickBuffs(state, pc, now = Date.now()) {
+export function tickBuffs(state, pc, now = Date.now(), opts = {}) {
+  const maxTicks = opts.catchUp ?? 24;
+  // Only while a buff runs, so an idle save with none does not change each frame.
+  if (Object.keys(activeRows(state)).length) state.seenAt = now;
   const events = [];
   for (const [classTsid, row] of Object.entries(activeRows(state))) {
     const def = row.def || getBuffCatalog()[classTsid];
@@ -531,7 +566,7 @@ export function tickBuffs(state, pc, now = Date.now()) {
       row.nextTickAt != null &&
       row.nextTickAt <= now &&
       (row.expiresAt == null || row.nextTickAt <= row.expiresAt) &&
-      safety < 24
+      safety < maxTicks
     ) {
       const effects = applyTickEffect(row, pc);
       state.ticksApplied = Math.max(0, Number(state.ticksApplied) || 0) + 1;

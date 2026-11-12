@@ -23,7 +23,7 @@ import {
 } from '../public/js/quoins.js?v=7e0dec6d';
 import { setMetabolicGainGate } from '../public/js/metabolics.js?v=8504134e';
 import { applyDropResult, createDropResult } from '../public/js/drop-tables.js?v=16e12632';
-import { applyBuff, createBuffState, tickBuffs } from '../public/js/buffs.js?v=819cb342';
+import { applyBuff, createBuffState, tickBuffs } from '../public/js/buffs.js?v=fd309a67';
 import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=10b118dd';
 import { applyVerbReward } from '../public/js/verb-rewards.js?v=d3ce41d5';
 
