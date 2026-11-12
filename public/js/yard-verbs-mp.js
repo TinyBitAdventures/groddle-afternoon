@@ -37,6 +37,7 @@
  * an animal or tree carries the visitor's uses today, never the owner's.
  */
 
+import { withArticle } from './words.js?v=ee4e72f8';
 import { createAnimalState } from './animals.js?v=14659b5c';
 import { petPiggy } from './animal-mood.js?v=a49495fc';
 import { trantFruitCycle } from './trant-care.js?v=9527ff03';
@@ -122,7 +123,7 @@ export const YARD_TEXT = Object.freeze({
   offline: 'You are offline.',
   /** What the owner reads of a visitor's act. Our words. */
   acted: (who, verb, what) => `${who} ${DONE_WORD[verb] || verb} your ${what}.`,
-  planted: (who, tree) => `${who} planted a ${tree} in your Patch.`,
+  planted: (who, tree) => `${who} planted ${withArticle(tree)} in your Patch.`,
   pool: (n) => `+${n} iMG for their Magic Rock`,
 });
 

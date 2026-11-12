@@ -54,8 +54,8 @@
  *     slashLine (the last line shown).
  */
 
-import { BUTLER_STRINGS } from '../butler.js?v=8232e2c7';
-import { butlerApi } from './butler-feature.js?v=d713db87';
+import { BUTLER_STRINGS } from '../butler.js?v=cc7772b7';
+import { butlerApi } from './butler-feature.js?v=e422265f';
 import { hellFeature } from './hell-feature.js?v=b9770c5a';
 import { locationEventsApi } from './location-events-feature.js?v=0cda70ed';
 import { towerApi } from './home-tower-feature.js?v=4ec55e06';

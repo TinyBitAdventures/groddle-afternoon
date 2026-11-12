@@ -705,7 +705,7 @@ const MAKING_ITEM_EXTRAS = {
   mangosteen: { label: 'Mangosteen', desc: 'A sweet and tangy mangosteen.' },
   orange_juice: { label: 'Orange Juice', desc: 'A surprising glass of orange juice.' },
   lemon_juice: { label: 'Lemon Juice', desc: 'A tall glass of exquisitely sour lemon juice.' },
-  fruity_juice: { label: 'Fruity Juice', desc: 'A glass of nigh-ambrosial fruit juice.' },
+  fruity_juice: { label: 'Fruity Juice', namePlural: 'Fruity Juices', desc: 'A glass of nigh-ambrosial fruit juice.' },
   bubble_tea: { label: 'Bubble Tea', desc: 'A super-frothy bubble tea.' },
   blue_bubble: { label: 'Blue Bubble', desc: 'A big blue bubble.' },
   tiny_bubble: { label: 'Tiny Bubble', desc: 'An eeny-weeny, fizzy-wizzy tiny bubble.' },

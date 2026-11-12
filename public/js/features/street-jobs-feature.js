@@ -49,6 +49,7 @@
  * 'restore', job type 5) and finishes the restore in its `onDone` hook.
  */
 
+import { pluralize } from '../words.js?v=ee4e72f8';
 import { ITEM_CATALOG, addItem, countItem, ensureItem, itemIcon, packStamp, removeItem } from '../inventory.js?v=5be47371';
 import { canUseTool, useToolCondition } from '../tools.js?v=5f482998';
 import { ecologyForStreet } from '../street-ecology.js?v=f27417a8';
@@ -976,7 +977,7 @@ function finishPhase(engine, jobId) {
     const mins = out.readyAt ? Math.round((out.readyAt - Date.now()) / 60000) : 0;
     steps.push({
       text: mins
-        ? `${next?.delayText ? plainText(jobText(next.delayText, { location: job.label })) : `The ${phaseOrdinal(out.index + 1)} phase, ${nextPhaseName(job, next)}, opens in ${mins} minutes.`}`
+        ? `${next?.delayText ? `${plainText(jobText(next.delayText, { location: job.label }))} It opens in ${pluralize(mins, 'minute')}.` : `The ${phaseOrdinal(out.index + 1)} phase, ${nextPhaseName(job, next)}, opens in ${pluralize(mins, 'minute')}.`}`
         : `The ${phaseOrdinal(out.index + 1)} phase, ${nextPhaseName(job, next)}, is ready now.`,
       response: 'OK',
     });
@@ -1602,8 +1603,8 @@ function renderPanel(engine) {
   statusLine.textContent = {
     done: `Finished. ${{ street: `The road to ${job.label} is open.`, restore: `${job.label} is restored.` }[job.kind] || `${job.label} is upgraded.`}`,
     built: `${job.label} is already built.`,
-    delayed: `${pcx.phase.delayText || 'The next phase is getting ready.'} It opens in ${status.until ? mins(status.until) : 1} minutes.`,
-    cooldown: `This street just finished a project. The next one opens in ${status.until ? mins(status.until) : 1} minutes.`,
+    delayed: `${pcx.phase.delayText || 'The next phase is getting ready.'} It opens in ${pluralize(status.until ? mins(status.until) : 1, 'minute')}.`,
+    cooldown: `This street just finished a project. The next one opens in ${pluralize(status.until ? mins(status.until) : 1, 'minute')}.`,
     active: `Solo amounts: 1/${SOLO_DIVISOR} of the original multiplayer totals.${work ? ` Working: ${work.units} units so far.` : ''}`,
     open: `Solo amounts: 1/${SOLO_DIVISOR} of the original multiplayer totals. Every contribution counts toward this phase.`,
   }[status.status];
@@ -2193,7 +2194,7 @@ function mpPhaseAward(engine, jobId, out, paid, paidPerformance, note) {
     const mins = out.readyAt ? Math.round((out.readyAt - Date.now()) / 60000) : 0;
     steps.push({
       text: mins
-        ? `${upcoming?.delayText ? plainText(jobText(upcoming.delayText, { location: job.label })) : `The ${phaseOrdinal(out.index + 1)} phase, ${nextPhaseName(job, upcoming)}, opens in ${mins} minutes.`}`
+        ? `${upcoming?.delayText ? `${plainText(jobText(upcoming.delayText, { location: job.label }))} It opens in ${pluralize(mins, 'minute')}.` : `The ${phaseOrdinal(out.index + 1)} phase, ${nextPhaseName(job, upcoming)}, opens in ${pluralize(mins, 'minute')}.`}`
         : `The ${phaseOrdinal(out.index + 1)} phase, ${nextPhaseName(job, upcoming)}, is ready now.`,
       response: 'OK',
     });

@@ -56,6 +56,7 @@
  * player did; letters that come by post stay in the mailbox.
  */
 
+import { pluralize } from './words.js?v=ee4e72f8';
 import { getGameDayKey } from './game-day.js?v=a7e262aa';
 import { normalizeButlerHi } from './hi-signs.js?v=32194768';
 import { filterText } from './word-filter.js?v=9a7a7ebb';
@@ -598,10 +599,8 @@ export function ago(ms, now = Date.now()) {
   return `${s} sec ago`;
 }
 
-/** common.js pluralize. */
-export function pluralize(count, single, plural) {
-  return count === 1 ? `1 ${single}` : `${count} ${plural}`;
-}
+/** common.js pluralize (js/words.js). */
+export { pluralize };
 
 const plural = (n, word) => (n === 1 ? word : `${word}s`);
 

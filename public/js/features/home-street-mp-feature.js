@@ -42,7 +42,7 @@
 
 import { announceCharacterChanged, characterHeaders, characterOf, isCharacterChanged } from '../character-guard.js?v=510034a7';
 import { ITEM_CATALOG, addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=5be47371';
-import { RECIPE_CATALOG, isRecipeCatalogReady, setRecipeCatalog } from '../making.js?v=2cd473f3';
+import { RECIPE_CATALOG, isRecipeCatalogReady, setRecipeCatalog } from '../making.js?v=39f79aaa';
 import { furnitureDef, furnitureScale, furnitureSize } from '../home-decor.js?v=bbf43c44';
 import { isStorageClass, storageHasContents } from '../home-storage.js?v=b0225465';
 import { pieceLabel } from '../furniture-upgrades.js?v=a3788c0d';
@@ -53,11 +53,11 @@ import { NOTE_POLE_CONTAINERS, NOTE_POLE_PARTS, NOTE_POLE_SIGN_Y } from '../note
 import { textureFromUrl } from '../textures.js?v=92ec53cd';
 import { addSignBoard, signArmWidth, signLabel } from '../street-render.js?v=47697d4c';
 import { openNotePicker, openNoteView } from '../note-view.js?v=eca7de52';
-import { homeStreetName, possessive, readVisitScene } from '../neighbours-mp.js?v=95f6997a';
-import { BACK_YARD_GROUND_Y, SIGN_PROMPT_LIFT, STREET_GROUND_Y, homesFeature, visitorHomeState } from './homes-feature.js?v=4e8a703f';
-import { projectApi } from './street-jobs-feature.js?v=de835505';
+import { homeStreetName, possessive, readVisitScene } from '../neighbours-mp.js?v=f686b3bd';
+import { BACK_YARD_GROUND_Y, SIGN_PROMPT_LIFT, STREET_GROUND_Y, homesFeature, visitorHomeState } from './homes-feature.js?v=f9ba2f06';
+import { projectApi } from './street-jobs-feature.js?v=2959c22c';
 import { saveStore } from '../save-store.js?v=5b167c14';
-import { giveCarriedNote, takeCarriedNote, writtenCarriedNotes } from './street-furniture-feature.js?v=0f8b0727';
+import { giveCarriedNote, takeCarriedNote, writtenCarriedNotes } from './street-furniture-feature.js?v=679ceb37';
 import {
   GOOD_NEIGHBOUR_AT,
   GOOD_NEIGHBOUR_COUNTER,
@@ -89,7 +89,7 @@ import {
   saleVerbs,
   signpostArms,
   signpostCandidates,
-} from '../home-street-mp.js?v=a2acd458';
+} from '../home-street-mp.js?v=bed20b90';
 
 export { HOME_STREET_MP_ID };
 

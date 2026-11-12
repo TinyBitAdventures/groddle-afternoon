@@ -127,6 +127,7 @@ import {
   tutorialNameDefault,
   TUTORIAL_NAME_MAX,
 } from '../newxp.js?v=45ae5f37';
+import { countWords } from '../words.js?v=ee4e72f8';
 import { ITEM_CATALOG, addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=5be47371';
 import { QUOIN_SHEET, QUOIN_TYPES, qrazyRewardForLevel } from '../quoins.js?v=7e0dec6d';
 import { soundForQuoin } from '../sound-moments.js?v=52ad523c';
@@ -1009,7 +1010,7 @@ function pickUp(engine, row) {
   engine.unregister(row.target);
   engine.refreshPack();
   engine.playSound('ITEM_PICKUP', { volume: 0.5 });
-  engine.pushActivity(`You picked up ${row.count > 1 ? `${row.count} ` : ''}${ITEM_LABEL(row.classTsid)}.`);
+  engine.pushActivity(`You picked up ${countWords(row.count, ITEM_LABEL(row.classTsid), ITEM_CATALOG[row.classTsid]?.namePlural || ITEM_LABEL(row.classTsid))}.`);
   engine.setData('newxpLast', `pickup:${row.id}`);
   row.onPick?.(row);
 }
@@ -3927,7 +3928,8 @@ export const newxpFeature = {
 
   travelGate(tsid, engine) {
     if (!active()) return null;
-    if (inTutorialScene(engine)) return { ok: false, msg: 'Follow the tutorial (or skip it from the Tutorial card).' };
+    // Multiplayer has no Skip (G334), so only solo is told about it.
+    if (inTutorialScene(engine)) return { ok: false, msg: engine?.mode === 'multiplayer' ? 'Follow the tutorial for now.' : 'Follow the tutorial (or skip it from the Tutorial card).' };
     if (save.stage === 'island' && save.island !== 'exited' && !GENTLE_ISLAND_TSIDS.includes(tsid)) return { ok: false, msg: 'You can\'t do that yet' };
     return null;
   },

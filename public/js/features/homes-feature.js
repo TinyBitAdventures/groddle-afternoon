@@ -170,7 +170,7 @@ import {
   swatchFilters,
   trayFilters,
 } from '../ui/home-builder.js?v=b71acd91';
-import { RECIPE_CATALOG } from '../making.js?v=2cd473f3';
+import { RECIPE_CATALOG } from '../making.js?v=39f79aaa';
 import {
   createBackYardState,
   fixtureObstacles,
@@ -212,7 +212,7 @@ import { DISPATCHER_HALF, DISPATCHER_TEXT, MOVABLE_FIXTURES, MOVABLE_FIXTURE_IDS
 import { displayTopOf, itemstackOverlayPoint, overlayAlpha, overlayLifeMs, playPoofIn, trackOverlay } from '../overlay-art.js?v=a6561207';
 import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=32c58aef';
 import { fadeInNewNear } from '../poof-fade.js?v=904e02fe';
-import { projectApi } from './street-jobs-feature.js?v=de835505';
+import { projectApi } from './street-jobs-feature.js?v=2959c22c';
 import { TOWER_CHASSIS, TOWER_CONFIG, TOWER_DOOR_DX, TOWER_GEO, TOWER_PROTO, normalizeTowerState } from '../home-tower.js?v=087df38f';
 import { drawTowerElevator, drawTowerExit, towerApi, visitorTowerView } from './home-tower-feature.js?v=4ec55e06';
 import { pieceUrl, roomPieces, surfaceAt, swatchPiece, wallTargetAt } from '../home-wallpaper.js?v=f1969400';

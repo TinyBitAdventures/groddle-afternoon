@@ -24,6 +24,7 @@
  *     &crownrival=<seconds>                  pre-fill the first rival's clock; it starts as It (G304 loss splash)
  */
 
+import { pluralize } from '../words.js?v=ee4e72f8';
 import { crowdScaleX } from '../avatar-anims.js?v=fb921bf4';
 import { OVERLAY_USES, playCountdownArt, playWindowOverlay } from '../overlays.js?v=4e81f749';
 import {
@@ -533,7 +534,7 @@ function finish(engine) {
   }
   if (res.secondsWithCrown > 0) engine.achievement('it_game:seconds_with_crown', res.secondsWithCrown);
   // The remake's own crown-time line (no source) goes to the activity log, not the splash.
-  if (!res.won) engine.pushActivity(`You held the crown for ${res.secondsWithCrown} seconds.`);
+  if (!res.won) engine.pushActivity(`You held the crown for ${pluralize(res.secondsWithCrown, 'second')}.`);
   // G304: games_end_it_game 633-700: a game_splash_screen, tsid it_game,
   // game_of_crowns_winner at you_winner with rays, or other_winner with the
   // winner's name (text_delta_y 25), then Play Again and Leave the Game (w 150,
@@ -784,13 +785,15 @@ export function crownsMpChallenge(classTsid, engine) {
   record.pendingTicket = classTsid;
   engine.updateHud();
   engine.save();
-  engine.pushActivity('You activated a Game of Crowns Ticket.');
   mpChallenging = true;
   if (!c.send('crown_challenge', {})) {
+    // The challenge never went out: say so, and that the ticket came back.
     mpChallenging = false;
     mpRefund(engine);
+    engine.toast(`${CROWNS_MP_TEXT.offline} Your ticket is back in your pack.`, 3200);
     return false;
   }
+  engine.pushActivity('You activated a Game of Crowns Ticket.');
   mpNote(engine, 'challenge');
   publish(engine);
   return true;
@@ -1358,7 +1361,7 @@ function mpFinish(engine, msg) {
       engine.playSound('YOU_WIN', { volume: 0.7 });
     } else {
       engine.pushActivity(`${out.winnerName} won the Game of Crowns.`);
-      if (out.played) engine.pushActivity(`You held the crown for ${out.seconds} seconds.`);
+      if (out.played) engine.pushActivity(`You held the crown for ${pluralize(out.seconds, 'second')}.`);
       engine.playSound('YOU_LOSE', { volume: 0.7 });
     }
     engine.gameSplash?.({

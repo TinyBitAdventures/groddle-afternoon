@@ -19,7 +19,7 @@ import {
   makeOpeningTool,
   gridStep,
 } from '../public/js/make-tools.js?v=3e4818c0';
-import { TOOL_CATALOG, MAKING_TOOL_SKILLS, listMakingTools, loadRecipeCatalogFromFile } from '../public/js/making.js?v=2cd473f3';
+import { TOOL_CATALOG, MAKING_TOOL_SKILLS, listMakingTools, loadRecipeCatalogFromFile } from '../public/js/making.js?v=39f79aaa';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const read = (p) => readFileSync(join(root, p), 'utf8');

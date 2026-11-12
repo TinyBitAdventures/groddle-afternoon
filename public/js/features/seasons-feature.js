@@ -35,7 +35,7 @@ import { addItem, countItem, ensureItem, removeItem, registerItemUse, ITEM_CATAL
 import { dametimeParts, getGameDayKey } from '../game-day.js?v=a7e262aa';
 import { setSeasonalSeedCheck as setGardenSeasonGate } from '../garden.js?v=37209241';
 import { setSeasonalSeedCheck as setMasterGardenSeasonGate } from '../garden.js?v=37209241';
-import { setSeasonalRecipeCheck } from '../making.js?v=2cd473f3';
+import { setSeasonalRecipeCheck } from '../making.js?v=39f79aaa';
 import { getToolCondition, copyForVerb, copyTag, migrateClassTag, setCopyTag, takeToolCopy } from '../tools.js?v=5f482998';
 
 /*

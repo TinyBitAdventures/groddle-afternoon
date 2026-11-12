@@ -9,8 +9,8 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { BEAKER_BADGES, TAUGHT_FOODS, TAUGHT_POWDERS, normalizeKeptRecipes, stampKeptRecipes } from '../public/js/recipe-memory.js?v=3c72d749';
-import { RECIPE_MEMORY_FEATURE_ID, recipeMemoryFeature, recipesLearnedFrom } from '../public/js/features/recipe-memory-feature.js?v=b25dfe49';
-import { RECIPE_CATALOG, canCraft, recipeKnown, searchRecipes } from '../public/js/making.js?v=2cd473f3';
+import { RECIPE_MEMORY_FEATURE_ID, recipeMemoryFeature, recipesLearnedFrom } from '../public/js/features/recipe-memory-feature.js?v=de8ab273';
+import { RECIPE_CATALOG, canCraft, recipeKnown, searchRecipes } from '../public/js/making.js?v=39f79aaa';
 import { createPlayerSave, parsePlayerSave, serializePlayerSave } from '../public/js/player-save.js?v=73f3592a';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
