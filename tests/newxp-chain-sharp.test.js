@@ -78,7 +78,7 @@ describe('tutorial pull chain 3x', () => {
   });
 
   it('ships each 3x twin at exactly 3x its x1 sheet, routed by js/sprite-hires.js', async () => {
-    const { HIRES_SPRITES, FIRST_DRAW_SPRITES, SPLIT_SPRITES } = await import('../public/js/sprite-hires.js?v=dd5da64c');
+    const { HIRES_SPRITES, FIRST_DRAW_SPRITES, SPLIT_SPRITES } = await import('../public/js/sprite-hires.js?v=d4cce9f9');
     for (const k of ['hang', 'pull']) {
       const hi = art[k].url.replace(/\.webp$/, '@3x.webp');
       assert.equal(HIRES_SPRITES.get(art[k].url), hi, k);

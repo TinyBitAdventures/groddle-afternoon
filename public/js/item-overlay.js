@@ -24,8 +24,8 @@
  */
 
 import { OVERLAY_FADE, overlayAlpha, overlayLifeMs, trackOverlay } from './overlay-art.js?v=75c3ea34';
-import { cutPackedFrames, packedFrameAt } from './packed-sheets.js?v=da88fa23';
-import { upgradeSource } from './sprite-hires.js?v=dd5da64c';
+import { cutPackedFrames, packedFrameAt } from './packed-sheets.js?v=dadad463';
+import { upgradeSource } from './sprite-hires.js?v=d4cce9f9';
 import { forgetTexture, loadTexture, whenLoaded } from './textures.js?v=f024bd6a';
 
 /** Decoded sheets kept after their overlay ends. */

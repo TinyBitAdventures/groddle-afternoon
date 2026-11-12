@@ -30,7 +30,7 @@ import {
   scionWords,
 } from '../public/js/purple-journey.js?v=5e078ed8';
 import { VOYAGE_FLOOR, VOYAGE_OFFSET } from '../public/js/purple-journey-scene.js?v=1a3f7ad3';
-import { purpleJourneyFeature } from '../public/js/features/purple-journey-feature.js?v=ed345e80';
+import { purpleJourneyFeature } from '../public/js/features/purple-journey-feature.js?v=8829f502';
 import { createAchievementState, applyAchievementProgress } from '../public/js/achievements.js?v=2e4aa9cb';
 import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=10b118dd';
 

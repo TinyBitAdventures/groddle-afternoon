@@ -22,7 +22,7 @@ import {
   chickenWaitPose,
 } from '../public/js/chicken-idles.js?v=eef0279b';
 import { PACKED_SHEETS } from '../public/js/packed-sheets-data.js?v=192c6f15';
-import { packedCell, packedDurationMs, packedFrameAt, packedRect } from '../public/js/packed-sheets.js?v=da88fa23';
+import { packedCell, packedDurationMs, packedFrameAt, packedRect } from '../public/js/packed-sheets.js?v=dadad463';
 import { CHICKEN_PAUSE, chickenPlan, chickenSeed, chickenWalkAt } from '../public/js/street-creatures.js?v=cef735cd';
 import { yardPlan, yardWanderAt, followYardPath } from '../public/js/yard-wander.js?v=69bfdbdb';
 import { imageSize } from '../tools/image-size.mjs';
@@ -286,7 +286,7 @@ describe('the pose on a sprite', () => {
   const table = { chickenWalk: { frames: frames(24, 'walk') }, chickenStand: { frames: frames(1, 'stand') }, chickenPeck: { frames: frames(32, 'peck') } };
 
   it('pecking_once plays once from the shared frame and holds; walk and stand are as they were', async () => {
-    const { chickenPose, showsChickenIdle } = await import('../public/js/chicken-idle-art.js?v=108c4357');
+    const { chickenPose, showsChickenIdle } = await import('../public/js/chicken-idle-art.js?v=5f97745e');
     const spr = sprite(table.chickenWalk.frames.slice(0, 6));
     assert.equal(chickenPose(null, table, spr, 'pecking_once', 500), 'pecking_once');
     assert.equal(spr.textures, table.chickenPeck.frames);
@@ -316,7 +316,7 @@ describe('the pose on a sprite', () => {
   });
 
   it('a state whose sheet is not in yet shows the still, and a squeeze is left to finish', async () => {
-    const { chickenPose } = await import('../public/js/chicken-idle-art.js?v=108c4357');
+    const { chickenPose } = await import('../public/js/chicken-idle-art.js?v=5f97745e');
     const spr = sprite(table.chickenWalk.frames.slice(0, 6));
     assert.equal(chickenPose(null, table, spr, 'idle2', 100), 'stand', 'no Pixi here, so no sheet: the still');
     assert.equal(spr.textures, table.chickenStand.frames);

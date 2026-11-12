@@ -210,7 +210,7 @@ import {
 import { PROTO_DEPLETED_ART } from '../home-proto-art.js?v=9309e9f3';
 import { DISPATCHER_HALF, DISPATCHER_TEXT, MOVABLE_FIXTURES, MOVABLE_FIXTURE_IDS, dispatcherAway, fixtureFits, fixtureText, savedFixtureRx, signpostX } from '../home-street-fixtures.js?v=bad831a1';
 import { displayTopOf, itemstackOverlayPoint, overlayAlpha, overlayLifeMs, playPoofIn, trackOverlay } from '../overlay-art.js?v=75c3ea34';
-import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=59ca0e2b';
+import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=b251d081';
 import { fadeInNewNear } from '../poof-fade.js?v=8984abd1';
 import { projectApi } from './street-jobs-feature.js?v=ead5b648';
 import { TOWER_CHASSIS, TOWER_CONFIG, TOWER_DOOR_DX, TOWER_GEO, TOWER_PROTO, normalizeTowerState } from '../home-tower.js?v=087df38f';
@@ -218,7 +218,7 @@ import { drawTowerElevator, drawTowerExit, towerApi, visitorTowerView } from './
 import { pieceUrl, roomPieces, surfaceAt, swatchPiece, wallTargetAt } from '../home-wallpaper.js?v=f1969400';
 import { maxTextureSizeOf, sharpDeco, wantsHiresDecos } from '../deco-hires.js?v=9ea9c4f3';
 import { SHARP_DECOS } from '../deco-sharp-list.js?v=a2424923';
-import { resourceNodesFeature } from './resource-nodes-feature.js?v=0d173b95';
+import { resourceNodesFeature } from './resource-nodes-feature.js?v=cf18ca3b';
 import { patchesFeature } from './patches-feature.js?v=d405f1a4';
 import { GROWN_TREE_LABELS, createPlot, growTree, plotLabel } from '../patches.js?v=61abc5fe';
 import { WOTD_DEPLETE_MS, WOTD_TEXT, nearestPourTarget, pourButton, pourConditions, pourConfirmText } from '../wine-pour.js?v=6daa23a7';

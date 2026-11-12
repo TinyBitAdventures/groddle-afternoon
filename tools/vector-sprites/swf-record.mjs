@@ -24,7 +24,10 @@
  * `place: true` also applies the transform the main timeline places the
  * animatee with (the flamingo is drawn mirrored and turned 5 degrees).
  *
- * Usage (from build.mjs, job "record": { "clips": ["<class or id>", ...], "place"?: true }):
+ * `hold` keeps an unsynced clip on another frame than 1: one that had already played that far when
+ * the recorder started (the firefly's glow pulse, sprite 2, recorded on its frame 4).
+ *
+ * Usage (from build.mjs, job "record": { "clips": ["<class or id>", ...], "hold"?: { "<class or id>": frame }, "place"?: true }):
  *   recordState(inFile, outFile, rootId, { clips, classes })
  */
 import { readFileSync, writeFileSync } from 'node:fs';
@@ -268,7 +271,7 @@ function labelAt(src, frame) {
  * `frames` (optional [from, to] list) limits which root frames are baked;
  * the others are left empty. Returns { frames, sprites }.
  */
-export function recordState(inFile, outFile, rootId, { clips = [], classes = new Map(), frames: ranges = null, place = false } = {}) {
+export function recordState(inFile, outFile, rootId, { clips = [], hold = {}, classes = new Map(), frames: ranges = null, place = false } = {}) {
   const buf = inflate(readFileSync(inFile));
   const sprites = spriteTable(buf);
   const root = sprites.get(rootId);
@@ -277,6 +280,12 @@ export function recordState(inFile, outFile, rootId, { clips = [], classes = new
     if (typeof c === 'number' || /^\d+$/.test(String(c))) return Number(c);
     if (!classes.has(c)) throw new Error(`no symbol ${c} in ${inFile}`);
     return classes.get(c);
+  }));
+  // `hold`: { "<class or id>": frame }, an unsynced clip the recorder found already played that far.
+  const held = new Map(Object.entries(hold).map(([c, f]) => {
+    if (/^\d+$/.test(String(c))) return [Number(c), Number(f)];
+    if (!classes.has(c)) throw new Error(`no symbol ${c} in ${inFile}`);
+    return [classes.get(c), Number(f)];
   }));
   // Does a sprite (or anything it ever places) contain a synced clip?
   const syncMemo = new Map();
@@ -308,7 +317,7 @@ export function recordState(inFile, outFile, rootId, { clips = [], classes = new
     const list = displayList(buf, src, frame);
     const body = [];
     for (const [depth, { char, fields }] of [...list].sort((a, b) => a[0] - b[0])) {
-      let childFrame = 1;
+      let childFrame = held.get(char) ?? 1;
       if (synced.has(char) && at) {
         const start = sprites.get(char)?.labels.get(at.name);
         childFrame = start ? Math.min(sprites.get(char).frames, start + at.k) : 1;

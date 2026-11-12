@@ -25,7 +25,7 @@ describe('the Piggy\'s sniff, from Tiny Speck\'s authoring file', () => {
     const three = imageSize(join(root, 'public/assets/sprites/npc_piggy__x1_root@3x.webp'));
     assert.deepEqual([one.w, one.h], [880, 310]);
     assert.deepEqual([three.w, three.h], [2640, 930]);
-    const { HIRES_SPRITES } = await import('../public/js/sprite-hires.js?v=dd5da64c');
+    const { HIRES_SPRITES } = await import('../public/js/sprite-hires.js?v=d4cce9f9');
     assert.equal(HIRES_SPRITES.get('assets/sprites/npc_piggy__x1_root.webp'), 'assets/sprites/npc_piggy__x1_root@3x.webp');
     execFileSync(process.execPath, [join(root, 'tools/vector-sprites/fla-labels.mjs'), '--check'], { stdio: 'pipe' });
   });
