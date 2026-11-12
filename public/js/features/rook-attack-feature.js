@@ -2228,7 +2228,8 @@ function rookedVerbs(engine, target) {
   const full = Boolean(mp) && !dosed && reviveFull(row, mp.client.me?.id);
   verbs.push({
     id: 'rook_revive',
-    label: `Revive (${(row?.doses || 0) + 1}/${ROOK_SOURCE.reviveHealers})`,
+    // #251: "(3/3)" read as finished while only two doses were in; say how many have helped so far.
+    label: `Revive (${row?.doses || 0} of ${ROOK_SOURCE.reviveHealers} have helped)`,
     enabled: enough && !dosed && !full,
     reason: dosed ? ROOK_TEXT.reviveDone(rookSingle(target)) : full ? ROOK_TEXT.reviveFull(rookSingle(target)) : enough ? '' : "You don't have enough energy to do that!",
     tooltip: ROOK_TEXT.reviveTooltip.replace('$itemclass', label.toLowerCase()).replace('$energy_cost', String(energy)),
