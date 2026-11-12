@@ -17,7 +17,7 @@ import {
   edgeMirrorStrip,
   edgeMirrorWidths,
   parallaxLayerOffset,
-} from '../public/js/street-render.js?v=1876e623';
+} from '../public/js/street-render.js?v=052b204a';
 import { cameraTargetX } from '../public/js/movement.js?v=b30f84eb';
 
 describe('edge mirror widths', () => {
@@ -60,9 +60,10 @@ describe('edge mirror widths', () => {
       edgeMirrorWidths({ parallax: false, streetW: 800, vpW: 1000, maxInset: 420 }),
       { left: 100 + EDGE_MIRROR_MARGIN, right: 100 + EDGE_MIRROR_MARGIN }
     );
-    // A narrower parallax layer sits at the view's right edge (percX 1): its left end shows.
-    assert.deepEqual(edgeMirrorWidths({ layerW: 900, streetW: 800, vpW: 1000 }), { left: 100 + EDGE_MIRROR_MARGIN, right: 0 });
-    assert.deepEqual(edgeMirrorWidths({ layerW: 60, streetW: 800, vpW: 1000 }), { left: 60, right: 0 });
+    // A parallax layer is centred on the street (report #209, parallaxRestX): a 900 px one shows
+    // 50 px past each end of the 1000 px view, a 60 px one is all strip on both sides.
+    assert.deepEqual(edgeMirrorWidths({ layerW: 900, streetW: 800, vpW: 1000 }), { left: 50 + EDGE_MIRROR_MARGIN, right: 50 + EDGE_MIRROR_MARGIN });
+    assert.deepEqual(edgeMirrorWidths({ layerW: 60, streetW: 800, vpW: 1000 }), { left: 60, right: 60 });
   });
 });
 

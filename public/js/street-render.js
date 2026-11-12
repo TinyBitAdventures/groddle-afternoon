@@ -1280,12 +1280,32 @@ function gradientTexture(PIXI, top, bottom) {
 export function parallaxLayerOffset(layer, camX, camY, vpW, vpH, streetW, streetH) {
   const maxX = streetW - vpW;
   const maxY = streetH - vpH;
-  const percX = maxX > 0 ? camX / maxX : 1;
-  const percY = maxY > 0 ? camY / maxY : 1;
   return {
-    x: camX + percX * (vpW - layer.w),
-    y: camY + percY * (vpH - layer.h),
+    x: maxX > 0 ? camX + (camX / maxX) * (vpW - layer.w) : parallaxRestX(layer.w, streetW),
+    y: maxY > 0 ? camY + (camY / maxY) * (vpH - layer.h) : parallaxRestY(layer.h, streetH),
   };
+}
+
+/**
+ * PURE (report #209, Grimssea Hollow): where a layer sits on a street narrower than the view.
+ * The camera cannot slide, so game.js centres the street (cameraTargetForPlayer: camX = -spare/2)
+ * with the middleground at 0. Each layer is centred on the street, as the slide puts it with the
+ * camera mid-street ((W - w) / 2), so a street-sized layer stays on the middleground at 0. The
+ * old rule (percX 1, the view's right edge) drew Grimssea's bark and shelves spare/2 to the right
+ * of the ladders and platforms.
+ */
+export function parallaxRestX(layerW, streetW) {
+  return (streetW - layerW) / 2;
+}
+
+/**
+ * PURE (report #209): the same on a street shorter than the view. The camera sits at (or near) the
+ * street's top and shows all of it, so each layer's bottom sits on the street's bottom (H - h), where
+ * the slide leaves it with the camera at the bottom; a street-sized layer stays at 0. The old rule
+ * (percY 1 against the view's bottom edge) carried a layer down by the spare and moved it with the camera.
+ */
+export function parallaxRestY(layerH, streetH) {
+  return streetH - layerH;
 }
 
 /**
@@ -1365,7 +1385,8 @@ export const SKIRT_SLIDE_MAX = 160;
 /**
  * PURE: where a layer is drawn in the band, or null when it is left out. The middleground and
  * layers with no canvas size use street coordinates, and a parallax layer the street's own size
- * has a zero offset at every camera (parallaxLayerOffset: camX + camX/(W-vpW) x (vpW - W) = 0):
+ * has a zero offset at every camera (parallaxLayerOffset: camX + camX/(W-vpW) x (vpW - W) = 0, and
+ * (W - W) / 2 = 0 on a street narrower than the view, parallaxRestX):
  * both are fixed to the ground (Hechey Track's `middleplus` dirt, The Great Hole to Ix's).
  * A layer of another size slides against the ground by W - w over the whole street, and its
  * bottom meets the street's bottom when the camera is at the bottom (y = H - h). One close to the
@@ -1947,7 +1968,9 @@ export const EDGE_MIRROR_BYTES = 32 * 1024 * 1024;
  * than the view. Each parallax layer slides by parallaxLayerOffset, so past the street's end each
  * ends at its own place: by the reserve itself for the middleground, by more for a layer wider
  * than the street (the foreground), by less for a far one, and not at all for one narrower than
- * the view. `parallax` false: a layer in street coordinates (the middleground; `layerW` unused).
+ * the view. On a street narrower than the view every layer is centred on the street
+ * (parallaxRestX), so a layer shows (view - w) / 2 past each end. `parallax` false: a layer in
+ * street coordinates (the middleground; `layerW` unused).
  * Capped at the layer's own width: a strip can only mirror the art there is.
  */
 export function edgeMirrorWidths({ layerW, parallax = true, streetW, vpW, maxInset = 0, margin = EDGE_MIRROR_MARGIN }) {
@@ -1962,7 +1985,7 @@ export function edgeMirrorWidths({ layerW, parallax = true, streetW, vpW, maxIns
   let right = 0;
   for (const cam of cams) {
     // The layer's left end on screen: parallaxLayerOffset less the camera.
-    const lx = parallax ? (maxX > 0 ? cam / maxX : 1) * (view - lw) : -cam;
+    const lx = parallax ? (maxX > 0 ? (cam / maxX) * (view - lw) : parallaxRestX(lw, W) - cam) : -cam;
     left = Math.max(left, lx);
     right = Math.max(right, view - (lx + lw));
   }

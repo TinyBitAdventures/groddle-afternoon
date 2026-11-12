@@ -10,7 +10,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import * as kit from '../public/js/quest-rooms/kit.js?v=6ec6de2e';
-import * as club from '../public/js/quest-rooms/clubhouse.js?v=c37cfc63';
+import * as club from '../public/js/quest-rooms/clubhouse.js?v=a33e55a8';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const JUMP_RISE = 100;

@@ -27,12 +27,12 @@ import {
   recognitionBranch,
   ticketDue,
 } from '../public/js/hell-tickets.js?v=0abe196e';
-import { hellTicketsFeature } from '../public/js/features/hell-tickets-feature.js?v=cbe7a5d4';
+import { hellTicketsFeature } from '../public/js/features/hell-tickets-feature.js?v=728f4869';
 import { hellFeature } from '../public/js/features/hell-feature.js?v=aa67fca8';
 import { hellBarFeature } from '../public/js/features/hell-bar-feature.js?v=b6c452e8';
 import { questOffersFeature } from '../public/js/features/quest-offers-feature.js?v=db81cdfe';
 import { questFlagsFeature } from '../public/js/features/quest-flags-feature.js?v=17c6ef48';
-import { FEATURES } from '../public/js/features/index.js?v=22516513';
+import { FEATURES } from '../public/js/features/index.js?v=a9d8e358';
 
 const spike = join(dirname(fileURLToPath(import.meta.url)), '..');
 const CONTENT = join(spike, 'public/assets/content');
