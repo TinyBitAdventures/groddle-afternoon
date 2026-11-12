@@ -38,15 +38,15 @@ import {
   takeObjs,
   treeReady,
   treeSkill,
-} from '../public/js/street-objects.js?v=773f9882';
-import { streetObjectsFeature } from '../public/js/features/street-objects-feature.js?v=c8c67d46';
-import { FEATURES } from '../public/js/features/index.js?v=a9d8e358';
+} from '../public/js/street-objects.js?v=b12b3ca5';
+import { streetObjectsFeature } from '../public/js/features/street-objects-feature.js?v=1abace91';
+import { FEATURES } from '../public/js/features/index.js?v=1ebe7220';
 import { createMineRock, mineRock } from '../public/js/mining.js?v=674ed39b';
 import { createResourceNode } from '../public/js/resource-nodes.js?v=817d1e54';
 import { createTrantState, fruitCapacityAt, setTrantTables } from '../public/js/trants.js?v=1b3c8ae3';
 import { placementRequests, ruleTables, streetObjectLayout } from '../tools/build-realtime-objects.mjs';
 import { STREET_INDEX, applyStreetIndex, loadStreetDataFromFs } from '../public/js/street-loader.js?v=18b181ad';
-import { setStreetEcologyCatalog } from '../public/js/street-ecology.js?v=08076876';
+import { PLANNED_NODE_CAPS, measuredNodeSpots, setStreetEcologyCatalog } from '../public/js/street-ecology.js?v=26dabe26';
 import { serverPath, skipWithoutServer } from '../tools/repos.mjs';
 
 const root = join(import.meta.dirname, '..');
@@ -504,9 +504,14 @@ describe('street objects: the server\'s layout', () => {
     const short = [];
     for (const [tsid, street] of Object.entries(data.streets)) {
       const counts = row(tsid)?.counts || {};
-      for (const cls of ['mortar_barnacle', 'ice_knob', 'jellisac', 'dirt_pile', 'peat_1']) {
+      for (const cls of ['ice_knob', 'jellisac', 'dirt_pile', 'peat_1']) {
         if (count(street.nodes, cls) < (counts[cls] || 0)) short.push(tsid);
       }
+      // Player report #210: every measured barnacle, then at most PLANNED_NODE_CAPS planned on a steady floor.
+      const measured = Math.min(counts.mortar_barnacle || 0, measuredNodeSpots(tsid)?.mortar_barnacle?.length || 0);
+      const barnacles = count(street.nodes, 'mortar_barnacle');
+      assert.ok(barnacles >= measured, `${tsid} keeps its ${measured} measured barnacles`);
+      assert.ok(barnacles <= measured + Math.min((counts.mortar_barnacle || 0) - measured, PLANNED_NODE_CAPS.mortar_barnacle), tsid);
     }
     assert.deepEqual([...new Set(short)].sort(), ['GA94KO5CFQA2V4Q', 'GDOVCSE5H2R2L24']);
   });

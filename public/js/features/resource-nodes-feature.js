@@ -100,7 +100,7 @@ import { playItemOverlay } from '../item-overlay.js?v=37bde39e';
 import { nodeToolOverlay, nodeToolSheet } from '../node-tools.js?v=cf9012f1';
 import { vpSequence } from '../quest-rooms/vp-overlay.js?v=75d28bfb';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
-import { salmonSwimAt } from '../street-creatures.js?v=55c7cd29';
+import { salmonSwimAt } from '../street-creatures.js?v=a2cfb6d7';
 import { GAME_EPOCH_MS } from '../game-day.js?v=188ef3fa';
 
 export const RESOURCE_FEATURE_ID = 'resource-nodes';
@@ -161,30 +161,62 @@ function resolveClassId(classTsid) {
   return getResourceNodeDef(classTsid)?.classTsid || null;
 }
 
-/** Planner requests: one group per node class, counts from the spawn list. */
-export function resourcePlacementGroups(population) {
+/** How many of each node class the spawn list holds, in its order. */
+function resourceClassCounts(population) {
   const counts = new Map();
   for (const raw of Array.isArray(population?.resourceNodeClasses) ? population.resourceNodeClasses : []) {
     const classTsid = resolveClassId(raw);
     if (!classTsid) continue;
     counts.set(classTsid, (counts.get(classTsid) || 0) + 1);
   }
-  return [...counts.entries()].map(([classTsid, count]) => ({
-    key: `${RESOURCE_GROUP_PREFIX}${classTsid}`,
-    count,
-    clearance: RESOURCE_PLACEMENT_CLEARANCE[classTsid] || 60,
-  }));
+  return counts;
 }
 
-/** Pair planner points with node keys; classes the planner could not seat are dropped. */
+/**
+ * Player report #210: the class's spots measured on the street's snaps (street-ecology.js
+ * measuredNodeSpots, populationForStreet `resourceSpots`), at most `count`.
+ */
+function measuredSpots(population, classTsid, count) {
+  const rows = population?.resourceSpots?.[classTsid];
+  if (!Array.isArray(rows)) return [];
+  return rows.filter((row) => Number.isFinite(row?.x) && Number.isFinite(row?.y)).slice(0, count);
+}
+
+/**
+ * Planner requests: one group per node class, counts from the spawn list, less the ones with a
+ * measured spot (those are never planned).
+ */
+export function resourcePlacementGroups(population) {
+  const groups = [];
+  for (const [classTsid, count] of resourceClassCounts(population)) {
+    const planned = count - measuredSpots(population, classTsid, count).length;
+    if (planned < 1) continue;
+    groups.push({
+      key: `${RESOURCE_GROUP_PREFIX}${classTsid}`,
+      count: planned,
+      clearance: RESOURCE_PLACEMENT_CLEARANCE[classTsid] || 60,
+    });
+  }
+  return groups;
+}
+
+/**
+ * Pair spots with node keys (`<class>:<index>`, so saved nodes keep theirs): a class's measured
+ * spots first (`wall: true`, drawn where the snap shows them, in the variant it shows), then the
+ * planner's points; ones the planner could not seat are dropped.
+ */
 export function resourceSpawnPlan(population, placement) {
   const plan = [];
-  for (const group of resourcePlacementGroups(population)) {
-    const classTsid = group.key.slice(RESOURCE_GROUP_PREFIX.length);
-    const points = (typeof placement === 'function' ? placement(group.key) : []) || [];
-    points.slice(0, group.count).forEach((point, index) => {
+  for (const [classTsid, count] of resourceClassCounts(population)) {
+    const spots = measuredSpots(population, classTsid, count);
+    spots.forEach((spot, index) => {
+      plan.push({ key: `${classTsid}:${index}`, classTsid, x: spot.x, y: spot.y, wall: true, ...(spot.variant ? { variant: spot.variant } : {}) });
+    });
+    if (count - spots.length < 1) continue;
+    const points = (typeof placement === 'function' ? placement(`${RESOURCE_GROUP_PREFIX}${classTsid}`) : []) || [];
+    points.slice(0, count - spots.length).forEach((point, index) => {
       if (!Number.isFinite(point?.x) || !Number.isFinite(point?.y)) return;
-      plan.push({ key: `${classTsid}:${index}`, classTsid, x: point.x, y: point.y });
+      plan.push({ key: `${classTsid}:${spots.length + index}`, classTsid, x: point.x, y: point.y });
     });
   }
   return plan;
@@ -201,7 +233,10 @@ export function prepareStreetResourceNodes(slot, plan, { tsid = '', now = Date.n
   for (const item of plan) {
     let node = normalizeResourceNode(slot.nodes[item.key]);
     if (!node || node.classTsid !== item.classTsid) {
-      node = createResourceNode(item.classTsid, { seed: `${tsid}:${item.key}`, now });
+      node = createResourceNode(item.classTsid, { seed: `${tsid}:${item.key}`, now, ...(item.variant ? { variant: item.variant } : {}) });
+    } else if (item.variant && node.variant !== item.variant) {
+      // A measured spot shows the snap's variant; the art is all a variant changes, so a saved node takes it.
+      node.variant = item.variant;
     }
     slot.nodes[item.key] = node;
     out.push({ ...item, node });
@@ -722,9 +757,17 @@ function buildGroundView(engine, entity) {
   const frame = resourceNodeFrame(entity.node);
   const texture = frame?.sheet ? frameTexture(engine, frame.sheet, frame.frameIndex) : null;
   const sprite = new PIXI.Sprite(texture || PIXI.Texture.EMPTY);
-  sprite.anchor.set(0.5, frame?.sheet ? footAnchor(frame.sheet, frame.frameIndex) : 1);
-  sprite.x = entity.x;
-  sprite.y = entity.y + 2;
+  if (entity.wall) {
+    // Player report #210: a measured spot is the frame cell's bottom centre on the wall the snap shows
+    // (obey_physics false: no floor under it), so every growth state keeps its place in the cell.
+    sprite.anchor.set(0.5, 1);
+    sprite.x = entity.x;
+    sprite.y = entity.y;
+  } else {
+    sprite.anchor.set(0.5, frame?.sheet ? footAnchor(frame.sheet, frame.frameIndex) : 1);
+    sprite.x = entity.x;
+    sprite.y = entity.y + 2;
+  }
   sprite.zIndex = itemZ(entity.classTsid, entity.classTsid === 'paper_tree' ? Z.paper : Z.ground);
   if (entity.classTsid !== 'paper_tree') {
     sprite._worldHitW = Math.max(46, frame?.sheet?.frameWidth || 46);
@@ -1018,7 +1061,7 @@ function refreshEntity(engine, entity) {
       const texture = frameTexture(engine, frame.sheet, frame.frameIndex);
       if (texture) {
         entity.view.sprite.texture = texture;
-        entity.view.sprite.anchor.set(0.5, footAnchor(frame.sheet, frame.frameIndex));
+        entity.view.sprite.anchor.set(0.5, entity.wall ? 1 : footAnchor(frame.sheet, frame.frameIndex));
         entity.view.sheetPath = frame.sheet.path;
         entity.view.frameIndex = frame.frameIndex;
       }

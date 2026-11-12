@@ -33,7 +33,7 @@ import {
   QUOIN_SHARD_FALL,
 } from '../public/js/quoin-shards.js?v=121156a0';
 import { placementRequests, streetQuoinLayout, classTable, mysteryTable } from '../tools/build-realtime-quoins.mjs';
-import { setStreetEcologyCatalog } from '../public/js/street-ecology.js?v=08076876';
+import { setStreetEcologyCatalog } from '../public/js/street-ecology.js?v=26dabe26';
 import { QUOIN_CLASSES } from '../public/js/quoins.js?v=237c1d5d';
 import { HAS_SERVER, serverPath, skipWithoutServer } from '../tools/repos.mjs';
 

@@ -5,6 +5,7 @@
 
 import { avatarHeadReach, groundBeneath, isItemSolid, isStandable, platformYAt, worldToScreen } from './street-model.js?v=b6cb6a4e';
 import { behindFloor } from './reach.js?v=4187d746';
+import { BARNACLE_SPOTS } from './barnacle-spots-data.js?v=cea3daec';
 
 export const STREET_ECOLOGY_URL = 'assets/content/street-ecology.json?v=official-ecology-6';
 
@@ -129,6 +130,48 @@ export const RESOURCE_NODE_CAPS = Object.freeze({
   npc_salmon: 8,
 });
 
+/**
+ * Player report #210: Mortar Barnacles were set by hand (mortar_barnacle.js obey_physics false), mostly
+ * on walls: Froughtful Fen's 11 sit on the beehive huts over its decks and on a barrel, none on the
+ * ground. The location files only count them, so a street whose players' snaps show where they were
+ * has measured spots (MEASURED_NODE_SPOTS, assets/content/barnacle-spots.json from
+ * tools/snap-placements/barnacles.py) and every barnacle the file names, measured first. Any the
+ * snaps did not show are planned on a floor, as are all of a street with no snap, and of those the
+ * planner seats at most PLANNED_NODE_CAPS: a floor is never where the original had them, so an
+ * invented row of 13 along the ground is worse than a few.
+ */
+export const PLANNED_NODE_CAPS = Object.freeze({
+  mortar_barnacle: 6,
+});
+
+/** Measured spots per class: { [class]: { [G tsid]: [[x, y, variant number], ...] } } (street px). */
+export const MEASURED_NODE_SPOTS = Object.freeze({
+  mortar_barnacle: Object.freeze({ variantPrefix: 'blister', streets: BARNACLE_SPOTS }),
+});
+
+/**
+ * A street's measured node spots, { [class]: [{ x, y, variant }] } (street px, the art's frame cell
+ * bottom centre: resource-nodes-feature draws these wall-mounted), or null when it has none.
+ */
+export function measuredNodeSpots(tsid) {
+  let out = null;
+  for (const [classTsid, source] of Object.entries(MEASURED_NODE_SPOTS)) {
+    let rows = null;
+    for (const alias of streetEcologyAliases(tsid)) {
+      if (source.streets[alias]) {
+        rows = source.streets[alias];
+        break;
+      }
+    }
+    if (!rows?.length) continue;
+    out ||= {};
+    out[classTsid] = rows
+      .filter((row) => Number.isFinite(row?.[0]) && Number.isFinite(row?.[1]))
+      .map(([x, y, v]) => ({ x, y, variant: Number.isFinite(v) ? `${source.variantPrefix}${v}` : null }));
+  }
+  return out;
+}
+
 function resourceCountsFrom(counts) {
   const out = {};
   for (const classTsid of RESOURCE_NODE_CLASSES) {
@@ -138,13 +181,22 @@ function resourceCountsFrom(counts) {
   return out;
 }
 
-function expandResourceClasses(counts) {
+function expandResourceClasses(counts, spots = null) {
   const out = [];
   for (const classTsid of RESOURCE_NODE_CLASSES) {
-    const n = Math.min(whole(counts?.[classTsid]), RESOURCE_NODE_CAPS[classTsid] ?? Infinity);
+    let n = Math.min(whole(counts?.[classTsid]), RESOURCE_NODE_CAPS[classTsid] ?? Infinity);
+    if (PLANNED_NODE_CAPS[classTsid] != null) {
+      const measured = Math.min(n, spots?.[classTsid]?.length || 0);
+      n = measured + Math.min(n - measured, PLANNED_NODE_CAPS[classTsid]);
+    }
     for (let i = 0; i < n; i += 1) out.push(classTsid);
   }
   return out;
+}
+
+/** The population's measured spots for its spawn list (resource-nodes-feature resourceSpawnPlan), if any. */
+function spotFields(spots) {
+  return spots ? { resourceSpots: spots } : {};
 }
 
 function whole(value, fallback = 0, max = 999) {
@@ -342,6 +394,8 @@ export function populationForStreet(tsid, entry, { starter = false } = {}) {
   }
   if (!entry && !starter) return emptyPopulation({ source: 'no-archived-row' });
   const counts = entry?.counts || {};
+  // Spots measured on this street's snaps (player report #210): its own floors and walls, whatever row.
+  const spots = measuredNodeSpots(tsid);
   if (entry?.interior === true || entry?.exact === true) {
     // Indoors, or an outdoor street whose archived file holds no ecology at
     // all (`exact`: quoins, Qurazy markers, event boxes, patches, notes):
@@ -367,7 +421,8 @@ export function populationForStreet(tsid, entry, { starter = false } = {}) {
       companions: entry.companions !== false,
       resourceCounts: resourceCountsFrom(counts),
       featureCounts: featureCountsFrom(counts),
-      resourceNodeClasses: expandResourceClasses(counts),
+      resourceNodeClasses: expandResourceClasses(counts, spots),
+      ...spotFields(spots),
     };
   }
   // A feature-built row for a rebuilt street may lift the rendering caps to its
@@ -436,7 +491,8 @@ export function populationForStreet(tsid, entry, { starter = false } = {}) {
     companions: entry?.companions !== false,
     resourceCounts: resourceCountsFrom(counts),
     featureCounts: featureCountsFrom(counts),
-    resourceNodeClasses: expandResourceClasses(counts),
+    resourceNodeClasses: expandResourceClasses(counts, spots),
+    ...spotFields(spots),
   };
 }
 
@@ -493,7 +549,28 @@ export const PLACEMENT_FOOTPRINTS = Object.freeze({
   piggies: ANIMAL_BODY.piggies + 2 * ANIMAL_PATROL.piggies,
   chickens: ANIMAL_BODY.chickens + 2 * ANIMAL_PATROL.chickens,
   butterflies: 48,
+  // Player report #210: a planned Mortar Barnacle's blister art (32-39 px a frame) and a little floor round it.
+  'resource:mortar_barnacle': 60,
 });
+
+/**
+ * Player report #210: planned Mortar Barnacles stood on a 45 degree ramp and on short ledges over
+ * Froughtful Fen's decks. A group here only takes a floor no steeper than `maxSlope` (rise over run)
+ * and never a ledge (a run shorter than `ledgeRun` px) with another floor under it (a perch,
+ * PERCH_DROP_PX); with no such spot left, or none with its footprint's room, it is not placed
+ * (planStreetPlacements: no fallback). Barnacles only:
+ * the other nodes keep the plain rule.
+ */
+export const STEADY_FLOOR_GROUPS = Object.freeze({
+  'resource:mortar_barnacle': Object.freeze({ maxSlope: 0.4, ledgeRun: 240 }),
+});
+
+/** PURE: whether a planner spot (buildPlatformCandidates) is a floor a STEADY_FLOOR_GROUPS rule takes. */
+export function steadyFloor(candidate, rule) {
+  if (!rule) return true;
+  if ((candidate?.slope || 0) > rule.maxSlope) return false;
+  return !((candidate?.under || 0) > 0 && (candidate?.run || 0) < rule.ledgeRun);
+}
 /** Groups that need their room but may sit on a perch as readily as on a floor. */
 export const PERCHING_GROUPS = Object.freeze(['butterflies']);
 
@@ -850,6 +927,14 @@ function roomAt(spans, x) {
   return 0;
 }
 
+/** The width of the floor run under x on `line` (0: none). */
+function runAt(spans, x) {
+  for (const [lo, hi] of spans || []) {
+    if (x >= lo - 0.01 && x <= hi + 0.01) return hi - lo;
+  }
+  return 0;
+}
+
 /** Build dense, stable candidates along the lower reachable platform bands. */
 export function buildPlatformCandidates(platforms, { worldW = 2500, seed = '', unreached = null } = {}) {
   // Only lines the avatar stands on (street-model.js isStandable): an underside or
@@ -920,6 +1005,9 @@ export function buildPlatformCandidates(platforms, { worldW = 2500, seed = '', u
         item,
         room: item ? roomAt(spans.get(platform), x) : 0,
         under: item ? under(x, y) : 0,
+        // STEADY_FLOOR_GROUPS: the line's rise over run and its floor run's width.
+        slope: Math.abs(platform.y2 - platform.y1) / Math.max(1e-6, width),
+        run: item ? runAt(spans.get(platform), x) : 0,
       });
     }
   }
@@ -957,7 +1045,9 @@ function scaledDistance(a, b, verticalScale = 1.75) {
  * ({ key, index }).
  * When no free spot has the room the thing still goes down, on the roomiest spots
  * left, and the plan lists it under `fallbacks` ({ key, index, room, footprint }).
- * Every placed point carries its spot's `room`.
+ * Every placed point carries its spot's `room`. A STEADY_FLOOR_GROUPS group (planned Mortar
+ * Barnacles, player report #210) takes no steep ramp and no short ledge, and no fallback: one
+ * with no such spot that has its room is left out.
  *
  * Reserved spots that carry a `block` (streetReservedSpots: doors, ladder feet,
  * signposts) are kept clear before all of that: big scenery (PLACEMENT_HEIGHTS,
@@ -1000,6 +1090,7 @@ export function planStreetPlacements(
       ? Math.max(0, request.footprint)
       : PLACEMENT_FOOTPRINTS[request.key] || 0;
     const perching = request?.perch === true || PERCHING_GROUPS.includes(request.key);
+    const steady = STEADY_FLOOR_GROUPS[request.key] || null;
     const walker = Boolean(ANIMAL_PATROL[request.key]);
     const height = Number.isFinite(request?.height) ? Math.max(0, request.height) : PLACEMENT_HEIGHTS[request.key] || 0;
     // The fixture each spot would cover for this request (null: clear); the arrival covers nothing.
@@ -1017,12 +1108,14 @@ export function planStreetPlacements(
       if (footprint > 0) {
         let clearNeed = -1;
         for (const candidate of candidates) {
-          if (used.has(candidate.id) || candidate.item === false) continue;
+          if (used.has(candidate.id) || candidate.item === false || !steadyFloor(candidate, steady)) continue;
           const room = Math.min(footprint, candidate.room || 0);
           need = Math.max(need, room);
           if (!covers.has(candidate.id)) clearNeed = Math.max(clearNeed, room);
         }
         if (clearNeed >= 0) need = clearNeed;
+        // A steady-floor group (STEADY_FLOOR_GROUPS) never takes a cramped spot: it is left out instead.
+        if (steady && need < footprint) break;
         if (need < footprint) fallbacks.push({ key: request.key, index, room: Math.round(need), footprint });
       }
       let best = null;
@@ -1031,6 +1124,7 @@ export function planStreetPlacements(
       for (const candidate of candidates) {
         if (used.has(candidate.id)) continue;
         if (!avatar && candidate.item === false) continue;
+        if (!steadyFloor(candidate, steady)) continue;
         if (need > 0 && (candidate.room || 0) < need) continue;
         const nearest = occupied.length
           ? Math.min(...occupied.map((other) => {

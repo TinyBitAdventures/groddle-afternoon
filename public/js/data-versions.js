@@ -19,6 +19,7 @@
       "assets/audio/sfx/STILL_COLLECT.mp3": "c699227f",
       "assets/audio/sfx/STILL_READY.mp3": "6eed2b3d",
       "assets/content/achievements.json": "f752dcd5",
+      "assets/content/barnacle-spots.json": "ea6c5ca0",
       "assets/content/deco-catalog.json": "4540131b",
       "assets/content/puzzle-triggers.json": "abbade34",
       "assets/content/quests.json": "3d1c3335",

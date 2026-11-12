@@ -2752,9 +2752,14 @@
   "deployed": "2026-11-11"
  },
  "git": {
-  "commits": 1675,
+  "commits": 1676,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-11",
+    "kind": "fix",
+    "text": "Classic no longer resizes the game on hover, and the iMG count fits"
+   },
    {
     "date": "2026-11-11",
     "kind": "fix",
@@ -2869,14 +2874,9 @@
     "date": "2026-11-11",
     "kind": "improve",
     "text": "Browse goods stays first in a street spirit's menu when it can reminisce"
-   },
-   {
-    "date": "2026-11-11",
-    "kind": "fix",
-    "text": "The street's top and bottom hold you, /stuck clears event physics, and Fernucopia's shaft flies"
    }
   ]
  },
- "tests": 816,
+ "tests": 817,
  "generatedAt": "2026-11-11"
 }

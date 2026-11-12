@@ -46,8 +46,10 @@ import {
   setStreetEcologyCatalog,
   ecologyForStreet,
   populationForStreet,
+  measuredNodeSpots,
+  PLANNED_NODE_CAPS,
   RESOURCE_NODE_CLASSES,
-} from '../public/js/street-ecology.js?v=08076876';
+} from '../public/js/street-ecology.js?v=26dabe26';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const publicRoot = join(__dirname, '../public');
@@ -721,7 +723,8 @@ describe('street ecology resource counts', () => {
   });
 
   // G399: the spawn list used to keep at most 6 barnacles, nubbins and Jellisacs, 3 piles and bogs, and
-  // 10 rocks a street, dropping placements the location XML has. Only the two wandering animals stay capped.
+  // 10 rocks a street, dropping placements the location XML has. Only the two wandering animals stay capped,
+  // and (player report #210) the Mortar Barnacles the planner has to invent a floor spot for.
   const STANDING_NODES = ['mortar_barnacle', 'ice_knob', 'jellisac', 'dirt_pile', 'peat_1', 'dust_trap', 'npc_sloth', 'paper_tree'];
   const ROCKS = ['rock_metal_1', 'rock_dullite_1', 'rock_beryl_1', 'rock_sparkly_1'];
 
@@ -734,7 +737,10 @@ describe('street ecology resource counts', () => {
       const counts = row?.counts || {};
       for (const cls of STANDING_NODES) {
         const n = pop.resourceNodeClasses.filter((id) => id === cls).length;
-        assert.equal(n, counts[cls] || 0, `${tsid} ${cls}`);
+        // Player report #210: barnacles the snaps place all spawn; at most PLANNED_NODE_CAPS more are planned.
+        const measured = Math.min(counts[cls] || 0, measuredNodeSpots(tsid)?.[cls]?.length || 0);
+        const want = PLANNED_NODE_CAPS[cls] == null ? counts[cls] || 0 : measured + Math.min((counts[cls] || 0) - measured, PLANNED_NODE_CAPS[cls]);
+        assert.equal(n, want, `${tsid} ${cls}`);
         totals[cls] = (totals[cls] || 0) + n;
       }
       for (const cls of ROCKS) assert.equal(pop.rockClasses.filter((id) => id === cls).length, counts[cls] || 0, `${tsid} ${cls}`);
