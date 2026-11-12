@@ -42,10 +42,10 @@ describe('Pixi 8 API only', () => {
   it('play/index.html and race-lab.html load the vendored Pixi 8 build', () => {
     for (const page of ['play/index.html', 'race-lab.html']) {
       const html = readFileSync(join(pub, page), 'utf8');
-      assert.match(html, /<script src="vendor\/pixi\/pixi-8\.22\.0\.min\.js"><\/script>/, page);
+      assert.match(html, /<script src="vendor\/pixi\/pixi-8\.23\.0\.min\.js"><\/script>/, page);
       assert.doesNotMatch(html, /cdn\.jsdelivr|unpkg|pixi\.js@7/, page);
     }
-    assert.ok(existsSync(join(pub, 'vendor/pixi/pixi-8.22.0.min.js')));
+    assert.ok(existsSync(join(pub, 'vendor/pixi/pixi-8.23.0.min.js')));
     assert.ok(existsSync(join(pub, 'vendor/pixi/LICENSE')));
   });
 
