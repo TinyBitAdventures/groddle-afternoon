@@ -36,8 +36,8 @@
 
 import { createMinnAccount } from '../minn-account.js?v=c15f0ecf';
 import { mountAccountForms, mountAccountSettings, mountPresenceSetting } from '../account-forms.js?v=559c1263';
-import { createBrowserSaveStore, freezeSoloSaves, restoreSoloSave, saveStore, savedAtOf, soloSaveSnapshot } from '../save-store.js?v=89422a9c';
-import { formatGameDayLabel } from '../game-day.js?v=84569fa2';
+import { createBrowserSaveStore, freezeSoloSaves, restoreSoloSave, saveStore, savedAtOf, soloSaveSnapshot, thawSoloSaves } from '../save-store.js?v=5b167c14';
+import { formatGameDayLabel } from '../game-day.js?v=a7e262aa';
 import { multiplayerEntryUrl } from '../game-mode.js?v=1ecf2899';
 import { markContinued, quietSession } from '../online-boot.js?v=733c6af0';
 import { installCharacterSwitcher } from '../character-switcher.js?v=b048a8bd';
@@ -226,6 +226,8 @@ function createPanel(engine, account, signedInSession) {
       freezeSoloSaves();
       restoreSoloSave(backup.data);
     } catch (err) {
+      // No reload follows a failed restore, so the running game must save again.
+      thawSoloSaves();
       say(`That backup cannot be restored: ${err?.message || err}`, 'bad');
       return;
     }

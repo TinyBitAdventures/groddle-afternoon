@@ -42,7 +42,7 @@ import {
 import { streetObjectsFeature } from '../public/js/features/street-objects-feature.js?v=e460a430';
 import { FEATURES } from '../public/js/features/index.js?v=abf1f974';
 import { createMineRock, mineRock } from '../public/js/mining.js?v=12a6f1bd';
-import { createResourceNode } from '../public/js/resource-nodes.js?v=9db2fcee';
+import { createResourceNode } from '../public/js/resource-nodes.js?v=24968e1f';
 import { createTrantState, fruitCapacityAt, setTrantTables } from '../public/js/trants.js?v=1b3c8ae3';
 import { placementRequests, ruleTables, streetObjectLayout } from '../tools/build-realtime-objects.mjs';
 import { STREET_INDEX, applyStreetIndex, loadStreetDataFromFs } from '../public/js/street-loader.js?v=18b181ad';

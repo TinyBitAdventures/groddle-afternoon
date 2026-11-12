@@ -39,7 +39,7 @@ import {
   treeDeathOutcome,
   useBottle,
 } from '../public/js/tree-poison.js?v=5ceea244';
-import { createPlot, killPlotTree, performPlotVerb, growTree } from '../public/js/patches.js?v=d63423c9';
+import { createPlot, killPlotTree, performPlotVerb, growTree } from '../public/js/patches.js?v=525b2236';
 import { createFeatureHost } from '../public/js/feature-host.js?v=06bb8b74';
 import { FEATURES } from '../public/js/features/index.js?v=abf1f974';
 import { adoptedPlan } from '../public/js/features/patches-feature.js?v=92f12bc2';
@@ -48,7 +48,7 @@ import {
   decorateTreeVerbs,
   streetTreeIndex,
   treeDeathFeature,
-} from '../public/js/features/tree-death-feature.js?v=ca9bac36';
+} from '../public/js/features/tree-death-feature.js?v=b9be4ab6';
 import { skillRemakeNote } from '../public/js/skill-tree.js?v=faa54b90';
 import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=10b118dd';
 

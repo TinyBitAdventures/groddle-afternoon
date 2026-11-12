@@ -25,8 +25,8 @@ import {
   setFreeTooltip,
   setFreeVerbState,
 } from '../public/js/animal-set-free.js?v=3b194fca';
-import { getVerbsFor } from '../public/content.js?v=968c90a7';
-import { createAnimalState } from '../public/js/animals.js?v=c944b0a6';
+import { getVerbsFor } from '../public/content.js?v=5d55594c';
+import { createAnimalState } from '../public/js/animals.js?v=14659b5c';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const pub = join(here, '../public');
@@ -44,7 +44,7 @@ describe('G283: the stun orb and the beam in view', () => {
   // Desk ORBERA (G293): the orb moved down to just above the name labels, so
   // the camera no longer looks up for it (tests/desk-decisions.test.js).
   it('the orb (200 px over your feet) sits in the 408 px viewport without the camera looking up', async () => {
-    const { ORB_ART } = await import('../public/js/features/rook-attack-feature.js?v=c41be919');
+    const { ORB_ART } = await import('../public/js/features/rook-attack-feature.js?v=5ed2c389');
     const { placeRookBadge, badgeExtent } = await import('../public/js/rook-badge-place.js?v=2bb00dfd');
     const viewH = 408;
     const feet = viewH * (0.5 + 150 / 600); // movement.js yCamOffsetAnchor(150)

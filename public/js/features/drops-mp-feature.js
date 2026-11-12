@@ -46,7 +46,7 @@
 import { ITEM_CATALOG, addItem, countItem, removeItem } from '../inventory.js?v=5be47371';
 import { TOOL_CONDITION_CATALOG, leavingCopyTag, leavingToolWear, receiveToolCopy, takeToolCopy } from '../tools.js?v=5f482998';
 import { createMinnAccount } from '../minn-account.js?v=c15f0ecf';
-import { saveStore } from '../save-store.js?v=89422a9c';
+import { saveStore } from '../save-store.js?v=5b167c14';
 import { DROP_OP, DROP_TEXT, dropEffect, eatenStack, groundFrom, homeStreetOwner, isPublicStreet, normalizeGroundStack, normalizeMine, pickupAsk, pigAnimalKey, shareReason, stackAt, stackLeft } from '../drops-mp.js?v=ec6a135d';
 
 export const DROPS_MP_FEATURE_ID = 'drops-mp';

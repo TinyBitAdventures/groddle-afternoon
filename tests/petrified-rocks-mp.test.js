@@ -12,7 +12,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { homedir } from 'node:os';
-import { LARGE_PLACES, ROCK_LARGE, ROCK_MEDIUM, TOP_PLACES } from '../public/js/feats-mp.js?v=6effac8a';
+import { LARGE_PLACES, ROCK_LARGE, ROCK_MEDIUM, TOP_PLACES } from '../public/js/feats-mp.js?v=29462dce';
 import { featTable } from '../tools/build-realtime-feats.mjs';
 import { CRACK_STEPS } from '../public/js/artifacts.js?v=fc419ecf';
 

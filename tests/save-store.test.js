@@ -31,14 +31,14 @@ import {
   savedAtOf,
   savedThrough,
   soloSaveSnapshot,
-} from '../public/js/save-store.js?v=89422a9c';
+} from '../public/js/save-store.js?v=5b167c14';
 import { HANDOFF_KEY, claimCharacter, leaveHandoff, listenForClaims, takeHandoff } from '../public/js/save-claim.js?v=30cf5250';
 import { SITE_DIR, skipWithoutSite } from '../tools/repos.mjs';
 import { spawnSync } from 'node:child_process';
 import { AUDIO_MUTED_KEY } from '../public/js/audio-pref.js?v=6fe817bc';
-import { STORAGE_KEY as APPEARANCE_KEY, APPEARANCE_PRESETS, appearanceToJson, loadAppearance, saveAppearance } from '../public/js/character-builder.js?v=91805f9c';
-import { getGameDayKey, getLastNewDayKey, getLastNewDayTs, resetGameDayClock, setLastNewDayTs } from '../public/js/game-day.js?v=84569fa2';
-import { createPlayerSave, parsePlayerSave, serializePlayerSave } from '../public/js/player-save.js?v=ae3205a3';
+import { STORAGE_KEY as APPEARANCE_KEY, APPEARANCE_PRESETS, appearanceToJson, loadAppearance, saveAppearance } from '../public/js/character-builder.js?v=3db864ee';
+import { getGameDayKey, getLastNewDayKey, getLastNewDayTs, resetGameDayClock, setLastNewDayTs } from '../public/js/game-day.js?v=a7e262aa';
+import { createPlayerSave, parsePlayerSave, serializePlayerSave } from '../public/js/player-save.js?v=a97f5a0e';
 
 const pub = join(import.meta.dirname, '..', 'public');
 const read = (rel) => readFileSync(join(pub, rel), 'utf8');
@@ -951,6 +951,18 @@ describe('solo backups', () => {
     assert.equal(storage.map.get('groddle_player_location'), 'BEFORE', 'the running game cannot write over a restore');
     assert.equal(fresh.saveStore.get('location'), 'BEFORE', 'reads still work');
     assert.equal(typeof freezeSoloSaves, 'function');
+  });
+
+  it('a failed restore thaws the solo store, so the running game keeps saving', async () => {
+    const fresh = await import(`../public/js/save-store.js?v=mp2-1&thaw=${Date.now()}`);
+    const storage = useLocalStorage(memoryStorage({}));
+    fresh.freezeSoloSaves();
+    assert.throws(() => fresh.restoreSoloSave({ kind: 'nope' }), /Only a solo backup/);
+    fresh.thawSoloSaves();
+    fresh.saveStore.set('location', 'AFTER-FAILED-RESTORE');
+    assert.equal(storage.map.get('groddle_player_location'), 'AFTER-FAILED-RESTORE');
+    const src = readFileSync(new URL('../public/js/features/account-backup-feature.js', import.meta.url), 'utf8');
+    assert.match(src, /restoreSoloSave\(backup\.data\);\n\s*\} catch \(err\) \{[\s\S]{0,160}thawSoloSaves\(\);/);
   });
 });
 

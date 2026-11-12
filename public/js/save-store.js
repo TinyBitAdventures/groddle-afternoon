@@ -648,6 +648,11 @@ export function freezeSoloSaves() {
   soloFrozen = true;
 }
 
+/** Lets the solo store write again (a restore failed, so no reload is coming). */
+export function thawSoloSaves() {
+  soloFrozen = false;
+}
+
 /** The store for this page's mode. In solo, writes stop once freezeSoloSaves() is called. */
 export const saveStore = GAME_MODE === MULTIPLAYER
   ? createSaveStore(GAME_MODE)

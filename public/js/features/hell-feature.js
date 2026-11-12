@@ -58,8 +58,8 @@ import {
   wineDrinkConditions,
   POOPED_ENERGY_PERCENT,
   SUPER_POOPED_CONSUMED_MULTIPLIER,
-} from '../hell.js?v=cd6ed74f';
-import { getGameDayKey } from '../game-day.js?v=84569fa2';
+} from '../hell.js?v=87b075a8';
+import { getGameDayKey } from '../game-day.js?v=a7e262aa';
 import { countItem, removeItem } from '../inventory.js?v=5be47371';
 import { frameTexture, sourceFromUrl } from '../textures.js?v=92ec53cd';
 

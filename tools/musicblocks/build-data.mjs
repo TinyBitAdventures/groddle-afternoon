@@ -17,8 +17,8 @@ import { existsSync, readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { MUSICBLOCK_CATALOG, MUSICBLOCK_SERIES, MUSICBLOCK_MONTH_MS, MUSICBLOCK_REPLAY_MS, createMusicblockState, playMusicblock } from '../../public/js/musicblocks.js?v=182d0a4e';
-import { GAME_DAY_MS } from '../../public/js/game-day.js?v=84569fa2';
+import { MUSICBLOCK_CATALOG, MUSICBLOCK_SERIES, MUSICBLOCK_MONTH_MS, MUSICBLOCK_REPLAY_MS, createMusicblockState, playMusicblock } from '../../public/js/musicblocks.js?v=e520f853';
+import { GAME_DAY_MS } from '../../public/js/game-day.js?v=a7e262aa';
 import { ITEM_BASE_COSTS } from '../../public/js/store-catalog.js?v=74b56af3';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
