@@ -219,18 +219,20 @@ describe('alternate characters in the site\'s source (groddle-afternoon-site)', 
       'src/MultiplayerSave.php': ['write'],
       'src/RealtimeTicket.php': ['ticket'],
       'src/LedgerMail.php': ['send', 'collect'],
-      'src/LedgerAuction.php': ['create', 'buy', 'cancel', 'collect'],
-      'src/ButlerParcels.php': ['take'],
+      'src/LedgerAuction.php': ['start', 'buy', 'cancel', 'collect'],
+      'src/ButlerParcels.php': ['takeOne'],
       'src/ButlerGifts.php': ['give', 'adopt'],
-      'src/LedgerBoxes.php': ['put', 'remove', 'collect'],
-      'src/LedgerFurniture.php': ['put', 'remove', 'collect'],
+      'src/LedgerBoxes.php': ['priceRoute', 'stopRoute', 'collectRoute'],
+      'src/LedgerFurniture.php': ['price', 'dontSell', 'collect'],
       'src/HomePool.php': ['collect'],
       'src/LedgerStarter.php': ['ask'],
+      // The game's Activity marks notices shown: a tab still playing another character must not (alts QA 2026-11-12).
+      'src/Community.php': ['gameRoute'],
     };
     for (const [file, names] of Object.entries(routes)) {
       const php = src(file);
       const guarded = [...php.matchAll(/public function (\w+)\(Request \$request[^)]*\): Response\n    \{\n        Logins::guard/g)].map((m) => m[1]);
-      assert.equal(guarded.length, names.length, `${file}: ${guarded.join(', ')}`);
+      assert.deepEqual(guarded, names, `${file}: ${guarded.join(', ')}`);
       assert.match(php, guard, file);
     }
   });

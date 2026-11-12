@@ -18,7 +18,7 @@ import assert from 'node:assert/strict';
 import { resolveTokens } from './css-tokens.js';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { quietSession } from '../public/js/online-boot.js?v=ef90a7af';
+import { quietSession } from '../public/js/online-boot.js?v=665579bb';
 import { createMinnAccount } from '../public/js/minn-account.js?v=460de12b';
 import { buildOnlinePage, ONLINE_BOOT_SRC } from '../tools/play-online/build.mjs';
 

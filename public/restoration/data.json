@@ -2752,9 +2752,19 @@
   "deployed": "2026-11-12"
  },
  "git": {
-  "commits": 1713,
+  "commits": 1717,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-12",
+    "kind": "fix",
+    "text": "Choosing Sell on an item scrolls the vendor's shelf up to it too"
+   },
+   {
+    "date": "2026-11-12",
+    "kind": "improve",
+    "text": "The Social drawer names the day at each day's first time line"
+   },
    {
     "date": "2026-11-12",
     "kind": "fix",
@@ -2864,16 +2874,6 @@
     "date": "2026-11-12",
     "kind": "new",
     "text": "The character builder shows picture tiles, and Reset goes back to your saved look"
-   },
-   {
-    "date": "2026-11-12",
-    "kind": "new",
-    "text": "Classic Skills open on the 2012 card grid, with the full skill table behind it"
-   },
-   {
-    "date": "2026-11-12",
-    "kind": "improve",
-    "text": "Quoins hang where players snapped them in 2012, each its own kind"
    }
   ]
  },

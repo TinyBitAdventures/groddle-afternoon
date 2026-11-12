@@ -22,6 +22,8 @@
  * Beside Sign out, Switch character (alternate characters, Austin 2026-11-12):
  * the save is written first, then the tab forgets its character and goes back
  * to the start card, which lists the login's characters (js/online-boot.js).
+ * The character chip (js/character-chip.js) does the same from a face in the corner that
+ * stays on screen in the tutorial, where the Menu is hidden.
  *
  * Off in practice copies (?practice=1 swaps the storage) and on a plain
  * static server (no account routes answer).
@@ -37,7 +39,8 @@ import { mountAccountForms, mountAccountSettings, mountPresenceSetting } from '.
 import { createBrowserSaveStore, freezeSoloSaves, restoreSoloSave, saveStore, savedAtOf, soloSaveSnapshot } from '../save-store.js?v=89422a9c';
 import { formatGameDayLabel } from '../game-day.js?v=f88e6e16';
 import { multiplayerEntryUrl } from '../game-mode.js?v=1ecf2899';
-import { markContinued, quietSession } from '../online-boot.js?v=ef90a7af';
+import { markContinued, quietSession } from '../online-boot.js?v=665579bb';
+import { installCharacterChip } from '../character-chip.js?v=12b8f02c';
 
 /** Which slot a new backup goes to: the first empty one, else the oldest (which then needs a yes). */
 export function slotForNewBackup(backups, slots) {
@@ -434,11 +437,30 @@ function createMultiplayerPanel(engine, account) {
   };
 }
 
-/** Multiplayer's Menu: Account (email, password), Switch character and Sign out, once the save is written. */
+/** Writes the game and waits for the store: twice, a write already in flight resolves the first, the newest change goes in the second. */
+async function saveNow(engine) {
+  try { engine.save?.(); } catch { /* the store writes what it has */ }
+  await saveStore.flush?.();
+  await saveStore.flush?.();
+}
+
+/** How often the chip's face is drawn again (cached by look: a new look shows within this). */
+const CHIP_FACE_MS = 5000;
+
+/** Multiplayer's Menu: Account (email, password), Switch character and Sign out, once the save is written; and the character chip. */
 function installSignOut(engine) {
+  const account = createMinnAccount({ baseUri: document.baseURI });
+  // The chip in the corner (every multiplayer player: it is also where a second character starts).
+  const chip = installCharacterChip({
+    account,
+    engine,
+    save: () => saveNow(engine),
+    markContinued,
+    face: () => Promise.resolve(engine.lookPortrait?.(engine.playerAppearance?.vector)),
+  });
+  if (chip) setInterval(() => { chip.refreshFace(); }, CHIP_FACE_MS);
   const list = document.getElementById('more-list');
   if (!list) return;
-  const account = createMinnAccount({ baseUri: document.baseURI });
   const panel = createMultiplayerPanel(engine, account);
   const acct = el('button', { id: 'account-btn', type: 'button', class: 'chrome-btn', title: 'Your email and password' }, 'Account');
   acct.addEventListener('click', () => { panel.open(); });

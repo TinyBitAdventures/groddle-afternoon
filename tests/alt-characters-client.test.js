@@ -18,7 +18,8 @@ import { createMinnAccountCore } from '../public/js/minn-account-core.js?v=74c75
 import { createSaveSync } from '../public/js/save-store.js?v=89422a9c';
 import { CLOSE_OTHER_CHARACTER, createRealtimeClient } from '../public/js/realtime-client.js?v=cda54c6e';
 import { OTHER_CHARACTER_TEXT, statusText } from '../public/js/features/realtime-feature.js?v=562a84fb';
-import { CHARACTER_COPY, SAVE_ALERT_COPY, characterChoices, continuesAs, createRefusalText, saveAlertFor } from '../public/js/online-boot.js?v=ef90a7af';
+import { CHARACTER_COPY, FRESH_HASH, SAVE_ALERT_COPY, characterChoices, continuesAs, createRefusalText, saveAlertFor } from '../public/js/online-boot.js?v=665579bb';
+import { CHIP_COPY, STYLE as CHIP_STYLE, cardUrl, chipChoices } from '../public/js/character-chip.js?v=12b8f02c';
 import { LOCAL_STATES } from '../public/js/shared-quoins.js?v=89d7b201';
 import { menuRowFor } from '../public/js/ui/topbar.js?v=e00f6c81';
 
@@ -155,7 +156,7 @@ describe('the start card\'s choices (online-boot characterChoices)', () => {
 
   it('one character: its row, and a fresh one on offer', () => {
     const c = characterChoices({ current: 54, limit: 3, canCreate: true, nextCreateAt: null, characters: [ada] }, session(54, 'Ada'));
-    assert.deepEqual(c.rows, [{ id: 54, name: 'Ada', level: 12, current: true }]);
+    assert.deepEqual(c.rows, [{ id: 54, name: 'Ada', level: 12, current: true, retirable: false }]);
     assert.deepEqual(c.create, { can: true, note: '', limit: 3 });
   });
 
@@ -178,8 +179,33 @@ describe('the start card\'s choices (online-boot characterChoices)', () => {
 
   it('no list (an older site, or it failed): the signed-in character alone, no fresh one', () => {
     const c = characterChoices(null, session(54, 'Ada'));
-    assert.deepEqual(c.rows, [{ id: 54, name: 'Ada', level: null, current: true }]);
+    assert.deepEqual(c.rows, [{ id: 54, name: 'Ada', level: null, current: true, retirable: false }]);
     assert.equal(c.create, null);
+  });
+
+  it('Retire is offered on an extra character that is not signed in, never the first or the one playing', () => {
+    const asAda = characterChoices({ current: 54, limit: 3, canCreate: false, characters: [ada, bo, cy] }, session(54, 'Ada'));
+    assert.deepEqual(asAda.rows.map((r) => [r.name, r.retirable]), [['Ada', false], ['Bo', true], ['Cy', true]]);
+    const asBo = characterChoices({ current: 77, limit: 3, canCreate: false, characters: [ada, bo, cy] }, session(77, 'Bo'));
+    assert.deepEqual(asBo.rows.map((r) => [r.name, r.retirable]), [['Bo', false], ['Ada', false], ['Cy', true]], 'the first never, the one playing never');
+    const unsure = characterChoices({ current: 54, limit: 3, canCreate: false, characters: [ada, { ...cy, first: undefined }] }, session(54, 'Ada'));
+    assert.equal(unsure.rows[1].retirable, false, 'only when the site says it is an extra one');
+    const gone = characterChoices({ current: 54, limit: 3, canCreate: false, characters: [ada, { ...bo, retired: true }] }, session(54, 'Ada'));
+    assert.equal(gone.retired[0].retirable, false, 'a retired one is restored, not retired again');
+  });
+
+  it('the retire question says plainly what happens, in the card (never window.confirm)', () => {
+    assert.equal(CHARACTER_COPY.retire, 'Retire');
+    assert.equal(CHARACTER_COPY.retireLabel('Bo'), 'Retire Bo');
+    assert.equal(CHARACTER_COPY.retireAsk('Bo'), "Retire Bo? They'll be hidden from this list. You can bring them back from Retired characters, and their name stays theirs for 30 days.");
+    const src = code('public/js/online-boot.js');
+    assert.doesNotMatch(src, /\bconfirm\(/);
+    const body = src.slice(src.indexOf('function appendRetire('), src.indexOf('function appendCharacters('));
+    assert.match(body, /const r = await account\.retireCharacter\(c\.id\);\n\s*if \(r\.ok\) \{\n\s*onRetired\?\.\(c\.id\);/, 'retired, then the card again');
+    assert.match(body, /note\.textContent = r\.message \|\| CHARACTER_COPY\.failed;\n\s*note\.dataset\.tone = 'bad';/, 'a refusal in the site\'s own words');
+    assert.match(src, /if \(c\.retirable\) appendRetire\(li, c, \{ account, busy, onRetired \}\);/);
+    assert.match(src, /appendCharacters\(card, \{ account, session, characters, onPlay, onSwitched, onRetired: onRefresh, fresh \}\)/);
+    assert.match(src, /onRefresh: \(\) => \{ boot\(\{ account \}\); \}/, 'the refreshed card reads the list again');
   });
 
   it('the words are plain, no em-dashes', () => {
@@ -359,5 +385,72 @@ describe('Menu > Switch character (account-backup-feature)', () => {
     assert.ok(order.every((i) => i > 0), String(order));
     assert.deepEqual([...order].sort((a, b) => a - b), order);
     assert.doesNotMatch(body, /signOut/, 'the session stays');
+  });
+});
+
+describe('the character chip (js/character-chip.js)', () => {
+  const ada = { id: 54, name: 'Ada', level: 12, lastPlayedAt: 100, retired: false, first: true };
+  const bo = { id: 77, name: 'Bo', level: 3, lastPlayedAt: 200, retired: false, first: false };
+  const chip = code('public/js/character-chip.js');
+
+  it('lists the one playing first and marked, the others to switch to, retired ones left to the card', () => {
+    const c = chipChoices({ current: 77, limit: 3, canCreate: true, characters: [ada, bo, { id: 80, name: 'Cy', level: 1, retired: true, first: false }] }, { id: 77, name: 'Bo' });
+    assert.deepEqual(c.rows, [{ id: 77, name: 'Bo', level: 3, current: true }, { id: 54, name: 'Ada', level: 12, current: false }]);
+    assert.deepEqual(c.fresh, { can: true, note: '' });
+    const full = chipChoices({ current: 54, limit: 3, canCreate: false, characters: [ada, bo, { ...bo, id: 80, name: 'Cy' }] }, { id: 54, name: 'Ada' });
+    assert.equal(full.fresh.note, 'You have 3 characters.');
+    const none = chipChoices(null, { id: 54, name: 'Ada' });
+    assert.deepEqual(none.rows.map((r) => [r.name, r.current]), [['Ada', true]], 'no list: the one playing alone');
+    assert.equal(none.fresh, null);
+  });
+
+  it('goes to the start card, opening the fresh character form on #fresh', () => {
+    assert.equal(FRESH_HASH, '#fresh');
+    assert.equal(cardUrl('https://groddle.localhost/play/online/', { fresh: true }), 'https://groddle.localhost/play/online/#fresh');
+    assert.equal(cardUrl('play/online/', { base: 'https://groddle.localhost/play/online/#x' }), 'https://groddle.localhost/play/online/play/online/');
+    assert.equal(cardUrl('https://groddle.localhost/play/online/', { base: 'https://groddle.localhost/' }), 'https://groddle.localhost/play/online/');
+    const boot = read('public/js/online-boot.js');
+    assert.match(boot, /const fresh = location\.hash === FRESH_HASH;\n\s*if \(fresh\) history\.replaceState/);
+    assert.match(boot, /if \(startFresh\) \{\n\s*open\.hidden = true;\n\s*form\.hidden = false;/);
+    assert.match(chip, /win\.history\.replaceState\(win\.history\.state, '', to\.href\);\n\s*win\.location\.reload\(\);/, 'a hash alone never reloads');
+  });
+
+  it('Switch saves first, then plays the other, then loads the game as it; refusals said plainly', () => {
+    const body = chip.slice(chip.indexOf('async function switchTo('), chip.indexOf('function draw('));
+    const order = ['await save();', 'await account.playCharacter(row.id);', 'markContinued(row.id);', 'goToCard('].map((x) => body.indexOf(x));
+    assert.ok(order.every((i) => i > 0), String(order));
+    assert.deepEqual([...order].sort((a, b) => a - b), order);
+    assert.match(body, /say\(r\?\.message \|\| CHARACTER_COPY\.failed, true\);/);
+    const leave = chip.slice(chip.indexOf('async function leaveFor('), chip.indexOf('async function switchTo('));
+    assert.ok(leave.indexOf('await save();') < leave.indexOf('markContinued(false);'), 'Start a fresh character and Manage save first, then show the card');
+  });
+
+  it('is a button with a popover: named, expanded state, Escape, the game\'s keys kept out', () => {
+    assert.match(chip, /'aria-haspopup': 'dialog', 'aria-expanded': 'false', 'aria-controls': 'character-chip-pop'/);
+    assert.match(chip, /role: 'dialog', 'aria-label': CHIP_COPY\.title/);
+    assert.match(chip, /e\.stopPropagation\(\);\n\s*if \(e\.key === 'Escape'\) close\(\);/);
+    assert.equal(CHIP_COPY.label('Bo'), 'Playing as Bo. Your characters');
+    assert.equal(CHIP_COPY.fresh, CHARACTER_COPY.fresh);
+    assert.equal(CHIP_COPY.manage, 'Manage characters');
+    assert.doesNotMatch(JSON.stringify(CHIP_COPY, (k, v) => (typeof v === 'function' ? v('Ada') : v)), /—/);
+    assert.doesNotMatch(chip, /—/);
+  });
+
+  it('sits in one placement block, safe-area aware, 44 px on touch, over the tutorial', () => {
+    const place = CHIP_STYLE.slice(CHIP_STYLE.indexOf('Placement'), CHIP_STYLE.indexOf('== end placement =='));
+    assert.match(place, /\.character-chip \{ position: fixed; left: calc\(var\(--hud-inset\) \+ env\(safe-area-inset-left, 0px\)\); bottom: calc\(var\(--hud-inset\) \+ env\(safe-area-inset-bottom, 0px\)\);/);
+    assert.match(place, /@media \(pointer: coarse\) \{ \.character-chip-btn \{ --chip-size: 44px; \} \}/);
+    assert.match(place, /:root\[data-ui="classic"\] \.character-chip \{/);
+    assert.doesNotMatch(CHIP_STYLE, /#[0-9a-f]{3,8}\b|rgba?\(/i, 'colours are tokens');
+    assert.doesNotMatch(CHIP_STYLE, /font-size:\s*\d|z-index:\s*\d/, 'type sizes and layers are tokens');
+  });
+
+  it('every multiplayer page gets it, beside Menu > Switch character (kept)', () => {
+    const src = read('public/js/features/account-backup-feature.js');
+    const install = src.slice(src.indexOf('function installSignOut('), src.indexOf('export const accountBackupFeature'));
+    assert.match(install, /const chip = installCharacterChip\(\{/);
+    assert.ok(install.indexOf('installCharacterChip(') < install.indexOf("getElementById('more-list')"), 'the chip does not wait on the Menu');
+    assert.match(install, /face: \(\) => Promise\.resolve\(engine\.lookPortrait\?\.\(engine\.playerAppearance\?\.vector\)\)/);
+    assert.match(install, /id: 'switch-character-btn'/);
   });
 });

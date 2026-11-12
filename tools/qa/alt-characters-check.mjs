@@ -13,8 +13,13 @@
  * played; switching to another character (the play call, then every write naming it); the
  * save's 409 character_changed (the playing-elsewhere card, no more writes); the realtime close
  * 4012 (the words, no reconnect); the Account panel's Switch character and Menu > Switch
- * character back to the card. Shots in Modern and
- * Classic. One Chrome at a time (tools/qa/browser.mjs openBrowser takes the lock).
+ * character back to the card; Retire on an extra character (never the first or the one signed
+ * in), its in-card confirmation, Cancel, a refusal in the site's words, retired then restored;
+ * the character chip (js/character-chip.js) in the tutorial and past it: always on screen, clear
+ * of the top bar, the tutorial pill, the sound button and the pack, its name on hover, the
+ * popover by mouse and keyboard, Switch (save first, then play, then in as the other), Start a
+ * fresh character (the card's form open) and Manage characters (the card).
+ * Shots in Modern and Classic. One Chrome at a time (tools/qa/browser.mjs openBrowser takes the lock).
  */
 import { mkdirSync } from 'node:fs';
 import { join } from 'node:path';
@@ -25,8 +30,8 @@ const ROOT = join(import.meta.dirname, '..', '..');
 const arg = (name, fallback) => process.argv.find((a) => a.startsWith(`--${name}=`))?.slice(name.length + 3) ?? fallback;
 const PORT = Number(arg('port', 8847));
 const SHOTS = arg('shots', '');
-/** --only=cards,fresh,switch,write,realtime runs those parts alone; --ui=modern|classic one skin. */
-const ONLY = new Set(arg('only', 'cards,fresh,switch,write,realtime').split(','));
+/** --only=cards,fresh,switch,write,realtime,retire,chip runs those parts alone; --ui=modern|classic one skin. */
+const ONLY = new Set(arg('only', 'cards,fresh,switch,write,realtime,retire,chip').split(','));
 const UIS = arg('ui', 'modern,classic').split(',');
 if (SHOTS) mkdirSync(SHOTS, { recursive: true });
 
@@ -34,6 +39,32 @@ const ADA = { id: 54, name: 'Ada', level: 12, lastPlayedAt: 1_762_900_000, retir
 const BO = { id: 77, name: 'Bo', level: 3, lastPlayedAt: 1_762_800_000, retired: false, first: false };
 const CY = { id: 80, name: 'Cy', level: 1, lastPlayedAt: null, retired: false, first: false };
 const NEW = { id: 91, name: 'Dot', level: 1, lastPlayedAt: null, retired: false, first: false };
+
+/** A save past the tutorial (as tools/qa/online-smoke.mjs seeds one): the street, not the clouds. */
+const PAST_TUTORIAL = {
+  kind: 'groddle-multiplayer',
+  format: 1,
+  entries: {
+    playerState: JSON.stringify({ savedAt: 5, inventory: {}, player: { currants: 0, level: 2, xp: 150 }, systems: { quests: { active: {}, completed: [], story: {} }, features: { newxp: { status: 'done', stage: 'done' } } } }),
+    location: JSON.stringify({ tsid: 'LIF12PMQ5121D68' }),
+  },
+};
+
+/** The chip's box and every HUD part it overlaps (the top bar, the tutorial pill, the sound button, the pack, the save pill). */
+const chipClear = (page) => page.evaluate(() => {
+  const chip = document.querySelector('[data-character-chip-button]');
+  const box = chip?.getBoundingClientRect();
+  if (!box || !box.width) return { shown: false, hits: [] };
+  const hits = [];
+  for (const sel of ['.top-bar', '#sound-btn', '[data-nx-label]', '#pack-row', '.save-pill', '.quest-tracker', '#social-rail', '.social-drawer']) {
+    for (const n of document.querySelectorAll(sel)) {
+      const r = n.getBoundingClientRect();
+      if (!r.width || !n.getClientRects().length || getComputedStyle(n).visibility === 'hidden') continue;
+      if (r.left < box.right && box.left < r.right && r.top < box.bottom && box.top < r.bottom) hits.push(sel);
+    }
+  }
+  return { shown: true, hits, box: { x: Math.round(box.x), y: Math.round(box.y), w: Math.round(box.width) } };
+});
 
 let failures = 0;
 const ok = (cond, what) => {
@@ -78,7 +109,16 @@ async function stubSite(ctx, state) {
       state.current = id;
       return json(route, 200, { ok: true, nonce: '0123456789' });
     }
-    if (path.startsWith('save') && method === 'GET') return json(route, 200, { version: 0, updatedAt: null, data: null });
+    const retire = /^characters\/(\d+)\/(retire|restore)$/.exec(path);
+    if (retire && method === 'POST') {
+      const next = retire[2] === 'retire' ? state.retireAnswers?.shift() : null;
+      if (next) return json(route, next.status, next.body);
+      const c = state.characters.find((x) => x.id === Number(retire[1]));
+      if (!c) return json(route, 404, { code: 'groddle_character_missing', message: "That character isn't one of yours." });
+      c.retired = retire[2] === 'retire';
+      return json(route, 200, { character: c });
+    }
+    if (path.startsWith('save') && method === 'GET') return json(route, 200, state.seeded ? { version: 1, updatedAt: '2026-11-12T09:00:00Z', data: PAST_TUTORIAL } : { version: 0, updatedAt: null, data: null });
     if (path === 'save' && method === 'PUT') {
       state.puts += 1;
       if (state.saveRefuse) return json(route, 409, { code: 'character_changed', message: 'You are playing another character now.' });
@@ -126,7 +166,9 @@ const CARD = `${BASE}/play/online/`;
 const shot = async (page, name) => {
   if (SHOTS) await page.screenshot({ path: join(SHOTS, `${name}.png`) });
 };
-const rows = (page) => page.$$eval('[data-online-characters] button', (bs) => bs.map((b) => b.textContent.replace(/\s+/g, ' ').trim()));
+const rows = (page) => page.$$eval('[data-online-characters] button.online-character', (bs) => bs.map((b) => b.textContent.replace(/\s+/g, ' ').trim()));
+/** The ids with a visible Retire link on the card. */
+const retireLinks = (page) => page.$$eval('[data-online-retire-open]', (bs) => bs.filter((b) => !b.hidden).map((b) => Number(b.dataset.onlineRetireOpen)));
 
 /** Waits until the game is past the gate and its start card (Start exploring, past the tutorial's card). */
 async function intoGame(page) {
@@ -159,6 +201,7 @@ try {
       await page.goto(CARD);
       await page.waitForSelector('[data-online-characters] button');
       const r = await rows(page);
+      ok((await retireLinks(page)).join() === list.filter((c) => !c.first).map((c) => c.id).join(), `${ui} ${n}: Retire on the extra characters only (${await retireLinks(page)})`);
       ok(r[0] === 'Play as Ada Level 12' && r.length === n, `${ui} ${n}: rows ${JSON.stringify(r)}`);
       const fresh = await page.$('[data-online-new-character]');
       const note = await page.$eval('[data-online-fresh-note]', (e) => e.textContent).catch(() => '');
@@ -300,6 +343,119 @@ try {
         ok((await rows(page)).length === 2, `${ui} menu: back to the card with both characters`);
       }
       await ctx.close();
+    }
+
+    // Retire: the extras only, a plain confirmation in the card, Cancel, a refusal, then retired and restored.
+    if (ONLY.has('retire')) {
+      const ctx = await newContext(browser, { ui });
+      const state = {
+        current: 77, characters: [{ ...ADA }, { ...BO }, { ...CY }], canCreate: false, createAnswers: [], puts: 0,
+        retireAnswers: [{ status: 409, body: { code: 'groddle_character_current', message: 'Switch to another character before retiring this one.' } }],
+      };
+      const log = await stubSite(ctx, state);
+      const page = await ctx.newPage();
+      await page.goto(CARD);
+      await page.waitForSelector('[data-online-characters] button');
+      ok((await retireLinks(page)).join() === '80', `${ui} retire: signed in as Bo, only Cy has Retire (${await retireLinks(page)})`);
+      await shot(page, `retire-card-${ui}`);
+      await page.click('[data-online-retire-open="80"]');
+      const ask = await page.$eval('[data-online-retire-confirm="80"]', (e) => (e.hidden ? '' : e.querySelector('.online-retire-ask').textContent));
+      ok(ask === "Retire Cy? They'll be hidden from this list. You can bring them back from Retired characters, and their name stays theirs for 30 days.", `${ui} retire: the question (${ask})`);
+      const focused = await page.evaluate(() => document.activeElement?.textContent);
+      ok(focused === 'Cancel', `${ui} retire: focus on Cancel (${focused})`);
+      await shot(page, `retire-confirm-${ui}`);
+      await page.click('[data-online-retire-confirm="80"] .online-retire-no');
+      const shut = await page.$eval('[data-online-retire-confirm="80"]', (e) => e.hidden);
+      ok(shut && !log.some((l) => l.path.endsWith('/retire')), `${ui} retire: Cancel closes it and sends nothing`);
+      // The site refuses (as it would for the one signed in): said in its words, in the confirmation.
+      await page.click('[data-online-retire-open="80"]');
+      await page.click('[data-online-retire="80"]');
+      await page.waitForFunction(() => document.querySelector('[data-online-retire-confirm="80"] [data-online-retire-note]')?.dataset.tone === 'bad');
+      const said = await page.$eval('[data-online-retire-confirm="80"] [data-online-retire-note]', (e) => e.textContent);
+      ok(said === 'Switch to another character before retiring this one.', `${ui} retire: refusal "${said}"`);
+      ok(!(await page.$eval('[data-online-retire="80"]', (b) => b.disabled)), `${ui} retire: buttons back after the refusal`);
+      await shot(page, `retire-refused-${ui}`);
+      // Now it goes through: the card again, Cy under Retired characters.
+      await page.click('[data-online-retire="80"]');
+      await page.waitForSelector('[data-online-restore="80"]', { state: 'attached', timeout: 20000 });
+      const after = await rows(page);
+      ok(after.join('|') === 'Play as Bo Level 3|Play as Ada Level 12', `${ui} retire: Cy gone from the list (${after.join(', ')})`);
+      const call = log.filter((l) => l.path === 'characters/80/retire');
+      ok(call.length === 2 && call.every((l) => l.method === 'POST' && l.header === '77'), `${ui} retire: POST characters/80/retire naming Bo`);
+      await page.click('[data-online-retired] summary');
+      await shot(page, `retire-done-${ui}`);
+      await page.click('[data-online-restore="80"]');
+      await page.waitForSelector('[data-online-character="80"]', { timeout: 20000 });
+      ok((await rows(page)).length === 3 && !(await page.$('[data-online-retired]')), `${ui} retire: Restore Cy brings Cy back`);
+      await ctx.close();
+    }
+
+    // The character chip: in the tutorial (the Menu hidden) and past it, then Switch, Start a fresh character, Manage.
+    if (ONLY.has('chip')) {
+      for (const seeded of [false, true]) {
+        const where = seeded ? 'street' : 'tutorial';
+        const ctx = await newContext(browser, { ui });
+        const state = { current: 54, characters: [{ ...ADA }, { ...BO }], canCreate: true, createAnswers: [], puts: 0, seeded };
+        const log = await stubSite(ctx, state);
+        const page = await ctx.newPage();
+        await page.goto(CARD);
+        await page.click('[data-online-continue]');
+        ok(await intoGame(page), `${ui} chip ${where}: in the game`);
+        await page.waitForTimeout(1500);
+        const clear = await chipClear(page);
+        ok(clear.shown && clear.hits.length === 0, `${ui} chip ${where}: shown, clear of the HUD (${JSON.stringify(clear)})`);
+        await page.waitForFunction(() => document.querySelector('.character-chip-face')?.dataset.face === 'avatar', null, { timeout: 10000 }).catch(() => {});
+        ok((await page.$eval('.character-chip-face', (e) => e.dataset.face || '')) === 'avatar', `${ui} chip ${where}: the face is the avatar`);
+        await page.hover('[data-character-chip-button]');
+        await page.waitForTimeout(250);
+        const label = await page.$eval('.character-chip-name', (e) => [e.textContent, getComputedStyle(e).opacity]);
+        ok(label[0] === 'Ada' && label[1] === '1', `${ui} chip ${where}: the name on hover (${label})`);
+        await shot(page, `chip-${where}-${ui}`);
+        await page.click('[data-character-chip-button]');
+        await page.waitForSelector('[data-character-chip-switch]');
+        const popRows = await page.$$eval('[data-character-chip-row]', (ls) => ls.map((l) => l.innerText.replace(/\s+/g, ' ').trim()));
+        ok(popRows.join('|') === 'Ada Level 12 Playing|Bo Level 3 Switch', `${ui} chip ${where}: rows ${popRows.join(', ')}`);
+        const extras = await page.$$eval('[data-character-chip-fresh], [data-character-chip-manage]', (bs) => bs.map((b) => b.textContent));
+        ok(extras.join('|') === 'Start a fresh character|Manage characters', `${ui} chip ${where}: ${extras.join(', ')}`);
+        const focus = await page.evaluate(() => document.activeElement?.getAttribute('aria-label'));
+        ok(focus === 'Switch to Bo', `${ui} chip ${where}: focus on Switch (${focus})`);
+        await shot(page, `chip-pop-${where}-${ui}`);
+        await page.keyboard.press('Escape');
+        const closed = await page.evaluate(() => [document.querySelector('[data-character-chip-pop]').hidden, document.activeElement?.hasAttribute('data-character-chip-button')]);
+        ok(closed[0] && closed[1], `${ui} chip ${where}: Escape closes it, focus back on the chip`);
+        if (seeded) {
+          // Keyboard: Enter on the chip, then Manage characters.
+          await page.keyboard.press('Enter');
+          await page.waitForSelector('[data-character-chip-manage]');
+          await page.focus('[data-character-chip-manage]');
+          await page.keyboard.press('Enter');
+          await page.waitForSelector('[data-online-characters] button.online-character', { timeout: 20000 });
+          ok((await rows(page)).length === 2, `${ui} chip manage: the start card`);
+          await ctx.close();
+          continue;
+        }
+        // Switch to Bo: saved first, then the play call naming Ada, then in as Bo.
+        const before = log.length;
+        await page.click('[data-character-chip-button]');
+        await page.click('[data-character-chip-switch="77"]');
+        await page.waitForFunction(() => document.getElementById('online-gate')?.hidden === false || document.querySelector('[data-character-chip-button]')?.getAttribute('aria-label')?.includes('Bo'), null, { timeout: 30000 }).catch(() => {});
+        ok(await intoGame(page), `${ui} chip switch: in the game again`);
+        const after = log.slice(before);
+        // Saved first: any write as Ada goes in before the play call, none after it.
+        const playAt = after.findIndex((l) => l.path === 'characters/77/play');
+        const lateAda = after.slice(playAt + 1).filter((l) => l.method === 'PUT' && l.header === '54').length;
+        ok(playAt >= 0 && after[playAt].header === '54' && lateAda === 0, `${ui} chip switch: play naming Ada, no write as Ada after it (${playAt}, ${lateAda})`);
+        const now = await page.$eval('[data-character-chip-button]', (b) => b.getAttribute('aria-label'));
+        ok(state.current === 77 && now === 'Playing as Bo. Your characters', `${ui} chip switch: playing as Bo (${now})`);
+        // Start a fresh character: the card with its form open.
+        await page.click('[data-character-chip-button]');
+        await page.click('[data-character-chip-fresh]');
+        await page.waitForSelector('[data-online-fresh-form]:not([hidden])', { timeout: 20000 });
+        const fresh = await page.evaluate(() => [document.activeElement?.id, location.hash]);
+        ok(fresh[0] === 'online-fresh-name' && fresh[1] === '', `${ui} chip fresh: the card's form, the name box focused (${fresh})`);
+        await shot(page, `chip-fresh-${ui}`);
+        await ctx.close();
+      }
     }
   }
 } finally {

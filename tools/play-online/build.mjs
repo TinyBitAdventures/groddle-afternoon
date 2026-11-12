@@ -88,6 +88,19 @@ const ONLINE_STYLE = `  <style>
     .online-gate .online-character { display: flex; align-items: baseline; justify-content: space-between; gap: var(--sp-5); text-align: left; }
     .online-gate .online-character-name { min-width: 0; overflow-wrap: anywhere; }
     .online-gate .online-character-level { flex: none; font-size: var(--fs-sm); font-weight: 600; opacity: 0.8; }
+    /* An extra character's Retire: a small link beside its row, and a plain confirmation under it in the card. */
+    .online-gate .online-character-row { display: flex; flex-wrap: wrap; align-items: center; column-gap: var(--sp-4); margin-top: var(--sp-5); }
+    .online-gate .online-character-row > .online-character { flex: 1 1 0; min-width: 0; margin-top: 0; }
+    .online-gate .online-retire-open { flex: none; padding: var(--sp-3) var(--sp-2); border: 0; background: none; font: inherit; font-size: var(--fs-sm); font-weight: 700; color: var(--text-moss); text-decoration: underline; cursor: pointer; }
+    .online-gate .online-retire-open[hidden], .online-gate .online-retire-confirm[hidden] { display: none; }
+    .online-gate .online-retire-confirm { flex: 1 0 100%; box-sizing: border-box; margin-top: var(--sp-4); padding: var(--sp-5) var(--sp-6); border-radius: var(--radius-md); background: var(--status-warn-soft); box-shadow: inset 0 0 0 2px var(--c-gold-76); }
+    .online-gate .online-retire-ask { margin: 0; }
+    .online-gate .online-retire-actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-4) var(--sp-7); margin-top: var(--sp-5); }
+    .online-gate .online-retire-yes { padding: var(--sp-4) var(--sp-7); border: 0; border-radius: var(--radius-lg); font: inherit; font-weight: 700; color: var(--text-on-dark); background: var(--status-danger); cursor: pointer; }
+    .online-gate .online-retire-actions button.online-home { width: auto; margin-top: 0; }
+    .online-gate .online-retire-note { margin: var(--sp-4) 0 0; font-weight: 600; color: var(--text-moss); }
+    .online-gate .online-retire-note:empty { display: none; }
+    .online-gate .online-retire-note[data-tone="bad"] { color: var(--text-danger); }
     .online-gate .online-fresh-form { display: grid; gap: var(--sp-2); margin-top: var(--sp-7); padding-top: var(--sp-6); border-top: 1px solid color-mix(in srgb, var(--c-green-42) 20%, transparent); }
     .online-gate .online-fresh-form[hidden], .online-gate .online-alt[hidden] { display: none; }
     .online-gate .online-fresh-form h3 { margin: 0; font-size: var(--fs-lg); }

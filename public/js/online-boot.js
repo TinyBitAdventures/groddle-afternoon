@@ -20,7 +20,9 @@
  * Signed in, the card lists them from groddle/v1/characters (Play as <name>, Level N, the
  * one signed in first), then Start a fresh character, Play solo and Not <name>? Sign out.
  * Playing another one signs this browser in as it (characters/{id}/play) and boots again.
- * The tab remembers which character it played, so a reload after another tab switched
+ * An extra character that is not the one signed in has a small Retire on its row: a plain
+ * confirmation in the card, then characters/{id}/retire, and it waits under Retired
+ * characters to come back (characters/{id}/restore). The tab remembers which character it played, so a reload after another tab switched
  * shows the card instead of walking in as someone else. Menu > Switch character in the
  * game (js/features/account-backup-feature.js) saves and comes back here.
  */
@@ -219,8 +221,15 @@ export const CHARACTER_COPY = Object.freeze({
   atLimit: (n) => `You have ${n} characters.`,
   retired: 'Retired characters',
   restore: (name) => `Restore ${name}`,
+  retire: 'Retire',
+  retireLabel: (name) => `Retire ${name}`,
+  retireAsk: (name) => `Retire ${name}? They'll be hidden from this list. You can bring them back from Retired characters, and their name stays theirs for 30 days.`,
+  retiring: (name) => `Retiring ${name}…`,
   failed: "That didn't work. Try again in a moment.",
 });
+
+/** The start card opened on its fresh character form (js/character-chip.js Start a fresh character). */
+export const FRESH_HASH = '#fresh';
 
 /** The most characters a login has when the site does not say (Austin 2026-11-12). */
 export const CHARACTER_LIMIT = 3;
@@ -234,19 +243,22 @@ function positiveId(id) {
  * What the card offers for a groddle/v1/characters answer (pure): rows to play (the signed-in
  * character first, then the rest as the site lists them; retired ones apart), and whether a fresh
  * character can be made now, or the plain reason it cannot. With no answer (an older site, or it
- * failed) the card offers the signed-in character alone and no fresh one.
- * @returns {{ rows: Array<{ id, name, level, current }>, retired: Array<{ id, name, level, current }>, create: null | { can: boolean, note: string, limit: number } }}
+ * failed) the card offers the signed-in character alone and no fresh one. A row is retirable when
+ * the site says it is an extra character (first: false) and it is not the one signed in (Austin
+ * 2026-11-12: never the first, never the one playing; the site checks again).
+ * @returns {{ rows: Array<{ id, name, level, current, retirable }>, retired: Array<{ id, name, level, current, retirable }>, create: null | { can: boolean, note: string, limit: number } }}
  */
 export function characterChoices(list, session) {
   const me = session?.player || null;
   const current = positiveId(list?.current) || positiveId(me?.id);
   const all = Array.isArray(list?.characters) ? list.characters.filter((c) => positiveId(c?.id) && typeof c.name === 'string' && c.name) : [];
   if (!all.length) {
-    return { rows: me ? [{ id: positiveId(me.id), name: String(me.name || ''), level: null, current: true }] : [], retired: [], create: null };
+    return { rows: me ? [{ id: positiveId(me.id), name: String(me.name || ''), level: null, current: true, retirable: false }] : [], retired: [], create: null };
   }
   const row = (c) => {
     const level = Math.floor(Number(c.level));
-    return { id: positiveId(c.id), name: c.name, level: level > 0 ? level : null, current: positiveId(c.id) === current };
+    const mine = positiveId(c.id) === current;
+    return { id: positiveId(c.id), name: c.name, level: level > 0 ? level : null, current: mine, retirable: !mine && c.first === false && c.retired !== true };
   };
   const live = all.filter((c) => c.retired !== true).map(row);
   const limit = Number.isInteger(list.limit) && list.limit > 0 ? list.limit : CHARACTER_LIMIT;
@@ -293,11 +305,65 @@ function el(tag, attrs = {}, text = '') {
 }
 
 /**
- * The signed-in card's characters: a row each (Play as <name>, Level N), Start a fresh character
- * (a name, then made and played) and, small, the retired ones to restore. onPlay plays the
- * signed-in one; onSwitched(id) boots again once the site signed this browser in as another.
+ * An extra character's Retire (Austin 2026-11-12): a small link beside its row opens a plain
+ * confirmation in the card (never window.confirm); Retire <name> asks the site
+ * (characters/{id}/retire), then onRetired() shows the card again with it under Retired
+ * characters. A refusal is said in the site's own words, in the confirmation.
  */
-function appendCharacters(card, { account, session, characters, onPlay, onSwitched }) {
+function appendRetire(li, c, { account, busy, onRetired }) {
+  li.classList.add('online-character-row');
+  const open = el('button', { type: 'button', class: 'online-retire-open', 'aria-label': CHARACTER_COPY.retireLabel(c.name), 'aria-expanded': 'false', 'data-online-retire-open': String(c.id) }, CHARACTER_COPY.retire);
+  const askId = `online-retire-ask-${c.id}`;
+  const box = el('div', { class: 'online-retire-confirm', role: 'group', 'aria-labelledby': askId, 'data-online-retire-confirm': String(c.id) });
+  box.hidden = true;
+  const yes = el('button', { type: 'button', class: 'online-retire-yes', 'data-online-retire': String(c.id) }, CHARACTER_COPY.retireLabel(c.name));
+  const no = el('button', { type: 'button', class: 'online-home online-retire-no' }, CHARACTER_COPY.cancel);
+  const note = el('p', { class: 'online-retire-note', role: 'status', 'aria-live': 'polite', 'data-online-retire-note': '' });
+  const actions = el('div', { class: 'online-retire-actions' });
+  actions.append(yes, no);
+  box.append(el('p', { id: askId, class: 'online-retire-ask' }, CHARACTER_COPY.retireAsk(c.name)), actions, note);
+  const shut = () => {
+    box.hidden = true;
+    open.hidden = false;
+    open.setAttribute('aria-expanded', 'false');
+    note.textContent = '';
+    delete note.dataset.tone;
+    open.focus();
+  };
+  open.addEventListener('click', () => {
+    open.hidden = true;
+    open.setAttribute('aria-expanded', 'true');
+    box.hidden = false;
+    no.focus();
+  });
+  no.addEventListener('click', shut);
+  box.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && !yes.disabled) shut();
+  });
+  yes.addEventListener('click', async () => {
+    busy(true);
+    note.textContent = CHARACTER_COPY.retiring(c.name);
+    delete note.dataset.tone;
+    const r = await account.retireCharacter(c.id);
+    if (r.ok) {
+      onRetired?.(c.id);
+      return;
+    }
+    busy(false);
+    note.textContent = r.message || CHARACTER_COPY.failed;
+    note.dataset.tone = 'bad';
+    yes.focus();
+  });
+  li.append(open, box);
+}
+
+/**
+ * The signed-in card's characters: a row each (Play as <name>, Level N; an extra one not signed
+ * in has a small Retire), Start a fresh character (a name, then made and played) and, small, the
+ * retired ones to restore. onPlay plays the signed-in one; onSwitched(id) boots again once the
+ * site signed this browser in as another; onRetired() shows the card again after a retire.
+ */
+function appendCharacters(card, { account, session, characters, onPlay, onSwitched, onRetired, fresh: startFresh = false }) {
   const choices = characterChoices(characters, session);
   const status = el('p', { class: 'online-characters-status', role: 'status', 'aria-live': 'polite', 'data-online-characters-status': '' });
   const busy = (on) => {
@@ -329,6 +395,7 @@ function appendCharacters(card, { account, session, characters, onPlay, onSwitch
     b.addEventListener('click', () => (c.current ? onPlay?.() : switchTo(c.id, c.name)));
     const li = el('li');
     li.append(b);
+    if (c.retirable) appendRetire(li, c, { account, busy, onRetired });
     list.append(li);
   });
   card.append(list);
@@ -397,6 +464,12 @@ function appendCharacters(card, { account, session, characters, onPlay, onSwitch
         await switchTo(id, String(made.character.name || name));
       });
       fresh.append(open, form);
+      // The character chip's Start a fresh character (#fresh): the form open, ready for a name.
+      if (startFresh) {
+        open.hidden = true;
+        form.hidden = false;
+        queueMicrotask(() => input.focus());
+      }
     }
     card.append(fresh);
   }
@@ -441,7 +514,9 @@ function showGate(gate, state, { account, onSignedIn, onSignedOut = onSignedIn, 
   for (const line of copy.body) card.append(el('p', {}, line));
   if (state === 'choose') {
     // One row per character (the signed-in one alone when the site has no list), then a fresh one.
-    const choices = appendCharacters(card, { account, session, characters, onPlay, onSwitched });
+    const fresh = location.hash === FRESH_HASH;
+    if (fresh) history.replaceState(history.state, '', location.pathname + location.search);
+    const choices = appendCharacters(card, { account, session, characters, onPlay, onSwitched, onRetired: onRefresh, fresh });
     card.append(el('a', { class: 'online-alt', href: 'play/', 'data-online-solo': '' }, SOLO_COPY.button));
     const out = el('button', { type: 'button', class: 'online-home online-signout', 'data-online-signout': '' }, name ? `Not ${name}? Sign out` : 'Sign out');
     out.addEventListener('click', async () => {
