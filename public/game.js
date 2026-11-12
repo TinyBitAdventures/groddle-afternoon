@@ -885,6 +885,12 @@ import {
   favorDisplayGiant,
   claimShrineEmblem,
   emblemCostFor,
+  addGiantFavor,
+  favorReadyLine,
+  donationLimitWarning,
+  DONATION_WARNING_YES,
+  DONATION_WARNING_NO,
+  isNoDonate,
   inEmblemHitbox,
   resetShrineDay,
   FAVOR_SPEND_COPY,
@@ -2282,6 +2288,11 @@ const shrineState = createShrineState();
 Object.defineProperty(pc, 'giantFavor', {
   enumerable: false,
   get: () => shrineState.favor,
+});
+// stats_add_favor_points for rewards (quests, badges, projects, revives): capped at each emblem target.
+Object.defineProperty(pc, 'addGiantFavor', {
+  enumerable: false,
+  value: (giantId, points) => creditGiantFavor(giantId, points),
 });
 const quoinState = createQuoinState();
 const foodState = createFoodState();
@@ -6157,11 +6168,7 @@ function updateHud() {
     : reconcilePlayerProgression(pc);
   if (levelUpdate.leveledUp && levelUpdate.favor) {
     // stats_add_favor_points('all', reward_favor), each Giant capped at its emblem target.
-    for (const id of Object.keys(shrineState.favor || {})) {
-      const cap = emblemCostFor(shrineState, id);
-      const have = Number(shrineState.favor[id]) || 0;
-      shrineState.favor[id] = Math.max(have, Math.min(cap, have + levelUpdate.favor));
-    }
+    creditGiantFavor('all', levelUpdate.favor);
   }
   if (levelUpdate.leveledUp && state.started) {
     const rewardBits = [];
@@ -14472,6 +14479,7 @@ function grabWorldQuoin(q, shared = null) {
     giantId,
     favor: shrineState.favor,
     favorCap: (id) => emblemCostFor(shrineState, id),
+    addFavor: (id, n) => creditGiantFavor(id, n),
     accelerateStudy: (seconds) => accelerateActiveStudy(skillState, seconds, Date.now()),
   });
   // At the limit a quoin says nothing (quoin.js 159); the prompt came when the limit was reached.
@@ -21467,7 +21475,8 @@ function applyParadiseReward(rewardDef) {
     return { actual: credited.actual, copy: credited.copy };
   } else if (rewardDef.type === 'favor') {
     const giantId = rewardDef.giantId || 'friendly';
-    shrineState.favor[giantId] = Math.max(0, shrineState.favor[giantId] || 0) + amount;
+    // quoin.js 189-190: stats_add_favor_points, capped at the emblem target.
+    creditGiantFavor(giantId, amount);
   }
   const copy =
     rewardDef.type === 'xp'
@@ -28460,6 +28469,16 @@ function openShrinePanel(target, { item = '' } = {}) {
   closeFeatPanel();
   const giant = GIANTS[target?.state?.giantId];
   if (!giant) return;
+  // include/shrines.js 300-303: a no_donate item dropped on a shrine is kept, with HORRIBLE_SOUND
+  // and "...it merely bemuses them." (the picker opens at 1 for an item worth no favor).
+  if (item && isNoDonate(item) && (inv[item] || 0) > 0) {
+    const refused = quoteShrineDonation(shrineState, giant.id, inv, item, 1);
+    playSound('HORRIBLE_SOUND', { volume: 0.6 });
+    pushActivity(refused.text);
+    toast(refused.text, 4200);
+    app.canvas.dataset.shrineNoDonate = item;
+    return;
+  }
   closePackPopover();
   closeVerbMenu();
   closeMap();
@@ -28585,7 +28604,8 @@ function renderShrinePanel() {
     return;
   }
   const capNotes = [
-    quote.atFavorCap ? `${giant.name} is ready to grant an emblem. Further favor waits until you claim it.` : '',
+    // give_emblem runs after every donation (shrines.js 632), so favor only waits at the target for pack room (93-99).
+    quote.atFavorCap ? `${giant.name} is ready to grant an emblem${features.query('packRoom', `emblem_${giantId}`, 1, engine) === 0 ? ' once your pack has room for it' : ''}.` : '',
     quote.atDailyFavorCap ? `Today's ${giant.name} favor limit is full.` : '',
     quote.atDailyXpCap ? `Today's shrine donation iMG limit is full.` : '',
   ].filter(Boolean);
@@ -28641,21 +28661,50 @@ function renderShrinePanel() {
   if (tip) tip.textContent = `Official shrine value: ${quote.baseCost} · more valuable offerings earn more favor.`;
 }
 
+/**
+ * The Donate button: evalDonate (include/shrines.js 171-343) asks "Do you still want to donate?"
+ * first when the donation goes past today's favor limit for this Giant or today's donation iMG.
+ */
 function performShrineDonation() {
   const target = activeShrineTarget;
   const giantId = target?.state?.giantId;
   const giant = GIANTS[giantId];
   if (!target || !giant || !shrineSelected) return;
+  const classTsid = shrineSelected;
+  const qty = shrineQty;
+  const quote = quoteShrineDonation(shrineState, giantId, inv, classTsid, qty, { xp: pc.xp, ...shrinePowderOpts(), ...shrineToolOpts() });
+  const warning = quote.ok ? donationLimitWarning(shrineState, quote, { level: pc.level }) : null;
+  if (!warning) {
+    doShrineDonation(target, classTsid, qty);
+    return;
+  }
+  closeShrinePanel();
+  app.canvas.dataset.shrineDonationWarning = warning;
+  openScriptedQuestDialogue({
+    title: `Shrine to ${giant.name}`,
+    cancelable: true,
+    primaryLabel: DONATION_WARNING_YES,
+    cancelLabel: DONATION_WARNING_NO,
+    beats: [{ text: warning, response: DONATION_WARNING_YES }],
+    onComplete: () => doShrineDonation(target, classTsid, qty),
+  });
+}
+
+/** doDonate (include/shrines.js 345-660), then give_emblem when the donation filled the favor (632). */
+function doShrineDonation(target, classTsid, qty) {
+  const giantId = target?.state?.giantId;
+  const giant = GIANTS[giantId];
+  if (!target || !giant || !classTsid) return;
   // A tool goes one at a time, its most worn copy (priced first, then moved last so it is the one removed).
-  const toolCopy = TOOL_WEAR[shrineSelected] ? leavingToolCopy(shrineSelected) : null;
-  const toolWorth = toolCopy != null ? leavingToolBaseCost(shrineSelected) : null;
-  const result = donateToShrine(shrineState, giantId, inv, pc, shrineSelected, shrineQty, {
+  const toolCopy = TOOL_WEAR[classTsid] ? leavingToolCopy(classTsid) : null;
+  const toolWorth = toolCopy != null ? leavingToolBaseCost(classTsid) : null;
+  const result = donateToShrine(shrineState, giantId, inv, pc, classTsid, qty, {
     ...shrinePowderOpts(),
     toolBaseCost: toolCopy != null ? () => toolWorth : shrineToolOpts().toolBaseCost,
     beforeRemove: toolCopy != null ? () => {
       // That tool's own slot empties, and its wear goes with it.
-      takeChosenStack(shrineSelected, 1, { copy: toolCopy });
-      takeToolCopy(toolState, shrineSelected, { copy: toolCopy });
+      takeChosenStack(classTsid, 1, { copy: toolCopy });
+      takeToolCopy(toolState, classTsid, { copy: toolCopy });
     } : null,
   });
   if (!result.ok) {
@@ -28681,18 +28730,21 @@ function performShrineDonation() {
   playShrineDonation(target);
   refreshShrineTarget(target);
   pushActivity(line);
-  // include/shrines.js 632-651: the shrine answers with the donation's iMG, mood and favor slugs
-  // (the source skips it under an emblem or the Giant screen; neither follows a donation here).
-  const answer = verbResponse(target.classId, shrineDonationResponseKey(result.baseCost, result.bonus), {
-    speaker: giant.name,
-    slugs: { xp: result.xp, mood: result.mood, favor: result.favor ? [{ giant: giantId, points: result.favor }] : null },
-  });
-  if (answer) showSpeechBubble(target, answer);
-  else floatText(target.sprite.x, target.sprite.y - 150, `+${result.favor} ${giant.name} favor`, 0xffe066);
-  // The slugs show the numbers; a Gameshow Ticket still gets its toast.
-  if (!answer || result.gameshowTicket) toast(line, 4200);
+  const slugs = { xp: result.xp, mood: result.mood, favor: result.favor ? [{ giant: giantId, points: result.favor }] : null };
+  // include/shrines.js 632: every donation ends in give_emblem, so the one that fills the favor
+  // brings the emblem (its bubble carries the donation's slugs, 123-124). Only when that gave
+  // nothing does the shrine answer with its tier line and sound (632-651).
+  const emblem = canClaimEmblem(shrineState, giantId) && grantShrineEmblem(target, { slugs });
+  if (!emblem) {
+    const answer = verbResponse(target.classId, shrineDonationResponseKey(result.baseCost, result.bonus), { speaker: giant.name, slugs });
+    if (answer) showSpeechBubble(target, answer);
+    else floatText(target.sprite.x, target.sprite.y - 150, `+${result.favor} ${giant.name} favor`, 0xffe066);
+    // The slugs show the numbers; a Gameshow Ticket still gets its toast.
+    if (!answer || result.gameshowTicket) toast(line, 4200);
+    // 636-650: the sound tier follows the donation's base cost (a lucky bonus plays the fourth).
+    playSound(soundForDonation(result.baseCost, result.bonus), { volume: 0.65 });
+  } else if (result.gameshowTicket) toast(line, 4200);
   burst(target.sprite.x, target.sprite.y - 85, 0xffe066, 20);
-  playSound(soundForDonation(result.favor), { volume: 0.65 });
   announceAchievementUpdates(
     applyAchievementProgress(achieveState, `shrines_donated:${giantId}`, 1, pc)
   );
@@ -28939,10 +28991,37 @@ function updateLadderTopSignposts() {
   });
 }
 
-function grantShrineEmblem(target) {
+/**
+ * stats_add_favor_points (inc_stats.js 955-998) for favor that is not a donation: each Giant up to
+ * its emblem target, and when a gain fills it the 10 s prompt and the activity line
+ * "You have reached N favor points with X. Get to a shrine and collect your emblem!".
+ * Returns the favor that landed (for 'all', the amount asked, as the source returns).
+ */
+function creditGiantFavor(giantId, points, { suppressPrompt = false } = {}) {
+  const rows = addGiantFavor(shrineState, giantId, points);
+  if (!suppressPrompt) {
+    for (const row of rows) {
+      if (!row.reached) continue;
+      const text = favorReadyLine(shrineState, row.giant);
+      engine.prompt?.({ text, choices: [{ value: 'ok', label: 'OK' }], timeout: 10 });
+      pushActivity(text);
+    }
+  }
+  if (rows.some((row) => row.change)) {
+    for (const t of interactables) if (t?.classId?.startsWith('npc_shrine_')) refreshShrineTarget(t);
+  }
+  return giantId === 'all' ? Math.max(0, Math.floor(Number(points) || 0)) : (rows[0]?.change || 0);
+}
+
+function grantShrineEmblem(target, { slugs = null } = {}) {
   const giantId = target?.state?.giantId;
-  const result = claimShrineEmblem(shrineState, giantId, inv, pc);
-  if (!result.ok) return false;
+  // shrines.js 93-99: no room for the emblem keeps the favor until there is.
+  const fits = features.query('packRoom', `emblem_${giantId}`, 1, engine) !== 0;
+  const result = claimShrineEmblem(shrineState, giantId, inv, pc, { fits });
+  if (!result.ok) {
+    if (result.reason === 'pack_full') app.canvas.dataset.shrineEmblemHeld = giantId;
+    return false;
+  }
   if (isShrineOpen()) closeShrinePanel();
   app.canvas.dataset.shrineEmblems = String(result.count);
   playShrineDonation(target);
@@ -28953,10 +29032,11 @@ function grantShrineEmblem(target) {
     speaker: result.giant.name,
     text: `Congratulations! Your devotion has earned you an emblem of ${result.giant.name}!`,
     durationMs: 5000,
-    slugs: result.xp ? { xp: result.xp } : null,
+    slugs: slugs || result.xp ? { ...(slugs || {}), xp: (Number(slugs?.xp) || 0) + result.xp } : null,
   });
   logMoment(`The Shrine grants you an Emblem of ${result.giant.name}.${result.xp ? ` +${result.xp} iMG.` : ''}`);
-  applyAchievementProgress(achieveState, `emblems_acquired:${giantId}`, 1, pc);
+  // shrines.js 159: achievements_increment('emblems_acquired'); its First Emblem badge comes with its card (+75 iMG).
+  announceAchievementUpdates(applyAchievementProgress(achieveState, `emblems_acquired:${giantId}`, 1, pc));
   enqueueAward({
     kind: 'badge',
     title: `Emblem of ${result.giant.name}`,

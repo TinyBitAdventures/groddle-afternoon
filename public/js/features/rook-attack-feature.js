@@ -2189,7 +2189,9 @@ function revive(engine, target, { balm = false, copy = null } = {}) {
   save.stats.revives += 1;
   if (r.done) {
     const favor = engine.pc.giantFavor;
-    if (favor && typeof favor === 'object') for (const g of Object.keys(favor)) favor[g] = (favor[g] || 0) + r.favor;
+    // stats_add_favor_points('all'): capped at each emblem target (pc.addGiantFavor, inc_stats.js 975-976).
+    if (typeof engine.pc.addGiantFavor === 'function') engine.pc.addGiantFavor('all', r.favor);
+    else if (favor && typeof favor === 'object') for (const g of Object.keys(favor)) favor[g] = (favor[g] || 0) + r.favor;
     removeRookedVisual(engine, key);
     revivedRainbow(engine, target.sprite);
     engine.playSound('RAINBOW_FULLYREVIVED', { volume: 0.5 });
@@ -2617,7 +2619,8 @@ function mpOnYou(engine, msg) {
   const xp = grant(engine, { xp: share.xp, energy: share.energy, mood: share.mood });
   if (share.favor) {
     const favor = engine.pc.giantFavor;
-    if (favor && typeof favor === 'object') for (const g of Object.keys(favor)) favor[g] = (favor[g] || 0) + share.favor;
+    if (typeof engine.pc.addGiantFavor === 'function') engine.pc.addGiantFavor('all', share.favor);
+    else if (favor && typeof favor === 'object') for (const g of Object.keys(favor)) favor[g] = (favor[g] || 0) + share.favor;
   }
   const effects = { xp, energy: share.energy, mood: share.mood };
   let line = shareLine(msg, { xp, energy: share.energy, mood: share.mood });

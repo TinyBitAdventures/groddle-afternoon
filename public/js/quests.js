@@ -310,9 +310,11 @@ export function applyRewards(pc, rewards, opts = {}) {
     for (const entry of favorRewards) {
       if (!entry.points) continue;
       // stats_add_favor_points('all', n) gives n to every Giant (inc_stats.js 956-961), as the
-      // Street Creator trophies' 30 do (report 97); 'tii' is the save's 'ti'.
+      // Street Creator trophies' 30 do (report 97); 'tii' is the save's 'ti'. In the game it caps
+      // each Giant at its emblem target (inc_stats.js 975-976) through pc.addGiantFavor.
       const giants = entry.giant === 'all' ? ALL_GIANTS : [entry.giant === 'tii' ? 'ti' : entry.giant];
-      for (const g of giants) favor[g] = Math.max(0, Number(favor[g]) || 0) + entry.points;
+      if (typeof pc.addGiantFavor === 'function') pc.addGiantFavor(entry.giant === 'all' ? 'all' : giants[0], entry.points);
+      else for (const g of giants) favor[g] = Math.max(0, Number(favor[g]) || 0) + entry.points;
     }
   }
   if (buffMultiplier > 1 && (energy || mood || xp || currants || favorPoints)) {

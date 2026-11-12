@@ -839,7 +839,9 @@ function payout(engine, rewards = {}) {
   for (const f of favor) {
     if (!f?.points || !ledger) continue;
     const giants = f.giant === 'all' ? Object.keys(GIANTS) : [f.giant === 'tii' ? 'ti' : f.giant];
-    for (const g of giants) ledger[g] = Math.max(0, Number(ledger[g]) || 0) + f.points;
+    // stats_add_favor_points: capped at the emblem target with its prompt (pc.addGiantFavor, inc_stats.js 975-996).
+    if (typeof pc.addGiantFavor === 'function') pc.addGiantFavor(f.giant === 'all' ? 'all' : giants[0], f.points);
+    else for (const g of giants) ledger[g] = Math.max(0, Number(ledger[g]) || 0) + f.points;
   }
   return { ...(rewards || {}), xp: landed, mood: moodLanded, energy: energyLanded };
 }

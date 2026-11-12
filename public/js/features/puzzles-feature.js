@@ -695,7 +695,11 @@ function payout(engine, r) {
   if (energy) pc.energy = Math.min(energyMax(pc), (pc.energy || 0) + energy);
   if (mood) pc.mood = Math.min(moodMax(pc), (pc.mood || 0) + mood);
   const ledger = pc.giantFavor;
-  for (const f of r.favor || []) if (ledger) ledger[f.giant] = Math.max(0, Number(ledger[f.giant]) || 0) + f.points;
+  for (const f of r.favor || []) {
+    // stats_add_favor_points: capped at the emblem target (pc.addGiantFavor, inc_stats.js 975-976).
+    if (typeof pc.addGiantFavor === 'function') pc.addGiantFavor(f.giant, f.points);
+    else if (ledger) ledger[f.giant] = Math.max(0, Number(ledger[f.giant]) || 0) + f.points;
+  }
   return { ...r, energy, mood };
 }
 

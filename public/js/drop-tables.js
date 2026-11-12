@@ -128,9 +128,13 @@ export function applyDropResult(result, target = {}) {
     if (target.favor) {
       for (const g of giants) {
         const before = Number(target.favor[g]) || 0;
-        const cap = typeof target.favorCap === 'function' ? target.favorCap(g) : Infinity;
-        target.favor[g] = Math.min(cap, before + f.points);
-        total += target.favor[g] - before;
+        // The game's stats_add_favor_points: the cap and the "collect your emblem" prompt (inc_stats.js 975-996).
+        if (typeof target.addFavor === 'function') target.addFavor(g, f.points);
+        else {
+          const cap = typeof target.favorCap === 'function' ? target.favorCap(g) : Infinity;
+          target.favor[g] = Math.min(cap, before + f.points);
+        }
+        total += (Number(target.favor[g]) || 0) - before;
       }
     }
     landed.favor += total;

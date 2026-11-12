@@ -234,8 +234,12 @@ describe('sound moments', () => {
     }
     assert.equal(soundForAward('level'), 'LEVEL_UP');
     assert.equal(soundForAward('achievement'), 'ACHIEVEMENT_UNLOCKED');
+    // By base cost (shrines.js 633-651), not favor: 120 is the third tier, a bonus the fourth.
     assert.equal(soundForDonation(5), 'DONATION_1ST_TIER');
-    assert.equal(soundForDonation(120), 'DONATION_4TH_TIER');
+    assert.equal(soundForDonation(100), 'DONATION_2ND_TIER');
+    assert.equal(soundForDonation(120), 'DONATION_3RD_TIER');
+    assert.equal(soundForDonation(501), 'DONATION_4TH_TIER');
+    assert.equal(soundForDonation(5, 'huge'), 'DONATION_4TH_TIER');
     assert.equal(soundForPanel('map-panel', true), 'OPEN_HUB_MAP');
     assert.equal(soundForPanel('quest-panel', false), 'QUEST_DIALOGUE_BOX_CLOSE');
     assert.equal(soundForPanel('vendor-panel', true), 'UI_PANEL_OPEN');

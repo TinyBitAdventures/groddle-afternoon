@@ -141,7 +141,8 @@ describe('shrines, the spinning wheel and the emblem', () => {
   it('game.js wires donations, the wheel and the emblem', () => {
     const game = read('game.js');
     assert.match(game, /verbResponse\(target\.classId, shrineDonationResponseKey\(result\.baseCost, result\.bonus\), \{/);
-    assert.match(game, /slugs: \{ xp: result\.xp, mood: result\.mood, favor: result\.favor \? \[\{ giant: giantId, points: result\.favor \}\] : null \},/);
+    // The donation's slugs ride the tier answer, or the emblem's bubble when the donation filled the favor.
+    assert.match(game, /const slugs = \{ xp: result\.xp, mood: result\.mood, favor: result\.favor \? \[\{ giant: giantId, points: result\.favor \}\] : null \};/);
     assert.match(game, /slugs: r\.kind === 'currants' && r\.amount \? \{ currants: r\.amount \} : null,/);
     assert.match(game, /text: `Congratulations! Your devotion has earned you an emblem of \$\{result\.giant\.name\}!`,/);
   });

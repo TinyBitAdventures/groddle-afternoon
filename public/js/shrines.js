@@ -27,7 +27,10 @@ import { metabolicGain, moodMax } from './metabolics.js?v=8504134e';
 import { grantMoodXp } from './mood-xp.js?v=958e7680';
 import { getSkillCatalog } from './content-catalogs.js?v=10b118dd';
 import { accelerateActiveStudy, getActiveStudy, maxStudyAcceleration } from './skills.js?v=4542bdf9';
-import { emblemUnlockSkillFor } from './skill-tree.js?v=e399b9ca';
+import { emblemUnlockSkillFor } from './skill-tree.js?v=faa54b90';
+import { NO_DONATE_CLASSES } from './shrine-no-donate-data.js?v=00000000';
+
+export { NO_DONATE_CLASSES };
 
 export const EMBLEM_FAVOR_COST = 1000;
 export const EMBLEM_FAVOR_INCREMENT = 100;
@@ -161,6 +164,19 @@ export const SHRINE_ITEM_BASE_COSTS = Object.freeze({
   musicblock_d_red_05: 700,
 });
 
+/** True when a shrine refuses this class as no_donate (the GSJS tag, or the item's own tags). */
+export function isNoDonate(classTsid) {
+  const id = String(classTsid || '');
+  return NO_DONATE_CLASSES.has(id) || (Array.isArray(ITEM_CATALOG[id]?.tags) && ITEM_CATALOG[id].tags.includes('no_donate'));
+}
+
+/** include/shrines.js 300-302: the line a no_donate item gets (pluralize: "1 Conch", "2 Conches"). */
+export function noDonateLine(label, count = 1, plural = '') {
+  const n = Math.max(1, Math.floor(Number(count) || 1));
+  const name = n === 1 ? label : (plural || `${label}s`);
+  return `Your attempt to donate ${n} ${name} does not anger the giants, nor does it please them. In fact, it merely bemuses them.`;
+}
+
 const GIANT_TIPS = Object.freeze([
   'Donating to a shrine earns favor with that Giant.',
   'The more valuable your donation, the more favor you earn.',
@@ -205,9 +221,14 @@ export function emblemCostFor(state, giantId) {
   return EMBLEM_FAVOR_COST + whole(state?.emblems?.[giantId], 0, 9999) * EMBLEM_FAVOR_INCREMENT;
 }
 
+/**
+ * One item's donation worth: its base cost. An item worth nothing gives nothing
+ * (include/shrines.js 397 base_cost * count; a no_donate item is priced 0 there too).
+ */
 export function donationValueFor(classTsid) {
+  if (isNoDonate(classTsid)) return 0;
   const catalogValue = whole(ITEM_CATALOG[classTsid]?.baseCost, 0);
-  return catalogValue || SHRINE_ITEM_BASE_COSTS[classTsid] || 1;
+  return catalogValue || SHRINE_ITEM_BASE_COSTS[classTsid] || 0;
 }
 
 function stableHash(value) {
@@ -264,6 +285,10 @@ export function quoteShrineDonation(state, giantId, inv, classTsid, count = 1, o
   ) {
     return { ok: false, reason: 'not_donatable' };
   }
+  if (isNoDonate(classTsid)) {
+    const label = ITEM_CATALOG[classTsid]?.label || classTsid.replace(/_/g, ' ');
+    return { ok: false, reason: 'no_donate', classTsid, label, text: noDonateLine(label, count, ITEM_CATALOG[classTsid]?.namePlural) };
+  }
   const have = whole(inv?.[classTsid]);
   const qty = toolValue != null ? 1 : Math.max(1, Math.min(have || 1, whole(count, 1, 9999)));
   if (have < qty) return { ok: false, reason: 'missing', have, qty };
@@ -285,6 +310,8 @@ export function quoteShrineDonation(state, giantId, inv, classTsid, count = 1, o
   const dailyXpRoom = Math.max(0, xpLimit - whole(state?.dailyXp));
   // evalDonate: daily favor takes up to its own room; total favor caps after.
   const dailyFavor = Math.min(rawFavor, dailyFavorRoom);
+  // evalDonate 211: the iMG its warning weighs (no No-No Powder there).
+  const evalXp = Math.round(baseCost * 0.2 * powderBonus) * moodMultiplier;
   return {
     ok: true,
     giant,
@@ -301,6 +328,7 @@ export function quoteShrineDonation(state, giantId, inv, classTsid, count = 1, o
     dailyFavor,
     dailyXpRoom,
     xpLimit,
+    evalXp,
     rawXp,
     rawMood,
     rawFavor,
@@ -354,6 +382,43 @@ export function listShrineDonationOptions(state, giantId, inv = {}, opts = {}) {
     // Tools after goods, so the panel's first pick is never a tool the player is using.
     .sort((a, b) => Number(a.tool) - Number(b.tool) || b.baseCost - a.baseCost || a.label.localeCompare(b.label));
 }
+
+/**
+ * evalDonate (items/include/shrines.js 171-343): a donation past today's favor limit for this Giant
+ * or past today's donation iMG asks first, "Do you still want to donate?" (Yes, donate anyway. /
+ * No thanks.). Returns that question, or null when the donation goes straight ahead. The iMG
+ * limit is not weighed at level 60 (256). The player's words use the Giant's name as ours spells it.
+ * @param {{ level?: number }} [opts]
+ */
+export function donationLimitWarning(state, quote, opts = {}) {
+  if (!quote?.ok || !quote.giant) return null;
+  const giantName = quote.giant.name;
+  const dailyMaxFavor = quote.emblemCost;
+  const dailyFavor = whole(state?.dailyFavor?.[quote.giant.id]);
+  const baseXP = quote.xpLimit;
+  const dailyXP = whole(state?.dailyXp);
+  const exceedsFavor = dailyFavor + quote.rawFavor > dailyMaxFavor;
+  const atMaxFavor = exceedsFavor && dailyFavor === dailyMaxFavor;
+  const exceedsXP = dailyXP + quote.evalXp > baseXP && (Number(opts.level) || 0) < 60;
+  const atMaxXP = exceedsXP && dailyXP === baseXP;
+  if (atMaxXP && atMaxFavor) {
+    return `You have reached your maximum of ${dailyMaxFavor} possible daily favor from donations to ${giantName} and your maximum daily iMG of ${baseXP} from shrine donations. You will receive no favor or iMG from this donation. Do you still want to donate?`;
+  }
+  if (exceedsFavor && exceedsXP) {
+    return `You are currently at ${dailyFavor} out of your possible ${dailyMaxFavor} daily favor from donations to ${giantName} and at ${dailyXP} of your possible ${baseXP} daily iMG from shrine donations. This donation will exceed your maximum daily favor limit for this giant as well as your maximum daily donation iMG, and you will not receive the full amounts. Do you still want to donate?`;
+  }
+  if (exceedsFavor) {
+    return `You are currently at ${dailyFavor} out of your possible ${dailyMaxFavor} daily favor from donations to ${giantName}. This donation will exceed your maximum daily favor limit for this giant. Do you still want to donate?`;
+  }
+  if (exceedsXP) {
+    return `You are currently at ${dailyXP} of your possible ${baseXP} daily iMG from shrine donations. This donation will exceed your maximum daily donation iMG, and you will not receive the full amount. Do you still want to donate?`;
+  }
+  return null;
+}
+
+/** evalDonate's two answers (include/shrines.js 317-339). */
+export const DONATION_WARNING_YES = 'Yes, donate anyway.';
+export const DONATION_WARNING_NO = 'No thanks.';
 
 export function donateToShrine(state, giantId, inv, pc, classTsid, count = 1, opts = {}) {
   const quote = quoteShrineDonation(state, giantId, inv, classTsid, count, { xp: pc?.xp, powderBonus: opts.powderBonus, noNo: opts.noNo, moodMultiplier: opts.moodMultiplier, toolBaseCost: opts.toolBaseCost });
@@ -479,18 +544,55 @@ export function favorPanelRows(state, hereId = null) {
   });
 }
 
+/**
+ * stats_add_favor_points (players/inc_stats.js 955-998) for favor from anywhere but a donation:
+ * each Giant's favor goes up to its emblem target and no further (init_prop max = stats_get_max_favor,
+ * apiInc), 'all' gives every Giant the amount. Favor already past the target (saves from before
+ * this cap) is never lowered. Returns one row per Giant: { giant, change, reached } where `reached`
+ * is true when this gain brought it to the target (the "collect your emblem" prompt).
+ */
+export function addGiantFavor(state, giantId, points) {
+  const ids = giantId === 'all' ? GIANT_IDS : [giantId === 'tii' ? 'ti' : giantId];
+  const amount = whole(points);
+  const rows = [];
+  if (!state?.favor) return rows;
+  for (const id of ids) {
+    if (!GIANTS[id]) continue;
+    const before = whole(state.favor[id]);
+    const cap = emblemCostFor(state, id);
+    const next = Math.max(before, Math.min(cap, before + amount));
+    state.favor[id] = next;
+    const change = next - before;
+    rows.push({ giant: id, change, reached: change > 0 && next >= cap });
+  }
+  return rows;
+}
+
+/** inc_stats.js 987: the prompt and activity line when a gain fills a Giant's favor. */
+export function favorReadyLine(state, giantId) {
+  const giant = GIANTS[giantId];
+  return `You have reached ${emblemCostFor(state, giantId)} favor points with ${giant?.name || giantId}. Get to a shrine and collect your emblem!`;
+}
+
 /** Every emblem after a Giant's first also pays 50 iMG (items/include/shrines.js:111). */
 export const EMBLEM_XP = 50;
 
-export function claimShrineEmblem(state, giantId, inv = {}, pc = null) {
+/**
+ * give_emblem (include/shrines.js 78-166). `opts.fits` false (the pack has no room for the emblem)
+ * keeps the favor for later, as createItemFromOffset's remainder did (93-99); a Giant's first
+ * emblem comes from its First Emblem badge in the source (the familiar brings it), so it is never held back.
+ * @param {{ fits?: boolean }} [opts]
+ */
+export function claimShrineEmblem(state, giantId, inv = {}, pc = null, opts = {}) {
   const giant = GIANTS[giantId];
   if (!giant) return { ok: false, reason: 'unknown_giant' };
   const cost = emblemCostFor(state, giantId);
   if (!canClaimEmblem(state, giantId)) {
     return { ok: false, reason: 'favor', have: whole(state?.favor?.[giantId]), cost };
   }
-  state.favor[giantId] = whole(state.favor[giantId]) - cost;
   const first = whole(state.emblems[giantId]) === 0;
+  if (!first && opts.fits === false) return { ok: false, reason: 'pack_full', giant, cost };
+  state.favor[giantId] = whole(state.favor[giantId]) - cost;
   state.emblems[giantId] = whole(state.emblems[giantId]) + 1;
   // shrines.js 111: stats_add_xp(50, false) takes the mood bonus.
   const xp = !first && pc ? grantMoodXp(pc, EMBLEM_XP) : 0;

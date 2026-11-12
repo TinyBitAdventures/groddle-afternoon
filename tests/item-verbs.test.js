@@ -290,7 +290,7 @@ describe('game.js wiring for G134', () => {
   it('buff events reach features, shrine powders reach donations, the spindle passes its spin', () => {
     const game = readFileSync(join(publicRoot, 'game.js'), 'utf8');
     assert.match(game, /features\.event\(`buff_\$\{event\.type\}:\$\{event\.classTsid\}`, 1, engine\)/);
-    assert.match(game, /donateToShrine\(shrineState, giantId, inv, pc, shrineSelected, shrineQty, \{\s*\.\.\.shrinePowderOpts\(\),/);
+    assert.match(game, /donateToShrine\(shrineState, giantId, inv, pc, classTsid, qty, \{\s*\.\.\.shrinePowderOpts\(\),/);
     assert.match(game, /shrinePowderAchievementCounters\(result\.powderConsumed, result\.baseCost\)/);
     assert.match(game, /makingOutputAchievementCounters\(record\.recipe\.tool, record\.recipe\.outputs, spin\)/);
     assert.match(game, /resetAchievementCounter: \(counter\) => resetAchievementCounter\(achieveState, counter\)/);

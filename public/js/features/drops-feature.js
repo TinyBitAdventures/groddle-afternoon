@@ -107,6 +107,7 @@ export function payDrop(engine, result, { source = '' } = {}) {
     addItem,
     favor: shrine?.favor || engine.pc?.giantFavor || null,
     favorCap: shrine ? (g) => emblemCostFor(shrine, g) : undefined,
+    addFavor: typeof engine.pc?.addGiantFavor === 'function' ? (g, n) => engine.pc.addGiantFavor(g, n) : undefined,
     energyCap: Math.max(100, Number(engine.pc?.energyMax) || 100),
     moodCap: 100,
   });

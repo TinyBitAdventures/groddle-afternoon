@@ -184,13 +184,17 @@ export function soundForAward(kind) {
   }
 }
 
-/** Shrine donation tiers (items/include/shrines.js:634-649). */
-export function soundForDonation(favorPoints = 0) {
-  const n = Number(favorPoints) || 0;
-  if (n >= 100) return 'DONATION_4TH_TIER';
-  if (n >= 50) return 'DONATION_3RD_TIER';
-  if (n >= 10) return 'DONATION_2ND_TIER';
-  return 'DONATION_1ST_TIER';
+/**
+ * Shrine donation tiers (items/include/shrines.js:633-651): by the donation's base cost
+ * (<= 10, <= 100, <= 500, more), a lucky bonus ('huge' or 'super') always the fourth.
+ */
+export function soundForDonation(baseCost = 0, bonus = null) {
+  if (bonus) return 'DONATION_4TH_TIER';
+  const n = Number(baseCost) || 0;
+  if (n <= 10) return 'DONATION_1ST_TIER';
+  if (n <= 100) return 'DONATION_2ND_TIER';
+  if (n <= 500) return 'DONATION_3RD_TIER';
+  return 'DONATION_4TH_TIER';
 }
 
 /** Panels and dialogs, keyed by element id. */

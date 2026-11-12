@@ -170,6 +170,6 @@ describe('Decoration Mode', () => {
 
 describe('the plural table grants nothing', () => {
   it('the economy builder reads it as a catalog, so a class named there does not lift its credit gate', () => {
-    assert.match(read('tools/build-economy.mjs'), /'public\/js\/item-plurals-data\.js',\s+\]\);/);
+    assert.match(read('tools/build-economy.mjs'), /const CATALOGS = new Set\(\[[^\]]*'public\/js\/item-plurals-data\.js',[^\]]*\]\);/);
   });
 });

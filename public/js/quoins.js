@@ -379,6 +379,8 @@ export function collectQuoin(state, typeId, pc, opts = {}) {
     const favor = opts.favor && typeof opts.favor === 'object' ? opts.favor : {};
     // stats_add_favor_points caps each Giant at its emblem target (stats_get_max_favor).
     const add = (id) => {
+      // The game's stats_add_favor_points (cap plus the "collect your emblem" prompt, inc_stats.js 983-996).
+      if (typeof opts.addFavor === 'function') return Number(opts.addFavor(id, amount)) || 0;
       const cap = typeof opts.favorCap === 'function' ? Number(opts.favorCap(id)) : Infinity;
       const before = Math.max(0, Math.floor(finite(favor[id], 0)));
       favor[id] = Math.min(Number.isFinite(cap) ? Math.max(before, cap) : Infinity, before + amount);

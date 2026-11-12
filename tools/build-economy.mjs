@@ -22,6 +22,7 @@
  *    built at run time would slip past this test, so it only ever tightens
  *    classes the game cannot name.
  *  - Gate g "capped" with cap n (slice 2): no ordinary source gives the class
+ *    (a shrine's emblems are ordinary: the donation that fills a Giant's favor gives one)
  *    (tools/job-obtainable.mjs: vendors, the kit's tools, harvests, recipes,
  *    transforms; nor a quest reward, an imagination card, a Cubimal box or
  *    an artifact assembly below), only the drop tables
@@ -73,6 +74,7 @@ import { IMAGINATION_UPGRADES } from '../public/js/imagination-data.js?v=4a85e7f
 import { SPINDLE_TOOLS } from '../public/js/making.js?v=a6b3716c';
 import { creditedMultiplayerQuests } from '../public/js/quests-mp.js?v=1fc5ff58';
 import { FURNITURE_STARTER_KIT } from '../public/js/homes-catalog.js?v=10ac34b6';
+import { GIANTS } from '../public/js/shrines.js?v=e2755fac';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 export const OUT = sitePath('data', 'economy.json');
@@ -106,6 +108,8 @@ const CATALOGS = new Set([
   'public/js/world-art-list.js',
   // What the Pick up chooser calls each class (js/world-items.js pickupCountTitle): words, not a grant.
   'public/js/item-plurals-data.js',
+  // The classes a shrine refuses (GSJS no_donate tags, js/shrines.js isNoDonate): a tag list, not a grant.
+  'public/js/shrine-no-donate-data.js',
 ]);
 
 export function unitValue(classTsid) {
@@ -260,6 +264,10 @@ export async function economyTable() {
   for (const card of Object.values(credits.cards)) ordinary.add(card.c);
   for (const c of Object.keys(credits.homeKit)) ordinary.add(c);
   for (const t of transforms) for (const c of Object.keys(t.o)) ordinary.add(c);
+  // The shrines give every Giant's emblem (js/shrines.js claimShrineEmblem builds `emblem_<giant>` at
+  // run time, so job-obtainable never sees it; items/include/shrines.js give_emblem 78-166): an
+  // ordinary class, paid for by the budget the donated goods refund, not a drop capped at 5 a day.
+  for (const id of Object.keys(GIANTS)) ordinary.add(`emblem_${id}`);
   const drops = dropCounts();
   const items = {};
   for (const [c, row] of Object.entries(trade.items)) {
