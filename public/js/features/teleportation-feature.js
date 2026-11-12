@@ -70,10 +70,12 @@ import {
   teleportToPoint,
   useScript,
 } from '../teleportation.js?v=e95cf7cb';
-import { loseEnergy } from '../metabolics.js?v=8504134e';
+import { energyMax, loseEnergy } from '../metabolics.js?v=8504134e';
+import { HOME_STREET_TSID } from '../homes.js?v=00000000';
 
 export const TELEPORT_FEATURE_ID = 'teleportation';
-const TANK = 100;
+/** inc_teleportation.js 920-937: the cost is a share of your own energy tank (metabolics_get_max_energy). */
+const tankOf = (engine) => energyMax(engine?.pc);
 const NARAKA_HUB_ID = '40';
 const DEMO_AWAY_STREET = 'GCR10NQRPKJ16H6'; // Sylvan Grove, Groddle Forest
 const ROMAN = ['', 'I', 'II', 'III', 'IV', 'V'];
@@ -94,6 +96,11 @@ function learned(engine) {
 
 function here(engine) {
   const street = engine.street || {};
+  // inc_teleportation.js 49-64: in your own home the point keeps the street the door is on (your
+  // home street), where a teleport there lands you (game.js streetTripTo goes home for it).
+  if (engine.homeContext?.().inHome && engine.streetTsid !== HOME_STREET_TSID) {
+    return { tsid: HOME_STREET_TSID, label: street.label || 'Your home', hubId: '', hubName: '' };
+  }
   return {
     tsid: engine.streetTsid,
     x: Math.round(engine.player?.x || 0),
@@ -109,10 +116,15 @@ function placeLabel(target) {
   return `${target.label || target.tsid}${target.hubName ? `, ${target.hubName}` : ''}`;
 }
 
-function unsavable(engine) {
-  const home = engine.homeContext();
+/**
+ * inc_teleportation.js 322-328: only a home you do not own is refused (your own is homeContext's
+ * inHome, never someone else's), as are rooms with their own way out and Naraka.
+ */
+function unsavable(engine, { script = false } = {}) {
   return Boolean(
-    engine.transientInstance() || home.inHome || String(engine.street?.hubId || '') === NARAKA_HUB_ID
+    engine.transientInstance() || String(engine.street?.hubId || '') === NARAKA_HUB_ID ||
+    // Ours: a script is handed to others, and RH_HOME_EXT is each reader's own home, so none is written at home.
+    (script && engine.homeContext?.().inHome)
   );
 }
 
@@ -125,7 +137,7 @@ function jumpCtx(engine) {
     learned: learned(engine),
     now: Date.now(),
     energy: engine.pc.energy,
-    tank: TANK,
+    tank: tankOf(engine),
     currentTsid: engine.streetTsid,
     fromHubId: String(engine.street?.hubId || ''),
     exists: (tsid) => engine.streetExists(tsid),
@@ -218,7 +230,7 @@ function publish(engine) {
   engine.setData('teleportCooldown', String(Math.max(0, Math.ceil((state.cooldownUntil - Date.now()) / 1000))));
   engine.setData('teleportPhase', pending ? 'warp' : arrival ? 'arriving' : 'idle');
   engine.setData('teleportScripts', heldTags(engine).map((t) => t?.tsid || '-').join(','));
-  engine.setData('teleportEnergyCost', String(teleportEnergyCost(learned(engine), TANK) ?? 0));
+  engine.setData('teleportEnergyCost', String(teleportEnergyCost(learned(engine), tankOf(engine)) ?? 0));
   engine.setData('teleportSummons', String(state.summonsToday || 0));
   if (engine.param('teleportdemo')) engine.setData('teleportDemo', demo.stage);
 }
@@ -360,7 +372,7 @@ function writeScript(engine) {
     learned: learned(engine),
     paper: countItem(engine.inv, PAPER_CLASS),
     quillWorking: quillWorking(engine),
-    unsavable: unsavable(engine),
+    unsavable: unsavable(engine, { script: true }),
     now: Date.now(),
   };
   const out = createScript(state, here(engine), ctx);
@@ -394,8 +406,8 @@ function readAloud(engine, copy = null) {
   removeItem(engine.inv, SCRIPT_CLASS, 1);
   if (out.vanished) {
     state = out.state;
+    // teleportation_script.js 323: stats_add_imagination, iMG only, no XP (inc_stats.js 494-499).
     engine.pc.imagination = (engine.pc.imagination || 0) + out.refundImg;
-    engine.pc.xp = (engine.pc.xp || 0) + out.refundImg;
     engine.pushActivity(out.message);
     engine.updateHud();
     engine.save();
@@ -464,7 +476,7 @@ function buildMapCard(engine) {
   const rank = teleportRank(skills);
   if (!rank) return null;
   ensureCss();
-  const cost = teleportEnergyCost(skills, TANK);
+  const cost = teleportEnergyCost(skills, tankOf(engine));
   const cooling = Math.max(0, Math.ceil((state.cooldownUntil - Date.now()) / 1000));
   const card = document.createElement('section');
   card.className = 'tp-map-card';
@@ -772,7 +784,7 @@ export const teleportationFeature = {
     if (!pre.ok) return { ok: false, error: pre.msg, copy: at, imbued: script.imbued };
     const ctx = jumpCtx(engine);
     const check = useScript(state, script, ctx);
-    const energyCost = script.imbued ? 0 : teleportEnergyCost(ctx.learned, TANK) || 0;
+    const energyCost = script.imbued ? 0 : teleportEnergyCost(ctx.learned, ctx.tank) || 0;
     return { ok: check.ok, error: check.ok ? '' : check.error, copy: at, imbued: script.imbued, energyCost };
   },
 
@@ -827,7 +839,7 @@ export const teleportationFeature = {
       if (script) {
         const check = useScript(state, script, ctx);
         const reason = engine.transientInstance() ? NO_EXIT : check.ok ? '' : check.error;
-        const cost = script.imbued ? 0 : teleportEnergyCost(ctx.learned, TANK) || 0;
+        const cost = script.imbued ? 0 : teleportEnergyCost(ctx.learned, ctx.tank) || 0;
         verbs.push({
           id: 'use',
           label: `Teleport to ${script.destination.label || script.destination.tsid}${cost ? ` · ${cost} energy` : ''}`,
@@ -844,7 +856,7 @@ export const teleportationFeature = {
         learned: learned(engine),
         paper: countItem(engine.inv, PAPER_CLASS),
         quillWorking: quillWorking(engine),
-        unsavable: unsavable(engine),
+        unsavable: unsavable(engine, { script: true }),
       });
       if (check.hidden) return null;
       return [{
