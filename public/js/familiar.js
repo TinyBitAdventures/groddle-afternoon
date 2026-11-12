@@ -196,9 +196,11 @@ export function measureLocationViewport(modal) {
   });
 }
 
-/** QuestConversationUI.as 86: the header of an offer card. */
+/** QuestConversationUI.as 86: the header of an offer card. kicker: null is a prompt with no speaker
+ * (engine.prompt, a summons confirm, Set free): no heading, never the Magic Rock's. */
 export function familiarCardHeading({ offer = false, kicker = '' } = {}) {
-  return offer ? 'New Quest' : String(kicker || 'Magic Rock');
+  if (offer) return 'New Quest';
+  return kicker === null ? '' : String(kicker || 'Magic Rock');
 }
 
 /** Robert Penner easeOutBounce (TSTweener 'easeOutBounce'), t in [0, 1]. */

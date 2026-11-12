@@ -30,7 +30,7 @@ import {
   skillLearnedModel,
   truncateLabel,
   vogLayout,
-} from '../public/js/familiar.js?v=5fd83250';
+} from '../public/js/familiar.js?v=bafd7139';
 import { CARD_ART_LAYERS } from '../public/js/imagination-data.js?v=4a85e7fe';
 import {
   _resetFamiliarDialog,
@@ -38,7 +38,7 @@ import {
   familiarDialogFeature,
   familiarDialogOpen,
   queueSkillLearned,
-} from '../public/js/features/familiar-dialog-feature.js?v=017fb596';
+} from '../public/js/features/familiar-dialog-feature.js?v=ab9681a0';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const PUBLIC = join(root, 'public');
@@ -117,6 +117,8 @@ describe('quest card look (G211) and voice of rock (G220)', () => {
     assert.equal(familiarLook({ look: 'vog', kicker: 'Magic Rock' }), 'vog');
     assert.equal(familiarCardHeading({ offer: true }), 'New Quest');
     assert.equal(familiarCardHeading({ offer: false, kicker: 'Magic Rock' }), 'Magic Rock');
+    assert.equal(familiarCardHeading({ offer: false }), 'Magic Rock', 'a familiar line with no kicker is the rock');
+    assert.equal(familiarCardHeading({ offer: false, kicker: null }), '', 'a prompt with no speaker has no heading');
   });
 
   it('builds the familiar card in the game markup without the old orb', () => {

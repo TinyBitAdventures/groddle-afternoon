@@ -4,12 +4,12 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=ac1912e3';
 import { createErrorOnce, createFeatureHost } from './js/feature-host.js?v=06bb8b74';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=7b71d7eb';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=929c82e9';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl, drawTileArt } from './js/enter-chooser.js?v=4a3ea327';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
 import { createVogOverlay } from './js/vog-overlay.js?v=d137399c';
-import { createPromptStack } from './js/prompt-stack.js?v=f8aea2cf';
+import { createPromptStack } from './js/prompt-stack.js?v=14009a48';
 import { createWindowStack } from './js/window-stack.js?v=a7104f02';
 import { HOG_HAUL_SPLASH, createGameSplash, splashFor } from './js/game-splash.js?v=f60a5067';
 import {
@@ -771,7 +771,7 @@ import {
   streetCardUp,
   STREET_CARD_UP,
   POL_OWNER_SIZE,
-} from './js/screen-fx.js?v=81177be4';
+} from './js/screen-fx.js?v=bfed8fb0';
 import { momentMoreText } from './js/ui/moment-card.js?v=68e10b61';
 import { CHAT_MAX_CHARS, chatBubbleText } from './js/ui/chat-input.js?v=72d000ac';
 // HUB: the hub is the Modern skin's; Classic owns X in its skin (js/classic/classic-hub.js).
@@ -783,8 +783,8 @@ import { streetMapSetting, toggleStreetMap } from './js/ui/street-minimap.js?v=6
 import './js/classic/classic-zoom.js?v=70273032';
 import { mountImaginationHub } from './js/ui/imagination-hub.js?v=51fa371f';
 import { newDayBubble, shuffleNewDayMessages, waitForScreenGates } from './js/screen-queue.js?v=cf0132c0';
-import { applyFamiliarLook, familiarCardHeading, familiarLook, skillArtFor, skillLearnedActivity } from './js/familiar.js?v=5fd83250';
-import { armPromptTimeout, promptTimeoutMs } from './js/prompt-timeout.js?v=b38c9757';
+import { applyFamiliarLook, familiarCardHeading, familiarLook, skillArtFor, skillLearnedActivity } from './js/familiar.js?v=bafd7139';
+import { armPromptTimeout, promptTimeoutMs } from './js/prompt-timeout.js?v=72b6e62d';
 import {
   planTravel,
   listMapDestinations,
@@ -1034,7 +1034,7 @@ import { SLUG_ANIMATION, SLUG_LAYOUT, SLUG_STYLES, SLUG_TARGETS, drawSlugIcon, f
 import { filterText } from './js/word-filter.js?v=9a7a7ebb'; // the remake's own word filter
 import { arrangeMapCards, fitMapExtras } from './js/map-extras.js?v=9f38c312'; // the Map's Shortcuts
 // The interface skin (js/classic/ui-mode.js) sets <html data-ui> as it loads: before main(), so before the boot cover lifts.
-import { installInterfaceSettings } from './js/classic/classic-prefs.js?v=7a7f49ac';
+import { installInterfaceSettings } from './js/classic/classic-prefs.js?v=089ed538';
 
 /** @type {object|null} assets/maps/index.json */
 let mapIndexCache = null;
@@ -25923,7 +25923,12 @@ function renderQuestDialogueBeat() {
   const inLog = look === 'familiar' && questDialogueState.inLog === true;
   const head = modal.querySelector('#quest-dialogue-head span');
   // ConversationManager.as 155-165: a titled familiar conversation shows the quest book and its title.
-  if (head) head.textContent = look === 'conversation' ? (title && !title.hidden ? title.textContent : '') : familiarCardHeading({ offer, kicker: questDialogueState.kicker });
+  if (head) {
+    head.textContent = look === 'conversation' ? (title && !title.hidden ? title.textContent : '') : familiarCardHeading({ offer, kicker: questDialogueState.kicker });
+    // A prompt with no speaker shows no header bar at all (summons confirm in Classic read "Magic Rock").
+    const bar = modal.querySelector('#quest-dialogue-head');
+    if (bar) bar.hidden = look !== 'conversation' && !head.textContent;
+  }
   const closeX = document.getElementById('quest-dialogue-close');
   // The card's close X declines like "Not right now" (in the Quests dialog it only closes the card);
   // emergencies have none (QuestConversationUI.as 154-155), but ticket 21 gives them one: it

@@ -23,7 +23,7 @@ import { emblemUnlockSkillFor, skillRemakeNote, skillTitle, skillTreeEntry, spen
 import { acceptOffer, pendingQuestOffers } from '../public/js/quest-offers.js?v=9c53455c';
 import { createQuestState } from '../public/js/quests.js?v=2b882eb6';
 import { normalizeStreetJobState, phaseRequirements, workCheck } from '../public/js/street-jobs.js?v=94f8d250';
-import { skillArtFor } from '../public/js/familiar.js?v=5fd83250';
+import { skillArtFor } from '../public/js/familiar.js?v=bafd7139';
 import { CARD_ART_LAYERS } from '../public/js/imagination-data.js?v=4a85e7fe';
 
 const root = join(import.meta.dirname, '..');

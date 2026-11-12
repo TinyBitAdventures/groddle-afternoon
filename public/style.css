@@ -9379,6 +9379,8 @@ header.top-bar + .sub { display: none; }
   border-bottom: 1px solid color-mix(in srgb, var(--c-white) 40%, transparent); font-size: var(--fs-md); font-weight: 700; line-height: 22px; color: var(--text-inverse);
 }
 .quest-dialogue[data-look="familiar"] .fam-head img { display: block; width: 32px; height: 22px; }
+/* A prompt with no speaker has no header bar, in both skins (game.js sets hidden when the heading is empty). */
+.quest-dialogue .fam-head[hidden] { display: none !important; }
 .quest-dialogue[data-look="familiar"] .fam-close:not([hidden]) { display: block; position: absolute; top: 7px; right: 7px; }
 .quest-dialogue[data-look="familiar"] .quest-dialogue-card h2 {
   margin: var(--sp-6) 0 var(--sp-1); color: var(--c-yellow-91); font-size: var(--fs-lg); line-height: var(--lh-snug); font-weight: 800;
@@ -11627,6 +11629,9 @@ html.stage-pinned[data-ui="modern"] header.top-bar { left: calc(var(--sp-5) + va
    sits over the card (bug-report-feature.js, classic.css). */
 #wrap:has(#quest-dialogue:not([hidden])) > header.top-bar { z-index: calc(var(--z-modal) + 31); pointer-events: none; }
 #wrap:has(#quest-dialogue:not([hidden])) > header.top-bar #bug-btn { pointer-events: auto; }
+/* A prompt that asks for an answer in time (a summons, a party invite) sits over an open quest card,
+   so its 30 s never runs out behind the card's layer (two-player summons QA, 2026-11-12). */
+body:has(#quest-dialogue:not([hidden])) .prompt-stack { z-index: calc(var(--z-modal) + 32); }
 
 /* —— VERBS —— (phase 2, Warm paper: the verb menu, js/ui/verb-menu.js; the HUD mock is the spec)
    The world's verb menu (#verb-menu) and a stack's menu (#pack-popover) are one compact card: a

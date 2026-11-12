@@ -24,7 +24,7 @@ import { fileURLToPath } from 'node:url';
 import { remoteAvatarZ } from '../public/js/features/realtime-feature.js?v=c864854a';
 import { FRONT_FURNITURE_SLOTS, furnitureDrawsInFront } from '../public/js/home-decor.js?v=bbf43c44';
 import { FURNITURE_CATALOG } from '../public/js/homes-catalog.js?v=10ac34b6';
-import { typingElsewhere } from '../public/js/screen-fx.js?v=81177be4';
+import { typingElsewhere } from '../public/js/screen-fx.js?v=bfed8fb0';
 import { SCREEN_SELECTOR, WINDOW_SELECTOR, isTopWindow, stackZ } from '../public/js/window-stack.js?v=a7104f02';
 import { BAND_Z, bandClass, itemBand, itemZ, knownItemClass } from '../public/js/item-bands.js?v=e98b10bc';
 import { BACKGROUND_CLASSES, FOREGROUND_CLASSES, FOREMOST_CLASSES, NORMAL_CLASSES } from '../public/js/item-bands-data.js?v=0ac4551c';
