@@ -364,6 +364,13 @@ function el(tag, attrs = {}, text = '') {
 
 let formCount = 0;
 
+/**
+ * Ticket 239: password managers (Proton Pass among them) read a form as a sign-in by its method
+ * and action and by its fields' autocomplete. Every form here posts to the site route its script
+ * calls (the script still sends it: submit is prevented), so a manager sees a real login.
+ */
+const formTarget = (route) => ({ method: 'post', action: new URL(`wp-json/groddle/v1/${route}`, document.baseURI).pathname });
+
 /** One labelled input with its help and error lines. */
 function field(id, label, attrs, help = '') {
   const wrap = el('div', { class: 'acct-field' });
@@ -404,8 +411,9 @@ export function mountAccountForms(host, { account, start = 'signin', reset = nul
   };
 
   // Sign in
-  const signin = el('form', { class: 'acct-form', id: `acct-signin-${n}`, 'data-form': 'signin', novalidate: true });
-  const siEmail = field(`acct-si-email-${n}`, 'Email', { name: 'email', type: 'email', autocomplete: 'email', inputmode: 'email', autocapitalize: 'none', spellcheck: 'false', required: true });
+  const signin = el('form', { class: 'acct-form', id: `acct-signin-${n}`, 'data-form': 'signin', ...formTarget('session'), novalidate: true });
+  // The sign-in's identifier is the username to a password manager, though it is an email.
+  const siEmail = field(`acct-si-email-${n}`, 'Email', { name: 'email', type: 'email', autocomplete: 'username', inputmode: 'email', autocapitalize: 'none', spellcheck: 'false', required: true });
   const siPass = field(`acct-si-pass-${n}`, 'Password', { name: 'password', type: 'password', autocomplete: 'current-password', required: true });
   const remember = el('input', { type: 'checkbox', name: 'remember', id: `acct-remember-${n}`, checked: true });
   const rememberRow = el('label', { class: 'acct-check', for: remember.id });
@@ -423,13 +431,15 @@ export function mountAccountForms(host, { account, start = 'signin', reset = nul
   signin.append(googleRows.signin.wrap, siEmail.wrap, siPass.wrap, rememberRow, siSubmit, forgotLink);
 
   // New player
-  const signup = el('form', { class: 'acct-form', id: `acct-signup-${n}`, 'data-form': 'signup', novalidate: true });
-  const suEmail = field(`acct-su-email-${n}`, 'Email', { name: 'email', type: 'email', autocomplete: 'email', inputmode: 'email', autocapitalize: 'none', spellcheck: 'false', required: true }, FORM_COPY.signup.emailHelp);
+  const signup = el('form', { class: 'acct-form', id: `acct-signup-${n}`, 'data-form': 'signup', ...formTarget('players'), novalidate: true });
+  // The new login's username, so a manager saves the email with the new password.
+  const suEmail = field(`acct-su-email-${n}`, 'Email', { name: 'email', type: 'email', autocomplete: 'username', inputmode: 'email', autocapitalize: 'none', spellcheck: 'false', required: true }, FORM_COPY.signup.emailHelp);
   const suPass = field(`acct-su-pass-${n}`, 'Password', { name: 'password', type: 'password', autocomplete: 'new-password', minlength: '8', required: true }, FORM_COPY.signup.passwordHelp);
   const suName = field(`acct-su-name-${n}`, 'Character name', { name: 'name', type: 'text', autocomplete: 'nickname', maxlength: '19', autocapitalize: 'words', spellcheck: 'false', required: true }, FORM_COPY.signup.nameHelp);
   // Never shown, never filled by people: a script that fills every field fills this one too.
   const trap = el('div', { class: 'acct-trap', 'aria-hidden': 'true' });
-  const trapInput = el('input', { type: 'text', name: 'website', tabindex: '-1', autocomplete: 'off' });
+  // Password managers leave it alone (their ignore marks), so it is never taken for a credential.
+  const trapInput = el('input', { type: 'text', name: 'website', tabindex: '-1', autocomplete: 'off', 'data-protonpass-ignore': 'true', 'data-1p-ignore': 'true', 'data-lpignore': 'true', 'data-bwignore': 'true', 'data-form-type': 'other' });
   trap.append(el('label', {}, 'Website'), trapInput);
   const suSubmit = el('button', { type: 'submit', class: 'acct-submit', 'data-account-submit': 'signup' }, FORM_COPY.signup.submit);
   // Turnstile's widget for each emailing form, empty (and hidden) unless the site has a site key.
@@ -444,14 +454,14 @@ export function mountAccountForms(host, { account, start = 'signin', reset = nul
   signup.append(googleRows.signup.wrap, suEmail.wrap, suPass.wrap, suName.wrap, trap, slots.signup, suSubmit, privacy);
 
   // Forgot your password
-  const forgot = el('form', { class: 'acct-form', id: `acct-forgot-${n}`, 'data-form': 'forgot', novalidate: true, hidden: true });
+  const forgot = el('form', { class: 'acct-form', id: `acct-forgot-${n}`, 'data-form': 'forgot', ...formTarget('password-reset'), novalidate: true, hidden: true });
   const fgEmail = field(`acct-fg-email-${n}`, 'Email', { name: 'email', type: 'email', autocomplete: 'email', inputmode: 'email', autocapitalize: 'none', spellcheck: 'false', required: true });
   const fgSubmit = el('button', { type: 'submit', class: 'acct-submit', 'data-account-submit': 'forgot' }, FORM_COPY.forgot.submit);
   const backLink = el('button', { type: 'button', class: 'acct-link', 'data-account-back': '' }, FORM_COPY.forgot.back);
   forgot.append(el('strong', {}, FORM_COPY.forgot.title), el('p', { class: 'acct-message' }, FORM_COPY.forgot.body), fgEmail.wrap, slots.forgot, fgSubmit, backLink);
 
   // Choose a new password (from a reset link)
-  const renew = el('form', { class: 'acct-form', id: `acct-reset-${n}`, 'data-form': 'reset', novalidate: true, hidden: true });
+  const renew = el('form', { class: 'acct-form', id: `acct-reset-${n}`, 'data-form': 'reset', ...formTarget('password-reset/confirm'), novalidate: true, hidden: true });
   const rsPass = field(`acct-rs-pass-${n}`, 'New password', { name: 'password', type: 'password', autocomplete: 'new-password', minlength: '8', required: true }, FORM_COPY.signup.passwordHelp);
   const rsSubmit = el('button', { type: 'submit', class: 'acct-submit', 'data-account-submit': 'reset' }, FORM_COPY.reset.submit);
   const againLink = el('button', { type: 'button', class: 'acct-link', 'data-account-again': '' }, FORM_COPY.reset.again);
@@ -466,7 +476,7 @@ export function mountAccountForms(host, { account, start = 'signin', reset = nul
   check.append(el('strong', {}, FORM_COPY.check.title), checkBody, checkHeld, slots.resend, resendButton, otherLink);
 
   // Finishing a character from the emailed link: automatic, unless a name or a new link is needed.
-  const finish = el('form', { class: 'acct-form', id: `acct-verify-${n}`, 'data-form': 'verify', novalidate: true, hidden: true });
+  const finish = el('form', { class: 'acct-form', id: `acct-verify-${n}`, 'data-form': 'verify', ...formTarget('players/verify'), novalidate: true, hidden: true });
   const finishTitle = el('strong', {}, FORM_COPY.verify.title);
   const vfName = field(`acct-vf-name-${n}`, 'Character name', { name: 'name', type: 'text', autocomplete: 'nickname', maxlength: '19', autocapitalize: 'words', spellcheck: 'false', required: true }, FORM_COPY.signup.nameHelp);
   const vfSubmit = el('button', { type: 'submit', class: 'acct-submit', 'data-account-submit': 'verify' }, FORM_COPY.verify.submit);
@@ -474,7 +484,7 @@ export function mountAccountForms(host, { account, start = 'signin', reset = nul
   finish.append(finishTitle, vfName.wrap, vfSubmit, newLinkButton);
 
   // Choose your character name (a new player from Google): the site's pending token, held here only.
-  const googleName = el('form', { class: 'acct-form', id: `acct-google-${n}`, 'data-form': 'google', novalidate: true, hidden: true });
+  const googleName = el('form', { class: 'acct-form', id: `acct-google-${n}`, 'data-form': 'google', ...formTarget('account/google/finish'), novalidate: true, hidden: true });
   const gnBody = el('p', { class: 'acct-message', 'data-account-google-email': '' });
   const gnName = field(`acct-gn-name-${n}`, 'Character name', { name: 'name', type: 'text', autocomplete: 'nickname', maxlength: '19', autocapitalize: 'words', spellcheck: 'false', required: true }, FORM_COPY.signup.nameHelp);
   const gnSubmit = el('button', { type: 'submit', class: 'acct-submit', 'data-account-submit': 'google' }, FORM_COPY.google.submit);
@@ -914,14 +924,14 @@ export function mountAccountSettings(host, { account, email = '', onChanged = ()
   };
   let shownEmail = email;
 
-  const mailForm = el('form', { class: 'acct-form', 'data-form': 'email', novalidate: true });
+  const mailForm = el('form', { class: 'acct-form', 'data-form': 'email', ...formTarget('account/email'), novalidate: true });
   const mailNow = el('p', { class: 'acct-message', 'data-account-email': '' }, shownEmail ? `Now: ${shownEmail}` : '');
   const mailNew = field(`acct-ch-email-${n}`, 'New email', { name: 'email', type: 'email', autocomplete: 'email', inputmode: 'email', autocapitalize: 'none', spellcheck: 'false', required: true }, SETTINGS_COPY.email.help);
   const mailCurrent = field(`acct-ch-email-current-${n}`, 'Current password', { name: 'current', type: 'password', autocomplete: 'current-password', required: true });
   const mailSubmit = el('button', { type: 'submit', class: 'acct-submit', 'data-account-submit': 'email' }, SETTINGS_COPY.email.submit);
   mailForm.append(el('strong', {}, SETTINGS_COPY.email.title), mailNow, mailNew.wrap, mailCurrent.wrap, mailSubmit);
 
-  const passForm = el('form', { class: 'acct-form', 'data-form': 'password', novalidate: true });
+  const passForm = el('form', { class: 'acct-form', 'data-form': 'password', ...formTarget('account/password'), novalidate: true });
   const passCurrent = field(`acct-ch-pass-current-${n}`, 'Current password', { name: 'current', type: 'password', autocomplete: 'current-password', required: true });
   const passNew = field(`acct-ch-pass-new-${n}`, 'New password', { name: 'password', type: 'password', autocomplete: 'new-password', minlength: '8', required: true }, FORM_COPY.signup.passwordHelp);
   const passSubmit = el('button', { type: 'submit', class: 'acct-submit', 'data-account-submit': 'password' }, SETTINGS_COPY.password.submit);
