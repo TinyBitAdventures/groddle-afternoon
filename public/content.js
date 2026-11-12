@@ -46,9 +46,12 @@ import {
   mineRock,
   tickMineRock,
   findWorkingPick,
+  knowsMining,
+  noPickLine,
   rockStatusLabel,
   ensureMiningItems,
-} from './js/mining.js?v=881c40fe';
+} from './js/mining.js?v=12a6f1bd';
+import { takeToolChoice } from './js/tool-choice.js?v=00000000';
 import {
   ANIMAL_CLASS_IDS,
   ensureAnimalState,
@@ -975,16 +978,14 @@ export function getVerbsFor(target, ctx) {
     // (rock_beryl_1.js verbs.mine conditions 193-214: it.is_pick && it.isWorking(), else
     // disabled "You'll need a pick first."), so the swing never starts.
     const learned = ctx.learned || ctx.skills?.learned || [];
-    const hasSkill =
-      learned.includes('mining_1') ||
-      learned.includes('mining_2') ||
-      learned.includes('mining_3') ||
-      learned.includes('mining_4');
+    const hasSkill = knowsMining(learned);
     // G553: the check takes this rank's real wear, 1 at Mining III and IV. A pick that works but can't
     // take the swing keeps the verb and refuses at once (isWorking() is 1 point in the verb's conditions,
     // the wear refusal comes from runSkillPackage: inc_skill_packages.js 169, include/mining.js 236-237).
-    const pick = findWorkingPick(inv, ctx.tools || null, miningToolWear(hasSkill ? learned : undefined));
-    const worn = !pick && Boolean(findWorkingPick(inv, ctx.tools || null, 1));
+    // A Metal Rock takes only a Fancy Pick (rock_metal_1.js conditions 198-202).
+    const rockType = rock.rockType || ROCK_CATALOG[classId]?.rockType;
+    const pick = findWorkingPick(inv, ctx.tools || null, miningToolWear(hasSkill ? learned : undefined), { rockType });
+    const worn = !pick && Boolean(findWorkingPick(inv, ctx.tools || null, 1, { rockType }));
     const depleted = !!(rock.depleted || rock.chunksRemaining <= 0);
     const mineUpgrades = ctx.imaginationUpgrades || pc.imaginationUpgrades || [];
     const swing = (hasSkill && miningProfile(learned, pick || 'pick', mineUpgrades))
@@ -996,12 +997,13 @@ export function getVerbsFor(target, ctx) {
       energy: swing?.energy ?? MINING_COSTS.energy,
       durationMs: worn ? 0 : swing?.durationMs,
       enabled: !depleted && (!!pick || worn) && hasSkill,
+      // rock_metal_1.js conditions 191-210: Mining I first, then the pick.
       reason: depleted
         ? rockStatusLabel(rock) || 'Depleted'
-        : !pick && !worn
-          ? "You'll need a pick first."
-          : !hasSkill
-            ? 'Need Mining I'
+        : !hasSkill
+          ? 'You need to know Mining I to use this.'
+          : !pick && !worn
+            ? noPickLine(rockType)
             : '',
       tooltip: depleted
         ? 'This rock is mined out'
@@ -1009,7 +1011,7 @@ export function getVerbsFor(target, ctx) {
           ? 'Your pick does not have enough uses left.'
         : pick
           ? `Swing your ${pick.replace(/_/g, ' ')} (${rock.chunksRemaining ?? '?'} chunks left)${gemHint ? `. ${gemHint}` : ''}`
-          : 'Requires a Pick in your pack',
+          : rockType === 'metal_rock' ? 'Requires a Fancy Pick in your pack' : 'Requires a Pick in your pack',
     });
     add('talk_to', 'inspect', {
       sort: 40,
@@ -1585,9 +1587,14 @@ export function runVerb(target, verbId, ctx) {
       return { ok: true, msgs, effects };
     }
     const learned = ctx.learned || ctx.skills?.learned || [];
+    // A pick the player named: a dragged stack or a Pick's own Use (js/tool-choice.js).
+    const chosen = takeToolChoice(target);
     const r = mineRock(rock, inv, pc, {
       learned,
       requireSkill: true,
+      tool: chosen?.cls || null,
+      copy: chosen?.copy ?? null,
+      force: chosen?.force === true,
       now: Date.now(),
       toolState: ctx.tools,
       // Multiplayer: the realtime server rolled this swing (groddle-afternoon-server/objects.go).

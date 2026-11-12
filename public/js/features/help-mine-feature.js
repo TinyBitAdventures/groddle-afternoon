@@ -46,13 +46,13 @@
  *     data-help-mine-companion (the last companion swing: name:chunks).
  */
 
-import { ROCK_CATALOG, findWorkingPick, miningProfile, miningToolWear } from '../mining.js?v=881c40fe';
-import { addItem } from '../inventory.js?v=2bd5b93e';
+import { ROCK_CATALOG, findWorkingPick, miningProfile, miningToolWear, setMiningBuffs } from '../mining.js?v=12a6f1bd';
+import { addItem } from '../inventory.js?v=5be47371';
 import { MEGA_ROCK_CHUNKS, megaRockChance } from '../imagination-effects.js?v=70169933';
 import { crowdScaleX } from '../avatar-anims.js?v=fb921bf4';
 import { frameTexture, loadTexture } from '../textures.js?v=92ec53cd';
-import { acceptOffer } from '../quest-offers.js?v=d76abcd0';
-import { HELP_DIG_COUNTER, HELP_DIG_LABEL, digHelpFrom, helpDigMessage, othersDigging } from '../help-dig.js?v=7b8a9733';
+import { acceptOffer } from '../quest-offers.js?v=9c53455c';
+import { CREW_NODES, CREW_VERBS, HELP_DIG_COUNTER, HELP_DIG_LABEL, HELP_SCRAPE_LABEL, digHelpFrom, helpDigMessage, helpScrapeMessage, othersDigging } from '../help-dig.js?v=7b8a9733';
 import {
   COMPANION_MINE_RULES,
   HELP_MINE_COUNTER,
@@ -385,9 +385,9 @@ function sharedMined(target, result, engine) {
   }
 }
 
-/** Multiplayer: the server's dig crew at a Dirt Pile ({ diggers, others }), or null. */
+/** Multiplayer: the server's crew at a shared node ({ diggers, others }: js/help-dig.js CREW_NODES), or null. */
 function sharedDigCrew(engine, target) {
-  if (target?.classId !== 'dirt_pile' || engine.mode !== 'multiplayer' || !engine.query?.('realtimeClient')) return null;
+  if (!CREW_NODES.has(target?.classId) || engine.mode !== 'multiplayer' || !engine.query?.('realtimeClient')) return null;
   const diggers = engine.query('sharedDiggers', target, engine);
   if (!Array.isArray(diggers)) return null;
   const me = Number(engine.query('realtimeClient')?.me?.id) || 0;
@@ -413,6 +413,23 @@ function sharedDug(target, result, engine) {
   engine.achievement(HELP_DIG_COUNTER, 1);
   engine.setData('helpDigLast', `bonus:${help.items}:${help.classTsid}:${help.by.join(',')}`);
   engine.setData('helpDigHelps', String(digHelps));
+}
+
+/** Your scrape at a shared Ice Nubbin landed: one more Ice for each other scraper (ice_knob.js 270-317). */
+function sharedScraped(target, result, engine) {
+  const help = digHelpFrom(engine.query('sharedVerbGrant', target, 'scrape', engine)?.help);
+  playerDig = null;
+  if (!help?.items) {
+    engine.setData('helpScrapeLast', 'alone');
+    return;
+  }
+  addItem(engine.inv, 'ice', help.items);
+  engine.pushActivity(helpScrapeMessage(help.items, help.by));
+  engine.floatText?.(target.sprite?.x ?? 0, (target.sprite?.y ?? 0) - 120, `+${help.items}`, 0xfff4d6);
+  // ice_knob.js 300: achievements_increment('ice', 'ice_received', got + bonus).
+  engine.achievement('ice:ice_received', help.items);
+  engine.refreshPack?.();
+  engine.setData('helpScrapeLast', `bonus:${help.items}:${help.by.join(',')}`);
 }
 
 /** Your swing begins: are you helping, and does anyone join you? */
@@ -593,6 +610,8 @@ export const helpMineFeature = {
   id: 'help-mine',
 
   onStreetEnter(street, engine) {
+    // A swing's gem chance reads Rubeweed from the player's buffs (js/mining.js mineRock).
+    setMiningBuffs((id) => engine.hasBuff?.(id));
     crews.clear();
     interest.clear();
     for (const s of sessions.values()) hidePick(s);
@@ -624,11 +643,16 @@ export const helpMineFeature = {
    * (resource-nodes-feature verbsFor asks; a Dirt Pile's menu is that feature's own).
    */
   sharedVerbLabel(target, verbId, engine) {
-    if (verbId !== 'dig') return null;
+    const label = verbId === 'dig' && target?.classId === 'dirt_pile'
+      ? HELP_DIG_LABEL
+      : verbId === 'scrape' && target?.classId === 'ice_knob'
+        ? HELP_SCRAPE_LABEL // include/scraping.js getVerbLabel 3-18
+        : null;
+    if (!label) return null;
     const dig = sharedDigCrew(engine, target);
     if (!dig?.others.length) return null;
-    engine.setData('helpDigLabel', HELP_DIG_LABEL);
-    return HELP_DIG_LABEL;
+    engine.setData(label === HELP_DIG_LABEL ? 'helpDigLabel' : 'helpScrapeLabel', label);
+    return label;
   },
 
   /** mining.js getVerbLabel: "help mine" while a companion works the rock. */
@@ -647,7 +671,8 @@ export const helpMineFeature = {
   },
 
   verbStarted(target, verb, engine) {
-    if (verb?.id === 'dig') {
+    // A use of a shared crew node: the server hears it start (a late landing is paid, and the help).
+    if (CREW_NODES.has(target?.classId) && String(verb?.id || '').split(':')[0] === CREW_VERBS[target.classId]) {
       const dig = sharedDigCrew(engine, target);
       if (dig) {
         playerDig = { target, helping: dig.others.length > 0 };
@@ -664,7 +689,7 @@ export const helpMineFeature = {
   },
 
   verbCancelled(target, verbId, engine) {
-    if (playerDig?.target === target && String(verbId).split(':')[0] === 'dig') {
+    if (playerDig?.target === target && String(verbId).split(':')[0] === CREW_VERBS[target?.classId]) {
       engine.query('sharedDigSwing', target, 'stop', engine);
       playerDig = null;
     }
@@ -677,7 +702,10 @@ export const helpMineFeature = {
 
   /** resource-nodes-feature performVerb, multiplayer: a node verb landed. */
   resourceNodeUsed(target, result, engine) {
-    if (target?.classId === 'dirt_pile' && result?.verbId === 'dig' && engine.mode === 'multiplayer') sharedDug(target, result, engine);
+    if (engine.mode !== 'multiplayer') return undefined;
+    if (target?.classId === 'dirt_pile' && result?.verbId === 'dig') sharedDug(target, result, engine);
+    else if (target?.classId === 'ice_knob' && result?.verbId === 'scrape') sharedScraped(target, result, engine);
+    else if (playerDig?.target === target) playerDig = null;
     return undefined;
   },
 

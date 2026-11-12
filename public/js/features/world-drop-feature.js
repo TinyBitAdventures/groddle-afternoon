@@ -23,11 +23,13 @@ import { ITEM_CATALOG } from '../inventory.js?v=2bd5b93e';
 import { listAnimalFeedOptions } from '../animals.js?v=1cc34c7e';
 import { isBagClass } from '../pack-slots.js?v=4a36968a';
 import { dropFor, dropTip } from '../world-drop.js?v=f162fb0e';
+import { canUseTool } from '../tools.js?v=5f482998';
+import { chooseTool } from '../tool-choice.js?v=00000000';
 
 export const WORLD_DROP_FEATURE_ID = 'world-drop';
 
 let wired = false;
-let dragging = null; // { cls }
+let dragging = null; // { cls, copy }
 let tip = null;
 let lit = null;
 
@@ -58,9 +60,11 @@ function worldPoint(engine, canvas, clientX, clientY) {
   return engine.entityLayer.toLocal(new engine.PIXI.Point((clientX - rect.left) * k, (clientY - rect.top) * k));
 }
 
-function ctxFor(engine, target) {
+function ctxFor(engine, target, copy = null) {
   const inv = engine.inv || {};
   return {
+    // drop_ok_code's stack.isWorking(): the dragged unit itself (its place in pack order).
+    working: (cls) => !engine.toolState || canUseTool(engine.toolState, cls, 1, Number.isInteger(copy) ? { copy } : {}).ok,
     feedable: (cls) => listAnimalFeedOptions(target?.classId, inv).some((o) => o.classTsid === cls),
     isBag: (cls) => isBagClass(cls) || /^bag_/.test(cls),
     hasTag: (cls, tag) => (ITEM_CATALOG[cls]?.tags || []).includes(tag),
@@ -68,7 +72,7 @@ function ctxFor(engine, target) {
 }
 
 /** What the dragged class does at a client point: { target, drop, tip, ok } or null. */
-export function overAt(engine, canvas, clientX, clientY, cls) {
+export function overAt(engine, canvas, clientX, clientY, cls, copy = null) {
   if (engine.query?.('homeEditMode', engine)) return null;
   // A player under the pointer is the gift's (features/gifts-feature.js).
   if (globalThis.groddleGifts?.playerAt?.(clientX, clientY)) return null;
@@ -77,7 +81,7 @@ export function overAt(engine, canvas, clientX, clientY, cls) {
   const target = engine.interactableAt?.(p.x, p.y);
   if (!target || target.classId === 'garden_plot') return null;
   const verbs = engine.targetVerbs?.(target) || [];
-  const drop = dropFor(target.classId, cls, verbs, ctxFor(engine, target));
+  const drop = dropFor(target.classId, cls, verbs, ctxFor(engine, target, copy));
   if (!drop) return null;
   const def = ITEM_CATALOG[cls] || {};
   const ok = drop.verb.enabled !== false;
@@ -104,7 +108,7 @@ function endDrag(engine) {
 }
 
 /** Run a drop: the target's own verb, through the menu's walk into reach. */
-export function runDrop(engine, over, cls) {
+export function runDrop(engine, over, cls, copy = null) {
   const { target, drop, ok } = over;
   const verb = drop.verb;
   engine.setData?.('worldDropLast', `${ok ? 'ran' : 'refused'}:${target.classId}:${verb.id}`);
@@ -114,6 +118,8 @@ export function runDrop(engine, over, cls) {
     return false;
   }
   engine.closeVerbMenu?.();
+  // A tool dragged onto a rock or a node is the one that works it (js/tool-choice.js).
+  if (drop.rule.tool) chooseTool(target, cls, { copy });
   if (drop.rule.use === 'pick') return engine.requestVerb?.(target, verb, { run: () => engine.openPicker?.(target, verb, cls) });
   if (drop.rule.use === 'donate') return engine.requestVerb?.(target, verb, { run: () => engine.openShrineDonate?.(target, cls) });
   return engine.requestVerb?.(target, verb);
@@ -128,13 +134,14 @@ function wire(engine) {
   document.addEventListener('dragstart', (event) => {
     const slot = event.target?.closest?.('.pack-slot');
     const cls = slot?.dataset?.tsid || '';
-    dragging = !event.defaultPrevented && cls && !slot.dataset.packBag ? { cls } : null;
+    const copy = slot?.dataset?.packCopy != null && slot.dataset.packCopy !== '' ? Number(slot.dataset.packCopy) : null;
+    dragging = !event.defaultPrevented && cls && !slot.dataset.packBag ? { cls, copy: Number.isInteger(copy) ? copy : null } : null;
     if (dragging) engine.setData?.('worldDrag', `dragging:${cls}`);
   });
   document.addEventListener('dragend', () => { if (dragging) endDrag(engine); });
   canvas.addEventListener('dragover', (event) => {
     if (!dragging) return;
-    const over = overAt(engine, canvas, event.clientX, event.clientY, dragging.cls);
+    const over = overAt(engine, canvas, event.clientX, event.clientY, dragging.cls, dragging.copy);
     if (!over) {
       engine.setData?.('worldDrag', `dragging:${dragging.cls}`);
       showTip('');
@@ -154,22 +161,22 @@ function wire(engine) {
   });
   canvas.addEventListener('drop', (event) => {
     if (!dragging) return;
-    const cls = dragging.cls;
-    const over = overAt(engine, canvas, event.clientX, event.clientY, cls);
+    const { cls, copy } = dragging;
+    const over = overAt(engine, canvas, event.clientX, event.clientY, cls, copy);
     endDrag(engine);
     if (!over) return;
     event.preventDefault();
-    runDrop(engine, over, cls);
+    runDrop(engine, over, cls, copy);
   });
   globalThis.groddleWorldDrop = {
-    over(x, y, cls) {
-      const o = overAt(engine, canvas, x, y, cls);
+    over(x, y, cls, copy = null) {
+      const o = overAt(engine, canvas, x, y, cls, copy);
       return o ? { target: o.target.classId, verb: o.drop.verb.id, rule: o.drop.rule.id, ok: o.ok, tip: o.tip } : null;
     },
-    drop(x, y, cls) {
-      const o = overAt(engine, canvas, x, y, cls);
+    drop(x, y, cls, copy = null) {
+      const o = overAt(engine, canvas, x, y, cls, copy);
       if (!o) return false;
-      runDrop(engine, o, cls);
+      runDrop(engine, o, cls, copy);
       return true;
     },
     /** A target's centre in client px, by class: the one on screen nearest the window's middle. */

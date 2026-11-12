@@ -19,7 +19,8 @@ describe('the drop-target table', () => {
     if (!egg) return t.skip('needs glitch-GameServerJS beside the game');
     const files = {
       give_egg: 'npc_newxp_dustbunny.js', feed: 'npc_piggy.js', apply_balm: 'npc_piggy.js', water: 'trant_bean.js',
-      apply_antidote: 'trant_bean.js', poison: 'trant_bean.js', mine: 'rock_metal_1.js', dig: 'patch.js', tend: 'patch.js',
+      apply_antidote: 'trant_bean.js', poison: 'trant_bean.js', mine_metal: 'rock_metal_1.js', mine: 'rock_beryl_1.js', dig: 'patch.js', tend: 'patch.js',
+      dig_dirt: 'dirt_pile.js', scrape: 'mortar_barnacle.js', scrape_ice: 'ice_knob.js',
       peat: 'peat_1.js', brush: 'npc_fox.js', add_note: 'bag_notice_board.js', donate: 'npc_shrine_cosma.js',
     };
     for (const rule of WORLD_DROP_RULES) {

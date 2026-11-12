@@ -61,7 +61,8 @@ import { ITEM_CATALOG, addItem, countItem } from '../inventory.js?v=2bd5b93e';
 import { setToolRemaining, toolCopies } from '../tools.js?v=5f482998';
 import { isItemFloor, platformYAt } from '../street-model.js?v=b6cb6a4e';
 import { hiresSpriteUrl } from '../sprite-hires.js?v=d4cce9f9';
-import { rollResourceNodeDrop } from './drops-feature.js?v=fc237a8b';
+import { rollResourceNodeDrop } from './drops-feature.js?v=2cd8ff9b';
+import { peekToolChoice, takeToolChoice } from '../tool-choice.js?v=00000000';
 import { slugsFromEffects } from '../speech-slugs.js?v=130338f9';
 import { resourceNodeResponseKey, verbResponse } from '../verb-responses.js?v=3ceb8a8c';
 import { rollSlothBonusSnails } from '../imagination-effects.js?v=70169933';
@@ -1181,6 +1182,30 @@ function nearbyFireflies(engine, entity) {
     .map((row) => row.other.node);
 }
 
+/**
+ * The Shovels and Aces of Spades in the pack, unit by unit in pack order ({ cls, copy }): the
+ * order findFirst walks (bag.js 672-694, pack-slots.js unitPlaces), so a Peat Bog or a Dirt Pile
+ * takes the first working one (peat_1.js 345-351, dirt_pile.js 211-212). Null without a layout.
+ */
+const PACK_ORDER_CLASSES = Object.freeze(['shovel', 'ace_of_spades']);
+export function packToolOrder(layout, classes = PACK_ORDER_CLASSES) {
+  if (!Array.isArray(layout?.pack?.slots)) return null;
+  const out = [];
+  const seen = {};
+  const add = (slot) => {
+    if (slot?.kind !== 'stack' || !classes.includes(slot.cls)) return;
+    for (let k = 0; k < Math.max(1, Math.floor(Number(slot.count) || 1)); k += 1) {
+      out.push({ cls: slot.cls, copy: seen[slot.cls] || 0 });
+      seen[slot.cls] = (seen[slot.cls] || 0) + 1;
+    }
+  };
+  for (const slot of layout.pack.slots) {
+    if (slot.kind === 'bag') (layout.bags?.[slot.key]?.slots || []).forEach(add);
+    else add(slot);
+  }
+  return out;
+}
+
 function verbContext(engine, entity, verbId) {
   // Multiplayer (street-objects-feature): the realtime server's go-ahead for a Dirt Pile dig carries
   // its roll (the skill's Loam drop, the first draw) and whether the crew's help made the yield Loam
@@ -1196,9 +1221,21 @@ function verbContext(engine, entity, verbId) {
     },
     loamBonus: grant.help?.loam === true,
   } : {};
+  // A tool the player named (a drag, or the tool's own pack verb: js/tool-choice.js).
+  const chosen = entity?.target ? peekToolChoice(entity.target) : null;
+  let toolOrder = null;
+  try {
+    toolOrder = packToolOrder(engine.query?.('packLayout', engine));
+  } catch {
+    toolOrder = null;
+  }
   return {
     ...shared,
     verbId,
+    ...(chosen ? { tool: chosen.cls, toolCopy: chosen.copy } : {}),
+    toolOrder,
+    // inc_skill_packages.js 538-541: Rubeweed x1.25 on a package's drop chance (the Dirt Pile's Loam).
+    rubeweed: Boolean(engine.hasBuff?.('rubeweed')),
     skills: engine.learnedSkills,
     // Imagination upgrades (scraping/scooping speed, ice and peat yield, dirt and peat daily limits).
     upgrades: engine.pc?.imaginationUpgrades || [],
@@ -1430,7 +1467,17 @@ function ownSide(engine, entity, verbId) {
 }
 
 function performVerb(engine, entity, verbId) {
-  const result = harvestResourceNode(entity.node, engine.inv, engine.pc, verbContext(engine, entity, verbId));
+  const ctx = verbContext(engine, entity, verbId);
+  if (entity?.target) takeToolChoice(entity.target);
+  // runSkillPackage rolls the package's drop before the node's own callback (inc_skill_packages.js
+  // 536-545), which a Jellisac reads (jellisac.js 182: no Super Harvest with a drop).
+  let preDrop = null;
+  ctx.rollDrop = () => {
+    preDrop = rollResourceNodeDrop(engine, { ok: true, classTsid: entity.classTsid, verbId: rulesVerbId(verbId) }, { pay: false });
+    return Boolean(preDrop?.hit && preDrop.result);
+  };
+  const result = harvestResourceNode(entity.node, engine.inv, engine.pc, ctx);
+  if (result.ok && preDrop) result.preDrop = preDrop;
   applyResult(engine, entity, result);
   // Help dig in multiplayer (features/help-mine-feature.js): the crew's bonus, after the dig's own yield.
   if (result.ok && engine.mode === 'multiplayer') engine.query?.('resourceNodeUsed', entity.target, result, engine);

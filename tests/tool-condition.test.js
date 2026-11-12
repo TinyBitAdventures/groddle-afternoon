@@ -93,19 +93,25 @@ describe('official persistent tool condition', () => {
     assert.equal(state.totalRepairs, 1);
   });
 
-  it('does not spend repair energy when the Tinkertool cannot do the work', () => {
+  it('a worn Tinkertool repairs tick by tick until it breaks, keeping what it fixed (tinkertool.js 405-455)', () => {
     const state = createToolConditionState();
     setToolRemaining(state, 'hoe', 10);
     setToolRemaining(state, 'tinkertool', 1);
     const pc = { energy: 100 };
-    const before = structuredClone(state);
     const result = repairToolCondition(state, 'hoe', pc, {
       learned: ['tinkering_1'],
       hasTinkertool: true,
     });
-    assert.equal(result.ok, false);
-    assert.equal(result.reason, 'tinkertool_broken');
-    assert.equal(pc.energy, 100);
+    assert.equal(result.ok, true, result.msg);
+    assert.equal(result.plan.ticks, 1);
+    assert.equal(getToolCondition(state, 'hoe').remaining, 13);
+    assert.equal(getToolCondition(state, 'tinkertool').broken, true);
+    assert.ok(pc.energy < 100);
+    // A broken Tinkertool does no repair for another tool.
+    const before = structuredClone(state);
+    const none = repairToolCondition(state, 'hoe', pc, { learned: ['tinkering_1'], hasTinkertool: true });
+    assert.equal(none.ok, false);
+    assert.equal(none.msg, 'You need a Tinkertool to repair this.');
     assert.deepEqual(state, before);
   });
 });
@@ -136,7 +142,7 @@ describe('tool wear across gameplay loops', () => {
     const pc = { energy: 60, imagination: 0, xp: 0 };
     const tools = createToolConditionState();
     setToolRemaining(tools, 'pick', MINING_COSTS.toolWear);
-    const rock = createMineRock('rock_metal_1', { chunksRemaining: 20 });
+    const rock = createMineRock('rock_beryl_1', { chunksRemaining: 20 });
     const opts = { learned: ['mining_1'], toolState: tools, rng: () => 0, now: 0 };
     const first = mineRock(rock, inv, pc, opts);
     assert.equal(first.ok, true);

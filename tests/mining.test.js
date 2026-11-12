@@ -40,9 +40,9 @@ import {
   craftRecipe,
   ensureMakingItems,
   TOOL_CATALOG,
-} from '../public/js/making.js?v=a6b3716c';
-import { DEFAULT_VENDOR, vendorBuy } from '../public/js/vendor.js?v=900d86d9';
-import { createToolConditionState, getToolCondition } from '../public/js/tools.js?v=5f482998';
+} from '../public/js/making.js?v=2cd473f3';
+import { DEFAULT_VENDOR, vendorBuy } from '../public/js/vendor.js?v=5207195b';
+import { bindToolInventory, createToolConditionState, getToolCondition, toolCopies } from '../public/js/tools.js?v=5f482998';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const SPIKE = join(__dirname, '../public');
@@ -98,34 +98,76 @@ describe('mining catalog (GSJS rocks)', () => {
 });
 
 describe('mine rock loop', () => {
-  it('requires pick and mining skill', () => {
-    const rock = createMineRock('rock_metal_1');
-    const inv = createInventory({});
+  it('asks for Mining I first, then a pick (rock_metal_1.js conditions 191-210)', () => {
+    const rock = createMineRock('rock_beryl_1');
     const pc = { energy: 80 };
-    const r = mineRock(rock, inv, pc, { learned: [], requireSkill: true });
+    const r = mineRock(rock, createInventory({}), pc, { learned: [], requireSkill: true });
     assert.equal(r.ok, false);
-    assert.equal(r.reason, 'no_pick');
+    assert.equal(r.reason, 'skill');
+    assert.deepEqual(r.msgs, ['You need to know Mining I to use this.']);
 
-    const inv2 = createInventory({ pick: 1 });
-    const r2 = mineRock(rock, inv2, pc, { learned: [], requireSkill: true });
-    assert.equal(r2.ok, false);
-    assert.equal(r2.reason, 'skill');
+    const r2 = mineRock(rock, createInventory({}), pc, { learned: ['mining_1'], requireSkill: true });
+    assert.equal(r2.reason, 'no_pick');
+    assert.deepEqual(r2.msgs, ["You'll need a pick first."]);
+  });
+
+  it('a Metal Rock takes only a Fancy Pick (rock_metal_1.js 183-203, 235-238)', () => {
+    const rock = createMineRock('rock_metal_1');
+    const pc = { energy: 80, imagination: 0, xp: 0 };
+    const plain = mineRock(rock, createInventory({ pick: 1 }), pc, { learned: ['mining_1'], requireSkill: true });
+    assert.equal(plain.reason, 'no_pick');
+    assert.deepEqual(plain.msgs, ["You'll need a Fancy Pick first."]);
+    assert.equal(findWorkingPick(createInventory({ pick: 1 }), null, 2, { rockType: 'metal_rock' }), null);
+    // A plain Pick's own Use (force_pick) on a Metal Rock.
+    const forced = mineRock(rock, createInventory({ pick: 1, fancy_pick: 1 }), pc, { learned: ['mining_1'], tool: 'pick', force: true });
+    assert.deepEqual(forced.msgs, ['This humdrum, everyday pick is far too brittle to mine a metal rock!']);
+    const fancy = mineRock(rock, createInventory({ pick: 1, fancy_pick: 1 }), pc, { learned: ['mining_1'], rng: () => 0 });
+    assert.equal(fancy.ok, true);
+    assert.equal(fancy.pick, 'fancy_pick');
+    // Any other rock takes either; the named one swings.
+    const beryl = createMineRock('rock_beryl_1');
+    const named = mineRock(beryl, createInventory({ pick: 1, fancy_pick: 1 }), pc, { learned: ['mining_1'], tool: 'pick', rng: () => 0 });
+    assert.equal(named.pick, 'pick');
+  });
+
+  it('a named copy is the one that wears (rock_beryl_1.js 241-242, include/mining.js 191-193)', () => {
+    const toolState = createToolConditionState();
+    const inv = createInventory({ pick: 2 });
+    bindToolInventory(toolState, inv);
+    const pc = { energy: 80, imagination: 0, xp: 0 };
+    const r = mineRock(createMineRock('rock_beryl_1'), inv, pc, { learned: ['mining_1'], toolState, tool: 'pick', copy: 1, rng: () => 0 });
+    assert.equal(r.ok, true);
+    assert.deepEqual(toolCopies(toolState, 'pick').map((c) => c.remaining), [100, 98]);
+  });
+
+  it('too tired: the package line (inc_skill_packages.js 177-179)', () => {
+    const r = mineRock(createMineRock('rock_beryl_1'), createInventory({ pick: 1 }), { energy: 5 }, { learned: ['mining_1'] });
+    assert.deepEqual(r.msgs, ["You're too tired to do that."]);
+  });
+
+  it('Rubeweed raises the gem chance by a quarter (inc_skill_packages.js 538-541)', () => {
+    const pc = { energy: 100, imagination: 0, xp: 0, imaginationUpgrades: ['mining_drop_1'] };
+    // 4% with the card; 4.5% misses without Rubeweed and hits with it (5%).
+    const without = mineRock(createMineRock('rock_beryl_1'), createInventory({ pick: 1 }), { ...pc }, { learned: ['mining_1'], rng: () => 0.045, rubeweed: false });
+    assert.equal(without.gem, null);
+    const withIt = mineRock(createMineRock('rock_beryl_1'), createInventory({ pick: 1 }), { ...pc }, { learned: ['mining_1'], rng: () => 0.045, rubeweed: true });
+    assert.ok(withIt.gem);
   });
 
   it('mines chunks, spends energy, depletes and respawns', () => {
-    // minChunks for metal is 3 — start with 3 so one swing depletes
-    const rock = createMineRock('rock_metal_1', { chunksRemaining: 3 });
+    // minChunks for sparkly is 3: start with 3 so one swing depletes
+    const rock = createMineRock('rock_sparkly_1', { chunksRemaining: 3 });
     const inv = createInventory({ pick: 1 });
     const pc = { energy: 100, imagination: 0, xp: 0 };
     const r = mineRock(rock, inv, pc, {
       learned: ['mining_1'],
       requireSkill: true,
-      rng: () => 0, // min chunks (3)
+      rng: () => 0.99, // max chunks (7), past the 3 left; and no 150-chunk mega rock (20% for Sparkly)
       now: 1000,
     });
     assert.equal(r.ok, true);
     assert.ok(r.got >= 3);
-    assert.ok(countItem(inv, 'metal_rock') >= 3);
+    assert.ok(countItem(inv, 'sparkly') >= 3);
     assert.equal(pc.energy, 100 - MINING_COSTS.energy);
     assert.ok(rock.depleted);
     assert.ok(rock.respawnAt > 1000);
@@ -137,24 +179,24 @@ describe('mine rock loop', () => {
   });
 
   it('gives the whole roll even past the chunks remaining (include/mining.js)', () => {
-    const rock = createMineRock('rock_metal_1', { chunksRemaining: 2 });
+    const rock = createMineRock('rock_sparkly_1', { chunksRemaining: 2 });
     const inv = createInventory({ pick: 1 });
     const pc = { energy: 100, imagination: 0, xp: 0 };
     const r = mineRock(rock, inv, pc, { learned: ['mining_1'], rng: () => 0 });
     assert.equal(r.got, 3);
-    assert.equal(countItem(inv, 'metal_rock'), 3);
+    assert.equal(countItem(inv, 'sparkly'), 3);
     assert.ok(rock.depleted);
   });
 
   it('refuses a swing when energy only equals the cost', () => {
-    const rock = createMineRock('rock_metal_1');
+    const rock = createMineRock('rock_beryl_1');
     const inv = createInventory({ pick: 1 });
     const pc = { energy: MINING_COSTS.energy };
     assert.equal(mineRock(rock, inv, pc, { learned: ['mining_1'] }).reason, 'energy');
   });
 
   it('each gem scales that pick\'s drop chance by 0.8', () => {
-    const rock = createMineRock('rock_metal_1');
+    const rock = createMineRock('rock_beryl_1');
     const inv = createInventory({ pick: 1 });
     const pc = { energy: 100, imagination: 0, xp: 0, imaginationUpgrades: ['mining_drop_1'] };
     const r = mineRock(rock, inv, pc, { learned: ['mining_1'], rng: () => 0 });

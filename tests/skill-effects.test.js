@@ -107,7 +107,7 @@ describe('Mining I to IV and Refining II', () => {
     const inv = createInventory({ pick: 1 });
     const tools = createToolConditionState();
     const pc = fresh({ mood: 75 }); // the x1 mood band (G148)
-    const rock = createMineRock('rock_metal_1');
+    const rock = createMineRock('rock_beryl_1');
     const r = mineRock(rock, inv, pc, {
       learned: ['mining_1', 'mining_2', 'mining_3', 'mining_4'],
       toolState: tools,
@@ -117,7 +117,7 @@ describe('Mining I to IV and Refining II', () => {
     assert.equal(pc.energy, 93);
     assert.equal(pc.xp, 10);
     assert.equal(getToolCondition(tools, 'pick').remaining, 99);
-    const blocked = mineRock(createMineRock('rock_metal_1'), inv, fresh(), { learned: [] });
+    const blocked = mineRock(createMineRock('rock_beryl_1'), inv, fresh(), { learned: [] });
     assert.equal(blocked.reason, 'skill');
   });
 

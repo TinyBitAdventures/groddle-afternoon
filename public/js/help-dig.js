@@ -48,6 +48,23 @@ export function helpDigMessage(count, classTsid, names = []) {
   return `You got ${count} additional ${count > 1 ? plural : single} thanks to the help you got from ${helpString(names)}.`;
 }
 
+/** include/scraping.js getVerbLabel 3-18: an Ice Nubbin's verb while anyone else scrapes it. */
+export const HELP_SCRAPE_LABEL = 'Help scrape';
+
+/** ice_knob.js 310-313: the bonus line, one Ice for each other scraper. */
+export function helpScrapeMessage(count, names = []) {
+  return `You got more ice with the help you received from ${helpString(names)}. +${count} Ice`;
+}
+
+/**
+ * The nodes whose uses the realtime server hears start (objects.go crewNodes): a use that started
+ * while the node was ready is paid even after another player emptied it (the source never checked
+ * again at completion). A Dirt Pile's diggers and an Ice Nubbin's scrapers help each other.
+ */
+export const CREW_NODES = Object.freeze(new Set(['mortar_barnacle', 'ice_knob', 'jellisac', 'dirt_pile', 'peat_1']));
+/** The verb that is a use of each crew node. */
+export const CREW_VERBS = Object.freeze({ mortar_barnacle: 'scrape', ice_knob: 'scrape', jellisac: 'scoop', dirt_pile: 'dig', peat_1: 'harvest' });
+
 /** Others digging the pile (the server's diggers less you): the verb reads "Help dig". */
 export function othersDigging(diggers, me) {
   const mine = Number(me) || 0;

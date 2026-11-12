@@ -158,8 +158,10 @@ export function rockPerks(classTsid, { upgrades = [], buffs = [] } = {}) {
   return out;
 }
 
-export function nodePerks(classTsid, verbId, { upgrades = [] } = {}) {
+export function nodePerks(classTsid, verbId, { upgrades = [], buffs = [] } = {}) {
   if (resourceClass(classTsid) === 'paper_tree' && verbId === 'harvest' && (upgrades || []).includes('gardening_harvest_paper')) return ['paper8'];
+  // A Dirt Pile's Loam drop the server rolls: Rubeweed x1.25 (inc_skill_packages.js 538-541).
+  if (resourceClass(classTsid) === 'dirt_pile' && verbId === 'dig' && (buffs || []).includes('rubeweed')) return ['rube'];
   return [];
 }
 
@@ -188,7 +190,8 @@ export function digSkill(learned = [], upgrades = []) {
  */
 export function rockReady(rock, { inv, pc, learned = [], toolState = null } = {}) {
   if (!rock) return false;
-  const pick = findWorkingPick(inv || {}, toolState, miningToolWear(learned));
+  // A Metal Rock takes only a Fancy Pick (rock_metal_1.js conditions 198-202).
+  const pick = findWorkingPick(inv || {}, toolState, miningToolWear(learned), { rockType: rock.rockType || ROCK_CATALOG[rock.classTsid]?.rockType });
   if (!pick) return false;
   const profile = miningProfile(learned, pick);
   if (!profile) return false;

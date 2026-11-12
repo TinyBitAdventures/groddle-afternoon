@@ -268,7 +268,8 @@ describe('scraping: Mortar Barnacle and Ice Nubbin', () => {
     const before2 = snapshot(node, inv, pc, toolState);
     const broken = harvestResourceNode(node, inv, pc, ctxBase({ toolState }));
     assert.equal(broken.reason, 'broken_tool');
-    assert.match(broken.message, /Scraper has become broken/);
+    // mortar_barnacle.js conditions 76-79: only a working scraper counts.
+    assert.equal(broken.message, "You'll need a working scraper first.");
     assert.equal(snapshot(node, inv, pc, toolState), before2);
 
     // A working second scraper is used when the first is broken.

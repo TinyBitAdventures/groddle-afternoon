@@ -76,9 +76,9 @@ import {
   countItem,
   ensureItem,
   ITEM_CATALOG,
-} from './inventory.js?v=2bd5b93e';
-import { canUseTool, useToolCondition } from './tools.js?v=5f482998';
-import { getGameDayKey } from './game-day.js?v=cf9afac0';
+} from './inventory.js?v=5be47371';
+import { TOOL_CONDITION_CATALOG, canUseTool, toolCopies, useToolCondition } from './tools.js?v=5f482998';
+import { getGameDayKey } from './game-day.js?v=84569fa2';
 import { grantMoodXp } from './mood-xp.js?v=958e7680';
 import { metabolicGain, moodMax, loseEnergy, loseMood } from './metabolics.js?v=8504134e';
 
@@ -1191,15 +1191,61 @@ function dailyLimitFor(def, verbId, ctx = {}) {
   return limit;
 }
 
-function findTool(verb, inv, toolState, wear) {
+/** peat_1.js 345-351, dirt_pile.js 211-212: a shovel is the first working Shovel or Ace of Spades in pack order (findFirst). */
+const PACK_ORDER_TOOLS = Object.freeze(new Set(['shovel', 'ace_of_spades']));
+
+/** The first unit of `cls` with a point left (isWorking), or -1; null when the class keeps no wear. */
+function firstWorkingCopy(toolState, cls) {
+  const d = TOOL_CONDITION_CATALOG[cls];
+  if (!d || d.contents || d.charges) return null;
+  return toolCopies(toolState, cls).findIndex((c) => !c.broken && c.remaining >= 1);
+}
+
+/**
+ * The tool a node's verb uses, as the source's handlers find it: a stack the player named
+ * (ctx.tool / ctx.toolCopy: a drag or the tool's own pack verb, msg.target_itemstack_tsid), else
+ * the first working one (Super Scraper before Scraper: mortar_barnacle.js 91-101, ice_knob.js
+ * 93-97; a Shovel or Ace of Spades in pack order, ctx.toolOrder). The skill package then checks
+ * that this one can take the wear (inc_skill_packages.js 166-170): { worn } when it can't.
+ */
+function findTool(verb, inv, toolState, wear, ctx = {}) {
   const owned = verb.tools.filter((id) => countItem(inv, id) >= 1);
   if (!owned.length) return { tool: null, owned: false };
-  if (!toolState) return { tool: owned[0], owned: true };
-  for (const id of owned) {
-    if (canUseTool(toolState, id, Math.max(1, wear)).ok) return { tool: id, owned: true };
+  let units;
+  const named = ctx.tool && verb.tools.includes(ctx.tool) && countItem(inv, ctx.tool) >= 1 ? ctx.tool : null;
+  if (named) units = [{ cls: named, copy: Number.isInteger(ctx.toolCopy) ? ctx.toolCopy : null }];
+  else if (verb.tools.every((id) => PACK_ORDER_TOOLS.has(id)) && Array.isArray(ctx.toolOrder) && ctx.toolOrder.some((u) => owned.includes(u?.cls))) {
+    units = ctx.toolOrder.filter((u) => owned.includes(u?.cls)).map((u) => ({ cls: u.cls, copy: Number.isInteger(u.copy) ? u.copy : null }));
+  } else units = owned.map((cls) => ({ cls, copy: null }));
+  if (!toolState) return { tool: units[0].cls, copy: units[0].copy, owned: true };
+  for (const u of units) {
+    let copy = u.copy;
+    if (copy == null) {
+      const first = firstWorkingCopy(toolState, u.cls);
+      if (first != null && first < 0) continue;
+      copy = first;
+    }
+    const at = copy == null ? {} : { copy };
+    if (!canUseTool(toolState, u.cls, 1, at).ok) {
+      if (named) break;
+      continue;
+    }
+    if (!canUseTool(toolState, u.cls, Math.max(1, wear), at).ok) return { tool: null, owned: true, worn: u.cls, copy };
+    return { tool: u.cls, copy, owned: true };
   }
   return { tool: null, owned: true, broken: owned[0] };
 }
+
+/** Nodes whose conditions count only a working tool, so a broken one reads as none. */
+const BROKEN_IS_MISSING = Object.freeze(new Set(['mortar_barnacle', 'ice_knob', 'dirt_pile', 'peat_1']));
+
+/** The handler's line when the tool it found can't take the wear (inc_skill_packages.js 169 error_tool_broken). */
+const WORN_TOOL_LINES = Object.freeze({
+  peat_1: 'Your Shovel is too worn out. Try repairing it or replacing it.', // peat_1.js 370
+  dirt_pile: "Your shovel doesn't have enough wear remaining.", // dirt_pile.js 225-226
+  // ice_knob.js 378-379 (its dash written as a full stop: no dashes in player text).
+  ice_knob: "Nope! You need to fix your scraper up first. It's almost busted!",
+});
 
 function fail(reason, message, extra = {}) {
   return { ok: false, reason, message, msgs: [message], ...extra };
@@ -1249,6 +1295,11 @@ function gateVerb(node, inv, pc, ctx = {}) {
     toolWear: wear,
   };
   let durationMs = pkg ? pkg.duration : verb.durationMs;
+
+  // dirt_pile.js conditions 103-110: the shovel before the dirt.
+  if (def.classTsid === 'dirt_pile' && verb.tools.length && !findTool(verb, inv, ctx.toolState, 1, ctx).tool) {
+    return fail(verb.tools.some((id) => countItem(inv, id) >= 1) ? 'broken_tool' : 'no_tool', toolMissingMessage(def, verb), { tools: [...verb.tools] });
+  }
 
   // State gates per node model.
   if (def.stock.model === 'respawn') {
@@ -1308,18 +1359,23 @@ function gateVerb(node, inv, pc, ctx = {}) {
     }
   }
 
-  // Tools.
+  // Tools (the dirt pile's shovel was checked first, above).
   let toolUsed = null;
+  let toolCopy = null;
   if (verb.tools.length) {
-    const found = findTool(verb, inv, ctx.toolState, wear);
+    const found = findTool(verb, inv, ctx.toolState, wear, ctx);
     if (!found.tool) {
-      if (found.owned) {
-        const label = itemName(found.broken || verb.tools[0]);
-        return fail('broken_tool', `This ${label} has become broken, and must be repaired.`, { tool: found.broken });
+      // A tool that works but can't take this verb's wear (runSkillPackage), else no working one:
+      // a broken tool is no tool (peat_1.js 166-169, dirt_pile.js 104-110, mortar_barnacle.js 76-79).
+      if (found.worn && WORN_TOOL_LINES[def.classTsid]) return fail('broken_tool', WORN_TOOL_LINES[def.classTsid], { tool: found.worn });
+      if (found.owned && !BROKEN_IS_MISSING.has(def.classTsid)) {
+        const label = itemName(found.worn || found.broken || verb.tools[0]);
+        return fail('broken_tool', `This ${label} has become broken, and must be repaired.`, { tool: found.worn || found.broken });
       }
-      return fail('no_tool', toolMissingMessage(def, verb), { tools: [...verb.tools] });
+      return fail(found.owned ? 'broken_tool' : 'no_tool', toolMissingMessage(def, verb), { tools: [...verb.tools], ...(found.broken ? { tool: found.broken } : {}) });
     }
     toolUsed = found.tool;
+    toolCopy = Number.isInteger(found.copy) ? found.copy : null;
   }
 
   // Firefly-specific gates (firefly_jar.js open conditions).
@@ -1331,10 +1387,12 @@ function gateVerb(node, inv, pc, ctx = {}) {
 
   // Energy (inc_skill_packages: fails when energy <= energy_cost).
   if (verb.skillPackage && costs.energy > 0 && (pc?.energy || 0) <= costs.energy) {
-    return fail('energy', `Needs more than ${costs.energy} energy (you have ${Math.floor(pc?.energy || 0)}).`, { needed: costs.energy + 1 });
+    // inc_skill_packages.js 177-179.
+    return fail('energy', "You're too tired to do that.", { needed: costs.energy + 1 });
   }
 
-  return { ok: true, ...base, pkg, costs, durationMs, toolUsed, limit };
+  const noImgUpgrades = pc?.partyScraping === true && PARTY_SCRAPING_PACKAGES.includes(verb.skillPackage);
+  return { ok: true, ...base, pkg, costs, durationMs, toolUsed, toolCopy, limit, noImgUpgrades };
 }
 
 /**
@@ -1485,7 +1543,10 @@ export function harvestResourceNode(node, inv, pc, ctx = {}) {
     case 'jellisac': {
       const qty = pkg.bonus_amount || 1;
       outputs.push({ classTsid: 'jellisac_clump', qty });
-      if (pkg.bonus_multiplier && rng() < (pkg.bonus_chance || 0)) {
+      // jellisac.js 182: the Super Harvest only when the package's drop did not come (the drop is
+      // rolled first, in runSkillPackage 536-545: ctx.rollDrop, features/drops-feature.js).
+      const gotDrop = typeof ctx.rollDrop === 'function' ? Boolean(ctx.rollDrop()) : false;
+      if (pkg.bonus_multiplier && !gotDrop && rng() < (pkg.bonus_chance || 0)) {
         const bonus = qty * (pkg.bonus_multiplier - 1);
         outputs.push({ classTsid: 'jellisac_clump', qty: bonus, superHarvest: true });
         extra.superHarvest = { classTsid: 'jellisac_clump', qty: bonus };
@@ -1497,7 +1558,8 @@ export function harvestResourceNode(node, inv, pc, ctx = {}) {
       break;
     }
     case 'dirt_pile': {
-      const dropChance = Number(pkg.drop_chance) || 0;
+      // inc_skill_packages.js 538-541: Rubeweed x1.25, at most 100.
+      const dropChance = (Number(pkg.drop_chance) || 0) * (ctx.rubeweed === true ? 1.25 : 1);
       const drop = pkg.drop_class_id && dropChance > 0 && rng() < Math.min(100, dropChance) / 100
         ? rollDropTable(pkg.drop_class_id, rng)
         : [];
@@ -1599,7 +1661,7 @@ export function harvestResourceNode(node, inv, pc, ctx = {}) {
   applyMetabolics(pc, costs);
   for (const out of outputs) addItem(inv, out.classTsid, out.qty);
   const toolUse = gate.toolUsed && ctx.toolState && toolWear > 0
-    ? useToolCondition(ctx.toolState, gate.toolUsed, toolWear)
+    ? useToolCondition(ctx.toolState, gate.toolUsed, toolWear, Number.isInteger(gate.toolCopy) ? { copy: gate.toolCopy } : {})
     : null;
   if (def.dailyLimit && def.dailyLimit.verb === verb.id) bumpDaily(node, verb.id, dayKey);
   node.totalHarvests = whole(node.totalHarvests, 0) + 1;
@@ -1742,6 +1804,8 @@ export function harvestResourceNode(node, inv, pc, ctx = {}) {
     toolUse,
     durationMs,
     skill: pkg?.skill || null,
+    // Party Scraping ran the package with no_img_upgrades (mortar_barnacle.js 343-345): no drop card.
+    noImgUpgrades: gate.noImgUpgrades === true,
     achievementCounters,
     node,
     ...extra,

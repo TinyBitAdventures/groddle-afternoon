@@ -132,10 +132,16 @@ export function payDrop(engine, result, { source = '' } = {}) {
 
 /** runSkillPackage's drop step for a package the player just completed. */
 export function rollDropFor(engine, packageId, opts = {}) {
-  const res = rollPackageDrop(packageId, { ...ctxFor(engine), ...(forceLuck ? { maxLuck: true } : {}), ...opts });
+  const { pay = true, ...rest } = opts;
+  const res = rollPackageDrop(packageId, { ...ctxFor(engine), ...(forceLuck ? { maxLuck: true } : {}), ...rest });
   rolls += 1;
   engine.setData?.('dropPackage', `${packageId}@${res.chance}%:${res.hit ? 'hit' : 'miss'}`);
-  if (res.hit && res.result) payDrop(engine, res.result, { source: packageId });
+  return pay ? payRolledDrop(engine, res) : res;
+}
+
+/** Pay a roll made earlier (rollDropFor with pay: false). */
+export function payRolledDrop(engine, res) {
+  if (res?.hit && res.result) payDrop(engine, res.result, { source: res.packageId || '' });
   else publish(engine);
   return res;
 }
@@ -154,10 +160,14 @@ export const RESOURCE_NODE_DROP_PACKAGES = Object.freeze({
  * Hook for features/resource-nodes-feature.js: call after a successful
  * harvest result ({ ok, classTsid, verbId }). Returns the roll or null.
  */
-export function rollResourceNodeDrop(engine, result) {
+export function rollResourceNodeDrop(engine, result, { pay = true } = {}) {
   if (!result?.ok) return null;
+  // Rolled already, before the verb's own result (jellisac.js 182 reads got_drop): pay it now.
+  if (result.preDrop) return pay ? payRolledDrop(engine, result.preDrop) : result.preDrop;
   const pkg = RESOURCE_NODE_DROP_PACKAGES[`${result.classTsid}:${result.verbId}`];
-  return pkg ? rollDropFor(engine, pkg) : null;
+  // Party Scraping runs the package with no_img_upgrades (mortar_barnacle.js 343-345,
+  // inc_skill_packages.js 589-611): the drop card is an imagination upgrade, so no drop.
+  return pkg ? rollDropFor(engine, pkg, { pay, ...(result.noImgUpgrades ? { upgrades: [] } : {}) }) : null;
 }
 
 function nearestGardenType(engine) {

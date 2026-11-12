@@ -276,19 +276,66 @@ export function rockSceneIndex(rock) {
   return Math.max(1, Math.min(5, Math.ceil(rock.chunksRemaining / 10)));
 }
 
+/** The rock type whose verb asks for a Fancy Pick (rock_metal_1.js classProps rock_type). */
+export const FANCY_PICK_ROCK = 'metal_rock';
+
 /**
+ * The pick a swing uses: the first working Fancy Pick, else the first working Pick
+ * (rock_beryl_1.js effects / handler 214-250). A Metal Rock takes only a Fancy Pick
+ * (rock_metal_1.js conditions 198-202, drop_ok_code 183-185). `opts.tool` is a pick the
+ * player named (a dragged stack, or a Pick's own Use: pick.js 311 force_pick), `opts.copy`
+ * which unit of it (its place in pack order).
  * @param {import('./inventory.js').Inventory} inv
+ * @param {{ rockType?: string, tool?: string|null, copy?: number|null }} [opts]
  */
-export function findWorkingPick(inv, toolState = null, wear = MINING_COSTS.toolWear) {
-  if (
-    countItem(inv, 'fancy_pick') >= 1 &&
-    (!toolState || canUseTool(toolState, 'fancy_pick', wear).ok)
-  ) return 'fancy_pick';
-  if (
-    countItem(inv, 'pick') >= 1 &&
-    (!toolState || canUseTool(toolState, 'pick', wear).ok)
-  ) return 'pick';
+export function findWorkingPick(inv, toolState = null, wear = MINING_COSTS.toolWear, opts = {}) {
+  const only = opts.rockType === FANCY_PICK_ROCK ? ['fancy_pick'] : ['fancy_pick', 'pick'];
+  const order = opts.tool ? only.filter((id) => id === opts.tool) : only;
+  for (const id of order) {
+    if (countItem(inv, id) < 1) continue;
+    const copy = opts.tool === id && Number.isInteger(opts.copy) ? { copy: opts.copy } : {};
+    if (!toolState || canUseTool(toolState, id, wear, copy).ok) return id;
+  }
   return null;
+}
+
+/** Whether the player knows Mining I (rock_*.js verbs.mine conditions: required_skill mining_1). */
+export function knowsMining(learned = []) {
+  return (learned || []).some((id) => /^mining_[1-4]$/.test(id));
+}
+
+/** rock_metal_1.js 196-207: the line a rock's Mine verb shows with no pick it takes. */
+export function noPickLine(rockType) {
+  return rockType === FANCY_PICK_ROCK ? "You'll need a Fancy Pick first." : "You'll need a pick first.";
+}
+
+/** rock_metal_1.js 235-238: a plain Pick's Use (force_pick) on a Metal Rock. */
+export const BRITTLE_PICK_LINE = 'This humdrum, everyday pick is far too brittle to mine a metal rock!';
+
+/** inc_skill_packages.js 177-179: energy at or under the package's cost. */
+export const TOO_TIRED_LINE = "You're too tired to do that.";
+
+/** inc_skill_packages.js 538-541: Rubeweed (Luck of the Rube) multiplies a package's drop chance by 1.25, at most 100. */
+export function rubeweedDropChance(chance, rubeweed = false) {
+  const c = Number(chance) || 0;
+  return Math.min(100, rubeweed ? c * 1.25 : c);
+}
+
+/**
+ * Where a swing reads whether Rubeweed runs (features/help-mine-feature.js sets it to the
+ * engine's buffs); a caller's opts.rubeweed wins. Pure callers (tests) pass it.
+ */
+let rubeweedSource = null;
+export function setMiningBuffs(fn) {
+  rubeweedSource = typeof fn === 'function' ? fn : null;
+}
+function rubeweedOn(opts) {
+  if (typeof opts.rubeweed === 'boolean') return opts.rubeweed;
+  try {
+    return Boolean(rubeweedSource?.('rubeweed'));
+  } catch {
+    return false;
+  }
 }
 
 /**
@@ -307,55 +354,56 @@ export function hasMiningTool(inv, toolId) {
  * @param {{ learned?: string[], requireSkill?: boolean, rng?: () => number, now?: number, chunks?: number }} [opts]
  */
 export function mineRock(rock, inv, pc, opts = {}) {
-  const def = ROCK_CATALOG[rock.classTsid] || Object.values(ROCK_CATALOG).find((r) => r.rockType === rock.rockType);
+  const def = ROCK_CATALOG[rock?.classTsid] || Object.values(ROCK_CATALOG).find((r) => r.rockType === rock?.rockType);
+  const rockType = rock?.rockType || def?.rockType;
   const msgs = [];
+  const skilled = Array.isArray(opts.learned) ? opts.learned : undefined;
+  const upgrades = Array.isArray(opts.upgrades) ? opts.upgrades : pc?.imaginationUpgrades || [];
+  // The rock's handler (rock_metal_1.js 225-250) and startMining (include/mining.js 180-217) in
+  // their order: Mining I, a plain Pick's Use on Metal Rock, the pick, then the rock itself.
+  if (opts.requireSkill !== false && !knowsMining(opts.learned || [])) {
+    // rock_metal_1.js verbs.mine conditions 193-196 (skills_get_name: "Mining I").
+    return { ok: false, reason: 'skill', msgs: ['You need to know Mining I to use this.'] };
+  }
+  if (opts.force && opts.tool === 'pick' && rockType === FANCY_PICK_ROCK) {
+    return { ok: false, reason: 'brittle', msgs: [BRITTLE_PICK_LINE] };
+  }
+  const named = { rockType, tool: opts.tool || null, copy: Number.isInteger(opts.copy) ? opts.copy : null };
+  const pick = findWorkingPick(inv, opts.toolState, miningToolWear(skilled), named);
+  if (!pick) {
+    // include/mining.js 236-237: a pick that works but can't take this swing's wear.
+    if (findWorkingPick(inv, opts.toolState, 1, named)) {
+      return { ok: false, reason: 'broken_tool', msgs: ['Your pick does not have enough uses left.'] };
+    }
+    const ownsPick = rockType === FANCY_PICK_ROCK
+      ? countItem(inv, 'fancy_pick') >= 1
+      : countItem(inv, 'fancy_pick') >= 1 || countItem(inv, 'pick') >= 1;
+    return {
+      ok: false,
+      reason: ownsPick && opts.toolState ? 'broken_tool' : 'no_pick',
+      // A broken pick is no pick (rock_beryl_1.js verbs.mine conditions 193-214, ticket 63);
+      // a Metal Rock asks for a Fancy Pick (rock_metal_1.js 198-202).
+      msgs: [noPickLine(rockType)],
+    };
+  }
   if (!rock || rock.depleted || rock.chunksRemaining <= 0) {
     // include/mining.js 214-217: isUseable (chunks_remaining > 0) or this line.
     return { ok: false, reason: 'depleted', msgs: ['This is not the rock you are looking for.'] };
   }
-  const skilled = Array.isArray(opts.learned) ? opts.learned : undefined;
-  const upgrades = Array.isArray(opts.upgrades) ? opts.upgrades : pc?.imaginationUpgrades || [];
-  const pick = findWorkingPick(inv, opts.toolState, miningToolWear(skilled));
-  if (!pick) {
-    // include/mining.js 236-237: a pick that works but can't take this swing's wear.
-    if (findWorkingPick(inv, opts.toolState, 1)) {
-      return { ok: false, reason: 'broken_tool', msgs: ['Your pick does not have enough uses left.'] };
-    }
-    const ownsPick = countItem(inv, 'fancy_pick') >= 1 || countItem(inv, 'pick') >= 1;
-    return {
-      ok: false,
-      reason: ownsPick && opts.toolState ? 'broken_tool' : 'no_pick',
-      // A broken pick is no pick (rock_beryl_1.js verbs.mine conditions 193-214, ticket 63).
-      msgs: ["You'll need a pick first."],
-    };
-  }
-  if (opts.requireSkill !== false) {
-    if (!miningProfile(opts.learned || [], pick)) {
-      return {
-        ok: false,
-        reason: 'skill',
-        // rock_metal_1.js verbs.mine conditions 193-196 (skills_get_name: "Mining I").
-        msgs: ['You need to know Mining I to use this.'],
-      };
-    }
-  }
   // Mining II–IV: faster swings, less energy, less wear, more xp.
   const profile = miningProfile(opts.requireSkill === false ? skilled : opts.learned || [], pick, upgrades)
     || miningProfile(undefined, pick, upgrades);
-  if (opts.toolState && !canUseTool(opts.toolState, pick, profile.toolWear).ok) {
+  const copyOpt = opts.tool === pick && Number.isInteger(opts.copy) ? { copy: opts.copy } : {};
+  if (opts.toolState && !canUseTool(opts.toolState, pick, profile.toolWear, copyOpt).ok) {
     return {
       ok: false,
       reason: 'broken_tool',
       msgs: ['Your pick does not have enough uses left.'],
     };
   }
-  // startSkillPackage refuses at energy <= cost.
+  // runSkillPackage refuses at energy <= cost (inc_skill_packages.js 177-179).
   if ((pc.energy || 0) <= profile.energy) {
-    return {
-      ok: false,
-      reason: 'energy',
-      msgs: [`Needs ${profile.energy} energy (you have ${Math.floor(pc.energy || 0)}).`],
-    };
+    return { ok: false, reason: 'energy', msgs: [TOO_TIRED_LINE] };
   }
 
   const rng = opts.rng || Math.random;
@@ -376,7 +424,7 @@ export function mineRock(rock, inv, pc, opts = {}) {
   addItem(inv, rock.chunkId, got);
   rock.chunksRemaining -= got;
   const toolUse = opts.toolState
-    ? useToolCondition(opts.toolState, pick, profile.toolWear)
+    ? useToolCondition(opts.toolState, pick, profile.toolWear, copyOpt)
     : null;
 
   const chunkLabel = def?.chunkLabel || rock.chunkId;
@@ -388,7 +436,9 @@ export function mineRock(rock, inv, pc, opts = {}) {
   // (addSkillPackageOverride in include/mining.js, cleared in doNewDay).
   let gem = null;
   const dropScale = Number(pc.miningDropScale?.[pick] ?? 1);
-  if (profile.dropClassId === 'gem_small' && profile.dropChance > 0 && rng() * 100 < profile.dropChance * dropScale) {
+  // inc_skill_packages.js 538-541: Rubeweed x1.25 on the (scaled) chance, at most 100.
+  const gemChance = rubeweedDropChance(profile.dropChance * dropScale, rubeweedOn(opts));
+  if (profile.dropClassId === 'gem_small' && profile.dropChance > 0 && rng() * 100 < gemChance) {
     pc.miningDropScale = { ...(pc.miningDropScale || {}), [pick]: dropScale * 0.8 };
     gem = rollGemSmall(rng);
     if (!ITEM_CATALOG[gem]) ensureItem(gem, GEM_ITEMS[gem]);

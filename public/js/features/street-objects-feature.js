@@ -147,12 +147,13 @@ import {
   treeId,
   treeReady,
   treeSkill,
-} from '../street-objects.js?v=c36a40da';
-import { ROCK_CATALOG } from '../mining.js?v=881c40fe';
-import { TRANT_META, trantStatusLabel } from '../trants.js?v=4d6f5593';
-import { quoteWoodTreeHarvest } from '../woodcutting.js?v=d7d876f0';
-import { animalStatusLabel, pickerMaxCount } from '../animals.js?v=1cc34c7e';
-import { highestAnimalKinshipRank, quoteAnimalKinship } from '../animal-kinship.js?v=ee58cc20';
+} from '../street-objects.js?v=d7ee507b';
+import { ROCK_CATALOG } from '../mining.js?v=12a6f1bd';
+import { TRANT_META, trantStatusLabel } from '../trants.js?v=1b3c8ae3';
+import { quoteWoodTreeHarvest } from '../woodcutting.js?v=5235a01a';
+import { animalStatusLabel, pickerMaxCount } from '../animals.js?v=c944b0a6';
+import { highestAnimalKinshipRank, quoteAnimalKinship } from '../animal-kinship.js?v=f91347e9';
+import { CREW_NODES } from '../help-dig.js?v=7b8a9733';
 import { animalPatrolRange, ANIMAL_BODY, TREE_FOOTPRINT } from '../street-ecology.js?v=f27417a8';
 import { INCUBATION, PIGGY_FEED, itemBaseCost, namedAnimalLabel, resetIncubation } from '../animal-husbandry.js?v=7929bf5e';
 import {
@@ -823,7 +824,7 @@ function sharedVerbOn(engine, target, verbId) {
       id: nodeId(n.key),
       ready: () => n.ready(verbId),
       reason: () => n.reason?.(verbId) || '',
-      perks: nodePerks(n.classTsid, verbId, { upgrades }),
+      perks: nodePerks(n.classTsid, verbId, { upgrades, buffs: engine.activeBuffIds?.() || [] }),
       // A Dirt Pile's dig: the server rolls its Loam drop from the skill (objects.go digHelp).
       skill: n.classTsid === 'dirt_pile' && verbId === 'dig' ? digSkill(learned, upgrades) : '',
     };
@@ -1350,20 +1351,23 @@ export const streetObjectsFeature = {
     return true;
   },
 
-  /** Help dig (features/help-mine-feature.js): who the server says digs a shared Dirt Pile, or null. */
+  /**
+   * Help dig and Help scrape (features/help-mine-feature.js): who the server says is using a shared
+   * crew node (a Dirt Pile, an Ice Nubbin, a barnacle, a Jellisac, a Peat Bog: js/help-dig.js CREW_NODES), or null.
+   */
   sharedDiggers(target, engine) {
     if (!client || !copy.snap || copy.none || !target?.resourceKey || (engine && copy.street !== engine.streetTsid)) return null;
     const n = (engine?.query?.('streetResourceNodes', engine) || []).find((row) => row.target === target);
-    if (!n || n.classTsid !== 'dirt_pile') return null;
+    if (!n || !CREW_NODES.has(n.classTsid)) return null;
     const s = stateFor(copy, nodeId(n.key));
     return Array.isArray(s?.diggers) ? s.diggers.map(Number) : [];
   },
 
-  /** Help dig: tell the server a dig at a shared Dirt Pile starts or stops (objects.go obj_dig). */
+  /** Tell the server a use of a shared crew node starts or stops (objects.go obj_dig: help, and a late landing paid). */
   sharedDigSwing(target, what, engine) {
     if (!client || !target?.resourceKey || (what !== 'start' && what !== 'stop')) return null;
     const n = (engine?.query?.('streetResourceNodes', engine) || []).find((row) => row.target === target);
-    if (!n || n.classTsid !== 'dirt_pile') return null;
+    if (!n || !CREW_NODES.has(n.classTsid)) return null;
     return client.send('obj_dig', { id: nodeId(n.key), do: what }) !== false;
   },
 

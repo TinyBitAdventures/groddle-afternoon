@@ -10,7 +10,9 @@
  * Each rule: `classes` (a target classId test), `verbs` (the remake's verb ids for it, first one
  * the target offers wins), `accepts(classTsid, ctx)` (drop_ok_code), `tip` (drop_tip, with the
  * client's {$count}, {$stack_name} and {$item_name}), `src` (file and lines), and `use`:
- *   'verb'   run the target's verb (a tool the verb finds in the pack itself: a Watering Can, a Pick);
+ *   'verb'   run the target's verb (a tool the verb finds in the pack itself: a Watering Can);
+ *            with `tool: true` the dragged stack is the tool the verb uses and wears (a Pick, a
+ *            Shovel, a Scraper: GSJS msg.target_itemstack_tsid; js/tool-choice.js);
  *   'pick'   the target-item picker with the dragged stack chosen (Feed: its how many step follows);
  *   'donate' the shrine's donation window with the dragged stack chosen.
  * Garden plots and Guano stay with features/garden-guano-feature.js (G403).
@@ -19,6 +21,8 @@
 const TREE = (c) => (/^trant_/.test(c) && !/_dead$/.test(c)) || c === 'wood_tree';
 const ANIMAL = (c) => ['npc_piggy', 'npc_chicken', 'npc_butterfly', 'npc_batterfly'].includes(c);
 const PICKS = new Set(['pick', 'fancy_pick']);
+const SHOVELS = new Set(['shovel', 'ace_of_spades']);
+const SCRAPERS = new Set(['scraper', 'super_scraper']);
 
 /** GSJS drop-target verbs the remake implements, in the order a target's verbs are tried. */
 export const WORLD_DROP_RULES = Object.freeze([
@@ -49,10 +53,35 @@ export const WORLD_DROP_RULES = Object.freeze([
     accepts: (s) => s === 'tree_poison' || s === 'potion_tree_poison', tip: 'Poison this tree, killing it.', src: 'trant_*.js verbs.poison',
   },
   {
-    // rock_metal_1 asks for a Fancy Pick in its drop_ok_code; the remake's Mine takes any working pick
-    // (the verb itself says when it can't), so the drag takes both.
-    id: 'mine', classes: (c) => /^rock_/.test(c), verbs: ['mine'], use: 'verb',
-    accepts: (s) => PICKS.has(s), tip: 'Mine this {$item_name}', src: 'rock_*.js verbs.mine (drop_ok_code is_pick)',
+    // rock_metal_1.js drop_ok_code 183-185: a Metal Rock takes only a working Fancy Pick.
+    id: 'mine_metal', classes: (c) => c === 'rock_metal_1', verbs: ['mine'], use: 'verb', tool: true,
+    accepts: (s, ctx) => s === 'fancy_pick' && ctx?.working?.(s) !== false,
+    tip: 'Mine this {$item_name}', src: 'rock_metal_1.js verbs.mine (drop_ok_code fancy_pick)',
+  },
+  {
+    // The other rocks take any working pick; the dragged stack is the pick that swings and wears
+    // (msg.target_itemstack_tsid: rock_beryl_1.js 241-242, include/mining.js 191-193).
+    id: 'mine', classes: (c) => /^rock_/.test(c) && c !== 'rock_metal_1', verbs: ['mine'], use: 'verb', tool: true,
+    accepts: (s, ctx) => PICKS.has(s) && ctx?.working?.(s) !== false,
+    tip: 'Mine this {$item_name}', src: 'rock_*.js verbs.mine (drop_ok_code is_pick)',
+  },
+  {
+    // dirt_pile.js verbs.dig 85-100: a working Shovel or Ace of Spades, which then digs (doDigging 208-209).
+    id: 'dig_dirt', classes: (c) => c === 'dirt_pile', verbs: ['dig'], use: 'verb', tool: true,
+    accepts: (s, ctx) => SHOVELS.has(s) && ctx?.working?.(s) !== false,
+    tip: 'Dig this {$item_name}', src: 'dirt_pile.js verbs.dig (drop_ok_code shovel, ace_of_spades)',
+  },
+  {
+    // mortar_barnacle.js verbs.scrape 54-60; the dragged scraper scrapes (startScraping 315-316).
+    id: 'scrape', classes: (c) => c === 'mortar_barnacle', verbs: ['scrape'], use: 'verb', tool: true,
+    accepts: (s, ctx) => SCRAPERS.has(s) && ctx?.working?.(s) !== false,
+    tip: 'Scrape this {$item_name}', src: 'mortar_barnacle.js verbs.scrape (drop_ok_code scraper)',
+  },
+  {
+    // ice_knob.js verbs.scrape 53-58 (its drop_tip is empty: the client shows no words).
+    id: 'scrape_ice', classes: (c) => c === 'ice_knob', verbs: ['scrape'], use: 'verb', tool: true,
+    accepts: (s, ctx) => SCRAPERS.has(s) && ctx?.working?.(s) !== false,
+    tip: '', src: 'ice_knob.js verbs.scrape (drop_ok_code scraper)',
   },
   {
     id: 'dig', classes: (c) => c === 'patch' || c === 'patch_dark', verbs: ['dig'], use: 'verb',
@@ -63,8 +92,9 @@ export const WORLD_DROP_RULES = Object.freeze([
     accepts: (s) => s === 'hoe' || s === 'high_class_hoe', tip: 'Tend this {$item_name}', src: 'patch.js verbs.tend',
   },
   {
-    id: 'peat', classes: (c) => /^peat_/.test(c), verbs: ['harvest'], use: 'verb',
-    accepts: (s) => s === 'shovel', tip: 'Harvest this {$item_name}', src: 'peat_*.js verbs.harvest',
+    // peat_1.js 136-139: a working Shovel only; it is the one that cuts (startHarvesting 336-338).
+    id: 'peat', classes: (c) => /^peat_/.test(c), verbs: ['harvest'], use: 'verb', tool: true,
+    accepts: (s, ctx) => s === 'shovel' && ctx?.working?.(s) !== false, tip: 'Harvest this {$item_name}', src: 'peat_*.js verbs.harvest',
   },
   {
     id: 'brush', classes: (c) => c === 'npc_fox', verbs: ['brush'], use: 'verb',
