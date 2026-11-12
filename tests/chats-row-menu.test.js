@@ -9,7 +9,7 @@
 import { describe, it, before, after } from 'node:test';
 import assert from 'node:assert/strict';
 import { FakeEl, memoryStore, page } from './social-fake-dom.js';
-import { mountSocialDrawer } from '../public/js/ui/social-drawer.js?v=bb35acd9';
+import { mountSocialDrawer } from '../public/js/ui/social-drawer.js?v=f320dfb0';
 import { createNotifier } from '../public/js/notify.js?v=1fb97b21';
 import { MORE_KEYS_LABEL } from '../public/js/ui/context-menu.js?v=79326483';
 import { IM_VERB_ID } from '../public/js/player-im.js?v=da51888c';

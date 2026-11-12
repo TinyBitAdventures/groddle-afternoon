@@ -16,6 +16,7 @@
  * sideInset() says how much, and the stack centres in the width that is left.
  */
 import { placeBelow, placeBeside, plainText } from './notify.js?v=1fb97b21';
+import { REPORT_WINDOW_SELECTOR } from './window-stack.js?v=a7104f02';
 
 const STACK_ID = 'notify-notices';
 const LOG_ID = 'activity-log';
@@ -54,6 +55,24 @@ function reducedMotion() {
   } catch {
     return false;
   }
+}
+
+/** Screens and the start card own the screen: notices wait under them (not zones). */
+const SCREEN_DIALOG_IDS = ['award-screen', 'new-day-screen', 'giant-screen-panel', 'overlay'];
+
+/**
+ * PURE: whether a [role=dialog] is a zone the notices keep off and the interaction menus step
+ * aside from (a feature's conversation card). Not the Activity log, the menus themselves, the
+ * glitch modals, the pack's dialogs or the screens; and not the report window (Austin
+ * 2026-11-12): it opens over everything to show what the player saw, so nothing under it moves,
+ * and its picture (bug-report-feature.js) shows them where they were.
+ */
+export function isZoneDialog(d) {
+  if (!d) return false;
+  if (d.id === LOG_ID || d.classList?.contains('verb-menu') || d.classList?.contains('glitch-modal') || d.closest?.('#pack-bar')) return false;
+  if (SCREEN_DIALOG_IDS.includes(d.id)) return false;
+  if (d.closest?.(REPORT_WINDOW_SELECTOR)) return false;
+  return true;
 }
 
 /** A visible element's rect relative to `root`'s, or null. */
@@ -301,9 +320,9 @@ export function mountNotifyView(notifier, { root, setData = () => {}, logButtonH
     if (buffs) blockers.push(buffs);
     const dialogs = [];
     for (const d of root.querySelectorAll('[role="dialog"]')) {
-      // Interaction menus (the verb menu, the Enter chooser, the item pickers: .verb-menu) step aside instead.
-      if (d.id === LOG_ID || d.classList.contains('verb-menu') || d.classList.contains('glitch-modal') || d.closest('#pack-bar')) continue;
-      if (['award-screen', 'new-day-screen', 'giant-screen-panel', 'overlay'].includes(d.id)) continue;
+      // Interaction menus (the verb menu, the Enter chooser, the item pickers: .verb-menu) step aside
+      // instead; the report window moves nothing (isZoneDialog).
+      if (!isZoneDialog(d)) continue;
       const card = dialogCard(d, rr, rootArea);
       if (card) dialogs.push(card);
     }
