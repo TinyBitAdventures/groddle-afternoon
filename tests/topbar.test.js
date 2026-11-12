@@ -22,7 +22,7 @@ import {
   vitalRing,
   volumeLevel,
   soundChannelToggle,
-} from '../public/js/ui/topbar.js?v=65bd7e6a';
+} from '../public/js/ui/topbar.js?v=8fb76b3d';
 
 import { GIANTS, canClaimEmblem, createShrineState, emblemCostFor, favorDisplayGiant, favorPanelRows, giantForStreet } from '../public/js/shrines.js?v=ec26da05';
 
@@ -202,7 +202,7 @@ describe('a narrow window: the actions pill gives way instead of running off the
     assert.match(game, /<span class="study-chip-short"><\/span>/);
   });
   it('the street map steps under the nameplate in a narrow window', () => {
-    const narrow = css.slice(css.indexOf('@media (max-width: 760px) {\n  [data-ui="modern"] .top-bar .hud-cur.currants'));
+    const narrow = css.slice(css.indexOf('@media (max-width: 760px) {\n  [data-ui="modern"] .top-bar #imagination-btn'));
     assert.match(narrow.slice(0, 1200), /\[data-ui="modern"\] \.street-minimap \{ top: calc\(2 \* var\(--hud-h\) \+ var\(--space-4\)\); \}/);
   });
 });

@@ -50,6 +50,10 @@ export const MENU_ROWS = Object.freeze({
   'menu-quest-btn': { group: 'world', rank: -3, key: 'Q' },
   'menu-make-btn': { group: 'world', rank: -2, key: 'N' },
   'menu-map-btn': { group: 'world', rank: -1, key: 'M' },
+  // A narrow window (style.css, under 760 px: every phone): the bar has no room for Mail and
+  // Imagination, so the Menu carries them (installNarrowRows).
+  'menu-imagination-btn': { group: 'me', rank: -1, key: 'X' },
+  'menu-mail-btn': { group: 'world', rank: -4 },
   'home-btn': { group: 'world', rank: 0 },
   'feat-btn': { group: 'world', rank: 1, key: 'H' },
   // Ticket 81: the Projects panel (features/street-jobs-feature.js).
@@ -778,6 +782,89 @@ function fitTopActions(doc) {
   }));
 }
 
+/**
+ * Mail, Imagination and the currants on a narrow window (the mobile QA, 2026-11-12: under 760 px
+ * style.css takes Mail and Imagination off the bar, under 560 the currants too, and nothing else
+ * reached Mail). The Menu carries a row for each bar button that is not drawn (Mail with its
+ * unread count, the bar's Menu button with a dot while mail waits), and under 560 px a currants
+ * line at the top of Me. Each row clicks the bar's own button, so the game's handlers stay one.
+ */
+export const NARROW_ROWS = Object.freeze({ 'mail-btn': ['menu-mail-btn', 'Mail'], 'imagination-btn': ['menu-imagination-btn', 'Imagination'] });
+
+function installNarrowRows(doc) {
+  const bar = doc.querySelector('header.top-bar');
+  const list = doc.getElementById('more-list');
+  if (!bar || !list) return;
+  const rows = {};
+  for (const [barId, [id, label]] of Object.entries(NARROW_ROWS)) {
+    let row = doc.getElementById(id);
+    if (!row) {
+      row = doc.createElement('button');
+      row.type = 'button';
+      row.id = id;
+      row.className = 'chrome-btn menu-narrow-row';
+      row.innerHTML = `<span>${label}</span>`;
+      row.hidden = true;
+      row.addEventListener('click', () => {
+        doc.getElementById('more-btn')?.click();
+        doc.getElementById(barId)?.click();
+      });
+      list.append(row);
+    }
+    rows[barId] = row;
+  }
+  const me = list.querySelector('[data-menu-group="me"]');
+  let cur = doc.getElementById('menu-currants');
+  if (me && !cur) {
+    cur = doc.createElement('div');
+    cur.id = 'menu-currants';
+    cur.className = 'menu-currants';
+    cur.dataset.menuControl = 'currants';
+    cur.setAttribute('role', 'status');
+    cur.innerHTML = '<span>Currants</span><strong></strong>';
+    // The bar's own currants picture (its keyed URL).
+    const pic = doc.querySelector('.top-bar .hud-cur.currants img')?.cloneNode(true);
+    if (pic) {
+      pic.alt = '';
+      cur.prepend(pic);
+    }
+    me.querySelector('.menu-group-label')?.after(cur);
+  }
+  const badge = doc.getElementById('mail-unread-badge');
+  const sync = () => {
+    for (const [barId, row] of Object.entries(rows)) {
+      const onBar = Boolean(doc.getElementById(barId)?.getClientRects().length);
+      if (row.hidden !== onBar) row.hidden = onBar;
+    }
+    const mailRow = rows['mail-btn'];
+    const unread = badge && !badge.hidden ? String(badge.textContent || '').trim() : '';
+    let count = mailRow.querySelector('.menu-row-count');
+    if (unread && !count) {
+      count = doc.createElement('span');
+      count.className = 'menu-row-count';
+      mailRow.append(count);
+    }
+    if (count) {
+      if (unread) count.textContent = unread;
+      else count.remove();
+    }
+    if (mailRow.hidden || !unread) delete bar.dataset.mailWaits;
+    else bar.dataset.mailWaits = unread;
+    const amount = doc.getElementById('stat-currants')?.textContent || '';
+    const strong = cur?.querySelector('strong');
+    if (strong && strong.textContent !== amount) strong.textContent = amount;
+  };
+  sync();
+  doc.defaultView?.addEventListener('resize', sync);
+  // Opening the Menu measures again (a sheet or a zoom can change what the bar draws).
+  doc.getElementById('more-btn')?.addEventListener('click', sync, true);
+  const watch = [badge, doc.getElementById('stat-currants')].filter(Boolean);
+  if (watch.length && typeof MutationObserver === 'function') {
+    const mo = new MutationObserver(sync);
+    for (const el of watch) mo.observe(el, { attributes: true, childList: true, characterData: true, subtree: true });
+  }
+}
+
 function installTopOverflow(doc) {
   const bar = doc.querySelector('header.top-bar');
   const pill = doc.querySelector('.top-bar .top-actions');
@@ -1067,6 +1154,7 @@ export function installTopBar(doc, opts = {}) {
   installLocationLink(doc);
   trackPillWidths(doc);
   installTopOverflow(doc);
+  installNarrowRows(doc);
   doc.getElementById('low-energy-btn')?.addEventListener('click', (e) => {
     e.stopPropagation();
     doc.querySelector('.top-bar .meta-pill.energy')?.click();

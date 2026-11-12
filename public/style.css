@@ -10990,7 +10990,6 @@ html.stage-pinned[data-ui="modern"] header.top-bar { left: calc(var(--sp-5) + va
 }
 /* A narrow window: the less-used chips go, and the nameplate drops under the pills. */
 @media (max-width: 760px) {
-  [data-ui="modern"] .top-bar .hud-cur.currants,
   [data-ui="modern"] .top-bar #imagination-btn,
   [data-ui="modern"] .top-bar #mail-btn,
   [data-ui="modern"] .top-bar .hud-div { display: none; }
@@ -10999,6 +10998,31 @@ html.stage-pinned[data-ui="modern"] header.top-bar { left: calc(var(--sp-5) + va
   [data-ui="modern"] #buff-strip { top: calc(2 * var(--hud-h) + var(--space-4)); }
   /* The street map steps down under the nameplate too, or it covers the street's name. */
   [data-ui="modern"] .street-minimap { top: calc(2 * var(--hud-h) + var(--space-4)); }
+}
+/* Mail, Imagination and (under 560 px) the currants live in the Menu then (js/ui/topbar.js
+   installNarrowRows): a currants line at the top of Me, Mail with its unread count, and a dot on the
+   bar's Menu button while mail waits. Over 560 px (a phone held sideways) the currants stay on the bar. */
+@media (max-width: 560px) {
+  [data-ui="modern"] .top-bar .hud-cur.currants { display: none; }
+}
+[data-ui="modern"] .more-list .menu-currants { display: none; }
+@media (max-width: 560px) {
+  [data-ui="modern"] .more-list .menu-currants {
+    display: flex; align-items: center; gap: var(--space-2); min-height: 32px; padding: 0 var(--space-2);
+    color: var(--text); font-size: var(--fs-m); font-weight: var(--fw-bold);
+  }
+  [data-ui="modern"] .more-list .menu-currants img { width: 17px; height: auto; }
+  [data-ui="modern"] .more-list .menu-currants strong { margin-left: auto; font-weight: var(--fw-heavy); }
+}
+[data-ui="modern"] .more-list .menu-row-count {
+  display: inline-grid; place-items: center; box-sizing: border-box; min-width: 18px; height: 18px; padding: 0 5px;
+  border-radius: var(--radius-pill); background: var(--danger); color: var(--c-white);
+  font-size: var(--fs-xs); font-weight: var(--fw-heavy); line-height: var(--lh-none);
+}
+[data-ui="modern"] .top-bar[data-mail-waits] #more-btn { position: relative; }
+[data-ui="modern"] .top-bar[data-mail-waits] #more-btn::after {
+  content: ""; position: absolute; top: 3px; right: 3px; width: 9px; height: 9px;
+  border-radius: var(--radius-round); background: var(--danger); box-shadow: 0 0 0 2px var(--surface-raised);
 }
 /* Report #100: a phone held upright is narrower than the two pills. The actions pill gives way (the
    study chip shortens with an ellipsis) and Report a problem and Menu come first in it, so both stay

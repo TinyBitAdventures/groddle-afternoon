@@ -21,7 +21,7 @@ import { OTHER_CHARACTER_TEXT, statusText } from '../public/js/features/realtime
 import { CHARACTER_COPY, FRESH_HASH, SAVE_ALERT_COPY, characterChoices, continuesAs, createRefusalText, saveAlertFor } from '../public/js/online-boot.js?v=52b9027b';
 import { CHIP_COPY, STYLE as CHIP_STYLE, cardUrl, chipChoices } from '../public/js/character-chip.js?v=8f0af78b';
 import { LOCAL_STATES } from '../public/js/shared-quoins.js?v=89d7b201';
-import { menuRowFor } from '../public/js/ui/topbar.js?v=65bd7e6a';
+import { menuRowFor } from '../public/js/ui/topbar.js?v=8fb76b3d';
 
 const root = join(import.meta.dirname, '..');
 const read = (rel) => readFileSync(join(root, rel), 'utf8');
