@@ -1268,7 +1268,10 @@ function gateVerb(node, inv, pc, ctx = {}) {
     }
   } else if (def.stock.model === 'tend') {
     if (verb.id === 'harvest' && node.units < 1) return fail('not_ready', "There's nothing to pick, cowboy!");
-    if (verb.id === 'water' && node.watered) return fail('not_wanted', "I don't want to be watered!");
+    // paper_tree.js 350-358: the watering can is asked for first; with none, the tool check below says so.
+    if (verb.id === 'water' && node.watered && (!verb.tools.length || findTool(verb, inv, ctx.toolState, wear).tool)) {
+      return fail('not_wanted', "I don't want to be watered!");
+    }
     if (verb.id === 'pet' && node.petted) return fail('not_wanted', "I don't want to be petted!");
   } else if (def.stock.model === 'session') {
     if (verb.id === 'knock') {

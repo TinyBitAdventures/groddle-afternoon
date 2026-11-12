@@ -540,7 +540,7 @@ describe('the feature', () => {
     assert.equal(sharedPatchesFeature.runVerbOverride(target(r, 'patch:0'), 'tend', r.engine), true);
     assert.deepEqual(r.sent.slice(n).map((m) => `${m.t}:${m.verb}:${m.do}`), ['patch_act:tend:stop']);
     assert.equal(stage('patch:0'), 'dirty');
-    assert.equal(r.log.toasts.at(-1), "Oops! That didn't work. Try again?");
+    assert.equal(r.log.toasts.at(-1), 'You tried to tend a Patch.');
     restore();
   });
 

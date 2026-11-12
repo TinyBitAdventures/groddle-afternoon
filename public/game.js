@@ -768,7 +768,7 @@ import {
   trantStatusLabel,
   trantFootAnchorY,
 } from './js/trants.js?v=4d6f5593';
-import { growStreetTrant } from './js/patches.js?v=796e43db';
+import { growStreetTrant } from './js/patches.js?v=9c1209ac';
 import {
   runStreetTransition,
   showAwardScreen,

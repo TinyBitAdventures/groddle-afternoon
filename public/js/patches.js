@@ -899,7 +899,8 @@ export function plotVerbs(plot, ctx = {}) {
   out.push(tendRow);
 
   const plantable = plantChoices(inv, plot.kind, hubId);
-  if (plantable.length && (messy || dug)) {
+  // patch.js 243-253: the weeds and the hole refuse before the bean check (270-278).
+  if (messy || dug) {
     // One row until the soil is ready; the bean choices appear once it is tended.
     out.push(verbRow('plant', 'Plant', {
       tooltip: 'Plant a Seasoned Bean',
@@ -1000,7 +1001,9 @@ export function performPlotVerb(plot, verbId, ctx = {}) {
     const { tool } = findWorkingTool(HOES, inv, toolState, wear);
     // inc_skill_packages.js: a failed success roll returns before any cost
     if (pkg.success_rate < 100 && !maxLuck && rng() >= pkg.success_rate / 100) {
-      return fail('tend', 'Oops! That didn\'t work. Try again?', {
+      // patch.js 727-733: tend_failed and the verb message, "You tried to tend a Patch."
+      // (item.js buildVerbMessage 26-37); the Oops line is the dig's start failure.
+      return fail('tend', `You tried to tend a ${SOIL_LABELS[plot.kind] || 'Patch'}.`, {
         reason: 'roll',
         response: soilResponse('tend_failed', rng),
         sound: 'CLICK_FAILURE',
