@@ -114,6 +114,7 @@ import {
   pickNewxpExit,
   shouldResume,
   tutorialPillSpot,
+  instructionFor,
   startNewxp,
   street4Check,
   questQueueLine,
@@ -125,7 +126,7 @@ import {
   vogPages,
   tutorialNameDefault,
   TUTORIAL_NAME_MAX,
-} from '../newxp.js?v=a551e661';
+} from '../newxp.js?v=45ae5f37';
 import { ITEM_CATALOG, addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=60dfc9ca';
 import { QUOIN_SHEET, QUOIN_TYPES, qrazyRewardForLevel } from '../quoins.js?v=7e0dec6d';
 import { soundForQuoin } from '../sound-moments.js?v=52ad523c';
@@ -139,7 +140,7 @@ import { frameTexture, onLoaded, sourceFromUrl, textureFromUrl, whenLoaded } fro
 import { upgradeSource } from '../sprite-hires.js?v=dd5da64c';
 import { grantMoodXp } from '../mood-xp.js?v=958e7680';
 import { displayTopOf, itemstackOverlayPoint, playPoofIn, playSheetOverlay, poofInAlpha } from '../overlay-art.js?v=75c3ea34';
-import { HOME_MACHINE } from '../home-ticket.js?v=9b031faa';
+import { HOME_MACHINE } from '../home-ticket.js?v=3739f724';
 import { animalAnchorX, animalAnchorY, createAnimalState } from '../animals.js?v=7e27e9d2';
 import {
   AK_ANIMALS,
@@ -424,7 +425,11 @@ function positionBubbles() {
   ui.fade.style.width = `${r.width}px`;
   ui.fade.style.height = `${r.height}px`;
   ui.instr.style.left = `${r.left + r.width / 2}px`;
-  ui.instr.style.top = `${r.top + Math.min(r.height - 60, (engineRef?.camera?.h || 408) * (r.width / (engineRef?.camera?.w || 960)) - 44)}px`;
+  let instrTop = r.top + Math.min(r.height - 60, (engineRef?.camera?.h || 408) * (r.width / (engineRef?.camera?.w || 960)) - 44);
+  // TOUCH: on a phone the instruction sits over the stick and Jump (js/touch-controls.js), never on them.
+  const thumbs = globalThis.GRODDLE_DEVICE === 'phone' ? document.querySelector('#touch-controls .touch-stick')?.getBoundingClientRect() : null;
+  if (thumbs?.height > 0) instrTop = Math.min(instrTop, thumbs.top - ui.instr.offsetHeight - 8);
+  ui.instr.style.top = `${instrTop}px`;
   // Under the energy, mood and level (#hud-stats), never over them (player report 2026-11-01).
   const pill = tutorialPillSpot(r, document.querySelector('#hud-stats')?.getBoundingClientRect());
   ui.pill.style.left = `${pill.left}px`;
@@ -551,9 +556,11 @@ async function overlay(t, { title = '', body = '', button = 'OK' } = {}) {
   alive(t);
 }
 
-function instruction(text) {
+function instruction(keysText) {
   ensureUi();
-  ui.instr.innerHTML = text.replace(/(Arrow Keys|Space Bar|Up\/Down Keys|Enter)/g, '<b>$1</b>');
+  // A phone reads the touch controls' words (js/newxp.js TOUCH_LINES).
+  const text = instructionFor(keysText, { touch: globalThis.GRODDLE_DEVICE === 'phone' });
+  ui.instr.innerHTML = text.replace(/(Arrow Keys|Space Bar|Up\/Down Keys|Enter|the Stick|Jump|Tap)/g, '<b>$1</b>');
   ui.instr.hidden = false;
   ui.instrSince = Date.now();
   engineRef?.setData('newxpInstruction', text);

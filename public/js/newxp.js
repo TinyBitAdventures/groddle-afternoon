@@ -348,6 +348,27 @@ export const LINES = Object.freeze({
   explore: 'Good luck! And just explore … try everything, see what happens. You\'ll learn all you need that way.',
 });
 
+/**
+ * The instruction overlays for a phone (window.GRODDLE_DEVICE === 'phone', js/touch-controls.js):
+ * the same steps in the words of the touch controls, where the original's speak of keys a phone
+ * does not have. A keyboard keeps LINES (the original's words).
+ */
+export const TOUCH_LINES = Object.freeze({
+  moveInstructions: 'Tap the ground to walk there!<br>(or hold the Stick if you prefer)',
+  buttonInstructions: 'Tap the buttons to advance through conversations',
+  jumpInstructions: 'Tap Jump to jump!',
+  jumpAcrossInstructions: 'Hold the Stick & tap Jump to jump across!',
+  climbInstructions: 'Hold Up on the Stick (or tap the ladder) to climb!',
+  interactInstructions: 'Tap glowing objects or players to interact',
+});
+
+/** PURE: the instruction for this device: a LINES instruction's touch words on a phone, else as given. */
+export function instructionFor(text, { touch = false } = {}) {
+  if (!touch) return text;
+  const key = Object.keys(TOUCH_LINES).find((k) => LINES[k] === text);
+  return key ? TOUCH_LINES[key] : text;
+}
+
 /** Fill {name}/{skill} and turn a source talk string into pages. */
 export function talkPages(text, vars = {}, finalButton = 'OK') {
   const filled = String(text || '').replace(/\{(\w+)\}/g, (_, k) => (vars[k] != null ? String(vars[k]) : ''));

@@ -7,7 +7,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { SLOTH_POOF_ART, slothPoofBase } from '../public/js/features/newxp-feature.js?v=fd5e77d2';
 import { itemstackOverlayPoint, standPlacement } from '../public/js/overlay-art.js?v=75c3ea34';
-import { training1Layout } from '../public/js/newxp.js?v=a551e661';
+import { training1Layout } from '../public/js/newxp.js?v=45ae5f37';
 
 const PUBLIC = join(dirname(fileURLToPath(import.meta.url)), '../public');
 const manifest = JSON.parse(readFileSync(join(PUBLIC, 'assets/sprites/overlays/overlays.json'), 'utf8'));

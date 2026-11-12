@@ -519,7 +519,7 @@ import {
   imagineHome,
   isHomePlaceTsid,
 } from './js/homes.js?v=631ab6b8';
-import { HOME_MACHINE, offerHomeTicket, renderTicketMachine } from './js/home-ticket.js?v=9b031faa';
+import { HOME_MACHINE, offerHomeTicket, renderTicketMachine } from './js/home-ticket.js?v=3739f724';
 import {
   MAIL_COMPANIONS,
   archiveMail,
@@ -795,7 +795,7 @@ import { landingY, stackRestY, walkSurfaceY } from './js/walk-surface.js?v=106bf
 import { holdCloseToFloor } from './js/slope-walk.js?v=9af1e505';
 import { JUMP_SPEED, MAX_TICK_FRAMES, WALK_MAX, avatarGround, coastX, frameSteps, stepAvatar, steerAccel, steerX, streetPhysicsExtras } from './js/avatar-step.js?v=43b1182e';
 import { createUserPath, stepUserPath } from './js/user-path.js?v=8880557f';
-import { climbGoalStep, installTouchControls, isPhoneDevice, touchTapPlan } from './js/touch-controls.js?v=48e63295';
+import { climbGoalStep, installTouchControls, isPhoneDevice, touchPrompt, touchTapPlan } from './js/touch-controls.js?v=4b7e0a03';
 import { FAILED_LINE, inVerbReach, movingLine, verbRange, walkOverEnd, walkOverGoals } from './js/walk-over.js?v=277ab977';
 import { hellBuffDesc, isInHell } from './js/hell.js?v=33923da7';
 import { climbBobY, ladderAnimState, ladderSwap } from './js/ladder-anim.js?v=a8b327a0';
@@ -32968,7 +32968,8 @@ async function main() {
               ? { key: 'Enter', label: signBoardLabel(arms[0].board) || arms[0].board.connection?.label || conn?.label || '', x: nearSign.screen.x, y }
               : { key: 'Enter', label: 'Choose a road', x: nearSign.screen.x, y };
       }
-      settlePrompt(want, performance.now());
+      // TOUCH: a phone's hint chips name a tap or the stick, not a key (js/touch-controls.js touchPrompt).
+      settlePrompt(TOUCH_PHONE ? touchPrompt(want) : want, performance.now());
       if (prompt.visible) {
         prompt.x = clampWorldOverlayX(prompt.x, prompt.width, 12);
         promptKeepClear();

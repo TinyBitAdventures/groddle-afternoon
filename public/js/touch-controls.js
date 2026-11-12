@@ -81,6 +81,19 @@ export function climbGoalStep(goalY, playerY, { held = false, near = 6 } = {}) {
 }
 
 /**
+ * PURE: a world hint chip ({ key, label, x, y }, game.js settlePrompt) in a phone's words: Enter
+ * (open the thing) and Up (get on the ladder) are a tap, a ladder climb is the stick and Jump.
+ * Any other chip (a signpost's number, G for the map) passes through.
+ */
+export function touchPrompt(want) {
+  if (!want) return want;
+  if (want.key === 'Enter') return { ...want, key: 'Tap' };
+  if (want.key === '↑') return { ...want, key: 'Tap' };
+  if (want.key === '↑↓') return { ...want, key: '', label: 'Stick climbs · Jump' };
+  return want;
+}
+
+/**
  * Builds the stick and the Jump button into `root` (the game's wrap) and wires them.
  * press(key) / release(key): the held keys (game.js `keys`); jump(): a jump's edge.
  * Returns { el, releaseAll, destroy }.
