@@ -170,6 +170,9 @@ for (const [q, list] of Object.entries(SPECIAL_TRIGGERS)) for (const t of list) 
 // Requirements the remake implements as the quest text describes, where the
 // source only checked a looser counter. Each row says why.
 const REQUIREMENT_OVERRIDES = {
+  // Cold Comfort (6d318f972c): the counter counts seconds (focusing_orb.js 831, 980), as the quest's own
+  // words say ("for a full minute"); the source line read "Replenish 60 energy".
+  meditativearts_maintain_energy_in_wintry_place: [{ id: 'r219', type: 'counter', name: 'wintry_place_meditation', num: 60, classId: 'focusing_orb', desc: 'Meditate for 60 seconds in Wintry Place without leaving' }],
   // Source: any 60 s meditation counted; the text asks for the same street on 11 game days, gaps of 6 at most
   // (js/meditation-station.js).
   meditativearts_meditation_station: [{ id: 'r470', type: 'counter', name: 'meditation_station_days', num: 11, classId: 'focusing_orb', desc: 'Meditate on the same street on 11 game days' }],
@@ -329,6 +332,10 @@ const EXCLUDE = {
   // and no archived street holds one. Its upper floors (LDOBRJIEU2V2Q2G, LDOBRKREU2V2F9B, LHF9DOUO7K03OUA)
   // were never archived. The inferred Hauki Seeks offer below stays for a phase 2 build.
   manor_mystery: 'unreachable_in_source',
+  // Chasing Hubba Dubba Hugs: no file offers it and nothing sets hugs_tremit / hugs_patomi / hugs_krios
+  // (quests/orld_ugs_esara.js 18-50; its apply_test only switches the requirements off away from
+  // those streets). A save that holds it lets it go (js/retired-quests.js).
+  orld_ugs_esara: 'unreachable_in_source',
   // needs real other players (no local-companion stand-in exists)
   kindly_randomness: 'needs_other_players', grub_giver: 'needs_other_players', neighbor_gifts: 'needs_other_players',
   // help_mine (I Me Mine) left this list with G207: the local companions work rocks you can help

@@ -113,7 +113,8 @@ import {
   SEED_TO_SCYTHE,
 } from '../quest-offers.js?v=d76abcd0';
 import { PEAT_TEXT, retireSoloPeatQuest } from '../peat-quest.js?v=c7baea41';
-import { parseQuestConversation } from '../quests.js?v=2951073f';
+import { retireDeadQuests, retiredQuestLine } from '../retired-quests.js?v=00000000';
+import { parseQuestConversation } from '../quests.js?v=2b882eb6';
 import { questRequirementText, renderQuestText, withQuestMarkup } from '../quest-text.js?v=7f5d761c';
 import { addItem, removeItem, countItem } from '../inventory.js?v=2bd5b93e';
 import { getQuestCatalog } from '../content-catalogs.js?v=10b118dd';
@@ -771,6 +772,13 @@ export const questOffersFeature = {
       // G451: solo no longer offers Peter out Peat; a save that held it lets it go, once, with a line.
       if (engine.mode !== 'multiplayer' && retireSoloPeatQuest(qs)) {
         engine.pushActivity(PEAT_TEXT.retired);
+        engine.save();
+        engine.updateHud?.();
+      }
+      // A quest no longer offered because it can never be finished (js/retired-quests.js), solo and online.
+      const retired = retireDeadQuests(qs);
+      if (retired.length) {
+        for (const title of retired) engine.pushActivity(retiredQuestLine(title));
         engine.save();
         engine.updateHud?.();
       }

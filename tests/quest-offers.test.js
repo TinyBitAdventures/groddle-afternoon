@@ -119,7 +119,8 @@ describe('classifyQuests', () => {
     // Judged out after the 129 were counted: Manor Mystery, never offered and never finishable in the
     // source (lane juju; build-quests.mjs EXCLUDE, tests/juju-judged.test.js). Peter out Peat takes other
     // players (G451, Austin 2026-11-07; tests/g451-peter-out-peat.test.js).
-    const judgedOut = ['manor_mystery', 'bogspecialization_harvest_full_peat_bog_in_time_period'].length;
+    // Chasing Hubba Dubba Hugs, never offered and nothing sets its flags (orld_ugs_esara.js 18-50; rules-b 2026-11-12).
+    const judgedOut = ['manor_mystery', 'bogspecialization_harvest_full_peat_bog_in_time_period', 'orld_ugs_esara'].length;
     assert.equal(c.solo.length, 129 + built + featureQuests - judgedOut);
     assert.equal(c.custom.length, 22); // + 5 Gentle Island tutorial quests (newxp-feature.js)
     assert.equal(c.excluded.length, 294 - built - featureQuests + judgedOut);

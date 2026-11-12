@@ -444,6 +444,8 @@ export function listQuestLog(state) {
   const cat = getQuestCatalog();
   const rows = [];
   for (const qid of Object.keys(state.active)) {
+    // hide_questlog (inc_quests.js 175, 328, 390-409): the seasonal day quests never show in the log.
+    if (cat[qid]?.hideQuestlog) continue;
     const p = getQuestProgress(state, qid);
     // A quest you are on is listed once, as active, even when `completed` also names it (a save that
     // holds both, 2026-11-08 "I can see that I have active quests, but cannot see any of them": the row
@@ -453,7 +455,7 @@ export function listQuestLog(state) {
   for (const qid of new Set(state.completed)) {
     if (state.active?.[qid]) continue;
     const def = cat[qid];
-    if (def) {
+    if (def && !def.hideQuestlog) {
       rows.push({
         def,
         active: false,

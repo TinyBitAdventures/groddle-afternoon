@@ -23,6 +23,7 @@
 
 import { getSkillCatalog } from './content-catalogs.js?v=10b118dd';
 import { SKILL_POINTS_PER_SECOND, pauseSkillStudy, listStudyQueue } from './skills.js?v=4542bdf9';
+import { retireDeadQuests } from './retired-quests.js?v=00000000';
 
 export const UNLEARN_CARD = 'unlearning_ability';
 
@@ -193,11 +194,16 @@ export function unlearnCheck(unlearnState, skillState, id, ctx = {}, now = Date.
   return { ok: true, seconds, def, quest: questRemovedBy(id, ctx.questState) };
 }
 
-/** quests_get_quest_for_unlearnt_skill: the in-progress (or failed) skill quest that will go. */
+/**
+ * quests_get_quest_for_unlearnt_skill (inc_quests.js 983-996): the skill quest that will go, while
+ * it is 'todo', which is accepted, failed, or offered and not yet taken (an offer waiting or put off).
+ */
 export function questRemovedBy(id, questState) {
   const quest = SKILL_QUEST_MAP[id];
   if (!quest || !questState) return null;
   if (questState.active?.[quest]) return quest;
+  const offers = questState.offers;
+  if (offers?.offered?.[quest] || offers?.declined?.[quest] || (Array.isArray(offers?.queue) && offers.queue.includes(quest))) return quest;
   return null;
 }
 
@@ -258,7 +264,8 @@ export function tickUnlearning(unlearnState, skillState, ctx = {}, now = Date.no
   let quest = null;
   if (wasLearned) {
     quest = questRemovedBy(id, ctx.questState);
-    if (quest) delete ctx.questState.active[quest];
+    // quests_remove (inc_quests.js 544-575, 1001-1007): out of the log and the familiar's offers.
+    if (quest) retireDeadQuests(ctx.questState, { [quest]: quest });
   }
   unlearnState.unlearned.push(id);
   return {

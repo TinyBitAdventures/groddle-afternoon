@@ -88,14 +88,15 @@ describe('which quests wait for a road on a fresh world', () => {
     assert.deepEqual([...w.reach].filter((t) => index.streets[t].hubId === '95').map((t) => index.streets[t].label).sort(), ['Hazy Gate 3', 'Languid Line S'], 'Xalanga, by Hazy Gate 3');
   });
 
-  it('names the five whose streets no open road reaches; each opens once its projects are built', () => {
+  it('names the six whose streets no open road reaches; each opens once its projects are built', () => {
     const state = freshJobs();
     const held = Object.keys(getQuestCatalog()).filter((id) => holdIn(state, id)).sort();
-    assert.deepEqual(held, [PURPLE, 'sparkly_of_interest_1', 'sparkly_of_interest_2', 'sparkly_of_interest_3', 'sparkly_of_interest_4']);
+    // Tend to Your Community counts its eight streets by id now (location.js 546-551), all behind projects.
+    assert.deepEqual(held, [PURPLE, 'sparkly_of_interest_1', 'sparkly_of_interest_2', 'sparkly_of_interest_3', 'sparkly_of_interest_4', 'tend_to_your_community']);
     // Explore The Seams waited for Oppidan Avenue, which Level 2 West's Key 7 door reaches now.
     assert.equal(holdIn(state, 'explore_the_seams'), null);
     // Neva Neva and Ajaya Bliss are behind Door Key 9 doors (Nawiwa Wend, Subarna Spells), on streets still to be built.
-    for (const id of [PURPLE, 'sparkly_of_interest_1', 'sparkly_of_interest_2', 'sparkly_of_interest_3', 'sparkly_of_interest_4']) {
+    for (const id of [PURPLE, 'sparkly_of_interest_1', 'sparkly_of_interest_2', 'sparkly_of_interest_3', 'sparkly_of_interest_4', 'tend_to_your_community']) {
       const jobs = chainJobs(state, id);
       assert.ok(jobs.length > 0 && jobs.every(Boolean), id);
       const built = freshJobs();

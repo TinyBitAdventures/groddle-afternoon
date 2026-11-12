@@ -115,7 +115,8 @@ describe('quest runner on mined catalog', () => {
 
   it('ticket 87: the Quests sheet lists every quest, newest first, and the footer counts the same rows', () => {
     const state = createQuestState();
-    const ids = listQuests().map((q) => q.classTsid).slice(0, 72);
+    // hide_questlog quests (the seasonal days) never show in the log (inc_quests.js 175, 390-409).
+    const ids = listQuests().filter((q) => !q.hideQuestlog).map((q) => q.classTsid).slice(0, 72);
     assert.equal(ids.length, 72);
     // 45 taken at t = 1000..1044, then 27 of another set finished at t = 2000..2026.
     ids.slice(0, 45).forEach((id, i) => {

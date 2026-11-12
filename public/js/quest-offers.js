@@ -69,7 +69,7 @@
  */
 
 import { VENDOR_NPCS, VENDOR_NPC_CLASSES } from './vendor-npcs.js?v=616c0568';
-import { getQuestCatalog } from './content-catalogs.js?v=10b118dd';
+import { getBuffCatalog, getQuestCatalog } from './content-catalogs.js?v=10b118dd';
 import { levelInfoForXp } from './progression.js?v=33462eaa';
 import { brokenToolCopies } from './tools.js?v=5f482998';
 import { offerableMultiplayerQuest } from './quests-mp.js?v=1fc5ff58';
@@ -115,7 +115,9 @@ export function normalizeQuestOfferState(seed = {}) {
     if (!id || !row || typeof row !== 'object') continue;
     const startedAt = Math.max(0, finiteInt(row.startedAt, 0));
     const endsAt = Math.max(startedAt, finiteInt(row.endsAt, 0));
-    if (endsAt > 0) timers[id] = { startedAt, endsAt };
+    // seenAt: the last tick an online-only timer saw (tickQuestTimers), so time away can be given back.
+    const seenAt = Math.max(0, finiteInt(row.seenAt, 0));
+    if (endsAt > 0) timers[id] = seenAt ? { startedAt, endsAt, seenAt } : { startedAt, endsAt };
   }
   const distinct = {};
   for (const [rawId, counters] of Object.entries(src.distinct || {})) {
@@ -757,6 +759,16 @@ export const SEAM_STREETS = Object.freeze([
  */
 export const GREAT_HOLE_STREETS = Object.freeze(['LM410EP19KL55', 'LLI2VDR4JRD1AEG', 'GM410EP19KL55', 'GLI2VDR4JRD1AEG']);
 
+/**
+ * Tend to Your Community's "Visit the Herb Gardens" (locations/location.js 546-551): entering any of
+ * the quest's eight streets (quests/tend_to_your_community.js `locations`: the three Herb Gardens,
+ * Pahsmeq Diggs, Kitkaa Carom, Heckes, Naatamo Way, Kaiya Kit), production L ids and their G aliases.
+ * The source also asked for the one street onCreate meant to choose, but its loop read the wrong
+ * variable and chose none (113-121), so any of the eight counts here.
+ */
+const HERB_GARDEN_TAILS = ['A95U14319524O9', 'A97L62229522GS', 'A99U5PI39524GN', 'HV17T973F42GEP', 'TJ13TRDHKV1970', 'TJ1013E97K17P1', 'IFN3FI0TNU10PS', 'HFR1N2PUMI2C7A'];
+export const HERB_GARDEN_STREETS = Object.freeze(HERB_GARDEN_TAILS.flatMap((t) => [`L${t}`, `G${t}`]));
+
 /** G460: players/inc_stores.js 99 generic_bag_classes; a purchase of any counts generic_bag_purchased (224-225). */
 export const GENERIC_BAG_CLASSES = Object.freeze([
   'bag_generic', 'bag_generic_blue', 'bag_generic_gray', 'bag_generic_green', 'bag_generic_pink',
@@ -913,7 +925,8 @@ export const COUNTER_ROUTES = Object.freeze([
   { system: 'travel', counter: 'arrive_at_neva_neva', event: 'street_entered:neva_neva' },
   { system: 'travel', counter: 'arrive_at_ajaya_bliss', event: 'street_entered:ajaya_bliss' },
   { system: 'travel', counter: 'go_to_eastwest_spice', event: 'street_entered:eastwest_spice' },
-  { system: 'travel', counter: 'visit_herb_gardens', event: 'street_entered:herb_gardens' },
+  // The streets' names never slug to "herb_gardens"; location.js 546 checks the tsid.
+  { system: 'travel', counter: 'visit_herb_gardens', event: 'street_entered_tsid:{a}', a: HERB_GARDEN_STREETS },
   { system: 'teleportation', counter: 'teleportation_count', event: 'teleported' },
   { system: 'teleportation', counter: 'teleport_between_zones', event: 'teleported_between_zones' },
   { system: 'teleportation', counter: 'teleportation_point_in_xalanga', event: 'teleport_point_set:xalanga' },
@@ -945,10 +958,12 @@ export const COUNTER_ROUTES = Object.freeze([
   { system: 'story', counter: 'return_to_spirit', event: 'street_spirit:talk' },
   { system: 'story', counter: 'quest_manor_mystery_done', event: 'note_manor_mystery:solve' },
   { system: 'story', counter: 'treasure_1', event: 'treasure_map_1:dig' },
-  { system: 'mining', counter: 'mine_100_sparkly_while_in_neva_neva', event: 'sparkly_mined_in:neva_neva', minAmount: 100 },
-  { system: 'mining', counter: 'grind_100_chunks_of_sparkly_in_neva_neva', event: 'sparkly_ground_in:neva_neva', minAmount: 100 },
-  { system: 'mining', counter: 'mine_100_sparkly_in_ajaya_bliss', event: 'sparkly_mined_in:ajaya_bliss', minAmount: 100 },
-  { system: 'mining', counter: 'grind_100_chunks_of_sparkly_in_ajaya_bliss', event: 'sparkly_ground_in:ajaya_bliss', minAmount: 100 },
+  // sparkly_of_interest_2 / _4: 100 chunks over the quest run, mined (game.js, a Sparkly rock's take)
+  // or ground (makingUnitQuestEvents) on that street; nothing in GSJS ever set these flags.
+  { system: 'mining', counter: 'mine_100_sparkly_while_in_neva_neva', event: 'sparkly_mined_in:neva_neva', threshold: 100 },
+  { system: 'mining', counter: 'grind_100_chunks_of_sparkly_in_neva_neva', event: 'sparkly_ground_in:neva_neva', threshold: 100 },
+  { system: 'mining', counter: 'mine_100_sparkly_in_ajaya_bliss', event: 'sparkly_mined_in:ajaya_bliss', threshold: 100 },
+  { system: 'mining', counter: 'grind_100_chunks_of_sparkly_in_ajaya_bliss', event: 'sparkly_ground_in:ajaya_bliss', threshold: 100 },
   // Last: every successful verb on an item also counts as VERB:<class>:<verb>
   // (items/item.js notifyVerb), e.g. npc_batterfly:feed, beer:drink.
   { system: 'verbs', counter: 'VERB:{a}:{b}', event: '{a}:{b}', note: 'generic item verb' },
@@ -972,6 +987,8 @@ export const EMITTED_EVENTS = Object.freeze([
   { event: 'ore_crushed', note: 'grinder crush, not barnacle (G441)' },
   { event: 'ore_refined:{a}' },
   { event: 'metal_smelted', note: 'amount 100 at the 20th ingot of one batch (G442)' },
+  { event: 'sparkly_mined_in:{a}', note: 'game.js: a Sparkly rock mined, the chunks taken, by the street name' },
+  { event: 'sparkly_ground_in:{a}', note: 'makingUnitQuestEvents: Sparkly fed to a grinder, by the street name' },
   { event: 'machines_assembled:{a}' },
   { event: 'machines_disassembled:{a}' },
   { event: 'herb_super_harvest:{a}' },
@@ -1353,7 +1370,7 @@ export function gardenPlotEvents(plot, label = 'street') {
  *   100_metal_smelted; here the 20th ingot of one batch sends metal_smelted 100.
  * @param {{ recipe: object, made: number }} record  made counts this unit
  */
-export function makingUnitQuestEvents(record) {
+export function makingUnitQuestEvents(record, { street = '' } = {}) {
   const recipe = record?.recipe || {};
   const tool = String(recipe.tool || '');
   const out = [];
@@ -1362,6 +1379,10 @@ export function makingUnitQuestEvents(record) {
       .filter((row) => row?.classTsid && row.classTsid !== 'barnacle')
       .reduce((sum, row) => sum + Math.max(1, Math.floor(Number(row.qty) || 1)), 0);
     if (ore > 0) out.push({ event: 'ore_crushed', amount: ore });
+    // Sparkly of Interest / Another Simple Sample: chunks of Sparkly ground on a street, by its name.
+    const sparkly = (recipe.inputs || []).filter((row) => row?.classTsid === 'sparkly')
+      .reduce((sum, row) => sum + Math.max(1, Math.floor(Number(row.qty) || 1)), 0);
+    if (sparkly > 0 && street) out.push({ event: `sparkly_ground_in:${street}`, amount: sparkly });
     for (const row of recipe.outputs || []) {
       if (row?.classTsid) out.push({ event: `ore_refined:${row.classTsid}`, amount: Math.max(1, Math.floor(Number(row.qty) || 1)) });
     }
@@ -1761,6 +1782,22 @@ export function questAwardPayload(def, summary = {}) {
  * progress resets; the quest stays in the log and can be started again).
  * @returns {string[]} failed quest ids
  */
+/**
+ * A gap between two timer ticks longer than this is time away (the page closed or asleep):
+ * the ticks run every second while the game runs (features/quest-offers-feature.js SYNC_MS).
+ */
+export const QUEST_TIMER_AWAY_MS = 30_000;
+
+/**
+ * True when the quest's timer buff only runs while you are online (catalog_buffs.js is_offline
+ * false: 1000 Favor for Whole Lotta Love, Many Shovels, Fear of Flying). inc_buffs.js 107-112
+ * freezes those at logout and 42-58 moves them on by the time away at login.
+ */
+export function questTimerPausesOffline(classTsid) {
+  const buff = getQuestCatalog()[classTsid]?.timer?.buff;
+  return Boolean(buff) && getBuffCatalog()?.[buff]?.isOffline === false;
+}
+
 export function tickQuestTimers(questState, now = Date.now()) {
   const offers = ensureQuestOfferState(questState);
   const failed = [];
@@ -1769,6 +1806,12 @@ export function tickQuestTimers(questState, now = Date.now()) {
     if (!quest) {
       delete offers.timers[id];
       continue;
+    }
+    // An online-only timer stands still while you are away: its end moves on by the gap.
+    if (questTimerPausesOffline(id)) {
+      const seen = Number(timer.seenAt) || 0;
+      if (seen && now - seen > QUEST_TIMER_AWAY_MS) timer.endsAt += now - seen;
+      timer.seenAt = now;
     }
     // graceUntil: a timer whose end is the server's to judge waits for its word (js/peat-quest.js).
     if (now < Math.max(timer.endsAt, Number(timer.graceUntil) || 0)) continue;

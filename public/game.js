@@ -3557,7 +3557,7 @@ function renderQuestTracker() {
   if (app?.canvas) app.canvas.dataset.questHolds = holds.join(',');
   const rows = listQuestTracker(questState, 2 + holds.length).filter((row) => !holds.includes(row.classTsid)).slice(0, 2);
   // The quests the log lists (a saved id the build no longer has is not one).
-  if (count) count.textContent = String(Object.keys(questState.active || {}).filter((id) => getQuestCatalog()[id]).length);
+  if (count) count.textContent = String(Object.keys(questState.active || {}).filter((id) => getQuestCatalog()[id] && !getQuestCatalog()[id].hideQuestlog).length);
   box.innerHTML = '';
   if (!rows.length) {
     const empty = document.createElement('div');
@@ -9708,6 +9708,9 @@ function executeVerb(target, verbId) {
     if (!achievementEvents.some((event) => event.counter === verbEvent)) emitGameEvent(verbEvent, 1, verbDetail);
     // Tree quest counters the badge events leave out (wood trees, super and last harvests, healing).
     for (const row of worldVerbQuestEvents(target, verbId, result)) emitGameEvent(row.event, row.amount, verbDetail);
+    // Sparkly of Interest / Another Simple Sample: the Sparkly mined on this street (quest-offers.js routes).
+    const sparklyMined = verbId === 'mine' ? Number(result.effects?.items?.sparkly) || 0 : 0;
+    if (sparklyMined > 0 && currentStreet?.label) emitGameEvent(`sparkly_mined_in:${streetEventSlug(currentStreet.label)}`, sparklyMined);
     // Ticket 68: a plot planted, watered, cleared or picked by hand counts like include/garden.js
     // (Tater 'n' Mater, Shucks To Be You, the garden badges), at home, on a street, solo or online.
     if (result.gardenPlot) {
@@ -27706,6 +27709,11 @@ function grinderPackRoom(cls, n) {
 /**
  * Barnacle talc the Grinder made but the pack can't carry falls to the ground
  * at the player's feet (players/inc_items.js 314-316, location.createItem at
+/** A street's name as quest events carry it ("Neva Neva" -> neva_neva). */
+function streetEventSlug(label) {
+  return String(label || '').toLowerCase().replace(/[^a-z0-9]+/g, '_');
+}
+
  * y - 29); where nothing can be set down, the pack takes it as before.
  */
 function dropGrinderRemainder(dropped) {
@@ -27723,7 +27731,8 @@ function noteMadeUnit(record, madeInv, stringBefore) {
     emitGameEvent(`making_tool_output:${record.recipe.tool}:${output.classTsid}`, output.qty || 1);
   }
   // Grinder ore_crushed / ore_refined, a 20-ingot smelt (quest-offers.js makingUnitQuestEvents).
-  for (const row of makingUnitQuestEvents(record)) emitGameEvent(row.event, row.amount);
+  const madeOn = currentStreet?.label ? streetEventSlug(currentStreet.label) : '';
+  for (const row of makingUnitQuestEvents(record, { street: madeOn })) emitGameEvent(row.event, row.amount);
   const achievementCounter = makingToolAchievementCounter(record.recipe.tool);
   const achievementUpdates = achievementCounter
     ? applyAchievementProgress(achieveState, achievementCounter, 1, pc)

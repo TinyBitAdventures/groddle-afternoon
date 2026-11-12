@@ -171,9 +171,13 @@ export const OFFER_OVERRIDES = Object.freeze({
     ],
     why: 'canOffer: walk_speed_3 and jump_2; an hour after part 1 and after the last repeat or fail',
   },
+  // inc_stats.js 301-303 offers it at 7,652 iMG through quests_offer, which reads prereq_quests and
+  // canOffer only (inc_quests.js 586-602); the file's over_level 13 is read by NPC givers alone
+  // (items/include/npc_quests.js 47-76), so it goes and the upgrades gate stays.
   puzzle_level_light_perspective: {
     prerequisites: [{ condition: 'custom_code', value: 'upgrades:walk_speed_3,jump_2', not: 0 }],
-    why: 'canOffer: walk_speed_3 and jump_2',
+    replacePrerequisites: true,
+    why: 'xp 7652 offer; canOffer: walk_speed_3 and jump_2',
   },
   puzzle_level_light_perspective_rem: {
     prerequisites: [

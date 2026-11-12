@@ -202,7 +202,7 @@ describe('making (G441 G442)', () => {
     assert.equal(progress(qs, id, '100_metal_smelted'), 0);
     send(qs, makingUnitQuestEvents({ recipe: recipe('plain_metal'), made: 20 }));
     assert.equal(progress(qs, id, '100_metal_smelted'), 1);
-    assert.match(read('game.js'), /for \(const row of makingUnitQuestEvents\(record\)\) emitGameEvent\(row\.event, row\.amount\);/);
+    assert.match(read('game.js'), /for \(const row of makingUnitQuestEvents\(record(, \{ street: madeOn \})?\)\) emitGameEvent\(row\.event, row\.amount\);/);
   });
 });
 

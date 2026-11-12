@@ -30190,7 +30190,8 @@
     "inferred": true
    }
   ],
-  "solo": true
+  "solo": false,
+  "soloReason": "unreachable_in_source"
  },
  "phantom_glitch": {
   "classTsid": "phantom_glitch",
@@ -31059,11 +31060,6 @@
   "showAlert": false,
   "prerequisites": [
    {
-    "condition": "over_level",
-    "value": 13,
-    "not": 0
-   },
-   {
     "condition": "custom_code",
     "value": "upgrades:walk_speed_3,jump_2",
     "not": 0
@@ -31084,7 +31080,7 @@
    }
   ],
   "instanceRoom": "light_perspective",
-  "offerNote": "canOffer: walk_speed_3 and jump_2",
+  "offerNote": "xp 7652 offer; canOffer: walk_speed_3 and jump_2",
   "solo": true
  },
  "puzzle_level_light_perspective_rem": {
