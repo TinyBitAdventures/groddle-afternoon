@@ -10343,7 +10343,9 @@ html[data-street-cards] .notify-notices { visibility: hidden; }
 .social-buddies .social-av { width: 32px; height: 32px; font-size: var(--fs-md); }
 .social-face { position: absolute; inset: 0; overflow: hidden; border-radius: var(--radius-round); background: var(--surface-sunken); opacity: 0; }
 .social-av[data-face] .social-face { opacity: 1; }
-.social-face img { position: absolute; left: 50%; top: -6%; width: 150%; height: auto; max-width: none; transform: translateX(-50%); pointer-events: none; }
+/* Report #229: the whole head inside the circle. The tile's head (hat and hair too) spans 68% of its
+   width and 31-155 of its 288 rows; at 120% it is 26 px of the 32 px circle, its middle on the circle's. */
+.social-face img { position: absolute; left: 50%; top: -6%; width: 120%; height: auto; max-width: none; transform: translateX(-50%); pointer-events: none; }
 .social-buddy-what { flex: 1 1 auto; min-width: 0; font-weight: 700; }
 /* RIGHTCLICK (js/ui/player-menu.js): a row opens the buddy's menu; its name is the button for the keys. */
 .social-buddies li[data-ctx] { cursor: pointer; }
