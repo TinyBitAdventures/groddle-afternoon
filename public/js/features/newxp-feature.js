@@ -128,12 +128,12 @@ import {
   TUTORIAL_NAME_MAX,
 } from '../newxp.js?v=45ae5f37';
 import { countWords } from '../words.js?v=ee4e72f8';
-import { ITEM_CATALOG, addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=5be47371';
+import { ITEM_CATALOG, addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=2bd5b93e';
 import { QUOIN_SHEET, QUOIN_TYPES, qrazyRewardForLevel } from '../quoins.js?v=7e0dec6d';
 import { soundForQuoin } from '../sound-moments.js?v=52ad523c';
 import { IMAGINATION_UPGRADES } from '../imagination.js?v=1bdfd77c';
 import { assignQuest, completeQuest } from '../quests.js?v=2951073f';
-import { acceptOffer, enqueueQuestOffer, questAwardPayload, turnInQuest } from '../quest-offers.js?v=ecd7c1d7';
+import { acceptOffer, enqueueQuestOffer, questAwardPayload, turnInQuest } from '../quest-offers.js?v=d76abcd0';
 import { getQuestCatalog } from '../content-catalogs.js?v=10b118dd';
 import { locationEventsApi } from './location-events-feature.js?v=0cda70ed';
 import * as kit from '../quest-rooms/kit.js?v=4e007609';
@@ -141,8 +141,8 @@ import { frameTexture, onLoaded, sourceFromUrl, textureFromUrl, whenLoaded } fro
 import { upgradeSource } from '../sprite-hires.js?v=d4cce9f9';
 import { grantMoodXp } from '../mood-xp.js?v=958e7680';
 import { displayTopOf, itemstackOverlayPoint, playPoofIn, playSheetOverlay, poofInAlpha } from '../overlay-art.js?v=a6561207';
-import { HOME_MACHINE } from '../home-ticket.js?v=6a19977b';
-import { animalAnchorX, animalAnchorY, createAnimalState } from '../animals.js?v=9b48173d';
+import { HOME_MACHINE } from '../home-ticket.js?v=b4222b3c';
+import { animalAnchorX, animalAnchorY, createAnimalState } from '../animals.js?v=1cc34c7e';
 import {
   AK_ANIMALS,
   AK_BUBBLE,

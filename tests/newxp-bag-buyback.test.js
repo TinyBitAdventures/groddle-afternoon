@@ -12,9 +12,9 @@ import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 import { CHEAP_BAG_PRICE, cheapBagPrice } from '../public/js/newxp.js?v=45ae5f37';
-import { __newxpTest } from '../public/js/features/newxp-feature.js?v=ae3dc877';
-import { vendorBuy, vendorSell, vendorSellValue } from '../public/js/vendor.js?v=5207195b';
-import { createInventory, countItem } from '../public/js/inventory.js?v=5be47371';
+import { __newxpTest } from '../public/js/features/newxp-feature.js?v=4300277b';
+import { vendorBuy, vendorSell, vendorSellValue } from '../public/js/vendor.js?v=900d86d9';
+import { createInventory, countItem } from '../public/js/inventory.js?v=2bd5b93e';
 
 const GSJS = join(import.meta.dirname, '..', '..', 'glitch-GameServerJS');
 

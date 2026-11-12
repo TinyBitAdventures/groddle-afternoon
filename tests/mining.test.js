@@ -40,8 +40,8 @@ import {
   craftRecipe,
   ensureMakingItems,
   TOOL_CATALOG,
-} from '../public/js/making.js?v=39f79aaa';
-import { DEFAULT_VENDOR, vendorBuy } from '../public/js/vendor.js?v=5207195b';
+} from '../public/js/making.js?v=a6b3716c';
+import { DEFAULT_VENDOR, vendorBuy } from '../public/js/vendor.js?v=900d86d9';
 import { createToolConditionState, getToolCondition } from '../public/js/tools.js?v=5f482998';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));

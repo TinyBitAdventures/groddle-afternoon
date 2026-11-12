@@ -50,9 +50,9 @@ import { ownBagLabel, stackMaxOf, isBagClass } from '../pack-slots.js?v=4a36968a
 import { ELEMENT_CLASSES, NO_BAG_CLASSES, NO_SLOT_CLASSES } from '../pack-slots-data.js?v=800f664c';
 import { TOOL_CONDITION_CATALOG, copyTagKind, copyTags, receiveToolCopy, setCopyTag, takeToolCopy } from '../tools.js?v=5f482998';
 import { scriptFromTag, scriptLabel } from '../teleportation.js?v=e95cf7cb';
-import { possessive, readVisitScene } from '../neighbours-mp.js?v=b4a811f1';
+import { possessive, readVisitScene } from '../neighbours-mp.js?v=8d032640';
 import { saveStore } from '../save-store.js?v=04420633';
-import { homesFeature } from './homes-feature.js?v=1ab67b46';
+import { homesFeature } from './homes-feature.js?v=38327b85';
 import {
   SDB_PRICE_MAX,
   STORAGE_TEXT as T,

@@ -23,7 +23,7 @@ import {
   loadRecipeCatalogFromFile,
   starterToolsInventory,
   STARTER_TOOL_IDS,
-} from '../public/js/making.js?v=39f79aaa';
+} from '../public/js/making.js?v=a6b3716c';
 import {
   ITEM_CATALOG,
   createInventory,
@@ -36,7 +36,7 @@ import {
   createFoodState,
   isFoodBonusItem,
   quoteFoodVarietyBonus,
-} from '../public/js/food.js?v=abdc9bf9';
+} from '../public/js/food.js?v=007ef0c8';
 import {
   TOOL_CONDITION_CATALOG,
   createToolConditionState,

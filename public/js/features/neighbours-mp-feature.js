@@ -104,8 +104,8 @@ import { cultivationDef, homeStreetLayout } from '../home-cultivation.js?v=f1242
 import { tickGarden } from '../garden.js?v=17d048df';
 import { BUTLER_RIG_SCALE, ButlerPainter, butlerRigNow, loadButlerRig } from '../butler-rig.js?v=86bb97ad';
 import { BUTLER, BUTLER_INFO, butlerInfoText, butlerPostRx, normalizeButlerParts } from '../butler.js?v=a660e585';
-import { butlerApi } from './butler-feature.js?v=a0631653';
-import { homesFeature, visitorHomeScene, visitorHomeState } from './homes-feature.js?v=1ab67b46';
+import { butlerApi } from './butler-feature.js?v=fc941161';
+import { homesFeature, visitorHomeScene, visitorHomeState } from './homes-feature.js?v=38327b85';
 import {
   BUTLER_MESSAGE_MAX,
   KEY_VERB,
@@ -150,7 +150,7 @@ import {
   tendedText,
   TENDED_KEEP,
   visitSceneTsid,
-} from '../neighbours-mp.js?v=b4a811f1';
+} from '../neighbours-mp.js?v=8d032640';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
 import { elevatorStops, towerLabel } from '../home-tower.js?v=087df38f';
 

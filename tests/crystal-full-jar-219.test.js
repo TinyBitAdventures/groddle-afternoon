@@ -20,7 +20,7 @@ import {
   loadRecipeCatalogFromFile,
   recipeBlockedLine,
   recipeInputHave,
-} from '../public/js/making.js?v=39f79aaa';
+} from '../public/js/making.js?v=a6b3716c';
 import { bindToolInventory, createToolConditionState, setToolRemaining, toolCopies } from '../public/js/tools.js?v=5f482998';
 import { economyTransforms } from '../tools/build-economy.mjs';
 

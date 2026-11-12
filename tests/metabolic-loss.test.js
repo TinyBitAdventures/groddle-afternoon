@@ -20,15 +20,15 @@ import {
 } from '../public/js/metabolics.js?v=8504134e';
 import { applyBuff, createBuffState, tickBuffs } from '../public/js/buffs.js?v=fd309a67';
 import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=10b118dd';
-import { HELL_TEXT, metabolicGate, normalizeHellState } from '../public/js/hell.js?v=9828025b';
+import { HELL_TEXT, metabolicGate, normalizeHellState } from '../public/js/hell.js?v=816e231d';
 import { BUTTER_UP, butterUpChicken } from '../public/js/animal-flattery.js?v=63001f58';
 import { SET_FREE, applySetFree } from '../public/js/animal-set-free.js?v=3b194fca';
 import { applyVerbReward, getVerbReward } from '../public/js/verb-rewards.js?v=d3ce41d5';
 import { createInventory, countItem } from '../public/js/inventory.js?v=2bd5b93e';
 import { startAssembly, startDisassembly } from '../public/js/machines.js?v=590a7d4a';
 import { createToolConditionState, repairToolCondition, setToolRemaining } from '../public/js/tools.js?v=5f482998';
-import { smeltMetalRocks } from '../public/js/mining.js?v=12a6f1bd';
-import { craftRecipe } from '../public/js/making.js?v=39f79aaa';
+import { smeltMetalRocks } from '../public/js/mining.js?v=881c40fe';
+import { craftRecipe } from '../public/js/making.js?v=a6b3716c';
 import { doChore, neighbourById, normalizeNeighbourState } from '../public/js/neighbours.js?v=caec2f76';
 
 const here = dirname(fileURLToPath(import.meta.url));

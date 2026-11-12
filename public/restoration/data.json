@@ -2752,9 +2752,44 @@
   "deployed": "2026-11-12"
  },
  "git": {
-  "commits": 1806,
+  "commits": 1814,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-12",
+    "kind": "fix",
+    "text": "Patches refuse Plant for the weeds or the hole first, a missed tend says Glitch's line, and the Paper Tree asks for the can first"
+   },
+   {
+    "date": "2026-11-12",
+    "kind": "fix",
+    "text": "Each recipe's iMG is capped per game day, as Glitch capped it"
+   },
+   {
+    "date": "2026-11-12",
+    "kind": "fix",
+    "text": "Buffs freeze while the game is closed and pick up where they stopped; the ones that ran on end with their end effects"
+   },
+   {
+    "date": "2026-11-12",
+    "kind": "fix",
+    "text": "Drinks' iMG takes the mood bonus, no drinking while dead, and Bacon is food again"
+   },
+   {
+    "date": "2026-11-12",
+    "kind": "fix",
+    "text": "No squeezing a Chicken on its egg, Super Animal Harvest Bacon, and the animals' refusals and misses say Glitch's lines"
+   },
+   {
+    "date": "2026-11-12",
+    "kind": "fix",
+    "text": "Garden potions price only the plots they work, a plot takes water again after an hour, and plot lines are Glitch's"
+   },
+   {
+    "date": "2026-11-12",
+    "kind": "fix",
+    "text": "Harvesting with exactly the energy cost no longer croaks you, and street Wood Trees grow back and fall into Patches"
+   },
    {
     "date": "2026-11-12",
     "kind": "improve",
@@ -2839,44 +2874,9 @@
     "date": "2026-11-12",
     "kind": "fix",
     "text": "A summons or invite prompt answers over an open quest card, and prompts with no speaker drop the Magic Rock heading"
-   },
-   {
-    "date": "2026-11-12",
-    "kind": "new",
-    "text": "Teleportation V summons a friend to where you stand, a Party Space too"
-   },
-   {
-    "date": "2026-11-12",
-    "kind": "improve",
-    "text": "The phone page opens with a Load the full game anyway button"
-   },
-   {
-    "date": "2026-11-12",
-    "kind": "improve",
-    "text": "PixiJS 8.23.0 replaces 8.22.0"
-   },
-   {
-    "date": "2026-11-12",
-    "kind": "fix",
-    "text": "A party invite stays up when you're too tired to go, so you can eat and then join"
-   },
-   {
-    "date": "2026-11-12",
-    "kind": "fix",
-    "text": "A rooked animal's Revive says how many have helped, not 3/3 before the third dose"
-   },
-   {
-    "date": "2026-11-12",
-    "kind": "new",
-    "text": "Reports say \"Read by the team\" once an administrator opens your report"
-   },
-   {
-    "date": "2026-11-12",
-    "kind": "fix",
-    "text": "Password managers take the game's account forms for a sign-in and a sign-up"
    }
   ]
  },
- "tests": 898,
+ "tests": 905,
  "generatedAt": "2026-11-12"
 }

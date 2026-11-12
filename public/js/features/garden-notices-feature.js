@@ -13,7 +13,7 @@
 
 import { tickGarden } from '../garden.js?v=17d048df';
 import { GARDEN_NOTICE_TIMEOUT, gardenNoticeLines, noticeAllowed, plotMarks } from '../garden-notices.js?v=dc26dd82';
-import { homesFeature } from './homes-feature.js?v=1ab67b46';
+import { homesFeature } from './homes-feature.js?v=38327b85';
 
 export const GARDEN_NOTICES_FEATURE_ID = 'garden-notices';
 const LOOK_MS = 1000;

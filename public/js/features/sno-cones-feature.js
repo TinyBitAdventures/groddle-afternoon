@@ -18,9 +18,9 @@
  *   Canvas: snoConeLast, snoConeEaten.
  */
 
-import { addItem, countItem, removeItem } from '../inventory.js?v=5be47371';
+import { addItem, countItem, removeItem } from '../inventory.js?v=2bd5b93e';
 import { getGameDayKey } from '../game-day.js?v=cf9afac0';
-import { listDroppedStacks } from '../world-items.js?v=792e1606';
+import { listDroppedStacks } from '../world-items.js?v=b4795798';
 import { XP_FOR_LEVEL } from '../progression.js?v=33462eaa';
 import {
   SNO_CONES,

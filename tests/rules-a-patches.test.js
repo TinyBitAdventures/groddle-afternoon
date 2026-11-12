@@ -6,8 +6,8 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 
-import { createPlot, performPlotVerb, plotVerbs } from '../public/js/patches.js?v=9c1209ac';
-import { createResourceNode, resourceNodeVerbs } from '../public/js/resource-nodes.js?v=755ccc90';
+import { createPlot, performPlotVerb, plotVerbs } from '../public/js/patches.js?v=e034b56d';
+import { createResourceNode, resourceNodeVerbs } from '../public/js/resource-nodes.js?v=e8971a67';
 
 describe('Plant on a weedy or dug Patch with no bean (patch.js 243-253 before 270-278)', () => {
   it('the weeds first, then the hole', () => {

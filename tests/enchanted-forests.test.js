@@ -39,11 +39,11 @@ import {
   plankYieldForMaturity,
   quoteWoodTreeHarvest,
   woodTreeStatusLabel,
-} from '../public/js/woodcutting.js?v=5235a01a';
-import { noteWoodTreeCare } from '../public/js/patches.js?v=342baf43';
-import { isTreeTarget } from '../public/js/features/tree-death-feature.js?v=f22d217e';
-import { enchantedForestFeature, hollowTrees, treeScreenSpots } from '../public/js/features/enchanted-forest-feature.js?v=8fce2616';
-import { FEATURES } from '../public/js/features/index.js?v=15306d46';
+} from '../public/js/woodcutting.js?v=d7d876f0';
+import { noteWoodTreeCare } from '../public/js/patches.js?v=e034b56d';
+import { isTreeTarget } from '../public/js/features/tree-death-feature.js?v=21e3384f';
+import { enchantedForestFeature, hollowTrees, treeScreenSpots } from '../public/js/features/enchanted-forest-feature.js?v=1d759aae';
+import { FEATURES } from '../public/js/features/index.js?v=2f165ad4';
 
 const spike = join(dirname(fileURLToPath(import.meta.url)), '..');
 const streets = join(spike, 'public/assets/streets');

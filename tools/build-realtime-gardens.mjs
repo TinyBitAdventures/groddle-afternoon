@@ -36,7 +36,7 @@ import { platformsScreen, streetWidth } from '../public/js/street-model.js?v=b6c
 import { ecologyForStreet, planStreetPlacements, populationForStreet, setStreetEcologyCatalog, streetGardenBoxBeds, streetReservedSpots } from '../public/js/street-ecology.js?v=f27417a8';
 import { GARDEN_FERTILIZE_PERC, GARDEN_SPEEDUP, GARDEN_WATER_MS, LEGACY_GARDEN, SEED_CATALOG, legacyGrowMs, streetGardenBed } from '../public/js/garden.js?v=17d048df';
 import { GARDEN_LOCK_MS, SHARED_GARDEN_STREETS } from '../public/js/shared-gardens.js?v=c1f90bc0';
-import { GARDEN_POTIONS, POTION_USES } from '../public/js/master-garden.js?v=e699ce82';
+import { GARDEN_POTIONS, POTION_USES } from '../public/js/master-garden.js?v=ee95fd54';
 import { placementRequests } from './build-realtime-objects.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');

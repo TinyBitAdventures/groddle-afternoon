@@ -13,8 +13,8 @@
  * QA: canvas data peatQuest (the last step: asked, started, refused, emptied, not_emptied).
  */
 
-import { ensureQuestOfferState } from '../quest-offers.js?v=ecd7c1d7';
-import { nodeId } from '../street-objects.js?v=b426cf9a';
+import { ensureQuestOfferState } from '../quest-offers.js?v=d76abcd0';
+import { nodeId } from '../street-objects.js?v=c36a40da';
 import { PEAT_ANSWER_GRACE_MS, PEAT_EVENT, PEAT_QUEST, PEAT_TEXT, fullBogNear } from '../peat-quest.js?v=c7baea41';
 
 export const PEAT_QUEST_FEATURE_ID = 'peat-quest-mp';

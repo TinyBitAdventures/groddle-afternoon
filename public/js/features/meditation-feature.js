@@ -41,7 +41,7 @@
  * radianceStatus, meditationTogether, meditatorsHere.
  */
 
-import { addItem, countItem, ensureItem } from '../inventory.js?v=5be47371';
+import { addItem, countItem, ensureItem } from '../inventory.js?v=2bd5b93e';
 import { GAME_DAY_MS, getGameDayKey, getGameDayStartMs } from '../game-day.js?v=cf9afac0';
 import {
   STATION_COUNTER,

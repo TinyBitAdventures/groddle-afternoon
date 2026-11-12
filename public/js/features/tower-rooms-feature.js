@@ -38,7 +38,7 @@
  * towerRoomItems, towerRoomGarden, towerRoomLast.
  */
 
-import { addItem, countItem } from '../inventory.js?v=5be47371';
+import { addItem, countItem } from '../inventory.js?v=2bd5b93e';
 import { getGameDayKey } from '../game-day.js?v=cf9afac0';
 import { DOOR_TEXT, doorKeyClass, insideBottomRect } from '../doors.js?v=727d0e0b';
 import { textureFromUrl } from '../textures.js?v=92ec53cd';

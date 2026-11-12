@@ -33,10 +33,10 @@ import { requireServer, serverPath } from './repos.mjs';
 
 import { STREET_INDEX, applyStreetIndex, loadStreetDataFromFs, setZoneStreetsShown } from '../public/js/street-loader.js?v=18b181ad';
 import { streetWidth } from '../public/js/street-model.js?v=b6cb6a4e';
-import { entranceScreenX } from '../public/js/features/foxes-feature.js?v=506e124c';
-import { preserveLayout } from '../public/js/foxes.js?v=910cf549';
-import { FOX_TEXT, FOX_TIMING } from '../public/js/foxes.js?v=910cf549';
-import { FOX_LEAVE_MS, FOX_PLAYERS_PER_FOX } from '../public/js/foxes-mp.js?v=8e7a69fd';
+import { entranceScreenX } from '../public/js/features/foxes-feature.js?v=c764080f';
+import { preserveLayout } from '../public/js/foxes.js?v=4be3e46c';
+import { FOX_TEXT, FOX_TIMING } from '../public/js/foxes.js?v=4be3e46c';
+import { FOX_LEAVE_MS, FOX_PLAYERS_PER_FOX } from '../public/js/foxes-mp.js?v=a9197f0a';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const outPath = serverPath('data', 'foxes.json');

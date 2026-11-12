@@ -26,10 +26,10 @@ import {
   refreshBoardPins,
 } from '../public/js/street-furniture.js?v=55131f49';
 import { UNNAMED_PLAYER, playerNameOr } from '../public/js/player-names.js?v=f9b78094';
-import { listPlayerTarget } from '../public/js/ui/player-menu.js?v=eed1abdb';
+import { listPlayerTarget } from '../public/js/ui/player-menu.js?v=4f94601b';
 import { BUDDY_TEXT, normalizeList } from '../public/js/buddies.js?v=cff7bf6e';
 import { youLine } from '../public/js/feats-mp.js?v=62dfc05e';
-import { fillName } from '../public/js/foxes.js?v=910cf549';
+import { fillName } from '../public/js/foxes.js?v=4be3e46c';
 import { APPEARANCE_PRESETS, BODY_STYLES } from '../public/js/character-builder.js?v=e1afc3ca';
 import { boardsData } from '../tools/build-realtime-boards.mjs';
 import { sitePath, skipWithoutSite } from '../tools/repos.mjs';

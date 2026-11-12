@@ -6,8 +6,8 @@
  * - items/include/shrines.js
  */
 
-import { addItem, ensureItem } from './inventory.js?v=5be47371';
-import { musicblockItemMeta } from './musicblocks.js?v=6b93f6ec';
+import { addItem, ensureItem } from './inventory.js?v=2bd5b93e';
+import { musicblockItemMeta } from './musicblocks.js?v=51fa975b';
 
 export const GAMESHOW_TICKET_ID = 'gameshow_ticket';
 export const SPINNING_WHEEL_APPEAR_MS = 1_200;

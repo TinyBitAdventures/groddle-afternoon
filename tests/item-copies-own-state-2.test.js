@@ -39,15 +39,15 @@ import { addItem, countItem, createInventory, removeItem } from '../public/js/in
 import { copyFromLedger, spendCopyCharge } from '../public/js/copy-charges.js?v=7b1d0bd9';
 import { createDroppedItemState, dropInventoryStack, pickupDroppedStack } from '../public/js/world-items.js?v=b4795798';
 import { useBottle, bottleUsesLeft } from '../public/js/tree-poison.js?v=5ceea244';
-import { usePotion as useGardenPotion, potionUsesLeft as gardenUsesLeft } from '../public/js/master-garden.js?v=e699ce82';
-import { potionsFeature, usePotionNow } from '../public/js/features/potions-feature.js?v=d919e340';
-import { powdersFeature } from '../public/js/features/powders-feature.js?v=1f096f37';
-import { treeDeathFeature } from '../public/js/features/tree-death-feature.js?v=f22d217e';
-import { masterGardenFeature } from '../public/js/features/master-garden-feature.js?v=c4e7db6d';
-import { itemVerbsMoreFeature } from '../public/js/features/item-verbs-more-feature.js?v=624256eb';
-import { supplyFeature } from '../public/js/features/supply-feature.js?v=79a59bf4';
-import { cubimalRaceFeature } from '../public/js/features/cubimal-race-feature.js?v=b82c6d28';
-import { seasonsFeature } from '../public/js/features/seasons-feature.js?v=60c4e3a2';
+import { usePotion as useGardenPotion, potionUsesLeft as gardenUsesLeft } from '../public/js/master-garden.js?v=ee95fd54';
+import { potionsFeature, usePotionNow } from '../public/js/features/potions-feature.js?v=8fc95885';
+import { powdersFeature } from '../public/js/features/powders-feature.js?v=32b8db62';
+import { treeDeathFeature } from '../public/js/features/tree-death-feature.js?v=21e3384f';
+import { masterGardenFeature } from '../public/js/features/master-garden-feature.js?v=5766650e';
+import { itemVerbsMoreFeature } from '../public/js/features/item-verbs-more-feature.js?v=9f33de7d';
+import { supplyFeature } from '../public/js/features/supply-feature.js?v=2a7f0ae8';
+import { cubimalRaceFeature } from '../public/js/features/cubimal-race-feature.js?v=7f15d5f1';
+import { seasonsFeature } from '../public/js/features/seasons-feature.js?v=c5d74a94';
 
 const root = join(import.meta.dirname, '..');
 

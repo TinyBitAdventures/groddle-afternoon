@@ -30,8 +30,8 @@ import {
   ensureQuestOfferState,
   routeQuestEvent,
   routesCounter,
-} from '../public/js/quest-offers.js?v=ecd7c1d7';
-import { racesFeature } from '../public/js/features/races-feature.js?v=371def00';
+} from '../public/js/quest-offers.js?v=d76abcd0';
+import { racesFeature } from '../public/js/features/races-feature.js?v=5d5235b6';
 import { raceSceneTsid } from '../public/js/races.js?v=ab22a079';
 import { HOG_HAUL_STREET_ID } from '../public/js/hog-haul.js?v=50d2e072';
 import { CROWNS_STREET } from '../public/js/game-of-crowns.js?v=e32f35f5';

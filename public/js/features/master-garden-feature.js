@@ -43,9 +43,9 @@ import {
   potionTendGarden,
   potionUsesLeft,
   usePotion,
-} from '../master-garden.js?v=e699ce82';
+} from '../master-garden.js?v=ee95fd54';
 import { rollDropTable } from '../drop-tables.js?v=16e12632';
-import { payDrop } from './drops-feature.js?v=eb1d8eb4';
+import { payDrop } from './drops-feature.js?v=fc237a8b';
 import { textureFromUrl } from '../textures.js?v=92ec53cd';
 import { playPotionBottle } from '../potion-bottle-fx.js?v=85e8687c';
 import { copyFromLedger, keepsCopies, verbCopy } from '../copy-charges.js?v=7b1d0bd9';

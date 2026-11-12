@@ -10,8 +10,8 @@ import { fileURLToPath } from 'node:url';
 import { metabolicGain, setMetabolicGainGate } from '../public/js/metabolics.js?v=8504134e';
 import { applyRewards, createQuestState } from '../public/js/quests.js?v=2951073f';
 import { collectQuoin, createQuoinState, creditQuoinStat } from '../public/js/quoins.js?v=7e0dec6d';
-import { HELL_TEXT, metabolicGate, normalizeHellState } from '../public/js/hell.js?v=9828025b';
-import { questOffersFeature } from '../public/js/features/quest-offers-feature.js?v=7c77bd57';
+import { HELL_TEXT, metabolicGate, normalizeHellState } from '../public/js/hell.js?v=816e231d';
+import { questOffersFeature } from '../public/js/features/quest-offers-feature.js?v=07ab9ba0';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const pub = join(here, '../public');

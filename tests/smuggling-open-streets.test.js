@@ -23,9 +23,9 @@ import {
   sourceKey,
 } from '../public/js/smuggling.js?v=ab6ee12a';
 import { applyStreetIndex, resolveIndexTsid } from '../public/js/street-loader.js?v=18b181ad';
-import { streetJobsFeature } from '../public/js/features/street-jobs-feature.js?v=c4f6c040';
-import { smugglingFeature } from '../public/js/features/smuggling-feature.js?v=0d439649';
-import { createInventory, addItem } from '../public/js/inventory.js?v=5be47371';
+import { streetJobsFeature } from '../public/js/features/street-jobs-feature.js?v=9d48b7f4';
+import { smugglingFeature } from '../public/js/features/smuggling-feature.js?v=3f04df75';
+import { createInventory, addItem } from '../public/js/inventory.js?v=2bd5b93e';
 
 const PUB = join(import.meta.dirname, '..', 'public');
 const read = (rel) => readFileSync(join(PUB, rel), 'utf8');

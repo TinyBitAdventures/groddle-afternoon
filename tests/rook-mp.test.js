@@ -20,7 +20,7 @@ import {
   syncObjs,
 } from '../public/js/rook-mp.js?v=0b9056b1';
 import { rookClockS, canStrike, canStun, rookPresent } from '../public/js/rook-attack.js?v=c12e825f';
-import { orbGlowIds } from '../public/js/features/rook-attack-feature.js?v=6b7118c4';
+import { orbGlowIds } from '../public/js/features/rook-attack-feature.js?v=e6e49a9b';
 import { HAS_SERVER, serverPath, skipWithoutServer } from '../tools/repos.mjs';
 
 const root = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -203,7 +203,7 @@ describe('rook-mp: wiring', () => {
 
   it('the server prices every offering the browser can make, so none reads as too small (ticket 38)', { skip: skipWithoutServer }, async () => {
     const data = JSON.parse(fs.readFileSync(serverPath('data/rook.json'), 'utf8'));
-    const { MUSICBLOCK_CATALOG } = await import('../public/js/musicblocks.js?v=6b93f6ec');
+    const { MUSICBLOCK_CATALOG } = await import('../public/js/musicblocks.js?v=51fa975b');
     const { ITEM_BASE_COSTS } = await import('../public/js/store-catalog.js?v=74b56af3');
     // Registered at run time in the browser, so a catalog-only build left them at the server's floor of 1.
     for (const [id, def] of Object.entries(MUSICBLOCK_CATALOG)) assert.equal(data.values[id], def.baseCost, id);

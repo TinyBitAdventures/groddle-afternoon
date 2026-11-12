@@ -44,8 +44,8 @@ import {
   craftRecipeBatch,
   craftUnitDurations,
   MACHINE_EXTRA_WAIT_MS,
-} from '../public/js/making.js?v=39f79aaa';
-import { createInventory, countItem } from '../public/js/inventory.js?v=5be47371';
+} from '../public/js/making.js?v=a6b3716c';
+import { createInventory, countItem } from '../public/js/inventory.js?v=2bd5b93e';
 import { createToolConditionState, getToolCondition } from '../public/js/tools.js?v=5f482998';
 
 const root = join(import.meta.dirname, '..', 'public');

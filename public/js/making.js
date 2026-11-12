@@ -32,7 +32,7 @@ import {
 } from './imagination-effects.js?v=70169933';
 import { grantMoodXp } from './mood-xp.js?v=958e7680';
 import { levelInfoForXp } from './progression.js?v=33462eaa';
-import { getGameDayKey } from './game-day.js?v=84569fa2';
+import { getGameDayKey } from './game-day.js?v=cf9afac0';
 import { loseEnergy, loseMood } from './metabolics.js?v=8504134e';
 
 /**

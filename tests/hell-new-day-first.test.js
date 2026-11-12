@@ -8,7 +8,7 @@
 import { beforeEach, describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { createHellState, croak, hellNewDay, shouldCroak } from '../public/js/hell.js?v=9828025b';
+import { createHellState, croak, hellNewDay, shouldCroak } from '../public/js/hell.js?v=816e231d';
 import { GAME_DAY_MS, getGameDayStartMs, newDayPending, setLastNewDayTs } from '../public/js/game-day.js?v=cf9afac0';
 
 const store = new Map();

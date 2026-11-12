@@ -19,8 +19,8 @@ import {
   listPackRows,
   isToolItem,
   getItemUseInfo,
-} from '../public/js/inventory.js?v=5be47371';
-import { starterToolsInventory, ensureMakingItems } from '../public/js/making.js?v=39f79aaa';
+} from '../public/js/inventory.js?v=2bd5b93e';
+import { starterToolsInventory, ensureMakingItems } from '../public/js/making.js?v=a6b3716c';
 import {
   createQuestState,
   assignQuest,

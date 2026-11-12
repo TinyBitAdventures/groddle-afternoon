@@ -38,7 +38,7 @@ import { ITEM_CATALOG, ensureItem, getItemUseInfo } from './inventory.js?v=2bd5b
 import { DROP_TABLES, applyDropResult, rollDropTable } from './drop-tables.js?v=16e12632';
 import { loseEnergy, loseMood, metabolicGain, moodMax } from './metabolics.js?v=8504134e';
 import { grantMoodXp } from './mood-xp.js?v=958e7680';
-import { musicblockItemMeta } from './musicblocks.js?v=6b93f6ec';
+import { musicblockItemMeta } from './musicblocks.js?v=51fa975b';
 import { isEnchantedForest } from './enchanted-forests.js?v=22ff871e';
 import { isSymphoniousTsid } from './symphonious-maximus.js?v=345ad437';
 import { isMissingFloorTsid } from './hidden-floors.js?v=732a2610';
@@ -47,7 +47,7 @@ import { ensurePiggyMood, piggyTwiceDailyTick, satePiggy } from './animal-mood.j
 import { isCrowdSad } from './animal-crowding.js?v=0ffb4ced';
 import { ecologyForStreet } from './street-ecology.js?v=f27417a8';
 import { filterText } from './word-filter.js?v=9a7a7ebb';
-import { getGameDayKey } from './game-day.js?v=84569fa2';
+import { getGameDayKey } from './game-day.js?v=cf9afac0';
 
 const MINUTE = 60 * 1000;
 const HOUR = 60 * MINUTE;

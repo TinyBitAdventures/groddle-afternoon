@@ -38,9 +38,9 @@ import {
   roomMachineState,
   setMachineArtFrame,
 } from '../public/js/machine-art.js?v=93e29c2d';
-import { MACHINE_IDS } from '../public/js/machines.js?v=301212d7';
-import { MACHINE_EXTRA_WAIT_MS, machineTank, tankFuel } from '../public/js/machine-rooms.js?v=6dc55180';
-import { craftRecipe, ensureMakingItems, loadRecipeCatalogFromFile } from '../public/js/making.js?v=39f79aaa';
+import { MACHINE_IDS } from '../public/js/machines.js?v=590a7d4a';
+import { MACHINE_EXTRA_WAIT_MS, machineTank, tankFuel } from '../public/js/machine-rooms.js?v=1b76a98c';
+import { craftRecipe, ensureMakingItems, loadRecipeCatalogFromFile } from '../public/js/making.js?v=a6b3716c';
 import { platformsScreen } from '../public/js/street-model.js?v=b6cb6a4e';
 import { machineRoomsFeature } from '../public/js/features/machine-rooms-feature.js?v=a2c71b37';
 import { machineArtFeature } from '../public/js/features/machine-art-feature.js?v=6d99882b';
