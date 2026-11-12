@@ -163,6 +163,10 @@ export function resolveAnimalKinshipPackage(classId, verbId, learned = [], upgra
     bonusMultiplier: Number(details.bonus_multiplier) || row.bonusMultiplier,
     bonusChance: Number(details.bonus_chance) || row.bonusChance,
     bonusAmount: Number(details.bonus_amount) || row.bonusAmount,
+    // inc_skill_packages.js 632-638: the overlay's drop too (Super Animal Harvest: Bacon at 25%,
+    // catalog_skill_packages.js 425-446), even at a rank with no drop of its own.
+    dropClassId: details.drop_class_id || row.dropClassId,
+    dropChance: Number(details.drop_chance) || row.dropChance,
     ...energy,
   };
 }
@@ -214,6 +218,10 @@ export function quoteAnimalKinship(state, classId, verbId, ctx = {}) {
   }
   const s = ensureAnimalKinshipState(classId, state || {});
   const usesToday = integer(s[actionState.daily]);
+  // npc_chicken.js 755-757: the first check, before sad and the daily limit.
+  if (classId === 'npc_chicken' && verbId === 'squeeze' && s.incubatingEgg) {
+    return quoteFailure('incubating', 'What kind of weirdo squeezes an incubating chicken?', selected, rank, usesToday);
+  }
   if (usesToday >= selected.intervalLimit) {
     const noun = verbId;
     const animalLabel = classId === 'npc_piggy'
@@ -250,26 +258,37 @@ export function quoteAnimalKinship(state, classId, verbId, ctx = {}) {
     }
   }
   if (classId === 'npc_butterfly' && verbId === 'milk' && rank < 6 && s.massageUsesToday < 1) {
+    // npc_butterfly.js 743: the milk handler's line (Milk stays clickable: ANIMAL_KINSHIP_CLICK_REFUSALS).
     return quoteFailure(
       'needs_massage',
-      'What? No warmup? Massage this Butterfly first.',
+      'What? No warmup? No preamble? You just walk up to a butterfly with your clammy hands and try to milk it? You have a lot to learn about charming butterflies.',
       selected,
       rank,
       usesToday
     );
   }
   const energy = Math.max(0, Number(ctx.pc?.energy) || 0);
+  // inc_skill_packages.js 176-179 runSkillPackage: energy <= cost x count.
   if (energy <= selected.energyCost) {
-    return quoteFailure(
-      'energy',
-      `Needs ${selected.energyCost} energy (you have ${Math.floor(energy)}).`,
-      selected,
-      rank,
-      usesToday
-    );
+    return quoteFailure('energy', "You're too tired to do that.", selected, rank, usesToday);
   }
   return { ok: true, reason: 'ready', msg: '', profile: selected, rank, usesToday };
 }
+
+/**
+ * Refusals the source makes in the verb's handler, not its conditions: the verb stays
+ * clickable and says why when chosen (no timed action). Energy (inc_skill_packages.js
+ * 176-179), a nibble before a pet (npc_piggy.js 892-900, the Piggy scoffs) and a milk with
+ * no massage (npc_butterfly.js 743).
+ */
+export const ANIMAL_KINSHIP_CLICK_REFUSALS = Object.freeze(['energy', 'needs_pet', 'needs_massage']);
+
+/** npc_piggy.js 1779, 1672: the activity line a missed success roll adds; the squeeze has none (npc_chicken.js 1565-1572). */
+const MISSED_ROLL_LINES = Object.freeze({
+  'npc_piggy:pet': 'Maybe you would have more luck if you felt some kinship with the Piggy.',
+  'npc_piggy:nibble': "That didn't work!",
+  'npc_chicken:squeeze': '',
+});
 
 function awardMetabolics(pc, selected, moodBonus = selected.moodBonus) {
   const effects = { energy: 0, mood: 0, xp: 0, items: {} };
@@ -294,7 +313,10 @@ function awardMetabolics(pc, selected, moodBonus = selected.moodBonus) {
  */
 export function performAnimalKinship(state, classId, verbId, ctx = {}) {
   const quote = quoteAnimalKinship(state, classId, verbId, ctx);
-  if (!quote.ok) return { ...quote, attempted: false, effects: { energy: 0, mood: 0, xp: 0, items: {} } };
+  // npc_piggy.js 875-880: a petted Piggy not in the mood refuses before runSkillPackage's energy check.
+  if (!quote.ok && !(quote.reason === 'energy' && classId === 'npc_piggy' && verbId === 'nibble' && piggyNibbleRefusal(state || {}))) {
+    return { ...quote, attempted: false, effects: { energy: 0, mood: 0, xp: 0, items: {} } };
+  }
   // npc_piggy.js nibble handler 875-880: petted (or AK VI) but mood 0 or
   // hunger > 2 refuses before the package runs, so nothing is spent.
   if (classId === 'npc_piggy' && verbId === 'nibble') {
@@ -319,7 +341,7 @@ export function performAnimalKinship(state, classId, verbId, ctx = {}) {
       ok: false,
       attempted: true,
       reason: 'success_rate',
-      msg: verbId === 'squeeze' ? 'Buk! No squeeze! The Chicken greased its feathers.' : `That ${verbId} did not work.`,
+      msg: MISSED_ROLL_LINES[`${classId}:${verbId}`] ?? `That ${verbId} did not work.`,
       effects: { energy: 0, mood: 0, xp: 0, items: {} },
     };
   }

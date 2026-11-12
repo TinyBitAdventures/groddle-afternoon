@@ -9425,6 +9425,8 @@ function executeVerb(target, verbId) {
     streetTsid: currentStreetTsid,
     sharedChunks: sharedGrant?.chunks,
     sharedGarden: Boolean(sharedGrant?.garden),
+    // inc_skill_packages.js 540: Luck of the Rube lifts a package's drop chance by 1.25.
+    rubeweed: engine.activeBuffIds().includes('rubeweed'),
     rng: () => {
       if (sharedRolls.length) return sharedRolls.shift();
       if (sharedRoll != null) {

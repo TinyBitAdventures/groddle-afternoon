@@ -297,8 +297,10 @@ describe('verb and live-client integration', () => {
     const skills = { learned: ['animalkinship_2'] };
     let verbs = getVerbsFor(target, { pc: player, inv, skills });
     assert.equal(verbs.find((row) => row.id === 'pet').durationMs, 2000);
-    assert.equal(verbs.find((row) => row.id === 'nibble').enabled, false);
-    assert.match(verbs.find((row) => row.id === 'nibble').reason, /love first/i);
+    // npc_piggy.js 892-900: clickable before a pet (the Piggy scoffs), no timed action.
+    assert.equal(verbs.find((row) => row.id === 'nibble').enabled, true);
+    assert.equal(verbs.find((row) => row.id === 'nibble').durationMs, 0);
+    assert.match(runVerb(target, 'nibble', { pc: player, inv, skills }).msgs.join(' '), /love first/i);
 
     assert.equal(runVerb(target, 'pet', { pc: player, inv, skills, rng: () => 0.5 }).ok, true);
     verbs = getVerbsFor(target, { pc: player, inv, skills });
@@ -317,7 +319,8 @@ describe('verb and live-client integration', () => {
     const tools = createToolConditionState();
     const skills = { learned: ['animalkinship_2'] };
     let verbs = getVerbsFor(target, { pc: player, inv, tools, skills });
-    assert.equal(verbs.find((row) => row.id === 'milk').enabled, false);
+    // npc_butterfly.js 743: Milk with no massage is clickable and refused in its handler.
+    assert.equal(verbs.find((row) => row.id === 'milk').durationMs, 0);
     assert.equal(verbs.find((row) => row.id === 'massage').durationMs, 1000);
     assert.match(verbs.find((row) => row.id === 'massage').tooltip, /1\/5/);
 

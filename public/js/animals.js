@@ -7,7 +7,7 @@
 import {
   ensureAnimalKinshipState,
   resetAnimalKinshipDay,
-} from './animal-kinship.js?v=f91347e9';
+} from './animal-kinship.js?v=ee58cc20';
 import {
   BABY_ANIMALS,
   babyFoodOptions,

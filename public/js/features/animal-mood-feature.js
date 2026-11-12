@@ -106,11 +106,12 @@ import { nearestSurfaceY } from '../walk-surface.js?v=106bfdc5';
 import { displayTopOf, itemstackOverlayPoint, playSheetOverlay } from '../overlay-art.js?v=a6561207';
 import { isInHell } from '../hell.js?v=9828025b';
 import { HOG_HAUL_STREET_ID } from '../hog-haul.js?v=50d2e072';
-import { TRANT_META, trantStatusLabel } from '../trants.js?v=1b3c8ae3';
-import { animalStatusLabel } from '../animals.js?v=9b48173d';
-import { quoteAnimalKinship } from '../animal-kinship.js?v=f91347e9';
-import { captureVerbState, isFoodItem, itemLabel } from '../animal-husbandry.js?v=0772cd08';
-import { ROOK_SHEETS, rookAttackFeature } from './rook-attack-feature.js?v=6b7118c4';
+import { TRANT_META, trantStatusLabel } from '../trants.js?v=4d6f5593';
+import { animalStatusLabel } from '../animals.js?v=c2373d54';
+import { quoteAnimalKinship } from '../animal-kinship.js?v=ee58cc20';
+import { VERB_RESPONSE_POOLS } from '../verb-responses-data.js?v=0b948684';
+import { captureVerbState, isFoodItem, itemLabel } from '../animal-husbandry.js?v=fe296c29';
+import { ROOK_SHEETS, rookAttackFeature } from './rook-attack-feature.js?v=9afcedd6';
 import { ANIMAL_BODY, ANIMAL_PATROL, TREE_FOOTPRINT } from '../street-ecology.js?v=f27417a8';
 import {
   CHECK_ON_REMOVE,
@@ -1681,7 +1682,20 @@ export const animalMoodFeature = {
       inv: engine.inv,
       learned: engine.learnedSkills,
     });
-    if (!quote.ok) return null;
+    // npc_piggy.js 892-900: a nibble before today's pet: the line, PIGGY_SCOFFS, nibble_without_pet, too_much_nibble.
+    if (quote.reason === 'needs_pet') {
+      engine.toast(quote.msg, 3200);
+      engine.pushActivity(`You try to nibble a Piggy. ${quote.msg}`);
+      engine.playSound?.('PIGGY_SCOFFS', { volume: 0.6 });
+      say(engine, target, pickLine(VERB_RESPONSE_POOLS.npc_piggy?.nibble_without_pet || [quote.msg]), 4000);
+      playClip(engine, recordFor(target), PIGGY_MOOD_SHEETS.tooMuchNibble);
+      lastEvent = 'nibble:refused:needs_pet';
+      engine.setData('animalKinshipResult', 'needs_pet');
+      publish(engine, true);
+      return true;
+    }
+    // 875-880: not in the mood refuses before runSkillPackage's energy check.
+    if (!quote.ok && quote.reason !== 'energy') return null;
     const refusal = piggyNibbleRefusal(target.state);
     if (!refusal) return null;
     // npc_piggy.js 875-879: the activity line, too_much_nibble, nibble_na_fail.

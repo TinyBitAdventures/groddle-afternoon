@@ -47,6 +47,7 @@ import { ensurePiggyMood, piggyTwiceDailyTick, satePiggy } from './animal-mood.j
 import { isCrowdSad } from './animal-crowding.js?v=0ffb4ced';
 import { ecologyForStreet } from './street-ecology.js?v=f27417a8';
 import { filterText } from './word-filter.js?v=9a7a7ebb';
+import { getGameDayKey } from './game-day.js?v=84569fa2';
 
 const MINUTE = 60 * 1000;
 const HOUR = 60 * MINUTE;
@@ -417,6 +418,9 @@ export function examinePlop(plop = {}) {
 // Pack side tables: plop contents, baby feed progress, hog-tie timers
 // ---------------------------------------------------------------------------
 
+/** Today's pets and nibbles a captured Piggy carries (they belong to the game day they were made). */
+const KINSHIP_CARRIED = Object.freeze(['petUsesToday', 'nibbleUsesToday', 'petted', 'nibbled']);
+
 /** Runtime state the feature saves (see normalizeHusbandryPack). */
 const packState = { plops: [], babies: {}, hogtie: null, captures: {}, captureCooldownUntil: 0 };
 
@@ -436,7 +440,14 @@ export function normalizeHusbandryPack(seed = {}) {
     packState.babies[id] = list.slice(0, 50).map((n) => Math.max(0, Math.floor(Number(n) || 0)));
   }
   packState.hogtie = s.hogtie && Number.isFinite(Number(s.hogtie.escapeAt))
-    ? { escapeAt: Number(s.hogtie.escapeAt), nextXpAt: Number(s.hogtie.nextXpAt) || 0, name: typeof s.hogtie.name === 'string' ? s.hogtie.name : '' }
+    ? {
+      escapeAt: Number(s.hogtie.escapeAt),
+      nextXpAt: Number(s.hogtie.nextXpAt) || 0,
+      name: typeof s.hogtie.name === 'string' ? s.hogtie.name : '',
+      ...(s.hogtie.kinship && typeof s.hogtie.kinship === 'object' && typeof s.hogtie.kinship.day === 'string'
+        ? { kinship: hogtieKinship(s.hogtie.kinship, 0, s.hogtie.kinship.day) }
+        : {}),
+    }
     : null;
   packState.captures = {};
   for (const [tsid, at] of Object.entries(s.captures || {})) {
@@ -823,6 +834,8 @@ export function capturePiggy(state, { pc, inv, learned = [], streetTsid = '', no
       escapeAt: now + hogtieEscapeDelayMs(HERDKEEPING.escapeChance, rng),
       nextXpAt: now + HERDKEEPING.hogtieTickMs,
       name: state?.userName || '',
+      // npc_piggy.js 478-494: petters, nibblers and the package limits go into the hog-tie.
+      kinship: hogtieKinship(state, now),
     };
     return {
       ok: true,
@@ -841,14 +854,29 @@ export function capturePiggy(state, { pc, inv, learned = [], streetTsid = '', no
 }
 
 /** released(): the hog-tied piggy becomes a normal piggy (mood 0) here. */
-export function releaseHogtied(inv, rng = Math.random) {
+function hogtieKinship(state, now, day = getGameDayKey(now)) {
+  const out = { day };
+  for (const key of KINSHIP_CARRIED) {
+    const v = state?.[key];
+    if (typeof v === 'boolean') out[key] = v;
+    else if (Number.isFinite(Number(v)) && v != null) out[key] = Math.max(0, Math.floor(Number(v)));
+  }
+  return out;
+}
+
+export function releaseHogtied(inv, rng = Math.random, now = Date.now()) {
   if ((inv?.hogtied_piggy || 0) < 1) return { ok: false, msg: 'You have no Hog-tied Piggy.' };
   inv.hogtied_piggy -= 1;
   const name = packState.hogtie?.name || '';
+  // hogtied_piggy.js 197-213: released, it remembers who petted and nibbled it today.
+  const carried = packState.hogtie?.kinship;
+  const kinship = carried && carried.day === getGameDayKey(now)
+    ? Object.fromEntries(KINSHIP_CARRIED.filter((k) => carried[k] != null).map((k) => [k, carried[k]]))
+    : {};
   packState.hogtie = inv.hogtied_piggy > 0
     ? { escapeAt: Date.now() + hogtieEscapeDelayMs(HERDKEEPING.escapeChance, rng), nextXpAt: Date.now() + HERDKEEPING.hogtieTickMs, name: '' }
     : null;
-  return { ok: true, name, bubble: pick(PIGGY_CAPTURE_RESPONSES.capture_released, rng) };
+  return { ok: true, name, kinship, bubble: pick(PIGGY_CAPTURE_RESPONSES.capture_released, rng) };
 }
 
 /** hog_tie buff tick + escape timer. Returns { xp, escaped }. */

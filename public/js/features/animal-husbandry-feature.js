@@ -928,14 +928,13 @@ function spawnStreet(engine) {
   }
   for (const row of s.animals) buildExtraAnimal(engine, row);
   landStarvedRemains(engine);
-  // Chickens whose incubation finished while we were away lose the egg (onIncubationComplete: player not found).
+  // npc_chicken.js onPlayerExit 1365-1373: leaving the street loses the egg your Chicken sat on
+  // (resetIncubation), however far along it was; so a Chicken still sitting on one here was left.
   for (const target of engine.interactables) {
     // Someone else's egg (multiplayer, incubBy): theirs to hatch or lose; the server says which.
     if (target.classId !== 'npc_chicken' || !target.state?.incubatingEgg || target.state.incubBy) continue;
-    if (incubationPhase(target.state, t, incubationTiming(engine)) === 'complete') {
-      resetIncubation(target.state);
-      lastAction = 'incubation:lost';
-    }
+    resetIncubation(target.state);
+    lastAction = 'incubation:lost';
   }
   setupDemo(engine);
   publish(engine, true);
@@ -1250,7 +1249,7 @@ function releasePiggyHere(engine, { escaped = false } = {}) {
     return false;
   }
   const x = (engine.player?.x || 200) + 40;
-  const row = addExtraAnimal(engine, 'npc_piggy', x, res.name ? { userName: res.name, namer: PLAYER_ID } : {});
+  const row = addExtraAnimal(engine, 'npc_piggy', x, { ...(res.kinship || {}), ...(res.name ? { userName: res.name, namer: PLAYER_ID } : {}) });
   row.state.mood = 0;
   const entity = extras.find((e) => e.row === row);
   // onReleased: somewhere depressing the piggy goes straight to sadness instead.

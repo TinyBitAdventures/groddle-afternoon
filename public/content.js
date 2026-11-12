@@ -57,9 +57,10 @@ import {
 } from './js/animals.js?v=9b48173d';
 import {
   quoteAnimalKinship,
+  ANIMAL_KINSHIP_CLICK_REFUSALS,
   performAnimalKinship,
   highestAnimalKinshipRank,
-} from './js/animal-kinship.js?v=f91347e9';
+} from './js/animal-kinship.js?v=ee58cc20';
 import {
   MUSICBLOCK_CATALOG,
   collectMusicblock,
@@ -185,7 +186,7 @@ export function getVerbsFor(target, ctx) {
     let enabled = opts.enabled !== false;
     let reason = opts.reason || '';
     let tooltip = opts.tooltip || '';
-    if (enabled && energy > 0 && pc.energy < energy) {
+    if (enabled && energy > 0 && pc.energy < energy && opts.energyGate !== false) {
       enabled = false;
       reason = `Needs ${energy} energy (you have ${Math.floor(pc.energy)}).`;
     }
@@ -501,6 +502,11 @@ export function getVerbsFor(target, ctx) {
     });
   }
 
+  // A kinship refusal the source makes in the handler stays clickable and says why, no timed action.
+  const kinshipState = (q) => (ANIMAL_KINSHIP_CLICK_REFUSALS.includes(q.reason)
+    ? { enabled: true, reason: '', durationMs: 0, energyGate: false }
+    : { enabled: q.ok, reason: q.ok ? '' : q.msg });
+
   if (classId === 'npc_piggy') {
     const kinshipCtx = {
       pc,
@@ -515,8 +521,7 @@ export function getVerbsFor(target, ctx) {
       tooltip: pet.ok
         ? `Make it feel better · ${pet.profile.intervalLimit}× per game day at your rank`
         : 'Make it feel better',
-      enabled: pet.ok,
-      reason: pet.ok ? '' : pet.msg,
+      ...kinshipState(pet),
     });
     const nibble = quoteAnimalKinship(s, classId, 'nibble', kinshipCtx);
     add('nibble', 'nibble', {
@@ -526,8 +531,7 @@ export function getVerbsFor(target, ctx) {
       tooltip: nibble.ok
         ? `Just a little nibbly-wibbly · yields ${nibble.profile.bonusAmount} Meat`
         : 'Just a little nibbly-wibbly · yields Meat',
-      enabled: nibble.ok,
-      reason: nibble.ok ? '' : nibble.msg,
+      ...kinshipState(nibble),
     });
     const feedOptions = listAnimalFeedOptions(classId, inv);
     add('feed', 'feed', {
@@ -606,8 +610,7 @@ export function getVerbsFor(target, ctx) {
       tooltip: squeeze.ok
         ? `Obtain ${squeeze.profile.bonusAmount} Grain · ${squeeze.profile.intervalLimit}× per game day at your rank`
         : 'Obtain Grain',
-      enabled: squeeze.ok,
-      reason: squeeze.ok ? '' : squeeze.msg,
+      ...kinshipState(squeeze),
     });
     // No Feed: npc_chicken.js has no feed verb (Austin, desk FEED, register G280).
     // G279: npc_chicken.js 163-236 (js/animal-flattery.js): no daily limit.
@@ -654,8 +657,7 @@ export function getVerbsFor(target, ctx) {
       tooltip: milk.ok
         ? `Extract ${milk.profile.bonusAmount} Butterfly Milk · ${milk.profile.intervalLimit}× per game day at your rank`
         : 'Extract Butterfly Milk',
-      enabled: milk.ok,
-      reason: milk.ok ? '' : milk.msg,
+      ...kinshipState(milk),
     });
     const massage = quoteAnimalKinship(s, classId, 'massage', kinshipCtx);
     add('massage', 'massage', {
@@ -667,8 +669,7 @@ export function getVerbsFor(target, ctx) {
         : massage.profile?.toolWear
           ? 'Advised before milking · uses 1/5 of a Butterfly Lotion tube'
           : 'Advised before milking · no lotion required at your rank',
-      enabled: massage.ok,
-      reason: massage.ok ? '' : massage.msg,
+      ...kinshipState(massage),
     });
     // G279: npc_butterfly.js 543-693 (js/animal-flattery.js): Butterfly Whisperer only.
     const sing = singToVerbState(s, {
@@ -1154,8 +1155,9 @@ export function runVerb(target, verbId, ctx) {
   };
   // The animal's answer to a finished verb, with that verb's slugs (sendResponse(key, pc, slugs)).
   const kinshipSpeech = (care, verb, bonus) => {
-    // A missed success roll answers without slugs (npc_piggy.js 1774, 1676).
-    if (!care.ok) return care.reason === 'success_rate' ? failedSpeech(verb) : null;
+    // A missed success roll answers without slugs (npc_piggy.js 1774, 1676); a missed squeeze
+    // says nothing (npc_chicken.js 1565-1572: CLICK_FAILURE, no response).
+    if (!care.ok) return care.reason === 'success_rate' && verb !== 'squeeze' ? failedSpeech(verb) : null;
     const key = animalResponseKey(classId, verb, {
       learned: ctx.skills?.learned || ctx.learned || [],
       achievements: ctx.achievements || [],
@@ -1172,7 +1174,8 @@ export function runVerb(target, verbId, ctx) {
   if (classId === 'npc_piggy' && verbId === 'pet') {
     const care = performKinship('pet');
     const speech = kinshipSpeech(care, 'pet', false);
-    effects._activityBase = care.ok ? 'You pet a Piggy.' : 'You try to pet a Piggy.';
+    // buildVerbMessage (item.js 26-37): a miss adds its line to the activity (npc_piggy.js 1779).
+    effects._activityBase = care.ok ? 'You pet a Piggy.' : `You try to pet a Piggy.${care.reason === 'success_rate' && care.msg ? ` ${care.msg}` : ''}`;
     if (!speech) msgs.push(care.ok ? '♥ oink' : care.msg);
     finalizeMsgs(msgs, effects);
     return {
@@ -1188,12 +1191,12 @@ export function runVerb(target, verbId, ctx) {
   }
   if (classId === 'npc_piggy' && verbId === 'nibble') {
     const care = performKinship('nibble');
-    const drop = care.ok ? applyKinshipDrop(care.profile, { pc, inv, rng: ctx.rng || Math.random }) : null;
+    const drop = care.ok ? applyKinshipDrop(care.profile, { pc, inv, rng: ctx.rng || Math.random, rubeweed: ctx.rubeweed === true }) : null;
     for (const [itemId, amount] of Object.entries(drop?.items || {})) {
       effects.items[itemId] = (effects.items[itemId] || 0) + amount;
     }
     const speech = kinshipSpeech(care, 'nibble', care.superHarvest);
-    effects._activityBase = care.ok ? 'You nibble a Piggy.' : 'You try to nibble a Piggy.';
+    effects._activityBase = care.ok ? 'You nibble a Piggy.' : `You try to nibble a Piggy.${care.reason === 'success_rate' && care.msg ? ` ${care.msg}` : ''}`;
     if (!speech) {
       msgs.push(care.ok
         ? `${care.superHarvest ? 'Super Harvest! ' : ''}The Piggy looks philosophical about it.`
@@ -1219,13 +1222,13 @@ export function runVerb(target, verbId, ctx) {
   // --- chicken ---
   if (classId === 'npc_chicken' && verbId === 'squeeze') {
     const care = performKinship('squeeze');
-    const drop = care.ok ? applyKinshipDrop(care.profile, { pc, inv, rng: ctx.rng || Math.random }) : null;
+    const drop = care.ok ? applyKinshipDrop(care.profile, { pc, inv, rng: ctx.rng || Math.random, rubeweed: ctx.rubeweed === true }) : null;
     for (const [itemId, amount] of Object.entries(drop?.items || {})) {
       effects.items[itemId] = (effects.items[itemId] || 0) + amount;
     }
     const speech = kinshipSpeech(care, 'squeeze', care.superHarvest);
     effects._activityBase = care.ok ? 'You squeeze a Chicken.' : 'You try to squeeze a Chicken.';
-    if (!speech) msgs.push(care.ok ? `${care.superHarvest ? 'Super Harvest! ' : ''}Buk!` : care.msg);
+    if (!speech && (care.ok || care.msg)) msgs.push(care.ok ? `${care.superHarvest ? 'Super Harvest! ' : ''}Buk!` : care.msg);
     finalizeMsgs(msgs, effects);
     return {
       ok: care.ok,

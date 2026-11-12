@@ -41,7 +41,8 @@ describe('Animal Kinship daily care', () => {
 
     let verbs = getVerbsFor(target, { pc, inv });
     assert.equal(verbs.find((verb) => verb.id === 'pet').enabled, true);
-    assert.equal(verbs.find((verb) => verb.id === 'nibble').enabled, false);
+    // npc_piggy.js 892-900: clickable, refused in the handler (no timed action).
+    assert.equal(verbs.find((verb) => verb.id === 'nibble').durationMs, 0);
     const feed = verbs.filter((verb) => verb.id === 'feed');
     assert.equal(feed.length, 1);
     assert.equal(feed[0].enabled, true);
