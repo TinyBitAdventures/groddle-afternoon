@@ -13765,4 +13765,7 @@ body.is-booting .touch-controls { display: none; }
 :root.touch-phone[data-ui="modern"] body { overflow-x: hidden; }
 /* The tutorial's pill (top left) waits while a sheet or window is open: it covered their titles. */
 :root.touch-phone[data-ui="modern"]:has(#game-root :is(.ui-sheet, .side-panel, .glitch-modal, .map-panel):not([hidden])) #newxp-pill { visibility: hidden; }
+/* iOS zooms the page into a focused field under 16 px (the mobile QA, 2026-11-12: chat and pack search
+   were 13 px, and the zoom stayed). On a phone every typing field is 16 px (--fs-lg). */
+:root.touch-phone :is(input:not([type="range"], [type="checkbox"], [type="radio"], [type="button"], [type="submit"]), textarea, select) { font-size: var(--fs-lg) !important; }
 /* —— end TOUCH PANELS —— */
