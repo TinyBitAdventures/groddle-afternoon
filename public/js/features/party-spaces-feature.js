@@ -1141,7 +1141,12 @@ function spacePrompt(engine, msg) {
     body: `<p class="party-modal-small" style="font-size:.84rem">${esc(PARTY_SPACES[s.template].desc)}</p><p class="party-modal-small">${esc(MP_PARTY_TEXT.partying(names))}</p>`,
     copy: MP_PARTY_TEXT.inviteCost(cost),
     buttons: [
-      { id: 'go', label: MP_PARTY_TEXT.inviteGo(cost), run: () => { closeModal(engine); rejoin(engine); } },
+      // #254: too little energy keeps the invite up, so eating first still gets you there
+      // (inc_party.js 483-493: "You don't have enough energy for that." then party_space_prompt again).
+      { id: 'go', label: MP_PARTY_TEXT.inviteGo(cost), run: () => {
+        closeModal(engine);
+        if (!rejoin(engine) && (Number(engine.pc.energy) || 0) <= rejoinCost(engine)) spacePrompt(engine, msg);
+      } },
       { id: 'later', label: MP_PARTY_TEXT.inviteLater, cancel: true, run: () => { closeModal(engine); note(engine, PARTY_TEXT.joinLater); engine.pushActivity(PARTY_TEXT.joinLater); } },
     ],
   });
