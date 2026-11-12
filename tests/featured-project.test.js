@@ -14,7 +14,7 @@ import { fileURLToPath } from 'node:url';
 import { FEATURED_TEXT, featuredChanged, featuredFromServer, featuredLabel, featuredPillText, featuredStatus, featuredWhere } from '../public/js/featured-project.js?v=31ce4607';
 import { FEATURED_PILL_ID, FEATURED_ROW_ID, renderFeaturedPill, renderFeaturedRow } from '../public/js/ui/featured-project.js?v=1d2fd2e9';
 import { buildProjectsPanel, renderProjects } from '../public/js/ui/projects-sheet.js?v=56d4acbc';
-import { jobIndicatorView } from '../public/js/job-indicator.js?v=f426edec';
+import { jobIndicatorView } from '../public/js/job-indicator.js?v=05498227';
 import { normalizeStreetJobState } from '../public/js/street-jobs.js?v=94f8d250';
 import { rowFromServer } from '../public/js/street-jobs-mp.js?v=25efcadf';
 import { PROJECTS_TEXT, projectEntry } from '../public/js/projects-tracker.js?v=edd58b99';

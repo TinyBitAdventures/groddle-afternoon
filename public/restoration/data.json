@@ -2752,9 +2752,34 @@
   "deployed": "2026-11-11"
  },
  "git": {
-  "commits": 1694,
+  "commits": 1699,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-12",
+    "kind": "fix",
+    "text": "The Street Spirits' Project available bubbles come down into view"
+   },
+   {
+    "date": "2026-11-12",
+    "kind": "fix",
+    "text": "Typing a long chat line keeps the newest messages in view"
+   },
+   {
+    "date": "2026-11-12",
+    "kind": "fix",
+    "text": "Buddies' faces fit inside their round avatars"
+   },
+   {
+    "date": "2026-11-12",
+    "kind": "fix",
+    "text": "The newest arrow or A/D you press steers, so a key the game still thinks is held never freezes you"
+   },
+   {
+    "date": "2026-11-12",
+    "kind": "fix",
+    "text": "The Butler's Leave it button stays in view under a long pick list"
+   },
    {
     "date": "2026-11-12",
     "kind": "fix",
@@ -2849,34 +2874,9 @@
     "date": "2026-11-11",
     "kind": "fix",
     "text": "Project gifts and rewards are confirmed once a save holding them is accepted"
-   },
-   {
-    "date": "2026-11-11",
-    "kind": "fix",
-    "text": "Apple a Day's end-of-buff energy boost shows when it lands"
-   },
-   {
-    "date": "2026-11-11",
-    "kind": "new",
-    "text": "One featured street project at a time, for everyone to build together"
-   },
-   {
-    "date": "2026-11-11",
-    "kind": "improve",
-    "text": "Feat goals grow with how many played the day before"
-   },
-   {
-    "date": "2026-11-11",
-    "kind": "improve",
-    "text": "A full bag's bar turns the accent colour in the pack"
-   },
-   {
-    "date": "2026-11-11",
-    "kind": "fix",
-    "text": "Saying the next incantation line yourself waits for someone new, as in Glitch"
    }
   ]
  },
- "tests": 838,
+ "tests": 843,
  "generatedAt": "2026-11-12"
 }

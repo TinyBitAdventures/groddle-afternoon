@@ -158,6 +158,24 @@ export function flipAlpha(ms) {
 }
 
 /**
+ * Report #231 (Dr Flavius): where the bubble's pointer tip goes so the bubble shows. Glitch hung it
+ * over the giver's head (ActionIndicatorView.as worldDisposableSpriteChangeHandler 199-202), and its
+ * view showed the room over a spirit; here a short window with the top bar over the world can leave
+ * it above the view, reachable only by jumping. Like the client's chat bubbles (ChatBubble.as
+ * keepInBounds 106-117, pushed down over their speaker), it comes down until its top clears the top
+ * bar, over the giver's head, never lower than the giver's feet. A giver wholly above the view keeps
+ * its bubble with it, out of sight (as keepInBounds left a speaker far out of view).
+ * All world px: `tip` the wanted tip, `height` from the bubble's top to its tip, `viewTop` the first
+ * row clear of the top bar, `feet` the giver's feet.
+ */
+export function jobIndicatorTip({ tip, height, viewTop, feet }) {
+  const lowest = viewTop + height;
+  if (tip >= lowest) return tip;
+  if (feet <= viewTop) return tip;
+  return Math.min(lowest, feet);
+}
+
+/**
  * The bubble as a PIXI container, its pointer's tip at (0, 0): place it over the giver's head.
  * `onClick` runs on a click while the view is clickable; the press is kept from the street below
  * (the canvas's own pointerdown would open whatever stands behind it).

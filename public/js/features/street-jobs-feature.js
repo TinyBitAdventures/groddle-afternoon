@@ -134,7 +134,7 @@ import { grantMoodXp } from '../mood-xp.js?v=958e7680';
 import { createMinnAccount } from '../minn-account.js?v=8f2741cd';
 import { normalizeGroups } from '../groups.js?v=c9635d96';
 import { frameTexture, sourceFromUrl, textureFromUrl } from '../textures.js?v=f024bd6a';
-import { createJobIndicator, jobIndicatorView, jobPerc } from '../job-indicator.js?v=f426edec';
+import { createJobIndicator, jobIndicatorTip, jobIndicatorView, jobPerc } from '../job-indicator.js?v=05498227';
 import { LOT_ART, LOT_CLASS, LOT_PLACEMENT, LOT_SIGN_BLOCKERS, LOT_SIGN_X, LOT_TEXT, floorYAt, lotFit, lotHeadline, lotVerb } from '../group-hall-lot.js?v=23e8fbd9';
 import { JOB_WORK_OVERLAY, jobWorkFloatPoint, jobWorkSoundKey, jobWorkToolScale, jobWorkToolSheet } from '../job-work-fx.js?v=ee7e10ca';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
@@ -516,6 +516,37 @@ function openGiver(engine, from) {
   if (head) openPanel(engine, head.jobId);
 }
 
+/**
+ * Report #231: the modern top bar's pills (stats, nameplate, buttons, the featured project's pill) as
+ * boxes in view px, none where they do not show (Classic draws its chrome outside the world).
+ * Measured at most twice a second.
+ */
+let topBarAt = -Infinity;
+let topBarBoxes = [];
+function topBarViewBoxes(engine, now = Date.now()) {
+  if (now - topBarAt < 500) return topBarBoxes;
+  topBarAt = now;
+  topBarBoxes = [];
+  const canvas = engine.renderer?.canvas;
+  if (typeof document === 'undefined' || !canvas?.getBoundingClientRect) return topBarBoxes;
+  const c = canvas.getBoundingClientRect();
+  if (!c.width) return topBarBoxes;
+  const scale = (engine.viewWidth || c.width) / c.width;
+  for (const node of document.querySelectorAll('.top-bar > .hud-pill, #street-nameplate, .featured-pill')) {
+    if (node.offsetParent === null || node.hidden) continue;
+    const r = node.getBoundingClientRect();
+    if (r.height > 0) topBarBoxes.push({ left: (r.left - c.left) * scale, right: (r.right - c.left) * scale, bottom: (r.bottom - c.top) * scale });
+  }
+  return topBarBoxes;
+}
+
+/** The first view row clear of the top bar over the view columns left..right (0 with nothing there). */
+export function topClearOver(boxes, left, right) {
+  let y = 0;
+  for (const b of boxes || []) if (b.left < right && b.right > left) y = Math.max(y, b.bottom);
+  return y;
+}
+
 function spawnGiver(engine, target) {
   const ind = createJobIndicator(engine.PIXI, { onClick: () => openGiver(engine, 'spirit'), textureFor: textureFromUrl });
   ind.root.label = 'job-indicator-spirit';
@@ -544,7 +575,15 @@ function tickIndicators(engine, now = Date.now()) {
       // y above the display, less the bubble's height), and over our Enter hint, which sits on
       // the same top (game.js: box.top - 12, a 22 px chip), so the two never cover each other.
       root.x = spr.x;
-      root.y = spr.y - Math.abs(spr._worldHitH || spr.height || 0) - INDICATOR_LIFT;
+      const want = spr.y - Math.abs(spr._worldHitH || spr.height || 0) - INDICATOR_LIFT;
+      // Report #231: down into the view, under the top bar, when the head is too near its top.
+      const cam = engine.camera;
+      const hit = root.hitArea;
+      if (cam && hit && v) {
+        const left = spr.x + hit.x - cam.x;
+        const clear = topClearOver(topBarViewBoxes(engine, now), left, left + hit.width);
+        root.y = jobIndicatorTip({ tip: want, height: -hit.y + 2, viewTop: cam.y + clear + 6, feet: spr.y });
+      } else root.y = want;
       giver.bubble = v ? v.main.join(' ') : '';
     }
   }
