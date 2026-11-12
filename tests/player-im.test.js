@@ -24,7 +24,7 @@ import {
 } from '../public/js/player-im.js?v=da51888c';
 import { playerImFeature } from '../public/js/features/player-im-feature.js?v=39f34d6d';
 import { FEATURES } from '../public/js/features/index.js?v=5df7801a';
-import { mountSocialDrawer } from '../public/js/ui/social-drawer.js?v=2aa33a1a';
+import { mountSocialDrawer } from '../public/js/ui/social-drawer.js?v=2eafb350';
 import { createNotifier } from '../public/js/notify.js?v=1fb97b21';
 import { memoryStore, page } from './social-fake-dom.js';
 import { serverPath, sitePath, skipWithoutSite } from '../tools/repos.mjs';

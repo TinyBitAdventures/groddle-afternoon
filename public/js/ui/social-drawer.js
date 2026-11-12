@@ -1559,6 +1559,18 @@ export function mountSocialDrawer({
     e.stopPropagation();
   });
 
+  // Report #230 (Friendly): a long line growing the box shrank the log above it, and the newest lines
+  // slid out of sight under it. A log that was at its end (the last scroll left it there) stays there
+  // whenever its height changes: the box growing or shrinking, the window or the drawer resized.
+  let logAtEnd = true;
+  const keepLogEnd = () => {
+    if (logAtEnd) log.scrollTop = log.scrollHeight;
+  };
+  log.addEventListener('scroll', () => {
+    logAtEnd = log.scrollHeight - log.scrollTop - log.clientHeight < 24;
+  });
+  if (typeof globalThis.ResizeObserver === 'function') new globalThis.ResizeObserver(keepLogEnd).observe(log);
+
   // The box wraps and grows up to five lines (js/ui/chat-input.js); Enter sends. Up and Down walk
   // back through what you said from its first or last line.
   if (input) {
@@ -1578,6 +1590,8 @@ export function mountSocialDrawer({
         return true;
       },
     });
+    // After bindChatInput's own input listener, which has fitted the box (and so the log) by now.
+    input.addEventListener('input', keepLogEnd);
   }
   // Before every other submit handler (they listen on the form or on this dock later):
   // keep the line for Up, and send a Party tab's line to the party (/p, party-feature).
