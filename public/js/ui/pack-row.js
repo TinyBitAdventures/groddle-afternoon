@@ -464,9 +464,11 @@ export function createPackRow({ document: doc = globalThis.document, setData = (
       box.scrollBy({ left: event.deltaY, behavior: 'auto' });
     }, { passive: false });
     // The tooltip: on hover after a moment, at once for a keyboard focus.
-    band.addEventListener('pointerover', (e) => { const el = tipTarget(e.target); if (el) queueTip(el); });
+    // None on a screen with no hover (the mobile QA, 2026-11-12: "Search pack" stayed up through later taps).
+    const noHover = () => Boolean(globalThis.matchMedia?.('(hover: none)').matches);
+    band.addEventListener('pointerover', (e) => { if (e.pointerType === 'touch' || noHover()) return; const el = tipTarget(e.target); if (el) queueTip(el); });
     band.addEventListener('pointerout', (e) => { const el = tipTarget(e.target); if (el && !el.contains(e.relatedTarget)) hideTip(); });
-    band.addEventListener('focusin', (e) => { const el = tipTarget(e.target); if (el && e.target.matches?.(':focus-visible')) queueTip(el, 0); });
+    band.addEventListener('focusin', (e) => { if (noHover()) return; const el = tipTarget(e.target); if (el && e.target.matches?.(':focus-visible')) queueTip(el, 0); });
     band.addEventListener('focusout', hideTip);
     band.addEventListener('pointerdown', hideTip);
     band.addEventListener('dragstart', hideTip);

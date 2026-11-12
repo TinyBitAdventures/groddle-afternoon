@@ -2752,9 +2752,84 @@
   "deployed": "2026-11-12"
  },
  "git": {
-  "commits": 1723,
+  "commits": 1741,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-12",
+    "kind": "fix",
+    "text": "A tap on a phone no longer leaves a tooltip standing"
+   },
+   {
+    "date": "2026-11-12",
+    "kind": "fix",
+    "text": "On a phone a double tap, pinch, pull down or long press on the UI no longer zooms, reloads or selects the page"
+   },
+   {
+    "date": "2026-11-12",
+    "kind": "fix",
+    "text": "On a phone chat, pack search and every typing field are 16 px, so iOS does not zoom into them"
+   },
+   {
+    "date": "2026-11-12",
+    "kind": "improve",
+    "text": "A phone reads \"Tap anywhere...\" on announcements and gets a start card without the Keys list"
+   },
+   {
+    "date": "2026-11-12",
+    "kind": "fix",
+    "text": "Notices keep clear of the top bar's pills and the tutorial pill; on a phone the pill waits behind open sheets"
+   },
+   {
+    "date": "2026-11-12",
+    "kind": "fix",
+    "text": "On a short screen the award screen's button can be reached"
+   },
+   {
+    "date": "2026-11-12",
+    "kind": "fix",
+    "text": "iOS shows the Upgrades cards' fronts, not their backs mirrored"
+   },
+   {
+    "date": "2026-11-12",
+    "kind": "fix",
+    "text": "On a short screen side sheets run to the floor, so Quests, Make, Skills and the vendor show more than one item"
+   },
+   {
+    "date": "2026-11-12",
+    "kind": "fix",
+    "text": "On a short screen the start card's Skip to Ur and Customize look first sit above the pack row"
+   },
+   {
+    "date": "2026-11-12",
+    "kind": "fix",
+    "text": "The stick and Jump wait while the start card is up"
+   },
+   {
+    "date": "2026-11-12",
+    "kind": "fix",
+    "text": "The Menu scrolls and stops above the pack row on a short screen, so Settings can be reached on a phone"
+   },
+   {
+    "date": "2026-11-12",
+    "kind": "fix",
+    "text": "A narrow window (every phone) reaches Mail and Imagination from the Menu and shows the currants"
+   },
+   {
+    "date": "2026-11-12",
+    "kind": "improve",
+    "text": "Panels on a phone: close buttons are 44 px targets, no window wider than the screen"
+   },
+   {
+    "date": "2026-11-12",
+    "kind": "improve",
+    "text": "The character builder on a phone keeps the preview, Random, Reset and Save in view"
+   },
+   {
+    "date": "2026-11-12",
+    "kind": "improve",
+    "text": "The tutorial and the world's hints speak touch on a phone"
+   },
    {
     "date": "2026-11-12",
     "kind": "new",
@@ -2799,84 +2874,9 @@
     "date": "2026-11-12",
     "kind": "improve",
     "text": "The Social drawer names the day at each day's first time line"
-   },
-   {
-    "date": "2026-11-12",
-    "kind": "fix",
-    "text": "Players in the tutorial see no street project status"
-   },
-   {
-    "date": "2026-11-12",
-    "kind": "fix",
-    "text": "Report credits read every page of the site's tickets, not only the first 200"
-   },
-   {
-    "date": "2026-11-12",
-    "kind": "improve",
-    "text": "A click runs the one-click verb of Glitch's one-click items, as Glitch did (G661)"
-   },
-   {
-    "date": "2026-11-12",
-    "kind": "improve",
-    "text": "Activity has a search box: a magnifying glass that filters its lines, Esc clears it (#223)"
-   },
-   {
-    "date": "2026-11-12",
-    "kind": "improve",
-    "text": "Reports marks a report an administrator replied to, even after it closes (#225)"
-   },
-   {
-    "date": "2026-11-12",
-    "kind": "new",
-    "text": "Alternate characters in the game: pick one on the start card, Switch character, and no write lands on another character"
-   },
-   {
-    "date": "2026-11-12",
-    "kind": "improve",
-    "text": "Phones draw the game at render resolution 1 so an iPhone tab stays under its memory limit"
-   },
-   {
-    "date": "2026-11-12",
-    "kind": "new",
-    "text": "The Giants' portraits on their Encyclopedia pages"
-   },
-   {
-    "date": "2026-11-12",
-    "kind": "fix",
-    "text": "The level builder's deco catalog and style profiles follow Winter Haven's floor"
-   },
-   {
-    "date": "2026-11-12",
-    "kind": "fix",
-    "text": "Grimssea Hollow's larger fungus stays sharp, and the signpost keys test follows the Map key change"
-   },
-   {
-    "date": "2026-11-12",
-    "kind": "fix",
-    "text": "No thin light line where a street's art meets its mirror past the end"
-   },
-   {
-    "date": "2026-11-12",
-    "kind": "fix",
-    "text": "The Street Spirits' Project available bubbles come down into view"
-   },
-   {
-    "date": "2026-11-12",
-    "kind": "fix",
-    "text": "Typing a long chat line keeps the newest messages in view"
-   },
-   {
-    "date": "2026-11-12",
-    "kind": "fix",
-    "text": "Buddies' faces fit inside their round avatars"
-   },
-   {
-    "date": "2026-11-12",
-    "kind": "fix",
-    "text": "The newest arrow or A/D you press steers, so a key the game still thinks is held never freezes you"
    }
   ]
  },
- "tests": 855,
+ "tests": 871,
  "generatedAt": "2026-11-12"
 }

@@ -546,9 +546,13 @@ function installTooltips(doc, scopes) {
     if (current && current !== el) hide();
     timer = setTimeout(() => show(el), ms);
   };
+  // The mobile QA (2026-11-12): on a touch screen a tap's hover and focus left a tooltip standing
+  // through later taps. A screen with no hover (a phone, a tablet) shows none.
+  const noHover = () => Boolean(globalThis.matchMedia?.('(hover: none)').matches);
   for (const scope of scopes) {
     if (!scope) continue;
     scope.addEventListener('pointerover', (e) => {
+      if (e.pointerType === 'touch' || noHover()) return;
       const el = e.target.closest?.('[data-tip]');
       if (el && scope.contains(el) && el !== current && !el.closest('.hud-pop, .more-list, .player-menu, .vitals-menu')) schedule(el);
     });
@@ -557,6 +561,7 @@ function installTooltips(doc, scopes) {
       if (el && !el.contains(e.relatedTarget)) hide();
     });
     scope.addEventListener('focusin', (e) => {
+      if (noHover()) return;
       const el = e.target.closest?.('[data-tip]');
       if (el && e.target.matches?.(':focus-visible') && !el.closest('.hud-pop, .more-list, .player-menu, .vitals-menu')) schedule(el, 120);
     });
