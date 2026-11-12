@@ -53,11 +53,11 @@ import { NOTE_POLE_CONTAINERS, NOTE_POLE_PARTS, NOTE_POLE_SIGN_Y } from '../note
 import { textureFromUrl } from '../textures.js?v=92ec53cd';
 import { addSignBoard, signArmWidth, signLabel } from '../street-render.js?v=47697d4c';
 import { openNotePicker, openNoteView } from '../note-view.js?v=eca7de52';
-import { homeStreetName, possessive, readVisitScene } from '../neighbours-mp.js?v=f686b3bd';
-import { BACK_YARD_GROUND_Y, SIGN_PROMPT_LIFT, STREET_GROUND_Y, homesFeature, visitorHomeState } from './homes-feature.js?v=f9ba2f06';
-import { projectApi } from './street-jobs-feature.js?v=2959c22c';
-import { saveStore } from '../save-store.js?v=5b167c14';
-import { giveCarriedNote, takeCarriedNote, writtenCarriedNotes } from './street-furniture-feature.js?v=679ceb37';
+import { homeStreetName, possessive, readVisitScene } from '../neighbours-mp.js?v=b4a811f1';
+import { BACK_YARD_GROUND_Y, SIGN_PROMPT_LIFT, STREET_GROUND_Y, homesFeature, visitorHomeState } from './homes-feature.js?v=1ab67b46';
+import { projectApi } from './street-jobs-feature.js?v=c4f6c040';
+import { saveStore } from '../save-store.js?v=04420633';
+import { giveCarriedNote, takeCarriedNote, writtenCarriedNotes } from './street-furniture-feature.js?v=9ecb3094';
 import {
   GOOD_NEIGHBOUR_AT,
   GOOD_NEIGHBOUR_COUNTER,

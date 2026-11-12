@@ -17,10 +17,10 @@ import { homedir } from 'node:os';
 import {
   HOME_LAYOUT_ART_ROOTS, HOME_LAYOUT_KINDS, HOME_LAYOUT_LIMITS, HOME_LAYOUT_TEXTS, HOME_LAYOUT_VERSION,
   HOME_FRAME_WINDOW, boxFromCorners, buildHomeLayout, describeHomeThing, hexColour, homeLayoutJson, homeLayoutKeyOf, homeViewFrame, layoutArtPath, splitFrameToSheet,
-} from '../public/js/home-layout.js?v=304971c0';
-import { collectHomeLayout, walkHomeScene } from '../public/js/home-layout-scene.js?v=153ee4f5';
+} from '../public/js/home-layout.js?v=2d93171b';
+import { collectHomeLayout, walkHomeScene } from '../public/js/home-layout-scene.js?v=2d6ecf6c';
 import { phoneStage, stageFor } from '../public/js/location-view.js?v=9747e89a';
-import { STREET_WORLD_H } from '../public/js/features/homes-feature.js?v=4889ae38';
+import { STREET_WORLD_H } from '../public/js/features/homes-feature.js?v=1ab67b46';
 import { AVATAR_STILL, homeKeyOf } from '../public/js/profiles.js?v=054ca723';
 import { HIRES_SPRITES, SPLIT_SPRITES } from '../public/js/sprite-hires.js?v=d4cce9f9';
 import { HOUSE_STYLE_KEYS } from '../public/js/features/homes-feature.js?v=1ab67b46';

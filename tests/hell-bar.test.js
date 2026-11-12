@@ -37,10 +37,10 @@ import {
   isHellBarTsid,
   pickBartenderLine,
   talkStateFor,
-} from '../public/js/hell-bar.js?v=57aabd10';
-import { hellBarFeature } from '../public/js/features/hell-bar-feature.js?v=9683d829';
-import { hellFeature } from '../public/js/features/hell-feature.js?v=b9770c5a';
-import { FEATURES } from '../public/js/features/index.js?v=2daf96e7';
+} from '../public/js/hell-bar.js?v=82129a31';
+import { hellBarFeature } from '../public/js/features/hell-bar-feature.js?v=85db56b5';
+import { hellFeature } from '../public/js/features/hell-feature.js?v=480cdd11';
+import { FEATURES } from '../public/js/features/index.js?v=15306d46';
 
 const spike = join(dirname(fileURLToPath(import.meta.url)), '..');
 const pub = join(spike, 'public');
