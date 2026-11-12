@@ -52,7 +52,7 @@ import { TOOL_CONDITION_CATALOG, copyTagKind, copyTags, receiveToolCopy, setCopy
 import { scriptFromTag, scriptLabel } from '../teleportation.js?v=1050225e';
 import { possessive, readVisitScene } from '../neighbours-mp.js?v=02c23c07';
 import { saveStore } from '../save-store.js?v=89422a9c';
-import { homesFeature } from './homes-feature.js?v=76721821';
+import { homesFeature } from './homes-feature.js?v=ad776024';
 import {
   SDB_PRICE_MAX,
   STORAGE_TEXT as T,
@@ -88,7 +88,7 @@ import {
   openPriceDialog,
   openStoreDialog,
   storageWindowKind,
-} from '../ui/storage-windows.js?v=3436f2ed';
+} from '../ui/storage-windows.js?v=7e3bf03b';
 
 export const HOME_STORAGE_ID = 'home-storage';
 export const CLASS_STORAGE = 'home_storage';

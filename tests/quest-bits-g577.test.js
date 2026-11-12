@@ -8,8 +8,8 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { questStepHtml } from '../public/js/ui/quest-tracker.js?v=445303df';
-import { questStep, orderQuestCards } from '../public/js/ui/quest-sheet.js?v=ccaa43a8';
+import { questStepHtml } from '../public/js/ui/quest-tracker.js?v=36a9983f';
+import { questStep, orderQuestCards } from '../public/js/ui/quest-sheet.js?v=c5465bbe';
 import { QUEST_MOVES_HERE, questTakesYouAway } from '../tools/encyclopedia/data.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');

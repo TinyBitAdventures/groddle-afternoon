@@ -45,6 +45,14 @@ export function stickKeys(dx, dy, { dead = STICK_DEAD, lock = STICK_AXIS_LOCK } 
   return out;
 }
 
+/** A tap on the stick's corner shorter than this (ms) that never moved it goes to the street behind. */
+export const STICK_TAP_MS = 300;
+
+/** PURE: whether a press on the stick was a tap meant for the street behind it. */
+export function isTapThrough({ moved, ms, dx = 0, dy = 0 }, { dead = STICK_DEAD, tapMs = STICK_TAP_MS } = {}) {
+  return !moved && Number(ms) >= 0 && Number(ms) < tapMs && Math.hypot(Number(dx) || 0, Number(dy) || 0) < dead;
+}
+
 /** PURE: the knob's offset, held inside STICK_RADIUS. */
 export function knobOffset(dx, dy, radius = STICK_RADIUS) {
   const x = Number(dx) || 0;
@@ -107,7 +115,7 @@ export function touchWords(text, touch = isPhoneDevice()) {
  * press(key) / release(key): the held keys (game.js `keys`); jump(): a jump's edge.
  * Returns { el, releaseAll, destroy }.
  */
-export function installTouchControls({ root, press, release, jump, doc = globalThis.document, win = globalThis.window } = {}) {
+export function installTouchControls({ root, press, release, jump, tapThrough = null, doc = globalThis.document, win = globalThis.window } = {}) {
   if (!root || !doc) return null;
   const el = doc.createElement('div');
   el.id = 'touch-controls';
@@ -126,6 +134,9 @@ export function installTouchControls({ root, press, release, jump, doc = globalT
   let origin = null;
   let held = [];
   let frame = 0;
+  // A short tap that never moved the stick: whether it held a key, and when it landed.
+  let moved = false;
+  let downAt = 0;
   const hold = (next) => {
     for (const k of held) if (!next.includes(k)) release(k);
     for (const k of next) press(k);
@@ -160,6 +171,8 @@ export function installTouchControls({ root, press, release, jump, doc = globalT
     e.preventDefault();
     stickId = e.pointerId;
     origin = { x: e.clientX, y: e.clientY };
+    moved = false;
+    downAt = e.timeStamp;
     try { zone.setPointerCapture(e.pointerId); } catch { /* a synthetic pointer */ }
     zone.classList.add('is-held');
     placeBase(e.clientX, e.clientY);
@@ -172,11 +185,18 @@ export function installTouchControls({ root, press, release, jump, doc = globalT
     const dy = e.clientY - origin.y;
     const k = knobOffset(dx, dy);
     knob.style.transform = `translate(${k.x.toFixed(1)}px, ${k.y.toFixed(1)}px)`;
-    hold(stickKeys(dx, dy));
+    const next = stickKeys(dx, dy);
+    if (next.length) moved = true;
+    hold(next);
   });
   for (const type of ['pointerup', 'pointercancel', 'lostpointercapture']) {
     zone.addEventListener(type, (e) => { if (e.pointerId === stickId) endStick(); });
   }
+  // The mobile QA (2026-11-12): a chicken under the stick's corner could not be tapped. A quick tap
+  // that never moved the stick (the browser's click: a tap, never a drag) is a tap on the street behind.
+  zone.addEventListener('click', (e) => {
+    if (isTapThrough({ moved, ms: e.timeStamp - downAt })) tapThrough?.(e.clientX, e.clientY);
+  });
 
   let jumpId = null;
   const endJump = () => {

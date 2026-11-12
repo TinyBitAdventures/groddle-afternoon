@@ -16,7 +16,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { CHECK_ICON, verbRowAttrs, verbRowInner, verbRowKeys } from '../public/js/ui/verb-menu.js?v=7716e570';
+import { CHECK_ICON, verbRowAttrs, verbRowInner, verbRowKeys } from '../public/js/ui/verb-menu.js?v=94936f9c';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const game = readFileSync(join(root, 'public/game.js'), 'utf8');

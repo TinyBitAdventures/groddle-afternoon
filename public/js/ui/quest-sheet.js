@@ -31,8 +31,8 @@
  * ("quest-card:<id>", "quest-sort"); #quest-tools, #quest-search, #quest-sort.
  */
 
-import { escapeText, CHEVRON_ICON } from './verb-menu.js?v=7716e570';
-import { bindContextTrigger, MORE_KEYS_LABEL } from './context-menu.js?v=79326483';
+import { escapeText, CHEVRON_ICON } from './verb-menu.js?v=94936f9c';
+import { bindContextTrigger, MORE_KEYS_LABEL } from './context-menu.js?v=55c84488';
 import { focusWorld } from './focus-return.js?v=da190597';
 
 export const QUEST_TABS = Object.freeze(['active', 'offered', 'done']);

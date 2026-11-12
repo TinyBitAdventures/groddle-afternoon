@@ -20,7 +20,7 @@ import { vitalLevel, vitalTitle } from '../vitals.js?v=85a51302';
 import { loadAudioRestore, saveAudioRestore } from '../audio-pref.js?v=6fe817bc';
 import { ZOOM_FIXED_NOTE, ZOOM_KEYS_HINT, clampZoom, zoomLabel, zoomValueText } from '../world-zoom.js?v=1d0c0cfb';
 import { NIGHT_TINT_HINT, NIGHT_TINT_LABEL } from '../night-tint.js?v=1dfc9c89';
-import { STREET_MAP_HINT, STREET_MAP_LABEL } from './street-minimap.js?v=fa31d398';
+import { STREET_MAP_HINT, STREET_MAP_LABEL } from './street-minimap.js?v=6c530941';
 import { focusBack } from './focus-return.js?v=da190597';
 
 /** The Menu's groups, in the mock's order; Social shows only when something is in it. */

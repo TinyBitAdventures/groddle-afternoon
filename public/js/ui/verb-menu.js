@@ -238,6 +238,17 @@ export function bindVerbMenu(el) {
     const focused = rowOf(el.ownerDocument?.activeElement);
     setDetail(el, focused && el.contains(focused) ? focused : null);
   });
+  // The tap that opened the menu is not a choice in it (the mobile QA, 2026-11-12): a phone opens the
+  // menu on the finger's press, and the click of that same tap then landed on a row under the finger
+  // (a Feed picker opened from a pig) or beside the card (the menu closed: "the tap opened nothing").
+  // A pointer's click counts only when its press began inside the menu; keys (detail 0) always count.
+  let pressedInside = false;
+  el.ownerDocument?.addEventListener?.('pointerdown', (e) => { pressedInside = el.contains(e.target); }, true);
+  el.addEventListener('click', (e) => {
+    if (pressedInside || !e.detail) return;
+    e.preventDefault();
+    e.stopImmediatePropagation();
+  }, true);
   el.addEventListener('click', (e) => {
     const row = rowOf(e.target);
     if (!row || row.getAttribute('aria-disabled') !== 'true') return;
