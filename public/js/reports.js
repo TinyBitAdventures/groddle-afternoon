@@ -6,7 +6,7 @@
  * (a stale one is fetched again once, as js/minn-account-core.js does).
  *
  * A ticket: { id, status: open|answered|working|closed, subject, createdAt, updatedAt,
- * lastMessageAt, lastAuthor: player|admin, unread, adminReplied }; a message: { id, author:
+ * lastMessageAt, lastAuthor: player|admin, unread, adminReplied, readByTeamAt }; a message: { id, author:
  * player|admin, body, at, edited }. Who wrote is a role: an administrator is never named.
  *
  * Ticket 49 (2026-11-02, a player's two ideas): Working on it is a status an
@@ -91,6 +91,9 @@ export const REPORT_TEXT = Object.freeze({
   // #225 (Friendly, 2026-11-12): a report an administrator replied to keeps a tag, closed or not.
   replied: 'Has a reply',
   repliedHint: 'An administrator replied to this report',
+  // Read by the team (Austin 2026-11-12): an administrator has opened it since your last message.
+  readByTeam: 'Read by the team',
+  readByTeamHint: 'An administrator has opened this report since your last message',
 });
 
 /**
@@ -213,7 +216,7 @@ const fold = (x) => String(x ?? '').normalize('NFKD').replace(/[\u0300-\u036f]/g
 export function matchesReport(t, query) {
   const words = fold(query).split(/\s+/).filter(Boolean);
   if (!words.length) return true;
-  const hay = `${fold(t?.subject)} ${fold(STATUS_WORDS[t?.status] || t?.status)}${showsReplied(t) ? ` ${fold(REPORT_TEXT.replied)}` : ''}`;
+  const hay = `${fold(t?.subject)} ${fold(STATUS_WORDS[t?.status] || t?.status)}${showsReplied(t) ? ` ${fold(REPORT_TEXT.replied)}` : ''}${readByTeamAt(t) ? ` ${fold(REPORT_TEXT.readByTeam)}` : ''}`;
   const id = String(Number(t?.id) || '');
   return words.every((w) => hay.includes(w) || (id && w.replace(/^#/, '') === id));
 }
@@ -226,6 +229,38 @@ export function matchesReport(t, query) {
  */
 export function showsReplied(t) {
   return t?.adminReplied === true && t.status !== 'answered';
+}
+
+/**
+ * Read by the team (Austin 2026-11-12, players asked whether we see their reports): when an
+ * administrator first opened the report after your latest message, as the site gives it
+ * (src/TicketStore.php readByTeamAt), or ''. Only while you wrote last: once an administrator
+ * answers, the reply (Answered, the new reply dot, Has a reply) says it, so the two never show
+ * together. A message from you clears it until an administrator opens the report again. Any
+ * status, closed too: closing a report never hides it from the team.
+ */
+export function readByTeamAt(t) {
+  if (t?.lastAuthor !== 'player' || t.status === 'answered') return '';
+  const at = typeof t.readByTeamAt === 'string' ? t.readByTeamAt : '';
+  return at && Number.isFinite(Date.parse(at)) ? at : '';
+}
+
+/** A read time: the clock time on the day it is now ("2:14 PM"), else the date ("Nov 3", with the year when not this one). */
+export function readWhen(iso, now = Date.now()) {
+  const t = Date.parse(String(iso || ''));
+  if (!Number.isFinite(t)) return '';
+  const d = new Date(t);
+  const n = new Date(now);
+  if (d.toDateString() === n.toDateString()) return d.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+  return d.toLocaleDateString([], { month: 'short', day: 'numeric', year: d.getFullYear() !== n.getFullYear() ? 'numeric' : undefined });
+}
+
+/** The marker's words, "Read by the team · 2:14 PM", or '' when the report has none. */
+export function readByTeamWords(t, now = Date.now()) {
+  const at = readByTeamAt(t);
+  if (!at) return '';
+  const when = readWhen(at, now);
+  return when ? `${REPORT_TEXT.readByTeam} · ${when}` : REPORT_TEXT.readByTeam;
 }
 
 /** The report a #report=<id> link names (the reply email's link), or 0. */

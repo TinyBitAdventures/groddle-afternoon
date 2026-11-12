@@ -23,8 +23,8 @@
 import { createMinnAccountCore } from '../minn-account-core.js?v=63758d34';
 import { mountAccountForms, resetLinkFrom, verifyLinkFrom } from '../account-forms.js?v=559c1263';
 import { gateFor, quietSession, suspendedNow } from '../online-session.js?v=6f1348c8';
-import { REPORT_MAX, REPORT_TEXT, STATUS_WORDS, createReportsApi, pictureRefused, pictureSrc, refusalWords, reportFromHash, ticketLine, unreadCount, whenWords } from '../reports.js?v=751c111c';
-import { DEVICE_KEY, PHONE_TEXT as T, POLL_MS, createPresenceApi, fitPhoto, friendsView, fullGameHref, itemNamesFrom, itemWords, mailRows, mailboxFromSave, mergePlayerMail, phoneContext, unreadLetters } from './companion-data.js?v=d05fd33d';
+import { REPORT_MAX, REPORT_TEXT, STATUS_WORDS, createReportsApi, pictureRefused, pictureSrc, refusalWords, reportFromHash, ticketLine, unreadCount, whenWords } from '../reports.js?v=fa6c662a';
+import { DEVICE_KEY, PHONE_TEXT as T, POLL_MS, createPresenceApi, fitPhoto, friendsView, fullGameHref, itemNamesFrom, itemWords, mailRows, mailboxFromSave, mergePlayerMail, phoneContext, unreadLetters } from './companion-data.js?v=9246f5c5';
 
 const doc = globalThis.document;
 

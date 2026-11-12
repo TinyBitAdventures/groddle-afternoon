@@ -3337,6 +3337,11 @@
 :root[data-ui="classic"] #bug-report-panel .reports-chip.is-closed { color: var(--c-classic-offline); }
 /* #225: Has a reply, on a report an administrator answered (closed or not). */
 :root[data-ui="classic"] #bug-report-panel .reports-replied { flex: none; padding: 0 calc(6 * var(--cu)); border: 1px dotted var(--c-classic-online-text); border-radius: var(--radius-xs); color: var(--c-classic-online-text); font: 700 calc(var(--fs-classic-body) * var(--cu-n, 1))/var(--lh-normal) var(--font-classic-title); white-space: nowrap; }
+/* Read by the team (Austin 2026-11-12): quiet words after a row's line, and under a thread's newest message. */
+:root[data-ui="classic"] #bug-report-panel .reports-read { display: inline-block; margin-left: calc(8 * var(--cu)); color: var(--c-classic-offline); white-space: nowrap; }
+:root[data-ui="classic"] #bug-report-panel .reports-read::before { content: "✓"; content: "✓" / ""; margin-right: calc(4 * var(--cu)); color: var(--c-classic-online-text); }
+:root[data-ui="classic"] #bug-report-panel .reports-read-note { margin: 0; color: var(--c-classic-offline); font-size: calc(var(--fs-classic-body) * var(--cu-n, 1)); text-align: right; }
+:root[data-ui="classic"] #bug-report-panel .reports-read-note::before { content: "✓"; content: "✓" / ""; margin-right: calc(4 * var(--cu)); color: var(--c-classic-online-text); }
 /* Ticket 49: Working on it, an administrator's mark. */
 :root[data-ui="classic"] #bug-report-panel .reports-chip.is-working { border-color: var(--c-classic-link); color: var(--c-classic-link); }
 :root[data-ui="classic"] #bug-report-panel .reports-empty { margin: calc(16 * var(--cu)) 0; color: var(--c-classic-offline); text-align: center; }

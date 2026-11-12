@@ -60,8 +60,8 @@
  * window.groddleBugReport.open('list'|'new'), .openTicket(id), .refresh() in multiplayer.
  */
 
-import { createReportsApi, REPORT_PICTURE, REPORT_TEXT, UNREAD_POLL_MS, base64Size, pictureSize, reportFromHash } from '../reports.js?v=751c111c';
-import { mountReportsSheet } from '../ui/reports-sheet.js?v=ee42f2ec';
+import { createReportsApi, REPORT_PICTURE, REPORT_TEXT, UNREAD_POLL_MS, base64Size, pictureSize, reportFromHash } from '../reports.js?v=fa6c662a';
+import { mountReportsSheet } from '../ui/reports-sheet.js?v=09d79e45';
 
 export const BUG_REPORT_FEATURE_ID = 'bug-report';
 
@@ -476,6 +476,11 @@ const STYLE = `
 [data-ui="modern"] #bug-report-panel .reports-chip.is-answered { color: var(--status-good); }
 /* #225: Has a reply, on a report an administrator answered (closed or not): an outline tag beside the status chip. */
 [data-ui="modern"] #bug-report-panel .reports-replied { flex: none; padding: 0 var(--space-2); border: 1px solid var(--status-good); border-radius: var(--radius-pill); color: var(--status-good); font-size: var(--fs-xs); font-weight: var(--fw-bold); line-height: var(--lh-tight); white-space: nowrap; }
+/* Read by the team (Austin 2026-11-12): quiet words after a row's line, and under a thread's newest message. */
+[data-ui="modern"] #bug-report-panel .reports-read { display: inline-block; margin-left: var(--space-2); color: var(--text-muted); font-size: var(--fs-xs); white-space: nowrap; }
+[data-ui="modern"] #bug-report-panel .reports-read::before { content: "✓"; content: "✓" / ""; margin-right: var(--space-1); color: var(--status-good); }
+[data-ui="modern"] #bug-report-panel .reports-read-note { margin: 0; align-self: flex-end; color: var(--text-muted); font-size: var(--fs-xs); }
+[data-ui="modern"] #bug-report-panel .reports-read-note::before { content: "✓"; content: "✓" / ""; margin-right: var(--space-1); color: var(--status-good); }
 /* Ticket 49: Working on it, an administrator's mark. */
 [data-ui="modern"] #bug-report-panel .reports-chip.is-working { background: color-mix(in srgb, var(--status-warn) 24%, transparent); color: var(--warn); }
 [data-ui="modern"] #bug-report-panel .reports-empty { margin: var(--space-4) 0; color: var(--text-muted); line-height: var(--lh-body); text-align: center; }

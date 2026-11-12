@@ -170,6 +170,20 @@ echo json_encode([
             'missing' => TicketStore::summary($base, 'player')['adminReplied'],
         ];
     })(),
+    // Read by the team (Austin 2026-11-12): the administrators' read mark, while the player wrote last and it covers their message.
+    'readByTeam' => (static function () use ($row): array {
+        $base = ['id' => 5, 'status' => 'open', 'subject' => 'Pigs', 'created_at' => '2026-10-30 11:00:00', 'updated_at' => '2026-10-30 12:00:00'];
+        return [
+            'neverOpened' => TicketStore::readByTeamAt($row('player', null, null)),
+            'openedAfter' => TicketStore::readByTeamAt($row('player', null, '2026-10-30 12:05:00')),
+            'sameSecond' => TicketStore::readByTeamAt($row('player', null, '2026-10-30 12:00:00')),
+            'openedBeforeNewMessage' => TicketStore::readByTeamAt($row('player', null, '2026-10-30 11:59:59')),
+            'adminWroteLast' => TicketStore::readByTeamAt($row('admin', null, '2026-10-30 12:00:00')),
+            'closedStillShows' => TicketStore::readByTeamAt(['status' => 'closed'] + $row('player', null, '2026-10-30 12:05:00')),
+            'summary' => TicketStore::summary($base + $row('player', null, '2026-10-30 12:05:00'), 'player')['readByTeamAt'],
+            'summaryNone' => TicketStore::summary($base + $row('player', null, null), 'player')['readByTeamAt'],
+        ];
+    })(),
     'unread' => [
         'adminWroteNeverRead' => TicketStore::unreadFor($row('admin', null, null), 'player'),
         'adminWroteReadBefore' => TicketStore::unreadFor($row('admin', '2026-10-30 11:00:00', null), 'player'),

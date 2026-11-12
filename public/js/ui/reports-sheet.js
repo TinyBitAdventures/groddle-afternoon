@@ -50,7 +50,9 @@
  * #reports-filter [data-reports-filter] (the search box, shown from REPORT_FILTER_MIN reports), [data-reports-no-match];
  * ticket 115: [data-reports-tabs] (role tablist) with tabs #reports-tab-<all|open|answered|working|closed>
  * [data-reports-tab=<tab>] carrying data-count and data-unread, #reports-tabpanel [data-reports-tabpanel],
- * [data-reports-tab-empty]; #225: [data-reports-replied] (Has a reply, js/reports.js showsReplied) on a row.
+ * [data-reports-tab-empty]; #225: [data-reports-replied] (Has a reply, js/reports.js showsReplied) on a row;
+ * Read by the team (Austin 2026-11-12): [data-reports-read] in a row's line and, in a thread,
+ * [data-reports-thread-read] under the newest message (js/reports.js readByTeamWords; datetime on both).
  *
  * Ticket 115 (Friendly, 2026-11-06): the list has tabs, All and each status with how many it holds,
  * and a red count on a tab holding a reply you have not read. A real tablist: one tab in the Tab
@@ -63,7 +65,7 @@
  * the rows, Enter opens one. A redrawn list keeps the focused row focused.
  */
 
-import { REPORT_FILTER_MIN, REPORT_MAX, REPORT_TABS, REPORT_TEXT as T, STATUS_WORDS, canEditFirst, inTab, matchesReport, pictureRefused, pictureSrc, refusalWords, showsReplied, sortReports, tabCounts, tabLabel, ticketLine, unreadCount, whenWords } from '../reports.js?v=751c111c';
+import { REPORT_FILTER_MIN, REPORT_MAX, REPORT_TABS, REPORT_TEXT as T, STATUS_WORDS, canEditFirst, inTab, matchesReport, pictureRefused, pictureSrc, readByTeamAt, readByTeamWords, refusalWords, showsReplied, sortReports, tabCounts, tabLabel, ticketLine, unreadCount, whenWords } from '../reports.js?v=fa6c662a';
 import { focusBack } from './focus-return.js?v=da190597';
 import { lightboxLink } from './picture-lightbox.js?v=0d2814c8';
 import { REPORT_MENU_TEXT, bindReportRowMenu, copyText, reportLink } from './report-row-menu.js?v=bad71076';
@@ -170,6 +172,8 @@ export function mountReportsSheet({ doc = globalThis.document, host, api, contex
   const threadWhen = e('span', { class: 'reports-when' });
   threadHead.append(threadChip, threadWhen);
   const msgs = e('ol', { class: 'reports-messages', 'data-reports-messages': '', 'aria-label': 'Messages' });
+  // Read by the team: under the newest message (yours) once an administrator has opened it.
+  const threadRead = e('p', { class: 'reports-read-note', title: T.readByTeamHint, hidden: true, 'data-reports-thread-read': '' });
   const closedNote = e('p', { class: 'reports-closed-note', hidden: true }, T.closed);
   const replyLabel = e('label', { for: 'reports-reply-text', class: 'reports-label' }, T.replyLabel);
   const reply = e('textarea', { id: 'reports-reply-text', class: 'reports-text', maxlength: String(REPORT_MAX), rows: '3', 'data-reports-reply-text': '' });
@@ -177,7 +181,7 @@ export function mountReportsSheet({ doc = globalThis.document, host, api, contex
   const closeTicket = e('button', { type: 'button', class: 'reports-btn is-quiet', 'data-reports-close-ticket': '' }, T.closeTicket);
   const sendReply = e('button', { type: 'button', class: 'reports-btn', 'data-reports-send-reply': '' }, T.replySend);
   threadActs.append(closeTicket, sendReply);
-  threadView.append(threadHead, msgs, closedNote, replyLabel, reply, threadActs);
+  threadView.append(threadHead, msgs, threadRead, closedNote, replyLabel, reply, threadActs);
   // Editing the report's first message in place (ticket 49): one box, kept across redraws.
   const editLabel = e('label', { for: 'reports-edit-text', class: 'reports-label' }, T.editLabel);
   const editBox = e('textarea', { id: 'reports-edit-text', class: 'reports-text reports-edit-text', maxlength: String(REPORT_MAX), rows: '4', 'data-reports-edit-text': '' });
@@ -298,7 +302,8 @@ export function mountReportsSheet({ doc = globalThis.document, host, api, contex
     list.replaceChildren(...shown.map((t) => {
       const li = e('li', { class: 'reports-row', 'data-ticket': t.id, 'data-unread': t.unread ? '1' : null });
       const replied = showsReplied(t);
-      const btn = e('button', { type: 'button', class: 'reports-row-btn', 'aria-haspopup': 'menu', 'aria-keyshortcuts': 'Shift+F10', 'aria-label': `${t.subject}, ${STATUS_WORDS[t.status] || t.status}${replied ? `, ${T.replied}` : ''}${t.unread ? `, ${T.unreadDot}` : ''}` });
+      const read = readByTeamWords(t, now());
+      const btn = e('button', { type: 'button', class: 'reports-row-btn', 'aria-haspopup': 'menu', 'aria-keyshortcuts': 'Shift+F10', 'aria-label': `${t.subject}, ${STATUS_WORDS[t.status] || t.status}${replied ? `, ${T.replied}` : ''}${read ? `, ${read}` : ''}${t.unread ? `, ${T.unreadDot}` : ''}` });
       const top = e('span', { class: 'reports-row-top' });
       if (t.unread) top.append(e('span', { class: 'reports-dot', title: T.unreadDot, 'aria-hidden': 'true' }));
       top.append(e('span', { class: 'reports-subject' }, t.subject || T.sheet));
@@ -307,7 +312,10 @@ export function mountReportsSheet({ doc = globalThis.document, host, api, contex
       // #225: an administrator replied to it, even if it has closed since.
       if (replied) top.append(e('span', { class: 'reports-replied', 'data-reports-replied': '', title: T.repliedHint, 'aria-hidden': 'true' }, T.replied));
       top.append(c);
-      btn.append(top, e('span', { class: 'reports-line' }, ticketLine(t, now())));
+      const line = e('span', { class: 'reports-line' }, ticketLine(t, now()));
+      // Read by the team, quiet after the line (only while you wrote last: js/reports.js readByTeamAt).
+      if (read) line.append(e('time', { class: 'reports-read', datetime: readByTeamAt(t), title: T.readByTeamHint, 'data-reports-read': '' }, read));
+      btn.append(top, line);
       btn.addEventListener('click', () => openTicket(t.id));
       li.append(btn);
       return li;
@@ -372,6 +380,10 @@ export function mountReportsSheet({ doc = globalThis.document, host, api, contex
       picLink = a;
       first.append(a);
     } else picLink = null;
+    const read = readByTeamWords(ticket, now());
+    threadRead.textContent = read;
+    threadRead.hidden = !read;
+    if (read) threadRead.setAttribute('data-at', readByTeamAt(ticket));
     closedNote.hidden = ticket.status !== 'closed';
     closeTicket.hidden = ticket.status === 'closed';
     // Open at the newest message's first line (a long reply reads from its start); the body is the one scroller.

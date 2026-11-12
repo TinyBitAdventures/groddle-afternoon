@@ -7,8 +7,8 @@ import { execFileSync, spawnSync } from 'node:child_process';
 import { existsSync, readFileSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { join } from 'node:path';
-import { mountReportsSheet } from '../public/js/ui/reports-sheet.js?v=ee42f2ec';
-import { REPORT_TEXT, matchesReport, showsReplied } from '../public/js/reports.js?v=751c111c';
+import { mountReportsSheet } from '../public/js/ui/reports-sheet.js?v=09d79e45';
+import { REPORT_TEXT, matchesReport, showsReplied } from '../public/js/reports.js?v=fa6c662a';
 import { SITE_DIR, sitePath, skipWithoutSite } from '../tools/repos.mjs';
 
 const root = join(import.meta.dirname, '..');
