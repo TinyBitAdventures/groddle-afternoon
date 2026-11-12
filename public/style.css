@@ -11182,6 +11182,19 @@ html.stage-pinned[data-ui="modern"] header.top-bar { left: calc(var(--sp-5) + va
   text-shadow: none;
 }
 [data-ui="modern"] .award-screen.is-visible .award-card { animation: momentIn 320ms var(--ease-out) both; }
+/* A short screen (the mobile QA, 2026-11-12: a phone held sideways, 343 px): the card's button ("Yeah!
+   I am!") sat under the bottom edge and nothing scrolled. Up to 500 px tall the art and its burst come
+   in at half size and the screen scrolls from its top, so the button can always be reached. */
+@media (max-height: 500px) {
+  [data-ui="modern"] .award-screen { --moment-burst: 96px; --moment-art: 80px; --moment-art-book: 72px; }
+  [data-ui="modern"] .award-screen,
+  [data-ui="modern"] .award-screen[data-kind="quest"],
+  [data-ui="modern"] .award-screen[data-kind="level"],
+  [data-ui="modern"] .award-screen[data-paged="true"] {
+    place-items: start center; overflow-y: auto; overscroll-behavior: contain;
+    padding-top: calc(var(--hud-h) + var(--space-2));
+  }
+}
 @keyframes momentIn { from { opacity: 0; transform: translateY(10px) scale(0.92); } }
 /* The art and its burst: 192 px, two thirds of it above the card's top edge. */
 [data-ui="modern"] .award-screen .award-badge,
