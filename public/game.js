@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=4f923e2b';
 import { createErrorOnce, createFeatureHost } from './js/feature-host.js?v=06bb8b74';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=f9138c16';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=8d128623';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl, drawTileArt } from './js/enter-chooser.js?v=4a3ea327';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -950,7 +950,7 @@ import {
   MAP_INDEX_URL,
   HUB_56_MAP_URL,
 } from './js/map-graph.js?v=c161229d';
-import { hubMapArtNote, hubMapSubtitle, questLogSummary } from './js/panel-copy.js?v=3243b9b2';
+import { hubMapArtNote, hubMapSubtitle, questLogSummary } from './js/panel-copy.js?v=85c3e029';
 import { bindMapIconTips } from './js/ui/map-icon-tips.js?v=6b3eb3f9';
 import { createMapZoom } from './js/map-zoom.js?v=4c2ce0e3';
 import {
@@ -25303,7 +25303,7 @@ async function openMap(hubId, { find = '', focus = '' } = {}) {
   if (title) title.textContent = view.hubName;
   if (sub) {
     // The painted-or-geometry note is for QA only (js/panel-copy.js), not the player's subtitle.
-    sub.textContent = hubMapSubtitle(view);
+    sub.textContent = hubMapSubtitle(view, { touch: TOUCH_PHONE });
     sub.dataset.mapArt = hubMapArtNote(view);
     // Modern folds it onto the one quiet line under the map, where a narrow window cuts it short.
     sub.title = sub.textContent;
@@ -28959,7 +28959,7 @@ function renderVendorList() {
             ${vendorGoLabel(isBuy, vendorQty, unit)}
           </button>
         </div>
-        <p class="count-pop-esc mp-modern-only"><span class="kcap">Esc</span> back · ${isBuy ? `◎ ${pc.currants || 0} to spend` : `${have} in your pack`}</p>
+        <p class="count-pop-esc mp-modern-only"><span class="count-pop-key"><span class="kcap">Esc</span> back · </span>${isBuy ? `◎ ${pc.currants || 0} to spend` : `${have} in your pack`}</p>
       </div>`;
     const applyQ = (n) => {
       vendorQty = Math.max(1, Math.min(maxQ, n));
@@ -32203,7 +32203,8 @@ async function main() {
     applyPlayerAppearance();
     // G339: not when the tutorial is about to take the player into the clouds.
     if (features.query('arrivalQuiet', engine) !== true) {
-      toast(`${currentStreet?.label || 'Hechey Track'} loaded. Press L for look · G for map.`);
+      // A phone has no keyboard: its toast names the street only (PHONEKEYS, style.css).
+      toast(`${currentStreet?.label || 'Hechey Track'} loaded.${TOUCH_PHONE ? '' : ' Press L for look · G for map.'}`);
       pushActivity(`A new afternoon begins on ${currentStreet?.label || 'Hechey Track'}.`);
     }
     if (buffDemoItem && bootParams.get('buffactivate') === '1') {

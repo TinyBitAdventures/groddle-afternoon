@@ -26,7 +26,7 @@ import { homePoolMpFeature } from '../public/js/features/home-pool-mp-feature.js
 import { qurazyFeature, resetQurazyFeatureForTests } from '../public/js/features/qurazy-feature.js?v=c369e726';
 import { QURAZY_SPAWN_LINE } from '../public/js/qurazy.js?v=72c4005a';
 import { QURAZY_PLACEMENT_GROUP } from '../public/js/features/qurazy-feature.js?v=c369e726';
-import { hubMapArtNote, hubMapSubtitle, questLogSummary } from '../public/js/panel-copy.js?v=3243b9b2';
+import { hubMapArtNote, hubMapSubtitle, questLogSummary } from '../public/js/panel-copy.js?v=85c3e029';
 
 const root = join(import.meta.dirname, '..');
 const read = (rel) => readFileSync(join(root, rel), 'utf8');
@@ -162,7 +162,7 @@ describe('Map subtitle', () => {
     assert.equal(hubMapArtNote(view), 'geometry only');
     assert.equal(hubMapArtNote({ ...view, bgLocal: true }), 'painted bg');
     const game = read('public/game.js');
-    assert.match(game, /sub\.textContent = hubMapSubtitle\(view\);\n\s+sub\.dataset\.mapArt = hubMapArtNote\(view\);/);
+    assert.match(game, /sub\.textContent = hubMapSubtitle\(view, \{ touch: TOUCH_PHONE \}\);\n\s+sub\.dataset\.mapArt = hubMapArtNote\(view\);/);
     assert.doesNotMatch(game, /'geometry only'/);
     assert.match(game, /from '\.\/js\/panel-copy\.js\?v=[0-9a-f]{8}';/);
   });

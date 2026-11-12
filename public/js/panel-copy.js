@@ -9,12 +9,15 @@
  *   cards) are counted on their own, so the numbers match the cards shown.
  */
 
-/** The Map subtitle: streets, playable streets and how to use the map. */
-export function hubMapSubtitle(view) {
+/**
+ * The Map subtitle: streets, playable streets and how to use the map. `touch` (a phone, html.touch-phone)
+ * says tap for click.
+ */
+export function hubMapSubtitle(view, { touch = false } = {}) {
   // The streets the map draws (map-graph.js buildHubMapView `hidden`: not the Start streets or towers).
   const streets = (Array.isArray(view?.streets) ? view.streets : []).filter((s) => !s.hidden);
   const playable = streets.filter((s) => s.loaded).length;
-  return `${streets.length} streets · ${playable} playable here · click a street to set a destination or teleport · red star = you`;
+  return `${streets.length} streets · ${playable} playable here · ${touch ? 'tap' : 'click'} a street to set a destination or teleport · red star = you`;
 }
 
 /** QA only (data-map-art on the subtitle): whether the region has painted art. */

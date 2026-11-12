@@ -5518,6 +5518,16 @@ body.buff-purple-pulse::after {
 .shrine-learn > [data-shrine-learn-spend] { grid-column: 2; grid-row: 1 / span 4; margin: 0; }
 .shrine-learn > h3.shrine-section-title { margin: 0; }
 .shrine-learn > .shrine-daily { margin-top: var(--sp-1); }
+/* A narrow window (Austin's iPhone, 2026-11-12: the text went one word a line beside "You can't
+   spend points right now"): the words take the width and the button goes under them. The favor
+   chips scroll sideways there, so their row fades at the edge it scrolls toward. */
+@media (max-width: 520px) {
+  .shrine-learn { grid-template-columns: minmax(0, 1fr); }
+  .shrine-learn > [data-shrine-learn-spend] { grid-column: 1; grid-row: auto; justify-self: stretch; margin-top: var(--sp-3); }
+  .shrine-all-favor { mask-image: linear-gradient(to right, #000 calc(100% - 2rem), transparent); }
+  /* Room past the last chip, so scrolled to the end it sits clear of the fade. */
+  .shrine-all-favor::after { content: ""; flex: 0 0 1.5rem; }
+}
 /* The card may use the whole space between the top bar and the pack, not 78% of the window. */
 .shrine-card { max-height: min(640px, calc(100% - 12px)); }
 .shrine-desc { margin-bottom: var(--sp-3); }
@@ -13877,3 +13887,30 @@ body.is-booting .touch-controls { display: none; }
 :root.touch-phone body { touch-action: pan-x pan-y; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent; }
 :root.touch-phone :is(input, textarea, select, [contenteditable="true"], [contenteditable=""], .activity-log, .social-log, #local-chat-log) { -webkit-user-select: text; user-select: text; -webkit-touch-callout: default; }
 /* —— end TOUCH PANELS —— */
+
+/* PHONEKEYS (Austin 2026-11-12, on his iPhone): a phone (html.touch-phone, the phone gate's
+   device) has no keyboard, so no key letter shows on it: the key caps on the bar's buttons, in sheet
+   heads, in the Menu's rows (data-key), the verb menu's numbers, "Esc close" and "Esc back", and the
+   Map's "M or G map" line. One rule for every window, in both skins. The Street map switch goes too:
+   a phone has no street map (features/street-minimap-feature.js). */
+:root.touch-phone :is(.kcap, .vm-key, .ui-sheet-esc, span.count-pop-esc, .count-pop-key, #map-panel .map-hint, [data-street-map-control]) { display: none !important; }
+:root.touch-phone .more-list [data-key]::after,
+:root.touch-phone .more-list [data-key-mod]::before { content: none; display: none; }
+/* A sheet's title on a phone shares its row with the close button, wrapping its own words, instead
+   of pushing the button onto a row of its own (a vendor's "Gardening Tools Vendor"). */
+:root.touch-phone[data-ui="modern"] #game-root :is(.ui-sheet-head, #achieve-panel .side-head, #skills-panel .side-head, #buffs-panel .side-head) > h2 { flex: 1 1 0; }
+/* The Map's head on a phone: the region box already names the region, so the title steps aside (read
+   aloud still) and the box takes the row; the tutorial hides the box, and then the title shows. */
+:root.touch-phone[data-ui="modern"] body:not(.nx-island-map) #map-panel .map-head > h2 {
+  position: absolute; width: 1px; height: 1px; margin: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap;
+}
+:root.touch-phone[data-ui="modern"] #map-panel .map-head .map-hub-picker { flex: 1 1 auto; min-width: 0; margin-right: 0; }
+:root.touch-phone[data-ui="modern"] #map-panel .map-head .map-hub-picker .combo { width: 100%; max-width: none; }
+/* The scroll icon steps aside too, so "Groddle Forest (41)" fits the box at the phone's 16 px; a
+   longer name ends in an ellipsis, never a cut digit. */
+:root.touch-phone[data-ui="modern"] body:not(.nx-island-map) #map-panel .map-head > .ui-sheet-icon { display: none; }
+:root.touch-phone[data-ui="modern"] #map-panel .map-head .combo-input { text-overflow: ellipsis; }
+/* Its quiet line under the map takes the whole width (no key hint beside it) and wraps, so the
+   counts and "tap a street" read in full. */
+:root.touch-phone[data-ui="modern"] #map-panel .map-card.map-hub > .map-sub { padding-right: var(--space-4); white-space: normal; text-overflow: clip; }
+/* end PHONEKEYS */

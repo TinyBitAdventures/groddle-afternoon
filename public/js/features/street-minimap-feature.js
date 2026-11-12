@@ -32,7 +32,12 @@
  *   the whole world menu), on a signpost Walk here and its arms (engine.openSignpostMenu, game.js);
  *   nothing else on the map opens one (menuFromMap).
  *
- * Canvas data: streetMap (shown|off|no-map|hidden), streetMapFog, streetMapExpanded,
+ * - Never on a phone (Austin 2026-11-12, on his iPhone: "I think the minimap should just be hidden
+ *   on the phone"): where window.GRODDLE_DEVICE is "phone" (the phone gate, js/touch-controls.js
+ *   isPhoneDevice) the feature builds no card, takes no snapshot and does nothing per tick; the
+ *   Menu's Street map switch, Classic's Preferences row and Shift+M go with it (style.css PHONEKEYS).
+ *
+ * Canvas data: streetMap (shown|off|no-map|hidden|phone), streetMapFog, streetMapExpanded,
  * streetMapDots, streetMapDotIds, streetMapSigns, streetMapPicture (lines|snapshot),
  * streetMapSnapMs (the last snapshot's cost), streetMapSnaps (how many taken), streetMapWalk (the last click: kind:x, or
  * refused). QA: &streetmapexpand=1 expands it on each street.
@@ -42,6 +47,7 @@ import { createStreetMinimap, minimapVisibility, onStreetMapChange, sceneSignMar
 import { classicArtUrl } from '../classic/classic-art.js?v=5f713e7d';
 import { onUiModeChange } from '../classic/ui-mode.js?v=f1f33f66';
 import { focusBack } from '../ui/focus-return.js?v=da190597';
+import { isPhoneDevice } from '../touch-controls.js?v=89321eeb';
 
 export const STREET_MINIMAP_FEATURE_ID = 'street-minimap';
 const UPDATE_MS = 100;
@@ -291,11 +297,21 @@ export function walkFromMap(engine, goal, { keyboard = false, doc = globalThis.d
   return ok;
 }
 
+/** PURE: whether this device goes without the street map (a phone, the phone gate's device). */
+export function minimapOffOnDevice(win = globalThis) {
+  return isPhoneDevice(win);
+}
+
 export const streetMinimapFeature = {
   id: STREET_MINIMAP_FEATURE_ID,
 
   init(engine) {
     if (typeof document === 'undefined') return;
+    // A phone has no street map: no card, no snapshots, nothing per tick (onTick returns with no view).
+    if (minimapOffOnDevice(globalThis)) {
+      engine.setData?.('streetMap', 'phone');
+      return;
+    }
     host = document.getElementById('game-root');
     if (!host || view) return;
     view = createStreetMinimap(document, host, {

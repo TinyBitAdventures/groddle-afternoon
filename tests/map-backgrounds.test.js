@@ -17,7 +17,7 @@ import { fileURLToPath } from 'node:url';
 import { readThumbs, regionThumbs, repaints } from '../tools/map-backgrounds/build.mjs';
 import { HUB_MAP_BACKGROUNDS } from '../public/js/hub-map-backgrounds.js?v=2b2d6468';
 import { buildHubMapView, isPlaceholderMap, PLACEHOLDER_MAP_COLOURS, PUBLIC_HUBS, renderHubMapSvg } from '../public/js/map-graph.js?v=c161229d';
-import { hubMapArtNote } from '../public/js/panel-copy.js?v=3243b9b2';
+import { hubMapArtNote } from '../public/js/panel-copy.js?v=85c3e029';
 import { CHECKLIST } from '../tools/restoration/checklist.mjs';
 import { MAP_ART_NOTE } from '../tools/encyclopedia/streets.mjs';
 
