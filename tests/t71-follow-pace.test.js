@@ -256,7 +256,7 @@ describe('ticket 71: carrying on under a card', () => {
     }
     const input = game.slice(game.indexOf('function handleInput() {'), game.indexOf('function soloChickenPause'));
     assert.match(input, /followUnderCard = !avatarHeldByScene\(\) && !climb\.active && features\.query\('followActive', engine\) === true;\n\s+if \(!followUnderCard\) \{\n\s+player\.vx = 0;\n\s+return;/);
-    assert.match(input, /const keyed = !followUnderCard;\n\s+let left = keyed && /, 'the card keeps the keys');
+    assert.match(input, /const keyed = !followUnderCard;\n(\s+\/\/[^\n]*\n)?\s+const heldSide = keyed \? heldDirection\(keys\) : 0;/, 'the card keeps the keys');
     assert.ok(input.indexOf('clearJumpQueue(jumpState);') < input.indexOf('followUnderCard = !avatarHeldByScene'), 'a Space meant for the card never jumps');
   });
 

@@ -27,6 +27,28 @@
 /** KeyBeacon._keyDownHandler 236-244: Keyboard.RIGHT, LEFT, A and D. */
 const MAC_RESET_KEYS = new Set(['ArrowRight', 'ArrowLeft', 'a', 'A', 'd', 'D']);
 
+/** The walking keys of each side (AvatarPhysicsHandler.as 350-360: LEFT or A, RIGHT or D). */
+const LEFT_KEYS = new Set(['ArrowLeft', 'a', 'A']);
+const RIGHT_KEYS = new Set(['ArrowRight', 'd', 'D']);
+
+/**
+ * Report 228 (Dr Flavius, Cloud Flight): -1, 1 or 0, the side of the newest walking key held.
+ * The client kept its held keys newest first (KeyBeacon.as _keyDownFire 278-283 moves a key to the
+ * front on every keydown) and walked toward whichever side was pressed last
+ * (AvatarPhysicsHandler.as 350-360, KeyBeacon.pressedBefore 223-225), so a key it still thought was
+ * down on the other side never stopped a fresh press. `keys` keeps that order (createHeldKeys moves a
+ * pressed key to the end); with Left and Right both in it, the remake stood still in Paradise and
+ * always went left on a street.
+ */
+export function heldDirection(keys) {
+  let dir = 0;
+  for (const k of keys || []) {
+    if (LEFT_KEYS.has(k)) dir = -1;
+    else if (RIGHT_KEYS.has(k)) dir = 1;
+  }
+  return dir;
+}
+
 /** KeyBeacon._keyUpFire 257: Keyboard.CONTROL, which Flash on a Mac reports for Cmd. */
 const RESET_ON_UP = new Set(['Meta', 'OS', 'Control']);
 
@@ -64,6 +86,12 @@ export function createHeldKeys(keys, { mac = false, onRelease = null } = {}) {
     // KeyBeacon 234-245: was_down is the held set before this press counts.
     if (mac && e.isTrusted !== false && !e.repeat && !e.shiftKey && MAC_RESET_KEYS.has(e.key) && !keys.has(e.key)) {
       releaseAll('mac-direction');
+    }
+    // KeyBeacon._keyDownFire 278-283: a key pressed again (or repeating) is the newest one held; the
+    // game adds a new one at the end itself (heldDirection reads the order).
+    if (e.key && keys.has(e.key)) {
+      keys.delete(e.key);
+      keys.add(e.key);
     }
     if (e.code && e.key) {
       let set = names.get(e.code);

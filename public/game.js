@@ -380,7 +380,7 @@ import {
   buildParadiseCourseArt,
   paradiseCoursePreloadUrls,
   paradiseCourseRuntime,
-} from './js/paradise-course-runtime.js?v=cebe5fad';
+} from './js/paradise-course-runtime.js?v=4347d73e';
 import {
   createAchievementState,
   applyAchievementProgress as applyAchievementProgressRaw,
@@ -1009,7 +1009,7 @@ import { createPromptSettler, promptId } from './js/prompt-settle.js?v=509ba9cc'
 import { clientKeyAction, createHotkeysSheet, isHotkeySheetRelease, isPlainKey } from './js/client-hotkeys.js?v=31d1891d';
 import { ENCYCLOPEDIA_MENU_LABEL, createEncyclopedia, isEncyclopediaKey } from './js/encyclopedia-links.js?v=eebc2a5d';
 import { EAT_PICK_TEXT, bestFoodIndex, eatChoices, eatTip } from './js/eat-pick.js?v=8fb763d0';
-import { installHeldKeyGuard, isMacPlatform } from './js/held-keys.js?v=98b96620';
+import { heldDirection, installHeldKeyGuard, isMacPlatform } from './js/held-keys.js?v=a28eb293';
 import { signpostArmRows, worldContextAction } from './js/world-context-menu.js?v=f3f48805';
 import { blockedPlayerVerbs, listPlayerTarget, opensPlayerMenu, playerMenuRows } from './js/ui/player-menu.js?v=0b385652';
 import { forgetTexture, frameTexture, isFailed, isLoaded, onFailed, onLoaded, textureFromUrl, whenLoaded } from './js/textures.js?v=f024bd6a';
@@ -14882,8 +14882,10 @@ function handleInput() {
   // PhysicsModel); Pooped and Super Pooped halve walk and jump instead (catalog_buffs.js 1689-1717,
   // hell-feature physics). Energy gates verbs and teleports, not walking.
   const keyed = !followUnderCard;
-  let left = keyed && (keys.has('ArrowLeft') || keys.has('a') || keys.has('A'));
-  let right = keyed && (keys.has('ArrowRight') || keys.has('d') || keys.has('D'));
+  // Report 228: the newest of Left and Right held walks (js/held-keys.js heldDirection).
+  const heldSide = keyed ? heldDirection(keys) : 0;
+  let left = heldSide < 0;
+  let right = heldSide > 0;
   const up = keyed && (keys.has('ArrowUp') || keys.has('w') || keys.has('W'));
   const down = keyed && (keys.has('ArrowDown') || keys.has('s') || keys.has('S'));
   if ((left || right) && (recentInteractionTarget || hoverTarget)) forgetInteractionFocus();
@@ -22381,8 +22383,8 @@ function confirmLeaveParadise() {
 
 function handleParadiseSlideInput() {
   if (!paradiseIsInstanced() || paradiseCourse()?.movement !== 'slide' || !player) return;
-  const left = keys.has('ArrowLeft') || keys.has('a') || keys.has('A');
-  const right = keys.has('ArrowRight') || keys.has('d') || keys.has('D');
+  const left = heldDirection(keys) < 0;
+  const right = heldDirection(keys) > 0;
   const now = movementNow();
   const jumpRequested = hasQueuedJump(jumpState, now);
   const steer = player.onGround ? 0.18 : 0.08;
@@ -22449,8 +22451,9 @@ function handleParadiseFlightInput() {
     setPlayerAnim('idle');
     return;
   }
-  const left = keys.has('ArrowLeft') || keys.has('a') || keys.has('A');
-  const right = keys.has('ArrowRight') || keys.has('d') || keys.has('D');
+  // Report 228: the newest of Left and Right held steers, never both cancelling (js/held-keys.js heldDirection).
+  const left = heldDirection(keys) < 0;
+  const right = heldDirection(keys) > 0;
   const lift =
     keys.has(' ') ||
     keys.has('ArrowUp') ||

@@ -16,6 +16,7 @@
  * vectors. Nothing here reads or copies recording pixels.
  */
 
+import { heldDirection } from './held-keys.js?v=a28eb293';
 import { stepParadiseBody, usesParadiseBody } from './paradise-courses.js?v=1a5d0aa7';
 import { SKY_PLUNGE_FILES } from './sky-plunge-art.js?v=47e01e53';
 import { isLoaded, onLoaded, textureFromUrl } from './textures.js?v=f024bd6a';
@@ -760,8 +761,9 @@ function releaseNoteSign(art, root, course) {
 
 function readInput(keys) {
   return {
-    left: keys.has('ArrowLeft') || keys.has('a') || keys.has('A'),
-    right: keys.has('ArrowRight') || keys.has('d') || keys.has('D'),
+    // Report 228: the newest of Left and Right held (js/held-keys.js heldDirection).
+    left: heldDirection(keys) < 0,
+    right: heldDirection(keys) > 0,
     up: keys.has('ArrowUp') || keys.has('w') || keys.has('W'),
     down: keys.has('ArrowDown') || keys.has('s') || keys.has('S'),
     jumpHeld: keys.has(' ') || keys.has('ArrowUp') || keys.has('w') || keys.has('W'),

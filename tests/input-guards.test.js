@@ -12,7 +12,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { createHeldKeys, installHeldKeyGuard, isMacPlatform, isEditableTarget } from '../public/js/held-keys.js?v=98b96620';
+import { createHeldKeys, installHeldKeyGuard, isMacPlatform, isEditableTarget } from '../public/js/held-keys.js?v=a28eb293';
 
 const game = readFileSync(join(dirname(fileURLToPath(import.meta.url)), '../public/game.js'), 'utf8');
 
@@ -115,7 +115,7 @@ describe('held keys (report 23)', () => {
 
   it('game.js installs the guard and lets go of keys on a new street and when a menu takes the avatar', () => {
     // RIGHTCLICK: game.js also takes isMacPlatform (a Mac's Ctrl+click is its right-click).
-    assert.match(game, /import \{ installHeldKeyGuard, isMacPlatform \} from '\.\/js\/held-keys\.js(\?v=[0-9a-f]{8})?';/);
+    assert.match(game, /import \{ heldDirection, installHeldKeyGuard, isMacPlatform \} from '\.\/js\/held-keys\.js(\?v=[0-9a-f]{8})?';/);
     assert.match(game, /const keys = new Set\(\);\n[\s\S]{0,300}const heldKeys = installHeldKeyGuard\(keys, /);
     assert.match(game, /function clearWorldEntities\(\) \{[\s\S]{0,200}heldKeys\.releaseAll\('street'\);/);
     assert.match(game, /if \(gameplayInputBlocked\(\)\) \{[\s\S]{0,600}if \(!inputWasBlocked\) heldKeys\.releaseAll\('held'\);/);
