@@ -263,7 +263,8 @@ function draw(engine) {
       } else if (shown?.selling) {
         subtitle = `${shown.stock.toLocaleString('en-US')} ${pluralOf(row.display?.classTsid || shown.class)} at ${shown.price.toLocaleString('en-US')}c each`;
       } else if (row.display?.count) subtitle = `${row.display.count.toLocaleString('en-US')} ${row.display.count === 1 ? labelOf(row.display.classTsid) : pluralOf(row.display.classTsid)}`;
-      e.target = engine.register({ featureId: HOME_STORAGE_ID, classId: CLASS_STORAGE, label: name, subtitle, sprite: box, state: { uid: row.id, owner } });
+      // itemClass: the piece's Glitch item, so a click on a cabinet opens it (G661, js/world-context-menu.js).
+      e.target = engine.register({ featureId: HOME_STORAGE_ID, classId: CLASS_STORAGE, label: name, subtitle, sprite: box, state: { uid: row.id, owner, itemClass: row.classTsid } });
     }
     if (shown?.selling) {
       // sdb_cost (getExtraConfig 944-957): the sale price over the box, 55 px up.

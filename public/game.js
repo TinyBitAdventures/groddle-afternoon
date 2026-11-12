@@ -1010,8 +1010,8 @@ import { clientKeyAction, createHotkeysSheet, isHotkeySheetRelease, isPlainKey }
 import { ENCYCLOPEDIA_MENU_LABEL, createEncyclopedia, isEncyclopediaKey } from './js/encyclopedia-links.js?v=eebc2a5d';
 import { EAT_PICK_TEXT, bestFoodIndex, eatChoices, eatTip } from './js/eat-pick.js?v=8fb763d0';
 import { heldDirection, installHeldKeyGuard, isMacPlatform } from './js/held-keys.js?v=a28eb293';
-import { signpostArmRows, worldContextAction } from './js/world-context-menu.js?v=f3f48805';
-import { blockedPlayerVerbs, listPlayerTarget, opensPlayerMenu, playerMenuRows } from './js/ui/player-menu.js?v=e7b35258';
+import { oneClickChoice, signpostArmRows, worldContextAction } from './js/world-context-menu.js?v=2a64801e';
+import { blockedPlayerVerbs, listPlayerTarget, opensPlayerMenu, playerMenuRows } from './js/ui/player-menu.js?v=0b385652';
 import { forgetTexture, frameTexture, isFailed, isLoaded, onFailed, onLoaded, textureFromUrl, whenLoaded } from './js/textures.js?v=f024bd6a';
 import { FALLBACK_MAX as WORLD_ART_FALLBACK_MAX, worldArtFor } from './js/world-art.js?v=0729bf92';
 import { sceneAnim, syncAnim } from './js/deco-anim.js?v=c421b62e';
@@ -31987,6 +31987,15 @@ async function main() {
         // Through the verb path, so street mailboxes (street-furniture) open
         // without a home and the home mailbox still opens the home mail.
         requestVerb(best, { id: 'view_inbox', label: 'Check Mail' }, { run: () => executeVerb(best, 'view_inbox') });
+        return;
+      }
+      // G661 (js/world-context-menu.js GLITCH_ONE_CLICK): Glitch's one-click items run their verb on a
+      // click when it is enabled, else the menu opens (TSFrontController.as 3736-3758); never while
+      // decorating (3736). Enter, a right-click and a long press still open the full menu.
+      const one = !currentAction && !features.query('homeEditMode', engine) ? oneClickChoice(best, () => menuVerbsFor(best)) : null;
+      if (one?.kind === 'run') {
+        setCanvasData('oneClick', `${best.classId || ''}:${one.verb.id}`);
+        requestVerb(best, one.verb);
         return;
       }
       openVerbMenu(best);
