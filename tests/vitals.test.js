@@ -8,12 +8,13 @@ import { fileURLToPath } from 'node:url';
 import {
   VITAL_CRITICAL,
   VITAL_LOW,
+  makingNeeds,
   vitalLevel,
   vitalMenuEmpty,
   vitalMenuHeading,
   vitalSnacks,
   vitalTitle,
-} from '../public/js/vitals.js?v=ca7471dd';
+} from '../public/js/vitals.js?v=85a51302';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -64,6 +65,38 @@ test('vitalSnacks: ordinary Eat and Drink that raise the stat, most first', () =
   assert.deepEqual(vitalSnacks({}), []);
 });
 
+/**
+ * Austin 2026-11-12 (live v0.34.0): "it's currently not possible to eat from this popout menu while
+ * crafting". The original let you: food_eat_conditions (items/include/food.js 3-28) has no making
+ * check, and making_is_making refuses only another making tool (players/inc_making.js 41-48, 80-88).
+ * The menu goes on offering food while a making runs, and keeps back what the batch's next units take.
+ */
+test('makingNeeds: what a running making still takes, by class', () => {
+  const recipe = { inputs: [{ classTsid: 'cheese', qty: 2 }, { classTsid: 'bun', qty: 1 }] };
+  assert.deepEqual(makingNeeds({ recipe, qty: 3, made: 0 }), { cheese: 6, bun: 3 });
+  assert.deepEqual(makingNeeds({ recipe, qty: 3, made: 2 }), { cheese: 2, bun: 1 });
+  assert.deepEqual(makingNeeds({ recipe, qty: 3, made: 3 }), {});
+  // The same class twice adds up; nothing running holds nothing.
+  assert.deepEqual(makingNeeds({ recipe: { inputs: [{ classTsid: 'apple', qty: 1 }, { classTsid: 'apple', qty: 2 }] }, qty: 2, made: 0 }), { apple: 6 });
+  assert.deepEqual(makingNeeds(null), {});
+  assert.deepEqual(makingNeeds({ recipe: {}, qty: 1, made: 0 }), {});
+});
+
+test('vitalSnacks: a running making keeps its units, the rest stay on the menu', () => {
+  const uses = {
+    cheese: { usable: true, verb: 'Eat', effects: { energy: 15 } },
+    apple: { usable: true, verb: 'Eat', effects: { energy: 10 } },
+  };
+  const useInfoFor = (id) => uses[id] || { usable: false, effects: {} };
+  const inv = { cheese: 6, apple: 3 };
+  const held = makingNeeds({ recipe: { inputs: [{ classTsid: 'cheese', qty: 2 }] }, qty: 2, made: 0 });
+  assert.deepEqual(vitalSnacks({ inv, stat: 'energy', useInfoFor, held }).map((s) => [s.classTsid, s.count]), [['cheese', 2], ['apple', 3]]);
+  // Every cheese spoken for: only the apple is offered.
+  assert.deepEqual(vitalSnacks({ inv: { cheese: 4, apple: 3 }, stat: 'energy', useInfoFor, held }).map((s) => s.classTsid), ['apple']);
+  // No making: the whole stack, as before.
+  assert.deepEqual(vitalSnacks({ inv, stat: 'energy', useInfoFor, held: {} }).map((s) => s.count), [6, 3]);
+});
+
 test('game.js draws the states and wires the click to the pack Eat', () => {
   const game = fs.readFileSync(path.join(root, 'public/game.js'), 'utf8');
   assert.match(game, /from '\.\/js\/vitals\.js\?v=[0-9a-f]{8}'/);
@@ -73,7 +106,10 @@ test('game.js draws the states and wires the click to the pack Eat', () => {
   assert.match(topbar, /label: vitalTitle\(stat, text, level\)/);
   assert.match(game, /function installVitalsMenu\(\)/);
   assert.match(game, /installVitalsMenu\(\);/);
-  assert.match(game, /vitalSnacks\(\{ inv, stat, useInfoFor: getPackUseInfo \}\)/);
+  assert.match(game, /vitalSnacks\(\{ inv, stat, useInfoFor: getPackUseInfo, held: makingNeeds\(activeCraftSession\) \}\)/);
+  // Eating never touches the making: the menu's path has no cancel or close of the Make panel.
+  const menu = game.slice(game.indexOf('function refreshVitalsMenu()'), game.indexOf('function installPlayerMenu()'));
+  assert.doesNotMatch(menu, /cancelMakeCraft|closeMakePanel|activeCraftSession = /);
   assert.match(game, /usePackItem\(btn\.dataset\.vitalUse, 1\)/);
 });
 

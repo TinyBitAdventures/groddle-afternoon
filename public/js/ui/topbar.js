@@ -16,7 +16,7 @@
  * game.js: it calls renderTopBar() from updateHud and installTopBar() once.
  * The pure helpers below are tested without a DOM (tests/topbar.test.js).
  */
-import { vitalLevel, vitalTitle } from '../vitals.js?v=ca7471dd';
+import { vitalLevel, vitalTitle } from '../vitals.js?v=85a51302';
 import { loadAudioRestore, saveAudioRestore } from '../audio-pref.js?v=6fe817bc';
 import { ZOOM_FIXED_NOTE, ZOOM_KEYS_HINT, clampZoom, zoomLabel, zoomValueText } from '../world-zoom.js?v=1d0c0cfb';
 import { NIGHT_TINT_HINT, NIGHT_TINT_LABEL } from '../night-tint.js?v=1dfc9c89';

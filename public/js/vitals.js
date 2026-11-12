@@ -47,16 +47,40 @@ export function vitalMenuEmpty(stat) {
 }
 
 /**
+ * What a making in progress still takes from the pack, by class: each input
+ * times the units not made yet. `session` is game.js activeCraftSession
+ * ({ recipe: { inputs: [{ classTsid, qty }] }, qty, made }), or null.
+ *
+ * The original let you eat while a making ran: food_eat_conditions
+ * (items/include/food.js 3-28) has no making check, making_is_making only
+ * refuses another making tool (players/inc_making.js 41-48, 80-88, 1736),
+ * and the MakingDialog was not modal (glitch-client MakingDialog.as). The
+ * menu leaves these units in the pack, so a snack never stops the batch.
+ */
+export function makingNeeds(session) {
+  const out = {};
+  const left = Math.max(0, Math.floor(Number(session?.qty) || 0) - Math.floor(Number(session?.made) || 0));
+  if (!left) return out;
+  for (const inp of session?.recipe?.inputs || []) {
+    const per = Math.floor(Number(inp?.qty) || 0);
+    if (!inp?.classTsid || per < 1) continue;
+    out[inp.classTsid] = (out[inp.classTsid] || 0) + per * left;
+  }
+  return out;
+}
+
+/**
  * Pack items that raise `stat` ('energy' or 'mood') through the ordinary
  * Eat or Drink, most first: [{ classTsid, count, gain, verb }].
  * useInfoFor(classTsid) is game.js getPackUseInfo (a feature's own verb,
  * buff herbs and one-off actions such as tickets are left out).
+ * `held` ({ classTsid: n }, makingNeeds) is kept back from each count.
  */
-export function vitalSnacks({ inv, stat, useInfoFor, limit = 5 } = {}) {
+export function vitalSnacks({ inv, stat, useInfoFor, limit = 5, held = {} } = {}) {
   const out = [];
   if (!inv || typeof useInfoFor !== 'function') return out;
   for (const [classTsid, n] of Object.entries(inv)) {
-    const count = Math.floor(Number(n) || 0);
+    const count = Math.floor(Number(n) || 0) - Math.max(0, Math.floor(Number(held?.[classTsid]) || 0));
     if (count < 1) continue;
     const info = useInfoFor(classTsid);
     if (!info?.usable || info.buff || info.singleAction || info.paradise) continue;

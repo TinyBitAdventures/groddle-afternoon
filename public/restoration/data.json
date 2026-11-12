@@ -2752,9 +2752,24 @@
   "deployed": "2026-11-12"
  },
  "git": {
-  "commits": 1719,
+  "commits": 1722,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-12",
+    "kind": "improve",
+    "text": "Something to eat keeps back what a running making still needs"
+   },
+   {
+    "date": "2026-11-12",
+    "kind": "fix",
+    "text": "The top bar's popovers open over an open side sheet, so you can eat while making"
+   },
+   {
+    "date": "2026-11-12",
+    "kind": "fix",
+    "text": "The character chip loads your characters"
+   },
    {
     "date": "2026-11-12",
     "kind": "fix",
@@ -2859,21 +2874,6 @@
     "date": "2026-11-12",
     "kind": "fix",
     "text": "The Butler's Leave it button stays in view under a long pick list"
-   },
-   {
-    "date": "2026-11-12",
-    "kind": "fix",
-    "text": "Winter Walk motes can't be farmed by leaving, pay Glitch's quoin amounts, and each street opens with you on its spawn"
-   },
-   {
-    "date": "2026-11-12",
-    "kind": "fix",
-    "text": "A thing your side can't reach behind a floor is reached from its other side, and a test holds every street's layout to the server's"
-   },
-   {
-    "date": "2026-11-12",
-    "kind": "fix",
-    "text": "Mail can carry what Glitch let you mail, such as CrabPod Headphones"
    }
   ]
  },

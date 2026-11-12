@@ -743,7 +743,7 @@ import {
 import { easeCameraAxis } from './js/camera-feel.js?v=e668afc5';
 import { renderResolution, resolutionCap, RESOLUTION_STEP } from './js/render-density.js?v=20f9f1ee';
 // g458: low energy and mood turn amber and red, and a click offers something from the pack.
-import { vitalMenuEmpty, vitalMenuHeading, vitalSnacks } from './js/vitals.js?v=ca7471dd';
+import { makingNeeds, vitalMenuEmpty, vitalMenuHeading, vitalSnacks } from './js/vitals.js?v=85a51302';
 import { DEFAULT_VP_H, LOCATION_VIEW_W, VIEW_CEIL_H, stageFor, sceneViewCap, sceneViewWidthCap, zoomMovesStage } from './js/location-view.js?v=f1f922b4';
 import {
   levelInfoForXp,
@@ -987,7 +987,7 @@ import { installHiresIcons } from './js/icon-hires.js?v=165dbd6e';
 import { installHiresDecos } from './js/deco-hires.js?v=9fd4ee86';
 import { loadAudioLevels, loadMutedPreference, saveAudioLevel, saveMutedPreference } from './js/audio-pref.js?v=6fe817bc';
 import { createAudioBuses, fadeGain } from './js/audio-buses.js?v=af167b54';
-import { installTopBar, renderTopBar } from './js/ui/topbar.js?v=ab9f6a0c';
+import { installTopBar, renderTopBar } from './js/ui/topbar.js?v=65bd7e6a';
 import { focusBack, installFocusReturn, lastInput } from './js/ui/focus-return.js?v=da190597';
 import { installContextGuard } from './js/ui/context-guard.js?v=0f71ac17';
 import { QUOIN_FRAME_BOB, advanceQuoinClock, quoinBobBetweenFrames } from './js/quoin-motion.js?v=ea0bd408';
@@ -1708,7 +1708,8 @@ function refreshVitalsMenu() {
   const menu = document.getElementById('vitals-menu');
   if (!menu || menu.hidden || !vitalsMenuFor) return;
   const stat = vitalsMenuFor;
-  const snacks = vitalSnacks({ inv, stat, useInfoFor: getPackUseInfo });
+  // A making in progress keeps what its next units take (js/vitals.js makingNeeds): eating goes on beside it.
+  const snacks = vitalSnacks({ inv, stat, useInfoFor: getPackUseInfo, held: makingNeeds(activeCraftSession) });
   const max = stat === 'mood' ? moodMax(pc) : energyCap();
   const now = stat === 'mood' ? pc.mood : pc.energy;
   const unit = stat === 'mood' ? 'mood' : 'energy';
