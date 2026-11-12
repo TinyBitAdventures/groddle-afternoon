@@ -55,8 +55,8 @@
  * signpost are drawn here.
  */
 
-import { textureFromUrl } from '../textures.js?v=f024bd6a';
-import { butlerApi } from '../features/butler-feature.js?v=49a2938b';
+import { textureFromUrl } from '../textures.js?v=92ec53cd';
+import { butlerApi } from '../features/butler-feature.js?v=002f6959';
 
 // source: questInstanceLocation(..., 5*60) -> instances_schedule_exit_prompt (a prompt, not a clock).
 export const EXIT_PROMPT_MS = 5 * 60 * 1000;

@@ -2752,9 +2752,39 @@
   "deployed": "2026-11-12"
  },
  "git": {
-  "commits": 1753,
+  "commits": 1760,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-12",
+    "kind": "fix",
+    "text": "Far street layers fit every sharp copy in their budget on desktop"
+   },
+   {
+    "date": "2026-11-12",
+    "kind": "fix",
+    "text": "Winter Walk and Winter Haven floors draw their spots round and crisp"
+   },
+   {
+    "date": "2026-11-12",
+    "kind": "fix",
+    "text": "Fireflies fly at 3x on Retina screens"
+   },
+   {
+    "date": "2026-11-12",
+    "kind": "fix",
+    "text": "Home-street houses, Firebog's ground fronts and Grimssea's bark knot draw crisp on Retina screens"
+   },
+   {
+    "date": "2026-11-12",
+    "kind": "fix",
+    "text": "Quest rooms draw their decos from the sharp copies on Retina screens"
+   },
+   {
+    "date": "2026-11-12",
+    "kind": "fix",
+    "text": "Homes, the meditation orb and quest-room animations see the real render density"
+   },
    {
     "date": "2026-11-12",
     "kind": "improve",
@@ -2844,39 +2874,9 @@
     "date": "2026-11-12",
     "kind": "fix",
     "text": "iOS shows the Upgrades cards' fronts, not their backs mirrored"
-   },
-   {
-    "date": "2026-11-12",
-    "kind": "fix",
-    "text": "On a short screen side sheets run to the floor, so Quests, Make, Skills and the vendor show more than one item"
-   },
-   {
-    "date": "2026-11-12",
-    "kind": "fix",
-    "text": "On a short screen the start card's Skip to Ur and Customize look first sit above the pack row"
-   },
-   {
-    "date": "2026-11-12",
-    "kind": "fix",
-    "text": "The stick and Jump wait while the start card is up"
-   },
-   {
-    "date": "2026-11-12",
-    "kind": "fix",
-    "text": "The Menu scrolls and stops above the pack row on a short screen, so Settings can be reached on a phone"
-   },
-   {
-    "date": "2026-11-12",
-    "kind": "fix",
-    "text": "A narrow window (every phone) reaches Mail and Imagination from the Menu and shows the currants"
-   },
-   {
-    "date": "2026-11-12",
-    "kind": "improve",
-    "text": "Panels on a phone: close buttons are 44 px targets, no window wider than the screen"
    }
   ]
  },
- "tests": 877,
+ "tests": 882,
  "generatedAt": "2026-11-12"
 }
