@@ -11,13 +11,14 @@
     every stylesheet, Pixi and game file, and stops the page before any of them load. A device with
     a fine pointer (a mouse or trackpad) always gets the game; localStorage groddle-play-device
     "full" (the companion's Load the full game anyway) or "companion" overrides the guess.
+    It also names the device in window.GRODDLE_DEVICE ("phone", "tablet" or "computer"), even
+    when the stored choice lets it play: a phone draws at render resolution 1 (js/render-density.js).
   -->
   <script id="phone-gate">
     (function phoneGate(w, d) {
       var KEY = 'groddle-play-device';
       var choice = '';
       try { choice = String(w.localStorage.getItem(KEY) || ''); } catch (e) { choice = ''; }
-      if (choice === 'full') return;
       var n = w.navigator || {};
       var ua = String(n.userAgent || '');
       var touch = Number(n.maxTouchPoints) || 0;
@@ -28,7 +29,10 @@
       var side = Math.min(Number(s.width) || 0, Number(s.height) || 0);
       var phone = /iPhone|iPod|Android.+Mobile|Windows Phone|IEMobile|Opera Mini|BlackBerry|webOS/.test(ua);
       var tablet = /iPad|Android|Silk|Kindle|Tablet/.test(ua) || (/Macintosh/.test(ua) && touch > 1);
-      var companion = choice === 'companion' || phone || (coarse && !fine) || (tablet && !fine) || (touch > 0 && side > 0 && side < 500);
+      var small = touch > 0 && side > 0 && side < 500;
+      w.GRODDLE_DEVICE = phone || small ? 'phone' : tablet ? 'tablet' : 'computer';
+      if (choice === 'full') return;
+      var companion = choice === 'companion' || phone || (coarse && !fine) || (tablet && !fine) || small;
       if (!companion) return;
       var to = new URL('play/phone/', d.baseURI);
       if (/\/play\/$/.test(w.location.pathname)) to.search = '?from=solo';
@@ -981,6 +985,6 @@
   </div>
   <!-- Password managers skip the game's own boxes (chat, searches, names); the account forms keep autofill. -->
   <script type="module" src="js/no-autofill.js?v=6a1a4382"></script>
-  <script type="module" src="game.js?v=f0a7bf35"></script>
+  <script type="module" src="game.js?v=bdc05db0"></script>
 </body>
 </html>

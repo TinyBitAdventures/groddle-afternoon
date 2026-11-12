@@ -10,10 +10,15 @@
  *
  *   node tools/qa/street-memory.mjs [--base=http://127.0.0.1:8799/play/] [--dwell=25] [--out=file.json]
  *     [--route=hell|normal|<tsid,tsid,...>] [--width=1440 --height=810] [--dpr=2] [--engine=webkit]
+ *     [--phone] [--query=density=4]
  *
  * --engine=webkit runs Playwright's WebKit (Safari's engine) and reads the physical footprint
  * (footprint(1), what Safari's memory reload weighs) of its WebContent and GPU processes; it has
  * no performance.memory.
+ *
+ * --phone dresses the context as an iPhone (its user agent, touch) that took the companion's
+ * Load the full game anyway, so the phone gate classes it a phone (js/render-density.js caps
+ * the render resolution). --query appends to the page's query (density=4 lifts that cap).
  *
  * The default route starts on Hechey Track, walks three Groddle streets, the six Naraka streets
  * from Hell One, then three Groddle streets again. Takes the one-browser lock.
@@ -25,8 +30,8 @@ import { acquireLock } from './browser-lock.mjs';
 import { webkit } from 'playwright';
 
 const flags = Object.fromEntries(process.argv.slice(2).filter((a) => a.startsWith('--')).map((a) => {
-  const [k, v] = a.slice(2).split('=');
-  return [k, v ?? true];
+  const at = a.indexOf('=');
+  return at < 0 ? [a.slice(2), true] : [a.slice(2, at), a.slice(at + 1)];
 }));
 const BASE = String(flags.base || 'http://127.0.0.1:8799/play/').replace(/\/?$/, '/');
 const DWELL = Number(flags.dwell || 25) * 1000;
@@ -38,6 +43,8 @@ const routes = {
   normal: [...NORMAL_A, ...NORMAL_B, ...NORMAL_A],
 };
 const route = routes[flags.route || 'hell'] || String(flags.route).split(',');
+const IPHONE_UA = 'Mozilla/5.0 (iPhone; CPU iPhone OS 19_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/19.0 Mobile/15E148 Safari/604.1';
+const EXTRA_QUERY = flags.query ? `&${flags.query}` : '';
 
 /** Resident memory (MB) of this Chrome's renderer and GPU processes. */
 function processMemory() {
@@ -93,16 +100,19 @@ try {
   const ctx = await browser.newContext({
     viewport: { width: Number(flags.width || 1440), height: Number(flags.height || 810) },
     deviceScaleFactor: Number(flags.dpr || 2),
+    ...(flags.phone ? { userAgent: IPHONE_UA, hasTouch: true, isMobile: true } : {}),
   });
+  if (flags.phone) await ctx.addInitScript(() => { try { localStorage.setItem('groddle-play-device', 'full'); } catch {} });
   const page = await ctx.newPage();
-  await page.goto(`${BASE}?autostart=1&questoffer=off&fresh=1&resetgame=1&memqa=1&streetdemo=${route[0]}`, { waitUntil: 'load' });
+  await page.goto(`${BASE}?autostart=1&questoffer=off&fresh=1&resetgame=1&memqa=1&streetdemo=${route[0]}${EXTRA_QUERY}`, { waitUntil: 'load' });
   await page.waitForFunction(() => window.groddleQA?.travel && !document.body.classList.contains('is-booting'), null, { timeout: 60000 });
+  console.log(JSON.stringify(await page.evaluate(() => ({ device: window.GRODDLE_DEVICE ?? null, touch: navigator.maxTouchPoints, screen: [screen.width, screen.height] }))));
   const sample = async (tsid, step) => {
     const m = await page.evaluate(() => {
       try { globalThis.gc?.(); } catch {}
       const r = window.groddleQA.renderStats();
       const s = window.groddleQA.snapshot();
-      return { street: s?.street?.label || '', gpuTextures: r.gpuTextures, gpuTextureMB: r.gpuTextureMB, images: r.images, heapMB: performance.memory ? +(performance.memory.usedJSHeapSize / 1048576).toFixed(1) : null, extra: window.groddleQA.memoryStats?.() || null };
+      return { street: s?.street?.label || '', resolution: r.resolution, gpuTextures: r.gpuTextures, gpuTextureMB: r.gpuTextureMB, images: r.images, heapMB: performance.memory ? +(performance.memory.usedJSHeapSize / 1048576).toFixed(1) : null, extra: window.groddleQA.memoryStats?.() || null };
     });
     const row = { step, tsid, ...m, decodedMB: +((m.images?.mpx || 0) * 4).toFixed(1), ...(isWebkit ? webkitFootprint() : processMemory()) };
     rows.push(row);

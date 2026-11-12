@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { MAX_RENDER_RESOLUTION, renderResolution } from '../public/js/render-density.js?v=ae0941e5';
+import { MAX_RENDER_RESOLUTION, renderResolution } from '../public/js/render-density.js?v=20f9f1ee';
 
 test('backing store matches the displayed canvas density', () => {
   // 1574 CSS px on Retina: the old fixed 2x store was upscaled 1.64x.
@@ -18,4 +18,11 @@ test('never drops below 1 or above the cap', () => {
 test('falls back to the view width and a dpr of 1', () => {
   assert.equal(renderResolution(0, 960, 0), 1);
   assert.equal(renderResolution(undefined, 960, undefined), 1);
+});
+
+test('a cap below the top holds the resolution there, and a bad cap falls back to the top', () => {
+  assert.equal(renderResolution(874, 960, 3, 1), 1);
+  assert.equal(renderResolution(1574, 960, 2, 2), 2);
+  assert.equal(renderResolution(1574, 960, 2, 0), 3.3);
+  assert.equal(renderResolution(2560, 960, 2, 9), MAX_RENDER_RESOLUTION);
 });

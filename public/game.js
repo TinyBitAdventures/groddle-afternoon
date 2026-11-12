@@ -741,7 +741,7 @@ import {
   cameraWorldHeightForGround,
 } from './js/movement.js?v=b30f84eb';
 import { easeCameraAxis } from './js/camera-feel.js?v=e668afc5';
-import { renderResolution, RESOLUTION_STEP } from './js/render-density.js?v=ae0941e5';
+import { renderResolution, resolutionCap, RESOLUTION_STEP } from './js/render-density.js?v=20f9f1ee';
 // g458: low energy and mood turn amber and red, and a click offers something from the pack.
 import { vitalMenuEmpty, vitalMenuHeading, vitalSnacks } from './js/vitals.js?v=ca7471dd';
 import { DEFAULT_VP_H, LOCATION_VIEW_W, VIEW_CEIL_H, stageFor, sceneViewCap, sceneViewWidthCap, zoomMovesStage } from './js/location-view.js?v=f1f922b4';
@@ -1840,11 +1840,23 @@ function installPlayerMenu() {
   });
 }
 
+/**
+ * This device's top render resolution (js/render-density.js resolutionCap): 1 on a phone (the
+ * phone gate's window.GRODDLE_DEVICE), so a phone tab stays clear of iOS's memory limit.
+ * QA: `?density=<n>` caps at n (4 lifts the phone cap), `?density=auto` keeps the device's own.
+ */
+const RENDER_CAP = resolutionCap({ device: window.GRODDLE_DEVICE, density: new URLSearchParams(location.search).get('density') });
+
+/** Device px per CSS px the art may pick its files by: a capped phone keeps the 1x sheets. */
+function artDpr() {
+  return Math.min(window.devicePixelRatio || 1, RENDER_CAP);
+}
+
 /** Keep the backing store at the canvas's displayed density (js/render-density.js). */
 function syncRenderResolution() {
   if (!app?.renderer || !app.canvas) return;
   const cssWidth = app.canvas.getBoundingClientRect().width;
-  const next = renderResolution(cssWidth, VIEW_W, window.devicePixelRatio || 1);
+  const next = renderResolution(cssWidth, VIEW_W, window.devicePixelRatio || 1, RENDER_CAP);
   if (Math.abs(next - app.renderer.resolution) < RESOLUTION_STEP / 2) return;
   app.renderer.resize(VIEW_W, VIEW_H, next);
   app.canvas.dataset.renderResolution = String(next);
@@ -1926,7 +1938,7 @@ function syncLocationViewHeight({ keepFraming = false } = {}) {
   VIEW_W = stage.viewW;
   if (app?.renderer) {
     // A scene can change the scale without the canvas changing size: keep the density with it.
-    const resolution = renderResolution(stage.cssWidth, VIEW_W, window.devicePixelRatio || 1);
+    const resolution = renderResolution(stage.cssWidth, VIEW_W, window.devicePixelRatio || 1, RENDER_CAP);
     app.renderer.resize(VIEW_W, VIEW_H, resolution);
     app.canvas.dataset.renderResolution = String(resolution);
     app.canvas.dataset.locationViewportHeight = String(LOCATION_VIEW_H);
@@ -10929,7 +10941,7 @@ const VECTOR_BAKE_ASKED_MS = 2000;
 
 /** Device pixels per art pixel decide the bake: 3x like js/sprite-hires.js, else 1x. */
 function vectorBakeScale() {
-  const dpr = window.devicePixelRatio || 1;
+  const dpr = artDpr();
   // The stage's zoom (g458: about 1:1 to 1680 px wide, then magnified), not the window over 960.
   return dpr * Math.max(1, STAGE_SCALE) >= 1.5 ? 3 : 1;
 }
@@ -30074,7 +30086,7 @@ async function main() {
   // 3x pack icons in Pixi sprites and <img>s, at their original sizes.
   installHiresIcons(textureUrls);
   // 3x animal sheets from the vector SWFs (js/sprite-hires.js), same frame rects.
-  installHiresSprites(textureUrls, { viewWidth: LOCATION_VIEW_W * Math.max(1, STAGE_SCALE) });
+  installHiresSprites(textureUrls, { dpr: artDpr(), viewWidth: LOCATION_VIEW_W * Math.max(1, STAGE_SCALE) });
   // Street decos load as WebP, 3x on Retina (js/deco-hires.js), same logical sizes.
   installHiresDecos(textureUrls, { renderer: () => app?.renderer });
   app = new PIXI.Application();
@@ -30083,7 +30095,7 @@ async function main() {
     height: VIEW_H,
     background: 0x8ec8e8,
     antialias: false,
-    resolution: renderResolution(VIEW_W, VIEW_W, window.devicePixelRatio || 1),
+    resolution: renderResolution(VIEW_W, VIEW_W, window.devicePixelRatio || 1, RENDER_CAP),
     autoDensity: true,
     preference: rendererPreference(),
     // GPU textures unused for 20 s (culled decos, old streets) are freed.
