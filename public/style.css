@@ -13728,6 +13728,11 @@ body.is-booting .touch-controls { display: none; }
   -webkit-tap-highlight-color: transparent;
 }
 .touch-jump.is-held { background: var(--surface-moss); transform: scale(0.94); }
+/* The on-screen keyboard is up (js/touch-controls.js watchPhoneKeyboard; the mobile QA, 2026-11-12: the
+   pack row jumped to the middle of the shrunken screen): the stick, Jump and the pack row wait, unless
+   the typing is in the pack's own search. */
+:root.touch-phone.kbd-up .touch-controls { display: none; }
+:root.touch-phone.kbd-up .pack-bar:not(:focus-within) { visibility: hidden; }
 @media (prefers-reduced-motion: reduce) {
   .touch-stick-base { transition: none; }
   .touch-jump.is-held { transform: none; }

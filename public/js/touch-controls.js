@@ -227,14 +227,78 @@ export function installTouchControls({ root, press, release, jump, tapThrough = 
     endJump();
   };
   win.addEventListener('blur', releaseAll);
+  const keyboard = watchPhoneKeyboard({ doc, win });
   return {
     el,
     releaseAll,
     destroy() {
       releaseAll();
       win.removeEventListener('blur', releaseAll);
+      keyboard.destroy();
       el.remove();
       doc.documentElement.classList.remove('touch-phone');
+    },
+  };
+}
+
+/** A field the on-screen keyboard opens for. */
+export function isTypingField(node) {
+  const tag = String(node?.tagName || '').toLowerCase();
+  if (tag === 'textarea' || node?.isContentEditable) return true;
+  if (tag !== 'input') return false;
+  return !/^(button|submit|reset|checkbox|radio|range|color|file|image|hidden)$/i.test(String(node.type || 'text'));
+}
+
+/**
+ * PURE: whether the on-screen keyboard is up: a typing field has focus and the screen it leaves is
+ * under three quarters of the height the page had without it (Android shrinks the window, iOS the
+ * visual viewport).
+ */
+export function keyboardUp({ typing, height, visualHeight, baseHeight }) {
+  const base = Number(baseHeight) || 0;
+  if (!typing || base <= 0) return false;
+  const seen = Math.min(Number(height) || base, Number(visualHeight) || base);
+  return seen < base * 0.75;
+}
+
+/**
+ * The on-screen keyboard on a phone (the mobile QA, 2026-11-12: with chat open the window shrank,
+ * and the pack row jumped up to the middle of the screen with the stick and Jump beside it).
+ * While it is up, html.kbd-up (style.css TOUCH) puts away the pack row (unless you type in its
+ * search) and the stick and Jump; when it goes, iOS's leftover page scroll is put back to the top.
+ */
+export function watchPhoneKeyboard({ doc = globalThis.document, win = globalThis.window } = {}) {
+  const html = doc?.documentElement;
+  if (!html || !win) return { destroy() {} };
+  const vv = win.visualViewport || null;
+  let base = Number(win.innerHeight) || 0;
+  const typing = () => isTypingField(doc.activeElement);
+  const sync = () => {
+    const h = Number(win.innerHeight) || 0;
+    if (!typing()) base = Math.max(h, Number(vv?.height) || 0);
+    const up = keyboardUp({ typing: typing(), height: h, visualHeight: vv?.height, baseHeight: base });
+    if (html.classList.contains('kbd-up') !== up) html.classList.toggle('kbd-up', up);
+  };
+  const settle = () => {
+    // After the field lets go: the keyboard closes and iOS can leave the page scrolled up.
+    win.setTimeout(() => {
+      sync();
+      if (!typing() && (win.scrollY || win.pageYOffset)) win.scrollTo(0, 0);
+    }, 120);
+  };
+  const onFocusIn = () => win.setTimeout(sync, 300);
+  win.addEventListener('resize', sync);
+  vv?.addEventListener?.('resize', sync);
+  doc.addEventListener('focusin', onFocusIn);
+  doc.addEventListener('focusout', settle);
+  return {
+    sync,
+    destroy() {
+      win.removeEventListener('resize', sync);
+      vv?.removeEventListener?.('resize', sync);
+      doc.removeEventListener('focusin', onFocusIn);
+      doc.removeEventListener('focusout', settle);
+      html.classList.remove('kbd-up');
     },
   };
 }
