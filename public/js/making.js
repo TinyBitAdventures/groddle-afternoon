@@ -31,6 +31,8 @@ import {
   wondrousWeave,
 } from './imagination-effects.js?v=70169933';
 import { grantMoodXp } from './mood-xp.js?v=958e7680';
+import { levelInfoForXp } from './progression.js?v=33462eaa';
+import { getGameDayKey } from './game-day.js?v=84569fa2';
 import { loseEnergy, loseMood } from './metabolics.js?v=8504134e';
 
 /**
@@ -397,6 +399,44 @@ export function isGrinderRecipe(recipe) {
  */
 export const GRINDER_DROPS_REMAINDER = Object.freeze(['barnacle_talc']);
 export const GRINDER_DROP_RISE = 29;
+
+/** inc_making.js 1540: the line once a recipe's iMG for the day is used up. */
+export const MAKING_XP_CAP_LINE = "You'll receive no more iMG from making these today. The creation process has ceased to stimulate your frontal cortex.";
+
+/**
+ * inc_making.js making_get_xp_ceiling (1554-1574): the iMG one recipe can give in a game day,
+ * by level: 250 to level 5, 500 to 10, then a share of the level's XP span (10% at 11, a
+ * quarter point less each level to 30; 5% after), and level 60's hard-coded 85447.4.
+ */
+export function makingXpCeiling(xp) {
+  const info = levelInfoForXp(xp);
+  const level = info.level;
+  if (level <= 5) return 250;
+  if (level <= 10) return 500;
+  const span = info.needed || 0;
+  if (level <= 30) return (0.10 - 0.0025 * (level - 11)) * span;
+  if (level >= 60) return 85447.4;
+  return 0.05 * span;
+}
+
+/**
+ * inc_stats.js stats_add_making_xp_today (748-768): a recipe's iMG today, held to the ceiling
+ * (apiSetLimits, apiInc gives what fits), the count on pc.recipeXpToday and started over on a
+ * new game day (player.js 1049 deletes recipe_xp_today). config_prod.js 1327 recipe_xp_caps.
+ * Returns what may be given, before the mood bonus (inc_making.js 1539-1546).
+ */
+export function capRecipeXp(pc, recipeId, xpReward, now = Date.now()) {
+  const want = Math.max(0, Number(xpReward) || 0);
+  if (!pc || !want) return { actual: want, capped: false };
+  const day = getGameDayKey(now);
+  if (!pc.recipeXpToday || pc.recipeXpToday.day !== day) pc.recipeXpToday = { day, recipes: {} };
+  const id = String(recipeId);
+  const so = Math.max(0, Number(pc.recipeXpToday.recipes[id]) || 0);
+  const ceiling = makingXpCeiling(pc.xp);
+  const actual = Math.max(0, Math.min(want, ceiling - so));
+  pc.recipeXpToday.recipes[id] = so + actual;
+  return { actual, capped: actual < want };
+}
 
 /** common.js pluralize: "1 Red Element", "12 Red Elements". */
 export function pluralizeItem(n, classTsid) {
@@ -1191,8 +1231,10 @@ export function craftRecipe(inv, pc, recipeKey, opts = {}) {
 
   // inc_making.js 1530: metabolics_lose_energy(energy_cost) (nothing while dead).
   const energyLost = loseEnergy(pc, cost);
-  // inc_making.js 1546: stats_add_xp(actual, false) takes the mood bonus.
-  const recipeXp = recipe.xpReward ? grantMoodXp(pc, recipe.xpReward) : 0;
+  // inc_making.js 1539-1546: the day's cap for this recipe first, then stats_add_xp(actual, false),
+  // which takes the mood bonus.
+  const xpCap = recipe.xpReward ? capRecipeXp(pc, recipe.id ?? recipeKey, recipe.xpReward, opts.now ?? Date.now()) : { actual: 0, capped: false };
+  const recipeXp = xpCap.actual ? grantMoodXp(pc, xpCap.actual) : 0;
   const rng = opts.rng || Math.random;
   if (unitIndex === 1 || batchExtras?.recipeKey !== recipeKey) {
     batchExtras = { recipeKey, swap: null, items: [], lines: [], xp: 0, destroyed: {} };
@@ -1203,6 +1245,7 @@ export function craftRecipe(inv, pc, recipeKey, opts = {}) {
     }
   }
   batchExtras.xp = (Number(batchExtras.xp) || 0) + recipeXp;
+  if (xpCap.capped) batchExtras.xpCapped = true;
   const swap = batchExtras.swap;
   // The Grinder keeps what the pack can carry (opts.room(cls, n) -> how many
   // fit) and destroys the rest instead of handing it to the magic rock;
@@ -1271,6 +1314,7 @@ export function craftRecipe(inv, pc, recipeKey, opts = {}) {
     msgs: [
       `You made ${recipe.name} with ${toolLabel} (${outLabels}). −${energyLost} energy, +${recipeXp} iMG.`,
       ...(bonusImagination ? [`Bonus imagination! +${bonusImagination} iMG.`] : []),
+      ...(xpCap.capped ? [MAKING_XP_CAP_LINE] : []),
       ...(unitIndex === 1 && swap ? [batchExtras.lines[0]] : []),
       ...(toolUse?.broke ? [toolUse.msg] : []),
     ],
@@ -1499,6 +1543,7 @@ export function buildCraftBatchResult(inv, pc, recipeKey, made, qtyRequested = m
         xp,
       }),
     ...(extras?.lines || []),
+    ...(extras?.xpCapped ? [MAKING_XP_CAP_LINE] : []),
   ].join(' ');
 
   return {

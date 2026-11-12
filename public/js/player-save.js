@@ -121,6 +121,10 @@ export function normalizePlayerSnapshot(seed = {}, fallback = PLAYER_DEFAULTS) {
     ...(source.aggressiveOff === true ? { aggressiveOff: true } : {}),
     // The Scraper's Party Scraping switch (scraper.js 70-128, pc.party_scraping); off unless turned on.
     ...(source.partyScraping === true ? { partyScraping: true } : {}),
+    // Each recipe's iMG this game day (js/making.js capRecipeXp; inc_stats.js recipe_xp_today).
+    ...(source.recipeXpToday && typeof source.recipeXpToday.day === 'string'
+      ? { recipeXpToday: { day: source.recipeXpToday.day, recipes: Object.fromEntries(Object.entries(cleanScalarRecord(source.recipeXpToday.recipes)).filter(([, v]) => typeof v === 'number' && v >= 0)) } }
+      : {}),
   };
 }
 
