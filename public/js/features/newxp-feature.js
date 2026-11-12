@@ -3517,6 +3517,8 @@ function teardown(engine) {
   }
   engine.setData('newxpStatus', save.status);
   engine.setData('newxpStage', save.stage);
+  // Austin 2026-11-12: a player still in the tutorial sees no street project status (the featured pill and row).
+  if (typeof document !== 'undefined') document.body?.classList.toggle('nx-tutorial', active());
   if (auto) engine.setData('newxpAutoplay', save.status === 'done' ? 'done' : save.status);
 }
 
@@ -3687,6 +3689,8 @@ function publish(engine, now) {
   lastData = now;
   engine.setData('newxpStatus', save.status);
   engine.setData('newxpStage', save.stage);
+  // Austin 2026-11-12: a player still in the tutorial sees no street project status (the featured pill and row).
+  if (typeof document !== 'undefined') document.body?.classList.toggle('nx-tutorial', active());
   engine.setData('newxpUpgrades', save.upgrades.join(','));
   engine.setData('newxpIsland', save.island);
   engine.setData('newxpRooted', rooted ? '1' : '0');

@@ -142,11 +142,11 @@ import { SIGN_ARMS, routeGraph } from '../map-routes.js?v=c7e7dc80';
 import { TELEPORTERS } from '../hidden-floors.js?v=732a2610';
 import { WINTRY_PORTAL_TELEPORTERS } from '../wintry-portal.js?v=1437deda';
 import { PROJECTS_TEXT, contributedJobs, mineTotal, projectEntry, projectList } from '../projects-tracker.js?v=edd58b99';
-import { PROJECTS_PANEL_ID, buildProjectsPanel, renderProjects } from '../ui/projects-sheet.js?v=56d4acbc';
+import { PROJECTS_PANEL_ID, buildProjectsPanel, renderProjects } from '../ui/projects-sheet.js?v=e32a73d1';
 import { SIDE_SHEET_IDS } from '../ui/panel-shell.js?v=e2abdf9e';
 import { trophyGotText } from '../home-trophies.js?v=2020b29b';
 import { FEATURED_TEXT, featuredChanged, featuredFromServer } from '../featured-project.js?v=31ce4607';
-import { renderFeaturedPill, renderFeaturedRow } from '../ui/featured-project.js?v=1d2fd2e9';
+import { renderFeaturedPill, renderFeaturedRow } from '../ui/featured-project.js?v=2cf77d29';
 import { GEM_HINTS, isGem } from '../gem-hints.js?v=4b65f7ac';
 
 export const STREET_JOBS_FEATURE_ID = 'street-jobs';

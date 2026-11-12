@@ -22,6 +22,7 @@ const STYLE = `
   border: 1px solid var(--border); border-radius: var(--radius-pill); background: var(--surface); color: var(--text); box-shadow: var(--shadow-2);
   font: var(--fw-bold) var(--fs-xs)/var(--lh-tight) var(--font-ui); white-space: nowrap; cursor: pointer; pointer-events: auto; }
 .featured-pill[hidden] { display: none; }
+body.nx-tutorial .featured-pill, body.nx-tutorial .featured-row { display: none; }
 .featured-pill:hover { border-color: var(--accent); }
 .featured-pill:focus-visible { outline: none; box-shadow: var(--shadow-2), 0 0 0 2px var(--focus); }
 .featured-pill .fp-star, .featured-row .fp-star { flex: none; width: 0.95em; height: 0.95em; color: var(--accent); }
