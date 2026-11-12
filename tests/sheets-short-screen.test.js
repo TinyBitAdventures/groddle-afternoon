@@ -10,7 +10,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { packRowClearance } from '../public/js/ui/pack-row.js?v=65c0f180';
+import { packRowClearance } from '../public/js/ui/pack-row.js?v=f27cf531';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const css = readFileSync(join(root, 'public/style.css'), 'utf8');
@@ -18,7 +18,7 @@ const css = readFileSync(join(root, 'public/style.css'), 'utf8');
 describe('side sheets on a short screen', () => {
   it('run to the floor, after the rule that stops them above the pack', () => {
     const base = css.indexOf('  max-height: calc(100% - var(--hud-h) - 6px - var(--pack-live-height, 72px) - 8px);');
-    const at = css.indexOf('/* A short screen (the mobile QA, 2026-11-12: a phone held sideways, 343 px)');
+    const at = css.indexOf('/* A short screen (the mobile QA, 2026-11-12: a phone held sideways, 343 px): a sheet');
     assert.ok(base > 0 && at > base);
     const block = css.slice(at, css.indexOf('}\n}', at) + 3);
     assert.match(block, /@media \(max-height: 500px\) \{[\s\S]*#game-root \.ui-sheet:not\(\.ui-sheet-center\),[\s\S]*#skills-panel,[\s\S]*\{ max-height: calc\(100% - var\(--hud-h\) - 6px - 8px\); \}/);
