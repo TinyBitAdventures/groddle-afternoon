@@ -2752,9 +2752,14 @@
   "deployed": "2026-11-11"
  },
  "git": {
-  "commits": 1688,
+  "commits": 1689,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-12",
+    "kind": "fix",
+    "text": "The Gentle Island bag vendor no longer buys bags back"
+   },
    {
     "date": "2026-11-12",
     "kind": "new",
@@ -2869,11 +2874,6 @@
     "date": "2026-11-11",
     "kind": "new",
     "text": "A street's art carries on past its ends, mirrored"
-   },
-   {
-    "date": "2026-11-11",
-    "kind": "fix",
-    "text": "Clicking a garden plot picks the plot under the pointer, every row"
    }
   ]
  },

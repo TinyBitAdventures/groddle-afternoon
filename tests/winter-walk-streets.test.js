@@ -36,8 +36,8 @@ import {
   WINTER_WALK_TSID,
   isWinterStreetTsid,
   winterStreetEcology,
-} from '../public/js/winter-walk-streets.js?v=8607edd3';
-import { rebuiltRoomsFeature } from '../public/js/features/rebuilt-rooms-feature.js?v=514604e6';
+} from '../public/js/winter-walk-streets.js?v=bdf0d11e';
+import { rebuiltRoomsFeature } from '../public/js/features/rebuilt-rooms-feature.js?v=07d6db6a';
 import { reachStreet } from '../public/js/builder/reach-graph.js?v=d03eeab1';
 
 const spike = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -230,6 +230,38 @@ describe('Winter Haven after the snaps', () => {
     const [first] = routeCandidates(haven, 'haven');
     assert.equal(first.y + haven.bounds.t, WINTER_HAVEN_GROUND_Y);
     assert.ok(first.x + haven.bounds.l < WINTER_HAVEN_STEP.x1);
+  });
+
+  it('#216: the feet stand on floor art, a ground layer behind them as the walk has', () => {
+    // Deco x is the centre, y the bottom, both layer-local (world minus the street's left and top).
+    const floorBehind = (s, layerId, feetY) => {
+      const at = s.layers.findIndex((l) => l.id === layerId);
+      const layer = s.layers[at];
+      assert.ok(layer, `${s.label}: ${layerId}`);
+      assert.ok(layer.z < 0 && at < s.layers.findIndex((l) => l.id === 'middleground'), `${s.label}: behind the walk line`);
+      assert.equal(layer.w, s.bounds.r - s.bounds.l, `${s.label}: street-wide, no parallax`);
+      const feet = feetY - s.bounds.t;
+      for (let x = 0; x <= s.bounds.r - s.bounds.l; x += 25) {
+        const d = layer.decos.find((o) => Math.abs(o.x - x) <= o.w / 2);
+        assert.ok(d, `${s.label}: floor behind x ${x + s.bounds.l}`);
+        assert.ok(d.y - d.h <= feet - 100, `${s.label}: its top at least 100 px above the feet at ${x + s.bounds.l}`);
+        assert.ok(d.y >= feet + 100, `${s.label}: it runs on under the front floor at ${x + s.bounds.l}`);
+      }
+      return layer;
+    };
+    floorBehind(walk, 'T_ww_ground', WINTER_WALK_START.y);
+    const ground = floorBehind(haven, 'T_wh_ground', WINTER_HAVEN_GROUND_Y);
+    // In front of the wall and icicles; the branches, pillars, drums and boards stand on it.
+    const order = haven.layers.map((l) => l.id);
+    for (const id of ['T_wh_wall', 'T_wh_icicles']) assert.ok(order.indexOf(id) < order.indexOf('T_wh_ground'), id);
+    for (const id of ['T_wh_trees', 'T_wh_pillars', 'T_wh_drums', 'T_wh_boards', 'T_wh_drum_tops']) assert.ok(order.indexOf(id) > order.indexOf('T_wh_ground'), id);
+    // The front floor's own plane and colour, so the two read as one floor.
+    const front = haven.layers.find((l) => l.id === 'T_wh_floor');
+    assert.ok(ground.decos.every((d) => d.sprite === 'dirt_platform_long'));
+    assert.deepEqual(ground.filters, front.filters);
+    const zs = haven.layers.map((l) => l.z);
+    assert.equal(new Set(zs).size, zs.length, 'one z a layer');
+    assert.deepEqual(zs.filter((z) => z < 0), [...zs.filter((z) => z < 0)].sort((a, b) => a - b), 'behind layers drawn in z order');
   });
 
   it('every step up is one ordinary hop: rubble, step, boardwalk, pillars, landing', () => {

@@ -644,7 +644,22 @@ function havenPillarDecos() {
   return out;
 }
 
-/** Snowy rubble along the bottom, in street-local coordinates. */
+/**
+ * #216 (Friendly: "should the map be moved up, or the character down?"): the cave floor behind the
+ * walk line, as the walk has its ground layer (walkGroundDecos), so the feet stand on floor art and
+ * not on the basalt wall. Its top lies 110 px above the feet (the walk's 109), the drums, branches
+ * and posts stand on it in front, and it runs on under the front floor; the same CC0 plane and colour
+ * as havenFloorDecos (street-local coordinates).
+ */
+function havenBackFloorDecos() {
+  const out = [];
+  let z = 0;
+  const ox = -HB.l;
+  const oy = -HB.t;
+  for (let x = HB.l - 300, i = 0; x < HB.r + 700; x += 1100, i += 1) out.push(deco('dirt_platform_long', x + ox, HG + 140 + oy, 1500, 250, z++, i % 2 ? {} : { flip: true }));
+  return out;
+}
+
 /** The cave floor in front, from just under the feet down past the street bottom (the ground skirt only stretches the middleground). */
 function havenFloorDecos() {
   const out = [];
@@ -682,8 +697,9 @@ export function winterHavenStreet() {
   WINTER_HAVEN_PILLARS.forEach((p, i) => platforms.push(plat(`plat_wh_pillar_${i + 1}`, p.x - Math.round(p.w * 0.45), p.x + Math.round(p.w * 0.45), p.top)));
   platforms.push(plat('plat_wh_landing', WINTER_HAVEN_LANDING.x1, WINTER_HAVEN_LANDING.x2, WINTER_HAVEN_LANDING.y));
   const layers = [
-    { id: 'T_wh_wall', name: 'bg_1', z: -9, w: 2500, h: H, decos: havenWallDecos(2500, H), filters: { tintColor: 0x7c6c78, tintAmount: 42, brightness: -22, saturation: -28 } },
-    { id: 'T_wh_icicles', name: 'bg_2', z: -8, w: 2560, h: H, decos: havenCeilingDecos(2560), filters: { tintColor: 0xd9d2ee, tintAmount: 25, brightness: -4 } },
+    { id: 'T_wh_wall', name: 'bg_1', z: -10, w: 2500, h: H, decos: havenWallDecos(2500, H), filters: { tintColor: 0x7c6c78, tintAmount: 42, brightness: -22, saturation: -28 } },
+    { id: 'T_wh_icicles', name: 'bg_2', z: -9, w: 2560, h: H, decos: havenCeilingDecos(2560), filters: { tintColor: 0xd9d2ee, tintAmount: 25, brightness: -4 } },
+    { id: 'T_wh_ground', name: 'ground', z: -8, w: W, h: H, decos: havenBackFloorDecos(), filters: { saturation: -100, brightness: -18, tintColor: 0x6e6676, tintAmount: 35 } },
     { id: 'T_wh_trees', name: 'branches', z: -7, w: W, h: H, decos: havenTreeDecos(), filters: { brightness: -14, saturation: -30 } },
     { id: 'T_wh_pillars', name: 'pillars', z: -6, w: W, h: H, decos: havenPillarDecos(), filters: { tintColor: 0xeee6ff, tintAmount: 14 } },
     { id: 'T_wh_drums', name: 'drums', z: -5, w: W, h: H, decos: havenDrumBackDecos(), filters: { saturation: -100, brightness: -4 } },
