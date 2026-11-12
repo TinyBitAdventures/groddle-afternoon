@@ -339,6 +339,10 @@ const PANEL_CSS = `
 .img-card.poor .img-front img.art,.img-card.poor .img-front img.icon{opacity:.35}
 .img-card.poor .img-front .img-title{background:color-mix(in srgb, var(--surface-bright) 60%, transparent);color:color-mix(in srgb, var(--c-black) 70%, transparent);text-shadow:none}
 .img-back{transform:rotateY(180deg);color:var(--c-navy-36);text-align:left}
+/* The mobile QA (2026-11-12): iOS WebKit flattened the flip and drew every card's back over its front,
+   mirrored. Each face also hides while turned away, switching at the half turn (edge on), in any engine. */
+.img-face{transition:visibility 0s linear .25s}
+.img-card:not(.flipped) .img-back,.img-card.flipped .img-front{visibility:hidden}
 .img-back .img-back-text{position:absolute;inset:0;padding:var(--sp-8) var(--sp-8) var(--sp-6);display:flex;flex-direction:column}
 .img-back h3{margin:0 0 var(--sp-4);font-size:var(--fs-base);line-height:var(--lh-tight);color:var(--text);text-shadow:0 1px 0 var(--c-white)}
 .img-back p{margin:0;font-size:var(--fs-sm);line-height:var(--lh-normal);color:var(--c-mauve-40);text-shadow:0 1px 0 color-mix(in srgb, var(--c-white) 70%, transparent)}
