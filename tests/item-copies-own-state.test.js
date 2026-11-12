@@ -34,7 +34,7 @@ import {
   useToolCondition,
 } from '../public/js/tools.js?v=5f482998';
 import { ITEM_CATALOG, addItem, createInventory, ensureItem, isToolItem, removeItem } from '../public/js/inventory.js?v=60dfc9ca';
-import { createPlayerSave, restorePlayerSave } from '../public/js/player-save.js?v=a7d1da05';
+import { createPlayerSave, restorePlayerSave } from '../public/js/player-save.js?v=350cb5f8';
 import { layoutPack, unitPlaces } from '../public/js/pack-slots.js?v=6b8393a1';
 import { bagsFeature } from '../public/js/features/bags-feature.js?v=c802a863';
 import { VENDOR_PROFILES, vendorBuy, vendorSell } from '../public/js/vendor.js?v=fd4bd725';

@@ -2752,9 +2752,14 @@
   "deployed": "2026-11-11"
  },
  "git": {
-  "commits": 1684,
+  "commits": 1685,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-12",
+    "kind": "improve",
+    "text": "Grimssea Hollow's shelves, ladders and door re-measured from Cleops's 2012 snap"
+   },
    {
     "date": "2026-11-12",
     "kind": "new",
@@ -2869,14 +2874,9 @@
     "date": "2026-11-11",
     "kind": "fix",
     "text": "A vendor's popover for a bottom-row item shows whole"
-   },
-   {
-    "date": "2026-11-11",
-    "kind": "improve",
-    "text": "Make has one way back, the pill over the panel, named after where it goes"
    }
   ]
  },
- "tests": 829,
+ "tests": 830,
  "generatedAt": "2026-11-12"
 }

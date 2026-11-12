@@ -97,7 +97,7 @@ describe('reports #194/#198: /stuck and Fernucopia\'s whistle stand (puzzles-fea
     globalThis.PIXI = { Sprite, Container: Display, Graphics: Display, Text, Texture, ImageSource, Rectangle: class {} };
     globalThis.Image ||= class { set src(v) { this._s = v; } decode() { return Promise.resolve(); } };
     globalThis.fetch = async () => ({ json: async () => raw });
-    ({ puzzlesFeature: puzzles } = await import('../public/js/features/puzzles-feature.js?v=73a80daa'));
+    ({ puzzlesFeature: puzzles } = await import('../public/js/features/puzzles-feature.js?v=bb2423b8'));
     ({ locationEventsFeature: events, locationEventsApi: eventsApi } = await import('../public/js/features/location-events-feature.js?v=0cda70ed'));
   });
 

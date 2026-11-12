@@ -22,7 +22,7 @@ import {
   qurazyIsChance,
   rollQurazy,
 } from '../public/js/qurazy.js?v=a219d5dc';
-import { planStreetQuoins } from '../public/js/quoins.js?v=237c1d5d';
+import { planStreetQuoins } from '../public/js/quoins.js?v=7e0dec6d';
 import {
   QURAZY_ZONE,
   QURAZY_OVERLAY,

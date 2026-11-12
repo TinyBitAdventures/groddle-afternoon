@@ -2,6 +2,7 @@
 
 import { energyMax, metabolicGain, moodMax } from './metabolics.js?v=8504134e';
 import { grantMoodXp } from './mood-xp.js?v=958e7680';
+import { QUOIN_COIN_COUNTS, QUOIN_SPOTS } from './quoin-spots-data.js?v=7c343cbc';
 
 export const DEFAULT_DAILY_QUOIN_LIMIT = 100;
 export const QUOIN_SHEET = Object.freeze({
@@ -151,6 +152,51 @@ export function planStreetQuoins(streetTsid, count = 8) {
   return Array.from({ length: total }, (_, index) =>
     STREET_SEQUENCE[(offset + index) % STREET_SEQUENCE.length]
   );
+}
+
+/**
+ * G271/G257: the street's quoins as players' 2012 snaps show them, or null
+ * (tools/snap-placements/quoins.py, assets/content/quoin-spots.json): each
+ * spot's cell centre in street px and the kind its art shows, in the shape a
+ * feature's quoinSpots hands game.js (exactY: no planner lift).
+ */
+export function measuredStreetQuoins(streetTsid) {
+  const tsid = String(streetTsid || '');
+  const rows = QUOIN_SPOTS[tsid] || (tsid.startsWith('L') ? QUOIN_SPOTS[`G${tsid.slice(1)}`] : null);
+  if (!rows?.length) return null;
+  // A kind of '' is a quoin the snaps show only as a shape (Umbra's silhouettes): its kind is hashed as elsewhere.
+  return rows
+    .filter((row) => Number.isFinite(row?.[0]) && Number.isFinite(row?.[1]) && row[2] !== 'qurazy')
+    .map(([x, y, type]) => (QUOIN_TYPES[type] ? { x, y, type, exactY: true } : { x, y, exactY: true }));
+}
+
+/** A planned spot this close to a measured one would double it up (two coins in one place). */
+export const MEASURED_QUOIN_CLEARANCE = 80;
+
+/**
+ * A street's natural quoin spots: the measured ones where the snaps show
+ * them, else the planner's (`planned`, game.js placement('quoins')). The
+ * snaps can miss a quoin that was grabbed before every snap, so when the
+ * street's 2012 file names more (`coins`, quoin-spots.json) the planner's
+ * spots top it up to that count, skipping any near a measured one; never
+ * more than the file names. A street with no measured spots keeps `planned`,
+ * and so does one whose population has no quoins (`count` 0: a feature's
+ * private instance or an emptied street).
+ */
+export function streetQuoinPoints(streetTsid, planned = [], { count = null, coins = QUOIN_COIN_COUNTS[streetTsid] } = {}) {
+  const plan = Array.isArray(planned) ? planned : [];
+  const measured = count === 0 ? null : measuredStreetQuoins(streetTsid);
+  if (!measured) return plan;
+  const target = Number.isInteger(coins) && coins > measured.length ? coins : measured.length;
+  const out = measured.slice(0, target);
+  for (const spot of plan) {
+    if (out.length >= target) break;
+    if (!Number.isFinite(spot?.x) || !Number.isFinite(spot?.y)) continue;
+    // A planned spot stands on a floor; its coin hangs 58-126 px over it (spawnWorldQuoin).
+    const near = measured.some((m) => Math.abs(m.x - spot.x) < MEASURED_QUOIN_CLEARANCE && Math.abs(m.y - (spot.y - 92)) < 160);
+    if (!near) out.push(spot);
+  }
+  return out;
 }
 
 /** The prompt when the day's limit is reached (inc_stats.js stats_add_quoins_today 687-693). */

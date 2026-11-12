@@ -23,6 +23,7 @@
       "assets/content/deco-catalog.json": "358507fa",
       "assets/content/puzzle-triggers.json": "abbade34",
       "assets/content/quests.json": "3d1c3335",
+      "assets/content/quoin-spots.json": "a10e555f",
       "assets/content/recipes.json": "a0e6141c",
       "assets/content/signpost-graph.json": "c618fc41",
       "assets/content/sound-keys.json": "e223c5a7",

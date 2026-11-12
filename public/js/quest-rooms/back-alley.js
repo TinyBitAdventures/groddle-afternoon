@@ -49,7 +49,7 @@
 import { onLoaded, textureFromUrl } from '../textures.js?v=f024bd6a';
 import { displayTopOf, itemstackOverlayPoint, playSheetOverlay } from '../overlay-art.js?v=75c3ea34';
 import { STATION_FLOOR, stationArrival, stationByTsid, stationScreen, surfaceStation } from '../subway.js?v=44d1a09f';
-import { ALLEY, ALLEY_ART, ALLEY_SET, SHADY, alleyPlatforms, drawAlley, inEnteredBox } from './back-alley-set.js?v=c786ae0c';
+import { ALLEY, ALLEY_ART, ALLEY_SET, SHADY, alleyPlatforms, drawAlley, inEnteredBox } from './back-alley-set.js?v=8b0223fa';
 
 export { ALLEY, ALLEY_ART, ALLEY_SET, alleyPlatforms };
 

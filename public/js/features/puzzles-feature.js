@@ -49,7 +49,7 @@
  */
 
 import { locationEventsApi } from './location-events-feature.js?v=0cda70ed';
-import { collectQuoin, QUOIN_SHEET, QUOIN_TYPES } from '../quoins.js?v=237c1d5d';
+import { collectQuoin, QUOIN_SHEET, QUOIN_TYPES } from '../quoins.js?v=7e0dec6d';
 import {
   CARD_RETURN_TEXT,
   PUZZLE_DATA_URL,

@@ -24,7 +24,7 @@ import {
   shardFor,
   statusOf,
 } from '../public/js/shared-quoins.js?v=98d9f115';
-import { sharedQuoinsFeature } from '../public/js/features/shared-quoins-feature.js?v=94b7050d';
+import { sharedQuoinsFeature } from '../public/js/features/shared-quoins-feature.js?v=c75498d5';
 import {
   QUOIN_SHARD_FLOOR,
   QUOIN_SHARD_NEAR,
@@ -34,7 +34,7 @@ import {
 } from '../public/js/quoin-shards.js?v=121156a0';
 import { placementRequests, streetQuoinLayout, classTable, mysteryTable } from '../tools/build-realtime-quoins.mjs';
 import { setStreetEcologyCatalog } from '../public/js/street-ecology.js?v=26dabe26';
-import { QUOIN_CLASSES } from '../public/js/quoins.js?v=237c1d5d';
+import { QUOIN_CLASSES } from '../public/js/quoins.js?v=7e0dec6d';
 import { HAS_SERVER, serverPath, skipWithoutServer } from '../tools/repos.mjs';
 
 const root = join(import.meta.dirname, '..');
@@ -350,7 +350,8 @@ describe('the server data', () => {
       const data = await loadStreetDataFromFs(tsid, join(root, 'public/assets/streets'));
       assert.deepEqual(streetQuoinLayout(data, { starter: tsid === index.default }), shipped.streets[tsid], `${tsid}: run node tools/build-realtime-quoins.mjs`);
     }
-    assert.equal(shipped.streets.GLI2V0UN7RD1T2J.length, 8);
+    // G271: Hechey Track's 30 quoins where the 2012 snap shows them, topped up from the planner to its file's 36.
+    assert.equal(shipped.streets.GLI2V0UN7RD1T2J.length, 36);
     assert.deepEqual(shipped.classes, classTable());
     assert.deepEqual(shipped.mystery, mysteryTable());
     assert.equal(Object.keys(shipped.classes).length, Object.keys(QUOIN_CLASSES).length);

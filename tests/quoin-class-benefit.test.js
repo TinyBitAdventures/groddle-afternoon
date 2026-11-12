@@ -20,7 +20,7 @@ import {
   quoinClassType,
   resetStreetQuoinsForNewDay,
   streetQuoinClass,
-} from '../public/js/quoins.js?v=237c1d5d';
+} from '../public/js/quoins.js?v=7e0dec6d';
 import { setMetabolicGainGate } from '../public/js/metabolics.js?v=8504134e';
 import { applyDropResult, createDropResult } from '../public/js/drop-tables.js?v=16e12632';
 import { applyBuff, createBuffState, tickBuffs } from '../public/js/buffs.js?v=819cb342';

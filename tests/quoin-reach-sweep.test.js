@@ -25,8 +25,8 @@ import { join } from 'node:path';
 import { applyStreetIndex, loadStreetDataFromFs, setZoneStreetsShown } from '../public/js/street-loader.js?v=18b181ad';
 import { isStandable, platformYAt, platformsScreen, streetWidth } from '../public/js/street-model.js?v=b6cb6a4e';
 import { buildPlatformCandidates, setStreetEcologyCatalog } from '../public/js/street-ecology.js?v=26dabe26';
-import { EDGE_MARGIN } from '../public/js/avatar-step.js?v=43b1182e';
-import { quoinTouches } from '../public/js/quoins.js?v=237c1d5d';
+import { EDGE_MARGIN, JUMP_SPEED, NORMAL_BUFF, WALK_MAX, avatarFall } from '../public/js/avatar-step.js?v=43b1182e';
+import { QUOIN_TOUCH, measuredStreetQuoins, quoinTouches } from '../public/js/quoins.js?v=7e0dec6d';
 import { streetQuoinLayout } from '../tools/build-realtime-quoins.mjs';
 import { isZoneTsid } from '../public/js/zone-streets.js?v=b40010d5';
 
@@ -96,19 +96,70 @@ describe('32: every quoin is in the avatar\'s reach', () => {
     assert.deepEqual(misses.slice(0, 20), [], `${misses.length} quoin spots out of reach`);
   });
 
-  it('every shared quoin the realtime server lays out touches too', () => {
+  it('every shared quoin the realtime server lays out touches too (a planned one with a hop)', () => {
     const misses = [];
     let total = 0;
     for (const data of streets) {
       const lines = platformsScreen(data).filter(isStandable);
       const w = streetWidth(data);
+      const exact = new Set((measuredStreetQuoins(data.tsid) || []).map((s) => `${s.x},${s.y}`));
       for (const [x, y, type] of streetQuoinLayout(data)) {
+        if (exact.has(`${x},${y}`)) continue; // G271: measured, checked below
         total += 1;
         if (!touchFrom({ x, y }, lines, w, { hop: HOP }).length) misses.push(`${data.tsid} ${data.label}: ${type} at (${x}, ${y})`);
       }
     }
-    assert.ok(total > 10000, `${total} quoins`);
+    assert.ok(total > 8000, `${total} quoins`);
     assert.deepEqual(misses, []);
+  });
+
+  it('G271: a quoin where the 2012 snaps show it is in a running jump\'s reach off some floor (all but a few)', () => {
+    // Tiny Speck hung quoins along jump arcs off ledges and over gaps, so a measured one is held to
+    // a running jump (WALK_MAX across, the street jump's rise and fall), not a standing hop. The
+    // arc ignores walls, and air control is not modelled, so this is a bound, not a proof. The few
+    // it misses (205 of 4,277 when measured, 2026-11-12: Bliss's own physics, quoins over a rock
+    // face the street file has no floor near) are left where the snaps put them.
+    const body = { vx: 0, vy: JUMP_SPEED, onGround: false };
+    const rise = [0];
+    for (let t = 1, y = 0; t < 600; t += 1) {
+      avatarFall(body, NORMAL_BUFF, 1);
+      y += body.vy;
+      rise.push(-y);
+    }
+    const apex = Math.max(...rise);
+    const lastFrameOver = (h) => {
+      for (let t = rise.length - 1; t >= 0; t -= 1) if (rise[t] >= h) return t;
+      return -1;
+    };
+    const halfW = (QUOIN_TOUCH.coinW + QUOIN_TOUCH.playerW) / 2;
+    const halfH = (QUOIN_TOUCH.coinH + QUOIN_TOUCH.playerH) / 2;
+    const misses = [];
+    let total = 0;
+    for (const data of streets) {
+      const spots = measuredStreetQuoins(data.tsid);
+      if (!spots) continue;
+      const lines = platformsScreen(data).filter(isStandable);
+      const w = streetWidth(data);
+      for (const q of spots) {
+        total += 1;
+        let reach = false;
+        for (const p of lines) {
+          const lo = Math.max(Math.min(p.x1, p.x2), EDGE_MARGIN, q.x - 2000);
+          const hi = Math.min(Math.max(p.x1, p.x2), w - EDGE_MARGIN, q.x + 2000);
+          for (let x0 = lo; x0 <= hi && !reach; x0 += 6) {
+            const y0 = platformYAt(p, x0, 0);
+            if (y0 == null) continue;
+            const need = y0 - QUOIN_TOUCH.playerH / 2 - q.y - halfH;
+            if (apex < need) continue;
+            reach = WALK_MAX * lastFrameOver(need) + halfW >= Math.abs(q.x - x0);
+          }
+          if (reach) break;
+        }
+        if (!reach) misses.push(`${data.tsid} ${data.label}: (${q.x}, ${q.y})`);
+      }
+    }
+    assert.ok(total > 4000, `${total} measured quoins`);
+    assert.ok(misses.length / total < 0.06, `${misses.length} of ${total} out of a running jump's reach: ${misses.slice(0, 10).join('; ')}`);
   });
 
   it('Mallos Means: the left iMG quoin is taken at the left end, at every height (a hop for the top row)', () => {

@@ -38,7 +38,7 @@
  * Canvas: data-quoin-got-fx = "<words>@<x>,<y>" (where the words sit).
  */
 
-import { QUOIN_TYPES, creditQuoinStat, quoinClassAmount } from '../quoins.js?v=237c1d5d';
+import { QUOIN_TYPES, creditQuoinStat, quoinClassAmount } from '../quoins.js?v=7e0dec6d';
 import {
   COMPANION_QUOIN_RULES,
   QUOIN_SHARD_FX,

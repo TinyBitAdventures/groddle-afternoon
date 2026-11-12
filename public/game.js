@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=9f222124';
 import { createErrorOnce, createFeatureHost } from './js/feature-host.js?v=06bb8b74';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=1f70bb1f';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=616807af';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -131,7 +131,7 @@ import {
 } from './js/legalize-it.js?v=b5645cb6';
 import { HALL, HALL_LAYOUT, HALL_QUESTIONS } from './js/bureaucratic-hall.js?v=a0bc6317';
 import { STATION_X, stationArrival, stationScreen, surfaceStation } from './js/subway.js?v=44d1a09f';
-import { ALLEY, SHADY, drawAlley, inEnteredBox } from './js/quest-rooms/back-alley-set.js?v=c786ae0c';
+import { ALLEY, SHADY, drawAlley, inEnteredBox } from './js/quest-rooms/back-alley-set.js?v=8b0223fa';
 import {
   WINTER_HAVEN_STREET_ID,
   WINTER_MOTE_REWARDS,
@@ -371,7 +371,7 @@ import {
   slipTerrainY,
   starlitMoonPlainAlpha,
   starlitRevealAlpha,
-} from './js/paradise-flight.js?v=6e0f92a5';
+} from './js/paradise-flight.js?v=c7acd7a2';
 import { resolveParadiseCourseAlias } from './js/paradise-courses.js?v=1a5d0aa7';
 import {
   buildParadiseCourseArt,
@@ -502,7 +502,7 @@ import {
   parsePlayerSave,
   serializePlayerSave,
   restorePlayerSave,
-} from './js/player-save.js?v=a7d1da05';
+} from './js/player-save.js?v=350cb5f8';
 import {
   HOME_INTERIOR_TSID,
   HOME_STREET_TSID,
@@ -929,7 +929,8 @@ import {
   resetStreetQuoinsForNewDay,
   creditQuoinStat,
   creditMetabolicReward,
-} from './js/quoins.js?v=237c1d5d';
+  streetQuoinPoints,
+} from './js/quoins.js?v=7e0dec6d';
 import {
   buildHubMapView,
   mapClickTravel,
@@ -24273,8 +24274,9 @@ async function enterStreet(tsid, opts = {}) {
   trees = spawnTrees(treeSpots);
   // Animated official eight-scene quoins placed along reachable platforms.
   // A rebuilt room whose picture shows where its quoins sit hands them in (features' quoinSpots: screen-space centres).
+  // G271: elsewhere a street players snapped in 2012 has its quoins where the snaps show them (quoins.js streetQuoinPoints).
   const roomQuoins = features.query('quoinSpots', data, engine);
-  quoins = spawnQuoins(Array.isArray(roomQuoins) ? roomQuoins : placement('quoins'));
+  quoins = spawnQuoins(Array.isArray(roomQuoins) ? roomQuoins : streetQuoinPoints(data.tsid, placement('quoins'), { count: currentStreetPopulation.quoins }));
 
   // Signposts are manually hit-tested by individual destination board.
   portalSprites = bgLayer.signViews || [];

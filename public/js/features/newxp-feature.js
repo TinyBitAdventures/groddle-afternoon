@@ -127,14 +127,14 @@ import {
   TUTORIAL_NAME_MAX,
 } from '../newxp.js?v=554cfdda';
 import { ITEM_CATALOG, addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=60dfc9ca';
-import { QUOIN_SHEET, QUOIN_TYPES, qrazyRewardForLevel } from '../quoins.js?v=237c1d5d';
+import { QUOIN_SHEET, QUOIN_TYPES, qrazyRewardForLevel } from '../quoins.js?v=7e0dec6d';
 import { soundForQuoin } from '../sound-moments.js?v=52ad523c';
 import { IMAGINATION_UPGRADES } from '../imagination.js?v=1bdfd77c';
 import { assignQuest, completeQuest } from '../quests.js?v=2b882eb6';
 import { acceptOffer, enqueueQuestOffer, questAwardPayload, turnInQuest } from '../quest-offers.js?v=9c53455c';
 import { getQuestCatalog } from '../content-catalogs.js?v=10b118dd';
 import { locationEventsApi } from './location-events-feature.js?v=0cda70ed';
-import * as kit from '../quest-rooms/kit.js?v=6ec6de2e';
+import * as kit from '../quest-rooms/kit.js?v=6186788f';
 import { frameTexture, onLoaded, sourceFromUrl, textureFromUrl, whenLoaded } from '../textures.js?v=f024bd6a';
 import { upgradeSource } from '../sprite-hires.js?v=dd5da64c';
 import { grantMoodXp } from '../mood-xp.js?v=958e7680';

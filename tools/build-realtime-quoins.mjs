@@ -43,7 +43,8 @@ import {
   mysteryClassFor,
   planStreetQuoins,
   streetQuoinClass,
-} from '../public/js/quoins.js?v=237c1d5d';
+  streetQuoinPoints,
+} from '../public/js/quoins.js?v=7e0dec6d';
 import { partyEcologyEntry, partySpaceForStreet } from '../public/js/party-spaces.js?v=0bfad685';
 import { isZoneTsid } from '../public/js/zone-streets.js?v=b40010d5';
 
@@ -83,7 +84,8 @@ export function streetEcology(tsid) {
 /**
  * One street's natural quoins: [x, y, type, class] where x, y are the
  * quoin's centre before its bob (game.js spawnWorldQuoin: x = spot.x,
- * baseY = spot.y - 58 - (index % 3) * 34) in the street's screen pixels.
+ * baseY = spot.y - 58 - (index % 3) * 34, or spot.y for a measured spot)
+ * in the street's screen pixels.
  */
 export function streetQuoinLayout(data, { starter = false, ecology = streetEcology(data.tsid) } = {}) {
   const population = populationForStreet(data.tsid, ecology, { starter });
@@ -94,11 +96,14 @@ export function streetQuoinLayout(data, { starter = false, ecology = streetEcolo
     seed: data.tsid,
     reserved,
   });
-  const points = plan.groups.quoins || [];
+  // G271: a street players snapped in 2012 has its quoins where the snaps show them, of the kind they show
+  // (game.js enterStreet streetQuoinPoints; a measured spot's y is the quoin's own, exactY).
+  const points = streetQuoinPoints(data.tsid, plan.groups.quoins || [], { count: population.quoins });
   const types = planStreetQuoins(data.tsid, points.length);
   return points.map((spot, i) => {
-    const type = types[i] || 'xp';
-    return [Math.round(spot.x * 10) / 10, Math.round((spot.y - 58 - (i % 3) * 34) * 10) / 10, type, streetQuoinClass(data.tsid, i, type)];
+    const type = QUOIN_TYPES[spot.type] ? spot.type : types[i] || 'xp';
+    const y = spot.exactY === true ? spot.y : spot.y - 58 - (i % 3) * 34;
+    return [Math.round(spot.x * 10) / 10, Math.round(y * 10) / 10, type, streetQuoinClass(data.tsid, i, type)];
   });
 }
 
