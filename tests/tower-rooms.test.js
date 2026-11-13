@@ -16,13 +16,15 @@ import {
   TOWER_ROOM_DOOR_LINKS,
   TOWER_ROOM_SPOTS,
   VENT,
+  VENT_BEAM_LEFT,
   VENT_ROOM_TSID,
+  decoPoint,
   towerRoomByTsid,
   towerRoomStreet,
   turned,
-} from '../public/js/tower-rooms.js?v=f238eaa9';
-import { inTowerSpot, towerSpotsFor } from '../public/js/home-tower.js?v=d33a67e4';
-import { restockGarden, towerRoomsFeature } from '../public/js/features/tower-rooms-feature.js?v=0ad979cc';
+} from '../public/js/tower-rooms.js?v=845686ac';
+import { inTowerSpot, towerSpotsFor } from '../public/js/home-tower.js?v=0962d6c8';
+import { restockGarden, towerRoomsFeature } from '../public/js/features/tower-rooms-feature.js?v=6438c4c0';
 import {
   ALL_TOWER_ROOMS,
   CHALLENGE_ROOMS,
@@ -37,7 +39,7 @@ import {
   anyTowerRoomByTsid,
   anyTowerRoomStreet,
   flats,
-} from '../public/js/tower-challenge-rooms.js?v=7502a893';
+} from '../public/js/tower-challenge-rooms.js?v=a13fd855';
 import { ladderTopDeck } from '../public/js/street-model.js?v=b6cb6a4e';
 import { GRAVITY, JUMP_SPEED, TERMINAL_VY, WALK_MAX, jumpApex } from '../public/js/avatar-step.js?v=43b1182e';
 
@@ -311,6 +313,21 @@ describe('rebuilt tower rooms: the secret spots', () => {
       assert.ok(box.x + s.bounds.l + 100 <= Math.max(...ledge.map((p) => p.x2)), spot.id);
       const y = floorAt(vent.platforms, spot.x, spot.y - 30);
       assert.equal(standing(vent, s, box, spot.x, y), true, spot.id);
+    }
+  });
+
+  it('#296: from the C6 door the shaft goes down: the log under it is floor only where it is drawn, and its open end drops onto the climb', () => {
+    // F 8885: players found the shaft's spots "on the way down" from the top door.
+    const log = vent.decos.find((d) => d.sprite === 'legs_moss_noBase' && d.r === 90);
+    // Turned 90 about its bottom-centre, the trunk runs from its anchor x rightwards past the wall.
+    assert.ok(decoPoint(log, 0.5, 1)[0] === log.x && decoPoint(log, 0.5, 0)[0] >= VENT.inner, 'drawn from its anchor to the right wall');
+    assert.ok(VENT_BEAM_LEFT >= log.x && VENT_BEAM_LEFT - log.x <= 40, 'floor starts at the drawn end');
+    for (let x = -VENT.inner; x < VENT_BEAM_LEFT; x += 10) assert.equal(floorAt(vent.platforms, x, -2400) === -2400, false, `no hidden floor at x ${x}`);
+    // Walking off the open end lands on a climb piece below, short of the C4 branch.
+    const below = (x) => vent.platforms.filter((p) => p.pc_perm === -1 && x >= Math.min(p.x1, p.x2) && x <= Math.max(p.x1, p.x2)).map((p) => floorAt([p], x, 0)).filter((y) => y > -2400).sort((a, b) => a - b)[0];
+    for (const x of [VENT_BEAM_LEFT - 10, VENT_BEAM_LEFT - 40]) {
+      const y = below(x);
+      assert.ok(y != null && y < VENT.c4Floor && y - -2400 <= 400, `x ${x} lands at ${y}`);
     }
   });
 

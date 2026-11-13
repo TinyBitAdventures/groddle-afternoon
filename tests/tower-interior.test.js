@@ -19,9 +19,9 @@ import {
   setStreetEcologyCatalog,
 } from '../public/js/street-ecology.js?v=cc49deed';
 import { applyIndexHub, loadStreetDataFromFs } from '../public/js/street-loader.js?v=18b181ad';
-import { TOWER_ROOMS, VENT } from '../public/js/tower-rooms.js?v=f238eaa9';
-import { ALL_TOWER_ROOMS } from '../public/js/tower-challenge-rooms.js?v=7502a893';
-import { towerRoomsFeature } from '../public/js/features/tower-rooms-feature.js?v=0ad979cc';
+import { TOWER_ROOMS, VENT } from '../public/js/tower-rooms.js?v=845686ac';
+import { ALL_TOWER_ROOMS } from '../public/js/tower-challenge-rooms.js?v=a13fd855';
+import { towerRoomsFeature } from '../public/js/features/tower-rooms-feature.js?v=6438c4c0';
 import { seasonsFeature } from '../public/js/features/seasons-feature.js?v=17d2ac97';
 
 const spike = join(dirname(fileURLToPath(import.meta.url)), '..');

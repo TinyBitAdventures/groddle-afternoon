@@ -337,6 +337,9 @@ export const VENT = Object.freeze({
   ceiling: -2990,
 });
 
+/** Where the log under the C6 door (legs_moss_noBase turned 90, drawn from x 0 rightwards) ends on the left. */
+export const VENT_BEAM_LEFT = 20;
+
 /** R5 picture px (x 0-320, y 0-1920) to world. */
 const ventPx = (x, y) => ({ x: Math.round((x - 160) * 3.11), y: Math.round(-2540 + (y - 158) * 3.11) });
 
@@ -434,10 +437,15 @@ function buildVent() {
     if (s === 'bridgeL') route.push(ropeBridge(id, -270, -1760, 420, `${climbWhy} R5: a rope bridge from the left wall (picture y 405-440).`));
     if (s === 'stumpL') route.push(ring(id, -62, -2080, 330, `${climbWhy} R5: a sliced-tree stump left of centre with red mushrooms (picture y 305-345).`));
     if (s === 'beam') {
-      const why = `${c6Why} The long log under the stumps runs wall to wall (picture y 195).`;
-      platforms.push(flat(id, -inner, inner, -2400, why));
+      // #296: the floor ran wall to wall but the log turned about its anchor is drawn from x 0 to the
+      // right wall only, so the left half was thin air you could not fall through. Players went down
+      // the shaft from the C6 door to the spots and the Tower St South exit (F 8885 Saro: "All of
+      // mine were on platforms on the way down"; Avery: "on the way down"), so the floor stops where
+      // the log does and its open end drops to the climb below.
+      const why = `${c6Why} The long log under the stumps (picture y 195); its left end opens on the shaft below (F 8885: the spots are found "on the way down").`;
+      platforms.push(flat(id, VENT_BEAM_LEFT, inner, -2400, why));
       decos.push(mg('legs_moss_noBase', 0, -2400 + 140, 330, 1020, 8, { r: 90 }));
-      route.push({ left: -inner, right: inner, top: -2400, low: -2400 });
+      route.push({ left: VENT_BEAM_LEFT, right: inner, top: -2400, low: -2400 });
     }
   }
   // The round deck at the right-hand rope bridge's end (picture x 255-325).
@@ -502,7 +510,7 @@ function buildVent() {
   }
   decos.push(...hangingSign(170, c6Floor - 150, 'Way Out', { rope: 520 }));
   decos.push({ sprite: 'jethimadh_int_lantern_1', x: 380, y: c6Floor + 61, w: 300, h: 450, z: 4, r: 0, layer: 'fg' });
-  decos.push(mg('underground_bogwillow', -60, -2400 + 6, 200, 200, 9), mg('underground_bogwillow_1', 240, c6Floor - 60 + 4, 58, 100, 9));
+  decos.push(mg('underground_bogwillow', 50, -2400 + 6, 170, 170, 9), mg('underground_bogwillow_1', 240, c6Floor - 60 + 4, 58, 100, 9));
   decos.push(mg('jethimadh_int_door_sign', 210, c4Floor - 70, 188, 110, 30), mg('firebog_sign_blank', 210, c4Floor - 87, 138, 80, 31, { signText: 'Way Out' }));
   const exitX = ventPx(72, 0).x;
   decos.push(mg('jethimadh_int_door_sign', exitX + 190, floor - 70, 188, 110, 30), mg('firebog_sign_blank', exitX + 190, floor - 87, 138, 80, 31, { signText: 'EXIT' }));

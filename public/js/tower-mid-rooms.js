@@ -49,9 +49,9 @@
  * Tower St West's door.
  */
 
-import { towerRoomIndexEntry } from './tower-rooms.js?v=f238eaa9';
-import { DOOR, anyTowerRoomStreet, barriersFor, collector, flat, ladder, plaque, shell } from './tower-challenge-rooms.js?v=7502a893';
-import { HALL, HALL_TSID, buildHall } from './hall-rejected-concepts.js?v=30e5a21e';
+import { towerRoomIndexEntry } from './tower-rooms.js?v=845686ac';
+import { DOOR, anyTowerRoomStreet, barriersFor, collector, flat, ladder, plaque, shell } from './tower-challenge-rooms.js?v=a13fd855';
+import { HALL, HALL_TSID, buildHall } from './hall-rejected-concepts.js?v=05ad7340';
 
 export const STAIRS_TSID = 'GIFFUV4ATQ72I6D';
 export const MEZZANINE_TSID = 'GIFGJ2246R72LJL';

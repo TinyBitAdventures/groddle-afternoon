@@ -43,7 +43,7 @@
  * ladder, plaque, lantern and wall helpers are exported for js/tower-mid-rooms.js.
  */
 
-import { BRIDGE_LINE, WALKWAY_LINE, decoPoint, hangingSign, stepsPiece, TOWER_ROOMS, towerRoomIndexEntry, towerRoomStreet } from './tower-rooms.js?v=f238eaa9';
+import { BRIDGE_LINE, WALKWAY_LINE, decoPoint, hangingSign, stepsPiece, TOWER_ROOMS, towerRoomIndexEntry, towerRoomStreet } from './tower-rooms.js?v=845686ac';
 import { TOWER_ROOM_4_FILES } from './tower-room-4-art.js?v=6a934af6';
 import { TOWER_ROOM_16_FILES } from './tower-room-16-art.js?v=eaafb5f7';
 

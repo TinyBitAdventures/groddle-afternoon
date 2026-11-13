@@ -112,7 +112,7 @@ import {
   towerSecretText,
   towerSpotsFor,
   workCheck,
-} from '../home-tower.js?v=d33a67e4';
+} from '../home-tower.js?v=0962d6c8';
 import { textureFromUrl } from '../textures.js?v=814d7926';
 import { denseSprite } from '../sprite-dense.js?v=2a0ce07a';
 import { pieceUrl } from '../home-wallpaper.js?v=f1969400';

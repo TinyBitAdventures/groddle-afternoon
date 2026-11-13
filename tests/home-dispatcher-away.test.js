@@ -22,7 +22,7 @@ import {
   placementCheck,
   putAwayDispatcher,
   putOutDispatcher,
-} from '../public/js/home-cultivation.js?v=1e2d2b2d';
+} from '../public/js/home-cultivation.js?v=a3135ffd';
 import {
   DISPATCHER_HALF,
   DISPATCHER_TEXT,
@@ -30,7 +30,7 @@ import {
   dispatcherDefaultRx,
 } from '../public/js/home-street-fixtures.js?v=bad831a1';
 import { createMailboxState, listMailboxMessages, sendMail } from '../public/js/mailbox.js?v=a3e833ba';
-import { homesFeature } from '../public/js/features/homes-feature.js?v=2ccf27ec';
+import { homesFeature } from '../public/js/features/homes-feature.js?v=cfa6d202';
 import { Display } from './fake-scene.js';
 
 const root = join(import.meta.dirname, '..', 'public', 'js');
