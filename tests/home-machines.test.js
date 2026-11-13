@@ -40,8 +40,8 @@ import {
   settleSolo,
   soloRow,
 } from '../public/js/home-machines.js?v=bc3d0938';
-import { homeMachinesFeature } from '../public/js/features/home-machines-feature.js?v=630d410a';
-import { RECIPE_CATALOG, setRecipeCatalog } from '../public/js/making.js?v=ba3677f0';
+import { homeMachinesFeature } from '../public/js/features/home-machines-feature.js?v=51d6f5c3';
+import { RECIPE_CATALOG, setRecipeCatalog } from '../public/js/making.js?v=db79a208';
 import { HAS_SERVER, HAS_SITE, SITE_DIR, serverPath } from '../tools/repos.mjs';
 
 const root = join(import.meta.dirname, '..');

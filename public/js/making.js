@@ -1706,11 +1706,51 @@ export function craftRecipeBatch(inv, pc, recipeKey, qty = 1, opts = {}) {
  * how many, and whether it is the ingredients that stop them.
  */
 export function makeEmptyLine(inv, recipes, opts = {}) {
-  const checks = recipes.map((r) => canCraft(inv, r, { ...opts, requireTool: false }));
+  const checks = recipes.map((r) => canCraft(inv, r, { ...(typeof opts === 'function' ? opts(r) : opts), requireTool: false }));
   const known = checks.filter((c) => c.ok || c.reason === 'ingredients').length;
   if (!known) return "You don't know any of these recipes yet.";
   const count = `You know ${known} ${known === 1 ? 'recipe' : 'recipes'} here`;
   return checks.some((c) => c.ok) ? `${count} but can't make any right now.` : `${count} but don't have the ingredients.`;
+}
+
+/**
+ * #305: one recipe counts as known by the rule makeEmptyLine counts with, so "Show them" lists exactly
+ * the recipes the note promised. The original listed only the recipes you know (MakingDialog.as
+ * 166-167; inc_making.js 141-167 sends known and unknown apart). `opts` may be a function of the recipe.
+ */
+export function recipeKnownHere(inv, recipe, opts = {}) {
+  const c = canCraft(inv, recipe, { ...(typeof opts === 'function' ? opts(recipe) : opts), requireTool: false });
+  return c.ok || c.reason === 'ingredients';
+}
+
+/**
+ * #305: the Make footer's count, in step with the empty note. `mode` is the list shown: 'canmake'
+ * (the "Can make now" box), 'known' (after "Show them") or 'all'.
+ * @param {{ mode: 'canmake'|'known'|'all', shown: number, known: number, all: number }} counts
+ */
+export function makeCountLine({ mode, shown, known, all }) {
+  const recipes = (n) => `${n} ${n === 1 ? 'recipe' : 'recipes'}`;
+  if (mode === 'canmake') {
+    if (!known) return `You don't know any of these ${recipes(all)} yet`;
+    return `You can make ${shown} of the ${recipes(known)} you know`;
+  }
+  if (mode === 'known') return `The ${recipes(known)} you know, of ${all}`;
+  return known && known < all ? `${recipes(all)}, ${known} you know` : recipes(all);
+}
+
+/**
+ * #305: what a known recipe still needs, in plain words on its tile: the ingredients by name and
+ * how many are short ("Missing 1 Lemon, 2 Ice"); otherwise the reason line it already has. The
+ * client greyed such a recipe with its reason (MakingRecipeUI.as 90-98, 176-187).
+ * @param {(input: object) => string} label the input's name as the panel writes it
+ */
+export function recipeMissingLine(inv, recipe, check, blockedLine, label, toolState = null) {
+  if (check?.reason !== 'ingredients') return blockedLine || '';
+  const short = (recipe?.inputs || [])
+    .map((i) => ({ i, n: i.qty - recipeInputHave(inv, i, toolState) }))
+    .filter((x) => x.n > 0)
+    .map((x) => `${x.n} ${label(x.i)}`);
+  return short.length ? `Missing ${short.join(', ')}` : blockedLine || '';
 }
 
 export function canCraftAgain(inv, pc, recipeKey, opts = {}) {

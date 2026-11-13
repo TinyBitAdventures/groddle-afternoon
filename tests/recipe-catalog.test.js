@@ -23,7 +23,7 @@ import {
   loadRecipeCatalogFromFile,
   starterToolsInventory,
   STARTER_TOOL_IDS,
-} from '../public/js/making.js?v=ba3677f0';
+} from '../public/js/making.js?v=db79a208';
 import {
   ITEM_CATALOG,
   createInventory,

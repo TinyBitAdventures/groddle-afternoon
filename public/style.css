@@ -5855,6 +5855,17 @@ body.buff-purple-pulse::after {
 .make-tile.blocked {
   opacity: 0.55;
 }
+/* #305: a recipe you know shows what it is missing, and stays readable (MakingRecipeUI.as 90-98). */
+.make-tile.blocked.known {
+  opacity: 0.8;
+}
+.make-tile .tile-why {
+  font-size: var(--fs-2xs);
+  font-weight: 700;
+  color: var(--text-danger);
+  text-align: center;
+  line-height: var(--lh-tight);
+}
 .make-tile.fruit-change-tile {
   min-height: 104px;
   background: linear-gradient(180deg, var(--surface-bright) 0%, var(--surface-card) 100%);
@@ -12555,6 +12566,7 @@ body:has(#quest-dialogue:not([hidden])) .prompt-stack { z-index: calc(var(--z-mo
 [data-ui="modern"] #make-panel .make-tile:focus-visible { outline: 2px solid var(--focus); outline-offset: 1px; }
 [data-ui="modern"] #make-panel .make-tile .tile-label { font-size: var(--fs-s); font-weight: var(--fw-heavy); color: var(--text); }
 [data-ui="modern"] #make-panel .make-tile .tile-req { font-size: var(--fs-xs); color: var(--text-muted); }
+[data-ui="modern"] #make-panel .make-tile .tile-why { font-size: var(--fs-xs); color: var(--text-danger); }
 [data-ui="modern"] #make-panel .make-empty { padding: var(--space-5) var(--space-2); text-align: center; color: var(--text-muted); font-size: var(--fs-m); }
 [data-ui="modern"] #make-panel .make-detail { margin-top: 0; }
 

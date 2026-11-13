@@ -10,7 +10,7 @@ import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { RECIPE_CATALOG, TOOL_CATALOG, canCraft, ensureMakingItems, listMakingTools, loadRecipeCatalogFromFile, makeEmptyLine, makePanelIcon, recipeBlockedLine } from '../public/js/making.js?v=ba3677f0';
+import { RECIPE_CATALOG, TOOL_CATALOG, canCraft, ensureMakingItems, listMakingTools, loadRecipeCatalogFromFile, makeCountLine, makeEmptyLine, makePanelIcon, recipeBlockedLine, recipeKnownHere, recipeMissingLine } from '../public/js/making.js?v=db79a208';
 import { createInventory } from '../public/js/inventory.js?v=f49c8998';
 import { createToolConditionState, setToolRemaining } from '../public/js/tools.js?v=48542c24';
 
@@ -155,9 +155,61 @@ describe('report 129: Make says why "Can make now" is empty', () => {
 
   it('has a button that turns the filter off', () => {
     const game = readFileSync(new URL('../public/game.js', import.meta.url), 'utf8');
-    assert.match(game, /makeEmptyLine\(inv, everyRecipe, opts\)/);
+    assert.match(game, /makeEmptyLine\(inv, everyRecipe, recipeOpts\)/);
     assert.match(game, /data-make-show-all>Show them<\/button>/);
     assert.match(game, /\[data-make-show-all\]'\)\?\.addEventListener\('click', \(\) => \{\s*makeCanMakeOnly = false;/);
     assert.match(game, /let makeCanMakeOnly = true;/);
+  });
+});
+
+describe('#305: "Show them" lists the recipes the note counted', () => {
+  const pan = (id, need, extra = {}) => ({ id, name: id, tool: 'frying_pan', inputs: [{ classTsid: 'cherry', qty: need }], ...extra });
+  const label = (i) => ({ cherry: 'Cherry', meat: 'Meat' })[i.classTsid] || i.classTsid;
+  const body = game.slice(game.indexOf('function renderMakePanel()'), game.indexOf('function openMakePanel('));
+
+  it('known is the rule the note counts with: ingredients short still counts, a missing skill does not', () => {
+    const recipes = [pan('a', 2), pan('b', 3), { ...sauce }];
+    const opts = { requireSkill: true, learned: ['cheffery_1'] };
+    const known = recipes.filter((r) => recipeKnownHere({}, r, opts));
+    assert.deepEqual(known.map((r) => r.id), ['a', 'b']);
+    assert.equal(makeEmptyLine({}, recipes, opts), "You know 2 recipes here but don't have the ingredients.");
+    assert.equal(makeEmptyLine({}, recipes, () => opts), makeEmptyLine({}, recipes, opts), 'per-recipe options give the same count');
+  });
+
+  it('the footer agrees with the note (the report: 0 of 11, while the note said 4)', () => {
+    assert.equal(makeCountLine({ mode: 'canmake', shown: 0, known: 4, all: 11 }), 'You can make 0 of the 4 recipes you know');
+    assert.equal(makeCountLine({ mode: 'canmake', shown: 1, known: 1, all: 3 }), 'You can make 1 of the 1 recipe you know');
+    assert.equal(makeCountLine({ mode: 'canmake', shown: 0, known: 0, all: 11 }), "You don't know any of these 11 recipes yet");
+    assert.equal(makeCountLine({ mode: 'known', shown: 4, known: 4, all: 11 }), 'The 4 recipes you know, of 11');
+    assert.equal(makeCountLine({ mode: 'all', shown: 11, known: 4, all: 11 }), '11 recipes, 4 you know');
+    assert.equal(makeCountLine({ mode: 'all', shown: 3, known: 3, all: 3 }), '3 recipes');
+  });
+
+  it('a known tile names what it is short, by name and count', () => {
+    const r = { id: 'x', name: 'x', tool: 'frying_pan', inputs: [{ classTsid: 'cherry', qty: 3 }, { classTsid: 'meat', qty: 1 }] };
+    const inv = createInventory({ cherry: 1, meat: 1 });
+    const check = canCraft(inv, r, { requireSkill: false, requireTool: false });
+    assert.equal(check.reason, 'ingredients');
+    assert.equal(recipeMissingLine(inv, r, check, "You're missing an ingredient!", label), 'Missing 2 Cherry');
+    assert.equal(recipeMissingLine(createInventory({}), r, check, 'x', label), 'Missing 3 Cherry, 1 Meat');
+    assert.equal(recipeMissingLine(inv, r, { ok: false, reason: 'tool' }, 'You need a Frying Pan to make this', label), 'You need a Frying Pan to make this');
+    assert.doesNotMatch(recipeMissingLine(inv, r, check, '', label), /—/);
+  });
+
+  it('the panel: Show them turns on the known filter, the box ends it, known sorts before unknown', () => {
+    assert.match(body, /makeCanMakeOnly = false;\s*\/\/[^\n]*\n\s*makeKnownOnly = knownCount > 0;/);
+    assert.match(game, /makeCanMakeOnly = Boolean\(event\.target\.checked\);\s*makeKnownOnly = false;/);
+    assert.match(body, /const rank = \(r\) => \(canMakeNow\(r\) \? 0 : knowsRecipe\.get\(r\) \? 1 : 2\);/);
+    assert.match(body, /makeMode === 'canmake' \? canMakeNow : \(r\) => knowsRecipe\.get\(r\)/);
+    assert.match(body, /class="tile-why" data-make-tile-why/);
+    assert.match(body, /makeCountLine\(\{ mode: makeMode, shown: recipes\.length, known: knownCount, all: allRecipes \}\)/);
+    const open = game.slice(game.indexOf('function openMakePanel('), game.indexOf('function openMakePanel(') + 600);
+    assert.match(open, /makeKnownOnly = false;/);
+  });
+
+  it('the original listed the known recipes only (MakingDialog.as 166, inc_making.js knowns/unknowns)', () => {
+    const dialog = join(root, '../glitch-client/com/tinyspeck/engine/port/MakingDialog.as');
+    if (!existsSync(dialog)) return;
+    assert.ok(readFileSync(dialog, 'utf8').includes('recipe_ui = new MakingRecipeUI(info.knowns, content_w);'));
   });
 });

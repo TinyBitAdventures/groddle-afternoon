@@ -3229,6 +3229,11 @@
 :root[data-ui="classic"] #game-root .street-nameplate > #featured-project-pill:focus-visible .fp-track { box-shadow: none; }
 /* === end bubble === */
 
+/* === chkui (lane) === */
+/* #305: a known recipe's tile says what it is missing, in the client's warning red (MakingRecipeUI.as 176-187). */
+:root[data-ui="classic"] #game-root #make-panel .make-tile .tile-why { font-size: calc(var(--fs-classic-count) * var(--cu-n, 1)); color: var(--text-danger); }
+/* === end chkui === */
+
 /* == TICKETS == Reports (js/ui/reports-sheet.js, online only) as a 2012 window: the Quest Log's frame
    (Dialog.as, WindowBorder.as, BigDialog.as) centred in the viewport, the white head with its 20 px
    title and the red cross, the grey well between two rules, the white footer with the minor buttons;

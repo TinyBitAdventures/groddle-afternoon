@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=4a584630';
 import { createErrorOnce, createFeatureHost } from './js/feature-host.js?v=06bb8b74';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=150965c2';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=7d8b4c97';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl, drawTileArt } from './js/enter-chooser.js?v=4a3ea327';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, bodyReachDistance, OUT_OF_REACH_LINE } from './js/reach.js?v=8e52df56';
@@ -598,6 +598,9 @@ import {
   canCraftAgain,
   canCraft,
   makeEmptyLine,
+  recipeKnownHere,
+  makeCountLine,
+  recipeMissingLine,
   ensureMakingItems,
   loadRecipeCatalog,
   RECIPE_CATALOG,
@@ -609,11 +612,11 @@ import {
   recipeTaskLimit,
   recipeToolInUse,
   pluralizeItem,
-} from './js/making.js?v=ba3677f0';
+} from './js/making.js?v=db79a208';
 import { outputIconsHtml, outputsPhrase, recipeOutputRows } from './js/ui/recipe-outputs.js?v=73e19baf';
 import { MAKE_TOOL_SHEETS } from './js/make-tool-sheets.js?v=6f758e09';
-import { createTestTubePanel, tryTileHtml, TRY_TILE_LABEL } from './js/test-tube-panel.js?v=9ac689f3';
-import { COMPOUND_RECIPE_IDS, EXPERIMENT_TOOL, experimentTooltip } from './js/test-tube.js?v=26a250fe';
+import { createTestTubePanel, tryTileHtml, TRY_TILE_LABEL } from './js/test-tube-panel.js?v=07306538';
+import { COMPOUND_RECIPE_IDS, EXPERIMENT_TOOL, experimentTooltip } from './js/test-tube.js?v=5314522a';
 import { groupMakingTools, makeToolCounts, makeToolCountLine, makeToolSpokenLine, makeOpeningTool, gridStep, stationForRecipe, MAKING_BUSY } from './js/make-tools.js?v=86877c3e';
 import { LOW_FUEL_LINE, craftSessionElapsedMs, isLowFuel, isMachineArt, machineArtHtml, packMakeState, playMachineHandOver, setMachineArtFrame } from './js/machine-art.js?v=038298f0';
 import {
@@ -2506,6 +2509,8 @@ let makeLastTool = null;
 let makeSearchQuery = '';
 /** VERBS: Make's "Can make now" filter (on by default, as in the HUD mock): only the recipes you can make now. */
 let makeCanMakeOnly = true;
+/** #305: "Show them" from the empty note lists only the recipes you know (MakingDialog.as 166-167); the box or another tool ends it. */
+let makeKnownOnly = false;
 /** A machine standing in the world the Make panel runs on instead of the pack (machine rooms, G169): { tool, toolState, onComplete } */
 let makeStation = null;
 /** @type {string|null} recipe key for make detail */
@@ -28437,6 +28442,7 @@ function openMakeTool(toolId, event = null) {
   makeToolFilter = toolId;
   makeLastTool = toolId;
   makeSearchQuery = '';
+  makeKnownOnly = false;
   makeSelected = null;
   makeQty = 1;
   renderMakePanel();
@@ -28685,29 +28691,28 @@ function renderMakePanel() {
 
   // From the first screen a search looks across every tool: "where do I make this?"
   const recipes = searchRecipes(makeSearchQuery, { tool: inTool ? makeToolFilter : 'all', ...known });
-  recipes.sort((a, b) => {
-    const ca = canMakeNow(a) ? 0 : 1;
-    const cb = canMakeNow(b) ? 0 : 1;
-    if (ca !== cb) return ca - cb;
-    return a.name.localeCompare(b.name);
-  });
+  // #305: what you can make now, then the rest you know, then the recipes you don't know yet.
+  const knowsRecipe = new Map(recipes.map((r) => [r, recipeKnownHere(inv, r, recipeOpts)]));
+  const rank = (r) => (canMakeNow(r) ? 0 : knowsRecipe.get(r) ? 1 : 2);
+  recipes.sort((a, b) => rank(a) - rank(b) || a.name.localeCompare(b.name));
   const allRecipes = recipes.length;
+  const knownCount = recipes.filter((r) => knowsRecipe.get(r)).length;
   const everyRecipe = makeCanMakeOnly ? recipes.slice() : recipes;
-  if (makeCanMakeOnly) {
+  const makeMode = makeCanMakeOnly ? 'canmake' : makeKnownOnly ? 'known' : 'all';
+  if (makeMode !== 'all') {
+    const keep = makeMode === 'canmake' ? canMakeNow : (r) => knowsRecipe.get(r);
     for (let i = recipes.length - 1; i >= 0; i--) {
-      if (!canMakeNow(recipes[i])) recipes.splice(i, 1);
+      if (!keep(recipes[i])) recipes.splice(i, 1);
     }
   }
-  if (app?.canvas) app.canvas.dataset.makeShown = `${recipes.length}/${allRecipes}${makeCanMakeOnly ? ':canmake' : ''}`;
+  if (app?.canvas) app.canvas.dataset.makeShown = `${recipes.length}/${allRecipes}${makeMode === 'all' ? '' : `:${makeMode}`}`;
 
   if (meta) {
     meta.textContent = makeSelected
       ? `Uses ${recipeEnergyCost(RECIPE_CATALOG[makeSelected], skillState.learned, pc.imaginationUpgrades)} energy · energy now ${Math.floor(pc.energy)}`
       : inTool && makeToolFilter === 'fruit_changing_machine'
         ? `${makeCanMakeOnly ? `${recipes.length} of ${allRecipes}` : recipes.length} fruits · ${countItem(inv, 'cherry')} cherries ready · energy ${Math.floor(pc.energy)}`
-        : makeCanMakeOnly
-          ? `${recipes.length} of ${allRecipes} recipes you can make now · energy ${Math.floor(pc.energy)}`
-          : `${recipes.length} recipes · energy ${Math.floor(pc.energy)}`;
+        : `${makeCountLine({ mode: makeMode, shown: recipes.length, known: knownCount, all: allRecipes })} · energy ${Math.floor(pc.energy)}`;
   }
 
   // Detail view
@@ -28796,7 +28801,7 @@ function renderMakePanel() {
     // Report 129: why, and a button that turns the filter off.
     // A search with nothing says what it looked in; from a tool it offers the other tools.
     list.innerHTML = makeCanMakeOnly && allRecipes
-      ? `<div class="make-empty"><p>${escapeHtml(makeEmptyLine(inv, everyRecipe, opts))}</p><button type="button" class="make-show-all" data-make-show-all>Show them</button></div>`
+      ? `<div class="make-empty"><p>${escapeHtml(makeEmptyLine(inv, everyRecipe, recipeOpts))}</p><button type="button" class="make-show-all" data-make-show-all>Show them</button></div>`
       : query && inTool
         ? `<div class="make-empty"><p>${escapeHtml(`No ${toolLabel} recipes for “${query}”.`)}</p><button type="button" class="make-show-all" data-make-search-all>Look in every tool</button></div>`
         : query
@@ -28804,6 +28809,8 @@ function renderMakePanel() {
           : '<div class="make-empty">No recipes for this tool yet.</div>';
     list.querySelector('[data-make-show-all]')?.addEventListener('click', () => {
       makeCanMakeOnly = false;
+      // #305: the recipes the note counted, and no others; none known shows every recipe.
+      makeKnownOnly = knownCount > 0;
       renderMakePanel();
       document.getElementById('make-canmake')?.focus({ preventScroll: true });
     });
@@ -28821,13 +28828,18 @@ function renderMakePanel() {
     const energyOk = pc.energy > recipeEnergyCost(recipe, skillState.learned, pc.imaginationUpgrades);
     const canMake = check.ok && energyOk;
     const blockedLine = canMake ? '' : makeBlockedLine(recipe, check);
+    // #305: a recipe you know but can't make says on its tile what it is missing.
+    const missingLine = canMake || !knowsRecipe.get(recipe)
+      ? ''
+      : recipeMissingLine(inv, recipe, check, blockedLine, (i) => recipeInputLabel(recipe, i), recipeOpts(recipe).toolState);
     const outRows = recipeOutputRows(recipe);
     const outId = outRows[0]?.classTsid;
     const tile = document.createElement('button');
     tile.type = 'button';
     tile.className = 'make-tile'
       + (inTool && makeToolFilter === 'fruit_changing_machine' ? ' fruit-change-tile' : '')
-      + (canMake ? '' : ' blocked');
+      + (canMake ? '' : ' blocked')
+      + (missingLine ? ' known' : '');
     tile.setAttribute('role', 'listitem');
     tile.dataset.makeRecipe = key;
     // A search over every tool says which tool makes each recipe.
@@ -28839,14 +28851,15 @@ function renderMakePanel() {
     tile.innerHTML = `
       ${outRows.length > 1 ? recipeOutputsHtml(outRows, { className: 'tile-outs' }) : `<img src="${itemIconUrl(outId)}" alt="" />`}
       <span class="tile-label">${recipe.name}</span>
-      <span class="tile-req">${inputs}</span>${withTool ? `
+      <span class="tile-req">${inputs}</span>${missingLine ? `
+      <span class="tile-why" data-make-tile-why>${escapeHtml(missingLine)}</span>` : ''}${withTool ? `
       <span class="tile-tool" data-make-tile-tool>${escapeHtml(withTool)}</span>` : ''}`;
     const makes = recipeMakesLine(recipe);
-    const tileTip = [blockedLine, makes].filter(Boolean).join(' ');
+    const tileTip = [missingLine && missingLine !== blockedLine ? `${missingLine}.` : '', blockedLine, makes].filter(Boolean).join(' ');
     if (tileTip) tile.title = tileTip;
     tile.setAttribute(
       'aria-label',
-      `${recipe.name}. ${withTool ? `${withTool}. ` : ''}${makes ? `${makes} ` : ''}${inputs}. ${recipeEnergyCost(recipe, skillState.learned, pc.imaginationUpgrades)} energy.${blockedLine ? ` ${blockedLine}` : ''}`
+      `${recipe.name}. ${withTool ? `${withTool}. ` : ''}${makes ? `${makes} ` : ''}${inputs}. ${recipeEnergyCost(recipe, skillState.learned, pc.imaginationUpgrades)} energy.${missingLine ? ` ${missingLine}.` : blockedLine ? ` ${blockedLine}` : ''}`
     );
     tile.addEventListener('click', (event) => {
       // G554: the recipe opens at its top, with Back in view, and Back returns to this place in the list.
@@ -28881,6 +28894,7 @@ function openMakePanel(station = null, { tool = null } = {}) {
     return;
   }
   makeStation = typeof station?.tool === 'string' ? station : null;
+  makeKnownOnly = false;
   testTubePanel.close();
   const openTool = makeOpeningTool({
     stationTool: makeStation?.tool,
@@ -32782,6 +32796,7 @@ async function main() {
   });
   document.getElementById('make-canmake')?.addEventListener('change', (event) => {
     makeCanMakeOnly = Boolean(event.target.checked);
+    makeKnownOnly = false;
     makeSelected = null;
     renderMakePanel();
   });
