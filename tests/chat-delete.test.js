@@ -95,7 +95,7 @@ describe('/chat/\'s Delete line (community/chat-pure.js, chat-menus.js, chat-app
   it('only an administrator\'s page is marked, and the asset key moved with the files', () => {
     const pages = src('src/CommunityPages.php');
     assert.match(pages, /\(\(\$viewer\['admin'\] \?\? false\) \? ' data-chat-admin="1"' : ''\)/);
-    assert.match(pages, /public const ASSET_KEY = 'community-15';/);
+    assert.match(pages, /public const ASSET_KEY = 'community-16';/);
   });
 });
 

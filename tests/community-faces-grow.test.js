@@ -42,7 +42,7 @@ describe('the boards\' words box grows (Bugs thread 6)', { skip: skipWithoutSite
     assert.match(js, /const fit = grow\(field\);/, 'the reply box');
     assert.match(js.slice(js.indexOf('function editPost(')), /grow\(field\);/, 'an edit');
     assert.match(src('src/CommunityPages.php'), /<textarea class="ctext cx-field" id="cthread-body"/);
-    assert.match(src('src/CommunityPages.php'), /public const ASSET_KEY = 'community-15';/);
+    assert.match(src('src/CommunityPages.php'), /public const ASSET_KEY = 'community-16';/);
   });
 });
 
