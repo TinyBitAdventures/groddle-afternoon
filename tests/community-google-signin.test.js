@@ -80,6 +80,6 @@ describe('the boards\' sign-in offers Continue with Google (/chat/bugs/9)', { sk
     }
     const block = js.slice(js.indexOf('// —— Continue with Google'), js.indexOf('wireSignIn(document);', js.indexOf('// —— Continue with Google')));
     assert.doesNotMatch(block.replace(/^\/\/ —— Continue with Google[^\n]*\n/, ''), /—/);
-    assert.match(src('src/CommunityPages.php'), /public const ASSET_KEY = 'community-16';/);
+    assert.ok(Number(src('src/CommunityPages.php').match(/public const ASSET_KEY = 'community-(\d+)';/)?.[1]) >= 16, 'community-16 or later');
   });
 });

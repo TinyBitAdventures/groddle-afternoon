@@ -89,6 +89,49 @@ describe('Announcements on a throwaway database', { skip: skipDb }, () => {
     assert.ok(r.start.staff.body.url.startsWith('/chat/announcements/'), 'the slug and its links stay');
   });
 
+  it('the team\'s new topic gives every character but its writer one unread announce notice (none to a login with no character)', () => {
+    const news = r.start.staff.body.thread.id;
+    for (const who of ['ada', 'bea', 'cyd']) assert.deepEqual(r.notices[who].filter((n) => n.kind === 'announce'), [{ kind: 'announce', thread: news, from: 900, read: false, game: false }], who);
+    assert.deepEqual(r.notices.staff.map((n) => n.kind), ['reply'], 'the writer gets none; a reply to the announcement notifies its writer as before');
+    assert.deepEqual(r.notices.noCharacter, []);
+    assert.equal(r.notices.ada.filter((n) => n.kind === 'reply').length, 1, 'Ada\'s own topic\'s reply notice is untouched');
+    assert.equal(r.notices.bea.filter((n) => n.kind === 'reply').length, 0, 'Bea replied to the announcement: she is not notified of her own reply');
+  });
+
+  it('it shows in the /chat/ panel and its badge, never in the game\'s Activity', () => {
+    const ann = r.panel.cyd.find((i) => i.kind === 'announce');
+    assert.deepEqual(ann, { kind: 'announce', text: 'New announcement: “Groddle news”', unread: true, url: ann.url });
+    assert.match(ann.url, /^\/chat\/announcements\/\d+-groddle-news\/#post-\d+$/);
+    assert.equal(r.badge.cyd, 1);
+    assert.equal(r.badge.ada, 2, 'Ada: the announcement and the reply to her topic');
+    assert.deepEqual(r.game.cyd, [], 'the game\'s list leaves announcements out');
+    assert.deepEqual(r.game.ada.map((n) => n[0]), ['reply'], 'and keeps the rest');
+    assert.deepEqual(r.list, [['announce', 'New announcement: “Groddle news” on the Community boards.']]);
+    assert.equal(r.noticeText, 'New announcement: “Groddle news” on the Community boards.');
+  });
+
+  it('unread until the topic is opened or Mark all read; once a character; never to a character made later', () => {
+    assert.equal(r.afterRead.ada.find((n) => n.kind === 'announce').read, true, 'opening the topic reads it');
+    assert.ok(r.afterRead.bea.every((n) => n.read), 'Mark all read reads it');
+    assert.equal(r.afterRead.cyd.find((n) => n.kind === 'announce').read, false);
+    assert.equal(r.afterRead.adaBadge, 1);
+    assert.equal(r.afterRead.cydBadge, 1);
+    assert.equal(r.again, 0, 'running it again writes nothing');
+    assert.deepEqual(r.later, [], 'a character made after the announcement never gets it');
+    assert.equal(r.second.total, 4, 'the next announcement reaches every character, Eve too');
+    assert.deepEqual(r.second.eve.map((n) => n.kind), ['announce']);
+  });
+
+  it('one INSERT ... SELECT, a kind that fits its column, and the game keeps game_at as it was', () => {
+    const c = src('src/Community.php');
+    assert.match(c, /public const ANNOUNCE = 'announce';/);
+    assert.ok('announce'.length <= Number(JSON.parse(src('minn.json')).tables.groddle_community_notices.find((l) => l.startsWith('kind ')).match(/varchar\((\d+)\)/)[1]));
+    assert.match(c, /INSERT INTO \{\$n\} \(user_id, kind, thread_id, post_id, from_id, count, created_at\) SELECT c\.user_id/);
+    assert.match(c, /AND x\.kind <> '" \. self::ANNOUNCE \. "'/);
+    assert.match(src('community/notifications.js'), /announce: svg\(/);
+    assert.match(src('community/community.css'), /\.notif-icon\[data-kind="announce"\]/);
+  });
+
   it('the rule is the administrators\' (manage_options), by board, never by user id', () => {
     const c = src('src/Community.php');
     assert.match(src('src/CommunityText.php'), /public const STAFF_BOARDS = \['announcements'\];/);

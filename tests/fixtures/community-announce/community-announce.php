@@ -161,6 +161,27 @@ try {
         'playerNew' => $page(910, 'new', 'announcements'),
     ];
     $out['said'] = CommunityText::said('groddle_community_staff_only');
+
+    // == 3. Every character hears of the team's new topic in /chat/, never in the game ==
+    $general = (int) ($out['start']['playerGeneral']['body']['thread']['id'] ?? 0);
+    $reply(911, $general, 'Count me in for the pond.');
+    $out['notices'] = ['staff' => $notices(900), 'ada' => $notices(910), 'bea' => $notices(911), 'cyd' => $notices(912), 'noCharacter' => $notices(913)];
+    $panel = static fn (int $u): array => array_values(array_map(static fn (array $i): array => ['kind' => $i['kind'], 'text' => $i['text'], 'unread' => $i['unread'], 'url' => $i['url']], (new Notifications($seams($u)))->items($u)));
+    $out['panel'] = ['ada' => $panel(910), 'cyd' => $panel(912)];
+    $out['badge'] = ['ada' => (new Notifications($seams(910)))->unread(910), 'cyd' => (new Notifications($seams(912)))->unread(912)];
+    $out['game'] = ['ada' => array_map(static fn (array $n): array => [$n['kind'], $n['text']], $community(910)->notices(910, true)), 'cyd' => $community(912)->notices(912, true)];
+    $out['list'] = array_map(static fn (array $n): array => [$n['kind'], $n['text']], $community(912)->notices(912, false));
+    // Opening the topic reads it; so does Mark all read.
+    $community(910)->readThread(910, $news);
+    (new Notifications($seams(911)))->mark(911, null);
+    $out['afterRead'] = ['ada' => $notices(910), 'bea' => $notices(911), 'cyd' => $notices(912), 'adaBadge' => (new Notifications($seams(910)))->unread(910), 'cydBadge' => (new Notifications($seams(912)))->unread(912)];
+    // Once a character: again writes nothing; a character made later never gets it.
+    $out['again'] = Community::announce($db, $news, 0, 900);
+    $person(914, 'Eve', 'subscriber', $now);
+    $out['later'] = $notices(914);
+    $later = $start(900, 'announcements', 'More Groddle news');
+    $out['second'] = ['eve' => $notices(914), 'total' => (int) $db->value('SELECT COUNT(*) FROM ' . $db->table(Community::NOTICES) . " WHERE kind = 'announce' AND thread_id = ?", [(int) ($later['body']['thread']['id'] ?? 0)])];
+    $out['noticeText'] = Community::noticeText(Community::ANNOUNCE, 1, 'Zz Staff', 'Groddle news');
 } catch (Throwable $e) {
     $out['error'] = get_class($e) . ': ' . $e->getMessage() . ' @' . $e->getFile() . ':' . $e->getLine();
 } finally {
