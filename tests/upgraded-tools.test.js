@@ -43,9 +43,9 @@ import {
 import { crushOre } from '../public/js/mining.js?v=b62c7722';
 import { MAKE_TOOL_SHEETS } from '../public/js/make-tool-sheets.js?v=6f758e09';
 import { clearPlot, createGarden, getPlot, hasHoe, hasWateringCan, plantPlot, waterPlot } from '../public/js/garden.js?v=92436baf';
-import { performTrantCare, quoteTrantCare } from '../public/js/trant-care.js?v=b4c09d17';
+import { performTrantCare, quoteTrantCare } from '../public/js/trant-care.js?v=e76c420c';
 import { createTrantState, setTrantTables } from '../public/js/trants.js?v=4d6f5593';
-import { createPlot, performPlotVerb, plotVerbs } from '../public/js/patches.js?v=5f333fdb';
+import { createPlot, performPlotVerb, plotVerbs } from '../public/js/patches.js?v=cd774b2c';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const pub = join(here, '../public');

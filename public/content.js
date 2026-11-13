@@ -15,7 +15,7 @@ import {
 import {
   quoteTrantCare,
   performTrantCare,
-} from './js/trant-care.js?v=b4c09d17';
+} from './js/trant-care.js?v=e76c420c';
 import {
   listPlantableSeeds,
   waterAllPlots,
@@ -57,7 +57,7 @@ import {
   ensureAnimalState,
   listAnimalFeedOptions,
   feedAnimal,
-} from './js/animals.js?v=c028763b';
+} from './js/animals.js?v=babec605';
 import {
   quoteAnimalKinship,
   ANIMAL_KINSHIP_CLICK_REFUSALS,
@@ -75,7 +75,7 @@ import {
   quoteWoodTreeHarvest,
   harvestWoodTree,
   woodTreeStatusLabel,
-} from './js/woodcutting.js?v=2fdc8fc5';
+} from './js/woodcutting.js?v=d2b88bb5';
 import { findWorkingRookTool } from './js/rook-woods.js?v=738634d9';
 import {
   HERDKEEPING,
@@ -86,7 +86,7 @@ import {
   namingVerbs,
   queuePlops,
   startIncubation,
-} from './js/animal-husbandry.js?v=f5569539';
+} from './js/animal-husbandry.js?v=a6f5b828';
 import { loseEnergy, metabolicGain, moodMax } from './js/metabolics.js?v=1383e6fd';
 import { SET_FREE, setFreeVerbState } from './js/animal-set-free.js?v=55ad2f83';
 import { BUTTER_UP, SING_TO, butterUpVerbState, butterUpChicken, singToVerbState, singToButterfly } from './js/animal-flattery.js?v=9700115b';
@@ -1349,6 +1349,8 @@ export function runVerb(target, verbId, ctx) {
       tools: ctx.tools,
       learned: ctx.skills?.learned || ctx.learned || [],
       rng: ctx.rng || Math.random,
+      // A Wood Tree the realtime server granted this on counts there (js/trant-care.js).
+      woodCareShared: ctx.woodCareShared === true,
     });
     if (care.effects) {
       effects.energy += care.effects.energy || 0;
@@ -1392,6 +1394,8 @@ export function runVerb(target, verbId, ctx) {
       tools: ctx.tools,
       learned: ctx.skills?.learned || ctx.learned || [],
       rng: ctx.rng || Math.random,
+      // A Wood Tree the realtime server granted this on counts there (js/trant-care.js).
+      woodCareShared: ctx.woodCareShared === true,
     });
     if (care.effects) {
       effects.energy += care.effects.energy || 0;

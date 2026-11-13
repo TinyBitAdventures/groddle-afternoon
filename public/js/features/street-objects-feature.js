@@ -147,15 +147,16 @@ import {
   treeId,
   treeReady,
   treeSkill,
-} from '../street-objects.js?v=563dc581';
+} from '../street-objects.js?v=7f8e0ded';
 import { ROCK_CATALOG } from '../mining.js?v=b62c7722';
 import { TRANT_META, trantStatusLabel } from '../trants.js?v=4d6f5593';
-import { quoteWoodTreeHarvest } from '../woodcutting.js?v=2fdc8fc5';
-import { animalStatusLabel, pickerMaxCount } from '../animals.js?v=c028763b';
+import { quoteWoodTreeHarvest } from '../woodcutting.js?v=d2b88bb5';
+import { highestLightGreenThumbRank, quoteTrantCare } from '../trant-care.js?v=e76c420c';
+import { animalStatusLabel, pickerMaxCount } from '../animals.js?v=babec605';
 import { highestAnimalKinshipRank, quoteAnimalKinship } from '../animal-kinship.js?v=ffe074b2';
 import { CREW_NODES } from '../help-dig.js?v=93d6358d';
 import { animalPatrolRange, ANIMAL_BODY, TREE_FOOTPRINT } from '../street-ecology.js?v=0f046853';
-import { INCUBATION, PIGGY_FEED, itemBaseCost, namedAnimalLabel, resetIncubation } from '../animal-husbandry.js?v=f5569539';
+import { INCUBATION, PIGGY_FEED, itemBaseCost, namedAnimalLabel, resetIncubation } from '../animal-husbandry.js?v=a6f5b828';
 import {
   applyCreatureState,
   batterflyAt,
@@ -182,7 +183,7 @@ import {
   dragonWalkAt,
   kittyWalkAt,
   walkerSpan,
-} from '../street-creatures.js?v=c7c35e1c';
+} from '../street-creatures.js?v=a47ea7cf';
 
 export const STREET_OBJECTS_FEATURE_ID = 'street-objects';
 const RECONCILE_MS = 250;
@@ -696,7 +697,11 @@ function reconcileAll(engine, force = false) {
 function viewOf(obj) {
   if (obj.kind === 'rock') return `${obj.id}=${obj.rock.chunksRemaining}${obj.rock.mega ? 'm' : ''}`;
   if (obj.kind === 'node') return `${obj.id}=${obj.node.units}${obj.node.petted ? 'p' : ''}${obj.node.watered ? 'w' : ''}`;
-  if (obj.kind === 'wood') return `${obj.id}=m${obj.state.maturity}c${obj.state.harvestCount || 0}${deathView(obj.state)}`;
+  if (obj.kind === 'wood') {
+    // Its care toward the next maturity (+pets/waters), when it has any.
+    const care = obj.state.carePets || obj.state.careWaters ? `+${obj.state.carePets || 0}/${obj.state.careWaters || 0}` : '';
+    return `${obj.id}=m${obj.state.maturity}c${obj.state.harvestCount || 0}${care}${deathView(obj.state)}`;
+  }
   if (obj.kind === 'pig') return `${obj.id}=m${obj.state.mood}h${obj.state.hunger}${obj.state.hasBeenPetted ? 'p' : ''}${obj.state.userName ? `~${obj.state.userName}` : ''}`;
   if (obj.kind === 'chicken') return `${obj.id}=s${obj.state.sharedSqueezes || 0}${obj.state.incubatingEgg ? 'i' : ''}`;
   if (obj.kind === 'butterfly') return `${obj.id}=m${obj.state.sharedMassages || 0}k${obj.state.sharedMilks || 0}`;
@@ -811,10 +816,19 @@ function sharedVerbOn(engine, target, verbId) {
     };
   }
   if (Number.isInteger(target.treeIndex) && target.classId === 'wood_tree' && !target.grownFromBean && target.state) {
-    if (verbId !== 'harvest') return null;
+    if (verbId === 'harvest') {
+      return {
+        id: treeId(target.treeIndex),
+        ready: () => quoteWoodTreeHarvest(target.state, engine.inv, engine.pc, engine.toolState).ok,
+      };
+    }
+    if (verbId !== 'pet' && verbId !== 'water') return null;
+    // A street Wood Tree's care counts on the server for everyone (objects.go tendWood); this
+    // player's own 5-minute clock, can and energy refuse here first, as in solo.
     return {
       id: treeId(target.treeIndex),
-      ready: () => quoteWoodTreeHarvest(target.state, engine.inv, engine.pc, engine.toolState).ok,
+      ready: () => quoteTrantCare(target.state, 'wood_tree', verbId, { pc: engine.pc, inv: engine.inv, tools: engine.toolState, learned }).ok,
+      skill: highestLightGreenThumbRank(learned) === 'no_skill' ? '' : highestLightGreenThumbRank(learned),
     };
   }
   if (target.resourceKey) {
@@ -924,7 +938,7 @@ function answered(engine, msg, ok) {
   if (!obj) return;
   // The local rules run on the state the server decided from, with its rolls.
   if (msg.before) applyKnown(obj, msg.before);
-  grant = { target: p.target, verbId: p.verbId, roll: Number(msg.roll), chunks: Number.isInteger(msg.chunks) ? msg.chunks : undefined, help: msg.help && typeof msg.help === 'object' ? msg.help : null, use: msg.use && typeof msg.use === 'object' ? msg.use : null, guano: Number.isInteger(msg.guano) ? msg.guano : undefined };
+  grant = { target: p.target, verbId: p.verbId, roll: Number(msg.roll), chunks: Number.isInteger(msg.chunks) ? msg.chunks : undefined, help: msg.help && typeof msg.help === 'object' ? msg.help : null, use: msg.use && typeof msg.use === 'object' ? msg.use : null, guano: Number.isInteger(msg.guano) ? msg.guano : undefined, matured: msg.matured === true ? Math.max(0, Math.floor(Number(msg.maturity) || 0)) : 0 };
   // G335 slice 5: food the ledger took for a Piggy or a Batterfly, or the egg a Chicken sits on,
   // leaves the pack with the verb below, once (the trade slice's applied list holds its op, so the
   // site counts it as applied).
@@ -1378,6 +1392,8 @@ export const streetObjectsFeature = {
     if (grant.use) out.use = grant.use;
     // A Batterfly's feed: the Guano the shared food counter released (objects_creatures.go).
     if (Number.isInteger(grant.guano)) out.guano = grant.guano;
+    // A street Wood Tree the care grew (objects.go tendWood "matured", "maturity").
+    if (grant.matured) out.matured = grant.matured;
     return out;
   },
 

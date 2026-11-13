@@ -10,7 +10,6 @@ import {
   maturityCycleMs,
   maturityGrowChance,
   normalizePlot,
-  noteWoodTreeCare,
   performPlotVerb,
   plantChoices,
   plotArtPath,
@@ -23,8 +22,9 @@ import {
   soilSpawnClasses,
   tickPlot,
   archivedSeedlingTrant,
-} from '../public/js/patches.js?v=5f333fdb';
+} from '../public/js/patches.js?v=cd774b2c';
 import { createToolConditionState, getToolCondition } from '../public/js/tools.js?v=62b37c51';
+import { harvestWoodTree, noteWoodCare } from '../public/js/woodcutting.js?v=d2b88bb5';
 
 const seq = (...values) => {
   let i = 0;
@@ -281,15 +281,13 @@ describe('beans to trees', () => {
     plot.seedling = { trantClass: 'wood_tree', petted: 3, minAt: 0, maxAt: 1e12, thirdPetAt: 0, growLevel: 0 };
     const tree = growTree(plot, 0);
     assert.equal(tree.state.maturity, 1);
-    for (let day = 0; day < 2; day += 1) {
-      tree.state.petted = true;
-      tree.state.watered = true;
-      noteWoodTreeCare(tree);
-      tree.state.petted = false;
-      tree.state.watered = false;
-      noteWoodTreeCare(tree);
+    // Each player's pet and water every 5 minutes (wood_tree.js canPet / canWater), counted as they land.
+    for (let round = 0; round < 2; round += 1) {
+      noteWoodCare(tree.state, 'pet', round * 300000 + 1);
+      noteWoodCare(tree.state, 'water', round * 300000 + 2);
     }
     assert.equal(tree.state.maturity, 2);
+    assert.deepEqual(tickPlot(plot, 5).events, [], 'the clock never grows a Wood Tree');
     tree.state.maturity = 0;
     tickPlot(plot, 10);
     assert.equal(plot.stage, 'tree');
@@ -305,12 +303,19 @@ describe('wood tree harvest', () => {
     plot.seedling = { trantClass: 'wood_tree', petted: 3, minAt: 0, maxAt: 1e12, thirdPetAt: 0, growLevel: 0 };
     const tree = growTree(plot, 0);
     tree.state.maturity = 3;
-    tree.state.petted = true;
-    noteWoodTreeCare(tree);
-    assert.equal(tree.woodPetted, 1);
-    tree.state.totalHarvests = (tree.state.totalHarvests || 0) + 1;
-    noteWoodTreeCare(tree);
-    assert.equal(tree.woodPetted, 0);
+    noteWoodCare(tree.state, 'pet', 1);
+    assert.equal(tree.state.carePets, 1);
+    const harvest = harvestWoodTree(tree.state, { hatchet: 1 }, { energy: 100 }, createToolConditionState({ hatchet: 1 }));
+    assert.equal(harvest.ok, true);
+    assert.equal(tree.state.carePets, 0);
+  });
+
+  it('a save\'s plot counts move onto the tree state, and its daily marks block nothing', () => {
+    const plot = normalizePlot({ classTsid: 'patch', kind: 'patch', stage: 'tree', tree: { classId: 'wood_tree', woodPetted: 3, woodWatered: 2, seenPetted: true, seenWatered: true, state: { maturity: 4, petted: true, watered: true } } });
+    assert.equal(plot.tree.state.carePets, 3);
+    assert.equal(plot.tree.state.careWaters, 2);
+    assert.equal(plot.tree.state.petted, false);
+    assert.equal('woodPetted' in plot.tree, false);
   });
 });
 

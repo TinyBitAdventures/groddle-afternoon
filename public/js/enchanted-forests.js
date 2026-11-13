@@ -332,8 +332,6 @@ export function createEnchantedTree({ seed = '', maturity = 6, variant = null } 
     dieAt: 0,
     growAt: 0,
     seedlingPets: 0,
-    woodPetted: 0,
-    woodWatered: 0,
     state: { maturity: whole(maturity, 6, 1, 6), harvestCount: 0, harvestedToday: false, totalHarvests: 0, petted: false, watered: false, enchanted: true },
   };
 }
@@ -346,9 +344,18 @@ export function normalizeEnchantedTree(tree, seed = '') {
   t.dieAt = whole(t.dieAt, 0, 0, Number.MAX_SAFE_INTEGER);
   t.growAt = whole(t.growAt, 0, 0, Number.MAX_SAFE_INTEGER);
   t.seedlingPets = whole(t.seedlingPets, 0);
-  t.woodPetted = whole(t.woodPetted, 0);
-  t.woodWatered = whole(t.woodWatered, 0);
   t.state = t.state && typeof t.state === 'object' ? t.state : createEnchantedTree({ seed }).state;
+  // Its care counts moved onto the state, where every Wood Tree keeps them (js/woodcutting.js
+  // noteWoodCare, adoptPlotWoodCounts; not imported here, woodcutting.js imports this module).
+  if (t.woodPetted != null || t.woodWatered != null) {
+    t.state.carePets = Math.max(whole(t.state.carePets, 0), whole(t.woodPetted, 0));
+    t.state.careWaters = Math.max(whole(t.state.careWaters, 0), whole(t.woodWatered, 0));
+  }
+  delete t.woodPetted;
+  delete t.woodWatered;
+  delete t.seenPetted;
+  delete t.seenWatered;
+  delete t.seenHarvests;
   t.state.enchanted = true;
   return t;
 }
@@ -375,8 +382,6 @@ export function advanceEnchantedTree(tree, now = Date.now()) {
     // growUp: a brand-new item, so the daily harvest/care marks start clean.
     tree.stage = 'tree';
     tree.growAt = 0;
-    tree.woodPetted = 0;
-    tree.woodWatered = 0;
     tree.state = {
       maturity: ENCHANTED_WOOD_TREE.regrowMaturity,
       harvestCount: 0,

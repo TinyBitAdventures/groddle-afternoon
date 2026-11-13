@@ -34,7 +34,7 @@
  */
 
 import { createTrantState, fruitCapacityAt, resetTrantDay } from './trants.js?v=4d6f5593';
-import { WOOD_TREE_MATURITY_MAP, ensureWoodTreeState, resetWoodTreeDay } from './woodcutting.js?v=2fdc8fc5';
+import { WOOD_TREE_MATURITY_MAP, adoptPlotWoodCounts, ensureWoodTreeState, resetWoodTreeDay } from './woodcutting.js?v=d2b88bb5';
 import { canUseTool, useToolCondition } from './tools.js?v=62b37c51';
 import { musicblockItemMeta } from './musicblocks.js?v=765ac56d';
 import { grantMoodXp } from './mood-xp.js?v=22648ec0';
@@ -495,8 +495,11 @@ export function normalizePlot(saved) {
       plot.stage = 'dirty';
     } else {
       const state = t.state;
-      if (classId === 'wood_tree') ensureWoodTreeState(state);
-      else {
+      if (classId === 'wood_tree') {
+        // Care counts live on the tree's state now (js/woodcutting.js noteWoodCare).
+        adoptPlotWoodCounts(t);
+        ensureWoodTreeState(state);
+      } else {
         state.classTsid = classId;
         state.maturity = whole(state.maturity, 1, 0, 10);
         state.health = whole(state.health, 7, 1, 10);
@@ -510,11 +513,6 @@ export function normalizePlot(saved) {
         state,
         grownAt: time(t.grownAt),
         lastCycleAt: time(t.lastCycleAt),
-        woodPetted: whole(t.woodPetted, 0),
-        woodWatered: whole(t.woodWatered, 0),
-        seenPetted: t.seenPetted === true,
-        seenWatered: t.seenWatered === true,
-        seenHarvests: whole(t.seenHarvests, whole(state?.totalHarvests, 0)),
         clearedAt: time(t.clearedAt),
         resetAt: time(t.resetAt, time(t.grownAt)),
       };
@@ -553,11 +551,6 @@ export function growTree(plot, now = Date.now()) {
     state,
     grownAt: now,
     lastCycleAt: now,
-    woodPetted: 0,
-    woodWatered: 0,
-    seenPetted: false,
-    seenWatered: false,
-    seenHarvests: 0,
     clearedAt: 0,
     resetAt: now,
   };
@@ -614,11 +607,6 @@ export function reviveDeadTree(plot, now = Date.now()) {
     state: createTrantState(classId, { ...REVIVED_TRANT, fruitCount: 0 }),
     grownAt: now,
     lastCycleAt: now,
-    woodPetted: 0,
-    woodWatered: 0,
-    seenPetted: false,
-    seenWatered: false,
-    seenHarvests: 0,
     clearedAt: 0,
     resetAt: now,
   };
@@ -706,48 +694,6 @@ export function growStreetTrant(state, classId, now = Date.now(), rng = Math.ran
 }
 
 /**
- * wood_tree.js care growth: each new petting/watering counts; once both are
- * done and both counts reach maturityMap[m-1], the tree gains one maturity.
- * A harvest the tree survives zeroes both counts.
- */
-export function noteWoodTreeCare(tree) {
-  if (!tree || tree.classId !== 'wood_tree') return false;
-  const state = ensureWoodTreeState(tree.state);
-  let changed = false;
-  if (state.petted && !tree.seenPetted) {
-    tree.woodPetted += 1;
-    changed = true;
-  }
-  if (state.watered && !tree.seenWatered) {
-    tree.woodWatered += 1;
-    changed = true;
-  }
-  tree.seenPetted = state.petted;
-  tree.seenWatered = state.watered;
-  // endHarvest zeroes both counts when the tree survives the harvest.
-  const harvests = Math.max(0, Math.floor(Number(state.totalHarvests) || 0));
-  if (harvests !== (tree.seenHarvests ?? harvests)) {
-    if (state.maturity > 0 && (tree.woodPetted || tree.woodWatered)) {
-      tree.woodPetted = 0;
-      tree.woodWatered = 0;
-      changed = true;
-    }
-  }
-  tree.seenHarvests = harvests;
-  if (changed && state.petted && state.watered && state.maturity >= 1 && state.maturity < 6) {
-    const need = WOOD_TREE_MATURITY_MAP[state.maturity - 1];
-    if (tree.woodPetted >= need && tree.woodWatered >= need) {
-      state.maturity += 1;
-      state.harvestCount = 0;
-      tree.woodPetted = 0;
-      tree.woodWatered = 0;
-      return 'grew';
-    }
-  }
-  return changed;
-}
-
-/**
  * Advance timers. Returns { changed, events } where events name what happened
  * (`regrew`, `filled`, `grew`, `withered`, `matured`, `woodCleared`).
  * @param {object} plot
@@ -785,12 +731,9 @@ export function tickPlot(plot, now = Date.now(), ctx = {}) {
   if (plot.stage === 'tree' && plot.tree) {
     const tree = plot.tree;
     if (tree.classId === 'wood_tree') {
-      const care = noteWoodTreeCare(tree);
-      if (care === 'grew') events.push('matured');
-      // wood_tree.js:1009-1012: care that brings a tree to maturity 6 counts wood_tree:maxed.
-      if (care === 'grew' && tree.state.maturity === 6) events.push('maxed');
-      else if (care) events.push('cared');
-      const state = tree.state;
+      // Its care grows it where the pet or water lands (js/trant-care.js, woodcutting.js
+      // noteWoodCare), never on the clock.
+      const state = ensureWoodTreeState(tree.state);
       if (state.maturity <= 0) {
         if (!tree.clearedAt) tree.clearedAt = now;
         if (now - tree.clearedAt >= SOIL_TIMERS.woodToPatchMs) {
@@ -819,8 +762,6 @@ export function resetPlotDay(plot, rng = Math.random, now = Date.now()) {
   else {
     resetTrantDay(tree.state);
   }
-  tree.seenPetted = false;
-  tree.seenWatered = false;
   return true;
 }
 

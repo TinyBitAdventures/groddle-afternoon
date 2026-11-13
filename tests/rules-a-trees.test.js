@@ -10,14 +10,14 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { getVerbsFor, runVerb } from '../public/content.js?v=4519afca';
+import { getVerbsFor, runVerb } from '../public/content.js?v=6ae44f2e';
 import { createTrantState, setTrantTables, fruitCapacityAt } from '../public/js/trants.js?v=4d6f5593';
-import { quoteTrantCare } from '../public/js/trant-care.js?v=b4c09d17';
-import { harvestWoodTree, noteWoodCare, quoteWoodTreeHarvest, WOOD_TREE_MATURITY_MAP } from '../public/js/woodcutting.js?v=2fdc8fc5';
-import { growStreetTrant, maturityCycleMs } from '../public/js/patches.js?v=5f333fdb';
+import { quoteTrantCare } from '../public/js/trant-care.js?v=e76c420c';
+import { harvestWoodTree, noteWoodCare, quoteWoodTreeHarvest, WOOD_TREE_MATURITY_MAP } from '../public/js/woodcutting.js?v=d2b88bb5';
+import { growStreetTrant, maturityCycleMs } from '../public/js/patches.js?v=cd774b2c';
 import { createToolConditionState } from '../public/js/tools.js?v=62b37c51';
-import { patchesFeature } from '../public/js/features/patches-feature.js?v=47c30e52';
-import { treeDeathFeature, WOOD_CLEARED_TO_PATCH_MS } from '../public/js/features/tree-death-feature.js?v=2a47914e';
+import { patchesFeature } from '../public/js/features/patches-feature.js?v=d4624101';
+import { treeDeathFeature, WOOD_CLEARED_TO_PATCH_MS } from '../public/js/features/tree-death-feature.js?v=96e594fd';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 setTrantTables(JSON.parse(fs.readFileSync(path.join(root, 'public/assets/content/trants.json'), 'utf8')));
@@ -73,10 +73,12 @@ describe('tree pet and water refusals (trant_fruit.js 552/611, wood_tree.js 525/
   });
 
   it('a Wood Tree adds "right now", and the can is asked for first', () => {
-    const state = { maturity: 6, petted: true, watered: true };
-    assert.equal(quoteTrantCare(state, 'wood_tree', 'pet', { pc: { energy: 50 } }).msg, "I don't want to be petted right now!");
-    assert.equal(quoteTrantCare(state, 'wood_tree', 'water', { pc: { energy: 50 }, inv: { watering_can: 1 }, tools: tools() }).msg, "I don't want to be watered right now!");
-    assert.equal(quoteTrantCare(state, 'wood_tree', 'water', { pc: { energy: 50 }, inv: {} }).reason, 'tool_missing');
+    // This player petted and watered it a minute ago: its 5-minute clocks (canPet / canWater 614-640).
+    const now = 1_800_000_060_000;
+    const state = { maturity: 6, petAt: now - 60000, waterAt: now - 60000 };
+    assert.equal(quoteTrantCare(state, 'wood_tree', 'pet', { pc: { energy: 50 }, now }).msg, "I don't want to be petted right now!");
+    assert.equal(quoteTrantCare(state, 'wood_tree', 'water', { pc: { energy: 50 }, inv: { watering_can: 1 }, tools: tools(), now }).msg, "I don't want to be watered right now!");
+    assert.equal(quoteTrantCare(state, 'wood_tree', 'water', { pc: { energy: 50 }, inv: {}, now }).reason, 'tool_missing');
   });
 
   it('too tired is the source line', () => {
@@ -105,28 +107,26 @@ describe('street Wood Tree care growth (wood_tree.js onTendComplete 1006-1015)',
   it('both counts reaching maturityMap[m-1] grow one maturity and start the counts over', () => {
     assert.deepEqual([...WOOD_TREE_MATURITY_MAP], [2, 3, 4, 5, 6, 0]);
     const s = { maturity: 1 };
-    s.petted = true;
-    assert.equal(noteWoodCare(s, 'pet'), true);
-    s.watered = true;
-    assert.equal(noteWoodCare(s, 'water'), true);
+    assert.equal(noteWoodCare(s, 'pet', 1000), true);
+    assert.equal(noteWoodCare(s, 'water', 2000), true);
     assert.equal(s.maturity, 1);
-    // A new day: a second pet and water (the daily model), and maturityMap[0] = 2 is met.
-    assert.equal(noteWoodCare(s, 'pet'), true);
-    assert.equal(noteWoodCare(s, 'water'), 'grew');
+    // Five minutes on: a second pet and water, and maturityMap[0] = 2 is met.
+    assert.equal(noteWoodCare(s, 'pet', 301000), true);
+    assert.equal(noteWoodCare(s, 'water', 302000), 'grew');
     assert.deepEqual([s.maturity, s.carePets, s.careWaters], [2, 0, 0]);
   });
 
   it('counts only check once the tree has been both petted and watered', () => {
     const s = { maturity: 1, carePets: 5, careWaters: 1, petted: true, watered: false };
-    assert.equal(noteWoodCare(s, 'pet'), true);
+    assert.equal(noteWoodCare(s, 'pet', 1000), true);
     assert.equal(s.maturity, 1);
   });
 
   it('a mighty tree (6) never grows past 6; a cleared one (0) counts nothing', () => {
-    const top = { maturity: 6, carePets: 10, careWaters: 10, petted: true, watered: true };
-    assert.equal(noteWoodCare(top, 'pet'), true);
+    const top = { maturity: 6, carePets: 10, careWaters: 10, petted: true, watered: true, needsResetAt: 5000 };
+    assert.equal(noteWoodCare(top, 'pet', 1000), true);
     assert.equal(top.maturity, 6);
-    assert.equal(noteWoodCare({ maturity: 0 }, 'pet'), false);
+    assert.equal(noteWoodCare({ maturity: 0 }, 'pet', 1000), false);
   });
 
   it('a harvest the tree survives zeroes the counts (endHarvest 783-786)', () => {

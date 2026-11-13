@@ -51,7 +51,7 @@ import { ensureItem } from '../inventory.js?v=f49c8998';
 import { isItemFloor, platformYAt } from '../street-model.js?v=b6cb6a4e';
 import { getStreetEcologyCatalog, streetEcologyAliases } from '../street-ecology.js?v=0f046853';
 import { trantFootAnchorY, trantStatusLabel } from '../trants.js?v=4d6f5593';
-import { woodTreeStatusLabel } from '../woodcutting.js?v=2fdc8fc5';
+import { woodTreeStatusLabel } from '../woodcutting.js?v=d2b88bb5';
 import {
   GROWN_TREE_LABELS,
   SEASONED_BEANS,
@@ -71,11 +71,11 @@ import {
   soilSpawnClasses,
   soilSpritePaths,
   tickPlot,
-} from '../patches.js?v=5f333fdb';
+} from '../patches.js?v=cd774b2c';
 import { frameTexture, isLoaded, onFailed, onLoaded, textureFromUrl } from '../textures.js?v=92ec53cd';
 import { HOE_TOOLS, firstWorkingTool } from '../tools.js?v=62b37c51';
 import { slugsFromEffects } from '../speech-slugs.js?v=130338f9';
-import { plotSignature, replayRng } from '../shared-patches.js?v=20bc23de';
+import { plotSignature, replayRng } from '../shared-patches.js?v=390a6796';
 
 export const PATCHES_FEATURE_ID = 'patches';
 export const SOIL_GROUP_PREFIX = 'soil:';
@@ -832,7 +832,7 @@ function streetItems(engine) {
   // Catch up on time spent away (seedlings, regrowth, tree maturity).
   for (const item of items) {
     resetPlotDayIfStale(item.plot, lastNewDayAt, Math.random, now);
-    if (tickPlot(item.plot, now).events.includes('maxed')) engine.achievement('wood_tree:maxed', 1);
+    tickPlot(item.plot, now);
   }
   return items;
 }
@@ -985,7 +985,6 @@ export const patchesFeature = {
       }
       const before = entity.plot.stage;
       const { changed, events } = tickPlot(entity.plot, now);
-      if (events.includes('maxed')) engine.achievement('wood_tree:maxed', 1);
       if (before !== entity.plot.stage) {
         dirty = true;
         const grew = events.includes('grew');

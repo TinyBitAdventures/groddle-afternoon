@@ -20,7 +20,7 @@
  * - krazy_salts.js verbs.push.
  */
 
-import { trantFruitCycle } from './trant-care.js?v=b4c09d17';
+import { trantFruitCycle } from './trant-care.js?v=e76c420c';
 
 /** One powder: its single verb, charges, sound and the verb's own tooltip. */
 const powder = (verb, label, tooltip, sound, extra = {}) => Object.freeze({ verb, label, tooltip, sound, maxCharges: 5, ...extra });
@@ -214,7 +214,13 @@ export function fertilizeTree(classId, state) {
   const before = `${state.maturity}/${state.health}`;
   if (classId === 'wood_tree' || classId === 'wood_tree_enchanted') {
     const m = Math.floor(Number(state.maturity) || 0);
-    if (m < 6) state.maturity = m + 1;
+    if (m < 6) {
+      // wood_tree.js plusMaturity 1091-1095: harvest_count and both care counts start over.
+      state.maturity = m + 1;
+      state.harvestCount = 0;
+      state.carePets = 0;
+      state.careWaters = 0;
+    }
   } else if (LIVING_TRANTS.includes(classId)) {
     const m = Math.floor(Number(state.maturity) || 0);
     if (m < 10) state.maturity = m + 1;

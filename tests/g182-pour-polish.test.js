@@ -16,7 +16,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { WOTD_TOOL, pourApproach, pourDropTip } from '../public/js/wine-pour-fx.js?v=364e22d2';
-import { harvestWoodTree, woodMaturityLabel, woodTreeStatusLabel } from '../public/js/woodcutting.js?v=2fdc8fc5';
+import { harvestWoodTree, woodMaturityLabel, woodTreeStatusLabel } from '../public/js/woodcutting.js?v=d2b88bb5';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const pub = join(root, 'public');

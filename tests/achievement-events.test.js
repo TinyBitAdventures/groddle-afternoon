@@ -24,8 +24,9 @@ import {
   purchaseAchievementUpdates,
 } from '../public/js/achievements.js?v=e4e5edd0';
 import { createResourceNode, harvestResourceNode } from '../public/js/resource-nodes.js?v=9b20788d';
-import { createPlot, growTree, tickPlot } from '../public/js/patches.js?v=5f333fdb';
-import { slothsChewing } from '../public/js/features/resource-nodes-feature.js?v=f14d2daf';
+import { createPlot, growTree } from '../public/js/patches.js?v=cd774b2c';
+import { noteWoodCare } from '../public/js/woodcutting.js?v=d2b88bb5';
+import { slothsChewing } from '../public/js/features/resource-nodes-feature.js?v=443d4951';
 import { supplyFeature } from '../public/js/features/supply-feature.js?v=f4a69cd2';
 import { bindToolInventory, createToolConditionState } from '../public/js/tools.js?v=62b37c51';
 import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=10b118dd';
@@ -301,17 +302,16 @@ describe('GSJS counter groups wired for G116-G119', () => {
     plot.seedling = { trantClass: 'wood_tree', petted: 3, minAt: 0, maxAt: 1e12, thirdPetAt: 0, growLevel: 0 };
     const tree = growTree(plot, 0);
     tree.state.maturity = 5;
-    const events = [];
-    for (let day = 0; day < 6 && tree.state.maturity < 6; day += 1) {
-      tree.state.petted = true;
-      tree.state.watered = true;
-      events.push(...tickPlot(plot, 10).events);
-      tree.state.petted = false;
-      tree.state.watered = false;
-      events.push(...tickPlot(plot, 10).events);
+    // Care counts as it lands (js/woodcutting.js noteWoodCare), every 5 minutes; game.js gives
+    // wood_tree:maxed on the 'grew' that reaches 6.
+    const grew = [];
+    for (let k = 0; k < 6; k += 1) {
+      noteWoodCare(tree.state, 'pet', k * 300000);
+      if (noteWoodCare(tree.state, 'water', k * 300000 + 1) === 'grew') grew.push(tree.state.maturity);
     }
     assert.equal(tree.state.maturity, 6);
-    assert.equal(events.filter((e) => e === 'maxed').length, 1);
+    assert.deepEqual(grew, [6]);
+    assert.match(readFileSync(new URL('../public/game.js', import.meta.url), 'utf8'), /if \(\(sharedMatured \|\| target\.state\.maturity\) === 6\) engine\.achievement\('wood_tree:maxed', 1\)/);
     assertEarns('wood_abettor', [{ counter: 'wood_tree:maxed', amount: 1 }], 1);
   });
 

@@ -72,7 +72,7 @@
 
 import { addItem, countItem, ITEM_CATALOG } from '../inventory.js?v=f49c8998';
 import { saveStore } from '../save-store.js?v=04420633';
-import { patchesFeature } from './patches-feature.js?v=47c30e52';
+import { patchesFeature } from './patches-feature.js?v=d4624101';
 import {
   COPY,
   GRANT_CLASSES,
@@ -97,7 +97,7 @@ import {
   sharedTreeReady,
   sharedTreeSkill,
   TRANTSFORM_VERB,
-} from '../shared-patches.js?v=20bc23de';
+} from '../shared-patches.js?v=390a6796';
 
 export const SHARED_PATCHES_FEATURE_ID = 'shared-patches';
 const REQUEST_TIMEOUT_MS = 8000;
@@ -525,7 +525,9 @@ function treeAnswered(engine, msg, ok, p, key) {
   const before = g ? countItem(engine.inv, String(g.c)) : 0;
   if (target && target.classId === p.classId) {
     prepareGrantedTree(target.state, target.classId, p.verb, msg);
-    treeGrant = { target, verbId: p.verbId, roll: Number(msg.roll), use };
+    // A Wood Tree the care grew (patches.go care "matured", "maturity"): heal_trant and maxed are the tender's.
+    const matured = msg.matured === true ? Math.max(0, Math.floor(Number(msg.maturity) || 0)) : 0;
+    treeGrant = { target, verbId: p.verbId, roll: Number(msg.roll), use, matured };
     try {
       engine.executeVerb?.(target, p.verbId, { animated: true });
     } finally {
@@ -783,6 +785,7 @@ export const sharedPatchesFeature = {
     if (!treeGrant || treeGrant.target !== target || treeGrant.verbId !== verbId) return null;
     const out = { roll: Number.isFinite(treeGrant.roll) ? treeGrant.roll : undefined };
     if (treeGrant.use) out.use = treeGrant.use;
+    if (treeGrant.matured) out.matured = treeGrant.matured;
     return out;
   },
 

@@ -38,9 +38,9 @@ import {
   takeObjs,
   treeReady,
   treeSkill,
-} from '../public/js/street-objects.js?v=563dc581';
-import { streetObjectsFeature } from '../public/js/features/street-objects-feature.js?v=9e183c09';
-import { FEATURES } from '../public/js/features/index.js?v=32fd2ef8';
+} from '../public/js/street-objects.js?v=7f8e0ded';
+import { streetObjectsFeature } from '../public/js/features/street-objects-feature.js?v=88862980';
+import { FEATURES } from '../public/js/features/index.js?v=8919bc05';
 import { createMineRock, mineRock } from '../public/js/mining.js?v=b62c7722';
 import { createResourceNode } from '../public/js/resource-nodes.js?v=9b20788d';
 import { createTrantState, fruitCapacityAt, setTrantTables } from '../public/js/trants.js?v=4d6f5593';
@@ -550,7 +550,13 @@ describe('street objects: Wood Trees', () => {
   it('take the shared maturity and harvest count, and keep the player\'s own daily limit', () => {
     const state = { maturity: 6, harvestCount: 0, harvestedToday: true, totalHarvests: 3 };
     applyWoodState(state, { id: 'tree:7', maturity: 4, count: 1 });
-    assert.deepEqual(state, { maturity: 4, harvestCount: 1, harvestedToday: true, totalHarvests: 3 });
+    const noCare = { carePets: 0, careWaters: 0, petted: false, watered: false, needsResetAt: 0 };
+    assert.deepEqual(state, { maturity: 4, harvestCount: 1, harvestedToday: true, totalHarvests: 3, ...noCare });
+    // Its care is the server's (objects.go tendWood); this player's own clock stays.
+    state.petAt = 1234;
+    applyWoodState(state, { id: 'tree:7', maturity: 4, count: 1, pets: 2, waters: 3, petted: true, watered: true });
+    assert.deepEqual([state.carePets, state.careWaters, state.petted, state.watered, state.petAt], [2, 3, true, true, 1234]);
+    assert.ok(state.needsResetAt > 0, 'both marks set: a stand-in reset time keeps them');
     applyWoodState(state, { id: 'tree:7', maturity: 99, count: -3 });
     assert.equal(state.maturity, 6);
     assert.equal(state.harvestCount, 0);
@@ -564,7 +570,7 @@ describe('street objects: Wood Trees', () => {
     takeObjs(copy, { street: 'GA1', snap: true, objs: [{ id: 'tree:7', maturity: 2, count: 0 }] });
     const obj = { id: 'tree:7', kind: 'wood', state: { maturity: 6, harvestCount: 1 } };
     assert.equal(reconcile(obj, copy), true);
-    assert.deepEqual(obj.state, { maturity: 2, harvestCount: 0 });
+    assert.deepEqual(obj.state, { maturity: 2, harvestCount: 0, carePets: 0, careWaters: 0, petted: false, watered: false, needsResetAt: 0 });
   });
 
   it('the server data carries the Wood Trees the game lays out', { skip: skipWithoutServer }, () => {

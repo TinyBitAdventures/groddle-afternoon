@@ -13,7 +13,8 @@
  *   animation, badges and quests all run unchanged while woodcutting.js uses
  *   the 10-60 plank map. Art: wood_tree_enchanted.swf (4 variants x 6
  *   maturities, 3x). Tree Poison skips them (tree-death-feature isTreeTarget);
- *   care growth follows wood_tree.js (patches.js noteWoodTreeCare);
+ *   care growth follows wood_tree.js, counted where the pet or water lands
+ *   (woodcutting.js noteWoodCare, from trant-care.js);
  * - wood_tree_enchanted.js onDie: a tree harvested to maturity 0 turns into
  *   an enchanted seedling 2 s later and grows back as a fresh maturity-1
  *   tree 5 minutes after that (patch_seedling.js min_time). The seedling's
@@ -33,8 +34,7 @@
 import { slugsFromEffects } from '../speech-slugs.js?v=130338f9';
 import { worldToScreen } from '../street-model.js?v=b6cb6a4e';
 import { frameTexture, textureFromUrl } from '../textures.js?v=92ec53cd';
-import { ensureWoodTreeState, resetWoodTreeDay, woodTreeStatusLabel } from '../woodcutting.js?v=2fdc8fc5';
-import { noteWoodTreeCare } from '../patches.js?v=5f333fdb';
+import { ensureWoodTreeState, resetWoodTreeDay, woodTreeStatusLabel } from '../woodcutting.js?v=d2b88bb5';
 import {
   ENCHANTED_FORESTS,
   ENCHANTED_WOOD_TREE,
@@ -46,7 +46,7 @@ import {
   normalizeEnchantedTree,
   petEnchantedSeedling,
   seedlingStatusLabel,
-} from '../enchanted-forests.js?v=dc045a4b';
+} from '../enchanted-forests.js?v=da978edc';
 
 export const ENCHANTED_FEATURE_ID = 'enchanted-forest';
 const SEEDLING_URL = 'assets/sprites/soil/patch-seedling@3x.webp';
@@ -77,7 +77,7 @@ export function hollowTrees(slot, f, { reset = false } = {}) {
   }
   slot.trees.forEach((tree, i) => {
     normalizeEnchantedTree(tree, `${f.tsid}:${i}`);
-    tree.classId = 'wood_tree'; // noteWoodTreeCare reads it
+    tree.classId = 'wood_tree';
   });
   return slot.trees;
 }
@@ -265,12 +265,9 @@ export const enchantedForestFeature = {
     for (const entity of entities) {
       const { tree } = entity;
       if (tree.stage === 'tree') {
-        // wood_tree.js care growth (pet + water counts against maturityMap).
-        const grew = noteWoodTreeCare(tree);
-        if (grew === 'grew') last = `matured:${entity.index}:${tree.state.maturity}`;
-        // wood_tree_enchanted.js:999-1002: tended up to maturity 6.
-        if (grew === 'grew' && tree.state.maturity === 6) engine.achievement('wood_tree:maxed', 1);
+        // Care grew it where the pet or water landed (game.js counts heal_trant and maxed).
         if (entity.target && entity.maturity !== tree.state.maturity && tree.state.maturity > 0) {
+          if (tree.state.maturity > entity.maturity) last = `matured:${entity.index}:${tree.state.maturity}`;
           entity.maturity = tree.state.maturity;
           entity.sprite.texture = treeTexture(engine, tree.variant, tree.state.maturity);
         }

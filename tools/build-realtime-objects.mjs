@@ -23,7 +23,10 @@
  *     (include/trants.js 1026-1041 updateFruitCap) and fruitProdMap (rules.prod:
  *     onFruitCycle 1043-1054, the fruit a tended tree's health rise brings back);
  *   - js/trant-care.js TRANT_CARE_PACKAGES living_pet / living_water success
- *     rates (catalog_skill_packages.js light_green_thumb_pet / _water);
+ *     rates (catalog_skill_packages.js light_green_thumb_pet / _water), and
+ *     wood_pet / wood_water (wood_tree_pet / _water) with js/woodcutting.js
+ *     WOOD_TREE_MATURITY_MAP (wood_tree.js maturityMap) for a street Wood Tree's
+ *     care (the server's trees.go woodTend);
  *   - js/resource-nodes.js RESOURCE_SKILL_PACKAGES dig_dirt_pile drop_chance and
  *     bonus_amount by skill (Dirt Pile help crews, dirt_pile.js onDigComplete);
  *   - js/animal-kinship.js ANIMAL_KINSHIP_PACKAGES npc_piggy pet / nibble success
@@ -87,19 +90,20 @@ import { ROCK_CATALOG } from '../public/js/mining.js?v=b62c7722';
 import { MEGA_ROCK_CHANCE, MEGA_ROCK_CHUNKS } from '../public/js/imagination-effects.js?v=70169933';
 import { RESOURCE_NODE_CATALOG, RESOURCE_SKILL_PACKAGES } from '../public/js/resource-nodes.js?v=9b20788d';
 import { ARBOROLOGY_HARVEST, TRANT_META } from '../public/js/trants.js?v=4d6f5593';
-import { TRANT_CARE_PACKAGES } from '../public/js/trant-care.js?v=b4c09d17';
+import { TRANT_CARE_PACKAGES } from '../public/js/trant-care.js?v=e76c420c';
+import { WOOD_TREE_MATURITY_MAP } from '../public/js/woodcutting.js?v=d2b88bb5';
 import { ANIMAL_KINSHIP_PACKAGES } from '../public/js/animal-kinship.js?v=ffe074b2';
 import { locationIsDepressing } from '../public/js/animal-mood.js?v=a49495fc';
-import { resourcePlacementGroups, resourceSpawnPlan } from '../public/js/features/resource-nodes-feature.js?v=f14d2daf';
-import { soilCountsForStreet, soilPlacementGroups } from '../public/js/features/patches-feature.js?v=47c30e52';
-import { KITTY_GROUP, kittyPlacementGroups } from '../public/js/features/heli-kitties-feature.js?v=57266e00';
-import { BATTERFLY_GROUP, batterflyPlacementGroups } from '../public/js/features/animal-husbandry-feature.js?v=816a79db';
+import { resourcePlacementGroups, resourceSpawnPlan } from '../public/js/features/resource-nodes-feature.js?v=443d4951';
+import { soilCountsForStreet, soilPlacementGroups } from '../public/js/features/patches-feature.js?v=d4624101';
+import { KITTY_GROUP, kittyPlacementGroups } from '../public/js/features/heli-kitties-feature.js?v=71a9c022';
+import { BATTERFLY_GROUP, batterflyPlacementGroups } from '../public/js/features/animal-husbandry-feature.js?v=e9944457';
 import { hasRaceDispenser } from '../public/js/races.js?v=ab22a079';
 import { setWildlifeCatalog, wildlifeFor } from '../public/js/wildlife.js?v=670c3a7f';
 import { boardSpotRow, furnitureFor, furniturePlacementGroups } from '../public/js/street-furniture.js?v=55131f49';
-import { INCUBATION } from '../public/js/animal-husbandry.js?v=f5569539';
-import { SHARED_NODE_CLASSES, freshTreePlan } from '../public/js/street-objects.js?v=563dc581';
-import { PIGGY_TRIP } from '../public/js/street-creatures.js?v=c7c35e1c';
+import { INCUBATION } from '../public/js/animal-husbandry.js?v=a6f5b828';
+import { SHARED_NODE_CLASSES, freshTreePlan } from '../public/js/street-objects.js?v=7f8e0ded';
+import { PIGGY_TRIP } from '../public/js/street-creatures.js?v=a47ea7cf';
 import { CRAB_PLACEMENT_KEY, CRAB_WALK, crabPlacementGroups } from '../public/js/crabs.js?v=5d5f62b3';
 import { KITTY_PET } from '../public/js/heli-kitties.js?v=addb573f';
 import { FIRE_DRAGON_PLACEMENT_KEY, FIRE_DRAGON_WALK, fireDragonPlacementGroups } from '../public/js/fire-dragon.js?v=b7f3d751';
@@ -334,6 +338,10 @@ export function ruleTables(trantTables) {
   const care = { pet: {}, water: {} };
   for (const [id, row] of Object.entries(TRANT_CARE_PACKAGES.living_pet)) care.pet[id] = row.successRate;
   for (const [id, row] of Object.entries(TRANT_CARE_PACKAGES.living_water)) care.water[id] = row.successRate;
+  const woodCare = { pet: {}, water: {} };
+  for (const [id, row] of Object.entries(TRANT_CARE_PACKAGES.wood_pet)) woodCare.pet[id] = row.successRate;
+  for (const [id, row] of Object.entries(TRANT_CARE_PACKAGES.wood_water)) woodCare.water[id] = row.successRate;
+  const woodMap = [...WOOD_TREE_MATURITY_MAP];
   const trants = {};
   for (const id of Object.keys(TRANT_META)) trants[id] = trantTables[id].fruitCapMap;
   // G361: fruitProdMap, what one health rise pushes back on (include/trants.js onFruitCycle 1043-1054).
@@ -361,7 +369,7 @@ export function ruleTables(trantTables) {
   const pigtrip = { ...PIGGY_TRIP };
   // How long a landed verb holds a Heli Kitty (its sleep) or a Crab (its menu wait) for everyone.
   const holds = { kittyPet: KITTY_PET.totalMs, crabVerb: CRAB_WALK.menuWaitMs, dragonPet: FIRE_DRAGON_WALK.menuWaitMs };
-  return { rocks, mega, nodes, harvest, care, trants, prod, dig, pig, ak, incubate, pigtrip, holds };
+  return { rocks, mega, nodes, harvest, care, woodCare, woodMap, trants, prod, dig, pig, ak, incubate, pigtrip, holds };
 }
 
 async function main() {

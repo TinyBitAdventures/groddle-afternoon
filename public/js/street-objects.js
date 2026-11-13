@@ -22,7 +22,8 @@
  *         objs    { street, snap?, none?, objs: [state] }
  * A state is { id, chunks, mega, in } (rock), { id, units, in, petted?,
  * watered?, reset?, diggers? } (node), { id, fruit, cap, health, maturity, petted,
- * watered, poison?, dead?, by? } (tree) or { id, mood, hunger, petted, daily,
+ * watered, poison?, dead?, by? } (tree), { id, maturity, count, pets?, waters?, petted?,
+ * watered?, poison?, dead?, by? } (a Wood Tree) or { id, mood, hunger, petted, daily,
  * croak, in } (pig: a street Piggy, objects_pigs.go); `in`, `reset` and
  * `poison` are ms from when it was sent.
  *
@@ -35,10 +36,10 @@
 import { ROCK_CATALOG, findWorkingPick, miningProfile, miningToolWear } from './mining.js?v=b62c7722';
 import { MINING_EXPERT_UPGRADES } from './imagination-effects.js?v=70169933';
 import { TRANT_META, canHarvestTrant, fruitCapacityAt, resolveArborologyPackage } from './trants.js?v=4d6f5593';
-import { highestLightGreenThumbRank, quoteTrantCare } from './trant-care.js?v=b4c09d17';
+import { highestLightGreenThumbRank, quoteTrantCare } from './trant-care.js?v=e76c420c';
 import { RESOURCE_NODE_ALIASES, RESOURCE_NODE_CATALOG, resolveResourceSkillPackage } from './resource-nodes.js?v=9b20788d';
 import { highestAnimalKinshipRank } from './animal-kinship.js?v=ffe074b2';
-import { applyAnimalName, applyCreatureState, clockOffset, pathFrom } from './street-creatures.js?v=c7c35e1c';
+import { applyAnimalName, applyCreatureState, clockOffset, pathFrom } from './street-creatures.js?v=a47ea7cf';
 
 /** The resource-node classes whose stock is shared (the "N uses left, then regrows" nodes). */
 /**
@@ -333,15 +334,23 @@ export function freshenTree(state, classId, index) {
 }
 
 /**
- * A Wood Tree as the server has it (groddle-afternoon-server objects.go chopWood):
- * the shared maturity and harvest_count. harvestedToday stays the player's own
- * (the source's per-player intervals[today]).
+ * A Wood Tree as the server has it (groddle-afternoon-server objects.go chopWood, tendWood):
+ * the shared maturity and harvest_count, and its care (pets, waters: petted_count /
+ * watered_count toward the next maturity; petted, watered: been_petted / been_watered).
+ * harvestedToday and the 5-minute care clocks (petAt, waterAt) stay the player's own (the
+ * source's per-player intervals[today], pet_intervals and water_intervals).
  */
 export function applyWoodState(state, s, now = Date.now()) {
   if (!state || !s) return state;
   const whole = (v, lo, hi) => Math.max(lo, Math.min(hi, Math.floor(Number(v) || 0)));
   state.maturity = whole(s.maturity, 0, 6);
   state.harvestCount = whole(s.count, 0, 1);
+  state.carePets = whole(s.pets, 0, 99);
+  state.careWaters = whole(s.waters, 0, 99);
+  state.petted = s.petted === true;
+  state.watered = s.watered === true;
+  // When the marks clear is the server's; a stand-in keeps js/woodcutting.js from reading them as an old save's.
+  state.needsResetAt = state.petted && state.watered ? Math.max(1, Number(state.needsResetAt) || 0) : 0;
   applyTreeDeath(state, s, now);
   return state;
 }
@@ -352,6 +361,11 @@ export function freshenWood(state) {
   clearTreeDeath(state);
   state.maturity = 6;
   state.harvestCount = 0;
+  state.carePets = 0;
+  state.careWaters = 0;
+  state.petted = false;
+  state.watered = false;
+  state.needsResetAt = 0;
   return state;
 }
 

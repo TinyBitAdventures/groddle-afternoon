@@ -12,7 +12,7 @@
 
 import { canUseTool, useToolCondition } from './tools.js?v=62b37c51';
 import { woodHarvestOverrides } from './imagination-effects.js?v=70169933';
-import { ENCHANTED_WOOD_TREE } from './enchanted-forests.js?v=dc045a4b';
+import { ENCHANTED_WOOD_TREE } from './enchanted-forests.js?v=da978edc';
 import { loseEnergy } from './metabolics.js?v=1383e6fd';
 
 export const WOOD_TREE_SOURCE = 'tinyspeck/glitch-GameServerJS CC0';
@@ -75,7 +75,30 @@ function whole(value, fallback = 0, min = 0, max = 999999) {
   return Math.max(min, Math.min(max, Number.isFinite(number) ? number : fallback));
 }
 
-/** Fill and sanitize persisted Wood Tree fields without replacing the object. */
+/**
+ * Wood Tree care timing (items/wood_tree.js). Each player may pet a Wood Tree, and water it, once
+ * every 5 minutes (canPet 614-626, canWater 628-640: now - pet_intervals[pc] < 5*60 refuses), and
+ * the tree's been-petted / been-watered marks clear 10 minutes after a tending finds both set
+ * (onTendComplete 1002-1003 apiSetTimer('onNeedsReset', 10*60*1000), onNeedsReset 904-909).
+ */
+export const WOOD_TREE_CARE = Object.freeze({
+  intervalMs: 5 * 60 * 1000,
+  needsResetMs: 10 * 60 * 1000,
+});
+
+function stamp(value) {
+  const n = Math.floor(Number(value));
+  return Number.isFinite(n) && n > 0 ? n : 0;
+}
+
+/**
+ * Fill and sanitize persisted Wood Tree fields without replacing the object. The care fields:
+ * petAt / waterAt (this player's last pet and water, the source's pet_intervals[pc] /
+ * water_intervals[pc]), carePets / careWaters (petted_count / watered_count), petted / watered
+ * (been_petted / been_watered) and needsResetAt (when those two clear). A save from the daily
+ * model has no needsResetAt: a tree marked both petted and watered there had its reset long
+ * since, so both clear and nothing blocks the next pet or water.
+ */
 export function ensureWoodTreeState(state = {}) {
   state.maturity = whole(state.maturity, 6, 0, 6);
   state.harvestCount = whole(state.harvestCount ?? state.harvest_count, 0, 0, 1);
@@ -83,15 +106,51 @@ export function ensureWoodTreeState(state = {}) {
   state.totalHarvests = whole(state.totalHarvests, 0);
   state.petted = state.petted === true;
   state.watered = state.watered === true;
-  // A street tree's petted_count / watered_count (noteWoodCare); Patch and hollow trees count on the plot.
-  if (state.carePets != null || state.careWaters != null) {
-    state.carePets = whole(state.carePets, 0);
-    state.careWaters = whole(state.careWaters, 0);
+  state.carePets = whole(state.carePets, 0);
+  state.careWaters = whole(state.careWaters, 0);
+  state.petAt = stamp(state.petAt);
+  state.waterAt = stamp(state.waterAt);
+  state.needsResetAt = stamp(state.needsResetAt);
+  if (state.petted && state.watered && !state.needsResetAt) {
+    state.petted = false;
+    state.watered = false;
   }
   if (state.enchanted !== true) delete state.enchanted;
   delete state.harvest_count;
   delete state.harvested;
   return state;
+}
+
+/**
+ * A tree grown in a Patch or a hollow kept its care counts on the plot record (woodPetted /
+ * woodWatered, counted from the daily flags); they move onto the tree's state, where every Wood
+ * Tree keeps them now, and the plot's daily-flag bookkeeping goes. Returns the record.
+ */
+export function adoptPlotWoodCounts(record) {
+  if (!record || typeof record !== 'object') return record;
+  if (record.state && typeof record.state === 'object' && (record.woodPetted != null || record.woodWatered != null)) {
+    const s = record.state;
+    s.carePets = Math.max(whole(s.carePets, 0), whole(record.woodPetted, 0));
+    s.careWaters = Math.max(whole(s.careWaters, 0), whole(record.woodWatered, 0));
+  }
+  delete record.woodPetted;
+  delete record.woodWatered;
+  delete record.seenPetted;
+  delete record.seenWatered;
+  delete record.seenHarvests;
+  return record;
+}
+
+/**
+ * The ms before this player may pet (or water) the tree again: 0 when it may (wood_tree.js
+ * canPet 614-626 / canWater 628-640, per player, 5 minutes).
+ */
+export function woodCareWait(state, kind, now = Date.now()) {
+  if (!state) return 0;
+  const at = stamp(kind === 'water' ? state.waterAt : state.petAt);
+  if (!at) return 0;
+  const left = at + WOOD_TREE_CARE.intervalMs - now;
+  return left > 0 && left <= WOOD_TREE_CARE.intervalMs ? left : 0;
 }
 
 /**
@@ -117,11 +176,10 @@ export function woodTreeStatusLabel(state = {}) {
   const s = ensureWoodTreeState(state);
   if (s.maturity <= 0) return 'Cleared · only a patch remains';
   const yieldCount = plankYieldForMaturity(s.maturity, s);
-  const base = s.harvestedToday
+  // Care marks no longer show: they belong to the 5-minute clocks, not the day.
+  return s.harvestedToday
     ? `${woodMaturityLabel(s.maturity)} · harvested today`
     : `${woodMaturityLabel(s.maturity)} · ${yieldCount} planks · Hatchet required`;
-  const care = [s.petted ? 'petted' : '', s.watered ? 'watered' : ''].filter(Boolean).join(' + ');
-  return care ? `${base} · ${care}` : base;
 }
 
 /** Read-only harvest gate used by the verb menu. */
@@ -207,7 +265,7 @@ export function harvestWoodTree(state, inv = {}, pc = {}, toolState = {}) {
     s.harvestCount = 1;
   }
   // endHarvest 783-786: a tree that lives on starts its care counts over.
-  if (s.maturity > 0 && (s.carePets || s.careWaters)) {
+  if (s.maturity > 0) {
     s.carePets = 0;
     s.careWaters = 0;
   }
@@ -228,20 +286,47 @@ export function harvestWoodTree(state, inv = {}, pc = {}, toolState = {}) {
 }
 
 /**
- * A street Wood Tree's care growth, at the moment a pet or water lands
- * (wood_tree.js onTendComplete 955-1010): each one counts (petted_count,
- * watered_count); once the tree has been both petted and watered and both counts
- * reach maturityMap[m-1], it grows one maturity and both counts start over
- * (plusMaturity 1091-1095). Trees grown in Patches and in the hollows count on
- * their plot instead (js/patches.js noteWoodTreeCare). Returns 'grew', true
- * (counted) or false (a cleared tree: onDie is on its way).
+ * This player's own care clock, set when a pet or water lands (wood_tree.js onTendComplete
+ * 987-988 water_intervals[pc] = time(), 997-998 pet_intervals[pc]). Online the server counts a
+ * shared tree's care, and the page keeps only this.
  */
-export function noteWoodCare(state, kind) {
+export function stampWoodCare(state, kind, now = Date.now()) {
   const s = ensureWoodTreeState(state || {});
-  if (s.maturity <= 0 || (kind !== 'pet' && kind !== 'water')) return false;
-  s.carePets = whole(s.carePets, 0) + (kind === 'pet' ? 1 : 0);
-  s.careWaters = whole(s.careWaters, 0) + (kind === 'water' ? 1 : 0);
-  if (s.petted && s.watered && s.maturity < 6) {
+  if (kind === 'pet') s.petAt = now;
+  else if (kind === 'water') s.waterAt = now;
+  return s;
+}
+
+/**
+ * A Wood Tree's care, at the moment a pet or water lands, wherever the tree stands (a street, a
+ * Patch, a hollow): wood_tree.js onTendComplete 955-1010. Each one counts (petted_count,
+ * watered_count, 981 / 992) and marks the tree (been_petted / been_watered) and this player's
+ * clock; once a tending finds both marks set, they clear 10 minutes on (1002-1003, onNeedsReset
+ * 904-909), and if both counts reach maturityMap[m-1] (889-896, 1005-1007) the tree grows one
+ * maturity and both counts start over (plusMaturity 1091-1095). Returns 'grew', true (counted)
+ * or false (a cleared tree: onDie is on its way). opts.own false: another player's care (a
+ * visitor's, applied on the owner's tree), which counts but leaves this player's clock alone.
+ */
+export function noteWoodCare(state, kind, now = Date.now(), opts = {}) {
+  const s = ensureWoodTreeState(state || {});
+  if (kind !== 'pet' && kind !== 'water') return false;
+  if (opts.own !== false) stampWoodCare(s, kind, now);
+  if (s.maturity <= 0) return false;
+  if (s.needsResetAt && now >= s.needsResetAt) {
+    s.petted = false;
+    s.watered = false;
+    s.needsResetAt = 0;
+  }
+  if (kind === 'pet') {
+    s.carePets += 1;
+    s.petted = true;
+  } else {
+    s.careWaters += 1;
+    s.watered = true;
+  }
+  if (!(s.petted && s.watered)) return true;
+  s.needsResetAt = now + WOOD_TREE_CARE.needsResetMs;
+  if (s.maturity < 6) {
     const need = WOOD_TREE_MATURITY_MAP[s.maturity - 1];
     if (s.carePets >= need && s.careWaters >= need) {
       s.maturity += 1;
@@ -254,10 +339,12 @@ export function noteWoodCare(state, kind) {
   return true;
 }
 
+/**
+ * A new game day: this player may harvest the tree again (canHarvest by intervals[today],
+ * 592-612). Care has no day: it runs on the 5-minute clocks above.
+ */
 export function resetWoodTreeDay(state = {}) {
   const s = ensureWoodTreeState(state);
   s.harvestedToday = false;
-  s.petted = false;
-  s.watered = false;
   return s;
 }

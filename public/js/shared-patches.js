@@ -44,12 +44,12 @@
  *   landed first reads CLEARED_FIRST_LINE.
  */
 
-import { DEAD_TRANT_CLASSES, GROWN_TREE_LABELS, SEASONED_BEANS, SOIL_CLASSES, resolveSoilPackage, resolveTendPackage, seedlingTimings } from './patches.js?v=5f333fdb';
+import { DEAD_TRANT_CLASSES, GROWN_TREE_LABELS, SEASONED_BEANS, SOIL_CLASSES, resolveSoilPackage, resolveTendPackage, seedlingTimings } from './patches.js?v=cd774b2c';
 import { TRANT_META, fruitCapacityAt } from './trants.js?v=4d6f5593';
-import { ensureWoodTreeState, quoteWoodTreeHarvest } from './woodcutting.js?v=2fdc8fc5';
+import { ensureWoodTreeState, quoteWoodTreeHarvest } from './woodcutting.js?v=d2b88bb5';
 import { POISON_DURATION_MS } from './tree-poison.js?v=0cfbc3fb';
-import { treeReady, treeSkill } from './street-objects.js?v=563dc581';
-import { highestLightGreenThumbRank, quoteTrantCare } from './trant-care.js?v=b4c09d17';
+import { treeReady, treeSkill } from './street-objects.js?v=7f8e0ded';
+import { highestLightGreenThumbRank, quoteTrantCare } from './trant-care.js?v=e76c420c';
 
 /** The release switch: on since game v0.24.0 (G564; false = dark, shared Patches off for everyone but the QA flag below). */
 export const SHARED_PATCHES_ON = true;
@@ -126,8 +126,13 @@ function fillTreeState(state, t, classId, now = Date.now()) {
   if (classId === 'wood_tree') {
     state.maturity = whole(t.maturity, 1, 0, 6);
     state.harvestCount = whole(t.count, 0, 0, 1);
+    // The tree's care is the server's (patches.go care): its marks and counts toward the next
+    // maturity. This player's own 5-minute clocks (petAt, waterAt) stay as the page set them.
     state.petted = t.petted === true;
     state.watered = t.watered === true;
+    state.needsResetAt = state.petted && state.watered ? Math.max(1, ms(state.needsResetAt)) : 0;
+    state.carePets = whole(t.woodPetted, 0);
+    state.careWaters = whole(t.woodWatered, 0);
     return ensureWoodTreeState(state);
   }
   state.classTsid = classId;
@@ -229,11 +234,6 @@ export function localPatchPlot(key, s, offset = 0, now = Date.now(), prev = null
         state,
         grownAt: at(t.grownAt) || now,
         lastCycleAt: at(t.cycleAt) || at(t.grownAt) || now,
-        woodPetted: whole(t.woodPetted, 0),
-        woodWatered: whole(t.woodWatered, 0),
-        seenPetted: state.petted === true,
-        seenWatered: state.watered === true,
-        seenHarvests: whole(state.totalHarvests, 0),
         clearedAt: at(t.clearedAt),
         resetAt: keep ? prev.tree.resetAt || now : now,
       };
@@ -299,8 +299,9 @@ export function sharedTreeKey(target) {
 /**
  * The player's own side of a tree verb on a shared Patch tree (tools, skill, energy, size), as in
  * solo: false and the verb runs here alone and refuses as solo does, never asking. What the server
- * decides is left out of the check: the tree's tending flags, the fruit on it (it may hold more than
- * this copy shows) and this player's harvests today (the server keeps them, plan section 7).
+ * decides is left out of the check: a trant's tending flags, the fruit on it (it may hold more than
+ * this copy shows) and this player's harvests today (the server keeps them, plan section 7). A Wood
+ * Tree's 5-minute clocks are this player's own (petAt, waterAt), so they refuse here.
  */
 export function sharedTreeReady(state, classId, verb, { inv = {}, pc = {}, learned = [], tools = null } = {}) {
   if (!state || !TREE_VERBS.includes(verb)) return false;

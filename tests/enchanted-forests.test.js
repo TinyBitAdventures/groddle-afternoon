@@ -32,18 +32,19 @@ import {
   petEnchantedSeedling,
   polylineY,
   seedlingRemainingMs,
-} from '../public/js/enchanted-forests.js?v=dc045a4b';
+} from '../public/js/enchanted-forests.js?v=da978edc';
 import {
   WOOD_TREE_HARVEST,
   harvestWoodTree,
+  noteWoodCare,
   plankYieldForMaturity,
   quoteWoodTreeHarvest,
   woodTreeStatusLabel,
-} from '../public/js/woodcutting.js?v=2fdc8fc5';
-import { noteWoodTreeCare } from '../public/js/patches.js?v=5f333fdb';
-import { isTreeTarget } from '../public/js/features/tree-death-feature.js?v=2a47914e';
-import { enchantedForestFeature, hollowTrees, treeScreenSpots } from '../public/js/features/enchanted-forest-feature.js?v=e46dac8f';
-import { FEATURES } from '../public/js/features/index.js?v=32fd2ef8';
+} from '../public/js/woodcutting.js?v=d2b88bb5';
+import { noteWoodTreeCare } from '../public/js/patches.js?v=cd774b2c';
+import { isTreeTarget } from '../public/js/features/tree-death-feature.js?v=96e594fd';
+import { enchantedForestFeature, hollowTrees, treeScreenSpots } from '../public/js/features/enchanted-forest-feature.js?v=701d5246';
+import { FEATURES } from '../public/js/features/index.js?v=8919bc05';
 
 const spike = join(dirname(fileURLToPath(import.meta.url)), '..');
 const streets = join(spike, 'public/assets/streets');
@@ -133,21 +134,21 @@ describe('enchanted wood tree rules (wood_tree_enchanted.js)', () => {
     assert.equal(petEnchantedSeedling(createEnchantedTree(), { energy: 5 }).reason, 'not_seedling');
   });
 
-  it('grow with care like any Wood Tree (maturityMap via noteWoodTreeCare)', () => {
+  it('grow with care like any Wood Tree, counted as it lands (noteWoodCare, maturityMap)', () => {
     const tree = normalizeEnchantedTree(createEnchantedTree({ maturity: 1 }));
-    tree.classId = 'wood_tree';
-    tree.state.petted = true;
-    noteWoodTreeCare(tree);
-    tree.state.watered = true;
-    noteWoodTreeCare(tree);
+    assert.equal(noteWoodCare(tree.state, 'pet', 1000), true);
+    assert.equal(noteWoodCare(tree.state, 'water', 2000), true);
     assert.equal(tree.state.maturity, 1, 'maturity 1 needs 2 of each');
-    tree.state.petted = false;
-    tree.state.watered = false;
-    noteWoodTreeCare(tree);
-    tree.state.petted = true;
-    tree.state.watered = true;
-    assert.equal(noteWoodTreeCare(tree), 'grew');
+    assert.equal(noteWoodCare(tree.state, 'pet', 301000), true);
+    assert.equal(noteWoodCare(tree.state, 'water', 302000), 'grew');
     assert.equal(tree.state.maturity, 2);
+  });
+
+  it('move a save\'s counts from the record onto the tree state', () => {
+    const tree = normalizeEnchantedTree({ stage: 'tree', woodPetted: 2, woodWatered: 1, state: { maturity: 3, petted: true } });
+    assert.equal(tree.state.carePets, 2);
+    assert.equal(tree.state.careWaters, 1);
+    assert.equal('woodPetted' in tree, false);
   });
 
   it('are skipped by Tree Poison', () => {

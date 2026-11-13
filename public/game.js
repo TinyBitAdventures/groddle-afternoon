@@ -2,9 +2,9 @@
  * Groddle Afternoon — original street geometry + layered decos
  * PixiJS 8 · locations-xml streets · CoU PNG decos · quests/items
  */
-import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=4519afca';
+import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=6ae44f2e';
 import { createErrorOnce, createFeatureHost } from './js/feature-host.js?v=06bb8b74';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=32fd2ef8';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=8919bc05';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl, drawTileArt } from './js/enter-chooser.js?v=4a3ea327';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -490,8 +490,8 @@ import { PACK_COPY, isBagClass, isElementClass, ownBagLabel, unitRankAt } from '
 import { FLOAT_TEXT_Z, SPEECH_BUBBLE_Z } from './js/fx-z.js?v=18dda7e3';
 import { hasPouch } from './js/elemental-pouch.js?v=ceefa97a';
 import { createPackRow, mountPackClearance, packBandRange, packCountText, packSearchEntries, packSlotTip } from './js/ui/pack-row.js?v=64e4a567';
-import { listAnimalFeedOptions } from './js/animals.js?v=c028763b';
-import { pickerMaxCount, pickerOptionsFor, pickerTakesCount } from './js/animals.js?v=c028763b';
+import { listAnimalFeedOptions } from './js/animals.js?v=babec605';
+import { pickerMaxCount, pickerOptionsFor, pickerTakesCount } from './js/animals.js?v=babec605';
 import {
   createDroppedItemState,
   parseDroppedItemState,
@@ -773,7 +773,7 @@ import {
   trantStatusLabel,
   trantFootAnchorY,
 } from './js/trants.js?v=4d6f5593';
-import { growStreetTrant } from './js/patches.js?v=5f333fdb';
+import { growStreetTrant } from './js/patches.js?v=cd774b2c';
 import {
   runStreetTransition,
   showAwardScreen,
@@ -868,15 +868,14 @@ import {
   createAnimalState,
   resetAnimalDay,
   animalStatusLabel,
-} from './js/animals.js?v=c028763b';
+} from './js/animals.js?v=babec605';
 import {
   ensureWoodTreeState,
-  noteWoodCare,
   pickWoodTool,
   resetWoodTreeDay,
   woodToolLabel,
   woodTreeStatusLabel,
-} from './js/woodcutting.js?v=2fdc8fc5';
+} from './js/woodcutting.js?v=d2b88bb5';
 import {
   GIANTS,
   createShrineState,
@@ -910,7 +909,7 @@ import {
 } from './js/shrines.js?v=a190faea';
 import { shrineSheet, shrineVariantFor } from './js/shrine-variants.js?v=7f11c97d';
 import { giantDisplayName } from './js/giant-names.js?v=0e295891';
-import { shrinePowderOptions, shrinePowderAchievementCounters } from './js/powders.js?v=4ed5ad28';
+import { shrinePowderOptions, shrinePowderAchievementCounters } from './js/powders.js?v=7ae9ec30';
 import {
   GAMESHOW_TICKET_ID,
   applySpinningWheelReward,
@@ -988,7 +987,7 @@ import {
   rockSpawnPlan,
   ROCK_SHAPE_WIDTHS,
 } from './js/street-ecology.js?v=0f046853';
-import { CHICKEN_PAUSE, chickenPauseRoll, easeToward, flightFloorAt, flightFloorFor, flyerLift } from './js/street-creatures.js?v=c7c35e1c';
+import { CHICKEN_PAUSE, chickenPauseRoll, easeToward, flightFloorAt, flightFloorFor, flyerLift } from './js/street-creatures.js?v=a47ea7cf';
 import { chickenPose, chickenIdleSheetsAsked } from './js/chicken-idle-art.js?v=c46b17d5';
 import { chickenWaitPose } from './js/chicken-idles.js?v=eef0279b';
 import { itemOverlayStats } from './js/item-overlay.js?v=97ed2ba0';
@@ -9452,6 +9451,9 @@ function executeVerb(target, verbId) {
     streetTsid: currentStreetTsid,
     sharedChunks: sharedGrant?.chunks,
     sharedGarden: Boolean(sharedGrant?.garden),
+    // A Wood Tree's pet or water the server granted (a street tree, a shared Patch tree): it
+    // counts the care for everyone, this page keeps only the player's own clock.
+    woodCareShared: Boolean(sharedGrant) && target.classId === 'wood_tree',
     // inc_skill_packages.js 540: Luck of the Rube lifts a package's drop chance by 1.25.
     rubeweed: engine.activeBuffIds().includes('rubeweed'),
     rng: () => {
@@ -9533,13 +9535,14 @@ function executeVerb(target, verbId) {
       app.canvas.dataset.trantCareClass = target.classId;
       app.canvas.dataset.trantCareTool = wateredWith;
     }
-    // wood_tree.js onTendComplete 1006-1015: a street Wood Tree grows by care (Patch and hollow
-    // trees count on their plot). Online the server holds a street tree's maturity.
-    if (result.ok && target.classId === 'wood_tree' && !target.grownFromBean && Number.isInteger(target.treeIndex)
-      && GAME_MODE !== 'multiplayer'
-      && noteWoodCare(target.state, baseVerb) === 'grew') {
+    // wood_tree.js onTendComplete 1005-1015: the care that grows a Wood Tree (on a street, in a
+    // Patch or a hollow; js/woodcutting.js noteWoodCare, counted as it landed in trant-care.js)
+    // counts heal_trant, and reaching maturity 6 wood_tree:maxed. A tree the server granted
+    // this on grows there (its answer's "matured" maturity), and its state comes back after.
+    const sharedMatured = target.classId === 'wood_tree' ? Number(sharedGrant?.matured) || 0 : 0;
+    if (result.ok && target.classId === 'wood_tree' && (result.trantCare?.woodCare === 'grew' || sharedMatured)) {
       emitGameEvent('trants_healed:wood_tree');
-      if (target.state.maturity === 6) engine.achievement('wood_tree:maxed', 1);
+      if ((sharedMatured || target.state.maturity) === 6) engine.achievement('wood_tree:maxed', 1);
     }
     if (target.classId === 'wood_tree') {
       refreshWoodTreeVisual(target);

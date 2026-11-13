@@ -38,15 +38,15 @@
  */
 
 import { withArticle } from './words.js?v=ee4e72f8';
-import { createAnimalState } from './animals.js?v=c028763b';
+import { createAnimalState } from './animals.js?v=babec605';
 import { petPiggy } from './animal-mood.js?v=a49495fc';
-import { trantFruitCycle } from './trant-care.js?v=b4c09d17';
+import { trantFruitCycle } from './trant-care.js?v=e76c420c';
 import { fruitCapacityAt, resetTrantDay } from './trants.js?v=4d6f5593';
-import { ensureWoodTreeState } from './woodcutting.js?v=2fdc8fc5';
-import { GROWN_TREE_LABELS, SEASONED_BEANS, SOIL_TIMERS, growTree, seedlingTimings } from './patches.js?v=5f333fdb';
+import { ensureWoodTreeState, noteWoodCare } from './woodcutting.js?v=d2b88bb5';
+import { GROWN_TREE_LABELS, SEASONED_BEANS, SOIL_TIMERS, growTree, seedlingTimings } from './patches.js?v=cd774b2c';
 import { GAME_DAY_MS, GAME_EPOCH_MS } from './game-day.js?v=cf9afac0';
 import { isNodeId, isRockId } from './yard-stock-mp.js?v=0d2668c5';
-import { STICK_ANIMAL } from './yard-wander.js?v=09c253cb';
+import { STICK_ANIMAL } from './yard-wander.js?v=3f3d5ea7';
 import { normalizeYardMachines } from './yard-fixtures-mp.js?v=dd022fe8';
 import { capYardAnimals, yardClassCap } from './animal-crowding.js?v=0ffb4ced';
 import { HOUSE_LOT_W, YARD_SEGMENT_W } from './home-cultivation.js?v=1e2d2b2d';
@@ -248,17 +248,17 @@ export function visitorTreeState(plot, key, mine = {}, now = Date.now()) {
   if (!tree || !plain(tree.state)) return null;
   const state = JSON.parse(JSON.stringify(tree.state));
   // A tree the site grew from a Seedling (HomeYard plotNow) carries the few fields it knows: the rest as growTree makes them.
-  if (tree.classId === 'wood_tree') ensureWoodTreeState(state);
-  else {
+  if (tree.classId === 'wood_tree') {
+    ensureWoodTreeState(state);
+    // The owner's own 5-minute clocks are not mine (wood_tree.js pet_intervals[pc]): mine start on this visit.
+    state.petAt = 0;
+    state.waterAt = 0;
+  } else {
     if (typeof state.classTsid !== 'string') state.classTsid = tree.classId;
     if (!Number.isFinite(state.fruitCapacity)) state.fruitCapacity = fruitCapacityAt(tree.classId, Number(state.maturity) || 1, Number(state.health) || 7);
   }
-  if ((Number(tree.resetAt) || 0) < gameDayStart(now)) {
-    if (tree.classId === 'wood_tree') {
-      state.petted = false;
-      state.watered = false;
-    } else resetTrantDay(state);
-  }
+  // A Wood Tree's care has no day (js/woodcutting.js WOOD_TREE_CARE); a trant's window does.
+  if (tree.classId !== 'wood_tree' && (Number(tree.resetAt) || 0) < gameDayStart(now)) resetTrantDay(state);
   if (tree.classId !== 'wood_tree') state.harvestsToday = Number(mine[`harvest:${key}`]) || 0;
   // canHarvest (wood_tree.js 586-612): once a game day per player and tree, so the visitor's own.
   else state.harvestedToday = (Number(mine[`harvest:${key}`]) || 0) >= 1;
@@ -268,13 +268,20 @@ export function visitorTreeState(plot, key, mine = {}, now = Date.now()) {
 /** What a visitor's verb changed on a tree copy: [verb, ...]. */
 export function treeSnapshot(state = {}) {
   // A trant counts harvestsToday, a Wood Tree its totalHarvests (js/woodcutting.js harvestWoodTree).
-  return { petted: state?.petted === true, watered: state?.watered === true, harvests: (Number(state?.harvestsToday) || 0) + (Number(state?.totalHarvests) || 0) };
+  // A Wood Tree's pet and water come every 5 minutes: each one moves my clock (petAt, waterAt).
+  return {
+    petted: state?.petted === true,
+    watered: state?.watered === true,
+    petAt: Number(state?.petAt) || 0,
+    waterAt: Number(state?.waterAt) || 0,
+    harvests: (Number(state?.harvestsToday) || 0) + (Number(state?.totalHarvests) || 0),
+  };
 }
 
 export function treeActs(before, after) {
   const out = [];
-  if (!before.petted && after.petted) out.push('pet');
-  if (!before.watered && after.watered) out.push('water');
+  if ((!before.petted && after.petted) || (after.petAt || 0) > (before.petAt || 0)) out.push('pet');
+  if ((!before.watered && after.watered) || (after.waterAt || 0) > (before.waterAt || 0)) out.push('water');
   for (let i = before.harvests; i < after.harvests; i += 1) out.push('harvest');
   return out;
 }
@@ -429,6 +436,12 @@ function applyTreeAct(tree, s, what, plot, act) {
     return { kind: 'tree', what, plot };
   }
   if (act.verb !== 'pet' && act.verb !== 'water') return null;
+  if (tree.classId === 'wood_tree') {
+    // wood_tree.js onTendComplete 955-1010: a visitor's care counts on my tree as it landed; my own
+    // 5-minute clock is mine. The game (patches-feature) saves; heal_trant is the visitor's.
+    noteWoodCare(s, act.verb, Number(act.at) || Date.now(), { own: false });
+    return { kind: 'tree', what, plot };
+  }
   // A tending from an earlier day than the tree's last day turn is that day's, already gone.
   if ((Number(tree.resetAt) || 0) > act.at) return { kind: 'tree', what, plot };
   const flag = act.verb === 'pet' ? 'petted' : 'watered';

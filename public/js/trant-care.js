@@ -6,7 +6,9 @@
  *   wood_tree_pet/water
  * - items/include/trants.js: Watering Can requirement and completion cadence;
  *   :117-121 waters with a working Irrigator 9000 first, then a Watering Can
- * - items/wood_tree.js: Wood Tree tending gates
+ * - items/wood_tree.js: Wood Tree tending gates, each player's 5-minute clocks
+ *   (canPet / canWater 614-640) and the care count (onTendComplete 955-1010,
+ *   js/woodcutting.js noteWoodCare)
  */
 
 import { TOOL_CONDITION_CATALOG, WATERING_CAN_TOOLS, canUseTool, firstWorkingTool, useToolCondition } from './tools.js?v=62b37c51';
@@ -14,6 +16,7 @@ import { fruitCapacityAt, fruitProductionAt } from './trants.js?v=4d6f5593';
 import { scaledToolWear, toolWearMultiplier } from './imagination-effects.js?v=70169933';
 import { metabolicGain, moodMax, loseEnergy, loseMood } from './metabolics.js?v=1383e6fd';
 import { grantMoodXp } from './mood-xp.js?v=22648ec0';
+import { noteWoodCare, stampWoodCare, woodCareWait } from './woodcutting.js?v=d2b88bb5';
 
 const freezeRanks = (ranks) => Object.freeze(
   Object.fromEntries(Object.entries(ranks).map(([id, row]) => [id, Object.freeze(row)]))
@@ -84,13 +87,18 @@ export function quoteTrantCare(state, classId, kind, ctx = {}) {
   let toolId = null;
   // trant_fruit.js 552 / 611 and wood_tree.js 525 / 564: the tree's own refusal. The water
   // verb asks for the can first (trant_fruit.js 603-609, wood_tree.js 559-562).
+  // A Wood Tree takes each player's pet and water once every 5 minutes (wood_tree.js canPet
+  // 614-626, canWater 628-640); a living trant once a tending window (its flags).
+  const wood = classId === 'wood_tree';
+  const now = Number.isFinite(ctx.now) ? ctx.now : Date.now();
+  const refused = () => (wood ? woodCareWait(state, kind, now) > 0 : Boolean(state[flag]));
   const unwanted = () => ({
     ok: false,
-    reason: 'daily',
-    msg: `I don't want to be ${flag}${classId === 'wood_tree' ? ' right now' : ''}!`,
+    reason: wood ? 'cooldown' : 'daily',
+    msg: `I don't want to be ${flag}${wood ? ' right now' : ''}!`,
     profile,
   });
-  if (kind === 'pet' && state[flag]) return unwanted();
+  if (kind === 'pet' && refused()) return unwanted();
   if (kind === 'water') {
     const can = firstWorkingTool(ctx.tools, ctx.inv, WATERING_CAN_TOOLS, profile.toolWear);
     if (!can.owned) {
@@ -101,7 +109,7 @@ export function quoteTrantCare(state, classId, kind, ctx = {}) {
     if (!tool.ok) {
       return { ok: false, reason: 'tool_broken', msg: 'Sadly, your Watering Can is too worn out.', profile, tool, toolId };
     }
-    if (state[flag]) return unwanted();
+    if (refused()) return unwanted();
   }
   const energy = Math.max(0, Number(ctx.pc?.energy) || 0);
   // inc_skill_packages.js 177-178 runSkillPackage refuses at energy <= cost.
@@ -135,6 +143,9 @@ export function trantFruitCycle(state, classId = state?.classTsid) {
  * failed living-trant pet loses its mood bonus (include/trants.js onPetComplete).
  * Health rises once a period, when the tree has been both petted and watered
  * (include/trants.js performTending), and that health tick regrows the fruit.
+ * A Wood Tree counts the care where it lands (js/woodcutting.js noteWoodCare,
+ * result.woodCare 'grew' when it grew); ctx.woodCareShared (the server granted
+ * the verb: it counts for everyone) keeps only this player's clock.
  */
 export function performTrantCare(state, classId, kind, ctx = {}) {
   const quote = quoteTrantCare(state, classId, kind, ctx);
@@ -170,9 +181,14 @@ export function performTrantCare(state, classId, kind, ctx = {}) {
   const toolUse = kind === 'water' && wear > 0
     ? useToolCondition(ctx.tools, toolId, wear)
     : null;
-  state[flag] = true;
   let fruitAdded = 0;
-  if (classId !== 'wood_tree') {
+  let woodCare = null;
+  if (classId === 'wood_tree') {
+    const now = Number.isFinite(ctx.now) ? ctx.now : Date.now();
+    if (ctx.woodCareShared) stampWoodCare(state, kind, now);
+    else woodCare = noteWoodCare(state, kind, now);
+  } else {
+    state[flag] = true;
     if (state.petted && state.watered) {
       // performTending (670-684): plusHealth, which runs onFruitCycle.
       state.health = Math.max(1, Math.min(10, (Number(state.health) || 5) + 1));
@@ -195,6 +211,7 @@ export function performTrantCare(state, classId, kind, ctx = {}) {
     profile,
     toolUse,
     fruitAdded,
+    woodCare,
     // slugs.energy is what metabolics_lose_energy took, 0 while dead (inc_skill_packages.js 487-488).
     effects: { energy: energyLost ? -energyLost : 0, mood, xp },
     msg: `Thanks for ${kind === 'water' ? 'watering' : 'petting'}!`,
