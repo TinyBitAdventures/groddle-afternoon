@@ -36,7 +36,7 @@ import {
   rockShapeFor,
   rockSpawnPlan,
   setStreetEcologyCatalog,
-} from '../public/js/street-ecology.js?v=64dcdacc';
+} from '../public/js/street-ecology.js?v=cc49deed';
 import { ROCK_BERYL_SPOTS, ROCK_DULLITE_SPOTS, ROCK_METAL_SPOTS, ROCK_SPARKLY_SPOTS } from '../public/js/node-spots-data.js?v=0817d192';
 
 const root = join(import.meta.dirname, '..');

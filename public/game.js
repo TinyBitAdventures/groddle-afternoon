@@ -2,12 +2,12 @@
  * Groddle Afternoon — original street geometry + layered decos
  * PixiJS 8 · locations-xml streets · CoU PNG decos · quests/items
  */
-import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=bf046b8e';
+import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=4a584630';
 import { createErrorOnce, createFeatureHost } from './js/feature-host.js?v=06bb8b74';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=e04c68ad';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=5698bcc5';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl, drawTileArt } from './js/enter-chooser.js?v=4a3ea327';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
-import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
+import { avatarHitBox, behindFloor, bodyReachDistance, OUT_OF_REACH_LINE } from './js/reach.js?v=8e52df56';
 import { createVogOverlay } from './js/vog-overlay.js?v=4ab1db52';
 import { createPromptStack } from './js/prompt-stack.js?v=6b79ae9b';
 import { createWindowStack } from './js/window-stack.js?v=a7104f02';
@@ -490,8 +490,8 @@ import { PACK_COPY, isBagClass, isElementClass, ownBagLabel, unitRankAt } from '
 import { FLOAT_TEXT_Z, SPEECH_BUBBLE_Z } from './js/fx-z.js?v=18dda7e3';
 import { hasPouch } from './js/elemental-pouch.js?v=42702eda';
 import { createPackRow, mountPackClearance, packBandRange, packCountText, packSearchEntries, packSlotTip } from './js/ui/pack-row.js?v=64e4a567';
-import { listAnimalFeedOptions, piggyFeedTip } from './js/animals.js?v=2520b6ed';
-import { pickerMaxCount, pickerOptionsFor, pickerTakesCount } from './js/animals.js?v=2520b6ed';
+import { listAnimalFeedOptions, piggyFeedTip } from './js/animals.js?v=d1f4fa7e';
+import { pickerMaxCount, pickerOptionsFor, pickerTakesCount } from './js/animals.js?v=d1f4fa7e';
 import {
   createDroppedItemState,
   parseDroppedItemState,
@@ -668,7 +668,7 @@ import {
   ensureStreetIndex,
   resolveIndexTsid,
 } from './js/street-loader.js?v=18b181ad';
-import { showDraftBanner, startDraftPlay } from './js/builder/draft-play.js?v=97bb46d0';
+import { showDraftBanner, startDraftPlay } from './js/builder/draft-play.js?v=a3124b8d';
 import {
   ladderTopDeck,
   groundBeneath,
@@ -869,7 +869,7 @@ import {
   createAnimalState,
   resetAnimalDay,
   animalStatusLabel,
-} from './js/animals.js?v=2520b6ed';
+} from './js/animals.js?v=d1f4fa7e';
 import {
   ensureWoodTreeState,
   pickWoodTool,
@@ -994,8 +994,8 @@ import {
   rockSpawnPlan,
   treePlacementRequest,
   ROCK_SHAPE_WIDTHS,
-} from './js/street-ecology.js?v=64dcdacc';
-import { CHICKEN_PAUSE, chickenPauseRoll, easeToward, flightFloorAt, flightFloorFor, flyerLift } from './js/street-creatures.js?v=ee7dfd05';
+} from './js/street-ecology.js?v=cc49deed';
+import { CHICKEN_PAUSE, chickenPauseRoll, easeToward, flightFloorAt, flightFloorFor, flyerLift } from './js/street-creatures.js?v=079038c2';
 import { chickenPose, chickenIdleSheetsAsked } from './js/chicken-idle-art.js?v=d79b13ec';
 import { chickenWaitPose } from './js/chicken-idles.js?v=eef0279b';
 import { itemOverlayStats } from './js/item-overlay.js?v=445d35d7';
@@ -10282,6 +10282,14 @@ function behindFloorFromPlayer(t, at = player) {
   return behindFloor(streetPlatforms, body, box, { x: t.sprite.x, y: t.sprite.y }, { airborne: Boolean(t.airborne), feetY: at.y, hitBox });
 }
 
+/** ENTERSHELF: how far across to a thing at the avatar's height (its hit box), else Infinity. */
+function enterBodyDistance(t) {
+  const box = spriteWorldHitBox(t.sprite, 0);
+  if (!box) return Infinity;
+  const head = avatarHitBox(player.x, player.y, features.query('avatarBodyScale', engine) ?? 1).top;
+  return bodyReachDistance(box, player.x, player.y, head);
+}
+
 /** In reach for Enter: near enough and not behind a floor. */
 function withinReach(t, maxD) {
   if (!t?.sprite || t.sprite.destroyed) return false;
@@ -10292,6 +10300,8 @@ function withinReach(t, maxD) {
 function interactReach(t) {
   if (!t?.sprite || t.sprite.destroyed) return Infinity;
   let d = interactDistance(t, player.x, player.y);
+  // ENTERSHELF (js/reach.js bodyReachDistance): food on a counter at head height is in reach.
+  if (!t.airborne) d = Math.min(d, enterBodyDistance(t));
   // Only things already close need the floor test (the callers' cut-off is 100).
   if (d < 160 && behindFloorFromPlayer(t)) return Infinity;
   // G679: a street toy (an invisible Clickable Broadcaster) is clicked, never the Enter key's nearest thing.

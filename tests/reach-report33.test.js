@@ -5,11 +5,11 @@ import assert from 'node:assert/strict';
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-import { AVATAR_HIT_BOX, avatarHitBox, behindFloor, boxesTouch } from '../public/js/reach.js?v=4187d746';
+import { AVATAR_HIT_BOX, avatarHitBox, behindFloor, boxesTouch } from '../public/js/reach.js?v=8e52df56';
 import { avatarHeadReach, groundBeneath, isBuriedSignpost, isStandable, platformYAt, platformsScreen, signpostNear, signpostReachY, worldToScreen } from '../public/js/street-model.js?v=b6cb6a4e';
 import { walkUpSignpostStreet } from '../public/js/ladder-top-signposts.js?v=046013b4';
 import { planSignpostTravel } from '../public/js/travel.js?v=7fd6e363';
-import { COPY, OBJECT_REACH, inObjectReach } from '../public/js/street-objects.js?v=2945b57f';
+import { COPY, OBJECT_REACH, inObjectReach } from '../public/js/street-objects.js?v=066b9bad';
 import { serverPath, skipWithoutServer } from '../tools/repos.mjs';
 
 const root = join(import.meta.dirname, '..');

@@ -17,7 +17,7 @@ import {
   plantSeedChoices,
   seedDropCheck,
 } from '../public/js/garden.js?v=1420a6d6';
-import { getVerbsFor, runVerb } from '../public/content.js?v=bf046b8e';
+import { getVerbsFor, runVerb } from '../public/content.js?v=4a584630';
 import { plotDragClass, seedOver } from '../public/js/features/garden-guano-feature.js?v=45d52804';
 import { sharedGardensFeature } from '../public/js/features/shared-gardens-feature.js?v=b273252a';
 

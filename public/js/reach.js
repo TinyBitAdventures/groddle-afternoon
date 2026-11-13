@@ -149,3 +149,22 @@ export function behindFloor(platforms, body, box, at = null, opts = {}) {
   };
   return Boolean(floorBetween(platforms, body.x, body.y, pt.x, pt.y, 1, skip));
 }
+
+/**
+ * ENTERSHELF (Austin 2026-11-13, EZ Cookin'): Enter's reach to a thing at the avatar's height.
+ * The client's Enter took what the avatar's hit box touched (MiddleGroundRenderer.as 1158-1167;
+ * AbstractAvatarView.as 139-149: 66 x 123, so up to 113 over the feet). A Cheese resting on a
+ * counter 100 over the floor sits at head height, and the remake's 100 px from the feet never
+ * reached it, while a click took it. So a thing whose box comes down within the hit box's height
+ * is as near as it is across (the same 100 px reach sideways); anything higher keeps the distance
+ * from the feet, and the caller still drops a thing behind a floor (behindFloor), so a ledge over
+ * your head stays out of reach. Infinity when the box is not at the avatar's height.
+ * @param {{ left:number, top:number, right:number, bottom:number }} box  the thing's box
+ * @param {number} x  the avatar's x
+ * @param {number} feetY  the avatar's feet
+ * @param {number} headY  the top of the avatar's hit box (avatarHitBox(...).top)
+ */
+export function bodyReachDistance(box, x, feetY, headY) {
+  if (!box || box.bottom < Math.min(headY, feetY) || box.top > feetY) return Infinity;
+  return x < box.left ? box.left - x : x > box.right ? x - box.right : 0;
+}
