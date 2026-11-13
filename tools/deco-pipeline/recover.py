@@ -157,9 +157,18 @@ def read_json(path, default):
     return json.load(open(path)) if os.path.exists(path) else default
 
 
+def made_decos():
+    """Our own shipped decos (gz_ names in public/assets/decos/groddle/: made art with its provenance in
+    tools/provenance/made-decos.json, js/deco-new-list.js). They are drawn, so never missing."""
+    d = os.path.join(os.path.dirname(MANIFEST), 'groddle')
+    if not os.path.isdir(d):
+        return set()
+    return {f[:-5] for f in os.listdir(d) if f.startswith('gz_') and f.endswith('.webp') and '@' not in f}
+
+
 def missing_now(place, manifest, twins):
-    """Placed sprites the renderer cannot draw (not shipped, no shipped twin)."""
-    have = set(manifest)
+    """Placed sprites the renderer cannot draw (not shipped, no shipped twin, not our own made deco)."""
+    have = set(manifest) | made_decos()
     return sorted(n for n in place if n not in have and twins.get(n) not in have)
 
 
