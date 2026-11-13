@@ -13946,6 +13946,13 @@ html:not(.stage-pinned)[data-ui="modern"] #wrap > .top-bar {
    them keeps its place. */
 [data-ui="modern"] #game-root:not([data-sheet]) #buff-strip { left: calc(var(--hud-inset) + var(--safe-l)); }
 [data-ui="modern"] #game-root .route-gps { right: max(calc(var(--hud-inset) + var(--safe-r)), var(--inset-r)); }
+/* SHORT SCREENS (the audit's findings 7 and 8, a phone held sideways, 335 to 430 px tall). The vitals
+   menu (energy or mood: food from the pack) ran off the bottom: it stops above the pack row, as the
+   Menu does, and scrolls. */
+[data-ui="modern"] .top-bar .vitals-menu {
+  max-height: calc(100dvh - var(--hud-h) - 16px - 80px - var(--safe-t) - var(--safe-b));
+  overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch;
+}
 /* === end LANDSCAPE-HUD === */
 
 /* —— MAPICONS —— the hub map's street icons (vendor, shrine, subway station; js/map-graph.js
