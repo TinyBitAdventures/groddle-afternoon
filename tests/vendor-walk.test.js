@@ -254,3 +254,69 @@ describe('the walk strips', () => {
     assert.ok(Math.abs(cell2 - (walk2.x + walk2.w) - 118) <= 1, 'walk_left crop x (measured 118)');
   });
 });
+
+describe('the walk strips at 3x (lane vendors3x)', () => {
+  const results = JSON.parse(readFileSync(join(ROOT, 'tools/vector-sprites/results.json'), 'utf8'));
+  const manifest = JSON.parse(readFileSync(join(ROOT, 'tools/vector-sprites/characters.json'), 'utf8'));
+  /** Strips that stay 1x because no SWF run matches them frame for frame (empty: every one matched). */
+  const KEEP_1X = new Set([]);
+  const motionPaths = () => Object.entries(VENDOR_NPC_MOTION_ART).flatMap(([cls, states]) => Object.keys(states).map((state) => [cls, state, vendorSheet(cls, state).path]));
+
+  it('each strip has its own job, so a poor match never costs the idle and talk 3x', () => {
+    for (const [cls, state, path] of motionPaths()) {
+      const job = manifest.jobs.find((j) => j.sheets.some((s) => s.path === path));
+      assert.ok(job, `${cls} ${state} is in tools/vector-sprites/characters.json`);
+      assert.match(job.character, /-motion$/, path);
+      assert.ok(!manifest.jobs.some((j) => j.character === job.character && j.sheets.some((s) => /_(idle|talk)\.webp$/.test(s.path))), path);
+    }
+  });
+
+  it('swaps every matched strip to a 3x render on first draw: same cells, frame count, run and feet', async () => {
+    const { FIRST_DRAW_SPRITES, HIRES_SPRITES, SPLIT_SPRITES } = await import('../public/js/sprite-hires.js?v=add7b764');
+    for (const [cls, state, path] of motionPaths()) {
+      const r = results[path];
+      const strip = vendorStrip(cls, state);
+      if (KEEP_1X.has(path)) {
+        assert.equal(r?.status, 'rejected', path);
+        assert.ok(!HIRES_SPRITES.has(path) && !SPLIT_SPRITES.has(path), `${path} stays 1x`);
+        continue;
+      }
+      assert.equal(r?.status, 'ok', `${path} ${r?.reason || ''}`);
+      assert.ok(FIRST_DRAW_SPRITES.has(path), path);
+      assert.ok(HIRES_SPRITES.has(path) || SPLIT_SPRITES.has(path), path);
+      // Same crop and frame count, unmirrored, one unbroken run of SWF frames (so the 30 fps clip keeps its timing).
+      assert.deepEqual([r.fw, r.fh, r.cells, r.mirror], [strip.crop.w, strip.crop.h, strip.frames, false], path);
+      assert.equal(r.swfFrames[1] - r.swfFrames[0], strip.frames - 1, path);
+      assert.equal(r.label, strip.oga, path);
+      assert.ok(r.score >= 0.95 && r.minFrame >= 0.85, `${path} ${r.score} ${r.minFrame}`);
+      assert.equal(r.drift.length, 0, path);
+      // Feet: the render sits where the idle strip's does, moved by the crop difference
+      // (offset3x is the SWF origin in 3x px of the cell), within one 1x pixel.
+      const idle = results[vendorSheet(cls, 'idle').path];
+      const ic = VENDOR_NPC_ART[cls].states.idle.crop;
+      const want = [idle.offset3x[0] - 3 * (strip.crop.x - ic.x), idle.offset3x[1] - 3 * (strip.crop.y - ic.y)];
+      assert.ok(Math.abs(r.offset3x[0] - want[0]) <= 2 && Math.abs(r.offset3x[1] - want[1]) <= 2, `${path} offset ${r.offset3x} want ${want}`);
+    }
+  });
+
+  it('each walk keeps the OGA strip\'s run of its SWF label (the walks skip the label\'s start-up frames)', () => {
+    // frame-match.mjs at the idle placement: the OGA walk strips hold the label's last frames
+    // (Meal Vendor walk_left 16 of 24, Uncle Friendly walk 14 of 22, Helga walk 16 of 23, Sno Cone 7 of 14).
+    const RUNS = {
+      npc_cooking_vendor_walk_left: [43, 58], npc_cooking_vendor_walk_right: [5, 20],
+      npc_jabba1_walk: [9, 22], npc_jabba2_walk: [62, 77],
+      npc_sno_cone_vending_machine_walk_left: [23, 29], npc_sno_cone_vending_machine_walk_right: [9, 15],
+      npc_tool_vendor_walk: [1, 24], npc_jabba1_impatient: [356, 441], npc_jabba2_turn: [93, 110],
+    };
+    for (const [name, run] of Object.entries(RUNS)) {
+      const r = results[`assets/sprites/vendors/${name}.webp`];
+      assert.deepEqual(r?.swfFrames, run, name);
+    }
+  });
+
+  it('the idle and talk 3x strips are all still there', () => {
+    for (const cls of VENDOR_NPC_CLASSES) {
+      for (const state of ['idle', 'talk']) assert.equal(results[vendorSheet(cls, state).path]?.status, 'ok', `${cls} ${state}`);
+    }
+  });
+});

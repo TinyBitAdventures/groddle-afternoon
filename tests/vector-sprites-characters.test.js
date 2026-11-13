@@ -65,6 +65,8 @@ const SHARP = [
   'fox-ranger', 'fox-bait',
   // The street vendors (js/vendor-npcs.js VENDOR_NPC_ART: cropped 8-column strips, idle loop + talk).
   'gardening-vendor', 'meal-vendor', 'tool-vendor', 'uncle-friendly', 'helga', 'sno-cone-vending-machine',
+  // Their walk, turn, stop, impatient and attract strips (VENDOR_NPC_MOTION_ART), each vendor's own group.
+  ...['gardening-vendor', 'meal-vendor', 'tool-vendor', 'uncle-friendly', 'helga', 'sno-cone-vending-machine'].map((v) => `${v}-motion`),
   'factory-defect-chick', // G407's chick, race and broken still
   'juju-red', 'juju-green', 'juju-yellow',
   ...['red', 'green', 'yellow'].flatMap((v) => ['blue', 'black', 'red'].map((b) => `juju-bandit-${v}-${b}`)),
