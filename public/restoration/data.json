@@ -169,7 +169,7 @@
    "group": "world",
    "name": "Hub maps and travel",
    "status": "source",
-   "blurb": "Every region’s map with its streets. Travel by signpost; from the map, set a destination for a guided path, or with Teleportation IV teleport to a street you have visited. Tiny Speck’s map paintings are lost, so each region’s map shows their small thumbnail of it, enlarged; Ix’s, Uralia’s, Groddle Forest’s, Groddle Meadow’s, Shimla Mirch’s, Groddle Heights’s, Jethimadh’s, Chakra Phool’s, Bortola’s, Alakol’s, Kajuu’s, Baqala’s, Karnata’s, Andra’s, Choru’s, Zhambu’s, Tamila’s, Salatu’s, Xalanga’s, Muufo’s, Besara’s, Kalavana’s, Vantalu’s, Aranna’s, Ormonos’s, Lida’s, Pollokoo’s, Callopee’s, Rasana’s, Massadoe’s, Brillah’s, Tahli’s, Firozi’s, Haraiva’s, Folivoria’s, Cauda’s, Sura’s, Fenneq’s, Roobrik’s, Balzare’s, Haoma’s, Kloro’s, Jal’s, Nottis’s, Samudra’s, Drifa’s and Vortex of Random’s are repainted for the remake from their thumbnails.",
+   "blurb": "Every region’s map with its streets. Travel by signpost; from the map, set a destination for a guided path, or with Teleportation IV teleport to a street you have visited. Tiny Speck’s map paintings are lost, so each region’s map shows their small thumbnail of it, enlarged; Ix’s, Uralia’s, Groddle Forest’s, Groddle Meadow’s, Shimla Mirch’s, Groddle Heights’s, Jethimadh’s, Chakra Phool’s, Bortola’s, Alakol’s, Kajuu’s, Baqala’s, Karnata’s, Andra’s, Choru’s, Zhambu’s, Tamila’s, Salatu’s, Xalanga’s, Muufo’s, Besara’s, Kalavana’s, Vantalu’s, Aranna’s, Ormonos’s, Lida’s, Pollokoo’s, Callopee’s, Rasana’s, Massadoe’s, Brillah’s, Tahli’s, Firozi’s, Haraiva’s, Folivoria’s, Cauda’s, Sura’s, Fenneq’s, Roobrik’s, Balzare’s, Haoma’s, Kloro’s, Jal’s, Nottis’s, Samudra’s, Drifa’s and Vortex of Random’s are repainted for the remake from their thumbnails; Naraka’s, Ilmenskie Caverns’s, The Seams’s and Ilmenskie Deeps’s had no thumbnail, so they are painted for the remake from the streets alone.",
    "multiplayer": null,
    "spot": null,
    "evidence": [
@@ -2792,128 +2792,128 @@
   "deployed": "2026-11-13"
  },
  "git": {
-  "commits": 1920,
+  "commits": 2030,
   "since": "2026-10-19",
   "recent": [
    {
     "date": "2026-11-13",
+    "kind": "improve",
+    "text": "Naraka, Ilmenskie Caverns, Ilmenskie Deeps and The Seams now have painted region maps"
+   },
+   {
+    "date": "2026-11-13",
+    "kind": "fix",
+    "text": "In the gut tubes (Greyving Grays and the four others) a phone's Jump button flips which way is down, and the hints say Jump instead of Space"
+   },
+   {
+    "date": "2026-11-13",
+    "kind": "fix",
+    "text": "The Museum of the Rook's Greeterbot stands on the floor by the door and greets you when you walk into it, so you see it first"
+   },
+   {
+    "date": "2026-11-13",
+    "kind": "fix",
+    "text": "In the Ventilation Room you can drop down the shaft from the Corridor Six door instead of walking on thin air"
+   },
+   {
+    "date": "2026-11-13",
+    "kind": "fix",
+    "text": "Claim Emblem with a full pack says the pack needs room, not that more favor is needed"
+   },
+   {
+    "date": "2026-11-13",
+    "kind": "fix",
+    "text": "With a full pack, the drink ticket prompt says it went to storage and the Hell Bartender keeps your ticket instead of sending the wine to the magic rock unseen"
+   },
+   {
+    "date": "2026-11-13",
+    "kind": "fix",
+    "text": "Enter reaches the food on EZ Cookin's counters and the Knife & Board on its table from the floor beside them"
+   },
+   {
+    "date": "2026-11-13",
+    "kind": "fix",
+    "text": "In EZ Cookin' the front tree no longer hides the food on the first two counters"
+   },
+   {
+    "date": "2026-11-13",
+    "kind": "fix",
+    "text": "The Magic Rock's card shows with the rock and its white glow, not the rock and glow a beat after the card"
+   },
+   {
+    "date": "2026-11-13",
+    "kind": "fix",
+    "text": "Online, a street you can already walk to still shows its project as open when the world has not built it yet"
+   },
+   {
+    "date": "2026-11-13",
+    "kind": "fix",
+    "text": "A street project that asks for the same item (or currants) twice now credits the row you contributed on"
+   },
+   {
+    "date": "2026-11-13",
     "kind": "new",
-    "text": "Breezy, EZ Cookin' and Talking 'bout Soil Appreciation get their practice streets back"
+    "text": "The Made for Groddle pictures on /restoration/ open in a compare popup that flips between the original and the made art"
    },
    {
     "date": "2026-11-13",
     "kind": "fix",
-    "text": "The phone Camera Mode check sits after the right-click guards in a world press"
+    "text": "Summoned from inside someone else's house, a friend lands at that house's front door and both players are told so"
    },
    {
     "date": "2026-11-13",
     "kind": "improve",
-    "text": "On a phone, Camera Mode opens from the Menu, a finger drag looks around and Done ends it"
+    "text": "Made for Groddle on /restoration/ shows the subway map paper, EZ Cookin's new props and three more region maps beside what they came from"
    },
    {
     "date": "2026-11-13",
     "kind": "improve",
-    "text": "Each report shows its number, in the Reports list and in the report itself"
-   },
-   {
-    "date": "2026-11-13",
-    "kind": "fix",
-    "text": "A blank Rename puts a bag back on its own name, so a Sort can name it again"
+    "text": "EZ Cookin' has its glass serving counters, white hanging lamps and round mosaic table back, made for Groddle"
    },
    {
     "date": "2026-11-13",
     "kind": "improve",
-    "text": "Zoomed in on a phone the street draws sharper, in the same memory as the whole-street view"
+    "text": "A sharp desktop draws the vendors' 3x walks; a phone keeps the 1x walk strips"
    },
    {
     "date": "2026-11-13",
     "kind": "improve",
-    "text": "A phone's top bar shows the currants and favor under the iMG"
+    "text": "The walking vendors are as sharp walking, turning and stopping as standing on Retina screens"
    },
    {
     "date": "2026-11-13",
     "kind": "fix",
-    "text": "On a phone the report window's Send shows without a scroll"
+    "text": "Online, a player arriving on Lotha Harte or Icicle Dangles picks up the street's state even when it comes while the street loads"
    },
    {
     "date": "2026-11-13",
-    "kind": "fix",
-    "text": "A phone's Menu no longer offers Interface: Classic, which could not show there"
+    "kind": "new",
+    "text": "Online, Koulato Cluster's firefly jars come out for everyone at the street's 30th arrival, and three players on them share the Firefly Jars"
+   },
+   {
+    "date": "2026-11-13",
+    "kind": "new",
+    "text": "Online, Lotha Harte's notes and heart and Icicle Dangles' lights are heard and seen by everyone on the street"
    },
    {
     "date": "2026-11-13",
     "kind": "improve",
-    "text": "On a phone the pack row gives its room to the slots: no slot count, smaller search and cloud"
-   },
-   {
-    "date": "2026-11-13",
-    "kind": "fix",
-    "text": "On a phone the loading card's upgrade line sits under Home to:, not in a wide column beside it"
+    "text": "EZ Cookin's practice street drops the stand-in hanging lamps, keeping its counters and table"
    },
    {
     "date": "2026-11-13",
     "kind": "improve",
-    "text": "On a phone the Map takes the screen's whole width and runs to its foot"
-   },
-   {
-    "date": "2026-11-13",
-    "kind": "fix",
-    "text": "In Mail on a phone the open letter keeps its colour while the list scrolls"
-   },
-   {
-    "date": "2026-11-13",
-    "kind": "fix",
-    "text": "On a phone the Make window's ingredients, machine and output stand centred in the box"
-   },
-   {
-    "date": "2026-11-13",
-    "kind": "fix",
-    "text": "On a phone the Imagination hub's tiles all fit on the screen"
-   },
-   {
-    "date": "2026-11-13",
-    "kind": "fix",
-    "text": "On a phone the three upgrade cards stand side by side, each with its Get Upgrade in view"
-   },
-   {
-    "date": "2026-11-13",
-    "kind": "fix",
-    "text": "Coloured street layers take a quarter of the memory on a phone, and a deco's original leaves the GPU once its coloured copy is made"
-   },
-   {
-    "date": "2026-11-13",
-    "kind": "fix",
-    "text": "A street trip lets go of the street you left at once, so an iPhone tab no longer dies on the way into Froughtful Fen"
-   },
-   {
-    "date": "2026-11-13",
-    "kind": "fix",
-    "text": "A dropped Still starts only with more than one Hooch's worth of grain, and shows empty until its next change, as in Glitch"
-   },
-   {
-    "date": "2026-11-13",
-    "kind": "fix",
-    "text": "A Still works on the ground, as in Glitch: drop it, then Distill and Collect there"
+    "text": "The featured project is a thin line along the bottom of the street name bubble, so notices stack under one bubble"
    },
    {
     "date": "2026-11-13",
     "kind": "improve",
-    "text": "Tiny Speck's own Still animations, empty, working, ready and collect, for a Still on the ground"
+    "text": "The street map is never left hidden in a scene, and the phone sheet opened early shows a calm empty card"
    },
    {
     "date": "2026-11-13",
     "kind": "improve",
-    "text": "A machine says \"You are making something else.\" while a hand tool makes something"
-   },
-   {
-    "date": "2026-11-13",
-    "kind": "fix",
-    "text": "On iPhone Safari the Auctions window ends above Safari's toolbar"
-   },
-   {
-    "date": "2026-11-13",
-    "kind": "fix",
-    "text": "On a phone the Groups and Account windows, and their kin from the Menu, fit the screen with the title and close button always showing"
+    "text": "Walking back to a street shows its map at once"
    }
   ]
  },
