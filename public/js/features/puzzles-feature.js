@@ -68,7 +68,7 @@ import {
   stepTriggers,
 } from '../puzzle-triggers.js?v=facc2c29';
 import { energyMax, metabolicGain, moodMax } from '../metabolics.js?v=1383e6fd';
-import { isLoaded, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js?v=92ec53cd';
+import { isLoaded, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js?v=814d7926';
 
 export const PUZZLES_FEATURE_ID = 'puzzles';
 export const LIGHT_BEAM_CLASS = 'light_beam';

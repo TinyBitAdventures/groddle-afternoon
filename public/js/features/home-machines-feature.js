@@ -104,10 +104,10 @@ import { getSkillCatalog } from '../content-catalogs.js?v=10b118dd';
 import { createBackYardState, homeStreetLayout, normalizeCultivationState } from '../home-cultivation.js?v=1e2d2b2d';
 import { readVisitScene } from '../neighbours-mp.js?v=78dd3b33';
 import { saveStore } from '../save-store.js?v=04420633';
-import { textureFromUrl } from '../textures.js?v=92ec53cd';
-import { createSheetLoader } from '../sprite-sheets.js?v=32c58aef';
-import { STREET_GROUND_Y, homesFeature } from './homes-feature.js?v=35daf16c';
-import { payAltarBonus } from './machine-rooms-feature.js?v=c36a2df8';
+import { textureFromUrl } from '../textures.js?v=814d7926';
+import { createSheetLoader } from '../sprite-sheets.js?v=3fae7efb';
+import { STREET_GROUND_Y, homesFeature } from './homes-feature.js?v=6bd9f3dc';
+import { payAltarBonus } from './machine-rooms-feature.js?v=9ef15f22';
 import { worldToScreen } from '../street-model.js?v=b6cb6a4e';
 import { nearestSurfaceY } from '../walk-surface.js?v=106bfdc5';
 

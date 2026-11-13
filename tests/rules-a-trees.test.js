@@ -16,8 +16,8 @@ import { quoteTrantCare } from '../public/js/trant-care.js?v=6ee0b0f5';
 import { harvestWoodTree, noteWoodCare, quoteWoodTreeHarvest, WOOD_TREE_MATURITY_MAP } from '../public/js/woodcutting.js?v=ee35a30a';
 import { growStreetTrant, maturityCycleMs } from '../public/js/patches.js?v=5ba97b77';
 import { createToolConditionState } from '../public/js/tools.js?v=48542c24';
-import { patchesFeature } from '../public/js/features/patches-feature.js?v=4c29b458';
-import { treeDeathFeature, WOOD_CLEARED_TO_PATCH_MS } from '../public/js/features/tree-death-feature.js?v=61a5c8aa';
+import { patchesFeature } from '../public/js/features/patches-feature.js?v=b7b34d23';
+import { treeDeathFeature, WOOD_CLEARED_TO_PATCH_MS } from '../public/js/features/tree-death-feature.js?v=05497c34';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 setTrantTables(JSON.parse(fs.readFileSync(path.join(root, 'public/assets/content/trants.json'), 'utf8')));

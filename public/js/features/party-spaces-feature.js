@@ -81,7 +81,7 @@ import {
   startParty,
   teleporterPhase,
 } from '../party-spaces.js?v=dcc45819';
-import { frameTexture, sourceFromUrl, textureFromUrl } from '../textures.js?v=92ec53cd';
+import { frameTexture, sourceFromUrl, textureFromUrl } from '../textures.js?v=814d7926';
 import { loseEnergy } from '../metabolics.js?v=1383e6fd';
 import { MP_PARTY_TEXT, MP_SPACE_STREET_RE, kickVerb, mpActivationBlock, normalizeSpace, partyFromSpace } from '../party-spaces-mp.js?v=3821c723';
 

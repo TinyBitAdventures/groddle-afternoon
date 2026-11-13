@@ -336,6 +336,25 @@ export function releaseIdleImages({ match, onGpu, now = Date.now(), idleMs = 300
 }
 
 /**
+ * #284 (an iPhone tab killed on a street trip): Pixi frees a GPU copy only after 20 s unused, so for
+ * 20 s after a trip the GPU held the street left behind as well as the new one and its colour bakes
+ * (2.1 GB in WebKit at iPhone size on the way into Froughtful Fen). Unload now the GPU copies of the
+ * images whose URL passes `match` among `managed` (the renderer's managed sources): what still draws
+ * them uploads them again from the decoded image this module keeps. Returns how many were unloaded.
+ */
+export function unloadGpuCopies({ match, managed } = {}) {
+  if (!(match instanceof RegExp) || !managed) return 0;
+  let unloaded = 0;
+  for (const source of [...managed]) {
+    const url = source?.[LOAD]?.url;
+    if (!url || source.destroyed || !match.test(url) || typeof source.unload !== 'function') continue;
+    source.unload();
+    unloaded += 1;
+  }
+  return unloaded;
+}
+
+/**
  * MEMQA (ticket 21): the loaded URL images by folder (assets/<a>/<b>), largest first: count and
  * megapixels, and how many of them are in `onGpu` (a Set of the renderer's managed sources: Pixi frees
  * a GPU copy unused for 20 s; the image stays here).

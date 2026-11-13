@@ -31,7 +31,7 @@
  * the reference recording (j9xJLETQzi4) shows quoins there.
  */
 
-import { onLoaded } from '../textures.js?v=92ec53cd';
+import { onLoaded } from '../textures.js?v=814d7926';
 
 export const STREET = 'GIFM4BD43383DKV';
 const BOUNDS = { l: -2000, t: -1000 };

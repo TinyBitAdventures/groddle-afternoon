@@ -47,8 +47,8 @@
  * blocks, billboards and silhouettes are clean vectors.
  */
 
-import { pushOutOfSolids, spawnQuoins, takeQuoins, BODY_H } from './puzzle-kit.js?v=ce6079c3';
-import { textureFromUrl } from '../textures.js?v=92ec53cd';
+import { pushOutOfSolids, spawnQuoins, takeQuoins, BODY_H } from './puzzle-kit.js?v=ffbba892';
+import { textureFromUrl } from '../textures.js?v=814d7926';
 
 const ROOM_ID = 'mental_block';
 const ART = `assets/sprites/quest-rooms/${ROOM_ID}/`;

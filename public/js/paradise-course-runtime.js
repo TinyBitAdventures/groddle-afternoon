@@ -19,7 +19,7 @@
 import { heldDirection } from './held-keys.js?v=a28eb293';
 import { stepParadiseBody, usesParadiseBody } from './paradise-courses.js?v=b466613b';
 import { SKY_PLUNGE_FILES } from './sky-plunge-art.js?v=47e01e53';
-import { isLoaded, onLoaded, textureFromUrl } from './textures.js?v=92ec53cd';
+import { isLoaded, onLoaded, textureFromUrl } from './textures.js?v=814d7926';
 
 const DECO_ROOT = 'assets/decos/groddle';
 const decoUrl = (name) => `${DECO_ROOT}/${name}.png`;

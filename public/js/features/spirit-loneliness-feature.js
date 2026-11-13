@@ -59,7 +59,7 @@ import { graphKey, routeGraph, tsidAliases } from '../map-routes.js?v=c7e7dc80';
 import { STREET_SPIRIT_VARIANTS, portraitFit, portraitSheet, spiritForStreet } from '../street-spirits.js?v=f9e88445';
 import { grantMoodXp } from '../mood-xp.js?v=22648ec0';
 import { denseFrame, denseSprite } from '../sprite-dense.js?v=2a0ce07a';
-import { loadVectorFrames, overlayAlpha, overlayFrameAt, overlayLifeMs, overlayPlacement, trackOverlay } from '../overlay-art.js?v=a6561207';
+import { loadVectorFrames, overlayAlpha, overlayFrameAt, overlayLifeMs, overlayPlacement, trackOverlay } from '../overlay-art.js?v=92383208';
 import {
   INVITE_ART,
   LONELY_RULES,

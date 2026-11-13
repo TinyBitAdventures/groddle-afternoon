@@ -25,7 +25,7 @@
  */
 
 import { RUBE_YARD_FILES } from './rube-yard-art.js?v=0a67d3e6';
-import { textureFromUrl } from './textures.js?v=92ec53cd';
+import { textureFromUrl } from './textures.js?v=814d7926';
 
 export const YARD_W = 1900;
 export const YARD_H = 760;

@@ -33,7 +33,7 @@
 
 import { createPlot, performPlotVerb, plotArtPath, plotVerbs, soilResponse } from '../patches.js?v=5ba97b77';
 import { getQuestCatalog } from '../content-catalogs.js?v=10b118dd';
-import { onLoaded, textureFromUrl } from '../textures.js?v=92ec53cd';
+import { onLoaded, textureFromUrl } from '../textures.js?v=814d7926';
 import { ensureItem } from '../inventory.js?v=f49c8998';
 
 export const PART_1 = 'smuggle_the_smuggler_part1';

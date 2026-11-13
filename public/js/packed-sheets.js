@@ -1,5 +1,5 @@
 import { upgradeSource } from './sprite-hires.js?v=d4cce9f9';
-import { frameTexture, loadTexture, whenLoaded } from './textures.js?v=92ec53cd';
+import { frameTexture, loadTexture, whenLoaded } from './textures.js?v=814d7926';
 
 /**
  * Packed animation sheets (js/packed-sheets-data.js, written by tools/packed-sheets/build.py): a

@@ -76,7 +76,7 @@ const G448_ART = ['overlay_sneezing_powder', 'focusing_orb_laser_beam', 'shrine_
 const SHARP1_MORE = ['trading', 'fox_bait_ignite', 'dice_overlay', 'twelve_sided_die', 'petrified_rock_open_overlay', 'right_arrow', 'crown_game_indicator_you', 'crown_game_indicator_someone_else', 'game_of_crowns_throbber'];
 const SHARP1_ART = ['poisoned', 'rooked', 'amorous_philtre_heart', 'play_glitch'];
 
-const overlays = () => import('../public/js/overlays.js?v=4e81f749');
+const overlays = () => import('../public/js/overlays.js?v=8ebf1499');
 const flush = async (n = 3) => {
   for (let i = 0; i < n; i += 1) {
     await new Promise((r) => setTimeout(r, 0));
@@ -386,7 +386,7 @@ describe('G441: the super harvest arc drawn from its SVG frames on dense screens
     // Nothing shows the race winner's rainbow (desk decisions), so it has no SVG frames.
     assert.ok(!art.rainbow_winner.vector);
     for (const f of ['player-verbs-mp-feature', 'rook-attack-feature', 'secret-spots-feature']) assert.match(read(`js/features/${f}.js`), /resolution: engine\.resolution \|\| 1/, f);
-    const oa = await import('../public/js/overlay-art.js?v=a6561207');
+    const oa = await import('../public/js/overlay-art.js?v=92383208');
     const ov = await overlays();
     assert.equal(ov.vectorDensity, oa.vectorDensity, 'one vector path');
     const y = art.rainbow_youdidit;
@@ -550,7 +550,7 @@ describe('G441: the super harvest arc drawn from its SVG frames on dense screens
 
   it('G448: playOverlay uses the default resolution when given none; the countdown window overlay draws SVG frames on a dense screen', async () => {
     const ov = await overlays();
-    const oa = await import('../public/js/overlay-art.js?v=a6561207');
+    const oa = await import('../public/js/overlay-art.js?v=92383208');
     const m = manifest['321_countdown'];
     const vtext = readFileSync(join(pub, 'assets/sprites/overlays', m.vector.file), 'utf8');
     const savedFetch = globalThis.fetch;

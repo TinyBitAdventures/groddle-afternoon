@@ -29,8 +29,8 @@
  */
 
 import { addItem, countItem, removeItem } from '../inventory.js?v=f49c8998';
-import { frameTexture, sourceFromUrl, textureFromUrl } from '../textures.js?v=92ec53cd';
-import { pixiSpeed } from '../sprite-sheets.js?v=32c58aef';
+import { frameTexture, sourceFromUrl, textureFromUrl } from '../textures.js?v=814d7926';
+import { pixiSpeed } from '../sprite-sheets.js?v=3fae7efb';
 import { ensureHellItems, HELL_BARTENDER, HELL_SPRITES } from '../hell.js?v=23354bc4';
 import { questFlagsFeature } from './quest-flags-feature.js?v=17c6ef48';
 import {

@@ -54,7 +54,7 @@ import { ITEM_CATALOG, addItem, countItem, ensureItem, itemIcon, packStamp, remo
 import { canUseTool, useToolCondition } from '../tools.js?v=48542c24';
 import { ecologyForStreet } from '../street-ecology.js?v=c8d6fa5b';
 import { worldToScreen } from '../street-model.js?v=b6cb6a4e';
-import { signArmWidth } from '../street-render.js?v=47697d4c';
+import { signArmWidth } from '../street-render.js?v=2c6bd942';
 import { getSkillCatalog } from '../content-catalogs.js?v=10b118dd';
 import { GIANTS } from '../shrines.js?v=a190faea';
 import { giantDisplayName } from '../giant-names.js?v=0e295891';
@@ -140,7 +140,7 @@ import {
 import { grantMoodXp } from '../mood-xp.js?v=22648ec0';
 import { createMinnAccount } from '../minn-account.js?v=c15f0ecf';
 import { normalizeGroups } from '../groups.js?v=c9635d96';
-import { frameTexture, sourceFromUrl, textureFromUrl } from '../textures.js?v=92ec53cd';
+import { frameTexture, sourceFromUrl, textureFromUrl } from '../textures.js?v=814d7926';
 import { createJobIndicator, jobIndicatorTip, jobIndicatorView, jobPerc } from '../job-indicator.js?v=05498227';
 import { LOT_ART, LOT_CLASS, LOT_PLACEMENT, LOT_SIGN_BLOCKERS, LOT_SIGN_X, LOT_TEXT, floorYAt, lotFit, lotHeadline, lotVerb } from '../group-hall-lot.js?v=23e8fbd9';
 import { JOB_WORK_OVERLAY, jobWorkFloatPoint, jobWorkSoundKey, jobWorkToolScale, jobWorkToolSheet } from '../job-work-fx.js?v=8b1616b7';

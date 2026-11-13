@@ -15,7 +15,7 @@ import { createInventory, countItem } from '../public/js/inventory.js?v=f49c8998
 import { copyForVerb, copyTags, createToolConditionState, setCopyTag } from '../public/js/tools.js?v=48542c24';
 import { resolveSound } from '../public/js/sound-board.js?v=7ff169eb';
 import { SOUND_ALIASES, SOUND_FILES } from '../public/js/sound-keys.js?v=fb6ee553';
-import { supplyFeature } from '../public/js/features/supply-feature.js?v=73cdbdad';
+import { supplyFeature } from '../public/js/features/supply-feature.js?v=82859ab1';
 import { STILL, advanceStill, createStillState, stillStopsAt } from '../public/js/machines.js?v=e96d8d3b';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');

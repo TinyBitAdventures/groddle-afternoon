@@ -136,11 +136,11 @@ import { assignQuest, completeQuest } from '../quests.js?v=40c71a37';
 import { acceptOffer, enqueueQuestOffer, questAwardPayload, turnInQuest } from '../quest-offers.js?v=1b92a976';
 import { getQuestCatalog } from '../content-catalogs.js?v=10b118dd';
 import { locationEventsApi } from './location-events-feature.js?v=0cda70ed';
-import * as kit from '../quest-rooms/kit.js?v=57af0d8f';
-import { frameTexture, onLoaded, sourceFromUrl, textureFromUrl, whenLoaded } from '../textures.js?v=92ec53cd';
+import * as kit from '../quest-rooms/kit.js?v=c436cb8a';
+import { frameTexture, onLoaded, sourceFromUrl, textureFromUrl, whenLoaded } from '../textures.js?v=814d7926';
 import { upgradeSource } from '../sprite-hires.js?v=d4cce9f9';
 import { grantMoodXp } from '../mood-xp.js?v=22648ec0';
-import { displayTopOf, itemstackOverlayPoint, playPoofIn, playSheetOverlay, poofInAlpha } from '../overlay-art.js?v=a6561207';
+import { displayTopOf, itemstackOverlayPoint, playPoofIn, playSheetOverlay, poofInAlpha } from '../overlay-art.js?v=92383208';
 import { HOME_MACHINE } from '../home-ticket.js?v=59830ec7';
 import { animalAnchorX, animalAnchorY, createAnimalState } from '../animals.js?v=1069540e';
 import {

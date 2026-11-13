@@ -25,6 +25,7 @@ class ImageSource extends Emitter {
     return changed;
   }
   update() { this.updates += 1; }
+  unload() { this.unloads = (this.unloads || 0) + 1; }
 }
 class Texture {
   constructor({ source, frame, label, dynamic }) { Object.assign(this, { source, frame, label, dynamic: Boolean(dynamic) }); }
@@ -53,7 +54,7 @@ before(async () => {
   globalThis.PIXI = { ImageSource, Texture };
   globalThis.Image = FakeImage;
   globalThis.document = { createElement: () => ({ width: 0, height: 0, getContext: () => ({ drawImage() {} }) }) };
-  T = await import('../public/js/textures.js?v=92ec53cd');
+  T = await import('../public/js/textures.js?v=814d7926');
 });
 after(() => {
   for (const [k, v] of Object.entries(saved)) globalThis[k] = v;
@@ -152,5 +153,27 @@ describe('ticket 21: street decos no street draws leave the image cache (release
     assert.equal(T.releaseIdleImages({ match, onGpu: new Set(), now: 60000, idleMs: 30000 }), 0);
     assert.equal(T.releaseIdleImages({ match, onGpu: new Set(), now: 70001, idleMs: 30000 }), 1);
     assert.equal(T.releaseIdleImages({ match: null, onGpu: new Set() }), 0, 'no match: nothing');
+  });
+});
+
+describe('#284: a street trip unloads the street left behind from the GPU at once (unloadGpuCopies)', () => {
+  it('unloads the managed URL images the match passes, nothing else', async () => {
+    const deco = await T.loadTexture('assets/decos/groddle/t284_tree_120x60.webp');
+    const sheet = await T.loadTexture('assets/sprites/animals/t284_pig_64x64.png');
+    const gone = await T.loadTexture('assets/decos/groddle/t284_gone_30x30.webp');
+    gone.source.destroyed = true;
+    const bake = new ImageSource({ resource: null, label: 'render texture' });
+    const match = /(^|\/)assets\/decos\//;
+    const managed = [deco.source, sheet.source, gone.source, bake, null];
+    assert.equal(T.unloadGpuCopies({ match, managed }), 1);
+    assert.equal(deco.source.unloads, 1, 'the deco left behind is unloaded');
+    assert.equal(sheet.source.unloads, undefined, 'an image outside the match stays');
+    assert.equal(gone.source.unloads, undefined, 'a destroyed source is left alone');
+    assert.equal(bake.unloads, undefined, 'a source not loaded from a URL (a bake) is left alone');
+    // The image stays cached: whatever draws it again uploads it from there.
+    assert.equal(T.cachedTexture('assets/decos/groddle/t284_tree_120x60.webp'), deco);
+    assert.equal(T.isLoaded(deco), true);
+    assert.equal(T.unloadGpuCopies({ match: null, managed }), 0, 'no match: nothing');
+    assert.equal(T.unloadGpuCopies({ match }), 0, 'no managed list: nothing');
   });
 });

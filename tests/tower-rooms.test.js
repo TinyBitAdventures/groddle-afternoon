@@ -22,7 +22,7 @@ import {
   turned,
 } from '../public/js/tower-rooms.js?v=f238eaa9';
 import { inTowerSpot, towerSpotsFor } from '../public/js/home-tower.js?v=d33a67e4';
-import { restockGarden, towerRoomsFeature } from '../public/js/features/tower-rooms-feature.js?v=6085c4f0';
+import { restockGarden, towerRoomsFeature } from '../public/js/features/tower-rooms-feature.js?v=0ad979cc';
 import {
   ALL_TOWER_ROOMS,
   CHALLENGE_ROOMS,

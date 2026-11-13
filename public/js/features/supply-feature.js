@@ -87,7 +87,7 @@ import {
   stillWaitsToStart,
 } from '../machines.js?v=e96d8d3b';
 import { STILL_ART_BOX, STILL_ART_CELL, stillArtFrame, stillArtState, stillSheetDef } from '../still-art.js?v=2eeb65ff';
-import { createSheetLoader } from '../sprite-sheets.js?v=32c58aef';
+import { createSheetLoader } from '../sprite-sheets.js?v=3fae7efb';
 import { HERB_SEEDS, ITEM_TRANSFORMS, listTransformVerbs, runTransform, transformVerbCount } from '../item-transforms.js?v=07b416a3';
 import {
   BUREAUCRACY_ITEMS,
@@ -98,7 +98,7 @@ import {
   completePapers,
   completePapersCheck,
 } from '../bureaucracy.js?v=b71fdd01';
-import { frameTexture, sourceFromUrl } from '../textures.js?v=92ec53cd';
+import { frameTexture, sourceFromUrl } from '../textures.js?v=814d7926';
 import { setMetalMakingMusic } from '../sound-moments.js?v=c57351b3';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
 

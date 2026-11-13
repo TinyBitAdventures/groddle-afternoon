@@ -42,7 +42,7 @@
  * 251-255, 539, 686-700).
  */
 
-import { frameTexture, sourceFromUrl } from './textures.js?v=92ec53cd';
+import { frameTexture, sourceFromUrl } from './textures.js?v=814d7926';
 
 export const OVERLAY_BASE = 'assets/sprites/overlays/';
 export const OVERLAY_MANIFEST_URL = `${OVERLAY_BASE}overlays.json?v=g448-2`;

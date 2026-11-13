@@ -57,10 +57,10 @@
  */
 
 import { BUTLER_STRINGS } from '../butler.js?v=a660e585';
-import { butlerApi } from './butler-feature.js?v=936e0836';
-import { hellFeature } from './hell-feature.js?v=d8327a47';
+import { butlerApi } from './butler-feature.js?v=5769617c';
+import { hellFeature } from './hell-feature.js?v=7477c8c7';
 import { locationEventsApi } from './location-events-feature.js?v=0cda70ed';
-import { towerApi } from './home-tower-feature.js?v=3fdbcf15';
+import { towerApi } from './home-tower-feature.js?v=a8d2246b';
 import { platformYAt, platformsScreen } from '../street-model.js?v=b6cb6a4e';
 import { COMMAND_HELP_INTRO, STUCK_COOLDOWN_MS, STUCK_TEXT, bareCommand, commandHelpLines, commandHint, isCommandHelp, misplacedCommand, slashPlan, strayLetterCommand, unknownLine } from '../slash-commands.js?v=ec0e84ee';
 import { parseTp, runTeleportCommand, TP_TEXT } from '../admin-teleport.js?v=fa56e8df';
