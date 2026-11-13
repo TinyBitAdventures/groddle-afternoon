@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=705c9a46';
 import { createErrorOnce, createFeatureHost } from './js/feature-host.js?v=06bb8b74';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=4757f005';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=bdf34768';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl, drawTileArt } from './js/enter-chooser.js?v=4a3ea327';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -1015,7 +1015,7 @@ import { installHiresIcons } from './js/icon-hires.js?v=165dbd6e';
 import { installHiresDecos } from './js/deco-hires.js?v=f59e60d3';
 import { loadAudioLevels, loadMutedPreference, saveAudioLevel, saveMutedPreference } from './js/audio-pref.js?v=6fe817bc';
 import { createAudioBuses, fadeGain } from './js/audio-buses.js?v=af167b54';
-import { installTopBar, renderTopBar } from './js/ui/topbar.js?v=4a4a72ea';
+import { installTopBar, renderTopBar } from './js/ui/topbar.js?v=f3230b0a';
 import { focusBack, installFocusReturn, lastInput } from './js/ui/focus-return.js?v=da190597';
 import { installContextGuard } from './js/ui/context-guard.js?v=0f71ac17';
 import { QUOIN_FRAME_BOB, advanceQuoinClock, quoinBobBetweenFrames } from './js/quoin-motion.js?v=ea0bd408';
@@ -32663,6 +32663,8 @@ async function main() {
   });
   function worldPress(e) {
     if (!state.started || menuTarget || isMapOpen() || isScreenFxBlocking()) return;
+    // #271: in a phone's Camera Mode a finger looks around (features/camera-mode-feature.js); a tap never walks or opens a menu.
+    if (TOUCH_PHONE && e.pointerType === 'touch' && features.query('cameraModeActive', engine) === true) return;
     // Player report 23: only the main button acts on the world. The client's right click was its
     // Flash menu, "A game by Tiny Speck" (BootStrap.as 38-55, TSMainView.as 207), never a verb menu.
     if (e.pointerType === 'mouse' && e.button !== 0) return;

@@ -7,7 +7,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { CAMERA_RANGE, EYEBALLERY_SKILL, cameraRange, stepLook } from '../public/js/features/camera-mode-feature.js?v=38e93494';
+import { CAMERA_MENU_ID, CAMERA_PHONE_COPY, CAMERA_RANGE, EYEBALLERY_SKILL, cameraRange, dragLook, stepLook } from '../public/js/features/camera-mode-feature.js?v=1db2ff07';
 
 const here = dirname(fileURLToPath(import.meta.url));
 
@@ -57,5 +57,33 @@ describe('camera mode in quest instances', () => {
   it('does not end itself every tick inside an instance', () => {
     const tick = src.slice(src.indexOf('onTick('), src.indexOf('onTick(') + 400);
     assert.match(tick, /engine\.busy\(\{ ignoreHome: true, ignoreInstance: true \}\)/);
+  });
+});
+
+describe('#271: Camera Mode on a phone, without a keyboard', () => {
+  const src = readFileSync(join(here, '../public/js/features/camera-mode-feature.js'), 'utf8');
+  it('a drag moves the look the other way, scaled to the world and held to the range', () => {
+    assert.deepEqual(dragLook({ x: 0, y: 0 }, 10, -5, 2, 400), { x: -20, y: 10 });
+    assert.deepEqual(dragLook({ x: 390, y: 0 }, -50, 0, 1, 400), { x: 400, y: 0 });
+    assert.deepEqual(dragLook({ x: 0, y: 0 }, -5000, 0, 1, Infinity), { x: 5000, y: 0 });
+    assert.deepEqual(dragLook({ x: 1, y: 2 }, 0, 0, 0, 400), { x: 1, y: 2 });
+  });
+  it('the phone Menu has a Camera Mode row in World, before Snaps', async () => {
+    const { MENU_ROWS, menuRowFor } = await import('../public/js/ui/topbar.js?v=f3230b0a');
+    assert.equal(CAMERA_MENU_ID, 'menu-camera-btn');
+    assert.deepEqual(menuRowFor(CAMERA_MENU_ID, { phone: true }), { group: 'world', rank: 2.5 });
+    assert.ok(MENU_ROWS[CAMERA_MENU_ID].rank < MENU_ROWS['snaps-btn'].rank);
+    // Only a phone makes the row; a computer keeps C.
+    assert.match(src, /if \(isPhoneDevice\(\)\) attachTouch\(engine\);/);
+  });
+  it('one finger looks, two pinch; Done ends it; taps do nothing while it is on', () => {
+    assert.match(src, /fingers\.size !== 1/);
+    assert.match(src, /onDone = \(\) => setActive\(engine, false\)/);
+    assert.equal(CAMERA_PHONE_COPY.done, 'Done');
+    for (const v of Object.values(CAMERA_PHONE_COPY)) assert.doesNotMatch(v, /\u2014|Arrows|\bC to\b/);
+    const game = readFileSync(join(here, '../public/game.js'), 'utf8');
+    assert.match(game, /TOUCH_PHONE && e\.pointerType === 'touch' && features\.query\('cameraModeActive', engine\) === true\) return;/);
+    const css = readFileSync(join(here, '../public/style.css'), 'utf8');
+    assert.match(css, /:root\.touch-phone\.camera-mode-on \.touch-controls \{ display: none; \}/);
   });
 });

@@ -68,6 +68,8 @@ export const MENU_ROWS = Object.freeze({
   'feat-btn': { group: 'world', rank: 1, key: 'H' },
   // Ticket 81: the Projects panel (features/street-jobs-feature.js).
   'projects-btn': { group: 'world', rank: 2, key: 'P' },
+  // #271: a phone only (features/camera-mode-feature.js): Camera Mode without the C key.
+  'menu-camera-btn': { group: 'world', rank: 2.5 },
   'snaps-btn': { group: 'world', rank: 3 },
   // ENCYC (js/encyclopedia-links.js): the Encyclopedia's home page in its own tab; I opens it on what you look at.
   'encyclopedia-btn': { group: 'world', rank: 4, key: 'I' },

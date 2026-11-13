@@ -27,6 +27,16 @@
  * OVERLAY_EMOTES), and each other client draws or drops the bubble over that
  * player (realtime-feature remoteAvatar). Solo has nobody else to see it.
  *
+ * #271 (Friendly, iPhone, 2026-11-13: "Is there a way to enter camera mode without a keyboard?"):
+ * on a phone (window.GRODDLE_DEVICE === 'phone') the Menu's World group has a Camera Mode row
+ * (#menu-camera-btn, js/ui/topbar.js MENU_ROWS) that turns it on. While it is on, one finger
+ * dragged on the street moves the look (dragLook: the street follows the finger, within the same
+ * range), two fingers still pinch the zoom (js/touch-pinch.js), and a Done button under the label
+ * ends it. The stick and Jump step aside meanwhile (html.camera-mode-on, style.css): they hold the
+ * game's own keys, which would climb a ladder while the view is away. The client's Camera Mode was
+ * keyboard only (C, TSFrontController.as maybeStartCameraManUserMode); the touch way in is ours.
+ * Computers are unchanged.
+ *
  * QA: ?autostart=1&camerademo=1 opens it (&cameraskill=1 grants Eyeballery,
  * &cameralook=x,y pans; &eyeballdemo=1 also draws the bubble over your own
  * Glitch, as the others would see it). Canvas data: cameraMode, cameraLookX,
@@ -37,6 +47,7 @@
 import { textureFromUrl } from '../textures.js?v=814d7926';
 import { OVERLAY_BUBBLE_URL, OVERLAY_USES, overlayBubbleBox, playOverlay } from '../overlays.js?v=8ebf1499';
 import { SPEECH_BUBBLE_Z } from '../fx-z.js?v=18dda7e3';
+import { isPhoneDevice } from '../touch-controls.js?v=b6071ea4';
 
 export const CAMERA_FEATURE_ID = 'camera-mode';
 /** getCameraAbilities: range without Eyeballery, px from the avatar. */
@@ -55,6 +66,29 @@ const PAN_KEYS = {
 /** The pan limit for a player: 400 px, or unlimited with Eyeballery. */
 export function cameraRange(learned = []) {
   return Array.isArray(learned) && learned.includes(EYEBALLERY_SKILL) ? Infinity : CAMERA_RANGE;
+}
+
+/** #271: the phone's words under "Camera Mode" (no keys there: a drag looks, Done returns). */
+export const CAMERA_PHONE_COPY = Object.freeze({
+  row: 'Camera Mode',
+  done: 'Done',
+  doneLabel: 'Leave Camera Mode',
+  hint: 'Drag to look',
+  hintRange: 'Drag to look · Eyeballery lets you look across the whole street',
+});
+
+/** The phone Menu's row (#271). */
+export const CAMERA_MENU_ID = 'menu-camera-btn';
+
+/**
+ * PURE (#271): a one-finger drag on a phone. The street follows the finger, so the look moves the
+ * other way: dx, dy are CSS px the finger moved, scale the world px per CSS px (the view's width
+ * over the canvas's), held within the range as the keys are.
+ */
+export function dragLook(look, dx, dy, scale, range) {
+  const k = Number(scale) > 0 ? Number(scale) : 1;
+  const clampTo = (v) => Math.max(-range, Math.min(range, v));
+  return { x: clampTo(look.x - (Number(dx) || 0) * k), y: clampTo(look.y - (Number(dy) || 0) * k) };
 }
 
 /** Step a look offset by held directions over dtMs, within the range. */
@@ -164,6 +198,8 @@ function sendEyeballing(engine, on) {
 let look = { x: 0, y: 0 };
 let listeners = null;
 let overlay = null;
+/** #271: Done on the phone's overlay ends Camera Mode (set by attach). */
+let onDone = null;
 
 /**
  * The client refused Camera Mode only with no location or a location flagged no_camera_mode
@@ -189,12 +225,26 @@ function showOverlay(on, range, snapHint = null) {
     overlay.innerHTML = `
       <div class="camera-mode-frame" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
       <span class="camera-mode-reticle" aria-hidden="true"></span>
-      <p class="camera-mode-label"><b>Camera Mode</b> <span data-camera-hint></span></p>`;
+      <p class="camera-mode-label"><b>Camera Mode</b> <span data-camera-hint></span></p>
+      <button type="button" class="camera-mode-done" data-camera-done hidden></button>`;
+    const done = overlay.querySelector('[data-camera-done]');
+    done.textContent = CAMERA_PHONE_COPY.done;
+    done.setAttribute('aria-label', CAMERA_PHONE_COPY.doneLabel);
+    done.addEventListener('click', (e) => {
+      e.preventDefault();
+      onDone?.();
+    });
     (document.getElementById('game-root') || document.body).appendChild(overlay);
   }
   overlay.hidden = !on;
+  const phone = isPhoneDevice();
+  overlay.querySelector('[data-camera-done]').hidden = !phone;
+  document.documentElement.classList.toggle('camera-mode-on', Boolean(on && phone));
   const hint = overlay.querySelector('[data-camera-hint]');
-  if (hint && typeof snapHint === 'string' && snapHint) {
+  if (hint && phone) {
+    // #271: no keys on a phone (a Snap needs Enter, so the snap line waits for a keyboard).
+    hint.textContent = Number.isFinite(range) ? CAMERA_PHONE_COPY.hintRange : CAMERA_PHONE_COPY.hint;
+  } else if (hint && typeof snapHint === 'string' && snapHint) {
     hint.textContent = snapHint;
   } else if (hint) {
     hint.textContent = Number.isFinite(range)
@@ -273,6 +323,68 @@ function attach(engine) {
   window.addEventListener('keyup', up, true);
   window.addEventListener('blur', blur);
   listeners = { down, up, blur };
+  onDone = () => setActive(engine, false);
+  if (isPhoneDevice()) attachTouch(engine);
+}
+
+/**
+ * #271: a phone's way in (the Menu row) and its drag. The row is made once #more-list is there
+ * (the bar may come after the feature) and clicks like the Menu's other rows: the Menu closes,
+ * then Camera Mode starts where C would start it.
+ */
+function placeMenuRow(engine) {
+  if (typeof document === 'undefined' || document.getElementById(CAMERA_MENU_ID)) return;
+  const list = document.getElementById('more-list');
+  if (!list) return;
+  const row = document.createElement('button');
+  row.type = 'button';
+  row.id = CAMERA_MENU_ID;
+  row.className = 'chrome-btn';
+  row.textContent = CAMERA_PHONE_COPY.row;
+  row.addEventListener('click', () => {
+    const more = document.getElementById('more-btn');
+    if (more && !list.hidden) more.click();
+    // After the Menu has closed (it holds the avatar while open).
+    setTimeout(() => {
+      if (!active && !homeEditing(engine) && !blocked(engine)) setActive(engine, true);
+      engine.setData?.('cameraMenuRow', active ? 'on' : 'blocked');
+    }, 0);
+  });
+  list.append(row);
+}
+
+function attachTouch(engine) {
+  placeMenuRow(engine);
+  const fingers = new Map();
+  const onStreet = (e) => e.pointerType === 'touch' && e.target === engine.canvas;
+  window.addEventListener('pointerdown', (e) => {
+    if (!onStreet(e)) return;
+    fingers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+  }, true);
+  window.addEventListener('pointermove', (e) => {
+    const f = fingers.get(e.pointerId);
+    if (!f) return;
+    const dx = e.clientX - f.x;
+    const dy = e.clientY - f.y;
+    f.x = e.clientX;
+    f.y = e.clientY;
+    // One finger looks; two are the pinch's zoom (js/touch-pinch.js).
+    if (!active || fingers.size !== 1 || (!dx && !dy)) return;
+    const rect = engine.canvas?.getBoundingClientRect?.();
+    const cam = engine.camera;
+    const scale = rect?.width > 0 && cam?.w > 0 ? cam.w / rect.width : 1;
+    const range = cameraRange(engine.learnedSkills);
+    const next = dragLook(look, dx, dy, scale, range);
+    // As the keys do: the look stops growing once the street's edge holds the view.
+    if (next.x < look.x && cam.x <= 0) next.x = look.x;
+    if (next.x > look.x && cam.x + cam.w >= engine.worldW) next.x = look.x;
+    look = next;
+    engine.setCameraLook(look.x, look.y);
+    publish(engine);
+  }, true);
+  const lift = (e) => fingers.delete(e.pointerId);
+  window.addEventListener('pointerup', lift, true);
+  window.addEventListener('pointercancel', lift, true);
 }
 
 export const cameraModeFeature = {
@@ -285,6 +397,7 @@ export const cameraModeFeature = {
 
   onStreetEnter(street, engine) {
     if (active) setActive(engine, false);
+    if (isPhoneDevice()) placeMenuRow(engine);
     if (engine.param('camerademo')) {
       if (engine.param('cameraskill') === '1') engine.grantSkill?.(EYEBALLERY_SKILL);
       setTimeout(() => {

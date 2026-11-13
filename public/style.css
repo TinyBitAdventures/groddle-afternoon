@@ -6486,6 +6486,29 @@ body.buff-purple-pulse::after {
   text-overflow: ellipsis;
 }
 .camera-mode-label b { letter-spacing: 0.06em; text-transform: uppercase; margin-right: var(--sp-3); }
+/* #271: a phone's Camera Mode: the label may wrap, Done (above the pack row, where the thumbs are)
+   ends it, and the stick and Jump step aside. */
+:root.touch-phone .camera-mode-label { white-space: normal; line-height: var(--lh-snug); }
+.camera-mode-done {
+  position: absolute;
+  left: 50%;
+  bottom: calc(var(--pack-live-height, 72px) + env(safe-area-inset-bottom, 0px) + var(--sp-8));
+  transform: translateX(-50%);
+  min-width: 7rem;
+  min-height: 44px;
+  padding: var(--sp-3) var(--sp-12);
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: var(--accent);
+  color: var(--text-inverse);
+  font: inherit;
+  font-size: var(--fs-lg);
+  font-weight: 700;
+  pointer-events: auto;
+  touch-action: manipulation;
+}
+.camera-mode-done[hidden] { display: none; }
+:root.touch-phone.camera-mode-on .touch-controls { display: none; }
 
 /* Type-to-search picker (js/combobox.js) */
 .combo {
