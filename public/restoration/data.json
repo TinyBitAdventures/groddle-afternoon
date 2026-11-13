@@ -2748,135 +2748,135 @@
   ]
  },
  "release": {
-  "game": "0.36.0",
+  "game": "0.36.1",
   "deployed": "2026-11-13"
  },
  "git": {
-  "commits": 1875,
+  "commits": 1918,
   "since": "2026-10-19",
   "recent": [
    {
-    "date": "2026-11-12",
+    "date": "2026-11-13",
     "kind": "fix",
-    "text": "A recipe of another tool picked in a machine's Make window is made with your own tool and counts for quests"
+    "text": "The phone Camera Mode check sits after the right-click guards in a world press"
    },
    {
-    "date": "2026-11-12",
-    "kind": "fix",
-    "text": "Trees, Paper Trees and mailboxes stand where players' 2012 snaps show them, and a planned mailbox keeps its stand over a floor"
-   },
-   {
-    "date": "2026-11-12",
-    "kind": "fix",
-    "text": "The snap tool measures trees, Paper Trees and street mailboxes the way it measures rocks"
-   },
-   {
-    "date": "2026-11-12",
+    "date": "2026-11-13",
     "kind": "improve",
-    "text": "Wine of the Dead's refusal in Hell says it won't bring you back, and that 11 Hellish Grapes will"
+    "text": "On a phone, Camera Mode opens from the Menu, a finger drag looks around and Done ends it"
    },
    {
-    "date": "2026-11-12",
-    "kind": "fix",
-    "text": "A long upgrade description scrolls, so Get Upgrade always shows"
-   },
-   {
-    "date": "2026-11-12",
-    "kind": "fix",
-    "text": "On a phone a list of choices is one a row, with Never mind last"
-   },
-   {
-    "date": "2026-11-12",
-    "kind": "fix",
-    "text": "The featured project's pill no longer covers the quest pill or the street's name"
-   },
-   {
-    "date": "2026-11-12",
-    "kind": "fix",
-    "text": "The eleven Giants' shrine pages are back in the Encyclopedia's files"
-   },
-   {
-    "date": "2026-11-12",
+    "date": "2026-11-13",
     "kind": "improve",
-    "text": "The pack's button says plain Eat or Drink when only one is left, not Eat one"
+    "text": "Each report shows its number, in the Reports list and in the report itself"
    },
    {
-    "date": "2026-11-12",
-    "kind": "new",
-    "text": "A Giant in the favor panel finds the closest Shrine to it and sets it as your destination"
-   },
-   {
-    "date": "2026-11-12",
+    "date": "2026-11-13",
     "kind": "fix",
-    "text": "Planned Barnacles, other nodes and Visiting Stones keep out of a planned tree's canopy"
+    "text": "A blank Rename puts a bag back on its own name, so a Sort can name it again"
    },
    {
-    "date": "2026-11-12",
-    "kind": "fix",
-    "text": "A right-click while carrying a garden no longer buys it, and Remove asks first"
-   },
-   {
-    "date": "2026-11-12",
-    "kind": "fix",
-    "text": "Barnacle Talc a full pack cannot carry lands in one pile, not one pile per talc"
-   },
-   {
-    "date": "2026-11-12",
-    "kind": "fix",
-    "text": "Doonboggle Trail's locked door lets a player with Door Key 1 into Ethereal Endeavour during the tutorial"
-   },
-   {
-    "date": "2026-11-12",
-    "kind": "fix",
-    "text": "The Animal Kinship practice hint is no longer hidden behind a black cover"
-   },
-   {
-    "date": "2026-11-12",
-    "kind": "fix",
-    "text": "Wood Trees take each player's pet and water every 5 minutes, so a planted one grows in about 95 minutes, not 20 game days"
-   },
-   {
-    "date": "2026-11-12",
-    "kind": "new",
-    "text": "Test Tube compounds are found by Experimenting, as in Glitch"
-   },
-   {
-    "date": "2026-11-12",
-    "kind": "fix",
-    "text": "Teleporting and /stuck take you out of a quest room, ending an unfinished quest as Leave does"
-   },
-   {
-    "date": "2026-11-12",
-    "kind": "fix",
-    "text": "Seeker of the Shiny and Meditation Station are offered once, not every 5 minutes forever"
-   },
-   {
-    "date": "2026-11-12",
+    "date": "2026-11-13",
     "kind": "improve",
-    "text": "Deploys leave Minn Engine and Minn Admin to update themselves on the live site; live.json pins neither"
+    "text": "Zoomed in on a phone the street draws sharper, in the same memory as the whole-street view"
    },
    {
-    "date": "2026-11-12",
-    "kind": "fix",
-    "text": "The level-up announcer registers before street objects, which stay just before realtime"
-   },
-   {
-    "date": "2026-11-12",
-    "kind": "fix",
-    "text": "Rocks stand where Glitch had them, in their own shapes at 1:1, and planned things use every floor height, off slopes and ledge ends"
-   },
-   {
-    "date": "2026-11-12",
-    "kind": "fix",
-    "text": "Every rock players' 2012 snaps show is measured, with its shape, and the rocks' _2 and _3 art ships"
-   },
-   {
-    "date": "2026-11-12",
+    "date": "2026-11-13",
     "kind": "improve",
-    "text": "Made for Groddle shows the Groddle Meadow map beside its surviving thumbnail; the Fire Dragon stays an experiment"
+    "text": "A phone's top bar shows the currants and favor under the iMG"
+   },
+   {
+    "date": "2026-11-13",
+    "kind": "fix",
+    "text": "On a phone the report window's Send shows without a scroll"
+   },
+   {
+    "date": "2026-11-13",
+    "kind": "fix",
+    "text": "A phone's Menu no longer offers Interface: Classic, which could not show there"
+   },
+   {
+    "date": "2026-11-13",
+    "kind": "improve",
+    "text": "On a phone the pack row gives its room to the slots: no slot count, smaller search and cloud"
+   },
+   {
+    "date": "2026-11-13",
+    "kind": "fix",
+    "text": "On a phone the loading card's upgrade line sits under Home to:, not in a wide column beside it"
+   },
+   {
+    "date": "2026-11-13",
+    "kind": "improve",
+    "text": "On a phone the Map takes the screen's whole width and runs to its foot"
+   },
+   {
+    "date": "2026-11-13",
+    "kind": "fix",
+    "text": "In Mail on a phone the open letter keeps its colour while the list scrolls"
+   },
+   {
+    "date": "2026-11-13",
+    "kind": "fix",
+    "text": "On a phone the Make window's ingredients, machine and output stand centred in the box"
+   },
+   {
+    "date": "2026-11-13",
+    "kind": "fix",
+    "text": "On a phone the Imagination hub's tiles all fit on the screen"
+   },
+   {
+    "date": "2026-11-13",
+    "kind": "fix",
+    "text": "On a phone the three upgrade cards stand side by side, each with its Get Upgrade in view"
+   },
+   {
+    "date": "2026-11-13",
+    "kind": "fix",
+    "text": "Coloured street layers take a quarter of the memory on a phone, and a deco's original leaves the GPU once its coloured copy is made"
+   },
+   {
+    "date": "2026-11-13",
+    "kind": "fix",
+    "text": "A street trip lets go of the street you left at once, so an iPhone tab no longer dies on the way into Froughtful Fen"
+   },
+   {
+    "date": "2026-11-13",
+    "kind": "fix",
+    "text": "A dropped Still starts only with more than one Hooch's worth of grain, and shows empty until its next change, as in Glitch"
+   },
+   {
+    "date": "2026-11-13",
+    "kind": "fix",
+    "text": "A Still works on the ground, as in Glitch: drop it, then Distill and Collect there"
+   },
+   {
+    "date": "2026-11-13",
+    "kind": "improve",
+    "text": "Tiny Speck's own Still animations, empty, working, ready and collect, for a Still on the ground"
+   },
+   {
+    "date": "2026-11-13",
+    "kind": "improve",
+    "text": "A machine says \"You are making something else.\" while a hand tool makes something"
+   },
+   {
+    "date": "2026-11-13",
+    "kind": "fix",
+    "text": "On iPhone Safari the Auctions window ends above Safari's toolbar"
+   },
+   {
+    "date": "2026-11-13",
+    "kind": "fix",
+    "text": "On a phone the Groups and Account windows, and their kin from the Menu, fit the screen with the title and close button always showing"
+   },
+   {
+    "date": "2026-11-13",
+    "kind": "improve",
+    "text": "Decoration Mode on a phone: drag the room to look around, a full-width tray, and a Display field that matches its buttons"
    }
   ]
  },
  "tests": 930,
- "generatedAt": "2026-11-12"
+ "generatedAt": "2026-11-13"
 }
