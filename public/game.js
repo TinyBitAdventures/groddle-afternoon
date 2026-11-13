@@ -2,9 +2,9 @@
  * Groddle Afternoon — original street geometry + layered decos
  * PixiJS 8 · locations-xml streets · CoU PNG decos · quests/items
  */
-import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=c25afaed';
+import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=b75ab87b';
 import { createErrorOnce, createFeatureHost } from './js/feature-host.js?v=06bb8b74';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=a9a57f19';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=742a05cf';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl, drawTileArt } from './js/enter-chooser.js?v=4a3ea327';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -490,8 +490,8 @@ import { PACK_COPY, isBagClass, isElementClass, ownBagLabel, unitRankAt } from '
 import { FLOAT_TEXT_Z, SPEECH_BUBBLE_Z } from './js/fx-z.js?v=18dda7e3';
 import { hasPouch } from './js/elemental-pouch.js?v=42702eda';
 import { createPackRow, mountPackClearance, packBandRange, packCountText, packSearchEntries, packSlotTip } from './js/ui/pack-row.js?v=64e4a567';
-import { listAnimalFeedOptions, piggyFeedTip } from './js/animals.js?v=7bbbf50e';
-import { pickerMaxCount, pickerOptionsFor, pickerTakesCount } from './js/animals.js?v=7bbbf50e';
+import { listAnimalFeedOptions, piggyFeedTip } from './js/animals.js?v=4230ec68';
+import { pickerMaxCount, pickerOptionsFor, pickerTakesCount } from './js/animals.js?v=4230ec68';
 import {
   createDroppedItemState,
   parseDroppedItemState,
@@ -868,7 +868,7 @@ import {
   createAnimalState,
   resetAnimalDay,
   animalStatusLabel,
-} from './js/animals.js?v=7bbbf50e';
+} from './js/animals.js?v=4230ec68';
 import {
   ensureWoodTreeState,
   pickWoodTool,

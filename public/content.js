@@ -57,7 +57,7 @@ import {
   ensureAnimalState,
   listAnimalFeedOptions,
   feedAnimal,
-} from './js/animals.js?v=7bbbf50e';
+} from './js/animals.js?v=4230ec68';
 import {
   quoteAnimalKinship,
   ANIMAL_KINSHIP_CLICK_REFUSALS,

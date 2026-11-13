@@ -221,9 +221,11 @@ export function animalStatusLabel(classId, state = {}) {
     const mood = piggyMoodLabel(s);
     if (mood) return mood;
     if (s.nibbleUsesToday) return `Nibbled ${s.nibbleUsesToday}× today · feeling philosophical`;
-    if (s.petted && s.fed) return 'Fed and loved · ready for a nibble';
+    // Fed today counts as full only while the hunger is 0: a snack (piggySnackOnly) or a tick since leaves it hungry.
+    const full = s.fed && !(Number(s.hunger) > 0);
+    if (s.petted && full) return 'Fed and loved · ready for a nibble';
     if (s.petUsesToday) return `Petted ${s.petUsesToday}× today · ready for a nibble`;
-    if (s.fed) return 'Well fed · wants a little love';
+    if (full) return 'Well fed · wants a little love';
     return s.hunger >= 2 ? 'Hungry · pet before nibbling' : 'Happy little porcine · pet before nibbling';
   }
   if (classId === 'npc_chicken') {

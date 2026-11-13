@@ -49,10 +49,10 @@ import {
   stickPlaceState,
   takePlop,
 } from '../public/js/animal-husbandry.js?v=b1efd9e0';
-import { piggyFeedTip, pickerMaxCount, pickerOptionsFor, pickerTakesCount, listAnimalFeedOptions, createAnimalState } from '../public/js/animals.js?v=7bbbf50e';
-import { getVerbsFor, runVerb } from '../public/content.js?v=c25afaed';
+import { animalStatusLabel, piggyFeedTip, pickerMaxCount, pickerOptionsFor, pickerTakesCount, listAnimalFeedOptions, createAnimalState } from '../public/js/animals.js?v=4230ec68';
+import { getVerbsFor, runVerb } from '../public/content.js?v=b75ab87b';
 import { setStreetEcologyCatalog } from '../public/js/street-ecology.js?v=c8d6fa5b';
-import { batterflyPlacementGroups, normalizeHusbandrySlot } from '../public/js/features/animal-husbandry-feature.js?v=89129051';
+import { batterflyPlacementGroups, normalizeHusbandrySlot } from '../public/js/features/animal-husbandry-feature.js?v=56f35c7a';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const publicDir = join(here, '../public');
@@ -217,6 +217,15 @@ describe('Piggy feeding and Piggy Plop (npc_animal feed, plop.js)', () => {
     assert.equal(piggyFeedTip('npc_piggy', { hunger: 0 }, cherry), '', 'not hungry: the usual footer');
     assert.equal(piggyFeedTip('npc_piggy', { hunger: 5 }, { classTsid: 'potato', label: 'Potato', have: 2 }), '', 'filling food');
     assert.equal(piggyFeedTip('npc_batterfly', { hunger: 5 }, cherry), '', 'only a Piggy');
+  });
+
+  it('a snack that left a Piggy hungry does not read "Well fed"', () => {
+    const state = { ...createAnimalState('npc_piggy'), hunger: 2 };
+    feedPiggyStack(state, 'cherry', 1);
+    state.fed = true;
+    assert.equal(animalStatusLabel('npc_piggy', state), 'Hungry · pet before nibbling');
+    feedPiggyStack(state, 'potato', 1);
+    assert.equal(animalStatusLabel('npc_piggy', state), 'Well fed · wants a little love');
   });
 
   it('plops 2-7 seeds at a time, five seconds apart', () => {
