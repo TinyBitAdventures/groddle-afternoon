@@ -101,6 +101,10 @@ for (const [name, dir, key] of [
   ['Minn Engine', join(homedir(), 'Cove/Sites/minn-engine.localhost'), 'engine'],
   ['Minn Admin', join(homedir(), 'Cove/Sites/minnadmin.localhost/public/wp-content/plugins/minn-admin'), 'minnAdmin'],
 ]) {
+  if (!live[key]) {
+    console.log(`${name}: not pinned; the live site updates it itself`);
+    continue;
+  }
   try {
     const ahead = since(dir, live[key]).length;
     console.log(`${name}: live ${String(live[key]).slice(0, 8)}, main ${git(dir, 'rev-parse', '--short=8', 'main')} (${ahead} commits since)`);

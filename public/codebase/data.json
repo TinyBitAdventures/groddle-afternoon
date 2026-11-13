@@ -415,12 +415,12 @@
   "engine": {
    "name": "Minn Engine",
    "url": "https://github.com/austinginder/minn-engine",
-   "commit": "707b59e3"
+   "commit": null
   },
   "minnAdmin": {
    "name": "Minn Admin",
    "url": "https://github.com/austinginder/minn-admin",
-   "commit": "43c7a991"
+   "commit": null
   }
  },
  "builtPages": [

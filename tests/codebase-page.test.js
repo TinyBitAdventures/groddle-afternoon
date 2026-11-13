@@ -24,8 +24,9 @@ describe('Code page data (tools/codebase/build-data.mjs)', () => {
     const d = readJson(join(GAME_DIR, 'public/codebase/data.json'));
     assert.deepEqual(d.repos.map((r) => r.id), ['game', 'server', 'site']);
     assert.deepEqual(d.repos.map((r) => r.ref), [live.game, live.server, live.site]);
-    assert.equal(d.platform.engine.commit, live.engine.slice(0, 8));
-    assert.equal(d.platform.minnAdmin.commit, live.minnAdmin.slice(0, 8));
+    // Minn Engine and Minn Admin update themselves on the live site, so live.json pins neither (2026-11-12).
+    assert.equal(d.platform.engine.commit, live.engine?.slice(0, 8) ?? null);
+    assert.equal(d.platform.minnAdmin.commit, live.minnAdmin?.slice(0, 8) ?? null);
     const ids = LANGUAGES.map(([id]) => id);
     for (const r of d.repos) {
       assert.equal(r.url, `https://github.com/TinyBitAdventures/${r.name}`);

@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
-# Deploys a release of the Groddle site to groddleafternoon.com (Kinsta): the game, the Groddle theme
-# (groddle-afternoon-site), Minn Engine and Minn Admin, each at the version tools/deploy/live.json names.
-# Everything is exported from git (tags for the game and site, pinned commits for Minn), never copied
-# from a working tree, so nothing uncommitted can ship. The database and wp-config.php are left alone
+# Deploys a release of the Groddle site to groddleafternoon.com (Kinsta): the game and the Groddle theme
+# (groddle-afternoon-site), each at the tag tools/deploy/live.json names. Both are exported from git,
+# never copied from a working tree, so nothing uncommitted can ship. Minn Engine and Minn Admin are not
+# deployed from here (Austin 2026-11-12): the site updates them itself, the engine through Minn's signed
+# releases and Minn Admin through its own updater, so a deploy never pins or rolls them back. The database and wp-config.php are left alone
 # (the first deploy, 2026-10-27, imported the database and added MINN_WP_API and GRODDLE_REALTIME_URL).
 #
 # Kinsta's layout, and why:
@@ -30,16 +31,13 @@ HOST=${GRODDLE_KINSTA_SSH:?set GRODDLE_KINSTA_SSH=user@host, or put it in ~/.con
 PORT=${GRODDLE_KINSTA_PORT:?set GRODDLE_KINSTA_PORT, or put it in ~/.config/groddle/deploy.env}
 SSH=(ssh -p "$PORT" -o BatchMode=yes -o ServerAliveInterval=15 -o ServerAliveCountMax=4)
 SITE_REPO=${GRODDLE_SITE_DIR:-$(dirname "$here")/groddle-afternoon-site}
-ENGINE_REPO=${MINN_ENGINE_REPO:-$HOME/Cove/Sites/minn-engine.localhost}
-ADMIN_REPO=${MINN_ADMIN_REPO:-$HOME/Cove/Sites/minnadmin.localhost/public/wp-content/plugins/minn-admin}
 AUDIT=$(dirname "$(cd "$here" && pwd -P)")
 
 field() { node -e 'const r = JSON.parse(require("fs").readFileSync(process.argv[1], "utf8")); const v = r[process.argv[2]]; if (!v) process.exit(1); console.log(v);' "$RELEASE" "$1" || { echo "$RELEASE names no $1" >&2; exit 1; }; }
 resolve() { git -C "$1" rev-parse --verify --quiet "$2^{commit}" || { echo "$2 is not in $1: tag or fetch it first" >&2; exit 1; }; }
-GAME_REF=$(field game); SITE_REF=$(field site); ENGINE_REF=$(field engine); ADMIN_REF=$(field minnAdmin)
+GAME_REF=$(field game); SITE_REF=$(field site)
 game_c=$(resolve "$here" "$GAME_REF"); site_c=$(resolve "$SITE_REPO" "$SITE_REF")
-engine_c=$(resolve "$ENGINE_REPO" "$ENGINE_REF"); admin_c=$(resolve "$ADMIN_REPO" "$ADMIN_REF")
-echo "deploying game $GAME_REF, site $SITE_REF, Minn Engine ${engine_c:0:8}, Minn Admin ${admin_c:0:8}"
+echo "deploying game $GAME_REF, site $SITE_REF"
 
 # The real path: macOS hands out /var/... for /private/var/..., and the build tools only run as main
 # when the path they were started by matches their own (they did nothing at all from /var).
@@ -47,10 +45,7 @@ work=$(cd "$(mktemp -d)" && pwd -P)
 trap 'git -C "$here" worktree remove --force "$work/game" >/dev/null 2>&1 || true; rm -rf "$work"' EXIT
 
 echo "1/6 export and build"
-mkdir -p "$work/engine" "$work/admin" "$work/site"
-git -C "$ENGINE_REPO" archive "$engine_c" public/minn | tar -x -C "$work/engine"
-git -C "$ADMIN_REPO" archive "$admin_c" | tar -x -C "$work/admin"
-rm -rf "$work/admin/tests"
+mkdir -p "$work/site"
 git -C "$SITE_REPO" archive "$site_c" | tar -x -C "$work/site"
 git -C "$here" worktree add --detach --quiet "$work/game" "$game_c"
 # The restoration and catalog builds read the original sources and the research inventory beside the game.
@@ -91,11 +86,8 @@ node "$work/game/tools/deploy/social.mjs" "$GAME" || { echo "social tags were no
 # which open games fetch (uncached, ?t= buster) to offer Update ready. A new id whenever any content key changed.
 node "$work/game/tools/deploy/build-id.mjs" "$GAME" --version="$GAME_REF" || { echo "the build id was not written" >&2; exit 1; }
 
-echo "2/6 Minn Engine, Minn Admin, theme"
-rsync -rlc --delete --exclude admin --exclude .install.json -e "${SSH[*]}" "$work/engine/public/minn/" "$HOST:public/minn/"
-rsync -rlc --delete --exclude tests --exclude node_modules -e "${SSH[*]}" "$work/admin/" "$HOST:public/wp-content/plugins/minn-admin/"
+echo "2/6 the theme"
 rsync -rlc --delete -e "${SSH[*]}" "$work/site/" "$HOST:public/wp-content/themes/groddle/"
-"${SSH[@]}" "$HOST" 'ln -sfn ../wp-content/plugins/minn-admin ~/public/minn/admin'
 
 echo "3/6 the game (changed files only)"
 "${SSH[@]}" "$HOST" 'rm -rf ~/web/game.next && cp -al ~/web/game ~/web/game.next'
@@ -131,7 +123,7 @@ while read -r type slug; do
 done < /tmp/groddle-paths.txt
 rm -f /tmp/groddle-paths.txt
 echo "shims: \$n"
-echo "\$(date -u +%FT%TZ) game $GAME_REF site $SITE_REF engine ${engine_c:0:8} minn-admin ${admin_c:0:8}" >> ~/private/deploys.log
+echo "\$(date -u +%FT%TZ) game $GAME_REF site $SITE_REF" >> ~/private/deploys.log
 REMOTE
 
 # G335 slice 4 (Austin 2026-10-28): users 1 and 54 (the developer's and the reviewer's characters) start the
