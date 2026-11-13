@@ -2752,9 +2752,39 @@
   "deployed": "2026-11-12"
  },
  "git": {
-  "commits": 1850,
+  "commits": 1857,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-12",
+    "kind": "new",
+    "text": "A Giant in the favor panel finds the closest Shrine to it and sets it as your destination"
+   },
+   {
+    "date": "2026-11-12",
+    "kind": "fix",
+    "text": "Planned Barnacles, other nodes and Visiting Stones keep out of a planned tree's canopy"
+   },
+   {
+    "date": "2026-11-12",
+    "kind": "fix",
+    "text": "A right-click while carrying a garden no longer buys it, and Remove asks first"
+   },
+   {
+    "date": "2026-11-12",
+    "kind": "fix",
+    "text": "Barnacle Talc a full pack cannot carry lands in one pile, not one pile per talc"
+   },
+   {
+    "date": "2026-11-12",
+    "kind": "fix",
+    "text": "Doonboggle Trail's locked door lets a player with Door Key 1 into Ethereal Endeavour during the tutorial"
+   },
+   {
+    "date": "2026-11-12",
+    "kind": "fix",
+    "text": "The Animal Kinship practice hint is no longer hidden behind a black cover"
+   },
    {
     "date": "2026-11-12",
     "kind": "fix",
@@ -2844,39 +2874,9 @@
     "date": "2026-11-12",
     "kind": "fix",
     "text": "Rocks, nodes and their tools follow Glitch: a Metal Rock takes a Fancy Pick, the dragged tool is the one that wears, and every use that started is paid"
-   },
-   {
-    "date": "2026-11-12",
-    "kind": "fix",
-    "text": "Street projects ask \"How many?\", pay every helper at the end, and count restorations as Glitch did"
-   },
-   {
-    "date": "2026-11-12",
-    "kind": "fix",
-    "text": "Quests that could never finish: Hubba Dubba Hugs leaves, the Herb Gardens visit and Sparkly of Interest count, timers wait while you are away"
-   },
-   {
-    "date": "2026-11-12",
-    "kind": "fix",
-    "text": "The donation that fills a Giant's favor gives the emblem, and favor from anywhere stops at the emblem target"
-   },
-   {
-    "date": "2026-11-12",
-    "kind": "fix",
-    "text": "The Encyclopedia names where the door keys come from and leaves out the group hall's lot marker"
-   },
-   {
-    "date": "2026-11-12",
-    "kind": "fix",
-    "text": "Patches refuse Plant for the weeds or the hole first, a missed tend says Glitch's line, and the Paper Tree asks for the can first"
-   },
-   {
-    "date": "2026-11-12",
-    "kind": "fix",
-    "text": "Each recipe's iMG is capped per game day, as Glitch capped it"
    }
   ]
  },
- "tests": 916,
+ "tests": 919,
  "generatedAt": "2026-11-12"
 }
