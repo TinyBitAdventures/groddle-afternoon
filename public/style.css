@@ -13902,6 +13902,52 @@ body:has(#quest-dialogue:not([hidden])) .prompt-stack { z-index: calc(var(--z-mo
 [data-ui="modern"] #game-root .route-gps { top: calc(var(--hud-h) + var(--space-3) + var(--minimap-h, 0px)); }
 /* —— end MINIMAP —— */
 
+/* === LANDSCAPE-HUD (land1) === */
+/* EDGE TO EDGE (Austin 2026-11-13: phones play upright and sideways, edge to edge): the play pages ask
+   for viewport-fit=cover (play/index.html), so on an iPhone the street runs under the notch and the
+   home indicator, and every HUD element at a screen edge keeps inside the safe area. --safe-* are the
+   screen's env(safe-area-inset-*): 0 on a computer and wherever there is no notch, so nothing moves
+   there. js/notify-view.js reads --safe-l and --safe-r. The stick and Jump (TOUCH) and the prompts
+   over them (PHONE6) already add the insets themselves. */
+:root {
+  --safe-t: env(safe-area-inset-top, 0px);
+  --safe-r: env(safe-area-inset-right, 0px);
+  --safe-b: env(safe-area-inset-bottom, 0px);
+  --safe-l: env(safe-area-inset-left, 0px);
+}
+/* The top bar's two pills. */
+[data-ui="modern"] header.top-bar,
+html:not(.stage-pinned)[data-ui="modern"] #wrap > .top-bar {
+  top: calc(var(--space-1) + var(--safe-t));
+  left: calc(var(--hud-inset) + var(--safe-l));
+  right: calc(var(--hud-inset) + var(--safe-r));
+}
+/* The street nameplate, between the pills or under them (PAPER keeps the same cases). */
+[data-ui="modern"] .street-nameplate { top: calc(var(--space-1) + var(--safe-t)); }
+[data-ui="modern"] .street-nameplate.is-placed.is-under { top: calc(var(--hud-h) + var(--space-2) + var(--safe-t)); }
+@media (max-width: 760px) {
+  [data-ui="modern"] .street-nameplate,
+  [data-ui="modern"] .street-nameplate.is-placed { top: calc(var(--hud-h) + var(--space-2) + var(--safe-t)); }
+}
+/* The Social drawer and its rail on the right (js/ui/social-drawer.js measures where it ends, so
+   --inset-r and everything centred beside it follow). */
+.local-chat-dock.social-drawer {
+  right: calc(var(--hud-inset, 8px) + var(--safe-r));
+  max-width: calc(100% - 16px - var(--safe-l) - var(--safe-r));
+}
+/* The pack row: above the home indicator, and its band inside the notch either way up. */
+#game-root .pack-bar:not([data-hb-dock]) {
+  bottom: var(--safe-b);
+  padding-left: max(calc(var(--pack-inset) + var(--safe-l)), var(--pack-clear-l, 0px));
+  padding-right: max(calc(var(--pack-inset) + var(--safe-r)), var(--pack-clear-r, 0px));
+}
+/* The buff strip (top left) and the route card (left of the drawer) keep off the notch. A top inset
+   (none in Safari's own window either way up) moves the pills, the name and the drawer; what sits under
+   them keeps its place. */
+[data-ui="modern"] #game-root:not([data-sheet]) #buff-strip { left: calc(var(--hud-inset) + var(--safe-l)); }
+[data-ui="modern"] #game-root .route-gps { right: max(calc(var(--hud-inset) + var(--safe-r)), var(--inset-r)); }
+/* === end LANDSCAPE-HUD === */
+
 /* —— MAPICONS —— the hub map's street icons (vendor, shrine, subway station; js/map-graph.js
    renderHubMapSvg) and their tips (js/ui/map-icon-tips.js). The icons draw in the map's own units,
    so they scale with it as the labels do. */
