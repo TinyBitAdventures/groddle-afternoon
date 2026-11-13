@@ -147,3 +147,29 @@ describe('#264 Send shows in the report window on a phone', () => {
     assert.ok(56 + 50 + 96 + 96 + 40 + 5 * 8 <= room - 2, `${room}`);
   });
 });
+
+// #264 (Friendly): "currants and favor aren't seen on the HUD in mobile. Currants do display in the main
+// menu but favor does not." The phone bar stacks them under the iMG in the left pill.
+describe('#264 currants and favor on the phone bar', () => {
+  const p = ':root.touch-phone[data-ui="modern"] .top-bar .hud-stats';
+  const area = (sel) => css.match(new RegExp(`${p.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')} ${sel.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')} \\{ grid-area: ([^;]+); \\}`))?.[1];
+
+  it('the pill is two short lines beside the rings and keeps the bar\'s height', () => {
+    const rows = css.match(/:root\.touch-phone\[data-ui="modern"\] \.top-bar \.hud-stats \{ display: grid; grid-template-rows: (\d+)px (\d+)px;/);
+    const hud = Number(css.match(/--hud-h: (\d+)px;/)[1]);
+    assert.ok(rows && Number(rows[1]) + Number(rows[2]) <= hud - 2, 'two rows inside the pill\'s border');
+  });
+
+  it('rings span both lines; iMG on top, currants and favor under it', () => {
+    for (const r of ['.ring.energy', '.ring.mood', '#player-menu-btn']) assert.match(area(r) || '', /^1 \/ \d \/ 3 \/ \d$/, r);
+    assert.equal(area('.hud-img'), '1 / 6 / 2 / 8');
+    assert.equal(area('.hud-cur.currants'), '2 / 6 / 3 / 7');
+    assert.equal(area('#favor-stat'), '2 / 7 / 3 / 8');
+  });
+
+  it('they show on a phone (over the narrow-window rules), but the tour\'s hide and favor\'s own hidden still win', () => {
+    assert.match(css, /:root\.touch-phone\[data-ui="modern"\] body:not\(\.nx-hide-currants\) \.top-bar \.hud-stats \.hud-cur\.currants,\n:root\.touch-phone\[data-ui="modern"\] \.top-bar \.hud-stats #favor-stat:not\(\[hidden\]\) \{ display: inline-flex; \}/);
+    assert.match(css, /\[data-ui="modern"\] \.top-bar \.hud-favor,\n  \[data-ui="modern"\] \.top-bar \.quoin-stat \{ display: none; \}/);
+    assert.match(css, /:root\.touch-phone\[data-ui="modern"\] \.more-list #menu-currants \{ display: none; \}/);
+  });
+});

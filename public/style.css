@@ -11087,6 +11087,26 @@ html.stage-pinned[data-ui="modern"] header.top-bar { left: calc(var(--sp-5) + va
 @media (max-width: 560px) {
   [data-ui="modern"] .top-bar .hud-cur.currants { display: none; }
 }
+/* #264 (Friendly, an upright phone): the currants were only in the Menu and favor was nowhere. The phone bar
+   stacks them under the iMG, two short lines beside the rings in the same pill: iMG on top, currants and
+   favor under it (a tap on favor opens Favor with the Giants, as on a computer). The bar keeps its height. */
+:root.touch-phone[data-ui="modern"] .top-bar .hud-stats { display: grid; grid-template-rows: 20px 20px; align-items: center; justify-items: start; column-gap: 2px; row-gap: 0; }
+:root.touch-phone[data-ui="modern"] .top-bar .hud-stats .ring.energy { grid-area: 1 / 1 / 3 / 2; }
+:root.touch-phone[data-ui="modern"] .top-bar .hud-stats .ring.mood { grid-area: 1 / 2 / 3 / 3; }
+:root.touch-phone[data-ui="modern"] .top-bar .hud-stats #player-menu-btn { grid-area: 1 / 3 / 3 / 4; }
+:root.touch-phone[data-ui="modern"] .top-bar .hud-stats #low-energy-btn { grid-area: 1 / 4 / 3 / 5; }
+:root.touch-phone[data-ui="modern"] .top-bar .hud-stats .hud-div { grid-area: 1 / 5 / 3 / 6; align-self: center; }
+:root.touch-phone[data-ui="modern"] .top-bar .hud-stats .hud-img { grid-area: 1 / 6 / 2 / 8; }
+:root.touch-phone[data-ui="modern"] .top-bar .hud-stats .hud-cur.currants { grid-area: 2 / 6 / 3 / 7; }
+:root.touch-phone[data-ui="modern"] .top-bar .hud-stats #favor-stat { grid-area: 2 / 7 / 3 / 8; }
+:root.touch-phone[data-ui="modern"] body:not(.nx-hide-currants) .top-bar .hud-stats .hud-cur.currants,
+:root.touch-phone[data-ui="modern"] .top-bar .hud-stats #favor-stat:not([hidden]) { display: inline-flex; }
+:root.touch-phone[data-ui="modern"] .top-bar .hud-stats .hud-cur { height: 20px; gap: 3px; padding: 0 var(--sp-2); font-size: var(--fs-s); }
+:root.touch-phone[data-ui="modern"] .top-bar .hud-stats .hud-cur strong { font-size: var(--fs-s); }
+:root.touch-phone[data-ui="modern"] .top-bar .hud-stats .hud-cur img { height: 14px; }
+:root.touch-phone[data-ui="modern"] .top-bar .hud-stats #favor-stat[data-neutral] img { width: 11px; height: 11px; }
+/* The Menu's currants line repeats the bar on a phone. */
+:root.touch-phone[data-ui="modern"] .more-list #menu-currants { display: none; }
 [data-ui="modern"] .more-list .menu-currants { display: none; }
 @media (max-width: 560px) {
   [data-ui="modern"] .more-list .menu-currants {
