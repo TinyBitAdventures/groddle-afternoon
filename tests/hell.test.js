@@ -60,7 +60,7 @@ import {
   shouldWarnLowEnergy,
   squishGrape,
   wineDrinkConditions,
-} from '../public/js/hell.js?v=07cc312d';
+} from '../public/js/hell.js?v=23354bc4';
 import { ITEM_CATALOG } from '../public/js/inventory.js?v=f49c8998';
 import { GAME_DAY_MS, getGameDayKey, getGameDayStartMs } from '../public/js/game-day.js?v=cf9afac0';
 import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=10b118dd';
@@ -550,7 +550,8 @@ describe('graves, hell quests, and Wine of the Dead', () => {
 
   it('Wine of the Dead unpoops the dead and kills the living', () => {
     const dead = croaked().state;
-    assert.equal(wineDrinkConditions(dead).reason, HELL_TEXT.wineNotPooped);
+    assert.equal(wineDrinkConditions(dead).reason, `${HELL_TEXT.wineNotPooped} ${HELL_TEXT.wineNoRevive}`);
+    assert.match(HELL_TEXT.wineNoRevive, /squish 11 bunches/);
     const pooped = { ...dead, pooped: { kind: 'pooped', appliedAt: DAY0, expiresAt: DAY0 + 1e7 } };
     const sip = drinkWineOfTheDead(pooped, { now: DAY0 });
     assert.equal(sip.reason, 'unpooped');

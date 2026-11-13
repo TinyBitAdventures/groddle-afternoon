@@ -103,6 +103,8 @@ export const HELL_TEXT = Object.freeze({
   wineNoLongerPooped: 'You are no longer pooped!',
   wineDied: 'You died!',
   wineNotPooped: "You aren't Pooped, so there's no reason to drink this now.",
+  // Remake copy (players read the wine's "will revive" description as bringing them back to life).
+  wineNoRevive: `It won't bring you back to life, though: squish ${GRAPES_REQUIRED} bunches of Hellish Grapes for that.`,
   wineTooltipDead: 'Bottoms up! Drink this to become less Pooped.',
   wineTooltipAlive: "Bottoms up! What's the worst that could happen?",
   walkingDeadTick: 'Braiiiiiiiiins!',
@@ -1457,7 +1459,7 @@ export function wineDrinkConditions(state, now = Date.now()) {
   const s = normalizeHellState(state);
   const tooltip = s.isDead ? HELL_TEXT.wineTooltipDead : HELL_TEXT.wineTooltipAlive;
   if (s.isDead && isPooped(s, now) !== 'pooped') {
-    return { state: 'disabled', reason: HELL_TEXT.wineNotPooped, tooltip };
+    return { state: 'disabled', reason: `${HELL_TEXT.wineNotPooped} ${HELL_TEXT.wineNoRevive}`, tooltip };
   }
   return { state: 'enabled', reason: '', tooltip };
 }
