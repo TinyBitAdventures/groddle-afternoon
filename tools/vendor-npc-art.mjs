@@ -7,7 +7,8 @@
  * (js/vendor-npcs.js VENDOR_NPC_ART: cell, frames); every state is cropped
  * to the union of its frames and written as a lossless WebP strip, 8 columns.
  * The crop offsets live in VENDOR_NPC_ART so the feet anchor stays the
- * source cell's.
+ * source cell's. The walk, turn, stop and impatient strips (VENDOR_NPC_MOTION_ART,
+ * G680) are cut the same way, on the class's cell grid.
  *
  *   node tools/vendor-npc-art.mjs            write the strips
  *   node tools/vendor-npc-art.mjs --measure  print each state's union crop
@@ -17,13 +18,16 @@ import { mkdirSync, readdirSync, rmSync, mkdtempSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import os from 'node:os';
-import { VENDOR_NPC_ART } from '../public/js/vendor-npcs.js?v=616c0568';
+import { VENDOR_NPC_ART, VENDOR_NPC_MOTION_ART } from '../public/js/vendor-npcs.js?v=a02e8603';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const OGA = join(os.homedir(), 'Documents/glitch-audit/opengameart/extracted_vendors/glitch-assets');
 const OUT = join(root, 'public/assets/sprites/vendors');
 const COLS = 8;
 const measure = process.argv.includes('--measure');
+// --only <state,...>: just those states (the strips already cut stay as they are).
+const onlyAt = process.argv.indexOf('--only');
+const only = onlyAt > 0 ? new Set(process.argv[onlyAt + 1].split(',')) : null;
 const magick = (args) => execFileSync('magick', args, { stdio: ['ignore', 'pipe', 'pipe'] }).toString();
 
 mkdirSync(OUT, { recursive: true });
@@ -32,7 +36,9 @@ try {
   for (const [classTsid, art] of Object.entries(VENDOR_NPC_ART)) {
     const dir = join(OGA, classTsid);
     const files = readdirSync(dir);
-    for (const [state, sheet] of Object.entries(art.states)) {
+    const states = { ...art.states, ...(VENDOR_NPC_MOTION_ART[classTsid] || {}) };
+    for (const [state, sheet] of Object.entries(states)) {
+      if (only && !only.has(state)) continue;
       const src = files.find((f) => f.includes(`_x1_${sheet.oga}_png_`));
       if (!src) throw new Error(`${dir}: no ${sheet.oga}`);
       const cells = join(tmp, `${classTsid}-${state}`);

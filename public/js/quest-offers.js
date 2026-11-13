@@ -69,7 +69,7 @@
  *   'mp' triggers, mpReady[need] whether what a quest needs is live.
  */
 
-import { VENDOR_NPCS, VENDOR_NPC_CLASSES } from './vendor-npcs.js?v=616c0568';
+import { VENDOR_NPCS, VENDOR_NPC_CLASSES } from './vendor-npcs.js?v=a02e8603';
 import { getBuffCatalog, getQuestCatalog } from './content-catalogs.js?v=10b118dd';
 import { levelInfoForXp } from './progression.js?v=72b2b22a';
 import { brokenToolCopies } from './tools.js?v=48542c24';

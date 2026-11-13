@@ -27,7 +27,7 @@ import {
   vendorNpcStoreProfile,
   vendorNpcsFor,
   vendorSheet,
-} from '../public/js/vendor-npcs.js?v=616c0568';
+} from '../public/js/vendor-npcs.js?v=a02e8603';
 import { VENDOR_PROFILES } from '../public/js/vendor.js?v=542d30c9';
 import { getQuestCatalog, loadContentCatalogsFromDir, resetContentCatalogs } from '../public/js/content-catalogs.js?v=10b118dd';
 import { createQuestState } from '../public/js/quests.js?v=40c71a37';
@@ -40,7 +40,7 @@ import {
   pendingQuestOffers,
   syncItemRequirements,
   turnInQuest,
-} from '../public/js/quest-offers.js?v=1b92a976';
+} from '../public/js/quest-offers.js?v=49eecffe';
 import { XP_FOR_LEVEL } from '../public/js/progression.js?v=72b2b22a';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');

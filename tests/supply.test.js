@@ -200,7 +200,7 @@ describe('pack transforms', () => {
     assert.deepEqual(events, [['cheese_very_stinky:poke', 1], ['VERB:poke:cheese_very_stinky', 1]]);
     const quests = JSON.parse(readFileSync(join(SPIKE, 'assets/content/quests.json'), 'utf8'));
     const def = (quests.quests || quests).find ? (quests.quests || quests).find((q) => q.classTsid === 'find_shiny_intrinsic_object') : (quests.quests || quests).find_shiny_intrinsic_object;
-    const { eventCounters } = await import('../public/js/quest-offers.js?v=1b92a976');
+    const { eventCounters } = await import('../public/js/quest-offers.js?v=49eecffe');
     const req = def.requirements.find((r) => r.id === 'r375');
     assert.ok(eventCounters('cheese_very_stinky:poke').some((c) => c.counter === req.name), req.name);
   });

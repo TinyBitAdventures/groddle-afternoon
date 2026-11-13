@@ -6,7 +6,8 @@
  * npc_jabba1.js, npc_jabba2.js, npc_sno_cone_vending_machine.js: each is an
  * `npc-vendor` whose buy/sell verb opens its own store (store_id 12, 16, 11,
  * 13, 15, 5 in catalog_stores.js, already in
- * store-catalog.js). Each stands where the archive put it.
+ * store-catalog.js). Each starts where the archive put it and walks its
+ * floor as the original did (G680, js/vendor-walk.js); the scarecrow stands.
  *
  * Placement: the archived late-game location objects (objref labels in
  * streets/mnt/stos/location_data/L*.xml) put them on 11 imported streets;
@@ -153,12 +154,65 @@ export const VENDOR_NPC_ART = Object.freeze({
   },
 });
 
+/**
+ * Their walks (register G680, js/vendor-walk.js): the walk, turn, stop and impatient strips from the
+ * same CC0 dump, cut the same way (tools/vendor-npc-art.mjs), on the class's cell grid. Each strip
+ * keeps every frame of its sheet (the cells after the last are empty) and its own union crop; the
+ * feet stay on the idle strip's lowest row (vendorAnchor). 1x only: the idle and talk strips swap
+ * to 3x renders of the SWF (js/sprite-hires.js), these do not yet.
+ */
+export const VENDOR_NPC_MOTION_ART = Object.freeze({
+  npc_tool_vendor: {
+    walk: { oga: 'walk', frames: 24, crop: { x: 23, y: 22, w: 129, h: 226 } },
+    walk_left: { oga: 'walk_left', frames: 25, crop: { x: 43, y: 20, w: 129, h: 226 } },
+    turn_left: { oga: 'turn_left', frames: 10, crop: { x: 11, y: 23, w: 174, h: 227 } },
+    turn_right: { oga: 'turn_right', frames: 11, crop: { x: 17, y: 23, w: 167, h: 225 } },
+  },
+  npc_cooking_vendor: {
+    walk_left: { oga: 'walk_left', frames: 16, crop: { x: 5, y: 18, w: 159, h: 211 } },
+    walk_right: { oga: 'walk_right', frames: 16, crop: { x: 9, y: 18, w: 155, h: 211 } },
+    walk_left_end: { oga: 'walk_left_end', frames: 16, crop: { x: 0, y: 17, w: 186, h: 212 } },
+    walk_right_end: { oga: 'walk_right_end', frames: 14, crop: { x: 5, y: 17, w: 181, h: 212 } },
+  },
+  npc_jabba1: {
+    walk: { oga: 'walk', frames: 14, crop: { x: 0, y: 10, w: 337, h: 191 } },
+    turn: { oga: 'turn', frames: 7, crop: { x: 88, y: 10, w: 293, h: 190 } },
+    walk_end: { oga: 'walk_end', frames: 10, crop: { x: 30, y: 11, w: 301, h: 190 } },
+    impatient: { oga: 'impatient', frames: 86, crop: { x: 85, y: 0, w: 251, h: 200 } },
+  },
+  npc_jabba2: {
+    walk: { oga: 'walk', frames: 16, crop: { x: 0, y: 7, w: 319, h: 185 } },
+    turn: { oga: 'turn', frames: 18, crop: { x: 105, y: 7, w: 232, h: 187 } },
+    walk_end: { oga: 'walk_end', frames: 15, crop: { x: 3, y: 7, w: 316, h: 185 } },
+    impatient: { oga: 'impatient', frames: 98, crop: { x: 124, y: 7, w: 313, h: 185 } },
+  },
+  npc_sno_cone_vending_machine: {
+    walk_left: { oga: 'walk_left', frames: 7, crop: { x: 0, y: 25, w: 164, h: 194 } },
+    walk_right: { oga: 'walk_right', frames: 7, crop: { x: 0, y: 25, w: 164, h: 194 } },
+    walk_end: { oga: 'walk_end', frames: 14, crop: { x: 0, y: 24, w: 188, h: 197 } },
+    attract: { oga: 'attract', frames: 34, crop: { x: 2, y: 0, w: 185, h: 221 } },
+  },
+  npc_gardening_vendor: {
+    attract: { oga: 'attract', frames: 30, crop: { x: 13, y: 1, w: 165, h: 197 } },
+  },
+});
+
 export const VENDOR_ART_DIR = 'assets/sprites/vendors/';
 const STRIP_COLS = 8;
 
+/** A state's strip def (VENDOR_NPC_ART idle/talk, else VENDOR_NPC_MOTION_ART). */
+export function vendorStrip(classTsid, state) {
+  return VENDOR_NPC_ART[classTsid]?.states?.[state] || VENDOR_NPC_MOTION_ART[classTsid]?.[state] || null;
+}
+
+/** Every state a class has a strip for. */
+export function vendorStates(classTsid) {
+  return [...Object.keys(VENDOR_NPC_ART[classTsid]?.states || {}), ...Object.keys(VENDOR_NPC_MOTION_ART[classTsid] || {})];
+}
+
 /** sprite-sheets.js sheet def for one state's strip. */
 export function vendorSheet(classTsid, state) {
-  const sheet = VENDOR_NPC_ART[classTsid]?.states?.[state];
+  const sheet = vendorStrip(classTsid, state);
   if (!sheet) return null;
   return {
     path: `${VENDOR_ART_DIR}${classTsid}_${state}.webp`,
@@ -171,13 +225,17 @@ export function vendorSheet(classTsid, state) {
 
 /**
  * Sprite anchor that keeps the source cell's centre over the platform point,
- * with the strip's lowest pixel (feet and shadow) on the ground.
+ * with the idle strip's lowest pixel (feet and shadow) on the ground: every
+ * state of a class shares that cell row, so a walk stands where the idle did.
+ * Flipping the sprite (scale.x -1) mirrors it about the cell's centre.
  */
 export function vendorAnchor(classTsid, state = 'idle') {
   const art = VENDOR_NPC_ART[classTsid];
-  const crop = art?.states?.[state]?.crop;
-  if (!crop) return { x: 0.5, y: 1 };
-  return { x: (art.cell.w / 2 - crop.x) / crop.w, y: 1 };
+  const crop = vendorStrip(classTsid, state)?.crop;
+  if (!art || !crop) return { x: 0.5, y: 1 };
+  const idle = art.states.idle.crop;
+  const feet = idle.y + idle.h;
+  return { x: (art.cell.w / 2 - crop.x) / crop.w, y: (feet - crop.y) / crop.h };
 }
 
 /** street-ecology.json `vendors` row for a street (G/L alias aware), or null. */

@@ -33,11 +33,11 @@ import {
   streetGardenBoxes,
   streetReservedSpots,
 } from '../public/js/street-ecology.js?v=c8d6fa5b';
-import { resourcePlacementGroups, resourceSpawnPlan } from '../public/js/features/resource-nodes-feature.js?v=9e676b05';
+import { resourcePlacementGroups, resourceSpawnPlan } from '../public/js/features/resource-nodes-feature.js?v=ef1d5ac2';
 import { JELLISAC_SPOTS, PEAT_SPOTS } from '../public/js/node-spots-data.js?v=a3c25916';
 import { bedKind, createGarden, fitGardenToBed, plantPlot } from '../public/js/garden.js?v=1420a6d6';
 import { bedKey, parsePlotId } from '../public/js/shared-gardens.js?v=c1f90bc0';
-import { normalizeGardenSnapshot } from '../public/js/player-save.js?v=1da05676';
+import { normalizeGardenSnapshot } from '../public/js/player-save.js?v=69395d5b';
 import { serverPath, skipWithoutServer } from '../tools/repos.mjs';
 
 const root = join(import.meta.dirname, '..');

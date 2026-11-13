@@ -283,9 +283,10 @@ export async function collectSheets() {
   }
 
   // Vendors, street spirits (and their loneliness clips), Juju Bandits: cropped OGA strips.
-  const { VENDOR_NPC_ART, vendorSheet } = await imp('js/vendor-npcs.js');
-  for (const [cls, art] of Object.entries(VENDOR_NPC_ART)) {
-    for (const state of Object.keys(art.states)) {
+  const { VENDOR_NPC_ART, vendorSheet, vendorStates } = await imp('js/vendor-npcs.js');
+  for (const cls of Object.keys(VENDOR_NPC_ART)) {
+    // idle and talk, then the walk strips (VENDOR_NPC_MOTION_ART, G680).
+    for (const state of vendorStates(cls)) {
       const d = vendorSheet(cls, state);
       rows.push(row(`vendor ${cls} ${state}`, d.path, { fw: d.fw, fh: d.fh, cols: d.cols, n: d.frames }));
     }

@@ -11,7 +11,7 @@ import { metabolicGain, setMetabolicGainGate } from '../public/js/metabolics.js?
 import { applyRewards, createQuestState } from '../public/js/quests.js?v=40c71a37';
 import { collectQuoin, createQuoinState, creditQuoinStat } from '../public/js/quoins.js?v=61be601c';
 import { HELL_TEXT, metabolicGate, normalizeHellState } from '../public/js/hell.js?v=23354bc4';
-import { questOffersFeature } from '../public/js/features/quest-offers-feature.js?v=8cea2b90';
+import { questOffersFeature } from '../public/js/features/quest-offers-feature.js?v=63d89cd2';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const pub = join(here, '../public');

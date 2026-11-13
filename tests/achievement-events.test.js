@@ -26,11 +26,11 @@ import {
 import { createResourceNode, harvestResourceNode } from '../public/js/resource-nodes.js?v=3a26727e';
 import { createPlot, growTree, tickPlot } from '../public/js/patches.js?v=5ba97b77';
 import { noteWoodCare } from '../public/js/woodcutting.js?v=ee35a30a';
-import { slothsChewing } from '../public/js/features/resource-nodes-feature.js?v=9e676b05';
+import { slothsChewing } from '../public/js/features/resource-nodes-feature.js?v=ef1d5ac2';
 import { supplyFeature } from '../public/js/features/supply-feature.js?v=82859ab1';
 import { createToolConditionState } from '../public/js/tools.js?v=48542c24';
 import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=10b118dd';
-import { normalizeAchievementSnapshot } from '../public/js/player-save.js?v=1da05676';
+import { normalizeAchievementSnapshot } from '../public/js/player-save.js?v=69395d5b';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const publicRoot = join(here, '../public');
