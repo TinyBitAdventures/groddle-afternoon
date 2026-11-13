@@ -4046,6 +4046,8 @@ button.play-context-head:focus-visible {
 
 /* Make progress / result (original multi-craft feedback) */
 .make-progress {
+  /* #268: the stage fits a narrow box (an upright phone) through the container query below. */
+  container: make-progress / inline-size;
   margin-top: var(--sp-5);
   padding: var(--sp-7) var(--sp-8) 0.7rem;
   text-align: center;
@@ -4229,6 +4231,16 @@ button.play-context-head:focus-visible {
   background: var(--c-sand-44);
   color: var(--text-inverse);
   font-size: var(--fs-2xs);
+}
+/* #268 (an upright phone): the stage's 70 + 118 + 70 px minimum ran past a 252 px box, so it sat right of
+   centre and the output ran off. Under 280 px the machine draws at 82% in a 92 px column and the sides share
+   the rest, so ingredients, machine and output stand centred inside the box. */
+@container make-progress (max-width: 280px) {
+  .make-progress .mp-stage { grid-template-columns: minmax(0, 1fr) 92px minmax(0, 1fr); gap: var(--sp-2); }
+  .make-progress .mp-tool-wrap { margin: -9px -10px; transform: scale(0.82); }
+  .make-progress .mp-output-wrap { gap: var(--sp-1); }
+  .make-progress .mp-output { width: 44px; height: 44px; }
+  .make-progress .mp-arrow { font-size: var(--fs-lg); }
 }
 .make-progress .mp-unit-row {
   display: flex;
