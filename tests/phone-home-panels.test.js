@@ -82,3 +82,32 @@ describe('#277 Decoration Mode on a phone', () => {
     assert.match(css, /:root\.touch-phone\[data-ui="modern"\] #game-root \.hb-pop \.hb-display-pick \{ flex: 1 1 10rem; min-width: 0; \}/);
   });
 });
+
+describe('#272 Groups and #280 Account: Menu windows fit the screen Safari leaves', () => {
+  const FAMILY = [
+    ['js/features/groups-feature.js', 'grp-panel', 'grp-close'],
+    ['js/features/account-backup-feature.js', 'account-panel', 'account-close'],
+    ['js/features/buddies-feature.js', 'buddies-panel', 'buddies-close'],
+    ['js/features/neighbours-mp-feature.js', 'keys-panel', 'keys-close'],
+    ['js/features/home-street-mp-feature.js', 'hs-panel', 'hs-close'],
+  ];
+  const block = css.slice(css.indexOf('/* PHONEPANELS'), css.indexOf('/* end PHONEPANELS */'));
+  it('each window is as tall as the visible screen at most and scrolls inside itself', () => {
+    for (const [file, panel] of [...FAMILY, ['js/classic/classic-prefs.js', 'prefs-window']]) {
+      const src = read(file);
+      const rule = src.match(new RegExp(`\\.${panel} \\{[^}]*\\}`))?.[0] || '';
+      assert.match(rule, /max-height: calc\(100vh - 2rem\); max-height: calc\(100dvh - 2rem\); overflow: auto; overscroll-behavior: contain;/, file);
+    }
+  });
+  it('on a phone the title and the close button stay at the top of each', () => {
+    assert.ok(block.length > 100, 'the PHONEPANELS block');
+    for (const [file, panel, close] of FAMILY) {
+      assert.ok(block.includes(`.${panel}`) && block.includes(`.${close}`), panel);
+      // The sticky head leans on the close button then the title opening the window.
+      assert.match(read(file), /\.append\(x, el\('h2', \{ id: '[a-z]+-title' \}/, file);
+    }
+    assert.match(block, /> h2:first-of-type \{\n\s+position: sticky; top: 0;/);
+    assert.match(block, /:first-child \{\n\s+position: sticky; top: var\(--sp-1\);/);
+    assert.match(block, /\.prefs-window > h2 \{ position: sticky; top: 0;/);
+  });
+});

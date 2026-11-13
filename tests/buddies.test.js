@@ -30,11 +30,11 @@ import {
   normalizeList,
 } from '../public/js/buddies.js?v=cff7bf6e';
 import { createMinnAccount } from '../public/js/minn-account.js?v=c15f0ecf';
-import { buddiesFeature } from '../public/js/features/buddies-feature.js?v=bb657c20';
+import { buddiesFeature } from '../public/js/features/buddies-feature.js?v=21897979';
 import { BUDDY_DESTINATION_TEXT, BUDDY_DESTINATION_VERB, buddyDestination, buddyFaceUrl, createFaceMemory } from '../public/js/buddy-list.js?v=b418f3f2';
 import { STREET_INDEX } from '../public/js/street-loader.js?v=18b181ad';
 import { FROM_LIST_VERBS, playerMenuRows } from '../public/js/ui/player-menu.js?v=c1ddb3c2';
-import { FEATURES } from '../public/js/features/index.js?v=be576003';
+import { FEATURES } from '../public/js/features/index.js?v=da911a3f';
 import { serverPath, sitePath, skipWithoutServer, skipWithoutSite } from '../tools/repos.mjs';
 
 const root = join(import.meta.dirname, '..');

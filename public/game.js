@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=8486632c';
 import { createErrorOnce, createFeatureHost } from './js/feature-host.js?v=06bb8b74';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=be576003';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=da911a3f';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl, drawTileArt } from './js/enter-chooser.js?v=4a3ea327';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -1059,7 +1059,7 @@ import { SLUG_ANIMATION, SLUG_LAYOUT, SLUG_STYLES, SLUG_TARGETS, drawSlugIcon, f
 import { filterText } from './js/word-filter.js?v=9a7a7ebb'; // the remake's own word filter
 import { arrangeMapCards, fitMapExtras } from './js/map-extras.js?v=9f38c312'; // the Map's Shortcuts
 // The interface skin (js/classic/ui-mode.js) sets <html data-ui> as it loads: before main(), so before the boot cover lifts.
-import { installInterfaceSettings } from './js/classic/classic-prefs.js?v=33a1964d';
+import { installInterfaceSettings } from './js/classic/classic-prefs.js?v=4815d990';
 
 /** @type {object|null} assets/maps/index.json */
 let mapIndexCache = null;

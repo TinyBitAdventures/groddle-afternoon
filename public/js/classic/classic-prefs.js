@@ -49,7 +49,7 @@ const typingIn = (t) => Boolean(t?.matches?.('input[type="text"], input[type="se
 export const PREFS_STYLE = `
 .prefs-shade { position: fixed; inset: 0; z-index: var(--z-dialog); display: grid; place-items: center; padding: var(--sp-8); background: color-mix(in srgb, var(--c-sage-23) 30%, transparent); }
 .prefs-shade[hidden] { display: none; }
-.prefs-window { position: relative; width: min(26rem, 100%); max-height: calc(100vh - 2rem); overflow: auto; border-radius: var(--radius-2xl); padding: var(--sp-8) var(--sp-9) var(--sp-9);
+.prefs-window { position: relative; width: min(26rem, 100%); max-height: calc(100vh - 2rem); max-height: calc(100dvh - 2rem); overflow: auto; overscroll-behavior: contain; border-radius: var(--radius-2xl); padding: var(--sp-8) var(--sp-9) var(--sp-9);
   background: var(--surface-card); color: var(--text); box-shadow: var(--shadow-3); font: var(--fs-base)/var(--lh-loose) var(--font-ui); }
 .prefs-window h2 { margin: 0 0 var(--sp-5); font-size: var(--fs-xl); color: var(--text-heading); }
 .prefs-window fieldset { margin: 0 0 var(--sp-6); padding: 0; border: 0; }

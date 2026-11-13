@@ -57,7 +57,7 @@ import { homeStreetName, possessive, readVisitScene } from '../neighbours-mp.js?
 import { BACK_YARD_GROUND_Y, SIGN_PROMPT_LIFT, STREET_GROUND_Y, homesFeature, visitorHomeState } from './homes-feature.js?v=11a76d23';
 import { projectApi } from './street-jobs-feature.js?v=ca4f7bc9';
 import { saveStore } from '../save-store.js?v=04420633';
-import { giveCarriedNote, takeCarriedNote, writtenCarriedNotes } from './street-furniture-feature.js?v=88cb98e7';
+import { giveCarriedNote, takeCarriedNote, writtenCarriedNotes } from './street-furniture-feature.js?v=3ad3c957';
 import {
   GOOD_NEIGHBOUR_AT,
   GOOD_NEIGHBOUR_COUNTER,
@@ -110,7 +110,7 @@ const BIG_SPENDERS = [[1009, 'big_spender'], [2003, 'el_big_spenderino'], [5003,
 const STYLE = `
 .hs-shade { position: fixed; inset: 0; z-index: calc(var(--z-screen) + 2); display: grid; place-items: center; padding: var(--sp-8); background: color-mix(in srgb, var(--c-sage-23) 45%, transparent); }
 .hs-shade[hidden] { display: none; }
-.hs-panel { width: min(26rem, 100%); max-height: calc(100vh - 2rem); overflow: auto; border-radius: var(--radius-2xl); padding: var(--sp-8) var(--sp-9) var(--sp-9);
+.hs-panel { width: min(26rem, 100%); max-height: calc(100vh - 2rem); max-height: calc(100dvh - 2rem); overflow: auto; overscroll-behavior: contain; border-radius: var(--radius-2xl); padding: var(--sp-8) var(--sp-9) var(--sp-9);
   background: var(--surface-card); color: var(--c-sand-28); box-shadow: var(--shadow-3); font: var(--fs-base)/var(--lh-loose) var(--font-system); }
 .hs-panel h2 { margin: 0 0 var(--sp-5); font-size: var(--fs-xl); }
 .hs-panel p { margin: var(--sp-3) 0; }

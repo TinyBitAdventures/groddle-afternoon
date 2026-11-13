@@ -13986,6 +13986,26 @@ body.is-booting .touch-controls { display: none; }
 :root.touch-phone :is(input, textarea, select, [contenteditable="true"], [contenteditable=""], .activity-log, .social-log, #local-chat-log) { -webkit-user-select: text; user-select: text; -webkit-touch-callout: default; }
 /* —— end TOUCH PANELS —— */
 
+/* PHONEPANELS (reports #272 and #280, Friendly, iPhone Safari): the Groups and Account windows, and their
+   kin from the Menu (Buddies, House Keys and the Butler, a home street's window, Interface), were taller
+   than the screen: 100vh is the screen with Safari's bars hidden, so the title, the close button and the
+   foot sat under the bars, and the shade does not scroll, so a swipe only bounced. Each window is now
+   sized to the screen Safari leaves (100dvh, in its feature's style) and scrolls inside itself; on a phone
+   its title and close button stay at the top while the rest scrolls under them. */
+:root.touch-phone :is(.grp-panel, .account-panel, .buddies-panel, .keys-panel, .hs-panel) { padding-top: 0; }
+:root.touch-phone :is(.grp-panel, .account-panel, .buddies-panel, .keys-panel, .hs-panel) > h2:first-of-type {
+  position: sticky; top: 0; z-index: var(--z-raised);
+  margin: 0 calc(-1 * var(--sp-9)) var(--sp-3); padding: var(--sp-6) var(--sp-9) var(--sp-4);
+  border-bottom: 1px solid var(--border); background: var(--surface-card);
+}
+:root.touch-phone :is(.grp-panel, .account-panel, .buddies-panel, .keys-panel, .hs-panel) > :is(.grp-close, .account-close, .buddies-close, .keys-close, .hs-close):first-child {
+  position: sticky; top: var(--sp-1); z-index: calc(var(--z-raised) + 1); margin: var(--sp-1) calc(-1 * var(--sp-5)) 0 0;
+}
+:root.touch-phone[data-ui="modern"] .prefs-window { padding-top: 0; }
+:root.touch-phone[data-ui="modern"] .prefs-window > h2 { position: sticky; top: 0; z-index: var(--z-raised); margin: 0 calc(-1 * var(--sp-9)) var(--sp-5); padding: var(--sp-8) var(--sp-9) var(--sp-4); background: var(--surface-card); }
+:root.touch-phone[data-ui="modern"] .prefs-window > .prefs-close { position: sticky; top: var(--sp-1); z-index: calc(var(--z-raised) + 1); float: right; margin: var(--sp-1) calc(-1 * var(--sp-5)) 0 0; }
+/* end PHONEPANELS */
+
 /* PHONEKEYS (Austin 2026-11-12, on his iPhone): a phone (html.touch-phone, the phone gate's
    device) has no keyboard, so no key letter shows on it: the key caps on the bar's buttons, in sheet
    heads, in the Menu's rows (data-key), the verb menu's numbers, "Esc close" and "Esc back", and the

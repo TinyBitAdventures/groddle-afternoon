@@ -81,7 +81,7 @@ const VERB_IDS = new Set([...Object.values(BUDDY_VERBS), BUDDY_DESTINATION_VERB]
 const STYLE = `
 .buddies-shade { position: fixed; inset: 0; z-index: var(--z-screen); display: grid; place-items: center; padding: var(--sp-8); background: color-mix(in srgb, var(--c-sage-23) 45%, transparent); }
 .buddies-shade[hidden] { display: none; }
-.buddies-panel { width: min(30rem, 100%); max-height: calc(100vh - 2rem); overflow: auto; border-radius: var(--radius-2xl); padding: var(--sp-8) var(--sp-9) var(--sp-9);
+.buddies-panel { width: min(30rem, 100%); max-height: calc(100vh - 2rem); max-height: calc(100dvh - 2rem); overflow: auto; overscroll-behavior: contain; border-radius: var(--radius-2xl); padding: var(--sp-8) var(--sp-9) var(--sp-9);
   background: var(--surface-card); color: var(--c-sand-28); box-shadow: var(--shadow-3); font: var(--fs-base)/var(--lh-loose) var(--font-system); }
 .buddies-panel h2 { margin: 0 0 var(--sp-3); font-size: var(--fs-xl); }
 .buddies-panel h3 { margin: var(--sp-7) 0 var(--sp-3); font-size: var(--fs-lg); color: var(--c-lime-49); }

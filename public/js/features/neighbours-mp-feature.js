@@ -169,7 +169,7 @@ const GIFT_WRAPPED_CLASS = 'bag_gift_box_wrapped';
 const STYLE = `
 .keys-shade { position: fixed; inset: 0; z-index: var(--z-screen); display: grid; place-items: center; padding: var(--sp-8); background: color-mix(in srgb, var(--c-sage-23) 45%, transparent); }
 .keys-shade[hidden] { display: none; }
-.keys-panel { width: min(30rem, 100%); max-height: calc(100vh - 2rem); overflow: auto; border-radius: var(--radius-2xl); padding: var(--sp-8) var(--sp-9) var(--sp-9);
+.keys-panel { width: min(30rem, 100%); max-height: calc(100vh - 2rem); max-height: calc(100dvh - 2rem); overflow: auto; overscroll-behavior: contain; border-radius: var(--radius-2xl); padding: var(--sp-8) var(--sp-9) var(--sp-9);
   background: var(--surface-card); color: var(--c-sand-28); box-shadow: var(--shadow-3); font: var(--fs-base)/var(--lh-loose) var(--font-system); }
 .keys-panel h2 { margin: 0 0 var(--sp-1); font-size: var(--fs-xl); }
 .keys-panel .keys-sub { margin: 0 0 var(--sp-5); opacity: 0.8; }

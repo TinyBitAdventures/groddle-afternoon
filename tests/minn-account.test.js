@@ -19,8 +19,8 @@ import { createMinnAccount, minnUrls } from '../public/js/minn-account.js?v=c15f
 import { GATE_COPY, JUJU_BOSS_GATES, SAVE_ALERT_COPY, bootDataFrom, deliverHandoff, gateFor, saveAlertFor } from '../public/js/online-boot.js?v=91e01718';
 import { SAVE_STOPPED } from '../public/js/save-store.js?v=04420633';
 import { FORM_COPY, SETTINGS_COPY, resetLinkFrom } from '../public/js/account-forms.js?v=29e9e2c3';
-import { restoreNeedsAsking, sizeLabel, slotForNewBackup, accountBackupFeature } from '../public/js/features/account-backup-feature.js?v=464d6c34';
-import { FEATURES } from '../public/js/features/index.js?v=be576003';
+import { restoreNeedsAsking, sizeLabel, slotForNewBackup, accountBackupFeature } from '../public/js/features/account-backup-feature.js?v=2339d3be';
+import { FEATURES } from '../public/js/features/index.js?v=da911a3f';
 import { multiplayerEntryUrl } from '../public/js/game-mode.js?v=1ecf2899';
 import { SAVE_ENTRY_NAMES, createMultiplayerSaveStore } from '../public/js/save-store.js?v=04420633';
 import { HAS_SITE, SITE_DIR, serverPath, skipWithoutServer, skipWithoutSite } from '../tools/repos.mjs';
