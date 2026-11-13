@@ -14,11 +14,12 @@ import {
   donationLimitWarning,
   donationValueFor,
   emblemCostFor,
+  emblemWaitingLine,
   favorReadyLine,
   isNoDonate,
   listShrineDonationOptions,
   quoteShrineDonation,
-} from '../public/js/shrines.js?v=7260fa28';
+} from '../public/js/shrines.js?v=4d558b8b';
 
 const game = readFileSync(join(import.meta.dirname, '..', 'public', 'game.js'), 'utf8');
 
@@ -45,6 +46,21 @@ describe('shrine emblem on the filling donation', () => {
     const fresh = createShrineState();
     fresh.favor.mab = 1000;
     assert.equal(claimShrineEmblem(fresh, 'mab', {}, null, { fits: false }).ok, true);
+  });
+
+  it('#293: Claim with a full pack says the pack is the reason, as the panel does, not more favor', () => {
+    assert.equal(emblemWaitingLine('pot'), 'Pot is ready to grant an emblem once your pack has room for it.');
+    const claim = game.slice(game.indexOf('function claimActiveShrineEmblem('), game.indexOf('let shrineEmblemInside'));
+    assert.match(claim, /toast\(canClaimEmblem\(shrineState, giantId\) \? emblemWaitingLine\(giantId\) : 'More favor is needed/);
+    assert.match(game, /=== 0 \? emblemWaitingLine\(giantId\)/, 'the panel note is the same line');
+    // The held emblem comes once there is room: the same claim, now fitting.
+    const state = createShrineState();
+    state.emblems.pot = 15;
+    state.favor.pot = emblemCostFor(state, 'pot');
+    const inv = {};
+    assert.equal(claimShrineEmblem(state, 'pot', inv, null, { fits: false }).reason, 'pack_full');
+    assert.equal(claimShrineEmblem(state, 'pot', inv, null, { fits: true }).ok, true);
+    assert.equal(inv.emblem_pot, 1);
   });
 });
 

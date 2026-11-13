@@ -46,7 +46,7 @@ test('the two re-framed house copies line up with their 2x files', () => {
 });
 
 test('the house picks its copy at R 4 and keeps the 2x file on a phone', async () => {
-  const { landscapeArt } = await import('../public/js/features/homes-feature.js?v=0e743757');
+  const { landscapeArt } = await import('../public/js/features/homes-feature.js?v=2ccf27ec');
   const house = { s: 'door_asset_house_medium_03', w: 764, h: 586, scale: 0.58 };
   assert.equal(landscapeArt(house, 4).url, `assets/decos/groddle/door_asset_house_medium_03@${rows.get('door_asset_house_medium_03').res}x.webp`);
   assert.equal(landscapeArt(house, 1).url, 'assets/decos/groddle/door_asset_house_medium_03.png');

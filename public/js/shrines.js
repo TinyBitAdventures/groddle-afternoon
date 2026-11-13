@@ -574,6 +574,15 @@ export function favorReadyLine(state, giantId) {
   return `You have reached ${emblemCostFor(state, giantId)} favor points with ${giant?.name || giantId}. Get to a shrine and collect your emblem!`;
 }
 
+/**
+ * A Giant at its emblem target with no pack room for the emblem (items/include/shrines.js 93-99 keeps
+ * the favor and gives nothing; the emblem comes with the next donation or walk past once there is room).
+ * The shrine panel's note and the Claim button's refusal (report #293) both say it.
+ */
+export function emblemWaitingLine(giantId) {
+  return `${GIANTS[giantId]?.name || giantId} is ready to grant an emblem once your pack has room for it.`;
+}
+
 /** Every emblem after a Giant's first also pays 50 iMG (items/include/shrines.js:111). */
 export const EMBLEM_XP = 50;
 

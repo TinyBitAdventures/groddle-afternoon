@@ -74,7 +74,7 @@ import { IMAGINATION_UPGRADES } from '../public/js/imagination-data.js?v=4a85e7f
 import { SPINDLE_TOOLS } from '../public/js/making.js?v=ba3677f0';
 import { creditedMultiplayerQuests } from '../public/js/quests-mp.js?v=1fc5ff58';
 import { FURNITURE_STARTER_KIT } from '../public/js/homes-catalog.js?v=10ac34b6';
-import { GIANTS } from '../public/js/shrines.js?v=7260fa28';
+import { GIANTS } from '../public/js/shrines.js?v=4d558b8b';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 export const OUT = sitePath('data', 'economy.json');

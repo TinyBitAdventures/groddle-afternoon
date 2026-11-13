@@ -256,7 +256,7 @@ describe('Egg Hunt and Pi Day', () => {
   it('is the source mechanic: Egg Plants pet with lgt_egg_plant_pet, five equally likely eggs, all year', async () => {
     const { SKILL_PACKAGES } = await import('../public/js/skill-packages-data.js?v=cb4e9ab3');
     const { DROP_TABLES } = await import('../public/js/drop-tables-data.js?v=c51a6400');
-    const { packageForEvent } = await import('../public/js/features/drops-feature.js?v=22e0e757');
+    const { packageForEvent } = await import('../public/js/features/drops-feature.js?v=5a241f9f');
     assert.equal(packageForEvent(`${EGG_HUNT.pet.trant}:pet`, {}), EGG_HUNT.pet.package);
     const pkg = SKILL_PACKAGES[EGG_HUNT.pet.package];
     assert.deepEqual(Object.values(pkg.skills).map((s) => [s.drop_class_id, s.drop_chance]), [[EGG_HUNT.pet.table, 10], [EGG_HUNT.pet.table, 15], [EGG_HUNT.pet.table, 20], [EGG_HUNT.pet.table, 30]]);
@@ -290,7 +290,7 @@ describe('Egg Hunt and Pi Day', () => {
   });
 
   it('counts each egg into the collection however it arrives, then gives the trophy for them (seasons-feature)', async () => {
-    const { seasonsFeature } = await import('../public/js/features/seasons-feature.js?v=85750769');
+    const { seasonsFeature } = await import('../public/js/features/seasons-feature.js?v=17d2ac97');
     const { createInventory, addItem, countItem, removeItem } = await import('../public/js/inventory.js?v=f49c8998');
     const unlocked = [];
     const counted = {};
@@ -364,7 +364,7 @@ describe('supply paths', () => {
 
 describe('a ?season= preview leaves the save alone (G342)', () => {
   it('a carved pumpkin survives previewing another season, and the save still remembers Zilloween', async () => {
-    const { seasonsFeature } = await import('../public/js/features/seasons-feature.js?v=85750769');
+    const { seasonsFeature } = await import('../public/js/features/seasons-feature.js?v=17d2ac97');
     const { createInventory, addItem, countItem } = await import('../public/js/inventory.js?v=f49c8998');
     const inv = createInventory();
     addItem(inv, 'pumpkin_carved_1', 2);

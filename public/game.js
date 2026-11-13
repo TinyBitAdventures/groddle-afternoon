@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=4a584630';
 import { createErrorOnce, createFeatureHost } from './js/feature-host.js?v=06bb8b74';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=c3b950e4';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=18ad6e56';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl, drawTileArt } from './js/enter-chooser.js?v=4a3ea327';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, bodyReachDistance, OUT_OF_REACH_LINE } from './js/reach.js?v=8e52df56';
@@ -510,7 +510,7 @@ import {
   parsePlayerSave,
   serializePlayerSave,
   restorePlayerSave,
-} from './js/player-save.js?v=4d26c60a';
+} from './js/player-save.js?v=477fdb26';
 import {
   HOME_INTERIOR_TSID,
   HOME_STREET_TSID,
@@ -892,6 +892,7 @@ import {
   emblemCostFor,
   addGiantFavor,
   favorReadyLine,
+  emblemWaitingLine,
   donationLimitWarning,
   DONATION_WARNING_YES,
   DONATION_WARNING_NO,
@@ -907,7 +908,7 @@ import {
   favorRelationNote,
   emblemRelationNote,
   formatSpeedUpTime,
-} from './js/shrines.js?v=7260fa28';
+} from './js/shrines.js?v=4d558b8b';
 import { shrineSheet, shrineVariantFor } from './js/shrine-variants.js?v=7f11c97d';
 import { giantDisplayName } from './js/giant-names.js?v=0e295891';
 import { shrinePowderOptions, shrinePowderAchievementCounters } from './js/powders.js?v=6f3d6671';
@@ -29171,7 +29172,7 @@ function renderShrinePanel() {
   }
   const capNotes = [
     // give_emblem runs after every donation (shrines.js 632), so favor only waits at the target for pack room (93-99).
-    quote.atFavorCap ? `${giant.name} is ready to grant an emblem${features.query('packRoom', `emblem_${giantId}`, 1, engine) === 0 ? ' once your pack has room for it' : ''}.` : '',
+    quote.atFavorCap ? (features.query('packRoom', `emblem_${giantId}`, 1, engine) === 0 ? emblemWaitingLine(giantId) : `${giant.name} is ready to grant an emblem.`) : '',
     quote.atDailyFavorCap ? `Today's ${giant.name} favor limit is full.` : '',
     quote.atDailyXpCap ? `Today's shrine donation iMG limit is full.` : '',
   ].filter(Boolean);
@@ -29492,7 +29493,9 @@ function performEmblemSpend(giantId) {
 
 function claimActiveShrineEmblem() {
   if (!grantShrineEmblem(activeShrineTarget)) {
-    toast('More favor is needed before an emblem can be claimed.');
+    // #293: at the target, the only refusal is a full pack (shrines.js 93-99), not more favor.
+    const giantId = activeShrineTarget?.state?.giantId;
+    toast(canClaimEmblem(shrineState, giantId) ? emblemWaitingLine(giantId) : 'More favor is needed before an emblem can be claimed.');
     renderShrinePanel();
   }
 }

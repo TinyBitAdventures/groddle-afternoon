@@ -17,12 +17,12 @@ import {
 } from '../public/js/new-player.js?v=f76dcbaf';
 import { createBrowserSaveStore, createMultiplayerSaveStore, createSaveStore } from '../public/js/save-store.js?v=04420633';
 import { createInventory } from '../public/js/inventory.js?v=f49c8998';
-import { normalizePlayerSnapshot, parsePlayerSave, restorePlayerSave } from '../public/js/player-save.js?v=4d26c60a';
+import { normalizePlayerSnapshot, parsePlayerSave, restorePlayerSave } from '../public/js/player-save.js?v=477fdb26';
 import { createQuoinState } from '../public/js/quoins.js?v=61be601c';
-import { createShrineState } from '../public/js/shrines.js?v=7260fa28';
+import { createShrineState } from '../public/js/shrines.js?v=4d558b8b';
 import { PARADISE_COURSES, PARADISE_TICKET_IDS } from '../public/js/paradise-flight.js?v=fdc76095';
 import { imaginationFeature, STARTER_UPGRADES } from '../public/js/features/imagination-feature.js?v=20dfa0c5';
-import { RESOURCE_FEATURE_ID, resourceNodesFeature } from '../public/js/features/resource-nodes-feature.js?v=a644eff2';
+import { RESOURCE_FEATURE_ID, resourceNodesFeature } from '../public/js/features/resource-nodes-feature.js?v=18c672c0';
 
 const here = import.meta.dirname;
 const pub = join(here, '..', 'public');
