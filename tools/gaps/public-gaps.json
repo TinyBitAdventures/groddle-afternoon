@@ -67,7 +67,7 @@
     {
       "id": "G679",
       "area": "Streets",
-      "text": "Some street effects seen in old recordings are still to come: the notes and heart on Lotha Harte, the firefly jars in Koulato Cluster, the gravity flips in Duodenal Browns and the herb gift on five streets."
+      "text": "The herb gift on five streets is still to come; Ding a Lingers waits on the snow roads."
     },
     {
       "id": "G681",
@@ -77,7 +77,7 @@
     {
       "id": "G680",
       "area": "World",
-      "text": "The six named vendors stand still instead of walking about, the Still has one look instead of four, and a few dropped items have no picture on the ground."
+      "text": "A few items have no picture of their own when dropped on the ground yet."
     },
     {
       "id": "G670",
@@ -654,6 +654,163 @@
       "report": 261,
       "commits": [
         "game:787deed5d3"
+      ]
+    },
+    {
+      "id": "F55",
+      "area": "Street projects",
+      "show": "fixing",
+      "text": "A street project that asked for the same item twice put what you gave on the first row, whichever row you used.",
+      "report": 290,
+      "commits": [
+        "game:80ecd65517"
+      ]
+    },
+    {
+      "id": "F56",
+      "area": "Street projects",
+      "show": "fixing",
+      "text": "Online, a street you could already walk to showed its project as built while the world had not finished it, so you could not help.",
+      "report": 294,
+      "commits": [
+        "game:aa4f11d092"
+      ]
+    },
+    {
+      "id": "F57",
+      "area": "Hell",
+      "show": "fixing",
+      "text": "With a full pack, the drink ticket went to your Magic Rock without saying so, and the Bartender's wine followed it unseen.",
+      "report": 292,
+      "commits": [
+        "game:07865e503f"
+      ]
+    },
+    {
+      "id": "F58",
+      "area": "Giants",
+      "show": "fixing",
+      "text": "With a full pack, claiming an emblem said more favor was needed instead of asking for room in the pack.",
+      "report": 293,
+      "commits": [
+        "game:085cd75270"
+      ]
+    },
+    {
+      "id": "F59",
+      "area": "Tower",
+      "show": "fixing",
+      "text": "In the Tower's Ventilation Room you walked out over thin air instead of dropping down the shaft.",
+      "report": 296,
+      "commits": [
+        "game:e900c9e8ca"
+      ]
+    },
+    {
+      "id": "F60",
+      "area": "Quest rooms",
+      "show": "fixing",
+      "text": "In the Museum of the Rook the Greeterbot greeted you from out of sight.",
+      "report": 297,
+      "commits": [
+        "game:ab27cffad8"
+      ]
+    },
+    {
+      "id": "F61",
+      "area": "Phones",
+      "show": "fixing",
+      "text": "In the gut tubes a phone's Jump button did not flip which way is down, so a phone player could get stuck.",
+      "commits": [
+        "game:5061684444"
+      ]
+    },
+    {
+      "id": "F62",
+      "area": "Getting around",
+      "show": "fixing",
+      "text": "Enter could not reach things resting on a counter or table beside you, such as the food in EZ Cookin'.",
+      "commits": [
+        "game:10bbdf1d3d",
+        "game:8716a80511"
+      ]
+    },
+    {
+      "id": "F63",
+      "area": "Map",
+      "show": "fixing",
+      "text": "The street map in the corner showed a rough sketch while a street's art loaded.",
+      "commits": [
+        "game:5ec789338b",
+        "game:76696cd806",
+        "game:4e9bccfdb8"
+      ]
+    },
+    {
+      "id": "F64",
+      "area": "Phones",
+      "show": "fixing",
+      "text": "A game link opened on a phone lost its settings on the way through the phone page.",
+      "commits": [
+        "game:66ab9f346c"
+      ]
+    },
+    {
+      "id": "F65",
+      "area": "Quests",
+      "show": "fixing",
+      "text": "The Magic Rock's card showed before the rock's white glow.",
+      "commits": [
+        "game:1b8be64e2c"
+      ]
+    },
+    {
+      "id": "F66",
+      "area": "Projects",
+      "show": "fixing",
+      "text": "Notices covered the featured project's progress under the street name.",
+      "commits": [
+        "game:33429d7639"
+      ]
+    },
+    {
+      "id": "F67",
+      "area": "Classic",
+      "show": "fixing",
+      "text": "In Classic, buff and cooldown chips sat on the energy arc.",
+      "report": 286,
+      "commits": [
+        "game:d527c905c1"
+      ]
+    },
+    {
+      "id": "F68",
+      "area": "Pack",
+      "show": "fixing",
+      "text": "An open bag closed when you clicked away, so you could not watch its counts while collecting.",
+      "report": 287,
+      "commits": [
+        "game:0cdd7aa2db"
+      ]
+    },
+    {
+      "id": "F69",
+      "area": "Vendors",
+      "show": "fixing",
+      "text": "A vendor's shelf jumped back to the top after each sale.",
+      "report": 288,
+      "commits": [
+        "game:797304453d"
+      ]
+    },
+    {
+      "id": "F70",
+      "area": "Classic",
+      "show": "fixing",
+      "text": "In Classic, a long Menu ran off the window, so Sign out could be out of reach.",
+      "report": 289,
+      "commits": [
+        "game:53e524fd92"
       ]
     },
     {

@@ -1,6 +1,6 @@
 {
   "note": "Written by tools/gaps/build-data.mjs from tools/gaps/public-gaps.json and the coverage register. Edit those, never this file.",
-  "release": "v0.36.1",
+  "release": "v0.37.0",
   "states": {
     "fixing": {
       "label": "Being fixed",
@@ -40,9 +40,9 @@
   },
   "counts": {
     "fixing": 1,
-    "known": 22,
+    "known": 14,
     "unreleased": 0,
-    "fixed": 60,
+    "fixed": 84,
     "lost": 5,
     "purpose": 15,
     "idea": 11
@@ -59,12 +59,14 @@
         {
           "id": "G682",
           "text": "The EZ Cookin' practice street and the Talking 'bout Soil Appreciation room are not built yet, so those quests play without their rooms.",
-          "state": "known"
+          "state": "fixed",
+          "version": "v0.37.0"
         },
         {
           "id": "G472",
           "text": "On the Winter Walk you cannot knock the icicles down yet.",
-          "state": "known"
+          "state": "fixed",
+          "version": "v0.37.0"
         },
         {
           "id": "G660",
@@ -85,6 +87,13 @@
           "report": 276,
           "state": "fixed",
           "version": "v0.36.1"
+        },
+        {
+          "id": "F60",
+          "text": "In the Museum of the Rook the Greeterbot greeted you from out of sight.",
+          "report": 297,
+          "state": "fixed",
+          "version": "v0.37.0"
         }
       ]
     },
@@ -120,6 +129,12 @@
           "text": "Seeker of the Shiny and Meditation Station are offered again every 5 minutes until you take them.",
           "state": "fixed",
           "version": "v0.36.0"
+        },
+        {
+          "id": "F65",
+          "text": "The Magic Rock's card showed before the rock's white glow.",
+          "state": "fixed",
+          "version": "v0.37.0"
         }
       ]
     },
@@ -132,19 +147,20 @@
           "state": "known"
         },
         {
-          "id": "G678",
-          "text": "In Thornfad Layers, the letter or heart that shows over your head by the locked door is not drawn yet.",
-          "state": "known"
-        },
-        {
           "id": "G679",
-          "text": "Some street effects seen in old recordings are still to come: the notes and heart on Lotha Harte, the firefly jars in Koulato Cluster, the gravity flips in Duodenal Browns and the herb gift on five streets.",
+          "text": "The herb gift on five streets is still to come; Ding a Lingers waits on the snow roads.",
           "state": "known"
         },
         {
           "id": "G681",
           "text": "Teleporters that work by walking into them have not all been checked yet.",
           "state": "known"
+        },
+        {
+          "id": "G678",
+          "text": "In Thornfad Layers, the letter or heart that shows over your head by the locked door is not drawn yet.",
+          "state": "fixed",
+          "version": "v0.37.0"
         }
       ]
     },
@@ -153,18 +169,19 @@
       "items": [
         {
           "id": "G680",
-          "text": "The six named vendors stand still instead of walking about, the Still has one look instead of four, and a few dropped items have no picture on the ground.",
-          "state": "known"
-        },
-        {
-          "id": "G670",
-          "text": "Mokkar Mill shows only one of its seven Jellisacs.",
+          "text": "A few items have no picture of their own when dropped on the ground yet.",
           "state": "known"
         },
         {
           "id": "G164",
           "text": "The small dark figure on the Hell Bar's counter, and the bar's own music, are still unidentified.",
           "state": "known"
+        },
+        {
+          "id": "G670",
+          "text": "Mokkar Mill shows only one of its seven Jellisacs.",
+          "state": "fixed",
+          "version": "v0.37.0"
         },
         {
           "id": "G669",
@@ -193,7 +210,14 @@
         {
           "id": "G471",
           "text": "There is no world map or subway map view yet, and GO buttons do not take the colour of the region they lead to.",
-          "state": "known"
+          "state": "fixed",
+          "version": "v0.37.0"
+        },
+        {
+          "id": "F63",
+          "text": "The street map in the corner showed a rough sketch while a street's art loaded.",
+          "state": "fixed",
+          "version": "v0.37.0"
         }
       ]
     },
@@ -346,6 +370,20 @@
           "text": "Talking to a Street Spirit opens its street project, as in Glitch.",
           "state": "fixed",
           "version": "v0.32.0"
+        },
+        {
+          "id": "F55",
+          "text": "A street project that asked for the same item twice put what you gave on the first row, whichever row you used.",
+          "report": 290,
+          "state": "fixed",
+          "version": "v0.37.0"
+        },
+        {
+          "id": "F56",
+          "text": "Online, a street you could already walk to showed its project as built while the world had not finished it, so you could not help.",
+          "report": 294,
+          "state": "fixed",
+          "version": "v0.37.0"
         }
       ]
     },
@@ -488,15 +526,16 @@
       "name": "Teleportation",
       "items": [
         {
-          "id": "G668",
-          "text": "Teleportation V cannot summon a player into a home yet.",
-          "state": "known"
-        },
-        {
           "id": "F33",
           "text": "Teleporting works out its energy cost from a 100-energy tank, and you cannot save a Teleportation Point in your own home.",
           "state": "fixed",
           "version": "v0.36.0"
+        },
+        {
+          "id": "G668",
+          "text": "Teleportation V cannot summon a player into a home yet.",
+          "state": "fixed",
+          "version": "v0.37.0"
         },
         {
           "id": "G666",
@@ -568,12 +607,14 @@
         {
           "id": "G673",
           "text": "Zoomed in on a phone, your Glitch sits high in the view.",
-          "state": "known"
+          "state": "fixed",
+          "version": "v0.37.0"
         },
         {
           "id": "G674",
           "text": "A second finger on the movement stick moves it.",
-          "state": "known"
+          "state": "fixed",
+          "version": "v0.37.0"
         },
         {
           "id": "F37",
@@ -626,6 +667,18 @@
           "report": 271,
           "state": "fixed",
           "version": "v0.36.1"
+        },
+        {
+          "id": "F61",
+          "text": "In the gut tubes a phone's Jump button did not flip which way is down, so a phone player could get stuck.",
+          "state": "fixed",
+          "version": "v0.37.0"
+        },
+        {
+          "id": "F64",
+          "text": "A game link opened on a phone lost its settings on the way through the phone page.",
+          "state": "fixed",
+          "version": "v0.37.0"
         }
       ]
     },
@@ -636,6 +689,20 @@
           "id": "G659",
           "text": "In Classic, the Wardrobe is not its own window yet, and new players do not get the 2012 arrow picker for their look.",
           "state": "known"
+        },
+        {
+          "id": "F67",
+          "text": "In Classic, buff and cooldown chips sat on the energy arc.",
+          "report": 286,
+          "state": "fixed",
+          "version": "v0.37.0"
+        },
+        {
+          "id": "F70",
+          "text": "In Classic, a long Menu ran off the window, so Sign out could be out of reach.",
+          "report": 289,
+          "state": "fixed",
+          "version": "v0.37.0"
         }
       ]
     },
@@ -670,6 +737,88 @@
           "text": "A bug report says Read by the team once an administrator has opened it.",
           "state": "fixed",
           "version": "v0.36.0"
+        }
+      ]
+    },
+    {
+      "name": "Hell",
+      "items": [
+        {
+          "id": "F57",
+          "text": "With a full pack, the drink ticket went to your Magic Rock without saying so, and the Bartender's wine followed it unseen.",
+          "report": 292,
+          "state": "fixed",
+          "version": "v0.37.0"
+        }
+      ]
+    },
+    {
+      "name": "Giants",
+      "items": [
+        {
+          "id": "F58",
+          "text": "With a full pack, claiming an emblem said more favor was needed instead of asking for room in the pack.",
+          "report": 293,
+          "state": "fixed",
+          "version": "v0.37.0"
+        }
+      ]
+    },
+    {
+      "name": "Tower",
+      "items": [
+        {
+          "id": "F59",
+          "text": "In the Tower's Ventilation Room you walked out over thin air instead of dropping down the shaft.",
+          "report": 296,
+          "state": "fixed",
+          "version": "v0.37.0"
+        }
+      ]
+    },
+    {
+      "name": "Getting around",
+      "items": [
+        {
+          "id": "F62",
+          "text": "Enter could not reach things resting on a counter or table beside you, such as the food in EZ Cookin'.",
+          "state": "fixed",
+          "version": "v0.37.0"
+        }
+      ]
+    },
+    {
+      "name": "Projects",
+      "items": [
+        {
+          "id": "F66",
+          "text": "Notices covered the featured project's progress under the street name.",
+          "state": "fixed",
+          "version": "v0.37.0"
+        }
+      ]
+    },
+    {
+      "name": "Pack",
+      "items": [
+        {
+          "id": "F68",
+          "text": "An open bag closed when you clicked away, so you could not watch its counts while collecting.",
+          "report": 287,
+          "state": "fixed",
+          "version": "v0.37.0"
+        }
+      ]
+    },
+    {
+      "name": "Vendors",
+      "items": [
+        {
+          "id": "F69",
+          "text": "A vendor's shelf jumped back to the top after each sale.",
+          "report": 288,
+          "state": "fixed",
+          "version": "v0.37.0"
         }
       ]
     }
