@@ -384,6 +384,80 @@ export function putOffCards(engine) {
 }
 
 /**
+ * #300 (G699): the Offered tab's cards for offers that went into the log unanswered (G225, the
+ * Magic Rock's "You have N new quests"), oldest first, so the tab holds every quest the count
+ * says. Each has Accept, and "Not right now" when the quest can wait (G229: only a startable
+ * one, offerCard). The original had no such list: QuestsDialog.as updateCountToast 241-252 kept
+ * only the count and "Show me", which opens one offer at a time; "Show me one" still does.
+ * Emergencies pop on the street and are not counted, so they are not drawn here either.
+ */
+export function waitingOfferCards(engine) {
+  if (typeof document === 'undefined') return [];
+  const qs = engine.questState;
+  const declined = ensureQuestOfferState(qs).declined || {};
+  const rows = waitingOffers(qs).filter((row) => !row.emergency && !declined[row.classTsid]);
+  return rows.map(({ classTsid, def }) => {
+    const offer = questOfferCard(classTsid);
+    const card = document.createElement('div');
+    card.className = 'q-card q-put-off q-waiting';
+    card.dataset.questPutOff = classTsid;
+    card.dataset.questWaiting = classTsid;
+    const title = document.createElement('div');
+    title.className = 'q-title';
+    title.textContent = def.title;
+    const state = document.createElement('div');
+    state.className = 'q-req';
+    state.textContent = 'New. Not accepted yet.';
+    card.append(title, state);
+    for (const r of def.requirements || []) {
+      const row = document.createElement('div');
+      row.className = 'q-req';
+      renderQuestText(row, questRequirementText(r.desc, 0, r.num));
+      card.appendChild(row);
+    }
+    if (offer?.moveNote) {
+      const note = document.createElement('div');
+      note.className = 'q-req';
+      note.textContent = offer.moveNote;
+      card.appendChild(note);
+    }
+    const blocked = def.needsStart ? startBlockedReason(engine) : '';
+    const go = document.createElement('button');
+    go.type = 'button';
+    go.className = 'content-action-btn';
+    go.dataset.questAccept = classTsid;
+    go.textContent = 'Accept';
+    go.title = offer?.acceptLabel || '';
+    go.disabled = offerOpen || Boolean(blocked);
+    if (blocked) go.title = blocked;
+    go.addEventListener('click', () => {
+      if (offerOpen || engine.questDialogueOpen?.() || (def.needsStart && startBlockedReason(engine))) return;
+      acceptCard(engine, classTsid, def);
+      engine.updateHud?.();
+    });
+    card.appendChild(go);
+    if (offer?.startable) {
+      const later = document.createElement('button');
+      later.type = 'button';
+      later.className = 'content-action-btn';
+      later.dataset.questLater = classTsid;
+      later.textContent = offer.declineLabel || 'Not right now';
+      later.disabled = offerOpen;
+      later.addEventListener('click', () => {
+        if (offerOpen || engine.questDialogueOpen?.()) return;
+        const result = putOffOffer(qs, classTsid, Date.now());
+        engine.setData('questOfferResult', result.ok ? 'putoff' : result.reason || 'failed');
+        engine.save();
+        engine.updateHud?.();
+        syncWaiting(engine);
+      });
+      card.appendChild(later);
+    }
+    return card;
+  });
+}
+
+/**
  * G255: the Try button on an accepted quest's log card (QuestElementUI.as
  * setTryButton 224-264): only startable quests this module handed out
  * (offers.managed; story quests draw their own Enter buttons). Started: "Try
@@ -674,7 +748,8 @@ export const questOffersFeature = {
 
   /** G229: game.js quest log asks for the put-off quests' cards. */
   questLogCards(engine) {
-    return putOffCards(engine);
+    // #300: the offers waiting unanswered first (newest quests), then the ones put off.
+    return [...waitingOfferCards(engine), ...putOffCards(engine)];
   },
 
   /** G255: game.js asks for each active quest card's extra buttons (the Try button). */
