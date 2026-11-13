@@ -10997,7 +10997,9 @@ html.stage-pinned[data-ui="modern"] header.top-bar { left: calc(var(--sp-5) + va
 /* Placed by js/ui/topbar.js: centred on the window unless a pill is in the way. */
 [data-ui="modern"] .street-nameplate.is-placed { left: var(--plate-x); transform: none; }
 /* Squeezed between the pills (a phone held sideways, js/ui/topbar.js nameplateLeft): under them, centred. */
-[data-ui="modern"] .street-nameplate.is-placed.is-under { top: calc(var(--hud-h) + var(--space-2)); left: 50%; transform: translateX(-50%); max-width: calc(100% - 2 * var(--hud-inset)); }
+/* Report #261: under the pills the name (or the quest pill, its Leave last) keeps clear of the Social rail
+   (--inset-r, js/ui/social-drawer.js) on both sides, so it stays centred; never under 12rem. */
+[data-ui="modern"] .street-nameplate.is-placed.is-under { top: calc(var(--hud-h) + var(--space-2)); left: 50%; transform: translateX(-50%); max-width: max(12rem, calc(100% - 2 * max(var(--hud-inset), var(--inset-r, 0px)))); }
 [data-ui="modern"] .street-nameplate #street-name { flex: 0 1 auto; min-width: 2em; overflow: hidden; text-overflow: ellipsis; }
 [data-ui="modern"] .street-nameplate .street-name-street { font-weight: var(--fw-heavy); }
 [data-ui="modern"] .street-nameplate .street-time-divider { margin: 0; color: var(--text-muted); }
@@ -11035,7 +11037,7 @@ html.stage-pinned[data-ui="modern"] header.top-bar { left: calc(var(--sp-5) + va
   [data-ui="modern"] .top-bar #mail-btn,
   [data-ui="modern"] .top-bar .hud-div { display: none; }
   [data-ui="modern"] .street-nameplate,
-  [data-ui="modern"] .street-nameplate.is-placed { top: calc(var(--hud-h) + var(--space-2)); left: 50%; transform: translateX(-50%); max-width: calc(100% - 2 * var(--hud-inset)); }
+  [data-ui="modern"] .street-nameplate.is-placed { top: calc(var(--hud-h) + var(--space-2)); left: 50%; transform: translateX(-50%); max-width: max(12rem, calc(100% - 2 * max(var(--hud-inset), var(--inset-r, 0px)))); }
   [data-ui="modern"] #buff-strip { top: calc(2 * var(--hud-h) + var(--space-4)); }
   /* The street map steps down under the nameplate too, or it covers the street's name. */
   [data-ui="modern"] .street-minimap { top: calc(2 * var(--hud-h) + var(--space-4)); }
@@ -13998,3 +14000,11 @@ body.is-booting .touch-controls { display: none; }
    on a phone the stack starts above them (js/touch-controls.js: the stick's 132 px corner over the pack). */
 :root.touch-phone #game-root .prompt-stack { bottom: calc(var(--pack-live-height, 72px) + env(safe-area-inset-bottom, 0px) + 132px + var(--space-2)); }
 /* end PHONE6 */
+/* Report #261: the pill sat on the quest pill too ("Winter Walk 11/15 motes [Leave]"), and on the name in
+   any window where the name drops under the pills (760 px or narrower, or squeezed: .is-under), phone or
+   not. It goes there in Modern, and in both skins while the name is a quest pill (a quest place, where the
+   project cannot be reached; the quest's caption and card open under it). The project stays in the Feat
+   panel (H), and on a phone the Menu. */
+@media (max-width: 760px) { [data-ui="modern"] #game-root #featured-project-pill { display: none; } }
+[data-ui="modern"] #game-root:has(#street-nameplate.is-under) #featured-project-pill,
+#game-root:has(#street-nameplate.is-quest) #featured-project-pill { display: none; }
