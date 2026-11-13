@@ -56,7 +56,7 @@ import {
   boxToScreen,
   midTowerRoomByTsid,
 } from '../tower-mid-rooms.js?v=678fdc50';
-import { touchWords } from '../touch-controls.js?v=34d558e1';
+import { touchWords } from '../touch-controls.js?v=6ae5adce';
 import { CLICK_ANYWHERE, HALL, HALL_ART, HALL_ART_ROOT, HALL_BUTTON_CLASS, HALL_WIDGET, WALL_BUTTON } from '../hall-rejected-concepts.js?v=30e5a21e';
 
 export const MID_TOWER_FEATURE_ID = 'mid-tower';

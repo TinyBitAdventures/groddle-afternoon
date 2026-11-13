@@ -54,7 +54,7 @@ import { createStreetMinimap, minimapVisibility, onStreetMapChange, sceneSignMar
 import { classicArtUrl } from '../classic/classic-art.js?v=5f713e7d';
 import { onUiModeChange } from '../classic/ui-mode.js?v=9705b783';
 import { focusBack } from '../ui/focus-return.js?v=da190597';
-import { isPhoneDevice } from '../touch-controls.js?v=34d558e1';
+import { isPhoneDevice } from '../touch-controls.js?v=6ae5adce';
 
 export const STREET_MINIMAP_FEATURE_ID = 'street-minimap';
 const UPDATE_MS = 100;

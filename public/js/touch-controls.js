@@ -17,7 +17,8 @@
  *   thumb" in the Menu's Settings group, kept on this device. On, the stick's corner grows to the
  *   lower left of the street (style.css LANDSCAPE-PANELS, data-float on #touch-controls): a thumb
  *   anywhere there places the stick and drags from it, and a quick tap there acts on the street as a
- *   tap anywhere else does (the thing under it, or a walk to that spot).
+ *   tap anywhere else does (the thing under it, or a walk to that spot). No stick rests in the corner
+ *   while it is on: the ring shows where the thumb lands and goes on release (style.css, not .is-held).
  */
 
 /** How far (CSS px) the knob travels from where the thumb landed. */

@@ -16,7 +16,7 @@ import {
   FLOAT_STICK_STORAGE_KEY,
   createFloatStick,
   parseFloatStick,
-} from '../public/js/touch-controls.js?v=34d558e1';
+} from '../public/js/touch-controls.js?v=6ae5adce';
 import { fakeControls, fakeEl } from './touch-fake-dom.js';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -136,6 +136,13 @@ describe('the wide corner and game.js', () => {
     assert.ok(at > 0);
     assert.match(rule, /\.touch-controls\[data-float="on"\] \.touch-stick \{\s*width: min\(45%, 360px\);\s*height: clamp\(132px, 100dvh - var\(--pack-live-height, 72px\) - var\(--hud-h\) - 96px, 300px\);/);
     assert.match(rule, /\.touch-controls\[data-float="on"\] \.touch-stick-base \{ left: 66px; top: calc\(100% - 66px\); \}/);
+  });
+  it('with data-float on, no ring rests in the corner: the stick shows only while a thumb is down (Austin 2026-11-13)', () => {
+    assert.match(rule, /\.touch-controls\[data-float="on"\] \.touch-stick:not\(\.is-held\) \.touch-stick-base \{ opacity: 0; transition: none; \}/);
+    // Off, the fixed stick rests in its corner as before.
+    assert.match(css, /\.touch-stick-base \{[^}]*opacity: 0\.72;/);
+    assert.match(css, /\.touch-stick\.is-held \.touch-stick-base \{ opacity: 1; \}/);
+    assert.doesNotMatch(css.replace(rule, ''), /\.touch-stick:not\(\.is-held\)/);
   });
   it('game.js gives the controls the setting, and a float tap on empty street walks', () => {
     assert.match(game, /floatStick: createFloatStick\(\{ win: window \}\),/);
