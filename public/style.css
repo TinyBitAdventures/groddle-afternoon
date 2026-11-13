@@ -14035,6 +14035,15 @@ body:has(#quest-dialogue:not([hidden])) .prompt-stack { z-index: calc(var(--z-mo
 .smm-sheet .street-minimap.is-phone-sheet .smm-hide,
 .smm-sheet .street-minimap.is-phone-sheet .smm-tab { display: none; }
 .smm-sheet .street-minimap.is-phone-sheet .smm-card { border-radius: var(--radius-m); overflow: visible; }
+/* READY: opened before its picture is in, the sheet holds a calm empty card of the map's size (never the
+   lines); the picture and marks fade in over it. */
+.smm-sheet .street-minimap.is-phone-sheet[data-ready="false"] { visibility: visible; opacity: 1; }
+.smm-sheet .street-minimap.is-phone-sheet[data-ready="false"] .smm-card { background: var(--surface-sunken); }
+.smm-sheet .street-minimap.is-phone-sheet[data-ready="false"] :is(.smm-window, .smm-marks, .smm-fog) { visibility: hidden; opacity: 0; }
+.smm-sheet .street-minimap.is-phone-sheet[data-ready="true"][data-fade="true"] :is(.smm-window, .smm-marks, .smm-fog) { transition: opacity var(--motion-med) var(--ease-out); }
+@media (prefers-reduced-motion: reduce) {
+  .smm-sheet .street-minimap.is-phone-sheet[data-ready="true"][data-fade="true"] :is(.smm-window, .smm-marks, .smm-fog) { transition: none; }
+}
 .smm-sheet-signs { flex: 0 1 auto; max-height: 38%; overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; touch-action: pan-y; }
 .smm-sheet-signs ul { display: flex; flex-direction: column; gap: var(--sp-2); margin: 0; padding: 0; list-style: none; }
 .smm-sheet-sign {

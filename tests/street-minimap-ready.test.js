@@ -187,7 +187,7 @@ describe('ART: the snapshot waits for the street\'s art, with a cap', () => {
     assert.ok(ART_SETTLE_MS >= 60 && ART_SETTLE_MS <= 250);
     assert.doesNotMatch(featSrc, /SNAP_AT_MS = \[900, 4000\]/, 'no fixed 0.9 s snapshot');
     assert.match(featSrc, /if \(state === 'shown'\) startArtCap\(engine\);/, 'the cap runs from when the map shows');
-    assert.match(featSrc, /a\.capped = true;[\s\S]{0,120}if \(view && !view\.ready\) snap\(engine\);/, 'the best snapshot at the cap');
+    assert.match(featSrc, /a\.capped = true;[\s\S]{0,400}else snap\(engine\);\s+\}, ART_CAP_MS\);/, 'the best snapshot at the cap');
     assert.match(featSrc, /a\.loaded = true;[\s\S]{0,400}if \(art === a\) snap\(engine\);/, 'and again once the art is in');
     assert.match(featSrc, /onLoaded\(src, done\);\s+onFailed\(src, done\);/, 'a failed image never holds the map back');
     assert.match(featSrc, /if \(!viewIsFor\(engine\.streetView, street\)\) return;/, 'snap never draws another street');
@@ -252,5 +252,32 @@ describe('REVISIT: a street walked back to shows its map at once', () => {
     assert.match(featSrc, /const cached = street && !rebuilt \? pictureCache\.get\(street\.tsid\) : null;/);
     assert.match(featSrc, /view\.setStreet\(street, \{ platforms: engine\.platforms \|\| \[\], keepPicture: rebuilt, cached \}\);[\s\S]{0,900}\} else startArt\(engine\);/, 'the art watch still runs on a hit');
     assert.match(featSrc, /street\.tsid && \(!art \|\| art\.loaded\)\) \{\s+pictureCache\.put\(street\.tsid, view\.pictureForCache\(\)\);/);
+  });
+});
+
+describe('READY in every scene: never left hidden', () => {
+  it('a scene with nothing to snap shows the lines at the cap; one with a view snaps', () => {
+    assert.match(featSrc, /if \(!view \|\| view\.ready\) return;\s+\/\/ Nothing to snap[^\n]*\n\s+if \(!viewIsFor\(engine\.streetView, street\)\) view\.reveal\(\);\s+else snap\(engine\);/);
+    assert.equal(viewIsFor({ children: [] }, { tsid: 'home' }), true, 'a live scene is watched and snapped');
+  });
+
+  it('the phone sheet opened early is a calm empty card of the map\'s size, the picture fading in over it', () => {
+    assert.match(css, /\.smm-sheet \.street-minimap\.is-phone-sheet\[data-ready="false"\] \{ visibility: visible; opacity: 1; \}/);
+    assert.match(css, /\.smm-sheet \.street-minimap\.is-phone-sheet\[data-ready="false"\] \.smm-card \{ background: var\(--surface-sunken\); \}/);
+    assert.match(css, /\.smm-sheet \.street-minimap\.is-phone-sheet\[data-ready="false"\] :is\(\.smm-window, \.smm-marks, \.smm-fog\) \{ visibility: hidden; opacity: 0; \}/);
+  });
+
+  it('fog_map keeps its wash and words over the picture; no_map stays hidden', () => {
+    const { view } = makeView();
+    view.setStreet(street('LF', { fogMap: true }));
+    view.setState('shown');
+    view.setPicture(fakeEl('canvas'));
+    assert.equal(view.root.dataset.fog, 'true');
+    assert.equal(view.root.querySelector('.smm-fog').hidden, false);
+    assert.equal(view.root.querySelector('.smm-fogwash').hidden, false);
+    const n = makeView();
+    n.view.setStreet(street('LN', { noMap: true }));
+    n.view.setState('no-map');
+    assert.equal(n.view.root.hidden, true);
   });
 });

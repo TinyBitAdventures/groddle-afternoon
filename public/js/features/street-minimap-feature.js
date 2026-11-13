@@ -23,6 +23,11 @@
  *   0.3 s after it settles, never more than once a second (resnapMiniMap's batching). The
  *   scene's own post (the signpost: Back to Ur and the friends' arms) shows as one signpost
  *   (sceneSignMarks), as location.is_home kept a home's posts (maybeAddSignpost).
+ * - READY in every scene: a live scene (home street, house, Tower floors, visits, instances, races)
+ *   is watched the same way (its own view and its kept entities) and snapped live; one with no view
+ *   to snap shows the lines at the cap, so the card is never left hidden. The phone sheet opened
+ *   before its picture is in shows a calm empty card (style.css PHONE MAP), never the lines. fog_map
+ *   keeps its wash and words over the picture (they fade in with it); no_map stays hidden.
  * - Ten times a second: your point, the other players here and the Rube. Other players are the
  *   realtime feature's (engine.query('minimapPlayers'), multiplayer) and solo's local companions
  *   when they are on (engine.localCompanions); items are the features' (engine.query('minimapItems'),
@@ -364,7 +369,10 @@ function startArtCap(engine) {
     if (art !== a || a.loaded) return;
     a.capped = true;
     engine.setData?.('streetMapArt', `capped:${a.left}`);
-    if (view && !view.ready) snap(engine);
+    if (!view || view.ready) return;
+    // Nothing to snap (a scene with no view of its own): the lines, so the rule never leaves a map hidden.
+    if (!viewIsFor(engine.streetView, street)) view.reveal();
+    else snap(engine);
   }, ART_CAP_MS);
 }
 
