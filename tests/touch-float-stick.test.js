@@ -16,7 +16,7 @@ import {
   FLOAT_STICK_STORAGE_KEY,
   createFloatStick,
   parseFloatStick,
-} from '../public/js/touch-controls.js?v=d65f8c10';
+} from '../public/js/touch-controls.js?v=34d558e1';
 import { fakeControls, fakeEl } from './touch-fake-dom.js';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');

@@ -139,6 +139,67 @@ export function installFloatStickSwitch(doc, setting) {
   return row;
 }
 
+/**
+ * FLOAT STICK (Austin's iPhone, 2026-11-13: "Under settings I just see zoom and Night tint"): the switch
+ * went in once, when the controls were built, and gave up when the Menu's Settings group was not there
+ * yet. This keeps it there however the Menu is built or rebuilt: it goes in now if it can, when the
+ * Settings group appears or is rebuilt (a watch on the page), and again as the Menu opens. One row only
+ * (installFloatStickSwitch checks its id). Returns { row(), ensure(), destroy() }.
+ */
+export function keepFloatStickSwitch(doc, setting, { win = globalThis.window } = {}) {
+  if (!doc || !setting) return { row: () => null, ensure: () => null, destroy() {} };
+  let row = null;
+  // The switch's input holds the id; the row is its label.
+  const current = () => {
+    const input = doc.getElementById?.('menu-float-stick');
+    return input ? input.closest?.('.menu-float-stick') || input : null;
+  };
+  const ensure = () => {
+    const there = current();
+    // A rebuilt Settings group dropped the old row (or it never went in): put it back.
+    if (there && there.isConnected !== false) return (row = there);
+    row = installFloatStickSwitch(doc, setting) || null;
+    return row;
+  };
+  ensure();
+  // The watch: the Menu's list once it is there (the page's own changes never wake it), the page until then.
+  let watch = null;
+  let watching = null;
+  const Observer = win?.MutationObserver || globalThis.MutationObserver;
+  const look = () => {
+    const list = doc.getElementById?.('more-list') || null;
+    const settings = doc.querySelector?.('#more-list [data-menu-group="settings"]');
+    if (settings && !settings.querySelector?.('#menu-float-stick')) ensure();
+    const target = list || doc.body || doc.documentElement;
+    if (watch && target && target !== watching) {
+      watch.disconnect();
+      watch.observe(target, { childList: true, subtree: true });
+      watching = target;
+    }
+  };
+  if (typeof Observer === 'function') {
+    watch = new Observer(look);
+    look();
+  }
+  // The Menu opening: the last chance before a player looks (capture, ahead of the Menu's own click).
+  const onOpen = (e) => {
+    if (!e?.target?.closest?.('#more-btn')) return;
+    ensure();
+    if (watch) look();
+  };
+  doc.addEventListener?.('click', onOpen, true);
+  return {
+    row: () => row,
+    ensure,
+    destroy() {
+      watch?.disconnect?.();
+      doc.removeEventListener?.('click', onOpen, true);
+      (current() || row)?.remove?.();
+      row = null;
+    },
+  };
+}
+
 /** A tap on the stick's corner shorter than this (ms) that never moved it goes to the street behind. */
 export const STICK_TAP_MS = 300;
 
@@ -230,7 +291,7 @@ export function installTouchControls({ root, press, release, jump, tapThrough = 
   };
   drawFloat();
   const offFloat = floatStick?.onChange?.(drawFloat);
-  const floatSwitch = installFloatStickSwitch(doc, floatStick);
+  const floatSwitch = keepFloatStickSwitch(doc, floatStick, { win });
 
   let stickId = null;
   let origin = null;
@@ -370,7 +431,7 @@ export function installTouchControls({ root, press, release, jump, tapThrough = 
       win.removeEventListener('blur', releaseAll);
       keyboard.destroy();
       if (typeof offFloat === 'function') offFloat();
-      floatSwitch?.remove?.();
+      floatSwitch?.destroy?.();
       el.remove();
       doc.documentElement.classList.remove('touch-phone');
     },
