@@ -24,7 +24,7 @@ import {
   subwayPoints,
   subwaySegments,
   worldRegionList,
-} from '../public/js/map-views.js?v=da4c16ef';
+} from '../public/js/map-views.js?v=67e2a94a';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const read = (p) => readFileSync(join(root, p), 'utf8');
@@ -161,7 +161,7 @@ describe('the Map window offers the three views (HubMapDialog.as)', () => {
     assert.match(game, /function closeMap\(\) \{[\s\S]*?mapPanelView = 'hub';/);
     // A station opens the street menu of its street above ground, a region opens its map.
     assert.match(game, /onStop: \(e, st\) => \{[\s\S]*?openMapStreetMenu\(canvas, e, street/);
-    assert.match(game, /bindWorldMap\(canvas, \{ touch, onOpen: \(id\) => openMap\(id\) \}\)/);
+    assert.match(game, /bindWorldMap\(canvas, \{ touch, onOpen: \(id\) => openMap\(id\), onPreview: /);
   });
 
   it('Classic draws them as the 2012 window\'s small grey buttons, in its own lane block', () => {

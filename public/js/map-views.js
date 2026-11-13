@@ -99,9 +99,12 @@ export function renderWorldMapSvg(regions, { youHubId = '', world = WORLD_MAP } 
 
 /**
  * Hover cards and clicks on a drawn world map. onOpen(hubId) opens a region's map. touch: the
- * first tap on a region shows its card, a second opens it. QA: canvas data worldCard <hub id>.
+ * first tap on a region shows its card, a second opens it. onPreview(hubId, how) runs when a card
+ * shows (how: 'pointer' a hover, 'focus' the keyboard, 'tap' a phone's first tap) and onPreview('')
+ * when it goes (MAPLOAD: game.js fetches the region's painting ahead of the click,
+ * js/map-bg-preload.js). QA: canvas data worldCard <hub id>.
  */
-export function bindWorldMap(canvas, { onOpen, touch = false, regions = WORLD_MAP.regions } = {}) {
+export function bindWorldMap(canvas, { onOpen, onPreview, touch = false, regions = WORLD_MAP.regions } = {}) {
   const svg = canvas?.querySelector('svg.world-map-svg');
   if (!svg) return null;
   const layer = svg.querySelector('.world-card-layer');
@@ -121,6 +124,7 @@ export function bindWorldMap(canvas, { onOpen, touch = false, regions = WORLD_MA
     // The client faded the star while its region's card was up (worldMapHoverHandler 357-366).
     if (star) star.classList.toggle('is-hidden', svg.querySelector(`.world-region[data-hub="${id}"]`)?.classList.contains('is-you') || false);
     canvas.dataset.worldCard = id;
+    onPreview?.(id, by);
   };
   const hide = (id) => {
     if (id && shown !== id) return;
@@ -129,6 +133,7 @@ export function bindWorldMap(canvas, { onOpen, touch = false, regions = WORLD_MA
     layer.innerHTML = '';
     star?.classList.remove('is-hidden');
     delete canvas.dataset.worldCard;
+    onPreview?.('');
   };
   // A tap or click on the sea or a closed region puts the card away.
   svg.addEventListener('click', (e) => { if (!e.target?.closest?.('.world-region.is-open')) hide(); });
@@ -144,7 +149,7 @@ export function bindWorldMap(canvas, { onOpen, touch = false, regions = WORLD_MA
     g.addEventListener('blur', () => { if (shownBy === 'focus') hide(id); });
     g.addEventListener('click', () => {
       if (tapFirst() && shown !== id) {
-        show(id);
+        show(id, 'tap');
         return;
       }
       onOpen?.(id);

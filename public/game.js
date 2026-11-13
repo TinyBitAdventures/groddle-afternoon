@@ -973,7 +973,9 @@ import {
   PUBLIC_HUBS,
 } from './js/map-graph.js?v=dc070b88';
 // G471: the world map and the subway map in the Map's window.
-import { MAP_VIEW_TITLES, bindSubwayMap, bindWorldMap, mapViewSubtitle, nearestStation, renderSubwayMapSvg, renderWorldMapSvg, worldRegionList } from './js/map-views.js?v=da4c16ef';
+import { MAP_VIEW_TITLES, bindSubwayMap, bindWorldMap, mapViewSubtitle, nearestStation, renderSubwayMapSvg, renderWorldMapSvg, worldRegionList } from './js/map-views.js?v=67e2a94a';
+// MAPLOAD: a region's painting fetched ahead of the click.
+import { createMapBgPreloader, mapBgFiles, prepareMapBg } from './js/map-bg-preload.js?v=fbd98bc7';
 import { hubMapArtNote, hubMapSubtitle, questLogSummary } from './js/panel-copy.js?v=85c3e029';
 import { bindMapIconTips } from './js/ui/map-icon-tips.js?v=6b3eb3f9';
 import { createMapZoom } from './js/map-zoom.js?v=4c2ce0e3';
@@ -1083,6 +1085,16 @@ let mapTrail = [];
 /** G471: the Map's view (js/map-views.js MAP_VIEWS) and the subway view's line. QA: canvas data mapView. */
 let mapPanelView = 'hub';
 let subwayMapDirection = 'forwards';
+/**
+ * MAPLOAD (Austin 2026-11-13): the scale the Map last drew at (fitMapCanvas; on a 1x screen it picks
+ * the painting's size), and the region paintings fetched ahead of a click (js/map-bg-preload.js), with
+ * the region's map data beside each.
+ */
+let mapFitScale = 0;
+const mapBgLoader = createMapBgPreloader({
+  files: (hubId) => mapBgFiles(hubId, { dpr: globalThis.devicePixelRatio, fitScale: mapFitScale, mapIndex: mapIndexCache }),
+  onPreload: (hubId) => loadHubMapData(hubId).catch(() => {}),
+});
 
 async function ensureMapIndex() {
   if (mapIndexCache) return mapIndexCache;
@@ -25708,6 +25720,8 @@ async function openMap(hubId, { find = '', focus = '', view: pickedView = '' } =
 
   // "You" on the hub map: the current street, or the street that stands for it (spot.tsid).
   const view = buildHubMapView(hubData, spot.hubId === targetHub ? spot.tsid : currentStreetTsid, STREET_INDEX.streets);
+  // MAPLOAD: the painting at the size this screen draws (the one a preload fetched).
+  prepareMapBg(view, { dpr: globalThis.devicePixelRatio, fitScale: mapFitScale });
   // Ticket 66: streets still under construction show it before you try to go (map-graph.js `building`).
   let building = 0;
   for (const st of view.streets || []) {
@@ -25852,7 +25866,8 @@ function showMapView(which, { panel, canvas, title, sub, spot, mapIndex }) {
   if (which === 'world') {
     const regions = worldRegionList(mapIndex, PUBLIC_HUBS);
     canvas.innerHTML = renderWorldMapSvg(regions, { youHubId: spot.hubId });
-    bindWorldMap(canvas, { touch, onOpen: (id) => openMap(id) });
+    // MAPLOAD: a region's painting is fetched once its card has been up a moment, at once on a phone's first tap.
+    bindWorldMap(canvas, { touch, onOpen: (id) => openMap(id), onPreview: (id, how) => mapBgLoader.preview(id, { now: how === 'tap' }) });
     subLine = mapViewSubtitle('world', { touch, regions });
   } else {
     const here = nearestStation(spot);
@@ -25866,6 +25881,8 @@ function showMapView(which, { panel, canvas, title, sub, spot, mapIndex }) {
       onStop: (e, st) => {
         const street = { tsid: st.surfaceStreetTsid, label: st.surfaceLabel, hubId: st.surfaceHubId, hubName: st.hubName };
         openMapStreetMenu(canvas, e, street, { here: st.surfaceStreetTsid === currentStreetTsid });
+        // MAPLOAD: the station's region, ready for its name's click into its map.
+        mapBgLoader.preload(st.surfaceHubId);
       },
       onHub: (st) => openMap(st.surfaceHubId, { find: st.surfaceStreetTsid }),
     });
@@ -25886,6 +25903,8 @@ function showMapView(which, { panel, canvas, title, sub, spot, mapIndex }) {
   arrangeMapCards(panel);
   panel.hidden = false;
   fitMapCanvas(panel);
+  // MAPLOAD: your own region's painting, ready for the click back into it (after the fit, which picks its size).
+  if (which === 'world') mapBgLoader.preload(spot.hubId);
 }
 
 /**
@@ -25984,6 +26003,7 @@ function fitMapCanvas(panel = document.getElementById('map-panel')) {
     }
     const soft = canvas.querySelector('image.map-bg-soft[data-hi]');
     if (soft && fit.scale * (Number(globalThis.devicePixelRatio) || 1) > 1.01) soft.setAttribute('href', soft.dataset.hi);
+    mapFitScale = fit.scale;
     setCanvasData('mapFit', `${fit.w}x${fit.h}@${fit.scale.toFixed(2)}${fit.compact ? ' compact' : ''}`);
   } finally {
     mapFitBusy = false;
