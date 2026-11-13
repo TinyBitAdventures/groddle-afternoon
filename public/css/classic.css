@@ -3201,8 +3201,8 @@
   overscroll-behavior: contain;
 }
 :root[data-ui="classic"] .top-bar #more-list[data-more-below] {
-  -webkit-mask-image: linear-gradient(to bottom, var(--c-black) calc(100% - 40px), transparent);
-  mask-image: linear-gradient(to bottom, var(--c-black) calc(100% - 40px), transparent);
+  -webkit-mask-image: linear-gradient(to bottom, var(--c-classic-ink) calc(100% - 40px), transparent);
+  mask-image: linear-gradient(to bottom, var(--c-classic-ink) calc(100% - 40px), transparent);
 }
 /* === end rep13 === */
 

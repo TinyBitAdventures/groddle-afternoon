@@ -3,6 +3,8 @@
  * running buff could not be watched. The modern skin's strip stands beside the sheet, as the quest
  * tracker does; Classic's windows sit in the middle of the world and leave it in sight, unchanged.
  * Screenshots of 1280, 800, 640, 390 and 340 px and of Classic were looked at (lane report).
+ * Report #286: Classic's one rule for the strip puts it right of the energy line, as the client did
+ * (BuffViewManager.as 116-119); it never follows an open sheet.
  */
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
@@ -42,9 +44,16 @@ describe('the buff strip and an open side sheet', () => {
     assert.match(block, /flex-direction: column/);
   });
 
-  it('leaves Classic alone: it pins the inset to 0 and has no rule of its own for the strip', () => {
+  it('leaves Classic alone with a sheet open: it pins the inset to 0, and its one strip rule (#286) never follows a sheet', () => {
     assert.match(classic, /--inset-l: 0px !important/);
-    assert.ok(!/buff-strip/.test(classic));
+    // #286: the one Classic rule, right of the energy line (BuffViewManager.as 116-119), not tied to a sheet.
+    const rules = classic.split('\n').filter((l) => /buff-strip/.test(l) && /\{/.test(l));
+    assert.deepEqual(rules, [':root[data-ui="classic"] #game-root #buff-strip {']);
+    const at = classic.indexOf(rules[0]);
+    const body = classic.slice(at, classic.indexOf('}', at));
+    assert.match(body, /left: calc\(var\(--classic-buffs-x, calc\(150 \* var\(--cu\)\)\) \+ 13 \* var\(--cu\)\);/);
+    assert.doesNotMatch(body, /--inset-l|--inset-r|data-sheet/);
+    assert.ok(!/\[data-sheet\][^{]*#buff-strip/.test(classic));
     assert.ok(!/\[data-sheet\] #buff-strip/.test(css.replace(/\[data-ui="modern"\][^\n]*#buff-strip[^\n]*/g, '')));
   });
 });

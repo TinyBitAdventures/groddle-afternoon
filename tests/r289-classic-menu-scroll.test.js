@@ -19,7 +19,7 @@ describe('report #289: the Classic Menu reaches Sign out at any height', () => {
     assert.match(block, /:root\[data-ui="classic"\] \.top-bar #more-list \{\s*box-sizing: border-box;\s*max-height: calc\(100dvh - 34 \* var\(--cu\) - 16px\);\s*overflow-y: auto;\s*overscroll-behavior: contain;/);
   });
   it('fades its foot while rows wait below, with WebKit\'s prefix', () => {
-    assert.match(block, /:root\[data-ui="classic"\] \.top-bar #more-list\[data-more-below\] \{\n\s*-webkit-mask-image: linear-gradient\(to bottom, var\(--c-black\) calc\(100% - 40px\), transparent\);\n\s*mask-image:/);
+    assert.match(block, /:root\[data-ui="classic"\] \.top-bar #more-list\[data-more-below\] \{\n\s*-webkit-mask-image: linear-gradient\(to bottom, var\(--c-classic-ink\) calc\(100% - 40px\), transparent\);\n\s*mask-image:/);
   });
   it('the mark is set for either skin (installMenu runs for both)', () => {
     assert.match(topbar, /const more = !list\.hidden && list\.scrollHeight - list\.scrollTop - list\.clientHeight > 4;/);
