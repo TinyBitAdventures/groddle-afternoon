@@ -35,8 +35,13 @@
  * command: a stuck player asked a guide, whose /link and god teleports are
  * staff-only above). It puts you back where you arrived on the street you
  * are on (the signpost or door you came through, else the street's own
- * arrival), or at the door at home. Once every 5 minutes; not in a race, a
- * timed quest room or a Paradise course (they have Leave), not while dead
+ * arrival), or at the door at home. Once every 5 minutes. In a quest room it
+ * takes you out, back where you came in, as Glitch's "Are you stuck? Do you
+ * want to leave this place?" did (players/inc_instances.js 322-357,
+ * instances_left with force): an unfinished quest ends as the room's Leave
+ * ends it (Austin 2026-11-12: "They should still be able to use /stuck"); no
+ * cooldown for that. Not in a race, a Paradise course or the other places that
+ * have their own Leave, not while dead
  * (Hell's grapes are the way out, items/bunch_of_grapes_hell.js), not in the
  * middle of something. It never moves you anywhere you had not already been
  * on that street, so it skips nothing the street gates.
@@ -70,6 +75,9 @@ export const SLASH_TEXT = Object.freeze({
 export const STUCK_TEXT = Object.freeze({
   done: "You're back where you arrived on this street.",
   doneHome: "You're back at the door.",
+  /** In a quest room: out, back where you came in (quest-instances-feature questRoomLeave). */
+  doneQuestRoom: "You're out of the quest room, back where you came in. An unfinished quest ends when you leave its room.",
+  doneQuestRoomSolved: "You're out of the quest room, back where you came in.",
   leave: "/stuck doesn't work here. Use Leave to get out.",
   dead: "You are dead. Squish Hellish Grapes to get out of Naraka.",
   /** G528: once, on a floor a plain jump doesn't get off. */
@@ -228,7 +236,8 @@ function travelBlock(ctx) {
  *                                    'inside' | 'outside' | 'return' |
  *                                    'house-from-tower' | 'tower'
  *   { command, butler: true }        the Butler IMs you
- *   { command, stuck: 'arrival' | 'home-door' | 'tower-door' }  /stuck's move
+ *   { command, stuck: 'arrival' | 'home-door' | 'tower-door' | 'quest-room' }  /stuck's move
+ * ctx.questRoom: the quest room you are in ({ title, solved }), else null.
  *   { command, silent: true }        the source returns without a word
  */
 export function slashPlan(text, ctx = {}) {
@@ -267,9 +276,11 @@ export function slashPlan(text, ctx = {}) {
     case '/butler':
       return ctx.butlerOwned ? { command, butler: true } : { command, silent: true };
     case '/stuck': {
-      if (ctx.instance) return { command, say: STUCK_TEXT.leave };
       if (ctx.dead) return { command, say: STUCK_TEXT.dead };
       if (ctx.busy) return { command, say: SLASH_TEXT.busy };
+      // A quest room: out the way its "Are you stuck?" prompt's Yes did (header), no cooldown.
+      if (ctx.questRoom) return { command, stuck: 'quest-room' };
+      if (ctx.instance) return { command, say: STUCK_TEXT.leave };
       if (ctx.stuckWaitMs > 0) return { command, say: STUCK_TEXT.wait(ctx.stuckWaitMs) };
       if (home.inHome) return { command, stuck: ctx.onTowerFloor ? 'tower-door' : 'home-door' };
       return { command, stuck: 'arrival' };

@@ -401,7 +401,7 @@ describe('MAPZOOM: wheel, drag, click and buttons on a real hub (Chrome)', { ski
 
 describe('MAPZOOM: the hold-? sheet says so', () => {
   it('a Map Zoom row beside Show Map', async () => {
-    const { hotkeySections, hotkeyText } = await import('../public/js/client-hotkeys.js?v=31d1891d');
+    const { hotkeySections, hotkeyText } = await import('../public/js/client-hotkeys.js?v=2922915e');
     const rows = hotkeySections().find((s) => s.title === 'Interface').rows;
     const at = rows.findIndex(([label]) => label === 'Show Map');
     assert.equal(rows[at + 1][0], 'Map Zoom');

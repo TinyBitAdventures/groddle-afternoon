@@ -12,7 +12,15 @@
  *   Penpersonship and a Quill.
  * - Every jump asks the host travelGate first, so the Hell feature's rules
  *   hold: the dead only move within Naraka, nobody teleports into Naraka, and
- *   Pooped blocks teleporting. Transient quest rooms keep their own exits.
+ *   Pooped blocks teleporting.
+ * - A quest room (features/quest-instances-feature.js) can be teleported out of, as Glitch
+ *   allowed: teleportation_can_teleport (players/inc_teleportation.js 126-171) checks only
+ *   the target, and teleportation_teleport 362-366 leaves the instance (instances_left with
+ *   no_auto_return) so you land on the target; arriving outside runs the quest's
+ *   onExitLocation (quests/quest_scripting.js 11-20), which fails an unfinished quest
+ *   (btc_room_3.js 67-76), as the room's Leave does. Saving a point there stays refused
+ *   (can_set_target 313), as does summoning (can_summon 777). The other places the game
+ *   holds you (races, Paradise, party spaces, the older rooms in game.js) keep their own exits.
  * - The jump plays a one-second shimmer (the source hit1 animation before
  *   teleportToLocationDelayed), then engine.enter() lands on the saved x/y.
  *
@@ -283,13 +291,20 @@ function destroyWarpFx(engine, fx) {
 /* Jumps                                                               */
 /* ------------------------------------------------------------------ */
 
-/** Shared checks before any jump: quest rooms, then the host travel gate. */
+/** A quest room the jump will leave (quest-instances-feature questRoomHere), else null. */
+const questRoomHere = (engine) => engine.query?.('questRoomHere', engine) || null;
+
+/** Held where teleporting waits: any instance but a quest room, which a jump leaves (header). */
+const noExit = (engine) => engine.transientInstance() && !questRoomHere(engine);
+
+/** Shared checks before any jump: held places, then the host travel gate. */
 function preflight(engine, target) {
   if (pending || arrival) return { ok: false, msg: 'You are already teleporting.' };
-  if (engine.transientInstance()) return { ok: false, msg: NO_EXIT };
+  if (noExit(engine)) return { ok: false, msg: NO_EXIT };
   if (target?.tsid) {
     // via 'teleport': teleportation_can_teleport (players/inc_teleportation.js 126, 219-223) refuses a street still being built.
-    const gate = engine.travelGate(target.tsid, { via: 'teleport' });
+    // leavesQuestRoom: the quest room's own travel gate lets a teleport go (land leaves it first).
+    const gate = engine.travelGate(target.tsid, { via: 'teleport', leavesQuestRoom: true });
     if (!gate.ok) return { ok: false, msg: gate.msg || 'You cannot teleport right now.' };
   }
   return { ok: true };
@@ -424,7 +439,9 @@ async function land(engine) {
   arrival = warp;
   publish(engine);
   try {
-    await engine.enter(warp.target.tsid, { spawnX: warp.target.x, spawnY: warp.target.y });
+    // From a quest room: leave it as its Leave does, landing on the target (header).
+    const left = questRoomHere(engine) ? await engine.query('questRoomLeave', engine, { to: warp.target }) : false;
+    if (!left) await engine.enter(warp.target.tsid, { spawnX: warp.target.x, spawnY: warp.target.y });
   } catch (err) {
     console.error(err);
     arrival = null;
@@ -838,7 +855,7 @@ export const teleportationFeature = {
       const script = scriptAt(engine, scriptCopy(engine, opts.copy));
       if (script) {
         const check = useScript(state, script, ctx);
-        const reason = engine.transientInstance() ? NO_EXIT : check.ok ? '' : check.error;
+        const reason = noExit(engine) ? NO_EXIT : check.ok ? '' : check.error;
         const cost = script.imbued ? 0 : teleportEnergyCost(ctx.learned, ctx.tank) || 0;
         verbs.push({
           id: 'use',

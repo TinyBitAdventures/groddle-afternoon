@@ -9,8 +9,8 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { PLAYER_COMMANDS, REMAKE_COMMANDS, SLASH_TEXT, STUCK_COOLDOWN_MS, STUCK_TEXT, slashPlan } from '../public/js/slash-commands.js?v=8533e143';
-import { slashCommandsFeature } from '../public/js/features/slash-commands-feature.js?v=cdbf0410';
+import { PLAYER_COMMANDS, REMAKE_COMMANDS, SLASH_TEXT, STUCK_COOLDOWN_MS, STUCK_TEXT, slashPlan } from '../public/js/slash-commands.js?v=ec0e84ee';
+import { slashCommandsFeature } from '../public/js/features/slash-commands-feature.js?v=3ac287a1';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const game = readFileSync(join(root, 'public/game.js'), 'utf8');
@@ -60,7 +60,7 @@ describe('/stuck rules (js/slash-commands.js)', () => {
     assert.deepEqual(slashPlan('/stuck', { home: { owned: true, inHome: true, room: 'interior' }, onTowerFloor: true }), { command: '/stuck', stuck: 'tower-door' });
   });
 
-  it('refuses in a race, a timed quest room or a Paradise course (Leave), dead in Hell (the grapes), or busy', () => {
+  it('refuses in a race, a Paradise course or another held place that is not a quest room (Leave; tests/quest-room-exits.test.js), dead in Hell (the grapes), or busy', () => {
     assert.equal(slashPlan('/stuck', { home: AWAY, instance: true }).say, STUCK_TEXT.leave);
     assert.match(STUCK_TEXT.leave, /Use Leave/);
     assert.equal(slashPlan('/stuck', { home: AWAY, dead: true }).say, STUCK_TEXT.dead);

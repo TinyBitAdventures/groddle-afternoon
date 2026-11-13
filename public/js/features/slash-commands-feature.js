@@ -26,9 +26,11 @@
  *   or door you came through, else the street's own arrival), standing on the
  *   floor, with the street's event physics dropped and its launch pads re-armed
  *   (location-events-feature stuck: reports #194, #198), or at home to the door
- *   (house, home street or tower floor). Once
+ *   (house, home street or tower floor). In a quest room it leaves the room, back
+ *   where you came in, as the room's Leave does (an unfinished quest ends; Austin
+ *   2026-11-12), with no cooldown. Otherwise once
  *   every 5 minutes (saved, so a reload does not reset it); refused with its
- *   reason in a race, a timed quest room or a Paradise course (Leave), dead in
+ *   reason in a race, a Paradise course or another place with its own Leave, dead in
  *   Hell (the grapes), or busy. Online it is a move on the same street like any
  *   step: the realtime server shares it as it shares every move (hub.go "move").
  *   G528: the first time you stand 12 s on a floor a plain jump can't leave
@@ -50,17 +52,17 @@
  *
  * QA: type the commands into Local chat. Canvas data: slashLast
  *     (`<command>:<outcome>`, `/tp:<kind>:<outcome>` once a /tp is answered,
- *     `/stuck:<arrival|street|home-door|tower-door|refused|failed>`),
+ *     `/stuck:<arrival|street|home-door|tower-door|quest-room|refused|failed>`),
  *     slashLine (the last line shown).
  */
 
 import { BUTLER_STRINGS } from '../butler.js?v=a660e585';
-import { butlerApi } from './butler-feature.js?v=6bb4e28d';
+import { butlerApi } from './butler-feature.js?v=fb85a22b';
 import { hellFeature } from './hell-feature.js?v=facbdc94';
 import { locationEventsApi } from './location-events-feature.js?v=0cda70ed';
 import { towerApi } from './home-tower-feature.js?v=21ad5e67';
 import { platformYAt, platformsScreen } from '../street-model.js?v=b6cb6a4e';
-import { COMMAND_HELP_INTRO, STUCK_COOLDOWN_MS, STUCK_TEXT, bareCommand, commandHelpLines, commandHint, isCommandHelp, misplacedCommand, slashPlan, strayLetterCommand, unknownLine } from '../slash-commands.js?v=8533e143';
+import { COMMAND_HELP_INTRO, STUCK_COOLDOWN_MS, STUCK_TEXT, bareCommand, commandHelpLines, commandHint, isCommandHelp, misplacedCommand, slashPlan, strayLetterCommand, unknownLine } from '../slash-commands.js?v=ec0e84ee';
 import { parseTp, runTeleportCommand, TP_TEXT } from '../admin-teleport.js?v=fa56e8df';
 import { minnUrls } from '../minn-account.js?v=c15f0ecf';
 import { saveStore } from '../save-store.js?v=04420633';
@@ -110,6 +112,7 @@ export function slashContext(engine) {
     dead: hellFeature.isDead?.() === true,
     busy: engine.acting?.() === true,
     instance: engine.transientInstance?.() === true,
+    questRoom: engine.query?.('questRoomHere', engine) || null,
     butlerOwned: butlerApi.owned?.() === true,
     stuckWaitMs: Math.max(0, stuckAt + STUCK_COOLDOWN_MS - now()),
   };
@@ -197,6 +200,20 @@ function stuckHintTick(engine) {
 /** /stuck's move: the street's arrival, or the door at home. */
 async function stuck(engine, plan) {
   let result;
+  if (plan.stuck === 'quest-room') {
+    // Out of the quest room as its Leave does (quest-instances-feature questRoomLeave); no cooldown.
+    const room = engine.query?.('questRoomHere', engine);
+    result = await engine.query?.('questRoomLeave', engine, { transition: engine.param?.('questfx') !== '0' });
+    if (!result) {
+      last = '/stuck:failed:quest-room';
+      publish(engine);
+      return;
+    }
+    activity(engine, room?.solved ? STUCK_TEXT.doneQuestRoomSolved : STUCK_TEXT.doneQuestRoom);
+    last = '/stuck:quest-room';
+    publish(engine);
+    return;
+  }
   if (plan.stuck === 'tower-door') result = await towerApi.goToFloor(engine, towerApi.currentFloor?.() ?? 0, 'door');
   else if (plan.stuck === 'home-door') result = await engine.refreshHomeScene?.({ arrive: 'door', spawnX: undefined });
   else result = engine.stuckReturn?.();

@@ -28,6 +28,10 @@
  *    (the tower chain, location.js 443-456). Three have no source fail that
  *    leaves a way back, so they keep the remake's giver prompt
  *    (RETRY_PROMPT_QUESTS, maybeOfferRetry); see register G313.
+ *  - Austin 2026-11-12: /stuck and teleporting leave a room too, as its Leave does
+ *    (questRoomHere, questRoomLeave): /stuck back where you came in, as the source's
+ *    "Are you stuck?" did; a teleport onto its target (inc_teleportation.js 362-366,
+ *    quest_scripting.js 11-20 onExitLocation). See tests/quest-room-exits.test.js.
  *
  * Room module contract (all optional except id/title/build or street):
  *   { id, title, kicker, icon, theme, durationMs | durationFor(questId),
@@ -169,7 +173,7 @@ const ROOM_MODULES = {
   an_autumn_day: () => import('../quest-rooms/an-autumn-day.js?v=bffa2879'),
   being_watched: () => import('../quest-rooms/being-watched.js?v=227cc8dd'),
   back_alley: () => import('../quest-rooms/back-alley.js?v=6e5730a6'),
-  clubhouse: () => import('../quest-rooms/clubhouse.js?v=ba13db76'),
+  clubhouse: () => import('../quest-rooms/clubhouse.js?v=c05ce9f4'),
   light_perspective: () => import('../quest-rooms/light-perspective.js?v=659430b1'),
   tile_puzzle: () => import('../quest-rooms/tile-puzzle.js?v=0e1a045c'),
   operation_grow: () => import('../quest-rooms/operation-grow.js?v=62208fb4'),
@@ -1186,7 +1190,9 @@ async function leaveInstance(engine, opts = {}) {
   restorePlayerScale(engine);
   room?.clear?.(ctx);
   clearContextEntities(engine);
-  const back = result.returnTo || save.returnTo;
+  // A teleport out (opts.to) lands on its own target, not back where you came in.
+  const to = opts.to?.tsid ? opts.to : null;
+  const back = to || result.returnTo || save.returnTo;
   run = null;
   const leftRoom = room;
   room = null;
@@ -1200,12 +1206,13 @@ async function leaveInstance(engine, opts = {}) {
   engine.setData('qiStatus', 'left');
   engine.setData('qiOutcome', result.outcome);
   const go = async (useTransition = false) => {
-    if (back?.tsid) await engine.enter(back.tsid, { spawnX: back.x, spawnY: back.y, quiet: true, bypassFeatureGates: true, useTransition });
+    if (to) await engine.enter(to.tsid, { spawnX: to.x, spawnY: to.y });
+    else if (back?.tsid) await engine.enter(back.tsid, { spawnX: back.x, spawnY: back.y, quiet: true, bypassFeatureGates: true, useTransition });
   };
   // Back to a street: the street's own loading card (its name, hub and picture), as any travel shows.
   // Back home: the quest's card, named for the home place. Never a card with no name ("An Unknown Area").
   const home = back?.tsid === HOME_STREET_TSID || back?.tsid === HOME_INTERIOR_TSID;
-  if (opts.transition === false || !back?.tsid) await go();
+  if (opts.transition === false || !back?.tsid || to) await go();
   else if (home) await withTransition(engine, back.tsid === HOME_INTERIOR_TSID ? 'Your House' : 'Your Home Street', leftRoom?.theme, () => go());
   else await go(true);
   publish(engine, true);
@@ -1516,8 +1523,24 @@ export const questInstancesFeature = {
   },
 
   travelGate(tsid, engine, meta = {}) {
-    if (!run || meta?.bypass) return null;
+    // A teleport may leave (features/teleportation-feature.js land runs questRoomLeave with `to`).
+    if (!run || meta?.bypass || meta?.leavesQuestRoom) return null;
     return { ok: false, msg: room?.travelText || "You can't travel from here. Use Leave to go back." };
+  },
+
+  /** The open quest room, for /stuck and teleporting (features/slash-commands-feature.js, teleportation-feature.js), else null. */
+  questRoomHere() {
+    return run ? { title: room?.title || '', solved: run.status === 'solved' } : null;
+  },
+
+  /**
+   * Leave the open quest room as its Leave button does (an unfinished quest fails, or keeps
+   * its room's own hook). `to`: a teleport's target, entered instead of the way back
+   * (inc_teleportation.js teleportation_teleport 362-366, instances_left no_auto_return).
+   * Answers the leave's promise, or null with no room open.
+   */
+  questRoomLeave(engine, opts = {}) {
+    return run ? leaveInstance(engine, opts) : null;
   },
 
   /** Street-based rooms keep only what the room spawns (no fallback animals). */

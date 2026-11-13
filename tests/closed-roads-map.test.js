@@ -69,7 +69,7 @@ describe('ticket 37: a road under construction says what is true', () => {
     assert.match(feature, /if \(!catalog \|\| !\['signpost', 'door', 'teleport'\]\.includes\(via\)\) return null;/);
     assert.match(feature, /streetUnderConstruction\(tsid, engine\) \{/);
     assert.doesNotMatch(feature, /or use the Map/);
-    assert.match(read('public/js/features/teleportation-feature.js'), /engine\.travelGate\(target\.tsid, \{ via: 'teleport' \}\)/);
+    assert.match(read('public/js/features/teleportation-feature.js'), /engine\.travelGate\(target\.tsid, \{ via: 'teleport', leavesQuestRoom: true \}\)/);
   });
 
   it('signposts to streets not in the game no longer say "not loaded yet"', () => {

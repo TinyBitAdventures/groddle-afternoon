@@ -12,7 +12,7 @@ import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { isOneClick, ONE_CLICK_VERBS, signpostArmRows, worldContextAction } from '../public/js/world-context-menu.js?v=2a64801e';
-import { hotkeySections } from '../public/js/client-hotkeys.js?v=31d1891d';
+import { hotkeySections } from '../public/js/client-hotkeys.js?v=2922915e';
 
 const PUBLIC = join(dirname(fileURLToPath(import.meta.url)), '../public');
 const game = readFileSync(join(PUBLIC, 'game.js'), 'utf8');
