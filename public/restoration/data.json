@@ -2752,9 +2752,24 @@
   "deployed": "2026-11-12"
  },
  "git": {
-  "commits": 1865,
+  "commits": 1869,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-12",
+    "kind": "fix",
+    "text": "Trees, Paper Trees and mailboxes stand where players' 2012 snaps show them, and a planned mailbox keeps its stand over a floor"
+   },
+   {
+    "date": "2026-11-12",
+    "kind": "fix",
+    "text": "The snap tool measures trees, Paper Trees and street mailboxes the way it measures rocks"
+   },
+   {
+    "date": "2026-11-12",
+    "kind": "improve",
+    "text": "Wine of the Dead's refusal in Hell says it won't bring you back, and that 11 Hellish Grapes will"
+   },
    {
     "date": "2026-11-12",
     "kind": "fix",
@@ -2859,24 +2874,9 @@
     "date": "2026-11-12",
     "kind": "fix",
     "text": "The restoration section bar marks which side has more and steps through it"
-   },
-   {
-    "date": "2026-11-12",
-    "kind": "improve",
-    "text": "A submenu with a link inside a header panel is a third level, indented under its link"
-   },
-   {
-    "date": "2026-11-12",
-    "kind": "new",
-    "text": "Made for Groddle, the restoration report's section on art made for the remake"
-   },
-   {
-    "date": "2026-11-12",
-    "kind": "fix",
-    "text": "The Energy Tank card fills mood too, low mood always warns, and the new day keeps Glitch's holds"
    }
   ]
  },
- "tests": 920,
+ "tests": 921,
  "generatedAt": "2026-11-12"
 }
