@@ -130,3 +130,20 @@ describe('#264 no Interface row on a phone', () => {
     assert.doesNotMatch(css.replace(/:root\.touch-phone \.more-list #interface-btn \{ display: none; \}/, ''), /#interface-btn \{[^}]*display: none/);
   });
 });
+
+// #264: "the send button in bug reports sits just far enough down that I have to scroll". A phone's
+// picture is tall, so its preview stood about 270 px high; on a phone the window runs nearly to the
+// screen's foot, the preview is a short thumbnail and the box starts smaller.
+describe('#264 Send shows in the report window on a phone', () => {
+  const bug = readFileSync(join(pub, 'js/features/bug-report-feature.js'), 'utf8');
+
+  it('the window, the box and the preview fit a 660 px screen', () => {
+    assert.match(bug, /:root\.touch-phone\[data-ui="modern"\] #game-root #bug-report-panel \{ padding: calc\(var\(--hud-h\) \+ 8px\) var\(--sp-2\) var\(--sp-4\); \}/);
+    assert.match(bug, /:root\.touch-phone\[data-ui="modern"\] #bug-report-panel \.reports-new-view \.reports-text \{ min-height: 6rem; \}/);
+    assert.match(bug, /:root\.touch-phone\[data-ui="modern"\] #bug-report-panel \.reports-picture-thumb img \{ width: auto; max-width: 100%; max-height: 96px; \}/);
+    // 660 less the bar and gutters (44 + 8 top, 16 below) holds the head (about 56), the title and line
+    // (about 50), a 6rem box, a 96 px preview, Send (about 40) and the gaps.
+    const room = 660 - 44 - 8 - 16;
+    assert.ok(56 + 50 + 96 + 96 + 40 + 5 * 8 <= room - 2, `${room}`);
+  });
+});

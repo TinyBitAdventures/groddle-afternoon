@@ -550,6 +550,14 @@ const STYLE = `
 [data-ui="modern"] #bug-report-panel .picture-lightbox-tab:hover { background: var(--surface-hover); text-decoration: underline; }
 [data-ui="modern"] #bug-report-panel .picture-lightbox-tab:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
 @media (prefers-reduced-motion: reduce) { [data-ui="modern"] #bug-report-panel .reports-card, .picture-lightbox { animation: none; } }
+/* #264 (Friendly, an upright phone): Send sat just below the window's foot. The picture of a phone's
+   screen is tall, so its preview (up to 45% of the row across) stood about 270 px high. On a phone the
+   window runs nearly to the foot of the screen (over the pack row), the preview is a short thumbnail and
+   the box starts smaller, so Send shows without a scroll. */
+:root.touch-phone[data-ui="modern"] #game-root #bug-report-panel { padding: calc(var(--hud-h) + 8px) var(--sp-2) var(--sp-4); }
+:root.touch-phone[data-ui="modern"] #bug-report-panel .reports-new-view .reports-text { min-height: 6rem; }
+:root.touch-phone[data-ui="modern"] #bug-report-panel .reports-picture-thumb { width: auto; max-width: 35%; }
+:root.touch-phone[data-ui="modern"] #bug-report-panel .reports-picture-thumb img { width: auto; max-width: 100%; max-height: 96px; }
 `;
 
 function el(tag, attrs = {}, text = '') {
