@@ -6755,6 +6755,13 @@ body.buff-purple-pulse::after {
   position: absolute;
   inset: 0;
 }
+/* MAPLOAD (Austin 2026-11-13; js/map-bg-preload.js): while a region's painting loads, its world-map
+   thumb shows softened in its place (.map-bg-wait), and the painting fades in over it when it arrives. */
+.hub-map-svg .map-bg-soft { transition: opacity 0.35s ease; }
+.hub-map-svg .map-bg-soft.is-waiting { opacity: 0; }
+@media (prefers-reduced-motion: reduce) {
+  .hub-map-svg .map-bg-soft { transition: none; }
+}
 /* MAPZOOM (ticket 76, Austin 2026-11-04; js/map-zoom.js): the wheel, a pinch and a drag zoom and pan the
    map (the viewBox narrows, so every line and name stays sharp); the page never scrolls or zooms under it.
    Past 2x the names grow more slowly (--map-text-k), the GO buttons, star and icons past 1.25x

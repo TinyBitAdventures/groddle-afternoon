@@ -14,6 +14,12 @@
  * own region when the World view opens; a station's region when its menu opens on the Subway view. At
  * most MAP_BG_PRELOAD_CAP regions are held, the oldest let go (a download still running is stopped):
  * never all 47 at once (a 1520 x 920 painting is 5.6 MB once decoded, on a phone).
+ *
+ * While a painting still loads, the map draws the region's own 150 x 91 thumb from Tiny Speck's world
+ * map (glitch-overlays/world_map.fla z_hub_maps_small, the map index's thumbLocal, the hover cards'
+ * picture) in its place, scaled up and softened (prepareMapBg sets view.bgWait for renderHubMapSvg). The
+ * painting was made from that thumb and frames the same view (tools/map-backgrounds/build.mjs), so when
+ * it arrives it fades in over it with nothing moving (watchMapBg; style.css .map-bg-soft).
  */
 import { HUB_MAP_BACKGROUNDS } from './hub-map-backgrounds.js?v=2b2d6468';
 
@@ -21,6 +27,10 @@ import { HUB_MAP_BACKGROUNDS } from './hub-map-backgrounds.js?v=2b2d6468';
 export const MAP_BG_PRELOAD_CAP = 4;
 /** How long the pointer rests on a region before its painting is fetched (a sweep across the map fetches none). */
 export const MAP_BG_HOVER_MS = 150;
+/** The painting's fade over the thumb (style.css .hub-map-svg .map-bg-soft transition); the thumb goes after it. */
+export const MAP_BG_FADE_MS = 350;
+/** With no load event by then, the painting shows anyway (whatever of it has arrived). */
+export const MAP_BG_GIVE_UP_MS = 20000;
 
 /** An art URL with its content key (js/data-urls.js groddleDataUrl); as it is in Node and on a page without the map. */
 const keyedArt = (url) => (typeof globalThis.groddleDataUrl === 'function' ? globalThis.groddleDataUrl(url) : url);
@@ -52,11 +62,12 @@ export function mapBgFiles(hubId, { dpr = 1, fitScale = 0, mapIndex = null, back
 /**
  * Before a region map is drawn (game.js openMap): the painting at the size this screen draws (the
  * Retina file at once when the Map last drew past 760 x 460 on a 1x screen, rather than the 1x file and
- * then a swap), the file a preload fetched.
+ * then a swap), and view.bgWait when it is not known to be loaded and a thumb can stand in for it.
  */
-export function prepareMapBg(view, { dpr = 1, fitScale = 0 } = {}) {
+export function prepareMapBg(view, { loader = null, dpr = 1, fitScale = 0, keyed = keyedArt } = {}) {
   if (!view?.bgSoft) return view;
   if (view.bgSoftHi && mapBgWantsHi(dpr, fitScale)) view.bgSoft = view.bgSoftHi;
+  view.bgWait = Boolean(view.thumbLocal) && !loader?.ready(keyed(view.bgSoft));
   return view;
 }
 
@@ -164,4 +175,43 @@ export function createMapBgPreloader({
     entry: (hubId) => entries.get(String(hubId ?? '')) || null,
     pending: () => waiting?.hubId || '',
   };
+}
+
+/**
+ * After a region map is drawn (game.js openMap): when its painting arrives it fades in over the thumb
+ * (the is-waiting class comes off), and the thumb goes once the fade is over; its URL is noted as
+ * loaded either way. A failed painting leaves the thumb in its place. QA: the map canvas's data mapBg,
+ * "cached" (known loaded: drawn at once, no thumb), "wait" (on the thumb), then "ready" (it arrived
+ * and faded in), "late" (shown after MAP_BG_GIVE_UP_MS without a load event) or "failed" (the thumb
+ * stays; a later load still shows it); none on a region without a painting.
+ */
+export function watchMapBg(canvas, { loader = null, timers = globalThis, fadeMs = MAP_BG_FADE_MS, giveUpMs = MAP_BG_GIVE_UP_MS } = {}) {
+  const img = canvas?.querySelector?.('image.map-bg-soft');
+  if (!img) {
+    if (canvas?.dataset) delete canvas.dataset.mapBg;
+    return null;
+  }
+  const thumb = canvas.querySelector('.map-bg-wait');
+  const wasWaiting = img.classList.contains('is-waiting');
+  canvas.dataset.mapBg = wasWaiting ? 'wait' : 'cached';
+  let shown = !wasWaiting;
+  let giveUp = null;
+  const show = (state) => {
+    if (shown) return;
+    shown = true;
+    canvas.dataset.mapBg = state;
+    if (giveUp) timers.clearTimeout(giveUp);
+    img.classList.remove('is-waiting');
+    if (thumb) timers.setTimeout(() => thumb.remove(), fadeMs + 50);
+  };
+  img.addEventListener('load', () => {
+    loader?.markReady(img.getAttribute('href'));
+    show('ready');
+  });
+  // Not final: the Map can swap the file for its Retina twin (fitMapCanvas), whose load still shows it.
+  img.addEventListener('error', () => {
+    if (!shown) canvas.dataset.mapBg = 'failed';
+  });
+  if (wasWaiting) giveUp = timers.setTimeout(() => show('late'), giveUpMs);
+  return img;
 }

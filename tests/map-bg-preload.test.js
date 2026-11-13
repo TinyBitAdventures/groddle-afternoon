@@ -3,7 +3,8 @@
  * (js/hub-map-backgrounds.js) is fetched ahead of the click, at the size the Map draws on this screen
  * (js/map-bg-preload.js): when a region's card shows on the World view (a resting pointer, keyboard
  * focus, a phone's first tap), your own region when the World view opens, a station's region when its
- * menu opens.
+ * menu opens. While a painting still loads, the region's thumb from the world map stands in for it,
+ * softened, and the painting fades in over it.
  */
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
@@ -13,8 +14,10 @@ import { fileURLToPath } from 'node:url';
 import { HUB_MAP_BACKGROUNDS } from '../public/js/hub-map-backgrounds.js?v=2b2d6468';
 import { WORLD_MAP } from '../public/js/map-views-data.js?v=8e7d7094';
 import { bindWorldMap } from '../public/js/map-views.js?v=67e2a94a';
-import { buildHubMapView, renderHubMapSvg } from '../public/js/map-graph.js?v=dc070b88';
+import { MAP_THUMB_SOFT, buildHubMapView, renderHubMapSvg } from '../public/js/map-graph.js?v=00a8aaed';
 import {
+  MAP_BG_FADE_MS,
+  MAP_BG_GIVE_UP_MS,
   MAP_BG_HOVER_MS,
   MAP_BG_PRELOAD_CAP,
   createMapBgPreloader,
@@ -22,7 +25,8 @@ import {
   mapBgFiles,
   mapBgWantsHi,
   prepareMapBg,
-} from '../public/js/map-bg-preload.js?v=fbd98bc7';
+  watchMapBg,
+} from '../public/js/map-bg-preload.js?v=c25948e6';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const read = (p) => readFileSync(join(root, p), 'utf8');
@@ -121,7 +125,7 @@ describe('which painting the Map draws on this screen (MAPLOAD)', () => {
     assert.match(renderHubMapSvg(small), /data-hi="assets\/maps\/art\/bg\/alakol@2x\.webp"/);
     // A region without a painting is left as it is.
     const bare = buildHubMapView(hub(77), '', STREETS);
-    assert.equal(prepareMapBg(bare, { dpr: 2 }).bgSoft, '');
+    assert.equal(prepareMapBg(bare, { dpr: 2 }).bgWait, undefined);
   });
 });
 
@@ -292,8 +296,121 @@ describe('the preview triggers (bindWorldMap onPreview, game.js)', () => {
     assert.match(game, /onPreload: \(hubId\) => loadHubMapData\(hubId\)\.catch\(\(\) => \{\}\)/);
     assert.match(game, /soft\.setAttribute\('href', soft\.dataset\.hi\);\n    mapFitScale = fit\.scale;/);
     // The region map is drawn from the same cache: prepared before it is drawn.
-    const prep = game.indexOf('prepareMapBg(view, { dpr: globalThis.devicePixelRatio, fitScale: mapFitScale });');
+    const prep = game.indexOf('prepareMapBg(view, { loader: mapBgLoader, dpr: globalThis.devicePixelRatio, fitScale: mapFitScale });');
     const drawn = game.indexOf('canvas.innerHTML = renderHubMapSvg(view);');
     assert.ok(prep > game.indexOf('async function openMap(') && drawn > prep, 'prepared, then drawn');
+  });
+});
+
+describe('the thumb while the painting loads, then the swap', () => {
+  const STYLE = read('public/style.css');
+
+  it('prepareMapBg waits on the thumb unless the painting is known loaded', () => {
+    const pre = createMapBgPreloader({ files, makeImage: fakeImages().make });
+    const view = prepareMapBg(buildHubMapView(hub(58), '', STREETS), { loader: pre, dpr: 2 });
+    assert.equal(view.bgWait, true);
+    pre.markReady(HUB_MAP_BACKGROUNDS['58'].x2);
+    assert.equal(prepareMapBg(buildHubMapView(hub(58), '', STREETS), { loader: pre, dpr: 2 }).bgWait, false);
+    // A region whose hub data names no thumb draws as before.
+    const noThumb = { ...hub(58), thumbLocal: '' };
+    assert.equal(prepareMapBg(buildHubMapView(noThumb, '', STREETS), { loader: createMapBgPreloader(), dpr: 2 }).bgWait, false);
+  });
+
+  it('the map draws the region\'s thumb in the painting\'s frame, softened, under the painting and everything on it', () => {
+    const view = buildHubMapView(hub(58), '', STREETS);
+    view.bgWait = true;
+    const svg = renderHubMapSvg(view);
+    const thumbAt = svg.indexOf('<g class="map-bg-wait"');
+    const bgAt = svg.indexOf('<image class="map-bg map-bg-soft is-waiting"');
+    assert.ok(thumbAt > 0 && bgAt > thumbAt, 'thumb, then the painting over it');
+    assert.match(svg, /<image class="map-bg-thumb" href="assets\/maps\/art\/thumbs\/sm_groddlemeadow\.jpg" x="0" y="0" width="760" height="460" preserveAspectRatio="none" filter="url\(#mapThumbSoft\)"\/>/);
+    assert.match(svg, /<image class="map-bg map-bg-soft is-waiting" href="assets\/maps\/art\/bg\/groddlemeadow\.webp"[^>]* x="0" y="0" width="760" height="460" preserveAspectRatio="none"\/>/, 'the same frame: nothing moves at the swap');
+    assert.match(svg, new RegExp(`<filter id="mapThumbSoft" x="0" y="0" width="1" height="1"[^>]*><feGaussianBlur stdDeviation="${MAP_THUMB_SOFT}" result="soft"/><feMerge><feMergeNode in="SourceGraphic"/><feMergeNode in="soft"/></feMerge></filter>`));
+    assert.match(svg, /<g class="map-bg-wait" pointer-events="none">/);
+    for (const cls of ['class="map-seg', 'class="map-label', 'class="map-hub-go"']) assert.ok(svg.indexOf(cls) > bgAt, `${cls} draws at once, on top`);
+    // Known loaded: drawn exactly as before.
+    view.bgWait = false;
+    const plain = renderHubMapSvg(view);
+    assert.doesNotMatch(plain, /map-bg-wait|map-bg-thumb|is-waiting|mapThumbSoft/);
+    assert.match(plain, /<image class="map-bg map-bg-soft" href=/);
+  });
+
+  it('style.css hides a waiting painting and fades it in (no fade with reduced motion)', () => {
+    assert.match(STYLE, /\.hub-map-svg \.map-bg-soft \{ transition: opacity 0\.35s ease; \}/);
+    assert.equal(MAP_BG_FADE_MS, 350, 'the thumb goes after the same fade');
+    assert.match(STYLE, /\.hub-map-svg \.map-bg-soft\.is-waiting \{ opacity: 0; \}/);
+    assert.match(STYLE, /@media \(prefers-reduced-motion: reduce\) \{\n  \.hub-map-svg \.map-bg-soft \{ transition: none; \}\n\}/);
+    assert.match(read('public/game.js'), /canvas\.innerHTML = renderHubMapSvg\(view\);\n(?:  [^\n]*\n){0,3}  watchMapBg\(canvas, \{ loader: mapBgLoader \}\);/);
+  });
+
+  /** A drawn region map: the painting <image> (waiting or not) and the thumb group. */
+  function fakeMapCanvas({ waiting = true, href = 'assets/maps/art/bg/groddlemeadow@2x.webp' } = {}) {
+    const classes = new Set(['map-bg', 'map-bg-soft', ...(waiting ? ['is-waiting'] : [])]);
+    const listeners = {};
+    const img = {
+      attrs: { href },
+      classList: { contains: (c) => classes.has(c), remove: (c) => classes.delete(c) },
+      getAttribute: (k) => img.attrs[k] ?? null,
+      setAttribute: (k, v) => (img.attrs[k] = v),
+      addEventListener: (type, fn) => (listeners[type] ||= []).push(fn),
+      fire: (type) => (listeners[type] || []).forEach((fn) => fn({})),
+    };
+    const thumb = waiting ? { removed: false, remove() { this.removed = true; } } : null;
+    const canvas = {
+      dataset: {},
+      querySelector: (sel) => (sel === 'image.map-bg-soft' ? img : sel === '.map-bg-wait' ? thumb : null),
+    };
+    return { canvas, img, thumb, classes };
+  }
+
+  it('watchMapBg: the painting arrives, fades in over the thumb, the thumb goes after the fade, its URL is known', () => {
+    const t = fakeTimers();
+    const pre = createMapBgPreloader();
+    const { canvas, img, thumb, classes } = fakeMapCanvas();
+    watchMapBg(canvas, { loader: pre, timers: t });
+    assert.equal(canvas.dataset.mapBg, 'wait');
+    img.fire('load');
+    assert.equal(classes.has('is-waiting'), false, 'fading in');
+    assert.equal(canvas.dataset.mapBg, 'ready');
+    assert.equal(pre.ready('assets/maps/art/bg/groddlemeadow@2x.webp'), true);
+    assert.equal(thumb.removed, false, 'the thumb stays under the fade');
+    t.run(MAP_BG_FADE_MS + 50);
+    assert.equal(thumb.removed, true);
+    t.run(MAP_BG_GIVE_UP_MS);
+    assert.equal(canvas.dataset.mapBg, 'ready', 'the give-up timer was put away');
+  });
+
+  it('watchMapBg: a failed file keeps the thumb; the Retina twin\'s load still shows it; no load event at all shows it late', () => {
+    const t = fakeTimers();
+    const a = fakeMapCanvas();
+    watchMapBg(a.canvas, { timers: t });
+    a.img.fire('error');
+    assert.equal(a.canvas.dataset.mapBg, 'failed');
+    assert.equal(a.classes.has('is-waiting'), true);
+    t.run(MAP_BG_FADE_MS * 2);
+    assert.equal(a.thumb.removed, false);
+    a.img.setAttribute('href', 'assets/maps/art/bg/groddlemeadow@2x.webp');
+    a.img.fire('load');
+    assert.equal(a.classes.has('is-waiting'), false);
+    const b = fakeMapCanvas();
+    watchMapBg(b.canvas, { timers: t });
+    t.run(MAP_BG_GIVE_UP_MS);
+    assert.equal(b.canvas.dataset.mapBg, 'late');
+    assert.equal(b.classes.has('is-waiting'), false);
+  });
+
+  it('watchMapBg: a painting known loaded draws at once (cached); a region with none clears the QA mark', () => {
+    const t = fakeTimers();
+    const pre = createMapBgPreloader();
+    const c = fakeMapCanvas({ waiting: false });
+    watchMapBg(c.canvas, { loader: pre, timers: t });
+    assert.equal(c.canvas.dataset.mapBg, 'cached');
+    assert.equal(t.size, 0, 'nothing to wait for');
+    c.img.fire('load');
+    assert.equal(pre.ready('assets/maps/art/bg/groddlemeadow@2x.webp'), true);
+    assert.equal(c.canvas.dataset.mapBg, 'cached', 'it never waited');
+    const none = { dataset: { mapBg: 'wait' }, querySelector: () => null };
+    assert.equal(watchMapBg(none), null);
+    assert.equal(none.dataset.mapBg, undefined);
   });
 });

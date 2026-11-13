@@ -700,6 +700,12 @@ export function layoutHubMapMarks(view) {
   return { labels, icons };
 }
 
+/**
+ * MAPLOAD: how soft a region's thumb is drawn while its painting loads, in map units (one thumb pixel
+ * is about 5 of them on the 760 x 460 frame): enough to melt the pixels, not the cliffs and paths.
+ */
+export const MAP_THUMB_SOFT = 4;
+
 /** An art URL with its content key (js/data-urls.js groddleDataUrl); as it is in Node and on a page without the map. */
 const keyedArt = (url) => (typeof globalThis.groddleDataUrl === 'function' ? globalThis.groddleDataUrl(url) : url);
 
@@ -807,8 +813,22 @@ export function renderHubMapSvg(view) {
     // game's other art (js/data-urls.js does not see an SVG href in an HTML string). The street
     // lines, labels and GO buttons read on it as they are (no wash): every street of a painted
     // region is playable, so none is drawn in the pale unvisited style.
+    // MAPLOAD (Austin 2026-11-13): while the painting still loads (view.bgWait, js/map-bg-preload.js
+    // prepareMapBg), the region's own 150 x 91 thumb from the world map (thumbLocal, the picture the
+    // painting was made from, framed the same) fills the frame under it, scaled up and softened (the
+    // soft copy over the sharp one, so the edges stay filled), and the painting fades in over it when
+    // it arrives (watchMapBg; style.css .map-bg-soft.is-waiting).
+    const wait = Boolean(view.bgWait && view.thumbLocal);
+    if (wait) {
+      parts.push(
+        `<g class="map-bg-wait" pointer-events="none">` +
+          `<filter id="mapThumbSoft" x="0" y="0" width="1" height="1" color-interpolation-filters="sRGB">` +
+          `<feGaussianBlur stdDeviation="${MAP_THUMB_SOFT}" result="soft"/><feMerge><feMergeNode in="SourceGraphic"/><feMergeNode in="soft"/></feMerge></filter>` +
+          `<image class="map-bg-thumb" href="${escapeXml(keyedArt(view.thumbLocal))}" x="0" y="0" width="${w}" height="${h}" preserveAspectRatio="none" filter="url(#mapThumbSoft)"/></g>`
+      );
+    }
     parts.push(
-      `<image class="map-bg map-bg-soft" href="${escapeXml(keyedArt(view.bgSoft))}"${view.bgSoftHi && view.bgSoftHi !== view.bgSoft ? ` data-hi="${escapeXml(keyedArt(view.bgSoftHi))}"` : ''} x="0" y="0" width="${w}" height="${h}" preserveAspectRatio="none"/>`
+      `<image class="map-bg map-bg-soft${wait ? ' is-waiting' : ''}" href="${escapeXml(keyedArt(view.bgSoft))}"${view.bgSoftHi && view.bgSoftHi !== view.bgSoft ? ` data-hi="${escapeXml(keyedArt(view.bgSoftHi))}"` : ''} x="0" y="0" width="${w}" height="${h}" preserveAspectRatio="none"/>`
     );
   } else if (view.bgPlaceholder) {
     // G569: the original's placeholder map, drawn from its surviving grey (no made-up hills).

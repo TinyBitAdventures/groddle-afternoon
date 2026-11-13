@@ -971,11 +971,11 @@ import {
   MAP_INDEX_URL,
   HUB_56_MAP_URL,
   PUBLIC_HUBS,
-} from './js/map-graph.js?v=dc070b88';
+} from './js/map-graph.js?v=00a8aaed';
 // G471: the world map and the subway map in the Map's window.
 import { MAP_VIEW_TITLES, bindSubwayMap, bindWorldMap, mapViewSubtitle, nearestStation, renderSubwayMapSvg, renderWorldMapSvg, worldRegionList } from './js/map-views.js?v=67e2a94a';
-// MAPLOAD: a region's painting fetched ahead of the click.
-import { createMapBgPreloader, mapBgFiles, prepareMapBg } from './js/map-bg-preload.js?v=fbd98bc7';
+// MAPLOAD: a region's painting fetched ahead of the click, its thumb in its place while it loads.
+import { createMapBgPreloader, mapBgFiles, prepareMapBg, watchMapBg } from './js/map-bg-preload.js?v=c25948e6';
 import { hubMapArtNote, hubMapSubtitle, questLogSummary } from './js/panel-copy.js?v=85c3e029';
 import { bindMapIconTips } from './js/ui/map-icon-tips.js?v=6b3eb3f9';
 import { createMapZoom } from './js/map-zoom.js?v=4c2ce0e3';
@@ -25720,8 +25720,8 @@ async function openMap(hubId, { find = '', focus = '', view: pickedView = '' } =
 
   // "You" on the hub map: the current street, or the street that stands for it (spot.tsid).
   const view = buildHubMapView(hubData, spot.hubId === targetHub ? spot.tsid : currentStreetTsid, STREET_INDEX.streets);
-  // MAPLOAD: the painting at the size this screen draws (the one a preload fetched).
-  prepareMapBg(view, { dpr: globalThis.devicePixelRatio, fitScale: mapFitScale });
+  // MAPLOAD: the painting at the size this screen draws, and the region's thumb in its place until it arrives.
+  prepareMapBg(view, { loader: mapBgLoader, dpr: globalThis.devicePixelRatio, fitScale: mapFitScale });
   // Ticket 66: streets still under construction show it before you try to go (map-graph.js `building`).
   let building = 0;
   for (const st of view.streets || []) {
@@ -25746,6 +25746,8 @@ async function openMap(hubId, { find = '', focus = '', view: pickedView = '' } =
   canvas.innerHTML = renderHubMapSvg(view);
   // The street icons' tips on hover and keyboard focus (vendor, shrine, subway; MapHub.as).
   bindMapIconTips(canvas);
+  // MAPLOAD: the painting fades in over the region's thumb when it arrives.
+  watchMapBg(canvas, { loader: mapBgLoader });
   // Ticket 21: the canvas keeps the drawn frame's shape (style.css .map-canvas aspect-ratio).
   const frame = canvas.querySelector('svg')?.getAttribute('viewBox')?.split(' ').map(Number) || [];
   if (frame[2] > 0 && frame[3] > 0) canvas.style.setProperty('--map-aspect', `${frame[2]} / ${frame[3]}`);
