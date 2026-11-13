@@ -792,7 +792,7 @@ import { worldZoom, setWorldZoom, stepWorldZoom, onZoomChange, zoomKeyAction, zo
 import { nightTint, nightTintOn, onNightTintChange, worldTintOpacity } from './js/night-tint.js?v=1dfc9c89';
 import { streetMapSetting, toggleStreetMap } from './js/ui/street-minimap.js?v=6c530941';
 import './js/classic/classic-zoom.js?v=5f2c24e2';
-import { mountImaginationHub } from './js/ui/imagination-hub.js?v=51fa371f';
+import { mountImaginationHub } from './js/ui/imagination-hub.js?v=169bc74b';
 import { newDayBubble, shuffleNewDayMessages, waitForScreenGates } from './js/screen-queue.js?v=cf0132c0';
 import { applyFamiliarLook, familiarCardHeading, familiarLook, skillArtFor, skillLearnedActivity } from './js/familiar.js?v=bafd7139';
 import { armPromptTimeout, promptTimeoutMs } from './js/prompt-timeout.js?v=fba1669f';

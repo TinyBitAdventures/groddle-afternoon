@@ -11612,6 +11612,10 @@ html.stage-pinned[data-ui="modern"] header.top-bar { left: calc(var(--sp-5) + va
   animation: hubFade 300ms both;
 }
 [data-ui="modern"] .imagination-hub .hub-pill img { height: 18px; }
+/* #267: too narrow for the arc (an upright phone): compact tiles on a narrower arc (imagination-hub.js hubLayout). */
+[data-ui="modern"] .imagination-hub.is-compact .hub-tile { width: 80px; }
+[data-ui="modern"] .imagination-hub.is-compact .hub-art { width: 54px; height: 54px; }
+[data-ui="modern"] .imagination-hub.is-compact .hub-label { padding: 2px 6px; font-size: var(--fs-s); }
 [data-ui="modern"] .imagination-hub.is-still *,
 [data-ui="modern"] .imagination-hub.is-still { animation: none; transition: none; }
 @media (prefers-reduced-motion: reduce) {

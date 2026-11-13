@@ -13,13 +13,14 @@ import { fileURLToPath } from 'node:url';
 import {
   HUB_RADIUS,
   HUB_RADIUS_MIN,
+  HUB_TILE_HALF_W_COMPACT,
   HUB_TILES,
   hubLayout,
   hubPillText,
   hubStep,
   hubTileForKey,
   isHubCloseKey,
-} from '../public/js/ui/imagination-hub.js?v=51fa371f';
+} from '../public/js/ui/imagination-hub.js?v=169bc74b';
 import { hotkeySections } from '../public/js/client-hotkeys.js?v=2922915e';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -99,6 +100,33 @@ describe('hub layout', () => {
     }
     const drawer = hubLayout({ head: { x: 1800, y: 500 }, feet: { x: 1800, y: 650 }, root: { w: 1920, h: 1080 }, right: 316 });
     for (const t of drawer.tiles) assert.ok(t.x + 46 <= 1920 - 316 - 8, `x ${t.x}`);
+    assert.equal(drawer.compact, false);
+  });
+
+  // #267 (Friendly, an upright iPhone 402 x 660): Skills and Quests ran off the left edge and Home and
+  // Back to world off the right, since the arc needs about 500 px across.
+  it('on an upright phone the arc is compact and every tile stays on screen, clear of the Social rail', () => {
+    const phone = hubLayout({ head: { x: 200, y: 260 }, feet: { x: 200, y: 330 }, root: { w: 402, h: 660 }, top: 64, bottom: 590, right: 50 });
+    assert.equal(phone.compact, true);
+    assert.ok(phone.rx < phone.r * 1.3);
+    for (const t of phone.tiles) {
+      assert.ok(t.x - HUB_TILE_HALF_W_COMPACT >= 8, `left ${t.x}`);
+      assert.ok(t.x + HUB_TILE_HALF_W_COMPACT <= 402 - 50 - 8, `right ${t.x}`);
+    }
+    // Still an arc: the ends level with the centre, the middle tile on top.
+    assert.equal(phone.tiles[0].y, phone.cy);
+    assert.equal(phone.tiles[6].y, phone.cy);
+    assert.equal(phone.tiles[3].x, phone.cx);
+    assert.ok(phone.tiles[3].y < phone.tiles[2].y);
+    const lay = hubLayout({ head: { x: 640, y: 345 }, feet: { x: 640, y: 513 }, root, bottom: 740 });
+    assert.equal(lay.compact, false);
+    assert.equal(lay.rx, Math.round(HUB_RADIUS * 1.3));
+  });
+
+  it('the compact tiles are the size the layout reserves', () => {
+    const css = read('style.css');
+    assert.match(css, new RegExp(`\\.imagination-hub\\.is-compact \\.hub-tile \\{ width: ${HUB_TILE_HALF_W_COMPACT * 2}px; \\}`));
+    assert.match(read('js/ui/imagination-hub.js'), /el\.classList\.toggle\('is-compact', lay\.compact\);/);
   });
 });
 

@@ -69,6 +69,8 @@ export const HUB_WIDEN = 1.3;
 const TILE_HALF_W = 46;
 const TILE_HALF_H = 50;
 const EDGE = 8;
+/** #267: a window too narrow for the arc (an upright phone) draws compact tiles, 80 px wide (style.css .is-compact). */
+export const HUB_TILE_HALF_W_COMPACT = 40;
 
 const plain = (e) => Boolean(e) && !e.shiftKey && !e.ctrlKey && !e.altKey && !e.metaKey;
 
@@ -101,14 +103,21 @@ export function hubStep(e) {
  * `right` the Social drawer's width. The arc's centre sits halfway down the avatar (the mock:
  * head + 84 of a 165 px avatar), the radius shrinks on a short window, and the whole arc moves
  * in to stay on screen.
- * Returns { cx, cy, r, tiles: [{ x, y }], pill: { x, y } }.
+ * #267 (an upright phone): where the arc 1.3 times as wide as it is tall cannot fit across, it is
+ * drawn compact: smaller tiles, and only as wide as the window allows (still `r` tall), so no tile
+ * runs off the side.
+ * Returns { cx, cy, r, rx, compact, tiles: [{ x, y }], pill: { x, y } }.
  */
 export function hubLayout({ head, feet, root, top = 56, bottom = null, right = 0, count = HUB_TILES.length } = {}) {
   const w = Math.max(0, Number(root?.w) || 0);
   const h = Math.max(0, Number(root?.h) || 0);
   const floor = Number.isFinite(bottom) ? Math.min(h, bottom) : h;
   const r = Math.round(Math.max(HUB_RADIUS_MIN, Math.min(HUB_RADIUS, (h - 120) / 3)));
-  const halfW = r * HUB_WIDEN + TILE_HALF_W;
+  const room = (w - Math.max(0, right)) / 2 - EDGE;
+  const compact = r * HUB_WIDEN + TILE_HALF_W > room;
+  const tileHalf = compact ? HUB_TILE_HALF_W_COMPACT : TILE_HALF_W;
+  const rx = compact ? Math.max(0, Math.min(r * HUB_WIDEN, room - tileHalf)) : r * HUB_WIDEN;
+  const halfW = rx + tileHalf;
   const hx = Number.isFinite(head?.x) ? head.x : w / 2;
   const hy = Number.isFinite(head?.y) ? head.y : h / 2;
   const fy = Number.isFinite(feet?.y) ? feet.y : hy + 150;
@@ -123,9 +132,9 @@ export function hubLayout({ head, feet, root, top = 56, bottom = null, right = 0
   const tiles = [];
   for (let i = 0; i < count; i++) {
     const a = count > 1 ? Math.PI - (i * Math.PI) / (count - 1) : Math.PI / 2;
-    tiles.push({ x: Math.round(cx + Math.cos(a) * r * HUB_WIDEN), y: Math.round(cy - Math.sin(a) * r) });
+    tiles.push({ x: Math.round(cx + Math.cos(a) * rx), y: Math.round(cy - Math.sin(a) * r) });
   }
-  return { cx: Math.round(cx), cy: Math.round(cy), r, tiles, pill: { x: Math.round(cx), y: Math.round(pillY) } };
+  return { cx: Math.round(cx), cy: Math.round(cy), r, rx: Math.round(rx), compact, tiles, pill: { x: Math.round(cx), y: Math.round(pillY) } };
 }
 
 /** The pill's words for a balance of iMG. */
@@ -191,6 +200,7 @@ export function mountImaginationHub(doc, { root, actions = {}, tileState = () =>
     const pr = pack && !pack.hidden ? pack.getBoundingClientRect() : null;
     const right = Number.parseFloat(win?.getComputedStyle?.(root).getPropertyValue('--inset-r')) || 0;
     const lay = hubLayout({ head: a.head, feet: a.feet, root: { w: rr.width, h: rr.height }, top, bottom: pr?.height ? pr.top - rr.top : null, right });
+    el.classList.toggle('is-compact', lay.compact);
     el.style.setProperty('--hub-x', `${lay.cx}px`);
     el.style.setProperty('--hub-y', `${lay.cy}px`);
     lay.tiles.forEach((p, i) => {
