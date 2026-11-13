@@ -348,3 +348,27 @@ export function landscapePhoneStage({ width, height, packReserve = MIN_PACK_HEIG
   const viewH = Math.max(1, Math.min(base.viewH, Math.floor(H / scale + 1e-6) - pack));
   return { scale, viewW, viewH, canvasH: viewH + pack, cssWidth: W, cssHeight: H, pinned: false, phone: true, landscape: true };
 }
+
+/**
+ * PURE (G673, "Zoomed in on a phone, your Glitch sits high in the view"): the camera anchor on a
+ * phone. The desktop camera puts the feet at `anchor` (0.75, yCamOffsetAnchor) of the location view,
+ * the canvas less the 132 world px pack reserve, which the computer's pack (about 104 CSS px at 1:1)
+ * roughly covers: the original's loc_vp_h was the stage less the pack it showed (TSMainView.as
+ * resizeToStage 1229-1257). A phone's pack row is shorter (packCoverCss, about 64 CSS px) and stays
+ * that size while the zoom magnifies the reserve (120 CSS px at portrait's closest, 152 sideways),
+ * so zoomed in the feet sat at 0.75 of a view that ended far above the real pack: 46% down a
+ * sideways screen. Here the anchor is `anchor` of the room over the real pack instead (in view px:
+ * viewH + packReserve - packCoverCss / scale), never higher than the desktop anchor, never so low
+ * the feet come nearer the real pack than `clearance` (js/movement.js MIN_GROUND_CLEARANCE), and at
+ * most 0.95 of the view. No measured pack (hidden, not laid out): the anchor as given.
+ */
+export function phoneCameraAnchor({ anchor = 0.75, viewH, packReserve = MIN_PACK_HEIGHT, packCoverCss, scale, clearance = 40 } = {}) {
+  const base = finite(anchor, 0.75);
+  const view = finite(viewH);
+  const cover = finite(packCoverCss);
+  const s = finite(scale);
+  if (!(view > 0) || !(cover >= 0) || !(s > 0)) return base;
+  const room = view + finite(packReserve, MIN_PACK_HEIGHT) - cover / s;
+  const feet = Math.min(base * room, room - finite(clearance, 40));
+  return Math.min(0.95, Math.max(base, feet / view));
+}

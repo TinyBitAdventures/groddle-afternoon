@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=b75ab87b';
 import { createErrorOnce, createFeatureHost } from './js/feature-host.js?v=06bb8b74';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=6c4eb7ec';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=91e67bfd';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl, drawTileArt } from './js/enter-chooser.js?v=4a3ea327';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -751,12 +751,13 @@ import {
   yCamOffsetAnchor,
   cameraBottomSlack,
   cameraWorldHeightForGround,
+  MIN_GROUND_CLEARANCE,
 } from './js/movement.js?v=b30f84eb';
 import { easeCameraAxis } from './js/camera-feel.js?v=e668afc5';
 import { renderResolution, resolutionCap, RESOLUTION_STEP, phoneZoomResolution } from './js/render-density.js?v=74c6f5f9';
 // g458: low energy and mood turn amber and red, and a click offers something from the pack.
 import { makingNeeds, vitalMenuEmpty, vitalMenuHeading, vitalSnacks } from './js/vitals.js?v=85a51302';
-import { DEFAULT_VP_H, LOCATION_VIEW_W, VIEW_CEIL_H, stageFor, sceneViewCap, sceneViewWidthCap, zoomMovesStage, phoneZoomSpan } from './js/location-view.js?v=ce416ea2';
+import { DEFAULT_VP_H, LOCATION_VIEW_W, VIEW_CEIL_H, stageFor, sceneViewCap, sceneViewWidthCap, zoomMovesStage, phoneZoomSpan, phoneCameraAnchor } from './js/location-view.js?v=cfef3b43';
 import {
   levelInfoForXp,
   reconcilePlayerProgression,
@@ -786,12 +787,12 @@ import {
 import { momentMoreText } from './js/ui/moment-card.js?v=df448740';
 import { CHAT_MAX_CHARS, chatBubbleText } from './js/ui/chat-input.js?v=72d000ac';
 // HUB: the hub is the Modern skin's; Classic owns X in its skin (js/classic/classic-hub.js).
-import { MODERN, onUiModeChange, uiState } from './js/classic/ui-mode.js?v=fe4561b8';
+import { MODERN, onUiModeChange, uiState } from './js/classic/ui-mode.js?v=9705b783';
 // ZOOM: the world zoom (a device preference) and Classic's frame scale under it; both load before main().
 import { worldZoom, setWorldZoom, stepWorldZoom, onZoomChange, zoomKeyAction, zoomKeyToast, zoomFixed, setZoomFixed, onZoomFixedChange, phoneZoom } from './js/world-zoom.js?v=ec0aa8a1';
 import { nightTint, nightTintOn, onNightTintChange, worldTintOpacity } from './js/night-tint.js?v=1dfc9c89';
 import { streetMapSetting, toggleStreetMap } from './js/ui/street-minimap.js?v=6c530941';
-import './js/classic/classic-zoom.js?v=25eadb80';
+import './js/classic/classic-zoom.js?v=286eea21';
 import { mountImaginationHub } from './js/ui/imagination-hub.js?v=169bc74b';
 import { newDayBubble, shuffleNewDayMessages, waitForScreenGates } from './js/screen-queue.js?v=cf0132c0';
 import { applyFamiliarLook, familiarCardHeading, familiarLook, skillArtFor, skillLearnedActivity } from './js/familiar.js?v=bafd7139';
@@ -1059,7 +1060,7 @@ import { SLUG_ANIMATION, SLUG_LAYOUT, SLUG_STYLES, SLUG_TARGETS, drawSlugIcon, f
 import { filterText } from './js/word-filter.js?v=9a7a7ebb'; // the remake's own word filter
 import { arrangeMapCards, fitMapExtras } from './js/map-extras.js?v=9f38c312'; // the Map's Shortcuts
 // The interface skin (js/classic/ui-mode.js) sets <html data-ui> as it loads: before main(), so before the boot cover lifts.
-import { installInterfaceSettings } from './js/classic/classic-prefs.js?v=45251aca';
+import { installInterfaceSettings } from './js/classic/classic-prefs.js?v=b88a9899';
 
 /** @type {object|null} assets/maps/index.json */
 let mapIndexCache = null;
@@ -2153,6 +2154,7 @@ const CAMERA_RESERVE_SHARE = 0.42;
  * the old #play-context rail still counts wherever a skin shows it over the world.
  */
 function syncCameraSafeArea() {
+  syncCameraPackCover();
   const root = document.getElementById('game-root');
   if (!root || root.clientWidth <= 0) {
     cameraRightInset = 0;
@@ -2209,7 +2211,27 @@ function deepestWalkableGroundY() {
 /** The street's own y_cam_offset (G*.xml physics; default 150) as a viewport anchor. */
 function streetCameraAnchor() {
   const offset = Number(currentStreet?.physics?.setting?.y_cam_offset);
-  return yCamOffsetAnchor(Number.isFinite(offset) ? offset : 150, LOCATION_VIEW_H);
+  const anchor = yCamOffsetAnchor(Number.isFinite(offset) ? offset : 150, LOCATION_VIEW_H);
+  // G673: on a phone, that share of the room over the real pack row (js/location-view.js phoneCameraAnchor).
+  if (!TOUCH_PHONE || !modernUi() || PINNED_VIEW_H > 0) return anchor;
+  return phoneCameraAnchor({ anchor, viewH: LOCATION_VIEW_H, packReserve: PACK_VIEW_RESERVE, packCoverCss: cameraPackCoverCss, scale: STAGE_SCALE, clearance: MIN_GROUND_CLEARANCE });
+}
+
+/** G673: CSS px of the canvas's bottom the phone's pack row covers (syncCameraSafeArea); NaN when not shown. */
+let cameraPackCoverCss = NaN;
+
+/** G673: measure the phone's pack row over the canvas (on resize and zoom, not every frame). */
+function syncCameraPackCover() {
+  if (!TOUCH_PHONE) return;
+  const bar = document.getElementById('pack-bar');
+  const canvas = app?.canvas;
+  if (!bar || !canvas?.isConnected || !shownElement(bar)) {
+    cameraPackCoverCss = NaN;
+    return;
+  }
+  const c = canvas.getBoundingClientRect();
+  const p = bar.getBoundingClientRect();
+  cameraPackCoverCss = p.height > 0 && c.height > 0 ? Math.max(0, c.bottom - p.top) : NaN;
 }
 
 function activeCameraWorldHeight(anchorRatio = 0.75) {

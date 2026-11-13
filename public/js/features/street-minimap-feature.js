@@ -45,7 +45,7 @@
 
 import { createStreetMinimap, minimapVisibility, onStreetMapChange, sceneSignMarks, setStreetMap, snapshotStreetView, snapsWithScene, streetMapOn } from '../ui/street-minimap.js?v=6c530941';
 import { classicArtUrl } from '../classic/classic-art.js?v=5f713e7d';
-import { onUiModeChange } from '../classic/ui-mode.js?v=fe4561b8';
+import { onUiModeChange } from '../classic/ui-mode.js?v=9705b783';
 import { focusBack } from '../ui/focus-return.js?v=da190597';
 import { isPhoneDevice } from '../touch-controls.js?v=b6071ea4';
 
