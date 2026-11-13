@@ -14,6 +14,9 @@
  *   RECONNECT_SPREAD_MS spreads them out). Shown and reconnect checks wait MIN_GAP_MS after the last.
  * - A failed check is silent; the next waits twice as long each time, up to BACKOFF_MAX_MS.
  * - A different build is announced once (onUpdate), and checking stops: the reload loads the newest.
+ * - #307/#308: online, the realtime server refusing a rock, tree or node as too far brings the notice
+ *   back (createReachReminder): an older page may draw shared things where the server no longer has
+ *   them. Never a reload by itself.
  */
 
 export const CHECK_EVERY_MS = 5 * 60_000;
@@ -24,6 +27,8 @@ export const MIN_GAP_MS = 60_000;
 /** A reconnect check waits a random 0..this, so a server restart does not bring every client at once. */
 export const RECONNECT_SPREAD_MS = 20_000;
 export const BACKOFF_MAX_MS = 30 * 60_000;
+/** A reach refusal brings the notice back at most this often (a player may swing at one rock a few times). */
+export const REMIND_GAP_MS = 60_000;
 /** The file the deploy writes (tools/deploy/build-id.mjs BUILD_FILE), from the site root. */
 export const BUILD_PATH = 'play/build.json';
 
@@ -34,6 +39,7 @@ export const UPDATE_TEXT = Object.freeze({
   saving: 'Saving…',
   activity: 'A new version is ready. Update ready at the top saves your game and reloads.',
   notSaved: 'Your game could not be saved just now, so it did not reload. Try again in a moment.',
+  reach: 'This page is an older version of the game, so some things may not be where everyone else sees them. Update ready at the top saves your game and reloads.',
 });
 
 /** The build this page was stamped with ('' when it was not: then nothing checks). */
@@ -167,12 +173,42 @@ export function createUpdateCheck({
     shown: () => nudge('visible'),
     /** The realtime socket came back after a drop. */
     reconnected: () => nudge('reconnect', { spread: RECONNECT_SPREAD_MS }),
+    /** The realtime server refused a shared thing as too far (#307/#308): a new build may be why. */
+    reached: () => nudge('reach'),
     get own() { return self; },
     get latest() { return latest; },
     get running() { return running; },
     get failures() { return failures; },
     get checks() { return checks; },
     get scheduled() { return timer != null; },
+  };
+}
+
+/**
+ * #307/#308 (G703): a tab left open across releases drew shared rocks, trees and peat where its own
+ * build put them, and the realtime server, which had moved them (server v0.29.0), refused the swing as
+ * too far. When such a refusal comes and the check already knows a newer build, the Update ready
+ * notice is said again (`say`, at most once per REMIND_GAP_MS); when it does not know one yet, a
+ * check runs now (the shown-again gap holds). Nothing reloads by itself (Austin 2026-10-31).
+ * @param {{ check: ReturnType<typeof createUpdateCheck>, now?: () => number, say?: (text: string) => void }} opts
+ */
+export function createReachReminder({ check, now = () => Date.now(), say = () => {} } = {}) {
+  let lastAt = -Infinity;
+  let count = 0;
+  return {
+    /** A reach refusal arrived: true when the notice was said again. */
+    reached() {
+      if (!check?.latest) {
+        check?.reached?.();
+        return false;
+      }
+      if (now() - lastAt < REMIND_GAP_MS) return false;
+      lastAt = now();
+      count += 1;
+      say(UPDATE_TEXT.reach);
+      return true;
+    },
+    get count() { return count; },
   };
 }
 

@@ -159,7 +159,13 @@ describe('33b: a shared verb that starts also lands', () => {
     const go = readFileSync(serverPath('objects.go'), 'utf8');
     assert.match(go, new RegExp(`objReachX = ${OBJECT_REACH.x}\\b`));
     assert.match(go, new RegExp(`objReachY = ${OBJECT_REACH.y}\\b`));
-    assert.match(go, new RegExp(`no\\("far", "${COPY.far.replace('.', '\\.')}"`));
+    // #307/#308: the far line on a thing that stays put starts with the client's own line and adds that an
+    // out of date page needs a reload (objTextFar); a walker's is the client's line as it is.
+    const far = COPY.far.replace('.', '\\.');
+    assert.match(go, new RegExp(`objTextFar = "${far} [^"]*out of date[^"]*reload`));
+    assert.match(go, new RegExp(`objTextFarWalker = "${far}"`));
+    assert.match(go, /no\("far", farText, nil\)/);
+    assert.match(go, /no\("far", objTextFar\)/);
   });
 
   it('in reach is the server\'s box from the feet to the spot', () => {

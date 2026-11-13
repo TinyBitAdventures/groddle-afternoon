@@ -869,6 +869,9 @@ function answered(engine, msg, ok) {
   }
   lastAnswer = `${msg.id}:${msg.verb}:${ok ? 'ok' : msg.code || 'no'}`;
   publish(engine);
+  // #307/#308: a rock, tree, node or dust target refused as too far, which never moves: an older page
+  // may draw it where the server no longer has it, so a waiting Update ready says so again.
+  if (!ok && reachRefusal(msg)) engine.query?.('updateReminder', 'far', engine);
   // The Guano under a Batterfly (sharedGuanoPick): the server gave this player the pile and credited
   // it, so it goes into the pack once, even when the answer comes late or the player has walked on.
   if (msg.verb === 'pickup') {
@@ -954,6 +957,12 @@ function answered(engine, msg, ok) {
   seen.set(stateKey(obj), copy.version);
   dirty.delete(obj.id);
   redraw(engine, obj);
+}
+
+/** A far refusal on a thing that stays put (objects.go objTextFar): not a Piggy or a street animal. */
+function reachRefusal(msg) {
+  if (msg?.code !== 'far') return false;
+  return msg.verb === 'dust' || ['rock', 'tree', 'node'].includes(idKind(msg.id));
 }
 
 /**

@@ -10,9 +10,9 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { BUILD_FILE, PLAY_PAGES, buildIdOf, pageBuildId, stamp, stampBuild, unstamp } from '../tools/deploy/build-id.mjs';
 import {
-  BACKOFF_MAX_MS, CHECK_EVERY_MS, JITTER, MIN_GAP_MS, RECONNECT_SPREAD_MS, UPDATE_TEXT,
-  blockingUi, buildUrl, createUpdateCheck, nextDelay, ownBuild, saveThenReload,
-} from '../public/js/update-check.js?v=814a78ec';
+  BACKOFF_MAX_MS, CHECK_EVERY_MS, JITTER, MIN_GAP_MS, RECONNECT_SPREAD_MS, REMIND_GAP_MS, UPDATE_TEXT,
+  blockingUi, buildUrl, createReachReminder, createUpdateCheck, nextDelay, ownBuild, saveThenReload,
+} from '../public/js/update-check.js?v=2496f20a';
 
 const read = (p) => readFileSync(new URL(`../${p}`, import.meta.url), 'utf8');
 
@@ -329,6 +329,68 @@ describe('the pill', () => {
     assert.match(src, /saveStore\?\.kind === 'multiplayer' \? saveStore : null/, 'online flushes the cloud save');
     assert.match(src, /announced !== build[\s\S]{0,80}pushActivity\?\.\(UPDATE_TEXT\.activity\)/, 'one Activity line per build');
     assert.match(src, /blockingUi\(engine\)/, 'waits for blocking UI');
+    assert.equal(src.split('location.reload(').length - 1, 1, 'reloads only from the click');
+  });
+});
+
+// #307/#308 (G703): a tab left open across releases got "You need to be closer" beside shared rocks the
+// server had moved; the server's line says a reload fixes it, and a page that already knows a newer
+// build says its Update ready notice again. Never a reload by itself.
+describe('the reach reminder', () => {
+  it('says the notice again on a reach refusal once a newer build is known, at most once a minute', async () => {
+    const c = clock();
+    let build = 'aaa';
+    const fetch = fakeFetch(() => ({ body: { build, version: 'v0.37.1' } }));
+    const check = createUpdateCheck({ own: 'aaa', url: (at) => `b?t=${at}`, fetch, ...c, random: () => 0.5 });
+    const said = [];
+    const reminder = createReachReminder({ check, now: c.now, say: (t) => said.push(t) });
+    check.start();
+    await c.run(CHECK_EVERY_MS);
+    assert.equal(reminder.reached(), false, 'the same build: nothing to say');
+    assert.deepEqual(said, []);
+
+    build = 'bbb';
+    await c.run(CHECK_EVERY_MS);
+    assert.equal(check.latest.build, 'bbb');
+    assert.equal(reminder.reached(), true);
+    assert.deepEqual(said, [UPDATE_TEXT.reach]);
+    assert.equal(reminder.reached(), false, 'a second swing at once says nothing more');
+    await c.run(REMIND_GAP_MS);
+    assert.equal(reminder.reached(), true, 'a minute on, again');
+    assert.equal(reminder.count, 2);
+    assert.equal(said.length, 2);
+  });
+
+  it('with no newer build known yet, a reach refusal checks now (after the shown-again gap)', async () => {
+    const c = clock();
+    const fetch = fakeFetch({ body: { build: 'bbb' } });
+    const seen = [];
+    const check = createUpdateCheck({ own: 'aaa', url: (at) => `b?t=${at}`, fetch, ...c, random: () => 0.5, onUpdate: (u) => seen.push(u) });
+    const reminder = createReachReminder({ check, now: c.now });
+    check.start();
+    assert.equal(reminder.reached(), false);
+    assert.equal(fetch.calls.length, 0, 'the page just loaded: within the gap, no check');
+    await c.run(MIN_GAP_MS);
+    assert.equal(reminder.reached(), false, 'the check runs; the pill announces the build as ever');
+    await c.run(0);
+    assert.equal(fetch.calls.length, 1);
+    assert.equal(seen.length, 1);
+    assert.equal(fetch.calls[0].url.startsWith('b?t='), true);
+  });
+
+  it('plain words that point at the pill', () => {
+    assert.match(UPDATE_TEXT.reach, /older version/);
+    assert.match(UPDATE_TEXT.reach, /Update ready/);
+    assert.ok(!UPDATE_TEXT.reach.includes('\u2014'));
+  });
+
+  it('the wiring: street objects ask on a far refusal of a rock, tree, node or dust; the feature says the notice, never reloads', () => {
+    const objects = read('public/js/features/street-objects-feature.js');
+    assert.match(objects, /if \(!ok && reachRefusal\(msg\)\) engine\.query\?\.\('updateReminder', 'far', engine\)/);
+    assert.match(objects, /function reachRefusal\(msg\) \{\s*if \(msg\?\.code !== 'far'\) return false;\s*return msg\.verb === 'dust' \|\| \['rock', 'tree', 'node'\]\.includes\(idKind\(msg\.id\)\);/);
+    const src = read('public/js/features/update-ready-feature.js');
+    assert.match(src, /updateReminder\(reason, engine\) \{\s*return session\?\.remind\(\) \? true : null;/);
+    assert.match(src, /createReachReminder\(\{\s*check,\s*say: \(text\) => \{\s*engine\.toast\?\.\(text, 6000\);\s*engine\.pushActivity\?\.\(text\);/);
     assert.equal(src.split('location.reload(').length - 1, 1, 'reloads only from the click');
   });
 });

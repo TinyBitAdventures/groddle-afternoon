@@ -15,12 +15,16 @@
  *   bar's tab order.
  * - Classic's placement and colours are in css/classic.css (the Classic palette lives only there).
  * - Activity gets one line per new build: "A new version is ready. ...".
+ * - #307/#308: a realtime refusal of a rock, tree or node as too far (street-objects-feature asks
+ *   updateReminder) says the notice again while a newer build waits (createReachReminder), and shows
+ *   the pill if a blocking screen let it.
  *
  * QA: canvas data updateReady (the new build id, '' until one), updateOwn (this page's build),
- * updateChecks (checks so far); window.groddleUpdate { check(), latest, own, reload() }.
+ * updateChecks (checks so far), updateReminded (reach reminders so far); window.groddleUpdate
+ * { check(), latest, own, reload(), remind() }.
  */
 
-import { UPDATE_TEXT, blockingUi, buildUrl, createUpdateCheck, ownBuild, saveThenReload } from '../update-check.js?v=814a78ec';
+import { UPDATE_TEXT, blockingUi, buildUrl, createReachReminder, createUpdateCheck, ownBuild, saveThenReload } from '../update-check.js?v=2496f20a';
 import { saveStore } from '../save-store.js?v=04420633';
 
 export const UPDATE_READY_FEATURE_ID = 'update-ready';
@@ -94,6 +98,15 @@ function createSession(engine, own) {
   });
   engine.setData?.('updateOwn', own);
   engine.setData?.('updateReady', '');
+  const reminder = createReachReminder({
+    check,
+    say: (text) => {
+      engine.toast?.(text, 6000);
+      engine.pushActivity?.(text);
+      engine.setData?.('updateReminded', String(reminder.count));
+      place();
+    },
+  });
 
   async function update() {
     if (busy || !check.latest) return;
@@ -139,6 +152,7 @@ function createSession(engine, own) {
   const session = {
     check: () => check.check('manual'),
     reload: update,
+    remind: () => reminder.reached(),
     watchRealtime,
     get latest() { return check.latest; },
     get own() { return own; },
@@ -174,5 +188,10 @@ export const updateReadyFeature = {
     if (now - lastTick < 1000) return;
     lastTick = now;
     session.tick();
+  },
+
+  /** street-objects-feature: the realtime server refused a rock, tree or node as too far (#307/#308). */
+  updateReminder(reason, engine) {
+    return session?.remind() ? true : null;
   },
 };
