@@ -26,7 +26,7 @@ import {
   panKey,
   placeCostText,
   trayFilters,
-} from '../public/js/ui/home-builder.js?v=8100230a';
+} from '../public/js/ui/home-builder.js?v=6197ffe7';
 import {
   INTERIOR,
   createHomeDecorState,

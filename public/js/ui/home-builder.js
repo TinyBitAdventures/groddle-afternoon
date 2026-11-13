@@ -264,6 +264,33 @@ function button(doc, b, cls = '') {
 }
 
 /**
+ * TRAY GRAB (Austin's iPhone, 2026-11-13, Cultivate and Decoration Mode: "I feel a swipe down/up the
+ * 'choose an item' panel would be a huge help, because it eats half the screen"): on a phone the tray
+ * has a grab handle; a swipe down folds it to a slim bar (its tabs, or the handle with the tray's name),
+ * a swipe up or a tap on the handle opens it again. The remake's: the 2012 client's tray was the pack's
+ * place on a computer and never folded (pack/PackTabberUI.as).
+ */
+export const TRAY_SWIPE_MIN = 28;
+/** A swipe is mostly up or down: its rise at least this many times its run. */
+export const TRAY_SWIPE_RATIO = 1.4;
+/** A press that moved less than this (css px) is a tap. */
+export const TRAY_TAP_MAX = 8;
+export const TRAY_GRAB_TEXT = Object.freeze({ fold: 'Fold the tray down', open: 'Open the tray', name: 'Choose an item' });
+
+/**
+ * PURE: what a press on the tray's grab (or its bare edges) does when it lifts: 'fold', 'open' or ''.
+ * `dx`, `dy`: how far it moved (dy down is positive); `tapToggles`: a tap counts (the handle itself).
+ */
+export function trayGesture(dx, dy, collapsed, { tapToggles = false, min = TRAY_SWIPE_MIN, ratio = TRAY_SWIPE_RATIO, tap = TRAY_TAP_MAX } = {}) {
+  const x = Math.abs(Number(dx) || 0);
+  const y = Number(dy) || 0;
+  if (Math.hypot(x, y) < tap) return tapToggles ? (collapsed ? 'open' : 'fold') : '';
+  if (Math.abs(y) < min || Math.abs(y) < x * ratio) return '';
+  if (y > 0) return collapsed ? '' : 'fold';
+  return collapsed ? 'open' : '';
+}
+
+/**
  * The builder's DOM in `root` (#game-root). render(model) redraws the banner and the tray;
  * setPop / setPlace draw the floating actions and the Place button at a client point.
  * The section keeps the old bar's id (#homes-bar) and close class (.hb-close): game.js's Shift+D
@@ -282,6 +309,13 @@ export function createHomeBuilder({ root, doc = root?.ownerDocument }) {
   const place = el(doc, 'button', { type: 'button', class: 'hb-place', id: 'homes-place', hidden: true, 'data-ctx': 'home-edit' });
   root.append(bar, pop, place);
   const html = doc.documentElement;
+  // TRAY GRAB: a phone only (game.js puts html.touch-phone on from the first paint).
+  const phone = Boolean(html?.classList?.contains('touch-phone'));
+  let collapsed = false;
+  const grab = phone ? el(doc, 'button', { type: 'button', class: 'hb-grab', id: 'homes-tray-grab', 'aria-controls': 'homes-tray', 'aria-expanded': 'true', 'data-home-grab': '1' }, [
+    el(doc, 'span', { class: 'hb-grab-bar', 'aria-hidden': 'true' }),
+    el(doc, 'span', { class: 'hb-grab-name' }),
+  ]) : null;
 
   let model = null;
   let press = null; // a tile pressed, before it is a drag
@@ -407,6 +441,73 @@ export function createHomeBuilder({ root, doc = root?.ownerDocument }) {
     if (bar.hidden || tray.hidden) return false;
     const r = tray.getBoundingClientRect();
     return x >= r.left && x <= r.right && y >= r.top && y <= r.bottom;
+  }
+
+  /** TRAY GRAB: fold the tray to its bar or open it; the stick, Jump and the room follow its height. */
+  function setCollapsed(v) {
+    const next = Boolean(v) && Boolean(grab);
+    if (grab) {
+      const name = grab.querySelector('.hb-grab-name');
+      const label = next ? TRAY_GRAB_TEXT.open : TRAY_GRAB_TEXT.fold;
+      grab.setAttribute('aria-expanded', String(!next));
+      grab.setAttribute('aria-label', label);
+      grab.title = label;
+      if (name) name.textContent = model?.mode === 'cultivate' ? TRAY_GRAB_TEXT.name : (model?.trayLabel || TRAY_GRAB_TEXT.name);
+    }
+    if (next === collapsed) return collapsed;
+    collapsed = next;
+    if (collapsed) {
+      tray.dataset.collapsed = '1';
+      html.dataset.homeTrayCollapsed = '1';
+    } else {
+      delete tray.dataset.collapsed;
+      delete html.dataset.homeTrayCollapsed;
+    }
+    syncTrayUp();
+    syncDock();
+    return collapsed;
+  }
+
+  // A swipe on the handle, or on the tray's bare parts (never a tile, the strip, the docked pack or a field).
+  if (grab) {
+    let swipe = null;
+    let eatClick = false;
+    const SKIP = '.hb-tile, .hb-strip, .hb-dock, .hb-page, input, select, textarea';
+    tray.addEventListener('pointerdown', (e) => {
+      // Modern only: Classic draws its 2012 tray, which never folds (style.css TRAY GRAB).
+      if (swipe || (e.button != null && e.button !== 0) || html.dataset.ui === 'classic') return;
+      const onGrab = Boolean(e.target?.closest?.('.hb-grab'));
+      if (!onGrab && e.target?.closest?.(SKIP)) return;
+      swipe = { id: e.pointerId, x: e.clientX, y: e.clientY, onGrab };
+    });
+    const lift = (e) => {
+      if (!swipe || e.pointerId !== swipe.id) return;
+      const was = swipe;
+      swipe = null;
+      if (e.type === 'pointercancel') return;
+      const act = trayGesture(e.clientX - was.x, e.clientY - was.y, collapsed, { tapToggles: was.onGrab });
+      if (!act) return;
+      setCollapsed(act === 'fold');
+      // The click that follows a swipe on a tab or the handle is the swipe's, not a second toggle.
+      eatClick = true;
+      setTimeout(() => { eatClick = false; }, 0);
+    };
+    doc.defaultView?.addEventListener('pointerup', lift, true);
+    doc.defaultView?.addEventListener('pointercancel', lift, true);
+    tray.addEventListener('click', (e) => {
+      if (!eatClick) return;
+      eatClick = false;
+      e.preventDefault();
+      e.stopPropagation();
+    }, true);
+    // The keyboard (and a screen reader): the handle is a button.
+    grab.addEventListener('click', (e) => {
+      if (e.detail === 0) setCollapsed(!collapsed);
+    });
+    // A tab picked while folded opens the tray on it.
+    tray.addEventListener('click', (e) => {
+      if (collapsed && e.target?.closest?.('[data-home-tab]')) setCollapsed(false);
+    });
   }
 
   function tileNode(t) {
@@ -561,6 +662,7 @@ export function createHomeBuilder({ root, doc = root?.ownerDocument }) {
       })));
     }
     pushFoot(m, parts);
+    if (grab) parts.unshift(grab);
     tray.replaceChildren(...parts);
     if (keepScroll) strip.scrollLeft = keepScroll;
     syncPager();
@@ -622,6 +724,7 @@ export function createHomeBuilder({ root, doc = root?.ownerDocument }) {
     panel.append(prev, box, next);
     parts.push(panel);
     pushFoot(m, parts);
+    if (grab) parts.unshift(grab);
     tray.replaceChildren(...parts);
     if (docked) resizeDock?.unobserve(docked.box);
     docked = { node, box, scroller };
@@ -649,6 +752,8 @@ export function createHomeBuilder({ root, doc = root?.ownerDocument }) {
       const hook = active && bar.contains(active) ? focusHook(active) : null;
       bar.hidden = !m;
       if (!m) {
+        // TRAY GRAB: the next time the builder opens, the tray is open.
+        setCollapsed(false);
         undock();
         delete html.dataset.homeBuilder;
         delete html.dataset.homeTray;
@@ -661,6 +766,8 @@ export function createHomeBuilder({ root, doc = root?.ownerDocument }) {
       syncCentre();
       html.dataset.homeTray = m.tab || m.mode;
       bar.dataset.homeMode = m.mode;
+      // TRAY GRAB: the handle's words for this mode (the fold itself is kept across redraws).
+      setCollapsed(collapsed);
       bar.setAttribute('aria-labelledby', 'homes-title');
       bar.setAttribute('aria-describedby', 'homes-keys-help');
       renderBanner(m);
@@ -745,6 +852,11 @@ export function createHomeBuilder({ root, doc = root?.ownerDocument }) {
     },
     /** True when the client point is over the tray (a drop there puts a piece away). */
     trayHit,
+    /** TRAY GRAB (a phone): whether the tray is folded to its bar, and fold or open it. */
+    get collapsed() {
+      return collapsed;
+    },
+    setCollapsed,
     /** The client rect the room shows in: under the banner, over the tray. */
     roomRect() {
       syncCentre();
@@ -778,5 +890,6 @@ function focusHook(node) {
     }
   }
   if (node.classList?.contains('hb-close')) return '.hb-close';
+  if (node.classList?.contains('hb-grab')) return '.hb-grab';
   return null;
 }
