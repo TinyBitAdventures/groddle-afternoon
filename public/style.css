@@ -14141,6 +14141,69 @@ body.is-booting .touch-controls { display: none; }
 :root.touch-phone[data-ui="modern"] .prefs-window > .prefs-close { position: sticky; top: var(--sp-1); z-index: calc(var(--z-raised) + 1); float: right; margin: var(--sp-1) calc(-1 * var(--sp-5)) 0 0; }
 /* end PHONEPANELS */
 
+/* === LANDSCAPE-PANELS (land2) === */
+/* Panels on a phone held sideways (the landscape audit, 2026-11-13; Austin: phones play both ways up, edge
+   to edge). Only a phone (html.touch-phone) that is wider than tall and under 500 px tall matches. */
+/* COMPACT SHEETS (#2): the left sheets (Quests, Make, Skills, Achievements, Feat, Buffs, a vendor, Projects)
+   spent about 200 px on their header, so at 667 x 335 the list showed one or two rows. Sideways the sheet
+   is wider (up to 440 px, leaving the pack row about 300 px beside it), and the header is one row: the
+   title, the sheet's first tool (Quests' tabs, the Make and badge searches) and the close button share it,
+   the other tools take a row under it, and the footer line goes (its counts are on the tabs and the top
+   bar). The card is a grid: row 1 the header, rows 2 and 3 the tools, row 4 the list (the one scroller,
+   tests/sheet-header-fixed.test.js), row 5 the footer. */
+@media (max-height: 500px) and (orientation: landscape) {
+  :root.touch-phone[data-ui="modern"] #game-root :is(.ui-sheet:not(.ui-sheet-center), #achieve-panel, #skills-panel, #buffs-panel) {
+    width: clamp(320px, 100% - 310px - env(safe-area-inset-left, 0px), 440px);
+    left: calc(var(--hud-inset) + env(safe-area-inset-left, 0px));
+  }
+  :root.touch-phone[data-ui="modern"] #game-root :is(.ui-sheet:not(.ui-sheet-center), #achieve-panel, #skills-panel, #buffs-panel) > .ui-sheet-card {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto auto;
+    grid-template-rows: auto auto auto minmax(0, 1fr) auto;
+    align-items: center;
+  }
+  :root.touch-phone[data-ui="modern"] #game-root :is(.ui-sheet:not(.ui-sheet-center), #achieve-panel, #skills-panel, #buffs-panel) > .ui-sheet-card > .ui-sheet-head { display: contents; }
+  :root.touch-phone[data-ui="modern"] #game-root :is(.ui-sheet:not(.ui-sheet-center), #achieve-panel, #skills-panel, #buffs-panel) > .ui-sheet-card > .ui-sheet-head > * { grid-row: 1; grid-column: 1 / 4; }
+  :root.touch-phone[data-ui="modern"] #game-root :is(.ui-sheet:not(.ui-sheet-center), #achieve-panel, #skills-panel, #buffs-panel) > .ui-sheet-card > .ui-sheet-head > :is(h2, .feat-title-lockup) {
+    grid-column: 1; flex: none; padding: 0 var(--space-2) 0 var(--space-4); font-size: var(--fs-l); white-space: nowrap;
+  }
+  :root.touch-phone[data-ui="modern"] #game-root :is(.ui-sheet:not(.ui-sheet-center), #achieve-panel, #skills-panel, #buffs-panel) > .ui-sheet-card > .ui-sheet-head > .feat-title-lockup :is(h2, .ui-sheet-title) { font-size: var(--fs-l); white-space: nowrap; }
+  :root.touch-phone[data-ui="modern"] #game-root :is(.ui-sheet:not(.ui-sheet-center), #achieve-panel, #skills-panel, #buffs-panel) > .ui-sheet-card > .ui-sheet-head > :is(.ui-sheet-icon, .kcap) { display: none; }
+  :root.touch-phone[data-ui="modern"] #game-root :is(.ui-sheet:not(.ui-sheet-center), #achieve-panel, #skills-panel, #buffs-panel) > .ui-sheet-card > .ui-sheet-head > :is(.ui-sheet-x, .verb-menu-x) { grid-column: 4; justify-self: end; margin: 2px; }
+  :root.touch-phone[data-ui="modern"] #game-root :is(.ui-sheet:not(.ui-sheet-center), #achieve-panel, #skills-panel, #buffs-panel) > .ui-sheet-card > :not(.ui-sheet-head) { grid-column: 1 / -1; min-width: 0; }
+  :root.touch-phone[data-ui="modern"] #game-root :is(.ui-sheet:not(.ui-sheet-center), #achieve-panel, #skills-panel, #buffs-panel) > .ui-sheet-card > .ui-sheet-body { grid-row: 4; align-self: stretch; }
+  :root.touch-phone[data-ui="modern"] #game-root :is(.ui-sheet:not(.ui-sheet-center), #achieve-panel, #skills-panel, #buffs-panel) > .ui-sheet-card > .ui-sheet-foot { display: none; }
+  /* Quests: the tabs in the title row. */
+  :root.touch-phone[data-ui="modern"] #game-root #quest-panel > .ui-sheet-card > #quest-tabs { grid-row: 1; grid-column: 2 / 4; margin: 0; padding: 2px; }
+  :root.touch-phone[data-ui="modern"] #game-root #quest-panel > .ui-sheet-card > #quest-tabs [role="tab"] { height: 28px; min-width: 0; padding: 0 var(--space-1); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  :root.touch-phone[data-ui="modern"] #game-root #quest-panel > .ui-sheet-card > .qc-tools { grid-row: 2; margin: 0 var(--space-4) var(--space-2); }
+  /* Make: the search in the title row; the question (or the way back to the tools) and Can make now under it. */
+  :root.touch-phone[data-ui="modern"] #game-root #make-panel > .ui-sheet-card > .make-search-row { display: contents; }
+  :root.touch-phone[data-ui="modern"] #game-root #make-panel .make-search-row > .make-search { grid-row: 1; grid-column: 2 / 4; height: 34px; }
+  :root.touch-phone[data-ui="modern"] #game-root #make-panel .make-search-row > .make-canmake { grid-row: 2; grid-column: 3 / 5; justify-self: end; padding: 0 var(--space-4) 0 var(--space-2); white-space: nowrap; }
+  :root.touch-phone[data-ui="modern"] #game-root #make-panel > .ui-sheet-card > .make-nav { grid-row: 2; grid-column: 1 / 3; flex-direction: row; align-items: center; padding: var(--space-1) 0 var(--space-1) var(--space-4); }
+  :root.touch-phone[data-ui="modern"] #game-root #make-panel > .ui-sheet-card > .make-nav .make-question { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+  /* Badges: the search in the title row; the status chips and the category on one row under it (the chips
+     scroll sideways if they do not fit); the count line beside the category. */
+  :root.touch-phone[data-ui="modern"] #game-root #achieve-panel > .ui-sheet-card > .badge-browser-tools { display: contents; }
+  :root.touch-phone[data-ui="modern"] #game-root #achieve-panel .badge-browser-tools > .badge-search { grid-row: 1; grid-column: 2 / 4; margin: 0; padding: 0; }
+  :root.touch-phone[data-ui="modern"] #game-root #achieve-panel .badge-browser-tools > .badge-search input { height: 34px; padding-top: 0; padding-bottom: 0; }
+  :root.touch-phone[data-ui="modern"] #game-root #achieve-panel .badge-browser-tools > .badge-status-filters { grid-row: 2; grid-column: 1 / 3; margin: 0; padding: var(--space-1) var(--space-2) var(--space-1) var(--space-4); overflow-x: auto; scrollbar-width: none; }
+  :root.touch-phone[data-ui="modern"] #game-root #achieve-panel .badge-browser-tools > .badge-status-filters button { flex: none; padding-inline: var(--space-2); }
+  :root.touch-phone[data-ui="modern"] #game-root #achieve-panel .badge-browser-tools > .badge-category-select { grid-row: 2; grid-column: 3 / 5; margin: 0; padding: var(--space-1) var(--space-4) var(--space-1) 0; }
+  :root.touch-phone[data-ui="modern"] #game-root #achieve-panel .badge-browser-tools > .badge-category-select > span { display: none; }
+  :root.touch-phone[data-ui="modern"] #game-root #achieve-panel .badge-browser-tools > .badge-category-select > :is(select, .combo) { width: 9.5rem; max-width: 9.5rem; flex: none; }
+  :root.touch-phone[data-ui="modern"] #game-root #achieve-panel .badge-browser-tools > .badge-category-select .combo-input { height: 30px; text-overflow: ellipsis; }
+  :root.touch-phone[data-ui="modern"] #game-root #achieve-panel > .ui-sheet-card > #achieve-meta { grid-row: 3; padding-top: 0; padding-bottom: var(--space-1); }
+  /* Skills: its filter chips (inside the list's sticky tools) on one row that scrolls sideways. */
+  :root.touch-phone[data-ui="modern"] #game-root #skills-panel .skill-tree-filters { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; }
+  :root.touch-phone[data-ui="modern"] #game-root #skills-panel .skill-tree-chip { flex: none; }
+  /* A badge row is one line of art and words: smaller art, the condition on one line. */
+  :root.touch-phone[data-ui="modern"] #game-root #achieve-panel .badge-card { grid-template-columns: 34px 1fr; gap: var(--space-2); padding: var(--space-1) var(--space-2); }
+  :root.touch-phone[data-ui="modern"] #game-root #achieve-panel .badge-card .badge-art { width: 34px; height: 34px; }
+}
+/* === end LANDSCAPE-PANELS === */
+
 /* PHONEKEYS (Austin 2026-11-12, on his iPhone): a phone (html.touch-phone, the phone gate's
    device) has no keyboard, so no key letter shows on it: the key caps on the bar's buttons, in sheet
    heads, in the Menu's rows (data-key), the verb menu's numbers, "Esc close" and "Esc back", and the
