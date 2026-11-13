@@ -169,7 +169,7 @@ import {
   placeCostText,
   swatchFilters,
   trayFilters,
-} from '../ui/home-builder.js?v=6197ffe7';
+} from '../ui/home-builder.js?v=378178ac';
 import { RECIPE_CATALOG } from '../making.js?v=ba3677f0';
 import {
   createBackYardState,
@@ -7767,7 +7767,9 @@ export const homesFeature = {
     stackCarry = null;
     hoverId = null;
     if (ui) {
-      ui.builder.render(null);
+      // A folded tray stays folded through the rebuild (a placement, a move or a removal in
+      // Cultivate refreshes the scene); leaving the mode or the home opens it again (renderBar).
+      ui.builder.render(null, { keepFold: true });
       ui.modes.hidden = true;
       if (ui.sign) ui.sign.hidden = true;
     }

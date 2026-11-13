@@ -744,16 +744,21 @@ export function createHomeBuilder({ root, doc = root?.ownerDocument }) {
     get model() {
       return model;
     },
-    /** Draw the banner and the tray for `m`, or hide everything when `m` is null. */
-    render(m) {
+    /**
+     * Draw the banner and the tray for `m`, or hide everything when `m` is null. keepFold: a scene
+     * rebuild under a builder that stays open (homes-feature onStreetClear) keeps the tray folded.
+     */
+    render(m, { keepFold = false } = {}) {
       model = m;
       // Keep focus where it was across a redraw (the same tile, tab or button by its data hook).
       const active = doc.activeElement;
       const hook = active && bar.contains(active) ? focusHook(active) : null;
       bar.hidden = !m;
       if (!m) {
-        // TRAY GRAB: the next time the builder opens, the tray is open.
-        setCollapsed(false);
+        // TRAY GRAB: the next time the builder opens, the tray is open. Not across a scene rebuild
+        // (Austin's iPhone, 2026-11-13: placing in Cultivate rebuilds the street, and the folded tray
+        // popped open over what he had just placed).
+        if (!keepFold) setCollapsed(false);
         undock();
         delete html.dataset.homeBuilder;
         delete html.dataset.homeTray;
