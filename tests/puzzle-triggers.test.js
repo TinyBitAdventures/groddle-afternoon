@@ -246,6 +246,22 @@ describe('gut tubes', () => {
     }
   });
 
+  test('a phone flips with its Jump button, and the toasts name it (Greyving Grays chat "stuck", 2026-11-13)', async () => {
+    const { puzzleToast } = await import('../public/js/features/puzzles-feature.js?v=b05ca768');
+    const src = readFileSync(join(root, 'public/js/features/puzzles-feature.js'), 'utf8');
+    // The phone has no Space key: its Jump button sends TOUCH_JUMP_EVENT (game.js installTouchControls).
+    assert.match(src, /window\.addEventListener\(TOUCH_JUMP_EVENT, \(\) => flipGravity\(engine\)\);/);
+    assert.match(src, /if \(e\.code !== 'Space' \|\| e\.repeat\) return;[\s\S]{0,200}flipGravity\(engine\);/);
+    const toasts = Object.values(data).flatMap((def) => [...(def.arrival || []), ...(def.triggers || [])].map((r) => r.toast).filter(Boolean));
+    const spaced = toasts.filter((t) => /Space/.test(t));
+    assert.ok(spaced.length >= 5);
+    for (const t of spaced) {
+      assert.equal(puzzleToast(t, false), t);
+      assert.doesNotMatch(puzzleToast(t, true), /Space/);
+    }
+    assert.equal(puzzleToast('Inside the gut, press Space to flip which way is down.', true), 'Inside the gut, tap Jump to flip which way is down.');
+  });
+
   test('Shim Shiri light beams lift into each tube', () => {
     const def = data.GA9BT2I0ILD340S;
     const s = street('GA9BT2I0ILD340S');

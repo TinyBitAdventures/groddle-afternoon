@@ -49,6 +49,7 @@
  */
 
 import { locationEventsApi } from './location-events-feature.js?v=f2b6c156';
+import { TOUCH_JUMP_EVENT, isPhoneDevice } from '../touch-controls.js?v=6ae5adce';
 import { collectQuoin, QUOIN_SHEET, QUOIN_TYPES } from '../quoins.js?v=61be601c';
 import {
   CARD_RETURN_TEXT,
@@ -577,22 +578,39 @@ function stepInverted(engine, p, height) {
  * scripts instead (def.gravityToggle names them).
  */
 let flipKeysBound = false;
+/**
+ * Flip which way is down (the street's invert/reset scripts). Space on a keyboard; on a phone,
+ * which has no Space key, its Jump button (Greyving Grays chat "stuck", 2026-11-13: the flip only
+ * heard the Space key, so a phone could never turn over at a bend).
+ */
+function flipGravity(engine) {
+  const flip = run?.def?.gravityToggle;
+  if (!flip || engine.busy() || engine.transientInstance()) return false;
+  const now = performance.now();
+  if (now - (run.flippedAt || -1e9) < 300) return false;
+  run.flippedAt = now;
+  const inverted = locationEventsApi.gravity() < 0;
+  fireAll(engine, [inverted ? flip.normal : flip.invert], 'flip');
+  run.flips = (run.flips || 0) + 1;
+  engine.playSound('JUMP', { volume: 0.4, rate: inverted ? 0.8 : 1.3 });
+  return true;
+}
+
 function bindGravityFlip(engine) {
   if (flipKeysBound || typeof window === 'undefined') return;
   flipKeysBound = true;
   window.addEventListener('keydown', (e) => {
-    const flip = run?.def?.gravityToggle;
-    if (!flip || e.code !== 'Space' || e.repeat) return;
+    if (e.code !== 'Space' || e.repeat) return;
     const tag = String(e.target?.tagName || '').toLowerCase();
-    if (tag === 'input' || tag === 'textarea' || engine.busy() || engine.transientInstance()) return;
-    const now = performance.now();
-    if (now - (run.flippedAt || -1e9) < 300) return;
-    run.flippedAt = now;
-    const inverted = locationEventsApi.gravity() < 0;
-    fireAll(engine, [inverted ? flip.normal : flip.invert], 'flip');
-    run.flips = (run.flips || 0) + 1;
-    engine.playSound('JUMP', { volume: 0.4, rate: inverted ? 0.8 : 1.3 });
+    if (tag === 'input' || tag === 'textarea') return;
+    flipGravity(engine);
   });
+  window.addEventListener(TOUCH_JUMP_EVENT, () => flipGravity(engine));
+}
+
+/** A puzzle street's toast names Space; a phone's key for it is its Jump button. */
+export function puzzleToast(text, phone = isPhoneDevice()) {
+  return phone ? String(text || '').replace(/\bpress Space\b/g, 'tap Jump').replace(/\bSpace\b/g, 'Jump') : text;
 }
 
 function stepRun(engine) {
@@ -609,7 +627,7 @@ function stepRun(engine) {
     for (const rule of run.def.arrival || []) {
       if (p.x >= rule.x0 && p.x <= rule.x1 && p.y >= rule.y0 && p.y <= rule.y1) {
         fireAll(engine, rule.events || [], 'arrival');
-        if (rule.toast) engine.toast(rule.toast);
+        if (rule.toast) engine.toast(puzzleToast(rule.toast));
         break;
       }
     }
@@ -624,7 +642,7 @@ function stepRun(engine) {
     if (edge.edge === 'enter' && edge.trigger.pullMs) run.pull = { x: edge.trigger.x, until: now + edge.trigger.pullMs };
     if (edge.edge === 'enter' && edge.trigger.toast && !run.toasted.has(edge.trigger.id)) {
       run.toasted.add(edge.trigger.id);
-      engine.toast(edge.trigger.toast);
+      engine.toast(puzzleToast(edge.trigger.toast));
     }
     // An instance's moment (A Summer's Day's birds, stones, water, orbs and dots).
     if (edge.edge === 'enter' && edge.trigger.moment) engine.instanceMoment?.(edge.trigger.moment, edge.trigger.id);
