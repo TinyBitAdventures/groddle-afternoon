@@ -62,7 +62,10 @@ describe('restoration section menu (ReportMenu.php)', () => {
     // Every anchor lands on a band of the page.
     for (const [href] of links.filter(([h]) => h.startsWith('#'))) assert.match(out, new RegExp(`<section class="wp-block-group band[^"]*" id="${href.slice(1)}">`), href);
     // The masthead's jump paragraph moved into the menu: its words are not shown twice.
-    assert.equal(out.split('Other remakes compared').length - 1, 1);
+    assert.equal(out.replace(nav[0], '').split('Other remakes compared').length - 1, 0);
+    // In the bar it is pinned at the end (computers) and ends the scrolling row (phones): one shows at a width.
+    assert.match(nav[0], /<ul class="report-menu-more"><li class="report-menu-out"><a href="\/compare\/">/);
+    assert.match(nav[0], /<li class="report-menu-out-inline"><a href="\/compare\/">Other remakes compared<\/a><\/li><\/ul>/);
     assert.doesNotMatch(out, /<p class="jump"/);
     assert.doesNotMatch(nav[0], /—/, 'no em dashes');
     // Everything else on the page is as it was.

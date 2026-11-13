@@ -369,6 +369,35 @@ function renderRest(data) {
   if (stamp) stamp.textContent = `Generated from the repository on ${data.generatedAt || 'build'}: ${fmt(data.git.commits)} commits since ${data.git.since}, ${data.tests} test files.`;
 }
 
+/* —— The section bar ——————————————————————————————————————— */
+/** The sticky bar's band links scroll sideways (style.css .report-menu): mark which side has more for the fade, and add a step button on each side while the row overflows. */
+function setupReportMenu() {
+  const list = $('.report-menu-links');
+  if (!list) return;
+  const step = (dir, label) => {
+    const b = el('button', { type: 'button', class: 'report-menu-step', 'aria-label': label, hidden: '' }, dir < 0 ? '\u2039' : '\u203a');
+    b.addEventListener('click', () => list.scrollBy({ left: dir * list.clientWidth * 0.7, behavior: 'smooth' }));
+    return b;
+  };
+  const back = step(-1, 'Earlier sections');
+  const on = step(1, 'More sections');
+  list.before(back);
+  list.after(on);
+  const update = () => {
+    const max = list.scrollWidth - list.clientWidth;
+    const atStart = list.scrollLeft <= 2;
+    const atEnd = list.scrollLeft >= max - 2;
+    const more = max <= 2 ? '' : atStart ? 'end' : atEnd ? 'start' : 'both';
+    if (more) list.dataset.more = more; else delete list.dataset.more;
+    back.hidden = !more || atStart;
+    on.hidden = !more || atEnd;
+  };
+  list.addEventListener('scroll', update, { passive: true });
+  addEventListener('resize', update);
+  update();
+}
+setupReportMenu();
+
 // Beside this script, wherever the page that loads it lives.
 const data = await (await fetch(new URL('data.json', import.meta.url), { cache: 'no-cache' })).json();
 renderScore(data);
