@@ -47,7 +47,8 @@ function uniqueSpritesNeeded() {
 function pngStemsOnDisk() {
   const stems = new Set();
   for (const name of readdirSync(decoDir)) {
-    if (!name.endsWith('.webp') || /@[\d.]+x\.webp$/.test(name)) continue;
+    // gz_ files are new art outside the library manifest (js/deco-new-list.js, tests/g316-provenance.test.js).
+    if (!name.endsWith('.webp') || /@[\d.]+x\.webp$/.test(name) || name.startsWith('gz_')) continue;
     const full = join(decoDir, name);
     const st = statSync(full);
     if (st.size < 30) continue;

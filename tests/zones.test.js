@@ -21,7 +21,7 @@ import { copyFileSync, existsSync, mkdirSync, mkdtempSync, readFileSync, readdir
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { GAME_DIR } from '../tools/repos.mjs';
-import { buildZones, files, listZones, mergeZoneIndex, mergeZoneEcology, streetWithZoneEdits, zoneStreets, sha256, overlay, NEW_ART } from '../tools/builder/zones.mjs';
+import { buildZones, files, listZones, mergeZoneIndex, mergeZoneEcology, streetWithZoneEdits, zoneStreets, sha256, overlay, NEW_ART, MADE_DECOS } from '../tools/builder/zones.mjs';
 import { publishZone, unacknowledged } from '../tools/builder/publish.mjs';
 import { loadValidatorContext } from '../tools/builder/validator-context.mjs';
 import { validateZone } from '../public/js/builder/validate.js?v=93c15080';
@@ -105,10 +105,10 @@ describe('the published zones in this checkout (public/assets/zones)', () => {
 
   it('every gz_ file ships with its provenance row, and every row with its file', () => {
     const gz = readdirSync(join(GAME_DIR, 'public/assets/decos/groddle')).filter((f) => f.startsWith('gz_'));
-    const art = existsSync(join(GAME_DIR, NEW_ART)) ? json(NEW_ART).art : {};
+    const art = { ...(existsSync(join(GAME_DIR, MADE_DECOS)) ? json(MADE_DECOS).art : {}), ...(existsSync(join(GAME_DIR, NEW_ART)) ? json(NEW_ART).art : {}) };
     for (const f of gz) {
       const name = f.replace(/(@1\.5x)?\.webp$/, '');
-      assert.ok(art[name], `${f} has no row in ${NEW_ART}`);
+      assert.ok(art[name], `${f} has no row in ${NEW_ART} or ${MADE_DECOS}`);
       assert.equal(sha256(readFileSync(join(GAME_DIR, 'public/assets/decos/groddle', f))), f.includes('@1.5x') ? art[name].sha256_3 : art[name].sha256, f);
     }
     for (const [name, row] of Object.entries(art)) assert.ok(existsSync(join(GAME_DIR, row.file)), name);
@@ -367,5 +367,30 @@ describe('the game: zones are solo only (js/zone-streets.js, js/street-loader.js
     }
     assert.deepEqual(Object.keys(withoutZoneRows({ [lane]: {}, [HECHEY]: {}, GX: { zone: 'z' } })), [HECHEY]);
     assert.deepEqual(withoutZoneConnects([{ id: 'a', connects: [{ tsid: lane }] }, { id: 'b', connects: [{ tsid: lane }, { tsid: HECHEY }] }]), [{ id: 'b', connects: [{ tsid: HECHEY }] }]);
+  });
+});
+
+describe('made decos: new art for Groddle\'s own rebuilt streets (tools/provenance/made-decos.json)', () => {
+  it('build-zones lists them in js/deco-new-list.js beside the zones\' art, keeps their files, and refuses bytes their row does not name', () => {
+    const root = tempCheckout();
+    const fs = files(root);
+    const bytes = readFileSync(join(ART, 'gz_moss_mound.webp'));
+    fs.write('public/assets/decos/groddle/gz_ai_test_prop.webp', bytes);
+    fs.write('public/assets/decos/groddle/gz_ai_test_prop@1.5x.webp', bytes);
+    const row = { file: 'public/assets/decos/groddle/gz_ai_test_prop.webp', sha256: sha256(bytes), file3: 'public/assets/decos/groddle/gz_ai_test_prop@1.5x.webp', sha256_3: sha256(bytes) };
+    fs.write(MADE_DECOS, JSON.stringify({ art: { gz_ai_test_prop: row } }));
+    buildZones(fs);
+    const list = readFileSync(join(root, 'public/js/deco-new-list.js'), 'utf8');
+    assert.match(list, /export const NEW_DECOS = new Set\(\["gz_ai_test_prop"\]\);/);
+    assert.match(list, /export const NEW_DECOS_HIRES = new Set\(\["gz_ai_test_prop"\]\);/);
+    assert.ok(fs.exists(row.file) && fs.exists(row.file3), 'not swept as a stray gz_ file');
+    fs.write(MADE_DECOS, JSON.stringify({ art: { gz_ai_test_prop: { ...row, sha256: 'f'.repeat(64) } } }));
+    assert.throws(() => buildZones(fs), /not the picture its provenance names/);
+  });
+
+  it('this checkout\'s made decos: the EZ Cookin\' props, each drawn on its street', () => {
+    const made = json(MADE_DECOS).art;
+    assert.deepEqual(Object.keys(made).sort(), ['gz_ai_ezc_glass_counter', 'gz_ai_ezc_hanging_lamp', 'gz_ai_ezc_round_table']);
+    for (const row of Object.values(made)) assert.deepEqual(row.streets, ['GIFII3UBRFB3KBE']);
   });
 });

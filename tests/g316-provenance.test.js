@@ -97,16 +97,18 @@ describe('non-CC0 files stay out (G316/G317)', () => {
   });
 });
 
-describe('new art from published zones (level builder P6)', () => {
-  it('every gz_ file is listed in tools/provenance/new-art.json with its bytes, maker and a CC0 1.0 dedication', () => {
+describe('new art from published zones (level builder P6) and made decos', () => {
+  it('every gz_ file is listed in tools/provenance/new-art.json or made-decos.json with its bytes, maker and a CC0 1.0 dedication', () => {
     const file = join(root, 'tools/provenance/new-art.json');
     const art = existsSync(file) ? JSON.parse(readFileSync(file, 'utf8')).art : {};
     const policy = JSON.parse(readFileSync(join(root, 'tools/builder/licence-policy.json'), 'utf8'));
     const sha = (buf) => createHash('sha256').update(buf).digest('hex');
     const decos = join(pub, 'assets/decos/groddle');
+    // Groddle's own rebuilt streets' new art (not a zone's) is recorded by hand: made-decos.json.
+    const made = JSON.parse(readFileSync(join(root, 'tools/provenance/made-decos.json'), 'utf8')).art;
     for (const f of readdirSync(decos).filter((n) => n.startsWith('gz_'))) {
       const name = f.replace(/(@1\.5x)?\.webp$/, '');
-      const row = art[name];
+      const row = art[name] || made[name];
       assert.ok(row, `${f}: no provenance row`);
       assert.equal(sha(readFileSync(join(decos, f))), f.includes('@1.5x') ? row.sha256_3 : row.sha256, `${f}: not the bytes its provenance names`);
     }
@@ -117,8 +119,25 @@ describe('new art from published zones (level builder P6)', () => {
       assert.ok(existsSync(join(root, row.file)), row.file);
       assert.ok(row.zones.length > 0, `${name}: no zone uses it`);
     }
+    // The made decos: AI-generated, each with its model, prompt, inputs and the streets that draw it.
+    const index = JSON.parse(readFileSync(join(pub, 'assets/streets/index.json'), 'utf8')).streets;
+    for (const [name, row] of Object.entries(made)) {
+      assert.match(name, new RegExp(policy.licences[row.licence].prefix ? `^${policy.licences[row.licence].prefix}` : '^gz_'), name);
+      assert.ok(!art[name], `${name}: both a zone's and a made deco`);
+      assert.equal(policy.licences[row.licence]?.origin, 'new', `${name}: ${row.licence}`);
+      for (const k of policy.licences[row.licence].requires) assert.ok(row[k], `${name}: ${k}`);
+      assert.ok(row.inputs.every((i) => /^(deco:|own:)/.test(i)), `${name}: inputs`);
+      assert.ok(row.inputs.filter((i) => i.startsWith('deco:')).every((i) => existsSync(join(decos, `${i.slice(5)}.webp`))), `${name}: library inputs`);
+      assert.equal(row.inputFiles.length, 5, `${name}: the five files given`);
+      for (const f of [row.file, row.file3]) assert.ok(existsSync(join(root, f)), f);
+      assert.ok(row.streets.length > 0 && row.streets.every((t) => index[t]), `${name}: streets`);
+      for (const t of row.streets) {
+        const street = JSON.parse(readFileSync(join(pub, index[t].file), 'utf8'));
+        assert.ok(street.layers.some((l) => l.decos.some((d) => d.sprite === name)), `${name}: ${t} draws it`);
+      }
+    }
     // Only gz_ names are new art, and the library manifest stays Tiny Speck's.
-    assert.ok(Object.keys(art).every((n) => /^gz_[a-z0-9_]+$/.test(n)));
+    assert.ok([...Object.keys(art), ...Object.keys(made)].every((n) => /^gz_[a-z0-9_]+$/.test(n)));
     assert.ok(!JSON.parse(readFileSync(join(pub, 'assets/decos/manifest.json'), 'utf8')).some((n) => n.startsWith('gz_')));
   });
 });
@@ -168,7 +187,7 @@ describe('sprites, decos and garden art (G316)', () => {
   it('every manifest deco has its file; renamed twins draw their CC0 SWF render', async () => {
     const names = JSON.parse(readFileSync(join(pub, 'assets/decos/manifest.json'), 'utf8'));
     for (const n of names) assert.ok(existsSync(join(pub, 'assets/decos/groddle', `${n}.webp`)), n);
-    const { DECO_TWINS } = await import('../public/js/street-render.js?v=0f1293df');
+    const { DECO_TWINS } = await import('../public/js/street-render.js?v=9b11451f');
     for (const [alias, twin] of Object.entries(DECO_TWINS)) {
       assert.ok(!names.includes(alias), alias);
       assert.ok(names.includes(twin), twin);

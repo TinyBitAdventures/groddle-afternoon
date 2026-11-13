@@ -30,7 +30,7 @@
 import { questStatus } from '../quest-offers.js?v=89511e1e';
 import { GIANT_SCREEN_FADE_MS, giantLoveResponse } from '../giant-love.js?v=aa9ea315';
 import { GIANTS, inEmblemHitbox } from '../shrines.js?v=7260fa28';
-import { vogPages } from '../newxp.js?v=7712f77d';
+import { vogPages } from '../newxp.js?v=92f67942';
 import { screenInput } from '../screen-fx.js?v=2e975a82';
 
 export const SHRINE_HINT_FEATURE_ID = 'shrine-hint';

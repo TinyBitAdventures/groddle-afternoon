@@ -48,7 +48,7 @@
  * EXIT sign; the sign texts already matched.
  */
 
-import { BODY_H, JUMP_GAP, JUMP_RISE, pushOutOfSolids, spawnQuoins, takeQuoins } from './puzzle-kit.js?v=eb76c151';
+import { BODY_H, JUMP_GAP, JUMP_RISE, pushOutOfSolids, spawnQuoins, takeQuoins } from './puzzle-kit.js?v=ba657a3e';
 
 const W = 7600;
 const H = 1100;

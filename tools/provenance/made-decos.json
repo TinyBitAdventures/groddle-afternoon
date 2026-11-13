@@ -1,0 +1,311 @@
+{
+ "format": "groddle-made-decos/1",
+ "about": "New decos made for Groddle's own rebuilt streets (not a published zone): AI-generated or own work, dedicated CC0 1.0 with who or what made them and from what inputs (tools/builder/licence-policy.json). They ship as gz_ files beside the library's, kept out of assets/decos/manifest.json; tools/builder/build-zones.mjs lists them in js/deco-new-list.js after checking each file's sha256 here, and tests/g316-provenance.test.js allows exactly these files with the zones' new-art.json.",
+ "references": [
+  "Players' full-street snaps of Breezy, EZ Cookin' from the Eleven collections (zoi, mackenzie, cleops, Nov-Dec 2012): reference only, never given to the model and never in the repo; the sizes in attach/01 were measured from them and the prompts describe them in words"
+ ],
+ "pack": "research/art-briefs/ez-cookin (outside git): brief.md, pack.md, prompts/, attach/ and attach/t3/ (the five files given), drop/ (model.txt)",
+ "count": 3,
+ "art": {
+  "gz_ai_ezc_glass_counter": {
+   "what": "The glass serving counter (three on the street, the food on their lids)",
+   "file": "public/assets/decos/groddle/gz_ai_ezc_glass_counter.webp",
+   "sha256": "a62248510fd0f42bcc515e7d41a914482849a0c071a2840c1202b2649081d5ad",
+   "bytes": 15002,
+   "file3": "public/assets/decos/groddle/gz_ai_ezc_glass_counter@1.5x.webp",
+   "sha256_3": "d84b2e44dea9383c08f4d835b12c92103fcd8ac12266575f05d25f49a3d09c26",
+   "bytes3": 26368,
+   "w": 220,
+   "h": 66,
+   "size": "220 x 64 units on the street (attach/01: glass lid 27, steel band 4, tub 33); the drawing is 3.34 to 1 against 3.44, drawn 220 x 64 (3% shorter than its file)",
+   "replaces": "store_counter (Tiny Speck, CC0 1.0), the stand-in since G682",
+   "streets": [
+    "GIFII3UBRFB3KBE"
+   ],
+   "licence": "ai-generated",
+   "author": "Austin Ginder (directed and chose it)",
+   "madeBy": "Grok Bot, for Austin Ginder, who directed and chose it",
+   "tool": "GPT Image 2.6 Sunburst in T3 Chat canvas",
+   "model": "GPT Image 2.6 Sunburst",
+   "made": "2026-11-13",
+   "chosen": {
+    "by": "Austin Ginder",
+    "on": "2026-11-13",
+    "of": "1 generation (research/art-briefs/ez-cookin/drop/model.txt)"
+   },
+   "settings": "21:9, High 2K, transparent, 1 image; 3072 x 1312 generated, trimmed to the drawing before the drop (model.txt)",
+   "prompt": "Draw one game prop for a whimsical 2D side-scrolling game (Glitch, by Tiny Speck, 2012): a glass-topped serving\ncounter that stands outdoors on a forest lane, with food laid on it for a cooking lesson. The original art is lost;\nattachment 1 gives its exact proportions.\n\nOutput: ONE counter, alone, centred, on a TRANSPARENT background (PNG with alpha). If transparency is impossible, use a\nflat pure magenta background (#FF00FF) with nothing else on it. About 880 x 256 pixels (4 pixels per game unit: the\ncounter is 220 units wide and 64 tall). No text, no ground, no grass, no shadow on the ground, no food on it.\n\nWhat it looks like (from players' 2012 pictures of the street, described here):\n- Seen from the side with the camera a little above, so the lid's top shows as a thin strip.\n- Top part (27 units tall): a long rounded glass lid like a sneeze guard or a display case, pale aqua tinted and\n  see-through, with two bright white highlight streaks and a thin lighter rim. The glass is semi-transparent: what\n  is behind it will show through in the game.\n- A thin darker steel band (4 units) where the lid meets the body, with a small round silver rivet near each end.\n- Bottom part (33 units tall): a white and pale grey steel tub, the ends rounded, narrowing a little toward the bottom\n  (about 197 units wide at the base), softly shaded darker toward the bottom edge, with two thin vertical panel seams.\n- Clean, friendly, slightly cartoon kitchen equipment, nothing industrial or grimy.\n\nStyle: flat vector game art exactly like the attachments from Tiny Speck: smooth shapes, soft gradients, gentle\nhighlights, no hard black outlines, no photographic texture, no 3D render look, no perspective distortion.\n\nAttachments (1 is our measurement drawing; 2 to 5 are Tiny Speck's own art, CC0):\n1. the sizes in game units. Follow piece 1's proportions.\n2. how Tiny Speck draws glass and glossy tops: copy the glass's tint, rim and white streak.\n3, 4. other furniture and lamps from the same game, for the finish.\n5. the forest street it stands on and the food that will sit on it (cheese, tomato, bun, meat): it must look right\n   next to these, at their scale.",
+   "promptNote": "The prompt exactly as given to the model: research/art-briefs/ez-cookin/prompts/01-glass-counter.txt (outside git), with the five attachments in inputFiles in this order.",
+   "inputs": [
+    "own:our measurement drawing of the three pieces, sizes from players' 2012 snaps (attach/t3/1-measurements-ours.png)",
+    "deco:k04_glass_01",
+    "deco:store_counter",
+    "deco:k04_window_01",
+    "deco:k04_table_02",
+    "deco:k04_table_01",
+    "deco:k04_table_05",
+    "deco:k04_lamp_05",
+    "deco:k04_lamp_04",
+    "deco:hanging_lightbulb",
+    "deco:bureaucratic_hall_light_1",
+    "deco:tree_coniferous_fg_2",
+    "deco:groddle_bush1",
+    "deco:groddle_fern_1",
+    "deco:heights_face_rock_1",
+    "deco:grassSlice_f1"
+   ],
+   "inputFiles": [
+    {
+     "n": 1,
+     "file": "1-measurements-ours.png",
+     "sha256": "bb8faa4d1ec4897137508fa288d6592d4752c4da83d3832fce41781302042535",
+     "what": "the three pieces as plain outlines with their sizes in street units, and where each stands on the street (research/art-briefs/ez-cookin/attach/01-measurements-ours.svg)",
+     "source": "our own measurement drawing: sizes and positions measured from players' 2012 full-street snaps of the street (Eleven collections, research/eleven-snaps/Tutorial), measurements only; the snaps were never attached or copied"
+    },
+    {
+     "n": 2,
+     "file": "2-cc0-glass-and-gloss.png",
+     "sha256": "27f8eebe76f732f30f1fa09584c8eba0810c1adafb8ce3998bc02c43fb253aae",
+     "what": "k04_glass_01, store_counter and k04_window_01 side by side: how Tiny Speck drew glass and glossy tops",
+     "source": "Tiny Speck, CC0 1.0: library decos kukubee2.swf#k04_glass_01, leavens1.swf#store_counter, kukubee2.swf#k04_window_01"
+    },
+    {
+     "n": 3,
+     "file": "3-cc0-iron-tables.png",
+     "sha256": "b9ee00d119defe771f26bfae1609ad097c1c305dd785475554e5062091cd5019",
+     "what": "k04_table_02, k04_table_01 and k04_table_05: tables with scrolled legs, for the table's legs and feet",
+     "source": "Tiny Speck, CC0 1.0: library decos kukubee2.swf#k04_table_02, #k04_table_01, #k04_table_05"
+    },
+    {
+     "n": 4,
+     "file": "4-cc0-white-lamps-and-cord.png",
+     "sha256": "7c2a6e62ffc3796a6ab92ded62a91e36f3608159cee4b98d3fa1944d3ba025a1",
+     "what": "k04_lamp_05, k04_lamp_04, hanging_lightbulb and bureaucratic_hall_light_1: white shades and a hanging cord, for the lamp's finish",
+     "source": "Tiny Speck, CC0 1.0: library decos kukubee2.swf#k04_lamp_05, #k04_lamp_04, groddle1.swf#hanging_lightbulb, #bureaucratic_hall_light_1"
+    },
+    {
+     "n": 5,
+     "file": "5-cc0-street-art-and-food.png",
+     "sha256": "42d5c70a364b143741aec1ae9973caddbcea854fa7ac5f5dc712747f68d24284",
+     "what": "the forest street art and the food that sits on the props, for colour, line weight and scale",
+     "source": "Tiny Speck, CC0 1.0: library decos groddle1.swf#tree_coniferous_fg_2, #groddle_bush1, #groddle_fern_1, #heights_face_rock_1, newxp.swf#grassSlice_f1; item icons from glitch-items food/cheese, food/tomato, food/bun, food/meat and tools/tool_base/knife_and_board"
+    }
+   ],
+   "source": {
+    "drop": "research/art-briefs/ez-cookin/drop/glass-counter.png",
+    "dropSha256": "2ef659c1c3fc3dc21450c0736d3759ac3a1643b97e1b8455f7ae8796ed1925d2",
+    "trim": "to the drawn pixels (alpha over 8): x 7-2547, y 8-769 (11.545 px a unit)",
+    "resize": "premultiplied Lanczos to whole units at 2 and 3 px a unit: 440 x 132 and 660 x 198",
+    "masterSha256": {
+     "x2": "388dd873c883b1bdc32c3483398aefee677a4323b4f6e9606411201760255cc2",
+     "x3": "24d815f59077f049186e2817f5065113be5a1410f16c00cb61fe1845f9959b39"
+    },
+    "encode": "cwebp 1.6.0: -metadata none -q 82 -m 4 -sharp_yuv -alpha_q 100 -alpha_filter best (tools/deco-pipeline/build.py's lossy settings)"
+   },
+   "intake": {
+    "on": "2026-11-13",
+    "by": "Claude (lane madeart): sizes checked against attach/01; trimmed and resized only, nothing redrawn"
+   }
+  },
+  "gz_ai_ezc_hanging_lamp": {
+   "what": "The white hanging lamp (one over each counter)",
+   "file": "public/assets/decos/groddle/gz_ai_ezc_hanging_lamp.webp",
+   "sha256": "5e0c305a5ddef07c8bd7af7c5f0332fc7bb276628205f247affa9ff7a050822a",
+   "bytes": 5994,
+   "file3": "public/assets/decos/groddle/gz_ai_ezc_hanging_lamp@1.5x.webp",
+   "sha256_3": "8de551371390e7e5d64e6413c3bb784dc7a44090564bd6136ee0ef6f5dd2b205",
+   "bytes3": 10844,
+   "w": 75,
+   "h": 654,
+   "size": "shade 75 x 27 units under 22 units of wires (attach/01); the drawing: shade 75 x 25.5, wires 23, then 59 units of cord, lengthened at intake so it rises to the top of the street (y -1000) wherever the camera looks; the shade hangs at -375 to -348 as in the snaps",
+   "replaces": "nothing: the store_lamp_01 stand-ins read like swings and were dropped (Austin 2026-11-13)",
+   "streets": [
+    "GIFII3UBRFB3KBE"
+   ],
+   "licence": "ai-generated",
+   "author": "Austin Ginder (directed and chose it)",
+   "madeBy": "Grok Bot, for Austin Ginder, who directed and chose it",
+   "tool": "GPT Image 2.6 Sunburst in T3 Chat canvas",
+   "model": "GPT Image 2.6 Sunburst",
+   "made": "2026-11-13",
+   "chosen": {
+    "by": "Austin Ginder",
+    "on": "2026-11-13",
+    "of": "1 generation (research/art-briefs/ez-cookin/drop/model.txt)"
+   },
+   "settings": "3:4, High 2K, transparent, 1 image; 1536 x 2048 generated, trimmed to the drawing before the drop (model.txt)",
+   "prompt": "Draw one game prop for a whimsical 2D side-scrolling game (Glitch, by Tiny Speck, 2012): a white hanging lamp that\nhangs over an outdoor serving counter in a forest. The original art is lost; attachment 1 gives its exact proportions.\n\nOutput: ONE lamp, alone, centred, on a TRANSPARENT background (PNG with alpha). If transparency is impossible, use a\nflat pure magenta background (#FF00FF) with nothing else on it. About 300 x 400 pixels (4 pixels per game unit). No\ntext, no ceiling, no tree, no light cone, no glow on the background.\n\nWhat it looks like (from players' 2012 pictures of the street, described here):\n- A short, wide drum shade, 75 units wide and 27 tall: glossy white, its sides gently shaded pale blue-grey toward\n  the bottom, a soft white highlight across the front, flat top and bottom with slightly rounded corners.\n- Under the middle of the shade, a small round white diffuser (about 14 units wide, 3 tall), a touch brighter.\n- Four thin pale steel wires rise from the top of the shade and meet at one point 22 units above it, like a\n  hanging planter's hanger.\n- From that point a single thin dark cord goes straight up to the top edge of the picture (about 50 units of it; the\n  game crops or stretches it).\n- It must read at once as a ceiling lamp, never as a swing or a hanging seat: a solid drum shade, wires meeting at\n  one point, no seat, no ropes to two sides.\n\nStyle: flat vector game art exactly like the attachments from Tiny Speck: smooth shapes, soft gradients, gentle\nhighlights, no hard black outlines, no photographic texture, no 3D render look.\n\nAttachments (1 is our measurement drawing; 2 to 5 are Tiny Speck's own art, CC0):\n1. the sizes in game units. Follow piece 2's proportions.\n2, 3. glass, gloss and furniture from the same game, for the finish.\n4. Tiny Speck's white lamp shades and a hanging cord: copy the shade's glossy white and the cord's look.\n5. the forest street it hangs in, for colour and line weight.",
+   "promptNote": "The prompt exactly as given to the model: research/art-briefs/ez-cookin/prompts/02-hanging-lamp.txt (outside git), with the five attachments in inputFiles in this order.",
+   "inputs": [
+    "own:our measurement drawing of the three pieces, sizes from players' 2012 snaps (attach/t3/1-measurements-ours.png)",
+    "deco:k04_glass_01",
+    "deco:store_counter",
+    "deco:k04_window_01",
+    "deco:k04_table_02",
+    "deco:k04_table_01",
+    "deco:k04_table_05",
+    "deco:k04_lamp_05",
+    "deco:k04_lamp_04",
+    "deco:hanging_lightbulb",
+    "deco:bureaucratic_hall_light_1",
+    "deco:tree_coniferous_fg_2",
+    "deco:groddle_bush1",
+    "deco:groddle_fern_1",
+    "deco:heights_face_rock_1",
+    "deco:grassSlice_f1"
+   ],
+   "inputFiles": [
+    {
+     "n": 1,
+     "file": "1-measurements-ours.png",
+     "sha256": "bb8faa4d1ec4897137508fa288d6592d4752c4da83d3832fce41781302042535",
+     "what": "the three pieces as plain outlines with their sizes in street units, and where each stands on the street (research/art-briefs/ez-cookin/attach/01-measurements-ours.svg)",
+     "source": "our own measurement drawing: sizes and positions measured from players' 2012 full-street snaps of the street (Eleven collections, research/eleven-snaps/Tutorial), measurements only; the snaps were never attached or copied"
+    },
+    {
+     "n": 2,
+     "file": "2-cc0-glass-and-gloss.png",
+     "sha256": "27f8eebe76f732f30f1fa09584c8eba0810c1adafb8ce3998bc02c43fb253aae",
+     "what": "k04_glass_01, store_counter and k04_window_01 side by side: how Tiny Speck drew glass and glossy tops",
+     "source": "Tiny Speck, CC0 1.0: library decos kukubee2.swf#k04_glass_01, leavens1.swf#store_counter, kukubee2.swf#k04_window_01"
+    },
+    {
+     "n": 3,
+     "file": "3-cc0-iron-tables.png",
+     "sha256": "b9ee00d119defe771f26bfae1609ad097c1c305dd785475554e5062091cd5019",
+     "what": "k04_table_02, k04_table_01 and k04_table_05: tables with scrolled legs, for the table's legs and feet",
+     "source": "Tiny Speck, CC0 1.0: library decos kukubee2.swf#k04_table_02, #k04_table_01, #k04_table_05"
+    },
+    {
+     "n": 4,
+     "file": "4-cc0-white-lamps-and-cord.png",
+     "sha256": "7c2a6e62ffc3796a6ab92ded62a91e36f3608159cee4b98d3fa1944d3ba025a1",
+     "what": "k04_lamp_05, k04_lamp_04, hanging_lightbulb and bureaucratic_hall_light_1: white shades and a hanging cord, for the lamp's finish",
+     "source": "Tiny Speck, CC0 1.0: library decos kukubee2.swf#k04_lamp_05, #k04_lamp_04, groddle1.swf#hanging_lightbulb, #bureaucratic_hall_light_1"
+    },
+    {
+     "n": 5,
+     "file": "5-cc0-street-art-and-food.png",
+     "sha256": "42d5c70a364b143741aec1ae9973caddbcea854fa7ac5f5dc712747f68d24284",
+     "what": "the forest street art and the food that sits on the props, for colour, line weight and scale",
+     "source": "Tiny Speck, CC0 1.0: library decos groddle1.swf#tree_coniferous_fg_2, #groddle_bush1, #groddle_fern_1, #heights_face_rock_1, newxp.swf#grassSlice_f1; item icons from glitch-items food/cheese, food/tomato, food/bun, food/meat and tools/tool_base/knife_and_board"
+    }
+   ],
+   "source": {
+    "drop": "research/art-briefs/ez-cookin/drop/hanging-lamp.png",
+    "dropSha256": "3d6b83bbbf71b2f35828ca212f3d882d215cdd43031f705ee0b6ad5f28ddbe26",
+    "trim": "to the drawn pixels (alpha over 8): x 8-1157, y 0-1686 (15.32 px a unit)",
+    "resize": "premultiplied Lanczos to whole units at 2 and 3 px a unit: 150 x 1308 and 225 x 1962; first the cord lengthened 544 units upward by repeating its top 4 rows (the plain cord)",
+    "masterSha256": {
+     "x2": "036ea86668208d5e22858fcb61a6226c2f8e6fb5f70557f339846d20e25f4381",
+     "x3": "0a1d3c618be73fe436368265cf9d90b764e13aa2db07a265153dbc6e3e78a5cf"
+    },
+    "encode": "cwebp 1.6.0: -metadata none -q 82 -m 4 -sharp_yuv -alpha_q 100 -alpha_filter best (tools/deco-pipeline/build.py's lossy settings)"
+   },
+   "intake": {
+    "on": "2026-11-13",
+    "by": "Claude (lane madeart): sizes checked against attach/01; trimmed and resized only, the cord lengthened, nothing redrawn"
+   }
+  },
+  "gz_ai_ezc_round_table": {
+   "what": "The round mosaic table the Knife & Board waits on",
+   "file": "public/assets/decos/groddle/gz_ai_ezc_round_table.webp",
+   "sha256": "1e66b3be12b5745a5b1c6c438eabaae51d2f358a4f1518016a917f1afd435730",
+   "bytes": 18430,
+   "file3": "public/assets/decos/groddle/gz_ai_ezc_round_table@1.5x.webp",
+   "sha256_3": "a3d065129ff1a2c8a55ce14fe8993f7c358b1c5ee1c272610dcb26df87f02ef1",
+   "bytes3": 29678,
+   "w": 182,
+   "h": 96,
+   "size": "182 x 88 units (attach/01); the drawing is 1.90 to 1 against 2.07 (8% taller), drawn at its own shape, 182 x 96, feet where the snaps have them",
+   "replaces": "k04_table_01 (Tiny Speck, CC0 1.0), the stand-in since G682",
+   "streets": [
+    "GIFII3UBRFB3KBE"
+   ],
+   "licence": "ai-generated",
+   "author": "Austin Ginder (directed and chose it)",
+   "madeBy": "Grok Bot, for Austin Ginder, who directed and chose it",
+   "tool": "GPT Image 2.6 Sunburst in T3 Chat canvas",
+   "model": "GPT Image 2.6 Sunburst",
+   "made": "2026-11-13",
+   "chosen": {
+    "by": "Austin Ginder",
+    "on": "2026-11-13",
+    "of": "1 generation (research/art-briefs/ez-cookin/drop/model.txt)"
+   },
+   "settings": "21:9, High 2K, transparent, 1 image; 3072 x 1312 generated, trimmed to the drawing before the drop (model.txt)",
+   "prompt": "Draw one game prop for a whimsical 2D side-scrolling game (Glitch, by Tiny Speck, 2012): a small round cafe table with\na tiled top and scrolled iron legs, standing outdoors on a forest lane. A Knife & Board waits on it. The original art\nis lost; attachment 1 gives its exact proportions.\n\nOutput: ONE table, alone, centred, on a TRANSPARENT background (PNG with alpha). If transparency is impossible, use a\nflat pure magenta background (#FF00FF) with nothing else on it. About 728 x 352 pixels (4 pixels per game unit: the\ntable is 182 units wide and 88 tall). No text, no ground, no grass, no shadow on the ground, nothing on the table.\n\nWhat it looks like (from players' 2012 pictures of the street, described here):\n- Seen from the side with the camera a little above, so the round top shows as a flat oval (182 wide, about 30 tall).\n- The top is a mosaic: an outer ring of white and very pale grey tiles, inside it a ring of pale aqua glass, and in\n  the middle small square tiles in pale aqua, light grey and soft beige. Gently glossy.\n- The rim (about 12 units thick) is a band of white and grey tile segments, alternating.\n- The base (46 units tall, about 70 wide) is grey wrought iron: four slim S-shaped legs that curl into small scrolls\n  at the feet, joined by a thin cross bar near the bottom.\n\nStyle: flat vector game art exactly like the attachments from Tiny Speck: smooth shapes, soft gradients, gentle\nhighlights, no hard black outlines, no photographic texture, no 3D render look.\n\nAttachments (1 is our measurement drawing; 2 to 5 are Tiny Speck's own art, CC0):\n1. the sizes in game units. Follow piece 3's proportions.\n2. how Tiny Speck draws glass and glossy tops: for the aqua glass ring.\n3. Tiny Speck's tables with scrolled iron legs: copy their leg shapes and scroll feet, in grey iron instead of brown.\n4. other furniture from the same game, for the finish.\n5. the forest street it stands on and the Knife & Board that sits on it, at their scale.",
+   "promptNote": "The prompt exactly as given to the model: research/art-briefs/ez-cookin/prompts/03-round-table.txt (outside git), with the five attachments in inputFiles in this order.",
+   "inputs": [
+    "own:our measurement drawing of the three pieces, sizes from players' 2012 snaps (attach/t3/1-measurements-ours.png)",
+    "deco:k04_glass_01",
+    "deco:store_counter",
+    "deco:k04_window_01",
+    "deco:k04_table_02",
+    "deco:k04_table_01",
+    "deco:k04_table_05",
+    "deco:k04_lamp_05",
+    "deco:k04_lamp_04",
+    "deco:hanging_lightbulb",
+    "deco:bureaucratic_hall_light_1",
+    "deco:tree_coniferous_fg_2",
+    "deco:groddle_bush1",
+    "deco:groddle_fern_1",
+    "deco:heights_face_rock_1",
+    "deco:grassSlice_f1"
+   ],
+   "inputFiles": [
+    {
+     "n": 1,
+     "file": "1-measurements-ours.png",
+     "sha256": "bb8faa4d1ec4897137508fa288d6592d4752c4da83d3832fce41781302042535",
+     "what": "the three pieces as plain outlines with their sizes in street units, and where each stands on the street (research/art-briefs/ez-cookin/attach/01-measurements-ours.svg)",
+     "source": "our own measurement drawing: sizes and positions measured from players' 2012 full-street snaps of the street (Eleven collections, research/eleven-snaps/Tutorial), measurements only; the snaps were never attached or copied"
+    },
+    {
+     "n": 2,
+     "file": "2-cc0-glass-and-gloss.png",
+     "sha256": "27f8eebe76f732f30f1fa09584c8eba0810c1adafb8ce3998bc02c43fb253aae",
+     "what": "k04_glass_01, store_counter and k04_window_01 side by side: how Tiny Speck drew glass and glossy tops",
+     "source": "Tiny Speck, CC0 1.0: library decos kukubee2.swf#k04_glass_01, leavens1.swf#store_counter, kukubee2.swf#k04_window_01"
+    },
+    {
+     "n": 3,
+     "file": "3-cc0-iron-tables.png",
+     "sha256": "b9ee00d119defe771f26bfae1609ad097c1c305dd785475554e5062091cd5019",
+     "what": "k04_table_02, k04_table_01 and k04_table_05: tables with scrolled legs, for the table's legs and feet",
+     "source": "Tiny Speck, CC0 1.0: library decos kukubee2.swf#k04_table_02, #k04_table_01, #k04_table_05"
+    },
+    {
+     "n": 4,
+     "file": "4-cc0-white-lamps-and-cord.png",
+     "sha256": "7c2a6e62ffc3796a6ab92ded62a91e36f3608159cee4b98d3fa1944d3ba025a1",
+     "what": "k04_lamp_05, k04_lamp_04, hanging_lightbulb and bureaucratic_hall_light_1: white shades and a hanging cord, for the lamp's finish",
+     "source": "Tiny Speck, CC0 1.0: library decos kukubee2.swf#k04_lamp_05, #k04_lamp_04, groddle1.swf#hanging_lightbulb, #bureaucratic_hall_light_1"
+    },
+    {
+     "n": 5,
+     "file": "5-cc0-street-art-and-food.png",
+     "sha256": "42d5c70a364b143741aec1ae9973caddbcea854fa7ac5f5dc712747f68d24284",
+     "what": "the forest street art and the food that sits on the props, for colour, line weight and scale",
+     "source": "Tiny Speck, CC0 1.0: library decos groddle1.swf#tree_coniferous_fg_2, #groddle_bush1, #groddle_fern_1, #heights_face_rock_1, newxp.swf#grassSlice_f1; item icons from glitch-items food/cheese, food/tomato, food/bun, food/meat and tools/tool_base/knife_and_board"
+    }
+   ],
+   "source": {
+    "drop": "research/art-briefs/ez-cookin/drop/round-table.png",
+    "dropSha256": "e628ee19df71a4e2039d789d9f7264cb20e62fc0227d0f25b644d9981e25819c",
+    "trim": "to the drawn pixels (alpha over 8): x 8-1980, y 8-1044 (10.835 px a unit)",
+    "resize": "premultiplied Lanczos to whole units at 2 and 3 px a unit: 364 x 192 and 546 x 288",
+    "masterSha256": {
+     "x2": "a3d3a3307eb3fab2154788c8f16045d758748eb31c4d4c34d02624791d1fe075",
+     "x3": "d27de3197e24cc53a079ae8cbd25e44cd01052b61a3f2579aaa6b2884a611737"
+    },
+    "encode": "cwebp 1.6.0: -metadata none -q 82 -m 4 -sharp_yuv -alpha_q 100 -alpha_filter best (tools/deco-pipeline/build.py's lossy settings)"
+   },
+   "intake": {
+    "on": "2026-11-13",
+    "by": "Claude (lane madeart): sizes checked against attach/01; trimmed and resized only, nothing redrawn"
+   }
+  }
+ }
+}

@@ -9,7 +9,7 @@
 
 import { NEIGHBOUR_SCENE, hash01, neighbourLayout } from '../neighbours.js?v=781ad57f';
 import { textureFromUrl } from '../textures.js?v=814d7926';
-import { sharpRoomDeco } from '../deco-hires.js?v=c110b16e';
+import { sharpRoomDeco } from '../deco-hires.js?v=8dbbe0f7';
 
 const DECO = 'assets/decos/groddle/';
 /** The widest view the parallax layers must cover (js/location-view.js: 1680, wider on ultrawide windows). */

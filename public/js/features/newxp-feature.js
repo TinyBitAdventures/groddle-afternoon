@@ -126,23 +126,23 @@ import {
   vogPages,
   tutorialNameDefault,
   TUTORIAL_NAME_MAX,
-} from '../newxp.js?v=7712f77d';
+} from '../newxp.js?v=92f67942';
 import { countWords } from '../words.js?v=ee4e72f8';
 import { ITEM_CATALOG, addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=f49c8998';
 import { QUOIN_SHEET, QUOIN_TYPES, qrazyRewardForLevel } from '../quoins.js?v=61be601c';
 import { soundForQuoin } from '../sound-moments.js?v=c57351b3';
 import { IMAGINATION_UPGRADES } from '../imagination.js?v=1bdfd77c';
-import { EZ_COOKIN_TSID, EZ_FOOD, practiceScreen } from '../practice-streets.js?v=aece0b35';
+import { EZ_COOKIN_TSID, EZ_FOOD, practiceScreen } from '../practice-streets.js?v=6c95cb75';
 import { assignQuest, completeQuest } from '../quests.js?v=40c71a37';
 import { acceptOffer, enqueueQuestOffer, questAwardPayload, turnInQuest } from '../quest-offers.js?v=89511e1e';
 import { getQuestCatalog } from '../content-catalogs.js?v=10b118dd';
 import { locationEventsApi } from './location-events-feature.js?v=f2b6c156';
-import * as kit from '../quest-rooms/kit.js?v=8bb400ea';
+import * as kit from '../quest-rooms/kit.js?v=8fc76e01';
 import { frameTexture, onLoaded, sourceFromUrl, textureFromUrl, whenLoaded } from '../textures.js?v=814d7926';
 import { upgradeSource } from '../sprite-hires.js?v=add7b764';
 import { grantMoodXp } from '../mood-xp.js?v=22648ec0';
 import { displayTopOf, itemstackOverlayPoint, playPoofIn, playSheetOverlay, poofInAlpha } from '../overlay-art.js?v=92383208';
-import { HOME_MACHINE } from '../home-ticket.js?v=76ff751b';
+import { HOME_MACHINE } from '../home-ticket.js?v=629ebe1c';
 import { animalAnchorX, animalAnchorY, createAnimalState } from '../animals.js?v=2520b6ed';
 import {
   AK_ANIMALS,

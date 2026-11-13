@@ -11,7 +11,7 @@
 
 import { frameTexture, isLoaded, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js?v=814d7926';
 import { quoinTouches } from '../quoins.js?v=61be601c';
-import { sharpRoomDeco } from '../deco-hires.js?v=c110b16e';
+import { sharpRoomDeco } from '../deco-hires.js?v=8dbbe0f7';
 
 export const DECO_DIR = 'assets/decos/groddle/';
 export const ICON_DIR = 'assets/sprites/icons/';

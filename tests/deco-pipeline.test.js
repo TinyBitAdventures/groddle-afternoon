@@ -10,9 +10,9 @@ import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { HIRES_DECOS, HIRES_DECOS_BIG } from '../public/js/deco-hires-list.js?v=60fcf361';
-import { decoUrl, installHiresDecos, wantsHiresDecos } from '../public/js/deco-hires.js?v=c110b16e';
+import { decoUrl, installHiresDecos, wantsHiresDecos } from '../public/js/deco-hires.js?v=8dbbe0f7';
 import { resolutionOfUrl } from '../public/js/textures.js?v=814d7926';
-import { recolourBudgetBytes } from '../public/js/street-render.js?v=0f1293df';
+import { recolourBudgetBytes } from '../public/js/street-render.js?v=9b11451f';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const decoDir = join(root, 'public/assets/decos/groddle');
@@ -56,7 +56,8 @@ describe('deco WebP pipeline', () => {
   it('ships a 3x file exactly for the listed decos, 1.5x the 2x size', () => {
     const listed = new Set([...HIRES_DECOS, ...HIRES_DECOS_BIG]);
     assert.ok(listed.size > 1500, `${listed.size} decos with 3x`);
-    for (const f of readdirSync(decoDir).filter((f) => f.endsWith('@1.5x.webp'))) {
+    // gz_ files are new art (js/deco-new-list.js), checked by tests/g316-provenance.test.js.
+    for (const f of readdirSync(decoDir).filter((f) => f.endsWith('@1.5x.webp') && !f.startsWith('gz_'))) {
       assert.ok(listed.has(f.slice(0, -'@1.5x.webp'.length)), `stray ${f}`);
     }
     for (const name of listed) {

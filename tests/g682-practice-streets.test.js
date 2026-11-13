@@ -22,6 +22,8 @@ import {
   EZ_FLAMINGO_AWAY,
   EZ_FOOD,
   EZ_KNIFE_AND_BOARD,
+  EZ_KNIFE_TABLE,
+  EZ_PROP_ART,
   PRACTICE_FLAMINGO,
   PRACTICE_HUB,
   PRACTICE_START,
@@ -42,11 +44,12 @@ import {
   practiceScreen,
   practiceStreetEcology,
   soilStreet,
-} from '../public/js/practice-streets.js?v=aece0b35';
+} from '../public/js/practice-streets.js?v=6c95cb75';
+import { NEW_DECOS, NEW_DECOS_HIRES } from '../public/js/deco-new-list.js?v=bf75b325';
 import { BUILT_ROOMS, QUEST_ROOMS } from '../public/js/quest-rooms/catalog.js?v=a217b716';
-import { FIRST_SKILLS, PRACTICE_TOOLS, firstSkill, practiceToolToPlace } from '../public/js/newxp.js?v=7712f77d';
-import { HELLO as EZ_HELLO, room as ezRoom } from '../public/js/quest-rooms/ez-cookin.js?v=ab0ae15d';
-import { HELLO as SOIL_HELLO, TEND_FIRST, patchArt, patchVerbs, room as soilRoom } from '../public/js/quest-rooms/soil-appreciation.js?v=95beafa6';
+import { FIRST_SKILLS, PRACTICE_TOOLS, firstSkill, practiceToolToPlace } from '../public/js/newxp.js?v=92f67942';
+import { HELLO as EZ_HELLO, room as ezRoom } from '../public/js/quest-rooms/ez-cookin.js?v=922a4c4d';
+import { HELLO as SOIL_HELLO, TEND_FIRST, patchArt, patchVerbs, room as soilRoom } from '../public/js/quest-rooms/soil-appreciation.js?v=68bd1925';
 
 const spike = join(dirname(fileURLToPath(import.meta.url)), '..');
 const pub = join(spike, 'public');
@@ -99,17 +102,39 @@ describe('G682 practice streets: street JSON', () => {
     for (const s of [file(EZ_COOKIN_TSID), file(SOIL_TSID)]) assert.ok(!JSON.stringify(s).includes('eleven-snaps/Tutorial/'));
   });
 
-  it('draw only shipped Tiny Speck decos', () => {
+  it('draw only shipped Tiny Speck decos, and EZ Cookin\'s three made props (made-decos.json)', () => {
+    const made = JSON.parse(readFileSync(join(spike, 'tools/provenance/made-decos.json'), 'utf8')).art;
     for (const s of [file(EZ_COOKIN_TSID), file(SOIL_TSID)]) {
-      for (const d of decos(s)) assert.ok(manifest.has(d.sprite), `${s.label}: ${d.sprite} in the deco manifest`);
+      for (const d of decos(s)) assert.ok(manifest.has(d.sprite) || (s.tsid === EZ_COOKIN_TSID && made[d.sprite]), `${s.label}: ${d.sprite} in the deco manifest`);
     }
+    for (const name of Object.keys(made)) assert.ok(NEW_DECOS.has(name) && NEW_DECOS_HIRES.has(name), `${name}: the renderer draws it, 2x and 3x`);
   });
 
-  it("EZ Cookin' keeps its counters and table, and hangs no stand-in lamps (store_lamp_01 read like swings, Austin 2026-11-13)", () => {
-    const ds = decos(file(EZ_COOKIN_TSID));
-    assert.equal(ds.filter((d) => d.sprite === 'store_lamp_01' || /^deco_ez_lamp_/.test(d.id || '')).length, 0, 'no hanging lamps until there is art');
-    assert.deepEqual(ds.filter((d) => d.sprite === 'store_counter').map((d) => d.id), EZ_COUNTERS.map((c) => `deco_ez_counter_${c.id}`));
-    assert.deepEqual(ds.filter((d) => d.sprite === 'k04_table_01').map((d) => d.id), ['deco_ez_knife_table']);
+  it("EZ Cookin's made props stand where the snaps have them: a glass counter under a lamp at each food stop, the round table under the Knife & Board", () => {
+    const s = file(EZ_COOKIN_TSID);
+    const ds = decos(s);
+    // Street JSON decos are in world units (bottom-centre).
+    const byId = (id) => ds.find((d) => d.id === id);
+    assert.equal(ds.filter((d) => ['store_counter', 'store_lamp_01', 'k04_table_01'].includes(d.sprite)).length, 0, 'the stand-ins are gone');
+    for (const c of EZ_COUNTERS) {
+      const counter = byId(`deco_ez_counter_${c.id}`);
+      const lamp = byId(`deco_ez_lamp_${c.id}`);
+      assert.equal(counter.sprite, 'gz_ai_ezc_glass_counter');
+      assert.equal(lamp.sprite, 'gz_ai_ezc_hanging_lamp');
+      // brief.md: 220 x 64, glass top 796 and feet 860 on the snap (world -204, -140).
+      assert.deepEqual([counter.x, counter.w, counter.h, counter.y], [c.x, 220, 64, EZ_PROP_ART.counterFeet]);
+      assert.ok(Math.abs(counter.y - counter.h - (c.top - 4)) <= 1, `${c.id}: the lid's top 4 above where the food rests`);
+      // The shade 75 wide over its counter, its bottom at -348 (the file's diffuser 2 under it); the cord runs to the street's top.
+      assert.deepEqual([lamp.x, lamp.w, lamp.y], [c.x, 75, EZ_PROP_ART.lampShadeBottom + 2]);
+      assert.ok(lamp.y - lamp.h <= 0, `${c.id}: the lamp's cord reaches the top of the street`);
+      // Each counter's food rests on its lid, within it.
+      for (const f of EZ_FOOD.filter((x) => `trant${x.counter}` === c.id)) assert.ok(f.x > counter.x - 110 && f.x < counter.x + 110, f.id);
+    }
+    const table = byId('deco_ez_knife_table');
+    assert.equal(table.sprite, 'gz_ai_ezc_round_table');
+    // snap x 518-700, feet 901 (world -99); drawn at the picture's own shape, 182 x 96.
+    assert.deepEqual([table.x, table.w, table.h, table.y], [EZ_KNIFE_TABLE.x, 182, 96, EZ_PROP_ART.tableFeet]);
+    assert.ok(EZ_KNIFE_AND_BOARD.y < table.y && EZ_KNIFE_AND_BOARD.y > table.y - table.h, 'the Knife & Board rests within the table top');
   });
 
   it('put the GSJS food on the counters\' tops (skillquest_ezc_v2.js location_targets, special_items)', { skip: noGsjs }, () => {

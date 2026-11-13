@@ -45,10 +45,14 @@
  * planes, the soil band grassSlice_f1, the raised block corey3_grassSlice_f1,
  * the sun the tutorial's own sun_01a_newxp, the EXIT arrow sign_arrow_1 with
  * the snaps' word drawn on it (features/rebuilt-rooms-feature.js).
- * Stand-ins (no CC0 piece found for the snaps' own): the glass-topped steel
- * serving counters are store_counter, the round glass table k04_table_01. The
- * snaps' white hanging lamps have no stand-in: store_lamp_01 read like swings
- * (Austin 2026-11-13), so they wait for art (research/art-briefs/ez-cookin).
+ * Made for Groddle (no CC0 piece matches the snaps' own): the glass-topped
+ * steel serving counters, their white hanging lamps and the round mosaic table
+ * are new art, gz_ai_ezc_glass_counter, gz_ai_ezc_hanging_lamp and
+ * gz_ai_ezc_round_table, drawn by GPT Image 2.6 Sunburst from our measurement
+ * drawing and Tiny Speck's CC0 decos, dedicated CC0 1.0 (provenance in
+ * tools/provenance/made-decos.json; brief in research/art-briefs/ez-cookin).
+ * They replace the stand-ins store_counter and k04_table_01 (the store_lamp_01
+ * lamps read like swings, Austin 2026-11-13).
  * Ours: the Hoe and Shovel's spots (they were street items; no snap shows them
  * before they were taken), the walls at both ends, the boxes' sizes.
  */
@@ -111,8 +115,9 @@ const SIZE = Object.freeze({
   groddle_grass_1: [106, 51],
   wildflowers_bunch_2: [191, 25],
   sun_01a_newxp: [311, 311],
-  store_counter: [456, 105],
-  k04_table_01: [1155, 780],
+  gz_ai_ezc_glass_counter: [220, 66],
+  gz_ai_ezc_hanging_lamp: [75, 654],
+  gz_ai_ezc_round_table: [182, 96],
   sign_arrow_1: [140, 93],
 });
 const sized = (sprite, x, y, s, z, extra = {}) => deco(sprite, x, y, SIZE[sprite][0] * s, SIZE[sprite][1] * s, z, extra);
@@ -264,12 +269,18 @@ export const EZ_COOKIN_BOUNDS = Object.freeze({ l: 0, r: 2800, t: -1000, b: 0 })
 export const EZ_COOKIN_FLOOR_Y = -92;
 /** The round table the Knife & Board waits on (snap x 520..698, top at -182). */
 export const EZ_KNIFE_TABLE = Object.freeze({ x: 608, x1: 540, x2: 676, top: -182 });
-/** The three serving counters, left to right (snap: 220 wide, tops at -200). */
+/** The three serving counters, left to right (snap: 220 wide, tops at -200 where the food rests). */
 export const EZ_COUNTERS = Object.freeze([
   Object.freeze({ id: 'trant1', x: 1022, x1: 912, x2: 1132, top: -200 }),
   Object.freeze({ id: 'trant2', x: 1442, x1: 1332, x2: 1552, top: -200 }),
   Object.freeze({ id: 'trant3', x: 1857, x1: 1747, x2: 1967, top: -200 }),
 ]);
+/**
+ * Where the snaps draw the made props (1 px = 1 unit, y as world y): each counter's glass top at
+ * -204 and feet at -140 (the food rests on the lid, -200); each lamp's shade -375 to -348 under
+ * wires from -397, over its counter; the table's feet at -99 under its tiled top.
+ */
+export const EZ_PROP_ART = Object.freeze({ counterFeet: -140, counterH: 64, lampShadeBottom: -348, tableFeet: -99 });
 /** The Knife & Board on its table (a street item: its x from the snap). */
 export const EZ_KNIFE_AND_BOARD = Object.freeze({ id: 'knife_and_board', classTsid: 'knife_and_board', count: 1, x: 605, y: -182 });
 /** skillquest_ezc_v2.js location_targets food_* with special_items (class, count): world x, y. */
@@ -291,7 +302,7 @@ export const EZ_FINISH_BOX = Object.freeze({ id: 'quest:flag:finish_ezcooking', 
 export const EZ_WALLS = Object.freeze({ l: 30, r: 2770 });
 
 export const EZ_COOKIN_SOURCE_LINE =
-  "reconstruction: Breezy, EZ Cookin' (LIFII3UBRFB3KBE, hub 132, not in tinyspeck/glitch-locations); layout from the Eleven full-street snaps (2800 x 1000, 1 px = 1 street unit; reference only) and skillquest_ezc_v2.js location_targets, CC0 groddle decos";
+  "reconstruction: Breezy, EZ Cookin' (LIFII3UBRFB3KBE, hub 132, not in tinyspeck/glitch-locations); layout from the Eleven full-street snaps (2800 x 1000, 1 px = 1 street unit; reference only) and skillquest_ezc_v2.js location_targets, CC0 groddle decos and three props made for Groddle (gz_ai_ezc_*, CC0 1.0)";
 
 function ezSkyDecos(lw, H) {
   // The sun low at the left, through the trees (zoi's snap).
@@ -345,11 +356,14 @@ function ezMiddleDecos() {
   let z = out.length;
   out.push(...laneEdge(W, 852, z, 21, [[880, 2000]]));
   z = out.length;
-  // The round table and the three counters (their hanging lamps wait for art: no stand-in reads right).
+  // The round table and the three counters under their lamps (made for Groddle, EZ_PROP_ART).
   const t = EZ_KNIFE_TABLE;
-  out.push(deco('k04_table_01', t.x, EZ_COOKIN_FLOOR_Y + oy + 2, 140, 95, z++, { id: 'deco_ez_knife_table' }));
+  const a = EZ_PROP_ART;
+  out.push(sized('gz_ai_ezc_round_table', t.x, a.tableFeet + oy, 1, z++, { id: 'deco_ez_knife_table' }));
   for (const c of EZ_COUNTERS) {
-    out.push(deco('store_counter', c.x, c.top + 53 + oy, 230, 53, z++, { id: `deco_ez_counter_${c.id}` }));
+    out.push(deco('gz_ai_ezc_glass_counter', c.x, a.counterFeet + oy, 220, a.counterH, z++, { id: `deco_ez_counter_${c.id}` }));
+    // The lamp's file ends 2 units under the shade (its little diffuser).
+    out.push(sized('gz_ai_ezc_hanging_lamp', c.x, a.lampShadeBottom + 2 + oy, 1, z++, { id: `deco_ez_lamp_${c.id}` }));
   }
   const s = EZ_EXIT_SIGN;
   out.push(deco('sign_arrow_1', s.x, s.y + oy, s.w, s.h, z++, { id: 'deco_ez_exit' }));
@@ -431,7 +445,7 @@ export function ezCookinStreet() {
       bounds: 'The snaps are full-street snaps, 2800 x 1000 at 1 px a unit: skillquest_ezc_v2.js food_1_1 (996, -192) lands on the first counter\'s top at 0, -1000.',
       layout: 'Left to right (zoi, mackenzie, cleops snaps): the start, the round table with the Knife & Board, three serving counters under hanging lamps with the food on them, two big trunks in front, the wooden EXIT arrow and the way out at the right.',
       food: 'skillquest_ezc_v2.js location_targets and special_items: cheese and two tomatoes, a bun and meat, ten buns, five cheese and five meat.',
-      art: 'CC0 groddle decos: tree_coniferous_*, pinehills_*, pinecluster_*, heights rocks tinted red-brown, evenground planes, grassSlice_f1, sun_01a_newxp, sign_arrow_1. Stand-ins: store_counter, k04_table_01 (no CC0 piece found for the snaps\' glass counters and table). The snaps\' hanging lamps are left out until there is art: store_lamp_01 read like swings.',
+      art: 'CC0 groddle decos: tree_coniferous_*, pinehills_*, pinecluster_*, heights rocks tinted red-brown, evenground planes, grassSlice_f1, sun_01a_newxp, sign_arrow_1. Made for Groddle (no CC0 piece matches): the glass counters, hanging lamps and round table, gz_ai_ezc_* by GPT Image 2.6 Sunburst, CC0 1.0 (tools/provenance/made-decos.json).',
       ours: 'The walls at both ends and the boxes\' sizes.',
     },
   });

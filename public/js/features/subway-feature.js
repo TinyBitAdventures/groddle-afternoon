@@ -41,7 +41,7 @@
 
 import { countItem } from '../inventory.js?v=f49c8998';
 import { OVERLAY_USES, playOverlay } from '../overlays.js?v=219965d5';
-import { doorsFeature } from './doors-feature.js?v=944e0537';
+import { doorsFeature } from './doors-feature.js?v=ba2470fc';
 import { frameTexture, textureFromUrl } from '../textures.js?v=814d7926';
 import {
   CAR_FLOOR,

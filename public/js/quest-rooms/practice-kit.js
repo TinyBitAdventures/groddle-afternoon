@@ -6,7 +6,7 @@
  * Used by js/quest-rooms/ez-cookin.js and soil-appreciation.js.
  */
 
-import { inPracticeBox, practiceScreen } from '../practice-streets.js?v=aece0b35';
+import { inPracticeBox, practiceScreen } from '../practice-streets.js?v=6c95cb75';
 
 const FLAMINGO_ART = 'assets/sprites/newxp/';
 /** features/newxp-feature.js SHEETS.flamingo: the npc_flamingo x1 sheets. */
