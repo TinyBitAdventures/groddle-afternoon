@@ -1,0 +1,140 @@
+{
+ "format": "groddle-made-showcase/1",
+ "about": "Pictures of the Made for Groddle section composed by tools/made-art/compose.py from shipped files and three game screenshots; tools/made-art/build-data.mjs checks each against its sha256.",
+ "files": {
+  "public/assets/made-art/ezc-props-outline.webp": {
+   "what": "Our drawing of EZ Cookin's table, counter and lamp, at their measured sizes",
+   "w": 750,
+   "h": 855,
+   "sha256": "13fdd803be2d824494e7823c0705f384e8149e98f8dae0ec6213085835ebe0b5",
+   "made": "drawn by compose.py from the outlines of research/art-briefs/ez-cookin/attach/01-measurements-ours.svg (our own measurement drawing) at their measured sizes, lamp, counter and table one above the other 24 units apart, 3 px a unit",
+   "from": []
+  },
+  "public/assets/made-art/ezc-props.webp": {
+   "what": "EZ Cookin's made table, counter and lamp, at the sizes the street draws them",
+   "w": 750,
+   "h": 855,
+   "sha256": "901b2ed4252580256198c593924d545d4d2ff4538bd5e1f554af87426145a61b",
+   "made": "the three made decos (3x files) at the sizes the street draws them (js/practice-streets.js EZ_PROP_ART), placed as in the drawing beside it, 3 px a unit, on the same paper",
+   "from": [
+    {
+     "file": "public/assets/decos/groddle/gz_ai_ezc_round_table@1.5x.webp",
+     "sha256": "a3d065129ff1a2c8a55ce14fe8993f7c358b1c5ee1c272610dcb26df87f02ef1"
+    },
+    {
+     "file": "public/assets/decos/groddle/gz_ai_ezc_glass_counter@1.5x.webp",
+     "sha256": "d84b2e44dea9383c08f4d835b12c92103fcd8ac12266575f05d25f49a3d09c26"
+    },
+    {
+     "file": "public/assets/decos/groddle/gz_ai_ezc_hanging_lamp@1.5x.webp",
+     "sha256": "8de551371390e7e5d64e6413c3bb784dc7a44090564bd6136ee0ef6f5dd2b205"
+    }
+   ]
+  },
+  "public/assets/made-art/ezc-room-stand-ins.webp": {
+   "what": "Breezy, EZ Cookin' with Tiny Speck's stand-ins: store_counter, store_lamp_01, k04_table_01 (CC0)",
+   "w": 720,
+   "h": 423,
+   "sha256": "12a08d7b8756b7bf318735c9c4eadec23d6e2e00e6dc82fe11c43842b22e7ab3",
+   "made": "screenshot of the game (1280 x 800, deviceScaleFactor 2): the tutorial's EZ Cooking pick (?newxp=skill&newxpskill=ezcooking_1, Aiight), the avatar placed at x 1640, the street JSON of 51a268aa9d^ served in place of today's; the HUD cropped off (x 232-1220, y 60-640), Lanczos to 720 x 423",
+   "from": [
+    {
+     "shot": "room-before.png",
+     "sha256": "997cfb5fdca93bcb9ce8c8563d4e1d1753c926be47f8960a8f67c1b455a4b11a"
+    }
+   ]
+  },
+  "public/assets/made-art/ezc-room.webp": {
+   "what": "Breezy, EZ Cookin' with its made counters and lamps",
+   "w": 720,
+   "h": 423,
+   "sha256": "c765b42fa0a2129e8be6315b396a87d9a39b44e2de0a45cf8f643bfdd5148e2e",
+   "made": "screenshot of the game (1280 x 800, deviceScaleFactor 2): the tutorial's EZ Cooking pick (?newxp=skill&newxpskill=ezcooking_1, Aiight), the avatar placed at x 1640, today's street; the HUD cropped off (x 232-1220, y 60-640), Lanczos to 720 x 423",
+   "from": [
+    {
+     "shot": "room-after.png",
+     "sha256": "fb4d59612285f25dd6e9357a8384bfe20b1e5532be0896a1a3b0d6f70696354e"
+    }
+   ]
+  },
+  "public/assets/made-art/maps-painted.webp": {
+   "what": "The paintings of Ix, Callopee and Haoma made again for Groddle",
+   "w": 600,
+   "h": 1116,
+   "sha256": "a39ffc68132558a74da88ecd78cd858b2576cadb81c9f0cb45603bec07116d73",
+   "made": "the three repainted maps (2x files) at four times the thumbnails, one above the other, 12 px apart (tools/provenance/repainted-maps.json)",
+   "from": [
+    {
+     "file": "public/assets/maps/art/bg/ix@2x.webp",
+     "sha256": "35253bea08465e05a03f574edc598231c0c6b78b07cab0b4d8eb5317582a8e90"
+    },
+    {
+     "file": "public/assets/maps/art/bg/callopee@2x.webp",
+     "sha256": "a238560044c94b57c7608de48342e71bd06d8cc9d0a3465f4480b634598026a3"
+    },
+    {
+     "file": "public/assets/maps/art/bg/haoma@2x.webp",
+     "sha256": "291aa1c076dbcc98f4d92cf6d2bfe65ea5eb9cb1ad7ebe0042b85f8832b02aa5"
+    }
+   ]
+  },
+  "public/assets/made-art/maps-thumbs.webp": {
+   "what": "Tiny Speck's thumbnails of Ix, Callopee and Haoma",
+   "w": 150,
+   "h": 279,
+   "sha256": "932b29743015a481561f6ae2582518418b028a539a5bb3383a04679882760ade",
+   "made": "the three CC0 thumbnails as they are, one above the other, 3 px apart",
+   "from": [
+    {
+     "file": "public/assets/maps/art/thumbs/sm_ix.jpg",
+     "sha256": "d0b9776e2735bcdc4ba75e6495166c6eb6928007a8e58b5529a08747c3432cfe",
+     "licence": "CC0 1.0, Tiny Speck"
+    },
+    {
+     "file": "public/assets/maps/art/thumbs/sm_callopee.jpg",
+     "sha256": "2d0e87daa129d0358720cd6616136371de58e05268b2536930d18dee896419f5",
+     "licence": "CC0 1.0, Tiny Speck"
+    },
+    {
+     "file": "public/assets/maps/art/thumbs/sm_haoma.jpg",
+     "sha256": "2a10fb6dfcbc0a9db3a2b746a63632dbd56e0c672313786db72c02c551d47805",
+     "licence": "CC0 1.0, Tiny Speck"
+    }
+   ]
+  },
+  "public/assets/made-art/subway-map-paper-line.webp": {
+   "what": "The recreated Subway System paper with the Red Line and its stations drawn on it",
+   "w": 752,
+   "h": 452,
+   "sha256": "d5e7f1e9c9f850d8217a0bfc03dcffbd385ba7d6231028dcf7963a89c13d8383",
+   "made": "screenshot of js/map-views.js renderSubwayMapSvg (the Map's Subway view) at 760 x 460, deviceScaleFactor 2, on the game's style.css with the station names and line buttons hidden; the rounded corners cropped (8 px), Lanczos to 752 x 452",
+   "from": [
+    {
+     "file": "public/assets/maps/art/subway/subway-map-paper@2x.webp",
+     "sha256": "81791b6f71917ba223f594bab666bdebb56fe65e3fbdc9bb0fff642e6bd7982b"
+    },
+    {
+     "file": "public/js/map-views.js"
+    },
+    {
+     "shot": "subway-render.png",
+     "sha256": "1250d635cb3349221359bb8eb62464fd2898ffb3982eb312f134a10b98780ba3"
+    }
+   ]
+  },
+  "public/assets/made-art/subway-sign-map.webp": {
+   "what": "The little map on Tiny Speck's in-world Subway Map sign",
+   "w": 232,
+   "h": 158,
+   "sha256": "483240cc72aeb50f21c5f58acf4920ece8d75d78baeb5c0660bc9491b4adb8bb",
+   "made": "crop x 27-259, y 47-205 of the sign (its map panel), lossless",
+   "from": [
+    {
+     "file": "public/assets/sprites/icons/subway_map@3x.webp",
+     "sha256": "638c98d54d90f4f14a30c336d220ebeb8062e036785ebb5309048a8a766415be",
+     "licence": "CC0 1.0, Tiny Speck: glitch-items misc/subway_map (subway_map.swf)"
+    }
+   ]
+  }
+ }
+}

@@ -12,7 +12,7 @@ import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
-import { build, dateLabel, playerWords, webpSize, wordProblems } from '../tools/made-art/build-data.mjs';
+import { build, dateLabel, playerWords, readMore, webpSize, wordProblems } from '../tools/made-art/build-data.mjs';
 import { FOOT, withMade } from '../tools/made-art/to-minn.mjs';
 import { madeBand, restorationContent } from '../tools/restoration/to-minn.mjs';
 import { GAME_DIR, SITE_DIR, sitePath, skipWithoutSite } from '../tools/repos.mjs';
@@ -54,12 +54,13 @@ describe('Made for Groddle data (tools/made-art/build-data.mjs)', () => {
   it('lists every piece in the provenance list once, newest first, with its date, licence and the original it comes from', () => {
     // Every made sprite that is not an experiment (the Fire Dragon stays in the builder, off the page), plus the curated region map.
     const shown = Object.entries(provenance.sprites).filter(([, p]) => p.experiment !== true).map(([id]) => id);
-    assert.deepEqual(made.pieces.map((p) => p.id).filter((id) => !id.startsWith('map:')).sort(), shown.sort());
+    assert.deepEqual(made.pieces.map((p) => p.id).filter((id) => !/^(maps?|subway|decos):/.test(id)).sort(), shown.sort());
     assert.ok(!made.pieces.some((p) => p.id.startsWith('npc_fire_dragon')), 'the Fire Dragon experiment is not on the page');
     const dates = made.pieces.map((p) => p.made);
     assert.deepEqual(dates, [...dates].sort().reverse());
+    // 2026-11-13 leads in the curated order: EZ Cookin's props, its room, the subway paper; then the quest book (2026-11-12).
+    assert.deepEqual(made.pieces.map((p) => p.id), ['decos:ezc', 'decos:ezc:room', 'subway:paper', 'quest_book_award', 'map:58', 'maps:27,107,131']);
     const book = made.pieces.find((p) => p.id === 'quest_book_award');
-    assert.equal(made.pieces[0], book, 'the quest book (2026-11-12) leads');
     assert.equal(book.madeLabel, '12 November 2026');
     assert.deepEqual([book.original.src, book.original.w, book.original.h, book.original.pixelated], ['/assets/ui/quest-book.webp', 86, 58, true]);
     assert.equal(book.image.src, '/assets/ui/quest-book-solid.webp');
@@ -73,8 +74,35 @@ describe('Made for Groddle data (tools/made-art/build-data.mjs)', () => {
     assert.match(map.caption, /150 by 91 pixel thumbnail/);
     for (const p of made.pieces) {
       assert.match(p.facts.at(-1).text, /CC0 1\.0/, `${p.id} says its licence`);
-      const tool = p.id.startsWith('map:') ? 'GPT Image' : provenance.sprites[p.id].tool;
+      const tool = /^(maps?|subway|decos):/.test(p.id) ? 'GPT Image 2.6 Sunburst' : provenance.sprites[p.id].tool;
       assert.ok(p.facts.some((f) => f.label === 'How it was made' && f.text.includes(tool)), `${p.id} names its tool`);
+    }
+  });
+
+  it('shows the subway paper, EZ Cookin\'s made props and a gallery of region maps beside what they come from, in composed pictures it can vouch for', () => {
+    const more = readMore();
+    const piece = (id) => made.pieces.find((p) => p.id === id);
+    // The subway paper beside a crop of Tiny Speck's sign (its little map), its pixels kept.
+    const sub = piece('subway:paper');
+    assert.deepEqual([sub.original.src, sub.original.pixelated, sub.image.src], ['/assets/made-art/subway-sign-map.webp', true, '/assets/made-art/subway-map-paper-line.webp']);
+    assert.equal(sub.made, more.subway.made);
+    assert.match(sub.original.label, /232 by 158 pixels/);
+    // Every made deco is on the page: the three EZ Cookin' props, beside our drawing of their sizes, and the room before and after.
+    const ez = piece('decos:ezc');
+    assert.deepEqual([ez.original.kind, ez.original.src, ez.image.src], ['guide', '/assets/made-art/ezc-props-outline.webp', '/assets/made-art/ezc-props.webp']);
+    assert.ok(ez.facts.some((f) => f.label === 'What the 2012 street had' && /glass-topped serving counters/.test(f.text)));
+    assert.deepEqual([piece('decos:ezc:room').original.src, piece('decos:ezc:room').image.src], ['/assets/made-art/ezc-room-stand-ins.webp', '/assets/made-art/ezc-room.webp']);
+    assert.deepEqual(Object.keys(more.decos.art).filter((n) => n.startsWith('gz_ai_ezc_')).sort(), Object.keys(more.decos.art).sort());
+    // The gallery: three thumbnails and their paintings, the same shape so they show at the same size.
+    const gal = piece('maps:27,107,131');
+    assert.equal(gal.image.w * gal.original.h, gal.original.w * gal.image.h);
+    assert.match(gal.facts.find((f) => f.label === 'How it was checked').text, /47 regions/);
+    // Each composed picture is the one tools/made-art/showcase.json records, and every recorded one is shown.
+    const shownFiles = made.pieces.flatMap((p) => [p.image.src, p.original?.src]).filter((f) => f?.startsWith('/assets/made-art/')).map((f) => `public${f}`);
+    assert.deepEqual(shownFiles.sort(), Object.keys(more.showcase.files).sort());
+    for (const [file, row] of Object.entries(more.showcase.files)) {
+      assert.deepEqual(webpSize(readFileSync(join(GAME_DIR, file))), { w: row.w, h: row.h }, file);
+      assert.ok(row.made && row.what, file);
     }
   });
 
@@ -97,13 +125,20 @@ describe('Made for Groddle data (tools/made-art/build-data.mjs)', () => {
       return files.get(file);
     };
     const maps = JSON.parse(readFileSync(join(GAME_DIR, 'tools/provenance/repainted-maps.json'), 'utf8'));
-    assert.equal(build(provenance, curated, read, maps).pieces.length, made.pieces.length);
+    const more = readMore();
+    assert.equal(build(provenance, curated, read, maps, more).pieces.length, made.pieces.length);
     const changed = (file) => (f) => (f === file ? Buffer.concat([read(f), Buffer.from([0])]) : read(f));
-    assert.throws(() => build(provenance, curated, changed(provenance.sprites.quest_book_award.file), maps), /no longer matches its provenance hash/);
+    assert.throws(() => build(provenance, curated, changed(provenance.sprites.quest_book_award.file), maps, more), /no longer matches its provenance hash/);
     assert.throws(() => build(provenance, { pieces: curated.pieces.slice(1) }, read), /has no words/);
     const odd = structuredClone(curated);
     odd.pieces[0].facts[0].text = 'Made with {nothing}.';
-    assert.throws(() => build(provenance, odd, read, maps), /nothing to fill \{nothing\}/);
+    assert.throws(() => build(provenance, odd, read, maps, more), /nothing to fill \{nothing\}/);
+    // A made deco changed, a composed picture changed or unrecorded, a made deco left off the page.
+    assert.throws(() => build(provenance, curated, changed(more.decos.art.gz_ai_ezc_hanging_lamp.file3), maps, more), /gz_ai_ezc_hanging_lamp@1\.5x\.webp no longer matches its provenance hash/);
+    assert.throws(() => build(provenance, curated, changed('public/assets/made-art/ezc-room.webp'), maps, more), /no longer matches its hash in tools\/made-art\/showcase\.json/);
+    assert.throws(() => build(provenance, curated, read, maps, { ...more, showcase: { files: {} } }), /is not recorded in tools\/made-art\/showcase\.json/);
+    const noEz = { pieces: curated.pieces.filter((p) => !p.id.startsWith('decos:')) };
+    assert.throws(() => build(provenance, noEz, read, maps, more), /gz_ai_ezc_glass_counter: a made deco \(made-decos\.json\) on no piece/);
   });
 
   it('reads sizes from the WebP files and writes dates in words', () => {

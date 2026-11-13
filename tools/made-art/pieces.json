@@ -1,5 +1,5 @@
 {
-  "note": "The words players read in the Made for Groddle section of /restoration/ (tools/made-art/build-data.mjs), one piece per entry of tools/provenance/made-sprites.json. In facts, {tool} is the provenance's tool, {overlap} the outline overlap its cut records, {w} and {h} the original's size in pixels.",
+  "note": "The words players read in the Made for Groddle section of /restoration/ (tools/made-art/build-data.mjs): one piece per entry of tools/provenance/made-sprites.json, and the curated pieces from repainted-maps.json (map:<hub>, maps:<hub>,<hub>), subway-map-paper.json (subway:paper) and made-decos.json (decos:<group>[:<view>]). image.file and original.file under public/assets/made-art/ are pictures composed by tools/made-art/compose.py (tools/made-art/showcase.json). In facts and labels, {tool} is the provenance's model or tool, {overlap} the outline overlap its cut records, {w} and {h} the original's size in pixels, {regions} how many region maps were painted again.",
   "pieces": [
     {
       "id": "quest_book_award",
@@ -66,6 +66,144 @@
         {
           "label": "In the game",
           "text": "The background of the Groddle Meadow map. The game draws its own streets, names and markers on top."
+        }
+      ]
+    },
+    {
+      "id": "decos:ezc",
+      "name": "EZ Cookin' counters, lamps and table",
+      "caption": "The glass serving counters, the white lamps over them and the round mosaic table of Breezy, EZ Cookin', the forest street where the EZ Cooking quest begins. No picture of them survives in Tiny Speck's files, only in players' snapshots of the street from 2012, so they were made again from their measured sizes.",
+      "display": {
+        "w": 237,
+        "h": 270
+      },
+      "image": {
+        "file": "public/assets/made-art/ezc-props.webp",
+        "label": "Made for Groddle",
+        "alt": "The made pieces at the same sizes: a mosaic-topped table on scrolled grey iron legs, a pale aqua glass lid over a white steel counter, and a white drum lamp hanging on four wires."
+      },
+      "original": {
+        "file": "public/assets/made-art/ezc-props-outline.webp",
+        "kind": "guide",
+        "label": "Our drawing of their sizes, measured from the 2012 snapshots",
+        "alt": "Plain outlines of a round table, a glass-topped counter and a drum lamp hanging over it, at their measured sizes."
+      },
+      "facts": [
+        {
+          "label": "What the 2012 street had",
+          "text": "Three glass-topped serving counters in a row along a pine forest lane at sunset, the food laid out on the glass, a white drum lamp hanging over each, and a small round table with a tiled top where the Knife & Board waited."
+        },
+        {
+          "label": "How it was made",
+          "text": "Drawn by an image model ({tool}) for Austin, one piece at a time. It was given our drawing of the sizes and four sheets of Tiny Speck's own glass, tables, lamps and forest art to match the look, and a description of each piece in words. Austin chose the pictures."
+        },
+        {
+          "label": "How it was checked",
+          "text": "Each picture was measured against the drawing: the counter is within 3% of its shape, the lamp within 6% and the table within 8%. The food was set on the counters and the Knife & Board on the table where the street's own script puts them, and the street was walked in the game on a desktop and a phone, in both looks."
+        },
+        {
+          "label": "In the game",
+          "text": "Breezy, EZ Cookin', when you take its quest or pick EZ Cooking in the tutorial."
+        }
+      ]
+    },
+    {
+      "id": "decos:ezc:room",
+      "name": "Breezy, EZ Cookin'",
+      "caption": "The same stretch of the street before and after. Until the new pieces came, Tiny Speck pieces that were close enough stood in: a shop counter for each serving counter, a hanging shop lamp over each, and a wooden pedestal table. The shop lamps looked too much like swings, so for a while the street had no lamps at all.",
+      "display": {
+        "w": 289,
+        "h": 170
+      },
+      "image": {
+        "file": "public/assets/made-art/ezc-room.webp",
+        "label": "With the pieces made for Groddle",
+        "alt": "The forest lane with two glass-topped white counters, bread, cheese and meat on them, and a white drum lamp over each."
+      },
+      "original": {
+        "file": "public/assets/made-art/ezc-room-stand-ins.webp",
+        "kind": "original",
+        "label": "With Tiny Speck's stand-ins",
+        "alt": "The same forest lane with beige shop counters on red legs, the same food on them, and green shop lamps hanging over them."
+      },
+      "facts": [
+        {
+          "label": "How it was made",
+          "text": "The counters, lamps and table are by an image model ({tool}). Everything else on the street is Tiny Speck's own art, laid out where the 2012 snapshots show it."
+        },
+        {
+          "label": "In the game",
+          "text": "Both pictures are the game itself: the tutorial's EZ Cooking practice street, the food where the street's script lays it."
+        }
+      ]
+    },
+    {
+      "id": "subway:paper",
+      "name": "Subway map paper",
+      "caption": "The paper under the Subway System map: pale sage green with cream sheets laid on it. Tiny Speck's full-size paper is lost. It survives only as the little map on the in-world Subway Map sign, so it was made again.",
+      "display": {
+        "w": 316,
+        "h": 190
+      },
+      "image": {
+        "file": "public/assets/made-art/subway-map-paper-line.webp",
+        "label": "Made again for Groddle, the game's line drawn on it",
+        "alt": "The recreated paper: cream sheets on soft sage green paper with faint fold creases, the red line and its stations drawn over it."
+      },
+      "original": {
+        "file": "public/assets/made-art/subway-sign-map.webp",
+        "kind": "original",
+        "pixelated": true,
+        "label": "The map on Tiny Speck's Subway Map sign, {w} by {h} pixels, shown at the same height",
+        "alt": "The little map on Tiny Speck's Subway Map sign, enlarged so its pixels show: cream sheets on pale green, a purple line with round stops."
+      },
+      "facts": [
+        {
+          "label": "How it was made",
+          "text": "Painted by an image model ({tool}) for Austin from our drawing of where the twelve sheets lie, measured from a 2012 picture of the map window, with the sign, Tiny Speck's world map charts and the station signs to match its look. It was asked for paper only: no line, no names."
+        },
+        {
+          "label": "How it was checked",
+          "text": "Each sheet's edges were found and compared with the drawing, then the picture was gently stretched to line them up. After that, nearly every edge sits within one unit of where it belongs."
+        },
+        {
+          "label": "In the game",
+          "text": "The Subway view of the Map. The game draws the line, the stations and their names on top."
+        }
+      ]
+    },
+    {
+      "id": "maps:27,107,131",
+      "name": "More region maps",
+      "caption": "Three more of the region paintings made again from their thumbnails: Ix, Callopee and Haoma, from top to bottom. Each kept its region's own shape and colours.",
+      "display": {
+        "w": 161,
+        "h": 300
+      },
+      "image": {
+        "file": "public/assets/made-art/maps-painted.webp",
+        "label": "Painted again for Groddle",
+        "alt": "Three painted top-down maps: a golden and rose-brown island of two lobes, a dark cave of winding tunnels, and a forest of pale icy spires."
+      },
+      "original": {
+        "file": "public/assets/made-art/maps-thumbs.webp",
+        "kind": "original",
+        "pixelated": true,
+        "label": "Tiny Speck's thumbnails, 150 by 91 pixels each, shown at the same size",
+        "alt": "Tiny Speck's three small thumbnails of the same maps, enlarged so their pixels show."
+      },
+      "facts": [
+        {
+          "label": "How it was made",
+          "text": "Painted by an image model ({tool}) under Austin's direction, each given its region's own thumbnail and a drawing of where the game puts the region's streets, so they still land in the right places, then toned down a little."
+        },
+        {
+          "label": "How it was checked",
+          "text": "Austin looked at each beside its thumbnail and kept it. {regions} regions in all were painted again this way."
+        },
+        {
+          "label": "In the game",
+          "text": "The backgrounds of the Ix, Callopee and Haoma region maps."
         }
       ]
     }

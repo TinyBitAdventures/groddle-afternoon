@@ -7,12 +7,18 @@
  * Tiny Speck original it comes from, or what it was made from.
  *
  * Which pieces there are, when they were made, with what tool and under what
- * licence come from the provenance list, tools/provenance/made-sprites.json;
- * every word players read comes from tools/made-art/pieces.json (curated by
- * hand, one entry per provenance entry). Image sizes are read from the files,
- * and each made file must still match the hash its provenance records.
- * Nothing else from the provenance (prompts, hashes, file names) reaches the
- * page.
+ * licence come from the provenance lists: tools/provenance/made-sprites.json
+ * (a piece per sprite), repainted-maps.json (map:<hub>, or maps:<hub>,<hub>
+ * for a gallery), subway-map-paper.json (subway:paper) and made-decos.json
+ * (decos:<group> or decos:<group>:<view>: the made decos named gz_ai_<group>_*,
+ * every one of which must be on the page). Every word players read comes from
+ * tools/made-art/pieces.json (curated by hand). Image sizes are read from the
+ * files, and each made file must still match the hash its provenance records.
+ * A piece may show a picture composed from those files (a crop, a render, a
+ * side-by-side) instead: its image.file (and original.file) under
+ * public/assets/made-art/, recorded with its hash in tools/made-art/showcase.json
+ * (tools/made-art/compose.py). Nothing else from the provenance (prompts,
+ * hashes, file names) reaches the page.
  *
  *   node tools/made-art/build-data.mjs           write made.json
  *   node tools/made-art/build-data.mjs --check   exit 1 when made.json is stale or breaks the page's rules
@@ -26,6 +32,9 @@ import { contentProblems } from '../gaps/build-data.mjs';
 
 export const PROVENANCE = join(GAME_DIR, 'tools/provenance/made-sprites.json');
 export const MAPS = join(GAME_DIR, 'tools/provenance/repainted-maps.json');
+export const SUBWAY = join(GAME_DIR, 'tools/provenance/subway-map-paper.json');
+export const MADE_DECOS = join(GAME_DIR, 'tools/provenance/made-decos.json');
+export const SHOWCASE = join(GAME_DIR, 'tools/made-art/showcase.json');
 export const CURATED = join(GAME_DIR, 'tools/made-art/pieces.json');
 export const OUT = join(GAME_DIR, 'public/restoration/made.json');
 
@@ -92,33 +101,94 @@ function picture(file, sheet, read) {
   return out;
 }
 
+/** The latest of some ISO dates. */
+const latest = (dates) => dates.slice().sort().at(-1);
+
+/** One licence for a piece made of several provenance rows, or a throw. */
+function oneOf(id, values, what) {
+  const set = [...new Set(values)];
+  if (set.length !== 1) throw new Error(`${id}: its provenance rows differ in ${what} (${set.join(', ')})`);
+  return set[0];
+}
+
 /**
  * made.json from the provenance and the curated words. `read` reads a file
- * under the game (a Buffer), so tests can hand in their own.
+ * under the game (a Buffer), so tests can hand in their own. `more` holds the
+ * other provenance lists: { subway, decos, showcase } (subway-map-paper.json,
+ * made-decos.json, tools/made-art/showcase.json).
  */
-export function build(provenance, curated, read = (file) => readFileSync(join(GAME_DIR, file)), maps = { regions: {} }) {
+export function build(provenance, curated, read = (file) => readFileSync(join(GAME_DIR, file)), maps = { regions: {} }, more = {}) {
+  const { subway = null, decos = { art: {} }, showcase = { files: {} } } = more;
   // An entry marked experiment (Austin 2026-11-12: the Fire Dragon) stays in the builder, off the page.
-  const made = Object.fromEntries(Object.entries(provenance.sprites).filter(([, p]) => p.experiment !== true));
-  // A repainted region map (tools/provenance/repainted-maps.json) is a piece by the id map:<hub id>: its 2x painting.
+  const made = Object.fromEntries(Object.entries(provenance.sprites).filter(([, p]) => p.experiment !== true).map(([id, p]) => [id, { ...p, files: [{ file: p.file, sha256: p.sha256 }] }]));
+  const regionCount = Object.keys(maps.regions).length;
+  const madeDecos = Object.entries(decos.art || {});
+  const shownDecos = new Set();
   for (const c of curated.pieces) {
-    const hub = /^map:(\d+)$/.exec(c.id)?.[1];
-    const region = hub && maps.regions[hub];
-    if (region) made[c.id] = { file: `public/${region.x2.file}`, sha256: region.x2.sha256, licence: region.licence, tool: region.model, made: region.made, regions: Object.keys(maps.regions).length };
+    // A repainted region map (tools/provenance/repainted-maps.json) is a piece by the id map:<hub id>: its 2x painting;
+    // maps:<hub>,<hub> is a gallery of several, shown as a picture composed from them (image.file).
+    const hubs = /^maps?:([\d,]+)$/.exec(c.id)?.[1]?.split(',');
+    const regions = hubs?.map((h) => maps.regions[h]);
+    if (regions?.length && regions.every(Boolean)) {
+      made[c.id] = {
+        file: `public/${regions[0].x2.file}`,
+        files: regions.map((r) => ({ file: `public/${r.x2.file}`, sha256: r.x2.sha256 })),
+        licence: oneOf(c.id, regions.map((r) => r.licence), 'licence'),
+        tool: oneOf(c.id, regions.map((r) => r.model), 'model'),
+        made: latest(regions.map((r) => r.made)),
+        regions: regionCount,
+        gallery: c.id.startsWith('maps:'),
+      };
+    }
+    // The Subway System map's recreated paper (tools/provenance/subway-map-paper.json).
+    if (c.id === 'subway:paper' && subway?.x2) {
+      const file = `public/${subway.x2.file}`;
+      made[c.id] = { file, files: [{ file, sha256: subway.x2.sha256 }], licence: subway.licence, tool: subway.model, made: subway.made };
+    }
+    // Made decos for Groddle's own streets (tools/provenance/made-decos.json): decos:<group>[:<view>] is every gz_ai_<group>_ deco.
+    const group = /^decos:([a-z0-9]+)(?::[a-z0-9-]+)?$/.exec(c.id)?.[1];
+    const rows = group ? madeDecos.filter(([name]) => name.startsWith(`gz_ai_${group}_`)) : [];
+    if (rows.length) {
+      for (const [name] of rows) shownDecos.add(name);
+      made[c.id] = {
+        file: rows[0][1].file,
+        files: rows.flatMap(([, r]) => [{ file: r.file, sha256: r.sha256 }, ...(r.file3 ? [{ file: r.file3, sha256: r.sha256_3 }] : [])]),
+        licence: oneOf(c.id, rows.map(([, r]) => r.licence), 'licence'),
+        tool: oneOf(c.id, rows.map(([, r]) => r.model), 'model'),
+        made: latest(rows.map(([, r]) => r.made)),
+      };
+    }
   }
   const byId = new Map(curated.pieces.map((p) => [p.id, p]));
   const problems = [];
   for (const id of Object.keys(made)) if (!byId.has(id)) problems.push(`${id}: in the provenance list but has no words in tools/made-art/pieces.json`);
   for (const id of byId.keys()) if (!made[id]) problems.push(`${id}: has words but is not in the provenance list`);
+  for (const [name] of madeDecos) if (!shownDecos.has(name)) problems.push(`${name}: a made deco (made-decos.json) on no piece of tools/made-art/pieces.json`);
   if (problems.length) throw new Error(problems.join('\n'));
 
+  const hash = (file) => createHash('sha256').update(read(file)).digest('hex');
+  const usedShowcase = new Set();
+  /** A composed picture (public/assets/made-art/) must be the one showcase.json records. */
+  const composed = (id, file) => {
+    if (!file.startsWith('public/assets/made-art/')) return;
+    const row = showcase.files?.[file];
+    if (!row) throw new Error(`${id}: ${file} is not recorded in tools/made-art/showcase.json`);
+    if (hash(file) !== row.sha256) throw new Error(`${id}: ${file} no longer matches its hash in tools/made-art/showcase.json; run tools/made-art/compose.py`);
+    usedShowcase.add(file);
+  };
   const pieces = curated.pieces.map((c, order) => {
     const prov = made[c.id];
-    const bytes = read(prov.file);
-    const sha = createHash('sha256').update(bytes).digest('hex');
-    if (sha !== prov.sha256) throw new Error(`${c.id}: ${prov.file} no longer matches its provenance hash; record the new art in made-sprites.json`);
+    for (const f of prov.files) {
+      if (hash(f.file) !== f.sha256) throw new Error(`${c.id}: ${f.file} no longer matches its provenance hash; record the new art in its provenance list`);
+    }
     const licence = LICENCES[prov.licence];
     if (!licence) throw new Error(`${c.id}: no words for the licence ${prov.licence}`);
-    const image = { ...picture(prov.file, c.image.sheet, read), label: c.image.label, alt: c.image.alt };
+    // A gallery or a group of decos has no one file to show: its picture is composed.
+    if ((prov.gallery || prov.files.length > 1) && !c.image.file && !c.id.startsWith('map:')) throw new Error(`${c.id}: several made files; show a composed picture (image.file)`);
+    const shown = c.image.file || prov.file;
+    composed(c.id, shown);
+    if (c.original?.file) composed(c.id, c.original.file);
+    const image = { ...picture(shown, c.image.sheet, read), label: c.image.label, alt: c.image.alt };
     const original = c.original ? { ...picture(c.original.file, c.original.sheet, read), kind: c.original.kind, alt: c.original.alt, ...(c.original.pixelated ? { pixelated: true } : {}) } : null;
     const overlap = /outline overlaps the original (\d+)%/.exec(prov.source?.cut || '')?.[1];
     const fill = (text) => text.replace(/\{(\w+)\}/g, (all, key) => {
@@ -143,10 +213,12 @@ export function build(provenance, curated, read = (file) => readFileSync(join(GA
       },
     };
   });
+  for (const file of Object.keys(showcase.files || {})) if (!usedShowcase.has(file)) problems.push(`${file}: in tools/made-art/showcase.json but on no piece`);
+  if (problems.length) throw new Error(problems.join('\n'));
   // Newest first; the curated order breaks a tie.
   pieces.sort((a, b) => (a.piece.made === b.piece.made ? a.order - b.order : a.piece.made < b.piece.made ? 1 : -1));
   return {
-    note: 'Written by tools/made-art/build-data.mjs from tools/provenance/made-sprites.json and tools/made-art/pieces.json. Edit those, never this file.',
+    note: 'Written by tools/made-art/build-data.mjs from the provenance lists in tools/provenance/, tools/made-art/showcase.json and tools/made-art/pieces.json. Edit those, never this file.',
     pieces: pieces.map((p) => p.piece),
   };
 }
@@ -164,11 +236,17 @@ export function wordProblems(data) {
   return problems;
 }
 
+/** The other provenance lists build() reads, from the checkout. */
+export function readMore() {
+  const json = (file) => (existsSync(file) ? JSON.parse(readFileSync(file, 'utf8')) : undefined);
+  return { subway: json(SUBWAY) || null, decos: json(MADE_DECOS), showcase: json(SHOWCASE) };
+}
+
 const stringify = (data) => `${JSON.stringify(data, null, 2)}\n`;
 
 function main() {
   const check = process.argv.includes('--check');
-  const data = build(JSON.parse(readFileSync(PROVENANCE, 'utf8')), JSON.parse(readFileSync(CURATED, 'utf8')), undefined, JSON.parse(readFileSync(MAPS, 'utf8')));
+  const data = build(JSON.parse(readFileSync(PROVENANCE, 'utf8')), JSON.parse(readFileSync(CURATED, 'utf8')), undefined, JSON.parse(readFileSync(MAPS, 'utf8')), readMore());
   const problems = wordProblems(data);
   if (problems.length) {
     console.error(`made: ${problems.length} problem(s):\n  ${problems.join('\n  ')}`);
