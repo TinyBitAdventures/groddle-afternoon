@@ -5970,7 +5970,7 @@ function bindPointer(engine) {
       }
       return;
     }
-    if (!mode || !scene || !isCanvas(e) || drag || press?.dragging) return;
+    if (!mode || !scene || !isCanvas(e) || drag || press?.dragging || press?.kind === 'pan') return;
     const p = worldPoint(engine, e);
     pointer = { ...p, inside: true };
     if (placing && carryBy !== 'pointer' && e.pointerType === 'mouse' && (e.movementX || e.movementY)) carryBy = 'pointer';
@@ -6005,6 +6005,14 @@ function bindPointer(engine) {
   }, { capture: true, passive: false });
   const onPressMove = (e) => {
     if (!press || e.pointerId !== press.pointerId) return;
+    if (press.kind === 'pan') {
+      // Report #277: a finger on the room's bare wall or floor moves the decorate camera.
+      if (!press.panning && Math.hypot(e.clientX - press.x, e.clientY - press.y) < DRAG_DIST) return;
+      press.panning = true;
+      e.preventDefault();
+      dragDecorCamera(engine, press, e);
+      return;
+    }
     if (!press.dragging) {
       const moved = Math.hypot(e.clientX - press.x, e.clientY - press.y);
       if (press.loose && press.touch && !press.held) {
@@ -6153,6 +6161,13 @@ function bindPointer(engine) {
       renderBar(engine);
       if (item && e.button === 0) {
         press = { id: item.id, x: e.clientX, y: e.clientY, pointerId: e.pointerId, dragging: false };
+        window.addEventListener('pointermove', onPressMove, true);
+        window.addEventListener('pointerup', onPressUp, true);
+        window.addEventListener('pointercancel', onPressUp, true);
+      } else if (!item && !press && e.pointerType !== 'mouse' && scene.room === 'interior') {
+        // Report #277: a phone has no arrow keys, wheel or mouse at the edge, so a finger dragged
+        // across the bare room scrolls it (the room follows the finger); a still tap only deselects.
+        press = { kind: 'pan', x: e.clientX, y: e.clientY, pointerId: e.pointerId, dragging: false, from: { x: decorCamX, y: decorPan } };
         window.addEventListener('pointermove', onPressMove, true);
         window.addEventListener('pointerup', onPressUp, true);
         window.addEventListener('pointercancel', onPressUp, true);
@@ -6476,6 +6491,45 @@ function panDecorCamera(engine, deltaX, deltaY, sideways = false) {
     decorPan = Math.max(range.lo, Math.min(range.hi, Math.round(from + Math.sign(dy) * Math.min(60, Math.max(10, Math.abs(dy))))));
   }
   return true;
+}
+
+/**
+ * Report #277 (Friendly, iPhone): the touch way to HandOfDecorator's camera scroll. `press` holds
+ * where the finger went down and the camera then ({ x: decorCamX, y: decorPan }); the camera moves
+ * by the finger's whole travel in world px, the other way (the room follows the finger), within the
+ * same bounds the keys keep.
+ */
+function dragDecorCamera(engine, press, e) {
+  if (mode !== 'decorate' || scene?.room !== 'interior') return false;
+  const f = canvasFrame(engine);
+  if (!f) return false;
+  // World px per css px, through the stage's own transform (the view's zoom included).
+  const a = worldPoint(engine, { clientX: f.rect.left, clientY: f.rect.top });
+  const b = worldPoint(engine, { clientX: f.rect.left + 100, clientY: f.rect.top + 100 });
+  const sx = (b.x - a.x) / 100 || f.k;
+  const sy = (b.y - a.y) / 100 || f.k;
+  const want = decorDragTarget({ from: press.from, dx: (e.clientX - press.x) * sx, dy: (e.clientY - press.y) * sy, playerX: engine.player?.x ?? 0 });
+  const span = roomSpan();
+  decorCamX = clampRoomX(want.x, { left: span.left, right: span.right, view: engine.camera?.w || 960 });
+  if (want.y != null) {
+    const ins = decorInsets(engine);
+    const range = decorLook({ playerY: engine.player?.y ?? INTERIOR.floorY, anchor: roomAnchor(engine), view: engine.camera?.h || LOOK_VIEW_H, top: ins.top, bottom: ins.bottom, ceilingTop: INTERIOR.ceilingTop, floorFront: INTERIOR.floorFront });
+    const from = press.from.y ?? (ceilingInHand() ? range.ceiling : range.floor);
+    decorPan = Math.max(range.lo, Math.min(range.hi, Math.round(from + want.y)));
+  }
+  engine.setData('homeTouchPan', `${Math.round(decorCamX)},${decorPan ?? ''}`);
+  return true;
+}
+
+/**
+ * PURE: where a finger's drag puts the decorate camera. `from` is the camera when the finger went
+ * down ({ x, y }: x the centre in world px or null for the avatar's, y the look or null), dx / dy
+ * the finger's travel in world px. Returns { x, y } with y the look change (null when none).
+ */
+export function decorDragTarget({ from = {}, dx = 0, dy = 0, playerX = 0 } = {}) {
+  const x = Math.round((from.x ?? playerX) - dx);
+  const y = Math.round(-dy) || null;
+  return { x, y };
 }
 
 function releaseCameraLook(engine) {

@@ -13457,6 +13457,13 @@ body:has(#quest-dialogue:not([hidden])) .prompt-stack { z-index: calc(var(--z-mo
    holds the avatar (game.js avatarHeldByScene), so they wait. */
 :root.touch-phone[data-home-builder="cultivate"] #game-root .touch-controls { bottom: calc(var(--hb-tray-up, 0px) + var(--sp-2)); }
 :root.touch-phone[data-home-builder="decorate"] #game-root .touch-controls { display: none; }
+/* Report #277: the Storage Display Box's item field was 16 px beside 11 px buttons. A phone keeps every
+   typing field at 16 px (TOUCH PANELS: under that iOS zooms the page into it), so on a phone the piece's
+   actions grow to meet it (thumb-sized, 14 px) and the field takes the row with Display beside it. */
+:root.touch-phone[data-ui="modern"] #game-root .hb-pop .hb-bt { min-height: 36px; padding: 0 var(--sp-6); font-size: var(--fs-base); }
+:root.touch-phone[data-ui="modern"] #game-root .hb-pop .hb-display-pick { flex: 1 1 10rem; min-width: 0; }
+:root.touch-phone[data-ui="modern"] #game-root .hb-pop .hb-display-pick .combo-pick { width: 100%; }
+:root.touch-phone[data-ui="modern"] #game-root .hb-pop .combo-pick .combo-input { min-height: 36px; font-weight: var(--fw-regular); }
 /* —— /BUILDER —— */
 [data-ui="modern"] #game-root .homes-styles .hs-sel { border-bottom: 1px solid var(--border); }
 [data-ui="modern"] #game-root .homes-styles .hs-name small { color: var(--text-muted); }

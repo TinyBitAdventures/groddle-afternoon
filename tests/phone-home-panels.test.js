@@ -8,6 +8,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { decorDragTarget } from '../public/js/features/homes-feature.js?v=11a76d23';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const read = (p) => readFileSync(join(root, 'public', p), 'utf8');
@@ -56,5 +57,28 @@ describe('#279 Cultivate and Change Style under the Social drawer', () => {
     const drawer = z(css, /\.local-chat-dock \{[^}]*z-index: calc\(var\(--z-hud\) \+ (\d+)\);/);
     assert.ok(drawer > 0 && modes > 0, `modes ${modes} drawer ${drawer}`);
     assert.ok(modes < drawer, `modes ${modes} must be under the drawer ${drawer}`);
+  });
+});
+
+describe('#277 Decoration Mode on a phone', () => {
+  const homes = read('js/features/homes-feature.js');
+  it('a finger drag moves the camera the other way (the room follows the finger)', () => {
+    assert.deepEqual(decorDragTarget({ from: { x: 1200, y: null }, dx: 240, dy: 0 }), { x: 960, y: null });
+    assert.deepEqual(decorDragTarget({ from: { x: null, y: null }, dx: -100, dy: 0, playerX: 500 }), { x: 600, y: null });
+    assert.deepEqual(decorDragTarget({ from: { x: 800, y: -20 }, dx: 0, dy: 90 }), { x: 800, y: -90 });
+  });
+  it('only a touch on the bare room pans; a mouse keeps the desktop ways (keys, wheel, edge)', () => {
+    assert.ok(homes.includes("} else if (!item && !press && e.pointerType !== 'mouse' && scene.room === 'interior') {"));
+    assert.match(homes, /press = \{ kind: 'pan', x: e\.clientX, y: e\.clientY, pointerId: e\.pointerId, dragging: false, from: \{ x: decorCamX, y: decorPan \} \};/);
+    assert.match(homes, /if \(press\.kind === 'pan'\) \{[\s\S]{0,300}dragDecorCamera\(engine, press, e\);/);
+  });
+  it('the tray takes the whole width and the stick and Jump wait (the avatar is held)', () => {
+    assert.match(css, /\[data-ui="modern"\] #game-root \.hb-tray \{ right: var\(--hud-inset\); \}/);
+    assert.match(css, /:root\.touch-phone\[data-home-builder="decorate"\] #game-root \.touch-controls \{ display: none; \}/);
+  });
+  it('the Display field keeps 16 px (no iOS zoom) and the actions grow to meet it', () => {
+    assert.match(css, /:root\.touch-phone :is\(input:not\(\[type="range"\], \[type="checkbox"\], \[type="radio"\], \[type="button"\], \[type="submit"\]\), textarea, select\) \{ font-size: var\(--fs-lg\) !important; \}/);
+    assert.match(css, /:root\.touch-phone\[data-ui="modern"\] #game-root \.hb-pop \.hb-bt \{ min-height: 36px; padding: 0 var\(--sp-6\); font-size: var\(--fs-base\); \}/);
+    assert.match(css, /:root\.touch-phone\[data-ui="modern"\] #game-root \.hb-pop \.hb-display-pick \{ flex: 1 1 10rem; min-width: 0; \}/);
   });
 });
