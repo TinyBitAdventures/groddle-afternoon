@@ -2752,9 +2752,14 @@
   "deployed": "2026-11-13"
  },
  "git": {
-  "commits": 1872,
+  "commits": 1875,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-12",
+    "kind": "fix",
+    "text": "A recipe of another tool picked in a machine's Make window is made with your own tool and counts for quests"
+   },
    {
     "date": "2026-11-12",
     "kind": "fix",
@@ -2869,14 +2874,9 @@
     "date": "2026-11-12",
     "kind": "improve",
     "text": "Made for Groddle shows the Groddle Meadow map beside its surviving thumbnail; the Fire Dragon stays an experiment"
-   },
-   {
-    "date": "2026-11-12",
-    "kind": "fix",
-    "text": "The restoration section bar marks which side has more and steps through it"
    }
   ]
  },
- "tests": 921,
+ "tests": 922,
  "generatedAt": "2026-11-12"
 }
