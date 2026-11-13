@@ -5,16 +5,19 @@
 
 import { avatarHeadReach, groundBeneath, isItemSolid, isStandable, platformYAt, worldToScreen } from './street-model.js?v=b6cb6a4e';
 import { behindFloor } from './reach.js?v=4187d746';
+import { MAILBOX_SHEETS, measuredMailboxes } from './street-furniture.js?v=8a5a223c';
 import { QUOIN_SPOTS } from './quoin-spots-data.js?v=7c343cbc';
 import { BARNACLE_SPOTS } from './barnacle-spots-data.js?v=cea3daec';
 import {
   JELLISAC_SPOTS,
+  PAPER_TREE_SPOTS,
   PEAT_SPOTS,
   ROCK_BERYL_SPOTS,
   ROCK_DULLITE_SPOTS,
   ROCK_METAL_SPOTS,
   ROCK_SPARKLY_SPOTS,
-} from './node-spots-data.js?v=8d619d0b';
+  TREE_SPOTS,
+} from './node-spots-data.js?v=a3c25916';
 
 export const STREET_ECOLOGY_URL = 'assets/content/street-ecology.json?v=official-ecology-6';
 
@@ -160,6 +163,8 @@ export const RESOURCE_NODE_CAPS = Object.freeze({
  * Rocks by hand (rock_metal_1.js etc. obey_physics false), and the planner put 31% of the 763 on
  * snapped streets at a height where the street never had one. Their spots and shapes come from the
  * snaps the same way (nodes.py), and the rest are planned (rockPlacementRequest, rockSpawnPlan).
+ * Paper Trees the same (paper_tree.js obey_physics false: the snaps show them on the floors, where
+ * no spot is ever a variant, so a spot carries none).
  */
 export const PLANNED_NODE_CAPS = Object.freeze({
   mortar_barnacle: 6,
@@ -172,6 +177,8 @@ export const MEASURED_NODE_SPOTS = Object.freeze({
   mortar_barnacle: Object.freeze({ variantPrefix: 'blister', streets: BARNACLE_SPOTS }),
   jellisac: Object.freeze({ variantPrefix: 'jellySack', streets: JELLISAC_SPOTS }),
   peat_1: Object.freeze({ variantPrefix: 'peat', streets: PEAT_SPOTS }),
+  // A Paper Tree's art follows its paper and care, never a variant: its spots carry none (null).
+  paper_tree: Object.freeze({ variantPrefix: '', streets: PAPER_TREE_SPOTS }),
   // A rock's variant is the class of the shape the snap shows (rock_metal_2: items/rock_metal_2.js, proxy_item rock_metal_1).
   rock_metal_1: Object.freeze({ variantPrefix: 'rock_metal_', streets: ROCK_METAL_SPOTS }),
   rock_beryl_1: Object.freeze({ variantPrefix: 'rock_beryl_', streets: ROCK_BERYL_SPOTS }),
@@ -224,9 +231,12 @@ function expandResourceClasses(counts, spots = null) {
   return out;
 }
 
-/** The population's measured spots for its spawn list (resource-nodes-feature resourceSpawnPlan), if any. */
-function spotFields(spots) {
-  return spots ? { resourceSpots: spots } : {};
+/**
+ * The population's measured spots: its nodes' for its spawn list (resource-nodes-feature
+ * resourceSpawnPlan) and its trees' (treePlacementRequest), if any.
+ */
+function spotFields(spots, trees = null) {
+  return { ...(spots ? { resourceSpots: spots } : {}), ...(trees ? { treeSpots: trees } : {}) };
 }
 
 /**
@@ -349,6 +359,72 @@ export function rockSpawnPlan(population, points = [], tsid = '') {
       room,
     };
   });
+}
+
+/**
+ * Trees (the placements audit, 2026-11-12): Glitch set its trants by hand (trant_fruit.js etc.
+ * obey_physics false) and the planner put 27% of the ones on snapped streets at a height where the
+ * street had none, low on the floors (their height rank against the street's floor spots: median
+ * 0.30, Glitch's 0.56). tools/snap-placements/nodes.py measures every trant players' 2012 snaps show
+ * (TREE_SPOTS, node-spots.json: the trunk's foot, the trant and its growth stage the snap shows).
+ * Wood Trees are not measured (our art does not match the snaps), so they stay planned.
+ *
+ * PURE: a street's measured tree spots, [{ x, y, classTsid, stage }], or null.
+ */
+export function measuredTreeSpots(tsid) {
+  for (const alias of streetEcologyAliases(tsid)) {
+    const rows = TREE_SPOTS[alias];
+    if (rows?.length) {
+      return rows
+        .filter((row) => Number.isFinite(row?.[0]) && Number.isFinite(row?.[1]))
+        .map(([x, y, classTsid, stage]) => ({ x, y, classTsid: String(classTsid || ''), stage: Number(stage) || 0 }));
+    }
+  }
+  return null;
+}
+
+/**
+ * PURE: each tree's measured spot by its index in treeClasses ({ x, y, stage, shown }), or null where
+ * it is planned. A trant the file names takes a spot where the snap shows a trant of its own class
+ * first (left to right), then any trant spot left (a trant spot was a spot: a dead tree left a patch
+ * and the patch grew whatever was planted, so the snap may show a Bean Tree where the file names a
+ * Fruit Tree). The tree keeps its class, index and saved state; `shown` is the class the snap shows.
+ * A Wood Tree never takes one.
+ */
+export function measuredTreeSlots(population) {
+  const classes = population?.treeClasses || [];
+  const spots = (population?.treeSpots || []).slice().sort((a, b) => a.x - b.x || a.y - b.y);
+  const taken = new Set();
+  const out = classes.map(() => null);
+  const seat = (index, spot, k) => {
+    taken.add(k);
+    out[index] = { x: spot.x, y: spot.y, stage: spot.stage, shown: spot.classTsid };
+  };
+  classes.forEach((classTsid, index) => {
+    if (classTsid === 'wood_tree') return;
+    const k = spots.findIndex((spot, i) => !taken.has(i) && spot.classTsid === classTsid);
+    if (k >= 0) seat(index, spots[k], k);
+  });
+  classes.forEach((classTsid, index) => {
+    if (classTsid === 'wood_tree' || out[index]) return;
+    const k = spots.findIndex((spot, i) => !taken.has(i));
+    if (k >= 0) seat(index, spots[k], k);
+  });
+  return out;
+}
+
+/**
+ * The trees' planner request: every tree of the street, the ones the snaps show as `fixed` points at
+ * their own index (planStreetPlacements seats them first, where the snap shows them, keeps every
+ * other thing off them, and puts each at its index in the group, so placement('trees')[i] is still
+ * tree i: its id tree:<i>, its class and its saved state), the rest planned. game.js enterStreet, the
+ * realtime builders and the level builder all ask with this.
+ */
+export function treePlacementRequest(population) {
+  const fixed = measuredTreeSlots(population).map((slot, index) => (
+    slot ? { x: slot.x, y: slot.y, w: TREE_FOOTPRINT, h: PLACEMENT_HEIGHTS.trees, index } : null
+  )).filter(Boolean);
+  return { key: 'trees', count: population?.treeClasses?.length || 0, clearance: 135, ...(fixed.length ? { fixed } : {}) };
 }
 
 function whole(value, fallback = 0, max = 999) {
@@ -585,7 +661,7 @@ export function populationForStreet(tsid, entry, { starter = false } = {}) {
       resourceCounts: resourceCountsFrom(counts),
       featureCounts: featureCountsFrom(counts),
       resourceNodeClasses: expandResourceClasses(counts, spots),
-      ...spotFields(spots),
+      ...spotFields(spots, measuredTreeSpots(tsid)),
     };
   }
   // A feature-built row for a rebuilt street may lift the rendering caps to its
@@ -660,7 +736,8 @@ export function populationForStreet(tsid, entry, { starter = false } = {}) {
     resourceCounts: resourceCountsFrom(counts),
     featureCounts: featureCountsFrom(counts),
     resourceNodeClasses: expandResourceClasses(counts, spots),
-    ...spotFields(spots),
+    // The starter's onboarding trees are the remake's own: they are planned.
+    ...spotFields(spots, starter && !entry ? null : measuredTreeSpots(tsid)),
   };
 }
 
@@ -735,6 +812,9 @@ export const PLACEMENT_FOOTPRINTS = Object.freeze({
   'resource:dust_trap': 60,
   'resource:paper_tree': 80,
   furnitureStone: 90,
+  // A street mailbox's stand (mailbox-left-idle.webp: 46 px at its foot, 1:1) and a little floor; the
+  // box on top may overhang.
+  furnitureMailbox: 60,
 });
 
 /**
@@ -758,6 +838,11 @@ export const PLACEMENT_FOOTPRINTS = Object.freeze({
  * rule: both ends over a floor, no short ledge over another floor, and a Dirt Pile's wide mound
  * no slope over 0.25 (Glitch's rocks, the nearest thing measured: 97% on floors of 0.25 or less).
  * A street with no such spot left plans fewer of them (planStreetPlacements: no fallback).
+ *
+ * Mailboxes the same (the placements audit, 2026-11-12: 12 of 262 planned with an end over 40 px of
+ * air, and after the height cut went the overhangs rose from 12 to 18): both ends of the stand over a
+ * floor, no slope over 0.3, a ledge as good as a floor. A street's mailbox is where its mail is, so
+ * one is never left out (`keep`): with no steady spot left it takes any, as before.
  */
 export const STEADY_FLOOR_GROUPS = Object.freeze({
   'resource:mortar_barnacle': Object.freeze({ maxSlope: 0.4, ledgeRun: 240 }),
@@ -768,6 +853,7 @@ export const STEADY_FLOOR_GROUPS = Object.freeze({
   'resource:dust_trap': Object.freeze({ maxSlope: 0.4, ledgeRun: 240, edgeDrop: 12 }),
   'resource:paper_tree': Object.freeze({ maxSlope: 0.3, ledgeRun: 240, edgeDrop: 12 }),
   furnitureStone: Object.freeze({ maxSlope: 0.3, ledgeRun: 240, edgeDrop: 12 }),
+  furnitureMailbox: Object.freeze({ maxSlope: 0.3, ledgeRun: 0, edgeDrop: 12, keep: true }),
 });
 
 /**
@@ -958,6 +1044,11 @@ export function streetReservedSpots(street) {
       out.push({ x: b.x, y: b.y, key: `garden-box:${index}`, clearance: 165, block: box(b.x, b.y, b.w, b.h) });
     });
   }
+  // The mailboxes players' 2012 snaps show (street-furniture.js measuredMailboxes, nodes.py): set by
+  // hand where they are, so every planned thing keeps clear of them as of a signpost.
+  (measuredMailboxes(street?.tsid) || []).forEach((m, index) => {
+    out.push({ x: m.x, y: m.y, key: `mailbox:${index}`, clearance: 80, block: box(m.x, m.y, MAILBOX_SHEETS.idle.fw, MAILBOX_SHEETS.idle.fh) });
+  });
   out.push(...frontDecoCovers(street));
   return out;
 }
@@ -1469,9 +1560,11 @@ function scaledDistance(a, b, verticalScale = 1.75) {
  * Ticket 64: no spot is on a floor run no arrival reaches (`unreached`, by default
  * the catalog's unreachedFloorsFor(`tsid`), `tsid` defaulting to the seed).
  *
- * A request may carry `fixed` points ({ x, y, w?, h? }: rocks measured on the snaps,
- * rockPlacementRequest): its group starts with them (marked `fixed`), they are occupied
- * before any group is planned, and `count` includes them. BIG_THING_GROUPS take a floor
+ * A request may carry `fixed` points ({ x, y, w?, h?, index? }: rocks and trees measured on the
+ * snaps, rockPlacementRequest, treePlacementRequest): they
+ * are occupied before any group is planned, `count` includes them, and its group starts with them
+ * (marked `fixed`), or with an `index` each stands at its index and the planned ones fill the rest. A
+ * STEADY_FLOOR_GROUPS rule with `keep` takes any spot when no steady one is left. BIG_THING_GROUPS take a floor
  * steeper than BIG_THING_MAX_SLOPE last; the plan lists such points under `steep`.
  *
  * @param {any[]} platforms
@@ -1503,6 +1596,7 @@ export function planStreetPlacements(
       clearance,
       room: 0,
       fixed: true,
+      ...(Number.isInteger(p.index) ? { index: p.index } : {}),
       ...(p.w > 0 && p.h > 0 ? { block: { l: p.x - p.w / 2, r: p.x + p.w / 2, t: p.y - p.h, b: p.y } } : {}),
     }));
     fixedOf.set(request.key, placed);
@@ -1523,7 +1617,13 @@ export function planStreetPlacements(
   for (const request of requests || []) {
     const count = whole(request?.count, 0, 40);
     const clearance = whole(request?.clearance, 40, 600);
-    groups[request.key] = (fixedOf.get(request.key) || []).slice(0, count);
+    // Fixed points with an `index` (measured trees, treePlacementRequest) stand at that index in the
+    // group, the planned ones fill the others in order; without one (rocks) they lead the group.
+    const fixedPts = fixedOf.get(request.key) || [];
+    const fixedAt = fixedPts.length && fixedPts.every((p) => Number.isInteger(p.index))
+      ? new Map(fixedPts.filter((p) => p.index < count).map((p) => [p.index, p]))
+      : null;
+    groups[request.key] = fixedAt ? [] : fixedPts.slice(0, count);
     if (request.key === 'trees') for (const point of groups.trees) canopies.push(canopyOf(point));
     const maxSlope = BIG_THING_GROUPS.includes(request.key) ? BIG_THING_MAX_SLOPE : null;
     const deck = DECK_GROUPS.includes(request.key);
@@ -1535,13 +1635,14 @@ export function planStreetPlacements(
     const perching = request?.perch === true || PERCHING_GROUPS.includes(request.key);
     const steady = STEADY_FLOOR_GROUPS[request.key] || null;
     // Reports #249, #250: a steady group with an edgeDrop also keeps both ends of its footprint over a floor.
-    const steadyAt = (candidate) => {
+    const steadyRule = (candidate) => {
       if (!steadyFloor(candidate, steady)) return false;
       if (!Number.isFinite(steady?.edgeDrop)) return true;
       const k = `${candidate.id}:${footprint}`;
       if (!edgeCache.has(k)) edgeCache.set(k, footOverAir(platforms, candidate, footprint / 2));
       return edgeCache.get(k) <= steady.edgeDrop;
     };
+    let steadyAt = steadyRule;
     const walker = Boolean(ANIMAL_PATROL[request.key]);
     const height = Number.isFinite(request?.height) ? Math.max(0, request.height) : PLACEMENT_HEIGHTS[request.key] || 0;
     // The fixture each spot would cover for this request (null: clear); the arrival covers nothing.
@@ -1555,6 +1656,16 @@ export function planStreetPlacements(
       }
     }
     for (let index = groups[request.key].length; index < count; index += 1) {
+      if (fixedAt?.has(index)) {
+        groups[request.key].push(fixedAt.get(index));
+        if (request.key === 'trees') canopies.push(canopyOf(fixedAt.get(index)));
+        continue;
+      }
+      // A `keep` rule (mailboxes) goes down even with no steady spot left: on any spot, as a planned
+      // thing did before the rule.
+      if (steady?.keep) {
+        steadyAt = candidates.some((c) => !used.has(c.id) && c.item !== false && steadyRule(c)) ? steadyRule : () => true;
+      }
       // The room this one asks for: its footprint, or the most any free clear spot
       // has (any free spot's, when none is clear).
       let need = 0;
@@ -1568,7 +1679,7 @@ export function planStreetPlacements(
         }
         if (clearNeed >= 0) need = clearNeed;
         // A steady-floor group (STEADY_FLOOR_GROUPS) never takes a cramped spot: it is left out instead.
-        if (steady && need < footprint) break;
+        if (steady && !steady.keep && need < footprint) break;
         if (need < footprint) fallbacks.push({ key: request.key, index, room: Math.round(need), footprint });
       }
       let best = null;

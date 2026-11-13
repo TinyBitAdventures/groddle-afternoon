@@ -76,6 +76,7 @@ import {
   clearOfDoors,
   treeObstacles,
   fixedFurniturePoints,
+  rowMailboxes,
   furniturePlacementGroups,
   furnitureFor,
   insideStoneHitbox,
@@ -100,7 +101,7 @@ import {
   streetNoteSeeds,
   takePinnedNote,
   writePaperNote,
-} from '../street-furniture.js?v=55131f49';
+} from '../street-furniture.js?v=8a5a223c';
 import {
   CHORES,
   NEIGHBOURS,
@@ -122,10 +123,10 @@ import {
 } from '../neighbours.js?v=781ad57f';
 import { buildNeighbourBackground, neighbourLoadingColors, neighbourPlatforms } from './neighbour-scene.js?v=a1d84d1e';
 import { closeNoteView, noteViewOpen, openBoardView, openNotePicker, openNoteView, openReportView } from '../note-view.js?v=eca7de52';
-import { BOARD_MP_TEXT, boardByline } from '../boards-mp.js?v=6e2613b2';
+import { BOARD_MP_TEXT, boardByline } from '../boards-mp.js?v=fd33c75a';
 import { textureFromUrl } from '../textures.js?v=92ec53cd';
-import { butlerApi } from './butler-feature.js?v=ec590369';
-import { neighboursMpApi } from './neighbours-mp-feature.js?v=0e68e428';
+import { butlerApi } from './butler-feature.js?v=f8a6177c';
+import { neighboursMpApi } from './neighbours-mp-feature.js?v=9547000e';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
 import { MAIL_POST_SENDER } from '../mailbox.js?v=a3e833ba';
 
@@ -421,11 +422,13 @@ function setMailboxClip(engine, entity, clip) {
   entity.sprite.gotoAndPlay(0);
 }
 
-function buildMailbox(engine, x, y) {
+function buildMailbox(engine, x, y, facing = 1) {
   const { PIXI } = engine;
   const frames = loader.frames(MAILBOX_SHEETS.idle);
   const spr = new PIXI.AnimatedSprite(frames.length ? frames : [PIXI.Texture.EMPTY]);
   spr.anchor.set(0.5, 0.99);
+  // mailboxRight (npc_mailbox.js variant) is mailboxLeft's art mirrored.
+  if (facing < 0) spr.scale.x = -1;
   spr.x = x;
   spr.y = y + 2;
   spr.zIndex = itemZ(MAILBOX_CLASS, 4);
@@ -1311,7 +1314,10 @@ function spawnStreet(engine, row) {
   const clear = (classTsid, half) => fixedFurniturePoints(row, classTsid)
     ? at(classTsid)
     : at(classTsid).map((p) => clearOfDoors(p, half, doors, engine.platforms, worldW));
-  (clear('npc_mailbox', 50)).forEach((p) => buildMailbox(engine, p.x, p.y));
+  // The mailboxes the snaps show stand where they show them, facing their way (street-furniture.js
+  // rowMailboxes); the planner seats the rest.
+  const shown = fixedFurniturePoints(row, MAILBOX_CLASS) ? [] : rowMailboxes(row, engine.street?.tsid || engine.streetTsid);
+  [...shown, ...clear('npc_mailbox', 50)].forEach((p) => buildMailbox(engine, p.x, p.y, p.facing === 2 ? -1 : 1));
   (clear('visiting_stone', STONE_ART.w / 2)).forEach((p, i) => buildStone(engine, p.x, p.y, i));
   (clear('bag_notice_board', BOARD_ART.w / 2)).forEach((p, i) => buildBoard(engine, p.x, p.y, i));
   const noteCount = Number(row?.note) || 0;
@@ -1470,7 +1476,7 @@ export const streetFurnitureFeature = {
   placementGroups(population, street, engine) {
     const catalog = wildlifeCatalog();
     if (!catalog || !street?.tsid) return [];
-    return furniturePlacementGroups(rowFor(engine, catalog, street));
+    return furniturePlacementGroups(rowFor(engine, catalog, street), street.tsid);
   },
 
   onStreetEnter(street, engine) {

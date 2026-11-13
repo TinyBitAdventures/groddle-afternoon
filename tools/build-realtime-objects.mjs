@@ -82,10 +82,11 @@ import {
   planStreetPlacements,
   populationForStreet,
   rockPlacementRequest,
+  treePlacementRequest,
   rockSpawnPlan,
   setStreetEcologyCatalog,
   streetReservedSpots,
-} from '../public/js/street-ecology.js?v=080b2e56';
+} from '../public/js/street-ecology.js?v=c8d6fa5b';
 import { ROCK_CATALOG } from '../public/js/mining.js?v=b62c7722';
 import { MEGA_ROCK_CHANCE, MEGA_ROCK_CHUNKS } from '../public/js/imagination-effects.js?v=70169933';
 import { RESOURCE_NODE_CATALOG, RESOURCE_SKILL_PACKAGES } from '../public/js/resource-nodes.js?v=9b20788d';
@@ -94,16 +95,16 @@ import { TRANT_CARE_PACKAGES } from '../public/js/trant-care.js?v=e76c420c';
 import { WOOD_TREE_MATURITY_MAP } from '../public/js/woodcutting.js?v=d2b88bb5';
 import { ANIMAL_KINSHIP_PACKAGES } from '../public/js/animal-kinship.js?v=ffe074b2';
 import { locationIsDepressing } from '../public/js/animal-mood.js?v=a49495fc';
-import { resourcePlacementGroups, resourceSpawnPlan } from '../public/js/features/resource-nodes-feature.js?v=b79bd649';
-import { soilCountsForStreet, soilPlacementGroups } from '../public/js/features/patches-feature.js?v=8af9c13c';
-import { KITTY_GROUP, kittyPlacementGroups } from '../public/js/features/heli-kitties-feature.js?v=a209368b';
-import { BATTERFLY_GROUP, batterflyPlacementGroups } from '../public/js/features/animal-husbandry-feature.js?v=43f937fb';
+import { resourcePlacementGroups, resourceSpawnPlan } from '../public/js/features/resource-nodes-feature.js?v=5f93b9e3';
+import { soilCountsForStreet, soilPlacementGroups } from '../public/js/features/patches-feature.js?v=fa1cf77d';
+import { KITTY_GROUP, kittyPlacementGroups } from '../public/js/features/heli-kitties-feature.js?v=1ddab877';
+import { BATTERFLY_GROUP, batterflyPlacementGroups } from '../public/js/features/animal-husbandry-feature.js?v=2788f727';
 import { hasRaceDispenser } from '../public/js/races.js?v=ab22a079';
 import { setWildlifeCatalog, wildlifeFor } from '../public/js/wildlife.js?v=670c3a7f';
-import { boardSpotRow, furnitureFor, furniturePlacementGroups } from '../public/js/street-furniture.js?v=55131f49';
-import { INCUBATION } from '../public/js/animal-husbandry.js?v=46649353';
-import { SHARED_NODE_CLASSES, freshTreePlan } from '../public/js/street-objects.js?v=6b878d95';
-import { PIGGY_TRIP } from '../public/js/street-creatures.js?v=16acda00';
+import { boardSpotRow, furnitureFor, furniturePlacementGroups } from '../public/js/street-furniture.js?v=8a5a223c';
+import { INCUBATION } from '../public/js/animal-husbandry.js?v=b80d23e0';
+import { SHARED_NODE_CLASSES, freshTreePlan } from '../public/js/street-objects.js?v=4c8cd006';
+import { PIGGY_TRIP } from '../public/js/street-creatures.js?v=4a0738f6';
 import { CRAB_PLACEMENT_KEY, CRAB_WALK, crabPlacementGroups } from '../public/js/crabs.js?v=5d5f62b3';
 import { KITTY_PET } from '../public/js/heli-kitties.js?v=addb573f';
 import { FIRE_DRAGON_PLACEMENT_KEY, FIRE_DRAGON_WALK, fireDragonPlacementGroups } from '../public/js/fire-dragon.js?v=b7f3d751';
@@ -124,7 +125,8 @@ const outPath = serverPath('data', 'objects.json');
 export function placementRequests(population) {
   return [
     { key: 'player', count: 1, clearance: 190 },
-    { key: 'trees', count: population.treeClasses.length, clearance: 135 },
+    // Trees the snaps show stand where they show them, at their own index (fixed points), the rest are planned.
+    treePlacementRequest(population),
     { key: 'gardens', count: population.gardens, clearance: 165 },
     { key: 'vendor', count: population.vendor ? 1 : 0, clearance: 120 },
     { key: 'shrine', count: population.shrine ? 1 : 0, clearance: 135 },
@@ -155,7 +157,7 @@ export function creatureRequests(population, street, ecology) {
   if (hasRaceDispenser(street.tsid)) groups.push({ key: 'raceDispenser', count: 1, clearance: 70 });
   groups.push(...soilPlacementGroups(soilCountsForStreet(street.tsid)));
   groups.push(...kittyPlacementGroups(wildlifeFor(ecology, street.tsid)));
-  groups.push(...furniturePlacementGroups(boardSpotRow(furnitureFor(ecology, street.tsid), street)));
+  groups.push(...furniturePlacementGroups(boardSpotRow(furnitureFor(ecology, street.tsid), street), street.tsid));
   groups.push(...batterflyPlacementGroups(street));
   return groups;
 }

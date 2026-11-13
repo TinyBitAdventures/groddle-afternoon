@@ -33,9 +33,10 @@ import {
   planStreetPlacements,
   populationForStreet,
   rockPlacementRequest,
+  treePlacementRequest,
   setStreetEcologyCatalog,
   streetReservedSpots,
-} from '../public/js/street-ecology.js?v=080b2e56';
+} from '../public/js/street-ecology.js?v=c8d6fa5b';
 import {
   MYSTERY_QUOIN_KINDS,
   QUOIN_CLASSES,
@@ -61,7 +62,7 @@ const outPath = serverPath('data', 'quoins.json');
 export function placementRequests(population) {
   return [
     { key: 'player', count: 1, clearance: 190 },
-    { key: 'trees', count: population.treeClasses.length, clearance: 135 },
+    treePlacementRequest(population),
     { key: 'gardens', count: population.gardens, clearance: 165 },
     { key: 'vendor', count: population.vendor ? 1 : 0, clearance: 120 },
     { key: 'shrine', count: population.shrine ? 1 : 0, clearance: 135 },

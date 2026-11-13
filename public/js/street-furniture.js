@@ -1,5 +1,6 @@
 import { isItemFloor, platformYAt, worldToScreen } from './street-model.js?v=b6cb6a4e';
 import { filterText } from './word-filter.js?v=9a7a7ebb';
+import { MAILBOX_SPOTS } from './node-spots-data.js?v=a3c25916';
 
 /**
  * Street furniture rules: street Mailboxes, placed Notes, Notice Boards and
@@ -247,13 +248,49 @@ export function clearOfDoors(point, halfWidth, doors = [], platforms = [], world
   return at;
 }
 
-/** Planner groups for one street row (notes beyond the planner cap pile up nearby). */
-export function furniturePlacementGroups(row) {
+/**
+ * The placements audit (2026-11-12): Glitch set its street mailboxes by hand (npc_mailbox.js
+ * obey_physics false), and 42% of the ones the planner put on snapped streets stood at a height
+ * where the street had none (Saani Shim's against the rock face, Glitch's on the flat floor to its
+ * left). tools/snap-placements/nodes.py measures every mailbox players' 2012 snaps show
+ * (MAILBOX_SPOTS, node-spots.json: [x, y, facing], 1 mailboxLeft, 2 mailboxRight).
+ *
+ * PURE: a street's measured mailboxes, [{ x, y, facing }] (screen px, where buildMailbox stands one), or null.
+ */
+export function measuredMailboxes(tsid) {
+  const id = String(tsid || '');
+  const aliases = [id];
+  if (id.startsWith('G')) aliases.push(`L${id.slice(1)}`);
+  if (id.startsWith('L')) aliases.push(`G${id.slice(1)}`);
+  for (const alias of aliases) {
+    const rows = MAILBOX_SPOTS[alias];
+    if (rows?.length) {
+      return rows.filter((r) => Number.isFinite(r?.[0]) && Number.isFinite(r?.[1])).map(([x, y, facing]) => ({ x, y, facing: facing === 2 ? 2 : 1 }));
+    }
+  }
+  return null;
+}
+
+/**
+ * PURE: the street's mailboxes the snaps show, at most the row's count ({ x, y, facing, fixed: true }).
+ * street-ecology.js streetReservedSpots keeps every planned thing clear of them (the same on every
+ * page and in the server's layout), and only the rest are planned.
+ */
+export function rowMailboxes(row, tsid) {
+  return (measuredMailboxes(tsid) || []).slice(0, whole(row?.[MAILBOX_CLASS])).map((m) => ({ ...m, fixed: true }));
+}
+
+/**
+ * Planner groups for one street row (notes beyond the planner cap pile up nearby). With the
+ * street's `tsid`, the mailboxes the snaps show are not planned (rowMailboxes).
+ */
+export function furniturePlacementGroups(row, tsid = '') {
   if (!row) return [];
   const out = [];
   for (const [classTsid, group] of Object.entries(FURNITURE_GROUPS)) {
     if (fixedFurniturePoints(row, classTsid)) continue;
-    const count = Math.min(PLANNER_GROUP_MAX, whole(row[classTsid]));
+    let count = Math.min(PLANNER_GROUP_MAX, whole(row[classTsid]));
+    if (classTsid === MAILBOX_CLASS) count -= rowMailboxes(row, tsid).length;
     if (count > 0) out.push({ key: group.key, count, clearance: group.clearance });
   }
   return out;

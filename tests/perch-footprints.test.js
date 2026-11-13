@@ -27,10 +27,11 @@ import {
   populationForStreet,
   setStreetEcologyCatalog,
   streetReservedSpots,
-} from '../public/js/street-ecology.js?v=080b2e56';
+  measuredTreeSpots,
+} from '../public/js/street-ecology.js?v=c8d6fa5b';
 import { placementRequests } from '../tools/build-realtime-objects.mjs';
 import { SHRINE_SHEETS } from '../public/js/shrine-variants.js?v=7f11c97d';
-import { adoptedPlan } from '../public/js/features/patches-feature.js?v=8af9c13c';
+import { adoptedPlan } from '../public/js/features/patches-feature.js?v=fa1cf77d';
 import { createPlot } from '../public/js/patches.js?v=cd774b2c';
 import { serverPath, skipWithoutServer } from '../tools/repos.mjs';
 
@@ -61,11 +62,12 @@ describe('the footprints', () => {
     assert.equal(TREE_FOOTPRINT, 180);
     // A planned Mortar Barnacle (player report #210): its blister art and a little floor round it; a planned
     // Jellisac's sack and a Peat Bog's whole mound (reports #249, #250). The placements audit (2026-11-12):
-    // a Dirt Pile's mound, an Ice Nubbin, a Dust Trap, a Paper Tree's trunk and a Visiting Stone.
+    // a Dirt Pile's mound, an Ice Nubbin, a Dust Trap, a Paper Tree's trunk, a Visiting Stone and a mailbox's stand.
     assert.deepEqual({ ...PLACEMENT_FOOTPRINTS }, {
       trees: 180, gardens: 280, vendor: 106, shrine: 118, rocks: 120, piggies: 240, chickens: 238, butterflies: 48,
       'resource:mortar_barnacle': 60, 'resource:jellisac': 60, 'resource:peat_1': 180,
       'resource:dirt_pile': 150, 'resource:ice_knob': 60, 'resource:dust_trap': 60, 'resource:paper_tree': 80, furnitureStone: 90,
+      furnitureMailbox: 60,
     });
     assert.equal(PERCH_DROP_PX, 150);
     const game = readFileSync(join(root, 'public/game.js'), 'utf8');
@@ -180,9 +182,13 @@ describe('the archived streets', () => {
     const data = street('GLI3272LOTD1B1F');
     const { pop, plan } = layoutOf(data);
     assert.equal(plan.groups.trees.length, pop.treeClasses.length);
-    assert.ok(plan.groups.trees.every((spot) => lineOf(spot) !== 'plat_1319844128815'));
+    assert.ok(plan.groups.trees.every((spot) => spot.fixed || lineOf(spot) !== 'plat_1319844128815'));
+    // The placements audit (2026-11-12): the trees its snap shows stand where it shows them, none in the pine.
+    const shown = plan.groups.trees.filter((spot) => spot.fixed);
+    assert.equal(shown.length, measuredTreeSpots(data.tsid).length);
+    assert.ok(shown.length >= 5 && shown.every((spot) => spot.y > 1000), shown.map((p) => `${p.x},${p.y}`).join(' '));
     const byId = new Map(buildPlatformCandidates(platformsScreen(data), { worldW: streetWidth(data), seed: data.tsid }).map((c) => [c.id, c]));
-    for (const spot of plan.groups.trees) {
+    for (const spot of plan.groups.trees.filter((t) => !t.fixed)) {
       const c = byId.get(spot.id);
       assert.ok(c.room >= TREE_FOOTPRINT && c.under < TREE_FOOTPRINT, `${spot.id} room ${c.room} under ${c.under}`);
     }
@@ -225,21 +231,29 @@ describe('the archived streets', () => {
     }
   });
 
-  it('the server data keeps every tree on room to stand', { skip: skipWithoutServer }, () => {
+  it('the server data keeps every planned tree on room to stand, and the rest where the snaps show them', { skip: skipWithoutServer }, () => {
     const data = JSON.parse(readFileSync(serverPath('data/objects.json'), 'utf8'));
     let trees = 0;
+    let shown = 0;
     for (const [tsid, row] of Object.entries(data.streets)) {
       if (!row.trees?.length) continue;
       const s = street(tsid);
       const byXY = new Map(buildPlatformCandidates(platformsScreen(s), { worldW: streetWidth(s), seed: tsid })
         .map((c) => [`${Math.round(c.x * 10) / 10},${Math.round((c.y + 2) * 10) / 10}`, c]));
+      const measured = new Set((measuredTreeSpots(tsid) || []).map((m) => `${Math.round(m.x * 10) / 10},${Math.round((m.y + 2) * 10) / 10}`));
       for (const [, , x, y] of row.trees) {
+        if (measured.has(`${x},${y}`)) {
+          shown += 1;
+          trees += 1;
+          continue;
+        }
         const c = byXY.get(`${x},${y}`);
         assert.ok(c && c.room >= TREE_FOOTPRINT, `${tsid} tree at ${x},${y}`);
         trees += 1;
       }
     }
     assert.ok(trees > 1800, String(trees));
+    assert.ok(shown > 900, String(shown));
   });
 });
 

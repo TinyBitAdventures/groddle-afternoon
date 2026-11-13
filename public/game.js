@@ -2,9 +2,9 @@
  * Groddle Afternoon — original street geometry + layered decos
  * PixiJS 8 · locations-xml streets · CoU PNG decos · quests/items
  */
-import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=9754dc15';
+import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=8486632c';
 import { createErrorOnce, createFeatureHost } from './js/feature-host.js?v=06bb8b74';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=4497c7cd';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=71e1e5f3';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl, drawTileArt } from './js/enter-chooser.js?v=4a3ea327';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -490,8 +490,8 @@ import { PACK_COPY, isBagClass, isElementClass, ownBagLabel, unitRankAt } from '
 import { FLOAT_TEXT_Z, SPEECH_BUBBLE_Z } from './js/fx-z.js?v=18dda7e3';
 import { hasPouch } from './js/elemental-pouch.js?v=ceefa97a';
 import { createPackRow, mountPackClearance, packBandRange, packCountText, packSearchEntries, packSlotTip } from './js/ui/pack-row.js?v=64e4a567';
-import { listAnimalFeedOptions } from './js/animals.js?v=ea4efd19';
-import { pickerMaxCount, pickerOptionsFor, pickerTakesCount } from './js/animals.js?v=ea4efd19';
+import { listAnimalFeedOptions } from './js/animals.js?v=d74effe0';
+import { pickerMaxCount, pickerOptionsFor, pickerTakesCount } from './js/animals.js?v=d74effe0';
 import {
   createDroppedItemState,
   parseDroppedItemState,
@@ -668,7 +668,7 @@ import {
   ensureStreetIndex,
   resolveIndexTsid,
 } from './js/street-loader.js?v=18b181ad';
-import { showDraftBanner, startDraftPlay } from './js/builder/draft-play.js?v=3cb8f7a8';
+import { showDraftBanner, startDraftPlay } from './js/builder/draft-play.js?v=ff7c3d20';
 import {
   ladderTopDeck,
   groundBeneath,
@@ -868,7 +868,7 @@ import {
   createAnimalState,
   resetAnimalDay,
   animalStatusLabel,
-} from './js/animals.js?v=ea4efd19';
+} from './js/animals.js?v=d74effe0';
 import {
   ensureWoodTreeState,
   pickWoodTool,
@@ -986,9 +986,10 @@ import {
   nearestPlacementGap,
   rockPlacementRequest,
   rockSpawnPlan,
+  treePlacementRequest,
   ROCK_SHAPE_WIDTHS,
-} from './js/street-ecology.js?v=080b2e56';
-import { CHICKEN_PAUSE, chickenPauseRoll, easeToward, flightFloorAt, flightFloorFor, flyerLift } from './js/street-creatures.js?v=16acda00';
+} from './js/street-ecology.js?v=c8d6fa5b';
+import { CHICKEN_PAUSE, chickenPauseRoll, easeToward, flightFloorAt, flightFloorFor, flyerLift } from './js/street-creatures.js?v=4a0738f6';
 import { chickenPose, chickenIdleSheetsAsked } from './js/chicken-idle-art.js?v=c46b17d5';
 import { chickenWaitPose } from './js/chicken-idles.js?v=eef0279b';
 import { itemOverlayStats } from './js/item-overlay.js?v=97ed2ba0';
@@ -24547,7 +24548,8 @@ async function enterStreet(tsid, opts = {}) {
     streetPlatforms,
     [
       { key: 'player', count: 1, clearance: 190 },
-      { key: 'trees', count: currentStreetPopulation.treeClasses.length, clearance: 135 },
+      // Trees the snaps show stand where they show them, at their own index (fixed points), the rest are planned.
+      treePlacementRequest(currentStreetPopulation),
       { key: 'gardens', count: currentStreetPopulation.gardens, clearance: 165 },
       { key: 'vendor', count: currentStreetPopulation.vendor ? 1 : 0, clearance: 120 },
       { key: 'shrine', count: currentStreetPopulation.shrine ? 1 : 0, clearance: 135 },

@@ -18,9 +18,9 @@ import { join } from 'node:path';
 
 import { STREET_INDEX, applyStreetIndex, loadStreetDataFromFs, setZoneStreetsShown } from '../public/js/street-loader.js?v=18b181ad';
 import { platformsScreen, streetWidth } from '../public/js/street-model.js?v=b6cb6a4e';
-import { ecologyForStreet, planStreetPlacements, populationForStreet, rockPlacementRequest, rockSpawnPlan, setStreetEcologyCatalog, streetGardenBoxBeds, streetReservedSpots } from '../public/js/street-ecology.js?v=080b2e56';
-import { resourceSpawnPlan } from '../public/js/features/resource-nodes-feature.js?v=b79bd649';
-import { FEATURES } from '../public/js/features/index.js?v=4497c7cd';
+import { ecologyForStreet, planStreetPlacements, populationForStreet, rockPlacementRequest, rockSpawnPlan, setStreetEcologyCatalog, streetGardenBoxBeds, streetReservedSpots, treePlacementRequest } from '../public/js/street-ecology.js?v=c8d6fa5b';
+import { resourceSpawnPlan } from '../public/js/features/resource-nodes-feature.js?v=5f93b9e3';
+import { FEATURES } from '../public/js/features/index.js?v=71e1e5f3';
 import { streetGardenBed } from '../public/js/garden.js?v=92436baf';
 import { isZoneTsid } from '../public/js/zone-streets.js?v=b40010d5';
 import { serverPath, skipWithoutServer } from '../tools/repos.mjs';
@@ -43,11 +43,13 @@ function plannerCall() {
 function clientCoreGroups() {
   const call = plannerCall();
   const core = call.slice(0, call.indexOf("...features.collect('placementGroups'"));
-  // The rocks' group is rockPlacementRequest(currentStreetPopulation) (its measured rocks fixed).
-  const rows = [...core.matchAll(/\{ key: '([a-zA-Z]+)', count: ([^,]+), clearance: (\d+) \}|rockPlacementRequest\(currentStreetPopulation\)/g)];
+  // The rocks' and trees' groups are rockPlacementRequest and treePlacementRequest(currentStreetPopulation)
+  // (the rocks and trees the snaps show fixed).
+  const rows = [...core.matchAll(/\{ key: '([a-zA-Z]+)', count: ([^,]+), clearance: (\d+) \}|rockPlacementRequest\(currentStreetPopulation\)|treePlacementRequest\(currentStreetPopulation\)/g)];
   assert.ok(rows.length >= 13, `read ${rows.length} planner groups from game.js`);
   return rows.map(([whole, key, expr, clearance]) => {
     if (whole.startsWith('rockPlacementRequest')) return { key: 'rocks', request: (pop) => rockPlacementRequest(pop) };
+    if (whole.startsWith('treePlacementRequest')) return { key: 'trees', request: (pop) => treePlacementRequest(pop) };
     if (/^\d+$/.test(expr.trim())) return { key, count: () => Number(expr), clearance: Number(clearance) };
     const m =/^currentStreetPopulation\.(\w+)(\.length| \? 1 : 0)?$/.exec(expr.trim());
     assert.ok(m, `game.js count for ${key} reads the street's population: ${expr}`);
