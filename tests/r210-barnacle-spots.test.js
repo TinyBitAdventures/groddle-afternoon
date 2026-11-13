@@ -26,7 +26,7 @@ import {
   populationForStreet,
   setStreetEcologyCatalog,
   steadyFloor,
-} from '../public/js/street-ecology.js?v=4922aff5';
+} from '../public/js/street-ecology.js?v=0f046853';
 import {
   prepareStreetResourceNodes,
   resourcePlacementGroups,
@@ -148,11 +148,12 @@ describe('player report #210: barnacles the snaps do not show', () => {
       { id: 'ledge', x1: 900, y1: 600, x2: 1050, y2: 600 },
       { id: 'floor', x1: 600, y1: 900, x2: 1400, y2: 900 },
     ];
-    const plan = planStreetPlacements(lines, [{ key: BARNACLE, count: 8, clearance: 42 }, { key: 'resource:ice_knob', count: 12, clearance: 46 }], { worldW: 1600, seed: 'r210', unreached: null });
+    const plan = planStreetPlacements(lines, [{ key: BARNACLE, count: 8, clearance: 42 }, { key: 'apples', count: 12, clearance: 30 }], { worldW: 1600, seed: 'r210', unreached: null });
     assert.ok(plan.groups[BARNACLE].length >= 3);
     for (const spot of plan.groups[BARNACLE]) assert.ok(spot.id.startsWith('floor:'), `barnacle on ${spot.id}`);
-    // Ice Nubbins keep the plain rule (and the ramp and ledge are there for them).
-    assert.ok(plan.groups['resource:ice_knob'].some((spot) => !spot.id.startsWith('floor:')));
+    // Apples keep the plain rule (and the ramp and ledge are there for them; Ice Nubbins have the steady rule
+    // since the placements audit, 2026-11-12).
+    assert.ok(plan.groups.apples.some((spot) => !spot.id.startsWith('floor:')));
   });
 
   it('never plans one on Froughtful Fen\'s ramp or deck ledges when it has no spots', () => {

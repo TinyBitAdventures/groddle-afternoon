@@ -646,6 +646,8 @@ import { GARDEN_SCALE, PLOT_H as GARDEN_PLOT_H, PLOT_W as GARDEN_PLOT_W, gardenF
 import { nearestPlotIndex } from './js/garden-view.js?v=04fe8467';
 import {
   ROCK_CATALOG,
+  ROCK_SHAPE_SHEETS,
+  rockShapeSheet,
   createMineRock,
   tickMineRock,
   rockStatusLabel,
@@ -664,7 +666,7 @@ import {
   ensureStreetIndex,
   resolveIndexTsid,
 } from './js/street-loader.js?v=18b181ad';
-import { showDraftBanner, startDraftPlay } from './js/builder/draft-play.js?v=ad2cfcd8';
+import { showDraftBanner, startDraftPlay } from './js/builder/draft-play.js?v=5635265f';
 import {
   ladderTopDeck,
   groundBeneath,
@@ -980,8 +982,11 @@ import {
   animalPatrolRange,
   ANIMAL_PATROL,
   nearestPlacementGap,
-} from './js/street-ecology.js?v=f27417a8';
-import { CHICKEN_PAUSE, chickenPauseRoll, easeToward, flightFloorAt, flightFloorFor, flyerLift } from './js/street-creatures.js?v=aa045cc6';
+  rockPlacementRequest,
+  rockSpawnPlan,
+  ROCK_SHAPE_WIDTHS,
+} from './js/street-ecology.js?v=0f046853';
+import { CHICKEN_PAUSE, chickenPauseRoll, easeToward, flightFloorAt, flightFloorFor, flyerLift } from './js/street-creatures.js?v=9d60b61b';
 import { chickenPose, chickenIdleSheetsAsked } from './js/chicken-idle-art.js?v=c46b17d5';
 import { chickenWaitPose } from './js/chicken-idles.js?v=eef0279b';
 import { itemOverlayStats } from './js/item-overlay.js?v=97ed2ba0';
@@ -1315,6 +1320,8 @@ const SHEETS = {
     url: 'assets/sprites/mining/rock_sparkly.webp?v=exact-rock-cells-1',
     fw: 131, fh: 127, cols: 5, rows: 1,
   },
+  // Each kind's _2 and _3 shapes (js/mining.js ROCK_SHAPES).
+  ...ROCK_SHAPE_SHEETS,
   hatchetTool: {
     url: 'assets/sprites/tools/hatchet-tool.webp',
     fw: 110, fh: 64, cols: 8, rows: 5, frameCount: 38,
@@ -13048,7 +13055,7 @@ const engine = {
   /** Redraw a garden bed's plots after a feature changed them (Master Gardener potions). */
   refreshGarden: (target) => refreshGardenVisual(target),
   /** One mineable rock that keeps its state in the street's rock slot `index`. */
-  spawnMineRock: (classTsid, x, y, index) => spawnMineRock(classTsid, x, y, index),
+  spawnMineRock: (classTsid, x, y, index, shape) => spawnMineRock(classTsid, x, y, index, shape),
   /** Redraw a rock after a feature changed its chunks (G207 companions mining). */
   refreshMineRock: (target) => refreshMineRockVisual(target),
   /** The timed verb running now ({ target, verbId }) or null (G207 help mine). */
@@ -24535,7 +24542,8 @@ async function enterStreet(tsid, opts = {}) {
       { key: 'gardens', count: currentStreetPopulation.gardens, clearance: 165 },
       { key: 'vendor', count: currentStreetPopulation.vendor ? 1 : 0, clearance: 120 },
       { key: 'shrine', count: currentStreetPopulation.shrine ? 1 : 0, clearance: 135 },
-      { key: 'rocks', count: currentStreetPopulation.rockClasses.length, clearance: 74 },
+      // Rocks the snaps show stand where they show them (fixed points), the rest are planned.
+      rockPlacementRequest(currentStreetPopulation),
       { key: 'piggies', count: currentStreetPopulation.piggies, clearance: 92 },
       { key: 'chickens', count: currentStreetPopulation.chickens, clearance: 86 },
       { key: 'butterflies', count: currentStreetPopulation.butterflies, clearance: 62 },
@@ -24617,7 +24625,7 @@ async function enterStreet(tsid, opts = {}) {
   streetGardenBoxBeds(data, currentStreetPopulation).forEach((bed) => {
     spawnGarden({ x: bed.x, y: bed.y, cols: bed.cols, rows: bed.rows, gardenType: bed.gardenType, bed: bed.bed, style: 'none' });
   });
-  spawnMineRocks(currentStreetPopulation.rockClasses, placement('rocks'));
+  spawnMineRocks(currentStreetPopulation.rockClasses, rockSpawnPlan(currentStreetPopulation, placement('rocks'), data.tsid));
 
   if (player) {
     const spawn = placement('player')[0];
@@ -30114,18 +30122,20 @@ function spawnMineRocks(typesOverride = null, placements = null) {
     'rock_sparkly_1',
     'rock_metal_1',
   ];
+  // `placements`: street-ecology.js rockSpawnPlan rows (each rock's spot and shape, measured or planned).
   const pts = placements || samplePlatformPoints(types.length + 2).slice(1);
   types.forEach((classTsid, i) => {
     const def = ROCK_CATALOG[classTsid];
     if (!def) return;
-    const p = pts[i] || {
+    const p = Number.isFinite(pts[i]?.x) ? pts[i] : {
       x: 200 + i * 160,
       y: GROUND_Y,
+      shape: pts[i]?.shape,
     };
     // A shared placement plan already reserves room around gardens and trees.
     const x = placements ? (p.x || 200) : (p.x || 200) + 80 + i * 40;
     const y = p.y || GROUND_Y;
-    spawnMineRock(classTsid, x, y, i);
+    spawnMineRock(classTsid, x, y, i, p.shape || 1);
   });
   streetWorldState().rocks.length = types.length;
   if (app?.canvas) {
@@ -30144,8 +30154,10 @@ function spawnMineRocks(typesOverride = null, placements = null) {
  * @param {number} y
  * @param {number} index
  */
-function spawnMineRock(classTsid, x, y, index = 0) {
+function spawnMineRock(classTsid, x, y, index = 0, shape = 1) {
   const def = ROCK_CATALOG[classTsid] || ROCK_CATALOG.rock_metal_1;
+  // The shape's sheet (js/mining.js ROCK_SHAPES); the rock, its class and its mining are the same.
+  const look = rockShapeSheet(def.classTsid, shape) || def;
   const rock = createMineRock(def.classTsid);
   const streetState = streetWorldState();
   const savedRock = streetState.rocks[index]?.classId === def.classTsid
@@ -30160,21 +30172,26 @@ function spawnMineRock(classTsid, x, y, index = 0) {
   root.zIndex = itemZ(def.classTsid, 9.5);
   root.eventMode = 'static';
   root.cursor = 'pointer';
-  // Hit box ~ rock width
-  root.hitArea = new PIXI.Rectangle(-48, -90, 96, 92);
-  root._mineHitW = 96;
-  root._mineHitH = 90;
+  // Hit box: the shape's whole rock as drawn (1:1, street-ecology.js ROCK_SHAPE_WIDTHS), its cell's height.
+  const hitW = ROCK_SHAPE_WIDTHS[def.classTsid]?.[shape - 1] || look.frameWidth;
+  const hitH = look.frameHeight;
+  root.hitArea = new PIXI.Rectangle(-hitW / 2, -hitH, hitW, hitH + 2);
+  root._mineHitW = hitW;
+  root._mineHitH = hitH;
+  root.rockShape = look === def ? 1 : shape;
 
-  const loadedFrames = textures[def.textureKey]?.frames || [];
-  const fallbackTexture = textureFromUrl(`${def.worldSheet}?v=exact-rock-cells-1`);
+  const loadedFrames = textures[look.textureKey]?.frames || [];
+  const fallbackTexture = textureFromUrl(`${look.worldSheet}?v=exact-rock-cells-1`);
   const spr = new PIXI.Sprite(loadedFrames[0] || fallbackTexture);
   spr.anchor.set(0.5, 1);
   // Use exact, preloaded frame cells. Creating a subtexture before an image
   // finishes loading can leave a permanently invalid frame (the missing
   // Sparkly Rock failure).
-  const fw = def.frameWidth;
-  const fh = def.frameHeight;
-  spr.scale.set(0.85);
+  const fw = look.frameWidth;
+  const fh = look.frameHeight;
+  // 1:1, as Glitch drew items (Itemstack.as 112-122: scale 1 unless the location sets item_scale);
+  // the snaps match the art at 1.0 (0.98-0.999) and not at 0.85.
+  spr.scale.set(1);
   spr.eventMode = 'none';
   root.addChild(spr);
   root.rockSprite = spr;

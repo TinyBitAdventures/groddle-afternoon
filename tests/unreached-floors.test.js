@@ -21,7 +21,7 @@ import {
   setStreetEcologyCatalog,
   streetReservedSpots,
   unreachedFloorsFor,
-} from '../public/js/street-ecology.js?v=4922aff5';
+} from '../public/js/street-ecology.js?v=0f046853';
 import { placementRequests, streetEcology } from '../tools/build-realtime-quoins.mjs';
 import { UNREACHED_JUMP, UNREACHED_JUMPS, overlapRuns, unreachedFloorsOf, unreachedJump } from '../tools/ecology/build-unreached-floors.mjs';
 import { NORMAL_BUFF, jumpApex } from '../public/js/avatar-step.js?v=43b1182e';
@@ -61,7 +61,9 @@ describe('ticket 64: nothing is planned on a floor nobody reaches', () => {
   it('Level 3 East: its rocks, quoins, apples and Musicblock go on the walk now, not under it', () => {
     const before = plan(LEVEL_3_EAST, { unreached: null });
     const under = (r) => Object.entries(r.plan.groups).flatMap(([g, pts]) => pts.filter((p) => lineAt(r.lines, p)?.id === UNDER_FLOOR).map(() => g));
-    assert.ok(under(before).includes('rocks') && under(before).includes('musicblocks') && under(before).includes('quoins'), 'the old plan had them under the walk (the report)');
+    // Since every floor height is planned (the placements audit, 2026-11-12) the Musicblock finds the walk
+    // by itself; the rocks and quoins would still go under it.
+    assert.ok(under(before).includes('rocks') && under(before).includes('quoins'), 'the old plan had them under the walk (the report)');
     const after = plan(LEVEL_3_EAST);
     assert.deepEqual(under(after), []);
     for (const g of ['rocks', 'quoins', 'musicblocks']) assert.equal(after.plan.groups[g].length, before.plan.groups[g].length, `${g}: all still placed`);

@@ -42,7 +42,7 @@ import { FEATURES } from '../public/js/features/index.js?v=2d36e2e8';
 import { GAME_EPOCH_MS } from '../public/js/game-day.js?v=cf9afac0';
 import { creatureRequests, setCreatureEcology, streetObjectLayout } from '../tools/build-realtime-objects.mjs';
 import { STREET_INDEX, applyStreetIndex, loadStreetDataFromFs } from '../public/js/street-loader.js?v=18b181ad';
-import { setStreetEcologyCatalog } from '../public/js/street-ecology.js?v=4922aff5';
+import { setStreetEcologyCatalog } from '../public/js/street-ecology.js?v=0f046853';
 import { serverPath, skipWithoutServer } from '../tools/repos.mjs';
 
 const root = join(import.meta.dirname, '..');

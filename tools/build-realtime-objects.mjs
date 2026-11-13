@@ -78,6 +78,8 @@ import {
   ecologyForStreet,
   planStreetPlacements,
   populationForStreet,
+  rockPlacementRequest,
+  rockSpawnPlan,
   setStreetEcologyCatalog,
   streetReservedSpots,
 } from '../public/js/street-ecology.js?v=f27417a8';
@@ -122,7 +124,7 @@ export function placementRequests(population) {
     { key: 'gardens', count: population.gardens, clearance: 165 },
     { key: 'vendor', count: population.vendor ? 1 : 0, clearance: 120 },
     { key: 'shrine', count: population.shrine ? 1 : 0, clearance: 135 },
-    { key: 'rocks', count: population.rockClasses.length, clearance: 74 },
+    rockPlacementRequest(population),
     { key: 'piggies', count: population.piggies, clearance: 92 },
     { key: 'chickens', count: population.chickens, clearance: 86 },
     { key: 'butterflies', count: population.butterflies, clearance: 62 },
@@ -171,7 +173,8 @@ function groundY(platforms) {
 
 /**
  * One street's shared objects, in the client's own ids:
- *   rocks [i, class, x, y]                 game.js spawnMineRocks / spawnMineRock (index i in rockClasses)
+ *   rocks [i, class, x, y]                 game.js spawnMineRocks / spawnMineRock (index i in rockClasses;
+ *                                          street-ecology.js rockSpawnPlan: measured or planned)
  *   trees [i, class, x, y, maturity, health] game.js spawnTrees (the trants, and the Wood Tree at
  *                                          maturity 6, health 0: ensureWoodTreeState's fresh tree)
  *   nodes [key, class, x, y]               resource-nodes-feature resourceSpawnPlan (`<class>:<n>`)
@@ -200,11 +203,13 @@ export function streetObjectLayout(data, { starter = false, ecology = ecologyFor
   const ground = groundY(platforms);
 
   const rocks = [];
-  const rockPts = placement('rocks');
-  population.rockClasses.forEach((classTsid, i) => {
+  rockSpawnPlan(population, placement('rocks'), data.tsid).forEach((p) => {
+    const { index: i, classTsid } = p;
     if (!ROCK_CATALOG[classTsid]) return;
-    const p = rockPts[i] || { x: 200 + i * 160, y: ground };
-    rocks.push([i, classTsid, r1(p.x || 200), r1(p.y || ground)]);
+    // game.js spawnMineRocks: a rock the planner could not seat stands at its fallback.
+    const x = p.x ?? 200 + i * 160;
+    const y = p.y ?? ground;
+    rocks.push([i, classTsid, r1(x || 200), r1(y || ground)]);
   });
 
   const trees = [];

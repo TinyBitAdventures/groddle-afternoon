@@ -18,10 +18,10 @@ import { join } from 'node:path';
 
 import { STREET_INDEX, applyStreetIndex, loadStreetDataFromFs, setZoneStreetsShown } from '../public/js/street-loader.js?v=18b181ad';
 import { platformsScreen, streetWidth } from '../public/js/street-model.js?v=b6cb6a4e';
-import { ecologyForStreet, planStreetPlacements, populationForStreet, setStreetEcologyCatalog, streetGardenBoxBeds, streetReservedSpots } from '../public/js/street-ecology.js?v=f27417a8';
-import { resourceSpawnPlan } from '../public/js/features/resource-nodes-feature.js?v=2cc2384a';
-import { FEATURES } from '../public/js/features/index.js?v=2d36e2e8';
-import { streetGardenBed } from '../public/js/garden.js?v=92436baf';
+import { ecologyForStreet, planStreetPlacements, populationForStreet, rockPlacementRequest, rockSpawnPlan, setStreetEcologyCatalog, streetGardenBoxBeds, streetReservedSpots } from '../public/js/street-ecology.js?v=0f046853';
+import { resourceSpawnPlan } from '../public/js/features/resource-nodes-feature.js?v=c3f110b1';
+import { FEATURES } from '../public/js/features/index.js?v=70acb2a3';
+import { streetGardenBed } from '../public/js/garden.js?v=37209241';
 import { isZoneTsid } from '../public/js/zone-streets.js?v=b40010d5';
 import { serverPath, skipWithoutServer } from '../tools/repos.mjs';
 
@@ -43,9 +43,11 @@ function plannerCall() {
 function clientCoreGroups() {
   const call = plannerCall();
   const core = call.slice(0, call.indexOf("...features.collect('placementGroups'"));
-  const rows = [...core.matchAll(/\{ key: '([a-zA-Z]+)', count: ([^,]+), clearance: (\d+) \}/g)];
+  // The rocks' group is rockPlacementRequest(currentStreetPopulation) (its measured rocks fixed).
+  const rows = [...core.matchAll(/\{ key: '([a-zA-Z]+)', count: ([^,]+), clearance: (\d+) \}|rockPlacementRequest\(currentStreetPopulation\)/g)];
   assert.ok(rows.length >= 13, `read ${rows.length} planner groups from game.js`);
-  return rows.map(([, key, expr, clearance]) => {
+  return rows.map(([whole, key, expr, clearance]) => {
+    if (whole.startsWith('rockPlacementRequest')) return { key: 'rocks', request: (pop) => rockPlacementRequest(pop) };
     if (/^\d+$/.test(expr.trim())) return { key, count: () => Number(expr), clearance: Number(clearance) };
     const m =/^currentStreetPopulation\.(\w+)(\.length| \? 1 : 0)?$/.exec(expr.trim());
     assert.ok(m, `game.js count for ${key} reads the street's population: ${expr}`);
@@ -64,7 +66,7 @@ function clientCoreGroups() {
 function clientLayout(data, core, nodesFeature) {
   const population = populationForStreet(data.tsid, ecologyForStreet(data.tsid), { starter: data.tsid === STREET_INDEX.default });
   const requests = [
-    ...core.map((g) => ({ key: g.key, count: g.count(population), clearance: g.clearance })),
+    ...core.map((g) => (g.request ? g.request(population) : { key: g.key, count: g.count(population), clearance: g.clearance })),
     // features.collect('placementGroups'): resource-nodes is the first feature with groups, and
     // the groups after it never move the ones before (the planner seats each group in order).
     ...nodesFeature.placementGroups(population),
@@ -72,7 +74,7 @@ function clientLayout(data, core, nodesFeature) {
   // game.js: WORLD_W = streetWidth(data); no saved-arrival spot online.
   const plan = planStreetPlacements(platformsScreen(data), requests, { worldW: streetWidth(data), seed: data.tsid, reserved: streetReservedSpots(data) });
   const placement = (key) => plan.groups[key] || [];
-  return { population, placement, nodes: resourceSpawnPlan(population, placement) };
+  return { population, placement, nodes: resourceSpawnPlan(population, placement), rocks: rockSpawnPlan(population, placement('rocks'), data.tsid) };
 }
 
 const r1 = (n) => Math.round(n * 10) / 10;
@@ -118,11 +120,12 @@ describe('the page lays out each street where the realtime server checks reach',
       } catch {
         continue;
       }
-      const { population, placement, nodes } = clientLayout(data, core, nodesFeature);
+      const { population, placement, nodes, rocks } = clientLayout(data, core, nodesFeature);
       const want = objects[tsid] || {};
       const bad = [];
       const rows = (kind, group, dy = 2) => {
-        const pts = placement(group);
+        // Rocks by their index in rockClasses (rockSpawnPlan: measured or planned), as game.js spawnMineRocks.
+        const pts = kind === 'rocks' ? rocks : placement(group);
         for (const row of want[kind] || []) {
           const [i] = row;
           const [x, y] = kind === 'rocks' || kind === 'trees' ? row.slice(2, 4) : row.slice(1, 3);

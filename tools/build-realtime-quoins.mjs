@@ -32,9 +32,10 @@ import {
   ecologyForStreet,
   planStreetPlacements,
   populationForStreet,
+  rockPlacementRequest,
   setStreetEcologyCatalog,
   streetReservedSpots,
-} from '../public/js/street-ecology.js?v=4922aff5';
+} from '../public/js/street-ecology.js?v=0f046853';
 import {
   MYSTERY_QUOIN_KINDS,
   QUOIN_CLASSES,
@@ -64,7 +65,7 @@ export function placementRequests(population) {
     { key: 'gardens', count: population.gardens, clearance: 165 },
     { key: 'vendor', count: population.vendor ? 1 : 0, clearance: 120 },
     { key: 'shrine', count: population.shrine ? 1 : 0, clearance: 135 },
-    { key: 'rocks', count: population.rockClasses.length, clearance: 74 },
+    rockPlacementRequest(population),
     { key: 'piggies', count: population.piggies, clearance: 92 },
     { key: 'chickens', count: population.chickens, clearance: 86 },
     { key: 'butterflies', count: population.butterflies, clearance: 62 },

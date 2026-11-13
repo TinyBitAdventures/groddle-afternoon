@@ -354,7 +354,11 @@ describe('game wiring', () => {
         `${key} must preload its exact five-cell strip`
       );
     }
-    assert.match(src, /const loadedFrames = textures\[def\.textureKey\]\?\.frames/);
+    // The rock's shape picks its sheet (js/mining.js ROCK_SHAPES), drawn 1:1 as Glitch drew items.
+    assert.match(src, /const look = rockShapeSheet\(def\.classTsid, shape\) \|\| def;/);
+    assert.match(src, /const loadedFrames = textures\[look\.textureKey\]\?\.frames/);
+    assert.match(src, /\.\.\.ROCK_SHAPE_SHEETS,/);
+    assert.match(spawn, /spr\.scale\.set\(1\);/);
     assert.match(src, /dataset\.rockPopulation/);
     assert.match(src, /URLSearchParams\(location\.search\)\.get\('rockdemo'\)/);
   });

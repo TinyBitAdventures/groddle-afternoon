@@ -334,7 +334,9 @@ describe('the server data', () => {
 
   it('lays out quoins with game.js enterStreet planner groups, in its order', () => {
     const game = read('public/game.js');
-    const call = game.slice(game.indexOf('currentStreetPlacement = planStreetPlacements('));
+    // The rocks' request is rockPlacementRequest (key 'rocks', clearance 74, its measured rocks fixed).
+    const call = game.slice(game.indexOf('currentStreetPlacement = planStreetPlacements('))
+      .replace(/rockPlacementRequest\(currentStreetPopulation\)/, "{ key: 'rocks', count: rocks, clearance: 74 }");
     const list = call.slice(0, call.indexOf("{ key: 'quoins'") + 80);
     const keys = [...list.matchAll(/\{ key: '([A-Za-z]+)', count: ([^,]+), clearance: (\d+) \}/g)].map((m) => [m[1], m[3]]);
     const pop = { treeClasses: [], gardens: 0, vendor: false, shrine: false, rockClasses: [], piggies: 0, chickens: 0, butterflies: 0, flyingButterflies: 0, apples: 0, musicblocks: 0, quoins: 0 };

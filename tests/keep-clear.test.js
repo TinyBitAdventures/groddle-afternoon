@@ -42,7 +42,7 @@ import {
   populationForStreet,
   setStreetEcologyCatalog,
   streetReservedSpots,
-} from '../public/js/street-ecology.js?v=4922aff5';
+} from '../public/js/street-ecology.js?v=0f046853';
 import { placementRequests } from '../tools/build-realtime-objects.mjs';
 import { serverPath, skipWithoutServer } from '../tools/repos.mjs';
 import { applyStreetIndex, loadStreetDataFromFs, setZoneStreetsShown } from '../public/js/street-loader.js?v=18b181ad';
@@ -78,6 +78,8 @@ function offences(plan, reserved) {
     if (key === 'player') continue;
     const big = SCENERY.includes(key);
     for (const p of points) {
+      // A rock the 2012 snaps show (`fixed`, rockPlacementRequest) stands where Glitch had it, by a signpost or not.
+      if (p.fixed) continue;
       const hit = blockingFixture(p, reserved, big ? { footprint: PLACEMENT_FOOTPRINTS[key], height: PLACEMENT_HEIGHTS[key] } : {});
       if (hit) out.push(`${key} at ${Math.round(p.x)},${Math.round(p.y)} covers ${hit.key}`);
     }
@@ -284,7 +286,8 @@ describe('ticket 89: nothing is planted behind a deco drawn in front of the stre
       const { plan: pl, reserved: rs } = layoutOf(data);
       const fr = rs.filter((r) => r.front);
       if (!fr.length) continue;
-      for (const key of ['trees', 'rocks', 'piggies']) for (const p of pl.groups[key] || []) if (hiddenBehindFront(p, key, fr)) hidden.push(`${tsid} ${key} ${Math.round(p.x)},${Math.round(p.y)}`);
+      // Rocks the snaps show (`fixed`) were drawn there in 2012, so they show (the front deco check is the planner's guess).
+      for (const key of ['trees', 'rocks', 'piggies']) for (const p of pl.groups[key] || []) if (!p.fixed && hiddenBehindFront(p, key, fr)) hidden.push(`${tsid} ${key} ${Math.round(p.x)},${Math.round(p.y)}`);
     }
     // Census of the server's data (2026-11-04): before, 229 trees, rocks and Piggies mostly behind a front deco; after, none.
     assert.deepEqual(hidden, []);
@@ -339,7 +342,7 @@ describe('ticket 118: rooted scenery keeps off a front deco players walk along',
       const walkways = frontDecoWalkways(platformsScreen(data), reserved.filter((r) => r.front));
       if (!walkways.length) continue;
       withWalkway += 1;
-      for (const key of SCENERY) for (const p of plan.groups[key] || []) if (footAtWalkway(p, PLACEMENT_FOOTPRINTS[key], walkways)) offenders.push(`${tsid} ${key} ${Math.round(p.x)},${Math.round(p.y)}`);
+      for (const key of SCENERY) for (const p of plan.groups[key] || []) if (!p.fixed && footAtWalkway(p, PLACEMENT_FOOTPRINTS[key], walkways)) offenders.push(`${tsid} ${key} ${Math.round(p.x)},${Math.round(p.y)}`);
     }
     // Census of the server's data (2026-11-06): 16 streets have one; before, 4 things stood at one (Flipside's plant, 3 others).
     assert.ok(withWalkway >= 10, String(withWalkway));

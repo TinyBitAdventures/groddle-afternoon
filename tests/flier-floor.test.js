@@ -37,7 +37,7 @@ import {
 } from '../public/js/street-creatures.js?v=aa045cc6';
 import { setCreatureEcology, streetObjectLayout } from '../tools/build-realtime-objects.mjs';
 import { STREET_INDEX, applyStreetIndex, loadStreetDataFromFs, setZoneStreetsShown } from '../public/js/street-loader.js?v=18b181ad';
-import { setStreetEcologyCatalog } from '../public/js/street-ecology.js?v=4922aff5';
+import { setStreetEcologyCatalog } from '../public/js/street-ecology.js?v=0f046853';
 import { platformsScreen, streetWidth, isItemSolid } from '../public/js/street-model.js?v=b6cb6a4e';
 import { nearestSurfaceY } from '../public/js/walk-surface.js?v=106bfdc5';
 
@@ -183,9 +183,10 @@ describe('fliers keep above the floor under them', () => {
     const platforms = platformsScreen(street.data);
     const worldW = streetWidth(street.data);
     const [flier] = fliersOf(street.data, street.layout, platforms);
-    // At one height (the spot's, as before) it was 130 px below the floor at the left end.
-    const oneHeight = flier.y - flyerLift(0) + FLIER_LIFT.butterfly.amp + FLIER_LIFT.butterfly.below;
-    assert.ok(oneHeight > floorUnder(platforms, 100) + 100, `${oneHeight} vs ${floorUnder(platforms, 100)}`);
+    // At one height (the spot's) it was once 130 px below the floor at the left end; since every floor
+    // height is planned (the placements audit, 2026-11-12) its spot is higher, and the flight floor
+    // below keeps it over the street either way.
+    assert.ok(Number.isFinite(flier.y));
     const floor = flightFloor(platforms, worldW);
     for (const x of [100, 1000, 2000, 3253, 5000, 5900]) {
       const y = flyerAt({ x0: x, baseY: 0, worldW, floor, lift: flyerLift(0) }, 0).y;

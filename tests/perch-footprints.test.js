@@ -27,7 +27,7 @@ import {
   populationForStreet,
   setStreetEcologyCatalog,
   streetReservedSpots,
-} from '../public/js/street-ecology.js?v=4922aff5';
+} from '../public/js/street-ecology.js?v=0f046853';
 import { placementRequests } from '../tools/build-realtime-objects.mjs';
 import { SHRINE_SHEETS } from '../public/js/shrine-variants.js?v=7f11c97d';
 import { adoptedPlan } from '../public/js/features/patches-feature.js?v=3e26b680';
@@ -56,12 +56,17 @@ function layoutOf(data, { footprints = true } = {}) {
 describe('the footprints', () => {
   it('come from the drawn art', () => {
     // Trants 127-267 px wide at 210 px tall, their feet up to 171 px (trant_egg); gardens 280 / 227;
-    // the vendor 422 px x 0.25; a shrine cell 151 px x 0.78; rocks 92-114 px at 0.85; a Piggy's feet and
+    // the vendor 422 px x 0.25; a shrine cell 151 px x 0.78; rocks 86-138 px at 1:1 (the _1 and _2 shapes); a Piggy's feet and
     // body (60) and a Chicken's (38) each with its patrol both ways (lane DOORCLEAR); a resting Butterfly's cell.
     assert.equal(TREE_FOOTPRINT, 180);
     // A planned Mortar Barnacle (player report #210): its blister art and a little floor round it; a planned
-    // Jellisac's sack and a Peat Bog's whole mound (reports #249, #250).
-    assert.deepEqual({ ...PLACEMENT_FOOTPRINTS }, { trees: 180, gardens: 280, vendor: 106, shrine: 118, rocks: 100, piggies: 240, chickens: 238, butterflies: 48, 'resource:mortar_barnacle': 60, 'resource:jellisac': 60, 'resource:peat_1': 180 });
+    // Jellisac's sack and a Peat Bog's whole mound (reports #249, #250). The placements audit (2026-11-12):
+    // a Dirt Pile's mound, an Ice Nubbin, a Dust Trap, a Paper Tree's trunk and a Visiting Stone.
+    assert.deepEqual({ ...PLACEMENT_FOOTPRINTS }, {
+      trees: 180, gardens: 280, vendor: 106, shrine: 118, rocks: 120, piggies: 240, chickens: 238, butterflies: 48,
+      'resource:mortar_barnacle': 60, 'resource:jellisac': 60, 'resource:peat_1': 180,
+      'resource:dirt_pile': 150, 'resource:ice_knob': 60, 'resource:dust_trap': 60, 'resource:paper_tree': 80, furnitureStone: 90,
+    });
     assert.equal(PERCH_DROP_PX, 150);
     const game = readFileSync(join(root, 'public/game.js'), 'utf8');
     assert.match(game, /trantDisplayScale\(tex, \{ targetH: 210, maxScale: 1 \}\)/);
@@ -73,7 +78,7 @@ describe('the footprints', () => {
 });
 
 describe('the floor a big thing needs', () => {
-  // A ceiling line up top keeps both floors in the planner's lower band.
+  // A ceiling line up top (it holds nothing; the planner once kept to the lower floors under it).
   const roof = { id: 'roof', x1: 40, y1: 0, x2: 1960, y2: 0, pcPerm: 1, itemPerm: 1 };
 
   it('turns down a branch stub over the floor', () => {
@@ -135,7 +140,8 @@ describe('the floor a big thing needs', () => {
   });
 
   it('still places everything on a street too cramped for it, on the roomiest spots, and says so', () => {
-    const ledges = [roof, floor('top', 40, 120, 100)];
+    // (Every floor height is a candidate now: no top floor, which would be a roomier spot than the ledges.)
+    const ledges = [roof];
     for (let i = 0; i < 8; i += 1) ledges.push(floor(`ledge${i}`, 100 + i * 220, 100 + i * 220 + (i === 3 ? 150 : 90), 1000));
     const plan = planStreetPlacements(ledges, [
       { key: 'trees', count: 3, clearance: 135 },

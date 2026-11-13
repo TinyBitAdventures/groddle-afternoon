@@ -5,8 +5,16 @@
 
 import { avatarHeadReach, groundBeneath, isItemSolid, isStandable, platformYAt, worldToScreen } from './street-model.js?v=b6cb6a4e';
 import { behindFloor } from './reach.js?v=4187d746';
+import { QUOIN_SPOTS } from './quoin-spots-data.js?v=7c343cbc';
 import { BARNACLE_SPOTS } from './barnacle-spots-data.js?v=cea3daec';
-import { JELLISAC_SPOTS, PEAT_SPOTS } from './node-spots-data.js?v=8d619d0b';
+import {
+  JELLISAC_SPOTS,
+  PEAT_SPOTS,
+  ROCK_BERYL_SPOTS,
+  ROCK_DULLITE_SPOTS,
+  ROCK_METAL_SPOTS,
+  ROCK_SPARKLY_SPOTS,
+} from './node-spots-data.js?v=8d619d0b';
 
 export const STREET_ECOLOGY_URL = 'assets/content/street-ecology.json?v=official-ecology-6';
 
@@ -147,6 +155,11 @@ export const RESOURCE_NODE_CAPS = Object.freeze({
  * mid-air and laid a Peat Bog along Ratin Jot Jog's root. They have measured spots the same way
  * (assets/content/node-spots.json from tools/snap-placements/nodes.py), and the planned rest keep
  * to steady floors (STEADY_FLOOR_GROUPS) and these caps.
+ *
+ * Rocks too (the placements audit, 2026-11-12): Glitch set its Metal, Beryl, Dullite and Sparkly
+ * Rocks by hand (rock_metal_1.js etc. obey_physics false), and the planner put 31% of the 763 on
+ * snapped streets at a height where the street never had one. Their spots and shapes come from the
+ * snaps the same way (nodes.py), and the rest are planned (rockPlacementRequest, rockSpawnPlan).
  */
 export const PLANNED_NODE_CAPS = Object.freeze({
   mortar_barnacle: 6,
@@ -159,6 +172,11 @@ export const MEASURED_NODE_SPOTS = Object.freeze({
   mortar_barnacle: Object.freeze({ variantPrefix: 'blister', streets: BARNACLE_SPOTS }),
   jellisac: Object.freeze({ variantPrefix: 'jellySack', streets: JELLISAC_SPOTS }),
   peat_1: Object.freeze({ variantPrefix: 'peat', streets: PEAT_SPOTS }),
+  // A rock's variant is the class of the shape the snap shows (rock_metal_2: items/rock_metal_2.js, proxy_item rock_metal_1).
+  rock_metal_1: Object.freeze({ variantPrefix: 'rock_metal_', streets: ROCK_METAL_SPOTS }),
+  rock_beryl_1: Object.freeze({ variantPrefix: 'rock_beryl_', streets: ROCK_BERYL_SPOTS }),
+  rock_dullite_1: Object.freeze({ variantPrefix: 'rock_dullite_', streets: ROCK_DULLITE_SPOTS }),
+  rock_sparkly_1: Object.freeze({ variantPrefix: 'rock_sparkly_', streets: ROCK_SPARKLY_SPOTS }),
 });
 
 /**
@@ -209,6 +227,128 @@ function expandResourceClasses(counts, spots = null) {
 /** The population's measured spots for its spawn list (resource-nodes-feature resourceSpawnPlan), if any. */
 function spotFields(spots) {
   return spots ? { resourceSpots: spots } : {};
+}
+
+/**
+ * Glitch's rocks came in three shapes a kind (the placements audit, 2026-11-12): rock_metal_2 and
+ * rock_metal_3 are items of their own with their own art (items/rock_metal_2.js 11-13: proxy_item
+ * rock_metal_1, no info page; 'position' 156 x 137 against _1's 136 x 100), and every line that
+ * mines them is _1's (the twelve rock_*_N.js files differ only in has_infopage, proxy_item,
+ * is_routable, the art and the thumb). So the remake keeps one class a kind and draws the shape.
+ * The art is Tiny Speck's own sheets (OpenGameArt glitch-assets-2.7z, CC0: js/mining.js ROCK_SHAPES).
+ *
+ * ROCK_SHAPE_SHARES: how many of each shape (_1, _2, _3) of each kind the players' 2012 snaps show
+ * (tools/snap-placements/nodes.py, node-spots.json: 720 of the 767 rocks the files name on the 223
+ * snapped rock streets, 430 of them _2 or _3); a planned rock takes a shape in those proportions,
+ * fixed per street and rock (rockShapeFor).
+ * ROCK_SHAPE_WIDTHS: each shape's whole rock as drawn (1:1), its first chunk frame's opaque width,
+ * which the floor under a planned rock must hold (else it takes a narrower shape).
+ * ROCK_SHAPE_HEIGHTS: the frame cell's height (what the hit box and the planner's keep-clear box cover).
+ */
+export const ROCK_SHAPE_SHARES = Object.freeze({
+  rock_metal_1: Object.freeze([154, 96, 55]),
+  rock_beryl_1: Object.freeze([53, 60, 60]),
+  rock_dullite_1: Object.freeze([44, 51, 36]),
+  rock_sparkly_1: Object.freeze([39, 25, 47]),
+});
+export const ROCK_SHAPE_WIDTHS = Object.freeze({
+  rock_metal_1: Object.freeze([126, 138, 168]),
+  rock_beryl_1: Object.freeze([96, 100, 153]),
+  rock_dullite_1: Object.freeze([86, 87, 130]),
+  rock_sparkly_1: Object.freeze([99, 104, 143]),
+});
+export const ROCK_SHAPE_HEIGHTS = Object.freeze({
+  rock_metal_1: Object.freeze([100, 137, 92]),
+  rock_beryl_1: Object.freeze([120, 129, 98]),
+  rock_dullite_1: Object.freeze([114, 130, 82]),
+  rock_sparkly_1: Object.freeze([127, 150, 88]),
+});
+
+/** PURE: a shape number (1-3) as a whole number, or 0. */
+function rockShapeNumber(variant) {
+  const n = Number(String(variant ?? '').slice(-1));
+  return n >= 1 && n <= 3 ? n : 0;
+}
+
+/**
+ * PURE: the shape (1-3) of a planned rock: drawn in Glitch's proportions from the street and the
+ * rock's index (the same on every page and the server's layout); a shape wider than the floor its
+ * spot holds (`room`, the plan point's) gives way to the widest one that fits, else the narrowest.
+ */
+export function rockShapeFor(tsid, index, classTsid, room = Infinity) {
+  const shares = ROCK_SHAPE_SHARES[classTsid];
+  if (!shares) return 1;
+  const total = shares.reduce((a, b) => a + b, 0);
+  let roll = ((stableEcologyHash(`${tsid}:rock-shape:${index}`) % 10007) / 10007) * total;
+  let shape = shares.length;
+  for (let i = 0; i < shares.length; i += 1) {
+    if (roll < shares[i]) {
+      shape = i + 1;
+      break;
+    }
+    roll -= shares[i];
+  }
+  const widths = ROCK_SHAPE_WIDTHS[classTsid];
+  if (!Number.isFinite(room) || widths[shape - 1] <= room) return shape;
+  const fits = [1, 2, 3].filter((n) => widths[n - 1] <= room);
+  if (fits.length) return fits.reduce((a, b) => (widths[b - 1] > widths[a - 1] ? b : a));
+  return [1, 2, 3].reduce((a, b) => (widths[b - 1] < widths[a - 1] ? b : a));
+}
+
+/** Each rock's measured spot ({ x, y, shape }) by its index in rockClasses, or null where it is planned. */
+function measuredRockSlots(population) {
+  const used = {};
+  return (population?.rockClasses || []).map((classTsid) => {
+    const k = used[classTsid] || 0;
+    used[classTsid] = k + 1;
+    const spot = population?.resourceSpots?.[classTsid]?.[k];
+    if (!spot || !Number.isFinite(spot.x) || !Number.isFinite(spot.y)) return null;
+    return { x: spot.x, y: spot.y, shape: rockShapeNumber(spot.variant) || 1 };
+  });
+}
+
+/**
+ * The rocks' planner request: every rock of the street, the ones measured on its snaps as `fixed`
+ * points (planStreetPlacements seats them first, where the snap shows them, and keeps every other
+ * thing off them), the rest planned. game.js enterStreet, the realtime builders and the level
+ * builder all ask with this.
+ */
+export function rockPlacementRequest(population) {
+  const fixed = measuredRockSlots(population).map((slot, index) => {
+    if (!slot) return null;
+    const classTsid = population.rockClasses[index];
+    return { x: slot.x, y: slot.y, w: ROCK_SHAPE_WIDTHS[classTsid]?.[slot.shape - 1] || 0, h: ROCK_SHAPE_HEIGHTS[classTsid]?.[slot.shape - 1] || 0 };
+  }).filter(Boolean);
+  return { key: 'rocks', count: population?.rockClasses?.length || 0, clearance: 74, ...(fixed.length ? { fixed } : {}) };
+}
+
+/**
+ * PURE: each rock of the street, in rockClasses order (its index is its id, rock:<i>, and its saved
+ * state's slot): { index, classTsid, x, y, shape, measured, room }. A measured rock stands where the
+ * snap shows it, in the snap's shape; a planned one on the planner's next point (`points`, the
+ * plan's rocks group: its fixed points first), in rockShapeFor's shape. x and y are null for a
+ * planned rock the planner could not seat.
+ */
+export function rockSpawnPlan(population, points = [], tsid = '') {
+  const slots = measuredRockSlots(population);
+  const planned = (points || []).filter((p) => !p?.fixed);
+  let next = 0;
+  return (population?.rockClasses || []).map((classTsid, index) => {
+    const slot = slots[index];
+    if (slot) return { index, classTsid, x: slot.x, y: slot.y, shape: slot.shape, measured: true, room: Infinity };
+    const p = planned[next];
+    next += 1;
+    const room = Number.isFinite(p?.room) ? p.room : Infinity;
+    return {
+      index,
+      classTsid,
+      x: Number.isFinite(p?.x) ? p.x : null,
+      y: Number.isFinite(p?.y) ? p.y : null,
+      shape: rockShapeFor(tsid, index, classTsid, room),
+      measured: false,
+      room,
+    };
+  });
 }
 
 function whole(value, fallback = 0, max = 999) {
@@ -533,9 +673,11 @@ export function populationForStreet(tsid, entry, { starter = false } = {}) {
  *   strip (the first garden) and 227 px for the three-plot herb bed.
  * - vendor: the Street Spirit art (decos/groddle/vendor.webp, 422 px) at 0.25.
  * - shrine: one shrine cell (151 px) at spawnShrine's 0.78.
- * - rocks: the mining sheets' opaque art (assets/sprites/mining, cells 131-137 px)
- *   at spawnMineRock's 0.85: metal 134 -> 114 px, beryl and sparkly 114 -> 97,
- *   dullite 108 -> 92.
+ * - rocks: the mining sheets' opaque art (assets/sprites/mining) at 1:1, as Glitch drew
+ *   items and the snaps show them (the placements audit, 2026-11-12: the art matches the snaps
+ *   at scale 1.0, 0.98-0.999, and not at 0.85): the _1 and _2 shapes 86-138 px
+ *   (ROCK_SHAPE_WIDTHS). A planned rock takes the wide, flat _3 shape (130-168 px) only where
+ *   its floor holds it (rockShapeFor).
  * - the walking animals (lane DOORCLEAR, 2026-10-31: a Chicken stood on the tip
  *   of a short branch up in Groddle Forest Junction's great tree and walked off
  *   its ends): the body (ANIMAL_BODY) plus its patrol both ways (ANIMAL_PATROL,
@@ -562,7 +704,7 @@ export const PLACEMENT_FOOTPRINTS = Object.freeze({
   gardens: 280,
   vendor: 106,
   shrine: 118,
-  rocks: 100,
+  rocks: 120,
   piggies: ANIMAL_BODY.piggies + 2 * ANIMAL_PATROL.piggies,
   chickens: ANIMAL_BODY.chickens + 2 * ANIMAL_PATROL.chickens,
   butterflies: 48,
@@ -572,6 +714,16 @@ export const PLACEMENT_FOOTPRINTS = Object.freeze({
   // 166-211 px, the opaque mound about 160-190) lying whole on its floor.
   'resource:jellisac': 60,
   'resource:peat_1': 180,
+  // The placements audit (2026-11-12): nodes that hung off ledge ends, each its art's foot as drawn
+  // (assets/sprites/resources, 1:1) and a little floor: a Dirt Pile's mound (179 px wide, 131 at
+  // its foot), an Ice Nubbin's (38-67 px, knob4 the widest), a Dust Trap's (39 px idle, the
+  // smack-down wider), a Paper Tree's trunk (54 px; the 230 px canopy may overhang, as a tree's
+  // does), a Visiting Stone (street-furniture visiting-stone.webp, 81 px).
+  'resource:dirt_pile': 150,
+  'resource:ice_knob': 60,
+  'resource:dust_trap': 60,
+  'resource:paper_tree': 80,
+  furnitureStone: 90,
 });
 
 /**
@@ -586,13 +738,39 @@ export const PLACEMENT_FOOTPRINTS = Object.freeze({
  * floor under either end of its footprint may fall away below its spot (footOverAir), so a Peat Bog
  * laid on a 0.5 root with its low end 38 px over air, or a Jellisac at a ledge's lip, is out. A Peat
  * Bog lies flat (no slope over 0.15), on a ledge as readily as on the floor (Glitch had them on
- * ledges: no ledge rule). The other nodes keep the plain rule.
+ * ledges: no ledge rule).
+ *
+ * The placements audit (2026-11-12): Dirt Piles and Ice Nubbins hung off ledge ends as the Peat Bog
+ * did (Dirt Piles: 41 of 250 with an end over 12 px of air, up to 227 px on Firabiz Flaunts; Ice
+ * Nubbins 17 of 310 over 40 px, 9 on short ledges high over the floor), Dust Traps stood on
+ * slopes over 0.4, and Visiting Stones over edges (Salix Seach, 183 px). They take the Jellisac's
+ * rule: both ends over a floor, no short ledge over another floor, and a Dirt Pile's wide mound
+ * no slope over 0.25 (Glitch's rocks, the nearest thing measured: 97% on floors of 0.25 or less).
+ * A street with no such spot left plans fewer of them (planStreetPlacements: no fallback).
  */
 export const STEADY_FLOOR_GROUPS = Object.freeze({
   'resource:mortar_barnacle': Object.freeze({ maxSlope: 0.4, ledgeRun: 240 }),
   'resource:jellisac': Object.freeze({ maxSlope: 0.25, ledgeRun: 240, edgeDrop: 12 }),
   'resource:peat_1': Object.freeze({ maxSlope: 0.15, ledgeRun: 0, edgeDrop: 12 }),
+  'resource:dirt_pile': Object.freeze({ maxSlope: 0.25, ledgeRun: 240, edgeDrop: 12 }),
+  'resource:ice_knob': Object.freeze({ maxSlope: 0.4, ledgeRun: 240, edgeDrop: 12 }),
+  'resource:dust_trap': Object.freeze({ maxSlope: 0.4, ledgeRun: 240, edgeDrop: 12 }),
+  'resource:paper_tree': Object.freeze({ maxSlope: 0.3, ledgeRun: 240, edgeDrop: 12 }),
+  furnitureStone: Object.freeze({ maxSlope: 0.3, ledgeRun: 240, edgeDrop: 12 }),
 });
+
+/**
+ * Big things stand on level ground (the placements audit, 2026-11-12): the planner had a Street
+ * Spirit on a 1.38 slope (Mullat), a mailbox on 1.78 against Saani Shim's rock face and a Bean Tree
+ * standing into Anrasan Glance's cliff. Of the rocks players' 2012 snaps show, 98.5% stand on a
+ * floor of 0.3 rise over run or less (650 measured: 10 over 0.3, 2 over 0.4, the steepest 0.47),
+ * and of the trants all of them (70: the steepest 0.23); 10% of the floor spots a street offers
+ * are steeper. So these groups take a floor steeper than BIG_THING_MAX_SLOPE only when no other
+ * spot is left (the plan lists them under `steep`), and never leave a thing out for it: a tree or
+ * rock keeps its index, a Piggy its home.
+ */
+export const BIG_THING_MAX_SLOPE = 0.3;
+export const BIG_THING_GROUPS = Object.freeze(['trees', 'rocks', 'vendor', 'shrine', 'piggies', 'chickens', 'furnitureMailbox']);
 
 /** PURE: whether a planner spot (buildPlatformCandidates) is a floor a STEADY_FLOOR_GROUPS rule takes. */
 export function steadyFloor(candidate, rule) {
@@ -657,6 +835,21 @@ export const FLOOR_JOIN_PX = 6;
 export const PERCH_DROP_PX = 150;
 
 /**
+ * For a rock a deck is not a perch (the placements audit, 2026-11-12): a planned rock on an upper
+ * floor whose own run is DECK_RUN_PX or more stands there as readily as on the street's floor. Of
+ * the rocks players' 2012 snaps show, 346 of 671 (52%) stand on an upper floor over another, all but
+ * 17 of them on a run of 240 px or more (244 on 480 or more), as high over the floor below as any
+ * such deck (median 338 px against 301); 44% of the floor spots on those streets are such upper
+ * floors. Taking the lowest floors first kept planned rocks low: ranked against each street's floor
+ * spots (0 its lowest, 1 its highest) their median was 0.27 against Glitch's 0.55, a two-sample KS
+ * distance of 0.43; with every height a candidate and decks as floors it is 0.66, KS 0.13. Trees keep the perch rule for now: decks taken as floors also put them in Groddle
+ * Forest Junction's pine branches, where its snaps show none (their spots are measured next, as
+ * the rocks'), and the walking animals keep to the floor while it has room.
+ */
+export const DECK_RUN_PX = 240;
+export const DECK_GROUPS = Object.freeze(['rocks']);
+
+/**
  * Keep-clear fixtures (lane DOORCLEAR, 2026-10-31): a Fruit Tree planted on
  * Groddle Forest Junction's subway steps (door_1, door_asset_subway_forest_heights_1,
  * 294 x 294 at 4099, 1063) hid half the way down. The planner reserves the
@@ -687,7 +880,7 @@ export const PLACEMENT_HEIGHTS = Object.freeze({
   gardens: 80, // garden-view.js bed box (44 px) and the crops that grow from it
   vendor: 127, // decos/groddle/vendor.webp 422 x 508 at 0.25
   shrine: 147, // a shrine cell 188 px tall at spawnShrine's 0.78
-  rocks: 110, // the mining sheets' cells (131-137 px) at spawnMineRock's 0.85
+  rocks: 130, // the mining sheets' cells (82-150 px tall, ROCK_SHAPE_HEIGHTS) at spawnMineRock's 1:1
 });
 export const LADDER_FOOT_PX = 120;
 /** Below a door's floor point, how far a spot still counts as its doorstep (a sloped floor). */
@@ -1087,7 +1280,23 @@ function runAt(spans, x) {
   return 0;
 }
 
-/** Build dense, stable candidates along the lower reachable platform bands. */
+/**
+ * G271: on a street whose 2012 snaps show its quoins (quoin-spots-data.js), the planner's quoins only
+ * top them up (quoins.js streetQuoinPoints drops a planned spot within MEASURED_QUOIN_CLEARANCE of a
+ * measured coin, the coin hanging about 92 px over its floor). So a planned quoin never takes such a
+ * spot: with every floor height planned they would land on the measured coins' floors and the
+ * top-up would come up short (Hechey Track 34 of its 36).
+ */
+function nearMeasuredQuoin(tsid) {
+  const rows = QUOIN_SPOTS[String(tsid || '')] || QUOIN_SPOTS[`G${String(tsid || '').slice(1)}`];
+  if (!rows?.length) return null;
+  return (spot) => rows.some((m) => m[2] !== 'qurazy' && Math.abs(m[0] - spot.x) < 80 && Math.abs(m[1] - (spot.y - 92)) < 160);
+}
+
+/** How far over a spot another item floor may lie for the spot to count as inside it (STACK_SINK_PX + 4). */
+const LINE_OVER_PX = 12;
+
+/** Build dense, stable candidates along every reachable floor. */
 export function buildPlatformCandidates(platforms, { worldW = 2500, seed = '', unreached = null } = {}) {
   // Only lines the avatar stands on (street-model.js isStandable): an underside or
   // ceiling (pc_perm 1) floats a tree (the cave roof on Meadow's Edge), and a soft
@@ -1113,11 +1322,14 @@ export function buildPlatformCandidates(platforms, { worldW = 2500, seed = '', u
       y: 600,
     }));
   }
-  const minY = Math.min(...clean.flatMap((p) => [p.y1, p.y2]));
-  const maxY = Math.max(...clean.flatMap((p) => [p.y1, p.y2]));
-  const lowerThreshold = minY + (maxY - minY) * 0.46;
-  let pool = clean.filter((p) => (p.y1 + p.y2) / 2 >= lowerThreshold);
-  if (pool.length < 4) pool = clean;
+  // Every height (the placements audit, 2026-11-12). The pool once kept only the lines in the lowest
+  // 54% of the street's floor heights, and nothing was ever planned higher: but 37% of the 698 rocks
+  // and 32% of the 78 trants players' 2012 snaps show stood above that cut. Ranked against the
+  // street's floor spots (0 its lowest, 1 its highest), Glitch's rocks spread over every height
+  // (median 0.56; tenths 27 53 92 68 68 70 80 74 80 86, KS 0.08 from even) and so do its trants
+  // (median 0.56), so every reachable floor is a candidate, as every height was to Tiny Speck (and for
+  // a rock an upper deck is a floor, DECK_RUN_PX).
+  const pool = clean;
 
   // Each item spot's room (the footprint its floor run holds, PLACEMENT_FOOTPRINTS)
   // and `under`: the widest floor run more than PERCH_DROP_PX below it (0: none).
@@ -1148,8 +1360,15 @@ export function buildPlatformCandidates(platforms, { worldW = 2500, seed = '', u
       if (skipRuns && inUnreachedRun(skipRuns, platform, x)) continue;
       const key = `${Math.round(x / 22)}:${Math.round(y / 14)}`;
       if (seen.has(key)) continue;
-      seen.add(key);
       const item = isItemSolid(platform);
+      // A spot just under another item floor (a line laid a few px over this one) is inside that
+      // floor: a thing set down there rests on the upper line (walk-surface.js stackRestY).
+      if (item && itemLines.some((other) => {
+        if (other === platform) return false;
+        const py = platformYAt(other, x, 0);
+        return py != null && py < y - 0.5 && py >= y - LINE_OVER_PX;
+      })) continue;
+      seen.add(key);
       candidates.push({
         id: `${platform.id || pIndex}:${i}`,
         x,
@@ -1212,6 +1431,11 @@ function scaledDistance(a, b, verticalScale = 1.75) {
  * Ticket 64: no spot is on a floor run no arrival reaches (`unreached`, by default
  * the catalog's unreachedFloorsFor(`tsid`), `tsid` defaulting to the seed).
  *
+ * A request may carry `fixed` points ({ x, y, w?, h? }: rocks measured on the snaps,
+ * rockPlacementRequest): its group starts with them (marked `fixed`), they are occupied
+ * before any group is planned, and `count` includes them. BIG_THING_GROUPS take a floor
+ * steeper than BIG_THING_MAX_SLOPE last; the plan lists such points under `steep`.
+ *
  * @param {any[]} platforms
  * @param {{key:string,count:number,clearance:number,footprint?:number}[]} requests
  */
@@ -1226,19 +1450,43 @@ export function planStreetPlacements(
   const walkways = frontDecoWalkways(platforms, fronts);
   const occupied = (reserved || []).filter((p) => !p?.front && Number.isFinite(p?.x) && Number.isFinite(p?.y))
     .map((point, index) => ({ ...point, key: point.key || `reserved:${index}`, clearance: whole(point.clearance, 120, 600) }));
+  // A request's `fixed` points (measured rocks, rockPlacementRequest) are seated before anything is
+  // planned: every other group keeps clear of them, and big scenery never covers one (`w` x `h`).
+  const fixedOf = new Map();
+  for (const request of requests || []) {
+    const pts = (Array.isArray(request?.fixed) ? request.fixed : []).filter((p) => Number.isFinite(p?.x) && Number.isFinite(p?.y));
+    if (!pts.length) continue;
+    const clearance = whole(request?.clearance, 40, 600);
+    const placed = pts.map((p, i) => ({
+      x: p.x,
+      y: p.y,
+      id: `fixed:${request.key}:${i}`,
+      key: request.key,
+      clearance,
+      room: 0,
+      fixed: true,
+      ...(p.w > 0 && p.h > 0 ? { block: { l: p.x - p.w / 2, r: p.x + p.w / 2, t: p.y - p.h, b: p.y } } : {}),
+    }));
+    fixedOf.set(request.key, placed);
+    occupied.push(...placed);
+  }
   const fixtures = occupied.filter((point) => point.block);
   const used = new Set();
   const groups = {};
   const fallbacks = [];
   const perches = [];
   const blocked = [];
+  const steep = [];
   const hiddenCache = new Map();
   const edgeCache = new Map();
 
   for (const request of requests || []) {
     const count = whole(request?.count, 0, 40);
     const clearance = whole(request?.clearance, 40, 600);
-    groups[request.key] = [];
+    groups[request.key] = (fixedOf.get(request.key) || []).slice(0, count);
+    const maxSlope = BIG_THING_GROUPS.includes(request.key) ? BIG_THING_MAX_SLOPE : null;
+    const deck = DECK_GROUPS.includes(request.key);
+    const measuredQuoin = request.key === 'quoins' ? nearMeasuredQuoin(tsid) : null;
     const avatar = request.key === 'player' || request.avatar === true;
     const footprint = avatar ? 0 : Number.isFinite(request?.footprint)
       ? Math.max(0, request.footprint)
@@ -1263,7 +1511,7 @@ export function planStreetPlacements(
         if (fixture) covers.set(candidate.id, fixture);
       }
     }
-    for (let index = 0; index < count; index += 1) {
+    for (let index = groups[request.key].length; index < count; index += 1) {
       // The room this one asks for: its footprint, or the most any free clear spot
       // has (any free spot's, when none is clear).
       let need = 0;
@@ -1287,6 +1535,7 @@ export function planStreetPlacements(
         if (used.has(candidate.id)) continue;
         if (!avatar && candidate.item === false) continue;
         if (!steadyAt(candidate)) continue;
+        if (measuredQuoin?.(candidate)) continue;
         if (need > 0 && (candidate.room || 0) < need) continue;
         const nearest = occupied.length
           ? Math.min(...occupied.map((other) => {
@@ -1300,7 +1549,7 @@ export function planStreetPlacements(
         const edgeBias = Math.min(candidate.x, worldW - candidate.x) / Math.max(1, worldW) * 0.08;
         const jitter = (stableEcologyHash(`${seed}:${request.key}:${index}:${candidate.id}`) % 1000) / 100000;
         const score = nearest + centerBias + edgeBias + jitter;
-        const perch = !perching && (candidate.under || 0) >= footprint;
+        const perch = !perching && (candidate.under || 0) >= footprint && !(deck && (candidate.run || 0) >= DECK_RUN_PX);
         // Big scenery: a clear perch before a crowded floor; a walking animal stays on
         // the floor while it has room, crowded or not (it walks off as others come),
         // never planted in a tree, rock or stall or on another walker, and, before a
@@ -1315,7 +1564,9 @@ export function planStreetPlacements(
         }
         // Ticket 118: rooted scenery on or behind a front deco that players walk along, last too.
         if (!hidden && height > 0 && footAtWalkway(candidate, footprint, walkways)) hidden = 32;
-        const tier = (footprint > 0
+        // Big things on a floor steeper than BIG_THING_MAX_SLOPE only when nothing else is left.
+        const tooSteep = maxSlope != null && (candidate.slope || 0) > maxSlope ? 64 : 0;
+        const tier = tooSteep + (footprint > 0
           ? walker ? (perch ? 8 : 0) + (scenery === 2 ? 4 : 0) + (nearest < 1 ? 2 : 0) + (scenery === 1 ? 1 : 0) : (perch ? 1 : 0) + (nearest < 1 ? 2 : 0)
           : 0) + (covers.has(candidate.id) ? (walker ? 16 : 4) : 0) + hidden;
         if (tier < bestTier || (tier === bestTier && score > bestScore)) {
@@ -1325,8 +1576,9 @@ export function planStreetPlacements(
         }
       }
       if (!best) break;
-      if (footprint > 0 && !perching && (best.under || 0) >= footprint) perches.push({ key: request.key, index });
+      if (footprint > 0 && !perching && (best.under || 0) >= footprint && !(deck && (best.run || 0) >= DECK_RUN_PX)) perches.push({ key: request.key, index });
       if (covers.has(best.id)) blocked.push({ key: request.key, index, fixture: covers.get(best.id).key });
+      if (maxSlope != null && (best.slope || 0) > maxSlope) steep.push({ key: request.key, index, slope: Math.round(best.slope * 100) / 100 });
       used.add(best.id);
       const point = { x: best.x, y: best.y, id: best.id, key: request.key, clearance, room: best.room || 0 };
       groups[request.key].push(point);
@@ -1334,7 +1586,7 @@ export function planStreetPlacements(
     }
   }
 
-  return { seed: String(seed), groups, occupied, candidateCount: candidates.length, fallbacks, perches, blocked };
+  return { seed: String(seed), groups, occupied, candidateCount: candidates.length, fallbacks, perches, blocked, steep };
 }
 
 /**

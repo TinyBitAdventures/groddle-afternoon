@@ -46,7 +46,7 @@ import { createResourceNode } from '../public/js/resource-nodes.js?v=9b20788d';
 import { createTrantState, fruitCapacityAt, setTrantTables } from '../public/js/trants.js?v=4d6f5593';
 import { placementRequests, ruleTables, streetObjectLayout } from '../tools/build-realtime-objects.mjs';
 import { STREET_INDEX, applyStreetIndex, loadStreetDataFromFs } from '../public/js/street-loader.js?v=18b181ad';
-import { PLANNED_NODE_CAPS, measuredNodeSpots, setStreetEcologyCatalog } from '../public/js/street-ecology.js?v=4922aff5';
+import { PLANNED_NODE_CAPS, measuredNodeSpots, setStreetEcologyCatalog } from '../public/js/street-ecology.js?v=0f046853';
 import { serverPath, skipWithoutServer } from '../tools/repos.mjs';
 
 const root = join(import.meta.dirname, '..');
@@ -481,7 +481,9 @@ describe('street objects: the feature', () => {
 describe('street objects: the server\'s layout', () => {
   it('lists game.js enterStreet\'s planner groups in order', () => {
     const game = read('public/game.js');
-    const call = game.slice(game.indexOf('currentStreetPlacement = planStreetPlacements('));
+    // The rocks' request is rockPlacementRequest (key 'rocks', clearance 74, its measured rocks fixed).
+    const call = game.slice(game.indexOf('currentStreetPlacement = planStreetPlacements('))
+      .replace(/rockPlacementRequest\(currentStreetPopulation\)/, "{ key: 'rocks', count: rocks, clearance: 74 }");
     const keys = [...call.slice(0, call.indexOf("features.collect('placementGroups'")).matchAll(/\{ key: '([a-zA-Z]+)'/g)].map((m) => m[1]);
     const pop = { treeClasses: [], rockClasses: [], resourceNodeClasses: [] };
     assert.deepEqual(placementRequests(pop).map((r) => r.key), keys);
@@ -519,9 +521,10 @@ describe('street objects: the server\'s layout', () => {
         if (cls !== 'mortar_barnacle' && n < most) steadyShort.push(`${tsid} ${cls}`);
       }
     }
-    assert.deepEqual([...new Set(short)].sort(), ['GDOVCSE5H2R2L24']);
-    // The other street that ran out (GA94KO5CFQA2V4Q's one Peat Bog) is now a steady-floor miss, below.
-    assert.ok(steadyShort.includes('GA94KO5CFQA2V4Q peat_1'), steadyShort.join(', '));
+    // Since every floor height is planned (the placements audit, 2026-11-12) no street runs out:
+    // Neelam Saff (GDOVCSE5H2R2L24) seats its second Dirt Pile and Seela Latta (GA94KO5CFQA2V4Q) its Peat Bog.
+    assert.deepEqual([...new Set(short)].sort(), []);
+    assert.ok(!steadyShort.includes('GA94KO5CFQA2V4Q peat_1'), steadyShort.join(', '));
     // The few planned Jellisacs and Peat Bogs no steady floor has room for are left out, not hung in the air.
     assert.ok(steadyShort.length <= 12, steadyShort.join(', '));
   });

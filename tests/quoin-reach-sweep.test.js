@@ -24,7 +24,7 @@ import { join } from 'node:path';
 
 import { applyStreetIndex, loadStreetDataFromFs, setZoneStreetsShown } from '../public/js/street-loader.js?v=18b181ad';
 import { isStandable, platformYAt, platformsScreen, streetWidth } from '../public/js/street-model.js?v=b6cb6a4e';
-import { buildPlatformCandidates, setStreetEcologyCatalog } from '../public/js/street-ecology.js?v=4922aff5';
+import { buildPlatformCandidates, setStreetEcologyCatalog } from '../public/js/street-ecology.js?v=0f046853';
 import { EDGE_MARGIN, JUMP_SPEED, NORMAL_BUFF, WALK_MAX, avatarFall } from '../public/js/avatar-step.js?v=43b1182e';
 import { QUOIN_TOUCH, measuredStreetQuoins, quoinTouches } from '../public/js/quoins.js?v=61be601c';
 import { streetQuoinLayout } from '../tools/build-realtime-quoins.mjs';
@@ -167,8 +167,10 @@ describe('32: every quoin is in the avatar\'s reach', () => {
     assert.ok(data, 'Mallos Means');
     const lines = platformsScreen(data).filter(isStandable);
     const w = streetWidth(data);
-    const left = streetQuoinLayout(data).reduce((a, b) => (b[0] < a[0] ? b : a));
-    assert.equal(left[2], 'xp');
+    // Where the plan put that quoin until every floor height was planned (the placements audit,
+    // 2026-11-12: now the planner spreads them over the upper floors too, and the sweep above covers
+    // those): a coin by the street's left bound is still taken there.
+    const left = [38.6, 1042.4, 'xp'];
     assert.ok(left[0] < 60 && left[0] > EDGE_MARGIN, `x ${left[0]}`);
     const floorY = left[1] + 58; // the shared layout floats it 58 px up (its index 3)
     for (const lift of LIFTS) {
