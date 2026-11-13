@@ -94,10 +94,10 @@
       "x1": "assets/maps/art/bg/ilmenskiecaverns.webp",
       "x2": "assets/maps/art/bg/ilmenskiecaverns@2x.webp",
       "repainted": "tools/provenance/repainted-maps.json",
-      "x1Bytes": 21514,
-      "x1Sha256": "14a2e6cfd920e1588284f532d3ef3d3277a3244dffc09f312c0ca8757b151d7a",
-      "x2Bytes": 87966,
-      "x2Sha256": "3d21a45949da88aa49c001cc32fb0c1ed0ae416de7265c1464ac7d127379aa5e"
+      "x1Bytes": 23876,
+      "x1Sha256": "60cc36345dcd609c7b75cdd627559ab47be9f8c06dbfeeca73cae1c667c777ed",
+      "x2Bytes": 91754,
+      "x2Sha256": "1e415be337b7bf03621bfa32145cd991e8d12f811ca016b2f8c93bfa3da535a9"
     },
     "51": {
       "hubName": "Uralia",
