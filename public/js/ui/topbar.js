@@ -22,7 +22,7 @@
  */
 import { vitalLevel, vitalTitle } from '../vitals.js?v=85a51302';
 import { loadAudioRestore, saveAudioRestore } from '../audio-pref.js?v=6fe817bc';
-import { PHONE_ZOOM_ENDS, PHONE_ZOOM_HINT, ZOOM_FIXED_NOTE, ZOOM_KEYS_HINT, clampZoom, phoneZoomLabel, phoneZoomValueText, zoomLabel, zoomValueText } from '../world-zoom.js?v=ec0aa8a1';
+import { PHONE_ZOOM_HINT, ZOOM_FIXED_NOTE, ZOOM_KEYS_HINT, clampZoom, phoneSideways, phoneZoomEnds, phoneZoomLabel, phoneZoomValueText, zoomLabel, zoomValueText } from '../world-zoom.js?v=38816228';
 import { NIGHT_TINT_HINT, NIGHT_TINT_LABEL } from '../night-tint.js?v=1dfc9c89';
 import { STREET_MAP_HINT, STREET_MAP_LABEL } from './street-minimap.js?v=6c530941';
 import { focusBack } from './focus-return.js?v=da190597';
@@ -1116,7 +1116,10 @@ export function zoomSlider(doc, zoom, { id, where, className = 'hud-slider hud-z
   const ends = doc.createElement('span');
   ends.id = `${id}-ends`;
   ends.className = 'hud-zoom-ends';
-  const [near, far] = phone ? PHONE_ZOOM_ENDS : ['Wide', 'Original'];
+  // A phone's ends follow the way it is held (land1's note: sideways level 0 is not the whole street).
+  const win = doc.defaultView || null;
+  const sideways = () => phone && phoneSideways(win?.innerWidth, win?.innerHeight);
+  const [near, far] = phone ? phoneZoomEnds({ landscape: sideways() }) : ['Wide', 'Original'];
   ends.innerHTML = `<span>${near}</span><span>${far}</span>`;
   // The keys that do the same from anywhere in the game (world-zoom.js zoomKeyAction).
   const keys = doc.createElement('p');
@@ -1128,8 +1131,10 @@ export function zoomSlider(doc, zoom, { id, where, className = 'hud-slider hud-z
     const z = clampZoom(zoom?.get?.());
     const fixed = Boolean(zoom?.fixed?.());
     if (doc.activeElement !== input) input.value = String(Math.round(z * 100));
-    setText(out, phone ? phoneZoomLabel(z) : zoomLabel(z));
-    input.setAttribute('aria-valuetext', phone ? phoneZoomValueText(z) : zoomValueText(z));
+    const landscape = sideways();
+    if (phone && ends.firstElementChild) setText(ends.firstElementChild, phoneZoomEnds({ landscape })[0]);
+    setText(out, phone ? phoneZoomLabel(z, { landscape }) : zoomLabel(z));
+    input.setAttribute('aria-valuetext', phone ? phoneZoomValueText(z, { landscape }) : zoomValueText(z));
     input.disabled = fixed;
     if (fixed) row.dataset.zoomFixed = '';
     else delete row.dataset.zoomFixed;
@@ -1145,6 +1150,7 @@ export function zoomSlider(doc, zoom, { id, where, className = 'hud-slider hud-z
   });
   zoom?.onChange?.(draw);
   zoom?.onFixedChange?.(draw);
+  if (phone) win?.addEventListener?.('resize', draw);
   draw();
   return { row, input, draw };
 }

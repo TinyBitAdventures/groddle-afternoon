@@ -136,22 +136,41 @@ export const PHONE_ZOOM_STORAGE_KEY = 'groddle.zoom.phone';
 export const PHONE_ZOOM_DEFAULT = 0;
 /** The phone slider's ends and the line under it (no keys on a phone). */
 export const PHONE_ZOOM_ENDS = Object.freeze(['Whole street', 'Closest']);
+/**
+ * Sideways (js/location-view.js landscapePhoneStage, a window at least as wide as tall), level 0 is a
+ * 408 px tall view, not the whole street (land1's note, 2026-11-13): its end is the farthest view.
+ */
+export const LANDSCAPE_PHONE_ZOOM_ENDS = Object.freeze(['Farthest', 'Closest']);
 export const PHONE_ZOOM_HINT = 'Pinch the street with two fingers to zoom.';
 
+/** PURE: the phone slider's two ends, upright or sideways. */
+export function phoneZoomEnds({ landscape = false } = {}) {
+  return landscape ? LANDSCAPE_PHONE_ZOOM_ENDS : PHONE_ZOOM_ENDS;
+}
+
+/** PURE: whether a phone window is sideways, as js/location-view.js stageFor decides (upright only when taller than wide). */
+export function phoneSideways(width, height) {
+  const w = Number(width) || 0;
+  const h = Number(height) || 0;
+  return w > 0 && h > 0 && !(h > w);
+}
+
 /** PURE: the phone level's live label. */
-export function phoneZoomLabel(z) {
+export function phoneZoomLabel(z, { landscape = false } = {}) {
   const v = clampZoom(z);
-  if (v <= 0) return PHONE_ZOOM_ENDS[0];
-  if (v >= 1) return PHONE_ZOOM_ENDS[1];
+  const ends = phoneZoomEnds({ landscape });
+  if (v <= 0) return ends[0];
+  if (v >= 1) return ends[1];
   return `${Math.round(v * 100)}%`;
 }
 
 /** PURE: the words a screen reader hears for a phone level. */
-export function phoneZoomValueText(z) {
+export function phoneZoomValueText(z, { landscape = false } = {}) {
   const v = clampZoom(z);
-  if (v <= 0) return 'Whole street';
+  const far = landscape ? 'Farthest' : 'Whole street';
+  if (v <= 0) return far;
   if (v >= 1) return 'Closest';
-  return `${Math.round(v * 100)}% of the way from the whole street to the closest`;
+  return `${Math.round(v * 100)}% of the way from the ${far.toLowerCase()} to the closest`;
 }
 
 /**

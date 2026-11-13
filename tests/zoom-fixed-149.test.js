@@ -10,9 +10,9 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { ZOOM_FIXED_NOTE, ZOOM_KEYS_HINT, createWorldZoom, zoomKeyToast } from '../public/js/world-zoom.js?v=ec0aa8a1';
+import { ZOOM_FIXED_NOTE, ZOOM_KEYS_HINT, createWorldZoom, zoomKeyToast } from '../public/js/world-zoom.js?v=38816228';
 import { zoomMovesStage, sceneViewWidthCap, sceneViewCap, MIN_PACK_HEIGHT } from '../public/js/location-view.js?v=cfef3b43';
-import { zoomSlider } from '../public/js/ui/topbar.js?v=f3230b0a';
+import { zoomSlider } from '../public/js/ui/topbar.js?v=1ccfa0b4';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const read = (rel) => fs.readFileSync(path.join(root, rel), 'utf8');

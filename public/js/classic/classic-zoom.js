@@ -9,7 +9,7 @@
  */
 import { uiState, onUiModeChange } from './ui-mode.js?v=9705b783';
 import { classicLayout } from './classic-layout.js?v=8ab26a26';
-import { worldZoom, onZoomChange } from '../world-zoom.js?v=ec0aa8a1';
+import { worldZoom, onZoomChange } from '../world-zoom.js?v=38816228';
 
 /** PURE: the --cu-zoom value for a window and state, or null to clear it. */
 export function classicZoomVar({ width, height, mode, size, zoom, contactsOpen = false }) {
