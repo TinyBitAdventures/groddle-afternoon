@@ -2792,9 +2792,14 @@
   "deployed": "2026-11-13"
  },
  "git": {
-  "commits": 2051,
+  "commits": 2052,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-13",
+    "kind": "improve",
+    "text": "Winter Walk says why motes won't come at the daily quoin limit"
+   },
    {
     "date": "2026-11-13",
     "kind": "fix",
@@ -2909,11 +2914,6 @@
     "date": "2026-11-13",
     "kind": "new",
     "text": "The Made for Groddle pictures on /restoration/ open in a compare popup that flips between the original and the made art"
-   },
-   {
-    "date": "2026-11-13",
-    "kind": "fix",
-    "text": "Summoned from inside someone else's house, a friend lands at that house's front door and both players are told so"
    }
   ]
  },

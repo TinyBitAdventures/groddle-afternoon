@@ -92,10 +92,21 @@ const SHEETS = Object.freeze({
   dislike_off: { path: `${ART}npc_crab_dislike_off.webp`, fw: 131, fh: 129, cols: 6, frames: 22 },
 });
 const LOOPING = new Set(['idle1', 'idle2', 'walk', 'listen', 'like_on', 'dislike_on']);
-/** The Colour Unblocking crab's world scale (quest-rooms/color-unblocking.js). */
-const CRAB_SCALE = 0.62;
-/** Feet sit 2 px above the cell bottom. */
+/**
+ * #301 (G702): a street crab is drawn at Glitch's size. npc_crab.js 14 sets adjusted_scale 1, and
+ * these sheets are the x1 cells (the @3x files are the same art for dense screens), so 1. It was
+ * 0.62, borrowed from the Colour Unblocking room's crab (quest-rooms/color-unblocking.js), which
+ * keeps its own.
+ */
+const CRAB_SCALE = 1;
+/** Feet sit 2 px above the cell bottom (idle1/idle2 opaque rows 43-126 of 129). */
 const FEET_PAD = 2;
+/**
+ * Its click box, fitted to the art at that scale: the standing crab's opaque pixels span x 10-108
+ * and y 43-126 of the 131x129 cell (idle1, idle2, dislike_off, measured on the sheets), so a box
+ * centred on the cell (anchor 0.5) is 112 wide to reach both claws, and 86 tall from the feet.
+ */
+const CRAB_HIT = Object.freeze({ w: 112, h: 86 });
 
 let loader = null;
 let generation = 0;
@@ -177,8 +188,8 @@ function spawn(engine, key, point) {
   spr.x = point.x;
   spr.y = point.y + FEET_PAD * CRAB_SCALE;
   spr.zIndex = 40;
-  spr._worldHitW = Math.round(110 * CRAB_SCALE);
-  spr._worldHitH = Math.round(90 * CRAB_SCALE);
+  spr._worldHitW = Math.round(CRAB_HIT.w * CRAB_SCALE);
+  spr._worldHitH = Math.round(CRAB_HIT.h * CRAB_SCALE);
   engine.entityLayer.addChild(spr);
   const crab = {
     key,

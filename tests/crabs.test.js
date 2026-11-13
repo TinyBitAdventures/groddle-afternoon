@@ -314,6 +314,25 @@ describe('source copy and data', () => {
     assert.ok(phones.includes(CRAB_ITEMS.crabphones.desc));
   });
 
+  it('#301 (G702): a street crab is Glitch\'s size (npc_crab.js 14 adjusted_scale 1), the Colour Unblocking crab keeps 0.62', () => {
+    const feature = readFileSync(join(PUBLIC, 'js/features/crabs-feature.js'), 'utf8');
+    assert.match(feature, /\nconst CRAB_SCALE = 1;\n/);
+    if (existsSync(CRAB_JS)) assert.match(readFileSync(CRAB_JS, 'utf8'), /var adjusted_scale = 1;/);
+    // The click box fits the standing crab's opaque pixels (x 10-108, y 43-126 of the 131x129 cell).
+    const hit = /const CRAB_HIT = Object\.freeze\(\{ w: (\d+), h: (\d+) \}\);/.exec(feature);
+    assert.ok(hit);
+    const [w, h] = [Number(hit[1]), Number(hit[2])];
+    const cx = 131 / 2;
+    assert.ok(cx - w / 2 <= 10 && cx + w / 2 >= 109, `w ${w}`);
+    assert.ok(w <= 116, `w ${w} no wider than the crab`);
+    assert.ok(h >= 129 - 43 && h <= 90, `h ${h}`);
+    assert.match(feature, /_worldHitW = Math\.round\(CRAB_HIT\.w \* CRAB_SCALE\)/);
+    // Feet on the ground: every placement and step adds the cell's 2 px foot pad at the drawn scale.
+    assert.equal((feature.match(/FEET_PAD \* CRAB_SCALE/g) || []).length, 6);
+    const room = readFileSync(join(PUBLIC, 'js/quest-rooms/color-unblocking.js'), 'utf8');
+    assert.match(room, /npc_crab_idle0\.webp`, 6, 5, \{ scale: 0\.62/);
+  });
+
   it('has the art, icons, buff, badge and feature registration', () => {
     for (const s of ['idle1', 'idle2', 'walk', 'listen', 'like_on', 'like_off', 'dislike_on', 'dislike_off']) {
       assert.ok(existsSync(join(PUBLIC, `assets/sprites/crabs/npc_crab_${s}.webp`)), s);
