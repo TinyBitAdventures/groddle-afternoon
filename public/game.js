@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=b75ab87b';
 import { createErrorOnce, createFeatureHost } from './js/feature-host.js?v=06bb8b74';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=742a05cf';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=6c4eb7ec';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl, drawTileArt } from './js/enter-chooser.js?v=4a3ea327';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -756,7 +756,7 @@ import { easeCameraAxis } from './js/camera-feel.js?v=e668afc5';
 import { renderResolution, resolutionCap, RESOLUTION_STEP, phoneZoomResolution } from './js/render-density.js?v=74c6f5f9';
 // g458: low energy and mood turn amber and red, and a click offers something from the pack.
 import { makingNeeds, vitalMenuEmpty, vitalMenuHeading, vitalSnacks } from './js/vitals.js?v=85a51302';
-import { DEFAULT_VP_H, LOCATION_VIEW_W, VIEW_CEIL_H, stageFor, sceneViewCap, sceneViewWidthCap, zoomMovesStage, phoneZoomSpan } from './js/location-view.js?v=ffd74741';
+import { DEFAULT_VP_H, LOCATION_VIEW_W, VIEW_CEIL_H, stageFor, sceneViewCap, sceneViewWidthCap, zoomMovesStage, phoneZoomSpan } from './js/location-view.js?v=ce416ea2';
 import {
   levelInfoForXp,
   reconcilePlayerProgression,
@@ -786,12 +786,12 @@ import {
 import { momentMoreText } from './js/ui/moment-card.js?v=df448740';
 import { CHAT_MAX_CHARS, chatBubbleText } from './js/ui/chat-input.js?v=72d000ac';
 // HUB: the hub is the Modern skin's; Classic owns X in its skin (js/classic/classic-hub.js).
-import { MODERN, onUiModeChange, uiState } from './js/classic/ui-mode.js?v=e8c5807a';
+import { MODERN, onUiModeChange, uiState } from './js/classic/ui-mode.js?v=fe4561b8';
 // ZOOM: the world zoom (a device preference) and Classic's frame scale under it; both load before main().
 import { worldZoom, setWorldZoom, stepWorldZoom, onZoomChange, zoomKeyAction, zoomKeyToast, zoomFixed, setZoomFixed, onZoomFixedChange, phoneZoom } from './js/world-zoom.js?v=ec0aa8a1';
 import { nightTint, nightTintOn, onNightTintChange, worldTintOpacity } from './js/night-tint.js?v=1dfc9c89';
 import { streetMapSetting, toggleStreetMap } from './js/ui/street-minimap.js?v=6c530941';
-import './js/classic/classic-zoom.js?v=5f2c24e2';
+import './js/classic/classic-zoom.js?v=25eadb80';
 import { mountImaginationHub } from './js/ui/imagination-hub.js?v=169bc74b';
 import { newDayBubble, shuffleNewDayMessages, waitForScreenGates } from './js/screen-queue.js?v=cf0132c0';
 import { applyFamiliarLook, familiarCardHeading, familiarLook, skillArtFor, skillLearnedActivity } from './js/familiar.js?v=bafd7139';
@@ -1059,7 +1059,7 @@ import { SLUG_ANIMATION, SLUG_LAYOUT, SLUG_STYLES, SLUG_TARGETS, drawSlugIcon, f
 import { filterText } from './js/word-filter.js?v=9a7a7ebb'; // the remake's own word filter
 import { arrangeMapCards, fitMapExtras } from './js/map-extras.js?v=9f38c312'; // the Map's Shortcuts
 // The interface skin (js/classic/ui-mode.js) sets <html data-ui> as it loads: before main(), so before the boot cover lifts.
-import { installInterfaceSettings } from './js/classic/classic-prefs.js?v=4815d990';
+import { installInterfaceSettings } from './js/classic/classic-prefs.js?v=45251aca';
 
 /** @type {object|null} assets/maps/index.json */
 let mapIndexCache = null;
@@ -1978,12 +1978,12 @@ function measureStage() {
   return stageFor({ ...stageArgs(), zoom: worldZoom() });
 }
 
-/** PHONE ZOOM (js/world-zoom.js phoneZoom): the close-up level the upright phone stage draws at. */
+/** PHONE ZOOM (js/world-zoom.js phoneZoom): the close-up level the phone stage draws at, upright or sideways. */
 function phoneCloseup() {
   return TOUCH_PHONE && modernUi() && PINNED_VIEW_H <= 0 ? phoneZoom.get() : 0;
 }
 
-/** PHONE ZOOM: how much closer the closest level draws on this street (1: it cannot, as sideways). */
+/** PHONE ZOOM: how much closer the closest level draws on this street (1: it cannot, as on a pinned page). */
 function phoneZoomSpanHere() {
   if (!TOUCH_PHONE || !modernUi() || PINNED_VIEW_H > 0) return 1;
   return phoneZoomSpan(stageArgs());

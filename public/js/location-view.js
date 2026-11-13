@@ -75,6 +75,13 @@ export const VIEW_FLOOR_H = 408;
  * closest. Tune here: the slider and the pinch span whatever this leaves.
  */
 export const PHONE_CLOSEST_SHARE = 0.56;
+/**
+ * LANDSCAPE PHONE ZOOM (Austin 2026-11-13: phones play both ways up; "the landscape zoom starts at
+ * portrait's 56% closest share, tunable"): the same share for a sideways phone (landscapePhoneStage),
+ * its own name so it can differ from portrait's. 0.56 brings a 874 x 402 iPhone from its whole view
+ * (1174 x 408 world px, the avatar 86 CSS px) to about 1.55 times as close (the avatar 133 px).
+ */
+export const LANDSCAPE_PHONE_CLOSEST_SHARE = 0.56;
 /** Before the page can be measured (boot, tests): the smallest view. */
 export const DEFAULT_VP_H = VIEW_FLOOR_H;
 
@@ -178,7 +185,8 @@ export function zoomMovesStage(args = {}) {
 
 /**
  * PURE (PHONE ZOOM): how much closer the closest phone zoom draws than the phone's own view, for
- * stageFor's arguments (1 when it cannot magnify: a sideways phone, a pinned page, a short room).
+ * stageFor's arguments (1 when it cannot magnify: a pinned page, a room already at the closest).
+ * Upright (phoneStage) and sideways (landscapePhoneStage) alike.
  */
 export function phoneZoomSpan(args = {}) {
   if (!args.phone || finite(args.pinnedHeight) > 0) return 1;
@@ -231,6 +239,12 @@ export function stageFor({
   const pack = finite(packReserve, MIN_PACK_HEIGHT);
   const pinned = finite(pinnedHeight);
   if (phone && !(pinned > 0) && W > 0 && H > W) return phoneStage({ width: W, height: H, packReserve: pack, sceneWidth, sceneHeight, closeup });
+  if (phone && !(pinned > 0) && W > 0 && H > 0) return landscapePhoneStage({ width: W, height: H, packReserve: pack, sceneWidth, sceneHeight, zoom, closeup });
+  return computerStage({ width: W, height: H, packReserve: pack, sceneWidth, sceneHeight, pinnedHeight: pinned, zoom });
+}
+
+/** PURE: stageFor's rule for a computer's window (and the pinned QA page), without the phone stages. */
+function computerStage({ width: W, height: H, packReserve: pack, sceneWidth, sceneHeight, pinnedHeight: pinned, zoom }) {
   if (pinned > 0 || !(W > 0) || !(H > 0)) {
     const viewW = LOCATION_VIEW_W;
     const viewH = locationViewHeightFor({ forced: pinned > 0 ? pinned : NaN, sceneHeight });
@@ -303,4 +317,34 @@ export function phoneStage({ width, height, packReserve = MIN_PACK_HEIGHT, scene
   const viewH = Math.max(VIEW_FLOOR_H, Math.min(room, fitH));
   const held = viewH < room;
   return { scale, viewW, viewH, canvasH: viewH + pack, cssWidth: W, cssHeight: held ? (viewH + pack) * scale : H, pinned: false, phone: true };
+}
+
+/**
+ * PURE (LANDSCAPE PHONE, Austin 2026-11-13: phones play upright and sideways): the stage of a phone
+ * held sideways (the phone gate's phone, a window at least as wide as tall). Level 0 is exactly the
+ * computer rule it always took (a 408 px tall view filling the short side: 1174 x 408 world px on a
+ * 874 x 402 iPhone), so the whole-street view is never narrower than before. That rule already sits
+ * on the view's height floor, so the computer zoom (Wide to Original) draws the same there and
+ * pinching did nothing (phoneZoomSpan 1).
+ *
+ * PHONE ZOOM: `closeup` (0 to 1, js/world-zoom.js phoneZoom, the pinch and the Menu's slider)
+ * magnifies from that view toward the scale the same phone reaches upright with a VIEW_FLOOR_H view
+ * filling its long side (phoneStage's closest end), geometrically, and 1 stops
+ * LANDSCAPE_PHONE_CLOSEST_SHARE of the way there, so the avatar comes out about as big at the closest
+ * level either way up. Closer than the floor rule, the view is shorter than VIEW_FLOOR_H (the room
+ * the screen leaves over the pack reserve) and the camera scrolls the street up and down, as it
+ * does upright. Fewer world px are drawn, never bigger textures.
+ */
+export function landscapePhoneStage({ width, height, packReserve = MIN_PACK_HEIGHT, sceneWidth, sceneHeight, zoom = 0, closeup = 0 } = {}) {
+  const W = finite(width);
+  const H = finite(height);
+  const pack = finite(packReserve, MIN_PACK_HEIGHT);
+  const base = computerStage({ width: W, height: H, packReserve: pack, sceneWidth, sceneHeight, pinnedHeight: NaN, zoom });
+  const c = Math.min(1, Math.max(0, finite(closeup, 0)));
+  const top = Math.max(W, H) / (VIEW_FLOOR_H + pack);
+  if (!(c > 0) || !(top > base.scale) || !(W > 0) || !(H > 0)) return { ...base, phone: true, landscape: true };
+  const scale = base.scale * (top / base.scale) ** (c * LANDSCAPE_PHONE_CLOSEST_SHARE);
+  const viewW = Math.round(W / scale);
+  const viewH = Math.max(1, Math.min(base.viewH, Math.floor(H / scale + 1e-6) - pack));
+  return { scale, viewW, viewH, canvasH: viewH + pack, cssWidth: W, cssHeight: H, pinned: false, phone: true, landscape: true };
 }

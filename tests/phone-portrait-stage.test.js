@@ -10,7 +10,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { MIN_PACK_HEIGHT, PHONE_PORTRAIT_MIN_VIEW_W, VIEW_FLOOR_H, VIEW_HOLD_H, phoneStage, stageFor } from '../public/js/location-view.js?v=ffd74741';
+import { MIN_PACK_HEIGHT, PHONE_PORTRAIT_MIN_VIEW_W, VIEW_FLOOR_H, VIEW_HOLD_H, phoneStage, stageFor } from '../public/js/location-view.js?v=ce416ea2';
 import { phoneScreenFrame } from '../public/js/touch-controls.js?v=b6071ea4';
 import { tutorialPillSpot } from '../public/js/newxp.js?v=91b8f176';
 
@@ -46,9 +46,10 @@ describe('an upright phone fits the street to the screen', () => {
     assert.ok(s.viewW <= 500);
     assert.ok(s.viewH >= VIEW_FLOOR_H);
   });
-  it('sideways, a pinned page and computers keep the old rule', () => {
+  it('sideways (at the whole view), a pinned page and computers keep the old rule', () => {
     const land = { width: 734, height: 343 };
-    assert.deepEqual(stageFor({ ...land, sceneHeight: 1000, phone: true }), stageFor({ ...land, sceneHeight: 1000 }));
+    // LANDSCAPE PHONE: level 0 is the computer rule, marked as a sideways phone (tests/landscape-phone-stage.test.js).
+    assert.deepEqual(stageFor({ ...land, sceneHeight: 1000, phone: true }), { ...stageFor({ ...land, sceneHeight: 1000 }), phone: true, landscape: true });
     assert.deepEqual(stageFor({ ...IPHONE, pinnedHeight: 500, phone: true }), stageFor({ ...IPHONE, pinnedHeight: 500 }));
     assert.match(game, /\/\/ TOUCH PORTRAIT: an upright phone fits the scene's height to the screen \(location-view phoneStage\)\.\n\s*phone: TOUCH_PHONE,/);
   });

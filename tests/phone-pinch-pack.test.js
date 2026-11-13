@@ -11,7 +11,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { MIN_PACK_HEIGHT, PHONE_CLOSEST_SHARE, VIEW_FLOOR_H, VIEW_HOLD_H, phoneStage, phoneZoomSpan, stageFor } from '../public/js/location-view.js?v=ffd74741';
+import { MIN_PACK_HEIGHT, PHONE_CLOSEST_SHARE, VIEW_FLOOR_H, VIEW_HOLD_H, phoneStage, phoneZoomSpan, stageFor } from '../public/js/location-view.js?v=ce416ea2';
 import { PHONE_ZOOM_DEFAULT, PHONE_ZOOM_STORAGE_KEY, ZOOM_DEFAULT, ZOOM_STORAGE_KEY, createWorldZoom, phoneZoomLabel } from '../public/js/world-zoom.js?v=ec0aa8a1';
 import { TAP_SLOP_PX, isWorldTap, pinchLevel } from '../public/js/touch-pinch.js?v=5bdb5971';
 import { signpostBoardAt } from '../public/js/street-render.js?v=57d38e04';
@@ -50,9 +50,9 @@ describe('the phone zoom: from the whole street to about one and a half times as
     assert.ok(Math.abs(at(1) - at(7)) < 1e-12, 'held to 1');
     assert.ok(at(0.25) < at(0.5) && at(0.5) < at(1));
   });
-  it('a short room magnifies less, sideways and a pinned page not at all', () => {
+  it('a short room magnifies less, a pinned page not at all (sideways: tests/landscape-phone-stage.test.js)', () => {
     assert.ok(phoneZoomSpan({ ...IPHONE, sceneHeight: 600 }) < phoneZoomSpan({ ...IPHONE, sceneHeight: 1000 }));
-    assert.equal(phoneZoomSpan({ width: 812, height: 340, phone: true, sceneHeight: 1000 }), 1);
+    assert.ok(phoneZoomSpan({ width: 812, height: 340, phone: true, sceneHeight: 1000 }) > 1.4, 'a sideways phone zooms too');
     assert.equal(phoneZoomSpan({ ...IPHONE, sceneHeight: 1000, pinnedHeight: 500 }), 1);
     assert.equal(phoneZoomSpan({ ...IPHONE, phone: false, sceneHeight: 1000 }), 1);
     // A computer's stage never reads it.
