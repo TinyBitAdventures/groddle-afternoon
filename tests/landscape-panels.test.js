@@ -91,3 +91,15 @@ describe('Mail sideways (#4)', () => {
     assert.match(rule, /#mail-panel \.mail-row-copy span \{ display: block; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;/);
   });
 });
+
+describe('the report window sideways (#9)', () => {
+  const rule = sidewaysRule('/* REPORT SIDEWAYS (#9)');
+  it('outranks the feature\'s own phone rule (injected after style.css) for the window\'s padding', () => {
+    assert.match(rule, /#game-root #bug-report-panel\.reports-panel \{ padding: calc\(var\(--hud-h\) \+ 4px\)/);
+  });
+  it('keeps Send at the foot while the rest scrolls, with a three-line box', () => {
+    assert.match(rule, /#bug-report-panel \.reports-actions \{ position: sticky; bottom: 0;/);
+    assert.match(rule, /#bug-report-panel \.reports-new-view \.reports-text \{ min-height: 3\.6rem; \}/);
+    assert.match(rule, /#bug-report-panel \.reports-foot \{ display: none; \}/);
+  });
+});

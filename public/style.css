@@ -14268,6 +14268,16 @@ body.is-booting .touch-controls { display: none; }
   :root.touch-phone[data-ui="modern"] #mail-panel .mail-row { padding: var(--space-1) var(--space-3); }
   :root.touch-phone[data-ui="modern"] #mail-panel .mail-row-copy span { display: block; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; -webkit-line-clamp: none; line-clamp: none; }
 }
+/* REPORT SIDEWAYS (#9): the report window's Send sat at 345-377 px on a 335 px screen. Sideways under
+   500 px tall: a one-row head, no footer line, the box starts at three lines (it still grows as you type
+   or drag it), and Send stays at the window's foot while the rest scrolls (a picture's thumbnail too). */
+@media (max-height: 500px) and (orientation: landscape) {
+  :root.touch-phone[data-ui="modern"] #game-root #bug-report-panel.reports-panel { padding: calc(var(--hud-h) + 4px) calc(var(--sp-2) + env(safe-area-inset-right, 0px)) 4px calc(var(--sp-2) + env(safe-area-inset-left, 0px)); }
+  :root.touch-phone[data-ui="modern"] #game-root #bug-report-panel .reports-head { padding-top: 0; padding-bottom: 0; }
+  :root.touch-phone[data-ui="modern"] #game-root #bug-report-panel .reports-foot { display: none; }
+  :root.touch-phone[data-ui="modern"] #game-root #bug-report-panel .reports-new-view .reports-text { min-height: 3.6rem; }
+  :root.touch-phone[data-ui="modern"] #game-root #bug-report-panel .reports-actions { position: sticky; bottom: 0; z-index: var(--z-raised); margin-top: auto; padding: var(--space-2) 0; background: var(--surface); }
+}
 /* === end LANDSCAPE-PANELS === */
 
 /* PHONEKEYS (Austin 2026-11-12, on his iPhone): a phone (html.touch-phone, the phone gate's
