@@ -97,6 +97,8 @@ export const energyDecayFeature = {
 
   onTick(dtMs, now, engine) {
     if (!engine.started || !engine.pc) return;
+    // On purpose (Austin 2026-11-12, kept): a hidden tab drains nothing, so a forgotten background
+    // tab never runs you down; Glitch (players/player.js onPeriodicEnergyLoss 2358-2359 drained whenever isOnline()). Known gaps P6.
     if (typeof document !== 'undefined' && document.visibilityState === 'hidden') return;
     const due = clock.advance(dtMs);
     for (let i = 0; i < due; i++) {

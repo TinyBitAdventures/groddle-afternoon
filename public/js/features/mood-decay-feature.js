@@ -116,6 +116,8 @@ export const moodDecayFeature = {
 
   onTick(dtMs, now, engine) {
     if (!engine.started || !engine.pc) return;
+    // On purpose (Austin 2026-11-12, kept): a hidden tab drains nothing, so a forgotten background
+    // tab never runs you down; Glitch (players/player.js onTimePlaying 793-794 ran every minute you were logged in). Known gaps P6.
     if (typeof document !== 'undefined' && document.visibilityState === 'hidden') return;
     if (demoMood != null && !demoApplied) {
       demoApplied = true;

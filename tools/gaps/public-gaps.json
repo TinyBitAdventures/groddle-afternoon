@@ -553,6 +553,12 @@
       "report": 219
     },
     {
+      "id": "P6",
+      "area": "Energy and mood",
+      "show": "purpose",
+      "text": "Energy and mood stop draining while the game's tab is hidden, so a forgotten background tab never runs you down. Glitch drained them whenever you were connected."
+    },
+    {
       "id": "G63",
       "area": "Animals",
       "show": "purpose",

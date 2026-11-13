@@ -2752,9 +2752,24 @@
   "deployed": "2026-11-12"
  },
  "git": {
-  "commits": 1839,
+  "commits": 1844,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-12",
+    "kind": "fix",
+    "text": "Teleporting and /stuck take you out of a quest room, ending an unfinished quest as Leave does"
+   },
+   {
+    "date": "2026-11-12",
+    "kind": "fix",
+    "text": "Seeker of the Shiny and Meditation Station are offered once, not every 5 minutes forever"
+   },
+   {
+    "date": "2026-11-12",
+    "kind": "fix",
+    "text": "The level-up announcer registers before street objects, which stay just before realtime"
+   },
    {
     "date": "2026-11-12",
     "kind": "fix",
@@ -2859,24 +2874,9 @@
     "date": "2026-11-12",
     "kind": "fix",
     "text": "No squeezing a Chicken on its egg, Super Animal Harvest Bacon, and the animals' refusals and misses say Glitch's lines"
-   },
-   {
-    "date": "2026-11-12",
-    "kind": "fix",
-    "text": "Garden potions price only the plots they work, a plot takes water again after an hour, and plot lines are Glitch's"
-   },
-   {
-    "date": "2026-11-12",
-    "kind": "fix",
-    "text": "Harvesting with exactly the energy cost no longer croaks you, and street Wood Trees grow back and fall into Patches"
-   },
-   {
-    "date": "2026-11-12",
-    "kind": "improve",
-    "text": "Quest rooms, skills, Party Spaces, Paradise, Appear offline and a few more lines say what the game really does"
    }
   ]
  },
- "tests": 913,
+ "tests": 914,
  "generatedAt": "2026-11-12"
 }

@@ -44,7 +44,7 @@
     "unreleased": 33,
     "fixed": 11,
     "lost": 5,
-    "purpose": 14,
+    "purpose": 15,
     "idea": 11
   },
   "areas": [
@@ -593,6 +593,11 @@
       "text": "A Plain Crystal takes one Firefly Jar and a little energy, not the seven jars Glitch's recipe asked for.",
       "report": 219,
       "area": "Food, buffs and making"
+    },
+    {
+      "id": "P6",
+      "text": "Energy and mood stop draining while the game's tab is hidden, so a forgotten background tab never runs you down. Glitch drained them whenever you were connected.",
+      "area": "Energy and mood"
     },
     {
       "id": "G63",
