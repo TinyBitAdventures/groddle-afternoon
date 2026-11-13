@@ -75,6 +75,9 @@ export const GENTLE_ISLAND = Object.freeze({
   doonboggle_trail: 'GA94GCF7H3D30IM',
   progress_way: 'GA94UK1BH3D3FJL', // the cheap bag vendor
   exit: 'GA93VBH3H3D38HF', // Gentle Island Exit
+  // Behind Doonboggle Trail's door_1343415170600 (Door Key 1); hub 129 lists it (inc_data_maps_prod.js
+  // 17711), so the island's travel gate lets a player with the key through (report #260).
+  ethereal_endeavour: 'GA9EKMN138D3QK2',
 });
 export const GENTLE_ISLAND_TSIDS = Object.freeze(Object.values(GENTLE_ISLAND));
 // source: inc_skillquest.js newbie_island arrival (-2302, -77), bounds l -2500 t -1200.

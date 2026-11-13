@@ -12,7 +12,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { REVIVED_TRANT, createPlot, reviveDeadTree, tickPlot } from '../public/js/patches.js?v=cd774b2c';
 import { powdersFeature } from '../public/js/features/powders-feature.js?v=284c2e26';
-import { HEADSPACE_SCENE, itemVerbsFeature, inGameLocation } from '../public/js/features/item-verbs-feature.js?v=9ce21f32';
+import { HEADSPACE_SCENE, itemVerbsFeature, inGameLocation } from '../public/js/features/item-verbs-feature.js?v=a777f37a';
 import { ROOK_WOODS_STREET_ID } from '../public/js/rook-woods.js?v=738634d9';
 import { INSTANCES as GWENDOLYN_INSTANCES, ROOM_ID as GWENDOLYN_ROOM } from '../public/js/quest-rooms/gwendolyn.js?v=ed999d7d';
 import { questSceneTsid } from '../public/js/quest-instance.js?v=f0df88c3';

@@ -7,7 +7,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
-import { tutorialNameDefault, TUTORIAL_NAME_MAX } from '../public/js/newxp.js?v=45ae5f37';
+import { tutorialNameDefault, TUTORIAL_NAME_MAX } from '../public/js/newxp.js?v=91b8f176';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 

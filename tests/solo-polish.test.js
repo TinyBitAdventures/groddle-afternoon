@@ -20,12 +20,12 @@ import { resolveTokens } from './css-tokens.js';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { accountBackupFeature } from '../public/js/features/account-backup-feature.js?v=464d6c34';
-import { homeStreetMpFeature } from '../public/js/features/home-street-mp-feature.js?v=840f8ea8';
-import { yardVerbsMpFeature } from '../public/js/features/yard-verbs-mp-feature.js?v=7dc30bb0';
+import { homeStreetMpFeature } from '../public/js/features/home-street-mp-feature.js?v=ab01ad22';
+import { yardVerbsMpFeature } from '../public/js/features/yard-verbs-mp-feature.js?v=eb570d2d';
 import { homePoolMpFeature } from '../public/js/features/home-pool-mp-feature.js?v=575920f2';
-import { qurazyFeature, resetQurazyFeatureForTests } from '../public/js/features/qurazy-feature.js?v=20089b86';
+import { qurazyFeature, resetQurazyFeatureForTests } from '../public/js/features/qurazy-feature.js?v=7cb78bad';
 import { QURAZY_SPAWN_LINE } from '../public/js/qurazy.js?v=fe657f4a';
-import { QURAZY_PLACEMENT_GROUP } from '../public/js/features/qurazy-feature.js?v=20089b86';
+import { QURAZY_PLACEMENT_GROUP } from '../public/js/features/qurazy-feature.js?v=7cb78bad';
 import { hubMapArtNote, hubMapSubtitle, questLogSummary } from '../public/js/panel-copy.js?v=85c3e029';
 
 const root = join(import.meta.dirname, '..');
