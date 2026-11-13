@@ -14056,6 +14056,15 @@ body.is-booting .touch-controls { display: none; }
 /* Its quiet line under the map takes the whole width (no key hint beside it) and wraps, so the
    counts and "tap a street" read in full. */
 :root.touch-phone[data-ui="modern"] #map-panel .map-card.map-hub > .map-sub { padding-right: var(--space-4); white-space: normal; text-overflow: clip; }
+/* #270 (Friendly, an upright phone): the Map was a small card between the top bar, the Social rail and the
+   pack. On a phone it takes the whole width and runs to the foot of the screen (the pack row, stick and
+   Jump wait under it), so the map draws as large as the screen's width allows (game.js fitMapCanvas). */
+:root.touch-phone[data-ui="modern"] #game-root #map-panel.ui-sheet-center {
+  bottom: 0;
+  z-index: var(--z-dialog);
+  padding: calc(var(--hud-h) + var(--sp-3)) var(--sp-2) var(--sp-4);
+}
+:root.touch-phone[data-ui="modern"]:has(#map-panel:not([hidden])) :is(.pack-bar, .touch-controls) { visibility: hidden; }
 /* end PHONEKEYS */
 
 /* PHONE6 (Austin 2026-11-12, on his iPhone; html.touch-phone, the phone gate's device): the pack

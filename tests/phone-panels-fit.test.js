@@ -63,3 +63,24 @@ describe('#274 Mail: the open letter keeps its colour while the list scrolls on 
     assert.ok(hoverBlocks.some((b) => /#mail-panel \.mail-row:hover \{ background: var\(--surface-raised\); \}/.test(b)));
   });
 });
+
+// #270 (Friendly): "if the map panel could be changed to take up most of the screen in mobile". The Map
+// stood between the top bar, the Social rail and the pack row; on a phone it takes the whole width and
+// runs to the screen's foot, and game.js fitMapCanvas draws the map as large as that box allows.
+describe('#270 the Map on a phone', () => {
+  const rule = block(':root.touch-phone[data-ui="modern"] #game-root #map-panel.ui-sheet-center {');
+
+  it('the panel runs to the foot of the screen, over the Social rail, with a small gutter', () => {
+    assert.match(rule, /bottom: 0;/);
+    assert.match(rule, /z-index: var\(--z-dialog\);/);
+    assert.match(rule, /padding: calc\(var\(--hud-h\) \+ var\(--sp-3\)\) var\(--sp-2\) var\(--sp-4\);/);
+  });
+
+  it('the pack row, stick and Jump wait under it', () => {
+    assert.match(css, /:root\.touch-phone\[data-ui="modern"\]:has\(#map-panel:not\(\[hidden\]\)\) :is\(\.pack-bar, \.touch-controls\) \{ visibility: hidden; \}/);
+  });
+
+  it('a computer keeps the room between the bar, the rail and the pack', () => {
+    assert.match(css, /\n\[data-ui="modern"\] #map-panel\.ui-sheet-center \{\s*padding: calc\(var\(--hud-h\) \+ 6px\) max\(var\(--hud-inset\), var\(--inset-r, 0px\)\) 0/);
+  });
+});
