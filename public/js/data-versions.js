@@ -578,7 +578,7 @@
       "landing/card-explore.webp": "7a2c1124",
       "landing/full/card-explore.webp": "cbce4e96",
       "restoration/gaps.json": "837a5a7b",
-      "restoration/made.json": "6c67a62b",
+      "restoration/made.json": "b47d7fd1",
       "restoration/shots/interrogation.webp": "4778b1b1",
     },
   };

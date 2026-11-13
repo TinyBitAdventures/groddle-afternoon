@@ -138,6 +138,13 @@ export function build(provenance, curated, read = (file) => readFileSync(join(GA
         made: latest(regions.map((r) => r.made)),
         regions: regionCount,
         gallery: c.id.startsWith('maps:'),
+        // Each region of a gallery on its own, for the page's compare popup (public/restoration/restoration.js):
+        // its painting and the thumbnail it was made from (assets/maps/art/thumbs/sm_<name>.jpg, as map:<hub> shows it).
+        parts: regions.map((r) => ({
+          name: r.hubName,
+          image: `public/${r.x2.file}`,
+          original: `public/${r.x2.file.replace(/\/bg\/([^/]+)@2x\.webp$/, '/thumbs/sm_$1.jpg')}`,
+        })),
       };
     }
     // The Subway System map's recreated paper (tools/provenance/subway-map-paper.json).
@@ -197,6 +204,21 @@ export function build(provenance, curated, read = (file) => readFileSync(join(GA
       return String(value);
     });
     if (original) original.label = fill(c.original.label);
+    // A gallery's regions one by one (the compare popup steps through them), in words from pieces.json's parts.
+    if (prov.gallery && !c.parts) throw new Error(`${c.id}: a gallery needs parts (the words for each region's two pictures)`);
+    const parts = prov.gallery ? prov.parts.map((part) => {
+      const orig = picture(part.original, null, read);
+      const fillPart = (text) => text.replace(/\{(\w+)\}/g, (all, key) => {
+        const value = { name: part.name, w: orig.w, h: orig.h }[key];
+        if (value === undefined) throw new Error(`${c.id}: nothing to fill {${key}} with in its parts`);
+        return String(value);
+      });
+      return {
+        name: part.name,
+        original: { ...orig, ...(c.original?.pixelated ? { pixelated: true } : {}), label: fillPart(c.parts.original.label), alt: fillPart(c.parts.original.alt) },
+        image: { ...picture(part.image, null, read), label: fillPart(c.parts.image.label), alt: fillPart(c.parts.image.alt) },
+      };
+    }) : null;
     return {
       order,
       piece: {
@@ -210,6 +232,7 @@ export function build(provenance, curated, read = (file) => readFileSync(join(GA
         image,
         ...(original ? { original } : {}),
         facts: [...c.facts.map((f) => ({ label: f.label, text: fill(f.text) })), { label: 'Licence', text: licence }],
+        ...(parts ? { parts } : {}),
       },
     };
   });
@@ -225,7 +248,8 @@ export function build(provenance, curated, read = (file) => readFileSync(join(GA
 
 /** What players read in made.json: every word, no URLs (they are the page's images, not its text). */
 export function playerWords(data) {
-  return data.pieces.map((p) => [p.name, p.madeLabel, p.caption, p.image.label, p.image.alt, p.original?.label, p.original?.alt, ...p.facts.flatMap((f) => [f.label, f.text])].filter(Boolean));
+  return data.pieces.map((p) => [p.name, p.madeLabel, p.caption, p.image.label, p.image.alt, p.original?.label, p.original?.alt, ...p.facts.flatMap((f) => [f.label, f.text]),
+    ...(p.parts || []).flatMap((part) => [part.name, part.original.label, part.original.alt, part.image.label, part.image.alt])].filter(Boolean));
 }
 
 /** The page's rules: no em-dash, no path, no @, no web address, no deny-listed name (tools/gaps), and no hash. */

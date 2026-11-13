@@ -273,6 +273,62 @@
           "label": "Licence",
           "text": "Dedicated to the public domain under CC0 1.0, like the Tiny Speck art it comes from."
         }
+      ],
+      "parts": [
+        {
+          "name": "Ix",
+          "original": {
+            "src": "/assets/maps/art/thumbs/sm_ix.jpg",
+            "w": 150,
+            "h": 91,
+            "pixelated": true,
+            "label": "Ix: Tiny Speck's thumbnail, 150 by 91 pixels",
+            "alt": "Tiny Speck's small thumbnail of the Ix map, enlarged so its pixels show."
+          },
+          "image": {
+            "src": "/assets/maps/art/bg/ix@2x.webp",
+            "w": 1520,
+            "h": 920,
+            "label": "Ix: painted again for Groddle",
+            "alt": "The Ix region map, painted again for Groddle from that thumbnail."
+          }
+        },
+        {
+          "name": "Callopee",
+          "original": {
+            "src": "/assets/maps/art/thumbs/sm_callopee.jpg",
+            "w": 150,
+            "h": 91,
+            "pixelated": true,
+            "label": "Callopee: Tiny Speck's thumbnail, 150 by 91 pixels",
+            "alt": "Tiny Speck's small thumbnail of the Callopee map, enlarged so its pixels show."
+          },
+          "image": {
+            "src": "/assets/maps/art/bg/callopee@2x.webp",
+            "w": 1520,
+            "h": 920,
+            "label": "Callopee: painted again for Groddle",
+            "alt": "The Callopee region map, painted again for Groddle from that thumbnail."
+          }
+        },
+        {
+          "name": "Haoma",
+          "original": {
+            "src": "/assets/maps/art/thumbs/sm_haoma.jpg",
+            "w": 150,
+            "h": 91,
+            "pixelated": true,
+            "label": "Haoma: Tiny Speck's thumbnail, 150 by 91 pixels",
+            "alt": "Tiny Speck's small thumbnail of the Haoma map, enlarged so its pixels show."
+          },
+          "image": {
+            "src": "/assets/maps/art/bg/haoma@2x.webp",
+            "w": 1520,
+            "h": 920,
+            "label": "Haoma: painted again for Groddle",
+            "alt": "The Haoma region map, painted again for Groddle from that thumbnail."
+          }
+        }
       ]
     }
   ]

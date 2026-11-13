@@ -9,6 +9,7 @@
  */
 
 import { dametimeParts } from '../js/game-day.js?v=cf9afac0';
+import { setupMadeCompare } from './made-compare.js?v=bbd8d187';
 
 const $ = (sel, root = document) => root.querySelector(sel);
 const el = (tag, attrs = {}, ...kids) => {
@@ -397,6 +398,8 @@ function setupReportMenu() {
   update();
 }
 setupReportMenu();
+// The Made for Groddle pictures open in a compare popup (made-compare.js); before data.json, which it does not need.
+setupMadeCompare(new URL('made.json', import.meta.url));
 
 // Beside this script, wherever the page that loads it lives.
 const data = await (await fetch(new URL('data.json', import.meta.url), { cache: 'no-cache' })).json();

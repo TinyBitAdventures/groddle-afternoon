@@ -1,5 +1,5 @@
 {
-  "note": "The words players read in the Made for Groddle section of /restoration/ (tools/made-art/build-data.mjs): one piece per entry of tools/provenance/made-sprites.json, and the curated pieces from repainted-maps.json (map:<hub>, maps:<hub>,<hub>), subway-map-paper.json (subway:paper) and made-decos.json (decos:<group>[:<view>]). image.file and original.file under public/assets/made-art/ are pictures composed by tools/made-art/compose.py (tools/made-art/showcase.json). In facts and labels, {tool} is the provenance's model or tool, {overlap} the outline overlap its cut records, {w} and {h} the original's size in pixels, {regions} how many region maps were painted again.",
+  "note": "The words players read in the Made for Groddle section of /restoration/ (tools/made-art/build-data.mjs): one piece per entry of tools/provenance/made-sprites.json, and the curated pieces from repainted-maps.json (map:<hub>, maps:<hub>,<hub>), subway-map-paper.json (subway:paper) and made-decos.json (decos:<group>[:<view>]). image.file and original.file under public/assets/made-art/ are pictures composed by tools/made-art/compose.py (tools/made-art/showcase.json). In facts and labels, {tool} is the provenance's model or tool, {overlap} the outline overlap its cut records, {w} and {h} the original's size in pixels, {regions} how many region maps were painted again. A gallery (maps:<hub>,<hub>) has parts: the words for each region's thumbnail and painting in the page's compare popup, where {name} is the region and {w} and {h} its thumbnail's size.",
   "pieces": [
     {
       "id": "quest_book_award",
@@ -191,6 +191,16 @@
         "pixelated": true,
         "label": "Tiny Speck's thumbnails, 150 by 91 pixels each, shown at the same size",
         "alt": "Tiny Speck's three small thumbnails of the same maps, enlarged so their pixels show."
+      },
+      "parts": {
+        "original": {
+          "label": "{name}: Tiny Speck's thumbnail, {w} by {h} pixels",
+          "alt": "Tiny Speck's small thumbnail of the {name} map, enlarged so its pixels show."
+        },
+        "image": {
+          "label": "{name}: painted again for Groddle",
+          "alt": "The {name} region map, painted again for Groddle from that thumbnail."
+        }
       },
       "facts": [
         {
