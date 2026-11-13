@@ -3218,6 +3218,17 @@
 :root[data-ui="classic"] #game-root #map-panel .subway-map-svg :is(.subway-stop-name, .subway-stop-hub, .subway-line-btn text) { font-family: var(--font-classic-title); }
 /* === end maps === */
 
+/* === bubble (lane) === */
+/* The featured project's line (js/ui/featured-project.js, Austin 2026-11-13). The 2012 client had no
+   featured project; the line takes the "Current location" readout's last row (CurrentLocationUI.as
+   21-142), under the street's name, in the tool-wear teal and square ends of ItemstackStatusBar.as 11-13. */
+:root[data-ui="classic"] #game-root .street-nameplate > #featured-project-pill:not([hidden]) { display: block; left: calc(32 * var(--cu)); right: 0; bottom: 0; height: calc(9 * var(--cu)); border-radius: 0; color: var(--c-classic-wear); }
+:root[data-ui="classic"] #game-root .street-nameplate > #featured-project-pill .fp-track { bottom: calc(3 * var(--cu)); height: calc(3 * var(--cu)); border-radius: 0; background: var(--c-classic-wear-track); }
+:root[data-ui="classic"] #game-root .street-nameplate > #featured-project-pill .fp-star { bottom: calc(4.5 * var(--cu)); width: calc(9 * var(--cu)); height: calc(9 * var(--cu)); }
+:root[data-ui="classic"] #game-root .street-nameplate > #featured-project-pill:focus-visible { outline: 2px solid var(--c-classic-focus); outline-offset: 1px; }
+:root[data-ui="classic"] #game-root .street-nameplate > #featured-project-pill:focus-visible .fp-track { box-shadow: none; }
+/* === end bubble === */
+
 /* == TICKETS == Reports (js/ui/reports-sheet.js, online only) as a 2012 window: the Quest Log's frame
    (Dialog.as, WindowBorder.as, BigDialog.as) centred in the viewport, the white head with its 20 px
    title and the red cross, the grey well between two rules, the white footer with the minor buttons;
@@ -3920,12 +3931,10 @@
   font: var(--fs-classic-body)/var(--lh-tight) var(--font-classic-body);
 }
 :root[data-ui="classic"] .world-drop-tip.is-no { color: var(--c-classic-debuff); }
-/* G656 featured street project (js/ui/featured-project.js): the pill, the Feat panel row and the Projects card in the 2012 palette. */
-:root[data-ui="classic"] .featured-pill { top: var(--space-2); border: 1px solid color-mix(in srgb, var(--c-classic-ink) 37%, transparent); border-radius: 5px;
-  background: var(--c-classic-panel); color: var(--c-classic-text); box-shadow: 0 2px 4px color-mix(in srgb, var(--c-classic-ink) 15%, transparent); font-family: var(--font-classic-body); }
-:root[data-ui="classic"] .featured-pill .fp-star, :root[data-ui="classic"] .featured-row .fp-star { color: var(--c-classic-wear); }
-:root[data-ui="classic"] .featured-pill .fp-bar, :root[data-ui="classic"] .featured-row .fp-bar { border-radius: 0; background: var(--c-classic-wear-track); }
-:root[data-ui="classic"] .featured-pill .fp-bar i, :root[data-ui="classic"] .featured-row .fp-bar i { background: var(--c-classic-wear); }
+/* G656 featured street project (js/ui/featured-project.js): the Feat panel row and the Projects card in the 2012 palette (the line: block bubble). */
+:root[data-ui="classic"] .featured-row .fp-star { color: var(--c-classic-wear); }
+:root[data-ui="classic"] .featured-row .fp-bar { border-radius: 0; background: var(--c-classic-wear-track); }
+:root[data-ui="classic"] .featured-row .fp-bar i { background: var(--c-classic-wear); }
 :root[data-ui="classic"] .featured-row { border-radius: 0; border-color: var(--c-classic-rule); background: var(--c-classic-well); color: var(--c-classic-text); font-family: var(--font-classic-body); }
 :root[data-ui="classic"] .featured-row .fp-open { color: var(--c-classic-wear); }
 :root[data-ui="classic"] .pj-card.is-featured { box-shadow: inset 0 0 0 2px var(--c-classic-wear); }

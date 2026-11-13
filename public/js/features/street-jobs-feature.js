@@ -150,11 +150,11 @@ import { SIGN_ARMS, routeGraph } from '../map-routes.js?v=c7e7dc80';
 import { TELEPORTERS } from '../hidden-floors.js?v=732a2610';
 import { WINTRY_PORTAL_TELEPORTERS } from '../wintry-portal.js?v=1437deda';
 import { PROJECTS_TEXT, contributedJobs, mineTotal, projectEntry, projectList } from '../projects-tracker.js?v=30bdd34d';
-import { PROJECTS_PANEL_ID, buildProjectsPanel, renderProjects } from '../ui/projects-sheet.js?v=4c7c4692';
+import { PROJECTS_PANEL_ID, buildProjectsPanel, renderProjects } from '../ui/projects-sheet.js?v=f97f2319';
 import { SIDE_SHEET_IDS } from '../ui/panel-shell.js?v=06a0d3fe';
 import { trophyGotText } from '../home-trophies.js?v=2020b29b';
-import { FEATURED_TEXT, featuredChanged, featuredFromServer, featuredNeedsLine } from '../featured-project.js?v=3cc0565c';
-import { renderFeaturedPill, renderFeaturedRow } from '../ui/featured-project.js?v=46c958b3';
+import { FEATURED_TEXT, featuredChanged, featuredFromServer, featuredNeedsLine } from '../featured-project.js?v=4210bead';
+import { renderFeaturedLine, renderFeaturedRow } from '../ui/featured-project.js?v=46bffa44';
 import { GEM_HINTS, isGem } from '../gem-hints.js?v=4b65f7ac';
 
 export const STREET_JOBS_FEATURE_ID = 'street-jobs';
@@ -530,7 +530,7 @@ function openGiver(engine, from) {
 }
 
 /**
- * Report #231: the modern top bar's pills (stats, nameplate, buttons, the featured project's pill) as
+ * Report #231: the modern top bar's pills (stats, nameplate with the featured project's line, buttons) as
  * boxes in view px, none where they do not show (Classic draws its chrome outside the world).
  * Measured at most twice a second.
  */
@@ -545,7 +545,7 @@ function topBarViewBoxes(engine, now = Date.now()) {
   const c = canvas.getBoundingClientRect();
   if (!c.width) return topBarBoxes;
   const scale = (engine.viewWidth || c.width) / c.width;
-  for (const node of document.querySelectorAll('.top-bar > .hud-pill, #street-nameplate, .featured-pill')) {
+  for (const node of document.querySelectorAll('.top-bar > .hud-pill, #street-nameplate')) {
     if (node.offsetParent === null || node.hidden) continue;
     const r = node.getBoundingClientRect();
     if (r.height > 0) topBarBoxes.push({ left: (r.left - c.left) * scale, right: (r.right - c.left) * scale, bottom: (r.bottom - c.top) * scale });
@@ -2624,14 +2624,14 @@ function featuredEntry(engine, seenAt) {
   return e;
 }
 
-/** G656: the pill under the street name and the Feat panel's row (js/ui/featured-project.js), multiplayer only. */
+/** G656: the line in the street name bubble and the Feat panel's row (js/ui/featured-project.js), multiplayer only. */
 function drawFeatured(engine) {
   if (typeof document === 'undefined' || !document.getElementById) return;
   const f = mpMode ? featured : null;
   const onOpen = () => openFeatured(engine);
-  // Ticket 240: the row (and the pill's tip) say what is left, from the Projects panel's own entry.
+  // Ticket 240: the row (and the line's tip) say what is left, from the Projects panel's own entry.
   const needs = f && engine ? featuredNeedsLine(featuredEntry(engine, Number(state.trackerSeen) || 0)) : '';
-  renderFeaturedPill(document, f, { onOpen, now: Date.now(), needs });
+  renderFeaturedLine(document, f, { onOpen, now: Date.now(), needs });
   renderFeaturedRow(document, f, { onOpen, now: Date.now(), needs });
   engine?.setData?.('featuredNeeds', needs);
   engine?.setData?.('featuredJob', f?.jobId || '');
@@ -2639,7 +2639,7 @@ function drawFeatured(engine) {
   engine?.setData?.('featuredLabel', f?.label || '');
 }
 
-/** A click on the pill or the row: the Projects panel on the featured project, its way there one click on. */
+/** A click on the line or the row: the Projects panel on the featured project, its way there one click on. */
 function openFeatured(engine) {
   if (!featured) return;
   // The Feat panel is a side sheet too: the Projects panel takes its place.

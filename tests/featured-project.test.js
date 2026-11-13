@@ -1,6 +1,6 @@
 /**
  * The featured street project (G656, Austin 2026-11-11): js/featured-project.js (the message and
- * the words), js/ui/featured-project.js (the pill and the Feat panel's row), the Projects panel's
+ * the words), js/ui/featured-project.js (the line in the street name bubble and the Feat panel's row), the Projects panel's
  * Featured section (js/ui/projects-sheet.js), the giver's bubble star (js/job-indicator.js), the
  * Global notices kept as notes (features/groups-feature.js) and the wiring in
  * features/street-jobs-feature.js. The server's rule is groddle-afternoon-server projects_featured.go
@@ -11,9 +11,9 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { FEATURED_TEXT, featuredChanged, featuredFromServer, featuredLabel, featuredPillText, featuredStatus, featuredWhere } from '../public/js/featured-project.js?v=3cc0565c';
-import { FEATURED_PILL_ID, FEATURED_ROW_ID, renderFeaturedPill, renderFeaturedRow } from '../public/js/ui/featured-project.js?v=46c958b3';
-import { buildProjectsPanel, renderProjects } from '../public/js/ui/projects-sheet.js?v=4c7c4692';
+import { FEATURED_TEXT, featuredChanged, featuredFromServer, featuredLabel, featuredPillText, featuredStatus, featuredWhere } from '../public/js/featured-project.js?v=4210bead';
+import { FEATURED_MENU_ID, FEATURED_PILL_ID, FEATURED_ROW_ID, renderFeaturedLine, renderFeaturedRow } from '../public/js/ui/featured-project.js?v=46bffa44';
+import { buildProjectsPanel, renderProjects } from '../public/js/ui/projects-sheet.js?v=f97f2319';
 import { jobIndicatorView } from '../public/js/job-indicator.js?v=05498227';
 import { normalizeStreetJobState } from '../public/js/street-jobs.js?v=ba02a385';
 import { rowFromServer } from '../public/js/street-jobs-mp.js?v=930d8534';
@@ -122,30 +122,61 @@ describe('the featured project message (js/featured-project.js)', () => {
     assert.match(featuredLabel(f, NOW), /^Featured street project: Tumble Rd 1\./);
     assert.equal(featuredChanged(null, f), true);
     assert.equal(featuredChanged(f, { ...f, percent: 50 }), false, 'progress is not a change of project');
-    for (const text of [FEATURED_TEXT.heading, FEATURED_TEXT.copy, FEATURED_TEXT.pillTip, FEATURED_TEXT.toast('X'), PROJECTS_TEXT.featuredCopy, featuredWhere(f), featuredStatus(f, NOW)]) {
+    for (const text of [FEATURED_TEXT.heading, FEATURED_TEXT.copy, FEATURED_TEXT.toast('X'), PROJECTS_TEXT.featuredCopy, featuredWhere(f), featuredStatus(f, NOW)]) {
       assert.ok(!/[–—]/.test(text), `no dashes: ${text}`);
     }
   });
 });
 
 describe('the pill and the Feat panel row (js/ui/featured-project.js)', () => {
-  it('draws the pill under the street name, hides it with none, and opens on a click', () => {
+  it('draws the line inside the street name bubble, hides it with none, and opens on a click', () => {
     const doc = fakeDoc();
     const gameRoot = doc.createElement('div');
     gameRoot.id = 'game-root';
+    const plate = doc.createElement('div');
+    plate.id = 'street-nameplate';
+    gameRoot.append(plate);
     doc.body.append(gameRoot);
     let opened = 0;
-    const pill = renderFeaturedPill(doc, featuredFromServer(MSG), { onOpen: () => (opened += 1), now: NOW });
-    assert.equal(pill.id, FEATURED_PILL_ID);
-    assert.equal(pill.hidden, false);
-    assert.equal(pill.dataset.featuredJob, TUMBLE);
-    assert.match(pill.textContent, /Featured: Tumble Rd 1 · 37%/);
-    assert.equal(pill.tagName, 'BUTTON');
-    pill.click();
+    let bubbled = 0;
+    const line = renderFeaturedLine(doc, featuredFromServer(MSG), { onOpen: () => (opened += 1), now: NOW, needs: 'Needs: 12 Planks' });
+    assert.equal(line.id, FEATURED_PILL_ID, 'the old pill id stays the QA hook');
+    assert.equal(line.parentElement, plate, 'in the bubble, so notices stack under one box');
+    assert.equal(gameRoot.children.length, 1, 'no separate pill over the world');
+    assert.equal(line.hidden, false);
+    assert.equal(line.tagName, 'BUTTON');
+    assert.match(line.className, /featured-line/);
+    assert.equal(line.dataset.featuredJob, TUMBLE);
+    assert.equal(line.props['--p'], '37%', 'the progress');
+    assert.equal(line.dataset.tip, 'Featured: Tumble Rd 1 · 37%', 'hover and focus words');
+    assert.equal(line.dataset.sub, 'Needs: 12 Planks', 'ticket 240: what is left');
+    assert.match(line.getAttribute('aria-label'), /^Featured street project: Tumble Rd 1\..*Needs: 12 Planks\.$/);
+    assert.ok(line.all((n) => n.getAttribute('class') === 'fp-star').length, 'the star at its end');
+    line.listeners.click[0]({ target: line, stopPropagation: () => (bubbled += 1) });
     assert.equal(opened, 1);
+    assert.equal(bubbled, 1, 'the bubble\'s own click (the Map) does not run too');
     assert.ok(doc.getElementById('featured-project-style'), 'its stylesheet (tokens only: tests/design-tokens.test.js)');
-    renderFeaturedPill(doc, null);
+    renderFeaturedLine(doc, { ...featuredFromServer(MSG), percent: 140 }, { now: NOW });
+    assert.equal(line.props['--p'], '100%', 'never past the end');
+    assert.equal(line.dataset.sub, undefined, 'no needs, no second part');
+    renderFeaturedLine(doc, null);
     assert.equal(doc.getElementById(FEATURED_PILL_ID).hidden, true);
+    assert.equal(doc.getElementById(FEATURED_MENU_ID), null, 'computers get no Menu row');
+  });
+
+  it('the line style keeps clear of the bubble and is not a pill over the world', () => {
+    const ui = read('public/js/ui/featured-project.js');
+    assert.doesNotMatch(ui, /\.featured-pill\b/);
+    assert.match(ui, /\.featured-line \{ position: absolute; left: var\(--space-4\); right: var\(--space-4\); bottom: 0;/);
+    assert.match(ui, /color: var\(--accent\)/, 'the project purple');
+    const css = read('public/style.css');
+    assert.match(css, /:root\.touch-phone\[data-ui="modern"\] #featured-project-pill \{ display: none; \}/, 'a phone keeps its Menu row');
+    assert.doesNotMatch(css, /is-under\) #featured-project-pill/, 'it stays when the name drops under the pills');
+    assert.match(css, /\.street-nameplate\.is-quest > :not\(\.quest-plate\) \{ display: none !important; \}/, 'a quest place hides it with the bubble');
+    const classic = read('public/css/classic.css');
+    const block = classic.slice(classic.indexOf('/* === bubble (lane) === */'), classic.indexOf('/* === end bubble === */'));
+    assert.match(block, /\.street-nameplate > #featured-project-pill:not\(\[hidden\]\) \{ display: block;/, 'Classic shows it under Current location');
+    assert.ok(classic.indexOf('/* === bubble (lane) === */') < classic.indexOf('/* == TICKETS =='));
   });
 
   it('puts the row under the shared Feat in the Feat panel', () => {
@@ -214,9 +245,9 @@ describe('the giver bubble star (js/job-indicator.js)', () => {
 describe('wiring', () => {
   const feature = read('public/js/features/street-jobs-feature.js');
   const groups = read('public/js/features/groups-feature.js');
-  it('the board feature follows project_featured online and draws the pill, the row and the star', () => {
+  it('the board feature follows project_featured online and draws the line, the row and the star', () => {
     assert.match(feature, /client\.on\('msg:project_featured'/);
-    assert.match(feature, /renderFeaturedPill\(document, f,/);
+    assert.match(feature, /renderFeaturedLine\(document, f,/);
     assert.match(feature, /renderFeaturedRow\(document, f,/);
     assert.match(feature, /featured: Boolean\(featured && featured\.jobId === head\.jobId\)/);
     assert.match(feature, /const f = mpMode \? featured : null;/, 'solo shows nothing');

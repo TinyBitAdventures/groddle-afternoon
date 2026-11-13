@@ -12,7 +12,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, it } from 'node:test';
 import { jobIndicatorTip } from '../public/js/job-indicator.js?v=05498227';
-import { topClearOver } from '../public/js/features/street-jobs-feature.js?v=396734ee';
+import { topClearOver } from '../public/js/features/street-jobs-feature.js?v=4a394d9c';
 
 const src = readFileSync(join(import.meta.dirname, '..', 'public', 'js', 'features', 'street-jobs-feature.js'), 'utf8');
 
@@ -47,6 +47,7 @@ describe('report 231: the project bubble stays in view', () => {
     assert.match(tick, /const want = spr\.y - Math\.abs\(spr\._worldHitH \|\| spr\.height \|\| 0\) - INDICATOR_LIFT;/);
     assert.match(tick, /topClearOver\(topBarViewBoxes\(engine, now\), left, left \+ hit\.width\)/);
     assert.match(tick, /root\.y = jobIndicatorTip\(\{ tip: want, height: -hit\.y \+ 2, viewTop: cam\.y \+ clear \+ 6, feet: spr\.y \}\);/);
-    assert.match(src, /document\.querySelectorAll\('\.top-bar > \.hud-pill, #street-nameplate, \.featured-pill'\)/);
+    // The featured project is a line inside the nameplate (Austin 2026-11-13), so the nameplate's box covers it.
+    assert.match(src, /document\.querySelectorAll\('\.top-bar > \.hud-pill, #street-nameplate'\)/);
   });
 });

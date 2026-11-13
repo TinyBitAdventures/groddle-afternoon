@@ -1,14 +1,14 @@
 /**
  * Ticket 240: the featured project says what it still needs before the trip there: the Feat
- * panel's row (and the pill's tip) carry a one-line summary, and the Projects card opened from
- * the pill or the row shows its needs open.
+ * panel's row (and the bubble line's tooltip) carry a one-line summary, and the Projects card opened
+ * from the line or the row shows its needs open.
  * Run: node --test tests/featured-project-needs.test.js
  */
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { featuredNeedsLine } from '../public/js/featured-project.js?v=3cc0565c';
+import { featuredNeedsLine } from '../public/js/featured-project.js?v=4210bead';
 
 const root = join(import.meta.dirname, '..');
 const read = (rel) => readFileSync(join(root, rel), 'utf8');
@@ -28,10 +28,10 @@ describe('the featured project\'s needs', () => {
     assert.equal(featuredNeedsLine(null), '');
   });
 
-  it('the row and the pill carry it, and the card opens with its needs shown', () => {
+  it('the row and the line carry it, and the card opens with its needs shown', () => {
     const ui = read('public/js/ui/featured-project.js');
     assert.match(ui, /\.\.\.\(o\.needs \? \[span\(doc, 'fp-needs', o\.needs\)\] : \[\]\)/);
-    assert.match(ui, /pill\.title = o\.needs \? `\$\{T\.pillTip\} \$\{o\.needs\}\.` : T\.pillTip;/);
+    assert.match(ui, /if \(o\.needs\) line\.dataset\.sub = o\.needs;/);
     const feature = read('public/js/features/street-jobs-feature.js');
     assert.match(feature, /featuredNeedsLine\(featuredEntry\(engine, Number\(state\.trackerSeen\) \|\| 0\)\)/);
     assert.match(feature, /pj\.openNeeds\.add\(featured\.jobId\);\n\s+pj\.sig = '';\n\s+if \(!pj\.open\) openProjects\(engine\);/);

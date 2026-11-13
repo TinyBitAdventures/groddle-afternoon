@@ -11,7 +11,7 @@
  * project_sync and when it changes or moves. Solo has no shared world to rebuild together, so it
  * shows nothing.
  *
- * Pure: the message read into a plain object, and the words the pill, the Feat panel's row, the
+ * Pure: the message read into a plain object, and the words the bubble's line, the Feat panel's row, the
  * Projects panel and the giver's bubble show. features/street-jobs-feature.js draws them
  * (js/ui/featured-project.js).
  */
@@ -22,7 +22,6 @@ export const FEATURED_TEXT = Object.freeze({
   copy: 'One street project at a time, for everyone to build together. It stays featured until it is built.',
   open: 'See the project',
   toast: (label) => `New featured street project: ${label}.`,
-  pillTip: 'The featured street project. Click for its details and the way there.',
   waiting: 'Opens soon',
   needs: 'Needs',
 });
@@ -67,7 +66,7 @@ export function featuredChanged(prev, next) {
   return (prev?.jobId || '') !== (next?.jobId || '');
 }
 
-/** The pill's words: "Featured: Lowland Slough · 25%". */
+/** The bubble line's tooltip (and the phone Menu row): "Featured: Lowland Slough · 25%". */
 export function featuredPillText(f) {
   if (!f) return '';
   return `${FEATURED_TEXT.tag}: ${f.label} · ${f.percent}%`;
@@ -92,7 +91,7 @@ export function featuredWhere(f) {
   return `A new street${f.hub ? ` in ${f.hub}` : ''}${from}`;
 }
 
-/** The pill's and the row's accessible name. */
+/** The line's and the row's accessible name. */
 export function featuredLabel(f, now = Date.now()) {
   if (!f) return '';
   return `${FEATURED_TEXT.heading}: ${f.label}. ${featuredWhere(f)}. ${featuredStatus(f, now)}.`;
