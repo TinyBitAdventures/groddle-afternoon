@@ -11,7 +11,7 @@ import { describe, it, before, after } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { memoryStore, page } from './social-fake-dom.js';
-import { mountSocialDrawer } from '../public/js/ui/social-drawer.js?v=9e7d9382';
+import { mountSocialDrawer } from '../public/js/ui/social-drawer.js?v=99cc04a6';
 import { createNotifier } from '../public/js/notify.js?v=1fb97b21';
 import { LONG_PRESS_MS } from '../public/js/ui/context-menu.js?v=55c84488';
 

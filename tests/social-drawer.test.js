@@ -28,7 +28,7 @@ import {
   splitChat,
   withTimeLines,
   writeChoice,
-} from '../public/js/ui/social-drawer.js?v=9e7d9382';
+} from '../public/js/ui/social-drawer.js?v=99cc04a6';
 import { createNotifier } from '../public/js/notify.js?v=1fb97b21';
 import { resolveTokens } from './css-tokens.js';
 
@@ -414,7 +414,8 @@ describe('the Social drawer: wiring', () => {
     const view = read('public/js/notify-view.js');
     assert.match(view, /const logView = activityLog \? mountActivityLog\(/);
     assert.match(view, /dockEl\?\.classList\.contains\('social-drawer'\) \? null : relRect\(dockEl, rr\)/);
-    assert.match(view, /const left = \(zones\.rootW - w\) \/ 2 \+ shift;/);
+    // LANDSCAPE: the centred spot is measured at the stylesheet's width (cw) even while the stack stands beside the avatar.
+    assert.match(view, /const cl = \(zones\.rootW - cw\) \/ 2 \+ shift;/);
   });
 
   it('the multiplayer features hand their lines and views to the drawer when there is one, else the old dock', () => {

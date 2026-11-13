@@ -1025,8 +1025,8 @@ import { denseSprite } from './js/sprite-dense.js?v=2a0ce07a';
 import { wholeStatAmounts, wholeEffects } from './js/stat-text.js?v=f96d8fd3';
 import { createNotifier, effectTokens, floatKey, offerCardDrop, stackFloat, tokenText } from './js/notify.js?v=1fb97b21';
 import { bubbleMs } from './js/read-time.js?v=be140198';
-import { mountNotifyView } from './js/notify-view.js?v=f40de936';
-import { mountSocialDrawer } from './js/ui/social-drawer.js?v=9e7d9382';
+import { mountNotifyView } from './js/notify-view.js?v=993ffafc';
+import { mountSocialDrawer } from './js/ui/social-drawer.js?v=99cc04a6';
 import { bindChatLinks } from './js/chat-links.js?v=b717fac7';
 import { SIDE_SHEET_IDS, bindTabs, inSideSheet, mountPanelShell, sheetKeyToWorld } from './js/ui/panel-shell.js?v=06a0d3fe';
 import { createQuestSheet, failedQuestPin, questLogNeedsSwap, questStep } from './js/ui/quest-sheet.js?v=c5465bbe';
@@ -3007,6 +3007,8 @@ const notifyView = mountNotifyView(notify, {
   sideInset: () => socialDrawer?.inset() || null,
   // VERBS: an open side sheet's width on the left (js/ui/panel-shell.js); the drawer's is on the right.
   sideInsetLeft: () => panelShell?.insetLeft() || 0,
+  // LANDSCAPE: on a short screen the notices step beside the avatar instead of over it.
+  avatarBox: () => (state.started ? avatarOnRoot()?.box || null : null),
 });
 /**
  * SOCIAL (phase 2, js/ui/social-drawer.js): the right-hand drawer is #local-chat-dock in the modern
@@ -12300,7 +12302,11 @@ function avatarOnRoot() {
   const sx = c.width / VIEW_W;
   const sy = c.height / VIEW_H;
   const x = c.left - rr.left + (b.x + b.width / 2) * sx;
-  return { head: { x, y: c.top - rr.top + b.y * sy }, feet: { x, y: c.top - rr.top + (b.y + b.height) * sy } };
+  const top = c.top - rr.top + b.y * sy;
+  const bottom = c.top - rr.top + (b.y + b.height) * sy;
+  const left = c.left - rr.left + b.x * sx;
+  // box: the whole avatar (the notices keep clear of it on a short screen, js/notify-view.js).
+  return { head: { x, y: top }, feet: { x, y: bottom }, box: { left, top, right: left + b.width * sx, bottom } };
 }
 
 const engine = {

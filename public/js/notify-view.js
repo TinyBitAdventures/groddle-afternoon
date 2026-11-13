@@ -249,7 +249,58 @@ export function mountActivityLog(notifier, { container, buttonHost = null, onOpe
  * The notice stack and its zones. `root` is #game-root. game.js calls frame()
  * once a frame with why notices must wait ('' when they may show).
  */
-export function mountNotifyView(notifier, { root, setData = () => {}, logButtonHost = null, activityLog = true, sideInset = () => null, sideInsetLeft = () => 0 } = {}) {
+/**
+ * LANDSCAPE (lane landscape's audit, 2026-11-13, finding 10: a phone held sideways is about 340 to
+ * 430 px tall, so the notices under the street name stood over the avatar's head). Under
+ * SHORT_SCREEN_H the stack steps beside the avatar when it would cover it: a column on the roomier
+ * side, as wide as that side leaves (NOTICE_W at most), never narrower than BESIDE_MIN_W (then it
+ * stays where it was). Taller windows (every computer) never move.
+ */
+export const SHORT_SCREEN_H = 520;
+/** The stack's width (style.css .notify-notices: min(440px, ...)). */
+export const NOTICE_W = 440;
+export const BESIDE_MIN_W = 180;
+
+/**
+ * PURE: where the notice stack goes beside the avatar, or null to stay centred. `rect` is where the
+ * centred stack sits, `avatar` the avatar's box, both in #game-root px; rootW, rootH the root's size;
+ * insetL / insetR the side sheet and the drawer; safeL / safeR the screen's safe area (a notch);
+ * keepOut the phone's stick and Jump (the column stops short of whichever stands on its side: a
+ * notice over Jump would take the thumb's tap).
+ */
+export function noticesBesideAvatar({ rect, avatar, rootW, rootH, insetL = 0, insetR = 0, safeL = 0, safeR = 0, keepOut = [], margin = 10, edge = 8 } = {}) {
+  if (!rect || !avatar || !(rootH > 0) || rootH >= SHORT_SCREEN_H) return null;
+  const overlaps = rect.left < avatar.right + margin && rect.right > avatar.left - margin
+    && rect.top < avatar.bottom + margin && rect.bottom > avatar.top - margin;
+  if (!overlaps) return null;
+  let minL = edge + Math.max(0, insetL, safeL);
+  let maxR = rootW - edge - Math.max(0, insetR, safeR);
+  for (const k of keepOut || []) {
+    if (!k) continue;
+    if (k.left >= avatar.right) maxR = Math.min(maxR, k.left - margin);
+    else if (k.right <= avatar.left) minL = Math.max(minL, k.right + margin);
+  }
+  const leftRoom = avatar.left - margin - minL;
+  const rightRoom = maxR - (avatar.right + margin);
+  const room = Math.max(leftRoom, rightRoom);
+  if (room < BESIDE_MIN_W) return null;
+  const width = Math.floor(Math.min(NOTICE_W, room));
+  // Hug the avatar's side, so the column stays as near the middle as it can.
+  const left = leftRoom >= rightRoom ? avatar.left - margin - width : avatar.right + margin;
+  return { left: Math.round(left), width };
+}
+
+/** The screen's safe area at the sides, CSS px (0 where there is none or no stylesheet). */
+function safeSides(el) {
+  try {
+    const cs = getComputedStyle(el);
+    return { safeL: parseFloat(cs.getPropertyValue('--safe-l')) || 0, safeR: parseFloat(cs.getPropertyValue('--safe-r')) || 0 };
+  } catch {
+    return { safeL: 0, safeR: 0 };
+  }
+}
+
+export function mountNotifyView(notifier, { root, setData = () => {}, logButtonHost = null, activityLog = true, sideInset = () => null, sideInsetLeft = () => 0, avatarBox = () => null } = {}) {
   if (typeof document === 'undefined' || !root) return null;
   const stack = document.createElement('div');
   stack.id = STACK_ID;
@@ -264,7 +315,9 @@ export function mountNotifyView(notifier, { root, setData = () => {}, logButtonH
   /** name → rect (#game-root px) reserved by its owner (reserve()). */
   const reserved = new Map();
   let measuredAt = -Infinity;
-  let zones = { top: 12, banner: [], blockers: [], maxBottom: Infinity, rootW: 0, insetL: 0, insetR: 0 };
+  let zones = { top: 12, banner: [], blockers: [], maxBottom: Infinity, rootW: 0, rootH: 0, insetL: 0, insetR: 0, avatar: null };
+  /** LANDSCAPE: the column beside the avatar the stack stands in ({ left, width }), or null (centred). */
+  let beside = null;
   let shiftKey = '';
   let place = { dy: 0, wait: false };
   let holdWhy = '';
@@ -364,7 +417,13 @@ export function mountNotifyView(notifier, { root, setData = () => {}, logButtonH
       banner,
       blockers,
       maxBottom: Math.min(floor - 8, rr.height * 0.62),
+      floorBottom: floor - 8,
       rootW: rr.width,
+      rootH: rr.height,
+      avatar: rr.height < SHORT_SCREEN_H ? (() => { try { return avatarBox(); } catch { return null; } })() : null,
+      keepOut: rr.height < SHORT_SCREEN_H ? ['.touch-stick', '.touch-jump'].map((sel) => relRect(root.querySelector(sel), rr)).filter(Boolean) : [],
+      // The screen's safe area (style.css LANDSCAPE-HUD --safe-l / --safe-r, env() resolved).
+      ...(rr.height < SHORT_SCREEN_H ? safeSides(root) : { safeL: 0, safeR: 0 }),
       // A side sheet on the left (VERBS' panel shell) as well as a drawer's own left.
       insetL: Math.max(0, Number(side?.left) || 0, Number((() => { try { return sideInsetLeft(); } catch { return 0; } })()) || 0),
       insetR: Math.max(0, Number(side?.right) || 0),
@@ -427,12 +486,45 @@ export function mountNotifyView(notifier, { root, setData = () => {}, logButtonH
       shownBox = null;
       return;
     }
-    const left = (zones.rootW - w) / 2 + shift;
-    const rect = { left, right: left + w, top: zones.top, bottom: zones.top + h };
+    // Centred, at the width the stylesheet gives it (the stack may be standing narrower beside the avatar).
+    const cw = beside ? Math.max(0, Math.min(NOTICE_W, zones.rootW - 24 - room)) : w;
+    const cl = (zones.rootW - cw) / 2 + shift;
+    // Its height at the other width, roughly (the cards' lines rewrap), so the choice does not flip.
+    const ch = beside && cw > 0 ? Math.ceil((h * beside.width) / cw) : h;
+    const centred = { left: cl, right: cl + cw, top: zones.top, bottom: zones.top + ch };
+    let rect = centred;
     place = placeBelow(rect, zones.blockers, { margin: 6, maxBottom: zones.maxBottom });
+    // LANDSCAPE: on a short screen, over the avatar (or with no room left centred, where it would
+    // cover it), it steps beside it (noticesBesideAvatar).
+    const probe = place.wait ? centred : { ...centred, top: centred.top + place.dy, bottom: centred.bottom + place.dy };
+    const side = zones.avatar
+      ? noticesBesideAvatar({ rect: probe, avatar: zones.avatar, rootW: zones.rootW, rootH: zones.rootH, insetL: zones.insetL, insetR: zones.insetR, safeL: zones.safeL, safeR: zones.safeR, keepOut: zones.keepOut })
+      : null;
+    if (side) {
+      const sh = beside ? h : Math.ceil((h * w) / side.width);
+      const sideRect = { left: side.left, right: side.left + side.width, top: zones.top, bottom: zones.top + sh };
+      // Beside the avatar it covers nothing it keeps clear of, so it may run down to the pack row.
+      const sidePlace = placeBelow(sideRect, zones.blockers, { margin: 6, maxBottom: zones.floorBottom });
+      if (!sidePlace.wait) {
+        rect = sideRect;
+        place = sidePlace;
+      }
+    }
+    setBeside(rect === centred ? null : side);
     const top = Math.round(zones.top + place.dy);
     if (stack.style.top !== `${top}px`) stack.style.top = `${top}px`;
-    shownBox = place.wait ? null : { left, right: left + w, top, bottom: top + h };
+    shownBox = place.wait ? null : { left: rect.left, right: rect.right, top, bottom: top + h };
+  }
+
+  /** LANDSCAPE: stand the stack in a column beside the avatar, or back to the stylesheet's centre. */
+  function setBeside(next) {
+    const key = next ? `${next.left}:${next.width}` : '';
+    if (key === (beside ? `${beside.left}:${beside.width}` : '')) return;
+    beside = next;
+    stack.style.left = next ? `${next.left}px` : '';
+    stack.style.width = next ? `${next.width}px` : '';
+    stack.style.transform = next ? 'none' : '';
+    setData('notifyBeside', key);
   }
 
   return {
