@@ -26,7 +26,7 @@
  * to its Subway button (game.js warmSubwayPaper, loader.warm). It is one picture, held apart from the
  * regions' cap. Opened before it arrives (the Subway Map sign's view), it fades in over the sage.
  */
-import { HUB_MAP_BACKGROUNDS } from './hub-map-backgrounds.js?v=2b2d6468';
+import { HUB_MAP_BACKGROUNDS } from './hub-map-backgrounds.js?v=d6a23c90';
 import { SUBWAY_PAPER, subwayPaper } from './map-views.js?v=da2f063e';
 
 /** How many regions' paintings are held at once (the latest previews, your own region among them). */

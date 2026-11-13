@@ -1,5 +1,5 @@
 {
-  "note": "Region map backgrounds upscaled from Tiny Speck's CC0 world-map thumbnails (G471); a region with `repainted` carries a repaint made from its thumbnail instead (G522), its provenance in that file. Built by tools/map-backgrounds/build.mjs; do not edit.",
+  "note": "Region map backgrounds upscaled from Tiny Speck's CC0 world-map thumbnails (G471); a region with `repainted` carries a repaint made from its thumbnail instead (G522), or, with `thumb: null`, from its street layout (a region with no thumbnail, G569), its provenance in that file. Built by tools/map-backgrounds/build.mjs; do not edit.",
   "license": "CC0 (Tiny Speck, glitch-overlays)",
   "source": {
     "fla": "glitch-overlays/world_map.fla",
@@ -76,6 +76,28 @@
       "x1Sha256": "bb973998350578062231d15987801203a78b05ed09e6c2d0faeba9a91a3c9386",
       "x2Bytes": 89922,
       "x2Sha256": "35253bea08465e05a03f574edc598231c0c6b78b07cab0b4d8eb5317582a8e90"
+    },
+    "40": {
+      "hubName": "Naraka",
+      "thumb": null,
+      "x1": "assets/maps/art/bg/naraka.webp",
+      "x2": "assets/maps/art/bg/naraka@2x.webp",
+      "repainted": "tools/provenance/repainted-maps.json",
+      "x1Bytes": 29390,
+      "x1Sha256": "9f2a2786bdc7ea5b8305c2220f497ee032006921eaa8a4e0123fc0d4372bdf3c",
+      "x2Bytes": 88470,
+      "x2Sha256": "095c01e4eb0a21f2e7cb8688c3d46dfe9a2b9a148c8a80cb9a5c6b699b750eac"
+    },
+    "50": {
+      "hubName": "Ilmenskie Caverns",
+      "thumb": null,
+      "x1": "assets/maps/art/bg/ilmenskiecaverns.webp",
+      "x2": "assets/maps/art/bg/ilmenskiecaverns@2x.webp",
+      "repainted": "tools/provenance/repainted-maps.json",
+      "x1Bytes": 21514,
+      "x1Sha256": "14a2e6cfd920e1588284f532d3ef3d3277a3244dffc09f312c0ca8757b151d7a",
+      "x2Bytes": 87966,
+      "x2Sha256": "3d21a45949da88aa49c001cc32fb0c1ed0ae416de7265c1464ac7d127379aa5e"
     },
     "51": {
       "hubName": "Uralia",
@@ -157,6 +179,17 @@
       "x2Bytes": 83588,
       "x2Sha256": "c2be8d9dd2630f6900f608bc5d77a13a241a1cd1f5290248b6f3654abe94fa1f"
     },
+    "66": {
+      "hubName": "The Seams",
+      "thumb": null,
+      "x1": "assets/maps/art/bg/theseams.webp",
+      "x2": "assets/maps/art/bg/theseams@2x.webp",
+      "repainted": "tools/provenance/repainted-maps.json",
+      "x1Bytes": 16144,
+      "x1Sha256": "a22b6796b0d1a09afb46785fbff1a41513cb0377924b77cfbca4db9e13b37bd3",
+      "x2Bytes": 52134,
+      "x2Sha256": "ba012b27e8b101c491a4c768b7642ed930f3bd87cd79a027929d67ee73b7005d"
+    },
     "71": {
       "hubName": "Jethimadh",
       "symbol": "z_hub_maps_small/sm_jethimadh",
@@ -220,6 +253,17 @@
       "x1Sha256": "a0cad877631ab079b6638f35193c020fccf44ec9ebe14399e000b15a5c93082e",
       "x2Bytes": 164072,
       "x2Sha256": "dd6e7073b0ff6bfbc8c6f6706168186226e1466a776fc34449aa3388c7670b4e"
+    },
+    "78": {
+      "hubName": "Ilmenskie Deeps",
+      "thumb": null,
+      "x1": "assets/maps/art/bg/ilmenskiedeeps.webp",
+      "x2": "assets/maps/art/bg/ilmenskiedeeps@2x.webp",
+      "repainted": "tools/provenance/repainted-maps.json",
+      "x1Bytes": 21898,
+      "x1Sha256": "0c51778b079afb16f6070d1486d6590db43aa28ddfb154cd4233c4b437722111",
+      "x2Bytes": 79260,
+      "x2Sha256": "5f0fad98d242779cd1c98c77ba3d8d8ec7e6d8c99fa09f5ea1d8f78206643877"
     },
     "85": {
       "hubName": "Kajuu",

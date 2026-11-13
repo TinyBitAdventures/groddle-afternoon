@@ -199,7 +199,7 @@ export async function addStreets(d, { inventory, picture, slug }) {
         quests: [...(questsOn.get(g) || [])].sort(),
         achievement: completist.has(hubId) && exploration.countsTowardHub(g, hubId) ? completist.get(hubId) : null,
         strip,
-        map: map && bg ? { src: bg.x1, hi: bg.x2, w: map.w, h: map.h, line: map.line, hubId, repainted: Boolean(bg.repainted) } : null,
+        map: map && bg ? { src: bg.x1, hi: bg.x2, w: map.w, h: map.h, line: map.line, hubId, repainted: Boolean(bg.repainted), noThumb: Boolean(bg.noThumb) } : null,
       },
     };
     d.entries.set(`streets:${k.slug}`, { key: `streets:${k.slug}`, section: 'streets', id: k.slug, ...e });
@@ -276,6 +276,8 @@ const streetChip = (t, P, d, extra = '') => {
 export const MAP_ART_NOTE = Object.freeze({
   thumbnail: 'Tiny Speck’s painting of the region is lost; this is their small thumbnail of it, enlarged.',
   repainted: 'Tiny Speck’s painting of the region is lost; this one was repainted for the remake from their small thumbnail of it.',
+  // G569: a region the world map drew no thumbnail for (Naraka, the Ilmenskies, The Seams).
+  layout: 'Tiny Speck’s painting of the region is lost, with no thumbnail of it; this one was painted for the remake from its streets.',
 });
 
 /** The region map with this street drawn on it (an SVG line over Tiny Speck's map), and its loading picture. */
@@ -286,7 +288,7 @@ function pictures(e, p) {
   if (st.map) {
     const m = st.map;
     const line = ([x1, y1, x2, y2], cls) => `<line class="${cls}" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" />`;
-    out.push(`<figure class="st-fig st-map"><div class="st-map-frame"><img src="${p}${esc(m.src)}" srcset="${p}${esc(m.src)} 1x, ${p}${esc(m.hi)} 2x" alt="" width="${m.w}" height="${m.h}" loading="lazy" decoding="async" /><svg viewBox="0 0 ${m.w} ${m.h}" aria-hidden="true">${(m.near || []).map((l) => line(l, 'st-near')).join('')}${line(m.line, 'st-here')}</svg></div><figcaption>Where it is on the map of ${esc(e.group)}, with the streets its roads lead to. ${MAP_ART_NOTE[m.repainted ? 'repainted' : 'thumbnail']}</figcaption></figure>`);
+    out.push(`<figure class="st-fig st-map"><div class="st-map-frame"><img src="${p}${esc(m.src)}" srcset="${p}${esc(m.src)} 1x, ${p}${esc(m.hi)} 2x" alt="" width="${m.w}" height="${m.h}" loading="lazy" decoding="async" /><svg viewBox="0 0 ${m.w} ${m.h}" aria-hidden="true">${(m.near || []).map((l) => line(l, 'st-near')).join('')}${line(m.line, 'st-here')}</svg></div><figcaption>Where it is on the map of ${esc(e.group)}, with the streets its roads lead to. ${MAP_ART_NOTE[m.noThumb ? 'layout' : m.repainted ? 'repainted' : 'thumbnail']}</figcaption></figure>`);
   }
   return out.length ? `<div class="st-figs">${out.join('')}</div>` : '';
 }

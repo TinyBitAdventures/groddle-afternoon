@@ -46,6 +46,16 @@ Repainted region maps (G522, 2026-11-05)
     only         the painting from the 2012 video "tour: The Map of Ur" were looked at and described
                  in the prompt's words; neither was given to the model or is in this repo
 
+  Regions with no thumbnail (G569, 2026-11-13): Naraka (40), Ilmenskie Caverns (50), Ilmenskie
+  Deeps (78) and The Seams (66) are not on the world map, so they have no thumbnail; each is
+  painted from its street layout alone (art/bg/naraka, ilmenskiecaverns, ilmenskiedeeps,
+  theseams .webp and @2x.webp). Made by Grok Bot for Austin Ginder (who directed and chose them),
+  GPT Image 2.6 Sunburst in T3 Chat canvas; inputs: the street layout from the hub's CC0 map data,
+  a mask widened from it (not The Seams), a sheet of Tiny Speck CC0 decos. The 2012 encyclopedia
+  copies of the lost paintings (and wiki captures) were only looked at to write WHAT TO PAINT:
+  never attached, never in this repo. Prompts and inputs in the provenance file. Naraka's map
+  opens only for the dead, as in the client (HubMapDialog.as 475-484).
+
 CDN hub paintings (full 760×460 bg/fg) — URLs preserved, files NOT on Wayback
   assets/maps/art-urls.txt         — 89 original c1/c2.glitch.bz URLs
   Each hub JSON keeps bg / fg CDN strings; bgLocal/fgLocal fill when recovered

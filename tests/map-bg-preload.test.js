@@ -11,10 +11,10 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { HUB_MAP_BACKGROUNDS } from '../public/js/hub-map-backgrounds.js?v=2b2d6468';
+import { HUB_MAP_BACKGROUNDS } from '../public/js/hub-map-backgrounds.js?v=d6a23c90';
 import { WORLD_MAP } from '../public/js/map-views-data.js?v=8e7d7094';
 import { bindWorldMap } from '../public/js/map-views.js?v=da2f063e';
-import { MAP_THUMB_SOFT, buildHubMapView, renderHubMapSvg } from '../public/js/map-graph.js?v=00a8aaed';
+import { MAP_THUMB_SOFT, buildHubMapView, renderHubMapSvg } from '../public/js/map-graph.js?v=fb63e6de';
 import {
   MAP_BG_FADE_MS,
   MAP_BG_GIVE_UP_MS,
@@ -28,7 +28,7 @@ import {
   prepareSubwayPaper,
   subwayPaperFile,
   watchMapBg,
-} from '../public/js/map-bg-preload.js?v=e5252dcc';
+} from '../public/js/map-bg-preload.js?v=9afd8125';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const read = (p) => readFileSync(join(root, p), 'utf8');

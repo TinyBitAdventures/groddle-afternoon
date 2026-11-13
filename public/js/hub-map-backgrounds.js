@@ -4,20 +4,25 @@
  * Tiny Speck's CC0 world-map file (glitch-overlays/world_map.fla, z_hub_maps_small/sm_*.jpg; G471):
  * x1 fills the 760 x 460 frame, x2 is the same at twice the size for Retina screens.
  * `repainted`: the region's painting was repainted for the remake from that thumbnail (G522,
- * provenance in tools/provenance/repainted-maps.json).
+ * provenance in tools/provenance/repainted-maps.json). `noThumb`: the region has no thumbnail, so
+ * its repaint was made from its street layout (G569).
  * Provenance (symbol, sha256, recipe): assets/maps/art/bg/backgrounds.json.
  */
 export const HUB_MAP_BACKGROUNDS = Object.freeze({
   '27': Object.freeze({ x1: 'assets/maps/art/bg/ix.webp', x2: 'assets/maps/art/bg/ix@2x.webp', repainted: true }), // Ix
+  '40': Object.freeze({ x1: 'assets/maps/art/bg/naraka.webp', x2: 'assets/maps/art/bg/naraka@2x.webp', repainted: true, noThumb: true }), // Naraka
+  '50': Object.freeze({ x1: 'assets/maps/art/bg/ilmenskiecaverns.webp', x2: 'assets/maps/art/bg/ilmenskiecaverns@2x.webp', repainted: true, noThumb: true }), // Ilmenskie Caverns
   '51': Object.freeze({ x1: 'assets/maps/art/bg/uralia.webp', x2: 'assets/maps/art/bg/uralia@2x.webp', repainted: true }), // Uralia
   '56': Object.freeze({ x1: 'assets/maps/art/bg/groddleforest.webp', x2: 'assets/maps/art/bg/groddleforest@2x.webp', repainted: true }), // Groddle Forest
   '58': Object.freeze({ x1: 'assets/maps/art/bg/groddlemeadow.webp', x2: 'assets/maps/art/bg/groddlemeadow@2x.webp', repainted: true }), // Groddle Meadow
   '63': Object.freeze({ x1: 'assets/maps/art/bg/shimlamirch.webp', x2: 'assets/maps/art/bg/shimlamirch@2x.webp', repainted: true }), // Shimla Mirch
   '64': Object.freeze({ x1: 'assets/maps/art/bg/groddleheights.webp', x2: 'assets/maps/art/bg/groddleheights@2x.webp', repainted: true }), // Groddle Heights
+  '66': Object.freeze({ x1: 'assets/maps/art/bg/theseams.webp', x2: 'assets/maps/art/bg/theseams@2x.webp', repainted: true, noThumb: true }), // The Seams
   '71': Object.freeze({ x1: 'assets/maps/art/bg/jethimadh.webp', x2: 'assets/maps/art/bg/jethimadh@2x.webp', repainted: true }), // Jethimadh
   '72': Object.freeze({ x1: 'assets/maps/art/bg/chakraphool.webp', x2: 'assets/maps/art/bg/chakraphool@2x.webp', repainted: true }), // Chakra Phool
   '75': Object.freeze({ x1: 'assets/maps/art/bg/bortola.webp', x2: 'assets/maps/art/bg/bortola@2x.webp', repainted: true }), // Bortola
   '76': Object.freeze({ x1: 'assets/maps/art/bg/alakol.webp', x2: 'assets/maps/art/bg/alakol@2x.webp', repainted: true }), // Alakol
+  '78': Object.freeze({ x1: 'assets/maps/art/bg/ilmenskiedeeps.webp', x2: 'assets/maps/art/bg/ilmenskiedeeps@2x.webp', repainted: true, noThumb: true }), // Ilmenskie Deeps
   '85': Object.freeze({ x1: 'assets/maps/art/bg/kajuu.webp', x2: 'assets/maps/art/bg/kajuu@2x.webp', repainted: true }), // Kajuu
   '86': Object.freeze({ x1: 'assets/maps/art/bg/baqala.webp', x2: 'assets/maps/art/bg/baqala@2x.webp', repainted: true }), // Baqala
   '88': Object.freeze({ x1: 'assets/maps/art/bg/karnata.webp', x2: 'assets/maps/art/bg/karnata@2x.webp', repainted: true }), // Karnata

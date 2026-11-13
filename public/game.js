@@ -970,14 +970,15 @@ import {
   parseMapSearchValue,
   noteMapTrail,
   pickMapSpot,
+  hubMapRefusal,
   MAP_INDEX_URL,
   HUB_56_MAP_URL,
   PUBLIC_HUBS,
-} from './js/map-graph.js?v=00a8aaed';
+} from './js/map-graph.js?v=fb63e6de';
 // G471: the world map and the subway map in the Map's window.
 import { MAP_VIEW_TITLES, bindSubwayMap, bindWorldMap, mapViewSubtitle, nearestStation, renderSubwayMapSvg, renderWorldMapSvg, worldRegionList } from './js/map-views.js?v=da2f063e';
 // MAPLOAD: a region's painting fetched ahead of the click, its thumb in its place while it loads.
-import { createMapBgPreloader, mapBgFiles, prepareMapBg, prepareSubwayPaper, subwayPaperFile, watchMapBg } from './js/map-bg-preload.js?v=e5252dcc';
+import { createMapBgPreloader, mapBgFiles, prepareMapBg, prepareSubwayPaper, subwayPaperFile, watchMapBg } from './js/map-bg-preload.js?v=9afd8125';
 import { hubMapArtNote, hubMapSubtitle, questLogSummary } from './js/panel-copy.js?v=85c3e029';
 import { bindMapIconTips } from './js/ui/map-icon-tips.js?v=6b3eb3f9';
 import { createMapZoom } from './js/map-zoom.js?v=4c2ce0e3';
@@ -25680,6 +25681,17 @@ async function openMap(hubId, { find = '', focus = '', view: pickedView = '' } =
     console.error(err);
   }
   const targetHub = String(hubId || mapPanelHubId || spot.hubId);
+  // Naraka's map is for the dead when picked (map-graph.js hubMapRefusal): the map on show stays.
+  const refusal = hubId || mapPanelHubId ? hubMapRefusal(targetHub, { dead: playerIsDead() }) : '';
+  if (refusal) {
+    toast(refusal);
+    playSound('CLICK_FAILURE', { volume: 0.45 });
+    if (hubSelect && isMapOpen()) {
+      hubSelect.value = String(mapPanelHubId || spot.hubId);
+      hubCombobox?.refresh();
+    }
+    return;
+  }
   mapPanelHubId = hubId ? targetHub : mapPanelHubId;
   mapPanelStreetTsid = currentStreetTsid;
 

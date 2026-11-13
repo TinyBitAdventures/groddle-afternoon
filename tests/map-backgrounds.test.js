@@ -6,6 +6,8 @@
  *
  * G522: a region in tools/provenance/repainted-maps.json carries a painting repainted for the
  * remake from its thumbnail instead (Groddle Meadow first, Austin 2026-11-05); the builder keeps it.
+ * G569 (2026-11-13): four regions the world map drew no thumbnail for (Naraka, Ilmenskie Caverns,
+ * Ilmenskie Deeps, The Seams) carry a repaint made from their street layouts.
  */
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
@@ -15,8 +17,8 @@ import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { readThumbs, regionThumbs, repaints } from '../tools/map-backgrounds/build.mjs';
-import { HUB_MAP_BACKGROUNDS } from '../public/js/hub-map-backgrounds.js?v=2b2d6468';
-import { buildHubMapView, isPlaceholderMap, PLACEHOLDER_MAP_COLOURS, PUBLIC_HUBS, renderHubMapSvg } from '../public/js/map-graph.js?v=00a8aaed';
+import { HUB_MAP_BACKGROUNDS } from '../public/js/hub-map-backgrounds.js?v=d6a23c90';
+import { buildHubMapView, hubMapRefusal, isPlaceholderMap, PLACEHOLDER_MAP_COLOURS, PUBLIC_HUBS, renderHubMapSvg } from '../public/js/map-graph.js?v=fb63e6de';
 import { hubMapArtNote } from '../public/js/panel-copy.js?v=85c3e029';
 import { CHECKLIST } from '../tools/restoration/checklist.mjs';
 import { MAP_ART_NOTE } from '../tools/encyclopedia/streets.mjs';
@@ -79,6 +81,12 @@ describe('region map backgrounds (tools/map-backgrounds/build.mjs)', () => {
     assert.equal(MANIFEST.source.sha256, flaSha256);
     assert.match(MANIFEST.license, /CC0/);
     for (const [id, r] of Object.entries(MANIFEST.regions)) {
+      // A region with no thumbnail has only its repaint (G569).
+      if (r.thumb === null) {
+        assert.equal(r.repainted, 'tools/provenance/repainted-maps.json', id);
+        assert.equal(INDEX.hubs[id].thumbLocal, '', id);
+        continue;
+      }
       const t = thumbs.get(r.symbol.replace(/^.*\//, ''));
       assert.ok(t, `${id} ${r.symbol}`);
       assert.equal(r.sha256, t.sha256);
@@ -99,7 +107,10 @@ describe('region map backgrounds (tools/map-backgrounds/build.mjs)', () => {
     for (const id of ids) {
       const r = REPAINTS.regions[id];
       const name = `${id} ${r.hubName}`;
-      assert.equal(regions[id]?.hubName, r.hubName, `${name} is a region with a thumbnail`);
+      // A region with a thumbnail, or one of the four the world map drew none for (G569).
+      const noThumb = !INDEX.hubs[id].thumbLocal;
+      assert.equal(noThumb ? INDEX.hubs[id].hubName : regions[id]?.hubName, r.hubName, `${name} is a region`);
+      assert.equal(Boolean(HUB_MAP_BACKGROUNDS[id].noThumb), noThumb, name);
       // The game, the build manifest and the provenance name the same two files.
       assert.equal(HUB_MAP_BACKGROUNDS[id].repainted, true, name);
       assert.equal(MANIFEST.regions[id].repainted, 'tools/provenance/repainted-maps.json', name);
@@ -124,8 +135,9 @@ describe('region map backgrounds (tools/map-backgrounds/build.mjs)', () => {
         assert.ok(i.file && i.what && i.source, `${name}: input ${i.n}`);
         assert.match(i.sha256, /^[0-9a-f]{64}$/, `${name}: input ${i.n}`);
       }
-      // Its own thumbnail is the first input, byte for byte.
-      assert.equal(r.inputs[0].sha256, MANIFEST.regions[id].sha256, `${name}: input 1 is its thumbnail`);
+      // Its own thumbnail is the first input, byte for byte; with none, the street layout from its map data.
+      if (noThumb) assert.match(`${r.inputs[0].what} ${r.inputs[0].source}`, new RegExp(`streets[\\s\\S]*hub-${id}\\.json`), `${name}: input 1 is its street layout`);
+      else assert.equal(r.inputs[0].sha256, MANIFEST.regions[id].sha256, `${name}: input 1 is its thumbnail`);
       assert.match(r.source.toning, /^magick /, `${name}: the toning step`);
       // Player captures and footage are named as reference only, never as inputs.
       for (const i of r.inputs) assert.doesNotMatch(`${i.what} ${i.source}`, /wiki|footage|youtube|video|capture/i, `${name}: input ${i.n}`);
@@ -139,6 +151,8 @@ describe('region map backgrounds (tools/map-backgrounds/build.mjs)', () => {
     for (const id of ids) assert.ok(blurb.includes(`${REPAINTS.regions[id].hubName}’s`), `the report names ${REPAINTS.regions[id].hubName}`);
     assert.match(MAP_ART_NOTE.repainted, /repainted for the remake/);
     assert.match(MAP_ART_NOTE.thumbnail, /thumbnail of it, enlarged/);
+    assert.match(MAP_ART_NOTE.layout, /no thumbnail of it; this one was painted for the remake from its streets/);
+    assert.match(blurb, /Naraka’s, Ilmenskie Caverns’s, The Seams’s and Ilmenskie Deeps’s had no thumbnail, so they are painted for the remake from the streets alone/);
     for (const note of [blurb, ...Object.values(MAP_ART_NOTE)]) assert.doesNotMatch(note, /—|Glitch/, 'player words: no em-dash, no trademark');
   });
 
@@ -242,23 +256,16 @@ describe('region map backgrounds (tools/map-backgrounds/build.mjs)', () => {
 
   /**
    * G569 follow-up (Austin 2026-11-07: "Check the source first, then grey them if they used the
-   * placeholder"). The six unpainted hubs left after G569 each had a painting of their own in the
+   * placeholder"). The unpainted hubs left after G569 each had a painting of their own in the
    * original, so none goes grey: they keep the drawn terrain until a painting turns up. What the
    * original did, per hub (GSJS inc_data_maps_prod.js maps_get_hubs_<id>; client HubMapDialog.as;
    * street flags from the archived G*.xml; the 2012 encyclopedia copies are in
-   * research/wayback/raw/c1-img/maps_encyclopedia, reference only, never shipped):
+   * research/wayback/raw/c1-img/maps_encyclopedia, reference only, never shipped).
+   * Naraka (40), Ilmenskie Caverns (50), Ilmenskie Deeps (78) and The Seams (66) left this list on
+   * 2026-11-13: repainted from their street layouts (tools/provenance/repainted-maps.json). The
+   * Seams' encyclopedia copy and a 2012 wiki capture do survive (hunt 2026-11-04), reference only.
    */
   const OWN_LOST_MAPS = Object.freeze({
-    // map_bg_purgatory_69074.jpg + an fg. A dark red cavern with a spiral path (encyclopedia
-    // naraka_124737.jpg). The client showed it only to the dead: "You can only see the map of
-    // Naraka when you're dead." (HubMapDialog.as 475-484, Hub.HELL_TSID '40').
-    40: { name: 'Naraka', file: 'map_bg_purgatory_69074.jpg' },
-    // + an fg. Blue-grey rock with the tunnels cut through it (encyclopedia ilmenskie_caverns_77122.jpg).
-    50: { name: 'Ilmenskie Caverns', file: 'map_bg_ilmenskie_caverns_43684.jpg' },
-    // + an fg. Grey rock, tunnels and caverns (encyclopedia ilmenskie_deeps_77122.jpg).
-    78: { name: 'Ilmenskie Deeps', file: 'map_bg_ilmenskie_deep_48415.jpg' },
-    // No copy or footage. Distant End's street sets no_hubmap (map not available there).
-    66: { name: 'The Seams', file: 'map_bg_seamstreet_56971.jpg' },
     // + an fg. No thumbnail, copy or footage (research/zone-art/map-jethimadh-tower-base/pack.md).
     77: { name: 'Jethimadh Tower: Base', file: 'map_bg_jethimadh_tower_base_45753.jpg' },
     // No copy or footage. The tutorial hid the map until the Mappery card (newbie_island.js 250, 298).
@@ -267,6 +274,31 @@ describe('region map backgrounds (tools/map-backgrounds/build.mjs)', () => {
     // seven streets set no_hubmap, so the map window never opened there ("The map is not available
     // in this location", HubMapDialog.as 468-471).
     142: { name: 'Moshi Moshi Oshilatis', file: 'moshi_moshi_oshilatis_bg_1352509438.jpg' },
+  });
+
+  it('G569: the four lost maps with no thumbnail are repainted from their streets', () => {
+    for (const [id, name, key] of [['40', 'Naraka', 'naraka'], ['50', 'Ilmenskie Caverns', 'ilmenskiecaverns'], ['78', 'Ilmenskie Deeps', 'ilmenskiedeeps'], ['66', 'The Seams', 'theseams']]) {
+      assert.equal(INDEX.hubs[id].thumbLocal, '', `${name} has no thumbnail`);
+      assert.deepEqual({ ...HUB_MAP_BACKGROUNDS[id] }, { x1: `assets/maps/art/bg/${key}.webp`, x2: `assets/maps/art/bg/${key}@2x.webp`, repainted: true, noThumb: true }, name);
+      assert.equal(REPAINTS.regions[id].hubName, name);
+      assert.equal(MANIFEST.regions[id].thumb, null, name);
+      const view = buildHubMapView(hub(id), '', STREETS);
+      assert.equal(view.bgSoft, `assets/maps/art/bg/${key}.webp`, name);
+      assert.equal(view.thumbLocal || '', '', `${name}: no thumb to stand in while it loads`);
+      assert.equal(hubMapArtNote(view), 'repainted painting', name);
+    }
+  });
+
+  it('Naraka\'s map is only for the dead (HubMapDialog.as 475-484)', () => {
+    assert.equal(hubMapRefusal('40'), 'You can only see the map of Naraka when you\'re dead.');
+    assert.equal(hubMapRefusal(40, { dead: false }), 'You can only see the map of Naraka when you\'re dead.');
+    assert.equal(hubMapRefusal('40', { dead: true }), '');
+    for (const id of ['56', '50', '66', '78', '', null]) assert.equal(hubMapRefusal(id), '', String(id));
+    // game.js openMap asks before it shows a picked hub, and keeps the map on show.
+    const game = read('public/game.js');
+    const open = game.slice(game.indexOf('async function openMap('), game.indexOf('mapPanelStreetTsid = currentStreetTsid;', game.indexOf('async function openMap(')));
+    assert.match(open, /hubMapRefusal\(targetHub, \{ dead: playerIsDead\(\) \}\)/);
+    assert.ok(open.indexOf('hubMapRefusal(') < open.indexOf('mapPanelHubId = hubId ? targetHub'), 'refused before the picked hub is kept');
   });
 
   it('G569: the unpainted hubs with a lost map of their own stay drawn, not placeholder grey', () => {

@@ -5,7 +5,7 @@
  */
 
 import { listMapDestinations, planTravel, resolveLoadedTsid, tsidAliases } from './travel.js?v=7fd6e363';
-import { HUB_MAP_BACKGROUNDS } from './hub-map-backgrounds.js?v=2b2d6468';
+import { HUB_MAP_BACKGROUNDS } from './hub-map-backgrounds.js?v=d6a23c90';
 import { HUB_COLOURS } from './map-views-data.js?v=8e7d7094';
 
 /** Map catalog + per-hub files. */
@@ -88,6 +88,16 @@ export function pickMapSpot(candidates, hubHasMap, streetOnHub, fallback = '56')
   const known = rows.find((c) => hubHasMap(c.hubId));
   if (known) return { hubId: known.hubId, tsid: here, onMap: false };
   return { hubId: String(fallback), tsid: here, onMap: false };
+}
+
+/**
+ * Naraka's map is for the dead (HubMapDialog.as goToHubFromClick 475-484, Hub.HELL_TSID '40': "because
+ * mart has a link to a place in hell and you must be dead to see it"). The words a living player is
+ * told instead of the map, or '' when the hub's map may open.
+ */
+export const NARAKA_MAP_HUB = '40';
+export function hubMapRefusal(hubId, { dead = false } = {}) {
+  return String(hubId ?? '') === NARAKA_MAP_HUB && !dead ? 'You can only see the map of Naraka when you\'re dead.' : '';
 }
 
 /**

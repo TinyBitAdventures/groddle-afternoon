@@ -32,14 +32,26 @@ import { readFileSync } from 'node:fs';
 /**
  * What the region maps' paintings are (G471, G522): Tiny Speck's are lost, so a map shows the
  * region's thumbnail enlarged (tools/map-backgrounds/build.mjs), or a painting repainted from it
- * for the remake (tools/provenance/repainted-maps.json). The sentence follows that file.
+ * for the remake (tools/provenance/repainted-maps.json). A region with no thumbnail (G569: Naraka,
+ * the Ilmenskies, The Seams) is painted from its street layout. The sentence follows those files.
+ * Each region is { name, thumb } (a bare name is a region with a thumbnail).
  */
-export function mapArtLine(repainted = Object.values(JSON.parse(readFileSync(new URL('../provenance/repainted-maps.json', import.meta.url), 'utf8')).regions).map((r) => r.hubName)) {
+export function repaintedRegions() {
+  const read = (rel) => JSON.parse(readFileSync(new URL(rel, import.meta.url), 'utf8'));
+  const index = read('../../public/assets/maps/index.json').hubs || {};
+  return Object.entries(read('../provenance/repainted-maps.json').regions).map(([id, r]) => ({ name: r.hubName, thumb: Boolean(index[id]?.thumbLocal) }));
+}
+
+export function mapArtLine(repainted = repaintedRegions()) {
   const lost = 'Tiny Speck’s map paintings are lost, so each region’s map shows their small thumbnail of it, enlarged';
-  if (!repainted.length) return `${lost}.`;
-  const names = repainted.map((n) => `${n}’s`);
-  const list = names.length === 1 ? names[0] : `${names.slice(0, -1).join(', ')} and ${names.at(-1)}`;
-  return `${lost}; ${list} ${names.length === 1 ? 'is repainted for the remake from its thumbnail' : 'are repainted for the remake from their thumbnails'}.`;
+  const rows = repainted.map((r) => (typeof r === 'string' ? { name: r, thumb: true } : r));
+  const and = (names) => (names.length === 1 ? names[0] : `${names.slice(0, -1).join(', ')} and ${names.at(-1)}`);
+  const withThumb = rows.filter((r) => r.thumb).map((r) => `${r.name}’s`);
+  const noThumb = rows.filter((r) => !r.thumb).map((r) => `${r.name}’s`);
+  const parts = [];
+  if (withThumb.length) parts.push(`${and(withThumb)} ${withThumb.length === 1 ? 'is repainted for the remake from its thumbnail' : 'are repainted for the remake from their thumbnails'}`);
+  if (noThumb.length) parts.push(`${and(noThumb)} ${noThumb.length === 1 ? 'had no thumbnail, so it is painted' : 'had no thumbnail, so they are painted'} for the remake from the streets alone`);
+  return parts.length ? `${lost}; ${parts.join('; ')}.` : `${lost}.`;
 }
 
 export const STATUS = Object.freeze({

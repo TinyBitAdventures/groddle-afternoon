@@ -96,7 +96,7 @@ describe('Made for Groddle data (tools/made-art/build-data.mjs)', () => {
     // The gallery: three thumbnails and their paintings, the same shape so they show at the same size.
     const gal = piece('maps:27,107,131');
     assert.equal(gal.image.w * gal.original.h, gal.original.w * gal.image.h);
-    assert.match(gal.facts.find((f) => f.label === 'How it was checked').text, /47 regions/);
+    assert.match(gal.facts.find((f) => f.label === 'How it was checked').text, /51 regions in all were painted again, four of them with no thumbnail/);
     // Each composed picture is the one tools/made-art/showcase.json records, and every recorded one is shown.
     const shownFiles = made.pieces.flatMap((p) => [p.image.src, p.original?.src]).filter((f) => f?.startsWith('/assets/made-art/')).map((f) => `public${f}`);
     assert.deepEqual(shownFiles.sort(), Object.keys(more.showcase.files).sort());
