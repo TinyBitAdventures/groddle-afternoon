@@ -463,6 +463,23 @@ export const locationEventsApi = {
     return fire(engine, name, target, clock);
   },
   flag: (name) => Boolean(current?.runtime.flags.has(name)),
+  /**
+   * Set or clear one of the street's flags (street-toys-mp: the server already decided, so a lock the
+   * street keeps here must not stop the event it sends). Answers false when no scripts run.
+   */
+  setFlag(name, on) {
+    if (!current) return false;
+    if (on) current.runtime.flags.add(name);
+    else current.runtime.flags.delete(name);
+    return true;
+  },
+  /** Drop the street's pending delayed runs of one event (the server runs that timer); answers how many. */
+  cancel(name) {
+    if (!current) return 0;
+    const before = current.runtime.timers.length;
+    current.runtime.timers = current.runtime.timers.filter((t) => t.event !== name);
+    return before - current.runtime.timers.length;
+  },
   /** Effective gravity against normal (negative while a script inverts it). */
   gravity() {
     const setting = effectiveSetting(clock);

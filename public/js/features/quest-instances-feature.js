@@ -93,7 +93,7 @@ import {
 } from '../quest-instance.js?v=f0df88c3';
 import { FAMILIAR_GATES, QUEST_ROOMS, REMINISCE_ITEMS, ROOM_ITEMS, isBuiltRoom, questGiver, roomModulePath } from '../quest-rooms/catalog.js?v=a217b716';
 import * as kit from '../quest-rooms/kit.js?v=8bb400ea';
-import { locationEventsApi } from './location-events-feature.js?v=0cda70ed';
+import { locationEventsApi } from './location-events-feature.js?v=f2b6c156';
 import {
   acceptOffer,
   ensureQuestOfferState,

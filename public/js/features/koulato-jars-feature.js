@@ -14,7 +14,7 @@
  */
 
 import { JAR_BOXES, JAR_DECOS, JAR_FLIES, countArrival, isKoulatoCluster, litJars, normalizeJarSave } from '../koulato-jars.js?v=5838b30a';
-import { locationEventsApi } from './location-events-feature.js?v=0cda70ed';
+import { locationEventsApi } from './location-events-feature.js?v=f2b6c156';
 
 export const KOULATO_JARS_FEATURE_ID = 'koulato-jars';
 const DATA_MS = 250;
