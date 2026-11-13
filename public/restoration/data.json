@@ -2752,9 +2752,14 @@
   "deployed": "2026-11-12"
  },
  "git": {
-  "commits": 1848,
+  "commits": 1850,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-12",
+    "kind": "fix",
+    "text": "Wood Trees take each player's pet and water every 5 minutes, so a planted one grows in about 95 minutes, not 20 game days"
+   },
    {
     "date": "2026-11-12",
     "kind": "new",
@@ -2869,14 +2874,9 @@
     "date": "2026-11-12",
     "kind": "fix",
     "text": "Each recipe's iMG is capped per game day, as Glitch capped it"
-   },
-   {
-    "date": "2026-11-12",
-    "kind": "fix",
-    "text": "Buffs freeze while the game is closed and pick up where they stopped; the ones that ran on end with their end effects"
    }
   ]
  },
- "tests": 915,
+ "tests": 916,
  "generatedAt": "2026-11-12"
 }
