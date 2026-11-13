@@ -2792,9 +2792,14 @@
   "deployed": "2026-11-13"
  },
  "git": {
-  "commits": 2050,
+  "commits": 2051,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-13",
+    "kind": "fix",
+    "text": "Meat Collectors, Milkers, Feeders and Magic Sticks now say they work on your home street"
+   },
    {
     "date": "2026-11-13",
     "kind": "fix",
@@ -2909,14 +2914,9 @@
     "date": "2026-11-13",
     "kind": "fix",
     "text": "Summoned from inside someone else's house, a friend lands at that house's front door and both players are told so"
-   },
-   {
-    "date": "2026-11-13",
-    "kind": "improve",
-    "text": "Made for Groddle on /restoration/ shows the subway map paper, EZ Cookin's new props and three more region maps beside what they came from"
    }
   ]
  },
- "tests": 963,
+ "tests": 964,
  "generatedAt": "2026-11-13"
 }

@@ -13,7 +13,7 @@
  *
  * Canvas data: questPlate (the adopted card's id), questPlateOpen, questCaption.
  */
-import { DOT_DONE, QUEST_PLATE_CARDS, captionMs, compactCount, dotCount, nextCaption, tidy } from '../quest-plate.js?v=aa3c45d0';
+import { DOT_DONE, QUEST_PLATE_CARDS, captionMs, compactCount, dotCount, nextCaption, tidy } from '../quest-plate.js?v=691cad9e';
 
 export const QUEST_PLATE_FEATURE_ID = 'quest-plate';
 const SYNC_MS = 150;
@@ -217,6 +217,8 @@ function fillProgress(card, cfg) {
     }
   } else if (cfg.count) {
     html = escapeHtml(compactCount(read(card, cfg.count)?.textContent, cfg.unit));
+    const note = cfg.countNote ? read(card, cfg.countNote) : null;
+    if (html && note && !note.hidden && note.dataset.short) html += ` · ${escapeHtml(note.dataset.short)}`;
   } else if (cfg.progress) {
     html = escapeHtml(compactCount(read(card, cfg.progress)?.textContent));
   }

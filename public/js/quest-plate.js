@@ -30,6 +30,7 @@
 /**
  * The quest cards that fold into the pill: each card's id and where its parts are.
  * title/stage/timer/leave/step/line/count/progress are selectors inside the card;
+ * countNote (#298) is a note beside the count: shown, its data-short follows the count in the pill;
  * icon is an <img> (or a mark whose text is the icon); dots are the progress marks
  * (done when they carry one of DOT_DONE).
  */
@@ -38,7 +39,7 @@ export const QUEST_PLATE_CARDS = Object.freeze([
   { id: 'greedy-street-hud', title: '.greedy-street-heading strong', stage: '[data-greedy-stage]', icon: '.greedy-street-mark', timer: '[data-greedy-timer]', leave: '#greedy-street-leave-btn', step: '[data-greedy-objective]', line: '[data-greedy-line]', dots: '[data-greedy-act]' },
   { id: 'four-letter-hud', title: '.four-letter-heading strong', stage: '[data-four-letter-progress]', icon: '.four-letter-heading img', leave: '#four-letter-leave-btn', step: '[data-four-letter-riddle]' },
   { id: 'legalize-hud', title: '.legalize-heading strong', stage: '[data-legalize-stage]', icon: '.legalize-heading img', leave: '#legalize-leave-btn', step: '[data-legalize-objective]', count: '[data-legalize-progress]' },
-  { id: 'winter-walk-hud', title: '.winter-walk-heading strong', stage: '[data-winter-stage]', icon: '.winter-walk-heading img', timer: '[data-winter-timer]', leave: '#winter-walk-leave-btn', step: '[data-winter-objective]', count: '[data-winter-motes]', unit: 'motes' },
+  { id: 'winter-walk-hud', title: '.winter-walk-heading strong', stage: '[data-winter-stage]', icon: '.winter-walk-heading img', timer: '[data-winter-timer]', leave: '#winter-walk-leave-btn', step: '[data-winter-objective]', count: '[data-winter-motes]', unit: 'motes', countNote: '[data-winter-mote-cap]' },
   { id: 'summers-day-hud', title: '.summers-day-heading strong', stage: '[data-summer-stage]', timer: '[data-summer-timer]', leave: '#summers-day-leave-btn', step: '[data-summer-objective]', count: '[data-summer-progress]' },
   { id: 'rook-woods-hud', title: '.rook-woods-heading strong', stage: '[data-rook-tool]', timer: '[data-rook-timer]', leave: '#rook-woods-leave-btn', step: '[data-rook-objective]' },
   { id: 'rook-museum-hud', title: '.rook-museum-heading strong', stage: '[data-rook-museum-stage]', icon: '.rook-museum-mark', leave: '#rook-museum-leave-btn', step: '[data-rook-museum-objective]', count: '[data-rook-museum-count]' },

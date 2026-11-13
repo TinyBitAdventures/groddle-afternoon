@@ -286,6 +286,31 @@ export function winterWalkProgress(state) {
   };
 }
 
+/**
+ * #298 (G701): at the daily quoin limit the iMG motes refuse, as a quoin does in Glitch
+ * (items/quoin.js 159: no message at all), and the walk's "0/15 motes" looked broken. The rule
+ * stays; the first mote refused in a walk says why (the limit prompt's own words, js/quoins.js
+ * quoinLimitPrompt), and the count says so beside it. A mote left behind stays in the run
+ * (#220 winterWalkRun keeps only the motes taken), so it is there on the next walk.
+ */
+export const WINTER_MOTE_LIMIT_NOTICE =
+  "You've reached your limit on quoins for this game day, and winter motes are quoins too. The motes you leave will still be here on a walk next game day.";
+/** Beside the count: the card's line, and the pill's short word. */
+export const WINTER_MOTE_LIMIT_NOTE = "Today's quoin limit is reached: the motes wait for the next game day.";
+export const WINTER_MOTE_LIMIT_SHORT = 'quoin limit';
+
+/** Whether this mote is held back by the limit (a Qurazy is outside it, quoin.js 159). */
+export function winterMoteCapped(kind, { collectedToday = 0, dailyLimit = Infinity } = {}) {
+  return kind !== 'qurazy' && Number(collectedToday) >= Number(dailyLimit);
+}
+
+/** The notice for a refused mote: once per walk, then ''. */
+export function winterMoteLimitNotice(state) {
+  if (!state || state.limitNoticeShown) return '';
+  state.limitNoticeShown = true;
+  return WINTER_MOTE_LIMIT_NOTICE;
+}
+
 export function winterWalkObjective(state) {
   if (!state) return 'Begin the Winter Walk';
   if (state.status === 'expired') return 'The winter path faded';

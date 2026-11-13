@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=6fdbf4c5';
 import { createErrorOnce, createFeatureHost } from './js/feature-host.js?v=06bb8b74';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=0cbbccfb';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=cd92dff0';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl, drawTileArt } from './js/enter-chooser.js?v=4a3ea327';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, bodyReachDistance, OUT_OF_REACH_LINE } from './js/reach.js?v=8e52df56';
@@ -151,12 +151,14 @@ import {
   noteWinterMoteTaken,
   noteWinterWalkEnd,
   returnToWinterWalk,
+  winterMoteCapped,
   winterMoteKind,
+  winterMoteLimitNotice,
   winterWalkObjective,
   winterWalkProgress,
   winterWalkRemainingMs,
   winterWalkRun,
-} from './js/winter-walk.js?v=b07450d2';
+} from './js/winter-walk.js?v=f830b2aa';
 import {
   SUMMERS_DAY_ANNEX_BOWL,
   SUMMERS_DAY_ANNEX_FLOOR_Y,
@@ -18953,6 +18955,10 @@ function renderWinterWalkHud() {
   }
   if (objective) objective.textContent = winterWalkObjective(winterWalkState);
   if (motes) motes.textContent = `${progress.collected} / ${progress.total}`;
+  // #298: at the daily quoin limit the motes refuse; the count says so beside it (card and pill).
+  const capNote = hud.querySelector('[data-winter-mote-cap]');
+  const capped = winterMoteCapped('mote', quoinState) && progress.collected < progress.total;
+  if (capNote && capNote.hidden === capped) capNote.hidden = !capped;
   if (img) img.textContent = winterWalkState.imgEarned.toLocaleString();
   if (app?.canvas) {
     app.canvas.dataset.winterWalkStatus = winterWalkState.status;
@@ -19058,8 +19064,12 @@ async function startWinterWalk(opts = {}) {
 function collectWinterWalkMote(entry) {
   if (!entry?.sprite || entry.collected || !winterWalkState) return false;
   // The motes are iMG quoins in a place that keeps the daily quoin limit (items/quoin.js 159, 236-237);
-  // a Qurazy is outside it (159).
-  if (entry.kind !== 'qurazy' && quoinState.collectedToday >= quoinState.dailyLimit) return false;
+  // a Qurazy is outside it (159). #298: the first one refused in a walk says why.
+  if (winterMoteCapped(entry.kind, quoinState)) {
+    const notice = winterMoteLimitNotice(winterWalkState);
+    if (notice) toast(notice, 6000);
+    return false;
+  }
   const result = collectWinterMote(
     winterWalkState,
     entry.stage,
