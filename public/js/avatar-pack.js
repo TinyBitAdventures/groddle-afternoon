@@ -163,3 +163,45 @@ export function redrawFrame(sprite) {
   if (sprite.updateAnchor && tex.defaultAnchor) sprite.anchor.copyFrom(tex.defaultAnchor);
   return true;
 }
+
+/**
+ * Frames a freed sheet's texture stays drawable for (G655). Pixi keeps each batch's list of
+ * textures until the render group's draw list is rebuilt, and a sprite moved to a texture whose
+ * source is already in its batch (a freed idle frame swapped for its stand-in from the base sheet)
+ * only updates in place (BatcherPipe checkAndUpdateTexture), so the batch still binds the freed
+ * source on the next render. Destroyed there, it threw "Cannot read properties of null (reading
+ * 'addressModeU')" (GlTextureSystem.updateStyle on the destroyed source's style). game.js marks the
+ * draw lists to be rebuilt and destroys the sheet only after this many frames.
+ */
+export const RETIRE_FRAMES = 2;
+
+/**
+ * A queue of releases that run `frames` ticks after they were added (game.js ticks it once a
+ * frame, before that frame's render). A release that throws is reported and dropped.
+ */
+export function createRetireQueue({ frames = RETIRE_FRAMES, warn = null } = {}) {
+  const rows = [];
+  return {
+    add(release) {
+      if (typeof release === 'function') rows.push({ release, left: Math.max(1, frames) });
+    },
+    tick() {
+      const due = [];
+      for (let i = rows.length - 1; i >= 0; i--) {
+        rows[i].left -= 1;
+        if (rows[i].left <= 0) due.push(...rows.splice(i, 1));
+      }
+      for (const row of due.reverse()) {
+        try {
+          row.release();
+        } catch (err) {
+          (warn || console.warn)('texture release failed', err);
+        }
+      }
+      return due.length;
+    },
+    get size() {
+      return rows.length;
+    },
+  };
+}

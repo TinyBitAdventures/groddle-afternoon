@@ -16,7 +16,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { remotesOnFreedFrames } from '../public/js/features/realtime-feature.js?v=05f1cc84';
+import { remotesOnFreedFrames } from '../public/js/features/realtime-feature.js?v=b787af61';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const read = (rel) => readFileSync(join(here, '..', rel), 'utf8');
@@ -86,3 +86,21 @@ describe('the freed idle sheet goes only after the other Glitches let go of it',
     assert.match(body, /if \(!pack\.pending\) appearanceTexCache\.set\(key, pack\);/);
   });
 });
+
+describe('G655: a freed sheet is destroyed only after the batches stop binding it', () => {
+  it('dropIdleSheet forgets the sheet at once and leaves the destroy to the retire queue', () => {
+    const game = read('public/game.js');
+    const body = fnBody(game, 'dropIdleSheet');
+    assert.match(body, /sheet\.forget\?\.\(\);\s*retireTextures\(\(\) => sheet\.release\?\.\(\)\);/);
+    assert.doesNotMatch(body.replace(/retireTextures\(\(\) => sheet\.release\?\.\(\)\)/, ''), /sheet\.release\?\.\(\)/, 'never released on the spot');
+    const retire = fnBody(game, 'retireTextures');
+    // The entity layer is a render group of its own once the street map has drawn it alone.
+    assert.match(retire, /entityLayer\?\.renderGroup, player\?\.parentRenderGroup, world\?\.renderGroup, app\?\.stage\?\.renderGroup/);
+    assert.match(read('public/js/ui/street-minimap.js'), /renderer\.render\(\{ container: layer, target: rt/);
+    assert.match(retire, /structureDidChange = true/);
+    assert.match(game, /const gameFrame = \(ticker\) => \{\s*syncStreetFront\(\);\s*\/\/[^\n]*\n\s*retireQueue\.tick\(\);/);
+    // A trimmed look's canvases go the same way.
+    assert.match(fnBody(game, 'trimVectorBakes'), /retireTextures\(/);
+  });
+});
+

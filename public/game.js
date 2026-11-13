@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=f6c16f91';
 import { createErrorOnce, createFeatureHost } from './js/feature-host.js?v=06bb8b74';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=5cb5b835';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=34aa29b9';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl, drawTileArt } from './js/enter-chooser.js?v=4a3ea327';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -817,7 +817,7 @@ import { climbBobY, ladderAnimState, ladderSwap } from './js/ladder-anim.js?v=a8
 import { VECTOR_AVATAR } from './js/avatar-vector-sheets.js?v=ad801376';
 import { createNpcGlitchKit } from './js/npc-glitch.js?v=28b5c170';
 import { bakeIdleSheet, bakeLook, bakeSheet, loadCatalog as loadAvatarCatalog, paintPreview as paintVectorPreview, prepareIdle, prepareLook } from './js/avatar-compositor.js?v=8b20791a';
-import { LATE_SHEETS, anchorSheetFrames, ensureAnimSheets, ensureLateSheet, fillPackAnims, packComplete, redrawFrame, showsStandIn } from './js/avatar-pack.js?v=d8fba962';
+import { LATE_SHEETS, anchorSheetFrames, createRetireQueue, ensureAnimSheets, ensureLateSheet, fillPackAnims, packComplete, redrawFrame, showsStandIn } from './js/avatar-pack.js?v=65324246';
 import { catalogItem, lookKey, randomVectorFields, resolveLook, variantSwatch } from './js/avatar-looks.js?v=76eb9653';
 import {
   createDefaultAppearance,
@@ -11148,16 +11148,26 @@ const appearanceTexCache = new Map();
 const idleSheetTextures = new Map();
 function loadIdleSheetTexture(def) {
   if (!idleSheetTextures.has(def.url)) {
-    idleSheetTextures.set(def.url, loadTexture(def.url).then((tex) => ({
-      def,
-      frames: sliceSheet(tex.source, def, def.frameCount ?? null),
-      // Free the decoded sheet (and its 3x upgrade); the next use fetches it again.
-      release() {
+    idleSheetTextures.set(def.url, loadTexture(def.url).then((tex) => {
+      // G655: forgotten at once (the next use fetches it again), destroyed frames later (retireTextures).
+      let forgotten = false;
+      const forget = () => {
+        if (forgotten) return;
+        forgotten = true;
         idleSheetTextures.delete(def.url);
         forgetTexture(def.url);
-        tex.source.destroy();
-      },
-    }))
+      };
+      return {
+        def,
+        frames: sliceSheet(tex.source, def, def.frameCount ?? null),
+        forget,
+        // Free the decoded sheet (and its 3x upgrade).
+        release() {
+          forget();
+          if (!tex.source.destroyed) tex.source.destroy();
+        },
+      };
+    })
       .catch((err) => {
         idleSheetTextures.delete(def.url);
         throw err;
@@ -11362,7 +11372,7 @@ function vectorAnimPack(key, app, { full = false } = {}) {
           bake.bases.push(base);
           const release = () => {
             bake.bases = bake.bases.filter((b) => b !== base);
-            base.destroy();
+            if (!base.destroyed) base.destroy();
           };
           return { def, stats, release, frames: sliceSheet(base, { fw: def.fw, fh: def.fh, cols: def.cols, rows: def.rows }, def.cells) };
         };
@@ -11399,7 +11409,10 @@ function trimVectorBakes(keep) {
     if (lk === keep || !bake.pack || bake.finishing || bake.ownKeys.size || player?.anims === bake.pack.anims || heldGlitchAnims.has(bake.pack.anims)) continue;
     if (performance.now() - bake.askedAt < VECTOR_BAKE_ASKED_MS) continue;
     for (const [k, p] of appearanceTexCache) if (p.anims === bake.pack.anims) appearanceTexCache.delete(k);
-    for (const base of bake.bases) base.destroy();
+    // G655: destroyed once no batch can still bind them (retireTextures).
+    const bases = bake.bases;
+    bake.bases = [];
+    retireTextures(() => { for (const base of bases) if (!base.destroyed) base.destroy(); });
     vectorBakes.delete(lk);
   }
 }
@@ -12029,8 +12042,28 @@ function dropIdleSheet(pack, name) {
     refilled.add(p.anims);
   }
   features.collect('glitchFramesFreed', refilled, engine);
-  sheet.release?.();
+  // G655: a batch may still bind the sheet on this frame's render, though no sprite shows it now.
+  sheet.forget?.();
+  retireTextures(() => sheet.release?.());
   if (app?.canvas && player?.pack === pack) app.canvas.dataset.playerIdleSheets = Object.keys(pack.sheets).filter((n) => IDLE_SHEETS.includes(n)).join(',');
+}
+
+/**
+ * G655: textures freed while the game runs are destroyed only after the draw lists were rebuilt
+ * without them. Pixi keeps a batch's textures until its render group's draw list is rebuilt, and a
+ * sprite moved onto a texture already in its batch (a freed idle frame swapped for its stand-in
+ * from the base sheet) is updated in place, so the next render still binds the freed source: one
+ * destroyed there threw "Cannot read properties of null (reading 'addressModeU')" (seen with three
+ * players in one look, register G655). Every draw list a Glitch can be in is marked to be rebuilt:
+ * the entity layer's own (Pixi makes it a render group of its own once the street map draws it
+ * alone, js/ui/street-minimap.js), the world's and the stage's; the release runs RETIRE_FRAMES
+ * frames later (gameFrame ticks the queue).
+ */
+const retireQueue = createRetireQueue();
+function retireTextures(release) {
+  const groups = new Set([entityLayer?.renderGroup, player?.parentRenderGroup, world?.renderGroup, app?.stage?.renderGroup]);
+  for (const group of groups) if (group) group.structureDidChange = true;
+  retireQueue.add(release);
 }
 
 /** AvatarController: a key or click restarts the AFK timer and returns from AFK. */
@@ -33585,6 +33618,8 @@ async function main() {
   const frameFailed = createErrorOnce();
   const gameFrame = (ticker) => {
     syncStreetFront();
+    // G655: freed textures go once the renders since have rebuilt their batches (retireTextures).
+    retireQueue.tick();
     orderPromptLayer();
     tickAtmosphere();
     if (!state.started) {

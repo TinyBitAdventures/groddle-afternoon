@@ -16,7 +16,9 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
   LATE_SHEETS, anchorSheetFrames, ensureAnimSheets, ensureLateSheet, fillPackAnims, lateSheetsForAnim, packComplete, redrawFrame, sheetsForAnim, showsStandIn, standInFrame,
-} from '../public/js/avatar-pack.js?v=d8fba962';
+  RETIRE_FRAMES,
+  createRetireQueue,
+} from '../public/js/avatar-pack.js?v=65324246';
 import { ANIMS, CORE_SHEETS, FALL_LOOP, SHEET_FRAMES, animForState, frameRef } from '../public/js/avatar-anims.js?v=fb921bf4';
 import { SHEET_ORDER, bakeLook, bakeSheet } from '../public/js/avatar-compositor.js?v=8b20791a';
 import { expandRig, lookMatrices, slotAssignments } from '../public/js/avatar-rig.js?v=b67f0da8';
@@ -373,7 +375,8 @@ describe('game wiring (G614)', () => {
     assert.match(body, /const adopt = [\s\S]*?new PIXI\.CanvasSource\(\{ resource: canvas, resolution: scale, scaleMode: 'linear' \}\);\s*bake\.bases\.push\(base\);/);
     assert.match(body, /const sheet = adopt\(name, canvas, def, at, stats\);/);
     const trim = fnBody(game, 'trimVectorBakes');
-    assert.match(trim, /for \(const base of bake\.bases\) base\.destroy\(\);\s*vectorBakes\.delete\(lk\);/);
+    // G655: every base goes, through the retire queue (destroyed once no batch binds it).
+    assert.match(trim, /const bases = bake\.bases;\s*bake\.bases = \[\];\s*retireTextures\(\(\) => \{ for \(const base of bases\) if \(!base\.destroyed\) base\.destroy\(\); \}\);\s*vectorBakes\.delete\(lk\);/);
     // Never the player's own look (worn or still painting), a look another player is drawn with, or one just asked for.
     assert.match(trim, /bake\.finishing \|\| bake\.ownKeys\.size \|\| player\?\.anims === bake\.pack\.anims \|\| heldGlitchAnims\.has\(bake\.pack\.anims\)/);
     assert.match(trim, /performance\.now\(\) - bake\.askedAt < VECTOR_BAKE_ASKED_MS/);
@@ -412,3 +415,65 @@ describe('game wiring (G614)', () => {
     assert.match(game, /import \{[^}]*\bfillPackAnims\b[^}]*\} from '\.\/js\/avatar-pack\.js/);
   });
 });
+
+/**
+ * G655 with a model of Pixi's batch: a sprite moved onto a texture already in its batch is updated
+ * in place (BatcherPipe checkAndUpdateTexture), so the batch keeps binding the old source until the
+ * draw list is rebuilt. Destroying it before then is the addressModeU error.
+ */
+describe('a freed sheet waits for the batches (G655)', () => {
+  function model() {
+    const base = { id: 'base', destroyed: false };
+    const idle3 = { id: 'idle3', destroyed: false };
+    const batch = { textures: [base, idle3] };
+    let rebuild = false;
+    const sprite = { source: idle3 };
+    const errors = [];
+    const render = () => {
+      if (rebuild) {
+        batch.textures = [...new Set([sprite.source])];
+        rebuild = false;
+      }
+      for (const t of batch.textures) if (t.destroyed) errors.push(`bound destroyed ${t.id}`);
+    };
+    return { base, idle3, batch, sprite, errors, render, markRebuild: () => { rebuild = true; } };
+  }
+
+  it('destroying at once, as before, binds the destroyed source on the next render', () => {
+    const m = model();
+    m.sprite.source = m.base; // the stand-in: base is in the batch, so no rebuild
+    m.idle3.destroyed = true;
+    m.render();
+    assert.deepEqual(m.errors, ['bound destroyed idle3']);
+  });
+
+  it('the retire queue destroys it RETIRE_FRAMES ticks later, after a rebuilt render', () => {
+    const m = model();
+    const q = createRetireQueue();
+    m.sprite.source = m.base;
+    m.markRebuild();
+    q.add(() => { m.idle3.destroyed = true; });
+    for (let frame = 0; frame < RETIRE_FRAMES + 2; frame++) {
+      q.tick();
+      m.render();
+    }
+    assert.equal(m.idle3.destroyed, true);
+    assert.deepEqual(m.errors, []);
+    assert.equal(q.size, 0);
+  });
+
+  it('runs each release once, in order, and survives one that throws', () => {
+    const q = createRetireQueue({ frames: 2, warn: () => {} });
+    const ran = [];
+    q.add(() => ran.push('a'));
+    q.add(() => { throw new Error('x'); });
+    q.add(() => ran.push('c'));
+    q.add('not a function');
+    assert.equal(q.size, 3);
+    assert.equal(q.tick(), 0);
+    assert.equal(q.tick(), 3);
+    assert.deepEqual(ran, ['a', 'c']);
+    assert.equal(q.tick(), 0);
+  });
+});
+
