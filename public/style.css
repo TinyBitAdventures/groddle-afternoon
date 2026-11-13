@@ -10860,6 +10860,11 @@ html.stage-pinned[data-ui="modern"] header.top-bar { left: calc(var(--sp-5) + va
 }
 /* A phone: rows are thumb targets. */
 :root.touch-phone[data-ui="modern"] .top-bar .more-list .chrome-btn { min-height: 44px; }
+/* MORE BELOW (topbar.js installMenu): a scrolling Menu fades at its foot while rows wait below it. */
+[data-ui="modern"] .top-bar .more-list[data-more-below] {
+  -webkit-mask-image: linear-gradient(to bottom, var(--c-black) calc(100% - 48px), transparent);
+  mask-image: linear-gradient(to bottom, var(--c-black) calc(100% - 48px), transparent);
+}
 [data-ui="modern"] .top-bar .more-list[hidden],
 [data-ui="modern"] .hud-pop[hidden],
 [data-ui="modern"] .top-bar .player-menu[hidden],

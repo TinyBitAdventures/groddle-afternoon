@@ -548,6 +548,19 @@ function installMenu(doc) {
     const next = e.key === 'Home' ? 0 : e.key === 'End' ? rows.length - 1 : (i + (e.key === 'ArrowDown' ? 1 : -1) + rows.length) % rows.length;
     rows[next].focus();
   });
+  // MORE BELOW (Austin's iPhone, 2026-11-13: "Under settings I just see zoom and Night tint"): a short
+  // screen scrolls the Menu (style.css, under 760 px tall) with no scroll bar on a phone, so its foot
+  // fades while rows wait below (data-more-below), and stops fading at the end.
+  const edge = () => {
+    const more = !list.hidden && list.scrollHeight - list.scrollTop - list.clientHeight > 4;
+    if ((list.dataset.moreBelow === '1') !== more) {
+      if (more) list.dataset.moreBelow = '1';
+      else delete list.dataset.moreBelow;
+    }
+  };
+  list.addEventListener('scroll', edge, { passive: true });
+  new MutationObserver(edge).observe(list, { attributes: true, attributeFilter: ['hidden'] });
+  doc.defaultView?.addEventListener?.('resize', edge);
   // Opened from the keyboard: the first row takes focus.
   const btn = doc.getElementById('more-btn');
   btn?.addEventListener('keydown', (e) => {
