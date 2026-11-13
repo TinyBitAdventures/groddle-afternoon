@@ -23,7 +23,10 @@
 import { REPORT_PICTURE, base64Size, pictureSize } from '../reports.js?v=fa6c662a';
 import { listMailboxMessages, mailSender, normalizeMailboxState } from '../mailbox.js?v=a3e833ba';
 import { addedYouOnly, normalizeList } from '../buddies.js?v=cff7bf6e';
-import { letterRow } from '../player-mail.js?v=af6a8b00';
+import { letterRow, normalizePlayerMailSlice } from '../player-mail.js?v=af6a8b00';
+
+/** The player mail feature's save slice (js/features/player-mail-feature.js PLAYER_MAIL_FEATURE_ID). */
+const PLAYER_MAIL_SLICE = 'player-mail';
 
 /** localStorage: "full" opens the game on this device anyway; "companion" always opens this page (play/index.html #phone-gate). */
 export const DEVICE_KEY = 'groddle-play-device';
@@ -129,14 +132,30 @@ export function fitPhoto(w, h, draw, limits = REPORT_PICTURE) {
   return null;
 }
 
-/** The mailbox in a multiplayer save (groddle/v1/save's answer), or null when the character has none yet. */
-export function mailboxFromSave(save) {
+function playerStateOf(save) {
   const raw = save?.data?.entries?.playerState;
   if (typeof raw !== 'string' || !raw) return null;
-  let state;
-  try { state = JSON.parse(raw); } catch { return null; }
-  const box = state?.systems?.mailbox;
+  try { return JSON.parse(raw); } catch { return null; }
+}
+
+/** The mailbox in a multiplayer save (groddle/v1/save's answer), or null when the character has none yet. */
+export function mailboxFromSave(save) {
+  const box = playerStateOf(save)?.systems?.mailbox;
   return box && typeof box === 'object' ? normalizeMailboxState(box) : null;
+}
+
+/**
+ * #282: every letter the save has already taken in, whatever became of it:
+ * the mailbox's rows (read, archived or deleted alike) and the player mail
+ * feature's seen list (js/features/player-mail-feature.js take: a letter put
+ * in the mailbox once is never put there again, even after it is gone).
+ */
+export function takenMailIds(save) {
+  const state = playerStateOf(save);
+  const ids = new Set();
+  for (const m of mailboxFromSave(save)?.messages || []) ids.add(m.id);
+  for (const id of normalizePlayerMailSlice(state?.systems?.features?.[PLAYER_MAIL_SLICE]).seen) ids.add(id);
+  return ids;
 }
 
 /** "Cherry" for cherry, "All Spice" for all_spice: an item's name when the catalog has none. */
@@ -169,8 +188,10 @@ export function mailRows(state, now = Date.now()) {
  * that came back) the save has not taken in yet, newest first; a letter the
  * save has is marked collected when the site says so. `answer` is
  * groddle/v1/mail's (null when it could not be read: the save's rows stand).
+ * `taken` (takenMailIds) holds the letters the save already has: one read and
+ * archived, or deleted, is not in the inbox rows but never comes back as new (#282).
  */
-export function mergePlayerMail(rows, answer, now = Date.now()) {
+export function mergePlayerMail(rows, answer, now = Date.now(), taken = null) {
   const out = Array.isArray(rows) ? rows.map((r) => ({ ...r })) : [];
   const byId = new Map(out.map((r) => [r.id, r]));
   for (const letter of Array.isArray(answer?.letters) ? answer.letters : []) {
@@ -181,6 +202,7 @@ export function mergePlayerMail(rows, answer, now = Date.now()) {
       if (letter.collected) have.collected = true;
       continue;
     }
+    if (taken?.has?.(m.id)) continue;
     const row = {
       id: m.id,
       sender: mailSender(m.sender),

@@ -30,12 +30,14 @@ import {
   itemWords,
   mailRows,
   mailboxFromSave,
+  mergePlayerMail,
   phoneContext,
   photoAttempts,
   snippetOf,
+  takenMailIds,
   unreadLetters,
   whereWords,
-} from '../public/js/phone/companion-data.js?v=fb2e210d';
+} from '../public/js/phone/companion-data.js?v=6c6e284f';
 
 const pub = join(import.meta.dirname, '..', 'public');
 const read = (p) => readFileSync(join(pub, p), 'utf8');
@@ -260,6 +262,33 @@ describe('Mail: the save\'s mailbox, read only', () => {
     assert.equal(rows[0].onItsWay, true, 'an express letter the Frog has not handed over');
     assert.equal(rows[2].collected, true);
     assert.equal(unreadLetters(rows), 2);
+  });
+
+  it('#282: a site letter the save took in and then archived or deleted is never new again', () => {
+    const a = '00000000000000a1';
+    const b = '00000000000000b2';
+    const c = '00000000000000c3';
+    const d = '00000000000000d4';
+    const save = { data: { entries: { playerState: JSON.stringify({ systems: {
+      mailbox: { messages: [
+        { id: `pm-${a}`, sender: 'Ada', text: 'Read and archived', sentAt: NOW - 9000, deliveryAt: NOW - 9000, read: true, archived: true },
+        { id: `pm-${b}`, sender: 'Ada', text: 'Deleted', sentAt: NOW - 8000, deliveryAt: NOW - 8000, read: true, deleted: true },
+      ] },
+      // Gone from the mailbox altogether: only the feature's seen list remembers it.
+      features: { 'player-mail': { seen: [`pm-${a}`, `pm-${b}`, `pm-${c}`] } },
+    } }) } } };
+    const letter = (id) => ({ id, box: 'in', from: { id: 7, name: 'Ada' }, to: { id: 9, name: 'Bo' }, text: 'Hi', item: null, currants: 0, at: NOW - 5000, sent: NOW - 5000, collected: false });
+    const answer = { letters: [letter(a), letter(b), letter(c), letter(d)] };
+    const taken = takenMailIds(save);
+    assert.deepEqual([...taken].sort(), [`pm-${a}`, `pm-${b}`, `pm-${c}`]);
+    const rows = mergePlayerMail(mailRows(mailboxFromSave(save), NOW), answer, NOW, taken);
+    assert.deepEqual(rows.map((r) => r.id), [`pm-${d}`], 'only the letter the save has never taken in is shown');
+    assert.equal(unreadLetters(rows), 1, 'the badge counts that one, not the archived ones');
+    // Without the save's list (the old call) the archived letters came back as new: the bug.
+    assert.equal(unreadLetters(mergePlayerMail(mailRows(mailboxFromSave(save), NOW), answer, NOW)), 4);
+    assert.equal(takenMailIds({ data: null }).size, 0);
+    const js = read('js/phone/companion.js');
+    assert.match(js, /mergePlayerMail\(mailRows\(box\), playerMail, Date\.now\(\), takenMailIds\(save\)\)/);
   });
 
   it('has nothing to show for a character with no save or no mailbox', () => {
