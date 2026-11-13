@@ -48,7 +48,7 @@
 
 import { isPhoneDevice } from '../touch-controls.js?v=d65f8c10';
 import { STREET_INDEX } from '../street-loader.js?v=18b181ad';
-import { SUBWAY_STREETS } from '../street-jobs.js?v=87fd5c87';
+import { SUBWAY_STREETS } from '../street-jobs.js?v=ba02a385';
 import { STATIONS, isCarTsid, stationByTsid } from '../subway.js?v=44d1a09f';
 import { hellFeature } from './hell-feature.js?v=7477c8c7';
 import {

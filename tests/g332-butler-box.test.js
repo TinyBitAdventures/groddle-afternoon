@@ -18,7 +18,7 @@ import { join } from 'node:path';
 
 import { mergeParcels, normalizeParcels } from '../public/js/neighbours-mp.js?v=78dd3b33';
 import { nextHandover, normalizeButlerState, normalizeParcelBox } from '../public/js/butler.js?v=a660e585';
-import { giftsFeature } from '../public/js/features/gifts-feature.js?v=21ff8b31';
+import { giftsFeature } from '../public/js/features/gifts-feature.js?v=ef259f28';
 import { HAS_SITE, SITE_DIR } from '../tools/repos.mjs';
 
 const root = join(import.meta.dirname, '..');

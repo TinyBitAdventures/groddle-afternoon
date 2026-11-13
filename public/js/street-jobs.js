@@ -431,18 +431,30 @@ export const SUBWAY_STREETS = Object.freeze(SUBWAY_LINE.stations.map((s) => gTsi
  * A street project counts as built when finished, built from the start (job.builtFromStart: Austin's
  * chosen roads, tools/street-jobs-built-from-start.json, solo and online alike), grandfathered (a
  * street you have stood on: see noteArrival), exempt, or a subway station's street. `force` lists
- * jobs to run regardless (QA demo boards).
+ * jobs to run regardless (QA demo boards). `open` (the solo QA param ?openroads=1, openRoadsWanted)
+ * counts every street as built for the session: nothing is written, so the save never learns of it.
  */
-export function isJobBuilt(state, catalog, jobId, { exemptFrom = [], force = [] } = {}) {
+export function isJobBuilt(state, catalog, jobId, { exemptFrom = [], force = [], open = false } = {}) {
   const job = jobDef(catalog, jobId);
   if (!job) return true;
   if (state.jobs[jobId]?.doneAt) return true;
   if (force.includes(jobId)) return false;
   if (job.builtFromStart) return true;
   if (job.kind !== 'street') return false;
+  if (open) return true;
   if (state.grandfathered.includes(job.street)) return true;
   if (SUBWAY_STREETS.includes(job.street)) return true;
   return job.connecting.some((tsid) => exemptFrom.includes(tsid));
+}
+
+/**
+ * QA (lane phonefix, 2026-11-13): ?openroads=1 opens every road still under construction for one solo
+ * session, so a street behind a closed road (Froughtful Fen on a fresh save) can be tested. Never in
+ * multiplayer or on /play/online/, and never saved (isJobBuilt's `open` writes nothing).
+ */
+export function openRoadsWanted(value, { multiplayer = false, path = '' } = {}) {
+  if (multiplayer || /\/play\/online(\/|$)/.test(String(path || ''))) return false;
+  return value === '1' || value === 'true' || value === 'on' || value === '';
 }
 
 /**

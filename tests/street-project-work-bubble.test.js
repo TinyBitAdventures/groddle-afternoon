@@ -18,8 +18,8 @@ import { after, before, describe, it } from 'node:test';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-import { projectApi, streetJobsFeature } from '../public/js/features/street-jobs-feature.js?v=b90dfc1b';
-import { soloNeed } from '../public/js/street-jobs.js?v=87fd5c87';
+import { projectApi, streetJobsFeature } from '../public/js/features/street-jobs-feature.js?v=23779432';
+import { soloNeed } from '../public/js/street-jobs.js?v=ba02a385';
 import { createToolConditionState } from '../public/js/tools.js?v=48542c24';
 import { Display, FakeEl, fakePixi } from './fake-scene.js';
 
