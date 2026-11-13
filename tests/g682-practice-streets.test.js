@@ -10,9 +10,11 @@ import { execFileSync } from 'node:child_process';
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { imageSize } from '../tools/image-size.mjs';
 import { assertStreetGeometry, platformYAt } from '../public/js/street-model.js?v=b6cb6a4e';
 import { reachStreet } from '../public/js/builder/reach-graph.js?v=d03eeab1';
 import {
+  EZ_BOUGHS,
   EZ_COOKIN_BOUNDS,
   EZ_COOKIN_FLOOR_Y,
   EZ_COOKIN_SOURCE_TSID,
@@ -44,12 +46,12 @@ import {
   practiceScreen,
   practiceStreetEcology,
   soilStreet,
-} from '../public/js/practice-streets.js?v=108f80a3';
+} from '../public/js/practice-streets.js?v=557238c1';
 import { NEW_DECOS, NEW_DECOS_HIRES } from '../public/js/deco-new-list.js?v=bf75b325';
 import { BUILT_ROOMS, QUEST_ROOMS } from '../public/js/quest-rooms/catalog.js?v=a217b716';
-import { FIRST_SKILLS, PRACTICE_TOOLS, firstSkill, practiceToolToPlace } from '../public/js/newxp.js?v=12f236c7';
-import { HELLO as EZ_HELLO, room as ezRoom } from '../public/js/quest-rooms/ez-cookin.js?v=b245dd00';
-import { HELLO as SOIL_HELLO, TEND_FIRST, patchArt, patchVerbs, room as soilRoom } from '../public/js/quest-rooms/soil-appreciation.js?v=6314aa57';
+import { FIRST_SKILLS, PRACTICE_TOOLS, firstSkill, practiceToolToPlace } from '../public/js/newxp.js?v=b89001c1';
+import { HELLO as EZ_HELLO, room as ezRoom } from '../public/js/quest-rooms/ez-cookin.js?v=77fee627';
+import { HELLO as SOIL_HELLO, TEND_FIRST, patchArt, patchVerbs, room as soilRoom } from '../public/js/quest-rooms/soil-appreciation.js?v=919cf3c8';
 
 const spike = join(dirname(fileURLToPath(import.meta.url)), '..');
 const pub = join(spike, 'public');
@@ -124,9 +126,8 @@ describe('G682 practice streets: street JSON', () => {
       // brief.md: 220 x 64, glass top 796 and feet 860 on the snap (world -204, -140).
       assert.deepEqual([counter.x, counter.w, counter.h, counter.y], [c.x, 220, 64, EZ_PROP_ART.counterFeet]);
       assert.ok(Math.abs(counter.y - counter.h - (c.top - 4)) <= 1, `${c.id}: the lid's top 4 above where the food rests`);
-      // The shade 75 wide over its counter, its bottom at -348 (the file's diffuser 2 under it); the cord runs to the street's top.
-      assert.deepEqual([lamp.x, lamp.w, lamp.y], [c.x, 75, EZ_PROP_ART.lampShadeBottom + 2]);
-      assert.ok(lamp.y - lamp.h <= 0, `${c.id}: the lamp's cord reaches the top of the street`);
+      // The shade 75 wide over its counter, its bottom at -348 (the file's diffuser 2 under it); a short cord to -438.
+      assert.deepEqual([lamp.x, lamp.w, lamp.y, lamp.y - lamp.h], [c.x, 75, EZ_PROP_ART.lampShadeBottom + 2, EZ_PROP_ART.lampCordTop]);
       // Each counter's food rests on its lid, within it.
       for (const f of EZ_FOOD.filter((x) => `trant${x.counter}` === c.id)) assert.ok(f.x > counter.x - 110 && f.x < counter.x + 110, f.id);
     }
@@ -135,6 +136,61 @@ describe('G682 practice streets: street JSON', () => {
     // snap x 518-700, feet 901 (world -99); drawn at the picture's own shape, 182 x 96.
     assert.deepEqual([table.x, table.w, table.h, table.y], [EZ_KNIFE_TABLE.x, 182, 96, EZ_PROP_ART.tableFeet]);
     assert.ok(EZ_KNIFE_AND_BOARD.y < table.y && EZ_KNIFE_AND_BOARD.y > table.y - table.h, 'the Knife & Board rests within the table top');
+  });
+
+  it("EZ Cookin's lamps hang on short cords whose ends hide under a fir bough, as each does in the snaps (Austin 2026-11-13: short cords under a bough)", () => {
+    const s = file(EZ_COOKIN_TSID);
+    const ds = decos(s);
+    const byId = (id) => ds.find((d) => d.id === id);
+    const mid = s.layers.find((l) => l.name === 'middleground').decos;
+    const firs = new Set(s.layers.find((l) => l.id === 'T_ez_firs').decos.map((d) => d.sprite));
+    // Measured from tree_coniferous_4's WebP alpha (728 x 1286 px, x from the left as drawn unflipped, y up
+    // from its foot): the long flat bough is solid (alpha over 200) for x 70-345, y 640-670; under it x 0-259
+    // is clear up to y 580; from y 90 to 360 (the counters' tops and the food) only the trunk, x 411-626, has pixels.
+    const ART = { tree_coniferous_4: { w: 728, h: 1286, core: { x: [70, 345], y: [640, 670] }, clear: { x: 259, y: 580 }, low: { y: [90, 360], x: [411, 626] } } };
+    const picture = imageSize(readFileSync(join(pub, 'assets/decos/groddle/tree_coniferous_4.webp')));
+    assert.deepEqual([picture.w, picture.h], [ART.tree_coniferous_4.w, ART.tree_coniferous_4.h], 'the measured picture');
+    // The lamp's file: 75 x 92 units (2x and 3x), the cord's top at the file's top.
+    for (const [f, k] of [['gz_ai_ezc_hanging_lamp.webp', 2], ['gz_ai_ezc_hanging_lamp@1.5x.webp', 3]]) {
+      const { w, h } = imageSize(readFileSync(join(pub, 'assets/decos/groddle', f)));
+      assert.deepEqual([w, h], [75 * k, 92 * k], f);
+    }
+    // A world box in a fir's picture: its x span (px, as drawn unflipped) and y span (px up from its foot).
+    const inArt = (d, x1, x2, y1, y2) => {
+      const a = ART[d.sprite];
+      const px = (wx) => {
+        const x = ((wx - (d.x - d.w / 2)) / d.w) * a.w;
+        return d.flip ? a.w - x : x;
+      };
+      const py = (wy) => ((d.y - wy) / d.h) * a.h;
+      const xs = [px(x1), px(x2)].sort((m, n) => m - n);
+      const ys = [py(y1), py(y2)].sort((m, n) => m - n);
+      return { x: xs, y: ys, off: xs[1] <= 0 || xs[0] >= a.w || ys[1] <= 0 || ys[0] >= a.h };
+    };
+    const allBoughs = EZ_COUNTERS.map((o) => byId(`deco_ez_bough_${o.id}`));
+    for (const c of EZ_COUNTERS) {
+      const lamp = byId(`deco_ez_lamp_${c.id}`);
+      const bough = byId(`deco_ez_bough_${c.id}`);
+      const counter = byId(`deco_ez_counter_${c.id}`);
+      assert.ok(bough && EZ_BOUGHS.some((b) => b.counter === c.id), `${c.id}: a bough`);
+      assert.ok(firs.has(bough.sprite) && ART[bough.sprite], `${c.id}: one of the street's own firs`);
+      // Drawn over the lamp's cord, under the counter (its foot stands behind it on the back lane).
+      assert.ok(mid.indexOf(lamp) < mid.indexOf(bough) && mid.indexOf(bough) < mid.indexOf(counter), `${c.id}: lamp, bough, counter`);
+      assert.ok(bough.y > -160 && bough.y < -140, `${c.id}: the fir stands on the back lane`);
+      // The cord's top, a unit either side, lies inside the bough's solid part.
+      const { core } = ART[bough.sprite];
+      const end = inArt(bough, lamp.x - 1, lamp.x + 1, lamp.y - lamp.h, lamp.y - lamp.h);
+      assert.ok(end.x[0] >= core.x[0] && end.x[1] <= core.x[1] && end.y[0] >= core.y[0] && end.y[1] <= core.y[1], `${c.id}: the cord's end under the bough`);
+      for (const b of allBoughs) {
+        const a = ART[b.sprite];
+        // The shade and its wires (75 wide, up to -397), a unit to spare: in the clear under the bough.
+        const shade = inArt(b, lamp.x - 38.5, lamp.x + 38.5, lamp.y, -398);
+        assert.ok(shade.off || (shade.x[1] <= a.clear.x && shade.y[1] <= a.clear.y), `${c.id}: ${b.id} keeps off the shade`);
+        // The counter's lid (from 4 under where the food rests) and the food on it: no foliage there, the trunk beside it.
+        const top = inArt(b, counter.x - 110, counter.x + 110, c.top + 4, c.top - 45);
+        assert.ok(top.off || (top.y[0] >= a.low.y[0] && top.y[1] <= a.low.y[1] && (top.x[1] < a.low.x[0] || top.x[0] > a.low.x[1])), `${c.id}: ${b.id} keeps the counter's top and food in view`);
+      }
+    }
   });
 
   it("EZ Cookin's front layer keeps the food, the counters' tops and the table top in view (the snaps' front trunks are bare there)", () => {

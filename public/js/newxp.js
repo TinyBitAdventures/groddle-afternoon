@@ -44,7 +44,7 @@
  */
 
 import { WALK_MAX, flatJump } from './avatar-step.js?v=43b1182e';
-import { EZ_FOOD } from './practice-streets.js?v=108f80a3';
+import { EZ_FOOD } from './practice-streets.js?v=557238c1';
 
 export const NEWXP_SAVE_VERSION = 1;
 

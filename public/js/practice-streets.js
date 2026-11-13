@@ -116,7 +116,7 @@ const SIZE = Object.freeze({
   wildflowers_bunch_2: [191, 25],
   sun_01a_newxp: [311, 311],
   gz_ai_ezc_glass_counter: [220, 66],
-  gz_ai_ezc_hanging_lamp: [75, 654],
+  gz_ai_ezc_hanging_lamp: [75, 92],
   gz_ai_ezc_round_table: [182, 96],
   sign_arrow_1: [140, 93],
 });
@@ -278,9 +278,21 @@ export const EZ_COUNTERS = Object.freeze([
 /**
  * Where the snaps draw the made props (1 px = 1 unit, y as world y): each counter's glass top at
  * -204 and feet at -140 (the food rests on the lid, -200); each lamp's shade -375 to -348 under
- * wires from -397, over its counter; the table's feet at -99 under its tiled top.
+ * wires from -397, over its counter, its short cord up to -438 (lampCordTop), where a fir bough
+ * hides its end (EZ_BOUGHS); the table's feet at -99 under its tiled top.
  */
-export const EZ_PROP_ART = Object.freeze({ counterFeet: -140, counterH: 64, lampShadeBottom: -348, tableFeet: -99 });
+export const EZ_PROP_ART = Object.freeze({ counterFeet: -140, counterH: 64, lampShadeBottom: -348, lampCordTop: -438, tableFeet: -99 });
+/**
+ * The fir boughs the lamps hang under (the Eleven snaps: each lamp just under a bough, reference
+ * only). One of the street's own firs (tree_coniferous_4, as on the fir layer) per counter, on the
+ * back lane behind it, its long flat bough over the lamp: drawn over the lamp's cord and under the
+ * counter, its lower boughs clear of the shade. x is the deco's centre (world), feet its foot.
+ */
+export const EZ_BOUGHS = Object.freeze([
+  Object.freeze({ counter: 'trant1', sprite: 'tree_coniferous_4', x: 930, feet: -150, scale: 0.88, flip: true }),
+  Object.freeze({ counter: 'trant2', sprite: 'tree_coniferous_4', x: 1534, feet: -150, scale: 0.88, flip: false }),
+  Object.freeze({ counter: 'trant3', sprite: 'tree_coniferous_4', x: 1980, feet: -150, scale: 0.88, flip: false }),
+]);
 /** The Knife & Board on its table (a street item: its x from the snap). */
 export const EZ_KNIFE_AND_BOARD = Object.freeze({ id: 'knife_and_board', classTsid: 'knife_and_board', count: 1, x: 605, y: -182 });
 /** skillquest_ezc_v2.js location_targets food_* with special_items (class, count): world x, y. */
@@ -361,9 +373,12 @@ function ezMiddleDecos() {
   const a = EZ_PROP_ART;
   out.push(sized('gz_ai_ezc_round_table', t.x, a.tableFeet + oy, 1, z++, { id: 'deco_ez_knife_table' }));
   for (const c of EZ_COUNTERS) {
-    out.push(deco('gz_ai_ezc_glass_counter', c.x, a.counterFeet + oy, 220, a.counterH, z++, { id: `deco_ez_counter_${c.id}` }));
-    // The lamp's file ends 2 units under the shade (its little diffuser).
+    // The lamp's file ends 2 units under the shade (its little diffuser), its cord at lampCordTop.
     out.push(sized('gz_ai_ezc_hanging_lamp', c.x, a.lampShadeBottom + 2 + oy, 1, z++, { id: `deco_ez_lamp_${c.id}` }));
+    // Over the cord's end, its fir bough; the fir's foot stands behind the counter, drawn after it.
+    const b = EZ_BOUGHS.find((x) => x.counter === c.id);
+    out.push(sized(b.sprite, b.x, b.feet + oy, b.scale, z++, { id: `deco_ez_bough_${c.id}`, ...(b.flip ? { flip: true } : {}) }));
+    out.push(deco('gz_ai_ezc_glass_counter', c.x, a.counterFeet + oy, 220, a.counterH, z++, { id: `deco_ez_counter_${c.id}` }));
   }
   const s = EZ_EXIT_SIGN;
   out.push(deco('sign_arrow_1', s.x, s.y + oy, s.w, s.h, z++, { id: 'deco_ez_exit' }));
@@ -445,7 +460,7 @@ export function ezCookinStreet() {
     why: {
       street: 'config_prod.js:1341 newxp_locations.ezcooking_1; inc_data_maps_prod.js:18068 (hub 132 Skill Quests); no location XML.',
       bounds: 'The snaps are full-street snaps, 2800 x 1000 at 1 px a unit: skillquest_ezc_v2.js food_1_1 (996, -192) lands on the first counter\'s top at 0, -1000.',
-      layout: 'Left to right (zoi, mackenzie, cleops snaps): the start, the round table with the Knife & Board, three serving counters under hanging lamps with the food on them, two big trunks in front, the wooden EXIT arrow and the way out at the right.',
+      layout: 'Left to right (zoi, mackenzie, cleops snaps): the start, the round table with the Knife & Board, three serving counters under hanging lamps (each on a short cord under a fir bough) with the food on them, two big trunks in front, the wooden EXIT arrow and the way out at the right.',
       food: 'skillquest_ezc_v2.js location_targets and special_items: cheese and two tomatoes, a bun and meat, ten buns, five cheese and five meat.',
       art: 'CC0 groddle decos: tree_coniferous_*, pinehills_*, pinecluster_*, heights rocks tinted red-brown, evenground planes, grassSlice_f1, sun_01a_newxp, sign_arrow_1. Made for Groddle (no CC0 piece matches): the glass counters, hanging lamps and round table, gz_ai_ezc_* by GPT Image 2.6 Sunburst, CC0 1.0 (tools/provenance/made-decos.json).',
       ours: 'The walls at both ends and the boxes\' sizes.',

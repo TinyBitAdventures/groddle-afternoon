@@ -108,7 +108,7 @@ def props_scene():
     # (name, centre x, feet y, drawn w, drawn h): the sizes js/practice-streets.js draws them at (EZ_PROP_ART), the
     # table's top, the counter's feet and the lamp's wires where the drawing has them (the lamp's file ends 2 under
     # its shade, whose top is 27.5 and wires' top 50.5 above the file's foot).
-    for name, cx, feet, dw, dh in (('gz_ai_ezc_round_table', 125, 179 + 96, 182, 96), ('gz_ai_ezc_glass_counter', 125, 155, 220, 64), ('gz_ai_ezc_hanging_lamp', 125, 15 + 50.5, 75, 654)):
+    for name, cx, feet, dw, dh in (('gz_ai_ezc_round_table', 125, 179 + 96, 182, 96), ('gz_ai_ezc_glass_counter', 125, 155, 220, 64), ('gz_ai_ezc_hanging_lamp', 125, 15 + 50.5, 75, 92)):
         p = deco(name)
         used.append(source(p))
         art = Image.open(p).convert('RGBA').resize((round(dw * S), round(dh * S)), Image.LANCZOS)

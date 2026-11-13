@@ -110,14 +110,14 @@
   "gz_ai_ezc_hanging_lamp": {
    "what": "The white hanging lamp (one over each counter)",
    "file": "public/assets/decos/groddle/gz_ai_ezc_hanging_lamp.webp",
-   "sha256": "5e0c305a5ddef07c8bd7af7c5f0332fc7bb276628205f247affa9ff7a050822a",
-   "bytes": 5994,
+   "sha256": "245afff7d8961d577c12235daac5dc3c1514daa17c130caafdea5d93d34d8cb2",
+   "bytes": 14538,
    "file3": "public/assets/decos/groddle/gz_ai_ezc_hanging_lamp@1.5x.webp",
-   "sha256_3": "8de551371390e7e5d64e6413c3bb784dc7a44090564bd6136ee0ef6f5dd2b205",
-   "bytes3": 10844,
+   "sha256_3": "6b3fe822ff5b6e980d1bed79619de808692bcc058111631bd1d2ec5e60ca0a26",
+   "bytes3": 25956,
    "w": 75,
-   "h": 654,
-   "size": "shade 75 x 27 units under 22 units of wires (attach/01); the drawing: shade 75 x 25.5, wires 23, then 59 units of cord, lengthened at intake so it rises to the top of the street (y -1000) wherever the camera looks; the shade hangs at -375 to -348 as in the snaps",
+   "h": 92,
+   "size": "shade 75 x 27 units under 22 units of wires (attach/01); the drawing: shade 75 x 25.5, wires 23, then a short cord: 92 units in all, the cord's top at y -438 inside a fir bough drawn over it (js/practice-streets.js EZ_BOUGHS), as each lamp hangs just under a bough in the snaps; the shade hangs at -375 to -348 as in the snaps",
    "replaces": "nothing: the store_lamp_01 stand-ins read like swings and were dropped (Austin 2026-11-13)",
    "streets": [
     "GIFII3UBRFB3KBE"
@@ -195,16 +195,16 @@
     "drop": "research/art-briefs/ez-cookin/drop/hanging-lamp.png",
     "dropSha256": "3d6b83bbbf71b2f35828ca212f3d882d215cdd43031f705ee0b6ad5f28ddbe26",
     "trim": "to the drawn pixels (alpha over 8): x 8-1157, y 0-1686 (15.32 px a unit)",
-    "resize": "premultiplied Lanczos to whole units at 2 and 3 px a unit: 150 x 1308 and 225 x 1962; first the cord lengthened 544 units upward by repeating its top 4 rows (the plain cord)",
+    "resize": "premultiplied Lanczos to whole units at 2 and 3 px a unit: 150 x 1308 and 225 x 1962; first the cord lengthened 544 units upward by repeating its top 4 rows (the plain cord); then (2026-11-13, lane polish1) cut to its bottom 92 units, 150 x 184 and 225 x 276, the cord's top under a fir bough (Austin's pick: short cords under a bough)",
     "masterSha256": {
      "x2": "036ea86668208d5e22858fcb61a6226c2f8e6fb5f70557f339846d20e25f4381",
      "x3": "0a1d3c618be73fe436368265cf9d90b764e13aa2db07a265153dbc6e3e78a5cf"
     },
-    "encode": "cwebp 1.6.0: -metadata none -q 82 -m 4 -sharp_yuv -alpha_q 100 -alpha_filter best (tools/deco-pipeline/build.py's lossy settings)"
+    "encode": "cwebp 1.6.0: -metadata none -q 82 -m 4 -sharp_yuv -alpha_q 100 -alpha_filter best (tools/deco-pipeline/build.py's lossy settings); the 92-unit cut re-encoded from those decoded pixels with cwebp 1.6.0 -lossless -exact -z 9 -metadata none, so no pixel changed"
    },
    "intake": {
     "on": "2026-11-13",
-    "by": "Claude (lane madeart): sizes checked against attach/01; trimmed and resized only, the cord lengthened, nothing redrawn"
+    "by": "Claude (lane madeart): sizes checked against attach/01; trimmed and resized only, the cord lengthened, nothing redrawn. Claude (lane polish1, 2026-11-13): the cord cut short, nothing redrawn"
    }
   },
   "gz_ai_ezc_round_table": {

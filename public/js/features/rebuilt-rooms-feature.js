@@ -33,7 +33,7 @@
 
 import { isRebuiltRoomTsid, rebuiltRoomEcology } from '../rebuilt-rooms.js?v=8c2eaf24';
 import { isLouiseVillaTsid, louiseVillaEcology } from '../louise-pasture-villa.js?v=9d267f7e';
-import { isPracticeStreetTsid, practiceExitSign, practiceStreetEcology } from '../practice-streets.js?v=108f80a3';
+import { isPracticeStreetTsid, practiceExitSign, practiceStreetEcology } from '../practice-streets.js?v=557238c1';
 import { textureFromUrl } from '../textures.js?v=814d7926';
 import {
   ICICLE_PILLAR_ASPECT,

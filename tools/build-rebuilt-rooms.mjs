@@ -93,7 +93,7 @@ import {
   ezCookinStreet,
   soilIndexEntry,
   soilStreet,
-} from '../public/js/practice-streets.js?v=108f80a3';
+} from '../public/js/practice-streets.js?v=557238c1';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const streetsDir = join(root, 'public/assets/streets');

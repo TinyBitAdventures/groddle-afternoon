@@ -104,8 +104,8 @@ import { cultivationDef, homeStreetLayout } from '../home-cultivation.js?v=a3135
 import { tickGarden } from '../garden.js?v=1420a6d6';
 import { BUTLER_RIG_SCALE, ButlerPainter, butlerRigNow, loadButlerRig } from '../butler-rig.js?v=86bb97ad';
 import { BUTLER, BUTLER_INFO, butlerInfoText, butlerPostRx, normalizeButlerParts } from '../butler.js?v=a660e585';
-import { butlerApi } from './butler-feature.js?v=bef0c7b2';
-import { homesFeature, visitorHomeScene, visitorHomeState } from './homes-feature.js?v=cfa6d202';
+import { butlerApi } from './butler-feature.js?v=4e181698';
+import { homesFeature, visitorHomeScene, visitorHomeState } from './homes-feature.js?v=6365233c';
 import {
   BUTLER_MESSAGE_MAX,
   KEY_VERB,

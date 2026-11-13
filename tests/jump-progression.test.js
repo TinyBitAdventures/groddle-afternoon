@@ -35,7 +35,7 @@ import { imaginationFeature } from '../public/js/features/imagination-feature.js
 import { NORMAL_BUFF, jumpApex } from '../public/js/avatar-step.js?v=43b1182e';
 import { reachStreet } from '../public/js/builder/reach-graph.js?v=d03eeab1';
 import { WINTER_WALK_START, WINTER_WALK_TSID } from '../public/js/winter-walk-streets.js?v=d1c7d113';
-import { SKIP_TUTORIAL_CARDS } from '../public/js/newxp.js?v=12f236c7';
+import { SKIP_TUTORIAL_CARDS } from '../public/js/newxp.js?v=b89001c1';
 
 const read = (rel) => readFileSync(join(import.meta.dirname, '..', 'public', rel), 'utf8');
 
