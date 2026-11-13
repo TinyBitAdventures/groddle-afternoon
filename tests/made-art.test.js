@@ -52,7 +52,10 @@ describe('Made for Groddle data (tools/made-art/build-data.mjs)', () => {
   });
 
   it('lists every piece in the provenance list once, newest first, with its date, licence and the original it comes from', () => {
-    assert.deepEqual(made.pieces.map((p) => p.id).sort(), Object.keys(provenance.sprites).sort());
+    // Every made sprite that is not an experiment (the Fire Dragon stays in the builder, off the page), plus the curated region map.
+    const shown = Object.entries(provenance.sprites).filter(([, p]) => p.experiment !== true).map(([id]) => id);
+    assert.deepEqual(made.pieces.map((p) => p.id).filter((id) => !id.startsWith('map:')).sort(), shown.sort());
+    assert.ok(!made.pieces.some((p) => p.id.startsWith('npc_fire_dragon')), 'the Fire Dragon experiment is not on the page');
     const dates = made.pieces.map((p) => p.made);
     assert.deepEqual(dates, [...dates].sort().reverse());
     const book = made.pieces.find((p) => p.id === 'quest_book_award');
@@ -63,14 +66,15 @@ describe('Made for Groddle data (tools/made-art/build-data.mjs)', () => {
     // Same shape as the original, so the two show at the same display size.
     assert.equal(book.image.w * book.original.h, book.original.w * book.image.h);
     assert.match(book.facts.find((f) => f.label === 'How it was checked').text, /overlaps the original's by 96%/);
-    const dragon = made.pieces.find((p) => p.id === 'npc_fire_dragon_walk');
-    assert.equal(dragon.original.kind, 'guide');
-    assert.match(dragon.original.src, /npc_piggy__x1_walk/);
-    assert.deepEqual(dragon.image.sheet, { cols: 8, rows: 1, frames: 8, fps: 10 });
-    assert.deepEqual([dragon.image.w, dragon.image.h], [360, 228]);
+    // A repainted region map beside Tiny Speck's surviving thumbnail (tools/provenance/repainted-maps.json).
+    const map = made.pieces.find((p) => p.id === 'map:58');
+    assert.deepEqual([map.original.src, map.original.w, map.original.h, map.original.pixelated], ['/assets/maps/art/thumbs/sm_groddlemeadow.jpg', 150, 91, true]);
+    assert.equal(map.image.src, '/assets/maps/art/bg/groddlemeadow@2x.webp');
+    assert.match(map.caption, /150 by 91 pixel thumbnail/);
     for (const p of made.pieces) {
       assert.match(p.facts.at(-1).text, /CC0 1\.0/, `${p.id} says its licence`);
-      assert.ok(p.facts.some((f) => f.label === 'How it was made' && f.text.includes(provenance.sprites[p.id].tool)), `${p.id} names its tool`);
+      const tool = p.id.startsWith('map:') ? 'GPT Image' : provenance.sprites[p.id].tool;
+      assert.ok(p.facts.some((f) => f.label === 'How it was made' && f.text.includes(tool)), `${p.id} names its tool`);
     }
   });
 
@@ -92,13 +96,14 @@ describe('Made for Groddle data (tools/made-art/build-data.mjs)', () => {
       if (!files.has(file)) files.set(file, readFileSync(join(GAME_DIR, file)));
       return files.get(file);
     };
-    assert.equal(build(provenance, curated, read).pieces.length, made.pieces.length);
+    const maps = JSON.parse(readFileSync(join(GAME_DIR, 'tools/provenance/repainted-maps.json'), 'utf8'));
+    assert.equal(build(provenance, curated, read, maps).pieces.length, made.pieces.length);
     const changed = (file) => (f) => (f === file ? Buffer.concat([read(f), Buffer.from([0])]) : read(f));
-    assert.throws(() => build(provenance, curated, changed(provenance.sprites.quest_book_award.file)), /no longer matches its provenance hash/);
+    assert.throws(() => build(provenance, curated, changed(provenance.sprites.quest_book_award.file), maps), /no longer matches its provenance hash/);
     assert.throws(() => build(provenance, { pieces: curated.pieces.slice(1) }, read), /has no words/);
     const odd = structuredClone(curated);
     odd.pieces[0].facts[0].text = 'Made with {nothing}.';
-    assert.throws(() => build(provenance, odd, read), /nothing to fill \{nothing\}/);
+    assert.throws(() => build(provenance, odd, read, maps), /nothing to fill \{nothing\}/);
   });
 
   it('reads sizes from the WebP files and writes dates in words', () => {

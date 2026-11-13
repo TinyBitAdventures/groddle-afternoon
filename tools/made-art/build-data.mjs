@@ -25,6 +25,7 @@ import { GAME_DIR } from '../repos.mjs';
 import { contentProblems } from '../gaps/build-data.mjs';
 
 export const PROVENANCE = join(GAME_DIR, 'tools/provenance/made-sprites.json');
+export const MAPS = join(GAME_DIR, 'tools/provenance/repainted-maps.json');
 export const CURATED = join(GAME_DIR, 'tools/made-art/pieces.json');
 export const OUT = join(GAME_DIR, 'public/restoration/made.json');
 
@@ -55,6 +56,21 @@ export function webpSize(buf) {
   throw new Error(`unknown WebP chunk ${chunk}`);
 }
 
+/** A JPEG file's width and height, from its first SOF marker. */
+export function jpegSize(buf) {
+  if (buf[0] !== 0xff || buf[1] !== 0xd8) throw new Error('not a JPEG file');
+  for (let i = 2; i + 9 < buf.length;) {
+    if (buf[i] !== 0xff) { i += 1; continue; }
+    const marker = buf[i + 1];
+    const len = buf.readUInt16BE(i + 2);
+    if (marker >= 0xc0 && marker <= 0xcf && ![0xc4, 0xc8, 0xcc].includes(marker)) return { w: buf.readUInt16BE(i + 7), h: buf.readUInt16BE(i + 5) };
+    i += 2 + len;
+  }
+  throw new Error('no JPEG frame header');
+}
+/** An image file's size: WebP or JPEG. */
+const imageSize = (buf) => (buf[0] === 0xff && buf[1] === 0xd8 ? jpegSize(buf) : webpSize(buf));
+
 /** The public URL of a file under public/. */
 const url = (file) => `/${file.replace(/^public\//, '')}`;
 
@@ -63,7 +79,7 @@ const url = (file) => `/${file.replace(/^public\//, '')}`;
  * Throws when the file is missing or a sheet does not divide into its grid.
  */
 function picture(file, sheet, read) {
-  const size = webpSize(read(file));
+  const size = imageSize(read(file));
   const out = { src: url(file), w: size.w, h: size.h };
   if (sheet) {
     const { cols, rows, frames } = sheet;
@@ -80,8 +96,15 @@ function picture(file, sheet, read) {
  * made.json from the provenance and the curated words. `read` reads a file
  * under the game (a Buffer), so tests can hand in their own.
  */
-export function build(provenance, curated, read = (file) => readFileSync(join(GAME_DIR, file))) {
-  const made = provenance.sprites;
+export function build(provenance, curated, read = (file) => readFileSync(join(GAME_DIR, file)), maps = { regions: {} }) {
+  // An entry marked experiment (Austin 2026-11-12: the Fire Dragon) stays in the builder, off the page.
+  const made = Object.fromEntries(Object.entries(provenance.sprites).filter(([, p]) => p.experiment !== true));
+  // A repainted region map (tools/provenance/repainted-maps.json) is a piece by the id map:<hub id>: its 2x painting.
+  for (const c of curated.pieces) {
+    const hub = /^map:(\d+)$/.exec(c.id)?.[1];
+    const region = hub && maps.regions[hub];
+    if (region) made[c.id] = { file: `public/${region.x2.file}`, sha256: region.x2.sha256, licence: region.licence, tool: region.model, made: region.made, regions: Object.keys(maps.regions).length };
+  }
   const byId = new Map(curated.pieces.map((p) => [p.id, p]));
   const problems = [];
   for (const id of Object.keys(made)) if (!byId.has(id)) problems.push(`${id}: in the provenance list but has no words in tools/made-art/pieces.json`);
@@ -99,7 +122,7 @@ export function build(provenance, curated, read = (file) => readFileSync(join(GA
     const original = c.original ? { ...picture(c.original.file, c.original.sheet, read), kind: c.original.kind, alt: c.original.alt, ...(c.original.pixelated ? { pixelated: true } : {}) } : null;
     const overlap = /outline overlaps the original (\d+)%/.exec(prov.source?.cut || '')?.[1];
     const fill = (text) => text.replace(/\{(\w+)\}/g, (all, key) => {
-      const value = { tool: prov.tool, overlap: overlap && `${overlap}%`, w: original?.w, h: original?.h }[key];
+      const value = { tool: prov.tool, overlap: overlap && `${overlap}%`, w: original?.w, h: original?.h, regions: prov.regions }[key];
       if (value === undefined || value === null) throw new Error(`${c.id}: nothing to fill {${key}} with`);
       return String(value);
     });
@@ -145,7 +168,7 @@ const stringify = (data) => `${JSON.stringify(data, null, 2)}\n`;
 
 function main() {
   const check = process.argv.includes('--check');
-  const data = build(JSON.parse(readFileSync(PROVENANCE, 'utf8')), JSON.parse(readFileSync(CURATED, 'utf8')));
+  const data = build(JSON.parse(readFileSync(PROVENANCE, 'utf8')), JSON.parse(readFileSync(CURATED, 'utf8')), undefined, JSON.parse(readFileSync(MAPS, 'utf8')));
   const problems = wordProblems(data);
   if (problems.length) {
     console.error(`made: ${problems.length} problem(s):\n  ${problems.join('\n  ')}`);

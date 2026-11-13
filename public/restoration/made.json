@@ -48,54 +48,44 @@
       ]
     },
     {
-      "id": "npc_fire_dragon_walk",
-      "anchor": "made-fire-dragon",
-      "name": "Fire Dragon",
-      "made": "2026-11-02",
-      "madeLabel": "2 November 2026",
-      "caption": "The first animal made for Groddle rather than restored: a small fire dragon that roams a street and can be petted. It is not from Glitch, so there was no original to copy. It was drawn in the style of Tiny Speck's animals and walks with the Piggy's stride.",
+      "id": "map:58",
+      "anchor": "made-groddle-meadow-map",
+      "name": "Groddle Meadow map",
+      "made": "2026-11-07",
+      "madeLabel": "7 November 2026",
+      "caption": "The painted background of the Groddle Meadow region map. Tiny Speck's full-size map paintings are lost; only a tiny 150 by 91 pixel thumbnail of each survived, so each region's painting was made again from its own thumbnail.",
       "display": {
-        "w": 240,
-        "h": 152
+        "w": 304,
+        "h": 184
       },
       "image": {
-        "src": "/assets/sprites/made/fire-dragon/npc_fire_dragon_walk@3x.webp",
-        "w": 360,
-        "h": 228,
-        "sheet": {
-          "cols": 8,
-          "rows": 1,
-          "frames": 8,
-          "fps": 10
-        },
-        "label": "The Fire Dragon's walk",
-        "alt": "A small orange fire dragon with a flame on its tail, walking to the right."
+        "src": "/assets/maps/art/bg/groddlemeadow@2x.webp",
+        "w": 1520,
+        "h": 920,
+        "label": "Painted again for Groddle",
+        "alt": "A painted top-down view of Groddle Meadow: green fields, small round trees, paths and a stream, in soft olive tones."
       },
       "original": {
-        "src": "/assets/sprites/npc_piggy__x1_walk_png_1354829432@3x.webp",
-        "w": 264,
-        "h": 186,
-        "sheet": {
-          "cols": 8,
-          "rows": 3,
-          "frames": 24
-        },
-        "kind": "guide",
-        "alt": "Tiny Speck's Piggy, mid step.",
-        "label": "What it was made from: Tiny Speck's Piggy walk, the stride guide"
+        "src": "/assets/maps/art/thumbs/sm_groddlemeadow.jpg",
+        "w": 150,
+        "h": 91,
+        "kind": "original",
+        "alt": "Tiny Speck's small thumbnail of the same map, enlarged so its pixels show: the same fields and trees, blurred.",
+        "pixelated": true,
+        "label": "Tiny Speck's thumbnail, 150 by 91 pixels, shown at the same size"
       },
       "facts": [
         {
           "label": "How it was made",
-          "text": "Drawn by an image model (GPT Image 2.5 Sunburst) under Austin's direction. Its look started from Tiny Speck's Piggy and Chicken walks, and its eight steps follow every third frame of the Piggy's walk."
+          "text": "Painted by an image model (GPT Image 2.6 Sunburst) under Austin's direction, from the region's own thumbnail, then toned toward the colours of the 2012 original."
         },
         {
-          "label": "How it was checked",
-          "text": "Austin picked this walk, the third attempt at it. Each of its frames is lined up on the dragon's snout and feet, so the steps hold steady as it walks."
+          "label": "How it was chosen",
+          "text": "Austin picked the closest of several tries. The same was done for every region whose painting was lost: 47 in all."
         },
         {
           "label": "In the game",
-          "text": "On streets the level builder gives them, up to three to a street. Each one can be petted once a game day."
+          "text": "The background of the Groddle Meadow map. The game draws its own streets, names and markers on top."
         },
         {
           "label": "Licence",

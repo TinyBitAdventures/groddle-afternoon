@@ -30,7 +30,7 @@ const band = (id, alt, title, inner) => group('section', `band${alt ? ' band-alt
  * to a page made before it.
  */
 export const madeBand = () => band('made', true, 'Made for Groddle', [
-  p('section-lead', 'Almost everything in Groddle Afternoon is Tiny Speck’s own art, which they gave to everyone under CC0. A few pieces were made for the remake: where nothing usable survived, where the original was too small to show well, or where the game gained something new. Each one is listed here, beside what it came from, with how it was made.'),
+  p('section-lead', 'Almost everything in Groddle Afternoon is Tiny Speck’s own art, which they gave to everyone under CC0. A few pieces were made for the remake: where nothing usable survived, like the region map paintings, or where the original was too small to show well, like the quest book. Each one is listed here, beside what it came from, with how it was made.'),
   data('made'),
 ]);
 

@@ -5,7 +5,10 @@
       "id": "quest_book_award",
       "name": "Quest book",
       "caption": "The open book on the card you see when you finish a quest. Tiny Speck drew it only {w} by {h} pixels, which turned soft and blurry when the card showed it large, so it was redrawn bigger to match the original as closely as possible.",
-      "display": { "w": 258, "h": 174 },
+      "display": {
+        "w": 258,
+        "h": 174
+      },
       "image": {
         "label": "Redrawn for Groddle",
         "alt": "The redrawn quest book: an open book with cream pages, a red cover and an orange bookmark, sharp at this size."
@@ -18,32 +21,52 @@
         "pixelated": true
       },
       "facts": [
-        { "label": "How it was made", "text": "Redrawn by an image model ({tool}) under Austin's direction, with Tiny Speck's own {w} by {h} book enlarged twelve times as the guide." },
-        { "label": "How it was checked", "text": "Shrunk back down to {w} by {h} pixels, its outline overlaps the original's by {overlap}." },
-        { "label": "In the game", "text": "The card for a finished quest in the Modern look. The Classic look keeps Tiny Speck's original book." }
+        {
+          "label": "How it was made",
+          "text": "Redrawn by an image model ({tool}) under Austin's direction, with Tiny Speck's own {w} by {h} book enlarged twelve times as the guide."
+        },
+        {
+          "label": "How it was checked",
+          "text": "Shrunk back down to {w} by {h} pixels, its outline overlaps the original's by {overlap}."
+        },
+        {
+          "label": "In the game",
+          "text": "The card for a finished quest in the Modern look. The Classic look keeps Tiny Speck's original book."
+        }
       ]
     },
     {
-      "id": "npc_fire_dragon_walk",
-      "name": "Fire Dragon",
-      "caption": "The first animal made for Groddle rather than restored: a small fire dragon that roams a street and can be petted. It is not from Glitch, so there was no original to copy. It was drawn in the style of Tiny Speck's animals and walks with the Piggy's stride.",
-      "display": { "w": 240, "h": 152 },
+      "id": "map:58",
+      "name": "Groddle Meadow map",
+      "caption": "The painted background of the Groddle Meadow region map. Tiny Speck's full-size map paintings are lost; only a tiny {w} by {h} pixel thumbnail of each survived, so each region's painting was made again from its own thumbnail.",
+      "display": {
+        "w": 304,
+        "h": 184
+      },
       "image": {
-        "label": "The Fire Dragon's walk",
-        "alt": "A small orange fire dragon with a flame on its tail, walking to the right.",
-        "sheet": { "cols": 8, "rows": 1, "frames": 8, "fps": 10 }
+        "label": "Painted again for Groddle",
+        "alt": "A painted top-down view of Groddle Meadow: green fields, small round trees, paths and a stream, in soft olive tones."
       },
       "original": {
-        "file": "public/assets/sprites/npc_piggy__x1_walk_png_1354829432@3x.webp",
-        "kind": "guide",
-        "label": "What it was made from: Tiny Speck's Piggy walk, the stride guide",
-        "alt": "Tiny Speck's Piggy, mid step.",
-        "sheet": { "cols": 8, "rows": 3, "frames": 24 }
+        "file": "public/assets/maps/art/thumbs/sm_groddlemeadow.jpg",
+        "kind": "original",
+        "label": "Tiny Speck's thumbnail, {w} by {h} pixels, shown at the same size",
+        "alt": "Tiny Speck's small thumbnail of the same map, enlarged so its pixels show: the same fields and trees, blurred.",
+        "pixelated": true
       },
       "facts": [
-        { "label": "How it was made", "text": "Drawn by an image model ({tool}) under Austin's direction. Its look started from Tiny Speck's Piggy and Chicken walks, and its eight steps follow every third frame of the Piggy's walk." },
-        { "label": "How it was checked", "text": "Austin picked this walk, the third attempt at it. Each of its frames is lined up on the dragon's snout and feet, so the steps hold steady as it walks." },
-        { "label": "In the game", "text": "On streets the level builder gives them, up to three to a street. Each one can be petted once a game day." }
+        {
+          "label": "How it was made",
+          "text": "Painted by an image model ({tool}) under Austin's direction, from the region's own thumbnail, then toned toward the colours of the 2012 original."
+        },
+        {
+          "label": "How it was chosen",
+          "text": "Austin picked the closest of several tries. The same was done for every region whose painting was lost: {regions} in all."
+        },
+        {
+          "label": "In the game",
+          "text": "The background of the Groddle Meadow map. The game draws its own streets, names and markers on top."
+        }
       ]
     }
   ]

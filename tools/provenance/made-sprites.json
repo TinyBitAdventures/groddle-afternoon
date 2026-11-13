@@ -21,7 +21,9 @@
         "sheet_sha256": "62a19545c2c8f9c2e0a5c9a190b3c80a25951403a1f63bd6c25dc74aea26de00",
         "attempt": 3,
         "cut": "each dragon found by the empty gaps around it, lined up on its snout tip and feet, scaled 0.45 into 360x228 cells (120x76 logical at 3x), 8 across, WebP q92 alpha 100"
-      }
+      },
+      "experiment": true,
+      "experimentNote": "Austin 2026-11-12: an experiment, kept for the game builder, not part of the project yet; left off the Made for Groddle section"
     },
     "quest_book_award": {
       "file": "public/assets/ui/quest-book-solid.webp",
