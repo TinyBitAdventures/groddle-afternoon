@@ -85,8 +85,23 @@ export const MENU_ROWS = Object.freeze({
   'account-btn': { group: 'settings', rank: 1 },
   // Alternate characters (2026-11-12): beside Sign out.
   'switch-character-btn': { group: 'settings', rank: 2 },
+  // Friendly on #284 (iPhone): a phone only (installPhonePageRow): back to the phone page (reports,
+  // mail, friends) without forgetting that this device opens the game.
+  'phone-page-btn': { group: 'settings', rank: 2.5 },
   'signout-btn': { group: 'settings', rank: 3 },
 });
+
+/** The phone page row's words (installPhonePageRow). */
+export const PHONE_PAGE_LABEL = 'Phone page: reports, mail, friends';
+
+/**
+ * PURE: where the phone page row goes (the page's base is the site root): play/phone/, with
+ * ?from=solo from solo so its "Load the full game anyway" comes back to solo (js/phone/companion-data.js
+ * fullGameHref). The device's choice (localStorage groddle-play-device) is left as it is.
+ */
+export function phonePageHref(mode = 'solo') {
+  return mode === 'multiplayer' ? 'play/phone/' : 'play/phone/?from=solo';
+}
 
 /** A Menu row's place: { group, rank, key?, mod? } (unknown rows go last in World); `phone` takes a row's phone place. */
 export function menuRowFor(id, { phone = false } = {}) {
@@ -1023,6 +1038,23 @@ function installPhoneRows(doc) {
   }
 }
 
+/**
+ * Friendly on #284 (iPhone): a phone that chose the full game always opened it from Play, with no
+ * way back to the phone page's reports, mail and friends. On a phone (html.touch-phone, either skin)
+ * the Menu has a row that opens that page; the page itself still offers "Load the full game anyway"
+ * and remembers the choice (js/phone/companion.js mountPlay).
+ */
+function installPhonePageRow(doc) {
+  const list = doc.getElementById('more-list');
+  if (!list || !doc.documentElement?.classList?.contains('touch-phone') || doc.getElementById('phone-page-btn')) return;
+  const a = doc.createElement('a');
+  a.id = 'phone-page-btn';
+  a.className = 'chrome-btn';
+  a.href = phonePageHref(doc.documentElement.dataset?.mode === 'multiplayer' ? 'multiplayer' : 'solo');
+  a.textContent = PHONE_PAGE_LABEL;
+  list.append(a);
+}
+
 function installTopOverflow(doc) {
   const bar = doc.querySelector('header.top-bar');
   const pill = doc.querySelector('.top-bar .top-actions');
@@ -1325,6 +1357,7 @@ export function installTopBar(doc, opts = {}) {
   installTopOverflow(doc);
   installNarrowRows(doc);
   installPhoneRows(doc);
+  installPhonePageRow(doc);
   doc.getElementById('low-energy-btn')?.addEventListener('click', (e) => {
     e.stopPropagation();
     doc.querySelector('.top-bar .meta-pill.energy')?.click();
