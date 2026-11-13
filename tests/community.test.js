@@ -155,8 +155,8 @@ describe('the boards\' words and links (groddle-afternoon-site src/CommunityText
     assert.deepEqual(php('[T::editable(1000, 1900), T::editable(1000, 1901)]'), [true, false], '15 minutes to edit');
   });
 
-  it('the boards are Glitch\'s six, in its order; the words are plain', () => {
-    assert.deepEqual(php('array_map(fn ($b) => $b[0], T::BOARDS)'), { announcements: 'Announcements & Events', general: 'General', ideas: 'Ideas', marketplace: 'Marketplace', bugs: 'Bugs', 'off-topic': 'Off Topic' });
+  it('the boards are Glitch\'s six, in its order (its Announcements & Events is our Announcements); the words are plain', () => {
+    assert.deepEqual(php('array_map(fn ($b) => $b[0], T::BOARDS)'), { announcements: 'Announcements', general: 'General', ideas: 'Ideas', marketplace: 'Marketplace', bugs: 'Bugs', 'off-topic': 'Off Topic' });
     const words = JSON.stringify(php('[T::BOARDS, T::SAID]'));
     assert.doesNotMatch(words, /[—–]/);
     assert.doesNotMatch(words, /Glitch/);

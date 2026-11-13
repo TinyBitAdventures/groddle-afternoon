@@ -116,6 +116,27 @@ try {
     };
     $notices = static fn (int $user): array => array_map(static fn (array $r): array => ['kind' => (string) $r['kind'], 'thread' => (int) $r['thread_id'], 'from' => (int) $r['from_id'], 'read' => $r['read_at'] !== null, 'game' => $r['game_at'] !== null], $db->rows('SELECT * FROM ' . $db->table(Community::NOTICES) . ' WHERE user_id = ? ORDER BY id', [$user]));
 
+    // == 2. The boards' rows as the live site has them (seeded before the rename): brought to the new words, once ==
+    $old = [
+        'announcements' => ['Announcements & Events', 'Parties, group meetups, contests and anything else players are organising in the game.'],
+        'general' => ['General', 'Playing the game: questions, tips, and talk about the latest changes.'],
+    ];
+    $i = 0;
+    foreach (CommunityText::BOARDS as $slug => [$n, $a]) {
+        [$n, $a] = $old[$slug] ?? [$n, $a];
+        $db->execute('INSERT INTO ' . $db->table(Community::BOARDS_T) . ' (slug, name, about, position, created_at) VALUES (?, ?, ?, ?, ?)', [$slug, $n, $a, $slug === 'ideas' ? 9 : $i, '2026-11-04 12:00:00']);
+        $i++;
+    }
+    $boardRows = static fn (): array => $db->rows('SELECT slug, name, about, position, created_at FROM ' . $db->table(Community::BOARDS_T) . ' ORDER BY slug');
+    $out['seed'] = ['staleBefore' => Community::boardsStale($boardRows())];
+    $first = $community(0)->boards();
+    $out['seed']['rows'] = $boardRows();
+    $out['seed']['staleAfter'] = Community::boardsStale($boardRows());
+    $community(0)->boards();
+    $out['seed']['again'] = $boardRows() === $out['seed']['rows'];
+    $out['seed']['shown'] = array_map(static fn (array $b): array => [$b['slug'], $b['name'], $b['about']], $first);
+    $out['seed']['emptyStale'] = Community::boardsStale([]);
+
     // == 1. Who starts a topic on Announcements: the team only; everyone replies ==
     $out['start'] = [
         'player' => $start(910, 'announcements', 'Party at the pond'),

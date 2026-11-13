@@ -74,6 +74,21 @@ describe('Announcements on a throwaway database', { skip: skipDb }, () => {
     assert.ok(r.pages.playerNew.includes(r.said) && !r.pages.playerNew.includes('data-community-new='), 'the form page refuses without a form');
   });
 
+  it('the board is renamed Announcements, General takes player events, and the live rows follow once (same slug)', () => {
+    const rows = Object.fromEntries(r.seed.rows.map((b) => [b.slug, b]));
+    assert.equal(r.seed.staleBefore, true);
+    assert.deepEqual([rows.announcements.name, rows.announcements.about], ['Announcements', 'News and updates from the team. Everyone can reply.']);
+    assert.match(rows.general.about, /player events: parties, meetups, contests/);
+    assert.equal(Number(rows.ideas.position), 9, 'a board keeps its place');
+    assert.equal(rows.announcements.created_at, '2026-11-04 12:00:00', 'and its created_at');
+    assert.equal(r.seed.rows.length, 6, 'nothing added or taken away');
+    assert.equal(r.seed.staleAfter, false);
+    assert.equal(r.seed.again, true, 'a second read changes nothing');
+    assert.equal(r.seed.emptyStale, true, 'an empty table is seeded');
+    assert.deepEqual(r.seed.shown[0], ['announcements', 'Announcements', 'News and updates from the team. Everyone can reply.'], 'the first read already shows the new words');
+    assert.ok(r.start.staff.body.url.startsWith('/chat/announcements/'), 'the slug and its links stay');
+  });
+
   it('the rule is the administrators\' (manage_options), by board, never by user id', () => {
     const c = src('src/Community.php');
     assert.match(src('src/CommunityText.php'), /public const STAFF_BOARDS = \['announcements'\];/);
