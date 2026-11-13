@@ -3191,6 +3191,19 @@
     0 0 3px var(--c-classic-page),
     0 1px 1px var(--c-classic-page);
 }
+/* Report #289 (1920x919): the Menu ran past the window's foot, with Sign out under it. It stops 10 px above
+   the foot (its top is the Menu button's foot, 34 u, plus 6 px) and scrolls; while rows wait below, its
+   foot fades (js/ui/topbar.js installMenu sets data-more-below, as the Modern Menu shows it). */
+:root[data-ui="classic"] .top-bar #more-list {
+  box-sizing: border-box;
+  max-height: calc(100dvh - 34 * var(--cu) - 16px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+:root[data-ui="classic"] .top-bar #more-list[data-more-below] {
+  -webkit-mask-image: linear-gradient(to bottom, var(--c-black) calc(100% - 40px), transparent);
+  mask-image: linear-gradient(to bottom, var(--c-black) calc(100% - 40px), transparent);
+}
 /* === end rep13 === */
 
 /* == TICKETS == Reports (js/ui/reports-sheet.js, online only) as a 2012 window: the Quest Log's frame
