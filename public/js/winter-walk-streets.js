@@ -205,7 +205,9 @@ export const WINTER_WALK_OVERHANG = Object.freeze([1300, 1760, 2160]);
  * Round 5: the big icicles under the overhang (the Tribute Blog's posts 37374550569 "you hit
  * icicles to make these large ones fall", 37415159206, 37421343721, and the Snaps 81185,
  * 83816, 82354, 81936; reference only). Their caps tuck under the rock (-450); the points stop
- * well over a standing avatar's head and clear of the pillars' tops. Tapping them down is not built: they hang still.
+ * well over a standing avatar's head and clear of the pillars' tops. G472: walk under one and it
+ * falls, standing in the snow as a pillar you can climb (js/winter-icicles.js, the recording
+ * 2Xko9Hy-cLE 1:25-1:29; run by features/rebuilt-rooms-feature.js).
  */
 export const WINTER_WALK_ICICLES = Object.freeze([
   Object.freeze({ x: 1130, top: -470, h: 190 }),
@@ -506,7 +508,7 @@ export function winterWalkStreet() {
       bounds: 'onStarted drops you at -2875,-81 (winter_walk.js:105), so the walk is the standard -3000..3000 with its floor at -81.',
       layout: 'Left to right: the camp (campfire, teepee) where you start, a wood of bare dead trees and snowy scrub, the caption, an open snowfield, then the cliffs\' end with a streaked basalt overhang hung with big icicles, three snow pillars and a cliff block with icy ledges, and at the far end a white blizzard bank with three more pillars, short, middle and tall, before the passage; firs, white hills and snowy basalt mountains behind.',
       route: 'js/winter-walk.js runs the timed route: motes spread over the platforms, the passage to Winter Haven at the right end, and the way home at the same end on the return.',
-      notBuilt: 'The big hollow two-trunk tree arching round the caption and the pale green curling plants are known from the blog and the Snaps but not built: no CC0 piece is either. Tapping the icicles down (the blog: "you hit icicles to make these large ones fall") is not built.',
+      notBuilt: 'The big hollow two-trunk tree arching round the caption and the pale green curling plants are known from the blog and the Snaps but not built: no CC0 piece is either. The big icicles fall when walked under and stand as pillars (G472, js/winter-icicles.js; the recording 2Xko9Hy-cLE).',
       caption: 'The pictures\' caption line is drawn at the same spot by features/rebuilt-rooms-feature.js (WINTER_WALK_CAPTION; Austin 2026-10-28: one-off approval).',
     },
   });

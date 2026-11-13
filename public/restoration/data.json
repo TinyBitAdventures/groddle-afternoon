@@ -2792,9 +2792,14 @@
   "deployed": "2026-11-13"
  },
  "git": {
-  "commits": 1919,
+  "commits": 1920,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-13",
+    "kind": "new",
+    "text": "Breezy, EZ Cookin' and Talking 'bout Soil Appreciation get their practice streets back"
+   },
    {
     "date": "2026-11-13",
     "kind": "fix",
@@ -2909,11 +2914,6 @@
     "date": "2026-11-13",
     "kind": "fix",
     "text": "On a phone the Groups and Account windows, and their kin from the Menu, fit the screen with the title and close button always showing"
-   },
-   {
-    "date": "2026-11-13",
-    "kind": "improve",
-    "text": "Decoration Mode on a phone: drag the room to look around, a full-width tray, and a Display field that matches its buttons"
    }
   ]
  },
