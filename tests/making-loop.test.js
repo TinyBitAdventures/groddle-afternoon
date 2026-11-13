@@ -452,7 +452,8 @@ describe('UI wiring', () => {
       }
     }
     const execBody = game.slice(execStart, execEnd);
-    const pushes = execBody.split('pushActivity(').length - 1;
+    // The hungry-Piggy snack line (9a0adce3e2) is its own fact and may follow the verb's one line.
+    const pushes = execBody.split('pushActivity(').length - 1 - (execBody.split('pushActivity(result.snack)').length - 1);
     assert.equal(pushes, 1, `executeVerb should call pushActivity once, got ${pushes}`);
     assert.ok(execBody.includes('feedLine') || execBody.includes('activityLine'));
     // Outline must not be a child of the sprite (would paint solid over art)
