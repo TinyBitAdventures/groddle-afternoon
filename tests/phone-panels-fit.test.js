@@ -111,3 +111,22 @@ describe('#273 the pack row on a phone', () => {
     assert.doesNotMatch(css, /touch-phone[^{]*#pack-search-btn[^{]*\{[^}]*display: none/);
   });
 });
+
+// #264: "switching to classic interface doesn't do anything" on a phone. Classic is desktop only
+// (js/classic/ui-mode.js, open question 11: under 960 x 540 the page shows Modern), and every phone is
+// under that either way up, so the Menu row changed nothing. A phone has no Interface row.
+describe('#264 no Interface row on a phone', () => {
+  const layout = readFileSync(join(pub, 'js/classic/classic-layout.js'), 'utf8');
+
+  it('Classic needs 960 x 540, more than any phone has either way up', () => {
+    assert.match(layout, /export const CLASSIC_MIN_W = 960;/);
+    assert.match(layout, /export const CLASSIC_MIN_H = 540;/);
+    // The phone gate's "small": a touch screen with a short side under 500 px (play/index.html).
+    assert.ok(500 < 540);
+  });
+
+  it('the row is hidden on a phone only', () => {
+    assert.match(css, /:root\.touch-phone \.more-list #interface-btn \{ display: none; \}/);
+    assert.doesNotMatch(css.replace(/:root\.touch-phone \.more-list #interface-btn \{ display: none; \}/, ''), /#interface-btn \{[^}]*display: none/);
+  });
+});

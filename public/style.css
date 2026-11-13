@@ -14044,6 +14044,10 @@ body.is-booting .touch-controls { display: none; }
 :root.touch-phone :is(.kcap, .vm-key, .ui-sheet-esc, span.count-pop-esc, .count-pop-key, #map-panel .map-hint, [data-street-map-control]) { display: none !important; }
 :root.touch-phone .more-list [data-key]::after,
 :root.touch-phone .more-list [data-key-mod]::before { content: none; display: none; }
+/* #264: Classic is desktop only (js/classic/ui-mode.js: a window under 960 x 540 shows Modern), and every
+   phone is under it either way up, so the Menu's "Interface: Classic" changed nothing there. A phone
+   has no Interface row. */
+:root.touch-phone .more-list #interface-btn { display: none; }
 /* A sheet's title on a phone shares its row with the close button, wrapping its own words, instead
    of pushing the button onto a row of its own (a vendor's "Gardening Tools Vendor"). */
 :root.touch-phone[data-ui="modern"] #game-root :is(.ui-sheet-head, #achieve-panel .side-head, #skills-panel .side-head, #buffs-panel .side-head) > h2 { flex: 1 1 0; }
