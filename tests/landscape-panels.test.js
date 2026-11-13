@@ -78,3 +78,16 @@ describe('Imagination upgrade cards sideways (#3)', () => {
     assert.match(rule, /#imagination-panel \.img-card \{ --h: clamp\(120px, 100dvh - var\(--hud-h\) - 112px, 279px\); --w: calc\(var\(--h\) \* 207 \/ 279\);/);
   });
 });
+
+describe('Mail sideways (#4)', () => {
+  const rule = sidewaysRule('/* MAIL SIDEWAYS (#4)');
+  it('shares the title row with the folders and Write mail, and drops the footer', () => {
+    assert.match(rule, /#mail-panel \.mail-card > \.mail-head \{ display: contents; \}/);
+    assert.match(rule, /#mail-panel \.mail-card > \.mail-tabs \{ grid-row: 1; grid-column: 2;/);
+    assert.match(rule, /#mail-panel \.mail-card > \.ui-sheet-foot \{ display: none; \}/);
+  });
+  it('stands the list and the letter side by side in the stretching row, one line per letter', () => {
+    assert.match(rule, /#mail-panel \.mail-card > \.mail-layout \{ grid-row: 2; grid-column: 1 \/ -1; align-self: stretch; height: auto; grid-template-columns: minmax\(200px, 38%\) minmax\(0, 1fr\);/);
+    assert.match(rule, /#mail-panel \.mail-row-copy span \{ display: block; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;/);
+  });
+});
