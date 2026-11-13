@@ -12,7 +12,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { createStreetMinimap } from '../public/js/ui/street-minimap.js?fresh=street-minimap-ready';
+import { PICTURE_CACHE_MAX, createPictureCache, createStreetMinimap } from '../public/js/ui/street-minimap.js?fresh=street-minimap-ready';
 import { ART_CAP_MS, ART_SETTLE_MS, pendingArtSources, viewIsFor } from '../public/js/features/street-minimap-feature.js?fresh=street-minimap-ready';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -55,6 +55,7 @@ function fakeEl(tag = 'div') {
     focus() {},
     querySelector(s) { if (!el.sel.has(s)) el.sel.set(s, fakeEl()); return el.sel.get(s); },
     querySelectorAll: () => [],
+    decode: () => Promise.resolve(),
     getBoundingClientRect: () => ({ left: 0, top: 0, right: 192, bottom: 100, width: 192, height: 100 }),
     clientWidth: 192,
     offsetWidth: 0,
@@ -150,7 +151,7 @@ describe('READY: the card waits unseen for its picture, then fades in', () => {
 
   it('the feature keeps the old hooks and adds streetMapReady; a failed snapshot reveals the lines', () => {
     assert.match(featSrc, /setData\?\.\('streetMapReady', on \? '1' : '0'\)/);
-    assert.match(featSrc, /if \(canvas\) view\.setPicture\(canvas\);\s+\/\/ READY[^\n]*\n\s+else if \(!view\.ready\) view\.reveal\(\);/);
+    assert.match(featSrc, /\/\/ READY: a snapshot that fails outright[^\n]*\n\s+else if \(!canvas && !view\.ready\) view\.reveal\(\);/);
     assert.match(viewSrc, /root\.dataset\.picture = kept \? 'snapshot' : 'lines';/, 'streetMapPicture keeps lines|snapshot');
   });
 });
@@ -196,5 +197,60 @@ describe('ART: the snapshot waits for the street\'s art, with a cap', () => {
     const open = featSrc.slice(featSrc.indexOf('function phoneOpen('), featSrc.indexOf('function phoneClose('));
     assert.doesNotMatch(open, /view\.expand\(true\);\s+\/\/ One snapshot[^\n]*\n\s+scheduleSnaps\(engine, \[60\]\);/);
     assert.match(featSrc, /function phoneClose\([^)]*\) \{\s+if \(!phone\) return;\s+clearSnaps\(\);\s+stopArt\(\);/);
+  });
+});
+
+describe('REVISIT: a street walked back to shows its map at once', () => {
+  it('keeps the last picture of the 12 most recent streets, the oldest going first', () => {
+    assert.equal(PICTURE_CACHE_MAX, 12);
+    const cache = createPictureCache({ max: 3 });
+    cache.put('LA', 'a');
+    cache.put('LB', 'b');
+    cache.put('LC', 'c');
+    assert.equal(cache.get('LA'), 'a', 'a read makes it the newest');
+    cache.put('LD', 'd');
+    assert.deepEqual(cache.keys(), ['LC', 'LA', 'LD']);
+    assert.equal(cache.get('LB'), null);
+    cache.put('LC', 'c2');
+    assert.deepEqual(cache.keys(), ['LA', 'LD', 'LC']);
+    assert.equal(cache.bytes(), 4);
+    cache.put('', 'x');
+    cache.put('LE', '');
+    assert.equal(cache.size, 3, 'no key or no picture: nothing kept');
+  });
+
+  it('a cached picture shows the card at once (no fade) once it decodes; a newer snapshot wins over a late decode', async () => {
+    const { view, log } = makeView();
+    view.setStreet(street('LA'), { cached: 'data:image/webp;base64,BBBB' });
+    view.setState('shown');
+    assert.equal(view.ready, false, 'waits for the decode, never a blank card');
+    await Promise.resolve();
+    await Promise.resolve();
+    assert.equal(view.ready, true);
+    assert.equal(view.root.dataset.fade, 'false');
+    assert.equal(view.root.dataset.picture, 'snapshot');
+    assert.equal(view.root.querySelector('.smm-pic').src, 'data:image/webp;base64,BBBB');
+    assert.deepEqual(log.ready, [true]);
+
+    const b = makeView();
+    b.view.setStreet(street('LB'), { cached: 'data:image/webp;base64,OLD' });
+    b.view.setState('shown');
+    b.view.setPicture(fakeEl('canvas'));
+    await Promise.resolve();
+    await Promise.resolve();
+    assert.notEqual(b.view.root.querySelector('.smm-pic').src, 'data:image/webp;base64,OLD');
+  });
+
+  it('stores the picture compactly: WebP, else JPEG', () => {
+    const { view } = makeView();
+    view.setStreet(street());
+    assert.match(view.pictureForCache(), /^data:image\/webp;/);
+    assert.match(viewSrc, /pic\.toDataURL\('image\/jpeg', 0\.85\)/);
+  });
+
+  it('the feature reads the cache on a new street, refreshes it after the art, and never caches a capped picture', () => {
+    assert.match(featSrc, /const cached = street && !rebuilt \? pictureCache\.get\(street\.tsid\) : null;/);
+    assert.match(featSrc, /view\.setStreet\(street, \{ platforms: engine\.platforms \|\| \[\], keepPicture: rebuilt, cached \}\);[\s\S]{0,900}\} else startArt\(engine\);/, 'the art watch still runs on a hit');
+    assert.match(featSrc, /street\.tsid && \(!art \|\| art\.loaded\)\) \{\s+pictureCache\.put\(street\.tsid, view\.pictureForCache\(\)\);/);
   });
 });

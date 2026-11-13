@@ -228,7 +228,7 @@ describe('home map: the wiring', () => {
     assert.equal(RESNAP_SETTLE_MS, 300);
     assert.equal(RESNAP_MIN_MS, 1000);
     assert.match(feature, /const REBUILD_SNAP_AT_MS = \[250, 1500\];/);
-    assert.match(feature, /view\.setStreet\(street, \{ platforms: engine\.platforms \|\| \[\], keepPicture: rebuilt \}\);/);
+    assert.match(feature, /view\.setStreet\(street, \{ platforms: engine\.platforms \|\| \[\], keepPicture: rebuilt, cached \}\);/);
     assert.match(feature, /if \(snapKey && liveKey\(engine\) !== snapKey\) requestResnap\(engine\);/);
     assert.match(ui, /const kept = keepPicture && snapPic && next && String\(next\.tsid \|\| ''\) === snapTsid \? snapPic : null;/);
     // A resize rebuild keeps it too.

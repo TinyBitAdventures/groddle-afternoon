@@ -43,7 +43,12 @@
  *   no click or Tab reaches it (data-ready "false"). The 2012 client snapped the street when the
  *   location was built, behind its loading view (LocationViewBuilder.locationBuilt ->
  *   resnapMiniMap), so its map was there when the street showed; only a map shown with no picture
- *   at all got a fogged stand-in until the snap (MiniMapView.show 873-886). A scene a feature builds (a home street, the house, a
+ *   at all got a fogged stand-in until the snap (MiniMapView.show 873-886).
+ * - REVISIT: the last picture of each of the PICTURE_CACHE_MAX most recent streets is kept for the
+ *   session (createPictureCache, a WebP or JPEG data URL at the picture's own size, a few KB each),
+ *   so a street you walk back to shows its map at once (setStreet's `cached`), refreshed when its
+ *   art has loaded. The 2012 client kept no such cache: its snap was ready behind the loading view.
+ *   A scene a feature builds (a home street, the house, a
  *   Tower floor, a visit, an instance or a race) has no street image: it is snapped live with
  *   its cultivations, fixtures and furniture, and re-snapped as it changes (lane HOMEMAP,
  *   features/street-minimap-feature.js).
@@ -388,6 +393,43 @@ export function sceneSignMarks(targets = []) {
 
 /* ------------------------------------------------------------------ picture */
 
+/** REVISIT: how many streets' pictures the session keeps. */
+export const PICTURE_CACHE_MAX = 12;
+
+/**
+ * REVISIT: the last pictures of recent streets, newest last (a small LRU by street tsid). Values are
+ * the compact data URLs view.pictureForCache makes; `bytes()` is their size, for QA (phone memory, G663).
+ */
+export function createPictureCache({ max = PICTURE_CACHE_MAX } = {}) {
+  const map = new Map();
+  const limit = Math.max(1, Math.floor(Number(max) || PICTURE_CACHE_MAX));
+  return {
+    get(key) {
+      const k = String(key ?? '');
+      if (!k || !map.has(k)) return null;
+      const v = map.get(k);
+      map.delete(k);
+      map.set(k, v);
+      return v;
+    },
+    put(key, value) {
+      const k = String(key ?? '');
+      if (!k || !value) return;
+      map.delete(k);
+      map.set(k, value);
+      while (map.size > limit) map.delete(map.keys().next().value);
+    },
+    delete: (key) => map.delete(String(key ?? '')),
+    clear: () => map.clear(),
+    get size() { return map.size; },
+    keys: () => [...map.keys()],
+    bytes: () => [...map.values()].reduce((n, v) => n + String(v).length, 0),
+  };
+}
+
+/** REVISIT: whether this browser writes WebP from a canvas (Safari may answer with a PNG); null until tried. */
+let webpWrites = null;
+
 const hex = (v) => `#${String(v || '').replace(/^#/, '').slice(0, 6).padStart(6, '0')}`;
 
 /**
@@ -604,6 +646,31 @@ export function createStreetMinimap(doc, host, opts = {}) {
   let lastLayout = -1;
   // READY: the card shows only once it has the street's picture (a snapshot, or the lines if one fails).
   let ready = false;
+  // REVISIT: a newer street or snapshot makes a cached picture still decoding stale.
+  let picToken = 0;
+
+  /** REVISIT: show a street's cached picture (a data URL) once it has decoded, at once (no fade). */
+  function showCached(url, token) {
+    const done = () => {
+      if (token !== picToken || !street) return;
+      const copy = doc.createElement('canvas');
+      copy.width = pic.width;
+      copy.height = pic.height;
+      try {
+        copy.getContext?.('2d')?.drawImage(picImg, 0, 0, copy.width, copy.height);
+        pic.getContext?.('2d')?.drawImage(picImg, 0, 0, pic.width, pic.height);
+      } catch { /* the snapshot to come draws it */ }
+      snapPic = copy;
+      snapTsid = String(street.tsid || '');
+      root.dataset.picture = 'snapshot';
+      setReady(true, { fade: false });
+    };
+    picImg.src = url;
+    const decoding = typeof picImg.decode === 'function' ? picImg.decode() : null;
+    // A picture that will not decode: the card waits for the street's own snapshot instead.
+    if (decoding?.then) decoding.then(done, () => {});
+    else done();
+  }
 
   /** READY: show the card (fading in unless `fade` is false) or hide it while its picture is made. */
   function setReady(on, { fade = true } = {}) {
@@ -887,7 +954,7 @@ export function createStreetMinimap(doc, host, opts = {}) {
      * expansion or a new style) keeps its last snapshot until the next one, so the map never
      * goes blank between them.
      */
-    setStreet(next, { platforms = [], keepPicture = false } = {}) {
+    setStreet(next, { platforms = [], keepPicture = false, cached = null } = {}) {
       const kept = keepPicture && snapPic && next && String(next.tsid || '') === snapTsid ? snapPic : null;
       const sameStreet = Boolean(next && street && String(next.tsid || '') === String(street.tsid || ''));
       // READY: the same street drawn again (a new width, a rebuilt home) stays shown.
@@ -923,6 +990,8 @@ export function createStreetMinimap(doc, host, opts = {}) {
       showPic();
       root.dataset.picture = kept ? 'snapshot' : 'lines';
       setReady(Boolean(kept) || stayReady, { fade: false });
+      picToken += 1;
+      if (!kept && !stayReady && typeof cached === 'string' && cached) showCached(cached, picToken);
       const fogged = Boolean(street.fogMap);
       fog.hidden = !fogged;
       wash.hidden = !fogged;
@@ -958,6 +1027,7 @@ export function createStreetMinimap(doc, host, opts = {}) {
       if (!canvas || !street) return false;
       const ctx = pic.getContext?.('2d');
       if (!ctx) return false;
+      picToken += 1;
       drawLinesPicture(pic, street, api._platforms || []);
       ctx.drawImage(canvas, 0, 0, pic.width, pic.height);
       snapPic = canvas;
@@ -966,6 +1036,22 @@ export function createStreetMinimap(doc, host, opts = {}) {
       root.dataset.picture = 'snapshot';
       setReady(true);
       return true;
+    },
+    /**
+     * REVISIT: the picture as it shows now, compact for the session's cache: WebP where the browser
+     * writes it, else JPEG (the picture is opaque: the sky gradient under everything). '' on failure.
+     */
+    pictureForCache() {
+      try {
+        if (webpWrites !== false) {
+          const url = pic.toDataURL('image/webp', 0.8);
+          webpWrites = url.startsWith('data:image/webp');
+          if (webpWrites) return url;
+        }
+        return pic.toDataURL('image/jpeg', 0.85);
+      } catch {
+        return '';
+      }
     },
     /** READY: no snapshot could be made: show the lines picture rather than nothing. */
     reveal() {

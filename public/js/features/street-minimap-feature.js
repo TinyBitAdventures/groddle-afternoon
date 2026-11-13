@@ -55,12 +55,13 @@
  * Canvas data: streetMap (shown|off|no-map|hidden|phone), streetMapFog, streetMapExpanded,
  * streetMapDots, streetMapDotIds, streetMapSigns, streetMapPicture (lines|snapshot),
  * streetMapReady (1 the card shows with its picture, 0 it waits unseen for it), streetMapArt (ART:
- * waiting for the view | loading:<images left> | capped:<images left> | loaded),
+ * waiting for the view | loading:<images left> | capped:<images left> | loaded), streetMapCache (REVISIT:
+ * hit, the street's last picture showed at once | miss), streetMapCacheKb (the cache's size),
  * streetMapSnapMs (the last snapshot's cost), streetMapSnaps (how many taken), streetMapWalk (the last click: kind:x, or
  * refused). QA: &streetmapexpand=1 expands it on each street.
  */
 
-import { createStreetMinimap, minimapVisibility, onStreetMapChange, sceneSignMarks, setStreetMap, signpostMarks, snapshotStreetView, snapsWithScene, streetMapOn } from '../ui/street-minimap.js?v=00643143';
+import { createPictureCache, createStreetMinimap, minimapVisibility, onStreetMapChange, sceneSignMarks, setStreetMap, signpostMarks, snapshotStreetView, snapsWithScene, streetMapOn } from '../ui/street-minimap.js?v=b91ef38a';
 import { classicArtUrl } from '../classic/classic-art.js?v=5f713e7d';
 import { onUiModeChange } from '../classic/ui-mode.js?v=9705b783';
 import { focusBack } from '../ui/focus-return.js?v=da190597';
@@ -95,6 +96,8 @@ let snapKey = '';
 let resnapTimer = null;
 let lastSignKey = '';
 let snapCount = 0;
+/** REVISIT: the last picture of each recent street this session (js/ui/street-minimap.js createPictureCache). */
+export const pictureCache = createPictureCache();
 /** ART: the art watch for this street ({ street, view, left, loaded, capped, ... }), or null. */
 let art = null;
 /** PHONE MAP: { btn, sheet, plateStreet } on a phone (the map's view lives only while the sheet is open). */
@@ -217,9 +220,13 @@ function snap(engine) {
   snapKey = live ? liveKey(engine) : '';
   const ms = lastSnapAt - t0;
   engine.setData?.('streetMapSnapMs', ms.toFixed(1));
-  if (canvas) view.setPicture(canvas);
+  // REVISIT: kept for a walk back once the art is all in (never a capped, half-loaded picture).
+  if (canvas && view.setPicture(canvas) && street.tsid && (!art || art.loaded)) {
+    pictureCache.put(street.tsid, view.pictureForCache());
+    engine.setData?.('streetMapCacheKb', String(Math.round(pictureCache.bytes() / 1024)));
+  }
   // READY: a snapshot that fails outright shows the lines picture rather than no card.
-  else if (!view.ready) view.reveal();
+  else if (!canvas && !view.ready) view.reveal();
   engine.setData?.('streetMapPicture', view.root.dataset.picture || 'lines');
   engine.setData?.('streetMapSnaps', String((snapCount += 1)));
 }
@@ -377,7 +384,10 @@ function enterStreet(engine) {
   street = next;
   clearSnaps();
   snapOwed = false;
-  view.setStreet(street, { platforms: engine.platforms || [], keepPicture: rebuilt });
+  // REVISIT: a street walked back to shows its last picture at once; its art still refreshes it.
+  const cached = street && !rebuilt ? pictureCache.get(street.tsid) : null;
+  view.setStreet(street, { platforms: engine.platforms || [], keepPicture: rebuilt, cached });
+  if (street && !rebuilt) engine.setData?.('streetMapCache', cached ? 'hit' : 'miss');
   if (!rebuilt) lastSignKey = '';
   engine.setData?.('streetMapSigns', view.root.dataset.signs || '0');
   engine.setData?.('streetMapFog', street?.fogMap ? '1' : '0');

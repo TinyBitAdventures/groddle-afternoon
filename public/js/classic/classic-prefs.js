@@ -25,7 +25,7 @@ import { CLASSIC_MIN_W, CLASSIC_MIN_H } from './classic-layout.js?v=8ab26a26';
 import { installClassicChrome } from './classic-chrome.js?v=e6e903b6';
 import { ZOOM_KEYS_HINT, clampZoom, onZoomChange, setWorldZoom, worldZoom, zoomLabel, zoomValueText } from '../world-zoom.js?v=38816228';
 import { NIGHT_TINT_HINT, NIGHT_TINT_LABEL, nightTintOn, onNightTintChange, setNightTint } from '../night-tint.js?v=1dfc9c89';
-import { STREET_MAP_HINT, STREET_MAP_LABEL, onStreetMapChange, setStreetMap, streetMapOn } from '../ui/street-minimap.js?v=00643143';
+import { STREET_MAP_HINT, STREET_MAP_LABEL, onStreetMapChange, setStreetMap, streetMapOn } from '../ui/street-minimap.js?v=b91ef38a';
 import { focusBack } from '../ui/focus-return.js?v=da190597';
 
 export const PREFS_TITLE = 'Preferences';
