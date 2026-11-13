@@ -13908,7 +13908,7 @@ body:has(#quest-dialogue:not([hidden])) .prompt-stack { z-index: calc(var(--z-mo
    home indicator, and every HUD element at a screen edge keeps inside the safe area. --safe-* are the
    screen's env(safe-area-inset-*): 0 on a computer and wherever there is no notch, so nothing moves
    there. js/notify-view.js reads --safe-l and --safe-r. The stick and Jump (TOUCH) and the prompts
-   over them (PHONE6) already add the insets themselves. */
+   over them (PHONE6) already add the insets themselves. Modern only: a phone always shows Modern (#264). */
 :root {
   --safe-t: env(safe-area-inset-top, 0px);
   --safe-r: env(safe-area-inset-right, 0px);
@@ -13931,12 +13931,12 @@ html:not(.stage-pinned)[data-ui="modern"] #wrap > .top-bar {
 }
 /* The Social drawer and its rail on the right (js/ui/social-drawer.js measures where it ends, so
    --inset-r and everything centred beside it follow). */
-.local-chat-dock.social-drawer {
+[data-ui="modern"] .local-chat-dock.social-drawer {
   right: calc(var(--hud-inset, 8px) + var(--safe-r));
   max-width: calc(100% - 16px - var(--safe-l) - var(--safe-r));
 }
 /* The pack row: above the home indicator, and its band inside the notch either way up. */
-#game-root .pack-bar:not([data-hb-dock]) {
+[data-ui="modern"] #game-root .pack-bar:not([data-hb-dock]) {
   bottom: var(--safe-b);
   padding-left: max(calc(var(--pack-inset) + var(--safe-l)), var(--pack-clear-l, 0px));
   padding-right: max(calc(var(--pack-inset) + var(--safe-r)), var(--pack-clear-r, 0px));

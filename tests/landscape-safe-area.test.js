@@ -46,8 +46,8 @@ describe('edge to edge on a phone', () => {
     assert.match(bar, /right: calc\(var\(--hud-inset\) \+ var\(--safe-r\)\)/);
     assert.match(rule('[data-ui="modern"] .street-nameplate'), /var\(--safe-t\)/);
     assert.match(rule('[data-ui="modern"] .street-nameplate.is-placed.is-under'), /var\(--safe-t\)/);
-    assert.match(rule('.local-chat-dock.social-drawer'), /right: calc\(var\(--hud-inset, 8px\) \+ var\(--safe-r\)\)/);
-    const pack = rule('#game-root .pack-bar:not([data-hb-dock])');
+    assert.match(rule('[data-ui="modern"] .local-chat-dock.social-drawer'), /right: calc\(var\(--hud-inset, 8px\) \+ var\(--safe-r\)\)/);
+    const pack = rule('[data-ui="modern"] #game-root .pack-bar:not([data-hb-dock])');
     assert.match(pack, /bottom: var\(--safe-b\)/);
     assert.match(pack, /padding-left: max\(calc\(var\(--pack-inset\) \+ var\(--safe-l\)\), var\(--pack-clear-l, 0px\)\)/);
     assert.match(pack, /padding-right: max\(calc\(var\(--pack-inset\) \+ var\(--safe-r\)\), var\(--pack-clear-r, 0px\)\)/);
