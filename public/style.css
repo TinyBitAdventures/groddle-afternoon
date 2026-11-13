@@ -14094,6 +14094,11 @@ body.is-booting .touch-controls { display: none; }
 :root.touch-phone #game-root #pack-bar:not([data-hb-dock]) .pack-scroll.is-over { -webkit-mask-image: linear-gradient(90deg, var(--c-black) 86%, transparent); mask-image: linear-gradient(90deg, var(--c-black) 86%, transparent); }
 :root.touch-phone #game-root #pack-bar:not([data-hb-dock]) .pack-scroll.is-scrolled { -webkit-mask-image: linear-gradient(90deg, transparent, var(--c-black) 10%); mask-image: linear-gradient(90deg, transparent, var(--c-black) 10%); }
 :root.touch-phone #game-root #pack-bar:not([data-hb-dock]) .pack-scroll.is-over.is-scrolled { -webkit-mask-image: linear-gradient(90deg, transparent, var(--c-black) 10%, var(--c-black) 86%, transparent); mask-image: linear-gradient(90deg, transparent, var(--c-black) 10%, var(--c-black) 86%, transparent); }
+/* #273 (Friendly): the row's end ("16/16", search and the save cloud) took room the slots need. On a phone
+   the slot count goes (the empty slots show it), and search and the cloud are small icons. */
+:root.touch-phone #game-root #pack-bar:not([data-hb-dock]) #pack-count { display: none; }
+:root.touch-phone #game-root #pack-bar:not([data-hb-dock]) #pack-search-btn { width: 30px; height: 30px; }
+:root.touch-phone #game-root #pack-bar:not([data-hb-dock]) #pack-row > .save-pill.in-row:not([data-state="conflict"], [data-state="signed-out"]) { width: 28px; height: 28px; }
 /* FEATURED: the featured project's pill covered the street's name ("Shiltrigg Tiers · 9:42 PM"). A
    phone shows the name; the project is the Menu's row instead (js/ui/featured-project.js
    renderFeaturedMenuRow) and the Feat panel's (H) as before. */

@@ -101,3 +101,13 @@ describe('#281 the loading card on a narrow screen', () => {
     assert.match(css, /\n\.st-details \{\s*display: flex;\s*align-items: flex-start;/);
   });
 });
+
+// #273 (Friendly): the pack row's end ("16/16", search, the save cloud) took the slots' room on a phone.
+describe('#273 the pack row on a phone', () => {
+  it('the slot count goes, search and the cloud are small icons, search stays', () => {
+    assert.match(css, /:root\.touch-phone #game-root #pack-bar:not\(\[data-hb-dock\]\) #pack-count \{ display: none; \}/);
+    assert.match(css, /:root\.touch-phone #game-root #pack-bar:not\(\[data-hb-dock\]\) #pack-search-btn \{ width: 30px; height: 30px; \}/);
+    assert.match(css, /#pack-row > \.save-pill\.in-row:not\(\[data-state="conflict"\], \[data-state="signed-out"\]\) \{ width: 28px; height: 28px; \}/);
+    assert.doesNotMatch(css, /touch-phone[^{]*#pack-search-btn[^{]*\{[^}]*display: none/);
+  });
+});
