@@ -16,7 +16,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { resolveTokens } from './css-tokens.js';
 
-import { DOT_DONE, QUEST_PLATE_CARDS, captionMs, compactCount, dotCount, nextCaption, tidy } from '../public/js/quest-plate.js?v=691cad9e';
+import { DOT_DONE, QUEST_PLATE_CARDS, captionMs, compactCount, dotCount, nextCaption, tidy } from '../public/js/quest-plate.js?v=a0240f13';
 
 const root = join(import.meta.dirname, '..');
 const read = (p) => readFileSync(join(root, p), 'utf8');

@@ -2792,9 +2792,14 @@
   "deployed": "2026-11-13"
  },
  "git": {
-  "commits": 2052,
+  "commits": 2053,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-13",
+    "kind": "fix",
+    "text": "Street crabs are their full Glitch size again"
+   },
    {
     "date": "2026-11-13",
     "kind": "improve",
@@ -2909,11 +2914,6 @@
     "date": "2026-11-13",
     "kind": "fix",
     "text": "A street project that asks for the same item (or currants) twice now credits the row you contributed on"
-   },
-   {
-    "date": "2026-11-13",
-    "kind": "new",
-    "text": "The Made for Groddle pictures on /restoration/ open in a compare popup that flips between the original and the made art"
    }
   ]
  },

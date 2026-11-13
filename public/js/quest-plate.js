@@ -30,7 +30,7 @@
 /**
  * The quest cards that fold into the pill: each card's id and where its parts are.
  * title/stage/timer/leave/step/line/count/progress are selectors inside the card;
- * countNote (#298) is a note beside the count: shown, its data-short follows the count in the pill;
+ * countNote (#298) is a note beside the count: shown, its data-short takes the unit's place in the pill;
  * icon is an <img> (or a mark whose text is the icon); dots are the progress marks
  * (done when they carry one of DOT_DONE).
  */

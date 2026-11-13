@@ -14,8 +14,8 @@ import {
   createWinterWalkState,
   winterMoteCapped,
   winterMoteLimitNotice,
-} from '../public/js/winter-walk.js?v=f830b2aa';
-import { QUEST_PLATE_CARDS, compactCount } from '../public/js/quest-plate.js?v=691cad9e';
+} from '../public/js/winter-walk.js?v=a5c63b75';
+import { QUEST_PLATE_CARDS, compactCount } from '../public/js/quest-plate.js?v=a0240f13';
 import { quoinLimitPrompt } from '../public/js/quoins.js?v=61be601c';
 
 const root = join(import.meta.dirname, '..');
@@ -61,7 +61,10 @@ describe('#298: Winter Walk motes at the daily quoin limit', () => {
     assert.match(hud, /winterMoteCapped\('mote', quoinState\) && progress\.collected < progress\.total/);
     const card = QUEST_PLATE_CARDS.find((c) => c.id === 'winter-walk-hud');
     assert.equal(card.countNote, '[data-winter-mote-cap]');
-    assert.match(plate, /if \(html && note && !note\.hidden && note\.dataset\.short\) html \+= ` · \$\{escapeHtml\(note\.dataset\.short\)\}`;/);
-    assert.equal(`${compactCount('0 / 15', card.unit)} · ${WINTER_MOTE_LIMIT_SHORT}`, '0/15 motes · quoin limit');
+    assert.match(plate, /const short = note && !note\.hidden \? note\.dataset\.short \|\| '' : '';/);
+    assert.match(plate, /compactCount\(read\(card, cfg\.count\)\?\.textContent, short \? '' : cfg\.unit\)/);
+    assert.match(plate, /if \(html && short\) html \+= ` · \$\{escapeHtml\(short\)\}`;/);
+    assert.equal(compactCount('0 / 15', card.unit), '0/15 motes');
+    assert.equal(`${compactCount('0 / 15', '')} · ${WINTER_MOTE_LIMIT_SHORT}`, '0/15 · limit');
   });
 });

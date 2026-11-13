@@ -295,9 +295,9 @@ export function winterWalkProgress(state) {
  */
 export const WINTER_MOTE_LIMIT_NOTICE =
   "You've reached your limit on quoins for this game day, and winter motes are quoins too. The motes you leave will still be here on a walk next game day.";
-/** Beside the count: the card's line, and the pill's short word. */
+/** Beside the count: the card's line, and the pill's short word ("0/15 · limit", room on a phone). */
 export const WINTER_MOTE_LIMIT_NOTE = "Today's quoin limit is reached: the motes wait for the next game day.";
-export const WINTER_MOTE_LIMIT_SHORT = 'quoin limit';
+export const WINTER_MOTE_LIMIT_SHORT = 'limit';
 
 /** Whether this mote is held back by the limit (a Qurazy is outside it, quoin.js 159). */
 export function winterMoteCapped(kind, { collectedToday = 0, dailyLimit = Infinity } = {}) {

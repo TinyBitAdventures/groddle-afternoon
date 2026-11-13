@@ -13,7 +13,7 @@
  *
  * Canvas data: questPlate (the adopted card's id), questPlateOpen, questCaption.
  */
-import { DOT_DONE, QUEST_PLATE_CARDS, captionMs, compactCount, dotCount, nextCaption, tidy } from '../quest-plate.js?v=691cad9e';
+import { DOT_DONE, QUEST_PLATE_CARDS, captionMs, compactCount, dotCount, nextCaption, tidy } from '../quest-plate.js?v=a0240f13';
 
 export const QUEST_PLATE_FEATURE_ID = 'quest-plate';
 const SYNC_MS = 150;
@@ -216,9 +216,11 @@ function fillProgress(card, cfg) {
         : `${n}/${total}`;
     }
   } else if (cfg.count) {
-    html = escapeHtml(compactCount(read(card, cfg.count)?.textContent, cfg.unit));
+    // #298: a shown note's short word takes the unit's place (the phone pill has room for one).
     const note = cfg.countNote ? read(card, cfg.countNote) : null;
-    if (html && note && !note.hidden && note.dataset.short) html += ` · ${escapeHtml(note.dataset.short)}`;
+    const short = note && !note.hidden ? note.dataset.short || '' : '';
+    html = escapeHtml(compactCount(read(card, cfg.count)?.textContent, short ? '' : cfg.unit));
+    if (html && short) html += ` · ${escapeHtml(short)}`;
   } else if (cfg.progress) {
     html = escapeHtml(compactCount(read(card, cfg.progress)?.textContent));
   }
