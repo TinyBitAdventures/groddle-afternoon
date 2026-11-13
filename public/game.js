@@ -32663,13 +32663,13 @@ async function main() {
   });
   function worldPress(e) {
     if (!state.started || menuTarget || isMapOpen() || isScreenFxBlocking()) return;
-    // #271: in a phone's Camera Mode a finger looks around (features/camera-mode-feature.js); a tap never walks or opens a menu.
-    if (TOUCH_PHONE && e.pointerType === 'touch' && features.query('cameraModeActive', engine) === true) return;
     // Player report 23: only the main button acts on the world. The client's right click was its
     // Flash menu, "A game by Tiny Speck" (BootStrap.as 38-55, TSMainView.as 207), never a verb menu.
     if (e.pointerType === 'mouse' && e.button !== 0) return;
     // RIGHTCLICK: a Mac's Ctrl+click is a right-click (the contextmenu below opens the menu); it never acts.
     if (e.pointerType === 'mouse' && e.ctrlKey && MAC_CTRL_CLICK) return;
+    // #271: in a phone's Camera Mode a finger looks around (features/camera-mode-feature.js); a tap never walks or opens a menu.
+    if (TOUCH_PHONE && e.pointerType === 'touch' && features.query('cameraModeActive', engine) === true) return;
     // The press that closed a verb menu (VERBS) does nothing else, as the old shade's did; so does
     // the press that closed a signpost's arms menu (RIGHTCLICK R6).
     if (e.timeStamp === verbMenuClosedByPointerAt || e.timeStamp === worldCtxMenu?.closedByPressAt()) return;
