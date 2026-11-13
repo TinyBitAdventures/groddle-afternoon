@@ -26,6 +26,8 @@ import {
   feedBaby,
   feedBatterfly,
   feedPiggyStack,
+  piggySnackLine,
+  piggySnackOnly,
   guanoForFoodCounter,
   hatchIncubation,
   hogtieEscapeDelayMs,
@@ -46,11 +48,11 @@ import {
   stepHogtie,
   stickPlaceState,
   takePlop,
-} from '../public/js/animal-husbandry.js?v=b80d23e0';
-import { pickerMaxCount, pickerOptionsFor, pickerTakesCount, listAnimalFeedOptions, createAnimalState } from '../public/js/animals.js?v=1069540e';
-import { getVerbsFor, runVerb } from '../public/content.js?v=705c9a46';
+} from '../public/js/animal-husbandry.js?v=b1efd9e0';
+import { pickerMaxCount, pickerOptionsFor, pickerTakesCount, listAnimalFeedOptions, createAnimalState } from '../public/js/animals.js?v=b23aee62';
+import { getVerbsFor, runVerb } from '../public/content.js?v=d52bb005';
 import { setStreetEcologyCatalog } from '../public/js/street-ecology.js?v=c8d6fa5b';
-import { batterflyPlacementGroups, normalizeHusbandrySlot } from '../public/js/features/animal-husbandry-feature.js?v=8140b3d2';
+import { batterflyPlacementGroups, normalizeHusbandrySlot } from '../public/js/features/animal-husbandry-feature.js?v=9dd4029a';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const publicDir = join(here, '../public');
@@ -178,6 +180,35 @@ describe('Piggy feeding and Piggy Plop (npc_animal feed, plop.js)', () => {
     assert.deepEqual(feedPiggyStack({}, 'pumpkin', 1).plops, [{ type: 'seed_pumpkin', num: 2 }]);
     assert.deepEqual(feedPiggyStack({}, 'cherry', 5).plops, [], 'cherries are not crops');
     assert.equal(feedPiggyStack({}, 'pumpkin', 50).count, 11, 'one stack (pumpkin stackmax 11)');
+  });
+
+  it('says when a feed under base cost 5 does not fill a hungry Piggy (npc_piggy.js 671-674)', () => {
+    const hungry = { hunger: 10, croaking: true };
+    let res = feedPiggyStack(hungry, 'cherry', 1);
+    assert.equal(res.snack, "The Piggy ate the Cherry, but it's still hungry. Something more filling would help.");
+    assert.equal(hungry.hunger, 10, 'the rule stays: a Cherry never clears the hunger');
+    assert.equal(res.xp, 0);
+    assert.match(res.msg, /You fed the Piggy 1 Cherry/, 'the feed line is unchanged');
+    assert.match(feedPiggyStack({ hunger: 1 }, 'grain', 3).snack, /ate the Grains?, but it's still hungry/i);
+    assert.match(feedPiggyStack({ hunger: 2, userName: 'Hamlet' }, 'plum', 1).snack, /^The Hamlet ate the plum,/i);
+    for (const cls of ['cherry', 'grain', 'plum', 'spinach', 'rice', 'onion', 'cucumber']) {
+      assert.equal(piggySnackOnly({ hunger: 4 }, cls), true, `${cls} is a snack`);
+    }
+    res = feedPiggyStack({ hunger: 10 }, 'potato', 1);
+    assert.equal(res.snack, '', 'filling food: no line');
+    assert.equal(res.xp, 2);
+    assert.equal(feedPiggyStack({ hunger: 0 }, 'cherry', 1).snack, '', 'not hungry: no line');
+    assert.equal(piggySnackLine({}, 'cherry'), '', 'no hunger read as not hungry');
+    // The content verb carries it for game.js, solo and on a shared street Piggy (whose hunger is the server's copy).
+    const target = { classId: 'npc_piggy', state: { ...createAnimalState('npc_piggy'), hunger: 5 } };
+    const pc = { energy: 80, mood: 50, imagination: 0, xp: 0 };
+    const snack = runVerb(target, 'feed:onion:2', { pc, inv: { onion: 2 } });
+    assert.equal(snack.ok, true);
+    assert.match(snack.snack, /ate the onions?, but it's still hungry/i);
+    assert.equal(target.state.hunger, 5);
+    const full = runVerb(target, 'feed:potato:1', { pc, inv: { potato: 1 } });
+    assert.equal(full.snack, '');
+    assert.equal(target.state.hunger, 0);
   });
 
   it('plops 2-7 seeds at a time, five seconds apart', () => {

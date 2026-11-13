@@ -16,7 +16,7 @@ import {
   isFoodItem,
   itemLabel,
   itemStackMax,
-} from './animal-husbandry.js?v=b80d23e0';
+} from './animal-husbandry.js?v=b1efd9e0';
 import { ensurePiggyMood, piggyMoodLabel } from './animal-mood.js?v=a49495fc';
 
 export const ANIMAL_CLASS_IDS = Object.freeze([
@@ -175,7 +175,7 @@ export function feedAnimal(classId, state, inv, classTsid, count = 1) {
     s.fed = true;
     s.feedCount = (s.feedCount || 0) + 1;
     s.lastFed = classTsid;
-    return { ok: true, classTsid, label: food.label, nutrition: food.nutrition, count: fed.count, xp: fed.xp, plops: fed.plops, msg: fed.msg };
+    return { ok: true, classTsid, label: food.label, nutrition: food.nutrition, count: fed.count, xp: fed.xp, plops: fed.plops, msg: fed.msg, snack: fed.snack };
   }
   inv[classTsid] -= 1;
   s.fed = true;

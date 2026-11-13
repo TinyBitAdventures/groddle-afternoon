@@ -2,9 +2,9 @@
  * Groddle Afternoon — original street geometry + layered decos
  * PixiJS 8 · locations-xml streets · CoU PNG decos · quests/items
  */
-import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=705c9a46';
+import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=d52bb005';
 import { createErrorOnce, createFeatureHost } from './js/feature-host.js?v=06bb8b74';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=bdf34768';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=08582437';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl, drawTileArt } from './js/enter-chooser.js?v=4a3ea327';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -490,8 +490,8 @@ import { PACK_COPY, isBagClass, isElementClass, ownBagLabel, unitRankAt } from '
 import { FLOAT_TEXT_Z, SPEECH_BUBBLE_Z } from './js/fx-z.js?v=18dda7e3';
 import { hasPouch } from './js/elemental-pouch.js?v=42702eda';
 import { createPackRow, mountPackClearance, packBandRange, packCountText, packSearchEntries, packSlotTip } from './js/ui/pack-row.js?v=64e4a567';
-import { listAnimalFeedOptions } from './js/animals.js?v=1069540e';
-import { pickerMaxCount, pickerOptionsFor, pickerTakesCount } from './js/animals.js?v=1069540e';
+import { listAnimalFeedOptions } from './js/animals.js?v=b23aee62';
+import { pickerMaxCount, pickerOptionsFor, pickerTakesCount } from './js/animals.js?v=b23aee62';
 import {
   createDroppedItemState,
   parseDroppedItemState,
@@ -868,7 +868,7 @@ import {
   createAnimalState,
   resetAnimalDay,
   animalStatusLabel,
-} from './js/animals.js?v=1069540e';
+} from './js/animals.js?v=b23aee62';
 import {
   ensureWoodTreeState,
   pickWoodTool,
@@ -989,7 +989,7 @@ import {
   treePlacementRequest,
   ROCK_SHAPE_WIDTHS,
 } from './js/street-ecology.js?v=c8d6fa5b';
-import { CHICKEN_PAUSE, chickenPauseRoll, easeToward, flightFloorAt, flightFloorFor, flyerLift } from './js/street-creatures.js?v=4a0738f6';
+import { CHICKEN_PAUSE, chickenPauseRoll, easeToward, flightFloorAt, flightFloorFor, flyerLift } from './js/street-creatures.js?v=fc1d4f00';
 import { chickenPose, chickenIdleSheetsAsked } from './js/chicken-idle-art.js?v=556916bb';
 import { chickenWaitPose } from './js/chicken-idles.js?v=eef0279b';
 import { itemOverlayStats } from './js/item-overlay.js?v=a2d2e5a3';
@@ -9594,6 +9594,11 @@ function executeVerb(target, verbId) {
       if (showLine) toast(toastLine, 3200);
       pushActivity(feedLine);
     }
+  }
+  // A feed that did not fill a hungry Piggy says so (content.js runVerb's `snack`, Austin's call 2026-11-13).
+  if (result.ok && result.snack) {
+    toast(result.snack, 5200);
+    pushActivity(result.snack);
   }
   (result.msgs || []).forEach((m, i) => {
     if (i === 0) return; // already toasted / fed above

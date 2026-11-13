@@ -319,13 +319,38 @@ export const PIGGY_FEED = Object.freeze({
 });
 
 /**
+ * npc_piggy.js feed 671-674 only sates a hungry Piggy with food of base cost
+ * 5 or more: anything cheaper (Cherry, Grain, Plum, Spinach, Rice, Onion,
+ * Cucumber) is eaten and leaves the hunger as it was. True for such a snack
+ * offered to a Piggy that is hungry (hunger above 0, the state the croak and
+ * the subtitle read).
+ */
+export function piggySnackOnly(state, classTsid) {
+  return Number(state?.hunger) > 0 && itemBaseCost(classTsid) < PIGGY_FEED.minBaseCost;
+}
+
+/**
+ * The line after a feed that did not fill a hungry Piggy (remake copy, Austin's
+ * call 2026-11-13: GSJS says nothing, and players kept hearing "I'm about to
+ * croak!" after feeding Cherries). Read before the feed; '' when it fills or
+ * the Piggy was not hungry.
+ */
+export function piggySnackLine(state, classTsid, count = 1) {
+  if (!piggySnackOnly(state, classTsid)) return '';
+  const name = typeof state?.userName === 'string' && state.userName.trim() ? state.userName.trim() : 'Piggy';
+  return `The ${name} ate the ${itemLabel(classTsid, count)}, but it's still hungry. Something more filling would help.`;
+}
+
+/**
  * npc_animal feed for a Piggy: feed up to one stack at once. Mutates the
- * piggy state and returns the XP, plop entries to queue, and the source line.
+ * piggy state and returns the XP, plop entries to queue, the source line,
+ * and `snack` (piggySnackLine) when the food did not fill a hungry Piggy.
  */
 export function feedPiggyStack(state, classTsid, requested = 1) {
   const s = state || {};
   const count = Math.max(1, Math.min(Math.floor(Number(requested) || 1), itemStackMax(classTsid)));
   let xp = 0;
+  const snack = piggySnackLine(s, classTsid, count);
   const hungry = Number(s.hunger) !== 0;
   if (itemBaseCost(classTsid) >= PIGGY_FEED.minBaseCost && hungry) {
     satePiggy(s);
@@ -346,6 +371,7 @@ export function feedPiggyStack(state, classTsid, requested = 1) {
     xp,
     plops,
     msg: `You fed the Piggy ${count} ${itemLabel(classTsid, count)}.`,
+    snack,
   };
 }
 
