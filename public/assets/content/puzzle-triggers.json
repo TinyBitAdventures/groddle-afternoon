@@ -4146,9 +4146,57 @@
       "param": "all",
       "all": false
      }
+    ],
+    "invert_phys_bottom": [
+     {
+      "type": "flag_not_exit",
+      "flag": "from_bottom"
+     },
+     {
+      "type": "physics",
+      "param": "gravity",
+      "value": -1,
+      "duration": 0,
+      "all": false
+     }
+    ],
+    "reset_phys_bottom": [
+     {
+      "type": "flag_not_exit",
+      "flag": "from_bottom"
+     },
+     {
+      "type": "physics_reset",
+      "param": "all",
+      "all": false
+     }
+    ],
+    "invert_phys_top": [
+     {
+      "type": "flag_not_exit",
+      "flag": "from_top"
+     },
+     {
+      "type": "physics",
+      "param": "gravity",
+      "value": -1,
+      "duration": 0,
+      "all": false
+     }
+    ],
+    "reset_phys_top": [
+     {
+      "type": "flag_not_exit",
+      "flag": "from_top"
+     },
+     {
+      "type": "physics_reset",
+      "param": "all",
+      "all": false
+     }
     ]
    },
-   "eventsWhy": "The source scripts are code the remake cannot run (player_enter picks a direction from pc.y and sets pc.startedAT; should_tp_top/bottom teleport only for the matching start; invert_phys is addCTPCPhysics({gravity:-1})). Repaired as flags: the arrival region fires gut_from_bottom (gravity x-1) or gut_from_top, and each end teleports only the traveller who started at the other end, with the source destinations. The serpentine/spiral's 14 lost boxes flipped gravity at its bends (invert_phys*/reset_phys*, check_a/check_b); their places are not recoverable, so Space works those same flips (gut_invert = gravity x-1, gut_normal = reset) and the traveller steers the bends.",
+   "eventsWhy": "The source scripts are code the remake cannot run (player_enter picks a direction from pc.y and sets pc.startedAT; should_tp_top/bottom teleport only for the matching start; invert_phys is addCTPCPhysics({gravity:-1})). Repaired as flags: the arrival region fires gut_from_bottom (gravity x-1) or gut_from_top, and each end teleports only the traveller who started at the other end, with the source destinations. The bends' boxes fire the source's own four flip scripts, repaired the same way: invert_phys_bottom / reset_phys_bottom act only for a traveller who came in at the bottom (pc.startedAT == 'bottom'), invert_phys_top / reset_phys_top only for one who came in at the top. Where each bend box stood is read from footage OJ8hhmn7h14 10:18-11:08 (register G679; each trigger's why). Space still flips gravity (gut_invert = gravity x-1, gut_normal = reset), a remake fallback the original did not have.",
    "arrival": [
     {
      "x0": 1200,
@@ -4158,7 +4206,7 @@
      "events": [
       "gut_from_bottom"
      ],
-     "toast": "Inside the gut, press Space to flip which way is down.",
+     "toast": "The gut turns you over at its bends. Space flips which way is down too.",
      "why": "The heart of the square spiral, where the brown beam (1920, 2080) and the Shim Shiri signpost (2031, 2247) both land; its source start_bottom check was pc.y > -2670 world on the way in."
     },
     {
@@ -4182,6 +4230,95 @@
       "gut_top"
      ],
      "why": "The spiral's outer mouth at the top left by the Tambra Tiss signpost (-97, 405): should_tp_top -> Tambra Tiss (354, -205)."
+    },
+    {
+     "id": "bend_inner_top",
+     "x": 1450,
+     "y": 1260,
+     "w": 220,
+     "h": 340,
+     "onEnter": [
+      "reset_phys_bottom",
+      "reset_phys_top"
+     ],
+     "why": "Footage OJ8hhmn7h14 10:20-10:22: up the brown shaft from the heart the traveller walks the inner top passage on its ceiling and drops to its floor left of the shaft, before the passage steps down to the left (minimap dot mid-passage). A top traveller, up the inner left side and the step on the ceiling, drops to the floor at the same place and walks on to the shaft (reset_phys_top)."
+    },
+    {
+     "id": "bend_inner_bottom_right",
+     "x": 2330,
+     "y": 2580,
+     "w": 240,
+     "h": 330,
+     "onEnter": [
+      "invert_phys_bottom"
+     ],
+     "why": "Footage OJ8hhmn7h14 10:32-10:33: on the floor of the inner bottom passage to its right end, then carried up the narrow inner right tube (x 2340-2400) head first, the silhouette at the top of the tube a second later."
+    },
+    {
+     "id": "bend_middle_top_right",
+     "x": 2100,
+     "y": 900,
+     "w": 220,
+     "h": 320,
+     "onEnter": [
+      "reset_phys_bottom"
+     ],
+     "why": "Footage OJ8hhmn7h14 10:36-10:38: on the middle top passage's ceiling after the turn left, then on its floor two seconds on (dot left of the turn)."
+    },
+    {
+     "id": "bend_outer_bottom_right",
+     "x": 2800,
+     "y": 2990,
+     "w": 280,
+     "h": 360,
+     "onEnter": [
+      "invert_phys_bottom"
+     ],
+     "why": "Footage OJ8hhmn7h14 10:54-10:56: on the floor of the outer bottom passage to its right end, then up the outer right side on its ceiling."
+    },
+    {
+     "id": "bend_outer_top_right",
+     "x": 2400,
+     "y": 420,
+     "w": 220,
+     "h": 380,
+     "onEnter": [
+      "reset_phys_bottom"
+     ],
+     "why": "Footage OJ8hhmn7h14 11:02-11:03: on the outer top passage's ceiling after the turn left, then on its floor walking to the mouth (11:04-11:08)."
+    },
+    {
+     "id": "bend_outer_bottom_left",
+     "x": 250,
+     "y": 2990,
+     "w": 300,
+     "h": 360,
+     "onEnter": [
+      "invert_phys_top"
+     ],
+     "why": "Mirror of bend_outer_bottom_right for a traveller from the mouth (no footage of that way): along the outer bottom passage leftward, the outer left side rises, so the turn up is where gravity reverses (invert_phys_top)."
+    },
+    {
+     "id": "bend_middle_top_left",
+     "x": 600,
+     "y": 900,
+     "w": 220,
+     "h": 320,
+     "onEnter": [
+      "reset_phys_top"
+     ],
+     "why": "Mirror of bend_middle_top_right for a traveller from the mouth: up the outer left side on the ceiling, then down to the floor of the middle top passage after the turn right (reset_phys_top)."
+    },
+    {
+     "id": "bend_inner_bottom_left",
+     "x": 820,
+     "y": 2640,
+     "w": 320,
+     "h": 360,
+     "onEnter": [
+      "invert_phys_top"
+     ],
+     "why": "Mirror of bend_inner_bottom_right for a traveller from the mouth: leftward along the inner bottom passage, the inner left side rises, so gravity reverses at the turn (invert_phys_top)."
     }
    ],
    "quoins": [
