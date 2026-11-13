@@ -37,7 +37,7 @@ import {
   isWinterStreetTsid,
   winterStreetEcology,
 } from '../public/js/winter-walk-streets.js?v=d1c7d113';
-import { rebuiltRoomsFeature } from '../public/js/features/rebuilt-rooms-feature.js?v=46da565d';
+import { rebuiltRoomsFeature } from '../public/js/features/rebuilt-rooms-feature.js?v=1a3883df';
 import { reachStreet } from '../public/js/builder/reach-graph.js?v=d03eeab1';
 
 const spike = join(dirname(fileURLToPath(import.meta.url)), '..');

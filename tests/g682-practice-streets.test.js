@@ -42,11 +42,11 @@ import {
   practiceScreen,
   practiceStreetEcology,
   soilStreet,
-} from '../public/js/practice-streets.js?v=b170eb1d';
+} from '../public/js/practice-streets.js?v=aece0b35';
 import { BUILT_ROOMS, QUEST_ROOMS } from '../public/js/quest-rooms/catalog.js?v=a217b716';
-import { FIRST_SKILLS, PRACTICE_TOOLS, firstSkill, practiceToolToPlace } from '../public/js/newxp.js?v=b3802708';
-import { HELLO as EZ_HELLO, room as ezRoom } from '../public/js/quest-rooms/ez-cookin.js?v=1b700821';
-import { HELLO as SOIL_HELLO, TEND_FIRST, patchArt, patchVerbs, room as soilRoom } from '../public/js/quest-rooms/soil-appreciation.js?v=206a8e3e';
+import { FIRST_SKILLS, PRACTICE_TOOLS, firstSkill, practiceToolToPlace } from '../public/js/newxp.js?v=7712f77d';
+import { HELLO as EZ_HELLO, room as ezRoom } from '../public/js/quest-rooms/ez-cookin.js?v=ab0ae15d';
+import { HELLO as SOIL_HELLO, TEND_FIRST, patchArt, patchVerbs, room as soilRoom } from '../public/js/quest-rooms/soil-appreciation.js?v=95beafa6';
 
 const spike = join(dirname(fileURLToPath(import.meta.url)), '..');
 const pub = join(spike, 'public');
@@ -103,6 +103,13 @@ describe('G682 practice streets: street JSON', () => {
     for (const s of [file(EZ_COOKIN_TSID), file(SOIL_TSID)]) {
       for (const d of decos(s)) assert.ok(manifest.has(d.sprite), `${s.label}: ${d.sprite} in the deco manifest`);
     }
+  });
+
+  it("EZ Cookin' keeps its counters and table, and hangs no stand-in lamps (store_lamp_01 read like swings, Austin 2026-11-13)", () => {
+    const ds = decos(file(EZ_COOKIN_TSID));
+    assert.equal(ds.filter((d) => d.sprite === 'store_lamp_01' || /^deco_ez_lamp_/.test(d.id || '')).length, 0, 'no hanging lamps until there is art');
+    assert.deepEqual(ds.filter((d) => d.sprite === 'store_counter').map((d) => d.id), EZ_COUNTERS.map((c) => `deco_ez_counter_${c.id}`));
+    assert.deepEqual(ds.filter((d) => d.sprite === 'k04_table_01').map((d) => d.id), ['deco_ez_knife_table']);
   });
 
   it('put the GSJS food on the counters\' tops (skillquest_ezc_v2.js location_targets, special_items)', { skip: noGsjs }, () => {

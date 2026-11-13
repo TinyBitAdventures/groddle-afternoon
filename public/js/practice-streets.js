@@ -46,8 +46,9 @@
  * the sun the tutorial's own sun_01a_newxp, the EXIT arrow sign_arrow_1 with
  * the snaps' word drawn on it (features/rebuilt-rooms-feature.js).
  * Stand-ins (no CC0 piece found for the snaps' own): the glass-topped steel
- * serving counters are store_counter, their white hanging lamps store_lamp_01,
- * the round glass table k04_table_01.
+ * serving counters are store_counter, the round glass table k04_table_01. The
+ * snaps' white hanging lamps have no stand-in: store_lamp_01 read like swings
+ * (Austin 2026-11-13), so they wait for art (research/art-briefs/ez-cookin).
  * Ours: the Hoe and Shovel's spots (they were street items; no snap shows them
  * before they were taken), the walls at both ends, the boxes' sizes.
  */
@@ -111,7 +112,6 @@ const SIZE = Object.freeze({
   wildflowers_bunch_2: [191, 25],
   sun_01a_newxp: [311, 311],
   store_counter: [456, 105],
-  store_lamp_01: [221, 330],
   k04_table_01: [1155, 780],
   sign_arrow_1: [140, 93],
 });
@@ -345,12 +345,11 @@ function ezMiddleDecos() {
   let z = out.length;
   out.push(...laneEdge(W, 852, z, 21, [[880, 2000]]));
   z = out.length;
-  // The round table and the three counters under their lamps.
+  // The round table and the three counters (their hanging lamps wait for art: no stand-in reads right).
   const t = EZ_KNIFE_TABLE;
   out.push(deco('k04_table_01', t.x, EZ_COOKIN_FLOOR_Y + oy + 2, 140, 95, z++, { id: 'deco_ez_knife_table' }));
   for (const c of EZ_COUNTERS) {
     out.push(deco('store_counter', c.x, c.top + 53 + oy, 230, 53, z++, { id: `deco_ez_counter_${c.id}` }));
-    out.push(deco('store_lamp_01', c.x, -348 + oy, 120, 180, z++, { id: `deco_ez_lamp_${c.id}` }));
   }
   const s = EZ_EXIT_SIGN;
   out.push(deco('sign_arrow_1', s.x, s.y + oy, s.w, s.h, z++, { id: 'deco_ez_exit' }));
@@ -432,7 +431,7 @@ export function ezCookinStreet() {
       bounds: 'The snaps are full-street snaps, 2800 x 1000 at 1 px a unit: skillquest_ezc_v2.js food_1_1 (996, -192) lands on the first counter\'s top at 0, -1000.',
       layout: 'Left to right (zoi, mackenzie, cleops snaps): the start, the round table with the Knife & Board, three serving counters under hanging lamps with the food on them, two big trunks in front, the wooden EXIT arrow and the way out at the right.',
       food: 'skillquest_ezc_v2.js location_targets and special_items: cheese and two tomatoes, a bun and meat, ten buns, five cheese and five meat.',
-      art: 'CC0 groddle decos: tree_coniferous_*, pinehills_*, pinecluster_*, heights rocks tinted red-brown, evenground planes, grassSlice_f1, sun_01a_newxp, sign_arrow_1. Stand-ins: store_counter, store_lamp_01, k04_table_01 (no CC0 piece found for the snaps\' glass counters, lamps and table).',
+      art: 'CC0 groddle decos: tree_coniferous_*, pinehills_*, pinecluster_*, heights rocks tinted red-brown, evenground planes, grassSlice_f1, sun_01a_newxp, sign_arrow_1. Stand-ins: store_counter, k04_table_01 (no CC0 piece found for the snaps\' glass counters and table). The snaps\' hanging lamps are left out until there is art: store_lamp_01 read like swings.',
       ours: 'The walls at both ends and the boxes\' sizes.',
     },
   });
