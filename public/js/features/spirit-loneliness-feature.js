@@ -51,6 +51,10 @@
  *   &lonelyautoplay=1       Yes, then on its street walk in and answer every line
  *                           (add &routeautoplay=1 to travel the route)
  *   &lonelyhold=invite      keep the porthole on screen (frozen at the loop) for screenshots
+ *
+ * Solo only (G320). The picker stands in for Glitch's world event (inc_world_events.js 16-72 ran it
+ * for everyone online at once), so each player having a lonely spirit of their own, and "someone
+ * else" cheering it up, only makes sense alone. A multiplayer game (engine.mode) runs none of it.
  */
 
 import { STREET_INDEX } from '../street-loader.js?v=18b181ad';
@@ -984,11 +988,15 @@ function autoplay(engine, now) {
 
 /* ------------------------------------------------------------ feature */
 
+/** G320: nothing of the solo picker runs in a multiplayer game. */
+const soloGame = (engine) => engine?.mode !== 'multiplayer';
+
 export const spiritLonelinessFeature = {
   id: SPIRIT_LONELINESS_FEATURE_ID,
 
   init(engine) {
     rt = freshRuntime();
+    if (!soloGame(engine)) return;
     loadGraph();
     publish(engine);
   },
@@ -997,13 +1005,15 @@ export const spiritLonelinessFeature = {
     return state;
   },
 
-  restore(slice) {
+  restore(slice, engine) {
     state = normalizeLonelyState(slice || {});
     // A party or race that was under way when the game closed has finished.
-    if (state.event?.visitedAt) clearEvent(state);
+    // G320: an event a multiplayer save carries from before is dropped too.
+    if (state.event?.visitedAt || (state.event && !soloGame(engine))) clearEvent(state);
   },
 
   onStreetEnter(_street, engine) {
+    if (!soloGame(engine)) return;
     const now = Date.now();
     rt.enteredAt = now;
     rt.here = streetKey(engine.streetTsid);
@@ -1027,7 +1037,7 @@ export const spiritLonelinessFeature = {
   },
 
   onTick(_dtMs, _t, engine) {
-    if (!engine.started) return;
+    if (!engine.started || !soloGame(engine)) return;
     const now = Date.now();
     demo(engine, now);
     // A talk closed some other way (Escape, a forced close) counts as unanswered.

@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=f6c16f91';
 import { createErrorOnce, createFeatureHost } from './js/feature-host.js?v=06bb8b74';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=947b1bac';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=5cb5b835';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl, drawTileArt } from './js/enter-chooser.js?v=4a3ea327';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -10991,6 +10991,8 @@ const COMPANIONS_STORAGE_KEY = 'companions';
  * Emotional Bear, and mail replies still work by name without world actors.
  */
 function localCompanionsEnabled() {
+  // G320: they stand in for other players, so a multiplayer game (real players) never has them.
+  if (GAME_MODE === 'multiplayer') return false;
   const params = new URLSearchParams(location.search);
   const requested = params.get('companions');
   if (requested === '1' || requested === '0') {
@@ -26901,6 +26903,8 @@ function sayAssignedFeatLine() {
 }
 
 function gatherFeatChain() {
+  // G320: the stand-ins fill a chain only in solo; online, three real players say the lines.
+  if (GAME_MODE === 'multiplayer') return;
   clearFeatCompanionTimers();
   resetIncantationChain(featState);
   const playerStep = (featState.chainsCompleted % INCANTATION_LINES.length) + 1;
@@ -26967,6 +26971,8 @@ function renderFeatPanel() {
   document.getElementById('feat-complete').textContent = String(status.chainsCompleted);
   const prompt = document.getElementById('feat-prompt');
   const say = document.getElementById('feat-say');
+  const gather = document.getElementById('feat-gather');
+  if (gather) gather.hidden = GAME_MODE === 'multiplayer';
   if (assistedFeatChain) {
     const line = INCANTATION_LINES[assistedFeatChain.playerStep - 1];
     if (prompt) {

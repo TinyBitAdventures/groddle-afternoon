@@ -47,7 +47,7 @@ import {
   spiritCryBox,
   spiritCrySheet,
 } from '../public/js/street-spirits.js?v=f9e88445';
-import { spiritLonelinessFeature } from '../public/js/features/spirit-loneliness-feature.js?v=69a74cd6';
+import { spiritLonelinessFeature } from '../public/js/features/spirit-loneliness-feature.js?v=c0c39357';
 import { ROUTE_SOURCES } from '../public/js/map-routes.js?v=c7e7dc80';
 import { setStreetEcologyCatalog } from '../public/js/street-ecology.js?v=64dcdacc';
 import { applyStreetIndex } from '../public/js/street-loader.js?v=18b181ad';
@@ -563,6 +563,35 @@ describe('feature', () => {
     spiritLonelinessFeature.onTick(16, 0, engine);
     assert.equal(spiritLonelinessFeature._state().event?.tsid, 'GLONE');
     assert.equal(spiritLonelinessFeature._state().nextCheckAt, Date.now() + LONELY_RULES.eventGapMs);
+  });
+
+  it('G320: a multiplayer game runs no solo picker, and drops an event its save carried', () => {
+    const engine = fakeEngine('GHOME');
+    engine.mode = 'multiplayer';
+    engine.visitedStreets = () => ['GLONE', 'GA'];
+    spiritLonelinessFeature.init(engine);
+    spiritLonelinessFeature.onStreetEnter({}, engine);
+    const s = spiritLonelinessFeature._state();
+    assert.deepEqual(s.visits, {}, 'no visits noted');
+    mock.timers.tick(LONELY_RULES.checkEveryMs * 2);
+    spiritLonelinessFeature.onTick(16, 0, engine);
+    assert.equal(spiritLonelinessFeature._state().event, null);
+    assert.equal(engine.calls.prompts.length, 0);
+    assert.deepEqual(engine.data, {}, 'nothing published');
+
+    // A save from before carried a running invite: solo keeps it, multiplayer drops it.
+    const solo = fakeEngine('GHOME');
+    spiritLonelinessFeature.onStreetEnter({}, solo);
+    spiritLonelinessFeature._begin(solo, 'GLONE', { type: 'A', now: Date.now() });
+    const slice = JSON.parse(JSON.stringify(spiritLonelinessFeature.save()));
+    spiritLonelinessFeature.restore(slice, solo);
+    assert.equal(spiritLonelinessFeature._state().event?.tsid, 'GLONE');
+    spiritLonelinessFeature.restore(slice, engine);
+    assert.equal(spiritLonelinessFeature._state().event, null);
+    engine.streetTsid = 'GLONE';
+    spiritLonelinessFeature.onStreetEnter({}, engine);
+    assert.equal(engine.query('spiritCry', engine), false);
+    assert.equal(engine.query('spiritLonelyHere', engine), null);
   });
 
   it('a street still under construction is not there yet: no spirit to miss you, no way through', () => {

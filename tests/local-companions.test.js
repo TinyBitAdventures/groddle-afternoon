@@ -123,6 +123,16 @@ describe('world integration', () => {
     assert.match(game, /companiondemo/);
   });
 
+  it('G320: a multiplayer game has no stand-ins and no Gather a chain', () => {
+    const game = readFileSync(join(publicRoot, 'game.js'), 'utf8');
+    const enabled = game.slice(game.indexOf('function localCompanionsEnabled()'));
+    assert.match(enabled.slice(0, enabled.indexOf('\n}\n')), /^function localCompanionsEnabled\(\) \{\n[^\n]*\n  if \(GAME_MODE === 'multiplayer'\) return false;/);
+    const gather = game.slice(game.indexOf('function gatherFeatChain()'));
+    assert.match(gather.slice(0, 300), /^function gatherFeatChain\(\) \{\n[^\n]*\n  if \(GAME_MODE === 'multiplayer'\) return;/);
+    const panel = game.slice(game.indexOf('function renderFeatPanel()'));
+    assert.match(panel.slice(0, panel.indexOf('\n}\n')), /gather\.hidden = GAME_MODE === 'multiplayer'/);
+  });
+
   it('wires companion verbs, assisted movement, street counting, and the original badge', () => {
     const game = readFileSync(join(publicRoot, 'game.js'), 'utf8');
     const content = readFileSync(join(publicRoot, 'content.js'), 'utf8');
