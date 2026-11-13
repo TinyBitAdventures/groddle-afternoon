@@ -15,11 +15,14 @@ import {
   PET_ROCK_SHEETS,
   QUEST_ROCK_WH,
   RAY_SETS,
+  ROCK_SHEET_WAIT_MS,
   FAMILIAR_DIALOG_MIN_W,
   achievementBubbleText,
+  decodePetRockSheet,
   easeOutBounce,
   familiarCardHeading,
   familiarLook,
+  holdForRockSheet,
   locationViewport,
   petRockFrameStyle,
   raySpinSeconds,
@@ -30,7 +33,7 @@ import {
   skillLearnedModel,
   truncateLabel,
   vogLayout,
-} from '../public/js/familiar.js?v=bafd7139';
+} from '../public/js/familiar.js?v=b9597cd3';
 import { CARD_ART_LAYERS } from '../public/js/imagination-data.js?v=4a85e7fe';
 import {
   _resetFamiliarDialog,
@@ -38,7 +41,7 @@ import {
   familiarDialogFeature,
   familiarDialogOpen,
   queueSkillLearned,
-} from '../public/js/features/familiar-dialog-feature.js?v=ab9681a0';
+} from '../public/js/features/familiar-dialog-feature.js?v=bf5413ed';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const PUBLIC = join(root, 'public');
@@ -438,5 +441,38 @@ describe('one familiar module', () => {
     walk(PUBLIC);
     assert.equal(keys.size, 1, `familiar.js under ${[...keys].join(', ')}`);
     assert.ok([...keys][0].startsWith('?v='), 'familiar.js is imported with a key');
+  });
+});
+
+describe('the rock card waits for its sheet (Austin 2026-11-13: the glow popped in late)', () => {
+  it('holds an opening card unseen until the sheet decodes', async () => {
+    const modal = { dataset: {} };
+    let decoded;
+    const timers = [];
+    holdForRockSheet(modal, { decode: () => new Promise((r) => (decoded = r)), setTimer: (fn, ms) => timers.push({ fn, ms }) });
+    assert.equal(modal.dataset.rockWait, 'true');
+    assert.equal(timers[0].ms, ROCK_SHEET_WAIT_MS);
+    decoded();
+    await new Promise((r) => setTimeout(r, 0));
+    assert.equal(modal.dataset.rockWait, undefined);
+  });
+
+  it('shows the card anyway when the decode takes too long, and an older hold never clears a newer one', async () => {
+    const modal = { dataset: {} };
+    const timers = [];
+    const setTimer = (fn, ms) => timers.push({ fn, ms });
+    holdForRockSheet(modal, { decode: () => new Promise(() => {}), setTimer });
+    holdForRockSheet(modal, { decode: () => new Promise(() => {}), setTimer });
+    timers[0].fn(); // the first hold's cap: stale
+    assert.equal(modal.dataset.rockWait, 'true');
+    timers[1].fn();
+    assert.equal(modal.dataset.rockWait, undefined);
+  });
+
+  it('decoding is a no-op without a DOM, and the look and the stylesheet use the hold', async () => {
+    await decodePetRockSheet();
+    assert.match(read('js/familiar.js'), /\(look === 'familiar' \|\| look === 'vog'\) && \(grow \|\| was !== look\)\) holdForRockSheet\(modal\)/);
+    assert.match(read('js/familiar.js'), /decodePetRockSheet\(state\);/);
+    assert.match(read('style.css'), /\.quest-dialogue\[data-rock-wait="true"\] \.quest-dialogue-card \{ opacity: 0; \}/);
   });
 });

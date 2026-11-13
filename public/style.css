@@ -9452,6 +9452,8 @@ header.top-bar + .sub { display: none; }
 /* The shared quest card keeps its plain look for everyone else. */
 .quest-dialogue-bubble { display: contents; }
 .quest-dialogue .fam-rock, .quest-dialogue .fam-head, .quest-dialogue .fam-close { display: none; }
+/* A rock card that is opening waits, unseen, for its sheet to decode (familiar.js holdForRockSheet). */
+.quest-dialogue[data-rock-wait="true"] .quest-dialogue-card { opacity: 0; }
 
 /* QuestConversationUI.as: rock 80 px with a white glow, a 462 px bubble in
    0x0a181d at 0.9 pointing at it, centred 80 px under the header, no shade. */

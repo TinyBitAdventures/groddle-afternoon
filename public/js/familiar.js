@@ -339,8 +339,53 @@ export function mountPetRock(el, { size = QUEST_ROCK_WH, state = 'idle' } = {}) 
   el.style.backgroundImage = `url("${keyedArt(sheet.hires || sheet.src)}")`;
   el.style.backgroundRepeat = 'no-repeat';
   paintRock(rock);
+  decodePetRockSheet(state);
   if (!rockTimer && typeof setInterval === 'function') rockTimer = setInterval(tickRocks, 1000 / FAMILIAR_FPS);
   return el;
+}
+
+/** One Image per sheet, kept so a later decode() is a quick check. */
+const sheetImages = new Map();
+
+/**
+ * Decode the rock's sheet (the 3x one is 2088 x 2907) before it is drawn:
+ * Chrome paints a card first and the big sheet (and the glow around it)
+ * a beat later otherwise. Asked again on each card, as the browser drops
+ * decoded pictures that are off screen. Resolves when ready (never rejects).
+ */
+export function decodePetRockSheet(state = 'idle') {
+  if (typeof Image !== 'function') return Promise.resolve();
+  const sheet = PET_ROCK_SHEETS[state] || PET_ROCK_SHEETS.idle;
+  const url = keyedArt(sheet.hires || sheet.src);
+  let img = sheetImages.get(url);
+  if (!img) {
+    img = new Image();
+    img.decoding = 'async';
+    img.src = url;
+    sheetImages.set(url, img);
+  }
+  return typeof img.decode === 'function' ? img.decode().catch(() => {}) : Promise.resolve();
+}
+
+/** The longest a rock card waits for its sheet before it shows anyway. */
+export const ROCK_SHEET_WAIT_MS = 600;
+const rockHolds = new WeakMap();
+
+/**
+ * Keep a card that is opening out of sight (data-rock-wait, opacity 0, so
+ * focus and clicks still work) until the rock's sheet is decoded, so the
+ * rock and its glow arrive with the card. `decode` and `setTimer` are for tests.
+ */
+export function holdForRockSheet(modal, { decode = decodePetRockSheet, setTimer = setTimeout, maxMs = ROCK_SHEET_WAIT_MS } = {}) {
+  if (!modal?.dataset) return;
+  const token = (rockHolds.get(modal) || 0) + 1;
+  rockHolds.set(modal, token);
+  modal.dataset.rockWait = 'true';
+  const release = () => {
+    if (rockHolds.get(modal) === token) delete modal.dataset.rockWait;
+  };
+  Promise.resolve(decode()).then(release, release);
+  if (typeof setTimer === 'function') setTimer(release, maxMs);
 }
 
 /**
@@ -410,6 +455,8 @@ export function applyFamiliarLook(modal, { look = 'plain', urgent = false, width
   modal.dataset.inLog = at ? 'true' : 'false';
   const card = modal.querySelector('.quest-dialogue-card');
   if (!card) return;
+  // Austin 2026-11-13: the rock's glow popped in after the card; an opening rock card waits for the sheet.
+  if ((look === 'familiar' || look === 'vog') && (grow || was !== look)) holdForRockSheet(modal);
   if (look === 'familiar') {
     ensureFamiliarRock(card, { size: QUEST_ROCK_WH, rays: 'quest' });
     if (at) {

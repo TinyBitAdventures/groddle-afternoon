@@ -7,7 +7,7 @@
  * DOM-driven (not Pixi) so it covers HUD + canvas inside #game-root.
  */
 
-import { ACHIEVEMENT_DROP, ACHIEVEMENT_ROCK_WH, achievementBubbleText, easeOutBounce, mountPetRock } from './familiar.js?v=bafd7139';
+import { ACHIEVEMENT_DROP, ACHIEVEMENT_ROCK_WH, achievementBubbleText, easeOutBounce, mountPetRock } from './familiar.js?v=b9597cd3';
 import { formatLoadingTime, ordinal } from './exploration.js?v=68f27989';
 import { isModernSkin, momentArt, momentArtShape, rewardChips } from './ui/moment-card.js?v=df448740';
 
