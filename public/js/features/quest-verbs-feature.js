@@ -28,7 +28,7 @@
  */
 
 import { addItem, removeItem, countItem } from '../inventory.js?v=f49c8998';
-import { OVERLAY_USES, playOverlay } from '../overlays.js?v=8ebf1499';
+import { OVERLAY_USES, playOverlay } from '../overlays.js?v=219965d5';
 import { displayTopOf, itemstackOverlayPoint } from '../overlay-art.js?v=92383208';
 
 export const QUEST_VERB_PREFIX = 'questverb_';

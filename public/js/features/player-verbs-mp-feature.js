@@ -54,7 +54,7 @@ import { ensureQuestOfferState } from '../quest-offers.js?v=49eecffe';
 import { gameDayIndex, getMusicblock, isMusicblock } from '../musicblocks.js?v=765ac56d';
 import { GAME_DAY_MS } from '../game-day.js?v=cf9afac0';
 import { playSheetOverlay } from '../overlay-art.js?v=92383208';
-import { showRainbow, rainbowSound } from '../overlays.js?v=8ebf1499';
+import { showRainbow, rainbowSound } from '../overlays.js?v=219965d5';
 import { copyFromLedger, spendCopyCharge } from '../copy-charges.js?v=c821e9fa';
 import {
   BEAR,

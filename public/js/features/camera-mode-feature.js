@@ -45,7 +45,7 @@
  */
 
 import { textureFromUrl } from '../textures.js?v=814d7926';
-import { OVERLAY_BUBBLE_URL, OVERLAY_USES, overlayBubbleBox, playOverlay } from '../overlays.js?v=8ebf1499';
+import { OVERLAY_BUBBLE_URL, OVERLAY_USES, overlayBubbleBox, playOverlay } from '../overlays.js?v=219965d5';
 import { SPEECH_BUBBLE_Z } from '../fx-z.js?v=18dda7e3';
 import { isPhoneDevice } from '../touch-controls.js?v=d65f8c10';
 

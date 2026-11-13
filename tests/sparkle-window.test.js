@@ -7,7 +7,7 @@ import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { OVERLAY_USES, windowOverlayFit, windowPlacement } from '../public/js/overlays.js?v=8ebf1499';
+import { OVERLAY_USES, windowOverlayFit, windowPlacement } from '../public/js/overlays.js?v=219965d5';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const GS = join(root, '../glitch-GameServerJS');

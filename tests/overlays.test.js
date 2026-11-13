@@ -76,7 +76,7 @@ const G448_ART = ['overlay_sneezing_powder', 'focusing_orb_laser_beam', 'shrine_
 const SHARP1_MORE = ['trading', 'fox_bait_ignite', 'dice_overlay', 'twelve_sided_die', 'petrified_rock_open_overlay', 'right_arrow', 'crown_game_indicator_you', 'crown_game_indicator_someone_else', 'game_of_crowns_throbber'];
 const SHARP1_ART = ['poisoned', 'rooked', 'amorous_philtre_heart', 'play_glitch'];
 
-const overlays = () => import('../public/js/overlays.js?v=8ebf1499');
+const overlays = () => import('../public/js/overlays.js?v=219965d5');
 const flush = async (n = 3) => {
   for (let i = 0; i < n; i += 1) {
     await new Promise((r) => setTimeout(r, 0));
@@ -97,7 +97,7 @@ describe('tools/overlays/build.mjs', () => {
     const { webpSize } = await import('../tools/overlays/build.mjs');
     let total = 0;
     for (const [key, m] of Object.entries(manifest)) {
-      assert.match(m.src, /^glitch-overlays\/[a-z0-9_]+\.fla$/, key);
+      assert.match(m.src, /^glitch-overlays\/[A-Za-z0-9_]+\.fla$/, key); // G678: letter_A_overlay ...
       assert.match(m.fla, /^[0-9a-f]{40}$/, key);
       const buf = readFileSync(join(pub, 'assets/sprites/overlays', m.file));
       const [w, h] = webpSize(buf);
@@ -109,7 +109,8 @@ describe('tools/overlays/build.mjs', () => {
     }
     // 17.7 MB as built (the seven rainbows are 1.25-1.5 MB each at 30 fps, as overlay-art's are; each loads when first
     // shown). Lane art 2026-11-08 added 1.8 MB: the slather splatter, click_to_prime, eyeballing, the teleporter, the subway window.
-    assert.ok(total < 18_200_000, `${total} bytes in all`);
+    // G678 added 0.5 MB: the 27 one-frame letter indicators (about 18 KB each).
+    assert.ok(total < 18_700_000, `${total} bytes in all`);
   });
 
   it('is not one of the overlay-art keys (two manifests, no overlap)', () => {

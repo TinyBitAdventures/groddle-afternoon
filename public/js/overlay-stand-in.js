@@ -14,7 +14,7 @@
  */
 
 import { playSheetOverlay } from './overlay-art.js?v=92383208';
-import { playOverlay } from './overlays.js?v=8ebf1499';
+import { playOverlay } from './overlays.js?v=219965d5';
 
 const STYLE = Object.freeze({ fill: 0xfffaf0, line: 0x6b5a48, text: 0x3b3128 });
 

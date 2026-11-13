@@ -10,8 +10,8 @@ import { describe, it } from 'node:test';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-import { createRealtimeClient } from '../public/js/realtime-client.js?v=cda54c6e';
-import { LOCAL_SUSPENDED } from '../public/js/features/realtime-feature.js?v=df069959';
+import { createRealtimeClient } from '../public/js/realtime-client.js?v=2663e2d3';
+import { LOCAL_SUSPENDED } from '../public/js/features/realtime-feature.js?v=05f1cc84';
 import { SITE_DIR, skipWithoutSite } from '../tools/repos.mjs';
 
 const root = join(import.meta.dirname, '..');

@@ -7,13 +7,13 @@ import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { OVERLAY_BUBBLE_URL, OVERLAY_USES, overlayBubbleBox } from '../public/js/overlays.js?v=8ebf1499';
+import { OVERLAY_BUBBLE_URL, OVERLAY_USES, overlayBubbleBox } from '../public/js/overlays.js?v=219965d5';
 import { OVERLAYS, expandMotionObjects } from '../tools/overlays/build.mjs';
 import { loadFla } from '../tools/overlay-art/xfl-svg.mjs';
 import { SHRINE_SHEETS, shrineClassFor, shrineRegionForHub, shrineSheet, shrineVariantFor } from '../public/js/shrine-variants.js?v=7f11c97d';
 import { checkVariants, variantFiles } from '../tools/shrine-variants/build.mjs';
-import { SLATHER_VERB, SPLATTER_STAGE_SIDE, splatterDy, slatherVerb } from '../public/js/features/quest-verbs-feature.js?v=807b6006';
-import { OVERLAY_EMOTES, EMOTES } from '../public/js/realtime-client.js?v=cda54c6e';
+import { SLATHER_VERB, SPLATTER_STAGE_SIDE, splatterDy, slatherVerb } from '../public/js/features/quest-verbs-feature.js?v=bce02f05';
+import { OVERLAY_EMOTES, EMOTES } from '../public/js/realtime-client.js?v=2663e2d3';
 import {
   GAME_TELEPORTER_DECO,
   GAME_TELEPORTER_PRICE,
@@ -22,7 +22,7 @@ import {
   gameTeleporterFeature,
   payForCrowns,
   teleporterPoint,
-} from '../public/js/features/game-teleporter-feature.js?v=26810179';
+} from '../public/js/features/game-teleporter-feature.js?v=dc132bdf';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const pub = join(root, 'public');
@@ -146,7 +146,9 @@ describe('G387 Camera Mode\'s eyeballing bubble (main.js 6853-6868, 6896-6899)',
   });
 
   it('online the state rides the emote message, never as an emotion', () => {
-    assert.deepEqual([...OVERLAY_EMOTES], ['eyeballing', 'eyeballing_done']);
+    // G678 adds the letter words after them (tests/thornfad-letters.test.js).
+    assert.deepEqual([...OVERLAY_EMOTES].slice(0, 2), ['eyeballing', 'eyeballing_done']);
+    assert.ok(OVERLAY_EMOTES.slice(2).every((e) => /^letter_/.test(e)));
     for (const e of OVERLAY_EMOTES) assert.ok(!EMOTES.includes(e));
     const client = read('js/realtime-client.js');
     assert.match(client, /if \(p && OVERLAY_EMOTES\.includes\(msg\.e\)\) \{\s+emit\('overlay', \{ id: p\.id, e: msg\.e, player: p \}\);\s+return;\s+\}/);

@@ -122,7 +122,7 @@ import { grantMoodXp } from '../mood-xp.js?v=22648ec0';
 import { displayTopOf, playSheetOverlay } from '../overlay-art.js?v=92383208';
 import { pcOverlayPoint, playItemOverlay } from '../item-overlay.js?v=a2d2e5a3';
 import { POWDER_SHAKE, powderShakerSheet } from '../powder-shakers.js?v=fcd18855';
-import { OVERLAY_USES, playOverlay, playWindowOverlay, windowOverlayFit } from '../overlays.js?v=8ebf1499';
+import { OVERLAY_USES, playOverlay, playWindowOverlay, windowOverlayFit } from '../overlays.js?v=219965d5';
 import {
   POWDER_MP,
   POWDER_MP_TEXT,

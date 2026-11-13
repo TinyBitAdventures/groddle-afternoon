@@ -78,7 +78,7 @@ import { emblemCostFor } from '../shrines.js?v=a190faea';
 import { rollDropTable } from '../drop-tables.js?v=8bcf111f';
 import { openNoteView, noteViewOpen } from '../note-view.js?v=eca7de52';
 import { payDrop } from './drops-feature.js?v=29255d3b';
-import { fireflyJarCounts, setFireflyJar } from './resource-nodes-feature.js?v=ef1d5ac2';
+import { fireflyJarCounts, setFireflyJar } from './resource-nodes-feature.js?v=30654aca';
 import { SEASON_DATA } from '../seasons-data.js?v=b5174bc9';
 import {
   CANDY_CLASSES,
@@ -134,7 +134,7 @@ import {
   yetiQuote,
 } from '../seasons.js?v=1978c3f3';
 import { frameTexture, sourceFromUrl, textureFromUrl } from '../textures.js?v=814d7926';
-import { playOverlay } from '../overlays.js?v=8ebf1499';
+import { playOverlay } from '../overlays.js?v=219965d5';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
 import { MAIL_POST_SENDER } from '../mailbox.js?v=a3e833ba';
 import { filterText } from '../word-filter.js?v=9a7a7ebb';

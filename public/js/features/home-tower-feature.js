@@ -48,7 +48,7 @@
  *   towerWork, towerAutoplay, towerSecrets, towerRock, towerVisited, towerTopY (street).
  */
 
-import { playOverlay } from '../overlays.js?v=8ebf1499';
+import { playOverlay } from '../overlays.js?v=219965d5';
 import { ITEM_CATALOG, countItem, ensureItem, itemIcon } from '../inventory.js?v=f49c8998';
 import { canUseTool, useToolCondition } from '../tools.js?v=48542c24';
 import { acceptOffer, npcQuestOffers } from '../quest-offers.js?v=49eecffe';

@@ -139,6 +139,9 @@ export const OVERLAY_USES = Object.freeze({
   crown_game_winner_someone_else: { type: 'vp', wh: 330, durationMs: 0, x: 0.5, y: 0.3, loop: false, src: 'players/inc_games.js 1090-1099' },
   button_play_again: { type: 'vp', wh: 150, durationMs: 0, x: 0.37, y: 0.6, loop: false, src: 'players/inc_games.js 1116-1131' },
   button_leave_game: { type: 'vp', wh: 150, durationMs: 0, x: 0.63, y: 0.6, loop: false, src: 'players/inc_games.js 1133-1148' },
+  // G678 announce_add_indicator (players/inc_announcements.js 585-642): a pc_overlay at delta_y -120, the larger side
+  // 60 px, until removed; Thornfad Layers (features/thornfad-letters-feature.js) and Alphabet Sauce. One row stands for all 27.
+  letter_A_overlay: { type: 'pc', wh: 60, durationMs: 0, dx: 0, dy: -120, loop: true, others: true, src: 'players/inc_announcements.js 585-642' },
 });
 
 /** G387: Tiny Speck's thought bubble (glitch-client overlay_bubble.swf frame 1, CC0) round an overlay with bubble: true. */

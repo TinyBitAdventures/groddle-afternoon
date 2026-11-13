@@ -56,6 +56,8 @@ const small = (k, extra = {}) => ({ fla: fla(k), scale: 2, step: 1, webp: 0.85, 
 // sends; only the 40 px bubble other players see uses them.
 // G441/G446: every 400 px rainbow also keeps its frames as SVG (vector), drawn sharp on dense screens.
 const rainbow = (k) => ({ fla: fla(k), scale: 1.25, step: 1, webp: 0.8, vector: true });
+/** letter_A_overlay ... letter_Z_overlay and letter_heart_overlay (glitch-overlays). */
+export const LETTER_KEYS = Object.freeze([...'ABCDEFGHIJKLMNOPQRSTUVWXYZ'].map((c) => `letter_${c}_overlay`).concat('letter_heart_overlay'));
 
 /**
  * Where each is shown lives with the player (public/js/overlays.js
@@ -142,6 +144,12 @@ export const OVERLAYS = Object.freeze({
   crown_game_winner_someone_else: { fla: fla('crown_game_winner_someone_else'), scale: 1.5, step: 1, webp: 0.85, vector: true },
   button_play_again: small('button_play_again', { webp: 0.9 }),
   button_leave_game: small('button_leave_game', { webp: 0.9 }),
+  // G678: the 27 letter indicators (A-Z and the heart, one frame each): Thornfad Layers' give_letters
+  // (LCR12NU45AM12BB.xml events) and items/alphabet_sauce.js 68-118 put one over your head with
+  // announce_add_indicator(..., { width: 42, height: 60 }); the client fits the art's larger side to
+  // 60 px (InLocationAnnouncementOverlay.as 425). The stages are about 80 px tall, so 2.25 sheet px
+  // per stage px is 3 texels for each of those 60 screen px.
+  ...Object.fromEntries(LETTER_KEYS.map((k) => [k, small(k, { scale: 2.25, webp: 0.9 })])),
 });
 
 /**

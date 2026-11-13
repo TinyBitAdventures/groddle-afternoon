@@ -63,7 +63,29 @@ export const EMOTES = Object.freeze(['happy', 'surprise', 'angry']);
  * They arrive as the client's 'overlay' event, never 'emoted'. Like the
  * source's announcement, a player who arrives later does not see it.
  */
-export const OVERLAY_EMOTES = Object.freeze(['eyeballing', 'eyeballing_done']);
+/**
+ * G678: a letter indicator over a Glitch (Thornfad Layers' letters, announce_add_indicator
+ * 'letter_<x>_overlay'): letter_a .. letter_z, letter_heart, and letter_off to take it down. The
+ * server relays any emote word (hub.go word: [a-z0-9_]{1,24}), so no server change. The sender
+ * repeats its word when someone joins the street, as GSJS sent indicators again on arrival.
+ */
+export const LETTER_WORD_OFF = 'letter_off';
+export const LETTER_WORDS = Object.freeze([...'abcdefghijklmnopqrstuvwxyz', 'heart'].map((c) => `letter_${c}`).concat(LETTER_WORD_OFF));
+export const OVERLAY_EMOTES = Object.freeze(['eyeballing', 'eyeballing_done', ...LETTER_WORDS]);
+
+/** The wire word for a letter ('A'..'Z' or 'heart'), or letter_off. */
+export function letterWord(letter) {
+  const s = String(letter || '').toLowerCase();
+  return /^([a-z]|heart)$/.test(s) ? `letter_${s}` : LETTER_WORD_OFF;
+}
+
+/** The letter a wire word carries ('A'..'Z' or 'heart'), '' for letter_off, null for any other word. */
+export function letterFromWord(word) {
+  if (word === LETTER_WORD_OFF) return '';
+  const m = /^letter_([a-z]|heart)$/.exec(String(word || ''));
+  if (!m) return null;
+  return m[1] === 'heart' ? 'heart' : m[1].toUpperCase();
+}
 
 /**
  * Avatar sheet states travel as the server's anim words (lower case, digits

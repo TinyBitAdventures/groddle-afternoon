@@ -11,7 +11,7 @@ import { execFileSync } from 'node:child_process';
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { socketUrl } from '../public/js/realtime-client.js?v=cda54c6e';
+import { socketUrl } from '../public/js/realtime-client.js?v=2663e2d3';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const siteDir = process.env.GRODDLE_SITE_DIR || join(root, '..', 'groddle-afternoon-site');

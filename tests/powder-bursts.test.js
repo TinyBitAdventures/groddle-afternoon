@@ -9,8 +9,8 @@ import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { closestTarget } from '../public/js/powders.js?v=6f3d6671';
-import { OVERLAY_USES } from '../public/js/overlays.js?v=8ebf1499';
-import { powdersFeature } from '../public/js/features/powders-feature.js?v=eada5058';
+import { OVERLAY_USES } from '../public/js/overlays.js?v=219965d5';
+import { powdersFeature } from '../public/js/features/powders-feature.js?v=ad284c92';
 import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=10b118dd';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
