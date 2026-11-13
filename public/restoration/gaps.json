@@ -1,6 +1,6 @@
 {
   "note": "Written by tools/gaps/build-data.mjs from tools/gaps/public-gaps.json and the coverage register. Edit those, never this file.",
-  "release": "v0.37.0",
+  "release": "v0.37.1",
   "states": {
     "fixing": {
       "label": "Being fixed",
@@ -42,7 +42,7 @@
     "fixing": 1,
     "known": 14,
     "unreleased": 0,
-    "fixed": 84,
+    "fixed": 85,
     "lost": 5,
     "purpose": 15,
     "idea": 11
@@ -384,6 +384,13 @@
           "report": 294,
           "state": "fixed",
           "version": "v0.37.0"
+        },
+        {
+          "id": "F71",
+          "text": "Online, the featured project still refused your work on a street you had already walked onto, saying the street was already built.",
+          "report": 302,
+          "state": "fixed",
+          "version": "v0.37.1"
         }
       ]
     },

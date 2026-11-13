@@ -814,6 +814,16 @@
       ]
     },
     {
+      "id": "F71",
+      "area": "Street projects",
+      "show": "fixing",
+      "text": "Online, the featured project still refused your work on a street you had already walked onto, saying the street was already built.",
+      "report": 302,
+      "commits": [
+        "game:6225f9f640"
+      ]
+    },
+    {
       "id": "G665",
       "area": "Accounts and saving",
       "text": "A bug report says Read by the team once an administrator has opened it."
