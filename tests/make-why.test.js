@@ -10,7 +10,7 @@ import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { RECIPE_CATALOG, TOOL_CATALOG, canCraft, ensureMakingItems, listMakingTools, loadRecipeCatalogFromFile, makeCountLine, makeEmptyLine, makePanelIcon, recipeBlockedLine, recipeKnownHere, recipeMissingLine } from '../public/js/making.js?v=db79a208';
+import { RECIPE_CATALOG, TOOL_CATALOG, canCraft, ensureMakingItems, listMakingTools, loadRecipeCatalogFromFile, makeCountLine, makeEmptyLine, makePanelIcon, recipeBlockedLine, recipeKnownHere, recipeMissingLine } from '../public/js/making.js?v=eddcceac';
 import { createInventory } from '../public/js/inventory.js?v=f49c8998';
 import { createToolConditionState, setToolRemaining } from '../public/js/tools.js?v=48542c24';
 
@@ -177,9 +177,9 @@ describe('#305: "Show them" lists the recipes the note counted', () => {
   });
 
   it('the footer agrees with the note (the report: 0 of 11, while the note said 4)', () => {
-    assert.equal(makeCountLine({ mode: 'canmake', shown: 0, known: 4, all: 11 }), 'You can make 0 of the 4 recipes you know');
-    assert.equal(makeCountLine({ mode: 'canmake', shown: 1, known: 1, all: 3 }), 'You can make 1 of the 1 recipe you know');
-    assert.equal(makeCountLine({ mode: 'canmake', shown: 0, known: 0, all: 11 }), "You don't know any of these 11 recipes yet");
+    assert.equal(makeCountLine({ mode: 'canmake', shown: 0, known: 4, all: 11 }), 'You can make 0 of the 4 you know');
+    assert.equal(makeCountLine({ mode: 'canmake', shown: 1, known: 1, all: 3 }), 'You can make 1 of the 1 you know');
+    assert.equal(makeCountLine({ mode: 'canmake', shown: 0, known: 0, all: 11 }), 'You know none of the 11 recipes');
     assert.equal(makeCountLine({ mode: 'known', shown: 4, known: 4, all: 11 }), 'The 4 recipes you know, of 11');
     assert.equal(makeCountLine({ mode: 'all', shown: 11, known: 4, all: 11 }), '11 recipes, 4 you know');
     assert.equal(makeCountLine({ mode: 'all', shown: 3, known: 3, all: 3 }), '3 recipes');

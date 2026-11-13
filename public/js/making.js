@@ -1731,8 +1731,9 @@ export function recipeKnownHere(inv, recipe, opts = {}) {
 export function makeCountLine({ mode, shown, known, all }) {
   const recipes = (n) => `${n} ${n === 1 ? 'recipe' : 'recipes'}`;
   if (mode === 'canmake') {
-    if (!known) return `You don't know any of these ${recipes(all)} yet`;
-    return `You can make ${shown} of the ${recipes(known)} you know`;
+    // Short: the Modern footer is one line beside "Esc close".
+    if (!known) return `You know none of the ${recipes(all)}`;
+    return `You can make ${shown} of the ${known} you know`;
   }
   if (mode === 'known') return `The ${recipes(known)} you know, of ${all}`;
   return known && known < all ? `${recipes(all)}, ${known} you know` : recipes(all);

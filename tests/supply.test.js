@@ -24,7 +24,7 @@ import {
   collectHooch,
 } from '../public/js/machines.js?v=e96d8d3b';
 import { runTransform, listTransformVerbs, transformCountMax, transformEdges, transformVerbCount } from '../public/js/item-transforms.js?v=07b416a3';
-import { RECIPE_CATALOG, craftRecipe, loadRecipeCatalogFromFile } from '../public/js/making.js?v=db79a208';
+import { RECIPE_CATALOG, craftRecipe, loadRecipeCatalogFromFile } from '../public/js/making.js?v=eddcceac';
 import { VENDOR_PROFILES } from '../public/js/vendor.js?v=542d30c9';
 import { SEED_CATALOG } from '../public/js/garden.js?v=1420a6d6';
 import { obtainableItems } from '../tools/job-obtainable.mjs';

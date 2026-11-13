@@ -17,7 +17,7 @@ import {
   loadRecipeCatalogFromFile,
   starterCraftIngredients,
   starterToolsInventory,
-} from '../public/js/making.js?v=db79a208';
+} from '../public/js/making.js?v=eddcceac';
 import {
   ITEM_CATALOG,
   countItem,
