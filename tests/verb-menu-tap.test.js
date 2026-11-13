@@ -64,12 +64,14 @@ describe('a tap on the stick\'s corner reaches the thing behind it', () => {
     assert.equal(isTapThrough({ moved: true, ms: 80 }), false, 'a walk is not a tap');
     assert.equal(isTapThrough({ moved: false, ms: 600 }), false, 'a hold is not a tap');
   });
-  it('the stick passes its click on; game.js taps only a thing there', () => {
-    assert.match(touch, /zone\.addEventListener\('click', \(e\) => \{\s*if \(isTapThrough\(\{ moved, ms: e\.timeStamp - downAt \}\)\) tapThrough\?\.\(e\.clientX, e\.clientY\);/);
-    const at = game.indexOf('tapThrough: (x, y) => {');
+  // G674: only the stick's own quick press (no second finger) is a tap through; the floating stick's
+  // wide corner (an option) also walks on empty street (tests/touch-float-stick.test.js).
+  it('the stick passes its own quick tap on; game.js taps only a thing there (or walks, floating)', () => {
+    assert.match(touch, /zone\.addEventListener\('click', \(e\) => \{\s*const ready = tapReady && stickId == null && !others\.size && isTapThrough\(\{ moved, ms: e\.timeStamp - downAt \}\);\s*tapReady = false;\s*if \(ready\) tapThrough\?\.\(e\.clientX, e\.clientY, \{ float: el\.dataset\.float === 'on' \}\);/);
+    const at = game.indexOf('tapThrough: (x, y, how = {}) => {');
     assert.ok(at > 0);
     const fn = game.slice(at, game.indexOf('\n      },', at));
     assert.match(fn, /const hit = pickInteractableAt\(sx, sy\);/);
-    assert.match(fn, /if \(!hit\) return;\s*app\.canvas\.dispatchEvent\(new PointerEvent\('pointerdown', \{ clientX: x, clientY: y, pointerType: 'touch'/);
+    assert.match(fn, /if \(!hit && !how\.float\) return;\s*app\.canvas\.dispatchEvent\(new PointerEvent\('pointerdown', \{ clientX: x, clientY: y, pointerType: 'touch'/);
   });
 });
