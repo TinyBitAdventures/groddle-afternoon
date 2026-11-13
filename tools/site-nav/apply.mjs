@@ -7,9 +7,11 @@
  * the header (<div class="site-nav-links">), with the section being read
  * marked, so one edit changes every page. A Navigation submenu becomes the
  * link with a toggle and a panel of the links inside it (site/theme.js opens
- * it); a submenu inside it is a headed group of that panel, the groups side by
- * side, and the submenu's own plain links then make the panel's footer row
- * (Austin 2026-11-05). One line per top-level item: applyToHtml ends the links at the first
+ * it); a submenu inside it with a url is a third level, its links a list
+ * indented beneath it in the panel's one column (Austin 2026-11-12), and one
+ * without a url is a heading: that panel lays its submenus out as headed
+ * groups side by side, its own plain links the footer row (Austin
+ * 2026-11-05). One line per top-level item: applyToHtml ends the links at the first
  * line that is only </div>. sync-to-cove.sh runs it on the copy in the
  * site's game/ folder; the spike's own pages keep their links.
  *
@@ -80,7 +82,8 @@ const flatInner = (node) => (node.name === SUBMENU ? node.inner.flatMap((b) => [
 
 /**
  * A submenu's panel (SiteNav::children): its links, and each submenu inside it
- * with links of its own as a group { label, href or '', className, children }.
+ * with links of its own as a group { label, href or '', className, children }
+ * (a third level when it has a url and no sibling is a heading, renderPanel).
  * A group's deeper submenus' links join it; an empty one is a plain link, and
  * one without a label gives its links to the panel.
  */
@@ -116,14 +119,19 @@ export function parseMenu(markup) {
 }
 
 const isGroup = (c) => Array.isArray(c.children);
+/** A panel whose submenus are columns: one of them is a heading without a url (SiteNav::columns). */
+const isColumns = (children) => children.some((c) => isGroup(c) && !c.href);
+const plain = ({ label, href, className }) => ({ label, href, className });
 
 /**
  * A panel's links in the order it draws them (SiteNav::panelLinks): a plain
- * panel's list, or each group's heading link (when it has a url) and links,
- * then the footer row's.
+ * panel's list, a nested one's links each followed by the links beneath it,
+ * or each group's heading link (when it has a url) and links, then the footer
+ * row's.
  */
 export function panelLinks(children = []) {
   if (!children.some(isGroup)) return children;
+  if (!isColumns(children)) return children.flatMap((c) => [plain(c), ...(c.children || [])]);
   return [
     ...children.filter(isGroup).flatMap((g) => [...(g.href ? [{ label: g.label, href: g.href, className: '' }] : []), ...g.children]),
     ...children.filter((c) => !isGroup(c)),
@@ -185,16 +193,25 @@ export function renderItem(link, index, current, pagePath) {
 }
 
 /**
- * A submenu's panel (SiteNav::panel). Plain links: one list. With groups: the
- * groups side by side (.site-nav-groups; site-nav.css stacks them on a phone),
- * each a labelled group under its heading, then the panel's own links in the
- * footer row (.site-nav-panel-foot). `child` counts the links in panelLinks() order.
+ * A submenu's panel (SiteNav::panel). Plain links: one list. With submenus
+ * that all have a url: a nested list (.site-nav-panel-nest), each submenu's
+ * link with its links in a list indented beneath it, in the menu's order. With
+ * a heading (a submenu without a url): the groups side by side
+ * (.site-nav-groups; site-nav.css stacks them on a phone), each a labelled
+ * group under its heading, then the panel's own links in the footer row
+ * (.site-nav-panel-foot). `child` counts the links in panelLinks() order.
  */
 export function renderPanel(children, id, child) {
   let k = 0;
   const mark = () => k++ === child;
   const loose = () => children.filter((c) => !isGroup(c)).map((c) => anchor(c, mark())).join('');
   if (!children.some(isGroup)) return `<div class="site-nav-panel" id="${id}" hidden>${loose()}</div>`;
+  if (!isColumns(children)) {
+    const list = children.map((c) => `<li>${anchor(c, mark())}`
+      + (isGroup(c) ? `<ul class="site-nav-nest">${c.children.map((l) => `<li>${anchor(l, mark())}</li>`).join('')}</ul>` : '')
+      + '</li>').join('');
+    return `<div class="site-nav-panel site-nav-panel-nest" id="${id}" hidden><ul class="site-nav-list">${list}</ul></div>`;
+  }
   const groups = children.filter(isGroup).map((g, n) => {
     const hid = `${id}-h${n}`;
     const head = g.href ? anchor({ label: g.label, href: g.href, className: '' }, mark()) : esc(g.label);

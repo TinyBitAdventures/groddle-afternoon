@@ -134,7 +134,7 @@ describe('the header menu in the built pages (tools/site-nav/apply.mjs)', () => 
     assert.deepEqual(odd[1].children.map((c) => `${c.label} ${c.className}`.trim()), ['Cartoons cartoons', 'Deeper', 'Away'],
       'a block that is not a submenu (the group) and a link without a url are skipped');
     assert.deepEqual(odd[1].children[1], { label: 'Deeper', href: '/tj/deeper/', className: '', children: [{ label: 'Deepest', href: '/deepest/', className: '' }] },
-      'a submenu inside a submenu is a group');
+      'a submenu inside a submenu carries its links');
     assert.ok(!('children' in odd[2]), 'an empty submenu is a plain link');
   });
 
@@ -164,8 +164,9 @@ describe('the header menu in the built pages (tools/site-nav/apply.mjs)', () => 
     // Without SECTIONS: the submenu's own links make the section, a link straight to the page still wins.
     const odd = parseMenu(SUBMENUS);
     assert.equal(currentIndex(odd, '/deepest/'), 1);
-    assert.equal(currentChild(odd[1].children, '/tj/cartoons/one/'), 2, 'counted as drawn: the group (its heading, its link), then the footer');
-    assert.equal(currentChild(odd[1].children, '/tj/deeper/'), 0, 'a group heading with a url is a link');
+    assert.equal(currentChild(odd[1].children, '/tj/cartoons/one/'), 0, 'counted as drawn: a third level keeps the menu\'s order');
+    assert.equal(currentChild(odd[1].children, '/tj/deeper/'), 1, 'a submenu with a url is a link');
+    assert.equal(currentChild(odd[1].children, '/deepest/'), 2, 'and its links follow it');
     assert.equal(currentChild(odd[1].children, '/tj/'), -1, 'the submenu\'s own page marks no child');
     assert.equal(currentIndex([...odd, { label: 'Deep', href: '/deepest/', className: '' }], '/deepest/'), 4);
     assert.equal(currentIndex(odd, '/play/online/'), -1);
@@ -215,9 +216,13 @@ describe('the header menu in the built pages (tools/site-nav/apply.mjs)', () => 
       + g(1, 'World', [['Places', 'places'], ['Streets', 'streets'], ['Stores', 'stores'], ['People', 'people'], ['Animals and creatures', 'animals'], ['Giants', 'giants'], ['Music and sounds', 'sounds']])
       + g(2, 'Doing', [['Quests', 'quests'], ['Skills', 'skills'], ['Achievements', 'achievements'], ['Feats and projects', 'feats']])
       + '</div><div class="site-nav-panel-foot"><a href="/encyclopedia/#q">Search the Encyclopedia</a><a href="/encyclopedia/">All sections</a></div></div></div>');
-    // A heading with a url is a link; a group's class rides on the group.
-    const linked = renderItem({ label: 'A', href: '/a/', className: '', children: [{ label: 'B', href: '/b/', className: 'x', children: [{ label: 'C', href: '/c/', className: '' }] }] }, 3, false, '/');
-    assert.match(linked, /<div class="site-nav-group x" role="group" aria-labelledby="site-nav-sub-3-h0"><span class="site-nav-head" id="site-nav-sub-3-h0"><a href="\/b\/">B<\/a><\/span><a href="\/c\/">C<\/a><\/div><\/div><\/div><\/div>$/, 'no footer row without loose links');
+    // Beside a heading, a submenu with a url is a group too, its heading a link; a group's class rides on the group.
+    const linked = renderItem({ label: 'A', href: '/a/', className: '', children: [
+      { label: 'H', href: '', className: '', children: [{ label: 'I', href: '/i/', className: '' }] },
+      { label: 'B', href: '/b/', className: 'x', children: [{ label: 'C', href: '/c/', className: '' }] },
+    ] }, 3, false, '/');
+    assert.match(linked, /<div class="site-nav-group x" role="group" aria-labelledby="site-nav-sub-3-h1"><span class="site-nav-head" id="site-nav-sub-3-h1"><a href="\/b\/">B<\/a><\/span><a href="\/c\/">C<\/a><\/div><\/div><\/div><\/div>$/, 'no footer row without loose links');
+    assert.deepEqual(panelLinks([{ label: 'H', href: '', className: '', children: [{ label: 'I', href: '/i/', className: '' }] }, { label: 'B', href: '/b/', className: 'x', children: [{ label: 'C', href: '/c/', className: '' }] }]).map((l) => l.href), ['/i/', '/b/', '/c/']);
   });
 
   it('keeps a plain submenu exactly as it was beside a grouped one', () => {
@@ -258,10 +263,78 @@ describe('the header menu in the built pages (tools/site-nav/apply.mjs)', () => 
     assert.match(once, /<div class="site-nav-links">\n {8}<div class="site-nav-sub">[^\n]*site-nav-panel-groups[^\n]*<\/div><\/div><\/div>\n {8}<a href="\/players\/">Players<\/a>/);
   });
 
+  // The Header menu with Known gaps under Restoration (Austin 2026-11-12), as tools/site-nav/add-gaps-link.mjs leaves it.
+  const NESTED = readFileSync(join(fixtures, 'nested.html'), 'utf8');
+
+  it('reads a submenu with a url inside Project as a third level (Austin 2026-11-12)', () => {
+    const links = parseMenu(NESTED);
+    const project = links[3];
+    assert.equal(project.label, 'Project');
+    assert.deepEqual(project.children.map((c) => (c.children ? `${c.label} ${c.href}: ${c.children.map((l) => `${l.label} ${l.href}`).join(', ')}` : `${c.label} ${c.href}`)), [
+      'Restoration /restoration/: History /restoration/history/, Known gaps /restoration/gaps/',
+      'Compare /compare/', 'Notes /changelog/', 'Code /code/', 'Contribute /contribute/',
+    ]);
+    assert.deepEqual(panelLinks(project.children).map((l) => l.label), ['Restoration', 'History', 'Known gaps', 'Compare', 'Notes', 'Code', 'Contribute'], 'in the menu\'s order');
+    assert.ok(panelLinks(project.children).every((l) => !l.children), 'the panel\'s links are plain links');
+    assert.deepEqual(links[0], parseMenu(GROUPED)[0], 'the Encyclopedia is untouched');
+  });
+
+  it('draws a third level as a nested list in the panel\'s one column, on one line', () => {
+    const project = parseMenu(NESTED)[3];
+    const line = renderItem(project, 3, false, '/players/');
+    assert.ok(!line.includes('\n'));
+    assert.equal(line, '<div class="site-nav-sub"><a href="/project/">Project</a>'
+      + '<button class="site-nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav-sub-3" aria-label="More in Project"></button>'
+      + '<div class="site-nav-panel site-nav-panel-nest" id="site-nav-sub-3" hidden><ul class="site-nav-list">'
+      + '<li><a href="/restoration/">Restoration</a><ul class="site-nav-nest"><li><a href="/restoration/history/">History</a></li><li><a href="/restoration/gaps/">Known gaps</a></li></ul></li>'
+      + '<li><a href="/compare/">Compare</a></li><li><a href="/changelog/">Notes</a></li><li><a href="/code/">Code</a></li><li><a href="/contribute/">Contribute</a></li>'
+      + '</ul></div></div>');
+    assert.doesNotMatch(line, /site-nav-group|site-nav-head|site-nav-panel-foot/, 'no columns, no footer row');
+    const enc = renderItem(parseMenu(NESTED)[0], 0, false, '/players/');
+    assert.match(enc, /site-nav-panel site-nav-panel-groups/, 'the Encyclopedia keeps its columns');
+    assert.doesNotMatch(enc, /site-nav-nest/);
+  });
+
+  it('marks the page being read at any level of the third-level panel', () => {
+    const links = parseMenu(NESTED);
+    for (const [path, label] of [
+      ['/restoration/', 'Restoration'], ['/restoration/history/', 'History'], ['/restoration/gaps/', 'Known gaps'],
+      ['/compare/', 'Compare'], ['/changelog/a-note/', 'Notes'], ['/contribute/', 'Contribute'], ['/project/', null],
+    ]) {
+      assert.equal(currentIndex(links, path), 3, path);
+      const marked = [...renderLinks(links, path).matchAll(/<a href="[^"]*" aria-current="page">([^<]+)<\/a>/g)].map((m) => m[1]);
+      assert.deepEqual(marked, label ? ['Project', label] : ['Project'], path);
+    }
+    assert.equal(currentChild(links[3].children, '/restoration/gaps/'), 2);
+    assert.doesNotMatch(renderLinks(links, '/players/x/'), /site-nav-panel-nest[^\n]*aria-current/, 'nothing in the panel marked off its section');
+  });
+
+  it('a built page takes the third-level menu and goes back to plain links', () => {
+    const html = readFileSync(join(root, 'public/compare/index.html'), 'utf8');
+    const links = parseMenu(NESTED);
+    const once = applyToHtml(html, '/restoration/gaps/', links);
+    assert.equal(applyToHtml(once, '/restoration/gaps/', links), once);
+    assert.equal(applyToHtml(once, '/compare/', FALLBACK), applyToHtml(html, '/compare/', FALLBACK));
+    assert.match(once, /\n {8}<div class="site-nav-sub"><a href="\/project\/" aria-current="page">Project<\/a>[^\n]*<a href="\/restoration\/gaps\/" aria-current="page">Known gaps<\/a>[^\n]*<\/ul><\/div><\/div>\n {8}<a class="site-nav-play"/);
+  });
+
+  it('styles the third level: one column, indented along a hairline guide, on a phone too and in the chat app', () => {
+    const css = readFileSync(join(root, 'public/site/site-nav.css'), 'utf8');
+    assert.match(css, /\.site-nav-list, \.site-nav-nest \{ margin: 0; padding: 0; list-style: none; \}/);
+    assert.match(css, /\.site-nav-nest \{ margin: 2px 0 2px 14px; padding-left: 6px; border-left: 1px solid var\(--border\); \}/);
+    const phone = css.slice(css.indexOf('@media (max-width: 640px)'));
+    assert.match(phone, /\.site-nav-panel-nest \{ display: block; \}/, 'not the plain panel\'s two columns');
+    assert.ok(css.indexOf('.site-nav-panel-nest { display: block; }') > css.indexOf('display: grid; grid-template-columns: repeat(2, minmax(0, 1fr));'), 'after the two-column rule it overrides');
+    if (!skipWithoutSite) {
+      const chat = readFileSync(sitePath('community/community.css'), 'utf8');
+      assert.match(chat, /\.site-nav-app\[data-menu\] \.site-nav-panel-nest, \.site-nav-app\[data-menu\] \.site-nav-panel-nest\[hidden\] \{ display: block; \}/, 'the chat app\'s phone menu keeps it one column');
+    }
+  });
+
   it('draws the same markup as the theme, and the chat app\'s layout of it (php: SiteNav::parse and nav)', { skip: (skipWithoutSite || (!existsSync(join(engine, 'src/Minn/Autoloader.php')) && 'Minn Engine not found (set MINN_ENGINE_DIR)')) }, () => {
-    const paths = ['/', '/items/', '/players/', '/project/', '/restoration/history/', '/compare/', '/changelog/a-note/', '/code/', '/codex/', '/tj/', '/tj/cartoons/x/', '/tj/deeper/', '/deepest/', '/empty/', '/play/online/',
+    const paths = ['/', '/items/', '/players/', '/project/', '/restoration/', '/restoration/history/', '/restoration/gaps/', '/contribute/', '/compare/', '/changelog/a-note/', '/code/', '/codex/', '/tj/', '/tj/cartoons/x/', '/tj/deeper/', '/deepest/', '/empty/', '/play/online/',
       '/encyclopedia/', '/encyclopedia/streets/groddle-meadow/', '/encyclopedia/feats/', '/encyclopedia/items/apple/'];
-    for (const file of ['header-menu.html', 'submenus.html', 'grouped.html']) {
+    for (const file of ['header-menu.html', 'submenus.html', 'grouped.html', 'nested.html']) {
       let out;
       try {
         out = JSON.parse(execFileSync('php', [join(fixtures, 'site-nav.php'), engine, sitePath(''), join(fixtures, file), ...paths], { encoding: 'utf8' }));

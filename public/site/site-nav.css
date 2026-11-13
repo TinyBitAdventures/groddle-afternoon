@@ -201,6 +201,13 @@ html { scroll-padding-top: calc(var(--site-nav-h) + 12px); }
   text-decoration: underline; text-decoration-color: var(--accent);
   text-decoration-thickness: 2px; text-underline-offset: 6px;
 }
+/* A panel with a third level (a Navigation submenu with a url inside the submenu, Austin 2026-11-12:
+   Project's Restoration over History and Known gaps): one column in the menu's order, the submenu a
+   link like the others and its links a nested list indented beneath it along a hairline guide. */
+.site-nav-list, .site-nav-nest { margin: 0; padding: 0; list-style: none; }
+.site-nav-list, .site-nav-nest { display: flex; flex-direction: column; gap: 2px; }
+.site-nav-nest { margin: 2px 0 2px 14px; padding-left: 6px; border-left: 1px solid var(--border); }
+.site-nav-links .site-nav-nest a { padding-top: 6px; padding-bottom: 6px; font-size: 14px; }
 /* A panel with groups (a Navigation submenu inside the submenu, Austin 2026-11-05: the Encyclopedia's
    Things, World and Doing): its groups side by side as columns, each under its heading, then the
    submenu's own links in a footer row under a hairline. */
@@ -229,6 +236,8 @@ html { scroll-padding-top: calc(var(--site-nav-h) + 12px); }
     border-width: 0 0 1px; border-radius: 0 0 12px 12px; padding: 8px 12px 10px;
   }
   .site-nav-panel::before { height: 20px; }
+  /* A third level keeps its one column on a phone too. */
+  .site-nav-panel-nest { display: block; }
 }
 /* Narrow, the groups stack under their headings, two links to a row, and the panel scrolls
    inside the screen when it is taller than it. */
