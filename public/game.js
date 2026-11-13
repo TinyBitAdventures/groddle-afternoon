@@ -613,7 +613,7 @@ import { outputIconsHtml, outputsPhrase, recipeOutputRows } from './js/ui/recipe
 import { MAKE_TOOL_SHEETS } from './js/make-tool-sheets.js?v=6f758e09';
 import { createTestTubePanel, tryTileHtml, TRY_TILE_LABEL } from './js/test-tube-panel.js?v=c7c704ad';
 import { COMPOUND_RECIPE_IDS, EXPERIMENT_TOOL, experimentTooltip } from './js/test-tube.js?v=cb60f9b7';
-import { groupMakingTools, makeToolCounts, makeToolCountLine, makeToolSpokenLine, makeOpeningTool, gridStep } from './js/make-tools.js?v=3e4818c0';
+import { groupMakingTools, makeToolCounts, makeToolCountLine, makeToolSpokenLine, makeOpeningTool, gridStep, stationForRecipe } from './js/make-tools.js?v=14d0baf5';
 import { LOW_FUEL_LINE, craftSessionElapsedMs, isLowFuel, isMachineArt, machineArtHtml, packMakeState, playMachineHandOver, setMachineArtFrame } from './js/machine-art.js?v=93e29c2d';
 import {
   createGarden,
@@ -27506,7 +27506,13 @@ function isBuffsOpen() {
   return panel && !panel.hidden;
 }
 
-function craftOpts() {
+/**
+ * The making options. With a recipe, the machine the window was opened on (makeStation) takes part
+ * only when the recipe is its own tool's (js/make-tools.js stationForRecipe): any other tool's
+ * recipe is made with the pack's tool, its own wear, and counts as made.
+ */
+function craftOpts(recipe = null) {
+  const station = recipe ? stationForRecipe(makeStation, recipe) : makeStation;
   return {
     learned: skillState.learned || [],
     achievements: achieveState.unlocked || [],
@@ -27514,8 +27520,8 @@ function craftOpts() {
     keptRecipes: features.query('keptRecipes'),
     requireSkill: true,
     requireTool: true,
-    toolState: makeStation?.toolState || toolState,
-    ...(makeStation ? { stationTool: makeStation.tool, station: makeStation } : {}),
+    toolState: station?.toolState || toolState,
+    ...(station ? { stationTool: station.tool, station } : {}),
     upgrades: pc.imaginationUpgrades || [],
   };
 }
@@ -27894,7 +27900,7 @@ function runMakeCraft(key, qty) {
     toast('Unknown recipe.');
     return;
   }
-  const opts = craftOpts();
+  const opts = craftOpts(recipe);
   const check = canCraft(inv, recipe, opts);
   const n = Math.max(1, Math.floor(qty || 1));
   // The grinder's and smelter's verbs price free units from a running buff first (buff-triggers).
@@ -27914,9 +27920,11 @@ function runMakeCraft(key, qty) {
   }
   // A room machine takes the ingredients now and runs on its own; the panel
   // closes (inc_making.js:306-308, rsp.no_modal :504) and you collect later (G175).
-  if (typeof makeStation?.startJob === 'function') {
+  // Only a recipe of the machine's own tool (craftOpts(recipe).station): a Blender recipe chosen after
+  // Back from a Fuelmaker is made here with the pack's Blender, as the source made it from its own menu.
+  if (typeof opts.station?.startJob === 'function') {
     const waitMultiplier = makingSkillAdjustments(recipe, opts.learned, opts.upgrades).waitMultiplier || 1;
-    if (makeStation.startJob({ key, recipe, qty: n, waitMultiplier }) !== false) closeMakePanel();
+    if (opts.station.startJob({ key, recipe, qty: n, waitMultiplier }) !== false) closeMakePanel();
     return;
   }
 
@@ -28027,7 +28035,7 @@ function showMakeResult(result, key) {
     closeMakePanel();
   });
   resEl.querySelector('[data-mr-more]')?.addEventListener('click', () => {
-    if (!canCraftAgain(inv, pc, key, craftOpts())) {
+    if (!canCraftAgain(inv, pc, key, craftOpts(RECIPE_CATALOG[key]))) {
       toast('Cannot make more right now.');
       return;
     }
@@ -28296,7 +28304,10 @@ function renderMakePanel() {
   }
   const known = { completedQuests: questState.completed || [], keptRecipes: features.query('keptRecipes') };
   const opts = craftOpts();
-  const canMakeNow = (r) => canCraft(inv, r, opts).ok && pc.energy > recipeEnergyCost(r, opts.learned, pc.imaginationUpgrades);
+  // At a machine, another tool's recipes are checked as the pack's tool makes them (craftOpts(recipe)).
+  let handOpts = null;
+  const recipeOpts = (r) => (makeStation && !stationForRecipe(makeStation, r) ? (handOpts ||= craftOpts(r)) : opts);
+  const canMakeNow = (r) => canCraft(inv, r, recipeOpts(r)).ok && pc.energy > recipeEnergyCost(r, opts.learned, pc.imaginationUpgrades);
   // VERBS: "Can make now" (on by default) leaves out what you can't make yet.
   const canMakeEl = document.getElementById('make-canmake');
   if (canMakeEl && canMakeEl.checked !== makeCanMakeOnly) canMakeEl.checked = makeCanMakeOnly;
@@ -28366,13 +28377,13 @@ function renderMakePanel() {
       const outRows = recipeOutputRows(recipe);
       const outId = outRows[0]?.classTsid;
       const makesLine = recipeMakesLine(recipe);
-      const check = canCraft(inv, recipe, opts);
+      const check = canCraft(inv, recipe, recipeOpts(recipe));
       const blockedLine = makeBlockedLine(recipe, check);
       const maxMake = (() => {
         if (!check.ok) return 0;
         let m = recipeTaskLimit(recipe, pc.imaginationUpgrades);
         for (const inp of recipe.inputs || []) {
-          m = Math.min(m, Math.floor(recipeInputHave(inv, inp, opts.toolState) / inp.qty));
+          m = Math.min(m, Math.floor(recipeInputHave(inv, inp, recipeOpts(recipe).toolState) / inp.qty));
         }
         const energyEach = recipeEnergyCost(recipe, skillState.learned, pc.imaginationUpgrades);
         // The batch needs energy strictly above its cost (inc_making.js).
@@ -28382,7 +28393,7 @@ function renderMakePanel() {
       makeQty = Math.max(1, Math.min(makeQty, Math.max(1, maxMake || 1)));
       const inputsHtml = (recipe.inputs || [])
         .map((i) => {
-          const have = recipeInputHave(inv, i, opts.toolState);
+          const have = recipeInputHave(inv, i, recipeOpts(recipe).toolState);
           const lab = recipeInputLabel(recipe, i);
           return `<div class="q-req"><img src="${itemIconUrl(i.classTsid)}" alt="" width="22" height="22" style="vertical-align:middle;margin-right:4px"/> <strong>${i.qty} ${lab}</strong> · you have ${have}</div>`;
         })
@@ -28459,7 +28470,7 @@ function renderMakePanel() {
     const key =
       recipe.key ||
       Object.keys(RECIPE_CATALOG).find((k) => RECIPE_CATALOG[k].id === recipe.id);
-    const check = canCraft(inv, recipe, opts);
+    const check = canCraft(inv, recipe, recipeOpts(recipe));
     const energyOk = pc.energy > recipeEnergyCost(recipe, skillState.learned, pc.imaginationUpgrades);
     const canMake = check.ok && energyOk;
     const blockedLine = canMake ? '' : makeBlockedLine(recipe, check);

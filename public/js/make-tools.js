@@ -55,6 +55,22 @@ export function groupMakingTools(tools, usable = () => true) {
 }
 
 /**
+ * The machine a Make goes to: the one the window was opened on (a home or machine-room machine,
+ * { tool, startJob, toolState }), only for a recipe of its own tool. Glitch made with the item
+ * whose menu was used and refused any other recipe (players/inc_making.js making_make_known
+ * 280-291: "recipe not supported by item"). Here Back leads from a machine to every tool, so a
+ * Blender recipe picked there is made with the pack's Blender (null), not handed to a Fuelmaker:
+ * that job ran on a hold with no Blender, made nothing it counted, and the quest never heard of it.
+ * @param {{ tool?: string }|null} station
+ * @param {{ tool?: string }|null} recipe
+ * @returns {object|null}
+ */
+export function stationForRecipe(station, recipe) {
+  if (!station || typeof station.tool !== 'string' || !recipe?.tool) return null;
+  return recipe.tool === station.tool ? station : null;
+}
+
+/**
  * Which screen Make opens on (Austin 2026-11-10): a machine in the world or a tool's pack card opens
  * that tool; the N key and the Make button open the tool used last this session while the player
  * can still use it, and the tools screen otherwise (the first open, or the tool is gone).
