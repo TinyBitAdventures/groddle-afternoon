@@ -2752,9 +2752,14 @@
   "deployed": "2026-11-12"
  },
  "git": {
-  "commits": 1846,
+  "commits": 1848,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-12",
+    "kind": "new",
+    "text": "Test Tube compounds are found by Experimenting, as in Glitch"
+   },
    {
     "date": "2026-11-12",
     "kind": "fix",
@@ -2869,14 +2874,9 @@
     "date": "2026-11-12",
     "kind": "fix",
     "text": "Buffs freeze while the game is closed and pick up where they stopped; the ones that ran on end with their end effects"
-   },
-   {
-    "date": "2026-11-12",
-    "kind": "fix",
-    "text": "Drinks' iMG takes the mood bonus, no drinking while dead, and Bacon is food again"
    }
   ]
  },
- "tests": 914,
+ "tests": 915,
  "generatedAt": "2026-11-12"
 }
