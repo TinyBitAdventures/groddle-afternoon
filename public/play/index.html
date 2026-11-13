@@ -9,8 +9,14 @@
     Phones and touch-only tablets open the phone companion (play/phone/: reports, mail, friends)
     instead of the game, which is too big for a phone tab (Austin 2026-10-31). This runs ahead of
     every stylesheet, Pixi and game file, and stops the page before any of them load. A device with
-    a fine pointer (a mouse or trackpad) always gets the game; localStorage groddle-play-device
-    "full" (the companion's Load the full game anyway) or "companion" overrides the guess.
+    a fine pointer (a mouse or trackpad) always gets the game.
+    A phone sees the phone page first on EVERY load, a reload included (Austin 2026-11-13: one rule,
+    the same every time). Its Play the game button lets one load through: it sets sessionStorage
+    groddle-play-once, which this gate reads and removes (or, with storage blocked, adds #play, which
+    this gate strips from the address), so a reload shows the phone page again.
+    localStorage groddle-play-device: "full" (Play the game on a touch tablet) lets a tablet play every
+    time, as before; a phone ignores it. "companion" always opens the phone page. "qa-game" is the QA
+    switch: the game on any device, still named a phone (tools/qa phone contexts set it).
     It also names the device in window.GRODDLE_DEVICE ("phone", "tablet" or "computer"), even
     when the stored choice lets it play: a phone draws at render resolution 1 (js/render-density.js).
   -->
@@ -31,9 +37,20 @@
       var tablet = /iPad|Android|Silk|Kindle|Tablet/.test(ua) || (/Macintosh/.test(ua) && touch > 1);
       var small = touch > 0 && side > 0 && side < 500;
       w.GRODDLE_DEVICE = phone || small ? 'phone' : tablet ? 'tablet' : 'computer';
-      if (choice === 'full') return;
+      if (choice === 'qa-game') return;
+      if (choice === 'full' && !(phone || small)) return;
       var companion = choice === 'companion' || phone || (coarse && !fine) || (tablet && !fine) || small;
       if (!companion) return;
+      var once = false;
+      try {
+        once = w.sessionStorage.getItem('groddle-play-once') === '1';
+        if (once) w.sessionStorage.removeItem('groddle-play-once');
+      } catch (e) { once = false; }
+      if (w.location.hash === '#play') {
+        once = true;
+        try { w.history.replaceState(w.history.state, '', w.location.pathname + w.location.search); } catch (e) { /* this load still plays */ }
+      }
+      if (once) return;
       var to = new URL('play/phone/', d.baseURI);
       if (/\/play\/$/.test(w.location.pathname)) to.search = '?from=solo';
       to.hash = w.location.hash;

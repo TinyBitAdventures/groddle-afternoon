@@ -165,7 +165,7 @@ function fakeSocketScript(closeAfterMs) {
   })();`;
 }
 
-/** An iPhone 16 Pro sized phone (402 x 874) that took the full game (the phone gate's "Load the full game anyway"). */
+/** An iPhone 16 Pro sized phone (402 x 874) that opens the game on every load (the phone gate's QA switch, groddle-play-device "qa-game"). */
 const PHONE = {
   viewport: { width: 402, height: 874 }, deviceScaleFactor: 3, isMobile: true, hasTouch: true,
   userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1',
@@ -173,7 +173,7 @@ const PHONE = {
 
 async function newContext(browser, { ui = 'modern', socket = null, phone = false } = {}) {
   const ctx = await browser.newContext(phone ? PHONE : { viewport: { width: 1280, height: 800 } });
-  await ctx.addInitScript((u) => { try { localStorage.setItem('groddle.ui', u); localStorage.setItem('groddle-play-device', 'full'); } catch {} }, ui);
+  await ctx.addInitScript((u) => { try { localStorage.setItem('groddle.ui', u); localStorage.setItem('groddle-play-device', 'qa-game'); } catch {} }, ui);
   if (socket) await ctx.addInitScript(socket);
   return ctx;
 }

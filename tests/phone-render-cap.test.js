@@ -42,6 +42,7 @@ function deviceOf(script, { ua, touch = 0, fine = true, coarse = false, screen =
     screen: { width: screen[0], height: screen[1] },
     location: { pathname: '/play/', hash: '', replace: (u) => calls.push(u) },
     stop: () => {},
+    sessionStorage: { getItem: () => null, removeItem: () => {} },
     localStorage: { getItem: (k) => (k === 'groddle-play-device' ? stored : null) },
   };
   vm.runInNewContext(script, { window, document: { baseURI: 'https://groddle.localhost/' }, URL });
@@ -56,10 +57,11 @@ describe('the phone gate names the device', () => {
     assert.equal(gateOf(read('play/online/index.html')), script);
   });
 
-  it('a phone that took Load the full game anyway still counts as a phone', () => {
+  it('a phone let into the game (QA switch qa-game) still counts as a phone; an old stored full no longer lets it in', () => {
     const iphone = { ua: UA.iphone, touch: 5, fine: false, coarse: true, screen: [393, 852] };
     assert.deepEqual(deviceOf(script, iphone), { device: 'phone', redirected: true });
-    assert.deepEqual(deviceOf(script, { ...iphone, stored: 'full' }), { device: 'phone', redirected: false });
+    assert.deepEqual(deviceOf(script, { ...iphone, stored: 'qa-game' }), { device: 'phone', redirected: false });
+    assert.deepEqual(deviceOf(script, { ...iphone, stored: 'full' }), { device: 'phone', redirected: true }, 'Austin 2026-11-13: the phone page first on every load');
     assert.equal(deviceOf(script, { ua: UA.android, touch: 5, fine: false, coarse: true, screen: [412, 915], stored: 'full' }).device, 'phone');
     assert.equal(deviceOf(script, { ua: UA.linux, touch: 5, fine: false, coarse: true, screen: [412, 915], stored: 'full' }).device, 'phone', 'request desktop site on a phone');
   });

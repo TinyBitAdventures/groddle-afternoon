@@ -24,7 +24,7 @@ import { createMinnAccountCore } from '../minn-account-core.js?v=63758d34';
 import { mountAccountForms, resetLinkFrom, verifyLinkFrom } from '../account-forms.js?v=29e9e2c3';
 import { gateFor, quietSession, suspendedNow } from '../online-session.js?v=6f1348c8';
 import { REPORT_MAX, REPORT_TEXT, STATUS_WORDS, createReportsApi, numberedLine, pictureRefused, pictureSrc, refusalWords, reportFromHash, reportNumber, unreadCount, whenWords } from '../reports.js?v=cfcaca31';
-import { DEVICE_KEY, PHONE_TEXT as T, POLL_MS, createPresenceApi, fitPhoto, friendsView, fullGameHref, itemNamesFrom, itemWords, mailRows, mailboxFromSave, mergePlayerMail, phoneContext, takenMailIds, unreadLetters } from './companion-data.js?v=5b243cbe';
+import { DEVICE_KEY, PHONE_TEXT as T, PLAY_ONCE_HASH, PLAY_ONCE_KEY, POLL_MS, createPresenceApi, fitPhoto, friendsView, fullGameHref, itemNamesFrom, itemWords, mailRows, mailboxFromSave, mergePlayerMail, phoneContext, phoneDevice, takenMailIds, unreadLetters } from './companion-data.js?v=e9d3d3d4';
 
 const doc = globalThis.document;
 
@@ -49,13 +49,20 @@ function storeSet(value) {
   } catch { /* private windows: this visit only */ }
 }
 
-/** The way into the full game, at the top of the page (experimental phone play, 2026-11-12: players missed it at the bottom). */
+/**
+ * The way into the full game, at the top of the page (experimental phone play, 2026-11-12: players
+ * missed it at the bottom), with the other choice beside it: stay for reports, mail and friends
+ * (Austin 2026-11-13: both choices plain at a glance). On a phone, Play the game opens the game for
+ * that one load (sessionStorage PLAY_ONCE_KEY, the gate removes it), so a reload comes back here.
+ */
 function mountPlay(host) {
   const play = el('section', { class: 'pc-card pc-play', 'aria-label': T.playTitle });
   play.append(el('h2', { class: 'pc-play-title' }, T.playTitle));
   const full = el('p', { class: 'pc-full' });
+  // A phone no longer remembers the game (an older "full" is cleared); a touch tablet still does.
+  if (phoneDevice() && storeGet() === 'full') storeSet('');
   if (storeGet() === 'full') {
-    // Opened by hand on a device that chose the game: offer the way back.
+    // Opened by hand on a tablet that chose the game: offer the way back.
     const back = el('button', { type: 'button', class: 'pc-linkish', 'data-phone-use-page': '' }, T.useThisPage);
     back.addEventListener('click', () => { storeSet(''); mountFull(full); });
     const go = el('a', { href: fullGameHref(location.search), class: 'pc-button', 'data-phone-full': '' }, T.full);
@@ -65,7 +72,7 @@ function mountPlay(host) {
   } else {
     mountFull(full);
   }
-  play.append(full);
+  play.append(full, el('p', { class: 'pc-hint pc-stay' }, T.stayHere));
   host.append(play);
 }
 
@@ -79,10 +86,23 @@ function mountNote(host) {
   host.append(note);
 }
 
+/**
+ * Play the game: this load only on a phone (the gate reads and removes PLAY_ONCE_KEY; with storage
+ * blocked the link carries PLAY_ONCE_HASH instead), remembered on a touch tablet as before.
+ */
+function playOnce(a) {
+  try {
+    sessionStorage.setItem(PLAY_ONCE_KEY, '1');
+  } catch {
+    a.href = a.getAttribute('href').split('#')[0] + PLAY_ONCE_HASH;
+  }
+  if (!phoneDevice()) storeSet('full');
+}
+
 function mountFull(host) {
   const href = fullGameHref(location.search);
   const a = el('a', { href, class: 'pc-button', 'data-phone-full': '' }, T.full);
-  a.addEventListener('click', () => storeSet('full'));
+  a.addEventListener('click', () => playOnce(a));
   host.replaceChildren(a, el('span', { class: 'pc-hint' }, T.fullHint));
 }
 

@@ -978,7 +978,7 @@ describe('every save read and write goes through the store', () => {
   // js/world-zoom.js keeps the world zoom (Wide to Original), a device preference;
   // js/night-tint.js keeps whether the world darkens with the game clock, a device preference;
   // js/ui/street-minimap.js keeps whether the street map shows (G370), a device preference;
-  // js/phone/companion.js is the phone page, not the game: it keeps this device's choice to open the full game anyway (groddle-play-device);
+  // js/phone/companion.js is the phone page, not the game: it keeps a touch tablet's choice to open the game (groddle-play-device) and sets the one-load Play the game flag (sessionStorage groddle-play-once);
   // js/builder/editor.js is the level builder in the console, not the game: it keeps its panels, cameras and clipboard on this device.
   // js/ui/quest-sheet.js keeps the Quests sheet's sort (ticket 77, groddle.questSort), a device preference.
   // js/touch-controls.js keeps a phone's "Stick follows your thumb" setting (02c12d4bf2), a device preference;

@@ -27,8 +27,8 @@
  * full; the WebContent process's largest share is WebKit Malloc (JS heap and DOM, 378 of 525 MB).
  * Decoded-image megapixels (decodedMB) are therefore not what Safari weighs.
  *
- * --phone dresses the context as an iPhone (its user agent, touch) that took the companion's
- * Load the full game anyway, so the phone gate classes it a phone (js/render-density.js caps
+ * --phone dresses the context as an iPhone (its user agent, touch) with the gate's QA switch
+ * (localStorage groddle-play-device "qa-game": the game on every load), so the phone gate classes it a phone (js/render-density.js caps
  * the render resolution). --closeup=<0..1> starts that phone at a phone zoom level (groddle.zoom.phone;
  * 1 is the closest, where js/render-density.js phoneZoomResolution raises the resolution). --query
  * appends to the page's query (density=4 lifts that cap).
@@ -125,7 +125,7 @@ try {
     deviceScaleFactor: Number(flags.dpr || 2),
     ...(flags.phone ? { userAgent: IPHONE_UA, hasTouch: true, isMobile: true } : {}),
   });
-  if (flags.phone) await ctx.addInitScript((closeup) => { try { localStorage.setItem('groddle-play-device', 'full'); if (closeup !== null) localStorage.setItem('groddle.zoom.phone', closeup); } catch {} }, flags.closeup === undefined ? null : String(flags.closeup));
+  if (flags.phone) await ctx.addInitScript((closeup) => { try { localStorage.setItem('groddle-play-device', 'qa-game'); if (closeup !== null) localStorage.setItem('groddle.zoom.phone', closeup); } catch {} }, flags.closeup === undefined ? null : String(flags.closeup));
   const page = await ctx.newPage();
   await page.goto(`${BASE}?autostart=1&questoffer=off&fresh=1&resetgame=1&memqa=1&streetdemo=${route[0]}${EXTRA_QUERY}`, { waitUntil: 'load' });
   await page.waitForFunction(() => window.groddleQA?.travel && !document.body.classList.contains('is-booting'), null, { timeout: 60000 });

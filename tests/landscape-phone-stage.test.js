@@ -94,7 +94,7 @@ describe('a sideways phone\'s stage', () => {
 
 describe('the companion page says both ways up', () => {
   it('"Upright or sideways", still new and experimental, still asking for a report', async () => {
-    const { PHONE_TEXT } = await import('../public/js/phone/companion-data.js?v=5b243cbe');
+    const { PHONE_TEXT } = await import('../public/js/phone/companion-data.js?v=e9d3d3d4');
     assert.equal(PHONE_TEXT.fullHint, 'New and experimental. Upright or sideways. Send a report if something goes wrong.');
     assert.doesNotMatch(PHONE_TEXT.fullHint, /upright,|Hold your phone/);
   });

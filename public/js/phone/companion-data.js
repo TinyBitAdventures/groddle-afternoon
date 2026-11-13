@@ -28,8 +28,34 @@ import { letterRow, normalizePlayerMailSlice } from '../player-mail.js?v=af6a8b0
 /** The player mail feature's save slice (js/features/player-mail-feature.js PLAYER_MAIL_FEATURE_ID). */
 const PLAYER_MAIL_SLICE = 'player-mail';
 
-/** localStorage: "full" opens the game on this device anyway; "companion" always opens this page (play/index.html #phone-gate). */
+/**
+ * localStorage: "full" opens the game on a touch tablet every time (a phone ignores it); "companion"
+ * always opens this page; "qa-game" (QA only) the game on any device (play/index.html #phone-gate).
+ */
 export const DEVICE_KEY = 'groddle-play-device';
+
+/**
+ * sessionStorage: "1" lets the next load of the game page through the phone gate, once (the gate
+ * removes it). A phone sees this page first on every load, a reload included (Austin 2026-11-13).
+ */
+export const PLAY_ONCE_KEY = 'groddle-play-once';
+
+/** With storage blocked, Play the game carries this hash instead; the gate strips it from the address. */
+export const PLAY_ONCE_HASH = '#play';
+
+/**
+ * PURE: the phone gate's phone test (play/index.html #phone-gate: phone || small), so this page
+ * knows whether Play the game is for one load (a phone) or remembered (a touch tablet).
+ */
+export function phoneDevice(env = globalThis) {
+  const n = env.navigator || {};
+  const ua = String(n.userAgent || '');
+  const touch = Number(n.maxTouchPoints) || 0;
+  const s = env.screen || {};
+  const side = Math.min(Number(s.width) || 0, Number(s.height) || 0);
+  const phone = /iPhone|iPod|Android.+Mobile|Windows Phone|IEMobile|Opera Mini|BlackBerry|webOS/.test(ua);
+  return phone || (touch > 0 && side > 0 && side < 500);
+}
 
 /** How often the badges ask again while the page is in view (ms). */
 export const POLL_MS = 60000;
@@ -47,8 +73,9 @@ export const PHONE_TEXT = Object.freeze({
   computerMore: 'Here you can keep up with your reports, letters and friends.',
   playTitle: 'Play on this phone',
   home: 'Visit the home page',
-  full: 'Load the full game anyway',
+  full: 'Play the game',
   fullHint: 'New and experimental. Upright or sideways. Send a report if something goes wrong.',
+  stayHere: 'Or stay here for your reports, mail and friends. In the game, the Menu\'s Phone page row brings you back.',
   fullRemembered: 'This device opens the full game.',
   useThisPage: 'Use this page instead',
   refresh: 'Refresh',
@@ -83,7 +110,7 @@ export const PHONE_TEXT = Object.freeze({
   suspendedBody: 'This account is suspended.',
 });
 
-/** Where "Load the full game anyway" goes: the page the player came from (play/ for solo), else the online game. */
+/** Where Play the game goes: the page the player came from (play/ for solo), else the online game. */
 export function fullGameHref(search = '') {
   return new URLSearchParams(String(search || '')).get('from') === 'solo' ? 'play/' : 'play/online/';
 }

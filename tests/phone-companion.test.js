@@ -22,6 +22,8 @@ import { REPORT_PICTURE } from '../public/js/reports.js?v=cfcaca31';
 import {
   DEVICE_KEY,
   PHONE_TEXT,
+  PLAY_ONCE_HASH,
+  PLAY_ONCE_KEY,
   createPresenceApi,
   fitPhoto,
   friendsView,
@@ -32,12 +34,13 @@ import {
   mailboxFromSave,
   mergePlayerMail,
   phoneContext,
+  phoneDevice,
   photoAttempts,
   snippetOf,
   takenMailIds,
   unreadLetters,
   whereWords,
-} from '../public/js/phone/companion-data.js?v=5b243cbe';
+} from '../public/js/phone/companion-data.js?v=e9d3d3d4';
 
 const pub = join(import.meta.dirname, '..', 'public');
 const read = (p) => readFileSync(join(pub, p), 'utf8');
@@ -57,16 +60,23 @@ const UA = {
 const gateOf = (html) => html.match(/<script id="phone-gate">([\s\S]*?)<\/script>/)?.[1];
 
 /** Runs a page's #phone-gate with a made-up device; answers where it went (or null) and what it called. */
-function runGate(script, { ua, touch = 0, fine = true, coarse = false, screen = [1440, 900], stored = null, path = '/play/online/', hash = '', storageThrows = false, base = 'https://groddle.localhost/' } = {}) {
+function runGate(script, { ua, touch = 0, fine = true, coarse = false, screen = [1440, 900], stored = null, path = '/play/online/', search = '', hash = '', storageThrows = false, session = null, base = 'https://groddle.localhost/' } = {}) {
   const calls = [];
   const store = { getItem: (k) => { if (storageThrows) throw new Error('SecurityError'); return k === 'groddle-play-device' ? stored : null; } };
+  const sess = session || new Map();
+  const sessionStore = {
+    getItem: (k) => { if (storageThrows) throw new Error('SecurityError'); return sess.has(k) ? sess.get(k) : null; },
+    removeItem: (k) => { if (storageThrows) throw new Error('SecurityError'); sess.delete(k); },
+  };
   const window = {
     navigator: { userAgent: ua, maxTouchPoints: touch },
     matchMedia: (q) => ({ matches: q === '(any-pointer: fine)' ? fine : q === '(any-pointer: coarse)' ? coarse : false }),
     screen: { width: screen[0], height: screen[1] },
-    location: { pathname: path, hash, replace: (u) => calls.push(['replace', u]) },
+    location: { pathname: path, search, hash, replace: (u) => calls.push(['replace', u]) },
+    history: { state: null, replaceState: (st, t, u) => calls.push(['replaceState', u]) },
     stop: () => calls.push(['stop']),
     get localStorage() { return store; },
+    get sessionStorage() { return sessionStore; },
   };
   vm.runInNewContext(script, { window, document: { baseURI: base }, URL });
   const replaced = calls.find((c) => c[0] === 'replace');
@@ -120,12 +130,40 @@ describe('the phone gate on /play/ and /play/online/', () => {
     assert.ok(runGate(script, { ua: UA.linux, touch: 5, fine: false, coarse: true, screen: [412, 915] }).to, 'request desktop site on a phone');
   });
 
-  it('follows the remembered choice: full plays anywhere, companion everywhere', () => {
+  it('follows the remembered choice: full on a tablet only, companion everywhere, qa-game (QA) plays anywhere', () => {
     assert.equal(DEVICE_KEY, 'groddle-play-device');
     assert.match(script, new RegExp(`var KEY = '${DEVICE_KEY}';`));
-    assert.equal(runGate(script, { ua: UA.iphone, touch: 5, fine: false, stored: 'full' }).to, null);
+    // Austin 2026-11-13: a phone sees the phone page first on every load, whatever it chose before.
+    assert.ok(runGate(script, { ua: UA.iphone, touch: 5, fine: false, stored: 'full' }).to, 'a phone ignores full');
+    assert.ok(runGate(script, { ua: UA.linux, touch: 5, fine: false, coarse: true, screen: [412, 915], stored: 'full' }).to, 'a small touch screen ignores full');
+    assert.equal(runGate(script, { ua: UA.mac, touch: 5, fine: false, coarse: true, screen: [820, 1180], stored: 'full' }).to, null, 'a touch tablet keeps its choice, as before');
+    assert.equal(runGate(script, { ua: UA.iphone, touch: 5, fine: false, stored: 'qa-game' }).to, null, 'the QA switch');
     assert.ok(runGate(script, { ua: UA.mac, stored: 'companion' }).to);
     assert.ok(runGate(script, { ua: UA.iphone, touch: 5, fine: false, storageThrows: true }).to, 'blocked storage still guesses');
+  });
+
+  it('Play the game lets ONE load through: the gate removes the flag, so a reload shows the phone page again', () => {
+    assert.equal(PLAY_ONCE_KEY, 'groddle-play-once');
+    assert.match(script, new RegExp(`'${PLAY_ONCE_KEY}'`));
+    const session = new Map([[PLAY_ONCE_KEY, '1']]);
+    const iphone = { ua: UA.iphone, touch: 5, fine: false, coarse: true, screen: [393, 852], session };
+    const first = runGate(script, iphone);
+    assert.equal(first.to, null, 'the load after Play the game is the game');
+    assert.equal(first.window.GRODDLE_DEVICE, 'phone');
+    assert.equal(session.has(PLAY_ONCE_KEY), false, 'used up');
+    assert.equal(runGate(script, iphone).to, 'https://groddle.localhost/play/phone/', 'a reload goes to the phone page');
+    // A computer never spends it (it plays anyway).
+    const left = new Map([[PLAY_ONCE_KEY, '1']]);
+    assert.equal(runGate(script, { ua: UA.mac, session: left }).to, null);
+    assert.equal(left.has(PLAY_ONCE_KEY), true);
+  });
+
+  it('with storage blocked, Play the game carries #play, which the gate strips from the address', () => {
+    assert.equal(PLAY_ONCE_HASH, '#play');
+    const r = runGate(script, { ua: UA.iphone, touch: 5, fine: false, storageThrows: true, path: '/play/', search: '?autostart=1', hash: '#play' });
+    assert.equal(r.to, null);
+    assert.deepEqual(r.calls, [['replaceState', '/play/?autostart=1']], 'a reload has no #play, so it shows the phone page');
+    assert.ok(runGate(script, { ua: UA.iphone, touch: 5, fine: false, hash: '#report=12' }).to, 'other hashes still go to the phone page');
   });
 
   it('says so in plain words, no em dashes', () => {
@@ -408,9 +446,33 @@ describe('Reports: a photo instead of a game picture', () => {
     assert.deepEqual(Object.keys(c).sort(), ['agent', 'build', 'errors', 'page', 'screen', 'street', 'streetName', 'x', 'y']);
   });
 
-  it('Load the full game anyway goes back where the player came from', () => {
+  it('Play the game goes back where the player came from', () => {
     assert.equal(fullGameHref(''), 'play/online/');
     assert.equal(fullGameHref('?from=solo'), 'play/');
+  });
+
+  it('knows a phone the way the gate does (phone or a small touch screen), so Play the game is for one load there', () => {
+    const env = (ua, touch, w, h) => ({ navigator: { userAgent: ua, maxTouchPoints: touch }, screen: { width: w, height: h } });
+    assert.equal(phoneDevice(env(UA.iphone, 5, 393, 852)), true);
+    assert.equal(phoneDevice(env(UA.android, 5, 412, 915)), true);
+    assert.equal(phoneDevice(env(UA.linux, 5, 412, 915)), true, 'request desktop site on a phone');
+    assert.equal(phoneDevice(env(UA.mac, 5, 820, 1180)), false, 'iPad');
+    assert.equal(phoneDevice(env(UA.mac, 0, 1280, 400)), false);
+  });
+
+  it('the page offers both choices at the top: Play the game, or stay for reports, mail and friends', () => {
+    const page = read('js/phone/companion.js');
+    assert.equal(PHONE_TEXT.full, 'Play the game');
+    assert.match(PHONE_TEXT.stayHere, /stay here for your reports, mail and friends/);
+    assert.match(PHONE_TEXT.stayHere, /Phone page/);
+    const fn = page.slice(page.indexOf('function mountPlay(host) {'), page.indexOf('/** The note under the panels'));
+    assert.match(fn, /play\.append\(full, el\('p', \{ class: 'pc-hint pc-stay' \}, T\.stayHere\)\)/);
+    assert.match(fn, /if \(phoneDevice\(\) && storeGet\(\) === 'full'\) storeSet\(''\);/, 'an older phone choice is cleared');
+    const once = page.slice(page.indexOf('function playOnce(a) {'), page.indexOf('function mountFull(host) {'));
+    assert.match(once, /sessionStorage\.setItem\(PLAY_ONCE_KEY, '1'\)/);
+    assert.match(once, /PLAY_ONCE_HASH/);
+    assert.match(once, /if \(!phoneDevice\(\)\) storeSet\('full'\);/, 'only a tablet remembers');
+    assert.match(page, /a\.addEventListener\('click', \(\) => playOnce\(a\)\);/);
   });
 });
 

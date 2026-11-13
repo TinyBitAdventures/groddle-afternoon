@@ -2,14 +2,15 @@
  * Friendly's follow-up on #284 (iPhone): with the full game remembered (localStorage groddle-play-device
  * "full"), Play always opened the game and there was no easy way back to the phone page's reports, mail
  * and friends. On a phone the Menu has a row that opens play/phone/ without forgetting the choice; the
- * phone page keeps its "Load the full game anyway" (and "Use this page instead") for that device.
+ * phone page keeps its Play the game (and, on a touch tablet that remembers it, "Use this page instead").
+ * Since 2026-11-13 a phone sees the phone page first on every load (tests/phone-companion.test.js).
  */
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { MENU_ROWS, PHONE_PAGE_LABEL, menuRowFor, phonePageHref } from '../public/js/ui/topbar.js?v=3e654797';
-import { fullGameHref } from '../public/js/phone/companion-data.js?v=5b243cbe';
+import { fullGameHref } from '../public/js/phone/companion-data.js?v=e9d3d3d4';
 
 const root = join(import.meta.dirname, '..');
 const topbar = readFileSync(join(root, 'public/js/ui/topbar.js'), 'utf8');
@@ -38,7 +39,7 @@ describe('Friendly on #284: the phone page from the Menu', () => {
     assert.match(topbar, /installPhoneRows\(doc\);\n  installPhonePageRow\(doc\);/);
   });
 
-  it('the phone page, opened on a device that chose the game, still offers the full game and the way back', () => {
+  it('the phone page, opened on a tablet that chose the game, still offers the full game and the way back', () => {
     const fn = companion.slice(companion.indexOf('function mountPlay(host) {'), companion.indexOf('/** The note under the panels'));
     assert.match(fn, /if \(storeGet\(\) === 'full'\) \{/);
     assert.match(fn, /el\('a', \{ href: fullGameHref\(location\.search\), class: 'pc-button', 'data-phone-full': '' \}, T\.full\)/);
