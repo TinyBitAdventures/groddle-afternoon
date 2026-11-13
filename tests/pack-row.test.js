@@ -165,9 +165,12 @@ describe('pack row: game.js wiring', () => {
     assert.match(view, /if \(e\.key === 'Escape'\) \{\s+e\.preventDefault\(\);\s+e\.stopPropagation\(\);\s+closeSearch\(\);/);
   });
 
-  it('the tray closes with Escape, a click elsewhere or its close; a stack\'s card sits over the tray', () => {
+  it('the tray closes with Escape or its close, never on a click elsewhere (#287); a stack\'s card sits over the tray', () => {
     assert.match(game, /if \(closePackTray\(\{ focusBag: Boolean\(document\.activeElement\?\.closest\?\.\('#pack-bar'\)\) \}\)\) return;/);
-    assert.match(game, /if \(features\.query\('packOpenBag'\) && !e\.target\?\.closest\?\.\('#pack-bag, #pack-popover, \.pack-slot, \.verb-menu'\)\) closePackTray\(\);/);
+    // #287: the client kept a bag open until it was clicked again (PackDisplayManager.as toggleContainer).
+    assert.doesNotMatch(game, /features\.query\('packOpenBag'\) && !e\.target\?\.closest\?\.\([^)]*\)\) closePackTray\(\);/);
+    const down = game.slice(game.indexOf("document.addEventListener('pointerdown', (e) => {\n    // #287"), game.indexOf('closePackPopover();\n  });', game.indexOf('// #287: a click outside the pack')));
+    assert.ok(down.length > 0 && !/closePackTray/.test(down), 'the page pointerdown leaves the tray open');
     assert.match(game, /const tray = anchor\.closest\?\.\('#pack-bag'\);\s+const floor = tray \? tray\.getBoundingClientRect\(\)\.top : barRect\.top;/);
     // The bag's Options (the client's opener strip) are in the tray's head.
     assert.match(game, /optionsLabel: PACK_COPY\.options,/);

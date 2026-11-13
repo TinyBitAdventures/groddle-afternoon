@@ -5753,7 +5753,7 @@ function openPackStackMenu(s, slot, { keys = false, swallowClick = false } = {})
   if (keys && MODERN_UI) focusVerbRow(document.getElementById('pack-popover'));
 }
 
-/** Close the open bag's tray (Escape, a click elsewhere, its close button). */
+/** Close the open bag's tray (Escape, its close button, a window it would lie over). */
 function closePackTray({ focusBag = false } = {}) {
   const key = features.query('packOpenBag') || '';
   if (!key) return false;
@@ -32031,8 +32031,10 @@ async function main() {
     cancelCurrentAction({ quiet: true });
   }, true);
   document.addEventListener('pointerdown', (e) => {
-    // A click outside the pack closes the open bag's tray (its bag, the stacks and the stack's card keep it).
-    if (features.query('packOpenBag') && !e.target?.closest?.('#pack-bag, #pack-popover, .pack-slot, .verb-menu')) closePackTray();
+    // #287: a click outside the pack leaves the open bag open, as the client did: a bag closed only on
+    // its own click, another bag opening, the keys or its close (PackDisplayManager.as toggleContainer
+    // 1072-1081, openContainer 1083-1108, closeContainer 1167-1181), and it stayed open across visits
+    // (LocalStorage OPEN_CONTAINER_TSID, 137-139). So the counts are seen going up as you gather.
     if (!isPackPopoverOpen()) return;
     const pop = document.getElementById('pack-popover');
     if (pop?.contains(e.target) || e.target?.closest?.('.pack-slot[data-tsid]')) return;
