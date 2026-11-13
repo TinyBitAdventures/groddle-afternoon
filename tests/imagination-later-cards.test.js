@@ -23,7 +23,7 @@ import {
   taskLimitMultiplier,
 } from '../public/js/imagination-effects.js?v=70169933';
 import { createInventory, countItem } from '../public/js/inventory.js?v=f49c8998';
-import { createToolConditionState, getToolCondition, setToolRemaining } from '../public/js/tools.js?v=62b37c51';
+import { createToolConditionState, getToolCondition, setToolRemaining } from '../public/js/tools.js?v=48542c24';
 import {
   DEFAULT_TASK_LIMIT,
   RECIPE_CATALOG,
@@ -32,7 +32,7 @@ import {
   loadRecipeCatalogFromFile,
   makingSkillAdjustments,
   recipeTaskLimit,
-} from '../public/js/making.js?v=bc0ec9c8';
+} from '../public/js/making.js?v=ba3677f0';
 import {
   assemblyCheck,
   assemblyEnergy,
@@ -43,7 +43,7 @@ import {
   finishMachineWork,
   startAssembly,
   startDisassembly,
-} from '../public/js/machines.js?v=112d1492';
+} from '../public/js/machines.js?v=7a292708';
 import {
   finishMeditation,
   levitationMinEnergy,
@@ -54,11 +54,11 @@ import {
 } from '../public/js/meditation.js?v=96f23682';
 import { skillPackageDetails } from '../public/js/skill-packages.js?v=bfb87281';
 import { strikeDamageFor } from '../public/js/rook-attack.js?v=c12e825f';
-import { createMineRock, mineRock, tickMineRock } from '../public/js/mining.js?v=b62c7722';
+import { createMineRock, mineRock, tickMineRock } from '../public/js/mining.js?v=b28fef74';
 import { runTransform, shuckDetails } from '../public/js/item-transforms.js?v=07b416a3';
-import { brushFox, createFox, foxFiberRange } from '../public/js/foxes.js?v=3470f86b';
+import { brushFox, createFox, foxFiberRange } from '../public/js/foxes.js?v=dca56213';
 import { soundForMakingTool } from '../public/js/sound-moments.js?v=c57351b3';
-import { supplyFeature } from '../public/js/features/supply-feature.js?v=f4a69cd2';
+import { supplyFeature } from '../public/js/features/supply-feature.js?v=2f4d9ecb';
 
 const SPIKE = join(dirname(fileURLToPath(import.meta.url)), '..', 'public');
 const seq = (...values) => {

@@ -4,8 +4,8 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { WORLD_DROP_RULES, dropFor, dropRulesFor, dropTip } from '../public/js/world-drop.js?v=98c01a74';
-import { overAt, runDrop } from '../public/js/features/world-drop-feature.js?v=fec80e28';
+import { WORLD_DROP_RULES, dropFor, dropRulesFor, dropTip } from '../public/js/world-drop.js?v=d152b2bb';
+import { overAt, runDrop } from '../public/js/features/world-drop-feature.js?v=5d2fe3df';
 
 const root = join(import.meta.dirname, '..');
 const pub = (f) => readFileSync(join(root, 'public', f), 'utf8');
@@ -21,7 +21,7 @@ describe('the drop-target table', () => {
       give_egg: 'npc_newxp_dustbunny.js', feed: 'npc_piggy.js', apply_balm: 'npc_piggy.js', water: 'trant_bean.js',
       apply_antidote: 'trant_bean.js', poison: 'trant_bean.js', mine_metal: 'rock_metal_1.js', mine: 'rock_beryl_1.js', dig: 'patch.js', tend: 'patch.js',
       dig_dirt: 'dirt_pile.js', scrape: 'mortar_barnacle.js', scrape_ice: 'ice_knob.js',
-      peat: 'peat_1.js', brush: 'npc_fox.js', add_note: 'bag_notice_board.js', donate: 'npc_shrine_cosma.js',
+      peat: 'peat_1.js', brush: 'npc_fox.js', add_note: 'bag_notice_board.js', donate: 'npc_shrine_cosma.js', distill: 'still.js',
     };
     for (const rule of WORLD_DROP_RULES) {
       const src = gsjs(files[rule.id]);

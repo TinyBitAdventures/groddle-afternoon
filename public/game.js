@@ -2,9 +2,9 @@
  * Groddle Afternoon — original street geometry + layered decos
  * PixiJS 8 · locations-xml streets · CoU PNG decos · quests/items
  */
-import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=8486632c';
+import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=f218c2d1';
 import { createErrorOnce, createFeatureHost } from './js/feature-host.js?v=06bb8b74';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=cb07149e';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=65c0d82b';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl, drawTileArt } from './js/enter-chooser.js?v=4a3ea327';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -37,8 +37,8 @@ import {
 // Quest copy is Flash htmlText: <b>/<i>/<br> drawn as formatting, the rest dropped, never innerHTML.
 import { questRequirementText, renderQuestText, withQuestMarkup } from './js/quest-text.js?v=7f5d761c';
 // G267: the world-verb quest counters skip offer-system quests; old saves drop the boot Moloko quest.
-import { dropSpiritRepeatOffers, SPIRIT_REPEAT_QUESTS } from './js/spirit-reminisce.js?v=83041c34';
-import { dropBootStarterQuests, questMoveNote, routesCounter, worldVerbQuestEvents, gardenPlotEvents, makingUnitQuestEvents, shrineDonationQuestEvents } from './js/quest-offers.js?v=b805222d';
+import { dropSpiritRepeatOffers, SPIRIT_REPEAT_QUESTS } from './js/spirit-reminisce.js?v=adbb9faf';
+import { dropBootStarterQuests, questMoveNote, routesCounter, worldVerbQuestEvents, gardenPlotEvents, makingUnitQuestEvents, shrineDonationQuestEvents } from './js/quest-offers.js?v=1b92a976';
 import {
   PHANTOM_QUEST_ID,
   REMEMBER_QUEST_ID,
@@ -233,7 +233,7 @@ import {
   rookEggStateForProgress,
   rookWoodsObjective,
   rookWoodsRemainingMs,
-} from './js/rook-woods.js?v=738634d9';
+} from './js/rook-woods.js?v=1b765560';
 import {
   ROOK_HALL_QUEST_ID,
   ROOK_HALL_START_QUEST_ID,
@@ -490,8 +490,8 @@ import { PACK_COPY, isBagClass, isElementClass, ownBagLabel, unitRankAt } from '
 import { FLOAT_TEXT_Z, SPEECH_BUBBLE_Z } from './js/fx-z.js?v=18dda7e3';
 import { hasPouch } from './js/elemental-pouch.js?v=ceefa97a';
 import { createPackRow, mountPackClearance, packBandRange, packCountText, packSearchEntries, packSlotTip } from './js/ui/pack-row.js?v=64e4a567';
-import { listAnimalFeedOptions } from './js/animals.js?v=d74effe0';
-import { pickerMaxCount, pickerOptionsFor, pickerTakesCount } from './js/animals.js?v=d74effe0';
+import { listAnimalFeedOptions } from './js/animals.js?v=1069540e';
+import { pickerMaxCount, pickerOptionsFor, pickerTakesCount } from './js/animals.js?v=1069540e';
 import {
   createDroppedItemState,
   parseDroppedItemState,
@@ -510,7 +510,7 @@ import {
   parsePlayerSave,
   serializePlayerSave,
   restorePlayerSave,
-} from './js/player-save.js?v=7e65753e';
+} from './js/player-save.js?v=1da05676';
 import {
   HOME_INTERIOR_TSID,
   HOME_STREET_TSID,
@@ -570,7 +570,7 @@ import {
   setCopyTag,
   migrateClassValue,
   brokenToolIcon,
-} from './js/tools.js?v=62b37c51';
+} from './js/tools.js?v=48542c24';
 import {
   listRecipes,
   listRecipesForTool,
@@ -608,11 +608,11 @@ import {
   recipeTaskLimit,
   recipeToolInUse,
   pluralizeItem,
-} from './js/making.js?v=bc0ec9c8';
+} from './js/making.js?v=ba3677f0';
 import { outputIconsHtml, outputsPhrase, recipeOutputRows } from './js/ui/recipe-outputs.js?v=73e19baf';
 import { MAKE_TOOL_SHEETS } from './js/make-tool-sheets.js?v=6f758e09';
-import { createTestTubePanel, tryTileHtml, TRY_TILE_LABEL } from './js/test-tube-panel.js?v=c7c704ad';
-import { COMPOUND_RECIPE_IDS, EXPERIMENT_TOOL, experimentTooltip } from './js/test-tube.js?v=cb60f9b7';
+import { createTestTubePanel, tryTileHtml, TRY_TILE_LABEL } from './js/test-tube-panel.js?v=9ac689f3';
+import { COMPOUND_RECIPE_IDS, EXPERIMENT_TOOL, experimentTooltip } from './js/test-tube.js?v=26a250fe';
 import { groupMakingTools, makeToolCounts, makeToolCountLine, makeToolSpokenLine, makeOpeningTool, gridStep, stationForRecipe, MAKING_BUSY } from './js/make-tools.js?v=86877c3e';
 import { LOW_FUEL_LINE, craftSessionElapsedMs, isLowFuel, isMachineArt, machineArtHtml, packMakeState, playMachineHandOver, setMachineArtFrame } from './js/machine-art.js?v=93e29c2d';
 import {
@@ -643,7 +643,7 @@ import {
   hasHoe,
   plantSeedChoices,
   PLANT_PICK_TITLE,
-} from './js/garden.js?v=92436baf';
+} from './js/garden.js?v=1420a6d6';
 import { GARDEN_SCALE, PLOT_H as GARDEN_PLOT_H, PLOT_W as GARDEN_PLOT_W, gardenFrame, gardenLayout, gardenStyle, plotPieces } from './js/garden-view.js?v=04fe8467';
 import { nearestPlotIndex } from './js/garden-view.js?v=04fe8467';
 import {
@@ -660,7 +660,7 @@ import {
   STARTER_MINING_SKILLS,
   findWorkingPick,
   miningToolWear,
-} from './js/mining.js?v=b62c7722';
+} from './js/mining.js?v=b28fef74';
 import {
   loadStreetData,
   STREET_INDEX,
@@ -773,7 +773,7 @@ import {
   trantStatusLabel,
   trantFootAnchorY,
 } from './js/trants.js?v=4d6f5593';
-import { growStreetTrant } from './js/patches.js?v=cd774b2c';
+import { growStreetTrant } from './js/patches.js?v=5ba97b77';
 import {
   runStreetTransition,
   showAwardScreen,
@@ -861,21 +861,21 @@ import {
   vendorSellUnitPrice,
   vendorBuyUnitPrice,
   VENDOR_BAG_HOLDS,
-} from './js/vendor.js?v=e76ac383';
+} from './js/vendor.js?v=542d30c9';
 import {
   animalAnchorX,
   animalAnchorY,
   createAnimalState,
   resetAnimalDay,
   animalStatusLabel,
-} from './js/animals.js?v=d74effe0';
+} from './js/animals.js?v=1069540e';
 import {
   ensureWoodTreeState,
   pickWoodTool,
   resetWoodTreeDay,
   woodToolLabel,
   woodTreeStatusLabel,
-} from './js/woodcutting.js?v=d2b88bb5';
+} from './js/woodcutting.js?v=ee35a30a';
 import {
   GIANTS,
   createShrineState,
@@ -909,7 +909,7 @@ import {
 } from './js/shrines.js?v=a190faea';
 import { shrineSheet, shrineVariantFor } from './js/shrine-variants.js?v=7f11c97d';
 import { giantDisplayName } from './js/giant-names.js?v=0e295891';
-import { shrinePowderOptions, shrinePowderAchievementCounters } from './js/powders.js?v=7ae9ec30';
+import { shrinePowderOptions, shrinePowderAchievementCounters } from './js/powders.js?v=6f3d6671';
 import {
   GAMESHOW_TICKET_ID,
   applySpinningWheelReward,
@@ -1039,7 +1039,7 @@ import { ENCYCLOPEDIA_MENU_LABEL, createEncyclopedia, isEncyclopediaKey } from '
 import { EAT_PICK_TEXT, bestFoodIndex, eatChoices, eatTip } from './js/eat-pick.js?v=8fb763d0';
 import { heldDirection, installHeldKeyGuard, isMacPlatform } from './js/held-keys.js?v=a28eb293';
 import { oneClickChoice, signpostArmRows, worldContextAction } from './js/world-context-menu.js?v=2a64801e';
-import { blockedPlayerVerbs, listPlayerTarget, opensPlayerMenu, playerMenuRows } from './js/ui/player-menu.js?v=c1ddb3c2';
+import { blockedPlayerVerbs, listPlayerTarget, opensPlayerMenu, playerMenuRows } from './js/ui/player-menu.js?v=a7bbaadc';
 import { forgetTexture, frameTexture, isFailed, isLoaded, onFailed, onLoaded, textureFromUrl, whenLoaded } from './js/textures.js?v=92ec53cd';
 import { FALLBACK_MAX as WORLD_ART_FALLBACK_MAX, worldArtFor } from './js/world-art.js?v=0729bf92';
 import { sceneAnim, syncAnim } from './js/deco-anim.js?v=0de84a64';
@@ -8693,13 +8693,27 @@ function feedPickerChoices(target, verbId = feedPickerVerb) {
   if (verbId === 'plant' && target?.classId === 'garden_plot') {
     return plantSeedChoices(inv, target.state?.garden?.gardenType || 'default');
   }
-  return verbId === 'feed'
-    ? listAnimalFeedOptions(target.classId, inv)
-    : pickerOptionsFor(target.classId, verbId, inv);
+  return pickChoices(target, verbId);
 }
 
-const FEED_PICKER_TITLES = { feed: 'Feed what?', incubate: 'Incubate what?', deposit: 'Deposit what?', plant: PLANT_PICK_TITLE };
-const FEED_PICKER_VERB_LABELS = { feed: 'Feed', incubate: 'Incubate', deposit: 'Deposit', plant: 'Plant' };
+/**
+ * A target-item verb's choices, whether it asks how many and the most at once: a feature's own
+ * first (#285: a dropped Still's Distill, features/supply-feature.js), else the animals'.
+ */
+function pickChoices(target, verbId) {
+  return features.query('pickerChoices', target, verbId, engine) ?? (verbId === 'feed'
+    ? listAnimalFeedOptions(target.classId, inv)
+    : pickerOptionsFor(target.classId, verbId, inv));
+}
+function pickTakesCount(target, verbId) {
+  return features.query('pickerTakesCount', target, verbId, engine) ?? pickerTakesCount(target?.classId, verbId);
+}
+function pickMax(target, classTsid) {
+  return features.query('pickerMax', target, feedPickerVerb, classTsid, engine) ?? pickerMaxCount(target?.classId, classTsid, inv);
+}
+
+const FEED_PICKER_TITLES = { feed: 'Feed what?', incubate: 'Incubate what?', deposit: 'Deposit what?', plant: PLANT_PICK_TITLE, distill: 'Distill what?' };
+const FEED_PICKER_VERB_LABELS = { feed: 'Feed', incubate: 'Incubate', deposit: 'Deposit', plant: 'Plant', distill: 'Distill' };
 /** GardenView.as onPlotClick 500-509: a clean plot clicked with no seeds. */
 const PLANT_NO_SEEDS_LINE = "You don't have any seeds to plant!";
 
@@ -8734,7 +8748,7 @@ function showFeedPickerQty(food) {
     placeFeedPicker();
     return;
   }
-  const max = Math.max(1, pickerMaxCount(feedPickerTarget?.classId, food.classTsid, inv));
+  const max = Math.max(1, pickMax(feedPickerTarget, food.classTsid));
   const input = document.getElementById('feed-picker-qty-input');
   const icon = document.getElementById('feed-picker-qty-icon');
   const label = document.getElementById('feed-picker-qty-label');
@@ -8747,7 +8761,7 @@ function showFeedPickerQty(food) {
   setFeedPickerQty(1);
   // MPANELS (js/ui/count-chooser.js): Enter in the field feeds what was typed; Esc cancels.
   bindCountField(input, {
-    max: () => Math.max(1, pickerMaxCount(feedPickerTarget?.classId, feedPickerQtyFood?.classTsid, inv)),
+    max: () => Math.max(1, pickMax(feedPickerTarget, feedPickerQtyFood?.classTsid)),
     set: (n) => setFeedPickerQty(n),
     preview: (n) => setFeedPickerQty(n, { typing: true }),
     confirm: (n) => {
@@ -8771,7 +8785,7 @@ function placeFeedPicker() {
 function setFeedPickerQty(value, { typing = false } = {}) {
   const food = feedPickerQtyFood;
   if (!food) return 1;
-  const max = Math.max(1, pickerMaxCount(feedPickerTarget?.classId, food.classTsid, inv));
+  const max = Math.max(1, pickMax(feedPickerTarget, food.classTsid));
   const n = clamp(Math.floor(Number(value) || 1), 1, max);
   const input = document.getElementById('feed-picker-qty-input');
   const go = document.getElementById('feed-picker-qty-go');
@@ -8811,7 +8825,7 @@ function chooseFeedPickerItem(classTsid) {
   const target = feedPickerTarget;
   const food = feedPickerOptions.find((option) => option.classTsid === classTsid);
   if (!target || !food || currentAction) return false;
-  if (pickerTakesCount(target.classId, feedPickerVerb) && pickerMaxCount(target.classId, classTsid, inv) > 1) {
+  if (pickTakesCount(target, feedPickerVerb) && pickMax(target, classTsid) > 1) {
     if (app?.canvas) app.canvas.dataset.feedPickerSelection = classTsid;
     showFeedPickerQty(food);
     return true;
@@ -8833,11 +8847,12 @@ function commitFeedPick(classTsid, count = 1) {
   }
   if (app?.canvas) app.canvas.dataset.feedPickerSelection = classTsid;
   closeFeedPicker('selected');
-  const counted = pickerTakesCount(target.classId, verbId);
+  const counted = pickTakesCount(target, verbId);
   return requestVerb(target, {
     id: counted ? `${verbId}:${classTsid}:${count}` : `${verbId}:${classTsid}`,
     label: `${verbId} ${counted && count > 1 ? `${count} ` : ''}${food.label}`,
-    ...(target.featureId ? { durationMs: 0 } : {}),
+    // A feature's verb (a dropped Still's Distill, #285) runs at once, as its menu row does.
+    ...(target.featureId || target.classId === 'dropped_item' ? { durationMs: 0 } : {}),
   }, { label: verbId });
 }
 
@@ -8856,9 +8871,7 @@ function openFeedPicker(target, verb = null, pick = '') {
   const sub = document.getElementById('feed-picker-sub');
   if (!panel || !grid || !sub) return false;
   const verbId = verb?.picker || verb?.id || 'feed';
-  const options = verbId === 'feed'
-    ? listAnimalFeedOptions(target.classId, inv)
-    : pickerOptionsFor(target.classId, verbId, inv);
+  const options = pickChoices(target, verbId);
   if (!options.length) {
     toast(verb?.emptyMsg || `You don't have anything this ${target.label || 'animal'} wants to eat.`, 2800);
     return false;
@@ -13065,7 +13078,8 @@ const engine = {
     if (blocked) return { ok: false, reason: 'blocked', msg: blocked };
     const n = normalizeStackQuantity(count, inv[classTsid] || 0);
     if (!n) return { ok: false, reason: 'missing', msg: 'That stack is no longer in your pack.' };
-    const result = dropInventoryStack(droppedItemState, inv, droppedStacksTsid(), classTsid, n, { x, y }, { now: Date.now(), mergeRadius: 12, ...(keepsOwnStack(classTsid) ? { merge: false } : {}), points: leavingToolPoints(classTsid, n) });
+    // Its words go down with it too (#285: a Still's hopper and Hooch), as Drop's do.
+    const result = dropInventoryStack(droppedItemState, inv, droppedStacksTsid(), classTsid, n, { x, y }, { now: Date.now(), mergeRadius: 12, ...(keepsOwnStack(classTsid) ? { merge: false } : {}), points: leavingToolPoints(classTsid, n), tags: leavingToolTags(classTsid, n) });
     if (!result.ok) return result;
     closePackPopover();
     saveDroppedItems();
@@ -14039,6 +14053,8 @@ function spawnDroppedItemStack(stack) {
   // Dropped stacks must stay legible in front of large vendors/gardens at crowded spawns.
   spr.zIndex = itemZ(stack.classTsid, 12);
   spr.worldItemId = stack.id;
+  // #285: a Still on the ground plays its own states (features/supply-feature.js dressDroppedStack).
+  features.query('dressDroppedStack', spr, stack, engine);
 
   entityLayer.addChild(spr);
   droppedItemSprites.push(spr);
@@ -14386,6 +14402,14 @@ function refusePickup(line) {
 }
 
 function pickupDroppedWorldItem(target, requested = Infinity) {
+  // A feature's canPickup (#285: a Still mid-collect, still.js 386-398).
+  const refused = features.query('groundPickupRefused', target, engine);
+  if (refused) {
+    toast(refused);
+    pushActivity(refused);
+    playSound('CLICK_FAILURE', { volume: 0.45 });
+    return false;
+  }
   if (target?.state?.contents?.length || target?.state?.name || target?.state?.sort) return pickupDroppedBag(target);
   // G152 (takeable.js:76-79, 84-93): a full pack refuses the stack; a part that fits is taken, the rest stays down.
   const wantClass = target?.state?.classTsid;
@@ -32081,7 +32105,7 @@ async function main() {
       }
       // MPANELS (js/ui/count-chooser.js): the arrows, Page Up / Page Down, Home and End.
       const was = Number(document.getElementById('feed-picker-qty-input')?.value) || 1;
-      const next = countKeyValue(e.key, was, Math.max(1, pickerMaxCount(feedPickerTarget?.classId, feedPickerQtyFood.classTsid, inv)));
+      const next = countKeyValue(e.key, was, Math.max(1, pickMax(feedPickerTarget, feedPickerQtyFood.classTsid)));
       if (next != null) {
         e.preventDefault();
         setFeedPickerQty(next);
@@ -33342,7 +33366,7 @@ async function main() {
   }
   // Garden talkback QA (js/garden-talk-qa.js): ?gardentalkdemo=herb|crop.
   if (new URLSearchParams(location.search).has('gardentalkdemo')) {
-    import('./js/garden-talk-qa.js?v=2635b9ac').then((m) => m.runGardenTalkDemo({ engine, executeVerb, params: new URLSearchParams(location.search) }));
+    import('./js/garden-talk-qa.js?v=27b053d3').then((m) => m.runGardenTalkDemo({ engine, executeVerb, params: new URLSearchParams(location.search) }));
   }
   // MEMQA (ticket 21, Safari's memory reload in Naraka): ?memqa=1 lets a probe walk streets through the
   // real street trip (tools/qa/street-memory.mjs). Solo pages only: online pages drop their params.

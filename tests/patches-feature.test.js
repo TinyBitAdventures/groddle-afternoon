@@ -13,9 +13,9 @@ import {
   trantFrameStage,
   treeFrameUrl,
   patchesFeature,
-} from '../public/js/features/patches-feature.js?v=fa1cf77d';
-import { FEATURES } from '../public/js/features/index.js?v=cb07149e';
-import { soilSpritePaths } from '../public/js/patches.js?v=cd774b2c';
+} from '../public/js/features/patches-feature.js?v=4c29b458';
+import { FEATURES } from '../public/js/features/index.js?v=65c0d82b';
+import { soilSpritePaths } from '../public/js/patches.js?v=5ba97b77';
 
 const ecology = JSON.parse(await readFile(new URL('../public/assets/content/street-ecology.json', import.meta.url), 'utf8'));
 

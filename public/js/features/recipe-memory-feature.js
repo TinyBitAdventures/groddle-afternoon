@@ -4,7 +4,7 @@
  * game.js calls stampOnce after the save loads; making.js recipeKnown reads the kept list through
  * query('keptRecipes'). Canvas: recipesKept (the ids, or "none"), recipesStamped.
  */
-import { RECIPE_CATALOG } from '../making.js?v=bc0ec9c8';
+import { RECIPE_CATALOG } from '../making.js?v=ba3677f0';
 import { normalizeKeptRecipes, stampKeptRecipes } from '../recipe-memory.js?v=3c72d749';
 
 export const RECIPE_MEMORY_FEATURE_ID = 'recipe-memory';

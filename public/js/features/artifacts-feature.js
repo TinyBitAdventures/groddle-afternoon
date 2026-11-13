@@ -37,7 +37,7 @@
 
 import { addItem, ensureItem, ITEM_CATALOG, removeItem } from '../inventory.js?v=f49c8998';
 import { DROP_ITEMS, rollDropTable } from '../drop-tables.js?v=8bcf111f';
-import { canUseTool, useToolCondition, TOOL_CONDITION_CATALOG } from '../tools.js?v=62b37c51';
+import { canUseTool, useToolCondition, TOOL_CONDITION_CATALOG } from '../tools.js?v=48542c24';
 import { OVERLAY_USES, playOverlay } from '../overlays.js?v=4e81f749';
 import {
   ALL_ARTIFACT_CLASSES,

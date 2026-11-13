@@ -15,7 +15,7 @@ import { fileURLToPath } from 'node:url';
 import { PROMPT_ROLL_OUT_MS, armPromptTimeout, promptTimeoutMs, timeoutChoice } from '../public/js/prompt-timeout.js?v=fba1669f';
 import { STREET_CARD_GONE, STREET_CARD_UP, cardHidesKey, cardPausedTimeout, installStreetCardKeyGuard, streetCardUp } from '../public/js/screen-fx.js?v=2e975a82';
 import { hellFeature } from '../public/js/features/hell-feature.js?v=d8327a47';
-import { questOffersFeature } from '../public/js/features/quest-offers-feature.js?v=c3a784f2';
+import { questOffersFeature } from '../public/js/features/quest-offers-feature.js?v=8cea2b90';
 import { HELL_ENTRY_PROMPT_TIMEOUT_MS, HELL_TEXT } from '../public/js/hell.js?v=23354bc4';
 import { createQuestState } from '../public/js/quests.js?v=40c71a37';
 

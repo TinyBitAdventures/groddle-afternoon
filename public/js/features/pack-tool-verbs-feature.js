@@ -10,8 +10,8 @@
  */
 
 import { countItem } from '../inventory.js?v=f49c8998';
-import { getToolCondition } from '../tools.js?v=62b37c51';
-import { ROCK_CATALOG, knowsMining } from '../mining.js?v=b62c7722';
+import { getToolCondition } from '../tools.js?v=48542c24';
+import { ROCK_CATALOG, knowsMining } from '../mining.js?v=b28fef74';
 import { chooseTool } from '../tool-choice.js?v=e0dcb60e';
 import {
   findCloseTarget,

@@ -2970,13 +2970,15 @@
  },
  "still": {
   "lines": [
-   "With Distilling, Distill Grain, Corn, Potatoes or a Bushel of Grain into its hopper (500 units), then Collect the Hooch it makes.",
-   "It makes one Hooch every 2 minutes 20 seconds, even while you are away, and holds up to 50."
+   "It works on the ground only: Drop it, in your house or on a street, then use it there. In your pack its Distill and Collect say to drop it first.",
+   "With Distilling, Distill Grain, Corn, Potatoes or a Bushel of Grain into its hopper (500 units), then Collect the Hooch it makes. Dragging the grain from your pack onto it distills too.",
+   "It makes one Hooch every 2 minutes 20 seconds while it lies there, even while you are away, and holds up to 50. Picked up, it stops; its hopper and Hooch go with it."
   ],
   "evidence": [
-   "public/js/machines.js:248-258 STILL skill distilling_1, hopperSize 500, hoochCost 14, maxHooch 50, workMs 140 s, distillables grain/corn/potato/grain_bushel",
-   "public/js/machines.js:295-331 distillInStill, collectHooch",
-   "public/js/features/supply-feature.js:8-9,336-345 Distill and Collect verbs"
+   "public/js/machines.js:322-332 STILL skill distilling_1, hopperSize 500, hoochCost 14, maxHooch 50, workMs 140 s, distillables grain/corn/potato/grain_bushel",
+   "public/js/machines.js:441-541 STILL_TEXT mustDrop, stillCollectCheck, stillDistillCheck, stillOnPickup",
+   "public/js/features/supply-feature.js:840-863 decorateVerbs: Collect and Distill on a dropped Still",
+   "public/js/world-drop.js distill rule (ground:still)"
   ]
  },
  "stoot_barfield_pullstring_doll": {

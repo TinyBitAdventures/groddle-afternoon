@@ -10,14 +10,14 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { getVerbsFor, runVerb } from '../public/content.js?v=8486632c';
+import { getVerbsFor, runVerb } from '../public/content.js?v=f218c2d1';
 import { createTrantState, setTrantTables, fruitCapacityAt } from '../public/js/trants.js?v=4d6f5593';
-import { quoteTrantCare } from '../public/js/trant-care.js?v=e76c420c';
-import { harvestWoodTree, noteWoodCare, quoteWoodTreeHarvest, WOOD_TREE_MATURITY_MAP } from '../public/js/woodcutting.js?v=d2b88bb5';
-import { growStreetTrant, maturityCycleMs } from '../public/js/patches.js?v=cd774b2c';
-import { createToolConditionState } from '../public/js/tools.js?v=62b37c51';
-import { patchesFeature } from '../public/js/features/patches-feature.js?v=fa1cf77d';
-import { treeDeathFeature, WOOD_CLEARED_TO_PATCH_MS } from '../public/js/features/tree-death-feature.js?v=1a8d43db';
+import { quoteTrantCare } from '../public/js/trant-care.js?v=6ee0b0f5';
+import { harvestWoodTree, noteWoodCare, quoteWoodTreeHarvest, WOOD_TREE_MATURITY_MAP } from '../public/js/woodcutting.js?v=ee35a30a';
+import { growStreetTrant, maturityCycleMs } from '../public/js/patches.js?v=5ba97b77';
+import { createToolConditionState } from '../public/js/tools.js?v=48542c24';
+import { patchesFeature } from '../public/js/features/patches-feature.js?v=4c29b458';
+import { treeDeathFeature, WOOD_CLEARED_TO_PATCH_MS } from '../public/js/features/tree-death-feature.js?v=61a5c8aa';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 setTrantTables(JSON.parse(fs.readFileSync(path.join(root, 'public/assets/content/trants.json'), 'utf8')));

@@ -11,12 +11,12 @@
  *   js/woodcutting.js noteWoodCare)
  */
 
-import { TOOL_CONDITION_CATALOG, WATERING_CAN_TOOLS, canUseTool, firstWorkingTool, useToolCondition } from './tools.js?v=62b37c51';
+import { TOOL_CONDITION_CATALOG, WATERING_CAN_TOOLS, canUseTool, firstWorkingTool, useToolCondition } from './tools.js?v=48542c24';
 import { fruitCapacityAt, fruitProductionAt } from './trants.js?v=4d6f5593';
 import { scaledToolWear, toolWearMultiplier } from './imagination-effects.js?v=70169933';
 import { metabolicGain, moodMax, loseEnergy, loseMood } from './metabolics.js?v=1383e6fd';
 import { grantMoodXp } from './mood-xp.js?v=22648ec0';
-import { noteWoodCare, stampWoodCare, woodCareWait } from './woodcutting.js?v=d2b88bb5';
+import { noteWoodCare, stampWoodCare, woodCareWait } from './woodcutting.js?v=ee35a30a';
 
 const freezeRanks = (ranks) => Object.freeze(
   Object.fromEntries(Object.entries(ranks).map(([id, row]) => [id, Object.freeze(row)]))

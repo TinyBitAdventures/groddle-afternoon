@@ -34,20 +34,20 @@ import {
   takeToolCopy,
   toolCopies,
   useCharge,
-} from '../public/js/tools.js?v=62b37c51';
+} from '../public/js/tools.js?v=48542c24';
 import { addItem, countItem, createInventory, removeItem } from '../public/js/inventory.js?v=f49c8998';
-import { copyFromLedger, spendCopyCharge } from '../public/js/copy-charges.js?v=e4ead2c7';
+import { copyFromLedger, spendCopyCharge } from '../public/js/copy-charges.js?v=c821e9fa';
 import { createDroppedItemState, dropInventoryStack, pickupDroppedStack } from '../public/js/world-items.js?v=5e592293';
-import { useBottle, bottleUsesLeft } from '../public/js/tree-poison.js?v=0cfbc3fb';
-import { usePotion as useGardenPotion, potionUsesLeft as gardenUsesLeft } from '../public/js/master-garden.js?v=84fcebf6';
-import { potionsFeature, usePotionNow } from '../public/js/features/potions-feature.js?v=3d639de5';
-import { powdersFeature } from '../public/js/features/powders-feature.js?v=b536791c';
-import { treeDeathFeature } from '../public/js/features/tree-death-feature.js?v=1a8d43db';
-import { masterGardenFeature } from '../public/js/features/master-garden-feature.js?v=8a6cf8a7';
-import { itemVerbsMoreFeature } from '../public/js/features/item-verbs-more-feature.js?v=c070bb25';
-import { supplyFeature } from '../public/js/features/supply-feature.js?v=f4a69cd2';
-import { cubimalRaceFeature } from '../public/js/features/cubimal-race-feature.js?v=39a52142';
-import { seasonsFeature } from '../public/js/features/seasons-feature.js?v=6a05fc5d';
+import { useBottle, bottleUsesLeft } from '../public/js/tree-poison.js?v=d8fb42c9';
+import { usePotion as useGardenPotion, potionUsesLeft as gardenUsesLeft } from '../public/js/master-garden.js?v=ff6ca66a';
+import { potionsFeature, usePotionNow } from '../public/js/features/potions-feature.js?v=8857b3a7';
+import { powdersFeature } from '../public/js/features/powders-feature.js?v=0cbbfbc6';
+import { treeDeathFeature } from '../public/js/features/tree-death-feature.js?v=61a5c8aa';
+import { masterGardenFeature } from '../public/js/features/master-garden-feature.js?v=72895990';
+import { itemVerbsMoreFeature } from '../public/js/features/item-verbs-more-feature.js?v=8163b283';
+import { supplyFeature } from '../public/js/features/supply-feature.js?v=2f4d9ecb';
+import { cubimalRaceFeature } from '../public/js/features/cubimal-race-feature.js?v=24090023';
+import { seasonsFeature } from '../public/js/features/seasons-feature.js?v=a1453bae';
 
 const root = join(import.meta.dirname, '..');
 
@@ -338,13 +338,13 @@ describe('Juju Shoo-Shoo Powder, the Butterfly Net and the Dusty Stick: each the
 });
 
 describe('a Still, a Cubimal, a lit pumpkin and an Emotional Bear: each their own', () => {
-  it('a Still picked distills into its own hopper; an older save is the first Still', () => {
+  it('a Still picked shows its own hopper; an older save is the first Still', () => {
     supplyFeature._reset();
     const { engine } = engineWith({ still: 2, grain: 30 }, { learnedSkills: ['distilling_1'] });
-    supplyFeature.runPackVerb('still', 'distill:grain', engine, { copy: 1 });
-    const tags = copyTags(engine.toolState, 'still');
-    assert.equal(tags[0], null);
-    assert.ok(tags[1]?.hopper > 0);
+    setCopyTag(engine.toolState, 'still', 1, { hopper: 28, hooch: 0, workingSince: 0 });
+    // #285: Distill works on the ground only; in the pack the picked Still's tooltip is its own hopper.
+    assert.match(supplyFeature.packVerbs('still', engine, { copy: 1 }).find((v) => v.id === 'distill').tooltip, /^The hopper contains 28 units, enough to make 2 Hooch/);
+    assert.equal(supplyFeature.packVerbs('still', engine, { copy: 0 }).find((v) => v.id === 'distill').tooltip, 'Add Grain, Potatoes or Corn to the hopper to begin making Hooch');
     const old = engineWith({ still: 2 }).engine;
     supplyFeature.restore({ version: 1, still: { hopper: 0, hooch: 4 } }, old);
     assert.equal(copyTags(old.toolState, 'still')[0].hooch, 4);

@@ -30,7 +30,7 @@
  */
 
 import { addItem, countItem, removeItem } from '../inventory.js?v=f49c8998';
-import { copyForVerb, copyTag, setCopyTag, takeToolCopy } from '../tools.js?v=62b37c51';
+import { copyForVerb, copyTag, setCopyTag, takeToolCopy } from '../tools.js?v=48542c24';
 import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=32c58aef';
 import { landingY, walkSurfaceY } from '../walk-surface.js?v=106bfdc5';
 import { displayTopOf, itemstackOverlayPoint, playSheetOverlay } from '../overlay-art.js?v=a6561207';

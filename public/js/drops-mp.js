@@ -37,7 +37,7 @@
  * name ...) ride with a one-copy stack as "t", as its wear rides as "r".
  */
 
-import { cleanCopyTag } from './tools.js?v=62b37c51';
+import { cleanCopyTag } from './tools.js?v=48542c24';
 
 /** Where the site and server ids come from (drops.go dropOpRe). */
 export const DROP_OP = /^drop-[0-9a-f]{16}$/;
@@ -94,6 +94,9 @@ export function shareReason(classTsid, table, { street = '', dropKey = '', scene
   if (!table?.items) return 'table';
   if (!table.items[c]) return 'type';
   if (c === 'note') return 'note';
+  // #285: a Still works on the ground (Distill, Collect, its hopper running); the shared ground keeps a
+  // stack's words but has no verbs to change them, so a Still stays the player's own, where it works.
+  if (c === 'still') return 'works';
   if (ownHome && herdFood && homeStreetOwner(street) > 0) return 'herd'; // the owner's animals eat it from the owner's own stacks
   return '';
 }

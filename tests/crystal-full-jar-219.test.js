@@ -20,8 +20,8 @@ import {
   loadRecipeCatalogFromFile,
   recipeBlockedLine,
   recipeInputHave,
-} from '../public/js/making.js?v=bc0ec9c8';
-import { bindToolInventory, createToolConditionState, setToolRemaining, toolCopies } from '../public/js/tools.js?v=62b37c51';
+} from '../public/js/making.js?v=ba3677f0';
+import { bindToolInventory, createToolConditionState, setToolRemaining, toolCopies } from '../public/js/tools.js?v=48542c24';
 import { economyTransforms } from '../tools/build-economy.mjs';
 
 const root = join(import.meta.dirname, '..');

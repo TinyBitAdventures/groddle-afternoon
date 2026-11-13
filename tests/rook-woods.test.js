@@ -36,11 +36,11 @@ import {
   rookEggStateForProgress,
   rookWoodsGroundY,
   rookWoodsRemainingMs,
-} from '../public/js/rook-woods.js?v=738634d9';
+} from '../public/js/rook-woods.js?v=1b765560';
 import {
   createToolConditionState,
   setToolRemaining,
-} from '../public/js/tools.js?v=62b37c51';
+} from '../public/js/tools.js?v=48542c24';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 

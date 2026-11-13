@@ -23,7 +23,7 @@
  */
 
 import { addItem, countItem, removeItem } from './inventory.js?v=f49c8998';
-import { getToolCondition, receiveToolCopy, setToolRemaining, toolCopies } from './tools.js?v=62b37c51';
+import { getToolCondition, receiveToolCopy, setToolRemaining, toolCopies } from './tools.js?v=48542c24';
 import { distillingBonus, hasMasterAssembler, hasMasterExploder, machinePartInstallMs } from './imagination-effects.js?v=70169933';
 import { loseEnergy } from './metabolics.js?v=1383e6fd';
 
@@ -372,40 +372,55 @@ export function stillRoom(state) {
 }
 
 /**
- * still.js distill: put as many of one distillable in as the hopper has room
- * for, then start. Corn / Grain / Potato Hoocher (still.js:286-297, 346-357)
- * add 20% more units than the room check counted.
+ * still.js distill (handler 273-376): put up to `count` of one distillable in, as many as the
+ * hopper has room for (can_fit), then start. Corn / Grain / Potato Hoocher (still.js:286-297,
+ * 346-357) add 20% more units than the room check counted. A Still already full of Hooch takes
+ * the grain into its hopper all the same and says so (360-362); it starts again after a Collect.
+ * The words are the handler's: "You added N Grain to the hopper.", the Hoocher line, and the two
+ * failure lines.
  */
-export function distillInStill(state, inv, classTsid, learned = [], now = Date.now(), upgrades = []) {
+export function distillInStill(state, inv, classTsid, learned = [], now = Date.now(), upgrades = [], count = Infinity) {
   advanceStill(state, now);
   const value = STILL.distillables[classTsid];
-  if (!value) return { ok: false, reason: 'not_distillable', msg: 'That will not distill.' };
-  if (!learned.includes(STILL.skill)) return { ok: false, reason: 'skill', msg: 'You need to know Distilling to use a Still.' };
-  if (state.hooch >= STILL.maxHooch) {
-    return { ok: false, reason: 'full', msg: "The Still is totally full. You'll have to remove some Hooch before you can make any more." };
-  }
+  if (!value) return { ok: false, reason: 'not_distillable', msg: 'You must have either Corn, Grain or Potatoes to distill.' };
+  if (!learned.includes(STILL.skill)) return { ok: false, reason: 'skill', msg: STILL_TEXT.skill };
   const fit = Math.floor(stillRoom(state) / value);
-  const taken = Math.min(countItem(inv, classTsid), fit);
-  if (taken < 1) return { ok: false, reason: 'room', msg: 'There is no room left in the hopper.' };
+  const want = Number.isFinite(Number(count)) ? Math.max(1, Math.floor(Number(count))) : Infinity;
+  const taken = Math.min(countItem(inv, classTsid), fit, want);
+  if (taken < 1) {
+    return countItem(inv, classTsid) < 1
+      ? { ok: false, reason: 'missing', msg: 'You must have either Corn, Grain or Potatoes to distill.' }
+      : { ok: false, reason: 'room', msg: "The hopper of this Still is too full for anything you're carrying." };
+  }
   removeItem(inv, classTsid, taken);
   const bonus = distillingBonus(classTsid, upgrades);
   // setHopperAmount(intval(hopper) + taken * base_cost * multiplier); reads intval.
   state.hopper = Math.floor(state.hopper + taken * value * bonus.multiplier);
-  if (!state.workingSince && state.hopper >= STILL.hoochCost) state.workingSince = now;
   const extra = bonus.name ? Math.round(taken * value * (bonus.multiplier - 1)) : 0;
-  return {
-    ok: true,
-    taken,
-    extra,
-    hopper: state.hopper,
-    msg: `You added ${taken} to the hopper (${state.hopper}/${STILL.hopperSize}).${extra ? ` Your "${bonus.name}" upgrade got you an extra ${extra} units in the hopper!` : ''}`,
-  };
+  const name = taken > 1 ? STILL_NAMES[classTsid][1] : STILL_NAMES[classTsid][0];
+  const lines = [`You added ${taken} ${name} to the hopper.`];
+  if (extra) lines.push(`Your "${bonus.name}" upgrade got you an extra ${extra} units in the hopper!`);
+  let started = false;
+  if (state.hooch >= STILL.maxHooch) lines.push("The Still is totally full. You'll have to remove some Hooch before you can make any more.");
+  else if (!state.workingSince && state.hopper >= STILL.hoochCost) {
+    state.workingSince = now;
+    started = true;
+  } else if (!state.workingSince) lines.push('Hm… nothing happened. Maybe you "still" need to add more stuff?');
+  return { ok: true, taken, extra, started, hopper: state.hopper, msg: lines.join(' ') };
 }
+
+/** The distillables' names, single and plural (items/grain.js, corn.js, potato.js, grain_bushel.js). */
+const STILL_NAMES = Object.freeze({
+  grain: ['Grain', 'Grains'],
+  corn: ['Corn', 'Corn'],
+  potato: ['Potato', 'Potatoes'],
+  grain_bushel: ['Bushel of Grain', 'Bushels of Grain'],
+});
 
 export function collectHooch(state, inv, learned = [], now = Date.now()) {
   advanceStill(state, now);
-  if (!learned.includes(STILL.skill)) return { ok: false, reason: 'skill', msg: 'You need to know Distilling to use a Still.' };
-  if (state.hooch < 1) return { ok: false, reason: 'empty', msg: 'There is no Hooch in the Still yet.' };
+  if (!learned.includes(STILL.skill)) return { ok: false, reason: 'skill', msg: STILL_TEXT.skill };
+  if (state.hooch < 1) return { ok: false, reason: 'empty', msg: stillIdleReason(state) };
   const got = state.hooch;
   addItem(inv, 'hooch', got);
   state.hooch = 0;
@@ -418,4 +433,109 @@ export function stillEtaSeconds(state, now = Date.now()) {
   advanceStill(state, now);
   if (!state.workingSince) return 0;
   return Math.max(0, Math.ceil((state.workingSince + STILL.workMs - now) / 1000));
+}
+
+/* A Still works on the ground only (#285; still.js getDescExtras 545, verbs.collect / distill
+ * conditions 134-136 and 208-210). Its words and its conditions, as the source's. */
+
+export const STILL_TEXT = Object.freeze({
+  mustDrop: 'You must first Drop this to use it.',
+  skill: 'You must know Distilling to use this.',
+  bootlegger: "Collecting Hooch from someone else's Still is against the bootlegger's code.",
+  needsMore: 'This Still needs more Potatoes, Corn or Grain to make Hooch. Try Distilling some.',
+  empty: 'This Still is currently empty. Try Distilling some Potatoes, Corn or Grain.',
+  tooFull: "The hopper of this Still is too full for anything you're carrying.",
+  nothing: 'You must have either Corn, Grain or Potatoes to distill.',
+  noChoices: 'You must have Corn, Grain or Potatoes in sufficient amounts to distill.',
+  collectingSelf: 'You are still collecting Hooch from this Still. Hold your horses!',
+  collectingOther: 'Someone is still collecting Hooch from this Still. Hold your horses!',
+  stealing: "Stealing a Still from someone else's home is the basest of crimes.",
+  distillTitle: 'Distill what?',
+});
+
+/** still.js onDrop 482-486: a Still put down with grain in its hopper starts working 2 s later. */
+export const STILL_DROP_START_MS = 2000;
+/** still.js verbs.collect handler 165: giveHooch 4 s after Collect. */
+export const STILL_COLLECT_MS = 4000;
+
+/** verbs.collect conditions 149-156: why there is nothing to collect. */
+export function stillIdleReason(state, now = Date.now()) {
+  advanceStill(state, now);
+  if (state.hopper >= STILL.hoochCost) {
+    return `This Still is currently working, and will produce ${Math.floor(state.hopper / STILL.hoochCost)} more Hooch. Return in a while to collect your Hooch.`;
+  }
+  return state.hopper ? STILL_TEXT.needsMore : STILL_TEXT.empty;
+}
+
+/** verbs.collect get_tooltip 120-126. */
+export function stillCollectTip(state) {
+  return `Collect your ${state.hooch > 1 ? `${state.hooch} Hooches` : 'Hooch'}!`;
+}
+
+/** verbs.distill get_tooltip 180-188. */
+export function stillDistillTip(state) {
+  return state.hopper
+    ? `The hopper contains ${state.hopper} units, enough to make ${Math.floor(state.hopper / STILL.hoochCost)} Hooch. Add more Grain, Potatoes or Corn to make more Hooch.`
+    : 'Add Grain, Potatoes or Corn to the hopper to begin making Hooch';
+}
+
+/**
+ * verbs.collect conditions 128-158. `onGround`: the Still lies in a place (isOnGround);
+ * `collecting`: someone's 4 s collect is under way (give_pc); `othersHome`: it stands in someone
+ * else's house (pols_is_pol and not the owner).
+ */
+export function stillCollectCheck(state, learned = [], { onGround = false, collecting = false, othersHome = false, now = Date.now() } = {}) {
+  if (!learned.includes(STILL.skill)) return { ok: false, msg: STILL_TEXT.skill };
+  if (!onGround) return { ok: false, msg: STILL_TEXT.mustDrop };
+  advanceStill(state, now);
+  if (state.hooch && !collecting) return othersHome ? { ok: false, msg: STILL_TEXT.bootlegger } : { ok: true, msg: '' };
+  return { ok: false, msg: stillIdleReason(state, now) };
+}
+
+/**
+ * verbs.distill valid_items 237-272: the distillables in the pack that the hopper has room for at
+ * least one of, each with how many fit (can_fit) and how many are held.
+ */
+export function stillDistillChoices(state, inv) {
+  const room = stillRoom(state);
+  const out = [];
+  for (const [classTsid, value] of Object.entries(STILL.distillables)) {
+    const have = countItem(inv, classTsid);
+    if (have > 0 && room >= value) out.push({ classTsid, have, max: Math.min(have, Math.floor(room / value)) });
+  }
+  return out;
+}
+
+/** verbs.distill conditions 202-234 (and drop_ok_code 192-201 for one class). */
+export function stillDistillCheck(state, inv, learned = [], { onGround = false, now = Date.now() } = {}) {
+  if (!onGround) return { ok: false, msg: STILL_TEXT.mustDrop };
+  if (!learned.includes(STILL.skill)) return { ok: false, msg: STILL_TEXT.skill };
+  advanceStill(state, now);
+  if (stillDistillChoices(state, inv).length) return { ok: true, msg: '' };
+  const held = Object.keys(STILL.distillables).some((c) => countItem(inv, c) > 0);
+  return { ok: false, msg: held ? STILL_TEXT.tooFull : STILL_TEXT.nothing };
+}
+
+/**
+ * onDrop 482-486: a Still put down idle with a Hooch's worth of grain in its hopper (and room for
+ * Hooch) starts working 2 s later. The source's test is `>` hoochCost, which left a hopper of
+ * exactly 14 idle until the next Distill; ours starts it (a Distill would have).
+ */
+export function stillWaitsToStart(state) {
+  return Boolean(state && !state.workingSince && state.hopper >= STILL.hoochCost && state.hooch < STILL.maxHooch);
+}
+
+/**
+ * onPickup 488-493: in the pack it stops (the timers cancelled). The Hooch it finished until now
+ * is counted first; the run under way is lost, as the cancelled finishWorking timer lost it.
+ */
+export function stillOnPickup(state, now = Date.now()) {
+  advanceStill(state, now);
+  state.workingSince = 0;
+  return state;
+}
+
+/** verbs.collect handler 159-167: the run under way stops (apiCancelTimer finishWorking) for the 4 s. */
+export function stillOnCollectStart(state, now = Date.now()) {
+  return stillOnPickup(state, now);
 }

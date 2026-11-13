@@ -16,7 +16,7 @@ import { describe, it } from 'node:test';
 import { actMessage, applyPigState } from '../public/js/street-objects.js?fresh=piggies-gone';
 import { COPY_TAG_CLASSES, COPY_TAG_RULES, cleanCopyTagOf } from '../public/js/copy-tags.js?fresh=piggies-gone';
 import { PIGGY_CROP_SEEDS, husbandryPack, normalizeHusbandryPack } from '../public/js/animal-husbandry.js?v=b80d23e0';
-import { copyTagKind } from '../public/js/tools.js?v=62b37c51';
+import { copyTagKind } from '../public/js/tools.js?v=48542c24';
 import { streetObjectsFeature } from '../public/js/features/street-objects-feature.js?fresh=piggies-gone';
 
 const root = join(import.meta.dirname, '..');

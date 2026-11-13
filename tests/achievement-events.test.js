@@ -23,14 +23,14 @@ import {
   resetAchievementCounter,
   purchaseAchievementUpdates,
 } from '../public/js/achievements.js?v=e4e5edd0';
-import { createResourceNode, harvestResourceNode } from '../public/js/resource-nodes.js?v=9b20788d';
-import { createPlot, growTree, tickPlot } from '../public/js/patches.js?v=cd774b2c';
-import { noteWoodCare } from '../public/js/woodcutting.js?v=d2b88bb5';
-import { slothsChewing } from '../public/js/features/resource-nodes-feature.js?v=5f93b9e3';
-import { supplyFeature } from '../public/js/features/supply-feature.js?v=f4a69cd2';
-import { bindToolInventory, createToolConditionState } from '../public/js/tools.js?v=62b37c51';
+import { createResourceNode, harvestResourceNode } from '../public/js/resource-nodes.js?v=3a26727e';
+import { createPlot, growTree, tickPlot } from '../public/js/patches.js?v=5ba97b77';
+import { noteWoodCare } from '../public/js/woodcutting.js?v=ee35a30a';
+import { slothsChewing } from '../public/js/features/resource-nodes-feature.js?v=3a9145d4';
+import { supplyFeature } from '../public/js/features/supply-feature.js?v=2f4d9ecb';
+import { createToolConditionState } from '../public/js/tools.js?v=48542c24';
 import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=10b118dd';
-import { normalizeAchievementSnapshot } from '../public/js/player-save.js?v=7e65753e';
+import { normalizeAchievementSnapshot } from '../public/js/player-save.js?v=1da05676';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const publicRoot = join(here, '../public');
@@ -333,28 +333,28 @@ describe('GSJS counter groups wired for G116-G119', () => {
   it('still:collected_in_pol only in your own home (still.js:454-455)', () => {
     supplyFeature._reset();
     const counted = [];
-    const engine = (inHome) => {
-      const inv = { still: 1 };
-      return {
-        inv,
-        pc: { energy: 100 },
-        // As game.js: the pack's tools follow the pack (each Still's Hooch is its copy's, js/tools.js).
-        toolState: bindToolInventory(createToolConditionState(), inv),
-        learnedSkills: ['distilling_1'],
-        param: () => null,
-        setData: () => {},
-        homeContext: () => ({ inHome }),
-        achievement: (counter, amount) => counted.push(`${counter}=${amount}`),
-      };
-    };
-    // An older save's one Still state becomes the Still's own.
-    const away = engine(false);
-    supplyFeature.restore({ still: { hopper: 0, hooch: 2 } }, away);
-    supplyFeature.runPackVerb('still', 'collect', away);
+    // #285: a Still is collected on the ground; the counter goes by where it stands when Collect starts.
+    const engine = (inHome, hooch) => ({
+      inv: {},
+      pc: { energy: 100 },
+      toolState: createToolConditionState(),
+      learnedSkills: ['distilling_1'],
+      param: () => null,
+      setData: () => {},
+      homeContext: () => ({ inHome, owned: true }),
+      achievement: (counter, amount) => counted.push(`${counter}=${amount}`),
+      droppedItems: { streets: { HERE: [{ id: 'world-item-1', classTsid: 'still', count: 1, x: 0, y: 0, tags: [{ hopper: 0, hooch, workingSince: 0 }] }] } },
+      dropTsid: 'HERE',
+      droppedItemsChanged() {},
+    });
+    const still = { classId: 'dropped_item', state: { id: 'world-item-1', classTsid: 'still', count: 1 } };
+    const away = engine(false, 2);
+    supplyFeature.runVerbOverride(still, 'collect', away);
+    supplyFeature.onTick(16, Date.now() + 4100, away);
     assert.deepEqual(counted, []);
-    const home = engine(true);
-    supplyFeature.restore({ still: { hopper: 0, hooch: 3 } }, home);
-    supplyFeature.runPackVerb('still', 'collect', home);
+    const home = engine(true, 3);
+    supplyFeature.runVerbOverride(still, 'collect', home);
+    supplyFeature.onTick(16, Date.now() + 4100, home);
     assert.deepEqual(counted, ['still:collected_in_pol=3']);
     assertEarns('moonshiner', [{ counter: 'still:collected_in_pol', amount: 3 }], 3);
   });

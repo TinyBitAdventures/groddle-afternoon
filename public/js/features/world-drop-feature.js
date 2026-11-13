@@ -20,10 +20,10 @@
  */
 
 import { ITEM_CATALOG } from '../inventory.js?v=f49c8998';
-import { listAnimalFeedOptions } from '../animals.js?v=d74effe0';
+import { listAnimalFeedOptions } from '../animals.js?v=1069540e';
 import { isBagClass } from '../pack-slots.js?v=4a36968a';
-import { dropFor, dropTip } from '../world-drop.js?v=98c01a74';
-import { canUseTool } from '../tools.js?v=62b37c51';
+import { dropFor, dropTip } from '../world-drop.js?v=d152b2bb';
+import { canUseTool } from '../tools.js?v=48542c24';
 import { chooseTool } from '../tool-choice.js?v=e0dcb60e';
 
 export const WORLD_DROP_FEATURE_ID = 'world-drop';
@@ -68,7 +68,14 @@ function ctxFor(engine, target, copy = null) {
     feedable: (cls) => listAnimalFeedOptions(target?.classId, inv).some((o) => o.classTsid === cls),
     isBag: (cls) => isBagClass(cls) || /^bag_/.test(cls),
     hasTag: (cls, tag) => (ITEM_CATALOG[cls]?.tags || []).includes(tag),
+    // #285: a Still on the ground takes what its hopper has room for (features/supply-feature.js).
+    distillable: (cls) => engine.query?.('stillTakes', target, cls, engine) === true,
   };
+}
+
+/** The class a drop rule tests: a stack lying on the ground goes by `ground:<its class>`. */
+function dropClassOf(target) {
+  return target?.classId === 'dropped_item' ? `ground:${target.state?.classTsid || ''}` : target?.classId;
 }
 
 /** What the dragged class does at a client point: { target, drop, tip, ok } or null. */
@@ -81,7 +88,7 @@ export function overAt(engine, canvas, clientX, clientY, cls, copy = null) {
   const target = engine.interactableAt?.(p.x, p.y);
   if (!target || target.classId === 'garden_plot') return null;
   const verbs = engine.targetVerbs?.(target) || [];
-  const drop = dropFor(target.classId, cls, verbs, ctxFor(engine, target, copy));
+  const drop = dropFor(dropClassOf(target), cls, verbs, ctxFor(engine, target, copy));
   if (!drop) return null;
   const def = ITEM_CATALOG[cls] || {};
   const ok = drop.verb.enabled !== false;

@@ -92,7 +92,7 @@
 
 import { ITEM_CATALOG, itemIcon } from '../inventory.js?v=f49c8998';
 import { frameTexture, sourceFromUrl } from '../textures.js?v=92ec53cd';
-import { questRoomConverse } from './quest-instances-feature.js?v=b325a735';
+import { questRoomConverse } from './quest-instances-feature.js?v=7e96306c';
 import { hellFeature } from './hell-feature.js?v=d8327a47';
 import { DISPATCHER_ART, FROG_ART, MAIL_NPC_ART_DIR } from '../mail-npc-art.js?v=1ed97a5d';
 import { DISPATCHER_GAP, DISPATCHER_HALF, DISPATCHER_TEXT, SIGNPOST } from '../home-street-fixtures.js?v=bad831a1';
@@ -121,8 +121,8 @@ import {
   sendCarriedToMailbox,
   sendDueToMailbox,
 } from '../mail-courier.js?v=68125101';
-import { AUCTION_SENDER, mailSubject, mailText } from '../auctions.js?v=0b1fff76';
-import { formatStack } from '../gifts.js?v=d28f78e8';
+import { AUCTION_SENDER, mailSubject, mailText } from '../auctions.js?v=79fd7e2a';
+import { formatStack } from '../gifts.js?v=09d34fe7';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
 
 export const MAIL_COURIER_FEATURE_ID = 'mail-courier';

@@ -54,10 +54,10 @@ import {
   plotNeedsWater,
   gardenNeedsWater,
   GARDEN_NO_DRY_PLOTS_LINE,
-} from '../public/js/garden.js?v=92436baf';
-import { getVerbsFor, runVerb } from '../public/content.js?v=8486632c';
+} from '../public/js/garden.js?v=1420a6d6';
+import { getVerbsFor, runVerb } from '../public/content.js?v=f218c2d1';
 import { plotPieces } from '../public/js/garden-view.js?v=04fe8467';
-import { plotsFor } from '../public/js/master-garden.js?v=84fcebf6';
+import { plotsFor } from '../public/js/master-garden.js?v=ff6ca66a';
 import {
   createInventory,
   countItem,
@@ -65,7 +65,7 @@ import {
   listPackToolSlots,
   isToolItem,
 } from '../public/js/inventory.js?v=f49c8998';
-import { DEFAULT_VENDOR, vendorBuy } from '../public/js/vendor.js?v=e76ac383';
+import { DEFAULT_VENDOR, vendorBuy } from '../public/js/vendor.js?v=542d30c9';
 import { HAS_SITE, SITE_DIR } from '../tools/repos.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));

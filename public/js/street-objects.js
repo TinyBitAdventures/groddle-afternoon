@@ -33,12 +33,12 @@
  * keeps a dig crew (diggers) as a rock keeps miners.
  */
 
-import { ROCK_CATALOG, findWorkingPick, miningProfile, miningToolWear } from './mining.js?v=b62c7722';
+import { ROCK_CATALOG, findWorkingPick, miningProfile, miningToolWear } from './mining.js?v=b28fef74';
 import { MINING_EXPERT_UPGRADES } from './imagination-effects.js?v=70169933';
 import { TRANT_META, canHarvestTrant, fruitCapacityAt, resolveArborologyPackage } from './trants.js?v=4d6f5593';
-import { highestLightGreenThumbRank, quoteTrantCare } from './trant-care.js?v=e76c420c';
-import { RESOURCE_NODE_ALIASES, RESOURCE_NODE_CATALOG, resolveResourceSkillPackage } from './resource-nodes.js?v=9b20788d';
-import { highestAnimalKinshipRank } from './animal-kinship.js?v=ffe074b2';
+import { highestLightGreenThumbRank, quoteTrantCare } from './trant-care.js?v=6ee0b0f5';
+import { RESOURCE_NODE_ALIASES, RESOURCE_NODE_CATALOG, resolveResourceSkillPackage } from './resource-nodes.js?v=3a26727e';
+import { highestAnimalKinshipRank } from './animal-kinship.js?v=44416a29';
 import { applyAnimalName, applyCreatureState, clockOffset, pathFrom } from './street-creatures.js?v=4a0738f6';
 
 /** The resource-node classes whose stock is shared (the "N uses left, then regrows" nodes). */

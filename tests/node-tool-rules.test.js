@@ -11,14 +11,14 @@
 import { describe, it, afterEach } from 'node:test';
 import assert from 'node:assert/strict';
 
-import { createResourceNode, harvestResourceNode } from '../public/js/resource-nodes.js?v=9b20788d';
-import { bindToolInventory, createToolConditionState, setToolRemaining, toolCopies } from '../public/js/tools.js?v=62b37c51';
-import { WORLD_DROP_RULES, dropFor } from '../public/js/world-drop.js?v=98c01a74';
+import { createResourceNode, harvestResourceNode } from '../public/js/resource-nodes.js?v=3a26727e';
+import { bindToolInventory, createToolConditionState, setToolRemaining, toolCopies } from '../public/js/tools.js?v=48542c24';
+import { WORLD_DROP_RULES, dropFor } from '../public/js/world-drop.js?v=d152b2bb';
 import { CHOICE_MS, chooseTool, clearToolChoice, peekToolChoice, takeToolChoice } from '../public/js/tool-choice.js?v=e0dcb60e';
 import { PACK_TOOL_TEXT, nodesFor, packToolButtons, packToolCondition, planPackToolVerb } from '../public/js/pack-tool-verbs.js?v=479afbd9';
-import { packToolOrder } from '../public/js/features/resource-nodes-feature.js?v=5f93b9e3';
+import { packToolOrder } from '../public/js/features/resource-nodes-feature.js?v=3a9145d4';
 import { CREW_NODES, CREW_VERBS, HELP_SCRAPE_LABEL, helpScrapeMessage } from '../public/js/help-dig.js?v=93d6358d';
-import { nodePerks } from '../public/js/street-objects.js?v=4c8cd006';
+import { nodePerks } from '../public/js/street-objects.js?v=43061a3d';
 
 const NOW = 1_700_000_000_000;
 const ctx = (extra = {}) => ({ now: NOW, dayKey: 'd1', rng: () => 0.5, ...extra });

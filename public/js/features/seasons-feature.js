@@ -33,10 +33,10 @@
 
 import { addItem, countItem, ensureItem, removeItem, registerItemUse, ITEM_CATALOG } from '../inventory.js?v=f49c8998';
 import { dametimeParts, getGameDayKey } from '../game-day.js?v=cf9afac0';
-import { setSeasonalSeedCheck as setGardenSeasonGate } from '../garden.js?v=92436baf';
-import { setSeasonalSeedCheck as setMasterGardenSeasonGate } from '../garden.js?v=92436baf';
-import { setSeasonalRecipeCheck } from '../making.js?v=bc0ec9c8';
-import { getToolCondition, copyForVerb, copyTag, migrateClassTag, setCopyTag, takeToolCopy } from '../tools.js?v=62b37c51';
+import { setSeasonalSeedCheck as setGardenSeasonGate } from '../garden.js?v=1420a6d6';
+import { setSeasonalSeedCheck as setMasterGardenSeasonGate } from '../garden.js?v=1420a6d6';
+import { setSeasonalRecipeCheck } from '../making.js?v=ba3677f0';
+import { getToolCondition, copyForVerb, copyTag, migrateClassTag, setCopyTag, takeToolCopy } from '../tools.js?v=48542c24';
 
 /*
  * Each lit pumpkin's phrases are its own (pumpkin_lit_*.js this.phrases, 380-391, at most 3), kept
@@ -78,7 +78,7 @@ import { emblemCostFor } from '../shrines.js?v=a190faea';
 import { rollDropTable } from '../drop-tables.js?v=8bcf111f';
 import { openNoteView, noteViewOpen } from '../note-view.js?v=eca7de52';
 import { payDrop } from './drops-feature.js?v=29255d3b';
-import { fireflyJarCounts, setFireflyJar } from './resource-nodes-feature.js?v=5f93b9e3';
+import { fireflyJarCounts, setFireflyJar } from './resource-nodes-feature.js?v=3a9145d4';
 import { SEASON_DATA } from '../seasons-data.js?v=b5174bc9';
 import {
   CANDY_CLASSES,

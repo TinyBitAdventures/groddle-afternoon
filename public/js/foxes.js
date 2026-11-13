@@ -16,7 +16,7 @@
  */
 
 import { addItem, countItem, ensureItem } from './inventory.js?v=f49c8998';
-import { canUseTool, useToolCondition } from './tools.js?v=62b37c51';
+import { canUseTool, useToolCondition } from './tools.js?v=48542c24';
 import { foxBrushingCard, scaledToolWear } from './imagination-effects.js?v=70169933';
 import { grantMoodXp } from './mood-xp.js?v=22648ec0';
 import { loseEnergy } from './metabolics.js?v=1383e6fd';

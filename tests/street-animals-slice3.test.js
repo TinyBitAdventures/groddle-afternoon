@@ -14,11 +14,11 @@ import { readFileSync } from 'node:fs';
 
 import { DRAGON_PLAN_MOVES, SALMON_SWIM, creatureOf, dragonPlan, dragonWalkAt, salmonSwimAt } from '../public/js/street-creatures.js?v=4a0738f6';
 import { FIRE_DRAGON_WALK } from '../public/js/fire-dragon.js?v=b7f3d751';
-import { foxLegFrom, foxOnLeg } from '../public/js/foxes-mp.js?v=d55c3c59';
-import { FOX_TIMING } from '../public/js/foxes.js?v=3470f86b';
-import { SHARED_NODE_CLASSES, applyNodeState, freshenNode, sharedNodeVerb } from '../public/js/street-objects.js?v=4c8cd006';
-import { createResourceNode } from '../public/js/resource-nodes.js?v=9b20788d';
-import { streetObjectsFeature } from '../public/js/features/street-objects-feature.js?v=3bcc52a6';
+import { foxLegFrom, foxOnLeg } from '../public/js/foxes-mp.js?v=16fb50be';
+import { FOX_TIMING } from '../public/js/foxes.js?v=dca56213';
+import { SHARED_NODE_CLASSES, applyNodeState, freshenNode, sharedNodeVerb } from '../public/js/street-objects.js?v=43061a3d';
+import { createResourceNode } from '../public/js/resource-nodes.js?v=3a26727e';
+import { streetObjectsFeature } from '../public/js/features/street-objects-feature.js?v=f9cd0b5f';
 import { serverPath, skipWithoutServer } from '../tools/repos.mjs';
 
 describe('a shared Salmon', () => {

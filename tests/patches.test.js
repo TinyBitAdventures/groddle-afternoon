@@ -22,9 +22,9 @@ import {
   soilSpawnClasses,
   tickPlot,
   archivedSeedlingTrant,
-} from '../public/js/patches.js?v=cd774b2c';
-import { createToolConditionState, getToolCondition } from '../public/js/tools.js?v=62b37c51';
-import { harvestWoodTree, noteWoodCare } from '../public/js/woodcutting.js?v=d2b88bb5';
+} from '../public/js/patches.js?v=5ba97b77';
+import { createToolConditionState, getToolCondition } from '../public/js/tools.js?v=48542c24';
+import { harvestWoodTree, noteWoodCare } from '../public/js/woodcutting.js?v=ee35a30a';
 
 const seq = (...values) => {
   let i = 0;

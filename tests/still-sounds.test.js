@@ -12,11 +12,11 @@ import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createInventory, countItem } from '../public/js/inventory.js?v=f49c8998';
-import { bindToolInventory, copyForVerb, copyTags, createToolConditionState, setCopyTag } from '../public/js/tools.js?v=62b37c51';
+import { copyForVerb, copyTags, createToolConditionState, setCopyTag } from '../public/js/tools.js?v=48542c24';
 import { resolveSound } from '../public/js/sound-board.js?v=7ff169eb';
 import { SOUND_ALIASES, SOUND_FILES } from '../public/js/sound-keys.js?v=fb6ee553';
-import { supplyFeature } from '../public/js/features/supply-feature.js?v=f4a69cd2';
-import { STILL, advanceStill, createStillState, stillStopsAt } from '../public/js/machines.js?v=112d1492';
+import { supplyFeature } from '../public/js/features/supply-feature.js?v=2f4d9ecb';
+import { STILL, advanceStill, createStillState, stillStopsAt } from '../public/js/machines.js?v=7a292708';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const PUB = join(ROOT, 'public');
@@ -27,43 +27,52 @@ const archiveMap = JSON.parse(readFileSync(join(ROOT, 'tools/sound/archiveorg-sf
 const catalog = JSON.parse(readFileSync(join(PUB, 'assets/content/sound-keys.json'), 'utf8')).keys;
 const sha256 = (rel) => createHash('sha256').update(readFileSync(join(PUB, rel))).digest('hex');
 
-function stillEngine(items, skills = ['distilling_1']) {
+/** A player beside `stills` Stills lying on this street (#285: a Still works on the ground). */
+function stillEngine(items, skills = ['distilling_1'], stills = 1) {
   const played = [];
+  const rows = Array.from({ length: stills }, (_, k) => ({ id: `world-item-${k + 1}`, classTsid: 'still', count: 1, x: 100 * k, y: 0 }));
   return {
     played,
-    inv: createInventory({ still: 1, ...items }),
+    inv: createInventory({ ...items }),
     pc: { energy: 100, imaginationUpgrades: [] },
     toolState: createToolConditionState(),
     learnedSkills: skills,
     param: () => null,
     playSound: (key, opts) => played.push([key, opts?.volume]),
+    droppedItems: { streets: { STREET: rows } },
+    dropTsid: 'STREET',
+    droppedItemsChanged() {},
   };
 }
+
+const groundTarget = (engine, at = 0) => ({ classId: 'dropped_item', state: { id: engine.droppedItems.streets.STREET[at].id, classTsid: 'still', count: 1 } });
+const groundTags = (engine) => engine.droppedItems.streets.STREET.map((r) => r.tags?.[0] ?? null);
 
 describe('the Still\'s sounds', () => {
   it('Distill opens the hopper lid; Collect rings the Still\'s chime', () => {
     supplyFeature._reset();
     const engine = stillEngine({ grain: 14 });
-    assert.equal(supplyFeature.runPackVerb('still', 'distill:grain', engine), true);
+    assert.equal(supplyFeature.runVerbOverride(groundTarget(engine), 'distill:grain:14', engine), true);
     assert.equal(countItem(engine.inv, 'grain'), 0);
     assert.deepEqual(engine.played, [['FUELMAKER_LOAD_OPEN', undefined]]);
     // Nothing to collect yet: no chime.
-    supplyFeature.runPackVerb('still', 'collect', engine);
+    supplyFeature.runVerbOverride(groundTarget(engine), 'collect', engine);
     assert.equal(engine.played.length, 1);
-    // A Still with three Hooch waiting (kept on the Still's own copy, as the feature keeps it).
+    // A Still with three Hooch waiting (kept on the dropped stack's own words): the chime at once, the Hooch 4 s on.
     supplyFeature._reset();
     const ready = stillEngine({});
-    setCopyTag(ready.toolState, 'still', copyForVerb(ready.toolState, 'still', null), { hopper: 0, hooch: 3, workingSince: 0 });
-    assert.equal(supplyFeature.runPackVerb('still', 'collect', ready), true);
-    assert.equal(countItem(ready.inv, 'hooch'), 3);
+    ready.droppedItems.streets.STREET[0].tags = [{ hopper: 0, hooch: 3, workingSince: 0 }];
+    assert.equal(supplyFeature.runVerbOverride(groundTarget(ready), 'collect', ready), true);
     assert.deepEqual(ready.played, [['STILL_COLLECT', 0.6]]);
+    supplyFeature.onTick(16, Date.now() + 4100, ready);
+    assert.equal(countItem(ready.inv, 'hooch'), 3);
     supplyFeature._reset();
   });
 
   it('a Distill that does not happen makes no sound', () => {
     supplyFeature._reset();
     const engine = stillEngine({ grain: 14 }, []);
-    supplyFeature.runPackVerb('still', 'distill:grain', engine);
+    supplyFeature.runVerbOverride(groundTarget(engine), 'distill:grain:14', engine);
     assert.equal(countItem(engine.inv, 'grain'), 14);
     assert.deepEqual(engine.played, []);
     supplyFeature._reset();
@@ -149,11 +158,15 @@ describe('the Still\'s sounds', () => {
 
   describe('the done chime', () => {
     const tick = (engine, now) => supplyFeature.onTick(16, now, engine);
-    const seed = (engine, tag, at = 0) => setCopyTag(engine.toolState, 'still', at, tag);
+    const seed = (engine, tag, at = 0) => {
+      const row = engine.droppedItems.streets.STREET[at];
+      if (tag) row.tags = [tag];
+      else delete row.tags;
+    };
     const t0 = 5_000_000;
     const stop = t0 + STILL.workMs;
 
-    it('rings once, for the holder, at the moment the Still runs dry', () => {
+    it('rings once, for the player beside it, at the moment the Still runs dry', () => {
       supplyFeature._reset();
       const engine = stillEngine({});
       seed(engine, { hopper: 14, hooch: 0, workingSince: t0 });
@@ -163,7 +176,7 @@ describe('the Still\'s sounds', () => {
       tick(engine, stop + 20);
       assert.deepEqual(engine.played, [['STILL_READY', 0.55]]);
       // Its Hooch is counted and kept on the Still.
-      assert.deepEqual(copyTags(engine.toolState, 'still')[0], { hopper: 0, hooch: 1, workingSince: 0 });
+      assert.deepEqual(groundTags(engine)[0], { hopper: 0, hooch: 1, workingSince: 0 });
       for (const later of [stop + 400, stop + 1500, stop + 60000]) tick(engine, later);
       assert.equal(engine.played.length, 1);
       supplyFeature._reset();
@@ -182,7 +195,7 @@ describe('the Still\'s sounds', () => {
       // The 50th: full.
       tick(engine, stop + STILL.workMs + 20);
       assert.deepEqual(engine.played, [['STILL_READY', 0.55]]);
-      assert.deepEqual(copyTags(engine.toolState, 'still')[0], { hopper: 72, hooch: 50, workingSince: 0 });
+      assert.deepEqual(groundTags(engine)[0], { hopper: 72, hooch: 50, workingSince: 0 });
       supplyFeature._reset();
     });
 
@@ -207,7 +220,7 @@ describe('the Still\'s sounds', () => {
       seed(closed, { hopper: 14, hooch: 0, workingSince: t0 });
       tick(closed, stop + 3600000);
       assert.deepEqual(closed.played, []);
-      assert.deepEqual(copyTags(closed.toolState, 'still')[0], { hopper: 0, hooch: 1, workingSince: 0 });
+      assert.deepEqual(groundTags(closed)[0], { hopper: 0, hooch: 1, workingSince: 0 });
       supplyFeature._reset();
       // Asleep: seen working, then nothing until well after.
       const asleep = stillEngine({});
@@ -236,9 +249,11 @@ describe('the Still\'s sounds', () => {
       seed(idle, null);
       tick(idle, stop + 2000);
       assert.deepEqual(idle.played, []);
-      // No Still in the pack: nothing to watch.
-      const none = stillEngine({});
-      none.inv = createInventory({ grain: 14 });
+      // A Still in the pack does not work (onPickup 488-493): it stops where it is and never rings.
+      const none = stillEngine({ still: 1 }, ['distilling_1'], 0);
+      setCopyTag(none.toolState, 'still', copyForVerb(none.toolState, 'still', null), { hopper: 14, hooch: 0, workingSince: t0 });
+      tick(none, t0 + 1000);
+      assert.deepEqual(copyTags(none.toolState, 'still')[0], { hopper: 14, hooch: 0, workingSince: 0 });
       tick(none, stop + 20);
       assert.deepEqual(none.played, []);
       supplyFeature._reset();
@@ -246,18 +261,15 @@ describe('the Still\'s sounds', () => {
 
     it('two Stills done at once ring one chime; a second Still on its own time rings its own', () => {
       supplyFeature._reset();
-      const engine = stillEngine({ still: 2 });
-      bindToolInventory(engine.toolState, engine.inv);
-      assert.equal(copyTags(engine.toolState, 'still').length, 2);
+      const engine = stillEngine({}, ['distilling_1'], 2);
       seed(engine, { hopper: 14, hooch: 0, workingSince: t0 }, 0);
       seed(engine, { hopper: 14, hooch: 7, workingSince: t0 }, 1);
       tick(engine, t0 + 1000);
       tick(engine, stop + 20);
       assert.deepEqual(engine.played, [['STILL_READY', 0.55]]);
-      assert.deepEqual(copyTags(engine.toolState, 'still'), [{ hopper: 0, hooch: 1, workingSince: 0 }, { hopper: 0, hooch: 8, workingSince: 0 }]);
+      assert.deepEqual(groundTags(engine), [{ hopper: 0, hooch: 1, workingSince: 0 }, { hopper: 0, hooch: 8, workingSince: 0 }]);
       supplyFeature._reset();
-      const apart = stillEngine({ still: 2 });
-      bindToolInventory(apart.toolState, apart.inv);
+      const apart = stillEngine({}, ['distilling_1'], 2);
       seed(apart, { hopper: 14, hooch: 0, workingSince: t0 }, 0);
       seed(apart, { hopper: 14, hooch: 0, workingSince: t0 + 30000 }, 1);
       tick(apart, t0 + 31000);

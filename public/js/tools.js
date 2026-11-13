@@ -147,8 +147,9 @@ function taggedClasses() {
     ...cubimals.map((slug) => [`npc_cubimal_${slug}`, tagged('Cubimal', `npc_cubimal_${slug}.js user_name`, 'name')]),
     // pumpkin_lit_*.js this.phrases per pumpkin (380-391, at most 3).
     ...[1, 2, 3, 4, 5].map((n) => [`pumpkin_lit_${n}`, tagged('Lit Pumpkin', `pumpkin_lit_${n}.js phrases`, 'phrases')]),
-    // still.js 30-31 instanceProps hooch and hopper_amount per Still.
-    ['still', tagged('Still', 'still.js hooch, hopper_amount', 'still')],
+    // still.js 30-31 instanceProps hooch and hopper_amount per Still; stackmax 1, so each Still lies on
+    // the ground on its own with its own hopper (#285: it works there), never in one pile (ownStack).
+    ['still', { ...tagged('Still', 'still.js hooch, hopper_amount', 'still'), ownStack: true }],
     // teleportation_script.js 15-19 stackmax 1, has_instance_props; destination and is_imbued per script
     // (setTarget 298-319, getLabel 254-260), which never share a stack, on the ground either (ownStack).
     ['teleportation_script', { ...tagged('Teleportation Script', 'teleportation_script.js destination, is_imbued', 'script'), ownStack: true }],

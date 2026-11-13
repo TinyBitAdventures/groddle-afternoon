@@ -14,7 +14,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { ITEM_PLURALS } from '../public/js/item-plurals-data.js?v=62e96051';
-import { normalizeGroundStack } from '../public/js/drops-mp.js?v=84c9e767';
+import { normalizeGroundStack } from '../public/js/drops-mp.js?v=3207d36c';
 import { createDroppedItemState, dropInventoryStack, pickupCountTitle, pickupCountToAsk, pickupDroppedStack } from '../public/js/world-items.js?v=5e592293';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');

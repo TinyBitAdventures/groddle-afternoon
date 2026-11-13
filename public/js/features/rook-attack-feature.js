@@ -125,8 +125,8 @@ import {
   syncObjs,
 } from '../rook-mp.js?v=0b9056b1';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
-import { copyChargesLeft, copyFromLedger, keepsCopies, spendCopyCharge, verbCopy } from '../copy-charges.js?v=e4ead2c7';
-import { migrateClassValue } from '../tools.js?v=62b37c51';
+import { copyChargesLeft, copyFromLedger, keepsCopies, spendCopyCharge, verbCopy } from '../copy-charges.js?v=c821e9fa';
+import { migrateClassValue } from '../tools.js?v=48542c24';
 import { playPotionBottle } from '../potion-bottle-fx.js?v=85e8687c';
 import { feedZone, placeRookBadge, unionBox } from '../rook-badge-place.js?v=2bb00dfd';
 

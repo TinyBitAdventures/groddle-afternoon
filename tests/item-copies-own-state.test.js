@@ -32,20 +32,20 @@ import {
   toolCopies,
   toolWornBaseCost,
   useToolCondition,
-} from '../public/js/tools.js?v=62b37c51';
+} from '../public/js/tools.js?v=48542c24';
 import { ITEM_CATALOG, addItem, createInventory, ensureItem, isToolItem, removeItem } from '../public/js/inventory.js?v=f49c8998';
-import { createPlayerSave, restorePlayerSave } from '../public/js/player-save.js?v=7e65753e';
+import { createPlayerSave, restorePlayerSave } from '../public/js/player-save.js?v=1da05676';
 import { layoutPack, unitPlaces } from '../public/js/pack-slots.js?v=4a36968a';
-import { bagsFeature } from '../public/js/features/bags-feature.js?v=b61da5c5';
-import { VENDOR_PROFILES, vendorBuy, vendorSell } from '../public/js/vendor.js?v=e76ac383';
-import { createResourceNode, harvestResourceNode, ensureResourceItems } from '../public/js/resource-nodes.js?v=9b20788d';
+import { bagsFeature } from '../public/js/features/bags-feature.js?v=b27d87e9';
+import { VENDOR_PROFILES, vendorBuy, vendorSell } from '../public/js/vendor.js?v=542d30c9';
+import { createResourceNode, harvestResourceNode, ensureResourceItems } from '../public/js/resource-nodes.js?v=3a26727e';
 import {
   fireflyJarCounts,
   fireflyJarInUse,
   resourceNodesFeature,
   setFireflyJar,
-} from '../public/js/features/resource-nodes-feature.js?v=5f93b9e3';
-import { toolBreakEvents } from '../public/js/quest-offers.js?v=b805222d';
+} from '../public/js/features/resource-nodes-feature.js?v=3a9145d4';
+import { toolBreakEvents } from '../public/js/quest-offers.js?v=1b92a976';
 
 const root = join(import.meta.dirname, '..');
 const read = (rel) => readFileSync(join(root, 'public', rel), 'utf8');
