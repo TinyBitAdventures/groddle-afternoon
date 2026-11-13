@@ -6,6 +6,7 @@
 
 import { listMapDestinations, planTravel, resolveLoadedTsid, tsidAliases } from './travel.js?v=7fd6e363';
 import { HUB_MAP_BACKGROUNDS } from './hub-map-backgrounds.js?v=2b2d6468';
+import { HUB_COLOURS } from './map-views-data.js?v=8e7d7094';
 
 /** Map catalog + per-hub files. */
 export const MAP_INDEX_URL = 'assets/maps/index.json';
@@ -158,6 +159,8 @@ export function buildHubMapView(hubData, currentTsid, streetIndex = {}) {
     x: clampGo(h.x, mapW),
     y: clampGo(h.y, mapH),
     arrow: h.arrow,
+    // G471: the GO button wears the colour of the region it leads to (goColour).
+    color: goColour(h),
     travelable: false,
   }));
 
@@ -219,6 +222,20 @@ export function buildHubMapView(hubData, currentTsid, streetIndex = {}) {
     nodes,
     edges,
   };
+}
+
+/** The client's GO colour when the hub's map data has none (MapHubButton.as 47). */
+export const GO_FALLBACK_COLOUR = '#cc0000';
+
+/**
+ * A GO button's colour (G471): its own when the exit names one, else the target region's map colour,
+ * as GSJS fills it (locations/location.js get_map 2996) and the client draws it (MapHubButton.as 45-53:
+ * a missing "#" put back; the ring filled with it 145-150, "To: <region>" written in it 81).
+ */
+export function goColour(exit, colours = HUB_COLOURS) {
+  const own = String(exit?.color || '').trim();
+  const c = /^#?[0-9a-f]{6}$/i.test(own) ? own : colours[String(exit?.hub_id ?? exit?.hubId ?? '')] || GO_FALLBACK_COLOUR;
+  return (c[0] === '#' ? c : `#${c}`).toLowerCase();
 }
 
 /**
@@ -904,7 +921,7 @@ export function renderHubMapSvg(view) {
 
   for (const h of view.hubs || []) {
     parts.push(
-      `<g class="map-hub-go" data-hub="${escapeXml(h.hubId)}" data-label="${escapeXml(h.label)}">` +
+      `<g class="map-hub-go" data-hub="${escapeXml(h.hubId)}" data-label="${escapeXml(h.label)}" style="--go-c: ${escapeXml(h.color || GO_FALLBACK_COLOUR)}">` +
         `<circle class="map-go-ring" cx="${h.x}" cy="${h.y}" r="22"/>` +
         // The word's nudge down is in em, so it counter-scales with the word (ticket 81: style.css .map-go-text).
         `<text class="map-go-text" x="${h.x}" y="${h.y}" dy="0.09em" text-anchor="middle" dominant-baseline="middle">GO</text>` +

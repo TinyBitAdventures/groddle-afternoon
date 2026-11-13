@@ -6892,13 +6892,15 @@ body.buff-purple-pulse::after {
   pointer-events: none;
 }
 .map-hub-go { cursor: pointer; }
+/* G471: a GO button wears the colour of the region it leads to (map-graph.js goColour, --go-c on its group;
+   MapHubButton.as fills the ring with it and writes "To: <region>" in it over a white glow). */
 .map-go-ring {
-  fill: var(--c-green-58);
+  fill: var(--go-c, var(--c-green-58));
   stroke: var(--text-inverse);
   stroke-width: 2.5;
   opacity: 0.92;
 }
-.map-hub-go:hover .map-go-ring { fill: var(--c-green-66); }
+.map-hub-go:hover .map-go-ring { fill: color-mix(in srgb, var(--go-c, var(--c-green-58)) 78%, var(--text-inverse)); opacity: 1; }
 .map-go-text {
   font-family: var(--font-ui);
   font-size: calc(var(--fs-xs) * var(--map-mark-k, 1));
@@ -6910,7 +6912,7 @@ body.buff-purple-pulse::after {
   font-family: var(--font-ui);
   font-size: calc(var(--fs-2xs) * var(--map-text-k, 1));
   font-weight: 700;
-  fill: var(--c-sand-24);
+  fill: color-mix(in srgb, var(--go-c, var(--c-sand-24)) 82%, var(--c-sand-24));
   pointer-events: none;
   paint-order: stroke fill;
   stroke: var(--text-on-dark);

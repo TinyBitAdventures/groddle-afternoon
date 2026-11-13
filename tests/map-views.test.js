@@ -1,5 +1,6 @@
 /**
- * The Map's other views (G471): the world map (glitch-overlays/world_map.fla, HubMapDialog.as) and
+ * The Map's other views (G471): GO buttons in the colour of the region they lead to (MapHubButton.as;
+ * GSJS location.js get_map 2996), the world map (glitch-overlays/world_map.fla, HubMapDialog.as) and
  * the subway map (config_prod.js transit_instances map_pos, MapTransit.as), switched from the Map's
  * head. tools/map-views/build.mjs writes js/map-views-data.js and the world map's art from the sources.
  */
@@ -9,8 +10,9 @@ import { execFileSync } from 'node:child_process';
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { WORLD_MAP } from '../public/js/map-views-data.js?v=8e7d7094';
-import { PUBLIC_HUBS } from '../public/js/map-graph.js?v=c161229d';
+import { HUB_COLOURS, WORLD_MAP } from '../public/js/map-views-data.js?v=8e7d7094';
+import { buildHubMapView, goColour, GO_FALLBACK_COLOUR, PUBLIC_HUBS, renderHubMapSvg } from '../public/js/map-graph.js?v=dc070b88';
+import { hubColours } from '../tools/map-views/build.mjs';
 import { STATIONS } from '../public/js/subway.js?v=44d1a09f';
 import {
   MAP_VIEW_TITLES,
@@ -26,6 +28,7 @@ import {
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const read = (p) => readFileSync(join(root, p), 'utf8');
+const hub = (id) => JSON.parse(read(`public/assets/maps/hubs/hub-${id}.json`));
 const INDEX = JSON.parse(read('public/assets/maps/index.json'));
 
 describe('map views builder', () => {
@@ -167,5 +170,44 @@ describe('the Map window offers the three views (HubMapDialog.as)', () => {
     assert.ok(block.length > 100);
     assert.ok(classic.indexOf('/* === end maps === */') < classic.indexOf('/* == TICKETS =='));
     assert.match(block, /\.map-head \.map-views \{ order: -1;/);
+  });
+});
+
+describe('GO buttons in the colour of the region they lead to (G471)', () => {
+  it('HUB_COLOURS is GSJS maps_get_maps() colour per hub, with the "#" put back', () => {
+    assert.deepEqual(HUB_COLOURS, hubColours());
+    assert.equal(HUB_COLOURS['56'], '#5f721d', 'Groddle Forest');
+    assert.equal(HUB_COLOURS['58'], '#1d3a80', 'Groddle Meadow');
+    assert.equal(HUB_COLOURS['110'], '#a77e00', 'Massadoe ("a77e00" in the data)');
+  });
+
+  it('goColour: the exit\'s own colour, else the target hub\'s, else the client\'s #cc0000', () => {
+    assert.equal(goColour({ hub_id: '58' }), '#1d3a80');
+    assert.equal(goColour({ hubId: '114' }), '#954f18');
+    assert.equal(goColour({ hub_id: '58', color: '00ff00' }), '#00ff00');
+    assert.equal(goColour({ hub_id: 'nope' }), GO_FALLBACK_COLOUR);
+  });
+
+  it('every GO button on a public region map has its target\'s colour from the data', () => {
+    let n = 0;
+    for (const id of PUBLIC_HUBS) {
+      let data;
+      try { data = hub(id); } catch { continue; }
+      for (const h of buildHubMapView(data, '', {}).hubs) {
+        assert.equal(h.color, HUB_COLOURS[h.hubId], `${data.hubName} -> ${h.hubName}`);
+        n++;
+      }
+    }
+    assert.ok(n > 150, `${n} GO buttons`);
+  });
+
+  it('the drawn GO carries its colour, and the ring and its words take it (style.css)', () => {
+    const view = buildHubMapView(hub('56'), '', {});
+    const svg = renderHubMapSvg(view);
+    assert.match(svg, /<g class="map-hub-go" data-hub="58" data-label="To: Groddle Meadow" style="--go-c: #1d3a80">/);
+    assert.match(svg, /<g class="map-hub-go" data-hub="63" data-label="To: Shimla Mirch" style="--go-c: #545454">/);
+    const style = read('public/style.css');
+    assert.match(style, /\n\.map-go-ring \{\n  fill: var\(--go-c, var\(--c-green-58\)\);/);
+    assert.match(style, /\n\.map-go-sub \{[^}]*fill: color-mix\(in srgb, var\(--go-c/);
   });
 });
