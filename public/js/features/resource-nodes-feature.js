@@ -101,7 +101,7 @@ import { playItemOverlay } from '../item-overlay.js?v=97ed2ba0';
 import { nodeToolOverlay, nodeToolSheet } from '../node-tools.js?v=cf9012f1';
 import { vpSequence } from '../quest-rooms/vp-overlay.js?v=2123f2b1';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
-import { salmonSwimAt } from '../street-creatures.js?v=a47ea7cf';
+import { salmonSwimAt } from '../street-creatures.js?v=380f7b70';
 import { GAME_EPOCH_MS } from '../game-day.js?v=cf9afac0';
 
 export const RESOURCE_FEATURE_ID = 'resource-nodes';

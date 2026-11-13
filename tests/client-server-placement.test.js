@@ -18,9 +18,9 @@ import { join } from 'node:path';
 
 import { STREET_INDEX, applyStreetIndex, loadStreetDataFromFs, setZoneStreetsShown } from '../public/js/street-loader.js?v=18b181ad';
 import { platformsScreen, streetWidth } from '../public/js/street-model.js?v=b6cb6a4e';
-import { ecologyForStreet, planStreetPlacements, populationForStreet, rockPlacementRequest, rockSpawnPlan, setStreetEcologyCatalog, streetGardenBoxBeds, streetReservedSpots } from '../public/js/street-ecology.js?v=0f046853';
-import { resourceSpawnPlan } from '../public/js/features/resource-nodes-feature.js?v=443d4951';
-import { FEATURES } from '../public/js/features/index.js?v=49fe4de0';
+import { ecologyForStreet, planStreetPlacements, populationForStreet, rockPlacementRequest, rockSpawnPlan, setStreetEcologyCatalog, streetGardenBoxBeds, streetReservedSpots } from '../public/js/street-ecology.js?v=7f511b35';
+import { resourceSpawnPlan } from '../public/js/features/resource-nodes-feature.js?v=673aa2f3';
+import { FEATURES } from '../public/js/features/index.js?v=a6211eef';
 import { streetGardenBed } from '../public/js/garden.js?v=92436baf';
 import { isZoneTsid } from '../public/js/zone-streets.js?v=b40010d5';
 import { serverPath, skipWithoutServer } from '../tools/repos.mjs';

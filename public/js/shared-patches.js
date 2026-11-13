@@ -48,7 +48,7 @@ import { DEAD_TRANT_CLASSES, GROWN_TREE_LABELS, SEASONED_BEANS, SOIL_CLASSES, re
 import { TRANT_META, fruitCapacityAt } from './trants.js?v=4d6f5593';
 import { ensureWoodTreeState, quoteWoodTreeHarvest } from './woodcutting.js?v=d2b88bb5';
 import { POISON_DURATION_MS } from './tree-poison.js?v=0cfbc3fb';
-import { treeReady, treeSkill } from './street-objects.js?v=7f8e0ded';
+import { treeReady, treeSkill } from './street-objects.js?v=c29b0eeb';
 import { highestLightGreenThumbRank, quoteTrantCare } from './trant-care.js?v=e76c420c';
 
 /** The release switch: on since game v0.24.0 (G564; false = dark, shared Patches off for everyone but the QA flag below). */

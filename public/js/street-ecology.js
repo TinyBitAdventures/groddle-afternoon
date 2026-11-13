@@ -882,6 +882,33 @@ export const PLACEMENT_HEIGHTS = Object.freeze({
   shrine: 147, // a shrine cell 188 px tall at spawnShrine's 0.78
   rocks: 130, // the mining sheets' cells (82-150 px tall, ROCK_SHAPE_HEIGHTS) at spawnMineRock's 1:1
 });
+/**
+ * Report #256: a Mortar Barnacle and a Visiting Stone planned on a ledge behind a Spice Tree on
+ * Kalix Follows stood inside its canopy. A planned tree's canopy (TREE_CANOPY: the widest trant as
+ * drawn, trant_spice 318x250 at spawnTrees' 210 px, 267 px; the group does not know its class) is
+ * a box the groups below keep out of while any other spot is left, each by its art's box: its
+ * footprint and this height (the art as drawn: the barnacle's blister frames 39-47 px, the
+ * Jellisac's sack 39-52, the Ice Nubbin's knobs 52-71, the Peat Bog's mound 46-104, the Dust
+ * Trap's idle trap 103, a Dirt Pile's mound about 120, a Paper Tree's 230 px canopy, the Visiting
+ * Stone's 101x155 art at its 81 px width, 124). In Glitch they were set down by hand and never
+ * planned into one another (the archived streets).
+ */
+export const TREE_CANOPY = Object.freeze({ w: 267, h: 210 });
+export const UNDER_CANOPY_HEIGHTS = Object.freeze({
+  'resource:mortar_barnacle': 47,
+  'resource:jellisac': 52,
+  'resource:ice_knob': 71,
+  'resource:peat_1': 104,
+  'resource:dust_trap': 103,
+  'resource:dirt_pile': 120,
+  'resource:paper_tree': 230,
+  furnitureStone: 124,
+});
+/** A planned tree's canopy box (TREE_CANOPY over its spot). */
+function canopyOf(point) {
+  const w = TREE_CANOPY.w / 2;
+  return { ...point, block: { l: point.x - w, r: point.x + w, t: point.y - TREE_CANOPY.h, b: point.y } };
+}
 export const LADDER_FOOT_PX = 120;
 /** Below a door's floor point, how far a spot still counts as its doorstep (a sloped floor). */
 export const DOORWAY_DROP_PX = 40;
@@ -1471,6 +1498,8 @@ export function planStreetPlacements(
     occupied.push(...placed);
   }
   const fixtures = occupied.filter((point) => point.block);
+  // Planned trees' canopies (report #256): only the UNDER_CANOPY_HEIGHTS groups keep out of them.
+  const canopies = [];
   const used = new Set();
   const groups = {};
   const fallbacks = [];
@@ -1484,6 +1513,7 @@ export function planStreetPlacements(
     const count = whole(request?.count, 0, 40);
     const clearance = whole(request?.clearance, 40, 600);
     groups[request.key] = (fixedOf.get(request.key) || []).slice(0, count);
+    if (request.key === 'trees') for (const point of groups.trees) canopies.push(canopyOf(point));
     const maxSlope = BIG_THING_GROUPS.includes(request.key) ? BIG_THING_MAX_SLOPE : null;
     const deck = DECK_GROUPS.includes(request.key);
     const measuredQuoin = request.key === 'quoins' ? nearMeasuredQuoin(tsid) : null;
@@ -1505,9 +1535,11 @@ export function planStreetPlacements(
     const height = Number.isFinite(request?.height) ? Math.max(0, request.height) : PLACEMENT_HEIGHTS[request.key] || 0;
     // The fixture each spot would cover for this request (null: clear); the arrival covers nothing.
     const covers = new Map();
-    if (!avatar && fixtures.length) {
+    const underCanopy = footprint > 0 && canopies.length ? UNDER_CANOPY_HEIGHTS[request.key] || 0 : 0;
+    if (!avatar && (fixtures.length || underCanopy)) {
       for (const candidate of candidates) {
-        const fixture = blockingFixture(candidate, fixtures, { footprint, height });
+        const fixture = blockingFixture(candidate, fixtures, { footprint, height })
+          || (underCanopy ? blockingFixture(candidate, canopies, { footprint, height: underCanopy }) : null);
         if (fixture) covers.set(candidate.id, fixture);
       }
     }
@@ -1583,6 +1615,7 @@ export function planStreetPlacements(
       const point = { x: best.x, y: best.y, id: best.id, key: request.key, clearance, room: best.room || 0 };
       groups[request.key].push(point);
       occupied.push(point);
+      if (request.key === 'trees') canopies.push(canopyOf(point));
     }
   }
 
