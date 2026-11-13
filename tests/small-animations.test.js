@@ -15,8 +15,8 @@ import { fileURLToPath } from 'node:url';
 import { POWDER_SHAKE, powderShakerSheet } from '../public/js/powder-shakers.js?v=fcd18855';
 import { POWDERS } from '../public/js/powders.js?v=6f3d6671';
 import { PACKED_SHEETS } from '../public/js/packed-sheets-data.js?v=192c6f15';
-import { packedCell, packedDurationMs, packedFrameAt } from '../public/js/packed-sheets.js?v=379a15fc';
-import { itemOverlayPlacement } from '../public/js/item-overlay.js?v=a2d2e5a3';
+import { packedCell, packedDurationMs, packedFrameAt } from '../public/js/packed-sheets.js?v=248ab5cc';
+import { itemOverlayPlacement } from '../public/js/item-overlay.js?v=445d35d7';
 import { PLAYER_VERBS } from '../public/js/player-verbs-mp.js?v=4d0315f5';
 import { imageSize } from '../tools/image-size.mjs';
 

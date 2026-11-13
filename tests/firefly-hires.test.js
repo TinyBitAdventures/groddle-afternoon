@@ -14,7 +14,7 @@ const pub = join(root, 'public');
 const SHEETS = ['firefly-full-path', 'firefly-half-path', 'firefly-small-path'].map((n) => `assets/sprites/resources/${n}.webp`);
 
 test('every firefly path sheet has a 3x twin exactly three times its size', async () => {
-  const { HIRES_SPRITES } = await import('../public/js/sprite-hires.js?v=d4cce9f9');
+  const { HIRES_SPRITES } = await import('../public/js/sprite-hires.js?v=add7b764');
   const results = JSON.parse(readFileSync(join(root, 'tools/vector-sprites/results.json'), 'utf8'));
   for (const path of SHEETS) {
     const twin = HIRES_SPRITES.get(path);

@@ -14,7 +14,7 @@
  * many are drawn), swoonerflyAt (x,y of the first).
  */
 
-import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=3fae7efb';
+import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=b4abfbf2';
 import { loadWildlifeCatalog, wildlifeCatalog } from '../wildlife.js?v=670c3a7f';
 import {
   SWOONERFLY_CLASS,

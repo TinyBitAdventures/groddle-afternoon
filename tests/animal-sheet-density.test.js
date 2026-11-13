@@ -62,7 +62,7 @@ test('every animal sheet the game slices is found, the Piggy rooting look among 
 });
 
 test('every animal sheet has a 3x twin from the vector SWF, exactly three times its 1x pixels', async () => {
-  const { HIRES_SPRITES } = await import('../public/js/sprite-hires.js?v=d4cce9f9');
+  const { HIRES_SPRITES } = await import('../public/js/sprite-hires.js?v=add7b764');
   const missing = [];
   for (const r of await animalSheets()) {
     if (r.density >= 3) continue;
@@ -73,7 +73,7 @@ test('every animal sheet has a 3x twin from the vector SWF, exactly three times 
 });
 
 test('each animal sheet stores at least as many pixels as its largest draw scale', async () => {
-  const { HIRES_SPRITES } = await import('../public/js/sprite-hires.js?v=d4cce9f9');
+  const { HIRES_SPRITES } = await import('../public/js/sprite-hires.js?v=add7b764');
   const { stageFor } = await import('../public/js/location-view.js?v=cfef3b43');
   // Original zoom on a 2560 x 1440 monitor (the game area under the top bar), CSS px per world px.
   const stage = stageFor({ width: 2560, height: 1360, sceneWidth: 4000, sceneHeight: 1000, zoom: 1 }).scale;
@@ -130,7 +130,7 @@ test('signpost woods keep Tiny Speck\'s own 1x pictures (their pixels, as lossle
 
 test('signpost woods have a sharp 3x copy, finer than a 2x screen draws them at Original zoom', async () => {
   const { readFileSync } = await import('node:fs');
-  const { HIRES_SPRITES, hiresSpriteUrl } = await import('../public/js/sprite-hires.js?v=d4cce9f9');
+  const { HIRES_SPRITES, hiresSpriteUrl } = await import('../public/js/sprite-hires.js?v=add7b764');
   const soft = [];
   for (const [path, size] of Object.entries(SIGN_RASTERS)) {
     const twin = HIRES_SPRITES.get(path);

@@ -24,10 +24,10 @@
  */
 
 import { ITEM_CATALOG, addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=f49c8998';
-import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=3fae7efb';
+import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=b4abfbf2';
 import { nearestSurfaceY } from '../walk-surface.js?v=106bfdc5';
 import { openNoteView, openNotePicker } from '../note-view.js?v=eca7de52';
-import { giveCarriedNote, takeCarriedNote, writtenCarriedNotes } from './street-furniture-feature.js?v=c22a7526';
+import { giveCarriedNote, takeCarriedNote, writtenCarriedNotes } from './street-furniture-feature.js?v=b2ea2955';
 import {
   BALL,
   BALL_HIT,

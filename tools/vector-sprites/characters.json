@@ -1,5 +1,5 @@
 {
- "about": "Character, NPC and shrine sheets the game draws, paired with their vector SWF (glitch-items, CC0). Same shape as animals.json; character groups are all-or-nothing, budget caps each 3x sheet, and every sheet swaps to 3x on first draw (js/sprite-hires.js installHiresFirstDraw). Run: node tools/vector-sprites/build.mjs --manifest tools/vector-sprites/characters.json [--only <character>]",
+ "about": "Character, NPC and shrine sheets the game draws, paired with their vector SWF (glitch-items, CC0). Same shape as animals.json; character groups are all-or-nothing (the vendors' walk strips are their own '<vendor>-motion' groups, so a walk that cannot be matched never costs the idle and talk 3x), budget caps each 3x sheet, and every sheet swaps to 3x on first draw (js/sprite-hires.js installHiresFirstDraw). Run: node tools/vector-sprites/build.mjs --manifest tools/vector-sprites/characters.json [--only <character>]",
  "firstDraw": true,
  "budget": {"maxSide": 8192, "maxMB": 64},
  "jobs": [
@@ -279,6 +279,39 @@
   {"name": "helga", "swf": "inhabitants/helga/npc_jabba2.swf", "sprite": 251, "sheets": [
    {"path": "assets/sprites/vendors/npc_jabba2_idle.webp", "label": "idle_stand", "fw": 195, "fh": 193, "cols": 8, "frames": 185},
    {"path": "assets/sprites/vendors/npc_jabba2_talk.webp", "label": "talk", "fw": 195, "fh": 193, "cols": 8, "frames": 72}
+  ] },
+  {"name": "tool-vendor-motion", "character": "tool-vendor-motion", "swf": "inhabitants/tool_vendor/npc_tool_vendor.swf", "sprite": 102, "sheets": [
+   {"path": "assets/sprites/vendors/npc_tool_vendor_walk.webp", "label": "walk", "fw": 129, "fh": 226, "cols": 8, "frames": 24},
+   {"path": "assets/sprites/vendors/npc_tool_vendor_walk_left.webp", "label": "walk_left", "fw": 129, "fh": 226, "cols": 8, "frames": 25},
+   {"path": "assets/sprites/vendors/npc_tool_vendor_turn_left.webp", "label": "turn_left", "fw": 174, "fh": 227, "cols": 8, "frames": 10},
+   {"path": "assets/sprites/vendors/npc_tool_vendor_turn_right.webp", "label": "turn_right", "fw": 167, "fh": 225, "cols": 8, "frames": 11}
+  ] },
+  {"name": "meal-vendor-motion", "character": "meal-vendor-motion", "swf": "inhabitants/meal_vendor/npc_cooking_vendor.swf", "sprite": 116, "sheets": [
+   {"path": "assets/sprites/vendors/npc_cooking_vendor_walk_left.webp", "label": "walk_left", "fw": 159, "fh": 211, "cols": 8, "frames": 16, "shift": 8},
+   {"path": "assets/sprites/vendors/npc_cooking_vendor_walk_right.webp", "label": "walk_right", "fw": 155, "fh": 211, "cols": 8, "frames": 16, "shift": 4},
+   {"path": "assets/sprites/vendors/npc_cooking_vendor_walk_left_end.webp", "label": "walk_left_end", "fw": 186, "fh": 212, "cols": 8, "frames": 16},
+   {"path": "assets/sprites/vendors/npc_cooking_vendor_walk_right_end.webp", "label": "walk_right_end", "fw": 181, "fh": 212, "cols": 8, "frames": 14}
+  ] },
+  {"name": "uncle-friendly-motion", "character": "uncle-friendly-motion", "swf": "inhabitants/uncle_friendly/npc_jabba1.swf", "sprite": 187, "sheets": [
+   {"path": "assets/sprites/vendors/npc_jabba1_walk.webp", "label": "walk", "fw": 337, "fh": 191, "cols": 8, "frames": 14, "shift": 7},
+   {"path": "assets/sprites/vendors/npc_jabba1_turn.webp", "label": "turn", "fw": 293, "fh": 190, "cols": 8, "frames": 7},
+   {"path": "assets/sprites/vendors/npc_jabba1_walk_end.webp", "label": "walk_end", "fw": 301, "fh": 190, "cols": 8, "frames": 10},
+   {"path": "assets/sprites/vendors/npc_jabba1_impatient.webp", "label": "impatient", "fw": 251, "fh": 200, "cols": 8, "frames": 86}
+  ] },
+  {"name": "helga-motion", "character": "helga-motion", "swf": "inhabitants/helga/npc_jabba2.swf", "sprite": 251, "sheets": [
+   {"path": "assets/sprites/vendors/npc_jabba2_walk.webp", "label": "walk", "fw": 319, "fh": 185, "cols": 8, "frames": 16, "shift": 7},
+   {"path": "assets/sprites/vendors/npc_jabba2_turn.webp", "label": "turn", "fw": 232, "fh": 187, "cols": 8, "frames": 18},
+   {"path": "assets/sprites/vendors/npc_jabba2_walk_end.webp", "label": "walk_end", "fw": 316, "fh": 185, "cols": 8, "frames": 15},
+   {"path": "assets/sprites/vendors/npc_jabba2_impatient.webp", "label": "impatient", "fw": 313, "fh": 185, "cols": 8, "frames": 98}
+  ] },
+  {"name": "sno-cone-vending-machine-motion", "character": "sno-cone-vending-machine-motion", "swf": "inhabitants/sno_cone_vending_machine/npc_sno_cone_vending_machine.swf", "sprite": 79, "sheets": [
+   {"path": "assets/sprites/vendors/npc_sno_cone_vending_machine_walk_left.webp", "label": "walk_left", "fw": 164, "fh": 194, "cols": 8, "frames": 7, "shift": 7},
+   {"path": "assets/sprites/vendors/npc_sno_cone_vending_machine_walk_right.webp", "label": "walk_right", "fw": 164, "fh": 194, "cols": 8, "frames": 7, "shift": 7},
+   {"path": "assets/sprites/vendors/npc_sno_cone_vending_machine_walk_end.webp", "label": "walk_end", "fw": 188, "fh": 197, "cols": 8, "frames": 14},
+   {"path": "assets/sprites/vendors/npc_sno_cone_vending_machine_attract.webp", "label": "attract", "fw": 185, "fh": 221, "cols": 8, "frames": 34}
+  ] },
+  {"name": "gardening-vendor-motion", "character": "gardening-vendor-motion", "swf": "inhabitants/gardening_vendor/npc_gardening_vendor.swf", "sprite": 53, "sheets": [
+   {"path": "assets/sprites/vendors/npc_gardening_vendor_attract.webp", "label": "attract", "fw": 165, "fh": 197, "cols": 8, "frames": 30}
   ] },
   {"name": "factory-defect-chick", "swf": "rare_items/npc_cubimal_factorydefect_chick/npc_cubimal_factorydefect_chick.swf", "sprite": 31, "sheets": [
    {"path": "assets/sprites/cubimals/npc_cubimal_factorydefect_chick_race.webp", "label": "race", "fw": 52, "fh": 33, "cols": 15, "frames": 59},

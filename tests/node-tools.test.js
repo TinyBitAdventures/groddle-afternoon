@@ -13,7 +13,7 @@ import { fileURLToPath } from 'node:url';
 
 import { NODE_TOOLS, NODE_TOOL_DELTAS, nodeToolOverlay, nodeToolSheet } from '../public/js/node-tools.js?v=cf9012f1';
 import { PACKED_SHEETS } from '../public/js/packed-sheets-data.js?v=192c6f15';
-import { packedCell, packedFrameAt } from '../public/js/packed-sheets.js?v=379a15fc';
+import { packedCell, packedFrameAt } from '../public/js/packed-sheets.js?v=248ab5cc';
 import { RESOURCE_NODE_CATALOG } from '../public/js/resource-nodes.js?v=3a26727e';
 import { imageSize } from '../tools/image-size.mjs';
 

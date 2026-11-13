@@ -16,7 +16,7 @@
  * Canvas: fireDragons, fireDragonLast, fireDragonPos, fireDragonMode.
  */
 
-import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=3fae7efb';
+import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=b4abfbf2';
 import { shiftMetabolic } from '../metabolics.js?v=1383e6fd';
 import { getGameDayKey } from '../game-day.js?v=cf9afac0';
 import { followPath } from '../street-creatures.js?v=ee7dfd05';

@@ -14,7 +14,7 @@ import { join } from 'node:path';
 import { createInventory, countItem } from '../public/js/inventory.js?v=f49c8998';
 import { copyForVerb, copyTags, createToolConditionState, keepsOwnStack, setCopyTag } from '../public/js/tools.js?v=48542c24';
 import { STILL, STILL_TEXT, createStillState, distillInStill, stillCollectCheck, stillDistillCheck } from '../public/js/machines.js?v=e96d8d3b';
-import { supplyFeature } from '../public/js/features/supply-feature.js?v=82859ab1';
+import { supplyFeature } from '../public/js/features/supply-feature.js?v=df2ef51c';
 import { createDroppedItemState, dropInventoryStack, pickupDroppedStack } from '../public/js/world-items.js?v=deadf665';
 import { shareReason } from '../public/js/drops-mp.js?v=3207d36c';
 import { dropFor } from '../public/js/world-drop.js?v=d152b2bb';
