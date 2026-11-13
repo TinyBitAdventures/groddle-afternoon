@@ -67,6 +67,14 @@ export const ORIGINAL_VIEW_H = 600;
 export const PHONE_PORTRAIT_MIN_VIEW_W = 560;
 /** The remake's smallest view: its old fixed 408 px, inside the source's 400-600. */
 export const VIEW_FLOOR_H = 408;
+/**
+ * PHONE ZOOM RANGE (Austin 2026-11-13 on his iPhone: "the max zoom in is really blurry. Maybe we
+ * reset the range so that max zoomed in on the phone scaled to like 56% zoomed in"): the share of
+ * the way from the phone's own view to a VIEW_FLOOR_H view filling the screen that the closest
+ * phone zoom (closeup 1) goes, geometrically. 1 was the old closest; at 0.56 the old 0.56 is the new
+ * closest. Tune here: the slider and the pinch span whatever this leaves.
+ */
+export const PHONE_CLOSEST_SHARE = 0.56;
 /** Before the page can be measured (boot, tests): the smallest view. */
 export const DEFAULT_VP_H = VIEW_FLOOR_H;
 
@@ -271,9 +279,11 @@ export function stageFor({
  * apply (the Wide and Original ends come out the same).
  *
  * PHONE ZOOM: `closeup` (0 to 1, js/world-zoom.js phoneZoom, a pinch) magnifies from that view
- * (0) to the closest the floors allow (1: a VIEW_FLOOR_H view filling the screen's height),
- * geometrically like the world zoom; the camera then scrolls the street up and down as a
- * computer's does. Fewer world px are drawn, never bigger textures (js/render-density.js).
+ * (0) toward the closest the floors allow (a VIEW_FLOOR_H view filling the screen's height),
+ * geometrically like the world zoom, and 1 stops PHONE_CLOSEST_SHARE of the way there (closer drew
+ * the art soft: the phone draws 1 backing px per world px, js/render-density.js); the camera then
+ * scrolls the street up and down as a computer's does. Fewer world px are drawn, never bigger
+ * textures.
  */
 export function phoneStage({ width, height, packReserve = MIN_PACK_HEIGHT, sceneWidth, sceneHeight, closeup = 0 } = {}) {
   const W = finite(width);
@@ -287,7 +297,7 @@ export function phoneStage({ width, height, packReserve = MIN_PACK_HEIGHT, scene
   const top = H / (VIEW_FLOOR_H + pack);
   scale = Math.min(scale, top);
   const c = Math.min(1, Math.max(0, finite(closeup, 0)));
-  if (c > 0 && top > scale) scale *= (top / scale) ** c;
+  if (c > 0 && top > scale) scale *= (top / scale) ** (c * PHONE_CLOSEST_SHARE);
   const viewW = Math.round(W / scale);
   const room = Math.floor(H / scale + 1e-6) - pack;
   const viewH = Math.max(VIEW_FLOOR_H, Math.min(room, fitH));

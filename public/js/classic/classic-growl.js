@@ -11,7 +11,7 @@
  * this mirrors each card as it comes, in order, once. The line is its own live region, since the
  * hidden stack no longer speaks.
  */
-import { uiState, onUiModeChange } from './ui-mode.js?v=1db965c7';
+import { uiState, onUiModeChange } from './ui-mode.js?v=e8c5807a';
 import { readMs } from '../read-time.js?v=be140198';
 import { NOTICE_KEEP_MS } from '../notify.js?v=1fb97b21';
 

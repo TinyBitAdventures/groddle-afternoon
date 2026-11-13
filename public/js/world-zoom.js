@@ -126,8 +126,9 @@ export function saveZoom(z, storage, key = ZOOM_STORAGE_KEY) {
  * zooming feature would be all it needs?"): an upright phone (js/location-view.js phoneStage)
  * already fits the whole street's height to the screen, so Wide and Original draw the same there.
  * Its own level goes the other way, closer: 0 is that whole-street view (where a phone starts), 1
- * the closest, a 408 px tall view (VIEW_FLOOR_H, the smallest any room was tuned for), about twice
- * as big on a 1000 px street. Same model as the world zoom (0 to 1, continuous, geometric), its
+ * the closest: PHONE_CLOSEST_SHARE (js/location-view.js) of the way, geometrically, to a 408 px
+ * tall view (VIEW_FLOOR_H, the smallest any room was tuned for), about 1.5 times as big on a
+ * 1000 px street (the whole way, twice as big, drew the art soft; Austin 2026-11-13). Same model as the world zoom (0 to 1, continuous, geometric), its
  * own slot on the device, never in a save; a two-finger pinch on the street moves it
  * (js/touch-pinch.js), as does the Menu's Zoom slider on a phone.
  */

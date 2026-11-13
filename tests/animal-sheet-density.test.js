@@ -74,7 +74,7 @@ test('every animal sheet has a 3x twin from the vector SWF, exactly three times 
 
 test('each animal sheet stores at least as many pixels as its largest draw scale', async () => {
   const { HIRES_SPRITES } = await import('../public/js/sprite-hires.js?v=d4cce9f9');
-  const { stageFor } = await import('../public/js/location-view.js?v=9747e89a');
+  const { stageFor } = await import('../public/js/location-view.js?v=ffd74741');
   // Original zoom on a 2560 x 1440 monitor (the game area under the top bar), CSS px per world px.
   const stage = stageFor({ width: 2560, height: 1360, sceneWidth: 4000, sceneHeight: 1000, zoom: 1 }).scale;
   assert.ok(stage > 2 && stage < 3, `stage ${stage}`);
@@ -102,7 +102,7 @@ const SIGN_RASTERS = Object.freeze({
 
 /** Device px per signpost art px: holder 0.8 x the stage at Original zoom x a 2x screen. */
 async function signDrawScale(width, height) {
-  const { stageFor } = await import('../public/js/location-view.js?v=9747e89a');
+  const { stageFor } = await import('../public/js/location-view.js?v=ffd74741');
   const { moduleConsts } = await import('./sheet-sources.js');
   const sign = moduleConsts('js/street-render.js').get('SIGNPOST');
   return sign.scale * stageFor({ width, height, sceneWidth: 4000, sceneHeight: 1000, zoom: 1 }).scale * 2;

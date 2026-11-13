@@ -11,11 +11,11 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { MIN_PACK_HEIGHT, VIEW_FLOOR_H, VIEW_HOLD_H, phoneStage, phoneZoomSpan, stageFor } from '../public/js/location-view.js?v=9747e89a';
-import { PHONE_ZOOM_DEFAULT, PHONE_ZOOM_STORAGE_KEY, ZOOM_DEFAULT, ZOOM_STORAGE_KEY, createWorldZoom, phoneZoomLabel } from '../public/js/world-zoom.js?v=34c2cf14';
+import { MIN_PACK_HEIGHT, PHONE_CLOSEST_SHARE, VIEW_FLOOR_H, VIEW_HOLD_H, phoneStage, phoneZoomSpan, stageFor } from '../public/js/location-view.js?v=ffd74741';
+import { PHONE_ZOOM_DEFAULT, PHONE_ZOOM_STORAGE_KEY, ZOOM_DEFAULT, ZOOM_STORAGE_KEY, createWorldZoom, phoneZoomLabel } from '../public/js/world-zoom.js?v=ec0aa8a1';
 import { TAP_SLOP_PX, isWorldTap, pinchLevel } from '../public/js/touch-pinch.js?v=5bdb5971';
 import { signpostBoardAt } from '../public/js/street-render.js?v=47697d4c';
-import { MENU_ROWS } from '../public/js/ui/topbar.js?v=0a34221d';
+import { MENU_ROWS } from '../public/js/ui/topbar.js?v=4a4a72ea';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const read = (rel) => readFileSync(join(root, rel), 'utf8');
@@ -27,19 +27,28 @@ const memory = () => {
   return { map, getItem: (k) => (map.has(k) ? map.get(k) : null), setItem: (k, v) => map.set(k, String(v)) };
 };
 
-describe('the phone zoom: from the whole street to about twice as close', () => {
-  it('0 is the phone view as before, 1 the floors\' closest, geometric between', () => {
+describe('the phone zoom: from the whole street to about one and a half times as close', () => {
+  it('0 is the phone view as before, 1 PHONE_CLOSEST_SHARE of the way to the floors\' closest, geometric between', () => {
+    assert.equal(PHONE_CLOSEST_SHARE, 0.56, 'Austin 2026-11-13: "scaled to like 56%"');
     const far = stageFor({ ...IPHONE, sceneHeight: 1000 });
     assert.deepEqual(stageFor({ ...IPHONE, sceneHeight: 1000, closeup: 0 }), far);
     assert.equal(far.viewH, VIEW_HOLD_H);
+    const floors = IPHONE.height / (VIEW_FLOOR_H + MIN_PACK_HEIGHT);
     const near = stageFor({ ...IPHONE, sceneHeight: 1000, closeup: 1 });
-    assert.equal(near.viewH, VIEW_FLOOR_H);
     assert.equal(near.cssHeight, IPHONE.height);
-    assert.ok(Math.abs(near.scale - IPHONE.height / (VIEW_FLOOR_H + MIN_PACK_HEIGHT)) < 1e-9);
+    // The old closest's 0.56 is the new 1: far * (floors / far) ** 0.56.
+    assert.ok(Math.abs(near.scale - far.scale * (floors / far.scale) ** PHONE_CLOSEST_SHARE) < 1e-9);
+    assert.ok(near.scale < floors && near.viewH > VIEW_FLOOR_H, `stops short of the floors (${near.viewW} x ${near.viewH})`);
     const mid = stageFor({ ...IPHONE, sceneHeight: 1000, closeup: 0.5 });
     assert.ok(Math.abs(mid.scale - Math.sqrt(far.scale * near.scale)) < 1e-9);
     const span = phoneZoomSpan({ ...IPHONE, sceneHeight: 1000 });
-    assert.ok(span > 2 && span < 2.2, `span ${span}`);
+    assert.ok(span > 1.45 && span < 1.55, `span ${span}`);
+    assert.ok(Math.abs(span - (floors / far.scale) ** PHONE_CLOSEST_SHARE) < 1e-9, 'the pinch and slider span the new range');
+  });
+  it('a saved level means the same share of the new range (a saved 1 is the new closest)', () => {
+    const at = (z) => stageFor({ ...IPHONE, sceneHeight: 1000, closeup: z }).scale;
+    assert.ok(Math.abs(at(1) - at(7)) < 1e-12, 'held to 1');
+    assert.ok(at(0.25) < at(0.5) && at(0.5) < at(1));
   });
   it('a short room magnifies less, sideways and a pinned page not at all', () => {
     assert.ok(phoneZoomSpan({ ...IPHONE, sceneHeight: 600 }) < phoneZoomSpan({ ...IPHONE, sceneHeight: 1000 }));
@@ -49,7 +58,7 @@ describe('the phone zoom: from the whole street to about twice as close', () => 
     // A computer's stage never reads it.
     assert.deepEqual(stageFor({ width: 1280, height: 720, sceneHeight: 1000, closeup: 1 }), stageFor({ width: 1280, height: 720, sceneHeight: 1000 }));
     const p = phoneStage({ ...IPHONE, sceneHeight: 1000, closeup: 7 });
-    assert.equal(p.viewH, VIEW_FLOOR_H, 'held to 1');
+    assert.deepEqual(p, phoneStage({ ...IPHONE, sceneHeight: 1000, closeup: 1 }), 'held to 1');
   });
   it('kept in its own slot, starting at the whole street; the world zoom keeps its own', () => {
     assert.equal(PHONE_ZOOM_STORAGE_KEY, 'groddle.zoom.phone');
