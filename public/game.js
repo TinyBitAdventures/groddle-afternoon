@@ -4679,7 +4679,7 @@ function renderPackPopover(classTsid, anchor = null) {
   }
   if (useInfo.usable) {
     const gateOk = !(useInfo.food && !useInfo.food.gate.ok);
-    rows.push({ attrs: 'data-pack-use', cls: 'pack-pop-primary', label: `${useInfo.verb}${useInfo.singleAction ? '' : ' one'}`, gain: useInfo.effects?.energy < 0 ? '' : useGain, cost: useInfo.effects?.energy < 0 ? -useInfo.effects.energy : 0, disabled: !gateOk, reason: useInfo.food?.gate?.reason || '', tip: useTip });
+    rows.push({ attrs: 'data-pack-use', cls: 'pack-pop-primary', label: `${useInfo.verb}${useInfo.singleAction || slot.count <= 1 ? '' : ' one'}`, gain: useInfo.effects?.energy < 0 ? '' : useGain, cost: useInfo.effects?.energy < 0 ? -useInfo.effects.energy : 0, disabled: !gateOk, reason: useInfo.food?.gate?.reason || '', tip: useTip });
   }
   if ((useInfo.paradise || useInfo.buff || useInfo.showDisabled) && !useInfo.usable) {
     rows.push({ attrs: 'data-pack-use data-pack-use-block', cls: 'pack-pop-primary', label: useInfo.verb, disabled: true, reason: useInfo.reason, tip: buffWords });
