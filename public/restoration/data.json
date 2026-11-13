@@ -2752,9 +2752,29 @@
   "deployed": "2026-11-12"
  },
  "git": {
-  "commits": 1833,
+  "commits": 1839,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-12",
+    "kind": "fix",
+    "text": "Rocks stand where Glitch had them, in their own shapes at 1:1, and planned things use every floor height, off slopes and ledge ends"
+   },
+   {
+    "date": "2026-11-12",
+    "kind": "fix",
+    "text": "Every rock players' 2012 snaps show is measured, with its shape, and the rocks' _2 and _3 art ships"
+   },
+   {
+    "date": "2026-11-12",
+    "kind": "improve",
+    "text": "Made for Groddle shows the Groddle Meadow map beside its surviving thumbnail; the Fire Dragon stays an experiment"
+   },
+   {
+    "date": "2026-11-12",
+    "kind": "fix",
+    "text": "The restoration section bar marks which side has more and steps through it"
+   },
    {
     "date": "2026-11-12",
     "kind": "improve",
@@ -2854,29 +2874,9 @@
     "date": "2026-11-12",
     "kind": "improve",
     "text": "Quest rooms, skills, Party Spaces, Paradise, Appear offline and a few more lines say what the game really does"
-   },
-   {
-    "date": "2026-11-12",
-    "kind": "improve",
-    "text": "Counts and articles read right (\"1 second\", \"an Egg Plant\", \"3 Fruity Juices\"), and two crown and tutorial lines say the truth"
-   },
-   {
-    "date": "2026-11-12",
-    "kind": "improve",
-    "text": "Neighbours' letters name as many things as they bring, and a second note says when it can go"
-   },
-   {
-    "date": "2026-11-12",
-    "kind": "improve",
-    "text": "The character card says a retired character keeps its place for 30 days, and tells that from the one-a-day wait"
-   },
-   {
-    "date": "2026-11-12",
-    "kind": "improve",
-    "text": "A phone reads the stick, Jump and taps in Paradise, hi signs, the tutorial, the Map and the ghost echo"
    }
   ]
  },
- "tests": 912,
+ "tests": 913,
  "generatedAt": "2026-11-12"
 }

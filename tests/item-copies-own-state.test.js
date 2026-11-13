@@ -37,14 +37,14 @@ import { ITEM_CATALOG, addItem, createInventory, ensureItem, isToolItem, removeI
 import { createPlayerSave, restorePlayerSave } from '../public/js/player-save.js?v=cfc8af81';
 import { layoutPack, unitPlaces } from '../public/js/pack-slots.js?v=4a36968a';
 import { bagsFeature } from '../public/js/features/bags-feature.js?v=b61da5c5';
-import { VENDOR_PROFILES, vendorBuy, vendorSell } from '../public/js/vendor.js?v=9889a12f';
+import { VENDOR_PROFILES, vendorBuy, vendorSell } from '../public/js/vendor.js?v=e76ac383';
 import { createResourceNode, harvestResourceNode, ensureResourceItems } from '../public/js/resource-nodes.js?v=9b20788d';
 import {
   fireflyJarCounts,
   fireflyJarInUse,
   resourceNodesFeature,
   setFireflyJar,
-} from '../public/js/features/resource-nodes-feature.js?v=2cc2384a';
+} from '../public/js/features/resource-nodes-feature.js?v=9067aab6';
 import { toolBreakEvents } from '../public/js/quest-offers.js?v=956218ac';
 
 const root = join(import.meta.dirname, '..');

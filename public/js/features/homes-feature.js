@@ -212,14 +212,14 @@ import { DISPATCHER_HALF, DISPATCHER_TEXT, MOVABLE_FIXTURES, MOVABLE_FIXTURE_IDS
 import { displayTopOf, itemstackOverlayPoint, overlayAlpha, overlayLifeMs, playPoofIn, trackOverlay } from '../overlay-art.js?v=a6561207';
 import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=32c58aef';
 import { fadeInNewNear } from '../poof-fade.js?v=904e02fe';
-import { projectApi } from './street-jobs-feature.js?v=944c121a';
+import { projectApi } from './street-jobs-feature.js?v=72d4fb06';
 import { TOWER_CHASSIS, TOWER_CONFIG, TOWER_DOOR_DX, TOWER_GEO, TOWER_PROTO, normalizeTowerState } from '../home-tower.js?v=d33a67e4';
 import { drawTowerElevator, drawTowerExit, towerApi, visitorTowerView } from './home-tower-feature.js?v=3fd236d0';
 import { pieceUrl, roomPieces, surfaceAt, swatchPiece, wallTargetAt } from '../home-wallpaper.js?v=f1969400';
 import { maxTextureSizeOf, sharpDeco, wantsHiresDecos } from '../deco-hires.js?v=f59e60d3';
 import { SHARP_DECOS } from '../deco-sharp-list.js?v=a2424923';
-import { resourceNodesFeature } from './resource-nodes-feature.js?v=2cc2384a';
-import { patchesFeature } from './patches-feature.js?v=3e26b680';
+import { resourceNodesFeature } from './resource-nodes-feature.js?v=9067aab6';
+import { patchesFeature } from './patches-feature.js?v=47c30e52';
 import { GROWN_TREE_LABELS, createPlot, growTree, plotLabel } from '../patches.js?v=5f333fdb';
 import { WOTD_DEPLETE_MS, WOTD_TEXT, nearestPourTarget, pourButton, pourConditions, pourConfirmText } from '../wine-pour.js?v=6daa23a7';
 import { WOTD_TOOL, pourApproach, pourDropTip } from '../wine-pour-fx.js?v=364e22d2';
@@ -243,7 +243,7 @@ import {
 import { frameTexture, isLoaded, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js?v=92ec53cd';
 import { FALLBACK_MAX as WORLD_ART_FALLBACK_MAX, worldArtFor } from '../world-art.js?v=0729bf92';
 import { oneArmSignpost } from '../street-render.js?v=47697d4c';
-import { ROCK_CATALOG } from '../mining.js?v=6ba1b868';
+import { ROCK_CATALOG } from '../mining.js?v=b62c7722';
 import {
   HOUSE_SIGN,
   IMG_BUBBLE_MS,

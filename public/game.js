@@ -2,9 +2,9 @@
  * Groddle Afternoon — original street geometry + layered decos
  * PixiJS 8 · locations-xml streets · CoU PNG decos · quests/items
  */
-import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=172fd167';
+import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=4519afca';
 import { createErrorOnce, createFeatureHost } from './js/feature-host.js?v=06bb8b74';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=2d36e2e8';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=971d7af7';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl, drawTileArt } from './js/enter-chooser.js?v=4a3ea327';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -490,8 +490,8 @@ import { PACK_COPY, isBagClass, isElementClass, ownBagLabel, unitRankAt } from '
 import { FLOAT_TEXT_Z, SPEECH_BUBBLE_Z } from './js/fx-z.js?v=18dda7e3';
 import { hasPouch } from './js/elemental-pouch.js?v=ceefa97a';
 import { createPackRow, mountPackClearance, packBandRange, packCountText, packSearchEntries, packSlotTip } from './js/ui/pack-row.js?v=64e4a567';
-import { listAnimalFeedOptions } from './js/animals.js?v=cc51a34b';
-import { pickerMaxCount, pickerOptionsFor, pickerTakesCount } from './js/animals.js?v=cc51a34b';
+import { listAnimalFeedOptions } from './js/animals.js?v=c028763b';
+import { pickerMaxCount, pickerOptionsFor, pickerTakesCount } from './js/animals.js?v=c028763b';
 import {
   createDroppedItemState,
   parseDroppedItemState,
@@ -658,7 +658,7 @@ import {
   STARTER_MINING_SKILLS,
   findWorkingPick,
   miningToolWear,
-} from './js/mining.js?v=6ba1b868';
+} from './js/mining.js?v=b62c7722';
 import {
   loadStreetData,
   STREET_INDEX,
@@ -859,14 +859,14 @@ import {
   vendorSellUnitPrice,
   vendorBuyUnitPrice,
   VENDOR_BAG_HOLDS,
-} from './js/vendor.js?v=9889a12f';
+} from './js/vendor.js?v=e76ac383';
 import {
   animalAnchorX,
   animalAnchorY,
   createAnimalState,
   resetAnimalDay,
   animalStatusLabel,
-} from './js/animals.js?v=cc51a34b';
+} from './js/animals.js?v=c028763b';
 import {
   ensureWoodTreeState,
   noteWoodCare,
@@ -986,7 +986,7 @@ import {
   rockSpawnPlan,
   ROCK_SHAPE_WIDTHS,
 } from './js/street-ecology.js?v=0f046853';
-import { CHICKEN_PAUSE, chickenPauseRoll, easeToward, flightFloorAt, flightFloorFor, flyerLift } from './js/street-creatures.js?v=9d60b61b';
+import { CHICKEN_PAUSE, chickenPauseRoll, easeToward, flightFloorAt, flightFloorFor, flyerLift } from './js/street-creatures.js?v=c7c35e1c';
 import { chickenPose, chickenIdleSheetsAsked } from './js/chicken-idle-art.js?v=c46b17d5';
 import { chickenWaitPose } from './js/chicken-idles.js?v=eef0279b';
 import { itemOverlayStats } from './js/item-overlay.js?v=97ed2ba0';

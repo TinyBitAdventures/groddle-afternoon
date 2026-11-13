@@ -50,14 +50,14 @@ import {
   noPickLine,
   rockStatusLabel,
   ensureMiningItems,
-} from './js/mining.js?v=6ba1b868';
+} from './js/mining.js?v=b62c7722';
 import { takeToolChoice } from './js/tool-choice.js?v=e0dcb60e';
 import {
   ANIMAL_CLASS_IDS,
   ensureAnimalState,
   listAnimalFeedOptions,
   feedAnimal,
-} from './js/animals.js?v=cc51a34b';
+} from './js/animals.js?v=c028763b';
 import {
   quoteAnimalKinship,
   ANIMAL_KINSHIP_CLICK_REFUSALS,
@@ -86,7 +86,7 @@ import {
   namingVerbs,
   queuePlops,
   startIncubation,
-} from './js/animal-husbandry.js?v=3017f786';
+} from './js/animal-husbandry.js?v=f5569539';
 import { loseEnergy, metabolicGain, moodMax } from './js/metabolics.js?v=1383e6fd';
 import { SET_FREE, setFreeVerbState } from './js/animal-set-free.js?v=55ad2f83';
 import { BUTTER_UP, SING_TO, butterUpVerbState, butterUpChicken, singToVerbState, singToButterfly } from './js/animal-flattery.js?v=9700115b';
