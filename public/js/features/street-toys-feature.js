@@ -23,7 +23,7 @@
 
 import { BROADCAST_DISTANCE, createNoteState, inBroadcastReach, lothaNote, prepareToyStreet, streetToysFor, toyDecoId, toyHitBox } from '../street-toys.js?v=09630452';
 import { locationEventsApi } from './location-events-feature.js?v=f2b6c156';
-import { TOY_CLICK, catchUpDangles, catchUpLotha, toyEvents, toyMessageFor, toyServerState } from '../street-toys-mp.js?v=9eca3893';
+import { TOY_CLICK, catchUpDangles, catchUpLotha, createToyTracker, toyEvents, toyMessageFor } from '../street-toys-mp.js?v=9eca3893';
 
 export const STREET_TOYS_FEATURE_ID = 'street-toys';
 const CLASS_ID = 'clickable_broadcaster';
@@ -42,6 +42,7 @@ let offs = [];
 let server = null;
 let heartShown = false;
 let tsid = '';
+let tracker = createToyTracker();
 
 function publish(engine, force = false) {
   const now = Date.now();
@@ -145,14 +146,17 @@ function watch(engine) {
   for (const off of offs) off?.();
   offs = [];
   client = c;
+  tracker = createToyTracker();
   if (!c?.on) return;
+  offs.push(c.on('roster', (msg) => tracker.roster(msg)));
   offs.push(c.on('msg:toy_state', (msg) => {
-    if (!def || !toyMessageFor(msg, tsid)) return;
-    server = toyServerState(msg, null);
+    tracker.take(msg);
+    if (def && toyMessageFor(msg, tsid)) server = tracker.stateFor(tsid);
   }));
   offs.push(c.on('msg:toy_played', (msg) => {
+    tracker.take(msg);
     if (!def || !toyMessageFor(msg, tsid)) return;
-    server = toyServerState(msg, server);
+    server = tracker.stateFor(tsid);
     if (typeof msg.toy === 'string' && msg.toy) last = msg.toy;
     for (const name of toyEvents(msg)) {
       // A heart never shown here (an arrival after it lit, before the catch-up) has nothing to fade.
@@ -221,6 +225,8 @@ export const streetToysFeature = {
     def = streetToysFor(street?.tsid);
     if (def && (engine.transientInstance?.() || engine.homeContext?.().inHome)) def = null;
     watch(engine);
+    // The server's word may have come while the street loaded.
+    server = def ? tracker.stateFor(tsid) : null;
     if (def) {
       spawn(engine, street);
       if (engine.param?.('streettoys') === 'play') demo = { at: Date.now() + 2500, queue: def.toys.map((t) => t.id) };
@@ -235,8 +241,8 @@ export const streetToysFeature = {
   },
 
   onTick(_dtMs, now, engine) {
-    if (!def || !toys.length) return;
     watch(engine);
+    if (!def || !toys.length) return;
     catchUp(engine);
     for (const t of toys) sync(engine, t);
     demoStep(engine, Date.now());
