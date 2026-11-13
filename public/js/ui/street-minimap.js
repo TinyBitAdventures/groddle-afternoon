@@ -1025,6 +1025,16 @@ export function createStreetMinimap(doc, host, opts = {}) {
     _platforms: [],
     destroy() {
       clearTimeout(rollTimer);
+      tween = null;
+      // PHONE MAP (street-minimap-feature.js): the picture's canvases go now, not at the next GC.
+      picImg.removeAttribute('src');
+      pic.width = 0;
+      pic.height = 0;
+      if (snapPic && 'width' in snapPic) {
+        snapPic.width = 0;
+        snapPic.height = 0;
+      }
+      snapPic = null;
       root.remove();
       showBtn.remove();
     },

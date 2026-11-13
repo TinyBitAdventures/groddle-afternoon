@@ -11,7 +11,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { minimapOffOnDevice } from '../public/js/features/street-minimap-feature.js?v=fb4531e6';
+import { minimapOffOnDevice } from '../public/js/features/street-minimap-feature.js?v=a27c517d';
 import { hubMapSubtitle } from '../public/js/panel-copy.js?v=85c3e029';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -76,9 +76,10 @@ describe('no street map on a phone', () => {
   });
   it('init builds no card there, so no snapshot and no tick work', () => {
     const init = feature.slice(feature.indexOf('  init(engine) {'), feature.indexOf('createStreetMinimap(document, host'));
-    assert.match(init, /if \(minimapOffOnDevice\(globalThis\)\) \{\s*engine\.setData\?\.\('streetMap', 'phone'\);\s*return;\s*\}/);
-    // onTick does nothing without a view.
-    assert.match(feature, /onTick\(dtMs, now, engine\) \{\s*if \(!view\) return;/);
+    // Lane phonefix (2026-11-13, p13): only the PHONE MAP button (tests/street-minimap-phone.test.js).
+    assert.match(init, /if \(minimapOffOnDevice\(globalThis\)\) \{\s*engine\.setData\?\.\('streetMap', 'phone'\);\s*\/\/ PHONE MAP[^\n]*\n\s*phoneInstall\(engine\);\s*return;\s*\}/);
+    // onTick does nothing without a view, but the phone button's street check.
+    assert.match(feature, /onTick\(dtMs, now, engine\) \{\s*if \(phone\) \{[\s\S]*?if \(!view\) return;[\s\S]*?\}\n\s*if \(!view\) return;/);
   });
 });
 

@@ -13933,6 +13933,58 @@ body:has(#quest-dialogue:not([hidden])) .prompt-stack { z-index: calc(var(--z-mo
 }
 /* The route card (To: / Next:) stacks under the map: --minimap-h is what the map takes (0 when hidden). */
 [data-ui="modern"] #game-root .route-gps { top: calc(var(--hud-h) + var(--space-3) + var(--minimap-h, 0px)); }
+/* PHONE MAP (Austin 2026-11-13, p13; js/features/street-minimap-feature.js): a phone has no corner card;
+   a map button at the front of the street's name opens the same map full screen, the signposts'
+   destinations listed under it (beside it, sideways). Both skins; a phone only. */
+.smm-phone-btn { display: none; }
+:root.touch-phone #game-root .street-nameplate > .smm-phone-btn:not([hidden]) {
+  position: relative; display: inline-flex; align-items: center; justify-content: center; vertical-align: middle;
+  width: 22px; height: 22px; margin: 0 var(--sp-3) 0 calc(-1 * var(--sp-2)); padding: 0; border: 0; border-radius: var(--radius-pill);
+  background: transparent; color: inherit; pointer-events: auto; cursor: pointer;
+}
+/* A thumb-sized target round the small icon. */
+:root.touch-phone #game-root .street-nameplate > .smm-phone-btn::before { content: ""; position: absolute; inset: -11px -10px; }
+:root.touch-phone #game-root .street-nameplate > .smm-phone-btn svg { width: 18px; height: 18px; }
+:root.touch-phone #game-root .street-nameplate > .smm-phone-btn:focus-visible { outline: 2px solid var(--focus); outline-offset: 1px; }
+.smm-sheet {
+  position: fixed; inset: 0; z-index: var(--z-dialog); box-sizing: border-box;
+  display: flex; align-items: center; justify-content: center;
+  padding: max(var(--space-3), env(safe-area-inset-top, 0px)) max(var(--space-3), env(safe-area-inset-right, 0px)) max(var(--space-3), env(safe-area-inset-bottom, 0px)) max(var(--space-3), env(safe-area-inset-left, 0px));
+  background: var(--scrim); font-family: var(--font-ui); touch-action: none;
+}
+.smm-sheet-card {
+  display: flex; flex-direction: column; gap: var(--space-2); box-sizing: border-box;
+  width: 100%; height: 100%; max-width: 960px; padding: var(--space-2) var(--space-3) var(--space-3);
+  border: 1px solid var(--border); border-radius: var(--radius-l); background: var(--surface); color: var(--text); box-shadow: var(--shadow-3);
+}
+.smm-sheet-head { display: flex; align-items: center; gap: var(--space-2); min-height: 44px; }
+.smm-sheet-head h2 { flex: 1 1 auto; min-width: 0; margin: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: var(--fs-base); font-weight: var(--fw-bold); }
+.smm-sheet-x { flex: none; width: 44px; height: 44px; margin-right: calc(-1 * var(--sp-3)); border: 0; border-radius: var(--radius-pill); background: transparent; color: var(--text-muted); font: inherit; font-size: var(--fs-xl); line-height: 1; cursor: pointer; }
+.smm-sheet-x:focus-visible { outline: 2px solid var(--focus); outline-offset: -2px; }
+.smm-sheet-map { position: relative; flex: 1 1 auto; min-height: 0; display: flex; align-items: center; justify-content: center; }
+/* The map itself: the corner card's frame, placed in the sheet at the width the feature gives it. */
+.smm-sheet .street-minimap.is-phone-sheet { position: relative; top: auto; right: auto; z-index: auto; }
+.smm-sheet .street-minimap.is-phone-sheet .smm-hide,
+.smm-sheet .street-minimap.is-phone-sheet .smm-tab { display: none; }
+.smm-sheet .street-minimap.is-phone-sheet .smm-card { border-radius: var(--radius-m); overflow: visible; }
+.smm-sheet-signs { flex: 0 1 auto; max-height: 38%; overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; touch-action: pan-y; }
+.smm-sheet-signs ul { display: flex; flex-direction: column; gap: var(--sp-2); margin: 0; padding: 0; list-style: none; }
+.smm-sheet-sign {
+  display: flex; align-items: center; gap: var(--space-2); box-sizing: border-box; width: 100%; min-height: 44px; padding: var(--sp-2) var(--space-2);
+  border: 1px solid var(--border); border-radius: var(--radius-m); background: var(--surface-raised); color: var(--text);
+  font: inherit; font-size: var(--fs-base); text-align: left; cursor: pointer;
+}
+.smm-sheet-sign img { flex: none; width: 14px; height: 21px; }
+.smm-sheet-sign span { flex: 1 1 auto; min-width: 0; }
+.smm-sheet-sign[data-side="left"]::before { content: "←" / ""; color: var(--text-muted); }
+.smm-sheet-sign[data-side="right"]::after { content: "→" / ""; color: var(--text-muted); }
+.smm-sheet-sign:focus-visible { outline: 2px solid var(--focus); outline-offset: 1px; }
+.smm-sheet-none { margin: 0; color: var(--text-muted); font-size: var(--fs-s); }
+@media (orientation: landscape) {
+  .smm-sheet-card { display: grid; grid-template-columns: minmax(0, 1fr) minmax(180px, 32%); grid-template-rows: auto minmax(0, 1fr); column-gap: var(--space-3); }
+  .smm-sheet-head { grid-column: 1 / -1; }
+  .smm-sheet-signs { max-height: none; }
+}
 /* —— end MINIMAP —— */
 
 /* === LANDSCAPE-HUD (land1) === */

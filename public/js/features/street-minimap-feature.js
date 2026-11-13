@@ -32,10 +32,17 @@
  *   the whole world menu), on a signpost Walk here and its arms (engine.openSignpostMenu, game.js);
  *   nothing else on the map opens one (menuFromMap).
  *
- * - Never on a phone (Austin 2026-11-12, on his iPhone: "I think the minimap should just be hidden
+ * - No card on a phone (Austin 2026-11-12, on his iPhone: "I think the minimap should just be hidden
  *   on the phone"): where window.GRODDLE_DEVICE is "phone" (the phone gate, js/touch-controls.js
- *   isPhoneDevice) the feature builds no card, takes no snapshot and does nothing per tick; the
- *   Menu's Street map switch, Classic's Preferences row and Shift+M go with it (style.css PHONEKEYS).
+ *   isPhoneDevice) the corner card is never built; the Menu's Street map switch, Classic's
+ *   Preferences row and Shift+M go with it (style.css PHONEKEYS).
+ * - PHONE MAP (Austin 2026-11-13, p13: "Not having the minimap makes it hard to find streets ... Maybe
+ *   an icon which opens minimap full screen then closes when finished?"): a small map button at the
+ *   front of the street's name opens the same map full screen (the street's picture, your spot, the
+ *   others here, the signposts), with the signposts' destinations listed under it. A tap on the map or
+ *   a destination walks there (MAPWALK) and closes it; so do the X, a tap outside and Esc. It costs
+ *   nothing while closed: the view, its picture canvas and its one snapshot are made on open and freed
+ *   on close (view.destroy zeroes the canvases), and nothing runs per tick but a street check.
  *
  * Canvas data: streetMap (shown|off|no-map|hidden|phone), streetMapFog, streetMapExpanded,
  * streetMapDots, streetMapDotIds, streetMapSigns, streetMapPicture (lines|snapshot),
@@ -43,7 +50,7 @@
  * refused). QA: &streetmapexpand=1 expands it on each street.
  */
 
-import { createStreetMinimap, minimapVisibility, onStreetMapChange, sceneSignMarks, setStreetMap, snapshotStreetView, snapsWithScene, streetMapOn } from '../ui/street-minimap.js?v=6c530941';
+import { createStreetMinimap, minimapVisibility, onStreetMapChange, sceneSignMarks, setStreetMap, signpostMarks, snapshotStreetView, snapsWithScene, streetMapOn } from '../ui/street-minimap.js?v=82f98cee';
 import { classicArtUrl } from '../classic/classic-art.js?v=5f713e7d';
 import { onUiModeChange } from '../classic/ui-mode.js?v=9705b783';
 import { focusBack } from '../ui/focus-return.js?v=da190597';
@@ -74,6 +81,8 @@ let snapKey = '';
 let resnapTimer = null;
 let lastSignKey = '';
 let snapCount = 0;
+/** PHONE MAP: { btn, sheet, plateStreet } on a phone (the map's view lives only while the sheet is open). */
+let phone = null;
 
 const reducedMotion = () => {
   try {
@@ -98,7 +107,8 @@ export function minimapRows(engine) {
 
 function stateFor(engine) {
   return minimapVisibility({
-    pref: streetMapOn(),
+    // PHONE MAP: opened on purpose, so the corner card's setting never hides it.
+    pref: phone ? true : streetMapOn(),
     street: engine.street,
     started: engine.started,
     moving: Boolean(engine.streetCardUp?.()),
@@ -302,6 +312,180 @@ export function minimapOffOnDevice(win = globalThis) {
   return isPhoneDevice(win);
 }
 
+/* ------------------------------------------------------------ phone map */
+
+const PHONE_MAP_SVG = '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><rect x="2.5" y="4" width="15" height="12" rx="2" /><path d="M2.5 12.5 7 9l3.5 2.5L14 8l3.5 3" /><circle cx="10.5" cy="7" r="1.4" fill="currentColor" stroke="none" /></svg>';
+export const PHONE_MAP_TEXT = Object.freeze({ open: 'Street map', close: 'Close the street map', signs: 'Signposts', none: 'No signposts on this street.' });
+
+/**
+ * PURE: the map's width (css px) in a box `availW` x `availH`, so the whole street fits without
+ * scrolling: as wide as the box, unless the street is tall enough that its height is the limit.
+ */
+export function phoneMapWidth(street, availW, availH) {
+  const b = street?.bounds || {};
+  const W = Number(b.r) - Number(b.l);
+  const H = Number(b.b) - Number(b.t);
+  const aw = Math.max(0, Number(availW) || 0);
+  const ah = Math.max(0, Number(availH) || 0);
+  if (!(W > 0) || !(H > 0) || !(ah > 0)) return Math.max(160, Math.floor(aw));
+  return Math.max(160, Math.floor(Math.min(aw, (ah * W) / H)));
+}
+
+/**
+ * PURE: the signposts' rows under the phone map, left to right: { id, x, y, text, side } where side
+ * says which way it stands from you ('left', 'right' or 'here', within 60 world px).
+ */
+export function phoneSignRows(marks = [], youX = null) {
+  return [...marks]
+    .filter((m) => m && Number.isFinite(m.x))
+    .sort((a, b) => a.x - b.x)
+    .map((m) => {
+      const dx = Number.isFinite(youX) ? m.x - youX : 0;
+      const side = !Number.isFinite(youX) || Math.abs(dx) <= 60 ? 'here' : dx < 0 ? 'left' : 'right';
+      const text = String(m.tip || '').split('\n').filter(Boolean).join(', ') || 'Signpost';
+      return { id: m.id, x: m.x, y: m.y, text, side };
+    });
+}
+
+function phoneOpen(engine) {
+  if (!phone || view || !engine.street || engine.street.noMap) return;
+  const doc = document;
+  const gameRoot = doc.getElementById('game-root');
+  if (!gameRoot) return;
+  const sheet = doc.createElement('div');
+  sheet.id = 'street-minimap-sheet';
+  sheet.className = 'smm-sheet';
+  sheet.setAttribute('role', 'dialog');
+  sheet.setAttribute('aria-modal', 'true');
+  sheet.setAttribute('aria-labelledby', 'smm-sheet-title');
+  sheet.dataset.ctx = 'minimap';
+  sheet.innerHTML = `
+    <div class="smm-sheet-card">
+      <header class="smm-sheet-head"><h2 id="smm-sheet-title"></h2><button type="button" class="smm-sheet-x" aria-label="${PHONE_MAP_TEXT.close}" title="${PHONE_MAP_TEXT.close}">×</button></header>
+      <div class="smm-sheet-map"></div>
+      <section class="smm-sheet-signs" aria-label="${PHONE_MAP_TEXT.signs}"></section>
+    </div>`;
+  sheet.querySelector('#smm-sheet-title').textContent = (doc.getElementById('street-name')?.textContent || '').trim() || PHONE_MAP_TEXT.open;
+  gameRoot.append(sheet);
+  const mapBox = sheet.querySelector('.smm-sheet-map');
+  const signsBox = sheet.querySelector('.smm-sheet-signs');
+  phone.sheet = sheet;
+  host = mapBox;
+  // The map fits the box the sheet leaves it (at least a third of the screen stays for the list).
+  const availW = mapBox.clientWidth || gameRoot.clientWidth - 32;
+  const availH = Math.max(120, (mapBox.clientHeight || gameRoot.clientHeight * 0.6));
+  view = createStreetMinimap(doc, mapBox, {
+    artUrl: classicArtUrl,
+    reducedMotion: () => true,
+    onHide: () => phoneClose(engine),
+    onShow: () => {},
+    onLayout: () => {},
+    maxHeight: () => availH,
+    onResnap: () => scheduleSnaps(engine, [60]),
+    onWalk: (goal, how) => {
+      const ok = walkFromMap(engine, goal, how);
+      if (ok) phoneClose(engine, { walked: true });
+      return ok;
+    },
+  });
+  view.root.classList.add('is-phone-sheet');
+  view.root.style.setProperty('--mm-w', `${phoneMapWidth(engine.street, availW, availH)}px`);
+  street = null;
+  lastState = '';
+  lastDots = '';
+  sync(engine, true);
+  view.expand(true);
+  // One snapshot, once the sheet has its size (its decos are on the street already).
+  scheduleSnaps(engine, [60]);
+  // The signposts' destinations, a tap away.
+  const marks = [...signpostMarks(engine.street), ...(isLiveScene(engine.streetView) ? sceneSignMarks(engine.interactables || []) : [])];
+  const rows = phoneSignRows(marks, engine.player?.x);
+  if (rows.length) {
+    const list = doc.createElement('ul');
+    for (const row of rows) {
+      const li = doc.createElement('li');
+      const b = doc.createElement('button');
+      b.type = 'button';
+      b.className = 'smm-sheet-sign';
+      b.dataset.side = row.side;
+      b.dataset.signId = row.id;
+      b.innerHTML = `<img alt="" src="${classicArtUrl('teensy_signpost')}" /><span></span>`;
+      b.querySelector('span').textContent = row.text;
+      b.setAttribute('aria-label', `Walk to the signpost to ${row.text}`);
+      b.addEventListener('click', () => {
+        if (walkFromMap(engine, { kind: 'sign', id: row.id, x: row.x, y: row.y }, { keyboard: true })) phoneClose(engine, { walked: true });
+      });
+      li.append(b);
+      list.append(li);
+    }
+    signsBox.append(list);
+  } else {
+    const p = doc.createElement('p');
+    p.className = 'smm-sheet-none';
+    p.textContent = PHONE_MAP_TEXT.none;
+    signsBox.append(p);
+  }
+  sheet.querySelector('.smm-sheet-x').addEventListener('click', () => phoneClose(engine));
+  // A tap outside the card closes it; the street under it never hears the tap.
+  sheet.addEventListener('pointerdown', (e) => e.stopPropagation());
+  sheet.addEventListener('click', (e) => {
+    if (!e.target?.closest?.('.smm-sheet-card')) phoneClose(engine);
+  });
+  sheet.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      e.stopPropagation();
+      phoneClose(engine);
+    }
+  });
+  phone.btn.setAttribute('aria-expanded', 'true');
+  sheet.querySelector('.smm-sheet-x').focus?.({ preventScroll: true });
+  engine.setData?.('streetMapPhone', 'open');
+}
+
+function phoneClose(engine, { walked = false } = {}) {
+  if (!phone) return;
+  clearSnaps();
+  view?.destroy();
+  view = null;
+  host = null;
+  street = null;
+  lastState = '';
+  lastDots = '';
+  snapOwed = false;
+  phone.sheet?.remove();
+  phone.sheet = null;
+  phone.btn.setAttribute('aria-expanded', 'false');
+  engine.setData?.('streetMap', 'phone');
+  engine.setData?.('streetMapPhone', walked ? 'walked' : 'closed');
+  // The keys go back to the world after a walk; the button after a close.
+  if (!walked) phone.btn.focus?.({ preventScroll: true });
+}
+
+/** PHONE MAP: the button at the front of the street's name (made once; kept when the name redraws). */
+function phoneInstall(engine) {
+  const plate = document.getElementById('street-nameplate');
+  if (!plate) return;
+  const btn = document.createElement('button');
+  btn.type = 'button';
+  btn.id = 'street-map-phone-btn';
+  btn.className = 'smm-phone-btn';
+  btn.setAttribute('aria-label', PHONE_MAP_TEXT.open);
+  btn.setAttribute('aria-haspopup', 'dialog');
+  btn.setAttribute('aria-expanded', 'false');
+  btn.title = PHONE_MAP_TEXT.open;
+  btn.innerHTML = PHONE_MAP_SVG;
+  btn.hidden = true;
+  // Its own tap: never the street's, never a quest's nameplate.
+  btn.addEventListener('pointerdown', (e) => e.stopPropagation());
+  btn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    if (view) phoneClose(engine);
+    else phoneOpen(engine);
+  });
+  plate.prepend(btn);
+  phone = { btn, sheet: null, plateStreet: undefined };
+}
+
 export const streetMinimapFeature = {
   id: STREET_MINIMAP_FEATURE_ID,
 
@@ -310,6 +494,8 @@ export const streetMinimapFeature = {
     // A phone has no street map: no card, no snapshots, nothing per tick (onTick returns with no view).
     if (minimapOffOnDevice(globalThis)) {
       engine.setData?.('streetMap', 'phone');
+      // PHONE MAP: a button that opens it full screen.
+      phoneInstall(engine);
       return;
     }
     host = document.getElementById('game-root');
@@ -346,6 +532,20 @@ export const streetMinimapFeature = {
   },
 
   onTick(dtMs, now, engine) {
+    if (phone) {
+      // The button shows on a street that has a map.
+      if (phone.plateStreet !== engine.street) {
+        phone.plateStreet = engine.street;
+        const off = !engine.street || Boolean(engine.street.noMap);
+        if (phone.btn.hidden !== off) phone.btn.hidden = off;
+      }
+      if (!view) return;
+      // A new street, a full-screen moment, the street card: the sheet closes.
+      if (engine.street !== street || stateFor(engine) !== 'shown') {
+        phoneClose(engine, { walked: true });
+        return;
+      }
+    }
     if (!view) return;
     const t = performance.now();
     if (t - lastUpdate < UPDATE_MS && engine.street === street) return;
