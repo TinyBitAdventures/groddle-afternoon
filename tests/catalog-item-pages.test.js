@@ -24,7 +24,7 @@ const recipes = JSON.parse(readFileSync(join(pub, 'assets/content/recipes.json')
 const costs = await loadCosts(spike);
 const making = await import('../public/js/making.js?v=ba3677f0');
 const vendor = await import('../public/js/vendor.js?v=542d30c9');
-const pack = await import('../public/js/pack-slots.js?v=4a36968a');
+const pack = await import('../public/js/pack-slots.js?v=4d446d78');
 const storage = await import('../public/js/home-storage.js?v=b0225465');
 const unescape = (s) => s.replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"');
 /** The "What it is for" list of a page, as plain lines. */

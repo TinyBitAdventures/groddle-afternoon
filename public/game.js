@@ -2,9 +2,9 @@
  * Groddle Afternoon — original street geometry + layered decos
  * PixiJS 8 · locations-xml streets · CoU PNG decos · quests/items
  */
-import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=f218c2d1';
+import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=705c9a46';
 import { createErrorOnce, createFeatureHost } from './js/feature-host.js?v=06bb8b74';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=0bf392d0';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=fb37e1c1';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl, drawTileArt } from './js/enter-chooser.js?v=4a3ea327';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -486,9 +486,9 @@ import {
 } from './js/inventory.js?v=f49c8998';
 import { TROPHY_FIND_TEXT, trophyOfBadge } from './js/home-trophies.js?v=2020b29b';
 import { HELD_AT_ONCE, HELD_AT_ONCE_TEXT } from './js/collection-trophies.js?v=3760d603';
-import { PACK_COPY, isBagClass, isElementClass, ownBagLabel, unitRankAt } from './js/pack-slots.js?v=4a36968a';
+import { PACK_COPY, isBagClass, isElementClass, ownBagLabel, unitRankAt } from './js/pack-slots.js?v=4d446d78';
 import { FLOAT_TEXT_Z, SPEECH_BUBBLE_Z } from './js/fx-z.js?v=18dda7e3';
-import { hasPouch } from './js/elemental-pouch.js?v=ceefa97a';
+import { hasPouch } from './js/elemental-pouch.js?v=42702eda';
 import { createPackRow, mountPackClearance, packBandRange, packCountText, packSearchEntries, packSlotTip } from './js/ui/pack-row.js?v=64e4a567';
 import { listAnimalFeedOptions } from './js/animals.js?v=1069540e';
 import { pickerMaxCount, pickerOptionsFor, pickerTakesCount } from './js/animals.js?v=1069540e';
@@ -504,7 +504,7 @@ import {
   pickupDroppedStack,
   placeDroppedBag,
   takeDroppedRecord,
-} from './js/world-items.js?v=5e592293';
+} from './js/world-items.js?v=deadf665';
 import {
   createPlayerSave,
   parsePlayerSave,

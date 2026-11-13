@@ -14,10 +14,10 @@ import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { PACK_COPY, roomFor } from '../public/js/pack-slots.js?v=4a36968a';
-import { getVerbsFor } from '../public/content.js?v=f218c2d1';
+import { PACK_COPY, roomFor } from '../public/js/pack-slots.js?v=4d446d78';
+import { getVerbsFor } from '../public/content.js?v=705c9a46';
 import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=10b118dd';
-import { itemVerbsMoreFeature, disperseGroundElements } from '../public/js/features/item-verbs-more-feature.js?v=ec07c315';
+import { itemVerbsMoreFeature, disperseGroundElements } from '../public/js/features/item-verbs-more-feature.js?v=6dafdcc6';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const GS = join(root, '../glitch-GameServerJS');

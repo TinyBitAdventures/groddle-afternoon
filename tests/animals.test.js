@@ -12,7 +12,7 @@ import {
   resetAnimalDay,
   animalStatusLabel,
 } from '../public/js/animals.js?v=1069540e';
-import { getVerbsFor, runVerb } from '../public/content.js?v=f218c2d1';
+import { getVerbsFor, runVerb } from '../public/content.js?v=705c9a46';
 import { actionDurationFor, actionLabelFor, ACTION_DURATION_MS } from '../public/js/action-timing.js?v=5db4e91b';
 
 const here = dirname(fileURLToPath(import.meta.url));

@@ -124,11 +124,11 @@ import {
   unitOrder,
   unitPlaces,
   unitRankAt,
-} from '../pack-slots.js?v=4a36968a';
+} from '../pack-slots.js?v=4d446d78';
 import { TOOL_CONDITION_CATALOG, moveToolCopy, pickToolCopies, placeToolCopies } from '../tools.js?v=48542c24';
 import { createMinnAccount } from '../minn-account.js?v=c15f0ecf';
-import { BAG_NAME_MAX, BAG_RENAME_COPY, bagLabel, canRenameBag, cleanBagName, renamedTo } from '../bag-names.js?v=22391c55';
-import { openNamePrompt } from '../ui/name-prompt.js?v=142b551a';
+import { BAG_NAME_MAX, BAG_RENAME_COPY, BAG_RENAME_HINT, bagLabel, canRenameBag, cleanBagName, renamedTo } from '../bag-names.js?v=bba085e1';
+import { openNamePrompt } from '../ui/name-prompt.js?v=4791b830';
 
 export const BAGS_FEATURE_ID = 'bags';
 export const BAG_DEMO_KIT = Object.freeze([
@@ -562,6 +562,7 @@ function askBagName(current, onName) {
   openNamePrompt({
     title: BAG_RENAME_COPY.title,
     label: BAG_RENAME_COPY.input,
+    hint: BAG_RENAME_HINT,
     value: shown,
     maxChars: BAG_NAME_MAX,
     // input_restrict 'A-Z a-z 0-9'.
@@ -578,13 +579,24 @@ function droppedRecord(target, engine) {
   return Array.isArray(rows) ? rows.find((r) => r.id === id && r.classTsid === target.state.classTsid) || null : null;
 }
 
-/** Rename a bag lying on the ground (ok_states in_location): the record keeps the name. */
+/**
+ * Rename a bag lying on the ground (ok_states in_location): the record keeps the
+ * name. Blank clears it (Austin 2026-11-13, #263), as in the pack: back to the
+ * sort's name when it has a sort, else the class label.
+ */
 function renameDroppedBag(target, engine, value) {
   const record = droppedRecord(target, engine);
   if (!record) return false;
-  const name = renamedTo(record.name, value);
-  if (name && name !== record.name) {
+  const before = `${record.name || ''}|${Boolean(record.sortNamed)}`;
+  const name = renamedTo(value);
+  if (name) {
     record.name = name;
+    delete record.sortNamed;
+  } else {
+    delete record.name;
+    if (record.sort) record.sortNamed = true;
+  }
+  if (`${record.name || ''}|${Boolean(record.sortNamed)}` !== before) {
     engine.droppedItemsChanged?.();
     engine.setData?.('packLast', `renamed:ground:${name}`);
   }
@@ -1002,11 +1014,13 @@ export const bagsFeature = {
     return first ? applyBagName(engine, first.key, value) : null;
   },
 
-  /** A dropped bag's Rename (game.js runs the ground verb here). True when handled. */
-  bagRenameGround(target, engine) {
+  /** A dropped bag's Rename (game.js runs the ground verb here). True when handled. value (tests): the answer, no box. */
+  bagRenameGround(target, engine, value) {
     const record = droppedRecord(target, engine);
     if (!record) return null;
-    askBagName(record.name, (value) => renameDroppedBag(target, engine, value));
+    if (value !== undefined) return renameDroppedBag(target, engine, value);
+    // verbs.rename 515: the box shows user_name, a sort's name included (as in the pack).
+    askBagName(record.name || (record.sortNamed ? sortName(record.sort) : ''), (value) => renameDroppedBag(target, engine, value));
     return true;
   },
 

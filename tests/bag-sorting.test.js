@@ -29,10 +29,10 @@ import {
   specializeBag,
   stackUp,
   unitOrder,
-} from '../public/js/pack-slots.js?v=4a36968a';
+} from '../public/js/pack-slots.js?v=4d446d78';
 import { SORT_TAG_CLASSES } from '../public/js/pack-slots-data.js?v=800f664c';
 import { ITEM_CATALOG, isToolItem } from '../public/js/inventory.js?v=f49c8998';
-import { bagsFeature } from '../public/js/features/bags-feature.js?v=b27d87e9';
+import { bagsFeature } from '../public/js/features/bags-feature.js?v=1b537f70';
 import { createToolConditionState } from '../public/js/tools.js?v=48542c24';
 import { remakeStatus, isOfferedInRemake } from '../public/js/imagination-remake.js?v=c37ad887';
 
@@ -148,6 +148,18 @@ describe('Internal Sortitude (doSpecialize, addItemStack 113-150)', () => {
     const kept = renameBag(byName, 'b1', 'Mining, etc.');
     assert.equal(kept.name, 'Mining etc');
     assert.deepEqual(kept.prefs.bags[0], { key: 'b1', cls: 'bag_bigger', name: 'Mining etc', sort: 'sort_mining' });
+  });
+
+  it('a blank Rename gives a sorted bag its sort\'s name back, and a Sort can name it again (#263)', () => {
+    const { inv, prefs } = kit();
+    const named = specializeBag(renameBag(prefs, 'b1', 'Rocks').prefs, 'b1', 'sort_mining').prefs;
+    const blank = renameBag(named, 'b1', '');
+    assert.equal(blank.changed, true);
+    assert.deepEqual(blank.prefs.bags[0], { key: 'b1', cls: 'bag_bigger', sort: 'sort_mining', sortNamed: true });
+    assert.equal(layoutPack(inv, blank.prefs, OPTS).bags.b1.label, 'Mining, etc.');
+    assert.equal(layoutPack(inv, specializeBag(blank.prefs, 'b1', 'sort_food').prefs, OPTS).bags.b1.label, 'Food');
+    // Blank on a bag the sort already names changes nothing.
+    assert.equal(renameBag(blank.prefs, 'b1', '  ').changed, false);
   });
 
   it('normalizePrefs keeps a sort only on a bag that can take one', () => {

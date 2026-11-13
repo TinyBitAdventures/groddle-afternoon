@@ -25,7 +25,7 @@ import {
   setFreeTooltip,
   setFreeVerbState,
 } from '../public/js/animal-set-free.js?v=55ad2f83';
-import { getVerbsFor } from '../public/content.js?v=f218c2d1';
+import { getVerbsFor } from '../public/content.js?v=705c9a46';
 import { createAnimalState } from '../public/js/animals.js?v=1069540e';
 
 const here = dirname(fileURLToPath(import.meta.url));
@@ -158,7 +158,7 @@ describe('G285: the last overlay stand-ins', () => {
   it("Feeling Called Love's heart is amorous_philtre_heart, a pc_overlay at delta_y -120", { skip: !haveGsjs }, async () => {
     assert.match(gsjs('items/catalog_buffs.js'), /pc\.announce_add_indicator\('feeling_called_love', 'amorous_philtre_heart'\);/);
     assert.match(gsjs('players/inc_announcements.js'), /delta_y: indicator\.delta_y \? indicator\.delta_y : -120,/);
-    const { LOVE_HEART } = await import('../public/js/features/potions-feature.js?v=c02ce2f6');
+    const { LOVE_HEART } = await import('../public/js/features/potions-feature.js?v=96e25d00');
     assert.deepEqual({ ...LOVE_HEART }, { key: 'amorous_philtre_heart', dy: -120 });
     assert.equal(manifest.amorous_philtre_heart.kind, 'sheet');
   });

@@ -24,11 +24,11 @@ import {
   shakeDeltas,
   shakeElement,
   shakePouch,
-} from '../public/js/elemental-pouch.js?v=ceefa97a';
-import { bagsFeature } from '../public/js/features/bags-feature.js?v=b27d87e9';
-import { runMoreVerb } from '../public/js/features/item-verbs-more-feature.js?v=ec07c315';
-import { pouchFeature } from '../public/js/features/elemental-pouch-feature.js?v=871146f9';
-import { FEATURES } from '../public/js/features/index.js?v=0bf392d0';
+} from '../public/js/elemental-pouch.js?v=42702eda';
+import { bagsFeature } from '../public/js/features/bags-feature.js?v=1b537f70';
+import { runMoreVerb } from '../public/js/features/item-verbs-more-feature.js?v=6dafdcc6';
+import { pouchFeature } from '../public/js/features/elemental-pouch-feature.js?v=1b5d25b3';
+import { FEATURES } from '../public/js/features/index.js?v=fb37e1c1';
 import { ITEM_CATALOG, countItem, createInventory } from '../public/js/inventory.js?v=f49c8998';
 import { STORE_CATALOG } from '../public/js/store-catalog.js?v=74b56af3';
 import { VENDOR_PROFILES, vendorBuy } from '../public/js/vendor.js?v=542d30c9';

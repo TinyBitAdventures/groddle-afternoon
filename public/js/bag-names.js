@@ -12,7 +12,11 @@
  *    user_name filled in.
  *  - onInputBoxResponse 605-611: the answer cut to 32, everything but
  *    letters, digits and spaces removed; only a non-empty answer becomes
- *    this.user_name (an empty one keeps the old name).
+ *    this.user_name (an empty one keeps the old name). Ours departs here on
+ *    Austin's word (2026-11-13, report #263): an empty answer clears the
+ *    player's name, so the bag goes back to its own name (its sort's name
+ *    when it has a sort, which a Sort can then give it again, else the class
+ *    label). The source had no way back to the default name.
  *  - getLabel 592-598: user_name when set, else the class label. That label
  *    is the item's label everywhere the client shows one (common.js
  *    make_item_simple 546): the open bag's header (glitch-client
@@ -82,11 +86,17 @@ export function cleanBagName(value) {
   return String(value).substr(0, BAG_NAME_MAX).replace(/[^a-z0-9 ]/gi, '').trim();
 }
 
-/** onInputBoxResponse 608-610: a non-empty answer is the new name, an empty one keeps the old. */
-export function renamedTo(oldName, value) {
-  const next = cleanBagName(value);
-  return next || cleanBagName(oldName);
+/**
+ * onInputBoxResponse 608-610: a non-empty answer is the new name. An empty one
+ * returns '' and clears the player's name (the source kept the old name; ours
+ * departs on Austin's word, 2026-11-13, #263).
+ */
+export function renamedTo(value) {
+  return cleanBagName(value);
 }
+
+/** The Name Me! box's hint line under the input (ours; the source's box had none). */
+export const BAG_RENAME_HINT = "Leave it blank for the bag's own name.";
 
 /**
  * getLabel 592-598: the player's name for it, else the class label. The name

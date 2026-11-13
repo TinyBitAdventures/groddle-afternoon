@@ -100,7 +100,7 @@ import {
   secondsToString,
 } from './machine-rooms.js?v=62bf02ed';
 import { ASSEMBLY_SKILL, FUEL_PER_CELL, MAX_FUEL, isMachine } from './machines.js?v=e96d8d3b';
-import { INTERIOR, interiorBounds } from './home-decor.js?v=bbf43c44';
+import { INTERIOR, interiorBounds } from './home-decor.js?v=06be9c65';
 import { machineRoomLayout } from './machine-rooms.js?v=62bf02ed';
 
 export const HOME_MACHINES_ID = 'home-machines';

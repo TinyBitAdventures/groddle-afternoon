@@ -36,7 +36,7 @@ import {
   placeFurniture,
   stackSurfaceAt,
   surfaceHeight,
-} from '../public/js/home-decor.js?v=bbf43c44';
+} from '../public/js/home-decor.js?v=06be9c65';
 import { FURNITURE_CATALOG } from '../public/js/homes-catalog.js?v=10ac34b6';
 
 const root = join(import.meta.dirname, '..');

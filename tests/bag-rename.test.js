@@ -6,7 +6,8 @@
  * (tooltip "Give me a new name", sort_on 67, "Name Me!" / "My new name:", 32
  * characters of 'A-Z a-z 0-9'), getLabel 592-598 (the name, else the label),
  * onInputBoxResponse 605-611 (cut to 32, letters, digits and spaces kept, an
- * empty answer keeps the old name). Rules: js/bag-names.js; the name lives on
+ * empty answer keeps the old name; ours clears it instead, Austin 2026-11-13,
+ * #263). Rules: js/bag-names.js; the name lives on
  * the bag's row in the pack arrangement (js/pack-slots.js), the feature is
  * features/bags-feature.js, a dropped bag keeps it (js/world-items.js).
  */
@@ -25,13 +26,14 @@ import {
   canRenameBag,
   cleanBagName,
   renamedTo,
-} from '../public/js/bag-names.js?v=22391c55';
-import { BAG_DEFS, PACK_CAPACITY, giveBag, layoutPack, moveStack, normalizePrefs, renameBag, takeBag } from '../public/js/pack-slots.js?v=4a36968a';
+  BAG_RENAME_HINT,
+} from '../public/js/bag-names.js?v=bba085e1';
+import { BAG_DEFS, PACK_CAPACITY, giveBag, layoutPack, moveStack, normalizePrefs, renameBag, takeBag } from '../public/js/pack-slots.js?v=4d446d78';
 import { ITEM_CATALOG, isToolItem } from '../public/js/inventory.js?v=f49c8998';
-import { createDroppedItemState, dropInventoryStack, parseDroppedItemState, placeDroppedBag, serializeDroppedItemState } from '../public/js/world-items.js?v=5e592293';
-import { bagsFeature } from '../public/js/features/bags-feature.js?v=b27d87e9';
-import { pouchFeature } from '../public/js/features/elemental-pouch-feature.js?v=871146f9';
-import { POUCH_CLASS } from '../public/js/elemental-pouch.js?v=ceefa97a';
+import { createDroppedItemState, dropInventoryStack, parseDroppedItemState, placeDroppedBag, serializeDroppedItemState } from '../public/js/world-items.js?v=deadf665';
+import { bagsFeature } from '../public/js/features/bags-feature.js?v=1b537f70';
+import { pouchFeature } from '../public/js/features/elemental-pouch-feature.js?v=1b5d25b3';
+import { POUCH_CLASS } from '../public/js/elemental-pouch.js?v=42702eda';
 import { HAS_SITE, SITE_DIR } from '../tools/repos.mjs';
 
 const ROOT = join(import.meta.dirname, '..');
@@ -84,12 +86,12 @@ describe('the rules (onInputBoxResponse 605-611)', () => {
     assert.equal(cleanBagName('   '), '');
   });
 
-  it('an empty answer keeps the old name; a new one replaces it', () => {
-    assert.equal(renamedTo('Lunchbox', ''), 'Lunchbox');
-    assert.equal(renamedTo('Lunchbox', '!!!'), 'Lunchbox');
-    assert.equal(renamedTo('Lunchbox', '   '), 'Lunchbox');
-    assert.equal(renamedTo('Lunchbox', 'Tools 2'), 'Tools 2');
-    assert.equal(renamedTo('', ''), '');
+  it('an empty answer clears the name (#263, departs from onInputBoxResponse 608-610); a new one replaces it', () => {
+    assert.equal(renamedTo(''), '');
+    assert.equal(renamedTo('!!!'), '');
+    assert.equal(renamedTo('   '), '');
+    assert.equal(renamedTo('Tools 2'), 'Tools 2');
+    assert.equal(BAG_RENAME_HINT, "Leave it blank for the bag's own name.");
   });
 
   it('shows the name, else the class label (getLabel 592-598)', () => {
@@ -153,14 +155,17 @@ describe('each bag has its own name (pack-slots.js)', () => {
     assert.deepEqual(layout.prefs.bags.find((b) => b.key === 'b1'), { key: 'b1', cls: 'bag_bigger' });
   });
 
-  it('an empty answer keeps the old name', () => {
-    const { prefs } = kit();
+  it('an empty answer puts the bag back on its class label (#263)', () => {
+    const { inv, prefs } = kit();
     const first = renameBag(prefs, 'b1', 'Fruit');
     const again = renameBag(first.prefs, 'b1', '   ');
     assert.equal(again.ok, true);
-    assert.equal(again.changed, false);
-    assert.equal(again.name, 'Fruit');
-    assert.equal(normalizePrefs(again.prefs).bags[0].name, 'Fruit');
+    assert.equal(again.changed, true);
+    assert.equal(again.name, '');
+    assert.deepEqual(normalizePrefs(again.prefs).bags[0], { key: 'b1', cls: 'bag_bigger' });
+    assert.equal(layoutPack(inv, again.prefs, OPTS).bags.b1.label, 'Bigger Bag');
+    // Blank on a bag with no name changes nothing.
+    assert.equal(renameBag(again.prefs, 'b1', '').changed, false);
   });
 
   it('a toolbox takes a name too; an unknown key does not', () => {
@@ -254,10 +259,14 @@ describe('the feature (bags-feature.js)', () => {
     const put = bagsFeature.packVerbs('cherry', engine).map((v) => v.label);
     assert.ok(put.includes('Put in Lunchbox (0/16)'), put.join(' | '));
     assert.ok(put.includes('Put in Bigger Bag (1/16)'), put.join(' | '));
-    // Blank keeps it, and does not save again.
+    // Blank clears it (#263) and saves; blank again does not save.
     globalThis.groddlePack.rename('b2', '');
-    assert.equal(engine.saves, 1);
-    assert.equal(bagsFeature.packBagInfo('b2', engine).label, 'Lunchbox');
+    assert.equal(engine.saves, 2);
+    assert.equal(bagsFeature.packBagInfo('b2', engine).label, 'Bigger Bag');
+    globalThis.groddlePack.rename('b2', '');
+    assert.equal(engine.saves, 2);
+    globalThis.groddlePack.rename('b2', 'Lunchbox');
+    assert.equal(engine.saves, 3);
     // Through JSON, as the save store and the site's save route keep it.
     const saved = JSON.parse(JSON.stringify(bagsFeature.save()));
     bagsFeature.restore(undefined, engine);
@@ -289,6 +298,20 @@ describe('the feature (bags-feature.js)', () => {
     assert.deepEqual(verbs.map((v) => v.id), ['pickup', 'rename']);
     assert.equal(verbs[1].tooltip, 'Give me a new name');
     assert.equal(bagsFeature.bagRenameGround(target, engine), true);
+    // A blank answer clears the name where it lies (#263); a new one sets it.
+    assert.equal(bagsFeature.bagRenameGround(target, engine, 'New one'), true);
+    const lying = () => engine.droppedItems.streets.LSTREET1.find((r) => r.id === placed.stack.id);
+    assert.equal(lying().name, 'New one');
+    assert.equal(bagsFeature.bagRenameGround(target, engine, ''), true);
+    assert.equal(lying().name, undefined);
+    assert.equal(engine.dropChanges, 2);
+    // A sorted bag on the ground goes back to its sort's name.
+    const sorted = placeDroppedBag(engine.droppedItems, 'LSTREET1', 'bag_bigger', [], { x: 40, y: 0 }, { name: 'Ore', sort: 'sort_mining' });
+    const sortedTarget = { classId: 'dropped_item', worldItemId: sorted.stack.id, state: { id: sorted.stack.id, classTsid: 'bag_bigger', name: 'Ore' } };
+    bagsFeature.bagRenameGround(sortedTarget, engine, '');
+    const row = engine.droppedItems.streets.LSTREET1.find((r) => r.id === sorted.stack.id);
+    assert.equal(row.name, undefined);
+    assert.equal(row.sortNamed, true);
     // A stack that is not the player's own record (a shared one) has no Rename.
     const shared = { classId: 'dropped_item', worldItemId: 'shared-1', state: { id: 'shared-1', classTsid: 'bag_generic' } };
     assert.equal(bagsFeature.decorateVerbs(shared, [{ id: 'pickup', label: 'pick up', enabled: true }], engine), null);

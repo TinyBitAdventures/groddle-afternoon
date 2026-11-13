@@ -33,7 +33,7 @@
 
 import { addItem, countItem, removeItem } from '../inventory.js?v=f49c8998';
 import { moodMax } from '../metabolics.js?v=1383e6fd';
-import { listDroppedStacks } from '../world-items.js?v=5e592293';
+import { listDroppedStacks } from '../world-items.js?v=deadf665';
 import {
   GARLIC_EAT_COUNTER,
   ITEM_VERBS,
@@ -45,7 +45,7 @@ import {
   itemVerbsFor,
   runItemVerb,
 } from '../item-verbs.js?v=994d3d4f';
-import { homesFeature } from './homes-feature.js?v=1277bc4e';
+import { homesFeature } from './homes-feature.js?v=7e6c817a';
 import { CROWNS_STREET } from '../game-of-crowns.js?v=e32f35f5';
 import { HOG_HAUL_STREET_ID } from '../hog-haul.js?v=50d2e072';
 import { isRaceSceneTsid } from '../races.js?v=ab22a079';

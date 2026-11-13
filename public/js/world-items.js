@@ -7,8 +7,8 @@
  * coupling it to Pixi or DOM state.
  */
 import { addItem, ITEM_CATALOG, removeItem } from './inventory.js?v=f49c8998';
-import { canRenameBag, cleanBagName } from './bag-names.js?v=22391c55';
-import { bagKeep } from './pack-slots.js?v=4a36968a';
+import { canRenameBag, cleanBagName } from './bag-names.js?v=bba085e1';
+import { bagKeep } from './pack-slots.js?v=4d446d78';
 import { ITEM_PLURALS } from './item-plurals-data.js?v=62e96051';
 
 export const WORLD_ITEM_STATE_VERSION = 1;

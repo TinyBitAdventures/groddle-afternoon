@@ -4,10 +4,11 @@
  * input_restrict, the current name filled in), drawn as a verb-menu card. The
  * Elemental Pouch's Rename box, now shared by every bag (features/bags-feature.js).
  *
- * openNamePrompt({ title, label, value, maxChars, restrict, onSubmit }) shows it
+ * openNamePrompt({ title, label, hint, value, maxChars, restrict, onSubmit }) shows it
  * (one at a time); OK or Enter calls onSubmit(the typed value), Cancel, the x and
  * Escape close it. restrict: a RegExp of the characters typing may not add
- * (input_restrict; the answer is cleaned again by whoever takes it).
+ * (input_restrict; the answer is cleaned again by whoever takes it). hint: an
+ * optional small line under the input (ours; the bag Rename's blank rule, #263).
  */
 
 let open = null;
@@ -21,7 +22,7 @@ export function namePromptOpen() {
   return Boolean(open?.isConnected);
 }
 
-export function openNamePrompt({ title = '', label = '', value = '', maxChars = 32, restrict = null, onSubmit = () => {} } = {}) {
+export function openNamePrompt({ title = '', label = '', hint = '', value = '', maxChars = 32, restrict = null, onSubmit = () => {} } = {}) {
   closeNamePrompt();
   if (typeof document === 'undefined') return null;
   const host = document.getElementById('verb-menu')?.parentElement || document.body;
@@ -39,6 +40,7 @@ export function openNamePrompt({ title = '', label = '', value = '', maxChars = 
         <label style="font-size:0.82rem;opacity:0.75"></label>
         <input type="text" autocomplete="off" spellcheck="false"
           style="font:inherit;padding:0.45rem 0.6rem;border:1px solid #d9ccb3;border-radius:8px;background:#fff" />
+        <div class="name-prompt-hint" style="font-size:0.75rem;opacity:0.7;margin-top:-0.25rem" hidden></div>
         <div style="display:flex;gap:0.5rem;justify-content:flex-end">
           <button type="button" data-cancel class="verb-choice" style="width:auto;border:1px solid #e4d9c4;border-radius:8px;padding:0.35rem 0.8rem">Cancel</button>
           <button type="submit" class="verb-choice" style="width:auto;border:1px solid #9cc47a;border-radius:8px;padding:0.35rem 0.8rem;background:#e8f0dc;font-weight:700">OK</button>
@@ -51,8 +53,15 @@ export function openNamePrompt({ title = '', label = '', value = '', maxChars = 
   const lab = wrap.querySelector('label');
   lab.textContent = label;
   lab.htmlFor = id;
+  const hintLine = wrap.querySelector('.name-prompt-hint');
+  if (hint) {
+    hintLine.textContent = hint;
+    hintLine.hidden = false;
+    hintLine.id = `${id}-hint`;
+  }
   const input = wrap.querySelector('input');
   input.id = id;
+  if (hint) input.setAttribute('aria-describedby', hintLine.id);
   input.maxLength = maxChars;
   input.value = String(value || '').slice(0, maxChars);
   if (restrict instanceof RegExp) {

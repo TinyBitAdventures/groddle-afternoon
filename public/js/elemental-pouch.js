@@ -33,7 +33,7 @@
  * cards (imagination-remake.js) and stay out.
  */
 
-import { cleanBagName } from './bag-names.js?v=22391c55';
+import { cleanBagName } from './bag-names.js?v=bba085e1';
 
 export const POUCH_CLASS = 'bag_elemental_pouch';
 export const POUCH_SKILL = 'elementhandling_1';

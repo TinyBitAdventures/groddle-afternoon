@@ -85,7 +85,7 @@ import {
   STACKMAX,
   TOOL_CLASSES,
 } from './pack-slots-data.js?v=800f664c';
-import { bagLabel, canRenameBag, cleanBagName, renamedTo } from './bag-names.js?v=22391c55';
+import { bagLabel, canRenameBag, cleanBagName, renamedTo } from './bag-names.js?v=bba085e1';
 
 /** PC.as:48 pack_slots; items/bag.js:1. */
 export const PACK_CAPACITY = 16;
@@ -1056,7 +1056,10 @@ export function giveBag(inv, prefs, cls, contents = [], opts = {}, name = '', ke
 
 /**
  * Rename one bag (verbs.rename, onInputBoxResponse 605-611): a non-empty answer,
- * cleaned, is its new name; an empty one keeps the old. key: the bag's prefs key.
+ * cleaned, is its new name. An empty one clears the player's name (Austin
+ * 2026-11-13, #263; the source kept the old name): the bag shows its sort's
+ * name again when it has a sort (sortNamed, so another Sort renames it too),
+ * else the class label. key: the bag's prefs key.
  * Returns { ok, prefs, name, changed } or { ok: false, reason }.
  */
 export function renameBag(prefs, key, value) {
@@ -1064,12 +1067,19 @@ export function renameBag(prefs, key, value) {
   const row = next.bags.find((b) => b.key === String(key || ''));
   if (!row) return { ok: false, reason: 'missing', prefs: next };
   if (!canRenameBag(row.cls)) return { ok: false, reason: 'not_renamable', prefs: next };
+  const before = `${row.name || ''}|${Boolean(row.sortNamed)}`;
   // verbs.rename 516: the name is the player's from now on, a sort's name included
   // (OK on the sort's name, as the box shows it, keeps it as the player's).
-  const name = renamedTo(row.name || (row.sortNamed ? sortName(row.sort) : ''), value);
-  const changed = name !== (row.name || '') || Boolean(row.sortNamed);
-  if (name) row.name = name;
-  delete row.sortNamed;
+  const name = renamedTo(value);
+  if (name) {
+    row.name = name;
+    delete row.sortNamed;
+  } else {
+    delete row.name;
+    if (row.sort) row.sortNamed = true;
+    else delete row.sortNamed;
+  }
+  const changed = `${row.name || ''}|${Boolean(row.sortNamed)}` !== before;
   return { ok: true, prefs: next, name, changed };
 }
 

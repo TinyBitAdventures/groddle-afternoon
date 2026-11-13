@@ -26,7 +26,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { SITE_DIR, skipWithoutSite } from '../tools/repos.mjs';
 import { FURNITURE_STARTER_KIT } from '../public/js/homes-catalog.js?v=10ac34b6';
-import { arrangeStarterRoom, createHomeDecorState, grantStarterKit } from '../public/js/home-decor.js?v=bbf43c44';
+import { arrangeStarterRoom, createHomeDecorState, grantStarterKit } from '../public/js/home-decor.js?v=06be9c65';
 import { takeFromHouse } from '../public/js/ledger-house.js?v=b34f5c89';
 import { applyCorrection } from '../public/js/features/ledger-feature.js?v=c172f473';
 
