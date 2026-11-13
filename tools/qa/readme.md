@@ -37,8 +37,12 @@ releases the lock.
 ## online-smoke.mjs: the two-player smoke check
 
     node tools/qa/online-smoke.mjs --local
-    node tools/qa/online-smoke.mjs --live          # prints what it will make, then stops
-    node tools/qa/online-smoke.mjs --live --yes    # production
+    node tools/qa/online-smoke.mjs --live          # prints what it would make, then stops
+    node tools/qa/online-smoke.mjs --live --yes    # production: only when Austin asks for it by name
+
+Smoke checks run on groddle.localhost (Austin 2026-11-13). The game has players every day, and a live run's
+throwaway "Zz Smoke" players chatting on a street look like real people. After a deploy, check live read-only
+(routes, /healthz, build.json, Minn Admin); `--live --yes` is kept for a run Austin asks for.
 
 Two throwaway players meet on one street and check: both get in; Local chat both ways (each waits up to 15 s for the line and records how long it took: a busy server can hold one for seconds, G536); a party
 invite, the Party chat in the Chats list and leaving; the save cloud's tooltip; a Reports round trip with a reply
