@@ -14,7 +14,18 @@
  *
  * --engine=webkit runs Playwright's WebKit (Safari's engine) and reads the physical footprint
  * (footprint(1), what Safari's memory reload weighs) of its WebContent and GPU processes; it has
- * no performance.memory.
+ * no performance.memory. Only this run's processes count (the ones that appeared when it opened
+ * its page: lanes on the other browser slot run WebKit at the same time, and summing every WebKit
+ * on the machine doubled a run's figures, G663), and each row also carries peakMB, the highest
+ * footprint sampled about every half second while it dwelt (a trip's peak lasts a second or two;
+ * the row's own reading comes after it). A row's procWarn notes a run that could not tell its
+ * processes apart.
+ *
+ * What the footprint weighs (G663, WebKit at iPhone size, footprint -p on Froughtful Fen): an
+ * <img>'s decoded pixels are memory WebKit may purge and barely count (52 Mpx of sheets held
+ * decoded: +5 MB), while ImageBitmaps (+204 MB for the same) and GL textures (+197 MB) count in
+ * full; the WebContent process's largest share is WebKit Malloc (JS heap and DOM, 378 of 525 MB).
+ * Decoded-image megapixels (decodedMB) are therefore not what Safari weighs.
  *
  * --phone dresses the context as an iPhone (its user agent, touch) that took the companion's
  * Load the full game anyway, so the phone gate classes it a phone (js/render-density.js caps
@@ -67,11 +78,19 @@ function processMemory() {
   }
 }
 
-/** Physical footprint (MB) of Playwright WebKit's WebContent and GPU processes (footprint(1)). */
+/** Pids of Playwright WebKit's processes whose command passes `re`. */
+function webkitPids(re) {
+  const rows = execFileSync('ps', ['-ax', '-o', 'pid=,command='], { encoding: 'utf8' }).split('\n');
+  return rows.map((r) => r.trim().match(/^(\d+)\s+(.*)$/)).filter((m) => m && /ms-playwright\/webkit/.test(m[2]) && re.test(m[2])).map((m) => m[1]);
+}
+
+/** This run's WebKit processes (set once its page has opened), or null for every one. */
+let ownPids = null;
+
+/** Physical footprint (MB) of this run's WebKit WebContent and GPU processes (footprint(1)). */
 function webkitFootprint() {
   try {
-    const rows = execFileSync('ps', ['-ax', '-o', 'pid=,command='], { encoding: 'utf8' }).split('\n');
-    const pick = (re) => rows.map((r) => r.trim().match(/^(\d+)\s+(.*)$/)).filter((m) => m && /ms-playwright\/webkit/.test(m[2]) && re.test(m[2])).map((m) => m[1]);
+    const pick = (re) => webkitPids(re).filter((pid) => !ownPids || ownPids.has(pid));
     const foot = (pids) => {
       let mb = 0;
       for (const pid of pids) {
@@ -90,8 +109,10 @@ function webkitFootprint() {
 const isWebkit = flags.engine === 'webkit';
 let browser;
 let close;
+let webkitBefore = new Set();
 if (isWebkit) {
   const lock = await acquireLock({ label: 'street-memory webkit' });
+  webkitBefore = new Set(webkitPids(/WebContent|GPU/));
   browser = await webkit.launch({ headless: true });
   close = async () => { await browser.close().catch(() => {}); lock.release(); };
 } else {
@@ -108,22 +129,45 @@ try {
   const page = await ctx.newPage();
   await page.goto(`${BASE}?autostart=1&questoffer=off&fresh=1&resetgame=1&memqa=1&streetdemo=${route[0]}${EXTRA_QUERY}`, { waitUntil: 'load' });
   await page.waitForFunction(() => window.groddleQA?.travel && !document.body.classList.contains('is-booting'), null, { timeout: 60000 });
+  let procWarn = null;
+  if (isWebkit) {
+    ownPids = new Set(webkitPids(/WebContent|GPU/).filter((pid) => !webkitBefore.has(pid)));
+    const count = (re) => webkitPids(re).filter((pid) => ownPids.has(pid)).length;
+    if (count(/WebContent/) !== 1 || count(/GPU/) !== 1) procWarn = { webContent: count(/WebContent/), gpu: count(/GPU/) };
+  }
   console.log(JSON.stringify(await page.evaluate(() => ({ device: window.GRODDLE_DEVICE ?? null, touch: navigator.maxTouchPoints, screen: [screen.width, screen.height] }))));
-  const sample = async (tsid, step) => {
+  /** WebKit: the dwell's highest footprint, sampled about every half second. */
+  const dwell = async (ms) => {
+    if (!isWebkit) {
+      await page.waitForTimeout(ms);
+      return null;
+    }
+    let peak = 0;
+    for (const end = Date.now() + ms; Date.now() < end;) {
+      const f = webkitFootprint();
+      peak = Math.max(peak, (f.rendererMB || 0) + (f.gpuMB || 0));
+      await page.waitForTimeout(400);
+    }
+    return peak;
+  };
+  const sample = async (tsid, step, peakMB) => {
     const m = await page.evaluate(() => {
       try { globalThis.gc?.(); } catch {}
       const r = window.groddleQA.renderStats();
       const s = window.groddleQA.snapshot();
       return { street: s?.street?.label || '', resolution: r.resolution, gpuTextures: r.gpuTextures, gpuTextureMB: r.gpuTextureMB, images: r.images, heapMB: performance.memory ? +(performance.memory.usedJSHeapSize / 1048576).toFixed(1) : null, extra: window.groddleQA.memoryStats?.() || null };
     });
-    const row = { step, tsid, ...m, decodedMB: +((m.images?.mpx || 0) * 4).toFixed(1), ...(isWebkit ? webkitFootprint() : processMemory()) };
+    const row = { step, tsid, ...m, decodedMB: +((m.images?.mpx || 0) * 4).toFixed(1), ...(isWebkit ? { ...webkitFootprint(), peakMB, ...(procWarn ? { procWarn } : {}) } : processMemory()) };
     rows.push(row);
     console.log(JSON.stringify(row));
   };
   for (let i = 0; i < route.length; i += 1) {
-    if (i > 0) await page.evaluate((t) => window.groddleQA.travel(t), route[i]);
-    await page.waitForTimeout(DWELL);
-    await sample(route[i], i);
+    // WebKit: the trip runs while the dwell samples, so its peak is caught.
+    const trip = i > 0 ? page.evaluate((t) => window.groddleQA.travel(t), route[i]) : null;
+    if (!isWebkit) await trip;
+    const peakMB = await dwell(DWELL);
+    await trip;
+    await sample(route[i], i, peakMB);
   }
 } finally {
   if (flags.out) writeFileSync(String(flags.out), JSON.stringify(rows, null, 1));
