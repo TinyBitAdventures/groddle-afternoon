@@ -110,9 +110,16 @@ export const PHONE_TEXT = Object.freeze({
   suspendedBody: 'This account is suspended.',
 });
 
-/** Where Play the game goes: the page the player came from (play/ for solo), else the online game. */
+/**
+ * Where Play the game goes: the page the player came from (play/ for solo), else the online game,
+ * with the address the link had (the gate's next=, iPhone round 3: a link with ?autostart=1 or a demo
+ * landed on the phone page and lost them).
+ */
 export function fullGameHref(search = '') {
-  return new URLSearchParams(String(search || '')).get('from') === 'solo' ? 'play/' : 'play/online/';
+  const params = new URLSearchParams(String(search || ''));
+  const base = params.get('from') === 'solo' ? 'play/' : 'play/online/';
+  const next = new URLSearchParams(params.get('next') || '').toString();
+  return next ? `${base}?${next}` : base;
 }
 
 /** What a phone report carries besides the words (src/BugReports.php CONTEXT keys). */

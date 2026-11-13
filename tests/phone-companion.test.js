@@ -40,7 +40,7 @@ import {
   takenMailIds,
   unreadLetters,
   whereWords,
-} from '../public/js/phone/companion-data.js?v=e9d3d3d4';
+} from '../public/js/phone/companion-data.js?v=9e02f28c';
 
 const pub = join(import.meta.dirname, '..', 'public');
 const read = (p) => readFileSync(join(pub, p), 'utf8');
@@ -111,6 +111,9 @@ describe('the phone gate on /play/ and /play/online/', () => {
     assert.equal(r.window.GRODDLE_PHONE, true);
     assert.equal(runGate(script, { ua: UA.android, touch: 5, fine: false, coarse: true, screen: [412, 915] }).to, 'https://groddle.localhost/play/phone/');
     assert.equal(runGate(script, { ua: UA.iphone, touch: 5, fine: false, path: '/play/', hash: '#verify=abc' }).to, 'https://groddle.localhost/play/phone/?from=solo#verify=abc');
+    // iPhone round 3: a link's own settings ride along as next= for Play the game to hand back.
+    assert.equal(runGate(script, { ua: UA.iphone, touch: 5, fine: false, path: '/play/', search: '?autostart=1&homedemo=cultivate' }).to, 'https://groddle.localhost/play/phone/?from=solo&next=autostart%3D1%26homedemo%3Dcultivate');
+    assert.equal(runGate(script, { ua: UA.iphone, touch: 5, fine: false, search: '?autostart=1' }).to, 'https://groddle.localhost/play/phone/?next=autostart%3D1');
   });
 
   it('sends touch-only tablets too, but a tablet with a trackpad or mouse plays', () => {
@@ -449,6 +452,12 @@ describe('Reports: a photo instead of a game picture', () => {
   it('Play the game goes back where the player came from', () => {
     assert.equal(fullGameHref(''), 'play/online/');
     assert.equal(fullGameHref('?from=solo'), 'play/');
+  });
+
+  it('Play the game hands back the address the link had (the gate\'s next=, iPhone round 3)', () => {
+    assert.equal(fullGameHref('?from=solo&next=autostart%3D1%26homedemo%3Dcultivate'), 'play/?autostart=1&homedemo=cultivate');
+    assert.equal(fullGameHref('?next=autostart%3D1'), 'play/online/?autostart=1');
+    assert.equal(fullGameHref('?from=solo&next='), 'play/');
   });
 
   it('knows a phone the way the gate does (phone or a small touch screen), so Play the game is for one load there', () => {

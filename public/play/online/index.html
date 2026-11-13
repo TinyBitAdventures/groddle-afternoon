@@ -39,6 +39,8 @@
     the same every time). Its Play the game button lets one load through: it sets sessionStorage
     groddle-play-once, which this gate reads and removes (or, with storage blocked, adds #play, which
     this gate strips from the address), so a reload shows the phone page again.
+    A link's own settings (?autostart=1, a demo) ride to the phone page as next= and come back with
+    Play the game (js/phone/companion-data.js fullGameHref; iPhone round 3).
     localStorage groddle-play-device: "full" (Play the game on a touch tablet) lets a tablet play every
     time, as before; a phone ignores it. "companion" always opens the phone page. "qa-game" is the QA
     switch: the game on any device, still named a phone (tools/qa phone contexts set it).
@@ -77,7 +79,10 @@
       }
       if (once) return;
       var to = new URL('play/phone/', d.baseURI);
-      if (/\/play\/$/.test(w.location.pathname)) to.search = '?from=solo';
+      if (/\/play\/$/.test(w.location.pathname)) to.searchParams.set('from', 'solo');
+      // A link's own settings (?autostart=1, a demo) ride along as next= and come back on Play the game.
+      var search = String(w.location.search || '');
+      if (search.length > 1) to.searchParams.set('next', search.slice(1));
       to.hash = w.location.hash;
       w.GRODDLE_PHONE = true;
       try { w.stop(); } catch (e) { /* the redirect still runs */ }
