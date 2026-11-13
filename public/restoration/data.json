@@ -2788,13 +2788,18 @@
   ]
  },
  "release": {
-  "game": "0.36.1",
+  "game": "0.37.0",
   "deployed": "2026-11-13"
  },
  "git": {
-  "commits": 2030,
+  "commits": 2032,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-13",
+    "kind": "improve",
+    "text": "Ilmenskie Caverns' map takes its second painting, with every street in a tunnel"
+   },
    {
     "date": "2026-11-13",
     "kind": "improve",
@@ -2909,11 +2914,6 @@
     "date": "2026-11-13",
     "kind": "improve",
     "text": "The street map is never left hidden in a scene, and the phone sheet opened early shows a calm empty card"
-   },
-   {
-    "date": "2026-11-13",
-    "kind": "improve",
-    "text": "Walking back to a street shows its map at once"
    }
   ]
  },
