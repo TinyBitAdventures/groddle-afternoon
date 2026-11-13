@@ -1,6 +1,6 @@
 /**
- * The street toys online (register G679): Lotha Harte's notes and heart and Icicle Dangles' lights
- * are the street's, shared with everyone there, as they were in Glitch
+ * The street toys online (register G679): Lotha Harte's notes and heart, Icicle Dangles' lights and
+ * Koulato Cluster's firefly jars are the street's, shared with everyone there, as they were in Glitch
  * (the location kept the flags and loc.* variables, deco_show/deco_hide went to every player and were
  * replayed to each arrival, play_sound all_players reached everyone: GameServerJS
  * locations/inc_events.js events_broadcast, inc_geo.js geo_deco_toggle_visibility). The realtime
@@ -12,7 +12,8 @@
  *
  * Each game runs the events it is sent on the street's own scripts and, every frame, brings its own
  * flags to the last state it was told (catchUp*), so a player arriving mid-state, or one whose socket
- * dropped, sees what the others see. Pure: street-toys-feature fires what these answer.
+ * dropped, sees what the others see. Pure: the features (street-toys-feature, koulato-jars-feature)
+ * fire what these answer.
  */
 
 export const TOY_CLICK = 'toy_click';
@@ -33,14 +34,18 @@ const bools = (list, n = 3) => Array.from({ length: n }, (_, i) => Boolean(Array
 
 /**
  * The server's state as this game keeps it, from a toy_state, or a toy_played over the last one
- * (prev): { toys, lit } for Lotha Harte, { toys, lights } for Icicle Dangles. Null when the message
- * says nothing usable.
+ * (prev): { toys, lit } for Lotha Harte, { toys, lights } for Icicle Dangles, { toys, arrivals, out,
+ * jars } for Koulato Cluster. Null when the message says nothing usable.
  */
 export function toyServerState(msg, prev = null) {
   if (!msg || typeof msg !== 'object') return prev;
   if (msg.t === 'toy_state') {
     if (msg.toys === 'lotha') return { toys: 'lotha', lit: msg.lit === true };
     if (msg.toys === 'dangles') return { toys: 'dangles', lights: bools(msg.lights) };
+    if (msg.toys === 'koulato') {
+      const n = Math.floor(Number(msg.arrivals));
+      return { toys: 'koulato', arrivals: Number.isFinite(n) && n > 0 ? n : 0, out: msg.out === true, jars: bools(msg.jars) };
+    }
     return prev;
   }
   if (msg.t !== 'toy_played' || !prev) return prev;
@@ -55,8 +60,39 @@ export function toyServerState(msg, prev = null) {
       const m = /^shroom_light_([123])_(on|off)$/.exec(e);
       if (m) next.lights[Number(m[1]) - 1] = m[2] === 'on';
     }
+  } else if (prev.toys === 'koulato') {
+    if (typeof msg.out === 'boolean') next.out = msg.out;
+    if (Array.isArray(msg.lit)) next.jars = bools(msg.lit);
+    const n = Math.floor(Number(msg.arrivals));
+    if (Number.isFinite(n) && n >= 0) next.arrivals = n;
   }
   return next;
+}
+
+/**
+ * The server's last word on the street this player's socket stands on. A join's toy_state can come
+ * before the game has entered the street (the socket joins while the street loads), so each feature
+ * keeps one of these from its first frame online and reads it on arrival (stateFor). roster(msg) on
+ * each roster (a new street's comes before its toy_state) forgets another street's word.
+ */
+export function createToyTracker() {
+  let street = '';
+  let state = null;
+  return {
+    roster(msg) {
+      if (!msg?.street || toyMessageFor(msg, street)) return;
+      street = String(msg.street);
+      state = null;
+    },
+    take(msg) {
+      if (msg?.t === 'toy_state') {
+        street = String(msg.street || '');
+        state = toyServerState(msg, null);
+      } else if (msg?.t === 'toy_played' && toyMessageFor(msg, street)) state = toyServerState(msg, state);
+      return state;
+    },
+    stateFor: (tsid) => (toyMessageFor({ street }, tsid) ? state : null),
+  };
 }
 
 /**
@@ -85,4 +121,41 @@ export function catchUpDangles(server, flag) {
     out.push({ clear: `light${n}`, fire: `shroom_light_${n}_${on ? 'on' : 'off'}` });
   });
   return out;
+}
+
+/**
+ * Koulato Cluster: the events that bring this game's jars (jarsOn: flag jars_on; lit: the jars lit
+ * here) to the server's: place_jars or put away (turn_off, hide_all), then each jar on or off.
+ * Answers { fire: [...], lit }.
+ */
+export function catchUpKoulato(server, jarsOn, lit) {
+  if (!server || server.toys !== 'koulato') return { fire: [], lit };
+  const fire = [];
+  let now = [...lit];
+  if (server.out && !jarsOn) {
+    fire.push('place_jars');
+    now = [false, false, false];
+  } else if (!server.out && jarsOn) {
+    fire.push('turn_off', 'hide_all');
+    now = [false, false, false];
+  }
+  if (server.out) {
+    server.jars.forEach((on, i) => {
+      if (on === now[i]) return;
+      fire.push(`jar${i + 1}_${on ? 'on' : 'off'}`);
+      now[i] = on;
+    });
+  }
+  return { fire, lit: now };
+}
+
+/**
+ * The completion's jars this game puts down itself: the ones the server could not share ("own") for
+ * this player (me). Each { n }: the caller drops it at JAR_BOXES[n - 1].drop.
+ */
+export function ownJars(msg, me) {
+  if (!Array.isArray(msg?.jars) || me == null) return [];
+  return msg.jars
+    .filter((j) => j && j.own === true && Number(j.id) === Number(me) && [1, 2, 3].includes(Number(j.n)))
+    .map((j) => ({ n: Number(j.n) }));
 }
