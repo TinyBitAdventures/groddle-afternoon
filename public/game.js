@@ -1033,6 +1033,7 @@ import { createQuestSheet, failedQuestPin, questLogNeedsSwap, questStep } from '
 import { createQuestTracker } from './js/ui/quest-tracker.js?v=36a9983f';
 import { bindContextTrigger, createContextMenu, isContextMenuKey as isMenuKey, MORE_KEYS_LABEL } from './js/ui/context-menu.js?v=55c84488';
 import { bindCountField, countKeyValue, countStepMarkup, createCountChooser, typedCount } from './js/ui/count-chooser.js?v=5bc894c8';
+import { createScrollKeep } from './js/ui/scroll-keep.js?v=2898b5b1';
 import { bindVerbMenu, centerVerbMenu, fitVerbMenuRows, focusVerbRow, lockVerbMenuSize, makePickTile, makeVerbRow, pickGridCols, placeVerbMenu, plainWords, refuseVerbRow, syncVerbDetail, verbMenuKey, verbRowAttrs, verbRowInner, verbRowKeys } from './js/ui/verb-menu.js?v=94936f9c';
 import { createPromptSettler, promptId } from './js/prompt-settle.js?v=509ba9cc';
 import { clientKeyAction, createHotkeysSheet, isHotkeySheetRelease, isPlainKey } from './js/client-hotkeys.js?v=2922915e';
@@ -2467,6 +2468,8 @@ let vendorDragBag = '';
 /** @type {null|{ label:string, qty:number, gain:number }} */
 let vendorSellReceipt = null;
 let vendorReceiptTimer = 0;
+/** #288: where the shelf (and the sheet's body) was scrolled, by vendor and tab, kept across a redraw. */
+const vendorShelfScroll = createScrollKeep();
 /** @type {string} make panel tool filter (`all` or tool class_tsid) */
 let makeToolFilter = 'all';
 /** Report #175: Make opens on the tools ('tools'); a tool's own screen is 'tool' (makeToolFilter names it). */
@@ -28773,6 +28776,9 @@ function closeVendor() {
   if (panel) panel.hidden = true;
   vendorSelected = null;
   vendorDragTsid = null;
+  // #288: a vendor opened next starts at the top of its shelf.
+  vendorShelfScroll.clear();
+  delete document.getElementById('vendor-list')?.dataset.shelf;
   document.getElementById('vendor-sell-drop')?.classList.remove('is-dragover');
 }
 
@@ -29531,6 +29537,11 @@ function renderVendorList() {
   const curEl = document.getElementById('vendor-currants');
   if (curEl) curEl.textContent = String(pc.currants || 0);
   if (!list) return;
+  // #288 (Classic, the Sell tab): the shelf jumped back to the top after each sale, Classic hiding it
+  // for the count and drawing it again after. Its place is taken while it shows and put back after.
+  const shelfScrollers = [list, list.closest('.vendor-body')];
+  const shelfKey = `${activeVendor.key}:${vendorTab}`;
+  if (!list.hidden && list.dataset.shelf) vendorShelfScroll.take(list.dataset.shelf, shelfScrollers);
   packPanelStamps.vendor = packStamp(inv, pc, toolState);
   renderVendorDropZone();
 
@@ -29542,7 +29553,10 @@ function renderVendorList() {
       ? ['data-vq', 'data-vq-val', 'data-v-go', 'data-v-back'].find((a) => document.activeElement.hasAttribute(a))
       : null;
     const hadFocusVal = hadFocus === 'data-vq' ? document.activeElement.getAttribute('data-vq') : null;
-    if (vendorPop) drawVendorTiles(list);
+    if (vendorPop) {
+      drawVendorTiles(list);
+      vendorShelfScroll.restore(shelfKey, shelfScrollers);
+    }
     list.hidden = !vendorPop;
     detail.hidden = false;
     const isBuy = vendorTab === 'buy';
@@ -29675,6 +29689,8 @@ function renderVendorList() {
         list.querySelector(`[data-vendor-item="${CSS.escape(was || '')}"]`)?.focus({ preventScroll: true });
         return;
       }
+      // #288: back on the shelf, the tile sold from has the focus again (if any are left), as a buy does.
+      const soldFrom = r.ok && !isBuy ? vendorSelected : null;
       if (r.ok && !isBuy) {
         vendorSellReceipt = { label, qty: r.qty, gain: r.gain };
         vendorSelected = null;
@@ -29688,6 +29704,7 @@ function renderVendorList() {
       }
       updateHud();
       renderVendorList();
+      if (soldFrom) list.querySelector(`[data-vendor-item="${CSS.escape(soldFrom)}"]`)?.focus({ preventScroll: true });
     });
     return;
   }
@@ -29700,6 +29717,7 @@ function renderVendorList() {
   // The room a pop under the bottom row asked for goes with it (placeVendorPop).
   list.style.paddingBottom = '';
   drawVendorTiles(list);
+  vendorShelfScroll.restore(shelfKey, shelfScrollers);
 }
 
 /** Space kept under a vendor pop once it is scrolled into view (px). */
@@ -29842,6 +29860,8 @@ bindContextTrigger(document.getElementById('vendor-list'), {
 function drawVendorTiles(list) {
   list.hidden = false;
   list.innerHTML = '';
+  // #288: the shelf this is (renderVendorList keeps its scroll by it).
+  list.dataset.shelf = `${activeVendor.key}:${vendorTab}`;
 
   if (vendorTab === 'buy') {
     for (const row of listBuyOffers(activeVendor.offers, pc.imaginationUpgrades)) {
