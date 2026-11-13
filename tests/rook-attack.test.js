@@ -307,7 +307,7 @@ describe('rooked things and cures', () => {
 });
 
 describe('rook attack feature', async () => {
-  const { ROOK_SHEETS, rookAttackFeature } = await import('../public/js/features/rook-attack-feature.js?v=d0863cf5');
+  const { ROOK_SHEETS, rookAttackFeature } = await import('../public/js/features/rook-attack-feature.js?v=8a6233dc');
   const { createFeatureHost } = await import('../public/js/feature-host.js?v=06bb8b74');
 
   /** Pixel size from a PNG IHDR or a WebP VP8/VP8L/VP8X header. */
@@ -338,7 +338,7 @@ describe('rook attack feature', async () => {
   // of 124x46, 8 to a row. Cut as 124x92 x16 it played two frames stacked and its last two cells
   // half empty. The scene is in the SWF's loopers and its last frame leads into its first.
   it('plays the rooked halo as the SWF did: 30 single frames at 30 fps, looping seamlessly', async () => {
-    const { ROOKED_HALO } = await import('../public/js/features/rook-attack-feature.js?v=d0863cf5');
+    const { ROOKED_HALO } = await import('../public/js/features/rook-attack-feature.js?v=8a6233dc');
     const { readImage } = await import('../tools/builder/art-image.mjs');
     const def = ROOK_SHEETS.halo;
     assert.deepEqual({ fw: def.fw, fh: def.fh, cols: def.cols, frames: def.frames }, { fw: 124, fh: 46, cols: 8, frames: 30 });
@@ -384,7 +384,7 @@ describe('rook attack feature', async () => {
   // The rooked animals' clips: the server's cadence per class, the SWFs' 30 fps, and only the
   // scenes the SWFs list in loopers loop (the rest play once and hold, as the client did).
   it('cycles the rooked animal clips on the server cadence, looping only the SWF loopers', async () => {
-    const { ROOKED_CADENCE, ROOKED_FPS, ROOKED_LOOPERS } = await import('../public/js/features/rook-attack-feature.js?v=d0863cf5');
+    const { ROOKED_CADENCE, ROOKED_FPS, ROOKED_LOOPERS } = await import('../public/js/features/rook-attack-feature.js?v=8a6233dc');
     assert.equal(ROOKED_FPS, 30);
     assert.deepEqual([...ROOKED_LOOPERS].sort(), ['bflyFly', 'bflyRest', 'piggy1']);
     const flat = (c) => [c.start, ...c.cycle].map(([clip, ms]) => `${clip}:${ms}`).join(' ');
@@ -527,7 +527,7 @@ describe('rook schedule: once a day (Austin 2026-11-04, as online)', () => {
   });
 
   it('drives the feature: an old save waits a day, then the dwell and the picked moment', async () => {
-    const { rookAttackFeature } = await import('../public/js/features/rook-attack-feature.js?v=d0863cf5');
+    const { rookAttackFeature } = await import('../public/js/features/rook-attack-feature.js?v=8a6233dc');
     const realNow = Date.now;
     const prevPixi = globalThis.PIXI;
     // Enough Pixi for the sheet loader to try (and quietly fail) its loads in node.

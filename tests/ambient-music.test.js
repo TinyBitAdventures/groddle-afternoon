@@ -18,7 +18,7 @@ import {
   SILENT_THEME,
 } from '../public/js/ambient-music.js?v=274c2864';
 
-import { SOUND_ALIASES, SOUND_FILES } from '../public/js/sound-keys.js?v=fb6ee553';
+import { SOUND_ALIASES, SOUND_FILES } from '../public/js/sound-keys.js?v=d6b20718';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const GSJS_MAIN = join(__dirname, '../../glitch-GameServerJS/main.js');

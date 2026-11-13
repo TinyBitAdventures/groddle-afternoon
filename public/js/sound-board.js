@@ -15,7 +15,7 @@
  * wherever the key is played, the sound test included, and ships untouched.
  */
 
-import { SOUND_ALIASES, SOUND_CATEGORIES, SOUND_FILES, SOUND_GAINS } from './sound-keys.js?v=fb6ee553';
+import { SOUND_ALIASES, SOUND_CATEGORIES, SOUND_FILES, SOUND_GAINS } from './sound-keys.js?v=d6b20718';
 import { playSynthRecipe, recipeForKey } from './synth-sfx.js?v=c30a1709';
 import { legacySoundKey } from './sound-moments.js?v=c57351b3';
 

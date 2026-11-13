@@ -21,7 +21,7 @@ import assert from 'node:assert/strict';
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { GLITCH_ONE_CLICK, GLITCH_ONE_CLICK_ABSENT, ONE_CLICK_ITEM_OF, isOneClick, oneClickChoice, oneClickItem, oneClickVerbId, worldContextAction } from '../public/js/world-context-menu.js?v=2a64801e';
+import { GLITCH_ONE_CLICK, GLITCH_ONE_CLICK_ABSENT, ONE_CLICK_ITEM_OF, isOneClick, oneClickChoice, oneClickItem, oneClickVerbId, worldContextAction } from '../public/js/world-context-menu.js?v=1c5adfee';
 import { cabinetVerbs } from '../public/js/home-storage.js?v=b0225465';
 import { poleVerbs } from '../public/js/home-street-mp.js?v=3364056b';
 
@@ -31,13 +31,13 @@ const GSJS_ITEMS = join(root, '../glitch-GameServerJS/items');
 const CLIENT = join(root, '../glitch-client/com/tinyspeck/engine/control/TSFrontController.as');
 
 const LISTED = {
-  bag_furniture_cabinet: 'open', bag_furniture_smallcabinet: 'open', bag_furniture_wallcabinet: 'open', esquibeth_button: 'press',
+  bag_furniture_cabinet: 'open', bag_furniture_smallcabinet: 'open', bag_furniture_wallcabinet: 'open', clickable_broadcaster: 'click_broadcast', esquibeth_button: 'press',
   letter_block: 'spin', magic_rock: 'talk_to', note_pole: 'read_oneclick', npc_spinning_wheel: 'spin', pile_of_currants: 'collect',
   wall_button: 'press', wall_switch: 'press',
 };
 
 describe('G661: Glitch\'s one-click items', () => {
-  it('the 24 classes are all accounted for: 11 in the game, 13 not (with why)', () => {
+  it('the 24 classes are all accounted for: 12 in the game, 12 not (with why)', () => {
     assert.deepEqual(Object.keys(GLITCH_ONE_CLICK).sort(), Object.keys(LISTED).sort());
     for (const [cls, glitch] of Object.entries(LISTED)) assert.equal(GLITCH_ONE_CLICK[cls].glitch, glitch, cls);
     assert.equal(Object.keys(GLITCH_ONE_CLICK).length + Object.keys(GLITCH_ONE_CLICK_ABSENT).length, 24);

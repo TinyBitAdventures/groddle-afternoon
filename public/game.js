@@ -2,9 +2,9 @@
  * Groddle Afternoon — original street geometry + layered decos
  * PixiJS 8 · locations-xml streets · CoU PNG decos · quests/items
  */
-import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=f6c16f91';
+import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=bf046b8e';
 import { createErrorOnce, createFeatureHost } from './js/feature-host.js?v=06bb8b74';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=8f618fbb';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=ed146889';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl, drawTileArt } from './js/enter-chooser.js?v=4a3ea327';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -490,8 +490,8 @@ import { PACK_COPY, isBagClass, isElementClass, ownBagLabel, unitRankAt } from '
 import { FLOAT_TEXT_Z, SPEECH_BUBBLE_Z } from './js/fx-z.js?v=18dda7e3';
 import { hasPouch } from './js/elemental-pouch.js?v=42702eda';
 import { createPackRow, mountPackClearance, packBandRange, packCountText, packSearchEntries, packSlotTip } from './js/ui/pack-row.js?v=64e4a567';
-import { listAnimalFeedOptions, piggyFeedTip } from './js/animals.js?v=1435a456';
-import { pickerMaxCount, pickerOptionsFor, pickerTakesCount } from './js/animals.js?v=1435a456';
+import { listAnimalFeedOptions, piggyFeedTip } from './js/animals.js?v=2520b6ed';
+import { pickerMaxCount, pickerOptionsFor, pickerTakesCount } from './js/animals.js?v=2520b6ed';
 import {
   createDroppedItemState,
   parseDroppedItemState,
@@ -510,7 +510,7 @@ import {
   parsePlayerSave,
   serializePlayerSave,
   restorePlayerSave,
-} from './js/player-save.js?v=99bfe5bd';
+} from './js/player-save.js?v=9aed8356';
 import {
   HOME_INTERIOR_TSID,
   HOME_STREET_TSID,
@@ -774,7 +774,7 @@ import {
   trantStatusLabel,
   trantFootAnchorY,
 } from './js/trants.js?v=4d6f5593';
-import { growStreetTrant } from './js/patches.js?v=5ba97b77';
+import { growStreetTrant } from './js/patches.js?v=1ba4f75f';
 import {
   runStreetTransition,
   showAwardScreen,
@@ -850,7 +850,7 @@ import {
   planMusicblockDrop,
   playMusicblock,
   starterMusicblocks,
-} from './js/musicblocks.js?v=765ac56d';
+} from './js/musicblocks.js?v=c498f7c3';
 import {
   VENDOR_PROFILES,
   selectVendorProfile,
@@ -869,7 +869,7 @@ import {
   createAnimalState,
   resetAnimalDay,
   animalStatusLabel,
-} from './js/animals.js?v=1435a456';
+} from './js/animals.js?v=2520b6ed';
 import {
   ensureWoodTreeState,
   pickWoodTool,
@@ -907,7 +907,7 @@ import {
   favorRelationNote,
   emblemRelationNote,
   formatSpeedUpTime,
-} from './js/shrines.js?v=a190faea';
+} from './js/shrines.js?v=7260fa28';
 import { shrineSheet, shrineVariantFor } from './js/shrine-variants.js?v=7f11c97d';
 import { giantDisplayName } from './js/giant-names.js?v=0e295891';
 import { shrinePowderOptions, shrinePowderAchievementCounters } from './js/powders.js?v=6f3d6671';
@@ -920,7 +920,7 @@ import {
   spinMeResponse,
   spinningWheelPhase,
   startSpinningWheel,
-} from './js/spinning-wheel.js?v=b277fdea';
+} from './js/spinning-wheel.js?v=afbea251';
 import {
   CUBIMAL_PACKAGE_IDS,
   cubimalCollectionProgress,
@@ -993,12 +993,12 @@ import {
   treePlacementRequest,
   ROCK_SHAPE_WIDTHS,
 } from './js/street-ecology.js?v=64dcdacc';
-import { CHICKEN_PAUSE, chickenPauseRoll, easeToward, flightFloorAt, flightFloorFor, flyerLift } from './js/street-creatures.js?v=bbc7e9b4';
+import { CHICKEN_PAUSE, chickenPauseRoll, easeToward, flightFloorAt, flightFloorFor, flyerLift } from './js/street-creatures.js?v=ee7dfd05';
 import { chickenPose, chickenIdleSheetsAsked } from './js/chicken-idle-art.js?v=556916bb';
 import { chickenWaitPose } from './js/chicken-idles.js?v=eef0279b';
 import { itemOverlayStats } from './js/item-overlay.js?v=a2d2e5a3';
 import { isCrowdSad } from './js/animal-crowding.js?v=0ffb4ced';
-import { createSoundBoard, DEFAULT_SFX_VOLUME, watchButtonClicks, watchPanelSounds } from './js/sound-board.js?v=7ff169eb';
+import { createSoundBoard, DEFAULT_SFX_VOLUME, watchButtonClicks, watchPanelSounds } from './js/sound-board.js?v=794a189b';
 import {
   actionLoopFor,
   legacySoundKey,
@@ -1043,7 +1043,7 @@ import { clientKeyAction, createHotkeysSheet, isHotkeySheetRelease, isPlainKey }
 import { ENCYCLOPEDIA_MENU_LABEL, createEncyclopedia, isEncyclopediaKey } from './js/encyclopedia-links.js?v=eebc2a5d';
 import { EAT_PICK_TEXT, bestFoodIndex, eatChoices, eatTip } from './js/eat-pick.js?v=8fb763d0';
 import { heldDirection, installHeldKeyGuard, isMacPlatform } from './js/held-keys.js?v=a28eb293';
-import { oneClickChoice, signpostArmRows, worldContextAction } from './js/world-context-menu.js?v=2a64801e';
+import { oneClickChoice, signpostArmRows, worldContextAction } from './js/world-context-menu.js?v=1c5adfee';
 import { blockedPlayerVerbs, listPlayerTarget, opensPlayerMenu, playerMenuRows } from './js/ui/player-menu.js?v=2a12c1a6';
 import { forgetTexture, frameTexture, isFailed, isLoaded, onFailed, onLoaded, textureFromUrl, whenLoaded } from './js/textures.js?v=814d7926';
 import { FALLBACK_MAX as WORLD_ART_FALLBACK_MAX, worldArtFor } from './js/world-art.js?v=0729bf92';
@@ -10278,6 +10278,8 @@ function interactReach(t) {
   let d = interactDistance(t, player.x, player.y);
   // Only things already close need the floor test (the callers' cut-off is 100).
   if (d < 160 && behindFloorFromPlayer(t)) return Infinity;
+  // G679: a street toy (an invisible Clickable Broadcaster) is clicked, never the Enter key's nearest thing.
+  if (t.clickOnly) return Infinity;
   // Prefer individual garden plots over the bed foot / large entities
   if (t.classId === 'dropped_item') {
     if (d > 130) return Infinity;
@@ -33574,7 +33576,7 @@ async function main() {
     },
   };
   if (new URLSearchParams(location.search).has('soundtest')) {
-    import('./js/sound-test.js?v=372afc9c').then((m) => m.openSoundTest({ document, playSound, board: () => audio.board, unmute: async () => {
+    import('./js/sound-test.js?v=87f8b580').then((m) => m.openSoundTest({ document, playSound, board: () => audio.board, unmute: async () => {
       state.muted = false;
       if (audio.ctx?.state === 'suspended') {
         try { await audio.ctx.resume(); } catch (_) { /* opt-in */ }

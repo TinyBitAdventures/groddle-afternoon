@@ -1217,6 +1217,27 @@
    "zip": "1274727254-CarnivorousPlantsDigestion.mp3",
    "md5": "254c61e17eef806c29002ead6ec95ca1",
    "match": "music_map"
+  },
+  {
+   "key": "WM_D1",
+   "zip": "1342025873-wm_d1.mp3",
+   "md5": "c9a310fdfd4a637530b9dd021d0fd96c",
+   "match": "filename",
+   "why": "Lotha Harte (LHV88RQU60B3Q0G.xml) first_note: a click on one of the street's three hanging icicles plays its note (register G679, js/street-toys.js). Pitch matches the name."
+  },
+  {
+   "key": "WM_D2",
+   "zip": "1342025965-wm_d2.mp3",
+   "md5": "91dc79f8a3fa784710eb35362a1d5254",
+   "match": "filename",
+   "why": "Lotha Harte (LHV88RQU60B3Q0G.xml) second_note: a click on one of the street's three hanging icicles plays its note (register G679, js/street-toys.js). Pitch matches the name."
+  },
+  {
+   "key": "WM_E2",
+   "zip": "1342025965-wm_e2.mp3",
+   "md5": "a9fd0525d07c1411f4a71ff7af8847a7",
+   "match": "filename",
+   "why": "Lotha Harte (LHV88RQU60B3Q0G.xml) third_note: a click on one of the street's three hanging icicles plays its note (register G679, js/street-toys.js). Pitch matches the name."
   }
  ],
  "aliases": {
@@ -1338,24 +1359,6 @@
    "key": "WM_C2",
    "zip": "1342025874-wm_c2.mp3",
    "md5": "cca050c9aa902921826e8d0f75999f19",
-   "why": "Pitch matches the name; Ding a Lingers / Lotha Harte note events, which nothing triggers in the remake (no item or box fires them)."
-  },
-  {
-   "key": "WM_D1",
-   "zip": "1342025873-wm_d1.mp3",
-   "md5": "c9a310fdfd4a637530b9dd021d0fd96c",
-   "why": "Pitch matches the name; Ding a Lingers / Lotha Harte note events, which nothing triggers in the remake (no item or box fires them)."
-  },
-  {
-   "key": "WM_D2",
-   "zip": "1342025965-wm_d2.mp3",
-   "md5": "91dc79f8a3fa784710eb35362a1d5254",
-   "why": "Pitch matches the name; Ding a Lingers / Lotha Harte note events, which nothing triggers in the remake (no item or box fires them)."
-  },
-  {
-   "key": "WM_E2",
-   "zip": "1342025965-wm_e2.mp3",
-   "md5": "a9fd0525d07c1411f4a71ff7af8847a7",
    "why": "Pitch matches the name; Ding a Lingers / Lotha Harte note events, which nothing triggers in the remake (no item or box fires them)."
   },
   {

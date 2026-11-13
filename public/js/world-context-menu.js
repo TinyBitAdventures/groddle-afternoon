@@ -41,11 +41,13 @@ export const ONE_CLICK_VERBS = Object.freeze({ npc_mailbox: 'view_inbox' });
  *
  * The ones the game has, by item class: the verb as our menu names it, and Glitch's verb id.
  * visitorsOnly: note_pole.js 494 hides read_oneclick from the owner at home (their menu has read and more).
+ * clickable_broadcaster: the street toys of Lotha Harte (G679, features/street-toys-feature.js).
  */
 export const GLITCH_ONE_CLICK = Object.freeze({
   bag_furniture_cabinet: Object.freeze({ verb: 'cabinet_open', glitch: 'open' }),
   bag_furniture_smallcabinet: Object.freeze({ verb: 'cabinet_open', glitch: 'open' }),
   bag_furniture_wallcabinet: Object.freeze({ verb: 'cabinet_open', glitch: 'open' }),
+  clickable_broadcaster: Object.freeze({ verb: 'click_broadcast', glitch: 'click_broadcast' }),
   esquibeth_button: Object.freeze({ verb: 'press', glitch: 'press' }),
   letter_block: Object.freeze({ verb: 'spin', glitch: 'spin' }),
   magic_rock: Object.freeze({ verb: 'talk_to', glitch: 'talk_to' }),
@@ -57,12 +59,11 @@ export const GLITCH_ONE_CLICK = Object.freeze({
 });
 
 /**
- * G661: the other 13 of the 24, and why none is in GLITCH_ONE_CLICK. newxp_chain already pulls on a
+ * G661: the other 12 of the 24, and why none is in GLITCH_ONE_CLICK. newxp_chain already pulls on a
  * click (its own hit area, features/newxp-feature.js), so it never had a menu to skip.
  */
 export const GLITCH_ONE_CLICK_ABSENT = Object.freeze({
   bag_sdb: 'not in the game',
-  clickable_broadcaster: 'not in the game (Operation Grow\'s bog patches were designed in its place)',
   esquibeth_note_1: 'not a thing in the game (the notes are set into the glyph, quest-rooms/esquibeth.js)',
   esquibeth_note_2: 'not a thing in the game',
   esquibeth_note_3: 'not a thing in the game',

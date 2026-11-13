@@ -10,11 +10,11 @@
   "mirrored": 1,
   "downloadsBestFit": 27,
   "archiveorgSfx": 214,
-  "soundsZip": 189,
+  "soundsZip": 192,
   "overlayFla": 3,
-  "withFile": 472,
+  "withFile": 475,
   "aliases": 89,
-  "playable": 561,
+  "playable": 564,
   "dead": 3,
   "live": 635
  },
@@ -10097,7 +10097,13 @@
    ],
    "sources": [
     "street:GHV88RQU60B3Q0G (Lotha Harte first_note)"
-   ]
+   ],
+   "file": "assets/audio/sfx/WM_D1.mp3",
+   "origin": "sounds-zip",
+   "why": "Lotha Harte (LHV88RQU60B3Q0G.xml) first_note: a click on one of the street's three hanging icicles plays its note (register G679, js/street-toys.js). Pitch matches the name.",
+   "zipFile": "1342025873-wm_d1.mp3",
+   "zipMd5": "c9a310fdfd4a637530b9dd021d0fd96c",
+   "zipMatch": "filename"
   },
   "WM_D2": {
    "category": "event",
@@ -10108,7 +10114,13 @@
    ],
    "sources": [
     "street:GHV88RQU60B3Q0G (Lotha Harte second_note)"
-   ]
+   ],
+   "file": "assets/audio/sfx/WM_D2.mp3",
+   "origin": "sounds-zip",
+   "why": "Lotha Harte (LHV88RQU60B3Q0G.xml) second_note: a click on one of the street's three hanging icicles plays its note (register G679, js/street-toys.js). Pitch matches the name.",
+   "zipFile": "1342025965-wm_d2.mp3",
+   "zipMd5": "91dc79f8a3fa784710eb35362a1d5254",
+   "zipMatch": "filename"
   },
   "WM_E2": {
    "category": "event",
@@ -10120,7 +10132,13 @@
    "sources": [
     "street:GHFIEG6R1JD30UH (Ding a Lingers note_4)",
     "street:GHV88RQU60B3Q0G (Lotha Harte third_note)"
-   ]
+   ],
+   "file": "assets/audio/sfx/WM_E2.mp3",
+   "origin": "sounds-zip",
+   "why": "Lotha Harte (LHV88RQU60B3Q0G.xml) third_note: a click on one of the street's three hanging icicles plays its note (register G679, js/street-toys.js). Pitch matches the name.",
+   "zipFile": "1342025965-wm_e2.mp3",
+   "zipMd5": "a9fd0525d07c1411f4a71ff7af8847a7",
+   "zipMatch": "filename"
   },
   "WM_G1": {
    "category": "event",

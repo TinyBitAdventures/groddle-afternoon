@@ -22,7 +22,7 @@ import {
   stackQuoinText,
 } from '../public/js/quoin-shards.js?v=121156a0';
 import { QUOIN_TYPES, collectQuoin, createQuoinState, creditQuoinStat } from '../public/js/quoins.js?v=61be601c';
-import { SOUND_ALIASES, SOUND_FILES } from '../public/js/sound-keys.js?v=fb6ee553';
+import { SOUND_ALIASES, SOUND_FILES } from '../public/js/sound-keys.js?v=d6b20718';
 
 const here = import.meta.dirname;
 const pub = join(here, '../public');
