@@ -37,7 +37,7 @@ import {
   takenMailIds,
   unreadLetters,
   whereWords,
-} from '../public/js/phone/companion-data.js?v=37feac5b';
+} from '../public/js/phone/companion-data.js?v=5b243cbe';
 
 const pub = join(import.meta.dirname, '..', 'public');
 const read = (p) => readFileSync(join(pub, p), 'utf8');

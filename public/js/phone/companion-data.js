@@ -48,7 +48,7 @@ export const PHONE_TEXT = Object.freeze({
   playTitle: 'Play on this phone',
   home: 'Visit the home page',
   full: 'Load the full game anyway',
-  fullHint: 'New and experimental. Hold your phone upright, and send a report if something goes wrong.',
+  fullHint: 'New and experimental. Upright or sideways. Send a report if something goes wrong.',
   fullRemembered: 'This device opens the full game.',
   useThisPage: 'Use this page instead',
   refresh: 'Refresh',

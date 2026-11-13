@@ -91,3 +91,11 @@ describe('a sideways phone\'s stage', () => {
     assert.match(game, /if \(!far\.phone\) return base;/);
   });
 });
+
+describe('the companion page says both ways up', () => {
+  it('"Upright or sideways", still new and experimental, still asking for a report', async () => {
+    const { PHONE_TEXT } = await import('../public/js/phone/companion-data.js?v=5b243cbe');
+    assert.equal(PHONE_TEXT.fullHint, 'New and experimental. Upright or sideways. Send a report if something goes wrong.');
+    assert.doesNotMatch(PHONE_TEXT.fullHint, /upright,|Hold your phone/);
+  });
+});

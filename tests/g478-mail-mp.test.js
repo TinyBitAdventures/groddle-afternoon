@@ -36,7 +36,7 @@ import { playerMailFeature } from '../public/js/features/player-mail-feature.js?
 import { createMailboxState, deliverMail, listMailboxMessages, mailCost, normalizeMailboxState, recordSentMail } from '../public/js/mailbox.js?v=a3e833ba';
 import { handOver, isExpressPending, sendDueToMailbox } from '../public/js/mail-courier.js?v=68125101';
 import { mailText } from '../public/js/ui/topbar.js?v=f3230b0a';
-import { mergePlayerMail } from '../public/js/phone/companion-data.js?v=37feac5b';
+import { mergePlayerMail } from '../public/js/phone/companion-data.js?v=5b243cbe';
 import { mailJson } from '../tools/build-mail.mjs';
 import { ITEM_BASE_COSTS } from '../public/js/store-catalog.js?v=74b56af3';
 import { HAS_SITE, SITE_DIR, sitePath } from '../tools/repos.mjs';
