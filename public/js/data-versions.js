@@ -587,7 +587,7 @@
       "encyclopedia/search.json": "4ad7d288",
       "landing/card-explore.webp": "7a2c1124",
       "landing/full/card-explore.webp": "cbce4e96",
-      "restoration/gaps.json": "5e224c19",
+      "restoration/gaps.json": "28c35f02",
       "restoration/made.json": "4952f335",
       "restoration/shots/interrogation.webp": "4778b1b1",
     },

@@ -2792,9 +2792,29 @@
   "deployed": "2026-11-13"
  },
  "git": {
-  "commits": 2042,
+  "commits": 2047,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-13",
+    "kind": "improve",
+    "text": "Make's footer count fits on one line in Modern"
+   },
+   {
+    "date": "2026-11-13",
+    "kind": "fix",
+    "text": "Classic: the Quests cards no longer show a Pin to screen button that does nothing"
+   },
+   {
+    "date": "2026-11-13",
+    "kind": "fix",
+    "text": "Quests' Offered tab shows every new quest, with Accept and Not right now"
+   },
+   {
+    "date": "2026-11-13",
+    "kind": "fix",
+    "text": "Make's \"Show them\" lists the recipes you know, each saying what it is missing"
+   },
    {
     "date": "2026-11-13",
     "kind": "fix",
@@ -2894,29 +2914,9 @@
     "date": "2026-11-13",
     "kind": "improve",
     "text": "A sharp desktop draws the vendors' 3x walks; a phone keeps the 1x walk strips"
-   },
-   {
-    "date": "2026-11-13",
-    "kind": "improve",
-    "text": "The walking vendors are as sharp walking, turning and stopping as standing on Retina screens"
-   },
-   {
-    "date": "2026-11-13",
-    "kind": "fix",
-    "text": "Online, a player arriving on Lotha Harte or Icicle Dangles picks up the street's state even when it comes while the street loads"
-   },
-   {
-    "date": "2026-11-13",
-    "kind": "new",
-    "text": "Online, Koulato Cluster's firefly jars come out for everyone at the street's 30th arrival, and three players on them share the Firefly Jars"
-   },
-   {
-    "date": "2026-11-13",
-    "kind": "new",
-    "text": "Online, Lotha Harte's notes and heart and Icicle Dangles' lights are heard and seen by everyone on the street"
    }
   ]
  },
- "tests": 962,
+ "tests": 963,
  "generatedAt": "2026-11-13"
 }
