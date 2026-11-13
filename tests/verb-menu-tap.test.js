@@ -12,7 +12,7 @@ import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { bindVerbMenu } from '../public/js/ui/verb-menu.js?v=94936f9c';
-import { STICK_TAP_MS, isTapThrough } from '../public/js/touch-controls.js?v=b6071ea4';
+import { STICK_TAP_MS, isTapThrough } from '../public/js/touch-controls.js?v=c7b3f264';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const game = readFileSync(join(root, 'public/game.js'), 'utf8');

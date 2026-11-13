@@ -9,8 +9,8 @@ import assert from 'node:assert/strict';
 import { createFeatureHost } from '../public/js/feature-host.js?v=06bb8b74';
 import { createInventory, countItem } from '../public/js/inventory.js?v=f49c8998';
 import { bindToolInventory, createToolConditionState } from '../public/js/tools.js?v=48542c24';
-import { levitateHint, meditationFeature } from '../public/js/features/meditation-feature.js?v=e6ca9001';
-import { TOUCH_JUMP_EVENT } from '../public/js/touch-controls.js?v=b6071ea4';
+import { levitateHint, meditationFeature } from '../public/js/features/meditation-feature.js?v=8d5797b3';
+import { TOUCH_JUMP_EVENT } from '../public/js/touch-controls.js?v=c7b3f264';
 import { teleportationFeature } from '../public/js/features/teleportation-feature.js?v=84f28379';
 
 function fakeEngine(overrides = {}) {

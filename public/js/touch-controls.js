@@ -143,6 +143,13 @@ export function installTouchControls({ root, press, release, jump, tapThrough = 
   // A short tap that never moved the stick: whether it held a key, and when it landed.
   let moved = false;
   let downAt = 0;
+  // G674: the stick follows only the finger that started it. Other fingers that land on its corner
+  // while it is held (a thumb on its way to Jump, a pinch) are kept here and never move or reset it;
+  // a press that had one is never a tap on the street. tapReady: the stick's own quick tap, for the
+  // click that follows it.
+  const others = new Set();
+  let multi = false;
+  let tapReady = false;
   const hold = (next) => {
     for (const k of held) if (!next.includes(k)) release(k);
     for (const k of next) press(k);
@@ -173,11 +180,22 @@ export function installTouchControls({ root, press, release, jump, tapThrough = 
     frame = 0;
   };
   zone.addEventListener('pointerdown', (e) => {
-    if (stickId != null) return;
+    if (stickId != null) {
+      if (e.pointerId !== stickId) {
+        e.preventDefault();
+        e.stopPropagation();
+        others.add(e.pointerId);
+        multi = true;
+      }
+      return;
+    }
+    if (others.has(e.pointerId)) return;
     e.preventDefault();
     stickId = e.pointerId;
     origin = { x: e.clientX, y: e.clientY };
     moved = false;
+    multi = others.size > 0;
+    tapReady = false;
     downAt = e.timeStamp;
     try { zone.setPointerCapture(e.pointerId); } catch { /* a synthetic pointer */ }
     zone.classList.add('is-held');
@@ -196,12 +214,24 @@ export function installTouchControls({ root, press, release, jump, tapThrough = 
     hold(next);
   });
   for (const type of ['pointerup', 'pointercancel', 'lostpointercapture']) {
-    zone.addEventListener(type, (e) => { if (e.pointerId === stickId) endStick(); });
+    zone.addEventListener(type, (e) => {
+      if (e.pointerId !== stickId) {
+        others.delete(e.pointerId);
+        return;
+      }
+      if (type === 'pointerup' && origin) {
+        tapReady = !multi && isTapThrough({ moved, ms: e.timeStamp - downAt, dx: e.clientX - origin.x, dy: e.clientY - origin.y });
+      }
+      endStick();
+    });
   }
   // The mobile QA (2026-11-12): a chicken under the stick's corner could not be tapped. A quick tap
-  // that never moved the stick (the browser's click: a tap, never a drag) is a tap on the street behind.
+  // that never moved the stick (the browser's click: a tap, never a drag) is a tap on the street behind;
+  // a second finger's click, or a press a second finger joined, is not (G674).
   zone.addEventListener('click', (e) => {
-    if (isTapThrough({ moved, ms: e.timeStamp - downAt })) tapThrough?.(e.clientX, e.clientY);
+    const ready = tapReady && stickId == null && !others.size && isTapThrough({ moved, ms: e.timeStamp - downAt });
+    tapReady = false;
+    if (ready) tapThrough?.(e.clientX, e.clientY);
   });
 
   let jumpId = null;
@@ -231,6 +261,8 @@ export function installTouchControls({ root, press, release, jump, tapThrough = 
   const releaseAll = () => {
     endStick();
     endJump();
+    others.clear();
+    tapReady = false;
   };
   win.addEventListener('blur', releaseAll);
   const keyboard = watchPhoneKeyboard({ doc, win });
