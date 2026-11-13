@@ -2752,9 +2752,14 @@
   "deployed": "2026-11-12"
  },
  "git": {
-  "commits": 1828,
+  "commits": 1831,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-12",
+    "kind": "new",
+    "text": "Made for Groddle, the restoration report's section on art made for the remake"
+   },
    {
     "date": "2026-11-12",
     "kind": "fix",
@@ -2869,11 +2874,6 @@
     "date": "2026-11-12",
     "kind": "fix",
     "text": "Three quest reward lines say what was really paid"
-   },
-   {
-    "date": "2026-11-12",
-    "kind": "fix",
-    "text": "A Master Gardener pour on a shared bed says too tired only when you are"
    }
   ]
  },
