@@ -402,6 +402,20 @@ const PANEL_CSS = `
 @media (max-width:640px){.img-card{--w:150px;--h:202px}.img-front .img-title{font-size:var(--fs-sm);padding:7px var(--sp-4)}.img-front .img-cost{font-size:var(--fs-base)}
   .img-back h3{font-size:var(--fs-md)}.img-back p{font-size:var(--fs-2xs)}.img-back .img-back-text{padding:var(--sp-5)}.img-hand{gap:var(--sp-5)}}
 @media (max-width:480px){.img-card{--w:132px;--h:178px}}
+/* #265, #266 (an upright phone): the third card wrapped under the first two, below the fold. The hand is
+   three small cards side by side (each a third of the row, the card's own shape), so every card and its
+   Get Upgrade show at once; the back's words keep scrolling between the title and the button. */
+@media (max-width:480px){.img-hand{flex-wrap:nowrap}
+  .img-card{--w:calc((100% - 2 * var(--sp-3)) / 3);--h:auto;max-width:132px;aspect-ratio:207 / 279}
+  .img-front .img-title{left:3px;right:3px;bottom:3px;padding:var(--sp-3) var(--sp-2);font-size:var(--fs-xs)}
+  .img-front .img-cost{top:var(--sp-3);right:var(--sp-4);font-size:var(--fs-sm)}
+  .img-front.keepable .img-title{bottom:var(--sp-10)}
+  .img-back .img-back-text{padding:var(--sp-4) var(--sp-4) var(--sp-3)}
+  .img-back h3{margin-bottom:var(--sp-2);font-size:var(--fs-xs)}
+  .img-back .img-back-words{margin-bottom:var(--sp-2)}
+  .img-back .img-buy{padding:var(--sp-2) var(--sp-1);font-size:var(--fs-xs);box-shadow:0 2px 0 var(--c-green-52)}
+  .img-back .img-buy:disabled{box-shadow:0 2px 0 var(--c-slate-74b)}
+  .img-back .img-back-cost{margin-top:var(--sp-1);font-size:var(--fs-xs)}}
 `;
 
 function el(tag, attrs = {}, text = '') {

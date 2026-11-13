@@ -12952,6 +12952,10 @@ body:has(#quest-dialogue:not([hidden])) .prompt-stack { z-index: calc(var(--z-mo
 [data-ui="modern"] #imagination-panel .img-tabs button { padding: 0; border: 0; }
 [data-ui="modern"] #imagination-panel .img-body { position: relative; padding: var(--space-1) var(--space-4) var(--space-3); }
 [data-ui="modern"] #imagination-panel .img-hand { gap: var(--space-5); padding: var(--space-5) var(--space-3) var(--space-4); border-radius: var(--radius-m); background: var(--surface-sunken); }
+/* #265, #266: on an upright phone the three cards stand side by side (imagination-feature.js), in a tighter well. */
+@media (max-width: 480px) {
+  [data-ui="modern"] #imagination-panel .img-hand { gap: var(--sp-3); padding: var(--space-3) var(--space-2); }
+}
 [data-ui="modern"] #imagination-panel .img-card:focus-visible { outline: 2px solid var(--focus); outline-offset: 4px; }
 [data-ui="modern"] #imagination-panel .img-help { margin: var(--space-2) 0 0; color: var(--text-muted); font-size: var(--fs-s); }
 [data-ui="modern"] #imagination-panel .img-empty { padding: var(--space-6) var(--space-3); color: var(--text-muted); font-size: var(--fs-m); }
