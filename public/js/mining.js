@@ -112,6 +112,48 @@ export const ROCK_CATALOG = {
   },
 };
 
+/**
+ * Each rock kind's three shapes (the placements audit, 2026-11-12): items/rock_<kind>_2.js and _3.js
+ * are proxy_item rock_<kind>_1 with their own art and the same mining (street-ecology.js
+ * ROCK_SHAPE_SHARES), so a rock keeps its _1 class and draws its shape's sheet: Tiny Speck's own
+ * five chunk frames (x1_5 ... x1_1, as the _1 sheets) from OpenGameArt glitch-assets-2.7z (CC0,
+ * glitch-assets/rock_<kind>_<n>/rock_<kind>_<n>__x1_5_x1_4_x1_3_x1_2_x1_1_png_<epoch>.png, pixels
+ * unchanged, lossless WebP). Shape 1 is the catalog's own sheet.
+ */
+const shapeSheet = (file, frameWidth, frameHeight, textureKey) =>
+  Object.freeze({ worldSheet: `assets/sprites/mining/${file}`, sheetFrames: 5, frameWidth, frameHeight, textureKey });
+export const ROCK_SHAPES = Object.freeze({
+  rock_metal_1: Object.freeze({
+    2: shapeSheet('rock_metal_2.webp', 156, 137, 'mineRockMetal2'),
+    3: shapeSheet('rock_metal_3.webp', 184, 92, 'mineRockMetal3'),
+  }),
+  rock_dullite_1: Object.freeze({
+    2: shapeSheet('rock_dullite_2.webp', 131, 130, 'mineRockDullite2'),
+    3: shapeSheet('rock_dullite_3.webp', 180, 82, 'mineRockDullite3'),
+  }),
+  rock_beryl_1: Object.freeze({
+    2: shapeSheet('rock_beryl_2.webp', 146, 129, 'mineRockBeryl2'),
+    3: shapeSheet('rock_beryl_3.webp', 184, 98, 'mineRockBeryl3'),
+  }),
+  rock_sparkly_1: Object.freeze({
+    2: shapeSheet('rock_sparkly_2.webp', 151, 150, 'mineRockSparkly2'),
+    3: shapeSheet('rock_sparkly_3.webp', 173, 88, 'mineRockSparkly3'),
+  }),
+});
+
+/** A rock's sheet for its shape (1-3): { worldSheet, sheetFrames, frameWidth, frameHeight, textureKey }. */
+export function rockShapeSheet(classTsid, shape = 1) {
+  const def = ROCK_CATALOG[classTsid];
+  if (!def) return null;
+  return ROCK_SHAPES[classTsid]?.[shape] || def;
+}
+
+/** game.js SHEETS rows for the _2 and _3 shapes (the _1 sheets are listed there by hand). */
+export const ROCK_SHAPE_SHEETS = Object.freeze(Object.fromEntries(
+  Object.values(ROCK_SHAPES).flatMap((shapes) => Object.values(shapes))
+    .map((s) => [s.textureKey, Object.freeze({ url: s.worldSheet, fw: s.frameWidth, fh: s.frameHeight, cols: 5, rows: 1 })])
+));
+
 /** GSJS catalog_skill_packages mining / smelting / refining (mining_1 rank). */
 export const MINING_COSTS = {
   energy: 12,

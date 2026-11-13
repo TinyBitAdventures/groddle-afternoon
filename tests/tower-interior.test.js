@@ -17,7 +17,7 @@ import {
   isInteriorHub,
   populationForStreet,
   setStreetEcologyCatalog,
-} from '../public/js/street-ecology.js?v=f27417a8';
+} from '../public/js/street-ecology.js?v=4922aff5';
 import { applyIndexHub, loadStreetDataFromFs } from '../public/js/street-loader.js?v=18b181ad';
 import { TOWER_ROOMS, VENT } from '../public/js/tower-rooms.js?v=f238eaa9';
 import { ALL_TOWER_ROOMS } from '../public/js/tower-challenge-rooms.js?v=7502a893';

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3.11
-"""Jellisac and Peat Bog spots measured from players' full-street snaps (player reports #249, #250).
+"""Jellisac, Peat Bog and rock spots measured from players' full-street snaps (player reports #249, #250).
 
 Tiny Speck's 2012 location files only count a street's Jellisacs and Peat Bogs, never where they
 were, and both were set by hand (jellisac.js and peat_base.js obey_physics false). The planner
@@ -31,6 +31,19 @@ Each spot is [x, y, variant]: the frame cell's bottom centre in street px (what
 resource-nodes-feature.js draws a measured node from: anchor 0.5, 1 on the cell), and the variant
 number the snap shows (jellySack<n>, peat<n>).
 
+Rocks (the placements audit of 2026-11-12): Glitch's Metal, Beryl, Dullite and Sparkly Rocks were set
+by hand too (rock_metal_1.js etc. obey_physics false), and each came in three shapes, rock_<kind>_1,
+_2 and _3 (the _2 and _3 classes are proxy_item of _1: the same rock to mine, its own art). The
+planner put 31% of them on floors where the street never had one. Every rock template (each kind's
+three shapes, every chunk frame) is matched at half resolution (ROCK_DOWN: 60 templates over a
+12000 px street would cost minutes a snap at full size), each hit then refined at full resolution in
+a ROCK_REFINE px window over its kind's 15 templates, which gives its spot and its shape. Real rocks
+score 0.90-0.99 at half resolution and the best non-rock 0.81 (ROCK_THRESHOLD; Sparkly's glitter
+scores lower, 0.84). Each spot is [x, y, shape]: the frame cell's bottom centre in street px, as
+game.js spawnMineRock draws it (anchor 0.5, 1, at 1:1), and the shape the snap shows (1, 2, 3). At
+most the location file's count of each kind is kept (the most seen, then the best), and the game
+plans the rest.
+
 The game reads the spots from public/js/node-spots-data.js (written from
 public/assets/content/node-spots.json here, so street-ecology.js has them in the browser, the
 realtime builders and the tests alike).
@@ -40,14 +53,18 @@ Usage (python3.11 has numpy + Pillow):
   python3.11 -I tools/snap-placements/nodes.py --check            exit 1 when the .js does not match the .json
   python3.11 -I tools/snap-placements/nodes.py --crops <dir>      also save a crop of every street's matches
   python3.11 -I tools/snap-placements/nodes.py --only jellisac:GIFDIDJT0GU1CR8 --dry
+  python3.11 -I tools/snap-placements/nodes.py --group rocks       measure only the rocks, keep the rest
 With no research/eleven-snaps beside the repo (a public clone) it says so and writes nothing.
 """
 import argparse, json, os, re, sys, unicodedata
 from multiprocessing import Pool
+for _v in ('OMP_NUM_THREADS', 'OPENBLAS_NUM_THREADS', 'VECLIB_MAXIMUM_THREADS', 'MKL_NUM_THREADS'):
+    os.environ.setdefault(_v, '1')
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
 SNAPS = os.path.join(ROOT, '..', 'research', 'eleven-snaps')
 SPRITES = os.path.join(ROOT, 'public', 'assets', 'sprites', 'resources')
+MINING = os.path.join(ROOT, 'public', 'assets', 'sprites', 'mining')
 ECOLOGY = os.path.join(ROOT, 'public', 'assets', 'content', 'street-ecology.json')
 INDEX = os.path.join(ROOT, 'public', 'assets', 'streets', 'index.json')
 OUT = os.path.join(ROOT, 'public', 'assets', 'content', 'node-spots.json')
@@ -77,6 +94,24 @@ CLASSES = {
         'near': (90, 30),
     },
 }
+# js/mining.js ROCK_CATALOG and ROCK_SHAPES: rock class -> shape -> (sheet, cell w, h); five chunk frames
+# a sheet (Tiny Speck's x1_5 ... x1_1), every one matched.
+ROCKS = {
+    'rock_metal_1': {'export': 'ROCK_METAL_SPOTS', 'threshold': 0.88,
+                     'shapes': {1: ('rock_metal.webp', 137, 100), 2: ('rock_metal_2.webp', 156, 137), 3: ('rock_metal_3.webp', 184, 92)}},
+    'rock_beryl_1': {'export': 'ROCK_BERYL_SPOTS', 'threshold': 0.88,
+                     'shapes': {1: ('rock_beryl.webp', 134, 120), 2: ('rock_beryl_2.webp', 146, 129), 3: ('rock_beryl_3.webp', 184, 98)}},
+    'rock_dullite_1': {'export': 'ROCK_DULLITE_SPOTS', 'threshold': 0.88,
+                       'shapes': {1: ('rock_dullite.webp', 131, 114), 2: ('rock_dullite_2.webp', 131, 130), 3: ('rock_dullite_3.webp', 180, 82)}},
+    'rock_sparkly_1': {'export': 'ROCK_SPARKLY_SPOTS', 'threshold': 0.84,
+                       'shapes': {1: ('rock_sparkly.webp', 131, 127), 2: ('rock_sparkly_2.webp', 151, 150), 3: ('rock_sparkly_3.webp', 173, 88)}},
+}
+ROCK_FRAMES = (0, 1, 2, 3, 4)
+ROCK_DOWN = 0.5
+ROCK_REFINE = 6  # px each way, full resolution
+ROCK_NEAR = (50, 40)  # one rock per this box in a snap (Glitch's rocks stand 60 px apart and more)
+ROCK_MERGE_PX = 24  # the same rock in two snaps (a frame's cell may shift its best fit a few px)
+ROCK_MIN_FULL = 0.75  # a refined hit under this at full resolution was a lucky blur: dropped
 MERGE_PX = 10
 MIN_STD = 0.03  # a flat patch (sky, a plain wall) never counts
 
@@ -190,6 +225,136 @@ def street_job(job):
     return {**job, 'per_snap': per_snap}
 
 
+def rock_templates(np, Image):
+    """[(class, shape, frame, full RGBA cell, half RGBA cell)] for every rock template."""
+    out = []
+    for cls, rock in ROCKS.items():
+        for shape, (file, fw, fh) in rock['shapes'].items():
+            sheet = Image.open(os.path.join(MINING, file)).convert('RGBA')
+            for f in ROCK_FRAMES:
+                cell = sheet.crop((f * fw, 0, f * fw + fw, fh))
+                full = np.asarray(cell).astype(np.float64) / 255
+                if (full[..., 3] > 0.5).sum() < 40:
+                    continue
+                half = np.asarray(cell.resize((max(4, round(fw * ROCK_DOWN)), max(4, round(fh * ROCK_DOWN))), Image.LANCZOS)).astype(np.float64) / 255
+                out.append((cls, shape, f, full, half))
+    return out
+
+
+def ncc_window(np, I, fr, x0, y0, reach):
+    """Best masked NCC of one full-size template with its top left within `reach` px of (x0, y0): (score, x, y)."""
+    from numpy.lib.stride_tricks import sliding_window_view
+    H, W = I.shape
+    h, w = fr.shape[:2]
+    lx, ly = max(0, x0 - reach), max(0, y0 - reach)
+    hx, hy = min(W - w, x0 + reach), min(H - h, y0 + reach)
+    if hx < lx or hy < ly:
+        return (-1, x0, y0)
+    region = I[ly:hy + h, lx:hx + w]
+    M = (fr[..., 3] > 0.5).astype(np.float64)
+    T = gray(np, fr)
+    n = M.sum()
+    Tp = (T - (T * M).sum() / n) * M
+    view = sliding_window_view(region, (h, w))
+    num = np.einsum('abij,ij->ab', view, Tp)
+    s1 = np.einsum('abij,ij->ab', view, M)
+    s2 = np.einsum('abij,ij->ab', view * view, M) if view.size < 4e7 else np.einsum('abij,ij->ab', sliding_window_view(region * region, (h, w)), M)
+    var = np.maximum(s2 - s1 * s1 / n, 0)
+    score = num / np.sqrt((Tp * Tp).sum() * np.maximum(var, 1e-9))
+    score[var / n < MIN_STD * MIN_STD] = 0
+    b = np.unravel_index(int(np.argmax(score)), score.shape)
+    return (float(score[b]), lx + int(b[1]), ly + int(b[0]))
+
+
+def rock_snap(np, Image, path, W, H, templates):
+    """Every rock one snap shows: [(full score, class, shape, frame, ax, ay, half score)]."""
+    im = Image.open(path).convert('RGB')
+    if im.size != (W, H):
+        if abs(im.size[0] / im.size[1] - W / H) > 0.005 * (W / H):
+            return None, f'skipped: {im.size[0]}x{im.size[1]} is not {W}x{H}'
+        im = im.resize((W, H), Image.LANCZOS)
+    small = im.resize((max(1, round(W * ROCK_DOWN)), max(1, round(H * ROCK_DOWN))), Image.LANCZOS)
+
+    def grey_of(img):
+        a = np.asarray(img)
+        return (a[..., 0] * np.float32(0.299 / 255) + a[..., 1] * np.float32(0.587 / 255) + a[..., 2] * np.float32(0.114 / 255)).astype(np.float64)
+    full, half = grey_of(im), grey_of(small)
+    del im, small
+    floor = min(r['threshold'] for r in ROCKS.values())
+    halves = [(i, t[4]) for i, t in enumerate(templates)]
+    Hh, Wh = half.shape
+    th = max(t[1].shape[0] for t in halves)
+    tw = max(t[1].shape[1] for t in halves)
+    hits = []
+    for y0 in range(0, max(1, Hh - th) + 1, TILE - th):
+        for x0 in range(0, max(1, Wh - tw) + 1, TILE - tw):
+            for s, x, y, i, _ in match_tile(np, half[y0:y0 + TILE, x0:x0 + TILE], [(i, 0, t) for i, t in halves], floor):
+                cls, shape, f, fr, hf = templates[i]
+                if s < ROCKS[cls]['threshold']:
+                    continue
+                # the hit's cell bottom centre in full street px
+                hits.append((s, (x + x0 + hf.shape[1] / 2) / ROCK_DOWN, (y + y0 + hf.shape[0]) / ROCK_DOWN, i))
+            if x0 + TILE >= Wh:
+                break
+        if y0 + TILE >= Hh:
+            break
+    del half
+    hits.sort(reverse=True)
+    picks = []
+    nx, ny = ROCK_NEAR
+    for s, ax, ay, i in hits:
+        if all(abs(ax - p[1]) > nx or abs(ay - p[2]) > ny for p in picks):
+            picks.append((s, ax, ay, i))
+    out = []
+    for s, ax, ay, i in picks:
+        cls = templates[i][0]
+        best = None
+        for c2, shape, f, fr, _ in templates:
+            if c2 != cls:
+                continue
+            h, w = fr.shape[:2]
+            score, x, y = ncc_window(np, full, fr, int(round(ax - w / 2)), int(round(ay - h)), ROCK_REFINE + 2)
+            if best is None or score > best[0]:
+                best = (score, cls, shape, f, x + w / 2, y + h, s)
+        if best and best[0] >= ROCK_MIN_FULL:
+            out.append(best)
+    return out, ''
+
+
+def rock_street_job(job):
+    import numpy as np
+    from PIL import Image
+    Image.MAX_IMAGE_PIXELS = None
+    templates = rock_templates(np, Image)
+    per_snap = []
+    for path in job['snaps']:
+        found, note = rock_snap(np, Image, path, job['w'], job['h'], templates)
+        per_snap.append((path, found, note))
+    return {**job, 'per_snap': per_snap}
+
+
+def rock_merge(job):
+    """Rocks across a street's snaps: [{x, y, cls, shape, seen, score}], the most seen first."""
+    clusters = []
+    for path, found, _ in job['per_snap']:
+        for score, cls, shape, f, ax, ay, hs in found or []:
+            for c in clusters:
+                if abs(c['x'] - ax) <= ROCK_MERGE_PX and abs(c['y'] - ay) <= ROCK_MERGE_PX:
+                    if path not in c['snaps']:
+                        c['snaps'].append(path)
+                    if score > c['score']:
+                        c.update(score=score, x=ax, y=ay, cls=cls, shape=shape)
+                    break
+            else:
+                clusters.append({'x': ax, 'y': ay, 'cls': cls, 'shape': shape, 'score': score, 'snaps': [path]})
+    clusters.sort(key=lambda c: (-len(c['snaps']), -c['score']))
+    return clusters
+
+
+def any_job(job):
+    return rock_street_job(job) if job['cls'] == 'rocks' else street_job(job)
+
+
 def merge(job):
     """Clusters of hits across snaps: [{x, y, v, seen, score}]."""
     clusters = []
@@ -256,21 +421,28 @@ def js_module(data):
              '/**\n'
              ' * Player reports #249 and #250: where each street\'s Jellisacs and Peat Bogs were, measured on players\'\n'
              ' * full-street snaps (see the JSON\'s source note). { [G tsid]: [[x, y, variant], ...] }: the frame cell\'s\n'
-             ' * bottom centre in street px and the variant number (jellySack<n>, peat<n>). street-ecology.js\n'
-             ' * measuredNodeSpots reads them.\n'
+             ' * bottom centre in street px and the variant number (jellySack<n>, peat<n>). The rocks the same\n'
+             ' * (the placements audit, 2026-11-12), with the shape the snap shows (rock_<kind>_<n>, 1-3).\n'
+             ' * street-ecology.js measuredNodeSpots reads them.\n'
              ' */\n']
-    for cls_id, cls in CLASSES.items():
+    for cls_id, cls in [*CLASSES.items(), *ROCKS.items()]:
         streets = data.get(cls_id, {}).get('streets', {})
         rows = ',\n'.join(f'  {json.dumps(t)}: {json.dumps(v, separators=(",", ":"))}' for t, v in sorted(streets.items()))
         parts.append(f'export const {cls["export"]} = Object.freeze({{\n{rows}{"," if rows else ""}\n}});\n')
     return '\n'.join(parts)
 
 
+def num(v):
+    v = round(v, 1)
+    return int(v) if float(v).is_integer() else v
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--snaps', default=SNAPS)
     ap.add_argument('--out', default=OUT)
-    ap.add_argument('--only', action='append', default=[], help='<class>:<tsid> or <class>')
+    ap.add_argument('--only', action='append', default=[], help='<class>:<tsid> or <class> (rocks: rocks:<tsid>)')
+    ap.add_argument('--group', choices=('all', 'nodes', 'rocks'), default='all', help='what to measure; the rest is kept from --out')
     ap.add_argument('--crops', default='')
     ap.add_argument('--dry', action='store_true')
     ap.add_argument('--jobs', type=int, default=3)
@@ -293,34 +465,79 @@ def main():
     index = json.load(open(INDEX))['streets']
     only = [o.split(':') for o in args.only]
     jobs = []
-    for cls_id, cls in CLASSES.items():
+
+    def street_meta(tsid):
+        meta = index.get(tsid)
+        if not meta:
+            return None
+        street = json.load(open(os.path.join(ROOT, 'public', meta['file'])))
+        b = street['bounds']
+        return meta, b['r'] - b['l'], b['b'] - b['t']
+
+    if args.group in ('all', 'nodes'):
+        for cls_id, cls in CLASSES.items():
+            for tsid, row in sorted(ecology['streets'].items()):
+                count = int((row or {}).get('counts', {}).get(cls_id) or 0)
+                if count < 1:
+                    continue
+                if only and not any(o[0] == cls_id and (len(o) < 2 or o[1] == tsid) for o in only):
+                    continue
+                got = street_meta(tsid)
+                if not got:
+                    continue
+                meta, w, h = got
+                snaps = find_snaps(snaps_dir, meta['label'], meta.get('hubName'))
+                if snaps:
+                    jobs.append({'cls': cls_id, 'tsid': tsid, 'label': meta['label'], 'count': count, 'w': w,
+                                 'h': h, 'snaps': snaps, 'threshold': args.threshold or cls['threshold']})
+    if args.group in ('all', 'rocks'):
         for tsid, row in sorted(ecology['streets'].items()):
-            count = int((row or {}).get('counts', {}).get(cls_id) or 0)
-            if count < 1:
+            counts = {c: int((row or {}).get('counts', {}).get(c) or 0) for c in ROCKS}
+            if sum(counts.values()) < 1:
                 continue
-            if only and not any(o[0] == cls_id and (len(o) < 2 or o[1] == tsid) for o in only):
+            if only and not any(o[0] == 'rocks' and (len(o) < 2 or o[1] == tsid) for o in only):
                 continue
-            meta = index.get(tsid)
-            if not meta:
+            got = street_meta(tsid)
+            if not got:
                 continue
-            street = json.load(open(os.path.join(ROOT, 'public', meta['file'])))
-            b = street['bounds']
+            meta, w, h = got
             snaps = find_snaps(snaps_dir, meta['label'], meta.get('hubName'))
             if snaps:
-                jobs.append({'cls': cls_id, 'tsid': tsid, 'label': meta['label'], 'count': count, 'w': b['r'] - b['l'],
-                             'h': b['b'] - b['t'], 'snaps': snaps, 'threshold': args.threshold or cls['threshold']})
+                jobs.append({'cls': 'rocks', 'tsid': tsid, 'label': meta['label'], 'counts': counts, 'w': w, 'h': h, 'snaps': snaps})
     print(f'{len(jobs)} street jobs have full-street snaps')
     with Pool(max(1, args.jobs), maxtasksperchild=4) as pool:
         done = []
-        for job in pool.imap_unordered(street_job, jobs, chunksize=1):
+        for job in pool.imap_unordered(any_job, jobs, chunksize=1):
             done.append(job)
             print(f"  matched {len(done)}/{len(jobs)}: {job['cls']} {job['label']}", flush=True)
-    out = {c: {'streets': {}, 'snaps': {}} for c in CLASSES}
-    totals = {c: [0, 0] for c in CLASSES}
+    measured = list(CLASSES) * (args.group in ('all', 'nodes')) + list(ROCKS) * (args.group in ('all', 'rocks'))
+    old = json.load(open(args.out))['classes'] if os.path.exists(args.out) else {}
+    out = {c: ({'streets': {}, 'snaps': {}} if c in measured else old.get(c, {'streets': {}, 'snaps': {}})) for c in [*CLASSES, *ROCKS]}
+    totals = {c: [0, 0] for c in measured}
+    shapes = {c: [0, 0, 0] for c in ROCKS}
     for job in sorted(done, key=lambda j: (j['cls'], j['tsid'])):
         for path, _, note in job['per_snap']:
             if note:
                 print(f"  {job['label']}: {os.path.basename(path)} {note}")
+        if job['cls'] == 'rocks':
+            clusters = rock_merge(job)
+            kept = []
+            for cls, n in job['counts'].items():
+                mine = [c for c in clusters if c['cls'] == cls][:n]
+                kept += mine
+                if mine:
+                    out[cls]['streets'][job['tsid']] = sorted([[num(c['x']), num(c['y']), c['shape']] for c in mine])
+                    out[cls]['snaps'][job['tsid']] = len(job['snaps'])
+                    totals[cls][0] += len(mine)
+                    totals[cls][1] += 1
+                    for c in mine:
+                        shapes[cls][c['shape'] - 1] += 1
+            extra = [c for c in clusters if c not in kept]
+            want = sum(job['counts'].values())
+            print(f"rocks {job['tsid']} {job['label']}: {len(kept)}/{want} from {len(job['snaps'])} snaps"
+                  + (f" ({len(extra)} more dropped: {[(c['cls'][5:-2], round(c['x']), round(c['y']), round(c['score'], 3), len(c['snaps'])) for c in extra][:6]})" if extra else '')
+                  + f" min score {min([c['score'] for c in kept], default=0):.3f}")
+            continue
         clusters = merge(job)
         keep = clusters[:job['count']]
         spots = sorted([[round(c['x'], 1), round(c['y'], 1), c['v']] for c in keep], key=lambda s: (s[0], s[1]))
@@ -336,16 +553,17 @@ def main():
         if args.crops:
             save_crop(job, sorted([[c['x'], c['y'], c['v'], c['score']] for c in keep]), args.crops)
     for c, (n, s) in totals.items():
-        print(f'{c}: {n} spots on {s} streets')
+        print(f'{c}: {n} spots on {s} streets' + (f' (shapes _1/_2/_3: {"/".join(map(str, shapes[c]))})' if c in ROCKS else ''))
     if args.dry or only:
         return 0
     data = {
-        'source': 'Jellisac and Peat Bog spots measured by tools/snap-placements/nodes.py (player reports #249, #250) '
-                  'from players\' full-street snaps of Nov-Dec 2012 gathered by the Eleven Giants project (collectors '
-                  'zoi, mackenzie, cleops; reference only, no pixels kept): our CC0 node art matched against each snap. '
-                  'classes[class].streets[tsid] = [[x, y, variant], ...]: the frame cell\'s bottom centre in street px '
-                  '(0, 0 = the street\'s top left, as street-model.js platformsScreen) and the variant number the snap '
-                  'shows (jellySack<n>, peat<n>). `snaps` is how many snaps of the street were matched. Do not edit by hand.',
+        'source': 'Jellisac, Peat Bog and rock spots measured by tools/snap-placements/nodes.py (player reports #249, #250; '
+                  'the placements audit of 2026-11-12) from players\' full-street snaps of Nov-Dec 2012 gathered by the Eleven '
+                  'Giants project (collectors zoi, mackenzie, cleops; reference only, no pixels kept): our CC0 node and rock art '
+                  'matched against each snap. classes[class].streets[tsid] = [[x, y, variant], ...]: the frame cell\'s bottom '
+                  'centre in street px (0, 0 = the street\'s top left, as street-model.js platformsScreen) and the variant number '
+                  'the snap shows (jellySack<n>, peat<n>; a rock\'s shape, rock_<kind>_<n>). `snaps` is how many snaps of the '
+                  'street were matched. Do not edit by hand.',
         'classes': out,
     }
     with open(args.out, 'w') as f:

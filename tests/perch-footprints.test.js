@@ -27,7 +27,7 @@ import {
   populationForStreet,
   setStreetEcologyCatalog,
   streetReservedSpots,
-} from '../public/js/street-ecology.js?v=f27417a8';
+} from '../public/js/street-ecology.js?v=4922aff5';
 import { placementRequests } from '../tools/build-realtime-objects.mjs';
 import { SHRINE_SHEETS } from '../public/js/shrine-variants.js?v=7f11c97d';
 import { adoptedPlan } from '../public/js/features/patches-feature.js?v=3e26b680';

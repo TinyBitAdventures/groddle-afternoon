@@ -6,7 +6,7 @@
 import { avatarHeadReach, groundBeneath, isItemSolid, isStandable, platformYAt, worldToScreen } from './street-model.js?v=b6cb6a4e';
 import { behindFloor } from './reach.js?v=4187d746';
 import { BARNACLE_SPOTS } from './barnacle-spots-data.js?v=cea3daec';
-import { JELLISAC_SPOTS, PEAT_SPOTS } from './node-spots-data.js?v=4984e395';
+import { JELLISAC_SPOTS, PEAT_SPOTS } from './node-spots-data.js?v=8d619d0b';
 
 export const STREET_ECOLOGY_URL = 'assets/content/street-ecology.json?v=official-ecology-6';
 
