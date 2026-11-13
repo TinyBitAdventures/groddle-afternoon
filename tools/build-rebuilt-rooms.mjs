@@ -13,6 +13,9 @@
  * Also the Interrogation room (public/js/interrogation-room.js, G352): no door
  * leads in or out (the console's teleport brings an administrator in, and the
  * room's own door, run by its feature, takes them back).
+ * Also the two skill-quest practice streets (public/js/practice-streets.js, G682),
+ * Breezy, EZ Cookin' and Talking 'bout Soil Appreciation: no doors lead in (the
+ * quests' starts and the tutorial's EZ Cooking pick move you there).
  * Each door's own connect x/y is kept and snapped to the rebuilt floor. Safe to
  * re-run; run it again after a street re-import or a build-street-navigation.mjs
  * pass.
@@ -81,6 +84,16 @@ import {
   interrogationIndexEntry,
   interrogationStreet,
 } from '../public/js/interrogation-room.js?v=c6a73859';
+import {
+  EZ_COOKIN_TSID,
+  PRACTICE_FLAMINGO,
+  PRACTICE_START,
+  SOIL_TSID,
+  ezCookinIndexEntry,
+  ezCookinStreet,
+  soilIndexEntry,
+  soilStreet,
+} from '../public/js/practice-streets.js?v=963451c6';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const streetsDir = join(root, 'public/assets/streets');
@@ -224,6 +237,16 @@ function indexRow(tsid, row) {
   if (!at?.snapped) throw new Error('no floor under the Interrogation room arrival');
   put(`${INTERROGATION_TSID}.json`, `${JSON.stringify(room)}\n`);
   indexRow(INTERROGATION_TSID, interrogationIndexEntry(room));
+}
+
+// The practice streets: closed streets, the start (123, -958) falling onto the lane.
+for (const [tsid, build, row] of [[EZ_COOKIN_TSID, ezCookinStreet, ezCookinIndexEntry], [SOIL_TSID, soilStreet, soilIndexEntry]]) {
+  const street = build();
+  // The start falls onto the lane at the flamingo's spot (skillquest_*.js initial_flamingo).
+  const at = arrivalInTarget(street, PRACTICE_START.x, PRACTICE_FLAMINGO.y - 4);
+  if (!at?.snapped) throw new Error(`no floor under ${street.label}'s start`);
+  put(`${tsid}.json`, `${JSON.stringify(street)}\n`);
+  indexRow(tsid, row(street));
 }
 
 if (indexChanged) put('index.json', `${JSON.stringify(index, null, 2)}\n`);

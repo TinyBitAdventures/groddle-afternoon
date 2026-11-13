@@ -64,7 +64,7 @@ import {
   training2MeterFull,
   tutorialPhysics,
   vogPages,
-} from '../public/js/newxp.js?v=91b8f176';
+} from '../public/js/newxp.js?v=bb31ecaa';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', 'public');
 const street = (tsid) => JSON.parse(readFileSync(join(ROOT, 'assets/streets', `${tsid}.json`), 'utf8'));
@@ -423,12 +423,8 @@ describe('newxp imported streets', () => {
     assert.ok(!inBox(ISLAND_BOXES.gentle_island_exit, 5000, 1000));
   });
 
-  it('has practice streets for the archived first skills', () => {
+  it('has practice streets for the first skills (EZ Cookin\'s rebuilt, G682)', () => {
     for (const s of FIRST_SKILLS) {
-      if (!s.street) {
-        assert.equal(s.id, 'ezcooking_1');
-        continue;
-      }
       const data = street(s.street);
       assert.ok((data.boxes || []).some((b) => b.id === s.finishBox), s.finishBox);
       assert.equal(data.musicFile, 'NEW_XP_TRAINING1');

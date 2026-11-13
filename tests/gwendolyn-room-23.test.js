@@ -14,13 +14,13 @@ import { fileURLToPath } from 'node:url';
 
 import * as kit from '../public/js/quest-rooms/kit.js?v=c436cb8a';
 import { loadContentCatalogsFromDir, getQuestCatalog } from '../public/js/content-catalogs.js?v=10b118dd';
-import { acceptOffer, ensureQuestOfferState, npcQuestOffers, pendingQuestOffers, turnInQuest } from '../public/js/quest-offers.js?v=49eecffe';
+import { acceptOffer, ensureQuestOfferState, npcQuestOffers, pendingQuestOffers, turnInQuest } from '../public/js/quest-offers.js?v=d18bee8b';
 import { XP_FOR_LEVEL } from '../public/js/progression.js?v=72b2b22a';
-import { OFFER_OVERRIDES } from '../public/js/quest-rooms/catalog.js?v=87636ba5';
+import { OFFER_OVERRIDES } from '../public/js/quest-rooms/catalog.js?v=a217b716';
 import { GREETERBOT } from '../public/js/tower-mid-rooms.js?v=678fdc50';
 import { ROOM_23_FILES } from '../public/js/gwendolyn-room-23-art.js?v=1de55db7';
 import { GWENDOLYN_INNER_FILES } from '../public/js/quest-rooms/gwendolyn-inner-art.js?v=06b4d5d6';
-import { INNER_BASE, PART3 as G_PART3, PART3_REPEAT as G_PART3_REPEAT, innerLayout, thirdPartFor } from '../public/js/quest-rooms/gwendolyn.js?v=4a79216f';
+import { INNER_BASE, PART3 as G_PART3, PART3_REPEAT as G_PART3_REPEAT, innerLayout, thirdPartFor } from '../public/js/quest-rooms/gwendolyn.js?v=0e43fb9a';
 import {
   CONSOLATION,
   CORRIDOR_FIVE_TSID,
@@ -50,7 +50,7 @@ import {
   leadPath,
   room23Street,
 } from '../public/js/gwendolyn-room-23.js?v=46e417b9';
-import { gwendolynRoom23Feature } from '../public/js/features/gwendolyn-room-23-feature.js?v=ccb2e5b4';
+import { gwendolynRoom23Feature } from '../public/js/features/gwendolyn-room-23-feature.js?v=95caf526';
 
 const spike = join(dirname(fileURLToPath(import.meta.url)), '..');
 const pub = (p) => join(spike, 'public', p);

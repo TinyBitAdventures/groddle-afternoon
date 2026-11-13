@@ -19,7 +19,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 import { closedStreets, normalizeStreetJobState } from '../public/js/street-jobs.js?v=87fd5c87';
-import { nearestReached, reachableStreets } from '../public/js/quest-reach.js?v=6d8f85cf';
+import { nearestReached, reachableStreets } from '../public/js/quest-reach.js?v=86a18606';
 import { routeGraph } from '../public/js/map-routes.js?v=c7e7dc80';
 import { openBootTarget, pickBootTarget } from '../public/js/ancestral-nostalgia.js?v=3d97122d';
 import { NOSTALGIA_BOOT_STREETS } from '../public/js/ancestral-nostalgia-data.js?v=0adb9184';

@@ -31,7 +31,7 @@ import {
   stepQuestInstance,
   stuckPromptDue,
 } from '../public/js/quest-instance.js?v=f0df88c3';
-import { BUILT_ROOMS, QUEST_ROOMS, roomModulePath } from '../public/js/quest-rooms/catalog.js?v=87636ba5';
+import { BUILT_ROOMS, QUEST_ROOMS, roomModulePath } from '../public/js/quest-rooms/catalog.js?v=a217b716';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const GSJS = join(root, '../glitch-GameServerJS');
@@ -82,6 +82,15 @@ const OWN_PROMPT = Object.freeze(['clubhouse', 'mental_block', 'gwendolyn', 'fir
 const SOURCE_TIMER = Object.freeze({
   // numismatic_hustle: exit_delay 0 (no prompt); players/inc_quests.js rainbow_run_start runs the 30-second race.
   rainbow_run: 'rainbow_run_start: a 30-second clock (exit_delay 0)',
+});
+
+/**
+ * G682: rooms whose quests never made an instance (onStarted teleportToLocationDelayed to a plain
+ * street), so the source had no exit delay to ask from: no prompt and no clock.
+ */
+const NO_INSTANCE = Object.freeze({
+  ez_cookin: 'ezcooking_1.js onStarted teleportToLocationDelayed (no instance, no exit_delay)',
+  soil_appreciation: 'soilappreciation_1.js onStarted teleportToLocationDelayed (no instance, no exit_delay)',
 });
 
 async function loadRoom(id) {
@@ -156,10 +165,19 @@ describe('the "Are you stuck?" run state (quest-instance.js)', () => {
 
 describe('every built room: the prompt, its own prompt, or a source timer', () => {
   it('lists each built room once', () => {
-    const listed = [...Object.keys(SHARED), ...OWN_PROMPT, ...Object.keys(SOURCE_TIMER)];
+    const listed = [...Object.keys(SHARED), ...OWN_PROMPT, ...Object.keys(SOURCE_TIMER), ...Object.keys(NO_INSTANCE)];
     assert.equal(new Set(listed).size, listed.length);
     assert.deepEqual([...listed].sort(), [...BUILT_ROOMS].sort());
   });
+
+  for (const id of Object.keys(NO_INSTANCE)) {
+    it(`${id}: no clock and no prompt (no instance in the source)`, async () => {
+      const { room } = await loadRoom(id);
+      assert.equal(room.durationMs, 0);
+      assert.equal(room.exitPromptMs, undefined);
+      assert.equal(room.exitPromptFor, undefined);
+    });
+  }
 
   for (const [id, seconds] of Object.entries(SHARED)) {
     it(`${id}: no clock, "Are you stuck?" after ${seconds} s`, async () => {

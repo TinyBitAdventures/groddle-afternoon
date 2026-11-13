@@ -24,7 +24,7 @@
  *   never in the quest log as offers. an_autumn_day_part2.js canOffer 73-87:
  *   an hour after part 1, and an hour after its own last finish or fail.
  */
-import { ensureQuestOfferState } from './quest-offers.js?v=49eecffe';
+import { ensureQuestOfferState } from './quest-offers.js?v=d18bee8b';
 
 export const SPIRIT_REMINISCE_SOURCE = 'tinyspeck/glitch-GameServerJS items/street_spirit.js 207-245 (CC0)';
 

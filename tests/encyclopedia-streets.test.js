@@ -40,7 +40,7 @@ describe('encyclopedia streets', () => {
     for (const x of d.streetsLeftOut) assert.ok(['no-region', 'no-hub', 'excluded'].includes(x.why), `${x.name}: ${x.why}`);
     // Only the old May 2010 new-player streets, the instanced quest and party places and the moderators'
     // Interrogation room (hub 67 Multiplayer Quests, G352) are left out.
-    for (const x of d.streetsLeftOut.filter((y) => y.why === 'no-region')) assert.match(x.region, /New Start|Puzzles|Tower Quest|Simple Level Quests|Multiplayer Quests/, x.name);
+    for (const x of d.streetsLeftOut.filter((y) => y.why === 'no-region')) assert.match(x.region, /New Start|Puzzles|Tower Quest|Simple Level Quests|Multiplayer Quests|Skill Quests/, x.name);
     const dirs = readdirSync(join(pub, 'encyclopedia/streets'), { withFileTypes: true }).filter((x) => x.isDirectory()).map((x) => x.name).sort();
     assert.deepEqual(dirs, kept.map((e) => e.id).sort());
     assert.match(read('encyclopedia/streets/index.html'), new RegExp(`${d.streetsLeftOut.length} more of the remake’s streets have no page`));

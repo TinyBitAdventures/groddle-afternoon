@@ -1394,8 +1394,8 @@
   ]
  },
  "rooms": {
-  "total": 22,
-  "built": 22,
+  "total": 24,
+  "built": 24,
   "rooms": [
    {
     "id": "an_autumn_day",
@@ -1464,6 +1464,26 @@
      "play": "Walk under the ceiling TVs as they turn to keep you in view, hop onto the dais, peek behind the veil, and find out who has been watching.",
      "source": "The five-minute nap, the Peek Behind the Veil and Ride It Out flags, and the rewards.",
      "rebuilt": "The room is laid out from a player's Snap: all black, a TV hung from the ceiling at the upper right, the sleeper alone in a dim pool of light. The TV is Tiny Speck's own Bureaucratic Hall set with its screen lit and flickering, as in the Snap; the veil and the Bureaucrat's three lines behind it are new writing.",
+     "footage": []
+    }
+   },
+   {
+    "id": "ez_cookin",
+    "title": "Breezy, EZ Cookin'",
+    "quests": [
+     "Breezy, EZ Cookin'"
+    ],
+    "built": true,
+    "shot": null,
+    "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&timedemo=day&questdemo=ezcooking_1&practice=1",
+    "hd": null,
+    "offer": "So, you have an interest in cooking, huh?",
+    "note": {
+     "tagline": "A Knife & Board, three counters of food and a flamingo who says hello.",
+     "about": "Breezy, EZ Cookin' was the first quest for EZ Cooking: a forest practice street where the Welcoming Flamingo got you started and the food waited on the counters.",
+     "play": "Hear the flamingo out, take the Knife & Board from its table and the food from the three counters, then walk right to the EXIT. Learn EZ Cooking outside the tutorial and the quest is offered; pick EZ Cooking in the tutorial and you walk the same street.",
+     "source": "The quest, its \"Do it all!\" flag and rewards, the flamingo's line and where it stands and flies, and the food on the counters (each item, how many, and where), all from the street's own script.",
+     "rebuilt": "The street's geometry was never archived. Players' full-street snaps from the Eleven collections are the street at its own size, so the counters, the table and the EXIT arrow stand where they show them: a pine forest at sunset in Tiny Speck's own firs, rocks and grass. No CC0 piece matches the snaps' glass serving counters, lamps and round table, so Tiny Speck's store counter, store lamp and a round table stand in for them.",
      "footage": []
     }
    },
@@ -1798,6 +1818,26 @@
        "label": "Smuggler Quest"
       }
      ]
+    }
+   },
+   {
+    "id": "soil_appreciation",
+    "title": "Talking ‘bout Soil Appreciation",
+    "quests": [
+     "Talking ‘bout Soil Appreciation"
+    ],
+    "built": true,
+    "shot": null,
+    "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&timedemo=day&questdemo=soilappreciation_1&practice=1",
+    "hd": null,
+    "offer": "Kid, can I ask you a question?",
+    "note": {
+     "tagline": "A Hoe, a Shovel, a Patch to tend and a Dirt Pile to dig.",
+     "about": "Talking 'bout Soil Appreciation was the first quest for Soil Appreciation: a forest practice street with a Patch and a Dirt Pile, and the Welcoming Flamingo to say it's pretty simple stuff.",
+     "play": "Hear the flamingo out, pick up the Hoe and the Shovel, tend the Patch on the mound (walk up its slope from the right), dig it, dig the Dirt Pile, then walk right to the EXIT.",
+     "source": "The quest, its \"Do it all!\" flag and rewards, the flamingo's two lines and its flight, and the rule that a Patch must be tended before it can be dug, all from the street's own script.",
+     "rebuilt": "The street's geometry was never archived. Players' full-street snaps show it at its own size: a grey stone, the Dirt Pile, a raised grassy block with the Patch on top and the EXIT arrow, under the same sunset pines, rebuilt in Tiny Speck's own pieces. Where the Hoe and Shovel lay is not in any snap, so they wait near the start.",
+     "footage": []
     }
    },
    {
@@ -2752,7 +2792,7 @@
   "deployed": "2026-11-13"
  },
  "git": {
-  "commits": 1918,
+  "commits": 1919,
   "since": "2026-10-19",
   "recent": [
    {

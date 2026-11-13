@@ -15,9 +15,9 @@
  *  4. house      the Magic Rock on your new home street (engine.grantHome:
  *                the house is imagined for free, in the style you chose),
  *                then "Take your pick …" of three first skills.
- *  5. skill      the imported practice street for that skill (A L'il Animal
- *                Kinship / Lift Your Light Green Thumb) with the flamingo;
- *                EZ Cooking's street is lost, so it goes straight on.
+ *  5. skill      the practice street for that skill (A L'il Animal Kinship
+ *                and Lift Your Light Green Thumb imported; Breezy, EZ Cookin'
+ *                rebuilt from snaps, js/practice-streets.js) with the flamingo.
  *  6. island     Gentle Island (hub 129, imported): the rock's bag quest
  *                (978 currants, buy_two_bags at the cheap bag vendor on
  *                Progress Way); then home (Progress Way is held: "Not so
@@ -126,14 +126,15 @@ import {
   vogPages,
   tutorialNameDefault,
   TUTORIAL_NAME_MAX,
-} from '../newxp.js?v=91b8f176';
+} from '../newxp.js?v=bb31ecaa';
 import { countWords } from '../words.js?v=ee4e72f8';
 import { ITEM_CATALOG, addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=f49c8998';
 import { QUOIN_SHEET, QUOIN_TYPES, qrazyRewardForLevel } from '../quoins.js?v=61be601c';
 import { soundForQuoin } from '../sound-moments.js?v=c57351b3';
 import { IMAGINATION_UPGRADES } from '../imagination.js?v=1bdfd77c';
+import { EZ_COOKIN_TSID, EZ_FOOD, practiceScreen } from '../practice-streets.js?v=963451c6';
 import { assignQuest, completeQuest } from '../quests.js?v=40c71a37';
-import { acceptOffer, enqueueQuestOffer, questAwardPayload, turnInQuest } from '../quest-offers.js?v=49eecffe';
+import { acceptOffer, enqueueQuestOffer, questAwardPayload, turnInQuest } from '../quest-offers.js?v=d18bee8b';
 import { getQuestCatalog } from '../content-catalogs.js?v=10b118dd';
 import { locationEventsApi } from './location-events-feature.js?v=0cda70ed';
 import * as kit from '../quest-rooms/kit.js?v=c436cb8a';
@@ -141,7 +142,7 @@ import { frameTexture, onLoaded, sourceFromUrl, textureFromUrl, whenLoaded } fro
 import { upgradeSource } from '../sprite-hires.js?v=d4cce9f9';
 import { grantMoodXp } from '../mood-xp.js?v=22648ec0';
 import { displayTopOf, itemstackOverlayPoint, playPoofIn, playSheetOverlay, poofInAlpha } from '../overlay-art.js?v=92383208';
-import { HOME_MACHINE } from '../home-ticket.js?v=59830ec7';
+import { HOME_MACHINE } from '../home-ticket.js?v=82304ddd';
 import { animalAnchorX, animalAnchorY, createAnimalState } from '../animals.js?v=1435a456';
 import {
   AK_ANIMALS,
@@ -2131,7 +2132,6 @@ async function runSkill(t) {
   hud({});
   const skill = firstSkill(save.skill) || FIRST_SKILLS[0];
   if (!skill.street || !engine.streetExists(skill.street)) {
-    // EZ Cooking's practice street is not in the archive.
     engine.pushActivity(`${skill.name}: the practice place is lost, so straight on to the Island.`);
     return 'island';
   }
@@ -2174,6 +2174,17 @@ async function runSkill(t) {
     else fireSafe(PRACTICE_TOOLS[skill.id].off);
   }
   if (ak) akSideTable(engine);
+  // skillquest_ezc_v2.js reset(): the food on the three counters (G682).
+  if (skill.id === 'ezcooking_1') {
+    for (const food of EZ_FOOD) {
+      const at = practiceScreen(EZ_COOKIN_TSID, food.x, food.y);
+      if (save.trainingTaken.includes(food.id)) continue;
+      addPickup(engine, food.id, food.classTsid, food.count, at.x, groundAt(at.x, at.y), (row) => {
+        if (!save.trainingTaken.includes(row.id)) save.trainingTaken.push(row.id);
+        engine.save();
+      });
+    }
+  }
   // flamingo_talk1: the flamingo pops in to say hello.
   const fl = makeNpc(engine, 'flamingo', 370, groundAt(370, 880), { register: true });
   run.npcs.push(fl);

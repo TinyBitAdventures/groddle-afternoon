@@ -4381,7 +4381,8 @@
     "name": "finish_ezcooking",
     "num": 1,
     "classId": "knife_and_board",
-    "desc": "Do it all!"
+    "desc": "Do it all!",
+    "route": "quest-instances"
    }
   ],
   "rewards": {
@@ -4432,8 +4433,8 @@
    "skill": "ezcooking_1",
    "item": "knife_and_board"
   },
-  "solo": true,
-  "custom": true
+  "instanceRoom": "ez_cookin",
+  "solo": true
  },
  "ezcooking_make_level1_recipes": {
   "classTsid": "ezcooking_make_level1_recipes",
@@ -32500,20 +32501,13 @@
   "completion": "You’re on your way now, digster! Here’s a little sumthin’ for your effort.",
   "requirements": [
    {
-    "id": "r370a",
-    "type": "counter",
-    "name": "patches_tended",
+    "id": "r370",
+    "type": "flag",
+    "name": "finish_soilappreciation",
     "num": 1,
-    "classId": "patch",
-    "desc": "Tend a Patch"
-   },
-   {
-    "id": "r370b",
-    "type": "counter",
-    "name": "dig_dirt",
-    "num": 1,
-    "classId": "shovel",
-    "desc": "Dig a Dirt Pile or a Patch"
+    "classId": "hoe",
+    "desc": "Do it all!",
+    "route": "quest-instances"
    }
   ],
   "rewards": {
@@ -32564,6 +32558,7 @@
    "skill": "soil_appreciation_1",
    "item": "shovel"
   },
+  "instanceRoom": "soil_appreciation",
   "solo": true
  },
  "soilappreciation_collect_loam": {

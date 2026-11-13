@@ -12,7 +12,7 @@ import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { createHash } from 'node:crypto';
 import { SHARED_LINKS, keyOf, moduleUrl, plan, resolveKeyConflicts, sharedLink } from '../tools/module-keys/build.mjs';
-import { BUILT_ROOMS, roomModulePath } from '../public/js/quest-rooms/catalog.js?v=87636ba5';
+import { BUILT_ROOMS, roomModulePath } from '../public/js/quest-rooms/catalog.js?v=a217b716';
 import { ONLINE_BOOT_SRC } from '../tools/play-online/build.mjs';
 import { HOOK_SRC } from '../tools/data-versions/build.mjs';
 

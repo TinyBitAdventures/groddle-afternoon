@@ -73,6 +73,8 @@ export const SHOTS = Object.freeze({
   'room:esquibeth': { route: `${Q}&questdemo=last_pilgrimage_of_esquibeth&esqstage=waterfall_04_wider`, wait: 22000 },
   'room:penalty': { route: `${Q}&questdemo=smuggle_the_smuggler_part1`, wait: 14000 },
   'room:firefly_whistle': { route: `${Q}&questdemo=firefly_whistle&questautoplay=look`, wait: 13000 },
+  'room:ez_cookin': { route: `${Q}&questdemo=ezcooking_1&questautoplay=hello`, wait: 14000 },
+  'room:soil_appreciation': { route: `${Q}&questdemo=soilappreciation_1&questautoplay=hello`, wait: 14000 },
 
   // Designer levels (tools/restoration/designer-levels.mjs): one shot per course or street.
   'level:radial_heights': { route: `${Q}&paradise=radial_heights&paradisepreview=moon&paradisefx=0`, wait: 12000 },

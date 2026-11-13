@@ -176,12 +176,8 @@ const REQUIREMENT_OVERRIDES = {
   // Source: any 60 s meditation counted; the text asks for the same street on 11 game days, gaps of 6 at most
   // (js/meditation-station.js).
   meditativearts_meditation_station: [{ id: 'r470', type: 'counter', name: 'meditation_station_days', num: 11, classId: 'focusing_orb', desc: 'Meditate on the same street on 11 game days' }],
-  // Source: one "Do it all!" flag on its newxp practice street (LHFS40864GB396O, skillquest_sa.js), whose
-  // geometry is lost; the quest text asks to "tend patches and dig dirt piles", so one of each anywhere.
-  soilappreciation_1: [
-    { id: 'r370a', type: 'counter', name: 'patches_tended', num: 1, classId: 'patch', desc: 'Tend a Patch' },
-    { id: 'r370b', type: 'counter', name: 'dig_dirt', num: 1, classId: 'shovel', desc: 'Dig a Dirt Pile or a Patch' },
-  ],
+  // soilappreciation_1 keeps the source's one "Do it all!" flag: its practice street is rebuilt
+  // (G682, js/practice-streets.js), so the flag is set at the exit as in skillquest_sa.js.
   // Ticket 88: the source counter is VERB:very_stinky_cheese:poke, but notifyVerb counts the item's class
   // (items/item.js 726: 'VERB:'+class_tsid+':'+verb), cheese_very_stinky, so the source line never moved.
   // The class the requirement itself names is the one counted. r390 is the source's own.
@@ -273,7 +269,9 @@ const INFERRED_GATES = {
 // Quests the remake already runs through a dedicated module in game.js.
 const CUSTOM = new Set([
   // newxp-feature.js (Gentle Island tutorial) drives these; the Magic Rock never offers them.
-  'animalkinship_1', 'ezcooking_1', 'lightgreenthumb_1', 'buy_two_bags', 'leave_gentle_island',
+  // ezcooking_1 is not here: its practice street is a quest room (G682, js/quest-rooms/ez-cookin.js),
+  // offered when EZ Cooking I is learnt outside the tutorial (inc_skills.js 1491-1504).
+  'animalkinship_1', 'lightgreenthumb_1', 'buy_two_bags', 'leave_gentle_island',
   'blue_and_white_part1', 'blue_and_white_part2', // summers-day.js
   'winter_walk', 'winter_walk_part2', // winter-walk.js
   'greedy_street_spirit', 'greedy_street_spirit_reminisce', // greedy-street-spirit.js
@@ -294,9 +292,11 @@ const CUSTOM = new Set([
 // street gives the tool (skillquest_lgt_v2.js items_added watering_can), and
 // only its completion offers the next quest (lightgreenthumb_1.js
 // onComplete_custom; quests_offer checks prereq_quests, inc_quests.js
-// 586-593). The remake has no route to those practice quests after newxp, so
-// the next quest waits until the player holds the tool its offer names
-// ("Now that you have a Watering Can", lightgreenthumb_water_trees.js 3).
+// 586-593). The remake has no route to the Animal Kinship and Light Green Thumb
+// practice quests after newxp, so the next quest waits until the player holds
+// the tool its offer names ("Now that you have a Watering Can",
+// lightgreenthumb_water_trees.js 3). EZ Cookin' and Soil Appreciation have their
+// rooms (G682); their proxies stay for players who learnt the skill before.
 const PREREQ_PROXY = {
   animalkinship_1: { skill: 'animalkinship_1' },
   ezcooking_1: { skill: 'ezcooking_1', item: 'knife_and_board' },

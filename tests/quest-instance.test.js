@@ -32,7 +32,7 @@ import {
   QUEST_ROOMS,
   builtInstanceQuests,
   roomModulePath,
-} from '../public/js/quest-rooms/catalog.js?v=87636ba5';
+} from '../public/js/quest-rooms/catalog.js?v=a217b716';
 import { loadContentCatalogsFromDir, getQuestCatalog } from '../public/js/content-catalogs.js?v=10b118dd';
 import * as kit from '../public/js/quest-rooms/kit.js?v=c436cb8a';
 
@@ -120,7 +120,8 @@ describe('quest room catalog', () => {
   before(() => loadContentCatalogsFromDir(join(root, 'public/assets/content')));
 
   it('maps the 32 once-excluded instance quests, Gwendolyn\'s Task, Smuggle the Smuggler and Firefly Whistle to rooms', () => {
-    assert.equal(Object.keys(QUEST_ROOMS).length, 40);
+    // + G682's two practice streets (ezcooking_1, soilappreciation_1).
+    assert.equal(Object.keys(QUEST_ROOMS).length, 42);
     const catalog = getQuestCatalog();
     for (const id of Object.keys(QUEST_ROOMS)) assert.ok(catalog[id], id);
   });
@@ -269,7 +270,7 @@ describe('The Wrizzards and The Rube (rube_yard)', () => {
   });
 
   it('registers the Play Cube for the pack catalog', async () => {
-    const { ROOM_ITEMS } = await import('../public/js/quest-rooms/catalog.js?v=87636ba5');
+    const { ROOM_ITEMS } = await import('../public/js/quest-rooms/catalog.js?v=a217b716');
     assert.equal(ROOM_ITEMS.play_cube.label, 'Play Cube');
     assert.equal(ROOM_ITEMS.play_cube.stackMax, 1);
     assert.equal(ROOM_ITEMS.play_cube.sellable, false);
@@ -346,7 +347,7 @@ describe('Le Misérable (le_miserable)', () => {
 
 describe('G99: the retry prompt names whoever offered the quest', () => {
   it('questGiver: NPC and pack-item givers, the Magic Rock for familiar offers', async () => {
-    const { questGiver, FAMILIAR_GATES, GIVER_LABELS } = await import('../public/js/quest-rooms/catalog.js?v=87636ba5');
+    const { questGiver, FAMILIAR_GATES, GIVER_LABELS } = await import('../public/js/quest-rooms/catalog.js?v=a217b716');
     const quests = JSON.parse(readFileSync(new URL('../public/assets/content/quests.json', import.meta.url), 'utf8'));
     const def = (id) => (Array.isArray(quests) ? quests : quests.quests || Object.values(quests)).find((q) => (q.classTsid || q.id) === id);
     assert.deepEqual(questGiver(def('join_club')), { npc: 'bag_butler', label: 'Butler' });
@@ -397,8 +398,8 @@ describe('G311: a failed room quest is Try again in the quest log', () => {
   };
 
   it('a run lost to a reload marks a startable quest failed, not a retry prompt', async () => {
-    const { questInstancesFeature } = await import('../public/js/features/quest-instances-feature.js?v=7c6e45eb');
-    const { ensureQuestOfferState } = await import('../public/js/quest-offers.js?v=49eecffe');
+    const { questInstancesFeature } = await import('../public/js/features/quest-instances-feature.js?v=7ddeba8e');
+    const { ensureQuestOfferState } = await import('../public/js/quest-offers.js?v=d18bee8b');
     assert.equal(getQuestCatalog().mental_block?.needsStart, true);
     assert.notEqual(getQuestCatalog().help_juju_bandits?.needsStart, true, 'no onStarted in GSJS');
     questInstancesFeature.restore({ questId: 'mental_block', roomId: 'mental_block', memory: {}, retry: { help_juju_bandits: Date.now() - 60_000 } });
@@ -461,8 +462,8 @@ describe('G313: failed room quests the source removes', () => {
   });
 
   it('a reload removes a source-removed quest and its offers, and keeps the prompt for the three', async () => {
-    const { questInstancesFeature } = await import('../public/js/features/quest-instances-feature.js?v=7c6e45eb');
-    const { questStatus } = await import('../public/js/quest-offers.js?v=49eecffe');
+    const { questInstancesFeature } = await import('../public/js/features/quest-instances-feature.js?v=7ddeba8e');
+    const { questStatus } = await import('../public/js/quest-offers.js?v=d18bee8b');
     const t = Date.now() - 60_000;
     questInstancesFeature.restore({ memory: {}, retry: { tower_quest: t, le_miserable_part_2: t, smuggle_the_smuggler_part2: t } });
     const active = { tower_quest: { progress: {} }, le_miserable_part_2: { progress: {} }, smuggle_the_smuggler_part2: { progress: {} } };
@@ -489,7 +490,7 @@ describe('G313: failed room quests the source removes', () => {
   });
 
   it('has no map card', async () => {
-    const { questInstancesFeature } = await import('../public/js/features/quest-instances-feature.js?v=7c6e45eb');
+    const { questInstancesFeature } = await import('../public/js/features/quest-instances-feature.js?v=7ddeba8e');
     assert.equal(questInstancesFeature.mapCards, undefined);
     const src = readFileSync(join(root, 'public/js/features/quest-instances-feature.js'), 'utf8');
     assert.doesNotMatch(src, /Unfinished quest places/);
@@ -510,7 +511,7 @@ describe('#107: a choice dialog can be dismissed', () => {
   const src = readFileSync(join(root, 'public/js/features/quest-instances-feature.js'), 'utf8');
 
   it('Escape and a click outside make the cancel choice (ChoicesDialog.as _escKeyHandler: cancel_value first)', async () => {
-    const { cancelChoice } = await import('../public/js/features/quest-instances-feature.js?v=7c6e45eb');
+    const { cancelChoice } = await import('../public/js/features/quest-instances-feature.js?v=7ddeba8e');
     const memories = [{ label: 'Four Letter Words', value: 'letter_block_2' }, { label: 'Hog Haul', value: 'hogtie_piggies' }, { label: 'Never mind', value: '', cancel: true }];
     assert.equal(cancelChoice(memories), '');
     assert.equal(cancelChoice([{ label: 'Stay', value: 'stay', cancel: true }, { label: 'Leave', value: 'leave' }]), 'stay');

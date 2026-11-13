@@ -17,8 +17,8 @@ import { fileURLToPath } from 'node:url';
 import vm from 'node:vm';
 
 import { getQuestCatalog, loadContentCatalogsFromDir, resetContentCatalogs } from '../public/js/content-catalogs.js?v=10b118dd';
-import { QUEST_MOVES_NOTE, questMoveNote, questOfferCard } from '../public/js/quest-offers.js?v=49eecffe';
-import { QUEST_ROOMS } from '../public/js/quest-rooms/catalog.js?v=87636ba5';
+import { QUEST_MOVES_NOTE, questMoveNote, questOfferCard } from '../public/js/quest-offers.js?v=d18bee8b';
+import { QUEST_ROOMS } from '../public/js/quest-rooms/catalog.js?v=a217b716';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const PUBLIC = join(ROOT, 'public');
@@ -71,9 +71,9 @@ describe('#83 quests that move you on accept', () => {
     assert.equal(questMoveNote(cat.winter_walk), QUEST_MOVES_NOTE);
     // Startable but staying put: a timed quest.
     assert.equal(questOfferCard('mining_mine_in_time_period').moveNote, '');
-    // soilappreciation_1 moved you to a practice street the remake does not have: no note.
+    // G682: soilappreciation_1 moves you to its rebuilt practice street, so it carries the note.
     assert.equal(cat.soilappreciation_1.movesOnStart, true);
-    assert.equal(questMoveNote(cat.soilappreciation_1), '');
+    assert.equal(questMoveNote(cat.soilappreciation_1), QUEST_MOVES_NOTE);
     assert.equal(questOfferCard('blending_make_level1_recipes').moveNote, '');
     const offered = Object.values(cat).filter((def) => def.solo && questMoveNote(def));
     assert.ok(offered.length >= 44, `${offered.length} offers carry the note`);

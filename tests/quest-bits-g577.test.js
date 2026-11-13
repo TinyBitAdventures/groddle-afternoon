@@ -58,9 +58,11 @@ describe('#143 which quests take you somewhere', () => {
   });
 
   it("the remake's own cases, and a start it can't carry says nothing", () => {
-    assert.deepEqual(Object.keys(QUEST_MOVES_HERE).sort(), ['ezcooking_1', 'rook_hall', 'rook_hall_start']);
+    assert.deepEqual(Object.keys(QUEST_MOVES_HERE).sort(), ['rook_hall', 'rook_hall_start']);
     assert.equal(questTakesYouAway(quest('rook_hall_start')), true);
-    assert.equal(questTakesYouAway(quest('soilappreciation_1')), false);
+    // G682: both practice streets are rebuilt quest rooms now.
+    assert.equal(questTakesYouAway(quest('soilappreciation_1')), true);
+    assert.equal(questTakesYouAway(quest('ezcooking_1')), true);
     assert.equal(questTakesYouAway(quest('get_first_tool')), false);
   });
 

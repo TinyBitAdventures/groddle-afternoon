@@ -576,8 +576,6 @@ export const QUEST_MOVES_HERE = Object.freeze({
   // with part two's onAccepted (rook_hall.js 280-285), which here begins inside the museum already.
   rook_hall_start: true,
   rook_hall: false,
-  // EZ Cooking's lesson has no street of its own (js/newxp.js SKILLS: street null).
-  ezcooking_1: false,
 });
 
 export function questTakesYouAway(q) {

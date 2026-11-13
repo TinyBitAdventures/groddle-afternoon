@@ -13355,6 +13355,24 @@
       "platforms": 1,
       "decos": 10,
       "reconstructed": true
+    },
+    "GIFII3UBRFB3KBE": {
+      "label": "Breezy, EZ Cookin'",
+      "file": "assets/streets/GIFII3UBRFB3KBE.json",
+      "hubId": "132",
+      "hubName": "Skill Quests",
+      "platforms": 5,
+      "decos": 91,
+      "reconstructed": true
+    },
+    "GHFS40864GB396O": {
+      "label": "Talking 'bout Soil Appreciation",
+      "file": "assets/streets/GHFS40864GB396O.json",
+      "hubId": "132",
+      "hubName": "Skill Quests",
+      "platforms": 3,
+      "decos": 73,
+      "reconstructed": true
     }
   }
 }

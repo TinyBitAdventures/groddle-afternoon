@@ -29,7 +29,8 @@
  * the layouts' `art`; where they stand is rebuilt from the recording
  * K2q5GXruLvE (rudiglitch, 2012) and the Snaps "Cloud Intro" and "TR1".
  * Gentle Island (hub 129, six streets) and the Animal Kinship / Light Green
- * Thumb practice streets are imported and used as they are.
+ * Thumb practice streets are imported and used as they are; EZ Cookin's was
+ * lost and is rebuilt from players' snaps (js/practice-streets.js, G682).
  *
  * Gentle Island scripts (newbie_island.js and the six streets' location
  * events): the quoins with a location_event_id (the Qurazy on Surveyor's
@@ -43,6 +44,7 @@
  */
 
 import { WALK_MAX, flatJump } from './avatar-step.js?v=43b1182e';
+import { EZ_FOOD } from './practice-streets.js?v=963451c6';
 
 export const NEWXP_SAVE_VERSION = 1;
 
@@ -92,12 +94,14 @@ export const ISLAND_BOXES = Object.freeze({
 
 /**
  * The three first skills (magic_rock.js showSkillChooser / onOverlayClicked)
- * and their practice streets (config newxp_locations). Only Animal Kinship
- * and Light Green Thumb were archived; EZ Cooking's street is lost.
+ * and their practice streets (config newxp_locations). Animal Kinship and
+ * Light Green Thumb were archived; EZ Cooking's (LIFII3UBRFB3KBE) is rebuilt
+ * from players' snaps (js/practice-streets.js, G682), its exit box the same
+ * quest:flag:finish_* box as the archived two.
  */
 export const FIRST_SKILLS = Object.freeze([
   { id: 'animalkinship_1', quest: 'animalkinship_1', choice: 'skill_animal_kinship', name: 'Animal Kinship', art: 'animalkinship', street: 'GHFRK14DDU53RQQ', finishBox: 'quest:flag:finish_animalkinship', practice: 'So … it’s Animal Kinship, eh? Alright then. Let’s practice!', reply: 'OK' },
-  { id: 'ezcooking_1', quest: 'ezcooking_1', choice: 'skill_ezcooking', name: 'EZ Cooking', art: 'ezcooking', street: null, finishBox: null, practice: 'Ah, EZ Cooking. Let\'s get started!', reply: 'Aiight' },
+  { id: 'ezcooking_1', quest: 'ezcooking_1', choice: 'skill_ezcooking', name: 'EZ Cooking', art: 'ezcooking', street: 'GIFII3UBRFB3KBE', finishBox: 'quest:flag:finish_ezcooking', practice: 'Ah, EZ Cooking. Let\'s get started!', reply: 'Aiight' },
   { id: 'light_green_thumb_1', quest: 'lightgreenthumb_1', choice: 'skill_lightgreenthumb', name: 'Light Green Thumb', art: 'lightgreenthumb', street: 'GUVCT29PSU53G9V', finishBox: 'quest:flag:finish_lightgreenthumb', practice: 'Light Green Thumb? Let’s practice!', reply: 'Aiight' },
 ]);
 /**
@@ -106,6 +110,9 @@ export const FIRST_SKILLS = Object.freeze([
  * skillquest_ak.js 105-107, skillquest_lgt_v2.js 144-147).
  */
 export const PRACTICE_TOOLS = Object.freeze({
+  // The Knife & Board on its table (skillquest_ezc_v2.js items_added knife_and_board clears area0;
+  // its spot from the snaps, js/practice-streets.js EZ_KNIFE_AND_BOARD). No sign event survives.
+  ezcooking_1: Object.freeze({ id: 'knife_and_board', classTsid: 'knife_and_board', count: 1, x: 605, y: 818, off: 'knifesignoff' }),
   animalkinship_1: Object.freeze({ id: 'butterfly_lotion', classTsid: 'butterfly_lotion', count: 1, x: 1823, y: 810, off: 'lotion_off' }),
   light_green_thumb_1: Object.freeze({ id: 'watering_can', classTsid: 'watering_can', count: 1, x: 650, y: 900, off: 'wateringcan_off' }),
 });
@@ -654,7 +661,7 @@ export function normalizeNewxpSave(seed = {}) {
     exit: s.exit && typeof s.exit === 'object' && typeof s.exit.tsid === 'string' ? { tsid: s.exit.tsid, x: Number(s.exit.x) || 0 } : null,
     flags: Array.isArray(s.flags) ? [...new Set(s.flags.filter((f) => ISLAND_FLAGS.includes(f)))] : [],
     musicblock: ISLAND_MUSICBLOCKS.includes(s.musicblock) ? s.musicblock : '',
-    trainingTaken: Array.isArray(s.trainingTaken) ? [...new Set(s.trainingTaken.filter((id) => [...TRAINING2_FOOD, ...TRAINING2_DRINKS, ...Object.values(PRACTICE_TOOLS)].some((r) => r.id === id)))] : [],
+    trainingTaken: Array.isArray(s.trainingTaken) ? [...new Set(s.trainingTaken.filter((id) => [...TRAINING2_FOOD, ...TRAINING2_DRINKS, ...Object.values(PRACTICE_TOOLS), ...EZ_FOOD].some((r) => r.id === id)))] : [],
     leftAt: Number.isFinite(s.leftAt) ? s.leftAt : 0,
     startedAt: Number.isFinite(s.startedAt) ? s.startedAt : 0,
     doneAt: Number.isFinite(s.doneAt) ? s.doneAt : 0,

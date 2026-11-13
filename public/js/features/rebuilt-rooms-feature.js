@@ -19,10 +19,16 @@
  *   doordemo=GA9R4OR505F3PSL&doorautoplay=1 (Growing Stuff),
  *   doordemo=GLIFIG7BP8G1MU9&doorautoplay=1 (Louise Pasture Villa, G371: js/louise-pasture-villa.js,
  *   an empty hall indoors like the others).
+ * - G682: the two skill-quest practice streets (js/practice-streets.js) are empty too (the
+ *   quest rooms place what their scripts did), and their wooden EXIT arrows carry the word the
+ *   snaps show (drawn here, as the client drew a deco's sign text). QA data: practiceExit.
+ *   QA: ?autostart=1&fresh=1&resetgame=1&questoffer=off&questdemo=ezcooking_1 (or
+ *   soilappreciation_1); the tutorial's pick: &newxp=skill&newxpskill=ezcooking_1.
  */
 
 import { isRebuiltRoomTsid, rebuiltRoomEcology } from '../rebuilt-rooms.js?v=8c2eaf24';
 import { isLouiseVillaTsid, louiseVillaEcology } from '../louise-pasture-villa.js?v=9d267f7e';
+import { isPracticeStreetTsid, practiceExitSign, practiceStreetEcology } from '../practice-streets.js?v=963451c6';
 import { WINTER_WALK_BOUNDS, WINTER_WALK_CAPTION, WINTER_WALK_TSID, winterStreetEcology } from '../winter-walk-streets.js?v=175da229';
 
 export const REBUILT_ROOMS_FEATURE_ID = 'rebuilt-rooms';
@@ -30,6 +36,41 @@ export const REBUILT_ROOMS_FEATURE_ID = 'rebuilt-rooms';
 const isRoom = (tsid) => isRebuiltRoomTsid(tsid) || isLouiseVillaTsid(tsid);
 
 let caption = null;
+let exitWord = null;
+
+function clearExitWord(engine) {
+  if (exitWord && !exitWord.destroyed) {
+    exitWord.parent?.removeChild(exitWord);
+    exitWord.destroy();
+  }
+  exitWord = null;
+  engine?.setData?.('practiceExit', '');
+}
+
+/** The practice street's EXIT arrow word (street-screen space; the streets' top-left is 0, -1000). */
+function drawExitWord(engine, street) {
+  const PIXI = engine.PIXI;
+  const sign = practiceExitSign(street?.tsid);
+  const layer = engine.entityLayer;
+  if (!PIXI || !layer || !sign) return;
+  const t = new PIXI.Text({ text: sign.text, style: {
+    fontFamily: 'Nunito, "Trebuchet MS", sans-serif',
+    fontSize: sign.size,
+    fontWeight: '900',
+    fill: 0xf6e7b8,
+    letterSpacing: 1,
+    stroke: { color: 0x5a3a1c, width: 3, join: 'round' },
+  } });
+  t.resolution = 3;
+  t.anchor.set(0.5, 0.5);
+  t.x = sign.x - (street.bounds?.l || 0);
+  t.y = sign.y - (street.bounds?.t || 0);
+  t.zIndex = 3;
+  t.eventMode = 'none';
+  layer.addChild(t);
+  exitWord = t;
+  engine.setData('practiceExit', sign.text);
+}
 
 function clearCaption(engine) {
   if (caption && !caption.destroyed) {
@@ -74,22 +115,29 @@ export const rebuiltRoomsFeature = {
 
   ecologyOverride(street) {
     // Winter Walk and Winter Haven (js/winter-walk-streets.js) are empty too: the route clears them.
-    return rebuiltRoomEcology(street?.tsid) || louiseVillaEcology(street?.tsid) || winterStreetEcology(street?.tsid);
+    return rebuiltRoomEcology(street?.tsid) || louiseVillaEcology(street?.tsid) || winterStreetEcology(street?.tsid) || practiceStreetEcology(street?.tsid);
   },
 
   onStreetEnter(street, engine) {
     engine.setData('rebuiltRoom', isRoom(street?.tsid) ? String(street.tsid) : '');
     clearCaption(engine);
     if (street?.tsid === WINTER_WALK_TSID) drawCaption(engine);
+    clearExitWord(engine);
+    if (isPracticeStreetTsid(street?.tsid)) drawExitWord(engine, street);
   },
 
   onStreetClear(engine) {
     engine.setData('rebuiltRoom', '');
     clearCaption(engine);
+    clearExitWord(engine);
   },
 
   /** The walk's stages clear the world after the street is entered (game.js setupWinterWalkStage): put it back. */
   onTick(dtMs, now, engine) {
+    if (isPracticeStreetTsid(engine.streetTsid) && (!exitWord || exitWord.destroyed || !exitWord.parent)) {
+      clearExitWord(engine);
+      drawExitWord(engine, engine.street);
+    }
     if (engine.streetTsid !== WINTER_WALK_TSID) return;
     if (!caption || caption.destroyed || !caption.parent) {
       clearCaption(engine);

@@ -61,6 +61,11 @@ export const QUEST_ROOMS = Object.freeze({
   // Firefly Whistle (onStarted instances_create_delayed firefly_whistle from
   // LM113UBSS8P18ET, the Fireflex 3000 Lab; not in the dump).
   firefly_whistle: 'firefly_whistle',
+  // G682: the skill-quest practice streets (onStarted teleportToLocationDelayed to
+  // newxp_locations.ezcooking_1 / soilappreciation_1), rebuilt from players' snaps
+  // (js/practice-streets.js).
+  ezcooking_1: 'ez_cookin',
+  soilappreciation_1: 'soil_appreciation',
 });
 
 /** Rooms that exist and pass QA. A quest is solo-offerable once its room is here. */
@@ -87,6 +92,8 @@ export const BUILT_ROOMS = Object.freeze([
   'penalty',
   'esquibeth',
   'firefly_whistle',
+  'ez_cookin',
+  'soil_appreciation',
 ]);
 
 /**

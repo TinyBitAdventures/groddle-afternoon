@@ -508,8 +508,7 @@ export const QUEST_MOVES_NOTE = 'Accepting takes you somewhere new.';
  * NPC's offer runs when you accept it (Gwendolyn's Task and its parts, Help
  * the Juju Bandits, It's Educational II). The remake moves you where it
  * rebuilt the room (instanceRoom) or the quest's own module runs it (custom);
- * a start it cannot carry (soilappreciation_1: the practice street is lost)
- * says nothing.
+ * a start it cannot carry says nothing.
  */
 export function questMoveNote(def) {
   return (def?.movesOnStart || def?.movesOnAccept) && (def.instanceRoom || def.custom) ? QUEST_MOVES_NOTE : '';

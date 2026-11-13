@@ -35,9 +35,9 @@ import {
   qurazyFeatureState,
   qurazyStreetEligible,
   resetQurazyFeatureForTests,
-} from '../public/js/features/qurazy-feature.js?v=0d2e9324';
-import * as qurazyModule from '../public/js/features/qurazy-feature.js?v=0d2e9324';
-import { GENTLE_ISLAND } from '../public/js/newxp.js?v=91b8f176';
+} from '../public/js/features/qurazy-feature.js?v=567a8e60';
+import * as qurazyModule from '../public/js/features/qurazy-feature.js?v=567a8e60';
+import { GENTLE_ISLAND } from '../public/js/newxp.js?v=bb31ecaa';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const PUBLIC = join(here, '../public');

@@ -47,7 +47,7 @@ import {
 import * as alleySet from '../public/js/quest-rooms/back-alley-set.js?v=0c9c5fc5';
 import { STATION_FLOOR, STATIONS, stationArrival, stationByTsid, surfaceStation } from '../public/js/subway.js?v=44d1a09f';
 import { BACK_ALLEY_FILES } from '../public/js/quest-rooms/back-alley-art.js?v=08af5d4f';
-import { QUEST_ROOMS } from '../public/js/quest-rooms/catalog.js?v=87636ba5';
+import { QUEST_ROOMS } from '../public/js/quest-rooms/catalog.js?v=a217b716';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const GSJS = join(homedir(), 'Documents/glitch-audit/glitch-GameServerJS');

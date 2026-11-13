@@ -91,7 +91,7 @@ import {
   stuckPromptDue,
   wayBackFrom,
 } from '../quest-instance.js?v=f0df88c3';
-import { FAMILIAR_GATES, QUEST_ROOMS, REMINISCE_ITEMS, ROOM_ITEMS, isBuiltRoom, questGiver, roomModulePath } from '../quest-rooms/catalog.js?v=87636ba5';
+import { FAMILIAR_GATES, QUEST_ROOMS, REMINISCE_ITEMS, ROOM_ITEMS, isBuiltRoom, questGiver, roomModulePath } from '../quest-rooms/catalog.js?v=a217b716';
 import * as kit from '../quest-rooms/kit.js?v=c436cb8a';
 import { locationEventsApi } from './location-events-feature.js?v=0cda70ed';
 import {
@@ -101,7 +101,7 @@ import {
   questAwardPayload,
   questMoveNote,
   turnInQuest,
-} from '../quest-offers.js?v=49eecffe';
+} from '../quest-offers.js?v=d18bee8b';
 import { parseQuestConversation } from '../quests.js?v=40c71a37';
 import { getQuestCatalog } from '../content-catalogs.js?v=10b118dd';
 import { addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=f49c8998';
@@ -173,14 +173,16 @@ const ROOM_MODULES = {
   an_autumn_day: () => import('../quest-rooms/an-autumn-day.js?v=7bb58c18'),
   being_watched: () => import('../quest-rooms/being-watched.js?v=45cf165d'),
   back_alley: () => import('../quest-rooms/back-alley.js?v=92d09198'),
-  clubhouse: () => import('../quest-rooms/clubhouse.js?v=408fd32d'),
+  clubhouse: () => import('../quest-rooms/clubhouse.js?v=4c1d33f9'),
   light_perspective: () => import('../quest-rooms/light-perspective.js?v=3b299c30'),
   tile_puzzle: () => import('../quest-rooms/tile-puzzle.js?v=a9f79bd2'),
   operation_grow: () => import('../quest-rooms/operation-grow.js?v=bdbc525f'),
-  gwendolyn: () => import('../quest-rooms/gwendolyn.js?v=4a79216f'),
+  gwendolyn: () => import('../quest-rooms/gwendolyn.js?v=0e43fb9a'),
   mental_block: () => import('../quest-rooms/mental-block.js?v=a61bf6fd'),
   penalty: () => import('../quest-rooms/penalty.js?v=6c893cfa'),
   esquibeth: () => import('../quest-rooms/esquibeth.js?v=998c8925'),
+  ez_cookin: () => import('../quest-rooms/ez-cookin.js?v=ecbd2aa6'),
+  soil_appreciation: () => import('../quest-rooms/soil-appreciation.js?v=6ae56a0c'),
   firefly_whistle: () => import('../quest-rooms/firefly-whistle.js?v=f2ba6330'),
 };
 

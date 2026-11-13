@@ -24,7 +24,7 @@ import {
   questRewardSummary,
   listQuestLog,
 } from '../public/js/quests.js?v=40c71a37';
-import { builtInstanceQuests } from '../public/js/quest-rooms/catalog.js?v=87636ba5';
+import { builtInstanceQuests } from '../public/js/quest-rooms/catalog.js?v=a217b716';
 import {
   OFFER_INTERVAL_MS,
   COUNTER_ROUTES,
@@ -53,7 +53,7 @@ import {
   tickQuestTimers,
   restartTimedQuest,
   questTimerStatus,
-} from '../public/js/quest-offers.js?v=49eecffe';
+} from '../public/js/quest-offers.js?v=d18bee8b';
 import { XP_FOR_LEVEL } from '../public/js/progression.js?v=72b2b22a';
 
 const CONTENT = join(dirname(fileURLToPath(import.meta.url)), '../public/assets/content');
@@ -113,22 +113,24 @@ describe('classifyQuests', () => {
     // instance_unbuilt to solo as each room lands.
     const built = builtInstanceQuests().length;
     // Overworld features that brought once-excluded quests back (not rooms).
-    // soilappreciation_1: its newxp practice street is lost; tend + dig anywhere, as its text says.
     // help_mine: the local companions work rocks you can help (G207, features/help-mine-feature.js).
-    const featureQuests = ['smuggling_basic', 'build_a_tower', 'meditativearts_meditation_station', 'soilappreciation_1', 'help_mine'].length;
+    const featureQuests = ['smuggling_basic', 'build_a_tower', 'meditativearts_meditation_station', 'help_mine'].length;
+    // G682: soilappreciation_1 (once a feature quest, now counted in built) and ezcooking_1 (once a
+    // custom tutorial quest) are quest rooms on their rebuilt practice streets; neither was excluded.
+    const wasCustom = ['ezcooking_1'].length;
     // Judged out after the 129 were counted: Manor Mystery, never offered and never finishable in the
     // source (lane juju; build-quests.mjs EXCLUDE, tests/juju-judged.test.js). Peter out Peat takes other
     // players (G451, Austin 2026-11-07; tests/g451-peter-out-peat.test.js).
     // Chasing Hubba Dubba Hugs, never offered and nothing sets its flags (orld_ugs_esara.js 18-50; rules-b 2026-11-12).
     const judgedOut = ['manor_mystery', 'bogspecialization_harvest_full_peat_bog_in_time_period', 'orld_ugs_esara'].length;
     assert.equal(c.solo.length, 129 + built + featureQuests - judgedOut);
-    assert.equal(c.custom.length, 22); // + 5 Gentle Island tutorial quests (newxp-feature.js)
-    assert.equal(c.excluded.length, 294 - built - featureQuests + judgedOut);
+    assert.equal(c.custom.length, 21); // + 4 Gentle Island tutorial quests (newxp-feature.js); ezcooking_1 is a room now
+    assert.equal(c.excluded.length, 294 - (built - wasCustom) - featureQuests + judgedOut);
     assert.equal(c.byReason.job.length, 200);
     assert.equal(c.byReason.multiplayer.length, 11);
     // Gwendolyn's Task and Smuggle the Smuggler were feature_unbuilt, not among the 32.
     // +1: firefly_whistle (the Fireflex 3000 Lab, once counted as tutorial), built in quest-rooms/firefly-whistle.js.
-    const onceInstance = builtInstanceQuests().filter((id) => !/^(tower_quest|smuggle_the_smuggler)/.test(id)).length;
+    const onceInstance = builtInstanceQuests().filter((id) => !/^(tower_quest|smuggle_the_smuggler|ezcooking_1|soilappreciation_1)/.test(id)).length;
     assert.equal((c.byReason.instance_unbuilt || []).length, 33 - onceInstance);
     assert.ok(!(c.byReason.instance_unbuilt || []).includes('firefly_whistle'));
     // No tutorial leftovers: the 2011 Magic Rock chain is retired; Gentle Island's quests are custom.

@@ -123,6 +123,22 @@ export const ROOM_NOTES = Object.freeze({
     rebuilt: "Narration was read from two full recordings, and her song (E G D, E C, A D) was matched from their audio against the recovered bell sounds. Each grotto's sky colour is sampled from players' Snaps and a recording: peach-pink, pale lemon with a pink flush, magenta-pink.",
     footage: [{ id: 'BgRgIaeaj9Q', label: 'The Last Pilgrimage of Esquibeth' }, { id: 'fvin5awPESI', label: 'The Last Pilgrimage of Esquibeth (SnygystFS)' }],
   },
+  ez_cookin: {
+    tagline: 'A Knife & Board, three counters of food and a flamingo who says hello.',
+    about: "Breezy, EZ Cookin' was the first quest for EZ Cooking: a forest practice street where the Welcoming Flamingo got you started and the food waited on the counters.",
+    play: 'Hear the flamingo out, take the Knife & Board from its table and the food from the three counters, then walk right to the EXIT. Learn EZ Cooking outside the tutorial and the quest is offered; pick EZ Cooking in the tutorial and you walk the same street.',
+    source: "The quest, its \"Do it all!\" flag and rewards, the flamingo's line and where it stands and flies, and the food on the counters (each item, how many, and where), all from the street's own script.",
+    rebuilt: "The street's geometry was never archived. Players' full-street snaps from the Eleven collections are the street at its own size, so the counters, the table and the EXIT arrow stand where they show them: a pine forest at sunset in Tiny Speck's own firs, rocks and grass. No CC0 piece matches the snaps' glass serving counters, lamps and round table, so Tiny Speck's store counter, store lamp and a round table stand in for them.",
+    footage: [],
+  },
+  soil_appreciation: {
+    tagline: 'A Hoe, a Shovel, a Patch to tend and a Dirt Pile to dig.',
+    about: "Talking 'bout Soil Appreciation was the first quest for Soil Appreciation: a forest practice street with a Patch and a Dirt Pile, and the Welcoming Flamingo to say it's pretty simple stuff.",
+    play: 'Hear the flamingo out, pick up the Hoe and the Shovel, tend the Patch on the mound (walk up its slope from the right), dig it, dig the Dirt Pile, then walk right to the EXIT.',
+    source: "The quest, its \"Do it all!\" flag and rewards, the flamingo's two lines and its flight, and the rule that a Patch must be tended before it can be dug, all from the street's own script.",
+    rebuilt: "The street's geometry was never archived. Players' full-street snaps show it at its own size: a grey stone, the Dirt Pile, a raised grassy block with the Patch on top and the EXIT arrow, under the same sunset pines, rebuilt in Tiny Speck's own pieces. Where the Hoe and Shovel lay is not in any snap, so they wait near the start.",
+    footage: [],
+  },
   being_watched: {
     tagline: 'A dark room, a TV on the ceiling, and something behind the veil.',
     about: 'Being Watched began with a stale cup of water and a nap, and a dream in the dark where the screens follow you.',

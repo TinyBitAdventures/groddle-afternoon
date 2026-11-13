@@ -7,7 +7,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { floatGain } from '../public/js/features/resource-nodes-feature.js?v=9c052508';
+import { floatGain } from '../public/js/features/resource-nodes-feature.js?v=d6c18f91';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 
