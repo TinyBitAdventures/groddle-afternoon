@@ -65,3 +65,16 @@ describe('compact sheets sideways (#2)', () => {
     assert.doesNotMatch(rule, /\.ui-sheet-x[^{]*\{[^}]*(min-)?(width|height): (?!44)\d+px/);
   });
 });
+
+describe('Imagination upgrade cards sideways (#3)', () => {
+  const rule = sidewaysRule('/* UPGRADES SIDEWAYS (#3)');
+  it('runs the window from under the top bar to the floor, title row shared with the tabs', () => {
+    assert.match(rule, /#imagination-panel\.ui-sheet-center \{ bottom: 0; align-items: flex-start; padding-top: calc\(var\(--hud-h\) \+ 4px\);/);
+    assert.match(rule, /#imagination-panel \.img-card-shell > \.img-head \{ display: contents; \}/);
+    assert.match(rule, /#imagination-panel \.img-card-shell > \.img-tabs \{ grid-row: 1; grid-column: 2;/);
+  });
+  it('deals the three cards side by side, each as tall as the room left, in their own shape', () => {
+    assert.match(rule, /#imagination-panel \.img-hand \{ flex-wrap: nowrap;/);
+    assert.match(rule, /#imagination-panel \.img-card \{ --h: clamp\(120px, 100dvh - var\(--hud-h\) - 112px, 279px\); --w: calc\(var\(--h\) \* 207 \/ 279\);/);
+  });
+});
