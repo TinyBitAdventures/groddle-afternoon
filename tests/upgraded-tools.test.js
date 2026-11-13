@@ -41,6 +41,7 @@ import {
   setToolRemaining,
 } from '../public/js/tools.js?v=62b37c51';
 import { crushOre } from '../public/js/mining.js?v=b62c7722';
+import { createDroppedItemState, dropInventoryStack } from '../public/js/world-items.js?v=5e592293';
 import { MAKE_TOOL_SHEETS } from '../public/js/make-tool-sheets.js?v=6f758e09';
 import { clearPlot, createGarden, getPlot, hasHoe, hasWateringCan, plantPlot, waterPlot } from '../public/js/garden.js?v=92436baf';
 import { performTrantCare, quoteTrantCare } from '../public/js/trant-care.js?v=e76c420c';
@@ -438,8 +439,23 @@ describe('Grinder overflow and its line (grand_ol_grinder.js onCrushComplete)', 
     const game = readFileSync(join(pub, 'game.js'), 'utf8');
     assert.match(game, /isGrinderRecipe\(recipe\) \? \{ \.\.\.opts, room: grinderPackRoom \} : opts/);
     assert.match(game, /features\.query\('packRoom', cls, n, engine\)/);
-    assert.match(game, /engine\.dropWorldStack\(cls, n, player\.x, player\.y - GRINDER_DROP_RISE\)/);
+    assert.match(game, /engine\.dropWorldStack\(cls, n, player\.x, player\.y - GRINDER_DROP_RISE, undefined, undefined, \{ merge: true \}\)/);
     assert.match(game, /dropGrinderRemainder\(result\.dropped\);\n\s+record\.made \+= 1;/);
+    assert.match(game, /dropWorldStack\(classTsid, count, x, y, points = undefined, tags = undefined, \{ merge = false \} = \{\}\)/);
+  });
+
+  it('report #257: a batch the pack cannot carry is one pile on the ground, not one per unit', () => {
+    // ore_grinder.js 610-614: one createItemFromGround for the whole crush, so one pile.
+    const state = createDroppedItemState();
+    for (let i = 0; i < 12; i++) {
+      const r = dropInventoryStack(state, { barnacle_talc: 1 }, 'GTJ13ELOLPQ1DP3', 'barnacle_talc', 1, { x: 2116, y: 939 }, { now: 1, merge: true });
+      assert.equal(r.ok, true);
+    }
+    assert.deepEqual(state.streets.GTJ13ELOLPQ1DP3.map((row) => row.count), [12]);
+    // Unmerged (every other drop that keeps its own pile) stays one row each.
+    const apart = createDroppedItemState();
+    for (let i = 0; i < 2; i++) dropInventoryStack(apart, { barnacle_talc: 1 }, 'GTJ13ELOLPQ1DP3', 'barnacle_talc', 1, { x: 2116, y: 939 }, { merge: false });
+    assert.equal(apart.streets.GTJ13ELOLPQ1DP3.length, 2);
   });
 
   it('matches the source', { skip: !existsSync(join(here, '../../glitch-GameServerJS')) && 'needs glitch-GameServerJS' }, () => {

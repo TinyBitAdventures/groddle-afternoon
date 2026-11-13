@@ -12983,11 +12983,12 @@ const engine = {
   /** The persistent per-street world slot (gardens, trees, rocks). */
   streetWorld: (tsid) => streetWorldState(tsid),
   /** createItemStack on the current street: a ground stack anyone can pick up. */
-  dropWorldStack(classTsid, count, x, y, points = undefined, tags = undefined) {
+  dropWorldStack(classTsid, count, x, y, points = undefined, tags = undefined, { merge = false } = {}) {
     // createItemStack(WithPoof) puts it in at the caller's point and it falls to the line under it.
     y = restingStackY(x, y);
     // `points`: a tool's own wear (or a jar's Fireflies) per unit, so it comes back up the same; `tags` its own words.
-    const result = dropInventoryStack(droppedItemState, { [classTsid]: count }, droppedStacksTsid(), classTsid, count, { x, y }, { now: Date.now(), merge: false, ...(Array.isArray(points) ? { points } : {}), ...(Array.isArray(tags) ? { tags } : {}) });
+    // `merge`: join a pile of the class already lying there (one pile for a whole batch).
+    const result = dropInventoryStack(droppedItemState, { [classTsid]: count }, droppedStacksTsid(), classTsid, count, { x, y }, { now: Date.now(), merge: Boolean(merge), ...(Array.isArray(points) ? { points } : {}), ...(Array.isArray(tags) ? { tags } : {}) });
     if (result.ok) {
       saveDroppedItems();
       refreshDroppedWorldItems();
@@ -27821,12 +27822,17 @@ function grinderPackRoom(cls, n) {
 /**
  * Barnacle talc the Grinder made but the pack can't carry falls to the ground
  * at the player's feet (players/inc_items.js 314-316, location.createItem at
- * y - 29); where nothing can be set down, the pack takes it as before.
+ * y - 29); where nothing can be set down, the pack takes it as before. The
+ * Grinder made a whole crush at once, so what it could not carry was one pile
+ * (items/ore_grinder.js 610-614, one createItemFromGround for count x output):
+ * each unit's talc joins the pile already there (report #257: a dozen piles of one).
+ * The magic rock never took it: only createItemFromFamiliar and the escrow
+ * path used rewards_store (inc_items.js 370-373, 494-495; inc_rewards.js 66-91).
  */
 function dropGrinderRemainder(dropped) {
   for (const [cls, n] of Object.entries(dropped || {})) {
     if (!(n > 0)) continue;
-    const res = player && currentStreetTsid ? engine.dropWorldStack(cls, n, player.x, player.y - GRINDER_DROP_RISE) : null;
+    const res = player && currentStreetTsid ? engine.dropWorldStack(cls, n, player.x, player.y - GRINDER_DROP_RISE, undefined, undefined, { merge: true }) : null;
     if (!res?.ok) addItem(inv, cls, n);
   }
 }
