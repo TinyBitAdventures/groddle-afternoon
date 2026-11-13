@@ -844,7 +844,7 @@ function bakeBlurredLayer(lc, size, colour, state) {
   const ready = () => {
     if (lc.destroyed || !lc.children.length) return;
     const t0 = performance.now();
-    const res = blurBakeResolution(size, renderer.resolution);
+    const res = blurBakeResolution(size, streetBakeResolution(renderer, state.cap));
     const pad = blurTilePad(size);
     const decos = lc.removeChildren();
     // Decos that play (js/deco-anim.js) cannot sit in a bake: they stay live, drawn through the
@@ -1091,6 +1091,22 @@ export function recolourBakeResolution(artResolution, cap = Infinity) {
   const art = Number(artResolution) > 0 ? Number(artResolution) : 1;
   const top = Number(cap) >= 1 ? Number(cap) : Infinity;
   return Math.min(art, top);
+}
+
+/**
+ * PHONE ZOOM SHARPNESS (Austin 2026-11-13): the resolution a street's own bakes and rasters are made
+ * at (blurred layers, the ground skirt, edge mirrors, sharp deco copies, animated decos): the
+ * renderer's, but no more than the street's bake cap (buildStreetView opts.bakeResolutionCap, the
+ * device's render cap). These textures span the whole street, so they grow with the square of the
+ * resolution; a zoomed-in phone raises its renderer's resolution for the screen (js/render-density.js
+ * phoneZoomResolution) but keeps these at its cap of 1 (WebKit at iPhone size: Ferncaster End to
+ * Froughtful Fen peaked at 1.6-1.8 GB with them following, over the 1.5 GB a tab can take). A
+ * computer's cap (4) is never under its resolution: unchanged there.
+ */
+export function streetBakeResolution(renderer, cap = Infinity) {
+  const r = Number(renderer?.resolution) > 0 ? Number(renderer.resolution) : 1;
+  const top = Number(cap) >= 1 ? Number(cap) : Infinity;
+  return Math.min(r, top);
 }
 
 /**
@@ -1690,7 +1706,7 @@ function buildGroundSkirt(PIXI, renderer, root, grounds, W, sourceH, depthPx, gr
     // How far the middleground's art runs below the edge (in view: the skirt's depth at most).
     const mainBox = main.getLocalBounds();
     const below = Math.max(0, Math.min(depth, Math.ceil(mainBox.maxY - sourceH)));
-    let res = Math.min(2, renderer.resolution || 1);
+    let res = Math.min(2, streetBakeResolution(renderer, root.bakeResolutionCap));
     while (res > 0.5 && W * (band + below) * res * res * 4 > SKIRT_BYTES) res /= 1.25;
     const chunkW = Math.max(256, Math.min(4096, Math.floor(maxTex / res)));
     // Pixi 8 drops the filters of the container it renders (and makes it a render group), so
@@ -2213,7 +2229,7 @@ export function attachEdgeMirrors(PIXI, renderer, root, layers, W, sourceH, inse
     state.timer = null;
     if (root.destroyed || !state.ready || !state.vpW) return;
     const plans = plan(state.vpW);
-    const base = renderer.resolution || 1;
+    const base = streetBakeResolution(renderer, root.bakeResolutionCap);
     const wanted = plans.filter((p) => p.left || p.right);
     const key = wanted.length ? `${base}|${wanted.map((p) => `${p.lc.label}:${p.left},${p.right}`).join(';')}` : 'none';
     state.base = base;
@@ -2302,7 +2318,7 @@ export function attachEdgeMirrors(PIXI, renderer, root, layers, W, sourceH, inse
       state.vpW = vpW;
       state.share = share;
       if (state.ready) schedule(first ? 0 : 250);
-    } else if (state.ready && state.builds && state.timer === null && (renderer.resolution || 1) !== state.base) {
+    } else if (state.ready && state.builds && state.timer === null && streetBakeResolution(renderer, root.bakeResolutionCap) !== state.base) {
       schedule(250);
     }
     for (const view of state.views) {
@@ -2489,11 +2505,13 @@ export function buildStreetView(street, PIXI, opts = {}) {
   root.recolourCache = recolourCache;
   /** QA (game.js groddleQA.recolourStats, #284): recoloured deco copies, how many are baked now and their GPU MB. */
   root.recolourStats = () => recolourStats(recolourCache);
+  /** PHONE ZOOM SHARPNESS: the street's bakes stay at or under this (streetBakeResolution). */
+  root.bakeResolutionCap = recolourCache.resolutionCap;
   /** Ladder tiles drawn from the street's ladders' `tiling` (addLadderTiles). */
   root.ladderTiles = 0;
   /** Blurred layers' tiles (bakeBlurredLayer): counts for QA in root.blurStats. */
   const blurState = {
-    PIXI, renderer: opts.renderer, layers: [], tiles: 0, bytes: 0, peakBytes: 0,
+    PIXI, renderer: opts.renderer, cap: recolourCache.resolutionCap, layers: [], tiles: 0, bytes: 0, peakBytes: 0,
     bakes: 0, bakeMs: 0, planMs: 0, evictions: 0, redraws: 0, eager: 0, culled: false, dirty: false,
   };
   root.blurStats = blurState;
@@ -2565,11 +2583,11 @@ export function buildStreetView(street, PIXI, opts = {}) {
   /** The far copies' slack this street affords at the renderer's resolution now (farSharp). */
   let farSlack = FAR_SLACKS[0];
   const sharpPick = (url, far = false, blur = 0, slack = farSlack) => (renderer
-    ? sharpDeco(url, renderer.resolution || 1, {
+    ? sharpDeco(url, streetBakeResolution(renderer, recolourCache.resolutionCap), {
       bigTextures: bigTextures(),
       far,
       farSlack: slack,
-      blurDensity: blur > 0 ? blurBakeResolution(blur, renderer.resolution) : 0,
+      blurDensity: blur > 0 ? blurBakeResolution(blur, streetBakeResolution(renderer, recolourCache.resolutionCap)) : 0,
     })
     : null);
   const decoArt = (deco, available) => (available.has(deco.sprite) ? deco.sprite : DECO_TWINS[deco.sprite] || deco.sprite);
@@ -2701,7 +2719,7 @@ export function buildStreetView(street, PIXI, opts = {}) {
       if (animated) {
         attachAnim(PIXI, spr, sprite, {
           clock: animClock,
-          resolution: renderer?.resolution || 1,
+          resolution: streetBakeResolution(renderer, recolourCache.resolutionCap),
           far,
           blur,
           size: sizeDeco,
@@ -2794,11 +2812,12 @@ export function buildStreetView(street, PIXI, opts = {}) {
     }
   };
   if (sharpViews.length && typeof renderer?.on === 'function') {
-    let lastResolution = renderer.resolution;
+    const bakeRes = () => streetBakeResolution(renderer, recolourCache.resolutionCap);
+    let lastResolution = bakeRes();
     let timer = null;
     const onResize = () => {
-      if (renderer.resolution === lastResolution) return;
-      lastResolution = renderer.resolution;
+      if (bakeRes() === lastResolution) return;
+      lastResolution = bakeRes();
       clearTimeout(timer);
       timer = setTimeout(() => {
         if (!root.destroyed) root.refreshSharpDecos();

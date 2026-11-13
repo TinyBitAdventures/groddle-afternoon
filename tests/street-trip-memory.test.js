@@ -12,8 +12,8 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { recolourBakeResolution, recolourStats } from '../public/js/street-render.js?v=dfd6d798';
-import { PHONE_RENDER_RESOLUTION, MAX_RENDER_RESOLUTION, resolutionCap } from '../public/js/render-density.js?v=20f9f1ee';
+import { recolourBakeResolution, recolourStats } from '../public/js/street-render.js?v=57d38e04';
+import { PHONE_RENDER_RESOLUTION, MAX_RENDER_RESOLUTION, resolutionCap } from '../public/js/render-density.js?v=74c6f5f9';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const game = readFileSync(join(root, 'public/game.js'), 'utf8');
@@ -37,7 +37,9 @@ describe('#284: recoloured deco copies bake at the device render cap', () => {
   });
 
   it('game.js passes the cap; the bake uses it and frees the original image\'s GPU copy', () => {
-    assert.match(game, /buildStreetView\(data, PIXI, \{[\s\S]{0,200}bakeResolutionCap: RENDER_CAP,/);
+    assert.match(game, /buildStreetView\(data, PIXI, \{[\s\S]{0,200}bakeResolutionCap: STREET_BAKE_CAP,/);
+    // PHONE ZOOM SHARPNESS: named, so a zoomed-in phone's raised resolution never lifts it.
+    assert.match(game, /const STREET_BAKE_CAP = RENDER_CAP;/);
     assert.match(render, /resolutionCap: Number\(opts\.bakeResolutionCap\) \|\| Infinity/);
     assert.match(render, /resolution: recolourBakeResolution\(base\.resolution, cap\),/);
     assert.equal((render.match(/bakeRecolour\(PIXI, renderer, [^)]*, cache\.resolutionCap\)/g) || []).length, 2, 'the first bake and the rebake');

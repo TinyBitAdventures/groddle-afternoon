@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=f218c2d1';
 import { createErrorOnce, createFeatureHost } from './js/feature-host.js?v=06bb8b74';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=c555ba62';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=0bf392d0';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl, drawTileArt } from './js/enter-chooser.js?v=4a3ea327';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -668,7 +668,7 @@ import {
   ensureStreetIndex,
   resolveIndexTsid,
 } from './js/street-loader.js?v=18b181ad';
-import { showDraftBanner, startDraftPlay } from './js/builder/draft-play.js?v=89377762';
+import { showDraftBanner, startDraftPlay } from './js/builder/draft-play.js?v=21be2f3a';
 import {
   ladderTopDeck,
   groundBeneath,
@@ -697,7 +697,7 @@ import {
   setSignpostHover,
   setSignpostKeys,
   signpostBoardAt,
-} from './js/street-render.js?v=dfd6d798';
+} from './js/street-render.js?v=57d38e04';
 import {
   GAME_DAY_MS,
   shouldFireNewDay,
@@ -753,7 +753,7 @@ import {
   cameraWorldHeightForGround,
 } from './js/movement.js?v=b30f84eb';
 import { easeCameraAxis } from './js/camera-feel.js?v=e668afc5';
-import { renderResolution, resolutionCap, RESOLUTION_STEP } from './js/render-density.js?v=20f9f1ee';
+import { renderResolution, resolutionCap, RESOLUTION_STEP, phoneZoomResolution } from './js/render-density.js?v=74c6f5f9';
 // g458: low energy and mood turn amber and red, and a click offers something from the pack.
 import { makingNeeds, vitalMenuEmpty, vitalMenuHeading, vitalSnacks } from './js/vitals.js?v=85a51302';
 import { DEFAULT_VP_H, LOCATION_VIEW_W, VIEW_CEIL_H, stageFor, sceneViewCap, sceneViewWidthCap, zoomMovesStage, phoneZoomSpan } from './js/location-view.js?v=ffd74741';
@@ -1893,12 +1893,37 @@ function artDpr() {
   return Math.min(window.devicePixelRatio || 1, RENDER_CAP);
 }
 
+/**
+ * #284 and PHONE ZOOM SHARPNESS: the resolution a street's own bakes stay at or under (recoloured
+ * deco copies, blurred layers, skirt, edge mirrors, sharp copies; js/street-render.js
+ * streetBakeResolution): the device's render cap, 1 on a phone, even when a zoomed-in phone draws
+ * the screen at more (stageResolution). Raising it on a phone took the Fen trip past 1.5 GB.
+ */
+const STREET_BAKE_CAP = RENDER_CAP;
+
+/** `?density=` (QA): a fixed density cap, so the phone zoom's budget (stageResolution) stays out of it. */
+const DENSITY_ASKED = Boolean(new URLSearchParams(location.search).get('density'));
+
+/**
+ * The renderer's resolution for a canvas cssWidth CSS px wide at the current view: the device's
+ * rule (js/render-density.js renderResolution), and on a phone zoomed in (PHONE ZOOM SHARPNESS)
+ * as much more as keeps the backing store within the whole-street view's (phoneZoomResolution).
+ */
+function stageResolution(cssWidth) {
+  const dpr = window.devicePixelRatio || 1;
+  const base = renderResolution(cssWidth, VIEW_W, dpr, RENDER_CAP);
+  if (!TOUCH_PHONE || DENSITY_ASKED || !(phoneCloseup() > 0)) return base;
+  const far = stageFor({ ...stageArgs(), zoom: worldZoom(), closeup: 0 });
+  if (!far.phone) return base;
+  return Math.max(base, phoneZoomResolution({ cssWidth, viewW: VIEW_W, viewH: VIEW_H, dpr, budgetPx: far.viewW * far.canvasH }));
+}
+
 /** Keep the backing store at the canvas's displayed density (js/render-density.js). */
 function syncRenderResolution() {
   // PINCH PREVIEW: the renderer keeps its size until the fingers lift.
   if (!app?.renderer || !app.canvas || pinchPreview) return;
   const cssWidth = app.canvas.getBoundingClientRect().width;
-  const next = renderResolution(cssWidth, VIEW_W, window.devicePixelRatio || 1, RENDER_CAP);
+  const next = stageResolution(cssWidth);
   if (Math.abs(next - app.renderer.resolution) < RESOLUTION_STEP / 2) return;
   app.renderer.resize(VIEW_W, VIEW_H, next);
   app.canvas.dataset.renderResolution = String(next);
@@ -2040,7 +2065,7 @@ function syncLocationViewHeight({ keepFraming = false } = {}) {
 /** The renderer at the view's size (VIEW_W x VIEW_H) and the density for the canvas's CSS width. */
 function resizeRendererToView(cssWidth) {
   // A scene can change the scale without the canvas changing size: keep the density with it.
-  const resolution = renderResolution(cssWidth, VIEW_W, window.devicePixelRatio || 1, RENDER_CAP);
+  const resolution = stageResolution(cssWidth);
   app.renderer.resize(VIEW_W, VIEW_H, resolution);
   app.canvas.dataset.renderResolution = String(resolution);
 }
@@ -24559,7 +24584,7 @@ async function enterStreet(tsid, opts = {}) {
     renderer: app.renderer,
     available,
     // #284: a phone's recoloured deco copies bake at its render cap, not the art's 2x.
-    bakeResolutionCap: RENDER_CAP,
+    bakeResolutionCap: STREET_BAKE_CAP,
     cameraBottomPadding: cameraBottomSlack(LOCATION_VIEW_H),
     // The canvas runs on under the overlaid pack.
     skirtBelow: VIEW_H - LOCATION_VIEW_H,

@@ -55,3 +55,38 @@ export function renderResolution(cssWidth, viewWidth, dpr = 1, cap = MAX_RENDER_
   const steps = Math.round(1 / RESOLUTION_STEP);
   return Math.round(clamped * steps) / steps;
 }
+
+/**
+ * PHONE ZOOM SHARPNESS (Austin 2026-11-13: "Yes, let the phone draw sharper when zoomed in, if it
+ * can handle it"): zoomed in (js/world-zoom.js phoneZoom above 0), a phone's view holds fewer world
+ * px, so the same backing store can spend more of them on each: the resolution rises until the
+ * canvas holds as many backing px as it did at the whole-street view (`budgetPx`, the level-0
+ * view's width x height at 1), never past the screen's own density (scale x DPR) nor this cap.
+ * The canvas then costs what it cost at level 0; what grows is what is drawn at the renderer's
+ * resolution (text, vector overlays, filter scratch over the screen). The cap is the dial for that
+ * (WebKit at 402 x 660 DPR 3, footprint sampled every half second, tools/qa/street-memory.mjs
+ * --engine=webkit --phone --closeup=1 for the walk: at 1.5 the Ferncaster End to Froughtful Fen trip
+ * peaked at 1.27-1.44 GB, level 0 at 1.35-1.41 GB; a fresh Froughtful Fen 1.03-1.49 GB).
+ * PHONE_RENDER_RESOLUTION (resolutionCap) stays the phone's cap for art files and every street
+ * bake (game.js STREET_BAKE_CAP, js/street-render.js streetBakeResolution): with the bakes
+ * following the resolution the trip peaked at 1.59-2.14 GB.
+ */
+export const PHONE_ZOOM_RESOLUTION_CAP = 1.5;
+
+/**
+ * PURE: the phone's render resolution for a view of viewW x viewH world px shown cssWidth CSS px
+ * wide: min(scale x DPR, sqrt(budgetPx / (viewW x viewH)), cap), never under 1, on the
+ * RESOLUTION_STEP grid (rounded down, so the budget always holds).
+ */
+export function phoneZoomResolution({ cssWidth, viewW, viewH, dpr = 1, budgetPx, cap = PHONE_ZOOM_RESOLUTION_CAP } = {}) {
+  const w = Number(viewW);
+  const h = Number(viewH);
+  const budget = Number(budgetPx);
+  if (!(w > 0) || !(h > 0) || !(budget > 0)) return 1;
+  const css = Number(cssWidth) > 0 ? Number(cssWidth) : w;
+  const screen = (css / w) * (Number(dpr) > 0 ? Number(dpr) : 1);
+  const fit = Math.sqrt(budget / (w * h));
+  const top = Math.min(MAX_RENDER_RESOLUTION, Number(cap) >= 1 ? Number(cap) : 1);
+  const steps = Math.round(1 / RESOLUTION_STEP);
+  return Math.max(1, Math.floor(Math.min(screen, fit, top) * steps + 1e-9) / steps);
+}

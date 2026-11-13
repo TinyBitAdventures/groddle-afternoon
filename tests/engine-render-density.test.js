@@ -46,13 +46,13 @@ test('no feature or quest room reads engine.app (it is undefined)', () => {
 });
 
 test('a large Retina stage gets more than 2 backing px per world px, a phone gets 1', async () => {
-  const { renderResolution, resolutionCap } = await import('../public/js/render-density.js?v=20f9f1ee');
+  const { renderResolution, resolutionCap } = await import('../public/js/render-density.js?v=74c6f5f9');
   const desktop = renderResolution(1920, 960, 2, resolutionCap({ device: 'computer' }));
   const phone = renderResolution(1920, 960, 2, resolutionCap({ device: 'phone' }));
   assert.ok(desktop > 2, `desktop ${desktop}`);
   assert.equal(phone, 1);
 
-  const { landscapeArt, wantsHiresPieces } = await import('../public/js/features/homes-feature.js?v=cdcfb1c2');
+  const { landscapeArt, wantsHiresPieces } = await import('../public/js/features/homes-feature.js?v=1277bc4e');
   // House interiors: 3x pieces past 2.25, read from engine.resolution.
   assert.equal(wantsHiresPieces({ resolution: desktop }), true);
   assert.equal(wantsHiresPieces({ resolution: phone }), false);

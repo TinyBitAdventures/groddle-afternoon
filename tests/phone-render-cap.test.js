@@ -18,7 +18,7 @@ import {
   PHONE_RENDER_RESOLUTION,
   renderResolution,
   resolutionCap,
-} from '../public/js/render-density.js?v=20f9f1ee';
+} from '../public/js/render-density.js?v=74c6f5f9';
 
 const pub = join(import.meta.dirname, '..', 'public');
 const read = (p) => readFileSync(join(pub, p), 'utf8');
