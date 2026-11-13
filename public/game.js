@@ -809,7 +809,7 @@ import { holdCloseToFloor } from './js/slope-walk.js?v=9af1e505';
 import { JUMP_SPEED, MAX_TICK_FRAMES, WALK_MAX, avatarGround, coastX, frameSteps, stepAvatar, steerAccel, steerX, streetPhysicsExtras } from './js/avatar-step.js?v=43b1182e';
 import { createUserPath, stepUserPath } from './js/user-path.js?v=8880557f';
 import { TOUCH_JUMP_EVENT, climbGoalStep, installTouchControls, isPhoneDevice, touchPrompt, touchTapPlan } from './js/touch-controls.js?v=b6071ea4';
-import { installPinchZoom } from './js/touch-pinch.js?v=6cd34a65';
+import { installPinchZoom } from './js/touch-pinch.js?v=5bdb5971';
 import { FAILED_LINE, inVerbReach, movingLine, verbRange, walkOverEnd, walkOverGoals } from './js/walk-over.js?v=277ab977';
 import { hellBuffDesc, isInHell } from './js/hell.js?v=23354bc4';
 import { climbBobY, ladderAnimState, ladderSwap } from './js/ladder-anim.js?v=a8b327a0';
@@ -1895,7 +1895,8 @@ function artDpr() {
 
 /** Keep the backing store at the canvas's displayed density (js/render-density.js). */
 function syncRenderResolution() {
-  if (!app?.renderer || !app.canvas) return;
+  // PINCH PREVIEW: the renderer keeps its size until the fingers lift.
+  if (!app?.renderer || !app.canvas || pinchPreview) return;
   const cssWidth = app.canvas.getBoundingClientRect().width;
   const next = renderResolution(cssWidth, VIEW_W, window.devicePixelRatio || 1, RENDER_CAP);
   if (Math.abs(next - app.renderer.resolution) < RESOLUTION_STEP / 2) return;
@@ -1905,6 +1906,17 @@ function syncRenderResolution() {
 
 /** The scene whose size last held the view (syncLocationViewHeight). */
 let viewSceneLayer = null;
+
+/**
+ * PINCH PREVIEW (Austin 2026-11-13 on his iPhone: "The phone zoom in/out flickers and is mostly
+ * black during the zoom itself"): a pinch set the phone zoom once a frame in a requestAnimationFrame
+ * that ran after Pixi's own, and each level resized the renderer, which clears the canvas: the
+ * cleared canvas was what the screen showed. While two fingers pinch (js/touch-pinch.js begin/end)
+ * the view, camera and scale follow the level as before, but the renderer keeps its size and only
+ * app.stage scales (scale: the STAGE_SCALE the renderer is sized for); the fingers lifting sizes
+ * the renderer once and draws at once (endPinchPreview). null when no pinch is live.
+ */
+let pinchPreview = null;
 
 /** `?viewh=<px>` (QA, the restoration and landing shots): the old page, a 960 px view scaled to the width. */
 const PINNED_VIEW_H = Number(new URLSearchParams(location.search).get('viewh')) || 0;
@@ -1975,7 +1987,7 @@ function syncLocationViewHeight({ keepFraming = false } = {}) {
   setZoomFixed(streetZoomFixed());
   if (TOUCH_PHONE) phoneZoom.setFixed(phoneZoomSpanHere() <= 1.005);
   const root = document.getElementById('game-root');
-  if (root && !stage.pinned) {
+  if (root && !stage.pinned && !pinchPreview) {
     // Only a view held under the window's height (a portrait phone) leaves a band above the canvas.
     const band = root.clientHeight - stage.cssHeight;
     if (band >= 1) {
@@ -1987,6 +1999,8 @@ function syncLocationViewHeight({ keepFraming = false } = {}) {
     }
   }
   STAGE_SCALE = stage.scale;
+  // PINCH PREVIEW: the stage draws at the new scale inside the renderer's old size.
+  if (pinchPreview && app?.stage) app.stage.scale.set(STAGE_SCALE / pinchPreview.scale);
   const next = stage.viewH;
   if (next === LOCATION_VIEW_H && stage.viewW === VIEW_W) return false;
   const grew = next - LOCATION_VIEW_H;
@@ -1994,10 +2008,7 @@ function syncLocationViewHeight({ keepFraming = false } = {}) {
   VIEW_H = next + PACK_VIEW_RESERVE;
   VIEW_W = stage.viewW;
   if (app?.renderer) {
-    // A scene can change the scale without the canvas changing size: keep the density with it.
-    const resolution = renderResolution(stage.cssWidth, VIEW_W, window.devicePixelRatio || 1, RENDER_CAP);
-    app.renderer.resize(VIEW_W, VIEW_H, resolution);
-    app.canvas.dataset.renderResolution = String(resolution);
+    if (!pinchPreview) resizeRendererToView(stage.cssWidth);
     app.canvas.dataset.locationViewportHeight = String(LOCATION_VIEW_H);
     app.canvas.dataset.viewWidth = String(VIEW_W);
     app.canvas.dataset.stageScale = STAGE_SCALE.toFixed(3);
@@ -2026,8 +2037,47 @@ function syncLocationViewHeight({ keepFraming = false } = {}) {
   return true;
 }
 
+/** The renderer at the view's size (VIEW_W x VIEW_H) and the density for the canvas's CSS width. */
+function resizeRendererToView(cssWidth) {
+  // A scene can change the scale without the canvas changing size: keep the density with it.
+  const resolution = renderResolution(cssWidth, VIEW_W, window.devicePixelRatio || 1, RENDER_CAP);
+  app.renderer.resize(VIEW_W, VIEW_H, resolution);
+  app.canvas.dataset.renderResolution = String(resolution);
+}
+
 /** ZOOM: a resize this file sends after a zoom change, so the camera keeps the framing it chose. */
 let zoomRelaying = false;
+
+/** PINCH PREVIEW: two fingers started moving the phone zoom (Modern only, like the level itself). */
+function beginPinchPreview() {
+  if (pinchPreview || !app?.renderer || !modernUi()) return;
+  pinchPreview = { scale: STAGE_SCALE };
+  setCanvasData('pinchPreview', 'on');
+}
+
+/**
+ * PINCH PREVIEW: the fingers lifted. The stage scale goes back to 1 and the renderer takes the
+ * view the pinch left, then draws at once, in this same task, so no frame shows the canvas the
+ * resize cleared; the usual resize listeners measure once.
+ */
+function endPinchPreview() {
+  if (!pinchPreview) return;
+  pinchPreview = null;
+  setCanvasData('pinchPreview', '');
+  if (!app?.renderer) return;
+  app.stage.scale.set(1);
+  syncLocationViewHeight({ keepFraming: true });
+  resizeRendererToView(measureStage().cssWidth);
+  app.canvas.dataset.viewWidth = String(VIEW_W);
+  app.canvas.dataset.stageScale = STAGE_SCALE.toFixed(3);
+  app.render();
+  try {
+    zoomRelaying = true;
+    window.dispatchEvent(new Event('resize'));
+  } finally {
+    zoomRelaying = false;
+  }
+}
 
 /**
  * ZOOM (js/world-zoom.js): the player moved the zoom. The stage resizes live (renderer density
@@ -2040,6 +2090,8 @@ function applyWorldZoom() {
   syncRenderResolution();
   if (app?.canvas) app.canvas.dataset.worldZoom = String(worldZoom());
   if (app?.canvas && TOUCH_PHONE) app.canvas.dataset.phoneZoom = String(phoneZoom.get());
+  // PINCH PREVIEW: the panels and overlays measure once, when the fingers lift (endPinchPreview).
+  if (pinchPreview) return;
   try {
     zoomRelaying = true;
     window.dispatchEvent(new Event('resize'));
@@ -32531,6 +32583,9 @@ async function main() {
     getLevel: () => phoneZoom.get(),
     setLevel: (z) => { if (modernUi()) phoneZoom.set(z); },
     span: () => phoneZoomSpanHere(),
+    // PINCH PREVIEW: no renderer resize while the fingers move, one when they lift.
+    begin: () => beginPinchPreview(),
+    end: () => endPinchPreview(),
     setData: (k, v) => setCanvasData(k, v),
   }) : null;
   app.canvas.addEventListener('pointerdown', (e) => {
@@ -32873,6 +32928,16 @@ async function main() {
     setInterval(play, 4000);
   }
   window.groddleQA = {
+    /**
+     * PINCH PREVIEW QA (WebKit has no two-finger touch in Playwright): drive a phone pinch as
+     * js/touch-pinch.js does: 'begin', then 'level' with each level (once a frame), then 'end'.
+     */
+    phonePinch(step, level) {
+      if (step === 'begin') beginPinchPreview();
+      else if (step === 'level' && modernUi()) phoneZoom.set(level);
+      else if (step === 'end') endPinchPreview();
+      return { level: phoneZoom.get(), preview: Boolean(pinchPreview), stageScale: app?.stage?.scale?.x ?? null, viewW: VIEW_W, renderer: app?.renderer ? [app.renderer.width, app.renderer.height] : null };
+    },
     /** SKIRT QA: the street's ground skirt (street-render buildGroundSkirt): depth, band, colours, layers, chunks. */
     groundSkirt: () => (bgLayer?.groundSkirt ? { ...bgLayer.groundSkirt } : null),
     /** EDGE MIRROR QA: the street's mirrored end strips (street-render attachEdgeMirrors): sizes, resolution, bytes, builds. */

@@ -9,6 +9,11 @@
  *   canvas's own pointerdown handler with the press's own event (its time and place).
  * - A second finger on the street makes it a pinch: no tap, the level follows the spread of the two
  *   fingers (pinchLevel), once a frame. A finger that drags is no tap either.
+ * - PINCH PREVIEW (Austin 2026-11-13: "The phone zoom in/out flickers and is mostly black during the
+ *   zoom itself"): begin() comes before the pinch's first level and end() after its last, once each,
+ *   so the game can draw the levels between by scaling the stage alone and size the renderer once,
+ *   when the fingers lift (resizing it once a frame cleared the canvas after Pixi drew it, so
+ *   most frames of a pinch showed black).
  * - The canvas takes every touch itself (touch-action: none), so the page never zooms or pans
  *   (style.css TOUCH PANELS keeps that for the rest of the page). The stick and Jump are their own
  *   elements with their own touches (js/touch-controls.js): a pinch on the street never reaches them.
@@ -43,10 +48,11 @@ export function isWorldTap({ dx = 0, dy = 0, pinched = false, cancelled = false 
 /**
  * Wires the canvas. tap(e): the world's press handler, called on lift with the press's event.
  * getLevel / setLevel / span: the phone zoom and its scale ratio for the current street.
+ * begin() / end(): a pinch that moves the level starts and ends (PINCH PREVIEW).
  * Returns { defer(e), destroy() }: defer(e) is true when the canvas's pointerdown should wait (a
  * real touch); synthetic presses (the stick's tap-through) act at once.
  */
-export function installPinchZoom({ canvas, tap, getLevel, setLevel, span = () => 1, setData = () => {}, win = globalThis.window } = {}) {
+export function installPinchZoom({ canvas, tap, getLevel, setLevel, span = () => 1, begin = () => {}, end = () => {}, setData = () => {}, win = globalThis.window } = {}) {
   if (!canvas) return null;
   canvas.style.touchAction = 'none';
   const fingers = new Map();
@@ -54,6 +60,7 @@ export function installPinchZoom({ canvas, tap, getLevel, setLevel, span = () =>
   let pinch = null;
   let frame = 0;
   let want = null;
+  let live = false;
 
   const spread = () => {
     const [a, b] = [...fingers.values()];
@@ -90,6 +97,10 @@ export function installPinchZoom({ canvas, tap, getLevel, setLevel, span = () =>
     if (!pinch || fingers.size < 2) return;
     const d = spread();
     if (!pinch.moved && Math.abs(d - pinch.dist) < PINCH_DEAD_PX) return;
+    if (!pinch.moved) {
+      live = true;
+      begin();
+    }
     pinch.moved = true;
     want = pinchLevel(pinch.level, pinch.dist, d, span());
     if (!frame) frame = win?.requestAnimationFrame ? win.requestAnimationFrame(flush) : (flush(), 0);
@@ -109,6 +120,10 @@ export function installPinchZoom({ canvas, tap, getLevel, setLevel, span = () =>
       frame = 0;
       flush();
       pinch = null;
+      if (live) {
+        live = false;
+        end();
+      }
       setData('pinch', '');
     }
   };
@@ -122,6 +137,10 @@ export function installPinchZoom({ canvas, tap, getLevel, setLevel, span = () =>
   return {
     defer: (e) => e?.pointerType === 'touch' && e.isTrusted === true && fingers.has(e.pointerId),
     destroy() {
+      if (live) {
+        live = false;
+        end();
+      }
       canvas.removeEventListener('pointerdown', onDown, true);
       canvas.removeEventListener('pointermove', onMove);
       for (const type of ['pointerup', 'pointercancel']) canvas.removeEventListener(type, onEnd);
