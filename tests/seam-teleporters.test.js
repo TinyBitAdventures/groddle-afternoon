@@ -84,6 +84,6 @@ describe("Oppidan Avenue's teleporters", () => {
 
   it('the hidden floors feature runs them with the other teleporters', () => {
     const feature = readFileSync(join(spike, 'public/js/features/hidden-floors-feature.js'), 'utf8');
-    assert.match(feature, /\.\.\.cavePitTeleportersOn\(street\.tsid\), \.\.\.seamTeleportersOn\(street\.tsid\)\];/);
+    assert.match(feature, /\.\.\.cavePitTeleportersOn\(street\.tsid\), \.\.\.seamTeleportersOn\(street\.tsid\)[,\]]/);
   });
 });

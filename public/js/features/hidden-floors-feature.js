@@ -19,6 +19,8 @@
  *   each end of the pit floor back up to that end's signpost island.
  *   Oppidan Avenue's four (js/seam-teleporters.js, G620): each cave's beam to that end of the
  *   city, each end of the city to that side's cave, as the footage shows.
+ *   Yellow Yawning's right end back to Shim Shiri (js/collision-teleporters.js, G681, with the
+ *   census of every street's Collision-triggered Teleporters).
  * - The painted "EXIT" on both floors: the forgotten floor's archived
  *   sign_txt and, on the lost floor, the word read off the footage.
  * - Goorsh Gam's canopy and Ilmenskie's cave mouth: there the avatar walks
@@ -64,6 +66,7 @@ import { narakaTeleportersOn } from '../hell.js?v=23354bc4';
 import { wintryPortalTeleportersOn } from '../wintry-portal.js?v=1437deda';
 import { cavePitTeleportersOn } from '../cave-pit.js?v=81e62950';
 import { seamTeleportersOn } from '../seam-teleporters.js?v=09d11340';
+import { collisionTeleportersOn } from '../collision-teleporters.js?v=b1214a65';
 
 export const HIDDEN_FLOORS_FEATURE_ID = 'hidden-floors';
 const CHECK_MS = 60;
@@ -200,7 +203,7 @@ export const hiddenFloorsFeature = {
       publish(engine, enteredAt, true);
       return;
     }
-    boxes = [...teleportersOn(street.tsid), ...narakaTeleportersOn(street.tsid), ...wintryPortalTeleportersOn(street.tsid), ...cavePitTeleportersOn(street.tsid), ...seamTeleportersOn(street.tsid)];
+    boxes = [...teleportersOn(street.tsid), ...narakaTeleportersOn(street.tsid), ...wintryPortalTeleportersOn(street.tsid), ...cavePitTeleportersOn(street.tsid), ...seamTeleportersOn(street.tsid), ...collisionTeleportersOn(street.tsid)];
     zone = clientPhysicsZone(street);
     if (isIlmenskieTsid(street.tsid)) ceilings = ceilingsScreen(street);
     const row = exitSignOn(street.tsid);
