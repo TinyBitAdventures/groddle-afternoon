@@ -84,9 +84,9 @@ let slice = normalizeAuctionsSlice(null);
 let multiplayer = false;
 
 const STYLE = `
-.auc-shade { position: fixed; inset: 0; z-index: calc(var(--z-dialog) + 4); background: color-mix(in srgb, var(--c-mauve-23) 28%, transparent); display: flex; align-items: flex-start; justify-content: center; padding: 7vh var(--sp-8) var(--sp-8); pointer-events: auto; }
+.auc-shade { position: fixed; inset: 0; z-index: calc(var(--z-dialog) + 4); background: color-mix(in srgb, var(--c-mauve-23) 28%, transparent); display: flex; align-items: flex-start; justify-content: center; padding: 7vh var(--sp-8) var(--sp-8); padding-top: 7dvh; pointer-events: auto; }
 .auc-shade[hidden] { display: none; }
-.auc-win { width: min(680px, 100%); max-height: 84vh; display: flex; flex-direction: column; border-radius: var(--radius-xl); background: var(--surface-card); color: var(--text); box-shadow: var(--shadow-3), 0 0 0 1px color-mix(in srgb, var(--c-violet-50) 18%, transparent); font: var(--fs-md)/var(--lh-normal) var(--font-system); overflow: hidden; }
+.auc-win { width: min(680px, 100%); max-height: 84vh; max-height: 84dvh; display: flex; flex-direction: column; border-radius: var(--radius-xl); background: var(--surface-card); color: var(--text); box-shadow: var(--shadow-3), 0 0 0 1px color-mix(in srgb, var(--c-violet-50) 18%, transparent); font: var(--fs-md)/var(--lh-normal) var(--font-system); overflow: hidden; }
 .auc-head { display: flex; gap: var(--sp-5); align-items: center; padding: var(--sp-6) var(--sp-7) var(--sp-3); }
 .auc-head h2 { margin: 0; font: 700 var(--fs-lg)/var(--lh-tight) var(--font-ui); color: var(--c-violet-36); }
 .auc-x { margin-left: auto; border: 0; background: transparent; font: 700 var(--fs-xl)/var(--lh-none) var(--font-system); color: var(--text-subtle); cursor: pointer; padding: var(--sp-1) var(--sp-3); border-radius: var(--radius-sm); }
