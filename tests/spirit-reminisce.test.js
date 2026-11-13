@@ -11,7 +11,7 @@ import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { loadContentCatalogsFromDir, resetContentCatalogs, getQuestCatalog } from '../public/js/content-catalogs.js?v=10b118dd';
 import { createQuestState } from '../public/js/quests.js?v=40c71a37';
-import { ensureQuestOfferState, npcQuestOffers, pendingQuestOffers, waitingOffers } from '../public/js/quest-offers.js?v=d18bee8b';
+import { ensureQuestOfferState, npcQuestOffers, pendingQuestOffers, waitingOffers } from '../public/js/quest-offers.js?v=89511e1e';
 import {
   REMINISCE_VERB,
   SPIRIT_REMINISCE_TEXT,
@@ -20,7 +20,7 @@ import {
   isStreetSpiritClass,
   spiritReminisceOffers,
   withReminisceVerb,
-} from '../public/js/spirit-reminisce.js?v=a062c734';
+} from '../public/js/spirit-reminisce.js?v=ce10eaf5';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const gsjs = join(root, '../glitch-GameServerJS');

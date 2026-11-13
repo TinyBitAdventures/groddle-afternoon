@@ -32,7 +32,7 @@ import {
   vendorSheet,
   vendorStates,
   vendorStrip,
-} from '../public/js/vendor-npcs.js?v=a02e8603';
+} from '../public/js/vendor-npcs.js?v=7cfca6a9';
 import { walkerSpan } from '../public/js/street-creatures.js?v=ee7dfd05';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -312,6 +312,24 @@ describe('the walk strips at 3x (lane vendors3x)', () => {
       const r = results[`assets/sprites/vendors/${name}.webp`];
       assert.deepEqual(r?.swfFrames, run, name);
     }
+  });
+
+  it('a sharp desktop swaps vendor strips to 3x on first draw; a phone (render cap 1) keeps the 1x strips', async () => {
+    const { resolutionCap } = await import('../public/js/render-density.js?v=74c6f5f9');
+    const { installHiresSprites, installHiresFirstDraw, hiresSpriteUrl } = await import('../public/js/sprite-hires.js?v=add7b764');
+    const textures = { addUrlRoute() {} };
+    const renderer = () => ({ texture: { _initSource() { return {}; } } });
+    // game.js artDpr(): min(devicePixelRatio, the device's render cap).
+    installHiresSprites(textures, { dpr: Math.min(3, resolutionCap({ device: 'phone' })), viewWidth: 402 });
+    const phone = renderer();
+    installHiresFirstDraw(phone);
+    assert.equal(phone.texture.hiresFirstDraw, undefined, 'a phone never swaps');
+    assert.equal(hiresSpriteUrl(vendorSheet('npc_tool_vendor', 'walk').path), null);
+    installHiresSprites(textures, { dpr: Math.min(2, resolutionCap({ device: 'computer' })), viewWidth: 1280 });
+    const desktop = renderer();
+    installHiresFirstDraw(desktop);
+    assert.equal(desktop.texture.hiresFirstDraw, true, 'a 2x desktop swaps on first draw');
+    assert.equal(hiresSpriteUrl(vendorSheet('npc_tool_vendor', 'walk').path), 'assets/sprites/vendors/npc_tool_vendor_walk@3x.webp');
   });
 
   it('the idle and talk 3x strips are all still there', () => {

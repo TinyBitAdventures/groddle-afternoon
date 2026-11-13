@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=bf046b8e';
 import { createErrorOnce, createFeatureHost } from './js/feature-host.js?v=06bb8b74';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=757f9059';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=28944158';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl, drawTileArt } from './js/enter-chooser.js?v=4a3ea327';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -37,8 +37,8 @@ import {
 // Quest copy is Flash htmlText: <b>/<i>/<br> drawn as formatting, the rest dropped, never innerHTML.
 import { questRequirementText, renderQuestText, withQuestMarkup } from './js/quest-text.js?v=7f5d761c';
 // G267: the world-verb quest counters skip offer-system quests; old saves drop the boot Moloko quest.
-import { dropSpiritRepeatOffers, SPIRIT_REPEAT_QUESTS } from './js/spirit-reminisce.js?v=a062c734';
-import { dropBootStarterQuests, questMoveNote, routesCounter, worldVerbQuestEvents, gardenPlotEvents, makingUnitQuestEvents, shrineDonationQuestEvents } from './js/quest-offers.js?v=d18bee8b';
+import { dropSpiritRepeatOffers, SPIRIT_REPEAT_QUESTS } from './js/spirit-reminisce.js?v=ce10eaf5';
+import { dropBootStarterQuests, questMoveNote, routesCounter, worldVerbQuestEvents, gardenPlotEvents, makingUnitQuestEvents, shrineDonationQuestEvents } from './js/quest-offers.js?v=89511e1e';
 import {
   PHANTOM_QUEST_ID,
   REMEMBER_QUEST_ID,
@@ -510,7 +510,7 @@ import {
   parsePlayerSave,
   serializePlayerSave,
   restorePlayerSave,
-} from './js/player-save.js?v=9aed8356';
+} from './js/player-save.js?v=4d26c60a';
 import {
   HOME_INTERIOR_TSID,
   HOME_STREET_TSID,

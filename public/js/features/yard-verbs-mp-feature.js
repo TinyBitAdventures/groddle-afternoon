@@ -69,7 +69,7 @@ import { frameTexture, onLoaded, sourceFromUrl, textureFromUrl } from '../textur
 import { homeStreetLayout, normalizeCultivationState } from '../home-cultivation.js?v=1e2d2b2d';
 import { readVisitScene } from '../neighbours-mp.js?v=a12300f9';
 import { saveStore } from '../save-store.js?v=04420633';
-import { STREET_GROUND_Y, homesFeature, wearHomeCultivation } from './homes-feature.js?v=0790ef89';
+import { STREET_GROUND_Y, homesFeature, wearHomeCultivation } from './homes-feature.js?v=bc1eb4d0';
 import { patchesFeature, treeFrameUrl } from './patches-feature.js?v=f1fc4def';
 import {
   YARD_STREET,
@@ -98,7 +98,7 @@ import { ROCK_CATALOG, rockStatusLabel, tickMineRock } from '../mining.js?v=b28f
 import { getResourceNodeDef, regrowDelayMs } from '../resource-nodes.js?v=3a26727e';
 import { getGameDayKey } from '../game-day.js?v=cf9afac0';
 import { rockReady } from '../street-objects.js?v=2945b57f';
-import { resourceNodesFeature } from './resource-nodes-feature.js?v=66fea9b9';
+import { resourceNodesFeature } from './resource-nodes-feature.js?v=13dfaf5d';
 import {
   ROCK_RESPAWN_MS,
   STOCK_NODE_VERBS,

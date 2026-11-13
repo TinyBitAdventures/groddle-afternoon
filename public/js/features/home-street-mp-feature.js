@@ -54,10 +54,10 @@ import { textureFromUrl } from '../textures.js?v=814d7926';
 import { addSignBoard, signArmWidth, signLabel } from '../street-render.js?v=0f1293df';
 import { openNotePicker, openNoteView } from '../note-view.js?v=eca7de52';
 import { homeStreetName, possessive, readVisitScene } from '../neighbours-mp.js?v=a12300f9';
-import { BACK_YARD_GROUND_Y, SIGN_PROMPT_LIFT, STREET_GROUND_Y, homesFeature, visitorHomeState } from './homes-feature.js?v=0790ef89';
-import { projectApi } from './street-jobs-feature.js?v=4a394d9c';
+import { BACK_YARD_GROUND_Y, SIGN_PROMPT_LIFT, STREET_GROUND_Y, homesFeature, visitorHomeState } from './homes-feature.js?v=bc1eb4d0';
+import { projectApi } from './street-jobs-feature.js?v=a04c5e7a';
 import { saveStore } from '../save-store.js?v=04420633';
-import { giveCarriedNote, takeCarriedNote, writtenCarriedNotes } from './street-furniture-feature.js?v=b2ea2955';
+import { giveCarriedNote, takeCarriedNote, writtenCarriedNotes } from './street-furniture-feature.js?v=00aa176a';
 import {
   GOOD_NEIGHBOUR_AT,
   GOOD_NEIGHBOUR_COUNTER,

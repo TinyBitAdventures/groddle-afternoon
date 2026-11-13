@@ -158,8 +158,10 @@ export const VENDOR_NPC_ART = Object.freeze({
  * Their walks (register G680, js/vendor-walk.js): the walk, turn, stop and impatient strips from the
  * same CC0 dump, cut the same way (tools/vendor-npc-art.mjs), on the class's cell grid. Each strip
  * keeps every frame of its sheet (the cells after the last are empty) and its own union crop; the
- * feet stay on the idle strip's lowest row (vendorAnchor). 1x only: the idle and talk strips swap
- * to 3x renders of the SWF (js/sprite-hires.js), these do not yet.
+ * feet stay on the idle strip's lowest row (vendorAnchor). Like the idle and talk strips, each swaps
+ * to a 3x render of the SWF on a sharp screen (js/sprite-hires.js; tools/vector-sprites/characters.json
+ * `<vendor>-motion` jobs, their own group so a poor match never costs the idle and talk 3x). A
+ * phone draws at 1 and keeps these 1x strips.
  */
 export const VENDOR_NPC_MOTION_ART = Object.freeze({
   npc_tool_vendor: {

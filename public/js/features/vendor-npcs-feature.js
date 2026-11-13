@@ -48,7 +48,7 @@ import {
   npcQuestOffers,
   questAwardPayload,
   turnInQuest,
-} from '../quest-offers.js?v=d18bee8b';
+} from '../quest-offers.js?v=89511e1e';
 import {
   GOT_QUEST_TEXT,
   VENDOR_NPCS,
@@ -63,7 +63,7 @@ import {
   vendorStates,
   vendorStreetsFor,
   vendorStrip,
-} from '../vendor-npcs.js?v=a02e8603';
+} from '../vendor-npcs.js?v=7cfca6a9';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
 import { chickenSeed, walkerSpan } from '../street-creatures.js?v=ee7dfd05';
 import { landingY, walkSurfaceY } from '../walk-surface.js?v=106bfdc5';

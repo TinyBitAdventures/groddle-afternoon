@@ -22,8 +22,8 @@ import {
   putOffOffer,
   questOfferCard,
   questStatus,
-} from '../public/js/quest-offers.js?v=d18bee8b';
-import { questOffersFeature, showWaitingOffer } from '../public/js/features/quest-offers-feature.js?v=7f658aac';
+} from '../public/js/quest-offers.js?v=89511e1e';
+import { questOffersFeature, showWaitingOffer } from '../public/js/features/quest-offers-feature.js?v=11a5835a';
 
 const PUBLIC = join(dirname(fileURLToPath(import.meta.url)), '../public');
 const read = (p) => readFileSync(join(PUBLIC, p), 'utf8');

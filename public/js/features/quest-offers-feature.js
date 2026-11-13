@@ -111,7 +111,7 @@ import {
   COLD_COMFORT_LEAVE_TEXT,
   HOME_TREE_GROWN_TEXT,
   SEED_TO_SCYTHE,
-} from '../quest-offers.js?v=d18bee8b';
+} from '../quest-offers.js?v=89511e1e';
 import { PEAT_TEXT, retireSoloPeatQuest } from '../peat-quest.js?v=c7baea41';
 import { retireDeadQuests, retiredQuestLine } from '../retired-quests.js?v=61758261';
 import { parseQuestConversation } from '../quests.js?v=40c71a37';

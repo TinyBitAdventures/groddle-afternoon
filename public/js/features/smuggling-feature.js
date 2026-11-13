@@ -38,14 +38,14 @@
 
 import { addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=f49c8998';
 import { canUseTool } from '../tools.js?v=48542c24';
-import { acceptOffer, ensureQuestOfferState, turnInQuest } from '../quest-offers.js?v=d18bee8b';
+import { acceptOffer, ensureQuestOfferState, turnInQuest } from '../quest-offers.js?v=89511e1e';
 import { parseQuestConversation } from '../quests.js?v=40c71a37';
 import { getQuestCatalog } from '../content-catalogs.js?v=10b118dd';
 import { STREET_INDEX, resolveIndexTsid } from '../street-loader.js?v=18b181ad';
 import { isStandable, worldToScreen } from '../street-model.js?v=b6cb6a4e';
 import { landingY, walkSurfaceY } from '../walk-surface.js?v=106bfdc5';
 import { hellFeature } from './hell-feature.js?v=7477c8c7';
-import { questRoomConverse } from './quest-instances-feature.js?v=ce346174';
+import { questRoomConverse } from './quest-instances-feature.js?v=c8869edb';
 import {
   CONTRABAND,
   CONTRABAND_ITEM,

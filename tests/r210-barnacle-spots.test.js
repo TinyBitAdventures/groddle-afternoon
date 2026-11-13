@@ -31,7 +31,7 @@ import {
   prepareStreetResourceNodes,
   resourcePlacementGroups,
   resourceSpawnPlan,
-} from '../public/js/features/resource-nodes-feature.js?v=66fea9b9';
+} from '../public/js/features/resource-nodes-feature.js?v=13dfaf5d';
 import { BARNACLE_SPOTS } from '../public/js/barnacle-spots-data.js?v=cea3daec';
 
 const root = join(import.meta.dirname, '..');

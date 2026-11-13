@@ -19,7 +19,7 @@ import { fileURLToPath } from 'node:url';
 
 import { loadContentCatalogsFromDir, resetContentCatalogs } from '../public/js/content-catalogs.js?v=10b118dd';
 import { createQuestState } from '../public/js/quests.js?v=40c71a37';
-import { acceptOffer, routeQuestEvent } from '../public/js/quest-offers.js?v=d18bee8b';
+import { acceptOffer, routeQuestEvent } from '../public/js/quest-offers.js?v=89511e1e';
 import { createInventory } from '../public/js/inventory.js?v=f49c8998';
 import { createToolConditionState } from '../public/js/tools.js?v=48542c24';
 import { setMetabolicGainGate } from '../public/js/metabolics.js?v=1383e6fd';

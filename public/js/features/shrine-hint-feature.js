@@ -27,7 +27,7 @@
  *   wrong-shrine:<giant>), giantLoveScreen (open | ready | closed),
  *   giantLoveLine, giantLoveSound.
  */
-import { questStatus } from '../quest-offers.js?v=d18bee8b';
+import { questStatus } from '../quest-offers.js?v=89511e1e';
 import { GIANT_SCREEN_FADE_MS, giantLoveResponse } from '../giant-love.js?v=aa9ea315';
 import { GIANTS, inEmblemHitbox } from '../shrines.js?v=7260fa28';
 import { vogPages } from '../newxp.js?v=7712f77d';
