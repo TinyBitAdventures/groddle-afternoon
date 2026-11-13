@@ -3226,6 +3226,9 @@ function islandSigns(engine, table = ISLAND_SIGNS, { follow = false } = {}) {
   }
 }
 
+/** Above every deco of a layer (deco z values are small whole numbers). */
+const SIGN_WORDS_Z = 100000;
+
 /** Follow each sign deco's show/hide (and its fade) from the street's own events. */
 function syncSigns(engine) {
   const views = engine.decoViews;
@@ -3234,16 +3237,25 @@ function syncSigns(engine) {
     const view = views?.get(row.id);
     row.label.visible = Boolean(view && !view.destroyed && view.visible);
     row.label.alpha = view ? view.alpha : 0;
-    // `follow`: ride the deco through its own (parallax) layer, centred on it.
-    if (row.follow && row.label.visible && view.parent && engine.entityLayer) {
-      const at = engine.entityLayer.toLocal(view.parent.toGlobal({ x: view.x, y: view.y - row.follow }));
-      row.label.x = at.x;
-      row.label.y = at.y;
+    // `follow`: the words ride in the deco's own (parallax) layer, centred on it, above every
+    // other deco there. The client drew sign_txt inside the sign deco (DecoRenderer.as 287-322)
+    // and stacked sign decos on top of their layer (LayerRenderer.as 201-203), so a cover deco
+    // on that layer never hid them (report #259: the practice street's blackcover over the hint).
+    if (row.follow && row.label.visible && view.parent) {
+      if (row.label.parent !== view.parent) {
+        view.parent.addChild(row.label);
+        row.label.zIndex = SIGN_WORDS_Z;
+      }
+      row.label.x = view.x;
+      row.label.y = view.y - row.follow;
     }
   }
   // QA (data-newxp-signs): each shown sign's deco id tail and label centre in world px.
+  const worldOf = (label) => (label.parent && engine.entityLayer && label.parent !== engine.entityLayer
+    ? engine.entityLayer.toLocal(label.parent.toGlobal({ x: label.x, y: label.y }))
+    : label);
   const shown = (run?.data?.signs || []).filter((row) => row.label.visible && !row.label.destroyed)
-    .map((row) => `${row.id.slice(-4)}@${Math.round(row.label.x)},${Math.round(row.label.y)}a${row.label.alpha.toFixed(2)}`).join(' ');
+    .map((row) => { const at = worldOf(row.label); return `${row.id.slice(-4)}@${Math.round(at.x)},${Math.round(at.y)}a${row.label.alpha.toFixed(2)}`; }).join(' ');
   if (shown !== lastSignsData) {
     lastSignsData = shown;
     engine.setData('newxpSigns', shown);

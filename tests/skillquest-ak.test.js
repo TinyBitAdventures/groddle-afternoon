@@ -32,7 +32,7 @@ import {
 } from '../public/js/skillquest-ak.js?v=397a9d19';
 import { listAnimalFeedOptions } from '../public/js/animals.js?v=babec605';
 import { populationForStreet } from '../public/js/street-ecology.js?v=0f046853';
-import { newxpFeature } from '../public/js/features/newxp-feature.js?v=464dd25d';
+import { newxpFeature } from '../public/js/features/newxp-feature.js?v=2ecfdad9';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const pub = join(here, '../public');
@@ -223,5 +223,19 @@ describe('G298: only what the source lists', () => {
     // item.js deleteWithPoof: apiDelete 200 ms after the puff; the sloth stays that long.
     assert.match(gsjs('items/item.js'), /container\.announce_sound_to_all\('PROTO_PUFF'\);\n\t\}\n\n\tthis\.apiSetTimer\('apiDelete', 200\);/);
     has(newxp, /const POOF_DELETE_MS = 200;/);
+  });
+
+  it('report #259: the hint words sit in their deco\'s own layer, above its blackcover', () => {
+    // The street's middleplus layer puts a newxpblack_blackcover_01a (z 10) across the hint sign (z 5).
+    const plus = street.layers.find((l) => (l.decos || []).some((d) => d.id === 'groddle_sign_blank_1342128759601'));
+    const sign = plus.decos.find((d) => d.id === 'groddle_sign_blank_1342128759601');
+    const cover = plus.decos.find((d) => d.sprite === 'newxpblack_blackcover_01a');
+    assert.ok(cover && cover.z > sign.z);
+    assert.ok(Math.abs(cover.x - sign.x) < sign.w / 2 && cover.y < sign.y && cover.y > sign.y - sign.h);
+    // The client drew sign_txt inside the deco and stacked sign decos on top of their layer
+    // (DecoRenderer.as 287-322, LayerRenderer.as 201-203): the words go into the deco's layer, above every deco.
+    has(newxp, /if \(row\.label\.parent !== view\.parent\) \{\n\s+view\.parent\.addChild\(row\.label\);\n\s+row\.label\.zIndex = SIGN_WORDS_Z;/);
+    has(newxp, /const SIGN_WORDS_Z = 100000;/);
+    assert.ok(100000 > Math.max(...street.layers.flatMap((l) => (l.decos || []).map((d) => d.z || 0))));
   });
 });
