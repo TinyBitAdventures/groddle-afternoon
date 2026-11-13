@@ -14278,6 +14278,36 @@ body.is-booting .touch-controls { display: none; }
   :root.touch-phone[data-ui="modern"] #game-root #bug-report-panel .reports-new-view .reports-text { min-height: 3.6rem; }
   :root.touch-phone[data-ui="modern"] #game-root #bug-report-panel .reports-actions { position: sticky; bottom: 0; z-index: var(--z-raised); margin-top: auto; padding: var(--space-2) 0; background: var(--surface); }
 }
+/* HOME BUILDER SIDEWAYS (#6): in Cultivation and Decoration Mode at 667-750 px wide the tray stood
+   137-172 px tall, about 70 px of street showed between it and the banner, and the banner ran under the
+   stick and Jump (they stand on the tray, home-builder.js syncTrayUp). Sideways under 500 px tall:
+   Cultivate's tray is one row (the note and your iMG, the choices, Expand, with smaller tiles and no
+   footer line), Decorate's tabs, filters and store share the row over its strip, and the banner sits
+   right under the top bar, one slim row, so it clears the stick and Jump. */
+@media (max-height: 500px) and (orientation: landscape) {
+  :root.touch-phone[data-ui="modern"] #game-root .hb-banner { top: calc(var(--hud-h) + 4px); padding-top: 2px; padding-bottom: 2px; }
+  :root.touch-phone[data-ui="modern"] #game-root .hb-banner .hb-hint { display: none; }
+  :root.touch-phone[data-ui="modern"] #game-root .hb-banner .hb-close { width: 36px; height: 36px; min-height: 36px; }
+  :root.touch-phone[data-ui="modern"] #game-root .hb-tray { bottom: max(var(--sp-2), env(safe-area-inset-bottom, 0px)); padding: var(--sp-2) var(--sp-2) var(--sp-2); gap: var(--sp-2) var(--space-3); }
+  /* Cultivate: one row. */
+  :root.touch-phone[data-ui="modern"] #game-root .hb-tray:has(.hb-aside) > .hb-foot { display: none; }
+  :root.touch-phone[data-ui="modern"] #game-root .hb-panel > .hb-aside { width: 118px; gap: 2px; padding: 0 var(--sp-2); }
+  :root.touch-phone[data-ui="modern"] #game-root .hb-panel > .hb-aside .hb-note { font-size: var(--fs-2xs); line-height: var(--lh-tight); }
+  :root.touch-phone[data-ui="modern"] #game-root .hb-panel > .hb-aside .hb-balance { font-size: var(--fs-2xs); }
+  :root.touch-phone[data-ui="modern"] #game-root .hb-tile-cult { width: 70px; height: 66px; }
+  :root.touch-phone[data-ui="modern"] #game-root .hb-tile-cult img { width: 44px; height: 30px; }
+  :root.touch-phone[data-ui="modern"] #game-root .hb-panel > .hb-tray-actions { gap: 2px; padding-left: var(--sp-3); }
+  :root.touch-phone[data-ui="modern"] #game-root .hb-panel > .hb-tray-actions .hb-bt { min-height: 30px; }
+  /* Decorate: the tabs, the filters and the store on one row over the strip; smaller tiles. */
+  :root.touch-phone[data-ui="modern"] #game-root .hb-tray:not(:has(.hb-aside)) { grid-template-columns: auto minmax(0, 1fr) auto; grid-template-areas: "tabs filters foot" "panel panel panel"; }
+  :root.touch-phone[data-ui="modern"] #game-root .hb-tray:not(:has(.hb-aside)) .hb-tabs { min-width: 0; overflow-x: auto; scrollbar-width: none; }
+  :root.touch-phone[data-ui="modern"] #game-root .hb-tray:not(:has(.hb-aside)) .hb-filters { flex-wrap: nowrap; min-width: 0; overflow-x: auto; scrollbar-width: none; }
+  :root.touch-phone[data-ui="modern"] #game-root .hb-tray:not(:has(.hb-aside)) .hb-filters button { flex: none; }
+  :root.touch-phone[data-ui="modern"] #game-root .hb-tray:not(:has(.hb-aside)) .hb-foot .hb-tray-note { display: none; }
+  :root.touch-phone[data-ui="modern"] #game-root .hb-tray:not(:has(.hb-aside)) .hb-tile { width: 64px; height: 64px; }
+  :root.touch-phone[data-ui="modern"] #game-root .hb-tray:not(:has(.hb-aside)) .hb-tile img { width: 38px; height: 34px; }
+  :root.touch-phone[data-ui="modern"] #game-root .hb-tray:not(:has(.hb-aside)) .hb-tile-swatch .hb-swatch { width: 44px; height: 40px; }
+}
 /* === end LANDSCAPE-PANELS === */
 
 /* PHONEKEYS (Austin 2026-11-12, on his iPhone): a phone (html.touch-phone, the phone gate's

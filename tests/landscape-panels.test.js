@@ -103,3 +103,18 @@ describe('the report window sideways (#9)', () => {
     assert.match(rule, /#bug-report-panel \.reports-foot \{ display: none; \}/);
   });
 });
+
+describe('Cultivate and Decorate sideways (#6)', () => {
+  const rule = sidewaysRule('/* HOME BUILDER SIDEWAYS (#6)');
+  it('puts the banner right under the top bar, slim, so it clears the stick and Jump on the tray', () => {
+    assert.match(rule, /\.hb-banner \{ top: calc\(var\(--hud-h\) \+ 4px\);/);
+    assert.match(rule, /\.hb-banner \.hb-hint \{ display: none; \}/);
+  });
+  it('lays Cultivate\'s tray in one row without its footer line, with smaller tiles', () => {
+    assert.match(rule, /\.hb-tray:has\(\.hb-aside\) > \.hb-foot \{ display: none; \}/);
+    assert.match(rule, /\.hb-tile-cult \{ width: 70px; height: 66px; \}/);
+  });
+  it('puts Decorate\'s tabs, filters and store on one row over the strip', () => {
+    assert.match(rule, /\.hb-tray:not\(:has\(\.hb-aside\)\) \{ grid-template-columns: auto minmax\(0, 1fr\) auto; grid-template-areas: "tabs filters foot" "panel panel panel"; \}/);
+  });
+});
