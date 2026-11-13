@@ -96,8 +96,8 @@ export const PHONE_PAGE_LABEL = 'Phone page: reports, mail, friends';
 
 /**
  * PURE: where the phone page row goes (the page's base is the site root): play/phone/, with
- * ?from=solo from solo so its "Load the full game anyway" comes back to solo (js/phone/companion-data.js
- * fullGameHref). The device's choice (localStorage groddle-play-device) is left as it is.
+ * ?from=solo from solo so its "Play the game" comes back to solo (js/phone/companion-data.js
+ * fullGameHref). A phone shows that page first on every load anyway (play/index.html's gate, Austin 2026-11-13).
  */
 export function phonePageHref(mode = 'solo') {
   return mode === 'multiplayer' ? 'play/phone/' : 'play/phone/?from=solo';
@@ -1041,8 +1041,8 @@ function installPhoneRows(doc) {
 /**
  * Friendly on #284 (iPhone): a phone that chose the full game always opened it from Play, with no
  * way back to the phone page's reports, mail and friends. On a phone (html.touch-phone, either skin)
- * the Menu has a row that opens that page; the page itself still offers "Load the full game anyway"
- * and remembers the choice (js/phone/companion.js mountPlay).
+ * the Menu has a row that opens that page. Since 2026-11-13 (Austin) a phone opens that page first on
+ * every load, and its "Play the game" opens the game for that load only (js/phone/companion.js mountPlay).
  */
 function installPhonePageRow(doc) {
   const list = doc.getElementById('more-list');

@@ -69,7 +69,7 @@ describe('#271: Camera Mode on a phone, without a keyboard', () => {
     assert.deepEqual(dragLook({ x: 1, y: 2 }, 0, 0, 0, 400), { x: 1, y: 2 });
   });
   it('the phone Menu has a Camera Mode row in World, before Snaps', async () => {
-    const { MENU_ROWS, menuRowFor } = await import('../public/js/ui/topbar.js?v=3e654797');
+    const { MENU_ROWS, menuRowFor } = await import('../public/js/ui/topbar.js?v=bbef6814');
     assert.equal(CAMERA_MENU_ID, 'menu-camera-btn');
     assert.deepEqual(menuRowFor(CAMERA_MENU_ID, { phone: true }), { group: 'world', rank: 2.5 });
     assert.ok(MENU_ROWS[CAMERA_MENU_ID].rank < MENU_ROWS['snaps-btn'].rank);

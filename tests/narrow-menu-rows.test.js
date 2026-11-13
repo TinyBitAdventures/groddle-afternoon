@@ -9,7 +9,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { MENU_ROWS, NARROW_ROWS, menuRowFor } from '../public/js/ui/topbar.js?v=3e654797';
+import { MENU_ROWS, NARROW_ROWS, menuRowFor } from '../public/js/ui/topbar.js?v=bbef6814';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const css = readFileSync(join(root, 'public/style.css'), 'utf8');
