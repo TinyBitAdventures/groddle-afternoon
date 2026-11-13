@@ -19,7 +19,7 @@ import {
 // The feature imports these with their browser cache tags; load the same module instances.
 import { energyDecayContext, energyDecayFeature, runEnergyLossTick } from '../public/js/features/energy-decay-feature.js?v=9072850d';
 import { __newxpTest } from '../public/js/features/newxp-feature.js?v=d46b505c';
-import { hellFeature } from '../public/js/features/hell-feature.js?v=7477c8c7';
+import { hellFeature } from '../public/js/features/hell-feature.js?v=53826df9';
 import { HELL_TEXT } from '../public/js/hell.js?v=23354bc4';
 import { SCENE_TSIDS } from '../public/js/newxp.js?v=12f236c7';
 import { createQuestState } from '../public/js/quests.js?v=40c71a37';

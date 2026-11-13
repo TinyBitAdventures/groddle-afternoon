@@ -70,7 +70,7 @@ export const HELL_TICKET_EVENTS = Object.freeze({
 /** quests/hell_hole.js onAccepted 89-101 (the overlay's text, line 100). */
 export const HELL_HOLE_ACCEPTED_TEXT = HELL_QUESTS.hell_hole.acceptedOverlay;
 
-/** quests/hell_quest.js onAccepted 99-105. The remake's pack has no size limit, so packFull never happens in play. */
+/** quests/hell_quest.js onAccepted 99-105: packFull when the pack has no room and the magic rock holds the ticket. */
 export function hellQuestAcceptedText(packFull = false) {
   return packFull ? HELL_QUESTS.hell_quest.acceptedTextPackFull : HELL_QUESTS.hell_quest.acceptedText;
 }

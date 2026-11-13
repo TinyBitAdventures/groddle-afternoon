@@ -99,6 +99,15 @@ function questStatus(engine) {
 const buyFlag = () => questFlagsFeature.has('buy_wotd');
 const hasTicket = (engine) => countItem(engine.inv, TICKET) > 0;
 const hasWine = (engine) => countItem(engine.inv, WINE) > 0;
+/**
+ * grantWine's full pack (items/hell_bartender.js 337-347): the ticket goes first, then the wine
+ * must fit, or the ticket comes back with the "Greed is good" bubble. Reports #292 and #295: with
+ * the pack full, the wine went to the magic rock unseen and the ticket was gone.
+ */
+function winePackFull(engine) {
+  const after = { ...engine.inv, [TICKET]: Math.max(0, countItem(engine.inv, TICKET) - 1) };
+  return engine.query?.('packRoom', WINE, 1, { inv: after }) === 0;
+}
 
 function publish(engine) {
   engine.setData('hellBarTickets', String(countItem(engine.inv, TICKET)));
@@ -260,7 +269,7 @@ function buyWine(engine) {
     engine.setData('hellBarLast', 'no_ticket');
     return;
   }
-  const grant = () => applyGrant(engine, grantWine({ hasTicket: hasTicket(engine), packFull: false, questStatus: status, buyFlag: buyFlag() }));
+  const grant = () => applyGrant(engine, grantWine({ hasTicket: hasTicket(engine), packFull: winePackFull(engine), questStatus: status, buyFlag: buyFlag() }));
   if (plan.conversation) converse(engine, plan.conversation, grant);
   else grant();
 }

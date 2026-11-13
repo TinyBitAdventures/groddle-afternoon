@@ -11,7 +11,7 @@ import { readdirSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { REVIVED_TRANT, createPlot, reviveDeadTree, tickPlot } from '../public/js/patches.js?v=1ba4f75f';
-import { powdersFeature } from '../public/js/features/powders-feature.js?v=b982fa25';
+import { powdersFeature } from '../public/js/features/powders-feature.js?v=4a6dcd1a';
 import { HEADSPACE_SCENE, itemVerbsFeature, inGameLocation } from '../public/js/features/item-verbs-feature.js?v=d460a673';
 import { ROOK_WOODS_STREET_ID } from '../public/js/rook-woods.js?v=1b765560';
 import { INSTANCES as GWENDOLYN_INSTANCES, ROOM_ID as GWENDOLYN_ROOM } from '../public/js/quest-rooms/gwendolyn.js?v=3c1b3c3d';

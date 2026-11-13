@@ -26,13 +26,13 @@ import {
   planGraveVisit,
   recognitionBranch,
   ticketDue,
-} from '../public/js/hell-tickets.js?v=900421de';
-import { hellTicketsFeature } from '../public/js/features/hell-tickets-feature.js?v=e2510aed';
-import { hellFeature } from '../public/js/features/hell-feature.js?v=7477c8c7';
-import { hellBarFeature } from '../public/js/features/hell-bar-feature.js?v=8ab00fa7';
+} from '../public/js/hell-tickets.js?v=ebd76e13';
+import { hellTicketsFeature } from '../public/js/features/hell-tickets-feature.js?v=18b9639d';
+import { hellFeature } from '../public/js/features/hell-feature.js?v=53826df9';
+import { hellBarFeature } from '../public/js/features/hell-bar-feature.js?v=012bc9e6';
 import { questOffersFeature } from '../public/js/features/quest-offers-feature.js?v=11a5835a';
 import { questFlagsFeature } from '../public/js/features/quest-flags-feature.js?v=17c6ef48';
-import { FEATURES } from '../public/js/features/index.js?v=5698bcc5';
+import { FEATURES } from '../public/js/features/index.js?v=c3b950e4';
 
 const spike = join(dirname(fileURLToPath(import.meta.url)), '..');
 const CONTENT = join(spike, 'public/assets/content');
@@ -367,6 +367,51 @@ describe('the chain in play (features, fake engine)', () => {
     assert.equal(engine.log.prompts.at(-1).text, 'Lily Linguistic has mourned your passing, you received a drink ticket for Wine of the Dead.');
     // G230: text only (player.js 1467-1472 sends no title), no "Naraka" kicker.
     assert.deepEqual(Object.keys(engine.log.prompts.at(-1)), ['text']);
+  });
+
+  it('#292/#295: a full pack: the ticket prompt says storage, the bartender keeps the ticket and says why', () => {
+    // A stand-in for bags-feature's packRoom: a full pack fits nothing more (hell_quest.js 98-105,
+    // player.js recognizeDeath, hell_bartender.js grantWine 337-347).
+    let room = 0;
+    const asked = [];
+    const withRoom = (engine) => Object.assign(engine, { query: (q, cls, n, ctx) => (q === 'packRoom' ? (asked.push([cls, ctx?.inv?.drink_ticket]), room) : undefined) });
+    const done = withRoom(fakeEngine({ gravedemo: 'mourn', gravevisitms: 0, gravecompanion: 'Amp', gravedone: 1 }));
+    hellTicketsFeature.init(done);
+    hellFeature.restore(deadIn(HELL_ONE));
+    const now = Date.now();
+    hellTicketsFeature.onTick(16, now, done);
+    hellTicketsFeature.onTick(16, now + 10, done);
+    hellTicketsFeature.onTick(16, now + 20, done);
+    assert.equal(countOf(done, 'drink_ticket'), 1, 'the magic rock holds it');
+    assert.equal(done.log.prompts.at(-1).text, 'Amp has mourned your passing, but since your pack is full, your drink ticket for Wine of the Dead has been put into storage.');
+
+    hellTicketsFeature._reset();
+    hellTicketsFeature.restore({});
+    hellFeature.restore({});
+    const engine = withRoom(fakeEngine());
+    hellTicketsFeature.init(engine);
+    questOffersFeature.init(engine);
+    engine.questState.active.hell_quest = { progress: {} };
+    hellTicketsFeature.onTick(16, now + 30, engine);
+    hellTicketsFeature.onTick(16, now + 40, engine);
+    assert.equal(engine.log.prompts.at(-1).text, 'Your pack is full so your drink ticket for Wine of the Dead has been put into storage. Your map has also been updated with the route to the Hell Bar.');
+
+    // The bar: the conversation runs, then the wine will not fit; the ticket stays, nothing goes to the rock unseen.
+    engine.enter(HELL_BAR_TSID);
+    hellBarFeature.runVerb({ classId: 'hell_bartender' }, 'buy_wine', engine);
+    engine.log.dialogues.at(-1).onComplete();
+    assert.deepEqual(asked.at(-1), ['wine_of_the_dead', 0], 'judged with the ticket already handed over');
+    assert.equal(countOf(engine, 'drink_ticket'), 1);
+    assert.equal(countOf(engine, 'wine_of_the_dead'), 0);
+    assert.equal(engine.data.hellBarLast, 'refused');
+    assert.deepEqual(engine.log.activity.slice(-1), ["You tried to buy wine from Hell's Bartender."]);
+    assert.ok(!engine.questState.active.hell_quest.progress.buy_wotd);
+    // Room made: the same ticket buys the wine.
+    room = 1;
+    hellBarFeature.runVerb({ classId: 'hell_bartender' }, 'buy_wine', engine);
+    engine.log.dialogues.at(-1).onComplete();
+    assert.equal(countOf(engine, 'drink_ticket'), 0);
+    assert.equal(countOf(engine, 'wine_of_the_dead'), 1);
   });
 
   it('G255: the offer has one button (no onStarted), is an emergency, and shows again if closed unanswered', () => {

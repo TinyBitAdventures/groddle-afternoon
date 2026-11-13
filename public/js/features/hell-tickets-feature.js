@@ -60,8 +60,8 @@ import {
   planGraveVisit,
   recognitionBranch,
   ticketDue,
-} from '../hell-tickets.js?v=900421de';
-import { hellFeature } from './hell-feature.js?v=7477c8c7';
+} from '../hell-tickets.js?v=ebd76e13';
+import { hellFeature } from './hell-feature.js?v=53826df9';
 import { doorsFeature } from './doors-feature.js?v=ba2470fc';
 
 export const HELL_TICKETS_FEATURE_ID = 'hell-tickets';
@@ -147,6 +147,13 @@ function presentOffer(engine, id, text) {
   return true;
 }
 
+/**
+ * createItemFromFamiliar's remainder (hell_quest.js onAccepted 98-105, player.recognizeDeath): no
+ * room in the pack, so the magic rock holds the ticket and the prompt says so (report #292: it said
+ * "You received a drink ticket" and the pack showed none).
+ */
+const ticketPackFull = (engine) => engine.query?.('packRoom', TICKET_CLASS, 1, engine) === 0;
+
 function grantTicket(engine) {
   addItem(engine.inv, TICKET_CLASS, 1);
   engine.refreshPack();
@@ -163,7 +170,7 @@ function applyRecognition(engine, result) {
 
 function fireVisit(engine) {
   const visit = state.visit;
-  const result = hellFeature.recognizeGrave({ type: visit.type, recognizer: visit.recognizer, questState: engine.questState }, engine);
+  const result = hellFeature.recognizeGrave({ type: visit.type, recognizer: visit.recognizer, questState: engine.questState, packFull: ticketPackFull(engine) }, engine);
   state = { ...state, visit: null, visits: state.visits + (result.ok ? 1 : 0) };
   engine.setData('hellTicketBranch', recognitionBranch(result));
   if (result.ok) applyRecognition(engine, result);
@@ -400,8 +407,9 @@ export const hellTicketsFeature = {
     }
     if (ticketDue(qs, state)) {
       state = { ...state, ticketGiven: true };
+      const packFull = ticketPackFull(engine);
       grantTicket(engine);
-      pendingPrompts.push({ text: hellQuestAcceptedText(false) });
+      pendingPrompts.push({ text: hellQuestAcceptedText(packFull) });
       // hell_quest.js onAccepted 114-120: buildPath('LA5RPAFK9OE28GN', pc.location.tsid), the route the prompt promises (G177).
       engine.query?.('mapRoute', 'set', { to: HELL_QUESTS.hell_quest.pathTo, source: 'hell_quest', quest: 'hell_quest' }, engine);
       engine.save();

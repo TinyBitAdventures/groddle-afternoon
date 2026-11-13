@@ -564,11 +564,12 @@ export const hellFeature = {
    * returns js/hell.js recognizeDeath's result; the caller
    * (features/hell-tickets-feature.js, G163) applies its offer / ticket effects.
    */
-  recognizeGrave({ type, recognizer, questState } = {}, engine) {
+  recognizeGrave({ type, recognizer, questState, packFull = false } = {}, engine) {
     const result = recognizeDeath(state, {
       type,
       recognizer,
       questState,
+      packFull: packFull === true,
       streetTsid: engine.streetTsid,
       hubId: engine.street?.hubId || '',
     });

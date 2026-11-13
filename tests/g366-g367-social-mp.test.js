@@ -14,8 +14,8 @@ import { createRealtimeClient, CORE_KINDS } from '../public/js/realtime-client.j
 import { TYPING_EVERY_MS, TYPING_MS, typingCounts, typingDotAlpha } from '../public/js/features/realtime-feature.js?v=b787af61';
 import { BUTLER_IM_TEXT, BUTLER_IM_VERBS, HELP_AGAIN_MS, commandHelp, imDelayMs, imLine, imText, normalizeImPrefs, parseButlerIm } from '../public/js/butler-im.js?v=44783638';
 import { butlerImFeature, BUTLER_TAB } from '../public/js/features/butler-im-feature.js?v=5ace2e44';
-import { slashCommandsFeature } from '../public/js/features/slash-commands-feature.js?v=a75f1c8e';
-import { FEATURES } from '../public/js/features/index.js?v=5698bcc5';
+import { slashCommandsFeature } from '../public/js/features/slash-commands-feature.js?v=d3b754a6';
+import { FEATURES } from '../public/js/features/index.js?v=c3b950e4';
 
 const root = join(import.meta.dirname, '..');
 const read = (rel) => readFileSync(join(root, rel), 'utf8');

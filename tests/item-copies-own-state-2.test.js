@@ -41,7 +41,7 @@ import { createDroppedItemState, dropInventoryStack, pickupDroppedStack } from '
 import { useBottle, bottleUsesLeft } from '../public/js/tree-poison.js?v=d8fb42c9';
 import { usePotion as useGardenPotion, potionUsesLeft as gardenUsesLeft } from '../public/js/master-garden.js?v=ff6ca66a';
 import { potionsFeature, usePotionNow } from '../public/js/features/potions-feature.js?v=97d1ddc8';
-import { powdersFeature } from '../public/js/features/powders-feature.js?v=b982fa25';
+import { powdersFeature } from '../public/js/features/powders-feature.js?v=4a6dcd1a';
 import { treeDeathFeature } from '../public/js/features/tree-death-feature.js?v=55283bfd';
 import { masterGardenFeature } from '../public/js/features/master-garden-feature.js?v=60f06ddd';
 import { itemVerbsMoreFeature } from '../public/js/features/item-verbs-more-feature.js?v=a7ef6866';
