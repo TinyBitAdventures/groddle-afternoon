@@ -10,7 +10,7 @@ import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { LINES, TOUCH_LINES, instructionFor } from '../public/js/newxp.js?v=91b8f176';
-import { touchPrompt } from '../public/js/touch-controls.js?v=c7b3f264';
+import { touchPrompt } from '../public/js/touch-controls.js?v=99de2061';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const feature = readFileSync(join(root, 'public/js/features/newxp-feature.js'), 'utf8');

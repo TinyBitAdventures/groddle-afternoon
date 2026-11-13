@@ -46,7 +46,7 @@
  * the door glow sits, G200).
  */
 
-import { isPhoneDevice } from '../touch-controls.js?v=c7b3f264';
+import { isPhoneDevice } from '../touch-controls.js?v=99de2061';
 import { STREET_INDEX } from '../street-loader.js?v=18b181ad';
 import { SUBWAY_STREETS } from '../street-jobs.js?v=87fd5c87';
 import { STATIONS, isCarTsid, stationByTsid } from '../subway.js?v=44d1a09f';

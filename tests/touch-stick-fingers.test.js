@@ -7,7 +7,7 @@
  */
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { installTouchControls } from '../public/js/touch-controls.js?v=c7b3f264';
+import { installTouchControls } from '../public/js/touch-controls.js?v=99de2061';
 
 /** A fake element: listeners, classes, style, dataset, a rect. */
 export function fakeEl(rect = { left: 0, top: 0, width: 132, height: 132 }) {

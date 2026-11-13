@@ -8,7 +8,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { isTypingField, keyboardUp, watchPhoneKeyboard } from '../public/js/touch-controls.js?v=c7b3f264';
+import { isTypingField, keyboardBox, keyboardUp, watchPhoneKeyboard } from '../public/js/touch-controls.js?v=99de2061';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const css = readFileSync(join(root, 'public/style.css'), 'utf8');
@@ -81,3 +81,47 @@ describe('the on-screen keyboard on a phone', () => {
     assert.match(css, /:root\.touch-phone\.kbd-up \.pack-bar:not\(:focus-within\) \{ visibility: hidden; \}/);
   });
 });
+
+// Landscape audit #5: the Social drawer's chat box sat under the keyboard (sideways about 145 px of
+// 335 are left). While it is up, html carries the box above it and the drawer you type in fits it.
+describe('the chat box above the keyboard (#5)', () => {
+  it('keyboardBox: the visual viewport in the game root\'s px, a gap all round', () => {
+    assert.deepEqual(keyboardBox({ top: 0, height: 144, innerHeight: 335, rootTop: 0 }), { top: 4, height: 136 }, 'iOS sideways');
+    assert.deepEqual(keyboardBox({ top: 40, height: 144, innerHeight: 335, rootTop: 0 }), { top: 44, height: 136 }, 'iOS scrolled the view down');
+    assert.deepEqual(keyboardBox({ top: 0, height: 144, innerHeight: 144, rootTop: 0 }), { top: 4, height: 136 }, 'Android: the window shrank');
+    assert.deepEqual(keyboardBox({ top: 0, height: 300, innerHeight: 200 }), { top: 4, height: 192 }, 'never taller than the window');
+    assert.deepEqual(keyboardBox({}), { top: 4, height: 0 });
+  });
+  it('watchPhoneKeyboard sets --kbd-top and --kbd-h while it is up, follows a scroll, and clears them', () => {
+    const win = fakeWin(335);
+    const vvOn = {};
+    win.visualViewport = { height: 335, offsetTop: 0, addEventListener: (t, fn) => { vvOn[t] = fn; }, removeEventListener() {} };
+    const doc = fakeDoc();
+    const props = new Map();
+    doc.documentElement.style = { setProperty: (k, v) => props.set(k, v), removeProperty: (k) => props.delete(k) };
+    doc.getElementById = (id) => (id === 'game-root' ? { getBoundingClientRect: () => ({ top: 0 }) } : null);
+    watchPhoneKeyboard({ doc, win });
+    doc.activeElement = { tagName: 'INPUT', type: 'text' };
+    win.visualViewport.height = 144;
+    vvOn.resize();
+    assert.equal(doc.classes.has('kbd-up'), true);
+    assert.equal(props.get('--kbd-top'), '4px');
+    assert.equal(props.get('--kbd-h'), '136px');
+    win.visualViewport.offsetTop = 40;
+    vvOn.scroll();
+    assert.equal(props.get('--kbd-top'), '44px');
+    doc.activeElement = null;
+    win.visualViewport.height = 335;
+    win.visualViewport.offsetTop = 0;
+    vvOn.resize();
+    assert.equal(props.has('--kbd-top'), false);
+    assert.equal(props.has('--kbd-h'), false);
+  });
+  it('style.css: the open drawer you type in fits the box, over the HUD', () => {
+    const at = css.indexOf('/* CHAT ABOVE THE KEYBOARD (#5)');
+    assert.ok(at > 0);
+    const rule = css.slice(at, css.indexOf('/* === end LANDSCAPE-PANELS === */', at));
+    assert.match(rule, /:root\.touch-phone\.kbd-up #game-root \.local-chat-dock\.social-drawer\.is-open:focus-within \{\s*top: var\(--kbd-top, var\(--social-top, 8px\)\);\s*height: var\(--kbd-h, auto\);\s*min-height: 0;/);
+  });
+});
+

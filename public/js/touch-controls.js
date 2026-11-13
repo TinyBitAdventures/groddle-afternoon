@@ -300,10 +300,28 @@ export function keyboardUp({ typing, height, visualHeight, baseHeight }) {
 }
 
 /**
+ * PURE: the box the screen leaves above the on-screen keyboard, in the game root's px (landscape audit
+ * #5): `top` and `height` are the visual viewport's (iOS keeps the window and shrinks it; Android
+ * shrinks the window too), `rootTop` where the game root's top is on the screen, `gap` the margin kept
+ * all round.
+ * @returns {{ top: number, height: number }}
+ */
+export function keyboardBox({ top = 0, height = 0, innerHeight = 0, rootTop = 0, gap = 4 } = {}) {
+  const h = Math.min(Number(height) || 0, Number(innerHeight) || Number(height) || 0);
+  return {
+    top: Math.round(Math.max(0, Number(top) || 0) - (Number(rootTop) || 0) + gap),
+    height: Math.round(Math.max(0, h - 2 * gap)),
+  };
+}
+
+/**
  * The on-screen keyboard on a phone (the mobile QA, 2026-11-12: with chat open the window shrank,
  * and the pack row jumped up to the middle of the screen with the stick and Jump beside it).
  * While it is up, html.kbd-up (style.css TOUCH) puts away the pack row (unless you type in its
  * search) and the stick and Jump; when it goes, iOS's leftover page scroll is put back to the top.
+ * Landscape audit #5: the Social drawer kept its 220 px and its chat box sat under the keyboard. While
+ * it is up, --kbd-top and --kbd-h on html are the box above it (keyboardBox, from the visual viewport,
+ * kept on its resize and scroll), and the drawer you type in fits that box (style.css LANDSCAPE-PANELS).
  */
 export function watchPhoneKeyboard({ doc = globalThis.document, win = globalThis.window } = {}) {
   const html = doc?.documentElement;
@@ -311,11 +329,25 @@ export function watchPhoneKeyboard({ doc = globalThis.document, win = globalThis
   const vv = win.visualViewport || null;
   let base = Number(win.innerHeight) || 0;
   const typing = () => isTypingField(doc.activeElement);
+  const pin = (up) => {
+    const style = html.style;
+    if (!style?.setProperty) return;
+    if (!up) {
+      style.removeProperty('--kbd-top');
+      style.removeProperty('--kbd-h');
+      return;
+    }
+    const rootTop = Number(doc.getElementById?.('game-root')?.getBoundingClientRect?.().top) || 0;
+    const box = keyboardBox({ top: vv?.offsetTop, height: vv?.height ?? win.innerHeight, innerHeight: win.innerHeight, rootTop });
+    style.setProperty('--kbd-top', `${box.top}px`);
+    style.setProperty('--kbd-h', `${box.height}px`);
+  };
   const sync = () => {
     const h = Number(win.innerHeight) || 0;
     if (!typing()) base = Math.max(h, Number(vv?.height) || 0);
     const up = keyboardUp({ typing: typing(), height: h, visualHeight: vv?.height, baseHeight: base });
     if (html.classList.contains('kbd-up') !== up) html.classList.toggle('kbd-up', up);
+    pin(up);
   };
   const settle = () => {
     // After the field lets go: the keyboard closes and iOS can leave the page scrolled up.
@@ -327,6 +359,7 @@ export function watchPhoneKeyboard({ doc = globalThis.document, win = globalThis
   const onFocusIn = () => win.setTimeout(sync, 300);
   win.addEventListener('resize', sync);
   vv?.addEventListener?.('resize', sync);
+  vv?.addEventListener?.('scroll', sync);
   doc.addEventListener('focusin', onFocusIn);
   doc.addEventListener('focusout', settle);
   return {
@@ -334,9 +367,11 @@ export function watchPhoneKeyboard({ doc = globalThis.document, win = globalThis
     destroy() {
       win.removeEventListener('resize', sync);
       vv?.removeEventListener?.('resize', sync);
+      vv?.removeEventListener?.('scroll', sync);
       doc.removeEventListener('focusin', onFocusIn);
       doc.removeEventListener('focusout', settle);
       html.classList.remove('kbd-up');
+      pin(false);
     },
   };
 }

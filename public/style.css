@@ -14308,6 +14308,21 @@ body.is-booting .touch-controls { display: none; }
   :root.touch-phone[data-ui="modern"] #game-root .hb-tray:not(:has(.hb-aside)) .hb-tile img { width: 38px; height: 34px; }
   :root.touch-phone[data-ui="modern"] #game-root .hb-tray:not(:has(.hb-aside)) .hb-tile-swatch .hb-swatch { width: 44px; height: 40px; }
 }
+/* CHAT ABOVE THE KEYBOARD (#5): the Social drawer kept its 220 px (from under the top bar) while the
+   keyboard was up, so its chat box sat under the keyboard (sideways only about 145 px of a 335 px screen
+   is left). While a field in the open drawer has focus and the keyboard is up, the drawer fills the box
+   above the keyboard (--kbd-top, --kbd-h: js/touch-controls.js watchPhoneKeyboard, from the visual
+   viewport, both ways up), its tabs step aside on a screen under 520 px tall (sideways), and the box and Send sit at its foot. */
+:root.touch-phone.kbd-up #game-root .local-chat-dock.social-drawer.is-open:focus-within {
+  top: var(--kbd-top, var(--social-top, 8px));
+  height: var(--kbd-h, auto);
+  min-height: 0;
+  max-height: none;
+  z-index: var(--z-dialog);
+}
+@media (max-height: 520px) {
+  :root.touch-phone.kbd-up #game-root .local-chat-dock.social-drawer.is-open:focus-within .social-tabs { display: none; }
+}
 /* === end LANDSCAPE-PANELS === */
 
 /* PHONEKEYS (Austin 2026-11-12, on his iPhone): a phone (html.touch-phone, the phone gate's
