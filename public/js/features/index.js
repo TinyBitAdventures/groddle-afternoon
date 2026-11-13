@@ -102,6 +102,7 @@ import { hiddenFloorsFeature } from './hidden-floors-feature.js?v=ebfe5cb2'; FEA
 import { vicarsPeakFeature } from './vicars-peak-feature.js?v=cb444319'; FEATURES.push(vicarsPeakFeature);
 import { thornfadLettersFeature } from './thornfad-letters-feature.js?v=60e6b364'; FEATURES.push(thornfadLettersFeature);
 import { streetToysFeature } from './street-toys-feature.js?v=3ff249cc'; FEATURES.push(streetToysFeature);
+import { koulatoJarsFeature } from './koulato-jars-feature.js?v=4e2e3fbf'; FEATURES.push(koulatoJarsFeature);
 import { rebuiltRoomsFeature } from './rebuilt-rooms-feature.js?v=46da565d'; FEATURES.push(rebuiltRoomsFeature);
 import { interrogationRoomFeature } from './interrogation-room-feature.js?v=1a5cb977'; FEATURES.push(interrogationRoomFeature);
 import { towerFloorsFeature } from './tower-floors-feature.js?v=fc4c24d8'; FEATURES.push(towerFloorsFeature);
