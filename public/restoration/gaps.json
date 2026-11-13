@@ -39,9 +39,9 @@
     }
   },
   "counts": {
-    "fixing": 2,
+    "fixing": 1,
     "known": 22,
-    "unreleased": 33,
+    "unreleased": 38,
     "fixed": 11,
     "lost": 5,
     "purpose": 15,
@@ -98,6 +98,16 @@
           "id": "F13",
           "text": "A few quest reward lines show a fixed amount instead of what was really paid.",
           "state": "unreleased"
+        },
+        {
+          "id": "F42",
+          "text": "Teleporting and /stuck do not work inside a quest room, where Glitch let you leave that way.",
+          "state": "unreleased"
+        },
+        {
+          "id": "F43",
+          "text": "Seeker of the Shiny and Meditation Station are offered again every 5 minutes until you take them.",
+          "state": "unreleased"
         }
       ]
     },
@@ -148,6 +158,11 @@
           "id": "G669",
           "text": "Jellisacs and Peat Bogs stand where the 2012 snaps show them, and every Herb Gardens planter box is an herb bed.",
           "report": 249,
+          "state": "unreleased"
+        },
+        {
+          "id": "F41",
+          "text": "Rocks stand lower than the 2012 snaps show them, in one shape, and some planned things hang over ledge ends or sit on steep slopes.",
           "state": "unreleased"
         },
         {
@@ -339,7 +354,7 @@
       "items": [
         {
           "id": "F24",
-          "text": "Street fruit trees never grow bigger, Wood Trees take care only once a day, and a tiny Wood Tree does not warn that harvesting will clear it.",
+          "text": "Street fruit trees never grow bigger, and a tiny Wood Tree does not warn that harvesting will clear it.",
           "state": "fixing"
         },
         {
@@ -350,6 +365,11 @@
         {
           "id": "F25",
           "text": "Garden potions ask for far too much energy, a plot that is still a little wet cannot be topped up, and pouring on a shared Master Garden can say you are too tired when you are not.",
+          "state": "unreleased"
+        },
+        {
+          "id": "F40",
+          "text": "Wood Trees take care only once a game day, so a planted one needs days of real time to grow.",
           "state": "unreleased"
         }
       ]
@@ -380,11 +400,6 @@
       "name": "Food, buffs and making",
       "items": [
         {
-          "id": "F29",
-          "text": "Making pays iMG with no daily limit per recipe, and every Test Tube mix is known from the start instead of found by experimenting.",
-          "state": "fixing"
-        },
-        {
           "id": "F27",
           "text": "Drinks give the same iMG whatever your mood, you can drink while dead and lose the drink, and a Rasher of Bacon cannot be eaten.",
           "state": "unreleased"
@@ -392,6 +407,11 @@
         {
           "id": "F28",
           "text": "Buffs keep running while the game is closed and can vanish on reload without their end effect.",
+          "state": "unreleased"
+        },
+        {
+          "id": "F29",
+          "text": "Making pays iMG with no daily limit per recipe, and every Test Tube mix is known from the start instead of found by experimenting.",
           "state": "unreleased"
         },
         {
@@ -545,7 +565,7 @@
   "purpose": [
     {
       "id": "G45",
-      "text": "Trees take one pet and one water a game day and never die of neglect. Glitch wanted care about every hour, which would wilt every tree overnight here.",
+      "text": "Fruit trees take one pet and one water a game day and never die of neglect. Glitch wanted care about every hour, which would wilt every tree overnight here.",
       "area": "Trees and gardens"
     },
     {
