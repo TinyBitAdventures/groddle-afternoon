@@ -73,6 +73,9 @@ function write(ledger, credited, entries, budget = 0) {
   return php('check', [ledger, credited, [], entries, budget, 50_000]);
 }
 
+// The site's daily count of credited paying level-ups (LedgerMath::LEVELS_DAILY), read from the source.
+const LEVELS_DAILY = skip ? 0 : Number(/LEVELS_DAILY = (\d+);/.exec(readFileSync(join(SITE_DIR, 'src/LedgerMath.php'), 'utf8'))?.[1]);
+
 describe('transforms a write\'s losses explain (LedgerMath::explain)', { skip }, () => {
   it('accepts cooking with no budget, and clamps the same dish made without using anything', () => {
     const before = counts({ cabbage: 1, corn: 1, bean_plain: 5 }, 10);
@@ -181,7 +184,7 @@ describe('exact credits once per character (LedgerMath::credits, check)', { skip
 
   it('credits at most LEVELS_DAILY paying level-ups a day; the next waits, kept in the save, never clamped (report #246)', () => {
     const reward = currantRewardForLevel(10);
-    const busy = { ...base, lvlday: { level: 3 } };
+    const busy = { ...base, lvlday: { level: LEVELS_DAILY } };
     const today = write(ledger, busy, save({ currants: 500 + reward, level: 10, xp: XP_FOR_LEVEL[8] }));
     assert.deepEqual(today.reconciled.clamped, none, 'the pack keeps the level\'s currants');
     assert.equal(today.after.currants, 500, 'but the ledger has not credited them yet');
@@ -197,7 +200,7 @@ describe('exact credits once per character (LedgerMath::credits, check)', { skip
     assert.deepEqual(write(counts({}, 500 + reward), paid, save({ currants: 500 + reward, level: 10, xp: XP_FOR_LEVEL[8] })).credits.goods, none, 'credited once');
   });
 
-  it('a level-35 save after three level-ups that day keeps its 61,860 currants (report #246)', () => {
+  it('a level-35 save after a full day of level-ups keeps its 61,860 currants (report #246)', () => {
     assert.equal(currantRewardForLevel(35), 61_860);
     assert.equal(ECON.credits.levels['35'], 61_860);
     // Levels 26 to 34 pay nothing, so they take no place in the day's count.
@@ -213,29 +216,29 @@ describe('exact credits once per character (LedgerMath::credits, check)', { skip
     assert.deepEqual(w35.reconciled.clamped, none);
     assert.equal(w35.credits.goods.currants, 61_860, 'credited at once: the count was not used up');
     // Even when the day's count is used up by paying levels, the currants stay in the pack.
-    const full = write(ledgerNow, { ...credited, level: { level: 34 }, lvlday: { level: 3 } }, save({ currants: 500 + 61_860, level: 35, xp: XP_FOR_LEVEL[33] }));
+    const full = write(ledgerNow, { ...credited, level: { level: 34 }, lvlday: { level: LEVELS_DAILY } }, save({ currants: 500 + 61_860, level: 35, xp: XP_FOR_LEVEL[33] }));
     assert.deepEqual(full.reconciled.clamped, none);
     assert.deepEqual(full.held, counts({}, 61_860));
     ledgerNow = full.after;
     // The next write that day sees the same: still kept, still not in the ledger.
-    const again = write(ledgerNow, { ...credited, level: { level: 35 }, lvlday: { level: 3 }, lvlwait: { 35: 61_860 } }, save({ currants: 500 + 61_860, level: 35, xp: XP_FOR_LEVEL[33] }));
+    const again = write(ledgerNow, { ...credited, level: { level: 35 }, lvlday: { level: LEVELS_DAILY }, lvlwait: { 35: 61_860 } }, save({ currants: 500 + 61_860, level: 35, xp: XP_FOR_LEVEL[33] }));
     assert.deepEqual(again.reconciled.clamped, none);
     assert.equal(again.after.currants, 500);
   });
 
   it('a forged level (xp below its threshold) is still refused, waiting or not', () => {
     const forged = save({ currants: 500 + 61_860, level: 35, xp: XP_FOR_LEVEL[33] - 1 });
-    for (const credited of [{ ...base, level: { level: 34 } }, { ...base, level: { level: 34 }, lvlday: { level: 3 } }]) {
+    for (const credited of [{ ...base, level: { level: 34 } }, { ...base, level: { level: 34 }, lvlday: { level: LEVELS_DAILY } }]) {
       const w = write(ledger, credited, forged);
       assert.equal(w.reconciled.clamped.currants, 61_860);
       assert.deepEqual(w.rows, []);
       assert.deepEqual(w.held, none);
     }
     // A waiting level covers only its own currants: more than that is clamped as before.
-    const over = write(ledger, { ...base, level: { level: 34 }, lvlday: { level: 3 } }, save({ currants: 500 + 61_860 + 10_000, level: 35, xp: XP_FOR_LEVEL[33] }));
+    const over = write(ledger, { ...base, level: { level: 34 }, lvlday: { level: LEVELS_DAILY } }, save({ currants: 500 + 61_860 + 10_000, level: 35, xp: XP_FOR_LEVEL[33] }));
     assert.equal(over.reconciled.clamped.currants, 10_000);
     // Spending a waiting level's currants refunds nothing into the budget (only a real credit later does).
-    const spent = write(ledger, { ...base, level: { level: 35 }, lvlday: { level: 3 }, lvlwait: { 35: 61_860 } }, save({ currants: 500, level: 35, xp: XP_FOR_LEVEL[33] }));
+    const spent = write(ledger, { ...base, level: { level: 35 }, lvlday: { level: LEVELS_DAILY }, lvlwait: { 35: 61_860 } }, save({ currants: 500, level: 35, xp: XP_FOR_LEVEL[33] }));
     assert.equal(spent.reconciled.budget, 0);
     assert.deepEqual(spent.held, none);
   });
