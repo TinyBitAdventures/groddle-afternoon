@@ -101,6 +101,6 @@ describe('#142 the Offered tab and pinned quests', () => {
   it('the sheet asks the pins', () => {
     const sheet = readFileSync(join(root, 'public/js/ui/quest-sheet.js'), 'utf8');
     assert.match(sheet, /pinned: Boolean\(n\.dataset\.quest && isPinned\(n\.dataset\.quest\)\)/);
-    assert.match(readFileSync(join(root, 'public/game.js'), 'utf8'), /isPinned: \(classTsid\) => Boolean\(questPins\(\)\?\.isPinned\(classTsid\)\)/);
+    assert.match(readFileSync(join(root, 'public/game.js'), 'utf8'), /isPinned: \(classTsid\) => modernUi\(\) && Boolean\(questPins\(\)\?\.isPinned\(classTsid\)\)/);
   });
 });

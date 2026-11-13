@@ -316,3 +316,19 @@ describe('report 127: a pinned quest whose try has ended', () => {
     assert.match(game, /questState\.offers\?\.failed\?\.\[classTsid\] \? failedQuestPin\(p\.def\) : questStep\(p\.requirements\)/);
   });
 });
+
+describe('#306: Classic has no Pin to screen button', () => {
+  const game = read('game.js');
+  it('the card asks for the Pin button in Modern only, and Classic orders without pins', () => {
+    assert.match(game, /extraActions: \(classTsid\) => \(classTsid && modernUi\(\) \? \[questPinButton\(classTsid\)\] : \[\]\),/);
+    assert.match(game, /isPinned: \(classTsid\) => modernUi\(\) && Boolean\(questPins\(\)\?\.isPinned\(classTsid\)\),/);
+  });
+  it('a skin change redraws an open Quests sheet, and Classic hides a button drawn before it', () => {
+    const change = game.slice(game.indexOf('onUiModeChange((now) => {'), game.indexOf('onUiModeChange((now) => {') + 500);
+    assert.match(change, /if \(!document\.getElementById\('quest-panel'\)\?\.hidden\) updateHud\(\);/);
+    assert.match(read('css/classic.css'), /:root\[data-ui="classic"\] #game-root #quest-panel \.qc-pin \{ display: none; \}/);
+  });
+  it('the pins stay in the save whatever the skin (the feature never reads the skin)', () => {
+    assert.doesNotMatch(read('js/features/quest-pins-feature.js'), /ui-mode|data-ui|modernUi/);
+  });
+});

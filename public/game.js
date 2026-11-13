@@ -6003,10 +6003,12 @@ const questSheet = createQuestSheet({
   setData: (key, value) => { if (app?.canvas) app.canvas.dataset[key] = value; },
   // A card opened or closed in place is what the next draw makes: keep it (no redraw under the pointer).
   onToggle: () => { questLogDrawn = document.getElementById('quest')?.innerHTML ?? questLogDrawn; },
-  // VERBS: an active quest's card pins it to the tracker (two at most).
-  extraActions: (classTsid) => (classTsid ? [questPinButton(classTsid)] : []),
+  // VERBS: an active quest's card pins it to the tracker (two at most). #306: Modern only: Classic
+  // draws no pins (Glitch had none), so its cards have no Pin button, no menu row and no pinned-first
+  // order; the pins stay in the save for Modern.
+  extraActions: (classTsid) => (classTsid && modernUi() ? [questPinButton(classTsid)] : []),
   // #142: pinned quests head the list whatever the sort (js/ui/quest-sheet.js orderQuestCards).
-  isPinned: (classTsid) => Boolean(questPins()?.isPinned(classTsid)),
+  isPinned: (classTsid) => modernUi() && Boolean(questPins()?.isPinned(classTsid)),
   // RIGHTCLICK (audit item 7): a card's menu (Pin or Unpin, Open, its buttons), as the tracker's rows have.
   contextMenu: createContextMenu({ doc: document, host: document.getElementById('game-root'), id: 'quest-card-menu', className: 'quest-card-menu', setData: (key, value) => { if (app?.canvas) app.canvas.dataset[key] = value; } }),
   // Ticket 77: the search box and the sort picker (the sort a device preference, kept by the sheet) draw it again.
@@ -33719,6 +33721,8 @@ async function main() {
   // Switching to Classic closes it (Classic's own hub answers X there).
   onUiModeChange((now) => {
     if (now.mode !== MODERN) imaginationHub?.close();
+    // #306: the Quests cards gain or lose their Pin button with the skin.
+    if (!document.getElementById('quest-panel')?.hidden) updateHud();
     // MPANELS: a vendor's count is a popover over the shelf in Modern, the shelf's own detail in Classic.
     if (isVendorOpen()) renderVendorList();
   });

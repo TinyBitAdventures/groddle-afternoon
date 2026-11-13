@@ -3232,6 +3232,9 @@
 /* === chkui (lane) === */
 /* #305: a known recipe's tile says what it is missing, in the client's warning red (MakingRecipeUI.as 176-187). */
 :root[data-ui="classic"] #game-root #make-panel .make-tile .tile-why { font-size: calc(var(--fs-classic-count) * var(--cu-n, 1)); color: var(--text-danger); }
+/* #306: Classic draws no quest pins (style.css shows the pinned tracker in Modern only; Glitch had none), so no Pin
+   button either; game.js leaves it off the card, this covers a card drawn before the skin changed. */
+:root[data-ui="classic"] #game-root #quest-panel .qc-pin { display: none; }
 /* === end chkui === */
 
 /* == TICKETS == Reports (js/ui/reports-sheet.js, online only) as a 2012 window: the Quest Log's frame
