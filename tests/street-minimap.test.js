@@ -244,8 +244,11 @@ describe('street map: no_map and fog_map', () => {
   it('the archive\'s flags are carried (build-street-layers.mjs): 65 no_map, 2 fog_map; the 15 tower floors (G144) add no_map like their lobbies', () => {
     const noMap = flagged('noMap');
     const fog = flagged('fogMap');
-    assert.equal(noMap.length, 65 + 15);
-    assert.equal(noMap.filter((f) => !/"internalLabel":"Abandoned [^"]+, floor \d"/.test(read(`public/assets/streets/${f}`))).length, 65);
+    // G682: the two rebuilt practice streets carry no_map like the archived two (GUVCT29PSU53G9V, GHFRK14DDU53RQQ).
+    const practice = ['GIFII3UBRFB3KBE.json', 'GHFS40864GB396O.json'];
+    assert.ok(practice.every((f) => noMap.includes(f)));
+    assert.equal(noMap.length, 65 + 15 + practice.length);
+    assert.equal(noMap.filter((f) => !practice.includes(f) && !/"internalLabel":"Abandoned [^"]+, floor \d"/.test(read(`public/assets/streets/${f}`))).length, 65);
     assert.deepEqual(fog.sort(), ['GHH12E1QP611OPA.json', 'GLI1D5DO1671QPA.json'], 'The Drop and The Other Drop');
     assert.ok(noMap.includes('GA9H1V6OGRU2FSB.json'), 'Abandoned Hauki Seeks Manor');
     assert.match(read('build-street-layers.mjs'), /topBool\('no_map'\)[\s\S]{0,200}topBool\('fog_map'\)/);

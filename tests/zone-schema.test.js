@@ -80,9 +80,9 @@ describe('the zone schema (docs/level-builder/zone.schema.json)', () => {
   it('every shipped street fits $defs/street', () => {
     const street = compileSchema(schema, '#/$defs/street');
     const dir = join(root, 'public/assets/streets');
-    // Tiny Speck's 1,460, the 15 abandoned-tower floors (G144), Louise Pasture Villa (G371) and the Interrogation room (G352); a published zone's streets (GZ, spec 11) are checked by tests/zones.test.js.
+    // Tiny Speck's 1,460, the 15 abandoned-tower floors (G144), Louise Pasture Villa (G371), the Interrogation room (G352) and the two practice streets (G682); a published zone's streets (GZ, spec 11) are checked by tests/zones.test.js.
     const files = readdirSync(dir).filter((f) => /^[GL][A-Z0-9]+\.json$/.test(f) && !/^[GL]Z[A-Z0-9]{13}\.json$/.test(f));
-    assert.equal(files.length, 1477);
+    assert.equal(files.length, 1479);
     const bad = [];
     for (const f of files) {
       const errors = street(JSON.parse(readFileSync(join(dir, f), 'utf8')), { limit: 3 });
@@ -127,7 +127,7 @@ describe('the deco catalog (tools/builder/deco-catalog.mjs, assets/content/deco-
     const manifest = json('public/assets/decos/manifest.json');
     assert.equal(cat.count, 2993);
     assert.equal(cat.decos.length, manifest.length);
-    assert.equal(cat.streetsScanned, 1477);
+    assert.equal(cat.streetsScanned, 1479); // + the two practice streets (G682)
     assert.deepEqual(cat.decos.map((d) => d.name), [...manifest].sort((a, b) => (a < b ? -1 : a > b ? 1 : 0)));
     const placed = cat.decos.filter((d) => !d.neverPlaced);
     // The Interrogation room (G352) is the first street to place bureaucratic_hall_waitingroom_1: 138 before.

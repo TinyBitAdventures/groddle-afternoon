@@ -86,8 +86,9 @@ describe('soft lines (pc_perm 0) are no floor for the avatar', () => {
   it('counts the lines it drops: 34 no event names on 22 streets, and one events only switch off', () => {
     const rows = softLines();
     const untoggled = rows.filter((r) => r.kind === 'untoggled');
-    assert.equal(untoggled.length, 34);
-    assert.equal(new Set(untoggled.map((r) => r.tsid)).size, 22);
+    // G682: + EZ Cookin's four table tops, item shelves on purpose (the food rests there).
+    assert.equal(untoggled.length, 38);
+    assert.equal(new Set(untoggled.map((r) => r.tsid)).size, 23);
     assert.ok(untoggled.some((r) => r.tsid === 'GA9KL9UE1D82RFO' && r.id === 'plat_1312406393104'), "Odena Odes' cave line");
     // High Jumper's Gully's Gameshow Ticket stand: hide_gst sets it to 0, nothing sets it on.
     assert.deepEqual(rows.filter((r) => r.kind === 'only-off').map((r) => `${r.tsid} ${r.id}`), ['GA94O989H3D3RN7 plat_1344547379043']);
@@ -127,7 +128,7 @@ describe('soft lines (pc_perm 0) are no floor for the avatar', () => {
       assert.deepEqual(bad, [], s.tsid);
       checked += 1;
     }
-    assert.equal(checked, 29);
+    assert.equal(checked, 30); // + EZ Cookin' (G682)
   });
 
   it('still lets items land on an item shelf (walk-surface landingY)', () => {

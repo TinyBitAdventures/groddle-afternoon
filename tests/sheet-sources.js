@@ -466,6 +466,13 @@ export async function collectSheets() {
   for (const [who, s] of Object.entries(newxp.get('SHEETS'))) {
     for (const [mode, [file, cols, r, n]] of Object.entries(s.modes)) rows.push(kitRow(`newxp ${who} ${mode}`, `${newxp.get('ART')}${file}.webp`, cols, r, n));
   }
+  // G682: the practice streets' Welcoming Flamingo (the newxp npc_flamingo sheets, by mode).
+  const practice = moduleConsts('js/quest-rooms/practice-kit.js');
+  for (const [mode, grid] of Object.entries(practice.get('FLAMINGO'))) {
+    if (!Array.isArray(grid)) continue;
+    const [file, cols, r, n] = grid;
+    rows.push(kitRow(`practice flamingo ${mode}`, `${practice.get('FLAMINGO_ART')}${file}.webp`, cols, r, n));
+  }
   // Every other kit call whose arguments are literals or module constants.
   for (const c of kitCalls()) {
     if (!c.args || c.args.some((a) => a === undefined)) continue;
@@ -479,6 +486,7 @@ export async function collectSheets() {
 export const KIT_TABLE_CALLS = Object.freeze([
   'js/features/gwendolyn-room-23-feature.js', 'js/features/newxp-feature.js', 'js/quest-rooms/esquibeth.js',
   'js/quest-rooms/gwendolyn.js', 'js/quest-rooms/juju-camp.js', 'js/quest-rooms/penalty.js',
+  'js/quest-rooms/practice-kit.js',
 ]);
 
 function dedupe(rows) {

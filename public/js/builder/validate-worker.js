@@ -17,9 +17,9 @@
  */
 import { validateZone } from './validate.js?v=93c15080';
 import { compileSchema } from './schema-check.js?v=cc9d1af4';
-import { DECO_TWINS } from '../street-render.js?v=57d38e04';
+import { DECO_TWINS } from '../street-render.js?v=0f1293df';
 import { ANIM_DECOS } from '../deco-anim-list.js?v=ecfee655';
-import { SHARP_DECOS } from '../deco-sharp-list.js?v=a2424923';
+import { SHARP_DECOS } from '../deco-sharp-list.js?v=28262069';
 import { setStreetEcologyCatalog } from '../street-ecology.js?v=64dcdacc';
 
 /** Where the game's files are, from this module's own URL (js/builder/ -> the game root). */

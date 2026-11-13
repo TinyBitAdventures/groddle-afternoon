@@ -16,7 +16,7 @@ const rows = new Map(plan.decos.map((r) => [r.name, r]));
 const url = (name) => `assets/decos/groddle/${name}.png`;
 
 async function withRenderer(resolution, fn) {
-  const hires = await import('../public/js/deco-hires.js?v=f59e60d3');
+  const hires = await import('../public/js/deco-hires.js?v=c110b16e');
   const renderer = { resolution, gl: { MAX_TEXTURE_SIZE: 1, getParameter: () => 16384 } };
   hires.installHiresDecos({ addUrlRoute() {} }, { renderer: () => renderer });
   try {
@@ -43,7 +43,7 @@ test("the Penalty Cell's trunk and bars take their sharp copies at R 4 and keep 
 });
 
 test('no sharp copy before the renderer starts, nor for a file outside the deco folder', async () => {
-  const { sharpRoomDeco } = await import('../public/js/deco-hires.js?v=f59e60d3');
+  const { sharpRoomDeco } = await import('../public/js/deco-hires.js?v=c110b16e');
   assert.equal(sharpRoomDeco(url('penaltybox_trunk'), 0.62), null);
   await withRenderer(4, ({ sharpRoomDeco: pick }) => {
     assert.equal(pick('assets/sprites/icons/apple.webp', 2), null);

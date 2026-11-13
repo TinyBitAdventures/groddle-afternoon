@@ -109,13 +109,16 @@ describe('street data (build-street-layers.mjs item_perm)', () => {
 
   it('the rebuilt streets: the ones copied from an archived street carry it, the 50 drawn by hand have none', () => {
     const rebuilt = allStreets().filter((s) => /^reconstruction/.test(s.source || ''));
-    assert.equal(rebuilt.length, 55); // + the 15 abandoned-tower floors (G144), Louise Pasture Villa (G371), the Interrogation room (G352)
+    assert.equal(rebuilt.length, 57); // + the 15 abandoned-tower floors (G144), Louise Pasture Villa (G371), the Interrogation room (G352), the two practice streets (G682)
     // tools/build-enchanted-forests.mjs slices the parent street; tools/build-forest-machine-room.mjs
     // copies the Meadow room's template; Louise Pasture Villa (G371) the apartment lobby template's.
     const copied = rebuilt.filter((s) => /Enchanted Forest hollows|Forest Community Machine Room|apartment lobby template/.test(s.source));
     assert.equal(copied.length, 5);
     assert.ok(copied.every((s) => s.platforms.every((p) => 'item_perm' in p)));
-    assert.ok(rebuilt.filter((s) => !copied.includes(s)).every((s) => s.platforms.every((p) => !('item_perm' in p))));
+    // G682: EZ Cookin's table tops are item shelves on purpose (pc_perm 0, item_perm -1: the food rests
+    // there, the avatar walks through, as on the archived practice streets' side table); its floors carry none.
+    const shelf = (p) => p.pc_perm === 0 && p.item_perm === -1;
+    assert.ok(rebuilt.filter((s) => !copied.includes(s)).every((s) => s.platforms.every((p) => !('item_perm' in p) || (s.tsid === 'GIFII3UBRFB3KBE' && shelf(p)))));
   });
 
   it('build-street-layers.mjs --check: the JSON matches the XML', { skip: !existsSync(xmlRoot) && 'needs ../streets (locations-xml.zip)' }, () => {
@@ -256,8 +259,9 @@ describe('the other lines the rule changes', () => {
     }
     assert.equal(soft, 2254); // R5: Room 23 gets a roof over its new upper floor; G371: Louise Pasture Villa's ceiling (Gregarious Towers')
     assert.equal(softStreets, 286);
-    assert.equal(disagree, 70);
-    assert.equal(disagreeStreets.size, 32);
+    // G682: + EZ Cookin's four table tops (item shelves: items rest, the avatar walks through).
+    assert.equal(disagree, 74);
+    assert.equal(disagreeStreets.size, 33);
   });
 });
 

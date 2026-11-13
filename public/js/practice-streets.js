@@ -62,7 +62,8 @@ export const PRACTICE_FLAMINGO = Object.freeze({ x: 370, y: -93 });
 const deco = (sprite, x, y, w, h, z, extra = {}) => ({ sprite, x: Math.round(x), y: Math.round(y), w: Math.round(w), h: Math.round(h), z, r: 0, ...extra });
 const countDecos = (layers) => layers.reduce((n, l) => n + (l.decos?.length || 0), 0);
 const sameTsid = (a, b) => String(a || '').length > 1 && String(a || '').slice(1) === String(b || '').slice(1);
-const plat = (id, x1, y1, x2, y2 = y1, extra = {}) => ({ id, x1, y1, x2, y2, pc_perm: -1, item_perm: -1, ...extra });
+/** A floor (no item_perm: a hand-drawn line is a plain floor for items too, as the other rebuilt rooms). */
+const plat = (id, x1, y1, x2, y2 = y1, extra = {}) => ({ id, x1, y1, x2, y2, pc_perm: -1, ...extra });
 /** A table top: items rest on it, the avatar walks through (as the archived practice streets' side table). */
 const shelf = (id, x1, x2, y) => ({ id, x1, y1: y, x2, y2: y, pc_perm: 0, item_perm: -1 });
 
@@ -198,12 +199,11 @@ function laneEdge(W, y, z0, seed, skip = []) {
   return out;
 }
 
-function shell({ tsid, sourceTsid, label, bounds, platforms, layers, barriers, boxes, source, why }) {
+function shell({ tsid, label, bounds, platforms, layers, barriers, boxes, source, why }) {
   return {
     source,
     reconstructed: true,
     tsid,
-    sourceTsid,
     label,
     hubId: PRACTICE_HUB.hubId,
     hubName: PRACTICE_HUB.hubName,
@@ -394,7 +394,7 @@ export function ezCookinBoxes() {
   const f = EZ_FINISH_BOX;
   return [
     { key: 'box_knife', id: 'knifeandboard', x: EZ_KNIFE_TABLE.x, y: EZ_COOKIN_FLOOR_Y + oy, w: 240, h: 200 },
-    ...EZ_COUNTERS.map((c, i) => ({ key: `box_${c.id}`, id: c.id, x: c.x, y: EZ_COOKIN_FLOOR_Y + oy, w: 240, h: 200, n: i + 1 })),
+    ...EZ_COUNTERS.map((c) => ({ key: `box_${c.id}`, id: c.id, x: c.x, y: EZ_COOKIN_FLOOR_Y + oy, w: 240, h: 200 })),
     { key: 'box_finish', id: f.id, x: f.x, y: f.y + oy, w: f.w, h: f.h },
   ];
 }
@@ -420,7 +420,6 @@ export function ezCookinStreet() {
   ];
   return shell({
     tsid: EZ_COOKIN_TSID,
-    sourceTsid: EZ_COOKIN_SOURCE_TSID,
     label: EZ_COOKIN_LABEL,
     bounds: B,
     platforms,
@@ -575,7 +574,6 @@ export function soilStreet() {
   ];
   return shell({
     tsid: SOIL_TSID,
-    sourceTsid: SOIL_SOURCE_TSID,
     label: SOIL_LABEL,
     bounds: B,
     platforms,

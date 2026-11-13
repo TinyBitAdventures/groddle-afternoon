@@ -38,7 +38,7 @@ import {
 } from '../public/js/quest-rooms/firefly-whistle.js?v=f2ba6330';
 import { DRESSING, ENTRY, FLOOR, FLOOR_Y, LAB, W, entryPath, labPlatforms, seamsToDraw, sx, sy } from '../public/js/quest-rooms/firefly-whistle-scene.js?v=d5b09ba8';
 import { FIREFLY_LAB_FILES } from '../public/js/quest-rooms/firefly-lab-art.js?v=481a55f9';
-import * as kit from '../public/js/quest-rooms/kit.js?v=c436cb8a';
+import * as kit from '../public/js/quest-rooms/kit.js?v=8bb400ea';
 import { BUILT_ROOMS, OFFER_OVERRIDES, QUEST_ROOMS, questGiver } from '../public/js/quest-rooms/catalog.js?v=a217b716';
 import { REMAKE_QUEST_NPCS } from '../public/js/quest-offers.js?v=d18bee8b';
 import { FIREFLY_OFFER_LINES, FIREFLY_WHISTLE_QUEST, fireflyTouches } from '../public/js/features/resource-nodes-feature.js?v=d6c18f91';

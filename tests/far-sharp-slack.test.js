@@ -14,8 +14,8 @@ const pub = join(root, 'public');
 const manifest = new Set(JSON.parse(readFileSync(join(pub, 'assets/decos/manifest.json'), 'utf8')));
 
 async function farPicks(tsid, R) {
-  const hires = await import('../public/js/deco-hires.js?v=f59e60d3');
-  const sr = await import('../public/js/street-render.js?v=57d38e04');
+  const hires = await import('../public/js/deco-hires.js?v=c110b16e');
+  const sr = await import('../public/js/street-render.js?v=0f1293df');
   const street = JSON.parse(readFileSync(join(pub, `assets/streets/${tsid}.json`), 'utf8'));
   const mz = street.layers.findIndex((l) => l.id === 'middleground');
   const mlz = street.layers[mz].z ?? mz;
@@ -40,7 +40,7 @@ async function farPicks(tsid, R) {
 }
 
 test('the far slack ladder runs from SHARP_SLACK to twice it in eighth-octave steps', async () => {
-  const { FAR_SLACKS, SHARP_SLACK } = await import('../public/js/deco-hires.js?v=f59e60d3');
+  const { FAR_SLACKS, SHARP_SLACK } = await import('../public/js/deco-hires.js?v=c110b16e');
   assert.equal(FAR_SLACKS.length, 9);
   assert.equal(FAR_SLACKS[0], SHARP_SLACK);
   assert.ok(Math.abs(FAR_SLACKS.at(-1) - 2 * SHARP_SLACK) < 1e-9);
@@ -61,7 +61,7 @@ test('Ilmenskie and Oktyabrya fit every far copy at R 4, and a phone keeps the s
 });
 
 test('a far WebP sized for a nearer placement loads downscaled to the far need', async () => {
-  const { sharpDeco } = await import('../public/js/deco-hires.js?v=f59e60d3');
+  const { sharpDeco } = await import('../public/js/deco-hires.js?v=c110b16e');
   const url = 'assets/decos/groddle/bck_hill_16.png';
   const near = sharpDeco(url, 4, { bigTextures: true });
   const far = sharpDeco(url, 4, { far: true, farSlack: 2.0566, bigTextures: true });

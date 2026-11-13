@@ -21,7 +21,7 @@ const planRow = (name) => JSON.parse(decoPlan.split('\n').find((l) => l.startsWi
 const HOUSES = ['door_asset_house_large_01', 'door_asset_house_medium_03', 'door_asset_house_large_05'];
 
 test('each home-street house has a sharp copy sized for its scale on a 4x backing store', async () => {
-  const { SHARP_DECOS } = await import('../public/js/deco-sharp-list.js?v=a2424923');
+  const { SHARP_DECOS } = await import('../public/js/deco-sharp-list.js?v=28262069');
   for (const name of HOUSES) {
     const r = rows.get(name);
     assert.ok(r, name);
@@ -46,7 +46,7 @@ test('the two re-framed house copies line up with their 2x files', () => {
 });
 
 test('the house picks its copy at R 4 and keeps the 2x file on a phone', async () => {
-  const { landscapeArt } = await import('../public/js/features/homes-feature.js?v=103aac9d');
+  const { landscapeArt } = await import('../public/js/features/homes-feature.js?v=47379a69');
   const house = { s: 'door_asset_house_medium_03', w: 764, h: 586, scale: 0.58 };
   assert.equal(landscapeArt(house, 4).url, `assets/decos/groddle/door_asset_house_medium_03@${rows.get('door_asset_house_medium_03').res}x.webp`);
   assert.equal(landscapeArt(house, 1).url, 'assets/decos/groddle/door_asset_house_medium_03.png');
