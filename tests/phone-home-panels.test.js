@@ -47,3 +47,14 @@ describe('#275 the Cultivate bars on a phone', () => {
     assert.match(builderJs, /renderTray\(m\);\n\s+syncTrayUp\(\);/);
   });
 });
+
+describe('#279 Cultivate and Change Style under the Social drawer', () => {
+  const homes = read('js/features/homes-feature.js');
+  it('the home street buttons sit under the drawer, over the HUD', () => {
+    const z = (src, re) => Number(src.match(re)?.[1]);
+    const modes = z(homes, /\.homes-modes\{[^}]*z-index:calc\(var\(--z-hud\) \+ (\d+)\)/);
+    const drawer = z(css, /\.local-chat-dock \{[^}]*z-index: calc\(var\(--z-hud\) \+ (\d+)\);/);
+    assert.ok(drawer > 0 && modes > 0, `modes ${modes} drawer ${drawer}`);
+    assert.ok(modes < drawer, `modes ${modes} must be under the drawer ${drawer}`);
+  });
+});

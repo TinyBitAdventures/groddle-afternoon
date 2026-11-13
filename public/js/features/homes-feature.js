@@ -3451,7 +3451,8 @@ function protoVerbs(item, engine) {
 // ---------------------------------------------------------------------------
 
 const CSS = `
-.homes-modes{position:absolute;left:50%;top:92px;transform:translateX(-50%);z-index:calc(var(--z-hud) + 18);display:flex;gap:var(--sp-3)}
+/* Report #279: under the Social drawer (z-hud + 14), as the street's other buttons sit; over the HUD. */
+.homes-modes{position:absolute;left:50%;top:92px;transform:translateX(-50%);z-index:calc(var(--z-hud) + 13);display:flex;gap:var(--sp-3)}
 .homes-modes[hidden]{display:none}
 .homes-modes button{border:none;border-radius:var(--radius-pill);padding:var(--sp-3) var(--sp-7);font-weight:700;font-size:var(--fs-sm);cursor:pointer;background:color-mix(in srgb, var(--surface-card) 94%, transparent);color:var(--text-brown);box-shadow:var(--shadow-2)}
 .homes-modes button.on{background:var(--accent);color:var(--text-inverse)}
