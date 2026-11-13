@@ -14323,6 +14323,21 @@ body.is-booting .touch-controls { display: none; }
 @media (max-height: 520px) {
   :root.touch-phone.kbd-up #game-root .local-chat-dock.social-drawer.is-open:focus-within .social-tabs { display: none; }
 }
+/* FLOAT STICK (Friendly's idea; Austin 2026-11-13: an option, off by default, js/touch-controls.js): with
+   "Stick follows your thumb" on, the stick's corner is the lower left of the street, either way up: up to
+   45% of the width (Jump stays on the right) and up to 300 px over the pack row, never into the top bar
+   or the pinned quests under it. A thumb anywhere there places the stick; it rests in its usual corner.
+   The pack, the panels (z-panel) and the prompts (prompt-stack) stay over it. */
+:root.touch-phone #game-root .touch-controls[data-float="on"] .touch-stick {
+  width: min(45%, 360px);
+  height: clamp(132px, 100dvh - var(--pack-live-height, 72px) - var(--hud-h) - 96px, 300px);
+}
+:root.touch-phone #game-root .touch-controls[data-float="on"] .touch-stick-base { left: 66px; top: calc(100% - 66px); }
+[data-ui="modern"] .more-list .menu-float-stick { padding: var(--space-1) var(--space-2) var(--space-2); border-radius: var(--radius-s); color: var(--text); font-size: var(--fs-m); font-weight: var(--fw-bold); }
+[data-ui="modern"] .more-list .menu-float-stick:hover { background: var(--surface-hover); }
+[data-ui="modern"] .more-list .menu-float-stick input { width: 16px; height: 16px; margin: 0; accent-color: var(--accent); }
+[data-ui="modern"] .more-list .menu-float-stick input:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+[data-ui="modern"] .more-list .menu-float-stick small { color: var(--text-muted); font-size: var(--fs-xs); font-weight: var(--fw-regular); line-height: var(--lh-snug); }
 /* === end LANDSCAPE-PANELS === */
 
 /* PHONEKEYS (Austin 2026-11-12, on his iPhone): a phone (html.touch-phone, the phone gate's

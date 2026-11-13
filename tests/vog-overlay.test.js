@@ -13,7 +13,7 @@ import {
   createVogOverlay,
   vogKeyAction,
   vogLines,
-} from '../public/js/vog-overlay.js?v=c1c6195e';
+} from '../public/js/vog-overlay.js?v=b4b28dd2';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const pub = join(here, '../public');

@@ -13,6 +13,11 @@
  *   tapped ladder to where it was tapped.
  * Both sit under every panel (z-hud), outside the safe area, and take only their own touches, so
  * a panel's scrolling and a tap on the world never reach them.
+ * - FLOAT STICK (Friendly's idea; Austin 2026-11-13: an option, off by default): "Stick follows your
+ *   thumb" in the Menu's Settings group, kept on this device. On, the stick's corner grows to the
+ *   lower left of the street (style.css LANDSCAPE-PANELS, data-float on #touch-controls): a thumb
+ *   anywhere there places the stick and drags from it, and a quick tap there acts on the street as a
+ *   tap anywhere else does (the thing under it, or a walk to that spot).
  */
 
 /** How far (CSS px) the knob travels from where the thumb landed. */
@@ -49,6 +54,89 @@ export function stickKeys(dx, dy, { dead = STICK_DEAD, lock = STICK_AXIS_LOCK } 
   if (ax >= dead && ax * lock >= ay) out.push(x < 0 ? 'ArrowLeft' : 'ArrowRight');
   if (ay >= dead && ay * lock >= ax) out.push(y < 0 ? 'ArrowUp' : 'ArrowDown');
   return out;
+}
+
+/** FLOAT STICK: where the choice is kept (this device only, like the zoom), and its words. */
+export const FLOAT_STICK_STORAGE_KEY = 'groddle.floatStick';
+export const FLOAT_STICK_EVENT = 'groddle:float-stick';
+export const FLOAT_STICK_DEFAULT = false;
+export const FLOAT_STICK_LABEL = 'Stick follows your thumb';
+export const FLOAT_STICK_HINT = 'Put your thumb down anywhere low on the left to walk from there.';
+
+/** PURE: the stored words as on (true) or off (false); anything else is the default (off). */
+export function parseFloatStick(v) {
+  if (v === 'on' || v === true || v === '1' || v === 'true') return true;
+  if (v === 'off' || v === false || v === '0' || v === 'false') return false;
+  return FLOAT_STICK_DEFAULT;
+}
+
+/**
+ * FLOAT STICK: the setting for one window: { get, set, onChange }. set() stores it (try/catch: a
+ * private window), tells the listeners and sends groddle:float-stick.
+ */
+export function createFloatStick({ win = globalThis, storage } = {}) {
+  const store = storage !== undefined ? storage : (() => { try { return win?.localStorage; } catch { return null; } })();
+  let on = FLOAT_STICK_DEFAULT;
+  try { on = parseFloatStick(store?.getItem?.(FLOAT_STICK_STORAGE_KEY) ?? null); } catch { /* the default */ }
+  const listeners = new Set();
+  return {
+    get: () => on,
+    set(v) {
+      const next = Boolean(v);
+      if (next === on) return on;
+      on = next;
+      try { store?.setItem?.(FLOAT_STICK_STORAGE_KEY, on ? 'on' : 'off'); } catch { /* not remembered */ }
+      for (const fn of [...listeners]) {
+        try { fn(on); } catch (err) { console.error(err); }
+      }
+      try {
+        if (typeof win?.CustomEvent === 'function') win.dispatchEvent(new win.CustomEvent(FLOAT_STICK_EVENT, { detail: { on } }));
+      } catch { /* no window events (tests) */ }
+      return on;
+    },
+    onChange(fn) {
+      listeners.add(fn);
+      return () => listeners.delete(fn);
+    },
+  };
+}
+
+/**
+ * FLOAT STICK: its switch, at the foot of the Menu's Settings group (after Zoom, Night tint and Street
+ * map, which the top bar puts after Zoom). Returns the row, or null when there is no Menu.
+ */
+export function installFloatStickSwitch(doc, setting) {
+  const settings = doc?.querySelector?.('#more-list [data-menu-group="settings"]');
+  if (!settings || !setting || doc.getElementById?.('menu-float-stick')) return null;
+  const id = 'menu-float-stick';
+  const row = doc.createElement('label');
+  row.className = 'hud-toggle menu-float-stick';
+  row.htmlFor = id;
+  row.dataset.menuControl = 'float-stick';
+  const input = doc.createElement('input');
+  Object.assign(input, { id, type: 'checkbox' });
+  input.setAttribute('role', 'switch');
+  input.setAttribute('aria-describedby', `${id}-hint`);
+  const words = doc.createElement('span');
+  words.textContent = FLOAT_STICK_LABEL;
+  const hint = doc.createElement('small');
+  hint.id = `${id}-hint`;
+  hint.textContent = FLOAT_STICK_HINT;
+  row.append(input, words, hint);
+  const draw = () => {
+    const on = Boolean(setting.get?.());
+    input.checked = on;
+    input.setAttribute('aria-checked', on ? 'true' : 'false');
+  };
+  input.addEventListener('change', () => {
+    setting.set?.(input.checked);
+    draw();
+  });
+  setting.onChange?.(draw);
+  draw();
+  settings.append(row);
+  settings.hidden = false;
+  return row;
 }
 
 /** A tap on the stick's corner shorter than this (ms) that never moved it goes to the street behind. */
@@ -121,7 +209,7 @@ export function touchWords(text, touch = isPhoneDevice()) {
  * press(key) / release(key): the held keys (game.js `keys`); jump(): a jump's edge.
  * Returns { el, releaseAll, destroy }.
  */
-export function installTouchControls({ root, press, release, jump, tapThrough = null, doc = globalThis.document, win = globalThis.window } = {}) {
+export function installTouchControls({ root, press, release, jump, tapThrough = null, floatStick = null, doc = globalThis.document, win = globalThis.window } = {}) {
   if (!root || !doc) return null;
   const el = doc.createElement('div');
   el.id = 'touch-controls';
@@ -135,6 +223,14 @@ export function installTouchControls({ root, press, release, jump, tapThrough = 
   const base = el.querySelector('.touch-stick-base');
   const knob = el.querySelector('.touch-stick-knob');
   const jumpBtn = el.querySelector('[data-touch-jump]');
+  // FLOAT STICK: the corner grows while the setting is on (style.css, data-float).
+  const drawFloat = () => {
+    if (floatStick?.get?.()) el.dataset.float = 'on';
+    else delete el.dataset.float;
+  };
+  drawFloat();
+  const offFloat = floatStick?.onChange?.(drawFloat);
+  const floatSwitch = installFloatStickSwitch(doc, floatStick);
 
   let stickId = null;
   let origin = null;
@@ -219,9 +315,9 @@ export function installTouchControls({ root, press, release, jump, tapThrough = 
         others.delete(e.pointerId);
         return;
       }
-      if (type === 'pointerup' && origin) {
-        tapReady = !multi && isTapThrough({ moved, ms: e.timeStamp - downAt, dx: e.clientX - origin.x, dy: e.clientY - origin.y });
-      }
+      // Whichever ends the press first (WebKit can send pointercancel before pointerup on a tap; the
+      // click that follows says it was one): a quick press that never steered, with no second finger.
+      if (origin) tapReady = !multi && isTapThrough({ moved, ms: e.timeStamp - downAt });
       endStick();
     });
   }
@@ -231,7 +327,7 @@ export function installTouchControls({ root, press, release, jump, tapThrough = 
   zone.addEventListener('click', (e) => {
     const ready = tapReady && stickId == null && !others.size && isTapThrough({ moved, ms: e.timeStamp - downAt });
     tapReady = false;
-    if (ready) tapThrough?.(e.clientX, e.clientY);
+    if (ready) tapThrough?.(e.clientX, e.clientY, { float: el.dataset.float === 'on' });
   });
 
   let jumpId = null;
@@ -273,6 +369,8 @@ export function installTouchControls({ root, press, release, jump, tapThrough = 
       releaseAll();
       win.removeEventListener('blur', releaseAll);
       keyboard.destroy();
+      if (typeof offFloat === 'function') offFloat();
+      floatSwitch?.remove?.();
       el.remove();
       doc.documentElement.classList.remove('touch-phone');
     },

@@ -11,7 +11,7 @@ import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { MIN_PACK_HEIGHT, PHONE_PORTRAIT_MIN_VIEW_W, VIEW_FLOOR_H, VIEW_HOLD_H, phoneStage, stageFor } from '../public/js/location-view.js?v=cfef3b43';
-import { phoneScreenFrame } from '../public/js/touch-controls.js?v=99de2061';
+import { phoneScreenFrame } from '../public/js/touch-controls.js?v=d65f8c10';
 import { tutorialPillSpot } from '../public/js/newxp.js?v=91b8f176';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');

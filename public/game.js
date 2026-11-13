@@ -4,11 +4,11 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=b75ab87b';
 import { createErrorOnce, createFeatureHost } from './js/feature-host.js?v=06bb8b74';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=d6d052c7';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=7513433c';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl, drawTileArt } from './js/enter-chooser.js?v=4a3ea327';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
-import { createVogOverlay } from './js/vog-overlay.js?v=c1c6195e';
+import { createVogOverlay } from './js/vog-overlay.js?v=b4b28dd2';
 import { createPromptStack } from './js/prompt-stack.js?v=f7ca1ed0';
 import { createWindowStack } from './js/window-stack.js?v=a7104f02';
 import { HOG_HAUL_SPLASH, createGameSplash, splashFor } from './js/game-splash.js?v=ebe52dc8';
@@ -809,7 +809,7 @@ import { landingY, stackRestY, walkSurfaceY } from './js/walk-surface.js?v=106bf
 import { holdCloseToFloor } from './js/slope-walk.js?v=9af1e505';
 import { JUMP_SPEED, MAX_TICK_FRAMES, WALK_MAX, avatarGround, coastX, frameSteps, stepAvatar, steerAccel, steerX, streetPhysicsExtras } from './js/avatar-step.js?v=43b1182e';
 import { createUserPath, stepUserPath } from './js/user-path.js?v=8880557f';
-import { TOUCH_JUMP_EVENT, climbGoalStep, installTouchControls, isPhoneDevice, touchPrompt, touchTapPlan } from './js/touch-controls.js?v=99de2061';
+import { TOUCH_JUMP_EVENT, climbGoalStep, createFloatStick, installTouchControls, isPhoneDevice, touchPrompt, touchTapPlan } from './js/touch-controls.js?v=d65f8c10';
 import { installPinchZoom } from './js/touch-pinch.js?v=5bdb5971';
 import { FAILED_LINE, inVerbReach, movingLine, verbRange, walkOverEnd, walkOverGoals } from './js/walk-over.js?v=277ab977';
 import { hellBuffDesc, isInHell } from './js/hell.js?v=23354bc4';
@@ -32787,14 +32787,16 @@ async function main() {
         queueJump(jumpState, movementNow());
         window.dispatchEvent(new CustomEvent(TOUCH_JUMP_EVENT));
       },
-      // A quick tap on the stick's corner on a thing behind it (an animal under it) is a tap on that thing.
-      tapThrough: (x, y) => {
+      floatStick: createFloatStick({ win: window }),
+      // A quick tap on the stick's corner on a thing behind it (an animal under it) is a tap on that thing;
+      // with the floating stick's wide corner, a tap on empty street there walks, as anywhere else.
+      tapThrough: (x, y, how = {}) => {
         const b = app.canvas.getBoundingClientRect();
         const sx = (x - b.left) * (VIEW_W / b.width) + camTarget;
         const sy = (y - b.top) * (VIEW_H / b.height) + (camY || 0);
         const hit = pickInteractableAt(sx, sy);
-        setCanvasData('touchTapThrough', hit?.classId || '');
-        if (!hit) return;
+        setCanvasData('touchTapThrough', hit?.classId || (how.float ? 'walk' : ''));
+        if (!hit && !how.float) return;
         app.canvas.dispatchEvent(new PointerEvent('pointerdown', { clientX: x, clientY: y, pointerType: 'touch', isPrimary: true, bubbles: true }));
       },
     });

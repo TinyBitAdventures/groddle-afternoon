@@ -18,7 +18,7 @@ import {
   knobOffset,
   stickKeys,
   touchTapPlan,
-} from '../public/js/touch-controls.js?v=99de2061';
+} from '../public/js/touch-controls.js?v=d65f8c10';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const game = readFileSync(join(root, 'public/game.js'), 'utf8');
