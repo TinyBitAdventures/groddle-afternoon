@@ -8,7 +8,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-import { PHONE_MAP_TEXT, phoneMapWidth, phoneSignRows } from '../public/js/features/street-minimap-feature.js?v=2f536f4c';
+import { PHONE_MAP_TEXT, phoneMapWidth, phoneSignRows } from '../public/js/features/street-minimap-feature.js?v=e1fa1b10';
 
 const root = join(import.meta.dirname, '..');
 const read = (rel) => readFileSync(join(root, rel), 'utf8');
@@ -44,7 +44,7 @@ describe('the street map on a phone', () => {
   it('makes the map on open and frees it on close; closed, a tick is a street check', () => {
     assert.match(feature, /phoneInstall\(engine\);\n\s*return;/);
     assert.match(feature, /view = createStreetMinimap\(doc, mapBox, \{/);
-    assert.match(feature, /function phoneClose\(engine, \{ walked = false \} = \{\}\) \{\n\s*if \(!phone\) return;\n\s*clearSnaps\(\);\n\s*view\?\.destroy\(\);\n\s*view = null;/);
+    assert.match(feature, /function phoneClose\(engine, \{ walked = false \} = \{\}\) \{\n\s*if \(!phone\) return;\n\s*clearSnaps\(\);\n\s*stopArt\(\);\n\s*view\?\.destroy\(\);\n\s*view = null;/);
     // A walk from the map or a destination closes it.
     assert.match(feature, /const ok = walkFromMap\(engine, goal, how\);\n\s*if \(ok\) phoneClose\(engine, \{ walked: true \}\);/);
     // A new street or a hiding moment closes it.

@@ -1,9 +1,17 @@
 /**
  * MINIMAP (G370): the street map's wiring (the view and its rules are js/ui/street-minimap.js).
  *
- * - Follows engine.street: a new street (or scene) gets its geometry, signposts and the lines
- *   picture at once, then the snapshot of its own layers 0.9 s and 4 s later, while the decos
- *   load (only while the map shows; a hidden map snaps when it next shows).
+ * - Follows engine.street: a new street (or scene) gets its geometry and signposts at once, and
+ *   the card waits unseen (READY, js/ui/street-minimap.js) for the snapshot of its own layers.
+ *   ART: the snapshot is taken when the street's art has really loaded: once the street view for
+ *   this street is up, every image under it (its layers, decos, front layers; a live scene's kept
+ *   entities too) that is still loading is waited for (js/textures.js onLoaded / onFailed), then
+ *   ART_SETTLE_MS for the colour bakes street-render runs as they land, then a frame. A slow
+ *   network has a cap: ART_CAP_MS after the map shows, the best snapshot so far shows, and the
+ *   map snaps again when the rest lands. The 2012 client did the same: a snap once the location
+ *   was built (LocationViewBuilder.locationBuilt -> resnapMiniMap) and another as each late deco
+ *   arrived (DecoRenderer.addAndSyncDecoAsset), batched to once a second. Only while the map
+ *   shows; a hidden map snaps when it next shows.
  * - Scenes a feature builds (lane HOMEMAP: the home street, the house, Tower floors, a visit to
  *   another player's home, the instances and races) have no street image to draw: they are
  *   snapped live, as the 2012 client re-snapped a home street (TSFrontController.resnapMiniMap,
@@ -46,7 +54,8 @@
  *
  * Canvas data: streetMap (shown|off|no-map|hidden|phone), streetMapFog, streetMapExpanded,
  * streetMapDots, streetMapDotIds, streetMapSigns, streetMapPicture (lines|snapshot),
- * streetMapReady (1 the card shows with its picture, 0 it waits unseen for it),
+ * streetMapReady (1 the card shows with its picture, 0 it waits unseen for it), streetMapArt (ART:
+ * waiting for the view | loading:<images left> | capped:<images left> | loaded),
  * streetMapSnapMs (the last snapshot's cost), streetMapSnaps (how many taken), streetMapWalk (the last click: kind:x, or
  * refused). QA: &streetmapexpand=1 expands it on each street.
  */
@@ -56,10 +65,14 @@ import { classicArtUrl } from '../classic/classic-art.js?v=5f713e7d';
 import { onUiModeChange } from '../classic/ui-mode.js?v=9705b783';
 import { focusBack } from '../ui/focus-return.js?v=da190597';
 import { isPhoneDevice } from '../touch-controls.js?v=6ae5adce';
+import { isFailed, isLoaded, onFailed, onLoaded } from '../textures.js?v=814d7926';
 
 export const STREET_MINIMAP_FEATURE_ID = 'street-minimap';
 const UPDATE_MS = 100;
-const SNAP_AT_MS = [900, 4000];
+/** ART: the best snapshot shows this long after the map shows, even while decos still arrive... */
+export const ART_CAP_MS = 3000;
+/** ...and once the art is in, the colour bakes it sets off (street-render recolour, edge mirrors) get this long. */
+export const ART_SETTLE_MS = 120;
 /** The same street built again: its picture stays until these. */
 const REBUILD_SNAP_AT_MS = [250, 1500];
 /** A change in what the snapshot draws waits this long to settle... */
@@ -82,6 +95,8 @@ let snapKey = '';
 let resnapTimer = null;
 let lastSignKey = '';
 let snapCount = 0;
+/** ART: the art watch for this street ({ street, view, left, loaded, capped, ... }), or null. */
+let art = null;
 /** PHONE MAP: { btn, sheet, plateStreet } on a phone (the map's view lives only while the sheet is open). */
 let phone = null;
 
@@ -181,6 +196,8 @@ function liveKey(engine) {
 
 function snap(engine) {
   if (!view || !street || engine.street !== street) return;
+  // ART: never another street's view (the old one stays up while the new one loads).
+  if (!viewIsFor(engine.streetView, street)) return;
   if (view.state !== 'shown') {
     snapOwed = true;
     return;
@@ -213,7 +230,7 @@ function readyChanged(engine, on) {
   if (view) engine.setData?.('streetMapPicture', view.root.dataset.picture || 'lines');
 }
 
-function scheduleSnaps(engine, at = SNAP_AT_MS) {
+function scheduleSnaps(engine, at) {
   clearSnaps();
   snapTimers = at.map((ms) => {
     const t = setTimeout(() => {
@@ -222,6 +239,126 @@ function scheduleSnaps(engine, at = SNAP_AT_MS) {
     }, ms);
     return t;
   });
+}
+
+/** ART: whether `v` (engine.streetView) is the view of `forStreet`: a scene a feature builds, or a street view built from it. */
+export function viewIsFor(v, forStreet) {
+  if (!v || v.destroyed || !forStreet) return false;
+  if (isLiveScene(v) || !v.street) return true;
+  return v.street === forStreet || String(v.street.tsid || '') === String(forStreet.tsid || '');
+}
+
+/**
+ * PURE (ART): the image sources under `roots` (Pixi nodes) still loading: a texture's source that has
+ * neither loaded nor failed (js/textures.js; a canvas or render texture counts as loaded).
+ */
+export function pendingArtSources(roots = [], { loaded = isLoaded, failed = isFailed } = {}) {
+  const out = new Set();
+  const stack = roots.filter(Boolean);
+  while (stack.length) {
+    const n = stack.pop();
+    if (!n || n.destroyed) continue;
+    const src = n.texture?.source;
+    if (src && !src.destroyed && !out.has(src) && !loaded(src) && !failed(src)) out.add(src);
+    const kids = n.children;
+    if (kids?.length) for (let i = 0; i < kids.length; i++) stack.push(kids[i]);
+  }
+  return [...out];
+}
+
+/** ART: what the snapshot draws: the view, its front layers, and a live scene's kept entities. */
+function artRoots(engine, v) {
+  const roots = [v];
+  if (v.frontView && !v.frontView.destroyed && v.frontView.parent !== v) roots.push(v.frontView);
+  if (isLiveScene(v)) {
+    const ents = sceneEntities(engine);
+    for (const child of ents?.layer.children || []) if (ents.keep(child)) roots.push(child);
+  }
+  return roots;
+}
+
+function stopArt() {
+  if (!art) return;
+  clearTimeout(art.capTimer);
+  clearTimeout(art.settleTimer);
+  art = null;
+}
+
+function startArt(engine) {
+  stopArt();
+  art = { street, view: null, left: 0, gen: 0, loaded: false, capped: false, capTimer: null, settleTimer: null };
+  engine.setData?.('streetMapArt', 'waiting');
+  attachArt(engine);
+}
+
+/** ART: start watching once this street's view is up (sync tries again every tick until it is). */
+function attachArt(engine) {
+  const a = art;
+  if (!a || a.loaded) return;
+  const v = engine.streetView;
+  if (a.view && a.view === v && !v.destroyed) return;
+  if (!viewIsFor(v, a.street)) return;
+  a.view = v;
+  watchArt(engine, a);
+  // Past the cap already with nothing shown (the view came late): the best snapshot now.
+  if (art === a && a.capped && view && !view.ready) snap(engine);
+}
+
+function watchArt(engine, a) {
+  const pending = pendingArtSources(artRoots(engine, a.view));
+  a.gen += 1;
+  const gen = a.gen;
+  a.left = pending.length;
+  if (!a.left) {
+    artLanded(engine, a);
+    return;
+  }
+  engine.setData?.('streetMapArt', `loading:${a.left}`);
+  const done = () => {
+    if (art !== a || a.gen !== gen) return;
+    a.left -= 1;
+    if (a.left <= 0) artLanded(engine, a);
+  };
+  for (const src of pending) {
+    onLoaded(src, done);
+    onFailed(src, done);
+  }
+}
+
+/** ART: everything that was loading is in: wait for anything added since, else snap a frame after the bakes. */
+function artLanded(engine, a) {
+  const v = engine.streetView;
+  if (v !== a.view || !v || v.destroyed) {
+    // Built again meanwhile: watch the new one.
+    a.view = null;
+    attachArt(engine);
+    return;
+  }
+  if (pendingArtSources(artRoots(engine, v)).length) {
+    watchArt(engine, a);
+    return;
+  }
+  a.loaded = true;
+  engine.setData?.('streetMapArt', 'loaded');
+  clearTimeout(a.settleTimer);
+  a.settleTimer = setTimeout(() => {
+    const frame = globalThis.requestAnimationFrame || ((fn) => setTimeout(fn, 16));
+    frame(() => {
+      if (art === a) snap(engine);
+    });
+  }, ART_SETTLE_MS);
+}
+
+/** ART: the cap runs from when the map first shows on this street. */
+function startArtCap(engine) {
+  const a = art;
+  if (!a || a.capTimer || a.loaded) return;
+  a.capTimer = setTimeout(() => {
+    if (art !== a || a.loaded) return;
+    a.capped = true;
+    engine.setData?.('streetMapArt', `capped:${a.left}`);
+    if (view && !view.ready) snap(engine);
+  }, ART_CAP_MS);
 }
 
 /** A change in a live scene: one snap once it settles, at most once a second. */
@@ -246,7 +383,12 @@ function enterStreet(engine) {
   engine.setData?.('streetMapFog', street?.fogMap ? '1' : '0');
   engine.setData?.('streetMapPicture', street ? view.root.dataset.picture || 'lines' : '');
   engine.setData?.('streetMapReady', view.ready ? '1' : '0');
-  if (street) scheduleSnaps(engine, rebuilt ? REBUILD_SNAP_AT_MS : SNAP_AT_MS);
+  if (!street) stopArt();
+  // The same street built again, already shown: its picture stays until the rebuild snaps.
+  else if (rebuilt && view.ready) {
+    stopArt();
+    scheduleSnaps(engine, REBUILD_SNAP_AT_MS);
+  } else startArt(engine);
 }
 
 /** A live scene's own posts on the map, and a new snapshot when what it draws has changed. */
@@ -265,7 +407,9 @@ function syncLiveScene(engine) {
 function sync(engine, force = false) {
   if (!view) return;
   if (engine.street !== street) enterStreet(engine);
+  attachArt(engine);
   const state = stateFor(engine);
+  if (state === 'shown') startArtCap(engine);
   if (force || state !== lastState) {
     lastState = state;
     view.setState(state);
@@ -406,8 +550,6 @@ function phoneOpen(engine) {
   lastDots = '';
   sync(engine, true);
   view.expand(true);
-  // One snapshot, once the sheet has its size (its decos are on the street already).
-  scheduleSnaps(engine, [60]);
   // The signposts' destinations, a tap away.
   const marks = [...signpostMarks(engine.street), ...(isLiveScene(engine.streetView) ? sceneSignMarks(engine.interactables || []) : [])];
   const rows = phoneSignRows(marks, engine.player?.x);
@@ -456,6 +598,7 @@ function phoneOpen(engine) {
 function phoneClose(engine, { walked = false } = {}) {
   if (!phone) return;
   clearSnaps();
+  stopArt();
   view?.destroy();
   view = null;
   host = null;

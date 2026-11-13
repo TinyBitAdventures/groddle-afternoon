@@ -13,6 +13,7 @@ import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createStreetMinimap } from '../public/js/ui/street-minimap.js?fresh=street-minimap-ready';
+import { ART_CAP_MS, ART_SETTLE_MS, pendingArtSources, viewIsFor } from '../public/js/features/street-minimap-feature.js?fresh=street-minimap-ready';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const read = (p) => readFileSync(join(root, p), 'utf8');
@@ -151,5 +152,49 @@ describe('READY: the card waits unseen for its picture, then fades in', () => {
     assert.match(featSrc, /setData\?\.\('streetMapReady', on \? '1' : '0'\)/);
     assert.match(featSrc, /if \(canvas\) view\.setPicture\(canvas\);\s+\/\/ READY[^\n]*\n\s+else if \(!view\.ready\) view\.reveal\(\);/);
     assert.match(viewSrc, /root\.dataset\.picture = kept \? 'snapshot' : 'lines';/, 'streetMapPicture keeps lines|snapshot');
+  });
+});
+
+describe('ART: the snapshot waits for the street\'s art, with a cap', () => {
+  const src = (state = {}) => ({ destroyed: false, ...state });
+  const node = (texSource, children = []) => ({ texture: texSource ? { source: texSource } : null, children, destroyed: false });
+
+  it('finds every image still loading under the view, once each, skipping loaded, failed and destroyed ones', () => {
+    const slow = src({ id: 'slow' });
+    const done = src({ id: 'done', ok: true });
+    const bad = src({ id: 'bad', bad: true });
+    const gone = src({ id: 'gone', destroyed: true });
+    const canvas = src({ id: 'canvas', ok: true });
+    const tree = node(null, [node(slow), node(done), node(null, [node(slow), node(bad), node(gone), { ...node(src()), destroyed: true }]), node(canvas)]);
+    const got = pendingArtSources([tree, null], { loaded: (s) => Boolean(s.ok), failed: (s) => Boolean(s.bad) });
+    assert.deepEqual(got.map((s) => s.id), ['slow']);
+    assert.deepEqual(pendingArtSources([], { loaded: () => true, failed: () => false }), []);
+  });
+
+  it('only snaps the view of this street: the old street view stays up while the new one loads', () => {
+    const here = { tsid: 'LA' };
+    assert.equal(viewIsFor(null, here), false);
+    assert.equal(viewIsFor({ destroyed: true, parallaxLayers: [], street: here }, here), false);
+    assert.equal(viewIsFor({ parallaxLayers: [], street: { tsid: 'LB' } }, here), false, 'the street before');
+    assert.equal(viewIsFor({ parallaxLayers: [], street: here }, here), true);
+    assert.equal(viewIsFor({ parallaxLayers: [], street: { tsid: 'LA' } }, here), true, 'the same street');
+    assert.equal(viewIsFor({ children: [] }, here), true, 'a scene a feature builds (live) is its own');
+  });
+
+  it('the cap: about 3 s after the map shows, then a re-snap when the rest lands; the bakes get a beat first', () => {
+    assert.equal(ART_CAP_MS, 3000);
+    assert.ok(ART_SETTLE_MS >= 60 && ART_SETTLE_MS <= 250);
+    assert.doesNotMatch(featSrc, /SNAP_AT_MS = \[900, 4000\]/, 'no fixed 0.9 s snapshot');
+    assert.match(featSrc, /if \(state === 'shown'\) startArtCap\(engine\);/, 'the cap runs from when the map shows');
+    assert.match(featSrc, /a\.capped = true;[\s\S]{0,120}if \(view && !view\.ready\) snap\(engine\);/, 'the best snapshot at the cap');
+    assert.match(featSrc, /a\.loaded = true;[\s\S]{0,400}if \(art === a\) snap\(engine\);/, 'and again once the art is in');
+    assert.match(featSrc, /onLoaded\(src, done\);\s+onFailed\(src, done\);/, 'a failed image never holds the map back');
+    assert.match(featSrc, /if \(!viewIsFor\(engine\.streetView, street\)\) return;/, 'snap never draws another street');
+  });
+
+  it('the phone sheet waits for the art the same way, not a fixed 60 ms snap', () => {
+    const open = featSrc.slice(featSrc.indexOf('function phoneOpen('), featSrc.indexOf('function phoneClose('));
+    assert.doesNotMatch(open, /view\.expand\(true\);\s+\/\/ One snapshot[^\n]*\n\s+scheduleSnaps\(engine, \[60\]\);/);
+    assert.match(featSrc, /function phoneClose\([^)]*\) \{\s+if \(!phone\) return;\s+clearSnaps\(\);\s+stopArt\(\);/);
   });
 });
