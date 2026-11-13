@@ -37,7 +37,7 @@ import { normalizeListing } from '../public/js/auctions.js?v=79fd7e2a';
 import { cabinetMove, cabinetPut, cabinetTake, normalizeContents } from '../public/js/home-storage.js?v=b0225465';
 import { CUBIMAL_NAMING } from '../public/js/cubimals.js?v=4e084d08';
 import { FAVOR_GIANTS } from '../public/js/potions.js?v=4f4c996d';
-import { HOPPER_CEILING, STILL } from '../public/js/machines.js?v=7a292708';
+import { HOPPER_CEILING, STILL } from '../public/js/machines.js?v=e96d8d3b';
 import { teachPhrase } from '../public/js/seasons.js?v=1978c3f3';
 import { addItem, countItem, createInventory } from '../public/js/inventory.js?v=f49c8998';
 

@@ -15,8 +15,8 @@ import { createInventory, countItem } from '../public/js/inventory.js?v=f49c8998
 import { copyForVerb, copyTags, createToolConditionState, setCopyTag } from '../public/js/tools.js?v=48542c24';
 import { resolveSound } from '../public/js/sound-board.js?v=7ff169eb';
 import { SOUND_ALIASES, SOUND_FILES } from '../public/js/sound-keys.js?v=fb6ee553';
-import { supplyFeature } from '../public/js/features/supply-feature.js?v=2f4d9ecb';
-import { STILL, advanceStill, createStillState, stillStopsAt } from '../public/js/machines.js?v=7a292708';
+import { supplyFeature } from '../public/js/features/supply-feature.js?v=73cdbdad';
+import { STILL, advanceStill, createStillState, stillStopsAt } from '../public/js/machines.js?v=e96d8d3b';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const PUB = join(ROOT, 'public');
@@ -176,7 +176,7 @@ describe('the Still\'s sounds', () => {
       tick(engine, stop + 20);
       assert.deepEqual(engine.played, [['STILL_READY', 0.55]]);
       // Its Hooch is counted and kept on the Still.
-      assert.deepEqual(groundTags(engine)[0], { hopper: 0, hooch: 1, workingSince: 0 });
+      assert.deepEqual(groundTags(engine)[0], { hopper: 0, hooch: 1, workingSince: 0, ready: true });
       for (const later of [stop + 400, stop + 1500, stop + 60000]) tick(engine, later);
       assert.equal(engine.played.length, 1);
       supplyFeature._reset();
@@ -195,7 +195,7 @@ describe('the Still\'s sounds', () => {
       // The 50th: full.
       tick(engine, stop + STILL.workMs + 20);
       assert.deepEqual(engine.played, [['STILL_READY', 0.55]]);
-      assert.deepEqual(groundTags(engine)[0], { hopper: 72, hooch: 50, workingSince: 0 });
+      assert.deepEqual(groundTags(engine)[0], { hopper: 72, hooch: 50, workingSince: 0, ready: true });
       supplyFeature._reset();
     });
 
@@ -220,7 +220,7 @@ describe('the Still\'s sounds', () => {
       seed(closed, { hopper: 14, hooch: 0, workingSince: t0 });
       tick(closed, stop + 3600000);
       assert.deepEqual(closed.played, []);
-      assert.deepEqual(groundTags(closed)[0], { hopper: 0, hooch: 1, workingSince: 0 });
+      assert.deepEqual(groundTags(closed)[0], { hopper: 0, hooch: 1, workingSince: 0, ready: true });
       supplyFeature._reset();
       // Asleep: seen working, then nothing until well after.
       const asleep = stillEngine({});
@@ -267,7 +267,7 @@ describe('the Still\'s sounds', () => {
       tick(engine, t0 + 1000);
       tick(engine, stop + 20);
       assert.deepEqual(engine.played, [['STILL_READY', 0.55]]);
-      assert.deepEqual(groundTags(engine), [{ hopper: 0, hooch: 1, workingSince: 0 }, { hopper: 0, hooch: 8, workingSince: 0 }]);
+      assert.deepEqual(groundTags(engine), [{ hopper: 0, hooch: 1, workingSince: 0, ready: true }, { hopper: 0, hooch: 8, workingSince: 0, ready: true }]);
       supplyFeature._reset();
       const apart = stillEngine({}, ['distilling_1'], 2);
       seed(apart, { hopper: 14, hooch: 0, workingSince: t0 }, 0);

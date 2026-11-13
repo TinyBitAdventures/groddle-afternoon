@@ -517,12 +517,13 @@ export function stillDistillCheck(state, inv, learned = [], { onGround = false, 
 }
 
 /**
- * onDrop 482-486: a Still put down idle with a Hooch's worth of grain in its hopper (and room for
- * Hooch) starts working 2 s later. The source's test is `>` hoochCost, which left a hopper of
- * exactly 14 idle until the next Distill; ours starts it (a Distill would have).
+ * onDrop 482-486: a Still put down idle with more than a Hooch's worth of grain in its hopper
+ * (`getHopperAmount() > getHoochCost()`, strictly: a hopper of exactly 14 stays idle until the
+ * next Distill, 363-364) starts working 2 s later. No room for Hooch: startWorking would only
+ * finish into a full Still, so it waits for a Collect (giveHooch 458-460).
  */
 export function stillWaitsToStart(state) {
-  return Boolean(state && !state.workingSince && state.hopper >= STILL.hoochCost && state.hooch < STILL.maxHooch);
+  return Boolean(state && !state.workingSince && state.hopper > STILL.hoochCost && state.hooch < STILL.maxHooch);
 }
 
 /**

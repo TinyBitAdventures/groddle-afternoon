@@ -29,15 +29,16 @@ export function stillSheetDef(state) {
 }
 
 /**
- * Which state a Still on the ground shows: collecting wins, then working, then Hooch waiting
- * (finishWorking: 'ready'), else empty. A Still with no Hooch that stopped for want of grain is
- * 'ready' in the source too until someone collects (finishWorking always sets it); with no Hooch
- * at all it can only be one that never ran, so it is empty.
+ * Which state a Still on the ground shows, the last one the source set: collecting
+ * (verbs.collect 161), working (startWorking 521), `ready` when a run of its finished since it was
+ * put down (finishWorking 409), else empty: onPickup set it (489), and neither onDrop (482-486) nor
+ * a load (onContainerChanged 468-472, creation only) sets another, so a Still dropped with Hooch
+ * in it shows empty until its next change.
  */
 export function stillArtState(state, { collecting = false, now = Date.now() } = {}) {
   if (collecting) return 'collect';
   if (state?.workingSince && state.workingSince <= now) return 'active';
-  if (state?.hooch > 0) return 'ready';
+  if (state?.ready) return 'ready';
   return 'empty';
 }
 

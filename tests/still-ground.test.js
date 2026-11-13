@@ -13,12 +13,12 @@ import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { createInventory, countItem } from '../public/js/inventory.js?v=f49c8998';
 import { copyForVerb, copyTags, createToolConditionState, keepsOwnStack, setCopyTag } from '../public/js/tools.js?v=48542c24';
-import { STILL, STILL_TEXT, createStillState, distillInStill, stillCollectCheck, stillDistillCheck } from '../public/js/machines.js?v=7a292708';
-import { supplyFeature } from '../public/js/features/supply-feature.js?v=2f4d9ecb';
+import { STILL, STILL_TEXT, createStillState, distillInStill, stillCollectCheck, stillDistillCheck } from '../public/js/machines.js?v=e96d8d3b';
+import { supplyFeature } from '../public/js/features/supply-feature.js?v=73cdbdad';
 import { createDroppedItemState, dropInventoryStack, pickupDroppedStack } from '../public/js/world-items.js?v=5e592293';
 import { shareReason } from '../public/js/drops-mp.js?v=3207d36c';
 import { dropFor } from '../public/js/world-drop.js?v=d152b2bb';
-import { STILL_ART, STILL_ART_CELL, stillArtFrame, stillArtState, stillSheetDef } from '../public/js/still-art.js?v=827e44e6';
+import { STILL_ART, STILL_ART_CELL, stillArtFrame, stillArtState, stillSheetDef } from '../public/js/still-art.js?v=2eeb65ff';
 
 const root = join(import.meta.dirname, '..');
 const STILL_JS = join(root, '..', 'glitch-GameServerJS', 'items', 'still.js');
@@ -150,7 +150,8 @@ describe('on the ground', () => {
   it('runs while you are away: the Hooch made since is there when you come back', () => {
     const engine = world({}, { tag: { hopper: 100, hooch: 0, workingSince: Date.now() - 10 * STILL.workMs - 1000 } });
     supplyFeature.onTick(16, Date.now(), engine);
-    assert.deepEqual(tagOf(engine), { hopper: 100 - 7 * STILL.hoochCost, hooch: 7, workingSince: 0 });
+    // finishWorking set 'ready' (409) while you were away.
+    assert.deepEqual(tagOf(engine), { hopper: 100 - 7 * STILL.hoochCost, hooch: 7, workingSince: 0, ready: true });
     assert.equal(engine.played.length, 0, 'a stop long ago passes in silence');
   });
 
@@ -160,10 +161,35 @@ describe('on the ground', () => {
     supplyFeature.onTick(16, t0, engine);
     assert.equal(tagOf(engine).workingSince, 0);
     supplyFeature.onStreetEnter({}, engine);
-    assert.match(engine.data.supplyStill, /working=0,ground=1,art=ready/);
+    // Picked up it was 'empty' (onPickup 489); nothing on drop sets another state, Hooch or not.
+    assert.match(engine.data.supplyStill, /working=0,ground=1,art=empty/);
     supplyFeature.onTick(16, t0 + 2100, engine);
     assert.equal(tagOf(engine).workingSince, t0 + 2000);
     assert.ok(engine.changed > 0, 'saved with the dropped stacks');
+  });
+
+  it('a hopper of exactly 14 stays idle after a drop (onDrop 483: more than hoochCost) until the next Distill', () => {
+    const t0 = Date.now();
+    const engine = world({ grain: 1 }, { tag: { hopper: 14, hooch: 0, workingSince: 0 } });
+    supplyFeature.onTick(16, t0, engine);
+    supplyFeature.onTick(16, t0 + 5000, engine);
+    assert.equal(tagOf(engine).workingSince, 0);
+    supplyFeature.runVerbOverride(target(engine), 'distill:grain:1', engine);
+    assert.ok(tagOf(engine).workingSince > 0, 'Distill starts it (363-364)');
+  });
+
+  it('shows empty when dropped, ready once a run of its finishes, then empty again after a Collect', () => {
+    const t0 = Date.now();
+    const engine = world({}, { tag: { hopper: 0, hooch: 2, workingSince: 0 } });
+    supplyFeature.onStreetEnter({}, engine);
+    assert.match(engine.data.supplyStill, /art=empty/);
+    engine.droppedItems.streets[T][0].tags = [{ hopper: 14, hooch: 2, workingSince: t0 - STILL.workMs - 10 }];
+    supplyFeature.onTick(16, t0, engine);
+    assert.equal(tagOf(engine).ready, true);
+    assert.match(engine.data.supplyStill, /art=ready/);
+    supplyFeature.runVerbOverride(target(engine), 'collect', engine);
+    supplyFeature.onTick(16, t0 + 4100, engine);
+    assert.equal(tagOf(engine), null, 'giveHooch: empty, nothing left to keep');
   });
 
   it('no Still is left in someone else\'s house, nor taken from it, nor collected from (canDrop, canPickup, 139-144)', () => {
@@ -250,7 +276,8 @@ describe('the art (js/still-art.js)', () => {
     const now = 1_000_000;
     assert.equal(stillArtState({ hopper: 0, hooch: 0, workingSince: 0 }, { now }), 'empty');
     assert.equal(stillArtState({ hopper: 30, hooch: 0, workingSince: now - 5 }, { now }), 'active');
-    assert.equal(stillArtState({ hopper: 0, hooch: 2, workingSince: 0 }, { now }), 'ready');
+    assert.equal(stillArtState({ hopper: 0, hooch: 2, workingSince: 0 }, { now }), 'empty', 'dropped with Hooch: empty (onPickup 489)');
+    assert.equal(stillArtState({ hopper: 0, hooch: 2, workingSince: 0, ready: true }, { now }), 'ready');
     assert.equal(stillArtState({ hopper: 0, hooch: 2, workingSince: 0 }, { now, collecting: true }), 'collect');
     // 30 fps: the collect clip is the collect timer's 4 s, held on its last frame.
     assert.equal(STILL_ART.collect.frames, 119);

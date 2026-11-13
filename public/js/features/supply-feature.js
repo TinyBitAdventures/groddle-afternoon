@@ -85,8 +85,8 @@ import {
   stillOnPickup,
   stillStopsAt,
   stillWaitsToStart,
-} from '../machines.js?v=7a292708';
-import { STILL_ART_BOX, STILL_ART_CELL, stillArtFrame, stillArtState, stillSheetDef } from '../still-art.js?v=827e44e6';
+} from '../machines.js?v=e96d8d3b';
+import { STILL_ART_BOX, STILL_ART_CELL, stillArtFrame, stillArtState, stillSheetDef } from '../still-art.js?v=2eeb65ff';
 import { createSheetLoader } from '../sprite-sheets.js?v=32c58aef';
 import { HERB_SEEDS, ITEM_TRANSFORMS, listTransformVerbs, runTransform, transformVerbCount } from '../item-transforms.js?v=07b416a3';
 import {
@@ -183,13 +183,31 @@ function groundRecord(engine, id, tsid = engine?.dropTsid) {
   return groundRows(engine, tsid).find((r) => r.id === id) || null;
 }
 
+/**
+ * `ready`: finishWorking set the Still's state to 'ready' since it was put down (still.js 409),
+ * kept until the next state change; a Still picked up is 'empty' (onPickup 489) and nothing sets
+ * another state on drop (onDrop 482-486) or on load (onContainerChanged 468-472 only on creation),
+ * so a dropped Still shows empty until it starts working or a run of its finishes.
+ */
 function groundState(record) {
-  return createStillState((Array.isArray(record?.tags) && record.tags[0]) || {});
+  const tag = (Array.isArray(record?.tags) && record.tags[0]) || {};
+  return { ...createStillState(tag), ready: tag.ready === true };
+}
+
+/** finishWorking for a run that ended (or ended while nobody looked): its Hooch, and the 'ready' state. */
+function settleGround(state, now = Date.now()) {
+  const stopsAt = stillStopsAt(state);
+  if (!stopsAt || now < stopsAt) return false;
+  advanceStill(state, now);
+  state.ready = true;
+  return true;
 }
 
 function writeGround(record, state) {
   const tags = Array.isArray(record.tags) ? record.tags.slice() : [];
-  tags[0] = !state.hopper && !state.hooch && !state.workingSince ? null : { hopper: state.hopper, hooch: state.hooch, workingSince: state.workingSince };
+  // A working Still is 'active' (startWorking 521); 'ready' lasts until then.
+  const ready = Boolean(state.ready && !state.workingSince);
+  tags[0] = !state.hopper && !state.hooch && !state.workingSince && !ready ? null : { hopper: state.hopper, hooch: state.hooch, workingSince: state.workingSince, ...(ready ? { ready: true } : {}) };
   if (tags.some((t) => t != null)) record.tags = tags;
   else delete record.tags;
 }
@@ -254,7 +272,7 @@ function watchGround(engine, now) {
     const due = stopsAt || groundStops.get(key) || 0;
     groundStops.delete(key);
     if (stopsAt) {
-      advanceStill(state, now);
+      settleGround(state, now);
       writeGround(rec, state);
       changed = true;
     }
@@ -306,6 +324,8 @@ function settleCollect(engine, now = Date.now()) {
   if (!rec) return publish(engine);
   const state = groundState(rec);
   const res = collectHooch(state, engine.inv, learned(engine), now);
+  // giveHooch 458-464: on working (startWorking, 'active') or 'empty'.
+  state.ready = false;
   writeGround(rec, state);
   // still.js:454-455 giveHooch: only Hooch collected in your own home (POL) counts.
   if (res.ok && done.inHome) engine.achievement?.('still:collected_in_pol', res.got);
@@ -325,6 +345,7 @@ function distillGround(engine, target, cls, n) {
   const state = groundState(rec);
   const check = stillDistillCheck(state, engine.inv, learned(engine), { onGround: true });
   if (!check.ok) return say(engine, check.msg, false);
+  settleGround(state);
   const res = distillInStill(state, engine.inv, cls, learned(engine), Date.now(), upgrades(engine), n);
   if (res.ok) {
     writeGround(rec, state);
@@ -511,7 +532,7 @@ function publish(engine) {
   const rec = groundRows(engine)[0];
   if (rec) {
     const ground = groundState(rec);
-    advanceStill(ground);
+    settleGround(ground);
     const busy = collecting?.key === groundKey(engine.dropTsid, rec.id);
     engine.setData('supplyStill', `hopper=${ground.hopper},hooch=${ground.hooch},working=${ground.workingSince && ground.workingSince <= Date.now() ? 1 : 0},ground=1,art=${stillArtState(ground, { collecting: busy })}`);
   } else {
