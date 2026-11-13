@@ -1,6 +1,6 @@
 {
   "note": "Written by tools/gaps/build-data.mjs from tools/gaps/public-gaps.json and the coverage register. Edit those, never this file.",
-  "release": "v0.36.0",
+  "release": "v0.36.1",
   "states": {
     "fixing": {
       "label": "Being fixed",
@@ -42,7 +42,7 @@
     "fixing": 1,
     "known": 22,
     "unreleased": 0,
-    "fixed": 49,
+    "fixed": 60,
     "lost": 5,
     "purpose": 15,
     "idea": 11
@@ -78,6 +78,13 @@
           "text": "Stepping into a quest room from the Ancestral Lands pauses the visit timer, as Glitch did.",
           "state": "fixed",
           "version": "v0.30.0"
+        },
+        {
+          "id": "F51",
+          "text": "In the Juju Hideout the campfire and a chair floated above the ground.",
+          "report": 276,
+          "state": "fixed",
+          "version": "v0.36.1"
         }
       ]
     },
@@ -443,6 +450,20 @@
           "text": "Meditation can say you gained energy right after saying you are too pooped, and a short first session can stick the Meditation Station.",
           "state": "fixed",
           "version": "v0.36.0"
+        },
+        {
+          "id": "F49",
+          "text": "A Still worked only from the pack and did nothing once dropped, where Glitch had it work on the ground with its own animations.",
+          "report": 285,
+          "state": "fixed",
+          "version": "v0.36.1"
+        },
+        {
+          "id": "F50",
+          "text": "A juice picked in a machine's Make window could go uncounted for quests, and a machine gave no reason when it could not start.",
+          "report": 247,
+          "state": "fixed",
+          "version": "v0.36.1"
         }
       ]
     },
@@ -498,6 +519,13 @@
           "text": "A few messages point to the wrong place: retrying Gwendolyn's Task or Rainbow Run, joining a Party Space later, skipping the tutorial online, and teleporting from the Map before you have the rank for it.",
           "state": "fixed",
           "version": "v0.36.0"
+        },
+        {
+          "id": "F54",
+          "text": "Players could not see their own reports' numbers.",
+          "report": 261,
+          "state": "fixed",
+          "version": "v0.36.1"
         }
       ]
     },
@@ -558,6 +586,46 @@
           "text": "On a phone you can pinch the street to zoom, scroll the pack row and tap signpost arms.",
           "state": "fixed",
           "version": "v0.36.0"
+        },
+        {
+          "id": "F44",
+          "text": "On an iPhone the game could close itself on the way into some streets, such as Froughtful Fen.",
+          "report": 284,
+          "state": "fixed",
+          "version": "v0.36.1"
+        },
+        {
+          "id": "F45",
+          "text": "Pinching to zoom on a phone flickered black, and the closest zoom was blurry.",
+          "state": "fixed",
+          "version": "v0.36.1"
+        },
+        {
+          "id": "F46",
+          "text": "On a phone, Cultivate, Decoration Mode and some windows such as Groups, Account and Auctions did not fit the screen, so some choices and close buttons were out of reach.",
+          "report": 275,
+          "state": "fixed",
+          "version": "v0.36.1"
+        },
+        {
+          "id": "F47",
+          "text": "On a phone the upgrade cards, the Imagination screen, Make, the Map, Mail, the pack row, the loading card and the report window were cramped or partly off the screen, and the top bar did not show currants or favor.",
+          "state": "fixed",
+          "version": "v0.36.1"
+        },
+        {
+          "id": "F48",
+          "text": "The phone page's Mail count included letters already read and archived.",
+          "report": 282,
+          "state": "fixed",
+          "version": "v0.36.1"
+        },
+        {
+          "id": "F53",
+          "text": "Camera Mode could not be opened on a phone, which has no keyboard.",
+          "report": 271,
+          "state": "fixed",
+          "version": "v0.36.1"
         }
       ]
     },
@@ -590,6 +658,12 @@
           "text": "After a failed restore of a backup, the solo game could stop saving until you reloaded.",
           "state": "fixed",
           "version": "v0.36.0"
+        },
+        {
+          "id": "F52",
+          "text": "The community boards' sign-in had no Continue with Google, though the game's has one.",
+          "state": "fixed",
+          "version": "v0.36.1"
         },
         {
           "id": "G665",

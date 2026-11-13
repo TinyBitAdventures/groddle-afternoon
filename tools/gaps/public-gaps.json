@@ -531,6 +531,132 @@
       ]
     },
     {
+      "id": "F44",
+      "area": "Phones",
+      "show": "fixing",
+      "text": "On an iPhone the game could close itself on the way into some streets, such as Froughtful Fen.",
+      "report": 284,
+      "commits": [
+        "game:320c85a4f6",
+        "game:778ede8cc0"
+      ]
+    },
+    {
+      "id": "F45",
+      "area": "Phones",
+      "show": "fixing",
+      "text": "Pinching to zoom on a phone flickered black, and the closest zoom was blurry.",
+      "commits": [
+        "game:e282f5c883",
+        "game:be4eb0dc8b",
+        "game:ccd6fff09b"
+      ]
+    },
+    {
+      "id": "F46",
+      "area": "Phones",
+      "show": "fixing",
+      "text": "On a phone, Cultivate, Decoration Mode and some windows such as Groups, Account and Auctions did not fit the screen, so some choices and close buttons were out of reach.",
+      "report": 275,
+      "commits": [
+        "game:2668d34fe9",
+        "game:f22ba9862f",
+        "game:fc886ef981",
+        "game:7c1a4ff1de",
+        "game:9b0dc8707a"
+      ]
+    },
+    {
+      "id": "F47",
+      "area": "Phones",
+      "show": "fixing",
+      "text": "On a phone the upgrade cards, the Imagination screen, Make, the Map, Mail, the pack row, the loading card and the report window were cramped or partly off the screen, and the top bar did not show currants or favor.",
+      "commits": [
+        "game:643176eb0a",
+        "game:b64fb48704",
+        "game:cca1a5b85c",
+        "game:af77eaab26",
+        "game:26a7239ae1",
+        "game:6ed9cc5f9f",
+        "game:36008b91d7",
+        "game:09b9e82d57",
+        "game:65060ee77a",
+        "game:09caced03b"
+      ]
+    },
+    {
+      "id": "F48",
+      "area": "Phones",
+      "show": "fixing",
+      "text": "The phone page's Mail count included letters already read and archived.",
+      "report": 282,
+      "commits": [
+        "game:c4fd1ac094"
+      ]
+    },
+    {
+      "id": "F49",
+      "area": "Food, buffs and making",
+      "show": "fixing",
+      "text": "A Still worked only from the pack and did nothing once dropped, where Glitch had it work on the ground with its own animations.",
+      "report": 285,
+      "commits": [
+        "game:f5190f752d",
+        "game:acf54826d2",
+        "game:f3a38385c6"
+      ]
+    },
+    {
+      "id": "F50",
+      "area": "Food, buffs and making",
+      "show": "fixing",
+      "text": "A juice picked in a machine's Make window could go uncounted for quests, and a machine gave no reason when it could not start.",
+      "report": 247,
+      "commits": [
+        "game:5ad7c3054c",
+        "game:299586af2d"
+      ]
+    },
+    {
+      "id": "F51",
+      "area": "Quest rooms",
+      "show": "fixing",
+      "text": "In the Juju Hideout the campfire and a chair floated above the ground.",
+      "report": 276,
+      "commits": [
+        "game:5ad9f0d83c"
+      ]
+    },
+    {
+      "id": "F52",
+      "area": "Accounts and saving",
+      "show": "fixing",
+      "text": "The community boards' sign-in had no Continue with Google, though the game's has one.",
+      "commits": [
+        "site:805d331"
+      ]
+    },
+    {
+      "id": "F53",
+      "area": "Phones",
+      "show": "fixing",
+      "text": "Camera Mode could not be opened on a phone, which has no keyboard.",
+      "report": 271,
+      "commits": [
+        "game:a30753819b"
+      ]
+    },
+    {
+      "id": "F54",
+      "area": "Messages",
+      "show": "fixing",
+      "text": "Players could not see their own reports' numbers.",
+      "report": 261,
+      "commits": [
+        "game:787deed5d3"
+      ]
+    },
+    {
       "id": "G665",
       "area": "Accounts and saving",
       "text": "A bug report says Read by the team once an administrator has opened it."
