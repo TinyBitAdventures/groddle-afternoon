@@ -312,7 +312,10 @@ export function rookMuseumPaintingAlphas(elapsedMs = 0) {
  */
 export const ROOK_MUSEUM_HALL = Object.freeze({
   spawn: Object.freeze(rookMuseumWorldPoint(ROOK_MUSEUM_SOURCE.entry.x)),
-  greeterStart: Object.freeze(rookMuseumWorldPoint(ROOK_MUSEUM_SOURCE.greeterStart.x, ROOK_MUSEUM_SOURCE.greeterStart.y)),
+  // #297: on the floor. npc_quest_widget walks (onCreate 201-210: npc_can_walk, y_offset 60), so the
+  // source's drop point (60 px over the floor by the door, -196 against the entry's -136) lands on it;
+  // drawn at that height it hung at head height, behind the conversation card.
+  greeterStart: Object.freeze(rookMuseumWorldPoint(ROOK_MUSEUM_SOURCE.greeterStart.x)),
   greeterEnd: Object.freeze(rookMuseumWorldPoint(ROOK_MUSEUM_SOURCE.greeterEnd.x, ROOK_MUSEUM_SOURCE.greeterEnd.y)),
   // npc_quest_widget variant widgetWood (rook_hall.js onEnterLocation): the Mezzanine Greeterbot's art.
   greeterArt: 'assets/sprites/quests/rook-museum/greeterbot_widgetWood_idle@2x.webp',
@@ -375,6 +378,13 @@ export function visitRookMuseumExhibit(state, exhibitId) {
     complete: state.status === 'ready',
   };
 }
+
+/**
+ * rook_hall.js onNpcCollision 311-323: walking into the Greeterbot starts its greeting (it never
+ * starts on its own). Its box is item_width 50 (npc_quest_widget onCreate), the avatar's about as wide.
+ */
+export const ROOK_GREETER_TOUCH = 50;
+export const rookGreeterTouched = (playerX, greeterX) => Math.abs(Number(playerX) - Number(greeterX)) <= ROOK_GREETER_TOUCH;
 
 export function rookMuseumObjective(state) {
   if (!state) return 'Enter the Museum of the Rook';

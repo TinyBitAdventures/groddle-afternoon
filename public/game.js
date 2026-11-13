@@ -253,10 +253,11 @@ import {
   createRookMuseumState,
   getRookMuseumExhibit,
   rookMuseumObjective,
+  rookGreeterTouched,
   rookMuseumOverlayPoint,
   rookMuseumPaintingAlphas,
   visitRookMuseumExhibit,
-} from './js/rook-museum.js?v=825ff833';
+} from './js/rook-museum.js?v=cc091e1c';
 import {
   DE_EMBIGGENIFY_PART2_QUEST_ID,
   DE_EMBIGGENIFY_QUEST_ID,
@@ -2612,6 +2613,7 @@ let rookMuseumState = null;
 let rookMuseumSourceLocation = null;
 let rookMuseumTargets = [];
 let rookMuseumGreeter = null;
+let rookMuseumGreeterInside = false;
 let rookMuseumStartPromise = null;
 let rookMuseumTransitionBusy = false;
 let rookMuseumActiveExhibit = null;
@@ -21104,7 +21106,9 @@ async function startRookMuseum(opts = {}) {
     rookMuseumTransitionBusy = false;
     pushActivity('You entered the Museum of the Rook.');
     updateHud();
-    setTimeout(beginRookMuseumOrientation, opts.autoGreeting === false ? 850 : 180);
+    // #297: the greeting waits for you to walk into the Greeterbot (updateRookMuseum), so it is seen
+    // first (&rookmuseumautoplay=1 still talks to it at once).
+    rookMuseumGreeterInside = false;
     return rookMuseumState;
   })();
   try {
@@ -21170,6 +21174,11 @@ function updateRookMuseum() {
       handleRookMuseumTarget(rookMuseumGreeter, 'talk_to');
     }
   }
+  // #297 rook_hall.js onNpcCollision 311-323: walking into the Greeterbot starts the greeting.
+  const greeter = rookMuseumGreeter?.sprite;
+  const touching = Boolean(greeter && !greeter.destroyed && rookGreeterTouched(player.x, greeter.x));
+  if (touching && !rookMuseumGreeterInside && rookMuseumState.status === 'arrival' && !isQuestDialogueOpen()) beginRookMuseumOrientation();
+  rookMuseumGreeterInside = touching;
   renderRookMuseumHud();
 }
 
@@ -31729,7 +31738,6 @@ async function main() {
   }
   if (rookMuseumDemo) {
     await startRookMuseum({
-      autoGreeting: true,
       useTransition: bootParams.get('rookmuseumfx') !== '0',
     });
   }

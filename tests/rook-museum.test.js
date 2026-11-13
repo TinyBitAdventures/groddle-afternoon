@@ -25,12 +25,13 @@ import {
   completeRookMuseum,
   createRookMuseumState,
   getRookMuseumExhibit,
+  rookGreeterTouched,
   rookMuseumObjective,
   rookMuseumOverlayPoint,
   rookMuseumPaintingAlphas,
   rookMuseumWorldPoint,
   visitRookMuseumExhibit,
-} from '../public/js/rook-museum.js?v=825ff833';
+} from '../public/js/rook-museum.js?v=cc091e1c';
 
 import { applyRewards, paidRewardBits } from '../public/js/quests.js?v=40c71a37';
 
@@ -263,4 +264,17 @@ test('quest reward lines say what was paid, buffs included (rook_hall.js 55-57, 
   assert.doesNotMatch(game, /\+400 iMG|\+200 iMG, \+200 currants|\+100 favor with Pot/);
   assert.match(game, /paidRewardBits\(completed\.paid, giantDisplayName\)/);
   assert.match(game, /paidRewardBits\(result\.paid, giantDisplayName\)/);
+});
+
+test('#297: the Greeterbot stands on the floor beside the door and greets you when you walk into it (rook_hall.js onNpcCollision)', () => {
+  // npc_quest_widget walks (onCreate npc_can_walk), so it stands where the avatar does, not at head height.
+  assert.equal(ROOK_MUSEUM_HALL.greeterStart.y, ROOK_MUSEUM_HALL.spawn.y);
+  assert.equal(ROOK_MUSEUM_HALL.greeterStart.x - ROOK_MUSEUM_HALL.spawn.x, ROOK_MUSEUM_SOURCE.greeterStart.x - ROOK_MUSEUM_SOURCE.entry.x);
+  // Arriving does not touch it; walking right into it does.
+  assert.equal(rookGreeterTouched(ROOK_MUSEUM_HALL.spawn.x, ROOK_MUSEUM_HALL.greeterStart.x), false);
+  assert.equal(rookGreeterTouched(ROOK_MUSEUM_HALL.greeterStart.x - 40, ROOK_MUSEUM_HALL.greeterStart.x), true);
+  const game = fs.readFileSync(path.join(root, 'public/game.js'), 'utf8');
+  assert.doesNotMatch(game, /setTimeout\(beginRookMuseumOrientation/, 'never on arrival');
+  const update = game.slice(game.indexOf('function updateRookMuseum('), game.indexOf('const EESTI_ASSET_ROOT'));
+  assert.match(update, /if \(touching && !rookMuseumGreeterInside && rookMuseumState\.status === 'arrival' && !isQuestDialogueOpen\(\)\) beginRookMuseumOrientation\(\);/);
 });
