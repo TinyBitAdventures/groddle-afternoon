@@ -356,6 +356,11 @@ const PANEL_CSS = `
 .img-back h3{margin:0 0 var(--sp-4);font-size:var(--fs-base);line-height:var(--lh-tight);color:var(--text);text-shadow:0 1px 0 var(--c-white)}
 .img-back p{margin:0;font-size:var(--fs-sm);line-height:var(--lh-normal);color:var(--c-mauve-40);text-shadow:0 1px 0 color-mix(in srgb, var(--c-white) 70%, transparent)}
 .img-back .img-note{margin-top:var(--sp-3);font-size:var(--fs-xs);color:var(--c-violet-48c);font-style:italic}
+/* Global chat 2026-11-13: a long description ran the card's Get Upgrade off its foot. The words scroll
+   between the title and the button, which always show; the card keeps its size (it flips as one). */
+.img-back h3,.img-back .img-buy,.img-back .img-back-cost{flex:none}
+.img-back .img-back-words{flex:1 1 auto;min-height:0;margin:0 calc(-1 * var(--sp-2)) var(--sp-3) 0;padding-right:var(--sp-2);overflow-y:auto;overscroll-behavior:contain;
+  scrollbar-width:thin;scrollbar-color:color-mix(in srgb, var(--c-mauve-40) 45%, transparent) transparent}
 .img-back .img-buy{margin-top:auto;font:inherit;font-weight:800;font-size:var(--fs-base);border:0;border-radius:var(--radius-sm);padding:9px var(--sp-5);cursor:pointer;
   background:linear-gradient(var(--c-green-78),var(--c-green-63));color:var(--text-inverse);text-shadow:0 1px 0 color-mix(in srgb, var(--c-black) 25%, transparent);box-shadow:0 3px 0 var(--c-green-52)}
 .img-back .img-buy:disabled{background:var(--c-grey-84);color:var(--c-slate-58b);box-shadow:0 3px 0 var(--c-slate-74b);cursor:not-allowed;text-shadow:none}
@@ -450,9 +455,12 @@ function buildCard(card, slot, ctx, { dealing = false } = {}) {
   const suitBack = `suit_${text.config.suit}_back`;
   if (text.config.suit && CARD_ART_LAYERS.includes(suitBack)) back.append(layer(suitBack));
   const bt = el('div', { class: 'img-back-text' });
-  bt.append(el('h3', {}, text.name), el('p', {}, text.desc));
+  // The words scroll on their own, so a long description never pushes Get Upgrade off the card.
+  const words = el('div', { class: 'img-back-words' });
+  words.append(el('p', {}, text.desc));
   const status = remakeStatus(card.class_tsid);
-  if (status.status === 'partial') bt.append(el('p', { class: 'img-note' }, status.note));
+  if (status.status === 'partial') words.append(el('p', { class: 'img-note' }, status.note));
+  bt.append(el('h3', {}, text.name), words);
   const buy = el('button', { type: 'button', class: 'img-buy', dataset: { buy: String(slot) }, disabled: !affordable }, affordable ? 'Get Upgrade' : 'Need more iMG');
   bt.append(buy, el('div', { class: 'img-back-cost' }, formatCost(card.cost)));
   back.append(bt);
