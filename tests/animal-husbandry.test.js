@@ -48,11 +48,11 @@ import {
   stepHogtie,
   stickPlaceState,
   takePlop,
-} from '../public/js/animal-husbandry.js?v=d66c545b';
-import { animalStatusLabel, piggyFeedTip, pickerMaxCount, pickerOptionsFor, pickerTakesCount, listAnimalFeedOptions, createAnimalState } from '../public/js/animals.js?v=9988e497';
-import { getVerbsFor, runVerb } from '../public/content.js?v=954bbaee';
+} from '../public/js/animal-husbandry.js?v=dfa74414';
+import { animalStatusLabel, piggyFeedTip, pickerMaxCount, pickerOptionsFor, pickerTakesCount, listAnimalFeedOptions, createAnimalState } from '../public/js/animals.js?v=47474803';
+import { getVerbsFor, runVerb } from '../public/content.js?v=6fdbf4c5';
 import { setStreetEcologyCatalog } from '../public/js/street-ecology.js?v=32b1be0a';
-import { batterflyPlacementGroups, normalizeHusbandrySlot } from '../public/js/features/animal-husbandry-feature.js?v=3addebea';
+import { batterflyPlacementGroups, normalizeHusbandrySlot } from '../public/js/features/animal-husbandry-feature.js?v=4fd4f76f';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const publicDir = join(here, '../public');
@@ -385,6 +385,21 @@ describe('Herdkeeping (npc_piggy capture, hogtied_piggy.js)', () => {
     assert.equal(stickPlaceState('magic_pig_stick', { learned: [HERDKEEPING.skill], ownYard: true }).enabled, true);
     assert.equal(stickPlaceState('magic_pig_stick', { learned: [HERDKEEPING.skill], ownYard: true, placed: [{ classTsid: 'magic_pig_stick' }] }).enabled, false);
     assert.equal(STICK_DISTANCE, 250);
+  });
+
+  it('#299 (G697): the refusals name the home street, never a back yard', () => {
+    // The house's yard is called the back yard (home-cultivation.js), and it refuses these.
+    const reasons = [
+      stickPlaceState('magic_pig_stick', { learned: [HERDKEEPING.skill], ownYard: false }).reason,
+      ...Object.values(REMOTE_MACHINES).map((d) => d.inoperable),
+    ];
+    for (const r of reasons) {
+      assert.match(r, /home street/, r);
+      assert.doesNotMatch(r, /back yard|inoperable|location you own/i, r);
+    }
+    const feature = readFileSync(join(publicDir, 'js/features/animal-husbandry-feature.js'), 'utf8');
+    assert.match(feature, /reason: REMOTE_MACHINES\[classTsid\]\.inoperable/, 'the greyed Place verb shows the same words');
+    assert.match(feature, /engine\.toast\(def\.inoperable/, 'the refusal toast shows the same words');
   });
 });
 

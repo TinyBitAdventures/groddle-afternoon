@@ -2792,9 +2792,14 @@
   "deployed": "2026-11-13"
  },
  "git": {
-  "commits": 2049,
+  "commits": 2050,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-13",
+    "kind": "fix",
+    "text": "Ora Soon's Sparkly Rock and 50 other measured rocks, Peat Bogs and Paper Trees sit on their floors instead of hanging over them"
+   },
    {
     "date": "2026-11-13",
     "kind": "improve",
@@ -2909,11 +2914,6 @@
     "date": "2026-11-13",
     "kind": "improve",
     "text": "Made for Groddle on /restoration/ shows the subway map paper, EZ Cookin's new props and three more region maps beside what they came from"
-   },
-   {
-    "date": "2026-11-13",
-    "kind": "improve",
-    "text": "EZ Cookin' has its glass serving counters, white hanging lamps and round mosaic table back, made for Groddle"
    }
   ]
  },

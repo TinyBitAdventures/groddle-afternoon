@@ -28,8 +28,8 @@
  *   hogtied_piggy.js (escape timer, release), catalog_buffs.js hog_tie (1 XP
  *   every 30 s) and piggy_capture_cooldown (600 s).
  * - items/magic_*_stick.js (place in a location you own, distance 250).
- * - items/meat_collector.js, butterfly_milker.js, piggy_feeder.js (back yard
- *   only, 24/22/20-minute collection, 20-minute feeding, capacities 60/80/80).
+ * - items/meat_collector.js, butterfly_milker.js, piggy_feeder.js (home street
+ *   only here, 24/22/20-minute collection, 20-minute feeding, capacities 60/80/80).
  * - items/catalog_drop_tables.js ak_chicken_squeeze, ..._seasoned_eggs, bacon
  *   (rolled with the shared js/drop-tables.js runDropTable).
  */
@@ -935,10 +935,18 @@ export const STICK_RADIUS_CHOICES = Object.freeze([
   { label: 'Very Tight', value: 50 },
 ]);
 
+/**
+ * #299 (G697): Glitch said "in a location you own" (magic_*_stick.js) and "in a back yard"
+ * (meat_collector.js 87), and let them work in either home location (inc_pols.js 726-734
+ * pols_is_pol). Here only the home street's herd ticks, so the house and its back yard
+ * refuse them; the words name the place that works.
+ */
+export const STICK_PLACE_ONLY = 'You can only place this on your home street, where your animals live.';
+
 export function stickPlaceState(classTsid, { learned = [], ownYard = false, placed = [] } = {}) {
   const def = MAGIC_STICKS[classTsid];
   if (!def) return { enabled: false, reason: '' };
-  if (!ownYard) return { enabled: false, reason: 'You can only place this in a location you own.' };
+  if (!ownYard) return { enabled: false, reason: STICK_PLACE_ONLY };
   if (!(learned || []).includes(HERDKEEPING.skill)) return { enabled: false, reason: 'You need to know Herdkeeping to use this.' };
   if ((placed || []).some((p) => p.classTsid === classTsid)) return { enabled: false, reason: `You already have a ${def.label} here.` };
   return { enabled: true, reason: '' };
@@ -947,6 +955,7 @@ export function stickPlaceState(classTsid, { learned = [], ownYard = false, plac
 // ---------------------------------------------------------------------------
 // Remote Herdkeeping: Meat Collector, Butterfly Milker, Piggy Feeder
 // ---------------------------------------------------------------------------
+// `inoperable`: #299 (G697), see STICK_PLACE_ONLY; the source's own words said "back yard".
 
 export const REMOTE_SKILL = 'remoteherdkeeping_1';
 
@@ -962,7 +971,7 @@ export const REMOTE_MACHINES = Object.freeze({
     fullPrompt: 'Your Meat Collector is full! Come back to your house to collect from it.',
     collectTooltip: 'Retrieve any meat inside',
     placeTooltip: 'Place this Meat Collector here',
-    inoperable: 'This Meat Collector is inoperable. You can use only a Meat Collector in a back yard.',
+    inoperable: "This Meat Collector won't work here. It only works on your home street, where your piggies live.",
   }),
   butterfly_milker: Object.freeze({
     label: 'Butterfly Milker',
@@ -975,7 +984,7 @@ export const REMOTE_MACHINES = Object.freeze({
     fullPrompt: 'Your Butterfly Milker is full! Come back to your house to collect from it.',
     collectTooltip: 'Retrieve any milk inside',
     placeTooltip: 'Place this Butterfly Milker here',
-    inoperable: 'This Butterfly Milker is inoperable. You can use only a Butterfly Milker in a back yard.',
+    inoperable: "This Butterfly Milker won't work here. It only works on your home street, where your butterflies live.",
   }),
   piggy_feeder: Object.freeze({
     label: 'Piggy Feeder',
@@ -985,7 +994,7 @@ export const REMOTE_MACHINES = Object.freeze({
     intervalMin: 20,
     depositTooltip: 'Stock with food for the piggies',
     placeTooltip: 'Place this Piggy Feeder here',
-    inoperable: 'A Piggy Feeder only feeds piggies in your back yard.',
+    inoperable: "This Piggy Feeder won't work here. It only feeds the piggies on your home street, where they live.",
   }),
 });
 
