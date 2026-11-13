@@ -70,11 +70,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="robots" content="noindex" />
   <title>Groddle Afternoon · Multiplayer</title>
-    <link rel="stylesheet" href="style.css?v=a78bb795" />
+    <link rel="stylesheet" href="style.css?v=921ad67e" />
   <!-- The UI font, self-hosted (style.css @font-face; OFL in assets/fonts/nunito/): the roman latin file, before first paint. -->
   <link rel="preload" href="assets/fonts/nunito/nunito-roman-latin.woff2" as="font" type="font/woff2" crossorigin />
   <!-- The Classic interface (js/classic/ui-mode.js sets <html data-ui="classic">); every rule is scoped to it. -->
-  <link rel="stylesheet" href="css/classic.css?v=ef8ec84e" />
+  <link rel="stylesheet" href="css/classic.css?v=2bf8f6c0" />
   <!-- Content keys for data and art URLs (js/data-urls.js): before every other script. -->
   <script src="js/data-versions.js?v=4df5aac6"></script>
   <script src="js/data-urls.js?v=523668ca"></script>
@@ -1042,6 +1042,11 @@
           <div class="map-head ui-sheet-head">
             <img class="ui-sheet-icon" src="assets/sprites/icons/teleportation_script.webp?v=4774a7f0" alt="" width="28" height="28" />
             <h2 id="map-hub-title" class="ui-sheet-title" tabindex="-1">Groddle Forest</h2>
+            <!-- G471: the client's map buttons (HubMapDialog.as): your region, the world map (js/map-views.js). -->
+            <div class="map-views" role="tablist" aria-label="Map view">
+              <button type="button" role="tab" class="map-view-btn" data-map-view="hub" aria-selected="true" title="Your region's map"><svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="6.5"/><circle cx="10" cy="10" r="2" class="fill"/><path d="M10 1v4M10 15v4M1 10h4M15 10h4"/></svg><span>Region</span></button>
+              <button type="button" role="tab" class="map-view-btn" data-map-view="world" aria-selected="false" title="World map"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M2 4.5l5-2 6 2 5-2v13l-5 2-6-2-5 2z"/><path d="M7 2.5v13M13 4.5v13"/></svg><span>World</span></button>
+            </div>
             <div class="map-hub-picker">
               <select id="map-hub-select" title="Browse hub maps" aria-label="Region"></select>
             </div>
@@ -1159,6 +1164,6 @@
   <!-- Password managers skip the game's own boxes (chat, searches, names); the account forms keep autofill. -->
   <script type="module" src="js/no-autofill.js?v=6a1a4382"></script>
   <!-- game.js loads once the multiplayer save is in memory (js/online-boot.js). -->
-  <script type="module" id="online-boot" src="js/online-boot.js?v=91e01718" data-game="game.js?v=6e6c528b"></script>
+  <script type="module" id="online-boot" src="js/online-boot.js?v=91e01718" data-game="game.js?v=e30b48c8"></script>
 </body>
 </html>

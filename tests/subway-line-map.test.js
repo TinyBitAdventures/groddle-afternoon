@@ -77,7 +77,7 @@ describe('lineView: the line being ridden', () => {
 
 describe('wiring', () => {
   it('game.js openMap asks the subway first (M, the map button and Classic\'s go through it)', () => {
-    assert.match(game, /async function openMap\(hubId, \{ find = '', focus = '' \} = \{\}\) \{\s*\/\/[^\n]*\n\s*if \(!hubId && !find && features\.query\('openMapOverride', engine\) === true\) return;/);
+    assert.match(game, /async function openMap\(hubId, \{ find = '', focus = '', view: pickedView = '' \} = \{\}\) \{\s*\/\/[^\n]*\n\s*if \(!hubId && !find && features\.query\('openMapOverride', engine\) === true\) return;/);
   });
 
   it('only on the train: M opens the line map, M again closes it; off the train it says no', () => {

@@ -61,3 +61,12 @@ Streets left off the map (round 5, 2026-10-31)
   on them (MapHub.as drawStreet). Written by tools/build-map-hidden.mjs from GSJS
   (greeting_locations, machine_rooms, the Apt basements rule) and the Tribute Blog's Nov 2012
   region maps (reference only). The region list offers GSJS public_hubs only (js/map-graph.js).
+
+World map (G471, 2026-11-13)
+  Tiny Speck's CC0 glitch-overlays/world_map.fla, the source of the client's world_map overlay
+  (GSJS inc_data_overlays.js, 2012-11-27): tools/map-views/build.mjs writes
+  assets/maps/art/world/world_map_locked.jpg   the sketched chart (the FLA's JPEG as is)
+  assets/maps/art/world/world_map_unlocked.jpg the painted chart (already here; byte for byte the FLA's)
+  assets/maps/art/world/frames.svg             the region frames and locked tiles (the FLA's vectors)
+  assets/maps/art/world/cards/<hub>.svg        each region's hover card (frame, thumbnail, lettered name)
+  js/map-views-data.js                         the 47 regions' click frames, centres and card placements

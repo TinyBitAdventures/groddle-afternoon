@@ -970,7 +970,10 @@ import {
   pickMapSpot,
   MAP_INDEX_URL,
   HUB_56_MAP_URL,
+  PUBLIC_HUBS,
 } from './js/map-graph.js?v=c161229d';
+// G471: the world map in the Map's window.
+import { MAP_VIEW_TITLES, bindWorldMap, mapViewSubtitle, renderWorldMapSvg, worldRegionList } from './js/map-views.js?v=0ccb4e50';
 import { hubMapArtNote, hubMapSubtitle, questLogSummary } from './js/panel-copy.js?v=85c3e029';
 import { bindMapIconTips } from './js/ui/map-icon-tips.js?v=6b3eb3f9';
 import { createMapZoom } from './js/map-zoom.js?v=4c2ce0e3';
@@ -1077,6 +1080,8 @@ let mapPanelHubId = null;
 let mapPanelStreetTsid = null;
 /** The streets walked, newest last, for places off the hub maps (map-graph.js noteMapTrail). */
 let mapTrail = [];
+/** G471: the Map's view (js/map-views.js MAP_VIEWS). QA: canvas data mapView. */
+let mapPanelView = 'hub';
 
 async function ensureMapIndex() {
   if (mapIndexCache) return mapIndexCache;
@@ -25586,7 +25591,7 @@ function renderHomeMapCallout(panel) {
 /**
  * @param {string} [hubId]  Open a specific hub map; default = player's hub
  */
-async function openMap(hubId, { find = '', focus = '' } = {}) {
+async function openMap(hubId, { find = '', focus = '', view: pickedView = '' } = {}) {
   // On the subway train: the line you are riding (features/subway-feature.js openMapOverride).
   if (!hubId && !find && features.query('openMapOverride', engine) === true) return;
   if (homeIsInstanced()) {
@@ -25690,6 +25695,14 @@ async function openMap(hubId, { find = '', focus = '' } = {}) {
     hubCombobox.refresh();
   }
 
+  // G471: the world map; a redraw while the Map is open keeps the view on show.
+  const mapView = pickedView || (!hubId && !find && isMapOpen() ? mapPanelView : 'hub');
+  markMapView(panel, mapView);
+  if (mapView !== 'hub') {
+    showMapView(mapView, { panel, canvas, title, sub, spot, mapIndex });
+    return;
+  }
+
   // "You" on the hub map: the current street, or the street that stands for it (spot.tsid).
   const view = buildHubMapView(hubData, spot.hubId === targetHub ? spot.tsid : currentStreetTsid, STREET_INDEX.streets);
   // Ticket 66: streets still under construction show it before you try to go (map-graph.js `building`).
@@ -25786,6 +25799,16 @@ async function openMap(hubId, { find = '', focus = '' } = {}) {
     });
   });
 
+  renderMapCards(panel);
+  arrangeMapCards(panel);
+  panel.hidden = false;
+  fitMapCanvas(panel);
+  if (find) showFoundStreet(canvas, find, view);
+  else if (focus) focusMapOn(canvas, focus);
+}
+
+/** The cards above the map (a quest's teleport, your home, the features' cards), before arrangeMapCards. */
+function renderMapCards(panel) {
   renderIlmenskieMapCallout(panel);
   renderHomeMapCallout(panel);
   panel.querySelectorAll('.map-feature-card').forEach((el) => el.remove());
@@ -25793,11 +25816,53 @@ async function openMap(hubId, { find = '', focus = '' } = {}) {
     el.classList.add('map-feature-card');
     panel.querySelector('.map-card')?.insertBefore(el, panel.querySelector('.map-canvas'));
   }
+}
+
+/**
+ * G471: the view buttons in the Map's head (HubMapDialog.as: your region, the world map), bound
+ * once; the one on show is pressed.
+ */
+function markMapView(panel, which) {
+  mapPanelView = which;
+  setCanvasData('mapView', which);
+  if (which !== 'world') delete document.getElementById('map-canvas')?.dataset.worldCard;
+  const bar = panel.querySelector('.map-views');
+  if (!bar) return;
+  if (!bar.dataset.bound) {
+    bar.dataset.bound = '1';
+    bar.addEventListener('click', (e) => {
+      const btn = e.target.closest('[data-map-view]');
+      if (!btn || (btn.getAttribute('aria-selected') === 'true' && btn.dataset.mapView !== 'hub')) return;
+      const next = btn.dataset.mapView;
+      // "Your region" is the client's recenter button: back to the map of where you are.
+      if (next === 'hub') mapPanelHubId = null;
+      openMap(null, { view: next });
+    });
+  }
+  for (const btn of bar.querySelectorAll('[data-map-view]')) btn.setAttribute('aria-selected', String(btn.dataset.mapView === which));
+}
+
+/** G471: the world map in the Map's window (js/map-views.js). */
+function showMapView(which, { panel, canvas, title, sub, spot, mapIndex }) {
+  const touch = TOUCH_PHONE || matchMedia?.('(hover: none)')?.matches || false;
+  const regions = worldRegionList(mapIndex, PUBLIC_HUBS);
+  canvas.innerHTML = renderWorldMapSvg(regions, { youHubId: spot.hubId });
+  bindWorldMap(canvas, { touch, onOpen: (id) => openMap(id) });
+  const subLine = mapViewSubtitle('world', { touch, regions });
+  if (title) title.textContent = MAP_VIEW_TITLES[which];
+  if (sub) {
+    sub.textContent = subLine;
+    sub.title = subLine;
+    delete sub.dataset.mapArt;
+  }
+  const svg = canvas.querySelector('svg');
+  const frame = svg?.getAttribute('viewBox')?.split(' ').map(Number) || [];
+  if (frame[2] > 0 && frame[3] > 0) canvas.style.setProperty('--map-aspect', `${frame[2]} / ${frame[3]}`);
+  mapZoomFor(canvas).attach(svg, which);
+  renderMapCards(panel);
   arrangeMapCards(panel);
   panel.hidden = false;
   fitMapCanvas(panel);
-  if (find) showFoundStreet(canvas, find, view);
-  else if (focus) focusMapOn(canvas, focus);
 }
 
 /**
@@ -26027,6 +26092,7 @@ function closeMap() {
   const panel = document.getElementById('map-panel');
   if (panel) panel.hidden = true;
   if (mapCtxMenu?.isOpen()) mapCtxMenu.close({ focus: false });
+  mapPanelView = 'hub';
   mapPanelHubId = null;
   // MAPZOOM: the next open starts at fit (the zoom is kept only while the Map stays open).
   mapZoom?.reset();

@@ -3205,6 +3205,16 @@
   mask-image: linear-gradient(to bottom, var(--c-classic-ink) calc(100% - 40px), transparent);
 }
 /* === end rep13 === */
+/* === maps (lane) === */
+/* G471: the Map's view buttons as the 2012 window drew them (Tribute Blog post 49872342514, reference only): three small grey buttons with an icon at the head's left, before the title; the one on show pressed in. */
+:root[data-ui="classic"] #game-root #map-panel .map-head .map-views { order: -1; gap: calc(4 * var(--cu)); padding: 0; margin-right: calc(10 * var(--cu)); background: none; }
+:root[data-ui="classic"] #game-root #map-panel .map-head .map-view-btn { min-height: 0; width: calc(38 * var(--cu)); height: calc(26 * var(--cu)); padding: 0; justify-content: center; border: 1px solid var(--c-classic-btn-minor-border); border-radius: var(--radius-xs); background: linear-gradient(180deg, var(--c-classic-btn-minor-top), var(--c-classic-btn-minor-bottom)); color: var(--c-classic-btn-minor-label); box-shadow: 0 1px 0 color-mix(in srgb, var(--c-classic-ink) 30%, transparent); }
+:root[data-ui="classic"] #game-root #map-panel .map-head .map-view-btn > span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+:root[data-ui="classic"] #game-root #map-panel .map-head .map-view-btn svg { width: calc(18 * var(--cu)); height: calc(18 * var(--cu)); }
+:root[data-ui="classic"] #game-root #map-panel .map-head .map-view-btn:hover { background: linear-gradient(180deg, var(--c-classic-panel), var(--c-classic-btn-minor-top)); }
+:root[data-ui="classic"] #game-root #map-panel .map-head .map-view-btn[aria-selected="true"] { background: var(--c-classic-btn-minor-bottom); box-shadow: inset 0 2px 4px color-mix(in srgb, var(--c-classic-ink) 25%, transparent); }
+:root[data-ui="classic"] #game-root #map-panel .map-head .map-view-btn:focus-visible { outline: 2px solid var(--c-classic-focus); outline-offset: 1px; }
+/* === end maps === */
 
 /* == TICKETS == Reports (js/ui/reports-sheet.js, online only) as a 2012 window: the Quest Log's frame
    (Dialog.as, WindowBorder.as, BigDialog.as) centred in the viewport, the white head with its 20 px
