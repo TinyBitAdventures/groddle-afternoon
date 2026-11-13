@@ -39,8 +39,8 @@ import {
   plainText,
   TROPHY_PIECES,
   planStreetTrophies,
-} from '../public/js/street-jobs.js?v=ba02a385';
-import { streetJobsFeature } from '../public/js/features/street-jobs-feature.js?v=383e9502';
+} from '../public/js/street-jobs.js?v=47d8573e';
+import { streetJobsFeature } from '../public/js/features/street-jobs-feature.js?v=007ab732';
 import { createAchievementState, applyAchievementProgress } from '../public/js/achievements.js?v=e4e5edd0';
 import { applyRewards } from '../public/js/quests.js?v=40c71a37';
 import { loadContentCatalogsFromDir, resetContentCatalogs } from '../public/js/content-catalogs.js?v=10b118dd';
@@ -188,6 +188,39 @@ describe('street jobs rules', () => {
     assert.equal(state.jobs['1'].startedAt, 5);
     assert.equal(contributeItems(state, catalog, '1', 'dullite', 1, inv, 5).ok, false);
     assert.equal(contributeItems(state, catalog, '1', 'apple', 1, { apple: 3 }, 5).ok, false);
+  });
+
+  it('report 290: an item asked for in two buckets goes to the row you chose', () => {
+    // The Jethimadh Tower's last phase (job 256, job_tower_ph4): Urth Blocks in bucket 1 (r662) and bucket 2 (r669), both open.
+    const at4 = () => normalizeStreetJobState({ jobs: { 256: { phase: 3, startedAt: 1, got: { r660: 1e9, r666: 1e9 } } } });
+    const urth = (state) => Object.fromEntries(phaseRequirements(state, catalog, '256').filter((r) => r.classId === 'grade_aa_earth_block').map((r) => [r.id, [r.got, r.open]]));
+    const state = at4();
+    assert.deepEqual(urth(state), { r662: [0, true], r669: [0, true] });
+    const inv = { grade_aa_earth_block: 4 };
+    // Solo amounts, as in his picture: 4 on the first row, 2 on the second.
+    const res = contributeItems(state, catalog, '256', 'grade_aa_earth_block', 1, inv, 5, 'r669');
+    assert.equal(res.ok, true);
+    assert.equal(res.req.id, 'r669');
+    assert.deepEqual(urth(state), { r662: [0, true], r669: [1, true] });
+    // No row named: the first open one, as GSJS inc_item did.
+    assert.equal(contributeItems(state, catalog, '256', 'grade_aa_earth_block', 1, inv, 5).req.id, 'r662');
+    assert.deepEqual(urth(state), { r662: [1, true], r669: [1, true] });
+    // A row that is done or not open takes nothing; the item does not spill into another row.
+    const full = at4();
+    contributeItems(full, catalog, '256', 'grade_aa_earth_block', 99, { grade_aa_earth_block: 99 }, 5, 'r669');
+    const bag = { grade_aa_earth_block: 5 };
+    assert.equal(contributeItems(full, catalog, '256', 'grade_aa_earth_block', 5, bag, 5, 'r669').ok, false);
+    assert.equal(bag.grade_aa_earth_block, 5);
+    assert.equal(contributeItems(full, catalog, '256', 'grade_aa_earth_block', 1, bag, 5, 'r661').ok, false);
+  });
+
+  it('report 290: currants go to the currants row you chose', () => {
+    const state = normalizeStreetJobState({ jobs: { 256: { phase: 3, startedAt: 1 } } });
+    const pc = { currants: 50 };
+    assert.equal(contributeCurrants(state, catalog, '256', 30, pc, 5, 'r666').req.id, 'r666');
+    assert.equal(state.jobs['256'].got.r666, 30);
+    assert.equal(state.jobs['256'].got.r660 || 0, 0);
+    assert.equal(contributeCurrants(state, catalog, '256', 20, pc, 5).req.id, 'r660');
   });
 
   it('runs work units with source energy and wear, and stops at the energy floor', () => {

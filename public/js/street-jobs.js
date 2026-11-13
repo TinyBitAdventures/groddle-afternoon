@@ -538,13 +538,25 @@ export function contributionBadgesReached(distinctPhases, before = distinctPhase
 }
 
 /**
- * quest.js inc_item: put up to `count` of one item into the first open
- * requirement for it. Mutates `inv` (plain class -> count map).
+ * The open requirement a contribution goes to: the row `rid` when one is named, else the first open
+ * one of its kind. Report #290 (Dr Flavius): the Jethimadh Tower's last phase asks for Urth Blocks in
+ * both its buckets (r662, r669), and both rows are open at once; what he put in on the second row
+ * went to the first. Glitch's client sent the row it was on (JobDetailsUI.as 231-235, 389-394
+ * current_req.id), but GSJS took no notice of it: quest.js inc_item 1463-1478 and inc_currants
+ * 1443-1461 fill the first open row of its kind. The remake credits the row you chose.
  */
-export function contributeItems(state, catalog, jobId, classId, count, inv, now = Date.now()) {
+function contributionReq(state, catalog, jobId, match, rid = '') {
+  return phaseRequirements(state, catalog, jobId).find((r) => match(r) && r.open && (!rid || r.id === rid));
+}
+
+/**
+ * quest.js inc_item: put up to `count` of one item into the open requirement `rid` (the row the
+ * player chose), or the first open requirement for it. Mutates `inv` (plain class -> count map).
+ */
+export function contributeItems(state, catalog, jobId, classId, count, inv, now = Date.now(), rid = '') {
   const gate = canContribute(state, catalog, jobId, now);
   if (!gate.ok) return { ok: false, msg: gate.msg };
-  const req = phaseRequirements(state, catalog, jobId).find((r) => r.type === 'item' && r.classId === classId && r.open);
+  const req = contributionReq(state, catalog, jobId, (r) => r.type === 'item' && r.classId === classId, rid);
   if (!req) return { ok: false, msg: 'Nothing here needs that right now.' };
   const have = whole(inv?.[classId]);
   const amount = Math.min(whole(count), have, req.need - req.got);
@@ -558,11 +570,11 @@ export function contributeItems(state, catalog, jobId, classId, count, inv, now 
   return { ok: true, amount, baseCost: amount * req.baseCost, req, ...rec, phaseReady: phaseIsComplete(state, catalog, jobId) };
 }
 
-/** quest.js inc_currants. Mutates pc.currants. */
-export function contributeCurrants(state, catalog, jobId, amount, pc, now = Date.now()) {
+/** quest.js inc_currants, into the row `rid` when named (see contributionReq). Mutates pc.currants. */
+export function contributeCurrants(state, catalog, jobId, amount, pc, now = Date.now(), rid = '') {
   const gate = canContribute(state, catalog, jobId, now);
   if (!gate.ok) return { ok: false, msg: gate.msg };
-  const req = phaseRequirements(state, catalog, jobId).find((r) => r.type === 'currants' && r.open);
+  const req = contributionReq(state, catalog, jobId, (r) => r.type === 'currants', rid);
   if (!req) return { ok: false, msg: 'No currants are needed right now.' };
   const pay = Math.min(whole(amount), whole(pc?.currants), req.need - req.got);
   if (pay <= 0) return { ok: false, msg: 'You do not have any currants to give.' };

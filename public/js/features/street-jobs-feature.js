@@ -110,7 +110,7 @@ import {
   sharePercent,
   percentCompleteText,
   jobRewardsText,
-} from '../street-jobs.js?v=ba02a385';
+} from '../street-jobs.js?v=47d8573e';
 import { PAPERS_BADGE } from '../subway.js?v=44d1a09f';
 import { gainMetabolic, loseEnergy } from '../metabolics.js?v=1383e6fd';
 import { closuresInTheWay, holdNote, nearestReached, placeIndex, questHold, questStoryKey, reachableStreets } from '../quest-reach.js?v=e7b68f54';
@@ -137,7 +137,7 @@ import {
   sharedSlice,
   topLine,
   leaderboard,
-} from '../street-jobs-mp.js?v=930d8534';
+} from '../street-jobs-mp.js?v=f5a3d8e3';
 import { grantMoodXp } from '../mood-xp.js?v=22648ec0';
 import { createMinnAccount } from '../minn-account.js?v=c15f0ecf';
 import { normalizeGroups } from '../groups.js?v=c9635d96';
@@ -149,8 +149,8 @@ import { itemZ } from '../item-bands.js?v=e98b10bc';
 import { SIGN_ARMS, routeGraph } from '../map-routes.js?v=c7e7dc80';
 import { TELEPORTERS } from '../hidden-floors.js?v=732a2610';
 import { WINTRY_PORTAL_TELEPORTERS } from '../wintry-portal.js?v=1437deda';
-import { PROJECTS_TEXT, contributedJobs, mineTotal, projectEntry, projectList } from '../projects-tracker.js?v=30bdd34d';
-import { PROJECTS_PANEL_ID, buildProjectsPanel, renderProjects } from '../ui/projects-sheet.js?v=f97f2319';
+import { PROJECTS_TEXT, contributedJobs, mineTotal, projectEntry, projectList } from '../projects-tracker.js?v=ab0c78e1';
+import { PROJECTS_PANEL_ID, buildProjectsPanel, renderProjects } from '../ui/projects-sheet.js?v=30f4eadd';
 import { SIDE_SHEET_IDS } from '../ui/panel-shell.js?v=06a0d3fe';
 import { trophyGotText } from '../home-trophies.js?v=2020b29b';
 import { FEATURED_TEXT, featuredChanged, featuredFromServer, featuredNeedsLine } from '../featured-project.js?v=4210bead';
@@ -1707,10 +1707,10 @@ function renderPanel(engine) {
     if (open && r.open) {
       if (r.type === 'item') {
         const max = Math.min(countItem(engine.inv, r.classId), left);
-        acts.append(qtyPicker({ jobId, rid: r.id, act: 'give', max, busy: Boolean(mp?.giving), go: (n) => doGive(engine, jobId, r.classId, n) }));
+        acts.append(qtyPicker({ jobId, rid: r.id, act: 'give', max, busy: Boolean(mp?.giving), go: (n) => doGive(engine, jobId, r.classId, n, r.id) }));
       } else if (r.type === 'currants') {
         const max = Math.min(n0(engine.pc.currants), left);
-        acts.append(qtyPicker({ jobId, rid: r.id, act: 'currants', max, busy: Boolean(mp?.giving), go: (n) => doCurrants(engine, jobId, n) }));
+        acts.append(qtyPicker({ jobId, rid: r.id, act: 'currants', max, busy: Boolean(mp?.giving), go: (n) => doCurrants(engine, jobId, n, r.id) }));
       } else if (r.type === 'work') {
         const busy = work && work.jobId === jobId && work.rid === r.id;
         if (busy) {
@@ -1872,9 +1872,10 @@ function loadHallGroups(engine) {
   return hallGroups.loading;
 }
 
-function doGive(engine, jobId, classId, n) {
-  if (shared(jobId)) return mpGive(engine, jobId, { classId, n });
-  const res = contributeItems(state, catalog, jobId, classId, n, engine.inv);
+/** #290: `rid` is the row the player chose (street-jobs.js contributionReq); '' means the first open one. */
+function doGive(engine, jobId, classId, n, rid = '') {
+  if (shared(jobId)) return mpGive(engine, jobId, { classId, n, rid });
+  const res = contributeItems(state, catalog, jobId, classId, n, engine.inv, Date.now(), rid);
   if (!res.ok) return engine.toast(res.msg), false;
   engine.pushActivity(`You contributed ${res.amount} ${itemLabel(classId, res.amount)}.`);
   engine.playSound('ITEM_GIVE', { volume: 0.55 });
@@ -1886,9 +1887,9 @@ function doGive(engine, jobId, classId, n) {
   return true;
 }
 
-function doCurrants(engine, jobId, n) {
-  if (shared(jobId)) return mpGive(engine, jobId, { currants: n });
-  const res = contributeCurrants(state, catalog, jobId, n, engine.pc);
+function doCurrants(engine, jobId, n, rid = '') {
+  if (shared(jobId)) return mpGive(engine, jobId, { currants: n, rid });
+  const res = contributeCurrants(state, catalog, jobId, n, engine.pc, Date.now(), rid);
   if (!res.ok) return engine.toast(res.msg), false;
   engine.pushActivity(`You contributed ${res.amount.toLocaleString()} currants.`);
   engine.updateHud();
@@ -2193,8 +2194,8 @@ function createMp(engine, client) {
 
   // QA (window.groddleProjects): the board's own actions, and the row as this page sees it.
   s.open = (jobId) => openPanel(engine, jobId);
-  s.give = (jobId, classId, n) => doGive(engine, jobId, classId, n);
-  s.currants = (jobId, n) => doCurrants(engine, jobId, n);
+  s.give = (jobId, classId, n, rid = '') => doGive(engine, jobId, classId, n, rid);
+  s.currants = (jobId, n, rid = '') => doCurrants(engine, jobId, n, rid);
   s.work = (jobId, rid, max = Infinity) => startWork(engine, jobId, rid, max);
   s.row = (jobId) => JSON.parse(JSON.stringify(state.jobs[jobId] || null));
   s.claim = (jobId, group) => mpClaim(engine, jobId, group);
@@ -2227,7 +2228,8 @@ function mpGive(engine, jobId, what) {
   if (s.giving) return engine.toast(MP_TEXT.counting), false;
   const money = what.currants != null;
   const reqs = phaseRequirements(state, catalog, jobId);
-  const req = money ? reqs.find((r) => r.type === 'currants' && r.open) : reqs.find((r) => r.type === 'item' && r.classId === what.classId && r.open);
+  // #290: the row the player chose; the server credits the req it is sent (projects.go give).
+  const req = reqs.find((r) => (money ? r.type === 'currants' : r.type === 'item' && r.classId === what.classId) && r.open && (!what.rid || r.id === what.rid));
   if (!req) return engine.toast(money ? 'No currants are needed right now.' : 'Nothing here needs that right now.'), false;
   const have = money ? n0(engine.pc.currants) : countItem(engine.inv, what.classId);
   const n = Math.min(n0(money ? what.currants : what.n), have, req.need - req.got - n0(state.jobs[jobId]?.held?.[req.id]));
@@ -2459,8 +2461,8 @@ function autoplayStep(engine, now) {
     return;
   }
   autoplay.stage = `phase${st.phase + 1}:${r.type}`;
-  if (r.type === 'item') doGive(engine, jobId, r.classId, r.need - r.got);
-  else if (r.type === 'currants') doCurrants(engine, jobId, r.need - r.got);
+  if (r.type === 'item') doGive(engine, jobId, r.classId, r.need - r.got, r.id);
+  else if (r.type === 'currants') doCurrants(engine, jobId, r.need - r.got, r.id);
   else if (r.type === 'work') {
     // Two real work units, then hire the rest (both source paths).
     if (!autoplay.worked[r.id] && workCheck(state, catalog, jobId, r.id, workCtx(engine)).ok && r.need - r.got > 1) {

@@ -14,10 +14,10 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 import { SIGN_ARMS, doorToward, findRoute, isRide, planRoute, createRouteState, routeGraph, signpostToward, subwayRides } from '../public/js/map-routes.js?v=c7e7dc80';
-import { SUBWAY_STREETS, closedStreets, initializeStreetJobs, normalizeStreetJobState } from '../public/js/street-jobs.js?v=ba02a385';
+import { SUBWAY_STREETS, closedStreets, initializeStreetJobs, normalizeStreetJobState } from '../public/js/street-jobs.js?v=47d8573e';
 import { stationByTsid } from '../public/js/subway.js?v=44d1a09f';
 import { reachRoutes, reachStreet } from '../public/js/builder/reach-graph.js?v=d03eeab1';
-import { applyWorld } from '../public/js/street-jobs-mp.js?v=930d8534';
+import { applyWorld } from '../public/js/street-jobs-mp.js?v=f5a3d8e3';
 import { SIGN_MAX_ARMS } from '../public/js/street-render.js?v=9b11451f';
 import { obtainableItems } from '../tools/job-obtainable.mjs';
 

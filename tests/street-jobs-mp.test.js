@@ -31,7 +31,7 @@ import {
   sharedSlice,
   topLine,
   leaderboard,
-} from '../public/js/street-jobs-mp.js?v=930d8534';
+} from '../public/js/street-jobs-mp.js?v=f5a3d8e3';
 import {
   isJobBuilt,
   jobStatus,
@@ -40,7 +40,7 @@ import {
   phaseRequirements,
   roadClosure,
   soloNeed,
-} from '../public/js/street-jobs.js?v=ba02a385';
+} from '../public/js/street-jobs.js?v=47d8573e';
 
 const root = join(import.meta.dirname, '..');
 const catalog = JSON.parse(readFileSync(join(root, 'public/assets/content/street-jobs.json'), 'utf8'));
@@ -224,13 +224,21 @@ describe('a give made with the window open (#105)', () => {
     assert.match(feature, /giveAfterSave\(\{ persist: \(\) => persist\(engine\), send: \(\) => s\.client\.send\('project_claim'/);
     assert.doesNotMatch(feature, /if \(!s\.client\.send\('project_(give|claim)'/);
   });
+
+  it('report 290: the board sends the row you chose, not the first row asking for that item', () => {
+    assert.match(feature, /go: \(n\) => doGive\(engine, jobId, r\.classId, n, r\.id\)/);
+    assert.match(feature, /go: \(n\) => doCurrants\(engine, jobId, n, r\.id\)/);
+    assert.match(feature, /mpGive\(engine, jobId, \{ classId, n, rid \}\)/);
+    assert.match(feature, /mpGive\(engine, jobId, \{ currants: n, rid \}\)/);
+    assert.match(feature, /&& r\.open && \(!what\.rid \|\| r\.id === what\.rid\)\);/);
+  });
 });
 
 describe('the feature keeps solo as it was', () => {
   it('gates every shared path on multiplayer', () => {
     assert.match(feature, /const shared = \(jobId\) => mpMode && Boolean\(catalog\) && isSharedJob\(catalog, jobId\);/);
     assert.match(feature, /mpMode = engine\?\.mode === 'multiplayer';/);
-    assert.match(feature, /function doGive\(engine, jobId, classId, n\) \{\n  if \(shared\(jobId\)\) return mpGive/);
+    assert.match(feature, /function doGive\(engine, jobId, classId, n, rid = ''\) \{\n  if \(shared\(jobId\)\) return mpGive/);
     assert.match(feature, /function doHire\(engine, jobId, rid\) \{\n  if \(shared\(jobId\)\) return false;/);
     assert.match(feature, /if \(check\.canHire && !shared\(jobId\)\)/);
     assert.match(feature, /if \(shared\(jobId\)\) return;\n  if \(!phaseIsComplete/);
@@ -276,7 +284,7 @@ describe('the site ledger counts project records (src/LedgerMath.php)', () => {
 
 describe('ticket 190: the final card of a shared project names your share', () => {
   it('contributedKey is the key markContributed records', async () => {
-    const { contributedKey } = await import('../public/js/street-jobs-mp.js?v=930d8534');
+    const { contributedKey } = await import('../public/js/street-jobs-mp.js?v=f5a3d8e3');
     const state = { phasesContributed: [] };
     markContributed(state, 'job-g-123', 'job_street_baq_12');
     assert.deepEqual(state.phasesContributed, [contributedKey('job-g-123', 'job_street_baq_12')]);
