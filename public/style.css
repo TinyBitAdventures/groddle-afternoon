@@ -8990,9 +8990,14 @@ header.top-bar + .sub { display: none; }
   cursor: pointer;
 }
 
-.mail-row:hover,
+/* #274 (Friendly, iPhone): a touch screen leaves :hover on the row a finger last touched, so while the list
+   scrolled the light colour of the open letter jumped from row to row (and flickered on the last one). The
+   open letter's colour follows .is-selected only; the hover colour waits for a pointer that can hover. */
 .mail-row.is-selected {
   background: var(--surface-card);
+}
+@media (hover: hover) {
+  .mail-row:hover { background: var(--surface-card); }
 }
 
 .mail-row-dot {
@@ -13153,8 +13158,8 @@ body:has(#quest-dialogue:not([hidden])) .prompt-stack { z-index: calc(var(--z-mo
 [data-ui="modern"] #mail-panel .mail-layout { flex: 1 1 auto; min-height: 0; max-height: none; height: min(460px, 100%); margin: 0 var(--space-4) var(--space-3); border: 1px solid var(--border); border-radius: var(--radius-m); overflow: hidden; }
 [data-ui="modern"] #mail-panel .mail-list { border-right: 1px solid var(--border); background: var(--surface-sunken); scrollbar-width: thin; }
 [data-ui="modern"] #mail-panel .mail-row { padding: var(--space-2) var(--space-3); border-bottom: 1px solid var(--border); color: var(--text); font: inherit; }
-[data-ui="modern"] #mail-panel .mail-row:hover,
 [data-ui="modern"] #mail-panel .mail-row.is-selected { background: var(--surface-raised); }
+@media (hover: hover) { [data-ui="modern"] #mail-panel .mail-row:hover { background: var(--surface-raised); } }
 [data-ui="modern"] #mail-panel .mail-row:focus-visible { outline: 2px solid var(--focus); outline-offset: -2px; }
 [data-ui="modern"] #mail-panel .mail-row-copy strong { font-weight: var(--fw-heavy); }
 [data-ui="modern"] #mail-panel :is(.mail-row-copy span, .mail-row time) { color: var(--text-muted); font-size: var(--fs-xs); }

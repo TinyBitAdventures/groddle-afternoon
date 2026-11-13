@@ -44,3 +44,22 @@ describe('#268 the Make stage on a phone', () => {
     assert.ok(side >= 42 && side >= 16 + 2 + out, `side ${side}`);
   });
 });
+
+// #274 (Friendly, iPhone): a touch screen keeps :hover on the row a finger last touched, so the open
+// letter's light colour jumped from row to row as the list scrolled. The colour follows .is-selected;
+// the hover colour only where a pointer can hover.
+describe('#274 Mail: the open letter keeps its colour while the list scrolls on a touch screen', () => {
+  const hoverBlocks = [...css.matchAll(/@media \(hover: hover\) \{([^@]*?\}\s*)\}/g)].map((m) => m[1]);
+
+  it('no :hover on a mail row outside a (hover: hover) query', () => {
+    const outside = css.replace(/@media \(hover: hover\) \{[^@]*?\}\s*\}/g, '');
+    assert.doesNotMatch(outside, /\.mail-row:hover/);
+  });
+
+  it('the open letter is coloured by .is-selected in both looks, and hover keeps its colour on a computer', () => {
+    assert.match(css, /\n\.mail-row\.is-selected \{\s*background: var\(--surface-card\);/);
+    assert.match(css, /\[data-ui="modern"\] #mail-panel \.mail-row\.is-selected \{ background: var\(--surface-raised\); \}/);
+    assert.ok(hoverBlocks.some((b) => /\.mail-row:hover \{ background: var\(--surface-card\); \}/.test(b)));
+    assert.ok(hoverBlocks.some((b) => /#mail-panel \.mail-row:hover \{ background: var\(--surface-raised\); \}/.test(b)));
+  });
+});
