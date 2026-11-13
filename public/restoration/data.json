@@ -2788,13 +2788,28 @@
   ]
  },
  "release": {
-  "game": "0.37.0",
+  "game": "0.37.1",
   "deployed": "2026-11-13"
  },
  "git": {
-  "commits": 2032,
+  "commits": 2042,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-13",
+    "kind": "fix",
+    "text": "Online, everyone can work on Yan Jaggery again: the featured project no longer says \"This street is already built\""
+   },
+   {
+    "date": "2026-11-13",
+    "kind": "improve",
+    "text": "EZ Cookin's lamps hang on short cords under fir boughs, so no cord runs off into open sky"
+   },
+   {
+    "date": "2026-11-13",
+    "kind": "improve",
+    "text": "The Magic Rock wears Glitch's full white rim on its cards, plain to see on the cream Quests panel"
+   },
    {
     "date": "2026-11-13",
     "kind": "improve",
@@ -2899,21 +2914,6 @@
     "date": "2026-11-13",
     "kind": "new",
     "text": "Online, Lotha Harte's notes and heart and Icicle Dangles' lights are heard and seen by everyone on the street"
-   },
-   {
-    "date": "2026-11-13",
-    "kind": "improve",
-    "text": "EZ Cookin's practice street drops the stand-in hanging lamps, keeping its counters and table"
-   },
-   {
-    "date": "2026-11-13",
-    "kind": "improve",
-    "text": "The featured project is a thin line along the bottom of the street name bubble, so notices stack under one bubble"
-   },
-   {
-    "date": "2026-11-13",
-    "kind": "improve",
-    "text": "The street map is never left hidden in a scene, and the phone sheet opened early shows a calm empty card"
    }
   ]
  },
