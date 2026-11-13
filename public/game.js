@@ -33705,9 +33705,9 @@ async function main() {
   const frameFailed = createErrorOnce();
   const gameFrame = (ticker) => {
     syncStreetFront();
+    orderPromptLayer();
     // G655: freed textures go once the renders since have rebuilt their batches (retireTextures).
     retireQueue.tick();
-    orderPromptLayer();
     tickAtmosphere();
     if (!state.started) {
       drawStreetFrame();
