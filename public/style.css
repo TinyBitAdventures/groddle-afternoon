@@ -13953,6 +13953,15 @@ html:not(.stage-pinned)[data-ui="modern"] #wrap > .top-bar {
   max-height: calc(100dvh - var(--hud-h) - 16px - 80px - var(--safe-t) - var(--safe-b));
   overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch;
 }
+/* Under 760 px wide a window drops the street's name under the pills (PAPER); a phone held sideways
+   (667 x 375, a letterboxed 17 Pro at 750) is that narrow but has room between them, and a second row
+   on a 360 px tall screen sat on the avatar's head. Sideways it stays in the row, where topbar.js
+   places it (squeezed under 200 px it still drops: .is-under). */
+@media (max-width: 760px) and (orientation: landscape) {
+  :root.touch-phone[data-ui="modern"] .street-nameplate.is-placed:not(.is-under) {
+    top: calc(var(--space-1) + var(--safe-t)); left: var(--plate-x); transform: none; max-width: var(--plate-room);
+  }
+}
 /* === end LANDSCAPE-HUD === */
 
 /* —— MAPICONS —— the hub map's street icons (vendor, shrine, subway station; js/map-graph.js
