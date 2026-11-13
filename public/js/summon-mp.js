@@ -23,7 +23,12 @@
  *   "<name> did not accept your summons." (718-725), "Oops. Something
  *   happened with that teleport." (614), the target's refusals in
  *   can_summon (740-759), "Summoning <name> to your location." (643, the
- *   token's reason, here the Activity line with the energy).
+ *   token's reason, here the Activity line with the energy). From inside
+ *   someone else's house the friend was sent to its front door outside
+ *   (teleportation_summon 663-665, pols_get_entrance_outside) after being
+ *   asked to the house by name, with no word of the door; the door lines
+ *   here are ours, on the source's own "summon you to <place>" and "is on
+ *   their way!".
  */
 
 export const SUMMON_VERB = 'mp_summon';
@@ -52,6 +57,11 @@ export const SUMMON_TEXT = Object.freeze({
   declined: (name) => `${name} did not accept your summons.`,
   oops: 'Oops. Something happened with that teleport.',
   summoned: (name) => `${name} summoned you.`,
+  // Ours (inc_teleportation.js 663-665 dropped the friend outside someone else's house without a word).
+  door: (house) => `the front door of ${house}`,
+  onTheirWayDoor: (name, house) => `${name} is on their way! They will arrive outside, at the front door of ${house}.`,
+  summonedDoor: (name, house) => `${name} summoned you to the front door of ${house}.`,
+  someHouse: 'the house',
   offline: "You're offline, so nobody can hear your summons right now.",
 });
 

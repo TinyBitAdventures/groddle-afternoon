@@ -22,11 +22,11 @@ import {
   paySummon,
   rollTeleportDay,
 } from '../public/js/teleportation.js?v=e95cf7cb';
-import { SUMMON_TEXT, SUMMON_VERB, askedText, summonRefusal, summonVerb } from '../public/js/summon-mp.js?v=42c1557d';
-import { readHomeStreet, summonHomePlace } from '../public/js/neighbours-mp.js?v=a12300f9';
-import { BLOCKED_PLAYER_VERBS, FROM_LIST_VERBS, playerMenuRows } from '../public/js/ui/player-menu.js?v=2a12c1a6';
-import { summonMpFeature } from '../public/js/features/summon-mp-feature.js?v=45d2ec01';
-import { teleportationFeature } from '../public/js/features/teleportation-feature.js?v=1468e2c0';
+import { SUMMON_TEXT, SUMMON_VERB, askedText, summonRefusal, summonVerb } from '../public/js/summon-mp.js?v=7598f381';
+import { readHomeStreet, summonHomePlace } from '../public/js/neighbours-mp.js?v=e141e898';
+import { BLOCKED_PLAYER_VERBS, FROM_LIST_VERBS, playerMenuRows } from '../public/js/ui/player-menu.js?v=a90fc41e';
+import { summonMpFeature } from '../public/js/features/summon-mp-feature.js?v=41578540';
+import { teleportationFeature } from '../public/js/features/teleportation-feature.js?v=4ab5dbdc';
 
 const ROOT = join(import.meta.dirname, '..');
 const V = ['teleportation_1', 'teleportation_2', 'teleportation_3', 'teleportation_4', 'teleportation_5'];
@@ -249,6 +249,14 @@ describe('Summons: the world side', () => {
     assert.equal(engine.pc.energy, 70);
   });
 
+  it('from inside someone else\'s house, tells the summoner the friend will be at its front door', () => {
+    teleportationFeature.restore({});
+    client.msg({ t: 'summon_pay', id: 2, name: 'Bo', door: { owner: 5, name: 'Cy' } });
+    assert.deepEqual(client.sent.pop(), ['summon_paid', { id: 2, ok: true }]);
+    assert.equal(last().text, "Bo is on their way! They will arrive outside, at the front door of Cy's House.");
+    teleportationFeature.restore({});
+  });
+
   it('says a no, a refusal and an Oops', () => {
     client.msg({ t: 'summon_declined', id: 2, name: 'Bo', text: 'Bo did not accept your summons.' });
     assert.equal(engine.log.activity.at(-1), 'Bo did not accept your summons.');
@@ -334,7 +342,23 @@ describe('Summons: the world side', () => {
     engine.query = query;
   });
 
-  it('G668: a summoner in a home: their own and a public home street take a summons, someone else\'s house does not', () => {
+  it("from inside someone else's house: asked to its front door, sent there as walking out of it", () => {
+    const calls = [];
+    const query = engine.query;
+    engine.query = (hook, ...args) => (hook === 'neighboursSummoned' ? (calls.push(args[0]), true) : query(hook, ...args));
+    client.msg({ t: 'summon_asked', from: { id: 7, name: 'Ada' }, street: 'HOUSE_5', door: { owner: 5, name: 'Cy' }, timeout: 30 });
+    assert.equal(last().text, "Ada would like to summon you to the front door of Cy's House. Do you accept?");
+    client.msg({ t: 'summon_gone', from: 7 });
+    client.msg({ t: 'summon_go', from: { id: 7, name: 'Ada' }, street: 'HOME_5', door: { owner: 5, name: 'Cy' }, party: false });
+    assert.deepEqual(calls.at(-1), { owner: 5, room: 'street', floor: 0, door: true });
+    assert.equal(engine.log.activity.at(-1), "Ada summoned you to the front door of Cy's House.");
+    // No name known (the owner offline and no pass): the house still.
+    client.msg({ t: 'summon_go', from: { id: 7, name: 'Ada' }, street: 'HOME_5', door: { owner: 5, name: '' }, party: false });
+    assert.equal(engine.log.activity.at(-1), 'Ada summoned you to the front door of the house.');
+    engine.query = query;
+  });
+
+  it('G668: a summoner in a home: the place\'s answer is the verb\'s', () => {
     teleportationFeature.restore({});
     const query = engine.query;
     for (const [place, reason] of [['', null], ['them', "You can't summon them here."], ['here', "You can't summon people here."]]) {
@@ -372,13 +396,13 @@ describe('G668: summons and homes (inc_teleportation.js 799-806)', () => {
     for (const bad of ['HOME_0', 'HOME_07', 'HOMES_7', 'GA5101', 'TOWER_7', 'PARTY_1', '', null]) assert.equal(readHomeStreet(bad), null, String(bad));
   });
 
-  it('your own home takes a summons; a visit takes one on the street or a Tower floor, not in the house', () => {
+  it('your own home takes a summons; a visit takes one anywhere (from the house, to its door)', () => {
     assert.equal(summonHomePlace({ street: 'HOME_7', me: 7, inHome: true }), '');
     assert.equal(summonHomePlace({ street: 'HOUSE_7', me: 7, inHome: true }), '');
     assert.equal(summonHomePlace({ street: 'TOWER_7_2', me: 7, inHome: true }), '');
     assert.equal(summonHomePlace({ street: 'HOME_9', me: 7, visiting: true }), '');
     assert.equal(summonHomePlace({ street: 'TOWER_9_0', me: 7, visiting: true }), '');
-    assert.equal(summonHomePlace({ street: 'HOUSE_9', me: 7, visiting: true }), 'them');
+    assert.equal(summonHomePlace({ street: 'HOUSE_9', me: 7, visiting: true }), '');
     // An upper floor of your house is shared with nobody.
     assert.equal(summonHomePlace({ street: '', me: 7, inHome: true }), 'here');
     assert.equal(summonHomePlace({ street: '', me: 7 }), null);

@@ -23,7 +23,12 @@
  * - Into a home (G668): from your own home street, house or Tower floor, or
  *   someone's home street or Tower floor (inc_teleportation.js 799-806); the
  *   target's game visits it as any visit does (neighbours-mp-feature: the
- *   site's pass, then the room) and lands beside you.
+ *   site's pass, then the room) and lands beside you. From inside someone
+ *   else's house the server sends them to its front door outside instead
+ *   (summon.go doorOf, inc_teleportation.js 663-665): they are asked to "the
+ *   front door of <owner>'s House", land where a player walking out of that
+ *   door stands, and knock or use a key as any visitor; you are told they
+ *   will arrive at the front door.
  * - Yes: your game pays (one of the day's two summonses, the energy, the
  *   cooldown) and says "<name> is on their way!" (648-655) with the Activity
  *   line "Summoning <name> to your location. -<cost> energy" (643); they
@@ -44,9 +49,9 @@ import {
   askedText,
   summonRefusal,
   summonVerb,
-} from '../summon-mp.js?v=42c1557d';
+} from '../summon-mp.js?v=7598f381';
 import { STREET_INDEX } from '../street-loader.js?v=18b181ad';
-import { homeStreetName, houseName, readHomeStreet } from '../neighbours-mp.js?v=a12300f9';
+import { homeStreetName, houseName, readHomeStreet } from '../neighbours-mp.js?v=e141e898';
 import { UNNAMED_PLAYER } from '../player-names.js?v=f9b78094';
 
 export const SUMMON_MP_FEATURE_ID = 'summon-mp';
@@ -65,6 +70,13 @@ function streetLabel(engine, tsid) {
   const s = STREET_INDEX.streets || {};
   const meta = s[tsid] || s[String(tsid).replace(/^G/, 'L')] || s[String(tsid).replace(/^L/, 'G')];
   return meta?.label || '';
+}
+
+/** The house a summons from inside someone else's house leads to the door of (summon.go door), or ''. */
+function doorHouse(door) {
+  if (!door || !(Number(door.owner) > 0)) return '';
+  const name = String(door.name || '');
+  return name ? houseName(name) : SUMMON_TEXT.someHouse;
 }
 
 function createSession(engine, client) {
@@ -169,7 +181,8 @@ function createSession(engine, client) {
     }
     client.send('summon_paid', { id, ok: true });
     engine.pushActivity?.(SUMMON_TEXT.summoning(name, out.energyCost || 0));
-    note(SUMMON_TEXT.onTheirWay(name), SUMMON_ON_WAY_SECONDS);
+    const house = doorHouse(msg?.door);
+    note(house ? SUMMON_TEXT.onTheirWayDoor(name, house) : SUMMON_TEXT.onTheirWay(name), SUMMON_ON_WAY_SECONDS);
   });
 
   // The target's side.
@@ -197,10 +210,13 @@ function createSession(engine, client) {
     // G668: the summoner's own home goes by its name; someone else's by the street index (none: their location).
     const home = readHomeStreet(street);
     const homePlace = home && home.owner === from ? (home.room === 'interior' ? houseName(name) : homeStreetName(name)) : '';
+    // From inside someone else's house: its front door (summon.go doorOf).
+    const house = doorHouse(msg.door);
+    const doorPlace = house ? SUMMON_TEXT.door(house) : '';
     if (asks.has(from)) engine.removePrompt?.(asks.get(from));
     const seconds = Number(msg.timeout) || SUMMON_ASK_SECONDS;
     const uid = engine.prompt?.({
-      text: askedText({ name, place: homePlace || streetLabel(engine, street), party: String(msg.party || '') }),
+      text: askedText({ name, place: doorPlace || homePlace || streetLabel(engine, street), party: String(msg.party || '') }),
       choices: [{ label: SUMMON_TEXT.yes, value: 'yes' }, { label: SUMMON_TEXT.no, value: 'no' }],
       iconButtons: true,
       timeout: seconds,
@@ -224,8 +240,12 @@ function createSession(engine, client) {
     const street = String(msg?.street || '');
     let went = false;
     const home = readHomeStreet(street);
+    const house = home?.room === 'street' ? doorHouse(msg?.door) : '';
     if (msg?.party === true) {
       went = engine.query?.('summonPartySpace', 'enter', engine) === true;
+    } else if (home && house) {
+      // Someone else's house: its front door on their home street, as walking out of it (inc_teleportation.js 663-665).
+      went = engine.query?.('neighboursSummoned', { ...home, door: true }, engine) === true;
     } else if (home) {
       // G668: a home street, house or Tower floor is a visit (neighbours-mp-feature): the site's pass, then the room.
       went = engine.query?.('neighboursSummoned', { ...home, at: msg?.x }, engine) === true;
@@ -236,7 +256,7 @@ function createSession(engine, client) {
       line(SUMMON_TEXT.oops, 3400);
       return;
     }
-    line(SUMMON_TEXT.summoned(name));
+    line(house ? SUMMON_TEXT.summonedDoor(name, house) : SUMMON_TEXT.summoned(name));
   });
   client.on('msg:summon_failed', (msg) => line(String(msg?.text || SUMMON_TEXT.oops), 3400));
 

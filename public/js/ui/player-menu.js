@@ -32,9 +32,9 @@ import { PROFILE_PAGE_VERB } from '../profiles.js?v=054ca723';
 import { IM_VERB_ID } from '../player-im.js?v=da51888c';
 import { BUDDY_VERBS } from '../buddies.js?v=cff7bf6e';
 import { BUDDY_DESTINATION_VERB } from '../buddy-list.js?v=b418f3f2';
-import { VISIT_VERB } from '../neighbours-mp.js?v=a12300f9';
+import { VISIT_VERB } from '../neighbours-mp.js?v=e141e898';
 import { FOLLOW_STOP_VERB } from '../follow-mp.js?v=ec738df5';
-import { SUMMON_VERB } from '../summon-mp.js?v=42c1557d';
+import { SUMMON_VERB } from '../summon-mp.js?v=7598f381';
 import { UNNAMED_PLAYER } from '../player-names.js?v=f9b78094';
 
 /** The feature that draws other players and owns their targets (features/party-feature.js PARTY_FEATURE_ID). */

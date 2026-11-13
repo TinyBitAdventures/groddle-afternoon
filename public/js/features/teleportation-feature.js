@@ -158,7 +158,7 @@ function jumpCtx(engine) {
  * Contraband, a Rook attack, and where they stand: a quest room or any place the game holds them
  * in, but a Party Space (main.js:3899), is "You can't summon people here." (776-797). A home
  * (799-806, G668): online, your own home and someone's home street or Tower floor take a
- * summons, someone else's house is "You can't summon them here." (neighbours-mp-feature
+ * summons, and from someone else's house the friend goes to its front door (neighbours-mp-feature
  * summonHomePlace); solo has no summons, and any home answers 'them' as before.
  */
 function summonCtx(engine, opts = {}) {

@@ -33,11 +33,11 @@ import {
   receivedLine,
   sharedHomeStreet,
   visitSceneTsid,
-} from '../public/js/neighbours-mp.js?v=a12300f9';
+} from '../public/js/neighbours-mp.js?v=e141e898';
 import { createMinnAccount } from '../public/js/minn-account.js?v=c15f0ecf';
-import { homesFeature, visitorHomeScene, visitorHomeState } from '../public/js/features/homes-feature.js?v=5b5a32b8';
-import { neighboursMpApi, neighboursMpFeature } from '../public/js/features/neighbours-mp-feature.js?v=10c26007';
-import { FEATURES } from '../public/js/features/index.js?v=32b3d9a8';
+import { homesFeature, visitorHomeScene, visitorHomeState } from '../public/js/features/homes-feature.js?v=5cfd2236';
+import { neighboursMpApi, neighboursMpFeature } from '../public/js/features/neighbours-mp-feature.js?v=2b6a40b4';
+import { FEATURES } from '../public/js/features/index.js?v=8453656d';
 import { YARD_STYLE_BY_KEY, streetLook, yardLook, yardStyleFor } from '../public/js/home-styles.js?v=13fe0aaa';
 import { serverPath, sitePath, skipWithoutServer, skipWithoutSite } from '../tools/repos.mjs';
 
@@ -366,6 +366,11 @@ describe('neighbours feature (js/features/neighbours-mp-feature.js)', () => {
     assert.ok(posted.slice(before).includes('GET homes/7'), 'the site is asked, as for any visit');
     assert.ok(events.includes('toast:You are blocked by that player.'), 'its refusal says why');
     assert.equal(client.take('home_pass').length, 0);
+    // To the front door of someone's house: the same visit, the site asked first.
+    const atDoor = posted.length;
+    assert.equal(neighboursMpFeature.neighboursSummoned({ owner: 7, room: 'street', door: true }, engine), true);
+    await wait(5);
+    assert.ok(posted.slice(atDoor).includes('GET homes/7'));
     assert.equal(neighboursMpFeature.summonHomePlace(engine), null, 'out of every home');
     home = { inHome: true, room: 'interior' };
     assert.equal(neighboursMpFeature.summonHomePlace(engine), '', 'your own house');
