@@ -84,3 +84,20 @@ describe('#270 the Map on a phone', () => {
     assert.match(css, /\n\[data-ui="modern"\] #map-panel\.ui-sheet-center \{\s*padding: calc\(var\(--hud-h\) \+ 6px\) max\(var\(--hud-inset\), var\(--inset-r, 0px\)\) 0/);
   });
 });
+
+// #281 (Friendly): on a phone the loading card's "Upgraded ~5 days 7 hours ago. Led by:" kept its one-line
+// width beside Home to:, which was left a thin column. Under 640 px the upgrade line goes under the list.
+describe('#281 the loading card on a narrow screen', () => {
+  const narrow = block('@media (max-width: 640px) {\n  .screen-transition-inner.st-card');
+
+  it('the details wrap: Home to: takes the row, the upgrade line goes under it at full width', () => {
+    assert.match(narrow, /\.st-details \{ flex-wrap: wrap; row-gap: var\(--sp-4\); \}/);
+    assert.match(narrow, /\.st-home \{ flex: 1 1 100%; \}/);
+    assert.match(narrow, /\.st-upgrade \{ margin-left: 0; flex: 1 1 0; min-width: 0; \}/);
+  });
+
+  it('a wide screen keeps the original side by side (LoadingLocationView: the upgrade on the right)', () => {
+    assert.match(css, /\n\.st-upgrade \{ margin-left: auto;/);
+    assert.match(css, /\n\.st-details \{\s*display: flex;\s*align-items: flex-start;/);
+  });
+});

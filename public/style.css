@@ -7164,6 +7164,11 @@ header.top-bar + .sub { display: none; }
   .screen-transition-inner.st-card { width: calc(100% - 32px); }
   .st-hubs, .st-progress { left: 16px; right: 16px; }
   .st-snap-wrap { height: 110px; }
+  /* #281 (an upright phone): "Upgraded ... ago. Led by:" took its one-line width beside Home to, which was
+     left a thin column. On a narrow card the upgrade line goes under the list, at the card's full width. */
+  .st-details { flex-wrap: wrap; row-gap: var(--sp-4); }
+  .st-home { flex: 1 1 100%; }
+  .st-upgrade { margin-left: 0; flex: 1 1 0; min-width: 0; }
 }
 
 /* —— Award / quest / level full-screen (AchievementView) —— */
