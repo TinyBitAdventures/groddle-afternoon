@@ -71,6 +71,10 @@ const TILE_HALF_H = 50;
 const EDGE = 8;
 /** #267: a window too narrow for the arc (an upright phone) draws compact tiles, 80 px wide (style.css .is-compact). */
 export const HUB_TILE_HALF_W_COMPACT = 40;
+/** A compact tile's half height: 54 px art, its label and padding (style.css .is-compact). */
+const TILE_HALF_H_COMPACT = 44;
+/** The flattest a flat arc gets (landscape audit #10). */
+export const HUB_FLAT_R_MIN = 40;
 
 const plain = (e) => Boolean(e) && !e.shiftKey && !e.ctrlKey && !e.altKey && !e.metaKey;
 
@@ -106,35 +110,49 @@ export function hubStep(e) {
  * #267 (an upright phone): where the arc 1.3 times as wide as it is tall cannot fit across, it is
  * drawn compact: smaller tiles, and only as wide as the window allows (still `r` tall), so no tile
  * runs off the side.
- * Returns { cx, cy, r, rx, compact, tiles: [{ x, y }], pill: { x, y } }.
+ * Landscape audit #10 (a phone held sideways, 667 x 335): where the arc cannot fit up and down between
+ * `top` and the pill, its top tiles ran over the top bar and the street's name. It is drawn flat:
+ * compact tiles, only as tall as the room above the centre allows, wider instead, with the tiles evenly
+ * spaced across (an even angle crowds a flat arc's ends).
+ * Returns { cx, cy, r, rx, compact, flat, tiles: [{ x, y }], pill: { x, y } }.
  */
 export function hubLayout({ head, feet, root, top = 56, bottom = null, right = 0, count = HUB_TILES.length } = {}) {
   const w = Math.max(0, Number(root?.w) || 0);
   const h = Math.max(0, Number(root?.h) || 0);
   const floor = Number.isFinite(bottom) ? Math.min(h, bottom) : h;
-  const r = Math.round(Math.max(HUB_RADIUS_MIN, Math.min(HUB_RADIUS, (h - 120) / 3)));
+  let r = Math.round(Math.max(HUB_RADIUS_MIN, Math.min(HUB_RADIUS, (h - 120) / 3)));
   const room = (w - Math.max(0, right)) / 2 - EDGE;
-  const compact = r * HUB_WIDEN + TILE_HALF_W > room;
-  const tileHalf = compact ? HUB_TILE_HALF_W_COMPACT : TILE_HALF_W;
-  const rx = compact ? Math.max(0, Math.min(r * HUB_WIDEN, room - tileHalf)) : r * HUB_WIDEN;
-  const halfW = rx + tileHalf;
+  let compact = r * HUB_WIDEN + TILE_HALF_W > room;
+  let tileHalf = compact ? HUB_TILE_HALF_W_COMPACT : TILE_HALF_W;
+  let rx = compact ? Math.max(0, Math.min(r * HUB_WIDEN, room - tileHalf)) : r * HUB_WIDEN;
   const hx = Number.isFinite(head?.x) ? head.x : w / 2;
   const hy = Number.isFinite(head?.y) ? head.y : h / 2;
   const fy = Number.isFinite(feet?.y) ? feet.y : hy + 150;
-  let cx = hx;
+  const centreX = (half) => {
+    const minX = EDGE + half;
+    const maxX = w - Math.max(0, right) - EDGE - half;
+    return maxX >= minX ? Math.min(maxX, Math.max(minX, hx)) : (minX + maxX) / 2;
+  };
+  let cx = centreX(rx + tileHalf);
   let cy = (hy + fy) / 2;
-  const minX = EDGE + halfW;
-  const maxX = w - Math.max(0, right) - EDGE - halfW;
-  cx = maxX >= minX ? Math.min(maxX, Math.max(minX, cx)) : (minX + maxX) / 2;
   cy = Math.max(top + r + TILE_HALF_H, cy);
   const pillY = Math.min(floor - 44, Math.max(cy + 24, fy + 16));
   cy = Math.min(cy, pillY - 24);
+  const flat = cy - r - TILE_HALF_H < top;
+  if (flat) {
+    compact = true;
+    tileHalf = HUB_TILE_HALF_W_COMPACT;
+    r = Math.round(Math.max(HUB_FLAT_R_MIN, Math.min(r, cy - top - TILE_HALF_H_COMPACT)));
+    rx = Math.max(0, Math.min(room - tileHalf, Math.max(r * HUB_WIDEN, (count - 1) * (tileHalf + 2))));
+    cx = centreX(rx + tileHalf);
+  }
   const tiles = [];
   for (let i = 0; i < count; i++) {
-    const a = count > 1 ? Math.PI - (i * Math.PI) / (count - 1) : Math.PI / 2;
-    tiles.push({ x: Math.round(cx + Math.cos(a) * rx), y: Math.round(cy - Math.sin(a) * r) });
+    const even = count > 1 ? 1 - (2 * i) / (count - 1) : 0;
+    const a = flat ? Math.acos(even) : count > 1 ? Math.PI - (i * Math.PI) / (count - 1) : Math.PI / 2;
+    tiles.push({ x: Math.round(cx + (flat ? -even : Math.cos(a)) * rx), y: Math.round(cy - Math.sin(a) * r) });
   }
-  return { cx: Math.round(cx), cy: Math.round(cy), r, rx: Math.round(rx), compact, tiles, pill: { x: Math.round(cx), y: Math.round(pillY) } };
+  return { cx: Math.round(cx), cy: Math.round(cy), r, rx: Math.round(rx), compact, flat, tiles, pill: { x: Math.round(cx), y: Math.round(pillY) } };
 }
 
 /** The pill's words for a balance of iMG. */
@@ -195,6 +213,12 @@ export function mountImaginationHub(doc, { root, actions = {}, tileState = () =>
     if (bar) {
       const b = bar.getBoundingClientRect();
       if (b.height) top = b.bottom - rr.top + 8;
+    }
+    // Landscape audit #10: the street's name, when it drops under the bar (a narrow window), is a floor too.
+    const plate = doc.getElementById('street-nameplate');
+    if (plate && !plate.hidden) {
+      const p = plate.getBoundingClientRect();
+      if (p.height && p.bottom - rr.top + 8 > top) top = p.bottom - rr.top + 8;
     }
     const pack = doc.getElementById('pack-bar');
     const pr = pack && !pack.hidden ? pack.getBoundingClientRect() : null;

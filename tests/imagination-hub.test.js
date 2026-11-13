@@ -20,7 +20,7 @@ import {
   hubStep,
   hubTileForKey,
   isHubCloseKey,
-} from '../public/js/ui/imagination-hub.js?v=169bc74b';
+} from '../public/js/ui/imagination-hub.js?v=6928c5b7';
 import { hotkeySections } from '../public/js/client-hotkeys.js?v=2922915e';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -121,6 +121,26 @@ describe('hub layout', () => {
     const lay = hubLayout({ head: { x: 640, y: 345 }, feet: { x: 640, y: 513 }, root, bottom: 740 });
     assert.equal(lay.compact, false);
     assert.equal(lay.rx, Math.round(HUB_RADIUS * 1.3));
+  });
+
+  // Landscape audit #10 (a phone held sideways, 667 x 335): the arc's top tiles ran over the top bar and
+  // the street's name under it. Where the arc cannot fit between them and the pill, it is drawn flat.
+  it('sideways on a phone the arc is flat, under the name, with the tiles evenly spaced across', () => {
+    const top = 104; // the name's foot (96) + 8
+    const side = hubLayout({ head: { x: 330, y: 160 }, feet: { x: 330, y: 250 }, root: { w: 659, h: 335 }, top, bottom: 271, right: 0 });
+    assert.equal(side.flat, true);
+    assert.equal(side.compact, true);
+    for (const t of side.tiles) {
+      assert.ok(t.y - 44 >= top, `tile top ${t.y - 44} under ${top}`);
+      assert.ok(t.x - HUB_TILE_HALF_W_COMPACT >= 8 && t.x + HUB_TILE_HALF_W_COMPACT <= 659 - 8, `x ${t.x}`);
+    }
+    const gaps = side.tiles.slice(1).map((t, i) => t.x - side.tiles[i].x);
+    assert.ok(Math.max(...gaps) - Math.min(...gaps) <= 1, `even gaps ${gaps}`);
+    assert.ok(Math.min(...gaps) >= HUB_TILE_HALF_W_COMPACT * 2, 'tiles never overlap across');
+    assert.ok(side.tiles[3].y < side.tiles[1].y && side.tiles[1].y < side.tiles[0].y, 'still an arc');
+    // A tall window keeps the round arc.
+    assert.equal(hubLayout({ head: { x: 640, y: 345 }, feet: { x: 640, y: 513 }, root, bottom: 740 }).flat, false);
+    assert.match(read('js/ui/imagination-hub.js'), /getElementById\('street-nameplate'\)/);
   });
 
   it('the compact tiles are the size the layout reserves', () => {
