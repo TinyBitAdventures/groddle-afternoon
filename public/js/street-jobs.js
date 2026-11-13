@@ -506,8 +506,15 @@ export function streetHasOpenProject(state, catalog, tsid, now = Date.now(), opt
 /* Contributing                                                         */
 /* ------------------------------------------------------------------ */
 
-function canContribute(state, catalog, jobId, now) {
-  const status = jobStatus(state, catalog, jobId, now);
+/**
+ * `opts` are the board's own jobStatus options (exemptFrom, force, open, sharedWorld), so the gate
+ * agrees with what the board shows. Reports #302 and #304 (2026-11-13): online, Yan Jaggery's board
+ * showed the featured project open (the #294 fix passed sharedWorld to the board) while every work row
+ * said "But! This street is already built.": this gate still read the street as built for anyone who
+ * had stood on it.
+ */
+function canContribute(state, catalog, jobId, now, opts = {}) {
+  const status = jobStatus(state, catalog, jobId, now, opts);
   if (status.status === 'active' || status.status === 'open') return { ok: true, status };
   const msg = {
     done: 'This project is finished.',
@@ -558,8 +565,8 @@ function contributionReq(state, catalog, jobId, match, rid = '') {
  * quest.js inc_item: put up to `count` of one item into the open requirement `rid` (the row the
  * player chose), or the first open requirement for it. Mutates `inv` (plain class -> count map).
  */
-export function contributeItems(state, catalog, jobId, classId, count, inv, now = Date.now(), rid = '') {
-  const gate = canContribute(state, catalog, jobId, now);
+export function contributeItems(state, catalog, jobId, classId, count, inv, now = Date.now(), rid = '', opts = {}) {
+  const gate = canContribute(state, catalog, jobId, now, opts);
   if (!gate.ok) return { ok: false, msg: gate.msg };
   const req = contributionReq(state, catalog, jobId, (r) => r.type === 'item' && r.classId === classId, rid);
   if (!req) return { ok: false, msg: 'Nothing here needs that right now.' };
@@ -576,8 +583,8 @@ export function contributeItems(state, catalog, jobId, classId, count, inv, now 
 }
 
 /** quest.js inc_currants, into the row `rid` when named (see contributionReq). Mutates pc.currants. */
-export function contributeCurrants(state, catalog, jobId, amount, pc, now = Date.now(), rid = '') {
-  const gate = canContribute(state, catalog, jobId, now);
+export function contributeCurrants(state, catalog, jobId, amount, pc, now = Date.now(), rid = '', opts = {}) {
+  const gate = canContribute(state, catalog, jobId, now, opts);
   if (!gate.ok) return { ok: false, msg: gate.msg };
   const req = contributionReq(state, catalog, jobId, (r) => r.type === 'currants', rid);
   if (!req) return { ok: false, msg: 'No currants are needed right now.' };
@@ -625,7 +632,7 @@ export function findWork(state, catalog, jobId, tool, except = '') {
  * items/include/jobs.js acceptJobWork 382-393 does.
  */
 export function workCheck(state, catalog, jobId, rid, ctx = {}, now = Date.now()) {
-  const gate = canContribute(state, catalog, jobId, now);
+  const gate = canContribute(state, catalog, jobId, now, ctx.jobOpts);
   if (!gate.ok) return { ok: false, msg: gate.msg };
   const req = phaseRequirements(state, catalog, jobId).find((r) => r.id === rid && r.type === 'work');
   if (!req) return { ok: false, msg: 'There is no such work.' };

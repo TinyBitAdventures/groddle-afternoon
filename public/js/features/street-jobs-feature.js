@@ -110,7 +110,7 @@ import {
   sharePercent,
   percentCompleteText,
   jobRewardsText,
-} from '../street-jobs.js?v=03e90891';
+} from '../street-jobs.js?v=28cb70d0';
 import { PAPERS_BADGE } from '../subway.js?v=44d1a09f';
 import { gainMetabolic, loseEnergy } from '../metabolics.js?v=1383e6fd';
 import { closuresInTheWay, holdNote, nearestReached, placeIndex, questHold, questStoryKey, reachableStreets } from '../quest-reach.js?v=e7b68f54';
@@ -137,7 +137,7 @@ import {
   sharedSlice,
   topLine,
   leaderboard,
-} from '../street-jobs-mp.js?v=d0c691a0';
+} from '../street-jobs-mp.js?v=7bbac683';
 import { grantMoodXp } from '../mood-xp.js?v=22648ec0';
 import { createMinnAccount } from '../minn-account.js?v=c15f0ecf';
 import { normalizeGroups } from '../groups.js?v=c9635d96';
@@ -149,8 +149,8 @@ import { itemZ } from '../item-bands.js?v=e98b10bc';
 import { SIGN_ARMS, routeGraph } from '../map-routes.js?v=c7e7dc80';
 import { TELEPORTERS } from '../hidden-floors.js?v=732a2610';
 import { WINTRY_PORTAL_TELEPORTERS } from '../wintry-portal.js?v=1437deda';
-import { PROJECTS_TEXT, contributedJobs, mineTotal, projectEntry, projectList } from '../projects-tracker.js?v=634a89af';
-import { PROJECTS_PANEL_ID, buildProjectsPanel, renderProjects } from '../ui/projects-sheet.js?v=baa2ea93';
+import { PROJECTS_TEXT, contributedJobs, mineTotal, projectEntry, projectList } from '../projects-tracker.js?v=56ccc824';
+import { PROJECTS_PANEL_ID, buildProjectsPanel, renderProjects } from '../ui/projects-sheet.js?v=bdd10ac0';
 import { SIDE_SHEET_IDS } from '../ui/panel-shell.js?v=06a0d3fe';
 import { trophyGotText } from '../home-trophies.js?v=2020b29b';
 import { FEATURED_TEXT, featuredChanged, featuredFromServer, featuredNeedsLine } from '../featured-project.js?v=4210bead';
@@ -1135,6 +1135,7 @@ function arrivalFor(job) {
 
 function workCtx(engine) {
   return {
+    jobOpts: opts(), // #302/#304: the work gate reads the street as the board does
     inv: engine.inv,
     pc: engine.pc,
     learned: engine.learnedSkills,
@@ -1876,7 +1877,7 @@ function loadHallGroups(engine) {
 /** #290: `rid` is the row the player chose (street-jobs.js contributionReq); '' means the first open one. */
 function doGive(engine, jobId, classId, n, rid = '') {
   if (shared(jobId)) return mpGive(engine, jobId, { classId, n, rid });
-  const res = contributeItems(state, catalog, jobId, classId, n, engine.inv, Date.now(), rid);
+  const res = contributeItems(state, catalog, jobId, classId, n, engine.inv, Date.now(), rid, opts());
   if (!res.ok) return engine.toast(res.msg), false;
   engine.pushActivity(`You contributed ${res.amount} ${itemLabel(classId, res.amount)}.`);
   engine.playSound('ITEM_GIVE', { volume: 0.55 });
@@ -1890,7 +1891,7 @@ function doGive(engine, jobId, classId, n, rid = '') {
 
 function doCurrants(engine, jobId, n, rid = '') {
   if (shared(jobId)) return mpGive(engine, jobId, { currants: n, rid });
-  const res = contributeCurrants(state, catalog, jobId, n, engine.pc, Date.now(), rid);
+  const res = contributeCurrants(state, catalog, jobId, n, engine.pc, Date.now(), rid, opts());
   if (!res.ok) return engine.toast(res.msg), false;
   engine.pushActivity(`You contributed ${res.amount.toLocaleString()} currants.`);
   engine.updateHud();

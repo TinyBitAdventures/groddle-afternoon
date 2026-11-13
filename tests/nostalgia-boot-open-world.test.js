@@ -18,7 +18,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-import { closedStreets, normalizeStreetJobState } from '../public/js/street-jobs.js?v=03e90891';
+import { closedStreets, normalizeStreetJobState } from '../public/js/street-jobs.js?v=28cb70d0';
 import { nearestReached, reachableStreets } from '../public/js/quest-reach.js?v=e7b68f54';
 import { routeGraph } from '../public/js/map-routes.js?v=c7e7dc80';
 import { openBootTarget, pickBootTarget } from '../public/js/ancestral-nostalgia.js?v=3d97122d';

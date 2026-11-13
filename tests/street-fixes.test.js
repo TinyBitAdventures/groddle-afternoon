@@ -10,7 +10,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { STREET_FIXES, applyStreetFixes, streetFixFor } from '../public/js/street-fixes.js?v=536481c5';
 import { STREET_FIXES_FEATURE_ID, streetFixesFeature } from '../public/js/features/street-fixes-feature.js?v=39e41b46';
-import { FEATURES } from '../public/js/features/index.js?v=a6398a77';
+import { FEATURES } from '../public/js/features/index.js?v=150965c2';
 
 const pub = join(dirname(fileURLToPath(import.meta.url)), '..', 'public');
 const street = (tsid) => JSON.parse(readFileSync(join(pub, 'assets/streets', `${tsid}.json`), 'utf8'));

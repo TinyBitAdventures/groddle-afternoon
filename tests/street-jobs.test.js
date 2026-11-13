@@ -39,8 +39,8 @@ import {
   plainText,
   TROPHY_PIECES,
   planStreetTrophies,
-} from '../public/js/street-jobs.js?v=03e90891';
-import { streetJobsFeature } from '../public/js/features/street-jobs-feature.js?v=9559c37f';
+} from '../public/js/street-jobs.js?v=28cb70d0';
+import { streetJobsFeature } from '../public/js/features/street-jobs-feature.js?v=175527e8';
 import { createAchievementState, applyAchievementProgress } from '../public/js/achievements.js?v=e4e5edd0';
 import { applyRewards } from '../public/js/quests.js?v=40c71a37';
 import { loadContentCatalogsFromDir, resetContentCatalogs } from '../public/js/content-catalogs.js?v=10b118dd';
@@ -235,6 +235,32 @@ describe('street jobs rules', () => {
     assert.equal(jobStatus(done, catalog, '262', 10 ** 13, { sharedWorld: true }).status, 'done');
     const other = normalizeStreetJobState({});
     assert.equal(closedStreets(other, catalog, { sharedWorld: true }).includes(YAN), true);
+  });
+
+  it('#302/#304: online, the work and give gates read Yan Jaggery as the board does', () => {
+    const YAN = 'GCR29V8S4Q12IF4';
+    const state = normalizeStreetJobState({ grandfathered: [YAN], jobs: { 262: { phase: 2, startedAt: 1, got: {} } } });
+    const work = phaseRequirements(state, catalog, '262').find((r) => r.type === 'work');
+    assert.ok(work, 'phase 3 of Yan Jaggery has a work row');
+    const ctx = { inv: {}, pc: { energy: 500, currants: 0 }, learned: [] };
+    // Solo (no board options): the street you stood on is built, as before.
+    assert.match(workCheck(state, catalog, '262', work.id, ctx, 10 ** 13).msg, /already built/);
+    // Online: the board's options reach the gate, so the reason is the work's own (tool, skill), never "built".
+    const online = workCheck(state, catalog, '262', work.id, { ...ctx, jobOpts: { sharedWorld: true } }, 10 ** 13);
+    assert.doesNotMatch(String(online.msg || ''), /already built/);
+    const item = phaseRequirements(state, catalog, '262').find((r) => r.type === 'item' && r.open);
+    if (item) {
+      const inv = { [item.classId]: 1 };
+      assert.match(contributeItems(state, catalog, '262', item.classId, 1, inv, 10 ** 13).msg, /already built/);
+      assert.equal(contributeItems(state, catalog, '262', item.classId, 1, inv, 10 ** 13, '', { sharedWorld: true }).ok, true);
+    }
+  });
+
+  it('#302/#304: the board hands its own options to the work gate and to giving', () => {
+    const src = readFileSync(new URL('../public/js/features/street-jobs-feature.js', import.meta.url), 'utf8');
+    assert.match(src, /function workCtx\(engine\) \{\s*return \{\s*jobOpts: opts\(\)/);
+    assert.match(src, /contributeItems\(state, catalog, jobId, classId, n, engine\.inv, Date\.now\(\), rid, opts\(\)\)/);
+    assert.match(src, /contributeCurrants\(state, catalog, jobId, n, engine\.pc, Date\.now\(\), rid, opts\(\)\)/);
   });
 
   it('runs work units with source energy and wear, and stops at the energy floor', () => {

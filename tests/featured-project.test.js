@@ -13,11 +13,11 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { FEATURED_TEXT, featuredChanged, featuredFromServer, featuredLabel, featuredPillText, featuredStatus, featuredWhere } from '../public/js/featured-project.js?v=4210bead';
 import { FEATURED_MENU_ID, FEATURED_PILL_ID, FEATURED_ROW_ID, renderFeaturedLine, renderFeaturedRow } from '../public/js/ui/featured-project.js?v=46bffa44';
-import { buildProjectsPanel, renderProjects } from '../public/js/ui/projects-sheet.js?v=baa2ea93';
+import { buildProjectsPanel, renderProjects } from '../public/js/ui/projects-sheet.js?v=bdd10ac0';
 import { jobIndicatorView } from '../public/js/job-indicator.js?v=05498227';
-import { normalizeStreetJobState } from '../public/js/street-jobs.js?v=03e90891';
-import { rowFromServer } from '../public/js/street-jobs-mp.js?v=d0c691a0';
-import { PROJECTS_TEXT, projectEntry } from '../public/js/projects-tracker.js?v=634a89af';
+import { normalizeStreetJobState } from '../public/js/street-jobs.js?v=28cb70d0';
+import { rowFromServer } from '../public/js/street-jobs-mp.js?v=7bbac683';
+import { PROJECTS_TEXT, projectEntry } from '../public/js/projects-tracker.js?v=56ccc824';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const read = (p) => readFileSync(join(root, p), 'utf8');
