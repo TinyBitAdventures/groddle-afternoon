@@ -54,8 +54,13 @@ describe('home confirms have two buttons and are not quest offers', () => {
   it('homes-feature asks no question through offerQuestDialogue', () => {
     assert.equal((src.match(/offerQuestDialogue/g) || []).length, 0);
     assert.match(src, /function confirmDialog\(engine, \{ title, kicker, beats, yes, no, onYes \}\) \{\n  engine\.scriptedDialogue\(\{[\s\S]*?cancelable: true,/);
-    // The four questions: pour, style, the placement warning, un-expand.
-    assert.equal((src.match(/^\s+confirmDialog\(engine, \{/gm) || []).length, 4);
+    // The five questions: pour, style, the placement warning, un-expand, and a proto's remove
+    // (proto_crop_garden_large.js 66-79: "Please Confirm!", Yes / Nevermind).
+    assert.equal((src.match(/^\s+confirmDialog\(engine, \{/gm) || []).length, 5);
+    assert.match(src, /title: 'Please Confirm!',[\s\S]{0,80}text: `Are you really sure you want to remove this \$\{label\}\?`, response: 'Yes' \}\],\n\s+yes: 'Yes',\n\s+no: 'Nevermind',/);
+    assert.match(src, /onClick: \(\) => confirmRemove\(engine\),/);
+    // A carried cultivation or piece goes down on the main button only (CultCarryUI.as 38, 49-50).
+    assert.match(src, /if \(\(placing \|\| stamping\) && e\.pointerType === 'mouse' && \(e\.button !== 0 \|\| e\.ctrlKey\)\) return;/);
   });
 
   it('the placement warning uses the client confirm wording', { skip: !existsSync(CLIENT) && 'glitch-client not beside the spike' }, () => {

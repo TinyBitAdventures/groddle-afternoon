@@ -4491,7 +4491,7 @@ function cultivationPop(engine) {
       disabled: item.endClass === TOWER_CHASSIS || running,
       title: item.endClass === TOWER_CHASSIS ? 'A finished Tower stays.' : running ? 'Pour some Wine of the Dead to cancel the project first.' : '',
       attrs: { 'data-home-action': 'remove' },
-      onClick: () => removeSelected(engine),
+      onClick: () => confirmRemove(engine),
     },
   ];
   if (item.depleted) {
@@ -4820,6 +4820,32 @@ function growYard(engine, side) {
   const shift = back || side === 'left' ? 150 : 0;
   engine.refreshHomeScene?.({ shift });
   return result;
+}
+
+/**
+ * verbs.remove on a proto: "Please Confirm!" / "Are you really sure you want to remove this
+ * <name>?" with Yes and Nevermind (items/proto_crop_garden_large.js 66-79, every proto_*.js),
+ * then the removal. Nothing comes back for it, so it is never one click (Live Help 2026-11-12).
+ */
+function confirmRemove(engine) {
+  if (selected?.kind !== 'cultivation') return false;
+  const id = selected.id;
+  const item = activeCult().items.find((row) => row.id === id);
+  if (!item) return false;
+  const label = cultivationDef(item.protoClass)?.label || 'thing';
+  confirmDialog(engine, {
+    title: 'Please Confirm!',
+    kicker: label,
+    beats: [{ text: `Are you really sure you want to remove this ${label}?`, response: 'Yes' }],
+    yes: 'Yes',
+    no: 'Nevermind',
+    onYes: () => {
+      if (activeCult().items.some((row) => row.id === id)) selected = { kind: 'cultivation', id };
+      removeSelected(engine);
+    },
+  });
+  engine.setData('homeRemove', `confirm:${id}`);
+  return true;
 }
 
 function removeSelected(engine) {
@@ -6080,6 +6106,10 @@ function bindPointer(engine) {
     if (!mode || !scene || !isCanvas(e)) return;
     e.stopPropagation();
     e.preventDefault();
+    // Only the main button sets a carried thing down: the client placed with the carry UI's button
+    // or Enter (CultCarryUI.as 38, 49-50; CultManager.as 1073-1085) and had no right-click there,
+    // so a right-click on the way no longer buys a garden (Live Help 2026-11-12).
+    if ((placing || stamping) && e.pointerType === 'mouse' && (e.button !== 0 || e.ctrlKey)) return;
     const p = worldPoint(engine, e);
     pointer = { ...p, inside: true };
     if (placing) {
