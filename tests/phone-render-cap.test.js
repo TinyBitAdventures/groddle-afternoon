@@ -110,7 +110,8 @@ describe('game.js', () => {
 
   it('passes it to every renderResolution call', () => {
     const calls = [...game.matchAll(/renderResolution\(([^;]*?)\)[,;]/g)].map((m) => m[1]);
-    assert.ok(calls.length >= 3, `found ${calls.length} calls`);
+    // stageResolution (the phone zoom budget, ccd6fff09b) holds the renderer resizes, so two calls remain.
+    assert.ok(calls.length >= 2, `found ${calls.length} calls`);
     for (const args of calls) assert.match(args, /, RENDER_CAP$/, `renderResolution(${args})`);
   });
 
