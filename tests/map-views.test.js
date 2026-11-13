@@ -7,6 +7,7 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
+import { createHash } from 'node:crypto';
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -16,15 +17,17 @@ import { hubColours } from '../tools/map-views/build.mjs';
 import { STATIONS } from '../public/js/subway.js?v=44d1a09f';
 import {
   MAP_VIEW_TITLES,
+  SUBWAY_PAPER,
   cubicAt,
   mapViewSubtitle,
   nearestStation,
   renderSubwayMapSvg,
   renderWorldMapSvg,
+  subwayPaper,
   subwayPoints,
   subwaySegments,
   worldRegionList,
-} from '../public/js/map-views.js?v=67e2a94a';
+} from '../public/js/map-views.js?v=da2f063e';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const read = (p) => readFileSync(join(root, p), 'utf8');
@@ -135,6 +138,80 @@ describe('subway map (map_pos, MapTransit.as)', () => {
     const ang = (svg) => Number(svg.match(/class="subway-arrow" d="[^"]*" transform="translate\([^)]*\) rotate\(([-\d.]+)\)/)[1]);
     assert.equal(Math.round(Math.abs(ang(blue) - ang(red))), 180);
     assert.doesNotMatch(renderSubwayMapSvg({ here: null }), /subway-you/);
+  });
+
+  it('draws the recreated paper over the sage and under the track, 760 x 460, never in the way of a click', () => {
+    const svg = renderSubwayMapSvg({ here: null, paper: { href: SUBWAY_PAPER.x1, hi: SUBWAY_PAPER.x2, wait: false } });
+    const img = svg.match(/<image class="subway-paper-art map-bg-soft"[^>]*\/>/)?.[0];
+    assert.ok(img, 'the paper is drawn');
+    assert.match(img, /href="assets\/maps\/art\/subway\/subway-map-paper\.webp" data-hi="assets\/maps\/art\/subway\/subway-map-paper@2x\.webp" x="0" y="0" width="760" height="460" preserveAspectRatio="none" pointer-events="none"/);
+    // The sage rect stays under it (its colour while it loads), the track and every name over it.
+    assert.ok(svg.indexOf('class="subway-paper"') < svg.indexOf(img));
+    assert.ok(svg.indexOf(img) < svg.indexOf('class="subway-track"'));
+    // Not ready: it starts hidden and fades in (js/map-bg-preload.js watchMapBg); a Retina file has no twin to swap in.
+    const waiting = renderSubwayMapSvg({ paper: { href: SUBWAY_PAPER.x2, hi: SUBWAY_PAPER.x2, wait: true } });
+    assert.match(waiting, /<image class="subway-paper-art map-bg-soft is-waiting" href="assets\/maps\/art\/subway\/subway-map-paper@2x\.webp" x="0"/);
+    // The paper is keyed like the game's other art (js/data-urls.js does not see an SVG href in a string).
+    const had = globalThis.groddleDataUrl;
+    globalThis.groddleDataUrl = (u) => `${u}?v=k3`;
+    try {
+      assert.match(renderSubwayMapSvg({ paper: subwayPaper({ dpr: 1 }) }), /href="assets\/maps\/art\/subway\/subway-map-paper\.webp\?v=k3" data-hi="[^"]*@2x\.webp\?v=k3"/);
+    } finally {
+      if (had) globalThis.groddleDataUrl = had;
+      else delete globalThis.groddleDataUrl;
+    }
+    // Its default: the Retina file on a Retina screen, as js/map-graph.js picks a region's painting.
+    assert.deepEqual(subwayPaper({ dpr: 1 }), { href: SUBWAY_PAPER.x1, hi: SUBWAY_PAPER.x2, wait: false });
+    assert.equal(subwayPaper({ dpr: 2 }).href, SUBWAY_PAPER.x2);
+    assert.doesNotMatch(renderSubwayMapSvg({ paper: null }), /subway-paper-art/);
+  });
+
+  it('the paper is the file its provenance names: sizes, bytes, sha256, CC0 1.0 with its maker, prompt and inputs', () => {
+    const prov = JSON.parse(read('tools/provenance/subway-map-paper.json'));
+    const policy = JSON.parse(read('tools/builder/licence-policy.json'));
+    assert.equal(prov.format, 'groddle-subway-map-paper/1');
+    assert.equal(prov.replaces.name, 'subway_map_bg_59215.jpg');
+    assert.match(read('public/js/subway-line.js'), /map_background_url: "http:\/\/c1\.glitch\.bz\/img\/maps\/subway_map_bg_59215\.jpg"/);
+    const sha = (buf) => createHash('sha256').update(buf).digest('hex');
+    const webpSize = (buf) => {
+      assert.equal(buf.toString('ascii', 8, 12), 'WEBP');
+      const chunk = buf.toString('ascii', 12, 16);
+      if (chunk === 'VP8 ') return [buf.readUInt16LE(26) & 0x3fff, buf.readUInt16LE(28) & 0x3fff];
+      if (chunk === 'VP8X') return [buf.readUIntLE(24, 3) + 1, buf.readUIntLE(27, 3) + 1];
+      const b = buf.readUInt32LE(21);
+      return [(b & 0x3fff) + 1, ((b >> 14) & 0x3fff) + 1];
+    };
+    for (const [d, size] of [['x1', [760, 460]], ['x2', [1520, 920]]]) {
+      const r = prov[d];
+      assert.equal(r.file, SUBWAY_PAPER[d], `${d}: the game draws the file the provenance names`);
+      assert.deepEqual([r.w, r.h], size);
+      const buf = readFileSync(join(root, 'public', r.file));
+      assert.deepEqual(webpSize(buf), size, r.file);
+      assert.equal(buf.length, r.bytes, r.file);
+      assert.equal(sha(buf), r.sha256, `${r.file} is the file its provenance names`);
+      assert.ok(buf.length < 120 * 1024, `${r.file} stays light`);
+    }
+    assert.deepEqual([SUBWAY_PAPER.w, SUBWAY_PAPER.h], [760, 460]);
+    assert.equal(prov.licence, 'ai-generated');
+    for (const k of policy.licences[prov.licence].requires.filter((k) => k !== 'sha256')) assert.ok(prov[k], k);
+    for (const k of ['model', 'made', 'madeBy', 'inputs', 'source']) assert.ok(prov[k], k);
+    assert.match(prov.tool, /GPT Image 2\.6 Sunburst in T3 Chat canvas/);
+    assert.match(prov.madeBy, /Grok Bot, for Austin Ginder, who directed it/);
+    assert.equal(prov.made, '2026-11-13');
+    assert.ok(prov.prompt.length > 1500 && /^Recreate the paper background of the Subway System map/.test(prov.prompt), 'the prompt in full');
+    assert.equal(prov.inputs.length, 5);
+    for (const i of prov.inputs) {
+      assert.ok(i.file && i.what && i.source, `input ${i.n}`);
+      assert.match(i.sha256, /^[0-9a-f]{64}$/, `input ${i.n}`);
+    }
+    // 1 and 2 are our own layout drawings; 3 to 5 Tiny Speck's CC0 art, by source file.
+    for (const i of prov.inputs.slice(0, 2)) assert.match(i.source, /^our own layout drawing/);
+    for (const i of prov.inputs.slice(2)) assert.match(i.source, /^Tiny Speck, CC0: /);
+    assert.match(prov.inputs[3].source, /world_map\.fla/);
+    // The 2012 picture of the window is named as reference only, never as an input.
+    for (const ref of prov.references) assert.match(ref, /reference only/);
+    assert.match(prov.source.warp, /warp\.mjs/);
+    assert.match(read('public/assets/maps/SOURCE.txt'), /Subway map paper \(G471, 2026-11-13\)/);
   });
 
   it('the quiet line says where you are and how to use it', () => {

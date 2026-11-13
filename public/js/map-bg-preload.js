@@ -20,8 +20,14 @@
  * picture) in its place, scaled up and softened (prepareMapBg sets view.bgWait for renderHubMapSvg). The
  * painting was made from that thumb and frames the same view (tools/map-backgrounds/build.mjs), so when
  * it arrives it fades in over it with nothing moving (watchMapBg; style.css .map-bg-soft).
+ *
+ * The Subway view's paper (2026-11-13, js/map-views.js SUBWAY_PAPER) is fetched the same way, so the
+ * view never opens on the bare sage: when the Map opens, and when the pointer or keyboard focus comes
+ * to its Subway button (game.js warmSubwayPaper, loader.warm). It is one picture, held apart from the
+ * regions' cap. Opened before it arrives (the Subway Map sign's view), it fades in over the sage.
  */
 import { HUB_MAP_BACKGROUNDS } from './hub-map-backgrounds.js?v=2b2d6468';
+import { SUBWAY_PAPER, subwayPaper } from './map-views.js?v=da2f063e';
 
 /** How many regions' paintings are held at once (the latest previews, your own region among them). */
 export const MAP_BG_PRELOAD_CAP = 4;
@@ -71,11 +77,26 @@ export function prepareMapBg(view, { loader = null, dpr = 1, fitScale = 0, keyed
   return view;
 }
 
+/** The Subway view's paper at the size the Map draws on this screen, unkeyed (mapBgWantsHi, as a region's painting). */
+export function subwayPaperFile({ dpr = 1, fitScale = 0, paper = SUBWAY_PAPER } = {}) {
+  return mapBgWantsHi(dpr, fitScale) ? paper.x2 : paper.x1;
+}
+
+/**
+ * Before the Subway view is drawn (game.js showMapView): js/map-views.js renderSubwayMapSvg's `paper`,
+ * the size this screen draws, waiting (hidden, to fade in) unless it is known to be loaded.
+ */
+export function prepareSubwayPaper({ loader = null, dpr = 1, fitScale = 0, keyed = keyedArt, paper = SUBWAY_PAPER } = {}) {
+  const href = subwayPaperFile({ dpr, fitScale, paper });
+  return { ...subwayPaper({ dpr, paper }), href, wait: !loader?.ready(keyed(href)) };
+}
+
 /**
  * The paintings fetched ahead of a click. files(hubId) -> { url, thumb } (unkeyed; mapBgFiles);
  * onPreload(hubId) runs each time a region is fetched (game.js warms its map data too).
  *   preload(hubId)                 fetch now (your region, a station's region)
  *   preview(hubId, { now })        a card showed: fetch after hoverMs, or now (a tap); '' puts a pending one away
+ *   warm(file)                     fetch one picture outside the regions (the Subway paper), never let go; its keyed URL
  *   ready(url) / markReady(url)    a keyed painting URL known to have loaded (preloaded or drawn by the Map)
  *   held() / pending()             the hub ids held, oldest first, and the one waiting on the pointer (QA, tests)
  */
@@ -145,6 +166,18 @@ export function createMapBgPreloader({
     return e;
   }
 
+  /** keyed URL -> its Image while it downloads (held, so it is not collected half way). */
+  const warming = new Map();
+  function warm(file) {
+    const url = file ? keyed(file) : '';
+    if (!url || loaded.has(url) || warming.has(url)) return url;
+    warming.set(url, fetchImage(url, (ok) => {
+      warming.delete(url);
+      if (ok) loaded.add(url);
+    }));
+    return url;
+  }
+
   function preview(hubId, { now = false } = {}) {
     if (waiting) {
       timers.clearTimeout(waiting.timer);
@@ -167,6 +200,8 @@ export function createMapBgPreloader({
   return {
     preload,
     preview,
+    warm,
+    warming: () => [...warming.keys()],
     ready: (url) => loaded.has(String(url || '')),
     markReady: (url) => {
       if (url) loaded.add(String(url));
@@ -183,7 +218,8 @@ export function createMapBgPreloader({
  * loaded either way. A failed painting leaves the thumb in its place. QA: the map canvas's data mapBg,
  * "cached" (known loaded: drawn at once, no thumb), "wait" (on the thumb), then "ready" (it arrived
  * and faded in), "late" (shown after MAP_BG_GIVE_UP_MS without a load event) or "failed" (the thumb
- * stays; a later load still shows it); none on a region without a painting.
+ * stays; a later load still shows it); none on a region without a painting. The Subway view's paper is
+ * watched the same way (image.map-bg-soft, no thumb: the sage stays under it).
  */
 export function watchMapBg(canvas, { loader = null, timers = globalThis, fadeMs = MAP_BG_FADE_MS, giveUpMs = MAP_BG_GIVE_UP_MS } = {}) {
   const img = canvas?.querySelector?.('image.map-bg-soft');

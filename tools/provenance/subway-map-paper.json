@@ -1,0 +1,93 @@
+{
+  "format": "groddle-subway-map-paper/1",
+  "policy": "The Subway System map’s paper (register G471), recreated for Groddle Afternoon: Tiny Speck’s subway_map_bg_59215.jpg (760 x 460, GSJS config_prod.js 668, js/subway-line.js map_background_url) was never archived, so a new picture made from our own layout drawings and Tiny Speck’s CC0 art stands in for it, dedicated CC0 1.0 with its provenance (tools/builder/licence-policy.json, \"ai-generated\"). js/map-views.js renderSubwayMapSvg draws it under the line; tests/map-views.test.js checks the files against this record.",
+  "replaces": {
+    "name": "subway_map_bg_59215.jpg",
+    "w": 760,
+    "h": 460,
+    "state": "lost: not on Wayback, no mirror (research/map-art/brief.md)",
+    "source": "GSJS config_prod.js 668 (transit_instances subway_1 map_background_url)"
+  },
+  "x1": {
+    "file": "assets/maps/art/subway/subway-map-paper.webp",
+    "w": 760,
+    "h": 460,
+    "bytes": 14998,
+    "sha256": "af1853c6b0486bb6f38bdd9f15a7e65505f871826cc69c1c451d64acda22c01c"
+  },
+  "x2": {
+    "file": "assets/maps/art/subway/subway-map-paper@2x.webp",
+    "w": 1520,
+    "h": 920,
+    "bytes": 65366,
+    "sha256": "81791b6f71917ba223f594bab666bdebb56fe65e3fbdc9bb0fff642e6bd7982b"
+  },
+  "licence": "ai-generated",
+  "author": "Austin Ginder (directed it)",
+  "madeBy": "Grok Bot, for Austin Ginder, who directed it",
+  "tool": "GPT Image 2.6 Sunburst in T3 Chat canvas",
+  "model": "GPT Image 2.6 Sunburst",
+  "made": "2026-11-13",
+  "settings": "16:9, High 2K, opaque, 1 image (research/map-art/drop/model.txt)",
+  "prompt": "Recreate the paper background of the Subway System map from a whimsical 2D game (Glitch, by Tiny Speck, 2012). The\noriginal picture is lost; attachments 1 and 2 show exactly how it was laid out.\n\nSize 1520 x 920 pixels, landscape, opaque. NO text, NO letters, NO numbers, NO lines of track, NO dots, NO arrows, NO\nicons: the game draws the subway line, the stations and every name on top of this picture.\n\nWhat to paint:\n- A sheet of pale sage green paper (about #dce7d6) filling the whole picture, with a fine paper grain and a soft,\n  slightly blotchy hand-painted wash, a little lighter in places.\n- Twelve cream paper sheets (about #f9fae9) laid on it EXACTLY where attachment 1 puts them: same positions, same sizes,\n  same arrangement (a row of three at the top middle with two under it, one on its own at the left, a block of three in\n  the middle, and a block of three at the bottom). They look like plain cream paper notes laid flat: straight edges, very\n  slightly soft, each with a hairline edge a touch darker than itself (about #e8e6d2) where it meets its neighbour, so\n  you can tell the sheets apart. Keep them flat and rectangular, not torn, not curled, no tape drawn.\n- A few very faint fold creases across the whole map, as if it had been folded in thirds: two light vertical creases and\n  one light horizontal crease, barely visible, a slightly lighter line with a soft shadow on one side.\n- Very low contrast overall: dark grey italic names and a thin red or blue line (attachment 2 shows them in place) must\n  read easily on every part of it, the cream sheets included.\n\nThe attachments (1 and 2 are our layout drawings; 3, 4 and 5 are Tiny Speck's own art, CC0):\n1. where the twelve cream sheets go. Follow it exactly.\n2. the same sheets with the subway line and names drawn over them, to show how it must read in the game. Do NOT paint\n   the line, the circles or any of the names.\n3. the in-world \"Subway Map\" sign: its little map is this paper. Match its pale green, its cream sheets, its gentle look.\n4. the world map charts from the same game, side by side: copy their paper grain and soft hand-painted wash (not their\n   dark colours).\n5. the station signs: the game's palette and friendliness, for mood only.\n\nFlat, calm, hand-made, no photographic texture, no vignette, no frame or border, no drop shadows, no 3D, no perspective.",
+  "promptNote": "The prompt exactly as given to the model: research/map-art/prompts/01-subway-map-paper.txt (outside git), with the five attachments below in this order.",
+  "inputs": [
+    {
+      "n": 1,
+      "file": "1-sheet-placement-1520x920.png",
+      "sha256": "19af2ab2621734b2a8b001f14f1d2198b265e88c42bef5140273acb51b0bf605",
+      "what": "where the twelve cream sheets go, as plain rectangles on the sage at 2x (research/map-art/patch-sheets.json)",
+      "source": "our own layout drawing: the sheets’ positions measured from a November 2012 picture of the original window, positions only; that picture was never attached or copied"
+    },
+    {
+      "n": 2,
+      "file": "2-sheets-under-line-and-names-1520x920.png",
+      "sha256": "0967bb2b0b6e4e5d8d7204ab00bd766553185d09708a25c634d7826ac232ce1f",
+      "what": "input 1 with the game’s own Red Line, the 12 stations and their names drawn over it, to show how it must read (the prompt says to paint none of them)",
+      "source": "our own layout drawing: station positions from Tiny Speck’s CC0 GSJS config_prod.js map_pos (js/subway-line.js), drawn by js/map-views.js"
+    },
+    {
+      "n": 3,
+      "file": "3-cc0-subway-map-sign.png",
+      "sha256": "c555cbb2763ebe4e45978819877eb5e1f2da8f111621ab5f7968f9b7d151cec1",
+      "what": "the in-world Subway Map sign, whose little map shows this paper: its palette and cream tiles",
+      "source": "Tiny Speck, CC0: glitch-items misc/subway_map (subway_map.swf, item art)"
+    },
+    {
+      "n": 4,
+      "file": "4-cc0-world-map-charts-1540x460.jpg",
+      "sha256": "7ebfc86045c0beed2eb7621af26b2cd231445ceef4da56da472d6e87ed20118a",
+      "what": "the world map’s sketched and painted charts side by side: the paper grain and wash, not the colours",
+      "source": "Tiny Speck, CC0: glitch-overlays/world_map.fla zz_background/world_map_locked and World_Map_all_unlocked2.jpg (byte for byte public/assets/maps/art/world/world_map_locked.jpg and world_map_unlocked.jpg)"
+    },
+    {
+      "n": 5,
+      "file": "5-cc0-station-signs.png",
+      "sha256": "6c97db6936884f4295c6e618540405ab5b270975fd5b7fae6095309c5a972d1e",
+      "what": "the 12 station signs: the palette and mood only",
+      "source": "Tiny Speck, CC0: glitch-locations subway1.swf (the station name signs, tools/build-subway-art.py)"
+    }
+  ],
+  "references": [
+    "The Tribute Blog’s capture of the original Subway System window (post 38013353380, November 2012): reference only, never given to the model and never in the repo; the cream sheets’ positions were measured from it and the prompt describes it in words"
+  ],
+  "source": {
+    "generated": "2048 x 1152 (16:9, High 2K): research/map-art/drop/subway-map-paper-raw-2048x1152.png",
+    "dropSha256": "62399a421594effc81012a7ef3a324c2261224d0404b1b14215daefcf11ebdca",
+    "measure": "measure.mjs: each sheet’s edges found from the cream/sage boundary and compared with the layout (input 1): mean overlap (IoU) 0.79, the middle block 10 to 15 units low on the 760 x 460 frame",
+    "warp": "warp.mjs moved the sheets onto the layout: one linear x map (src = 0.9869 x + 2.56) and a piecewise-linear y map (0->1.6 64->67.2 128->134.0 132->140.2 176->186.5 200->210.0 240->252.7 304->319.2 332->342.2 400->404.1 460->458.6), bilinear from the 2048 x 1152 raw at 3040 x 1840, then Lanczos down to 1520 x 920 and 760 x 460. Mean IoU after: 0.97, every edge within 1 unit except sheet 6’s right edge (3)",
+    "masterSha256": {
+      "x1": "179cdc2885228b1ccf849cc6e51c4653a3ab132109439b2520c957aacae90609",
+      "x2": "b6859b5a1c4b0ec08269a7b74b78593f0e38d180caa54496de5a0826de805f04"
+    },
+    "encode": {
+      "x1": "cwebp -q 88 -m 6 paper-760x460.png -o subway-map-paper.webp",
+      "x2": "cwebp -q 88 -m 6 paper-1520x920.png -o subway-map-paper@2x.webp"
+    },
+    "pack": "research/map-art (outside git): brief.md, pack.md, prompts/, attach/t3/, drop/ (model.txt); the intake (recipe.md, measure.mjs, warp.mjs, overlay-after.png) stayed in the lead’s scratch folder"
+  },
+  "intake": {
+    "on": "2026-11-13",
+    "by": "Claude (lane subway), files shipped unchanged from the lead’s intake"
+  }
+}

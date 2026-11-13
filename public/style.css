@@ -6962,6 +6962,12 @@ body.buff-purple-pulse::after {
 .world-map-svg .world-you { transition: opacity var(--motion-fast) linear; }
 .world-map-svg .world-you.is-hidden { opacity: 0; }
 .subway-map-svg .subway-paper { fill: var(--c-sage-93); }
+/* The recreated paper over the sage (js/map-views.js SUBWAY_PAPER); not loaded yet, it fades in (js/map-bg-preload.js). */
+.subway-map-svg .map-bg-soft { transition: opacity 0.35s ease; }
+.subway-map-svg .map-bg-soft.is-waiting { opacity: 0; }
+@media (prefers-reduced-motion: reduce) {
+  .subway-map-svg .map-bg-soft { transition: none; }
+}
 .subway-map-svg .subway-track { fill: none; stroke: var(--line-c); stroke-width: 3; stroke-linecap: round; opacity: 0.9; }
 .subway-map-svg .subway-arrow { fill: var(--line-c); }
 .subway-map-svg .subway-stop-hit, .subway-map-svg .subway-stop-hub { cursor: pointer; outline: none; }
@@ -6969,8 +6975,10 @@ body.buff-purple-pulse::after {
 .subway-map-svg .subway-stop-ring { fill: var(--c-white); stroke: var(--c-sand-63); stroke-width: 2; }
 .subway-map-svg .subway-stop-dot { fill: var(--line-c); }
 .subway-map-svg .subway-stop-hit:is(:hover, :focus-visible) .subway-stop-ring { stroke: var(--line-c); stroke-width: 3; }
-.subway-map-svg .subway-stop-name { font: italic 800 var(--fs-md) var(--font-ui); fill: var(--c-grey-29); paint-order: stroke fill; stroke: var(--c-sage-93); stroke-width: 3; }
-.subway-map-svg .subway-stop-hub { font: italic 700 var(--fs-sm) var(--font-ui); fill: var(--c-sand-56); paint-order: stroke fill; stroke: var(--c-sage-93); stroke-width: 3; }
+/* The names straddle the paper's sage and its cream sheets (as on the 2012 map): a halo of the sheets' cream, half
+   see-through, is lost on a sheet and a soft glow on the sage, and still parts a name from the line under it. */
+.subway-map-svg .subway-stop-name { font: italic 800 var(--fs-md) var(--font-ui); fill: var(--c-grey-29); paint-order: stroke fill; stroke: color-mix(in srgb, var(--c-cream-99b) 55%, transparent); stroke-width: 3; }
+.subway-map-svg .subway-stop-hub { font: italic 700 var(--fs-sm) var(--font-ui); fill: var(--c-sand-51b); paint-order: stroke fill; stroke: color-mix(in srgb, var(--c-cream-99b) 55%, transparent); stroke-width: 3; }
 .subway-map-svg .subway-stop-hub:is(:hover, :focus-visible) { fill: var(--c-sand-36); text-decoration: underline; }
 .subway-map-svg .subway-line-btn { cursor: pointer; outline: none; }
 .subway-map-svg .subway-line-btn rect { fill: var(--surface-sunken); stroke: none; opacity: 0.85; }

@@ -71,5 +71,26 @@ World map (G471, 2026-11-13)
   assets/maps/art/world/cards/<hub>.svg        each region's hover card (frame, thumbnail, lettered name)
   js/map-views-data.js                         the 47 regions' click frames, centres and card placements
   The subway map's paper and line overlays (subway_map_bg_59215.jpg, subway_*_line_fg_59215.png) are
-  lost; js/map-views.js draws the line from config_prod.js map_pos, and the paper waits on the art brief
-  in research/map-art/brief.md.
+  lost; js/map-views.js draws the line from config_prod.js map_pos, and the paper is recreated (below).
+
+Subway map paper (G471, 2026-11-13)
+  assets/maps/art/subway/subway-map-paper.webp (760x460) and subway-map-paper@2x.webp (1520x920):
+  the paper the Subway System map is drawn on, twelve cream sheets on pale sage where the 2012 window
+  had them, in place of the lost subway_map_bg_59215.jpg (GSJS config_prod.js 668). js/map-views.js
+  renderSubwayMapSvg draws it under the line; tests/map-views.test.js checks sizes, hashes, provenance.
+    Licence      AI-generated, dedicated CC0 1.0 (tools/builder/licence-policy.json)
+    Model        GPT Image 2.6 Sunburst, in T3 Chat canvas, 2026-11-13 (16:9, High 2K, 1 image),
+                 made by Grok Bot for Austin Ginder, who directed it
+    Prompt       in full in tools/provenance/subway-map-paper.json
+    Inputs       1. where the twelve cream sheets go (our own drawing; positions measured from a
+                    November 2012 picture of the window, positions only)
+                 2. that drawing with the game's own line, stations and names over it (our own;
+                    stations from config_prod.js map_pos)
+                 3. the Subway Map sign (Tiny Speck, CC0, glitch-items misc/subway_map)
+                 4. the world map's two charts (Tiny Speck, CC0, glitch-overlays/world_map.fla)
+                 5. the station signs (Tiny Speck, CC0, glitch-locations subway1.swf)
+    After        the sheets measured against the layout and moved onto it (one x map, a piecewise
+                 y map, bilinear at 2x, Lanczos down), then cwebp -q 88
+    Reference    the Tribute Blog's capture of the original window (post 38013353380): looked at,
+    only         measured for positions and described in the prompt's words; never given to the
+                 model and not in this repo

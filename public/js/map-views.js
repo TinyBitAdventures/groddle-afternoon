@@ -15,12 +15,14 @@
  *
  * Subway map (MapTransit.as; GSJS location.js get_map 3043-3093): the 12 stations at their
  * config_prod.js map_pos on the client's 760 x 460 frame, the Red Line and the Blue Line (one track
- * run either way), the station you are at or nearest to marked. The client drew the line and the
- * stations from two lost pictures (subway_map_bg_59215.jpg, subway_red_line_fg_59215.png and its
- * blue twin, never archived); until they are repainted (research/map-art/brief.md) the line is
- * drawn here as a smooth curve through the stations in their order. A station opens the same
- * menu a street does on the region map (Set as Destination, Teleport Here) for its street above
- * ground; its region's name opens that region's map with the street found.
+ * run either way), the station you are at or nearest to marked. The client drew them over two
+ * pictures (config_prod.js 668: subway_map_bg_59215.jpg, the paper both lines share, and
+ * subway_red_line_fg_59215.png with its blue twin), none ever archived. The paper is recreated
+ * (2026-11-13, SUBWAY_PAPER: twelve cream sheets on sage where the 2012 window had them, made for
+ * the remake, dedicated CC0 1.0, tools/provenance/subway-map-paper.json); the line stays drawn here
+ * as a smooth curve through the stations in their order, so it always sits on them. A station opens
+ * the same menu a street does on the region map (Set as Destination, Teleport Here) for its street
+ * above ground; its region's name opens that region's map with the street found.
  */
 import { WORLD_MAP } from './map-views-data.js?v=8e7d7094';
 import { LINE_COLOURS, STATIONS, SUBWAY_ART, SUBWAY_ART_BASE, lineName } from './subway.js?v=44d1a09f';
@@ -29,6 +31,8 @@ export const MAP_VIEWS = Object.freeze(['hub', 'world', 'subway']);
 /** The window's title in each view (the client's: the region's name, "World Map", "Subway System"). */
 export const MAP_VIEW_TITLES = Object.freeze({ world: 'World Map', subway: 'Subway System' });
 
+/** An art URL with its content key (js/data-urls.js groddleDataUrl), as js/map-graph.js keys a region's painting. */
+const keyedArt = (url) => (typeof globalThis.groddleDataUrl === 'function' ? globalThis.groddleDataUrl(url) : url);
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
 const f1 = (v) => Math.round(v * 10) / 10;
 
@@ -176,6 +180,27 @@ export const SUBWAY_LABELS = Object.freeze({
   9: [16, 4, 'start'], 10: [-14, -16, 'end'], 11: [-12, -18, 'end'], 12: [-14, 4, 'end'],
 });
 
+/**
+ * The Subway System map's paper, recreated (Tiny Speck's subway_map_bg_59215.jpg is lost): 760 x 460
+ * and its Retina twin, the same picture in the light and dark themes, as the region paintings are.
+ */
+export const SUBWAY_PAPER = Object.freeze({
+  x1: 'assets/maps/art/subway/subway-map-paper.webp',
+  x2: 'assets/maps/art/subway/subway-map-paper@2x.webp',
+  w: 760,
+  h: 460,
+});
+
+/**
+ * The paper as renderSubwayMapSvg draws it: { href, hi, wait } (unkeyed). The Retina file on a
+ * Retina screen (as js/map-graph.js picks a region's painting); a 1x screen gets the 760 x 460 file and
+ * the Retina twin as `hi`, which game.js fitMapCanvas and js/map-zoom.js swap in once the map draws
+ * past 760 x 460. js/map-bg-preload.js prepareSubwayPaper answers for the screen and the loader instead.
+ */
+export function subwayPaper({ dpr = Number(globalThis.devicePixelRatio) || 1, wait = false, paper = SUBWAY_PAPER } = {}) {
+  return { href: dpr > 1 ? paper.x2 : paper.x1, hi: paper.x2, wait: Boolean(wait) };
+}
+
 /** The Red Line's stations in order as [x, y] (config_prod.js map_pos; the Blue Line runs them backwards). */
 export function subwayPoints(stations = STATIONS) {
   return stations.map((s) => [s.map_pos[0], s.map_pos[1]]);
@@ -235,8 +260,13 @@ export function nearestStation(spot, stations = STATIONS, regions = WORLD_MAP.re
   return best ? { station: best.station, how: 'near' } : null;
 }
 
-/** The subway map as SVG on the client's 760 x 460 frame. here: nearestStation()'s answer. */
-export function renderSubwayMapSvg({ direction = 'forwards', here = null, stations = STATIONS } = {}) {
+/**
+ * The subway map as SVG on the client's 760 x 460 frame. here: nearestStation()'s answer. paper:
+ * subwayPaper()'s answer; the plain sage rect stays under the picture, the colour on show while it
+ * loads (with `wait` it starts hidden and fades in when it arrives: js/map-bg-preload.js watchMapBg,
+ * style.css .subway-map-svg .map-bg-soft).
+ */
+export function renderSubwayMapSvg({ direction = 'forwards', here = null, stations = STATIONS, paper = subwayPaper() } = {}) {
   const W = 760;
   const H = 460;
   const colour = LINE_COLOURS[direction] || LINE_COLOURS.forwards;
@@ -272,8 +302,14 @@ export function renderSubwayMapSvg({ direction = 'forwards', here = null, statio
       + `<rect x="${x}" y="8" width="80" height="24" rx="5"/><line x1="${x + 8}" y1="20" x2="${x + 72}" y2="20"/>`
       + `<text x="${x + 40}" y="24.5" text-anchor="middle">${esc(lineName(dir))}</text></g>`;
   }).join('');
+  // The paper, under the track and every name; its own class keeps the region painting's load and
+  // Retina swap (game.js fitMapCanvas, js/map-zoom.js: image.map-bg-soft[data-hi]).
+  const hi = paper?.hi && paper.hi !== paper.href ? ` data-hi="${esc(keyedArt(paper.hi))}"` : '';
+  const paperArt = paper?.href
+    ? `<image class="subway-paper-art map-bg-soft${paper.wait ? ' is-waiting' : ''}" href="${esc(keyedArt(paper.href))}"${hi} x="0" y="0" width="${W}" height="${H}" preserveAspectRatio="none" pointer-events="none"/>`
+    : '';
   return `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" class="subway-map-svg" role="group" aria-label="Subway System, ${esc(lineName(direction))}" style="--line-c: ${colour}">`
-    + `<rect class="subway-paper" width="${W}" height="${H}"/>`
+    + `<rect class="subway-paper" width="${W}" height="${H}"/>${paperArt}`
     + `<path class="subway-track" d="${d}"/>${arrows}${stops}${you}${buttons}</svg>`;
 }
 

@@ -66,6 +66,8 @@
       "assets/decos/groddle/tree_knot_01b_et1@1.5x.webp": "adbeb38b",
       "assets/decos/groddle/tree_pineCluster4.svg": "bd50a5d3",
       "assets/decos/groddle/zutto_cloud_2@2.5x.webp": "72bac37c",
+      "assets/maps/art/subway/subway-map-paper.webp": "af1853c6",
+      "assets/maps/art/subway/subway-map-paper@2x.webp": "81791b6f",
       "assets/maps/art/world/cards/100.svg": "0fbade33",
       "assets/maps/art/world/cards/101.svg": "2b793030",
       "assets/maps/art/world/cards/102.svg": "a772fdca",

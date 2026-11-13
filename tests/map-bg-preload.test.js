@@ -13,7 +13,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { HUB_MAP_BACKGROUNDS } from '../public/js/hub-map-backgrounds.js?v=2b2d6468';
 import { WORLD_MAP } from '../public/js/map-views-data.js?v=8e7d7094';
-import { bindWorldMap } from '../public/js/map-views.js?v=67e2a94a';
+import { bindWorldMap } from '../public/js/map-views.js?v=da2f063e';
 import { MAP_THUMB_SOFT, buildHubMapView, renderHubMapSvg } from '../public/js/map-graph.js?v=00a8aaed';
 import {
   MAP_BG_FADE_MS,
@@ -25,8 +25,10 @@ import {
   mapBgFiles,
   mapBgWantsHi,
   prepareMapBg,
+  prepareSubwayPaper,
+  subwayPaperFile,
   watchMapBg,
-} from '../public/js/map-bg-preload.js?v=c25948e6';
+} from '../public/js/map-bg-preload.js?v=e5252dcc';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const read = (p) => readFileSync(join(root, p), 'utf8');
@@ -289,7 +291,7 @@ describe('the preview triggers (bindWorldMap onPreview, game.js)', () => {
   it('game.js: a card previews (a tap at once), the World view fetches your region, a station\'s menu its region', () => {
     const game = read('public/game.js');
     assert.match(game, /onPreview: \(id, how\) => mapBgLoader\.preview\(id, \{ now: how === 'tap' \}\)/);
-    assert.match(game, /fitMapCanvas\(panel\);\n  \/\/ MAPLOAD: [^\n]*\n  if \(which === 'world'\) mapBgLoader\.preload\(spot\.hubId\);\n\}/, 'after the fit, which picks the size');
+    assert.match(game, /fitMapCanvas\(panel\);\n  \/\/ MAPLOAD: [^\n]*\n  if \(which === 'world'\) mapBgLoader\.preload\(spot\.hubId\);\n  warmSubwayPaper\(\);\n\}/, 'after the fit, which picks the size');
     assert.match(game, /openMapStreetMenu\(canvas, e, street, \{ here: st\.surfaceStreetTsid === currentStreetTsid \}\);\n[^\n]*\n        mapBgLoader\.preload\(st\.surfaceHubId\);/);
     // The files at the size the Map draws (fitMapCanvas keeps its scale), the map data warmed beside them.
     assert.match(game, /files: \(hubId\) => mapBgFiles\(hubId, \{ dpr: globalThis\.devicePixelRatio, fitScale: mapFitScale, mapIndex: mapIndexCache \}\)/);
@@ -412,5 +414,75 @@ describe('the thumb while the painting loads, then the swap', () => {
     const none = { dataset: { mapBg: 'wait' }, querySelector: () => null };
     assert.equal(watchMapBg(none), null);
     assert.equal(none.dataset.mapBg, undefined);
+  });
+});
+
+describe('the Subway view\'s paper is fetched ahead too (2026-11-13)', () => {
+  const X1 = 'assets/maps/art/subway/subway-map-paper.webp';
+  const X2 = 'assets/maps/art/subway/subway-map-paper@2x.webp';
+
+  it('the size the Map draws on this screen, as a region\'s painting (devicePixelRatio, a 1x Map past 760 x 460)', () => {
+    assert.equal(subwayPaperFile({ dpr: 1, fitScale: 1 }), X1);
+    assert.equal(subwayPaperFile({ dpr: 1, fitScale: 0.8 }), X1);
+    assert.equal(subwayPaperFile({ dpr: 1, fitScale: 1.3 }), X2, 'a 1x screen drawing the Map at 1.3x');
+    assert.equal(subwayPaperFile({ dpr: 2 }), X2);
+    assert.equal(subwayPaperFile({ dpr: 3, fitScale: 0.4 }), X2, 'a phone');
+  });
+
+  it('prepareSubwayPaper waits (to fade in) unless the file is known loaded, and names the Retina twin', () => {
+    const pre = createMapBgPreloader({ makeImage: fakeImages().make });
+    assert.deepEqual(prepareSubwayPaper({ loader: pre, dpr: 1, fitScale: 1 }), { href: X1, hi: X2, wait: true });
+    pre.markReady(X1);
+    assert.deepEqual(prepareSubwayPaper({ loader: pre, dpr: 1, fitScale: 1 }), { href: X1, hi: X2, wait: false });
+    assert.equal(prepareSubwayPaper({ loader: pre, dpr: 2 }).href, X2);
+    assert.equal(prepareSubwayPaper({ loader: pre, dpr: 2 }).wait, true, 'the Retina file is its own download');
+  });
+
+  it('warm fetches it once under its keyed URL, outside the regions\' cap, and knows it once loaded', () => {
+    const im = fakeImages();
+    const had = globalThis.groddleDataUrl;
+    globalThis.groddleDataUrl = (u) => `${u}?v=k2`;
+    try {
+      const pre = createMapBgPreloader({ files, makeImage: im.make });
+      assert.equal(pre.warm(X2), `${X2}?v=k2`);
+      assert.equal(pre.warm(X2), `${X2}?v=k2`);
+      assert.deepEqual(im.images.map((i) => i.src), [`${X2}?v=k2`], 'asked twice, fetched once');
+      assert.deepEqual(pre.warming(), [`${X2}?v=k2`]);
+      for (const id of ['76', '58', '56', '64', '85']) pre.preload(id);
+      assert.equal(im.images[0].aborted, false, 'the regions coming and going never stop it');
+      im.images[0].load();
+      assert.equal(pre.ready(`${X2}?v=k2`), true);
+      assert.deepEqual(pre.warming(), []);
+      assert.equal(prepareSubwayPaper({ loader: pre, dpr: 2 }).wait, false, 'drawn at once, no fade');
+      const n = im.images.length;
+      pre.warm(X2);
+      assert.equal(im.images.length, n, 'known loaded: nothing fetched');
+      // A failed fetch is tried again next time.
+      pre.warm(X1);
+      im.bySrc(`${X1}?v=k2`).fail();
+      pre.warm(X1);
+      assert.equal(im.images.filter((i) => i.src === `${X1}?v=k2`).length, 2);
+      assert.equal(pre.warm(''), '');
+    } finally {
+      if (had) globalThis.groddleDataUrl = had;
+      else delete globalThis.groddleDataUrl;
+    }
+  });
+
+  it('game.js: when the Map opens (region, World and Subway views) and when its Subway button is hovered or focused', () => {
+    const game = read('public/game.js');
+    assert.match(game, /function warmSubwayPaper\(\) \{\n  return mapBgLoader\.warm\(subwayPaperFile\(\{ dpr: globalThis\.devicePixelRatio, fitScale: mapFitScale \}\)\);/);
+    // After the fit, which picks the size: the region path and the other views.
+    assert.match(game, /fitMapCanvas\(panel\);\n  if \(find\) showFoundStreet\(canvas, find, view\);\n  else if \(focus\) focusMapOn\(canvas, focus\);\n  warmSubwayPaper\(\);\n\}/);
+    assert.match(game, /if \(which === 'world'\) mapBgLoader\.preload\(spot\.hubId\);\n  warmSubwayPaper\(\);\n\}/);
+    assert.match(game, /closest\?\.\('\[data-map-view="subway"\]'\)\) warmSubwayPaper\(\);/);
+    assert.match(game, /bar\.addEventListener\('pointerover', warmOn\);\n    bar\.addEventListener\('focusin', warmOn\);/);
+    // The view draws the size this screen takes, and fades the paper in when it was not ready.
+    assert.match(game, /const paper = prepareSubwayPaper\(\{ loader: mapBgLoader, dpr: globalThis\.devicePixelRatio, fitScale: mapFitScale \}\);\n    canvas\.innerHTML = renderSubwayMapSvg\(\{ direction: subwayMapDirection, here, paper \}\);/);
+    const view = game.slice(game.indexOf('function showMapView('), game.indexOf('function mapZoomFor('));
+    assert.ok(view.indexOf('watchMapBg(canvas, { loader: mapBgLoader });') > view.indexOf('renderSubwayMapSvg('));
+    const css = read('public/style.css');
+    assert.match(css, /\.subway-map-svg \.map-bg-soft\.is-waiting \{ opacity: 0; \}/);
+    assert.match(css, /prefers-reduced-motion: reduce\) \{\n  \.subway-map-svg \.map-bg-soft \{ transition: none; \}/);
   });
 });
