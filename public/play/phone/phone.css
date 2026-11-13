@@ -223,7 +223,7 @@ p { margin: 0; }
 .pc-chip { flex: none; padding: 1px 9px; border-radius: 999px; font-size: 0.75rem; font-weight: 800; background: var(--track); color: var(--fg); border: 1px solid var(--border); }
 .pc-chip-answered { background: color-mix(in srgb, var(--moss) 18%, var(--chip-solid)); border-color: var(--moss); }
 .pc-chip-closed { color: var(--muted); }
-.pc-thread-meta { display: flex; gap: 8px; }
+.pc-thread-meta { display: flex; gap: 8px; align-items: center; }
 
 /* —— a thread —— */
 .pc-messages { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }

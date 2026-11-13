@@ -16,9 +16,9 @@ import { homedir } from 'node:os';
 import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { SITE_DIR, sitePath, skipWithoutSite } from '../tools/repos.mjs';
-import { REPORT_MAX, REPORT_PICTURE, REPORT_TEXT, STATUS_WORDS, UNREAD_POLL_MS, base64Size, canEditFirst, createReportsApi, pictureRefused, pictureSize, pictureSrc, refusalWords, reportFromHash, ticketLine, unreadCount, whenWords } from '../public/js/reports.js?v=fa6c662a';
-import { mountReportsSheet } from '../public/js/ui/reports-sheet.js?v=09d79e45';
-import { BUG_TEXT, badgeFor, bugReportFeature, capturePicture } from '../public/js/features/bug-report-feature.js?v=65d0d9cf';
+import { REPORT_MAX, REPORT_PICTURE, REPORT_TEXT, STATUS_WORDS, UNREAD_POLL_MS, base64Size, canEditFirst, createReportsApi, pictureRefused, pictureSize, pictureSrc, numberedLine, refusalWords, reportFromHash, reportNumber, ticketLine, unreadCount, whenWords } from '../public/js/reports.js?v=cfcaca31';
+import { mountReportsSheet } from '../public/js/ui/reports-sheet.js?v=4825c4fb';
+import { BUG_TEXT, badgeFor, bugReportFeature, capturePicture } from '../public/js/features/bug-report-feature.js?v=35a740cc';
 
 const root = join(import.meta.dirname, '..');
 const read = (p) => readFileSync(join(root, p), 'utf8');
@@ -130,6 +130,12 @@ describe('the rules (js/reports.js)', () => {
     assert.equal(whenWords('nonsense', NOW), '');
     assert.equal(ticketLine({ lastAuthor: 'admin', lastMessageAt: ago(120) }, NOW), 'Administrator replied 2 min ago');
     assert.equal(ticketLine({ lastAuthor: 'player', lastMessageAt: ago(120) }, NOW), 'You wrote 2 min ago');
+    // #261: each report's number, first on the line.
+    assert.equal(reportNumber({ id: 266 }), 'Report #266');
+    assert.equal(reportNumber({ id: 0 }), '');
+    assert.equal(reportNumber({}), '');
+    assert.equal(numberedLine({ id: 266, lastAuthor: 'player', lastMessageAt: ago(120) }, NOW), 'Report #266 · You wrote 2 min ago');
+    assert.equal(numberedLine({ lastAuthor: 'player', lastMessageAt: ago(120) }, NOW), 'You wrote 2 min ago');
   });
 
   it('keeps the original form\'s words and the site\'s limits, with no em dashes', () => {
@@ -209,7 +215,7 @@ describe('the Reports sheet (js/ui/reports-sheet.js)', () => {
     assert.equal(rows[1].dataset.unread, undefined);
     assert.ok(rows[0].find((n) => n.className === 'reports-dot'));
     assert.ok(rows[0].find((n) => n.className === 'reports-chip is-answered' && n.textContent === 'Answered'));
-    assert.ok(rows[0].textContent.includes('Administrator replied 1 min ago'));
+    assert.ok(rows[0].textContent.includes('Report #3 · Administrator replied 1 min ago'), rows[0].textContent);
     assert.deepEqual(states.at(-1), { state: 'open', view: 'list', unread: 1, ticket: 0, last: '2 reports' });
   });
 
@@ -228,6 +234,8 @@ describe('the Reports sheet (js/ui/reports-sheet.js)', () => {
     const msgs = byData(host, 'reportsMessages');
     assert.equal(msgs.children[0].dataset.author, 'admin');
     assert.ok(msgs.children[0].textContent.startsWith('Administrator'));
+    // #261: the thread's head says its number.
+    assert.ok(host.find((n) => n.className === 'reports-when').textContent.startsWith('Report #3 · '));
 
     await sheet.openTicket(2);
     await flush();

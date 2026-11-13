@@ -18,7 +18,7 @@ import { dirname, join, relative, resolve } from 'node:path';
 import vm from 'node:vm';
 import { sitePath, skipWithoutSite } from '../tools/repos.mjs';
 import { createMinnAccount } from '../public/js/minn-account.js?v=c15f0ecf';
-import { REPORT_PICTURE } from '../public/js/reports.js?v=fa6c662a';
+import { REPORT_PICTURE } from '../public/js/reports.js?v=cfcaca31';
 import {
   DEVICE_KEY,
   PHONE_TEXT,
@@ -37,7 +37,7 @@ import {
   takenMailIds,
   unreadLetters,
   whereWords,
-} from '../public/js/phone/companion-data.js?v=6c6e284f';
+} from '../public/js/phone/companion-data.js?v=37feac5b';
 
 const pub = join(import.meta.dirname, '..', 'public');
 const read = (p) => readFileSync(join(pub, p), 'utf8');
@@ -201,6 +201,9 @@ describe('play/phone/ (the companion page)', () => {
     assert.ok(!graph.includes('js/online-boot.js'), 'the start card stays out of the phone');
     assert.match(js, /mountAccountForms\(host, \{\n\s*account,\n\s*start: location\.hash === '#new' \? 'signup' : 'signin',\n\s*reset: resetLinkFrom\(location\.hash\),\n\s*verify: verifyLinkFrom\(location\.hash\),/);
     assert.match(js, /reports = createReportsApi\(\{ baseUri: doc\.baseURI, nonce: account\.nonce \}\);/, 'the ticket calls carry the signed-in nonce');
+    // #261: the Reports tab shows each report's number, in its row and its thread.
+    assert.match(js, /'pc-row-line' \}, numberedLine\(t\)\)/);
+    assert.match(js, /'data-phone-report-number': '' \}, reportNumber\(t\)\)/);
     assert.match(js, /await account\.signOut\(\)/);
     // online-boot only boots on a page with #online-boot, which the companion never has.
     assert.match(read('js/online-boot.js'), /if \(typeof document !== 'undefined' && document\.getElementById\('online-boot'\)\) \{/);

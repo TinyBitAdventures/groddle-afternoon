@@ -65,7 +65,7 @@
  * the rows, Enter opens one. A redrawn list keeps the focused row focused.
  */
 
-import { REPORT_FILTER_MIN, REPORT_MAX, REPORT_TABS, REPORT_TEXT as T, STATUS_WORDS, canEditFirst, inTab, matchesReport, pictureRefused, pictureSrc, readByTeamAt, readByTeamWords, refusalWords, showsReplied, sortReports, tabCounts, tabLabel, ticketLine, unreadCount, whenWords } from '../reports.js?v=fa6c662a';
+import { REPORT_FILTER_MIN, REPORT_MAX, REPORT_TABS, REPORT_TEXT as T, STATUS_WORDS, canEditFirst, inTab, matchesReport, numberedLine, pictureRefused, pictureSrc, readByTeamAt, readByTeamWords, refusalWords, reportNumber, showsReplied, sortReports, tabCounts, tabLabel, unreadCount, whenWords } from '../reports.js?v=cfcaca31';
 import { focusBack } from './focus-return.js?v=da190597';
 import { lightboxLink } from './picture-lightbox.js?v=0d2814c8';
 import { REPORT_MENU_TEXT, bindReportRowMenu, copyText, reportLink } from './report-row-menu.js?v=bad71076';
@@ -303,7 +303,7 @@ export function mountReportsSheet({ doc = globalThis.document, host, api, contex
       const li = e('li', { class: 'reports-row', 'data-ticket': t.id, 'data-unread': t.unread ? '1' : null });
       const replied = showsReplied(t);
       const read = readByTeamWords(t, now());
-      const btn = e('button', { type: 'button', class: 'reports-row-btn', 'aria-haspopup': 'menu', 'aria-keyshortcuts': 'Shift+F10', 'aria-label': `${t.subject}, ${STATUS_WORDS[t.status] || t.status}${replied ? `, ${T.replied}` : ''}${read ? `, ${read}` : ''}${t.unread ? `, ${T.unreadDot}` : ''}` });
+      const btn = e('button', { type: 'button', class: 'reports-row-btn', 'aria-haspopup': 'menu', 'aria-keyshortcuts': 'Shift+F10', 'aria-label': `${t.subject}, ${reportNumber(t) ? `${reportNumber(t)}, ` : ''}${STATUS_WORDS[t.status] || t.status}${replied ? `, ${T.replied}` : ''}${read ? `, ${read}` : ''}${t.unread ? `, ${T.unreadDot}` : ''}` });
       const top = e('span', { class: 'reports-row-top' });
       if (t.unread) top.append(e('span', { class: 'reports-dot', title: T.unreadDot, 'aria-hidden': 'true' }));
       top.append(e('span', { class: 'reports-subject' }, t.subject || T.sheet));
@@ -312,7 +312,8 @@ export function mountReportsSheet({ doc = globalThis.document, host, api, contex
       // #225: an administrator replied to it, even if it has closed since.
       if (replied) top.append(e('span', { class: 'reports-replied', 'data-reports-replied': '', title: T.repliedHint, 'aria-hidden': 'true' }, T.replied));
       top.append(c);
-      const line = e('span', { class: 'reports-line' }, ticketLine(t, now()));
+      // #261: the report's number first, so a player can refer to it.
+      const line = e('span', { class: 'reports-line' }, numberedLine(t, now()));
       // Read by the team, quiet after the line (only while you wrote last: js/reports.js readByTeamAt).
       if (read) line.append(e('time', { class: 'reports-read', datetime: readByTeamAt(t), title: T.readByTeamHint, 'data-reports-read': '' }, read));
       btn.append(top, line);
@@ -338,7 +339,7 @@ export function mountReportsSheet({ doc = globalThis.document, host, api, contex
     if (!ticket) return;
     title.textContent = ticket.subject || T.sheet;
     chip(threadChip, ticket.status);
-    threadWhen.textContent = ticketLine(ticket, now());
+    threadWhen.textContent = numberedLine(ticket, now());
     const canEdit = canEditFirst({ editable, messages });
     if (!canEdit) editing = false;
     msgs.replaceChildren(...messages.map((m, i) => {

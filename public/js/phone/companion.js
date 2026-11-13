@@ -23,8 +23,8 @@
 import { createMinnAccountCore } from '../minn-account-core.js?v=63758d34';
 import { mountAccountForms, resetLinkFrom, verifyLinkFrom } from '../account-forms.js?v=29e9e2c3';
 import { gateFor, quietSession, suspendedNow } from '../online-session.js?v=6f1348c8';
-import { REPORT_MAX, REPORT_TEXT, STATUS_WORDS, createReportsApi, pictureRefused, pictureSrc, refusalWords, reportFromHash, ticketLine, unreadCount, whenWords } from '../reports.js?v=fa6c662a';
-import { DEVICE_KEY, PHONE_TEXT as T, POLL_MS, createPresenceApi, fitPhoto, friendsView, fullGameHref, itemNamesFrom, itemWords, mailRows, mailboxFromSave, mergePlayerMail, phoneContext, takenMailIds, unreadLetters } from './companion-data.js?v=6c6e284f';
+import { REPORT_MAX, REPORT_TEXT, STATUS_WORDS, createReportsApi, numberedLine, pictureRefused, pictureSrc, refusalWords, reportFromHash, reportNumber, unreadCount, whenWords } from '../reports.js?v=cfcaca31';
+import { DEVICE_KEY, PHONE_TEXT as T, POLL_MS, createPresenceApi, fitPhoto, friendsView, fullGameHref, itemNamesFrom, itemWords, mailRows, mailboxFromSave, mergePlayerMail, phoneContext, takenMailIds, unreadLetters } from './companion-data.js?v=37feac5b';
 
 const doc = globalThis.document;
 
@@ -326,7 +326,8 @@ async function loadReports() {
     const b = el('button', { type: 'button', class: 'pc-row', 'data-ticket': t.id, ...(t.unread ? { 'data-unread': '' } : {}) });
     const top = el('span', { class: 'pc-row-top' });
     top.append(el('span', { class: 'pc-row-title' }, t.subject || 'Report'), el('span', { class: `pc-chip pc-chip-${t.status}` }, STATUS_WORDS[t.status] || t.status));
-    b.append(top, el('span', { class: 'pc-row-line' }, ticketLine(t)));
+    // #261: the report's number first, as in the game's Reports window.
+    b.append(top, el('span', { class: 'pc-row-line' }, numberedLine(t)));
     if (t.unread) b.append(el('span', { class: 'pc-dot', 'aria-label': REPORT_TEXT.unreadDot }));
     b.addEventListener('click', () => openThread(t.id));
     li.append(b);
@@ -370,6 +371,8 @@ function drawThread(answer, status = '') {
   panelHead(panel, t.subject || 'Report', { back: { label: REPORT_TEXT.back, go: backToReports } });
   const meta = el('p', { class: 'pc-thread-meta' });
   meta.append(el('span', { class: `pc-chip pc-chip-${t.status}`, 'data-phone-status': t.status || '' }, STATUS_WORDS[t.status] || ''));
+  // #261: the report's number beside its status.
+  if (reportNumber(t)) meta.append(el('span', { class: 'pc-muted', 'data-phone-report-number': '' }, reportNumber(t)));
   panel.append(meta);
   const msgs = el('ol', { class: 'pc-messages', 'data-phone-messages': '' });
   const pic = pictureSrc(answer?.picture);

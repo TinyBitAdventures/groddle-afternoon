@@ -94,6 +94,8 @@ export const REPORT_TEXT = Object.freeze({
   // Read by the team (Austin 2026-11-12): an administrator has opened it since your last message.
   readByTeam: 'Read by the team',
   readByTeamHint: 'An administrator has opened this report since your last message',
+  // #261 (Friendly, 2026-11-13): each report's number, so a reply or a note can refer to it.
+  number: (id) => `Report #${id}`,
 });
 
 /**
@@ -290,6 +292,17 @@ export function ticketLine(t, now = Date.now()) {
   const who = t?.lastAuthor === 'admin' ? 'Administrator replied' : 'You wrote';
   const when = whenWords(t?.lastMessageAt, now);
   return when ? `${who} ${when}` : who;
+}
+
+/** #261: a report's number as the player reads it ("Report #266"), or '' without a real id. */
+export function reportNumber(t) {
+  const id = Number(t?.id);
+  return Number.isInteger(id) && id > 0 ? REPORT_TEXT.number(id) : '';
+}
+
+/** #261: the row's and the thread's second line: the report's number, then ticketLine. */
+export function numberedLine(t, now = Date.now()) {
+  return [reportNumber(t), ticketLine(t, now)].filter(Boolean).join(' · ');
 }
 
 /** A refusal's words (the site's own message when it gave one). */

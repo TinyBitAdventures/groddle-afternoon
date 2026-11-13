@@ -8,7 +8,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { REPORT_MENU_TEXT, reportLink, reportMenuRows } from '../public/js/ui/report-row-menu.js?v=bad71076';
-import { createReportsApi, reportFromHash } from '../public/js/reports.js?v=fa6c662a';
+import { createReportsApi, reportFromHash } from '../public/js/reports.js?v=cfcaca31';
 import { sitePath, skipWithoutSite } from '../tools/repos.mjs';
 
 const root = join(import.meta.dirname, '..');

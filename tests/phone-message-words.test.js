@@ -11,7 +11,7 @@ import { fileURLToPath } from 'node:url';
 import { EXTRA_PARADISE_COURSES as PARADISE_COURSES, paradiseControls } from '../public/js/paradise-courses.js?v=b466613b';
 import { BOARD_TEXT } from '../public/js/hi-signs-mp.js?v=09fa6076';
 import { HI_TEXT } from '../public/js/hi-signs.js?v=f365ab8d';
-import { PHONE_TEXT } from '../public/js/phone/companion-data.js?v=6c6e284f';
+import { PHONE_TEXT } from '../public/js/phone/companion-data.js?v=37feac5b';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const read = (p) => readFileSync(join(root, p), 'utf8');
