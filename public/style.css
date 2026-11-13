@@ -13953,8 +13953,13 @@ body:has(#quest-dialogue:not([hidden])) .prompt-stack { z-index: calc(var(--z-mo
 /* The tip hangs below the card, where the route card and other HUD cards sit at the same z: lift
    the whole map a step while a tip shows (the tip's own z only counts inside the map). */
 .street-minimap:has(.smm-tip:not([hidden])) { z-index: calc(var(--z-hud) + 1); }
+/* READY (Austin 2026-11-13): on a new street the card holds its place unseen (inert in the module)
+   until its picture is in, then fades in; a picture already in hand shows at once (data-fade false). */
+.street-minimap[data-ready="false"] { visibility: hidden; opacity: 0; }
+.street-minimap[data-ready="true"][data-fade="true"] { transition: opacity var(--motion-med) var(--ease-out); }
 @media (prefers-reduced-motion: reduce) {
   .street-minimap .smm-tab img { transition: none; }
+  .street-minimap[data-ready="true"][data-fade="true"] { transition: none; }
 }
 /* Modern: a paper card left of the Social drawer (--inset-r), the map inside a cream frame. */
 [data-ui="modern"] .street-minimap .smm-card {

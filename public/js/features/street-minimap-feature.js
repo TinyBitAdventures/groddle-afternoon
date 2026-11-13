@@ -46,11 +46,12 @@
  *
  * Canvas data: streetMap (shown|off|no-map|hidden|phone), streetMapFog, streetMapExpanded,
  * streetMapDots, streetMapDotIds, streetMapSigns, streetMapPicture (lines|snapshot),
+ * streetMapReady (1 the card shows with its picture, 0 it waits unseen for it),
  * streetMapSnapMs (the last snapshot's cost), streetMapSnaps (how many taken), streetMapWalk (the last click: kind:x, or
  * refused). QA: &streetmapexpand=1 expands it on each street.
  */
 
-import { createStreetMinimap, minimapVisibility, onStreetMapChange, sceneSignMarks, setStreetMap, signpostMarks, snapshotStreetView, snapsWithScene, streetMapOn } from '../ui/street-minimap.js?v=82f98cee';
+import { createStreetMinimap, minimapVisibility, onStreetMapChange, sceneSignMarks, setStreetMap, signpostMarks, snapshotStreetView, snapsWithScene, streetMapOn } from '../ui/street-minimap.js?v=00643143';
 import { classicArtUrl } from '../classic/classic-art.js?v=5f713e7d';
 import { onUiModeChange } from '../classic/ui-mode.js?v=9705b783';
 import { focusBack } from '../ui/focus-return.js?v=da190597';
@@ -200,8 +201,16 @@ function snap(engine) {
   const ms = lastSnapAt - t0;
   engine.setData?.('streetMapSnapMs', ms.toFixed(1));
   if (canvas) view.setPicture(canvas);
+  // READY: a snapshot that fails outright shows the lines picture rather than no card.
+  else if (!view.ready) view.reveal();
   engine.setData?.('streetMapPicture', view.root.dataset.picture || 'lines');
   engine.setData?.('streetMapSnaps', String((snapCount += 1)));
+}
+
+/** READY: the card shows with its picture, or waits unseen for it (canvas data streetMapReady). */
+function readyChanged(engine, on) {
+  engine.setData?.('streetMapReady', on ? '1' : '0');
+  if (view) engine.setData?.('streetMapPicture', view.root.dataset.picture || 'lines');
 }
 
 function scheduleSnaps(engine, at = SNAP_AT_MS) {
@@ -236,6 +245,7 @@ function enterStreet(engine) {
   engine.setData?.('streetMapSigns', view.root.dataset.signs || '0');
   engine.setData?.('streetMapFog', street?.fogMap ? '1' : '0');
   engine.setData?.('streetMapPicture', street ? view.root.dataset.picture || 'lines' : '');
+  engine.setData?.('streetMapReady', view.ready ? '1' : '0');
   if (street) scheduleSnaps(engine, rebuilt ? REBUILD_SNAP_AT_MS : SNAP_AT_MS);
 }
 
@@ -380,6 +390,7 @@ function phoneOpen(engine) {
     onHide: () => phoneClose(engine),
     onShow: () => {},
     onLayout: () => {},
+    onReady: (on) => readyChanged(engine, on),
     maxHeight: () => availH,
     onResnap: () => scheduleSnaps(engine, [60]),
     onWalk: (goal, how) => {
@@ -511,6 +522,7 @@ export const streetMinimapFeature = {
       },
       // What stacks under the map (the route card) starts a 12 px gap below it.
       onLayout: (h) => host.style.setProperty('--minimap-h', `${h > 0 ? h + 12 : 0}px`),
+      onReady: (on) => readyChanged(engine, on),
       maxHeight: () => Math.max(120, (host.clientHeight || 600) * 0.55),
       onResnap: () => scheduleSnaps(engine, [60]),
       onWalk: (goal, how) => walkFromMap(engine, goal, how),

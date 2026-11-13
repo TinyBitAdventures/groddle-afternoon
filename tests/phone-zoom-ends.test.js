@@ -5,7 +5,7 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 
 import { LANDSCAPE_PHONE_ZOOM_ENDS, PHONE_ZOOM_ENDS, createWorldZoom, phoneSideways, phoneZoomEnds, phoneZoomLabel, phoneZoomValueText } from '../public/js/world-zoom.js?v=38816228';
-import { zoomSlider } from '../public/js/ui/topbar.js?v=bbef6814';
+import { zoomSlider } from '../public/js/ui/topbar.js?v=8716bb4b';
 
 function fakeDoc(win) {
   const make = (tag) => {

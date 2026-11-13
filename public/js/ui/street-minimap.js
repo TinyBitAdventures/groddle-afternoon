@@ -35,8 +35,15 @@
  *   itemstacks hidden; batched to once a second, again after a deco or a home change, and when
  *   another client at the home sent RESNAP_MINIMAP). Here the street's own layers are drawn
  *   small through Pixi (snapshotStreetView, every layer stretched to the street as a flat
- *   picture), over the sky gradient and the platform lines, which show only until the first
- *   snapshot lands (or if it fails). A scene a feature builds (a home street, the house, a
+ *   picture), over the sky gradient and the platform lines, which show only if a snapshot fails.
+ * - READY (Austin 2026-11-13: "the minimap looks bad while loading ... Maybe hide it till it's ready
+ *   to show?"): on a new street the card waits invisible, holding its place (its height still goes
+ *   to onLayout, so the route card under it never jumps), until its first snapshot lands, then
+ *   fades in (--motion-med; at once under prefers-reduced-motion). While it waits it is inert, so
+ *   no click or Tab reaches it (data-ready "false"). The 2012 client snapped the street when the
+ *   location was built, behind its loading view (LocationViewBuilder.locationBuilt ->
+ *   resnapMiniMap), so its map was there when the street showed; only a map shown with no picture
+ *   at all got a fogged stand-in until the snap (MiniMapView.show 873-886). A scene a feature builds (a home street, the house, a
  *   Tower floor, a visit, an instance or a race) has no street image: it is snapped live with
  *   its cultivations, fixtures and furniture, and re-snapped as it changes (lane HOMEMAP,
  *   features/street-minimap-feature.js).
@@ -73,7 +80,8 @@
  *
  * QA (features/street-minimap-feature.js): canvas data streetMap (shown|off|hidden|no-map),
  * streetMapFog, streetMapExpanded, streetMapDots, streetMapSigns, streetMapPicture
- * (snapshot|lines), streetMapSnapMs, streetMapWalk (the last click's kind:x, or "refused").
+ * (snapshot|lines), streetMapReady (1 shown with its picture, 0 waiting for it), streetMapSnapMs,
+ * streetMapWalk (the last click's kind:x, or "refused").
  */
 
 import { bindContextTrigger } from './context-menu.js?v=55c84488';
@@ -506,6 +514,7 @@ const MAP_SVG = '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stro
  *   onLayout(px)       the height the card takes now (0 hidden), for what stacks under it
  *   onWalk(goal, how)  a click (or Enter) on the map: { kind: 'sign'|'player'|'item'|'point',
  *                      id, x, y } in world px; how.keyboard true from a key
+ *   onReady(on)        READY: the card has its picture and shows (true), or waits for it (false)
  *   now()              ms clock (tests)
  */
 export function createStreetMinimap(doc, host, opts = {}) {
@@ -522,6 +531,9 @@ export function createStreetMinimap(doc, host, opts = {}) {
   root.dataset.ctx = 'minimap';
   root.hidden = true;
   root.dataset.expanded = 'false';
+  // READY: invisible (and inert) until the street's picture is in.
+  root.dataset.ready = 'false';
+  root.inert = true;
   root.innerHTML = `
     <div class="smm-card">
       <div class="smm-window"><img class="smm-pic" alt="" /><div class="smm-fogwash" hidden></div></div>
@@ -590,6 +602,24 @@ export function createStreetMinimap(doc, host, opts = {}) {
   const signs = new Map();
   const dots = new Map();
   let lastLayout = -1;
+  // READY: the card shows only once it has the street's picture (a snapshot, or the lines if one fails).
+  let ready = false;
+
+  /** READY: show the card (fading in unless `fade` is false) or hide it while its picture is made. */
+  function setReady(on, { fade = true } = {}) {
+    const next = Boolean(on);
+    if (next === ready) return;
+    ready = next;
+    root.dataset.ready = next ? 'true' : 'false';
+    root.dataset.fade = next && fade ? 'true' : 'false';
+    // Nothing reaches a card nobody can see: no click, no Tab, no tip.
+    root.inert = !next;
+    if (!next) {
+      hideTip();
+      clearTimeout(rollTimer);
+    }
+    opts.onReady?.(next);
+  }
 
   const widthPx = () => {
     const w = win.getBoundingClientRect?.().width || win.clientWidth || 0;
@@ -849,6 +879,8 @@ export function createStreetMinimap(doc, host, opts = {}) {
     get expanded() { return expanded; },
     get geometry() { return geom; },
     get state() { return state; },
+    /** READY: whether the card has its picture and shows. */
+    get ready() { return ready; },
     /**
      * A new street: its geometry, signposts and the fallback picture until a snapshot lands.
      * `keepPicture`: the same street built again (a home street after a cultivation, an
@@ -858,6 +890,8 @@ export function createStreetMinimap(doc, host, opts = {}) {
     setStreet(next, { platforms = [], keepPicture = false } = {}) {
       const kept = keepPicture && snapPic && next && String(next.tsid || '') === snapTsid ? snapPic : null;
       const sameStreet = Boolean(next && street && String(next.tsid || '') === String(street.tsid || ''));
+      // READY: the same street drawn again (a new width, a rebuilt home) stays shown.
+      const stayReady = Boolean(ready && keepPicture && sameStreet);
       if (!sameStreet) sceneMarks = [];
       street = next || null;
       api._platforms = Array.isArray(platforms) ? platforms : [];
@@ -873,6 +907,7 @@ export function createStreetMinimap(doc, host, opts = {}) {
       destEl.hidden = true;
       if (!street) {
         geom = null;
+        setReady(false);
         return;
       }
       geom = mapGeometry(street, { width: widthPx() });
@@ -887,6 +922,7 @@ export function createStreetMinimap(doc, host, opts = {}) {
       else snapPic = null;
       showPic();
       root.dataset.picture = kept ? 'snapshot' : 'lines';
+      setReady(Boolean(kept) || stayReady, { fade: false });
       const fogged = Boolean(street.fogMap);
       fog.hidden = !fogged;
       wash.hidden = !fogged;
@@ -928,7 +964,12 @@ export function createStreetMinimap(doc, host, opts = {}) {
       snapTsid = String(street.tsid || '');
       showPic();
       root.dataset.picture = 'snapshot';
+      setReady(true);
       return true;
+    },
+    /** READY: no snapshot could be made: show the lines picture rather than nothing. */
+    reveal() {
+      if (street) setReady(true);
     },
     /**
      * Your point and every other mark: [{ kind: 'player'|'item', id, label, x, y, colorGroup?,
