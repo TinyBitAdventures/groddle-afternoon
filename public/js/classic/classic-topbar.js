@@ -80,6 +80,12 @@ export function imgStatShown(text, classic) {
   return classic ? imgCountText(now) : now.replace(/,/g, '');
 }
 
+/** PURE: where the buff strip's left starts, in px from its stage: the energy line's right edge (report #286). */
+export function buffsLeftPx(lineRight, hostLeft) {
+  const x = Math.round((Number(lineRight) || 0) - (Number(hostLeft) || 0));
+  return `${Math.max(0, x)}px`;
+}
+
 /** PURE: "80/100" from the energy ring's tooltip ("Energy 80/100"). */
 export function energyText(tip) {
   const m = /(\d[\d,]*)\s*\/\s*(\d[\d,]*)/.exec(String(tip || ''));
@@ -264,7 +270,25 @@ export function installClassicTopbar({ doc = globalThis.document, win = globalTh
     stats.append(dt, dd);
   }
 
-  const sync = () => { syncVitals(); syncDate(); syncVolume(); syncImg(); };
+  // Report #286: the buff chips (#buff-strip, game.js renderBuffStrip) sat over the energy arc. The
+  // client lined them up right of the energy line, "see how fat that energy read out is"
+  // (BuffViewManager.as refresh 116-119: x = PlayerInfoUI energy_w + BuffUI.RADIUS + 10; y 20 under
+  // the header). The strip's left follows the line's right edge (css/classic.css, lane rep13).
+  const strip = doc.getElementById('buff-strip');
+  function placeBuffs() {
+    if (!strip || !energyLine) return;
+    if (!classic()) {
+      strip.style.removeProperty('--classic-buffs-x');
+      return;
+    }
+    const host = strip.offsetParent || strip.parentElement;
+    const line = energyLine.getBoundingClientRect();
+    if (!host || !line.width) return;
+    const x = buffsLeftPx(line.right, host.getBoundingClientRect().left);
+    if (strip.style.getPropertyValue('--classic-buffs-x') !== x) strip.style.setProperty('--classic-buffs-x', x);
+  }
+
+  const sync = () => { syncVitals(); syncDate(); syncVolume(); syncImg(); placeBuffs(); };
 
   if (typeof win.MutationObserver === 'function') {
     const mo = new win.MutationObserver(sync);
@@ -279,6 +303,10 @@ export function installClassicTopbar({ doc = globalThis.document, win = globalTh
     if (menu) new win.MutationObserver(syncQuoins).observe(menu, { childList: true, subtree: true, attributes: true, attributeFilter: ['hidden'] });
   }
   for (const id of ['sfx-volume', 'music-volume']) doc.getElementById(id)?.addEventListener('input', syncVolume);
+  // The line grows with the count and the scale (u), and the stage moves with the window.
+  if (energyLine && typeof win.ResizeObserver === 'function') new win.ResizeObserver(placeBuffs).observe(energyLine);
+  win.addEventListener?.('resize', placeBuffs);
+  if (strip && typeof win.MutationObserver === 'function') new win.MutationObserver(placeBuffs).observe(strip, { attributes: true, attributeFilter: ['hidden'] });
 
   // The face: your avatar (game.js ownerPortraitUrl, the still the home card draws), the head in the
   // circle as PlayerFaceUI drew it (the avatar at .8, masked to the circle). Redrawn when the look

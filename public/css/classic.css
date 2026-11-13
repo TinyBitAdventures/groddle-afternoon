@@ -3170,6 +3170,29 @@
 :root[data-ui="classic"] #game-root #make-panel #make-result > .tt-nothing { grid-column: 1 / -1; grid-row: auto; justify-self: stretch; }
 /* === end testtube === */
 
+/* === rep13 (lane) === */
+/* Report #286: the buff chips sat over the energy arc. The client lined them up right of the energy line,
+   their centres 20 px under the header (BuffViewManager.as 32, 116-119: x = energy_w + BuffUI.RADIUS 13
+   + 10, so a circle's left is 13 past the line's right edge); js/classic/classic-topbar.js placeBuffs
+   measures the line (--classic-buffs-x). */
+:root[data-ui="classic"] #game-root #buff-strip {
+  left: calc(var(--classic-buffs-x, calc(150 * var(--cu))) + 13 * var(--cu));
+  top: calc(20 * var(--cu));
+  transform: translateY(-50%);
+}
+/* The energy line is dark words over the street, unreadable on a dark or busy sky. The client lifted the
+   line off the world with a 1 px drop shadow (PlayerInfoUI.as 175, StaticFilters.as 364-373); the same
+   idea for these dark words: a halo of the page colour, so they read on any background. */
+:root[data-ui="classic"] .top-bar .classic-energy-text {
+  opacity: 0.9;
+  text-shadow:
+    0 0 2px var(--c-classic-page),
+    0 0 2px var(--c-classic-page),
+    0 0 3px var(--c-classic-page),
+    0 1px 1px var(--c-classic-page);
+}
+/* === end rep13 === */
+
 /* == TICKETS == Reports (js/ui/reports-sheet.js, online only) as a 2012 window: the Quest Log's frame
    (Dialog.as, WindowBorder.as, BigDialog.as) centred in the viewport, the white head with its 20 px
    title and the red cross, the grey well between two rules, the white footer with the minor buttons;
