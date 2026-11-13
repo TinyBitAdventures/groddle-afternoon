@@ -1,5 +1,5 @@
 /**
- * Street toys (register G679): Lotha Harte's three icicles and heart.
+ * Street toys (register G679): Lotha Harte's three icicles and heart, Icicle Dangles' three lights.
  * js/street-toys.js rules against the street data and the source scripts.
  */
 import { test, describe } from 'node:test';
@@ -17,14 +17,15 @@ import {
   streetToysFor,
   toyDecoId,
   toyHitBox,
-} from '../public/js/street-toys.js?v=72c1c106';
-import { GLITCH_ONE_CLICK, oneClickChoice } from '../public/js/world-context-menu.js?v=1c5adfee';
+} from '../public/js/street-toys.js?v=09630452';
+import { GLITCH_ONE_CLICK, oneClickChoice } from '../public/js/world-context-menu.js?v=34676f3f';
 import { createEventRuntime, runLocationEvent } from '../public/js/location-events.js?v=05663361';
 import { SOUND_FILES } from '../public/js/sound-keys.js?v=d6b20718';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const street = (tsid) => JSON.parse(readFileSync(join(root, 'public/assets/streets', `${tsid}.json`), 'utf8'));
 const LOTHA = 'GHV88RQU60B3Q0G';
+const ICICLE = 'GHF70EIUS0D3RDM';
 
 describe('street toys data', () => {
   test('every toy names a deco the street has and events the street scripts', () => {
@@ -102,6 +103,23 @@ describe('Lotha Harte note order (loc.note1-3)', () => {
     const note = runLocationEvent(rt, s.events, 'first_note', { now: 100, target: true });
     assert.deepEqual(note.map((e) => e.type), ['sound']);
     assert.deepEqual(rt.timers.map((t) => [t.event, t.at]), [['light_fade', 22000]]);
+  });
+});
+
+describe('Icicle Dangles lights', () => {
+  test('one click broadcasting _on then _off toggles the light, with the 700 ms lockout', () => {
+    const s = street(ICICLE);
+    const rt = createEventRuntime();
+    const click = (now) => {
+      const fx = [];
+      for (const ev of ['shroom_light_1_on', 'shroom_light_1_off']) fx.push(...runLocationEvent(rt, s.events, ev, { now, target: true }));
+      return fx.filter((e) => e.type === 'deco').map((e) => e.visible);
+    };
+    assert.deepEqual(click(0), [false], 'lit at first: a click puts it out');
+    assert.deepEqual(click(100), [], 'locked out for 700 ms');
+    for (const t of [...rt.timers]) if (t.at <= 800) runLocationEvent(rt, s.events, t.event, { now: 800 });
+    rt.timers = [];
+    assert.deepEqual(click(900), [true], 'and on again');
   });
 });
 

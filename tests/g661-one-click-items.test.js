@@ -21,7 +21,7 @@ import assert from 'node:assert/strict';
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { GLITCH_ONE_CLICK, GLITCH_ONE_CLICK_ABSENT, ONE_CLICK_ITEM_OF, isOneClick, oneClickChoice, oneClickItem, oneClickVerbId, worldContextAction } from '../public/js/world-context-menu.js?v=1c5adfee';
+import { GLITCH_ONE_CLICK, GLITCH_ONE_CLICK_ABSENT, ONE_CLICK_ITEM_OF, isOneClick, oneClickChoice, oneClickItem, oneClickVerbId, worldContextAction } from '../public/js/world-context-menu.js?v=34676f3f';
 import { cabinetVerbs } from '../public/js/home-storage.js?v=b0225465';
 import { poleVerbs } from '../public/js/home-street-mp.js?v=3364056b';
 

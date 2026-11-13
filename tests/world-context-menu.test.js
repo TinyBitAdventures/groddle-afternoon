@@ -11,7 +11,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { isOneClick, ONE_CLICK_VERBS, signpostArmRows, worldContextAction } from '../public/js/world-context-menu.js?v=1c5adfee';
+import { isOneClick, ONE_CLICK_VERBS, signpostArmRows, worldContextAction } from '../public/js/world-context-menu.js?v=34676f3f';
 import { hotkeySections } from '../public/js/client-hotkeys.js?v=2922915e';
 
 const PUBLIC = join(dirname(fileURLToPath(import.meta.url)), '../public');

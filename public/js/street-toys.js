@@ -1,5 +1,5 @@
 /**
- * Street toys (register G679): the Clickable Broadcasters of the snow streets, rebuilt (Lotha Harte). Pure rules
+ * Street toys (register G679): the Clickable Broadcasters of the snow streets, rebuilt. Pure rules
  * and data; features/street-toys-feature.js runs them.
  *
  * What survives in source:
@@ -12,7 +12,7 @@
  *   Code the remake cannot run (loc.noteN on Lotha Harte) is done here (lothaNote).
  *
  * Where each one stood is OUR reading, with its why. A toy hangs its hit box on the deco it plays
- * (an icicle), so the box follows that deco's parallax as the art does. Decos that carry
+ * (an icicle, a light), so the box follows that deco's parallax as the art does. Decos that carry
  * no id in the street data get one in prepareStreet (`deco.layer` + `deco.index`, checked by sprite
  * and x so a rebuilt street cannot shift it onto another deco).
  */
@@ -55,6 +55,18 @@ export const STREET_TOYS = Object.freeze({
         why: 'Footage FPQqvshxqfA 5:00-5:01: the third click is on the icicle between them, 190 px left of the first (art 190 px), the highest tip; WM_E2. The heart is lit by 5:10.',
       }),
     ]),
+  }),
+  GHF70EIUS0D3RDM: Object.freeze({
+    name: 'Icicle Dangles',
+    // Not reachable by road until the road to ice opens (G645); built because its places come from its own decos.
+    hide: Object.freeze([]),
+    toys: Object.freeze([1, 2, 3].map((n, i) => Object.freeze({
+      id: `icicle_light_${n}`,
+      deco: Object.freeze({ id: ['light_spot_2_groddle1_1352325189104', 'light_spot_2_groddle1_1352325189092', 'light_spot_2_groddle1_1352325189082'][i] }),
+      hit: 'whole',
+      events: Object.freeze([`shroom_light_${n}_on`, `shroom_light_${n}_off`]),
+      why: `No footage: shroom_light_${n}_on and _off fade light_spot_2_groddle1 deco ${n} in and out (500 ms, 700 ms lockout) and are a toggle when one click broadcasts both, so the broadcaster stood on that light. The template draws the lights lit, so the first click puts one out.`,
+    }))),
   }),
 });
 

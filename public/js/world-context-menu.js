@@ -41,7 +41,7 @@ export const ONE_CLICK_VERBS = Object.freeze({ npc_mailbox: 'view_inbox' });
  *
  * The ones the game has, by item class: the verb as our menu names it, and Glitch's verb id.
  * visitorsOnly: note_pole.js 494 hides read_oneclick from the owner at home (their menu has read and more).
- * clickable_broadcaster: the street toys of Lotha Harte (G679, features/street-toys-feature.js).
+ * clickable_broadcaster: the street toys of Lotha Harte and Icicle Dangles (G679, features/street-toys-feature.js).
  */
 export const GLITCH_ONE_CLICK = Object.freeze({
   bag_furniture_cabinet: Object.freeze({ verb: 'cabinet_open', glitch: 'open' }),

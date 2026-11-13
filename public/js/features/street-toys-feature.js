@@ -1,6 +1,7 @@
 /**
  * Street toys (register G679; rules and sources in js/street-toys.js): the Clickable Broadcasters of
- * Lotha Harte: three icicles that play three notes; the right order lights the heart.
+ * Lotha Harte (three icicles that play three notes; the right order lights the heart) and Icicle
+ * Dangles (three lights that go out and on).
  *
  * Each toy is an invisible hit box hung on the deco it plays and moved with that deco's parallax every
  * frame. A left click runs click_broadcast at once (Glitch's one-click item, world-context-menu.js
@@ -17,7 +18,7 @@
  *   (1 while the heart's lock is set), streetToyAt (id:x,y,w,h of each hit box in world space, x, y its middle).
  */
 
-import { BROADCAST_DISTANCE, createNoteState, inBroadcastReach, lothaNote, prepareToyStreet, streetToysFor, toyDecoId, toyHitBox } from '../street-toys.js?v=72c1c106';
+import { BROADCAST_DISTANCE, createNoteState, inBroadcastReach, lothaNote, prepareToyStreet, streetToysFor, toyDecoId, toyHitBox } from '../street-toys.js?v=09630452';
 import { locationEventsApi } from './location-events-feature.js?v=0cda70ed';
 
 export const STREET_TOYS_FEATURE_ID = 'street-toys';
