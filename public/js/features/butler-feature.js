@@ -558,6 +558,9 @@ const CSS = `
 #butler-dialog .bd-text { margin: 0.2rem 0 var(--sp-3); line-height: var(--lh-normal); white-space: pre-line; }
 #butler-dialog .bd-choices { display: flex; flex-wrap: wrap; gap: 0.45rem; justify-content: flex-end; padding: 0.3rem 0.95rem 0.95rem; }
 #butler-dialog .bd-choices.bd-stack { flex-direction: column; align-items: stretch; }
+/* Report #262: on a phone a list of choices (three or more) is one a row, as the Crab's tunes. */
+:root.touch-phone #butler-dialog .bd-choices:has(> :nth-child(3)) { flex-direction: column; flex-wrap: nowrap; justify-content: flex-start; align-items: stretch; }
+@media (max-width: 560px) { #butler-dialog .bd-choices:has(> :nth-child(3)) { flex-direction: column; flex-wrap: nowrap; justify-content: flex-start; align-items: stretch; } }
 #butler-dialog .bd-btn { font: inherit; border: 1px solid var(--border); border-radius: var(--radius-md); padding: var(--sp-3) var(--sp-7); background: var(--surface-card); cursor: pointer; text-align: left; }
 #butler-dialog .bd-btn:hover, #butler-dialog .bd-btn:focus-visible { background: var(--surface-parchment); }
 #butler-dialog .bd-btn.primary { border-color: var(--c-lime-77b); background: var(--surface-moss); font-weight: 700; }

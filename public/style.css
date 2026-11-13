@@ -9498,6 +9498,23 @@ header.top-bar + .sub { display: none; }
   background: linear-gradient(var(--c-slate-61), var(--c-slate-45)); outline: none; box-shadow: 0 0 0 2px color-mix(in srgb, var(--c-orange-69) 75%, transparent);
 }
 .quest-dialogue[data-look="conversation"] .quest-dialogue-actions button[hidden] { display: none; }
+/* Report #262: on a phone a list of choices wrapped in centred rows, one left alone beside the last. In the
+   Magic Rock's two looks a long list with its cancel pinned under it (#107) is a column at any width (its
+   cancel sat beside the list); on a phone any list (three or more) is one choice a row, full width, the
+   cancel last, as the Crab's and the Butler's call-outs. !important: the box's inline style and the looks'. */
+.quest-dialogue:is([data-look="conversation"], [data-look="vog"]) [data-qi-choices]:has(> .qi-choice-list) {
+  flex-direction: column !important; flex-wrap: nowrap; align-items: center !important;
+}
+:root.touch-phone .quest-dialogue:is([data-look="conversation"], [data-look="vog"]) [data-qi-choices]:is(:has(> :nth-child(3)), :has(> .qi-choice-list)) {
+  flex-direction: column !important; flex-wrap: nowrap; align-items: stretch !important;
+}
+:root.touch-phone .quest-dialogue:is([data-look="conversation"], [data-look="vog"]) .qi-choice-list { align-items: stretch; }
+@media (max-width: 560px) {
+  .quest-dialogue:is([data-look="conversation"], [data-look="vog"]) [data-qi-choices]:is(:has(> :nth-child(3)), :has(> .qi-choice-list)) {
+    flex-direction: column !important; flex-wrap: nowrap; align-items: stretch !important;
+  }
+  .quest-dialogue:is([data-look="conversation"], [data-look="vog"]) .qi-choice-list { align-items: stretch; }
+}
 @media (prefers-reduced-motion: reduce) { .quest-dialogue[data-look="conversation"] .quest-dialogue-card.fam-grow { animation: none; } }
 
 /* G225: offers that wait in the quest log. The count rides the Quests button

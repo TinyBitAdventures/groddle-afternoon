@@ -282,6 +282,10 @@ const CSS = `
 #crab-talk .ct-btn img { width: 22px; height: 22px; object-fit: contain; }
 #crab-talk .ct-btn:hover, #crab-talk .ct-btn:focus-visible { background: var(--surface-parchment); }
 #crab-talk .ct-btn.primary { border-color: var(--c-red-75); background: var(--surface-parchment); font-weight: 700; }
+/* Report #262: on a phone the tunes wrapped right-aligned, the last beside "Never mind" on one row. A list
+   (three choices or more) is one choice a row there, full width, "Never mind" last as it is sent. */
+:root.touch-phone #crab-talk .ct-choices:has(> :nth-child(3)) { flex-direction: column; flex-wrap: nowrap; justify-content: flex-start; align-items: stretch; }
+@media (max-width: 560px) { #crab-talk .ct-choices:has(> :nth-child(3)) { flex-direction: column; flex-wrap: nowrap; justify-content: flex-start; align-items: stretch; } }
 @media (prefers-color-scheme: dark) {
   #crab-talk { background: var(--surface-dark); color: var(--c-cream-93); border-color: var(--c-brown-48); }
   #crab-talk .ct-btn { background: var(--c-sand-33); border-color: var(--c-sand-42); }
