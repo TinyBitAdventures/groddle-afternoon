@@ -2,9 +2,9 @@
  * Groddle Afternoon — original street geometry + layered decos
  * PixiJS 8 · locations-xml streets · CoU PNG decos · quests/items
  */
-import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=d52bb005';
+import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=c25afaed';
 import { createErrorOnce, createFeatureHost } from './js/feature-host.js?v=06bb8b74';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=08582437';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=a9a57f19';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl, drawTileArt } from './js/enter-chooser.js?v=4a3ea327';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -490,8 +490,8 @@ import { PACK_COPY, isBagClass, isElementClass, ownBagLabel, unitRankAt } from '
 import { FLOAT_TEXT_Z, SPEECH_BUBBLE_Z } from './js/fx-z.js?v=18dda7e3';
 import { hasPouch } from './js/elemental-pouch.js?v=42702eda';
 import { createPackRow, mountPackClearance, packBandRange, packCountText, packSearchEntries, packSlotTip } from './js/ui/pack-row.js?v=64e4a567';
-import { listAnimalFeedOptions } from './js/animals.js?v=b23aee62';
-import { pickerMaxCount, pickerOptionsFor, pickerTakesCount } from './js/animals.js?v=b23aee62';
+import { listAnimalFeedOptions, piggyFeedTip } from './js/animals.js?v=7bbbf50e';
+import { pickerMaxCount, pickerOptionsFor, pickerTakesCount } from './js/animals.js?v=7bbbf50e';
 import {
   createDroppedItemState,
   parseDroppedItemState,
@@ -868,7 +868,7 @@ import {
   createAnimalState,
   resetAnimalDay,
   animalStatusLabel,
-} from './js/animals.js?v=b23aee62';
+} from './js/animals.js?v=7bbbf50e';
 import {
   ensureWoodTreeState,
   pickWoodTool,
@@ -8532,7 +8532,9 @@ function openVerbPickLevel(target, verb, row, focusFood = '') {
       requestVerb(target, { ...verb, id: `plant:${seed.classTsid}`, picker: undefined }, { label: verb.label || 'plant' });
     }
     : null;
-  renderVerbMenu(target, null, { verbId, verb, options, title: FEED_PICKER_TITLES[verbId] || 'Feed what?', ...(plantPick ? { onPick: plantPick } : {}) });
+  // A hungry Piggy's footer says which foods are only a snack (piggyFeedTip, Austin's call 2026-11-13).
+  const tipFor = verbId === 'feed' && target.classId === 'npc_piggy' ? (food) => piggyFeedTip(target.classId, target.state, food) : null;
+  renderVerbMenu(target, null, { verbId, verb, options, title: FEED_PICKER_TITLES[verbId] || 'Feed what?', ...(plantPick ? { onPick: plantPick } : {}), ...(tipFor ? { tipFor } : {}) });
   placeWorldVerbMenu(target);
   const at = Math.max(0, options.findIndex((o) => o.classTsid === focusFood));
   focusVerbRow(menu, at + 1);

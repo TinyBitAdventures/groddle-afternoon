@@ -160,7 +160,7 @@ describe('the home street rock (G231)', async () => {
   const { towerApi } = await import('../public/js/features/home-tower-feature.js?v=a8d2246b');
   const { shiftButlerRuntime } = await import('../public/js/features/butler-feature.js?v=0eed6a62');
   const { homeEditing } = await import('../public/js/features/camera-mode-feature.js?v=1db2ff07');
-  const { newxpFeature, __newxpTest } = await import('../public/js/features/newxp-feature.js?v=c9427865');
+  const { newxpFeature, __newxpTest } = await import('../public/js/features/newxp-feature.js?v=42952a19');
   const street = { classId: 'magic_rock', state: { room: 'street' } };
   const yard = { classId: 'magic_rock', state: { room: 'yard' } };
   const towerQuest = { active: { build_a_tower: { started: 1 } }, completed: [], offers: {} };

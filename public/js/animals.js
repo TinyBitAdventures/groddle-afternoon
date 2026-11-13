@@ -12,6 +12,7 @@ import {
   BABY_ANIMALS,
   babyFoodOptions,
   feedPiggyStack,
+  piggySnackOnly,
   incubationEggOptions,
   isFoodItem,
   itemLabel,
@@ -138,6 +139,15 @@ export function listAnimalFeedOptions(classId, inv = {}) {
     .sort()
     .map((classTsid) => ({ classTsid, label: itemLabel(classTsid), nutrition: 0, have: inv[classTsid] || 0 }));
   return [...known, ...extra];
+}
+
+/**
+ * The Feed what? footer for a food that will not fill this hungry Piggy (piggySnackOnly:
+ * base cost under 5, npc_piggy.js 671-674), in our words; '' keeps the usual "Cherry (you have 5)".
+ */
+export function piggyFeedTip(classId, state, food) {
+  if (classId !== 'npc_piggy' || !food || !piggySnackOnly(state, food.classTsid)) return '';
+  return `${food.label} (you have ${Math.max(0, Math.floor(Number(food.have) || 0))}) · a snack, it won't fill a hungry Piggy`;
 }
 
 /** Does this target-item verb also ask how many (requires_target_item_count)? */

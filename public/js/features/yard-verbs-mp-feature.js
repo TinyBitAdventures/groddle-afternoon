@@ -64,7 +64,7 @@
 import { performPlotVerb, plotArtPath, plotLabel, plotStatusLabel, plotVerbs } from '../patches.js?v=5ba97b77';
 import { trantStatusLabel } from '../trants.js?v=4d6f5593';
 import { woodTreeStatusLabel } from '../woodcutting.js?v=ee35a30a';
-import { animalAnchorX, animalAnchorY, animalStatusLabel } from '../animals.js?v=b23aee62';
+import { animalAnchorX, animalAnchorY, animalStatusLabel } from '../animals.js?v=7bbbf50e';
 import { frameTexture, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js?v=814d7926';
 import { homeStreetLayout, normalizeCultivationState } from '../home-cultivation.js?v=1e2d2b2d';
 import { readVisitScene } from '../neighbours-mp.js?v=78dd3b33';
@@ -87,7 +87,7 @@ import {
   treeSnapshot,
   visitorAnimalState,
   visitorTreeState,
-} from '../yard-verbs-mp.js?v=e1c00d88';
+} from '../yard-verbs-mp.js?v=74050415';
 import { yardFixtureRows, yardFixtureVerbs, yardFixturesKey } from '../yard-fixtures-mp.js?v=dd022fe8';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
 import { followYardPath, stickForClass } from '../yard-wander.js?v=654c4dc5';
