@@ -5,7 +5,7 @@
 
 import { avatarHeadReach, groundBeneath, isItemSolid, isStandable, platformYAt, worldToScreen } from './street-model.js?v=b6cb6a4e';
 import { behindFloor } from './reach.js?v=4187d746';
-import { MAILBOX_SHEETS, measuredMailboxes } from './street-furniture.js?v=8a5a223c';
+import { MAILBOX_SHEETS, measuredMailboxes } from './street-furniture.js?v=d99e92c5';
 import { QUOIN_SPOTS } from './quoin-spots-data.js?v=7c343cbc';
 import { BARNACLE_SPOTS } from './barnacle-spots-data.js?v=cea3daec';
 import {
@@ -17,7 +17,7 @@ import {
   ROCK_METAL_SPOTS,
   ROCK_SPARKLY_SPOTS,
   TREE_SPOTS,
-} from './node-spots-data.js?v=a3c25916';
+} from './node-spots-data.js?v=0817d192';
 
 export const STREET_ECOLOGY_URL = 'assets/content/street-ecology.json?v=official-ecology-6';
 

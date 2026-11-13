@@ -101,7 +101,7 @@ import {
   streetNoteSeeds,
   takePinnedNote,
   writePaperNote,
-} from '../street-furniture.js?v=8a5a223c';
+} from '../street-furniture.js?v=d99e92c5';
 import {
   CHORES,
   NEIGHBOURS,
@@ -123,10 +123,10 @@ import {
 } from '../neighbours.js?v=781ad57f';
 import { buildNeighbourBackground, neighbourLoadingColors, neighbourPlatforms } from './neighbour-scene.js?v=e0981c8a';
 import { closeNoteView, noteViewOpen, openBoardView, openNotePicker, openNoteView, openReportView } from '../note-view.js?v=eca7de52';
-import { BOARD_MP_TEXT, boardByline } from '../boards-mp.js?v=fd33c75a';
+import { BOARD_MP_TEXT, boardByline } from '../boards-mp.js?v=9f6f492b';
 import { textureFromUrl } from '../textures.js?v=814d7926';
-import { butlerApi } from './butler-feature.js?v=69fc54e2';
-import { neighboursMpApi } from './neighbours-mp-feature.js?v=57bcb110';
+import { butlerApi } from './butler-feature.js?v=1499b2d9';
+import { neighboursMpApi } from './neighbours-mp-feature.js?v=2024011b';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
 import { MAIL_POST_SENDER } from '../mailbox.js?v=a3e833ba';
 

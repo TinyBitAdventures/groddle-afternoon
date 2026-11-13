@@ -7,7 +7,7 @@
  */
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
-import { TREE_CANOPY, UNDER_CANOPY_HEIGHTS, blockingFixture, planStreetPlacements } from '../public/js/street-ecology.js?v=c8d6fa5b';
+import { TREE_CANOPY, UNDER_CANOPY_HEIGHTS, blockingFixture, planStreetPlacements } from '../public/js/street-ecology.js?v=64dcdacc';
 
 const line = (id, x1, y1, x2, y2) => ({ id, x1, y1, x2, y2, pcPerm: -1, itemPerm: -1 });
 // A long floor and, behind the tree, a long ledge 135 px up (Kalix Follows: tree at 1077, ledge at 942).

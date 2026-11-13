@@ -26,7 +26,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { requireServer, serverPath } from './repos.mjs';
 
-import { BOARD_CAPACITY, BOARD_CLASS, NOTE_LIMITS, REMAKE_NOTE_TEXTS, boardPinSeeds } from '../public/js/street-furniture.js?v=8a5a223c';
+import { BOARD_CAPACITY, BOARD_CLASS, NOTE_LIMITS, REMAKE_NOTE_TEXTS, boardPinSeeds } from '../public/js/street-furniture.js?v=d99e92c5';
 import { MACHINE_ROOM_TSIDS } from '../public/js/machine-rooms.js?v=62bf02ed';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');

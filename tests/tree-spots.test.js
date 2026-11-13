@@ -30,9 +30,9 @@ import {
   setStreetEcologyCatalog,
   streetReservedSpots,
   treePlacementRequest,
-} from '../public/js/street-ecology.js?v=c8d6fa5b';
-import { furniturePlacementGroups, measuredMailboxes, rowMailboxes } from '../public/js/street-furniture.js?v=8a5a223c';
-import { MAILBOX_SPOTS, PAPER_TREE_SPOTS, TREE_SPOTS } from '../public/js/node-spots-data.js?v=a3c25916';
+} from '../public/js/street-ecology.js?v=64dcdacc';
+import { furniturePlacementGroups, measuredMailboxes, rowMailboxes } from '../public/js/street-furniture.js?v=d99e92c5';
+import { MAILBOX_SPOTS, PAPER_TREE_SPOTS, TREE_SPOTS } from '../public/js/node-spots-data.js?v=0817d192';
 
 const root = join(import.meta.dirname, '..');
 const read = (rel) => readFileSync(join(root, rel), 'utf8');

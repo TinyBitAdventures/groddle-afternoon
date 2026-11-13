@@ -66,7 +66,7 @@
  */
 
 import { isPhoneDevice } from '../touch-controls.js?v=d65f8c10';
-import { butlerApi } from './butler-feature.js?v=69fc54e2';
+import { butlerApi } from './butler-feature.js?v=1499b2d9';
 import { metabolicGain, moodMax } from '../metabolics.js?v=1383e6fd';
 import { frameTexture, sourceFromUrl } from '../textures.js?v=814d7926';
 import {

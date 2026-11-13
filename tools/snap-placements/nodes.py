@@ -274,10 +274,83 @@ def street_job(job):
             im = im.resize((W, H), Image.LANCZOS)
         a = np.asarray(im)
         grey = (a[..., 0] * np.float32(0.299 / 255) + a[..., 1] * np.float32(0.587 / 255) + a[..., 2] * np.float32(0.114 / 255)).astype(np.float64)
+        picks = match_snap(np, grey, templates, cls, job['threshold'])
+        for ex, ey in EYE_SPOTS.get(job['cls'], {}).get(job['tsid'], ()):
+            fit = occluded_fit(np, a, templates, ex, ey)
+            if fit:
+                picks.append(fit)
         del a, im
-        per_snap.append((path, match_snap(np, grey, templates, cls, job['threshold']), ''))
+        per_snap.append((path, picks, ''))
         del grey
     return {**job, 'per_snap': per_snap}
+
+
+# G670: Jellisacs the snaps show that the matcher cannot score, because the street's own roots and
+# moss hang in front of most of the sac (a half-hidden sac scores 0.5-0.84 in grey, under the 0.86
+# threshold, where the floor's green grass scores 0.7 too). Each was seen by eye on every snap of the
+# street; the point is only where to look (about the sac's bottom centre): occluded_fit measures the
+# spot and the variant from the sac's own green pixels. Mokkar Mill's file names 7 and all 7 show:
+# 1628, 2438, 2631 (the one the matcher finds), 3185 and 3242 (two behind the mossy pillar), 3645
+# and 3762 (behind a dark pod).
+EYE_SPOTS = {
+    'jellisac': {
+        'GTJ102C4FFQ1Q6O': ((1628, 315), (2438, 355), (2631, 359), (3185, 205), (3242, 162), (3645, 199), (3762, 120)),
+    },
+}
+EYE_REACH = 22  # px each way the fit may move the eye's point
+EYE_MIN_SEEN = 0.25  # at least this share of the frame's art must show as green in the snap
+
+
+def jelly_green(np, rgb):
+    """A Jellisac's own green (its sacs; the roots, pods and moss around them are brown or olive), rgb 0..1."""
+    r, g, b = rgb[..., 0], rgb[..., 1], rgb[..., 2]
+    return (g > r * 1.12) & (g > b * 1.02) & (g > 0.12)
+
+
+def occluded_fit(np, a, templates, ex, ey, reach=EYE_REACH):
+    """The best fit of every template frame near (ex, ey), scored only on the snap pixels that show the
+    sac's green (colour NCC over the pixels both the frame's art and the snap's green cover, times the
+    fourth root of the share seen, less half the green outside the art in its box): a pick tuple
+    (score, left, top, variant, frame, anchor x, anchor y), or None when too little shows."""
+    from numpy.lib.stride_tricks import sliding_window_view
+    H, W = a.shape[:2]
+    best = None
+    for v, f, fr in templates:
+        h, w = fr.shape[:2]
+        lx, ly = int(ex - w / 2 - reach), int(ey - h - reach)
+        if lx < 0 or ly < 0 or lx + 2 * reach + w > W or ly + 2 * reach + h > H:
+            continue
+        region = a[ly:ly + 2 * reach + h, lx:lx + 2 * reach + w].astype(np.float64) / 255
+        G = jelly_green(np, region).astype(np.float64)
+        M = (fr[..., 3] > 0.5).astype(np.float64)
+        t = fr[..., :3]
+        gv = sliding_window_view(G, (h, w))  # (ny, nx, h, w)
+        vis = gv * M
+        n = vis.sum(axis=(2, 3))
+        cov = varp = vart = 0
+        for c in range(3):
+            pv = sliding_window_view(region[..., c], (h, w))
+            tc = t[..., c]
+            sp = np.einsum('abij,abij->ab', vis, pv)
+            st = np.einsum('abij,ij->ab', vis, tc)
+            spt = np.einsum('abij,abij,ij->ab', vis, pv, tc)
+            spp = np.einsum('abij,abij,abij->ab', vis, pv, pv)
+            stt = np.einsum('abij,ij->ab', vis, tc * tc)
+            nn = np.maximum(n, 1)
+            cov = cov + spt - sp * st / nn
+            varp = varp + spp - sp * sp / nn
+            vart = vart + stt - st * st / nn
+        ncc = cov / np.sqrt(np.maximum(varp * vart, 1e-12))
+        seen = n / M.sum()
+        spill = (gv * (1 - M)).sum(axis=(2, 3)) / max(1.0, (1 - M).sum())
+        score = ncc * np.power(np.maximum(seen, 0), 0.25) - 0.5 * spill
+        score[seen < EYE_MIN_SEEN] = -1
+        k = np.unravel_index(int(np.argmax(score)), score.shape)
+        s = float(score[k])
+        if s > -1 and (best is None or s > best[0]):
+            x, y = lx + int(k[1]), ly + int(k[0])
+            best = (s, x, y, v, f, x + w / 2, y + h)
+    return best
 
 
 def rock_templates(np, Image):

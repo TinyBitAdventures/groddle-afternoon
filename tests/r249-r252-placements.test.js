@@ -32,9 +32,9 @@ import {
   streetGardenBoxBeds,
   streetGardenBoxes,
   streetReservedSpots,
-} from '../public/js/street-ecology.js?v=c8d6fa5b';
-import { resourcePlacementGroups, resourceSpawnPlan } from '../public/js/features/resource-nodes-feature.js?v=30654aca';
-import { JELLISAC_SPOTS, PEAT_SPOTS } from '../public/js/node-spots-data.js?v=a3c25916';
+} from '../public/js/street-ecology.js?v=64dcdacc';
+import { resourcePlacementGroups, resourceSpawnPlan } from '../public/js/features/resource-nodes-feature.js?v=9c052508';
+import { JELLISAC_SPOTS, PEAT_SPOTS } from '../public/js/node-spots-data.js?v=0817d192';
 import { bedKind, createGarden, fitGardenToBed, plantPlot } from '../public/js/garden.js?v=1420a6d6';
 import { bedKey, parsePlotId } from '../public/js/shared-gardens.js?v=c1f90bc0';
 import { normalizeGardenSnapshot } from '../public/js/player-save.js?v=69395d5b';
@@ -51,6 +51,7 @@ setStreetEcologyCatalog(catalog);
 const VUOKSI = 'GTJ135JKNQU113D';
 const RATIN = 'GIFDIDJT0GU1CR8';
 const CHAKRA = 'GA95U14319524O9';
+const MOKKAR = 'GTJ102C4FFQ1Q6O';
 
 describe('reports #249, #250: the measured Jellisac and Peat Bog spots', () => {
   it('have the documented shape, on real streets, inside each street and within its count', () => {
@@ -104,6 +105,23 @@ describe('reports #249, #250: the measured Jellisac and Peat Bog spots', () => {
     }
     const pop = populationForStreet(RATIN, ecologyForStreet(RATIN));
     assert.ok(!resourcePlacementGroups(pop).some((g) => g.key === 'resource:peat_1'), 'no Peat Bog is planned there');
+  });
+
+  it('G670: hang all seven of Mokkar Mill\'s Jellisacs where the snaps show them, half hidden in the roots', () => {
+    const spots = measuredNodeSpots(MOKKAR).jellisac;
+    assert.equal(ecologyForStreet(MOKKAR).counts.jellisac, 7);
+    assert.equal(spots.length, 7, 'the matcher found 1; nodes.py EYE_SPOTS points at the six behind roots and pods');
+    const pop = populationForStreet(MOKKAR, ecologyForStreet(MOKKAR));
+    assert.ok(!resourcePlacementGroups(pop).some((g) => g.key === 'resource:jellisac'), 'none is planned on a floor');
+    const plan = resourceSpawnPlan(pop, () => []).filter((row) => row.classTsid === 'jellisac');
+    assert.equal(plan.length, 7);
+    const lines = platformsScreen(street(MOKKAR));
+    for (const row of plan) {
+      assert.equal(row.wall, true);
+      // Up in the roots, every one clear over the floor or ledge under it (the planner's four stood on the floor).
+      const floor = groundBeneath(lines, row.x, row.y, 0);
+      assert.ok(!floor || floor.y - row.y > 80, `${row.x},${row.y}: floor ${floor?.y}`);
+    }
   });
 });
 

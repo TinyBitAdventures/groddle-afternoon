@@ -20,7 +20,7 @@ import {
   pourConfirmText,
 } from '../public/js/wine-pour.js?v=6daa23a7';
 import { homeTowerFeature, towerApi } from '../public/js/features/home-tower-feature.js?v=d46934bb';
-import { homesFeature } from '../public/js/features/homes-feature.js?v=ff50812a';
+import { homesFeature } from '../public/js/features/homes-feature.js?v=ecc9bb1b';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const gsjs = join(root, '..', 'glitch-GameServerJS');

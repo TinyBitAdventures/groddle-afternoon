@@ -1,6 +1,6 @@
 import { isItemFloor, platformYAt, worldToScreen } from './street-model.js?v=b6cb6a4e';
 import { filterText } from './word-filter.js?v=9a7a7ebb';
-import { MAILBOX_SPOTS } from './node-spots-data.js?v=a3c25916';
+import { MAILBOX_SPOTS } from './node-spots-data.js?v=0817d192';
 
 /**
  * Street furniture rules: street Mailboxes, placed Notes, Notice Boards and
