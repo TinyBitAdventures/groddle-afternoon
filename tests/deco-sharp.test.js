@@ -14,7 +14,7 @@ import { SHARP_DECOS } from '../public/js/deco-sharp-list.js?v=a2424923';
 import { HIRES_DECOS } from '../public/js/deco-hires-list.js?v=60fcf361';
 import { FAR_SHARP_BUDGET_BYTES, FAR_SLACKS, SHARP_SLACK, SVG_MAX_PIXELS, SVG_MAX_SIDE, admitSharp, isSharpDeco, sharpDeco } from '../public/js/deco-hires.js?v=f59e60d3';
 import { resolutionOfUrl } from '../public/js/textures.js?v=814d7926';
-import { landscapeArt } from '../public/js/features/homes-feature.js?v=6bd9f3dc';
+import { landscapeArt } from '../public/js/features/homes-feature.js?v=cdcfb1c2';
 import { EXTERIOR_STYLES, INTERIOR_STYLES, streetLook, yardLook } from '../public/js/home-styles.js?v=13fe0aaa';
 import { layoutArtPath } from '../public/js/home-layout.js?v=546baf47';
 
@@ -225,7 +225,7 @@ describe('street-render draws sharp copies on the sharp layers', () => {
       }
     };
     globalThis.document = { createElement: () => ({ width: 0, height: 0, getContext: () => ({ drawImage() {} }) }) };
-    const { buildStreetView } = await import('../public/js/street-render.js?v=2c6bd942');
+    const { buildStreetView } = await import('../public/js/street-render.js?v=dfd6d798');
     const handlers = {};
     const renderer = {
       resolution: 1,
@@ -271,7 +271,7 @@ describe('street-render draws sharp copies on the sharp layers', () => {
   });
 
   it('far layers: sharp copies within the street budget, the rest on their 2x files', async () => {
-    const { buildStreetView } = await import('../public/js/street-render.js?v=2c6bd942');
+    const { buildStreetView } = await import('../public/js/street-render.js?v=dfd6d798');
     const manifest = new Set(JSON.parse(readFileSync(join(root, 'public/assets/decos/manifest.json'), 'utf8')));
     const renderer = { resolution: 3.9, gl: { MAX_TEXTURE_SIZE: 1, getParameter: () => 8192 }, generateTexture: () => null, on() {}, off() {} };
     for (const tsid of ['GA95U14319524O9', 'GHFC3I4EKMI20JD', 'GA9117J18492SRS']) {

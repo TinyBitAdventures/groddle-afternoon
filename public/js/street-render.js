@@ -1081,19 +1081,38 @@ function trimTexturePool(PIXI) {
   }, 250);
 }
 
-/** Render one deco texture through the layer's colour matrix. */
-function bakeRecolour(PIXI, renderer, base, colour) {
+/**
+ * The resolution a recoloured copy is baked at: its art's, but no more than the device's render
+ * cap (`cap`, js/render-density.js resolutionCap). A phone draws at 1 backing px per view px, so a
+ * 2x deco's copy at 2 held four times the pixels it can show (#284: Froughtful Fen's copies took
+ * 237 MB of GPU memory at iPhone size, 53 MB at 1). A computer's cap is 4: its copies are as before.
+ */
+export function recolourBakeResolution(artResolution, cap = Infinity) {
+  const art = Number(artResolution) > 0 ? Number(artResolution) : 1;
+  const top = Number(cap) >= 1 ? Number(cap) : Infinity;
+  return Math.min(art, top);
+}
+
+/**
+ * Render one deco texture through the layer's colour matrix, at recolourBakeResolution. The decos
+ * draw the copy, so the original's GPU copy goes at once (#284): Pixi's texture GC kept it 20 s,
+ * so a street whose every layer is coloured (Froughtful Fen) held its art twice on arrival. A
+ * rebake uploads it again from the image js/textures.js keeps; only an image source is unloaded
+ * (a render texture has no other copy).
+ */
+function bakeRecolour(PIXI, renderer, base, colour, cap = Infinity) {
   trimTexturePool(PIXI);
   const holder = new PIXI.Sprite(frameTexture(base));
   holder.filters = [colour];
   const texture = renderer.generateTexture({
     target: holder,
     frame: new PIXI.Rectangle(0, 0, base.width, base.height),
-    resolution: base.resolution,
+    resolution: recolourBakeResolution(base.resolution, cap),
   });
   holder.texture.destroy();
   holder.filters = null;
   holder.destroy();
+  if (PIXI.ImageSource && base instanceof PIXI.ImageSource && !base.destroyed) base.unload();
   return texture;
 }
 
@@ -1163,7 +1182,7 @@ function recolourDeco(PIXI, renderer, cache, spr, original, colour, key, now) {
   const id = `${key}|${base.uid}`;
   let entry = cache.entries.get(id);
   if (!entry) {
-    entry = { id, base, colour, texture: bakeRecolour(PIXI, renderer, base, colour), users: new Set(), seen: now, bytes: recolourBudgetBytes(base) };
+    entry = { id, base, colour, texture: bakeRecolour(PIXI, renderer, base, colour, cache.resolutionCap), users: new Set(), seen: now, bytes: recolourBudgetBytes(base) };
     cache.entries.set(id, entry);
     cache.textures.set(id, entry.texture);
   }
@@ -1198,7 +1217,7 @@ function recolourAnim(PIXI, renderer, cache, spr, lc) {
 function ensureRecoloured(PIXI, renderer, cache, spr) {
   const entry = spr.recolour?.entry;
   if (!entry || entry.texture) return;
-  entry.texture = bakeRecolour(PIXI, renderer, entry.base, entry.colour);
+  entry.texture = bakeRecolour(PIXI, renderer, entry.base, entry.colour, cache.resolutionCap);
   cache.textures.set(entry.id, entry.texture);
   cache.rebakes += 1;
   for (const user of entry.users) if (!user.destroyed) setDecoTexture(PIXI, user, entry.texture);
@@ -1226,6 +1245,19 @@ function swapDecoTexture(PIXI, renderer, cache, spr, texture) {
   }
   if (!entry.texture) ensureRecoloured(PIXI, renderer, cache, spr);
   else spr.texture = entry.texture;
+}
+
+/** The recolour cache's entries, the baked ones and their GPU bytes (at their real resolution). */
+export function recolourStats(cache) {
+  let baked = 0;
+  let gpuBytes = 0;
+  for (const entry of cache.entries.values()) {
+    if (!entry.texture) continue;
+    baked += 1;
+    const src = entry.texture.source;
+    gpuBytes += (src?.pixelWidth || 0) * (src?.pixelHeight || 0) * 4;
+  }
+  return { entries: cache.entries.size, baked, gpuMB: +(gpuBytes / 1048576).toFixed(1), budgetMB: +(cache.bytes / 1048576).toFixed(1), evictions: cache.evictions, rebakes: cache.rebakes };
 }
 
 /** Free recoloured textures whose decos have all been culled for a while. */
@@ -2443,6 +2475,7 @@ function cullLayer(lc, camX, camY, vpW, vpH, rebake, now) {
  *   available?: Set<string>,
  *   debugPlatforms?: boolean,
  *   cameraBottomPadding?: number,
+ *   bakeResolutionCap?: number,
  *   renderer?: import('pixi.js').Renderer
  * }} [opts]
  */
@@ -2451,8 +2484,11 @@ export function buildStreetView(street, PIXI, opts = {}) {
   const available = opts.available || decoManifest || new Set();
   const root = new PIXI.Container();
   root.sortableChildren = true;
-  const recolourCache = { PIXI, textures: new Map(), entries: new Map(), bytes: 0, evictions: 0, rebakes: 0, lastEvict: 0 };
+  // #284: recoloured copies bake at most at the device's render cap (recolourBakeResolution).
+  const recolourCache = { PIXI, textures: new Map(), entries: new Map(), bytes: 0, evictions: 0, rebakes: 0, lastEvict: 0, resolutionCap: Number(opts.bakeResolutionCap) || Infinity };
   root.recolourCache = recolourCache;
+  /** QA (game.js groddleQA.recolourStats, #284): recoloured deco copies, how many are baked now and their GPU MB. */
+  root.recolourStats = () => recolourStats(recolourCache);
   /** Ladder tiles drawn from the street's ladders' `tiling` (addLadderTiles). */
   root.ladderTiles = 0;
   /** Blurred layers' tiles (bakeBlurredLayer): counts for QA in root.blurStats. */

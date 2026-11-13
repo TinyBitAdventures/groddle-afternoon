@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=f218c2d1';
 import { createErrorOnce, createFeatureHost } from './js/feature-host.js?v=06bb8b74';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=d7d98f3e';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=6d0d656d';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl, drawTileArt } from './js/enter-chooser.js?v=4a3ea327';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -668,7 +668,7 @@ import {
   ensureStreetIndex,
   resolveIndexTsid,
 } from './js/street-loader.js?v=18b181ad';
-import { showDraftBanner, startDraftPlay } from './js/builder/draft-play.js?v=0d301609';
+import { showDraftBanner, startDraftPlay } from './js/builder/draft-play.js?v=89377762';
 import {
   ladderTopDeck,
   groundBeneath,
@@ -697,7 +697,7 @@ import {
   setSignpostHover,
   setSignpostKeys,
   signpostBoardAt,
-} from './js/street-render.js?v=2c6bd942';
+} from './js/street-render.js?v=dfd6d798';
 import {
   GAME_DAY_MS,
   shouldFireNewDay,
@@ -24558,6 +24558,8 @@ async function enterStreet(tsid, opts = {}) {
   bgLayer = buildStreetView(data, PIXI, {
     renderer: app.renderer,
     available,
+    // #284: a phone's recoloured deco copies bake at its render cap, not the art's 2x.
+    bakeResolutionCap: RENDER_CAP,
     cameraBottomPadding: cameraBottomSlack(LOCATION_VIEW_H),
     // The canvas runs on under the overlaid pack.
     skirtBelow: VIEW_H - LOCATION_VIEW_H,
@@ -32984,6 +32986,8 @@ async function main() {
     groundSkirt: () => (bgLayer?.groundSkirt ? { ...bgLayer.groundSkirt } : null),
     /** EDGE MIRROR QA: the street's mirrored end strips (street-render attachEdgeMirrors): sizes, resolution, bytes, builds. */
     edgeMirrors: () => bgLayer?.edgeMirrorStats?.() || null,
+    /** RECOLOUR QA (#284): the street's recoloured deco copies (street-render recolourStats): entries, baked, GPU MB. */
+    recolourStats: () => bgLayer?.recolourStats?.() || null,
     /**
      * FRIENDPOST QA: every signpost arm on screen (street posts' and a scene post's, the home
      * street's signpost) with its centre in view px (times the canvas's client box over viewW,
