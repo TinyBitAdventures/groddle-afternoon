@@ -39,8 +39,8 @@ import {
   plainText,
   TROPHY_PIECES,
   planStreetTrophies,
-} from '../public/js/street-jobs.js?v=47d8573e';
-import { streetJobsFeature } from '../public/js/features/street-jobs-feature.js?v=007ab732';
+} from '../public/js/street-jobs.js?v=03e90891';
+import { streetJobsFeature } from '../public/js/features/street-jobs-feature.js?v=c006cb5f';
 import { createAchievementState, applyAchievementProgress } from '../public/js/achievements.js?v=e4e5edd0';
 import { applyRewards } from '../public/js/quests.js?v=40c71a37';
 import { loadContentCatalogsFromDir, resetContentCatalogs } from '../public/js/content-catalogs.js?v=10b118dd';
@@ -221,6 +221,20 @@ describe('street jobs rules', () => {
     assert.equal(state.jobs['256'].got.r666, 30);
     assert.equal(state.jobs['256'].got.r660 || 0, 0);
     assert.equal(contributeCurrants(state, catalog, '256', 20, pc, 5).req.id, 'r660');
+  });
+
+  it('report 294: online, a street you have stood on stays open for you but its project is still open to build', () => {
+    // Yan Jaggery (job 262), featured at 63% on the server while this player had it grandfathered.
+    const YAN = 'GCR29V8S4Q12IF4';
+    const state = normalizeStreetJobState({ grandfathered: [YAN], jobs: { 262: { phase: 2, startedAt: 1, got: { r1: 1 } } } });
+    assert.equal(jobStatus(state, catalog, '262', 10 ** 13).status, 'built'); // solo: unchanged
+    assert.equal(jobStatus(state, catalog, '262', 10 ** 13, { sharedWorld: true }).status, 'active');
+    assert.equal(closedStreets(state, catalog, { sharedWorld: true }).includes(YAN), false); // the road stays open for you
+    assert.equal(roadClosure(state, catalog, YAN, [YAN], { sharedWorld: true }), null);
+    const done = normalizeStreetJobState({ grandfathered: [YAN], jobs: { 262: { phase: 3, doneAt: 5 } } });
+    assert.equal(jobStatus(done, catalog, '262', 10 ** 13, { sharedWorld: true }).status, 'done');
+    const other = normalizeStreetJobState({});
+    assert.equal(closedStreets(other, catalog, { sharedWorld: true }).includes(YAN), true);
   });
 
   it('runs work units with source energy and wear, and stops at the energy floor', () => {

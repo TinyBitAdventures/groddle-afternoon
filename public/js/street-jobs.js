@@ -433,8 +433,9 @@ export const SUBWAY_STREETS = Object.freeze(SUBWAY_LINE.stations.map((s) => gTsi
  * street you have stood on: see noteArrival), exempt, or a subway station's street. `force` lists
  * jobs to run regardless (QA demo boards). `open` (the solo QA param ?openroads=1, openRoadsWanted)
  * counts every street as built for the session: nothing is written, so the save never learns of it.
+ * `mine` false leaves out the streets you have stood on (jobStatus in the shared world, report #294).
  */
-export function isJobBuilt(state, catalog, jobId, { exemptFrom = [], force = [], open = false } = {}) {
+export function isJobBuilt(state, catalog, jobId, { exemptFrom = [], force = [], open = false, mine = true } = {}) {
   const job = jobDef(catalog, jobId);
   if (!job) return true;
   if (state.jobs[jobId]?.doneAt) return true;
@@ -442,7 +443,7 @@ export function isJobBuilt(state, catalog, jobId, { exemptFrom = [], force = [],
   if (job.builtFromStart) return true;
   if (job.kind !== 'street') return false;
   if (open) return true;
-  if (state.grandfathered.includes(job.street)) return true;
+  if (mine && state.grandfathered.includes(job.street)) return true;
   if (SUBWAY_STREETS.includes(job.street)) return true;
   return job.connecting.some((tsid) => exemptFrom.includes(tsid));
 }
@@ -460,13 +461,17 @@ export function openRoadsWanted(value, { multiplayer = false, path = '' } = {}) 
 /**
  * 'built' | 'done' | 'delayed' | 'cooldown' | 'active' | 'open'
  * plus the phase index and, for waits, when they end.
+ * `opts.sharedWorld` (online): a street you have stood on keeps its road open for you (roadClosure,
+ * closedStreets) but its project is still the world's to build. Report #294 (Dr Flavius): Yan Jaggery
+ * was the featured project at 63% (the server's row, projects_featured.go) while his board called the
+ * street already built, so he could not help with it.
  */
 export function jobStatus(state, catalog, jobId, now = Date.now(), opts = {}) {
   const job = jobDef(catalog, jobId);
   const row = state.jobs[jobId];
   if (!job) return { status: 'built', phase: 0 };
   if (row?.doneAt) return { status: 'done', phase: job.phases.length - 1 };
-  if (isJobBuilt(state, catalog, jobId, opts)) return { status: 'built', phase: 0 };
+  if (isJobBuilt(state, catalog, jobId, { ...opts, mine: !opts.sharedWorld })) return { status: 'built', phase: 0 };
   const phase = row?.phase || 0;
   if (row?.readyAt && row.readyAt > now) return { status: 'delayed', phase, until: row.readyAt };
   const started = Boolean(row?.startedAt);
