@@ -74,7 +74,7 @@ import { metabolicGain, moodMax } from '../metabolics.js?v=1383e6fd';
 import { quoinDailyLimitFor } from '../quoins.js?v=61be601c';
 import { emblemCostFor } from '../shrines.js?v=a190faea';
 import { GROWN_TREE_LABELS, trantsformPlotTree } from '../patches.js?v=cd774b2c';
-import { COPY as SHARED_PATCH_COPY } from '../shared-patches.js?v=b0108b2b';
+import { COPY as SHARED_PATCH_COPY } from '../shared-patches.js?v=e1d891c2';
 import { isPoisoned } from '../tree-poison.js?v=0cfbc3fb';
 import { furnitureSize } from '../home-decor.js?v=bbf43c44';
 import { playPotionBottle } from '../potion-bottle-fx.js?v=85e8687c';
@@ -136,10 +136,10 @@ import {
   usePotion,
 } from '../potions.js?v=4f4c996d';
 import { itemVerbAchievementCounters } from '../item-verbs.js?v=994d3d4f';
-import { patchesFeature } from './patches-feature.js?v=558b35e0';
-import { homesFeature } from './homes-feature.js?v=7b0a03eb';
-import { streetTreeIndex } from './tree-death-feature.js?v=838d9036';
-import { questRoomConverse } from './quest-instances-feature.js?v=a431cf80';
+import { patchesFeature } from './patches-feature.js?v=8af9c13c';
+import { homesFeature } from './homes-feature.js?v=16e1b9d1';
+import { streetTreeIndex } from './tree-death-feature.js?v=0b02fd7e';
+import { questRoomConverse } from './quest-instances-feature.js?v=88814fd9';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
 import { copyChargesLeft, copyFromLedger, keepsCopies, spendCopyCharge, verbCopy } from '../copy-charges.js?v=e4ead2c7';
 import { copyTag, migrateClassTag, migrateClassValue, setCopyTag, toolCopies } from '../tools.js?v=62b37c51';

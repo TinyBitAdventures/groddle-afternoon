@@ -449,7 +449,9 @@ function installFavor(doc, favor) {
     pop.dataset.ready = String(rows.filter((r) => r.ready).length);
     pop.innerHTML = `<h3 class="hud-pop-title">Favor with the Giants</h3><ul class="favor-list">${rows.map((r) => {
       const t = favorRowText(r);
-      return `<li class="favor-row" data-giant="${esc(r.id)}"${r.ready ? ' data-ready' : ''}${r.here ? ' data-here' : ''} aria-label="${esc(t.label)}">`
+      // Report #258: each Giant finds its closest Shrine (FavorProgressUI.as 129: the button's tip).
+      const find = favor.find ? ` role="button" tabindex="0" title="${esc(`Find the closest Shrine to ${r.name}`)}"` : '';
+      return `<li class="favor-row" data-giant="${esc(r.id)}"${r.ready ? ' data-ready' : ''}${r.here ? ' data-here' : ''}${find} aria-label="${esc(t.label)}">`
         + `<img src="${esc(r.icon)}" alt="" width="18" height="24" />`
         + `<span class="favor-name">${esc(r.name)}</span>`
         + `<span class="favor-meter" aria-hidden="true"><i style="width: ${Math.round(r.share * 100)}%"></i></span>`
@@ -459,6 +461,16 @@ function installFavor(doc, favor) {
   };
   // Clear of an open side sheet (Make, Quests, Skills and the rest) and the Social drawer.
   const p = popover(doc, chip, pop, { onOpen: draw, clear: true });
+  const findFrom = (e) => {
+    const li = e.target?.closest?.('.favor-row[data-giant]');
+    if (!li || !favor.find) return;
+    e.preventDefault();
+    e.stopPropagation();
+    p.close();
+    favor.find(li.dataset.giant);
+  };
+  pop.addEventListener('click', findFrom);
+  pop.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') findFrom(e); });
   chip.addEventListener('keydown', (e) => {
     if (e.key !== 'Enter' && e.key !== ' ') return;
     // Not the game's Enter (verbs) or Space (jump).

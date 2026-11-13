@@ -16,7 +16,7 @@ import { after, before, describe, it } from 'node:test';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-import { projectApi, streetJobsFeature } from '../public/js/features/street-jobs-feature.js?v=383fae0b';
+import { projectApi, streetJobsFeature } from '../public/js/features/street-jobs-feature.js?v=7ae9e889';
 import { soloNeed } from '../public/js/street-jobs.js?v=87fd5c87';
 import { createToolConditionState } from '../public/js/tools.js?v=62b37c51';
 import { Display, FakeEl, fakePixi } from './fake-scene.js';

@@ -40,14 +40,14 @@ import { copyFromLedger, spendCopyCharge } from '../public/js/copy-charges.js?v=
 import { createDroppedItemState, dropInventoryStack, pickupDroppedStack } from '../public/js/world-items.js?v=5e592293';
 import { useBottle, bottleUsesLeft } from '../public/js/tree-poison.js?v=0cfbc3fb';
 import { usePotion as useGardenPotion, potionUsesLeft as gardenUsesLeft } from '../public/js/master-garden.js?v=84fcebf6';
-import { potionsFeature, usePotionNow } from '../public/js/features/potions-feature.js?v=51d7c694';
-import { powdersFeature } from '../public/js/features/powders-feature.js?v=72ec7713';
-import { treeDeathFeature } from '../public/js/features/tree-death-feature.js?v=838d9036';
+import { potionsFeature, usePotionNow } from '../public/js/features/potions-feature.js?v=6c6b7569';
+import { powdersFeature } from '../public/js/features/powders-feature.js?v=898b8120';
+import { treeDeathFeature } from '../public/js/features/tree-death-feature.js?v=0b02fd7e';
 import { masterGardenFeature } from '../public/js/features/master-garden-feature.js?v=8a6cf8a7';
-import { itemVerbsMoreFeature } from '../public/js/features/item-verbs-more-feature.js?v=da104fbf';
+import { itemVerbsMoreFeature } from '../public/js/features/item-verbs-more-feature.js?v=53a5c60b';
 import { supplyFeature } from '../public/js/features/supply-feature.js?v=f4a69cd2';
 import { cubimalRaceFeature } from '../public/js/features/cubimal-race-feature.js?v=39a52142';
-import { seasonsFeature } from '../public/js/features/seasons-feature.js?v=555d8f12';
+import { seasonsFeature } from '../public/js/features/seasons-feature.js?v=b3908d75';
 
 const root = join(import.meta.dirname, '..');
 

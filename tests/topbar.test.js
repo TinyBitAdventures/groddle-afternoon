@@ -22,7 +22,7 @@ import {
   vitalRing,
   volumeLevel,
   soundChannelToggle,
-} from '../public/js/ui/topbar.js?v=04d7482c';
+} from '../public/js/ui/topbar.js?v=0a34221d';
 
 import { GIANTS, canClaimEmblem, createShrineState, emblemCostFor, favorDisplayGiant, favorPanelRows, giantForStreet } from '../public/js/shrines.js?v=a190faea';
 
@@ -260,7 +260,7 @@ describe('the favor panel (report #170): all eleven Giants from the favor displa
     assert.doesNotMatch(body, /<button/);
     assert.match(topbar, /favorPanel = installFavor\(doc, opts\.favor\);/);
     assert.match(topbar, /favorPanel\?\.sync\(\);/);
-    assert.match(game, /favor: \{ rows: \(\) => favorPanelRows\(shrineState, favorGiantHere\(\)\?\.id \|\| null\) \},/);
+    assert.match(game, /favor: \{ rows: \(\) => favorPanelRows\(shrineState, favorGiantHere\(\)\?\.id \|\| null\), find: \(giant\) => findNearestShrine\(giant\) \},/);
     // The display still shows the street's Giant (favorChip), and the tooltip hides while the panel is open.
     assert.match(game, /favor: favorGiant \? \{\n\s+name: favorGiant\.name,/);
     assert.match(read('style.css'), /\[data-ui="modern"\] \.favor-pop \{ width: 300px;/);
@@ -321,7 +321,7 @@ describe('the favor display shows whenever any Giant has favor (report #170, G63
     // The game asks it for the display and for the panel's "here" row.
     assert.match(game, /const favorGiant = favorGiantHere\(\);/);
     assert.match(game, /function favorGiantHere\(\) \{\n\s+return favorDisplayGiant\(shrineState, currentStreet, \{\n\s+shrineHere: interactables\.some\(\(target\) => String\(target\?\.classId \|\| ''\)\.startsWith\('npc_shrine_'\)\),/);
-    assert.match(game, /favor: \{ rows: \(\) => favorPanelRows\(shrineState, favorGiantHere\(\)\?\.id \|\| null\) \},/);
+    assert.match(game, /favor: \{ rows: \(\) => favorPanelRows\(shrineState, favorGiantHere\(\)\?\.id \|\| null\), find: \(giant\) => findNearestShrine\(giant\) \},/);
   });
 
   it('still hidden under 1,100 px wide and in Classic', () => {

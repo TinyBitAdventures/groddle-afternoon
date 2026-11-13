@@ -436,6 +436,17 @@ function wholeLineUnreached(unreached, line) {
   return runs.some(([a, b]) => a <= lo + 28 && b >= hi - 28);
 }
 
+/**
+ * Report #258: the streets whose shrine is this Giant's (each street row's giantId, where the
+ * game stands its shrine), for "Find the closest Shrine to <Giant>" (glitch-client
+ * FavorProgressUI.as 129, 189-212).
+ */
+export function shrineStreetsFor(giantId, source = catalog) {
+  const id = String(giantId || '');
+  if (!id) return [];
+  return Object.entries(source?.streets || {}).filter(([, row]) => row?.giantId === id).map(([tsid]) => tsid);
+}
+
 export function ecologyForStreet(tsid, source = catalog) {
   for (const alias of streetEcologyAliases(tsid)) {
     if (source?.streets?.[alias]) return source.streets[alias];

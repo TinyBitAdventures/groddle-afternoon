@@ -15,7 +15,7 @@ import { MIN_PACK_HEIGHT, VIEW_FLOOR_H, VIEW_HOLD_H, phoneStage, phoneZoomSpan, 
 import { PHONE_ZOOM_DEFAULT, PHONE_ZOOM_STORAGE_KEY, ZOOM_DEFAULT, ZOOM_STORAGE_KEY, createWorldZoom, phoneZoomLabel } from '../public/js/world-zoom.js?v=34c2cf14';
 import { TAP_SLOP_PX, isWorldTap, pinchLevel } from '../public/js/touch-pinch.js?v=6cd34a65';
 import { signpostBoardAt } from '../public/js/street-render.js?v=47697d4c';
-import { MENU_ROWS } from '../public/js/ui/topbar.js?v=04d7482c';
+import { MENU_ROWS } from '../public/js/ui/topbar.js?v=0a34221d';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const read = (rel) => readFileSync(join(root, rel), 'utf8');

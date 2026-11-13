@@ -35,7 +35,7 @@ import {
   rockPlacementRequest,
   setStreetEcologyCatalog,
   streetReservedSpots,
-} from '../public/js/street-ecology.js?v=7f511b35';
+} from '../public/js/street-ecology.js?v=080b2e56';
 import {
   MYSTERY_QUOIN_KINDS,
   QUOIN_CLASSES,

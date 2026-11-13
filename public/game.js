@@ -2,9 +2,9 @@
  * Groddle Afternoon — original street geometry + layered decos
  * PixiJS 8 · locations-xml streets · CoU PNG decos · quests/items
  */
-import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=83595c2b';
+import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=9754dc15';
 import { createErrorOnce, createFeatureHost } from './js/feature-host.js?v=06bb8b74';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=a6211eef';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=b8dd19cb';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl, drawTileArt } from './js/enter-chooser.js?v=4a3ea327';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -490,8 +490,8 @@ import { PACK_COPY, isBagClass, isElementClass, ownBagLabel, unitRankAt } from '
 import { FLOAT_TEXT_Z, SPEECH_BUBBLE_Z } from './js/fx-z.js?v=18dda7e3';
 import { hasPouch } from './js/elemental-pouch.js?v=ceefa97a';
 import { createPackRow, mountPackClearance, packBandRange, packCountText, packSearchEntries, packSlotTip } from './js/ui/pack-row.js?v=64e4a567';
-import { listAnimalFeedOptions } from './js/animals.js?v=9d7b83fd';
-import { pickerMaxCount, pickerOptionsFor, pickerTakesCount } from './js/animals.js?v=9d7b83fd';
+import { listAnimalFeedOptions } from './js/animals.js?v=ea4efd19';
+import { pickerMaxCount, pickerOptionsFor, pickerTakesCount } from './js/animals.js?v=ea4efd19';
 import {
   createDroppedItemState,
   parseDroppedItemState,
@@ -668,7 +668,7 @@ import {
   ensureStreetIndex,
   resolveIndexTsid,
 } from './js/street-loader.js?v=18b181ad';
-import { showDraftBanner, startDraftPlay } from './js/builder/draft-play.js?v=5cfd873f';
+import { showDraftBanner, startDraftPlay } from './js/builder/draft-play.js?v=3cb8f7a8';
 import {
   ladderTopDeck,
   groundBeneath,
@@ -868,7 +868,7 @@ import {
   createAnimalState,
   resetAnimalDay,
   animalStatusLabel,
-} from './js/animals.js?v=9d7b83fd';
+} from './js/animals.js?v=ea4efd19';
 import {
   ensureWoodTreeState,
   pickWoodTool,
@@ -976,6 +976,7 @@ import { createMapZoom } from './js/map-zoom.js?v=4c2ce0e3';
 import {
   loadStreetEcologyCatalog,
   ecologyForStreet,
+  shrineStreetsFor,
   populationForStreet,
   planStreetPlacements,
   streetReservedSpots,
@@ -986,8 +987,8 @@ import {
   rockPlacementRequest,
   rockSpawnPlan,
   ROCK_SHAPE_WIDTHS,
-} from './js/street-ecology.js?v=7f511b35';
-import { CHICKEN_PAUSE, chickenPauseRoll, easeToward, flightFloorAt, flightFloorFor, flyerLift } from './js/street-creatures.js?v=380f7b70';
+} from './js/street-ecology.js?v=080b2e56';
+import { CHICKEN_PAUSE, chickenPauseRoll, easeToward, flightFloorAt, flightFloorFor, flyerLift } from './js/street-creatures.js?v=16acda00';
 import { chickenPose, chickenIdleSheetsAsked } from './js/chicken-idle-art.js?v=c46b17d5';
 import { chickenWaitPose } from './js/chicken-idles.js?v=eef0279b';
 import { itemOverlayStats } from './js/item-overlay.js?v=97ed2ba0';
@@ -1013,7 +1014,7 @@ import { installHiresIcons } from './js/icon-hires.js?v=165dbd6e';
 import { installHiresDecos } from './js/deco-hires.js?v=f59e60d3';
 import { loadAudioLevels, loadMutedPreference, saveAudioLevel, saveMutedPreference } from './js/audio-pref.js?v=6fe817bc';
 import { createAudioBuses, fadeGain } from './js/audio-buses.js?v=af167b54';
-import { installTopBar, renderTopBar } from './js/ui/topbar.js?v=04d7482c';
+import { installTopBar, renderTopBar } from './js/ui/topbar.js?v=0a34221d';
 import { focusBack, installFocusReturn, lastInput } from './js/ui/focus-return.js?v=da190597';
 import { installContextGuard } from './js/ui/context-guard.js?v=0f71ac17';
 import { QUOIN_FRAME_BOB, advanceQuoinClock, quoinBobBetweenFrames } from './js/quoin-motion.js?v=ea0bd408';
@@ -28622,6 +28623,44 @@ function isVendorOpen() {
 }
 
 /** The Giant the top bar's favor display reads here, or null (G631, js/shrines.js favorDisplayGiant). */
+/**
+ * Report #258: a Giant in the favor panel finds the closest Shrine to it and sets it as your
+ * destination. Glitch's Giant button ("Find the closest Shrine to <Giant>", FavorProgressUI.as
+ * 129, 189-212) opened the shrine's info with "The nearest <Shrine> is in <street>" and its "Set
+ * as destination" (GetInfoDialog.as 769-787, 1094-1118); here one click does both. Nearest is
+ * the fewest streets away by road (js/map-routes.js findRoute over every one of its shrines).
+ */
+function findNearestShrine(giant) {
+  const row = favorPanelRows(shrineState, null).find((r) => r.id === giant);
+  if (!row) return null;
+  const shrine = `Shrine to ${row.name}`;
+  const streets = shrineStreetsFor(row.id);
+  const here = String(currentStreetTsid || '');
+  const alias = (t) => [t, t.replace(/^G/, 'L'), t.replace(/^L/, 'G')];
+  if (here && streets.some((t) => alias(t).includes(here))) {
+    toast(`The nearest ${shrine} is right here in your location!`, 3200);
+    setCanvasData('favorShrine', `${row.id}@here`);
+    return { ok: true, here: true };
+  }
+  if (!streets.length) {
+    toast(`Can’t find any ${shrine}s where you are now.`, 3200);
+    return { ok: false };
+  }
+  const res = engine.query('mapRoute', 'set', { to: streets, source: 'player' }, engine);
+  if (!res || res.ok === false) {
+    toast(res?.error || `Can’t find any ${shrine}s where you are now.`, 4000);
+    setCanvasData('favorShrine', `${row.id}:${res?.error || 'none'}`);
+    return res;
+  }
+  const to = res.route?.destination || '';
+  const meta = to ? STREET_INDEX.streets?.[to] || STREET_INDEX.streets?.[to.replace(/^L/, 'G')] : null;
+  const line = meta?.label ? `The nearest ${shrine} is in ${meta.label}. It is set as your destination.` : `Directions to the nearest ${shrine} are set.`;
+  toast(line, 4000);
+  pushActivity(line);
+  setCanvasData('favorShrine', `${row.id}@${to}`);
+  return res;
+}
+
 function favorGiantHere() {
   return favorDisplayGiant(shrineState, currentStreet, {
     shrineHere: interactables.some((target) => String(target?.classId || '').startsWith('npc_shrine_')),
@@ -33272,7 +33311,7 @@ async function main() {
     zoom: hudZoom,
     nightTint,
     streetMap: streetMapSetting,
-    favor: { rows: () => favorPanelRows(shrineState, favorGiantHere()?.id || null) },
+    favor: { rows: () => favorPanelRows(shrineState, favorGiantHere()?.id || null), find: (giant) => findNearestShrine(giant) },
     onImagination: () => (modernUi() && imaginationHub ? imaginationHub.toggle() : document.getElementById('img-btn')?.click()),
     onMail: () => { if (state.started) openMailboxPanel(); },
     onPlayerCard: () => document.getElementById('player-menu-btn')?.click(),

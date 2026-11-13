@@ -10883,6 +10883,9 @@ html.stage-pinned[data-ui="modern"] header.top-bar { left: calc(var(--sp-5) + va
 }
 [data-ui="modern"] .favor-row[data-here] { background: var(--surface-sunken); }
 [data-ui="modern"] .favor-row img { width: auto; height: 24px; justify-self: center; }
+/* Report #258: a Giant's row finds its closest Shrine. */
+[data-ui="modern"] .favor-row[role="button"] { cursor: pointer; }
+[data-ui="modern"] .favor-row[role="button"]:hover, [data-ui="modern"] .favor-row[role="button"]:focus-visible { background: color-mix(in srgb, currentColor 8%, transparent); }
 [data-ui="modern"] .favor-meter { height: 6px; border-radius: var(--radius-pill); background: var(--track); overflow: hidden; }
 [data-ui="modern"] .favor-meter i { display: block; height: 100%; border-radius: inherit; background: var(--accent); }
 [data-ui="modern"] .favor-row[data-ready] .favor-meter i { background: var(--good); }
