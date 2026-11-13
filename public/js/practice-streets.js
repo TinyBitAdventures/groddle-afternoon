@@ -377,8 +377,10 @@ function ezMiddleDecos() {
 function ezFrontDecos() {
   const W = EZ_COOKIN_BOUNDS.r;
   // The big trunks in front of the lane (zoi: 1215 and 2040), and dark bushes along the bottom.
+  // The snaps' two trunks are bare up past the lamps, so both are fg_1 (no low skirt): the food
+  // and the counters' tops stay in view (fg_3 here, its low skirt, hid the first counter's cheese).
   const out = [
-    sized('tree_coniferous_fg_3', 1215, 1060, 0.85, 0),
+    sized('tree_coniferous_fg_1', 1215, 1060, 0.85, 0),
     sized('tree_coniferous_fg_1', 2040, 1060, 0.88, 1, { flip: true }),
     sized('tree_coniferous_fg_4', 2790, 1060, 0.8, 2),
     sized('tree_coniferous_fg_2', 10, 1060, 0.8, 3, { flip: true }),

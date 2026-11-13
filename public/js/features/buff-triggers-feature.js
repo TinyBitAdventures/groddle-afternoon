@@ -63,7 +63,7 @@ import { meditationFeature } from './meditation-feature.js?v=3b161fc1';
 import { teleportationFeature } from './teleportation-feature.js?v=4ab5dbdc';
 import { rookAttackFeature } from './rook-attack-feature.js?v=bc83707c';
 import { rubeFeature } from './rube-feature.js?v=b83c534a';
-import { smugglingFeature } from './smuggling-feature.js?v=d9da03a7';
+import { smugglingFeature } from './smuggling-feature.js?v=111c6cae';
 import { hellFeature } from './hell-feature.js?v=7477c8c7';
 import { isPooped } from '../hell.js?v=23354bc4';
 

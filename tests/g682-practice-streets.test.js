@@ -44,12 +44,12 @@ import {
   practiceScreen,
   practiceStreetEcology,
   soilStreet,
-} from '../public/js/practice-streets.js?v=6c95cb75';
+} from '../public/js/practice-streets.js?v=108f80a3';
 import { NEW_DECOS, NEW_DECOS_HIRES } from '../public/js/deco-new-list.js?v=bf75b325';
 import { BUILT_ROOMS, QUEST_ROOMS } from '../public/js/quest-rooms/catalog.js?v=a217b716';
-import { FIRST_SKILLS, PRACTICE_TOOLS, firstSkill, practiceToolToPlace } from '../public/js/newxp.js?v=92f67942';
-import { HELLO as EZ_HELLO, room as ezRoom } from '../public/js/quest-rooms/ez-cookin.js?v=922a4c4d';
-import { HELLO as SOIL_HELLO, TEND_FIRST, patchArt, patchVerbs, room as soilRoom } from '../public/js/quest-rooms/soil-appreciation.js?v=68bd1925';
+import { FIRST_SKILLS, PRACTICE_TOOLS, firstSkill, practiceToolToPlace } from '../public/js/newxp.js?v=12f236c7';
+import { HELLO as EZ_HELLO, room as ezRoom } from '../public/js/quest-rooms/ez-cookin.js?v=b245dd00';
+import { HELLO as SOIL_HELLO, TEND_FIRST, patchArt, patchVerbs, room as soilRoom } from '../public/js/quest-rooms/soil-appreciation.js?v=6314aa57';
 
 const spike = join(dirname(fileURLToPath(import.meta.url)), '..');
 const pub = join(spike, 'public');
@@ -135,6 +135,29 @@ describe('G682 practice streets: street JSON', () => {
     // snap x 518-700, feet 901 (world -99); drawn at the picture's own shape, 182 x 96.
     assert.deepEqual([table.x, table.w, table.h, table.y], [EZ_KNIFE_TABLE.x, 182, 96, EZ_PROP_ART.tableFeet]);
     assert.ok(EZ_KNIFE_AND_BOARD.y < table.y && EZ_KNIFE_AND_BOARD.y > table.y - table.h, 'the Knife & Board rests within the table top');
+  });
+
+  it("EZ Cookin's front layer keeps the food, the counters' tops and the table top in view (the snaps' front trunks are bare there)", () => {
+    const s = file(EZ_COOKIN_TSID);
+    const front = s.layers.find((l) => l.name === 'middleplus');
+    const oy = -s.bounds.t;
+    // The lowest branches wider than a quarter of the picture, as a fraction of its height from the
+    // top (measured from each WebP's alpha). fg_3 and fg_4 have a skirt down by their roots.
+    const FOLIAGE_BOTTOM = { tree_coniferous_fg_1: 0.6, tree_coniferous_fg_2: 0.73, tree_coniferous_fg_3: 0.92, tree_coniferous_fg_4: 0.92 };
+    const tops = [...EZ_COUNTERS, { id: 'table', ...EZ_KNIFE_TABLE }];
+    for (const d of front.decos) {
+      const top = d.y - oy - d.h;
+      for (const t of tops) {
+        if (d.x + d.w / 2 <= t.x1 || d.x - d.w / 2 >= t.x2) continue;
+        if (FOLIAGE_BOTTOM[d.sprite] != null) {
+          // The trunk (an eighth of the picture) misses the top, and the branches hang above the food.
+          assert.ok(Math.abs(d.x - t.x) > (t.x2 - t.x1) / 2 + d.w / 16, `${d.sprite} at ${d.x}: its trunk misses ${t.id}`);
+          assert.ok(top + d.h * FOLIAGE_BOTTOM[d.sprite] < t.top - 60, `${d.sprite} at ${d.x}: its branches hang above ${t.id}'s food`);
+        } else {
+          assert.ok(top > t.top + 20, `${d.sprite} at ${d.x}: stays below ${t.id}'s top`);
+        }
+      }
+    }
   });
 
   it('put the GSJS food on the counters\' tops (skillquest_ezc_v2.js location_targets, special_items)', { skip: noGsjs }, () => {
