@@ -2752,7 +2752,7 @@
   "deployed": "2026-11-12"
  },
  "git": {
-  "commits": 1844,
+  "commits": 1846,
   "since": "2026-10-19",
   "recent": [
    {
@@ -2764,6 +2764,11 @@
     "date": "2026-11-12",
     "kind": "fix",
     "text": "Seeker of the Shiny and Meditation Station are offered once, not every 5 minutes forever"
+   },
+   {
+    "date": "2026-11-12",
+    "kind": "improve",
+    "text": "Deploys leave Minn Engine and Minn Admin to update themselves on the live site; live.json pins neither"
    },
    {
     "date": "2026-11-12",
@@ -2869,11 +2874,6 @@
     "date": "2026-11-12",
     "kind": "fix",
     "text": "Drinks' iMG takes the mood bonus, no drinking while dead, and Bacon is food again"
-   },
-   {
-    "date": "2026-11-12",
-    "kind": "fix",
-    "text": "No squeezing a Chicken on its egg, Super Animal Harvest Bacon, and the animals' refusals and misses say Glitch's lines"
    }
   ]
  },
