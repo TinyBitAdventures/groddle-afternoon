@@ -53,7 +53,7 @@ import {
   tickQuestTimers,
   restartTimedQuest,
   questTimerStatus,
-} from '../public/js/quest-offers.js?v=956218ac';
+} from '../public/js/quest-offers.js?v=b805222d';
 import { XP_FOR_LEVEL } from '../public/js/progression.js?v=72b2b22a';
 
 const CONTENT = join(dirname(fileURLToPath(import.meta.url)), '../public/assets/content');
@@ -310,7 +310,12 @@ describe('familiar delivery, decline and accept', () => {
     assert.deepEqual(ids(talk.completable), ['vendor_ping_pong_part1']);
   });
 
-  it('repeatable quests are offered again after completion', () => {
+  // Austin 2026-11-12: Seeker of the Shiny and Meditation Station came back every 5 minutes
+  // forever. GSJS re-offers a done repeatable quest only on a fresh quests_offer call
+  // (players/inc_quests.js 610-615) and nothing calls it for these two (only the admin
+  // /testquest, main.js 2359-2372), so the familiar offers them once. A repeat accepted
+  // some other way (a waiting offer, an NPC) still restarts the quest.
+  it('the familiar never re-offers a completed repeatable quest', () => {
     const state = createQuestState();
     state.completed.push('de_embiggenify_part2');
     const pc = freshPc();
@@ -320,7 +325,11 @@ describe('familiar delivery, decline and accept', () => {
     routeQuestEvent(state, 'cheese_very_stinky:poke', 3, { inv });
     assert.equal(turnInQuest(state, 'find_shiny_intrinsic_object', pc, { inv }).ok, true);
     assert.equal(inv.small_worthless, 0);
-    assert.ok(ids(pendingQuestOffers(state, pc, {})).includes('find_shiny_intrinsic_object'));
+    assert.ok(!ids(pendingQuestOffers(state, pc, {})).includes('find_shiny_intrinsic_object'));
+    state.completed.push('meditativearts_get_max_relax');
+    assert.ok(ids(pendingQuestOffers(state, pc, {})).includes('meditativearts_meditation_station'), 'offered once');
+    state.completed.push('meditativearts_meditation_station');
+    assert.ok(!ids(pendingQuestOffers(state, pc, {})).includes('meditativearts_meditation_station'));
     assert.equal(acceptOffer(state, 'find_shiny_intrinsic_object', {}).reason, 'repeat');
     assert.equal(ensureQuestOfferState(state).repeats.find_shiny_intrinsic_object, 1);
   });

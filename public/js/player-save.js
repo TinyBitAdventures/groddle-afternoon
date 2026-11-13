@@ -11,7 +11,7 @@ import { normalizeEmotionalBearState } from './emotional-bear.js?v=172f393b';
 import { normalizeHomeState } from './homes.js?v=631ab6b8';
 import { normalizeMailboxState } from './mailbox.js?v=a3e833ba';
 import { normalizeFeatureSlices } from './feature-host.js?v=06bb8b74';
-import { normalizeQuestOfferState } from './quest-offers.js?v=956218ac';
+import { normalizeQuestOfferState } from './quest-offers.js?v=b805222d';
 
 export const PLAYER_SAVE_VERSION = 7;
 

@@ -9,7 +9,8 @@
  *
  * How the original worked, and what this module reproduces:
  *  - quests_offer(): a quest is offered when its prereq_quests are done,
- *    canOffer() passes and its status is 'none' (or 'done' and repeatable).
+ *    canOffer() passes and its status is 'none' (or 'done' and repeatable,
+ *    which only a fresh call re-offers: NPCs here, never the familiar).
  *    Callers were level-ups (quests_level_map, offered once you are 5% into
  *    the level), skill learning (skills_get_quest_map), XP thresholds,
  *    quest completion code (chains), achievements, and named hooks.
@@ -429,10 +430,22 @@ export function triggerMet(trigger, def, questState, pc = null, ctx = {}) {
 
 const TRIGGER_RANK = { quest: 0, skill: 1, level: 2, xp: 2, achievement: 3, event: 4, region: 4, street: 4, npc: 5, prerequisites: 6, inferred: 6 };
 
-function offerableStatus(questState, def) {
+/**
+ * A done quest is offered again only when it is repeatable, and then only by an NPC.
+ * The source re-offers a done repeatable quest only when something calls quests_offer
+ * for it again (players/inc_quests.js quests_offer 610-615). The familiar's callers
+ * fire once: a chain's onComplete, the level map (status 'none' only, 1055), a
+ * skill learnt (quests_learnt_skill_do 974-980), an achievement. Nothing in GSJS calls
+ * quests_offer for Seeker of the Shiny or Meditation Station at all (only the admin
+ * /testquest, main.js 2359-2372), so their standing triggers here (quests.json
+ * offerTriggers 'quest' and 'inferred') offer them once and never again; before this
+ * they came back every 5 minutes forever. NPC givers ask on every talk and
+ * skip only a done quest that is not repeatable (items/include/npc_quests.js 28-30), so the Reminisce repeats stay.
+ */
+function offerableStatus(questState, def, { npc = false } = {}) {
   const status = questStatus(questState, def.classTsid);
   if (status === 'none') return true;
-  return status === 'done' && def.isRepeatable;
+  return status === 'done' && def.isRepeatable && npc;
 }
 
 /** The game's "is this quest on hold" check (features/quest-offers-feature.js init), or null. */
@@ -447,7 +460,7 @@ function eligibleTrigger(def, questState, pc, ctx, { npc = false } = {}) {
   const mp = def?.solo ? null : offerableMultiplayerQuest(def?.classTsid, ctx);
   if (!def?.solo && !mp) return null;
   if (def.custom && !ctx.includeCustom) return null;
-  if (!offerableStatus(questState, def)) return null;
+  if (!offerableStatus(questState, def, { npc })) return null;
   // Austin 2026-11-03 (js/quest-reach.js): a quest that needs a street no open road reaches yet
   // waits until one does (street-jobs-feature questHold: closed project roads, solo or the shared
   // world), from the familiar and from every NPC (their callers' ctx, or the check the game set).

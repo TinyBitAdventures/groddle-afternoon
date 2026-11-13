@@ -13,7 +13,7 @@ import { fileURLToPath } from 'node:url';
 import * as kit from '../public/js/quest-rooms/kit.js?v=57af0d8f';
 import { QUEST_ROOMS, roomModulePath } from '../public/js/quest-rooms/catalog.js?v=87636ba5';
 import { loadContentCatalogsFromDir, getQuestCatalog } from '../public/js/content-catalogs.js?v=10b118dd';
-import { acceptOffer, ensureQuestOfferState, questStatus, turnInQuest } from '../public/js/quest-offers.js?v=956218ac';
+import { acceptOffer, ensureQuestOfferState, questStatus, turnInQuest } from '../public/js/quest-offers.js?v=b805222d';
 import { gwendolynOffers } from '../public/js/gwendolyn-room-23.js?v=46e417b9';
 import {
   CACTUS,
@@ -48,7 +48,7 @@ import {
   room,
   stageForQuest,
   thirdPartFor,
-} from '../public/js/quest-rooms/gwendolyn.js?v=1b7e6f86';
+} from '../public/js/quest-rooms/gwendolyn.js?v=ed999d7d';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const pub = (p) => join(root, 'public', p);

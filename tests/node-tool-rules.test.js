@@ -16,7 +16,7 @@ import { bindToolInventory, createToolConditionState, setToolRemaining, toolCopi
 import { WORLD_DROP_RULES, dropFor } from '../public/js/world-drop.js?v=98c01a74';
 import { CHOICE_MS, chooseTool, clearToolChoice, peekToolChoice, takeToolChoice } from '../public/js/tool-choice.js?v=e0dcb60e';
 import { PACK_TOOL_TEXT, nodesFor, packToolButtons, packToolCondition, planPackToolVerb } from '../public/js/pack-tool-verbs.js?v=479afbd9';
-import { packToolOrder } from '../public/js/features/resource-nodes-feature.js?v=9067aab6';
+import { packToolOrder } from '../public/js/features/resource-nodes-feature.js?v=f14d2daf';
 import { CREW_NODES, CREW_VERBS, HELP_SCRAPE_LABEL, helpScrapeMessage } from '../public/js/help-dig.js?v=93d6358d';
 import { nodePerks } from '../public/js/street-objects.js?v=563dc581';
 
