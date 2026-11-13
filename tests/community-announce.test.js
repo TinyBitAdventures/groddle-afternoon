@@ -132,6 +132,30 @@ describe('Announcements on a throwaway database', { skip: skipDb }, () => {
     assert.match(src('community/community.css'), /\.notif-icon\[data-kind="announce"\]/);
   });
 
+  it('the one-off for an earlier announcement: a dry run by default, then once, and only for the team\'s topic on Announcements', () => {
+    const b = r.backfill;
+    assert.deepEqual({ ...b.dry, thread: 0 }, { thread: 0, title: 'Welcome to the boards', board: 'announcements', author: 900, players: 4, would: 4 });
+    assert.equal(b.afterDry, 0, 'the dry run writes nothing');
+    assert.equal(b.apply.written, 4);
+    assert.equal(b.afterApply, 4);
+    assert.equal(b.again.would, 0);
+    assert.equal(b.again.written, 0);
+    assert.equal(b.afterAgain, 4, 'running it twice writes nothing more');
+    assert.deepEqual(b.cydPanel, ['New announcement: “Welcome to the boards”']);
+    assert.equal(b.refused.general.error, 'That thread is not on a board only the team posts on.');
+    assert.equal(b.refused.playerOnAnnouncements.error, 'That thread was not started by an administrator.');
+    assert.equal(b.refused.missing.error, 'There is no thread by that id.');
+    for (const k of Object.keys(b.refused)) assert.equal(b.refused[k].written, undefined, k);
+  });
+
+  it('bin/announce-notify.php: wp eval-file, thread=<id>, changes nothing without apply', () => {
+    const bin = src('bin/announce-notify.php');
+    assert.match(bin, /wp eval-file wp-content\/themes\/groddle\/bin\/announce-notify\.php thread=11 {10}\(counts, changes nothing\)/);
+    assert.match(bin, /\$apply = in_array\('apply', \$given, true\);/);
+    assert.match(bin, /Groddle\\Minn\\Community::announceBackfill\(Minn\\Runtime\\Runtime::current\(\)->db, \$thread, \$apply\)/);
+    assert.doesNotMatch(bin, /[—–]/);
+  });
+
   it('the rule is the administrators\' (manage_options), by board, never by user id', () => {
     const c = src('src/Community.php');
     assert.match(src('src/CommunityText.php'), /public const STAFF_BOARDS = \['announcements'\];/);

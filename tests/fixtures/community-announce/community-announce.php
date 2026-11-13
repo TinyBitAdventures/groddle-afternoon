@@ -182,6 +182,28 @@ try {
     $later = $start(900, 'announcements', 'More Groddle news');
     $out['second'] = ['eve' => $notices(914), 'total' => (int) $db->value('SELECT COUNT(*) FROM ' . $db->table(Community::NOTICES) . " WHERE kind = 'announce' AND thread_id = ?", [(int) ($later['body']['thread']['id'] ?? 0)])];
     $out['noticeText'] = Community::noticeText(Community::ANNOUNCE, 1, 'Zz Staff', 'Groddle news');
+
+    // == 4. The one-off for an announcement posted before the notices (thread 11 on the live site) ==
+    $old = static function (string $board, int $author, string $title) use ($db, $at, $now): int {
+        $db->execute('INSERT INTO ' . $db->table(Community::THREADS) . " (board, author_id, title, status, created_at, last_post_at) VALUES (?, ?, ?, 'open', ?, ?)", [$board, $author, $title, $at($now - DAY), $at($now - DAY)]);
+        $id = $db->insertId();
+        $db->execute('INSERT INTO ' . $db->table(Community::POSTS) . " (thread_id, author_id, author_name, body, status, created_at, changed_ms) VALUES (?, ?, 'x', 'Old news.', 'shown', ?, 1)", [$id, $author, $at($now - DAY)]);
+        $db->execute('UPDATE ' . $db->table(Community::THREADS) . ' SET first_post_id = ?, posts = 1 WHERE id = ?', [$db->insertId(), $id]);
+        return $id;
+    };
+    $eleven = $old('announcements', 900, 'Welcome to the boards');
+    $count = static fn (int $t): int => (int) $db->value('SELECT COUNT(*) FROM ' . $db->table(Community::NOTICES) . ' WHERE thread_id = ?', [$t]);
+    $out['backfill'] = ['dry' => Community::announceBackfill($db, $eleven, false), 'afterDry' => $count($eleven)];
+    $out['backfill']['apply'] = Community::announceBackfill($db, $eleven, true);
+    $out['backfill']['afterApply'] = $count($eleven);
+    $out['backfill']['again'] = Community::announceBackfill($db, $eleven, true);
+    $out['backfill']['afterAgain'] = $count($eleven);
+    $out['backfill']['cydPanel'] = array_values(array_filter(array_map(static fn (array $i): string => $i['text'], (new Notifications($seams(912)))->items(912)), static fn (string $t): bool => str_contains($t, 'Welcome')));
+    $out['backfill']['refused'] = [
+        'general' => Community::announceBackfill($db, $general, true),
+        'playerOnAnnouncements' => Community::announceBackfill($db, $old('announcements', 910, 'Sneaky'), true),
+        'missing' => Community::announceBackfill($db, 99999, true),
+    ];
 } catch (Throwable $e) {
     $out['error'] = get_class($e) . ': ' . $e->getMessage() . ' @' . $e->getFile() . ':' . $e->getLine();
 } finally {
