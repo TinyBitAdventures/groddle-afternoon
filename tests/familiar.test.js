@@ -476,3 +476,23 @@ describe('the rock card waits for its sheet (Austin 2026-11-13: the glow popped 
     assert.match(read('style.css'), /\.quest-dialogue\[data-rock-wait="true"\] \.quest-dialogue-card \{ opacity: 0; \}/);
   });
 });
+
+describe("the rock's glow on its cards (QuestConversationUI.as 76: GlowFilter 0xececec, alpha 0.8, strength 20)", () => {
+  it('is a near-solid light rim (hard copies on four sides), not a soft haze that fades on the cream Quests panel', () => {
+    const glitch = join(root, '..', 'glitch-client', 'com/tinyspeck/engine/view/ui/quest/QuestConversationUI.as');
+    if (existsSync(glitch)) assert.match(readFileSync(glitch, 'utf8'), /\{color:0xececec, alpha:\.8, strength:20\}, StaticFilters\.white4px40AlphaGlowA/);
+    const rule = /\.quest-dialogue\[data-look="familiar"\] \.fam-rock-art \{([^}]*)\}/.exec(read('style.css'))?.[1] || '';
+    // The rim's colour: 0xececec at 0.8 (the familiar look covers both the street card and the card in the Quests log).
+    assert.match(rule, /--fam-rim: color-mix\(in srgb, var\(--c-grey-94\) 80%, transparent\);/);
+    const shadows = [...rule.matchAll(/drop-shadow\(([^ ]+) ([^ ]+) ([^ ]+) var\(--fam-rim\)\)/g)].map((m) => m.slice(1, 4).map(parseFloat));
+    const hard = shadows.filter(([, , blur]) => blur === 0);
+    // Strength 20 fills the glow's blur: one unblurred copy right, left, down and up.
+    for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
+      assert.ok(hard.some(([x, y]) => Math.sign(x) === dx && Math.sign(y) === dy && Math.abs(x || y) >= 1), `a hard copy toward ${dx},${dy}`);
+    }
+    // Out to Glitch's 3 px (blur 6, half each side), with a soft last pixel.
+    const reach = Math.max(...hard.map(([x, y]) => Math.abs(x) + Math.abs(y))) + Math.max(0, ...shadows.map(([, , b]) => b));
+    assert.ok(reach >= 2 && reach <= 3.5, `rim reach ${reach}`);
+    assert.doesNotMatch(rule, /drop-shadow\(0 0 [4-9]px/, 'no wide haze');
+  });
+});

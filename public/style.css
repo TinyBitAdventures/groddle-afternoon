@@ -9469,8 +9469,12 @@ header.top-bar + .sub { display: none; }
 }
 .quest-dialogue[data-look="familiar"] .fam-rock { display: block; }
 .quest-dialogue[data-look="familiar"] .fam-rock-art {
-  /* glow 0xececec, alpha 0.8, strength 20 (QuestConversationUI.as 76) */
-  filter: drop-shadow(0 0 1.5px var(--c-grey-94)) drop-shadow(0 0 4px color-mix(in srgb, var(--c-grey-94) 80%, transparent));
+  /* glow 0xececec, alpha 0.8, strength 20 over white4px40AlphaGlow's blur 6 (QuestConversationUI.as 76,
+     StaticFilters.as 265-271): strength 20 fills the blur, so the rock wore a near-solid 3 px light rim, not
+     a haze. Four hard copies 2 px out (a rim that reads on the cream Quests panel and on the street; WebKit
+     rounds offsets to whole px) and a 1 px soft edge. */
+  --fam-rim: color-mix(in srgb, var(--c-grey-94) 80%, transparent);
+  filter: drop-shadow(2px 0 0 var(--fam-rim)) drop-shadow(-2px 0 0 var(--fam-rim)) drop-shadow(0 2px 0 var(--fam-rim)) drop-shadow(0 -2px 0 var(--fam-rim)) drop-shadow(0 0 1px var(--fam-rim));
 }
 .quest-dialogue[data-look="familiar"][data-urgent="true"] .fam-rays { display: block; }
 .quest-dialogue[data-look="familiar"] .quest-dialogue-bubble {
