@@ -82,6 +82,6 @@ describe('#219 a crystal takes a full Firefly Jar, kept, and 7 Barnacle Talc', (
   it('the Make panel counts and names the full jar', () => {
     const game = readFileSync(join(root, 'public/game.js'), 'utf8');
     assert.match(game, /if \(input\.full > 0\) return `full \$\{label\}`;/);
-    assert.match(game, /const have = recipeInputHave\(inv, i, opts\.toolState\);/);
+    assert.match(game, /const have = recipeInputHave\(inv, i, recipeOpts\(recipe\)\.toolState\);/);
   });
 });
