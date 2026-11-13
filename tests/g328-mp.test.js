@@ -33,11 +33,11 @@ import {
   receivedLine,
   sharedHomeStreet,
   visitSceneTsid,
-} from '../public/js/neighbours-mp.js?v=78dd3b33';
+} from '../public/js/neighbours-mp.js?v=a12300f9';
 import { createMinnAccount } from '../public/js/minn-account.js?v=c15f0ecf';
-import { homesFeature, visitorHomeScene, visitorHomeState } from '../public/js/features/homes-feature.js?v=64d015dd';
-import { neighboursMpApi, neighboursMpFeature } from '../public/js/features/neighbours-mp-feature.js?v=1b871f90';
-import { FEATURES } from '../public/js/features/index.js?v=34aa29b9';
+import { homesFeature, visitorHomeScene, visitorHomeState } from '../public/js/features/homes-feature.js?v=2caaad28';
+import { neighboursMpApi, neighboursMpFeature } from '../public/js/features/neighbours-mp-feature.js?v=30b729e1';
+import { FEATURES } from '../public/js/features/index.js?v=411d6d96';
 import { YARD_STYLE_BY_KEY, streetLook, yardLook, yardStyleFor } from '../public/js/home-styles.js?v=13fe0aaa';
 import { serverPath, sitePath, skipWithoutServer, skipWithoutSite } from '../tools/repos.mjs';
 
@@ -351,6 +351,28 @@ describe('neighbours feature (js/features/neighbours-mp-feature.js)', () => {
     await wait(5);
     assert.ok(events.includes('toast:You are blocked by that player.'));
     assert.equal(client.take('home_pass').length, 0, 'no pass without a home');
+  });
+
+  it('G668: a summons into a home is a visit (your own goes home), and where a summons may come', async () => {
+    const travels = [];
+    engine.homeTravel = (a) => travels.push(a);
+    assert.equal(neighboursMpFeature.neighboursSummoned({ owner: 1, room: 'interior', floor: 0, at: 300 }, engine), true);
+    await wait(5);
+    assert.deepEqual(travels, ['teleport-inside']);
+    const before = posted.length;
+    events.length = 0;
+    assert.equal(neighboursMpFeature.neighboursSummoned({ owner: 7, room: 'interior', floor: 0, at: 300 }, engine), true);
+    await wait(5);
+    assert.ok(posted.slice(before).includes('GET homes/7'), 'the site is asked, as for any visit');
+    assert.ok(events.includes('toast:You are blocked by that player.'), 'its refusal says why');
+    assert.equal(client.take('home_pass').length, 0);
+    assert.equal(neighboursMpFeature.summonHomePlace(engine), null, 'out of every home');
+    home = { inHome: true, room: 'interior' };
+    assert.equal(neighboursMpFeature.summonHomePlace(engine), '', 'your own house');
+    home = { inHome: false, room: 'street' };
+    assert.equal(neighboursMpFeature.summonHomePlace({ mode: 'solo' }), null);
+    assert.equal(neighboursMpFeature.neighboursSummoned({ owner: 7 }, { mode: 'solo' }), null);
+    delete engine.homeTravel;
   });
 
   it('asks the owner about a knock, and answers the server', () => {

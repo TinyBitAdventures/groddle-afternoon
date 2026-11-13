@@ -23,9 +23,10 @@ import {
   rollTeleportDay,
 } from '../public/js/teleportation.js?v=e95cf7cb';
 import { SUMMON_TEXT, SUMMON_VERB, askedText, summonRefusal, summonVerb } from '../public/js/summon-mp.js?v=42c1557d';
-import { BLOCKED_PLAYER_VERBS, FROM_LIST_VERBS, playerMenuRows } from '../public/js/ui/player-menu.js?v=a7bbaadc';
-import { summonMpFeature } from '../public/js/features/summon-mp-feature.js?v=6389f111';
-import { teleportationFeature } from '../public/js/features/teleportation-feature.js?v=84f28379';
+import { readHomeStreet, summonHomePlace } from '../public/js/neighbours-mp.js?v=a12300f9';
+import { BLOCKED_PLAYER_VERBS, FROM_LIST_VERBS, playerMenuRows } from '../public/js/ui/player-menu.js?v=2a12c1a6';
+import { summonMpFeature } from '../public/js/features/summon-mp-feature.js?v=45d2ec01';
+import { teleportationFeature } from '../public/js/features/teleportation-feature.js?v=1468e2c0';
 
 const ROOT = join(import.meta.dirname, '..');
 const V = ['teleportation_1', 'teleportation_2', 'teleportation_3', 'teleportation_4', 'teleportation_5'];
@@ -316,6 +317,40 @@ describe('Summons: the world side', () => {
     assert.equal(engine.log.activity.at(-1), 'Oops. Something happened with that teleport.');
   });
 
+  it('G668: into a home it visits through neighbours-mp beside the summoner; the prompt names your own home', () => {
+    const calls = [];
+    const query = engine.query;
+    engine.query = (hook, ...args) => (hook === 'neighboursSummoned' ? (calls.push(args[0]), true) : query(hook, ...args));
+    client.msg({ t: 'summon_asked', from: { id: 7, name: 'Ada' }, street: 'HOUSE_7', timeout: 30 });
+    assert.equal(last().text, "Ada would like to summon you to Ada's House. Do you accept?");
+    client.msg({ t: 'summon_asked', from: { id: 7, name: 'Ada' }, street: 'HOME_7', timeout: 30 });
+    assert.equal(last().text, "Ada would like to summon you to Ada's Home Street. Do you accept?");
+    client.msg({ t: 'summon_gone', from: 7 });
+    for (const [street, want] of [['HOUSE_7', { owner: 7, room: 'interior', floor: 0, at: 320 }], ['HOME_9', { owner: 9, room: 'street', floor: 0, at: 320 }], ['TOWER_7_3', { owner: 7, room: 'tower', floor: 3, at: 320 }]]) {
+      client.msg({ t: 'summon_go', from: { id: 7, name: 'Ada' }, street, x: 320, y: -50, party: false });
+      assert.deepEqual(calls.at(-1), want);
+      assert.equal(engine.log.activity.at(-1), 'Ada summoned you.');
+    }
+    engine.query = query;
+  });
+
+  it('G668: a summoner in a home: their own and a public home street take a summons, someone else\'s house does not', () => {
+    teleportationFeature.restore({});
+    const query = engine.query;
+    for (const [place, reason] of [['', null], ['them', "You can't summon them here."], ['here', "You can't summon people here."]]) {
+      engine.query = (hook, ...args) => (hook === 'summonHomePlace' ? place : query(hook, ...args));
+      const verb = summonMpFeature.verbOverride(bo, engine).find((v) => v.id === SUMMON_VERB);
+      if (reason) assert.equal(verb.reason, reason);
+      else assert.equal(verb.enabled, true, JSON.stringify(verb));
+    }
+    // Out of every home (null), the old rules: inHome alone is 'them'.
+    engine.query = (hook, ...args) => (hook === 'summonHomePlace' ? null : query(hook, ...args));
+    engine.homeContext = () => ({ inHome: true });
+    assert.equal(summonMpFeature.verbOverride(bo, engine).find((v) => v.id === SUMMON_VERB).reason, "You can't summon them here.");
+    engine.homeContext = () => ({ inHome: false });
+    engine.query = query;
+  });
+
   it("a summoner in a quest room can't summon, in a Party Space can", () => {
     teleportationFeature.restore({});
     engine.inQuestRoom = true;
@@ -326,5 +361,26 @@ describe('Summons: the world side', () => {
     assert.equal(verb.enabled, true);
     engine.inQuestRoom = false;
     engine.partySpace.here = false;
+  });
+});
+
+describe('G668: summons and homes (inc_teleportation.js 799-806)', () => {
+  it('reads the realtime home streets', () => {
+    assert.deepEqual(readHomeStreet('HOME_7'), { owner: 7, room: 'street', floor: 0 });
+    assert.deepEqual(readHomeStreet('HOUSE_12'), { owner: 12, room: 'interior', floor: 0 });
+    assert.deepEqual(readHomeStreet('TOWER_7_4'), { owner: 7, room: 'tower', floor: 4 });
+    for (const bad of ['HOME_0', 'HOME_07', 'HOMES_7', 'GA5101', 'TOWER_7', 'PARTY_1', '', null]) assert.equal(readHomeStreet(bad), null, String(bad));
+  });
+
+  it('your own home takes a summons; a visit takes one on the street or a Tower floor, not in the house', () => {
+    assert.equal(summonHomePlace({ street: 'HOME_7', me: 7, inHome: true }), '');
+    assert.equal(summonHomePlace({ street: 'HOUSE_7', me: 7, inHome: true }), '');
+    assert.equal(summonHomePlace({ street: 'TOWER_7_2', me: 7, inHome: true }), '');
+    assert.equal(summonHomePlace({ street: 'HOME_9', me: 7, visiting: true }), '');
+    assert.equal(summonHomePlace({ street: 'TOWER_9_0', me: 7, visiting: true }), '');
+    assert.equal(summonHomePlace({ street: 'HOUSE_9', me: 7, visiting: true }), 'them');
+    // An upper floor of your house is shared with nobody.
+    assert.equal(summonHomePlace({ street: '', me: 7, inHome: true }), 'here');
+    assert.equal(summonHomePlace({ street: '', me: 7 }), null);
   });
 });

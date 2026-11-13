@@ -140,6 +140,30 @@ export function homeStreetFor(ownerId, room = 'street', floor = 0) {
   return `${room === 'interior' ? HOUSE_STREET_PREFIX : HOME_STREET_PREFIX}${id}`;
 }
 
+/** { owner, room, floor } a realtime home street names (homeStreetFor's inverse), or null. */
+export function readHomeStreet(street) {
+  const m = /^(HOME|HOUSE)_([1-9]\d{0,17})$|^TOWER_([1-9]\d{0,17})_(\d)$/.exec(String(street || ''));
+  if (!m) return null;
+  if (m[3]) return { owner: Number(m[3]), room: 'tower', floor: Number(m[4]) };
+  return { owner: Number(m[2]), room: m[1] === 'HOUSE' ? 'interior' : 'street', floor: 0 };
+}
+
+/**
+ * G668: whether a summons may bring someone to the home you stand in (inc_teleportation.js
+ * 799-806): '' yes, 'them' "You can't summon them here.", 'here' "You can't summon people
+ * here.", null when you are in no home. `street` is sharedHomeStreet's answer. The owner
+ * summons anyone into their own home street, house or Tower floor; a visitor on someone's home
+ * street or Tower floor (public, inc_pols.js 448-458) may too, and the realtime server refuses a
+ * target that owner blocks (summon.go homePlace); from inside someone else's house, no. An upper
+ * floor of your own house is shared with nobody, so nobody can be summoned to it.
+ */
+export function summonHomePlace({ street = '', me = 0, inHome = false, visiting = false } = {}) {
+  const home = readHomeStreet(street);
+  if (!home) return inHome || visiting ? 'here' : null;
+  if (home.owner === positiveId(me)) return '';
+  return home.room === 'interior' ? 'them' : '';
+}
+
 /** The visit scene's tsid (engine.enterScene): MPH_<id> on the street, MPH_<id>_IN in the house, MPH_<id>_T<n> on a Tower floor. */
 export function visitSceneTsid(ownerId, room = 'street', floor = 0) {
   const id = positiveId(ownerId);

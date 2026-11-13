@@ -104,8 +104,8 @@ import { cultivationDef, homeStreetLayout } from '../home-cultivation.js?v=1e2d2
 import { tickGarden } from '../garden.js?v=1420a6d6';
 import { BUTLER_RIG_SCALE, ButlerPainter, butlerRigNow, loadButlerRig } from '../butler-rig.js?v=86bb97ad';
 import { BUTLER, BUTLER_INFO, butlerInfoText, butlerPostRx, normalizeButlerParts } from '../butler.js?v=a660e585';
-import { butlerApi } from './butler-feature.js?v=2c5fd28a';
-import { homesFeature, visitorHomeScene, visitorHomeState } from './homes-feature.js?v=64d015dd';
+import { butlerApi } from './butler-feature.js?v=35bb3d57';
+import { homesFeature, visitorHomeScene, visitorHomeState } from './homes-feature.js?v=2caaad28';
 import {
   BUTLER_MESSAGE_MAX,
   KEY_VERB,
@@ -145,12 +145,13 @@ import {
   readVisitScene,
   receivedLine,
   sharedHomeStreet,
+  summonHomePlace,
   tendAct,
   tendCounters,
   tendedText,
   TENDED_KEEP,
   visitSceneTsid,
-} from '../neighbours-mp.js?v=78dd3b33';
+} from '../neighbours-mp.js?v=a12300f9';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
 import { elevatorStops, towerLabel } from '../home-tower.js?v=d33a67e4';
 
@@ -311,8 +312,11 @@ function createSession(engine, client) {
     return { tsid: engine.streetTsid, x: Math.round(engine.player?.x || 0), y: Math.round(engine.player?.y || 0) };
   }
 
-  /** houses_visit (or visiting_visit_random with ownerId 0): the site checks, then the owner's street. */
-  async function visitHome(ownerId, { random = false, name = '' } = {}) {
+  /**
+   * houses_visit (or visiting_visit_random with ownerId 0): the site checks, then the owner's street.
+   * G668: a summons there (`summoned`) lands in its room (`room`, `floor`) beside the summoner (`at`).
+   */
+  async function visitHome(ownerId, { random = false, name = '', room = 'street', floor = 0, at = null, summoned = false } = {}) {
     const block = visitBlock();
     if (block) {
       notice(block, 2600);
@@ -320,7 +324,7 @@ function createSession(engine, client) {
     }
     if (busy) return false;
     if (!random && Number(ownerId) === me()) {
-      engine.homeTravel?.('teleport');
+      engine.homeTravel?.(room === 'interior' ? 'teleport-inside' : 'teleport');
       return true;
     }
     busy = true;
@@ -340,6 +344,14 @@ function createSession(engine, client) {
     const returnTo = returnPoint();
     visit = { owner: view.owner.id, name: view.owner.name || name, view, room: 'street', returnTo, key: view.key || holdsKeyFrom(keys, view.owner.id), letIn: false, targets: {}, gardens: new Set(), beds: new Map(), watered: new Set(), butler: answerButler(view) };
     sendPass();
+    if (summoned) {
+      // A Tower that is not built is no floor to land on: the home street then.
+      const tower = room === 'tower' && visitorHomeState(view).tower;
+      await show(room === 'tower' && !tower ? 'street' : room, { floor, at });
+      // inc_teleportation.js:676 achievements_increment('teleportation_others', 'summonee').
+      engine.achievement?.('teleportation_others:summonee', 1);
+      return true;
+    }
     await show('street');
     if (view.random) engine.achievement?.(`visit_random:${view.owner.id}`, 1);
     notice(T.visited(visit.name), 3200);
@@ -347,7 +359,7 @@ function createSession(engine, client) {
   }
 
   /** The visit scene for a room, through the loading card. */
-  async function show(room, { arrive = '', floor = 0, via = '' } = {}) {
+  async function show(room, { arrive = '', floor = 0, via = '', at = null } = {}) {
     if (!visit) return;
     const built = visitorHomeScene(engine, visit.view, room, { returnLabel: wayOutOf(visit.returnTo).label, floor, via });
     const tower = room === 'tower' ? visitorHomeState(visit.view).tower : null;
@@ -355,6 +367,8 @@ function createSession(engine, client) {
     const label = room === 'interior' ? houseName(visit.name) : room === 'tower' ? `${possessive(visit.name)} ${towerLabel(tower)}` : homeStreetName(visit.name);
     let x = arrive === 'door' && room === 'street' ? built.doorX + 70 : built.spawnX;
     if (arrive === 'tower' && room === 'street' && Number.isFinite(visit.towerX)) x = visit.towerX + 60;
+    // G668: summoned, beside the summoner (inc_teleportation.js:660, x + 20), inside the room.
+    if (at != null && Number.isFinite(Number(at))) x = Math.max(40, Math.min(built.width - 40, Math.round(Number(at))));
     const scene = {
       tsid: visitSceneTsid(visit.owner, room, built.floor),
       label,
@@ -1435,6 +1449,18 @@ function createSession(engine, client) {
       if (!visit || !readVisitScene(engine.streetTsid)) return null;
       return { ...wayOutOf(visit.returnTo), go: () => goBack() };
     },
+    /** G668 (summonHomePlace): whether a summons may bring someone to the home you stand in, or null. */
+    summonPlace() {
+      const home = engine.homeContext?.() || {};
+      return summonHomePlace({ street: this.street(), me: me(), inHome: home.inHome === true, visiting: Boolean(visit && readVisitScene(engine.streetTsid)) });
+    },
+    /** G668 (summon-mp-feature): summoned to a home street, house or Tower floor; true once the visit is under way. */
+    summoned({ owner, room = 'street', floor = 0, at = null } = {}) {
+      if (!(Number(owner) > 0) || busy) return false;
+      // A refusal on the way (the site's houses_visit: blocked, the tutorial, no house) says why itself.
+      visitHome(Number(owner), { room, floor, at, summoned: true });
+      return true;
+    },
     /** The street others share with you (realtimeStreet). */
     street() {
       const home = engine.homeContext?.() || {};
@@ -1609,6 +1635,21 @@ export const neighboursMpFeature = {
   realtimeStreet(engine) {
     if (!session || engine?.mode !== 'multiplayer') return null;
     return session.street() || null;
+  },
+
+  /**
+   * G668 (teleportation-feature summonCtx): in a home, '' when a summons may come here, 'them' or
+   * 'here' when not; null out of every home.
+   */
+  summonHomePlace(engine) {
+    if (!session || engine?.mode !== 'multiplayer') return null;
+    return session.summonPlace();
+  },
+
+  /** G668 (summon-mp-feature summon_go): summoned to someone's home ({ owner, room, floor, at }); true once under way. */
+  neighboursSummoned(opts, engine) {
+    if (!session || engine?.mode !== 'multiplayer') return null;
+    return session.summoned(opts) || null;
   },
 
   /** G367 (features/butler-im-feature.js): the visited owner's Butler says a line; its name, or null. */

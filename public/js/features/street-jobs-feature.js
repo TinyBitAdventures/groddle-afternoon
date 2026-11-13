@@ -58,7 +58,7 @@ import { signArmWidth } from '../street-render.js?v=0f1293df';
 import { getSkillCatalog } from '../content-catalogs.js?v=10b118dd';
 import { GIANTS } from '../shrines.js?v=a190faea';
 import { giantDisplayName } from '../giant-names.js?v=0e295891';
-import { teleportationFeature } from './teleportation-feature.js?v=84f28379';
+import { teleportationFeature } from './teleportation-feature.js?v=1468e2c0';
 import {
   SOLO_DIVISOR,
   WORK_UNIT_MS,

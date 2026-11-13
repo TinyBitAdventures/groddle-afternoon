@@ -156,12 +156,15 @@ function jumpCtx(engine) {
 /**
  * The summoner's side of teleportation_can_summon (js/teleportation.js canSummon): dead, Pooped,
  * Contraband, a Rook attack, and where they stand: a quest room or any place the game holds them
- * in, but a Party Space (main.js:3899), is "You can't summon people here." (776-797), a home
- * "You can't summon them here." (799-806; a summons carries no home pass).
+ * in, but a Party Space (main.js:3899), is "You can't summon people here." (776-797). A home
+ * (799-806, G668): online, your own home and someone's home street or Tower floor take a
+ * summons, someone else's house is "You can't summon them here." (neighbours-mp-feature
+ * summonHomePlace); solo has no summons, and any home answers 'them' as before.
  */
 function summonCtx(engine, opts = {}) {
   const partyHere = engine.query?.('summonPartySpace', 'here', engine) === true;
-  const place = engine.homeContext?.().inHome ? 'them' : engine.transientInstance() && !partyHere ? 'here' : '';
+  const home = engine.mode === 'multiplayer' ? engine.query?.('summonHomePlace', engine) : null;
+  const place = typeof home === 'string' ? home : engine.homeContext?.().inHome ? 'them' : engine.transientInstance() && !partyHere ? 'here' : '';
   return {
     ...jumpCtx(engine),
     dead: engine.query?.('isDead') === true,
