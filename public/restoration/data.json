@@ -2752,9 +2752,14 @@
   "deployed": "2026-11-12"
  },
  "git": {
-  "commits": 1831,
+  "commits": 1833,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-12",
+    "kind": "improve",
+    "text": "A submenu with a link inside a header panel is a third level, indented under its link"
+   },
    {
     "date": "2026-11-12",
     "kind": "new",
@@ -2869,14 +2874,9 @@
     "date": "2026-11-12",
     "kind": "improve",
     "text": "A phone reads the stick, Jump and taps in Paradise, hi signs, the tutorial, the Map and the ghost echo"
-   },
-   {
-    "date": "2026-11-12",
-    "kind": "fix",
-    "text": "Three quest reward lines say what was really paid"
    }
   ]
  },
- "tests": 911,
+ "tests": 912,
  "generatedAt": "2026-11-12"
 }
