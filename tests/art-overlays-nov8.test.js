@@ -194,7 +194,10 @@ describe('G387 the Crown Game Teleporter (game_teleporter.js 177-237)', () => {
     assert.deepEqual(gameTeleporterFeature.verbsFor({ classId: 'npc_piggy' }), []);
     const [v] = gameTeleporterFeature.verbsFor({ classId: 'game_teleporter' });
     assert.deepEqual([v.id, v.label, v.sort, v.tooltip], ['activate', 'Activate', 50, 'Play a sporrrrrrrrrrrrrrts']);
-    assert.match(read('js/features/index.js'), /FEATURES\.push\(gameTeleporterFeature\);\nimport \{ streetObjectsFeature \}/);
+    // Registered before street objects, so its verb answers first (the level-up announcer may sit between).
+    const reg = read('js/features/index.js');
+    const tele = reg.indexOf('FEATURES.push(gameTeleporterFeature);');
+    assert.ok(tele > 0 && tele < reg.indexOf('FEATURES.push(streetObjectsFeature);'));
   });
 });
 

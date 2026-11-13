@@ -9,6 +9,10 @@ import { readFileSync, readdirSync, existsSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import * as acorn from 'acorn';
+import { ROCK_SHAPE_SHEETS } from '../public/js/mining.js?v=b62c7722';
+
+// Spread rows in game.js's SHEETS, built by code the syntax-tree evaluator cannot run.
+const SHEET_SPREADS = { ROCK_SHAPE_SHEETS };
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const pub = join(root, 'public');
@@ -142,13 +146,21 @@ export function gameSheetTable() {
   const game = moduleConstsWithImports('game.js');
   const decl = game.ast.body
     .flatMap((n) => (n.type === 'VariableDeclaration' ? n.declarations : []))
-    .find((d) => d.id.name === 'SHEETS');
+    .find((d) => d.id?.name === 'SHEETS');
   const out = [];
+  const props = [];
   for (const prop of decl.init.properties) {
-    const name = prop.key.name ?? prop.key.value;
-    // The vector Glitch's sheets come from VECTOR_AVATAR (collectSheets reads them there).
+    // `...ROCK_SHAPE_SHEETS`: each entry of the spread object, as if written inline.
+    if (prop.type === 'SpreadElement') {
+      const spread = SHEET_SPREADS[prop.argument.name] ?? game.evaluate(prop.argument);
+      for (const [name, def] of Object.entries(spread || {})) props.push({ name, def });
+      continue;
+    }
     if (prop.value.type === 'CallExpression' && prop.value.callee.name === 'glitchSheetDef') continue;
-    const def = game.evaluate(prop.value);
+    props.push({ name: prop.key.name ?? prop.key.value, def: game.evaluate(prop.value) });
+  }
+  for (const { name, def } of props) {
+    // The vector Glitch's sheets come from VECTOR_AVATAR (collectSheets reads them there), skipped above.
     if (def.whole || !def.fw) continue;
     const grid = def.cols * def.rows;
     out.push({ name, path: clean(def.url), fw: def.fw, fh: def.fh, cols: def.cols, rows: def.rows, n: Math.min(grid, def.frameCount ?? grid), ...(def.trim ? { trim: def.trim } : {}) });
