@@ -93,8 +93,8 @@ import {
   expireSolo,
   tankOf,
   TAKEN_KEEP,
-} from '../home-machines.js?v=5d556192';
-import { CALL_PLAYER_LINES, MACHINE_HITBOX, MACHINE_SKILLS, collectLine, machineJobMs, machineMadeLine, runningSoundKey, takeJobIngredients } from '../machine-rooms.js?v=38a8d973';
+} from '../home-machines.js?v=90b4629f';
+import { CALL_PLAYER_LINES, MACHINE_HITBOX, MACHINE_SKILLS, collectLine, machineJobMs, machineMadeLine, runningSoundKey, takeJobIngredients } from '../machine-rooms.js?v=741cd26e';
 import { MACHINE_ART_SHEETS, LOW_FUEL_BUBBLE_MS, LOW_FUEL_LINE, isLowFuel, machineFrame, machineSheetDef, roomMachineState } from '../machine-art.js?v=93e29c2d';
 import { FUEL_CELL, FUEL_PER_CELL, MAX_FUEL } from '../machines.js?v=112d1492';
 import { ITEM_CATALOG, addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=f49c8998';
@@ -107,7 +107,7 @@ import { saveStore } from '../save-store.js?v=04420633';
 import { textureFromUrl } from '../textures.js?v=92ec53cd';
 import { createSheetLoader } from '../sprite-sheets.js?v=32c58aef';
 import { STREET_GROUND_Y, homesFeature } from './homes-feature.js?v=11a76d23';
-import { payAltarBonus } from './machine-rooms-feature.js?v=bec7e1c5';
+import { payAltarBonus } from './machine-rooms-feature.js?v=5cf13cd9';
 import { worldToScreen } from '../street-model.js?v=b6cb6a4e';
 import { nearestSurfaceY } from '../walk-surface.js?v=106bfdc5';
 
@@ -971,6 +971,7 @@ function createSession(engine, client) {
         skillName,
         now: t,
         musicUpgrade: upgrades().includes('metalmaking_music'),
+        making: engine.makingNow?.() === true,
       });
     },
     runVerb(target, verbId) {

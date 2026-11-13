@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=8486632c';
 import { createErrorOnce, createFeatureHost } from './js/feature-host.js?v=06bb8b74';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=b92bb420';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=cb07149e';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl, drawTileArt } from './js/enter-chooser.js?v=4a3ea327';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -613,7 +613,7 @@ import { outputIconsHtml, outputsPhrase, recipeOutputRows } from './js/ui/recipe
 import { MAKE_TOOL_SHEETS } from './js/make-tool-sheets.js?v=6f758e09';
 import { createTestTubePanel, tryTileHtml, TRY_TILE_LABEL } from './js/test-tube-panel.js?v=c7c704ad';
 import { COMPOUND_RECIPE_IDS, EXPERIMENT_TOOL, experimentTooltip } from './js/test-tube.js?v=cb60f9b7';
-import { groupMakingTools, makeToolCounts, makeToolCountLine, makeToolSpokenLine, makeOpeningTool, gridStep, stationForRecipe } from './js/make-tools.js?v=14d0baf5';
+import { groupMakingTools, makeToolCounts, makeToolCountLine, makeToolSpokenLine, makeOpeningTool, gridStep, stationForRecipe, MAKING_BUSY } from './js/make-tools.js?v=86877c3e';
 import { LOW_FUEL_LINE, craftSessionElapsedMs, isLowFuel, isMachineArt, machineArtHtml, packMakeState, playMachineHandOver, setMachineArtFrame } from './js/machine-art.js?v=93e29c2d';
 import {
   createGarden,
@@ -12537,6 +12537,8 @@ const engine = {
   refreshRock: (target) => refreshMineRockVisual(target),
   /** Open the Make panel on a machine in the world: { tool, toolState, onComplete({ recipe, key, made }) } (G169). */
   openMakeStation: (station) => openMakePanel(station),
+  /** #247: a hand tool (or the Test Tube) is making something: a machine can't start (inc_making.js making_is_making 1736-1756). */
+  makingNow: () => makingNow(),
   /**
    * Finish a room machine's job (G175): craft its units on the machine's own
    * `hold` inventory (ingredients in, outputs out) with that machine's tank,
@@ -27946,7 +27948,11 @@ function noteMadeUnit(record, madeInv, stringBefore) {
 
 /** Start a cancellable per-unit session without mutating inventory up front. */
 function runMakeCraft(key, qty) {
-  if (activeCraftSession) return;
+  // #247: making_make_known 325-327 refuses a second make while one runs.
+  if (activeCraftSession) {
+    toast(MAKING_BUSY.make);
+    return;
+  }
   const recipe = RECIPE_CATALOG[key];
   if (!recipe) {
     toast('Unknown recipe.');
@@ -28574,7 +28580,17 @@ function renderMakePanel() {
  * @param {{ tool: string, toolState?: object }|null} [station]
  * @param {{ tool?: string|null }} [opts]
  */
+/** #247: a hand tool's job (or a Test Tube try) is running; a machine's own job never counts (making_is_making 1736-1756). */
+function makingNow() {
+  return Boolean(activeCraftSession) || testTubePanel.busy();
+}
+
 function openMakePanel(station = null, { tool = null } = {}) {
+  // #247: a machine's Make while a hand tool makes: the source's refusal (making_make_known 325-327), the job keeps its panel.
+  if (typeof station?.tool === 'string' && makingNow()) {
+    toast(MAKING_BUSY.make);
+    return;
+  }
   makeStation = typeof station?.tool === 'string' ? station : null;
   testTubePanel.close();
   const openTool = makeOpeningTool({

@@ -55,6 +55,7 @@
 import { FOREST_MACHINE_ROOM_HELD, FOREST_MACHINE_ROOM_TSID } from './forest-machine-room.js?v=5f7e4589';
 import { MACHINE_ROOMS } from './exploration.js?v=68f27989';
 import { FRESH_FUEL, FUEL_PER_CELL, MAX_FUEL } from './machines.js?v=112d1492';
+import { MAKING_BUSY } from './make-tools.js?v=86877c3e';
 
 /** config_prod.js:1332 machine_rooms, as built (G prefix). */
 export const MACHINE_ROOM_TSIDS = Object.freeze([...MACHINE_ROOMS]);
@@ -325,8 +326,9 @@ export function roomMachineVerbs(classTsid, tank, ctx = {}) {
       durationMs: 0,
     });
   } else {
-    // making_check_allowed (inc_making.js:80-108).
-    const useReason = lockReason || (skill && !learned.includes(skill)
+    // making_check_allowed (inc_making.js:80-108): a hand tool making something comes first (#247,
+    // ctx.making: making_is_making 1736-1756), after the machine's own lock (fuelmaker.js use 652-671).
+    const useReason = lockReason || (ctx.making ? MAKING_BUSY.verb : '') || (skill && !learned.includes(skill)
       ? `You need to know ${skillName} to use this.`
       : fuel <= 0
         ? `This ${label} does not have enough fuel remaining.`

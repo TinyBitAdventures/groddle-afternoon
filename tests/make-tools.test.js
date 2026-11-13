@@ -18,7 +18,7 @@ import {
   makeToolSpokenLine,
   makeOpeningTool,
   gridStep,
-} from '../public/js/make-tools.js?v=14d0baf5';
+} from '../public/js/make-tools.js?v=86877c3e';
 import { TOOL_CATALOG, MAKING_TOOL_SKILLS, listMakingTools, loadRecipeCatalogFromFile } from '../public/js/making.js?v=bc0ec9c8';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');

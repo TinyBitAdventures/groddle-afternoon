@@ -71,6 +71,17 @@ export function stationForRecipe(station, recipe) {
 }
 
 /**
+ * #247: a hand tool's job blocks a machine (players/inc_making.js making_is_making 1736-1756: a
+ * machine's own job never counts, so the reverse order always works). The machine's Use is greyed
+ * with making_check_allowed's reason (86-87); a Make that still gets through is refused with
+ * making_make_known's (325-327, make_fail_rsp's words, no full stop).
+ */
+export const MAKING_BUSY = Object.freeze({
+  verb: 'You are making something else.',
+  make: 'You are already making something',
+});
+
+/**
  * Which screen Make opens on (Austin 2026-11-10): a machine in the world or a tool's pack card opens
  * that tool; the N key and the Make button open the tool used last this session while the player
  * can still use it, and the tools screen otherwise (the first open, or the tool is gone).

@@ -98,10 +98,10 @@ import {
   machineTank,
   roomMachineVerbs,
   secondsToString,
-} from './machine-rooms.js?v=38a8d973';
+} from './machine-rooms.js?v=741cd26e';
 import { ASSEMBLY_SKILL, FUEL_PER_CELL, MAX_FUEL, isMachine } from './machines.js?v=112d1492';
 import { INTERIOR, interiorBounds } from './home-decor.js?v=bbf43c44';
-import { machineRoomLayout } from './machine-rooms.js?v=38a8d973';
+import { machineRoomLayout } from './machine-rooms.js?v=741cd26e';
 
 export const HOME_MACHINES_ID = 'home-machines';
 
@@ -303,7 +303,7 @@ export const tankOf = (m) => machineTank({ condition: { [m.classTsid]: { remaini
  * The verbs a placed machine offers `me`: use / collect / refuel (and Metal
  * Music) as a room machine's (machine-rooms roomMachineVerbs), plus Pick up
  * for the owner or a key-holder (fuelmaker.js disassemble 296-349).
- * ctx: { me, mayTake, learned, fuelCells, skillName, now, musicUpgrade }
+ * ctx: { me, mayTake, learned, fuelCells, skillName, now, musicUpgrade, making (#247: a hand tool's job runs) }
  */
 export function placedMachineVerbs(m, ctx = {}) {
   const me = String(ctx.me ?? 'you');
@@ -320,6 +320,7 @@ export function placedMachineVerbs(m, ctx = {}) {
     user: me,
     musicUpgrade: ctx.musicUpgrade,
     musicOn: m.music,
+    making: ctx.making === true,
   });
   if (ctx.mayTake) verbs.push(pickupVerb(m, { ...ctx, me, now, mine }));
   return verbs;

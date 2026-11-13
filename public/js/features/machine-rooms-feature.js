@@ -84,7 +84,7 @@ import {
   secondsToString,
   takeJobIngredients,
   tankFuel,
-} from '../machine-rooms.js?v=38a8d973';
+} from '../machine-rooms.js?v=741cd26e';
 import { refuelMachine, MAX_FUEL } from '../machines.js?v=112d1492';
 import { DROP_ITEMS, applyDropResult, isEmptyDrop, rollDropTable } from '../drop-tables.js?v=8bcf111f';
 import { ITEM_CATALOG, addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=f49c8998';
@@ -653,6 +653,7 @@ export const machineRoomsFeature = {
       user: SOLO_USER,
       musicUpgrade: hasMusicCard(engine),
       musicOn: !musicOff[m.def.id],
+      making: engine.makingNow?.() === true,
     });
   },
 
