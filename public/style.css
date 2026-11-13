@@ -13430,6 +13430,33 @@ body:has(#quest-dialogue:not([hidden])) .prompt-stack { z-index: calc(var(--z-mo
   [data-ui="modern"] #game-root .hb-tray .hb-filters button { flex: none; }
   [data-ui="modern"] #game-root .hb-tray .hb-tray-note { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 }
+/* Report #275 (Friendly, iPhone Safari): on a phone the Cultivate bars could not be used. The banner's
+   buttons pushed the close button off the screen, and the picker's choices were squeezed to nothing
+   beside the note and Expand. On a narrow screen the banner spans the stage (clear of the Social rail),
+   its buttons wrap and the close button keeps its place; the title steps aside while there are buttons
+   (still read aloud). The tray takes the whole width, and the Cultivation picker stacks: the note and
+   your iMG, then the choices, then Expand. */
+@media (max-width: 640px) {
+  [data-ui="modern"] #game-root .hb-banner { left: var(--hud-inset); right: calc(var(--inset-r, 0px) + var(--hud-inset)); max-width: none; transform: none; padding-left: var(--space-2); border-radius: var(--radius-l); }
+  [data-ui="modern"] #game-root .hb-banner:has(.hb-banner-actions > *) .hb-banner-text { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+  [data-ui="modern"] #game-root .hb-banner:has(.hb-banner-actions > *) .hb-banner-actions { padding-left: 0; border-left: 0; }
+  [data-ui="modern"] #game-root .hb-banner .hb-banner-text { flex: 1 1 auto; }
+  [data-ui="modern"] #game-root .hb-banner-actions { flex: 1 1 auto; flex-wrap: wrap; min-width: 0; }
+  [data-ui="modern"] #game-root .hb-banner .hb-close { margin-left: auto; }
+  [data-ui="modern"] #game-root .hb-tray { right: var(--hud-inset); }
+  [data-ui="modern"] #game-root .hb-tray .hb-panel:has(> .hb-aside) { flex-wrap: wrap; row-gap: var(--sp-3); }
+  [data-ui="modern"] #game-root .hb-panel > .hb-aside { flex: 1 1 100%; width: auto; flex-direction: row; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 0 var(--sp-4); padding: 0 var(--sp-2); }
+  [data-ui="modern"] #game-root .hb-panel > .hb-aside .hb-note { font-size: var(--fs-xs); }
+  [data-ui="modern"] #game-root .hb-panel:has(> .hb-aside) > .hb-strip { flex: 1 1 0; }
+  [data-ui="modern"] #game-root .hb-panel:has(> .hb-aside) > .hb-tray-actions { flex: 1 1 100%; flex-direction: row; flex-wrap: wrap; align-items: center; gap: var(--sp-2) var(--sp-4); padding: var(--sp-3) var(--sp-2) 0; border-left: 0; border-top: 1px solid var(--border); }
+  [data-ui="modern"] #game-root .hb-panel:has(> .hb-aside) > .hb-tray-actions .hb-tray-actions-row { flex-wrap: wrap; }
+  [data-ui="modern"] #game-root .hb-panel:has(> .hb-aside) > .hb-tray-actions .hb-note { flex: 1 1 100%; }
+}
+/* Report #275: a phone's stick and Jump (js/touch-controls.js) stood under the tray. In Cultivation Mode
+   you still walk the street, so they stand above the tray (home-builder.js syncTrayUp); Decoration Mode
+   holds the avatar (game.js avatarHeldByScene), so they wait. */
+:root.touch-phone[data-home-builder="cultivate"] #game-root .touch-controls { bottom: calc(var(--hb-tray-up, 0px) + var(--sp-2)); }
+:root.touch-phone[data-home-builder="decorate"] #game-root .touch-controls { display: none; }
 /* —— /BUILDER —— */
 [data-ui="modern"] #game-root .homes-styles .hs-sel { border-bottom: 1px solid var(--border); }
 [data-ui="modern"] #game-root .homes-styles .hs-name small { color: var(--text-muted); }

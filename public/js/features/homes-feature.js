@@ -169,7 +169,7 @@ import {
   placeCostText,
   swatchFilters,
   trayFilters,
-} from '../ui/home-builder.js?v=b71acd91';
+} from '../ui/home-builder.js?v=8100230a';
 import { RECIPE_CATALOG } from '../making.js?v=bc0ec9c8';
 import {
   createBackYardState,

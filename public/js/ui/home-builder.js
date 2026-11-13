@@ -383,9 +383,25 @@ export function createHomeBuilder({ root, doc = root?.ownerDocument }) {
 
   // The tray and the dock box move the row; the scroller's own boxes (bags, stacks) growing or
   // shrinking only change what the arrows can reach.
-  const resizeDock = typeof ResizeObserver === 'function' ? new ResizeObserver(() => { syncDock(); dockPager?.(); }) : null;
+  const resizeDock = typeof ResizeObserver === 'function' ? new ResizeObserver(() => { syncDock(); dockPager?.(); syncTrayUp(); }) : null;
   resizeDock?.observe(tray);
-  doc.defaultView?.addEventListener('resize', () => syncDock());
+  doc.defaultView?.addEventListener('resize', () => { syncDock(); syncTrayUp(); });
+
+  /**
+   * Report #275: how far the tray reaches up from the stage's foot (css px), as --hb-tray-up on
+   * #game-root, so a phone's stick and Jump (js/touch-controls.js) stand above the tray in
+   * Cultivation Mode instead of under it. Cleared when the builder closes.
+   */
+  function syncTrayUp() {
+    if (bar.hidden || tray.hidden) {
+      if (root.style.getPropertyValue('--hb-tray-up')) root.style.removeProperty('--hb-tray-up');
+      return;
+    }
+    const t = tray.getBoundingClientRect();
+    if (!t.height) return;
+    const px = `${Math.max(0, Math.round(root.getBoundingClientRect().bottom - t.top))}px`;
+    if (root.style.getPropertyValue('--hb-tray-up') !== px) root.style.setProperty('--hb-tray-up', px);
+  }
 
   function trayHit(x, y) {
     if (bar.hidden || tray.hidden) return false;
@@ -638,6 +654,7 @@ export function createHomeBuilder({ root, doc = root?.ownerDocument }) {
         delete html.dataset.homeTray;
         this.setPop(null);
         this.setPlace(null);
+        syncTrayUp();
         return;
       }
       html.dataset.homeBuilder = m.mode;
@@ -648,6 +665,7 @@ export function createHomeBuilder({ root, doc = root?.ownerDocument }) {
       bar.setAttribute('aria-describedby', 'homes-keys-help');
       renderBanner(m);
       renderTray(m);
+      syncTrayUp();
       if (hook) bar.querySelector(hook)?.focus({ preventScroll: true });
     },
     /**
