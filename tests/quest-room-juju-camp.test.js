@@ -9,7 +9,7 @@ import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import * as kit from '../public/js/quest-rooms/kit.js?v=57af0d8f';
-import * as mod from '../public/js/quest-rooms/juju-camp.js?v=a8e3f4f2';
+import * as mod from '../public/js/quest-rooms/juju-camp.js?v=cb1fbe4d';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', 'public');
 const street = (tsid) => JSON.parse(readFileSync(join(ROOT, 'assets', 'streets', `${tsid}.json`), 'utf8'));
@@ -264,5 +264,38 @@ describe('Juju Hideout look (G70, players Snaps)', () => {
     assert.deepEqual([file, w, h], [plan.pieces.juju_grandma_chair_01a_al1.file, ...plan.pieces.juju_grandma_chair_01a_al1.world]);
     const bytes = readFileSync(join(ROOT, 'assets/sprites/quest-rooms/juju_camp', file));
     assert.equal(createHash('sha256').update(bytes).digest('hex').slice(0, 16), plan.pieces.juju_grandma_chair_01a_al1.sha);
+  });
+
+  it('#276: the campfire, the papers, the teepees and the chair stand on the floor the player and the bandits stand on', () => {
+    // A WebP's height from its header (VP8X canvas, VP8L or VP8 key frame).
+    const webpHeight = (path) => {
+      const b = readFileSync(path);
+      const kind = b.toString('ascii', 12, 16);
+      if (kind === 'VP8X') return 1 + b.readUIntLE(27, 3);
+      if (kind === 'VP8L') return 1 + ((b.readUInt32LE(21) >> 14) & 0x3fff);
+      return b.readUInt16LE(28) & 0x3fff;
+    };
+    // Empty rows under each file's drawn foot (measured from the alpha: magick -trim), for the height it has.
+    const EMPTY_BELOW = {
+      juju_grandma_campfire_01a_al1: [260, 59],
+      juju_grandma_tent_01a_al1: [506, 10],
+      juju_grandma_papers_01a_al1: [190, 0],
+      juju_grandma_papers_01b_al1: [72, 0],
+      juju_grandma_papers_01c_al1: [40, 1],
+    };
+    for (const [name, x, dy, scale] of mod.CAMP_PIECES) {
+      const [height, empty] = EMPTY_BELOW[name];
+      assert.equal(webpHeight(join(ROOT, 'assets/decos/groddle', `${name}.webp`)), height, `${name}: the art changed, measure again`);
+      // Below the floor line is in front of it (the player's feet are on it); above it floats.
+      const foot = dy - empty * scale;
+      assert.ok(foot >= -2 && foot <= (name.includes('tent') ? 6 : 3), `${name} at ${x}: foot ${foot.toFixed(1)} px from the floor`);
+    }
+    // The chair (208 px in the world, its legs end 27 of 416 rows above the @2x file's bottom).
+    const chairFoot = mod.CHAIR_DY - (27 / 416) * 208;
+    assert.ok(chairFoot >= -2 && chairFoot <= 3, `chair foot ${chairFoot}`);
+    // The bandits' feet are row 185 of their 254 px frames, Grandma's the frame's bottom row.
+    const src = readFileSync(join(ROOT, 'js/quest-rooms/juju-camp.js'), 'utf8');
+    assert.match(src, /KID_SHEETS, \{ ax: 148 \/ 240, ay: 185 \/ 254 \}\);\n\s*view\.x = [^\n]+\n\s*view\.y = sy\(FLOOR_Y\);/);
+    assert.match(src, /GRANDMA_SHEETS, \{ ax: 0\.38, ay: 1 \}\);\n\s*view\.x = sx\(GRANDMA_X\);\n\s*view\.y = sy\(FLOOR_Y\) \+ 4;/);
   });
 });

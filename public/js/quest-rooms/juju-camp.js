@@ -625,19 +625,27 @@ export const JUJU_DUSK = Object.freeze({
   tent: 0xcabca4,
   grass: 0x8a8460,
 });
-/** Camp pieces at hideout x: [deco, x, dy, scale, flip]. Grandma sits at GRANDMA_X. */
+/**
+ * Camp pieces at hideout x: [deco, x, dy, scale, flip]. Grandma sits at GRANDMA_X.
+ * #276: dy puts each piece's drawn foot on the floor the player and the bandits stand on, not
+ * its file's bottom edge: the campfire's 260 px file ends its stones at row 201 (59 px empty
+ * below, 37 px at 0.62), so it sits 37 down; the papers have none (2 down, lying on the grass) and the
+ * teepees 5 px (10 down: their poles just into the ground).
+ */
 export const CAMP_PIECES = Object.freeze([
   ['juju_grandma_tent_01a_al1', -2700, 10, 0.55, true],
   ['juju_grandma_tent_01a_al1', -1960, 10, 0.56, false],
-  ['juju_grandma_papers_01a_al1', -2585, 6, 0.5, false],
-  ['juju_grandma_papers_01b_al1', -2630, 5, 0.55, false],
-  ['juju_grandma_papers_01c_al1', -2380, 3, 0.6, false],
-  ['juju_grandma_campfire_01a_al1', -2215, 18, 0.62, false],
-  ['juju_grandma_papers_01c_al1', -1180, 3, 0.6, true],
+  ['juju_grandma_papers_01a_al1', -2585, 2, 0.5, false],
+  ['juju_grandma_papers_01b_al1', -2630, 2, 0.55, false],
+  ['juju_grandma_papers_01c_al1', -2380, 2, 0.6, false],
+  ['juju_grandma_campfire_01a_al1', -2215, 37, 0.62, false],
+  ['juju_grandma_papers_01c_al1', -1180, 2, 0.6, true],
 ]);
 /** The dirt mound in front of the fire, with stones round its foot. */
 /** In front of the walkway, low in the frame as in the Snaps. */
 export const CAMP_MOUND = Object.freeze({ x: -2060, dy: 112, scale: 0.62 });
+/** #276: the chair's file (208 px tall) ends its legs 13.5 px above its bottom edge: its legs on the floor. */
+export const CHAIR_DY = 14;
 
 function buildBackground(ctx) {
   const { PIXI, kit } = ctx;
@@ -682,7 +690,7 @@ function buildBackground(ctx) {
   const chair = new PIXI.Sprite(textureFromUrl(`${ART}${chairFile}`));
   chair.anchor.set(0.5, 1);
   chair.x = sx(GRANDMA_X) - 14;
-  chair.y = floor + 8;
+  chair.y = floor + CHAIR_DY;
   chair.tint = 0xd8ccb8;
   world.addChild(chair);
   // The dirt mound and its stones.

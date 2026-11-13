@@ -167,7 +167,7 @@ const ROOM_MODULES = {
   kids_room: () => import('../quest-rooms/kids-room.js?v=23c5c21b'),
   rube_yard: () => import('../quest-rooms/rube-yard.js?v=3be3257c'),
   le_miserable: () => import('../quest-rooms/le-miserable.js?v=7995949d'),
-  juju_camp: () => import('../quest-rooms/juju-camp.js?v=a8e3f4f2'),
+  juju_camp: () => import('../quest-rooms/juju-camp.js?v=cb1fbe4d'),
   picto_pattern: () => import('../quest-rooms/picto-pattern.js?v=43f6a2f2'),
   radiant_glare: () => import('../quest-rooms/radiant-glare.js?v=4aacb084'),
   an_autumn_day: () => import('../quest-rooms/an-autumn-day.js?v=bffa2879'),
