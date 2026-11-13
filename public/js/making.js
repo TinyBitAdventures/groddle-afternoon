@@ -207,6 +207,8 @@ export const TOOL_CATALOG = {
     desc: "If you want to turn elements into compounds, you need a handy-dandy test tube. It's totally tubular.",
     icon: itemIcon('test_tube'),
     isTool: true,
+    // test_tube.js 274: its making verb is experiment ("You want to experiment with a Test Tube?").
+    action: 'experiment',
   },
   beaker: {
     classTsid: 'beaker',
@@ -848,8 +850,30 @@ export function listRecipesProducing(classTsid) {
  * from before the gate (`keptRecipes`: recipe ids, js/recipe-memory.js).
  */
 export function recipeKnown(recipe, completedQuests = null, keptRecipes = null) {
+  if (recipe?.discoverable && !compoundKnown(recipe)) return false;
   if (!recipe?.taughtBy || !Array.isArray(completedQuests) || completedQuests.includes(recipe.taughtBy)) return true;
   return Array.isArray(keptRecipes) && keptRecipes.includes(String(recipe.id));
+}
+
+/**
+ * The Test Tube's sixteen compounds (catalog_recipes.js 146-161, `learnt: 0`) are found by
+ * Experimenting (js/test-tube.js); until then making_get_recipes (players/inc_making.js 1576-1627)
+ * lists them as unknowns. js/features/compound-discovery-feature.js installs the save's list; with
+ * none installed (tests, tools, before the save loads) every compound counts as known.
+ * @type {() => string[]|null}
+ */
+let knownCompoundIds = () => null;
+
+/** @param {(() => string[]|null)|null} fn */
+export function setCompoundKnowledge(fn) {
+  knownCompoundIds = typeof fn === 'function' ? fn : () => null;
+}
+
+/** Whether a discoverable recipe has been found (always true for any other recipe). */
+export function compoundKnown(recipe) {
+  if (!recipe?.discoverable) return true;
+  const ids = knownCompoundIds();
+  return !Array.isArray(ids) || ids.includes(String(recipe.id));
 }
 
 export function listRecipes() {
@@ -954,6 +978,7 @@ export function recipeBlockedLine(recipe, check, ctx = {}) {
     case 'skill':
       return `You need ${ctx.skillName?.(check.skill) || check.skill} to make this`;
     case 'quest':
+    case 'undiscovered':
       return "You don't know how to make this";
     case 'achievement':
       return `You need to get the ${ctx.achievementName?.(check.achievement) || check.achievement} achievement.`;
@@ -1071,6 +1096,7 @@ export function canCraft(inv, recipe, opts = {}) {
   }
   // Quest-taught recipes (making_try_learn_recipe from a quest's onComplete)
   // apply only when the caller passes the completed quest ids.
+  if (!compoundKnown(recipe)) return { ok: false, reason: 'undiscovered' };
   if (!recipeKnown(recipe, opts.completedQuests, opts.keptRecipes)) {
     return { ok: false, reason: 'quest', quest: recipe.taughtBy };
   }
@@ -1141,7 +1167,7 @@ export function craftRecipe(inv, pc, recipeKey, opts = {}) {
         msgs: [check.msg || `Your ${check.need} needs repairing.`],
       };
     }
-    if (check.reason === 'quest') {
+    if (check.reason === 'quest' || check.reason === 'undiscovered') {
       return {
         ok: false,
         reason: 'quest',

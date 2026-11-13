@@ -17,7 +17,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { inflateSync } from 'node:zlib';
 import { MAKE_TOOL_SHEETS } from '../public/js/make-tool-sheets.js?v=6f758e09';
-import { TOOL_STAND_INS, listMakingTools, loadRecipeCatalogFromFile } from '../public/js/making.js?v=5338cc7e';
+import { TOOL_STAND_INS, listMakingTools, loadRecipeCatalogFromFile } from '../public/js/making.js?v=bc0ec9c8';
 
 const spike = join(dirname(fileURLToPath(import.meta.url)), '..');
 const pub = join(spike, 'public');

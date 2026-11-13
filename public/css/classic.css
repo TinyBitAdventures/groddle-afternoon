@@ -3154,6 +3154,22 @@
 :root[data-ui="classic"]:not([data-home-builder]) body.nx-hide-pack:not(:has(#overlay:not(.hidden))) #pack-row > .save-pill.in-row:not([data-state="conflict"]):not([data-state="signed-out"]) { background: var(--c-classic-panel); box-shadow: 0 0 0 1px var(--c-classic-slot-ring); }
 /* === end cloud === */
 
+/* === testtube (lane) === */
+/* The Test Tube's experiment screens (js/test-tube-panel.js) in the client's making style: white slots on the
+   pack slot ring (MakingSlot.as), the Classic title face, the error in red (MakingErrorUI.as making_error). */
+:root[data-ui="classic"] #game-root #make-panel :is(.tt-slot, .tt-element) { background: var(--c-classic-panel); border: 0; box-shadow: 0 0 0 1px var(--c-classic-slot-ring); border-radius: 5px; color: var(--c-classic-title); }
+:root[data-ui="classic"] #game-root #make-panel .tt-empty { box-shadow: 0 0 0 1px var(--c-classic-slot-ring) inset; background: var(--c-classic-well); color: var(--c-classic-offline); }
+:root[data-ui="classic"] #game-root #make-panel :is(.tt-slot-name, .tt-error, .tt-sub) { font-family: var(--font-classic-title); }
+:root[data-ui="classic"] #game-root #make-panel .tt-sub { color: var(--c-classic-text); font-size: calc(var(--fs-classic-body) * var(--cu-n, 1)); }
+:root[data-ui="classic"] #game-root #make-panel :is(.tt-element-count, .tt-pouch-title) { color: var(--c-classic-count); }
+:root[data-ui="classic"] #game-root #make-panel .tt-error { color: var(--c-classic-close); font-size: calc(var(--fs-classic-row-title) * 1.25 * var(--cu-n, 1)); }
+:root[data-ui="classic"] #game-root #make-panel .tt-error-line { color: var(--c-classic-text); }
+:root[data-ui="classic"] #game-root #make-panel .tt-step :is(button, input) { background: var(--c-classic-btn); border-color: var(--c-classic-btn-shade); color: var(--c-classic-title); }
+:root[data-ui="classic"] #game-root #make-panel .tt-step input { background: var(--c-classic-input); border-color: var(--c-classic-input-border); }
+:root[data-ui="classic"] #game-root #make-panel :is(.tt-element, .tt-slot button):focus-visible { outline: 0; box-shadow: 0 0 0 2px var(--c-classic-focus); }
+:root[data-ui="classic"] #game-root #make-panel #make-result > .tt-nothing { grid-column: 1 / -1; grid-row: auto; justify-self: stretch; }
+/* === end testtube === */
+
 /* == TICKETS == Reports (js/ui/reports-sheet.js, online only) as a 2012 window: the Quest Log's frame
    (Dialog.as, WindowBorder.as, BigDialog.as) centred in the viewport, the white head with its 20 px
    title and the red cross, the grey well between two rules, the white footer with the minor buttons;

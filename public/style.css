@@ -12393,6 +12393,43 @@ body:has(#quest-dialogue:not([hidden])) .prompt-stack { z-index: calc(var(--z-mo
 [data-ui="modern"] #make-panel .make-empty { padding: var(--space-5) var(--space-2); text-align: center; color: var(--text-muted); font-size: var(--fs-m); }
 [data-ui="modern"] #make-panel .make-detail { margin-top: 0; }
 
+/* The Test Tube's experiment screens (js/test-tube-panel.js; MakingTryUI.as): four slots with counts,
+   the pouch's elements as buttons, "Try it!". Both skins; Classic recolours them in its own block. */
+#make-panel .make-try-tile .tile-label { font-weight: var(--fw-heavy); }
+#make-panel .tt-try { display: flex; flex-direction: column; align-items: center; gap: var(--space-3); padding: var(--space-2) 0; text-align: center; }
+#make-panel .tt-sub { margin: 0; color: var(--text-muted); font-size: var(--fs-m); }
+#make-panel .tt-slots { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-2); width: 100%; max-width: 320px; }
+#make-panel .tt-slot { position: relative; display: flex; flex-direction: column; align-items: center; gap: var(--space-1); min-height: 120px; padding: var(--space-2) var(--space-1); border: 1px solid var(--border); border-radius: var(--radius-m); background: var(--surface-raised); }
+#make-panel .tt-slot img { width: 40px; height: 40px; object-fit: contain; }
+#make-panel .tt-slot-name { font-size: var(--fs-xs); font-weight: var(--fw-heavy); color: var(--text); line-height: var(--lh-tight); }
+#make-panel .tt-empty { justify-content: center; border-style: dashed; color: var(--text-muted); font-size: var(--fs-xs); }
+#make-panel .tt-slot-x { position: absolute; top: 2px; right: 2px; width: 22px; height: 22px; padding: 0; border: 0; border-radius: var(--radius-pill); background: none; color: var(--text-muted); font-size: var(--fs-m); line-height: 1; cursor: pointer; }
+#make-panel .tt-slot-x:hover { color: var(--text); background: var(--surface-hover); }
+#make-panel .tt-step { display: flex; align-items: center; gap: 2px; margin-top: auto; }
+#make-panel .tt-step button { width: 26px; height: 26px; padding: 0; border: 1px solid var(--border); border-radius: var(--radius-s); background: var(--surface); color: var(--text); font-weight: var(--fw-heavy); cursor: pointer; }
+#make-panel .tt-step button:disabled { opacity: 0.4; cursor: default; }
+#make-panel .tt-step input { width: 40px; height: 26px; padding: 0; border: 1px solid var(--border); border-radius: var(--radius-s); text-align: center; font: inherit; font-size: var(--fs-s); -moz-appearance: textfield; }
+#make-panel .tt-step input::-webkit-inner-spin-button, #make-panel .tt-step input::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+#make-panel .tt-why { margin: 0; font-weight: var(--fw-heavy); color: var(--text-danger); }
+#make-panel .tt-go { min-width: 140px; }
+#make-panel .tt-pouch-title { margin: var(--space-2) 0 0; font-size: var(--fs-xs); font-weight: var(--fw-heavy); color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; }
+#make-panel .tt-pouch { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--space-2); width: 100%; max-width: 460px; }
+#make-panel .tt-element { position: relative; display: flex; flex-direction: column; align-items: center; gap: var(--space-1); padding: var(--space-2) var(--space-1); border: 1px solid var(--border); border-radius: var(--radius-m); background: var(--surface-raised); color: var(--text); font: inherit; cursor: pointer; }
+#make-panel .tt-element:hover:not(:disabled) { border-color: var(--border-strong); background: var(--surface-hover); }
+#make-panel .tt-element:focus-visible, #make-panel .tt-slot button:focus-visible { outline: 2px solid var(--focus); outline-offset: 1px; }
+#make-panel .tt-element:disabled { opacity: 0.45; cursor: default; }
+#make-panel .tt-element img { width: 28px; height: 28px; object-fit: contain; }
+#make-panel .tt-element-name { font-size: var(--fs-xs); line-height: var(--lh-tight); }
+#make-panel .tt-element-count { font-size: var(--fs-s); }
+#make-panel .tt-unknown { display: inline-grid; place-items: center; width: 48px; height: 48px; border: 2px dashed var(--border-strong); border-radius: var(--radius-m); font-size: var(--fs-xl); font-weight: var(--fw-heavy); color: var(--text-muted); }
+#make-panel .tt-nothing { display: flex; flex-direction: column; align-items: center; gap: var(--space-2); padding: var(--space-4) var(--space-2); text-align: center; }
+#make-panel .tt-error { margin: 0; font-size: var(--fs-l); font-weight: var(--fw-heavy); color: var(--text-danger); }
+#make-panel .tt-error-line { margin: 0; color: var(--text); font-size: var(--fs-m); }
+#make-panel .tt-again { margin-top: var(--space-3); }
+#make-panel .mr-used-left { opacity: 0.65; font-weight: 500; }
+:root.touch-phone #make-panel .tt-step button { width: 34px; height: 34px; }
+:root.touch-phone #make-panel .tt-slot-x { width: 32px; height: 32px; }
+
 /* The Map: the shell's centred size (its own width, for the hub art), over a scrim. */
 [data-ui="modern"] #map-panel.ui-sheet-center { background: var(--scrim); backdrop-filter: none; }
 [data-ui="modern"] #map-panel .map-card.map-hub {

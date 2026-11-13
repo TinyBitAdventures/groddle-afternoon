@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=4519afca';
 import { createErrorOnce, createFeatureHost } from './js/feature-host.js?v=06bb8b74';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=abf25c84';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=32fd2ef8';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl, drawTileArt } from './js/enter-chooser.js?v=4a3ea327';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -608,9 +608,11 @@ import {
   recipeTaskLimit,
   recipeToolInUse,
   pluralizeItem,
-} from './js/making.js?v=5338cc7e';
+} from './js/making.js?v=bc0ec9c8';
 import { outputIconsHtml, outputsPhrase, recipeOutputRows } from './js/ui/recipe-outputs.js?v=73e19baf';
 import { MAKE_TOOL_SHEETS } from './js/make-tool-sheets.js?v=6f758e09';
+import { createTestTubePanel, tryTileHtml, TRY_TILE_LABEL } from './js/test-tube-panel.js?v=c7c704ad';
+import { COMPOUND_RECIPE_IDS, EXPERIMENT_TOOL, experimentTooltip } from './js/test-tube.js?v=cb60f9b7';
 import { groupMakingTools, makeToolCounts, makeToolCountLine, makeToolSpokenLine, makeOpeningTool, gridStep } from './js/make-tools.js?v=3e4818c0';
 import { LOW_FUEL_LINE, craftSessionElapsedMs, isLowFuel, isMachineArt, machineArtHtml, packMakeState, playMachineHandOver, setMachineArtFrame } from './js/machine-art.js?v=93e29c2d';
 import {
@@ -4612,7 +4614,7 @@ function renderPackPopover(classTsid, anchor = null) {
   const makeLabel = slot.isTool
     ? classTsid === 'fruit_changing_machine'
       ? 'Convert fruit'
-      : `Make with ${slot.label}`
+      : classTsid === EXPERIMENT_TOOL ? 'Experiment' : `Make with ${slot.label}`
     : `Show ${relatedRecipes.length === 1 ? 'recipe' : 'recipes'}`;
   const dropPrompt = packDropMode
     ? `<div class="pack-drop-quantity count-pop" data-pack-drop-panel role="group" aria-label="Choose quantity to drop">
@@ -4771,7 +4773,9 @@ function renderPackPopover(classTsid, anchor = null) {
       </div>`;
       })()
     : '';
-  if (recipeTarget) rows.push({ attrs: 'data-pack-make', label: makeLabel, tip: recipeNote ? `${recipeNote} · opens Make` : 'Opens Make' });
+  // test_tube.js 274-283: Experiment is the Test Tube's verb, before any compound is known.
+  if (slot.isTool && classTsid === EXPERIMENT_TOOL) rows.push({ attrs: 'data-pack-make', label: makeLabel, tip: experimentTooltip(knownCompoundIds().length) });
+  else if (recipeTarget) rows.push({ attrs: 'data-pack-make', label: makeLabel, tip: recipeNote ? `${recipeNote} · opens Make` : 'Opens Make' });
   const dropBlock = packDropBlockReason(classTsid);
   // takeable_drop_conditions {state: null}: an element's menu has no Drop row at all (element_red.js 143-145).
   // A class whose feature has a drop verb of its own (the Crafty Bot's, npc_crafty_bot.js 323-342) shows that one.
@@ -27583,6 +27587,70 @@ function makeToolSheetVisual(toolId) {
   return `<span class="mp-tool mp-tool-sheet" data-tool="${escapeHtml(toolId)}" data-frames="${sheet.frames}" role="img" aria-label="${escapeHtml(label)} working" style="${style}"></span>`;
 }
 
+/** The compounds found so far (js/features/compound-discovery-feature.js); all sixteen before the stamp. */
+function knownCompoundIds() {
+  return features.query('knownCompounds') || [...COMPOUND_RECIPE_IDS];
+}
+
+/** Experimenting with a Test Tube (js/test-tube-panel.js, rules js/test-tube.js). */
+const testTubePanel = createTestTubePanel({
+  inv: () => inv,
+  pc: () => pc,
+  learned: () => skillState.learned || [],
+  known: knownCompoundIds,
+  iconUrl: itemIconUrl,
+  escape: escapeHtml,
+  toolVisual: () => makeToolSheetVisual(EXPERIMENT_TOOL) || `<img class="mp-tool" src="${itemIconUrl(EXPERIMENT_TOOL)}" alt="" />`,
+  onStart: () => {
+    syncMakeBack();
+    startCraftSoundLoop(EXPERIMENT_TOOL);
+  },
+  onResult: (outcome) => {
+    stopCraftSoundLoop();
+    updateHud();
+    if (!outcome.ok) {
+      if (outcome.reason === 'nothing') {
+        // inc_making.js 1158: making_unknown_tool_fail; 1187 CRAFTING_RESULT_NOTHING.
+        announceAchievementUpdates(applyAchievementProgress(achieveState, `making_unknown_tool_fail:${EXPERIMENT_TOOL}`, 1, pc));
+        playSound('CRAFTING_RESULT_NOTHING', { volume: 0.5 });
+      }
+      pushActivity(outcome.lines.join(' '));
+      syncMakeBack();
+      return;
+    }
+    features.get('compound-discovery')?.learnCompound(outcome.recipe.id, engine);
+    // inc_making.js 1274-1279: making_unknown_recipe, making_unknown_tool, making_tool; quests_made_recipe.
+    emitGameEvent(`making_recipe:${outcome.key}`);
+    for (const output of outcome.outputs) emitGameEvent(`making_tool_output:${EXPERIMENT_TOOL}:${output.classTsid}`, output.qty || 1);
+    announceAchievementUpdates([
+      ...applyAchievementProgress(achieveState, `making_unknown_recipe:${outcome.recipe.id}`, 1, pc),
+      ...applyAchievementProgress(achieveState, `making_unknown_tool:${EXPERIMENT_TOOL}`, 1, pc),
+      ...applyAchievementProgress(achieveState, `making_tool:${EXPERIMENT_TOOL}`, 1, pc),
+    ]);
+    pushActivity(outcome.activityLine);
+    if (outcome.extraLine) pushActivity(outcome.extraLine);
+    toast(outcome.activityLine);
+    playSound(soundForMakingDone(EXPERIMENT_TOOL), { volume: 0.6 });
+    if (player) floatText(player.x, player.y - 80, outcome.recipe.name, 0xffe066);
+    syncMakeBack();
+  },
+  onBack: () => {
+    renderMakePanel();
+    makeKeyFocus({ detail: 0 }, '[data-make-try]');
+  },
+  onDone: () => closeMakePanel(),
+});
+
+/** The back pill while the Test Tube's experiment screens are up: back to its recipes, never mid-try. */
+function syncMakeBack() {
+  const backEl = document.getElementById('make-tools-back');
+  if (!backEl || !testTubePanel.isOpen()) return;
+  backEl.hidden = false;
+  backEl.disabled = testTubePanel.busy();
+  backEl.innerHTML = '<span aria-hidden="true">←</span> Test Tube';
+  backEl.setAttribute('aria-label', 'Back to the Test Tube recipes (Backspace)');
+}
+
 /** Draw the source-inspired ingredients → working tool → output stage once. */
 function renderMakeProgressStage(record) {
   const { recipe, timer } = record;
@@ -27702,6 +27770,7 @@ function cancelMakeCraft({ close = false, quiet = false } = {}) {
 
 /** Commit one recipe only after each visible tool cycle finishes. */
 function updateMakeCraft(deltaMs) {
+  testTubePanel.tick(deltaMs);
   const record = activeCraftSession;
   if (!record) return;
   const advanced = advanceCraftSession(record.timer, deltaMs);
@@ -27995,6 +28064,7 @@ function makeKeyFocus(event, selector) {
 
 /** Report #175: a tool's own screen, from its button on the tools screen. */
 function openMakeTool(toolId, event = null) {
+  testTubePanel.close();
   makeToolsScroll = makeScroller()?.scrollTop || 0;
   makeView = 'tool';
   makeToolFilter = toolId;
@@ -28010,6 +28080,7 @@ function openMakeTool(toolId, event = null) {
 
 /** Back to the tools, where the player left them. `keepSearch` carries a tool's search over to every tool. */
 function showMakeTools(event = null, { keepSearch = false } = {}) {
+  testTubePanel.close();
   const from = makeToolFilter;
   makeView = 'tools';
   makeSelected = null;
@@ -28022,7 +28093,7 @@ function showMakeTools(event = null, { keepSearch = false } = {}) {
 
 /** One step back with Backspace: a recipe or its result to its list, a tool to the tools. True when it went anywhere. */
 function makeStepBack() {
-  if (activeCraftSession) return false;
+  if (activeCraftSession || testTubePanel.busy()) return false;
   if (!makeSelected && makeView !== 'tool') return false;
   makeNavBack({ detail: 0 });
   return true;
@@ -28030,7 +28101,11 @@ function makeStepBack() {
 
 /** The pill over the panel (#make-tools-back) and Backspace: a recipe or its result back to the list, where it was; else the tools. */
 function makeNavBack(event = null) {
-  if (activeCraftSession) return;
+  if (activeCraftSession || testTubePanel.busy()) return;
+  if (testTubePanel.isOpen()) {
+    testTubePanel.back();
+    return;
+  }
   if (makeSelected) {
     const recipe = makeSelected;
     makeSelected = null;
@@ -28112,6 +28187,27 @@ function renderMakeTools(toolsEl, known, canMake) {
   return { owned, total };
 }
 
+/** The Test Tube's first tile, which opens the experiment screen (MakingDialog.as onRecipeClick 'try' 517-526). */
+function makeTryTile() {
+  const tile = document.createElement('button');
+  tile.type = 'button';
+  tile.className = 'make-tile make-try-tile';
+  tile.setAttribute('role', 'listitem');
+  tile.dataset.makeTry = '1';
+  const knownCount = knownCompoundIds().length;
+  tile.innerHTML = tryTileHtml(itemIconUrl, escapeHtml, knownCount);
+  tile.title = experimentTooltip(knownCount);
+  tile.setAttribute('aria-label', `${TRY_TILE_LABEL}. ${experimentTooltip(knownCount)}.`);
+  tile.addEventListener('click', (event) => {
+    makeListScroll = makeScroller()?.scrollTop || 0;
+    testTubePanel.open();
+    renderMakePanel();
+    setMakeScroll(0);
+    makeKeyFocus(event, '#make-detail [data-tt-add]:not(:disabled)');
+  });
+  return tile;
+}
+
 function renderMakePanel() {
   const list = document.getElementById('make-list');
   const detail = document.getElementById('make-detail');
@@ -28151,6 +28247,7 @@ function renderMakePanel() {
   // tools; a recipe and its result go back to the list they came from, named after it.
   const backEl = document.getElementById('make-tools-back');
   if (backEl) {
+    backEl.disabled = false;
     backEl.hidden = !inTool && !makeSelected;
     // Where it goes: the tool's list, a search's results, or (a recipe opened from the pack) the tools.
     const to = makeSelected && inTool ? toolLabel : makeSelected && query ? 'Recipes' : 'Tools';
@@ -28159,6 +28256,8 @@ function renderMakePanel() {
   }
 
   syncMakePanelIcon();
+  const canDiscover = inTool && makeToolFilter === EXPERIMENT_TOOL && !query && !makeSelected;
+  if (!canDiscover) testTubePanel.close();
 
   // The Tinkertool repairs from the pack, but its recipe list is for making.
   const toolAction = makeToolFilter === 'tinkertool'
@@ -28193,6 +28292,13 @@ function renderMakePanel() {
   if (toolsEl) {
     toolsEl.hidden = !showTools;
     if (!showTools) toolsEl.innerHTML = '';
+  }
+  if (canDiscover && testTubePanel.isOpen()) {
+    list.hidden = true;
+    syncMakeBack();
+    testTubePanel.render();
+    if (app?.canvas) app.canvas.dataset.makeShown = `experiment:${testTubePanel.view()}`;
+    return;
   }
   if (showTools) {
     const tally = toolsEl ? renderMakeTools(toolsEl, searchRecipes('', { tool: 'all', ...known }), canMakeNow) : { owned: 0, total: 0 };
@@ -28310,6 +28416,12 @@ function renderMakePanel() {
 
   list.hidden = false;
   list.innerHTML = '';
+  // MakingRecipeUI.as 59-77: "Try to make something new" leads a tool that can discover (the Test Tube).
+  const tryTile = canDiscover ? makeTryTile() : null;
+  if (tryTile && !recipes.length && !allRecipes) {
+    list.appendChild(tryTile);
+    return;
+  }
   if (!recipes.length) {
     // Report 129: why, and a button that turns the filter off.
     // A search with nothing says what it looked in; from a tool it offers the other tools.
@@ -28326,8 +28438,10 @@ function renderMakePanel() {
       document.getElementById('make-canmake')?.focus({ preventScroll: true });
     });
     list.querySelector('[data-make-search-all]')?.addEventListener('click', (event) => showMakeTools(event, { keepSearch: true }));
+    if (tryTile) list.prepend(tryTile);
     return;
   }
+  if (tryTile) list.appendChild(tryTile);
 
   for (const recipe of recipes) {
     const key =
@@ -28387,6 +28501,7 @@ function renderMakePanel() {
  */
 function openMakePanel(station = null, { tool = null } = {}) {
   makeStation = typeof station?.tool === 'string' ? station : null;
+  testTubePanel.close();
   const openTool = makeOpeningTool({
     stationTool: makeStation?.tool,
     askedTool: tool,
@@ -28422,6 +28537,9 @@ function openMakePanel(station = null, { tool = null } = {}) {
 
 function closeMakePanel() {
   cancelMakeCraft({ close: true, quiet: true });
+  // A try still waiting takes nothing (inc_making.js tryToMake only checks the pack).
+  if (testTubePanel.busy()) stopCraftSoundLoop();
+  testTubePanel.close();
   makeStation = null;
   clearMakeFeedback();
   setMakeCraftingUi(false);
@@ -30711,6 +30829,8 @@ async function main() {
     handleSkillCompletions([]);
   }
   features.get('recipe-memory')?.stampOnce(savedPlayerState ? storedPlayerSave : null, engine);
+  // A save from before Test Tube discovery keeps all sixteen compounds; a new character finds them.
+  features.get('compound-discovery')?.stampOnce(savedPlayerState ? storedPlayerSave : null, engine);
   const homeDemo = String(bootParams.get('homedemo') || '').toLowerCase();
   if (homeDemo) {
     pc.currants = Math.max(pc.currants, 1_250);
