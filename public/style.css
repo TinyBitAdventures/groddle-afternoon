@@ -6932,7 +6932,7 @@ body.buff-purple-pulse::after {
 }
 
 /* G471: the Map's views (js/map-views.js): the view buttons in its head (HubMapDialog.as: your region,
-   the world map) and the world map. */
+   the world map, the transit map), the world map and the subway map. */
 .map-views { display: inline-flex; flex: none; gap: 2px; padding: 2px; border-radius: var(--radius-pill); background: var(--surface-sunken); }
 .map-view-btn {
   display: inline-flex; align-items: center; gap: var(--sp-2); min-height: 28px; padding: 0 var(--sp-4) 0 var(--sp-3);
@@ -6945,13 +6945,30 @@ body.buff-purple-pulse::after {
 .map-view-btn[aria-selected="true"] { background: var(--surface-bright); color: var(--text); box-shadow: var(--shadow-1); }
 .map-view-btn:focus-visible { outline: 2px solid var(--c-gold-85); outline-offset: 1px; }
 /* They fill the canvas box as the region map does (ticket 21, .map-canvas > .hub-map-svg). */
-.map-canvas > .world-map-svg { position: absolute; inset: 0; }
+.map-canvas > :is(.world-map-svg, .subway-map-svg) { position: absolute; inset: 0; }
 .world-map-svg .world-region-hit { fill: transparent; stroke: none; }
 .world-map-svg .world-region.is-open { cursor: pointer; outline: none; }
 .world-map-svg .world-region.is-open:focus-visible .world-region-hit { stroke: var(--text-inverse); stroke-width: 1.5; stroke-dasharray: 3 2; }
 .world-map-svg .world-card { filter: drop-shadow(0 2px 5px color-mix(in srgb, var(--c-black) 60%, transparent)); }
 .world-map-svg .world-you { transition: opacity var(--motion-fast) linear; }
 .world-map-svg .world-you.is-hidden { opacity: 0; }
+.subway-map-svg .subway-paper { fill: var(--c-sage-93); }
+.subway-map-svg .subway-track { fill: none; stroke: var(--line-c); stroke-width: 3; stroke-linecap: round; opacity: 0.9; }
+.subway-map-svg .subway-arrow { fill: var(--line-c); }
+.subway-map-svg .subway-stop-hit, .subway-map-svg .subway-stop-hub { cursor: pointer; outline: none; }
+.subway-map-svg .subway-stop-pad { fill: transparent; }
+.subway-map-svg .subway-stop-ring { fill: var(--c-white); stroke: var(--c-sand-63); stroke-width: 2; }
+.subway-map-svg .subway-stop-dot { fill: var(--line-c); }
+.subway-map-svg .subway-stop-hit:is(:hover, :focus-visible) .subway-stop-ring { stroke: var(--line-c); stroke-width: 3; }
+.subway-map-svg .subway-stop-name { font: italic 800 var(--fs-md) var(--font-ui); fill: var(--c-grey-29); paint-order: stroke fill; stroke: var(--c-sage-93); stroke-width: 3; }
+.subway-map-svg .subway-stop-hub { font: italic 700 var(--fs-sm) var(--font-ui); fill: var(--c-sand-56); paint-order: stroke fill; stroke: var(--c-sage-93); stroke-width: 3; }
+.subway-map-svg .subway-stop-hub:is(:hover, :focus-visible) { fill: var(--c-sand-36); text-decoration: underline; }
+.subway-map-svg .subway-line-btn { cursor: pointer; outline: none; }
+.subway-map-svg .subway-line-btn rect { fill: var(--surface-sunken); stroke: none; opacity: 0.85; }
+.subway-map-svg .subway-line-btn.is-on rect { fill: var(--surface-bright); stroke: var(--line-c); stroke-width: 1.5; opacity: 1; }
+.subway-map-svg .subway-line-btn:focus-visible rect { stroke: var(--c-gold-85); stroke-width: 2; }
+.subway-map-svg .subway-line-btn line { stroke: var(--line-c); stroke-width: 2; opacity: 0.35; }
+.subway-map-svg .subway-line-btn text { font: 700 var(--fs-xs) var(--font-ui); fill: var(--line-c); paint-order: stroke fill; stroke: var(--surface-bright); stroke-width: 3; }
 /* A phone's head (the region box and the close button) keeps the view buttons as icons only. */
 :root.touch-phone[data-ui="modern"] #map-panel .map-head .map-view-btn { padding: 0 var(--sp-2); min-height: 32px; }
 :root.touch-phone[data-ui="modern"] #map-panel .map-head .map-view-btn > span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }

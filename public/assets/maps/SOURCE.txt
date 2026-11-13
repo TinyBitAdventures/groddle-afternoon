@@ -70,3 +70,6 @@ World map (G471, 2026-11-13)
   assets/maps/art/world/frames.svg             the region frames and locked tiles (the FLA's vectors)
   assets/maps/art/world/cards/<hub>.svg        each region's hover card (frame, thumbnail, lettered name)
   js/map-views-data.js                         the 47 regions' click frames, centres and card placements
+  The subway map's paper and line overlays (subway_map_bg_59215.jpg, subway_*_line_fg_59215.png) are
+  lost; js/map-views.js draws the line from config_prod.js map_pos, and the paper waits on the art brief
+  in research/map-art/brief.md.

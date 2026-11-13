@@ -1,6 +1,7 @@
 /**
- * The Map's world view (G471): the world map (glitch-overlays/world_map.fla, HubMapDialog.as),
- * switched from the Map's head. tools/map-views/build.mjs writes js/map-views-data.js and the world map's art from the sources.
+ * The Map's other views (G471): the world map (glitch-overlays/world_map.fla, HubMapDialog.as) and
+ * the subway map (config_prod.js transit_instances map_pos, MapTransit.as), switched from the Map's
+ * head. tools/map-views/build.mjs writes js/map-views-data.js and the world map's art from the sources.
  */
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
@@ -10,12 +11,18 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { WORLD_MAP } from '../public/js/map-views-data.js?v=8e7d7094';
 import { PUBLIC_HUBS } from '../public/js/map-graph.js?v=c161229d';
+import { STATIONS } from '../public/js/subway.js?v=44d1a09f';
 import {
   MAP_VIEW_TITLES,
+  cubicAt,
   mapViewSubtitle,
+  nearestStation,
+  renderSubwayMapSvg,
   renderWorldMapSvg,
+  subwayPoints,
+  subwaySegments,
   worldRegionList,
-} from '../public/js/map-views.js?v=0ccb4e50';
+} from '../public/js/map-views.js?v=da4c16ef';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const read = (p) => readFileSync(join(root, p), 'utf8');
@@ -56,7 +63,7 @@ describe('world map (world_map.fla)', () => {
   it('the quiet line says how to use it, and the title is the client\'s', () => {
     assert.match(mapViewSubtitle('world', { regions: worldRegionList(INDEX, PUBLIC_HUBS), touch: true }), /^47 regions · tap a region to see it, tap again to open its map/);
     assert.match(mapViewSubtitle('world', { regions: worldRegionList(INDEX, PUBLIC_HUBS) }), /^47 regions · click a region to open its map · red star = you$/);
-    assert.deepEqual(MAP_VIEW_TITLES, { world: 'World Map' });
+    assert.equal(MAP_VIEW_TITLES.world, 'World Map');
   });
 
   it('every region is open (a public region with streets), named from the map index', () => {
@@ -83,13 +90,65 @@ describe('world map (world_map.fla)', () => {
   });
 });
 
-describe('the Map window offers the world view (HubMapDialog.as)', () => {
+describe('subway map (map_pos, MapTransit.as)', () => {
+  it('the line runs through the 12 stations at their map_pos, closed, in Red Line order', () => {
+    const pts = subwayPoints();
+    assert.equal(pts.length, 12);
+    assert.deepEqual(pts[0], [475, 270], 'Groddle Forest Junction');
+    const segs = subwaySegments(pts);
+    assert.equal(segs.length, 12);
+    for (let i = 0; i < segs.length; i++) {
+      assert.deepEqual(segs[i][0], pts[i]);
+      assert.deepEqual(segs[i][3], pts[(i + 1) % 12]);
+    }
+    const mid = cubicAt(segs[0], 0.5);
+    assert.ok(mid.x < 475 && mid.x > 409 && mid.y < 270 && mid.y > 205, 'GFJ to Tallish Crest bows between them');
+  });
+
+  it('marks the station you are at, else your region\'s, else the nearest region\'s on the world map', () => {
+    assert.deepEqual(nearestStation({ tsid: 'GLI32G3NUTD100I', hubId: '58' }), { station: STATIONS.find((s) => s.id === 3), how: 'here' });
+    assert.equal(nearestStation({ tsid: 'GNOPE', hubId: '64' }).station.name, 'Tallish Crest');
+    assert.equal(nearestStation({ tsid: 'GNOPE', hubId: '64' }).how, 'region');
+    // Lida (105) has no station: the station whose region's centre lies nearest Lida's on the world map.
+    const lida = nearestStation({ tsid: '', hubId: '105' });
+    assert.equal(lida.how, 'near');
+    const c = WORLD_MAP.regions['105'].centre;
+    const d = (s) => Math.hypot(WORLD_MAP.regions[s.surfaceHubId].centre[0] - c[0], WORLD_MAP.regions[s.surfaceHubId].centre[1] - c[1]);
+    assert.equal(lida.station, STATIONS.reduce((a, b) => (d(b) < d(a) ? b : a)));
+    assert.equal(nearestStation({ tsid: '', hubId: '40' }), null, 'Naraka is on no world map');
+  });
+
+  it('draws 12 stops, the marker on yours, the two line buttons, arrows the way the line runs', () => {
+    const here = nearestStation({ tsid: 'GLI3272LOTD1B1F', hubId: '56' });
+    const red = renderSubwayMapSvg({ direction: 'forwards', here });
+    assert.match(red, /^<svg viewBox="0 0 760 460"/);
+    assert.equal((red.match(/<g class="subway-stop[ "]/g) || []).length, 12);
+    assert.match(red, /<g class="subway-stop is-here" data-station="1" data-tsid="GLI3272LOTD1B1F" data-hub="56"/);
+    assert.match(red, /class="map-you subway-you" href="assets\/sprites\/subway\/subway_map_current_station_red@2x.webp" x="460" y="255.5"/);
+    assert.match(red, /<g class="subway-line-btn is-on" data-dir="forwards" tabindex="0" role="button" aria-pressed="true"/);
+    assert.equal((red.match(/class="subway-arrow"/g) || []).length, 12);
+    const blue = renderSubwayMapSvg({ direction: 'backwards', here });
+    assert.match(blue, /subway_map_current_station_blue/);
+    const ang = (svg) => Number(svg.match(/class="subway-arrow" d="[^"]*" transform="translate\([^)]*\) rotate\(([-\d.]+)\)/)[1]);
+    assert.equal(Math.round(Math.abs(ang(blue) - ang(red))), 180);
+    assert.doesNotMatch(renderSubwayMapSvg({ here: null }), /subway-you/);
+  });
+
+  it('the quiet line says where you are and how to use it', () => {
+    const here = nearestStation({ tsid: 'GNOPE', hubId: '64' });
+    assert.match(mapViewSubtitle('subway', { here }), /^12 stations · Red Line · Nearest station: Tallish Crest \(Groddle Heights\) · click a station/);
+    assert.match(mapViewSubtitle('world', { regions: worldRegionList(INDEX, PUBLIC_HUBS), touch: true }), /^47 regions · tap a region to see it, tap again to open its map/);
+    assert.deepEqual(MAP_VIEW_TITLES, { world: 'World Map', subway: 'Subway System' });
+  });
+});
+
+describe('the Map window offers the three views (HubMapDialog.as)', () => {
   const html = read('public/play/index.html');
   const game = read('public/game.js');
 
   it('its head holds the view buttons, in both pages', () => {
     for (const page of [html, read('public/play/online/index.html')]) {
-      for (const v of ['hub', 'world']) assert.match(page, new RegExp(`class="map-view-btn" data-map-view="${v}"`));
+      for (const v of ['hub', 'world', 'subway']) assert.match(page, new RegExp(`class="map-view-btn" data-map-view="${v}"`));
     }
   });
 
@@ -97,7 +156,8 @@ describe('the Map window offers the world view (HubMapDialog.as)', () => {
     assert.match(game, /async function openMap\(hubId, \{ find = '', focus = '', view: pickedView = '' \} = \{\}\)/);
     assert.match(game, /const mapView = pickedView \|\| \(!hubId && !find && isMapOpen\(\) \? mapPanelView : 'hub'\);/);
     assert.match(game, /function closeMap\(\) \{[\s\S]*?mapPanelView = 'hub';/);
-    // A region opens its map.
+    // A station opens the street menu of its street above ground, a region opens its map.
+    assert.match(game, /onStop: \(e, st\) => \{[\s\S]*?openMapStreetMenu\(canvas, e, street/);
     assert.match(game, /bindWorldMap\(canvas, \{ touch, onOpen: \(id\) => openMap\(id\) \}\)/);
   });
 

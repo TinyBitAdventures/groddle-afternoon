@@ -972,8 +972,8 @@ import {
   HUB_56_MAP_URL,
   PUBLIC_HUBS,
 } from './js/map-graph.js?v=c161229d';
-// G471: the world map in the Map's window.
-import { MAP_VIEW_TITLES, bindWorldMap, mapViewSubtitle, renderWorldMapSvg, worldRegionList } from './js/map-views.js?v=0ccb4e50';
+// G471: the world map and the subway map in the Map's window.
+import { MAP_VIEW_TITLES, bindSubwayMap, bindWorldMap, mapViewSubtitle, nearestStation, renderSubwayMapSvg, renderWorldMapSvg, worldRegionList } from './js/map-views.js?v=da4c16ef';
 import { hubMapArtNote, hubMapSubtitle, questLogSummary } from './js/panel-copy.js?v=85c3e029';
 import { bindMapIconTips } from './js/ui/map-icon-tips.js?v=6b3eb3f9';
 import { createMapZoom } from './js/map-zoom.js?v=4c2ce0e3';
@@ -1080,8 +1080,9 @@ let mapPanelHubId = null;
 let mapPanelStreetTsid = null;
 /** The streets walked, newest last, for places off the hub maps (map-graph.js noteMapTrail). */
 let mapTrail = [];
-/** G471: the Map's view (js/map-views.js MAP_VIEWS). QA: canvas data mapView. */
+/** G471: the Map's view (js/map-views.js MAP_VIEWS) and the subway view's line. QA: canvas data mapView. */
 let mapPanelView = 'hub';
+let subwayMapDirection = 'forwards';
 
 async function ensureMapIndex() {
   if (mapIndexCache) return mapIndexCache;
@@ -25695,7 +25696,7 @@ async function openMap(hubId, { find = '', focus = '', view: pickedView = '' } =
     hubCombobox.refresh();
   }
 
-  // G471: the world map; a redraw while the Map is open keeps the view on show.
+  // G471: the world map or the subway map; a redraw while the Map is open keeps the view on show.
   const mapView = pickedView || (!hubId && !find && isMapOpen() ? mapPanelView : 'hub');
   markMapView(panel, mapView);
   if (mapView !== 'hub') {
@@ -25819,8 +25820,8 @@ function renderMapCards(panel) {
 }
 
 /**
- * G471: the view buttons in the Map's head (HubMapDialog.as: your region, the world map), bound
- * once; the one on show is pressed.
+ * G471: the view buttons in the Map's head (HubMapDialog.as: your region, the world map, the
+ * transit map), bound once; the one on show is pressed.
  */
 function markMapView(panel, which) {
   mapPanelView = which;
@@ -25842,13 +25843,33 @@ function markMapView(panel, which) {
   for (const btn of bar.querySelectorAll('[data-map-view]')) btn.setAttribute('aria-selected', String(btn.dataset.mapView === which));
 }
 
-/** G471: the world map in the Map's window (js/map-views.js). */
+/** G471: the world map or the subway map in the Map's window (js/map-views.js). */
 function showMapView(which, { panel, canvas, title, sub, spot, mapIndex }) {
   const touch = TOUCH_PHONE || matchMedia?.('(hover: none)')?.matches || false;
-  const regions = worldRegionList(mapIndex, PUBLIC_HUBS);
-  canvas.innerHTML = renderWorldMapSvg(regions, { youHubId: spot.hubId });
-  bindWorldMap(canvas, { touch, onOpen: (id) => openMap(id) });
-  const subLine = mapViewSubtitle('world', { touch, regions });
+  let subLine = '';
+  if (which === 'world') {
+    const regions = worldRegionList(mapIndex, PUBLIC_HUBS);
+    canvas.innerHTML = renderWorldMapSvg(regions, { youHubId: spot.hubId });
+    bindWorldMap(canvas, { touch, onOpen: (id) => openMap(id) });
+    subLine = mapViewSubtitle('world', { touch, regions });
+  } else {
+    const here = nearestStation(spot);
+    canvas.innerHTML = renderSubwayMapSvg({ direction: subwayMapDirection, here });
+    bindSubwayMap(canvas, {
+      onLine: (dir) => {
+        subwayMapDirection = dir === 'backwards' ? 'backwards' : 'forwards';
+        openMap(null, { view: 'subway' });
+      },
+      // The station's street above ground, in the menu a street gets on the region map.
+      onStop: (e, st) => {
+        const street = { tsid: st.surfaceStreetTsid, label: st.surfaceLabel, hubId: st.surfaceHubId, hubName: st.hubName };
+        openMapStreetMenu(canvas, e, street, { here: st.surfaceStreetTsid === currentStreetTsid });
+      },
+      onHub: (st) => openMap(st.surfaceHubId, { find: st.surfaceStreetTsid }),
+    });
+    setCanvasData('mapStation', here ? `${here.station.id}:${here.how}` : '');
+    subLine = mapViewSubtitle('subway', { touch, here, direction: subwayMapDirection });
+  }
   if (title) title.textContent = MAP_VIEW_TITLES[which];
   if (sub) {
     sub.textContent = subLine;

@@ -1,5 +1,5 @@
 /**
- * The Map's world view (G471), beside the region map in the same window.
+ * The Map's world and subway views (G471), beside the region map in the same window.
  *
  * The client's map window (HubMapDialog.as) had three buttons at its top left: back to your own
  * region, the world map (world_map_in_bt / world_map_out_bt) and the transit map (transit_bt).
@@ -12,12 +12,22 @@
  * thumbnail and hand-lettered name, the clip's "over" state). A click opens the region's map
  * (worldMapClickHandler -> goToHubFromClick). On a touch screen, which has no hover, the first
  * tap shows the card and a second tap on it opens the map.
+ *
+ * Subway map (MapTransit.as; GSJS location.js get_map 3043-3093): the 12 stations at their
+ * config_prod.js map_pos on the client's 760 x 460 frame, the Red Line and the Blue Line (one track
+ * run either way), the station you are at or nearest to marked. The client drew the line and the
+ * stations from two lost pictures (subway_map_bg_59215.jpg, subway_red_line_fg_59215.png and its
+ * blue twin, never archived); until they are repainted (research/map-art/brief.md) the line is
+ * drawn here as a smooth curve through the stations in their order. A station opens the same
+ * menu a street does on the region map (Set as Destination, Teleport Here) for its street above
+ * ground; its region's name opens that region's map with the street found.
  */
 import { WORLD_MAP } from './map-views-data.js?v=8e7d7094';
+import { LINE_COLOURS, STATIONS, SUBWAY_ART, SUBWAY_ART_BASE, lineName } from './subway.js?v=44d1a09f';
 
-export const MAP_VIEWS = Object.freeze(['hub', 'world']);
-/** The window's title in each view (the client's: the region's name, "World Map"). */
-export const MAP_VIEW_TITLES = Object.freeze({ world: 'World Map' });
+export const MAP_VIEWS = Object.freeze(['hub', 'world', 'subway']);
+/** The window's title in each view (the client's: the region's name, "World Map", "Subway System"). */
+export const MAP_VIEW_TITLES = Object.freeze({ world: 'World Map', subway: 'Subway System' });
 
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
 const f1 = (v) => Math.round(v * 10) / 10;
@@ -148,14 +158,160 @@ export function bindWorldMap(canvas, { onOpen, touch = false, regions = WORLD_MA
   return { show, hide, shown: () => shown };
 }
 
+// ------------------------------------------------------------------ subway
+
+/**
+ * Where each station's name sits from its dot, as on the Subway System map (Tribute Blog post
+ * 38013353380, reference only): [dx, dy, text-anchor] of the name's baseline; its region's name
+ * goes under it.
+ */
+export const SUBWAY_LABELS = Object.freeze({
+  1: [16, -4, 'start'], 2: [14, -12, 'start'], 3: [-14, 2, 'end'], 4: [-16, -2, 'end'],
+  5: [16, -4, 'start'], 6: [16, -6, 'start'], 7: [16, -2, 'start'], 8: [10, -24, 'end'],
+  9: [16, 4, 'start'], 10: [-14, -16, 'end'], 11: [-12, -18, 'end'], 12: [-14, 4, 'end'],
+});
+
+/** The Red Line's stations in order as [x, y] (config_prod.js map_pos; the Blue Line runs them backwards). */
+export function subwayPoints(stations = STATIONS) {
+  return stations.map((s) => [s.map_pos[0], s.map_pos[1]]);
+}
+
+/**
+ * A closed Catmull-Rom curve through the points, as cubic Bezier segments
+ * [[p0, c1, c2, p1], ...] (one a pair of neighbouring stations).
+ */
+export function subwaySegments(pts) {
+  const n = pts.length;
+  const out = [];
+  for (let i = 0; i < n; i++) {
+    const p0 = pts[(i - 1 + n) % n];
+    const p1 = pts[i];
+    const p2 = pts[(i + 1) % n];
+    const p3 = pts[(i + 2) % n];
+    const c1 = [p1[0] + (p2[0] - p0[0]) / 6, p1[1] + (p2[1] - p0[1]) / 6];
+    const c2 = [p2[0] - (p3[0] - p1[0]) / 6, p2[1] - (p3[1] - p1[1]) / 6];
+    out.push([p1, c1, c2, p2]);
+  }
+  return out;
+}
+
+/** A cubic's point and direction (radians) at t. */
+export function cubicAt([p0, c1, c2, p1], t) {
+  const u = 1 - t;
+  const x = u * u * u * p0[0] + 3 * u * u * t * c1[0] + 3 * u * t * t * c2[0] + t * t * t * p1[0];
+  const y = u * u * u * p0[1] + 3 * u * u * t * c1[1] + 3 * u * t * t * c2[1] + t * t * t * p1[1];
+  const dx = 3 * u * u * (c1[0] - p0[0]) + 6 * u * t * (c2[0] - c1[0]) + 3 * t * t * (p1[0] - c2[0]);
+  const dy = 3 * u * u * (c1[1] - p0[1]) + 6 * u * t * (c2[1] - c1[1]) + 3 * t * t * (p1[1] - c2[1]);
+  return { x, y, angle: Math.atan2(dy, dx) };
+}
+
+/**
+ * The station to mark (MapTransit.as setPlayerLocation, there only on the line itself): the one you
+ * stand at or above, else the one in your region, else the one whose region lies nearest yours on
+ * the world map (centre to centre), else none. spot: { tsid, hubId } (game.js playerMapSpot).
+ * Returns { station, how: 'here' | 'region' | 'near' } or null.
+ */
+export function nearestStation(spot, stations = STATIONS, regions = WORLD_MAP.regions) {
+  const tsid = String(spot?.tsid || '');
+  const hubId = String(spot?.hubId || '');
+  const at = stations.find((s) => tsid && (s.surfaceStreetTsid === tsid || s.streetTsid === tsid));
+  if (at) return { station: at, how: 'here' };
+  const inRegion = stations.find((s) => String(s.surfaceHubId) === hubId);
+  if (inRegion) return { station: inRegion, how: 'region' };
+  const mine = regions[hubId]?.centre;
+  if (!mine) return null;
+  let best = null;
+  for (const s of stations) {
+    const c = regions[String(s.surfaceHubId)]?.centre;
+    if (!c) continue;
+    const d = Math.hypot(c[0] - mine[0], c[1] - mine[1]);
+    if (!best || d < best.d) best = { station: s, d };
+  }
+  return best ? { station: best.station, how: 'near' } : null;
+}
+
+/** The subway map as SVG on the client's 760 x 460 frame. here: nearestStation()'s answer. */
+export function renderSubwayMapSvg({ direction = 'forwards', here = null, stations = STATIONS } = {}) {
+  const W = 760;
+  const H = 460;
+  const colour = LINE_COLOURS[direction] || LINE_COLOURS.forwards;
+  const segs = subwaySegments(subwayPoints(stations));
+  const d = `M${segs[0][0].map(f1).join(',')}` + segs.map(([, c1, c2, p1]) => ` C${c1.map(f1).join(',')} ${c2.map(f1).join(',')} ${p1.map(f1).join(',')}`).join('') + ' Z';
+  // One arrow a stretch, half way along it, pointing the way this line runs.
+  const arrows = segs.map((seg) => {
+    const m = cubicAt(seg, 0.5);
+    const deg = (m.angle * 180) / Math.PI + (direction === 'backwards' ? 180 : 0);
+    return `<path class="subway-arrow" d="M-6,-5 L6,0 L-6,5 Z" transform="translate(${f1(m.x)} ${f1(m.y)}) rotate(${f1(deg)})"/>`;
+  }).join('');
+  const mark = here?.station || null;
+  const stops = stations.map((s) => {
+    const [x, y] = s.map_pos;
+    const [dx, dy, anchor] = SUBWAY_LABELS[s.id] || [14, -4, 'start'];
+    const isHere = mark && mark.id === s.id;
+    const label = `${s.name}, ${s.hubName}`;
+    return `<g class="subway-stop${isHere ? ' is-here' : ''}" data-station="${s.id}" data-tsid="${esc(s.surfaceStreetTsid)}" data-hub="${esc(s.surfaceHubId)}" data-label="${esc(s.surfaceLabel)}">`
+      + `<g class="subway-stop-hit" tabindex="0" role="button" aria-label="${esc(`${label}: set a destination or teleport`)}">`
+      + `<circle class="subway-stop-pad" cx="${x}" cy="${y}" r="14"/><circle class="subway-stop-ring" cx="${x}" cy="${y}" r="6"/><circle class="subway-stop-dot" cx="${x}" cy="${y}" r="2.6"/>`
+      + `<text class="subway-stop-name" x="${x + dx}" y="${y + dy}" text-anchor="${anchor}">${esc(s.name)}</text></g>`
+      + `<text class="subway-stop-hub" x="${x + dx}" y="${y + dy + 15}" text-anchor="${anchor}" tabindex="0" role="link" aria-label="${esc(`${s.hubName} map`)}">${esc(s.hubName)}</text></g>`;
+  }).join('');
+  const art = mark ? SUBWAY_ART[direction === 'backwards' ? 'subway_map_current_station_blue' : 'subway_map_current_station_red'] : null;
+  const you = mark && art
+    ? `<image class="map-you subway-you" href="${esc(SUBWAY_ART_BASE + art[0])}" x="${mark.map_pos[0] - art[1] / 2}" y="${mark.map_pos[1] - art[2] / 2 - 1}" width="${art[1]}" height="${art[2]}" pointer-events="none"/>`
+    : '';
+  // The line buttons at the top right (MapTransit.as build: each line's name over a stroke of its colour).
+  const buttons = ['forwards', 'backwards'].map((dir, i) => {
+    const on = dir === direction;
+    const x = 586 + i * 86;
+    return `<g class="subway-line-btn${on ? ' is-on' : ''}" data-dir="${dir}" tabindex="0" role="button" aria-pressed="${on}" style="--line-c: ${LINE_COLOURS[dir]}">`
+      + `<rect x="${x}" y="8" width="80" height="24" rx="5"/><line x1="${x + 8}" y1="20" x2="${x + 72}" y2="20"/>`
+      + `<text x="${x + 40}" y="24.5" text-anchor="middle">${esc(lineName(dir))}</text></g>`;
+  }).join('');
+  return `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" class="subway-map-svg" role="group" aria-label="Subway System, ${esc(lineName(direction))}" style="--line-c: ${colour}">`
+    + `<rect class="subway-paper" width="${W}" height="${H}"/>`
+    + `<path class="subway-track" d="${d}"/>${arrows}${stops}${you}${buttons}</svg>`;
+}
+
+/**
+ * Clicks on a drawn subway map: onStop(event, station) a station, onHub(station) its region's name,
+ * onLine(direction) a line button.
+ */
+export function bindSubwayMap(canvas, { onStop, onHub, onLine, stations = STATIONS } = {}) {
+  const svg = canvas?.querySelector('svg.subway-map-svg');
+  if (!svg) return null;
+  const byId = (g) => stations.find((s) => String(s.id) === g.closest('.subway-stop')?.getAttribute('data-station')) || null;
+  const keyed = (el, fn) => {
+    el.addEventListener('click', fn);
+    el.addEventListener('keydown', (e) => {
+      if (e.key !== 'Enter' && e.key !== ' ') return;
+      e.preventDefault();
+      const r = el.getBoundingClientRect();
+      fn({ clientX: r.left + r.width / 2, clientY: r.top + r.height / 2, preventDefault() {} });
+    });
+  };
+  for (const hit of svg.querySelectorAll('.subway-stop-hit')) {
+    keyed(hit, (e) => { const s = byId(hit); if (s) onStop?.(e, s); });
+    hit.addEventListener('contextmenu', (e) => { e.preventDefault(); const s = byId(hit); if (s) onStop?.(e, s); });
+  }
+  for (const t of svg.querySelectorAll('.subway-stop-hub')) keyed(t, () => { const s = byId(t); if (s) onHub?.(s); });
+  for (const b of svg.querySelectorAll('.subway-line-btn')) keyed(b, () => onLine?.(b.getAttribute('data-dir')));
+  return svg;
+}
+
 /** The quiet line under the map in each view. */
-export function mapViewSubtitle(view, { touch = false, regions = [] } = {}) {
+export function mapViewSubtitle(view, { touch = false, regions = [], here = null, direction = 'forwards' } = {}) {
   const verb = touch ? 'tap' : 'click';
   if (view === 'world') {
     const open = regions.filter((r) => r.open).length;
     return touch
       ? `${open} regions · tap a region to see it, tap again to open its map · red star = you`
       : `${open} regions · ${verb} a region to open its map · red star = you`;
+  }
+  if (view === 'subway') {
+    const near = here?.station
+      ? `${here.how === 'here' ? 'You are at' : 'Nearest station:'} ${here.station.name} (${here.station.hubName})`
+      : 'No station near you';
+    return `${STATIONS.length} stations · ${lineName(direction)} · ${near} · ${verb} a station to set a destination or teleport`;
   }
   return '';
 }
