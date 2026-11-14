@@ -11379,6 +11379,14 @@ html.stage-pinned[data-ui="modern"] header.top-bar { left: calc(var(--sp-5) + va
 .world-drop-tip[hidden] { display: none; }
 .world-drop-tip.is-left { transform: translate(calc(-100% - 14px), 10px); }
 .world-drop-tip.is-no { color: var(--c-red-53d); }
+/* A thing with no menu shows its name by the pointer on hover, or for a moment on a tap (js/world-name-tip.js, #320). */
+.world-name-tip {
+  position: fixed; z-index: calc(var(--z-dialog) + 6); pointer-events: none; transform: translate(14px, 10px);
+  padding: var(--sp-1) var(--sp-3); border-radius: var(--radius-sm); background: var(--surface-card); color: var(--text);
+  box-shadow: var(--shadow-2); font: 700 var(--fs-sm)/var(--lh-snug) var(--font-system); white-space: nowrap;
+}
+.world-name-tip[hidden] { display: none; }
+.world-name-tip.is-left { transform: translate(calc(-100% - 14px), 10px); }
 /* A narrow window (topbar.js fitTopActions): the study pill keeps only its number or time, then
    Map, Make and Quests leave the bar for the Menu's World group. */
 #study-chip .study-chip-short { display: none; }

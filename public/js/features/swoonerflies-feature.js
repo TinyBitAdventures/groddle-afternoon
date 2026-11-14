@@ -5,7 +5,9 @@
  * 'fly-rooked' state. Rules and source lines live in js/swoonerflies.js:
  * onCreate sets 'fly-rooked', nothing in GSJS but Gwendolyn's squid makes
  * one fall, and the item has no verbs and is not selectable, so this draws a
- * sprite and registers no target.
+ * sprite and registers no target. The one addition (#320, Austin 2026-11-14):
+ * hovering one (or tapping it on a phone) shows its name, 'Swoonerfly', by the
+ * pointer (js/world-name-tip.js), still with no glow and no menu.
  *
  * QA: ?autostart=1&fresh=1&resetgame=1&questoffer=off&streetdemo=GA51450HIC42Q4I
  * (or GIF5UU8FO3029OK, GUVNIF7Q9KR2382); &swoonerflydemo=1 also stands one
@@ -18,12 +20,14 @@ import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=b4abfbf2';
 import { loadWildlifeCatalog, wildlifeCatalog } from '../wildlife.js?v=670c3a7f';
 import {
   SWOONERFLY_CLASS,
+  SWOONERFLY_LABEL,
   SWOONERFLY_PLACEMENT_KEY,
   SWOONERFLY_SHEET,
   swoonerflyPlacementGroups,
   swoonerfliesFor,
 } from '../swoonerflies.js?v=75b61747';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
+import { hideNameTip, wireNameTip } from '../world-name-tip.js?v=78a0ca81';
 
 export const SWOONERFLIES_FEATURE_ID = 'swoonerflies';
 
@@ -41,7 +45,8 @@ function spawn(engine, point) {
   spr.y = point.y;
   // npc_swoonerfly sets neither flag (items/npc_swoonerfly.js itemDef): a normal item.
   spr.zIndex = itemZ(SWOONERFLY_CLASS, 10);
-  spr.eventMode = 'none';
+  // Not a target (no glow, no menu); only its name by the pointer.
+  wireNameTip(spr, SWOONERFLY_LABEL);
   spr.loop = true;
   spr.animationSpeed = pixiSpeed(SWOONERFLY_SHEET.fps);
   // Each one starts at its own frame, so two on one street do not flap in step.
@@ -114,6 +119,7 @@ export const swoonerfliesFeature = {
   /** Street clear destroys the entity layer; only drop references (feature-host onStreetClear). */
   onStreetClear() {
     generation += 1;
+    hideNameTip();
     sprites = [];
   },
 

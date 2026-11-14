@@ -108,7 +108,7 @@ describe('the archived placements', () => {
 describe('the feature', () => {
   it('is registered and draws one looping, untargetable sprite per objref', async () => {
     assert.match(readFileSync(join(pub, 'js/features/index.js'), 'utf8'), /import \{ swoonerfliesFeature \} from '\.\/swoonerflies-feature\.js\?v=[0-9a-f]{8}'; FEATURES\.push\(swoonerfliesFeature\);/);
-    const { swoonerfliesFeature } = await import('../public/js/features/swoonerflies-feature.js?v=31fce691');
+    const { swoonerfliesFeature } = await import('../public/js/features/swoonerflies-feature.js?v=b99f199d');
     class AnimatedSprite {
       constructor(textures) {
         this.textures = textures;
@@ -118,6 +118,7 @@ describe('the feature', () => {
         this.destroyed = false;
       }
       gotoAndPlay(f) { this.frame = f; this.playing = true; }
+      on(ev, fn) { (this.handlers ||= {})[ev] = fn; return this; }
     }
     const PIXI = { AnimatedSprite, Texture: { EMPTY: {} }, Rectangle: class {} };
     const added = [];
@@ -143,11 +144,48 @@ describe('the feature', () => {
     assert.equal(added.length, 1);
     const [spr] = added;
     assert.deepEqual([spr.x, spr.y, spr.ax, spr.ay, spr.loop, spr.playing], [1234, 870, 0.5, 1, true, true]);
-    assert.equal(registered.length, 0, 'not_selectable: no menu, no tooltip');
+    assert.equal(registered.length, 0, 'not_selectable: no menu, no glow');
+    // #320 (Austin 2026-11-14): its name on hover or tap, the arrow cursor (nothing to click).
+    assert.deepEqual([spr.eventMode, spr.cursor], ['static', 'default']);
+    assert.deepEqual(Object.keys(spr.handlers).sort(), ['pointermove', 'pointerout', 'pointerover', 'pointertap']);
     assert.equal(data.swoonerflies, '1');
     swoonerfliesFeature.onStreetClear(engine);
     assert.equal(swoonerfliesFeature._state().count, 0);
     setWildlifeCatalog(null);
+  });
+});
+
+describe('the name tip (#320)', () => {
+  it('shows the label by the pointer, flips near the right edge, hides on leave', async () => {
+    const { showNameTip, hideNameTip, wireNameTip, TAP_MS } = await import('../public/js/world-name-tip.js?v=78a0ca81');
+    const els = [];
+    const doc = {
+      defaultView: { innerWidth: 1000 },
+      createElement: () => {
+        const cls = new Set();
+        const el = { style: {}, attrs: {}, isConnected: true, setAttribute(k, v) { this.attrs[k] = v; }, classList: { toggle: (c, on) => (on ? cls.add(c) : cls.delete(c)), contains: (c) => cls.has(c) } };
+        els.push(el);
+        return el;
+      },
+      body: { appendChild: () => {} },
+    };
+    const el = showNameTip(SWOONERFLY_LABEL, 400, 300, doc);
+    assert.deepEqual([el.className, el.textContent, el.style.left, el.style.top, el.hidden, el.attrs.role], ['world-name-tip', 'Swoonerfly', '400px', '300px', false, 'tooltip']);
+    assert.equal(el.classList.contains('is-left'), false);
+    showNameTip(SWOONERFLY_LABEL, 900, 300, doc);
+    assert.equal(el.classList.contains('is-left'), true);
+    assert.equal(els.length, 1, 'one tip element for the page');
+    hideNameTip();
+    assert.equal(el.hidden, true);
+    // A touch hover does nothing; a touch tap shows it, and it hides again after TAP_MS.
+    const handlers = {};
+    wireNameTip({ on: (ev, fn) => { handlers[ev] = fn; } }, 'Swoonerfly');
+    handlers.pointerover({ pointerType: 'touch', clientX: 10, clientY: 10 });
+    assert.equal(el.hidden, true);
+    assert.ok(TAP_MS >= 1000);
+    const css = readFileSync(join(pub, 'style.css'), 'utf8');
+    assert.match(css, /\.world-name-tip \{[^}]*pointer-events: none/);
+    assert.match(css, /\.world-name-tip\[hidden\] \{ display: none; \}/);
   });
 });
 
