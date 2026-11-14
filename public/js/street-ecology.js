@@ -18,7 +18,7 @@ import {
   ROCK_SPARKLY_SPOTS,
   TREE_SPOTS,
 } from './node-spots-data.js?v=97d4281c';
-import { SHRINE_SPOTS } from './shrine-spots-data.js?v=73006a8c';
+import { SHRINE_SPOTS } from './shrine-spots-data.js?v=f7ad6f74';
 
 export const STREET_ECOLOGY_URL = 'assets/content/street-ecology.json?v=official-ecology-6';
 
@@ -415,10 +415,11 @@ export function measuredTreeSlots(population) {
 }
 
 /**
- * Shrines (lane meadow2012, 2026-11-14): Glitch set each by hand (npc_shrine_*.js obey_physics
- * false) and the planner put Groddle Meadow's far from where its street's 2011-2012 picture shows
- * them (30 of 36 more than 300 px off). tools/snap-placements/shrine-pictures.mjs seats the spots
- * read off those pictures on the floor under them (shrine-spots-data.js SHRINE_SPOTS).
+ * Shrines (lanes meadow2012 and pins2, 2026-11-14): Glitch set each by hand (npc_shrine_*.js
+ * obey_physics false) and the planner put Groddle Meadow's far from where its street's 2011-2012
+ * picture shows them (30 of 36 more than 300 px off), and the same in the 16 other regions no
+ * player's snap covers. tools/snap-placements/shrine-pictures.mjs seats the spots read off those
+ * pictures on the floor under them (shrine-spots-data.js SHRINE_SPOTS).
  *
  * PURE: a street's shrine spot, { x, y } (the shrine's foot, street px), or null where it is planned.
  */

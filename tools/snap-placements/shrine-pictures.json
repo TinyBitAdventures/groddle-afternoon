@@ -1,9 +1,9 @@
 {
- "about": "Groddle Meadow's shrines where Tiny Speck's 2011-2012 street pictures show them (lane meadow2012, 2026-11-14). Read by eye off each street's whole-street render (research/wayback/raw/street-images/groddle-meadow/<picture>, 720 px wide; reference only, never shipped) at three times its size against a street-px grid: spot = the shrine's foot in street px (0, 0 = the street's top left, as street-model.js platformsScreen), good to about 25 px. tools/snap-placements/shrine-pictures.mjs seats each on the floor under it and writes public/js/shrine-spots-data.js. Hand-kept: edit here, then run that tool.",
+ "about": "Shrines where Tiny Speck's 2011-2012 street pictures show them, in every region no player's snap covers: Groddle Meadow (lane meadow2012) and 16 more (lane pins2, 2026-11-14). Read off each street's whole-street render (research/wayback/raw/street-images/<picture>, 720 px wide; reference only, never shipped): spot = the shrine's foot in street px (0, 0 = the street's top left, as street-model.js platformsScreen), good to about 25 px. Groddle Meadow's were read by eye at three times the picture's size against a street-px grid; lane pins2 matched our own CC0 shrine art against each picture and checked every hit by eye on a zoomed crop. `unread`: the shrine streets of those regions left to the planner, and why (no picture survives, or the picture shows no shrine). tools/snap-placements/shrine-pictures.mjs seats each on the floor under it and writes public/js/shrine-spots-data.js. Hand-kept: edit here, then run that tool.",
  "streets": {
   "GLI32N0F1UD114O": {
    "label": "Archimedes Acres",
-   "picture": "LLI32N0F1UD114O_main_1316233363.jpg",
+   "picture": "groddle-meadow/LLI32N0F1UD114O_main_1316233363.jpg",
    "spot": [
     4770,
     915
@@ -11,7 +11,7 @@
   },
   "GCR10U5VHMK112O": {
    "label": "Bailestorth Shin",
-   "picture": "LCR10U5VHMK112O_main_1339298938.jpg",
+   "picture": "groddle-meadow/LCR10U5VHMK112O_main_1339298938.jpg",
    "spot": [
     1656,
     891
@@ -19,7 +19,7 @@
   },
   "GCR10K0NLRK1GKE": {
    "label": "Balliure Heath",
-   "picture": "LCR10K0NLRK1GKE_main_1311271998.jpg",
+   "picture": "groddle-meadow/LCR10K0NLRK1GKE_main_1311271998.jpg",
    "spot": [
     3204,
     882
@@ -27,7 +27,7 @@
   },
   "GCR117DK18O11FF": {
    "label": "Bonebottle Sands",
-   "picture": "LCR117DK18O11FF_main_1339299887.jpg",
+   "picture": "groddle-meadow/LCR117DK18O11FF_main_1339299887.jpg",
    "spot": [
     4095,
     870
@@ -35,7 +35,7 @@
   },
   "GCRHSGTEION115H": {
    "label": "Bonelington Hole",
-   "picture": "LCRHSGTEION115H_main_1311272112.jpg",
+   "picture": "groddle-meadow/LCRHSGTEION115H_main_1311272112.jpg",
    "spot": [
     1336,
     1220
@@ -43,7 +43,7 @@
   },
   "GCR11DNA3EL10TD": {
    "label": "Briarset Croft",
-   "picture": "LCR11DNA3EL10TD_main_1351299525.jpg",
+   "picture": "groddle-meadow/LCR11DNA3EL10TD_main_1351299525.jpg",
    "spot": [
     4395,
     870
@@ -51,7 +51,7 @@
   },
   "GCR13VM1REM1GHI": {
    "label": "Brinlow Vale",
-   "picture": "LCR13VM1REM1GHI_main_1339300724.jpg",
+   "picture": "groddle-meadow/LCR13VM1REM1GHI_main_1339300724.jpg",
    "spot": [
     2904,
     876
@@ -59,7 +59,7 @@
   },
   "GCR199KIJRK1I2B": {
    "label": "Broxhurst Green",
-   "picture": "LCR199KIJRK1I2B_main_1336606976.jpg",
+   "picture": "groddle-meadow/LCR199KIJRK1I2B_main_1336606976.jpg",
    "spot": [
     984,
     894
@@ -67,7 +67,7 @@
   },
   "GCR144H8APK1OJS": {
    "label": "Buckward Vale",
-   "picture": "LCR144H8APK1OJS_main_1339300790.jpg",
+   "picture": "groddle-meadow/LCR144H8APK1OJS_main_1339300790.jpg",
    "spot": [
     5064,
     885
@@ -75,7 +75,7 @@
   },
   "GCR17BAC6OL11L8": {
    "label": "Coldthorp Lam",
-   "picture": "LCR17BAC6OL11L8_main_1325350625.jpg",
+   "picture": "groddle-meadow/LCR17BAC6OL11L8_main_1325350625.jpg",
    "spot": [
     680,
     594
@@ -83,7 +83,7 @@
   },
   "GCR14062REM1QIR": {
    "label": "Eglesgown Wanks",
-   "picture": "LCR14062REM1QIR_main_1316232534.jpg",
+   "picture": "groddle-meadow/LCR14062REM1QIR_main_1316232534.jpg",
    "spot": [
     4386,
     867
@@ -91,7 +91,7 @@
   },
   "GLI33CQJ3UD1G5J": {
    "label": "Elysian Slope",
-   "picture": "LLI33CQJ3UD1G5J_main_1344635677.jpg",
+   "picture": "groddle-meadow/LLI33CQJ3UD1G5J_main_1344635677.jpg",
    "spot": [
     1725,
     894
@@ -99,7 +99,7 @@
   },
   "GLI32KHF0UD1AOK": {
    "label": "Estevan Hummock",
-   "picture": "LLI32KHF0UD1AOK_main_1344635722.jpg",
+   "picture": "groddle-meadow/LLI32KHF0UD1AOK_main_1344635722.jpg",
    "spot": [
     3100,
     708
@@ -107,7 +107,7 @@
   },
   "GLI32J0SVTD114U": {
    "label": "Estevan Meadows",
-   "picture": "LLI32J0SVTD114U_main_1343866407.jpg",
+   "picture": "groddle-meadow/LLI32J0SVTD114U_main_1343866407.jpg",
    "spot": [
     4625,
     925
@@ -115,7 +115,7 @@
   },
   "GCR10M2FUJK177P": {
    "label": "Fanfoot Flare",
-   "picture": "LCR10M2FUJK177P_main_1346289343.jpg",
+   "picture": "groddle-meadow/LCR10M2FUJK177P_main_1346289343.jpg",
    "spot": [
     4750,
     918
@@ -123,7 +123,7 @@
   },
   "GCR113VN08O1116": {
    "label": "Greenvern Mend",
-   "picture": "LCR113VN08O1116_main_1339300087.jpg",
+   "picture": "groddle-meadow/LCR113VN08O1116_main_1339300087.jpg",
    "spot": [
     4386,
     864
@@ -131,7 +131,7 @@
   },
   "GCR202JSVIN1STL": {
    "label": "Kipacre Greens",
-   "picture": "LCR202JSVIN1STL_main_1339298354.jpg",
+   "picture": "groddle-meadow/LCR202JSVIN1STL_main_1339298354.jpg",
    "spot": [
     2565,
     846
@@ -139,7 +139,7 @@
   },
   "GCR111KI08O1HLB": {
    "label": "Langden Abbey",
-   "picture": "LCR111KI08O1HLB_main_1339298006.jpg",
+   "picture": "groddle-meadow/LCR111KI08O1HLB_main_1339298006.jpg",
    "spot": [
     3150,
     930
@@ -147,7 +147,7 @@
   },
   "GCR10B6U5NJ1VMA": {
    "label": "Leftmost Graze",
-   "picture": "LCR10B6U5NJ1VMA_main_1317080994.jpg",
+   "picture": "groddle-meadow/LCR10B6U5NJ1VMA_main_1317080994.jpg",
    "spot": [
     2754,
     885
@@ -155,7 +155,7 @@
   },
   "GLIFIG7BP8G1MU9": {
    "label": "Louise Pasture",
-   "picture": "LLIFIG7BP8G1MU9_main_1343866665.jpg",
+   "picture": "groddle-meadow/LLIFIG7BP8G1MU9_main_1343866665.jpg",
    "spot": [
     2550,
     711
@@ -163,7 +163,7 @@
   },
   "GLIERMJ93DE1H25": {
    "label": "Marrakesh Meadow",
-   "picture": "LLIERMJ93DE1H25_main_1336607432.jpg",
+   "picture": "groddle-meadow/LLIERMJ93DE1H25_main_1336607432.jpg",
    "spot": [
     2886,
     888
@@ -171,7 +171,7 @@
   },
   "GLI32HBOUTD1GQV": {
    "label": "Marylpole Mount",
-   "picture": "LLI32HBOUTD1GQV_main_1336607505.jpg",
+   "picture": "groddle-meadow/LLI32HBOUTD1GQV_main_1336607505.jpg",
    "spot": [
     1296,
     936
@@ -179,7 +179,7 @@
   },
   "GLID3PL336E1RN1": {
    "label": "Meadow's Edge",
-   "picture": "LLID3PL336E1RN1_main_1346959097.jpg",
+   "picture": "groddle-meadow/LLID3PL336E1RN1_main_1346959097.jpg",
    "spot": [
     3936,
     699
@@ -187,7 +187,7 @@
   },
   "GCR10K3BPJK1U6F": {
    "label": "Otterlane",
-   "picture": "LCR10K3BPJK1U6F_main_1339298804.jpg",
+   "picture": "groddle-meadow/LCR10K3BPJK1U6F_main_1339298804.jpg",
    "spot": [
     5430,
     480
@@ -195,7 +195,7 @@
   },
   "GCRO4M7LH5L1QOO": {
    "label": "Prestnash Thrash",
-   "picture": "LCRO4M7LH5L1QOO_main_1336607596.jpg",
+   "picture": "groddle-meadow/LCRO4M7LH5L1QOO_main_1336607596.jpg",
    "spot": [
     3465,
     885
@@ -203,7 +203,7 @@
   },
   "GCR11EIB3EL15ID": {
    "label": "Ramsley Sway",
-   "picture": "LCR11EIB3EL15ID_main_1338526942.jpg",
+   "picture": "groddle-meadow/LCR11EIB3EL15ID_main_1338526942.jpg",
    "spot": [
     2394,
     915
@@ -211,7 +211,7 @@
   },
   "GLI32IDPUTD1F2R": {
    "label": "Ritzrock Rise",
-   "picture": "LLI32IDPUTD1F2R_main_1317075937.jpg",
+   "picture": "groddle-meadow/LLI32IDPUTD1F2R_main_1317075937.jpg",
    "spot": [
     1224,
     927
@@ -219,7 +219,7 @@
   },
   "GCR169OSLQL13JR": {
    "label": "Rookthills Lay",
-   "picture": "LCR169OSLQL13JR_main_1311272160.jpg",
+   "picture": "groddle-meadow/LCR169OSLQL13JR_main_1311272160.jpg",
    "spot": [
     2046,
     602
@@ -227,7 +227,7 @@
   },
   "GCR11CD34KK1AN1": {
    "label": "Rushlane Steading",
-   "picture": "LCR11CD34KK1AN1_main_1311272241.jpg",
+   "picture": "groddle-meadow/LCR11CD34KK1AN1_main_1311272241.jpg",
    "spot": [
     1845,
     849
@@ -235,7 +235,7 @@
   },
   "GCR1UJAMSIN1D0G": {
    "label": "Sculdent Shill",
-   "picture": "LCR1UJAMSIN1D0G_main_1339300513.jpg",
+   "picture": "groddle-meadow/LCR1UJAMSIN1D0G_main_1339300513.jpg",
    "spot": [
     5256,
     816
@@ -243,7 +243,7 @@
   },
   "GCR1985LIRK12N4": {
    "label": "Tillymurry Hurry",
-   "picture": "LCR1985LIRK12N4_main_1317003591.jpg",
+   "picture": "groddle-meadow/LCR1985LIRK12N4_main_1317003591.jpg",
    "spot": [
     4704,
     891
@@ -251,7 +251,7 @@
   },
   "GCR1664750O1D23": {
    "label": "Twickenrill Grotto",
-   "picture": "LCR1664750O1D23_main_1311272055.jpg",
+   "picture": "groddle-meadow/LCR1664750O1D23_main_1311272055.jpg",
    "spot": [
     2156,
     570
@@ -259,7 +259,7 @@
   },
   "GLI334UG2UD1IKQ": {
    "label": "Waylon Way",
-   "picture": "LLI334UG2UD1IKQ_main_1316056618.jpg",
+   "picture": "groddle-meadow/LLI334UG2UD1IKQ_main_1316056618.jpg",
    "spot": [
     2910,
     885
@@ -267,7 +267,7 @@
   },
   "GCRVT5V0BDO1HLF": {
    "label": "Welldale",
-   "picture": "LCRVT5V0BDO1HLF_main_1311272378.jpg",
+   "picture": "groddle-meadow/LCRVT5V0BDO1HLF_main_1311272378.jpg",
    "spot": [
     2904,
     876
@@ -275,7 +275,7 @@
   },
   "GCR13R31REM1A4S": {
    "label": "Wickdoon Mood",
-   "picture": "LCR13R31REM1A4S_main_1347820620.jpg",
+   "picture": "groddle-meadow/LCR13R31REM1A4S_main_1347820620.jpg",
    "spot": [
     3870,
     837
@@ -283,11 +283,435 @@
   },
   "GCR7C1EG6LL1197": {
    "label": "Wilhem Borough",
-   "picture": "LCR7C1EG6LL1197_main_1328477530.jpg",
+   "picture": "groddle-meadow/LCR7C1EG6LL1197_main_1328477530.jpg",
    "spot": [
     2031,
     885
    ]
+  },
+  "GIF17GAI3VV1C1F": {
+   "label": "Boan Stravenue",
+   "picture": "jethimadh/LIF17GAI3VV1C1F_main_1346636093.jpg",
+   "spot": [
+    903,
+    1083
+   ]
+  },
+  "GIFGR4QG5IV1QPI": {
+   "label": "Kala Close",
+   "picture": "jethimadh/LIFGR4QG5IV1QPI_main_1346546253.jpg",
+   "spot": [
+    3549,
+    1021
+   ]
+  },
+  "GIF12UPTEUV14ON": {
+   "label": "Kalix Follows",
+   "picture": "jethimadh/LIF12UPTEUV14ON_main_1346635709.jpg",
+   "spot": [
+    701,
+    1062
+   ]
+  },
+  "GIF1GTHPO9V14NG": {
+   "label": "Konka Brink",
+   "picture": "jethimadh/LIF1GTHPO9V14NG_main_1346287254.jpg",
+   "spot": [
+    2854,
+    903
+   ]
+  },
+  "GIF10RP1DBU11NU": {
+   "label": "Koulato Cluster",
+   "picture": "jethimadh/LIF10RP1DBU11NU_main_1346551263.jpg",
+   "spot": [
+    2840,
+    1319
+   ]
+  },
+  "GIF1077T5TU16I9": {
+   "label": "Kyron Kreep",
+   "picture": "jethimadh/LIF1077T5TU16I9_main_1346553215.jpg",
+   "spot": [
+    2939,
+    844
+   ]
+  },
+  "GIF1SGGD7EU12T5": {
+   "label": "Lentua Lane",
+   "picture": "jethimadh/LIF1SGGD7EU12T5_main_1316330386.jpg",
+   "spot": [
+    2410,
+    958
+   ]
+  },
+  "GIF11LLL5KV1CUG": {
+   "label": "Lonkari Line",
+   "picture": "jethimadh/LIF11LLL5KV1CUG_main_1346719621.jpg",
+   "spot": [
+    424,
+    951
+   ]
+  },
+  "GIF12EQUGVU1RPI": {
+   "label": "Luiro Run",
+   "picture": "jethimadh/LIF12EQUGVU1RPI_main_1346718658.jpg",
+   "spot": [
+    4090,
+    1007
+   ]
+  },
+  "GIFMOLVTLHV1RAR": {
+   "label": "Naata Garth",
+   "picture": "jethimadh/LIFMOLVTLHV1RAR_main_1346287400.jpg",
+   "spot": [
+    661,
+    817
+   ]
+  },
+  "GIFN3FI0TNU10PS": {
+   "label": "Naatamo Way",
+   "picture": "jethimadh/LIFN3FI0TNU10PS_main_1310754399.jpg",
+   "spot": [
+    2972,
+    826
+   ]
+  },
+  "GIFN5CQH1OU1P61": {
+   "label": "Paats Yield",
+   "picture": "jethimadh/LIFN5CQH1OU1P61_main_1346718027.jpg",
+   "spot": [
+    2556,
+    889
+   ]
+  },
+  "GIFNIC9JFOU1B2S": {
+   "label": "Raudan Rasp",
+   "picture": "jethimadh/LIFNIC9JFOU1B2S_main_1346720837.jpg",
+   "spot": [
+    2417,
+    826
+   ]
+  },
+  "GIF113PVOQU1UE5": {
+   "label": "Simo Steer",
+   "picture": "jethimadh/LIF113PVOQU1UE5_main_1346547015.jpg",
+   "spot": [
+    3063,
+    986
+   ]
+  },
+  "GIF1609JRKV151E": {
+   "label": "Svarta Swale",
+   "picture": "jethimadh/LIF1609JRKV151E_main_1346641752.jpg",
+   "spot": [
+    1465,
+    903
+   ]
+  },
+  "GIF12VEKFAV1D67": {
+   "label": "Sysma Link",
+   "picture": "jethimadh/LIF12VEKFAV1D67_main_1346716536.jpg",
+   "spot": [
+    1257,
+    1014
+   ]
+  },
+  "GIF13FGQHKV1E72": {
+   "label": "Tallus Gardens",
+   "picture": "jethimadh/LIF13FGQHKV1E72_main_1346719105.jpg",
+   "spot": [
+    4535,
+    847
+   ]
+  },
+  "GIF25C8OJSV19UJ": {
+   "label": "Tana Trample",
+   "picture": "jethimadh/LIF25C8OJSV19UJ_main_1346633907.jpg",
+   "spot": [
+    2083,
+    882
+   ]
+  },
+  "GIF1F3IM11020RB": {
+   "label": "Tower St East",
+   "picture": "jethimadh/LIF1F3IM11020RB_main_1346723687.jpg",
+   "spot": [
+    3646,
+    806
+   ]
+  },
+  "GIF163TJHQU191C": {
+   "label": "Tower St North",
+   "picture": "jethimadh/LIF163TJHQU191C_main_1346723085.jpg",
+   "spot": [
+    1292,
+    931
+   ]
+  },
+  "GIF5UU8FO3029OK": {
+   "label": "Tower St West",
+   "picture": "jethimadh/LIF5UU8FO3029OK_main_1316332989.jpg",
+   "spot": [
+    1875,
+    785
+   ]
+  },
+  "GIFNH08K9OU1SAB": {
+   "label": "Tuntsa Coze",
+   "picture": "jethimadh/LIFNH08K9OU1SAB_main_1346722141.jpg",
+   "spot": [
+    2750,
+    924
+   ]
+  },
+  "GIFMGTCIQGU13TS": {
+   "label": "Uskela Passage",
+   "picture": "jethimadh/LIFMGTCIQGU13TS_main_1346717220.jpg",
+   "spot": [
+    5458,
+    675
+   ]
+  },
+  "GA9PIEHVQ8A2H4S": {
+   "label": "Arju Podi",
+   "picture": "kalavana/LA9PIEHVQ8A2H4S_main_1316384740.jpg",
+   "spot": [
+    868,
+    2808
+   ]
+  },
+  "GA9HJCHM18A21B4": {
+   "label": "Badvi Bist",
+   "picture": "kalavana/LA9HJCHM18A21B4_main_1336603198.jpg",
+   "spot": [
+    4700,
+    833
+   ]
+  },
+  "GA9TEL683JA2JU0": {
+   "label": "Bakti Mahar",
+   "picture": "kalavana/LA9TEL683JA2JU0_main_1346290136.jpg",
+   "spot": [
+    2133,
+    783
+   ]
+  },
+  "GA91161VALA21D4": {
+   "label": "Botchi Etta",
+   "picture": "kalavana/LA91161VALA21D4_main_1316382016.jpg",
+   "spot": [
+    844,
+    672
+   ]
+  },
+  "GA9TDT2BUIA2GMA": {
+   "label": "Chalan Vaara",
+   "picture": "kalavana/LA9TDT2BUIA2GMA_main_1316386988.jpg",
+   "spot": [
+    3442,
+    717
+   ]
+  },
+  "GA9QOQAL96A2L2K": {
+   "label": "Coci Muttah",
+   "picture": "kalavana/LA9QOQAL96A2L2K_main_1346289552.jpg",
+   "spot": [
+    2983,
+    750
+   ]
+  },
+  "GA99CL11LSA2M35": {
+   "label": "Fitadara Fry",
+   "picture": "kalavana/LA99CL11LSA2M35_main_1336599879.jpg",
+   "spot": [
+    3825,
+    825
+   ]
+  },
+  "GA91SD0IEQA24L5": {
+   "label": "Goli Grabs",
+   "picture": "kalavana/LA91SD0IEQA24L5_main_1346289203.jpg",
+   "spot": [
+    4900,
+    842
+   ]
+  },
+  "GA911J5DKLA20MS": {
+   "label": "Gooliv Naven",
+   "picture": "kalavana/LA911J5DKLA20MS_main_1337377118.jpg",
+   "spot": [
+    1074,
+    800
+   ]
+  },
+  "GA934IQQT8A26SV": {
+   "label": "Gopra Byle",
+   "picture": "kalavana/LA934IQQT8A26SV_main_1350694438.jpg",
+   "spot": [
+    3817,
+    817
+   ]
+  },
+  "GA9U04T3OAA2R2L": {
+   "label": "Jellow Diaspora",
+   "picture": "kalavana/LA9U04T3OAA2R2L_main_1346289670.jpg",
+   "spot": [
+    3225,
+    792
+   ]
+  },
+  "GA9V2T5DH8A23JD": {
+   "label": "Kakkasi Uni",
+   "picture": "kalavana/LA9V2T5DH8A23JD_main_1346289468.jpg",
+   "spot": [
+    2650,
+    833
+   ]
+  },
+  "GA9M05J386A296V": {
+   "label": "Kelba Vallu",
+   "picture": "kalavana/LA9M05J386A296V_main_1314991742.jpg",
+   "spot": [
+    1332,
+    2312
+   ]
+  },
+  "GA9TDS1HSIA2RCO": {
+   "label": "Kuri Chil",
+   "picture": "kalavana/LA9TDS1HSIA2RCO_main_1336603441.jpg",
+   "spot": [
+    1850,
+    817
+   ]
+  },
+  "GA931JPPT8A2LPU": {
+   "label": "Ladag Mach",
+   "picture": "kalavana/LA931JPPT8A2LPU_main_1320892375.jpg",
+   "spot": [
+    1058,
+    833
+   ]
+  },
+  "GA9DURMSIAA2S1T": {
+   "label": "Nandu Pitha",
+   "picture": "kalavana/LA9DURMSIAA2S1T_main_1346290087.jpg",
+   "spot": [
+    1350,
+    850
+   ]
+  },
+  "GA9RPI1P1QA2IMQ": {
+   "label": "Nia Sra",
+   "picture": "kalavana/LA9RPI1P1QA2IMQ_main_1346289415.jpg",
+   "spot": [
+    1167,
+    767
+   ]
+  },
+  "GA9I8CS028A2O5F": {
+   "label": "Pilnjan Plink",
+   "picture": "kalavana/LA9I8CS028A2O5F_main_1354308764.jpg",
+   "spot": [
+    2817,
+    583
+   ]
+  },
+  "GA94KO5CFQA2V4Q": {
+   "label": "Seela Latta",
+   "picture": "kalavana/LA94KO5CFQA2V4Q_main_1336603685.jpg",
+   "spot": [
+    872,
+    1378
+   ]
+  },
+  "GA98V53GRQA2VTO": {
+   "label": "Tonki Toe",
+   "picture": "kalavana/LA98V53GRQA2VTO_main_1339118120.jpg",
+   "spot": [
+    3942,
+    817
+   ]
+  },
+  "GA99VU1246A2VND": {
+   "label": "Vilong Hari",
+   "picture": "kalavana/LA99VU1246A2VND_main_1330322081.jpg",
+   "spot": [
+    5100,
+    825
+   ]
+  }
+ },
+ "unread": {
+  "GIF102S56SV16TJ": {
+   "label": "Iso Roine",
+   "hub": "Jethimadh",
+   "why": "no 2012 picture survives"
+  },
+  "GIF15S7VPRV1DIP": {
+   "label": "Kiehiman Course",
+   "hub": "Jethimadh",
+   "why": "no 2012 picture survives"
+  },
+  "GIF1AUQNSDU1UFL": {
+   "label": "Konemaen Jaunt",
+   "hub": "Jethimadh",
+   "why": "no 2012 picture survives"
+  },
+  "GIF10HE4JTU1S7P": {
+   "label": "Onto Parada",
+   "hub": "Jethimadh",
+   "why": "no 2012 picture survives"
+  },
+  "GIF126GSMBU1V2Q": {
+   "label": "Tadaa Track",
+   "hub": "Jethimadh",
+   "why": "no 2012 picture survives"
+  },
+  "GIFMVP96ONU12CO": {
+   "label": "Tammer Path",
+   "hub": "Jethimadh",
+   "why": "no 2012 picture survives"
+  },
+  "GIF15OTSM102353": {
+   "label": "Tower St South",
+   "hub": "Jethimadh",
+   "why": "no 2012 picture survives"
+  },
+  "GA911I05ILA2CQ5": {
+   "label": "Dusa Tanad",
+   "hub": "Kalavana",
+   "why": "no 2012 picture survives"
+  },
+  "GA9111M11LA2VAT": {
+   "label": "Ghora Chani",
+   "hub": "Kalavana",
+   "why": "no 2012 picture survives"
+  },
+  "GA9TIJ7S4JA2CNF": {
+   "label": "Pandu Chepa",
+   "hub": "Kalavana",
+   "why": "no 2012 picture survives"
+  },
+  "GA91120N5LA249C": {
+   "label": "Senna Karup",
+   "hub": "Kalavana",
+   "why": "no 2012 picture survives"
+  },
+  "GA9T7IFRDIA2N0K": {
+   "label": "Tambra Tiss",
+   "hub": "Kalavana",
+   "why": "no 2012 picture survives"
+  },
+  "GA9P334396A2GHP": {
+   "label": "Tokali Kola",
+   "hub": "Kalavana",
+   "why": "no 2012 picture survives"
+  },
+  "GA9CO2B02OA2BG0": {
+   "label": "Valia Shede",
+   "hub": "Kalavana",
+   "why": "no 2012 picture survives"
   }
  }
 }
