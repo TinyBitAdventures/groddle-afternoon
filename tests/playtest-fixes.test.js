@@ -30,7 +30,8 @@ test('G247 hall: glass doors, then the chairs, then the counter, none overlappin
   const game = read('game.js');
   assert.doesNotMatch(game, /for \(const x of \[250, 340, 430, 520\]\)/);
   const halls = read('js/features/bureaucratic-halls-feature.js');
-  assert.match(game, /counter\.position\.set\(HALL_LAYOUT\.counterLeft, HALL\.ground \+ 4\);\n  counter\.width = 811;/);
+  // G718: Legalize It's own copy (and its counter) is gone; its application uses this hall.
+  assert.doesNotMatch(game, /function spawnLegalizeHall/);
   assert.match(halls, /counter\.position\.set\(HALL_LAYOUT\.counterLeft, HALL\.ground \+ 4\);\n  counter\.width = 811;/);
   assert.match(halls, /const EXIT_X = HALL_LAYOUT\.exitX;/);
   assert.match(read('js/bureaucratic-hall.js'), /exitX: 72,/);

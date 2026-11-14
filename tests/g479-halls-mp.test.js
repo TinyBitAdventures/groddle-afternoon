@@ -13,7 +13,7 @@ import { join } from 'node:path';
 import { execFileSync } from 'node:child_process';
 
 import { HALL_MP_TEXT, HALL_TURN_MS, busyForOther, clerkAt, clerkRow, poseChanged } from '../public/js/halls-mp.js?v=044b5c5a';
-import { HALL, HALL_LAYOUT, PLEASE_WAIT_MS, createHallFlow } from '../public/js/bureaucratic-hall.js?v=a0bc6317';
+import { HALL, HALL_LAYOUT, PLEASE_WAIT_MS, createHallFlow } from '../public/js/bureaucratic-hall.js?v=a8eaa334';
 import { hallsData } from '../tools/build-realtime-halls.mjs';
 import { HAS_SERVER, serverPath, skipWithoutServer } from '../tools/repos.mjs';
 
@@ -212,8 +212,10 @@ describe('the multiplayer branch of bureaucratic-halls-feature', () => {
     assert.match(src, /realtimeStreet\(engine\) \{\n\s*return hall\?\.shared && engine\.inScene\?\.\(\) \? hallSceneTsid\(hall\.def\.tsid\) : null;/);
     assert.match(src, /engine\?\.mode === 'multiplayer' && Boolean\(engine\.query\?\.\('realtimeClient'\)\)/);
   });
-  it('Legalize It\'s hall stays the player\'s own (no shared in its flow)', () => {
-    const fn = src.slice(src.indexOf('bureaucraticHallFlow(engine, opts = {}) {'), src.indexOf('/** QA for Legalize It'));
-    assert.doesNotMatch(fn, /shared/);
+  it('Legalize It\'s application runs in the shared Grange hall, with the server\'s bureaucrats (G718)', () => {
+    // One visit start for every hall: the quest's script rides along with `shared` (no private flow).
+    assert.match(src, /const visit = engine\.hallVisit\?\.\(def\.tsid\) \|\| null;/);
+    assert.match(src, /startFlow\(engine, clerks, \{ label: hall\.def\.label, shared, script: visit\?\.script \|\| null, start: visit\?\.start \|\| null \}\);/);
+    assert.doesNotMatch(src, /bureaucraticHallFlow/);
   });
 });

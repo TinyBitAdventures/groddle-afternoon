@@ -22,9 +22,16 @@
  * (10 s, and "Just wait!" if you act), then one comes over to help: Talk to
  * lists what npc_bureaucrat.js getItems allows (store 17: the Card-Carrying
  * Qualification, Your Papers, the General Building Permit), passes you on,
- * asks its random question and takes the fee. Legalize It's hall (game.js
- * spawnLegalizeHall) runs the same flow through the `bureaucraticHallFlow`
- * query, with the recorded session's choices fixed.
+ * asks its random question and takes the fee.
+ *
+ * Legalize It (G718) makes its application in Gregarious Grange's hall, this
+ * one, as Glitch did: the quest only instanced The Back Alley
+ * (card_carrying_qualification.js onStarted 80-91) and the street's door
+ * connects to the real LIF101O8CDQ1AMU. On the way in the hall asks the game
+ * for the visit's script (engine.hallVisit, game.js legalizeHallVisit): the
+ * recorded session's choices and the quest's steps; leaving tells it
+ * (script.onLeave). The quest's old private copy is gone; its id still
+ * resolves here (reloadLocation).
  *
  * Every hall has its Water Cooler (js/water-cooler.js: items/water_cooler.js
  * get_water, 2 energy for a Cup of Water). Drinking the cup (cup_of_water.js
@@ -41,7 +48,12 @@
  * (isBusy 805-837: one bureaucrat serves one player at a time); everyone sees
  * the same bureaucrats walk, stroll and serve. Your visit's conversations stay
  * yours. What they sell is bought from your purse as in solo, a loss the
- * ledger always accepts. Legalize It's hall stays your own.
+ * ledger always accepts. Legalize It's application is one of those visits.
+ *
+ * A reload in a hall (its scene saved, HALL_<tsid>, or the hall's own tsid,
+ * which the quest's private copy used) starts on the hall's street in front
+ * of its door and walks back in once the street is up (in multiplayer once
+ * the realtime client is online, so the hall is the shared one).
  *
  * QA: ?autostart=1&questoffer=off&doordemo=GA5I10NJDL52TKD (Chego Chase),
  *   doordemo=GA91JUQT2G82GUL (Baeli Bray) or doordemo=GLI32G3NUTD100I&doorindex=1
@@ -56,14 +68,14 @@
  *   confirm, done, left), hallStep, hallHelper, hallBuff, hallRefusals, hallClerks.
  */
 
-import { LEGALIZE_CLERKS } from '../legalize-it.js?v=d27094df';
+import { LEGALIZE_CLERKS } from '../legalize-it.js?v=9afd2e68';
 import { addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=f49c8998';
 import { loseEnergy, loseMood } from '../metabolics.js?v=1383e6fd';
 import { acceptOffer, ensureQuestOfferState, markOffered, questMoveNote, questStatus } from '../quest-offers.js?v=89511e1e';
 import { getQuestCatalog } from '../content-catalogs.js?v=10b118dd';
 import { parseQuestConversation } from '../quests.js?v=40c71a37';
 import { CUP_CLASS, CUP_OF_WATER, WATER_COOLER, WATER_COOLER_CLASS, drinkCup, getWater, getWaterState } from '../water-cooler.js?v=1cf1b040';
-import { BUREAUCRAT_CLASS, HALL, HALL_LAYOUT, HALL_TEXT, PLEASE_WAIT_BUFF, TALK_VERB, createHallFlow } from '../bureaucratic-hall.js?v=a0bc6317';
+import { BUREAUCRAT_CLASS, HALL, HALL_LAYOUT, HALL_TEXT, PLEASE_WAIT_BUFF, TALK_VERB, createHallFlow } from '../bureaucratic-hall.js?v=a8eaa334';
 import { closeQuestRoomConverse, questRoomConverse } from './quest-instances-feature.js?v=36c62dad';
 import { HALL_MP_TEXT, HALL_POSE_MS, clerkAt, clerkRow, poseChanged } from '../halls-mp.js?v=044b5c5a';
 
@@ -72,16 +84,28 @@ export const HALL_ENTER_VERB = 'hall_enter';
 export const HALL_LEAVE_VERB = 'hall_leave';
 const CUP_QUEST_ID = 'stale_but_necessary';
 
-/** Street door id -> the hall behind it (location XML door connects). */
+/** Street door id -> the hall behind it (location XML door connects); x, y = the door on its street JSON. */
 export const HALL_DOORS = Object.freeze({
-  door_1300484753304: Object.freeze({ street: 'GLI32G3NUTD100I', streetLabel: 'Gregarious Grange', tsid: 'LIF101O8CDQ1AMU', label: 'Bureaucratic Hall' }),
-  door_1321408650118: Object.freeze({ street: 'GA5I10NJDL52TKD', streetLabel: 'Chego Chase', tsid: 'LDOCV86VHCD245F', label: 'Andra Bureaucratic Hall' }),
-  door_1312484975748: Object.freeze({ street: 'GA91JUQT2G82GUL', streetLabel: 'Baeli Bray', tsid: 'LIF2E3LVGK82J7Q', label: 'Muufo Bureaucratic Hall' }),
+  door_1300484753304: Object.freeze({ street: 'GLI32G3NUTD100I', streetLabel: 'Gregarious Grange', tsid: 'LIF101O8CDQ1AMU', label: 'Bureaucratic Hall', x: 1101, y: 847 }),
+  door_1321408650118: Object.freeze({ street: 'GA5I10NJDL52TKD', streetLabel: 'Chego Chase', tsid: 'LDOCV86VHCD245F', label: 'Andra Bureaucratic Hall', x: 939, y: 830 }),
+  door_1312484975748: Object.freeze({ street: 'GA91JUQT2G82GUL', streetLabel: 'Baeli Bray', tsid: 'LIF2E3LVGK82J7Q', label: 'Muufo Bureaucratic Hall', x: 1115, y: 821 }),
 });
 
-/** Scene ids stay apart from Legalize It's own LIF101O8CDQ1AMU scene. */
+/** The hall's scene street: one for everyone in it (halls.go HALL_<tsid>). */
 export function hallSceneTsid(hallTsid) {
   return `HALL_${hallTsid}`;
+}
+
+/** The hall a saved place stands in: its scene (HALL_<tsid>) or its own tsid (Legalize It's old private copy). */
+export function hallForPlace(tsid) {
+  const id = String(tsid || '').replace(/^HALL_/, '');
+  return Object.values(HALL_DOORS).find((d) => d.tsid === id) || null;
+}
+
+/** Where a reload in a hall starts: the hall's street in front of its door, and the hall to walk back into. null otherwise. */
+export function hallReload(saved) {
+  const def = hallForPlace(saved?.tsid);
+  return def ? { def, at: { tsid: def.street, x: def.x, y: def.y } } : null;
 }
 
 /** The hall for a street door target, or null. */
@@ -100,9 +124,9 @@ export const DRINK_VERB = 'cup_drink';
 const EXIT_ART = 'assets/decos/groddle/door_asset_bureaucratic_hall_int.png';
 const COUNTER_ART = 'assets/decos/groddle/bureaucratic_hall_counter_1.png';
 
-let hall = null; // { def, returnTo }
+let hall = null; // { def, returnTo, shared, visit }
 let last = '';
-/** The hall visit running now (this feature's halls or Legalize It's): js/bureaucratic-hall.js createHallFlow. */
+/** The hall visit running now (Legalize It's application too): js/bureaucratic-hall.js createHallFlow. */
 let flow = null;
 let flowTargets = [];
 let autoAt = 0;
@@ -112,6 +136,8 @@ let demoAt = 0;
 let openTalk = null;
 /** Multiplayer: the realtime client and the hall's bureaucrats as the server sent them. */
 let mpHall = null;
+/** A reload in a hall: { def, until } (walk back in once its street is up). */
+let pendingReload = null;
 
 function publish(engine) {
   engine.setData?.('hallScene', hall ? hall.def.tsid : '');
@@ -119,7 +145,7 @@ function publish(engine) {
 }
 
 /** `kit` = engine.bureaucraticHall(): { layer, clerk(index, x, y, scale), sprite(url) }. */
-function spawnHall(engine, kit, shared = null) {
+function spawnHall(engine, kit, shared = null, visit = null) {
   const door = kit.sprite(EXIT_ART);
   door.anchor.set(0.5, 1);
   door.position.set(EXIT_X, ROOM.ground + 2);
@@ -153,7 +179,7 @@ function spawnHall(engine, kit, shared = null) {
   counter.zIndex = 44;
   counter.eventMode = 'none';
   engine.entityLayer.addChild(counter);
-  startFlow(engine, clerks, { label: hall.def.label, shared });
+  startFlow(engine, clerks, { label: hall.def.label, shared, script: visit?.script || null, start: visit?.start || null });
   const cooler = kit.sprite(COOLER_ART);
   cooler.anchor.set(0.5, 1);
   cooler.position.set(COOLER_X, ROOM.ground + 2);
@@ -543,11 +569,22 @@ export function enterHall(engine, def, door = null) {
     returnTo,
     ownLight: true,
   });
-  hall = { def, returnTo, shared: Boolean(shared) };
-  spawnHall(engine, kit, shared);
+  // A quest's application made here (Legalize It in the Grange's hall): its script, or null.
+  const visit = engine.hallVisit?.(def.tsid) || null;
+  hall = { def, returnTo, shared: Boolean(shared), visit };
+  spawnHall(engine, kit, shared, visit);
   last = `enter:${def.tsid}`;
   publish(engine);
   return true;
+}
+
+/** Out of the hall any way: the visit ends, and a quest's application hears it (location.js 810-819). */
+function endVisit() {
+  const visit = hall?.visit;
+  hall = null;
+  flow?.end();
+  flow = null;
+  visit?.script?.onLeave?.();
 }
 
 /** The glass doors: back to the street door you came in by. */
@@ -556,9 +593,7 @@ export async function leaveHall(engine) {
   const back = hall.returnTo;
   const tsid = back.tsid || hall.def.street;
   last = `leave:${hall.def.tsid}`;
-  hall = null;
-  flow?.end();
-  flow = null;
+  endVisit();
   engine.playSound?.('DOOR_OPEN', { volume: 0.6 });
   await engine.enter(tsid, { spawnX: back.x, spawnY: back.y, quiet: true, bypassFeatureGates: true });
   publish(engine);
@@ -570,6 +605,28 @@ function runHallDemo(engine) {
   const def = Object.values(HALL_DOORS).find((d) => d.tsid === engine.param?.('halldemo'));
   demoDone = true;
   if (def) enterHall(engine, def, { x: engine.player?.x, y: engine.player?.y });
+}
+
+/** Walk into the hall by its tsid, from in front of its street door (a reload, Legalize It's return). */
+export function enterHallByTsid(engine, tsid) {
+  const def = hallForPlace(tsid);
+  return def ? enterHall(engine, def, { x: def.x, y: def.y }) : false;
+}
+
+/** The reload's way back in: once its street is up and nothing is busy (multiplayer: online, or given up waiting). */
+function runReload(engine, now) {
+  const p = pendingReload;
+  if (engine.streetTsid !== p.def.street || now > p.until) {
+    pendingReload = null;
+    return;
+  }
+  if (engine.busy?.() || now < p.at) return;
+  const client = engine.mode === 'multiplayer' ? engine.query?.('realtimeClient') : null;
+  if (client && client.state !== 'online' && now < p.until - 2000) return;
+  pendingReload = null;
+  enterHall(engine, p.def, { x: p.def.x, y: p.def.y });
+  last = `reload:${p.def.tsid}`;
+  publish(engine);
 }
 
 function runDemo(engine, now) {
@@ -585,12 +642,18 @@ export const bureaucraticHallsFeature = {
   id: HALLS_FEATURE_ID,
 
   onStreetEnter(street, engine) {
+    // The reload's first street: the hall's, then walk in; any other (a failed load), forget it.
+    if (pendingReload && !pendingReload.at) {
+      if (engine.streetTsid === pendingReload.def.street) pendingReload.at = Date.now() + 600;
+      else pendingReload = null;
+    }
     if (!demoDone && engine.param?.('halldemo')) demoAt = Date.now() + 1800;
     else if (!demoDone && engine.param?.('hallautoplay') === '1') demoAt = Date.now() + 1800;
     publish(engine);
   },
 
   onTick(dtMs, now, engine) {
+    if (pendingReload?.at) runReload(engine, now);
     if (demoAt && now >= demoAt && !engine.busy?.()) {
       if (engine.param?.('halldemo')) {
         demoAt = 0;
@@ -613,9 +676,7 @@ export const bureaucraticHallsFeature = {
 
   onStreetClear() {
     // Leaving the scene any way (the glass doors, the Map, a teleport) leaves the hall (location.js 810-819).
-    hall = null;
-    flow?.end();
-    flow = null;
+    endVisit();
     flowTargets = [];
     // G718: a bureaucrat's line left open does not follow you out onto the street.
     if (openTalk) {
@@ -624,12 +685,17 @@ export const bureaucraticHallsFeature = {
     }
   },
 
-  /**
-   * Legalize It's hall (game.js spawnLegalizeHall) runs this hall's visit:
-   * `targets` are its bureaucrats, `script` fixes the recorded session's choices.
-   */
-  bureaucraticHallFlow(engine, opts = {}) {
-    return startFlow(engine, opts.targets || [], opts);
+  /** A reload saved in a hall: start on the hall's street at its door, then walk back in (onTick runReload). */
+  reloadLocation(saved) {
+    const back = hallReload(saved);
+    if (!back) return null;
+    pendingReload = { def: back.def, at: 0, until: Date.now() + 30000 };
+    return { ...back.at };
+  },
+
+  /** Into a hall by its tsid (Legalize It's resume, game.js startLegalizeIt). */
+  hallEnter(tsid, engine) {
+    return enterHallByTsid(engine, tsid) || null;
   },
 
   /** QA for Legalize It's autoplay: one step of the visit. */
@@ -709,6 +775,7 @@ export const bureaucraticHallsFeature = {
     openTalk = null;
     autoAt = 0;
     hall = null;
+    pendingReload = null;
     last = '';
     demoDone = false;
     demoAt = 0;

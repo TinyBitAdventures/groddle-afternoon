@@ -28,7 +28,7 @@ import {
   purchaseQualification,
   requestLegalizeQualification,
   travelToGregarious,
-} from '../public/js/legalize-it.js?v=d27094df';
+} from '../public/js/legalize-it.js?v=9afd2e68';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -157,7 +157,7 @@ test('client integration ships recovered clean quest art and a playable route', 
   assert.match(game, /handleLegalizeTarget/);
   assert.match(game, /legalizeautoplay/);
   // The waiting area, Please Wait and the calls are the shared hall visit (js/bureaucratic-hall.js).
-  assert.match(game, /features\.query\('bureaucraticHallFlow', engine, \{/);
+  assert.match(game, /hallVisit: \(hallTsid\) => legalizeHallVisit\(hallTsid\)/);
   assert.match(game, /const LEGALIZE_HALL_QUESTION = HALL_QUESTIONS\.findIndex\(\(qn\) => qn\.options\.join\('\|'\) === 'Beige\|Other'\);/);
   assert.doesNotMatch(game, /legalizeWaitStartedAt/);
   assert.match(game, /recovered-animated-bureaucrats/);
@@ -174,7 +174,7 @@ test('client integration ships recovered clean quest art and a playable route', 
   assert.match(game, /const LEGALIZE_STAIRS_DOOR = 'door_subway_stairs';/);
   assert.match(game, /from '\.\/js\/quest-rooms\/back-alley-set\.js\?v=[0-9a-f]{8}'/);
   assert.match(game, /papersRefused: \(\) => legalizeGateRefused\(\)/);
-  assert.match(content, /legalize_hall_entrance/);
+  assert.doesNotMatch(content, /legalize_hall_entrance|legalize_hall_exit/);
   assert.match(content, /npc_back_alley_bureaucrat/);
   assert.match(content, /npc_bureaucrat/);
   assert.match(html, /id="legalize-hud"/);

@@ -38,9 +38,8 @@ import {
   legalizeObjective,
   legalizeReloadLocation,
   legalizeWayBack,
-} from '../public/js/legalize-it.js?v=d27094df';
+} from '../public/js/legalize-it.js?v=9afd2e68';
 import { closeQuestRoomConverse } from '../public/js/features/quest-instances-feature.js?v=36c62dad';
-import { getVerbsFor } from '../public/content.js?v=4cadcfb4';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const game = fs.readFileSync(path.join(root, 'public/game.js'), 'utf8');
@@ -59,7 +58,8 @@ const newPc = () => ({ energy: 50, mood: 50, imagination: 0, currants: 200, xp: 
 describe('Legalize It: always a way out', () => {
   it('the fallback way out is Gregarious Grange Subway Station at A Red Button', () => {
     assert.equal(FALLBACK.tsid, 'GCR177QO65T1EON');
-    assert.deepEqual(LEGALIZE_INSTANCE_TSIDS, [LEGALIZE_BACK_ALLEY_TSID, LEGALIZE_HALL_TSID]);
+    // G718: the hall is the Grange's shared one; only The Back Alley is the quest's own.
+    assert.deepEqual(LEGALIZE_INSTANCE_TSIDS, [LEGALIZE_BACK_ALLEY_TSID]);
     assert.match(game, /const LEGALIZE_EXIT_FALLBACK = Object\.freeze\(\{ tsid: LEGALIZE_STATION_STREET, x: LEGALIZE_GATE_SPOT\.x, y: LEGALIZE_GATE_SPOT\.y \}\);/);
     assert.match(game, /const LEGALIZE_GATE_SPOT = stationScreen\(STATION_X\.gate - 70\);/);
   });
@@ -98,11 +98,11 @@ describe('Legalize It: always a way out', () => {
     assert.equal(questState.story.legalize, undefined);
   });
 
-  it('a reload saved inside the alley or the hall resumes at the way out', () => {
+  it('a reload saved inside the alley resumes at the way out (the hall: tests/legalize-shared-hall.test.js)', () => {
     const empty = createQuestState();
-    for (const tsid of [LEGALIZE_BACK_ALLEY_TSID, LEGALIZE_HALL_TSID]) {
-      assert.deepEqual(legalizeReloadLocation({ tsid, x: 721, y: 620 }, empty, FALLBACK), { ...FALLBACK });
-    }
+    assert.deepEqual(legalizeReloadLocation({ tsid: LEGALIZE_BACK_ALLEY_TSID, x: 721, y: 620 }, empty, FALLBACK), { ...FALLBACK });
+    // The old private hall's id is the shared hall's now (bureaucratic-halls-feature.js reloadLocation).
+    assert.equal(legalizeReloadLocation({ tsid: LEGALIZE_HALL_TSID, x: 721, y: 620 }, empty, FALLBACK), null);
     const withSource = { story: { legalize: { sourceLocation: { tsid: 'GLI2V0UN7RD1T2J', x: 5, y: 6 } } } };
     assert.deepEqual(legalizeReloadLocation({ tsid: LEGALIZE_BACK_ALLEY_TSID, x: 1, y: 1 }, withSource, FALLBACK), { tsid: 'GLI2V0UN7RD1T2J', x: 5, y: 6 });
     // Any other place (a regular hall's scene too) is not ours.
@@ -196,15 +196,13 @@ describe("Legalize It's hall has its glass doors (G718)", () => {
     assert.equal(leaveBureaucraticHall(null).ok, false);
   });
 
-  it('the doors are drawn as every hall draws them and lead out to the hall door on Gregarious Grange', () => {
-    const hall = game.slice(game.indexOf('function spawnLegalizeHall('), game.indexOf('const LEGALIZE_HALL_PICKS'));
-    assert.match(hall, /door_asset_bureaucratic_hall_int\.png/);
-    assert.match(hall, /exit\.position\.set\(HALL_LAYOUT\.exitX, HALL\.ground \+ 2\);/);
-    assert.match(hall, /classId: 'legalize_hall_exit'/);
-    const leave = game.slice(game.indexOf('async function legalizeLeaveHall('), game.indexOf('async function legalizeRunStep('));
-    assert.match(leave, /leaveBureaucraticHall\(legalizeRun\);/);
-    assert.match(leave, /legalizeEnterStreet\(LEGALIZE_GRANGE_STREET, LEGALIZE_HALL_DOOR_SPOT\)/);
-    assert.match(game, /target\.classId === 'legalize_hall_exit' && verbId === 'leave'\) \{\s*legalizeLeaveHall\(\);/);
+  it('the glass doors are the shared hall\'s and lead out to the hall door on Gregarious Grange', () => {
+    // No private hall left: its doors, its Leave and its own verbs are gone (bureaucratic-halls-feature.js has them).
+    for (const gone of ['spawnLegalizeHall', 'legalizeLeaveHall', 'refreshLegalizeClerks', 'legalize_hall_exit', 'legalize_hall_entrance']) {
+      assert.doesNotMatch(game, new RegExp(`\\b${gone}\\b`), gone);
+    }
+    const visit = game.slice(game.indexOf('function legalizeHallScript('), game.indexOf('/** The fee paid'));
+    assert.match(visit, /onLeave: \(\) => \{\s*if \(!legalizeRun\) return;\s*leaveBureaucraticHall\(legalizeRun\);/);
     // In front of the street's hall door, where every hall's glass doors return you.
     const street = JSON.parse(fs.readFileSync(path.join(root, 'public/assets/streets/GLI32G3NUTD100I.json'), 'utf8'));
     const door = street.doors.find((d) => d.id === 'door_1300484753304');
@@ -215,16 +213,11 @@ describe("Legalize It's hall has its glass doors (G718)", () => {
 
   it("a bureaucrat's line left open goes when you leave the hall, any hall", () => {
     const halls = fs.readFileSync(path.join(root, 'public/js/features/bureaucratic-halls-feature.js'), 'utf8');
-    const clear = halls.slice(halls.indexOf('  onStreetClear() {'), halls.indexOf('  bureaucraticHallFlow('));
+    const clear = halls.slice(halls.indexOf('  onStreetClear() {'), halls.indexOf('  reloadLocation(saved) {'));
+    assert.match(clear, /endVisit\(\);/);
     assert.match(clear, /if \(openTalk\) \{\s*openTalk = null;\s*closeQuestRoomConverse\(\);/);
     assert.match(halls, /openTalk = talk;/);
     // Nothing up: nothing to close.
     assert.equal(closeQuestRoomConverse(), false);
-  });
-
-  it('the doors offer Leave', () => {
-    const verbs = getVerbsFor({ classId: 'legalize_hall_exit', subtitle: 'Back out to Gregarious Grange', state: {} }, { pc: newPc(), inv: {} });
-    assert.deepEqual(verbs.map((v) => [v.id, v.enabled]), [['leave', true]]);
-    assert.equal(verbs[0].tooltip, 'Back out to Gregarious Grange');
   });
 });

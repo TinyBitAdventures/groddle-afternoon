@@ -1,7 +1,8 @@
 /**
  * The Bureaucratic Hall: the room, and the bureaucrats' greeting, waiting
- * area, Please Wait and help, shared by every hall (features/bureaucratic-halls-feature.js)
- * and by Legalize It's hall (game.js spawnLegalizeHall), so there is one flow.
+ * area, Please Wait and help, shared by every hall (features/bureaucratic-halls-feature.js),
+ * Legalize It's application in Gregarious Grange's hall too (game.js legalizeHallScript),
+ * so there is one flow.
  *
  * Source (glitch-GameServerJS, CC0):
  * - locations/location.js 1076-1094 hitbox bureaucratic_hall_entered: unless
@@ -288,7 +289,8 @@ const randInt = (a, b, rng) => a + Math.floor(rng() * (b - a + 1));
  *   pick(kind, list) -> index; question() -> index into HALL_QUESTIONS;
  *   handoff() -> bool; helperFor(reason) -> clerk index; onHelp(i, step);
  *   onTalk(i); onItem(classTsid); onAnswer(index); onPurchase(item) -> result | null;
- *   onEnd(bought).
+ *   onEnd(bought) (also when multiplayer takes your turn); onLeave() (out of the hall, called
+ *   by features/bureaucratic-halls-feature.js).
  * host: now(), player() {x, y}, pcLabel(), clerkCount, clerkLabel(i), drawClerk(i, pose),
  *   say(i, text), converse(i, { text, choices }) -> Promise<value|null>,
  *   prompt({ text, timeout, timeoutValue, onChoice }) -> uid, removePrompt(uid),
@@ -830,6 +832,8 @@ export function createHallFlow(host, { script = null, start = null, shared = nul
         clerks[k].willHelp = false;
         letGo(clerks[k]);
       }
+      // A quest's application (Legalize It) ends with no card, as Nevermind does.
+      script?.onEnd?.(false);
       setPhase('done', 'lost');
       return true;
     },

@@ -286,26 +286,6 @@ export function getVerbsFor(target, ctx) {
     });
   }
 
-  if (classId === 'legalize_hall_entrance') {
-    // game.js legalizeRealTarget: Gregarious Grange's own hall door, into the quest's hall.
-    add('enter', 'enter hall', {
-      sort: 10,
-      enabled:
-        Boolean(s.legalizeState) &&
-        ['grange_exterior', 'hall_waiting', 'hall_called', 'hall_processing'].includes(s.legalizeState.stage),
-      tooltip: 'Enter the Bureaucratic Hall',
-    });
-  }
-
-  if (classId === 'legalize_hall_exit') {
-    // game.js spawnLegalizeHall: the quest hall's glass doors, as every hall's (bureaucratic-halls-feature.js Leave).
-    add('leave', 'leave', {
-      sort: 10,
-      enabled: true,
-      tooltip: target?.subtitle || 'Leave the hall',
-    });
-  }
-
   if (classId === 'npc_back_alley_bureaucrat') {
     add('talk_to', 'talk to', {
       sort: 10,

@@ -2,9 +2,9 @@
  * Groddle Afternoon — original street geometry + layered decos
  * PixiJS 8 · locations-xml streets · CoU PNG decos · quests/items
  */
-import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=4cadcfb4';
+import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=288cbcba';
 import { createErrorOnce, createFeatureHost } from './js/feature-host.js?v=06bb8b74';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=a2a622a5';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=f7573bdf';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl, drawTileArt } from './js/enter-chooser.js?v=4a3ea327';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, bodyReachDistance, OUT_OF_REACH_LINE } from './js/reach.js?v=8e52df56';
@@ -106,9 +106,11 @@ import {
   LEGALIZE_CARD_ID,
   LEGALIZE_CLERKS,
   LEGALIZE_GRANGE_TSID,
+  LEGALIZE_HALL_STAGES,
   LEGALIZE_HALL_TSID,
   LEGALIZE_INSTANCE_TSIDS,
   LEGALIZE_QUEST_ID,
+  LEGALIZE_SHARED_HALL,
   abandonLegalize,
   activateCardFromPack,
   answerLegalizeQuestion,
@@ -119,8 +121,9 @@ import {
   departForBackAlley,
   ensureLegalizeState,
   ensureLegalizeWayBack,
+  endLegalizeVisit,
   enterBackAlleyStation,
-  enterBureaucraticHall,
+  enterLegalizeHall,
   exitToGregariousGrange,
   leaveBureaucraticHall,
   legalizeObjective,
@@ -131,8 +134,8 @@ import {
   qualificationVerb,
   requestLegalizeQualification,
   travelToGregarious,
-} from './js/legalize-it.js?v=d27094df';
-import { HALL, HALL_LAYOUT, HALL_QUESTIONS } from './js/bureaucratic-hall.js?v=a0bc6317';
+} from './js/legalize-it.js?v=9afd2e68';
+import { HALL, HALL_LAYOUT, HALL_QUESTIONS } from './js/bureaucratic-hall.js?v=a8eaa334';
 import { STATION_X, stationArrival, stationScreen, surfaceStation } from './js/subway.js?v=e6995db8';
 import { ALLEY, SHADY, drawAlley, inEnteredBox } from './js/quest-rooms/back-alley-set.js?v=8f5d057b';
 import {
@@ -9541,8 +9544,6 @@ function executeVerb(target, verbId) {
   if (
     [
       'legalize_transit_gate',
-      'legalize_hall_entrance',
-      'legalize_hall_exit',
       'npc_back_alley_bureaucrat',
       'npc_bureaucrat',
     ].includes(target?.classId)
@@ -12361,7 +12362,8 @@ const features = createFeatureHost(FEATURES);
  * there, never inside the instance, and (ticket 67) a stay at home goes on when it leads home.
  */
 function instanceWayBack() {
-  if (legalizeRun && legalizeSourceLocation?.tsid) return legalizeSourceLocation;
+  // G718: the Grange's hall is a shared place, saved as itself (bureaucratic-halls-feature.js reloadLocation walks back in).
+  if (legalizeRun && legalizeSourceLocation?.tsid && currentStreetTsid !== LEGALIZE_SHARED_HALL) return legalizeSourceLocation;
   // Never save a place inside the quest's instances: a reload there resumes at their way out.
   if (LEGALIZE_INSTANCE_TSIDS.includes(currentStreetTsid)) return legalizeWayOut();
   if (rookMuseumState && rookMuseumSourceLocation?.tsid) return rookMuseumSourceLocation;
@@ -13481,7 +13483,9 @@ const engine = {
   },
   /** The subway gate's papers refusal was OK'd (features/subway-feature.js): Legalize It's way into The Back Alley. */
   papersRefused: () => legalizeGateRefused(),
-  /** Legalize It's Bureaucratic Hall room and clerk art, for the hall doors (features/bureaucratic-halls-feature.js). */
+  /** Legalize It's application in Gregarious Grange's shared hall (features/bureaucratic-halls-feature.js enterHall). */
+  hallVisit: (hallTsid) => legalizeHallVisit(hallTsid),
+  /** The Bureaucratic Hall room and clerk art, for the hall doors (features/bureaucratic-halls-feature.js). */
   bureaucraticHall: () => ({
     layer: drawBureaucraticHall(),
     clerk: (index, x, y, scale) => makeLegalizeBureaucrat(index, x, y, scale),
@@ -17372,9 +17376,11 @@ const LEGALIZE_BUREAUCRAT_ART = [
  * Legalize It runs on the real places (card_carrying_qualification.js,
  * subway_gate.js, npc_bureaucrat.js, location.js): Gregarious Grange's own
  * subway station (features/subway-feature.js, Tiny Speck's subway1.swf), the
- * imported Gregarious Grange street (GLI32G3NUTD100I) with its hall door,
- * and the two places only the quest opens, The Back Alley instance (the one
- * set, js/quest-rooms/back-alley-set.js) and the Bureaucratic Hall.
+ * imported Gregarious Grange street (GLI32G3NUTD100I) with its hall door
+ * into the street's shared Bureaucratic Hall (features/bureaucratic-halls-feature.js,
+ * the one hall everyone on the street walks into, as in Glitch: G718), and
+ * the one place only the quest opens, The Back Alley instance (the one set,
+ * js/quest-rooms/back-alley-set.js).
  */
 const LEGALIZE_STATION = surfaceStation(LEGALIZE_GRANGE_TSID);
 const LEGALIZE_STATION_STREET = LEGALIZE_STATION.streetTsid;
@@ -17388,7 +17394,7 @@ const LEGALIZE_STATION_ARRIVAL = stationArrival(-575);
 const LEGALIZE_GATE_SPOT = stationScreen(STATION_X.gate - 70);
 /** Up the stairs: in front of the street's subway entrance (the stairs door's connect arrive). */
 const LEGALIZE_GRANGE_ARRIVAL = Object.freeze({ x: 3430, y: 910 });
-/** Out of the hall's glass doors: in front of its street door (GLI32G3NUTD100I.json door_1300484753304), as every hall returns you. */
+/** In front of the hall's street door (GLI32G3NUTD100I.json door_1300484753304), where its glass doors return you. */
 const LEGALIZE_HALL_DOOR_SPOT = Object.freeze({ x: 1101, y: 847 });
 /**
  * The way out when an application has none recorded: Gregarious Grange
@@ -17399,9 +17405,9 @@ const LEGALIZE_EXIT_FALLBACK = Object.freeze({ tsid: LEGALIZE_STATION_STREET, x:
 /** npc_bureaucrat.js 784: the halls the Bureaucrat marks on your map (prod), as streets. */
 const LEGALIZE_HALL_STREETS = Object.freeze(['GLI32G3NUTD100I', 'GA91JUQT2G82GUL', 'GA5I10NJDL52TKD']);
 
-/** The two places only the quest opens: The Back Alley instance and its Bureaucratic Hall. */
+/** The one place only the quest opens: The Back Alley instance (the hall is the street's shared one). */
 function legalizeIsInstanced() {
-  return Boolean(legalizeRun && [LEGALIZE_BACK_ALLEY_TSID, LEGALIZE_HALL_TSID].includes(currentStreetTsid));
+  return Boolean(legalizeRun && currentStreetTsid === LEGALIZE_BACK_ALLEY_TSID);
 }
 
 /** The application under way, also after a reload or a walk away and back. */
@@ -17414,7 +17420,7 @@ function legalizeRouteState() {
   return legalizeRun;
 }
 
-/** Where leaving The Back Alley or the quest's hall takes you, never null (js/legalize-it.js legalizeWayBack). */
+/** Where leaving The Back Alley takes you, never null (js/legalize-it.js legalizeWayBack). */
 function legalizeWayOut() {
   return legalizeWayBack(
     { sourceLocation: legalizeSourceLocation || legalizeRun?.sourceLocation || null },
@@ -17422,18 +17428,18 @@ function legalizeWayOut() {
   );
 }
 
-/** On one of the route's places (the station, the street, the alley, the hall). */
+/** On one of the route's places (the station, the street, the alley, the shared hall). */
 function legalizeOnRoute() {
   return Boolean(
     legalizeRouteState() &&
-      [LEGALIZE_STATION_STREET, LEGALIZE_GRANGE_STREET, LEGALIZE_BACK_ALLEY_TSID, LEGALIZE_HALL_TSID].includes(currentStreetTsid)
+      [LEGALIZE_STATION_STREET, LEGALIZE_GRANGE_STREET, LEGALIZE_BACK_ALLEY_TSID, LEGALIZE_SHARED_HALL].includes(currentStreetTsid)
   );
 }
 
 /**
  * The real door that carries a step, as the target content.js knows: the
- * station's stairs once you are back from the alley (Exit) and the street's
- * hall door on the way to the application (Enter). null otherwise.
+ * station's stairs once you are back from the alley (Exit). The street's
+ * hall door is every player's (bureaucratic-halls-feature.js Enter). null otherwise.
  */
 function legalizeRealTarget(target) {
   if (target?.classId !== 'street_door' || !legalizeOnRoute()) return null;
@@ -17448,12 +17454,6 @@ function legalizeRealTarget(target) {
   });
   if (currentStreetTsid === LEGALIZE_STATION_STREET && id === LEGALIZE_STAIRS_DOOR && stage === 'gregarious_arrival') {
     return as('legalize_transit_gate', 'exit_gregarious_station');
-  }
-  if (
-    currentStreetTsid === LEGALIZE_GRANGE_STREET && id === LEGALIZE_HALL_DOOR &&
-    ['grange_exterior', 'hall_waiting', 'hall_called', 'hall_processing'].includes(stage)
-  ) {
-    return as('legalize_hall_entrance', 'enter_hall');
   }
   return null;
 }
@@ -17757,62 +17757,20 @@ function spawnLegalizeGregariousExterior() {
   return legalizeEnterStreet(LEGALIZE_GRANGE_STREET, LEGALIZE_GRANGE_ARRIVAL);
 }
 
-function spawnLegalizeHall() {
-  installLegalizeScene(drawBureaucraticHall(), {
-    tsid: LEGALIZE_HALL_TSID,
-    label: 'Bureaucratic Hall',
-    hubName: 'Gregarious Grange',
-    spawnX: HALL_LAYOUT.arrival.x,
-    spawnY: HALL_LAYOUT.arrival.y,
-  });
-  legalizeTargets = LEGALIZE_CLERKS.map((clerk, index) => {
-    const spr = makeLegalizeBureaucrat(index, HALL_LAYOUT.clerkHomes[index], HALL_LAYOUT.clerkBackY, 1);
-    spr.zIndex = 40;
-    entityLayer.addChild(spr);
-    // The hall's visit (features/bureaucratic-halls-feature.js) owns the bureaucrats' verbs.
-    return register({
-      classId: 'npc_bureaucrat',
-      featureId: 'bureaucratic-halls',
-      label: clerk.name,
-      subtitle: index === legalizeRun.clerkIndex ? 'Handling your application' : 'Not your department',
-      sprite: spr,
-      state: { legalizeState: legalizeRun, clerkIndex: index },
-    });
-  });
-  const counter = new PIXI.Sprite(textureFromUrl('assets/decos/groddle/bureaucratic_hall_counter_1.png'));
-  counter.anchor.set(0, 1);
-  // The same counter as every hall's (features/bureaucratic-halls-feature.js placeCounter).
-  counter.position.set(HALL_LAYOUT.counterLeft, HALL.ground + 4);
-  counter.width = 811;
-  counter.height = 103;
-  counter.zIndex = 44;
-  counter.eventMode = 'none';
-  entityLayer.addChild(counter);
-  // G718: the hall's glass doors, drawn as every street hall's (features/bureaucratic-halls-feature.js
-  // spawnHall), back out to Gregarious Grange. Not in legalizeTargets: those are the visit's bureaucrats.
-  const exit = new PIXI.Sprite(textureFromUrl('assets/decos/groddle/door_asset_bureaucratic_hall_int.png'));
-  exit.anchor.set(0.5, 1);
-  exit.position.set(HALL_LAYOUT.exitX, HALL.ground + 2);
-  exit.scale.set(0.5);
-  exit.zIndex = 30;
-  entityLayer.addChild(exit);
-  register({
-    classId: 'legalize_hall_exit',
-    label: 'Gregarious Grange',
-    subtitle: 'Back out to Gregarious Grange',
-    sprite: exit,
-    state: { legalizeState: legalizeRun },
-  });
-  // Legalize It runs the hall's own visit, with the recorded session's choices.
-  const done = ['card_owned', 'complete'].includes(legalizeRun.stage);
-  features.query('bureaucraticHallFlow', engine, {
-    targets: legalizeTargets.slice(),
-    label: 'Bureaucratic Hall',
-    script: legalizeHallScript(),
-    start: done ? 'done' : null,
-  });
-  refreshLegalizeClerks();
+/**
+ * Into Gregarious Grange's hall with the application under way
+ * (features/bureaucratic-halls-feature.js enterHall asks engine.hallVisit):
+ * the shared hall everyone on the street is in (G718), as Glitch's door led
+ * to the real LIF101O8CDQ1AMU. Its visit runs the recorded session's script;
+ * null for any other hall or stage (the plain visit: a card bought there
+ * still counts, activateCardFromPack).
+ */
+function legalizeHallVisit(hallTsid) {
+  if (hallTsid !== LEGALIZE_HALL_TSID || !legalizeRouteState()) return null;
+  if (!enterLegalizeHall(legalizeRun).ok) return null;
+  pushActivity('You enter the Bureaucratic Hall.');
   renderLegalizeHud();
+  return { script: legalizeHallScript() };
 }
 
 /**
@@ -17828,10 +17786,7 @@ const LEGALIZE_HALL_PICKS = Object.freeze({ helping_ready: 6, purchasing_step1: 
 const LEGALIZE_HALL_QUESTION = HALL_QUESTIONS.findIndex((qn) => qn.options.join('|') === 'Beige|Other');
 
 function legalizeHallScript() {
-  const refresh = () => {
-    refreshLegalizeClerks();
-    renderLegalizeHud();
-  };
+  const refresh = () => renderLegalizeHud();
   return {
     pick: (kind) => LEGALIZE_HALL_PICKS[kind] ?? null,
     question: () => LEGALIZE_HALL_QUESTION,
@@ -17858,34 +17813,19 @@ function legalizeHallScript() {
     },
     onPurchase: () => finishLegalizePurchase(),
     onEnd: (bought) => {
-      if (bought || !legalizeRun || ['card_owned', 'complete'].includes(legalizeRun.stage)) return;
-      // Nevermind: the application starts over. Walking back into the desk room is the
-      // "exit and re-enter" (a fresh visit greets you there); the glass doors also lead out.
-      Object.assign(legalizeRun, { stage: 'hall_waiting', handoffs: 0, clerkIndex: 0 });
-      setTimeout(() => {
-        if (currentStreetTsid !== LEGALIZE_HALL_TSID || !legalizeRun) return;
-        features.query('bureaucraticHallFlow', engine, { targets: legalizeTargets.slice(), label: 'Bureaucratic Hall', script: legalizeHallScript() });
-        refresh();
-      }, 1000);
+      // Nevermind (or a lost turn): as in every hall, apply again by leaving and coming back in.
+      if (bought || !legalizeRun) return;
+      endLegalizeVisit(legalizeRun);
       refresh();
     },
+    // G718: out of the hall any way (its glass doors, the Map, a teleport): the application waits outside.
+    onLeave: () => {
+      if (!legalizeRun) return;
+      leaveBureaucraticHall(legalizeRun);
+      refresh();
+      savePlayerState();
+    },
   };
-}
-
-function refreshLegalizeClerks() {
-  for (const target of legalizeTargets) {
-    if (target.classId !== 'npc_bureaucrat') continue;
-    const index = Number(target.state?.clerkIndex);
-    const current = index === Number(legalizeRun.clerkIndex);
-    const called =
-      current && ['hall_called', 'hall_processing', 'card_owned'].includes(legalizeRun.stage);
-    target.subtitle = called
-      ? 'Handling your application'
-      : current
-        ? 'Please wait to be called'
-        : 'Not your department';
-  }
-  renderLegalizeHud();
 }
 
 /** The fee paid (the hall visit's Pay 50): the quest's purchase; 'ok' or 'broke' for the visit. */
@@ -17902,7 +17842,6 @@ function finishLegalizePurchase() {
   pushActivity(`You paid ${result.cost} currants and received a Card-Carrying Qualification.`);
   floatText(player.x, player.y - 90, 'Qualification acquired', 0xffe066);
   burst(player.x, player.y - 50, 0xffe066, 15);
-  refreshLegalizeClerks();
   renderLegalizeHud();
   updateHud();
   // The visit then shows items/npc_bureaucrat.js showEndPrompt (js/bureaucratic-hall.js).
@@ -17936,25 +17875,6 @@ function legalizeBriefing(target) {
       setTimeout(() => legalizeLeaveAlley(), 500);
     },
   });
-}
-
-/**
- * G718: the hall's glass doors, out to Gregarious Grange in front of the
- * hall's street door. Leaving clears the visit (js/legalize-it.js
- * leaveBureaucraticHall, location.js 810-819; the hall feature's streetClear
- * ends the visit and its Please Wait), so the clerks start over when you
- * come back in. The quest stays active; a bought card stays bought.
- */
-async function legalizeLeaveHall() {
-  if (currentStreetTsid !== LEGALIZE_HALL_TSID || legalizeTransitionBusy || !legalizeRun) return;
-  leaveBureaucraticHall(legalizeRun);
-  playSound('DOOR_OPEN', { volume: 0.6 });
-  await legalizeRunStep(
-    () => legalizeEnterStreet(LEGALIZE_GRANGE_STREET, LEGALIZE_HALL_DOOR_SPOT),
-    'You leave the Bureaucratic Hall for Gregarious Grange.',
-    ''
-  );
-  savePlayerState();
 }
 
 /** One step's place change, then its activity line and hint. */
@@ -18003,11 +17923,7 @@ function handleLegalizeTarget(target, verbId) {
     legalizeBriefing(target);
     return;
   }
-  if (target.classId === 'legalize_hall_exit' && verbId === 'leave') {
-    legalizeLeaveHall();
-    return;
-  }
-  if (['legalize_transit_gate', 'legalize_hall_entrance'].includes(target.classId)) {
+  if (target.classId === 'legalize_transit_gate') {
     const action = target.state?.routeAction;
     let result = { ok: false };
     let spawn = null;
@@ -18023,29 +17939,17 @@ function handleLegalizeTarget(target, verbId) {
       spawn = spawnLegalizeGregariousExterior;
       activity = 'You step out onto Gregarious Grange.';
       message = 'The Bureaucratic Hall is along the street to the left.';
-    } else if (action === 'enter_hall' && verbId === 'enter') {
-      if (legalizeRun.stage === 'grange_exterior') {
-        result = enterBureaucraticHall(legalizeRun);
-      } else if (['hall_waiting', 'hall_called', 'hall_processing'].includes(legalizeRun.stage)) {
-        // location.js 810-819: leaving the hall cleared the visit, so an application under way starts over.
-        Object.assign(legalizeRun, { stage: 'hall_waiting', handoffs: 0, clerkIndex: 0 });
-        result = { ok: true };
-      }
-      spawn = spawnLegalizeHall;
-      activity = 'You enter the Bureaucratic Hall.';
-      message = '';
     }
     if (!result.ok || !spawn) return;
-    // In the hall a bureaucrat greets you (js/bureaucratic-hall.js), as in every hall.
     legalizeRunStep(spawn, activity, message);
   }
 }
 
 /**
  * The pack's Activate (js/legalize-it.js activateCardFromPack): a card from
- * any hall, player or auction, with or without Legalize It. Inside the quest's
- * two instanced places the completion takes you back where you came from;
- * anywhere else the application just ends where you stand.
+ * any hall, player or auction, with or without Legalize It. Inside The Back
+ * Alley the completion takes you back where you came from; anywhere else (the
+ * Grange's shared hall too) the application just ends where you stand.
  */
 function activateLegalizeCard() {
   const inInstance = legalizeIsInstanced();
@@ -18082,7 +17986,7 @@ function activateLegalizeCard() {
   return true;
 }
 
-/** The application finished away from The Back Alley and the quest's hall: no trip back, the run just ends (its map route goes with the quest). */
+/** The application finished away from The Back Alley: no trip back, the run just ends (its map route goes with the quest). */
 function endLegalizeRunInPlace() {
   legalizeRun = null;
   legalizeSourceLocation = null;
@@ -18112,7 +18016,7 @@ async function startLegalizeIt(opts = {}) {
       x: player?.x ?? WORLD_W * 0.5,
       y: player?.y ?? GROUND_Y,
     });
-    // Started from inside the alley or the hall: their way back can't be themselves.
+    // Started from inside the alley: its way back can't be itself.
     if (LEGALIZE_INSTANCE_TSIDS.includes(legalizeSourceLocation?.tsid)) legalizeSourceLocation = { ...LEGALIZE_EXIT_FALLBACK };
     legalizeRun = ensureLegalizeState(questState, legalizeSourceLocation);
     legalizeRun.sourceLocation ||= createLegalizeState(legalizeSourceLocation).sourceLocation;
@@ -18138,11 +18042,15 @@ async function startLegalizeIt(opts = {}) {
       await spawnLegalizeGregariousExterior();
       pushActivity('You return to Gregarious Grange.');
       toast('Enter the Bureaucratic Hall along the street.', 3600);
+    } else if (LEGALIZE_HALL_STAGES.includes(stage)) {
+      // Back into the street's shared hall (its visit starts over: location.js 810-819).
+      await legalizeEnterStreet(LEGALIZE_GRANGE_STREET, LEGALIZE_HALL_DOOR_SPOT);
+      features.query('hallEnter', LEGALIZE_HALL_TSID, engine);
     } else {
-      // location.js 810-819: leaving the hall cleared the visit, so an application under way starts over.
-      if (['hall_called', 'hall_processing'].includes(stage)) Object.assign(legalizeRun, { stage: 'hall_waiting', handoffs: 0, clerkIndex: 0 });
-      spawnLegalizeHall();
+      // The card is bought: it is activated from the pack, anywhere.
+      await legalizeEnterStreet(LEGALIZE_GRANGE_STREET, LEGALIZE_HALL_DOOR_SPOT);
       pushActivity('You return to the Bureaucratic Hall on Gregarious Grange.');
+      if (stage === 'card_owned') toast('Activate the Card-Carrying Qualification from your pack.', 3600);
     }
     renderLegalizeHud();
     updateHud();
@@ -18236,7 +18144,7 @@ function updateLegalizeIt() {
   }
   if (
     autoplayMode === 'hall' &&
-    currentStreetTsid === LEGALIZE_HALL_TSID &&
+    currentStreetTsid === LEGALIZE_SHARED_HALL &&
     legalizeRun.stage === 'hall_called'
   ) {
     return;
@@ -18265,10 +18173,11 @@ function updateLegalizeIt() {
       executeVerb(stairs, 'exit');
     }
   } else if (legalizeRun.stage === 'grange_exterior' && currentStreetTsid === LEGALIZE_GRANGE_STREET) {
+    // The street's hall door, every player's (bureaucratic-halls-feature.js Enter).
     const hall = streetDoor(LEGALIZE_HALL_DOOR);
     if (hall) {
       player.x = hall.sprite.x;
-      executeVerb(hall, 'enter');
+      executeVerb(hall, 'hall_enter');
     }
   } else if (['hall_waiting', 'hall_called', 'hall_processing'].includes(legalizeRun.stage)) {
     // One step of the hall's visit: answer, step into the waiting area, skip the walks and the wait.
@@ -31583,7 +31492,9 @@ async function main() {
       : Math.max(1, Math.floor(TOOL_CONDITION_CATALOG[toolDemo].capacity * 0.12));
     setToolRemaining(toolState, toolDemo, requested);
   }
-  // The Back Alley and the quest's hall are instances, not streets: a save inside resumes at their way out.
+  // The Back Alley is an instance, not a street: a save inside resumes at its way out. A save in a
+  // Bureaucratic Hall (Legalize It's old private copy LIF101O8CDQ1AMU too) walks back into the shared
+  // hall (features/bureaucratic-halls-feature.js reloadLocation).
   const featureStart = legalizeReloadLocation(loadPlayerLocation(), questState, LEGALIZE_EXIT_FALLBACK) ||
     features.query('reloadLocation', loadPlayerLocation(), engine);
   const savedLoc = featureStart

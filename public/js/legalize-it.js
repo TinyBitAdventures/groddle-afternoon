@@ -15,7 +15,17 @@ import { countItem, removeItem } from './inventory.js?v=f49c8998';
 export const LEGALIZE_QUEST_ID = 'card_carrying_qualification';
 export const LEGALIZE_BACK_ALLEY_TSID = 'LIF177DTS6T1KFG';
 export const LEGALIZE_GRANGE_TSID = 'LLI32G3NUTD100I';
+/**
+ * The Bureaucratic Hall behind Gregarious Grange's door (location XML door_1300484753304:
+ * connect target LIF101O8CDQ1AMU, a real location). Glitch had no private copy: the quest
+ * only instanced The Back Alley (card_carrying_qualification.js onStarted 80-91), so the
+ * application was made in the hall everyone on the street walks into. Its scene is the
+ * shared hall's (features/bureaucratic-halls-feature.js hallSceneTsid).
+ */
 export const LEGALIZE_HALL_TSID = 'LIF101O8CDQ1AMU';
+export const LEGALIZE_SHARED_HALL = `HALL_${LEGALIZE_HALL_TSID}`;
+/** The application's stages inside the hall. */
+export const LEGALIZE_HALL_STAGES = Object.freeze(['hall_waiting', 'hall_called', 'hall_processing']);
 export const LEGALIZE_CARD_ID = 'card_carrying_qualification';
 export const LEGALIZE_PAPERS_ID = 'your_papers';
 export const LEGALIZE_CARD_COST = 50;
@@ -113,6 +123,7 @@ export function ensureLegalizeState(questState, sourceLocation = null) {
   state.activated = Boolean(state.activated);
   state.purchasedAt = Math.max(0, Number(state.purchasedAt) || 0);
   state.completedAt = Math.max(0, Number(state.completedAt) || 0);
+  state.visitOver = Boolean(state.visitOver);
   if (!state.sourceLocation?.tsid && sourceLocation?.tsid) {
     state.sourceLocation = createLegalizeState(sourceLocation).sourceLocation;
   }
@@ -166,7 +177,35 @@ export function enterBureaucraticHall(state) {
   }
   state.stage = 'hall_waiting';
   state.clerkIndex = 0;
+  state.visitOver = false;
   return { ok: true, reason: 'entered_hall', clerk: LEGALIZE_CLERKS[0], state };
+}
+
+/**
+ * Walking into the Grange's hall with the application under way: from the
+ * street it starts (enterBureaucraticHall); an application already in a hall
+ * stage starts over at the waiting area, since leaving cleared the visit
+ * (location.js 810-819). Any other stage is no application here: the hall's
+ * plain visit (a card bought there still counts, activateCardFromPack).
+ */
+export function enterLegalizeHall(state) {
+  if (!state) return { ok: false, reason: 'no_application', state };
+  if (state.stage === 'grange_exterior') return enterBureaucraticHall(state);
+  if (!LEGALIZE_HALL_STAGES.includes(state.stage)) return { ok: false, reason: 'not_applying', state };
+  Object.assign(state, { stage: 'hall_waiting', handoffs: 0, clerkIndex: 0, visitOver: false });
+  return { ok: true, reason: 'entered_hall', clerk: LEGALIZE_CLERKS[0], state };
+}
+
+/**
+ * The visit ended with no card (Nevermind, or in multiplayer the turn ran
+ * out): the bureaucrats will not greet you again until you leave and come
+ * back in (npc_bureaucrat.js 579-584 clears the step only; location.js 1076
+ * greets only without !bureaucracy_started, which leaving clears, 810-819).
+ */
+export function endLegalizeVisit(state) {
+  if (!state || !LEGALIZE_HALL_STAGES.includes(state.stage)) return { ok: false, reason: 'not_in_hall', state };
+  Object.assign(state, { stage: 'hall_waiting', handoffs: 0, clerkIndex: 0, visitOver: true });
+  return { ok: true, reason: 'visit_over', state };
 }
 
 /**
@@ -177,10 +216,11 @@ export function enterBureaucraticHall(state) {
  */
 export function leaveBureaucraticHall(state) {
   if (!state) return { ok: false, reason: 'no_application', state };
-  if (['hall_waiting', 'hall_called', 'hall_processing'].includes(state.stage)) {
+  if (LEGALIZE_HALL_STAGES.includes(state.stage)) {
     state.stage = 'grange_exterior';
     state.handoffs = 0;
     state.clerkIndex = 0;
+    state.visitOver = false;
   }
   return { ok: true, reason: 'left_hall', state };
 }
@@ -374,11 +414,11 @@ export function legalizeOnAccepted({ questState, inv, achieveState, pc = null, n
   return { completed: Boolean(legalizeUpdate(done)), updates: done };
 }
 
-/** The two places only the quest opens (instances, never streets): The Back Alley and its Bureaucratic Hall. */
-export const LEGALIZE_INSTANCE_TSIDS = Object.freeze([LEGALIZE_BACK_ALLEY_TSID, LEGALIZE_HALL_TSID]);
+/** The one place only the quest opens (an instance, never a street): The Back Alley. */
+export const LEGALIZE_INSTANCE_TSIDS = Object.freeze([LEGALIZE_BACK_ALLEY_TSID]);
 
 /**
- * Where leaving the quest's places takes you: instances_exit returns you to
+ * Where leaving The Back Alley takes you: instances_exit returns you to
  * the place the instance was entered from (players/inc_instances.js;
  * npc_bureaucrat.js 762 and 795, pc.instances_get_exit('back_alley')), which
  * is the application's sourceLocation. With none recorded, `fallback` (the
@@ -399,10 +439,10 @@ export function ensureLegalizeWayBack(state, fallback = null) {
 }
 
 /**
- * A saved location inside The Back Alley or the quest's hall: neither is a
- * street a reload can open, so the reload resumes at the way back (an older
- * build could save one when the application had no way back). null for any
- * other place.
+ * A saved location inside The Back Alley: no street a reload can open, so
+ * the reload resumes at the way back (an older build could save one when the
+ * application had no way back). null for any other place: the hall is the
+ * Grange's shared one (features/bureaucratic-halls-feature.js reloadLocation).
  */
 export function legalizeReloadLocation(saved, questState, fallback = null) {
   if (!LEGALIZE_INSTANCE_TSIDS.includes(String(saved?.tsid || ''))) return null;
@@ -432,6 +472,7 @@ export function legalizeObjective(state) {
   if (state.stage === 'back_alley_station') return 'Take the subway to Gregarious Grange';
   if (state.stage === 'gregarious_arrival') return 'Exit Gregarious Grange Subway Station';
   if (state.stage === 'grange_exterior') return 'Enter the Bureaucratic Hall';
+  if (state.stage === 'hall_waiting' && state.visitOver) return 'Leave the hall and come back in to apply again';
   if (state.stage === 'hall_waiting') return 'Move into the waiting area';
   if (state.stage === 'hall_called') {
     return `Speak with ${LEGALIZE_CLERKS[state.clerkIndex].name}`;

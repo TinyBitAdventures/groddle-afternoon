@@ -16,9 +16,9 @@ import {
   HALL_LEAVE_VERB,
   bureaucraticHallsFeature,
   hallSceneTsid,
-} from '../public/js/features/bureaucratic-halls-feature.js?v=4b997a54';
+} from '../public/js/features/bureaucratic-halls-feature.js?v=e9bd5b24';
 import { supplyFeature } from '../public/js/features/supply-feature.js?v=a703f7a8';
-import { LEGALIZE_HALL_TSID } from '../public/js/legalize-it.js?v=d27094df';
+import { LEGALIZE_HALL_TSID, LEGALIZE_SHARED_HALL } from '../public/js/legalize-it.js?v=9afd2e68';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const street = (tsid) => JSON.parse(readFileSync(join(root, 'public/assets/streets', `${tsid}.json`), 'utf8'));
@@ -71,8 +71,12 @@ describe('hall doors', () => {
     }
   });
 
-  it('the hall scenes never reuse Legalize It\'s scene id', () => {
-    for (const def of Object.values(HALL_DOORS)) assert.notEqual(hallSceneTsid(def.tsid), LEGALIZE_HALL_TSID);
+  it('Legalize It\'s hall is the Grange\'s shared scene (G718), and each door stands where its street has it', () => {
+    assert.equal(hallSceneTsid(LEGALIZE_HALL_TSID), LEGALIZE_SHARED_HALL);
+    for (const [doorId, def] of Object.entries(HALL_DOORS)) {
+      const door = street(def.street).doors.find((d) => d.id === doorId);
+      assert.deepEqual([def.x, def.y], [door.x, door.y], doorId);
+    }
   });
 
   it('Enter opens the hall: scene, glass doors, four bureaucrats running the hall visit', () => {
