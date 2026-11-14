@@ -2792,9 +2792,14 @@
   "deployed": "2026-11-13"
  },
  "git": {
-  "commits": 2061,
+  "commits": 2062,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-13",
+    "kind": "fix",
+    "text": "A Storage Display Box shows its item in its own shape, so a Wine of the Dead is a bottle again"
+   },
    {
     "date": "2026-11-13",
     "kind": "fix",
@@ -2909,14 +2914,9 @@
     "date": "2026-11-13",
     "kind": "fix",
     "text": "The Museum of the Rook's Greeterbot stands on the floor by the door and greets you when you walk into it, so you see it first"
-   },
-   {
-    "date": "2026-11-13",
-    "kind": "fix",
-    "text": "In the Ventilation Room you can drop down the shaft from the Corridor Six door instead of walking on thin air"
    }
   ]
  },
- "tests": 967,
+ "tests": 968,
  "generatedAt": "2026-11-13"
 }

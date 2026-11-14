@@ -9678,7 +9678,8 @@ function executeVerb(target, verbId) {
   (result.msgs || []).forEach((m, i) => {
     if (i === 0) return; // already toasted / fed above
     if (reactionText && m === reactionText) return; // rendered in a wrapped speech bubble
-    floatText(target.sprite.x, resultFloatY(target, spoke || Boolean(reactionText)) - i * 16, m, 0xfff4d6);
+    // #311: as long as the first line (life 110), so a three-line result is readable to the top.
+    floatText(target.sprite.x, resultFloatY(target, spoke || Boolean(reactionText)) - i * 16, m, 0xfff4d6, { life: 110 });
   });
   // Floating metabolic deltas, unless the answer's slugs already show them
   // (the client's slugs fly to the stats instead, SlugAnimator.as).
@@ -9816,7 +9817,10 @@ function executeVerb(target, verbId) {
         picked.collection.complete
           ? 'Musicblock set complete!'
           : `Tunes ${picked.collection.owned}/${picked.collection.total}`,
-        0xc6a2ff
+        0xc6a2ff,
+        // #311 (The Catface): the top of a Musicblock's three lines faded in under a second; it
+        // lasts as long as the pickup line under it now.
+        { life: 110 }
       );
     }
     playSound(soundForVerb(target.classId, verbId, result), { volume: 0.7, jitter: 0.06 });

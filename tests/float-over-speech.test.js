@@ -37,6 +37,6 @@ describe('floating words over the speech balloon', () => {
     assert.match(game, /const RESULT_FLOAT_RISE = 50;\nconst RESULT_FLOAT_UNDER_SPEECH = 12;/);
     assert.match(game, /return target\.sprite\.y - \(speaking \? RESULT_FLOAT_UNDER_SPEECH : RESULT_FLOAT_RISE\);/);
     assert.match(game, /floatText\(target\.sprite\.x, resultFloatY\(target, spoke \|\| Boolean\(reactionText\)\), toastLine, 0xfff4d6, \{ life: 110 \}\)/);
-    assert.match(game, /floatText\(target\.sprite\.x, resultFloatY\(target, spoke \|\| Boolean\(reactionText\)\) - i \* 16, m, 0xfff4d6\)/);
+    assert.match(game, /floatText\(target\.sprite\.x, resultFloatY\(target, spoke \|\| Boolean\(reactionText\)\) - i \* 16, m, 0xfff4d6, \{ life: 110 \}\)/);
   });
 });
