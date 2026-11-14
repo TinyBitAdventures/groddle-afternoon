@@ -12,7 +12,7 @@ import { readFileSync, readdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { saleVerbs } from '../public/js/home-street-mp.js?v=202c3e87';
-import { homeStorageFeature } from '../public/js/features/home-storage-feature.js?v=40117257';
+import { homeStorageFeature } from '../public/js/features/home-storage-feature.js?v=ddc8cf30';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const read = (p) => readFileSync(join(root, p), 'utf8');
@@ -111,9 +111,32 @@ describe('the windows (CabinetDialog.as, StoreBuyUI.as) in both skins', () => {
     assert.match(windows, /'Done'/);
     assert.match(windows, /'Move Here'/);
     assert.match(windows, /\.hst-win \{ position: fixed; z-index: calc\(var\(--z-panel\) - 1\);/);
-    assert.match(windows, /max-height: calc\(100vh - 230px\)/);
+    // #325: it stops at the pack bar's live top (game.js --pack-live-height), not a fixed 230 px.
+    assert.match(windows, /max-height: calc\(100dvh - max\(64px, 9vh\) - var\(--pack-live-height, 112px\) - 8px\);/);
     // findDropTarget: an empty slot, or the same class under its stackmax.
     assert.match(windows, /return s\.classTsid === cls && s\.count < \(opts\.stackmax\?\.\(cls\) \?\? Infinity\);/);
+  });
+
+  it('#325: fits a small phone (360 wide, 365 tall): no sideways scroll, the shelves wrap and a short window scrolls from its top', () => {
+    const css = (sel) => {
+      const at = windows.indexOf(sel);
+      assert.ok(at >= 0, sel);
+      return windows.slice(at, windows.indexOf('}', at));
+    };
+    // The picture gives way first; the shelves never push the window wider than the screen.
+    assert.match(css('.hst-art {'), /flex: 0 1 96px; min-width: 56px;/);
+    assert.match(css('.hst-grid-wrap {'), /min-width: 0; overflow-x: hidden;/);
+    const narrow = windows.slice(windows.indexOf('@media (max-width: 480px)'), windows.indexOf('@media (max-height: 520px)'));
+    assert.match(narrow, /\.hst-win:not\(\.hst-dialog\) \{ width: calc\(100vw - 24px\); \}/);
+    assert.match(narrow, /\.hst-grid \{ grid-template-columns: repeat\(auto-fill, 50px\);/);
+    assert.match(narrow, /\.hst-win header small \{ order: 2; flex-basis: 100%; \}/);
+    const short = windows.slice(windows.indexOf('@media (max-height: 520px)'));
+    assert.match(short, /\.hst-body \{ align-items: flex-start; \}/);
+    assert.match(short, /\.hst-grid-wrap \{ max-height: none !important; overflow: visible; \}/);
+    // Up and down keys go by the slots a row shows now.
+    assert.match(windows, /ArrowUp: -shown, ArrowDown: shown/);
+    // The cabinet's own width (cols) still sets the shelves on a wider screen.
+    assert.match(windows, /wrap\.style\.setProperty\('--cols', String\(cols\)\);/);
   });
 
   it('dresses the Classic skin in the original dialog\'s blocker colour (0x213036, the token nearest it)', () => {

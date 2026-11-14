@@ -27,7 +27,10 @@ import { bindContextTrigger } from './context-menu.js?v=55c84488';
 
 const CSS = `
 .hst-win { position: fixed; z-index: calc(var(--z-panel) - 1); left: 50%; top: max(64px, 9vh); transform: translateX(-50%);
-  max-width: calc(100vw - 24px); max-height: calc(100vh - 230px); display: flex; flex-direction: column; overflow: hidden;
+  max-width: calc(100vw - 24px); display: flex;
+  /* #325: down to the pack bar's live top (--pack-live-height, game.js), so a short phone keeps its rows and Done. */
+  max-height: calc(100vh - max(64px, 9vh) - var(--pack-live-height, 112px) - 8px);
+  max-height: calc(100dvh - max(64px, 9vh) - var(--pack-live-height, 112px) - 8px); flex-direction: column; overflow: hidden;
   background: var(--surface-card); color: var(--text); border-radius: var(--radius-2xl); box-shadow: var(--shadow-3);
   border: 1px solid color-mix(in srgb, var(--c-umber-41) 18%, transparent); font-family: var(--font-ui); }
 .hst-win[hidden] { display: none; }
@@ -37,10 +40,31 @@ const CSS = `
 .hst-win header small { color: var(--text-muted); font-weight: 700; }
 .hst-win .hst-x { border: 0; background: transparent; color: inherit; font-size: var(--fs-2xl); line-height: 1; cursor: pointer; padding: 0 var(--sp-2); }
 .hst-body { display: flex; gap: var(--sp-6); align-items: center; padding: var(--sp-6) var(--sp-7); overflow: auto; }
-.hst-art { flex: none; width: 96px; display: grid; place-items: center; }
-.hst-art img { max-width: 96px; max-height: 150px; image-rendering: auto; }
-.hst-grid-wrap { overflow-y: auto; overscroll-behavior: contain; padding-right: 4px; }
+/* #325: on a narrow window the picture shrinks first, then (480 px and under) the shelves take fewer slots a row: never a sideways scroll. */
+.hst-art { flex: 0 1 96px; min-width: 56px; display: grid; place-items: center; }
+.hst-art img { max-width: 100%; max-height: 150px; image-rendering: auto; }
+.hst-grid-wrap { flex: 0 1 auto; min-width: 0; overflow-x: hidden; overflow-y: auto; overscroll-behavior: contain; padding-right: 4px; }
 .hst-grid { display: grid; grid-template-columns: repeat(var(--cols), 50px); column-gap: 4px; row-gap: 18px; padding: 8px 18px 12px; }
+@media (max-width: 480px) {
+  .hst-win header { flex-wrap: wrap; row-gap: 0; }
+  .hst-win header h2 { min-width: 0; }
+  .hst-win header .hst-x { order: 1; }
+  .hst-win header small { order: 2; flex-basis: 100%; }
+  /* The cabinet takes the phone's width, as the dialogs do (its picture and shelves centred in it). */
+  .hst-win:not(.hst-dialog) { width: calc(100vw - 24px); }
+  .hst-body { gap: var(--sp-4); padding: var(--sp-4) var(--sp-5); justify-content: center; }
+  /* The cabinet's own width of shelves (and room for a scroll bar); narrower than that, they wrap to fewer slots a row. */
+  .hst-grid-wrap { width: calc(var(--cols) * 54px + 24px); }
+  .hst-grid { grid-template-columns: repeat(auto-fill, 50px); padding: 8px 6px 12px; }
+  .hst-foot { padding: var(--sp-3) var(--sp-5) var(--sp-4); }
+}
+/* A short window: the body scrolls as one (picture and shelves) from its top, so no row is out of reach. */
+@media (max-height: 520px) {
+  .hst-body { align-items: flex-start; }
+  .hst-art { flex-basis: 64px; }
+  .hst-art img { max-height: 96px; }
+  .hst-grid-wrap { max-height: none !important; overflow: visible; }
+}
 .hst-shelf { grid-column: 1 / -1; height: 0; }
 .hst-slot { position: relative; width: 50px; height: 52px; box-sizing: border-box; border-radius: var(--radius-md); display: grid; place-items: center;
   background: color-mix(in srgb, var(--surface-sunken) 75%, transparent); border: 2px solid transparent; padding: 0; cursor: default; font: inherit; color: inherit; }
@@ -201,7 +225,7 @@ export function openCabinetWindow(opts) {
   }
   const wrap = el('div', { class: 'hst-grid-wrap' });
   const grid = el('div', { class: 'hst-grid', role: 'grid', 'aria-label': title, 'data-hst-grid': '' });
-  grid.style.setProperty('--cols', String(cols));
+  wrap.style.setProperty('--cols', String(cols));
   wrap.append(grid);
   body.append(wrap);
   h.root.append(body);
@@ -418,7 +442,9 @@ export function openCabinetWindow(opts) {
     const b = e.target?.closest?.('[data-hst-slot]');
     if (!b) return;
     const i = Number(b.dataset.hstSlot);
-    const step = { ArrowLeft: -1, ArrowRight: 1, ArrowUp: -cols, ArrowDown: cols }[e.key];
+    // #325: a narrow window wraps the shelves, so up and down go by the slots a row shows now.
+    const shown = getComputedStyle(grid).gridTemplateColumns.split(' ').filter(Boolean).length || cols;
+    const step = { ArrowLeft: -1, ArrowRight: 1, ArrowUp: -shown, ArrowDown: shown }[e.key];
     if (step) {
       e.preventDefault();
       e.stopPropagation();
