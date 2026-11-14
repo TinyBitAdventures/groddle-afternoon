@@ -25882,7 +25882,8 @@ async function openMap(hubId, { find = '', focus = '', view: pickedView = '' } =
   if (find) showFoundStreet(canvas, find, view);
   else if (focus) focusMapOn(canvas, focus);
   warmSubwayPaper();
-  warmWorldCharts();
+  // G663: a phone fetches the World charts' 1.5 MB-a-piece Retina pair only when the World view opens, not on every Map.
+  if (!TOUCH_PHONE) warmWorldCharts();
 }
 
 /** The cards above the map (a quest's teleport, your home, the features' cards), before arrangeMapCards. */
@@ -25979,7 +25980,8 @@ function showMapView(which, { panel, canvas, title, sub, spot, mapIndex }) {
   // MAPLOAD: your own region's painting, ready for the click back into it (after the fit, which picks its size).
   if (which === 'world') mapBgLoader.preload(spot.hubId);
   warmSubwayPaper();
-  warmWorldCharts();
+  // G663: a phone fetches the World charts' 1.5 MB-a-piece Retina pair only when the World view opens, not on every Map.
+  if (!TOUCH_PHONE) warmWorldCharts();
 }
 
 /**

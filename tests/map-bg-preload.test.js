@@ -293,7 +293,7 @@ describe('the preview triggers (bindWorldMap onPreview, game.js)', () => {
   it('game.js: a card previews (a tap at once), the World view fetches your region, a station\'s menu its region', () => {
     const game = read('public/game.js');
     assert.match(game, /onPreview: \(id, how\) => mapBgLoader\.preview\(id, \{ now: how === 'tap' \}\)/);
-    assert.match(game, /fitMapCanvas\(panel\);\n  \/\/ MAPLOAD: [^\n]*\n  if \(which === 'world'\) mapBgLoader\.preload\(spot\.hubId\);\n  warmSubwayPaper\(\);\n  warmWorldCharts\(\);\n\}/, 'after the fit, which picks the size');
+    assert.match(game, /fitMapCanvas\(panel\);\n  \/\/ MAPLOAD: [^\n]*\n  if \(which === 'world'\) mapBgLoader\.preload\(spot\.hubId\);\n  warmSubwayPaper\(\);\n  \/\/ G663: [^\n]*\n  if \(!TOUCH_PHONE\) warmWorldCharts\(\);\n\}/, 'after the fit, which picks the size');
     assert.match(game, /openMapStreetMenu\(canvas, e, street, \{ here: st\.surfaceStreetTsid === currentStreetTsid \}\);\n[^\n]*\n        mapBgLoader\.preload\(st\.surfaceHubId\);/);
     // The files at the size the Map draws (fitMapCanvas keeps its scale), the map data warmed beside them.
     assert.match(game, /files: \(hubId\) => mapBgFiles\(hubId, \{ dpr: globalThis\.devicePixelRatio, fitScale: mapFitScale, mapIndex: mapIndexCache \}\)/);
@@ -475,8 +475,8 @@ describe('the Subway view\'s paper is fetched ahead too (2026-11-13)', () => {
     const game = read('public/game.js');
     assert.match(game, /function warmSubwayPaper\(\) \{\n  return mapBgLoader\.warm\(subwayPaperFile\(\{ dpr: globalThis\.devicePixelRatio, fitScale: mapFitScale \}\)\);/);
     // After the fit, which picks the size: the region path and the other views.
-    assert.match(game, /fitMapCanvas\(panel\);\n  if \(find\) showFoundStreet\(canvas, find, view\);\n  else if \(focus\) focusMapOn\(canvas, focus\);\n  warmSubwayPaper\(\);\n  warmWorldCharts\(\);\n\}/);
-    assert.match(game, /if \(which === 'world'\) mapBgLoader\.preload\(spot\.hubId\);\n  warmSubwayPaper\(\);\n  warmWorldCharts\(\);\n\}/);
+    assert.match(game, /fitMapCanvas\(panel\);\n  if \(find\) showFoundStreet\(canvas, find, view\);\n  else if \(focus\) focusMapOn\(canvas, focus\);\n  warmSubwayPaper\(\);\n  \/\/ G663: [^\n]*\n  if \(!TOUCH_PHONE\) warmWorldCharts\(\);\n\}/);
+    assert.match(game, /if \(which === 'world'\) mapBgLoader\.preload\(spot\.hubId\);\n  warmSubwayPaper\(\);\n  \/\/ G663: [^\n]*\n  if \(!TOUCH_PHONE\) warmWorldCharts\(\);\n\}/);
     assert.match(game, /closest\?\.\('\[data-map-view="subway"\]'\)\) warmSubwayPaper\(\);/);
     assert.match(game, /bar\.addEventListener\('pointerover', warmOn\);\n    bar\.addEventListener\('focusin', warmOn\);/);
     // The view draws the size this screen takes, and fades the paper in when it was not ready.

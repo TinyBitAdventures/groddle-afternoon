@@ -374,3 +374,13 @@ describe('GO buttons in the colour of the region they lead to (G471)', () => {
     assert.match(style, /\n\.map-go-sub \{[^}]*fill: color-mix\(in srgb, var\(--go-c/);
   });
 });
+
+describe('World charts on phones (G663)', () => {
+  it('a phone does not fetch the Retina charts on every Map open, only when the World view draws them', async () => {
+    const { readFileSync } = await import('node:fs');
+    const game = readFileSync(new URL('../public/game.js', import.meta.url), 'utf8');
+    const calls = game.match(/^\s*(if \(!TOUCH_PHONE\) )?warmWorldCharts\(\);/gm) || [];
+    assert.equal(calls.length, 2);
+    for (const c of calls) assert.match(c, /if \(!TOUCH_PHONE\) warmWorldCharts\(\);/);
+  });
+});

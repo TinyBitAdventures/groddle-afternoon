@@ -2792,9 +2792,19 @@
   "deployed": "2026-11-13"
  },
  "git": {
-  "commits": 2055,
+  "commits": 2058,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-13",
+    "kind": "new",
+    "text": "The Restoration page shows Tiny Speck's World map beside its sharpened Retina copy"
+   },
+   {
+    "date": "2026-11-13",
+    "kind": "improve",
+    "text": "The World map is sharp on Retina screens and phones"
+   },
    {
     "date": "2026-11-13",
     "kind": "fix",
@@ -2904,16 +2914,6 @@
     "date": "2026-11-13",
     "kind": "fix",
     "text": "Enter reaches the food on EZ Cookin's counters and the Knife & Board on its table from the floor beside them"
-   },
-   {
-    "date": "2026-11-13",
-    "kind": "fix",
-    "text": "In EZ Cookin' the front tree no longer hides the food on the first two counters"
-   },
-   {
-    "date": "2026-11-13",
-    "kind": "fix",
-    "text": "The Magic Rock's card shows with the rock and its white glow, not the rock and glow a beat after the card"
    }
   ]
  },
