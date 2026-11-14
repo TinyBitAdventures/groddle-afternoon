@@ -599,7 +599,7 @@
       "encyclopedia/search.json": "c25f422a",
       "landing/card-explore.webp": "7a2c1124",
       "landing/full/card-explore.webp": "cbce4e96",
-      "restoration/gaps.json": "8d070b53",
+      "restoration/gaps.json": "8222e865",
       "restoration/made.json": "ec650338",
       "restoration/shots/interrogation.webp": "4778b1b1",
     },
