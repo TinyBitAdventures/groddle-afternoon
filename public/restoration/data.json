@@ -2788,13 +2788,18 @@
   ]
  },
  "release": {
-  "game": "0.38.1",
+  "game": "0.39.0",
   "deployed": "2026-11-14"
  },
  "git": {
-  "commits": 2111,
+  "commits": 2116,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-14",
+    "kind": "fix",
+    "text": "The Kinsta deploy hands a child page's folder to Minn (restoration/maps)"
+   },
    {
     "date": "2026-11-14",
     "kind": "improve",
@@ -2909,11 +2914,6 @@
     "date": "2026-11-13",
     "kind": "fix",
     "text": "Legalize It's Bureaucratic Hall has its glass doors out to Gregarious Grange"
-   },
-   {
-    "date": "2026-11-13",
-    "kind": "fix",
-    "text": "A meditation cut short by a teleport counts on the street it started on"
    }
   ]
  },
