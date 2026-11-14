@@ -16,8 +16,8 @@
   },
   "counts": {
     "regions": 51,
-    "restored": 4,
-    "painted": 43,
+    "restored": 14,
+    "painted": 33,
     "layout": 4
   },
   "world": {
@@ -140,6 +140,396 @@
       "place": "/encyclopedia/places/andra/"
     },
     {
+      "id": "101",
+      "name": "Aranna",
+      "anchor": "map-aranna",
+      "state": "restored",
+      "caption": "Tiny Speck’s own 2012 painting of Aranna, restored: the 2012 Encyclopedia showed it under the game’s roads, names and buttons, and that picture was given to an image model to take the markings off and sharpen without moving anything, then toned back to the 2012 colour.",
+      "differences": "The cliff bands, the spires, the boulders and the scrub below sit where 2012 had them. The haze over the top edge came back as pale sky. The model returned it greener and more saturated; the toning step brings it back to 2012's colour.",
+      "facts": [
+        {
+          "label": "Made",
+          "text": "13 November 2026, with GPT Image 2.6 Sunburst"
+        },
+        {
+          "label": "Replaced",
+          "text": "The painting made from the thumbnail on 6 November 2026"
+        }
+      ],
+      "before": {
+        "src": "/restoration/maps/replaced/aranna.b4632814.webp",
+        "w": 760,
+        "h": 460,
+        "label": "Before: painted from the thumbnail on 6 November 2026",
+        "src2": "/restoration/maps/replaced/aranna@2x.97f21b1c.webp"
+      },
+      "after": {
+        "src": "/assets/maps/art/bg/aranna.webp",
+        "w": 760,
+        "h": 460,
+        "label": "Restored, in the game now",
+        "src2": "/assets/maps/art/bg/aranna@2x.webp"
+      },
+      "card": {
+        "src": "/assets/maps/art/world/cards/101.svg",
+        "w": 151,
+        "h": 120,
+        "label": "Its card on the World map"
+      },
+      "place": "/encyclopedia/places/aranna/"
+    },
+    {
+      "id": "128",
+      "name": "Balzare",
+      "anchor": "map-balzare",
+      "state": "restored",
+      "caption": "Tiny Speck’s own 2012 painting of Balzare, restored: the 2012 Encyclopedia showed it under the game’s roads, names and buttons, and that picture was given to an image model to take the markings off and sharpen without moving anything, then toned back to the 2012 colour.",
+      "differences": "The coast and the forest's edges hold, with the dark track to the top-right exit and the yellow woods at the right. The 2012 sea of pale paper with dashes came back as grey-blue water ripples. Returned more saturated; the toning step takes most of the green out, back to 2012's dark grey forest.",
+      "facts": [
+        {
+          "label": "Made",
+          "text": "13 November 2026, with GPT Image 2.6 Sunburst"
+        },
+        {
+          "label": "Replaced",
+          "text": "The painting made from the thumbnail on 6 November 2026"
+        }
+      ],
+      "before": {
+        "src": "/restoration/maps/replaced/balzare.56aebfe4.webp",
+        "w": 760,
+        "h": 460,
+        "label": "Before: painted from the thumbnail on 6 November 2026",
+        "src2": "/restoration/maps/replaced/balzare@2x.99cc5fbd.webp"
+      },
+      "after": {
+        "src": "/assets/maps/art/bg/balzare.webp",
+        "w": 760,
+        "h": 460,
+        "label": "Restored, in the game now",
+        "src2": "/assets/maps/art/bg/balzare@2x.webp"
+      },
+      "card": {
+        "src": "/assets/maps/art/world/cards/128.svg",
+        "w": 151,
+        "h": 118,
+        "label": "Its card on the World map"
+      },
+      "place": "/encyclopedia/places/balzare/"
+    },
+    {
+      "id": "86",
+      "name": "Baqala",
+      "anchor": "map-baqala",
+      "state": "restored",
+      "caption": "Tiny Speck’s own 2012 painting of Baqala, restored: the 2012 Encyclopedia showed it under the game’s roads, names and buttons, and that picture was given to an image model to take the markings off and sharpen without moving anything, then toned back to the 2012 colour.",
+      "differences": "Every bush and rock is where 2012 had it; the soft mounds of the plain are a little flatter. The model returned it greener; the toning step brings it back to 2012's colour.",
+      "facts": [
+        {
+          "label": "Made",
+          "text": "14 November 2026, with GPT Image 2.6 Sunburst"
+        },
+        {
+          "label": "Replaced",
+          "text": "The painting made from the thumbnail on 6 November 2026"
+        }
+      ],
+      "before": {
+        "src": "/restoration/maps/replaced/baqala.8c6571c8.webp",
+        "w": 760,
+        "h": 460,
+        "label": "Before: painted from the thumbnail on 6 November 2026",
+        "src2": "/restoration/maps/replaced/baqala@2x.9a30b752.webp"
+      },
+      "after": {
+        "src": "/assets/maps/art/bg/baqala.webp",
+        "w": 760,
+        "h": 460,
+        "label": "Restored, in the game now",
+        "src2": "/assets/maps/art/bg/baqala@2x.webp"
+      },
+      "card": {
+        "src": "/assets/maps/art/world/cards/86.svg",
+        "w": 151,
+        "h": 124,
+        "label": "Its card on the World map"
+      },
+      "place": "/encyclopedia/places/baqala/"
+    },
+    {
+      "id": "98",
+      "name": "Besara",
+      "anchor": "map-besara",
+      "state": "restored",
+      "caption": "Tiny Speck’s own 2012 painting of Besara, restored: the 2012 Encyclopedia showed it under the game’s roads, names and buttons, and that picture was given to an image model to take the markings off and sharpen without moving anything, then toned back to the 2012 colour.",
+      "differences": "The hedges keep their places, but the grass lanes between them (where the 2012 roads ran) came back wider and the hedges a little smaller, so the land reads more open than 2012. The wooden boards at the Habitat and Preserve streets are part of the painting (MapHub drew only shop, shrine and subway icons) and stay. Returned darker and greener; the toning step brings it back.",
+      "facts": [
+        {
+          "label": "Made",
+          "text": "14 November 2026, with GPT Image 2.6 Sunburst"
+        },
+        {
+          "label": "Replaced",
+          "text": "The painting made from the thumbnail on 6 November 2026"
+        }
+      ],
+      "before": {
+        "src": "/restoration/maps/replaced/besara.6942be9e.webp",
+        "w": 760,
+        "h": 460,
+        "label": "Before: painted from the thumbnail on 6 November 2026",
+        "src2": "/restoration/maps/replaced/besara@2x.0ae1bf8f.webp"
+      },
+      "after": {
+        "src": "/assets/maps/art/bg/besara.webp",
+        "w": 760,
+        "h": 460,
+        "label": "Restored, in the game now",
+        "src2": "/assets/maps/art/bg/besara@2x.webp"
+      },
+      "card": {
+        "src": "/assets/maps/art/world/cards/98.svg",
+        "w": 151,
+        "h": 124,
+        "label": "Its card on the World map"
+      },
+      "place": "/encyclopedia/places/besara/"
+    },
+    {
+      "id": "75",
+      "name": "Bortola",
+      "anchor": "map-bortola",
+      "state": "restored",
+      "caption": "Tiny Speck’s own 2012 painting of Bortola, restored: the 2012 Encyclopedia showed it under the game’s roads, names and buttons, and that picture was given to an image model to take the markings off and sharpen without moving anything, then toned back to the 2012 colour.",
+      "differences": "Woods, rock shelf, boulders and trees sit where 2012 had them; the woods' edges are smoother and the open lanes between them a little wider. The wooden boards at the Habitat and Park streets are part of the painting and stay. Returned darker and greener; the toning step brings it back.",
+      "facts": [
+        {
+          "label": "Made",
+          "text": "14 November 2026, with GPT Image 2.6 Sunburst"
+        },
+        {
+          "label": "Replaced",
+          "text": "The painting made from the thumbnail on 6 November 2026"
+        }
+      ],
+      "before": {
+        "src": "/restoration/maps/replaced/bortola.fc83a29b.webp",
+        "w": 760,
+        "h": 460,
+        "label": "Before: painted from the thumbnail on 6 November 2026",
+        "src2": "/restoration/maps/replaced/bortola@2x.8c0d08e2.webp"
+      },
+      "after": {
+        "src": "/assets/maps/art/bg/bortola.webp",
+        "w": 760,
+        "h": 460,
+        "label": "Restored, in the game now",
+        "src2": "/assets/maps/art/bg/bortola@2x.webp"
+      },
+      "card": {
+        "src": "/assets/maps/art/world/cards/75.svg",
+        "w": 151,
+        "h": 119,
+        "label": "Its card on the World map"
+      },
+      "place": "/encyclopedia/places/bortola/"
+    },
+    {
+      "id": "112",
+      "name": "Brillah",
+      "anchor": "map-brillah",
+      "state": "restored",
+      "caption": "Tiny Speck’s own 2012 painting of Brillah, restored: the 2012 Encyclopedia showed it under the game’s roads, names and buttons, and that picture was given to an image model to take the markings off and sharpen without moving anything, then toned back to the 2012 colour.",
+      "differences": "The two plateaus, the cliffs at the left, the trees, rocks and flower patches sit where 2012 had them; the dry sand on the right is a little smoother than 2012's patchy ground. Returned greener; the toning step brings it back.",
+      "facts": [
+        {
+          "label": "Made",
+          "text": "14 November 2026, with GPT Image 2.6 Sunburst"
+        },
+        {
+          "label": "Replaced",
+          "text": "The painting made from the thumbnail on 6 November 2026"
+        }
+      ],
+      "before": {
+        "src": "/restoration/maps/replaced/brillah.f0ab8572.webp",
+        "w": 760,
+        "h": 460,
+        "label": "Before: painted from the thumbnail on 6 November 2026",
+        "src2": "/restoration/maps/replaced/brillah@2x.93eecca9.webp"
+      },
+      "after": {
+        "src": "/assets/maps/art/bg/brillah.webp",
+        "w": 760,
+        "h": 460,
+        "label": "Restored, in the game now",
+        "src2": "/assets/maps/art/bg/brillah@2x.webp"
+      },
+      "card": {
+        "src": "/assets/maps/art/world/cards/112.svg",
+        "w": 151,
+        "h": 121,
+        "label": "Its card on the World map"
+      },
+      "place": "/encyclopedia/places/brillah/"
+    },
+    {
+      "id": "107",
+      "name": "Callopee",
+      "anchor": "map-callopee",
+      "state": "restored",
+      "caption": "Tiny Speck’s own 2012 painting of Callopee, restored: the 2012 Encyclopedia showed it under the game’s roads, names and buttons, and that picture was given to an image model to take the markings off and sharpen without moving anything, then toned back to the 2012 colour.",
+      "differences": "The cave's outline and its chambers hold; the ridge walls between chambers (where the 2012 roads ran) are a little reshaped, and a few grass tufts sit on ledges that 2012 left bare. Close to 2012's colour as delivered; the toning step is small.",
+      "facts": [
+        {
+          "label": "Made",
+          "text": "14 November 2026, with GPT Image 2.6 Sunburst"
+        },
+        {
+          "label": "Replaced",
+          "text": "The painting made from the thumbnail on 6 November 2026"
+        }
+      ],
+      "before": {
+        "src": "/restoration/maps/replaced/callopee.57e72ea3.webp",
+        "w": 760,
+        "h": 460,
+        "label": "Before: painted from the thumbnail on 6 November 2026",
+        "src2": "/restoration/maps/replaced/callopee@2x.a2385600.webp"
+      },
+      "after": {
+        "src": "/assets/maps/art/bg/callopee.webp",
+        "w": 760,
+        "h": 460,
+        "label": "Restored, in the game now",
+        "src2": "/assets/maps/art/bg/callopee@2x.webp"
+      },
+      "card": {
+        "src": "/assets/maps/art/world/cards/107.svg",
+        "w": 52,
+        "h": 39,
+        "label": "Its card on the World map"
+      },
+      "place": "/encyclopedia/places/callopee/"
+    },
+    {
+      "id": "120",
+      "name": "Cauda",
+      "anchor": "map-cauda",
+      "state": "restored",
+      "caption": "Tiny Speck’s own 2012 painting of Cauda, restored: the 2012 Encyclopedia showed it under the game’s roads, names and buttons, and that picture was given to an image model to take the markings off and sharpen without moving anything, then toned back to the 2012 colour.",
+      "differences": "Trees, bushes, flower patches, rocks and the wooden boards at the Preserve, Habitat and Park streets (part of the painting) sit where 2012 had them. Returned greener; the toning step brings it back.",
+      "facts": [
+        {
+          "label": "Made",
+          "text": "14 November 2026, with GPT Image 2.6 Sunburst"
+        },
+        {
+          "label": "Replaced",
+          "text": "The painting made from the thumbnail on 6 November 2026"
+        }
+      ],
+      "before": {
+        "src": "/restoration/maps/replaced/cauda.c2dacf5d.webp",
+        "w": 760,
+        "h": 460,
+        "label": "Before: painted from the thumbnail on 6 November 2026",
+        "src2": "/restoration/maps/replaced/cauda@2x.4a9689a1.webp"
+      },
+      "after": {
+        "src": "/assets/maps/art/bg/cauda.webp",
+        "w": 760,
+        "h": 460,
+        "label": "Restored, in the game now",
+        "src2": "/assets/maps/art/bg/cauda@2x.webp"
+      },
+      "card": {
+        "src": "/assets/maps/art/world/cards/120.svg",
+        "w": 151,
+        "h": 117,
+        "label": "Its card on the World map"
+      },
+      "place": "/encyclopedia/places/cauda/"
+    },
+    {
+      "id": "72",
+      "name": "Chakra Phool",
+      "anchor": "map-chakra-phool",
+      "state": "restored",
+      "caption": "Tiny Speck’s own 2012 painting of Chakra Phool, restored: the 2012 Encyclopedia showed it under the game’s roads, names and buttons, and that picture was given to an image model to take the markings off and sharpen without moving anything, then toned back to the 2012 colour.",
+      "differences": "The island, its coast, ponds and pods hold; the central pit came back a little deeper and smoother, its inner ledges softened, and the dry shrubs at the lower left are fewer. The 2012 sea of pale paper keeps its dashes. Returned darker; the toning step brings it back.",
+      "facts": [
+        {
+          "label": "Made",
+          "text": "14 November 2026, with GPT Image 2.6 Sunburst"
+        },
+        {
+          "label": "Replaced",
+          "text": "The painting made from the thumbnail on 6 November 2026"
+        }
+      ],
+      "before": {
+        "src": "/restoration/maps/replaced/chakraphool.135ad174.webp",
+        "w": 760,
+        "h": 460,
+        "label": "Before: painted from the thumbnail on 6 November 2026",
+        "src2": "/restoration/maps/replaced/chakraphool@2x.b3b5d0d4.webp"
+      },
+      "after": {
+        "src": "/assets/maps/art/bg/chakraphool.webp",
+        "w": 760,
+        "h": 460,
+        "label": "Restored, in the game now",
+        "src2": "/assets/maps/art/bg/chakraphool@2x.webp"
+      },
+      "card": {
+        "src": "/assets/maps/art/world/cards/72.svg",
+        "w": 151,
+        "h": 119,
+        "label": "Its card on the World map"
+      },
+      "place": "/encyclopedia/places/chakra-phool/"
+    },
+    {
+      "id": "90",
+      "name": "Choru",
+      "anchor": "map-choru",
+      "state": "restored",
+      "caption": "Tiny Speck’s own 2012 painting of Choru, restored: the 2012 Encyclopedia showed it under the game’s roads, names and buttons, and that picture was given to an image model to take the markings off and sharpen without moving anything, then toned back to the 2012 colour.",
+      "differences": "Every bush, rock and the pond sit where 2012 had them; the soft hill right of the centre came back as a whorl in the grass. Returned greener; the toning step brings it back.",
+      "facts": [
+        {
+          "label": "Made",
+          "text": "14 November 2026, with GPT Image 2.6 Sunburst"
+        },
+        {
+          "label": "Replaced",
+          "text": "The painting made from the thumbnail on 6 November 2026"
+        }
+      ],
+      "before": {
+        "src": "/restoration/maps/replaced/choru.0c5247ba.webp",
+        "w": 760,
+        "h": 460,
+        "label": "Before: painted from the thumbnail on 6 November 2026",
+        "src2": "/restoration/maps/replaced/choru@2x.00b69f0d.webp"
+      },
+      "after": {
+        "src": "/assets/maps/art/bg/choru.webp",
+        "w": 760,
+        "h": 460,
+        "label": "Restored, in the game now",
+        "src2": "/assets/maps/art/bg/choru@2x.webp"
+      },
+      "card": {
+        "src": "/assets/maps/art/world/cards/90.svg",
+        "w": 151,
+        "h": 121,
+        "label": "Its card on the World map"
+      },
+      "place": "/encyclopedia/places/choru/"
+    },
+    {
       "id": "56",
       "name": "Groddle Forest",
       "anchor": "map-groddle-forest",
@@ -216,346 +606,6 @@
         "label": "Its card on the World map"
       },
       "place": "/encyclopedia/places/groddle-meadow/"
-    },
-    {
-      "id": "101",
-      "name": "Aranna",
-      "anchor": "map-aranna",
-      "state": "painted",
-      "caption": "Tiny Speck’s 760 x 460 painting of Aranna is lost; only its thumbnail on the World map survived. This painting was made from that thumbnail and the region’s street layout, in the style of the decos Tiny Speck painted its streets with.",
-      "differences": "",
-      "facts": [
-        {
-          "label": "Made",
-          "text": "6 November 2026, with GPT Image 2.6 Sunburst"
-        }
-      ],
-      "before": {
-        "src": "/assets/maps/art/thumbs/sm_aranna.jpg",
-        "w": 150,
-        "h": 91,
-        "label": "Tiny Speck’s thumbnail, all that survived (150 x 91)"
-      },
-      "after": {
-        "src": "/assets/maps/art/bg/aranna.webp",
-        "w": 760,
-        "h": 460,
-        "label": "Painted for Groddle, in the game now",
-        "src2": "/assets/maps/art/bg/aranna@2x.webp"
-      },
-      "card": {
-        "src": "/assets/maps/art/world/cards/101.svg",
-        "w": 151,
-        "h": 120,
-        "label": "Its card on the World map"
-      },
-      "place": "/encyclopedia/places/aranna/"
-    },
-    {
-      "id": "128",
-      "name": "Balzare",
-      "anchor": "map-balzare",
-      "state": "painted",
-      "caption": "Tiny Speck’s 760 x 460 painting of Balzare is lost; only its thumbnail on the World map survived. This painting was made from that thumbnail and the region’s street layout, in the style of the decos Tiny Speck painted its streets with.",
-      "differences": "",
-      "facts": [
-        {
-          "label": "Made",
-          "text": "6 November 2026, with GPT Image 2.6 Sunburst"
-        }
-      ],
-      "before": {
-        "src": "/assets/maps/art/thumbs/sm_balzare.jpg",
-        "w": 150,
-        "h": 91,
-        "label": "Tiny Speck’s thumbnail, all that survived (150 x 91)"
-      },
-      "after": {
-        "src": "/assets/maps/art/bg/balzare.webp",
-        "w": 760,
-        "h": 460,
-        "label": "Painted for Groddle, in the game now",
-        "src2": "/assets/maps/art/bg/balzare@2x.webp"
-      },
-      "card": {
-        "src": "/assets/maps/art/world/cards/128.svg",
-        "w": 151,
-        "h": 118,
-        "label": "Its card on the World map"
-      },
-      "place": "/encyclopedia/places/balzare/"
-    },
-    {
-      "id": "86",
-      "name": "Baqala",
-      "anchor": "map-baqala",
-      "state": "painted",
-      "caption": "Tiny Speck’s 760 x 460 painting of Baqala is lost; only its thumbnail on the World map survived. This painting was made from that thumbnail and the region’s street layout, in the style of the decos Tiny Speck painted its streets with.",
-      "differences": "",
-      "facts": [
-        {
-          "label": "Made",
-          "text": "6 November 2026, with GPT Image 2.6 Sunburst"
-        }
-      ],
-      "before": {
-        "src": "/assets/maps/art/thumbs/sm_baqala.jpg",
-        "w": 150,
-        "h": 91,
-        "label": "Tiny Speck’s thumbnail, all that survived (150 x 91)"
-      },
-      "after": {
-        "src": "/assets/maps/art/bg/baqala.webp",
-        "w": 760,
-        "h": 460,
-        "label": "Painted for Groddle, in the game now",
-        "src2": "/assets/maps/art/bg/baqala@2x.webp"
-      },
-      "card": {
-        "src": "/assets/maps/art/world/cards/86.svg",
-        "w": 151,
-        "h": 124,
-        "label": "Its card on the World map"
-      },
-      "place": "/encyclopedia/places/baqala/"
-    },
-    {
-      "id": "98",
-      "name": "Besara",
-      "anchor": "map-besara",
-      "state": "painted",
-      "caption": "Tiny Speck’s 760 x 460 painting of Besara is lost; only its thumbnail on the World map survived. This painting was made from that thumbnail and the region’s street layout, in the style of the decos Tiny Speck painted its streets with.",
-      "differences": "",
-      "facts": [
-        {
-          "label": "Made",
-          "text": "6 November 2026, with GPT Image 2.6 Flare"
-        }
-      ],
-      "before": {
-        "src": "/assets/maps/art/thumbs/sm_besara.jpg",
-        "w": 150,
-        "h": 91,
-        "label": "Tiny Speck’s thumbnail, all that survived (150 x 91)"
-      },
-      "after": {
-        "src": "/assets/maps/art/bg/besara.webp",
-        "w": 760,
-        "h": 460,
-        "label": "Painted for Groddle, in the game now",
-        "src2": "/assets/maps/art/bg/besara@2x.webp"
-      },
-      "card": {
-        "src": "/assets/maps/art/world/cards/98.svg",
-        "w": 151,
-        "h": 124,
-        "label": "Its card on the World map"
-      },
-      "place": "/encyclopedia/places/besara/"
-    },
-    {
-      "id": "75",
-      "name": "Bortola",
-      "anchor": "map-bortola",
-      "state": "painted",
-      "caption": "Tiny Speck’s 760 x 460 painting of Bortola is lost; only its thumbnail on the World map survived. This painting was made from that thumbnail and the region’s street layout, in the style of the decos Tiny Speck painted its streets with.",
-      "differences": "",
-      "facts": [
-        {
-          "label": "Made",
-          "text": "6 November 2026, with GPT Image 2.6 Sunburst"
-        }
-      ],
-      "before": {
-        "src": "/assets/maps/art/thumbs/sm_bortola.jpg",
-        "w": 150,
-        "h": 91,
-        "label": "Tiny Speck’s thumbnail, all that survived (150 x 91)"
-      },
-      "after": {
-        "src": "/assets/maps/art/bg/bortola.webp",
-        "w": 760,
-        "h": 460,
-        "label": "Painted for Groddle, in the game now",
-        "src2": "/assets/maps/art/bg/bortola@2x.webp"
-      },
-      "card": {
-        "src": "/assets/maps/art/world/cards/75.svg",
-        "w": 151,
-        "h": 119,
-        "label": "Its card on the World map"
-      },
-      "place": "/encyclopedia/places/bortola/"
-    },
-    {
-      "id": "112",
-      "name": "Brillah",
-      "anchor": "map-brillah",
-      "state": "painted",
-      "caption": "Tiny Speck’s 760 x 460 painting of Brillah is lost; only its thumbnail on the World map survived. This painting was made from that thumbnail and the region’s street layout, in the style of the decos Tiny Speck painted its streets with.",
-      "differences": "",
-      "facts": [
-        {
-          "label": "Made",
-          "text": "6 November 2026, with GPT Image 2.6 Sunburst"
-        }
-      ],
-      "before": {
-        "src": "/assets/maps/art/thumbs/sm_brillah.jpg",
-        "w": 150,
-        "h": 91,
-        "label": "Tiny Speck’s thumbnail, all that survived (150 x 91)"
-      },
-      "after": {
-        "src": "/assets/maps/art/bg/brillah.webp",
-        "w": 760,
-        "h": 460,
-        "label": "Painted for Groddle, in the game now",
-        "src2": "/assets/maps/art/bg/brillah@2x.webp"
-      },
-      "card": {
-        "src": "/assets/maps/art/world/cards/112.svg",
-        "w": 151,
-        "h": 121,
-        "label": "Its card on the World map"
-      },
-      "place": "/encyclopedia/places/brillah/"
-    },
-    {
-      "id": "107",
-      "name": "Callopee",
-      "anchor": "map-callopee",
-      "state": "painted",
-      "caption": "Tiny Speck’s 760 x 460 painting of Callopee is lost; only its thumbnail on the World map survived. This painting was made from that thumbnail and the region’s street layout, in the style of the decos Tiny Speck painted its streets with.",
-      "differences": "",
-      "facts": [
-        {
-          "label": "Made",
-          "text": "6 November 2026, with GPT Image 2.6 Sunburst"
-        }
-      ],
-      "before": {
-        "src": "/assets/maps/art/thumbs/sm_callopee.jpg",
-        "w": 150,
-        "h": 91,
-        "label": "Tiny Speck’s thumbnail, all that survived (150 x 91)"
-      },
-      "after": {
-        "src": "/assets/maps/art/bg/callopee.webp",
-        "w": 760,
-        "h": 460,
-        "label": "Painted for Groddle, in the game now",
-        "src2": "/assets/maps/art/bg/callopee@2x.webp"
-      },
-      "card": {
-        "src": "/assets/maps/art/world/cards/107.svg",
-        "w": 52,
-        "h": 39,
-        "label": "Its card on the World map"
-      },
-      "place": "/encyclopedia/places/callopee/"
-    },
-    {
-      "id": "120",
-      "name": "Cauda",
-      "anchor": "map-cauda",
-      "state": "painted",
-      "caption": "Tiny Speck’s 760 x 460 painting of Cauda is lost; only its thumbnail on the World map survived. This painting was made from that thumbnail and the region’s street layout, in the style of the decos Tiny Speck painted its streets with.",
-      "differences": "",
-      "facts": [
-        {
-          "label": "Made",
-          "text": "6 November 2026, with GPT Image 2.6 Sunburst"
-        }
-      ],
-      "before": {
-        "src": "/assets/maps/art/thumbs/sm_cauda.jpg",
-        "w": 150,
-        "h": 91,
-        "label": "Tiny Speck’s thumbnail, all that survived (150 x 91)"
-      },
-      "after": {
-        "src": "/assets/maps/art/bg/cauda.webp",
-        "w": 760,
-        "h": 460,
-        "label": "Painted for Groddle, in the game now",
-        "src2": "/assets/maps/art/bg/cauda@2x.webp"
-      },
-      "card": {
-        "src": "/assets/maps/art/world/cards/120.svg",
-        "w": 151,
-        "h": 117,
-        "label": "Its card on the World map"
-      },
-      "place": "/encyclopedia/places/cauda/"
-    },
-    {
-      "id": "72",
-      "name": "Chakra Phool",
-      "anchor": "map-chakra-phool",
-      "state": "painted",
-      "caption": "Tiny Speck’s 760 x 460 painting of Chakra Phool is lost; only its thumbnail on the World map survived. This painting was made from that thumbnail and the region’s street layout, in the style of the decos Tiny Speck painted its streets with.",
-      "differences": "",
-      "facts": [
-        {
-          "label": "Made",
-          "text": "6 November 2026, with GPT Image 2.6 Sunburst"
-        }
-      ],
-      "before": {
-        "src": "/assets/maps/art/thumbs/sm_chakraphool.jpg",
-        "w": 150,
-        "h": 91,
-        "label": "Tiny Speck’s thumbnail, all that survived (150 x 91)"
-      },
-      "after": {
-        "src": "/assets/maps/art/bg/chakraphool.webp",
-        "w": 760,
-        "h": 460,
-        "label": "Painted for Groddle, in the game now",
-        "src2": "/assets/maps/art/bg/chakraphool@2x.webp"
-      },
-      "card": {
-        "src": "/assets/maps/art/world/cards/72.svg",
-        "w": 151,
-        "h": 119,
-        "label": "Its card on the World map"
-      },
-      "place": "/encyclopedia/places/chakra-phool/"
-    },
-    {
-      "id": "90",
-      "name": "Choru",
-      "anchor": "map-choru",
-      "state": "painted",
-      "caption": "Tiny Speck’s 760 x 460 painting of Choru is lost; only its thumbnail on the World map survived. This painting was made from that thumbnail and the region’s street layout, in the style of the decos Tiny Speck painted its streets with.",
-      "differences": "",
-      "facts": [
-        {
-          "label": "Made",
-          "text": "6 November 2026, with GPT Image 2.6 Sunburst"
-        }
-      ],
-      "before": {
-        "src": "/assets/maps/art/thumbs/sm_choru.jpg",
-        "w": 150,
-        "h": 91,
-        "label": "Tiny Speck’s thumbnail, all that survived (150 x 91)"
-      },
-      "after": {
-        "src": "/assets/maps/art/bg/choru.webp",
-        "w": 760,
-        "h": 460,
-        "label": "Painted for Groddle, in the game now",
-        "src2": "/assets/maps/art/bg/choru@2x.webp"
-      },
-      "card": {
-        "src": "/assets/maps/art/world/cards/90.svg",
-        "w": 151,
-        "h": 121,
-        "label": "Its card on the World map"
-      },
-      "place": "/encyclopedia/places/choru/"
     },
     {
       "id": "141",

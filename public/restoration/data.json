@@ -2792,9 +2792,64 @@
   "deployed": "2026-11-14"
  },
  "git": {
-  "commits": 2094,
+  "commits": 2110,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-14",
+    "kind": "new",
+    "text": "Maps joins History and Known gaps under Restoration in the header menu"
+   },
+   {
+    "date": "2026-11-14",
+    "kind": "new",
+    "text": "A Maps page beside the restoration report: every map beside the picture it replaced or was made from"
+   },
+   {
+    "date": "2026-11-14",
+    "kind": "improve",
+    "text": "The Make window links the skill a recipe needs to that skill"
+   },
+   {
+    "date": "2026-11-14",
+    "kind": "fix",
+    "text": "A cabinet's storage window fits a small phone without a sideways scroll"
+   },
+   {
+    "date": "2026-11-14",
+    "kind": "improve",
+    "text": "The Make window links the achievement a recipe needs to its badge"
+   },
+   {
+    "date": "2026-11-14",
+    "kind": "fix",
+    "text": "An Autumn Day plays its own sad music, looped, with the hub music silent"
+   },
+   {
+    "date": "2026-11-14",
+    "kind": "fix",
+    "text": "Kajuu, Karnata, Lida and Cauda shrines stand where the 2012 street pictures show them"
+   },
+   {
+    "date": "2026-11-14",
+    "kind": "fix",
+    "text": "Ormonos, Muufo, Haraiva, Massadoe and Pollokoo shrines stand where the 2012 street pictures show them"
+   },
+   {
+    "date": "2026-11-14",
+    "kind": "fix",
+    "text": "Drifa's and Nottis's shrines stand where the 2012 street pictures show them"
+   },
+   {
+    "date": "2026-11-14",
+    "kind": "fix",
+    "text": "The Ilmenskie and Ix shrines stand where the 2012 street pictures show them"
+   },
+   {
+    "date": "2026-11-14",
+    "kind": "fix",
+    "text": "Jethimadh's and Kalavana's shrines stand where the 2012 street pictures show them"
+   },
    {
     "date": "2026-11-14",
     "kind": "fix",
@@ -2859,64 +2914,9 @@
     "date": "2026-11-13",
     "kind": "improve",
     "text": "Alakol, Groddle Forest and Andra's maps are Tiny Speck's 2012 paintings, restored and matched to 2012's colour"
-   },
-   {
-    "date": "2026-11-13",
-    "kind": "improve",
-    "text": "Groddle Meadow's restored map wears the 2012 painting's colour"
-   },
-   {
-    "date": "2026-11-13",
-    "kind": "fix",
-    "text": "World map hover cards are sharp at the size the map draws them, and a changed card is never served stale"
-   },
-   {
-    "date": "2026-11-13",
-    "kind": "improve",
-    "text": "Groddle Meadow's map is Tiny Speck's 2012 painting, restored, and its World map card shows it"
-   },
-   {
-    "date": "2026-11-13",
-    "kind": "fix",
-    "text": "A butterfly massage or milk that misses says Glitch's own line"
-   },
-   {
-    "date": "2026-11-13",
-    "kind": "fix",
-    "text": "A refused Butterfly milk says why in a readable notice, not one huge line across the screen"
-   },
-   {
-    "date": "2026-11-13",
-    "kind": "improve",
-    "text": "A shaped rock draws from the one copy of its sheet instead of loading a second"
-   },
-   {
-    "date": "2026-11-13",
-    "kind": "fix",
-    "text": "Digging a Dirt Pile and cutting Peat sound while you work, with no extra sound at the end"
-   },
-   {
-    "date": "2026-11-13",
-    "kind": "fix",
-    "text": "Scraping a barnacle sounds while you scrape, not after"
-   },
-   {
-    "date": "2026-11-13",
-    "kind": "fix",
-    "text": "All three lines over a picked-up Musicblock stay long enough to read"
-   },
-   {
-    "date": "2026-11-13",
-    "kind": "fix",
-    "text": "A Storage Display Box shows its item in its own shape, so a Wine of the Dead is a bottle again"
-   },
-   {
-    "date": "2026-11-13",
-    "kind": "fix",
-    "text": "Mr. Block's conversation card sits beside or above him instead of in the middle of the screen"
    }
   ]
  },
- "tests": 977,
+ "tests": 979,
  "generatedAt": "2026-11-14"
 }
