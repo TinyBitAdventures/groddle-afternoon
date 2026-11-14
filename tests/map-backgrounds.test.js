@@ -63,7 +63,8 @@ describe('region map backgrounds (tools/map-backgrounds/build.mjs)', () => {
         const buf = readFileSync(p);
         assert.deepEqual(webpSize(buf), size, rel);
         // A repaint has real detail: it may weigh more, still well under a street's art.
-        const cap = bg.repainted ? 256 * 1024 : 120 * 1024;
+        // One restored from Tiny Speck's 2012 picture (method 'restored') keeps the original's full grain and weighs more again.
+        const cap = /^restored/.test(REPAINTS.regions[id]?.method || '') ? 384 * 1024 : bg.repainted ? 256 * 1024 : 120 * 1024;
         assert.ok(buf.length < cap, `${rel} stays light (${buf.length} bytes)`);
       }
     }
@@ -137,8 +138,14 @@ describe('region map backgrounds (tools/map-backgrounds/build.mjs)', () => {
       }
       // Its own thumbnail is the first input, byte for byte; with none, the street layout from its map data.
       if (noThumb) assert.match(`${r.inputs[0].what} ${r.inputs[0].source}`, new RegExp(`streets[\\s\\S]*hub-${id}\\.json`), `${name}: input 1 is its street layout`);
-      else assert.equal(r.inputs[0].sha256, MANIFEST.regions[id].sha256, `${name}: input 1 is its thumbnail`);
-      assert.match(r.source.toning, /^magick /, `${name}: the toning step`);
+      // One restored from 2012 takes Tiny Speck's own 2012 Encyclopedia picture of it instead (regions-restore pack).
+      else if (/^restored/.test(r.method || '')) {
+        assert.match(r.inputs[0].source, /c1\.glitch\.bz\/img\/maps_encyclopedia\/[a-z_]+_\d+\.jpg/, `${name}: input 1 is its 2012 picture`);
+        assert.ok(r.replaces?.x2?.sha256 && r.replaces.made, `${name}: names the painting it replaces`);
+      } else assert.equal(r.inputs[0].sha256, MANIFEST.regions[id].sha256, `${name}: input 1 is its thumbnail`);
+      // A restore is kept as delivered: its record says how it was cropped and aligned instead of a toning step.
+      if (/^restored/.test(r.method || '')) assert.match(r.source.crop, /Lanczos to 1520 x 920/, `${name}: the crop`);
+      else assert.match(r.source.toning, /^magick /, `${name}: the toning step`);
       // Player captures and footage are named as reference only, never as inputs.
       for (const i of r.inputs) assert.doesNotMatch(`${i.what} ${i.source}`, /wiki|footage|youtube|video|capture/i, `${name}: input ${i.n}`);
       for (const ref of r.references || []) assert.match(ref, /reference only/, name);

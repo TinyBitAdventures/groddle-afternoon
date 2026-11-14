@@ -38,14 +38,14 @@
     {
       "id": "map:58",
       "name": "Groddle Meadow map",
-      "caption": "The painted background of the Groddle Meadow region map. Tiny Speck's full-size map paintings are lost; only a tiny {w} by {h} pixel thumbnail of each survived, so each region's painting was made again from its own thumbnail.",
+      "caption": "The painted background of the Groddle Meadow region map. Tiny Speck's full-size map paintings are lost as files, but the 2012 Encyclopedia drew this one at full size under the game's roads and street names. That picture was restored: the markings taken off and the painting sharpened, with everything else left where Tiny Speck put it.",
       "display": {
         "w": 304,
         "h": 184
       },
       "image": {
-        "label": "Painted again for Groddle",
-        "alt": "A painted top-down view of Groddle Meadow: green fields, small round trees, paths and a stream, in soft olive tones."
+        "label": "Restored from 2012",
+        "alt": "A painted top-down view of Groddle Meadow: rolling green fields, small trees and bushes, a flower patch and rocks, a cliff along the top edge and a forest at the right."
       },
       "original": {
         "file": "public/assets/maps/art/thumbs/sm_groddlemeadow.jpg",
@@ -57,11 +57,11 @@
       "facts": [
         {
           "label": "How it was made",
-          "text": "Painted by an image model ({tool}) under Austin's direction, from the region's own thumbnail, then toned toward the colours of the 2012 original."
+          "text": "Restored by an image model ({tool}) under Austin's direction, from the 2012 Encyclopedia's picture of this map: asked to remove only the roads, names, icons and GO buttons and sharpen, without moving anything."
         },
         {
           "label": "How it was chosen",
-          "text": "Austin picked the closest of several tries. The same was done for every region whose painting was lost: {regions} in all."
+          "text": "Austin compared it with the 2012 picture and with the painting made earlier from the thumbnail, and chose the restore. The other regions' paintings were made from their thumbnails ({regions} in all); they are next."
         },
         {
           "label": "In the game",

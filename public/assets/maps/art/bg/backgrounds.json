@@ -142,10 +142,10 @@
       "x1": "assets/maps/art/bg/groddlemeadow.webp",
       "x2": "assets/maps/art/bg/groddlemeadow@2x.webp",
       "repainted": "tools/provenance/repainted-maps.json",
-      "x1Bytes": 43070,
-      "x1Sha256": "82c60c310845f3a98d41205b5bc9cee38eaeef2fc219d9d6c4302ba2874da3b7",
-      "x2Bytes": 159456,
-      "x2Sha256": "4808cae82f780c6705d7d675f6d7dcd3c2e833c31e53b1fb69b7ef6178623b7a"
+      "x1Bytes": 103922,
+      "x1Sha256": "70a4f50b65f845111e5420aead18bef3431a7f69fe6f39164c2df925bbf0ee34",
+      "x2Bytes": 349364,
+      "x2Sha256": "cffb17c70ce8743c41541599afbcf5797a27639682892708019ebaf222740bed"
     },
     "63": {
       "hubName": "Shimla Mirch",

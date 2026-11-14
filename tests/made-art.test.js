@@ -58,8 +58,9 @@ describe('Made for Groddle data (tools/made-art/build-data.mjs)', () => {
     assert.ok(!made.pieces.some((p) => p.id.startsWith('npc_fire_dragon')), 'the Fire Dragon experiment is not on the page');
     const dates = made.pieces.map((p) => p.made);
     assert.deepEqual(dates, [...dates].sort().reverse());
-    // 2026-11-13 leads in the curated order: EZ Cookin's props, its room, the subway paper, the World map at 2x; then the quest book (2026-11-12).
-    assert.deepEqual(made.pieces.map((p) => p.id), ['decos:ezc', 'decos:ezc:room', 'subway:paper', 'world:2x', 'quest_book_award', 'map:58', 'maps:27,107,131']);
+    // 2026-11-13 leads in the curated order: the Groddle Meadow map restored from 2012, EZ Cookin's props, its room, the subway paper, the World
+    // map at 2x; then the quest book (2026-11-12).
+    assert.deepEqual(made.pieces.map((p) => p.id), ['map:58', 'decos:ezc', 'decos:ezc:room', 'subway:paper', 'world:2x', 'quest_book_award', 'maps:27,107,131']);
     const book = made.pieces.find((p) => p.id === 'quest_book_award');
     assert.equal(book.madeLabel, '12 November 2026');
     assert.deepEqual([book.original.src, book.original.w, book.original.h, book.original.pixelated], ['/assets/ui/quest-book.webp', 86, 58, true]);
@@ -71,7 +72,8 @@ describe('Made for Groddle data (tools/made-art/build-data.mjs)', () => {
     const map = made.pieces.find((p) => p.id === 'map:58');
     assert.deepEqual([map.original.src, map.original.w, map.original.h, map.original.pixelated], ['/assets/maps/art/thumbs/sm_groddlemeadow.jpg', 150, 91, true]);
     assert.equal(map.image.src, '/assets/maps/art/bg/groddlemeadow@2x.webp');
-    assert.match(map.caption, /150 by 91 pixel thumbnail/);
+    // Groddle Meadow was restored from the 2012 Encyclopedia's picture (2026-11-13); the thumbnail stays beside it.
+    assert.match(map.caption, /2012 Encyclopedia/);
     for (const p of made.pieces) {
       assert.match(p.facts.at(-1).text, /CC0 1\.0/, `${p.id} says its licence`);
       const tool = /^(maps?|subway|world|decos):/.test(p.id) ? 'GPT Image 2.6 Sunburst' : provenance.sprites[p.id].tool;

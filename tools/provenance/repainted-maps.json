@@ -386,73 +386,117 @@
         "file": "assets/maps/art/bg/groddlemeadow.webp",
         "w": 760,
         "h": 460,
-        "bytes": 43070,
-        "sha256": "82c60c310845f3a98d41205b5bc9cee38eaeef2fc219d9d6c4302ba2874da3b7"
+        "bytes": 103922,
+        "sha256": "70a4f50b65f845111e5420aead18bef3431a7f69fe6f39164c2df925bbf0ee34"
       },
       "x2": {
         "file": "assets/maps/art/bg/groddlemeadow@2x.webp",
         "w": 1520,
         "h": 920,
-        "bytes": 159456,
-        "sha256": "4808cae82f780c6705d7d675f6d7dcd3c2e833c31e53b1fb69b7ef6178623b7a"
+        "bytes": 349364,
+        "sha256": "cffb17c70ce8743c41541599afbcf5797a27639682892708019ebaf222740bed"
       },
       "licence": "ai-generated",
       "author": "Austin Ginder (directed and chose it)",
+      "madeBy": "Grok Bot, for Austin Ginder, who directed it",
       "tool": "GPT Image 2.6 Sunburst in T3 Chat canvas (t3.chat/canvas)",
       "model": "GPT Image 2.6 Sunburst",
-      "made": "2026-11-07",
+      "made": "2026-11-13",
+      "method": "restored: Tiny Speck's own 2012 painting, as the 2012 Encyclopedia drew it under the game's roads, names, icons and GO buttons, given to the model to take the markings off and sharpen without moving anything (research/map-art/regions-restore, the region pilot). Unlike the paintings made from thumbnails, the 2012 picture is the model's input here.",
       "chosen": {
         "by": "Austin Ginder",
-        "on": "2026-11-07",
-        "of": "the second of 3 redo generations (the first was GPT Image 2.6 Flare, the other two Sunburst), toned toward the 2012 original; it replaces the painting of 2026-11-06, which was greyer and smoother than the original"
+        "on": "2026-11-13",
+        "of": "1 generation, kept as made (colour as delivered); it replaces the painting of 2026-11-07, made from the thumbnail"
       },
-      "prompt": "Paint ONE image: the background painting for an in-game region map of \"Groddle Meadow\", a region in a whimsical 2D browser game. Size 1520 x 920 pixels (landscape, exactly this ratio; if only fixed ratios are offered, use 16:10). This is the painted landscape that sits UNDER the game's map interface. The game draws its own street lines, names, buttons and markers on top later, so the painting must contain none of them.\n\nVIEW AND FEEL\nSeen from directly above, like a painted map: not from a side or three-quarter angle. Trees read as small round canopies or small pointed tops with a soft shadow; no trunks showing. Hills, cliffs and slopes read by their light and shadow. Like a hand-painted miniature diorama, quiet and gentle: soft natural colours, soft shadows, a fine even texture over the ground (like felt or fine brush strokes), and only a little scattered detail. Fewer and smaller features is better than more: most of the land is calm open ground, so thin street lines and small labels drawn on top stay easy to read. Storybook, never grim, never photographic, never neon.\n\nCOLOUR AND TEXTURE\nFresh and sunny, like the original hand-painted maps this replaces: grass is a bright, slightly yellow spring green (never grey-olive or dull khaki), sand a warm pale yellow, rock warm browns and soft creams. Every patch of ground carries a visible fine felt-like texture of tiny brush strokes, so it looks handmade and soft, never photographic or smooth.\n\nWHAT TO PAINT\nOne island of meadow. Its shape must follow attachment 02 closely (same outline, same position, same proportions), because the game's streets are fixed to those positions (attachment 03).\n- The sea and margins: pale parchment white with faint grey wavy hatching, like calm water drawn on paper. It fills the left part of the picture, the top-left corner and a thin strip along the bottom edge.\n- The coast edge: a raised rim like the cut edge of a diorama tile: a thin cream and sandy lip on top and, under it, a band of warm reddish-brown earth showing its layers, clearest along the bottom shore, with a soft shadow below.\n- The ground: a bright, fresh yellow-green meadow with a fine felt texture, a few faint lighter streaks running from top to bottom, and gentle undulations. Calm and open.\n- Trees: small and scattered singly: round dark-green bushes and small pointed conifers with soft shadows, a few more in the upper half, and one dense grove of round bushy trees at the lower left by the coast.\n- Rocks: two or three reddish-pink boulders just right of the centre, and a few small grey stones near the top.\n- Flowers: one small patch of pink, white and pale blue blossom just left of the centre, with a few tiny pale flowers around it.\n- Top-right corner: brown rocky cliffs rising beyond the top edge, and a small brown ledge on the right edge near the top.\n- Right edge: a strip of dense, darker conifer forest down the lower right.\n- Light: soft warm daylight from the upper left; gentle shadows falling to the lower right.\n\nSTYLE\nMatch attachment 04: Tiny Speck's own painted plants and scenery for this region (soft painterly shapes, gentle shading, no hard black outlines), but much smaller and simpler, as seen on a map from high above.\n\nDO NOT INCLUDE\nNo text, letters, numbers or labels of any kind. No roads, paths, lines, grids or street markings. No circles, buttons, pins, arrows, icons, stars or \"you are here\" markers. No compass, legend, scale bar, border, frame, title or vignette. No people or characters. No UI of any kind.\n\nATTACHMENTS\n01  the original 150 x 91 thumbnail of this region's painting (Tiny Speck, public domain). The colours and the layout to follow.\n02  that thumbnail enlarged to 1520 x 920 with no extra detail. Follow its shapes closely: coastlines, cliffs, water, forest and open ground in the same places and proportions; repaint everything with real detail.\n03  where the game will draw the streets (dark lines) and region exits (yellow circles), at the same 1520 x 920 scale. For placement only: do NOT paint these lines or circles.\n04  Tiny Speck's own painted trees, plants and scenery from this region's streets (public domain). The style and palette to match, drawn smaller and simpler.\n\nReturn the single painted landscape image only.\n",
-      "promptNote": "The prompt exactly as given to the model: research/zone-art/map-groddle-meadow/redo-2026-11-07/prompt.txt, pasted with attach/01-04 in order (drop/model.txt). The redo adds a COLOUR AND TEXTURE section and rewrites WHAT TO PAINT from the 2012 footage frame; the old input 4 (our map window) was left out so the current painting would not pull the model back toward it.",
+      "prompt": "This is a restoration job, not an illustration job. The attachment is a 2012 game map: an original hand-painted landscape with game markings drawn on top of it. Give me back the same painting with every game marking removed, and sharper. Do not move or redraw anything else.\n\nRemove completely, and paint in what lies underneath so it matches the painting around it:\n- the pale yellow-white road lines and ribbons that join the places, and their joints;\n- every street name and every word, including \"To: ...\" labels;\n- the small grey sign and house icons along the roads;\n- the round \"GO\" buttons and the small round blue-and-red station badge.\nWhere a marking covered something, continue the grass, rock, sand, water, trees or cliffs that surround it, in the same style. Do not add anything new where a marking was: no new trees, rocks, buildings or paths.\n\nThe attachment is already the exact size and shape I want back (16:9). The painting fills the middle; the two flat bands at the left and right edges are padding: leave them flat, the same colour, and do not extend the painting into them. Do not stretch, scale, crop, shift or re-frame anything.\n\nEverything that is part of the painting must come back at exactly the same position, size, angle and shape, so that the result laid over the attachment matches line for line: every coastline, cliff edge, river, field edge, tree, bush, rock, cloud, building and shadow. Keep the colours, the lighting and the overall brightness exactly as they are; do not make it more saturated, darker or more contrasty.\n\nMake it crisper than a plain enlargement: remove the JPEG blocks and blur, make the existing edges crisp, and bring out the brushwork and texture already there. If you are unsure whether something is part of the painting or a marking, keep it.\n\nNo text of your own, no lines, no border, no frame, no watermark.",
+      "promptNote": "The prompt exactly as given to the model: research/map-art/regions-restore/prompt.txt (outside git), with input 1 alone (drop/model.txt).",
       "inputs": [
         {
           "n": 1,
-          "file": "01-thumbnail-150x91.jpg",
-          "sha256": "80cdaa4ced1ed76175bc3817648e998310d2eed02ff6497a8405fc3bc30f2a65",
-          "what": "the region’s own 150 x 91 thumbnail of the lost painting",
-          "source": "Tiny Speck, CC0: glitch-overlays/world_map.fla LIBRARY/z_hub_maps_small/sm_groddlemeadow.jpg (byte for byte public/assets/maps/art/thumbs/sm_groddlemeadow.jpg)"
-        },
-        {
-          "n": 2,
-          "file": "02-thumbnail-enlarged-1520x920.png",
-          "sha256": "c0ad907e2d0b2e154356f53065828d96ae9dbd81f7d95a621a06f835ece9f39b",
-          "what": "input 1 enlarged to 1520 x 920 (Lanczos), nothing added: the coastline and colour guide",
-          "source": "made from input 1, CC0"
-        },
-        {
-          "n": 3,
-          "file": "03-street-layout-1520x920.png",
-          "sha256": "36caec5ece709c71bebe4edc817b35552ff3968221cf9c373009f2bef94812dc",
-          "what": "where the map draws the 40 visible streets (dark lines) and 4 exits (yellow circles), at 2x",
-          "source": "drawn from Tiny Speck’s CC0 map data (public/assets/maps/hubs/hub-58.json, from GSJS inc_data_maps_prod.js)"
-        },
-        {
-          "n": 4,
-          "file": "04-style-cc0-groddle-decos.png",
-          "sha256": "92ac514e6ddf0ee1a4a27eabe3de67f33ebf45831a9f45fb1eb93be4a10402d6",
-          "what": "a sheet of 18 decos Tiny Speck painted this region’s streets with (the most used trees, bushes, flowers and hills): the style and palette",
-          "source": "Tiny Speck decos, CC0"
+          "file": "01-groddle-meadow-2012-2x-on-16x9-1636x920.jpg",
+          "sha256": "997dee1c96291b6187feb0afe9fa3b683d4f9d415b2dbdcd2a402130a4d84f85",
+          "what": "Tiny Speck's 2012 Encyclopedia map of Groddle Meadow (760 x 460: the painting with the game's roads, street names, icons, GO buttons and station badge), enlarged to 1520 x 920 (Lanczos) and centred on a 1636 x 920 canvas with flat side bands of its edge colour, so the 16:9 canvas does not stretch it",
+          "source": "Tiny Speck: c1.glitch.bz/img/maps_encyclopedia/groddle_meadow_77122.jpg (2012), saved from the Wayback Machine (research/wayback/raw/c1-img/maps_encyclopedia, outside git; sha256 b66452c7133c264509b56f98dc9583712f728d0544ba6891da9e481f632ef487)"
         }
       ],
       "references": [
-        "A player’s capture of the original Groddle Meadow map window (Glitch Strategy wiki): reference only, never given to the model and never in the repo",
-        "A frame of the original painting from the 2012 video \"tour: The Map of Ur\" (YouTube bXxXB6GUoMU at 95.7 s): reference only, never given to the model and never in the repo; the prompt describes its composition in words",
-        "A comparison sheet of the 2012 paintings (from footage) beside the earlier repaints (research/zone-art/map-groddle-meadow/redo-2026-11-07/reference-only/): reference only, never given to the model and never in the repo"
+        "The painting of 2026-11-07 it replaces (made from the thumbnail; its record is under replaces): reference only, used to compare, never given to the model"
       ],
       "source": {
-        "generated": "2048 x 1152 (16:9, High 2K; no 16:10 option), centre-cropped to 1520 x 920: redo-2026-11-07/drop/groddle-meadow-redo2-2.png",
-        "dropSha256": "4e52082af3ba6fc52f4f5697486aba24b23732bcc25ece6060f956a7e3e88849",
-        "toning": "magick groddle-meadow-redo2-2.png -modulate 92,62,96 master.png (toward the 2012 original’s olive felt; Austin approved this one step for all three redos, 2026-11-07)",
-        "masterSha256": "1f9bd9772dc07392d8dfe668cc5f5d3a207e55c6afe68d0f47bba7ffeaea2226",
+        "generated": "2048 x 1152 (16:9, High 2K, opaque, 1 image): research/map-art/drop/regions/01-groddle-meadow-restored-raw.png",
+        "dropSha256": "35928f303d0fc96eb44c02a91baf15b67f45bf103fbc409aa79886e48bf66df4",
+        "crop": "the side bands cut off (raw x 72.606 to 1975.394), Lanczos to 1520 x 920, shifted 1 px left and 0.5 px up onto the 2012 picture's lines (measured drift after: within 1 px at 2x in 11 of 12 tiles of a 4 x 3 grid, 3 px in the last); no toning",
+        "masterSha256": "35e6e6f55e3dc4a993fb1a173247387eb618acdbc31a34cd59589987c2414e67",
         "encode": {
           "x1": "magick master.png -filter Lanczos -resize 760x460! -quality 82 -define webp:method=6 groddlemeadow.webp",
           "x2": "magick master.png -quality 82 -define webp:method=6 groddlemeadow@2x.webp"
         },
-        "pack": "research/zone-art/map-groddle-meadow/redo-2026-11-07 (outside git): pack.md, prompt.txt, attach/, drop/ (model.txt), reference-only/; the first painting’s pack is one folder up"
+        "pack": "research/map-art/regions-restore (outside git): readme.md, prompt.txt, attach/, order.txt"
+      },
+      "differences": "The 2012 sea of pale paper with dashes came back as blue water ripples; the land is greener and darker than 2012, with less of its yellow-grey haze; small trees that sat half under labels came back whole.",
+      "replaces": {
+        "made": "2026-11-07",
+        "x1": {
+          "file": "assets/maps/art/bg/groddlemeadow.webp",
+          "w": 760,
+          "h": 460,
+          "bytes": 43070,
+          "sha256": "82c60c310845f3a98d41205b5bc9cee38eaeef2fc219d9d6c4302ba2874da3b7"
+        },
+        "x2": {
+          "file": "assets/maps/art/bg/groddlemeadow@2x.webp",
+          "w": 1520,
+          "h": 920,
+          "bytes": 159456,
+          "sha256": "4808cae82f780c6705d7d675f6d7dcd3c2e833c31e53b1fb69b7ef6178623b7a"
+        },
+        "chosen": {
+          "by": "Austin Ginder",
+          "on": "2026-11-07",
+          "of": "the second of 3 redo generations (the first was GPT Image 2.6 Flare, the other two Sunburst), toned toward the 2012 original; it replaces the painting of 2026-11-06, which was greyer and smoother than the original"
+        },
+        "source": {
+          "generated": "2048 x 1152 (16:9, High 2K; no 16:10 option), centre-cropped to 1520 x 920: redo-2026-11-07/drop/groddle-meadow-redo2-2.png",
+          "dropSha256": "4e52082af3ba6fc52f4f5697486aba24b23732bcc25ece6060f956a7e3e88849",
+          "toning": "magick groddle-meadow-redo2-2.png -modulate 92,62,96 master.png (toward the 2012 original’s olive felt; Austin approved this one step for all three redos, 2026-11-07)",
+          "masterSha256": "1f9bd9772dc07392d8dfe668cc5f5d3a207e55c6afe68d0f47bba7ffeaea2226",
+          "encode": {
+            "x1": "magick master.png -filter Lanczos -resize 760x460! -quality 82 -define webp:method=6 groddlemeadow.webp",
+            "x2": "magick master.png -quality 82 -define webp:method=6 groddlemeadow@2x.webp"
+          },
+          "pack": "research/zone-art/map-groddle-meadow/redo-2026-11-07 (outside git): pack.md, prompt.txt, attach/, drop/ (model.txt), reference-only/; the first painting’s pack is one folder up"
+        },
+        "promptNote": "The prompt exactly as given to the model: research/zone-art/map-groddle-meadow/redo-2026-11-07/prompt.txt, pasted with attach/01-04 in order (drop/model.txt). The redo adds a COLOUR AND TEXTURE section and rewrites WHAT TO PAINT from the 2012 footage frame; the old input 4 (our map window) was left out so the current painting would not pull the model back toward it.",
+        "inputs": [
+          {
+            "n": 1,
+            "file": "01-thumbnail-150x91.jpg",
+            "sha256": "80cdaa4ced1ed76175bc3817648e998310d2eed02ff6497a8405fc3bc30f2a65",
+            "what": "the region’s own 150 x 91 thumbnail of the lost painting",
+            "source": "Tiny Speck, CC0: glitch-overlays/world_map.fla LIBRARY/z_hub_maps_small/sm_groddlemeadow.jpg (byte for byte public/assets/maps/art/thumbs/sm_groddlemeadow.jpg)"
+          },
+          {
+            "n": 2,
+            "file": "02-thumbnail-enlarged-1520x920.png",
+            "sha256": "c0ad907e2d0b2e154356f53065828d96ae9dbd81f7d95a621a06f835ece9f39b",
+            "what": "input 1 enlarged to 1520 x 920 (Lanczos), nothing added: the coastline and colour guide",
+            "source": "made from input 1, CC0"
+          },
+          {
+            "n": 3,
+            "file": "03-street-layout-1520x920.png",
+            "sha256": "36caec5ece709c71bebe4edc817b35552ff3968221cf9c373009f2bef94812dc",
+            "what": "where the map draws the 40 visible streets (dark lines) and 4 exits (yellow circles), at 2x",
+            "source": "drawn from Tiny Speck’s CC0 map data (public/assets/maps/hubs/hub-58.json, from GSJS inc_data_maps_prod.js)"
+          },
+          {
+            "n": 4,
+            "file": "04-style-cc0-groddle-decos.png",
+            "sha256": "92ac514e6ddf0ee1a4a27eabe3de67f33ebf45831a9f45fb1eb93be4a10402d6",
+            "what": "a sheet of 18 decos Tiny Speck painted this region’s streets with (the most used trees, bushes, flowers and hills): the style and palette",
+            "source": "Tiny Speck decos, CC0"
+          }
+        ]
       }
     },
     "63": {
