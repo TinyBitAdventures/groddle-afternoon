@@ -970,6 +970,103 @@
       ]
     },
     {
+      "id": "F86",
+      "area": "Quests",
+      "show": "fixing",
+      "text": "Legalize It's Bureaucratic Hall had no way out: its glass doors were missing.",
+      "commits": [
+        "game:949994b9bd"
+      ]
+    },
+    {
+      "id": "F87",
+      "area": "Vendors",
+      "show": "fixing",
+      "text": "A vendor could buy the units your Magic Rock held for a full pack, along with the stack in your pack.",
+      "report": 317,
+      "commits": [
+        "game:b12ea96701"
+      ]
+    },
+    {
+      "id": "F88",
+      "area": "Streets",
+      "show": "fixing",
+      "text": "A meditation cut short by a teleport did not count on the street it started on.",
+      "report": 316,
+      "commits": [
+        "game:17e5f7e0b3"
+      ]
+    },
+    {
+      "id": "F89",
+      "area": "Streets",
+      "show": "fixing",
+      "text": "The Louise Pasture Villa's door stood alone in an open field, with no house around it.",
+      "commits": [
+        "game:73d6d75c12"
+      ]
+    },
+    {
+      "id": "F90",
+      "area": "Streets",
+      "show": "fixing",
+      "text": "Groddle Meadow's shrines stood far from where Tiny Speck's 2012 street pictures show them.",
+      "commits": [
+        "game:e64b6cf0e3"
+      ]
+    },
+    {
+      "id": "F91",
+      "area": "Quests",
+      "show": "fixing",
+      "text": "In Radiant Glare, the top bank of bulbs refused clicks from the disc, though the room said clicking works from anywhere.",
+      "report": 318,
+      "commits": [
+        "game:78e56c2fbc"
+      ]
+    },
+    {
+      "id": "F92",
+      "area": "Streets",
+      "show": "fixing",
+      "text": "A shrine, tree, vendor or animal could stand on top of a Peat Bog, Jellisac or Barnacle.",
+      "report": 319,
+      "commits": [
+        "game:dd487620c2"
+      ]
+    },
+    {
+      "id": "F93",
+      "area": "Gardens",
+      "show": "fixing",
+      "text": "Joining a street with a felled tree drew its Patch twice.",
+      "report": 321,
+      "commits": [
+        "game:94900cf9d4"
+      ]
+    },
+    {
+      "id": "F94",
+      "area": "Quests",
+      "show": "fixing",
+      "text": "With a bag open, a quest's award waited, so Gwendolyn's Task never offered its second part.",
+      "report": 322,
+      "commits": [
+        "game:aaf2e82099"
+      ]
+    },
+    {
+      "id": "F95",
+      "area": "Animals",
+      "show": "fixing",
+      "text": "A Swoonerfly lying on the ground showed no name, so it looked like a dying butterfly.",
+      "report": 320,
+      "commits": [
+        "game:538474fa1f"
+      ]
+    },
+    {
       "id": "G665",
       "area": "Accounts and saving",
       "text": "A bug report says Read by the team once an administrator has opened it."
