@@ -13,8 +13,10 @@ import { assertStreetGeometry, platformYAt } from '../public/js/street-model.js?
 import { arrivalInTarget } from '../public/js/location-navigation.js?v=90fca5cc';
 import { checkDoorEntry, doorAt, doorDestination } from '../public/js/doors.js?v=727d0e0b';
 import {
+  HOUSE_GROUND_ART,
   LOUISE_PASTURE_DOOR,
   LOUISE_PASTURE_ENTRY,
+  LOUISE_PASTURE_HOUSE,
   LOUISE_PASTURE_SIGN_ID,
   LOUISE_PASTURE_TSID,
   LOUISE_VILLA_ARRIVE,
@@ -26,12 +28,13 @@ import {
   LOUISE_VILLA_TEMPLATE_TSID,
   LOUISE_VILLA_TSID,
   isLouiseVillaTsid,
+  louisePastureHouseSpan,
   louiseVillaEcology,
   louiseVillaStreet,
   villaLayerX,
   villaLayerY,
-} from '../public/js/louise-pasture-villa.js?v=9d267f7e';
-import { rebuiltRoomsFeature } from '../public/js/features/rebuilt-rooms-feature.js?v=72965a94';
+} from '../public/js/louise-pasture-villa.js?v=01066f39';
+import { rebuiltRoomsFeature } from '../public/js/features/rebuilt-rooms-feature.js?v=80416d0d';
 
 const spike = join(dirname(fileURLToPath(import.meta.url)), '..');
 const pub = join(spike, 'public');
@@ -151,6 +154,52 @@ describe('Louise Pasture Villa: the doors', () => {
     // Nothing else stands in the doorway: no signpost within 400 px.
     for (const sp of pasture.signposts) assert.ok(Math.abs(sp.x - LOUISE_PASTURE_ENTRY.x) > 400, sp.id);
     assert.equal(pasture.doors.filter((x) => x.id === LOUISE_PASTURE_DOOR).length, 1);
+  });
+
+  it('the way in stands in the apartment house bldg_ext_apt.swf draws, as on the five tower streets (a player saw a door with no villa)', () => {
+    const d = door(pasture, LOUISE_PASTURE_DOOR);
+    const dx = d.x + pasture.bounds.l;
+    const dy = d.y + pasture.bounds.t;
+    const mg = pasture.layers.find((l) => l.name === 'middleground');
+    const base = mg.decos.find((x) => x.id === LOUISE_PASTURE_HOUSE.base.id);
+    const top = mg.decos.find((x) => x.id === LOUISE_PASTURE_HOUSE.extension.id);
+    assert.deepEqual([base.sprite, top.sprite], ['abandoned_apt_base_1', 'abandoned_apt_extension_1']);
+    for (const x of [base, top]) {
+      assert.ok(manifest.has(x.sprite) && existsSync(join(pub, 'assets/decos/groddle', `${x.sprite}.webp`)), x.sprite);
+      assert.equal(mg.decos.filter((y) => y.id === x.id).length, 1);
+    }
+    // The five tower streets stand the house on their door_asset_abandoned_apt_1 the same way each time.
+    const offsets = [];
+    for (const tsid of ['GLI32G3NUTD100I', 'GA9A9CGB9F824PK', 'GHV2SQS7ENA25BL', 'GHV36AG0LO2208L', 'GA9I4JIPBE92B8M']) {
+      const s = street(tsid);
+      const all = s.layers.find((l) => l.name === 'middleground').decos;
+      const b = all.find((x) => x.sprite === 'abandoned_apt_base_1');
+      const e = all.find((x) => x.sprite === 'abandoned_apt_extension_1' && Math.abs(x.x - b.x) < 20 && x.y < b.y - 500 && x.y > b.y - 700);
+      const td = s.doors.find((x) => x.sprite === 'door_asset_abandoned_apt_1' && Math.abs(x.x + s.bounds.l - b.x) < 60);
+      offsets.push([b.x - (td.x + s.bounds.l), b.y - (td.y + s.bounds.t), e.x - b.x, e.y - b.y, b.z < e.z]);
+    }
+    const median = (i) => offsets.map((o) => o[i]).sort((a, b) => a - b)[2];
+    assert.deepEqual([LOUISE_PASTURE_HOUSE.base.dx, LOUISE_PASTURE_HOUSE.base.dy, LOUISE_PASTURE_HOUSE.extension.dx, LOUISE_PASTURE_HOUSE.extension.dy], [median(0), median(1), median(2), median(3)]);
+    assert.ok(offsets.every((o) => o[4]), 'the extension draws over the base');
+    // The door stands in the arch: the house round it, its foot just under the door's.
+    assert.deepEqual([base.x - dx, base.y - dy, top.x - base.x, top.y - base.y], [median(0), median(1), median(2), median(3)]);
+    assert.deepEqual([base.w, base.h, top.w, top.h], [678, 651, 623, 380]);
+    // In front of the ground strips under it and behind the flowers and bushes there.
+    const span = louisePastureHouseSpan();
+    assert.deepEqual(span, { l: base.x - base.w / 2, r: base.x + base.w / 2 });
+    const under = mg.decos.filter((x) => x !== base && x !== top && x.x + x.w / 2 > span.l && x.x - x.w / 2 < span.r);
+    const ground = under.filter((x) => HOUSE_GROUND_ART.test(x.sprite));
+    assert.ok(ground.length >= 5);
+    assert.ok(ground.every((x) => x.z < base.z), 'in front of the ground strips');
+    assert.equal(top.z, base.z + 1);
+    assert.ok(under.filter((x) => !HOUSE_GROUND_ART.test(x.sprite)).every((x) => x.z > top.z), 'behind the flowers and bushes');
+    // The sign beside the house on the flat ground to its right (the towers: 352-377 px from the middle), on the floor.
+    const sign = mg.decos.find((x) => x.id === LOUISE_PASTURE_SIGN_ID);
+    assert.ok(sign.x > span.r, 'the sign stands beside the house (its left end in front of the corner, as the towers\' do)');
+    assert.ok(Math.abs(sign.x - base.x) >= 352 && Math.abs(sign.x - base.x) <= 377, `sign ${sign.x - base.x} from the middle`);
+    const signFoot = arrivalInTarget(pasture, sign.x, -130);
+    assert.ok(signFoot.snapped && Math.abs(sign.y - (signFoot.y + pasture.bounds.t) - LOUISE_PASTURE_ENTRY.sign.sink) <= 1);
+    assert.ok(sign.z > Math.max(...mg.decos.filter((x) => x !== sign).map((x) => x.z)));
   });
 
   it("the sources: GSJS lists the villa in hub 58, and Louise Pasture's sources name it", { skip: (!existsSync(gsjs) || !existsSync(locations)) && 'GSJS or the street dump not beside this worktree' }, () => {

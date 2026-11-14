@@ -40,13 +40,29 @@
  *   villa's door led out to Louise Pasture: the EXIT door does.
  * - Nothing archived leads in: Louise Pasture's 2012 geometry has no doors.
  *   Its swf list still names bldg_ext_apt.swf (:2982), the apartment exterior
- *   art the five tower streets load for the way into their lobby, which is a
- *   free-standing door_asset_abandoned_apt_1 (120 x 179) with a
- *   sign_apartment_groddle beside it (Gregarious Grange door_1336671188731,
- *   Hauki Seeks, Sabudana Drama, Egret Taun, Hakusan Heaps). The way in here
- *   is that door and sign on Louise Pasture's flat stretch east of the dirt
- *   mounds (remake choice: no position survives), and it lands where those
- *   five doors land in their lobby (connect 606,-98).
+ *   art the five tower streets load for the way into their lobby: an
+ *   apartment house with a door_asset_abandoned_apt_1 (120 x 179) in its arch
+ *   and a sign_apartment_groddle beside it (Gregarious Grange
+ *   door_1336671188731, Hauki Seeks, Sabudana Drama, Egret Taun, Hakusan
+ *   Heaps). The way in here is that house, door and sign on Louise Pasture's
+ *   flat stretch east of the dirt mounds (remake choice: no position
+ *   survives), and it lands where those five doors land in their lobby
+ *   (connect 606,-98).
+ * - The house the door stands in (lane meadow2012, 2026-11-14; a player saw
+ *   "a door for the Louise Pasture Villa, but there is no villa (at least
+ *   from the outside)"). bldg_ext_apt.swf, the exterior swf Louise Pasture's
+ *   own file loads, draws one apartment house and no other front:
+ *   abandoned_apt_base_1 (the ground and first floors, the arch the door
+ *   stands in) and abandoned_apt_extension_1 (two floors more). It is the
+ *   five tower streets' house, and they stand it on the door the same way
+ *   each time (LOUISE_PASTURE_HOUSE: the base 24 px right of the door and its
+ *   foot 19 px lower, the extension 603 px up, the medians of the five), in
+ *   front of the ground strips. Here it stands without their rubble, posters
+ *   and window boards (the villa is the hall before the towers' neglect), and
+ *   the sign stands beside the house on the flat ground to its right, as
+ *   Hakusan Heaps, Sabudana Drama, Hauki Seeks and Egret Taun stand theirs
+ *   (352-377 px from the house's middle). The swf has no tidier front: the
+ *   house is weathered, its windows broken.
  * - The lift is art: in the towers it is a signpost to the upper floors, and
  *   the villa's floors (if it had any) left no trace.
  */
@@ -67,7 +83,25 @@ export const LOUISE_PASTURE_SOURCE_TSID = 'LLIFIG7BP8G1MU9';
 export const LOUISE_PASTURE_DOOR = 'door_louise_pasture_villa';
 export const LOUISE_PASTURE_SIGN_ID = 'deco_louise_pasture_villa_sign';
 /** The way in on Louise Pasture: world x, and the floor it stands on (platform _pl1286403109760, 642..913). */
-export const LOUISE_PASTURE_ENTRY = Object.freeze({ x: 880, door: { w: 120, h: 179, sprite: 'door_asset_abandoned_apt_1' }, sign: { dx: -165, w: 279, h: 144, sink: 8 } });
+export const LOUISE_PASTURE_ENTRY = Object.freeze({ x: 880, door: { w: 120, h: 179, sprite: 'door_asset_abandoned_apt_1' }, sign: { dx: 380, w: 279, h: 144, sink: 8 } });
+/**
+ * The apartment house round the way in (bldg_ext_apt.swf), placed from the door as the five tower
+ * streets place it: base dx/dy from the door's foot, the extension's dx/dy from the base's foot.
+ * Medians of Gregarious Grange, Hakusan Heaps, Sabudana Drama, Hauki Seeks and Egret Taun
+ * (base 21-25 right, 19-21 down; extension -9..3 across, 596-615 up).
+ */
+export const LOUISE_PASTURE_HOUSE = Object.freeze({
+  base: Object.freeze({ id: 'deco_louise_pasture_villa_house', sprite: 'abandoned_apt_base_1', dx: 24, dy: 19, w: 678, h: 651 }),
+  extension: Object.freeze({ id: 'deco_louise_pasture_villa_house_top', sprite: 'abandoned_apt_extension_1', dx: -3, dy: -603, w: 623, h: 380 }),
+});
+/** The house's world span on Louise Pasture (left, right). */
+export const louisePastureHouseSpan = () => {
+  const b = LOUISE_PASTURE_HOUSE.base;
+  const x = LOUISE_PASTURE_ENTRY.x + b.dx;
+  return { l: x - b.w / 2, r: x + b.w / 2 };
+};
+/** The street art the house stands in front of (the ground strips under it), as on the five tower streets. */
+export const HOUSE_GROUND_ART = /^(?:evenground_|dirt_platform|dirt_horizon|crosssection_|patch_mossy|patch_dirt)/;
 
 export const LOUISE_VILLA_SOURCE_LINE =
   'reconstruction: Louise Pasture Villa (LCRDGMREPJ02ORK, not in tinyspeck/glitch-locations); layout from its 2011-04-29 render (Wayback street image, 720 x 308, reference only) on the apartment lobby template (Gregarious Towers GA5134UPLRU29OH geometry), CC0 bldg_int_apt decos';
@@ -191,11 +225,14 @@ export function louiseVillaStreet(template, { pastureXY = null, pastureArrive = 
 }
 
 /**
- * The door row and sign deco the builder puts on Louise Pasture. `ground` is the world floor y under
- * the door; `z` puts the sign over the street's grass strips (the towers' signs stand in front of theirs).
+ * The door row, the house round it and the sign the builder puts on Louise Pasture. `ground` is the
+ * world floor y under the door, `signGround` under the sign; `houseZ` puts the house in front of the
+ * ground strips under it (the base, then the extension one above), and `z` the sign over the street's
+ * grass strips (the towers' signs stand in front of theirs).
  */
-export function louisePastureEntry(pasture, ground, { villaArrive = null, z = 0 } = {}) {
+export function louisePastureEntry(pasture, ground, { villaArrive = null, z = 0, houseZ = 0, signGround = ground } = {}) {
   const E = LOUISE_PASTURE_ENTRY;
+  const H = LOUISE_PASTURE_HOUSE;
   const { l, t } = pasture.bounds;
   const door = {
     id: LOUISE_PASTURE_DOOR,
@@ -218,8 +255,14 @@ export function louisePastureEntry(pasture, ground, { villaArrive = null, z = 0 
       ...(villaArrive ? { arrive: { ...villaArrive } } : {}),
     },
   };
-  const sign = deco('sign_apartment_groddle', E.x + E.sign.dx, ground + E.sign.sink, E.sign.w, E.sign.h, z, { id: LOUISE_PASTURE_SIGN_ID });
-  return { door, sign };
+  const baseX = E.x + H.base.dx;
+  const baseY = ground + H.base.dy;
+  const house = [
+    deco(H.base.sprite, baseX, baseY, H.base.w, H.base.h, houseZ, { id: H.base.id }),
+    deco(H.extension.sprite, baseX + H.extension.dx, baseY + H.extension.dy, H.extension.w, H.extension.h, houseZ + 1, { id: H.extension.id }),
+  ];
+  const sign = deco('sign_apartment_groddle', E.x + E.sign.dx, signGround + E.sign.sink, E.sign.w, E.sign.h, z, { id: LOUISE_PASTURE_SIGN_ID });
+  return { door, house, sign };
 }
 
 export const louiseVillaIndexEntry = (street) => ({

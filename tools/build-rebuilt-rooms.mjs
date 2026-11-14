@@ -8,8 +8,8 @@
  * Also Winter Walk and Winter Haven (public/js/winter-walk-streets.js), the
  * two streets the timed Winter Walk route runs on (no doors lead in).
  * Also Louise Pasture Villa (public/js/louise-pasture-villa.js, G371): its
- * EXIT door out to Louise Pasture, and the door and apartment sign that lead
- * in, added to Louise Pasture.
+ * EXIT door out to Louise Pasture, and the apartment house, door and sign
+ * that lead in, added to Louise Pasture.
  * Also the Interrogation room (public/js/interrogation-room.js, G352): no door
  * leads in or out (the console's teleport brings an administrator in, and the
  * room's own door, run by its feature, takes them back).
@@ -66,8 +66,10 @@ import {
   winterWalkStreet,
 } from '../public/js/winter-walk-streets.js?v=d1c7d113';
 import {
+  HOUSE_GROUND_ART,
   LOUISE_PASTURE_DOOR,
   LOUISE_PASTURE_ENTRY,
+  LOUISE_PASTURE_HOUSE,
   LOUISE_PASTURE_SIGN_ID,
   LOUISE_PASTURE_TSID,
   LOUISE_VILLA_ARRIVE,
@@ -75,9 +77,10 @@ import {
   LOUISE_VILLA_TEMPLATE_TSID,
   LOUISE_VILLA_TSID,
   louisePastureEntry,
+  louisePastureHouseSpan,
   louiseVillaIndexEntry,
   louiseVillaStreet,
-} from '../public/js/louise-pasture-villa.js?v=9d267f7e';
+} from '../public/js/louise-pasture-villa.js?v=01066f39';
 import {
   INTERROGATION_ARRIVE,
   INTERROGATION_TSID,
@@ -216,10 +219,26 @@ function indexRow(tsid, row) {
   const villaArrive = arrivalInTarget(draft, LOUISE_VILLA_ARRIVE.x, LOUISE_VILLA_ARRIVE.y);
   if (!villaArrive?.snapped) throw new Error('no floor at the villa arrival');
   const mg = pasture.layers.find((l) => l.name === 'middleground');
-  const z = 1 + Math.max(...mg.decos.filter((d) => d.id !== LOUISE_PASTURE_SIGN_ID).map((d) => d.z));
-  const { door, sign } = louisePastureEntry(pasture, ground, { villaArrive: { x: villaArrive.x, y: villaArrive.y }, z });
+  const ours = new Set([LOUISE_PASTURE_SIGN_ID, LOUISE_PASTURE_HOUSE.base.id, LOUISE_PASTURE_HOUSE.extension.id]);
+  const theirs = mg.decos.filter((d) => !ours.has(d.id));
+  const z = 1 + Math.max(...theirs.map((d) => d.z));
+  // The house stands in front of the ground strips under it and behind everything else there
+  // (flowers, bushes), as on the five tower streets.
+  const span = louisePastureHouseSpan();
+  const under = theirs.filter((d) => d.x + d.w / 2 > span.l && d.x - d.w / 2 < span.r);
+  const houseZ = 1 + Math.max(...under.filter((d) => HOUSE_GROUND_ART.test(d.sprite)).map((d) => d.z));
+  const inFront = under.filter((d) => !HOUSE_GROUND_ART.test(d.sprite) && d.z <= houseZ + 1);
+  if (inFront.length) throw new Error(`Louise Pasture: ${inFront.map((d) => d.sprite).join(', ')} would draw behind the villa's house`);
+  const signFoot = arrivalInTarget(pasture, E.x + E.sign.dx, -130);
+  if (!signFoot?.snapped) throw new Error("no floor under the villa's sign");
+  const { door, house, sign } = louisePastureEntry(pasture, ground, {
+    villaArrive: { x: villaArrive.x, y: villaArrive.y },
+    z,
+    houseZ,
+    signGround: signFoot.y + pasture.bounds.t,
+  });
   pasture.doors = [...(pasture.doors || []).filter((d) => d.id !== LOUISE_PASTURE_DOOR), door];
-  mg.decos = [...mg.decos.filter((d) => d.id !== LOUISE_PASTURE_SIGN_ID), sign];
+  mg.decos = [...theirs, ...house, sign];
   pasture.stats.doorCount = pasture.doors.length;
   pasture.stats.decoCount = pasture.layers.reduce((n, l) => n + l.decos.length, 0);
   const room = louiseVillaStreet(template, { pastureXY: { x: E.x, y: ground }, pastureArrive: { x: foot.x, y: foot.y } });
