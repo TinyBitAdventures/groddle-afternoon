@@ -8,5 +8,7 @@
     { "id": "hosting", "name": "Web hosting for the site", "amount": 20, "every": "month" },
     { "id": "ai", "name": "AI tokens", "amount": 50, "every": "month" }
   ],
-  "in": []
+  "in": [
+    { "date": "2026-11-14", "source": "GitHub Sponsors", "amount": 5 }
+  ]
 }

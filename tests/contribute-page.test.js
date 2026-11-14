@@ -92,7 +92,8 @@ describe('the Contribute page data (tools/contribute/build-data.mjs)', () => {
     assert.deepEqual([t('2026-11-03').out, t('2026-11-03').months], [8600, 1]);
     assert.deepEqual([t('2026-12-01').out, t('2026-12-01').months], [16200, 2]);
     const march = t('2027-03-15');
-    assert.deepEqual([march.out, march.months, march.in, march.difference], [39000, 5, 0, -39000]);
+    assert.deepEqual([march.out, march.months, march.in, march.difference], [39000, 5, 500, -38500], 'the first gift: $5 by GitHub Sponsors on 14 November 2026');
+    assert.deepEqual([t('2026-11-13').in, t('2026-11-14').in, t('2026-11-14').gifts], [0, 500, 1]);
     assert.deepEqual(march.costs.map((c) => c.times), [1, 5, 5, 5]);
     assert.deepEqual([t('2027-10-31').out, t('2027-11-01').out], [92200, 100800], 'the domain renews on the anniversary');
     // A start on the 31st: a short month is charged on its last day, a leap day's anniversary on 28 February.
@@ -126,8 +127,9 @@ describe('the site draws the ledger and the shrine (groddle-afternoon-site src/C
     }
   });
 
-  it('draws the ledger for a fixed day: totals, each cost, and nothing in yet', { skip: skipPhp }, () => {
-    const html = runPhp(data, `echo Contribute::ledger($d, '2027-03-15', 'Updated automatically each month. Money in is added by hand when it arrives.');`);
+  it('draws the ledger for a fixed day: totals, each cost, nothing in yet, then the first gift', { skip: skipPhp }, () => {
+    // Nothing in: the ledger as it stood before its first gift.
+    const html = runPhp({ ...data, in: [] }, `echo Contribute::ledger($d, '2027-03-15', 'Updated automatically each month. Money in is added by hand when it arrives.');`);
     const num = (label) => html.match(new RegExp(`<p class="tile-label">${label}</p><div class="tile-num">([^<]+)</div>`))?.[1];
     assert.equal(num('Money in, all time'), '$0');
     assert.equal(num('Money out, all time'), '$390');
@@ -138,6 +140,9 @@ describe('the site draws the ledger and the shrine (groddle-afternoon-site src/C
     assert.match(html, /<th scope="row">Money out<span class="ct-every">\$76 a month and \$10 a year<\/span><\/th><td class="ct-when">\$76 a month and \$10 a year<\/td><td><\/td><td class="ct-times"><\/td><td class="ct-num">\$390<\/td>/);
     assert.match(html, /Nothing has come in yet\./);
     assert.match(html, /As of 15 March 2027\. Updated automatically each month\. Money in is added by hand when it arrives\./);
+    const real = runPhp(data, `echo Contribute::ledger($d, '2026-11-14', '');`);
+    assert.match(real, /<td><time datetime="2026-11-14">14 November 2026<\/time><\/td><td>GitHub Sponsors<\/td><td class="ct-num">\$5<\/td>/);
+    assert.match(real, /<p class="tile-label">Money in, all time<\/p><div class="tile-num">\$5<\/div><p class="tile-note">From 1 gift<\/p>/);
     const gifts = runPhp(EDGES, `echo Contribute::ledger($d, '2026-03-10', '');`);
     assert.match(gifts, /<td><time datetime="2026-03-10">10 March 2026<\/time><\/td><td>GitHub Sponsors<\/td><td class="ct-num">\$25\.50<\/td>/);
     assert.match(gifts, /<p class="tile-label">Money in, all time<\/p><div class="tile-num">\$30\.50<\/div><p class="tile-note">From 2 gifts<\/p>/);

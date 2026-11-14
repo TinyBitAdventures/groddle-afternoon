@@ -615,7 +615,7 @@
       "assets/streets/index.json": "32007564",
       "assets/ui/quest-book-solid.webp": "a53d6aca",
       "assets/ui/quest_bubble_active.png": "2de1b09a",
-      "contribute/data.json": "e25ce0e0",
+      "contribute/data.json": "5041fe65",
       "encyclopedia/search.json": "bd15e649",
       "landing/card-explore.webp": "7a2c1124",
       "landing/full/card-explore.webp": "cbce4e96",

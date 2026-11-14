@@ -28,7 +28,13 @@
    "cents": 5000
   }
  ],
- "in": [],
+ "in": [
+  {
+   "date": "2026-11-14",
+   "source": "GitHub Sponsors",
+   "cents": 500
+  }
+ ],
  "shrine": {
   "giant": "pot",
   "name": "Pot",
