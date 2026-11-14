@@ -16,8 +16,8 @@
   },
   "counts": {
     "regions": 51,
-    "restored": 14,
-    "painted": 33,
+    "restored": 16,
+    "painted": 31,
     "layout": 4
   },
   "world": {
@@ -530,6 +530,84 @@
       "place": "/encyclopedia/places/choru/"
     },
     {
+      "id": "141",
+      "name": "Drifa",
+      "anchor": "map-drifa",
+      "state": "restored",
+      "caption": "Tiny Speck’s own 2012 painting of Drifa, restored: the 2012 Encyclopedia showed it under the game’s roads, names and buttons, and that picture was given to an image model to take the markings off and sharpen without moving anything, then toned back to the 2012 colour.",
+      "differences": "Every snowy conifer, frosted shrub, rock pile and the frozen pond sit where 2012 had them; the pond's upper lobe is a little rounder, and 2012's soft grey shading in the bottom-left corner and its scattered falling snowflakes are gone. Returned greyer and bluer than 2012's near-white; the toning step (matched to the snow, gamma 2.28) brings it back.",
+      "facts": [
+        {
+          "label": "Made",
+          "text": "14 November 2026, with GPT Image 2.6 Sunburst"
+        },
+        {
+          "label": "Replaced",
+          "text": "The painting made from the thumbnail on 6 November 2026"
+        }
+      ],
+      "before": {
+        "src": "/restoration/maps/replaced/drifa.1225c974.webp",
+        "w": 760,
+        "h": 460,
+        "label": "Before: painted from the thumbnail on 6 November 2026",
+        "src2": "/restoration/maps/replaced/drifa@2x.9ad94491.webp"
+      },
+      "after": {
+        "src": "/assets/maps/art/bg/drifa.webp",
+        "w": 760,
+        "h": 460,
+        "label": "Restored, in the game now",
+        "src2": "/assets/maps/art/bg/drifa@2x.webp"
+      },
+      "card": {
+        "src": "/assets/maps/art/world/cards/141.svg",
+        "w": 111,
+        "h": 87,
+        "label": "Its card on the World map"
+      },
+      "place": "/encyclopedia/places/drifa/"
+    },
+    {
+      "id": "114",
+      "name": "Firozi",
+      "anchor": "map-firozi",
+      "state": "restored",
+      "caption": "Tiny Speck’s own 2012 painting of Firozi, restored: the 2012 Encyclopedia showed it under the game’s roads, names and buttons, and that picture was given to an image model to take the markings off and sharpen without moving anything, then toned back to the 2012 colour.",
+      "differences": "Coast, islets, cliffs, the green shelf, the canyon and the rocky plateau sit where 2012 had them; the dashed lines on 2012's paper sea came back as soft wave strokes, and the plateau's dark cracks as softer ledges. Returned a little warmer and more saturated; the toning step brings it back.",
+      "facts": [
+        {
+          "label": "Made",
+          "text": "14 November 2026, with GPT Image 2.6 Sunburst"
+        },
+        {
+          "label": "Replaced",
+          "text": "The painting made from the thumbnail on 6 November 2026"
+        }
+      ],
+      "before": {
+        "src": "/restoration/maps/replaced/firozi.e4fc1741.webp",
+        "w": 760,
+        "h": 460,
+        "label": "Before: painted from the thumbnail on 6 November 2026",
+        "src2": "/restoration/maps/replaced/firozi@2x.581ed28a.webp"
+      },
+      "after": {
+        "src": "/assets/maps/art/bg/firozi.webp",
+        "w": 760,
+        "h": 460,
+        "label": "Restored, in the game now",
+        "src2": "/assets/maps/art/bg/firozi@2x.webp"
+      },
+      "card": {
+        "src": "/assets/maps/art/world/cards/114.svg",
+        "w": 151,
+        "h": 118,
+        "label": "Its card on the World map"
+      },
+      "place": "/encyclopedia/places/firozi/"
+    },
+    {
       "id": "56",
       "name": "Groddle Forest",
       "anchor": "map-groddle-forest",
@@ -608,40 +686,6 @@
       "place": "/encyclopedia/places/groddle-meadow/"
     },
     {
-      "id": "141",
-      "name": "Drifa",
-      "anchor": "map-drifa",
-      "state": "painted",
-      "caption": "Tiny Speck’s 760 x 460 painting of Drifa is lost; only its thumbnail on the World map survived. This painting was made from that thumbnail and the region’s street layout, in the style of the decos Tiny Speck painted its streets with.",
-      "differences": "",
-      "facts": [
-        {
-          "label": "Made",
-          "text": "6 November 2026, with GPT Image 2.6 Sunburst"
-        }
-      ],
-      "before": {
-        "src": "/assets/maps/art/thumbs/sm_drifa.jpg",
-        "w": 150,
-        "h": 91,
-        "label": "Tiny Speck’s thumbnail, all that survived (150 x 91)"
-      },
-      "after": {
-        "src": "/assets/maps/art/bg/drifa.webp",
-        "w": 760,
-        "h": 460,
-        "label": "Painted for Groddle, in the game now",
-        "src2": "/assets/maps/art/bg/drifa@2x.webp"
-      },
-      "card": {
-        "src": "/assets/maps/art/world/cards/141.svg",
-        "w": 111,
-        "h": 87,
-        "label": "Its card on the World map"
-      },
-      "place": "/encyclopedia/places/drifa/"
-    },
-    {
       "id": "123",
       "name": "Fenneq",
       "anchor": "map-fenneq",
@@ -674,40 +718,6 @@
         "label": "Its card on the World map"
       },
       "place": "/encyclopedia/places/fenneq/"
-    },
-    {
-      "id": "114",
-      "name": "Firozi",
-      "anchor": "map-firozi",
-      "state": "painted",
-      "caption": "Tiny Speck’s 760 x 460 painting of Firozi is lost; only its thumbnail on the World map survived. This painting was made from that thumbnail and the region’s street layout, in the style of the decos Tiny Speck painted its streets with.",
-      "differences": "",
-      "facts": [
-        {
-          "label": "Made",
-          "text": "6 November 2026, with GPT Image 2.6 Sunburst"
-        }
-      ],
-      "before": {
-        "src": "/assets/maps/art/thumbs/sm_firozi.jpg",
-        "w": 150,
-        "h": 91,
-        "label": "Tiny Speck’s thumbnail, all that survived (150 x 91)"
-      },
-      "after": {
-        "src": "/assets/maps/art/bg/firozi.webp",
-        "w": 760,
-        "h": 460,
-        "label": "Painted for Groddle, in the game now",
-        "src2": "/assets/maps/art/bg/firozi@2x.webp"
-      },
-      "card": {
-        "src": "/assets/maps/art/world/cards/114.svg",
-        "w": 151,
-        "h": 118,
-        "label": "Its card on the World map"
-      },
-      "place": "/encyclopedia/places/firozi/"
     },
     {
       "id": "119",

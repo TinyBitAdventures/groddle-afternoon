@@ -572,14 +572,14 @@
         "file": "assets/maps/art/bg/firozi@2x.webp",
         "kind": "made for Groddle",
         "provenance": "tools/provenance/repainted-maps.json",
-        "sha256": "581ed28a3470e61c16bf2310dbadd304499503f9b0f58610266c5626552281ec"
+        "sha256": "363f183773016baed506ad7c0f35a599e377e0bf0522d99796f61541ea906abc"
       },
       "picture": {
         "type": "image/webp",
         "w": 750,
         "h": 455,
-        "bytes": 22038,
-        "sha256": "abf09749955269e681ae8d75d1803d5adaec7831ccfc12c6cea2810952423a30"
+        "bytes": 48986,
+        "sha256": "fc71c3e0fa0d17b7cfa928222574d1002d1d2cc4fafbb4f5db16e04c0fa5a739"
       }
     },
     "116": {
@@ -793,14 +793,14 @@
         "file": "assets/maps/art/bg/drifa@2x.webp",
         "kind": "made for Groddle",
         "provenance": "tools/provenance/repainted-maps.json",
-        "sha256": "9ad94491b58661da38ea72a6abf5563dff4ebc4c266bf203b60f1cdccd6a8bcd"
+        "sha256": "beedaf962fbec657b703716ba4b36d6d57e752272d015b412a1f1c9a0642bdb8"
       },
       "picture": {
         "type": "image/webp",
         "w": 750,
         "h": 455,
-        "bytes": 16416,
-        "sha256": "df820033129ac503273bedacd521d75526e9eac1e1721a582623c0a0e51e3c42"
+        "bytes": 12774,
+        "sha256": "0d467a2a2186f92452d7efbec517166e8ab112ea1fcb50d6dfe110f08d47f43d"
       }
     },
     "143": {

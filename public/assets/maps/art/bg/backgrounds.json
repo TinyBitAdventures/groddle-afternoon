@@ -628,10 +628,10 @@
       "x1": "assets/maps/art/bg/firozi.webp",
       "x2": "assets/maps/art/bg/firozi@2x.webp",
       "repainted": "tools/provenance/repainted-maps.json",
-      "x1Bytes": 35992,
-      "x1Sha256": "e4fc1741e71e6a7bc7dcae10b0dd3fd24b5ea5aa28c6c5bab8eac2e66303fd3f",
-      "x2Bytes": 130116,
-      "x2Sha256": "581ed28a3470e61c16bf2310dbadd304499503f9b0f58610266c5626552281ec"
+      "x1Bytes": 71080,
+      "x1Sha256": "83036e00cc91092f450758450e80684bf51b13bb8e8bc38ac02da28e72b67867",
+      "x2Bytes": 242262,
+      "x2Sha256": "363f183773016baed506ad7c0f35a599e377e0bf0522d99796f61541ea906abc"
     },
     "116": {
       "hubName": "Haraiva",
@@ -836,10 +836,10 @@
       "x1": "assets/maps/art/bg/drifa.webp",
       "x2": "assets/maps/art/bg/drifa@2x.webp",
       "repainted": "tools/provenance/repainted-maps.json",
-      "x1Bytes": 24382,
-      "x1Sha256": "1225c97426d79a50b1398e529df01914ab21d6638d7349eeeca23fb36f66a04f",
-      "x2Bytes": 67158,
-      "x2Sha256": "9ad94491b58661da38ea72a6abf5563dff4ebc4c266bf203b60f1cdccd6a8bcd"
+      "x1Bytes": 21716,
+      "x1Sha256": "969573f0e95aa8b4133e36e130531a4a5afd18119b2fdd690d47e901285a66d1",
+      "x2Bytes": 71288,
+      "x2Sha256": "beedaf962fbec657b703716ba4b36d6d57e752272d015b412a1f1c9a0642bdb8"
     },
     "143": {
       "hubName": "Vortex of Random",
