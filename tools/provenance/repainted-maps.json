@@ -311,15 +311,15 @@
         "file": "assets/maps/art/bg/groddleforest.webp",
         "w": 760,
         "h": 460,
-        "bytes": 89572,
-        "sha256": "08d3e000ff3f8b3c6afbfea4b10f7a2e00547802383ff60dc5c11030bb69b639"
+        "bytes": 89930,
+        "sha256": "43296f2a0b1b9396ebf0e6feeb501dae8abf23c25a5cf32c8588736056ac7a86"
       },
       "x2": {
         "file": "assets/maps/art/bg/groddleforest@2x.webp",
         "w": 1520,
         "h": 920,
-        "bytes": 279504,
-        "sha256": "990e09f316dd615c2d45d3e5debf7eb1087ce5a3f5ba0410449761d7de70cb8f"
+        "bytes": 279316,
+        "sha256": "ea55614e1d8c36972c75ea62acd8869fd11f5ed73a8ff56045f39c51e286a080"
       },
       "licence": "ai-generated",
       "author": "Austin Ginder (directed and chose it)",
@@ -350,7 +350,7 @@
       "source": {
         "generated": "2048 x 1152 (16:9, High 2K, opaque, 1 image): research/map-art/drop/regions/03-groddle-forest-restored-raw.png",
         "dropSha256": "63fa9334eb0babf9a1b0034bc2747942518da7b7035e62cce1f077d223369955",
-        "crop": "the side bands cut off (raw x 72.606 to 1975.394), Lanczos to 1520 x 920, shifted -1 px across and -1 px down onto the 2012 picture's lines (worst drift after alignment 2 px at 2x in a 4 x 3 grid of tiles (tiles: 2 1 1 1 0 1 2 2 1 1 1 2))",
+        "crop": "the side bands cut off (raw x 72.606 to 1975.394), Lanczos to 1520 x 920, shifted -1 px across and -1 px down onto the 2012 picture's lines (worst drift after alignment 2 px at 2x in a 4 x 3 grid of tiles (tiles: 2 1 1 1 0 1 2 2 1 1 1 2)); the painting ended a few raw px inside the cut, so the 3 left and 3 right columns of band colour were filled with the painting's first clean column beside them (on the toned picture, 2026-11-14, lane maps3; tone unchanged)",
         "toning": "magick master.png -modulate 100,81,100 -gamma 1.32 toned.png (matched to the 2012 picture: saturation and lightness of its mid pixels, lightness 0.12 to 0.78, so the 2012 roads, text and paper sea do not count; gamma rather than brightness so the paper sea keeps its grain)",
         "encode": {
           "x1": "magick toned.png -filter Lanczos -resize 760x460! -quality 82 -define webp:method=6 groddleforest.webp",
@@ -430,15 +430,15 @@
         "file": "assets/maps/art/bg/groddlemeadow.webp",
         "w": 760,
         "h": 460,
-        "bytes": 88062,
-        "sha256": "253deb62c3f91c299139aedf7e6b77713fc1086ee0f4f275bcf06b5cc15c7212"
+        "bytes": 88354,
+        "sha256": "5ab6d1788b673a4d5d7a6b1f0b9eb6351c307f397d10a2c977a94a93ec7fad4e"
       },
       "x2": {
         "file": "assets/maps/art/bg/groddlemeadow@2x.webp",
         "w": 1520,
         "h": 920,
-        "bytes": 289750,
-        "sha256": "dc800b9fc0f7b7f41a8bd7d591b757f4d9c9f8f8a3a598dc077cb216f4922fad"
+        "bytes": 289636,
+        "sha256": "3d3ec5ecb3a7b0b1d9365cbb54481376b2400abb469c8667fcbe12c1bd32f112"
       },
       "licence": "ai-generated",
       "author": "Austin Ginder (directed and chose it)",
@@ -469,7 +469,7 @@
       "source": {
         "generated": "2048 x 1152 (16:9, High 2K, opaque, 1 image): research/map-art/drop/regions/01-groddle-meadow-restored-raw.png",
         "dropSha256": "35928f303d0fc96eb44c02a91baf15b67f45bf103fbc409aa79886e48bf66df4",
-        "crop": "the side bands cut off (raw x 72.606 to 1975.394), Lanczos to 1520 x 920, shifted -1 px across and -0.5 px down onto the 2012 picture's lines (within 1 px at 2x in 11 of 12 tiles, 3 px in the last)",
+        "crop": "the side bands cut off (raw x 72.606 to 1975.394), Lanczos to 1520 x 920, shifted -1 px across and -0.5 px down onto the 2012 picture's lines (within 1 px at 2x in 11 of 12 tiles, 3 px in the last); the painting ended a few raw px inside the cut, so the 3 left and 4 right columns of band colour were filled with the painting's first clean column beside them (on the toned picture, 2026-11-14, lane maps3; tone unchanged)",
         "toning": "magick master.png -modulate 100,77,100 -gamma 1.4 toned.png (matched to the 2012 picture: saturation and lightness of its mid pixels, lightness 0.12 to 0.78, so the 2012 roads, text and paper sea do not count; gamma rather than brightness so the paper sea keeps its grain)",
         "encode": {
           "x1": "magick toned.png -filter Lanczos -resize 760x460! -quality 82 -define webp:method=6 groddlemeadow.webp",
@@ -852,15 +852,15 @@
         "file": "assets/maps/art/bg/chakraphool.webp",
         "w": 760,
         "h": 460,
-        "bytes": 48082,
-        "sha256": "9413e39aecd6c1bfddfcbc7758f974767079e2444a3507de2a03570d366d4abd"
+        "bytes": 48338,
+        "sha256": "77eeb2568fe15c9533802957f0b34b57bed87115ba0a74af7d77eccc4145f452"
       },
       "x2": {
         "file": "assets/maps/art/bg/chakraphool@2x.webp",
         "w": 1520,
         "h": 920,
-        "bytes": 164474,
-        "sha256": "a72a27b3e8a4c2170f037d0b11e1fb9974d4007889a549151a9552201f783986"
+        "bytes": 164528,
+        "sha256": "b8ccded62b38b0512d635993df03a884a8f40e786e21a8e797b856a98f4c8cba"
       },
       "licence": "ai-generated",
       "author": "Austin Ginder (directed and chose it)",
@@ -891,7 +891,7 @@
       "source": {
         "generated": "2048 x 1152 (16:9, High 2K, opaque, 1 image): research/map-art/drop/regions/13-chakra-phool-restored-raw.png",
         "dropSha256": "5fc43d10005b927d9b7a2e154abd77eafa23af435000f31ba133d22ae90fa345",
-        "crop": "the side bands cut off (raw x 72.606 to 1975.394), Lanczos to 1520 x 920, shifted 0 px across and 0 px down onto the 2012 picture's lines (worst drift after alignment 4 px at 2x in a 4 x 3 grid of tiles (tiles: 1 1 0 2 1 4 4 2 1 2 2 2))",
+        "crop": "the side bands cut off (raw x 72.606 to 1975.394), Lanczos to 1520 x 920, shifted 0 px across and 0 px down onto the 2012 picture's lines (worst drift after alignment 4 px at 2x in a 4 x 3 grid of tiles (tiles: 1 1 0 2 1 4 4 2 1 2 2 2)); the painting ended a few raw px inside the cut, so the 4 left and 3 right columns of band colour were filled with the painting's first clean column beside them (on the toned picture, 2026-11-14, lane maps3; tone unchanged)",
         "toning": "magick master.png -modulate 100,97,100 -gamma 1.16 toned.png (matched to the 2012 picture: saturation and lightness of its mid pixels, lightness 0.12 to 0.78, so the 2012 roads, text and paper sea do not count; gamma rather than brightness so the paper sea keeps its grain)",
         "encode": {
           "x1": "magick toned.png -filter Lanczos -resize 760x460! -quality 82 -define webp:method=6 chakraphool.webp",
@@ -978,15 +978,15 @@
         "file": "assets/maps/art/bg/bortola.webp",
         "w": 760,
         "h": 460,
-        "bytes": 92596,
-        "sha256": "f1beac58aed6ef571f4343b31510bf1fceba8a414aa5f4a20fbeeeae722b9ac1"
+        "bytes": 92438,
+        "sha256": "2e6c4612f22247fda4b1e556380d2f7ae8efc24a588cba9aefc4f64bc87f606e"
       },
       "x2": {
         "file": "assets/maps/art/bg/bortola@2x.webp",
         "w": 1520,
         "h": 920,
-        "bytes": 307112,
-        "sha256": "dc7b01083ed784ca5ce272b269166813c5e648278e9a0ac2ebe72fd238f1dc09"
+        "bytes": 306666,
+        "sha256": "d2818cc960a8d1d81ea20aaaaa5a9fc3ce3435e9aeec0db45d09701a40784e42"
       },
       "licence": "ai-generated",
       "author": "Austin Ginder (directed and chose it)",
@@ -1017,7 +1017,7 @@
       "source": {
         "generated": "2048 x 1152 (16:9, High 2K, opaque, 1 image): research/map-art/drop/regions/09-bortola-restored-raw.png",
         "dropSha256": "bfc8a8dc82a5e7c1c8ed915a3004dd7c1f4b3014c8287d4bafd4ce8e14420226",
-        "crop": "the side bands cut off (raw x 72.606 to 1975.394), Lanczos to 1520 x 920, shifted 0 px across and 2 px down onto the 2012 picture's lines (worst drift after alignment 2 px at 2x in a 4 x 3 grid of tiles (tiles: 1 2 2 1 1 1 1 1 1 1 1 1))",
+        "crop": "the side bands cut off (raw x 72.606 to 1975.394), Lanczos to 1520 x 920, shifted 0 px across and 2 px down onto the 2012 picture's lines (worst drift after alignment 2 px at 2x in a 4 x 3 grid of tiles (tiles: 1 2 2 1 1 1 1 1 1 1 1 1)); the painting ended a few raw px inside the cut, so the 2 left and 2 right columns of band colour were filled with the painting's first clean column beside them (on the toned picture, 2026-11-14, lane maps3; tone unchanged)",
         "toning": "magick master.png -modulate 100,86,100 -gamma 1.24 toned.png (matched to the 2012 picture: saturation and lightness of its mid pixels, lightness 0.12 to 0.78, so the 2012 roads, text and paper sea do not count; gamma rather than brightness so the paper sea keeps its grain)",
         "encode": {
           "x1": "magick toned.png -filter Lanczos -resize 760x460! -quality 82 -define webp:method=6 bortola.webp",
@@ -1104,15 +1104,15 @@
         "file": "assets/maps/art/bg/alakol.webp",
         "w": 760,
         "h": 460,
-        "bytes": 71820,
-        "sha256": "426fc4bcfc2896eaf209a432259e66289c3cbd664f4da69530370903f4a4e030"
+        "bytes": 71610,
+        "sha256": "a12b075e02ae64f0688422d7128d05091aa5b7d915613cebbcfeb985aad1feb1"
       },
       "x2": {
         "file": "assets/maps/art/bg/alakol@2x.webp",
         "w": 1520,
         "h": 920,
-        "bytes": 230070,
-        "sha256": "fe1ad091095935003976aeabaedc26fc3391826dfa69b1c361bc3ad907a5ce12"
+        "bytes": 229760,
+        "sha256": "0184964b19e8eca6daea67dbd95ef796b5bcc633e3f9e6dcd224f5eb00d22995"
       },
       "licence": "ai-generated",
       "author": "Austin Ginder (directed and chose it)",
@@ -1143,7 +1143,7 @@
       "source": {
         "generated": "2048 x 1152 (16:9, High 2K, opaque, 1 image): research/map-art/drop/regions/02-alakol-restored-raw.png",
         "dropSha256": "ce1d11fd03dc822ae15b8d8cda1d88987dfa441394d1453f18afeefa4190e4e6",
-        "crop": "the side bands cut off (raw x 72.606 to 1975.394), Lanczos to 1520 x 920, shifted 0 px across and 0 px down onto the 2012 picture's lines (worst drift after alignment 4 px at 2x in a 4 x 3 grid of tiles (tiles: 1 0 0 1 1 1 2 2 2 2 2 4))",
+        "crop": "the side bands cut off (raw x 72.606 to 1975.394), Lanczos to 1520 x 920, shifted 0 px across and 0 px down onto the 2012 picture's lines (worst drift after alignment 4 px at 2x in a 4 x 3 grid of tiles (tiles: 1 0 0 1 1 1 2 2 2 2 2 4)); the painting ended a few raw px inside the cut, so the 3 left and 3 right columns of band colour were filled with the painting's first clean column beside them (on the toned picture, 2026-11-14, lane maps3; tone unchanged)",
         "toning": "magick master.png -modulate 100,86,100 -gamma 1.12 toned.png (matched to the 2012 picture: saturation and lightness of its mid pixels, lightness 0.12 to 0.78, so the 2012 roads, text and paper sea do not count; gamma rather than brightness so the paper sea keeps its grain)",
         "encode": {
           "x1": "magick toned.png -filter Lanczos -resize 760x460! -quality 82 -define webp:method=6 alakol.webp",
@@ -1371,15 +1371,15 @@
         "file": "assets/maps/art/bg/baqala.webp",
         "w": 760,
         "h": 460,
-        "bytes": 66990,
-        "sha256": "873dc21459512fcba72b18ba26dbe29574f545b0ca3acf421eaf040d88b93035"
+        "bytes": 66850,
+        "sha256": "38a0b80f4b8732c676f7654806930f6a7cbdd6121c984ae487f9c97a5db4f900"
       },
       "x2": {
         "file": "assets/maps/art/bg/baqala@2x.webp",
         "w": 1520,
         "h": 920,
-        "bytes": 238306,
-        "sha256": "f379a149c3037041afa41e141d25659dd241ad5a0470b8d2ed765f57eb1182bf"
+        "bytes": 238000,
+        "sha256": "e1310b2157713ffff2c253d6b4513737a1ab15b19aa2ae81d3450fdbf1e70258"
       },
       "licence": "ai-generated",
       "author": "Austin Ginder (directed and chose it)",
@@ -1410,7 +1410,7 @@
       "source": {
         "generated": "2048 x 1152 (16:9, High 2K, opaque, 1 image): research/map-art/drop/regions/07-baqala-restored-raw.png",
         "dropSha256": "4332df0e6c088a21a7159a4268c187a4f3033557a2bb7f4decd109610d1f26a2",
-        "crop": "the side bands cut off (raw x 72.606 to 1975.394), Lanczos to 1520 x 920, shifted 0 px across and 3 px down onto the 2012 picture's lines (worst drift after alignment 2 px at 2x in a 4 x 3 grid of tiles (tiles: 2 2 2 2 1 1 1 1 2 2 2 2))",
+        "crop": "the side bands cut off (raw x 72.606 to 1975.394), Lanczos to 1520 x 920, shifted 0 px across and 3 px down onto the 2012 picture's lines (worst drift after alignment 2 px at 2x in a 4 x 3 grid of tiles (tiles: 2 2 2 2 1 1 1 1 2 2 2 2)); the painting ended a few raw px inside the cut, so the 3 left and 2 right columns of band colour were filled with the painting's first clean column beside them (on the toned picture, 2026-11-14, lane maps3; tone unchanged)",
         "toning": "magick master.png -modulate 100,84,100 -gamma 1.2 toned.png (matched to the 2012 picture: saturation and lightness of its mid pixels, lightness 0.12 to 0.78, so the 2012 roads, text and paper sea do not count; gamma rather than brightness so the paper sea keeps its grain)",
         "encode": {
           "x1": "magick toned.png -filter Lanczos -resize 760x460! -quality 82 -define webp:method=6 baqala.webp",
@@ -1577,15 +1577,15 @@
         "file": "assets/maps/art/bg/andra.webp",
         "w": 760,
         "h": 460,
-        "bytes": 53390,
-        "sha256": "5a505c9eeb396d6e550759c2d44bb2b85e7b354ddcae3df80ed05b8af2d9e7e9"
+        "bytes": 53650,
+        "sha256": "544b7c85a3f59c76f9ee58af24fbddd5374c57bc572c895305d16911ce0da394"
       },
       "x2": {
         "file": "assets/maps/art/bg/andra@2x.webp",
         "w": 1520,
         "h": 920,
-        "bytes": 197038,
-        "sha256": "a9c3d6b2bcd3716db34a59b53a33bee5589ff4460649e814b2c345821e8e2183"
+        "bytes": 196712,
+        "sha256": "3344fc9c22dfc3a9c64cfdbeb4b74570831a2e8d459d90bbcac82cdf9b7afd70"
       },
       "licence": "ai-generated",
       "author": "Austin Ginder (directed and chose it)",
@@ -1616,7 +1616,7 @@
       "source": {
         "generated": "2048 x 1152 (16:9, High 2K, opaque, 1 image): research/map-art/drop/regions/04-andra-restored-raw.png",
         "dropSha256": "63880af97a4ae3d7c711d7b882fcb15ee29c670a61d99a9e956f2acee6b30839",
-        "crop": "the side bands cut off (raw x 72.606 to 1975.394), Lanczos to 1520 x 920, shifted -1 px across and 1 px down onto the 2012 picture's lines (worst drift after alignment 4 px at 2x in a 4 x 3 grid of tiles (tiles: 1 1 1 1 1 1 1 2 4 4 2 1))",
+        "crop": "the side bands cut off (raw x 72.606 to 1975.394), Lanczos to 1520 x 920, shifted -1 px across and 1 px down onto the 2012 picture's lines (worst drift after alignment 4 px at 2x in a 4 x 3 grid of tiles (tiles: 1 1 1 1 1 1 1 2 4 4 2 1)); the painting ended a few raw px inside the cut, so the 1 left and 4 right columns of band colour were filled with the painting's first clean column beside them (on the toned picture, 2026-11-14, lane maps3; tone unchanged)",
         "toning": "magick master.png -modulate 100,77,100 -gamma 1.24 toned.png (matched to the 2012 picture: saturation and lightness of its mid pixels, lightness 0.12 to 0.78, so the 2012 roads, text and paper sea do not count; gamma rather than brightness so the paper sea keeps its grain)",
         "encode": {
           "x1": "magick toned.png -filter Lanczos -resize 760x460! -quality 82 -define webp:method=6 andra.webp",
@@ -1703,15 +1703,15 @@
         "file": "assets/maps/art/bg/choru.webp",
         "w": 760,
         "h": 460,
-        "bytes": 59114,
-        "sha256": "58825a98cced31bf10f0404590847225f83c37356b1bbba80f8545a8eb51d096"
+        "bytes": 59234,
+        "sha256": "01f950edd9e52986446c8081c3ffd0bdd30b8df41556193b13bd70d96171fe3e"
       },
       "x2": {
         "file": "assets/maps/art/bg/choru@2x.webp",
         "w": 1520,
         "h": 920,
-        "bytes": 220228,
-        "sha256": "7147d90936702eeab153e4fd17788bcf39f8b5d5e7caa04fed8abc8b4b40ac18"
+        "bytes": 220062,
+        "sha256": "b125f5dddea1bb8d20c574d802c4b0325e3dddbaeffb7864b0b527f0af883745"
       },
       "licence": "ai-generated",
       "author": "Austin Ginder (directed and chose it)",
@@ -1742,7 +1742,7 @@
       "source": {
         "generated": "2048 x 1152 (16:9, High 2K, opaque, 1 image): research/map-art/drop/regions/14-choru-restored-raw.png",
         "dropSha256": "38ec4fa7ce1bfdfd4979aeafa17cf9c7556952b863fdb20c220d91d158d1e7d7",
-        "crop": "the side bands cut off (raw x 72.606 to 1975.394), Lanczos to 1520 x 920, shifted -1 px across and 1 px down onto the 2012 picture's lines (worst drift after alignment 2 px at 2x in a 4 x 3 grid of tiles (tiles: 1 0 0 0 2 1 1 1 2 1 1 1))",
+        "crop": "the side bands cut off (raw x 72.606 to 1975.394), Lanczos to 1520 x 920, shifted -1 px across and 1 px down onto the 2012 picture's lines (worst drift after alignment 2 px at 2x in a 4 x 3 grid of tiles (tiles: 1 0 0 0 2 1 1 1 2 1 1 1)); the painting ended a few raw px inside the cut, so the 1 left and 3 right columns of band colour were filled with the painting's first clean column beside them (on the toned picture, 2026-11-14, lane maps3; tone unchanged)",
         "toning": "magick master.png -modulate 100,86,100 -gamma 1.24 toned.png (matched to the 2012 picture: saturation and lightness of its mid pixels, lightness 0.12 to 0.78, so the 2012 roads, text and paper sea do not count; gamma rather than brightness so the paper sea keeps its grain)",
         "encode": {
           "x1": "magick toned.png -filter Lanczos -resize 760x460! -quality 82 -define webp:method=6 choru.webp",
@@ -2234,15 +2234,15 @@
         "file": "assets/maps/art/bg/besara.webp",
         "w": 760,
         "h": 460,
-        "bytes": 103578,
-        "sha256": "7f56a70c76b46540f42cb6215294ac0378d7df890fcf26de8ef94080be8d11a6"
+        "bytes": 103414,
+        "sha256": "8664c22fe083ec4c9bdc5b4106bef9fe431c45438e791b3c7f12c2948050e203"
       },
       "x2": {
         "file": "assets/maps/art/bg/besara@2x.webp",
         "w": 1520,
         "h": 920,
-        "bytes": 320044,
-        "sha256": "98687d3f8efa9926045fa054417519996f2bb5e7acab95e0503ee47a7f867050"
+        "bytes": 319390,
+        "sha256": "edb46201a8def51b0d2f924b6a85c6953d7ecb13aab4abb7629db6522596ecb9"
       },
       "licence": "ai-generated",
       "author": "Austin Ginder (directed and chose it)",
@@ -2273,7 +2273,7 @@
       "source": {
         "generated": "2048 x 1152 (16:9, High 2K, opaque, 1 image): research/map-art/drop/regions/08-besara-restored-raw.png",
         "dropSha256": "2c06e7611eb734fb9a99cb4e9c24c77b8b72ba1bcd9b43b24498778a13575304",
-        "crop": "the side bands cut off (raw x 72.606 to 1975.394), Lanczos to 1520 x 920, shifted -1 px across and 2 px down onto the 2012 picture's lines (worst drift after alignment 2 px at 2x in a 4 x 3 grid of tiles (tiles: 2 1 2 1 0 0 1 0 2 1 2 1))",
+        "crop": "the side bands cut off (raw x 72.606 to 1975.394), Lanczos to 1520 x 920, shifted -1 px across and 2 px down onto the 2012 picture's lines (worst drift after alignment 2 px at 2x in a 4 x 3 grid of tiles (tiles: 2 1 2 1 0 0 1 0 2 1 2 1)); the painting ended a few raw px inside the cut, so the 1 left and 3 right columns of band colour were filled with the painting's first clean column beside them (on the toned picture, 2026-11-14, lane maps3; tone unchanged)",
         "toning": "magick master.png -modulate 100,84,100 -gamma 1.24 toned.png (matched to the 2012 picture: saturation and lightness of its mid pixels, lightness 0.12 to 0.78, so the 2012 roads, text and paper sea do not count; gamma rather than brightness so the paper sea keeps its grain)",
         "encode": {
           "x1": "magick toned.png -filter Lanczos -resize 760x460! -quality 82 -define webp:method=6 besara.webp",
@@ -2520,15 +2520,15 @@
         "file": "assets/maps/art/bg/aranna.webp",
         "w": 760,
         "h": 460,
-        "bytes": 78426,
-        "sha256": "d227924dc0f35f9f168d28e4478613f8296e38d7372cb75216254251389fac76"
+        "bytes": 78540,
+        "sha256": "26ac1c38d5d72b23caf01761b132577ee7e5aff439bf45a718683330158592a0"
       },
       "x2": {
         "file": "assets/maps/art/bg/aranna@2x.webp",
         "w": 1520,
         "h": 920,
-        "bytes": 259306,
-        "sha256": "f973330178c552eb53bdae3773535a245325237ccbe88b9b2a94f8d55ea06691"
+        "bytes": 259228,
+        "sha256": "1c4184b2d30e4a3397df2b2b296694bbd4172dc69ca56a35741f666133dd279a"
       },
       "licence": "ai-generated",
       "author": "Austin Ginder (directed and chose it)",
@@ -2559,7 +2559,7 @@
       "source": {
         "generated": "2048 x 1152 (16:9, High 2K, opaque, 1 image): research/map-art/drop/regions/05-aranna-restored-raw.png",
         "dropSha256": "8721f5e14a85f6eb7fddb8ec5f249eb99016840ae1fa956c1315c30c077b68ea",
-        "crop": "the side bands cut off (raw x 72.606 to 1975.394), Lanczos to 1520 x 920, shifted 1 px across and 3 px down onto the 2012 picture's lines (worst drift after alignment 4 px at 2x in a 4 x 3 grid of tiles (tiles: 4 0 2 1 0 1 1 1 1 2 2 1))",
+        "crop": "the side bands cut off (raw x 72.606 to 1975.394), Lanczos to 1520 x 920, shifted 1 px across and 3 px down onto the 2012 picture's lines (worst drift after alignment 4 px at 2x in a 4 x 3 grid of tiles (tiles: 4 0 2 1 0 1 1 1 1 2 2 1)); the painting ended a few raw px inside the cut, so the 3 left and 1 right columns of band colour were filled with the painting's first clean column beside them (on the toned picture, 2026-11-14, lane maps3; tone unchanged)",
         "toning": "magick master.png -modulate 100,83,100 -gamma 1.08 toned.png (matched to the 2012 picture: saturation and lightness of its mid pixels, lightness 0.12 to 0.78, so the 2012 roads, text and paper sea do not count; gamma rather than brightness so the paper sea keeps its grain)",
         "encode": {
           "x1": "magick toned.png -filter Lanczos -resize 760x460! -quality 82 -define webp:method=6 aranna.webp",
@@ -2886,15 +2886,15 @@
         "file": "assets/maps/art/bg/callopee.webp",
         "w": 760,
         "h": 460,
-        "bytes": 60552,
-        "sha256": "1772c77f13d12fcbd948ec94f9327da7d5af61ad25364f57cda2f4378c4ae677"
+        "bytes": 60320,
+        "sha256": "94dd94efec2e630f153f4cb51c721f6e0923781ee99b69ccc54afce0afe9454b"
       },
       "x2": {
         "file": "assets/maps/art/bg/callopee@2x.webp",
         "w": 1520,
         "h": 920,
-        "bytes": 212758,
-        "sha256": "5bcbaea6610ff4ab595934074a0d891831edae4eb03b75f0086947b8e887b1b8"
+        "bytes": 211942,
+        "sha256": "820276bf72327c20a1c3197b085ae0665b84a8077813459abe014581f93b9a0e"
       },
       "licence": "ai-generated",
       "author": "Austin Ginder (directed and chose it)",
@@ -2925,7 +2925,7 @@
       "source": {
         "generated": "2048 x 1152 (16:9, High 2K, opaque, 1 image): research/map-art/drop/regions/11-callopee-restored-raw.png",
         "dropSha256": "3e860735dd27ebf6c3bb8a1a3f95b197accb481710f7f9db9a5ae980d5fae7ab",
-        "crop": "the side bands cut off (raw x 72.606 to 1975.394), Lanczos to 1520 x 920, shifted 0 px across and 1 px down onto the 2012 picture's lines (worst drift after alignment 2 px at 2x in a 4 x 3 grid of tiles (tiles: 1 2 1 1 1 1 1 0 1 1 2 1))",
+        "crop": "the side bands cut off (raw x 72.606 to 1975.394), Lanczos to 1520 x 920, shifted 0 px across and 1 px down onto the 2012 picture's lines (worst drift after alignment 2 px at 2x in a 4 x 3 grid of tiles (tiles: 1 2 1 1 1 1 1 0 1 1 2 1)); the painting ended a few raw px inside the cut, so the 4 left and 3 right columns of band colour were filled with the painting's first clean column beside them (on the toned picture, 2026-11-14, lane maps3; tone unchanged)",
         "toning": "magick master.png -modulate 100,95,100 -gamma 1.08 toned.png (matched to the 2012 picture: saturation and lightness of its mid pixels, lightness 0.12 to 0.78, so the 2012 roads, text and paper sea do not count; gamma rather than brightness so the paper sea keeps its grain)",
         "encode": {
           "x1": "magick toned.png -filter Lanczos -resize 760x460! -quality 82 -define webp:method=6 callopee.webp",
@@ -3173,15 +3173,15 @@
         "file": "assets/maps/art/bg/brillah.webp",
         "w": 760,
         "h": 460,
-        "bytes": 73198,
-        "sha256": "81666cee8817ccaf43e4512337634291b65af08e6cb5db228eb1aa09e03c25f9"
+        "bytes": 73502,
+        "sha256": "be161b3cb07d2e076d9bcaa9f747a9404ca1e3ac9aa17058fc26682f6f8425e3"
       },
       "x2": {
         "file": "assets/maps/art/bg/brillah@2x.webp",
         "w": 1520,
         "h": 920,
-        "bytes": 241798,
-        "sha256": "3691bd5a0685dc70b2fa282a4fd94b6b1ecca31bc2ed7313f7b82249115780a3"
+        "bytes": 241344,
+        "sha256": "ffdb83d20442d5d0fff78737851e17612eba45e434841774c01824ba1095f6e9"
       },
       "licence": "ai-generated",
       "author": "Austin Ginder (directed and chose it)",
@@ -3212,7 +3212,7 @@
       "source": {
         "generated": "2048 x 1152 (16:9, High 2K, opaque, 1 image): research/map-art/drop/regions/10-brillah-restored-raw.png",
         "dropSha256": "fb0db101868fa3bdd8abd40006eeb25dd31db22fa461c9f87920b7dd35e0314a",
-        "crop": "the side bands cut off (raw x 72.606 to 1975.394), Lanczos to 1520 x 920, shifted 0 px across and 2 px down onto the 2012 picture's lines (worst drift after alignment 2 px at 2x in a 4 x 3 grid of tiles (tiles: 1 2 1 2 0 1 1 1 2 2 2 2))",
+        "crop": "the side bands cut off (raw x 72.606 to 1975.394), Lanczos to 1520 x 920, shifted 0 px across and 2 px down onto the 2012 picture's lines (worst drift after alignment 2 px at 2x in a 4 x 3 grid of tiles (tiles: 1 2 1 2 0 1 1 1 2 2 2 2)); the painting ended a few raw px inside the cut, so the 4 left and 4 right columns of band colour were filled with the painting's first clean column beside them (on the toned picture, 2026-11-14, lane maps3; tone unchanged)",
         "toning": "magick master.png -modulate 100,77,100 -gamma 1.2 toned.png (matched to the 2012 picture: saturation and lightness of its mid pixels, lightness 0.12 to 0.78, so the 2012 roads, text and paper sea do not count; gamma rather than brightness so the paper sea keeps its grain)",
         "encode": {
           "x1": "magick toned.png -filter Lanczos -resize 760x460! -quality 82 -define webp:method=6 brillah.webp",
@@ -3665,15 +3665,15 @@
         "file": "assets/maps/art/bg/cauda.webp",
         "w": 760,
         "h": 460,
-        "bytes": 79486,
-        "sha256": "2c297c6968da6e15a7b93135e0f2faab434312e2857ead89114283e6b872da0b"
+        "bytes": 79154,
+        "sha256": "8a5a1c29ba394276d069c4c4670758ae88b55ccabb81ddd261398d3d57999981"
       },
       "x2": {
         "file": "assets/maps/art/bg/cauda@2x.webp",
         "w": 1520,
         "h": 920,
-        "bytes": 256254,
-        "sha256": "b4024b2e4b71274b8ce3be5e7c69ca70a3ed2cc8852faf0986e83354e9b15c0a"
+        "bytes": 255738,
+        "sha256": "549336412752b07c4dd49deea4748e2221f8d47eed20876217c397f571429e09"
       },
       "licence": "ai-generated",
       "author": "Austin Ginder (directed and chose it)",
@@ -3704,7 +3704,7 @@
       "source": {
         "generated": "2048 x 1152 (16:9, High 2K, opaque, 1 image): research/map-art/drop/regions/12-cauda-restored-raw.png",
         "dropSha256": "12ef218f8c2dd9f19c6967d424145c62bc21107effec64fe34e527db7ad87faf",
-        "crop": "the side bands cut off (raw x 72.606 to 1975.394), Lanczos to 1520 x 920, shifted 0 px across and 3 px down onto the 2012 picture's lines (worst drift after alignment 2 px at 2x in a 4 x 3 grid of tiles (tiles: 2 2 2 2 0 1 1 1 0 1 1 1))",
+        "crop": "the side bands cut off (raw x 72.606 to 1975.394), Lanczos to 1520 x 920, shifted 0 px across and 3 px down onto the 2012 picture's lines (worst drift after alignment 2 px at 2x in a 4 x 3 grid of tiles (tiles: 2 2 2 2 0 1 1 1 0 1 1 1)); the painting ended a few raw px inside the cut, so the 3 left and 3 right columns of band colour were filled with the painting's first clean column beside them (on the toned picture, 2026-11-14, lane maps3; tone unchanged)",
         "toning": "magick master.png -modulate 100,78,100 -gamma 1.32 toned.png (matched to the 2012 picture: saturation and lightness of its mid pixels, lightness 0.12 to 0.78, so the 2012 roads, text and paper sea do not count; gamma rather than brightness so the paper sea keeps its grain)",
         "encode": {
           "x1": "magick toned.png -filter Lanczos -resize 760x460! -quality 82 -define webp:method=6 cauda.webp",
@@ -4031,15 +4031,15 @@
         "file": "assets/maps/art/bg/balzare.webp",
         "w": 760,
         "h": 460,
-        "bytes": 103740,
-        "sha256": "66be323fb0909e4470ec05245fd191e68292d4ec597f279e4739f876f057aaa0"
+        "bytes": 103076,
+        "sha256": "cb8a6f7b15a222a45e04061001caaff50acd7d54353855555326582ff03a16b7"
       },
       "x2": {
         "file": "assets/maps/art/bg/balzare@2x.webp",
         "w": 1520,
         "h": 920,
-        "bytes": 342762,
-        "sha256": "fa87344d6e79f63dab96b1a67baa7794d1162dc792f778a51261a0fc0bbad4ca"
+        "bytes": 342828,
+        "sha256": "8a6b21e067ccd9a98a25ff51337460f6a05026dba89efc30958471f98e363558"
       },
       "licence": "ai-generated",
       "author": "Austin Ginder (directed and chose it)",
@@ -4070,7 +4070,7 @@
       "source": {
         "generated": "2048 x 1152 (16:9, High 2K, opaque, 1 image): research/map-art/drop/regions/06-balzare-restored-raw.png",
         "dropSha256": "894cf6376cfd515ef1e6d24cc086119367a6ae312354fc2d8ea0a65b764ca54d",
-        "crop": "the side bands cut off (raw x 72.606 to 1975.394), Lanczos to 1520 x 920, shifted -1 px across and 2 px down onto the 2012 picture's lines (worst drift after alignment 2 px at 2x in a 4 x 3 grid of tiles (tiles: 1 1 2 2 1 1 1 0 2 2 1 1))",
+        "crop": "the side bands cut off (raw x 72.606 to 1975.394), Lanczos to 1520 x 920, shifted -1 px across and 2 px down onto the 2012 picture's lines (worst drift after alignment 2 px at 2x in a 4 x 3 grid of tiles (tiles: 1 1 2 2 1 1 1 0 2 2 1 1)); the painting ended a few raw px inside the cut, so the 1 left and 3 right columns of band colour were filled with the painting's first clean column beside them (on the toned picture, 2026-11-14, lane maps3; tone unchanged)",
         "toning": "magick master.png -modulate 100,58,100 -gamma 1.04 toned.png (matched to the 2012 picture: saturation and lightness of its mid pixels, lightness 0.12 to 0.78, so the 2012 roads, text and paper sea do not count; gamma rather than brightness so the paper sea keeps its grain)",
         "encode": {
           "x1": "magick toned.png -filter Lanczos -resize 760x460! -quality 82 -define webp:method=6 balzare.webp",
