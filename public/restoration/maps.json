@@ -1,0 +1,1779 @@
+{
+  "note": "Built by tools/restoration-maps/build-data.mjs from the provenance records; do not edit.",
+  "states": {
+    "restored": {
+      "label": "Restored from 2012",
+      "tone": "moss"
+    },
+    "painted": {
+      "label": "Painted from the thumbnail",
+      "tone": "sky"
+    },
+    "layout": {
+      "label": "Painted from the street layout",
+      "tone": "plum"
+    }
+  },
+  "counts": {
+    "regions": 51,
+    "restored": 4,
+    "painted": 43,
+    "layout": 4
+  },
+  "world": {
+    "made": "13 November 2026",
+    "model": "GPT Image 2.6 Sunburst",
+    "charts": [
+      {
+        "anchor": "world-unlocked",
+        "name": "The painted chart",
+        "caption": "The painted chart the World view shows round every region you may open.",
+        "before": {
+          "src": "/assets/maps/art/world/world_map_unlocked.jpg",
+          "w": 760,
+          "h": 460,
+          "label": "Tiny Speck’s chart (760 x 460)"
+        },
+        "after": {
+          "src": "/assets/maps/art/world/world_map_unlocked@2x.webp",
+          "w": 1520,
+          "h": 920,
+          "label": "Sharpened at 2x (1520 x 920), in the game now"
+        }
+      },
+      {
+        "anchor": "world-locked",
+        "name": "The sketched chart",
+        "caption": "The sketched chart under everything, where regions you have not opened sit.",
+        "before": {
+          "src": "/assets/maps/art/world/world_map_locked.jpg",
+          "w": 760,
+          "h": 460,
+          "label": "Tiny Speck’s chart (760 x 460)"
+        },
+        "after": {
+          "src": "/assets/maps/art/world/world_map_locked@2x.webp",
+          "w": 1520,
+          "h": 920,
+          "label": "Sharpened at 2x (1520 x 920), in the game now"
+        }
+      }
+    ]
+  },
+  "regions": [
+    {
+      "id": "76",
+      "name": "Alakol",
+      "anchor": "map-alakol",
+      "state": "restored",
+      "caption": "Tiny Speck’s own 2012 painting of Alakol, restored: the 2012 Encyclopedia showed it under the game’s roads, names and buttons, and that picture was given to an image model to take the markings off and sharpen without moving anything, then toned back to the 2012 colour.",
+      "differences": "The cleanest of the pilot: cliffs, the rock ridge, the clouds, the beach and the huts sit where 2012 had them. The model returned it a little greener and more saturated; the toning step brings it back to 2012's colour.",
+      "facts": [
+        {
+          "label": "Made",
+          "text": "13 November 2026, with GPT Image 2.6 Sunburst"
+        },
+        {
+          "label": "Replaced",
+          "text": "The painting made from the thumbnail on 7 November 2026"
+        }
+      ],
+      "before": {
+        "src": "/restoration/maps/replaced/alakol.a0cad877.webp",
+        "w": 760,
+        "h": 460,
+        "label": "Before: painted from the thumbnail on 7 November 2026",
+        "src2": "/restoration/maps/replaced/alakol@2x.dd6e7073.webp"
+      },
+      "after": {
+        "src": "/assets/maps/art/bg/alakol.webp",
+        "w": 760,
+        "h": 460,
+        "label": "Restored, in the game now",
+        "src2": "/assets/maps/art/bg/alakol@2x.webp"
+      },
+      "card": {
+        "src": "/assets/maps/art/world/cards/76.svg",
+        "w": 151,
+        "h": 121,
+        "label": "Its card on the World map"
+      },
+      "place": "/encyclopedia/places/alakol/"
+    },
+    {
+      "id": "89",
+      "name": "Andra",
+      "anchor": "map-andra",
+      "state": "restored",
+      "caption": "Tiny Speck’s own 2012 painting of Andra, restored: the 2012 Encyclopedia showed it under the game’s roads, names and buttons, and that picture was given to an image model to take the markings off and sharpen without moving anything, then toned back to the 2012 colour.",
+      "differences": "The layout holds, but the model added two dark squiggles in the bottom sand where a street name ran in 2012. It returned the land more saturated; the toning step brings it back to 2012's colour.",
+      "facts": [
+        {
+          "label": "Made",
+          "text": "13 November 2026, with GPT Image 2.6 Sunburst"
+        },
+        {
+          "label": "Replaced",
+          "text": "The painting made from the thumbnail on 6 November 2026"
+        }
+      ],
+      "before": {
+        "src": "/restoration/maps/replaced/andra.15eaf604.webp",
+        "w": 760,
+        "h": 460,
+        "label": "Before: painted from the thumbnail on 6 November 2026",
+        "src2": "/restoration/maps/replaced/andra@2x.61a1d490.webp"
+      },
+      "after": {
+        "src": "/assets/maps/art/bg/andra.webp",
+        "w": 760,
+        "h": 460,
+        "label": "Restored, in the game now",
+        "src2": "/assets/maps/art/bg/andra@2x.webp"
+      },
+      "card": {
+        "src": "/assets/maps/art/world/cards/89.svg",
+        "w": 151,
+        "h": 121,
+        "label": "Its card on the World map"
+      },
+      "place": "/encyclopedia/places/andra/"
+    },
+    {
+      "id": "56",
+      "name": "Groddle Forest",
+      "anchor": "map-groddle-forest",
+      "state": "restored",
+      "caption": "Tiny Speck’s own 2012 painting of Groddle Forest, restored: the 2012 Encyclopedia showed it under the game’s roads, names and buttons, and that picture was given to an image model to take the markings off and sharpen without moving anything, then toned back to the 2012 colour.",
+      "differences": "The island's outline holds, but the open clearings in the middle of the 2012 forest came back filled with bushes. The model returned it about 12% darker and much greener; the toning step brings it back to 2012's colour.",
+      "facts": [
+        {
+          "label": "Made",
+          "text": "13 November 2026, with GPT Image 2.6 Sunburst"
+        },
+        {
+          "label": "Replaced",
+          "text": "The painting made from the thumbnail on 7 November 2026"
+        }
+      ],
+      "before": {
+        "src": "/restoration/maps/replaced/groddleforest.296e950b.webp",
+        "w": 760,
+        "h": 460,
+        "label": "Before: painted from the thumbnail on 7 November 2026",
+        "src2": "/restoration/maps/replaced/groddleforest@2x.405377b9.webp"
+      },
+      "after": {
+        "src": "/assets/maps/art/bg/groddleforest.webp",
+        "w": 760,
+        "h": 460,
+        "label": "Restored, in the game now",
+        "src2": "/assets/maps/art/bg/groddleforest@2x.webp"
+      },
+      "card": {
+        "src": "/assets/maps/art/world/cards/56.svg",
+        "w": 151,
+        "h": 117,
+        "label": "Its card on the World map"
+      },
+      "place": "/encyclopedia/places/groddle-forest/"
+    },
+    {
+      "id": "58",
+      "name": "Groddle Meadow",
+      "anchor": "map-groddle-meadow",
+      "state": "restored",
+      "caption": "Tiny Speck’s own 2012 painting of Groddle Meadow, restored: the 2012 Encyclopedia showed it under the game’s roads, names and buttons, and that picture was given to an image model to take the markings off and sharpen without moving anything, then toned back to the 2012 colour.",
+      "differences": "The 2012 sea of pale paper with dashes came back as blue water ripples; small trees that sat half under labels came back whole. The model returned the land greener and darker than 2012; the toning step brings it back to 2012's colour.",
+      "facts": [
+        {
+          "label": "Made",
+          "text": "13 November 2026, with GPT Image 2.6 Sunburst"
+        },
+        {
+          "label": "Replaced",
+          "text": "The painting made from the thumbnail on 7 November 2026"
+        }
+      ],
+      "before": {
+        "src": "/restoration/maps/replaced/groddlemeadow.82c60c31.webp",
+        "w": 760,
+        "h": 460,
+        "label": "Before: painted from the thumbnail on 7 November 2026",
+        "src2": "/restoration/maps/replaced/groddlemeadow@2x.4808cae8.webp"
+      },
+      "after": {
+        "src": "/assets/maps/art/bg/groddlemeadow.webp",
+        "w": 760,
+        "h": 460,
+        "label": "Restored, in the game now",
+        "src2": "/assets/maps/art/bg/groddlemeadow@2x.webp"
+      },
+      "card": {
+        "src": "/assets/maps/art/world/cards/58.svg",
+        "w": 153,
+        "h": 115,
+        "label": "Its card on the World map"
+      },
+      "place": "/encyclopedia/places/groddle-meadow/"
+    },
+    {
+      "id": "101",
+      "name": "Aranna",
+      "anchor": "map-aranna",
+      "state": "painted",
+      "caption": "Tiny Speck’s 760 x 460 painting of Aranna is lost; only its thumbnail on the World map survived. This painting was made from that thumbnail and the region’s street layout, in the style of the decos Tiny Speck painted its streets with.",
+      "differences": "",
+      "facts": [
+        {
+          "label": "Made",
+          "text": "6 November 2026, with GPT Image 2.6 Sunburst"
+        }
+      ],
+      "before": {
+        "src": "/assets/maps/art/thumbs/sm_aranna.jpg",
+        "w": 150,
+        "h": 91,
+        "label": "Tiny Speck’s thumbnail, all that survived (150 x 91)"
+      },
+      "after": {
+        "src": "/assets/maps/art/bg/aranna.webp",
+        "w": 760,
+        "h": 460,
+        "label": "Painted for Groddle, in the game now",
+        "src2": "/assets/maps/art/bg/aranna@2x.webp"
+      },
+      "card": {
+        "src": "/assets/maps/art/world/cards/101.svg",
+        "w": 151,
+        "h": 120,
+        "label": "Its card on the World map"
+      },
+      "place": "/encyclopedia/places/aranna/"
+    },
+    {
+      "id": "128",
+      "name": "Balzare",
+      "anchor": "map-balzare",
+      "state": "painted",
+      "caption": "Tiny Speck’s 760 x 460 painting of Balzare is lost; only its thumbnail on the World map survived. This painting was made from that thumbnail and the region’s street layout, in the style of the decos Tiny Speck painted its streets with.",
+      "differences": "",
+      "facts": [
+        {
+          "label": "Made",
+          "text": "6 November 2026, with GPT Image 2.6 Sunburst"
+        }
+      ],
+      "before": {
+        "src": "/assets/maps/art/thumbs/sm_balzare.jpg",
+        "w": 150,
+        "h": 91,
+        "label": "Tiny Speck’s thumbnail, all that survived (150 x 91)"
+      },
+      "after": {
+        "src": "/assets/maps/art/bg/balzare.webp",
+        "w": 760,
+        "h": 460,
+        "label": "Painted for Groddle, in the game now",
+        "src2": "/assets/maps/art/bg/balzare@2x.webp"
+      },
+      "card": {
+        "src": "/assets/maps/art/world/cards/128.svg",
+        "w": 151,
+        "h": 118,
+        "label": "Its card on the World map"
+      },
+      "place": "/encyclopedia/places/balzare/"
+    },
+    {
+      "id": "86",
+      "name": "Baqala",
+      "anchor": "map-baqala",
+      "state": "painted",
+      "caption": "Tiny Speck’s 760 x 460 painting of Baqala is lost; only its thumbnail on the World map survived. This painting was made from that thumbnail and the region’s street layout, in the style of the decos Tiny Speck painted its streets with.",
+      "differences": "",
+      "facts": [
+        {
+          "label": "Made",
+          "text": "6 November 2026, with GPT Image 2.6 Sunburst"
+        }
+      ],
+      "before": {
+        "src": "/assets/maps/art/thumbs/sm_baqala.jpg",
+        "w": 150,
+        "h": 91,
+        "label": "Tiny Speck’s thumbnail, all that survived (150 x 91)"
+      },
+      "after": {
+        "src": "/assets/maps/art/bg/baqala.webp",
+        "w": 760,
+        "h": 460,
+        "label": "Painted for Groddle, in the game now",
+        "src2": "/assets/maps/art/bg/baqala@2x.webp"
+      },
+      "card": {
+        "src": "/assets/maps/art/world/cards/86.svg",
+        "w": 151,
+        "h": 124,
+        "label": "Its card on the World map"
+      },
+      "place": "/encyclopedia/places/baqala/"
+    },
+    {
+      "id": "98",
+      "name": "Besara",
+      "anchor": "map-besara",
+      "state": "painted",
+      "caption": "Tiny Speck’s 760 x 460 painting of Besara is lost; only its thumbnail on the World map survived. This painting was made from that thumbnail and the region’s street layout, in the style of the decos Tiny Speck painted its streets with.",
+      "differences": "",
+      "facts": [
+        {
+          "label": "Made",
+          "text": "6 November 2026, with GPT Image 2.6 Flare"
+        }
+      ],
+      "before": {
+        "src": "/assets/maps/art/thumbs/sm_besara.jpg",
+        "w": 150,
+        "h": 91,
+        "label": "Tiny Speck’s thumbnail, all that survived (150 x 91)"
+      },
+      "after": {
+        "src": "/assets/maps/art/bg/besara.webp",
+        "w": 760,
+        "h": 460,
+        "label": "Painted for Groddle, in the game now",
+        "src2": "/assets/maps/art/bg/besara@2x.webp"
+      },
+      "card": {
+        "src": "/assets/maps/art/world/cards/98.svg",
+        "w": 151,
+        "h": 124,
+        "label": "Its card on the World map"
+      },
+      "place": "/encyclopedia/places/besara/"
+    },
+    {
+      "id": "75",
+      "name": "Bortola",
+      "anchor": "map-bortola",
+      "state": "painted",
+      "caption": "Tiny Speck’s 760 x 460 painting of Bortola is lost; only its thumbnail on the World map survived. This painting was made from that thumbnail and the region’s street layout, in the style of the decos Tiny Speck painted its streets with.",
+      "differences": "",
+      "facts": [
+        {
+          "label": "Made",
+          "text": "6 November 2026, with GPT Image 2.6 Sunburst"
+        }
+      ],
+      "before": {
+        "src": "/assets/maps/art/thumbs/sm_bortola.jpg",
+        "w": 150,
+        "h": 91,
+        "label": "Tiny Speck’s thumbnail, all that survived (150 x 91)"
+      },
+      "after": {
+        "src": "/assets/maps/art/bg/bortola.webp",
+        "w": 760,
+        "h": 460,
+        "label": "Painted for Groddle, in the game now",
+        "src2": "/assets/maps/art/bg/bortola@2x.webp"
+      },
+      "card": {
+        "src": "/assets/maps/art/world/cards/75.svg",
+        "w": 151,
+        "h": 119,
+        "label": "Its card on the World map"
+      },
+      "place": "/encyclopedia/places/bortola/"
+    },
+    {
+      "id": "112",
+      "name": "Brillah",
+      "anchor": "map-brillah",
+      "state": "painted",
+      "caption": "Tiny Speck’s 760 x 460 painting of Brillah is lost; only its thumbnail on the World map survived. This painting was made from that thumbnail and the region’s street layout, in the style of the decos Tiny Speck painted its streets with.",
+      "differences": "",
+      "facts": [
+        {
+          "label": "Made",
+          "text": "6 November 2026, with GPT Image 2.6 Sunburst"
+        }
+      ],
+      "before": {
+        "src": "/assets/maps/art/thumbs/sm_brillah.jpg",
+        "w": 150,
+        "h": 91,
+        "label": "Tiny Speck’s thumbnail, all that survived (150 x 91)"
+      },
+      "after": {
+        "src": "/assets/maps/art/bg/brillah.webp",
+        "w": 760,
+        "h": 460,
+        "label": "Painted for Groddle, in the game now",
+        "src2": "/assets/maps/art/bg/brillah@2x.webp"
+      },
+      "card": {
+        "src": "/assets/maps/art/world/cards/112.svg",
+        "w": 151,
+        "h": 121,
+        "label": "Its card on the World map"
+      },
+      "place": "/encyclopedia/places/brillah/"
+    },
+    {
+      "id": "107",
+      "name": "Callopee",
+      "anchor": "map-callopee",
+      "state": "painted",
+      "caption": "Tiny Speck’s 760 x 460 painting of Callopee is lost; only its thumbnail on the World map survived. This painting was made from that thumbnail and the region’s street layout, in the style of the decos Tiny Speck painted its streets with.",
+      "differences": "",
+      "facts": [
+        {
+          "label": "Made",
+          "text": "6 November 2026, with GPT Image 2.6 Sunburst"
+        }
+      ],
+      "before": {
+        "src": "/assets/maps/art/thumbs/sm_callopee.jpg",
+        "w": 150,
+        "h": 91,
+        "label": "Tiny Speck’s thumbnail, all that survived (150 x 91)"
+      },
+      "after": {
+        "src": "/assets/maps/art/bg/callopee.webp",
+        "w": 760,
+        "h": 460,
+        "label": "Painted for Groddle, in the game now",
+        "src2": "/assets/maps/art/bg/callopee@2x.webp"
+      },
+      "card": {
+        "src": "/assets/maps/art/world/cards/107.svg",
+        "w": 52,
+        "h": 39,
+        "label": "Its card on the World map"
+      },
+      "place": "/encyclopedia/places/callopee/"
+    },
+    {
+      "id": "120",
+      "name": "Cauda",
+      "anchor": "map-cauda",
+      "state": "painted",
+      "caption": "Tiny Speck’s 760 x 460 painting of Cauda is lost; only its thumbnail on the World map survived. This painting was made from that thumbnail and the region’s street layout, in the style of the decos Tiny Speck painted its streets with.",
+      "differences": "",
+      "facts": [
+        {
+          "label": "Made",
+          "text": "6 November 2026, with GPT Image 2.6 Sunburst"
+        }
+      ],
+      "before": {
+        "src": "/assets/maps/art/thumbs/sm_cauda.jpg",
+        "w": 150,
+        "h": 91,
+        "label": "Tiny Speck’s thumbnail, all that survived (150 x 91)"
+      },
+      "after": {
+        "src": "/assets/maps/art/bg/cauda.webp",
+        "w": 760,
+        "h": 460,
+        "label": "Painted for Groddle, in the game now",
+        "src2": "/assets/maps/art/bg/cauda@2x.webp"
+      },
+      "card": {
+        "src": "/assets/maps/art/world/cards/120.svg",
+        "w": 151,
+        "h": 117,
+        "label": "Its card on the World map"
+      },
+      "place": "/encyclopedia/places/cauda/"
+    },
+    {
+      "id": "72",
+      "name": "Chakra Phool",
+      "anchor": "map-chakra-phool",
+      "state": "painted",
+      "caption": "Tiny Speck’s 760 x 460 painting of Chakra Phool is lost; only its thumbnail on the World map survived. This painting was made from that thumbnail and the region’s street layout, in the style of the decos Tiny Speck painted its streets with.",
+      "differences": "",
+      "facts": [
+        {
+          "label": "Made",
+          "text": "6 November 2026, with GPT Image 2.6 Sunburst"
+        }
+      ],
+      "before": {
+        "src": "/assets/maps/art/thumbs/sm_chakraphool.jpg",
+        "w": 150,
+        "h": 91,
+        "label": "Tiny Speck’s thumbnail, all that survived (150 x 91)"
+      },
+      "after": {
+        "src": "/assets/maps/art/bg/chakraphool.webp",
+        "w": 760,
+        "h": 460,
+        "label": "Painted for Groddle, in the game now",
+        "src2": "/assets/maps/art/bg/chakraphool@2x.webp"
+      },
+      "card": {
+        "src": "/assets/maps/art/world/cards/72.svg",
+        "w": 151,
+        "h": 119,
+        "label": "Its card on the World map"
+      },
+      "place": "/encyclopedia/places/chakra-phool/"
+    },
+    {
+      "id": "90",
+      "name": "Choru",
+      "anchor": "map-choru",
+      "state": "painted",
+      "caption": "Tiny Speck’s 760 x 460 painting of Choru is lost; only its thumbnail on the World map survived. This painting was made from that thumbnail and the region’s street layout, in the style of the decos Tiny Speck painted its streets with.",
+      "differences": "",
+      "facts": [
+        {
+          "label": "Made",
+          "text": "6 November 2026, with GPT Image 2.6 Sunburst"
+        }
+      ],
+      "before": {
+        "src": "/assets/maps/art/thumbs/sm_choru.jpg",
+        "w": 150,
+        "h": 91,
+        "label": "Tiny Speck’s thumbnail, all that survived (150 x 91)"
+      },
+      "after": {
+        "src": "/assets/maps/art/bg/choru.webp",
+        "w": 760,
+        "h": 460,
+        "label": "Painted for Groddle, in the game now",
+        "src2": "/assets/maps/art/bg/choru@2x.webp"
+      },
+      "card": {
+        "src": "/assets/maps/art/world/cards/90.svg",
+        "w": 151,
+        "h": 121,
+        "label": "Its card on the World map"
+      },
+      "place": "/encyclopedia/places/choru/"
+    },
+    {
+      "id": "141",
+      "name": "Drifa",
+      "anchor": "map-drifa",
+      "state": "painted",
+      "caption": "Tiny Speck’s 760 x 460 painting of Drifa is lost; only its thumbnail on the World map survived. This painting was made from that thumbnail and the region’s street layout, in the style of the decos Tiny Speck painted its streets with.",
+      "differences": "",
+      "facts": [
+        {
+          "label": "Made",
+          "text": "6 November 2026, with GPT Image 2.6 Sunburst"
+        }
+      ],
+      "before": {
+        "src": "/assets/maps/art/thumbs/sm_drifa.jpg",
+        "w": 150,
+        "h": 91,
+        "label": "Tiny Speck’s thumbnail, all that survived (150 x 91)"
+      },
+      "after": {
+        "src": "/assets/maps/art/bg/drifa.webp",
+        "w": 760,
+        "h": 460,
+        "label": "Painted for Groddle, in the game now",
+        "src2": "/assets/maps/art/bg/drifa@2x.webp"
+      },
+      "card": {
+        "src": "/assets/maps/art/world/cards/141.svg",
+        "w": 111,
+        "h": 87,
+        "label": "Its card on the World map"
+      },
+      "place": "/encyclopedia/places/drifa/"
+    },
+    {
+      "id": "123",
+      "name": "Fenneq",
+      "anchor": "map-fenneq",
+      "state": "painted",
+      "caption": "Tiny Speck’s 760 x 460 painting of Fenneq is lost; only its thumbnail on the World map survived. This painting was made from that thumbnail and the region’s street layout, in the style of the decos Tiny Speck painted its streets with.",
+      "differences": "",
+      "facts": [
+        {
+          "label": "Made",
+          "text": "6 November 2026, with GPT Image 2.6 Sunburst"
+        }
+      ],
+      "before": {
+        "src": "/assets/maps/art/thumbs/sm_fenneq.jpg",
+        "w": 150,
+        "h": 91,
+        "label": "Tiny Speck’s thumbnail, all that survived (150 x 91)"
+      },
+      "after": {
+        "src": "/assets/maps/art/bg/fenneq.webp",
+        "w": 760,
+        "h": 460,
+        "label": "Painted for Groddle, in the game now",
+        "src2": "/assets/maps/art/bg/fenneq@2x.webp"
+      },
+      "card": {
+        "src": "/assets/maps/art/world/cards/123.svg",
+        "w": 151,
+        "h": 126,
+        "label": "Its card on the World map"
+      },
+      "place": "/encyclopedia/places/fenneq/"
+    },
+    {
+      "id": "114",
+      "name": "Firozi",
+      "anchor": "map-firozi",
+      "state": "painted",
+      "caption": "Tiny Speck’s 760 x 460 painting of Firozi is lost; only its thumbnail on the World map survived. This painting was made from that thumbnail and the region’s street layout, in the style of the decos Tiny Speck painted its streets with.",
+      "differences": "",
+      "facts": [
+        {
+          "label": "Made",
+          "text": "6 November 2026, with GPT Image 2.6 Sunburst"
+        }
+      ],
+      "before": {
+        "src": "/assets/maps/art/thumbs/sm_firozi.jpg",
+        "w": 150,
+        "h": 91,
+        "label": "Tiny Speck’s thumbnail, all that survived (150 x 91)"
+      },
+      "after": {
+        "src": "/assets/maps/art/bg/firozi.webp",
+        "w": 760,
+        "h": 460,
+        "label": "Painted for Groddle, in the game now",
+        "src2": "/assets/maps/art/bg/firozi@2x.webp"
+      },
+      "card": {
+        "src": "/assets/maps/art/world/cards/114.svg",
+        "w": 151,
+        "h": 118,
+        "label": "Its card on the World map"
+      },
+      "place": "/encyclopedia/places/firozi/"
+    },
+    {
+      "id": "119",
+      "name": "Folivoria",
+      "anchor": "map-folivoria",
+      "state": "painted",
+      "caption": "Tiny Speck’s 760 x 460 painting of Folivoria is lost; only its thumbnail on the World map survived. This painting was made from that thumbnail and the region’s street layout, in the style of the decos Tiny Speck painted its streets with.",
+      "differences": "",
+      "facts": [
+        {
+          "label": "Made",
+          "text": "6 November 2026, with GPT Image 2.6 Sunburst"
+        }
+      ],
+      "before": {
+        "src": "/assets/maps/art/thumbs/sm_folivoria.jpg",
+        "w": 150,
+        "h": 91,
+        "label": "Tiny Speck’s thumbnail, all that survived (150 x 91)"
+      },
+      "after": {
+        "src": "/assets/maps/art/bg/folivoria.webp",
+        "w": 760,
+        "h": 460,
+        "label": "Painted for Groddle, in the game now",
+        "src2": "/assets/maps/art/bg/folivoria@2x.webp"
+      },
+      "card": {
+        "src": "/assets/maps/art/world/cards/119.svg",
+        "w": 54,
+        "h": 41,
+        "label": "Its card on the World map"
+      },
+      "place": "/encyclopedia/places/folivoria/"
+    },
+    {
+      "id": "64",
+      "name": "Groddle Heights",
+      "anchor": "map-groddle-heights",
+      "state": "painted",
+      "caption": "Tiny Speck’s 760 x 460 painting of Groddle Heights is lost; only its thumbnail on the World map survived. This painting was made from that thumbnail and the region’s street layout, in the style of the decos Tiny Speck painted its streets with.",
+      "differences": "",
+      "facts": [
+        {
+          "label": "Made",
+          "text": "6 November 2026, with GPT Image 2.6 Sunburst"
+        }
+      ],
+      "before": {
+        "src": "/assets/maps/art/thumbs/sm_groddleheights.jpg",
+        "w": 150,
+        "h": 91,
+        "label": "Tiny Speck’s thumbnail, all that survived (150 x 91)"
+      },
+      "after": {
+        "src": "/assets/maps/art/bg/groddleheights.webp",
+        "w": 760,
+        "h": 460,
+        "label": "Painted for Groddle, in the game now",
+        "src2": "/assets/maps/art/bg/groddleheights@2x.webp"
+      },
+      "card": {
+        "src": "/assets/maps/art/world/cards/64.svg",
+        "w": 150,
+        "h": 120,
+        "label": "Its card on the World map"
+      },
+      "place": "/encyclopedia/places/groddle-heights/"
+    },
+    {
+      "id": "131",
+      "name": "Haoma",
+      "anchor": "map-haoma",
+      "state": "painted",
+      "caption": "Tiny Speck’s 760 x 460 painting of Haoma is lost; only its thumbnail on the World map survived. This painting was made from that thumbnail and the region’s street layout, in the style of the decos Tiny Speck painted its streets with.",
+      "differences": "",
+      "facts": [
+        {
+          "label": "Made",
+          "text": "6 November 2026, with GPT Image 2.6 Sunburst"
+        }
+      ],
+      "before": {
+        "src": "/assets/maps/art/thumbs/sm_haoma.jpg",
+        "w": 150,
+        "h": 91,
+        "label": "Tiny Speck’s thumbnail, all that survived (150 x 91)"
+      },
+      "after": {
+        "src": "/assets/maps/art/bg/haoma.webp",
+        "w": 760,
+        "h": 460,
+        "label": "Painted for Groddle, in the game now",
+        "src2": "/assets/maps/art/bg/haoma@2x.webp"
+      },
+      "card": {
+        "src": "/assets/maps/art/world/cards/131.svg",
+        "w": 151,
+        "h": 119,
+        "label": "Its card on the World map"
+      },
+      "place": "/encyclopedia/places/haoma/"
+    },
+    {
+      "id": "116",
+      "name": "Haraiva",
+      "anchor": "map-haraiva",
+      "state": "painted",
+      "caption": "Tiny Speck’s 760 x 460 painting of Haraiva is lost; only its thumbnail on the World map survived. This painting was made from that thumbnail and the region’s street layout, in the style of the decos Tiny Speck painted its streets with.",
+      "differences": "",
+      "facts": [
+        {
+          "label": "Made",
+          "text": "6 November 2026, with GPT Image 2.6 Sunburst"
+        }
+      ],
+      "before": {
+        "src": "/assets/maps/art/thumbs/sm_haraiva.jpg",
+        "w": 150,
+        "h": 91,
+        "label": "Tiny Speck’s thumbnail, all that survived (150 x 91)"
+      },
+      "after": {
+        "src": "/assets/maps/art/bg/haraiva.webp",
+        "w": 760,
+        "h": 460,
+        "label": "Painted for Groddle, in the game now",
+        "src2": "/assets/maps/art/bg/haraiva@2x.webp"
+      },
+      "card": {
+        "src": "/assets/maps/art/world/cards/116.svg",
+        "w": 151,
+        "h": 119,
+        "label": "Its card on the World map"
+      },
+      "place": "/encyclopedia/places/haraiva/"
+    },
+    {
+      "id": "27",
+      "name": "Ix",
+      "anchor": "map-ix",
+      "state": "painted",
+      "caption": "Tiny Speck’s 760 x 460 painting of Ix is lost; only its thumbnail on the World map survived. This painting was made from that thumbnail and the region’s street layout, in the style of the decos Tiny Speck painted its streets with.",
+      "differences": "",
+      "facts": [
+        {
+          "label": "Made",
+          "text": "6 November 2026, with GPT Image 2.6 Sunburst"
+        }
+      ],
+      "before": {
+        "src": "/assets/maps/art/thumbs/sm_ix.jpg",
+        "w": 150,
+        "h": 91,
+        "label": "Tiny Speck’s thumbnail, all that survived (150 x 91)"
+      },
+      "after": {
+        "src": "/assets/maps/art/bg/ix.webp",
+        "w": 760,
+        "h": 460,
+        "label": "Painted for Groddle, in the game now",
+        "src2": "/assets/maps/art/bg/ix@2x.webp"
+      },
+      "card": {
+        "src": "/assets/maps/art/world/cards/27.svg",
+        "w": 151,
+        "h": 122,
+        "label": "Its card on the World map"
+      },
+      "place": "/encyclopedia/places/ix/"
+    },
+    {
+      "id": "136",
+      "name": "Jal",
+      "anchor": "map-jal",
+      "state": "painted",
+      "caption": "Tiny Speck’s 760 x 460 painting of Jal is lost; only its thumbnail on the World map survived. This painting was made from that thumbnail and the region’s street layout, in the style of the decos Tiny Speck painted its streets with.",
+      "differences": "",
+      "facts": [
+        {
+          "label": "Made",
+          "text": "6 November 2026, with GPT Image 2.6 Sunburst"
+        }
+      ],
+      "before": {
+        "src": "/assets/maps/art/thumbs/sm_jal.jpg",
+        "w": 150,
+        "h": 91,
+        "label": "Tiny Speck’s thumbnail, all that survived (150 x 91)"
+      },
+      "after": {
+        "src": "/assets/maps/art/bg/jal.webp",
+        "w": 760,
+        "h": 460,
+        "label": "Painted for Groddle, in the game now",
+        "src2": "/assets/maps/art/bg/jal@2x.webp"
+      },
+      "card": {
+        "src": "/assets/maps/art/world/cards/136.svg",
+        "w": 151,
+        "h": 121,
+        "label": "Its card on the World map"
+      },
+      "place": "/encyclopedia/places/jal/"
+    },
+    {
+      "id": "71",
+      "name": "Jethimadh",
+      "anchor": "map-jethimadh",
+      "state": "painted",
+      "caption": "Tiny Speck’s 760 x 460 painting of Jethimadh is lost; only its thumbnail on the World map survived. This painting was made from that thumbnail and the region’s street layout, in the style of the decos Tiny Speck painted its streets with.",
+      "differences": "",
+      "facts": [
+        {
+          "label": "Made",
+          "text": "6 November 2026, with GPT Image 2.6 Sunburst"
+        }
+      ],
+      "before": {
+        "src": "/assets/maps/art/thumbs/sm_jethimadh.jpg",
+        "w": 150,
+        "h": 91,
+        "label": "Tiny Speck’s thumbnail, all that survived (150 x 91)"
+      },
+      "after": {
+        "src": "/assets/maps/art/bg/jethimadh.webp",
+        "w": 760,
+        "h": 460,
+        "label": "Painted for Groddle, in the game now",
+        "src2": "/assets/maps/art/bg/jethimadh@2x.webp"
+      },
+      "card": {
+        "src": "/assets/maps/art/world/cards/71.svg",
+        "w": 151,
+        "h": 126,
+        "label": "Its card on the World map"
+      },
+      "place": "/encyclopedia/places/jethimadh/"
+    },
+    {
+      "id": "85",
+      "name": "Kajuu",
+      "anchor": "map-kajuu",
+      "state": "painted",
+      "caption": "Tiny Speck’s 760 x 460 painting of Kajuu is lost; only its thumbnail on the World map survived. This painting was made from that thumbnail and the region’s street layout, in the style of the decos Tiny Speck painted its streets with.",
+      "differences": "",
+      "facts": [
+        {
+          "label": "Made",
+          "text": "6 November 2026, with GPT Image 2.6 Sunburst"
+        }
+      ],
+      "before": {
+        "src": "/assets/maps/art/thumbs/sm_kajuu.jpg",
+        "w": 150,
+        "h": 91,
+        "label": "Tiny Speck’s thumbnail, all that survived (150 x 91)"
+      },
+      "after": {
+        "src": "/assets/maps/art/bg/kajuu.webp",
+        "w": 760,
+        "h": 460,
+        "label": "Painted for Groddle, in the game now",
+        "src2": "/assets/maps/art/bg/kajuu@2x.webp"
+      },
+      "card": {
+        "src": "/assets/maps/art/world/cards/85.svg",
+        "w": 151,
+        "h": 125,
+        "label": "Its card on the World map"
+      },
+      "place": "/encyclopedia/places/kajuu/"
+    },
+    {
+      "id": "99",
+      "name": "Kalavana",
+      "anchor": "map-kalavana",
+      "state": "painted",
+      "caption": "Tiny Speck’s 760 x 460 painting of Kalavana is lost; only its thumbnail on the World map survived. This painting was made from that thumbnail and the region’s street layout, in the style of the decos Tiny Speck painted its streets with.",
+      "differences": "",
+      "facts": [
+        {
+          "label": "Made",
+          "text": "6 November 2026, with GPT Image 2.6 Sunburst"
+        }
+      ],
+      "before": {
+        "src": "/assets/maps/art/thumbs/sm_kalavana.jpg",
+        "w": 150,
+        "h": 91,
+        "label": "Tiny Speck’s thumbnail, all that survived (150 x 91)"
+      },
+      "after": {
+        "src": "/assets/maps/art/bg/kalavana.webp",
+        "w": 760,
+        "h": 460,
+        "label": "Painted for Groddle, in the game now",
+        "src2": "/assets/maps/art/bg/kalavana@2x.webp"
+      },
+      "card": {
+        "src": "/assets/maps/art/world/cards/99.svg",
+        "w": 151,
+        "h": 120,
+        "label": "Its card on the World map"
+      },
+      "place": "/encyclopedia/places/kalavana/"
+    },
+    {
+      "id": "88",
+      "name": "Karnata",
+      "anchor": "map-karnata",
+      "state": "painted",
+      "caption": "Tiny Speck’s 760 x 460 painting of Karnata is lost; only its thumbnail on the World map survived. This painting was made from that thumbnail and the region’s street layout, in the style of the decos Tiny Speck painted its streets with.",
+      "differences": "",
+      "facts": [
+        {
+          "label": "Made",
+          "text": "6 November 2026, with GPT Image 2.6 Sunburst"
+        }
+      ],
+      "before": {
+        "src": "/assets/maps/art/thumbs/sm_karnata.jpg",
+        "w": 150,
+        "h": 91,
+        "label": "Tiny Speck’s thumbnail, all that survived (150 x 91)"
+      },
+      "after": {
+        "src": "/assets/maps/art/bg/karnata.webp",
+        "w": 760,
+        "h": 460,
+        "label": "Painted for Groddle, in the game now",
+        "src2": "/assets/maps/art/bg/karnata@2x.webp"
+      },
+      "card": {
+        "src": "/assets/maps/art/world/cards/88.svg",
+        "w": 151,
+        "h": 120,
+        "label": "Its card on the World map"
+      },
+      "place": "/encyclopedia/places/karnata/"
+    },
+    {
+      "id": "133",
+      "name": "Kloro",
+      "anchor": "map-kloro",
+      "state": "painted",
+      "caption": "Tiny Speck’s 760 x 460 painting of Kloro is lost; only its thumbnail on the World map survived. This painting was made from that thumbnail and the region’s street layout, in the style of the decos Tiny Speck painted its streets with.",
+      "differences": "",
+      "facts": [
+        {
+          "label": "Made",
+          "text": "6 November 2026, with GPT Image 2.6 Sunburst"
+        }
+      ],
+      "before": {
+        "src": "/assets/maps/art/thumbs/sm_kloro.jpg",
+        "w": 150,
+        "h": 91,
+        "label": "Tiny Speck’s thumbnail, all that survived (150 x 91)"
+      },
+      "after": {
+        "src": "/assets/maps/art/bg/kloro.webp",
+        "w": 760,
+        "h": 460,
+        "label": "Painted for Groddle, in the game now",
+        "src2": "/assets/maps/art/bg/kloro@2x.webp"
+      },
+      "card": {
+        "src": "/assets/maps/art/world/cards/133.svg",
+        "w": 151,
+        "h": 119,
+        "label": "Its card on the World map"
+      },
+      "place": "/encyclopedia/places/kloro/"
+    },
+    {
+      "id": "105",
+      "name": "Lida",
+      "anchor": "map-lida",
+      "state": "painted",
+      "caption": "Tiny Speck’s 760 x 460 painting of Lida is lost; only its thumbnail on the World map survived. This painting was made from that thumbnail and the region’s street layout, in the style of the decos Tiny Speck painted its streets with.",
+      "differences": "",
+      "facts": [
+        {
+          "label": "Made",
+          "text": "6 November 2026, with GPT Image 2.6 Sunburst"
+        }
+      ],
+      "before": {
+        "src": "/assets/maps/art/thumbs/sm_lida.jpg",
+        "w": 150,
+        "h": 91,
+        "label": "Tiny Speck’s thumbnail, all that survived (150 x 91)"
+      },
+      "after": {
+        "src": "/assets/maps/art/bg/lida.webp",
+        "w": 760,
+        "h": 460,
+        "label": "Painted for Groddle, in the game now",
+        "src2": "/assets/maps/art/bg/lida@2x.webp"
+      },
+      "card": {
+        "src": "/assets/maps/art/world/cards/105.svg",
+        "w": 151,
+        "h": 119,
+        "label": "Its card on the World map"
+      },
+      "place": "/encyclopedia/places/lida/"
+    },
+    {
+      "id": "110",
+      "name": "Massadoe",
+      "anchor": "map-massadoe",
+      "state": "painted",
+      "caption": "Tiny Speck’s 760 x 460 painting of Massadoe is lost; only its thumbnail on the World map survived. This painting was made from that thumbnail and the region’s street layout, in the style of the decos Tiny Speck painted its streets with.",
+      "differences": "",
+      "facts": [
+        {
+          "label": "Made",
+          "text": "6 November 2026, with GPT Image 2.6 Sunburst"
+        }
+      ],
+      "before": {
+        "src": "/assets/maps/art/thumbs/sm_massadoe.jpg",
+        "w": 150,
+        "h": 91,
+        "label": "Tiny Speck’s thumbnail, all that survived (150 x 91)"
+      },
+      "after": {
+        "src": "/assets/maps/art/bg/massadoe.webp",
+        "w": 760,
+        "h": 460,
+        "label": "Painted for Groddle, in the game now",
+        "src2": "/assets/maps/art/bg/massadoe@2x.webp"
+      },
+      "card": {
+        "src": "/assets/maps/art/world/cards/110.svg",
+        "w": 52,
+        "h": 39,
+        "label": "Its card on the World map"
+      },
+      "place": "/encyclopedia/places/massadoe/"
+    },
+    {
+      "id": "97",
+      "name": "Muufo",
+      "anchor": "map-muufo",
+      "state": "painted",
+      "caption": "Tiny Speck’s 760 x 460 painting of Muufo is lost; only its thumbnail on the World map survived. This painting was made from that thumbnail and the region’s street layout, in the style of the decos Tiny Speck painted its streets with.",
+      "differences": "",
+      "facts": [
+        {
+          "label": "Made",
+          "text": "6 November 2026, with GPT Image 2.6 Sunburst"
+        }
+      ],
+      "before": {
+        "src": "/assets/maps/art/thumbs/sm_muufo.jpg",
+        "w": 150,
+        "h": 91,
+        "label": "Tiny Speck’s thumbnail, all that survived (150 x 91)"
+      },
+      "after": {
+        "src": "/assets/maps/art/bg/muufo.webp",
+        "w": 760,
+        "h": 460,
+        "label": "Painted for Groddle, in the game now",
+        "src2": "/assets/maps/art/bg/muufo@2x.webp"
+      },
+      "card": {
+        "src": "/assets/maps/art/world/cards/97.svg",
+        "w": 151,
+        "h": 123,
+        "label": "Its card on the World map"
+      },
+      "place": "/encyclopedia/places/muufo/"
+    },
+    {
+      "id": "137",
+      "name": "Nottis",
+      "anchor": "map-nottis",
+      "state": "painted",
+      "caption": "Tiny Speck’s 760 x 460 painting of Nottis is lost; only its thumbnail on the World map survived. This painting was made from that thumbnail and the region’s street layout, in the style of the decos Tiny Speck painted its streets with.",
+      "differences": "",
+      "facts": [
+        {
+          "label": "Made",
+          "text": "6 November 2026, with GPT Image 2.6 Sunburst"
+        }
+      ],
+      "before": {
+        "src": "/assets/maps/art/thumbs/sm_nottis.jpg",
+        "w": 150,
+        "h": 91,
+        "label": "Tiny Speck’s thumbnail, all that survived (150 x 91)"
+      },
+      "after": {
+        "src": "/assets/maps/art/bg/nottis.webp",
+        "w": 760,
+        "h": 460,
+        "label": "Painted for Groddle, in the game now",
+        "src2": "/assets/maps/art/bg/nottis@2x.webp"
+      },
+      "card": {
+        "src": "/assets/maps/art/world/cards/137.svg",
+        "w": 57,
+        "h": 39,
+        "label": "Its card on the World map"
+      },
+      "place": "/encyclopedia/places/nottis/"
+    },
+    {
+      "id": "102",
+      "name": "Ormonos",
+      "anchor": "map-ormonos",
+      "state": "painted",
+      "caption": "Tiny Speck’s 760 x 460 painting of Ormonos is lost; only its thumbnail on the World map survived. This painting was made from that thumbnail and the region’s street layout, in the style of the decos Tiny Speck painted its streets with.",
+      "differences": "",
+      "facts": [
+        {
+          "label": "Made",
+          "text": "6 November 2026, with GPT Image 2.6 Sunburst"
+        }
+      ],
+      "before": {
+        "src": "/assets/maps/art/thumbs/sm_ormonos.jpg",
+        "w": 150,
+        "h": 91,
+        "label": "Tiny Speck’s thumbnail, all that survived (150 x 91)"
+      },
+      "after": {
+        "src": "/assets/maps/art/bg/ormonos.webp",
+        "w": 760,
+        "h": 460,
+        "label": "Painted for Groddle, in the game now",
+        "src2": "/assets/maps/art/bg/ormonos@2x.webp"
+      },
+      "card": {
+        "src": "/assets/maps/art/world/cards/102.svg",
+        "w": 151,
+        "h": 116,
+        "label": "Its card on the World map"
+      },
+      "place": "/encyclopedia/places/ormonos/"
+    },
+    {
+      "id": "106",
+      "name": "Pollokoo",
+      "anchor": "map-pollokoo",
+      "state": "painted",
+      "caption": "Tiny Speck’s 760 x 460 painting of Pollokoo is lost; only its thumbnail on the World map survived. This painting was made from that thumbnail and the region’s street layout, in the style of the decos Tiny Speck painted its streets with.",
+      "differences": "",
+      "facts": [
+        {
+          "label": "Made",
+          "text": "6 November 2026, with GPT Image 2.6 Sunburst"
+        }
+      ],
+      "before": {
+        "src": "/assets/maps/art/thumbs/sm_pollokoo.jpg",
+        "w": 150,
+        "h": 91,
+        "label": "Tiny Speck’s thumbnail, all that survived (150 x 91)"
+      },
+      "after": {
+        "src": "/assets/maps/art/bg/pollokoo.webp",
+        "w": 760,
+        "h": 460,
+        "label": "Painted for Groddle, in the game now",
+        "src2": "/assets/maps/art/bg/pollokoo@2x.webp"
+      },
+      "card": {
+        "src": "/assets/maps/art/world/cards/106.svg",
+        "w": 57,
+        "h": 39,
+        "label": "Its card on the World map"
+      },
+      "place": "/encyclopedia/places/pollokoo/"
+    },
+    {
+      "id": "109",
+      "name": "Rasana",
+      "anchor": "map-rasana",
+      "state": "painted",
+      "caption": "Tiny Speck’s 760 x 460 painting of Rasana is lost; only its thumbnail on the World map survived. This painting was made from that thumbnail and the region’s street layout, in the style of the decos Tiny Speck painted its streets with.",
+      "differences": "",
+      "facts": [
+        {
+          "label": "Made",
+          "text": "6 November 2026, with GPT Image 2.6 Sunburst"
+        }
+      ],
+      "before": {
+        "src": "/assets/maps/art/thumbs/sm_rasana.jpg",
+        "w": 150,
+        "h": 91,
+        "label": "Tiny Speck’s thumbnail, all that survived (150 x 91)"
+      },
+      "after": {
+        "src": "/assets/maps/art/bg/rasana.webp",
+        "w": 760,
+        "h": 460,
+        "label": "Painted for Groddle, in the game now",
+        "src2": "/assets/maps/art/bg/rasana@2x.webp"
+      },
+      "card": {
+        "src": "/assets/maps/art/world/cards/109.svg",
+        "w": 151,
+        "h": 121,
+        "label": "Its card on the World map"
+      },
+      "place": "/encyclopedia/places/rasana/"
+    },
+    {
+      "id": "126",
+      "name": "Roobrik",
+      "anchor": "map-roobrik",
+      "state": "painted",
+      "caption": "Tiny Speck’s 760 x 460 painting of Roobrik is lost; only its thumbnail on the World map survived. This painting was made from that thumbnail and the region’s street layout, in the style of the decos Tiny Speck painted its streets with.",
+      "differences": "",
+      "facts": [
+        {
+          "label": "Made",
+          "text": "6 November 2026, with GPT Image 2.6 Sunburst"
+        }
+      ],
+      "before": {
+        "src": "/assets/maps/art/thumbs/sm_roobrik.jpg",
+        "w": 150,
+        "h": 91,
+        "label": "Tiny Speck’s thumbnail, all that survived (150 x 91)"
+      },
+      "after": {
+        "src": "/assets/maps/art/bg/roobrik.webp",
+        "w": 760,
+        "h": 460,
+        "label": "Painted for Groddle, in the game now",
+        "src2": "/assets/maps/art/bg/roobrik@2x.webp"
+      },
+      "card": {
+        "src": "/assets/maps/art/world/cards/126.svg",
+        "w": 151,
+        "h": 119,
+        "label": "Its card on the World map"
+      },
+      "place": "/encyclopedia/places/roobrik/"
+    },
+    {
+      "id": "93",
+      "name": "Salatu",
+      "anchor": "map-salatu",
+      "state": "painted",
+      "caption": "Tiny Speck’s 760 x 460 painting of Salatu is lost; only its thumbnail on the World map survived. This painting was made from that thumbnail and the region’s street layout, in the style of the decos Tiny Speck painted its streets with.",
+      "differences": "",
+      "facts": [
+        {
+          "label": "Made",
+          "text": "6 November 2026, with GPT Image 2.6 Sunburst"
+        }
+      ],
+      "before": {
+        "src": "/assets/maps/art/thumbs/sm_salatu.jpg",
+        "w": 150,
+        "h": 91,
+        "label": "Tiny Speck’s thumbnail, all that survived (150 x 91)"
+      },
+      "after": {
+        "src": "/assets/maps/art/bg/salatu.webp",
+        "w": 760,
+        "h": 460,
+        "label": "Painted for Groddle, in the game now",
+        "src2": "/assets/maps/art/bg/salatu@2x.webp"
+      },
+      "card": {
+        "src": "/assets/maps/art/world/cards/93.svg",
+        "w": 151,
+        "h": 119,
+        "label": "Its card on the World map"
+      },
+      "place": "/encyclopedia/places/salatu/"
+    },
+    {
+      "id": "140",
+      "name": "Samudra",
+      "anchor": "map-samudra",
+      "state": "painted",
+      "caption": "Tiny Speck’s 760 x 460 painting of Samudra is lost; only its thumbnail on the World map survived. This painting was made from that thumbnail and the region’s street layout, in the style of the decos Tiny Speck painted its streets with.",
+      "differences": "",
+      "facts": [
+        {
+          "label": "Made",
+          "text": "6 November 2026, with GPT Image 2.6 Sunburst"
+        }
+      ],
+      "before": {
+        "src": "/assets/maps/art/thumbs/sm_samudra.jpg",
+        "w": 150,
+        "h": 91,
+        "label": "Tiny Speck’s thumbnail, all that survived (150 x 91)"
+      },
+      "after": {
+        "src": "/assets/maps/art/bg/samudra.webp",
+        "w": 760,
+        "h": 460,
+        "label": "Painted for Groddle, in the game now",
+        "src2": "/assets/maps/art/bg/samudra@2x.webp"
+      },
+      "card": {
+        "src": "/assets/maps/art/world/cards/140.svg",
+        "w": 151,
+        "h": 120,
+        "label": "Its card on the World map"
+      },
+      "place": "/encyclopedia/places/samudra/"
+    },
+    {
+      "id": "63",
+      "name": "Shimla Mirch",
+      "anchor": "map-shimla-mirch",
+      "state": "painted",
+      "caption": "Tiny Speck’s 760 x 460 painting of Shimla Mirch is lost; only its thumbnail on the World map survived. This painting was made from that thumbnail and the region’s street layout, in the style of the decos Tiny Speck painted its streets with.",
+      "differences": "",
+      "facts": [
+        {
+          "label": "Made",
+          "text": "6 November 2026, with GPT Image 2.6 Sunburst"
+        }
+      ],
+      "before": {
+        "src": "/assets/maps/art/thumbs/sm_shimlamirch.jpg",
+        "w": 150,
+        "h": 91,
+        "label": "Tiny Speck’s thumbnail, all that survived (150 x 91)"
+      },
+      "after": {
+        "src": "/assets/maps/art/bg/shimlamirch.webp",
+        "w": 760,
+        "h": 460,
+        "label": "Painted for Groddle, in the game now",
+        "src2": "/assets/maps/art/bg/shimlamirch@2x.webp"
+      },
+      "card": {
+        "src": "/assets/maps/art/world/cards/63.svg",
+        "w": 151,
+        "h": 120,
+        "label": "Its card on the World map"
+      },
+      "place": "/encyclopedia/places/shimla-mirch/"
+    },
+    {
+      "id": "121",
+      "name": "Sura",
+      "anchor": "map-sura",
+      "state": "painted",
+      "caption": "Tiny Speck’s 760 x 460 painting of Sura is lost; only its thumbnail on the World map survived. This painting was made from that thumbnail and the region’s street layout, in the style of the decos Tiny Speck painted its streets with.",
+      "differences": "",
+      "facts": [
+        {
+          "label": "Made",
+          "text": "6 November 2026, with GPT Image 2.6 Sunburst"
+        }
+      ],
+      "before": {
+        "src": "/assets/maps/art/thumbs/sm_sura.jpg",
+        "w": 150,
+        "h": 91,
+        "label": "Tiny Speck’s thumbnail, all that survived (150 x 91)"
+      },
+      "after": {
+        "src": "/assets/maps/art/bg/sura.webp",
+        "w": 760,
+        "h": 460,
+        "label": "Painted for Groddle, in the game now",
+        "src2": "/assets/maps/art/bg/sura@2x.webp"
+      },
+      "card": {
+        "src": "/assets/maps/art/world/cards/121.svg",
+        "w": 151,
+        "h": 119,
+        "label": "Its card on the World map"
+      },
+      "place": "/encyclopedia/places/sura/"
+    },
+    {
+      "id": "113",
+      "name": "Tahli",
+      "anchor": "map-tahli",
+      "state": "painted",
+      "caption": "Tiny Speck’s 760 x 460 painting of Tahli is lost; only its thumbnail on the World map survived. This painting was made from that thumbnail and the region’s street layout, in the style of the decos Tiny Speck painted its streets with.",
+      "differences": "",
+      "facts": [
+        {
+          "label": "Made",
+          "text": "6 November 2026, with GPT Image 2.6 Sunburst"
+        }
+      ],
+      "before": {
+        "src": "/assets/maps/art/thumbs/sm_tahli.jpg",
+        "w": 150,
+        "h": 91,
+        "label": "Tiny Speck’s thumbnail, all that survived (150 x 91)"
+      },
+      "after": {
+        "src": "/assets/maps/art/bg/tahli.webp",
+        "w": 760,
+        "h": 460,
+        "label": "Painted for Groddle, in the game now",
+        "src2": "/assets/maps/art/bg/tahli@2x.webp"
+      },
+      "card": {
+        "src": "/assets/maps/art/world/cards/113.svg",
+        "w": 151,
+        "h": 121,
+        "label": "Its card on the World map"
+      },
+      "place": "/encyclopedia/places/tahli/"
+    },
+    {
+      "id": "92",
+      "name": "Tamila",
+      "anchor": "map-tamila",
+      "state": "painted",
+      "caption": "Tiny Speck’s 760 x 460 painting of Tamila is lost; only its thumbnail on the World map survived. This painting was made from that thumbnail and the region’s street layout, in the style of the decos Tiny Speck painted its streets with.",
+      "differences": "",
+      "facts": [
+        {
+          "label": "Made",
+          "text": "6 November 2026, with GPT Image 2.6 Sunburst"
+        }
+      ],
+      "before": {
+        "src": "/assets/maps/art/thumbs/sm_tamila.jpg",
+        "w": 150,
+        "h": 91,
+        "label": "Tiny Speck’s thumbnail, all that survived (150 x 91)"
+      },
+      "after": {
+        "src": "/assets/maps/art/bg/tamila.webp",
+        "w": 760,
+        "h": 460,
+        "label": "Painted for Groddle, in the game now",
+        "src2": "/assets/maps/art/bg/tamila@2x.webp"
+      },
+      "card": {
+        "src": "/assets/maps/art/world/cards/92.svg",
+        "w": 151,
+        "h": 120,
+        "label": "Its card on the World map"
+      },
+      "place": "/encyclopedia/places/tamila/"
+    },
+    {
+      "id": "51",
+      "name": "Uralia",
+      "anchor": "map-uralia",
+      "state": "painted",
+      "caption": "Tiny Speck’s 760 x 460 painting of Uralia is lost; only its thumbnail on the World map survived. This painting was made from that thumbnail and the region’s street layout, in the style of the decos Tiny Speck painted its streets with.",
+      "differences": "",
+      "facts": [
+        {
+          "label": "Made",
+          "text": "6 November 2026, with GPT Image 2.6 Sunburst"
+        }
+      ],
+      "before": {
+        "src": "/assets/maps/art/thumbs/sm_uralia.jpg",
+        "w": 150,
+        "h": 91,
+        "label": "Tiny Speck’s thumbnail, all that survived (150 x 91)"
+      },
+      "after": {
+        "src": "/assets/maps/art/bg/uralia.webp",
+        "w": 760,
+        "h": 460,
+        "label": "Painted for Groddle, in the game now",
+        "src2": "/assets/maps/art/bg/uralia@2x.webp"
+      },
+      "card": {
+        "src": "/assets/maps/art/world/cards/51.svg",
+        "w": 151,
+        "h": 123,
+        "label": "Its card on the World map"
+      },
+      "place": "/encyclopedia/places/uralia/"
+    },
+    {
+      "id": "100",
+      "name": "Vantalu",
+      "anchor": "map-vantalu",
+      "state": "painted",
+      "caption": "Tiny Speck’s 760 x 460 painting of Vantalu is lost; only its thumbnail on the World map survived. This painting was made from that thumbnail and the region’s street layout, in the style of the decos Tiny Speck painted its streets with.",
+      "differences": "",
+      "facts": [
+        {
+          "label": "Made",
+          "text": "6 November 2026, with GPT Image 2.6 Sunburst"
+        }
+      ],
+      "before": {
+        "src": "/assets/maps/art/thumbs/sm_vantalu.jpg",
+        "w": 150,
+        "h": 91,
+        "label": "Tiny Speck’s thumbnail, all that survived (150 x 91)"
+      },
+      "after": {
+        "src": "/assets/maps/art/bg/vantalu.webp",
+        "w": 760,
+        "h": 460,
+        "label": "Painted for Groddle, in the game now",
+        "src2": "/assets/maps/art/bg/vantalu@2x.webp"
+      },
+      "card": {
+        "src": "/assets/maps/art/world/cards/100.svg",
+        "w": 151,
+        "h": 120,
+        "label": "Its card on the World map"
+      },
+      "place": "/encyclopedia/places/vantalu/"
+    },
+    {
+      "id": "143",
+      "name": "Vortex of Random",
+      "anchor": "map-vortex-of-random",
+      "state": "painted",
+      "caption": "Tiny Speck’s 760 x 460 painting of Vortex of Random is lost; only its thumbnail on the World map survived. This painting was made from that thumbnail and the region’s street layout, in the style of the decos Tiny Speck painted its streets with.",
+      "differences": "",
+      "facts": [
+        {
+          "label": "Made",
+          "text": "6 November 2026, with GPT Image 2.6 Sunburst"
+        }
+      ],
+      "before": {
+        "src": "/assets/maps/art/thumbs/sm_vortex.jpg",
+        "w": 150,
+        "h": 91,
+        "label": "Tiny Speck’s thumbnail, all that survived (150 x 91)"
+      },
+      "after": {
+        "src": "/assets/maps/art/bg/vortex.webp",
+        "w": 760,
+        "h": 460,
+        "label": "Painted for Groddle, in the game now",
+        "src2": "/assets/maps/art/bg/vortex@2x.webp"
+      },
+      "card": {
+        "src": "/assets/maps/art/world/cards/143.svg",
+        "w": 184,
+        "h": 120,
+        "label": "Its card on the World map"
+      },
+      "place": "/encyclopedia/places/vortex-of-random/"
+    },
+    {
+      "id": "95",
+      "name": "Xalanga",
+      "anchor": "map-xalanga",
+      "state": "painted",
+      "caption": "Tiny Speck’s 760 x 460 painting of Xalanga is lost; only its thumbnail on the World map survived. This painting was made from that thumbnail and the region’s street layout, in the style of the decos Tiny Speck painted its streets with.",
+      "differences": "",
+      "facts": [
+        {
+          "label": "Made",
+          "text": "6 November 2026, with GPT Image 2.6 Sunburst"
+        }
+      ],
+      "before": {
+        "src": "/assets/maps/art/thumbs/sm_xalanga.jpg",
+        "w": 150,
+        "h": 91,
+        "label": "Tiny Speck’s thumbnail, all that survived (150 x 91)"
+      },
+      "after": {
+        "src": "/assets/maps/art/bg/xalanga.webp",
+        "w": 760,
+        "h": 460,
+        "label": "Painted for Groddle, in the game now",
+        "src2": "/assets/maps/art/bg/xalanga@2x.webp"
+      },
+      "card": {
+        "src": "/assets/maps/art/world/cards/95.svg",
+        "w": 151,
+        "h": 124,
+        "label": "Its card on the World map"
+      },
+      "place": "/encyclopedia/places/xalanga/"
+    },
+    {
+      "id": "91",
+      "name": "Zhambu",
+      "anchor": "map-zhambu",
+      "state": "painted",
+      "caption": "Tiny Speck’s 760 x 460 painting of Zhambu is lost; only its thumbnail on the World map survived. This painting was made from that thumbnail and the region’s street layout, in the style of the decos Tiny Speck painted its streets with.",
+      "differences": "",
+      "facts": [
+        {
+          "label": "Made",
+          "text": "6 November 2026, with GPT Image 2.6 Sunburst"
+        }
+      ],
+      "before": {
+        "src": "/assets/maps/art/thumbs/sm_zhambu.jpg",
+        "w": 150,
+        "h": 91,
+        "label": "Tiny Speck’s thumbnail, all that survived (150 x 91)"
+      },
+      "after": {
+        "src": "/assets/maps/art/bg/zhambu.webp",
+        "w": 760,
+        "h": 460,
+        "label": "Painted for Groddle, in the game now",
+        "src2": "/assets/maps/art/bg/zhambu@2x.webp"
+      },
+      "card": {
+        "src": "/assets/maps/art/world/cards/91.svg",
+        "w": 151,
+        "h": 120,
+        "label": "Its card on the World map"
+      },
+      "place": "/encyclopedia/places/zhambu/"
+    },
+    {
+      "id": "50",
+      "name": "Ilmenskie Caverns",
+      "anchor": "map-ilmenskie-caverns",
+      "state": "layout",
+      "caption": "Ilmenskie Caverns had no thumbnail on the World map, so its painting was made from its street layout alone, in the style of the decos Tiny Speck painted its streets with.",
+      "differences": "",
+      "facts": [
+        {
+          "label": "Made",
+          "text": "13 November 2026, with GPT Image 2.6 Sunburst"
+        }
+      ],
+      "before": null,
+      "after": {
+        "src": "/assets/maps/art/bg/ilmenskiecaverns.webp",
+        "w": 760,
+        "h": 460,
+        "label": "Painted for Groddle, in the game now",
+        "src2": "/assets/maps/art/bg/ilmenskiecaverns@2x.webp"
+      },
+      "card": null,
+      "place": "/encyclopedia/places/ilmenskie-caverns/"
+    },
+    {
+      "id": "78",
+      "name": "Ilmenskie Deeps",
+      "anchor": "map-ilmenskie-deeps",
+      "state": "layout",
+      "caption": "Ilmenskie Deeps had no thumbnail on the World map, so its painting was made from its street layout alone, in the style of the decos Tiny Speck painted its streets with.",
+      "differences": "",
+      "facts": [
+        {
+          "label": "Made",
+          "text": "13 November 2026, with GPT Image 2.6 Sunburst"
+        }
+      ],
+      "before": null,
+      "after": {
+        "src": "/assets/maps/art/bg/ilmenskiedeeps.webp",
+        "w": 760,
+        "h": 460,
+        "label": "Painted for Groddle, in the game now",
+        "src2": "/assets/maps/art/bg/ilmenskiedeeps@2x.webp"
+      },
+      "card": null,
+      "place": "/encyclopedia/places/ilmenskie-deeps/"
+    },
+    {
+      "id": "40",
+      "name": "Naraka",
+      "anchor": "map-naraka",
+      "state": "layout",
+      "caption": "Naraka had no thumbnail on the World map, so its painting was made from its street layout alone, in the style of the decos Tiny Speck painted its streets with.",
+      "differences": "",
+      "facts": [
+        {
+          "label": "Made",
+          "text": "13 November 2026, with GPT Image 2.6 Sunburst"
+        }
+      ],
+      "before": null,
+      "after": {
+        "src": "/assets/maps/art/bg/naraka.webp",
+        "w": 760,
+        "h": 460,
+        "label": "Painted for Groddle, in the game now",
+        "src2": "/assets/maps/art/bg/naraka@2x.webp"
+      },
+      "card": null,
+      "place": "/encyclopedia/places/naraka/"
+    },
+    {
+      "id": "66",
+      "name": "The Seams",
+      "anchor": "map-the-seams",
+      "state": "layout",
+      "caption": "The Seams had no thumbnail on the World map, so its painting was made from its street layout alone, in the style of the decos Tiny Speck painted its streets with.",
+      "differences": "",
+      "facts": [
+        {
+          "label": "Made",
+          "text": "13 November 2026, with GPT Image 2.6 Sunburst"
+        }
+      ],
+      "before": null,
+      "after": {
+        "src": "/assets/maps/art/bg/theseams.webp",
+        "w": 760,
+        "h": 460,
+        "label": "Painted for Groddle, in the game now",
+        "src2": "/assets/maps/art/bg/theseams@2x.webp"
+      },
+      "card": null,
+      "place": "/encyclopedia/places/the-seams/"
+    }
+  ]
+}
