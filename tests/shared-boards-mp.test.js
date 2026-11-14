@@ -28,8 +28,8 @@ import {
   sameWords,
 } from '../public/js/boards-mp.js?v=fb1edbf3';
 import { BOARD_PINS, NOTE_LIMITS, REMAKE_NOTE_BYLINE, REMAKE_NOTE_MARKER, isRemakeNote, noteContent, normalizeNote, noteWriteVerb } from '../public/js/street-furniture.js?v=cf1d21b1';
-import { boardsMpFeature, createBoardsSession } from '../public/js/features/boards-mp-feature.js?v=02e8f5fd';
-import { carriedNoteList, giveCarriedNote, streetFurnitureFeature } from '../public/js/features/street-furniture-feature.js?v=9776621b';
+import { boardsMpFeature, createBoardsSession } from '../public/js/features/boards-mp-feature.js?v=1f4aaf02';
+import { carriedNoteList, giveCarriedNote, streetFurnitureFeature } from '../public/js/features/street-furniture-feature.js?v=5c380500';
 import { boardsData } from '../tools/build-realtime-boards.mjs';
 import { HAS_SITE, SITE_DIR, serverPath, sitePath, skipWithoutServer, skipWithoutSite } from '../tools/repos.mjs';
 
