@@ -9,7 +9,7 @@ import assert from 'node:assert/strict';
 import { createFeatureHost } from '../public/js/feature-host.js?v=06bb8b74';
 import { createInventory, countItem } from '../public/js/inventory.js?v=f49c8998';
 import { bindToolInventory, createToolConditionState } from '../public/js/tools.js?v=48542c24';
-import { levitateHint, meditationFeature } from '../public/js/features/meditation-feature.js?v=3b161fc1';
+import { levitateHint, meditationFeature } from '../public/js/features/meditation-feature.js?v=de5fbcda';
 import { TOUCH_JUMP_EVENT } from '../public/js/touch-controls.js?v=6ae5adce';
 import { teleportationFeature } from '../public/js/features/teleportation-feature.js?v=4ab5dbdc';
 
@@ -98,6 +98,68 @@ describe('meditation feature', () => {
     assert.equal(verbs.find((v) => v.id === 'radiate').enabled, false);
     assert.equal(meditationFeature.runPackVerb('focusing_orb', 'radiate', engine), true);
     assert.deepEqual(engine.toasts, ["There's nobody near enough for you to radiate."]);
+  });
+});
+
+/** Just enough Pixi for the orb overlay (buildMeditationFx) in Node. */
+class FxObj {
+  constructor() {
+    this.children = [];
+    this.anchor = { set() {} };
+    this.position = { set() {} };
+  }
+  addChild(c) { this.children.push(c); return c; }
+  removeChild() {}
+  destroy() {}
+  play() {}
+}
+const FAKE_PIXI = {
+  Container: FxObj,
+  AnimatedSprite: FxObj,
+  Rectangle: class { constructor(x, y, w, h) { Object.assign(this, { x, y, w, h }); } },
+  ImageSource: class { on() {} emit() {} },
+  Texture: class { constructor(o) { Object.assign(this, o); } },
+};
+
+describe('a teleport mid-meditation (#316)', () => {
+  it('credits the session to the street it started on, not the destination', () => {
+    const start = Date.now();
+    const realNow = Date.now;
+    const data = {};
+    const engine = fakeEngine({
+      learned: ['meditativearts_1'],
+      extra: {
+        playCue: () => Promise.resolve(() => {}),
+        floatText() {},
+        PIXI: FAKE_PIXI,
+        fxLayer: new FxObj(),
+        setData: (k, v) => { data[k] = v; },
+        questState: { active: { meditativearts_meditation_station: { progress: {} } } },
+      },
+    });
+    meditationFeature.restore({});
+    const prevPixi = globalThis.PIXI;
+    globalThis.PIXI = FAKE_PIXI;
+    try {
+      Date.now = () => start;
+      assert.equal(meditationFeature.runPackVerb('focusing_orb', 'meditate', engine), true);
+      assert.ok(meditationFeature.holdQuestOffers(), 'a session is running');
+      // enterStreet: currentStreetTsid moves to the destination, then streetClear.
+      Date.now = () => start + 30_000;
+      engine.streetTsid = 'LA5PPFP86NF2FOS';
+      engine.street = { label: 'Gregarious Grange' };
+      meditationFeature.onStreetClear(engine);
+      assert.equal(meditationFeature.holdQuestOffers(), null, 'the teleport ended it');
+      const station = meditationFeature.save().station;
+      assert.equal(station.tsid, 'GLI2V0UN7RD1T2J');
+      assert.equal(station.label, 'Hechey Track');
+      assert.equal(station.todaySeconds, 30);
+      assert.match(data.meditationStation, /^GLI2V0UN7RD1T2J:/);
+    } finally {
+      Date.now = realNow;
+      globalThis.PIXI = prevPixi;
+      meditationFeature.restore({});
+    }
   });
 });
 

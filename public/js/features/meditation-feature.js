@@ -111,7 +111,7 @@ const JUMP_KEYS = new Set([' ', 'w', 'W']);
 let state = normalizeMeditationState();
 /** Meditation Station practice (js/meditation-station.js), saved beside the meditation state. */
 let station = normalizeStationState();
-let session = null; // transient: { kind, focus, startedAt, durationMs, x, ticks, stopMusic }
+let session = null; // transient: { kind, focus, startedAt, durationMs, x, ticks, stopMusic, streetTsid, streetLabel }
 let fx = null; // Pixi container + parts while meditating
 let levFx = null;
 let orbFrames = null;
@@ -306,7 +306,15 @@ function begin(engine, verbId) {
     engine.toast(out.error || MEDITATION_TEXT.failed);
     return false;
   }
-  session = { ...out.session, x: engine.player.x, stopMusic: null };
+  // The street the session sits on: a teleport changes engine.streetTsid before
+  // onStreetClear ends the session, and the gain belongs where it was earned (#316).
+  session = {
+    ...out.session,
+    x: engine.player.x,
+    stopMusic: null,
+    streetTsid: engine.streetTsid,
+    streetLabel: engine.street?.label || engine.streetTsid,
+  };
   engine.pushActivity(out.line);
   engine.playCue(out.music, { volume: 0.55 }).then((stop) => {
     if (session && !session.stopMusic) session.stopMusic = stop;
@@ -337,7 +345,7 @@ function end(engine, reason = 'timer', at = Date.now()) {
     upgrades: upgrades(engine),
     tank: tankOf(engine),
     dayKey: dayKey(),
-    streetTsid: engine.streetTsid,
+    streetTsid: done.streetTsid || engine.streetTsid,
     energy: pc.energy,
     mood: pc.mood,
     moodMax: moodMax(pc),
@@ -384,7 +392,7 @@ function end(engine, reason = 'timer', at = Date.now()) {
     engine.achievement(event.counter, event.amount);
   }
   if (done.kind === 'focused') focusPocusNote(engine, done.focus, done.focus === 'energy' ? energy : mood, before);
-  stationAfterSession(engine, out.seconds);
+  stationAfterSession(engine, out.seconds, done);
   engine.setData('meditationLast', `${reason}:${out.seconds}s:e${energy}:m${mood}:i${out.img}:${out.full ? 'full' : 'part'}${out.imgBonus ? `:bonus${out.imgBonus}` : ''}${out.maxRelax ? ':maxrelax' : ''}`);
   engine.updateHud();
   engine.save();
@@ -404,16 +412,19 @@ function focusPocusNote(engine, focus, gained, before) {
   if (line) engine.pushActivity(line);
 }
 
-/** Meditation Station: one counted game day per 60 s on the same street (quest active only). */
-function stationAfterSession(engine, seconds) {
+/**
+ * Meditation Station: one counted game day per 60 s on the same street (quest active only).
+ * The street is the one the session started on, not where a teleport left the player.
+ */
+function stationAfterSession(engine, seconds, done = null) {
   const quest = engine.questState?.active?.[STATION_QUEST];
   if (!quest) {
     station = normalizeStationState();
     return;
   }
   const res = recordStationSession(station, {
-    tsid: engine.streetTsid,
-    label: engine.street?.label || engine.streetTsid,
+    tsid: done?.streetTsid || engine.streetTsid,
+    label: done?.streetLabel || engine.street?.label || engine.streetTsid,
     seconds,
     day: Math.floor(getGameDayStartMs(Date.now()) / GAME_DAY_MS),
   });
