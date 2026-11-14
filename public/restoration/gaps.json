@@ -1,6 +1,6 @@
 {
   "note": "Written by tools/gaps/build-data.mjs from tools/gaps/public-gaps.json and the coverage register. Edit those, never this file.",
-  "release": "v0.37.1",
+  "release": "v0.38.0",
   "states": {
     "fixing": {
       "label": "Being fixed",
@@ -42,7 +42,7 @@
     "fixing": 1,
     "known": 14,
     "unreleased": 0,
-    "fixed": 85,
+    "fixed": 99,
     "lost": 5,
     "purpose": 15,
     "idea": 11
@@ -135,6 +135,20 @@
           "text": "The Magic Rock's card showed before the rock's white glow.",
           "state": "fixed",
           "version": "v0.37.0"
+        },
+        {
+          "id": "F74",
+          "text": "New quests counted in the Quests panel could not be found in its tabs.",
+          "report": 300,
+          "state": "fixed",
+          "version": "v0.38.0"
+        },
+        {
+          "id": "F76",
+          "text": "On Winter Walk at the daily coin limit, the motes refused you without a word.",
+          "report": 298,
+          "state": "fixed",
+          "version": "v0.38.0"
         }
       ]
     },
@@ -201,6 +215,13 @@
           "text": "Rocks stand lower than the 2012 snaps show them, in one shape, and some planned things hang over ledge ends or sit on steep slopes.",
           "state": "fixed",
           "version": "v0.36.0"
+        },
+        {
+          "id": "F80",
+          "text": "Some rocks, peat bogs and paper trees hung above their ground, so you had to jump to use them.",
+          "report": 303,
+          "state": "fixed",
+          "version": "v0.38.0"
         }
       ]
     },
@@ -229,6 +250,20 @@
           "text": "Short lines from animals and characters stay up for Glitch's own times, such as three seconds for a Yum!",
           "state": "fixed",
           "version": "v0.30.0"
+        },
+        {
+          "id": "F78",
+          "text": "A subway ride played two tunes over each other.",
+          "report": 303,
+          "state": "fixed",
+          "version": "v0.38.0"
+        },
+        {
+          "id": "F84",
+          "text": "Scraping a barnacle, digging a dirt pile and cutting peat played their tool sound after the work instead of during it.",
+          "report": 310,
+          "state": "fixed",
+          "version": "v0.38.0"
         },
         {
           "id": "G11",
@@ -273,6 +308,13 @@
           "state": "known"
         },
         {
+          "id": "F83",
+          "text": "The top line over a picked-up Musicblock vanished too fast to read.",
+          "report": 311,
+          "state": "fixed",
+          "version": "v0.38.0"
+        },
+        {
           "id": "G174",
           "text": "A few dozen items in the encyclopedia have no icon, because their art was never archived.",
           "state": "lost"
@@ -298,6 +340,13 @@
           "text": "A key-holder walking into another player's house no longer gets a page error.",
           "state": "fixed",
           "version": "v0.30.0"
+        },
+        {
+          "id": "F82",
+          "text": "A Storage Display Box squashed its item's picture into a square.",
+          "report": 314,
+          "state": "fixed",
+          "version": "v0.38.0"
         },
         {
           "id": "G48",
@@ -466,6 +515,26 @@
           "text": "In solo you can squeeze a Chicken that is sitting on your egg, and Super Animal Harvest does not give its Bacon chance.",
           "state": "fixed",
           "version": "v0.36.0"
+        },
+        {
+          "id": "F72",
+          "text": "A Meat Collector, Butterfly Milker, Piggy Feeder or Magic Sticks refused in the house's yard said they only work in a back yard, without naming the home street where they do.",
+          "report": 299,
+          "state": "fixed",
+          "version": "v0.38.0"
+        },
+        {
+          "id": "F77",
+          "text": "Street crabs were drawn smaller than in Glitch, so their dance was hard to see.",
+          "report": 301,
+          "state": "fixed",
+          "version": "v0.38.0"
+        },
+        {
+          "id": "F85",
+          "text": "Milking a butterfly that was not ready ran its answer across the whole screen in one line.",
+          "state": "fixed",
+          "version": "v0.38.0"
         }
       ]
     },
@@ -509,6 +578,13 @@
           "report": 247,
           "state": "fixed",
           "version": "v0.36.1"
+        },
+        {
+          "id": "F73",
+          "text": "A Make window's Show them listed every recipe, not the ones you know, and never said what each was missing.",
+          "report": 305,
+          "state": "fixed",
+          "version": "v0.38.0"
         }
       ]
     },
@@ -710,6 +786,13 @@
           "report": 289,
           "state": "fixed",
           "version": "v0.37.0"
+        },
+        {
+          "id": "F75",
+          "text": "In Classic, Pin to screen did nothing you could see.",
+          "report": 306,
+          "state": "fixed",
+          "version": "v0.38.0"
         }
       ]
     },
@@ -791,6 +874,13 @@
           "text": "Enter could not reach things resting on a counter or table beside you, such as the food in EZ Cookin'.",
           "state": "fixed",
           "version": "v0.37.0"
+        },
+        {
+          "id": "F79",
+          "text": "A game left open across an update said you were too far from rocks and trees you stood beside, without saying a reload fixes it.",
+          "report": 307,
+          "state": "fixed",
+          "version": "v0.38.0"
         }
       ]
     },
@@ -826,6 +916,18 @@
           "report": 288,
           "state": "fixed",
           "version": "v0.37.0"
+        }
+      ]
+    },
+    {
+      "name": "Conversations",
+      "items": [
+        {
+          "id": "F81",
+          "text": "A conversation card sat over the character talking to you.",
+          "report": 313,
+          "state": "fixed",
+          "version": "v0.38.0"
         }
       ]
     }

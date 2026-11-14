@@ -824,6 +824,152 @@
       ]
     },
     {
+      "id": "F72",
+      "area": "Animals",
+      "show": "fixing",
+      "text": "A Meat Collector, Butterfly Milker, Piggy Feeder or Magic Sticks refused in the house's yard said they only work in a back yard, without naming the home street where they do.",
+      "report": 299,
+      "commits": [
+        "game:123e9b314a"
+      ]
+    },
+    {
+      "id": "F73",
+      "area": "Food, buffs and making",
+      "show": "fixing",
+      "text": "A Make window's Show them listed every recipe, not the ones you know, and never said what each was missing.",
+      "report": 305,
+      "commits": [
+        "game:7ddd5bf413",
+        "game:698007f52e"
+      ]
+    },
+    {
+      "id": "F74",
+      "area": "Quests",
+      "show": "fixing",
+      "text": "New quests counted in the Quests panel could not be found in its tabs.",
+      "report": 300,
+      "commits": [
+        "game:a7a743344a"
+      ]
+    },
+    {
+      "id": "F75",
+      "area": "Classic",
+      "show": "fixing",
+      "text": "In Classic, Pin to screen did nothing you could see.",
+      "report": 306,
+      "commits": [
+        "game:fe7f8944ef"
+      ]
+    },
+    {
+      "id": "F76",
+      "area": "Quests",
+      "show": "fixing",
+      "text": "On Winter Walk at the daily coin limit, the motes refused you without a word.",
+      "report": 298,
+      "commits": [
+        "game:f57c18652f",
+        "game:2ff210865b"
+      ]
+    },
+    {
+      "id": "F77",
+      "area": "Animals",
+      "show": "fixing",
+      "text": "Street crabs were drawn smaller than in Glitch, so their dance was hard to see.",
+      "report": 301,
+      "commits": [
+        "game:2585ec7a16"
+      ]
+    },
+    {
+      "id": "F78",
+      "area": "Sounds",
+      "show": "fixing",
+      "text": "A subway ride played two tunes over each other.",
+      "report": 303,
+      "commits": [
+        "game:dc97e7ddab"
+      ]
+    },
+    {
+      "id": "F79",
+      "area": "Getting around",
+      "show": "fixing",
+      "text": "A game left open across an update said you were too far from rocks and trees you stood beside, without saying a reload fixes it.",
+      "report": 307,
+      "commits": [
+        "game:0c73d02a76",
+        "server:c43e2bd"
+      ]
+    },
+    {
+      "id": "F80",
+      "area": "World",
+      "show": "fixing",
+      "text": "Some rocks, peat bogs and paper trees hung above their ground, so you had to jump to use them.",
+      "report": 303,
+      "commits": [
+        "game:40d3c813f3",
+        "server:eddd55e",
+        "server:f0fd711"
+      ]
+    },
+    {
+      "id": "F81",
+      "area": "Conversations",
+      "show": "fixing",
+      "text": "A conversation card sat over the character talking to you.",
+      "report": 313,
+      "commits": [
+        "game:be7c971cb7"
+      ]
+    },
+    {
+      "id": "F82",
+      "area": "Homes",
+      "show": "fixing",
+      "text": "A Storage Display Box squashed its item's picture into a square.",
+      "report": 314,
+      "commits": [
+        "game:a6d632c42f"
+      ]
+    },
+    {
+      "id": "F83",
+      "area": "Items",
+      "show": "fixing",
+      "text": "The top line over a picked-up Musicblock vanished too fast to read.",
+      "report": 311,
+      "commits": [
+        "game:6b16f85417"
+      ]
+    },
+    {
+      "id": "F84",
+      "area": "Sounds",
+      "show": "fixing",
+      "text": "Scraping a barnacle, digging a dirt pile and cutting peat played their tool sound after the work instead of during it.",
+      "report": 310,
+      "commits": [
+        "game:db2ae16936",
+        "game:7165e3f520"
+      ]
+    },
+    {
+      "id": "F85",
+      "area": "Animals",
+      "show": "fixing",
+      "text": "Milking a butterfly that was not ready ran its answer across the whole screen in one line.",
+      "commits": [
+        "game:a6628725b4",
+        "game:94ba6235c3"
+      ]
+    },
+    {
       "id": "G665",
       "area": "Accounts and saving",
       "text": "A bug report says Read by the team once an administrator has opened it."
