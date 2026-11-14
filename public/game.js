@@ -30798,7 +30798,9 @@ function spawnMineRock(classTsid, x, y, index = 0, shape = 1) {
   root.rockShape = look === def ? 1 : shape;
 
   const loadedFrames = textures[look.textureKey]?.frames || [];
-  const fallbackTexture = textureFromUrl(`${look.worldSheet}?v=exact-rock-cells-1`);
+  // The sheet's own SHEETS URL, the one loadSheets loaded: a _2 or _3 shape is listed without the
+  // `?v=exact-rock-cells-1` the _1 sheets carry, so that suffix made a second copy of its image.
+  const fallbackTexture = textureFromUrl(SHEETS[look.textureKey]?.url || `${look.worldSheet}?v=exact-rock-cells-1`);
   const spr = new PIXI.Sprite(loadedFrames[0] || fallbackTexture);
   spr.anchor.set(0.5, 1);
   // Use exact, preloaded frame cells. Creating a subtexture before an image

@@ -2792,9 +2792,14 @@
   "deployed": "2026-11-13"
  },
  "git": {
-  "commits": 2064,
+  "commits": 2065,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-13",
+    "kind": "fix",
+    "text": "Digging a Dirt Pile and cutting Peat sound while you work, with no extra sound at the end"
+   },
    {
     "date": "2026-11-13",
     "kind": "fix",
@@ -2909,14 +2914,9 @@
     "date": "2026-11-13",
     "kind": "improve",
     "text": "Ilmenskie Caverns' map takes its second painting, with every street in a tunnel"
-   },
-   {
-    "date": "2026-11-13",
-    "kind": "improve",
-    "text": "Naraka, Ilmenskie Caverns, Ilmenskie Deeps and The Seams now have painted region maps"
    }
   ]
  },
- "tests": 969,
+ "tests": 970,
  "generatedAt": "2026-11-13"
 }
