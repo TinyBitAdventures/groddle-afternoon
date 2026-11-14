@@ -10,7 +10,7 @@ import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { RECIPE_CATALOG, TOOL_CATALOG, canCraft, ensureMakingItems, listMakingTools, loadRecipeCatalogFromFile, makeCountLine, makeEmptyLine, makePanelIcon, recipeBlockedHtml, recipeBlockedLine, recipeKnownHere, recipeMissingLine } from '../public/js/making.js?v=96a16677';
+import { RECIPE_CATALOG, TOOL_CATALOG, canCraft, ensureMakingItems, listMakingTools, loadRecipeCatalogFromFile, makeCountLine, makeEmptyLine, makePanelIcon, recipeBlockedHtml, recipeBlockedLine, recipeKnownHere, recipeMissingLine } from '../public/js/making.js?v=9bbf2186';
 import { createInventory } from '../public/js/inventory.js?v=f49c8998';
 import { createToolConditionState, setToolRemaining } from '../public/js/tools.js?v=48542c24';
 
@@ -228,13 +228,25 @@ describe('#324: the achievement a recipe needs is a link to its badge', () => {
     assert.equal(html, 'You need to get the <button type="button" class="make-why-link" data-make-achievement="super_saucier" title="See what the Super Saucier achievement takes">Super Saucier</button> achievement.');
   });
 
+  it('a missing skill is a button that opens it (inc_making.js 1708 skills_linkify)', () => {
+    const check = canCraft(createInventory({ saucepan: 1, ...full }), sauce, { requireSkill: true, requireTool: true, learned: [] });
+    assert.equal(check.reason, 'skill');
+    const skillName = (id) => ({ saucery_1: 'Saucery I' })[id] || id;
+    const line = recipeBlockedLine(sauce, check, { skillName });
+    assert.equal(line, 'You need Saucery I to make this');
+    assert.equal(recipeBlockedHtml(line, check, { skillName, escape: esc }),
+      'You need <button type="button" class="make-why-link" data-make-skill="saucery_1" title="See the Saucery I skill">Saucery I</button> to make this');
+  });
+
   it('any other reason stays plain, escaped text', () => {
-    assert.equal(recipeBlockedHtml('You need <b>', { ok: false, reason: 'skill', skill: 'x' }, { achievementName: name, escape: esc }), 'You need &lt;b&gt;');
+    assert.equal(recipeBlockedHtml('You need <b>', { ok: false, reason: 'skill', skill: 'x' }, { skillName: () => 'Nope', escape: esc }), 'You need &lt;b&gt;');
+    assert.equal(recipeBlockedHtml('You need <b>', { ok: false, reason: 'tool', need: 'b' }, { achievementName: name, escape: esc }), 'You need &lt;b&gt;');
     assert.equal(recipeBlockedHtml('You need more energy!', { ok: true }, { escape: esc }), 'You need more energy!');
   });
 
   it('the Make window opens the Achievements panel on that badge, in both skins', () => {
-    assert.match(game, /recipeBlockedHtml\(blockedLine, check, \{ achievementName: makeAchievementName, escape: escapeHtml \}\)/);
+    assert.match(game, /recipeBlockedHtml\(blockedLine, check, \{ achievementName: makeAchievementName, skillName: makeSkillName, escape: escapeHtml \}\)/);
+    assert.match(game, /\[data-make-skill\]'\)\?\.addEventListener\('click', \(e\) => engine\.openSkillTree\(e\.currentTarget\.dataset\.makeSkill\)\)/);
     assert.match(game, /\[data-make-achievement\]'\)\?\.addEventListener\('click', \(e\) => openAchievementCard\(/);
     const open = game.slice(game.indexOf('function openAchievementCard('), game.indexOf('function openAchievementCard(') + 700);
     assert.match(open, /query: name/);

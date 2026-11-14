@@ -11,7 +11,7 @@ import { fileURLToPath } from 'node:url';
 import { countWords, pluralize, withArticle } from '../public/js/words.js?v=ee4e72f8';
 import { YARD_TEXT } from '../public/js/yard-verbs-mp.js?v=ddbe365c';
 import { pluralize as butlerPluralize } from '../public/js/butler.js?v=a660e585';
-import { ensureMakingItems } from '../public/js/making.js?v=96a16677';
+import { ensureMakingItems } from '../public/js/making.js?v=9bbf2186';
 import { ITEM_CATALOG } from '../public/js/inventory.js?v=f49c8998';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');

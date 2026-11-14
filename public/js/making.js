@@ -996,20 +996,25 @@ export function recipeBlockedLine(recipe, check, ctx = {}) {
 }
 
 /**
- * #324: the "why" line as HTML, the achievement it names a button that opens that badge (Glitch
- * linkified it: inc_making.js 1715 achievements_linkify, main.js 834), so the player can see what
- * it takes. `line` is recipeBlockedLine's answer for the same check; `escape` escapes HTML.
+ * #324: the "why" line as HTML, the achievement or skill it names a button that opens that badge
+ * or skill (Glitch linkified both: inc_making.js 1708 skills_linkify, 1715 achievements_linkify,
+ * main.js 834), so the player can see what it takes. `line` is recipeBlockedLine's answer for the
+ * same check; `escape` escapes HTML.
  * @param {string} line
  * @param {ReturnType<typeof canCraft>} check
- * @param {{ achievementName?: (id: string) => string, escape: (s: string) => string }} ctx
+ * @param {{ achievementName?: (id: string) => string, skillName?: (id: string) => string, escape: (s: string) => string }} ctx
  */
 export function recipeBlockedHtml(line, check, ctx) {
   const esc = ctx.escape;
-  const id = check && !check.ok && check.reason === 'achievement' ? String(check.achievement || '') : '';
-  const name = id ? ctx.achievementName?.(id) || id : '';
-  const at = name ? String(line || '').indexOf(name) : -1;
-  if (at < 0) return esc(String(line || ''));
-  return `${esc(line.slice(0, at))}<button type="button" class="make-why-link" data-make-achievement="${esc(id)}" title="See what the ${esc(name)} achievement takes">${esc(name)}</button>${esc(line.slice(at + name.length))}`;
+  const text = String(line || '');
+  const kind = check && !check.ok ? check.reason : '';
+  const id = kind === 'achievement' ? String(check.achievement || '') : kind === 'skill' ? String(check.skill || '') : '';
+  const name = !id ? '' : kind === 'skill' ? ctx.skillName?.(id) || id : ctx.achievementName?.(id) || id;
+  const at = name ? text.indexOf(name) : -1;
+  if (at < 0) return esc(text);
+  const attr = kind === 'skill' ? 'data-make-skill' : 'data-make-achievement';
+  const tip = kind === 'skill' ? `See the ${name} skill` : `See what the ${name} achievement takes`;
+  return `${esc(text.slice(0, at))}<button type="button" class="make-why-link" ${attr}="${esc(id)}" title="${esc(tip)}">${esc(name)}</button>${esc(text.slice(at + name.length))}`;
 }
 
 /**

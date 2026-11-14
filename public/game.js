@@ -619,11 +619,11 @@ import {
   recipeTaskLimit,
   recipeToolInUse,
   pluralizeItem,
-} from './js/making.js?v=96a16677';
+} from './js/making.js?v=9bbf2186';
 import { outputIconsHtml, outputsPhrase, recipeOutputRows } from './js/ui/recipe-outputs.js?v=73e19baf';
 import { MAKE_TOOL_SHEETS } from './js/make-tool-sheets.js?v=6f758e09';
-import { createTestTubePanel, tryTileHtml, TRY_TILE_LABEL } from './js/test-tube-panel.js?v=6ea51a50';
-import { COMPOUND_RECIPE_IDS, EXPERIMENT_TOOL, experimentTooltip } from './js/test-tube.js?v=4447e633';
+import { createTestTubePanel, tryTileHtml, TRY_TILE_LABEL } from './js/test-tube-panel.js?v=30aa19db';
+import { COMPOUND_RECIPE_IDS, EXPERIMENT_TOOL, experimentTooltip } from './js/test-tube.js?v=8b97bc31';
 import { groupMakingTools, makeToolCounts, makeToolCountLine, makeToolSpokenLine, makeOpeningTool, gridStep, stationForRecipe, MAKING_BUSY } from './js/make-tools.js?v=86877c3e';
 import { LOW_FUEL_LINE, craftSessionElapsedMs, isLowFuel, isMachineArt, machineArtHtml, packMakeState, playMachineHandOver, setMachineArtFrame } from './js/machine-art.js?v=038298f0';
 import {
@@ -28434,11 +28434,12 @@ function makeBlockedLine(recipe, check) {
   return recipeBlockedLine(recipe, check, {
     inv,
     energyOk: pc.energy > recipeEnergyCost(recipe, skillState.learned, pc.imaginationUpgrades),
-    skillName: (id) => skillTitle(getSkillCatalog()[id]) || getSkillCatalog()[id]?.name || id,
+    skillName: makeSkillName,
     achievementName: makeAchievementName,
   });
 }
 const makeAchievementName = (id) => getAchievementCatalog()[id]?.name || id.replace(/_/g, ' ');
+const makeSkillName = (id) => skillTitle(getSkillCatalog()[id]) || getSkillCatalog()[id]?.name || id;
 
 /**
  * #324: an achievement named in the Make window opens the Achievements panel searched to its card
@@ -28799,7 +28800,7 @@ function renderMakePanel() {
         <div class="make-detail-body">
           <h3>${recipe.name}</h3>
           ${makesLine ? `<p class="make-outs-line" data-make-outs>${escapeHtml(makesLine)}</p>` : ''}
-          ${blockedLine ? `<p class="make-why" data-make-why>${recipeBlockedHtml(blockedLine, check, { achievementName: makeAchievementName, escape: escapeHtml })}</p>` : ''}
+          ${blockedLine ? `<p class="make-why" data-make-why>${recipeBlockedHtml(blockedLine, check, { achievementName: makeAchievementName, skillName: makeSkillName, escape: escapeHtml })}</p>` : ''}
           <p>${blockedLine ? '' : `You can make up to ${maxMake}. `}Uses ${recipeEnergyCost(recipe, skillState.learned, pc.imaginationUpgrades)} energy each.</p>
           ${makingSkillAdjustments(recipe, skillState.learned).note ? `<p class="make-skill-note">${makingSkillAdjustments(recipe, skillState.learned).note}</p>` : ''}
           ${inputsHtml}
@@ -28819,6 +28820,8 @@ function renderMakePanel() {
         if (inp) inp.value = String(makeQty);
       };
       detail.querySelector('[data-make-achievement]')?.addEventListener('click', (e) => openAchievementCard(e.currentTarget.dataset.makeAchievement));
+      // inc_making.js 1708 skills_linkify: the skill opens in the Skills panel, focused on it.
+      detail.querySelector('[data-make-skill]')?.addEventListener('click', (e) => engine.openSkillTree(e.currentTarget.dataset.makeSkill));
       detail.querySelector('[data-mq="-"]')?.addEventListener('click', () => applyQty(makeQty - 1));
       detail.querySelector('[data-mq="+"]')?.addEventListener('click', () => applyQty(makeQty + 1));
       detail.querySelector('[data-mq="max"]')?.addEventListener('click', () => applyQty(maxMake || 1));
