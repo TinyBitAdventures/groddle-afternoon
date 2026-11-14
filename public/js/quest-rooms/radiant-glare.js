@@ -640,6 +640,9 @@ export const room = {
         subtitle: b.panel === 'totem' ? 'Clicking works from anywhere' : 'Mix the light',
         sprite: spr,
         rgBulb: b,
+        // HINT: "clicking on it works just as well". game.js skips the floor test and the verb's
+        // range for it (behindFloorFromPlayer, verbReachFrom); report #318.
+        reachAnywhere: true,
       });
       return { ...b, spr, target };
     });

@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=a5d648fd';
 import { createErrorOnce, createFeatureHost } from './js/feature-host.js?v=06bb8b74';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=64f1d496';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=22d61aba';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl, drawTileArt } from './js/enter-chooser.js?v=4a3ea327';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, bodyReachDistance, OUT_OF_REACH_LINE } from './js/reach.js?v=8e52df56';
@@ -9283,7 +9283,8 @@ function verbWalkRange(target, verbId) {
 /** In reach for the verb with the avatar's feet at `at` (the thing measured where it is now). */
 function verbReachFrom(target, verbId, at = player) {
   if (!target?.sprite || target.sprite.destroyed) return false;
-  const range = verbWalkRange(target, verbId);
+  // A target marked reachAnywhere (Radiant Glare's bulbs, #318) takes its verb at any distance.
+  const range = target.reachAnywhere ? null : verbWalkRange(target, verbId);
   const dist = interactDistance(target, at.x, at.y);
   const serverFar = Boolean(features.query('verbOutOfReach', target, verbId, engine, { x: at.x, y: at.y }));
   const behind = !/^pc_/.test(String(target.classId || '')) && behindFloorFromPlayer(target, at);
@@ -10322,6 +10323,9 @@ function interactDistance(t, px, py) {
  */
 function behindFloorFromPlayer(t, at = player) {
   if (!t?.sprite || t.sprite.destroyed || !streetPlatforms?.length) return false;
+  // Report 318: a target marked reachAnywhere (Radiant Glare's bulbs: "Clicking works from
+  // anywhere") is never behind a floor; the totem's top bank hangs under the disc you stand on.
+  if (t.reachAnywhere) return false;
   const bodyScale = features.query('avatarBodyScale', engine) ?? 1;
   const body = { x: at.x, y: at.y - avatarHeadReach(bodyScale).reach / 2 };
   const box = spriteWorldHitBox(t.sprite, 0);

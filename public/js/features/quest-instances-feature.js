@@ -170,7 +170,7 @@ const ROOM_MODULES = {
   le_miserable: () => import('../quest-rooms/le-miserable.js?v=39dbce12'),
   juju_camp: () => import('../quest-rooms/juju-camp.js?v=8f348e11'),
   picto_pattern: () => import('../quest-rooms/picto-pattern.js?v=f5989c1a'),
-  radiant_glare: () => import('../quest-rooms/radiant-glare.js?v=7804afe3'),
+  radiant_glare: () => import('../quest-rooms/radiant-glare.js?v=d743533a'),
   an_autumn_day: () => import('../quest-rooms/an-autumn-day.js?v=00d2af49'),
   being_watched: () => import('../quest-rooms/being-watched.js?v=777a7df0'),
   back_alley: () => import('../quest-rooms/back-alley.js?v=afd20ece'),
