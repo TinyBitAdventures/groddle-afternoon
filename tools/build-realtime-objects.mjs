@@ -82,11 +82,12 @@ import {
   planStreetPlacements,
   populationForStreet,
   rockPlacementRequest,
+  shrinePlacementRequest,
   treePlacementRequest,
   rockSpawnPlan,
   setStreetEcologyCatalog,
   streetReservedSpots,
-} from '../public/js/street-ecology.js?v=32b1be0a';
+} from '../public/js/street-ecology.js?v=9adea14d';
 import { ROCK_CATALOG } from '../public/js/mining.js?v=b28fef74';
 import { MEGA_ROCK_CHANCE, MEGA_ROCK_CHUNKS } from '../public/js/imagination-effects.js?v=70169933';
 import { RESOURCE_NODE_CATALOG, RESOURCE_SKILL_PACKAGES } from '../public/js/resource-nodes.js?v=3a26727e';
@@ -95,16 +96,16 @@ import { TRANT_CARE_PACKAGES } from '../public/js/trant-care.js?v=6ee0b0f5';
 import { WOOD_TREE_MATURITY_MAP } from '../public/js/woodcutting.js?v=ee35a30a';
 import { ANIMAL_KINSHIP_PACKAGES } from '../public/js/animal-kinship.js?v=e2a94c13';
 import { locationIsDepressing } from '../public/js/animal-mood.js?v=a49495fc';
-import { resourcePlacementGroups, resourceSpawnPlan } from '../public/js/features/resource-nodes-feature.js?v=1fc9b6d2';
-import { soilCountsForStreet, soilPlacementGroups } from '../public/js/features/patches-feature.js?v=4f5eb230';
-import { KITTY_GROUP, kittyPlacementGroups } from '../public/js/features/heli-kitties-feature.js?v=f53b20d3';
-import { BATTERFLY_GROUP, batterflyPlacementGroups } from '../public/js/features/animal-husbandry-feature.js?v=00719b7c';
+import { resourcePlacementGroups, resourceSpawnPlan } from '../public/js/features/resource-nodes-feature.js?v=bacced97';
+import { soilCountsForStreet, soilPlacementGroups } from '../public/js/features/patches-feature.js?v=f39ed9bb';
+import { KITTY_GROUP, kittyPlacementGroups } from '../public/js/features/heli-kitties-feature.js?v=010eed05';
+import { BATTERFLY_GROUP, batterflyPlacementGroups } from '../public/js/features/animal-husbandry-feature.js?v=2954baaf';
 import { hasRaceDispenser } from '../public/js/races.js?v=ab22a079';
 import { setWildlifeCatalog, wildlifeFor } from '../public/js/wildlife.js?v=670c3a7f';
 import { boardSpotRow, furnitureFor, furniturePlacementGroups } from '../public/js/street-furniture.js?v=cf1d21b1';
-import { INCUBATION } from '../public/js/animal-husbandry.js?v=65a1a24c';
-import { SHARED_NODE_CLASSES, freshTreePlan } from '../public/js/street-objects.js?v=44e4fc1c';
-import { PIGGY_TRIP } from '../public/js/street-creatures.js?v=470047e9';
+import { INCUBATION } from '../public/js/animal-husbandry.js?v=d4045cd5';
+import { SHARED_NODE_CLASSES, freshTreePlan } from '../public/js/street-objects.js?v=2c59015f';
+import { PIGGY_TRIP } from '../public/js/street-creatures.js?v=51baa41a';
 import { CRAB_PLACEMENT_KEY, CRAB_WALK, crabPlacementGroups } from '../public/js/crabs.js?v=cd5dd7a6';
 import { KITTY_PET } from '../public/js/heli-kitties.js?v=addb573f';
 import { FIRE_DRAGON_PLACEMENT_KEY, FIRE_DRAGON_WALK, fireDragonPlacementGroups } from '../public/js/fire-dragon.js?v=b7f3d751';
@@ -129,7 +130,8 @@ export function placementRequests(population) {
     treePlacementRequest(population),
     { key: 'gardens', count: population.gardens, clearance: 165 },
     { key: 'vendor', count: population.vendor ? 1 : 0, clearance: 120 },
-    { key: 'shrine', count: population.shrine ? 1 : 0, clearance: 135 },
+    // The shrine where its street's picture shows it (fixed), else planned.
+    shrinePlacementRequest(population),
     rockPlacementRequest(population),
     { key: 'piggies', count: population.piggies, clearance: 92 },
     { key: 'chickens', count: population.chickens, clearance: 86 },

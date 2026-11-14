@@ -2792,9 +2792,19 @@
   "deployed": "2026-11-14"
  },
  "git": {
-  "commits": 2079,
+  "commits": 2081,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-13",
+    "kind": "fix",
+    "text": "Groddle Meadow's shrines stand where the 2012 street pictures show them"
+   },
+   {
+    "date": "2026-11-13",
+    "kind": "improve",
+    "text": "The Louise Pasture Villa door stands in an apartment house"
+   },
    {
     "date": "2026-11-13",
     "kind": "fix",
@@ -2904,19 +2914,9 @@
     "date": "2026-11-13",
     "kind": "fix",
     "text": "Street crabs are their full Glitch size again"
-   },
-   {
-    "date": "2026-11-13",
-    "kind": "improve",
-    "text": "Winter Walk says why motes won't come at the daily quoin limit"
-   },
-   {
-    "date": "2026-11-13",
-    "kind": "fix",
-    "text": "Meat Collectors, Milkers, Feeders and Magic Sticks now say they work on your home street"
    }
   ]
  },
- "tests": 972,
+ "tests": 973,
  "generatedAt": "2026-11-13"
 }

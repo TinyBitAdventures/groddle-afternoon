@@ -33,10 +33,11 @@ import {
   planStreetPlacements,
   populationForStreet,
   rockPlacementRequest,
+  shrinePlacementRequest,
   treePlacementRequest,
   setStreetEcologyCatalog,
   streetReservedSpots,
-} from '../public/js/street-ecology.js?v=32b1be0a';
+} from '../public/js/street-ecology.js?v=9adea14d';
 import {
   MYSTERY_QUOIN_KINDS,
   QUOIN_CLASSES,
@@ -65,7 +66,8 @@ export function placementRequests(population) {
     treePlacementRequest(population),
     { key: 'gardens', count: population.gardens, clearance: 165 },
     { key: 'vendor', count: population.vendor ? 1 : 0, clearance: 120 },
-    { key: 'shrine', count: population.shrine ? 1 : 0, clearance: 135 },
+    // The shrine where its street's picture shows it (fixed), else planned.
+    shrinePlacementRequest(population),
     rockPlacementRequest(population),
     { key: 'piggies', count: population.piggies, clearance: 92 },
     { key: 'chickens', count: population.chickens, clearance: 86 },

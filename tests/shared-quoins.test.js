@@ -33,7 +33,7 @@ import {
   QUOIN_SHARD_FALL,
 } from '../public/js/quoin-shards.js?v=121156a0';
 import { placementRequests, streetQuoinLayout, classTable, mysteryTable } from '../tools/build-realtime-quoins.mjs';
-import { setStreetEcologyCatalog } from '../public/js/street-ecology.js?v=32b1be0a';
+import { setStreetEcologyCatalog } from '../public/js/street-ecology.js?v=9adea14d';
 import { QUOIN_CLASSES } from '../public/js/quoins.js?v=61be601c';
 import { HAS_SERVER, serverPath, skipWithoutServer } from '../tools/repos.mjs';
 
@@ -338,7 +338,9 @@ describe('the server data', () => {
     const call = game.slice(game.indexOf('currentStreetPlacement = planStreetPlacements('))
       .replace(/rockPlacementRequest\(currentStreetPopulation\)/, "{ key: 'rocks', count: rocks, clearance: 74 }")
       // The trees' request is treePlacementRequest (key 'trees', clearance 135, the trees the snaps show fixed).
-      .replace(/treePlacementRequest\(currentStreetPopulation\)/, "{ key: 'trees', count: trees, clearance: 135 }");
+      .replace(/treePlacementRequest\(currentStreetPopulation\)/, "{ key: 'trees', count: trees, clearance: 135 }")
+      // The shrine's request is shrinePlacementRequest (key 'shrine', clearance 135, a shrine its 2012 picture shows fixed).
+      .replace(/shrinePlacementRequest\(currentStreetPopulation\)/, "{ key: 'shrine', count: shrine, clearance: 135 }");
     const list = call.slice(0, call.indexOf("{ key: 'quoins'") + 80);
     const keys = [...list.matchAll(/\{ key: '([A-Za-z]+)', count: ([^,]+), clearance: (\d+) \}/g)].map((m) => [m[1], m[3]]);
     const pop = { treeClasses: [], gardens: 0, vendor: false, shrine: false, rockClasses: [], piggies: 0, chickens: 0, butterflies: 0, flyingButterflies: 0, apples: 0, musicblocks: 0, quoins: 0 };

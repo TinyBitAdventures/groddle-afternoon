@@ -38,15 +38,15 @@ import {
   takeObjs,
   treeReady,
   treeSkill,
-} from '../public/js/street-objects.js?v=44e4fc1c';
-import { streetObjectsFeature } from '../public/js/features/street-objects-feature.js?v=1094a187';
-import { FEATURES } from '../public/js/features/index.js?v=9995e259';
+} from '../public/js/street-objects.js?v=2c59015f';
+import { streetObjectsFeature } from '../public/js/features/street-objects-feature.js?v=9883859f';
+import { FEATURES } from '../public/js/features/index.js?v=64f1d496';
 import { createMineRock, mineRock } from '../public/js/mining.js?v=b28fef74';
 import { createResourceNode } from '../public/js/resource-nodes.js?v=3a26727e';
 import { createTrantState, fruitCapacityAt, setTrantTables } from '../public/js/trants.js?v=4d6f5593';
 import { placementRequests, ruleTables, streetObjectLayout } from '../tools/build-realtime-objects.mjs';
 import { STREET_INDEX, applyStreetIndex, loadStreetDataFromFs } from '../public/js/street-loader.js?v=18b181ad';
-import { PLANNED_NODE_CAPS, measuredNodeSpots, setStreetEcologyCatalog } from '../public/js/street-ecology.js?v=32b1be0a';
+import { PLANNED_NODE_CAPS, measuredNodeSpots, setStreetEcologyCatalog } from '../public/js/street-ecology.js?v=9adea14d';
 import { serverPath, skipWithoutServer } from '../tools/repos.mjs';
 
 const root = join(import.meta.dirname, '..');
@@ -485,7 +485,9 @@ describe('street objects: the server\'s layout', () => {
     const call = game.slice(game.indexOf('currentStreetPlacement = planStreetPlacements('))
       .replace(/rockPlacementRequest\(currentStreetPopulation\)/, "{ key: 'rocks', count: rocks, clearance: 74 }")
       // The trees' request is treePlacementRequest (key 'trees', clearance 135, the trees the snaps show fixed).
-      .replace(/treePlacementRequest\(currentStreetPopulation\)/, "{ key: 'trees', count: trees, clearance: 135 }");
+      .replace(/treePlacementRequest\(currentStreetPopulation\)/, "{ key: 'trees', count: trees, clearance: 135 }")
+      // The shrine's request is shrinePlacementRequest (key 'shrine', clearance 135, a shrine its 2012 picture shows fixed).
+      .replace(/shrinePlacementRequest\(currentStreetPopulation\)/, "{ key: 'shrine', count: shrine, clearance: 135 }");
     const keys = [...call.slice(0, call.indexOf("features.collect('placementGroups'")).matchAll(/\{ key: '([a-zA-Z]+)'/g)].map((m) => m[1]);
     const pop = { treeClasses: [], rockClasses: [], resourceNodeClasses: [] };
     assert.deepEqual(placementRequests(pop).map((r) => r.key), keys);

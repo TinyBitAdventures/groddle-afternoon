@@ -1,0 +1,293 @@
+{
+ "about": "Groddle Meadow's shrines where Tiny Speck's 2011-2012 street pictures show them (lane meadow2012, 2026-11-14). Read by eye off each street's whole-street render (research/wayback/raw/street-images/groddle-meadow/<picture>, 720 px wide; reference only, never shipped) at three times its size against a street-px grid: spot = the shrine's foot in street px (0, 0 = the street's top left, as street-model.js platformsScreen), good to about 25 px. tools/snap-placements/shrine-pictures.mjs seats each on the floor under it and writes public/js/shrine-spots-data.js. Hand-kept: edit here, then run that tool.",
+ "streets": {
+  "GLI32N0F1UD114O": {
+   "label": "Archimedes Acres",
+   "picture": "LLI32N0F1UD114O_main_1316233363.jpg",
+   "spot": [
+    4770,
+    915
+   ]
+  },
+  "GCR10U5VHMK112O": {
+   "label": "Bailestorth Shin",
+   "picture": "LCR10U5VHMK112O_main_1339298938.jpg",
+   "spot": [
+    1656,
+    891
+   ]
+  },
+  "GCR10K0NLRK1GKE": {
+   "label": "Balliure Heath",
+   "picture": "LCR10K0NLRK1GKE_main_1311271998.jpg",
+   "spot": [
+    3204,
+    882
+   ]
+  },
+  "GCR117DK18O11FF": {
+   "label": "Bonebottle Sands",
+   "picture": "LCR117DK18O11FF_main_1339299887.jpg",
+   "spot": [
+    4095,
+    870
+   ]
+  },
+  "GCRHSGTEION115H": {
+   "label": "Bonelington Hole",
+   "picture": "LCRHSGTEION115H_main_1311272112.jpg",
+   "spot": [
+    1336,
+    1220
+   ]
+  },
+  "GCR11DNA3EL10TD": {
+   "label": "Briarset Croft",
+   "picture": "LCR11DNA3EL10TD_main_1351299525.jpg",
+   "spot": [
+    4395,
+    870
+   ]
+  },
+  "GCR13VM1REM1GHI": {
+   "label": "Brinlow Vale",
+   "picture": "LCR13VM1REM1GHI_main_1339300724.jpg",
+   "spot": [
+    2904,
+    876
+   ]
+  },
+  "GCR199KIJRK1I2B": {
+   "label": "Broxhurst Green",
+   "picture": "LCR199KIJRK1I2B_main_1336606976.jpg",
+   "spot": [
+    984,
+    894
+   ]
+  },
+  "GCR144H8APK1OJS": {
+   "label": "Buckward Vale",
+   "picture": "LCR144H8APK1OJS_main_1339300790.jpg",
+   "spot": [
+    5064,
+    885
+   ]
+  },
+  "GCR17BAC6OL11L8": {
+   "label": "Coldthorp Lam",
+   "picture": "LCR17BAC6OL11L8_main_1325350625.jpg",
+   "spot": [
+    680,
+    594
+   ]
+  },
+  "GCR14062REM1QIR": {
+   "label": "Eglesgown Wanks",
+   "picture": "LCR14062REM1QIR_main_1316232534.jpg",
+   "spot": [
+    4386,
+    867
+   ]
+  },
+  "GLI33CQJ3UD1G5J": {
+   "label": "Elysian Slope",
+   "picture": "LLI33CQJ3UD1G5J_main_1344635677.jpg",
+   "spot": [
+    1725,
+    894
+   ]
+  },
+  "GLI32KHF0UD1AOK": {
+   "label": "Estevan Hummock",
+   "picture": "LLI32KHF0UD1AOK_main_1344635722.jpg",
+   "spot": [
+    3100,
+    708
+   ]
+  },
+  "GLI32J0SVTD114U": {
+   "label": "Estevan Meadows",
+   "picture": "LLI32J0SVTD114U_main_1343866407.jpg",
+   "spot": [
+    4625,
+    925
+   ]
+  },
+  "GCR10M2FUJK177P": {
+   "label": "Fanfoot Flare",
+   "picture": "LCR10M2FUJK177P_main_1346289343.jpg",
+   "spot": [
+    4750,
+    918
+   ]
+  },
+  "GCR113VN08O1116": {
+   "label": "Greenvern Mend",
+   "picture": "LCR113VN08O1116_main_1339300087.jpg",
+   "spot": [
+    4386,
+    864
+   ]
+  },
+  "GCR202JSVIN1STL": {
+   "label": "Kipacre Greens",
+   "picture": "LCR202JSVIN1STL_main_1339298354.jpg",
+   "spot": [
+    2565,
+    846
+   ]
+  },
+  "GCR111KI08O1HLB": {
+   "label": "Langden Abbey",
+   "picture": "LCR111KI08O1HLB_main_1339298006.jpg",
+   "spot": [
+    3150,
+    930
+   ]
+  },
+  "GCR10B6U5NJ1VMA": {
+   "label": "Leftmost Graze",
+   "picture": "LCR10B6U5NJ1VMA_main_1317080994.jpg",
+   "spot": [
+    2754,
+    885
+   ]
+  },
+  "GLIFIG7BP8G1MU9": {
+   "label": "Louise Pasture",
+   "picture": "LLIFIG7BP8G1MU9_main_1343866665.jpg",
+   "spot": [
+    2550,
+    711
+   ]
+  },
+  "GLIERMJ93DE1H25": {
+   "label": "Marrakesh Meadow",
+   "picture": "LLIERMJ93DE1H25_main_1336607432.jpg",
+   "spot": [
+    2886,
+    888
+   ]
+  },
+  "GLI32HBOUTD1GQV": {
+   "label": "Marylpole Mount",
+   "picture": "LLI32HBOUTD1GQV_main_1336607505.jpg",
+   "spot": [
+    1296,
+    936
+   ]
+  },
+  "GLID3PL336E1RN1": {
+   "label": "Meadow's Edge",
+   "picture": "LLID3PL336E1RN1_main_1346959097.jpg",
+   "spot": [
+    3936,
+    699
+   ]
+  },
+  "GCR10K3BPJK1U6F": {
+   "label": "Otterlane",
+   "picture": "LCR10K3BPJK1U6F_main_1339298804.jpg",
+   "spot": [
+    5430,
+    480
+   ]
+  },
+  "GCRO4M7LH5L1QOO": {
+   "label": "Prestnash Thrash",
+   "picture": "LCRO4M7LH5L1QOO_main_1336607596.jpg",
+   "spot": [
+    3465,
+    885
+   ]
+  },
+  "GCR11EIB3EL15ID": {
+   "label": "Ramsley Sway",
+   "picture": "LCR11EIB3EL15ID_main_1338526942.jpg",
+   "spot": [
+    2394,
+    915
+   ]
+  },
+  "GLI32IDPUTD1F2R": {
+   "label": "Ritzrock Rise",
+   "picture": "LLI32IDPUTD1F2R_main_1317075937.jpg",
+   "spot": [
+    1224,
+    927
+   ]
+  },
+  "GCR169OSLQL13JR": {
+   "label": "Rookthills Lay",
+   "picture": "LCR169OSLQL13JR_main_1311272160.jpg",
+   "spot": [
+    2046,
+    602
+   ]
+  },
+  "GCR11CD34KK1AN1": {
+   "label": "Rushlane Steading",
+   "picture": "LCR11CD34KK1AN1_main_1311272241.jpg",
+   "spot": [
+    1845,
+    849
+   ]
+  },
+  "GCR1UJAMSIN1D0G": {
+   "label": "Sculdent Shill",
+   "picture": "LCR1UJAMSIN1D0G_main_1339300513.jpg",
+   "spot": [
+    5256,
+    816
+   ]
+  },
+  "GCR1985LIRK12N4": {
+   "label": "Tillymurry Hurry",
+   "picture": "LCR1985LIRK12N4_main_1317003591.jpg",
+   "spot": [
+    4704,
+    891
+   ]
+  },
+  "GCR1664750O1D23": {
+   "label": "Twickenrill Grotto",
+   "picture": "LCR1664750O1D23_main_1311272055.jpg",
+   "spot": [
+    2156,
+    570
+   ]
+  },
+  "GLI334UG2UD1IKQ": {
+   "label": "Waylon Way",
+   "picture": "LLI334UG2UD1IKQ_main_1316056618.jpg",
+   "spot": [
+    2910,
+    885
+   ]
+  },
+  "GCRVT5V0BDO1HLF": {
+   "label": "Welldale",
+   "picture": "LCRVT5V0BDO1HLF_main_1311272378.jpg",
+   "spot": [
+    2904,
+    876
+   ]
+  },
+  "GCR13R31REM1A4S": {
+   "label": "Wickdoon Mood",
+   "picture": "LCR13R31REM1A4S_main_1347820620.jpg",
+   "spot": [
+    3870,
+    837
+   ]
+  },
+  "GCR7C1EG6LL1197": {
+   "label": "Wilhem Borough",
+   "picture": "LCR7C1EG6LL1197_main_1328477530.jpg",
+   "spot": [
+    2031,
+    885
+   ]
+  }
+ }
+}

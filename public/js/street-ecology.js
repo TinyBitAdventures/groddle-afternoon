@@ -18,6 +18,7 @@ import {
   ROCK_SPARKLY_SPOTS,
   TREE_SPOTS,
 } from './node-spots-data.js?v=97d4281c';
+import { SHRINE_SPOTS } from './shrine-spots-data.js?v=73006a8c';
 
 export const STREET_ECOLOGY_URL = 'assets/content/street-ecology.json?v=official-ecology-6';
 
@@ -414,6 +415,43 @@ export function measuredTreeSlots(population) {
 }
 
 /**
+ * Shrines (lane meadow2012, 2026-11-14): Glitch set each by hand (npc_shrine_*.js obey_physics
+ * false) and the planner put Groddle Meadow's far from where its street's 2011-2012 picture shows
+ * them (30 of 36 more than 300 px off). tools/snap-placements/shrine-pictures.mjs seats the spots
+ * read off those pictures on the floor under them (shrine-spots-data.js SHRINE_SPOTS).
+ *
+ * PURE: a street's shrine spot, { x, y } (the shrine's foot, street px), or null where it is planned.
+ */
+export function measuredShrineSpot(tsid) {
+  if (!tsid) return null;
+  for (const alias of streetEcologyAliases(tsid)) {
+    const row = SHRINE_SPOTS[alias];
+    if (row && Number.isFinite(row[0]) && Number.isFinite(row[1])) return { x: row[0], y: row[1] };
+  }
+  return null;
+}
+
+function shrineSpotField(tsid) {
+  const spot = measuredShrineSpot(tsid);
+  return spot ? { shrineSpot: spot } : {};
+}
+
+/**
+ * The shrine's planner request: the street's shrine, as a `fixed` point where its picture shows it
+ * (planStreetPlacements seats it before anything else is planned and keeps every other thing off
+ * it, its box PLACEMENT_FOOTPRINTS.shrine x PLACEMENT_HEIGHTS.shrine), else planned. game.js
+ * enterStreet, the realtime builders and the level builder all ask with this.
+ */
+export function shrinePlacementRequest(population) {
+  const count = population?.shrine ? 1 : 0;
+  const spot = population?.shrineSpot;
+  const fixed = count && Number.isFinite(spot?.x) && Number.isFinite(spot?.y)
+    ? [{ x: spot.x, y: spot.y, w: PLACEMENT_FOOTPRINTS.shrine, h: PLACEMENT_HEIGHTS.shrine }]
+    : null;
+  return { key: 'shrine', count, clearance: 135, ...(fixed ? { fixed } : {}) };
+}
+
+/**
  * The trees' planner request: every tree of the street, the ones the snaps show as `fixed` points at
  * their own index (planStreetPlacements seats them first, where the snap shows them, keeps every
  * other thing off them, and puts each at its index in the group, so placement('trees')[i] is still
@@ -662,6 +700,7 @@ export function populationForStreet(tsid, entry, { starter = false } = {}) {
       featureCounts: featureCountsFrom(counts),
       resourceNodeClasses: expandResourceClasses(counts, spots),
       ...spotFields(spots, measuredTreeSpots(tsid)),
+      ...shrineSpotField(entry.giantId ? tsid : null),
     };
   }
   // A feature-built row for a rebuilt street may lift the rendering caps to its
@@ -738,6 +777,7 @@ export function populationForStreet(tsid, entry, { starter = false } = {}) {
     resourceNodeClasses: expandResourceClasses(counts, spots),
     // The starter's onboarding trees are the remake's own: they are planned.
     ...spotFields(spots, starter && !entry ? null : measuredTreeSpots(tsid)),
+    ...shrineSpotField(shrine && entry ? tsid : null),
   };
 }
 
