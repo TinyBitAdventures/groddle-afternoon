@@ -784,6 +784,10 @@ async function spawnStreet(engine, items, myGeneration) {
     sprite: null,
     target: null,
   }));
+  // Report #321 (Ritzrock Rise): a plot adopted meanwhile whose key the plan already has is
+  // replaced by the planned one; its view goes too, or its sprite and target stay on the street
+  // as a second Patch that answers "Nothing to do here".
+  for (const old of entities) if (!adoptedMeanwhile.includes(old)) dropView(engine, old);
   entities = [...spawned, ...adoptedMeanwhile];
   demoEntity = entities.find((e) => e.demo) || null;
   spawning = false;

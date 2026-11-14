@@ -39,7 +39,7 @@ import {
   legalizeReloadLocation,
   legalizeWayBack,
 } from '../public/js/legalize-it.js?v=d27094df';
-import { closeQuestRoomConverse } from '../public/js/features/quest-instances-feature.js?v=198b8096';
+import { closeQuestRoomConverse } from '../public/js/features/quest-instances-feature.js?v=2d0873a4';
 import { getVerbsFor } from '../public/content.js?v=a5d648fd';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');

@@ -31,8 +31,8 @@ import { HELP_DIG_COUNTER, HELP_DIG_LABEL, digHelpFrom, helpDigMessage, othersDi
 import { MULTIPLAYER_QUESTS, MULTIPLAYER_QUESTS_LEFT_OUT, creditedMultiplayerQuests, offerableMultiplayerQuest } from '../public/js/quests-mp.js?v=1fc5ff58';
 import { createResourceNode, harvestResourceNode } from '../public/js/resource-nodes.js?v=3a26727e';
 import { isPoisoned, TREE_ANTIDOTE, TREE_POISON, BOTANY_SKILL } from '../public/js/tree-poison.js?v=d8fb42c9';
-import { treeDeathFeature } from '../public/js/features/tree-death-feature.js?v=324939be';
-import { patchesFeature } from '../public/js/features/patches-feature.js?v=f39ed9bb';
+import { treeDeathFeature } from '../public/js/features/tree-death-feature.js?v=f52c092c';
+import { patchesFeature } from '../public/js/features/patches-feature.js?v=067d04d0';
 import { streetObjectsFeature } from '../public/js/features/street-objects-feature.js?v=9883859f';
 import { helpMineFeature } from '../public/js/features/help-mine-feature.js?v=74fd4b85';
 import { animalMoodFeature } from '../public/js/features/animal-mood-feature.js?v=9da24db2';

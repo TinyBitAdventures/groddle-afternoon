@@ -28,10 +28,10 @@ import {
   sharedTreeSkill,
   TRANTSFORM_VERB,
 } from '../public/js/shared-patches.js?v=387005ed';
-import { sharedPatchesFeature } from '../public/js/features/shared-patches-feature.js?v=578db422';
-import { patchesFeature } from '../public/js/features/patches-feature.js?v=f39ed9bb';
-import { treeDeathFeature, decorateTreeVerbs } from '../public/js/features/tree-death-feature.js?v=324939be';
-import { potionsFeature } from '../public/js/features/potions-feature.js?v=2daa7b89';
+import { sharedPatchesFeature } from '../public/js/features/shared-patches-feature.js?v=17911686';
+import { patchesFeature } from '../public/js/features/patches-feature.js?v=067d04d0';
+import { treeDeathFeature, decorateTreeVerbs } from '../public/js/features/tree-death-feature.js?v=f52c092c';
+import { potionsFeature } from '../public/js/features/potions-feature.js?v=e1b74106';
 import { powdersFeature, runPowder } from '../public/js/features/powders-feature.js?v=7abf1cc4';
 import { streetObjectsFeature } from '../public/js/features/street-objects-feature.js?v=9883859f';
 import { rookKeyFor } from '../public/js/rook-attack.js?v=c12e825f';
@@ -644,5 +644,64 @@ describe('every grownFromBean branch keeps its solo path and takes the shared on
     const solo = { classId: 'trant_spice', grownFromBean: true, state: { maturity: 5 }, sprite: {} };
     assert.equal(streetObjectsFeature.sharedFertilize([solo], false, { mode: 'multiplayer', query: () => null }), null);
     assert.equal(streetObjectsFeature.sharedFertilize([{ ...solo, sharedPatch: 'patch:0' }], false, { mode: 'solo', query: () => null }), null);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// #321 (Ritzrock Rise): a felled shared Wood Tree's plot drawn twice on join
+// ---------------------------------------------------------------------------
+
+describe('#321 a dead shared street tree\'s plot is drawn once when the street loads', () => {
+  let ecology;
+  let undo = () => {};
+  before(() => {
+    ecology = getStreetEcologyCatalog();
+    setStreetEcologyCatalog({ ...(ecology || {}), soil: { [OLD_MAIN]: { patch: 4, trant_spice_dead: 1 } } });
+  });
+  after(() => {
+    setStreetEcologyCatalog(ecology);
+    undo();
+  });
+
+  /** boot() up to the street's Patches: the features ready, the street cleared, not yet entered. */
+  function ready(r) {
+    const prevPixi = globalThis.PIXI;
+    globalThis.PIXI = PIXI;
+    const store = new Map([[SHARED_PATCHES_QA_KEY, '1']]);
+    globalThis.window = { localStorage: { getItem: (k) => store.get(k) ?? null } };
+    for (const f of [sharedPatchesFeature, treeDeathFeature, streetObjectsFeature, powdersFeature, potionsFeature]) f._reset();
+    sharedPatchesFeature.restore(undefined, r.engine);
+    sharedPatchesFeature.init(r.engine);
+    treeDeathFeature.init(r.engine);
+    patchesFeature.onStreetClear();
+    undo = () => { globalThis.PIXI = prevPixi; delete globalThis.window; };
+  }
+  const plotTargets = (r, key) => r.interactables.filter((t) => t.patchKey === key);
+  const deadTree = { key: 'tree:5', soilClass: 'patch', x: 3000, y: 966 };
+
+  it('the tree\'s death lands before the Patches spawn: one plot, the planned one', async () => {
+    const r = rig();
+    ready(r);
+    snapshot(r, {});
+    // street-objects-feature sharedTreeDied -> tree-death killTree -> adoptPlot, on join.
+    patchesFeature.adoptPlot(r.engine, deadTree);
+    await tick();
+    patchesFeature.onStreetEnter(r.engine.street, r.engine);
+    await tick();
+    await tick();
+    assert.equal(plotTargets(r, 'tree:5').length, 1);
+    assert.equal(patchesFeature.entityByKey('tree:5')?.target, plotTargets(r, 'tree:5')[0]);
+  });
+
+  it('the tree\'s death lands while the Patches spawn: one plot', async () => {
+    const r = rig();
+    ready(r);
+    snapshot(r, { 'tree:5': { class: 'patch', kind: 'patch', stage: 'dirty', x: 3000, y: 966 } });
+    patchesFeature.onStreetEnter(r.engine.street, r.engine);
+    patchesFeature.adoptPlot(r.engine, deadTree);
+    await tick();
+    await tick();
+    assert.equal(plotTargets(r, 'tree:5').length, 1);
+    assert.equal(patchesFeature.entityByKey('tree:5')?.target, plotTargets(r, 'tree:5')[0]);
   });
 });
