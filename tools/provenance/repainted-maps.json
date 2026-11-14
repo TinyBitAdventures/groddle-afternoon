@@ -1151,7 +1151,7 @@
         },
         "pack": "research/map-art/regions-restore (outside git): readme.md, prompt.txt, attach/, order.txt; intake: scratchpad regions-intake (intake.sh, tone2.py)"
       },
-      "differences": "The cleanest of the pilot: cliffs, the rock ridge, the clouds, the beach and the huts sit where 2012 had them. The model returned it a little greener and more saturated; the toning step brings it back to 2012's colour.",
+      "differences": "The cleanest of the first four: cliffs, the rock ridge, the clouds, the beach and the huts sit where 2012 had them. The model returned it a little greener and more saturated; the toning step brings it back to 2012's colour.",
       "replaces": {
         "made": "2026-11-07",
         "x1": {

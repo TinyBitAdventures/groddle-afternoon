@@ -2792,9 +2792,14 @@
   "deployed": "2026-11-14"
  },
  "git": {
-  "commits": 2110,
+  "commits": 2111,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-14",
+    "kind": "improve",
+    "text": "The Maps page shows the fourteen restored regions"
+   },
    {
     "date": "2026-11-14",
     "kind": "new",
@@ -2909,11 +2914,6 @@
     "date": "2026-11-13",
     "kind": "fix",
     "text": "A meditation cut short by a teleport counts on the street it started on"
-   },
-   {
-    "date": "2026-11-13",
-    "kind": "improve",
-    "text": "Alakol, Groddle Forest and Andra's maps are Tiny Speck's 2012 paintings, restored and matched to 2012's colour"
    }
   ]
  },
