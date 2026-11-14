@@ -75,8 +75,8 @@ describe('Groddle on Minn (groddle-afternoon-site, a block theme that is also an
     for (const d of dirs) {
       const type = JSON.parse(readFileSync(join(ext, 'blocks', d, 'block.json'), 'utf8'));
       assert.equal(type.name, `groddle/${d}`);
-      // The Known gaps list is its own page's block (src/RestorationGaps.php, tests/gaps-page.test.js); Made for Groddle has its own drawer (src/RestorationMade.php, tests/made-art.test.js).
-      if (d.startsWith('restoration-') && d !== 'restoration-gaps' && d !== 'restoration-made') assert.match(restoration, new RegExp(`\\$section\\('${d.slice('restoration-'.length)}'`), d);
+      // The Known gaps list and the Maps page are their own pages' blocks (src/RestorationGaps.php, tests/gaps-page.test.js; src/RestorationMaps.php, tests/restoration-maps.test.js); Made for Groddle has its own drawer (src/RestorationMade.php, tests/made-art.test.js).
+      if (d.startsWith('restoration-') && !['restoration-gaps', 'restoration-maps', 'restoration-made'].includes(d)) assert.match(restoration, new RegExp(`\\$section\\('${d.slice('restoration-'.length)}'`), d);
       else assert.match(sources, new RegExp(`\\$minn->block\\('blocks/${d}'`), d);
       if (type.parent) assert.ok(declared.includes(type.parent[0]), `${d}'s parent is a declared block`);
       if (type.allowedBlocks) assert.deepEqual(type.example.innerBlocks.map((b) => b.name), type.allowedBlocks, `${d} inserts with a child to edit`);
@@ -90,7 +90,7 @@ describe('Groddle on Minn (groddle-afternoon-site, a block theme that is also an
     const { restorationContent } = await import('../tools/restoration/to-minn.mjs');
     const content = restorationContent();
     assert.doesNotMatch(content, /wp:html/);
-    const sections = readdirSync(join(ext, 'blocks')).filter((d) => d.startsWith('restoration-') && d !== 'restoration-gaps');
+    const sections = readdirSync(join(ext, 'blocks')).filter((d) => d.startsWith('restoration-') && d !== 'restoration-gaps' && d !== 'restoration-maps');
     for (const d of sections) assert.equal(content.split(`<!-- wp:groddle/${d}`).length - 1, 1, `${d} is on the page once`);
     // Every jump link lands on a band, each band's heading carries the id its section is labelled by.
     const bands = [...content.matchAll(/<section class="wp-block-group band[^"]*" id="([a-z]+)">/g)].map((m) => m[1]);

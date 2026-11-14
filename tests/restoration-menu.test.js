@@ -86,7 +86,8 @@ describe('restoration section menu (ReportMenu.php)', () => {
 
   it('is drawn by the theme over the report\'s rendered content, sticky, in the page\'s tokens', { skip: skipWithoutSite }, () => {
     const ext = readFileSync(join(SITE_DIR, 'src/Extension.php'), 'utf8');
-    assert.match(ext, /\$minn->filterContent\(static fn \(string \$html\): string => Restoration::drawn\(\) \? ReportMenu::insert\(\$html\) : \$html\)/);
+    // The Maps page (src/RestorationMaps.php) wears the same bar.
+    assert.match(ext, /\$minn->filterContent\(static fn \(string \$html\): string => Restoration::drawn\(\) \|\| RestorationMaps::drawn\(\) \? ReportMenu::insert\(\$html\) : \$html\)/);
     assert.match(readFileSync(join(SITE_DIR, 'src/Restoration.php'), 'utf8'), /public static function drawn\(\): bool/);
     const css = readFileSync(join(SITE_DIR, 'style.css'), 'utf8');
     const rules = css.slice(css.indexOf("/* The restoration report's section menu"), css.indexOf('/* The Musicblocks page'));
