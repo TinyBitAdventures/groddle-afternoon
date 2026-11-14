@@ -2792,9 +2792,19 @@
   "deployed": "2026-11-14"
  },
  "git": {
-  "commits": 2092,
+  "commits": 2094,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-14",
+    "kind": "fix",
+    "text": "Legalize It's application is made in Gregarious Grange's shared Bureaucratic Hall, with everyone else in it"
+   },
+   {
+    "date": "2026-11-14",
+    "kind": "improve",
+    "text": "Aranna, Balzare, Baqala, Besara, Bortola, Brillah, Callopee, Cauda, Chakra Phool and Choru's maps are Tiny Speck's 2012 paintings, restored and matched to 2012's colour"
+   },
    {
     "date": "2026-11-14",
     "kind": "improve",
@@ -2904,19 +2914,9 @@
     "date": "2026-11-13",
     "kind": "fix",
     "text": "Mr. Block's conversation card sits beside or above him instead of in the middle of the screen"
-   },
-   {
-    "date": "2026-11-13",
-    "kind": "improve",
-    "text": "World map hover cards show each region's painting, sharp on Retina screens"
-   },
-   {
-    "date": "2026-11-13",
-    "kind": "improve",
-    "text": "Phones fetch the World map's sharp charts only when the World view opens"
    }
   ]
  },
- "tests": 976,
+ "tests": 977,
  "generatedAt": "2026-11-14"
 }
