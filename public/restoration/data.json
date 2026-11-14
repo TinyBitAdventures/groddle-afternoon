@@ -2792,9 +2792,14 @@
   "deployed": "2026-11-13"
  },
  "git": {
-  "commits": 2054,
+  "commits": 2055,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-13",
+    "kind": "fix",
+    "text": "A subway ride plays only the train's own sound, not a second tune under it"
+   },
    {
     "date": "2026-11-13",
     "kind": "improve",
@@ -2909,14 +2914,9 @@
     "date": "2026-11-13",
     "kind": "fix",
     "text": "The Magic Rock's card shows with the rock and its white glow, not the rock and glow a beat after the card"
-   },
-   {
-    "date": "2026-11-13",
-    "kind": "fix",
-    "text": "Online, a street you can already walk to still shows its project as open when the world has not built it yet"
    }
   ]
  },
- "tests": 965,
+ "tests": 966,
  "generatedAt": "2026-11-13"
 }
