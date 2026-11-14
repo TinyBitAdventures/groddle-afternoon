@@ -109,6 +109,7 @@ import { runStreetTransition } from '../screen-fx.js?v=ebdb038b';
 import { HOME_INTERIOR_TSID, HOME_STREET_TSID } from '../homes.js?v=631ab6b8';
 import { armPromptTimeout, promptTimeoutMs } from '../prompt-timeout.js?v=ce86b5b6';
 import { applyFamiliarLook, familiarLook } from '../familiar.js?v=b9597cd3';
+import { placeDialogueBySpeaker } from '../speaker-card.js?v=94220469';
 import { collectQuoin, QUOIN_SHEET, QUOIN_TYPES } from '../quoins.js?v=61be601c';
 import { sourceFromUrl } from '../textures.js?v=814d7926';
 import { REMAKE_ROOM_PHYSICS } from '../avatar-step.js?v=43b1182e';
@@ -559,7 +560,7 @@ export function cancelChoice(choices, cancel) {
  * `timeout` (source seconds) closes it on its own and resolves with
  * `timeoutValue` or null (G198, js/prompt-timeout.js).
  */
-function converse(engine, { title = '', kicker = '', text = '', beats = null, choices = null, timeout = 0, timeoutValue = null, look: lookOpt = '', width = 0, note = '', cancel: cancelOpt } = {}) {
+function converse(engine, { title = '', kicker = '', text = '', beats = null, choices = null, timeout = 0, timeoutValue = null, look: lookOpt = '', width = 0, note = '', cancel: cancelOpt, speaker = null } = {}) {
   // G225: Magic Rock lines take the FamiliarDialog CONVERSATION panel unless the caller names a look.
   const look = familiarLook({ look: lookOpt, kicker });
   buildChrome(engine);
@@ -624,6 +625,9 @@ function converse(engine, { title = '', kicker = '', text = '', beats = null, ch
       // inc_announcements.js 375-482): the rock with rays at the top, the bubble under it.
       applyFamiliarLook(dialog.modal, { look, width, grow: opening });
       engine.setData('qiDialogLook', look);
+      // #313: a plain conversation sits clear of its speaker, over its head as Glitch's talk bubble did.
+      const spot = placeDialogueBySpeaker(dialog.modal, look === 'plain' ? engine.speakerRectIn?.(speaker, dialog.modal) || null : null);
+      engine.setData('qiDialogPlace', spot ? `${spot.how}:${spot.x},${spot.y}` : '');
       dialog.choices.querySelector('button')?.focus?.();
     };
     render();
@@ -753,7 +757,9 @@ function makeContext(engine) {
     complete: () => (run ? requirementsMet(engine, run.questId) : false),
     leave: (opts) => leaveInstance(engine, opts),
     gotoStage: (stage, opts) => gotoStage(engine, stage, opts),
-    converse: (opts) => converse(engine, opts),
+    // #313: a room's conversation names its speaker by title (Mr. Block's lines are his), as the
+    // source's conversation_start came from the thing talking (ChoicesDialog.as 833-880).
+    converse: (opts = {}) => converse(engine, { ...opts, speaker: opts.speaker ?? c.targets.find((t) => opts.title && t.label === opts.title) ?? null }),
     /**
      * G304: a source prompts_add (not modal) on the bottom-right prompt stack
      * (engine.prompt), e.g. instances_show_exit_prompt's "Are you stuck?".

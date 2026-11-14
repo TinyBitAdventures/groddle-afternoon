@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=d18e90b8';
 import { createErrorOnce, createFeatureHost } from './js/feature-host.js?v=06bb8b74';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=0b6e235e';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=e2837606';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl, drawTileArt } from './js/enter-chooser.js?v=4a3ea327';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, bodyReachDistance, OUT_OF_REACH_LINE } from './js/reach.js?v=8e52df56';
@@ -802,6 +802,7 @@ import './js/classic/classic-zoom.js?v=cd7c918c';
 import { mountImaginationHub } from './js/ui/imagination-hub.js?v=6928c5b7';
 import { newDayBubble, shuffleNewDayMessages, waitForScreenGates } from './js/screen-queue.js?v=cf0132c0';
 import { applyFamiliarLook, familiarCardHeading, familiarLook, skillArtFor, skillLearnedActivity } from './js/familiar.js?v=b9597cd3';
+import { placeDialogueBySpeaker } from './js/speaker-card.js?v=94220469';
 import { armPromptTimeout, promptTimeoutMs } from './js/prompt-timeout.js?v=ce86b5b6';
 import {
   planTravel,
@@ -8710,6 +8711,12 @@ function placeMenuAtTarget(menu, target, dataKey) {
   if (app?.canvas) app.canvas.dataset[dataKey] = `${placed.x},${placed.y},${placed.below ? 'below' : 'above'},${placed.tail ?? 'none'}`;
 }
 
+/** #313: a speaking thing's sprite in `el`'s px (clipped to it), or null when it is gone or off screen. */
+function speakerRectIn(target, el) {
+  if (!target?.sprite || target.sprite.destroyed || !el?.getBoundingClientRect) return null;
+  return targetPageRect(target, el.getBoundingClientRect());
+}
+
 /** A thing's sprite as a rect in #game-root's px (its bounds, clipped to the view), or null. */
 function targetPageRect(target, rr) {
   const spr = target?.sprite;
@@ -12867,6 +12874,8 @@ const engine = {
   get stage() {
     return app?.stage || null;
   },
+  /** #313: a target's sprite as a rect in `el`'s px (a dialog placing itself clear of its speaker), or null. */
+  speakerRectIn: (target, el) => speakerRectIn(target, el),
   /** The game's Pixi canvas (shrine hints place themselves over it), or null before boot. */
   get canvas() {
     return app?.canvas || null;
@@ -17089,6 +17098,7 @@ function openCurrentFourLetterRiddle() {
   if (!riddle) return;
   openScriptedQuestDialogue({
     title: 'Mr. Block',
+    speaker: fourLetterMrBlock,
     kicker: `Riddle ${fourLetterState.riddleIndex + 1} of ${FOUR_LETTER_RIDDLES.length}`,
     beats: [{ text: riddle.text, response: 'Hm…' }],
   });
@@ -17098,6 +17108,7 @@ function confirmLeaveFourLetterQuest() {
   if (!fourLetterIsInstanced()) return;
   openScriptedQuestDialogue({
     title: 'Mr. Block',
+    speaker: fourLetterMrBlock,
     kicker: 'Leaving so soon?',
     cancelable: true,
     beats: [
@@ -17156,6 +17167,7 @@ function handleFourLetterTarget(target, verbId) {
     const dialogue = FOUR_LETTER_NEXT_DIALOGUE[fourLetterState.riddleIndex - 1];
     openScriptedQuestDialogue({
       title: 'Mr. Block',
+      speaker: fourLetterMrBlock,
       kicker: `${result.word}!`,
       beats: dialogue,
     });
@@ -17164,6 +17176,7 @@ function handleFourLetterTarget(target, verbId) {
 
   openScriptedQuestDialogue({
     title: 'Mr. Block',
+    speaker: fourLetterMrBlock,
     kicker: 'BEAT!',
     beats: FOUR_LETTER_FINAL_DIALOGUE,
     onComplete: finishFourLetterQuest,
@@ -17238,6 +17251,7 @@ async function startFourLetterQuest(opts = {}) {
     toast('Everything suddenly looks enormous.', 3200);
     openScriptedQuestDialogue({
       title: 'Mr. Block',
+      speaker: fourLetterMrBlock,
       kicker: 'Four Letter Words',
       beats: FOUR_LETTER_INTRO,
       onComplete: () => {
@@ -26507,6 +26521,9 @@ function renderQuestDialogueBeat() {
   const wasHidden = modal.hidden;
   modal.hidden = false;
   applyFamiliarLook(modal, { look, urgent, grow: wasHidden, at: inLog ? questLogCardSpot(modal) : null });
+  // #313: a plain conversation's speaker stays in view, the card over its head as Glitch's bubble was.
+  const spot = placeDialogueBySpeaker(modal, look === 'plain' && !inLog ? speakerRectIn(questDialogueState.speaker, modal) : null);
+  setCanvasData('questCardPlace', spot ? `${spot.how}:${spot.x},${spot.y}` : '');
   if (app?.canvas) app.canvas.dataset.questCardLook = `${look}${urgent ? ':urgent' : ''}${inLog ? ':log' : ''}`;
 }
 
@@ -26597,6 +26614,8 @@ function openScriptedQuestDialogue({
   noDecline = false,
   primaryBlocked = '',
   note = '',
+  // #313: the thing talking (a registered target): the card sits clear of it (js/speaker-card.js).
+  speaker = null,
 }) {
   // G217: an offer or prompt that arrives over the Enter chooser or a verb menu waits until they close.
   if (holdScriptedDialog(arguments[0])) return;
@@ -26624,6 +26643,7 @@ function openScriptedQuestDialogue({
     noDecline: noDecline === true,
     primaryBlocked: String(primaryBlocked || ''),
     note: String(note || ''),
+    speaker,
   };
   renderQuestDialogueBeat();
   armQuestDialogueTimeout({ timeout, timeoutMs, timeoutValue, onTimeout });
