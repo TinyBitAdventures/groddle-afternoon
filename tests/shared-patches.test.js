@@ -33,11 +33,11 @@ import {
   sharedPatchesOn,
   soilRolls,
   stripSharedPlots,
-} from '../public/js/shared-patches.js?v=7fe2a9c6';
-import { sharedPatchesFeature } from '../public/js/features/shared-patches-feature.js?v=b9a456b8';
-import { patchesFeature, soilSpawnPlan } from '../public/js/features/patches-feature.js?v=be667edc';
-import { FEATURES } from '../public/js/features/index.js?v=9568cfd4';
-import { getStreetEcologyCatalog, setStreetEcologyCatalog } from '../public/js/street-ecology.js?v=4016b2cb';
+} from '../public/js/shared-patches.js?v=2a03d1bd';
+import { sharedPatchesFeature } from '../public/js/features/shared-patches-feature.js?v=c4538394';
+import { patchesFeature, soilSpawnPlan } from '../public/js/features/patches-feature.js?v=1d5714ed';
+import { FEATURES } from '../public/js/features/index.js?v=2c0a90f1';
+import { getStreetEcologyCatalog, setStreetEcologyCatalog } from '../public/js/street-ecology.js?v=02dd7dda';
 import { HAS_SERVER, serverPath } from '../tools/repos.mjs';
 
 const read = (p) => readFileSync(new URL(`../${p}`, import.meta.url), 'utf8');

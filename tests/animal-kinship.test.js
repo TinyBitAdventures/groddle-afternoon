@@ -16,8 +16,8 @@ import {
   performAnimalKinship,
   resetAnimalKinshipDay,
 } from '../public/js/animal-kinship.js?v=e2a94c13';
-import { createAnimalState, animalStatusLabel } from '../public/js/animals.js?v=5af77017';
-import { getVerbsFor, runVerb } from '../public/content.js?v=de8f27e6';
+import { createAnimalState, animalStatusLabel } from '../public/js/animals.js?v=3c7debb6';
+import { getVerbsFor, runVerb } from '../public/content.js?v=3b682793';
 import { createToolConditionState, getToolCondition, setToolRemaining } from '../public/js/tools.js?v=48542c24';
 
 const here = dirname(fileURLToPath(import.meta.url));
