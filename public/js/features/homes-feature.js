@@ -2543,6 +2543,19 @@ function spawnStreetTargets(engine) {
  */
 export const SDB_ITEM_DY = -26;
 export const SDB_BASE_FOOT = -12;
+/** bag_furniture_sdb.js getExtraConfig 926: the shown item is drawn `width: 34`. */
+export const SDB_ITEM_WH = 34;
+
+/**
+ * #314 (a Wine of the Dead squashed into a blob): the scale that fits a w x h icon into the
+ * SDB_ITEM_WH box keeping its shape, as the client's ItemIconView did with a given wh
+ * (glitch-client ItemIconView.as 315-321: the longer side becomes wh). 1 while the size is unknown.
+ */
+export function displayIconScale(w, h, wh = SDB_ITEM_WH) {
+  const long = Math.max(Number(w) || 0, Number(h) || 0);
+  return long > 0 ? wh / long : 1;
+}
+
 function displayIconY(item, upgradeId = item.upgradeId) {
   const foot = Number(pieceArt(item.classTsid, upgradeId)?.foot);
   return SDB_ITEM_DY + (Number.isFinite(foot) ? foot : SDB_BASE_FOOT);
@@ -2585,8 +2598,15 @@ function furnitureView(PIXI, item) {
   if (item.display?.classTsid) {
     const icon = new PIXI.Sprite(textureFromUrl(ITEM_CATALOG[item.display.classTsid]?.icon || `assets/sprites/icons/${item.display.classTsid}.webp`));
     icon.anchor.set(0.5);
-    icon.width = 34;
-    icon.height = 34;
+    // #314: fitted into the 34 px box, its shape kept; an icon still loading is fitted when it arrives.
+    const fit = () => {
+      if (!icon.destroyed) icon.scale.set(displayIconScale(icon.texture.width, icon.texture.height));
+    };
+    if (isLoaded(icon.texture)) fit();
+    else {
+      icon.scale.set(0);
+      onLoaded(icon.texture, fit);
+    }
     icon.y = displayIconY(item, upgradeId);
     icon.label = 'sdb-icon';
     box.addChild(icon);
@@ -6801,6 +6821,14 @@ function demoSetup(engine) {
       },
       mode: () => mode,
       selected: () => selected,
+      // QA (#314): a placed Storage Display Box shows `count` of a class (its icon fitted to 34 px).
+      show: (id, classTsid, count = 1) => {
+        const row = placedItem(decor, id);
+        if (!row || row.classTsid !== 'bag_furniture_sdb') return false;
+        row.display = { classTsid, count };
+        renderFurniture(engine);
+        return true;
+      },
     };
     if (engine.param('homeautoplay') === '1') runDecorateAutoplay(engine);
     else if (engine.param('furnupautoplay')) runFurnUpAutoplay(engine, String(engine.param('furnupautoplay')));

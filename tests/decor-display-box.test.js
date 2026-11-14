@@ -101,3 +101,29 @@ describe('a Storage Display Box takes things, as the original did', () => {
     assert.match(fn.slice(0, 400), /!displayRefusal\(box, cls, displayMeta\(cls\)\)/);
   });
 });
+
+/**
+ * #314 (CoffeeSnob: a Wine of the Dead in a Storage Display Box looked squashed): the shown icon was
+ * forced to 34 x 34, so the 15 x 48 bottle became a blob. bag_furniture_sdb.js getExtraConfig 926
+ * gives it `width: 34`, and the client's ItemIconView fits an icon into that box by its longer
+ * side (ItemIconView.as 315-321), keeping its shape.
+ */
+describe('#314 the shown item keeps its shape', async () => {
+  const { displayIconScale, SDB_ITEM_WH } = await import('../public/js/features/homes-feature.js?v=b971cd68');
+  it('fits the longer side into 34 px', () => {
+    assert.equal(SDB_ITEM_WH, 34);
+    const wine = displayIconScale(15, 48);
+    assert.equal(Math.round(48 * wine), 34);
+    assert.ok(Math.abs(15 * wine - 10.625) < 1e-9);
+    const cheese = displayIconScale(56, 46);
+    assert.equal(Math.round(56 * cheese), 34);
+    assert.equal(displayIconScale(0, 0), 1);
+  });
+  it('sets a scale, never width and height apart, and fits an icon that loads late', () => {
+    const at = homes.indexOf("icon.label = 'sdb-icon'");
+    const body = homes.slice(homes.lastIndexOf('if (item.display?.classTsid)', at), at);
+    assert.doesNotMatch(body, /icon\.(width|height) =/);
+    assert.match(body, /icon\.scale\.set\(displayIconScale\(icon\.texture\.width, icon\.texture\.height\)\)/);
+    assert.match(body, /onLoaded\(icon\.texture, fit\)/);
+  });
+});

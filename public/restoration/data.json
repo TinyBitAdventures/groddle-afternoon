@@ -2792,9 +2792,14 @@
   "deployed": "2026-11-13"
  },
  "git": {
-  "commits": 2060,
+  "commits": 2061,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-13",
+    "kind": "fix",
+    "text": "Mr. Block's conversation card sits beside or above him instead of in the middle of the screen"
+   },
    {
     "date": "2026-11-13",
     "kind": "improve",
@@ -2909,11 +2914,6 @@
     "date": "2026-11-13",
     "kind": "fix",
     "text": "In the Ventilation Room you can drop down the shaft from the Corridor Six door instead of walking on thin air"
-   },
-   {
-    "date": "2026-11-13",
-    "kind": "fix",
-    "text": "Claim Emblem with a full pack says the pack needs room, not that more favor is needed"
    }
   ]
  },
