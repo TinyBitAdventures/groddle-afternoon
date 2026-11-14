@@ -2792,9 +2792,24 @@
   "deployed": "2026-11-14"
  },
  "git": {
-  "commits": 2074,
+  "commits": 2078,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-13",
+    "kind": "fix",
+    "text": "A vendor buys only what sits in your pack and bags, never what the magic rock holds"
+   },
+   {
+    "date": "2026-11-13",
+    "kind": "fix",
+    "text": "Legalize It's Bureaucratic Hall has its glass doors out to Gregarious Grange"
+   },
+   {
+    "date": "2026-11-13",
+    "kind": "fix",
+    "text": "A meditation cut short by a teleport counts on the street it started on"
+   },
    {
     "date": "2026-11-13",
     "kind": "improve",
@@ -2899,24 +2914,9 @@
     "date": "2026-11-13",
     "kind": "fix",
     "text": "Meat Collectors, Milkers, Feeders and Magic Sticks now say they work on your home street"
-   },
-   {
-    "date": "2026-11-13",
-    "kind": "fix",
-    "text": "Ora Soon's Sparkly Rock and 50 other measured rocks, Peat Bogs and Paper Trees sit on their floors instead of hanging over them"
-   },
-   {
-    "date": "2026-11-13",
-    "kind": "improve",
-    "text": "A shared rock, tree or peat refused as too far brings the Update ready notice back when a newer version is out"
-   },
-   {
-    "date": "2026-11-13",
-    "kind": "improve",
-    "text": "Make's footer count fits on one line in Modern"
    }
   ]
  },
- "tests": 971,
+ "tests": 972,
  "generatedAt": "2026-11-13"
 }
