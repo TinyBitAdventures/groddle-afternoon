@@ -2788,13 +2788,18 @@
   ]
  },
  "release": {
-  "game": "0.38.0",
+  "game": "0.38.1",
   "deployed": "2026-11-14"
  },
  "git": {
-  "commits": 2086,
+  "commits": 2090,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-14",
+    "kind": "improve",
+    "text": "Swoonerflies show their name on hover"
+   },
    {
     "date": "2026-11-14",
     "kind": "fix",
@@ -2909,11 +2914,6 @@
     "date": "2026-11-13",
     "kind": "improve",
     "text": "Phones fetch the World map's sharp charts only when the World view opens"
-   },
-   {
-    "date": "2026-11-13",
-    "kind": "new",
-    "text": "The Restoration page shows Tiny Speck's World map beside its sharpened Retina copy"
    }
   ]
  },
