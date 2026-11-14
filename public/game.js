@@ -2,7 +2,7 @@
  * Groddle Afternoon — original street geometry + layered decos
  * PixiJS 8 · locations-xml streets · CoU PNG decos · quests/items
  */
-import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=d18e90b8';
+import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=981372b8';
 import { createErrorOnce, createFeatureHost } from './js/feature-host.js?v=06bb8b74';
 import { FEATURES, questFlagsFeature } from './js/features/index.js?v=770768c5';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl, drawTileArt } from './js/enter-chooser.js?v=4a3ea327';
@@ -8308,6 +8308,12 @@ function quoinGotText(x, y, text, color = 0xffffff) {
 const RESULT_FLOAT_RISE = 50;
 const RESULT_FLOAT_UNDER_SPEECH = 12;
 /**
+ * Austin 2026-11-13: a float is one line that never wraps, so a verb result's sentence longer than
+ * this went across the whole screen and off both edges. Such a line is a notice instead (it wraps);
+ * a first line also goes to the activity log, where the source sent its verb messages (pc.sendActivity).
+ */
+const RESULT_FLOAT_MAX_CHARS = 72;
+/**
  * Where a verb's result words start over its target (a garden plot, a tree): 50 px up, or, while
  * the target's own speech balloon is up, at its feet (ticket 245), since a short target's balloon
  * tail hangs about 50 px up, so the words began right under it. They rise from there over it.
@@ -9662,11 +9668,13 @@ function executeVerb(target, verbId) {
     const toastLine = result.msgs?.[0] || feedLine;
     // Report 121: a worn tool's plain reason shows beside the plot's talkback.
     const showLine = (!spoke || result.toastWithSpeech) && toastLine !== reactionText;
-    if (result.ok && verbChangedSomething(result.effects) && target.sprite && !target.sprite.destroyed) {
+    // RESULT_FLOAT_MAX_CHARS: a sentence too long to float is a notice, read at its length.
+    const longLine = String(toastLine).length > RESULT_FLOAT_MAX_CHARS;
+    if (result.ok && verbChangedSomething(result.effects) && !longLine && target.sprite && !target.sprite.destroyed) {
       if (showLine) floatText(target.sprite.x, resultFloatY(target, spoke || Boolean(reactionText)), toastLine, 0xfff4d6, { life: 110 });
       logGain(feedLine);
     } else {
-      if (showLine) toast(toastLine, 3200);
+      if (showLine) toast(toastLine, longLine ? 6400 : 3200);
       pushActivity(feedLine);
     }
   }
@@ -9678,6 +9686,11 @@ function executeVerb(target, verbId) {
   (result.msgs || []).forEach((m, i) => {
     if (i === 0) return; // already toasted / fed above
     if (reactionText && m === reactionText) return; // rendered in a wrapped speech bubble
+    // RESULT_FLOAT_MAX_CHARS: too long to float, so a notice (the verb's one activity line is above).
+    if (String(m).length > RESULT_FLOAT_MAX_CHARS) {
+      toast(m, 5200);
+      return;
+    }
     // #311: as long as the first line (life 110), so a three-line result is readable to the top.
     floatText(target.sprite.x, resultFloatY(target, spoke || Boolean(reactionText)) - i * 16, m, 0xfff4d6, { life: 110 });
   });

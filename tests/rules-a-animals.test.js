@@ -15,7 +15,7 @@ import {
   resolveAnimalKinshipPackage,
 } from '../public/js/animal-kinship.js?v=44416a29';
 import { createAnimalState } from '../public/js/animals.js?v=d58c564d';
-import { getVerbsFor, runVerb } from '../public/content.js?v=d18e90b8';
+import { getVerbsFor, runVerb } from '../public/content.js?v=981372b8';
 import { applyKinshipDrop, capturePiggy, HERDKEEPING, husbandryPack, normalizeHusbandryPack, releaseHogtied } from '../public/js/animal-husbandry.js?v=65a1a24c';
 
 const pc = (seed = {}) => ({ energy: 100, mood: 40, imagination: 0, xp: 0, ...seed });
@@ -68,7 +68,8 @@ describe('handler refusals stay clickable and say the source line', () => {
     assert.equal(row.enabled, true);
     const r = runVerb(target, 'milk', { pc: pc(), inv: {}, skills: { learned: [] } });
     assert.equal(r.ok, false);
-    assert.ok(r.msgs.some((m) => m.startsWith('What? No warmup? No preamble?')));
+    // npc_butterfly.js 743-746: the line is in the verb message (buildVerbMessage, sendActivity), after the verb.
+    assert.ok(r.msgs[0].startsWith('You try to milk a Butterfly. What? No warmup? No preamble?'));
   });
 
   it('a nibble before a pet is clickable (npc_piggy.js 892-900)', () => {

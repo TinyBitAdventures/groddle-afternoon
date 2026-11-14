@@ -32,7 +32,7 @@ import {
 import { createAnimalState, animalStatusLabel, resetAnimalDay } from '../public/js/animals.js?v=d58c564d';
 import { performAnimalKinship } from '../public/js/animal-kinship.js?v=44416a29';
 import { advanceYard, capturePiggy, captureVerbState, feedPiggyStack, normalizeHusbandryPack } from '../public/js/animal-husbandry.js?v=65a1a24c';
-import { getVerbsFor, runVerb } from '../public/content.js?v=d18e90b8';
+import { getVerbsFor, runVerb } from '../public/content.js?v=981372b8';
 import { animalMoodFeature, describeAnimalPlace } from '../public/js/features/animal-mood-feature.js?v=f2c15ba1';
 import { remakeStatus } from '../public/js/imagination-remake.js?v=c37ad887';
 import { animalHusbandryFeature, deathRollFor, normalizeHusbandrySlot } from '../public/js/features/animal-husbandry-feature.js?v=3aded537';
@@ -350,7 +350,8 @@ describe('Nibble mood gate (npc_piggy.js 862-910)', () => {
     assert.equal(nibble.enabled, true);
     const res = runVerb(target, 'nibble', { pc: player, inv: {}, learned: AK6, rng: () => 0.5 });
     assert.equal(res.ok, false);
-    assert.ok(res.msgs.includes(PIGGY_LINES.nibbleRefused));
+    // npc_piggy.js 877: the line goes in the verb message (buildVerbMessage), after "You try to nibble a Piggy."
+    assert.equal(res.msgs[0], `You try to nibble a Piggy. ${PIGGY_LINES.nibbleRefused}`);
     assert.equal(player.energy, 100);
   });
 });

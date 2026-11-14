@@ -2792,9 +2792,14 @@
   "deployed": "2026-11-13"
  },
  "git": {
-  "commits": 2065,
+  "commits": 2066,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-13",
+    "kind": "improve",
+    "text": "A shaped rock draws from the one copy of its sheet instead of loading a second"
+   },
    {
     "date": "2026-11-13",
     "kind": "fix",
@@ -2909,14 +2914,9 @@
     "date": "2026-11-13",
     "kind": "improve",
     "text": "The Magic Rock wears Glitch's full white rim on its cards, plain to see on the cream Quests panel"
-   },
-   {
-    "date": "2026-11-13",
-    "kind": "improve",
-    "text": "Ilmenskie Caverns' map takes its second painting, with every street in a tunnel"
    }
   ]
  },
- "tests": 970,
+ "tests": 971,
  "generatedAt": "2026-11-13"
 }

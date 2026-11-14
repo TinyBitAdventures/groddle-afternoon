@@ -1157,6 +1157,14 @@ export function runVerb(target, verbId, ctx) {
     return said ? { ...said, failed: true } : null;
   };
   // The animal's answer to a finished verb, with that verb's slugs (sendResponse(key, pc, slugs)).
+  // Austin 2026-11-13 (a Butterfly milked with no massage drew its refusal as one screen-wide float):
+  // a refused or missed care verb's line goes after "You try to ..." in the activity, as the source's
+  // buildVerbMessage did (item.js 26-37; npc_butterfly.js 743-746, npc_piggy.js 892-900 and 1779:
+  // pc.sendActivity), so it shows in the notice and the log, never as a float.
+  // A missed success roll adds its line only where the source's handler did (npc_piggy.js 1779, 1672:
+  // `missLine`); elsewhere a miss keeps its short line as before.
+  const triedLine = (tried, care, missLine = false) => (care.msg && (care.reason !== 'success_rate' || missLine) ? `${tried} ${care.msg}` : tried);
+  const missFloat = (care, speech) => (!speech && !care.ok && care.reason === 'success_rate' && care.msg ? care.msg : '');
   const kinshipSpeech = (care, verb, bonus) => {
     // A missed success roll answers without slugs (npc_piggy.js 1774, 1676); a missed squeeze
     // says nothing (npc_chicken.js 1565-1572: CLICK_FAILURE, no response).
@@ -1178,8 +1186,8 @@ export function runVerb(target, verbId, ctx) {
     const care = performKinship('pet');
     const speech = kinshipSpeech(care, 'pet', false);
     // buildVerbMessage (item.js 26-37): a miss adds its line to the activity (npc_piggy.js 1779).
-    effects._activityBase = care.ok ? 'You pet a Piggy.' : `You try to pet a Piggy.${care.reason === 'success_rate' && care.msg ? ` ${care.msg}` : ''}`;
-    if (!speech) msgs.push(care.ok ? '♥ oink' : care.msg);
+    effects._activityBase = care.ok ? 'You pet a Piggy.' : triedLine('You try to pet a Piggy.', care, true);
+    if (!speech && care.ok) msgs.push('♥ oink');
     finalizeMsgs(msgs, effects);
     return {
       ok: care.ok,
@@ -1199,12 +1207,8 @@ export function runVerb(target, verbId, ctx) {
       effects.items[itemId] = (effects.items[itemId] || 0) + amount;
     }
     const speech = kinshipSpeech(care, 'nibble', care.superHarvest);
-    effects._activityBase = care.ok ? 'You nibble a Piggy.' : `You try to nibble a Piggy.${care.reason === 'success_rate' && care.msg ? ` ${care.msg}` : ''}`;
-    if (!speech) {
-      msgs.push(care.ok
-        ? `${care.superHarvest ? 'Super Harvest! ' : ''}The Piggy looks philosophical about it.`
-        : care.msg);
-    }
+    effects._activityBase = care.ok ? 'You nibble a Piggy.' : triedLine('You try to nibble a Piggy.', care, true);
+    if (!speech && care.ok) msgs.push(`${care.superHarvest ? 'Super Harvest! ' : ''}The Piggy looks philosophical about it.`);
     finalizeMsgs(msgs, effects);
     return {
       ok: care.ok,
@@ -1230,8 +1234,9 @@ export function runVerb(target, verbId, ctx) {
       effects.items[itemId] = (effects.items[itemId] || 0) + amount;
     }
     const speech = kinshipSpeech(care, 'squeeze', care.superHarvest);
-    effects._activityBase = care.ok ? 'You squeeze a Chicken.' : 'You try to squeeze a Chicken.';
-    if (!speech && (care.ok || care.msg)) msgs.push(care.ok ? `${care.superHarvest ? 'Super Harvest! ' : ''}Buk!` : care.msg);
+    effects._activityBase = care.ok ? 'You squeeze a Chicken.' : triedLine('You try to squeeze a Chicken.', care);
+    if (!speech && care.ok) msgs.push(`${care.superHarvest ? 'Super Harvest! ' : ''}Buk!`);
+    else if (missFloat(care, speech)) msgs.push(missFloat(care, speech));
     finalizeMsgs(msgs, effects);
     return {
       ok: care.ok,
@@ -1273,12 +1278,9 @@ export function runVerb(target, verbId, ctx) {
   if (classId === 'npc_butterfly' && verbId === 'massage') {
     const care = performKinship('massage');
     const speech = kinshipSpeech(care, 'massage', care.bonusTriggered);
-    effects._activityBase = care.ok ? 'You massage a Butterfly.' : 'You try to massage a Butterfly.';
-    if (!speech) {
-      msgs.push(care.ok
-        ? `${care.bonusTriggered ? 'Expert touch! ' : ''}The Butterfly shimmers appreciatively.`
-        : care.msg);
-    }
+    effects._activityBase = care.ok ? 'You massage a Butterfly.' : triedLine('You try to massage a Butterfly.', care);
+    if (!speech && care.ok) msgs.push(`${care.bonusTriggered ? 'Expert touch! ' : ''}The Butterfly shimmers appreciatively.`);
+    else if (missFloat(care, speech)) msgs.push(missFloat(care, speech));
     finalizeMsgs(msgs, effects);
     return {
       ok: care.ok,
@@ -1294,12 +1296,9 @@ export function runVerb(target, verbId, ctx) {
   if (classId === 'npc_butterfly' && verbId === 'milk') {
     const care = performKinship('milk');
     const speech = kinshipSpeech(care, 'milk', care.superHarvest);
-    effects._activityBase = care.ok ? 'You milk a Butterfly.' : 'You try to milk a Butterfly.';
-    if (!speech) {
-      msgs.push(care.ok
-        ? `${care.superHarvest ? 'Super Harvest! ' : ''}The Butterfly offers its most precious essence.`
-        : care.msg);
-    }
+    effects._activityBase = care.ok ? 'You milk a Butterfly.' : triedLine('You try to milk a Butterfly.', care);
+    if (!speech && care.ok) msgs.push(`${care.superHarvest ? 'Super Harvest! ' : ''}The Butterfly offers its most precious essence.`);
+    else if (missFloat(care, speech)) msgs.push(missFloat(care, speech));
     finalizeMsgs(msgs, effects);
     return {
       ok: care.ok,
