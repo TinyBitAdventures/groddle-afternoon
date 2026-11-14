@@ -2788,13 +2788,18 @@
   ]
  },
  "release": {
-  "game": "0.37.1",
-  "deployed": "2026-11-13"
+  "game": "0.38.0",
+  "deployed": "2026-11-14"
  },
  "git": {
-  "commits": 2071,
+  "commits": 2074,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-13",
+    "kind": "improve",
+    "text": "Alakol, Groddle Forest and Andra's maps are Tiny Speck's 2012 paintings, restored and matched to 2012's colour"
+   },
    {
     "date": "2026-11-13",
     "kind": "improve",
@@ -2909,11 +2914,6 @@
     "date": "2026-11-13",
     "kind": "improve",
     "text": "Make's footer count fits on one line in Modern"
-   },
-   {
-    "date": "2026-11-13",
-    "kind": "fix",
-    "text": "Classic: the Quests cards no longer show a Pin to screen button that does nothing"
    }
   ]
  },
