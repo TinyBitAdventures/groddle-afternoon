@@ -57,13 +57,13 @@ import {
   ensureAnimalState,
   listAnimalFeedOptions,
   feedAnimal,
-} from './js/animals.js?v=d58c564d';
+} from './js/animals.js?v=2e091ff9';
 import {
   quoteAnimalKinship,
   ANIMAL_KINSHIP_CLICK_REFUSALS,
   performAnimalKinship,
   highestAnimalKinshipRank,
-} from './js/animal-kinship.js?v=44416a29';
+} from './js/animal-kinship.js?v=e2a94c13';
 import {
   MUSICBLOCK_CATALOG,
   collectMusicblock,

@@ -12,7 +12,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { runVerb } from '../public/content.js?v=981372b8';
+import { runVerb } from '../public/content.js?v=190ab2dd';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const game = readFileSync(join(root, 'public/game.js'), 'utf8');
@@ -45,5 +45,14 @@ describe('game.js floats only short result lines', () => {
     assert.match(game, /const RESULT_FLOAT_MAX_CHARS = 72;/);
     assert.match(game, /const longLine = String\(toastLine\)\.length > RESULT_FLOAT_MAX_CHARS;\n\s+if \(result\.ok && verbChangedSomething\(result\.effects\) && !longLine/);
     assert.match(game, /if \(String\(m\)\.length > RESULT_FLOAT_MAX_CHARS\) \{\n\s+toast\(m, 5200\);\n\s+return;/);
+  });
+});
+
+describe('a butterfly miss says what Glitch said', () => {
+  it('massage and milk misses use npc_butterfly.js 1195 and 1363, not our own fallback', async () => {
+    const { readFileSync } = await import('node:fs');
+    const src = readFileSync(new URL('../public/js/animal-kinship.js', import.meta.url), 'utf8');
+    assert.match(src, /'npc_butterfly:massage': "Oh no, that didn't work!",/);
+    assert.match(src, /'npc_butterfly:milk': "Oh no, that didn't work\. Try again\?",/);
   });
 });

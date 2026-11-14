@@ -33,8 +33,8 @@ import { createPlayerSave, normalizePlayerSave } from '../public/js/player-save.
 import { createDroppedItemState, dropInventoryStack, pickupDroppedStack } from '../public/js/world-items.js?v=deadf665';
 import { layoutPack, unitPlaces, unitRankAt } from '../public/js/pack-slots.js?v=4d446d78';
 import { toolBreakEvents } from '../public/js/quest-offers.js?v=89511e1e';
-import { performAnimalKinship } from '../public/js/animal-kinship.js?v=44416a29';
-import { createAnimalState } from '../public/js/animals.js?v=d58c564d';
+import { performAnimalKinship } from '../public/js/animal-kinship.js?v=e2a94c13';
+import { createAnimalState } from '../public/js/animals.js?v=2e091ff9';
 
 const remaining = (tools, cls) => toolCopies(tools, cls).map((c) => c.remaining);
 

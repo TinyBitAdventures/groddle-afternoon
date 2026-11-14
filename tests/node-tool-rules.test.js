@@ -18,7 +18,7 @@ import { CHOICE_MS, chooseTool, clearToolChoice, peekToolChoice, takeToolChoice 
 import { PACK_TOOL_TEXT, nodesFor, packToolButtons, packToolCondition, planPackToolVerb } from '../public/js/pack-tool-verbs.js?v=479afbd9';
 import { packToolOrder } from '../public/js/features/resource-nodes-feature.js?v=1fc9b6d2';
 import { CREW_NODES, CREW_VERBS, HELP_SCRAPE_LABEL, helpScrapeMessage } from '../public/js/help-dig.js?v=93d6358d';
-import { nodePerks } from '../public/js/street-objects.js?v=c0888398';
+import { nodePerks } from '../public/js/street-objects.js?v=44e4fc1c';
 
 const NOW = 1_700_000_000_000;
 const ctx = (extra = {}) => ({ now: NOW, dayKey: 'd1', rng: () => 0.5, ...extra });

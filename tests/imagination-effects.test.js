@@ -25,7 +25,7 @@ import { createMineRock, miningProfile, mineRock, smeltMetalRocks } from '../pub
 import { craftRecipe, makingSkillAdjustments } from '../public/js/making.js?v=eddcceac';
 import { createToolConditionState, getToolCondition, repairToolCondition, setToolRemaining } from '../public/js/tools.js?v=48542c24';
 import { quoteWoodTreeHarvest } from '../public/js/woodcutting.js?v=ee35a30a';
-import { resolveAnimalKinshipPackage } from '../public/js/animal-kinship.js?v=44416a29';
+import { resolveAnimalKinshipPackage } from '../public/js/animal-kinship.js?v=e2a94c13';
 import { createGarden, getPlot, plantPlot, plotKey } from '../public/js/garden.js?v=1420a6d6';
 import { vendorBuy, vendorSell, vendorBuyUnitPrice } from '../public/js/vendor.js?v=542d30c9';
 import { normalizePlayerSnapshot } from '../public/js/player-save.js?v=477fdb26';

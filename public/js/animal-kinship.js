@@ -283,10 +283,15 @@ export function quoteAnimalKinship(state, classId, verbId, ctx = {}) {
  */
 export const ANIMAL_KINSHIP_CLICK_REFUSALS = Object.freeze(['energy', 'needs_pet', 'needs_massage']);
 
-/** npc_piggy.js 1779, 1672: the activity line a missed success roll adds; the squeeze has none (npc_chicken.js 1565-1572). */
+/**
+ * The activity line a missed success roll adds: npc_piggy.js 1779, 1672; npc_butterfly.js 1195 (onMassageComplete) and
+ * 1363 (onMilkComplete); the squeeze has none (npc_chicken.js 1565-1572).
+ */
 const MISSED_ROLL_LINES = Object.freeze({
   'npc_piggy:pet': 'Maybe you would have more luck if you felt some kinship with the Piggy.',
   'npc_piggy:nibble': "That didn't work!",
+  'npc_butterfly:massage': "Oh no, that didn't work!",
+  'npc_butterfly:milk': "Oh no, that didn't work. Try again?",
   'npc_chicken:squeeze': '',
 });
 
