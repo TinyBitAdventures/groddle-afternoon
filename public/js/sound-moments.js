@@ -108,6 +108,11 @@ export function actionLoopFor(classId, verbId) {
   if (verb === 'water' || verb === 'water_all') return { key: 'WATERING_CAN', intervalMs: 900 };
   if (verb === 'smash') return { key: 'PICK', intervalMs: 600 };
   if (verb === 'hoe' || verb === 'clear') return { key: 'HOE', intervalMs: 700 };
+  // #310: a Scraper's sound runs while a barnacle or an ice knob is scraped, from the start, as the
+  // skill package announced the tool's class sound when it began and stopped it at the end
+  // (players/inc_skill_packages.js 388 and 424; mortar_barnacle.js 347, ice_knob.js runSkillPackage).
+  // The Super Scraper has no file of its own (sound-keys.json: alias SCRAPER).
+  if (verb === 'scrape' && (cls === 'mortar_barnacle' || cls === 'ice_knob')) return { key: 'SCRAPER', intervalMs: 1800 };
   return null;
 }
 

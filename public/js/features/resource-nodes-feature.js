@@ -1346,13 +1346,17 @@ function notePublishResult(result) {
   lastHarvest = [result.classTsid || '', result.verbId || '', result.ok ? 'ok' : result.reason || 'fail', outs].join(':');
 }
 
-function sfxFor(result) {
+export function sfxFor(result) {
   if (result.jarFull) return 'COMPLETE_QUEST_REQUIREMENT';
   if (result.classTsid === 'paper_tree') return result.verbId === 'pet' ? 'PET_TRANT' : result.verbId === 'water' ? 'WATERING_CAN' : 'PAPER_TREE';
   if (result.classTsid === 'dust_trap') return 'DUST_TRAP_SMACK_DOWN';
   if (result.classTsid === 'npc_sloth') return result.verbId === 'knock' ? 'SLOTH_KNOCKER' : 'SLOTH_EAT';
   if (result.classTsid === 'npc_salmon') return 'SALMON_CATCH';
   if (result.classTsid === 'npc_firefly') return 'BUTTERFLY_SING';
+  // #310: the scraper sounded while the scrape ran (js/sound-moments.js actionLoopFor); the end is the
+  // node's own: mortar_barnacle.js 296 BARNACLE_IS_RELEASED, ice_knob.js 320 ICE_CUBE.
+  if (result.verbId === 'scrape' && result.classTsid === 'mortar_barnacle') return 'BARNACLE_IS_RELEASED';
+  if (result.verbId === 'scrape' && result.classTsid === 'ice_knob') return 'ICE_CUBE';
   return { scrape: 'SCRAPER', scoop: 'SCOOPED_JELLISAC', dig: 'SHOVEL', harvest: 'HOE' }[result.verbId] || 'ITEM_PICKUP';
 }
 

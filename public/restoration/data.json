@@ -2792,9 +2792,14 @@
   "deployed": "2026-11-13"
  },
  "git": {
-  "commits": 2062,
+  "commits": 2063,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-13",
+    "kind": "fix",
+    "text": "All three lines over a picked-up Musicblock stay long enough to read"
+   },
    {
     "date": "2026-11-13",
     "kind": "fix",
@@ -2909,14 +2914,9 @@
     "date": "2026-11-13",
     "kind": "fix",
     "text": "In the gut tubes (Greyving Grays and the four others) a phone's Jump button flips which way is down, and the hints say Jump instead of Space"
-   },
-   {
-    "date": "2026-11-13",
-    "kind": "fix",
-    "text": "The Museum of the Rook's Greeterbot stands on the floor by the door and greets you when you walk into it, so you see it first"
    }
   ]
  },
- "tests": 968,
+ "tests": 969,
  "generatedAt": "2026-11-13"
 }
