@@ -5978,6 +5978,18 @@ body.buff-purple-pulse::after {
   font-weight: 700;
   color: var(--text-danger);
 }
+/* #324: the achievement a recipe needs opens its badge (inc_making.js 1715 achievements_linkify). */
+.make-detail-body .make-why-link {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  padding: 0;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+}
+.make-detail-body .make-why-link:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
 .qty-row {
   display: flex;
   align-items: center;

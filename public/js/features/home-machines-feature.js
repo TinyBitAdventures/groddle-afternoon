@@ -99,7 +99,7 @@ import { MACHINE_ART_SHEETS, LOW_FUEL_BUBBLE_MS, LOW_FUEL_LINE, isLowFuel, machi
 import { FUEL_CELL, FUEL_PER_CELL, MAX_FUEL } from '../machines.js?v=e96d8d3b';
 import { ITEM_CATALOG, addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=f49c8998';
 import { receiveToolCopy, takeToolCopy } from '../tools.js?v=48542c24';
-import { RECIPE_CATALOG } from '../making.js?v=eddcceac';
+import { RECIPE_CATALOG } from '../making.js?v=96a16677';
 import { getSkillCatalog } from '../content-catalogs.js?v=10b118dd';
 import { createBackYardState, homeStreetLayout, normalizeCultivationState } from '../home-cultivation.js?v=a3135ffd';
 import { readVisitScene } from '../neighbours-mp.js?v=e141e898';

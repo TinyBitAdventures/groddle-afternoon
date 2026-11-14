@@ -594,6 +594,7 @@ import {
   makePanelIcon,
   recipeToolFor,
   recipeBlockedLine,
+  recipeBlockedHtml,
   recipeInputHave,
   createCraftSession,
   advanceCraftSession,
@@ -618,11 +619,11 @@ import {
   recipeTaskLimit,
   recipeToolInUse,
   pluralizeItem,
-} from './js/making.js?v=eddcceac';
+} from './js/making.js?v=96a16677';
 import { outputIconsHtml, outputsPhrase, recipeOutputRows } from './js/ui/recipe-outputs.js?v=73e19baf';
 import { MAKE_TOOL_SHEETS } from './js/make-tool-sheets.js?v=6f758e09';
-import { createTestTubePanel, tryTileHtml, TRY_TILE_LABEL } from './js/test-tube-panel.js?v=3301ccb9';
-import { COMPOUND_RECIPE_IDS, EXPERIMENT_TOOL, experimentTooltip } from './js/test-tube.js?v=2537c05b';
+import { createTestTubePanel, tryTileHtml, TRY_TILE_LABEL } from './js/test-tube-panel.js?v=6ea51a50';
+import { COMPOUND_RECIPE_IDS, EXPERIMENT_TOOL, experimentTooltip } from './js/test-tube.js?v=4447e633';
 import { groupMakingTools, makeToolCounts, makeToolCountLine, makeToolSpokenLine, makeOpeningTool, gridStep, stationForRecipe, MAKING_BUSY } from './js/make-tools.js?v=86877c3e';
 import { LOW_FUEL_LINE, craftSessionElapsedMs, isLowFuel, isMachineArt, machineArtHtml, packMakeState, playMachineHandOver, setMachineArtFrame } from './js/machine-art.js?v=038298f0';
 import {
@@ -28434,8 +28435,20 @@ function makeBlockedLine(recipe, check) {
     inv,
     energyOk: pc.energy > recipeEnergyCost(recipe, skillState.learned, pc.imaginationUpgrades),
     skillName: (id) => skillTitle(getSkillCatalog()[id]) || getSkillCatalog()[id]?.name || id,
-    achievementName: (id) => getAchievementCatalog()[id]?.name || id.replace(/_/g, ' '),
+    achievementName: makeAchievementName,
   });
+}
+const makeAchievementName = (id) => getAchievementCatalog()[id]?.name || id.replace(/_/g, ' ');
+
+/**
+ * #324: an achievement named in the Make window opens the Achievements panel searched to its card
+ * (its description and progress), as Glitch's linkified name did (inc_making.js 1715, main.js 834).
+ */
+function openAchievementCard(classTsid) {
+  const name = getAchievementCatalog()[classTsid]?.name;
+  if (!name) return;
+  Object.assign(achievementBrowser, { status: 'all', category: 'all', query: name, limit: ACHIEVEMENT_PAGE_SIZE });
+  openAchievePanel();
 }
 
 /** Report 119: the title's icon is the open tool's, or the recipe's (MakingDialog.as setTitle 299, 305); the tools screen and a search over every tool keep the panel's own. */
@@ -28786,7 +28799,7 @@ function renderMakePanel() {
         <div class="make-detail-body">
           <h3>${recipe.name}</h3>
           ${makesLine ? `<p class="make-outs-line" data-make-outs>${escapeHtml(makesLine)}</p>` : ''}
-          ${blockedLine ? `<p class="make-why" data-make-why>${escapeHtml(blockedLine)}</p>` : ''}
+          ${blockedLine ? `<p class="make-why" data-make-why>${recipeBlockedHtml(blockedLine, check, { achievementName: makeAchievementName, escape: escapeHtml })}</p>` : ''}
           <p>${blockedLine ? '' : `You can make up to ${maxMake}. `}Uses ${recipeEnergyCost(recipe, skillState.learned, pc.imaginationUpgrades)} energy each.</p>
           ${makingSkillAdjustments(recipe, skillState.learned).note ? `<p class="make-skill-note">${makingSkillAdjustments(recipe, skillState.learned).note}</p>` : ''}
           ${inputsHtml}
@@ -28805,6 +28818,7 @@ function renderMakePanel() {
         const inp = detail.querySelector('[data-mq-val]');
         if (inp) inp.value = String(makeQty);
       };
+      detail.querySelector('[data-make-achievement]')?.addEventListener('click', (e) => openAchievementCard(e.currentTarget.dataset.makeAchievement));
       detail.querySelector('[data-mq="-"]')?.addEventListener('click', () => applyQty(makeQty - 1));
       detail.querySelector('[data-mq="+"]')?.addEventListener('click', () => applyQty(makeQty + 1));
       detail.querySelector('[data-mq="max"]')?.addEventListener('click', () => applyQty(maxMake || 1));

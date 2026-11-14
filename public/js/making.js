@@ -996,6 +996,23 @@ export function recipeBlockedLine(recipe, check, ctx = {}) {
 }
 
 /**
+ * #324: the "why" line as HTML, the achievement it names a button that opens that badge (Glitch
+ * linkified it: inc_making.js 1715 achievements_linkify, main.js 834), so the player can see what
+ * it takes. `line` is recipeBlockedLine's answer for the same check; `escape` escapes HTML.
+ * @param {string} line
+ * @param {ReturnType<typeof canCraft>} check
+ * @param {{ achievementName?: (id: string) => string, escape: (s: string) => string }} ctx
+ */
+export function recipeBlockedHtml(line, check, ctx) {
+  const esc = ctx.escape;
+  const id = check && !check.ok && check.reason === 'achievement' ? String(check.achievement || '') : '';
+  const name = id ? ctx.achievementName?.(id) || id : '';
+  const at = name ? String(line || '').indexOf(name) : -1;
+  if (at < 0) return esc(String(line || ''));
+  return `${esc(line.slice(0, at))}<button type="button" class="make-why-link" data-make-achievement="${esc(id)}" title="See what the ${esc(name)} achievement takes">${esc(name)}</button>${esc(line.slice(at + name.length))}`;
+}
+
+/**
  * The tool in the Make panel's title (MakingDialog.as setTitle 299, 305: the tool's iconic, its
  * broken_iconic when no copy works). `tool` empty is the panel's own icon. A tab for a tool the
  * player has no copy of (the original opened from a tool, so it never had one) shows it whole.

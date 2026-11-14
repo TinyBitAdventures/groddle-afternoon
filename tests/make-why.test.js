@@ -10,7 +10,7 @@ import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { RECIPE_CATALOG, TOOL_CATALOG, canCraft, ensureMakingItems, listMakingTools, loadRecipeCatalogFromFile, makeCountLine, makeEmptyLine, makePanelIcon, recipeBlockedLine, recipeKnownHere, recipeMissingLine } from '../public/js/making.js?v=eddcceac';
+import { RECIPE_CATALOG, TOOL_CATALOG, canCraft, ensureMakingItems, listMakingTools, loadRecipeCatalogFromFile, makeCountLine, makeEmptyLine, makePanelIcon, recipeBlockedHtml, recipeBlockedLine, recipeKnownHere, recipeMissingLine } from '../public/js/making.js?v=96a16677';
 import { createInventory } from '../public/js/inventory.js?v=f49c8998';
 import { createToolConditionState, setToolRemaining } from '../public/js/tools.js?v=48542c24';
 
@@ -211,5 +211,35 @@ describe('#305: "Show them" lists the recipes the note counted', () => {
     const dialog = join(root, '../glitch-client/com/tinyspeck/engine/port/MakingDialog.as');
     if (!existsSync(dialog)) return;
     assert.ok(readFileSync(dialog, 'utf8').includes('recipe_ui = new MakingRecipeUI(info.knowns, content_w);'));
+  });
+});
+
+describe('#324: the achievement a recipe needs is a link to its badge', () => {
+  const esc = (t) => String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  const name = (id) => ({ super_saucier: 'Super Saucier' })[id] || id;
+  it('Wavy Gravy names Super Saucier as a button that carries its id (inc_making.js 1715 achievements_linkify)', () => {
+    const gravy = RECIPE_CATALOG.wavy_gravy;
+    assert.deepEqual(gravy.achievements, ['super_saucier']);
+    const check = canCraft(createInventory({ saucepan: 1 }), gravy, { requireSkill: true, requireTool: true, achievements: [] });
+    assert.equal(check.reason, 'achievement');
+    const line = recipeBlockedLine(gravy, check, { achievementName: name });
+    assert.equal(line, 'You need to get the Super Saucier achievement.');
+    const html = recipeBlockedHtml(line, check, { achievementName: name, escape: esc });
+    assert.equal(html, 'You need to get the <button type="button" class="make-why-link" data-make-achievement="super_saucier" title="See what the Super Saucier achievement takes">Super Saucier</button> achievement.');
+  });
+
+  it('any other reason stays plain, escaped text', () => {
+    assert.equal(recipeBlockedHtml('You need <b>', { ok: false, reason: 'skill', skill: 'x' }, { achievementName: name, escape: esc }), 'You need &lt;b&gt;');
+    assert.equal(recipeBlockedHtml('You need more energy!', { ok: true }, { escape: esc }), 'You need more energy!');
+  });
+
+  it('the Make window opens the Achievements panel on that badge, in both skins', () => {
+    assert.match(game, /recipeBlockedHtml\(blockedLine, check, \{ achievementName: makeAchievementName, escape: escapeHtml \}\)/);
+    assert.match(game, /\[data-make-achievement\]'\)\?\.addEventListener\('click', \(e\) => openAchievementCard\(/);
+    const open = game.slice(game.indexOf('function openAchievementCard('), game.indexOf('function openAchievementCard(') + 700);
+    assert.match(open, /query: name/);
+    assert.match(open, /openAchievePanel\(\)/);
+    const classic = readFileSync(join(root, 'public/css/classic.css'), 'utf8');
+    assert.ok(classic.includes('.make-why-link'));
   });
 });

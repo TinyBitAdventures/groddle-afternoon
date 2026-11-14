@@ -3237,6 +3237,11 @@
 :root[data-ui="classic"] #game-root #quest-panel .qc-pin { display: none; }
 /* === end chkui === */
 
+/* === chk4 (lane) === */
+/* #324: the achievement link in the Make window's why line keeps the line's own font and colour. */
+:root[data-ui="classic"] #game-root #make-panel .make-detail-body .make-why-link { font: inherit; color: inherit; text-decoration: underline; }
+/* === end chk4 === */
+
 /* == TICKETS == Reports (js/ui/reports-sheet.js, online only) as a 2012 window: the Quest Log's frame
    (Dialog.as, WindowBorder.as, BigDialog.as) centred in the viewport, the white head with its 20 px
    title and the red cross, the grey well between two rules, the white footer with the minor buttons;
