@@ -126,10 +126,10 @@
       "x1": "assets/maps/art/bg/groddleforest.webp",
       "x2": "assets/maps/art/bg/groddleforest@2x.webp",
       "repainted": "tools/provenance/repainted-maps.json",
-      "x1Bytes": 53528,
-      "x1Sha256": "296e950b60e926dc17498476d136a165aa6233f8719b0ad802564bb6b0d6a500",
-      "x2Bytes": 163296,
-      "x2Sha256": "405377b93db02e6e9e36c96c5ecfc5d4892b73dc2d9afdff4aaf5bd027ca1324"
+      "x1Bytes": 89572,
+      "x1Sha256": "08d3e000ff3f8b3c6afbfea4b10f7a2e00547802383ff60dc5c11030bb69b639",
+      "x2Bytes": 279504,
+      "x2Sha256": "990e09f316dd615c2d45d3e5debf7eb1087ce5a3f5ba0410449761d7de70cb8f"
     },
     "58": {
       "hubName": "Groddle Meadow",
@@ -142,10 +142,10 @@
       "x1": "assets/maps/art/bg/groddlemeadow.webp",
       "x2": "assets/maps/art/bg/groddlemeadow@2x.webp",
       "repainted": "tools/provenance/repainted-maps.json",
-      "x1Bytes": 84136,
-      "x1Sha256": "7828394c8eeb5e675c1420965f5eaedbc83be22d522f365dbf33e4eb407b5a44",
-      "x2Bytes": 290488,
-      "x2Sha256": "fe22ca388a6e7f044dea5fefd3ffaf01ff417b05e1b121ad91ea88dac1b4090f"
+      "x1Bytes": 88062,
+      "x1Sha256": "253deb62c3f91c299139aedf7e6b77713fc1086ee0f4f275bcf06b5cc15c7212",
+      "x2Bytes": 289750,
+      "x2Sha256": "dc800b9fc0f7b7f41a8bd7d591b757f4d9c9f8f8a3a598dc077cb216f4922fad"
     },
     "63": {
       "hubName": "Shimla Mirch",
@@ -249,10 +249,10 @@
       "x1": "assets/maps/art/bg/alakol.webp",
       "x2": "assets/maps/art/bg/alakol@2x.webp",
       "repainted": "tools/provenance/repainted-maps.json",
-      "x1Bytes": 43596,
-      "x1Sha256": "a0cad877631ab079b6638f35193c020fccf44ec9ebe14399e000b15a5c93082e",
-      "x2Bytes": 164072,
-      "x2Sha256": "dd6e7073b0ff6bfbc8c6f6706168186226e1466a776fc34449aa3388c7670b4e"
+      "x1Bytes": 71820,
+      "x1Sha256": "426fc4bcfc2896eaf209a432259e66289c3cbd664f4da69530370903f4a4e030",
+      "x2Bytes": 230070,
+      "x2Sha256": "fe1ad091095935003976aeabaedc26fc3391826dfa69b1c361bc3ad907a5ce12"
     },
     "78": {
       "hubName": "Ilmenskie Deeps",
@@ -324,10 +324,10 @@
       "x1": "assets/maps/art/bg/andra.webp",
       "x2": "assets/maps/art/bg/andra@2x.webp",
       "repainted": "tools/provenance/repainted-maps.json",
-      "x1Bytes": 31532,
-      "x1Sha256": "15eaf604f7871ae18ba22b030a950d9925052426d64ec346f1cb2a006b0fdb8d",
-      "x2Bytes": 102540,
-      "x2Sha256": "61a1d4904c7d7b53b1a2d7b4c6e73cd4727b4f0062cb3797dece14b9f2ee144f"
+      "x1Bytes": 53390,
+      "x1Sha256": "5a505c9eeb396d6e550759c2d44bb2b85e7b354ddcae3df80ed05b8af2d9e7e9",
+      "x2Bytes": 197038,
+      "x2Sha256": "a9c3d6b2bcd3716db34a59b53a33bee5589ff4460649e814b2c345821e8e2183"
     },
     "90": {
       "hubName": "Choru",

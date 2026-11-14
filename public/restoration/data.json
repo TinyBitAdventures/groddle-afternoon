@@ -2792,9 +2792,14 @@
   "deployed": "2026-11-13"
  },
  "git": {
-  "commits": 2070,
+  "commits": 2071,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-13",
+    "kind": "improve",
+    "text": "Groddle Meadow's restored map wears the 2012 painting's colour"
+   },
    {
     "date": "2026-11-13",
     "kind": "fix",
@@ -2909,11 +2914,6 @@
     "date": "2026-11-13",
     "kind": "fix",
     "text": "Classic: the Quests cards no longer show a Pin to screen button that does nothing"
-   },
-   {
-    "date": "2026-11-13",
-    "kind": "fix",
-    "text": "Quests' Offered tab shows every new quest, with Accept and Not right now"
    }
   ]
  },
