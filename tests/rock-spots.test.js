@@ -6,6 +6,8 @@
  * - rocks stand where players' 2012 snaps show them, in the shape they show
  *   (tools/snap-placements/nodes.py, assets/content/node-spots.json, js/node-spots-data.js);
  * - a planned rock takes a shape in Glitch's proportions (street-ecology.js rockShapeFor);
+ * - a measured rock, Peat Bog or Paper Tree hanging more than 25 px over its floor is seated on it
+ *   (player report #303, G704: Ora Soon's Sparkly Rock, 58 px up, was refused until you jumped);
  * - every reachable floor height is planned (buildPlatformCandidates), big things keep off slopes
  *   over BIG_THING_MAX_SLOPE while any other spot is left, and Dirt Piles, Ice Nubbins, Dust Traps,
  *   Paper Trees and Visiting Stones never hang an end over air (STEADY_FLOOR_GROUPS).
@@ -36,8 +38,10 @@ import {
   rockShapeFor,
   rockSpawnPlan,
   setStreetEcologyCatalog,
-} from '../public/js/street-ecology.js?v=cc49deed';
-import { ROCK_BERYL_SPOTS, ROCK_DULLITE_SPOTS, ROCK_METAL_SPOTS, ROCK_SPARKLY_SPOTS } from '../public/js/node-spots-data.js?v=0817d192';
+} from '../public/js/street-ecology.js?v=32b1be0a';
+import { PAPER_TREE_SPOTS, PEAT_SPOTS, ROCK_BERYL_SPOTS, ROCK_DULLITE_SPOTS, ROCK_METAL_SPOTS, ROCK_SPARKLY_SPOTS } from '../public/js/node-spots-data.js?v=97d4281c';
+import { platformsScreen } from '../public/js/street-model.js?v=b6cb6a4e';
+import { serverPath, skipWithoutServer } from '../tools/repos.mjs';
 
 const root = join(import.meta.dirname, '..');
 const read = (rel) => readFileSync(join(root, rel), 'utf8');
@@ -152,6 +156,86 @@ describe('rocks the snaps show', () => {
     assert.deepEqual(rows.map((r) => [r.index, r.classTsid, r.measured]), [[0, 'rock_metal_1', true], [1, 'rock_metal_1', false], [2, 'rock_beryl_1', false]]);
     assert.deepEqual([rows[0].x, rows[0].y, rows[0].shape], [900, 600, 3]);
     assert.ok(rows.slice(1).every((r) => Number.isFinite(r.x) && [1, 2, 3].includes(r.shape)));
+  });
+});
+
+// Player report #303 (G704): tools/snap-placements/nodes.py SEAT_HANG / SEAT_SINK / seat_spots, mirrored.
+describe('measured nodes stand on their floors', () => {
+  const HANG = 25;
+  const SINK = 15;
+  const index = JSON.parse(read('public/assets/streets/index.json')).streets;
+  const floorsOf = (tsid) => platformsScreen(JSON.parse(read(`public/${index[tsid].file}`))).filter((p) => p.pcPerm !== 0 && p.pcPerm !== 1);
+  const floorUnder = (floors, x, y) => {
+    let best = null;
+    for (const p of floors) {
+      if (x < p.x1 || x > p.x2) continue;
+      const ly = p.x2 - p.x1 < 1e-6 ? Math.min(p.y1, p.y2) : p.y1 + ((x - p.x1) / (p.x2 - p.x1)) * (p.y2 - p.y1);
+      if (ly >= y - SINK && (!best || ly < best.y)) best = { y: ly, id: p.id };
+    }
+    return best;
+  };
+  // Each spot's frame cell width (nodes.py ROCKS shapes, CLASSES sheets).
+  const CELL = {
+    rock_metal_1: [137, 156, 184], rock_beryl_1: [134, 146, 184], rock_dullite_1: [131, 131, 180], rock_sparkly_1: [131, 151, 173],
+    peat_1: [211, 166, 178], paper_tree: [232],
+  };
+  const SPOTS = {
+    rock_metal_1: ROCK_METAL_SPOTS, rock_beryl_1: ROCK_BERYL_SPOTS, rock_dullite_1: ROCK_DULLITE_SPOTS, rock_sparkly_1: ROCK_SPARKLY_SPOTS,
+    peat_1: PEAT_SPOTS, paper_tree: PAPER_TREE_SPOTS,
+  };
+
+  it('no measured rock, Peat Bog or Paper Tree hangs more than 25 px over the floor beneath it', () => {
+    const hanging = [];
+    let checked = 0;
+    for (const [cls, streets] of Object.entries(SPOTS)) {
+      for (const [tsid, rows] of Object.entries(streets)) {
+        const floors = floorsOf(tsid);
+        for (const [x, y, v] of rows) {
+          const under = floorUnder(floors, x, y);
+          if (!under) continue;
+          checked += 1;
+          if (under.y - y <= HANG) continue;
+          const q = (CELL[cls][(v || 1) - 1] || CELL[cls][0]) / 4;
+          if ([x - q, x + q].some((px) => { const f = floorUnder(floors, px, y); return f && f.y - y <= HANG; })) continue;
+          hanging.push(`${cls} ${tsid} ${x},${y} ${Math.round(under.y - y)} px over ${under.id}`);
+        }
+      }
+    }
+    assert.ok(checked > 800, String(checked));
+    assert.deepEqual(hanging, []);
+  });
+
+  it('Ora Soon: the Sparkly Rock sits on its floor, in the game and on the server', () => {
+    const [x, y, shape] = ROCK_SPARKLY_SPOTS.GHVMHDIBNA32QPF[0];
+    assert.equal(x, 2857.5);
+    assert.equal(shape, 3);
+    const under = floorUnder(floorsOf('GHVMHDIBNA32QPF'), x, y);
+    assert.equal(under.id, 'plat_1306883827302');
+    assert.ok(Math.abs(under.y - y) < 0.1, `${y} vs the floor at ${under.y}`);
+    assert.deepEqual(spotsFile.classes.rock_sparkly_1.seated.GHVMHDIBNA32QPF, [[2857.5, 440, y]], 'the measured y is kept beside the seated one');
+  });
+
+  it('every seat is recorded beside the spot it moved, a Jellisac never (they hang in holes in the rock face)', () => {
+    let moved = 0;
+    for (const [cls, entry] of Object.entries(spotsFile.classes)) {
+      if (!entry.seated) continue;
+      assert.ok(cls in SPOTS, `${cls} has seats`);
+      for (const [tsid, seats] of Object.entries(entry.seated)) {
+        for (const [x, from, to] of seats) {
+          assert.ok(to - from > HANG, `${cls} ${tsid} ${x}: ${from} -> ${to}`);
+          assert.ok(entry.streets[tsid].some((row) => row[0] === x && row[1] === to), `${cls} ${tsid} ${x} stands at ${to}`);
+          moved += 1;
+        }
+      }
+    }
+    assert.equal(moved, 51);
+  });
+
+  it('the server lays the seated rocks where the game does', { skip: skipWithoutServer }, () => {
+    const objects = JSON.parse(readFileSync(serverPath('data/objects.json'), 'utf8')).streets;
+    const rock = objects.GHVMHDIBNA32QPF.rocks[0];
+    assert.deepEqual(rock.slice(0, 3), [0, 'rock_sparkly_1', 2857.5]);
+    assert.equal(rock[3], ROCK_SPARKLY_SPOTS.GHVMHDIBNA32QPF[0][1]);
   });
 });
 

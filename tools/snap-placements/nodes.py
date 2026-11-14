@@ -44,6 +44,16 @@ game.js spawnMineRock draws it (anchor 0.5, 1, at 1:1), and the shape the snap s
 most the location file's count of each kind is kept (the most seen, then the best), and the game
 plans the rest.
 
+Seating (player report #303, G704): a snap's spot is where the art matched, and a few rocks matched
+high (Ora Soon's Sparkly Rock 58 px over its floor: the reach check, js/reach.js behindFloor, refused it
+until you jumped). Before writing, every rock, Peat Bog and Paper Tree whose spot hangs more than
+SEAT_HANG px over the standable platform beneath it (at its centre and both quarter points of its
+cell, so one resting a side on a step stays) goes down onto that platform: the cell's bottom centre on
+the line. Spots within SEAT_HANG (a rock on a painted knob, the usual 5-20 px) stay. Each move is kept
+in classes[class].seated[tsid] as [x, measured y, seated y]. Jellisacs hang in holes in the rock face
+and are never seated; trees and mailboxes are not nodes and stay as measured. --seat seats the spots
+already in --out without measuring (no snaps needed); --check also fails while one still hangs.
+
 The game reads the spots from public/js/node-spots-data.js (written from
 public/assets/content/node-spots.json here, so street-ecology.js has them in the browser, the
 realtime builders and the tests alike).
@@ -55,6 +65,7 @@ Usage (python3.11 has numpy + Pillow):
   python3.11 -I tools/snap-placements/nodes.py --only jellisac:GIFDIDJT0GU1CR8 --dry
   python3.11 -I tools/snap-placements/nodes.py --group rocks       measure only the rocks, keep the rest
   python3.11 -I tools/snap-placements/nodes.py --group trees --short   re-measure only the streets with fewer trees than trants
+  python3.11 -I tools/snap-placements/nodes.py --seat              measure nothing: seat the spots in --out that hang
 With no research/eleven-snaps beside the repo (a public clone) it says so and writes nothing.
 """
 import argparse, json, os, re, sys, unicodedata
@@ -169,6 +180,70 @@ ART_SETS = {
 }
 MERGE_PX = 10
 MIN_STD = 0.03  # a flat patch (sky, a plain wall) never counts
+
+# Seating (#303): what is seated and how (see the docstring). Widths are each spot's frame cell, by
+# its shape or variant; a Paper Tree's spot has no variant, so its one cell width.
+SEAT_HANG = 25  # px over the platform beneath: more is hanging
+SEAT_SINK = 15  # a line this far over a spot still counts as beneath it (a rock set into its floor)
+SEAT_CLASSES = ('rock_metal_1', 'rock_beryl_1', 'rock_dullite_1', 'rock_sparkly_1', 'peat_1', 'paper_tree')
+
+
+def seat_width(cls_id, variant):
+    if cls_id in ROCKS:
+        return ROCKS[cls_id]['shapes'].get(variant, ROCKS[cls_id]['shapes'][1])[1]
+    sheets = CLASSES[cls_id]['sheets']
+    return sheets.get(variant, next(iter(sheets.values())))[1]
+
+
+def street_floors(tsid, index):
+    """The street's standable platform lines in street px, left to right: [(id, (x1, y1), (x2, y2))].
+    street-model.js platformsScreen; pc_perm 1 (an underside) and 0 (soft both ways) are not floors."""
+    meta = index.get(tsid)
+    if not meta:
+        return []
+    street = json.load(open(os.path.join(ROOT, 'public', meta['file'])))
+    l, t = street['bounds']['l'], street['bounds']['t']
+    out = []
+    for p in street.get('platforms', []):
+        if p.get('pc_perm') in (0, 1):
+            continue
+        a, b = (p['x1'] - l, p['y1'] - t), (p['x2'] - l, p['y2'] - t)
+        out.append((p['id'], *((a, b) if a[0] <= b[0] else (b, a))))
+    return out
+
+
+def floor_under(floors, x, y):
+    """The nearest floor line at x that is not more than SEAT_SINK over y: (line y, id), or None."""
+    best = None
+    for pid, a, b in floors:
+        if x < a[0] or x > b[0]:
+            continue
+        ly = min(a[1], b[1]) if b[0] - a[0] < 1e-6 else a[1] + (x - a[0]) / (b[0] - a[0]) * (b[1] - a[1])
+        if ly >= y - SEAT_SINK and (best is None or ly < best[0]):
+            best = (ly, pid)
+    return best
+
+
+def seat_spots(out, index):
+    """Seats every hanging spot of SEAT_CLASSES in `out` (in place, order kept: a rock's place in its
+    class's list is its index). Returns the moves: [(class, tsid, x, old y, new y, platform id)]."""
+    moves = []
+    for cls_id in SEAT_CLASSES:
+        entry = out.get(cls_id) or {}
+        for tsid, spots in sorted(entry.get('streets', {}).items()):
+            floors = street_floors(tsid, index)
+            for spot in spots:
+                x, y = spot[0], spot[1]
+                under = floor_under(floors, x, y)
+                if not under or under[0] - y <= SEAT_HANG:
+                    continue
+                q = seat_width(cls_id, spot[2]) / 4
+                if any((f := floor_under(floors, px, y)) and f[0] - y <= SEAT_HANG for px in (x - q, x + q)):
+                    continue  # a side rests on a nearer floor (a step under the rock)
+                spot[1] = num(under[0])
+                entry.setdefault('seated', {}).setdefault(tsid, []).append([x, y, spot[1]])
+                moves.append((cls_id, tsid, x, y, spot[1], under[1]))
+    return moves
 
 
 def norm(s):
@@ -738,6 +813,7 @@ def js_module(data):
              ' * (the placements audit, 2026-11-12), with the shape the snap shows (rock_<kind>_<n>, 1-3); Paper\n'
              ' * Trees with no variant (null). TREE_SPOTS: [x, y, class, stage], the trunk\'s foot and the trant the\n'
              ' * snap shows (street-ecology.js treePlacementRequest); MAILBOX_SPOTS: [x, y, facing] (1 left, 2 right).\n'
+             ' * A rock, Peat Bog or Paper Tree that matched more than 25 px over its floor is seated on it (#303).\n'
              ' * street-ecology.js measuredNodeSpots reads them.\n'
              ' */\n']
     for cls_id, cls in [*CLASSES.items(), *ROCKS.items(), *ART_SETS.items()]:
@@ -764,14 +840,27 @@ def main():
     ap.add_argument('--threshold', type=float, default=0)
     ap.add_argument('--check', action='store_true')
     ap.add_argument('--short', action='store_true', help='trees, mailboxes: only the streets with fewer spots than the file names; the rest kept')
+    ap.add_argument('--seat', action='store_true', help='measure nothing: seat the spots in --out that hang over their floor (#303)')
     args = ap.parse_args()
     if args.check:
-        want = js_module(json.load(open(args.out))['classes'])
+        classes = json.load(open(args.out))['classes']
+        want = js_module(classes)
         have = open(JS_OUT).read() if os.path.exists(JS_OUT) else ''
         if want != have:
             print(f'{os.path.relpath(JS_OUT, ROOT)} is stale: run python3.11 -I tools/snap-placements/nodes.py')
             return 1
-        print(f'{os.path.relpath(JS_OUT, ROOT)} matches {os.path.relpath(args.out, ROOT)}')
+        hanging = seat_spots(json.loads(json.dumps(classes)), json.load(open(INDEX))['streets'])
+        if hanging:
+            print(f'{len(hanging)} spots hang over their floor, first {hanging[0][:5]}: run python3.11 -I tools/snap-placements/nodes.py --seat')
+            return 1
+        print(f'{os.path.relpath(JS_OUT, ROOT)} matches {os.path.relpath(args.out, ROOT)}, every node seated')
+        return 0
+    if args.seat:
+        data = json.load(open(args.out))
+        moves = seat_spots(data['classes'], json.load(open(INDEX))['streets'])
+        print_seated(moves)
+        if moves and not args.dry:
+            write_out(args.out, data['classes'])
         return 0
     snaps_dir = os.path.abspath(args.snaps)
     if not os.path.isdir(snaps_dir):
@@ -922,8 +1011,20 @@ def main():
             save_crop(job, sorted([[c['x'], c['y'], c['v'], c['score']] for c in keep]), args.crops)
     for c, (n, s) in totals.items():
         print(f'{c}: {n} spots on {s} streets' + (f' (shapes _1/_2/_3: {"/".join(map(str, shapes[c]))})' if c in ROCKS else ''))
+    print_seated(seat_spots(out, index))
     if args.dry or only:
         return 0
+    write_out(args.out, out)
+    return 0
+
+
+def print_seated(moves):
+    for cls_id, tsid, x, y0, y1, pid in moves:
+        print(f'  seated {cls_id} {tsid} x {x}: y {y0} -> {y1} (on {pid}, {num(y1 - y0)} px down)')
+    print(f'seated {len(moves)} hanging spots (more than {SEAT_HANG} px over their floor)')
+
+
+def write_out(path, out):
     data = {
         'source': 'Jellisac, Peat Bog, Paper Tree, rock, tree and mailbox spots measured by tools/snap-placements/nodes.py (player reports #249, #250; '
                   'the placements audit of 2026-11-12) from players\' full-street snaps of Nov-Dec 2012 gathered by the Eleven '
@@ -933,15 +1034,16 @@ def main():
                   'the snap shows (jellySack<n>, peat<n>; a rock\'s shape, rock_<kind>_<n>; a Paper Tree none). trees: [x, y, class, '
                   'stage], the trunk\'s foot and the trant and growth stage the snap shows (Wood Trees not measured). mailboxes: '
                   '[x, y, facing], 1 mailboxLeft, 2 mailboxRight. `snaps` is how many snaps of the '
-                  'street were matched. Do not edit by hand.',
+                  'street were matched. `seated` (player report #303): a rock, Peat Bog or Paper Tree that matched '
+                  'more than 25 px over the platform beneath it was set down onto it, [x, measured y, seated y]. '
+                  'Do not edit by hand.',
         'classes': out,
     }
-    with open(args.out, 'w') as f:
+    with open(path, 'w') as f:
         f.write(json.dumps(data, ensure_ascii=False, separators=(',', ':')).replace('],"', '],\n"').replace('{"source"', '{\n"source"') + '\n')
     with open(JS_OUT, 'w') as f:
         f.write(js_module(out))
-    print(f'wrote {os.path.relpath(args.out, ROOT)} and {os.path.relpath(JS_OUT, ROOT)}')
-    return 0
+    print(f'wrote {os.path.relpath(path, ROOT)} and {os.path.relpath(JS_OUT, ROOT)}')
 
 
 if __name__ == '__main__':

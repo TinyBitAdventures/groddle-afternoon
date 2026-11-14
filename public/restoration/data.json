@@ -2792,9 +2792,14 @@
   "deployed": "2026-11-13"
  },
  "git": {
-  "commits": 2047,
+  "commits": 2049,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-13",
+    "kind": "improve",
+    "text": "A shared rock, tree or peat refused as too far brings the Update ready notice back when a newer version is out"
+   },
    {
     "date": "2026-11-13",
     "kind": "improve",
@@ -2909,11 +2914,6 @@
     "date": "2026-11-13",
     "kind": "improve",
     "text": "EZ Cookin' has its glass serving counters, white hanging lamps and round mosaic table back, made for Groddle"
-   },
-   {
-    "date": "2026-11-13",
-    "kind": "improve",
-    "text": "A sharp desktop draws the vendors' 3x walks; a phone keeps the 1x walk strips"
    }
   ]
  },

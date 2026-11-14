@@ -31,7 +31,7 @@ import { extname, join, resolve } from 'node:path';
 import { homedir } from 'node:os';
 import { pathToFileURL } from 'node:url';
 import { reachRoutes } from '../../public/js/builder/reach-graph.js?v=d03eeab1';
-import { zoneArrivals } from '../../public/js/builder/validate.js?v=d31116cf';
+import { zoneArrivals } from '../../public/js/builder/validate.js?v=7aa4a01d';
 
 const TYPES = { '.js': 'text/javascript', '.mjs': 'text/javascript', '.css': 'text/css', '.json': 'application/json', '.webp': 'image/webp', '.png': 'image/png', '.svg': 'image/svg+xml', '.html': 'text/html', '.woff2': 'font/woff2', '.mp3': 'audio/mpeg', '.ogg': 'audio/ogg', '.jpg': 'image/jpeg', '.atlas': 'text/plain', '.xml': 'text/xml' };
 const SITE_ONLY = /^\/(wp-json|wp-admin|wp-login\.php|console|minn-admin|wp-content|minn|builder-art)(\/|$)/;

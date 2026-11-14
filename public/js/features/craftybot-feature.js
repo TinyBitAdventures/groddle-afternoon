@@ -53,7 +53,7 @@ import { ITEM_CATALOG, addItem, countItem, ensureItem, itemIcon, removeItem } fr
 import { canUseTool, getToolCondition, setToolRemaining } from '../tools.js?v=48542c24';
 import { MAKING_TOOL_SKILLS, listRecipes, recipeKnown, TOOL_CATALOG } from '../making.js?v=eddcceac';
 import { listDroppedStacks } from '../world-items.js?v=deadf665';
-import { BACK_YARD_GROUND_Y, homesFeature } from './homes-feature.js?v=a98d4930';
+import { BACK_YARD_GROUND_Y, homesFeature } from './homes-feature.js?v=6ed8f208';
 import { cabinetTake, isCabinetClass } from '../home-storage.js?v=b0225465';
 import {
   CRAFTYBOT,
