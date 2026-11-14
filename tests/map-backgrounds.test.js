@@ -143,9 +143,13 @@ describe('region map backgrounds (tools/map-backgrounds/build.mjs)', () => {
         assert.match(r.inputs[0].source, /c1\.glitch\.bz\/img\/maps_encyclopedia\/[a-z_]+_\d+\.jpg/, `${name}: input 1 is its 2012 picture`);
         assert.ok(r.replaces?.x2?.sha256 && r.replaces.made, `${name}: names the painting it replaces`);
       } else assert.equal(r.inputs[0].sha256, MANIFEST.regions[id].sha256, `${name}: input 1 is its thumbnail`);
-      // A restore is kept as delivered: its record says how it was cropped and aligned instead of a toning step.
-      if (/^restored/.test(r.method || '')) assert.match(r.source.crop, /Lanczos to 1520 x 920/, `${name}: the crop`);
-      else assert.match(r.source.toning, /^magick /, `${name}: the toning step`);
+      // A restore says how it was cropped and aligned, and is matched to its 2012 picture's colour (Austin 2026-11-14:
+      // 'matched to 2012' for every restored region) by saturation and gamma, never a brightness boost (that clipped the paper sea).
+      if (/^restored/.test(r.method || '')) {
+        assert.match(r.source.crop, /Lanczos to 1520 x 920/, `${name}: the crop`);
+        assert.match(r.source.toning, /^magick master\.png -modulate 100,\d+,100 -gamma [\d.]+ toned\.png /, `${name}: toned to 2012 by gamma`);
+        assert.ok(r.differences?.length > 40, `${name}: says how it differs from 2012`);
+      } else assert.match(r.source.toning, /^magick /, `${name}: the toning step`);
       // Player captures and footage are named as reference only, never as inputs.
       for (const i of r.inputs) assert.doesNotMatch(`${i.what} ${i.source}`, /wiki|footage|youtube|video|capture/i, `${name}: input ${i.n}`);
       for (const ref of r.references || []) assert.match(ref, /reference only/, name);

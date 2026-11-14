@@ -60,7 +60,7 @@ describe('Made for Groddle data (tools/made-art/build-data.mjs)', () => {
     assert.deepEqual(dates, [...dates].sort().reverse());
     // 2026-11-13 leads in the curated order: the Groddle Meadow map restored from 2012, EZ Cookin's props, its room, the subway paper, the World
     // map at 2x; then the quest book (2026-11-12).
-    assert.deepEqual(made.pieces.map((p) => p.id), ['map:58', 'decos:ezc', 'decos:ezc:room', 'subway:paper', 'world:2x', 'quest_book_award', 'maps:27,107,131']);
+    assert.deepEqual(made.pieces.map((p) => p.id), ['map:58', 'decos:ezc', 'decos:ezc:room', 'subway:paper', 'world:2x', 'quest_book_award', 'maps:27,51,131']);
     const book = made.pieces.find((p) => p.id === 'quest_book_award');
     assert.equal(book.madeLabel, '12 November 2026');
     assert.deepEqual([book.original.src, book.original.w, book.original.h, book.original.pixelated], ['/assets/ui/quest-book.webp', 86, 58, true]);
@@ -103,7 +103,7 @@ describe('Made for Groddle data (tools/made-art/build-data.mjs)', () => {
     assert.deepEqual([piece('decos:ezc:room').original.src, piece('decos:ezc:room').image.src], ['/assets/made-art/ezc-room-stand-ins.webp', '/assets/made-art/ezc-room.webp']);
     assert.deepEqual(Object.keys(more.decos.art).filter((n) => n.startsWith('gz_ai_ezc_')).sort(), Object.keys(more.decos.art).sort());
     // The gallery: three thumbnails and their paintings, the same shape so they show at the same size.
-    const gal = piece('maps:27,107,131');
+    const gal = piece('maps:27,51,131');
     assert.equal(gal.image.w * gal.original.h, gal.original.w * gal.image.h);
     assert.match(gal.facts.find((f) => f.label === 'How it was checked').text, /51 regions in all were painted again, four of them with no thumbnail/);
     // Each composed picture is the one tools/made-art/showcase.json records, and every recorded one is shown.

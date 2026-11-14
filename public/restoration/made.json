@@ -275,12 +275,12 @@
       ]
     },
     {
-      "id": "maps:27,107,131",
+      "id": "maps:27,51,131",
       "anchor": "made-more-region-maps",
       "name": "More region maps",
       "made": "2026-11-06",
       "madeLabel": "6 November 2026",
-      "caption": "Three more of the region paintings made again from their thumbnails: Ix, Callopee and Haoma, from top to bottom. Each kept its region's own shape and colours.",
+      "caption": "Three more of the region paintings made again from their thumbnails: Ix, Uralia and Haoma, from top to bottom. Each kept its region's own shape and colours.",
       "display": {
         "w": 161,
         "h": 300
@@ -290,7 +290,7 @@
         "w": 600,
         "h": 1116,
         "label": "Painted again for Groddle",
-        "alt": "Three painted top-down maps: a golden and rose-brown island of two lobes, a dark cave of winding tunnels, and a forest of pale icy spires."
+        "alt": "Three painted top-down maps: a golden and rose-brown island of two lobes, a small teal island scattered with stones on pale paper, and a forest of pale icy spires."
       },
       "original": {
         "src": "/assets/made-art/maps-thumbs.webp",
@@ -312,7 +312,7 @@
         },
         {
           "label": "In the game",
-          "text": "The backgrounds of the Ix, Callopee and Haoma region maps."
+          "text": "The backgrounds of the Ix, Uralia and Haoma region maps."
         },
         {
           "label": "Licence",
@@ -339,21 +339,21 @@
           }
         },
         {
-          "name": "Callopee",
+          "name": "Uralia",
           "original": {
-            "src": "/assets/maps/art/thumbs/sm_callopee.jpg",
+            "src": "/assets/maps/art/thumbs/sm_uralia.jpg",
             "w": 150,
             "h": 91,
             "pixelated": true,
-            "label": "Callopee: Tiny Speck's thumbnail, 150 by 91 pixels",
-            "alt": "Tiny Speck's small thumbnail of the Callopee map, enlarged so its pixels show."
+            "label": "Uralia: Tiny Speck's thumbnail, 150 by 91 pixels",
+            "alt": "Tiny Speck's small thumbnail of the Uralia map, enlarged so its pixels show."
           },
           "image": {
-            "src": "/assets/maps/art/bg/callopee@2x.webp",
+            "src": "/assets/maps/art/bg/uralia@2x.webp",
             "w": 1520,
             "h": 920,
-            "label": "Callopee: painted again for Groddle",
-            "alt": "The Callopee region map, painted again for Groddle from that thumbnail."
+            "label": "Uralia: painted again for Groddle",
+            "alt": "The Uralia region map, painted again for Groddle from that thumbnail."
           }
         },
         {

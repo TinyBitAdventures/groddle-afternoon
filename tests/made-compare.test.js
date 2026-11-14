@@ -15,7 +15,7 @@ import { boxOf, compareSteps, openingStep, partView, stepFrom } from '../public/
 
 const readJson = (file) => JSON.parse(readFileSync(join(GAME_DIR, file), 'utf8'));
 const made = readJson('public/restoration/made.json');
-const gallery = made.pieces.find((p) => p.id === 'maps:27,107,131');
+const gallery = made.pieces.find((p) => p.id === 'maps:27,51,131');
 const pairsOf = (piece) => (piece.parts
   ? piece.parts.map((p) => [partView(p.original, false), partView(p.image, true)])
   : [[piece.original, piece.image].filter(Boolean)]);
@@ -29,7 +29,7 @@ describe('Made for Groddle compare popup (public/restoration/made-compare.js)', 
     assert.equal(steps.length, 6, 'three regions, two pictures each: "1 of 6" to "6 of 6"');
     assert.deepEqual(steps.map(([pi, vi]) => pairs[pi][vi].label), [
       "Ix: Tiny Speck's thumbnail, 150 by 91 pixels", 'Ix: painted again for Groddle',
-      "Callopee: Tiny Speck's thumbnail, 150 by 91 pixels", 'Callopee: painted again for Groddle',
+      "Uralia: Tiny Speck's thumbnail, 150 by 91 pixels", 'Uralia: painted again for Groddle',
       "Haoma: Tiny Speck's thumbnail, 150 by 91 pixels", 'Haoma: painted again for Groddle',
     ]);
     assert.equal(stepFrom(5, 1, 6), 0);
@@ -43,7 +43,7 @@ describe('Made for Groddle compare popup (public/restoration/made-compare.js)', 
     assert.equal(openingStep(book, 1), 1);
     const pairs = pairsOf(gallery);
     assert.equal(openingStep(pairs, 0, 0, true), 0, 'Enter on the thumbnails: Ix');
-    assert.equal(openingStep(pairs, 1, 0.5, true), 3, 'the middle of the paintings: Callopee painted');
+    assert.equal(openingStep(pairs, 1, 0.5, true), 3, 'the middle of the paintings: Uralia painted');
     assert.equal(openingStep(pairs, 0, 0.99, true), 4, 'the bottom of the thumbnails: Haoma');
     assert.equal(openingStep(pairs, 1, 1.4, true), 5, 'clamped to the last region');
     assert.equal(openingStep([[{ w: 1, h: 1 }]], 1), 0, 'a card with no original opens on its one picture');
@@ -61,7 +61,7 @@ describe('Made for Groddle compare popup (public/restoration/made-compare.js)', 
   });
 
   it('made.json gives the gallery each region\'s own thumbnail and painting, the same shape, the thumbnail pixels kept', () => {
-    assert.deepEqual(gallery.parts.map((p) => p.name), ['Ix', 'Callopee', 'Haoma'], 'top to bottom, as the card and its caption list them');
+    assert.deepEqual(gallery.parts.map((p) => p.name), ['Ix', 'Uralia', 'Haoma'], 'top to bottom, as the card and its caption list them');
     for (const part of gallery.parts) {
       for (const v of [part.original, part.image]) assert.ok(existsSync(join(GAME_DIR, 'public', v.src)), v.src);
       assert.match(part.original.src, /^\/assets\/maps\/art\/thumbs\/sm_[a-z]+\.jpg$/);
@@ -78,7 +78,7 @@ describe('Made for Groddle compare popup (public/restoration/made-compare.js)', 
     const curated = readJson('tools/made-art/pieces.json');
     const maps = readJson('tools/provenance/repainted-maps.json');
     const odd = structuredClone(curated);
-    delete odd.pieces.find((p) => p.id === 'maps:27,107,131').parts;
+    delete odd.pieces.find((p) => p.id === 'maps:27,51,131').parts;
     assert.throws(() => build(provenance, odd, undefined, maps, readMore()), /a gallery needs parts/);
   });
 

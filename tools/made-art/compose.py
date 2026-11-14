@@ -119,7 +119,7 @@ def props_scene():
 
 # Region maps: three thumbnails and their paintings, one column each
 
-MAPS = [('27', 'ix'), ('107', 'callopee'), ('131', 'haoma')]
+MAPS = [('27', 'ix'), ('51', 'uralia'), ('131', 'haoma')]
 GAP = 3  # px between thumbnails (12 between paintings)
 
 
@@ -184,9 +184,9 @@ def main():
 
     # Region maps.
     a, b, ta, pb = maps_columns()
-    put('maps-thumbs', webp(a, 'maps-thumbs', lossless=True), "Tiny Speck's thumbnails of Ix, Callopee and Haoma",
+    put('maps-thumbs', webp(a, 'maps-thumbs', lossless=True), "Tiny Speck's thumbnails of Ix, Uralia and Haoma",
         f'the three CC0 thumbnails as they are, one above the other, {GAP} px apart', [t | {'licence': 'CC0 1.0, Tiny Speck'} for t in ta])
-    put('maps-painted', webp(b, 'maps-painted', q=86), 'The paintings of Ix, Callopee and Haoma made again for Groddle',
+    put('maps-painted', webp(b, 'maps-painted', q=86), 'The paintings of Ix, Uralia and Haoma made again for Groddle',
         f'the three repainted maps (2x files) at four times the thumbnails, one above the other, {GAP * 4} px apart (tools/provenance/repainted-maps.json)', pb)
 
     doc = {'format': 'groddle-made-showcase/1',

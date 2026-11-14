@@ -207,9 +207,9 @@
       ]
     },
     {
-      "id": "maps:27,107,131",
+      "id": "maps:27,51,131",
       "name": "More region maps",
-      "caption": "Three more of the region paintings made again from their thumbnails: Ix, Callopee and Haoma, from top to bottom. Each kept its region's own shape and colours.",
+      "caption": "Three more of the region paintings made again from their thumbnails: Ix, Uralia and Haoma, from top to bottom. Each kept its region's own shape and colours.",
       "display": {
         "w": 161,
         "h": 300
@@ -217,7 +217,7 @@
       "image": {
         "file": "public/assets/made-art/maps-painted.webp",
         "label": "Painted again for Groddle",
-        "alt": "Three painted top-down maps: a golden and rose-brown island of two lobes, a dark cave of winding tunnels, and a forest of pale icy spires."
+        "alt": "Three painted top-down maps: a golden and rose-brown island of two lobes, a small teal island scattered with stones on pale paper, and a forest of pale icy spires."
       },
       "original": {
         "file": "public/assets/made-art/maps-thumbs.webp",
@@ -247,7 +247,7 @@
         },
         {
           "label": "In the game",
-          "text": "The backgrounds of the Ix, Callopee and Haoma region maps."
+          "text": "The backgrounds of the Ix, Uralia and Haoma region maps."
         }
       ]
     }

@@ -58,10 +58,10 @@
    ]
   },
   "public/assets/made-art/maps-painted.webp": {
-   "what": "The paintings of Ix, Callopee and Haoma made again for Groddle",
+   "what": "The paintings of Ix, Uralia and Haoma made again for Groddle",
    "w": 600,
    "h": 1116,
-   "sha256": "a39ffc68132558a74da88ecd78cd858b2576cadb81c9f0cb45603bec07116d73",
+   "sha256": "a510a368fe1a819bb598c49e60d9d0de6c57abf63292aa54148b7bc6e76eb9c9",
    "made": "the three repainted maps (2x files) at four times the thumbnails, one above the other, 12 px apart (tools/provenance/repainted-maps.json)",
    "from": [
     {
@@ -69,8 +69,8 @@
      "sha256": "35253bea08465e05a03f574edc598231c0c6b78b07cab0b4d8eb5317582a8e90"
     },
     {
-     "file": "public/assets/maps/art/bg/callopee@2x.webp",
-     "sha256": "a238560044c94b57c7608de48342e71bd06d8cc9d0a3465f4480b634598026a3"
+     "file": "public/assets/maps/art/bg/uralia@2x.webp",
+     "sha256": "73afd4d527b4a508af9b261d893355888b89710be14cff61cf2b27883b12dd18"
     },
     {
      "file": "public/assets/maps/art/bg/haoma@2x.webp",
@@ -79,10 +79,10 @@
    ]
   },
   "public/assets/made-art/maps-thumbs.webp": {
-   "what": "Tiny Speck's thumbnails of Ix, Callopee and Haoma",
+   "what": "Tiny Speck's thumbnails of Ix, Uralia and Haoma",
    "w": 150,
    "h": 279,
-   "sha256": "932b29743015a481561f6ae2582518418b028a539a5bb3383a04679882760ade",
+   "sha256": "6b5fc15828ab34d6f69b740a4d27649eb0c53b9cca4a89827f1b3c5cfd29f5d2",
    "made": "the three CC0 thumbnails as they are, one above the other, 3 px apart",
    "from": [
     {
@@ -91,8 +91,8 @@
      "licence": "CC0 1.0, Tiny Speck"
     },
     {
-     "file": "public/assets/maps/art/thumbs/sm_callopee.jpg",
-     "sha256": "2d0e87daa129d0358720cd6616136371de58e05268b2536930d18dee896419f5",
+     "file": "public/assets/maps/art/thumbs/sm_uralia.jpg",
+     "sha256": "4d4ddccb5d659d2b945f7d70dbf6eb1b2818e3dc461faa54647468502582ce2d",
      "licence": "CC0 1.0, Tiny Speck"
     },
     {
