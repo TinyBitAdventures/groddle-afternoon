@@ -1,0 +1,925 @@
+{
+  "format": "groddle-encyclopedia-maps/1",
+  "policy": "Tiny Speck’s 2012 Encyclopedia region maps (c1.glitch.bz/img/maps_encyclopedia, saved from the Wayback Machine): each region’s 760 x 460 painting as the Encyclopedia drew it, with the game’s roads, names, icons and GO buttons on it. Austin’s call (2026-11-14, lane mapsbefore): they ship as Tiny Speck’s own originals, as the “before” picture of each region on the Maps page (/restoration/maps/), on the same footing as his 2026-10-28 call to ship Tiny Speck’s original recordings from their CDN. Only the files listed here ship, each re-encoded as WebP at its own pixels and size by tools/restoration-maps/build-data.mjs from the local copy whose sha256 is recorded, to the shipped path with the sha256 recorded under it. Player snaps, videos and anything else from research/ still never ship. The game itself does not draw them: its region maps are the paintings in repainted-maps.json.",
+  "encode": "cwebp -q 90 -m 6 -metadata none <local> -o public/<shipped.file>",
+  "regions": {
+    "27": {
+      "region": "Ix",
+      "source": "http://c1.glitch.bz/img/maps_encyclopedia/ix_77122.jpg",
+      "wayback": "20131119141501",
+      "archived": "https://web.archive.org/web/20131119141501id_/http://c1.glitch.bz/img/maps_encyclopedia/ix_77122.jpg",
+      "local": "research/wayback/raw/c1-img/maps_encyclopedia/ix_77122.jpg",
+      "w": 760,
+      "h": 460,
+      "bytes": 86423,
+      "sha256": "e0614e65de99ca0aba5114eb8f25a9a47e715ae99b242dffc82007d671401acf",
+      "shipped": {
+        "file": "restoration/maps/2012/ix.webp",
+        "sha256": "0bc008462e59ce1fc8531015709adf5ad26ae30c42392be387440049a21d5edd",
+        "bytes": 84504,
+        "w": 760,
+        "h": 460
+      }
+    },
+    "40": {
+      "region": "Naraka",
+      "source": "http://c1.glitch.bz/img/maps_encyclopedia/naraka_124737.jpg",
+      "wayback": "20131119141507",
+      "archived": "https://web.archive.org/web/20131119141507id_/http://c1.glitch.bz/img/maps_encyclopedia/naraka_124737.jpg",
+      "local": "research/wayback/raw/c1-img/maps_encyclopedia/naraka_124737.jpg",
+      "w": 760,
+      "h": 460,
+      "bytes": 72707,
+      "sha256": "538098b532957868a9e0cf94a4049c0c4c09aadd895268c2fb5039861e886295",
+      "shipped": {
+        "file": "restoration/maps/2012/naraka.webp",
+        "sha256": "4f32346adec3900d0dd9f41fe7276190958caba60ea3440a224d098505bf2ce7",
+        "bytes": 40800,
+        "w": 760,
+        "h": 460
+      }
+    },
+    "50": {
+      "region": "Ilmenskie Caverns",
+      "source": "http://c1.glitch.bz/img/maps_encyclopedia/ilmenskie_caverns_77122.jpg",
+      "wayback": "20130918195149",
+      "archived": "https://web.archive.org/web/20130918195149id_/http://c1.glitch.bz/img/maps_encyclopedia/ilmenskie_caverns_77122.jpg",
+      "local": "research/wayback/raw/c1-img/maps_encyclopedia/ilmenskie_caverns_77122.jpg",
+      "w": 760,
+      "h": 460,
+      "bytes": 72749,
+      "sha256": "c1f7574f2f5d09272c3a62c47d885cc06e6fdf78c0d3d3a6d2456e3ac7ff3dd8",
+      "shipped": {
+        "file": "restoration/maps/2012/ilmenskiecaverns.webp",
+        "sha256": "f1a1f84ec3f2008baa905d175f8f7e2b62cea821d429f774f67acd9861d74adb",
+        "bytes": 87020,
+        "w": 760,
+        "h": 460
+      }
+    },
+    "51": {
+      "region": "Uralia",
+      "source": "http://c1.glitch.bz/img/maps_encyclopedia/uralia_77122.jpg",
+      "wayback": "20131119141516",
+      "archived": "https://web.archive.org/web/20131119141516id_/http://c1.glitch.bz/img/maps_encyclopedia/uralia_77122.jpg",
+      "local": "research/coverage/hunt-maps-2026-11-04/encyclopedia-760/uralia_77122.jpg",
+      "w": 760,
+      "h": 460,
+      "bytes": 89848,
+      "sha256": "e553d1561aeaa4307bb29f87b310c30b1a525de6f0e0f7bc451eaa81ddbb0b0a",
+      "shipped": {
+        "file": "restoration/maps/2012/uralia.webp",
+        "sha256": "2b122adb512f1475a6890d39f1fc5ac8d54666d92bd4ede9e8fdf0e033d8b8d6",
+        "bytes": 89446,
+        "w": 760,
+        "h": 460
+      }
+    },
+    "56": {
+      "region": "Groddle Forest",
+      "source": "http://c1.glitch.bz/img/maps_encyclopedia/groddle_forest_77122.jpg",
+      "wayback": "20130918194957",
+      "archived": "https://web.archive.org/web/20130918194957id_/http://c1.glitch.bz/img/maps_encyclopedia/groddle_forest_77122.jpg",
+      "local": "research/wayback/raw/c1-img/maps_encyclopedia/groddle_forest_77122.jpg",
+      "w": 760,
+      "h": 460,
+      "bytes": 112840,
+      "sha256": "ea815d6ccafb1200c66635a74037be0c112fb612906a8b6c7df3135e9e4247be",
+      "shipped": {
+        "file": "restoration/maps/2012/groddleforest.webp",
+        "sha256": "ebbb76cece7635c022a4d24646b703c2e48c106e4e02c7bd215dd1ff467c9f73",
+        "bytes": 123012,
+        "w": 760,
+        "h": 460
+      }
+    },
+    "58": {
+      "region": "Groddle Meadow",
+      "source": "http://c1.glitch.bz/img/maps_encyclopedia/groddle_meadow_77122.jpg",
+      "wayback": "20130325183121",
+      "archived": "https://web.archive.org/web/20130325183121id_/http://c1.glitch.bz/img/maps_encyclopedia/groddle_meadow_77122.jpg",
+      "local": "research/wayback/raw/c1-img/maps_encyclopedia/groddle_meadow_77122.jpg",
+      "w": 760,
+      "h": 460,
+      "bytes": 122966,
+      "sha256": "b66452c7133c264509b56f98dc9583712f728d0544ba6891da9e481f632ef487",
+      "shipped": {
+        "file": "restoration/maps/2012/groddlemeadow.webp",
+        "sha256": "4dce4f82c689d317e2a0cdf11968c08703c4449b385c98da66615d046f3d8451",
+        "bytes": 123496,
+        "w": 760,
+        "h": 460
+      }
+    },
+    "63": {
+      "region": "Shimla Mirch",
+      "source": "http://c1.glitch.bz/img/maps_encyclopedia/shimla_mirch_77122.jpg",
+      "wayback": "20131119141513",
+      "archived": "https://web.archive.org/web/20131119141513id_/http://c1.glitch.bz/img/maps_encyclopedia/shimla_mirch_77122.jpg",
+      "local": "research/wayback/raw/c1-img/maps_encyclopedia/shimla_mirch_77122.jpg",
+      "w": 760,
+      "h": 460,
+      "bytes": 109136,
+      "sha256": "4e21259694432839fcb592eff6a82bad709d01686e919259e2153f5d756d461c",
+      "shipped": {
+        "file": "restoration/maps/2012/shimlamirch.webp",
+        "sha256": "71138735f711aeed2e18804d2885bde75fb2cdf4100950f13d439a05804c5dd4",
+        "bytes": 104590,
+        "w": 760,
+        "h": 460
+      }
+    },
+    "64": {
+      "region": "Groddle Heights",
+      "source": "http://c1.glitch.bz/img/maps_encyclopedia/groddle_heights_77122.jpg",
+      "wayback": "20131119141459",
+      "archived": "https://web.archive.org/web/20131119141459id_/http://c1.glitch.bz/img/maps_encyclopedia/groddle_heights_77122.jpg",
+      "local": "research/wayback/raw/c1-img/maps_encyclopedia/groddle_heights_77122.jpg",
+      "w": 760,
+      "h": 460,
+      "bytes": 87990,
+      "sha256": "5f2975d923ea53ec8d9643f03c98a53bbe539054d8510f3849ea570e2bacb3ab",
+      "shipped": {
+        "file": "restoration/maps/2012/groddleheights.webp",
+        "sha256": "1c9a9cf5528b3569df4608dd6917e323a715febd2ec4881e4fe099068af1baa5",
+        "bytes": 83946,
+        "w": 760,
+        "h": 460
+      }
+    },
+    "66": {
+      "region": "The Seams",
+      "source": "http://c1.glitch.bz/img/maps_encyclopedia/the_seams_124751.jpg",
+      "wayback": "20131119141515",
+      "archived": "https://web.archive.org/web/20131119141515id_/http://c1.glitch.bz/img/maps_encyclopedia/the_seams_124751.jpg",
+      "local": "research/coverage/hunt-maps-2026-11-04/encyclopedia-760/the_seams_124751.jpg",
+      "w": 760,
+      "h": 460,
+      "bytes": 70897,
+      "sha256": "b4b5539e5ff5bbd6beba0566ecf0cf851af59b3ceb52cd356527d6a989f3ff4d",
+      "shipped": {
+        "file": "restoration/maps/2012/theseams.webp",
+        "sha256": "e21cb83977933bdbde5de42cdb7eabe1dec2c3262add964983058598cac50c96",
+        "bytes": 76330,
+        "w": 760,
+        "h": 460
+      }
+    },
+    "71": {
+      "region": "Jethimadh",
+      "source": "http://c1.glitch.bz/img/maps_encyclopedia/jethimadh_77122.jpg",
+      "wayback": "20131119141503",
+      "archived": "https://web.archive.org/web/20131119141503id_/http://c1.glitch.bz/img/maps_encyclopedia/jethimadh_77122.jpg",
+      "local": "research/wayback/raw/c1-img/maps_encyclopedia/jethimadh_77122.jpg",
+      "w": 760,
+      "h": 460,
+      "bytes": 95606,
+      "sha256": "4578670a86ae6d2a121f10bfb6dbee888e4f2afcb058ec93300c9417f1fb05d4",
+      "shipped": {
+        "file": "restoration/maps/2012/jethimadh.webp",
+        "sha256": "32eba541720223041a5d40fb757f4904358f85802159d781476445d68bc7db7e",
+        "bytes": 90018,
+        "w": 760,
+        "h": 460
+      }
+    },
+    "72": {
+      "region": "Chakra Phool",
+      "source": "http://c1.glitch.bz/img/maps_encyclopedia/chakra_phool_115315.jpg",
+      "wayback": "20131119141456",
+      "archived": "https://web.archive.org/web/20131119141456id_/http://c1.glitch.bz/img/maps_encyclopedia/chakra_phool_115315.jpg",
+      "local": "research/wayback/raw/c1-img/maps_encyclopedia/chakra_phool_115315.jpg",
+      "w": 760,
+      "h": 459,
+      "bytes": 191003,
+      "sha256": "48429e2bcb74c6a1f085fadb62158755a7375cf84a4708fdbb0858f60a52a425",
+      "shipped": {
+        "file": "restoration/maps/2012/chakraphool.webp",
+        "sha256": "e87adba0331f0009b81a8bd69b624e78c445b8451a71a77e4874b2d83252c1fa",
+        "bytes": 100868,
+        "w": 760,
+        "h": 459
+      }
+    },
+    "75": {
+      "region": "Bortola",
+      "source": "http://c1.glitch.bz/img/maps_encyclopedia/bortola_120329.jpg",
+      "wayback": "20131119141455",
+      "archived": "https://web.archive.org/web/20131119141455id_/http://c1.glitch.bz/img/maps_encyclopedia/bortola_120329.jpg",
+      "local": "research/wayback/raw/c1-img/maps_encyclopedia/bortola_120329.jpg",
+      "w": 760,
+      "h": 459,
+      "bytes": 160310,
+      "sha256": "9c24dad8e933f38d1ce47456633feac2b2e4ddef06e23746ba1ec10144d90729",
+      "shipped": {
+        "file": "restoration/maps/2012/bortola.webp",
+        "sha256": "7a0af6b5d9d66f3d9818bfd74e9518d1866736e15d31b7747f2b9f06b540ba52",
+        "bytes": 125998,
+        "w": 760,
+        "h": 459
+      }
+    },
+    "76": {
+      "region": "Alakol",
+      "source": "http://c1.glitch.bz/img/maps_encyclopedia/alakol_120298.jpg",
+      "wayback": "20131119141452",
+      "archived": "https://web.archive.org/web/20131119141452id_/http://c1.glitch.bz/img/maps_encyclopedia/alakol_120298.jpg",
+      "local": "research/wayback/raw/c1-img/maps_encyclopedia/alakol_120298.jpg",
+      "w": 760,
+      "h": 459,
+      "bytes": 137034,
+      "sha256": "217c8c7c6c8d0a316fd559b9aa5046e17fe6f384fd174b7d8ec3efd11ea2e9aa",
+      "shipped": {
+        "file": "restoration/maps/2012/alakol.webp",
+        "sha256": "33373357357d2363d671a7cbf63fbaff7336e2bb2f16ca88010005f077661824",
+        "bytes": 105722,
+        "w": 760,
+        "h": 459
+      }
+    },
+    "78": {
+      "region": "Ilmenskie Deeps",
+      "source": "http://c1.glitch.bz/img/maps_encyclopedia/ilmenskie_deeps_77122.jpg",
+      "wayback": "20131119141501",
+      "archived": "https://web.archive.org/web/20131119141501id_/http://c1.glitch.bz/img/maps_encyclopedia/ilmenskie_deeps_77122.jpg",
+      "local": "research/wayback/raw/c1-img/maps_encyclopedia/ilmenskie_deeps_77122.jpg",
+      "w": 760,
+      "h": 460,
+      "bytes": 96509,
+      "sha256": "5c1be9aa4f4409a4a5826045bbdd6b246e1c14152371850404a80e356f197b75",
+      "shipped": {
+        "file": "restoration/maps/2012/ilmenskiedeeps.webp",
+        "sha256": "83921af1b9bdd901c5447bdc4d4834ae57b61a83287cc357235d941665842f0b",
+        "bytes": 96742,
+        "w": 760,
+        "h": 460
+      }
+    },
+    "85": {
+      "region": "Kajuu",
+      "source": "http://c1.glitch.bz/img/maps_encyclopedia/kajuu_77122.jpg",
+      "wayback": "20131119141504",
+      "archived": "https://web.archive.org/web/20131119141504id_/http://c1.glitch.bz/img/maps_encyclopedia/kajuu_77122.jpg",
+      "local": "research/wayback/raw/c1-img/maps_encyclopedia/kajuu_77122.jpg",
+      "w": 760,
+      "h": 460,
+      "bytes": 109295,
+      "sha256": "828c1da54ddac2ad7a0b07a0deee3e91e7af18bc68790424213867238f03a075",
+      "shipped": {
+        "file": "restoration/maps/2012/kajuu.webp",
+        "sha256": "c414f9b7283018ee80439eaec909758523371c05f9a07fd70dee1b6f0adb1d44",
+        "bytes": 105052,
+        "w": 760,
+        "h": 460
+      }
+    },
+    "86": {
+      "region": "Baqala",
+      "source": "http://c1.glitch.bz/img/maps_encyclopedia/baqala_77122.jpg",
+      "wayback": "20131119141454",
+      "archived": "https://web.archive.org/web/20131119141454id_/http://c1.glitch.bz/img/maps_encyclopedia/baqala_77122.jpg",
+      "local": "research/wayback/raw/c1-img/maps_encyclopedia/baqala_77122.jpg",
+      "w": 760,
+      "h": 460,
+      "bytes": 118799,
+      "sha256": "a8293c6ccf2be2d04df9a226ac000d42ac8d0ad4939b8696c1b65fffcf949f81",
+      "shipped": {
+        "file": "restoration/maps/2012/baqala.webp",
+        "sha256": "a31b182720d5887ef7284f0cb7137b0444250eff6a0a63d30ea079daaee2febb",
+        "bytes": 123212,
+        "w": 760,
+        "h": 460
+      }
+    },
+    "88": {
+      "region": "Karnata",
+      "source": "http://c1.glitch.bz/img/maps_encyclopedia/karnata_124445.jpg",
+      "wayback": "20131119141504",
+      "archived": "https://web.archive.org/web/20131119141504id_/http://c1.glitch.bz/img/maps_encyclopedia/karnata_124445.jpg",
+      "local": "research/wayback/raw/c1-img/maps_encyclopedia/karnata_124445.jpg",
+      "w": 760,
+      "h": 459,
+      "bytes": 131831,
+      "sha256": "5fe53c17ab79a7d37f2c0de3397c9c1b1e54944660a607138a350071cb1b9e40",
+      "shipped": {
+        "file": "restoration/maps/2012/karnata.webp",
+        "sha256": "33cdca44bc23ec09f636bcb0e8fc13613d9858b658b9d97a64649018dbb32b57",
+        "bytes": 101322,
+        "w": 760,
+        "h": 459
+      }
+    },
+    "89": {
+      "region": "Andra",
+      "source": "http://c1.glitch.bz/img/maps_encyclopedia/andra_77122.jpg",
+      "wayback": "20130323024207",
+      "archived": "https://web.archive.org/web/20130323024207id_/http://c1.glitch.bz/img/maps_encyclopedia/andra_77122.jpg",
+      "local": "research/wayback/raw/c1-img/maps_encyclopedia/andra_77122.jpg",
+      "w": 760,
+      "h": 460,
+      "bytes": 110101,
+      "sha256": "73b09bbbbf26ce59deb17ced7f1845f753228c5d83439ffe77409284c6bea6fa",
+      "shipped": {
+        "file": "restoration/maps/2012/andra.webp",
+        "sha256": "bd23c317a9960fe7c74dbda25c8d332a58fb8a7f2d8ab8d65e71a6e21f92cf21",
+        "bytes": 105260,
+        "w": 760,
+        "h": 460
+      }
+    },
+    "90": {
+      "region": "Choru",
+      "source": "http://c1.glitch.bz/img/maps_encyclopedia/choru_121909.jpg",
+      "wayback": "20131119141457",
+      "archived": "https://web.archive.org/web/20131119141457id_/http://c1.glitch.bz/img/maps_encyclopedia/choru_121909.jpg",
+      "local": "research/wayback/raw/c1-img/maps_encyclopedia/choru_121909.jpg",
+      "w": 760,
+      "h": 459,
+      "bytes": 145252,
+      "sha256": "b305bc940a801cd565da67f2b419a465e591f5f33be1dadffe3d99ba0092d477",
+      "shipped": {
+        "file": "restoration/maps/2012/choru.webp",
+        "sha256": "4cd37996b494825c57d05288cc201651673ffea5183b70a79f143ba7a6923827",
+        "bytes": 116590,
+        "w": 760,
+        "h": 459
+      }
+    },
+    "91": {
+      "region": "Zhambu",
+      "source": "http://c1.glitch.bz/img/maps_encyclopedia/zhambu_77122.jpg",
+      "wayback": "20131119141517",
+      "archived": "https://web.archive.org/web/20131119141517id_/http://c1.glitch.bz/img/maps_encyclopedia/zhambu_77122.jpg",
+      "local": "research/coverage/hunt-maps-2026-11-04/encyclopedia-760/zhambu_77122.jpg",
+      "w": 760,
+      "h": 460,
+      "bytes": 119479,
+      "sha256": "29d3ab650eb2dde751195acbbcff426a1f63d2f4c10ccbd2f66751a0147e9c2f",
+      "shipped": {
+        "file": "restoration/maps/2012/zhambu.webp",
+        "sha256": "7d5f98963affb758a7a2c905e74c8a86e8845d61c5679949a30d1a40cc998080",
+        "bytes": 121290,
+        "w": 760,
+        "h": 460
+      }
+    },
+    "92": {
+      "region": "Tamila",
+      "source": "http://c1.glitch.bz/img/maps_encyclopedia/tamila_92723.jpg",
+      "wayback": "20131119141515",
+      "archived": "https://web.archive.org/web/20131119141515id_/http://c1.glitch.bz/img/maps_encyclopedia/tamila_92723.jpg",
+      "local": "research/coverage/hunt-maps-2026-11-04/encyclopedia-760/tamila_92723.jpg",
+      "w": 760,
+      "h": 459,
+      "bytes": 339747,
+      "sha256": "993edd088e6d4d5aa290e4df4c95c783b26c2e459f2879de6568ca039a0d1c30",
+      "shipped": {
+        "file": "restoration/maps/2012/tamila.webp",
+        "sha256": "b30ca4a5b94ce0ec231cbf01c01b80d4e703fde08f55d64847863a565449aa00",
+        "bytes": 130414,
+        "w": 760,
+        "h": 459
+      }
+    },
+    "93": {
+      "region": "Salatu",
+      "source": "http://c1.glitch.bz/img/maps_encyclopedia/salatu_115315.jpg",
+      "wayback": "20131119141513",
+      "archived": "https://web.archive.org/web/20131119141513id_/http://c1.glitch.bz/img/maps_encyclopedia/salatu_115315.jpg",
+      "local": "research/wayback/raw/c1-img/maps_encyclopedia/salatu_115315.jpg",
+      "w": 760,
+      "h": 459,
+      "bytes": 180755,
+      "sha256": "e18688b2b5cdbab3091750f16cc3878fe2be53996b42f81d075252e900c56350",
+      "shipped": {
+        "file": "restoration/maps/2012/salatu.webp",
+        "sha256": "9bf446f2c46ad41d9c9e70f5d1c657032f592340ed51013902d9f620e11563e0",
+        "bytes": 118238,
+        "w": 760,
+        "h": 459
+      }
+    },
+    "95": {
+      "region": "Xalanga",
+      "source": "http://c1.glitch.bz/img/maps_encyclopedia/xalanga_77122.jpg",
+      "wayback": "20131119141517",
+      "archived": "https://web.archive.org/web/20131119141517id_/http://c1.glitch.bz/img/maps_encyclopedia/xalanga_77122.jpg",
+      "local": "research/coverage/hunt-maps-2026-11-04/encyclopedia-760/xalanga_77122.jpg",
+      "w": 760,
+      "h": 460,
+      "bytes": 111527,
+      "sha256": "1730cd8d7a1796421ace99d543d917b46d3f1558db04a9b1531a35144ce042f4",
+      "shipped": {
+        "file": "restoration/maps/2012/xalanga.webp",
+        "sha256": "c465ecee39214901d2b0a84cc5c26dd0e0703289ca86792290883b45a5cbcaab",
+        "bytes": 120236,
+        "w": 760,
+        "h": 460
+      }
+    },
+    "97": {
+      "region": "Muufo",
+      "source": "http://c1.glitch.bz/img/maps_encyclopedia/muufo_124445.jpg",
+      "wayback": "20131119141507",
+      "archived": "https://web.archive.org/web/20131119141507id_/http://c1.glitch.bz/img/maps_encyclopedia/muufo_124445.jpg",
+      "local": "research/wayback/raw/c1-img/maps_encyclopedia/muufo_124445.jpg",
+      "w": 760,
+      "h": 459,
+      "bytes": 140477,
+      "sha256": "0db8ddec995f435e3e946aa2e30dd785c22c2e0114185b283ceef30210a284ec",
+      "shipped": {
+        "file": "restoration/maps/2012/muufo.webp",
+        "sha256": "fada23ffe20b74977d0ea17368e5e620ade4829577c323e06f6474cb6e90a836",
+        "bytes": 110850,
+        "w": 760,
+        "h": 459
+      }
+    },
+    "98": {
+      "region": "Besara",
+      "source": "http://c1.glitch.bz/img/maps_encyclopedia/besara_92708.jpg",
+      "wayback": "20131119141454",
+      "archived": "https://web.archive.org/web/20131119141454id_/http://c1.glitch.bz/img/maps_encyclopedia/besara_92708.jpg",
+      "local": "research/wayback/raw/c1-img/maps_encyclopedia/besara_92708.jpg",
+      "w": 760,
+      "h": 459,
+      "bytes": 353679,
+      "sha256": "37bc296d69cbd6cc91b028379f1a9672ab9bed4a6458b0cfd96068677b6f3eb6",
+      "shipped": {
+        "file": "restoration/maps/2012/besara.webp",
+        "sha256": "129b6003b74df3806d8a9b974221ba400ec46287f8d962f54725863d66e3f196",
+        "bytes": 136726,
+        "w": 760,
+        "h": 459
+      }
+    },
+    "99": {
+      "region": "Kalavana",
+      "source": "http://c1.glitch.bz/img/maps_encyclopedia/kalavana_77122.jpg",
+      "wayback": "20131119141504",
+      "archived": "https://web.archive.org/web/20131119141504id_/http://c1.glitch.bz/img/maps_encyclopedia/kalavana_77122.jpg",
+      "local": "research/wayback/raw/c1-img/maps_encyclopedia/kalavana_77122.jpg",
+      "w": 760,
+      "h": 460,
+      "bytes": 101203,
+      "sha256": "f8284eddf6b7f44209e5ff3570af039622c1e90ea1fc115fc09882797a66f6b0",
+      "shipped": {
+        "file": "restoration/maps/2012/kalavana.webp",
+        "sha256": "cd338feff49962f1df4a15443c8d601960d851b1c459d366fe789b6f28ee757a",
+        "bytes": 96428,
+        "w": 760,
+        "h": 460
+      }
+    },
+    "100": {
+      "region": "Vantalu",
+      "source": "http://c1.glitch.bz/img/maps_encyclopedia/vantalu_122166.jpg",
+      "wayback": "20131119141516",
+      "archived": "https://web.archive.org/web/20131119141516id_/http://c1.glitch.bz/img/maps_encyclopedia/vantalu_122166.jpg",
+      "local": "research/coverage/hunt-maps-2026-11-04/encyclopedia-760/vantalu_122166.jpg",
+      "w": 760,
+      "h": 459,
+      "bytes": 139604,
+      "sha256": "147920917340331055003fda9e346f3eeaefbc00ec5359f13758f0b5d563d4b2",
+      "shipped": {
+        "file": "restoration/maps/2012/vantalu.webp",
+        "sha256": "524bd550c02e43e226399a5c89a2babb4edbcb725e1998ec5730e1167e1453a4",
+        "bytes": 110252,
+        "w": 760,
+        "h": 459
+      }
+    },
+    "101": {
+      "region": "Aranna",
+      "source": "http://c1.glitch.bz/img/maps_encyclopedia/aranna_124371.jpg",
+      "wayback": "20131119141453",
+      "archived": "https://web.archive.org/web/20131119141453id_/http://c1.glitch.bz/img/maps_encyclopedia/aranna_124371.jpg",
+      "local": "research/wayback/raw/c1-img/maps_encyclopedia/aranna_124371.jpg",
+      "w": 760,
+      "h": 459,
+      "bytes": 130977,
+      "sha256": "c67f06b6c5d60b86abf702942271da141ce61e8841a92fd15f93ec5a68a805fd",
+      "shipped": {
+        "file": "restoration/maps/2012/aranna.webp",
+        "sha256": "c22cd6e865e4f5810ad668d284c41c53a1b00f8dab1ddc64a125bb9db07a7c92",
+        "bytes": 102544,
+        "w": 760,
+        "h": 459
+      }
+    },
+    "102": {
+      "region": "Ormonos",
+      "source": "http://c1.glitch.bz/img/maps_encyclopedia/ormonos_120329.jpg",
+      "wayback": "20131119141508",
+      "archived": "https://web.archive.org/web/20131119141508id_/http://c1.glitch.bz/img/maps_encyclopedia/ormonos_120329.jpg",
+      "local": "research/wayback/raw/c1-img/maps_encyclopedia/ormonos_120329.jpg",
+      "w": 760,
+      "h": 459,
+      "bytes": 133164,
+      "sha256": "a0eef9265b3512ff22e58bc58c0bcb00c26fd87fdd36c26d83fa500ac443d575",
+      "shipped": {
+        "file": "restoration/maps/2012/ormonos.webp",
+        "sha256": "1b1b2516447d8712fa071a1b75c2f16db54ac0d1e9699db8f587e8a273cadf91",
+        "bytes": 101992,
+        "w": 760,
+        "h": 459
+      }
+    },
+    "105": {
+      "region": "Lida",
+      "source": "http://c1.glitch.bz/img/maps_encyclopedia/lida_124371.jpg",
+      "wayback": "20131119141505",
+      "archived": "https://web.archive.org/web/20131119141505id_/http://c1.glitch.bz/img/maps_encyclopedia/lida_124371.jpg",
+      "local": "research/wayback/raw/c1-img/maps_encyclopedia/lida_124371.jpg",
+      "w": 760,
+      "h": 459,
+      "bytes": 145114,
+      "sha256": "59200301fe742aa57f3f820902e4d3f5c0ee966190e14bcf97cd59d97bfa57b8",
+      "shipped": {
+        "file": "restoration/maps/2012/lida.webp",
+        "sha256": "958dfa92d38837be000bc425180e81158e073b89eafd7c9767990aa3252bdecb",
+        "bytes": 112694,
+        "w": 760,
+        "h": 459
+      }
+    },
+    "106": {
+      "region": "Pollokoo",
+      "source": "http://c1.glitch.bz/img/maps_encyclopedia/pollokoo_77552.jpg",
+      "wayback": "20131119141512",
+      "archived": "https://web.archive.org/web/20131119141512id_/http://c1.glitch.bz/img/maps_encyclopedia/pollokoo_77552.jpg",
+      "local": "research/wayback/raw/c1-img/maps_encyclopedia/pollokoo_77552.jpg",
+      "w": 760,
+      "h": 460,
+      "bytes": 135020,
+      "sha256": "30b099e14af5838fbc191da3d22369df411a2d2421fdbdba2c976d7643e94ffa",
+      "shipped": {
+        "file": "restoration/maps/2012/pollokoo.webp",
+        "sha256": "459d9b9bcb57f1be4ade8eeab71a1ff184fc0d8a29368204c668d7b9dc1c0b66",
+        "bytes": 94872,
+        "w": 760,
+        "h": 460
+      }
+    },
+    "107": {
+      "region": "Callopee",
+      "source": "http://c1.glitch.bz/img/maps_encyclopedia/callopee_124371.jpg",
+      "wayback": "20131119141456",
+      "archived": "https://web.archive.org/web/20131119141456id_/http://c1.glitch.bz/img/maps_encyclopedia/callopee_124371.jpg",
+      "local": "research/wayback/raw/c1-img/maps_encyclopedia/callopee_124371.jpg",
+      "w": 760,
+      "h": 459,
+      "bytes": 120918,
+      "sha256": "f609410b40c43caebda97c0913d06ad3f44d343f5702cf002fa3b3f0dce841e5",
+      "shipped": {
+        "file": "restoration/maps/2012/callopee.webp",
+        "sha256": "385e574869894dccf69fe98c18c93dae4792918ce4b335842aaa9264748893bb",
+        "bytes": 83800,
+        "w": 760,
+        "h": 459
+      }
+    },
+    "109": {
+      "region": "Rasana",
+      "source": "http://c1.glitch.bz/img/maps_encyclopedia/rasana_100685.jpg",
+      "wayback": "20131119141512",
+      "archived": "https://web.archive.org/web/20131119141512id_/http://c1.glitch.bz/img/maps_encyclopedia/rasana_100685.jpg",
+      "local": "research/wayback/raw/c1-img/maps_encyclopedia/rasana_100685.jpg",
+      "w": 760,
+      "h": 459,
+      "bytes": 222987,
+      "sha256": "17eb75dbd60289847e8f521b2297bf403c9d6f85d852427d7395e8333f69f3de",
+      "shipped": {
+        "file": "restoration/maps/2012/rasana.webp",
+        "sha256": "d4290c0833f03ad35ace59171f2445261aa55af9d09ade90a530a30b30503580",
+        "bytes": 118652,
+        "w": 760,
+        "h": 459
+      }
+    },
+    "110": {
+      "region": "Massadoe",
+      "source": "http://c1.glitch.bz/img/maps_encyclopedia/massadoe_124371.jpg",
+      "wayback": "20131119141506",
+      "archived": "https://web.archive.org/web/20131119141506id_/http://c1.glitch.bz/img/maps_encyclopedia/massadoe_124371.jpg",
+      "local": "research/wayback/raw/c1-img/maps_encyclopedia/massadoe_124371.jpg",
+      "w": 760,
+      "h": 459,
+      "bytes": 121867,
+      "sha256": "7cba634627208bf3bbd660e82d6db364a8ff38f7fb44c5cc91814c5a5216820b",
+      "shipped": {
+        "file": "restoration/maps/2012/massadoe.webp",
+        "sha256": "e65af80b50ffd5bfa918e47ed144f9ddc8069c8d8dbe32cfa92db059ec5abd2f",
+        "bytes": 86228,
+        "w": 760,
+        "h": 459
+      }
+    },
+    "112": {
+      "region": "Brillah",
+      "source": "http://c1.glitch.bz/img/maps_encyclopedia/brillah_124445.jpg",
+      "wayback": "20131119141455",
+      "archived": "https://web.archive.org/web/20131119141455id_/http://c1.glitch.bz/img/maps_encyclopedia/brillah_124445.jpg",
+      "local": "research/wayback/raw/c1-img/maps_encyclopedia/brillah_124445.jpg",
+      "w": 760,
+      "h": 459,
+      "bytes": 133390,
+      "sha256": "287a758de8ef0823badee841031913e72f93c38ca27b3286e8c6a21ab93f77d4",
+      "shipped": {
+        "file": "restoration/maps/2012/brillah.webp",
+        "sha256": "a71141a70b6e6386c09ee10dbada8e0919e18d3781eef9c409e7a520b8c5917a",
+        "bytes": 103140,
+        "w": 760,
+        "h": 459
+      }
+    },
+    "113": {
+      "region": "Tahli",
+      "source": "http://c1.glitch.bz/img/maps_encyclopedia/tahli_92700.jpg",
+      "wayback": "20131119141514",
+      "archived": "https://web.archive.org/web/20131119141514id_/http://c1.glitch.bz/img/maps_encyclopedia/tahli_92700.jpg",
+      "local": "research/coverage/hunt-maps-2026-11-04/encyclopedia-760/tahli_92700.jpg",
+      "w": 760,
+      "h": 460,
+      "bytes": 320710,
+      "sha256": "0a5acc0a06389b7bb68e668e408a4f2c9c9ecac42814e3d573bd82e763e7f033",
+      "shipped": {
+        "file": "restoration/maps/2012/tahli.webp",
+        "sha256": "7229e16f1df54a97f398592392b7cce2e4bcd450362eae4c67f8f047d56acffd",
+        "bytes": 109900,
+        "w": 760,
+        "h": 460
+      }
+    },
+    "114": {
+      "region": "Firozi",
+      "source": "http://c1.glitch.bz/img/maps_encyclopedia/firozi_120329.jpg",
+      "wayback": "20131119141458",
+      "archived": "https://web.archive.org/web/20131119141458id_/http://c1.glitch.bz/img/maps_encyclopedia/firozi_120329.jpg",
+      "local": "research/wayback/raw/c1-img/maps_encyclopedia/firozi_120329.jpg",
+      "w": 760,
+      "h": 459,
+      "bytes": 107769,
+      "sha256": "1d347bac5e78e35ab787c3a6c8b3b9d471318a13a4bc64041fdc482662323706",
+      "shipped": {
+        "file": "restoration/maps/2012/firozi.webp",
+        "sha256": "965cbc34c99f067f51224dc7a0c22f27dd9389feb370468f1fbd9b326bece112",
+        "bytes": 105402,
+        "w": 760,
+        "h": 459
+      }
+    },
+    "116": {
+      "region": "Haraiva",
+      "source": "http://c1.glitch.bz/img/maps_encyclopedia/haraiva_124445.jpg",
+      "wayback": "20131119141500",
+      "archived": "https://web.archive.org/web/20131119141500id_/http://c1.glitch.bz/img/maps_encyclopedia/haraiva_124445.jpg",
+      "local": "research/wayback/raw/c1-img/maps_encyclopedia/haraiva_124445.jpg",
+      "w": 760,
+      "h": 459,
+      "bytes": 109193,
+      "sha256": "111947887e6fc3285fc57e56df8e5cc6052e7b5873886198404beb4b248eee3a",
+      "shipped": {
+        "file": "restoration/maps/2012/haraiva.webp",
+        "sha256": "eba94040cf816f1086f9d3d2a7a3da924473d0542de087557964b3c4e3958b30",
+        "bytes": 79186,
+        "w": 760,
+        "h": 459
+      }
+    },
+    "119": {
+      "region": "Folivoria",
+      "source": "http://c1.glitch.bz/img/maps_encyclopedia/folivoria_92700.jpg",
+      "wayback": "20131119141458",
+      "archived": "https://web.archive.org/web/20131119141458id_/http://c1.glitch.bz/img/maps_encyclopedia/folivoria_92700.jpg",
+      "local": "research/wayback/raw/c1-img/maps_encyclopedia/folivoria_92700.jpg",
+      "w": 760,
+      "h": 460,
+      "bytes": 322055,
+      "sha256": "3efbd9adf457a489acf59a611dbf1e4d7c5cb93aceb9a269d307e8c8935f7f8a",
+      "shipped": {
+        "file": "restoration/maps/2012/folivoria.webp",
+        "sha256": "d62d7184d362fa2fefcf76d7a8e3b33369ff5633fc3588538fd235c693e7df03",
+        "bytes": 120962,
+        "w": 760,
+        "h": 460
+      }
+    },
+    "120": {
+      "region": "Cauda",
+      "source": "http://c1.glitch.bz/img/maps_encyclopedia/cauda_92700.jpg",
+      "wayback": "20131119141456",
+      "archived": "https://web.archive.org/web/20131119141456id_/http://c1.glitch.bz/img/maps_encyclopedia/cauda_92700.jpg",
+      "local": "research/wayback/raw/c1-img/maps_encyclopedia/cauda_92700.jpg",
+      "w": 760,
+      "h": 460,
+      "bytes": 318429,
+      "sha256": "44963301bd27dceed4ac87cdc6d7f3a771cf21c832fde97db79aa87232274fa6",
+      "shipped": {
+        "file": "restoration/maps/2012/cauda.webp",
+        "sha256": "8ba7428bc30a97fffe95a5f3f26b67571d103c82cee3a7f9f1b6cce8543725ff",
+        "bytes": 125996,
+        "w": 760,
+        "h": 460
+      }
+    },
+    "121": {
+      "region": "Sura",
+      "source": "http://c1.glitch.bz/img/maps_encyclopedia/sura_92700.jpg",
+      "wayback": "20131119141514",
+      "archived": "https://web.archive.org/web/20131119141514id_/http://c1.glitch.bz/img/maps_encyclopedia/sura_92700.jpg",
+      "local": "research/wayback/raw/c1-img/maps_encyclopedia/sura_92700.jpg",
+      "w": 760,
+      "h": 459,
+      "bytes": 325811,
+      "sha256": "cb10fec7758824d7e81f48397fc539977de0772af3a78ff29189ecb4a5391f5b",
+      "shipped": {
+        "file": "restoration/maps/2012/sura.webp",
+        "sha256": "b0a59b7244a5bc2d115dafe7ed9f21ae165d81b889d15959f782e24edcaf4353",
+        "bytes": 130936,
+        "w": 760,
+        "h": 459
+      }
+    },
+    "123": {
+      "region": "Fenneq",
+      "source": "http://c1.glitch.bz/img/maps_encyclopedia/fenneq_92700.jpg",
+      "wayback": "20131119141457",
+      "archived": "https://web.archive.org/web/20131119141457id_/http://c1.glitch.bz/img/maps_encyclopedia/fenneq_92700.jpg",
+      "local": "research/wayback/raw/c1-img/maps_encyclopedia/fenneq_92700.jpg",
+      "w": 760,
+      "h": 460,
+      "bytes": 289000,
+      "sha256": "109ec37d0ebe5651ce8df9babb8f4ba2512cdae31901ac697af94c2e48850ff9",
+      "shipped": {
+        "file": "restoration/maps/2012/fenneq.webp",
+        "sha256": "fad3174fb66d62fc9b4a38f74633ada1500e06af78d626ef546d0b054fde5811",
+        "bytes": 99494,
+        "w": 760,
+        "h": 460
+      }
+    },
+    "126": {
+      "region": "Roobrik",
+      "source": "http://c1.glitch.bz/img/maps_encyclopedia/roobrik_100551.jpg",
+      "wayback": "20131119141512",
+      "archived": "https://web.archive.org/web/20131119141512id_/http://c1.glitch.bz/img/maps_encyclopedia/roobrik_100551.jpg",
+      "local": "research/wayback/raw/c1-img/maps_encyclopedia/roobrik_100551.jpg",
+      "w": 760,
+      "h": 459,
+      "bytes": 216262,
+      "sha256": "24023f409e463fbeb717a052b807bc1564d6433d5053957c018a3192a1cd9192",
+      "shipped": {
+        "file": "restoration/maps/2012/roobrik.webp",
+        "sha256": "9db9833bfa870a5c1364387768d3a8528f24433438fa48a84489bec33d0c1074",
+        "bytes": 130132,
+        "w": 760,
+        "h": 459
+      }
+    },
+    "128": {
+      "region": "Balzare",
+      "source": "http://c1.glitch.bz/img/maps_encyclopedia/balzare_100551.jpg",
+      "wayback": "20131119141454",
+      "archived": "https://web.archive.org/web/20131119141454id_/http://c1.glitch.bz/img/maps_encyclopedia/balzare_100551.jpg",
+      "local": "research/wayback/raw/c1-img/maps_encyclopedia/balzare_100551.jpg",
+      "w": 760,
+      "h": 459,
+      "bytes": 206569,
+      "sha256": "67396eb8cf1c707a334b8e988c17a0378c91cbb757eb287ddf026cfb208cddea",
+      "shipped": {
+        "file": "restoration/maps/2012/balzare.webp",
+        "sha256": "b54d62e59dc4ada004988b8e57af157894e9b8cd8e23170017c0516c4a87e71a",
+        "bytes": 123450,
+        "w": 760,
+        "h": 459
+      }
+    },
+    "131": {
+      "region": "Haoma",
+      "source": "http://c1.glitch.bz/img/maps_encyclopedia/haoma_115315.jpg",
+      "wayback": "20131119141500",
+      "archived": "https://web.archive.org/web/20131119141500id_/http://c1.glitch.bz/img/maps_encyclopedia/haoma_115315.jpg",
+      "local": "research/wayback/raw/c1-img/maps_encyclopedia/haoma_115315.jpg",
+      "w": 760,
+      "h": 459,
+      "bytes": 226538,
+      "sha256": "8daad54fb7bb66a505aec1438ed713d4a0c09a39e00b7ccdbf7ffe0b63b8c8f0",
+      "shipped": {
+        "file": "restoration/maps/2012/haoma.webp",
+        "sha256": "fca85d544dc014d37697a4f4e4ab04aa2efd3b18fb7f3c7fb6b6df18eaaed9b4",
+        "bytes": 134188,
+        "w": 760,
+        "h": 459
+      }
+    },
+    "133": {
+      "region": "Kloro",
+      "source": "http://c1.glitch.bz/img/maps_encyclopedia/kloro_115315.jpg",
+      "wayback": "20131119141505",
+      "archived": "https://web.archive.org/web/20131119141505id_/http://c1.glitch.bz/img/maps_encyclopedia/kloro_115315.jpg",
+      "local": "research/wayback/raw/c1-img/maps_encyclopedia/kloro_115315.jpg",
+      "w": 760,
+      "h": 459,
+      "bytes": 230610,
+      "sha256": "7cc35b56325018acc1f376d96383a67aceabbc855496f4b703c45df632df77ed",
+      "shipped": {
+        "file": "restoration/maps/2012/kloro.webp",
+        "sha256": "bbe7e23e146b96e6822877ad981150054a5103f0ff76e45db497efd82ec958ab",
+        "bytes": 131334,
+        "w": 760,
+        "h": 459
+      }
+    },
+    "136": {
+      "region": "Jal",
+      "source": "http://c1.glitch.bz/img/maps_encyclopedia/jal_124410.jpg",
+      "wayback": "20131119141503",
+      "archived": "https://web.archive.org/web/20131119141503id_/http://c1.glitch.bz/img/maps_encyclopedia/jal_124410.jpg",
+      "local": "research/wayback/raw/c1-img/maps_encyclopedia/jal_124410.jpg",
+      "w": 760,
+      "h": 459,
+      "bytes": 148110,
+      "sha256": "87ec1c6c6f7ef407ac2e7c86b7b3d060c685f3439a08ed8561f60c314970fc05",
+      "shipped": {
+        "file": "restoration/maps/2012/jal.webp",
+        "sha256": "ec3ebf785b3f46be211bf856e28fc281d1e1b9ce96c2996a90c788c952d1bab0",
+        "bytes": 115804,
+        "w": 760,
+        "h": 459
+      }
+    },
+    "137": {
+      "region": "Nottis",
+      "source": "http://c1.glitch.bz/img/maps_encyclopedia/nottis_124410.jpg",
+      "wayback": "20131118013245",
+      "archived": "https://web.archive.org/web/20131118013245id_/http://c1.glitch.bz/img/maps_encyclopedia/nottis_124410.jpg",
+      "local": "research/wayback/raw/c1-img/maps_encyclopedia/nottis_124410.jpg",
+      "w": 760,
+      "h": 459,
+      "bytes": 120064,
+      "sha256": "81560d61fa508d84e8b64642b15d19c5b7775ae2885914193a15306dbd0bfc19",
+      "shipped": {
+        "file": "restoration/maps/2012/nottis.webp",
+        "sha256": "9b235f3d3aee287a12f4527b1360be0351f59cf21a65ec68facb91c8d24faa3f",
+        "bytes": 77966,
+        "w": 760,
+        "h": 459
+      }
+    },
+    "140": {
+      "region": "Samudra",
+      "source": "http://c1.glitch.bz/img/maps_encyclopedia/samudra_124454.jpg",
+      "wayback": "20131119141513",
+      "archived": "https://web.archive.org/web/20131119141513id_/http://c1.glitch.bz/img/maps_encyclopedia/samudra_124454.jpg",
+      "local": "research/wayback/raw/c1-img/maps_encyclopedia/samudra_124454.jpg",
+      "w": 760,
+      "h": 459,
+      "bytes": 113266,
+      "sha256": "6496352a73ac5797db8549b38ef00572e70987e656f53839b6019570264c9d7d",
+      "shipped": {
+        "file": "restoration/maps/2012/samudra.webp",
+        "sha256": "85ab650f3d4aa86e4bce20e62e924846d65978cd3d21f80cad5e172de6181427",
+        "bytes": 80334,
+        "w": 760,
+        "h": 459
+      }
+    },
+    "141": {
+      "region": "Drifa",
+      "source": "http://c1.glitch.bz/img/maps_encyclopedia/drifa_124410.jpg",
+      "wayback": "20131119141457",
+      "archived": "https://web.archive.org/web/20131119141457id_/http://c1.glitch.bz/img/maps_encyclopedia/drifa_124410.jpg",
+      "local": "research/wayback/raw/c1-img/maps_encyclopedia/drifa_124410.jpg",
+      "w": 760,
+      "h": 459,
+      "bytes": 76879,
+      "sha256": "e2846b7ef960c2569f8a21e64de39a084a71fcae9e0af0b966bd9c327b1b68b8",
+      "shipped": {
+        "file": "restoration/maps/2012/drifa.webp",
+        "sha256": "1c189f25202ea0f441e336f51ede9d43c5c44931a977841e8c06a04c7d8fce96",
+        "bytes": 43926,
+        "w": 760,
+        "h": 459
+      }
+    },
+    "143": {
+      "region": "Vortex of Random",
+      "source": "http://c1.glitch.bz/img/maps_encyclopedia/vortex_of_random_124454.jpg",
+      "wayback": "20131119141517",
+      "archived": "https://web.archive.org/web/20131119141517id_/http://c1.glitch.bz/img/maps_encyclopedia/vortex_of_random_124454.jpg",
+      "local": "research/coverage/hunt-maps-2026-11-04/encyclopedia-760/vortex_of_random_124454.jpg",
+      "w": 760,
+      "h": 459,
+      "bytes": 134692,
+      "sha256": "172e8b2b659df885016f16b00753bcac4ab82c74443051f27d2ffd4150b4c68c",
+      "shipped": {
+        "file": "restoration/maps/2012/vortex.webp",
+        "sha256": "f68f5395c0fd13762abf4ac4f7d6810a940d53588198049d47e4fd996c3700e4",
+        "bytes": 91222,
+        "w": 760,
+        "h": 459
+      }
+    }
+  }
+}

@@ -18,6 +18,13 @@
  * AI-generated, dedicated CC0 1.0, when a published zone uses it and its provenance is recorded:
  * every gz_ deco file is listed in tools/provenance/new-art.json with the sha256 of its bytes and a
  * licence the publish policy allows, and nothing else new comes in.
+ *
+ * 2026-11-14 (Austin: "For the before images, I want to use the originals we have from screenshots, not our
+ * before AI generations"; lane mapsbefore): Tiny Speck's 2012 Encyclopedia region maps (c1.glitch.bz
+ * img/maps_encyclopedia, saved from the Wayback Machine) ship as Tiny Speck's own originals, the "before" of
+ * each region on the Maps page, on the footing of the 2026-10-28 call on the original recordings. They are
+ * allowed by path and sha256 only: tools/provenance/encyclopedia-maps.json lists each one's saved copy and
+ * sha256 and the shipped WebP's path and sha256. Player snaps, videos and anything else from research/ stay out.
  */
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
@@ -94,6 +101,46 @@ describe('non-CC0 files stay out (G316/G317)', () => {
       for (const g of gone) if (text.includes(g)) named.push(`${relative(root, f)} -> ${g}`);
     }
     assert.deepEqual(named, []);
+  });
+});
+
+describe('Tiny Speck\'s 2012 Encyclopedia maps (2026-11-14)', () => {
+  it('ship only from the list, at their own paths byte for byte, under restoration/maps/2012/, and nothing else from research/', () => {
+    const list = JSON.parse(readFileSync(join(root, 'tools/provenance/encyclopedia-maps.json'), 'utf8')).regions;
+    const rows = Object.values(list);
+    assert.ok(rows.length >= 50 && rows.length <= 51, `${rows.length} regions`);
+    const sha = (f) => createHash('sha256').update(readFileSync(f)).digest('hex');
+    const shipped = new Map();
+    const saved = new Map();
+    for (const e of rows) {
+      assert.match(e.source, /^http:\/\/c1\.glitch\.bz\/img\/maps_encyclopedia\/[a-z_]+_\d+\.jpg$/, e.region);
+      assert.match(e.local, /^research\/(wayback\/raw\/c1-img\/maps_encyclopedia|coverage\/hunt-maps-2026-11-04\/encyclopedia-760)\/[a-z_]+_\d+\.jpg$/, e.region);
+      assert.match(e.shipped.file, /^restoration\/maps\/2012\/[a-z]+\.webp$/, e.region);
+      assert.equal(sha(join(pub, e.shipped.file)), e.shipped.sha256, `${e.shipped.file}: not the bytes the list names`);
+      shipped.set(e.shipped.sha256, e.shipped.file);
+      saved.set(e.sha256, e.local);
+    }
+    const dir = join(pub, 'restoration/maps');
+    assert.deepEqual(walk(dir).map((f) => relative(pub, f)).sort(), rows.map((e) => e.shipped.file).sort(), 'only the listed maps under restoration/maps/');
+    // No saved 2012 JPEG anywhere, and no 2012 map anywhere but its own path (compared by size first, then sha256).
+    const savedBytes = new Set(rows.map((e) => e.bytes));
+    const shippedBytes = new Set(rows.map((e) => e.shipped.bytes));
+    const hits = [];
+    for (const d of [pub, join(root, 'assets-src')]) {
+      for (const f of walk(d)) {
+        if (!/\.(png|jpe?g|webp|gif)$/i.test(f)) continue;
+        const size = statSync(f).size;
+        if (!savedBytes.has(size) && !shippedBytes.has(size)) continue;
+        const h = sha(f);
+        if (saved.has(h)) hits.push(`${relative(root, f)} is the saved ${saved.get(h)}`);
+        if (shipped.has(h) && relative(pub, f) !== shipped.get(h)) hits.push(`${relative(root, f)} is ${shipped.get(h)} out of place`);
+      }
+    }
+    assert.deepEqual(hits, []);
+    // The game never draws them: its region maps are the CC0 paintings (repainted-maps.json). The content-key map
+    // (js/data-versions.js) only keys their URLs for the Maps page.
+    const code = [join(pub, 'game.js'), ...walk(join(pub, 'js')).filter((f) => f.endsWith('.js') && !f.endsWith(join('js', 'data-versions.js')))];
+    assert.deepEqual(code.filter((f) => readFileSync(f, 'utf8').includes('restoration/maps/2012')).map((f) => relative(root, f)), []);
   });
 });
 

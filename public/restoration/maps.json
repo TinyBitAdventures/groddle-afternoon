@@ -1,5 +1,6 @@
 {
   "note": "Built by tools/restoration-maps/build-data.mjs from the provenance records; do not edit.",
+  "view": "wipe",
   "states": {
     "restored": {
       "label": "Restored from 2012",
@@ -32,13 +33,15 @@
           "src": "/assets/maps/art/world/world_map_unlocked.jpg",
           "w": 760,
           "h": 460,
-          "label": "Tiny Speck’s chart (760 x 460)"
+          "label": "Tiny Speck’s chart",
+          "alt": "Tiny Speck’s chart, 760 x 460"
         },
         "after": {
           "src": "/assets/maps/art/world/world_map_unlocked@2x.webp",
           "w": 1520,
           "h": 920,
-          "label": "Sharpened at 2x (1520 x 920), in the game now"
+          "label": "Now, at 2x",
+          "alt": "The chart sharpened at 2x, 1520 x 920, in the game now"
         }
       },
       {
@@ -49,13 +52,15 @@
           "src": "/assets/maps/art/world/world_map_locked.jpg",
           "w": 760,
           "h": 460,
-          "label": "Tiny Speck’s chart (760 x 460)"
+          "label": "Tiny Speck’s chart",
+          "alt": "Tiny Speck’s chart, 760 x 460"
         },
         "after": {
           "src": "/assets/maps/art/world/world_map_locked@2x.webp",
           "w": 1520,
           "h": 920,
-          "label": "Sharpened at 2x (1520 x 920), in the game now"
+          "label": "Now, at 2x",
+          "alt": "The chart sharpened at 2x, 1520 x 920, in the game now"
         }
       }
     ]
@@ -66,7 +71,7 @@
       "name": "Alakol",
       "anchor": "map-alakol",
       "state": "restored",
-      "caption": "Tiny Speck’s own 2012 painting of Alakol, restored: the 2012 Encyclopedia showed it under the game’s roads, names and buttons, and that picture was given to an image model to take the markings off and sharpen without moving anything, then toned back to the 2012 colour.",
+      "caption": "Tiny Speck’s own painting of Alakol, restored from its 2012 Encyclopedia map: the painting with the game’s roads, names and buttons on it. An image model took those markings off and sharpened it without moving anything, then it was toned back to the 2012 colour.",
       "differences": "The cleanest of the first four: cliffs, the rock ridge, the clouds, the beach and the huts sit where 2012 had them. The model returned it a little greener and more saturated; the toning step brings it back to 2012's colour.",
       "facts": [
         {
@@ -76,20 +81,25 @@
         {
           "label": "Replaced",
           "text": "The painting made from the thumbnail on 7 November 2026"
+        },
+        {
+          "label": "2012",
+          "text": "Tiny Speck’s Encyclopedia map, as the Internet Archive saved it on 19 November 2013"
         }
       ],
       "before": {
-        "src": "/restoration/maps/replaced/alakol.a0cad877.webp",
+        "src": "/restoration/maps/2012/alakol.webp",
         "w": 760,
-        "h": 460,
-        "label": "Before: painted from the thumbnail on 7 November 2026",
-        "src2": "/restoration/maps/replaced/alakol@2x.dd6e7073.webp"
+        "h": 459,
+        "label": "2012",
+        "alt": "Tiny Speck’s 2012 Encyclopedia map of Alakol, with the game’s roads and names on it"
       },
       "after": {
         "src": "/assets/maps/art/bg/alakol.webp",
         "w": 760,
         "h": 460,
-        "label": "Restored, in the game now",
+        "label": "Now",
+        "alt": "Alakol restored, as the game draws it now",
         "src2": "/assets/maps/art/bg/alakol@2x.webp"
       },
       "card": {
@@ -105,7 +115,7 @@
       "name": "Andra",
       "anchor": "map-andra",
       "state": "restored",
-      "caption": "Tiny Speck’s own 2012 painting of Andra, restored: the 2012 Encyclopedia showed it under the game’s roads, names and buttons, and that picture was given to an image model to take the markings off and sharpen without moving anything, then toned back to the 2012 colour.",
+      "caption": "Tiny Speck’s own painting of Andra, restored from its 2012 Encyclopedia map: the painting with the game’s roads, names and buttons on it. An image model took those markings off and sharpened it without moving anything, then it was toned back to the 2012 colour.",
       "differences": "The layout holds, but the model added two dark squiggles in the bottom sand where a street name ran in 2012. It returned the land more saturated; the toning step brings it back to 2012's colour.",
       "facts": [
         {
@@ -115,20 +125,25 @@
         {
           "label": "Replaced",
           "text": "The painting made from the thumbnail on 6 November 2026"
+        },
+        {
+          "label": "2012",
+          "text": "Tiny Speck’s Encyclopedia map, as the Internet Archive saved it on 23 March 2013"
         }
       ],
       "before": {
-        "src": "/restoration/maps/replaced/andra.15eaf604.webp",
+        "src": "/restoration/maps/2012/andra.webp",
         "w": 760,
         "h": 460,
-        "label": "Before: painted from the thumbnail on 6 November 2026",
-        "src2": "/restoration/maps/replaced/andra@2x.61a1d490.webp"
+        "label": "2012",
+        "alt": "Tiny Speck’s 2012 Encyclopedia map of Andra, with the game’s roads and names on it"
       },
       "after": {
         "src": "/assets/maps/art/bg/andra.webp",
         "w": 760,
         "h": 460,
-        "label": "Restored, in the game now",
+        "label": "Now",
+        "alt": "Andra restored, as the game draws it now",
         "src2": "/assets/maps/art/bg/andra@2x.webp"
       },
       "card": {
@@ -144,7 +159,7 @@
       "name": "Aranna",
       "anchor": "map-aranna",
       "state": "restored",
-      "caption": "Tiny Speck’s own 2012 painting of Aranna, restored: the 2012 Encyclopedia showed it under the game’s roads, names and buttons, and that picture was given to an image model to take the markings off and sharpen without moving anything, then toned back to the 2012 colour.",
+      "caption": "Tiny Speck’s own painting of Aranna, restored from its 2012 Encyclopedia map: the painting with the game’s roads, names and buttons on it. An image model took those markings off and sharpened it without moving anything, then it was toned back to the 2012 colour.",
       "differences": "The cliff bands, the spires, the boulders and the scrub below sit where 2012 had them. The haze over the top edge came back as pale sky. The model returned it greener and more saturated; the toning step brings it back to 2012's colour.",
       "facts": [
         {
@@ -154,20 +169,25 @@
         {
           "label": "Replaced",
           "text": "The painting made from the thumbnail on 6 November 2026"
+        },
+        {
+          "label": "2012",
+          "text": "Tiny Speck’s Encyclopedia map, as the Internet Archive saved it on 19 November 2013"
         }
       ],
       "before": {
-        "src": "/restoration/maps/replaced/aranna.b4632814.webp",
+        "src": "/restoration/maps/2012/aranna.webp",
         "w": 760,
-        "h": 460,
-        "label": "Before: painted from the thumbnail on 6 November 2026",
-        "src2": "/restoration/maps/replaced/aranna@2x.97f21b1c.webp"
+        "h": 459,
+        "label": "2012",
+        "alt": "Tiny Speck’s 2012 Encyclopedia map of Aranna, with the game’s roads and names on it"
       },
       "after": {
         "src": "/assets/maps/art/bg/aranna.webp",
         "w": 760,
         "h": 460,
-        "label": "Restored, in the game now",
+        "label": "Now",
+        "alt": "Aranna restored, as the game draws it now",
         "src2": "/assets/maps/art/bg/aranna@2x.webp"
       },
       "card": {
@@ -183,7 +203,7 @@
       "name": "Balzare",
       "anchor": "map-balzare",
       "state": "restored",
-      "caption": "Tiny Speck’s own 2012 painting of Balzare, restored: the 2012 Encyclopedia showed it under the game’s roads, names and buttons, and that picture was given to an image model to take the markings off and sharpen without moving anything, then toned back to the 2012 colour.",
+      "caption": "Tiny Speck’s own painting of Balzare, restored from its 2012 Encyclopedia map: the painting with the game’s roads, names and buttons on it. An image model took those markings off and sharpened it without moving anything, then it was toned back to the 2012 colour.",
       "differences": "The coast and the forest's edges hold, with the dark track to the top-right exit and the yellow woods at the right. The 2012 sea of pale paper with dashes came back as grey-blue water ripples. Returned more saturated; the toning step takes most of the green out, back to 2012's dark grey forest.",
       "facts": [
         {
@@ -193,20 +213,25 @@
         {
           "label": "Replaced",
           "text": "The painting made from the thumbnail on 6 November 2026"
+        },
+        {
+          "label": "2012",
+          "text": "Tiny Speck’s Encyclopedia map, as the Internet Archive saved it on 19 November 2013"
         }
       ],
       "before": {
-        "src": "/restoration/maps/replaced/balzare.56aebfe4.webp",
+        "src": "/restoration/maps/2012/balzare.webp",
         "w": 760,
-        "h": 460,
-        "label": "Before: painted from the thumbnail on 6 November 2026",
-        "src2": "/restoration/maps/replaced/balzare@2x.99cc5fbd.webp"
+        "h": 459,
+        "label": "2012",
+        "alt": "Tiny Speck’s 2012 Encyclopedia map of Balzare, with the game’s roads and names on it"
       },
       "after": {
         "src": "/assets/maps/art/bg/balzare.webp",
         "w": 760,
         "h": 460,
-        "label": "Restored, in the game now",
+        "label": "Now",
+        "alt": "Balzare restored, as the game draws it now",
         "src2": "/assets/maps/art/bg/balzare@2x.webp"
       },
       "card": {
@@ -222,7 +247,7 @@
       "name": "Baqala",
       "anchor": "map-baqala",
       "state": "restored",
-      "caption": "Tiny Speck’s own 2012 painting of Baqala, restored: the 2012 Encyclopedia showed it under the game’s roads, names and buttons, and that picture was given to an image model to take the markings off and sharpen without moving anything, then toned back to the 2012 colour.",
+      "caption": "Tiny Speck’s own painting of Baqala, restored from its 2012 Encyclopedia map: the painting with the game’s roads, names and buttons on it. An image model took those markings off and sharpened it without moving anything, then it was toned back to the 2012 colour.",
       "differences": "Every bush and rock is where 2012 had it; the soft mounds of the plain are a little flatter. The model returned it greener; the toning step brings it back to 2012's colour.",
       "facts": [
         {
@@ -232,20 +257,25 @@
         {
           "label": "Replaced",
           "text": "The painting made from the thumbnail on 6 November 2026"
+        },
+        {
+          "label": "2012",
+          "text": "Tiny Speck’s Encyclopedia map, as the Internet Archive saved it on 19 November 2013"
         }
       ],
       "before": {
-        "src": "/restoration/maps/replaced/baqala.8c6571c8.webp",
+        "src": "/restoration/maps/2012/baqala.webp",
         "w": 760,
         "h": 460,
-        "label": "Before: painted from the thumbnail on 6 November 2026",
-        "src2": "/restoration/maps/replaced/baqala@2x.9a30b752.webp"
+        "label": "2012",
+        "alt": "Tiny Speck’s 2012 Encyclopedia map of Baqala, with the game’s roads and names on it"
       },
       "after": {
         "src": "/assets/maps/art/bg/baqala.webp",
         "w": 760,
         "h": 460,
-        "label": "Restored, in the game now",
+        "label": "Now",
+        "alt": "Baqala restored, as the game draws it now",
         "src2": "/assets/maps/art/bg/baqala@2x.webp"
       },
       "card": {
@@ -261,7 +291,7 @@
       "name": "Besara",
       "anchor": "map-besara",
       "state": "restored",
-      "caption": "Tiny Speck’s own 2012 painting of Besara, restored: the 2012 Encyclopedia showed it under the game’s roads, names and buttons, and that picture was given to an image model to take the markings off and sharpen without moving anything, then toned back to the 2012 colour.",
+      "caption": "Tiny Speck’s own painting of Besara, restored from its 2012 Encyclopedia map: the painting with the game’s roads, names and buttons on it. An image model took those markings off and sharpened it without moving anything, then it was toned back to the 2012 colour.",
       "differences": "The hedges keep their places, but the grass lanes between them (where the 2012 roads ran) came back wider and the hedges a little smaller, so the land reads more open than 2012. The wooden boards at the Habitat and Preserve streets are part of the painting (MapHub drew only shop, shrine and subway icons) and stay. Returned darker and greener; the toning step brings it back.",
       "facts": [
         {
@@ -271,20 +301,25 @@
         {
           "label": "Replaced",
           "text": "The painting made from the thumbnail on 6 November 2026"
+        },
+        {
+          "label": "2012",
+          "text": "Tiny Speck’s Encyclopedia map, as the Internet Archive saved it on 19 November 2013"
         }
       ],
       "before": {
-        "src": "/restoration/maps/replaced/besara.6942be9e.webp",
+        "src": "/restoration/maps/2012/besara.webp",
         "w": 760,
-        "h": 460,
-        "label": "Before: painted from the thumbnail on 6 November 2026",
-        "src2": "/restoration/maps/replaced/besara@2x.0ae1bf8f.webp"
+        "h": 459,
+        "label": "2012",
+        "alt": "Tiny Speck’s 2012 Encyclopedia map of Besara, with the game’s roads and names on it"
       },
       "after": {
         "src": "/assets/maps/art/bg/besara.webp",
         "w": 760,
         "h": 460,
-        "label": "Restored, in the game now",
+        "label": "Now",
+        "alt": "Besara restored, as the game draws it now",
         "src2": "/assets/maps/art/bg/besara@2x.webp"
       },
       "card": {
@@ -300,7 +335,7 @@
       "name": "Bortola",
       "anchor": "map-bortola",
       "state": "restored",
-      "caption": "Tiny Speck’s own 2012 painting of Bortola, restored: the 2012 Encyclopedia showed it under the game’s roads, names and buttons, and that picture was given to an image model to take the markings off and sharpen without moving anything, then toned back to the 2012 colour.",
+      "caption": "Tiny Speck’s own painting of Bortola, restored from its 2012 Encyclopedia map: the painting with the game’s roads, names and buttons on it. An image model took those markings off and sharpened it without moving anything, then it was toned back to the 2012 colour.",
       "differences": "Woods, rock shelf, boulders and trees sit where 2012 had them; the woods' edges are smoother and the open lanes between them a little wider. The wooden boards at the Habitat and Park streets are part of the painting and stay. Returned darker and greener; the toning step brings it back.",
       "facts": [
         {
@@ -310,20 +345,25 @@
         {
           "label": "Replaced",
           "text": "The painting made from the thumbnail on 6 November 2026"
+        },
+        {
+          "label": "2012",
+          "text": "Tiny Speck’s Encyclopedia map, as the Internet Archive saved it on 19 November 2013"
         }
       ],
       "before": {
-        "src": "/restoration/maps/replaced/bortola.fc83a29b.webp",
+        "src": "/restoration/maps/2012/bortola.webp",
         "w": 760,
-        "h": 460,
-        "label": "Before: painted from the thumbnail on 6 November 2026",
-        "src2": "/restoration/maps/replaced/bortola@2x.8c0d08e2.webp"
+        "h": 459,
+        "label": "2012",
+        "alt": "Tiny Speck’s 2012 Encyclopedia map of Bortola, with the game’s roads and names on it"
       },
       "after": {
         "src": "/assets/maps/art/bg/bortola.webp",
         "w": 760,
         "h": 460,
-        "label": "Restored, in the game now",
+        "label": "Now",
+        "alt": "Bortola restored, as the game draws it now",
         "src2": "/assets/maps/art/bg/bortola@2x.webp"
       },
       "card": {
@@ -339,7 +379,7 @@
       "name": "Brillah",
       "anchor": "map-brillah",
       "state": "restored",
-      "caption": "Tiny Speck’s own 2012 painting of Brillah, restored: the 2012 Encyclopedia showed it under the game’s roads, names and buttons, and that picture was given to an image model to take the markings off and sharpen without moving anything, then toned back to the 2012 colour.",
+      "caption": "Tiny Speck’s own painting of Brillah, restored from its 2012 Encyclopedia map: the painting with the game’s roads, names and buttons on it. An image model took those markings off and sharpened it without moving anything, then it was toned back to the 2012 colour.",
       "differences": "The two plateaus, the cliffs at the left, the trees, rocks and flower patches sit where 2012 had them; the dry sand on the right is a little smoother than 2012's patchy ground. Returned greener; the toning step brings it back.",
       "facts": [
         {
@@ -349,20 +389,25 @@
         {
           "label": "Replaced",
           "text": "The painting made from the thumbnail on 6 November 2026"
+        },
+        {
+          "label": "2012",
+          "text": "Tiny Speck’s Encyclopedia map, as the Internet Archive saved it on 19 November 2013"
         }
       ],
       "before": {
-        "src": "/restoration/maps/replaced/brillah.f0ab8572.webp",
+        "src": "/restoration/maps/2012/brillah.webp",
         "w": 760,
-        "h": 460,
-        "label": "Before: painted from the thumbnail on 6 November 2026",
-        "src2": "/restoration/maps/replaced/brillah@2x.93eecca9.webp"
+        "h": 459,
+        "label": "2012",
+        "alt": "Tiny Speck’s 2012 Encyclopedia map of Brillah, with the game’s roads and names on it"
       },
       "after": {
         "src": "/assets/maps/art/bg/brillah.webp",
         "w": 760,
         "h": 460,
-        "label": "Restored, in the game now",
+        "label": "Now",
+        "alt": "Brillah restored, as the game draws it now",
         "src2": "/assets/maps/art/bg/brillah@2x.webp"
       },
       "card": {
@@ -378,7 +423,7 @@
       "name": "Callopee",
       "anchor": "map-callopee",
       "state": "restored",
-      "caption": "Tiny Speck’s own 2012 painting of Callopee, restored: the 2012 Encyclopedia showed it under the game’s roads, names and buttons, and that picture was given to an image model to take the markings off and sharpen without moving anything, then toned back to the 2012 colour.",
+      "caption": "Tiny Speck’s own painting of Callopee, restored from its 2012 Encyclopedia map: the painting with the game’s roads, names and buttons on it. An image model took those markings off and sharpened it without moving anything, then it was toned back to the 2012 colour.",
       "differences": "The cave's outline and its chambers hold; the ridge walls between chambers (where the 2012 roads ran) are a little reshaped, and a few grass tufts sit on ledges that 2012 left bare. Close to 2012's colour as delivered; the toning step is small.",
       "facts": [
         {
@@ -388,20 +433,25 @@
         {
           "label": "Replaced",
           "text": "The painting made from the thumbnail on 6 November 2026"
+        },
+        {
+          "label": "2012",
+          "text": "Tiny Speck’s Encyclopedia map, as the Internet Archive saved it on 19 November 2013"
         }
       ],
       "before": {
-        "src": "/restoration/maps/replaced/callopee.57e72ea3.webp",
+        "src": "/restoration/maps/2012/callopee.webp",
         "w": 760,
-        "h": 460,
-        "label": "Before: painted from the thumbnail on 6 November 2026",
-        "src2": "/restoration/maps/replaced/callopee@2x.a2385600.webp"
+        "h": 459,
+        "label": "2012",
+        "alt": "Tiny Speck’s 2012 Encyclopedia map of Callopee, with the game’s roads and names on it"
       },
       "after": {
         "src": "/assets/maps/art/bg/callopee.webp",
         "w": 760,
         "h": 460,
-        "label": "Restored, in the game now",
+        "label": "Now",
+        "alt": "Callopee restored, as the game draws it now",
         "src2": "/assets/maps/art/bg/callopee@2x.webp"
       },
       "card": {
@@ -417,7 +467,7 @@
       "name": "Cauda",
       "anchor": "map-cauda",
       "state": "restored",
-      "caption": "Tiny Speck’s own 2012 painting of Cauda, restored: the 2012 Encyclopedia showed it under the game’s roads, names and buttons, and that picture was given to an image model to take the markings off and sharpen without moving anything, then toned back to the 2012 colour.",
+      "caption": "Tiny Speck’s own painting of Cauda, restored from its 2012 Encyclopedia map: the painting with the game’s roads, names and buttons on it. An image model took those markings off and sharpened it without moving anything, then it was toned back to the 2012 colour.",
       "differences": "Trees, bushes, flower patches, rocks and the wooden boards at the Preserve, Habitat and Park streets (part of the painting) sit where 2012 had them. Returned greener; the toning step brings it back.",
       "facts": [
         {
@@ -427,20 +477,25 @@
         {
           "label": "Replaced",
           "text": "The painting made from the thumbnail on 6 November 2026"
+        },
+        {
+          "label": "2012",
+          "text": "Tiny Speck’s Encyclopedia map, as the Internet Archive saved it on 19 November 2013"
         }
       ],
       "before": {
-        "src": "/restoration/maps/replaced/cauda.c2dacf5d.webp",
+        "src": "/restoration/maps/2012/cauda.webp",
         "w": 760,
         "h": 460,
-        "label": "Before: painted from the thumbnail on 6 November 2026",
-        "src2": "/restoration/maps/replaced/cauda@2x.4a9689a1.webp"
+        "label": "2012",
+        "alt": "Tiny Speck’s 2012 Encyclopedia map of Cauda, with the game’s roads and names on it"
       },
       "after": {
         "src": "/assets/maps/art/bg/cauda.webp",
         "w": 760,
         "h": 460,
-        "label": "Restored, in the game now",
+        "label": "Now",
+        "alt": "Cauda restored, as the game draws it now",
         "src2": "/assets/maps/art/bg/cauda@2x.webp"
       },
       "card": {
@@ -456,7 +511,7 @@
       "name": "Chakra Phool",
       "anchor": "map-chakra-phool",
       "state": "restored",
-      "caption": "Tiny Speck’s own 2012 painting of Chakra Phool, restored: the 2012 Encyclopedia showed it under the game’s roads, names and buttons, and that picture was given to an image model to take the markings off and sharpen without moving anything, then toned back to the 2012 colour.",
+      "caption": "Tiny Speck’s own painting of Chakra Phool, restored from its 2012 Encyclopedia map: the painting with the game’s roads, names and buttons on it. An image model took those markings off and sharpened it without moving anything, then it was toned back to the 2012 colour.",
       "differences": "The island, its coast, ponds and pods hold; the central pit came back a little deeper and smoother, its inner ledges softened, and the dry shrubs at the lower left are fewer. The 2012 sea of pale paper keeps its dashes. Returned darker; the toning step brings it back.",
       "facts": [
         {
@@ -466,20 +521,25 @@
         {
           "label": "Replaced",
           "text": "The painting made from the thumbnail on 6 November 2026"
+        },
+        {
+          "label": "2012",
+          "text": "Tiny Speck’s Encyclopedia map, as the Internet Archive saved it on 19 November 2013"
         }
       ],
       "before": {
-        "src": "/restoration/maps/replaced/chakraphool.135ad174.webp",
+        "src": "/restoration/maps/2012/chakraphool.webp",
         "w": 760,
-        "h": 460,
-        "label": "Before: painted from the thumbnail on 6 November 2026",
-        "src2": "/restoration/maps/replaced/chakraphool@2x.b3b5d0d4.webp"
+        "h": 459,
+        "label": "2012",
+        "alt": "Tiny Speck’s 2012 Encyclopedia map of Chakra Phool, with the game’s roads and names on it"
       },
       "after": {
         "src": "/assets/maps/art/bg/chakraphool.webp",
         "w": 760,
         "h": 460,
-        "label": "Restored, in the game now",
+        "label": "Now",
+        "alt": "Chakra Phool restored, as the game draws it now",
         "src2": "/assets/maps/art/bg/chakraphool@2x.webp"
       },
       "card": {
@@ -495,7 +555,7 @@
       "name": "Choru",
       "anchor": "map-choru",
       "state": "restored",
-      "caption": "Tiny Speck’s own 2012 painting of Choru, restored: the 2012 Encyclopedia showed it under the game’s roads, names and buttons, and that picture was given to an image model to take the markings off and sharpen without moving anything, then toned back to the 2012 colour.",
+      "caption": "Tiny Speck’s own painting of Choru, restored from its 2012 Encyclopedia map: the painting with the game’s roads, names and buttons on it. An image model took those markings off and sharpened it without moving anything, then it was toned back to the 2012 colour.",
       "differences": "Every bush, rock and the pond sit where 2012 had them; the soft hill right of the centre came back as a whorl in the grass. Returned greener; the toning step brings it back.",
       "facts": [
         {
@@ -505,20 +565,25 @@
         {
           "label": "Replaced",
           "text": "The painting made from the thumbnail on 6 November 2026"
+        },
+        {
+          "label": "2012",
+          "text": "Tiny Speck’s Encyclopedia map, as the Internet Archive saved it on 19 November 2013"
         }
       ],
       "before": {
-        "src": "/restoration/maps/replaced/choru.0c5247ba.webp",
+        "src": "/restoration/maps/2012/choru.webp",
         "w": 760,
-        "h": 460,
-        "label": "Before: painted from the thumbnail on 6 November 2026",
-        "src2": "/restoration/maps/replaced/choru@2x.00b69f0d.webp"
+        "h": 459,
+        "label": "2012",
+        "alt": "Tiny Speck’s 2012 Encyclopedia map of Choru, with the game’s roads and names on it"
       },
       "after": {
         "src": "/assets/maps/art/bg/choru.webp",
         "w": 760,
         "h": 460,
-        "label": "Restored, in the game now",
+        "label": "Now",
+        "alt": "Choru restored, as the game draws it now",
         "src2": "/assets/maps/art/bg/choru@2x.webp"
       },
       "card": {
@@ -534,7 +599,7 @@
       "name": "Drifa",
       "anchor": "map-drifa",
       "state": "restored",
-      "caption": "Tiny Speck’s own 2012 painting of Drifa, restored: the 2012 Encyclopedia showed it under the game’s roads, names and buttons, and that picture was given to an image model to take the markings off and sharpen without moving anything, then toned back to the 2012 colour.",
+      "caption": "Tiny Speck’s own painting of Drifa, restored from its 2012 Encyclopedia map: the painting with the game’s roads, names and buttons on it. An image model took those markings off and sharpened it without moving anything, then it was toned back to the 2012 colour.",
       "differences": "Every snowy conifer, frosted shrub, rock pile and the frozen pond sit where 2012 had them; the pond's upper lobe is a little rounder, and 2012's soft grey shading in the bottom-left corner and its scattered falling snowflakes are gone. Returned greyer and bluer than 2012's near-white; the toning step (matched to the snow, gamma 2.28) brings it back.",
       "facts": [
         {
@@ -544,20 +609,25 @@
         {
           "label": "Replaced",
           "text": "The painting made from the thumbnail on 6 November 2026"
+        },
+        {
+          "label": "2012",
+          "text": "Tiny Speck’s Encyclopedia map, as the Internet Archive saved it on 19 November 2013"
         }
       ],
       "before": {
-        "src": "/restoration/maps/replaced/drifa.1225c974.webp",
+        "src": "/restoration/maps/2012/drifa.webp",
         "w": 760,
-        "h": 460,
-        "label": "Before: painted from the thumbnail on 6 November 2026",
-        "src2": "/restoration/maps/replaced/drifa@2x.9ad94491.webp"
+        "h": 459,
+        "label": "2012",
+        "alt": "Tiny Speck’s 2012 Encyclopedia map of Drifa, with the game’s roads and names on it"
       },
       "after": {
         "src": "/assets/maps/art/bg/drifa.webp",
         "w": 760,
         "h": 460,
-        "label": "Restored, in the game now",
+        "label": "Now",
+        "alt": "Drifa restored, as the game draws it now",
         "src2": "/assets/maps/art/bg/drifa@2x.webp"
       },
       "card": {
@@ -573,7 +643,7 @@
       "name": "Firozi",
       "anchor": "map-firozi",
       "state": "restored",
-      "caption": "Tiny Speck’s own 2012 painting of Firozi, restored: the 2012 Encyclopedia showed it under the game’s roads, names and buttons, and that picture was given to an image model to take the markings off and sharpen without moving anything, then toned back to the 2012 colour.",
+      "caption": "Tiny Speck’s own painting of Firozi, restored from its 2012 Encyclopedia map: the painting with the game’s roads, names and buttons on it. An image model took those markings off and sharpened it without moving anything, then it was toned back to the 2012 colour.",
       "differences": "Coast, islets, cliffs, the green shelf, the canyon and the rocky plateau sit where 2012 had them; the dashed lines on 2012's paper sea came back as soft wave strokes, and the plateau's dark cracks as softer ledges. Returned a little warmer and more saturated; the toning step brings it back.",
       "facts": [
         {
@@ -583,20 +653,25 @@
         {
           "label": "Replaced",
           "text": "The painting made from the thumbnail on 6 November 2026"
+        },
+        {
+          "label": "2012",
+          "text": "Tiny Speck’s Encyclopedia map, as the Internet Archive saved it on 19 November 2013"
         }
       ],
       "before": {
-        "src": "/restoration/maps/replaced/firozi.e4fc1741.webp",
+        "src": "/restoration/maps/2012/firozi.webp",
         "w": 760,
-        "h": 460,
-        "label": "Before: painted from the thumbnail on 6 November 2026",
-        "src2": "/restoration/maps/replaced/firozi@2x.581ed28a.webp"
+        "h": 459,
+        "label": "2012",
+        "alt": "Tiny Speck’s 2012 Encyclopedia map of Firozi, with the game’s roads and names on it"
       },
       "after": {
         "src": "/assets/maps/art/bg/firozi.webp",
         "w": 760,
         "h": 460,
-        "label": "Restored, in the game now",
+        "label": "Now",
+        "alt": "Firozi restored, as the game draws it now",
         "src2": "/assets/maps/art/bg/firozi@2x.webp"
       },
       "card": {
@@ -612,7 +687,7 @@
       "name": "Groddle Forest",
       "anchor": "map-groddle-forest",
       "state": "restored",
-      "caption": "Tiny Speck’s own 2012 painting of Groddle Forest, restored: the 2012 Encyclopedia showed it under the game’s roads, names and buttons, and that picture was given to an image model to take the markings off and sharpen without moving anything, then toned back to the 2012 colour.",
+      "caption": "Tiny Speck’s own painting of Groddle Forest, restored from its 2012 Encyclopedia map: the painting with the game’s roads, names and buttons on it. An image model took those markings off and sharpened it without moving anything, then it was toned back to the 2012 colour.",
       "differences": "The island's outline holds, but the open clearings in the middle of the 2012 forest came back filled with bushes. The model returned it about 12% darker and much greener; the toning step brings it back to 2012's colour.",
       "facts": [
         {
@@ -622,20 +697,25 @@
         {
           "label": "Replaced",
           "text": "The painting made from the thumbnail on 7 November 2026"
+        },
+        {
+          "label": "2012",
+          "text": "Tiny Speck’s Encyclopedia map, as the Internet Archive saved it on 18 September 2013"
         }
       ],
       "before": {
-        "src": "/restoration/maps/replaced/groddleforest.296e950b.webp",
+        "src": "/restoration/maps/2012/groddleforest.webp",
         "w": 760,
         "h": 460,
-        "label": "Before: painted from the thumbnail on 7 November 2026",
-        "src2": "/restoration/maps/replaced/groddleforest@2x.405377b9.webp"
+        "label": "2012",
+        "alt": "Tiny Speck’s 2012 Encyclopedia map of Groddle Forest, with the game’s roads and names on it"
       },
       "after": {
         "src": "/assets/maps/art/bg/groddleforest.webp",
         "w": 760,
         "h": 460,
-        "label": "Restored, in the game now",
+        "label": "Now",
+        "alt": "Groddle Forest restored, as the game draws it now",
         "src2": "/assets/maps/art/bg/groddleforest@2x.webp"
       },
       "card": {
@@ -651,7 +731,7 @@
       "name": "Groddle Meadow",
       "anchor": "map-groddle-meadow",
       "state": "restored",
-      "caption": "Tiny Speck’s own 2012 painting of Groddle Meadow, restored: the 2012 Encyclopedia showed it under the game’s roads, names and buttons, and that picture was given to an image model to take the markings off and sharpen without moving anything, then toned back to the 2012 colour.",
+      "caption": "Tiny Speck’s own painting of Groddle Meadow, restored from its 2012 Encyclopedia map: the painting with the game’s roads, names and buttons on it. An image model took those markings off and sharpened it without moving anything, then it was toned back to the 2012 colour.",
       "differences": "The 2012 sea of pale paper with dashes came back as blue water ripples; small trees that sat half under labels came back whole. The model returned the land greener and darker than 2012; the toning step brings it back to 2012's colour.",
       "facts": [
         {
@@ -661,20 +741,25 @@
         {
           "label": "Replaced",
           "text": "The painting made from the thumbnail on 7 November 2026"
+        },
+        {
+          "label": "2012",
+          "text": "Tiny Speck’s Encyclopedia map, as the Internet Archive saved it on 25 March 2013"
         }
       ],
       "before": {
-        "src": "/restoration/maps/replaced/groddlemeadow.82c60c31.webp",
+        "src": "/restoration/maps/2012/groddlemeadow.webp",
         "w": 760,
         "h": 460,
-        "label": "Before: painted from the thumbnail on 7 November 2026",
-        "src2": "/restoration/maps/replaced/groddlemeadow@2x.4808cae8.webp"
+        "label": "2012",
+        "alt": "Tiny Speck’s 2012 Encyclopedia map of Groddle Meadow, with the game’s roads and names on it"
       },
       "after": {
         "src": "/assets/maps/art/bg/groddlemeadow.webp",
         "w": 760,
         "h": 460,
-        "label": "Restored, in the game now",
+        "label": "Now",
+        "alt": "Groddle Meadow restored, as the game draws it now",
         "src2": "/assets/maps/art/bg/groddlemeadow@2x.webp"
       },
       "card": {
@@ -690,25 +775,31 @@
       "name": "Fenneq",
       "anchor": "map-fenneq",
       "state": "painted",
-      "caption": "Tiny Speck’s 760 x 460 painting of Fenneq is lost; only its thumbnail on the World map survived. This painting was made from that thumbnail and the region’s street layout, in the style of the decos Tiny Speck painted its streets with.",
+      "caption": "Tiny Speck’s painting of Fenneq survives only in the 2012 Encyclopedia map, under the game’s roads and names. The painting in the game now was made from the World map’s 150 x 91 thumbnail and the region’s street layout, in the style of the decos Tiny Speck painted its streets with, so the two differ.",
       "differences": "",
       "facts": [
         {
           "label": "Made",
           "text": "6 November 2026, with GPT Image 2.6 Sunburst"
+        },
+        {
+          "label": "2012",
+          "text": "Tiny Speck’s Encyclopedia map, as the Internet Archive saved it on 19 November 2013"
         }
       ],
       "before": {
-        "src": "/assets/maps/art/thumbs/sm_fenneq.jpg",
-        "w": 150,
-        "h": 91,
-        "label": "Tiny Speck’s thumbnail, all that survived (150 x 91)"
+        "src": "/restoration/maps/2012/fenneq.webp",
+        "w": 760,
+        "h": 460,
+        "label": "2012",
+        "alt": "Tiny Speck’s 2012 Encyclopedia map of Fenneq, with the game’s roads and names on it"
       },
       "after": {
         "src": "/assets/maps/art/bg/fenneq.webp",
         "w": 760,
         "h": 460,
-        "label": "Painted for Groddle, in the game now",
+        "label": "Now",
+        "alt": "Fenneq painted for Groddle, as the game draws it now",
         "src2": "/assets/maps/art/bg/fenneq@2x.webp"
       },
       "card": {
@@ -724,25 +815,31 @@
       "name": "Folivoria",
       "anchor": "map-folivoria",
       "state": "painted",
-      "caption": "Tiny Speck’s 760 x 460 painting of Folivoria is lost; only its thumbnail on the World map survived. This painting was made from that thumbnail and the region’s street layout, in the style of the decos Tiny Speck painted its streets with.",
+      "caption": "Tiny Speck’s painting of Folivoria survives only in the 2012 Encyclopedia map, under the game’s roads and names. The painting in the game now was made from the World map’s 150 x 91 thumbnail and the region’s street layout, in the style of the decos Tiny Speck painted its streets with, so the two differ.",
       "differences": "",
       "facts": [
         {
           "label": "Made",
           "text": "6 November 2026, with GPT Image 2.6 Sunburst"
+        },
+        {
+          "label": "2012",
+          "text": "Tiny Speck’s Encyclopedia map, as the Internet Archive saved it on 19 November 2013"
         }
       ],
       "before": {
-        "src": "/assets/maps/art/thumbs/sm_folivoria.jpg",
-        "w": 150,
-        "h": 91,
-        "label": "Tiny Speck’s thumbnail, all that survived (150 x 91)"
+        "src": "/restoration/maps/2012/folivoria.webp",
+        "w": 760,
+        "h": 460,
+        "label": "2012",
+        "alt": "Tiny Speck’s 2012 Encyclopedia map of Folivoria, with the game’s roads and names on it"
       },
       "after": {
         "src": "/assets/maps/art/bg/folivoria.webp",
         "w": 760,
         "h": 460,
-        "label": "Painted for Groddle, in the game now",
+        "label": "Now",
+        "alt": "Folivoria painted for Groddle, as the game draws it now",
         "src2": "/assets/maps/art/bg/folivoria@2x.webp"
       },
       "card": {
@@ -758,25 +855,31 @@
       "name": "Groddle Heights",
       "anchor": "map-groddle-heights",
       "state": "painted",
-      "caption": "Tiny Speck’s 760 x 460 painting of Groddle Heights is lost; only its thumbnail on the World map survived. This painting was made from that thumbnail and the region’s street layout, in the style of the decos Tiny Speck painted its streets with.",
+      "caption": "Tiny Speck’s painting of Groddle Heights survives only in the 2012 Encyclopedia map, under the game’s roads and names. The painting in the game now was made from the World map’s 150 x 91 thumbnail and the region’s street layout, in the style of the decos Tiny Speck painted its streets with, so the two differ.",
       "differences": "",
       "facts": [
         {
           "label": "Made",
           "text": "6 November 2026, with GPT Image 2.6 Sunburst"
+        },
+        {
+          "label": "2012",
+          "text": "Tiny Speck’s Encyclopedia map, as the Internet Archive saved it on 19 November 2013"
         }
       ],
       "before": {
-        "src": "/assets/maps/art/thumbs/sm_groddleheights.jpg",
-        "w": 150,
-        "h": 91,
-        "label": "Tiny Speck’s thumbnail, all that survived (150 x 91)"
+        "src": "/restoration/maps/2012/groddleheights.webp",
+        "w": 760,
+        "h": 460,
+        "label": "2012",
+        "alt": "Tiny Speck’s 2012 Encyclopedia map of Groddle Heights, with the game’s roads and names on it"
       },
       "after": {
         "src": "/assets/maps/art/bg/groddleheights.webp",
         "w": 760,
         "h": 460,
-        "label": "Painted for Groddle, in the game now",
+        "label": "Now",
+        "alt": "Groddle Heights painted for Groddle, as the game draws it now",
         "src2": "/assets/maps/art/bg/groddleheights@2x.webp"
       },
       "card": {
@@ -792,25 +895,31 @@
       "name": "Haoma",
       "anchor": "map-haoma",
       "state": "painted",
-      "caption": "Tiny Speck’s 760 x 460 painting of Haoma is lost; only its thumbnail on the World map survived. This painting was made from that thumbnail and the region’s street layout, in the style of the decos Tiny Speck painted its streets with.",
+      "caption": "Tiny Speck’s painting of Haoma survives only in the 2012 Encyclopedia map, under the game’s roads and names. The painting in the game now was made from the World map’s 150 x 91 thumbnail and the region’s street layout, in the style of the decos Tiny Speck painted its streets with, so the two differ.",
       "differences": "",
       "facts": [
         {
           "label": "Made",
           "text": "6 November 2026, with GPT Image 2.6 Sunburst"
+        },
+        {
+          "label": "2012",
+          "text": "Tiny Speck’s Encyclopedia map, as the Internet Archive saved it on 19 November 2013"
         }
       ],
       "before": {
-        "src": "/assets/maps/art/thumbs/sm_haoma.jpg",
-        "w": 150,
-        "h": 91,
-        "label": "Tiny Speck’s thumbnail, all that survived (150 x 91)"
+        "src": "/restoration/maps/2012/haoma.webp",
+        "w": 760,
+        "h": 459,
+        "label": "2012",
+        "alt": "Tiny Speck’s 2012 Encyclopedia map of Haoma, with the game’s roads and names on it"
       },
       "after": {
         "src": "/assets/maps/art/bg/haoma.webp",
         "w": 760,
         "h": 460,
-        "label": "Painted for Groddle, in the game now",
+        "label": "Now",
+        "alt": "Haoma painted for Groddle, as the game draws it now",
         "src2": "/assets/maps/art/bg/haoma@2x.webp"
       },
       "card": {
@@ -826,25 +935,31 @@
       "name": "Haraiva",
       "anchor": "map-haraiva",
       "state": "painted",
-      "caption": "Tiny Speck’s 760 x 460 painting of Haraiva is lost; only its thumbnail on the World map survived. This painting was made from that thumbnail and the region’s street layout, in the style of the decos Tiny Speck painted its streets with.",
+      "caption": "Tiny Speck’s painting of Haraiva survives only in the 2012 Encyclopedia map, under the game’s roads and names. The painting in the game now was made from the World map’s 150 x 91 thumbnail and the region’s street layout, in the style of the decos Tiny Speck painted its streets with, so the two differ.",
       "differences": "",
       "facts": [
         {
           "label": "Made",
           "text": "6 November 2026, with GPT Image 2.6 Sunburst"
+        },
+        {
+          "label": "2012",
+          "text": "Tiny Speck’s Encyclopedia map, as the Internet Archive saved it on 19 November 2013"
         }
       ],
       "before": {
-        "src": "/assets/maps/art/thumbs/sm_haraiva.jpg",
-        "w": 150,
-        "h": 91,
-        "label": "Tiny Speck’s thumbnail, all that survived (150 x 91)"
+        "src": "/restoration/maps/2012/haraiva.webp",
+        "w": 760,
+        "h": 459,
+        "label": "2012",
+        "alt": "Tiny Speck’s 2012 Encyclopedia map of Haraiva, with the game’s roads and names on it"
       },
       "after": {
         "src": "/assets/maps/art/bg/haraiva.webp",
         "w": 760,
         "h": 460,
-        "label": "Painted for Groddle, in the game now",
+        "label": "Now",
+        "alt": "Haraiva painted for Groddle, as the game draws it now",
         "src2": "/assets/maps/art/bg/haraiva@2x.webp"
       },
       "card": {
@@ -860,25 +975,31 @@
       "name": "Ix",
       "anchor": "map-ix",
       "state": "painted",
-      "caption": "Tiny Speck’s 760 x 460 painting of Ix is lost; only its thumbnail on the World map survived. This painting was made from that thumbnail and the region’s street layout, in the style of the decos Tiny Speck painted its streets with.",
+      "caption": "Tiny Speck’s painting of Ix survives only in the 2012 Encyclopedia map, under the game’s roads and names. The painting in the game now was made from the World map’s 150 x 91 thumbnail and the region’s street layout, in the style of the decos Tiny Speck painted its streets with, so the two differ.",
       "differences": "",
       "facts": [
         {
           "label": "Made",
           "text": "6 November 2026, with GPT Image 2.6 Sunburst"
+        },
+        {
+          "label": "2012",
+          "text": "Tiny Speck’s Encyclopedia map, as the Internet Archive saved it on 19 November 2013"
         }
       ],
       "before": {
-        "src": "/assets/maps/art/thumbs/sm_ix.jpg",
-        "w": 150,
-        "h": 91,
-        "label": "Tiny Speck’s thumbnail, all that survived (150 x 91)"
+        "src": "/restoration/maps/2012/ix.webp",
+        "w": 760,
+        "h": 460,
+        "label": "2012",
+        "alt": "Tiny Speck’s 2012 Encyclopedia map of Ix, with the game’s roads and names on it"
       },
       "after": {
         "src": "/assets/maps/art/bg/ix.webp",
         "w": 760,
         "h": 460,
-        "label": "Painted for Groddle, in the game now",
+        "label": "Now",
+        "alt": "Ix painted for Groddle, as the game draws it now",
         "src2": "/assets/maps/art/bg/ix@2x.webp"
       },
       "card": {
@@ -894,25 +1015,31 @@
       "name": "Jal",
       "anchor": "map-jal",
       "state": "painted",
-      "caption": "Tiny Speck’s 760 x 460 painting of Jal is lost; only its thumbnail on the World map survived. This painting was made from that thumbnail and the region’s street layout, in the style of the decos Tiny Speck painted its streets with.",
+      "caption": "Tiny Speck’s painting of Jal survives only in the 2012 Encyclopedia map, under the game’s roads and names. The painting in the game now was made from the World map’s 150 x 91 thumbnail and the region’s street layout, in the style of the decos Tiny Speck painted its streets with, so the two differ.",
       "differences": "",
       "facts": [
         {
           "label": "Made",
           "text": "6 November 2026, with GPT Image 2.6 Sunburst"
+        },
+        {
+          "label": "2012",
+          "text": "Tiny Speck’s Encyclopedia map, as the Internet Archive saved it on 19 November 2013"
         }
       ],
       "before": {
-        "src": "/assets/maps/art/thumbs/sm_jal.jpg",
-        "w": 150,
-        "h": 91,
-        "label": "Tiny Speck’s thumbnail, all that survived (150 x 91)"
+        "src": "/restoration/maps/2012/jal.webp",
+        "w": 760,
+        "h": 459,
+        "label": "2012",
+        "alt": "Tiny Speck’s 2012 Encyclopedia map of Jal, with the game’s roads and names on it"
       },
       "after": {
         "src": "/assets/maps/art/bg/jal.webp",
         "w": 760,
         "h": 460,
-        "label": "Painted for Groddle, in the game now",
+        "label": "Now",
+        "alt": "Jal painted for Groddle, as the game draws it now",
         "src2": "/assets/maps/art/bg/jal@2x.webp"
       },
       "card": {
@@ -928,25 +1055,31 @@
       "name": "Jethimadh",
       "anchor": "map-jethimadh",
       "state": "painted",
-      "caption": "Tiny Speck’s 760 x 460 painting of Jethimadh is lost; only its thumbnail on the World map survived. This painting was made from that thumbnail and the region’s street layout, in the style of the decos Tiny Speck painted its streets with.",
+      "caption": "Tiny Speck’s painting of Jethimadh survives only in the 2012 Encyclopedia map, under the game’s roads and names. The painting in the game now was made from the World map’s 150 x 91 thumbnail and the region’s street layout, in the style of the decos Tiny Speck painted its streets with, so the two differ.",
       "differences": "",
       "facts": [
         {
           "label": "Made",
           "text": "6 November 2026, with GPT Image 2.6 Sunburst"
+        },
+        {
+          "label": "2012",
+          "text": "Tiny Speck’s Encyclopedia map, as the Internet Archive saved it on 19 November 2013"
         }
       ],
       "before": {
-        "src": "/assets/maps/art/thumbs/sm_jethimadh.jpg",
-        "w": 150,
-        "h": 91,
-        "label": "Tiny Speck’s thumbnail, all that survived (150 x 91)"
+        "src": "/restoration/maps/2012/jethimadh.webp",
+        "w": 760,
+        "h": 460,
+        "label": "2012",
+        "alt": "Tiny Speck’s 2012 Encyclopedia map of Jethimadh, with the game’s roads and names on it"
       },
       "after": {
         "src": "/assets/maps/art/bg/jethimadh.webp",
         "w": 760,
         "h": 460,
-        "label": "Painted for Groddle, in the game now",
+        "label": "Now",
+        "alt": "Jethimadh painted for Groddle, as the game draws it now",
         "src2": "/assets/maps/art/bg/jethimadh@2x.webp"
       },
       "card": {
@@ -962,25 +1095,31 @@
       "name": "Kajuu",
       "anchor": "map-kajuu",
       "state": "painted",
-      "caption": "Tiny Speck’s 760 x 460 painting of Kajuu is lost; only its thumbnail on the World map survived. This painting was made from that thumbnail and the region’s street layout, in the style of the decos Tiny Speck painted its streets with.",
+      "caption": "Tiny Speck’s painting of Kajuu survives only in the 2012 Encyclopedia map, under the game’s roads and names. The painting in the game now was made from the World map’s 150 x 91 thumbnail and the region’s street layout, in the style of the decos Tiny Speck painted its streets with, so the two differ.",
       "differences": "",
       "facts": [
         {
           "label": "Made",
           "text": "6 November 2026, with GPT Image 2.6 Sunburst"
+        },
+        {
+          "label": "2012",
+          "text": "Tiny Speck’s Encyclopedia map, as the Internet Archive saved it on 19 November 2013"
         }
       ],
       "before": {
-        "src": "/assets/maps/art/thumbs/sm_kajuu.jpg",
-        "w": 150,
-        "h": 91,
-        "label": "Tiny Speck’s thumbnail, all that survived (150 x 91)"
+        "src": "/restoration/maps/2012/kajuu.webp",
+        "w": 760,
+        "h": 460,
+        "label": "2012",
+        "alt": "Tiny Speck’s 2012 Encyclopedia map of Kajuu, with the game’s roads and names on it"
       },
       "after": {
         "src": "/assets/maps/art/bg/kajuu.webp",
         "w": 760,
         "h": 460,
-        "label": "Painted for Groddle, in the game now",
+        "label": "Now",
+        "alt": "Kajuu painted for Groddle, as the game draws it now",
         "src2": "/assets/maps/art/bg/kajuu@2x.webp"
       },
       "card": {
@@ -996,25 +1135,31 @@
       "name": "Kalavana",
       "anchor": "map-kalavana",
       "state": "painted",
-      "caption": "Tiny Speck’s 760 x 460 painting of Kalavana is lost; only its thumbnail on the World map survived. This painting was made from that thumbnail and the region’s street layout, in the style of the decos Tiny Speck painted its streets with.",
+      "caption": "Tiny Speck’s painting of Kalavana survives only in the 2012 Encyclopedia map, under the game’s roads and names. The painting in the game now was made from the World map’s 150 x 91 thumbnail and the region’s street layout, in the style of the decos Tiny Speck painted its streets with, so the two differ.",
       "differences": "",
       "facts": [
         {
           "label": "Made",
           "text": "6 November 2026, with GPT Image 2.6 Sunburst"
+        },
+        {
+          "label": "2012",
+          "text": "Tiny Speck’s Encyclopedia map, as the Internet Archive saved it on 19 November 2013"
         }
       ],
       "before": {
-        "src": "/assets/maps/art/thumbs/sm_kalavana.jpg",
-        "w": 150,
-        "h": 91,
-        "label": "Tiny Speck’s thumbnail, all that survived (150 x 91)"
+        "src": "/restoration/maps/2012/kalavana.webp",
+        "w": 760,
+        "h": 460,
+        "label": "2012",
+        "alt": "Tiny Speck’s 2012 Encyclopedia map of Kalavana, with the game’s roads and names on it"
       },
       "after": {
         "src": "/assets/maps/art/bg/kalavana.webp",
         "w": 760,
         "h": 460,
-        "label": "Painted for Groddle, in the game now",
+        "label": "Now",
+        "alt": "Kalavana painted for Groddle, as the game draws it now",
         "src2": "/assets/maps/art/bg/kalavana@2x.webp"
       },
       "card": {
@@ -1030,25 +1175,31 @@
       "name": "Karnata",
       "anchor": "map-karnata",
       "state": "painted",
-      "caption": "Tiny Speck’s 760 x 460 painting of Karnata is lost; only its thumbnail on the World map survived. This painting was made from that thumbnail and the region’s street layout, in the style of the decos Tiny Speck painted its streets with.",
+      "caption": "Tiny Speck’s painting of Karnata survives only in the 2012 Encyclopedia map, under the game’s roads and names. The painting in the game now was made from the World map’s 150 x 91 thumbnail and the region’s street layout, in the style of the decos Tiny Speck painted its streets with, so the two differ.",
       "differences": "",
       "facts": [
         {
           "label": "Made",
           "text": "6 November 2026, with GPT Image 2.6 Sunburst"
+        },
+        {
+          "label": "2012",
+          "text": "Tiny Speck’s Encyclopedia map, as the Internet Archive saved it on 19 November 2013"
         }
       ],
       "before": {
-        "src": "/assets/maps/art/thumbs/sm_karnata.jpg",
-        "w": 150,
-        "h": 91,
-        "label": "Tiny Speck’s thumbnail, all that survived (150 x 91)"
+        "src": "/restoration/maps/2012/karnata.webp",
+        "w": 760,
+        "h": 459,
+        "label": "2012",
+        "alt": "Tiny Speck’s 2012 Encyclopedia map of Karnata, with the game’s roads and names on it"
       },
       "after": {
         "src": "/assets/maps/art/bg/karnata.webp",
         "w": 760,
         "h": 460,
-        "label": "Painted for Groddle, in the game now",
+        "label": "Now",
+        "alt": "Karnata painted for Groddle, as the game draws it now",
         "src2": "/assets/maps/art/bg/karnata@2x.webp"
       },
       "card": {
@@ -1064,25 +1215,31 @@
       "name": "Kloro",
       "anchor": "map-kloro",
       "state": "painted",
-      "caption": "Tiny Speck’s 760 x 460 painting of Kloro is lost; only its thumbnail on the World map survived. This painting was made from that thumbnail and the region’s street layout, in the style of the decos Tiny Speck painted its streets with.",
+      "caption": "Tiny Speck’s painting of Kloro survives only in the 2012 Encyclopedia map, under the game’s roads and names. The painting in the game now was made from the World map’s 150 x 91 thumbnail and the region’s street layout, in the style of the decos Tiny Speck painted its streets with, so the two differ.",
       "differences": "",
       "facts": [
         {
           "label": "Made",
           "text": "6 November 2026, with GPT Image 2.6 Sunburst"
+        },
+        {
+          "label": "2012",
+          "text": "Tiny Speck’s Encyclopedia map, as the Internet Archive saved it on 19 November 2013"
         }
       ],
       "before": {
-        "src": "/assets/maps/art/thumbs/sm_kloro.jpg",
-        "w": 150,
-        "h": 91,
-        "label": "Tiny Speck’s thumbnail, all that survived (150 x 91)"
+        "src": "/restoration/maps/2012/kloro.webp",
+        "w": 760,
+        "h": 459,
+        "label": "2012",
+        "alt": "Tiny Speck’s 2012 Encyclopedia map of Kloro, with the game’s roads and names on it"
       },
       "after": {
         "src": "/assets/maps/art/bg/kloro.webp",
         "w": 760,
         "h": 460,
-        "label": "Painted for Groddle, in the game now",
+        "label": "Now",
+        "alt": "Kloro painted for Groddle, as the game draws it now",
         "src2": "/assets/maps/art/bg/kloro@2x.webp"
       },
       "card": {
@@ -1098,25 +1255,31 @@
       "name": "Lida",
       "anchor": "map-lida",
       "state": "painted",
-      "caption": "Tiny Speck’s 760 x 460 painting of Lida is lost; only its thumbnail on the World map survived. This painting was made from that thumbnail and the region’s street layout, in the style of the decos Tiny Speck painted its streets with.",
+      "caption": "Tiny Speck’s painting of Lida survives only in the 2012 Encyclopedia map, under the game’s roads and names. The painting in the game now was made from the World map’s 150 x 91 thumbnail and the region’s street layout, in the style of the decos Tiny Speck painted its streets with, so the two differ.",
       "differences": "",
       "facts": [
         {
           "label": "Made",
           "text": "6 November 2026, with GPT Image 2.6 Sunburst"
+        },
+        {
+          "label": "2012",
+          "text": "Tiny Speck’s Encyclopedia map, as the Internet Archive saved it on 19 November 2013"
         }
       ],
       "before": {
-        "src": "/assets/maps/art/thumbs/sm_lida.jpg",
-        "w": 150,
-        "h": 91,
-        "label": "Tiny Speck’s thumbnail, all that survived (150 x 91)"
+        "src": "/restoration/maps/2012/lida.webp",
+        "w": 760,
+        "h": 459,
+        "label": "2012",
+        "alt": "Tiny Speck’s 2012 Encyclopedia map of Lida, with the game’s roads and names on it"
       },
       "after": {
         "src": "/assets/maps/art/bg/lida.webp",
         "w": 760,
         "h": 460,
-        "label": "Painted for Groddle, in the game now",
+        "label": "Now",
+        "alt": "Lida painted for Groddle, as the game draws it now",
         "src2": "/assets/maps/art/bg/lida@2x.webp"
       },
       "card": {
@@ -1132,25 +1295,31 @@
       "name": "Massadoe",
       "anchor": "map-massadoe",
       "state": "painted",
-      "caption": "Tiny Speck’s 760 x 460 painting of Massadoe is lost; only its thumbnail on the World map survived. This painting was made from that thumbnail and the region’s street layout, in the style of the decos Tiny Speck painted its streets with.",
+      "caption": "Tiny Speck’s painting of Massadoe survives only in the 2012 Encyclopedia map, under the game’s roads and names. The painting in the game now was made from the World map’s 150 x 91 thumbnail and the region’s street layout, in the style of the decos Tiny Speck painted its streets with, so the two differ.",
       "differences": "",
       "facts": [
         {
           "label": "Made",
           "text": "6 November 2026, with GPT Image 2.6 Sunburst"
+        },
+        {
+          "label": "2012",
+          "text": "Tiny Speck’s Encyclopedia map, as the Internet Archive saved it on 19 November 2013"
         }
       ],
       "before": {
-        "src": "/assets/maps/art/thumbs/sm_massadoe.jpg",
-        "w": 150,
-        "h": 91,
-        "label": "Tiny Speck’s thumbnail, all that survived (150 x 91)"
+        "src": "/restoration/maps/2012/massadoe.webp",
+        "w": 760,
+        "h": 459,
+        "label": "2012",
+        "alt": "Tiny Speck’s 2012 Encyclopedia map of Massadoe, with the game’s roads and names on it"
       },
       "after": {
         "src": "/assets/maps/art/bg/massadoe.webp",
         "w": 760,
         "h": 460,
-        "label": "Painted for Groddle, in the game now",
+        "label": "Now",
+        "alt": "Massadoe painted for Groddle, as the game draws it now",
         "src2": "/assets/maps/art/bg/massadoe@2x.webp"
       },
       "card": {
@@ -1166,25 +1335,31 @@
       "name": "Muufo",
       "anchor": "map-muufo",
       "state": "painted",
-      "caption": "Tiny Speck’s 760 x 460 painting of Muufo is lost; only its thumbnail on the World map survived. This painting was made from that thumbnail and the region’s street layout, in the style of the decos Tiny Speck painted its streets with.",
+      "caption": "Tiny Speck’s painting of Muufo survives only in the 2012 Encyclopedia map, under the game’s roads and names. The painting in the game now was made from the World map’s 150 x 91 thumbnail and the region’s street layout, in the style of the decos Tiny Speck painted its streets with, so the two differ.",
       "differences": "",
       "facts": [
         {
           "label": "Made",
           "text": "6 November 2026, with GPT Image 2.6 Sunburst"
+        },
+        {
+          "label": "2012",
+          "text": "Tiny Speck’s Encyclopedia map, as the Internet Archive saved it on 19 November 2013"
         }
       ],
       "before": {
-        "src": "/assets/maps/art/thumbs/sm_muufo.jpg",
-        "w": 150,
-        "h": 91,
-        "label": "Tiny Speck’s thumbnail, all that survived (150 x 91)"
+        "src": "/restoration/maps/2012/muufo.webp",
+        "w": 760,
+        "h": 459,
+        "label": "2012",
+        "alt": "Tiny Speck’s 2012 Encyclopedia map of Muufo, with the game’s roads and names on it"
       },
       "after": {
         "src": "/assets/maps/art/bg/muufo.webp",
         "w": 760,
         "h": 460,
-        "label": "Painted for Groddle, in the game now",
+        "label": "Now",
+        "alt": "Muufo painted for Groddle, as the game draws it now",
         "src2": "/assets/maps/art/bg/muufo@2x.webp"
       },
       "card": {
@@ -1200,25 +1375,31 @@
       "name": "Nottis",
       "anchor": "map-nottis",
       "state": "painted",
-      "caption": "Tiny Speck’s 760 x 460 painting of Nottis is lost; only its thumbnail on the World map survived. This painting was made from that thumbnail and the region’s street layout, in the style of the decos Tiny Speck painted its streets with.",
+      "caption": "Tiny Speck’s painting of Nottis survives only in the 2012 Encyclopedia map, under the game’s roads and names. The painting in the game now was made from the World map’s 150 x 91 thumbnail and the region’s street layout, in the style of the decos Tiny Speck painted its streets with, so the two differ.",
       "differences": "",
       "facts": [
         {
           "label": "Made",
           "text": "6 November 2026, with GPT Image 2.6 Sunburst"
+        },
+        {
+          "label": "2012",
+          "text": "Tiny Speck’s Encyclopedia map, as the Internet Archive saved it on 18 November 2013"
         }
       ],
       "before": {
-        "src": "/assets/maps/art/thumbs/sm_nottis.jpg",
-        "w": 150,
-        "h": 91,
-        "label": "Tiny Speck’s thumbnail, all that survived (150 x 91)"
+        "src": "/restoration/maps/2012/nottis.webp",
+        "w": 760,
+        "h": 459,
+        "label": "2012",
+        "alt": "Tiny Speck’s 2012 Encyclopedia map of Nottis, with the game’s roads and names on it"
       },
       "after": {
         "src": "/assets/maps/art/bg/nottis.webp",
         "w": 760,
         "h": 460,
-        "label": "Painted for Groddle, in the game now",
+        "label": "Now",
+        "alt": "Nottis painted for Groddle, as the game draws it now",
         "src2": "/assets/maps/art/bg/nottis@2x.webp"
       },
       "card": {
@@ -1234,25 +1415,31 @@
       "name": "Ormonos",
       "anchor": "map-ormonos",
       "state": "painted",
-      "caption": "Tiny Speck’s 760 x 460 painting of Ormonos is lost; only its thumbnail on the World map survived. This painting was made from that thumbnail and the region’s street layout, in the style of the decos Tiny Speck painted its streets with.",
+      "caption": "Tiny Speck’s painting of Ormonos survives only in the 2012 Encyclopedia map, under the game’s roads and names. The painting in the game now was made from the World map’s 150 x 91 thumbnail and the region’s street layout, in the style of the decos Tiny Speck painted its streets with, so the two differ.",
       "differences": "",
       "facts": [
         {
           "label": "Made",
           "text": "6 November 2026, with GPT Image 2.6 Sunburst"
+        },
+        {
+          "label": "2012",
+          "text": "Tiny Speck’s Encyclopedia map, as the Internet Archive saved it on 19 November 2013"
         }
       ],
       "before": {
-        "src": "/assets/maps/art/thumbs/sm_ormonos.jpg",
-        "w": 150,
-        "h": 91,
-        "label": "Tiny Speck’s thumbnail, all that survived (150 x 91)"
+        "src": "/restoration/maps/2012/ormonos.webp",
+        "w": 760,
+        "h": 459,
+        "label": "2012",
+        "alt": "Tiny Speck’s 2012 Encyclopedia map of Ormonos, with the game’s roads and names on it"
       },
       "after": {
         "src": "/assets/maps/art/bg/ormonos.webp",
         "w": 760,
         "h": 460,
-        "label": "Painted for Groddle, in the game now",
+        "label": "Now",
+        "alt": "Ormonos painted for Groddle, as the game draws it now",
         "src2": "/assets/maps/art/bg/ormonos@2x.webp"
       },
       "card": {
@@ -1268,25 +1455,31 @@
       "name": "Pollokoo",
       "anchor": "map-pollokoo",
       "state": "painted",
-      "caption": "Tiny Speck’s 760 x 460 painting of Pollokoo is lost; only its thumbnail on the World map survived. This painting was made from that thumbnail and the region’s street layout, in the style of the decos Tiny Speck painted its streets with.",
+      "caption": "Tiny Speck’s painting of Pollokoo survives only in the 2012 Encyclopedia map, under the game’s roads and names. The painting in the game now was made from the World map’s 150 x 91 thumbnail and the region’s street layout, in the style of the decos Tiny Speck painted its streets with, so the two differ.",
       "differences": "",
       "facts": [
         {
           "label": "Made",
           "text": "6 November 2026, with GPT Image 2.6 Sunburst"
+        },
+        {
+          "label": "2012",
+          "text": "Tiny Speck’s Encyclopedia map, as the Internet Archive saved it on 19 November 2013"
         }
       ],
       "before": {
-        "src": "/assets/maps/art/thumbs/sm_pollokoo.jpg",
-        "w": 150,
-        "h": 91,
-        "label": "Tiny Speck’s thumbnail, all that survived (150 x 91)"
+        "src": "/restoration/maps/2012/pollokoo.webp",
+        "w": 760,
+        "h": 460,
+        "label": "2012",
+        "alt": "Tiny Speck’s 2012 Encyclopedia map of Pollokoo, with the game’s roads and names on it"
       },
       "after": {
         "src": "/assets/maps/art/bg/pollokoo.webp",
         "w": 760,
         "h": 460,
-        "label": "Painted for Groddle, in the game now",
+        "label": "Now",
+        "alt": "Pollokoo painted for Groddle, as the game draws it now",
         "src2": "/assets/maps/art/bg/pollokoo@2x.webp"
       },
       "card": {
@@ -1302,25 +1495,31 @@
       "name": "Rasana",
       "anchor": "map-rasana",
       "state": "painted",
-      "caption": "Tiny Speck’s 760 x 460 painting of Rasana is lost; only its thumbnail on the World map survived. This painting was made from that thumbnail and the region’s street layout, in the style of the decos Tiny Speck painted its streets with.",
+      "caption": "Tiny Speck’s painting of Rasana survives only in the 2012 Encyclopedia map, under the game’s roads and names. The painting in the game now was made from the World map’s 150 x 91 thumbnail and the region’s street layout, in the style of the decos Tiny Speck painted its streets with, so the two differ.",
       "differences": "",
       "facts": [
         {
           "label": "Made",
           "text": "6 November 2026, with GPT Image 2.6 Sunburst"
+        },
+        {
+          "label": "2012",
+          "text": "Tiny Speck’s Encyclopedia map, as the Internet Archive saved it on 19 November 2013"
         }
       ],
       "before": {
-        "src": "/assets/maps/art/thumbs/sm_rasana.jpg",
-        "w": 150,
-        "h": 91,
-        "label": "Tiny Speck’s thumbnail, all that survived (150 x 91)"
+        "src": "/restoration/maps/2012/rasana.webp",
+        "w": 760,
+        "h": 459,
+        "label": "2012",
+        "alt": "Tiny Speck’s 2012 Encyclopedia map of Rasana, with the game’s roads and names on it"
       },
       "after": {
         "src": "/assets/maps/art/bg/rasana.webp",
         "w": 760,
         "h": 460,
-        "label": "Painted for Groddle, in the game now",
+        "label": "Now",
+        "alt": "Rasana painted for Groddle, as the game draws it now",
         "src2": "/assets/maps/art/bg/rasana@2x.webp"
       },
       "card": {
@@ -1336,25 +1535,31 @@
       "name": "Roobrik",
       "anchor": "map-roobrik",
       "state": "painted",
-      "caption": "Tiny Speck’s 760 x 460 painting of Roobrik is lost; only its thumbnail on the World map survived. This painting was made from that thumbnail and the region’s street layout, in the style of the decos Tiny Speck painted its streets with.",
+      "caption": "Tiny Speck’s painting of Roobrik survives only in the 2012 Encyclopedia map, under the game’s roads and names. The painting in the game now was made from the World map’s 150 x 91 thumbnail and the region’s street layout, in the style of the decos Tiny Speck painted its streets with, so the two differ.",
       "differences": "",
       "facts": [
         {
           "label": "Made",
           "text": "6 November 2026, with GPT Image 2.6 Sunburst"
+        },
+        {
+          "label": "2012",
+          "text": "Tiny Speck’s Encyclopedia map, as the Internet Archive saved it on 19 November 2013"
         }
       ],
       "before": {
-        "src": "/assets/maps/art/thumbs/sm_roobrik.jpg",
-        "w": 150,
-        "h": 91,
-        "label": "Tiny Speck’s thumbnail, all that survived (150 x 91)"
+        "src": "/restoration/maps/2012/roobrik.webp",
+        "w": 760,
+        "h": 459,
+        "label": "2012",
+        "alt": "Tiny Speck’s 2012 Encyclopedia map of Roobrik, with the game’s roads and names on it"
       },
       "after": {
         "src": "/assets/maps/art/bg/roobrik.webp",
         "w": 760,
         "h": 460,
-        "label": "Painted for Groddle, in the game now",
+        "label": "Now",
+        "alt": "Roobrik painted for Groddle, as the game draws it now",
         "src2": "/assets/maps/art/bg/roobrik@2x.webp"
       },
       "card": {
@@ -1370,25 +1575,31 @@
       "name": "Salatu",
       "anchor": "map-salatu",
       "state": "painted",
-      "caption": "Tiny Speck’s 760 x 460 painting of Salatu is lost; only its thumbnail on the World map survived. This painting was made from that thumbnail and the region’s street layout, in the style of the decos Tiny Speck painted its streets with.",
+      "caption": "Tiny Speck’s painting of Salatu survives only in the 2012 Encyclopedia map, under the game’s roads and names. The painting in the game now was made from the World map’s 150 x 91 thumbnail and the region’s street layout, in the style of the decos Tiny Speck painted its streets with, so the two differ.",
       "differences": "",
       "facts": [
         {
           "label": "Made",
           "text": "6 November 2026, with GPT Image 2.6 Sunburst"
+        },
+        {
+          "label": "2012",
+          "text": "Tiny Speck’s Encyclopedia map, as the Internet Archive saved it on 19 November 2013"
         }
       ],
       "before": {
-        "src": "/assets/maps/art/thumbs/sm_salatu.jpg",
-        "w": 150,
-        "h": 91,
-        "label": "Tiny Speck’s thumbnail, all that survived (150 x 91)"
+        "src": "/restoration/maps/2012/salatu.webp",
+        "w": 760,
+        "h": 459,
+        "label": "2012",
+        "alt": "Tiny Speck’s 2012 Encyclopedia map of Salatu, with the game’s roads and names on it"
       },
       "after": {
         "src": "/assets/maps/art/bg/salatu.webp",
         "w": 760,
         "h": 460,
-        "label": "Painted for Groddle, in the game now",
+        "label": "Now",
+        "alt": "Salatu painted for Groddle, as the game draws it now",
         "src2": "/assets/maps/art/bg/salatu@2x.webp"
       },
       "card": {
@@ -1404,25 +1615,31 @@
       "name": "Samudra",
       "anchor": "map-samudra",
       "state": "painted",
-      "caption": "Tiny Speck’s 760 x 460 painting of Samudra is lost; only its thumbnail on the World map survived. This painting was made from that thumbnail and the region’s street layout, in the style of the decos Tiny Speck painted its streets with.",
+      "caption": "Tiny Speck’s painting of Samudra survives only in the 2012 Encyclopedia map, under the game’s roads and names. The painting in the game now was made from the World map’s 150 x 91 thumbnail and the region’s street layout, in the style of the decos Tiny Speck painted its streets with, so the two differ.",
       "differences": "",
       "facts": [
         {
           "label": "Made",
           "text": "6 November 2026, with GPT Image 2.6 Sunburst"
+        },
+        {
+          "label": "2012",
+          "text": "Tiny Speck’s Encyclopedia map, as the Internet Archive saved it on 19 November 2013"
         }
       ],
       "before": {
-        "src": "/assets/maps/art/thumbs/sm_samudra.jpg",
-        "w": 150,
-        "h": 91,
-        "label": "Tiny Speck’s thumbnail, all that survived (150 x 91)"
+        "src": "/restoration/maps/2012/samudra.webp",
+        "w": 760,
+        "h": 459,
+        "label": "2012",
+        "alt": "Tiny Speck’s 2012 Encyclopedia map of Samudra, with the game’s roads and names on it"
       },
       "after": {
         "src": "/assets/maps/art/bg/samudra.webp",
         "w": 760,
         "h": 460,
-        "label": "Painted for Groddle, in the game now",
+        "label": "Now",
+        "alt": "Samudra painted for Groddle, as the game draws it now",
         "src2": "/assets/maps/art/bg/samudra@2x.webp"
       },
       "card": {
@@ -1438,25 +1655,31 @@
       "name": "Shimla Mirch",
       "anchor": "map-shimla-mirch",
       "state": "painted",
-      "caption": "Tiny Speck’s 760 x 460 painting of Shimla Mirch is lost; only its thumbnail on the World map survived. This painting was made from that thumbnail and the region’s street layout, in the style of the decos Tiny Speck painted its streets with.",
+      "caption": "Tiny Speck’s painting of Shimla Mirch survives only in the 2012 Encyclopedia map, under the game’s roads and names. The painting in the game now was made from the World map’s 150 x 91 thumbnail and the region’s street layout, in the style of the decos Tiny Speck painted its streets with, so the two differ.",
       "differences": "",
       "facts": [
         {
           "label": "Made",
           "text": "6 November 2026, with GPT Image 2.6 Sunburst"
+        },
+        {
+          "label": "2012",
+          "text": "Tiny Speck’s Encyclopedia map, as the Internet Archive saved it on 19 November 2013"
         }
       ],
       "before": {
-        "src": "/assets/maps/art/thumbs/sm_shimlamirch.jpg",
-        "w": 150,
-        "h": 91,
-        "label": "Tiny Speck’s thumbnail, all that survived (150 x 91)"
+        "src": "/restoration/maps/2012/shimlamirch.webp",
+        "w": 760,
+        "h": 460,
+        "label": "2012",
+        "alt": "Tiny Speck’s 2012 Encyclopedia map of Shimla Mirch, with the game’s roads and names on it"
       },
       "after": {
         "src": "/assets/maps/art/bg/shimlamirch.webp",
         "w": 760,
         "h": 460,
-        "label": "Painted for Groddle, in the game now",
+        "label": "Now",
+        "alt": "Shimla Mirch painted for Groddle, as the game draws it now",
         "src2": "/assets/maps/art/bg/shimlamirch@2x.webp"
       },
       "card": {
@@ -1472,25 +1695,31 @@
       "name": "Sura",
       "anchor": "map-sura",
       "state": "painted",
-      "caption": "Tiny Speck’s 760 x 460 painting of Sura is lost; only its thumbnail on the World map survived. This painting was made from that thumbnail and the region’s street layout, in the style of the decos Tiny Speck painted its streets with.",
+      "caption": "Tiny Speck’s painting of Sura survives only in the 2012 Encyclopedia map, under the game’s roads and names. The painting in the game now was made from the World map’s 150 x 91 thumbnail and the region’s street layout, in the style of the decos Tiny Speck painted its streets with, so the two differ.",
       "differences": "",
       "facts": [
         {
           "label": "Made",
           "text": "6 November 2026, with GPT Image 2.6 Sunburst"
+        },
+        {
+          "label": "2012",
+          "text": "Tiny Speck’s Encyclopedia map, as the Internet Archive saved it on 19 November 2013"
         }
       ],
       "before": {
-        "src": "/assets/maps/art/thumbs/sm_sura.jpg",
-        "w": 150,
-        "h": 91,
-        "label": "Tiny Speck’s thumbnail, all that survived (150 x 91)"
+        "src": "/restoration/maps/2012/sura.webp",
+        "w": 760,
+        "h": 459,
+        "label": "2012",
+        "alt": "Tiny Speck’s 2012 Encyclopedia map of Sura, with the game’s roads and names on it"
       },
       "after": {
         "src": "/assets/maps/art/bg/sura.webp",
         "w": 760,
         "h": 460,
-        "label": "Painted for Groddle, in the game now",
+        "label": "Now",
+        "alt": "Sura painted for Groddle, as the game draws it now",
         "src2": "/assets/maps/art/bg/sura@2x.webp"
       },
       "card": {
@@ -1506,25 +1735,31 @@
       "name": "Tahli",
       "anchor": "map-tahli",
       "state": "painted",
-      "caption": "Tiny Speck’s 760 x 460 painting of Tahli is lost; only its thumbnail on the World map survived. This painting was made from that thumbnail and the region’s street layout, in the style of the decos Tiny Speck painted its streets with.",
+      "caption": "Tiny Speck’s painting of Tahli survives only in the 2012 Encyclopedia map, under the game’s roads and names. The painting in the game now was made from the World map’s 150 x 91 thumbnail and the region’s street layout, in the style of the decos Tiny Speck painted its streets with, so the two differ.",
       "differences": "",
       "facts": [
         {
           "label": "Made",
           "text": "6 November 2026, with GPT Image 2.6 Sunburst"
+        },
+        {
+          "label": "2012",
+          "text": "Tiny Speck’s Encyclopedia map, as the Internet Archive saved it on 19 November 2013"
         }
       ],
       "before": {
-        "src": "/assets/maps/art/thumbs/sm_tahli.jpg",
-        "w": 150,
-        "h": 91,
-        "label": "Tiny Speck’s thumbnail, all that survived (150 x 91)"
+        "src": "/restoration/maps/2012/tahli.webp",
+        "w": 760,
+        "h": 460,
+        "label": "2012",
+        "alt": "Tiny Speck’s 2012 Encyclopedia map of Tahli, with the game’s roads and names on it"
       },
       "after": {
         "src": "/assets/maps/art/bg/tahli.webp",
         "w": 760,
         "h": 460,
-        "label": "Painted for Groddle, in the game now",
+        "label": "Now",
+        "alt": "Tahli painted for Groddle, as the game draws it now",
         "src2": "/assets/maps/art/bg/tahli@2x.webp"
       },
       "card": {
@@ -1540,25 +1775,31 @@
       "name": "Tamila",
       "anchor": "map-tamila",
       "state": "painted",
-      "caption": "Tiny Speck’s 760 x 460 painting of Tamila is lost; only its thumbnail on the World map survived. This painting was made from that thumbnail and the region’s street layout, in the style of the decos Tiny Speck painted its streets with.",
+      "caption": "Tiny Speck’s painting of Tamila survives only in the 2012 Encyclopedia map, under the game’s roads and names. The painting in the game now was made from the World map’s 150 x 91 thumbnail and the region’s street layout, in the style of the decos Tiny Speck painted its streets with, so the two differ.",
       "differences": "",
       "facts": [
         {
           "label": "Made",
           "text": "6 November 2026, with GPT Image 2.6 Sunburst"
+        },
+        {
+          "label": "2012",
+          "text": "Tiny Speck’s Encyclopedia map, as the Internet Archive saved it on 19 November 2013"
         }
       ],
       "before": {
-        "src": "/assets/maps/art/thumbs/sm_tamila.jpg",
-        "w": 150,
-        "h": 91,
-        "label": "Tiny Speck’s thumbnail, all that survived (150 x 91)"
+        "src": "/restoration/maps/2012/tamila.webp",
+        "w": 760,
+        "h": 459,
+        "label": "2012",
+        "alt": "Tiny Speck’s 2012 Encyclopedia map of Tamila, with the game’s roads and names on it"
       },
       "after": {
         "src": "/assets/maps/art/bg/tamila.webp",
         "w": 760,
         "h": 460,
-        "label": "Painted for Groddle, in the game now",
+        "label": "Now",
+        "alt": "Tamila painted for Groddle, as the game draws it now",
         "src2": "/assets/maps/art/bg/tamila@2x.webp"
       },
       "card": {
@@ -1574,25 +1815,31 @@
       "name": "Uralia",
       "anchor": "map-uralia",
       "state": "painted",
-      "caption": "Tiny Speck’s 760 x 460 painting of Uralia is lost; only its thumbnail on the World map survived. This painting was made from that thumbnail and the region’s street layout, in the style of the decos Tiny Speck painted its streets with.",
+      "caption": "Tiny Speck’s painting of Uralia survives only in the 2012 Encyclopedia map, under the game’s roads and names. The painting in the game now was made from the World map’s 150 x 91 thumbnail and the region’s street layout, in the style of the decos Tiny Speck painted its streets with, so the two differ.",
       "differences": "",
       "facts": [
         {
           "label": "Made",
           "text": "6 November 2026, with GPT Image 2.6 Sunburst"
+        },
+        {
+          "label": "2012",
+          "text": "Tiny Speck’s Encyclopedia map, as the Internet Archive saved it on 19 November 2013"
         }
       ],
       "before": {
-        "src": "/assets/maps/art/thumbs/sm_uralia.jpg",
-        "w": 150,
-        "h": 91,
-        "label": "Tiny Speck’s thumbnail, all that survived (150 x 91)"
+        "src": "/restoration/maps/2012/uralia.webp",
+        "w": 760,
+        "h": 460,
+        "label": "2012",
+        "alt": "Tiny Speck’s 2012 Encyclopedia map of Uralia, with the game’s roads and names on it"
       },
       "after": {
         "src": "/assets/maps/art/bg/uralia.webp",
         "w": 760,
         "h": 460,
-        "label": "Painted for Groddle, in the game now",
+        "label": "Now",
+        "alt": "Uralia painted for Groddle, as the game draws it now",
         "src2": "/assets/maps/art/bg/uralia@2x.webp"
       },
       "card": {
@@ -1608,25 +1855,31 @@
       "name": "Vantalu",
       "anchor": "map-vantalu",
       "state": "painted",
-      "caption": "Tiny Speck’s 760 x 460 painting of Vantalu is lost; only its thumbnail on the World map survived. This painting was made from that thumbnail and the region’s street layout, in the style of the decos Tiny Speck painted its streets with.",
+      "caption": "Tiny Speck’s painting of Vantalu survives only in the 2012 Encyclopedia map, under the game’s roads and names. The painting in the game now was made from the World map’s 150 x 91 thumbnail and the region’s street layout, in the style of the decos Tiny Speck painted its streets with, so the two differ.",
       "differences": "",
       "facts": [
         {
           "label": "Made",
           "text": "6 November 2026, with GPT Image 2.6 Sunburst"
+        },
+        {
+          "label": "2012",
+          "text": "Tiny Speck’s Encyclopedia map, as the Internet Archive saved it on 19 November 2013"
         }
       ],
       "before": {
-        "src": "/assets/maps/art/thumbs/sm_vantalu.jpg",
-        "w": 150,
-        "h": 91,
-        "label": "Tiny Speck’s thumbnail, all that survived (150 x 91)"
+        "src": "/restoration/maps/2012/vantalu.webp",
+        "w": 760,
+        "h": 459,
+        "label": "2012",
+        "alt": "Tiny Speck’s 2012 Encyclopedia map of Vantalu, with the game’s roads and names on it"
       },
       "after": {
         "src": "/assets/maps/art/bg/vantalu.webp",
         "w": 760,
         "h": 460,
-        "label": "Painted for Groddle, in the game now",
+        "label": "Now",
+        "alt": "Vantalu painted for Groddle, as the game draws it now",
         "src2": "/assets/maps/art/bg/vantalu@2x.webp"
       },
       "card": {
@@ -1642,25 +1895,31 @@
       "name": "Vortex of Random",
       "anchor": "map-vortex-of-random",
       "state": "painted",
-      "caption": "Tiny Speck’s 760 x 460 painting of Vortex of Random is lost; only its thumbnail on the World map survived. This painting was made from that thumbnail and the region’s street layout, in the style of the decos Tiny Speck painted its streets with.",
+      "caption": "Tiny Speck’s painting of Vortex of Random survives only in the 2012 Encyclopedia map, under the game’s roads and names. The painting in the game now was made from the World map’s 150 x 91 thumbnail and the region’s street layout, in the style of the decos Tiny Speck painted its streets with, so the two differ.",
       "differences": "",
       "facts": [
         {
           "label": "Made",
           "text": "6 November 2026, with GPT Image 2.6 Sunburst"
+        },
+        {
+          "label": "2012",
+          "text": "Tiny Speck’s Encyclopedia map, as the Internet Archive saved it on 19 November 2013"
         }
       ],
       "before": {
-        "src": "/assets/maps/art/thumbs/sm_vortex.jpg",
-        "w": 150,
-        "h": 91,
-        "label": "Tiny Speck’s thumbnail, all that survived (150 x 91)"
+        "src": "/restoration/maps/2012/vortex.webp",
+        "w": 760,
+        "h": 459,
+        "label": "2012",
+        "alt": "Tiny Speck’s 2012 Encyclopedia map of Vortex of Random, with the game’s roads and names on it"
       },
       "after": {
         "src": "/assets/maps/art/bg/vortex.webp",
         "w": 760,
         "h": 460,
-        "label": "Painted for Groddle, in the game now",
+        "label": "Now",
+        "alt": "Vortex of Random painted for Groddle, as the game draws it now",
         "src2": "/assets/maps/art/bg/vortex@2x.webp"
       },
       "card": {
@@ -1676,25 +1935,31 @@
       "name": "Xalanga",
       "anchor": "map-xalanga",
       "state": "painted",
-      "caption": "Tiny Speck’s 760 x 460 painting of Xalanga is lost; only its thumbnail on the World map survived. This painting was made from that thumbnail and the region’s street layout, in the style of the decos Tiny Speck painted its streets with.",
+      "caption": "Tiny Speck’s painting of Xalanga survives only in the 2012 Encyclopedia map, under the game’s roads and names. The painting in the game now was made from the World map’s 150 x 91 thumbnail and the region’s street layout, in the style of the decos Tiny Speck painted its streets with, so the two differ.",
       "differences": "",
       "facts": [
         {
           "label": "Made",
           "text": "6 November 2026, with GPT Image 2.6 Sunburst"
+        },
+        {
+          "label": "2012",
+          "text": "Tiny Speck’s Encyclopedia map, as the Internet Archive saved it on 19 November 2013"
         }
       ],
       "before": {
-        "src": "/assets/maps/art/thumbs/sm_xalanga.jpg",
-        "w": 150,
-        "h": 91,
-        "label": "Tiny Speck’s thumbnail, all that survived (150 x 91)"
+        "src": "/restoration/maps/2012/xalanga.webp",
+        "w": 760,
+        "h": 460,
+        "label": "2012",
+        "alt": "Tiny Speck’s 2012 Encyclopedia map of Xalanga, with the game’s roads and names on it"
       },
       "after": {
         "src": "/assets/maps/art/bg/xalanga.webp",
         "w": 760,
         "h": 460,
-        "label": "Painted for Groddle, in the game now",
+        "label": "Now",
+        "alt": "Xalanga painted for Groddle, as the game draws it now",
         "src2": "/assets/maps/art/bg/xalanga@2x.webp"
       },
       "card": {
@@ -1710,25 +1975,31 @@
       "name": "Zhambu",
       "anchor": "map-zhambu",
       "state": "painted",
-      "caption": "Tiny Speck’s 760 x 460 painting of Zhambu is lost; only its thumbnail on the World map survived. This painting was made from that thumbnail and the region’s street layout, in the style of the decos Tiny Speck painted its streets with.",
+      "caption": "Tiny Speck’s painting of Zhambu survives only in the 2012 Encyclopedia map, under the game’s roads and names. The painting in the game now was made from the World map’s 150 x 91 thumbnail and the region’s street layout, in the style of the decos Tiny Speck painted its streets with, so the two differ.",
       "differences": "",
       "facts": [
         {
           "label": "Made",
           "text": "6 November 2026, with GPT Image 2.6 Sunburst"
+        },
+        {
+          "label": "2012",
+          "text": "Tiny Speck’s Encyclopedia map, as the Internet Archive saved it on 19 November 2013"
         }
       ],
       "before": {
-        "src": "/assets/maps/art/thumbs/sm_zhambu.jpg",
-        "w": 150,
-        "h": 91,
-        "label": "Tiny Speck’s thumbnail, all that survived (150 x 91)"
+        "src": "/restoration/maps/2012/zhambu.webp",
+        "w": 760,
+        "h": 460,
+        "label": "2012",
+        "alt": "Tiny Speck’s 2012 Encyclopedia map of Zhambu, with the game’s roads and names on it"
       },
       "after": {
         "src": "/assets/maps/art/bg/zhambu.webp",
         "w": 760,
         "h": 460,
-        "label": "Painted for Groddle, in the game now",
+        "label": "Now",
+        "alt": "Zhambu painted for Groddle, as the game draws it now",
         "src2": "/assets/maps/art/bg/zhambu@2x.webp"
       },
       "card": {
@@ -1744,20 +2015,31 @@
       "name": "Ilmenskie Caverns",
       "anchor": "map-ilmenskie-caverns",
       "state": "layout",
-      "caption": "Ilmenskie Caverns had no thumbnail on the World map, so its painting was made from its street layout alone, in the style of the decos Tiny Speck painted its streets with.",
+      "caption": "Ilmenskie Caverns had no thumbnail on the World map, so the painting in the game now was made from its street layout alone, in the style of the decos Tiny Speck painted its streets with. The 2012 Encyclopedia map shows Tiny Speck’s own painting, under the game’s roads and names.",
       "differences": "",
       "facts": [
         {
           "label": "Made",
           "text": "13 November 2026, with GPT Image 2.6 Sunburst"
+        },
+        {
+          "label": "2012",
+          "text": "Tiny Speck’s Encyclopedia map, as the Internet Archive saved it on 18 September 2013"
         }
       ],
-      "before": null,
+      "before": {
+        "src": "/restoration/maps/2012/ilmenskiecaverns.webp",
+        "w": 760,
+        "h": 460,
+        "label": "2012",
+        "alt": "Tiny Speck’s 2012 Encyclopedia map of Ilmenskie Caverns, with the game’s roads and names on it"
+      },
       "after": {
         "src": "/assets/maps/art/bg/ilmenskiecaverns.webp",
         "w": 760,
         "h": 460,
-        "label": "Painted for Groddle, in the game now",
+        "label": "Now",
+        "alt": "Ilmenskie Caverns painted for Groddle, as the game draws it now",
         "src2": "/assets/maps/art/bg/ilmenskiecaverns@2x.webp"
       },
       "card": null,
@@ -1768,20 +2050,31 @@
       "name": "Ilmenskie Deeps",
       "anchor": "map-ilmenskie-deeps",
       "state": "layout",
-      "caption": "Ilmenskie Deeps had no thumbnail on the World map, so its painting was made from its street layout alone, in the style of the decos Tiny Speck painted its streets with.",
+      "caption": "Ilmenskie Deeps had no thumbnail on the World map, so the painting in the game now was made from its street layout alone, in the style of the decos Tiny Speck painted its streets with. The 2012 Encyclopedia map shows Tiny Speck’s own painting, under the game’s roads and names.",
       "differences": "",
       "facts": [
         {
           "label": "Made",
           "text": "13 November 2026, with GPT Image 2.6 Sunburst"
+        },
+        {
+          "label": "2012",
+          "text": "Tiny Speck’s Encyclopedia map, as the Internet Archive saved it on 19 November 2013"
         }
       ],
-      "before": null,
+      "before": {
+        "src": "/restoration/maps/2012/ilmenskiedeeps.webp",
+        "w": 760,
+        "h": 460,
+        "label": "2012",
+        "alt": "Tiny Speck’s 2012 Encyclopedia map of Ilmenskie Deeps, with the game’s roads and names on it"
+      },
       "after": {
         "src": "/assets/maps/art/bg/ilmenskiedeeps.webp",
         "w": 760,
         "h": 460,
-        "label": "Painted for Groddle, in the game now",
+        "label": "Now",
+        "alt": "Ilmenskie Deeps painted for Groddle, as the game draws it now",
         "src2": "/assets/maps/art/bg/ilmenskiedeeps@2x.webp"
       },
       "card": null,
@@ -1792,20 +2085,31 @@
       "name": "Naraka",
       "anchor": "map-naraka",
       "state": "layout",
-      "caption": "Naraka had no thumbnail on the World map, so its painting was made from its street layout alone, in the style of the decos Tiny Speck painted its streets with.",
+      "caption": "Naraka had no thumbnail on the World map, so the painting in the game now was made from its street layout alone, in the style of the decos Tiny Speck painted its streets with. The 2012 Encyclopedia map shows Tiny Speck’s own painting, under the game’s roads and names.",
       "differences": "",
       "facts": [
         {
           "label": "Made",
           "text": "13 November 2026, with GPT Image 2.6 Sunburst"
+        },
+        {
+          "label": "2012",
+          "text": "Tiny Speck’s Encyclopedia map, as the Internet Archive saved it on 19 November 2013"
         }
       ],
-      "before": null,
+      "before": {
+        "src": "/restoration/maps/2012/naraka.webp",
+        "w": 760,
+        "h": 460,
+        "label": "2012",
+        "alt": "Tiny Speck’s 2012 Encyclopedia map of Naraka, with the game’s roads and names on it"
+      },
       "after": {
         "src": "/assets/maps/art/bg/naraka.webp",
         "w": 760,
         "h": 460,
-        "label": "Painted for Groddle, in the game now",
+        "label": "Now",
+        "alt": "Naraka painted for Groddle, as the game draws it now",
         "src2": "/assets/maps/art/bg/naraka@2x.webp"
       },
       "card": null,
@@ -1816,20 +2120,31 @@
       "name": "The Seams",
       "anchor": "map-the-seams",
       "state": "layout",
-      "caption": "The Seams had no thumbnail on the World map, so its painting was made from its street layout alone, in the style of the decos Tiny Speck painted its streets with.",
+      "caption": "The Seams had no thumbnail on the World map, so the painting in the game now was made from its street layout alone, in the style of the decos Tiny Speck painted its streets with. The 2012 Encyclopedia map shows Tiny Speck’s own painting, under the game’s roads and names.",
       "differences": "",
       "facts": [
         {
           "label": "Made",
           "text": "13 November 2026, with GPT Image 2.6 Sunburst"
+        },
+        {
+          "label": "2012",
+          "text": "Tiny Speck’s Encyclopedia map, as the Internet Archive saved it on 19 November 2013"
         }
       ],
-      "before": null,
+      "before": {
+        "src": "/restoration/maps/2012/theseams.webp",
+        "w": 760,
+        "h": 460,
+        "label": "2012",
+        "alt": "Tiny Speck’s 2012 Encyclopedia map of The Seams, with the game’s roads and names on it"
+      },
       "after": {
         "src": "/assets/maps/art/bg/theseams.webp",
         "w": 760,
         "h": 460,
-        "label": "Painted for Groddle, in the game now",
+        "label": "Now",
+        "alt": "The Seams painted for Groddle, as the game draws it now",
         "src2": "/assets/maps/art/bg/theseams@2x.webp"
       },
       "card": null,

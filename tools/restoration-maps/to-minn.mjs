@@ -30,7 +30,7 @@ export function mapsContent() {
     group('header', 'masthead', null, [group('div', 'wrap', null, [
       p('kicker', 'Groddle Field Notes · Restoration report'),
       h(1, 'Maps'),
-      p('lead', 'Every map in Groddle Afternoon beside the picture it replaced or was made from. Tiny Speck’s large region paintings were lost when Glitch closed. Some are back from 2012, the rest were painted again from the small pictures that survived, and the World map was sharpened for today’s screens. Flip, wipe or enlarge any of them to see the difference.'),
+      p('lead', 'Every map in Groddle Afternoon beside Tiny Speck’s own map of the same place. Each region’s “before” is the map the Glitch Encyclopedia showed in 2012: Tiny Speck’s painting with the game’s roads and names on it, saved by the Internet Archive. The paintings themselves were lost as files when Glitch closed. Some are back, restored from those 2012 maps, the rest were painted again from the small pictures that survived, and the World map was sharpened for today’s screens. Wipe across, flip or enlarge any of them to see the difference.'),
       data('summary'),
       p('jump', '<a href="#world">The World map</a> <a href="#restored">Restored from 2012</a> <a href="#painted">Painted again</a> <a href="#how">How they were made</a> <a href="/restoration/">The restoration report</a>'),
     ])]),
@@ -39,16 +39,16 @@ export function mapsContent() {
       data('world'),
     ]),
     band('restored', true, 'Restored from 2012', [
-      p('section-lead', 'For these regions Tiny Speck’s own painting came back. The 2012 Encyclopedia showed each region’s map with the game’s roads, names and buttons drawn on top. That picture was the starting point: an image model took the markings off and sharpened it without moving anything, and the result was toned back to 2012’s colour. Each is shown beside the painting it replaced. The 2012 pictures themselves are not shown, because they are not part of Tiny Speck’s CC0 release.'),
+      p('section-lead', 'For these regions Tiny Speck’s own painting came back. The 2012 Encyclopedia showed each region’s map with the game’s roads, names and buttons drawn on top, and that map is the picture on the left. It was the starting point: an image model took the markings off and sharpened it without moving anything, and the result was toned back to 2012’s colour.'),
       data('restored'),
     ]),
     band('painted', false, 'Painted again', [
-      p('section-lead', 'For the other regions, the only thing left of Tiny Speck’s painting is the small thumbnail on the World map. Each was painted again from that thumbnail and the region’s street layout, in the style of the decos Tiny Speck painted its streets with. A few regions had no thumbnail at all and were painted from their street layout alone. As more 2012 paintings are restored, they move up to the section above.'),
+      p('section-lead', 'These regions were painted again before the 2012 maps were put to use: each from the small thumbnail on the World map and the region’s street layout, in the style of the decos Tiny Speck painted its streets with, and a few with no thumbnail from their street layout alone. Beside each is Tiny Speck’s 2012 map of it, so you can see how far the new painting strays. As more are restored from their 2012 maps, they move up to the section above.'),
       data('painted'),
     ]),
     band('how', true, 'How they were made', [
       p('section-lead', 'Each restore is toned to its own 2012 picture: the average saturation and lightness of its middle tones are matched, leaving out the 2012 roads, white lettering and pale paper sea, so they do not count. Gamma is used rather than a brightness boost, so the light paper sea keeps its grain.'),
-      p('', 'Every picture on this page is CC0: Tiny Speck’s own art, which they gave to the public domain, or a picture made for Groddle Afternoon and given to the public domain the same way. The 2012 Encyclopedia pictures were only a guide and are kept out. The record of how each map was made, from what, and who chose it, ships with the game’s source.'),
+      p('', 'The before pictures are Tiny Speck’s own 2012 Encyclopedia maps, shown as Tiny Speck made them, with the game’s roads and names on them, the same way the game plays Tiny Speck’s original recordings. Every other picture on this page is CC0: Tiny Speck’s own art, which they gave to the public domain, or a picture made for Groddle Afternoon and given to the public domain the same way. The record of how each map was made, from what, and who chose it, and the list of the 2012 maps with where each was saved from, ship with the game’s source.'),
     ]),
     group('div', 'wrap report-foot', null, [
       p('', 'This page fills itself from those records, so a region restored in a new release appears here on its own.'),
@@ -71,7 +71,7 @@ async function main() {
     console.log(`page ${found.id} is already there; left alone (--force overwrites it)`);
     return;
   }
-  const body = { title: 'Maps', slug: SLUG, parent: parent.id, status: 'publish', template: TEMPLATE, excerpt: 'Every map in Groddle Afternoon beside the picture it replaced or was made from: the World map sharpened, the regions restored from 2012, and the regions painted again from their thumbnails.', content };
+  const body = { title: 'Maps', slug: SLUG, parent: parent.id, status: 'publish', template: TEMPLATE, excerpt: 'Every map in Groddle Afternoon beside Tiny Speck’s own 2012 Encyclopedia map of the same place: the World map sharpened, the regions restored from 2012, and the regions painted again from their thumbnails.', content };
   const saved = found ? await minn.rest('POST', `/wp/v2/pages/${found.id}`, body) : await minn.rest('POST', '/wp/v2/pages', body);
   console.log(`${found ? 'overwrote' : 'created'} page ${saved.id} at ${saved.link}`);
 }

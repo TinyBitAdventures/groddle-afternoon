@@ -1,9 +1,10 @@
 /**
  * The Maps page (/restoration/maps/, Austin 2026-11-14): tools/restoration-maps/build-data.mjs writes
- * public/restoration/maps.json from the provenance records and keeps each restored region's replaced
- * painting reachable, the site's src/RestorationMaps.php draws it, tools/restoration-maps/to-minn.mjs
- * made the page (its header menu link: tests/site-nav-maps-link.test.js). Only CC0 art ships:
- * nothing from research/ and no 2012 Encyclopedia picture.
+ * public/restoration/maps.json from the provenance records, the site's src/RestorationMaps.php draws it,
+ * tools/restoration-maps/to-minn.mjs made the page (its header menu link: tests/site-nav-maps-link.test.js).
+ * Each region's "before" is Tiny Speck's own 2012 Encyclopedia map (Austin 2026-11-14, lane mapsbefore),
+ * shipped from tools/provenance/encyclopedia-maps.json by path and sha256 only; nothing else from
+ * research/ ships (tests/g316-provenance.test.js guards the bytes). Each pair opens in Wipe.
  */
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
@@ -13,13 +14,15 @@ import { existsSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSy
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
-import { REPLACED_DIR, STATES, isRestored, playerWords, replacedFiles, wordProblems } from '../tools/restoration-maps/build-data.mjs';
+import { DIR_2012, ENCODE, MAPS_DIR, STATES, VIEW, build, files2012, isRestored, listProblems, playerWords, wordProblems } from '../tools/restoration-maps/build-data.mjs';
+import { webpSize } from '../tools/made-art/build-data.mjs';
 import { PATH, SLUG, TEMPLATE, mapsContent } from '../tools/restoration-maps/to-minn.mjs';
 import { GAME_DIR, SITE_DIR, skipWithoutSite } from '../tools/repos.mjs';
 
 const readJson = (path) => JSON.parse(readFileSync(path, 'utf8'));
 const maps = readJson(join(GAME_DIR, 'public/restoration/maps.json'));
 const provenance = readJson(join(GAME_DIR, 'tools/provenance/repainted-maps.json'));
+const encyclopedia = readJson(join(GAME_DIR, 'tools/provenance/encyclopedia-maps.json'));
 const builder = join(GAME_DIR, 'tools/restoration-maps/build-data.mjs');
 const sha256 = (buf) => createHash('sha256').update(buf).digest('hex');
 const pub = (src) => join(GAME_DIR, 'public', src.replace(/^\//, ''));
@@ -44,45 +47,91 @@ function draw(data, part = 'all') {
 }
 
 describe('Maps page data (tools/restoration-maps/build-data.mjs)', () => {
-  it('is current: maps.json and the kept replaced paintings match the provenance records', () => {
+  it('is current: maps.json and the 2012 maps match the provenance records', () => {
     execFileSync(process.execPath, [builder, '--check'], { stdio: 'pipe' });
   });
 
-  it('lists every region in the provenance once, a restored one beside the painting it replaced', () => {
+  it('lists every region in the provenance once, beside Tiny Speck\'s 2012 map of it (restored, painted and layout alike)', () => {
     assert.deepEqual(maps.regions.map((r) => r.id).sort(), Object.keys(provenance.regions).sort());
     for (const [id, r] of Object.entries(provenance.regions)) {
       const m = maps.regions.find((x) => x.id === id);
       assert.equal(m.name, r.hubName);
       assert.equal(m.after.src, `/${r.x1.file}`, id);
       assert.equal(m.after.src2, `/${r.x2.file}`, id);
-      if (isRestored(r)) {
-        assert.equal(m.state, 'restored', id);
-        assert.ok(m.before.src.startsWith(`/${REPLACED_DIR}/`), `${id} keeps its replaced painting`);
-        assert.equal(sha256(readFileSync(pub(m.before.src))), r.replaces.x1.sha256, `${id} replaced x1`);
-        assert.equal(sha256(readFileSync(pub(m.before.src2))), r.replaces.x2.sha256, `${id} replaced x2`);
-      } else {
-        assert.notEqual(m.state, 'restored', id);
-        if (m.before) assert.match(m.before.src, /^\/assets\/maps\/art\/thumbs\/sm_[a-z]+\.jpg$/, `${id} beside its CC0 thumbnail`);
-      }
+      assert.equal(m.after.label, 'Now', id);
+      assert.equal(m.state === 'restored', isRestored(r), id);
+      const old = encyclopedia.regions[id];
+      if (old) {
+        assert.equal(m.before.src, `/${old.shipped.file}`, `${id} beside its 2012 map`);
+        assert.equal(m.before.src2, undefined, `${id}: the 2012 map has no 2x`);
+        assert.equal(m.before.label, '2012', id);
+        assert.match(m.before.alt, /2012 Encyclopedia map .*roads and names/, id);
+        assert.equal(sha256(readFileSync(pub(m.before.src))), old.shipped.sha256, `${id} 2012 map bytes`);
+        assert.ok(m.facts.some((f) => f.label === '2012' && /Internet Archive saved it on \d+ \w+ 201[23]$/.test(f.text)), `${id} says when it was saved`);
+      } else if (m.before) assert.match(m.before.src, /^\/assets\/maps\/art\/thumbs\/sm_[a-z]+\.jpg$/, `${id} beside its CC0 thumbnail`);
+      // The paintings a restore replaced are no longer shown; their records stay.
+      if (isRestored(r)) assert.ok(r.replaces.x1.sha256 && r.replaces.x2.sha256, `${id} keeps its replaces record`);
     }
+    assert.ok(Object.keys(encyclopedia.regions).length >= 50, 'all 50 regions with a 2012 map in the regions-restore list');
     for (const s of Object.keys(STATES)) assert.equal(maps.counts[s], maps.regions.filter((r) => r.state === s).length, s);
     assert.ok(maps.counts.restored >= 4, 'Groddle Meadow, Alakol, Groddle Forest and Andra at least');
   });
 
-  it('every picture is a file the site serves, and nothing comes from research/ or the 2012 Encyclopedia', () => {
+  it('every picture is a file the site serves: the game\'s CC0 art, or a 2012 map the list names by path and sha256', () => {
     const srcs = [...maps.world.charts.flatMap((c) => [c.before, c.after]), ...maps.regions.flatMap((r) => [r.before, r.after, r.card])]
       .filter(Boolean).flatMap((p) => [p.src, p.src2].filter(Boolean));
     assert.ok(srcs.length > 100);
+    const listed = files2012(encyclopedia);
     for (const src of srcs) {
-      assert.match(src, /^\/(assets\/maps\/art\/(bg|thumbs|world)\/|restoration\/maps\/replaced\/)/, src);
+      assert.match(src, /^\/(assets\/maps\/art\/(bg|thumbs|world)\/|restoration\/maps\/2012\/[a-z]+\.webp$)/, src);
       assert.ok(existsSync(pub(src)), src);
-      assert.doesNotMatch(src, /research|encyclopedia|maps_encyclopedia|2012/i, src);
+      if (src.startsWith(`/${DIR_2012}/`)) assert.ok(listed.has(src.slice(1)), `${src} is on the list`);
+      else assert.doesNotMatch(src, /research|encyclopedia|maps_encyclopedia|2012/i, src);
     }
-    const kept = readdirSync(join(GAME_DIR, 'public', REPLACED_DIR)).map((n) => `${REPLACED_DIR}/${n}`).sort();
-    assert.deepEqual(kept, [...replacedFiles(provenance).keys()].sort(), 'only the replaced paintings the records name');
-    // The 2012 picture's own sha256 (a restore's input) never ships.
-    const inputs = new Set(Object.values(provenance.regions).filter(isRestored).flatMap((r) => (r.inputs || []).map((i) => i.sha256)));
-    for (const n of readdirSync(join(GAME_DIR, 'public', REPLACED_DIR))) assert.ok(!inputs.has(sha256(readFileSync(join(GAME_DIR, 'public', REPLACED_DIR, n)))), n);
+    // Only the listed 2012 maps sit under restoration/maps/ (the replaced paintings left on 2026-11-14).
+    const kept = readdirSync(join(GAME_DIR, 'public', MAPS_DIR), { recursive: true }).map((n) => `${MAPS_DIR}/${n}`).filter((f) => !f.endsWith(DIR_2012)).sort();
+    assert.deepEqual(kept, [...listed.keys()].sort());
+  });
+
+  it('the 2012 maps: only c1.glitch.bz Encyclopedia maps, each Tiny Speck\'s own pixels and size as WebP, recorded by sha256', () => {
+    assert.deepEqual(listProblems(encyclopedia, provenance), []);
+    assert.match(encyclopedia.policy, /Austin’s call \(2026-11-14/);
+    assert.match(encyclopedia.policy, /Player snaps, videos and anything else from research\/ still never ship/);
+    assert.equal(encyclopedia.encode, `cwebp ${ENCODE.filter((a) => a !== '-quiet').join(' ')} <local> -o public/<shipped.file>`);
+    const sources = new Set();
+    for (const [id, e] of Object.entries(encyclopedia.regions)) {
+      const buf = readFileSync(pub(e.shipped.file));
+      assert.equal(sha256(buf), e.shipped.sha256, id);
+      assert.equal(buf.length, e.shipped.bytes, id);
+      // Its own pixels and size: never upscaled (the page scales it to the painting now).
+      assert.deepEqual(webpSize(buf), { w: e.w, h: e.h }, id);
+      assert.deepEqual([e.shipped.w, e.shipped.h], [e.w, e.h], id);
+      assert.ok(e.w === 760 && (e.h === 459 || e.h === 460), `${id}: ${e.w} x ${e.h}`);
+      assert.equal(e.archived, `https://web.archive.org/web/${e.wayback}id_/${e.source}`, id);
+      assert.notEqual(e.sha256, e.shipped.sha256, `${id}: re-encoded, not the saved JPEG`);
+      assert.ok(!sources.has(e.sha256), `${id}: one 2012 map per region`);
+      sources.add(e.sha256);
+    }
+  });
+
+  it('a region with no 2012 map keeps its thumbnail (or nothing) and says so on its card', () => {
+    const index = readJson(join(GAME_DIR, 'public/assets/maps/index.json'));
+    const fs = { read: (f) => (existsSync(pub(f)) ? readFileSync(pub(f)) : null), exists: (f) => existsSync(pub(f)) };
+    const only = { regions: Object.fromEntries(Object.entries(encyclopedia.regions).filter(([id]) => id !== '27' && id !== '40')) };
+    const data = build(provenance, null, index, fs, only);
+    const ix = data.regions.find((r) => r.id === '27');
+    assert.equal(ix.before.src, `/${index.hubs['27'].thumbLocal}`);
+    assert.match(ix.caption, /No 2012 Encyclopedia map of Ix survives, so it is shown beside that thumbnail\./);
+    assert.ok(!ix.facts.some((f) => f.label === '2012'));
+    const naraka = data.regions.find((r) => r.id === '40');
+    assert.equal(naraka.before, null);
+    assert.match(naraka.caption, /No 2012 Encyclopedia map of Naraka survives/);
+    assert.deepEqual(wordProblems(data), []);
+  });
+
+  it('opens each pair in Wipe', () => {
+    assert.equal(VIEW, 'wipe');
+    assert.equal(maps.view, 'wipe');
   });
 
   it('the words have no path, no @, no em-dash and no hash, and name the 2012 source in words', () => {
@@ -101,6 +150,13 @@ describe('Maps page data (tools/restoration-maps/build-data.mjs)', () => {
 });
 
 describe('the Maps page in Minn (tools/restoration-maps/to-minn.mjs)', () => {
+  it('says the before pictures are Tiny Speck\'s 2012 Encyclopedia maps with the game\'s roads and names on them', () => {
+    const content = mapsContent();
+    assert.match(content, /The before pictures are Tiny Speck’s own 2012 Encyclopedia maps, shown as Tiny Speck made them, with the game’s roads and names on them/);
+    assert.match(content, /Wipe across, flip or enlarge/);
+    assert.doesNotMatch(content, /not shown|are kept out|beside the painting it replaced/);
+  });
+
   it('is a full-width child of the report, its words around the four parts, with a masthead and bands for the section menu', () => {
     assert.equal(PATH, '/restoration/maps/');
     assert.equal(SLUG, 'maps');
@@ -126,7 +182,30 @@ describe('the Maps block (site src/RestorationMaps.php)', { skip: skipWithoutSit
     }
     assert.ok(html.includes('srcset="/assets/maps/art/bg/groddlemeadow.webp 1x, /assets/maps/art/bg/groddlemeadow@2x.webp 2x"'));
     assert.doesNotMatch(html, /<script/);
-    assert.equal((html.match(/data-maps-pair/g) || []).length, maps.regions.filter((r) => r.before).length + maps.world.charts.length, 'a pair to compare wherever there is a picture before');
+    const pairs = maps.regions.filter((r) => r.before).length + maps.world.charts.length;
+    assert.equal((html.match(/data-maps-pair/g) || []).length, pairs, 'a pair to compare wherever there is a picture before');
+    // Each pair opens in Wipe (the script starts from the mode drawn here).
+    assert.equal((html.match(/data-maps-pair data-mode="wipe"/g) || []).length, pairs);
+    assert.ok(html.includes('src="/restoration/maps/2012/groddlemeadow.webp"'));
+    assert.ok(html.includes('alt="Tiny Speck’s 2012 Encyclopedia map of Groddle Meadow, with the game’s roads and names on it"'));
+    assert.ok(html.includes('<figcaption>2012</figcaption>') && html.includes('<figcaption>Now</figcaption>'));
+    // A 760 x 460 2012 map is no thumbnail: it fills its half.
+    assert.doesNotMatch(draw(maps, 'painted'), /maps-fig-small/);
+    const odd = structuredClone(maps);
+    odd.view = 'nonsense"><b>';
+    assert.match(draw(odd, 'restored'), /data-mode="wipe"/);
+    odd.view = 'flip';
+    assert.match(draw(odd, 'restored'), /data-mode="flip"/);
+  });
+
+  it('the script opens each pair, and the larger preview, in the mode drawn (Wipe), Flip and Side by side still there', () => {
+    const js = readFileSync(join(SITE_DIR, 'restoration/maps.js'), 'utf8');
+    assert.match(js, /modes: \[\['wipe', 'Wipe'\], \['flip', 'Flip'\], \['side', 'Side by side'\]\]/);
+    assert.match(js, /modes: \[\['wipe', 'Wipe'\], \['flip', 'Flip'\]\]/);
+    assert.match(js, /const startMode = \(pair, allowed = MODES\) => \(allowed\.includes\(pair\.dataset\.mode\) \? pair\.dataset\.mode : 'wipe'\)/);
+    assert.match(js, /state = \{ mode: startMode\(pair\), pic: 'after', cut: 50 \}/);
+    assert.match(js, /mode: previewMode,/);
+    assert.doesNotMatch(js, /pair\.dataset\.mode = 'flip'/);
   });
 
   it('draws each part alone, and keeps anything but the game\'s pictures and site pages out of src and href', () => {
@@ -138,10 +217,11 @@ describe('the Maps block (site src/RestorationMaps.php)', { skip: skipWithoutSit
     const bad = structuredClone(maps);
     bad.regions[0].after.src = 'javascript:alert(1)';
     bad.regions[0].before.src = '/assets/../../wp-config.php';
+    bad.regions[0].before.alt = '"><script>x</script>';
     bad.regions[0].place = 'https://example.com/';
     bad.regions[0].name = '<b>x</b>';
     const out = draw(bad, 'restored');
-    assert.doesNotMatch(out, /javascript:|wp-config|example\.com|<b>x<\/b>/);
+    assert.doesNotMatch(out, /javascript:|wp-config|example\.com|<b>x<\/b>|<script/);
   });
 
   it('is registered: block.json, minn.json and the extension', () => {
