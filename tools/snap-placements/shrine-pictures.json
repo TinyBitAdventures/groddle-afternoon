@@ -289,6 +289,102 @@
     885
    ]
   },
+  "GHF583RFVLD3IUE": {
+   "label": "Candy Cane Lane",
+   "picture": "drifa/LHF583RFVLD3IUE_main_1353365124.jpg",
+   "spot": [
+    2167,
+    883
+   ]
+  },
+  "GHFN5KCGS5D3IFC": {
+   "label": "Curling Lake",
+   "picture": "drifa/LHFN5KCGS5D3IFC_main_1353303398.jpg",
+   "spot": [
+    3117,
+    883
+   ]
+  },
+  "GHFS89VFIID3EB6": {
+   "label": "Curving Clusters",
+   "picture": "drifa/LHFS89VFIID3EB6_main_1353212584.jpg",
+   "spot": [
+    4900,
+    833
+   ]
+  },
+  "GHFA15VS0UC3ITS": {
+   "label": "Dark Cavern",
+   "picture": "drifa/LHFA15VS0UC3ITS_main_1353301172.jpg",
+   "spot": [
+    1392,
+    972
+   ]
+  },
+  "GHFK965MT8D3G9E": {
+   "label": "Drooping Drift",
+   "picture": "drifa/LHFK965MT8D3G9E_main_1353298411.jpg",
+   "spot": [
+    942,
+    883
+   ]
+  },
+  "GHFOE9L06OD3JR6": {
+   "label": "Flurry Piles",
+   "picture": "drifa/LHFOE9L06OD3JR6_main_1353297149.jpg",
+   "spot": [
+    3175,
+    817
+   ]
+  },
+  "GHF7DU3N0UC3DRA": {
+   "label": "Luminous Night",
+   "picture": "drifa/LHF7DU3N0UC3DRA_main_1353112854.jpg",
+   "spot": [
+    592,
+    792
+   ]
+  },
+  "GHFHNQ3RFUC3JMI": {
+   "label": "Moonlit Grove",
+   "picture": "drifa/LHFHNQ3RFUC3JMI_main_1353136152.jpg",
+   "spot": [
+    975,
+    867
+   ]
+  },
+  "GHF6UMCMHOD387H": {
+   "label": "Slippery Climb",
+   "picture": "drifa/LHF6UMCMHOD387H_main_1353307750.jpg",
+   "spot": [
+    1735,
+    1505
+   ]
+  },
+  "GHFODV4KNLD3L8L": {
+   "label": "Tree Mas",
+   "picture": "drifa/LHFODV4KNLD3L8L_main_1353134019.jpg",
+   "spot": [
+    742,
+    883
+   ]
+  },
+  "GHFNDP1TKQD3V3O": {
+   "label": "Tripping Ledges",
+   "picture": "drifa/LHFNDP1TKQD3V3O_main_1353291437.jpg",
+   "spot": [
+    1135,
+    1485
+   ]
+  },
+  "GHF468KKJGD3IMD": {
+   "label": "Vibrant Banks",
+   "picture": "drifa/LHF468KKJGD3IMD_main_1353309625.jpg",
+   "spot": [
+    1642,
+    900
+   ]
+  },
   "GHH1011JSO11ORS": {
    "label": "Level 2 West",
    "picture": "ilmenskie-caverns/LHH1011JSO11ORS_main_1335392655.jpg",
@@ -784,9 +880,151 @@
     5100,
     825
    ]
+  },
+  "GHVCUKA1I0B3UE8": {
+   "label": "Awn Terio",
+   "picture": "nottis/LHVCUKA1I0B3UE8_main_1351303674.jpg",
+   "spot": [
+    2133,
+    900
+   ]
+  },
+  "GHVN4R7V7OA3MFN": {
+   "label": "Brilyn Chelyn",
+   "picture": "nottis/LHVN4R7V7OA3MFN_main_1351319527.jpg",
+   "spot": [
+    1992,
+    867
+   ]
+  },
+  "GHV7LLAAIDB35G2": {
+   "label": "Dokk Rokk",
+   "picture": "nottis/LHV7LLAAIDB35G2_main_1354059093.jpg",
+   "spot": [
+    1847,
+    417
+   ]
+  },
+  "GHV7VE7O4MA35H6": {
+   "label": "Hellinum Dum",
+   "picture": "nottis/LHV7VE7O4MA35H6_main_1351322070.jpg",
+   "spot": [
+    2842,
+    667
+   ]
+  },
+  "GHVDH0710RA3812": {
+   "label": "Joklin Seddin",
+   "picture": "nottis/LHVDH0710RA3812_main_1351328685.jpg",
+   "spot": [
+    3258,
+    525
+   ]
+  },
+  "GHVRJLV2UOA3EMR": {
+   "label": "Lacier Landare",
+   "picture": "nottis/LHVRJLV2UOA3EMR_main_1351320212.jpg",
+   "spot": [
+    4333,
+    825
+   ]
+  },
+  "GHV7RGKN4MA33RT": {
+   "label": "Myndun Snun",
+   "picture": "nottis/LHV7RGKN4MA33RT_main_1351322607.jpg",
+   "spot": [
+    1049,
+    681
+   ]
+  },
+  "GHVNJNP4MAB3JI5": {
+   "label": "Pallur Runnar",
+   "picture": "nottis/LHVNJNP4MAB3JI5_main_1351311399.jpg",
+   "spot": [
+    1139,
+    646
+   ]
+  },
+  "GHVO8GQFVAB33C9": {
+   "label": "Sickle Nappo",
+   "picture": "nottis/LHVO8GQFVAB33C9_main_1351321664.jpg",
+   "spot": [
+    2575,
+    692
+   ]
+  },
+  "GHV8KV9R4MA3JLS": {
+   "label": "Slappao Kalt",
+   "picture": "nottis/LHV8KV9R4MA3JLS_main_1351327763.jpg",
+   "spot": [
+    4725,
+    650
+   ]
+  },
+  "GHVPOOR1LTA3NJ2": {
+   "label": "Stenina Jora",
+   "picture": "nottis/LHVPOOR1LTA3NJ2_main_1351323796.jpg",
+   "spot": [
+    1010,
+    650
+   ]
+  },
+  "GHVFCFD8FRA37T6": {
+   "label": "Stornur Sezzez",
+   "picture": "nottis/LHVFCFD8FRA37T6_main_1351302813.jpg",
+   "spot": [
+    924,
+    667
+   ]
+  },
+  "GHVQ1AS19UA3O3T": {
+   "label": "Toppa Tre",
+   "picture": "nottis/LHVQ1AS19UA3O3T_main_1351308846.jpg",
+   "spot": [
+    4650,
+    705
+   ]
+  },
+  "GHV8E39Q4MA3CMV": {
+   "label": "Tunglio Bru",
+   "picture": "nottis/LHV8E39Q4MA3CMV_main_1351324733.jpg",
+   "spot": [
+    2936,
+    756
+   ]
   }
  },
  "unread": {
+  "GHF8LE0Q0UC3QEF": {
+   "label": "Bright Day",
+   "hub": "Drifa",
+   "why": "no 2012 picture survives"
+  },
+  "GHFATC8M4RD3E61": {
+   "label": "Chilling Light",
+   "hub": "Drifa",
+   "why": "no 2012 picture survives"
+  },
+  "GHFIEG6R1JD30UH": {
+   "label": "Ding a Lingers",
+   "hub": "Drifa",
+   "why": "no 2012 picture survives"
+  },
+  "GHFH7LJRA8D3QAR": {
+   "label": "Fort Aban Don",
+   "hub": "Drifa",
+   "why": "no 2012 picture survives"
+  },
+  "GHF70EIUS0D3RDM": {
+   "label": "Icicle Dangles",
+   "hub": "Drifa",
+   "why": "no 2012 picture survives"
+  },
+  "GHF6E6PK0UC34J5": {
+   "label": "Sliding Skimmers",
+   "hub": "Drifa",
+   "why": "no 2012 picture survives"
+  },
   "GA9154LI9R22R7A": {
    "label": "Ajaya Bliss",
    "hub": "Ilmenskie Deeps",
@@ -875,6 +1113,36 @@
   "GA9CO2B02OA2BG0": {
    "label": "Valia Shede",
    "hub": "Kalavana",
+   "why": "no 2012 picture survives"
+  },
+  "GHV1U1OJ7DB3RGF": {
+   "label": "Frysta Virki",
+   "hub": "Nottis",
+   "why": "no 2012 picture survives"
+  },
+  "GHVQ48MA5GB39HE": {
+   "label": "Glatour Stooir",
+   "hub": "Nottis",
+   "why": "no 2012 picture survives"
+  },
+  "GHV8H4NQ4MA316V": {
+   "label": "Klikka Kawer",
+   "hub": "Nottis",
+   "why": "no 2012 picture survives"
+  },
+  "GHV88RQU60B3Q0G": {
+   "label": "Lotha Harte",
+   "hub": "Nottis",
+   "why": "no 2012 picture survives"
+  },
+  "GHV7EKEL4MA3L56": {
+   "label": "Snullin Ballin",
+   "hub": "Nottis",
+   "why": "no 2012 picture survives"
+  },
+  "GHV894HP4MA3ME7": {
+   "label": "Stafli Joli",
+   "hub": "Nottis",
    "why": "no 2012 picture survives"
   }
  }

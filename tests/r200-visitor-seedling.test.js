@@ -18,7 +18,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 import { GROWN_TREE_LABELS, SOIL_TIMERS, performPlotVerb, plotVerbs } from '../public/js/patches.js?v=1ba4f75f';
-import { allowedVerbs, applyYardAct, growIfReady, visitorTreeState } from '../public/js/yard-verbs-mp.js?v=6b54ee9d';
+import { allowedVerbs, applyYardAct, growIfReady, visitorTreeState } from '../public/js/yard-verbs-mp.js?v=f05e257e';
 import { GAME_DIR, HAS_SITE, SITE_DIR } from '../tools/repos.mjs';
 
 const gsjs = join(GAME_DIR, '..', 'glitch-GameServerJS');
@@ -196,7 +196,7 @@ describe('a visit draws the tree a pet grows, and a refresh rebuilds one', () =>
       worldW: 3000,
     };
     try {
-      const { yardVerbsMpFeature } = await import('../public/js/features/yard-verbs-mp-feature.js?v=776aa0ab');
+      const { yardVerbsMpFeature } = await import('../public/js/features/yard-verbs-mp-feature.js?v=44771cb3');
       yardVerbsMpFeature.onTick(16, 1, engine);
       for (let i = 0; i < 20 && !globalThis.groddleYard?.visit; i += 1) await new Promise((r) => setTimeout(r, 5));
       const yardSession = globalThis.groddleYard;

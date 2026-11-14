@@ -16,9 +16,9 @@ import { bindToolInventory, createToolConditionState, setToolRemaining, toolCopi
 import { WORLD_DROP_RULES, dropFor } from '../public/js/world-drop.js?v=d152b2bb';
 import { CHOICE_MS, chooseTool, clearToolChoice, peekToolChoice, takeToolChoice } from '../public/js/tool-choice.js?v=e0dcb60e';
 import { PACK_TOOL_TEXT, nodesFor, packToolButtons, packToolCondition, planPackToolVerb } from '../public/js/pack-tool-verbs.js?v=479afbd9';
-import { packToolOrder } from '../public/js/features/resource-nodes-feature.js?v=dc5e313f';
+import { packToolOrder } from '../public/js/features/resource-nodes-feature.js?v=89f01ea4';
 import { CREW_NODES, CREW_VERBS, HELP_SCRAPE_LABEL, helpScrapeMessage } from '../public/js/help-dig.js?v=93d6358d';
-import { nodePerks } from '../public/js/street-objects.js?v=5082ace1';
+import { nodePerks } from '../public/js/street-objects.js?v=33bc330f';
 
 const NOW = 1_700_000_000_000;
 const ctx = (extra = {}) => ({ now: NOW, dayKey: 'd1', rng: () => 0.5, ...extra });
