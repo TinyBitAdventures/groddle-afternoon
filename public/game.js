@@ -3478,6 +3478,9 @@ function conversationCardOpen() {
     // client's queue never waited on them; an "Are you stuck?" left up held a quest's award, and the
     // Smuggler's crawl with it, for good.
     if (d.classList.contains('game-prompt')) continue;
+    // Report 322: the pack band's dialogs (the open bag's tray #pack-bag, aria-modal false) are the
+    // pack, not a card over the game; a bag left open held Gwendolyn's award, so Part 2 never came.
+    if (d.closest('#pack-bar')) continue;
     if (d.closest('[hidden]') || !d.getClientRects().length) continue;
     if (getComputedStyle(d).visibility === 'hidden') continue;
     return true;
