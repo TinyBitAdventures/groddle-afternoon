@@ -2238,7 +2238,7 @@
 {"s":"sounds","id":"andra_kajuu_9","n":"Kajuu / Andra track 9","g":"Region music","st":"snd_original","ic":"assets/maps/art/thumbs/sm_kajuu.jpg","h":"encyclopedia/sounds/andra_kajuu_9/"},
 {"s":"sounds","id":"animal_stick","n":"Animal stick","g":"Quests, games and puzzles","st":"snd_original","ic":"assets/sprites/icons/magic_butterfly_stick.webp","h":"encyclopedia/sounds/animal_stick/"},
 {"s":"sounds","id":"asslandia","n":"Asslandia","g":"Street music","st":"snd_original","ic":"assets/sprites/icons/musicblock_d_green_01.webp","h":"encyclopedia/sounds/asslandia/"},
-{"s":"sounds","id":"autumn_day","n":"Autumn day","g":"Party and event music","st":"snd_original","ic":"assets/sprites/icons/musicblock_d_green_01.webp","h":"encyclopedia/sounds/autumn_day/"},
+{"s":"sounds","id":"autumn_day","n":"Autumn day","g":"Street music","st":"snd_original","ic":"assets/sprites/icons/musicblock_d_green_01.webp","h":"encyclopedia/sounds/autumn_day/"},
 {"s":"sounds","id":"awesome_pot","n":"Awesome Pot","g":"Tools and verbs","st":"snd_original","ic":"assets/sprites/icons/awesome_pot.webp","h":"encyclopedia/sounds/awesome_pot/"},
 {"s":"sounds","id":"badge_fanfare","n":"Badge fanfare","g":"New in the remake","st":"snd_standin","ic":"","h":"encyclopedia/sounds/badge_fanfare/"},
 {"s":"sounds","id":"barnacle_is_released","n":"Barnacle is released","g":"Creatures and trees","st":"snd_original","ic":"assets/sprites/icons/mortar_barnacle.webp","h":"encyclopedia/sounds/barnacle_is_released/"},

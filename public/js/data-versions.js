@@ -616,7 +616,7 @@
       "assets/ui/quest-book-solid.webp": "a53d6aca",
       "assets/ui/quest_bubble_active.png": "2de1b09a",
       "contribute/data.json": "e25ce0e0",
-      "encyclopedia/search.json": "c25f422a",
+      "encyclopedia/search.json": "bd15e649",
       "landing/card-explore.webp": "7a2c1124",
       "landing/full/card-explore.webp": "cbce4e96",
       "restoration/gaps.json": "3fcad6e1",

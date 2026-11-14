@@ -79,6 +79,7 @@ export const PLACES = {
   home_uralia: 'the Uralia home street',
   home_firebogs: 'the Firebogs home street',
   asslandia: 'Shim Shiri',
+  autumn_day: 'An Autumn Day',
   street_savanna1: null,
   street_uralia1: null,
   street_firebogs1: null,
