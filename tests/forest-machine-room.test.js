@@ -12,7 +12,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { assertStreetGeometry } from '../public/js/street-model.js?v=b6cb6a4e';
 import { arrivalInTarget } from '../public/js/location-navigation.js?v=90fca5cc';
-import { populationForStreet } from '../public/js/street-ecology.js?v=449b7771';
+import { populationForStreet } from '../public/js/street-ecology.js?v=bbf8d2b7';
 import { MACHINE_ROOMS, availableHubStreets, countsTowardHub, isMachineRoom, streetVisitCounters } from '../public/js/exploration.js?v=68f27989';
 import {
   CLEARING_DOOR,

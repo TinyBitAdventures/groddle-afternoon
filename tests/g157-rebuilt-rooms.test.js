@@ -11,7 +11,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { assertStreetGeometry, platformYAt } from '../public/js/street-model.js?v=b6cb6a4e';
 import { arrivalInTarget } from '../public/js/location-navigation.js?v=90fca5cc';
-import { populationForStreet } from '../public/js/street-ecology.js?v=449b7771';
+import { populationForStreet } from '../public/js/street-ecology.js?v=bbf8d2b7';
 import { checkDoorEntry, doorAt, doorDestination } from '../public/js/doors.js?v=727d0e0b';
 import { eventCounters, SEAM_STREETS } from '../public/js/quest-offers.js?v=89511e1e';
 import {

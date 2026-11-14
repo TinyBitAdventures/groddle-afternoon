@@ -37,7 +37,7 @@ import {
   treePlacementRequest,
   setStreetEcologyCatalog,
   streetReservedSpots,
-} from '../public/js/street-ecology.js?v=449b7771';
+} from '../public/js/street-ecology.js?v=bbf8d2b7';
 import {
   MYSTERY_QUOIN_KINDS,
   QUOIN_CLASSES,

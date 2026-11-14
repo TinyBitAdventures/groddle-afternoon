@@ -28,7 +28,7 @@ import {
   streetWidth,
 } from '../public/js/animal-crowding.js?v=0ffb4ced';
 import { SAD_PIGGY_LINES, ensurePiggyMood } from '../public/js/animal-mood.js?v=a49495fc';
-import { createAnimalState } from '../public/js/animals.js?v=e976ad4d';
+import { createAnimalState } from '../public/js/animals.js?v=0322c588';
 import { GAME_DAY_MS, getGameDayStartMs } from '../public/js/game-day.js?v=cf9afac0';
 import { advanceYard, capturePiggy, createMachine, normalizeHusbandryPack } from '../public/js/animal-husbandry.js?v=c1577210';
 import { getVerbsFor } from '../public/content.js?v=de8f27e6';

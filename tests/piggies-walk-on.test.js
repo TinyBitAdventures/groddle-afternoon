@@ -20,8 +20,8 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { createAnimalState } from '../public/js/animals.js?v=e976ad4d';
-import { PIGGY_ROOTING, animalMoodFeature, piggyRootDelayMs } from '../public/js/features/animal-mood-feature.js?v=277f0345';
+import { createAnimalState } from '../public/js/animals.js?v=0322c588';
+import { PIGGY_ROOTING, animalMoodFeature, piggyRootDelayMs } from '../public/js/features/animal-mood-feature.js?v=138d9c79';
 import { platformsScreen, streetWidth } from '../public/js/street-model.js?v=b6cb6a4e';
 import {
   ANIMAL_BODY,
@@ -35,8 +35,8 @@ import {
   setStreetEcologyCatalog,
   streetReservedSpots,
   walkInScenery,
-} from '../public/js/street-ecology.js?v=449b7771';
-import { walkerAt } from '../public/js/street-creatures.js?v=fe3f7248';
+} from '../public/js/street-ecology.js?v=bbf8d2b7';
+import { walkerAt } from '../public/js/street-creatures.js?v=f0568fb4';
 import { placementRequests } from '../tools/build-realtime-objects.mjs';
 import { applyStreetIndex, loadStreetDataFromFs, setZoneStreetsShown } from '../public/js/street-loader.js?v=18b181ad';
 

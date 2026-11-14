@@ -15,12 +15,12 @@
  * ecology rows, the style profiles and the zone schema (assets/content/zone.schema.json, a copy of
  * docs/level-builder/zone.schema.json that tests/builder-validate.test.js keeps equal).
  */
-import { validateZone } from './validate.js?v=5573cbb0';
+import { validateZone } from './validate.js?v=f2277a7f';
 import { compileSchema } from './schema-check.js?v=cc9d1af4';
 import { DECO_TWINS } from '../street-render.js?v=9b11451f';
 import { ANIM_DECOS } from '../deco-anim-list.js?v=ecfee655';
 import { SHARP_DECOS } from '../deco-sharp-list.js?v=28262069';
-import { setStreetEcologyCatalog } from '../street-ecology.js?v=449b7771';
+import { setStreetEcologyCatalog } from '../street-ecology.js?v=bbf8d2b7';
 
 /** Where the game's files are, from this module's own URL (js/builder/ -> the game root). */
 const ROOT = new URL('../../', import.meta.url);
