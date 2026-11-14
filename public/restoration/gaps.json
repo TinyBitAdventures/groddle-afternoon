@@ -1,6 +1,6 @@
 {
   "note": "Written by tools/gaps/build-data.mjs from tools/gaps/public-gaps.json and the coverage register. Edit those, never this file.",
-  "release": "v0.39.0",
+  "release": "v0.39.1",
   "states": {
     "fixing": {
       "label": "Being fixed",
