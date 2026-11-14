@@ -2792,9 +2792,14 @@
   "deployed": "2026-11-14"
  },
  "git": {
-  "commits": 2085,
+  "commits": 2086,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-14",
+    "kind": "fix",
+    "text": "Shrines, trees, vendors and animals keep off the Peat Bogs, Jellisacs, Barnacles and Paper Trees the snaps place"
+   },
    {
     "date": "2026-11-14",
     "kind": "fix",
@@ -2909,11 +2914,6 @@
     "date": "2026-11-13",
     "kind": "new",
     "text": "The Restoration page shows Tiny Speck's World map beside its sharpened Retina copy"
-   },
-   {
-    "date": "2026-11-13",
-    "kind": "improve",
-    "text": "The World map is sharp on Retina screens and phones"
    }
   ]
  },
