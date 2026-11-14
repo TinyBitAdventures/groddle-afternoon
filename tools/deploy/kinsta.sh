@@ -116,7 +116,8 @@ shim='<?php
 // Kinsta serves a folder index itself: hand this folder'"'"'s address to Minn (tools/deploy/kinsta.sh writes this).
 require \$_SERVER["DOCUMENT_ROOT"] . "/index.php";'
 n=0
-wp db query "SELECT post_type, post_name FROM wp_posts WHERE post_status='publish' AND post_type IN ('page','post')" --skip-column-names > /tmp/groddle-paths.txt
+# A child page's folder is its parents' slugs and its own (restoration/maps), up to three levels deep.
+wp db query "SELECT p.post_type, CONCAT_WS('/', NULLIF(g2.post_name, ''), NULLIF(g1.post_name, ''), p.post_name) FROM wp_posts p LEFT JOIN wp_posts g1 ON g1.ID = p.post_parent AND p.post_type = 'page' LEFT JOIN wp_posts g2 ON g2.ID = g1.post_parent WHERE p.post_status='publish' AND p.post_type IN ('page','post')" --skip-column-names > /tmp/groddle-paths.txt
 while read -r type slug; do
 	[ "\$type" = post ] && p="changelog/\$slug" || p="\$slug"
 	[ -d ~/web/game/\$p ] && { printf '%s\n' "\$shim" > ~/web/game/\$p/index.php; n=\$((n+1)); }
