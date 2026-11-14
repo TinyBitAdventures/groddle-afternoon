@@ -1,6 +1,6 @@
 {
   "note": "Written by tools/gaps/build-data.mjs from tools/gaps/public-gaps.json and the coverage register. Edit those, never this file.",
-  "release": "v0.38.0",
+  "release": "v0.38.1",
   "states": {
     "fixing": {
       "label": "Being fixed",
@@ -41,8 +41,8 @@
   "counts": {
     "fixing": 1,
     "known": 14,
-    "unreleased": 10,
-    "fixed": 99,
+    "unreleased": 0,
+    "fixed": 109,
     "lost": 5,
     "purpose": 15,
     "idea": 11
@@ -101,23 +101,6 @@
       "name": "Quests",
       "items": [
         {
-          "id": "F86",
-          "text": "Legalize It's Bureaucratic Hall had no way out: its glass doors were missing.",
-          "state": "unreleased"
-        },
-        {
-          "id": "F91",
-          "text": "In Radiant Glare, the top bank of bulbs refused clicks from the disc, though the room said clicking works from anywhere.",
-          "report": 318,
-          "state": "unreleased"
-        },
-        {
-          "id": "F94",
-          "text": "With a bag open, a quest's award waited, so Gwendolyn's Task never offered its second part.",
-          "report": 322,
-          "state": "unreleased"
-        },
-        {
           "id": "F11",
           "text": "Chasing Hubba Dubba Hugs is offered but cannot be finished, and Tend to Your Community never ticks its Herb Gardens step.",
           "state": "fixed",
@@ -166,6 +149,26 @@
           "report": 298,
           "state": "fixed",
           "version": "v0.38.0"
+        },
+        {
+          "id": "F86",
+          "text": "Legalize It's Bureaucratic Hall had no way out: its glass doors were missing.",
+          "state": "fixed",
+          "version": "v0.38.1"
+        },
+        {
+          "id": "F91",
+          "text": "In Radiant Glare, the top bank of bulbs refused clicks from the disc, though the room said clicking works from anywhere.",
+          "report": 318,
+          "state": "fixed",
+          "version": "v0.38.1"
+        },
+        {
+          "id": "F94",
+          "text": "With a bag open, a quest's award waited, so Gwendolyn's Task never offered its second part.",
+          "report": 322,
+          "state": "fixed",
+          "version": "v0.38.1"
         }
       ]
     },
@@ -188,32 +191,36 @@
           "state": "known"
         },
         {
+          "id": "G678",
+          "text": "In Thornfad Layers, the letter or heart that shows over your head by the locked door is not drawn yet.",
+          "state": "fixed",
+          "version": "v0.37.0"
+        },
+        {
           "id": "F88",
           "text": "A meditation cut short by a teleport did not count on the street it started on.",
           "report": 316,
-          "state": "unreleased"
+          "state": "fixed",
+          "version": "v0.38.1"
         },
         {
           "id": "F89",
           "text": "The Louise Pasture Villa's door stood alone in an open field, with no house around it.",
-          "state": "unreleased"
+          "state": "fixed",
+          "version": "v0.38.1"
         },
         {
           "id": "F90",
           "text": "Groddle Meadow's shrines stood far from where Tiny Speck's 2012 street pictures show them.",
-          "state": "unreleased"
+          "state": "fixed",
+          "version": "v0.38.1"
         },
         {
           "id": "F92",
           "text": "A shrine, tree, vendor or animal could stand on top of a Peat Bog, Jellisac or Barnacle.",
           "report": 319,
-          "state": "unreleased"
-        },
-        {
-          "id": "G678",
-          "text": "In Thornfad Layers, the letter or heart that shows over your head by the locked door is not drawn yet.",
           "state": "fixed",
-          "version": "v0.37.0"
+          "version": "v0.38.1"
         }
       ]
     },
@@ -537,12 +544,6 @@
       "name": "Animals",
       "items": [
         {
-          "id": "F95",
-          "text": "A Swoonerfly lying on the ground showed no name, so it looked like a dying butterfly.",
-          "report": 320,
-          "state": "unreleased"
-        },
-        {
           "id": "G642",
           "text": "Chickens squawk and flutter off when you walk into them.",
           "state": "fixed",
@@ -580,6 +581,13 @@
           "text": "Milking a butterfly that was not ready ran its answer across the whole screen in one line.",
           "state": "fixed",
           "version": "v0.38.0"
+        },
+        {
+          "id": "F95",
+          "text": "A Swoonerfly lying on the ground showed no name, so it looked like a dying butterfly.",
+          "report": 320,
+          "state": "fixed",
+          "version": "v0.38.1"
         }
       ]
     },
@@ -956,17 +964,18 @@
       "name": "Vendors",
       "items": [
         {
-          "id": "F87",
-          "text": "A vendor could buy the units your Magic Rock held for a full pack, along with the stack in your pack.",
-          "report": 317,
-          "state": "unreleased"
-        },
-        {
           "id": "F69",
           "text": "A vendor's shelf jumped back to the top after each sale.",
           "report": 288,
           "state": "fixed",
           "version": "v0.37.0"
+        },
+        {
+          "id": "F87",
+          "text": "A vendor could buy the units your Magic Rock held for a full pack, along with the stack in your pack.",
+          "report": 317,
+          "state": "fixed",
+          "version": "v0.38.1"
         }
       ]
     },
@@ -989,7 +998,8 @@
           "id": "F93",
           "text": "Joining a street with a felled tree drew its Patch twice.",
           "report": 321,
-          "state": "unreleased"
+          "state": "fixed",
+          "version": "v0.38.1"
         }
       ]
     }
