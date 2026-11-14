@@ -11,7 +11,7 @@ import assert from 'node:assert/strict';
 import { join } from 'node:path';
 
 import { GENTLE_ISLAND, LEAVE_FLAG_DELAY_MS, leaveFlagStreet, normalizeNewxpSave } from '../public/js/newxp.js?v=b89001c1';
-import { __newxpTest } from '../public/js/features/newxp-feature.js?v=e0cd1a94';
+import { __newxpTest } from '../public/js/features/newxp-feature.js?v=7521efb6';
 import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=10b118dd';
 import { acceptOffer } from '../public/js/quest-offers.js?v=89511e1e';
 import { createQuestState } from '../public/js/quests.js?v=40c71a37';

@@ -113,6 +113,10 @@ export function actionLoopFor(classId, verbId) {
   // (players/inc_skill_packages.js 388 and 424; mortar_barnacle.js 347, ice_knob.js runSkillPackage).
   // The Super Scraper has no file of its own (sound-keys.json: alias SCRAPER).
   if (verb === 'scrape' && (cls === 'mortar_barnacle' || cls === 'ice_knob')) return { key: 'SCRAPER', intervalMs: 1800 };
+  // Digging a Dirt Pile and cutting Peat take a Shovel or an Ace of Spades (dirt_pile.js 211-220,
+  // peat_1.js 345-367 runSkillPackage with the shovel as tool_item), so the Shovel's sound runs the
+  // same way (ACE_OF_SPADES has no file of its own: sound-keys.json alias SHOVEL).
+  if ((verb === 'dig' && cls === 'dirt_pile') || (verb === 'harvest' && /^peat_\d$/.test(cls))) return { key: 'SHOVEL', intervalMs: 1250 };
   return null;
 }
 

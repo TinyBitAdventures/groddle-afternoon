@@ -12,7 +12,7 @@ import {
   playSynthRecipe,
   recipeForKey,
 } from '../public/js/synth-sfx.js?v=c30a1709';
-import { createSoundBoard, resolveSound } from '../public/js/sound-board.js?v=7d2c65a8';
+import { createSoundBoard, resolveSound } from '../public/js/sound-board.js?v=e3634838';
 import {
   LEGACY_SFX_KEYS,
   actionLoopFor,
@@ -24,7 +24,7 @@ import {
   soundForPanel,
   soundForQuoin,
   soundForVerb,
-} from '../public/js/sound-moments.js?v=d7ea4f12';
+} from '../public/js/sound-moments.js?v=ac6375de';
 
 const root = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
 const pub = path.join(root, 'public');

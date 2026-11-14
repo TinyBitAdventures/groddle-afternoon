@@ -8,8 +8,8 @@
  */
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { actionLoopFor } from '../public/js/sound-moments.js?v=d7ea4f12';
-import { sfxFor } from '../public/js/features/resource-nodes-feature.js?v=a98a38eb';
+import { actionLoopFor } from '../public/js/sound-moments.js?v=ac6375de';
+import { sfxFor } from '../public/js/features/resource-nodes-feature.js?v=1fc9b6d2';
 
 describe('#310 scraping sounds from the start', () => {
   it('the Scraper sound loops for the whole scrape of a barnacle or an ice knob', () => {
@@ -20,7 +20,26 @@ describe('#310 scraping sounds from the start', () => {
   it("the end plays the node's own sound, not the Scraper a second time", () => {
     assert.equal(sfxFor({ ok: true, classTsid: 'mortar_barnacle', verbId: 'scrape' }), 'BARNACLE_IS_RELEASED');
     assert.equal(sfxFor({ ok: true, classTsid: 'ice_knob', verbId: 'scrape' }), 'ICE_CUBE');
-    // Other packages keep their end sound (no change here).
-    assert.equal(sfxFor({ ok: true, classTsid: 'dirt_pile', verbId: 'dig' }), 'SHOVEL');
+  });
+});
+
+/**
+ * Digging a Dirt Pile and cutting Peat run the same package with a Shovel or an Ace of Spades as
+ * tool_item (dirt_pile.js 211-220, peat_1.js 345-367): the Shovel sounds while they run and nothing
+ * plays at the end (onDigComplete dirt_pile.js 293-487, onHarvestComplete peat_1.js 233-316 announce no sound).
+ */
+describe('digging and peat sound from the start, as scraping', () => {
+  it('the Shovel loops while a Dirt Pile is dug or Peat is cut', () => {
+    assert.equal(actionLoopFor('dirt_pile', 'dig').key, 'SHOVEL');
+    for (const peat of ['peat_1', 'peat_2', 'peat_3']) assert.equal(actionLoopFor(peat, 'harvest').key, 'SHOVEL', peat);
+    // A crop's harvest is not a peat cut.
+    assert.equal(actionLoopFor('trant_fruit', 'harvest'), null);
+  });
+  it('no end sound where Glitch had none', () => {
+    assert.equal(sfxFor({ ok: true, classTsid: 'dirt_pile', verbId: 'dig' }), null);
+    assert.equal(sfxFor({ ok: true, classTsid: 'peat_1', verbId: 'harvest' }), null);
+    // Others keep theirs.
+    assert.equal(sfxFor({ ok: true, classTsid: 'paper_tree', verbId: 'harvest' }), 'PAPER_TREE');
+    assert.equal(sfxFor({ ok: true, classTsid: 'jellisac', verbId: 'scoop' }), 'SCOOPED_JELLISAC');
   });
 });

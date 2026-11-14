@@ -130,7 +130,7 @@ import {
 import { countWords } from '../words.js?v=ee4e72f8';
 import { ITEM_CATALOG, addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=f49c8998';
 import { QUOIN_SHEET, QUOIN_TYPES, qrazyRewardForLevel } from '../quoins.js?v=61be601c';
-import { soundForQuoin } from '../sound-moments.js?v=d7ea4f12';
+import { soundForQuoin } from '../sound-moments.js?v=ac6375de';
 import { IMAGINATION_UPGRADES } from '../imagination.js?v=1bdfd77c';
 import { EZ_COOKIN_TSID, EZ_FOOD, practiceScreen } from '../practice-streets.js?v=557238c1';
 import { assignQuest, completeQuest } from '../quests.js?v=40c71a37';

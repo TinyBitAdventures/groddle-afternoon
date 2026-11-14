@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=d18e90b8';
 import { createErrorOnce, createFeatureHost } from './js/feature-host.js?v=06bb8b74';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=a73b58ce';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=770768c5';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl, drawTileArt } from './js/enter-chooser.js?v=4a3ea327';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, bodyReachDistance, OUT_OF_REACH_LINE } from './js/reach.js?v=8e52df56';
@@ -1009,7 +1009,7 @@ import { chickenPose, chickenIdleSheetsAsked } from './js/chicken-idle-art.js?v=
 import { chickenWaitPose } from './js/chicken-idles.js?v=eef0279b';
 import { itemOverlayStats } from './js/item-overlay.js?v=445d35d7';
 import { isCrowdSad } from './js/animal-crowding.js?v=0ffb4ced';
-import { createSoundBoard, DEFAULT_SFX_VOLUME, watchButtonClicks, watchPanelSounds } from './js/sound-board.js?v=7d2c65a8';
+import { createSoundBoard, DEFAULT_SFX_VOLUME, watchButtonClicks, watchPanelSounds } from './js/sound-board.js?v=e3634838';
 import {
   actionLoopFor,
   legacySoundKey,
@@ -1023,7 +1023,7 @@ import {
   soundForGameEvent,
   soundForQuoin,
   soundForVerb,
-} from './js/sound-moments.js?v=d7ea4f12';
+} from './js/sound-moments.js?v=ac6375de';
 import { loseMood, moodMax, setMetabolicGainGate, setMetabolicLossGate, setMoodLossNotice } from './js/metabolics.js?v=1383e6fd';
 import { MOOD_DECAY_TEXT } from './js/mood-decay.js?v=49175993';
 import { installHiresIcons } from './js/icon-hires.js?v=165dbd6e';
@@ -33710,7 +33710,7 @@ async function main() {
     },
   };
   if (new URLSearchParams(location.search).has('soundtest')) {
-    import('./js/sound-test.js?v=b4a439f8').then((m) => m.openSoundTest({ document, playSound, board: () => audio.board, unmute: async () => {
+    import('./js/sound-test.js?v=72d68256').then((m) => m.openSoundTest({ document, playSound, board: () => audio.board, unmute: async () => {
       state.muted = false;
       if (audio.ctx?.state === 'suspended') {
         try { await audio.ctx.resume(); } catch (_) { /* opt-in */ }

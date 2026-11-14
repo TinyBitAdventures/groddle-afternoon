@@ -1357,6 +1357,9 @@ export function sfxFor(result) {
   // node's own: mortar_barnacle.js 296 BARNACLE_IS_RELEASED, ice_knob.js 320 ICE_CUBE.
   if (result.verbId === 'scrape' && result.classTsid === 'mortar_barnacle') return 'BARNACLE_IS_RELEASED';
   if (result.verbId === 'scrape' && result.classTsid === 'ice_knob') return 'ICE_CUBE';
+  // A dig or a peat cut had no sound at the end: the Shovel sounded while it ran (actionLoopFor) and
+  // onDigComplete / onHarvestComplete announce none (dirt_pile.js 293-487, peat_1.js 233-316).
+  if ((result.verbId === 'dig' && result.classTsid === 'dirt_pile') || (result.verbId === 'harvest' && /^peat_\d$/.test(String(result.classTsid)))) return null;
   return { scrape: 'SCRAPER', scoop: 'SCOOPED_JELLISAC', dig: 'SHOVEL', harvest: 'HOE' }[result.verbId] || 'ITEM_PICKUP';
 }
 
@@ -1422,7 +1425,8 @@ function applyResult(engine, entity, result) {
   const answer = talkbackFor(result, drop);
   if (answer && entity.target) engine.say(entity.target, answer.text, answer.durationMs, { slugs: answer.slugs });
   else if (result.costs?.xp) engine.floatText(anchorX, anchorY - lift, `+${result.costs.xp} iMG`, 0xd7b8ff);
-  engine.playSound(sfxFor(result), { volume: 0.6, jitter: 0.05 });
+  const sfx = sfxFor(result);
+  if (sfx) engine.playSound(sfx, { volume: 0.6, jitter: 0.05 });
 
   if (entity.classTsid === 'npc_firefly') {
     const filled = normalizeFireflyJarState(result.jar || {});

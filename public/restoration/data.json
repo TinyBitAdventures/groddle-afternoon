@@ -2792,9 +2792,14 @@
   "deployed": "2026-11-13"
  },
  "git": {
-  "commits": 2063,
+  "commits": 2064,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-13",
+    "kind": "fix",
+    "text": "Scraping a barnacle sounds while you scrape, not after"
+   },
    {
     "date": "2026-11-13",
     "kind": "fix",
@@ -2909,11 +2914,6 @@
     "date": "2026-11-13",
     "kind": "improve",
     "text": "Naraka, Ilmenskie Caverns, Ilmenskie Deeps and The Seams now have painted region maps"
-   },
-   {
-    "date": "2026-11-13",
-    "kind": "fix",
-    "text": "In the gut tubes (Greyving Grays and the four others) a phone's Jump button flips which way is down, and the hints say Jump instead of Space"
    }
   ]
  },
