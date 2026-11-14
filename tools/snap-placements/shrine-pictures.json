@@ -289,6 +289,150 @@
     885
    ]
   },
+  "GHH1011JSO11ORS": {
+   "label": "Level 2 West",
+   "picture": "ilmenskie-caverns/LHH1011JSO11ORS_main_1335392655.jpg",
+   "spot": [
+    2192,
+    875
+   ]
+  },
+  "GA91JU4QQ712DJN": {
+   "label": "Arjun Plunge",
+   "picture": "ilmenskie-deeps/LA91JU4QQ712DJN_main_1343867900.jpg",
+   "spot": [
+    1077,
+    2612
+   ]
+  },
+  "GA9114MS8B32FB2": {
+   "label": "Churni Sanctum",
+   "picture": "ilmenskie-deeps/LA9114MS8B32FB2_main_1352934929.jpg",
+   "spot": [
+    2875,
+    1028
+   ]
+  },
+  "GM112V6OCA126K1": {
+   "label": "Devi Drape",
+   "picture": "ilmenskie-deeps/LM112V6OCA126K1_main_1343868610.jpg",
+   "spot": [
+    598,
+    2444
+   ]
+  },
+  "GA918AIN63127HB": {
+   "label": "Dobak Fathom",
+   "picture": "ilmenskie-deeps/LA918AIN63127HB_main_1346470414.jpg",
+   "spot": [
+    3646,
+    867
+   ]
+  },
+  "GM1TS65LBN12EIV": {
+   "label": "Gori Blear",
+   "picture": "ilmenskie-deeps/LM1TS65LBN12EIV_main_1306366601.jpg",
+   "spot": [
+    3104,
+    1028
+   ]
+  },
+  "GA911QQIDI32J6R": {
+   "label": "Janagi Elations",
+   "picture": "ilmenskie-deeps/LA911QQIDI32J6R_main_1315947843.jpg",
+   "spot": [
+    1033,
+    446
+   ]
+  },
+  "GM113FUK5422FVO": {
+   "label": "Kosi Aracana",
+   "picture": "ilmenskie-deeps/LM113FUK5422FVO_main_1316549003.jpg",
+   "spot": [
+    1325,
+    1808
+   ]
+  },
+  "GA9QR2STO832N8E": {
+   "label": "Malika Whim",
+   "picture": "ilmenskie-deeps/LA9QR2STO832N8E_main_1307068237.jpg",
+   "spot": [
+    2007,
+    903
+   ]
+  },
+  "GA912TJ0KF328Q3": {
+   "label": "Megna Burrow",
+   "picture": "ilmenskie-deeps/LA912TJ0KF328Q3_main_1354059286.jpg",
+   "spot": [
+    2604,
+    257
+   ]
+  },
+  "GA910DULG012JIE": {
+   "label": "Punar Grotta",
+   "picture": "ilmenskie-deeps/LA910DULG012JIE_main_1306096120.jpg",
+   "spot": [
+    2619,
+    578
+   ]
+  },
+  "GA9QKFSST732VNK": {
+   "label": "Punpun Snug",
+   "picture": "ilmenskie-deeps/LA9QKFSST732VNK_main_1320884632.jpg",
+   "spot": [
+    802,
+    885
+   ]
+  },
+  "GM169I1E0C226G1": {
+   "label": "Sarda Rapt",
+   "picture": "ilmenskie-deeps/LM169I1E0C226G1_main_1315945008.jpg",
+   "spot": [
+    160,
+    1377
+   ]
+  },
+  "GA9B6PJ3NM22M0D": {
+   "label": "Subarna Spells",
+   "picture": "ilmenskie-deeps/LA9B6PJ3NM22M0D_main_1315949332.jpg",
+   "spot": [
+    1958,
+    1483
+   ]
+  },
+  "GM410QQ0CHARO": {
+   "label": "Flipside",
+   "picture": "ix/LM410QQ0CHARO_main_1339301422.jpg",
+   "spot": [
+    3617,
+    1922
+   ]
+  },
+  "GM4115NJ46G8M": {
+   "label": "Groddle Ladder",
+   "picture": "ix/LM4115NJ46G8M_main_1343864598.jpg",
+   "spot": [
+    606,
+    2939
+   ]
+  },
+  "GM4109NI2R640": {
+   "label": "Guillermo Gamera Way",
+   "picture": "ix/LM4109NI2R640_main_1343870659.jpg",
+   "spot": [
+    3450,
+    1944
+   ]
+  },
+  "GM410TMR0S2S1": {
+   "label": "Ruta Asuncion",
+   "picture": "ix/LM410TMR0S2S1_main_1328476474.jpg",
+   "spot": [
+    2033,
+    700
+   ]
+  },
   "GIF17GAI3VV1C1F": {
    "label": "Boan Stravenue",
    "picture": "jethimadh/LIF17GAI3VV1C1F_main_1346636093.jpg",
@@ -643,6 +787,26 @@
   }
  },
  "unread": {
+  "GA9154LI9R22R7A": {
+   "label": "Ajaya Bliss",
+   "hub": "Ilmenskie Deeps",
+   "why": "no 2012 picture survives"
+  },
+  "GA9ENT2CRE22NFB": {
+   "label": "Amant Kudos",
+   "hub": "Ilmenskie Deeps",
+   "why": "no 2012 picture survives"
+  },
+  "GA9DNT3I2U22RS7": {
+   "label": "Nandak Intention",
+   "hub": "Ilmenskie Deeps",
+   "why": "no 2012 picture survives"
+  },
+  "GM113VSD6922MRJ": {
+   "label": "Tharon Spelunk",
+   "hub": "Ilmenskie Deeps",
+   "why": "no 2012 picture survives"
+  },
   "GIF102S56SV16TJ": {
    "label": "Iso Roine",
    "hub": "Jethimadh",

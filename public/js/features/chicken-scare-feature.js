@@ -28,9 +28,9 @@
 
 import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=b4abfbf2';
 import { landingY, walkSurfaceY } from '../walk-surface.js?v=106bfdc5';
-import { ANIMAL_PATROL } from '../street-ecology.js?v=acbadab3';
+import { ANIMAL_PATROL } from '../street-ecology.js?v=4016b2cb';
 import { forcedRoll } from '../animal-mood.js?v=a49495fc';
-import { animalCrowdSad } from './animal-mood-feature.js?v=aefda7cb';
+import { animalCrowdSad } from './animal-mood-feature.js?v=dd26049a';
 import {
   CHICKEN_CLASS,
   CHICKEN_HOP,
