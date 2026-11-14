@@ -6,7 +6,7 @@
 
 import { listMapDestinations, planTravel, resolveLoadedTsid, tsidAliases } from './travel.js?v=7fd6e363';
 import { HUB_MAP_BACKGROUNDS } from './hub-map-backgrounds.js?v=d6a23c90';
-import { HUB_COLOURS } from './map-views-data.js?v=8e7d7094';
+import { HUB_COLOURS } from './map-views-data.js?v=bf881f35';
 
 /** Map catalog + per-hub files. */
 export const MAP_INDEX_URL = 'assets/maps/index.json';

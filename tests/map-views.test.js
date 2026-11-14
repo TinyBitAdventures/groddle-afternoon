@@ -11,8 +11,8 @@ import { createHash } from 'node:crypto';
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { HUB_COLOURS, WORLD_MAP } from '../public/js/map-views-data.js?v=8e7d7094';
-import { buildHubMapView, goColour, GO_FALLBACK_COLOUR, PUBLIC_HUBS, renderHubMapSvg } from '../public/js/map-graph.js?v=fb63e6de';
+import { HUB_COLOURS, WORLD_MAP } from '../public/js/map-views-data.js?v=bf881f35';
+import { buildHubMapView, goColour, GO_FALLBACK_COLOUR, PUBLIC_HUBS, renderHubMapSvg } from '../public/js/map-graph.js?v=31437f5b';
 import { hubColours } from '../tools/map-views/build.mjs';
 import { STATIONS } from '../public/js/subway.js?v=e6995db8';
 import {
@@ -26,8 +26,9 @@ import {
   subwayPaper,
   subwayPoints,
   subwaySegments,
+  worldCharts,
   worldRegionList,
-} from '../public/js/map-views.js?v=3aed2e8f';
+} from '../public/js/map-views.js?v=00dfaf00';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const read = (p) => readFileSync(join(root, p), 'utf8');
@@ -93,6 +94,91 @@ describe('world map (world_map.fla)', () => {
     assert.match(svg, /<polygon class="map-you world-you" points="479.7,281.7 /);
     // A region the world map does not draw (The Seams, under the ground) has no star (showYouOnWorld).
     assert.doesNotMatch(renderWorldMapSvg(regions, { youHubId: '66' }), /world-you/);
+  });
+
+  it('draws the charts\' Retina twins on a Retina screen; a 1x screen gets the 760 files with the twins as data-hi; nothing else moves', () => {
+    const regions = worldRegionList(INDEX, PUBLIC_HUBS);
+    const lo = renderWorldMapSvg(regions, { youHubId: '56', charts: worldCharts({ dpr: 1 }) });
+    assert.match(lo, /class="world-chart world-chart-locked" href="assets\/maps\/art\/world\/world_map_locked\.jpg" data-hi="assets\/maps\/art\/world\/world_map_locked@2x\.webp" width="760" height="460"/);
+    assert.match(lo, /class="world-chart world-chart-open" href="assets\/maps\/art\/world\/world_map_unlocked\.jpg" data-hi="assets\/maps\/art\/world\/world_map_unlocked@2x\.webp" width="760" height="460" preserveAspectRatio="none" mask="url\(#world-reveal\)"/);
+    const hi = renderWorldMapSvg(regions, { youHubId: '56', charts: worldCharts({ dpr: 2 }) });
+    assert.match(hi, /class="world-chart world-chart-locked" href="assets\/maps\/art\/world\/world_map_locked@2x\.webp" width="760" height="460"/);
+    assert.match(hi, /class="world-chart world-chart-open" href="assets\/maps\/art\/world\/world_map_unlocked@2x\.webp" width="760" height="460"/);
+    assert.doesNotMatch(hi, /data-hi=/, 'already the Retina pair: nothing to swap');
+    assert.equal(worldCharts({ dpr: 1, hi: true }).locked, WORLD_MAP.lockedHi, 'a 1x Map drawn past 760 x 460');
+    // The frames, hover regions, mask and star are in map units: the same SVG but for the two hrefs.
+    const strip = (svg) => svg.replace(/ href="[^"]*world_map_[^"]*"( data-hi="[^"]*")?/g, '');
+    assert.equal(strip(hi), strip(lo));
+    assert.equal(strip(lo), strip(renderWorldMapSvg(regions, { youHubId: '56' })));
+    // Keyed like the subway paper (js/data-urls.js), the twin too.
+    const had = globalThis.groddleDataUrl;
+    globalThis.groddleDataUrl = (u) => `${u}?v=k4`;
+    try {
+      assert.match(renderWorldMapSvg(regions, { charts: worldCharts({ dpr: 1 }) }), /href="assets\/maps\/art\/world\/world_map_locked\.jpg\?v=k4" data-hi="[^"]*world_map_locked@2x\.webp\?v=k4"/);
+    } finally {
+      if (had) globalThis.groddleDataUrl = had;
+      else delete globalThis.groddleDataUrl;
+    }
+  });
+
+  it('the Retina twins are the files their provenance names: sharpened copies of Tiny Speck\'s CC0 charts, CC0 1.0', () => {
+    const prov = JSON.parse(read('tools/provenance/world-map-2x.json'));
+    const policy = JSON.parse(read('tools/builder/licence-policy.json'));
+    assert.equal(prov.format, 'groddle-world-map-2x/1');
+    const sha = (buf) => createHash('sha256').update(buf).digest('hex');
+    const webpSize = (buf) => {
+      assert.equal(buf.toString('ascii', 8, 12), 'WEBP');
+      const chunk = buf.toString('ascii', 12, 16);
+      if (chunk === 'VP8 ') return [buf.readUInt16LE(26) & 0x3fff, buf.readUInt16LE(28) & 0x3fff];
+      if (chunk === 'VP8X') return [buf.readUIntLE(24, 3) + 1, buf.readUIntLE(27, 3) + 1];
+      const b = buf.readUInt32LE(21);
+      return [(b & 0x3fff) + 1, ((b >> 14) & 0x3fff) + 1];
+    };
+    const jpegSize = (buf) => {
+      for (let i = 2; i + 9 < buf.length;) {
+        if (buf[i] !== 0xff) { i += 1; continue; }
+        const m = buf[i + 1];
+        if (m >= 0xc0 && m <= 0xcf && ![0xc4, 0xc8, 0xcc].includes(m)) return [buf.readUInt16BE(i + 7), buf.readUInt16BE(i + 5)];
+        i += 2 + buf.readUInt16BE(i + 2);
+      }
+      return null;
+    };
+    assert.deepEqual(Object.keys(prov.charts).sort(), ['locked', 'unlocked']);
+    for (const chart of ['locked', 'unlocked']) {
+      const c = prov.charts[chart];
+      // The originals stay, byte for byte the FLA's (tools/map-views/build.mjs).
+      assert.equal(c.original.file, WORLD_MAP[chart], `${chart}: the 760 x 460 original the game draws`);
+      assert.equal(c.x2.file, WORLD_MAP[`${chart}Hi`], `${chart}: the game draws the twin the provenance names`);
+      for (const [r, size, dims] of [[c.original, [760, 460], jpegSize], [c.x2, [1520, 920], webpSize]]) {
+        assert.deepEqual([r.w, r.h], size, r.file);
+        const buf = readFileSync(join(root, 'public', r.file));
+        assert.deepEqual(dims(buf), size, r.file);
+        assert.equal(buf.length, r.bytes, r.file);
+        assert.equal(sha(buf), r.sha256, `${r.file} is the file its provenance names`);
+      }
+      assert.ok(c.x2.bytes < 450 * 1024, `${c.x2.file} stays under 450 KB`);
+      assert.match(c.raw.sha256, /^[0-9a-f]{64}$/);
+      assert.deepEqual([c.raw.w, c.raw.h], [2048, 1152]);
+      for (const k of ['r', 'g', 'b']) assert.ok(c.gain[k] > 1 && c.gain[k] < 1.2, `${chart} gain ${k}`);
+    }
+    assert.equal(prov.licence, 'ai-generated');
+    for (const k of policy.licences[prov.licence].requires.filter((k) => k !== 'sha256')) assert.ok(prov[k], k);
+    for (const k of ['model', 'made', 'madeBy', 'inputs', 'source', 'settings', 'processing', 'knownDifferences']) assert.ok(prov[k], k);
+    assert.equal(prov.model, 'GPT Image 2.6 Sunburst');
+    assert.equal(prov.tool, 'GPT Image 2.6 Sunburst in T3 Chat canvas');
+    assert.equal(prov.madeBy, 'Grok Bot, for Austin Ginder, who directed it');
+    assert.equal(prov.settings.startsWith('16:9, High 2K, opaque, 1 image'), true);
+    assert.equal(prov.made, '2026-11-13');
+    assert.match(prov.source, /^Tiny Speck, CC0: glitch-overlays\/world_map\.fla LIBRARY\/zz_background\/world_map_unlocked\.jpg and world_map_locked\.jpg/);
+    assert.ok(/^This is a restoration job, not an illustration job\. Sharpen the attached picture\./.test(prov.prompt) && prov.prompt.length > 1300, 'the prompt in full');
+    assert.equal(prov.inputs.length, 2, 'one input a chart, one chat each');
+    for (const i of prov.inputs) {
+      assert.ok(i.file && i.what && i.chart, `input ${i.n}`);
+      assert.match(i.sha256, /^[0-9a-f]{64}$/, `input ${i.n}`);
+      assert.match(i.source, /^Tiny Speck, CC0: glitch-overlays\/world_map\.fla/, `input ${i.n}`);
+    }
+    assert.ok(prov.notes.some((n) => /^Round 1 .*rejected/.test(n)), 'the rejected first round is recorded');
+    assert.match(read('public/assets/maps/SOURCE.txt'), /World map charts at 2x \(G471, 2026-11-13\)/);
   });
 });
 

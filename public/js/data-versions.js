@@ -141,6 +141,8 @@
       "assets/maps/art/world/cards/99.svg": "c5b0252e",
       "assets/maps/art/world/frames.svg": "84309305",
       "assets/maps/art/world/world_map_locked.jpg": "8c4a0f3e",
+      "assets/maps/art/world/world_map_locked@2x.webp": "5968c811",
+      "assets/maps/art/world/world_map_unlocked@2x.webp": "d0be165b",
       "assets/sprites/animals/npc_batterfly_profile_turned.webp": "ba6f1609",
       "assets/sprites/animals/npc_batterfly_profile_turned@3x.webp": "1d289b45",
       "assets/sprites/animals/npc_chicken_flying.webp": "1104d65c",

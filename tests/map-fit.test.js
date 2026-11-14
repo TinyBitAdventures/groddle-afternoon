@@ -41,7 +41,7 @@ import {
   mapFitSize,
   quadBox,
   renderHubMapSvg,
-} from '../public/js/map-graph.js?v=fb63e6de';
+} from '../public/js/map-graph.js?v=31437f5b';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const read = (p) => readFileSync(join(root, p), 'utf8');
@@ -198,7 +198,7 @@ describe('ticket 76: the Map grows with the window (MAPSIZE)', () => {
     assert.match(game, /mapFitObserver\.observe\(panel\);\n\s+mapFitObserver\.observe\(card\);/);
     assert.match(game, /globalThis\.addEventListener\?\.\('resize', again\);/);
     // A 1x screen takes the Retina painting once the map draws past 760 x 460 (no blurry art).
-    assert.match(game, /if \(soft && fit\.scale \* \(Number\(globalThis\.devicePixelRatio\) \|\| 1\) > 1\.01\) soft\.setAttribute\('href', soft\.dataset\.hi\);/);
+    assert.match(game, /if \(fit\.scale \* \(Number\(globalThis\.devicePixelRatio\) \|\| 1\) > 1\.01\) \{\n      for \(const soft of canvas\.querySelectorAll\('image\[data-hi\]'\)\) soft\.setAttribute\('href', soft\.dataset\.hi\);/);
     assert.match(read('public/js/map-graph.js'), /data-hi="\$\{escapeXml\(keyedArt\(view\.bgSoftHi\)\)\}"/);
   });
 

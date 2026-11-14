@@ -24,7 +24,7 @@
  * the same menu a street does on the region map (Set as Destination, Teleport Here) for its street
  * above ground; its region's name opens that region's map with the street found.
  */
-import { WORLD_MAP } from './map-views-data.js?v=8e7d7094';
+import { WORLD_MAP } from './map-views-data.js?v=bf881f35';
 import { LINE_COLOURS, STATIONS, SUBWAY_ART, SUBWAY_ART_BASE, lineName } from './subway.js?v=e6995db8';
 
 export const MAP_VIEWS = Object.freeze(['hub', 'world', 'subway']);
@@ -75,10 +75,34 @@ function grownQuad(quad, centre, d) {
 }
 
 /**
+ * The two charts as renderWorldMapSvg draws them: { locked, unlocked, lockedHi, unlockedHi } (unkeyed).
+ * Tiny Speck's charts exist only at 760 x 460; their 1520 x 920 twins are sharpened copies
+ * (tools/provenance/world-map-2x.json). As the Subway paper (subwayPaper): the Retina files on a
+ * Retina screen, or when `hi` says so (js/map-bg-preload.js prepareWorldCharts: a 1x screen whose
+ * Map last drew past 760 x 460); else the 760 files, with the twins as data-hi for game.js
+ * fitMapCanvas and js/map-zoom.js to swap in once the map draws larger.
+ */
+export function worldCharts({ dpr = Number(globalThis.devicePixelRatio) || 1, hi = null, world = WORLD_MAP } = {}) {
+  const big = hi === null ? dpr > 1 : Boolean(hi);
+  return {
+    locked: big && world.lockedHi ? world.lockedHi : world.locked,
+    unlocked: big && world.unlockedHi ? world.unlockedHi : world.unlocked,
+    lockedHi: world.lockedHi || '',
+    unlockedHi: world.unlockedHi || '',
+  };
+}
+
+/** A chart's href, and its Retina twin as data-hi when that is another file (keyed, escaped). */
+function chartHref(href, hi) {
+  return `href="${esc(keyedArt(href))}"${hi && hi !== href ? ` data-hi="${esc(keyedArt(hi))}"` : ''}`;
+}
+
+/**
  * The world map as SVG (760 x 460 map units). youHubId: the region to star (none when the
  * player's region is not on the world map: the client's getRegion found none and drew no star).
+ * charts: worldCharts()'s answer (the files only; every frame, card and the star stay in map units).
  */
-export function renderWorldMapSvg(regions, { youHubId = '', world = WORLD_MAP } = {}) {
+export function renderWorldMapSvg(regions, { youHubId = '', world = WORLD_MAP, charts = worldCharts({ world }) } = {}) {
   const { w, h } = world;
   const you = regions.find((r) => r.hubId === String(youHubId || ''));
   const reveal = regions.filter((r) => r.open).map((r) => `<polygon points="${grownQuad(r.quad, r.centre, WORLD_REVEAL.grow)}"/>`).join('');
@@ -95,8 +119,8 @@ export function renderWorldMapSvg(regions, { youHubId = '', world = WORLD_MAP } 
     + `<defs><filter id="world-reveal-soft" x="-10%" y="-10%" width="120%" height="120%"><feGaussianBlur stdDeviation="${WORLD_REVEAL.blur}"/></filter>`
     + `<mask id="world-reveal" maskUnits="userSpaceOnUse" x="0" y="0" width="${w}" height="${h}"><rect width="${w}" height="${h}" fill="black"/>`
     + `<g fill="white" filter="url(#world-reveal-soft)">${reveal}</g></mask></defs>`
-    + `<image class="world-chart world-chart-locked" href="${esc(world.locked)}" width="${w}" height="${h}" preserveAspectRatio="none"/>`
-    + `<image class="world-chart world-chart-open" href="${esc(world.unlocked)}" width="${w}" height="${h}" preserveAspectRatio="none" mask="url(#world-reveal)"/>`
+    + `<image class="world-chart world-chart-locked" ${chartHref(charts.locked, charts.lockedHi)} width="${w}" height="${h}" preserveAspectRatio="none"/>`
+    + `<image class="world-chart world-chart-open" ${chartHref(charts.unlocked, charts.unlockedHi)} width="${w}" height="${h}" preserveAspectRatio="none" mask="url(#world-reveal)"/>`
     + `<image class="world-frames" href="${esc(world.frames)}" width="${w}" height="${h}" preserveAspectRatio="none" pointer-events="none"/>`
     + `<g class="world-regions">${hits}</g>${star}<g class="world-card-layer" pointer-events="none"></g></svg>`;
 }

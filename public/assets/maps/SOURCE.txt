@@ -104,3 +104,19 @@ Subway map paper (G471, 2026-11-13)
     Reference    the Tribute Blog's capture of the original window (post 38013353380): looked at,
     only         measured for positions and described in the prompt's words; never given to the
                  model and not in this repo
+
+World map charts at 2x (G471, 2026-11-13)
+  assets/maps/art/world/world_map_unlocked@2x.webp and world_map_locked@2x.webp (1520x920): Tiny
+  Speck's two 760x460 charts sharpened for Retina screens, the same lines, lettering and places (not
+  a new picture). js/map-views.js worldCharts picks them on a Retina screen, or once a 1x screen draws
+  the map past 760x460; the 760x460 originals stay. tests/map-views.test.js checks sizes, hashes,
+  provenance.
+    Licence      AI-generated, dedicated CC0 1.0 (tools/builder/licence-policy.json)
+    Model        GPT Image 2.6 Sunburst, in T3 Chat canvas, 2026-11-13 (16:9, High 2K, 1 image),
+                 made by Grok Bot for Austin Ginder, who directed it
+    Prompt       in full in tools/provenance/world-map-2x.json
+    Inputs       each chart alone, in its own chat: the original at 2x on a 16:9 canvas with flat
+                 side bands (Tiny Speck, CC0, glitch-overlays/world_map.fla)
+    After        bands cropped, Lanczos to 1520x920, shifted onto the original's lines, a per-channel
+                 gain to the original's mean colour, WebP quality 80
+    Round 1      a repaint (Ix redrawn, lettering in a new hand, map stretched): rejected

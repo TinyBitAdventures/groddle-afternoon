@@ -25,9 +25,14 @@
  * view never opens on the bare sage: when the Map opens, and when the pointer or keyboard focus comes
  * to its Subway button (game.js warmSubwayPaper, loader.warm). It is one picture, held apart from the
  * regions' cap. Opened before it arrives (the Subway Map sign's view), it fades in over the sage.
+ *
+ * The World view's two charts (2026-11-13, js/map-views.js worldCharts: Tiny Speck's 760 x 460 charts
+ * and their sharpened 1520 x 920 twins) are warmed the same way, the pair this screen draws: when the
+ * Map opens and when the pointer or keyboard focus comes to its World button (game.js warmWorldCharts).
  */
 import { HUB_MAP_BACKGROUNDS } from './hub-map-backgrounds.js?v=d6a23c90';
-import { SUBWAY_PAPER, subwayPaper } from './map-views.js?v=3aed2e8f';
+import { WORLD_MAP } from './map-views-data.js?v=bf881f35';
+import { SUBWAY_PAPER, subwayPaper, worldCharts } from './map-views.js?v=00dfaf00';
 
 /** How many regions' paintings are held at once (the latest previews, your own region among them). */
 export const MAP_BG_PRELOAD_CAP = 4;
@@ -89,6 +94,20 @@ export function subwayPaperFile({ dpr = 1, fitScale = 0, paper = SUBWAY_PAPER } 
 export function prepareSubwayPaper({ loader = null, dpr = 1, fitScale = 0, keyed = keyedArt, paper = SUBWAY_PAPER } = {}) {
   const href = subwayPaperFile({ dpr, fitScale, paper });
   return { ...subwayPaper({ dpr, paper }), href, wait: !loader?.ready(keyed(href)) };
+}
+
+/** The World view's two charts at the size the Map draws on this screen, unkeyed (mapBgWantsHi, as a region's painting). */
+export function worldChartFiles({ dpr = 1, fitScale = 0, world = WORLD_MAP } = {}) {
+  const c = worldCharts({ hi: mapBgWantsHi(dpr, fitScale), world });
+  return [c.locked, c.unlocked];
+}
+
+/**
+ * Before the World view is drawn (game.js showMapView): js/map-views.js renderWorldMapSvg's `charts`,
+ * the Retina pair at once when this screen draws it (a 1x screen whose Map last drew past 760 x 460).
+ */
+export function prepareWorldCharts({ dpr = 1, fitScale = 0, world = WORLD_MAP } = {}) {
+  return worldCharts({ hi: mapBgWantsHi(dpr, fitScale), world });
 }
 
 /**

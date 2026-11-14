@@ -979,14 +979,14 @@ import {
   MAP_INDEX_URL,
   HUB_56_MAP_URL,
   PUBLIC_HUBS,
-} from './js/map-graph.js?v=fb63e6de';
+} from './js/map-graph.js?v=31437f5b';
 // G471: the world map and the subway map in the Map's window.
-import { MAP_VIEW_TITLES, bindSubwayMap, bindWorldMap, mapViewSubtitle, nearestStation, renderSubwayMapSvg, renderWorldMapSvg, worldRegionList } from './js/map-views.js?v=3aed2e8f';
+import { MAP_VIEW_TITLES, bindSubwayMap, bindWorldMap, mapViewSubtitle, nearestStation, renderSubwayMapSvg, renderWorldMapSvg, worldRegionList } from './js/map-views.js?v=00dfaf00';
 // MAPLOAD: a region's painting fetched ahead of the click, its thumb in its place while it loads.
-import { createMapBgPreloader, mapBgFiles, prepareMapBg, prepareSubwayPaper, subwayPaperFile, watchMapBg } from './js/map-bg-preload.js?v=5f75925a';
+import { createMapBgPreloader, mapBgFiles, prepareMapBg, prepareSubwayPaper, prepareWorldCharts, subwayPaperFile, watchMapBg, worldChartFiles } from './js/map-bg-preload.js?v=f2edd389';
 import { hubMapArtNote, hubMapSubtitle, questLogSummary } from './js/panel-copy.js?v=85c3e029';
 import { bindMapIconTips } from './js/ui/map-icon-tips.js?v=6b3eb3f9';
-import { createMapZoom } from './js/map-zoom.js?v=4c2ce0e3';
+import { createMapZoom } from './js/map-zoom.js?v=4f0762b2';
 import {
   loadStreetEcologyCatalog,
   ecologyForStreet,
@@ -1106,6 +1106,10 @@ const mapBgLoader = createMapBgPreloader({
 /** The Subway view's paper, fetched ahead of its button's click (when the Map opens, its button hovered or focused). */
 function warmSubwayPaper() {
   return mapBgLoader.warm(subwayPaperFile({ dpr: globalThis.devicePixelRatio, fitScale: mapFitScale }));
+}
+/** The World view's two charts, the pair this screen draws, fetched ahead of its button's click (as the Subway paper). */
+function warmWorldCharts() {
+  return worldChartFiles({ dpr: globalThis.devicePixelRatio, fitScale: mapFitScale }).map((f) => mapBgLoader.warm(f));
 }
 
 async function ensureMapIndex() {
@@ -25878,6 +25882,7 @@ async function openMap(hubId, { find = '', focus = '', view: pickedView = '' } =
   if (find) showFoundStreet(canvas, find, view);
   else if (focus) focusMapOn(canvas, focus);
   warmSubwayPaper();
+  warmWorldCharts();
 }
 
 /** The cards above the map (a quest's teleport, your home, the features' cards), before arrangeMapCards. */
@@ -25914,6 +25919,7 @@ function markMapView(panel, which) {
     // The Subway view's paper, on its way while the pointer or keyboard focus is on its button.
     const warmOn = (e) => {
       if (e.target.closest?.('[data-map-view="subway"]')) warmSubwayPaper();
+      if (e.target.closest?.('[data-map-view="world"]')) warmWorldCharts();
     };
     bar.addEventListener('pointerover', warmOn);
     bar.addEventListener('focusin', warmOn);
@@ -25927,7 +25933,8 @@ function showMapView(which, { panel, canvas, title, sub, spot, mapIndex }) {
   let subLine = '';
   if (which === 'world') {
     const regions = worldRegionList(mapIndex, PUBLIC_HUBS);
-    canvas.innerHTML = renderWorldMapSvg(regions, { youHubId: spot.hubId });
+    const charts = prepareWorldCharts({ dpr: globalThis.devicePixelRatio, fitScale: mapFitScale });
+    canvas.innerHTML = renderWorldMapSvg(regions, { youHubId: spot.hubId, charts });
     // MAPLOAD: a region's painting is fetched once its card has been up a moment, at once on a phone's first tap.
     bindWorldMap(canvas, { touch, onOpen: (id) => openMap(id), onPreview: (id, how) => mapBgLoader.preview(id, { now: how === 'tap' }) });
     subLine = mapViewSubtitle('world', { touch, regions });
@@ -25972,6 +25979,7 @@ function showMapView(which, { panel, canvas, title, sub, spot, mapIndex }) {
   // MAPLOAD: your own region's painting, ready for the click back into it (after the fit, which picks its size).
   if (which === 'world') mapBgLoader.preload(spot.hubId);
   warmSubwayPaper();
+  warmWorldCharts();
 }
 
 /**
@@ -26068,8 +26076,10 @@ function fitMapCanvas(panel = document.getElementById('map-panel')) {
       delete card.dataset.mapCompact;
       return null;
     }
-    const soft = canvas.querySelector('image.map-bg-soft[data-hi]');
-    if (soft && fit.scale * (Number(globalThis.devicePixelRatio) || 1) > 1.01) soft.setAttribute('href', soft.dataset.hi);
+    // The Retina files once the map draws past 760 x 460 (a region's painting, the Subway paper, the World view's charts).
+    if (fit.scale * (Number(globalThis.devicePixelRatio) || 1) > 1.01) {
+      for (const soft of canvas.querySelectorAll('image[data-hi]')) soft.setAttribute('href', soft.dataset.hi);
+    }
     mapFitScale = fit.scale;
     setCanvasData('mapFit', `${fit.w}x${fit.h}@${fit.scale.toFixed(2)}${fit.compact ? ' compact' : ''}`);
   } finally {

@@ -5,7 +5,8 @@
 export const HUB_COLOURS = Object.freeze({"26":"#ff0000","27":"#651717","28":"#ff0000","33":"#ff0000","37":"#ff0000","40":"#7b0000","41":"#ff0000","45":"#ff0000","49":"#ff0000","50":"#633279","51":"#591f73","52":"#ff0000","55":"#ff0000","56":"#5f721d","57":"#ff0000","58":"#1d3a80","60":"#ff0000","61":"#ff0000","63":"#545454","64":"#6a5522","66":"#009995","67":"#ff0000","69":"#ff0000","70":"#ff0000","71":"#726758","72":"#6d5255","73":"#ff0000","75":"#3b7700","76":"#2d8a4a","77":"#513122","78":"#492e5e","79":"#ff0000","80":"#ff0000","81":"#ff0000","82":"#ff0000","83":"#ff0000","84":"#ff0000","85":"#a05200","86":"#959b00","87":"#ff0000","88":"#479500","89":"#de5d25","90":"#b8aa00","91":"#d88a00","92":"#718f00","93":"#008f6a","94":"#ff0000","95":"#8f5200","96":"#ff0000","97":"#008f03","98":"#34a700","99":"#a73600","100":"#2da89e","101":"#00a773","102":"#00937f","103":"#ff0000","105":"#00a73d","106":"#a56800","107":"#a75200","108":"#ff0000","109":"#00a77b","110":"#a77e00","111":"#ff0000","112":"#00a773","113":"#a75200","114":"#954f18","115":"#ff0000","116":"#189495","117":"#ff0000","118":"#ff0000","119":"#a75200","120":"#52a700","121":"#1d8a00","123":"#b55513","124":"#ff0000","125":"#ff0000","126":"#a75200","127":"#ff0000","128":"#980094","129":"#5289a8","130":"#ff0000","131":"#00a79d","132":"#ff0000","133":"#804a16","134":"#ff0000","135":"#ff0000","136":"#005182","137":"#0097a7","138":"#ff0000","139":"#ff0000","140":"#ff0000","141":"#ff0000","142":"#44a700","143":"#009995"});
 
 /**
- * The world map (world_map.fla, HubMapDialog.as): the locked and painted charts, the frames
+ * The world map (world_map.fla, HubMapDialog.as): the locked and painted charts (760 x 460, and
+ * their 1520 x 920 Retina twins, sharpened from them: tools/provenance/world-map-2x.json), the frames
  * overlay, and the 47 regions by hub id: the clip's click frame as a quad (map units), its
  * centre (where the client put the "you" star, showYouOnWorld 374-381) and its hover card
  * (drawn in the clip's own space over box [x, y, w, h], placed by matrix m).
@@ -15,6 +16,8 @@ export const WORLD_MAP = Object.freeze({
   h: 460,
   locked: 'assets/maps/art/world/world_map_locked.jpg',
   unlocked: 'assets/maps/art/world/world_map_unlocked.jpg',
+  lockedHi: 'assets/maps/art/world/world_map_locked@2x.webp',
+  unlockedHi: 'assets/maps/art/world/world_map_unlocked@2x.webp',
   frames: 'assets/maps/art/world/frames.svg',
   regions: Object.freeze({
     "27": Object.freeze({ quad: [[166.65,79.51],[231.23,79.51],[231.23,130.31],[166.65,130.31]], centre: [198.94,104.91], card: Object.freeze({ href: 'assets/maps/art/world/cards/27.svg', box: [-21.35,-8.35,150.41,121.56], m: [1,0,0,1,163.7,79.25] }) }),

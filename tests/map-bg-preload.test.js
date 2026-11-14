@@ -12,9 +12,9 @@ import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { HUB_MAP_BACKGROUNDS } from '../public/js/hub-map-backgrounds.js?v=d6a23c90';
-import { WORLD_MAP } from '../public/js/map-views-data.js?v=8e7d7094';
-import { bindWorldMap } from '../public/js/map-views.js?v=3aed2e8f';
-import { MAP_THUMB_SOFT, buildHubMapView, renderHubMapSvg } from '../public/js/map-graph.js?v=fb63e6de';
+import { WORLD_MAP } from '../public/js/map-views-data.js?v=bf881f35';
+import { bindWorldMap } from '../public/js/map-views.js?v=00dfaf00';
+import { MAP_THUMB_SOFT, buildHubMapView, renderHubMapSvg } from '../public/js/map-graph.js?v=31437f5b';
 import {
   MAP_BG_FADE_MS,
   MAP_BG_GIVE_UP_MS,
@@ -26,9 +26,11 @@ import {
   mapBgWantsHi,
   prepareMapBg,
   prepareSubwayPaper,
+  prepareWorldCharts,
   subwayPaperFile,
   watchMapBg,
-} from '../public/js/map-bg-preload.js?v=5f75925a';
+  worldChartFiles,
+} from '../public/js/map-bg-preload.js?v=f2edd389';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const read = (p) => readFileSync(join(root, p), 'utf8');
@@ -291,12 +293,12 @@ describe('the preview triggers (bindWorldMap onPreview, game.js)', () => {
   it('game.js: a card previews (a tap at once), the World view fetches your region, a station\'s menu its region', () => {
     const game = read('public/game.js');
     assert.match(game, /onPreview: \(id, how\) => mapBgLoader\.preview\(id, \{ now: how === 'tap' \}\)/);
-    assert.match(game, /fitMapCanvas\(panel\);\n  \/\/ MAPLOAD: [^\n]*\n  if \(which === 'world'\) mapBgLoader\.preload\(spot\.hubId\);\n  warmSubwayPaper\(\);\n\}/, 'after the fit, which picks the size');
+    assert.match(game, /fitMapCanvas\(panel\);\n  \/\/ MAPLOAD: [^\n]*\n  if \(which === 'world'\) mapBgLoader\.preload\(spot\.hubId\);\n  warmSubwayPaper\(\);\n  warmWorldCharts\(\);\n\}/, 'after the fit, which picks the size');
     assert.match(game, /openMapStreetMenu\(canvas, e, street, \{ here: st\.surfaceStreetTsid === currentStreetTsid \}\);\n[^\n]*\n        mapBgLoader\.preload\(st\.surfaceHubId\);/);
     // The files at the size the Map draws (fitMapCanvas keeps its scale), the map data warmed beside them.
     assert.match(game, /files: \(hubId\) => mapBgFiles\(hubId, \{ dpr: globalThis\.devicePixelRatio, fitScale: mapFitScale, mapIndex: mapIndexCache \}\)/);
     assert.match(game, /onPreload: \(hubId\) => loadHubMapData\(hubId\)\.catch\(\(\) => \{\}\)/);
-    assert.match(game, /soft\.setAttribute\('href', soft\.dataset\.hi\);\n    mapFitScale = fit\.scale;/);
+    assert.match(game, /soft\.setAttribute\('href', soft\.dataset\.hi\);\n    \}\n    mapFitScale = fit\.scale;/);
     // The region map is drawn from the same cache: prepared before it is drawn.
     const prep = game.indexOf('prepareMapBg(view, { loader: mapBgLoader, dpr: globalThis.devicePixelRatio, fitScale: mapFitScale });');
     const drawn = game.indexOf('canvas.innerHTML = renderHubMapSvg(view);');
@@ -473,8 +475,8 @@ describe('the Subway view\'s paper is fetched ahead too (2026-11-13)', () => {
     const game = read('public/game.js');
     assert.match(game, /function warmSubwayPaper\(\) \{\n  return mapBgLoader\.warm\(subwayPaperFile\(\{ dpr: globalThis\.devicePixelRatio, fitScale: mapFitScale \}\)\);/);
     // After the fit, which picks the size: the region path and the other views.
-    assert.match(game, /fitMapCanvas\(panel\);\n  if \(find\) showFoundStreet\(canvas, find, view\);\n  else if \(focus\) focusMapOn\(canvas, focus\);\n  warmSubwayPaper\(\);\n\}/);
-    assert.match(game, /if \(which === 'world'\) mapBgLoader\.preload\(spot\.hubId\);\n  warmSubwayPaper\(\);\n\}/);
+    assert.match(game, /fitMapCanvas\(panel\);\n  if \(find\) showFoundStreet\(canvas, find, view\);\n  else if \(focus\) focusMapOn\(canvas, focus\);\n  warmSubwayPaper\(\);\n  warmWorldCharts\(\);\n\}/);
+    assert.match(game, /if \(which === 'world'\) mapBgLoader\.preload\(spot\.hubId\);\n  warmSubwayPaper\(\);\n  warmWorldCharts\(\);\n\}/);
     assert.match(game, /closest\?\.\('\[data-map-view="subway"\]'\)\) warmSubwayPaper\(\);/);
     assert.match(game, /bar\.addEventListener\('pointerover', warmOn\);\n    bar\.addEventListener\('focusin', warmOn\);/);
     // The view draws the size this screen takes, and fades the paper in when it was not ready.
@@ -484,5 +486,31 @@ describe('the Subway view\'s paper is fetched ahead too (2026-11-13)', () => {
     const css = read('public/style.css');
     assert.match(css, /\.subway-map-svg \.map-bg-soft\.is-waiting \{ opacity: 0; \}/);
     assert.match(css, /prefers-reduced-motion: reduce\) \{\n  \.subway-map-svg \.map-bg-soft \{ transition: none; \}/);
+  });
+});
+
+describe('the World view\'s two charts are fetched ahead too, the pair this screen draws (2026-11-13)', () => {
+  const X1 = [WORLD_MAP.locked, WORLD_MAP.unlocked];
+  const X2 = [WORLD_MAP.lockedHi, WORLD_MAP.unlockedHi];
+
+  it('the 760 x 460 pair on a 1x screen, the Retina pair on a Retina screen or a 1x Map drawn past 760 x 460', () => {
+    assert.deepEqual(X2, ['assets/maps/art/world/world_map_locked@2x.webp', 'assets/maps/art/world/world_map_unlocked@2x.webp']);
+    assert.deepEqual(worldChartFiles({ dpr: 1, fitScale: 1 }), X1);
+    assert.deepEqual(worldChartFiles({ dpr: 1, fitScale: 0.8 }), X1);
+    assert.deepEqual(worldChartFiles({ dpr: 1, fitScale: 1.3 }), X2, 'a 1x screen drawing the Map at 1.3x');
+    assert.deepEqual(worldChartFiles({ dpr: 2 }), X2);
+    assert.deepEqual(worldChartFiles({ dpr: 3, fitScale: 0.4 }), X2, 'a phone');
+    assert.deepEqual(prepareWorldCharts({ dpr: 1, fitScale: 1 }), { locked: X1[0], unlocked: X1[1], lockedHi: X2[0], unlockedHi: X2[1] });
+    assert.deepEqual(prepareWorldCharts({ dpr: 1, fitScale: 1.3 }), { locked: X2[0], unlocked: X2[1], lockedHi: X2[0], unlockedHi: X2[1] });
+  });
+
+  it('game.js: warmed when the Map opens and when its World button is hovered or focused; the view draws the prepared pair', () => {
+    const game = read('public/game.js');
+    assert.match(game, /function warmWorldCharts\(\) \{\n  return worldChartFiles\(\{ dpr: globalThis\.devicePixelRatio, fitScale: mapFitScale \}\)\.map\(\(f\) => mapBgLoader\.warm\(f\)\);/);
+    assert.match(game, /closest\?\.\('\[data-map-view="world"\]'\)\) warmWorldCharts\(\);/);
+    assert.match(game, /const charts = prepareWorldCharts\(\{ dpr: globalThis\.devicePixelRatio, fitScale: mapFitScale \}\);\n    canvas\.innerHTML = renderWorldMapSvg\(regions, \{ youHubId: spot\.hubId, charts \}\);/);
+    // Both swaps take every Retina twin on the map (a region's painting, the Subway paper, both charts).
+    assert.match(game, /for \(const soft of canvas\.querySelectorAll\('image\[data-hi\]'\)\) soft\.setAttribute\('href', soft\.dataset\.hi\);/);
+    assert.match(read('public/js/map-zoom.js'), /for \(const soft of svg\.querySelectorAll\('image\[data-hi\]'\)\) soft\.setAttribute\('href', soft\.dataset\.hi\);/);
   });
 });

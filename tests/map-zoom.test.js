@@ -35,7 +35,7 @@ import {
   viewWithPointAt,
   wheelZoomFactor,
   zoomMapAt,
-} from '../public/js/map-zoom.js?v=4c2ce0e3';
+} from '../public/js/map-zoom.js?v=4f0762b2';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const read = (p) => readFileSync(join(root, p), 'utf8');
@@ -412,7 +412,7 @@ describe('MAPZOOM: the hold-? sheet says so', () => {
 
 describe('MAPZOOM: the buttons take the clearest corner', () => {
   it('a GO button in the bottom right sends them to the bottom left; a tie keeps the bottom right', async () => {
-    const { pickMapZoomCorner, MAP_ZOOM_CORNERS } = await import('../public/js/map-zoom.js?v=4c2ce0e3');
+    const { pickMapZoomCorner, MAP_ZOOM_CORNERS } = await import('../public/js/map-zoom.js?v=4f0762b2');
     assert.deepEqual([...MAP_ZOOM_CORNERS], ['br', 'bl', 'tr', 'tl']);
     const box = [0, 0, 800, 480];
     const size = { w: 28, h: 86, m: 8 };

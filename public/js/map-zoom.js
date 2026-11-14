@@ -232,9 +232,11 @@ export function createMapZoom(canvas, { onChange = null, doc = globalThis.docume
     svg.toggleAttribute('data-zoomed', zoomed);
     canvas.toggleAttribute('data-zoomed', zoomed);
     canvas.dataset.mapZoom = view.zoom.toFixed(2);
-    // MAPSIZE: a 1x screen takes the Retina painting once a map unit draws over one device pixel.
-    const soft = svg.querySelector('image.map-bg-soft[data-hi]');
-    if (soft && (rect().width / vb[2]) * (Number(globalThis.devicePixelRatio) || 1) > 1.01) soft.setAttribute('href', soft.dataset.hi);
+    // MAPSIZE: a 1x screen takes the Retina painting once a map unit draws over one device pixel
+    // (a region's painting, the Subway paper, the World view's two charts).
+    if ((rect().width / vb[2]) * (Number(globalThis.devicePixelRatio) || 1) > 1.01) {
+      for (const soft of svg.querySelectorAll('image[data-hi]')) soft.setAttribute('href', soft.dataset.hi);
+    }
     if (ctl) {
       ctl.querySelector('[data-zoom="in"]').disabled = view.zoom >= MAP_ZOOM_MAX - EPS;
       ctl.querySelector('[data-zoom="out"]').disabled = !zoomed;

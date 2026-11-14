@@ -1,0 +1,115 @@
+{
+  "format": "groddle-world-map-2x/1",
+  "policy": "The World map's two charts at 2x for Retina screens. Tiny Speck's charts exist only at 760 x 460 (every bitmap of glitch-overlays/world_map.fla), and the World view (js/map-views.js renderWorldMapSvg) draws them far larger on a Retina screen, so they looked soft. These are sharpened copies of Tiny Speck's own CC0 charts, not new pictures: same lines, same lettering, same places. Dedicated CC0 1.0 with their provenance (tools/builder/licence-policy.json, \"ai-generated\"). The 760 x 460 originals stay in the game, drawn on a 1x screen; tests/map-views.test.js checks every file against this record.",
+  "source": "Tiny Speck, CC0: glitch-overlays/world_map.fla LIBRARY/zz_background/world_map_unlocked.jpg and world_map_locked.jpg (2012-01-17; byte for byte public/assets/maps/art/world/world_map_unlocked.jpg and world_map_locked.jpg)",
+  "charts": {
+    "unlocked": {
+      "what": "the painted chart (the World view's bg_reveal, shown round every region you may open)",
+      "original": {
+        "file": "assets/maps/art/world/world_map_unlocked.jpg",
+        "w": 760,
+        "h": 460,
+        "bytes": 63876,
+        "sha256": "b25614212efbbe07eb0b32f47c5cc884bca61a3f55512bfed81d46a8e95fef9c"
+      },
+      "x2": {
+        "file": "assets/maps/art/world/world_map_unlocked@2x.webp",
+        "w": 1520,
+        "h": 920,
+        "bytes": 389682,
+        "sha256": "d0be165b9772f723a980fa4f96106ddb0e311712cd283605eb6ff78b310a661f"
+      },
+      "raw": {
+        "file": "drop/world-map-painted-r2-raw.png",
+        "w": 2048,
+        "h": 1152,
+        "sha256": "fb5e6df9fdb14b6ae34619ddc815c8cc98a5b4a41ac298d88f501af5c570a755"
+      },
+      "shift": "-0.5 px at 2x",
+      "gain": {
+        "r": 1.0415,
+        "g": 1.0735,
+        "b": 1.136
+      }
+    },
+    "locked": {
+      "what": "the sketched chart (the World view's bg, under everything)",
+      "original": {
+        "file": "assets/maps/art/world/world_map_locked.jpg",
+        "w": 760,
+        "h": 460,
+        "bytes": 59000,
+        "sha256": "8c4a0f3e43ceb2d1a98424a558914171a3ac4ab34ee875fd33ce6eb94de048dd"
+      },
+      "x2": {
+        "file": "assets/maps/art/world/world_map_locked@2x.webp",
+        "w": 1520,
+        "h": 920,
+        "bytes": 335162,
+        "sha256": "5968c8111519663737977ba6e61c3feb2b6b529a6476471358a8da95f8de4fa0"
+      },
+      "raw": {
+        "file": "drop/world-map-sketched-r2-raw.png",
+        "w": 2048,
+        "h": 1152,
+        "sha256": "9b1a386c3a54eb0f7e2da01cfb274bf960758d459868e15142159d7a8dc1b63a"
+      },
+      "shift": "-1 px at 2x",
+      "gain": {
+        "r": 1.0819,
+        "g": 1.0879,
+        "b": 1.1086
+      }
+    }
+  },
+  "licence": "ai-generated",
+  "author": "Austin Ginder (directed it)",
+  "madeBy": "Grok Bot, for Austin Ginder, who directed it",
+  "tool": "GPT Image 2.6 Sunburst in T3 Chat canvas",
+  "model": "GPT Image 2.6 Sunburst",
+  "made": "2026-11-13",
+  "settings": "16:9, High 2K, opaque, 1 image (research/map-art/drop/model.txt)",
+  "prompt": "This is a restoration job, not an illustration job. Sharpen the attached picture. Do not move or redraw anything.\n\nThe attachment is already the exact size and shape I want back (16:9). The map fills the middle; the two flat bands at the left and right edges are padding: leave them flat, the same colour, and do not extend the map into them. Do not stretch, scale, crop, shift or re-frame anything.\n\nTreat every pixel's position as fixed. Each coastline, island, contour line, dashed route, tree, cloud, the compass rose, the small doodles and every hand-lettered word must come back at exactly the same position, size, angle and shape, so that the result laid over the attachment matches line for line. Keep the lettering exactly as written: the same hand, the same letter shapes, the same spacing and wobble. Do not neaten, straighten, respell or restyle it. Do not add, remove or change any building, figure, tree or island detail, even small ones. Keep the colours and the darkness of the sea exactly as they are; do not make the sea bluer or greener.\n\nThe only changes allowed: remove the JPEG blocks and blur, make the existing edges crisp, and bring out the paper grain and painted texture that are already there. If you are unsure whether something is detail or blur, keep it as it is.\n\nNo text of your own, no border, no frame, no watermark.\n",
+  "promptNote": "The prompt exactly as given to the model: research/map-art/world-2x/prompt-2.txt (outside git). One chat per chart, each with its one input below attached (paths under research/map-art/world-2x/, outside git).",
+  "inputs": [
+    {
+      "n": 1,
+      "chart": "unlocked",
+      "file": "attach/3-cc0-world-map-painted-2x-on-16x9-1636x920.png",
+      "sha256": "f2214d9086fcd06652c3f45d4d303b2167f1645438fdd5f8218e9a88bad5a289",
+      "what": "the painted chart at 2x (Lanczos), centred on a 1636 x 920 canvas with flat side bands of its edge colour, so T3 Chat's 16:9 canvas does not stretch it; attached alone, in its own chat",
+      "source": "Tiny Speck, CC0: glitch-overlays/world_map.fla LIBRARY/zz_background/world_map_unlocked.jpg (byte for byte public/assets/maps/art/world/world_map_unlocked.jpg)"
+    },
+    {
+      "n": 2,
+      "chart": "locked",
+      "file": "attach/4-cc0-world-map-sketched-2x-on-16x9-1636x920.png",
+      "sha256": "87f885d3a4c77a815e2b4a868c74dfaf29fec43b67dc3f54e76a1a7860f294e2",
+      "what": "the sketched chart at 2x (Lanczos), centred on a 1636 x 920 canvas with flat side bands of its edge colour, so T3 Chat's 16:9 canvas does not stretch it; attached alone, in its own chat",
+      "source": "Tiny Speck, CC0: glitch-overlays/world_map.fla LIBRARY/zz_background/world_map_locked.jpg (byte for byte public/assets/maps/art/world/world_map_locked.jpg)"
+    }
+  ],
+  "processing": {
+    "by": "Claude",
+    "steps": [
+      "the side bands cropped off the 2048 x 1152 raw output (x 72.606 to 1975.394)",
+      "Lanczos to 1520 x 920",
+      "shifted onto the original's lines (painted -0.5 px, sketched -1 px at 2x); the drift measured after that is within 2 px at 2x in every tile of a 4 x 3 grid",
+      "a per-channel gain to the original's mean colour (charts.<chart>.gain; the model returned both 7 to 8% darker)",
+      "WebP quality 80"
+    ],
+    "raws": "research/map-art/drop/ (outside git), paths in charts.<chart>.raw"
+  },
+  "knownDifferences": [
+    "the sketched chart's faint marks beside Groddle Isle came back as a clear dashed line along its right edge",
+    "the compass N gained a small tick",
+    "the dashed routes read more clearly than the soft originals"
+  ],
+  "notes": [
+    "Round 1 (research/map-art/world-2x/prompt.txt with the plain 760 x 460 original) was rejected: it was a repaint, not a sharpening. Ix was redrawn with a new tower and figure, the lettering came back in a new hand, the sea turned a cooler teal, and T3's 16:9 canvas stretched the map about 2% taller. Round 2 (this record) fixed the shape with the banded 16:9 input and asked only for a sharpening."
+  ],
+  "intake": {
+    "on": "2026-11-13",
+    "by": "Claude (lane worldmap), files shipped unchanged from the lead's intake"
+  }
+}

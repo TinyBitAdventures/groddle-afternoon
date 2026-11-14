@@ -23,7 +23,8 @@
  *
  * Writes
  *   public/assets/maps/art/world/world_map_locked.jpg  the FLA's locked chart, its JPEG as is
- *       (world_map_unlocked.jpg is already there, byte for byte the FLA's)
+ *       (world_map_unlocked.jpg is already there, byte for byte the FLA's; both charts' Retina twins,
+ *       world_map_*@2x.webp, are shipped files the module only names: tools/provenance/world-map-2x.json)
  *   public/assets/maps/art/world/frames.svg  the `locked` and `outlines` layers: each frame
  *       drawing once as a <symbol>, one <use> a frame (the FLA's vectors through
  *       tools/overlay-art/xfl-svg.mjs)
@@ -234,7 +235,8 @@ export function moduleText(colours, world) {
 export const HUB_COLOURS = Object.freeze(${JSON.stringify(colours)});
 
 /**
- * The world map (world_map.fla, HubMapDialog.as): the locked and painted charts, the frames
+ * The world map (world_map.fla, HubMapDialog.as): the locked and painted charts (760 x 460, and
+ * their 1520 x 920 Retina twins, sharpened from them: tools/provenance/world-map-2x.json), the frames
  * overlay, and the 47 regions by hub id: the clip's click frame as a quad (map units), its
  * centre (where the client put the "you" star, showYouOnWorld 374-381) and its hover card
  * (drawn in the clip's own space over box [x, y, w, h], placed by matrix m).
@@ -244,6 +246,8 @@ export const WORLD_MAP = Object.freeze({
   h: ${FRAME[1]},
   locked: '${URL_DIR}/world_map_locked.jpg',
   unlocked: '${URL_DIR}/world_map_unlocked.jpg',
+  lockedHi: '${URL_DIR}/world_map_locked@2x.webp',
+  unlockedHi: '${URL_DIR}/world_map_unlocked@2x.webp',
   frames: '${URL_DIR}/frames.svg',
   regions: Object.freeze({
 ${rows.join('\n')}
