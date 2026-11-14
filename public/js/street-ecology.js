@@ -1052,7 +1052,7 @@ export const DOORWAY_DROP_PX = 40;
 
 /**
  * The street's keep-clear spots for planStreetPlacements, in screen space:
- * { x, y, key, clearance, block: { l, r, t, b }, doorway? }. One helper for
+ * { x, y, key, clearance, block: { l, r, t, b }, doorway?, scenery? }. One helper for
  * game.js enterStreet, the realtime data builders and the level builder, so
  * every player's street and the server's layout match.
  */
@@ -1089,7 +1089,50 @@ export function streetReservedSpots(street) {
   (measuredMailboxes(street?.tsid) || []).forEach((m, index) => {
     out.push({ x: m.x, y: m.y, key: `mailbox:${index}`, clearance: 80, block: box(m.x, m.y, MAILBOX_SHEETS.idle.fw, MAILBOX_SHEETS.idle.fh) });
   });
+  out.push(...measuredNodeCovers(street?.tsid));
   out.push(...frontDecoCovers(street));
+  return out;
+}
+
+/**
+ * Report #319: the measured Peat Bogs, Jellisacs, Mortar Barnacles and Paper Trees (measuredNodeSpots,
+ * drawn where the snaps show them, resource-nodes-feature resourceSpawnPlan) as keep-clear spots, so
+ * a planned shrine, tree, rock, vendor, garden or animal never stands on one and a quoin keeps its
+ * distance, as of a measured rock or tree (Viscid Pud's shrine was planned 32 px from its peat).
+ * Glitch set both by hand (peat_1.js, jellisac.js, npc_shrine_*.js obey_physics false), so they
+ * never met. Each box is the art's frame cell as drawn (1:1, its bottom centre on the spot: the
+ * wall barnacles' too, so one well above a shrine leaves it be), the soft clearance its planned
+ * node's (resource-nodes-feature RESOURCE_PLACEMENT_CLEARANCE). `scenery`: walking animals keep
+ * their walk off it (walkInScenery). Every measured spot is drawn (expandResourceClasses keeps them).
+ */
+export const MEASURED_NODE_COVERS = Object.freeze({
+  // resource-nodes.js mortar_barnacle sheets blister1-6: frame width x height.
+  mortar_barnacle: Object.freeze({ clearance: 42, cells: Object.freeze({ blister1: [39, 44], blister2: [35, 40], blister3: [35, 39], blister4: [36, 40], blister5: [32, 39], blister6: [39, 47] }) }),
+  jellisac: Object.freeze({ clearance: 42, cells: Object.freeze({ jellySack1: [40, 48], jellySack2: [42, 46], jellySack3: [44, 39], jellySack4: [47, 52] }) }),
+  peat_1: Object.freeze({ clearance: 115, cells: Object.freeze({ peat1: [211, 52], peat2: [166, 46], peat3: [178, 57] }) }),
+  // One art for every Paper Tree (its sheet follows its care): 232 x 216.
+  paper_tree: Object.freeze({ clearance: 135, cells: Object.freeze({ '': [232, 216] }) }),
+});
+
+/** PURE: a street's measured node keep-clear spots (MEASURED_NODE_COVERS), in screen space. */
+export function measuredNodeCovers(tsid) {
+  const out = [];
+  const spots = tsid ? measuredNodeSpots(tsid) : null;
+  for (const [classTsid, rule] of Object.entries(MEASURED_NODE_COVERS)) {
+    (spots?.[classTsid] || []).forEach((spot, index) => {
+      const cells = Object.values(rule.cells);
+      // An unknown variant takes the class's widest cell.
+      const [w, h] = rule.cells[spot.variant || ''] || cells.reduce((a, b) => (b[0] > a[0] ? b : a));
+      out.push({
+        x: spot.x,
+        y: spot.y,
+        key: `node:${classTsid}:${index}`,
+        clearance: rule.clearance,
+        block: { l: spot.x - w / 2, r: spot.x + w / 2, t: spot.y - h, b: spot.y },
+        scenery: true,
+      });
+    });
+  }
   return out;
 }
 
@@ -1838,8 +1881,10 @@ export function walkInScenery(point, key, placed = []) {
       if (Math.abs(point.x - other.x) < (ANIMAL_BODY[other.key] + (ANIMAL_BODY[key] || 0)) / 2) return 2;
       continue;
     }
-    if (!SCENERY_KEYS.includes(other.key)) continue;
-    const reach = (PLACEMENT_FOOTPRINTS[other.key] || 0) / 2 + body;
+    // A measured node (measuredNodeCovers, report #319) by its own box.
+    const sceneryBox = other.scenery && other.block ? other.block.r - other.block.l : 0;
+    if (!sceneryBox && !SCENERY_KEYS.includes(other.key)) continue;
+    const reach = (sceneryBox || PLACEMENT_FOOTPRINTS[other.key] || 0) / 2 + body;
     if (Math.abs(point.x - other.x) < reach) return 2;
     if (Math.abs(point.x - range - other.x) < reach || Math.abs(point.x + range - other.x) < reach
       || (point.x - range < other.x && point.x + range > other.x)) worst = 1;

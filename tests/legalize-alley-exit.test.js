@@ -39,8 +39,8 @@ import {
   legalizeReloadLocation,
   legalizeWayBack,
 } from '../public/js/legalize-it.js?v=d27094df';
-import { closeQuestRoomConverse } from '../public/js/features/quest-instances-feature.js?v=2d0873a4';
-import { getVerbsFor } from '../public/content.js?v=a5d648fd';
+import { closeQuestRoomConverse } from '../public/js/features/quest-instances-feature.js?v=36c62dad';
+import { getVerbsFor } from '../public/content.js?v=4cadcfb4';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const game = fs.readFileSync(path.join(root, 'public/game.js'), 'utf8');

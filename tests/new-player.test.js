@@ -22,7 +22,7 @@ import { createQuoinState } from '../public/js/quoins.js?v=61be601c';
 import { createShrineState } from '../public/js/shrines.js?v=4d558b8b';
 import { PARADISE_COURSES, PARADISE_TICKET_IDS } from '../public/js/paradise-flight.js?v=fdc76095';
 import { imaginationFeature, STARTER_UPGRADES } from '../public/js/features/imagination-feature.js?v=20dfa0c5';
-import { RESOURCE_FEATURE_ID, resourceNodesFeature } from '../public/js/features/resource-nodes-feature.js?v=bacced97';
+import { RESOURCE_FEATURE_ID, resourceNodesFeature } from '../public/js/features/resource-nodes-feature.js?v=214ac1c9';
 
 const here = import.meta.dirname;
 const pub = join(here, '..', 'public');
