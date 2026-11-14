@@ -1067,6 +1067,59 @@
       ]
     },
     {
+      "id": "F96",
+      "area": "Quests",
+      "show": "fixing",
+      "text": "Legalize It sent you to a private copy of the Bureaucratic Hall, so you could not see other players there as you could in Glitch.",
+      "commits": [
+        "game:f5b2ce4a42"
+      ]
+    },
+    {
+      "id": "F97",
+      "area": "Streets",
+      "show": "fixing",
+      "text": "Shrines in sixteen regions stood where the game guessed, often far from where Tiny Speck's 2012 street pictures show them.",
+      "commits": [
+        "game:80766d6c4a",
+        "game:8604ee9f60",
+        "game:a902d79bb8",
+        "game:1394da4935",
+        "game:6ab1d5c9ff"
+      ]
+    },
+    {
+      "id": "F98",
+      "area": "Quests",
+      "show": "fixing",
+      "text": "An Autumn Day played its own music only once, over the usual street music.",
+      "report": 323,
+      "commits": [
+        "game:2c9dd9cb8c"
+      ]
+    },
+    {
+      "id": "F99",
+      "area": "Food, buffs and making",
+      "show": "fixing",
+      "text": "A recipe that needed an achievement or a skill named it without a link to see what it takes.",
+      "report": 324,
+      "commits": [
+        "game:b3174a0a07",
+        "game:82e5d064e7"
+      ]
+    },
+    {
+      "id": "F100",
+      "area": "Homes",
+      "show": "fixing",
+      "text": "On a small phone a cabinet's storage window scrolled sideways.",
+      "report": 325,
+      "commits": [
+        "game:a217bd9f38"
+      ]
+    },
+    {
       "id": "G665",
       "area": "Accounts and saving",
       "text": "A bug report says Read by the team once an administrator has opened it."
