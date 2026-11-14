@@ -2788,13 +2788,18 @@
   ]
  },
  "release": {
-  "game": "0.39.0",
+  "game": "0.39.1",
   "deployed": "2026-11-14"
  },
  "git": {
-  "commits": 2120,
+  "commits": 2123,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-14",
+    "kind": "improve",
+    "text": "The Maps page shows Tiny Speck's own 2012 Encyclopedia map as each region's before, and opens in Wipe"
+   },
    {
     "date": "2026-11-14",
     "kind": "fix",
@@ -2909,11 +2914,6 @@
     "date": "2026-11-13",
     "kind": "fix",
     "text": "Groddle Meadow's shrines stand where the 2012 street pictures show them"
-   },
-   {
-    "date": "2026-11-13",
-    "kind": "improve",
-    "text": "The Louise Pasture Villa door stands in an apartment house"
    }
   ]
  },
