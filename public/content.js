@@ -297,6 +297,15 @@ export function getVerbsFor(target, ctx) {
     });
   }
 
+  if (classId === 'legalize_hall_exit') {
+    // game.js spawnLegalizeHall: the quest hall's glass doors, as every hall's (bureaucratic-halls-feature.js Leave).
+    add('leave', 'leave', {
+      sort: 10,
+      enabled: true,
+      tooltip: target?.subtitle || 'Leave the hall',
+    });
+  }
+
   if (classId === 'npc_back_alley_bureaucrat') {
     add('talk_to', 'talk to', {
       sort: 10,

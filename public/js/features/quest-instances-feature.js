@@ -1820,3 +1820,10 @@ export async function offerInRoom(engine, questId, { kicker = '' } = {}) {
 }
 
 export { converse as questRoomConverse };
+
+/** Closes the conversation up now (its promise answers null): a room left mid-talk takes its talk with it. */
+export function closeQuestRoomConverse() {
+  if (!dialogOpen()) return false;
+  dialog.resolve?.(null);
+  return true;
+}

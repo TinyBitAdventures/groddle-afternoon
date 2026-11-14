@@ -25,7 +25,7 @@ import {
   ensureLegalizeState,
   legalizeOnAccepted,
   qualificationVerb,
-} from '../public/js/legalize-it.js?v=0649416e';
+} from '../public/js/legalize-it.js?v=d27094df';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 

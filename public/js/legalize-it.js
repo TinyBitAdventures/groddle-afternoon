@@ -169,6 +169,22 @@ export function enterBureaucraticHall(state) {
   return { ok: true, reason: 'entered_hall', clerk: LEGALIZE_CLERKS[0], state };
 }
 
+/**
+ * Out through the hall's glass doors (G718): location.js 810-819 clears the
+ * visit when you leave a bureaucratic_hall (!bureaucracy_waiting, _step,
+ * _started, Please Wait), so an application under way is back outside the
+ * hall, its clerks starting over on the way in. A bought card is untouched.
+ */
+export function leaveBureaucraticHall(state) {
+  if (!state) return { ok: false, reason: 'no_application', state };
+  if (['hall_waiting', 'hall_called', 'hall_processing'].includes(state.stage)) {
+    state.stage = 'grange_exterior';
+    state.handoffs = 0;
+    state.clerkIndex = 0;
+  }
+  return { ok: true, reason: 'left_hall', state };
+}
+
 export function callLegalizeApplicant(state) {
   if (!state || !['hall_waiting', 'hall_processing'].includes(state.stage)) {
     return { ok: false, reason: 'not_waiting', state };

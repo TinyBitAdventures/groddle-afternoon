@@ -56,7 +56,7 @@
  *   confirm, done, left), hallStep, hallHelper, hallBuff, hallRefusals, hallClerks.
  */
 
-import { LEGALIZE_CLERKS } from '../legalize-it.js?v=0649416e';
+import { LEGALIZE_CLERKS } from '../legalize-it.js?v=d27094df';
 import { addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=f49c8998';
 import { loseEnergy, loseMood } from '../metabolics.js?v=1383e6fd';
 import { acceptOffer, ensureQuestOfferState, markOffered, questMoveNote, questStatus } from '../quest-offers.js?v=89511e1e';
@@ -64,7 +64,7 @@ import { getQuestCatalog } from '../content-catalogs.js?v=10b118dd';
 import { parseQuestConversation } from '../quests.js?v=40c71a37';
 import { CUP_CLASS, CUP_OF_WATER, WATER_COOLER, WATER_COOLER_CLASS, drinkCup, getWater, getWaterState } from '../water-cooler.js?v=1cf1b040';
 import { BUREAUCRAT_CLASS, HALL, HALL_LAYOUT, HALL_TEXT, PLEASE_WAIT_BUFF, TALK_VERB, createHallFlow } from '../bureaucratic-hall.js?v=a0bc6317';
-import { questRoomConverse } from './quest-instances-feature.js?v=2cfdbe13';
+import { closeQuestRoomConverse, questRoomConverse } from './quest-instances-feature.js?v=2c0ec52b';
 import { HALL_MP_TEXT, HALL_POSE_MS, clerkAt, clerkRow, poseChanged } from '../halls-mp.js?v=044b5c5a';
 
 export const HALLS_FEATURE_ID = 'bureaucratic-halls';
@@ -108,6 +108,8 @@ let flowTargets = [];
 let autoAt = 0;
 let demoDone = false;
 let demoAt = 0;
+/** The visit's conversation still up (its promise), closed when you leave the hall (G718). */
+let openTalk = null;
 /** Multiplayer: the realtime client and the hall's bureaucrats as the server sent them. */
 let mpHall = null;
 
@@ -211,8 +213,14 @@ function hallHost(engine, targets, { label = 'Bureaucratic Hall', buy = null } =
     clerkLabel: (i) => targets[i]?.label || 'Bureaucrat',
     drawClerk: (i, pose) => poseClerk(targets[i]?.sprite, pose),
     say: (i, text) => targets[i] && engine.say?.(targets[i], text, 5000),
-    converse: (i, { text, choices }) =>
-      questRoomConverse(engine, { title: targets[i]?.label || 'Bureaucrat', kicker: label, beats: [{ text, response: '' }], choices, look: 'conversation' }),
+    converse: (i, { text, choices }) => {
+      const talk = questRoomConverse(engine, { title: targets[i]?.label || 'Bureaucrat', kicker: label, beats: [{ text, response: '' }], choices, look: 'conversation' });
+      openTalk = talk;
+      talk.then(() => {
+        if (openTalk === talk) openTalk = null;
+      });
+      return talk;
+    },
     prompt: (opts) => engine.prompt?.(opts),
     removePrompt: (uid) => engine.removePrompt?.(uid),
     applyBuff: () => engine.applyBuff?.(PLEASE_WAIT_BUFF),
@@ -609,6 +617,11 @@ export const bureaucraticHallsFeature = {
     flow?.end();
     flow = null;
     flowTargets = [];
+    // G718: a bureaucrat's line left open does not follow you out onto the street.
+    if (openTalk) {
+      openTalk = null;
+      closeQuestRoomConverse();
+    }
   },
 
   /**
@@ -693,6 +706,7 @@ export const bureaucraticHallsFeature = {
     flow?.end();
     flow = null;
     flowTargets = [];
+    openTalk = null;
     autoAt = 0;
     hall = null;
     last = '';

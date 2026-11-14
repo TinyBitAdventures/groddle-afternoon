@@ -34,9 +34,13 @@ import {
   activateCardFromPack,
   ensureLegalizeState,
   ensureLegalizeWayBack,
+  leaveBureaucraticHall,
+  legalizeObjective,
   legalizeReloadLocation,
   legalizeWayBack,
-} from '../public/js/legalize-it.js?v=0649416e';
+} from '../public/js/legalize-it.js?v=d27094df';
+import { closeQuestRoomConverse } from '../public/js/features/quest-instances-feature.js?v=2c0ec52b';
+import { getVerbsFor } from '../public/content.js?v=5166662c';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const game = fs.readFileSync(path.join(root, 'public/game.js'), 'utf8');
@@ -168,5 +172,59 @@ describe('Legalize It: always a way out', () => {
     assert.match(exit, /back_alley_briefed'\) return legalizeLeaveAlley\(\)/);
     assert.match(exit, /leaveLegalizeIt\(\{ abandon: false \}\)/);
     assert.match(exit, /spawnLegalizeGregariousStation/);
+  });
+});
+
+describe("Legalize It's hall has its glass doors (G718)", () => {
+  it('leaving clears the visit: the application waits outside, the quest stays (location.js 810-819)', () => {
+    for (const stage of ['hall_waiting', 'hall_called', 'hall_processing']) {
+      const questState = createQuestState();
+      assignQuest(questState, LEGALIZE_QUEST_ID, { ignorePrereq: true });
+      const run = ensureLegalizeState(questState);
+      Object.assign(run, { stage, handoffs: 1, clerkIndex: 2 });
+      assert.equal(leaveBureaucraticHall(run).ok, true);
+      assert.equal(run.stage, 'grange_exterior', stage);
+      assert.equal(run.handoffs, 0);
+      assert.equal(run.clerkIndex, 0);
+      assert.equal(legalizeObjective(run), 'Enter the Bureaucratic Hall');
+      assert.ok(questState.active[LEGALIZE_QUEST_ID], 'the quest stays active');
+      assert.equal(questState.story.legalize, run);
+    }
+    const bought = { stage: 'card_owned', handoffs: 1, clerkIndex: 1, cardOwned: true };
+    leaveBureaucraticHall(bought);
+    assert.deepEqual(bought, { stage: 'card_owned', handoffs: 1, clerkIndex: 1, cardOwned: true });
+    assert.equal(leaveBureaucraticHall(null).ok, false);
+  });
+
+  it('the doors are drawn as every hall draws them and lead out to the hall door on Gregarious Grange', () => {
+    const hall = game.slice(game.indexOf('function spawnLegalizeHall('), game.indexOf('const LEGALIZE_HALL_PICKS'));
+    assert.match(hall, /door_asset_bureaucratic_hall_int\.png/);
+    assert.match(hall, /exit\.position\.set\(HALL_LAYOUT\.exitX, HALL\.ground \+ 2\);/);
+    assert.match(hall, /classId: 'legalize_hall_exit'/);
+    const leave = game.slice(game.indexOf('async function legalizeLeaveHall('), game.indexOf('async function legalizeRunStep('));
+    assert.match(leave, /leaveBureaucraticHall\(legalizeRun\);/);
+    assert.match(leave, /legalizeEnterStreet\(LEGALIZE_GRANGE_STREET, LEGALIZE_HALL_DOOR_SPOT\)/);
+    assert.match(game, /target\.classId === 'legalize_hall_exit' && verbId === 'leave'\) \{\s*legalizeLeaveHall\(\);/);
+    // In front of the street's hall door, where every hall's glass doors return you.
+    const street = JSON.parse(fs.readFileSync(path.join(root, 'public/assets/streets/GLI32G3NUTD100I.json'), 'utf8'));
+    const door = street.doors.find((d) => d.id === 'door_1300484753304');
+    assert.equal(door.connect.tsid, LEGALIZE_HALL_TSID);
+    const spot = game.match(/const LEGALIZE_HALL_DOOR_SPOT = Object\.freeze\(\{ x: (\d+), y: (\d+) \}\);/);
+    assert.deepEqual([Number(spot[1]), Number(spot[2])], [door.x, door.y]);
+  });
+
+  it("a bureaucrat's line left open goes when you leave the hall, any hall", () => {
+    const halls = fs.readFileSync(path.join(root, 'public/js/features/bureaucratic-halls-feature.js'), 'utf8');
+    const clear = halls.slice(halls.indexOf('  onStreetClear() {'), halls.indexOf('  bureaucraticHallFlow('));
+    assert.match(clear, /if \(openTalk\) \{\s*openTalk = null;\s*closeQuestRoomConverse\(\);/);
+    assert.match(halls, /openTalk = talk;/);
+    // Nothing up: nothing to close.
+    assert.equal(closeQuestRoomConverse(), false);
+  });
+
+  it('the doors offer Leave', () => {
+    const verbs = getVerbsFor({ classId: 'legalize_hall_exit', subtitle: 'Back out to Gregarious Grange', state: {} }, { pc: newPc(), inv: {} });
+    assert.deepEqual(verbs.map((v) => [v.id, v.enabled]), [['leave', true]]);
+    assert.equal(verbs[0].tooltip, 'Back out to Gregarious Grange');
   });
 });
