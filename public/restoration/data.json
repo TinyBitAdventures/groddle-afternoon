@@ -2792,9 +2792,19 @@
   "deployed": "2026-11-14"
  },
  "git": {
-  "commits": 2116,
+  "commits": 2120,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-14",
+    "kind": "fix",
+    "text": "The fourteen restored region maps lose the pale strips at their left and right edges"
+   },
+   {
+    "date": "2026-11-14",
+    "kind": "improve",
+    "text": "Drifa and Firozi's maps are Tiny Speck's 2012 paintings, restored and matched to 2012's colour"
+   },
    {
     "date": "2026-11-14",
     "kind": "fix",
@@ -2904,16 +2914,6 @@
     "date": "2026-11-13",
     "kind": "improve",
     "text": "The Louise Pasture Villa door stands in an apartment house"
-   },
-   {
-    "date": "2026-11-13",
-    "kind": "fix",
-    "text": "A vendor buys only what sits in your pack and bags, never what the magic rock holds"
-   },
-   {
-    "date": "2026-11-13",
-    "kind": "fix",
-    "text": "Legalize It's Bureaucratic Hall has its glass doors out to Gregarious Grange"
    }
   ]
  },
