@@ -1,6 +1,6 @@
 {
   "note": "Written by tools/gaps/build-data.mjs from tools/gaps/public-gaps.json and the coverage register. Edit those, never this file.",
-  "release": "v0.38.1",
+  "release": "v0.39.0",
   "states": {
     "fixing": {
       "label": "Being fixed",
@@ -41,8 +41,8 @@
   "counts": {
     "fixing": 1,
     "known": 14,
-    "unreleased": 5,
-    "fixed": 109,
+    "unreleased": 0,
+    "fixed": 114,
     "lost": 5,
     "purpose": 15,
     "idea": 11
@@ -100,17 +100,6 @@
     {
       "name": "Quests",
       "items": [
-        {
-          "id": "F96",
-          "text": "Legalize It sent you to a private copy of the Bureaucratic Hall, so you could not see other players there as you could in Glitch.",
-          "state": "unreleased"
-        },
-        {
-          "id": "F98",
-          "text": "An Autumn Day played its own music only once, over the usual street music.",
-          "report": 323,
-          "state": "unreleased"
-        },
         {
           "id": "F11",
           "text": "Chasing Hubba Dubba Hugs is offered but cannot be finished, and Tend to Your Community never ticks its Herb Gardens step.",
@@ -180,6 +169,19 @@
           "report": 322,
           "state": "fixed",
           "version": "v0.38.1"
+        },
+        {
+          "id": "F96",
+          "text": "Legalize It sent you to a private copy of the Bureaucratic Hall, so you could not see other players there as you could in Glitch.",
+          "state": "fixed",
+          "version": "v0.39.0"
+        },
+        {
+          "id": "F98",
+          "text": "An Autumn Day played its own music only once, over the usual street music.",
+          "report": 323,
+          "state": "fixed",
+          "version": "v0.39.0"
         }
       ]
     },
@@ -200,11 +202,6 @@
           "id": "G681",
           "text": "Teleporters that work by walking into them have not all been checked yet.",
           "state": "known"
-        },
-        {
-          "id": "F97",
-          "text": "Shrines in sixteen regions stood where the game guessed, often far from where Tiny Speck's 2012 street pictures show them.",
-          "state": "unreleased"
         },
         {
           "id": "G678",
@@ -237,6 +234,12 @@
           "report": 319,
           "state": "fixed",
           "version": "v0.38.1"
+        },
+        {
+          "id": "F97",
+          "text": "Shrines in sixteen regions stood where the game guessed, often far from where Tiny Speck's 2012 street pictures show them.",
+          "state": "fixed",
+          "version": "v0.39.0"
         }
       ]
     },
@@ -392,12 +395,6 @@
           "state": "known"
         },
         {
-          "id": "F100",
-          "text": "On a small phone a cabinet's storage window scrolled sideways.",
-          "report": 325,
-          "state": "unreleased"
-        },
-        {
           "id": "G640",
           "text": "Visitors see the owner's Garden Gnomes, Magic Sticks and animal machines on a home street.",
           "state": "fixed",
@@ -415,6 +412,13 @@
           "report": 314,
           "state": "fixed",
           "version": "v0.38.0"
+        },
+        {
+          "id": "F100",
+          "text": "On a small phone a cabinet's storage window scrolled sideways.",
+          "report": 325,
+          "state": "fixed",
+          "version": "v0.39.0"
         },
         {
           "id": "G48",
@@ -617,12 +621,6 @@
       "name": "Food, buffs and making",
       "items": [
         {
-          "id": "F99",
-          "text": "A recipe that needed an achievement or a skill named it without a link to see what it takes.",
-          "report": 324,
-          "state": "unreleased"
-        },
-        {
           "id": "F27",
           "text": "Drinks give the same iMG whatever your mood, you can drink while dead and lose the drink, and a Rasher of Bacon cannot be eaten.",
           "state": "fixed",
@@ -666,6 +664,13 @@
           "report": 305,
           "state": "fixed",
           "version": "v0.38.0"
+        },
+        {
+          "id": "F99",
+          "text": "A recipe that needed an achievement or a skill named it without a link to see what it takes.",
+          "report": 324,
+          "state": "fixed",
+          "version": "v0.39.0"
         }
       ]
     },
