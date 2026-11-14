@@ -121,6 +121,7 @@ import {
   roomFor,
   saleBags,
   takeBag,
+  takesNoSlot,
   unitOrder,
   unitPlaces,
   unitRankAt,
@@ -211,7 +212,12 @@ function cleanRock(value) {
   return out;
 }
 
-/** Compare what the rock held with what it holds now: new holdings and what came back into slots. */
+/**
+ * Compare what the rock held with what it holds now: new holdings and what came back into slots.
+ * Units that leave the pack leave from its slots (the rock is a bag nobody reaches: a vendor sells
+ * only slotted units, js/vendor.js), so what the rock gives back is what fills slots beyond those
+ * left after the loss: selling a whole stack while the rock held more of it gives those back (#317).
+ */
 export function rockChanges(before, after, slottedBefore = {}, slottedAfter = {}) {
   const holding = [];
   const given = [];
@@ -220,9 +226,11 @@ export function rockChanges(before, after, slottedBefore = {}, slottedAfter = {}
     if (more > 0) holding.push({ cls, n: more });
   }
   for (const [cls, n] of Object.entries(before)) {
-    const less = n - (after[cls] || 0);
-    const slottedMore = (slottedAfter[cls] || 0) - (slottedBefore[cls] || 0);
-    const back = Math.min(less, slottedMore);
+    const rockAfter = after[cls] || 0;
+    const less = n - rockAfter;
+    const lost = Math.max(0, (slottedBefore[cls] || 0) + n - (slottedAfter[cls] || 0) - rockAfter);
+    const kept = Math.max(0, (slottedBefore[cls] || 0) - lost);
+    const back = Math.min(less, (slottedAfter[cls] || 0) - kept);
     if (back > 0) given.push({ cls, n: back });
   }
   return { holding, given };
@@ -774,6 +782,17 @@ export const bagsFeature = {
 
   packLayout(engine) {
     return reconcile(engine);
+  },
+
+  /**
+   * #317: how many units of a class sit in slots (the pack and its bags), not with the magic
+   * rock; null for a class that takes no slot. A vendor sells only these (js/vendor.js opts.slotted).
+   */
+  packSlotted(classTsid, engine) {
+    const cls = String(classTsid || '');
+    if (!cls || !engine?.inv) return null;
+    if (takesNoSlot(cls)) return null;
+    return layoutPack(engine.inv, slice.prefs, opts()).slotted[cls] || 0;
   },
 
   packRoom(classTsid, count, engine) {

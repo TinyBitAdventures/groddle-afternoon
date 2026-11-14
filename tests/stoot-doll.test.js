@@ -36,7 +36,7 @@ import {
   createVendorSellQuote,
   listSellOffers,
   vendorSell,
-} from '../public/js/vendor.js?v=542d30c9';
+} from '../public/js/vendor.js?v=dc7d6463';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 

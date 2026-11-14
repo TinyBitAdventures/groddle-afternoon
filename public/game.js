@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=5166662c';
 import { createErrorOnce, createFeatureHost } from './js/feature-host.js?v=06bb8b74';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=d3cab111';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=b1f59b01';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl, drawTileArt } from './js/enter-chooser.js?v=4a3ea327';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, bodyReachDistance, OUT_OF_REACH_LINE } from './js/reach.js?v=8e52df56';
@@ -870,7 +870,7 @@ import {
   vendorSellUnitPrice,
   vendorBuyUnitPrice,
   VENDOR_BAG_HOLDS,
-} from './js/vendor.js?v=542d30c9';
+} from './js/vendor.js?v=dc7d6463';
 import {
   animalAnchorX,
   animalAnchorY,
@@ -5973,7 +5973,8 @@ function renderPackBar() {
     }
     const labelOf = (e) => packNamed(e.classTsid, e.copy)?.label || e.label;
     const hits = packSearchEntries(found, query, labelOf);
-    renderPackRow(itemsBox, hits, { emptyCount: 0, container: 'pack', query });
+    // #317: the magic rock stays in sight while searching (what it holds is not in the hits).
+    renderPackRow(itemsBox, hits, { emptyCount: 0, container: 'pack', query, rock: packLayout.rockStacks ? packLayout.rock : null });
     if (!hits.length) packRow.markNoMatches(itemsBox, query);
     if (app?.canvas) app.canvas.dataset.packSearchHits = String(hits.length);
   } else {
@@ -29792,6 +29793,8 @@ function vendorSellOpts() {
     // Report #79 (Austin 2026-11-11, "Refuse: empty it first"): a bag sells only empty, the one
     // chosen if it was chosen (bags-feature packSaleBags; null for anything that is not a bag).
     emptyBags: (classTsid) => (isBagClass(classTsid) ? features.query('packSaleBags', classTsid, engine, vendorSellBag) ?? null : null),
+    // #317: only units in slots sell; the magic rock's stay with it (bags-feature packSlotted).
+    slotted: (classTsid) => features.query('packSlotted', classTsid, engine) ?? null,
   };
 }
 

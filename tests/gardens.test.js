@@ -65,7 +65,7 @@ import {
   listPackToolSlots,
   isToolItem,
 } from '../public/js/inventory.js?v=f49c8998';
-import { DEFAULT_VENDOR, vendorBuy } from '../public/js/vendor.js?v=542d30c9';
+import { DEFAULT_VENDOR, vendorBuy } from '../public/js/vendor.js?v=dc7d6463';
 import { HAS_SITE, SITE_DIR } from '../tools/repos.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));

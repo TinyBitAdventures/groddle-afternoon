@@ -31,7 +31,7 @@
 import { addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=f49c8998';
 import { getGameDayKey } from '../game-day.js?v=cf9afac0';
 import { acceptOffer, ensureQuestOfferState } from '../quest-offers.js?v=89511e1e';
-import { VENDOR_PROFILES } from '../vendor.js?v=542d30c9';
+import { VENDOR_PROFILES } from '../vendor.js?v=dc7d6463';
 import {
   ELEMENT_STACKMAX,
   POUCH_CLASS,

@@ -38,6 +38,18 @@ function sellableBags(classTsid, opts) {
   return n == null ? null : Math.max(0, Math.floor(Number(n) || 0));
 }
 
+/**
+ * #317: how many of a class sit in pack and bag slots (opts.slotted(classTsid): bags-feature
+ * packSlotted), or null when nobody asked or the class takes no slot. The magic rock holds the
+ * rest, as the source's rock was a bag of its own a store never looked in (inc_stores.js storeSell
+ * 261 counts the pack: countItemClass), so a vendor neither lists nor buys rock-held units.
+ */
+function slottedCount(classTsid, opts) {
+  if (typeof opts?.slotted !== 'function') return null;
+  const n = opts.slotted(classTsid);
+  return n == null ? null : Math.max(0, Math.floor(Number(n) || 0));
+}
+
 /** Build one catalog_stores.js offer using the store's buy-back rate. */
 function officialOffer(classTsid, label, buyPrice, buyMultiplier = BUYBACK_MULTIPLIER) {
   return {
@@ -279,6 +291,11 @@ export function vendorSell(pc, inv, offers, classTsid, qty = 1, opts = {}) {
   if (countItem(inv, classTsid) < amount) {
     return { ok: false, reason: 'empty', msgs: ["Sorry, you don't have as much as you tried to sell."] };
   }
+  // #317: what the magic rock holds is not for sale (inc_stores.js 291-293, its count is the pack's).
+  const slotted = slottedCount(classTsid, opts);
+  if (slotted != null && slotted < amount) {
+    return { ok: false, reason: 'empty', msgs: ["Sorry, you don't have as much as you tried to sell."] };
+  }
   // A tool goes one copy at a time at its worn price (opts.toolBaseCost); with no callback it stays.
   const isTool = Boolean(ITEM_CATALOG[classTsid]?.isTool);
   if (isTool && (amount !== 1 || typeof opts.toolBaseCost !== 'function')) {
@@ -338,7 +355,11 @@ export function listBuyOffers(offers, upgrades = []) {
 function sellSlots(inv, opts = {}) {
   const toolCost = typeof opts.toolBaseCost === 'function' ? opts.toolBaseCost : null;
   return listPackSlots(inv)
-    .filter((slot) => slot.sellable !== false && (!slot.isTool || toolCost))
+    .map((slot) => {
+      const n = slottedCount(slot.classTsid, opts);
+      return n == null || n >= slot.count ? slot : { ...slot, count: n };
+    })
+    .filter((slot) => slot.count > 0 && slot.sellable !== false && (!slot.isTool || toolCost))
     .map((slot) => {
       if (!slot.isTool) return { slot, baseCost: undefined, maxQty: slot.count };
       const cost = toolCost(slot.classTsid);
