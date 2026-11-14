@@ -27,7 +27,7 @@ import { join } from 'node:path';
 export const GAPS = { label: 'Known gaps', url: '/restoration/gaps/' };
 
 /** Every block comment in the markup with its offsets, nested: { name, attrs, start, end, inner } (end past the closer). */
-function blocks(markup) {
+export function blocks(markup) {
   const top = { inner: [] };
   const stack = [top];
   for (const m of markup.matchAll(/<!--\s+(\/)?wp:([a-z0-9/-]+)(?:\s+(\{[\s\S]*?\}))?\s+(\/)?-->/g)) {
@@ -111,7 +111,7 @@ function deployEnv() {
 }
 
 /** A WP-CLI runner for the local site or the live one: wp(args, stdin) returns stdout. */
-function runner(args) {
+export function runner(args) {
   if (args.site) return (wpArgs, input) => execFileSync('wp', [`--path=${args.site}`, ...wpArgs], { encoding: 'utf8', input });
   const env = deployEnv();
   const quote = (s) => `'${String(s).replace(/'/g, `'\\''`)}'`;
