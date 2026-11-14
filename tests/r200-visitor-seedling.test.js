@@ -20,6 +20,7 @@ import { join } from 'node:path';
 import { GROWN_TREE_LABELS, SOIL_TIMERS, performPlotVerb, plotVerbs } from '../public/js/patches.js?v=1ba4f75f';
 import { allowedVerbs, applyYardAct, growIfReady, visitorTreeState } from '../public/js/yard-verbs-mp.js?v=ddbe365c';
 import { GAME_DIR, HAS_SITE, SITE_DIR } from '../tools/repos.mjs';
+import { GAME_DAY_MS, GAME_EPOCH_MS } from '../public/js/game-day.js?v=cf9afac0';
 
 const gsjs = join(GAME_DIR, '..', 'glitch-GameServerJS');
 const hasPhp = spawnSync('php', ['-v']).status === 0;
@@ -253,7 +254,9 @@ function resetSession() {
 }
 
 describe('the site grows it too (src/HomeYard.php plotNow)', { skip: skipSite }, () => {
-  const now = Date.now();
+  // Halfway through the current game day: a pet only counts from the day's start (HomeYard plotNow $dayStart),
+  // so a 'now' in a day's first minutes failed the pets placed minutes before it.
+  const now = GAME_EPOCH_MS + Math.floor((Date.now() - GAME_EPOCH_MS) / GAME_DAY_MS) * GAME_DAY_MS + GAME_DAY_MS / 2;
   const stateWith = (plot) => ({
     systems: { home: { owned: true }, features: { homes: { cult: { items: [{ id: 1, protoClass: 'proto_patch', endClass: 'patch', rx: 470 }] } } } },
     world: { streets: { RH_HOME_EXT: { features: { patches: { plots: { 'patch:0': plot } } } } } },
