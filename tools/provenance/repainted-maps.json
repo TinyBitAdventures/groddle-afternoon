@@ -386,15 +386,15 @@
         "file": "assets/maps/art/bg/groddlemeadow.webp",
         "w": 760,
         "h": 460,
-        "bytes": 103922,
-        "sha256": "70a4f50b65f845111e5420aead18bef3431a7f69fe6f39164c2df925bbf0ee34"
+        "bytes": 84136,
+        "sha256": "7828394c8eeb5e675c1420965f5eaedbc83be22d522f365dbf33e4eb407b5a44"
       },
       "x2": {
         "file": "assets/maps/art/bg/groddlemeadow@2x.webp",
         "w": 1520,
         "h": 920,
-        "bytes": 349364,
-        "sha256": "cffb17c70ce8743c41541599afbcf5797a27639682892708019ebaf222740bed"
+        "bytes": 290488,
+        "sha256": "fe22ca388a6e7f044dea5fefd3ffaf01ff417b05e1b121ad91ea88dac1b4090f"
       },
       "licence": "ai-generated",
       "author": "Austin Ginder (directed and chose it)",
@@ -405,8 +405,8 @@
       "method": "restored: Tiny Speck's own 2012 painting, as the 2012 Encyclopedia drew it under the game's roads, names, icons and GO buttons, given to the model to take the markings off and sharpen without moving anything (research/map-art/regions-restore, the region pilot). Unlike the paintings made from thumbnails, the 2012 picture is the model's input here.",
       "chosen": {
         "by": "Austin Ginder",
-        "on": "2026-11-13",
-        "of": "1 generation, kept as made (colour as delivered); it replaces the painting of 2026-11-07, made from the thumbnail"
+        "on": "2026-11-14",
+        "of": "1 generation, toned to the 2012 picture's colour (Austin chose 'matched to 2012' over 'as delivered' and 'toned halfway' on a comparison page); it replaces the painting of 2026-11-07, made from the thumbnail"
       },
       "prompt": "This is a restoration job, not an illustration job. The attachment is a 2012 game map: an original hand-painted landscape with game markings drawn on top of it. Give me back the same painting with every game marking removed, and sharper. Do not move or redraw anything else.\n\nRemove completely, and paint in what lies underneath so it matches the painting around it:\n- the pale yellow-white road lines and ribbons that join the places, and their joints;\n- every street name and every word, including \"To: ...\" labels;\n- the small grey sign and house icons along the roads;\n- the round \"GO\" buttons and the small round blue-and-red station badge.\nWhere a marking covered something, continue the grass, rock, sand, water, trees or cliffs that surround it, in the same style. Do not add anything new where a marking was: no new trees, rocks, buildings or paths.\n\nThe attachment is already the exact size and shape I want back (16:9). The painting fills the middle; the two flat bands at the left and right edges are padding: leave them flat, the same colour, and do not extend the painting into them. Do not stretch, scale, crop, shift or re-frame anything.\n\nEverything that is part of the painting must come back at exactly the same position, size, angle and shape, so that the result laid over the attachment matches line for line: every coastline, cliff edge, river, field edge, tree, bush, rock, cloud, building and shadow. Keep the colours, the lighting and the overall brightness exactly as they are; do not make it more saturated, darker or more contrasty.\n\nMake it crisper than a plain enlargement: remove the JPEG blocks and blur, make the existing edges crisp, and bring out the brushwork and texture already there. If you are unsure whether something is part of the painting or a marking, keep it.\n\nNo text of your own, no lines, no border, no frame, no watermark.",
       "promptNote": "The prompt exactly as given to the model: research/map-art/regions-restore/prompt.txt (outside git), with input 1 alone (drop/model.txt).",
@@ -425,15 +425,17 @@
       "source": {
         "generated": "2048 x 1152 (16:9, High 2K, opaque, 1 image): research/map-art/drop/regions/01-groddle-meadow-restored-raw.png",
         "dropSha256": "35928f303d0fc96eb44c02a91baf15b67f45bf103fbc409aa79886e48bf66df4",
-        "crop": "the side bands cut off (raw x 72.606 to 1975.394), Lanczos to 1520 x 920, shifted 1 px left and 0.5 px up onto the 2012 picture's lines (measured drift after: within 1 px at 2x in 11 of 12 tiles of a 4 x 3 grid, 3 px in the last); no toning",
+        "crop": "the side bands cut off (raw x 72.606 to 1975.394), Lanczos to 1520 x 920, shifted 1 px left and 0.5 px up onto the 2012 picture's lines (measured drift after: within 1 px at 2x in 11 of 12 tiles of a 4 x 3 grid, 3 px in the last)",
         "masterSha256": "35e6e6f55e3dc4a993fb1a173247387eb618acdbc31a34cd59589987c2414e67",
         "encode": {
-          "x1": "magick master.png -filter Lanczos -resize 760x460! -quality 82 -define webp:method=6 groddlemeadow.webp",
-          "x2": "magick master.png -quality 82 -define webp:method=6 groddlemeadow@2x.webp"
+          "x1": "magick toned.png -filter Lanczos -resize 760x460! -quality 82 -define webp:method=6 groddlemeadow.webp",
+          "x2": "magick toned.png -quality 82 -define webp:method=6 groddlemeadow@2x.webp"
         },
-        "pack": "research/map-art/regions-restore (outside git): readme.md, prompt.txt, attach/, order.txt"
+        "pack": "research/map-art/regions-restore (outside git): readme.md, prompt.txt, attach/, order.txt",
+        "toning": "magick master.png -modulate 128,63,100 toned.png (matched to 2012: the grass's saturation 0.44 to 0.27 and lightness 0.40 to 0.51, measured on green pixels only against the 2012 picture's 0.28 and 0.52)",
+        "tonedSha256": "a65b47e039fa65911db94d8b66ce69d33a76a6db71430c0fe88b0f0c077bbfcd"
       },
-      "differences": "The 2012 sea of pale paper with dashes came back as blue water ripples; the land is greener and darker than 2012, with less of its yellow-grey haze; small trees that sat half under labels came back whole.",
+      "differences": "The 2012 sea of pale paper with dashes came back as blue water ripples; small trees that sat half under labels came back whole. The model returned the land greener and darker than 2012; the toning step brings it back to 2012's colour.",
       "replaces": {
         "made": "2026-11-07",
         "x1": {

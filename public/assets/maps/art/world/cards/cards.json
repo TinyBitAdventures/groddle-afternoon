@@ -78,14 +78,14 @@
         "file": "assets/maps/art/bg/groddlemeadow@2x.webp",
         "kind": "made for Groddle",
         "provenance": "tools/provenance/repainted-maps.json",
-        "sha256": "cffb17c70ce8743c41541599afbcf5797a27639682892708019ebaf222740bed"
+        "sha256": "fe22ca388a6e7f044dea5fefd3ffaf01ff417b05e1b121ad91ea88dac1b4090f"
       },
       "picture": {
         "type": "image/webp",
         "w": 750,
         "h": 455,
-        "bytes": 75168,
-        "sha256": "05f0e263b1466cfbf62308d76401452ad9ff415988f72da4f367676801f27070"
+        "bytes": 59788,
+        "sha256": "72f5fdf4dc0ca0bd0640494e8a9a18b8bbb6e9e1ca4480eedf8f907a0fa70eee"
       }
     },
     "63": {

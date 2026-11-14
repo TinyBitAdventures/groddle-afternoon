@@ -2792,9 +2792,14 @@
   "deployed": "2026-11-13"
  },
  "git": {
-  "commits": 2069,
+  "commits": 2070,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-13",
+    "kind": "fix",
+    "text": "World map hover cards are sharp at the size the map draws them, and a changed card is never served stale"
+   },
    {
     "date": "2026-11-13",
     "kind": "improve",
@@ -2909,11 +2914,6 @@
     "date": "2026-11-13",
     "kind": "fix",
     "text": "Quests' Offered tab shows every new quest, with Accept and Not right now"
-   },
-   {
-    "date": "2026-11-13",
-    "kind": "fix",
-    "text": "Make's \"Show them\" lists the recipes you know, each saying what it is missing"
    }
   ]
  },
