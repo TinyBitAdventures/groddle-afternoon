@@ -54,12 +54,12 @@ describe('Made for Groddle data (tools/made-art/build-data.mjs)', () => {
   it('lists every piece in the provenance list once, newest first, with its date, licence and the original it comes from', () => {
     // Every made sprite that is not an experiment (the Fire Dragon stays in the builder, off the page), plus the curated region map.
     const shown = Object.entries(provenance.sprites).filter(([, p]) => p.experiment !== true).map(([id]) => id);
-    assert.deepEqual(made.pieces.map((p) => p.id).filter((id) => !/^(maps?|subway|decos):/.test(id)).sort(), shown.sort());
+    assert.deepEqual(made.pieces.map((p) => p.id).filter((id) => !/^(maps?|subway|world|decos):/.test(id)).sort(), shown.sort());
     assert.ok(!made.pieces.some((p) => p.id.startsWith('npc_fire_dragon')), 'the Fire Dragon experiment is not on the page');
     const dates = made.pieces.map((p) => p.made);
     assert.deepEqual(dates, [...dates].sort().reverse());
-    // 2026-11-13 leads in the curated order: EZ Cookin's props, its room, the subway paper; then the quest book (2026-11-12).
-    assert.deepEqual(made.pieces.map((p) => p.id), ['decos:ezc', 'decos:ezc:room', 'subway:paper', 'quest_book_award', 'map:58', 'maps:27,107,131']);
+    // 2026-11-13 leads in the curated order: EZ Cookin's props, its room, the subway paper, the World map at 2x; then the quest book (2026-11-12).
+    assert.deepEqual(made.pieces.map((p) => p.id), ['decos:ezc', 'decos:ezc:room', 'subway:paper', 'world:2x', 'quest_book_award', 'map:58', 'maps:27,107,131']);
     const book = made.pieces.find((p) => p.id === 'quest_book_award');
     assert.equal(book.madeLabel, '12 November 2026');
     assert.deepEqual([book.original.src, book.original.w, book.original.h, book.original.pixelated], ['/assets/ui/quest-book.webp', 86, 58, true]);
@@ -74,7 +74,7 @@ describe('Made for Groddle data (tools/made-art/build-data.mjs)', () => {
     assert.match(map.caption, /150 by 91 pixel thumbnail/);
     for (const p of made.pieces) {
       assert.match(p.facts.at(-1).text, /CC0 1\.0/, `${p.id} says its licence`);
-      const tool = /^(maps?|subway|decos):/.test(p.id) ? 'GPT Image 2.6 Sunburst' : provenance.sprites[p.id].tool;
+      const tool = /^(maps?|subway|world|decos):/.test(p.id) ? 'GPT Image 2.6 Sunburst' : provenance.sprites[p.id].tool;
       assert.ok(p.facts.some((f) => f.label === 'How it was made' && f.text.includes(tool)), `${p.id} names its tool`);
     }
   });
@@ -87,6 +87,13 @@ describe('Made for Groddle data (tools/made-art/build-data.mjs)', () => {
     assert.deepEqual([sub.original.src, sub.original.pixelated, sub.image.src], ['/assets/made-art/subway-sign-map.webp', true, '/assets/made-art/subway-map-paper-line.webp']);
     assert.equal(sub.made, more.subway.made);
     assert.match(sub.original.label, /232 by 158 pixels/);
+    // The World map: Tiny Speck's 760 x 460 painted chart beside its sharpened 2x twin (tools/provenance/world-map-2x.json).
+    const world = piece('world:2x');
+    assert.deepEqual([world.original.src, world.original.w, world.original.h], ['/assets/maps/art/world/world_map_unlocked.jpg', 760, 460]);
+    assert.deepEqual([world.image.src, world.image.w, world.image.h], ['/assets/maps/art/world/world_map_unlocked@2x.webp', 1520, 920]);
+    assert.equal(world.made, more.world.made);
+    assert.match(world.caption, /^Tiny Speck's World map, sharpened for Retina screens\./);
+    assert.match(world.original.label, /760 by 460 pixels/);
     // Every made deco is on the page: the three EZ Cookin' props, beside our drawing of their sizes, and the room before and after.
     const ez = piece('decos:ezc');
     assert.deepEqual([ez.original.kind, ez.original.src, ez.image.src], ['guide', '/assets/made-art/ezc-props-outline.webp', '/assets/made-art/ezc-props.webp']);

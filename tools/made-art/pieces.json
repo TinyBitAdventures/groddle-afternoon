@@ -1,5 +1,5 @@
 {
-  "note": "The words players read in the Made for Groddle section of /restoration/ (tools/made-art/build-data.mjs): one piece per entry of tools/provenance/made-sprites.json, and the curated pieces from repainted-maps.json (map:<hub>, maps:<hub>,<hub>), subway-map-paper.json (subway:paper) and made-decos.json (decos:<group>[:<view>]). image.file and original.file under public/assets/made-art/ are pictures composed by tools/made-art/compose.py (tools/made-art/showcase.json). In facts and labels, {tool} is the provenance's model or tool, {overlap} the outline overlap its cut records, {w} and {h} the original's size in pixels, {regions} how many region maps were painted again. A gallery (maps:<hub>,<hub>) has parts: the words for each region's thumbnail and painting in the page's compare popup, where {name} is the region and {w} and {h} its thumbnail's size.",
+  "note": "The words players read in the Made for Groddle section of /restoration/ (tools/made-art/build-data.mjs): one piece per entry of tools/provenance/made-sprites.json, and the curated pieces from repainted-maps.json (map:<hub>, maps:<hub>,<hub>), subway-map-paper.json (subway:paper), world-map-2x.json (world:2x) and made-decos.json (decos:<group>[:<view>]). image.file and original.file under public/assets/made-art/ are pictures composed by tools/made-art/compose.py (tools/made-art/showcase.json). In facts and labels, {tool} is the provenance's model or tool, {overlap} the outline overlap its cut records, {w} and {h} the original's size in pixels, {regions} how many region maps were painted again. A gallery (maps:<hub>,<hub>) has parts: the words for each region's thumbnail and painting in the page's compare popup, where {name} is the region and {w} and {h} its thumbnail's size.",
   "pieces": [
     {
       "id": "quest_book_award",
@@ -169,6 +169,40 @@
         {
           "label": "In the game",
           "text": "The Subway view of the Map. The game draws the line, the stations and their names on top."
+        }
+      ]
+    },
+    {
+      "id": "world:2x",
+      "name": "World map",
+      "caption": "Tiny Speck's World map, sharpened for Retina screens. Tiny Speck drew its two charts, the painted one and the sketched one, only {w} by {h} pixels, and the World view shows them much larger on a sharp screen, where they looked soft. These are the same charts at twice the size: every coast, route and hand-lettered name where it was.",
+      "display": {
+        "w": 316,
+        "h": 191
+      },
+      "image": {
+        "file": "public/assets/maps/art/world/world_map_unlocked@2x.webp",
+        "label": "Sharpened for Groddle, twice the size",
+        "alt": "The painted World map, crisp: dark blue sea, Groddle Isle and its neighbours in soft painted colours, the islands' names in Tiny Speck's own hand."
+      },
+      "original": {
+        "file": "public/assets/maps/art/world/world_map_unlocked.jpg",
+        "kind": "original",
+        "label": "Tiny Speck's painted chart, {w} by {h} pixels, shown at the same size",
+        "alt": "Tiny Speck's painted World map: the same sea, islands and names, softer and a little blocky."
+      },
+      "facts": [
+        {
+          "label": "How it was made",
+          "text": "Sharpened by an image model ({tool}) for Austin, one chart at a time, each asked to move and redraw nothing, only to take away the blur. A first try that redrew islands and lettering was thrown away."
+        },
+        {
+          "label": "How it was checked",
+          "text": "Laid over Tiny Speck's charts and nudged onto their lines, then matched to their colours. Every part of each map sits within one pixel of where it is on the original, at the original's size. A few marks read more clearly than before: the dashed routes, a faint line beside Groddle Isle on the sketched chart, a small tick on the compass."
+        },
+        {
+          "label": "In the game",
+          "text": "The World view of the Map on a Retina screen or a phone, and on any screen once the map is shown larger than {w} by {h}. The region frames, cards and your star sit where they always did."
         }
       ]
     },

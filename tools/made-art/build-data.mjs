@@ -9,7 +9,8 @@
  * Which pieces there are, when they were made, with what tool and under what
  * licence come from the provenance lists: tools/provenance/made-sprites.json
  * (a piece per sprite), repainted-maps.json (map:<hub>, or maps:<hub>,<hub>
- * for a gallery), subway-map-paper.json (subway:paper) and made-decos.json
+ * for a gallery), subway-map-paper.json (subway:paper), world-map-2x.json
+ * (world:2x, the World map's two charts sharpened at 2x) and made-decos.json
  * (decos:<group> or decos:<group>:<view>: the made decos named gz_ai_<group>_*,
  * every one of which must be on the page). Every word players read comes from
  * tools/made-art/pieces.json (curated by hand). Image sizes are read from the
@@ -33,6 +34,7 @@ import { contentProblems } from '../gaps/build-data.mjs';
 export const PROVENANCE = join(GAME_DIR, 'tools/provenance/made-sprites.json');
 export const MAPS = join(GAME_DIR, 'tools/provenance/repainted-maps.json');
 export const SUBWAY = join(GAME_DIR, 'tools/provenance/subway-map-paper.json');
+export const WORLD = join(GAME_DIR, 'tools/provenance/world-map-2x.json');
 export const MADE_DECOS = join(GAME_DIR, 'tools/provenance/made-decos.json');
 export const SHOWCASE = join(GAME_DIR, 'tools/made-art/showcase.json');
 export const CURATED = join(GAME_DIR, 'tools/made-art/pieces.json');
@@ -114,11 +116,11 @@ function oneOf(id, values, what) {
 /**
  * made.json from the provenance and the curated words. `read` reads a file
  * under the game (a Buffer), so tests can hand in their own. `more` holds the
- * other provenance lists: { subway, decos, showcase } (subway-map-paper.json,
- * made-decos.json, tools/made-art/showcase.json).
+ * other provenance lists: { subway, world, decos, showcase } (subway-map-paper.json,
+ * world-map-2x.json, made-decos.json, tools/made-art/showcase.json).
  */
 export function build(provenance, curated, read = (file) => readFileSync(join(GAME_DIR, file)), maps = { regions: {} }, more = {}) {
-  const { subway = null, decos = { art: {} }, showcase = { files: {} } } = more;
+  const { subway = null, world = null, decos = { art: {} }, showcase = { files: {} } } = more;
   // An entry marked experiment (Austin 2026-11-12: the Fire Dragon) stays in the builder, off the page.
   const made = Object.fromEntries(Object.entries(provenance.sprites).filter(([, p]) => p.experiment !== true).map(([id, p]) => [id, { ...p, files: [{ file: p.file, sha256: p.sha256 }] }]));
   const regionCount = Object.keys(maps.regions).length;
@@ -151,6 +153,12 @@ export function build(provenance, curated, read = (file) => readFileSync(join(GA
     if (c.id === 'subway:paper' && subway?.x2) {
       const file = `public/${subway.x2.file}`;
       made[c.id] = { file, files: [{ file, sha256: subway.x2.sha256 }], licence: subway.licence, tool: subway.model, made: subway.made };
+    }
+    // The World map's two charts at 2x (tools/provenance/world-map-2x.json): both twins checked, the painted one shown.
+    if (c.id === 'world:2x' && world?.charts) {
+      const twins = ['unlocked', 'locked'].map((k) => world.charts[k]?.x2).filter(Boolean);
+      const files = twins.map((x2) => ({ file: `public/${x2.file}`, sha256: x2.sha256 }));
+      if (files.length) made[c.id] = { file: files[0].file, files, licence: world.licence, tool: world.model, made: world.made };
     }
     // Made decos for Groddle's own streets (tools/provenance/made-decos.json): decos:<group>[:<view>] is every gz_ai_<group>_ deco.
     const group = /^decos:([a-z0-9]+)(?::[a-z0-9-]+)?$/.exec(c.id)?.[1];
@@ -263,7 +271,7 @@ export function wordProblems(data) {
 /** The other provenance lists build() reads, from the checkout. */
 export function readMore() {
   const json = (file) => (existsSync(file) ? JSON.parse(readFileSync(file, 'utf8')) : undefined);
-  return { subway: json(SUBWAY) || null, decos: json(MADE_DECOS), showcase: json(SHOWCASE) };
+  return { subway: json(SUBWAY) || null, world: json(WORLD) || null, decos: json(MADE_DECOS), showcase: json(SHOWCASE) };
 }
 
 const stringify = (data) => `${JSON.stringify(data, null, 2)}\n`;

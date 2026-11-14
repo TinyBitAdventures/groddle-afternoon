@@ -138,6 +138,51 @@
       ]
     },
     {
+      "id": "world:2x",
+      "anchor": "made-world-map",
+      "name": "World map",
+      "made": "2026-11-13",
+      "madeLabel": "13 November 2026",
+      "caption": "Tiny Speck's World map, sharpened for Retina screens. Tiny Speck drew its two charts, the painted one and the sketched one, only 760 by 460 pixels, and the World view shows them much larger on a sharp screen, where they looked soft. These are the same charts at twice the size: every coast, route and hand-lettered name where it was.",
+      "display": {
+        "w": 316,
+        "h": 191
+      },
+      "image": {
+        "src": "/assets/maps/art/world/world_map_unlocked@2x.webp",
+        "w": 1520,
+        "h": 920,
+        "label": "Sharpened for Groddle, twice the size",
+        "alt": "The painted World map, crisp: dark blue sea, Groddle Isle and its neighbours in soft painted colours, the islands' names in Tiny Speck's own hand."
+      },
+      "original": {
+        "src": "/assets/maps/art/world/world_map_unlocked.jpg",
+        "w": 760,
+        "h": 460,
+        "kind": "original",
+        "alt": "Tiny Speck's painted World map: the same sea, islands and names, softer and a little blocky.",
+        "label": "Tiny Speck's painted chart, 760 by 460 pixels, shown at the same size"
+      },
+      "facts": [
+        {
+          "label": "How it was made",
+          "text": "Sharpened by an image model (GPT Image 2.6 Sunburst) for Austin, one chart at a time, each asked to move and redraw nothing, only to take away the blur. A first try that redrew islands and lettering was thrown away."
+        },
+        {
+          "label": "How it was checked",
+          "text": "Laid over Tiny Speck's charts and nudged onto their lines, then matched to their colours. Every part of each map sits within one pixel of where it is on the original, at the original's size. A few marks read more clearly than before: the dashed routes, a faint line beside Groddle Isle on the sketched chart, a small tick on the compass."
+        },
+        {
+          "label": "In the game",
+          "text": "The World view of the Map on a Retina screen or a phone, and on any screen once the map is shown larger than 760 by 460. The region frames, cards and your star sit where they always did."
+        },
+        {
+          "label": "Licence",
+          "text": "Dedicated to the public domain under CC0 1.0, like the Tiny Speck art it comes from."
+        }
+      ]
+    },
+    {
       "id": "quest_book_award",
       "anchor": "made-quest-book",
       "name": "Quest book",
