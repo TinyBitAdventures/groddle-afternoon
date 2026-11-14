@@ -38,6 +38,7 @@
  *     exitPromptMs | exitPromptFor(questId) (the source exit_delay: the
  *       "Are you stuck?" prompt, see maybeAskStuck; a room using it has
  *       durationMs 0), stuckPromptReady(ctx) -> false to hold the prompt back,
+ *     musicFile (the location's music_file key, looped in place of the hub music),
  *     firstStage, stageLabel(stage), loadingLabel(stage) (the loading card's line, else stageLabel),
  *     build(ctx, stage) -> { width, height, background, platforms, walls,
  *                            barriers, spawn: {x,y}, label, hubName }
@@ -171,7 +172,7 @@ const ROOM_MODULES = {
   juju_camp: () => import('../quest-rooms/juju-camp.js?v=8f348e11'),
   picto_pattern: () => import('../quest-rooms/picto-pattern.js?v=f5989c1a'),
   radiant_glare: () => import('../quest-rooms/radiant-glare.js?v=d743533a'),
-  an_autumn_day: () => import('../quest-rooms/an-autumn-day.js?v=00d2af49'),
+  an_autumn_day: () => import('../quest-rooms/an-autumn-day.js?v=c17ff17d'),
   being_watched: () => import('../quest-rooms/being-watched.js?v=777a7df0'),
   back_alley: () => import('../quest-rooms/back-alley.js?v=afd20ece'),
   clubhouse: () => import('../quest-rooms/clubhouse.js?v=4be22564'),
@@ -1013,6 +1014,8 @@ async function buildStage(engine, stage) {
     ownLight: Boolean(scene.ownLight ?? room.ownLight),
     // A room whose avatars draw in grey (or another location filter): game.js setAvatarTone.
     avatarFilters: scene.avatarFilters ?? room.avatarFilters ?? null,
+    // #323: the instance location's music_file (a GSJS music key), looped as street music in place of the hub's.
+    musicFile: scene.musicFile ?? room.musicFile ?? null,
   });
   if (engine.street) engine.street.barriers = scene.barriers || [];
   room.enter?.(ctx, stage);

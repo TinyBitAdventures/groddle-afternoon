@@ -438,6 +438,12 @@
       "gsjsKeys": ["JAL1"],
       "note": "1350945525-Jal_1.8.mp3 from Sounds.zip (music_map JAL1).",
       "tracks": ["assets/audio/sfx/JAL1.mp3"]
+    },
+    "autumn_day": {
+      "label": "An Autumn Day",
+      "gsjsKeys": ["AUTUMN_DAY"],
+      "note": "1350096123-Autumn_Day_2.5.mp3 (inc_data_sounds.js:82), the An Autumn Day memory's own music: an instance location's music_file loops (location.js 481-482, announce_music 999) with the hub music paused (SoundMaster.as playSound 264-278); player footage shows it repeat every ~87 s.",
+      "tracks": ["assets/audio/sfx/AUTUMN_DAY.mp3"]
     }
   },
   "streetMusic": {
@@ -473,7 +479,8 @@
     "AMBIENT_FIREBOGS1": "street_firebogs1",
     "JAL1": "street_jal1",
     "WHISTLE_SONG": "snappy",
-    "HOME_STREET_GRODDLE_WHISTLE": "snappy"
+    "HOME_STREET_GRODDLE_WHISTLE": "snappy",
+    "AUTUMN_DAY": "autumn_day"
   },
   "hubMap": {
     "18": "caverns",

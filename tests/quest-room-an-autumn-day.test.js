@@ -22,6 +22,7 @@ import {
   FEELING_LABEL,
   LINGER_MS,
   MAIN,
+  MUSIC_FILE,
   MAIN_LABEL,
   ROOM,
   ROOM_ID,
@@ -41,7 +42,13 @@ import {
   sentenceSlots,
   slotCorrect,
   touchesToSolve,
-} from '../public/js/quest-rooms/an-autumn-day.js?v=00d2af49';
+} from '../public/js/quest-rooms/an-autumn-day.js?v=c17ff17d';
+import {
+  setAmbientMusicConfig,
+  resolveAmbientTheme,
+  tracksForTheme,
+  ambientPlaylist,
+} from '../public/js/ambient-music.js?v=75a5ad20';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const pub = (p) => join(root, 'public', p);
@@ -129,6 +136,31 @@ describe('An Autumn Day (an_autumn_day): source', () => {
     // Desk FOOTWORDS (G314): GSJS's own words (inc_data_maps_prod.js 17952-17954), not the footage's.
     assert.equal(CAPTION, 'This feeling of …');
     assert.equal(CAPTION, FEELING_LABEL);
+  });
+});
+
+describe('An Autumn Day: its music (#323)', () => {
+  it('plays AUTUMN_DAY as the location music: looped, in place of the hub music', () => {
+    setAmbientMusicConfig(JSON.parse(readFileSync(pub('assets/content/ambient-music.json'), 'utf8')));
+    assert.equal(MUSIC_FILE, 'AUTUMN_DAY');
+    assert.equal(room.musicFile, MUSIC_FILE);
+    // A scene room has no hub (hubName ''): its music_file theme, not the default library.
+    const theme = resolveAmbientTheme({ hubId: 'scene', hubName: '', musicFile: room.musicFile });
+    assert.equal(theme, 'street:AUTUMN_DAY');
+    assert.deepEqual(tracksForTheme(theme), ['assets/audio/sfx/AUTUMN_DAY.mp3']);
+    // location.js 481-482: announce_music(music_file, 999), so it loops.
+    assert.deepEqual(ambientPlaylist(theme), { tracks: ['assets/audio/sfx/AUTUMN_DAY.mp3'], start: 0, loop: true });
+  });
+
+  it('is no one-shot cue over the ducked hub music, and every room stage carries it', () => {
+    const src = readFileSync(pub('js/quest-rooms/an-autumn-day.js'), 'utf8');
+    assert.ok(!src.includes('playCue'), 'the room plays no cue of its own');
+    const runner = readFileSync(pub('js/features/quest-instances-feature.js'), 'utf8');
+    assert.match(runner, /musicFile: scene\.musicFile \?\? room\.musicFile/);
+    const game = readFileSync(join(root, 'public/game.js'), 'utf8');
+    const enter = game.slice(game.indexOf('  enterScene(scene) {'), game.indexOf('  playEmotion(emotion'));
+    assert.match(enter, /musicFile: scene\.musicFile \|\| null/);
+    assert.match(enter, /if \(scene\.musicFile\)[\s\S]*setAmbientForStreet\(currentStreet\)/);
   });
 });
 
@@ -227,7 +259,7 @@ describe('An Autumn Day: the look of the Snaps (G75)', () => {
     const { fileURLToPath } = await import('node:url');
     const spike = join(dirname(fileURLToPath(import.meta.url)), '..');
     const { AN_AUTUMN_DAY_FILES } = await import('../public/js/an-autumn-day-art.js?v=d6b2601b');
-    const mod = await import('../public/js/quest-rooms/an-autumn-day.js?v=00d2af49');
+    const mod = await import('../public/js/quest-rooms/an-autumn-day.js?v=c17ff17d');
     const plan = JSON.parse(readFileSync(join(spike, 'tools/room-art/an_autumn_day.json'), 'utf8'));
     assert.match(plan.source, /glitch-locations limbo1\.swf \(CC0\)/);
     assert.deepEqual(Object.keys(plan.pieces).sort(), Object.keys(AN_AUTUMN_DAY_FILES).sort());

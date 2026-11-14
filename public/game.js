@@ -13531,7 +13531,14 @@ const engine = {
       platforms: streetPlatforms,
       signposts: [],
       ownLight: Boolean(scene.ownLight),
+      musicFile: scene.musicFile || null,
     };
+    // #323: a scene with its own music_file plays it as its street music (looped, hub music silent:
+    // location.js 481-482); the street you go back to brings its own music again.
+    if (scene.musicFile) {
+      if (app?.canvas) app.canvas.dataset.ambientTheme = resolveAmbientTheme(currentStreet);
+      if (state.started && audio.ctx) setAmbientForStreet(currentStreet);
+    }
     if (player && scene.spawn) {
       player.x = scene.spawn.x;
       player.y = scene.spawn.y;

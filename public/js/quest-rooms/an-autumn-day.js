@@ -84,7 +84,12 @@ export const SCRAMBLE = Object.freeze(['feeling', 'of', 'This', 'comfort.']);
 export const LINGER_MS = 12_000;
 
 const ART = 'assets/sprites/quest-rooms/an_autumn_day/';
-const MUSIC = 'assets/audio/sfx/AUTUMN_DAY.mp3';
+/**
+ * #323: the memory's own music, AUTUMN_DAY (inc_data_sounds.js:82, Autumn_Day_2.5), played as the
+ * location's music_file: looped (location.js 481-482, announce_music 999) with the hub music paused
+ * (SoundMaster.as playSound 264-278) in all four rooms. Player footage repeats it every ~87 s.
+ */
+export const MUSIC_FILE = 'AUTUMN_DAY';
 
 /* ------------------------------------------------------------------ */
 /* Geometry                                                             */
@@ -1002,6 +1007,7 @@ export const room = {
   icon: `${ART}bird_icon.webp`,
   theme: 'warm',
   hubName: HUB_NAME,
+  musicFile: MUSIC_FILE,
   durationMs: 0,
   exitPromptMs: EXIT_PROMPT_MS, // "Are you stuck?" after 5 * 60 (runtime maybeAskStuck)
   firstStage: 'main',
@@ -1049,14 +1055,6 @@ export const room = {
   enter(ctx, stage) {
     const d = ctx.data;
     silhouette(ctx, true);
-    if (!d.stopMusic && !d.musicStarting) {
-      d.musicStarting = true;
-      Promise.resolve(ctx.engine.playCue?.(MUSIC, { volume: 0.5 })).then((stop) => {
-        d.musicStarting = false;
-        if (!ctx.run) stop?.();
-        else d.stopMusic = stop;
-      });
-    }
     if (FEELINGS.includes(stage)) {
       d.feeling = stage;
       d.feelEnteredAt = Date.now();
@@ -1125,8 +1123,6 @@ export const room = {
 
   onLeave(ctx) {
     silhouette(ctx, false);
-    ctx.data.stopMusic?.();
-    ctx.data.stopMusic = null;
     return {};
   },
 
