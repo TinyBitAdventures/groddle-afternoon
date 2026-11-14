@@ -1,0 +1,824 @@
+{
+  "note": "The World map's hover cards (glitch-overlays/world_map.fla region clips, Tiny Speck, CC0): each card's 150 x 91 thumbnail replaced by its region's painting at 2x (the painting's provenance in the file named; a painting made for Groddle is the same CC0 picture its region map shows), drawn in the thumbnail's box. `thumbOf`: the FLA's card drew another region's thumbnail (Baqala's drew Zhambu's); the card carries its own region's painting. A card with `painting: null` keeps Tiny Speck's thumbnail. Built by tools/map-views/build.mjs; do not edit.",
+  "source": {
+    "fla": "glitch-overlays/world_map.fla",
+    "folder": "LIBRARY/z_hub_maps_small/"
+  },
+  "picture": [
+    300,
+    182
+  ],
+  "recipe": [
+    "-filter",
+    "Lanczos",
+    "-resize",
+    "300x182!",
+    "-strip",
+    "-quality",
+    "75",
+    "-define",
+    "webp:method=6"
+  ],
+  "cards": {
+    "27": {
+      "hubName": "Ix",
+      "thumb": "z_hub_maps_small/sm_ix.jpg",
+      "painting": {
+        "file": "assets/maps/art/bg/ix@2x.webp",
+        "kind": "made for Groddle",
+        "provenance": "tools/provenance/repainted-maps.json",
+        "sha256": "35253bea08465e05a03f574edc598231c0c6b78b07cab0b4d8eb5317582a8e90"
+      },
+      "picture": {
+        "type": "image/webp",
+        "w": 300,
+        "h": 182,
+        "bytes": 3842,
+        "sha256": "5ebe67f0a3362c1533e91859e4f82fbceade8daade4c73c59547bf06c251375c"
+      }
+    },
+    "51": {
+      "hubName": "Uralia",
+      "thumb": "z_hub_maps_small/sm_uralia.jpg",
+      "painting": {
+        "file": "assets/maps/art/bg/uralia@2x.webp",
+        "kind": "made for Groddle",
+        "provenance": "tools/provenance/repainted-maps.json",
+        "sha256": "73afd4d527b4a508af9b261d893355888b89710be14cff61cf2b27883b12dd18"
+      },
+      "picture": {
+        "type": "image/webp",
+        "w": 300,
+        "h": 182,
+        "bytes": 4526,
+        "sha256": "fe2753bfba0491899123749c293399a588f0157a986850be01e8fb34657c3cb9"
+      }
+    },
+    "56": {
+      "hubName": "Groddle Forest",
+      "thumb": "z_hub_maps_small/sm_groddleforest.jpg",
+      "painting": {
+        "file": "assets/maps/art/bg/groddleforest@2x.webp",
+        "kind": "made for Groddle",
+        "provenance": "tools/provenance/repainted-maps.json",
+        "sha256": "405377b93db02e6e9e36c96c5ecfc5d4892b73dc2d9afdff4aaf5bd027ca1324"
+      },
+      "picture": {
+        "type": "image/webp",
+        "w": 300,
+        "h": 182,
+        "bytes": 7360,
+        "sha256": "d58c63078d094692a2f00a1200c495752a2d2576d953eab79075093042ea07d5"
+      }
+    },
+    "58": {
+      "hubName": "Groddle Meadow",
+      "thumb": "z_hub_maps_small/sm_groddlemeadow.jpg",
+      "painting": {
+        "file": "assets/maps/art/bg/groddlemeadow@2x.webp",
+        "kind": "made for Groddle",
+        "provenance": "tools/provenance/repainted-maps.json",
+        "sha256": "4808cae82f780c6705d7d675f6d7dcd3c2e833c31e53b1fb69b7ef6178623b7a"
+      },
+      "picture": {
+        "type": "image/webp",
+        "w": 300,
+        "h": 182,
+        "bytes": 5170,
+        "sha256": "3e55d0b3025d41db64582e9dc854651aecb157eecb7df5a4fcbf0015ba48cca7"
+      }
+    },
+    "63": {
+      "hubName": "Shimla Mirch",
+      "thumb": "z_hub_maps_small/sm_shimlamirch.jpg",
+      "painting": {
+        "file": "assets/maps/art/bg/shimlamirch@2x.webp",
+        "kind": "made for Groddle",
+        "provenance": "tools/provenance/repainted-maps.json",
+        "sha256": "6e633c60fce436187189394d4397bd23df2e7dc942cd68f6d0fd983cddf803fe"
+      },
+      "picture": {
+        "type": "image/webp",
+        "w": 300,
+        "h": 182,
+        "bytes": 2972,
+        "sha256": "9a5ebf054c40275f212aee3ec5fa69f6f835eb31962905f96bac85d14a06e0df"
+      }
+    },
+    "64": {
+      "hubName": "Groddle Heights",
+      "thumb": "z_hub_maps_small/sm_groddleheights.jpg",
+      "painting": {
+        "file": "assets/maps/art/bg/groddleheights@2x.webp",
+        "kind": "made for Groddle",
+        "provenance": "tools/provenance/repainted-maps.json",
+        "sha256": "c2be8d9dd2630f6900f608bc5d77a13a241a1cd1f5290248b6f3654abe94fa1f"
+      },
+      "picture": {
+        "type": "image/webp",
+        "w": 300,
+        "h": 182,
+        "bytes": 3606,
+        "sha256": "cd7dce36bcb24e940961abca2417d7b085d50764f90c41359a35ec0eb3b2b986"
+      }
+    },
+    "71": {
+      "hubName": "Jethimadh",
+      "thumb": "z_hub_maps_small/sm_jethimadh.jpg",
+      "painting": {
+        "file": "assets/maps/art/bg/jethimadh@2x.webp",
+        "kind": "made for Groddle",
+        "provenance": "tools/provenance/repainted-maps.json",
+        "sha256": "f2f583c78f031273c97294fa57c11866885a44c236b496dbfcddbf1b163ab46b"
+      },
+      "picture": {
+        "type": "image/webp",
+        "w": 300,
+        "h": 182,
+        "bytes": 3818,
+        "sha256": "9e32f75722667dfbb84c2d18ca0cbab118d230a96e8f25fd186f67b314028c73"
+      }
+    },
+    "72": {
+      "hubName": "Chakra Phool",
+      "thumb": "z_hub_maps_small/sm_chakraphool.jpg",
+      "painting": {
+        "file": "assets/maps/art/bg/chakraphool@2x.webp",
+        "kind": "made for Groddle",
+        "provenance": "tools/provenance/repainted-maps.json",
+        "sha256": "b3b5d0d4540696d0e765efc2de395ed8c46bfbe72e13e0c9f2350c6e069c1f2e"
+      },
+      "picture": {
+        "type": "image/webp",
+        "w": 300,
+        "h": 182,
+        "bytes": 3878,
+        "sha256": "c94f7d4bf8bc8ecb76fd79791876c05f48c9cd5e407dc81da7a21a2fea988a38"
+      }
+    },
+    "75": {
+      "hubName": "Bortola",
+      "thumb": "z_hub_maps_small/sm_bortola.jpg",
+      "painting": {
+        "file": "assets/maps/art/bg/bortola@2x.webp",
+        "kind": "made for Groddle",
+        "provenance": "tools/provenance/repainted-maps.json",
+        "sha256": "8c0d08e2d4194fa0e4fd8c3367e6f484e152f9cc26c424da19b239cdbdaac396"
+      },
+      "picture": {
+        "type": "image/webp",
+        "w": 300,
+        "h": 182,
+        "bytes": 4910,
+        "sha256": "48ef15b07ea9b6f75c11547347638405991375d160bcc8ee04fb0c4247370f30"
+      }
+    },
+    "76": {
+      "hubName": "Alakol",
+      "thumb": "z_hub_maps_small/sm_alakol.jpg",
+      "painting": {
+        "file": "assets/maps/art/bg/alakol@2x.webp",
+        "kind": "made for Groddle",
+        "provenance": "tools/provenance/repainted-maps.json",
+        "sha256": "dd6e7073b0ff6bfbc8c6f6706168186226e1466a776fc34449aa3388c7670b4e"
+      },
+      "picture": {
+        "type": "image/webp",
+        "w": 300,
+        "h": 182,
+        "bytes": 5868,
+        "sha256": "59784bee3b12e8304f1adfad9c7d31f30c946ec126cca050228aeccbfb3a61ef"
+      }
+    },
+    "85": {
+      "hubName": "Kajuu",
+      "thumb": "z_hub_maps_small/sm_kajuu.jpg",
+      "painting": {
+        "file": "assets/maps/art/bg/kajuu@2x.webp",
+        "kind": "made for Groddle",
+        "provenance": "tools/provenance/repainted-maps.json",
+        "sha256": "a58429a3efded0d99e3c17e6302163c35506234f9d09661b918b4361c9e78ee6"
+      },
+      "picture": {
+        "type": "image/webp",
+        "w": 300,
+        "h": 182,
+        "bytes": 5790,
+        "sha256": "16af17aad473978aa30de5f3545a042d0c873ac31f1bf56e26c3aea51211749d"
+      }
+    },
+    "86": {
+      "hubName": "Baqala",
+      "thumb": "z_hub_maps_small/sm_zhambu.jpg",
+      "thumbOf": "91",
+      "painting": {
+        "file": "assets/maps/art/bg/baqala@2x.webp",
+        "kind": "made for Groddle",
+        "provenance": "tools/provenance/repainted-maps.json",
+        "sha256": "9a30b75241c2fa362a13556ea78a93e009c060f076acfa1ee43b696364a7b898"
+      },
+      "picture": {
+        "type": "image/webp",
+        "w": 300,
+        "h": 182,
+        "bytes": 2714,
+        "sha256": "468907bc413ddd836c386026059c4f8e7069f726c095085b9a53a0133fd36654"
+      }
+    },
+    "88": {
+      "hubName": "Karnata",
+      "thumb": "z_hub_maps_small/sm_karnata.jpg",
+      "painting": {
+        "file": "assets/maps/art/bg/karnata@2x.webp",
+        "kind": "made for Groddle",
+        "provenance": "tools/provenance/repainted-maps.json",
+        "sha256": "953e1f96f8db2329159d9a90858c3b6a91c3d1f19b3c24b58fdbb243267aa52a"
+      },
+      "picture": {
+        "type": "image/webp",
+        "w": 300,
+        "h": 182,
+        "bytes": 3270,
+        "sha256": "e95dfd1d052a89cfce9ea283f17646bc99f3d1583b7a714a7a1cabbdda437290"
+      }
+    },
+    "89": {
+      "hubName": "Andra",
+      "thumb": "z_hub_maps_small/sm_andra.jpg",
+      "painting": {
+        "file": "assets/maps/art/bg/andra@2x.webp",
+        "kind": "made for Groddle",
+        "provenance": "tools/provenance/repainted-maps.json",
+        "sha256": "61a1d4904c7d7b53b1a2d7b4c6e73cd4727b4f0062cb3797dece14b9f2ee144f"
+      },
+      "picture": {
+        "type": "image/webp",
+        "w": 300,
+        "h": 182,
+        "bytes": 4756,
+        "sha256": "a089375eca7a8972e175eea9ca0b6889fd4814c0d19de71b449051e2f06001cb"
+      }
+    },
+    "90": {
+      "hubName": "Choru",
+      "thumb": "z_hub_maps_small/sm_choru.jpg",
+      "painting": {
+        "file": "assets/maps/art/bg/choru@2x.webp",
+        "kind": "made for Groddle",
+        "provenance": "tools/provenance/repainted-maps.json",
+        "sha256": "00b69f0da3f85f972298dd9eeae98a928a81b8e0704ddecd5363e4973770d2f7"
+      },
+      "picture": {
+        "type": "image/webp",
+        "w": 300,
+        "h": 182,
+        "bytes": 3202,
+        "sha256": "45ddf45fbebc70cff7c70f02a4640c7514ada6b90fce79e3a5e99d68fd7b108a"
+      }
+    },
+    "91": {
+      "hubName": "Zhambu",
+      "thumb": "z_hub_maps_small/sm_zhambu.jpg",
+      "painting": {
+        "file": "assets/maps/art/bg/zhambu@2x.webp",
+        "kind": "made for Groddle",
+        "provenance": "tools/provenance/repainted-maps.json",
+        "sha256": "e92206bf1a1922e322b0ad0af51e063720f5e4c3d59934ddd4e55949d944bdaa"
+      },
+      "picture": {
+        "type": "image/webp",
+        "w": 300,
+        "h": 182,
+        "bytes": 4130,
+        "sha256": "74179b4bedebac6f515b1be76edb688e0152dccda11b74d81b1d73dc03d22743"
+      }
+    },
+    "92": {
+      "hubName": "Tamila",
+      "thumb": "z_hub_maps_small/sm_tamila.jpg",
+      "painting": {
+        "file": "assets/maps/art/bg/tamila@2x.webp",
+        "kind": "made for Groddle",
+        "provenance": "tools/provenance/repainted-maps.json",
+        "sha256": "9ccf35344a9361430866445032dd3e618d4c3678bb888361020c997a454b4f3e"
+      },
+      "picture": {
+        "type": "image/webp",
+        "w": 300,
+        "h": 182,
+        "bytes": 4574,
+        "sha256": "64d14edc166cdf1cd9073bacee77697d067dfca7f128265f1e2434a0a15eb2a5"
+      }
+    },
+    "93": {
+      "hubName": "Salatu",
+      "thumb": "z_hub_maps_small/sm_salatu.jpg",
+      "painting": {
+        "file": "assets/maps/art/bg/salatu@2x.webp",
+        "kind": "made for Groddle",
+        "provenance": "tools/provenance/repainted-maps.json",
+        "sha256": "7abd2725dcebb8b5222011c678a6cabbd9464ade93b91e91eb51252514aac8f1"
+      },
+      "picture": {
+        "type": "image/webp",
+        "w": 300,
+        "h": 182,
+        "bytes": 4928,
+        "sha256": "a7e299789101d86a901530e8c7d2c4ad9808a54e94a8a1398f639aae6e5f93b0"
+      }
+    },
+    "95": {
+      "hubName": "Xalanga",
+      "thumb": "z_hub_maps_small/sm_xalanga.jpg",
+      "painting": {
+        "file": "assets/maps/art/bg/xalanga@2x.webp",
+        "kind": "made for Groddle",
+        "provenance": "tools/provenance/repainted-maps.json",
+        "sha256": "e5da3171509d2947ee9d335db6516c8a653a7098b232680e0619ab73192ed6ca"
+      },
+      "picture": {
+        "type": "image/webp",
+        "w": 300,
+        "h": 182,
+        "bytes": 3562,
+        "sha256": "8f3e2747cb8b99463e8693bc601ca1d3913907cdbe344e2baa0f6557e7b82855"
+      }
+    },
+    "97": {
+      "hubName": "Muufo",
+      "thumb": "z_hub_maps_small/sm_muufo.jpg",
+      "painting": {
+        "file": "assets/maps/art/bg/muufo@2x.webp",
+        "kind": "made for Groddle",
+        "provenance": "tools/provenance/repainted-maps.json",
+        "sha256": "c60239168e727e1211ada06ecf84cf5d77bdefdfb355d469bc583ff92aa54cd2"
+      },
+      "picture": {
+        "type": "image/webp",
+        "w": 300,
+        "h": 182,
+        "bytes": 3814,
+        "sha256": "dfaa166d7e48d0adc39635ef59ff7f98bb8597d4bbaec287be24fb4a40e91e0d"
+      }
+    },
+    "98": {
+      "hubName": "Besara",
+      "thumb": "z_hub_maps_small/sm_besara.jpg",
+      "painting": {
+        "file": "assets/maps/art/bg/besara@2x.webp",
+        "kind": "made for Groddle",
+        "provenance": "tools/provenance/repainted-maps.json",
+        "sha256": "0ae1bf8f13726e826b701c707d13bfcf0595a6e3569aa7da36f6fdb3b2c9843e"
+      },
+      "picture": {
+        "type": "image/webp",
+        "w": 300,
+        "h": 182,
+        "bytes": 6640,
+        "sha256": "a8394ae85e5616c593e1bda469d42a87a21611c0ee0c424aae1edee514ee1f1c"
+      }
+    },
+    "99": {
+      "hubName": "Kalavana",
+      "thumb": "z_hub_maps_small/sm_kalavana.jpg",
+      "painting": {
+        "file": "assets/maps/art/bg/kalavana@2x.webp",
+        "kind": "made for Groddle",
+        "provenance": "tools/provenance/repainted-maps.json",
+        "sha256": "49f0cf53909bbb665358ca687dbe6ba7a322793be907879fe238115dceb63d9f"
+      },
+      "picture": {
+        "type": "image/webp",
+        "w": 300,
+        "h": 182,
+        "bytes": 4004,
+        "sha256": "079a46b8475b509b192ee8507f85d4a488db0d9dc167a48b124bdcda6c29fe77"
+      }
+    },
+    "100": {
+      "hubName": "Vantalu",
+      "thumb": "z_hub_maps_small/sm_vantalu.jpg",
+      "painting": {
+        "file": "assets/maps/art/bg/vantalu@2x.webp",
+        "kind": "made for Groddle",
+        "provenance": "tools/provenance/repainted-maps.json",
+        "sha256": "ad8106733dff822e53e83374de9791353c0b816d7c4f353a472c624ceb74c2bb"
+      },
+      "picture": {
+        "type": "image/webp",
+        "w": 300,
+        "h": 182,
+        "bytes": 5726,
+        "sha256": "62fcee07ae3af688eee304a65f5da4e28d294629dc0b3c7da0a8e2c70d925aa5"
+      }
+    },
+    "101": {
+      "hubName": "Aranna",
+      "thumb": "z_hub_maps_small/sm_aranna.jpg",
+      "painting": {
+        "file": "assets/maps/art/bg/aranna@2x.webp",
+        "kind": "made for Groddle",
+        "provenance": "tools/provenance/repainted-maps.json",
+        "sha256": "97f21b1cd152e5054b063a21de0e98b573bcd23c301c7b5e158f571fd8d312ec"
+      },
+      "picture": {
+        "type": "image/webp",
+        "w": 300,
+        "h": 182,
+        "bytes": 4900,
+        "sha256": "066f9f527c205faef5cb02e0f886788ff977aabef44d8a67ce78e341c9e32baf"
+      }
+    },
+    "102": {
+      "hubName": "Ormonos",
+      "thumb": "z_hub_maps_small/sm_ormonos.jpg",
+      "painting": {
+        "file": "assets/maps/art/bg/ormonos@2x.webp",
+        "kind": "made for Groddle",
+        "provenance": "tools/provenance/repainted-maps.json",
+        "sha256": "2ef671c16917c928eaaf6402d05ae13505d5fe27972dfcc75fa22556dbc475dd"
+      },
+      "picture": {
+        "type": "image/webp",
+        "w": 300,
+        "h": 182,
+        "bytes": 4978,
+        "sha256": "ea03e047fbb965f6dac53b8e143e84a25bc9053e0c812fa850d31a1b8e8f346c"
+      }
+    },
+    "105": {
+      "hubName": "Lida",
+      "thumb": "z_hub_maps_small/sm_lida.jpg",
+      "painting": {
+        "file": "assets/maps/art/bg/lida@2x.webp",
+        "kind": "made for Groddle",
+        "provenance": "tools/provenance/repainted-maps.json",
+        "sha256": "addf222af98b7745a635ac2bb6e25156ed474053eea1111708ee90231285ec7d"
+      },
+      "picture": {
+        "type": "image/webp",
+        "w": 300,
+        "h": 182,
+        "bytes": 4686,
+        "sha256": "ff6ef41d0b5e4ed6794fdae95b3fe758909da38a52a047dcaffb821122f42636"
+      }
+    },
+    "106": {
+      "hubName": "Pollokoo",
+      "thumb": "z_hub_maps_small/sm_pollokoo.jpg",
+      "painting": {
+        "file": "assets/maps/art/bg/pollokoo@2x.webp",
+        "kind": "made for Groddle",
+        "provenance": "tools/provenance/repainted-maps.json",
+        "sha256": "85afaa3e22b83e622e55dceafbb9aefb576609da136028ec2cd180920981786b"
+      },
+      "picture": {
+        "type": "image/webp",
+        "w": 300,
+        "h": 182,
+        "bytes": 5800,
+        "sha256": "0f0a2eced3a60ac8dda0c1c8a55eebdb581da15142aa452ef884ee9eab8c470f"
+      }
+    },
+    "107": {
+      "hubName": "Callopee",
+      "thumb": "z_hub_maps_small/sm_callopee.jpg",
+      "painting": {
+        "file": "assets/maps/art/bg/callopee@2x.webp",
+        "kind": "made for Groddle",
+        "provenance": "tools/provenance/repainted-maps.json",
+        "sha256": "a238560044c94b57c7608de48342e71bd06d8cc9d0a3465f4480b634598026a3"
+      },
+      "picture": {
+        "type": "image/webp",
+        "w": 300,
+        "h": 182,
+        "bytes": 5292,
+        "sha256": "c9ca337edc6d6348a785e91cde356f9f566ade2dab78504398b51be1c262b1f7"
+      }
+    },
+    "109": {
+      "hubName": "Rasana",
+      "thumb": "z_hub_maps_small/sm_rasana.jpg",
+      "painting": {
+        "file": "assets/maps/art/bg/rasana@2x.webp",
+        "kind": "made for Groddle",
+        "provenance": "tools/provenance/repainted-maps.json",
+        "sha256": "bcc047fb3f68af73d5e8e8c9d6d1ac4bb90dab1492f1956b1f320bd8dfa77d09"
+      },
+      "picture": {
+        "type": "image/webp",
+        "w": 300,
+        "h": 182,
+        "bytes": 5254,
+        "sha256": "0ff68a36f22c511df293cfdfb424e06f25cb8dc6c1144b3d96bc8bdd82645e2c"
+      }
+    },
+    "110": {
+      "hubName": "Massadoe",
+      "thumb": "z_hub_maps_small/sm_massadoe.jpg",
+      "painting": {
+        "file": "assets/maps/art/bg/massadoe@2x.webp",
+        "kind": "made for Groddle",
+        "provenance": "tools/provenance/repainted-maps.json",
+        "sha256": "6ee9999030f6c3ff8bfad2cb0b468fd06daf045d2a9d5c52aa575eca70bfd28e"
+      },
+      "picture": {
+        "type": "image/webp",
+        "w": 300,
+        "h": 182,
+        "bytes": 5232,
+        "sha256": "538fbe5dbaa4b1092f99b568f5447df9f159fb516c37c8c7e8ba85203f4b2ce8"
+      }
+    },
+    "112": {
+      "hubName": "Brillah",
+      "thumb": "z_hub_maps_small/sm_brillah.jpg",
+      "painting": {
+        "file": "assets/maps/art/bg/brillah@2x.webp",
+        "kind": "made for Groddle",
+        "provenance": "tools/provenance/repainted-maps.json",
+        "sha256": "93eecca92c61080e6cebcdfce2a7ba8e1e8b37cb9af6d57497fca814a5c5e63e"
+      },
+      "picture": {
+        "type": "image/webp",
+        "w": 300,
+        "h": 182,
+        "bytes": 4594,
+        "sha256": "cac0e13e19984b730c68a7b896bf9c5f37c2693e8879b3e29e24311047e61e72"
+      }
+    },
+    "113": {
+      "hubName": "Tahli",
+      "thumb": "z_hub_maps_small/sm_tahli.jpg",
+      "painting": {
+        "file": "assets/maps/art/bg/tahli@2x.webp",
+        "kind": "made for Groddle",
+        "provenance": "tools/provenance/repainted-maps.json",
+        "sha256": "7b7a2a3023bf9307c7e6458879cc5cfa20dd9f503993a65dcc0976528dfbf98b"
+      },
+      "picture": {
+        "type": "image/webp",
+        "w": 300,
+        "h": 182,
+        "bytes": 6410,
+        "sha256": "85bcd2a49608f9631f2f01df235c2fbea1940f182053bd603272ab1e97c1364d"
+      }
+    },
+    "114": {
+      "hubName": "Firozi",
+      "thumb": "z_hub_maps_small/sm_firozi.jpg",
+      "painting": {
+        "file": "assets/maps/art/bg/firozi@2x.webp",
+        "kind": "made for Groddle",
+        "provenance": "tools/provenance/repainted-maps.json",
+        "sha256": "581ed28a3470e61c16bf2310dbadd304499503f9b0f58610266c5626552281ec"
+      },
+      "picture": {
+        "type": "image/webp",
+        "w": 300,
+        "h": 182,
+        "bytes": 4862,
+        "sha256": "6b7b6c30f49d5d3074d0cedeb3ebce4da7761b8ca7f808af9d45c93f29c19931"
+      }
+    },
+    "116": {
+      "hubName": "Haraiva",
+      "thumb": "z_hub_maps_small/sm_haraiva.jpg",
+      "painting": {
+        "file": "assets/maps/art/bg/haraiva@2x.webp",
+        "kind": "made for Groddle",
+        "provenance": "tools/provenance/repainted-maps.json",
+        "sha256": "8bf003eba34e2066f4db95247e2a758ba6334664c52869fa4de3fcefd3560ddc"
+      },
+      "picture": {
+        "type": "image/webp",
+        "w": 300,
+        "h": 182,
+        "bytes": 5532,
+        "sha256": "abc4c553d59ee723b46cb64429239f09f1986b32c91f3ce78497a17d8496571d"
+      }
+    },
+    "119": {
+      "hubName": "Folivoria",
+      "thumb": "z_hub_maps_small/sm_folivoria.jpg",
+      "painting": {
+        "file": "assets/maps/art/bg/folivoria@2x.webp",
+        "kind": "made for Groddle",
+        "provenance": "tools/provenance/repainted-maps.json",
+        "sha256": "731f832737dc4a04a649704d785658f4938d67d171d85689810397acf68bd594"
+      },
+      "picture": {
+        "type": "image/webp",
+        "w": 300,
+        "h": 182,
+        "bytes": 4396,
+        "sha256": "64c107564f1495d75ba779f254d7a10fe361a1754aa49851b5f26777c94bdec3"
+      }
+    },
+    "120": {
+      "hubName": "Cauda",
+      "thumb": "z_hub_maps_small/sm_cauda.jpg",
+      "painting": {
+        "file": "assets/maps/art/bg/cauda@2x.webp",
+        "kind": "made for Groddle",
+        "provenance": "tools/provenance/repainted-maps.json",
+        "sha256": "4a9689a1009e6bdac32a71f8f37a6f3d6b3992bc1d7bd48a7d78a89ec5ca2c69"
+      },
+      "picture": {
+        "type": "image/webp",
+        "w": 300,
+        "h": 182,
+        "bytes": 2972,
+        "sha256": "acb37d67dc6d48ac67808729ec39a29abb372839c0e921ee20becc9129337a9c"
+      }
+    },
+    "121": {
+      "hubName": "Sura",
+      "thumb": "z_hub_maps_small/sm_sura.jpg",
+      "painting": {
+        "file": "assets/maps/art/bg/sura@2x.webp",
+        "kind": "made for Groddle",
+        "provenance": "tools/provenance/repainted-maps.json",
+        "sha256": "c684cca1b87421ceb94fc1f35d4814742060a873c5e1d4003c77dd1033f8885a"
+      },
+      "picture": {
+        "type": "image/webp",
+        "w": 300,
+        "h": 182,
+        "bytes": 5396,
+        "sha256": "f5494cd85dd98b0847613b667eb8370010ccf28133d22778e42a9f9a0a8e55f7"
+      }
+    },
+    "123": {
+      "hubName": "Fenneq",
+      "thumb": "z_hub_maps_small/sm_fenneq.jpg",
+      "painting": {
+        "file": "assets/maps/art/bg/fenneq@2x.webp",
+        "kind": "made for Groddle",
+        "provenance": "tools/provenance/repainted-maps.json",
+        "sha256": "661229dbab500d303bb00f8f34c98fe2180c77a510a0da92d108e678cb321314"
+      },
+      "picture": {
+        "type": "image/webp",
+        "w": 300,
+        "h": 182,
+        "bytes": 4284,
+        "sha256": "57b03237b26134aaecea53be1af11badbb92c7a68b7db4685d092a84be54646c"
+      }
+    },
+    "126": {
+      "hubName": "Roobrik",
+      "thumb": "z_hub_maps_small/sm_roobrik.jpg",
+      "painting": {
+        "file": "assets/maps/art/bg/roobrik@2x.webp",
+        "kind": "made for Groddle",
+        "provenance": "tools/provenance/repainted-maps.json",
+        "sha256": "506a9e8b72154aadd090b4b67a4f23eeecc1404322101ebe5d10d139a77020e4"
+      },
+      "picture": {
+        "type": "image/webp",
+        "w": 300,
+        "h": 182,
+        "bytes": 7722,
+        "sha256": "1255c0c7c9121823c2fa4cdbaef86fadb699df36f022e3f5f5fb3b97ae1d5f5f"
+      }
+    },
+    "128": {
+      "hubName": "Balzare",
+      "thumb": "z_hub_maps_small/sm_balzare.jpg",
+      "painting": {
+        "file": "assets/maps/art/bg/balzare@2x.webp",
+        "kind": "made for Groddle",
+        "provenance": "tools/provenance/repainted-maps.json",
+        "sha256": "99cc5fbdc9a76fa2a4f97f2d84d152b05ef259cfe5d8fc9fb4c3fae81f5b0e9b"
+      },
+      "picture": {
+        "type": "image/webp",
+        "w": 300,
+        "h": 182,
+        "bytes": 4124,
+        "sha256": "a48e50e8d39772bdb856d6b947f04dbae6cca8a68dfcdb858c4a3310510f180a"
+      }
+    },
+    "131": {
+      "hubName": "Haoma",
+      "thumb": "z_hub_maps_small/sm_haoma.jpg",
+      "painting": {
+        "file": "assets/maps/art/bg/haoma@2x.webp",
+        "kind": "made for Groddle",
+        "provenance": "tools/provenance/repainted-maps.json",
+        "sha256": "291aa1c076dbcc98f4d92cf6d2bfe65ea5eb9cb1ad7ebe0042b85f8832b02aa5"
+      },
+      "picture": {
+        "type": "image/webp",
+        "w": 300,
+        "h": 182,
+        "bytes": 10516,
+        "sha256": "f9c10b4ae955b1384ae5cb04b52a1d6fef8af13c42dd3a63e113fa38f4eb8523"
+      }
+    },
+    "133": {
+      "hubName": "Kloro",
+      "thumb": "z_hub_maps_small/sm_kloro.jpg",
+      "painting": {
+        "file": "assets/maps/art/bg/kloro@2x.webp",
+        "kind": "made for Groddle",
+        "provenance": "tools/provenance/repainted-maps.json",
+        "sha256": "66abfccff6b73c6ba3165ddbea002b210ee0c449797a2d8a4a080a027b117831"
+      },
+      "picture": {
+        "type": "image/webp",
+        "w": 300,
+        "h": 182,
+        "bytes": 8312,
+        "sha256": "ff43f153e6b2c1624d34c9404feca5c135e65d9fb7c6c332533e133d6e8733f1"
+      }
+    },
+    "136": {
+      "hubName": "Jal",
+      "thumb": "z_hub_maps_small/sm_jal.jpg",
+      "painting": {
+        "file": "assets/maps/art/bg/jal@2x.webp",
+        "kind": "made for Groddle",
+        "provenance": "tools/provenance/repainted-maps.json",
+        "sha256": "171414d15f7e1cc03550c70ee0108d79f30d2f960421973e8e34595550dab65f"
+      },
+      "picture": {
+        "type": "image/webp",
+        "w": 300,
+        "h": 182,
+        "bytes": 4130,
+        "sha256": "c0fcd3b86919ee125efd4a7a1182d51fbe007afebcbce7c6c8222877cf1f2624"
+      }
+    },
+    "137": {
+      "hubName": "Nottis",
+      "thumb": "z_hub_maps_small/sm_nottis.jpg",
+      "painting": {
+        "file": "assets/maps/art/bg/nottis@2x.webp",
+        "kind": "made for Groddle",
+        "provenance": "tools/provenance/repainted-maps.json",
+        "sha256": "1f5ea3f9c528ce2c3e31cf6cdebe961ca065c5cd4b4bfb6e09899c7945a2e695"
+      },
+      "picture": {
+        "type": "image/webp",
+        "w": 300,
+        "h": 182,
+        "bytes": 5852,
+        "sha256": "423136dfd7b0007d027a7a7bca6dcd7a9799d11b3372a5b3c4a475a381b31f8f"
+      }
+    },
+    "140": {
+      "hubName": "Samudra",
+      "thumb": "z_hub_maps_small/sm_samudra.jpg",
+      "painting": {
+        "file": "assets/maps/art/bg/samudra@2x.webp",
+        "kind": "made for Groddle",
+        "provenance": "tools/provenance/repainted-maps.json",
+        "sha256": "94cda3214ad49f4b8c345eba97694a864bbec84b12a08d0c83102278cf4173b3"
+      },
+      "picture": {
+        "type": "image/webp",
+        "w": 300,
+        "h": 182,
+        "bytes": 2998,
+        "sha256": "ffcc917825ebdcd56673bc9fff12f0518582a16d0836243f80e43f6f4d152ced"
+      }
+    },
+    "141": {
+      "hubName": "Drifa",
+      "thumb": "z_hub_maps_small/sm_drifa.jpg",
+      "painting": {
+        "file": "assets/maps/art/bg/drifa@2x.webp",
+        "kind": "made for Groddle",
+        "provenance": "tools/provenance/repainted-maps.json",
+        "sha256": "9ad94491b58661da38ea72a6abf5563dff4ebc4c266bf203b60f1cdccd6a8bcd"
+      },
+      "picture": {
+        "type": "image/webp",
+        "w": 300,
+        "h": 182,
+        "bytes": 4560,
+        "sha256": "4a724f57b28c8bec2ea7804271112d8a247e563059332bb927c390b4ac301807"
+      }
+    },
+    "143": {
+      "hubName": "Vortex of Random",
+      "thumb": "z_hub_maps_small/sm_vortex.jpg",
+      "painting": {
+        "file": "assets/maps/art/bg/vortex@2x.webp",
+        "kind": "made for Groddle",
+        "provenance": "tools/provenance/repainted-maps.json",
+        "sha256": "12ef58cc02bc809b889425b35805ba4e474fe6e3a185eb53694e183de7ffddac"
+      },
+      "picture": {
+        "type": "image/webp",
+        "w": 300,
+        "h": 182,
+        "bytes": 5810,
+        "sha256": "dd896f58898102fed36cc910fd26ae4999d4cce21f150429d745ca8457fa09f6"
+      }
+    }
+  }
+}

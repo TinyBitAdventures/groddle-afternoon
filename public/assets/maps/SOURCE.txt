@@ -78,7 +78,8 @@ World map (G471, 2026-11-13)
   assets/maps/art/world/world_map_locked.jpg   the sketched chart (the FLA's JPEG as is)
   assets/maps/art/world/world_map_unlocked.jpg the painted chart (already here; byte for byte the FLA's)
   assets/maps/art/world/frames.svg             the region frames and locked tiles (the FLA's vectors)
-  assets/maps/art/world/cards/<hub>.svg        each region's hover card (frame, thumbnail, lettered name)
+  assets/maps/art/world/cards/<hub>.svg        each region's hover card (frame, picture, lettered name)
+  assets/maps/art/world/cards/cards.json       which card carries which painting (below)
   js/map-views-data.js                         the 47 regions' click frames, centres and card placements
   The subway map's paper and line overlays (subway_map_bg_59215.jpg, subway_*_line_fg_59215.png) are
   lost; js/map-views.js draws the line from config_prod.js map_pos, and the paper is recreated (below).
@@ -104,6 +105,24 @@ Subway map paper (G471, 2026-11-13)
     Reference    the Tribute Blog's capture of the original window (post 38013353380): looked at,
     only         measured for positions and described in the prompt's words; never given to the
                  model and not in this repo
+
+World map hover cards at 2x (G471, 2026-11-13)
+  Each card's picture was Tiny Speck's 150x91 thumbnail (z_hub_maps_small/sm_*.jpg), soft on a
+  Retina screen. tools/map-views/build.mjs now draws in the same 150x91 box the region's own painting
+  (assets/maps/art/bg/<region>@2x.webp) scaled whole to 300x182, WebP, embedded in the card; the
+  frame, the lettered name and every placement are Tiny Speck's as before, and the thumbnail ships
+  in no card. All 47 cards carry a painting made for Groddle (the repaints in
+  tools/provenance/repainted-maps.json, the same CC0 pictures the region maps show; nothing new):
+  27 Ix, 51 Uralia, 56 Groddle Forest, 58 Groddle Meadow, 63 Shimla Mirch, 64 Groddle Heights,
+  71 Jethimadh, 72 Chakra Phool, 75 Bortola, 76 Alakol, 85 Kajuu, 86 Baqala, 88 Karnata, 89 Andra,
+  90 Choru, 91 Zhambu, 92 Tamila, 93 Salatu, 95 Xalanga, 97 Muufo, 98 Besara, 99 Kalavana,
+  100 Vantalu, 101 Aranna, 102 Ormonos, 105 Lida, 106 Pollokoo, 107 Callopee, 109 Rasana,
+  110 Massadoe, 112 Brillah, 113 Tahli, 114 Firozi, 116 Haraiva, 119 Folivoria, 120 Cauda, 121 Sura,
+  123 Fenneq, 126 Roobrik, 128 Balzare, 131 Haoma, 133 Kloro, 136 Jal, 137 Nottis, 140 Samudra,
+  141 Drifa, 143 Vortex of Random. A card whose region has no painting would keep its thumbnail.
+  Baqala's card (region_86) drew Zhambu's thumbnail in the FLA (sm_baqala is in the file but on no
+  card); it now carries Baqala's own painting. Naraka is on no card (the world map never drew it).
+  Per card: the painting, its sha256 and the picture's in art/world/cards/cards.json.
 
 World map charts at 2x (G471, 2026-11-13)
   assets/maps/art/world/world_map_unlocked@2x.webp and world_map_locked@2x.webp (1520x920): Tiny

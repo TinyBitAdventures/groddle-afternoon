@@ -21,6 +21,21 @@
  * Nov 2012 (posts 38005474341, 45119695823, 49865657967, 49872342514: one world map at four
  * dates, reference only) show the painted chart glowing through round each region's frames.
  *
+ * Hover cards at 2x (Austin, 2026-11-13: sharpen the cards with the World map's 2x charts): a card
+ * draws its region's 150 x 91 thumbnail (z_hub_maps_small/sm_*.jpg, a quality-50 JPEG) at about
+ * 133 x 81 map units, soft on a Retina screen. Every region the cards show now has a full painting
+ * (public/assets/maps/art/bg, tools/map-backgrounds/build.mjs), and a thumbnail is that painting's
+ * whole frame scaled (tools/map-backgrounds/build.mjs; the repaints were made from the thumbnails
+ * over the same 760 x 460 frame). So the card's picture is the region's painting (its @2x file)
+ * scaled to the thumbnail's box at 2x, CARD_PICTURE, as WebP (CARD_RECIPE), still embedded as a
+ * data: URI (a card is drawn as an SVG image, where an outside reference does not load) and still
+ * drawn at the thumbnail's 150 x 91 (the frame, the lettering and every placement as Tiny Speck drew
+ * them). The thumbnail itself then ships in no card. A card whose thumbnail has no region painting
+ * keeps Tiny Speck's thumbnail. Baqala's card (region_86) drew Zhambu's thumbnail in the FLA; it
+ * now carries Baqala's own painting. Which card carries which painting: CARDS_MANIFEST. Encoding needs
+ * ImageMagick 7 (magick); a picture is encoded again only when its painting or the recipe changes,
+ * and --check (no ImageMagick) checks each embedded picture against the manifest's hashes.
+ *
  * Writes
  *   public/assets/maps/art/world/world_map_locked.jpg  the FLA's locked chart, its JPEG as is
  *       (world_map_unlocked.jpg is already there, byte for byte the FLA's; both charts' Retina twins,
@@ -29,16 +44,20 @@
  *       drawing once as a <symbol>, one <use> a frame (the FLA's vectors through
  *       tools/overlay-art/xfl-svg.mjs)
  *   public/assets/maps/art/world/cards/<hub id>.svg  each region's hover card at its "over" stop
- *       (frame 10): the sketched frame, the 150 x 91 thumbnail, the lettered name
+ *       (frame 10): the sketched frame, the region's painting at 2x in the thumbnail's 150 x 91 box
+ *       (Tiny Speck's thumbnail where there is no painting), the lettered name
+ *   public/assets/maps/art/world/cards/cards.json  which card carries which painting (hashes, recipe)
  *   public/js/map-views-data.js  HUB_COLOURS and WORLD_MAP (each region's click frame as a
  *       quad, its centre for the "you" star, its card's placement)
  *
- *   node tools/map-views/build.mjs          build
+ *   node tools/map-views/build.mjs          build (ImageMagick 7 when a card picture needs encoding)
  *   node tools/map-views/build.mjs --check  exit 1 when any output is stale (tests/map-views.test.js)
  */
 import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { execFileSync } from 'node:child_process';
+import { createHash } from 'node:crypto';
 import vm from 'node:vm';
 import { readZip } from '../avatar-compositor/xfl.mjs';
 import { frameSvg, loadFla } from '../overlay-art/xfl-svg.mjs';
@@ -55,6 +74,16 @@ const URL_DIR = 'assets/maps/art/world';
 export const FRAME = Object.freeze([760, 460]);
 /** The region clip's "over" playhead stops on frame 10 (index 9, stop()); 12 ticks from "over" is past it. */
 const CARD_TICK = 12;
+/** The thumbnails' library folder in the FLA (sm_<region>.jpg, 150 x 91). */
+const THUMB_FOLDER = 'z_hub_maps_small/';
+/** The region paintings' manifest (tools/map-backgrounds/build.mjs). */
+const BACKGROUNDS = 'public/assets/maps/art/bg/backgrounds.json';
+export const CARDS_MANIFEST = `${WORLD_DIR}/cards/cards.json`;
+/** A card's picture: the thumbnail's 150 x 91 box at 2x. */
+export const CARD_PICTURE = Object.freeze([300, 182]);
+/** The painting (its 1520 x 920 @2x file) to CARD_PICTURE: ImageMagick steps, WebP to stdout. */
+export const CARD_RECIPE = Object.freeze(['-filter', 'Lanczos', '-resize', `${CARD_PICTURE[0]}x${CARD_PICTURE[1]}!`, '-strip', '-quality', '75', '-define', 'webp:method=6']);
+const sha256 = (buf) => createHash('sha256').update(buf).digest('hex');
 
 const r2 = (v) => Math.round(v * 100) / 100;
 const mul = (p, q) => [
@@ -130,6 +159,19 @@ function elementsAt(sym, index) {
   return out;
 }
 
+/** Every bitmap a list of elements draws, on any frame of any symbol it holds (library names). */
+function bitmapLibs(fla, els, acc = new Set(), seen = new Set()) {
+  for (const e of els) {
+    if (e.k === 'bmp') acc.add(e.lib);
+    else if (e.k === 'group') bitmapLibs(fla, e.members, acc, seen);
+    else if (e.k === 'inst' && !seen.has(e.lib)) {
+      seen.add(e.lib);
+      for (const L of fla.symbols.get(e.lib)?.layers || []) for (const f of L.frames) bitmapLibs(fla, f.els, acc, seen);
+    }
+  }
+  return acc;
+}
+
 /** A one-layer main timeline holding these elements, for frameSvg. */
 function stageOf(fla, els, frames = 1) {
   const main = {
@@ -153,9 +195,10 @@ const fmt = (m) => m.map(r2).join(' ');
 
 /**
  * Everything the world map needs from the FLA: { locked (JPEG bytes), unlocked (JPEG bytes),
- * framesSvg, cards: Map<id, svg>, regions }.
+ * framesSvg, cards: Map<id, svg>, thumbs: Map<id, thumbnail library name>, regions }.
+ * picture(id, thumb): a data: URL to draw in the thumbnail's box instead of the thumbnail, or null.
  */
-export function readWorldMap(flaPath = join(audit, FLA)) {
+export function readWorldMap(flaPath = join(audit, FLA), picture = () => null) {
   const fla = loadFla(flaPath);
   const zip = readZip(flaPath);
   const layer = (name) => fla.main.layers.find((l) => l.name === name)?.frames[0]?.els || [];
@@ -191,6 +234,7 @@ export function readWorldMap(flaPath = join(audit, FLA)) {
   // The regions.
   const regions = {};
   const cards = new Map();
+  const thumbs = new Map();
   for (const inst of layer('FlashAICB')) {
     const id = inst.k === 'inst' ? inst.lib.match(/\/region_(\d+)$/)?.[1] : null;
     if (!id) continue;
@@ -215,11 +259,23 @@ export function readWorldMap(flaPath = join(audit, FLA)) {
     const dx = wx0 < 2 ? 2 - wx0 : wx1 > W - 2 ? W - 2 - wx1 : 0;
     const dy = wy0 < 2 ? 2 - wy0 : wy1 > H - 2 ? H - 2 - wy1 : 0;
     const m = [inst.m[0], inst.m[1], inst.m[2], inst.m[3], inst.m[4] + dx, inst.m[5] + dy].map(r2);
-    const card = frameSvg(stageOf(fla, [{ ...inst, m: I }], 30), CARD_TICK, { box, start: { [inst.lib]: 'over' } });
+    // The card's thumbnail: the one bitmap from the thumbnails' folder the clip draws.
+    const thumb = [...bitmapLibs(fla, [inst])].filter((l) => l.startsWith(THUMB_FOLDER));
+    if (thumb.length !== 1) throw new Error(`${FLA}: region_${id} draws ${thumb.length} thumbnails`);
+    thumbs.set(id, thumb[0]);
+    const url = picture(id, thumb[0]);
+    let cardFla = fla;
+    if (url) {
+      // The picture takes the thumbnail's place at the thumbnail's own size (one bitmap pixel is
+      // one stage unit), so the card draws exactly as before, only sharper.
+      const b = fla.bitmaps.get(thumb[0]);
+      cardFla = { ...fla, bitmaps: new Map(fla.bitmaps).set(thumb[0], { ...b, px: { ...b.px, url } }) };
+    }
+    const card = frameSvg(stageOf(cardFla, [{ ...inst, m: I }], 30), CARD_TICK, { box, start: { [inst.lib]: 'over' } });
     cards.set(id, `${card}\n`);
     regions[id] = { quad, centre: [cx, cy], card: { box, m } };
   }
-  return { locked: bitmap('zz_background/world_map_locked'), unlocked: bitmap('zz_background/world_map_unlocked'), framesSvg, cards, regions };
+  return { locked: bitmap('zz_background/world_map_locked'), unlocked: bitmap('zz_background/world_map_unlocked'), framesSvg, cards, thumbs, regions };
 }
 
 export function moduleText(colours, world) {
@@ -256,10 +312,73 @@ ${rows.join('\n')}
 `;
 }
 
+const readJsonIf = (rel) => {
+  try {
+    return JSON.parse(readFileSync(join(spike, rel), 'utf8'));
+  } catch {
+    return null;
+  }
+};
+
+/** The WebP pictures a card file embeds now (bytes), to keep one whose painting and recipe stand. */
+function embeddedPictures(id) {
+  const abs = join(spike, WORLD_DIR, 'cards', `${id}.svg`);
+  if (!existsSync(abs)) return [];
+  return [...readFileSync(abs, 'utf8').matchAll(/href="data:image\/webp;base64,([A-Za-z0-9+/=]+)"/g)].map((m) => Buffer.from(m[1], 'base64'));
+}
+
+/**
+ * The cards' pictures: a picture(id, thumb) for readWorldMap and the manifest it fills.
+ * encode: run ImageMagick for a picture that cannot be kept (otherwise it comes out empty, and so stale).
+ */
+export function cardPictures({ encode = false } = {}) {
+  const bg = readJsonIf(BACKGROUNDS)?.regions || {};
+  const bySymbol = new Map(Object.entries(bg).filter(([, r]) => r.symbol).map(([id, r]) => [r.symbol, { id, ...r }]));
+  const old = readJsonIf(CARDS_MANIFEST);
+  const sameRecipe = JSON.stringify(old?.recipe) === JSON.stringify(CARD_RECIPE);
+  const cards = {};
+  const picture = (id, thumb) => {
+    // The card's own region's painting. Tiny Speck's Baqala card (region_86) draws Zhambu's
+    // thumbnail (sm_zhambu; sm_baqala is in the FLA but on no card): a slip with no use, so the
+    // card gets Baqala's painting and the manifest says what the FLA drew (`thumbOf`).
+    // The paintings' manifest names a thumbnail without its .jpg (z_hub_maps_small/sm_ix).
+    const r = bg[id] ? { id, ...bg[id] } : null;
+    const of = bySymbol.get(thumb.replace(/\.jpg$/i, ''))?.id;
+    const drew = of && of !== id ? { thumb, thumbOf: of } : { thumb };
+    if (!r) {
+      cards[id] = { ...drew, painting: null };
+      return null;
+    }
+    const painting = readFileSync(join(spike, 'public', r.x2));
+    const paintingSha = sha256(painting);
+    const was = old?.cards?.[id];
+    let pic = sameRecipe && was?.painting?.sha256 === paintingSha
+      ? embeddedPictures(id).find((b) => sha256(b) === was.picture?.sha256) : null;
+    if (!pic && encode) pic = execFileSync('magick', [join(spike, 'public', r.x2), ...CARD_RECIPE, 'webp:-'], { maxBuffer: 1 << 24 });
+    pic ||= Buffer.alloc(0);
+    cards[id] = {
+      hubName: r.hubName,
+      ...drew,
+      painting: { file: r.x2, kind: r.repainted ? 'made for Groddle' : 'Tiny Speck\'s thumbnail enlarged', provenance: r.repainted || BACKGROUNDS.replace(/^public\//, ''), sha256: paintingSha },
+      picture: { type: 'image/webp', w: CARD_PICTURE[0], h: CARD_PICTURE[1], bytes: pic.length, sha256: sha256(pic) },
+    };
+    return `data:image/webp;base64,${pic.toString('base64')}`;
+  };
+  const manifest = () => ({
+    note: 'The World map\'s hover cards (glitch-overlays/world_map.fla region clips, Tiny Speck, CC0): each card\'s 150 x 91 thumbnail replaced by its region\'s painting at 2x (the painting\'s provenance in the file named; a painting made for Groddle is the same CC0 picture its region map shows), drawn in the thumbnail\'s box. `thumbOf`: the FLA\'s card drew another region\'s thumbnail (Baqala\'s drew Zhambu\'s); the card carries its own region\'s painting. A card with `painting: null` keeps Tiny Speck\'s thumbnail. Built by tools/map-views/build.mjs; do not edit.',
+    source: { fla: FLA, folder: `LIBRARY/${THUMB_FOLDER}` },
+    picture: CARD_PICTURE,
+    recipe: CARD_RECIPE,
+    cards: Object.fromEntries(Object.entries(cards).sort(([a], [b]) => Number(a) - Number(b))),
+  });
+  return { picture, manifest };
+}
+
 /** Every output as [path, Buffer|string]. */
-export function outputs() {
+export function outputs({ encode = false } = {}) {
   const colours = hubColours();
-  const world = readWorldMap();
+  const pics = cardPictures({ encode });
+  const world = readWorldMap(join(audit, FLA), pics.picture);
   const files = [
     [`${WORLD_DIR}/world_map_locked.jpg`, world.locked],
     [`${WORLD_DIR}/world_map_unlocked.jpg`, world.unlocked],
@@ -267,12 +386,13 @@ export function outputs() {
     [MODULE, moduleText(colours, world)],
   ];
   for (const [id, svg] of [...world.cards].sort((a, b) => Number(a[0]) - Number(b[0]))) files.push([`${WORLD_DIR}/cards/${id}.svg`, svg]);
+  files.push([CARDS_MANIFEST, `${JSON.stringify(pics.manifest(), null, 2)}\n`]);
   return files;
 }
 
 function main() {
   const check = process.argv.includes('--check');
-  const files = outputs();
+  const files = outputs({ encode: !check });
   const stale = [];
   for (const [rel, data] of files) {
     const abs = join(spike, rel);

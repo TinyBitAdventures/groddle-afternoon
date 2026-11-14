@@ -13,7 +13,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { HUB_COLOURS, WORLD_MAP } from '../public/js/map-views-data.js?v=bf881f35';
 import { buildHubMapView, goColour, GO_FALLBACK_COLOUR, PUBLIC_HUBS, renderHubMapSvg } from '../public/js/map-graph.js?v=31437f5b';
-import { hubColours } from '../tools/map-views/build.mjs';
+import { CARD_PICTURE, CARDS_MANIFEST, hubColours, readWorldMap } from '../tools/map-views/build.mjs';
 import { STATIONS } from '../public/js/subway.js?v=e6995db8';
 import {
   MAP_VIEW_TITLES,
@@ -179,6 +179,110 @@ describe('world map (world_map.fla)', () => {
     }
     assert.ok(prov.notes.some((n) => /^Round 1 .*rejected/.test(n)), 'the rejected first round is recorded');
     assert.match(read('public/assets/maps/SOURCE.txt'), /World map charts at 2x \(G471, 2026-11-13\)/);
+  });
+
+  describe('hover cards at 2x: each region\'s painting in the thumbnail\'s box', () => {
+    const manifest = JSON.parse(read(CARDS_MANIFEST));
+    const bg = JSON.parse(read('public/assets/maps/art/bg/backgrounds.json')).regions;
+    const sha = (buf) => createHash('sha256').update(buf).digest('hex');
+    const card = (id) => read(`public/${WORLD_MAP.regions[id].card.href}`);
+    const pictures = (svg) => [...svg.matchAll(/href="data:(image\/[a-z]+);base64,([A-Za-z0-9+/=]+)"/g)].map((m) => ({ type: m[1], buf: Buffer.from(m[2], 'base64') }));
+    const webpSize = (buf) => {
+      assert.equal(buf.toString('ascii', 8, 12), 'WEBP');
+      const chunk = buf.toString('ascii', 12, 16);
+      if (chunk === 'VP8 ') return [buf.readUInt16LE(26) & 0x3fff, buf.readUInt16LE(28) & 0x3fff];
+      if (chunk === 'VP8X') return [buf.readUIntLE(24, 3) + 1, buf.readUIntLE(27, 3) + 1];
+      const b = buf.readUInt32LE(21);
+      return [(b & 0x3fff) + 1, ((b >> 14) & 0x3fff) + 1];
+    };
+
+    it('every card embeds one WebP of 300 x 182 made from its own region\'s painting, and no thumbnail', () => {
+      const ids = Object.keys(WORLD_MAP.regions);
+      assert.deepEqual(Object.keys(manifest.cards).sort(), [...ids].sort(), 'one manifest row a card');
+      assert.deepEqual(CARD_PICTURE, [300, 182]);
+      assert.deepEqual(manifest.picture, CARD_PICTURE);
+      for (const id of ids) {
+        const row = manifest.cards[id];
+        // Every region on the world map has a painting today; a card without one would keep its thumbnail.
+        assert.ok(row.painting, `card ${id} carries a painting`);
+        assert.equal(row.painting.file, bg[id].x2, `card ${id}: its own region's @2x painting`);
+        assert.equal(row.painting.sha256, bg[id].x2Sha256, `card ${id}: the painting its region map shows`);
+        assert.equal(sha(readFileSync(join(root, 'public', row.painting.file))), row.painting.sha256);
+        assert.equal(row.painting.provenance, bg[id].repainted ? 'tools/provenance/repainted-maps.json' : 'assets/maps/art/bg/backgrounds.json');
+        const pics = pictures(card(id));
+        assert.equal(pics.length, 1, `card ${id} embeds one picture`);
+        assert.equal(pics[0].type, 'image/webp', `card ${id}: the thumbnail (a JPEG) ships nowhere`);
+        assert.deepEqual(webpSize(pics[0].buf), CARD_PICTURE, `card ${id} picture size`);
+        assert.equal(pics[0].buf.length, row.picture.bytes);
+        assert.equal(sha(pics[0].buf), row.picture.sha256, `card ${id}: the picture the manifest names`);
+      }
+    });
+
+    it('each picture is its painting scaled whole (grey-level match against the painting, ImageMagick)', (t) => {
+      try {
+        execFileSync('magick', ['-version'], { stdio: 'ignore' });
+      } catch {
+        t.skip('no ImageMagick');
+        return;
+      }
+      const grey = (src, input) => execFileSync('magick', [src, '-resize', '75x46!', '-colorspace', 'Gray', '-depth', '8', 'gray:-'], { input });
+      const ncc = (a, b) => {
+        const n = a.length;
+        let ma = 0;
+        let mb = 0;
+        for (let i = 0; i < n; i++) { ma += a[i] / n; mb += b[i] / n; }
+        let num = 0;
+        let da = 0;
+        let db = 0;
+        for (let i = 0; i < n; i++) { num += (a[i] - ma) * (b[i] - mb); da += (a[i] - ma) ** 2; db += (b[i] - mb) ** 2; }
+        return num / Math.sqrt(da * db);
+      };
+      const painting = (id) => grey(join(root, 'public', bg[id].x2));
+      // Groddle Forest, Groddle Heights, Baqala (whose FLA card drew Zhambu), Haoma, Drifa (a smaller card).
+      for (const [id, other] of [['56', '58'], ['64', '58'], ['86', '91'], ['131', '133'], ['141', '64']]) {
+        const pic = grey('webp:-', pictures(card(id))[0].buf);
+        const own = ncc(pic, painting(id));
+        assert.ok(own > 0.98, `card ${id}: ${own.toFixed(3)} against its painting`);
+        assert.ok(ncc(pic, painting(other)) < own - 0.2, `card ${id} is not hub ${other}'s painting`);
+      }
+    });
+
+    it('draws exactly as Tiny Speck\'s card: the same SVG as with the thumbnail but for the picture, in its 150 x 91 box', () => {
+      const tiny = readWorldMap();
+      const strip = (svg) => svg.replace(/href="data:image\/[a-z]+;base64,[A-Za-z0-9+/=]+"/g, 'href=""');
+      for (const id of Object.keys(WORLD_MAP.regions)) {
+        const now = card(id);
+        assert.equal(strip(now), strip(tiny.cards.get(id)), `card ${id}: frame, lettering and placement unchanged`);
+        assert.match(now, /<image id="b\d+" width="150" height="91" preserveAspectRatio="none" href="data:image\/webp;/);
+      }
+    });
+
+    it('stays small: a picture under 12 KB, a card under 28 KB, all 47 under 1 MB', () => {
+      let total = 0;
+      for (const [id, row] of Object.entries(manifest.cards)) {
+        const bytes = Buffer.byteLength(card(id));
+        total += bytes;
+        assert.ok(row.picture.bytes < 12 * 1024, `card ${id} picture ${row.picture.bytes} bytes`);
+        assert.ok(bytes < 28 * 1024, `card ${id} ${bytes} bytes`);
+      }
+      assert.ok(total < 1024 * 1024, `${total} bytes`);
+    });
+
+    it('Baqala\'s card drew Zhambu\'s thumbnail in the FLA; it now carries Baqala\'s own painting', () => {
+      assert.equal(manifest.cards['86'].thumb, 'z_hub_maps_small/sm_zhambu.jpg');
+      assert.equal(manifest.cards['86'].thumbOf, '91');
+      assert.equal(manifest.cards['86'].painting.file, 'assets/maps/art/bg/baqala@2x.webp');
+      assert.equal(manifest.cards['91'].painting.file, 'assets/maps/art/bg/zhambu@2x.webp');
+      const others = Object.entries(manifest.cards).filter(([id, r]) => id !== '86' && r.thumbOf);
+      assert.deepEqual(others, [], 'every other card drew its own region\'s thumbnail');
+    });
+
+    it('Naraka, shown only to the dead, is on no card: the world map never drew it', () => {
+      assert.equal(WORLD_MAP.regions['40'], undefined);
+      assert.equal(manifest.cards['40'], undefined);
+      const naraka = bg['40'].x2Sha256;
+      assert.ok(Object.values(manifest.cards).every((r) => r.painting?.sha256 !== naraka));
+    });
   });
 });
 
