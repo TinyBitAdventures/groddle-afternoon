@@ -2,9 +2,9 @@
  * Groddle Afternoon — original street geometry + layered decos
  * PixiJS 8 · locations-xml streets · CoU PNG decos · quests/items
  */
-import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=6fdbf4c5';
+import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=d18e90b8';
 import { createErrorOnce, createFeatureHost } from './js/feature-host.js?v=06bb8b74';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=7cf8a4cd';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=0b6e235e';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl, drawTileArt } from './js/enter-chooser.js?v=4a3ea327';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, bodyReachDistance, OUT_OF_REACH_LINE } from './js/reach.js?v=8e52df56';
@@ -132,7 +132,7 @@ import {
   travelToGregarious,
 } from './js/legalize-it.js?v=0649416e';
 import { HALL, HALL_LAYOUT, HALL_QUESTIONS } from './js/bureaucratic-hall.js?v=a0bc6317';
-import { STATION_X, stationArrival, stationScreen, surfaceStation } from './js/subway.js?v=44d1a09f';
+import { STATION_X, stationArrival, stationScreen, surfaceStation } from './js/subway.js?v=e6995db8';
 import { ALLEY, SHADY, drawAlley, inEnteredBox } from './js/quest-rooms/back-alley-set.js?v=8f5d057b';
 import {
   WINTER_HAVEN_STREET_ID,
@@ -493,8 +493,8 @@ import { PACK_COPY, isBagClass, isElementClass, ownBagLabel, unitRankAt } from '
 import { FLOAT_TEXT_Z, SPEECH_BUBBLE_Z } from './js/fx-z.js?v=18dda7e3';
 import { hasPouch } from './js/elemental-pouch.js?v=42702eda';
 import { createPackRow, mountPackClearance, packBandRange, packCountText, packSearchEntries, packSlotTip } from './js/ui/pack-row.js?v=64e4a567';
-import { listAnimalFeedOptions, piggyFeedTip } from './js/animals.js?v=47474803';
-import { pickerMaxCount, pickerOptionsFor, pickerTakesCount } from './js/animals.js?v=47474803';
+import { listAnimalFeedOptions, piggyFeedTip } from './js/animals.js?v=d58c564d';
+import { pickerMaxCount, pickerOptionsFor, pickerTakesCount } from './js/animals.js?v=d58c564d';
 import {
   createDroppedItemState,
   parseDroppedItemState,
@@ -842,7 +842,7 @@ import {
   ambientPlaylist,
   SILENT_THEME,
   themeLabel,
-} from './js/ambient-music.js?v=274c2864';
+} from './js/ambient-music.js?v=75a5ad20';
 import {
   MUSICBLOCK_CATALOG,
   MUSICBLOCK_PLAYBACK,
@@ -875,7 +875,7 @@ import {
   createAnimalState,
   resetAnimalDay,
   animalStatusLabel,
-} from './js/animals.js?v=47474803';
+} from './js/animals.js?v=d58c564d';
 import {
   ensureWoodTreeState,
   pickWoodTool,
@@ -981,9 +981,9 @@ import {
   PUBLIC_HUBS,
 } from './js/map-graph.js?v=fb63e6de';
 // G471: the world map and the subway map in the Map's window.
-import { MAP_VIEW_TITLES, bindSubwayMap, bindWorldMap, mapViewSubtitle, nearestStation, renderSubwayMapSvg, renderWorldMapSvg, worldRegionList } from './js/map-views.js?v=da2f063e';
+import { MAP_VIEW_TITLES, bindSubwayMap, bindWorldMap, mapViewSubtitle, nearestStation, renderSubwayMapSvg, renderWorldMapSvg, worldRegionList } from './js/map-views.js?v=3aed2e8f';
 // MAPLOAD: a region's painting fetched ahead of the click, its thumb in its place while it loads.
-import { createMapBgPreloader, mapBgFiles, prepareMapBg, prepareSubwayPaper, subwayPaperFile, watchMapBg } from './js/map-bg-preload.js?v=9afd8125';
+import { createMapBgPreloader, mapBgFiles, prepareMapBg, prepareSubwayPaper, subwayPaperFile, watchMapBg } from './js/map-bg-preload.js?v=5f75925a';
 import { hubMapArtNote, hubMapSubtitle, questLogSummary } from './js/panel-copy.js?v=85c3e029';
 import { bindMapIconTips } from './js/ui/map-icon-tips.js?v=6b3eb3f9';
 import { createMapZoom } from './js/map-zoom.js?v=4c2ce0e3';
@@ -1003,7 +1003,7 @@ import {
   treePlacementRequest,
   ROCK_SHAPE_WIDTHS,
 } from './js/street-ecology.js?v=32b1be0a';
-import { CHICKEN_PAUSE, chickenPauseRoll, easeToward, flightFloorAt, flightFloorFor, flyerLift } from './js/street-creatures.js?v=e748acb9';
+import { CHICKEN_PAUSE, chickenPauseRoll, easeToward, flightFloorAt, flightFloorFor, flyerLift } from './js/street-creatures.js?v=470047e9';
 import { chickenPose, chickenIdleSheetsAsked } from './js/chicken-idle-art.js?v=d79b13ec';
 import { chickenWaitPose } from './js/chicken-idles.js?v=eef0279b';
 import { itemOverlayStats } from './js/item-overlay.js?v=445d35d7';

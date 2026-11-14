@@ -73,6 +73,8 @@ export function resolveAmbientTheme(street = {}) {
   // library is lost, so the street keeps its hub's music.
   const musicKey = String(street.musicFile || '').trim();
   if (musicKey === 'NO_MUSIC') return SILENT_THEME;
+  // A lost key the remake keeps quiet rather than stand in for (#303: SUBWAY_CAR_HUM, under the train loop).
+  if (musicKey && cfg.streetMusic?.[musicKey] === SILENT_THEME) return SILENT_THEME;
   if (musicKey && cfg.streetMusic?.[musicKey] && cfg.themes?.[cfg.streetMusic[musicKey]]) {
     return `street:${musicKey}`;
   }

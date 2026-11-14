@@ -2792,9 +2792,14 @@
   "deployed": "2026-11-13"
  },
  "git": {
-  "commits": 2053,
+  "commits": 2054,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-13",
+    "kind": "improve",
+    "text": "Winter Walk's quest pill shows \"0/15 · limit\" at the quoin limit, short enough for a phone"
+   },
    {
     "date": "2026-11-13",
     "kind": "fix",
@@ -2909,14 +2914,9 @@
     "date": "2026-11-13",
     "kind": "fix",
     "text": "Online, a street you can already walk to still shows its project as open when the world has not built it yet"
-   },
-   {
-    "date": "2026-11-13",
-    "kind": "fix",
-    "text": "A street project that asks for the same item (or currants) twice now credits the row you contributed on"
    }
   ]
  },
- "tests": 964,
+ "tests": 965,
  "generatedAt": "2026-11-13"
 }

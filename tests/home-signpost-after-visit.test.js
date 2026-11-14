@@ -17,8 +17,8 @@
 import assert from 'node:assert/strict';
 import { after, before, describe, it } from 'node:test';
 
-import { homeStreetMpFeature } from '../public/js/features/home-street-mp-feature.js?v=ee6e70b4';
-import { homesFeature } from '../public/js/features/homes-feature.js?v=e6689566';
+import { homeStreetMpFeature } from '../public/js/features/home-street-mp-feature.js?v=dfa50bf7';
+import { homesFeature } from '../public/js/features/homes-feature.js?v=4105a2f4';
 import { visitSceneTsid } from '../public/js/neighbours-mp.js?v=e141e898';
 import { Display, FakeEl, fakePixi } from './fake-scene.js';
 

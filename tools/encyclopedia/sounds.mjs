@@ -238,7 +238,8 @@ export function addSounds(d, { picture }) {
     if (state.status !== 'original' && state.status !== 'silent') {
       if (street) {
         const st = streetStatus(music, keys, key, street.hubId);
-        state = { status: st.status === 'stand-in' ? 'stand-in' : st.status, theme: st.theme };
+        // A lost key the remake keeps quiet (#303) is still missing, not quiet in the original.
+        state = { status: st.lost ? 'missing' : st.status === 'stand-in' ? 'stand-in' : st.status, theme: st.theme };
         files = st.tracks;
         via = 'street';
       } else if (region || themes.length) {

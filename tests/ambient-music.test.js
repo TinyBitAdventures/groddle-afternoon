@@ -16,7 +16,7 @@ import {
   allAmbientTrackUrls,
   ambientPlaylist,
   SILENT_THEME,
-} from '../public/js/ambient-music.js?v=274c2864';
+} from '../public/js/ambient-music.js?v=75a5ad20';
 
 import { SOUND_ALIASES, SOUND_FILES } from '../public/js/sound-keys.js?v=d6b20718';
 
@@ -97,6 +97,11 @@ describe('street music_file keys', () => {
   it('maps geometry music_file keys through streetMusic to recovered themes', () => {
     const cfg = JSON.parse(readFileSync(cfgPath, 'utf8'));
     for (const [key, theme] of Object.entries(cfg.streetMusic || {})) {
+      // #303: a lost key kept quiet maps to silence, not a theme.
+      if (theme === SILENT_THEME) {
+        assert.equal(resolveAmbientTheme({ musicFile: key }), SILENT_THEME);
+        continue;
+      }
       assert.ok(cfg.themes[theme], `${key} -> ${theme} has no theme`);
       assert.deepEqual(tracksForTheme(`street:${key}`), tracksForTheme(theme));
       for (const url of cfg.themes[theme].tracks) assert.ok(existsSync(join(__dirname, '../public', url)), url);

@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { STATION_BOUNDS, STATION_X } from '../public/js/subway.js?v=44d1a09f';
+import { STATION_BOUNDS, STATION_X } from '../public/js/subway.js?v=e6995db8';
 import { SUBWAY_ART } from '../public/js/subway-art.js?v=789979e3';
 
 const pub = join(dirname(fileURLToPath(import.meta.url)), '..', 'public');

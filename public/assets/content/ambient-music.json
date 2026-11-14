@@ -208,7 +208,7 @@
     },
     "subway": {
       "label": "Subway",
-      "gsjsKeys": ["TRAVELLING_TRAIN", "SUBWAY_STATION_HUM"],
+      "gsjsKeys": ["SUBWAY_STATION_HUM"],
       "tracks": [
         "assets/audio/ambient/subway_music_1344997270.mp3",
         "assets/audio/ambient/elevator_music_1344997334.mp3",
@@ -457,7 +457,7 @@
     "HOME_STREET_FIREBOGS": "home_firebogs",
     "CLOUD_DROP_2": "sky_plunge",
     "SUBWAY_STATION_HUM": "subway",
-    "SUBWAY_CAR_HUM": "subway",
+    "SUBWAY_CAR_HUM": "silence",
     "XAVIER_CARNIVOROUS_PLANTS": "carnivorous_plants",
     "ABANDONED_APARTMENTS1": "abandoned_apartments",
     "UNDERGROUND_PUZZLES": "underground_puzzles",

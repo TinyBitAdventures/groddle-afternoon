@@ -64,13 +64,13 @@
 import { performPlotVerb, plotArtPath, plotLabel, plotStatusLabel, plotVerbs } from '../patches.js?v=1ba4f75f';
 import { trantStatusLabel } from '../trants.js?v=4d6f5593';
 import { woodTreeStatusLabel } from '../woodcutting.js?v=ee35a30a';
-import { animalAnchorX, animalAnchorY, animalStatusLabel } from '../animals.js?v=47474803';
+import { animalAnchorX, animalAnchorY, animalStatusLabel } from '../animals.js?v=d58c564d';
 import { frameTexture, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js?v=814d7926';
 import { homeStreetLayout, normalizeCultivationState } from '../home-cultivation.js?v=a3135ffd';
 import { readVisitScene } from '../neighbours-mp.js?v=e141e898';
 import { saveStore } from '../save-store.js?v=04420633';
-import { STREET_GROUND_Y, homesFeature, wearHomeCultivation } from './homes-feature.js?v=e6689566';
-import { patchesFeature, treeFrameUrl } from './patches-feature.js?v=29aff48e';
+import { STREET_GROUND_Y, homesFeature, wearHomeCultivation } from './homes-feature.js?v=4105a2f4';
+import { patchesFeature, treeFrameUrl } from './patches-feature.js?v=8e8a271d';
 import {
   YARD_STREET,
   YARD_TEXT as T,
@@ -87,18 +87,18 @@ import {
   treeSnapshot,
   visitorAnimalState,
   visitorTreeState,
-} from '../yard-verbs-mp.js?v=1f025efb';
+} from '../yard-verbs-mp.js?v=bcc57329';
 import { yardFixtureRows, yardFixtureVerbs, yardFixturesKey } from '../yard-fixtures-mp.js?v=dd022fe8';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
-import { followYardPath, stickForClass } from '../yard-wander.js?v=605416e7';
+import { followYardPath, stickForClass } from '../yard-wander.js?v=3d06aaa7';
 import { showsChickenIdle, yardChickenPose } from '../chicken-idle-art.js?v=d79b13ec';
 import { chickenWaitPose } from '../chicken-idles.js?v=eef0279b';
 import { countItem, removeItem } from '../inventory.js?v=f49c8998';
 import { ROCK_CATALOG, rockStatusLabel, tickMineRock } from '../mining.js?v=b28fef74';
 import { getResourceNodeDef, regrowDelayMs } from '../resource-nodes.js?v=3a26727e';
 import { getGameDayKey } from '../game-day.js?v=cf9afac0';
-import { rockReady } from '../street-objects.js?v=4e9e16e6';
-import { resourceNodesFeature } from './resource-nodes-feature.js?v=b4018b83';
+import { rockReady } from '../street-objects.js?v=c0888398';
+import { resourceNodesFeature } from './resource-nodes-feature.js?v=3d43fff6';
 import {
   ROCK_RESPAWN_MS,
   STOCK_NODE_VERBS,

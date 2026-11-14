@@ -525,6 +525,12 @@ const why = Object.freeze({
 });
 
 export const STATION_MUSIC = 'SUBWAY_STATION_HUM';
+/**
+ * The car's music_file. #303 (G705): its recording (inc_data_sounds.js 195, hum_caboose_4.mp3)
+ * is lost, and the subway stand-in theme played under the recovered TRAVELLING_TRAIN loop
+ * (subway_loop3, inc_transit.js 287), two tracks at once. ambient-music.json now maps the key to
+ * silence, so a ride is the train loop alone; the station's music comes back on arrival.
+ */
 export const CAR_MUSIC = 'SUBWAY_CAR_HUM';
 
 /**

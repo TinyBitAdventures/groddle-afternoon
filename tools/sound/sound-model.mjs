@@ -117,6 +117,8 @@ export function streetMusicKeys(music, base = root) {
 export function streetState(music, key, hubId) {
   if (key === 'NO_MUSIC') return { status: 'silent', label: 'silence (NO_MUSIC)', tracks: [] };
   const theme = music.streetMusic?.[key];
+  // A lost key mapped to silence (ambient-music.js resolveAmbientTheme; #303 SUBWAY_CAR_HUM).
+  if (theme === 'silence') return { status: 'silent', label: 'silence (its recording is lost)', tracks: [], lost: true };
   if (theme && music.themes[theme]) return { status: 'theme', label: `theme ${theme}`, tracks: music.themes[theme].tracks, theme };
   const hubTheme = (hubId != null && music.hubMap[String(hubId)]) || music.defaultTheme;
   return { status: 'hub', label: `the hub's music (${hubTheme})`, tracks: music.themes[hubTheme]?.tracks || [], theme: hubTheme };
