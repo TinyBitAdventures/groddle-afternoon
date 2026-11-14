@@ -2792,9 +2792,14 @@
   "deployed": "2026-11-13"
  },
  "git": {
-  "commits": 2068,
+  "commits": 2069,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-13",
+    "kind": "improve",
+    "text": "Groddle Meadow's map is Tiny Speck's 2012 painting, restored, and its World map card shows it"
+   },
    {
     "date": "2026-11-13",
     "kind": "fix",
@@ -2909,11 +2914,6 @@
     "date": "2026-11-13",
     "kind": "fix",
     "text": "Make's \"Show them\" lists the recipes you know, each saying what it is missing"
-   },
-   {
-    "date": "2026-11-13",
-    "kind": "fix",
-    "text": "Online, everyone can work on Yan Jaggery again: the featured project no longer says \"This street is already built\""
    }
   ]
  },

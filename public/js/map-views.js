@@ -148,7 +148,7 @@ export function bindWorldMap(canvas, { onOpen, onPreview, touch = false, regions
     shown = id;
     shownBy = by;
     const [x, y, cw, ch] = card.box;
-    layer.innerHTML = `<image class="world-card" href="${esc(card.href)}" x="${x}" y="${y}" width="${cw}" height="${ch}" transform="matrix(${card.m.join(' ')})"/>`;
+    layer.innerHTML = `<image class="world-card" href="${esc(keyedArt(card.href))}" x="${x}" y="${y}" width="${cw}" height="${ch}" transform="matrix(${card.m.join(' ')})"/>`;
     // The client faded the star while its region's card was up (worldMapHoverHandler 357-366).
     if (star) star.classList.toggle('is-hidden', svg.querySelector(`.world-region[data-hub="${id}"]`)?.classList.contains('is-you') || false);
     canvas.dataset.worldCard = id;

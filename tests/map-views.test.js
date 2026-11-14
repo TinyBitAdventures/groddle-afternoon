@@ -28,7 +28,7 @@ import {
   subwaySegments,
   worldCharts,
   worldRegionList,
-} from '../public/js/map-views.js?v=00dfaf00';
+} from '../public/js/map-views.js?v=75d5f9a0';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const read = (p) => readFileSync(join(root, p), 'utf8');
@@ -196,10 +196,10 @@ describe('world map (world_map.fla)', () => {
       return [(b & 0x3fff) + 1, ((b >> 14) & 0x3fff) + 1];
     };
 
-    it('every card embeds one WebP of 300 x 182 made from its own region\'s painting, and no thumbnail', () => {
+    it('every card embeds one WebP of 750 x 455 made from its own region\'s painting, and no thumbnail', () => {
       const ids = Object.keys(WORLD_MAP.regions);
       assert.deepEqual(Object.keys(manifest.cards).sort(), [...ids].sort(), 'one manifest row a card');
-      assert.deepEqual(CARD_PICTURE, [300, 182]);
+      assert.deepEqual(CARD_PICTURE, [750, 455]);
       assert.deepEqual(manifest.picture, CARD_PICTURE);
       for (const id of ids) {
         const row = manifest.cards[id];
@@ -257,15 +257,15 @@ describe('world map (world_map.fla)', () => {
       }
     });
 
-    it('stays small: a picture under 12 KB, a card under 32 KB (Groddle Meadow, restored from 2012, has the most grain), all 47 under 1 MB', () => {
+    it('stays light: a picture under 80 KB, a card under 120 KB, all 47 under 2.5 MB (a card loads only when its region is hovered)', () => {
       let total = 0;
       for (const [id, row] of Object.entries(manifest.cards)) {
         const bytes = Buffer.byteLength(card(id));
         total += bytes;
-        assert.ok(row.picture.bytes < 12 * 1024, `card ${id} picture ${row.picture.bytes} bytes`);
-        assert.ok(bytes < 32 * 1024, `card ${id} ${bytes} bytes`);
+        assert.ok(row.picture.bytes < 80 * 1024, `card ${id} picture ${row.picture.bytes} bytes`);
+        assert.ok(bytes < 120 * 1024, `card ${id} ${bytes} bytes`);
       }
-      assert.ok(total < 1024 * 1024, `${total} bytes`);
+      assert.ok(total < 2.5 * 1024 * 1024, `${total} bytes`);
     });
 
     it('Baqala\'s card drew Zhambu\'s thumbnail in the FLA; it now carries Baqala\'s own painting', () => {
@@ -486,5 +486,12 @@ describe('World charts on phones (G663)', () => {
     const calls = game.match(/^\s*(if \(!TOUCH_PHONE\) )?warmWorldCharts\(\);/gm) || [];
     assert.equal(calls.length, 2);
     for (const c of calls) assert.match(c, /if \(!TOUCH_PHONE\) warmWorldCharts\(\);/);
+  });
+});
+
+describe('World map hover cards are fetched fresh when they change', () => {
+  it('a card loads under its content key, as the charts do, so a rebuilt card is never served stale', () => {
+    const src = readFileSync(new URL('../public/js/map-views.js', import.meta.url), 'utf8');
+    assert.match(src, /<image class="world-card" href="\$\{esc\(keyedArt\(card\.href\)\)\}"/);
   });
 });

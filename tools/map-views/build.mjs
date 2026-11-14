@@ -27,7 +27,8 @@
  * (public/assets/maps/art/bg, tools/map-backgrounds/build.mjs), and a thumbnail is that painting's
  * whole frame scaled (tools/map-backgrounds/build.mjs; the repaints were made from the thumbnails
  * over the same 760 x 460 frame). So the card's picture is the region's painting (its @2x file)
- * scaled to the thumbnail's box at 2x, CARD_PICTURE, as WebP (CARD_RECIPE), still embedded as a
+ * scaled to 750 x 455, CARD_PICTURE (five times the thumbnail's box: the World view draws a card about 375 px wide, 750
+ * device pixels on a Retina screen; Austin 2026-11-14, the 300 x 182 card still looked soft), as WebP (CARD_RECIPE), still embedded as a
  * data: URI (a card is drawn as an SVG image, where an outside reference does not load) and still
  * drawn at the thumbnail's 150 x 91 (the frame, the lettering and every placement as Tiny Speck drew
  * them). The thumbnail itself then ships in no card. A card whose thumbnail has no region painting
@@ -80,7 +81,7 @@ const THUMB_FOLDER = 'z_hub_maps_small/';
 const BACKGROUNDS = 'public/assets/maps/art/bg/backgrounds.json';
 export const CARDS_MANIFEST = `${WORLD_DIR}/cards/cards.json`;
 /** A card's picture: the thumbnail's 150 x 91 box at 2x. */
-export const CARD_PICTURE = Object.freeze([300, 182]);
+export const CARD_PICTURE = Object.freeze([750, 455]);
 /** The painting (its 1520 x 920 @2x file) to CARD_PICTURE: ImageMagick steps, WebP to stdout. */
 export const CARD_RECIPE = Object.freeze(['-filter', 'Lanczos', '-resize', `${CARD_PICTURE[0]}x${CARD_PICTURE[1]}!`, '-strip', '-quality', '75', '-define', 'webp:method=6']);
 const sha256 = (buf) => createHash('sha256').update(buf).digest('hex');
