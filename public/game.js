@@ -497,8 +497,8 @@ import { PACK_COPY, isBagClass, isElementClass, ownBagLabel, unitRankAt } from '
 import { FLOAT_TEXT_Z, SPEECH_BUBBLE_Z } from './js/fx-z.js?v=18dda7e3';
 import { hasPouch } from './js/elemental-pouch.js?v=42702eda';
 import { createPackRow, mountPackClearance, packBandRange, packCountText, packSearchEntries, packSlotTip } from './js/ui/pack-row.js?v=64e4a567';
-import { listAnimalFeedOptions, piggyFeedTip } from './js/animals.js?v=0322c588';
-import { pickerMaxCount, pickerOptionsFor, pickerTakesCount } from './js/animals.js?v=0322c588';
+import { listAnimalFeedOptions, piggyFeedTip } from './js/animals.js?v=3c7debb6';
+import { pickerMaxCount, pickerOptionsFor, pickerTakesCount } from './js/animals.js?v=3c7debb6';
 import {
   createDroppedItemState,
   parseDroppedItemState,
@@ -678,7 +678,7 @@ import {
   ensureStreetIndex,
   resolveIndexTsid,
 } from './js/street-loader.js?v=18b181ad';
-import { showDraftBanner, startDraftPlay } from './js/builder/draft-play.js?v=71138bfd';
+import { showDraftBanner, startDraftPlay } from './js/builder/draft-play.js?v=20f16426';
 import {
   ladderTopDeck,
   groundBeneath,
@@ -880,7 +880,7 @@ import {
   createAnimalState,
   resetAnimalDay,
   animalStatusLabel,
-} from './js/animals.js?v=0322c588';
+} from './js/animals.js?v=3c7debb6';
 import {
   ensureWoodTreeState,
   pickWoodTool,
@@ -1008,8 +1008,8 @@ import {
   shrinePlacementRequest,
   treePlacementRequest,
   ROCK_SHAPE_WIDTHS,
-} from './js/street-ecology.js?v=bbf8d2b7';
-import { CHICKEN_PAUSE, chickenPauseRoll, easeToward, flightFloorAt, flightFloorFor, flyerLift } from './js/street-creatures.js?v=f0568fb4';
+} from './js/street-ecology.js?v=02dd7dda';
+import { CHICKEN_PAUSE, chickenPauseRoll, easeToward, flightFloorAt, flightFloorFor, flyerLift } from './js/street-creatures.js?v=06fed82a';
 import { chickenPose, chickenIdleSheetsAsked } from './js/chicken-idle-art.js?v=d79b13ec';
 import { chickenWaitPose } from './js/chicken-idles.js?v=eef0279b';
 import { itemOverlayStats } from './js/item-overlay.js?v=445d35d7';

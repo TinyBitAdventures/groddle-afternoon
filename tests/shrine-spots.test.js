@@ -24,8 +24,8 @@ import {
   setStreetEcologyCatalog,
   shrinePlacementRequest,
   streetReservedSpots,
-} from '../public/js/street-ecology.js?v=bbf8d2b7';
-import { SHRINE_SPOTS } from '../public/js/shrine-spots-data.js?v=8bc49010';
+} from '../public/js/street-ecology.js?v=02dd7dda';
+import { SHRINE_SPOTS } from '../public/js/shrine-spots-data.js?v=c45dc2c2';
 import { platformYAt, platformsScreen, streetWidth } from '../public/js/street-model.js?v=b6cb6a4e';
 import { NUDGE_PX, SEAT_PX, seatOnFloor, standsOnReserved } from '../tools/snap-placements/shrine-pictures.mjs';
 import { placementRequests } from '../tools/build-realtime-objects.mjs';
@@ -47,7 +47,8 @@ describe('shrine spots from the 2012 street pictures', () => {
 
   it("every shrine street of a pinned region has its picture's spot or says why not; none without a shrine", () => {
     const hubs = new Set([...Object.keys(source), ...Object.keys(pictures.unread)].map((tsid) => String(index[tsid]?.hubId)));
-    assert.ok(hubs.has('58'), 'Groddle Meadow');
+    // Groddle Meadow and the 17 other hubs research/eleven-snaps has no snap of (Old Groddle Forest's one shrine street has no picture).
+    assert.deepEqual([...hubs].sort(), ['102', '105', '106', '110', '116', '120', '137', '141', '27', '28', '50', '58', '71', '78', '85', '88', '97', '99']);
     for (const [tsid, row] of Object.entries(index)) {
       if (!hubs.has(String(row.hubId))) continue;
       const pop = populationForStreet(tsid, ecologyForStreet(tsid));
@@ -60,6 +61,8 @@ describe('shrine spots from the 2012 street pictures', () => {
       if (pictures.unread[tsid]) assert.match(pictures.unread[tsid].why, /^(no 2012 picture survives|its picture shows no shrine)$/, row.label);
       else assert.match(source[tsid].picture, /^[a-z-]+\/L[A-Z0-9]+_main_\d+\.jpg$/, row.label);
     }
+    assert.equal(Object.keys(SHRINE_SPOTS).length, 296);
+    assert.equal(Object.keys(pictures.unread).length, 48);
   });
 
   it('each spot is seated on a standable floor that holds the shrine, near where the picture shows it', () => {

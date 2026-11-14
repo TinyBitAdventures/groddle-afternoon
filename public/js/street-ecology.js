@@ -18,7 +18,7 @@ import {
   ROCK_SPARKLY_SPOTS,
   TREE_SPOTS,
 } from './node-spots-data.js?v=97d4281c';
-import { SHRINE_SPOTS } from './shrine-spots-data.js?v=8bc49010';
+import { SHRINE_SPOTS } from './shrine-spots-data.js?v=c45dc2c2';
 
 export const STREET_ECOLOGY_URL = 'assets/content/street-ecology.json?v=official-ecology-6';
 
