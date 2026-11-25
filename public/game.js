@@ -1159,7 +1159,7 @@ import { isOneClickDoor, oneClickChoice, signpostArmRows, worldContextAction } f
 import { blockedPlayerVerbs, listPlayerTarget, opensPlayerMenu, playerMenuRows } from './js/ui/player-menu.js?v=c573508b';
 import { forgetTexture, frameTexture, isFailed, isLoaded, onFailed, onLoaded, textureFromUrl, whenLoaded } from './js/textures.js?v=b8e38103';
 import { FALLBACK_MAX as WORLD_ART_FALLBACK_MAX, worldArtFor } from './js/world-art.js?v=a67514c8';
-import { HOME_PIP_PX, drawLockPip, homeMarkNote, homePipShown, homeStackMark } from './js/home-stack-marks.js?v=0ff4c29f';
+import { HOME_PIP_PX, HOME_PIP_WORDS, drawLockPip, drawPipWords, homeMarkNote, homePipShown, homePipWordsShown, homeStackMark } from './js/home-stack-marks.js?v=a41ed26e';
 import { attachAnim, sceneAnim, syncAnim } from './js/deco-anim.js?v=de95df20';
 import { revealStartCard, whenSceneDrawn } from './js/start-backdrop.js?v=8510d51e';
 import { cancelAllOverlays, displayTopOf, itemstackOverlayPoint, playPoofIn, setOverlayResolution } from './js/overlay-art.js?v=e50bacca';
@@ -16351,16 +16351,42 @@ function placeDroppedCount(spr, w, h) {
 function updateHomeStackPips() {
   let marked = 0;
   let shown = 0;
+  let worded = '';
   const decorating = features.query('homeEditMode', engine) === 'decorate';
   for (const spr of droppedItemSprites) {
     const pip = spr?.homePip;
     if (!pip || pip.destroyed) continue;
     marked += 1;
-    pip.visible = homePipShown(spr.homeMark, { decorating, hovered: hoverTarget?.sprite === spr, menuOpen: menuTarget?.sprite === spr });
+    const hovered = hoverTarget?.sprite === spr;
+    pip.visible = homePipShown(spr.homeMark, { decorating, hovered, menuOpen: menuTarget?.sprite === spr });
     if (pip.visible) shown += 1;
+    // #669 (G1304): the words beside the padlock on the stack under the pointer, in this skin's tip.
+    const say = pip.visible && homePipWordsShown(spr.homeMark, { hovered });
+    const ui = modernUi() ? 'modern' : 'classic';
+    if (say && pip.words && (pip.words.destroyed || pip.words.ui !== ui)) {
+      if (!pip.words.destroyed) pip.words.destroy({ children: true });
+      pip.words = null;
+    }
+    if (say && !pip.words) {
+      pip.words = drawPipWords(PIXI, ui);
+      pip.words.position.set(HOME_PIP_PX / 2 + 3, 0);
+      pip.addChild(pip.words);
+    }
+    if (pip.words && !pip.words.destroyed) pip.words.visible = say;
+    // Over the stacks beside it while it speaks (a neighbour's art covered the words), back after.
+    if (say && spr._wordsZ === undefined) {
+      spr._wordsZ = spr.zIndex;
+      spr.zIndex = spr._wordsZ + 1000;
+    } else if (!say && spr._wordsZ !== undefined) {
+      spr.zIndex = spr._wordsZ;
+      spr._wordsZ = undefined;
+    }
+    if (say) worded = spr.homeMark;
   }
   const line = marked ? `${shown}/${marked}` : '';
   if (app?.canvas && app.canvas.dataset.homeLockPips !== line) app.canvas.dataset.homeLockPips = line;
+  const words = worded ? HOME_PIP_WORDS : '';
+  if (app?.canvas && app.canvas.dataset.homeLockWords !== words) app.canvas.dataset.homeLockWords = words;
 }
 
 /**

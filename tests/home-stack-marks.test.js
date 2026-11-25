@@ -9,7 +9,7 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { HOME_MARK_TEXT, HOME_PIP_PX, drawLockPip, homeMarkNote, homePipShown, homeStackMark, tokenColour } from '../public/js/home-stack-marks.js?v=0ff4c29f';
+import { HOME_MARK_TEXT, HOME_PIP_PX, HOME_PIP_WORDS, drawLockPip, drawPipWords, homeMarkNote, homePipShown, homePipWordsShown, homeStackMark, pipWordsStyle, tokenColour } from '../public/js/home-stack-marks.js?v=a41ed26e';
 
 const ROOT = join(import.meta.dirname, '..');
 const read = (rel) => readFileSync(join(ROOT, rel), 'utf8');
@@ -72,7 +72,7 @@ describe('home stack marks: the wiring', () => {
   it('a decor stack gets a hidden pip, the target its header line, and the pips follow hover, menu and Decoration Mode each frame', () => {
     assert.match(game, /if \(mark === 'decor'\) \{\s*spr\.homePip = drawLockPip\(PIXI\);\s*spr\.homePip\.visible = false;/);
     assert.match(game, /\.\.\.\(mark \? \{ homeMark: mark, homeNote: homeMarkNote\(mark\) \} : \{\}\)/);
-    assert.match(game, /homePipShown\(spr\.homeMark, \{ decorating, hovered: hoverTarget\?\.sprite === spr, menuOpen: menuTarget\?\.sprite === spr \}\)/);
+    assert.match(game, /const hovered = hoverTarget\?\.sprite === spr;\s*pip\.visible = homePipShown\(spr\.homeMark, \{ decorating, hovered, menuOpen: menuTarget\?\.sprite === spr \}\)/);
     assert.match(game, /const decorating = features\.query\('homeEditMode', engine\) === 'decorate';/);
     assert.match(game, /run\('home lock pips', updateHomeStackPips\);/);
     assert.match(game, /note\.textContent = level \? '' : target\.homeNote \|\| '';/);
@@ -88,5 +88,63 @@ describe('home stack marks: the wiring', () => {
     assert.ok(e, 'inventions.json home-stack-marks');
     assert.equal(e.kind, 'UI');
     assert.ok(e.where.some((w) => w.file === 'public/js/home-stack-marks.js'));
+  });
+});
+
+describe('#669 point 4 (G1304): the padlock says what it means', () => {
+  it('the words, plain and short, only on the stack under the pointer', () => {
+    assert.equal(HOME_PIP_WORDS, 'Only you can pick this up');
+    assert.doesNotMatch(HOME_PIP_WORDS, /—/);
+    assert.equal(homePipWordsShown('decor', { hovered: true }), true);
+    assert.equal(homePipWordsShown('decor', {}), false, 'Decoration Mode shows every pip, the words only on the hovered one');
+    assert.equal(homePipWordsShown('shared', { hovered: true }), false);
+    assert.equal(homePipWordsShown('', { hovered: true }), false);
+  });
+
+  it('each skin\'s tooltip dress', () => {
+    const token = (name, fallback) => `tok(${name})` || fallback;
+    const modern = pipWordsStyle('modern', token);
+    assert.equal(modern.bg, 'tok(--surface-tip)');
+    assert.equal(modern.ink, 'tok(--text-tip)');
+    assert.equal(modern.font, 'tok(--font-ui)');
+    const classic = pipWordsStyle('classic', token);
+    assert.equal(classic.bg, 'tok(--c-classic-tip)');
+    assert.equal(classic.ink, 'tok(--c-classic-text)');
+    assert.equal(classic.rim, 'tok(--c-classic-ink)');
+    assert.equal(classic.rimAlpha, 0.37);
+    assert.equal(classic.font, 'tok(--font-classic-body)');
+    // The same tokens the bar's tip uses in each skin.
+    assert.match(read('public/style.css'), /\[data-ui="modern"\] \.hud-tip \{[^}]*background: var\(--surface-tip\); color: var\(--text-tip\)/);
+    assert.match(read('public/css/classic.css'), /:root\[data-ui="classic"\] \.hud-tip \{[^}]*background: var\(--c-classic-tip\);[^}]*color: var\(--c-classic-text\);/);
+  });
+
+  it('drawPipWords: a pill with the words that never takes a click', () => {
+    const texts = [];
+    const chain = new Proxy({}, { get: () => () => chain });
+    class Container { constructor() { this.children = []; } addChild(c) { this.children.push(c); } }
+    class Text { constructor(o) { texts.push(o); this.width = 120; this.height = 14; this.position = { set() {} }; } }
+    const box = drawPipWords({ Container, Text, Graphics: function Graphics() { return chain; } }, 'classic', (_, f) => f);
+    assert.equal(box.label, 'home-lock-words');
+    assert.equal(box.eventMode, 'none');
+    assert.equal(box.ui, 'classic');
+    assert.equal(texts[0].text, HOME_PIP_WORDS);
+    assert.equal(box.children.length, 2);
+  });
+
+  it('game.js puts the words beside a shown pip on the hovered stack, rebuilt when the skin changes', () => {
+    const game = read('public/game.js');
+    assert.match(game, /const say = pip\.visible && homePipWordsShown\(spr\.homeMark, \{ hovered \}\);/);
+    assert.match(game, /pip\.words = drawPipWords\(PIXI, ui\);\s*pip\.words\.position\.set\(HOME_PIP_PX \/ 2 \+ 3, 0\);/);
+    assert.match(game, /pip\.words\.ui !== ui/);
+    assert.match(game, /app\.canvas\.dataset\.homeLockWords = words/);
+    // Raised over its neighbours while it speaks, put back after.
+    assert.match(game, /if \(say && spr\._wordsZ === undefined\) \{\s*spr\._wordsZ = spr\.zIndex;\s*spr\.zIndex = spr\._wordsZ \+ 1000;\s*\} else if \(!say && spr\._wordsZ !== undefined\) \{\s*spr\.zIndex = spr\._wordsZ;/);
+  });
+
+  it('the invention entry has its ruling', () => {
+    const reg = JSON.parse(read('tools/inventions/inventions.json'));
+    const e = reg.entries.find((x) => x.id === 'home-stack-marks');
+    assert.match(e.title, /Only you can pick this up/);
+    assert.match(e.ruling, /G1304/);
   });
 });

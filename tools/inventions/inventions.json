@@ -5809,9 +5809,9 @@
   },
   {
    "id": "home-stack-marks",
-   "title": "Decoration Mode marks: at your own home online, a small lock pip on the stacks only you can pick up (on hover or tap, and on all of them in Decoration Mode), and an \"Anyone here can pick this up\" line in a dropped stack's menu header (Glitch showed the owner no difference)",
+   "title": "Decoration Mode marks: at your own home online, a small lock pip on the stacks only you can pick up (on hover or tap, and on all of them in Decoration Mode) with the words \"Only you can pick this up\" beside it on the stack under the pointer, and an \"Anyone here can pick this up\" line in a dropped stack's menu header (Glitch showed the owner no difference)",
    "kind": "UI",
-   "status": "proposed",
+   "status": "kept",
    "where": [
     {
      "file": "public/js/home-stack-marks.js"
@@ -5827,8 +5827,10 @@
     }
    ],
    "why": "G1190 made dropped things in a house, yard or Tower shared while what the owner sets in Decoration Mode stays theirs; the two look the same on the floor.",
-   "ruling": "Austin 2026-11-23 (the day's calls): asked for a way for owners to tell decor from freebies; built as a proposal",
-   "rows": []
+   "ruling": "Austin 2026-11-23 (the day's calls): asked for a way for owners to tell decor from freebies; built as a proposal. Austin 2026-11-25 (#669, G1304): the padlock alone meant nothing to a player; keep it with \"Only you can pick this up\" beside it on hover, in each skin's tooltip",
+   "rows": [
+    "G1304"
+   ]
   },
   {
    "id": "enter-walk-past-chip",

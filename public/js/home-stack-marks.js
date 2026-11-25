@@ -47,6 +47,69 @@ export function homePipShown(mark, { decorating = false, hovered = false, menuOp
   return mark === 'decor' && Boolean(decorating || hovered || menuOpen);
 }
 
+/**
+ * #669 (G1304, Austin 2026-11-25): the pip's words, beside it while the pointer is on the stack
+ * (a tap on a phone): the padlock alone said nothing, its meaning was only in the menu header.
+ */
+export const HOME_PIP_WORDS = 'Only you can pick this up';
+
+/** PURE: whether a shown pip has its words beside it: only on the stack under the pointer. */
+export function homePipWordsShown(mark, { hovered = false } = {}) {
+  return mark === 'decor' && Boolean(hovered);
+}
+
+/**
+ * PURE: the words' dress, the game's tooltip in each skin. Modern: the bar's tip (style.css
+ * .hud-tip: --surface-tip, --text-tip, --font-ui, bold). Classic: the client's pale yellow tip
+ * (TipDisplayManager.as 28-32; classic.css .hud-tip: --c-classic-tip, --c-classic-text, a hairline
+ * of --c-classic-ink at .37, --font-classic-body).
+ */
+export function pipWordsStyle(ui = 'modern', token = tokenColour) {
+  if (ui === 'classic') {
+    return {
+      bg: token('--c-classic-tip', '#f8f6b4'),
+      ink: token('--c-classic-text', '#4b5357'),
+      rim: token('--c-classic-ink', '#000000'),
+      rimAlpha: 0.37,
+      font: token('--font-classic-body', 'Helvetica Neue, Helvetica, Arial, sans-serif'),
+      weight: '400',
+      radius: 4,
+    };
+  }
+  return {
+    bg: token('--surface-tip', '#3a332b'),
+    ink: token('--text-tip', '#fbf7ef'),
+    rim: null,
+    rimAlpha: 0,
+    font: token('--font-ui', 'Nunito, Trebuchet MS, sans-serif'),
+    weight: '700',
+    radius: 6,
+  };
+}
+
+/**
+ * The words in a tip pill, a Pixi container whose left edge sits at (0, 0), centred on y = 0 (the
+ * pip's middle), so it goes just right of the pip.
+ */
+export function drawPipWords(PIXI, ui = 'modern', token = tokenColour) {
+  const st = pipWordsStyle(ui, token);
+  const box = new PIXI.Container();
+  box.label = 'home-lock-words';
+  box.eventMode = 'none';
+  const text = new PIXI.Text({ text: HOME_PIP_WORDS, style: { fontFamily: st.font, fontSize: 11, fontWeight: st.weight, fill: st.ink } });
+  const padX = 6;
+  const h = 18;
+  const w = Math.ceil((text.width || 0) + padX * 2);
+  const g = new PIXI.Graphics();
+  g.roundRect(0, -h / 2, w, h, st.radius).fill({ color: st.bg, alpha: 0.96 });
+  if (st.rim) g.stroke({ width: 1, color: st.rim, alpha: st.rimAlpha });
+  text.position?.set?.(padX, Math.round(-(text.height || 0) / 2));
+  box.addChild(g);
+  box.addChild(text);
+  box.ui = ui;
+  return box;
+}
+
 /** The pip's size, screen px: a disc this wide at the art's top left corner. */
 export const HOME_PIP_PX = 14;
 
