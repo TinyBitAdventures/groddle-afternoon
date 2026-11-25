@@ -2814,9 +2814,19 @@
   "deployed": "2026-11-25"
  },
  "git": {
-  "commits": 3499,
+  "commits": 3501,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-25",
+    "kind": "new",
+    "text": "Camera Mode can snap your whole house, Tower or home street, every floor stacked"
+   },
+   {
+    "date": "2026-11-25",
+    "kind": "fix",
+    "text": "A garden's Water all shows the energy it will really spend, not 2"
+   },
    {
     "date": "2026-11-25",
     "kind": "fix",
@@ -2926,16 +2936,6 @@
     "date": "2026-11-24",
     "kind": "fix",
     "text": "A Batterfly's Guano falls where it is flying, onto the floor under it"
-   },
-   {
-    "date": "2026-11-24",
-    "kind": "fix",
-    "text": "Street Butterflies and Batterflies wander the whole street instead of popping in at its edge"
-   },
-   {
-    "date": "2026-11-24",
-    "kind": "fix",
-    "text": "Firebog street spirits' flames and vines move when they talk and cry too"
    }
   ]
  },
