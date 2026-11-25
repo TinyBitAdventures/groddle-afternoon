@@ -20,10 +20,10 @@ import {
 } from '../public/js/home-layout.js?v=c6ab27df';
 import { collectHomeLayout, walkHomeScene } from '../public/js/home-layout-scene.js?v=7f45c357';
 import { phoneStage, stageFor } from '../public/js/location-view.js?v=fa4d254b';
-import { STREET_WORLD_H } from '../public/js/features/homes-feature.js?v=bd0bfd5c';
+import { STREET_WORLD_H } from '../public/js/features/homes-feature.js?v=38f289ee';
 import { AVATAR_STILL, homeKeyOf } from '../public/js/profiles.js?v=7caf2524';
 import { HIRES_SPRITES, SPLIT_SPRITES } from '../public/js/sprite-hires.js?v=e96be5f1';
-import { HOUSE_STYLE_KEYS } from '../public/js/features/homes-feature.js?v=bd0bfd5c';
+import { HOUSE_STYLE_KEYS } from '../public/js/features/homes-feature.js?v=38f289ee';
 import { SITE_DIR, skipWithoutSite } from '../tools/repos.mjs';
 
 const root = join(import.meta.dirname, '..');
@@ -385,7 +385,8 @@ describe('the frame a home street is taken in (homeViewFrame, HOMESHOT)', () => 
     assert.match(game, /bgLayer\?\.updateParallax\?\.\(-world\.x, -world\.y, VIEW_W, LOCATION_VIEW_H, VIEW_H, parallaxSnap\(\)\);\n\s*bgLayer\?\.cullDecos\?\.\(-world\.x, -world\.y, VIEW_W, VIEW_H\);\n\s*\}\n\s*\},/);
     assert.match(game, /return frame \? engine\.viewAt\(frame, \(\) => shot\(frame\.w, frame\.h\)\) : shot\(VIEW_W, LOCATION_VIEW_H\);/);
     const profiles = read('public/js/features/profiles-feature.js');
-    assert.match(profiles, /const frame = homeFrameFor\(engine\);\n\s*const view = engine\.snapshotView\?\.\(\{ resolution: HOME_RESOLUTION, \.\.\.\(frame \? \{ frame \} : \{\}\) \}\);/);
+    // G1283: drawn as a public picture (js/public-picture.js withPublicView: no players, bubbles or name plates).
+    assert.match(profiles, /const frame = homeFrameFor\(engine\);\n\s*\/\/ G1283[^\n]*\n\s*const view = withPublicView\(engine, \(\) => engine\.snapshotView\?\.\(\{ resolution: HOME_RESOLUTION, \.\.\.\(frame \? \{ frame \} : \{\}\) \}\)\);/);
   });
 });
 

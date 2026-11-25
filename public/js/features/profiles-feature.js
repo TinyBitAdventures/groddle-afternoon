@@ -87,7 +87,8 @@ import {
 } from '../profiles.js?v=7caf2524';
 import { homeLayoutJson, homeLayoutKeyOf, HOME_LAYOUT_LIMITS } from '../home-layout.js?v=c6ab27df';
 import { collectHomeLayout, homeFrameFor } from '../home-layout-scene.js?v=7f45c357';
-import { renderHomeLocation } from '../home-shot-render.js?v=913b14b9';
+import { renderHomeLocation } from '../home-shot-render.js?v=cac82952';
+import { withPublicView } from '../public-picture.js?v=1a0b03fa';
 
 export const PROFILES_FEATURE_ID = 'profiles';
 
@@ -326,7 +327,8 @@ async function encodeCanvas(canvas, type, quality = HOME_QUALITY) {
  */
 async function drawHome(engine) {
   const frame = homeFrameFor(engine);
-  const view = engine.snapshotView?.({ resolution: HOME_RESOLUTION, ...(frame ? { frame } : {}) });
+  // G1283: a public picture: no players, bubbles, name plates or hint (js/public-picture.js), as saveHomeImg.
+  const view = withPublicView(engine, () => engine.snapshotView?.({ resolution: HOME_RESOLUTION, ...(frame ? { frame } : {}) }));
   if (!view?.width || !view?.height) return null;
   try {
     for (const { w, h } of homeSizes(view.width, view.height)) {
@@ -436,7 +438,7 @@ async function uploadLayout(engine, s, { force = false } = {}) {
  * `render` and `encode` are the renderer's and the encoder's (tests pass their own).
  */
 export async function drawTower(engine, { render = renderHomeLocation, encode = encodeCanvas } = {}) {
-  const shot = await render(engine, { kind: 'tower', width: TOWER_SHOT_WIDTH });
+  const shot = await render(engine, { kind: 'tower', width: TOWER_SHOT_WIDTH, public: true });
   const canvas = shot?.canvas;
   if (!canvas?.width || !canvas?.height) return null;
   try {

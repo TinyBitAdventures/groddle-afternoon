@@ -62,7 +62,7 @@ import {
 } from '../snaps.js?v=887f3da9';
 import { VINTAGE_TEXT, applyFilter, filterComponents, filtersFor } from '../snap-filters.js?v=32315cf1';
 import { HOME_SHOT_COPY, homeShotState } from '../home-shot.js?v=4384d3a2';
-import { renderHomeLocation } from '../home-shot-render.js?v=913b14b9';
+import { renderHomeLocation } from '../home-shot-render.js?v=cac82952';
 
 export const SNAPS_FEATURE_ID = 'snaps';
 const VERB = 'take_picture';

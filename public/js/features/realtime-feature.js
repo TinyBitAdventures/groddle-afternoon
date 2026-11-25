@@ -74,6 +74,7 @@ import { playOverlay } from '../overlays.js?v=91dcee74';
 import { publicStreet } from '../shared-street.js?v=dce5694b';
 import { anchorBottomCentre } from '../sprite-feet.js?v=6358a697';
 import { NAMEPLATE_STYLE } from '../world-text.js?v=6b49f88c';
+import { PUBLIC_HIDE } from '../public-picture.js?v=1a0b03fa';
 
 export const REALTIME_FEATURE_ID = 'realtime';
 /** Lines kept in the chat log. */
@@ -343,6 +344,8 @@ function createSession(engine) {
     plate.roundRect(-Math.ceil(name.width / 2) - 7, name.y - name.height - 4, Math.ceil(name.width) + 14, Math.ceil(name.height) + 7, 7)
       .fill({ color: 0xfffdf5, alpha: 0.86 }).stroke({ width: 1, color: 0x5fa83a, alpha: 0.7 });
     root.addChild(body, plate, name);
+    // G1283: a picture that can be shown publicly leaves another player and their name plate out.
+    root.publicPicture = PUBLIC_HIDE;
     root.zIndex = remoteAvatarZ(arrivals++);
     root.eventMode = 'none';
     root.x = p.x;

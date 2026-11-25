@@ -10,6 +10,10 @@
  *   kind        'house' | 'tower' | 'street', or omitted for where the player stands
  *   resolution  pixels per world px (a Snap: the renderer's own), capped to fit maxW x maxH
  *   width       a set picture width instead (an automatic upload: 720 as homes.setImage took)
+ *   public      a picture that can be shown publicly (G1283: an upload for the site's pages):
+ *               the live scene is drawn without players or anything over them (bubbles, name
+ *               plates, the hint; js/public-picture.js), as Glitch's saveHomeImg left every PC
+ *               and overlay out. The camera's whole-house Snap leaves it off and keeps the screen.
  *
  * The place comes from features/homes-feature.js (engine.query('homeShotSource', engine, kind)):
  * the house or Tower as its floors, ground floor first, each { index, top, bottom, bound, pitch,
@@ -26,6 +30,7 @@ import { readbackCanvas } from './render-probe.js?v=519c86ef';
 import { isLoaded, whenLoaded } from './textures.js?v=b8e38103';
 import { homeShotBands, homeShotRows, homeShotScale, homeShotSize } from './home-shot.js?v=4384d3a2';
 import { homeFrameFor } from './home-layout-scene.js?v=7f45c357';
+import { withPublicView } from './public-picture.js?v=1a0b03fa';
 
 /** How long a texture still loading is waited for before the picture is drawn anyway (ms). */
 export const HOME_SHOT_WAIT_MS = 4000;
@@ -84,12 +89,16 @@ function worldOf(engine) {
   return engine?.entityLayer?.parent || null;
 }
 
-/** One live frame of the scene: the camera over it (engine.viewAt), textures waited for, drawn, put back. */
-async function liveFrame(engine, io, frame, resolution, timeoutMs) {
+/**
+ * One live frame of the scene: the camera over it (engine.viewAt), textures waited for, drawn, put
+ * back. `isPublic`: drawn with players and everything over them hidden (withPublicView).
+ */
+async function liveFrame(engine, io, frame, resolution, timeoutMs, isPublic = false) {
   const world = worldOf(engine);
   if (!world || typeof engine.viewAt !== 'function') return null;
   await settle(engine.viewAt(frame, () => pendingTextures(world)), timeoutMs);
-  return engine.viewAt(frame, () => io.read(world, { width: frame.w, height: frame.h, resolution, x: frame.x, y: frame.y }));
+  const read = () => io.read(world, { width: frame.w, height: frame.h, resolution, x: frame.x, y: frame.y });
+  return engine.viewAt(frame, () => (isPublic ? withPublicView(engine, read) : read()));
 }
 
 /**
@@ -106,7 +115,7 @@ export async function renderHomeShot(engine, source, opts = {}) {
     const f = source.frame || wholeStreetFrame(engine);
     if (!f || !(f.w > 0) || !(f.h > 0)) return null;
     const scale = homeShotScale({ w: f.w, h: f.h, ...fit });
-    const canvas = await liveFrame(engine, io, f, scale, timeoutMs);
+    const canvas = await liveFrame(engine, io, f, scale, timeoutMs, opts.public === true);
     if (!canvas?.width) return null;
     return { canvas, w: canvas.width, h: canvas.height, scale, kind: 'street', floors: 1, placeW: f.w, placeH: f.h };
   }
@@ -130,7 +139,7 @@ export async function renderHomeShot(engine, source, opts = {}) {
     const frame = { x: Number(floor.x0) || 0, y: band.y0, w: width, h: band.y1 - band.y0 };
     let piece = null;
     if (floor.live) {
-      piece = await liveFrame(engine, io, frame, scale, timeoutMs);
+      piece = await liveFrame(engine, io, frame, scale, timeoutMs, opts.public === true);
     } else if (typeof floor.build === 'function') {
       const container = floor.build();
       try {

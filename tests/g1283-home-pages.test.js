@@ -30,6 +30,8 @@ import {
 } from '../public/js/profiles.js?v=7caf2524';
 import { createMinnAccount } from '../public/js/minn-account.js?v=3d783519';
 import { drawTower, markHomeStale, profilesFeature, profilesState, towerTick, uploadTower } from '../public/js/features/profiles-feature.js?fresh=g1283';
+import { renderHomeShot } from '../public/js/home-shot-render.js?v=cac82952';
+import { PUBLIC_HIDE, publicHidden, withPublicView } from '../public/js/public-picture.js?v=1a0b03fa';
 import { GAME_DIR, HAS_SITE, SITE_DIR, skipWithoutSite } from '../tools/repos.mjs';
 
 const read = (rel) => readFileSync(join(GAME_DIR, rel), 'utf8');
@@ -109,7 +111,7 @@ describe('the upload hook (features/profiles-feature.js)', () => {
     assert.equal(towerTick(engine, s, T0, opts), null, 'just arrived');
     assert.equal(towerTick(engine, s, T0 + HOME_SETTLE_MS - 1, opts), null);
     assert.equal(await towerTick(engine, s, T0 + HOME_SETTLE_MS, opts), true);
-    assert.deepEqual(calls.render, [{ kind: 'tower', width: 720 }], 'every floor, 720 wide (renderHomeLocation)');
+    assert.deepEqual(calls.render, [{ kind: 'tower', width: 720, public: true }], 'every floor, 720 wide, as a public picture (renderHomeLocation)');
     assert.deepEqual(calls.encode, [[720, 1206, 'image/webp', 0.85]]);
     assert.deepEqual(calls.upload, [{ key: towerKeyOf(TOWER, T0 + HOME_SETTLE_MS), tower: 'QUJD', name: 'Zz Spire' }]);
     assert.equal(data.profileTower, 'uploaded');
@@ -129,7 +131,7 @@ describe('the upload hook (features/profiles-feature.js)', () => {
       assert.equal(s.home.staleAt, t + 10, 'the home street\'s picture too');
       assert.equal(await towerTick(engine, s, t + 10 + HOME_STALE_DELAY_MS - 1, opts), false, `${why}: not 3 s yet`);
       assert.equal(await towerTick(engine, s, t + 10 + HOME_STALE_DELAY_MS, opts), true, `${why}: 3 s after`);
-      assert.deepEqual(calls.render, [{ kind: 'tower', width: 720 }]);
+      assert.deepEqual(calls.render, [{ kind: 'tower', width: 720, public: true }]);
       assert.equal(s.tower.staleAt, 0);
     }
   });
@@ -185,7 +187,7 @@ describe('the upload hook (features/profiles-feature.js)', () => {
     assert.equal(await drawTower({}, { render: shot(720, TOWER_MAX.h + 1), encode: enc }), null);
     assert.equal(await drawTower({}, { render: async () => null, encode: enc }), null, 'no Tower to draw');
     const src = read('public/js/features/profiles-feature.js');
-    assert.match(src, /const shot = await render\(engine, \{ kind: 'tower', width: TOWER_SHOT_WIDTH \}\);/);
+    assert.match(src, /const shot = await render\(engine, \{ kind: 'tower', width: TOWER_SHOT_WIDTH, public: true \}\);/);
     assert.match(src, /import \{ renderHomeLocation \} from '\.\.\/home-shot-render\.js\?v=[0-9a-f]{8}';/, 'the reusable render lane houseshotk landed');
   });
 
@@ -197,6 +199,91 @@ describe('the upload hook (features/profiles-feature.js)', () => {
     assert.equal(s.tower.failedAt, T0);
     assert.equal(await uploadTower(engine, s, { now: T0 + RETRY_MS + 1, ...opts }), false, 'within five minutes of a failure');
     assert.match(read('public/js/features/profiles-feature.js'), /uploadTower: \(\) => uploadTower\(engine, s, \{ force: true \}\),/);
+  });
+});
+
+describe('public pictures leave out players and everything over them (js/public-picture.js)', () => {
+  /**
+   * A made-up stage as the game builds it (game.js: world = bgLayer, entityLayer, streetFrontLayer,
+   * fxLayer; the hint's layer beside world on the stage), with the owner's Glitch, a visitor's
+   * Glitch and name plate (realtime-feature makeRemote), a speech bubble and a hi-sign in fxLayer.
+   */
+  function stage() {
+    const node = (label, children = []) => {
+      const n = { label, visible: true, children };
+      for (const c of children) c.parent = n;
+      return n;
+    };
+    const player = node('player');
+    const visitor = node('visitor', [node('body'), node('plate'), node('name')]);
+    visitor.publicPicture = PUBLIC_HIDE;
+    const house = node('house');
+    const rock = node('magic-rock');
+    const entityLayer = node('entities', [house, player, visitor, rock]);
+    const fxLayer = node('fx', [node('speech-bubble'), node('hi-sign')]);
+    const bgLayer = node('bg');
+    const front = node('street-front');
+    const world = node('world', [bgLayer, entityLayer, front, fxLayer]);
+    const promptLayer = node('prompt-layer');
+    const cover = node('street-cover');
+    const st = node('stage', [world, promptLayer, cover]);
+    const engine = { stage: st, entityLayer, fxLayer, player, viewAt: (frame, fn) => fn(), worldW: 3000 };
+    const shown = () => Object.fromEntries([player, visitor, fxLayer, promptLayer, cover, house, rock, bgLayer, front, world].map((n) => [n.label, n.visible]));
+    return { engine, shown, nodes: { player, visitor, fxLayer, promptLayer, cover, house, rock } };
+  }
+
+  it('hides the owner, other players with their name plates, the bubbles and the hint for one draw, then puts them back', () => {
+    const { engine, shown } = stage();
+    const during = withPublicView(engine, () => shown());
+    assert.deepEqual(during, { player: false, visitor: false, fx: false, 'prompt-layer': false, 'street-cover': false, house: true, 'magic-rock': true, bg: true, 'street-front': true, world: true });
+    assert.ok(Object.values(shown()).every(Boolean), 'everything back after');
+    assert.throws(() => withPublicView(engine, () => { throw new Error('draw failed'); }), /draw failed/);
+    assert.ok(Object.values(shown()).every(Boolean), 'back after a failed draw too');
+  });
+
+  it('leaves what was already hidden hidden', () => {
+    const { engine, nodes } = stage();
+    nodes.cover.visible = false;
+    assert.ok(!publicHidden(engine).includes(nodes.cover));
+    withPublicView(engine, () => null);
+    assert.equal(nodes.cover.visible, false);
+  });
+
+  it('an upload render carries no players, bubbles or name plates; the camera\'s whole-house Snap keeps the screen', async () => {
+    for (const isPublic of [true, false]) {
+      const { engine, shown } = stage();
+      const seen = [];
+      const io = {
+        read: (container, o) => { seen.push({ ...shown(), live: container === engine.entityLayer.parent }); return { width: Math.round(o.width * o.resolution), height: Math.round(o.height * o.resolution) }; },
+        canvas: (w, h) => ({ width: w, height: h, getContext: () => ({ fillRect() {}, drawImage() {} }) }),
+      };
+      // The home street (the live scene) and a Tower whose floor the player stands on (live) above one drawn from the home.
+      await renderHomeShot(engine, { kind: 'street', frame: { x: 0, y: 0, w: 1680, h: 720 } }, { io, width: 1680, public: isPublic, timeoutMs: 1 });
+      const floor = (index, extra) => ({ index, top: 0, bottom: 300, bound: 0, pitch: 0, width: 1178, x0: 0, ...extra });
+      await renderHomeShot(engine, { kind: 'tower', width: 1178, floors: [floor(0, { live: true }), floor(1, { build: () => ({ destroy() {}, children: [] }) })] }, { io, width: 720, public: isPublic, timeoutMs: 1 });
+      // Three reads: the street, then the Tower's floors top first; the floor built from the home has no players in it.
+      assert.equal(seen.length, 3);
+      const live = seen.filter((s) => s.live);
+      assert.equal(live.length, 2);
+      for (const s of live) {
+        for (const k of ['player', 'visitor', 'fx', 'prompt-layer', 'street-cover']) assert.equal(s[k], !isPublic, `${isPublic ? 'upload' : 'Snap'}: ${k}`);
+        assert.equal(s.house, true);
+      }
+      assert.ok(Object.values(shown()).every(Boolean));
+    }
+  });
+
+  it('every upload path asks for it: the home street picture, the Tower cutaway; the visitor is marked; the Snap does not', () => {
+    const prof = read('public/js/features/profiles-feature.js');
+    assert.match(prof, /const view = withPublicView\(engine, \(\) => engine\.snapshotView\?\.\(\{ resolution: HOME_RESOLUTION, \.\.\.\(frame \? \{ frame \} : \{\}\) \}\)\);/);
+    assert.match(prof, /render\(engine, \{ kind: 'tower', width: TOWER_SHOT_WIDTH, public: true \}\)/);
+    assert.match(read('public/js/features/realtime-feature.js'), /root\.addChild\(body, plate, name\);\n[^\n]*\n\s*root\.publicPicture = PUBLIC_HIDE;/);
+    const snaps = read('public/js/features/snaps-feature.js');
+    assert.match(snaps, /renderHomeLocation\(engine, \{ kind: st\.kind, resolution:/);
+    assert.doesNotMatch(snaps, /public: true/, 'a Snap is private until its owner shares it, and keeps what is on screen');
+    // The speech bubbles, hi-signs and floating text are all in fxLayer.
+    assert.match(read('public/game.js'), /speechBubbles\.push\(bubble\);\n\s*fxLayer\.addChild\(bubble\);/);
+    assert.match(read('public/js/features/hi-signs-feature.js'), /fxLayer/);
   });
 });
 
