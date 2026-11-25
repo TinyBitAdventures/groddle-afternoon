@@ -11,7 +11,7 @@ import { after as afterAll, before as beforeAll, describe, it } from 'node:test'
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-import { homeMachinesFeature } from '../public/js/features/home-machines-feature.js?v=3c83ec82';
+import { homeMachinesFeature } from '../public/js/features/home-machines-feature.js?v=f8f69ef6';
 import { RECIPE_CATALOG, setRecipeCatalog } from '../public/js/making.js?v=1ec1075e';
 import { MAX_FUEL } from '../public/js/machines.js?v=5d749d26';
 import { fakePixi } from './fake-scene.js';
@@ -90,7 +90,12 @@ describe('#689: a home machine\'s Make offline keeps the panel open', () => {
     client.state = 'stopped';
     toasts.length = 0;
     assert.equal(session.make(0, key, 1), false, 'game.js runMakeCraft closes the panel unless startJob says false');
-    assert.deepEqual(toasts, ['You need to be online to do that.']);
+    // G1306: one wording for every shared act: "Reconnecting..." while the client comes back.
+    assert.deepEqual(toasts, ['Reconnecting...']);
+    client.state = 'replaced';
+    toasts.length = 0;
+    assert.equal(session.make(0, key, 1), false);
+    assert.deepEqual(toasts, ['You need to be online to do that.'], 'an ended client: the machines\' words');
     assert.equal(sent.length, 0);
     client.state = 'online';
     assert.equal(session.make(0, key, 1), true);

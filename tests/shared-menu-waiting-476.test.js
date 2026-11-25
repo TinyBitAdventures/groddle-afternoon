@@ -13,7 +13,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 import { COPY, greyWaitingVerbs, waitingIds } from '../public/js/street-objects.js?v=4ce8ad4f';
-import { streetObjectsFeature } from '../public/js/features/street-objects-feature.js?v=f9cff392';
+import { streetObjectsFeature } from '../public/js/features/street-objects-feature.js?v=8bb4c799';
 import { createTrantState } from '../public/js/trants.js?v=864ea9ff';
 
 const root = join(import.meta.dirname, '..');

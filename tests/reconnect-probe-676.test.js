@@ -14,9 +14,9 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 import { CLOSE_QUIET, PROBE_TIMEOUT_MS, QUIET_MS, createRealtimeClient } from '../public/js/realtime-client.js?v=9471ca67';
-import { PROBE_AFTER_MS, RECONNECTING_LINE, createOnlineRequests, waitLine } from '../public/js/online-request.js?v=825926b4';
+import { PROBE_AFTER_MS, RECONNECTING_LINE, createOnlineRequests, waitLine } from '../public/js/online-request.js?v=09ac8a9c';
 import { COPY } from '../public/js/street-objects.js?v=4ce8ad4f';
-import { streetObjectsFeature } from '../public/js/features/street-objects-feature.js?v=f9cff392';
+import { streetObjectsFeature } from '../public/js/features/street-objects-feature.js?v=8bb4c799';
 import { createTrantState } from '../public/js/trants.js?v=864ea9ff';
 
 const root = join(import.meta.dirname, '..');
@@ -273,7 +273,7 @@ describe('#676: a street object waiting on a dead socket', () => {
     for (const f of ['shared-gardens-feature', 'shared-patches-feature', 'street-objects-feature']) {
       const src = read(`public/js/features/${f}.js`);
       assert.match(src, /createOnlineRequests\(\{ waitMs: \(\) => answerWaitMs\(client\), probe: \(\) => client\?\.probe\?\.\(\) \}\)/, f);
-      assert.match(src, /!LOCAL_STATES\.has\(state\)\) engine\.toast\?\.\(waitLine\(c, COPY\.timeout\), 2400\)/, f);
+      assert.match(src, /!ENDED_STATES\.has\(state\)\) engine\.toast\?\.\(waitLine\(c, COPY\.timeout\), 2400\)/, f);
       assert.doesNotMatch(src, /engine\.toast\?\.\(COPY\.(connecting|busy|waiting),/, `${f}: every wait line goes through waitLine`);
     }
   });

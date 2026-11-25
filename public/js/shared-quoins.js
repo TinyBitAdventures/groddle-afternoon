@@ -22,8 +22,14 @@
  * player standing in it does not ask every frame.
  */
 
-/** Realtime client states that will not come back by themselves: quoins go back to solo rules. */
-export const LOCAL_STATES = Object.freeze(new Set(['off', 'signed-out', 'replaced', 'other-character', 'stopped']));
+import { NO_REALTIME_STATES } from './online-request.js?v=09ac8a9c';
+
+/**
+ * G1306 (Austin's ruling 2026-11-25): the realtime states in which a street's quoins follow the solo
+ * rules: only a site with no realtime at all. Stopped, reconnecting, replaced or signed out, the
+ * quoins drawn stay as the server had them and none is collected until the street is back.
+ */
+export const LOCAL_STATES = NO_REALTIME_STATES;
 
 export const CLAIM_WAIT_MS = 3000;
 export const RECLAIM_MS = 1200;

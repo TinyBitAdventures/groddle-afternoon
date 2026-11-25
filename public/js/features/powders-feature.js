@@ -115,6 +115,7 @@ import {
 import { itemVerbAchievementCounters } from '../item-verbs.js?v=ecade42e';
 import { copyChargesLeft, copyFromLedger, keepsCopies, spendCopyCharge, verbCopy } from '../copy-charges.js?v=ab07e909';
 import { migrateClassValue } from '../tools.js?v=4156bba8';
+import { offlineLine, sharedOffline } from '../online-request.js?v=09ac8a9c';
 import { DEAD_TRANT_CLASSES } from '../patches.js?v=3498abf3';
 import { COPY as SHARED_PATCH_COPY } from '../shared-patches.js?v=59d5b9d0';
 import { hellFeature } from './hell-feature.js?v=74604dfc';
@@ -547,6 +548,14 @@ export function runPowder(engine, classTsid, copy = null) {
     mpNote(engine, last);
     publish(engine);
     return last;
+  }
+  // G1306: a powder that reaches the street is not run on this page's own rules while it cannot reach it.
+  if (SPREAD_POWDERS.has(classTsid) && sharedOffline(ensureMp(engine))) {
+    engine.toast?.(offlineLine(mpc), 2400);
+    last = `${classTsid}:offline`;
+    mpNote(engine, last);
+    publish(engine);
+    return null;
   }
   last = `${classTsid}:${runnerFor(classTsid)(engine, classTsid)}`;
   publish(engine);

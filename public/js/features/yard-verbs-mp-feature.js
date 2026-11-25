@@ -85,10 +85,10 @@ import { woodTreeStatusLabel } from '../woodcutting.js?v=9e9af511';
 import { animalStatusLabel } from '../animals.js?v=19981d8f';
 import { frameTexture, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js?v=b8e38103';
 import { createBackYardState, homeStreetLayout, normalizeCultivationState } from '../home-cultivation.js?v=2f71ba70';
-import { insideQuery, readVisitScene } from '../neighbours-mp.js?v=f8d6357b';
+import { insideQuery, readVisitScene } from '../neighbours-mp.js?v=7cb7a3d5';
 import { saveStore } from '../save-store.js?v=4e720735';
-import { BACK_YARD_GROUND_Y, STREET_GROUND_Y, homesFeature, wearHomeCultivation } from './homes-feature.js?v=03134745';
-import { holdYardAnimal } from './animal-husbandry-feature.js?v=5f3522d1';
+import { BACK_YARD_GROUND_Y, STREET_GROUND_Y, homesFeature, wearHomeCultivation } from './homes-feature.js?v=56705fe1';
+import { holdYardAnimal } from './animal-husbandry-feature.js?v=de7aaa5d';
 import { patchesFeature, treeFrameUrl } from './patches-feature.js?v=5dbc6102';
 import {
   BACK_YARD_PREFIX,
@@ -134,6 +134,7 @@ import {
   visitorRock,
 } from '../yard-stock-mp.js?v=c91f13b7';
 import { standOnFeet } from '../sprite-feet.js?v=6358a697';
+import { offlineLine } from '../online-request.js?v=09ac8a9c';
 
 export { YARD_VERBS_MP_ID };
 
@@ -576,7 +577,7 @@ function createSession(engine, client) {
       verb = base;
     }
     if (client.state !== 'online') {
-      notice(T.offline);
+      notice(offlineLine(client));
       return true;
     }
     for (const a of sent.values()) {
@@ -758,7 +759,7 @@ function createSession(engine, client) {
   function send(kind, id, verb, reward = null) {
     if (!visit) return;
     if (client.state !== 'online') {
-      notice(T.offline);
+      notice(offlineLine(client));
       // R31 (#522): never sent, so never kept.
       undoReward({ reward });
       refreshVisit();
@@ -889,7 +890,7 @@ function createSession(engine, client) {
     const bean = String(verbId).slice(6);
     if (countItem(engine.inv, bean) < 1) return true;
     if (client.state !== 'online') {
-      notice(T.offline);
+      notice(offlineLine(client));
       return true;
     }
     for (const a of sent.values()) if (a.plant) return true;

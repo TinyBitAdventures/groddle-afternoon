@@ -72,7 +72,7 @@ import {
 } from '../trade.js?v=5fb43d2f';
 import { UNNAMED_PLAYER } from '../player-names.js?v=f9b78094';
 import { beginDrag, registerDropTarget } from '../drop-targets.js?v=59e6edb4';
-import { draggedCount, draggedStack, takeDragged } from '../drag-stack.js?v=80e43757';
+import { draggedCount, draggedStack, takeDragged } from '../drag-stack.js?v=4321c8c6';
 
 export const TRADE_FEATURE_ID = 'trade';
 export const TRADE_VERB = 'trade_start';

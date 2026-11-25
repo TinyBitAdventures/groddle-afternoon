@@ -69,7 +69,8 @@ import { createMinnAccount } from '../minn-account.js?v=7c3bdd51';
 import { saveStore, savedThrough } from '../save-store.js?v=4e720735';
 import { ownGroundRows } from '../ground-stacks.js?v=22792362';
 import { pileMaxOf } from '../world-items.js?v=a5deb102';
-import { DROP_OP, DROP_QUEUE_MAX, DROP_TEXT, bucketTake, dropEffect, dropRefusalText, eatenStack, groundFrom, homePlaceOf, isFloorPlace, isPublicStreet, likeSharedStack, normalizeGroundStack, normalizeItem, normalizeMine, pickupAsk, pigAnimalKey, shareReason, stackAt, stackLeft } from '../drops-mp.js?v=499b0363';
+import { offlineLine, sharedOffline } from '../online-request.js?v=09ac8a9c';
+import { DROP_OP, DROP_QUEUE_MAX, DROP_TEXT, bucketTake, dropEffect, dropRefusalText, eatenStack, groundFrom, homePlaceOf, isFloorPlace, isPublicStreet, likeSharedStack, normalizeGroundStack, normalizeItem, normalizeMine, pickupAsk, pigAnimalKey, shareReason, stackAt, stackLeft } from '../drops-mp.js?v=6a16d73d';
 
 export const DROPS_MP_FEATURE_ID = 'drops-mp';
 const TABLE_URL = 'assets/content/trade-items.json';
@@ -304,9 +305,14 @@ function createSession(engine, client) {
    * the house on the home street and in the house, a Tower floor's own.
    */
   function here() {
-    const s = String(client.street || '');
+    if (client.state !== 'online') return null;
+    return placeOf(String(client.street || ''));
+  }
+
+  /** The place of realtime room `s` when it is the scene this game shows (here() for the room joined). */
+  function placeOf(s) {
     const scene = String(engine.streetTsid || '');
-    if (client.state !== 'online' || !s || !scene) return null;
+    if (!s || !scene) return null;
     if (isPublicStreet(s)) return s === scene ? { street: s, key: s, ox: 0, ownHome: false } : null;
     const place = homePlaceOf(s);
     if (!place) return null;
@@ -596,7 +602,7 @@ function createSession(engine, client) {
   function drop({ classTsid, count, x, y, copy = null, into = null, merge = true }) {
     const p = here();
     const c = String(classTsid || '');
-    if (!p) return null;
+    if (!p) return offlineDrop(c);
     if (!table) {
       loadTable();
       return null;
@@ -617,6 +623,20 @@ function createSession(engine, client) {
     queue.push({ street: p.street, classTsid: c, count: n, x, y, copy, into: into ? String(into) : null, merge: merge !== false, pend: q });
     pendingChanged();
     pump();
+    return true;
+  }
+
+  /**
+   * G1306 (Austin's ruling 2026-11-25): not online, a drop on a place whose ground is shared (the
+   * room this page wants is this scene) is refused, not left as a stack only this page has. A class
+   * that stays the player's own there online still drops here as in solo. Null: the drop is local.
+   */
+  function offlineDrop(c) {
+    if (!sharedOffline(client)) return null;
+    const p = placeOf(String(client.wanted || ''));
+    if (!p) return null;
+    if (table && reasonAt(p, c)) return null;
+    engine.toast?.(offlineLine(client), 2400);
     return true;
   }
 
@@ -743,7 +763,7 @@ function createSession(engine, client) {
       return false;
     }
     if (client.state !== 'online') {
-      engine.toast?.(DROP_TEXT.offline, 2400);
+      engine.toast?.(offlineLine(client), 2400);
       return false;
     }
     if (picking && Date.now() - picking.at < WAIT_MS) return true;
@@ -776,7 +796,7 @@ function createSession(engine, client) {
       redraw();
       return { ok: false, reason: 'gone', msg: DROP_TEXT.gone };
     }
-    if (client.state !== 'online') return { ok: false, reason: 'offline', msg: DROP_TEXT.offline };
+    if (client.state !== 'online') return { ok: false, reason: 'offline', msg: offlineLine(client) };
     // Already on its way to a shelf, or too many waiting.
     const live = claims.filter((q) => !q.done);
     if (live.some((q) => q.sid === sid) || live.length >= DROP_QUEUE_MAX) return { ok: false, reason: 'busy', msg: DROP_TEXT.picking };
@@ -850,7 +870,7 @@ function createSession(engine, client) {
       redraw();
       return { ok: false, reason: 'gone', msg: DROP_TEXT.gone };
     }
-    if (client.state !== 'online') return { ok: false, reason: 'offline', msg: DROP_TEXT.offline };
+    if (client.state !== 'online') return { ok: false, reason: 'offline', msg: offlineLine(client) };
     if (moving && !moving.settled && Date.now() - moving.at < WAIT_MS) return { ok: false, reason: 'busy', msg: DROP_TEXT.moving };
     const x = Number(to.x);
     const y = Number(to.y);

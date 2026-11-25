@@ -23,6 +23,7 @@
 
 import { BROADCAST_DISTANCE, createNoteState, inBroadcastReach, lothaNote, prepareToyStreet, streetToysFor, toyDecoId, toyHitBox } from '../street-toys.js?v=09630452';
 import { locationEventsApi } from './location-events-feature.js?v=ac6acbc9';
+import { offlineLine, sharedOffline } from '../online-request.js?v=09ac8a9c';
 import { TOY_CLICK, catchUpDangles, catchUpLotha, createToyTracker, toyEvents, toyMessageFor } from '../street-toys-mp.js?v=9eca3893';
 
 export const STREET_TOYS_FEATURE_ID = 'street-toys';
@@ -184,6 +185,12 @@ export function broadcast(engine, toyId) {
   // Online the street keeps the order: the server sends everyone (you too) what it runs.
   const c = shared(engine);
   if (c && c.send(TOY_CLICK, { toy: toyId })) return true;
+  // G1306: the street's toys are not played on this page's own rules while the street is not live.
+  const lc = liveClient(engine);
+  if (c || (sharedOffline(lc) && toyMessageFor({ street: lc.wanted }, tsid))) {
+    engine.toast?.(offlineLine(lc), 2400);
+    return true;
+  }
   last = toyId;
   for (const name of t.toy.events) {
     locationEventsApi.fire(engine, name);

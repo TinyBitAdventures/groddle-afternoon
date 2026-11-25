@@ -82,7 +82,7 @@ export const DROP_TEXT = Object.freeze({
   full: (place) => `This ${place} can't hold any more dropped things.`,
   gone: 'That stack has already been picked up.', // the game's own
   locked: 'You are not allowed to pick this up.', // takeable.js:39
-  offline: "You're offline.",
+  // G1306: a drop or pickup refused offline says js/online-request.js offlineLine ("Reconnecting...").
   // The drop verb's tooltip on every item (e.g. items/apple.js:84): the pack's drop prompt when the
   // stack is dropped for everyone (on a street those never merge; a house floor's do: drops.go).
   prompt: 'Drop it on the ground.',

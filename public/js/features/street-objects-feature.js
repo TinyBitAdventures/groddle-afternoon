@@ -155,7 +155,7 @@ import {
   treeSkill,
   waitingIds,
 } from '../street-objects.js?v=4ce8ad4f';
-import { answerWaitMs, createOnlineRequests, waitLine } from '../online-request.js?v=825926b4';
+import { ENDED_STATES, NO_REALTIME_STATES, answerWaitMs, createOnlineRequests, offlineLine, sharedOffline, waitLine } from '../online-request.js?v=09ac8a9c';
 import { ROCK_CATALOG } from '../mining.js?v=5e49efb3';
 import { TRANT_META, trantStatusLabel } from '../trants.js?v=864ea9ff';
 import { quoteWoodTreeHarvest } from '../woodcutting.js?v=9e9af511';
@@ -196,8 +196,13 @@ export const STREET_OBJECTS_FEATURE_ID = 'street-objects';
 const RECONCILE_MS = 250;
 /** No snapshot for the street joined in this long (a dropped obj_sync): ask again. */
 const SYNC_RETRY_MS = 3000;
-/** States in which the site has no live street at all: the local rules apply. */
-const LOCAL_STATES = new Set(['off', 'signed-out', 'replaced', 'other-character', 'stopped']);
+/**
+ * States in which the site has no live street at all: the local rules apply. G1306 (Austin's ruling
+ * 2026-11-25, #689): only a site with no realtime ('off'). Stopped, reconnecting, replaced or signed
+ * out, a shared object's verbs are refused (js/online-request.js waitLine: "Reconnecting...") and
+ * nothing is granted here; the objects keep showing what the server last said.
+ */
+const LOCAL_STATES = NO_REALTIME_STATES;
 
 let client = null;
 let copy = createStreetCopy();
@@ -217,6 +222,12 @@ let lastAnswer = '';
 let creaturesShownAt = 0;
 /** Sprites this feature set on a shared path (sprite._path), cleared when the street stops sharing. */
 let pathed = new Set();
+/**
+ * G1306: what the last snapshot said about its room, kept while the street is not live: whether the
+ * server shares nothing there (none) and which street animals it holds, so a verb on one of them is
+ * still refused rather than run on the page's own rules.
+ */
+let known = { room: '', none: false, animals: new Set() };
 
 function clearPaths() {
   for (const spr of pathed) {
@@ -230,6 +241,7 @@ function clearPaths() {
 }
 
 function reset() {
+  if (copy.snap && copy.street) known = { room: copy.street, none: copy.none, animals: new Set(copy.animals) };
   clearPaths();
   placedFor = new WeakMap();
   placedView = '';
@@ -255,7 +267,7 @@ function bind(engine) {
   c.on('state', ({ state }) => {
     if (state === 'online') return;
     reset();
-    if (pending.size && !LOCAL_STATES.has(state)) engine.toast?.(waitLine(c, COPY.timeout), 2400);
+    if (pending.size && !ENDED_STATES.has(state)) engine.toast?.(waitLine(c, COPY.timeout), 2400);
     const waited = [...pending.values()];
     pending.clear();
     publish(engine);
@@ -697,6 +709,31 @@ function shared(engine) {
   return Boolean(client) && client.state === 'online' && copy.snap && !copy.none && copy.street === objectRoom(engine);
 }
 
+/** The server said it shares nothing in this room (its snapshot, or while not live the last one's word). */
+function noneHere(engine) {
+  const room = objectRoom(engine);
+  if (copy.snap) return copy.street === room && copy.none;
+  return known.room === room && known.none;
+}
+
+/**
+ * G1306: whether the server holds this street animal. The snapshot's word while it is here; with no
+ * snapshot (connecting, reconnecting, stopped), the last one's for this room, else every street
+ * animal is taken to be the server's, so none runs on the page's own rules meanwhile.
+ */
+function heldAnimal(engine, id) {
+  const room = objectRoom(engine);
+  if (copy.snap && copy.street === room) return copy.animals.has(id);
+  if (!client || LOCAL_STATES.has(client.state)) return false;
+  if (known.room === room) return !known.none && known.animals.has(id);
+  return true;
+}
+
+/** G1306: the realtime room this page is in (or joining) is this street's, and it is not online now. */
+function offlineHere(engine, c = client) {
+  return engine?.mode === 'multiplayer' && sharedOffline(c) && roomIsStreet(engine, c) && !noneHere(engine);
+}
+
 /**
  * The realtime room whose objects are this street's: the street itself, or in a Party Space its
  * party's own room (PARTY_<id>, party-spaces-feature sharedObjectStreet), which the server lays out
@@ -809,7 +846,7 @@ function sharedVerbOn(engine, target, verbId) {
   }
   // Street animals: the player's own side (energy, lotion, daily limits, warmup) refuses locally.
   const animal = creatureOf(target);
-  if (animal && copy.animals.has(animal.id)) {
+  if (animal && heldAnimal(engine, animal.id)) {
     const [base, cls, countText] = String(verbId || '').split(':');
     if ((animal.kind === 'chicken' && base === 'squeeze') || (animal.kind === 'butterfly' && (base === 'massage' || base === 'milk'))) {
       if (verbId !== base) return null;
@@ -1091,7 +1128,7 @@ function ask(engine, target, verbId) {
   if (!roomIsStreet(engine, c)) return null;
   const verb = sharedVerbOn(engine, target, verbId);
   if (!verb) return null;
-  if (copy.none && copy.street === objectRoom(engine)) return null;
+  if (noneHere(engine)) return null;
   if (!shared(engine)) {
     engine.toast?.(waitLine(client, COPY.connecting), 2400);
     return true;
@@ -1126,7 +1163,9 @@ function refusedNow(engine, target, verbId) {
   const c = bind(engine);
   if (!c || LOCAL_STATES.has(c.state) || !roomIsStreet(engine, c)) return null;
   const verb = sharedVerbOn(engine, target, verbId);
-  if (!verb || !shared(engine)) return null;
+  if (!verb) return null;
+  // G1306: not online, a shared object's verb is refused before the swing, not after it.
+  if (!shared(engine)) return offlineHere(engine, c) ? waitLine(c, COPY.connecting) : null;
   for (const p of pending.values()) {
     if (p.id === verb.id && !p.silent) return COPY.busy;
   }
@@ -1169,7 +1208,7 @@ function askName(engine, target, value) {
   if (engine.mode !== 'multiplayer' || target?.yardVisit) return null;
   const c = bind(engine);
   if (!c || LOCAL_STATES.has(c.state) || !roomIsStreet(engine, c)) return null;
-  if (copy.none && copy.street === objectRoom(engine)) return null;
+  if (noneHere(engine)) return null;
   const pig = target?.classId === 'npc_piggy' ? streetPigIndex(target, engine.streetTsid) : -1;
   const animal = pig < 0 ? creatureOf(target) : null;
   let id = '';
@@ -1185,7 +1224,7 @@ function askName(engine, target, value) {
       return true;
     }
     // Only an animal this street's snapshot named is the server's; any other stays the page's own.
-    if (!copy.animals.has(animal.id)) return null;
+    if (!heldAnimal(engine, animal.id)) return null;
     id = animal.id;
   } else return null;
   for (const p of pending.values()) {
@@ -1324,7 +1363,7 @@ export const streetObjectsFeature = {
     const c = bind(engine);
     if (!c || LOCAL_STATES.has(c.state) || !roomIsStreet(engine, c)) return null;
     const pig = streetPigIndex(target, engine.streetTsid);
-    if (pig < 0 || (copy.none && copy.street === objectRoom(engine))) return null;
+    if (pig < 0 || noneHere(engine)) return null;
     const id = pigId(pig);
     if (!shared(engine) || !copy.objs.has(id)) {
       engine.toast?.(waitLine(client, COPY.connecting), 2400);
@@ -1375,6 +1414,11 @@ export const streetObjectsFeature = {
    */
   sharedGuanoPick(target, engine, x = null) {
     const a = creatureOf(target);
+    // G1306: a shared pile drawn before the street went offline is not picked up on this page's rules.
+    if (a?.kind === 'batterfly' && !shared(engine) && offlineHere(engine, bind(engine))) {
+      engine.toast?.(offlineLine(client), 2400);
+      return true;
+    }
     if (!a || a.kind !== 'batterfly' || !shared(engine) || !guanoPiles(copy) || !copy.animals.has(a.id)) return null;
     for (const p of pending.values()) {
       if (p.id === a.id && !p.silent) {
@@ -1468,6 +1512,11 @@ export const streetObjectsFeature = {
   sharedFertilize(targets, lite, engine, classTsid = lite ? 'fertilidust_lite' : 'fertilidust', copy = null) {
     if (!engine || engine.mode !== 'multiplayer') return null;
     const patchTrees = (targets || []).filter((t) => typeof t?.sharedPatch === 'string' && t.sharedPatch);
+    // G1306: not online, the dust grows no shared tree on this page's rules (street trees or a shared Patch's).
+    if (!shared(engine) && offlineHere(engine, bind(engine)) && (patchTrees.length || (targets || []).some(isStreetTree))) {
+      engine.toast?.(offlineLine(client), 2400);
+      return true;
+    }
     if (!shared(engine) && !patchTrees.length) return null;
     const trees = shared(engine) ? (targets || []).filter(isStreetTree) : [];
     if (!trees.length && !patchTrees.length) return null;
@@ -1542,6 +1591,7 @@ export const streetObjectsFeature = {
     client = null;
     creaturesShownAt = 0;
     reset();
+    known = { room: '', none: false, animals: new Set() };
     pending.clear();
     grant = null;
     reqSeq = 0;

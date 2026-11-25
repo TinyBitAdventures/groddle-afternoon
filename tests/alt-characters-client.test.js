@@ -21,7 +21,7 @@ import { CLOSE_OTHER_CHARACTER, createRealtimeClient } from '../public/js/realti
 import { OTHER_CHARACTER_TEXT, statusText } from '../public/js/features/realtime-feature.js?v=258fc1f0';
 import { CHARACTER_COPY, FRESH_HASH, SAVE_ALERT_COPY, characterChoices, continuesAs, createRefusalText, saveAlertFor } from '../public/js/online-boot.js?v=f1f2766b';
 import { SWITCHER_COPY, STYLE as SWITCHER_STYLE, cardUrl, popoverPlace, switcherChoices } from '../public/js/character-switcher.js?v=265e3b6a';
-import { LOCAL_STATES } from '../public/js/shared-quoins.js?v=89d7b201';
+import { LOCAL_STATES } from '../public/js/shared-quoins.js?v=7feb4ae3';
 import { menuRowFor } from '../public/js/ui/topbar.js?v=95c1fdb0';
 
 const root = join(import.meta.dirname, '..');

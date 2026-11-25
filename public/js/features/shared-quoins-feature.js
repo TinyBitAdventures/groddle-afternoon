@@ -31,8 +31,11 @@
  * the touch is left to game.js, which says so and leaves the quoin alone.
  * Personal quoins (Qurazy, quest rewards, private instances, homes) never
  * come here. A Party Space's quoins are its party's (G334): the space's hub
- * street (PARTY_<id>, the sharedQuoinStreet query) is the street they share. If realtime is off for good (off, signed out, replaced) the
- * street's quoins are this player's own again, as in solo.
+ * street (PARTY_<id>, the sharedQuoinStreet query) is the street they share. Only on a site with no realtime at all ('off') are the
+ * street's quoins this player's own, as in solo. G1306 (Austin's ruling 2026-11-25): stopped,
+ * reconnecting, replaced or signed out, the quoins drawn stay as the server had them (a street
+ * entered meanwhile hides them: nobody knows which are there), and a touch collects nothing and says
+ * "Reconnecting..." (js/online-request.js offlineLine) until the street is back.
  *
  * QA: canvas data sharedQuoins (pending | shared | local | off),
  * sharedQuoinsStreet, sharedQuoinsLive (spawned/total), sharedQuoinLast
@@ -41,12 +44,15 @@
 
 import { QUOIN_TYPES, creditQuoinStat } from '../quoins.js?v=5abad2c7';
 import { quoinShardGrabberSound, quoinShardSoundKey } from '../quoin-shards.js?v=121156a0';
-import { LOCAL_STATES, SHARD_STATS, createSharedQuoinBook, fxShards, normalizeGrab, shardFor, statusOf } from '../shared-quoins.js?v=89d7b201';
+import { LOCAL_STATES, SHARD_STATS, createSharedQuoinBook, fxShards, normalizeGrab, shardFor, statusOf } from '../shared-quoins.js?v=7feb4ae3';
 import { publicStreet } from '../shared-street.js?v=dce5694b';
+import { offlineLine, sharedOffline } from '../online-request.js?v=09ac8a9c';
 
 export const SHARED_QUOINS_FEATURE_ID = 'shared-quoins';
 /** Status goes out on a change, and at least this often while on a street. */
 const STATUS_EVERY_MS = 15000;
+/** G1306: a quoin touched while the street is not live says so at most this often. */
+const OFFLINE_SAY_MS = 4000;
 
 let client = null;
 let book = null;
@@ -60,6 +66,7 @@ let asked = '';
 let statusKey = '';
 let statusAt = 0;
 let mode = 'off';
+let offlineSaidAt = 0;
 
 function multiplayer(engine) {
   return engine?.mode === 'multiplayer';
@@ -305,7 +312,7 @@ export const sharedQuoinsFeature = {
     }
     const next = currentMode(engine);
     if (next !== mode) {
-      // Realtime is gone for good: the drawn quoins are this player's own again.
+      // No realtime on this site: the drawn quoins are this player's own.
       if (next === 'local') for (const q of naturalQuoins(engine)) q.visible = true;
       mode = next;
       publish(engine);
@@ -324,7 +331,14 @@ export const sharedQuoinsFeature = {
     if (Number.isInteger(q.summersDayBonusIndex) || Number.isInteger(q.summersDayRewardIndex)) return null;
     const m = currentMode(engine);
     if (m === 'local' || m === 'off') return null;
-    if (m === 'pending' || !q.sharedQuoin) return true;
+    if (m === 'pending' || !q.sharedQuoin) {
+      // G1306: not online, nothing is collected here; the touch says why (not every frame).
+      if (sharedOffline(client) && Date.now() - offlineSaidAt >= OFFLINE_SAY_MS) {
+        offlineSaidAt = Date.now();
+        engine.toast?.(offlineLine(client), 2000);
+      }
+      return true;
+    }
     const qs = engine.quoinState;
     // quoin.js 159: at the daily limit the quoin is not taken; game.js says so.
     if (qs && q.typeId !== 'qurazy' && qs.collectedToday >= qs.dailyLimit) return null;

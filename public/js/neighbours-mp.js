@@ -27,7 +27,7 @@
 import { SEED_CATALOG, applyFertilizer, sowPlot, wetPlot } from './garden.js?v=a7c6f521';
 import { normalizeParcelBox, stackCopy } from './butler.js?v=152429c8';
 import { normalizeVisitGnomes } from './garden-gnome.js?v=d9f8e52b';
-import { DROP_TEXT } from './drops-mp.js?v=499b0363';
+import { DROP_TEXT } from './drops-mp.js?v=6a16d73d';
 
 /** The realtime server's street for a player's home street (homes.go). */
 export const HOME_STREET_PREFIX = 'HOME_';

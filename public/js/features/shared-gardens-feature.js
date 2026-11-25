@@ -41,9 +41,11 @@
  *   and acknowledged as a pick's.
  * - Others' tools: garden_ev's "tool" draws that player's can, hoe or Guano in a bubble over their
  *   head for the act's time, as the original's pc_overlay to the street did.
- * - The server without this module (bad_frame), a "none" answer, or no live
- *   realtime: the bed goes back to the save's own plots and every verb is
- *   local, as before G368. Solo never comes here (engine.mode).
+ * - The server without this module (bad_frame), a "none" answer, or a site
+ *   with no realtime ('off'): the bed goes back to the save's own plots and
+ *   every verb is local, as before G368. G1306: stopped, reconnecting,
+ *   replaced or signed out, the bed stays as the server had it and its verbs
+ *   are refused ("Reconnecting..."). Solo never comes here (engine.mode).
  *
  * QA: canvas data sharedGardens (street:snap|none|local|waiting), sharedGardensLast
  * (plot:verb:ok|code), sharedGardensView (each plot as this page has it: default:1-1=crop@7,
@@ -72,7 +74,7 @@ import { addItem, countItem, ITEM_CATALOG, itemIcon } from '../inventory.js?v=64
 import { JOB_WORK_BUBBLE, JOB_WORK_OVERLAY, JOB_WORK_REMOTE_BUBBLE_DY, jobWorkToolScale, jobWorkToolSheet } from '../job-work-fx.js?v=a2dc6a5a';
 import { frameTexture, sourceFromUrl, textureFromUrl } from '../textures.js?v=b8e38103';
 import { gardenGrowModifier } from '../imagination-effects.js?v=70169933';
-import { answerWaitMs, createOnlineRequests, waitLine } from '../online-request.js?v=825926b4';
+import { ENDED_STATES, NO_REALTIME_STATES, answerWaitMs, createOnlineRequests, sharedOffline, waitLine } from '../online-request.js?v=09ac8a9c';
 import { saveStore, savedThrough } from '../save-store.js?v=4e720735';
 import {
   LOCK_LINE,
@@ -96,7 +98,12 @@ const APPLIED_KEEP = 100;
  * is there pays for it from the earning budget, which an earner who spent theirs would see clamped.
  */
 const GRANT_SAVE_DELAY_MS = 2500;
-const LOCAL_STATES = new Set(['off', 'signed-out', 'replaced', 'other-character', 'stopped']);
+/**
+ * G1306 (Austin's ruling 2026-11-25, #689): the plots are the save's own only on a site with no
+ * realtime ('off'). Stopped, reconnecting, replaced or signed out, they stay drawn as the server had
+ * them and a verb is refused (waitLine: "Reconnecting...") with nothing granted here.
+ */
+const LOCAL_STATES = NO_REALTIME_STATES;
 const COPY = Object.freeze({
   connecting: 'The street is still connecting. Try again in a moment.',
   timeout: 'The garden did not answer. Try again.',
@@ -283,7 +290,7 @@ function bind(engine) {
   client = c;
   c.on('state', ({ state }) => {
     if (state === 'online') return;
-    if (pending.size && !LOCAL_STATES.has(state)) engine.toast?.(waitLine(c, COPY.timeout), 2400);
+    if (pending.size && !ENDED_STATES.has(state)) engine.toast?.(waitLine(c, COPY.timeout), 2400);
     pending.clear();
     if (LOCAL_STATES.has(state)) backToLocal(engine);
     const beds = copy.beds;
@@ -766,6 +773,12 @@ export const sharedGardensFeature = {
 
   /** game.js beginVerbAction: another player's crop in its planter's 60 seconds (GardenView.as 481-486). */
   verbRefusedNow(target, verbId, engine) {
+    // G1306: not online, a shared plot's or bed's verb is refused before its bar (ask says the same after).
+    if (engine?.mode === 'multiplayer' && isSharedTarget(target) && sharedOffline(bind(engine)) && !shared(engine)) {
+      const base = String(verbId || '').split(':')[0];
+      const isBed = target.classId === 'garden_new';
+      if (isBed ? verbId === 'water_all' : VERBS.has(base) && (base === verbId || base === 'plant')) return waitLine(client, COPY.connecting);
+    }
     if (verbId !== 'harvest' || target?.classId !== 'garden_plot' || !target.state?.garden?.shared || !shared(engine)) return null;
     return lockedFor(target.state.plot, me()) ? LOCK_LINE : null;
   },

@@ -105,15 +105,16 @@ import { RECIPE_CATALOG } from '../making.js?v=1ec1075e';
 import { getSkillCatalog } from '../content-catalogs.js?v=2b7048b9';
 import { createBackYardState, homeStreetLayout, normalizeCultivationState } from '../home-cultivation.js?v=2f71ba70';
 import { lookOf, poseOf } from './realtime-feature.js?v=258fc1f0';
-import { insideQuery, readVisitScene } from '../neighbours-mp.js?v=f8d6357b';
+import { insideQuery, readVisitScene } from '../neighbours-mp.js?v=7cb7a3d5';
 import { saveStore } from '../save-store.js?v=4e720735';
 import { frameTexture, sourceFromUrl, textureFromUrl } from '../textures.js?v=b8e38103';
 import { createSheetLoader } from '../sprite-sheets.js?v=d787e3c3';
-import { STREET_GROUND_Y, homesFeature } from './homes-feature.js?v=03134745';
+import { STREET_GROUND_Y, homesFeature } from './homes-feature.js?v=56705fe1';
 import { payAltarBonus } from './machine-rooms-feature.js?v=e27c6152';
 import { worldToScreen } from '../street-model.js?v=a9a05f9d';
 import { nearestSurfaceY } from '../walk-surface.js?v=3c919d5b';
 import { standOnFeet } from '../sprite-feet.js?v=6358a697';
+import { offlineLine } from '../online-request.js?v=09ac8a9c';
 
 export { HOME_MACHINES_ID };
 
@@ -557,7 +558,7 @@ function createSession(engine, client) {
 
   function send(verb, m, extra = {}, { retried = false } = {}) {
     if (!client || client.state !== 'online') {
-      say(T.offline);
+      say(offlineLine(client));
       return false;
     }
     req += 1;
@@ -567,7 +568,7 @@ function createSession(engine, client) {
     const ok = client.send('home_machine', { req, owner, verb, ...(m ? { id: m.id } : {}), ...extra });
     if (ok === false) {
       sent.delete(req);
-      say(T.offline);
+      say(offlineLine(client));
       return false;
     }
     last = `sent:${verb}:${m?.id || extra.class || ''}`;
@@ -605,7 +606,7 @@ function createSession(engine, client) {
     if (mp) {
       // #689: offline the act can't go: say so and keep the Make panel open (false), as a refusal does.
       if (!client || client.state !== 'online') {
-        say(T.offline);
+        say(offlineLine(client));
         return false;
       }
       // The ledger counts what the last save held: write it first, then ask.

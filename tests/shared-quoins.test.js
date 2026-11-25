@@ -23,8 +23,8 @@ import {
   normalizeSync,
   shardFor,
   statusOf,
-} from '../public/js/shared-quoins.js?v=89d7b201';
-import { sharedQuoinsFeature } from '../public/js/features/shared-quoins-feature.js?v=15495d40';
+} from '../public/js/shared-quoins.js?v=7feb4ae3';
+import { sharedQuoinsFeature } from '../public/js/features/shared-quoins-feature.js?v=60096224';
 import {
   QUOIN_SHARD_FLOOR,
   QUOIN_SHARD_NEAR,
@@ -120,7 +120,8 @@ describe('the book', () => {
     assert.equal(shardFor(grab, 9), null);
     assert.deepEqual(statusOf({ afk: true, following: 'yes', multiplier: 250 }), { afk: true, following: false, mult: 100 });
     assert.deepEqual(statusOf({ multiplier: 'x' }), { afk: false, following: false, mult: 1 });
-    assert.ok(LOCAL_STATES.has('replaced') && !LOCAL_STATES.has('offline'));
+    // G1306: only a site with no realtime follows the solo rules (tests/offline-shared-g1306.test.js).
+    assert.ok(LOCAL_STATES.has('off') && !LOCAL_STATES.has('replaced') && !LOCAL_STATES.has('stopped') && !LOCAL_STATES.has('offline'));
   });
 });
 
@@ -295,10 +296,14 @@ describe('the feature', () => {
     sharedQuoinsFeature.onTick(16, 0, engine);
     assert.deepEqual(client.sent.at(-1), { t: 'quoin_status', afk: true, following: false, mult: 2 });
 
-    // Realtime gone for good: the quoins drawn are the player's own again.
+    // G1306: replaced, nothing is collected here; only a site with no realtime makes them the player's own.
     client.emit('msg:quoin_back', { street: 'GQTEST', i: 1 });
     client.state = 'replaced';
     client.emit('roster', { street: '', players: [] });
+    sharedQuoinsFeature.onTick(16, 0, engine);
+    assert.equal(engine.data.sharedQuoins, 'pending');
+    assert.equal(sharedQuoinsFeature.quoinTouched(quoinAt(engine, 1), engine), true);
+    client.state = 'off';
     sharedQuoinsFeature.onTick(16, 0, engine);
     assert.equal(engine.data.sharedQuoins, 'local');
     assert.equal(sharedQuoinsFeature.quoinTouched(quoinAt(engine, 1), engine), null);

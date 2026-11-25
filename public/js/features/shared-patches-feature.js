@@ -72,7 +72,7 @@
 
 import { addItem, countItem, ITEM_CATALOG } from '../inventory.js?v=6414dbdc';
 import { exposeQA } from '../qa-gate.js?v=f4e2cd82';
-import { answerWaitMs, createOnlineRequests, waitLine } from '../online-request.js?v=825926b4';
+import { ENDED_STATES, NO_REALTIME_STATES, answerWaitMs, createOnlineRequests, sharedOffline, waitLine } from '../online-request.js?v=09ac8a9c';
 import { saveStore, savedThrough } from '../save-store.js?v=4e720735';
 import { patchesFeature } from './patches-feature.js?v=5dbc6102';
 import {
@@ -111,7 +111,12 @@ const TEND_LOCK_MS = 10000;
  * outbox (credits.go, batched), and a save that shows the items first pays them from the budget.
  */
 const GRANT_SAVE_DELAY_MS = 2500;
-const LOCAL_STATES = new Set(['off', 'signed-out', 'replaced', 'other-character', 'stopped']);
+/**
+ * G1306 (Austin's ruling 2026-11-25, #689): the plots are the save's own only on a site with no
+ * realtime ('off'). Stopped, reconnecting, replaced or signed out, they stay drawn as the server had
+ * them and a verb is refused (waitLine: "Reconnecting...") with nothing granted here.
+ */
+const LOCAL_STATES = NO_REALTIME_STATES;
 /** The soil verbs this feature asks about (tree verbs stay the page's until lane 3). */
 const SOIL_VERBS = new Set(['tend', 'dig', 'plant', 'pet', 'clear']);
 /** Verbs with an action bar the server hears the start of. */
@@ -290,7 +295,7 @@ function bind(engine) {
   client = c;
   c.on('state', ({ state }) => {
     if (state === 'online') return;
-    if ([...pending.values()].some((p) => p.phase === 'land') && !LOCAL_STATES.has(state)) engine.toast?.(waitLine(c, COPY.timeout), 2400);
+    if ([...pending.values()].some((p) => p.phase === 'land') && !ENDED_STATES.has(state)) engine.toast?.(waitLine(c, COPY.timeout), 2400);
     pending.clear();
     startRefused.clear();
     serverOff = false;
@@ -790,6 +795,11 @@ export const sharedPatchesFeature = {
   /** game.js beginVerbAction: another player tending (or digging) refuses before the bar (patch.js 171-174, 373-381). */
   verbRefusedNow(target, verbId, engine) {
     const key = sharedKey(target);
+    // G1306: not online, a shared plot's soil verb or a shared Patch tree's verb is refused before its bar.
+    if (engine?.mode === 'multiplayer' && enabled && !shared(engine) && live(engine) && sharedOffline(client)) {
+      const base = String(verbId || '').split(':')[0];
+      if ((key && SOIL_VERBS.has(base)) || (sharedTreeKey(target) && TREE_VERBS.includes(verbId))) return waitLine(client, COPY.connecting);
+    }
     if (!key || !shared(engine)) return null;
     return refusedBeforeBar(copy.plots.get(key), verbId, me());
   },

@@ -91,6 +91,7 @@ import { FOX_FLURRY_COUNTER, foxLegFrom, foxOnLeg, igniteBaitXs, normalizeBaits,
 import { clockOffset } from '../street-creatures.js?v=5ca995d4';
 import { itemZ } from '../item-bands.js?v=ec366be3';
 import { topUpMetabolic } from '../metabolics.js?v=48f784bf';
+import { offlineLine, sharedOffline } from '../online-request.js?v=09ac8a9c';
 
 export const FOX_FEATURE_ID = 'foxes';
 /** {name} in the Fox Ranger's lines: the remake has no player names in solo, so "friend", as quests.js fills {pc_label}. */
@@ -753,6 +754,14 @@ function performBrush(engine, entity, { ignoreReach = false } = {}) {
     publish(engine, true);
     return { ok: false, reason: 'out_of_reach' };
   }
+  // G1306: the server's fox (it counts everyone's brushes and sends it off) is not brushed on this
+  // page's own rules while the street is not live.
+  if (mp && entity.serverId && sharedOffline(mp.client)) {
+    engine.toast(offlineLine(mp.client), 2400);
+    lastBrush = 'offline';
+    publish(engine, true);
+    return { ok: false, reason: 'offline' };
+  }
   const result = brushFox({
     pc: engine.pc,
     inv: engine.inv,
@@ -1074,7 +1083,7 @@ function ignite(engine) {
     // Multiplayer: the server drops the baits for everyone and decides the fox (foxes.go fox_ignite).
     if (!mp.client.send('fox_ignite', { baits: igniteBaitXs(p.x, engine.worldW, rng) })) {
       addItem(engine.inv, FOX_BAIT_ID, 1);
-      engine.toast('You are offline.', 2400);
+      engine.toast(offlineLine(mp.client), 2400);
       return false;
     }
     mp.refundAt = now + 4000;

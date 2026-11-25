@@ -49,9 +49,40 @@ export const PROBE_AFTER_MS = 3000;
 /** #676: the words while the socket connects again, in place of "still asking" and "still connecting". */
 export const RECONNECTING_LINE = 'Reconnecting...';
 
-/** #676: a feature's line (busy, connecting, timeout), or RECONNECTING_LINE while its client connects again. */
+/**
+ * G1306 (Austin's ruling 2026-11-25, #689): the one realtime state with no shared world at all: the
+ * site runs no realtime (the ticket route's 503, realtime-client.js 'off'). Only then do shared
+ * things (quoins, street objects, gardens, Patches) follow the solo rules on this page. Every other
+ * state that is not 'online' (connecting, offline, stopped, replaced, signed out...) stops them.
+ */
+export const NO_REALTIME_STATES = Object.freeze(new Set(['off']));
+/** G1306: states the client does not leave by itself (realtime-feature says why); never "Reconnecting...". */
+export const ENDED_STATES = Object.freeze(new Set(['off', 'signed-out', 'replaced', 'other-character', 'booted', 'suspended']));
+/** G1306: a shared act refused while this page cannot reach the street and will not by itself (home-machines.js offline). */
+export const OFFLINE_LINE = 'You need to be online to do that.';
+
+/**
+ * G1306: multiplayer with a realtime client that is not online now but the street is shared: shared
+ * acts are refused (offlineLine), nothing is granted here. False in solo (no client) and with no
+ * realtime on the site ('off').
+ */
+export function sharedOffline(client) {
+  return Boolean(client) && client.state !== 'online' && !NO_REALTIME_STATES.has(client.state);
+}
+
+/** G1306: the words for a shared act refused while not online: "Reconnecting..." unless the client has ended. */
+export function offlineLine(client) {
+  return ENDED_STATES.has(client?.state) ? OFFLINE_LINE : RECONNECTING_LINE;
+}
+
+/**
+ * #676: a feature's line (busy, connecting, timeout), or RECONNECTING_LINE while its client connects
+ * again. G1306: a stopped or retrying client says "Reconnecting..." too, an ended one OFFLINE_LINE.
+ */
 export function waitLine(client, line) {
-  return client?.reconnecting ? RECONNECTING_LINE : line;
+  if (client?.reconnecting || client?.state === 'stopped' || client?.state === 'offline') return RECONNECTING_LINE;
+  if (ENDED_STATES.has(client?.state)) return OFFLINE_LINE;
+  return line;
 }
 
 /** How long to wait for an answer on this connection: hello's word, else the fallback. */

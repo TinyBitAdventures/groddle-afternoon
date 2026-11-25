@@ -123,7 +123,7 @@ import { ILMENSKIE_QUEST_ID } from '../public/js/ilmenskie-quest.js?v=0e9809ac';
 import { FIRST_SKILL_QUEST_ID } from '../public/js/quest-offers.js?v=ea6fde02';
 import { CAMERA_OFFER } from '../public/js/snaps.js?v=b5be8bff';
 // #670: the classes a player keeps their own on shared ground (a note, a Still), which the site's house-floor move reads.
-import { KEPT_OWN } from '../public/js/drops-mp.js?v=499b0363';
+import { KEPT_OWN } from '../public/js/drops-mp.js?v=6a16d73d';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 export const OUT = sitePath('data', 'economy.json');

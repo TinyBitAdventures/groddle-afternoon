@@ -26,7 +26,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { DROP_TEXT, dropRefusalText, nextUtcDay, untilText, waitingText } from '../public/js/drops-mp.js?v=499b0363';
+import { DROP_TEXT, dropRefusalText, nextUtcDay, untilText, waitingText } from '../public/js/drops-mp.js?v=6a16d73d';
 import { SITE_DIR, skipWithoutSite } from '../tools/repos.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');

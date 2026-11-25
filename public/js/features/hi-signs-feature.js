@@ -66,9 +66,10 @@
  */
 
 import { isPhoneDevice } from '../touch-controls.js?v=6e1b7f26';
-import { butlerApi } from './butler-feature.js?v=47610a80';
+import { butlerApi } from './butler-feature.js?v=4a30f957';
 import { gainMetabolic, metabolicGain, moodMax } from '../metabolics.js?v=48f784bf';
 import { frameTexture, sourceFromUrl } from '../textures.js?v=b8e38103';
+import { offlineLine } from '../online-request.js?v=09ac8a9c';
 import {
   HI,
   HI_BUTLER_ID,
@@ -704,7 +705,7 @@ function onHiState(engine, m) {
 /** sayHi in multiplayer: the server rolls and aims; hi_said comes back. */
 function sayHiMp(engine) {
   if (mpc.state !== 'online') {
-    engine.toast?.('You can say hi once you are back online.', 2400);
+    engine.toast?.(offlineLine(mpc), 2400);
     lastMsg = 'hi:offline';
     publish(engine, true);
     return lastMsg;

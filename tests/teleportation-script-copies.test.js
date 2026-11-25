@@ -45,10 +45,10 @@ import {
   scriptTitle,
   useScript,
 } from '../public/js/teleportation.js?v=cbbc673f';
-import { teleportationFeature as feature } from '../public/js/features/teleportation-feature.js?v=df49dd08';
+import { teleportationFeature as feature } from '../public/js/features/teleportation-feature.js?v=bfd738c4';
 import { cleanContents, createDroppedItemState, dropInventoryStack, pickupDroppedStack, placeDroppedBag } from '../public/js/world-items.js?v=a5deb102';
 import { cabinetPut, cabinetTake, cleanHeldList, normalizeContents } from '../public/js/home-storage.js?v=b0225465';
-import { normalizeGroundStack, normalizeItem } from '../public/js/drops-mp.js?v=499b0363';
+import { normalizeGroundStack, normalizeItem } from '../public/js/drops-mp.js?v=6a16d73d';
 import { goodsWithHeldTags, normalizeGoods } from '../public/js/trade.js?v=5fb43d2f';
 
 const root = join(import.meta.dirname, '..');

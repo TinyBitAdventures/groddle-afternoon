@@ -34,9 +34,9 @@ import {
   soilRolls,
   stripSharedPlots,
 } from '../public/js/shared-patches.js?v=59d5b9d0';
-import { sharedPatchesFeature } from '../public/js/features/shared-patches-feature.js?v=7acfd2ff';
+import { sharedPatchesFeature } from '../public/js/features/shared-patches-feature.js?v=67d1e803';
 import { patchesFeature, soilSpawnPlan } from '../public/js/features/patches-feature.js?v=5dbc6102';
-import { FEATURES } from '../public/js/features/index.js?v=9245908b';
+import { FEATURES } from '../public/js/features/index.js?v=3bce0e77';
 import { getStreetEcologyCatalog, setStreetEcologyCatalog } from '../public/js/street-ecology.js?v=58aafb61';
 import { HAS_SERVER, serverPath } from '../tools/repos.mjs';
 
@@ -718,9 +718,23 @@ describe('the feature', () => {
     assert.equal(stage('patch:2'), 'clean', 'still drawn as the server had it');
     assert.equal(sharedPatchesFeature.runVerbOverride(target(r, 'patch:2'), 'dig', r.engine), true);
     assert.equal(r.log.toasts.at(-1), COPY.connecting);
-    // Signed out: the save's own plots.
+    // G1306: stopped or signed out, the plots stay as the server had them and a verb is refused.
+    r.client.state = 'stopped';
+    r.client.emit('state', { state: 'stopped' });
+    assert.equal(sharedPatchesFeature.verbRefusedNow(target(r, 'patch:2'), 'dig', r.engine), 'Reconnecting...');
+    assert.equal(sharedPatchesFeature.runVerbOverride(target(r, 'patch:2'), 'dig', r.engine), true);
+    assert.equal(r.log.toasts.at(-1), 'Reconnecting...');
     r.client.state = 'signed-out';
     r.client.emit('state', { state: 'signed-out' });
+    await tick();
+    assert.equal(stage('patch:2'), 'clean', 'still the server\'s plot');
+    assert.ok(target(r, 'patch:2').sharedPatch);
+    assert.equal(sharedPatchesFeature.runVerbOverride(target(r, 'patch:2'), 'dig', r.engine), true);
+    assert.equal(r.log.toasts.at(-1), 'You need to be online to do that.');
+    assert.equal(r.sent.filter((m) => m.t === 'patch_act' && m.verb === 'dig').length, 0, 'nothing asked, nothing granted');
+    // A site with no realtime: the save's own plots.
+    r.client.state = 'off';
+    r.client.emit('state', { state: 'off' });
     await tick();
     assert.equal(stage('patch:2'), 'dirty', 'the save has no plot there (it was dropped when the street was shared)');
     assert.ok(!target(r, 'patch:2').sharedPatch);
