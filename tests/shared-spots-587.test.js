@@ -25,14 +25,14 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 import { createStreetCopy, snapshotPlace, takeObjs } from '../public/js/street-objects.js?v=4ce8ad4f';
-import { streetObjectsFeature } from '../public/js/features/street-objects-feature.js?v=8bb4c799';
+import { streetObjectsFeature } from '../public/js/features/street-objects-feature.js?v=30392f9b';
 import { moveEntity, resourceSpawnPlan } from '../public/js/features/resource-nodes-feature.js?v=2f4c13e8';
 import { createResourceNode } from '../public/js/resource-nodes.js?v=90d75c60';
 import { createMineRock } from '../public/js/mining.js?v=5e49efb3';
 import { STREET_INDEX, applyStreetIndex, loadStreetDataFromFs, setZoneStreetsShown } from '../public/js/street-loader.js?v=10376267';
 import { platformsScreen, streetWidth } from '../public/js/street-model.js?v=a9a05f9d';
 import { ecologyForStreet, planStreetPlacements, populationForStreet, rockSpawnPlan, setStreetEcologyCatalog, streetReservedSpots } from '../public/js/street-ecology.js?v=58aafb61';
-import { FEATURES } from '../public/js/features/index.js?v=3ca4e4c5';
+import { FEATURES } from '../public/js/features/index.js?v=cfe74a7f';
 import { setWildlifeCatalog } from '../public/js/wildlife.js?v=670c3a7f';
 import { isZoneTsid } from '../public/js/zone-streets.js?v=b40010d5';
 import { placementRequests } from '../tools/build-realtime-objects.mjs';

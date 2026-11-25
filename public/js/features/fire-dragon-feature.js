@@ -10,6 +10,9 @@
  * Each dragon's memory (the game day it was petted) lives in its street's feature
  * slot, so it persists with the world.
  *
+ * G1311 (Austin's ruling 2026-11-25): online, a street dragon the server holds is not petted
+ * while the street is not live ("Reconnecting...", or "You need to be online to do that.").
+ *
  * QA: ?autostart=1&fresh=1&resetgame=1&questoffer=off&dragondemo=1 stands one beside
  * the player on any street; &dragondemo=2 (or 3) stands that many. &dragonautoplay=pet
  * pets the first. In a draft: populate --street k npc_fire_dragon=2.
@@ -277,7 +280,13 @@ export const fireDragonFeature = {
 
   runVerb(target, verbId, engine) {
     const d = dragons.find((x) => x.target === target);
-    if (d && verbId === 'dragon_pet') pet(engine, d);
+    // G1311: a street Fire Dragon the server holds is not petted on this page's own rules while the
+    // street is not live (street-objects-feature sharedWalkerOffline).
+    const offline = d ? engine.query?.('sharedWalkerOffline', target, engine) : null;
+    if (offline) {
+      engine.toast(offline, 2400);
+      last = 'pet:offline';
+    } else if (d && verbId === 'dragon_pet') pet(engine, d);
     publish(engine);
     return true;
   },

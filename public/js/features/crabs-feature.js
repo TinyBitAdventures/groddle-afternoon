@@ -19,6 +19,8 @@
  * and clock, npc_walkable's roam rolled from a seed every page shares), stands for everyone while a
  * player is at it, listens or reacts (sharedHold, the server's wait), and the street sees a flatter,
  * hug, insult or pinch. Its memory stays each player's own (Austin 2026-11-08: position only).
+ * G1311 (Austin's ruling 2026-11-25): while the street is not live its verbs and its call-out for a
+ * tune are refused ("Reconnecting...", or "You need to be online to do that.") and grant nothing.
  *
  * The source plays no Musicblock audio for the crab: the tune goes into the
  * crab's headphones (its listen clip), the player hears nothing.
@@ -402,6 +404,14 @@ function answer(engine, value) {
     return;
   }
   closeTalk(engine);
+  // G1311: the street went offline while the call-out was up: no tune, nothing given or taken.
+  const offline = offlineFor(engine, crab);
+  if (offline) {
+    engine.toast(offline, 2400);
+    startMoving(engine, crab);
+    last = 'play:offline';
+    return;
+  }
   if (!MUSICBLOCK_CATALOG[value] || countItem(engine.inv, value) < 1) {
     engine.say(crab.target, CRAB_COPY.notSure, CRAB_REPLY_MS);
     startMoving(engine, crab);
@@ -554,6 +564,14 @@ function runPending(engine) {
 
 // —— Verbs ——————————————————————————————————————————————————————————————
 
+/**
+ * G1311 (Austin's ruling 2026-11-25): the line a street Crab the server holds refuses with while
+ * the street is not live ("Reconnecting...", or "You need to be online to do that."), else null.
+ */
+function offlineFor(engine, crab) {
+  return engine.query?.('sharedWalkerOffline', crab.target, engine) || null;
+}
+
 function runCrabVerb(engine, crab, verb) {
   const result = crabVerb(crab.memory, verb, dayKey());
   if (!result) return;
@@ -602,6 +620,8 @@ function tickCrabs(engine, dtMs) {
     if (talk || !p || crab.mode === 'busy' || engine.busy()) continue;
     if (!inCrabHitBox({ x: crab.sprite.x, y: crab.sprite.y }, p)) continue;
     if (pending.some((row) => row.crab === crab)) continue;
+    // G1311: no call-out for a tune while the street is not live (its rewards would land here only).
+    if (offlineFor(engine, crab)) continue;
     const want = crabWantsMusic(crab.memory, { inv: engine.inv, dayKey: dayKey(), offering: false });
     if (want.ok) openOffer(engine, crab);
   }
@@ -796,7 +816,13 @@ export const crabsFeature = {
 
   runVerb(target, verbId, engine) {
     const crab = crabs.find((c) => c.target === target);
-    if (crab && verbId.startsWith('crab_')) runCrabVerb(engine, crab, verbId.slice(5));
+    // G1311: a street Crab the server holds is not flattered, hugged, insulted or pinched on this
+    // page's own rules while the street is not live (street-objects-feature sharedWalkerOffline).
+    const offline = crab ? offlineFor(engine, crab) : null;
+    if (offline) {
+      engine.toast(offline, 2400);
+      last = `${verbId.replace(/^crab_/, '')}:offline`;
+    } else if (crab && verbId.startsWith('crab_')) runCrabVerb(engine, crab, verbId.slice(5));
     publish(engine);
     return true;
   },

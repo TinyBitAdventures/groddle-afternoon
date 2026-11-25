@@ -36,7 +36,7 @@ import { createResourceNode, harvestResourceNode } from '../public/js/resource-n
 import { isPoisoned, TREE_ANTIDOTE, TREE_POISON, BOTANY_SKILL } from '../public/js/tree-poison.js?v=646d1bc1';
 import { treeDeathFeature } from '../public/js/features/tree-death-feature.js?v=38f181f1';
 import { patchesFeature } from '../public/js/features/patches-feature.js?v=00a40d74';
-import { streetObjectsFeature } from '../public/js/features/street-objects-feature.js?v=8bb4c799';
+import { streetObjectsFeature } from '../public/js/features/street-objects-feature.js?v=30392f9b';
 import { helpMineFeature, relabelOpenDig } from '../public/js/features/help-mine-feature.js?v=15486785';
 import { animalMoodFeature } from '../public/js/features/animal-mood-feature.js?v=83cc2f2f';
 

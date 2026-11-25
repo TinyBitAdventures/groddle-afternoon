@@ -734,6 +734,23 @@ function offlineHere(engine, c = client) {
   return engine?.mode === 'multiplayer' && sharedOffline(c) && roomIsStreet(engine, c) && !noneHere(engine);
 }
 
+/** Street animals whose verbs land on the page and the server only mirrors (sharedWalkerVerb). */
+const WALKER_KINDS = new Set(['kitty', 'crab', 'dragon']);
+
+/**
+ * G1311 (Austin's ruling 2026-11-25): a street Heli Kitty, Crab or Fire Dragon the server holds is
+ * not tended on this page's own rules while the street is not live (a pet, a flatter, a tune): the
+ * line to refuse with (online-request.js offlineLine), or null when the verb may run.
+ */
+function walkerOffline(engine, target) {
+  if (!engine || engine.mode !== 'multiplayer' || target?.yardVisit) return null;
+  const a = creatureOf(target);
+  if (!a || !WALKER_KINDS.has(a.kind)) return null;
+  const c = bind(engine);
+  if (!c || shared(engine) || !offlineHere(engine, c) || !heldAnimal(engine, a.id)) return null;
+  return offlineLine(c);
+}
+
 /**
  * The realtime room whose objects are this street's: the street itself, or in a Party Space its
  * party's own room (PARTY_<id>, party-spaces-feature sharedObjectStreet), which the server lays out
@@ -1160,6 +1177,9 @@ function ask(engine, target, verbId) {
 function refusedNow(engine, target, verbId) {
   if (engine.mode !== 'multiplayer' || target?.yardVisit) return null;
   if (grant && grant.target === target && grant.verbId === verbId) return null;
+  // G1311: a Heli Kitty, Crab or Fire Dragon the server holds is not tended while the street is not live.
+  const walker = walkerOffline(engine, target);
+  if (walker) return walker;
   const c = bind(engine);
   if (!c || LOCAL_STATES.has(c.state) || !roomIsStreet(engine, c)) return null;
   const verb = sharedVerbOn(engine, target, verbId);
@@ -1471,6 +1491,14 @@ export const streetObjectsFeature = {
   sharedClockNow(engine) {
     if (!shared(engine)) return null;
     return Date.now() + (Number(copy.offset) || 0);
+  },
+
+  /**
+   * G1311: the line a verb on this street Heli Kitty, Crab or Fire Dragon is refused with while the
+   * street is not live (heli-kitties, crabs and fire-dragon features ask before granting), else null.
+   */
+  sharedWalkerOffline(target, engine) {
+    return walkerOffline(engine, target);
   },
 
   /**

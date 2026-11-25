@@ -25,7 +25,9 @@
  * server's spot and clock, the source's pauses rolled from a seed every page shares), a player at
  * one holds it for everyone, and a pet puts it to sleep for everyone (the server holds it and the
  * street sees the pet). A bump startles it into a hop where it stands, on that screen only (its
- * place is everyone's). Names stay in each player's own street slot.
+ * place is everyone's). Names stay in each player's own street slot. G1311 (Austin's ruling
+ * 2026-11-25): while the street is not live (reconnecting, stopped, ended) its verbs are refused
+ * with "Reconnecting..." or "You need to be online to do that." and grant nothing.
  *
  * Art: recovered CC0 OGA `npc_kitty_chicken` adult (`3*`) sheets under
  * assets/sprites/kitties/, sliced on their exact 136×115 cells.
@@ -492,6 +494,15 @@ export const heliKittiesFeature = {
   runVerb(target, verbId, engine) {
     const entity = kitties.find((e) => e.target === target);
     if (!entity) return true;
+    // G1311: a street Heli Kitty the server holds is not petted or named on this page's own rules
+    // while the street is not live (street-objects-feature sharedWalkerOffline).
+    const offline = engine.query?.('sharedWalkerOffline', target, engine);
+    if (offline) {
+      engine.toast(offline, 2400);
+      lastAction = 'offline';
+      publish(engine, true);
+      return true;
+    }
     if (verbId === 'pet') pet(engine, entity);
     else if (verbId === 'name') openNameModal(engine, entity, 'Name Me!');
     else if (verbId === 'rename') openNameModal(engine, entity, 'Rename Me!');
