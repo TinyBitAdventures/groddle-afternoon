@@ -26,6 +26,12 @@
  *   "segments": 11,                   wall segments per floor, end caps included (home-decor
  *                                     wallSegments, HOME_LIMITS 6..20; 150 px each)
  *   "exterior": { "style": "meadow" } optional: the home street's style (meadow|firebog|uralia)
+ *   "yard": { "segments": 5, "items": [ { "class": "proto_patch", "x": -300 } ] }
+ *                                     optional: the back yard the ground floor opens onto (G1291):
+ *                                     its segments (HOME_LIMITS 5..20, 150 px each) and what is
+ *                                     cultivated there, a proto class (inc_cultivation.js, the
+ *                                     Cultivate list) or what it grew into ("rock_beryl_2"), x in room
+ *                                     px (negative: the yard is left of the house's left end)
  *   "floors": [ ground, second, third ]  1..3 floors (HOME_LIMITS.MAX_FLOORS), ground floor first
  * }
  *
@@ -38,7 +44,8 @@
  *   "pieces":   [ piece, ... ],       furniture and trophies (home-decor placed rows)
  *   "items":    [ { "class", "count", "x" } ],   loose stacks on the floor
  *   "machines": [ { "class": "woodworker", "x": 300, "fuel": 50 } ],  home-machines rows
- *   "craftybot": { "x": 1500 }        the Crafty Bot, on one floor at most
+ *   "craftybot": { "x": 1500, "folded": true }  the Crafty Bot, on one floor at most; folded: asleep
+ *                                     as a cube (npc_crafty_bot.js craft_state 'sleep', sleepMode)
  * }
  *
  * A piece (positions are room px: 0 is the house's left end, as home-decor keeps x):
@@ -58,6 +65,9 @@
  *                                     x left out spreads them evenly over the surface
  * }
  *
+ * Side tables, pedestals and the like are pieces too: the white pedestal of the 2012 picture is
+ * furniture_sidetable style 162 (Shell Side Table, items/catalog_furniture.js).
+ *
  * Doors: every floor but the top needs one "up" Door and every floor but the ground one "down"
  * Door; floor N's up Door leads to floor N+1's down Door (home-floors links, each keeping its own
  * x). A missing one is added plain and reported.
@@ -65,6 +75,7 @@
  */
 
 import { HOME_LIMITS } from './homes-catalog.js?v=0367f90f';
+import { cultivationDef, listCultivationClasses } from './home-cultivation.js?v=2f71ba70';
 import {
   INTERIOR,
   furnitureDef,
@@ -98,7 +109,7 @@ const MAX_FUEL = 200;
 const MAX_PIECES = 2000;
 const MAX_ITEMS = 2000;
 
-const TOP_KEYS = new Set(['format', 'version', 'title', 'source', 'segments', 'exterior', 'floors', 'notes']);
+const TOP_KEYS = new Set(['format', 'version', 'title', 'source', 'segments', 'exterior', 'yard', 'floors', 'notes']);
 const FLOOR_KEYS = new Set(['name', 'wall', 'walls', 'floor', 'ceiling', 'pieces', 'items', 'machines', 'craftybot', 'notes']);
 const PIECE_KEYS = new Set(['class', 'style', 'x', 'y', 'plat', 'facing', 'ref', 'on', 'door', 'show', 'contents', 'items', 'note']);
 
@@ -390,6 +401,8 @@ export function validateHouseFile(raw, { isItem = () => true } = {}) {
       else {
         botFloor = fi;
         floor.craftybot = { x: Math.round(f.craftybot.x) };
+        if (f.craftybot.folded === true) floor.craftybot.folded = true;
+        else if (f.craftybot.folded != null && f.craftybot.folded !== false) problems.push({ level: 'warn', where: `${fw}.craftybot`, msg: '"folded" is true or false: it stands.' });
       }
     }
     return floor;
@@ -412,14 +425,59 @@ export function validateHouseFile(raw, { isItem = () => true } = {}) {
       }
     }
   });
+  const yard = raw.yard == null ? null : backYard(raw.yard, problems);
   const house = {
     title: typeof raw.title === 'string' ? raw.title.slice(0, 120) : '',
     source: typeof raw.source === 'string' ? raw.source.slice(0, 200) : '',
     segments,
     style,
     floors,
+    ...(yard ? { yard } : {}),
   };
   return { ok: true, problems, house };
+}
+
+/** The cultivation a yard entry names: its proto class, or the proto of what it grew into. */
+function cultivationOf(cls) {
+  if (cultivationDef(cls)) return { protoClass: cls, endClass: null };
+  const def = listCultivationClasses().find((d) => d.endItems.includes(cls) && d.kind !== 'tower');
+  return def ? { protoClass: def.protoClass, endClass: cls } : null;
+}
+
+/** G1291: the back yard's segments and cultivations ({ yardLeft, items: [{ protoClass, endClass, rx }] }), or null. */
+function backYard(raw, problems) {
+  if (!isObj(raw)) {
+    problems.push({ level: 'warn', where: 'yard', msg: '"yard" is an object with "segments" and "items": ignored.' });
+    return null;
+  }
+  unknownKeys(raw, new Set(['segments', 'items', 'notes']), 'yard', problems);
+  const lo = HOME_LIMITS.START_BACKYARD_SEGMENTS;
+  const hi = HOME_LIMITS.MAX_BACKYARD_SEGMENTS;
+  let segments = lo;
+  if (raw.segments != null) {
+    const n = Math.floor(Number(raw.segments));
+    segments = Number.isFinite(n) ? Math.max(lo, Math.min(hi, n)) : lo;
+    if (segments !== n) problems.push({ level: 'warn', where: 'yard.segments', msg: `A back yard has ${lo} to ${hi} segments: ${segments} is used.` });
+  }
+  const minX = -segments * 150 + 60;
+  const items = [];
+  for (const [i, it] of (Array.isArray(raw.items) ? raw.items : []).entries()) {
+    const at = `yard.items[${i}]`;
+    const cls = cleanClass(it?.class);
+    const found = cls ? cultivationOf(cls) : null;
+    if (!found) {
+      problems.push({ level: 'error', where: at, msg: `Unknown yard cultivation "${it?.class}": left out.` });
+      continue;
+    }
+    if (!finite(it.x)) {
+      problems.push({ level: 'error', where: at, msg: `${cls} has no "x": left out.` });
+      continue;
+    }
+    const rx = Math.round(Math.max(minX, Math.min(0, it.x)));
+    if (rx !== Math.round(it.x)) problems.push({ level: 'warn', where: at, msg: `${cls} at x ${it.x} moved to ${rx} to stay in the yard.` });
+    items.push({ ...found, rx });
+  }
+  return { yardLeft: segments - lo, items };
 }
 
 /** A machine id the home-machines slice takes (hm-<16 hex>), one per machine in the file. */
@@ -516,7 +574,7 @@ export function buildHouse(house) {
     for (const m of f.machines) {
       machines.push({ id: machineId(machines.length + 1), classTsid: m.classTsid, owner: '', ownerName: '', place: fi ? `house:${fi}` : 'house', rx: m.x, fuel: m.fuel, music: true, job: null, contents: {} });
     }
-    if (f.craftybot) craftybot = { floor: fi, x: f.craftybot.x };
+    if (f.craftybot) craftybot = { floor: fi, x: f.craftybot.x, ...(f.craftybot.folded ? { folded: true } : {}) };
     const c = {};
     for (const row of state.placed) c[row.classTsid] = (c[row.classTsid] || 0) + 1;
     counts.push(c);
@@ -535,7 +593,13 @@ export function buildHouse(house) {
   }
   for (const d of decors) for (const row of d.placed) delete row.door;
   const floors = { upper: decors.slice(1), links, pending: null, at: 0 };
-  return { decors, floors, machines, craftybot, stacks, counts, problems, style: house.style, title: house.title };
+  // G1291: the back yard as the homes slice keeps it (home-cultivation createBackYardState).
+  const backYard = house.yard ? {
+    yard: 'back',
+    yardLeft: house.yard.yardLeft,
+    items: house.yard.items.map((it, i) => ({ id: i + 1, protoClass: it.protoClass, ...(it.endClass ? { endClass: it.endClass } : {}), rx: it.rx, placedAt: 0 })),
+  } : null;
+  return { decors, floors, machines, craftybot, backYard, stacks, counts, problems, style: house.style, title: house.title };
 }
 
 /** Pieces a built house holds, per floor and in all. */

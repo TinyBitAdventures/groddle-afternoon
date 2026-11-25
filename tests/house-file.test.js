@@ -223,6 +223,33 @@ describe('the loader lays the whole file into a fresh solo save', () => {
     assert.ok(rows.every((r) => r.x >= x0), 'stacks stand in the house, past the back yard');
   });
 
+  it('G1291 (#669): a folded Crafty Bot sleeps as a cube, and the back yard keeps what is cultivated there', () => {
+    const engine = fakeEngine();
+    const homeState = freshSave(engine);
+    const file = JSON.parse(JSON.stringify(SAMPLE));
+    const botFloor = file.floors.findIndex((f) => f.craftybot);
+    file.floors[botFloor].craftybot.folded = true;
+    file.yard = { segments: 7, items: [{ class: 'proto_patch', x: -400 }, { class: 'rock_beryl_2', x: -800 }, { class: 'proto_herb_garden_small', x: -9999 }, { class: 'sofa', x: -100 }] };
+    const checked = validateHouseFile(file, { isItem });
+    assert.ok(checked.problems.some((p) => p.where === 'yard.items[3]' && p.level === 'error'), 'not a cultivation: left out');
+    assert.ok(checked.problems.some((p) => p.where === 'yard.items[2]' && /moved to -990/.test(p.msg)), 'kept inside the 7 segments');
+    const built = buildHouse(checked.house);
+    applyHouse(built, { engine, features, homeState, imagineHome });
+    const bot = craftybotFeature.save();
+    assert.deepEqual([bot.craftState, bot.anim, bot.collapsed], ['sleep', 'sleepMode', true], 'npc_crafty_bot.js craft_state sleep');
+    const yard = homesFeature._state().backCult;
+    assert.equal(yard.yardLeft, 2, 'seven back yard segments, five to start with');
+    assert.deepEqual(yard.items.slice(0, 2).map((r) => [r.protoClass, r.endClass, r.rx]), [['proto_patch', 'patch', -400], ['proto_beryl_rock', 'rock_beryl_2', -800]]);
+    // A garden keeps its bed whole in the yard (home-cultivation settleGardens may move it in).
+    const garden = yard.items[2];
+    assert.equal(garden.protoClass, 'proto_herb_garden_small');
+    assert.ok(garden.rx >= -990 && garden.rx <= 0, String(garden.rx));
+    // Standing (no "folded") is the plain idle bot.
+    file.floors[botFloor].craftybot.folded = false;
+    applyHouse(buildHouse(validateHouseFile(file, { isItem }).house), { engine, features, homeState, imagineHome });
+    assert.deepEqual([craftybotFeature.save().craftState, craftybotFeature.save().collapsed], ['idle', false]);
+  });
+
   it('a second file replaces what the first laid in the house', () => {
     const engine = fakeEngine();
     const homeState = freshSave(engine);

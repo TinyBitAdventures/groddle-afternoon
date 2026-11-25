@@ -101,7 +101,7 @@ export function applyHouse(built, { engine, features, homeState, imagineHome, ur
   if (!homeState.owned) imagineHome(homeState, built.style || 'meadow', Date.now() - 60_000);
   const homes = features.get('homes');
   const was = homes.save() || {};
-  homes.restore({ ...was, decor: built.decors[0], floors: built.floors, ...(url ? { houseFile: url } : {}) }, engine);
+  homes.restore({ ...was, decor: built.decors[0], floors: built.floors, ...(built.backYard ? { backYard: built.backYard } : {}), ...(url ? { houseFile: url } : {}) }, engine);
   const machines = features.get('home-machines');
   if (machines) {
     const slice = machines.save() || {};
@@ -110,7 +110,9 @@ export function applyHouse(built, { engine, features, homeState, imagineHome, ur
   const bot = features.get('craftybot');
   if (bot && built.craftybot) {
     const x0 = built.craftybot.floor ? 0 : homes.roomWorldX();
-    bot.restore({ ...(bot.save() || {}), owned: true, boxRead: true, where: 'interior', floor: built.craftybot.floor, x: x0 + built.craftybot.x, craftState: 'idle', anim: 'idle0', crafting: false, queue: [] }, engine);
+    // G1291: folded is the bot asleep as a cube (npc_crafty_bot.js craft_state 'sleep': collapsed, sleepMode).
+    const pose = built.craftybot.folded ? { craftState: 'sleep', anim: 'sleepMode', collapsed: true } : { craftState: 'idle', anim: 'idle0', collapsed: false };
+    bot.restore({ ...(bot.save() || {}), owned: true, boxRead: true, where: 'interior', floor: built.craftybot.floor, x: x0 + built.craftybot.x, ...pose, crafting: false, queue: [] }, engine);
   }
   // What stood in the house before goes; then each stack is set down where the file puts it.
   const places = ownGroundPlaces(engine);
