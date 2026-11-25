@@ -1,0 +1,22 @@
+{
+  "about": "G1303 (#669): where a machine may be set down, one table for the game's js/home-machines.js placeCheck and the site's src/HomeMachines.php placeWhy (tests/g1303-machine-drop-at-pointer.test.js runs both). machines: the x of the place's placed machines; fixed: a machine room's own; span: [lo, hi] (null: the home street, whose ends the game checks from its layout); rx: where it goes; from: where the player stands ({rx, dy}, null: where it goes); why: null when it may.",
+  "cases": [
+    { "name": "at your feet, 199 px from one", "machines": [0], "fixed": [], "span": null, "rx": 199, "from": null, "why": "near" },
+    { "name": "at your feet, 200 px from one", "machines": [0], "fixed": [], "span": null, "rx": 200, "from": null, "why": null },
+    { "name": "standing where it goes is the same", "machines": [300], "fixed": [], "span": [76, 974], "rx": 499, "from": { "rx": 499, "dy": 0 }, "why": "near" },
+    { "name": "dropped 120 px from one, standing 220 px from it", "machines": [300], "fixed": [], "span": [76, 974], "rx": 420, "from": { "rx": 520, "dy": 0 }, "why": null },
+    { "name": "dropped 300 px away, standing 150 px from one", "machines": [300], "fixed": [], "span": [76, 974], "rx": 600, "from": { "rx": 450, "dy": 0 }, "why": "near" },
+    { "name": "standing exactly 200 px from one", "machines": [300], "fixed": [], "span": [76, 974], "rx": 350, "from": { "rx": 500, "dy": 0 }, "why": null },
+    { "name": "Euclidean: up on a piece, 219 px from one", "machines": [300], "fixed": [], "span": [76, 974], "rx": 420, "from": { "rx": 460, "dy": -150 }, "why": null },
+    { "name": "Euclidean: up on a piece, 189 px from one", "machines": [300], "fixed": [], "span": [76, 974], "rx": 420, "from": { "rx": 460, "dy": -100 }, "why": "near" },
+    { "name": "the ends are where it goes, wherever you stand", "machines": [], "fixed": [], "span": [76, 974], "rx": 146, "from": { "rx": 600, "dy": 0 }, "why": "edge" },
+    { "name": "just inside the end", "machines": [], "fixed": [], "span": [76, 974], "rx": 147, "from": { "rx": 600, "dy": 0 }, "why": null },
+    { "name": "standing past the end is no matter", "machines": [], "fixed": [], "span": [76, 974], "rx": 500, "from": { "rx": 950, "dy": 0 }, "why": null },
+    { "name": "a room's own machines count: let go 129 px from one, standing 269 px from it", "machines": [], "fixed": [-486, -29, 496], "span": [-700, 700], "rx": 100, "from": { "rx": 240, "dy": 0 }, "why": null },
+    { "name": "a room's own machines count: standing 179 px from one", "machines": [], "fixed": [-486, -29, 496], "span": [-700, 700], "rx": 300, "from": { "rx": 150, "dy": 0 }, "why": "near" },
+    { "name": "another player's machine in the room counts", "machines": [100], "fixed": [-486, -29, 496], "span": [-700, 700], "rx": 300, "from": { "rx": 250, "dy": 0 }, "why": "near" },
+    { "name": "the home street: far along it", "machines": [0, 400], "fixed": [], "span": null, "rx": 1500, "from": { "rx": 700, "dy": 0 }, "why": null },
+    { "name": "the 2012 house's top floor: 115 px apart", "machines": [158], "fixed": [], "span": [76, 1324], "rx": 273, "from": { "rx": 359, "dy": 0 }, "why": null },
+    { "name": "eight out already", "machines": [-2000, -1700, -1400, -1100, -800, -500, -200, 100], "fixed": [], "span": null, "rx": 2000, "from": { "rx": 2000, "dy": 0 }, "why": "many" }
+  ]
+}

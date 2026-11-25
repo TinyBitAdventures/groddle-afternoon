@@ -165,6 +165,14 @@ try {
     $out['take'] = $act(['op' => op(), 'owner' => OWNER, 'actor' => OWNER, 'place' => 'house:1', 'verb' => 'take', 'id' => $up]);
     $out['rowUpAfter'] = $rowOf($up);
     $out['rowGround'] = $rowOf($ground);
+
+    // —— G1303 (#669): the 200 px from where the player stands (the realtime server's "from") ——
+    $out['fromNear'] = $act(['op' => op(), 'owner' => OWNER, 'actor' => OWNER, 'place' => 'house', 'verb' => 'place', 'class' => 'fuelmaker', 'rx' => 600, 'from' => ['rx' => 520, 'dy' => 0]]);
+    $out['noFrom'] = $act(['op' => op(), 'owner' => OWNER, 'actor' => OWNER, 'place' => 'house', 'verb' => 'place', 'class' => 'fuelmaker', 'rx' => 290]);
+    $out['badFrom'] = $act(['op' => op(), 'owner' => OWNER, 'actor' => OWNER, 'place' => 'house', 'verb' => 'place', 'class' => 'fuelmaker', 'rx' => 290, 'from' => ['rx' => '610', 'dy' => 0]]);
+    $near = op();
+    $out['fromFar'] = $act(['op' => $near, 'owner' => OWNER, 'actor' => OWNER, 'place' => 'house', 'verb' => 'place', 'class' => 'fuelmaker', 'rx' => 290, 'from' => ['rx' => 610, 'dy' => 0]]);
+    $out['rowNear'] = $rowOf($near);
 } catch (Throwable $e) {
     $out['error'] = get_class($e) . ': ' . $e->getMessage() . ' @ ' . $e->getFile() . ':' . $e->getLine();
 } finally {

@@ -668,7 +668,10 @@ function createSession(engine, client) {
    * G1303 (#669): `dropX`, a world x, is where a Decoration Mode drag let it go (HandOfDecorator.as
    * dropItemFromPackOnTargetPlatform 1673-1690 sent drop_x / drop_y and takeable.js 164-170 put it
    * there); without it, at your feet (takeable.js:164 dest_x = pc.x). The 200 px is from you either way
-   * (placeCheck `from`: canDrop's findCloseStack measured from the player).
+   * (placeCheck `from`: canDrop's findCloseStack measured from the player). Online the act carries where
+   * this place's x 0 and walk line are as drawn here (ox, oy): the realtime server reads where you stand
+   * from its own record of your moves against them and the site measures the 200 px from there
+   * (home_machines.go machineFromPos, HomeMachines::placeWhy), the same rule as here.
    */
   function placeFromPack(classTsid, copy = null, dropX = null) {
     const at = where();
@@ -684,7 +687,8 @@ function createSession(engine, client) {
     const fuel = engine.toolState ? takeToolCopy(engine.toolState, classTsid, { copy: one ?? undefined, take: false }) : null;
     if (mp) {
       placing = one != null && Number.isFinite(fuel) ? { classTsid, pick: { copy: one, copies: [one], r: fuel, t: null } } : null;
-      return send('place', null, { class: classTsid, rx: check.rx, ...(Number.isFinite(fuel) ? { fuel: Math.max(0, Math.min(MAX_FUEL, Math.round(fuel))) } : {}) });
+      const origin = Number.isFinite(home.x0) && Number.isFinite(home.groundY) ? { ox: home.x0, oy: home.groundY } : {};
+      return send('place', null, { class: classTsid, rx: check.rx, ...origin, ...(Number.isFinite(fuel) ? { fuel: Math.max(0, Math.min(MAX_FUEL, Math.round(fuel))) } : {}) });
     }
     return solo('place', null, { classTsid, rx: check.rx, copy: one });
   }

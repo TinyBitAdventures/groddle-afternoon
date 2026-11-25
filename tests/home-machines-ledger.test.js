@@ -6,7 +6,8 @@
  * acts to groddle-afternoon-site src/HomeMachines.php on a MariaDB database it makes for the run
  * (test_groddle_machines_<hex>) and drops: set down on "house:1", run (the Planks leave the
  * ledger once, asked again nothing moves), collected (the Boards arrive), refuelled, seen by a
- * visitor's game with its place, picked up; the ground floor's machine stays where it is. The
+ * visitor's game with its place, picked up; the ground floor's machine stays where it is; G1303:
+ * a place measured from where the player stands ("from"). The
  * database is the local Cove one by default (GRODDLE_TEST_MYSQL="host user password" overrides);
  * without the site, the engine, php with mysqli or a database it skips.
  *
@@ -95,5 +96,13 @@ describe('G1249: a machine on an upper floor of the house, through the ledger (H
     assert.deepEqual([r.take.taken.class, r.take.taken.fuel], ['woodworker', 98]);
     assert.equal(r.rowUpAfter.status, 'taken');
     assert.deepEqual(r.rowGround, { place: 'house', rx: 400, fuel: 50, status: 'placed', job: null });
+  });
+
+  it('G1303 (#669): the 200 px is from where the player stands, the machine where it was let go', () => {
+    assert.deepEqual([r.fromNear.status, r.fromNear.why], ['refused', 'near'], 'standing 120 px from the one at 400, letting go 200 px from it');
+    assert.deepEqual([r.noFrom.status, r.noFrom.why], ['refused', 'near'], 'no from: standing where it goes, 110 px from it');
+    assert.deepEqual([r.badFrom.status, r.badFrom.why], ['refused', 'here'], 'a from that is not one');
+    assert.equal(r.fromFar.status, 'settled', 'standing 210 px from it, let go 110 px from it');
+    assert.deepEqual(r.rowNear, { place: 'house', rx: 290, fuel: 50, status: 'placed', job: null });
   });
 });
