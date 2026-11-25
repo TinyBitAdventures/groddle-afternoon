@@ -1599,8 +1599,15 @@ function createSession(engine, client) {
     forgetInside(msg.owner);
     if (!visit || Number(msg.owner) !== visit.owner) return;
     visit.letIn = false;
-    // G1018: no longer let in (or the key taken back): the door asks the site again.
-    if (!visit.key || msg.why === 'revoked') visit.view.inside = false;
+    // G1018: no longer let in (or the key taken back): the house and back yard leave this copy of the
+    // home (the site would not send them now), and the door asks the site again.
+    if (!visit.key || msg.why === 'revoked') {
+      const homes = { ...(visit.view.homes || {}) };
+      delete homes.decor;
+      delete homes.backYard;
+      delete homes.yardStyle;
+      visit.view = { ...visit.view, homes, inside: false, backYardLive: false };
+    }
     if (msg.why === 'revoked') visit.key = false;
     notice(outText(msg.why, visit.name), 4200);
     if (visit.room === 'interior') goOutside();
