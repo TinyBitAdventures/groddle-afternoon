@@ -6,6 +6,8 @@
  * rim's filter pushed, and every later frame broke until a reload.
  * Reproduction: /play/?autostart=1&fresh=1&resetgame=1&questoffer=off&homedemo=home at 1453x805,
  * avatar beside the house: groddleQA.frameStageThrows() counted render throws; none now.
+ * #703 (the same day): Helga's rim sat off her body in some animations; a vendor's states have their
+ * own anchors and the rim copies took the anchor only when made.
  * Run: node --test tests/rim-art-701.test.js
  */
 import { describe, it } from 'node:test';
@@ -54,5 +56,13 @@ describe('#701/#702: only real sprite art takes the cyan rim', () => {
     assert.match(game, /signpostGlowParts\(v\)\)\.filter\(rimArt\)/);
     assert.match(game, /if \(!src \|\| src\.destroyed \|\| !rimArt\(src\)\) \{\s*outline\.visible = false;/);
     assert.match(game, /new PIXI\.Sprite\(rimArt\(source\) \? source\.texture : PIXI\.Texture\.EMPTY\)/);
+  });
+});
+
+describe('#703: the rim follows a vendor\'s anchor from state to state', () => {
+  it('each vendor state has its own anchor, so the copies take it at every sync, not only when made', () => {
+    const feature = readFileSync(join(ROOT, 'public/js/features/vendor-npcs-feature.js'), 'utf8');
+    assert.match(feature, /const anchor = vendorAnchor\(npc\.classTsid, state\);\s*npc\.sprite\.anchor\.set\(anchor\.x, anchor\.y\);/);
+    assert.match(game, /if \(ax != null && \(s\.anchor\.x !== ax \|\| s\.anchor\.y !== ay\)\) s\.anchor\.set\(ax, ay\);/);
   });
 });
