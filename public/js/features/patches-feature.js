@@ -369,26 +369,71 @@ function treeSubtitle(tree) {
   return tree.classId === 'wood_tree' ? woodTreeStatusLabel(tree.state) : trantStatusLabel(tree.state);
 }
 
-async function buildView(engine, entity, myGeneration, { grow = false } = {}) {
+/**
+ * A plot's art on its spot as the Patch draws it: a grown tree on its foot (scaled, facing
+ * `direction`), else the soil, Seedling or dead trant on the soil line. Adds the sprite to the
+ * entity layer and returns it with the tree's scale (`s`).
+ */
+function plotSprite(engine, plot, { x, y, direction = 1 }, tex) {
   const { PIXI } = engine;
+  const sprite = new PIXI.Sprite(tex || PIXI.Texture.EMPTY);
+  sprite.x = x;
+  sprite.y = y + 2;
+  sprite.roundPixels = true;
+  let s = 1;
+  if (plot.stage === 'tree') {
+    const isWood = plot.tree.classId === 'wood_tree';
+    // G583, R12: the trunk's foot on the soil line (js/sprite-feet.js), as street trees.
+    standOnFeet(sprite);
+    s = treeScale(tex, isWood);
+    sprite._woodDirection = direction;
+    sprite.scale.set(direction * s, s);
+    sprite.zIndex = Z.tree;
+  } else {
+    const dead = plot.stage === 'dead';
+    sprite.anchor.set(0.5, dead ? 1 : plot.stage === 'seedling' ? SEEDLING_ANCHOR_Y : SOIL_ANCHOR_Y);
+    sprite.zIndex = dead ? Z.tree : Z.soil;
+    if (!dead) {
+      sprite._worldHitW = 130;
+      sprite._worldHitH = plot.stage === 'seedling' ? 70 : 56;
+    }
+    if (plot.stage === 'seedling') {
+      s = 1 + Math.min(3, plot.seedling?.petted || 0) * 0.07;
+      sprite.scale.set(s);
+    }
+  }
+  engine.entityLayer.addChild(sprite);
+  return { sprite, s };
+}
+
+/**
+ * R5: a Patch as this feature draws it, from `plot` (a fresh one when the owner's plot is not
+ * known), with no target: display only, for the Patches of another player's back yard
+ * (homes-feature drawVisitorYard). The art fills in once it loads.
+ */
+export function plotStill(engine, { x, y, plot = null, classTsid = 'patch', direction = 1 } = {}) {
+  const shown = plot || createPlot(classTsid, { now: Date.now() });
+  const { sprite } = plotSprite(engine, shown, { x, y, direction }, null);
+  texturesForPlot(engine, shown).then((tex) => {
+    if (!tex || sprite.destroyed) return;
+    sprite.texture = tex;
+    if (shown.stage === 'tree') {
+      const s = treeScale(tex, shown.tree.classId === 'wood_tree');
+      sprite.scale.set(direction * s, s);
+    }
+  }, () => {});
+  return sprite;
+}
+
+async function buildView(engine, entity, myGeneration, { grow = false } = {}) {
   entity.sig = plotSignature(entity.plot);
   const tex = await texturesForPlot(engine, entity.plot);
   if (myGeneration !== generation || !entities.includes(entity)) return;
   dropView(engine, entity);
   const plot = entity.plot;
-  const sprite = new PIXI.Sprite(tex || PIXI.Texture.EMPTY);
-  sprite.x = entity.x;
-  sprite.y = entity.y + 2;
-  sprite.roundPixels = true;
+  const { sprite, s } = plotSprite(engine, plot, { x: entity.x, y: entity.y, direction: entity.direction }, tex);
   if (plot.stage === 'tree') {
     const isWood = plot.tree.classId === 'wood_tree';
-    // G583, R12: the trunk's foot on the soil line (js/sprite-feet.js), as street trees.
-    standOnFeet(sprite);
-    const s = treeScale(tex, isWood);
-    sprite._woodDirection = entity.direction;
-    sprite.scale.set(entity.direction * s, s);
-    sprite.zIndex = Z.tree;
-    engine.entityLayer.addChild(sprite);
     entity.sprite = sprite;
     entity.shownMaturity = plot.tree.state.maturity;
     entity.shownFruit = isWood ? '' : trantFruitArt({ classTsid: plot.tree.classId, ...plot.tree.state });
@@ -404,20 +449,7 @@ async function buildView(engine, entity, myGeneration, { grow = false } = {}) {
     if (grow) growFx(engine, sprite, s);
     return;
   }
-  const dead = plot.stage === 'dead';
-  sprite.anchor.set(0.5, dead ? 1 : plot.stage === 'seedling' ? SEEDLING_ANCHOR_Y : SOIL_ANCHOR_Y);
-  sprite.zIndex = dead ? Z.tree : Z.soil;
-  if (!dead) {
-    sprite._worldHitW = 130;
-    sprite._worldHitH = plot.stage === 'seedling' ? 70 : 56;
-  }
-  if (plot.stage === 'seedling') {
-    const petted = plot.seedling?.petted || 0;
-    const s = 1 + Math.min(3, petted) * 0.07;
-    sprite.scale.set(s);
-    sprite.playPet = () => wiggle(engine, sprite, s);
-  }
-  engine.entityLayer.addChild(sprite);
+  if (plot.stage === 'seedling') sprite.playPet = () => wiggle(engine, sprite, s);
   entity.sprite = sprite;
   entity.target = engine.register({
     classId: plotClassId(plot),

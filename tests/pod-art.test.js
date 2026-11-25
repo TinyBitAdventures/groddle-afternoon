@@ -63,7 +63,10 @@ describe('pods and their nodes (#512)', () => {
 
   it('the yard and a visit draw them on the walk line from that point', () => {
     const draws = [...homes.matchAll(/textureFromUrl\(`assets\/sprites\/cultivation\/\$\{def\.art\}\.webp`\)\);\n(\s+)(\w+)\(spr(, art)?\);\n\s+spr\.x = [^;]+;\n\s+spr\.y = ([^;]+);/g)];
-    assert.equal(draws.length, 2, 'own yard and a visited one');
+    // R5: one drawing (drawPodArt) for your own yard and a visited one.
+    assert.equal(draws.length, 1, 'one pod-art drawing');
+    assert.match(homes, /for \(const \{ item, def \} of each\('art'\)\) drawPodArt\(engine, def, cultivationWorldX\(item, st\), groundY\);/, 'own yard');
+    assert.match(homes, /p\.part === 'art'\) \{\n\s+shown = drawPodArt\(engine, def, x, groundY\);/, 'a visited one');
     for (const m of draws) {
       assert.equal(m[2], 'standPodArt');
       assert.equal(m[4], 'groundY');

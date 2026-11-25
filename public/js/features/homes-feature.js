@@ -234,8 +234,8 @@ import { pieceUrl, roomPieces, surfaceAt, swatchPiece, wallTargetAt } from '../h
 import { renderHomeLocation } from '../home-shot-render.js?v=b1875d75';
 import { maxTextureSizeOf, sharpDeco, wantsHiresDecos } from '../deco-hires.js?v=34f36d77';
 import { SHARP_DECOS } from '../deco-sharp-list.js?v=7d615f20';
-import { resourceNodesFeature } from './resource-nodes-feature.js?v=8601e418';
-import { patchesFeature } from './patches-feature.js?v=5c1671f0';
+import { resourceNodeStill, resourceNodesFeature } from './resource-nodes-feature.js?v=8601e418';
+import { patchesFeature, plotStill } from './patches-feature.js?v=5c1671f0';
 import { GROWN_TREE_LABELS, createPlot, growTree, plotLabel } from '../patches.js?v=3498abf3';
 import { WOTD_DEPLETE_MS, WOTD_TEXT, nearestPourTarget, pourButton, pourConditions, pourConfirmText } from '../wine-pour.js?v=6daa23a7';
 import { WOTD_TOOL, pourApproach, pourDropTip } from '../wine-pour-fx.js?v=364e22d2';
@@ -400,6 +400,34 @@ export function cultivationNodes(item, now = Date.now()) {
   }
   if (def.kind === 'hive') return hiveFireflySpots(item, now).map((spot) => ({ classTsid: 'npc_firefly', ...spot }));
   return [];
+}
+
+/**
+ * R5: what a yard draws for its cultivations, part by part: the one list the owner's yard
+ * (spawnCultivations, with its live verbs) and a visitor's (drawVisitorYard, as stills) both draw
+ * from, so a visit shows everything the owner sees. Parts: 'tower', 'proto' (worn out), 'rock',
+ * 'garden', 'patch', 'art' (a pod's, mound's or hive's recovered art) and 'node' (each resource
+ * node it carries: a Peat Bog, a Dirt Pile, a pod's barnacle or jellisac, a hive's Fireflies;
+ * `node` is cultivationNodes' { classTsid, dx, dy }). Pure.
+ */
+export function yardDrawParts(items, now = Date.now()) {
+  const parts = [];
+  for (const item of items || []) {
+    const def = cultivationDef(item?.protoClass);
+    if (!def) continue;
+    if (def.kind === 'tower') {
+      parts.push({ part: 'tower', item, def });
+      continue;
+    }
+    if (item.depleted) {
+      parts.push({ part: 'proto', item, def });
+      continue;
+    }
+    if (def.kind === 'rock' || def.kind === 'garden' || def.kind === 'patch') parts.push({ part: def.kind, item, def });
+    if (def.art) parts.push({ part: 'art', item, def });
+    for (const node of cultivationNodes(item, now)) parts.push({ part: 'node', item, def, node });
+  }
+  return parts;
 }
 
 /**
@@ -3158,6 +3186,41 @@ function playPendingPoofs(engine, st, before = null) {
   if (engine.setData) engine.setData('homePoof', String(now));
 }
 
+/** A pod's, mound's or hive's recovered art on its spot (POD_ART), on the owner's yard and a visitor's. */
+function drawPodArt(engine, def, x, groundY) {
+  const art = POD_ART[def.art];
+  if (!art) return null;
+  const spr = new engine.PIXI.Sprite(textureFromUrl(`assets/sprites/cultivation/${def.art}.webp`));
+  standPodArt(spr, art);
+  spr.x = x;
+  spr.y = groundY;
+  spr.zIndex = 14;
+  spr.width = art.w;
+  spr.height = art.h;
+  engine.entityLayer.addChild(spr);
+  return spr;
+}
+
+/** A worn-out cultivation's proto art (PROTO_DEPLETED_ART) in its box, on the owner's yard and a visitor's. */
+function drawProtoBox(engine, item, x, groundY) {
+  const { PIXI } = engine;
+  const art = PROTO_DEPLETED_ART[item.protoClass];
+  const box = new PIXI.Container();
+  box.x = x;
+  box.y = groundY + 6;
+  box.zIndex = 14;
+  if (art) {
+    const [file, ox, oy, w, h] = art;
+    const spr = new PIXI.Sprite(textureFromUrl(`assets/sprites/cultivation/proto/${file}`));
+    spr.anchor.set(ox / w, oy / h);
+    spr.width = w;
+    spr.height = h;
+    box.addChild(spr);
+  }
+  engine.entityLayer.addChild(box);
+  return box;
+}
+
 function shimEngine(engine, population, points) {
   return Object.create(engine, {
     population: { value: population },
@@ -3170,23 +3233,24 @@ function shimEngine(engine, population, points) {
  * house), each kind through its own system, with this yard's world slots.
  */
 function spawnCultivations(engine, st = activeCult()) {
-  const { PIXI } = engine;
   const now = Date.now();
   const tsid = yardTsid(st);
   const groundY = yardGroundY(st);
   const world = engine.streetWorld ? engine.streetWorld(tsid) : null;
   // A queued poof fades in what this redraw adds for its item (playPendingPoofs, G298).
   const poofBefore = pendingPoofs.length ? new Set(engine.entityLayer?.children || []) : null;
+  // R5: the parts a visitor's yard draws too (yardDrawParts, drawVisitorYard).
+  const parts = yardDrawParts(st.items, now);
+  const each = (kind) => parts.filter((p) => p.part === kind);
   // Rocks: the yard's own rock slots, in cultivation order.
-  const rocks = rockItems(st.items);
+  const rocks = each('rock').map((p) => p.item);
   rocks.forEach((item, index) => {
     engine.spawnMineRock?.(rockClassFor(item.endClass), cultivationWorldX(item, st), groundY, index);
   });
   if (world) world.rocks.length = rocks.length;
   // Gardens: their plots live with the cultivation.
-  for (const item of liveItems(st.items)) {
-    const def = cultivationDef(item.protoClass);
-    if (def.kind !== 'garden' || !engine.spawnGarden) continue;
+  for (const { item, def } of each('garden')) {
+    if (!engine.spawnGarden) break;
     const target = engine.spawnGarden({
       x: cultivationWorldX(item, st),
       y: groundY + 2,
@@ -3208,27 +3272,13 @@ function spawnCultivations(engine, st = activeCult()) {
     }
   }
   // Pods, mounds and hives: their recovered art, then the resource nodes.
-  for (const item of liveItems(st.items)) {
-    const def = cultivationDef(item.protoClass);
-    if (!def.art) continue;
-    const art = POD_ART[def.art];
-    const spr = new PIXI.Sprite(textureFromUrl(`assets/sprites/cultivation/${def.art}.webp`));
-    standPodArt(spr, art);
-    spr.x = cultivationWorldX(item, st);
-    spr.y = groundY;
-    spr.zIndex = 14;
-    spr.width = art.w;
-    spr.height = art.h;
-    engine.entityLayer.addChild(spr);
-  }
+  for (const { item, def } of each('art')) drawPodArt(engine, def, cultivationWorldX(item, st), groundY);
   const population = { resourceNodeClasses: [] };
   const points = {};
-  for (const item of st.items) {
-    for (const node of cultivationNodes(item, now)) {
-      const cls = node.classTsid.startsWith('peat_') ? 'peat_1' : node.classTsid;
-      population.resourceNodeClasses.push(node.classTsid);
-      (points[`resource:${cls}`] ||= []).push({ x: cultivationWorldX(item, st) + node.dx, y: groundY + node.dy });
-    }
+  for (const { item, node } of each('node')) {
+    const cls = node.classTsid.startsWith('peat_') ? 'peat_1' : node.classTsid;
+    population.resourceNodeClasses.push(node.classTsid);
+    (points[`resource:${cls}`] ||= []).push({ x: cultivationWorldX(item, st) + node.dx, y: groundY + node.dy });
   }
   if (population.resourceNodeClasses.length) {
     resourceNodesFeature.onStreetEnter({ tsid }, shimEngine(engine, population, points));
@@ -3446,25 +3496,9 @@ function protoSubtitle(item, st = activeCult()) {
 }
 
 function spawnProtos(engine, st = activeCult()) {
-  const { PIXI } = engine;
   protoTargets.clear();
-  for (const item of st.items) {
-    if (!item.depleted) continue;
-    const def = cultivationDef(item.protoClass);
-    const art = PROTO_DEPLETED_ART[item.protoClass];
-    const box = new PIXI.Container();
-    box.x = cultivationWorldX(item, st);
-    box.y = yardGroundY(st) + 6;
-    box.zIndex = 14;
-    if (art) {
-      const [file, ox, oy, w, h] = art;
-      const spr = new PIXI.Sprite(textureFromUrl(`assets/sprites/cultivation/proto/${file}`));
-      spr.anchor.set(ox / w, oy / h);
-      spr.width = w;
-      spr.height = h;
-      box.addChild(spr);
-    }
-    engine.entityLayer.addChild(box);
+  for (const { item, def } of yardDrawParts(st.items).filter((p) => p.part === 'proto')) {
+    const box = drawProtoBox(engine, item, cultivationWorldX(item, st), yardGroundY(st));
     const target = engine.register({
       classId: item.protoClass,
       featureId: HOMES_FEATURE_ID,
@@ -7997,55 +8031,49 @@ function rockStill(PIXI, endClass) {
 }
 
 /**
- * The owner's cultivations as they stand, for a visitor: rocks, pods, mounds
- * and hives, worn-out protos, and gardens with their crops (the garden path,
- * detached, a copy of the owner's plots). Display only: the visitor's
- * features own none of it (features/neighbours-mp-feature.js answers their
- * menus). On the home street (`opts.liveRocks`) the rocks are left to
- * yard-verbs-mp-feature, which draws them and the resource nodes as the
- * site has them, to mine and harvest; Patches are that feature's too.
+ * The owner's cultivations as they stand, for a visitor: every part the
+ * owner's own yard draws (yardDrawParts, R5), through the same drawing:
+ * rocks as stills, gardens with their crops (the garden path, detached, a
+ * copy of the owner's plots), pod, mound and hive art, their resource nodes
+ * (a Peat Bog, a Dirt Pile, a barnacle, Fireflies) and Patches as the
+ * resource-nodes and patches features draw them, and worn-out protos.
+ * Display only: the visitor's features own none of it
+ * (features/neighbours-mp-feature.js answers their menus). On the home street
+ * (`opts.live`) the rocks, nodes and Patches are left to
+ * yard-verbs-mp-feature, which draws them as the site has them, to mine,
+ * harvest and tend. Returns the garden targets; `opts.drawn` (an array)
+ * collects each part with what was drawn for it.
  */
 function drawVisitorYard(engine, st, groundY, houseX, opts = {}) {
   const { PIXI } = engine;
   const layer = engine.entityLayer;
   const targets = [];
-  for (const item of st.items) {
-    const def = cultivationDef(item.protoClass);
-    if (def?.kind === 'tower' && opts.tower) {
+  const now = Date.now();
+  for (const p of yardDrawParts(st.items, now)) {
+    const { item, def } = p;
+    const x = houseX + item.rx;
+    let shown = null;
+    if (p.part === 'tower') {
+      if (!opts.tower) continue;
       // MPVISIT: the owner's Tower (built: its chassis and sign; else the scaffolding).
       const built = item.endClass === TOWER_CHASSIS && opts.tower.built;
-      opts.towerSpot = { box: visitorTowerView(engine, opts.tower, { x: houseX + item.rx, groundY, built }), built };
+      opts.towerSpot = { box: visitorTowerView(engine, opts.tower, { x, groundY, built }), built };
+      shown = opts.towerSpot.box;
+    } else if (p.part === 'proto') {
+      shown = drawProtoBox(engine, item, x, groundY);
+    } else if (opts.live && (p.part === 'rock' || p.part === 'node' || p.part === 'patch')) {
+      // MPVISIT: the home street's rocks, nodes and Patches are yard-verbs-mp-feature's, to use on a visit.
       continue;
-    }
-    if (!def || def.kind === 'tower') continue;
-    const x = houseX + item.rx;
-    if (item.depleted) {
-      const art = PROTO_DEPLETED_ART[item.protoClass];
-      if (!art) continue;
-      const [file, ox, oy, w, h] = art;
-      const spr = new PIXI.Sprite(textureFromUrl(`assets/sprites/cultivation/proto/${file}`));
-      spr.anchor.set(ox / w, oy / h);
-      spr.width = w;
-      spr.height = h;
-      spr.x = x;
-      spr.y = groundY + 6;
-      spr.zIndex = 14;
-      layer.addChild(spr);
-      continue;
-    }
-    if (def.kind === 'rock') {
-      // MPVISIT: the home street's rocks are minable on a visit (yard-verbs-mp-feature draws them).
-      if (opts.liveRocks) continue;
-      const spr = rockStill(PIXI, item.endClass);
-      spr.x = x;
-      spr.y = groundY;
-      spr.zIndex = 22;
-      layer.addChild(spr);
-      continue;
-    }
-    if (def.kind === 'garden' && engine.spawnGarden) {
+    } else if (p.part === 'rock') {
+      shown = rockStill(PIXI, item.endClass);
+      shown.x = x;
+      shown.y = groundY;
+      shown.zIndex = 22;
+      layer.addChild(shown);
+    } else if (p.part === 'garden') {
+      if (!engine.spawnGarden) continue;
       const garden = st.gardens[item.id] ? JSON.parse(JSON.stringify(st.gardens[item.id])) : null;
-      const target = engine.spawnGarden({
+      shown = engine.spawnGarden({
         x,
         y: groundY + 2,
         gardenType: def.gardenType,
@@ -8055,20 +8083,16 @@ function drawVisitorYard(engine, st, groundY, houseX, opts = {}) {
         garden,
         detached: true,
       });
-      if (target) targets.push(target);
-      continue;
+      if (shown) targets.push(shown);
+    } else if (p.part === 'art') {
+      shown = drawPodArt(engine, def, x, groundY);
+    } else if (p.part === 'node') {
+      shown = resourceNodeStill(engine, { classTsid: p.node.classTsid, x: x + p.node.dx, y: groundY + p.node.dy, key: `${item.id}:${p.node.classTsid}` });
+    } else if (p.part === 'patch') {
+      // The owner's plot is their game's (the site sends no back-yard plots): a fresh Patch.
+      shown = plotStill(engine, { x, y: groundY, classTsid: item.endClass });
     }
-    if (def.art && POD_ART[def.art]) {
-      const art = POD_ART[def.art];
-      const spr = new PIXI.Sprite(textureFromUrl(`assets/sprites/cultivation/${def.art}.webp`));
-      standPodArt(spr, art);
-      spr.x = x;
-      spr.y = groundY;
-      spr.zIndex = 14;
-      spr.width = art.w;
-      spr.height = art.h;
-      layer.addChild(spr);
-    }
+    if (Array.isArray(opts.drawn)) opts.drawn.push({ part: p.part, protoClass: item.protoClass, shown });
   }
   return targets;
 }
@@ -8215,7 +8239,7 @@ export function visitorHomeScene(engine, view = {}, room = 'street', opts = {}) 
         gate.y = STREET_GROUND_Y + 2;
         gate.zIndex = 20;
         eng.entityLayer.addChild(gate);
-        const yardOpts = { liveRocks: true, tower: v.tower };
+        const yardOpts = { live: true, tower: v.tower };
         const gardens = drawVisitorYard(eng, st, STREET_GROUND_Y, layout.houseX, yardOpts);
         // G1245: the owner's Vine Radio where they stood it (features/vine-radio-feature.js draws it).
         const radioRx = fixtureRx(st, 'radio', { at: { mailboxX: usual, doorway: background.houseDoorway } });

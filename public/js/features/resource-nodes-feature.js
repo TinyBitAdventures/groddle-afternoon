@@ -745,10 +745,9 @@ function dropTarget(engine, entity) {
   entity.view = null;
 }
 
-function buildGroundView(engine, entity) {
+/** A ground node's frame on its spot (wall-measured or standing on its foot), its band and hit size. */
+function groundSprite(engine, entity, frame, texture) {
   const { PIXI } = engine;
-  const frame = resourceNodeFrame(entity.node);
-  const texture = frame?.sheet ? frameTexture(engine, frame.sheet, frame.frameIndex) : null;
   const sprite = new PIXI.Sprite(texture || PIXI.Texture.EMPTY);
   if (entity.wall) {
     // Player report #210: a measured spot is the frame cell's bottom centre on the wall the snap shows
@@ -769,17 +768,22 @@ function buildGroundView(engine, entity) {
     sprite._worldHitH = Math.max(40, frame?.sheet?.frameHeight || 40);
   }
   engine.entityLayer.addChild(sprite);
+  return sprite;
+}
+
+function buildGroundView(engine, entity) {
+  const frame = resourceNodeFrame(entity.node);
+  const texture = frame?.sheet ? frameTexture(engine, frame.sheet, frame.frameIndex) : null;
+  const sprite = groundSprite(engine, entity, frame, texture);
   // #582: a frame whose sheet is not loaded yet is not recorded as drawn, so the refresh draws it.
   entity.view = { kind: 'ground', sprite, sheetPath: texture ? frame?.sheet?.path : null, frameIndex: texture ? frame?.frameIndex : null };
   entity.target = targetFor(engine, entity, sprite);
   if (!texture && frame?.sheet) refreshEntity(engine, entity);
 }
 
-function buildFireflyView(engine, entity) {
+/** A Firefly's glow and flapping body (the root is placed by placeFirefly, or held still). */
+function fireflySprite(engine, entity, frames) {
   const { PIXI } = engine;
-  const frame = resourceNodeFrame(entity.node);
-  const frames = sheetFrames(engine, frame.sheet);
-  if (!frames.length) return;
   const root = new PIXI.Container();
   root.zIndex = itemZ(entity.classTsid, Z.firefly);
   root._worldHitW = 72;
@@ -795,6 +799,14 @@ function buildFireflyView(engine, entity) {
   fly.gotoAndPlay(hash(entity.key) % frames.length);
   root.addChild(glow, fly);
   engine.entityLayer.addChild(root);
+  return { root, glow, fly };
+}
+
+function buildFireflyView(engine, entity) {
+  const frame = resourceNodeFrame(entity.node);
+  const frames = sheetFrames(engine, frame.sheet);
+  if (!frames.length) return;
+  const { root, glow, fly } = fireflySprite(engine, entity, frames);
   const seed = hash(entity.key);
   entity.view = {
     kind: 'firefly',
@@ -821,6 +833,47 @@ function placeFirefly(entity, dtMs) {
   view.glow.x = bounds ? bounds.cx - view.sheet.frameWidth / 2 : 0;
   view.glow.y = view.fly.y + (bounds ? bounds.cy - view.sheet.frameHeight / 2 : 0);
   view.glow.alpha = 0.55 + 0.3 * Math.sin(t * 3.1 + view.phase);
+}
+
+/**
+ * R5: a node as this feature draws it (groundSprite's frame on its foot, a Firefly's glow and body
+ * over its spot), fresh from createResourceNode and with no target: display only, for the nodes of
+ * another player's back yard (homes-feature drawVisitorYard). The frame fills in once its sheet
+ * loads. Returns the display object, or null for a class with no still (Sloths, Salmon, traps).
+ */
+export function resourceNodeStill(engine, { classTsid, x, y, key = '' } = {}) {
+  const def = getResourceNodeDef(classTsid);
+  if (!def || def.art !== 'raster' || classTsid === 'npc_salmon' || classTsid === 'dust_trap') return null;
+  const node = createResourceNode(classTsid, { seed: key, now: Date.now() });
+  const frame = resourceNodeFrame(node);
+  if (!frame?.sheet || frame.hidden) return null;
+  const entity = { classTsid: def.classTsid, key: key || classTsid, x, y, node };
+  const fly = def.classTsid === 'npc_firefly';
+  const holder = fly ? new engine.PIXI.Container() : groundSprite(engine, entity, frame, frameTexture(engine, frame.sheet, frame.frameIndex));
+  if (fly) {
+    holder.zIndex = itemZ(entity.classTsid, Z.firefly);
+    holder.x = x;
+    holder.y = y - 74;
+    engine.entityLayer.addChild(holder);
+  }
+  const fill = () => {
+    if (holder.destroyed) return;
+    if (fly) {
+      const frames = sheetFrames(engine, frame.sheet);
+      if (!frames.length || holder.children?.length) return;
+      const { root } = fireflySprite(engine, entity, frames);
+      holder.addChild(root);
+      root.zIndex = 0;
+      return;
+    }
+    const texture = frameTexture(engine, frame.sheet, frame.frameIndex);
+    if (!texture) return;
+    holder.texture = texture;
+    holder.anchor.set(0.5, footAnchor(frame.sheet, frame.frameIndex));
+  };
+  if (sheets.has(frame.sheet.path)) fill();
+  else Promise.resolve().then(() => ensureSheet(engine, frame.sheet)).then(fill, () => {});
+  return holder;
 }
 
 function buildSalmonView(engine, entity) {
