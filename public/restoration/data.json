@@ -2814,9 +2814,34 @@
   "deployed": "2026-11-25"
  },
  "git": {
-  "commits": 3537,
+  "commits": 3543,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-25",
+    "kind": "improve",
+    "text": "A visitor walked out of a house keeps no copy of its inside"
+   },
+   {
+    "date": "2026-11-25",
+    "kind": "fix",
+    "text": "A friend's back yard draws each rock, node and Patch once for those let in"
+   },
+   {
+    "date": "2026-11-25",
+    "kind": "improve",
+    "text": "Comment wording on the house-locked line"
+   },
+   {
+    "date": "2026-11-25",
+    "kind": "new",
+    "text": "Key holders and visitors let in can dig, harvest and tend in a friend's back yard"
+   },
+   {
+    "date": "2026-11-25",
+    "kind": "new",
+    "text": "Visitors see inside a house and its back yard only with a key or once let in"
+   },
    {
     "date": "2026-11-25",
     "kind": "fix",
@@ -2911,34 +2936,9 @@
     "date": "2026-11-25",
     "kind": "fix",
     "text": "A dead connection is found in seconds and says \"Reconnecting...\""
-   },
-   {
-    "date": "2026-11-25",
-    "kind": "fix",
-    "text": "Your Feat place moves as others pass you"
-   },
-   {
-    "date": "2026-11-25",
-    "kind": "fix",
-    "text": "Upright on a phone a short room shows whole from its top"
-   },
-   {
-    "date": "2026-11-25",
-    "kind": "fix",
-    "text": "The phone's stick lets go when its lift is lost, and stops at a new street"
-   },
-   {
-    "date": "2026-11-25",
-    "kind": "fix",
-    "text": "The three subway tracks come with the Vine Radio, now that no station plays them"
-   },
-   {
-    "date": "2026-11-25",
-    "kind": "fix",
-    "text": "Quest rooms play the teleport chime going in and out, and the Door Drink plays it once"
    }
   ]
  },
- "tests": 1384,
+ "tests": 1386,
  "generatedAt": "2026-11-25"
 }
