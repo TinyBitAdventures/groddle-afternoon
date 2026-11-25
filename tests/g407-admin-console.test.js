@@ -314,7 +314,8 @@ describe('the site routes (groddle-afternoon-site AdminConsole, AdminConsolePage
     }
     assert.match(src, /private const ADMIN = 'manage_options';/);
     const page = readFileSync(sitePath('src/AdminConsolePage.php'), 'utf8');
-    assert.match(page, /Response::redirect\('\/minn-admin\/login\?redirect_to=' \. rawurlencode\(self::PATH\), 302\)/);
+    // Signed out goes to sign-in, back to the console address asked for (site 8d6e1eb; tests/console-routes.test.js checks $back).
+    assert.match(page, /Response::redirect\('\/minn-admin\/login\?redirect_to=' \. rawurlencode\(\$back\), 302\)/);
     assert.match(page, /can\(\$user->id, 'manage_options'\)\) \{\s*return Response::html\(self::refused\(\), 403\)/);
     assert.ok(page.indexOf("can($user->id, 'manage_options')") < page.indexOf('$this->document()'), 'the gate comes before the page');
     assert.match(readFileSync(sitePath('src/Extension.php'), 'utf8'), /new AdminConsole\(\$minn\)/);
