@@ -67,7 +67,7 @@ import {
   CAMERA_CLASS, CAPTION_MAX, FORGET_RECHARGE_SEC, RECHARGE_BUFF, SNAP_COPY as T, SNAP_MAX_BYTES, TRAVEL,
   albumSnaps, base64Bytes, canSnap, cleanCaption, isSnapDownload, isSnapUrl, jpegBase64, savedActions, snapAuthor, snapDate, snapPlace,
   snapFileName, snapResolution, snapShareUrl, snapSteps, snapStreet, takePictureState, viewerActions, viewerStep, withCamera, WHOLE_SNAP,
-} from '../snaps.js?v=887f3da9';
+} from '../snaps.js?v=b5be8bff';
 import { VINTAGE_TEXT, applyFilter, filterComponents, filtersFor } from '../snap-filters.js?v=32315cf1';
 import { HOME_SHOT_COPY, homeShotState } from '../home-shot.js?v=4384d3a2';
 import { renderHomeLocation } from '../home-shot-render.js?v=cac82952';

@@ -34,7 +34,7 @@ import { ensureHellItems } from '../public/js/hell.js?v=d77f15ef';
 import { ensureFoxItems } from '../public/js/foxes.js?v=4497a984';
 import { STORE_CATALOG } from '../public/js/store-catalog.js?v=c6ebb2bd';
 import { IMAGINATION_UPGRADES } from '../public/js/imagination-data.js?v=4a85e7fe';
-import { remakeStatus } from '../public/js/imagination-remake.js?v=c37ad887';
+import { remakeStatus } from '../public/js/imagination-remake.js?v=99997003';
 import { HOTKEYS_FOOTER, HOTKEYS_TITLE, hotkeySections } from '../public/js/client-hotkeys.js?v=5c5a4301';
 import { SKILL_REMAKE_NOTES } from '../public/js/skill-tree.js?v=08772a4b';
 

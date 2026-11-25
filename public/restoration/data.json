@@ -2366,10 +2366,10 @@
  "imagination": {
   "total": 275,
   "counts": {
-   "live": 248,
+   "live": 253,
    "starter": 7,
    "none": 6,
-   "online": 14
+   "online": 9
   }
  },
  "jobs": {
@@ -2814,9 +2814,19 @@
   "deployed": "2026-11-25"
  },
  "git": {
-  "commits": 3509,
+  "commits": 3513,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-25",
+    "kind": "new",
+    "text": "Solo snaps save to your device, and a house file's practice copy can snap"
+   },
+   {
+    "date": "2026-11-25",
+    "kind": "fix",
+    "text": "Enter in Camera Mode no longer works the nearest item"
+   },
    {
     "date": "2026-11-25",
     "kind": "fix",
@@ -2926,19 +2936,9 @@
     "date": "2026-11-25",
     "kind": "fix",
     "text": "A restyled cabinet's storage window shows the style's own picture"
-   },
-   {
-    "date": "2026-11-25",
-    "kind": "fix",
-    "text": "A squashed shadow deco keeps its soft edge (Egret Taun Towers Basement's ceiling)"
-   },
-   {
-    "date": "2026-11-25",
-    "kind": "fix",
-    "text": "Groddle Ladder's sky crack shows the starry night, not its white mask"
    }
   ]
  },
- "tests": 1380,
+ "tests": 1381,
  "generatedAt": "2026-11-25"
 }

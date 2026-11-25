@@ -57,7 +57,7 @@ import {
 import { brainCapacityRescale, skillTimeFactor } from '../imagination-effects.js?v=70169933';
 import { betterLearningDiscount } from '../better-learning.js?v=044ff9ff';
 import { rescaleStudiesForLearningModifier } from '../skills.js?v=dfbf499b';
-import { isOfferedInRemake, isOfferedOnline, remakeStatus } from '../imagination-remake.js?v=c37ad887';
+import { isOfferedInRemake, isOfferedOnline, remakeStatus } from '../imagination-remake.js?v=99997003';
 import { hellFeature } from './hell-feature.js?v=74604dfc';
 import { CARD_ZOOM_MS, createImgReveal, createLabelPicker, measureArt, playAreaRect, revealContent } from '../img-reveal.js?v=0386b354';
 import { autoplayLog } from '../autoplay-log.js?v=55bb4823';

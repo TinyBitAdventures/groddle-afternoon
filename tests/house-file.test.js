@@ -26,7 +26,7 @@ import {
   resolveHouseFileUrl,
   validateHouseFile,
 } from '../public/js/house-file.js?v=a0b6c7aa';
-import { applyHouse, bootHouseFile, houseFileRequest } from '../public/js/house-file-loader.js?v=5c6102c5';
+import { applyHouse, bootHouseFile, houseFileRequest } from '../public/js/house-file-loader.js?v=b55d31ac';
 import { homesFeature } from '../public/js/features/homes-feature.js?v=38f289ee';
 import { homeMachinesFeature } from '../public/js/features/home-machines-feature.js?v=89b7cb5a';
 import { craftybotFeature } from '../public/js/features/craftybot-feature.js?v=b2044ae6';

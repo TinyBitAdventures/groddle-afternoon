@@ -40,7 +40,7 @@ import {
   resolveParadiseReward,
 } from '../public/js/paradise-flight.js?v=165732ba';
 import { QURAZY_REWARDS } from '../public/js/quoins.js?v=5abad2c7';
-import { remakeStatus } from '../public/js/imagination-remake.js?v=c37ad887';
+import { remakeStatus } from '../public/js/imagination-remake.js?v=99997003';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const publicDir = path.join(here, '..', 'public');

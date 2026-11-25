@@ -27,7 +27,7 @@
 import { ITEM_CATALOG } from './inventory.js?v=6414dbdc';
 import { ownGroundPlaces } from './ground-stacks.js?v=22792362';
 import { isSolo } from './game-mode.js?v=1ecf2899';
-import { SNAPSHOTTERY } from './snaps.js?v=887f3da9';
+import { SNAPSHOTTERY } from './snaps.js?v=b5be8bff';
 import {
   HOUSE_FILE_MAX_BYTES,
   HOUSE_FILE_PARAM,

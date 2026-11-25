@@ -378,7 +378,7 @@ describe('solo is untouched', () => {
     const src = read('public/js/features/imagination-feature.js');
     assert.match(src, /offerable: engine\?\.mode === 'multiplayer' \? offeredInMultiplayer : isOfferedInRemake/);
     assert.match(src, /const offeredInMultiplayer = isOfferedOnline;/);
-    const { remakeStatus, isOfferedInRemake, isOfferedOnline } = await import('../public/js/imagination-remake.js?v=c37ad887');
+    const { remakeStatus, isOfferedInRemake, isOfferedOnline } = await import('../public/js/imagination-remake.js?v=99997003');
     for (const id of ['transcendental_radius_1', 'transcendental_radius_2', 'transcendental_radius_3', 'transcendental_benefits_1', 'transcendental_benefits_2', 'transcendental_imagination', 'meditative_arts_less_distraction', 'meditative_arts_less_distraction_2']) {
       assert.equal(remakeStatus(id).status, 'online', id);
       assert.equal(isOfferedInRemake(id), false, id);

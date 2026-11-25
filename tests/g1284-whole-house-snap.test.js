@@ -35,7 +35,7 @@ import { renderHomeShot } from '../public/js/home-shot-render.js?v=cac82952';
 import { roomPieces } from '../public/js/home-wallpaper.js?v=a882fa38';
 import { createHomeDecorState, INTERIOR } from '../public/js/home-decor.js?v=adc6b830';
 import { HOME_STALE_DELAY_MS, RETRY_MS, staleRefreshDue } from '../public/js/profiles.js?v=7caf2524';
-import { snapSteps, SNAP_MAX_H, SNAP_MAX_W, WHOLE_SNAP } from '../public/js/snaps.js?v=887f3da9';
+import { snapSteps, SNAP_MAX_H, SNAP_MAX_W, WHOLE_SNAP } from '../public/js/snaps.js?v=b5be8bff';
 import { snapsFeature } from '../public/js/features/snaps-feature.js?fresh=g1284';
 import { profilesFeature } from '../public/js/features/profiles-feature.js?fresh=g1284';
 

@@ -11,7 +11,7 @@ import {
   moodWarningFor,
   periodicMoodLoss,
 } from '../public/js/mood-decay.js?v=49175993';
-import { isOfferedInRemake, remakeStatus } from '../public/js/imagination-remake.js?v=c37ad887';
+import { isOfferedInRemake, remakeStatus } from '../public/js/imagination-remake.js?v=99997003';
 import { IMAGINATION_UPGRADES } from '../public/js/imagination.js?v=1bdfd77c';
 // The feature imports these with their browser cache tags; load the same module instances.
 import { moodDecayContext, moodDecayFeature, runMoodDecayMinute } from '../public/js/features/mood-decay-feature.js?v=f5557766';

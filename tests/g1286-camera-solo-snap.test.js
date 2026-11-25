@@ -25,12 +25,12 @@ import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { cameraKey } from '../public/js/features/camera-mode-feature.js?v=f4448510';
+import { cameraKey } from '../public/js/features/camera-mode-feature.js?v=9df0576f';
 import { cameraModeFeature } from '../public/js/features/camera-mode-feature.js?fresh=g1286';
 import { snapsFeature } from '../public/js/features/snaps-feature.js?fresh=g1286';
-import { SNAP_COPY, snapFileName } from '../public/js/snaps.js?v=887f3da9';
-import { remakeStatus, isOfferedInRemake } from '../public/js/imagination-remake.js?v=c37ad887';
-import { HOUSE_FILE_SNAP_NOTE, grantPracticeSnapshottery, showHouseFileReport } from '../public/js/house-file-loader.js?v=5c6102c5';
+import { SNAP_COPY, snapFileName } from '../public/js/snaps.js?v=b5be8bff';
+import { remakeStatus, isOfferedInRemake } from '../public/js/imagination-remake.js?v=99997003';
+import { HOUSE_FILE_SNAP_NOTE, grantPracticeSnapshottery, showHouseFileReport } from '../public/js/house-file-loader.js?v=b55d31ac';
 import { roomPieces } from '../public/js/home-wallpaper.js?v=a882fa38';
 import { createHomeDecorState, INTERIOR } from '../public/js/home-decor.js?v=adc6b830';
 

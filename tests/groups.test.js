@@ -35,7 +35,7 @@ import {
 } from '../public/js/groups.js?v=d5a70dca';
 import { createMinnAccount } from '../public/js/minn-account.js?v=3d783519';
 import { groupsFeature } from '../public/js/features/groups-feature.js?v=a14de711';
-import { FEATURES } from '../public/js/features/index.js?v=e79448d2';
+import { FEATURES } from '../public/js/features/index.js?v=0091b66e';
 import { serverPath, sitePath, skipWithoutServer, skipWithoutSite } from '../tools/repos.mjs';
 
 const root = join(import.meta.dirname, '..');
@@ -448,7 +448,7 @@ describe('Trade Channelling in multiplayer (imagination-feature)', () => {
   it('is dealt in multiplayer only', async () => {
     const src = read('public/js/features/imagination-feature.js');
     assert.match(src, /offerable: engine\?\.mode === 'multiplayer' \? offeredInMultiplayer : isOfferedInRemake/);
-    const { remakeStatus, isOfferedInRemake, isOfferedOnline } = await import('../public/js/imagination-remake.js?v=c37ad887');
+    const { remakeStatus, isOfferedInRemake, isOfferedOnline } = await import('../public/js/imagination-remake.js?v=99997003');
     assert.equal(remakeStatus('trade_channel').status, 'online');
     assert.equal(isOfferedInRemake('trade_channel'), false);
     assert.equal(isOfferedOnline('trade_channel'), true);

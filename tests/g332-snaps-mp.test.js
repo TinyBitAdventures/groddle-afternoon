@@ -18,9 +18,9 @@ import { join } from 'node:path';
 import {
   CAMERA_OFFER, FORGET_RECHARGE_SEC, RECHARGE_BUFF, SNAP_COPY, SNAPSHOTTERY, TRAVEL,
   canSnap, cleanCaption, isSnapStreet, isSnapUrl, snapAuthor, snapPlace, snapStreet, takePictureState, withCamera,
-} from '../public/js/snaps.js?v=887f3da9';
-import { snapsFeature } from '../public/js/features/snaps-feature.js?v=05622532';
-import { FEATURES } from '../public/js/features/index.js?v=e79448d2';
+} from '../public/js/snaps.js?v=b5be8bff';
+import { snapsFeature } from '../public/js/features/snaps-feature.js?v=2b773dec';
+import { FEATURES } from '../public/js/features/index.js?v=0091b66e';
 import { HAS_SITE, SITE_DIR, skipWithoutSite } from '../tools/repos.mjs';
 
 const root = join(import.meta.dirname, '..');
@@ -232,7 +232,7 @@ describe('snaps feature: the Camera item stays online (solo snaps to the device:
     assert.ok(ids.indexOf('snaps') < ids.indexOf('street-objects'));
     const game = read('public/game.js');
     assert.match(game, /for \(const feature of features\.features\) \{\s*if \(typeof feature\.vendorProfile === 'function'\) activeVendor = feature\.vendorProfile\(activeVendor, engine\) \|\| activeVendor;/);
-    const { remakeStatus, isOfferedInRemake, isOfferedOnline } = await import('../public/js/imagination-remake.js?v=c37ad887');
+    const { remakeStatus, isOfferedInRemake, isOfferedOnline } = await import('../public/js/imagination-remake.js?v=99997003');
     // Snapshottery and its filter packs (js/snap-filters.js): G1286, solo snaps to the device under the same card rule.
     for (const id of ['snapshotting', 'snapshottery_basic_filter_pack', 'snapshottery_filter_pack_1', 'snapshottery_filter_pack_2', 'snapshottery_filter_pack_3']) {
       assert.equal(remakeStatus(id).status, 'live', id);
