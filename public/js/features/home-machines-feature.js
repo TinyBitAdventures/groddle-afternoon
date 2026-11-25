@@ -96,7 +96,7 @@ import {
   TAKEN_KEEP,
 } from '../home-machines.js?v=a2ba898c';
 import { CALL_PLAYER_LINES, MACHINE_HITBOX, MACHINE_SKILLS, collectLine, machineJobMs, machineMadeLine, refuelCount, runningSoundKey, takeJobIngredients } from '../machine-rooms.js?v=ca927ffd';
-import { MACHINE_ART_SHEETS, LOW_FUEL_BUBBLE_MS, LOW_FUEL_LINE, isLowFuel, machineFrame, machineSheetDef, roomMachineState } from '../machine-art.js?v=d3381a4b';
+import { MACHINE_ART_SHEETS, LOW_FUEL_BUBBLE_MS, LOW_FUEL_LINE, isLowFuel, machineFrame, machineFrameRect, machineSheetDef, roomMachineState } from '../machine-art.js?v=d3381a4b';
 import { FUEL_CELL, FUEL_PER_CELL, MAX_FUEL } from '../machines.js?v=5d749d26';
 import { ITEM_CATALOG, addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=6414dbdc';
 import { receiveToolCopy, takeToolCopy } from '../tools.js?v=4156bba8';
@@ -107,7 +107,7 @@ import { createBackYardState, homeStreetLayout, normalizeCultivationState } from
 import { lookOf, poseOf } from './realtime-feature.js?v=d1d08bf7';
 import { readVisitScene } from '../neighbours-mp.js?v=1ea504ef';
 import { saveStore } from '../save-store.js?v=4e720735';
-import { textureFromUrl } from '../textures.js?v=b8e38103';
+import { frameTexture, sourceFromUrl, textureFromUrl } from '../textures.js?v=b8e38103';
 import { createSheetLoader } from '../sprite-sheets.js?v=d787e3c3';
 import { STREET_GROUND_Y, homesFeature } from './homes-feature.js?v=38f289ee';
 import { payAltarBonus } from './machine-rooms-feature.js?v=e27c6152';
@@ -1145,6 +1145,30 @@ function createSession(engine, client) {
   };
 }
 
+/**
+ * G1290 (#669): one machine for a whole-house picture of a floor nobody stands on, from what the
+ * home keeps: its sheet's frame for the state it is in (a running job plays 'active', else
+ * 'assembled'), standing on the room's walk line at the house's room x, as drawOne puts it.
+ */
+export function homeShotMachineSprite(PIXI, m, x0 = 0, t = Date.now()) {
+  const s = MACHINE_ART_SHEETS[m.classTsid];
+  let sprite;
+  if (s) {
+    const { state, since } = roomMachineState({ job: m.job && jobRunning(m.job, t) ? m.job : null, waiting: false, collectedAt: 0 }, t);
+    const r = machineFrameRect(m.classTsid, Math.max(0, machineFrame(m.classTsid, state, t - since)));
+    sprite = new PIXI.Sprite(frameTexture(sourceFromUrl(s.url), new PIXI.Rectangle(r.x, r.y, r.w, r.h)));
+    sprite.anchor.set(s.ax / s.fw, s.ay / s.fh);
+  } else {
+    sprite = new PIXI.Sprite(textureFromUrl(`assets/sprites/icons/${m.classTsid}.webp`));
+    standOnFeet(sprite);
+  }
+  sprite.x = Math.round(x0 + (Number(m.rx) || 0));
+  sprite.y = ROOM_GROUND_Y;
+  sprite.zIndex = 14;
+  sprite.label = 'shot-machine';
+  return sprite;
+}
+
 function ensure(engine) {
   if (session) return session;
   if (typeof document === 'undefined' || !engine?.started) return null;
@@ -1187,6 +1211,22 @@ export const homeMachinesFeature = {
     if (verbId !== 'machine_place' || !isHomeMachineClass(classTsid)) return false;
     ensure(engine)?.placeFromPack(classTsid, opts?.copy ?? null);
     return true;
+  },
+
+  /**
+   * G1290 (#669): the machines a house or Tower floor keeps (`place`: house, house:1, tower:2),
+   * drawn into a whole-house picture's `layer` with the room's left end at `x0`. Returns how many.
+   */
+  drawHomeShotMachines(place, layer, x0, engine) {
+    const s = session ? session.slice : savedSlice ? normalizeSlice(savedSlice) : null;
+    if (!s || !layer || !engine?.PIXI) return 0;
+    let n = 0;
+    for (const m of s.machines) {
+      if (m.place !== place) continue;
+      layer.addChild(homeShotMachineSprite(engine.PIXI, m, x0));
+      n += 1;
+    }
+    return n;
   },
 
   save() {

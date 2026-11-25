@@ -1960,6 +1960,27 @@ export const craftybotFeature = {
     return serializeCraftybotState(bot);
   },
 
+  /**
+   * G1290 (#669): the bot in a whole-house picture of a floor nobody stands on (homes-feature
+   * floorShotContainer), from its saved state: its clip's resting frame (a looping clip's first, a
+   * finished one's last: folded asleep, sleepMode), at its x, on `groundY`, facing as it does.
+   * Returns 1 when drawn, 0 when it stands elsewhere.
+   */
+  drawHomeShotBot(floor, layer, groundY, engine) {
+    if (!bot.owned || bot.where !== 'interior' || botFloor() !== floor || !layer || !engine?.PIXI) return 0;
+    const clip = bot.anim === 'craft' ? 'craftStart' : ANIM_CLIP[bot.anim] || (CLIPS[bot.anim] ? bot.anim : 'idle0');
+    const frames = clipFrames(engine, clip);
+    const spr = new engine.PIXI.Sprite(frames[CLIPS[clip].loop ? 0 : frames.length - 1]);
+    spr.anchor.set(ANCHOR.x, ANCHOR.y);
+    spr.scale.x = bot.dir === 'right' ? -1 : 1;
+    spr.x = Math.round(bot.x);
+    spr.y = groundY + 2;
+    spr.zIndex = itemZ(BOT, 4);
+    spr.label = 'shot-craftybot';
+    layer.addChild(spr);
+    return 1;
+  },
+
   restore(slice) {
     bot = normalizeCraftybotState(slice || {});
     // The pack copy is the bot itself.

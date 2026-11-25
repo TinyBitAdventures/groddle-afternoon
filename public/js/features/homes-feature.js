@@ -316,6 +316,7 @@ import { WORLD_FONT_FAMILY } from '../world-text.js?v=6b49f88c';
 import { HOUSE_ART_DIR, HOUSE_FROM_HOME_STYLE, HOUSE_STYLE_IDS, composeHouse, houseFitViewH, houseLabel, houseLot, normalizeHouse } from '../home-house.js?v=3c88c47c';
 import { closeHousePicker, housePickerOpen, openHousePicker, refreshHousePicker } from '../ui/house-picker.js?v=67f03b99';
 import { YARD_WALL_DX } from '../yard-wander.js?v=28f55f45';
+import { housePlace, towerPlace } from '../home-machines.js?v=a2ba898c';
 
 export const HOMES_FEATURE_ID = 'homes';
 const HOME_STREET_TSID = 'RH_HOME_EXT';
@@ -8737,6 +8738,10 @@ function floorShotContainer(engine, { floorDecor, x0 = 0, yard = false, construc
       if (construction) drawTowerBench(shim, { groundY: GROUND_Y });
     }
     if (dropTsid) engine.drawOwnStacks?.(dropTsid, root);
+    // G1290 (#669): the machines and the Crafty Bot that floor keeps, from the saved home.
+    const place = towerFloor != null ? towerPlace(towerFloor) : houseFloor != null ? housePlace(houseFloor) : '';
+    if (place) engine.query?.('drawHomeShotMachines', place, root, x0, engine);
+    if (houseFloor != null) engine.query?.('drawHomeShotBot', houseFloor, root, INTERIOR.floorY, engine);
     return root;
   } finally {
     decor = keep;
