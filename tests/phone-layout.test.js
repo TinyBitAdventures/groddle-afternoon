@@ -14,6 +14,8 @@
  * - #635: an open bag keeps every slot (and a long count) inside its tray at 360x629;
  * - #5: the verb menu and the chooser keep off the stick, Act and Jump, Act taps open and choose
  *   every time, and favor on the caption takes a real touch tap (a 44 px tall hit area);
+ * - the chooser stands in the street above the controls (between the stick and Act sideways), off the
+ *   pinned quest and the pack row, its tiles scrolling inside it, at 360x629 to 402x874 and sideways;
  * - the pinned quest never covers the stick (the tutorial too), and the action chip ("Tap · choose
  *   from 4", drawn on the canvas) keeps off Act, Jump, the stick and the card (R1 audit #5).
  * Run: node --test tests/phone-layout.test.js
@@ -24,8 +26,8 @@ import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
-  GAP, PILL_IDS, STICK, TAP_H, boxesOverlap, fullScreenWay, layoutProblems, menuRoomOf, phoneRegions, pillBadge, socialPillCount, stickRegionOf, streetFloorOf,
-} from '../public/js/ui/phone-layout.js?v=90ed47f1';
+  CHOOSER_MIN_W, GAP, PILL_IDS, STICK, TAP_H, boxesOverlap, chooserRoomOf, fullScreenWay, layoutProblems, menuRoomOf, phoneRegions, pillBadge, socialPillCount, stickRegionOf, streetFloorOf,
+} from '../public/js/ui/phone-layout.js?v=1d8b6006';
 import { phonePins } from '../public/js/ui/quest-pin-button.js?v=2931d81d';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -175,6 +177,39 @@ describe('phone layout: the regions (pure)', () => {
     assert.equal(812 - s2.right, side.act.left - GAP);
     assert.equal(s2.floor, side.pack.top - GAP);
     assert.equal(menuRoomOf(phoneRegions({ width: 390, height: 844, sheet: 'half' }), { width: 390 }), null);
+  });
+
+  it('the chooser\'s room (lane pink 2026-11-25): in the street above the controls upright, beside or over the pinned quest sideways, none under a sheet', () => {
+    const pin = { w: 150, h: 49 };
+    const clear = (r, b, where) => {
+      for (const k of ['stick', 'act', 'jump', 'pack', 'pin', 'strip', 'caption']) assert.ok(!boxesOverlap(b, r[k]), `${where}: the chooser's room overlaps ${k}`);
+      assert.ok(b.left >= 0 && b.top >= 0 && b.right > b.left && b.bottom > b.top, `${where}: a room on the screen`);
+    };
+    for (const [w, h, safe] of [[360, 629], [384, 748], [390, 844], [402, 874, { t: 62, b: 34 }]]) {
+      const up = phoneRegions({ width: w, height: h, safe, pin, caption: { w: 200, h: 26 } });
+      assert.ok(up.pin, `${w}x${h}: the card shows`);
+      const b = chooserRoomOf(up, { width: w });
+      clear(up, b, `${w}x${h}`);
+      assert.equal(b.bottom, Math.min(up.stick.top, up.act.top, up.jump.top) - GAP);
+      assert.equal(b.top, up.notices.top);
+    }
+    // Sideways: beside the card, the room's whole height, when that leaves the chooser room enough...
+    for (const [w, h, safe] of [[844, 390], [874, 402, { l: 62, r: 62, b: 21 }], [748, 384]]) {
+      const side = phoneRegions({ width: w, height: h, safe, pin });
+      assert.ok(side.pin, `${w}x${h}: the card shows`);
+      const b = chooserRoomOf(side, { width: w });
+      clear(side, b, `${w}x${h}`);
+      assert.equal(b.left, side.pin.right + GAP, `${w}x${h}: beside the card`);
+      assert.equal(b.bottom, side.pack.top - GAP);
+    }
+    // ...and over it when beside it is too narrow.
+    const narrow = phoneRegions({ width: 640, height: 360, pin: { w: 200, h: 49 } });
+    const over = chooserRoomOf(narrow, { width: 640 });
+    assert.ok(narrow.act.left - GAP - (narrow.pin.right + GAP) < CHOOSER_MIN_W);
+    clear(narrow, over, '640x360');
+    assert.equal(over.bottom, narrow.pin.top - GAP);
+    assert.equal(over.left, narrow.stick.right + GAP);
+    assert.equal(chooserRoomOf(phoneRegions({ width: 390, height: 844, sheet: 'half' }), { width: 390 }), null);
   });
 
   it('the Map takes the whole height (sideways the whole screen) and leaves the notices no room', () => {
@@ -826,8 +861,8 @@ describe('G1307 (#653): the pinned quest under the stick on the real game (Chrom
         }
         return boxes;
       }));
-      // With a menu open only the card's pairs count here: the chooser is a centred dialog whose shade dims
-      // the stick and Jump by design (Act comes up over it), and the #5 test owns the menus against the controls.
+      // With a menu open only the card's pairs count here: the #5 test owns the menus against the controls,
+      // and 'the chooser keeps off the controls on a phone' the chooser against them, the card and the pack row.
       const check = (boxes, when, only = null) => {
         for (const p of layoutProblems(boxes, { width: w, height: h })) if (!only || p.split(' ').includes(only)) bad.push(`${place} ${when}: ${p}`);
       };
@@ -866,6 +901,123 @@ describe('G1307 (#653): the pinned quest under the stick on the real game (Chrom
         const opened = await tab.evaluate(() => document.documentElement.dataset.phoneSheet === 'half' && Boolean(document.getElementById('quest-panel')?.checkVisibility()));
         if (!opened) bad.push(`${place}: a tap on the card did not open Quests`);
       }
+      if (errors.length) bad.push(`${place}: ${errors.join('; ')}`);
+      await ctx.close();
+    }
+    assert.deepEqual(bad, []);
+  });
+});
+
+/**
+ * The chooser of several things on a phone (lane pink 2026-11-25: centred on the screen it covered Act,
+ * the stick and Jump at 360x629 and 384x748, and reached into the raised stick at 390x844): it stands in
+ * the street above the controls (between the stick and Act sideways), clear of the pinned quest and the
+ * pack row, and with many tiles it scrolls inside itself. Glitch's disambiguator sat in the middle of the
+ * location view (InteractionMenu.as 1149-1153); Glitch had no phone controls to keep off.
+ */
+describe('the chooser keeps off the controls on a phone (Chrome)', { skip: !chromium && 'no playwright' }, () => {
+  const LOCK_WAIT_MS = 30 * 60_000;
+  const IOS = 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1';
+  const ANDROID = 'Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Mobile Safari/537.36';
+  let server = null;
+  let chrome = null;
+  before(async () => {
+    const { openBrowser } = await import('../tools/qa/browser.mjs');
+    const { startServer } = await import('../tools/qa/serve.mjs');
+    chrome = await openBrowser({ label: 'phone-layout chooser test', waitMs: LOCK_WAIT_MS });
+    server = await startServer({ root: join(root, 'public') });
+  }, { timeout: LOCK_WAIT_MS + 60_000 });
+  after(async () => {
+    await chrome?.close();
+    await server?.stop();
+  });
+
+  // [place, width, height, user agent, safe-area insets (the Home Screen app's) or null]
+  const PLACES = [
+    ['Android 360x629', 360, 629, ANDROID, null],
+    ['Android 384x748', 384, 748, ANDROID, null],
+    ['iPhone 390x844', 390, 844, IOS, null],
+    ['iPhone Home Screen app 402x874', 402, 874, IOS, { top: 62, bottom: 34, left: 0, right: 0 }],
+    ['Android sideways 748x384', 748, 384, ANDROID, null],
+    ['iPhone sideways 844x390', 844, 390, IOS, null],
+    ['iPhone Home Screen app sideways 874x402', 874, 402, IOS, { top: 0, bottom: 21, left: 62, right: 62 }],
+  ];
+  it('stands clear of the stick, Act, Jump, the pack row and the pinned quest, and scrolls its tiles when they are many', { timeout: 400_000 }, async () => {
+    const base = `http://127.0.0.1:${server.address().port}`;
+    const bad = [];
+    for (const [place, w, h, ua, insets] of PLACES) {
+      const ctx = await chrome.browser.newContext({ viewport: { width: w, height: h }, isMobile: true, hasTouch: true, deviceScaleFactor: 1, userAgent: ua });
+      await ctx.addInitScript((standalone) => {
+        try { localStorage.setItem('groddle-play-device', 'qa-game'); } catch { /* none */ }
+        if (standalone) Object.defineProperty(Navigator.prototype, 'standalone', { get: () => true, configurable: true });
+      }, Boolean(insets));
+      const tab = await ctx.newPage();
+      const cdp = await ctx.newCDPSession(tab);
+      await cdp.send('Emulation.setSafeAreaInsetsOverride', { insets: insets || { top: 0, bottom: 0, left: 0, right: 0 } });
+      const errors = [];
+      tab.on('pageerror', (e) => errors.push(e.message));
+      await tab.goto(`${base}/play/?autostart=1&questoffer=off&hstip=0&fresh=1&resetgame=1`);
+      await tab.waitForFunction(() => !document.body.classList.contains('is-booting') && document.getElementById('overlay')?.classList.contains('hidden') && document.documentElement.classList.contains('phone-layout'), null, { timeout: 60_000 });
+      await tab.evaluate(() => {
+        for (const b of document.querySelectorAll('button')) if (b.textContent.trim() === 'Got it' && b.offsetParent) b.click();
+        window.groddleQA?.questPins?.pin('animalkinship_pet_piggies');
+      });
+      const settled = async (read) => {
+        let prev = await read();
+        for (let i = 0; i < 20; i++) {
+          await tab.waitForTimeout(150);
+          const next = await read();
+          if (JSON.stringify(next) === JSON.stringify(prev)) return next;
+          prev = next;
+        }
+        return prev;
+      };
+      const measure = () => settled(() => tab.evaluate(() => {
+        const seen = (el) => el && !el.hidden && el.checkVisibility({ visibilityProperty: true, opacityProperty: true }) && el.getBoundingClientRect().width > 0;
+        const rect = (el) => {
+          const r = el.getBoundingClientRect();
+          return { left: r.left, top: r.top, right: r.right, bottom: r.bottom };
+        };
+        const chooser = document.getElementById('enter-chooser');
+        const grid = chooser?.querySelector('.feed-picker-grid');
+        const pieces = {
+          chooser: seen(chooser) ? chooser.querySelector('.feed-picker-card') : null,
+          pin: document.getElementById('quest-pins'),
+          stick: document.querySelector('.touch-stick'),
+          act: document.querySelector('.touch-act'),
+          jump: document.querySelector('.touch-jump'),
+          pack: document.getElementById('pack-row'),
+        };
+        const boxes = {};
+        for (const [k, el] of Object.entries(pieces)) if (seen(el)) boxes[k] = rect(el);
+        return { boxes, tiles: grid?.children.length || 0, scrolls: grid ? grid.scrollHeight > grid.clientHeight + 1 : false, gridH: grid?.clientHeight || 0 };
+      }));
+      const check = (got, when) => {
+        if (!got.boxes.chooser) {
+          bad.push(`${place} ${when}: no chooser`);
+          return;
+        }
+        for (const k of ['pin', 'stick', 'act', 'jump', 'pack']) if (!got.boxes[k]) bad.push(`${place} ${when}: no ${k} to check against`);
+        // The chooser's pairs only (the HUD's own pairs are the tests above), and the card on the screen.
+        for (const p of layoutProblems(got.boxes, { width: w, height: h })) if (p.split(' ').includes('chooser')) bad.push(`${place} ${when}: ${p}`);
+      };
+      const street = await measure();
+      if (street.boxes.act) {
+        await tab.touchscreen.tap((street.boxes.act.left + street.boxes.act.right) / 2, (street.boxes.act.top + street.boxes.act.bottom) / 2);
+        await tab.waitForTimeout(450);
+      }
+      const few = await measure();
+      check(few, `${few.tiles} tiles`);
+      // Many things in reach: the tiles scroll inside the card, which stays in its room.
+      await tab.evaluate(() => {
+        const grid = document.querySelector('#enter-chooser .feed-picker-grid');
+        const tile = grid?.firstElementChild;
+        for (let i = 0; tile && i < 18; i++) grid.insertBefore(tile.cloneNode(true), grid.lastElementChild);
+      });
+      const many = await measure();
+      check(many, `${many.tiles} tiles`);
+      if (many.boxes.chooser && !many.scrolls) bad.push(`${place} ${many.tiles} tiles: the tiles do not scroll inside the card`);
+      if (many.boxes.chooser && many.gridH < 90) bad.push(`${place} ${many.tiles} tiles: the tiles' box is ${many.gridH} px tall, less than a tile`);
       if (errors.length) bad.push(`${place}: ${errors.join('; ')}`);
       await ctx.close();
     }

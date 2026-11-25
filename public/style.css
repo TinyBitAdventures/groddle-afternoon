@@ -15897,4 +15897,17 @@ body.is-booting .touch-controls { display: none; }
     position: absolute; top: calc(var(--sp-4) + var(--slot) + var(--sp-6)); left: var(--sp-4); right: var(--sp-4); z-index: var(--z-raised); margin: 0;
   }
 }
+/* The chooser of several things (js/enter-chooser.js; lane pink 2026-11-25: centred, it covered Act, the
+   stick and Jump) stands in the street above the controls, between the stick and Act sideways, off the
+   pinned quest and the pack row (--pr-chooser-*, phone-layout.js chooserRoomOf), its tiles scrolling
+   inside it when they are many, three to a row (sideways too, where its room is narrower). Its keys line
+   goes, as the key caps do on a phone. */
+:root.phone-layout[data-ui="modern"] #enter-chooser {
+  display: flex; align-items: center; justify-content: center; box-sizing: border-box;
+  padding: var(--pr-chooser-t, 0px) var(--pr-chooser-r, 0px) var(--pr-chooser-b, 0px) var(--pr-chooser-l, 0px);
+}
+:root.phone-layout[data-ui="modern"] #enter-chooser .feed-picker-card { width: min(430px, 100%); max-height: 100%; display: flex; flex-direction: column; }
+:root.phone-layout[data-ui="modern"] #enter-chooser .feed-picker-card > * { flex: none; }
+:root.phone-layout[data-ui="modern"] #enter-chooser .feed-picker-card > .feed-picker-grid { flex: 0 1 auto; min-height: 0; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+:root.phone-layout[data-ui="modern"] #enter-chooser .verb-menu-hint { display: none; }
 /* === end PHONE LAYOUT === */

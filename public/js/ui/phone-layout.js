@@ -282,6 +282,35 @@ export function menuRoomOf(regions, { width } = {}) {
   return { top, floor: floorAbove - GAP, left: regions.stick.right + GAP, right: Math.max(EDGE, num(width) - regions.act.left + GAP) };
 }
 
+/** The least width and height the chooser's room keeps beside or over the pinned quest. */
+export const CHOOSER_MIN_W = 240;
+export const CHOOSER_MIN_H = 120;
+
+/**
+ * PURE (lane pink 2026-11-25: centred on the screen, the chooser of several things covered Act, the stick
+ * and Jump at 360x629 and 384x748, and reached into the raised stick at 390x844): the box the chooser
+ * (js/enter-chooser.js, "Choose the thing you want to interact with:") stands in on a phone, in the root's
+ * px ({ left, top, right, bottom }). It is a menu's room (menuRoomOf: above the controls upright, between
+ * the stick and Act sideways), kept off the pinned quest too: sideways the card beside the stick takes the
+ * room's foot, so the chooser goes beside the card (the room's whole height) when that leaves it
+ * CHOOSER_MIN_W, else over it. The chooser is centred in it and its tiles scroll (style.css PHONE
+ * LAYOUT). null when the controls are covered (a sheet is open): it stays centred on the screen. Glitch
+ * put it in the middle of the location view (InteractionMenu.as 1149-1153), with no phone controls.
+ */
+export function chooserRoomOf(regions, { width } = {}) {
+  const room = menuRoomOf(regions, { width });
+  if (!room) return null;
+  let b = box(room.left, room.top, num(width) - room.right, room.floor);
+  const pin = regions.pin;
+  if (pin && boxesOverlap(pin, b)) {
+    const fits = (c) => c.right - c.left >= CHOOSER_MIN_W && c.bottom - c.top >= CHOOSER_MIN_H;
+    // Beside the card when that is wide enough (the full height: the tiles scroll up and down), else over it.
+    const ways = [box(pin.right + GAP, b.top, b.right, b.bottom), box(b.left, b.top, b.right, pin.top - GAP)];
+    b = ways.find(fits) || ways[1];
+  }
+  return b;
+}
+
 /**
  * PURE (G1230, #595 and #632: an iPhone with "Stick follows your thumb" on): the stick's region from
  * its measured box. With the float stick on, the stick's box is the whole lower-left corner a thumb
@@ -561,6 +590,7 @@ export function mountPhoneLayout({ doc = globalThis.document, root, sheets = {},
     delete html.dataset.phoneSheet;
     engine?.setStageDock?.(null, 'phone');
     html.style.removeProperty('--pr-stick-up');
+    for (const k of ['t', 'l', 'r', 'b']) html.style.removeProperty(`--pr-chooser-${k}`);
     stickUp = 0;
     current = null;
     last = null;
@@ -680,6 +710,15 @@ export function mountPhoneLayout({ doc = globalThis.document, root, sheets = {},
       set('--pr-pin-l', regions.pin.left);
       set('--pr-pin-b', rr.height - regions.pin.bottom);
     }
+    // The chooser of several things stands in the street above the controls (chooserRoomOf); under a sheet,
+    // with no controls showing, it stays centred on the screen.
+    const ch = chooserRoomOf(regions, { width: rr.width });
+    if (ch) {
+      set('--pr-chooser-t', ch.top);
+      set('--pr-chooser-l', ch.left);
+      set('--pr-chooser-r', rr.width - ch.right);
+      set('--pr-chooser-b', rr.height - ch.bottom);
+    } else for (const k of ['t', 'l', 'r', 'b']) html.style.removeProperty(`--pr-chooser-${k}`);
     // G1307: the stick stands up over the card's row (it keeps its spot while covered, hidden then, so it
     // does not jump as a sheet or a bag closes).
     if (!s.kind && regions.stickUp !== stickUp) {
