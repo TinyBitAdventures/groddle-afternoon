@@ -152,9 +152,10 @@ export function untilText(ms) {
 
 /**
  * #691: why an act is refused when `k` of the `n` it takes are in the pack but past today's limit
- * (emblems past the day's four, tickets, beads ...): the same words as the site's LedgerMath::waitingText,
- * "This Emblem of Mab is past today's limit, so it isn't counted yet. You can drop it after midnight UTC
- * (in about 3 hours)." `one` and `many` are the class's names; `currants` names the player's currants.
+ * (Gameshow Tickets, beads, artifact pieces ...; never an emblem, G1299): the same words as the site's
+ * LedgerMath::waitingText, "This Gameshow Ticket is past today's limit, so it isn't counted yet. You can
+ * drop it after midnight UTC (in about 3 hours)." `one` and `many` are the class's names; `currants`
+ * names the player's currants.
  */
 export function waitingText({ one = 'item', many = one, n = 1, k = n, verb = 'drop', now = Date.now(), clears = nextUtcDay(now), currants = false } = {}) {
   const count = (x) => Number(x).toLocaleString('en-US');
