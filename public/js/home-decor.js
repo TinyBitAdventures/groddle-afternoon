@@ -51,7 +51,7 @@ import {
   HOME_LIMITS,
   HOME_TEXTURE_CONFIGS,
 } from './homes-catalog.js?v=0367f90f';
-import { cleanHistory, cleanUpgradeId, upgradeArt, upgradeRow } from './furniture-upgrades.js?v=6cc0e2da';
+import { cleanHistory, cleanUpgradeId, upgradeArt, upgradeRow } from './furniture-upgrades.js?v=f563b304';
 import { SDB_COUNT_MAX, SDB_PRICE_MAX, isCabinetClass, normalizeContents, storagePickupLock } from './home-storage.js?v=b0225465';
 import { stackMaxOf } from './pack-slots.js?v=38e4aea5';
 
@@ -243,12 +243,14 @@ export const REST_INSET = 2;
  * (tools/furniture-upgrades/render.py --feet), and the remake draws the art's
  * bottom on the piece's foot, so the plat is `platY - foot` over it:
  * - a piece hung above its point (the wall shelves, foot > 0: the Basic Wooden
- *   Shelf's plat is 52 over a stage bottom 19 px under its 49 px art) rests
- *   things 33 px up, on the plank (HOUSEFIX, Austin 2026-11-01);
+ *   Shelf's plat is 52 over a stage bottom 24 px under its 49 px art) rests
+ *   things 28 px up, on the plank (HOUSEFIX, Austin 2026-11-01; the foot is
+ *   measured from the zoom-3 art, #669: at zoom 1 it read 19 and things stood
+ *   at 33, 5 px behind the plat);
  * - a floor piece drawn past its point (foot < 0: legs and front edges in
  *   three-quarter view reach below the line it stands on) rests them that much
  *   higher, on its top: the Dining Table with Striped Runner's plat 52 with a
- *   foot of -24 is 76 up its 90 px art. Before, its plat was taken as it stood,
+ *   foot of -23 is 75 up its 90 px art. Before, its plat was taken as it stood,
  *   so things sat on a table's front edge or in front of its legs.
  * Nothing rests above the art's visible top over its middle (art.top, measured
  * by tools/furniture-upgrades/tops.mjs, whose --check sweeps every piece): a

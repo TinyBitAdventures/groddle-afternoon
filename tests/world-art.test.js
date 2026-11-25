@@ -14,8 +14,8 @@ import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { WORLD_ART } from '../public/js/world-art-list.js?v=932c8bcf';
 import { FALLBACK_MAX, artIdOf, worldArtFor, worldStateFor } from '../public/js/world-art.js?v=a67514c8';
-import { surfaceHeight, stackSurfaceAt, createHomeDecorState } from '../public/js/home-decor.js?v=36f8d733';
-import { FURNITURE_UPGRADES } from '../public/js/furniture-upgrades-data.js?v=4fe80b0f';
+import { surfaceHeight, stackSurfaceAt, createHomeDecorState } from '../public/js/home-decor.js?v=31f37d9b';
+import { FURNITURE_UPGRADES } from '../public/js/furniture-upgrades-data.js?v=0b2cf3cc';
 
 const root = join(import.meta.dirname, '..');
 const pub = join(root, 'public');
@@ -187,17 +187,43 @@ describe('what is set on a shelf rests on its plank', () => {
       const h = surfaceHeight('furniture_shelf', id);
       assert.ok(h > 0 && h <= row.art.h, `${id}: ${h} on ${row.art.h}`);
     }
-    // Basic Wooden Shelf (94): plat 52 over a stage bottom 19 px under its 49 px art: 33 up, on the plank.
-    assert.equal(FURNITURE_UPGRADES.furniture_shelf.upgrades['94'].art.foot, 19);
-    assert.equal(surfaceHeight('furniture_shelf', '94'), 33);
+    // Basic Wooden Shelf (94): plat 52 over a stage bottom 24 px under its 49 px art: 28 up, on the plank.
+    assert.equal(FURNITURE_UPGRADES.furniture_shelf.upgrades['94'].art.foot, 24);
+    assert.equal(surfaceHeight('furniture_shelf', '94'), 28);
   });
 
   it('rests things on the base shelf\'s plank from its own plat; a table drawn past its point rests things that much higher, on its top (DECOITEMS)', () => {
     // DECOPOLISH: furniture_shelf.js getFurnitureBaseGeo plat 38 over a stage bottom 8 px under its 47 px art: 30 up.
     assert.equal(surfaceHeight('furniture_shelf', ''), 30);
-    // Dining Table with Striped Runner: plat 52 over a stage bottom 24 px above its art's bottom.
-    assert.equal(FURNITURE_UPGRADES.furniture_table.upgrades['59'].art.foot, -24);
-    assert.equal(surfaceHeight('furniture_table', '59'), 76);
+    // Dining Table with Striped Runner: plat 52 over a stage bottom 23 px above its art's bottom.
+    assert.equal(FURNITURE_UPGRADES.furniture_table.upgrades['59'].art.foot, -23);
+    assert.equal(surfaceHeight('furniture_table', '59'), 75);
+  });
+
+  it('things stand on the plat Glitch gave each shelf, not behind it: the foot is measured on the art drawn (#669)', () => {
+    // #669: on Glitch's shelves things stood near the front lip; ours stood 3 to 5 px further
+    // back. The plats were right; the feet were read at zoom 1, where FFDec draws a blurred drop
+    // shadow longer than in the zoom-3 art the game draws, so the stage bottom sat too low.
+    // [style, catalog plat, foot on the zoom-3 art, rest = plat - foot]
+    const SHELVES = {
+      344: [51, 2, 49], // Firebog Shelf: plat 4 px behind its front lip, 49 up (the 2012 picture: 48-50)
+      95: [53, 26, 27], // Glass Shelf: plat at the glass's front edge
+      94: [52, 24, 28], // Basic Wooden Shelf
+      93: [52, 26, 26], // Basic Black Shelf
+    };
+    for (const [id, [plat, foot, rest]] of Object.entries(SHELVES)) {
+      const row = FURNITURE_UPGRADES.furniture_shelf.upgrades[id];
+      assert.equal(row.platY, plat, `${id} plat`);
+      assert.equal(row.art.foot, foot, `${id} foot`);
+      assert.equal(surfaceHeight('furniture_shelf', id), rest, `${id} rest`);
+    }
+    // render.py --feet measures at the zoom the art is rendered at, with the same crop.
+    const render = readFileSync(join(root, 'tools/furniture-upgrades/render.py'), 'utf8');
+    const feet = render.slice(render.indexOf('def feet('), render.indexOf('\nBASE = '));
+    assert.match(feet, /'-zoom', str\(ZOOM\)/);
+    assert.match(feet, /crops\(keys, plan, out_dir, names\)/);
+    assert.match(feet, /foot_of\(infos\[key\], y, h, ZOOM\)/);
+    assert.doesNotMatch(feet, /'-zoom', '1'/);
   });
 
   it("a stack dragged onto an upgraded shelf lands on the shelf's plank", () => {
@@ -205,6 +231,6 @@ describe('what is set on a shelf rests on its plank', () => {
     state.placed.push({ id: 99, classTsid: 'furniture_shelf', upgradeId: '94', x: 700, y: 300, z: 50, slot: 'wall' });
     const at = stackSurfaceAt(state, 700, 250);
     assert.equal(at.on, 99);
-    assert.equal(at.y, 267);
+    assert.equal(at.y, 272);
   });
 });

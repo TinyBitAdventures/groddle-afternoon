@@ -18,8 +18,8 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { createHomeDecorState, DISPLAY_TEXT, displayDeposit, displayRefusal, displayWithdraw, surfaceHeight } from '../public/js/home-decor.js?v=36f8d733';
-import { FURNITURE_UPGRADES } from '../public/js/furniture-upgrades-data.js?v=4fe80b0f';
+import { createHomeDecorState, DISPLAY_TEXT, displayDeposit, displayRefusal, displayWithdraw, surfaceHeight } from '../public/js/home-decor.js?v=31f37d9b';
+import { FURNITURE_UPGRADES } from '../public/js/furniture-upgrades-data.js?v=0b2cf3cc';
 import { basePlats } from '../tools/furniture-upgrades/build.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -152,7 +152,7 @@ describe('a Storage Display Box takes things, as the original did', () => {
  * side (ItemIconView.as 315-321), keeping its shape.
  */
 describe('#314 the shown item keeps its shape', async () => {
-  const { displayIconScale, SDB_ITEM_WH } = await import('../public/js/features/homes-feature.js?v=8907127a');
+  const { displayIconScale, SDB_ITEM_WH } = await import('../public/js/features/homes-feature.js?v=c9995a3a');
   it('fits the longer side into 34 px', () => {
     assert.equal(SDB_ITEM_WH, 34);
     const wine = displayIconScale(15, 48);

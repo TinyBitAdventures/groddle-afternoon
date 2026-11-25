@@ -41,8 +41,8 @@ import {
   isHousePlace,
   settleSolo,
   soloRow,
-} from '../public/js/home-machines.js?v=c3fac8d8';
-import { homeMachinesFeature } from '../public/js/features/home-machines-feature.js?v=dc6775ec';
+} from '../public/js/home-machines.js?v=fe3d2424';
+import { homeMachinesFeature } from '../public/js/features/home-machines-feature.js?v=f3f9017d';
 import { RECIPE_CATALOG, setRecipeCatalog } from '../public/js/making.js?v=1ec1075e';
 import { HAS_SERVER, HAS_SITE, SITE_DIR, serverPath } from '../tools/repos.mjs';
 

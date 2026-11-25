@@ -30,9 +30,9 @@ import { cameraModeFeature } from '../public/js/features/camera-mode-feature.js?
 import { snapsFeature } from '../public/js/features/snaps-feature.js?fresh=g1286';
 import { SNAP_COPY, snapFileName } from '../public/js/snaps.js?v=b5be8bff';
 import { remakeStatus, isOfferedInRemake } from '../public/js/imagination-remake.js?v=99997003';
-import { HOUSE_FILE_SNAP_NOTE, grantPracticeSnapshottery, showHouseFileReport } from '../public/js/house-file-loader.js?v=841f141b';
+import { HOUSE_FILE_SNAP_NOTE, grantPracticeSnapshottery, showHouseFileReport } from '../public/js/house-file-loader.js?v=098dae8f';
 import { roomPieces } from '../public/js/home-wallpaper.js?v=5d3594e4';
-import { createHomeDecorState, INTERIOR } from '../public/js/home-decor.js?v=36f8d733';
+import { createHomeDecorState, INTERIOR } from '../public/js/home-decor.js?v=31f37d9b';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const read = (f) => readFileSync(join(here, '..', f), 'utf8');

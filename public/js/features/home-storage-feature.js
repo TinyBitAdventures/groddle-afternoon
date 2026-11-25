@@ -44,8 +44,8 @@
 import { announceCharacterChanged, characterHeaders, characterOf, isCharacterChanged } from '../character-guard.js?v=510034a7';
 import { exposeQA } from '../qa-gate.js?v=f4e2cd82';
 import { ITEM_CATALOG, addItem, countItem, ensureItem, itemIcon, removeItem } from '../inventory.js?v=6414dbdc';
-import { displayRefusal, furnitureDef, furnitureSize, isFurniture, pieceArt } from '../home-decor.js?v=36f8d733';
-import { pieceLabel } from '../furniture-upgrades.js?v=6cc0e2da';
+import { displayRefusal, furnitureDef, furnitureSize, isFurniture, pieceArt } from '../home-decor.js?v=31f37d9b';
+import { pieceLabel } from '../furniture-upgrades.js?v=f563b304';
 import { textureFromUrl } from '../textures.js?v=b8e38103';
 import { ownBagLabel, stackMaxOf, isBagClass } from '../pack-slots.js?v=38e4aea5';
 import { ELEMENT_CLASSES, NO_BAG_CLASSES, NO_SLOT_CLASSES } from '../pack-slots-data.js?v=800f664c';
@@ -53,7 +53,7 @@ import { TOOL_CONDITION_CATALOG, copyTagKind, copyTags, pickToolCopies, receiveT
 import { draggedStack, takeDragged } from '../drag-stack.js?v=80e43757';
 import { scriptFromTag, scriptLabel } from '../teleportation.js?v=cbbc673f';
 import { insideQuery, possessive, readVisitScene } from '../neighbours-mp.js?v=9cbf7e03';
-import { homesFeature } from './homes-feature.js?v=8907127a';
+import { homesFeature } from './homes-feature.js?v=c9995a3a';
 import { saveStore, savedThrough } from '../save-store.js?v=4e720735';
 import {
   SDB_PRICE_MAX,

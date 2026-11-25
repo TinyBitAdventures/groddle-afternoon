@@ -38,9 +38,9 @@ import {
   snapPlacement,
   standSetAt,
   standingSets,
-} from '../public/js/home-decor.js?v=36f8d733';
+} from '../public/js/home-decor.js?v=31f37d9b';
 import { FURNITURE_CATALOG } from '../public/js/homes-catalog.js?v=0367f90f';
-import { FURNITURE_UPGRADES } from '../public/js/furniture-upgrades-data.js?v=4fe80b0f';
+import { FURNITURE_UPGRADES } from '../public/js/furniture-upgrades-data.js?v=0b2cf3cc';
 
 const root = join(import.meta.dirname, '..');
 const GSJS = join(root, '../glitch-GameServerJS');
@@ -219,12 +219,12 @@ describe("G1136: each placement set's depth is Glitch's", () => {
     moveFurniture(state, sofa.id, { x: 600, y: restY('furniture_sofa', 'chair') });
     assert.equal(sofa.plat, 'chair');
     assert.equal(sofa.y, platLineY('chair') + 22);
-    // A style whose art reaches 31 px under its point (upgrade 345): same plat, 9 px lower.
-    assert.equal(FURNITURE_UPGRADES.furniture_sofa.upgrades['345'].art.foot, -31);
+    // A style whose art reaches 30 px under its point (upgrade 345, measured on its zoom-3 art, #669): same plat, 8 px lower.
+    assert.equal(FURNITURE_UPGRADES.furniture_sofa.upgrades['345'].art.foot, -30);
     sofa.upgradeId = '345';
     moveFurniture(state, sofa.id, { x: sofa.x, y: sofa.y, plat: sofa.plat });
     assert.equal(sofa.plat, 'chair');
-    assert.equal(sofa.y, platLineY('chair') + 31);
+    assert.equal(sofa.y, platLineY('chair') + 30);
   });
 
   it('saved pieces from the walk line go to the plat nearest where they stood; a saved plat stays', () => {

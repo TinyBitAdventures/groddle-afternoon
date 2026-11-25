@@ -87,8 +87,8 @@ import {
   surfaceHeight,
   textureConfig,
   wallSlots,
-} from './home-decor.js?v=36f8d733';
-import { cleanUpgradeId } from './furniture-upgrades.js?v=6cc0e2da';
+} from './home-decor.js?v=31f37d9b';
+import { cleanUpgradeId } from './furniture-upgrades.js?v=f563b304';
 import { CABINETS, SDB_CLASS, SDB_COUNT_MAX, isCabinetClass, normalizeContents } from './home-storage.js?v=b0225465';
 import { MACHINE_LABELS } from './machine-rooms.js?v=ca927ffd';
 import { stackMaxOf } from './pack-slots.js?v=38e4aea5';

@@ -22,8 +22,8 @@ import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { FURNITURE_CATALOG } from '../public/js/homes-catalog.js?v=0367f90f';
-import { FURNITURE_UPGRADES } from '../public/js/furniture-upgrades-data.js?v=4fe80b0f';
-import { createHomeDecorState, INTERIOR, placeFurniture, settleStacks, stackSurfaceAt, STALE_REST_GIVE, surfaceHeight } from '../public/js/home-decor.js?v=36f8d733';
+import { FURNITURE_UPGRADES } from '../public/js/furniture-upgrades-data.js?v=0b2cf3cc';
+import { createHomeDecorState, INTERIOR, placeFurniture, settleStacks, stackSurfaceAt, STALE_REST_GIVE, surfaceHeight } from '../public/js/home-decor.js?v=31f37d9b';
 import { normalizeDroppedItemState } from '../public/js/world-items.js?v=a5deb102';
 import { isStandable } from '../public/js/street-model.js?v=a9a05f9d';
 import { BUILDER_TEXT } from '../public/js/ui/home-builder.js?v=03679434';
@@ -66,11 +66,11 @@ describe('the house floor holds the avatar', () => {
 });
 
 describe('what is set down keeps the piece it rests on (settleStacks)', () => {
-  it("rests Austin's diamond, set down before HOUSEFIX at 52 px, on his Basic Wooden Shelf's plank (33 px)", () => {
+  it("rests Austin's diamond, set down before HOUSEFIX at 52 px, on his Basic Wooden Shelf's plank (28 px, #669)", () => {
     const state = austinsRoom();
     const rows = [{ id: 'world-item-2', classTsid: 'gem_diamond', count: 1, x: 1830, y: 358 }];
     assert.equal(settleStacks(state, rows, 1140), 1);
-    assert.deepEqual({ x: rows[0].x, y: rows[0].y, on: rows[0].on }, { x: 1830, y: 410 - 33, on: 7 });
+    assert.deepEqual({ x: rows[0].x, y: rows[0].y, on: rows[0].on }, { x: 1830, y: 410 - 28, on: 7 });
     assert.equal(settleStacks(state, rows, 1140), 0, 'settled stays settled');
   });
 
@@ -88,7 +88,7 @@ describe('what is set down keeps the piece it rests on (settleStacks)', () => {
     const rows = [
       { id: 'a', classTsid: 'apple', count: 1, x: 1140 + 558, y: INTERIOR.floorY },
       { id: 'b', classTsid: 'apple', count: 1, x: 1140 + 900, y: INTERIOR.floorY },
-      { id: 'c', classTsid: 'apple', count: 1, x: 1140 + 690, y: 410 - 33 - STALE_REST_GIVE - 5 },
+      { id: 'c', classTsid: 'apple', count: 1, x: 1140 + 690, y: 410 - 28 - STALE_REST_GIVE - 5 },
     ];
     assert.equal(settleStacks(state, rows, 1140), 0);
     assert.equal(rows.some((r) => r.on), false);

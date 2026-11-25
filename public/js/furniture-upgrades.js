@@ -39,7 +39,7 @@
  *   recovered frame.
  */
 
-import { FURNITURE_UPGRADES } from './furniture-upgrades-data.js?v=4fe80b0f';
+import { FURNITURE_UPGRADES } from './furniture-upgrades-data.js?v=0b2cf3cc';
 
 export { FURNITURE_UPGRADES };
 

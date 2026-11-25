@@ -9,7 +9,7 @@ import { TRAINING2_TABLE_ART, TRAINING2_TABLE_SCALE, training2Layout, training2T
 import { PARADISE_COURSES, PARADISE_EXIT_ART, STARLIT_NIGHT_CLOUDS, STARLIT_NIGHT_CLOUD_SPRITE, PARADISE_STAR_SIDE, paradisePickupTouches, paradiseSourcePoints, paradiseStarArt } from '../public/js/paradise-flight.js?v=165732ba';
 import { POTION_ART } from '../public/js/potion-art.js?v=9d731b38';
 import { ROOK_WOODS_BIRDS } from '../public/js/rook-woods.js?v=0aab151e';
-import { FURNITURE_UPGRADES } from '../public/js/furniture-upgrades-data.js?v=4fe80b0f';
+import { FURNITURE_UPGRADES } from '../public/js/furniture-upgrades-data.js?v=0b2cf3cc';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', 'public');
 const AUDIT = join(process.env.HOME || '', 'Documents/glitch-audit');

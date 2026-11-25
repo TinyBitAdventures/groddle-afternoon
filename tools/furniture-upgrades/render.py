@@ -18,11 +18,18 @@ size is whole, and written as public/assets/sprites/furniture/upgrades/<class>/<
 centre, the point the original placed a piece by (LocationItemstackView.as
 _positionViewDO 853-854) and measured its catalog plats from: the trimmed art
 loses it, so js/home-decor.js surfaceHeight takes it off a plat (the Basic Wooden
-Shelf's plat is 52 over the stage bottom, its art ends 19 px above it, so things
-rest 33 px up its 49 px art, on the plank). Each render records it; for art
-rendered before it was kept:
+Shelf's plat is 52 over the stage bottom, its art ends 24 px above it, so things
+rest 28 px up its 49 px art, on the plank). Each render records it; to measure
+it again without writing art:
 
     python3 -I tools/furniture-upgrades/render.py --feet [--work DIR]
+
+It is measured at ZOOM, from the same trim (and group crop) as the art, never
+at zoom 1: FFDec draws a filter (a drop shadow, a glow) the same number of
+device pixels at any zoom, so at zoom 1 a blurred shadow reaches further below
+the plank than in the zoom-3 art. The Firebog Shelf trims 4 px taller at zoom 1
+and its foot read -1 for art whose bottom is 2 px over the stage bottom, so
+things on it stood 3 px behind its plat (#669, shelfk 2026-11-25).
 
 The plain pieces (no upgrade) draw their recovered OGA frame, which is the base
 SWF's frame 1 trimmed (glitch-items/furniture/furniture_base/<class>/<class>.swf,
@@ -116,31 +123,56 @@ def foot_of(info, y, h, zoom):
     return round(((y1 - y0) * 2 * zoom - (y + h)) / zoom)
 
 
+def crops(batch, plan, out_dir, names):
+    """{key: (w, h, x, y)}: each render's trim at ZOOM, a `group`'s keys cropped to the union of their art."""
+    boxes = {}
+    for key in batch:
+        png = os.path.join(out_dir, names[key], '1.png')
+        if os.path.exists(png):
+            boxes[key] = trim_box(png)
+    union = {}
+    for key, (w, h, x, y) in boxes.items():
+        group = plan[key].get('group')
+        if group is None:
+            continue
+        l, t, r, btm = union.get(group, (x, y, x + w, y + h))
+        union[group] = (min(l, x), min(t, y), max(r, x + w), max(btm, y + h))
+    for key, (w, h, x, y) in list(boxes.items()):
+        group = plan[key].get('group')
+        if group in union:
+            l, t, r, btm = union[group]
+            boxes[key] = (r - l, btm - t, l, t)
+    return boxes
+
+
 def feet(art, work):
-    """Render every key at zoom 1 to measure its foot (no art is written)."""
+    """Render every key at ZOOM, as its art was, to measure its foot (no art is written)."""
     plan = json.load(open(PLAN))
-    keys = [k for k in sorted(art) if k in plan]
-    for b in range(0, len(keys), BATCH):
-        batch = keys[b:b + BATCH]
+    todo = [(key,) for key in sorted(art) if key in plan]
+    done = 0
+    for b, batch in enumerate(batches(todo, plan)):
+        keys = [row[0] for row in batch]
         src_dir = os.path.join(work, f'fsrc{b}')
         out_dir = os.path.join(work, f'fout{b}')
         os.makedirs(src_dir, exist_ok=True)
-        infos = {}
-        for key in batch:
+        names, infos = {}, {}
+        for key in keys:
             src = os.path.expanduser(plan[key]['swf'])
+            names[key] = key.replace('/', '__') + '.swf'
             infos[key] = swfinfo.read(src)
-            swfinfo.rewrite(src, os.path.join(src_dir, key.replace('/', '__') + '.swf'), pad=1.0, swaps=swaps_for(src, plan[key].get('parts')))
-        subprocess.run([JAVA, '-Djava.awt.headless=true', '-jar', FFDEC, '-zoom', '1', '-ignorebackground',
+            swfinfo.rewrite(src, os.path.join(src_dir, names[key]), pad=1.0, swaps=swaps_for(src, plan[key].get('parts')))
+        subprocess.run([JAVA, '-Djava.awt.headless=true', '-jar', FFDEC, '-zoom', str(ZOOM), '-ignorebackground',
                         '-select', '1', '-format', 'frame:png', '-export', 'frame', out_dir, src_dir],
                        capture_output=True, text=True)
-        for key in batch:
-            png = os.path.join(out_dir, key.replace('/', '__') + '.swf', '1.png')
-            if os.path.exists(png):
-                w, h, x, y = trim_box(png)
-                art[key]['foot'] = foot_of(infos[key], y, h, 1)
+        for key, (w, h, x, y) in crops(keys, plan, out_dir, names).items():
+            if (w + (-w % ZOOM)) // ZOOM != art[key]['w'] or (h + (-h % ZOOM)) // ZOOM != art[key]['h']:
+                print(f'  {key}: renders {w}x{h} at {ZOOM}x, its art is {art[key]["w"]}x{art[key]["h"]}: render it again')
+                continue
+            art[key]['foot'] = foot_of(infos[key], y, h, ZOOM)
         shutil.rmtree(src_dir, ignore_errors=True)
         shutil.rmtree(out_dir, ignore_errors=True)
-        print(f'  {min(b + BATCH, len(keys))}/{len(keys)}')
+        done += len(keys)
+        print(f'  {done}/{len(todo)}')
 
 
 BASE = os.path.join(HERE, 'base.json')
@@ -255,18 +287,7 @@ def main(args):
         subprocess.run([JAVA, '-Djava.awt.headless=true', '-jar', FFDEC, '-zoom', str(ZOOM), '-ignorebackground',
                         '-select', '1', '-format', 'frame:png', '-export', 'frame', out_dir, src_dir],
                        capture_output=True, text=True)
-        boxes = {}
-        for key, *_ in batch:
-            png = os.path.join(out_dir, names[key], '1.png')
-            if os.path.exists(png):
-                boxes[key] = trim_box(png)
-        union = {}
-        for key, (w, h, x, y) in boxes.items():
-            group = plan[key].get('group')
-            if group is None:
-                continue
-            l, t, r, btm = union.get(group, (x, y, x + w, y + h))
-            union[group] = (min(l, x), min(t, y), max(r, x + w), max(btm, y + h))
+        boxes = crops([key for key, *_ in batch], plan, out_dir, names)
         for key, src, digest, dst in batch:
             png = os.path.join(out_dir, names[key], '1.png')
             if key not in boxes:
@@ -274,10 +295,6 @@ def main(args):
                 art.pop(key, None)
                 continue
             w, h, x, y = boxes[key]
-            group = plan[key].get('group')
-            if group in union:
-                l, t, r, btm = union[group]
-                w, h, x, y = r - l, btm - t, l, t
             if w < 4 or h < 4:
                 print('  empty render', key)
                 art.pop(key, None)

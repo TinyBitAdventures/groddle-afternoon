@@ -12,10 +12,10 @@ import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { FURNITURE_UPGRADES, FURNITURE_UPGRADES_LEFT_OUT } from '../public/js/furniture-upgrades-data.js?v=4fe80b0f';
-import { applyUpgrade, listUpgrades, styleCurrants, upgradeArt, upgradeVerb } from '../public/js/furniture-upgrades.js?v=6cc0e2da';
-import { DOOR_CLASS } from '../public/js/home-floors.js?v=23b16959';
-import { normalizeHomeDecorState } from '../public/js/home-decor.js?v=36f8d733';
+import { FURNITURE_UPGRADES, FURNITURE_UPGRADES_LEFT_OUT } from '../public/js/furniture-upgrades-data.js?v=0b2cf3cc';
+import { applyUpgrade, listUpgrades, styleCurrants, upgradeArt, upgradeVerb } from '../public/js/furniture-upgrades.js?v=f563b304';
+import { DOOR_CLASS } from '../public/js/home-floors.js?v=459925ff';
+import { normalizeHomeDecorState } from '../public/js/home-decor.js?v=31f37d9b';
 
 const pub = join(import.meta.dirname, '..', 'public');
 const read = (rel) => readFileSync(join(pub, 'js', rel), 'utf8');
