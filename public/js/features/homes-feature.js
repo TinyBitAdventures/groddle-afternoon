@@ -8199,8 +8199,9 @@ export function visitorHomeScene(engine, view = {}, room = 'street', opts = {}) 
           door.y = spec.y;
           door.zIndex = 8;
           eng.entityLayer.addChild(door);
-          // G1018: only those allowed in see this; its rocks are yard-verbs-mp-feature's, to mine (as the street's).
-          const gardens = drawVisitorYard(eng, yard, BACK_YARD_GROUND_Y, homeStreetLayout(yard).houseX, { liveRocks: true });
+          // G1018: for a viewer who may act in it (the site's answer says so: backYardLive), its rocks, nodes
+          // and Patches are yard-verbs-mp-feature's, to use, drawn once there; anyone who only looks gets stills.
+          const gardens = drawVisitorYard(eng, yard, BACK_YARD_GROUND_Y, homeStreetLayout(yard).houseX, { live: view.backYardLive === true, drawn: opts.drawn });
           return { door, gardens, pieces, roomX: x0 };
         },
       };

@@ -455,6 +455,9 @@ export function normalizeHomeView(answer) {
     // G1018: whether this answer shows the house and back yard (Neighbours::forVisitor): the owner, a
     // key-holder, or someone let in. A site from before it sends no `inside` and shows everything.
     inside: answer.inside !== false,
+    // G1018: the back yard's rocks, nodes and Patches take verbs for this viewer (a site that knows G1018
+    // and lets them in): yard-verbs-mp-feature draws them to use, and the scene leaves out its stills.
+    backYardLive: answer.inside === true,
     pass: typeof answer.pass?.token === 'string' && answer.pass.token ? answer.pass.token : '',
     // R31 (#522): how long the site said the pass is good for (Neighbours::PASS_TTL), in seconds.
     passTtl: typeof answer.pass?.token === 'string' && answer.pass.token ? visitPassTtl(answer.pass.expiresIn) : 0,
