@@ -413,7 +413,9 @@ describe('the chat log (Austin 2026-10-31: chat written down for spam and abuse 
     const open = src.slice(src.indexOf('function openChat('), src.indexOf("chatForm.addEventListener('submit'"));
     assert.match(open, /chatForm\.player\.value = `#\$\{player\.id\}`;/, 'filtered by id, not a name piece');
     assert.match(open, /showTab\('chat'\)/);
-    assert.match(src, /\/\^#chat=\\d\+\$\/\.test\(location\.hash\)\) openChat\(/, '#chat=<id> opens it filtered');
+    // /console/chat/<id>/ (or the old #chat=<id>) opens it filtered (tests/console-routes.test.js).
+    assert.match(src, /else if \(route\.tab === 'chat' && route\.id\) openChat\(\{ id: route\.id \}\);/, '/console/chat/<id>/ opens it filtered');
+    assert.match(open, /go\(\{ tab: 'chat', id: player\.id \}, \{ push: false \}\)/);
   });
 
   it('asks for the viewer\'s own days: From at its local midnight, To up to the next one', () => {

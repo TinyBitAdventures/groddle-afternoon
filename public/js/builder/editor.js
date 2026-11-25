@@ -353,7 +353,7 @@ async function boot() {
   const keysBtn = btn('Keys', { 'aria-haspopup': 'dialog', 'aria-keyshortcuts': 'Shift+?' });
   const validateBtn = btn('Validate', { class: 'builder-btn builder-validate', 'data-builder-validate': '', 'aria-controls': 'builder-findings', hidden: true, title: 'Check the draft: reach, links, geometry' });
   const bar = el('header', { class: 'builder-bar' },
-    el('div', { class: 'builder-bar-group' }, el('a', { href: '/console/#builder', class: 'builder-back' }, 'Console'), newDraftBtn, draftSel, streetSel, newStreetBtn, openBtn, forkBtn),
+    el('div', { class: 'builder-bar-group' }, el('a', { href: '/console/drafts/', class: 'builder-back' }, 'Console'), newDraftBtn, draftSel, streetSel, newStreetBtn, openBtn, forkBtn),
     el('div', { class: 'builder-bar-group' }, undoBtn, redoBtn, zoomOut, zoomLabel, zoomIn, fitBtn, keysBtn, validateBtn, playBtn),
     status);
   const layersList = el('ul', { class: 'builder-layers', 'aria-label': 'Layers', 'data-builder-layers': '' });

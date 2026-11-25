@@ -69,7 +69,7 @@ describe('the Reports search and menu in the console (console/console.js)', { sk
     assert.equal(closed.find((m) => m.id === 'working').enabled, false);
     assert.equal(closed.find((m) => m.id === 'working').reason, 'Reopen it first.');
     assert.equal(mod.reportMenuFor(ada).find((m) => m.id === 'player').label, 'Ada: player menu…');
-    assert.equal(mod.reportLink(12, 'https://groddle.localhost'), 'https://groddle.localhost/console/#report=12');
+    assert.equal(mod.reportLink(12, 'https://groddle.localhost'), 'https://groddle.localhost/console/reports/12/');
     for (const m of mod.reportMenuFor(ada)) assert.doesNotMatch(m.label, /[—–]/);
     const js = src('console/console.js');
     const pick = js.slice(js.indexOf('function reportPick('), js.indexOf('const head = $(\'[data-console-thread-body] .console-thread-head\');')).replace(/\/\/.*$/gm, '');
@@ -108,8 +108,9 @@ describe('the Reports search and menu in the console (console/console.js)', { sk
     const js = src('console/console.js');
     assert.equal(mod.REPORT_SEARCH_MS, 300);
     assert.match(js, /searchTimer = setTimeout\(\(\) => setSearch\(ticketSearch\.q\.value\), REPORT_SEARCH_MS\);/);
-    assert.match(js, /if \(hash\) history\.replaceState\(null, '', reportsHash\(query\)\);/);
-    assert.match(js, /const search = reportsHashQuery\(location\.hash\);/);
+    // Since 2026-11-25 the search is in the Reports address (/console/reports/?q=), changed as it is typed (tests/console-routes.test.js).
+    assert.match(js, /if \(hash\) go\(\{ tab: 'reports', q: query \}, \{ push: false \}\);/);
+    assert.equal(mod.consoleRoute('/console/reports/', '?q=the%20pig').q, 'the pig');
     assert.match(js, /el\('b', \{\}, \.\.\.marked\(t\.subject \|\| '\(no words\)'\)\)/);
     assert.doesNotMatch(js, /innerHTML|insertAdjacentHTML|outerHTML/, 'marks are elements, words are text');
     assert.match(src('console/console.css'), /\.console-ticketlist mark \{/);

@@ -564,7 +564,7 @@ async function checks() {
     q(`UPDATE wp_usermeta SET meta_value = 'a:1:{s:13:"administrator";b:1;}' WHERE user_id = ${M.id} AND meta_key = 'wp_capabilities' AND ${M.id} > ${MIN_ID}`);
     M.p = await M.ctx.newPage();
     watch(M);
-    await M.p.goto(`${SITE}/console/#reports`, { waitUntil: 'load', timeout: 60000 });
+    await M.p.goto(`${SITE}/console/reports/`, { waitUntil: 'load', timeout: 60000 });
     await M.p.waitForSelector('[data-console-server][data-state]', { timeout: 30000 });
 
     await dismiss(A);
@@ -583,7 +583,7 @@ async function checks() {
     await A.p.keyboard.press('Escape');
     await wait(400);
 
-    await M.p.goto(`${SITE}/console/#reports`, { waitUntil: 'load' });
+    await M.p.goto(`${SITE}/console/reports/`, { waitUntil: 'load' });
     await M.p.waitForSelector(`[data-console-tickets] [data-ticket="${ticketId}"]`, { timeout: 20000 });
     await M.p.click(`[data-console-tickets] [data-ticket="${ticketId}"]`);
     await M.p.waitForFunction((id) => document.querySelector('[data-console-thread-meta]')?.textContent.startsWith(`#${id} `), ticketId, { timeout: 15000 });

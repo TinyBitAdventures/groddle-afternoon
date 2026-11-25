@@ -2814,9 +2814,19 @@
   "deployed": "2026-11-25"
  },
  "git": {
-  "commits": 3552,
+  "commits": 3554,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-25",
+    "kind": "fix",
+    "text": "The phone page loads the link code only when a report thread has an address, keeping its first load small"
+   },
+   {
+    "date": "2026-11-25",
+    "kind": "improve",
+    "text": "Links in a report's messages can be clicked, in the game's Reports window and on the phone page"
+   },
    {
     "date": "2026-11-25",
     "kind": "fix",
@@ -2926,19 +2936,9 @@
     "date": "2026-11-25",
     "kind": "new",
     "text": "A play link can load a whole house from a house file into solo play"
-   },
-   {
-    "date": "2026-11-25",
-    "kind": "improve",
-    "text": "A whole-house Snap of a tall Tower keeps a readable width"
-   },
-   {
-    "date": "2026-11-25",
-    "kind": "new",
-    "text": "Camera Mode can snap your whole house, Tower or home street, every floor stacked"
    }
   ]
  },
- "tests": 1388,
+ "tests": 1389,
  "generatedAt": "2026-11-25"
 }
