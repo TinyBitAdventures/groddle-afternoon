@@ -1301,6 +1301,11 @@ header .sub {
 /* Window announcements drawn by js/overlay-art.js playVectorOverlay (the Qurazy banner): above the
    world and the HUD, under side panels, modals, the pack and notices (a note card covers them). */
 #game-root > canvas.overlay-art { z-index: var(--z-overlay); }
+/* G1309 (Austin 2026-11-25): the banner drew over the "choose from" chooser's title (z-hud + 15, under
+   it so its shade stays under the quest card and Act can come up over it) and Classic's verb menu
+   (z-world + 3) for its few seconds. The banner steps aside while one is open instead: lifting the
+   menus would lift their shade over the HUD. Visibility, as playVectorOverlay sets the opacity itself. */
+#game-root:has(:is(#enter-chooser, #verb-menu):not([hidden])) > canvas.overlay-art { visibility: hidden; }
 
 .overlay {
   position: absolute;
