@@ -2814,9 +2814,19 @@
   "deployed": "2026-11-25"
  },
  "git": {
-  "commits": 3580,
+  "commits": 3586,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-25",
+    "kind": "new",
+    "text": "A Giant Icon placed in a home is shared: everyone's uses spend its actions, and visitors can tithe it"
+   },
+   {
+    "date": "2026-11-25",
+    "kind": "fix",
+    "text": "Giant Icons can be placed on your home street and in your house, and visitors can adore them"
+   },
    {
     "date": "2026-11-25",
     "kind": "fix",
@@ -2926,19 +2936,9 @@
     "date": "2026-11-25",
     "kind": "new",
     "text": "Key holders and visitors let in can dig, harvest and tend in a friend's back yard"
-   },
-   {
-    "date": "2026-11-25",
-    "kind": "new",
-    "text": "Visitors see inside a house and its back yard only with a key or once let in"
-   },
-   {
-    "date": "2026-11-25",
-    "kind": "fix",
-    "text": "A musicblock played for you shows its block and notes over you, and its bubble to everyone else"
    }
   ]
  },
- "tests": 1397,
+ "tests": 1399,
  "generatedAt": "2026-11-25"
 }
