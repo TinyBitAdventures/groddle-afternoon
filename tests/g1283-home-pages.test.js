@@ -1,9 +1,10 @@
 /**
- * G1283: public home pages, as Glitch's site had. The profile's "View <name>'s Home Street"
- * button (the archived profile: <div class="profile-visit-home"><a class="button-tiny"
- * href="/locations/<home street>/">View Serguei's Home Street</a>) opens a page for the home
- * street (the picture the game takes of it, the owner, the house), and a player with a Tower gets
- * a page for it ("<Tower name>", "Owned by <name>", the cutaway of every floor, Zoom; Glitch's
+ * G1283: public home pages, as Glitch's site had. Glitch's profile had "View <name>'s Home
+ * Street" (the archived profile: <div class="profile-visit-home"><a class="button-tiny"
+ * href="/locations/<home street>/">View Serguei's Home Street</a>); here the profile draws the
+ * home street itself, so its page of the static picture went (Austin 2026-11-25: "I don't see
+ * anything that static image has that the mockup home street doesn't have"): the address answers
+ * 301 to the profile. A player with a Tower gets a page for it ("<Tower name>", "Owned by <name>", the cutaway of every floor, Zoom; Glitch's
  * Tower location pages). Glitch's client posted the Tower's picture 720 wide through saveHomeImg
  * after decorating, a Tower change or cultivation; here features/profiles-feature.js sends the
  * cutaway (js/home-shot-render.js renderHomeLocation, kind 'tower') at 720 wide after the same
@@ -13,9 +14,9 @@
  * - features/profiles-feature.js: towerTick / uploadTower / drawTower with a made-up renderer
  * - js/minn-account.js: PUT profile/tower
  * - the site (groddle-afternoon-site): the routes, the profile rule, HomePicture's 'tower'
- *   limits; on a throwaway database (tests/fixtures/profiles/home-pages.php) the pages answer
- *   signed out, the buttons show only with a picture, the Tower page only with a Tower, and a
- *   page that is not public (below level 5, suspended) is gone
+ *   limits; on a throwaway database (tests/fixtures/profiles/home-pages.php) the Tower page
+ *   answers signed out, only with a Tower, the button shows only then, the home street's address
+ *   goes to the profile, and a page that is not public (below level 5, suspended) is gone
  */
 import assert from 'node:assert/strict';
 import { describe, it, before } from 'node:test';
@@ -387,20 +388,13 @@ describe('the public home pages on a throwaway database', { skip: skipDb }, () =
     assert.equal(r['answer bea'], 'tower:null', 'the answer names tower, so the game knows the site takes one');
   });
 
-  it('the home street\'s page answers signed out: the owner, the picture, the house, the way back', (t) => {
-    if (!r.gd) return t.skip('no GD in this PHP');
-    const p = r.street['ada signed out'];
-    assert.equal(p.status, 200);
-    assert.equal(p.h1, 'Zz Ada&#039;s Home Street');
-    assert.deepEqual(p.owned, ['/players/zz-ada/', 'Zz Ada']);
-    assert.equal(p.house, 'Groddle Cottage', 'the house the layout shows');
-    assert.equal(p.img, '/players/920/home?v=T');
-    assert.equal(p.back, true);
-    assert.equal(p.ogImage, 'https://groddle.test/players/920/home?v=T', 'its link preview is the picture');
-    assert.equal(p.cache, 'no-cache');
-    assert.equal(r.street['ada other'].status, 200, 'and to another player');
-    assert.equal(r.street['bea signed out'].house, null, 'no layout yet: no house line');
-    for (const v of Object.values(r.street)) assert.equal(v.leaks, false, 'no email, login or id beyond the picture\'s path');
+  it('the home street\'s old address answers 301 to the profile (the profile draws the home street; Austin 2026-11-25)', () => {
+    for (const [k, slug] of [['ada signed out', 'zz-ada'], ['ada other', 'zz-ada'], ['bea signed out', 'zz-bea'], ['eve signed out', 'zz-eve'], ['cy signed out', 'zz-cy'], ['cy owner', 'zz-cy'], ['dee signed out', 'zz-dee']]) {
+      assert.deepEqual([r.street[k].status, r.street[k].location], [301, `/players/${slug}/`], k);
+    }
+    assert.equal(r.street.nobody.status, 404);
+    assert.deepEqual(r['bare street'], [301, '/players/zz-ada/'], 'without the slash too, in one step');
+    for (const v of Object.values(r.street)) assert.equal(v.leaks, false, 'no email, login or id');
   });
 
   it('the Tower\'s page answers signed out: its name, Owned by, the cutaway framed with Zoom', (t) => {
@@ -419,30 +413,28 @@ describe('the public home pages on a throwaway database', { skip: skipDb }, () =
     for (const v of Object.values(r.tower)) if (typeof v === 'object') assert.equal(v.interior, false);
   });
 
-  it('the Tower page is only for players with a Tower; neither page without its picture', () => {
+  it('the Tower page is only for players with a Tower', () => {
     assert.equal(r.tower['bea signed out'].status, 404);
     assert.equal(r.tower['eve signed out'].status, 404);
-    assert.equal(r.street['eve signed out'].status, 404);
     assert.equal(r.street.nobody.status, 404);
     assert.deepEqual(r.bare, [301, '/players/zz-ada/tower/']);
   });
 
-  it('the profile shows each button only when its picture is there', (t) => {
+  it('the profile shows the Tower button only with a Tower, and no home street button (it draws the home street)', (t) => {
     if (!r.gd) return t.skip('no GD in this PHP');
-    assert.deepEqual(r.profile.ada, { status: 200, links: [['/players/zz-ada/home-street/', "View Zz Ada's Home Street"], ['/players/zz-ada/tower/', 'View Zz <b>Spire</b>']] });
-    assert.deepEqual(r.profile.bea, { status: 200, links: [['/players/zz-bea/home-street/', "View Zz Bea's Home Street"]] });
+    assert.deepEqual(r.profile.ada, { status: 200, links: [['/players/zz-ada/tower/', 'View Zz <b>Spire</b>']] });
+    assert.deepEqual(r.profile.bea, { status: 200, links: [] });
     assert.deepEqual(r.profile.eve, { status: 200, links: [] });
   });
 
   it('privacy: a page that is not public (below level 5) is its owner\'s alone, unindexed; a suspended player\'s is gone', (t) => {
     if (!r.gd) return t.skip('no GD in this PHP');
-    for (const k of ['cy signed out', 'cy other', 'dee signed out']) assert.equal(r.street[k].status, 404, k);
     for (const k of ['cy signed out', 'dee signed out']) assert.equal(r.tower[k].status, 404, k);
-    for (const p of [r.street['cy owner'], r.tower['cy owner']]) {
+    for (const p of [r.tower['cy owner']]) {
       assert.equal(p.status, 200);
       assert.equal(p.private, true, 'told only they see it');
       assert.equal(p.noindex, true);
-      assert.notEqual(p.ogImage, 'https://groddle.test/players/922/home?v=T');
+      assert.notEqual(p.ogImage, 'https://groddle.test/players/922/tower-image?v=T');
     }
     assert.deepEqual(r.image['ada tower signed out'], [200, 'image/webp']);
     assert.equal(r.image['bea tower'][0], 404);

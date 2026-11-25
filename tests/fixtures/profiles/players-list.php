@@ -3,8 +3,9 @@
  * Runs the site repo's Players page (G1298: groddle-afternoon-site src/PlayerPages.php index(),
  * visit(), src/PlayerList.php) against a throwaway MariaDB database and prints what it drew as
  * JSON (tests/g1298-players-page.test.js): the order of the cards for each sort, the filters
- * alone and together, the neighbourhood view, "Visit a neighbour", and that a player who appears
- * offline is never online and never shows a last-played time. The database
+ * alone and together, the neighbourhood view, "Visit a neighbour", that a player who appears
+ * offline is never online and never shows a last-played time, and that only a signed-in player
+ * sees who is online and when anyone played (a signed-out page asks nothing about either). The database
  * (test_groddle_players_<hex>) is made here and dropped at the end. The players are made-up
  * fixtures.
  *
@@ -66,6 +67,8 @@ const PEOPLE = [
     936 => ['Zz Gus', 6, 5, 20 * 86400, false, null, false, 0, 0, false],
 ];
 const ONLINE = [930, 933, 934, 935];
+const PLAYER = 934;   // the reader for most pages: signed in with a character (Eve, unlisted, so she changes no list)
+const NO_CHARACTER = 940;   // signed in, but no character: sees what the signed-out see
 
 function connect(string $host, string $user, string $pass, ?string $db = null): mysqli
 {
@@ -136,6 +139,7 @@ try {
             $db->execute('INSERT INTO ' . $db->table(AdminConsole::BANS) . ' (user_id, reason, admin_user_id, created_at) VALUES (?, ?, 1, ?)', [$id, 'fixture', $at($now)]);
         }
     }
+    $db->execute('INSERT INTO ' . $db->table('users') . ' (ID, user_login, user_pass, user_email, user_registered, display_name) VALUES (?, ?, ?, ?, ?, ?)', [NO_CHARACTER, 'account-940', '$P$none', 'a940@groddle.test', $at($now - 86400), 'account-940']);
     // Gus ignores Ada: to Gus, Ada has no public Snaps (Snaps::publicOf).
     $db->execute('INSERT INTO ' . $db->table(Buddies::IGNORES) . ' (user_id, ignored_id, added_at) VALUES (?, ?, ?)', [936, 930, $at($now)]);
     // The realtime server's connected players as the site keeps them (Dee appears offline, but an older server sent her id anyway).
@@ -155,7 +159,7 @@ try {
             return ['status' => 404, 'html' => ''];
         }
     };
-    $index = static function (array $query, int $as = 0) use ($request, $seams, $answer): array {
+    $index = static function (array $query, int $as = PLAYER) use ($request, $seams, $answer): array {
         $r = $request('/players/', $query);
         $s = $seams($as, $r);
         return $answer(static fn (): Response => (new PlayerPages($s, StaticRoot::fromSite($s)))->index($r));
@@ -196,7 +200,8 @@ try {
     $out['visit button'] = preg_match('#<a class="players-visit" href="([^"]+)"#', $plain, $m) ? $m[1] : null;
     $out['form'] = [
         'get' => str_contains($plain, '<form class="players-filters" method="get" action="/players/"'),
-        'boxes' => preg_match_all('#<input type="checkbox" name="(snaps|tower|street|online)" value="1"#', $plain),
+        'boxes' => preg_match_all('#<input type="checkbox" name="(snaps|tower|home|online)" value="1"#', $plain),
+        'online box' => str_contains($plain, 'name="online"'),
         'show' => str_contains($plain, '<button type="submit" class="players-apply">Show</button>'),
     ];
     $out['script'] = preg_match('#<script src="(/wp-content/themes/groddle/players/players\.js\?v=[0-9a-f]{8})" defer></script>#', $plain, $m) ? 'keyed' : null;
@@ -206,13 +211,13 @@ try {
     $filters = [
         'snaps' => ['snaps' => '1'],
         'tower' => ['tower' => '1'],
-        'street' => ['street' => '1'],
-        'online' => ['online' => '1'],
+        'home' => ['home' => '1'],
+        'street (the old name)' => ['street' => '1'],
+        'online (gone)' => ['online' => '1'],
         'snaps+tower' => ['snaps' => '1', 'tower' => '1'],
-        'street+tower age' => ['street' => '1', 'tower' => '1', 'sort' => 'age'],
-        'street level' => ['street' => '1', 'sort' => 'level'],
-        'tower+online' => ['tower' => '1', 'online' => '1'],
-        'snaps+street+tower+online' => ['snaps' => '1', 'street' => '1', 'tower' => '1', 'online' => '1'],
+        'home+tower age' => ['home' => '1', 'tower' => '1', 'sort' => 'age'],
+        'home level' => ['home' => '1', 'sort' => 'level'],
+        'snaps+home+tower' => ['snaps' => '1', 'home' => '1', 'tower' => '1'],
         'not 1' => ['snaps' => 'yes'],
     ];
     foreach ($filters as $k => $q) {
@@ -223,7 +228,7 @@ try {
     preg_match_all('#<nav class="players-sort"[^>]*>(.*?)</nav>#s', $filtered, $m);
     preg_match_all('#<a href="([^"]+)" data-players-nav="">([^<]+)</a>#', $m[1][0] ?? '', $tabs, PREG_SET_ORDER);
     $out['tabs keep filters'] = array_map(static fn (array $x): array => [html_entity_decode($x[1]), $x[2]], $tabs);
-    $out['checked'] = preg_match_all('#name="(snaps|tower|street|online)" value="1" checked#', $filtered, $m) ? $m[1] : [];
+    $out['checked'] = preg_match_all('#name="(snaps|tower|home|online)" value="1" checked#', $filtered, $m) ? $m[1] : [];
     $out['hidden sort'] = str_contains($filtered, '<input type="hidden" name="sort" value="level" />');
     // Nobody matches (to Gus, the only one with a Tower and public Snaps has none): the way back keeps the sort and view.
     $none = $index(['tower' => '1', 'snaps' => '1', 'sort' => 'name', 'view' => 'street'], 936)['html'];
@@ -235,11 +240,37 @@ try {
     // == Online: a list older than ONLINE_KEEP shows nobody ==
     $setOnline($now - PlayerList::ONLINE_KEEP - 5);
     $site->setOption(PlayerList::ONLINE_TRIED, (string) $now, 'off'); // asked just now (no server here): the old list stays
-    $out['stale online'] = ['dots' => array_sum(array_column($cards($index(['sort' => 'name'])['html']), 'online')), 'filter' => $who($cards($index(['online' => '1'])['html']))];
+    $out['stale online'] = ['dots' => array_sum(array_column($cards($index(['sort' => 'name'])['html']), 'online')), ];
+    $setOnline($now);
+
+    // == Signed out (and signed in without a character): no dot, no "Played ...", no Recently played, no ask ==
+    $site->deleteOption(PlayerList::ONLINE_OPTION);
+    $site->deleteOption(PlayerList::ONLINE_TRIED);
+    $setOnline($now);
+    foreach (['signed out' => 0, 'no character' => NO_CHARACTER] as $k => $as) {
+        $pages = [$index([], $as), $index(['sort' => 'played'], $as), $index(['sort' => 'played', 'view' => 'street'], $as), $index(['online' => '1'], $as), $index(['sort' => 'age'], $as)];
+        $html = implode("\n", array_column($pages, 'html'));
+        preg_match_all('#<nav class="players-sort"[^>]*>(.*?)</nav>#s', $pages[0]['html'], $m);
+        $out['public'][$k] = [
+            'tabs' => trim(html_entity_decode(strip_tags($m[1][0] ?? ''))),
+            'played sort' => $who($cards($pages[1]['html'])),
+            'online param' => $who($cards($pages[3]['html'])),
+            'dots' => substr_count($html, 'player-online'),
+            'words' => preg_match('/Online now|Played |Recently played|data-online|data-played|groddle_players_online/', $html, $w) ? $w[0] : null,
+            'lots' => count($lots($pages[2]['html'])),
+        ];
+    }
+    // Nothing asked of the realtime server for them: with no kept list, a signed-out view writes none and does not try.
+    $site->deleteOption(PlayerList::ONLINE_OPTION);
+    $site->deleteOption(PlayerList::ONLINE_TRIED);
+    $index([], 0);
+    $out['public asks'] = [$site->option(PlayerList::ONLINE_OPTION), $site->option(PlayerList::ONLINE_TRIED)];
+    $index([], PLAYER);
+    $out['player asks'] = $site->option(PlayerList::ONLINE_TRIED) !== null;
     $setOnline($now);
 
     // == The neighbourhood: the same players, in the same order ==
-    foreach (['newest' => [], 'played' => ['sort' => 'played'], 'street+level' => ['street' => '1', 'sort' => 'level'], 'snaps' => ['snaps' => '1']] as $k => $q) {
+    foreach (['newest' => [], 'played' => ['sort' => 'played'], 'home+level' => ['home' => '1', 'sort' => 'level'], 'snaps' => ['snaps' => '1']] as $k => $q) {
         $hood = $index($q + ['view' => 'street'])['html'];
         $out['hood'][$k] = ['lots' => $lots($hood), 'cards' => $who($cards($index($q)['html'])), 'region' => str_contains($hood, '<div class="hood" role="region" aria-label="Neighbourhood" tabindex="0">')];
     }
@@ -251,7 +282,7 @@ try {
     $out['hood view nav'] = trim(strip_tags($m[1] ?? ''));
     $out['hood cards link'] = preg_match('#<a href="([^"]+)" data-players-nav="">Cards</a>#', $hood, $m) ? html_entity_decode($m[1]) : null;
 
-    // == Visit a neighbour: only players with a home street page; never the reader's own ==
+    // == Visit a neighbour: only players with a home street picture; never the reader's own ==
     $visit = static function (int $as) use ($request, $seams, $answer): array {
         $r = $request('/players/', ['visit' => '1']);
         $s = $seams($as, $r);

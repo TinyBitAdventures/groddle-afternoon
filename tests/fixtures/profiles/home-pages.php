@@ -3,8 +3,8 @@
  * Runs the site repo's public home pages (G1283: groddle-afternoon-site src/PlayerPages.php
  * place(), visitLinks(), the tower-image picture; src/Profiles.php tower(); src/HomePicture.php
  * 'tower') against a throwaway MariaDB database and prints what happened as JSON
- * (tests/g1283-home-pages.test.js): who sees the home street's and the Tower's pages, signed in
- * or out; the profile's buttons only when a picture is there; a Tower's cutaway upload within
+ * (tests/g1283-home-pages.test.js): who sees the Tower's page, signed in or out; the home
+ * street's old address answering 301 to the profile; the profile's Tower button only with a Tower; a Tower's cutaway upload within
  * its limits. The database (test_groddle_homes_<hex>) is made here and dropped at the end. The
  * players are made-up fixtures.
  *
@@ -202,6 +202,7 @@ try {
             'leaks' => preg_match('/@groddle\.test|player-9\d\d|user_email/', $html) === 1,
             'interior' => preg_match('/home_interior|house-inside|interior/i', $html) === 1,
             'cache' => $a['headers']['Cache-Control'] ?? null,
+            'location' => $a['headers']['Location'] ?? null,
         ];
     };
     $out['street'] = [
@@ -258,6 +259,9 @@ try {
     $r = $request(Method::Get, '/players/zz-ada/tower');
     $bare = $answer(static fn (): Response => $pages(0, $r)->barePlace($r, 'zz-ada', 'tower'));
     $out['bare'] = [$bare['status'], $bare['headers']['Location'] ?? null];
+    $r = $request(Method::Get, '/players/zz-ada/home-street');
+    $bare = $answer(static fn (): Response => $pages(0, $r)->barePlace($r, 'zz-ada', 'home-street'));
+    $out['bare street'] = [$bare['status'], $bare['headers']['Location'] ?? null];
 } catch (Throwable $e) {
     $out['error'] = get_class($e) . ': ' . $e->getMessage() . ' @ ' . basename($e->getFile()) . ':' . $e->getLine();
 } finally {

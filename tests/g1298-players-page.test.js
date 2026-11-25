@@ -2,11 +2,15 @@
  * G1298: the Players page (/players/), Austin 2026-11-25. Beside Newest: Level (highest first,
  * the level under the name), Age (oldest first, "Joined ... ago", as Glitch's profiles showed a
  * join date), Recently played (PlayTime's last time, in days) and Name; filters Has public snaps
- * (a camera chip with the count), Has a Tower, Has a home street, Online now (a green dot); a
+ * (a camera chip with the count), Has a Tower, Has a home (a home street picture; ?street=1 still read); a green dot on players online; a
  * Cards / Neighbourhood view (every listed home street picture side by side as one street); and
- * "Visit a neighbour" (a random home street page, picked on the server). All query parameters,
+ * "Visit a neighbour" (a random player with a home street picture, picked on the server). The
+ * houses and Visit open the profile, which draws the home street (Austin 2026-11-25). All query parameters,
  * so it works without JavaScript; players/players.js swaps the list in place. "Appear offline"
- * (PresenceSetting) players are never online and sort as never seen.
+ * (PresenceSetting) players are never online and sort as never seen. Who is online and when
+ * anyone played are for signed-in players only (Austin 2026-11-25: "Remove the online now
+ * filter. I don't want non players to see that."): no Online now filter at all, and a
+ * signed-out page has no dot, no "Played ..." and no Recently played sort.
  *
  * - the site (groddle-afternoon-site): src/PlayerPages.php index(), visit(), onlineNow();
  *   src/PlayerList.php; style.css; players/players.js
@@ -31,7 +35,9 @@ describe('the Players page\'s code (site repo)', { skip: skipWithoutSite }, () =
   it('every option is a query parameter the server reads; no new route (a player named "visit" keeps their page)', () => {
     const list = site('src/PlayerList.php');
     assert.match(list, /public const SORTS = \['newest' => 'Newest', 'level' => 'Level', 'age' => 'Age', 'played' => 'Recently played', 'name' => 'Name'\];/);
-    assert.match(list, /public const FILTERS = \['snaps' => 'Has public snaps', 'tower' => 'Has a Tower', 'street' => 'Has a home street', 'online' => 'Online now'\];/);
+    assert.match(list, /public const FILTERS = \['snaps' => 'Has public snaps', 'tower' => 'Has a Tower', 'home' => 'Has a home'\];/);
+    assert.match(list, /public const PLAYER_SORTS = \['played'\];/);
+    assert.match(list, /public const FILTER_ALIASES = \['street' => 'home'\];/, 'links made with ?street=1 still filter');
     assert.match(list, /public const VIEWS = \['cards' => 'Cards', 'street' => 'Neighbourhood'\];/);
     const pages = site('src/PlayerPages.php');
     assert.doesNotMatch(pages, /'\/players\/visit/);
@@ -42,10 +48,20 @@ describe('the Players page\'s code (site repo)', { skip: skipWithoutSite }, () =
     const pages = site('src/PlayerPages.php');
     const index = pages.slice(pages.indexOf('public function index('), pages.indexOf('private function visit('));
     assert.match(index, /\$hidden = "EXISTS \(SELECT 1 FROM \{\$meta\} ho WHERE ho\.user_id = c\.user_id AND ho\.meta_key = '" \. PresenceSetting::META \. "' AND ho\.meta_value = '1'\)";/);
-    assert.match(index, /\$played = "CASE WHEN \{\$hidden\} THEN NULL ELSE/);
+    assert.match(index, /\$played = \$player \? "CASE WHEN \{\$hidden\} THEN NULL ELSE/);
     assert.match(index, /'online' => isset\(\$isOnline\[\$id\]\) && !\(int\) \$row\['hidden'\]/);
-    assert.match(index, /AND NOT \{\$hidden\}"/);
     assert.match(site('src/PlayerList.php'), /empty\(\$p\['off'\]\)/, 'the realtime server\'s own "off" is honoured too');
+  });
+
+  it('only a signed-in player (an account with a character) gets play times and the online list, on the server', () => {
+    const pages = site('src/PlayerPages.php');
+    const index = pages.slice(pages.indexOf('public function index('), pages.indexOf('private function visit('));
+    assert.match(index, /\$player = \$reader > 0 && \$this->isPlayer\(\$reader\);/);
+    assert.match(index, /\$o = PlayerList::options\(\$request->query, \$player\);/);
+    assert.match(index, /: 'NULL';/, 'no last-played time is even read for anyone else');
+    assert.match(index, /\$online = \$player \? \$this->onlineNow\(\$now\) : \[\];/, 'nor the realtime server asked');
+    assert.match(index, /foreach \(PlayerList::sorts\(\$player\) as \$sort => \$label\)/);
+    assert.doesNotMatch(index, /filters'\]\['online'\]/, 'no Online now filter');
   });
 
   it('a public page never waits long on the realtime server, and never shows a stale list', () => {
@@ -158,32 +174,46 @@ describe('the Players page on a throwaway database', { skip: skipDb }, () => {
       assert.equal(dee.online, false);
       assert.ok(dee.fact === null || !/Played|Online/.test(dee.fact), dee.fact);
     }
-    assert.deepEqual(r.filters.online, ['zz-ada'], 'connected, but hidden: not in Online now');
     for (const v of Object.values(r.hood)) assert.equal(v.lots.find((l) => l.who === 'zz-dee')?.online ?? false, false);
   });
 
   it('the green dot and the Snaps chip: online players (a list no older than two minutes), public Snaps only', () => {
     assert.deepEqual(r.sorts.name.map((c) => [c.who, c.online, c.snaps]), [['zz-ada', true, 2], ['zz-bea', false, 0], ['zz-cy', false, 1], ['zz-dee', false, 0], ['zz-gus', false, 0]], 'Bea\'s private Snap is not counted');
-    assert.deepEqual(r['stale online'], { dots: 0, filter: [] }, 'an old list shows nobody online');
+    assert.deepEqual(r['stale online'], { dots: 0 }, 'an old list shows nobody online');
     assert.deepEqual(r.blocked, { snaps: ['zz-cy'], chip: { 'zz-ada': 0, 'zz-bea': 0, 'zz-cy': 1, 'zz-dee': 0, 'zz-gus': 0 } }, 'to a reader she blocks or who blocks her, as the profile');
+  });
+
+  it('signed out, or signed in without a character: no green dot, no "Played ...", no Recently played, nothing asked', () => {
+    for (const k of ['signed out', 'no character']) {
+      const p = r.public[k];
+      assert.equal(p.tabs, 'Newest · Level · Age · Name', `${k}: no Recently played tab`);
+      assert.deepEqual(p['played sort'], ['zz-cy', 'zz-gus', 'zz-ada', 'zz-bea', 'zz-dee'], `${k}: an old ?sort=played is Newest`);
+      assert.equal(p['online param'].length, 5, `${k}: ?online=1 ignored`);
+      assert.equal(p.dots, 0, `${k}: no green dot, cards or neighbourhood (Ada is online)`);
+      assert.equal(p.words, null, `${k}: nothing about online or play times in the page`);
+      assert.equal(p.lots, 5);
+    }
+    assert.deepEqual(r['public asks'], [null, null], 'a signed-out view never asks the realtime server');
+    assert.equal(r['player asks'], true, 'a player\'s view does');
   });
 
   it('filters work alone and together, with any sort; only "1" turns one on', () => {
     assert.deepEqual(r.filters.snaps, ['zz-cy', 'zz-ada']);
     assert.deepEqual(r.filters.tower, ['zz-ada', 'zz-dee']);
-    assert.deepEqual(r.filters.street, ['zz-ada', 'zz-bea', 'zz-dee']);
+    assert.deepEqual(r.filters.home, ['zz-ada', 'zz-bea', 'zz-dee']);
+    assert.deepEqual(r.filters['street (the old name)'], ['zz-ada', 'zz-bea', 'zz-dee']);
     assert.deepEqual(r.filters['snaps+tower'], ['zz-ada']);
-    assert.deepEqual(r.filters['street+tower age'], ['zz-dee', 'zz-ada']);
-    assert.deepEqual(r.filters['street level'], ['zz-bea', 'zz-ada', 'zz-dee']);
-    assert.deepEqual(r.filters['tower+online'], ['zz-ada']);
-    assert.deepEqual(r.filters['snaps+street+tower+online'], ['zz-ada']);
+    assert.deepEqual(r.filters['home+tower age'], ['zz-dee', 'zz-ada']);
+    assert.deepEqual(r.filters['home level'], ['zz-bea', 'zz-ada', 'zz-dee']);
+    assert.deepEqual(r.filters['snaps+home+tower'], ['zz-ada']);
+    assert.equal(r.filters['online (gone)'].length, 5, 'an old ?online=1 is ignored');
     assert.equal(r.filters['not 1'].length, 5);
     assert.equal(r['filtered count'], '2 of 5 characters');
     assert.equal(r.none, '/players/?sort=name&view=street', 'nobody matches: "Show everyone" keeps the sort and view');
   });
 
   it('works without JavaScript: a GET form of checkboxes with Show, sort links that keep the filters', () => {
-    assert.deepEqual(r.form, { get: true, boxes: 4, show: true });
+    assert.deepEqual(r.form, { get: true, boxes: 3, 'online box': false, show: true });
     assert.deepEqual(r.checked, ['snaps']);
     assert.equal(r['hidden sort'], true, 'the form carries the sort');
     assert.deepEqual(r['tabs keep filters'], [['/players/?snaps=1', 'Newest'], ['/players/?sort=age&snaps=1', 'Age'], ['/players/?sort=played&snaps=1', 'Recently played'], ['/players/?sort=name&snaps=1', 'Name']]);
@@ -199,7 +229,7 @@ describe('the Players page on a throwaway database', { skip: skipDb }, () => {
           assert.equal(lot.img, null);
           assert.equal(lot.href, `/players/${lot.who}/`, 'no picture: the profile');
         } else {
-          assert.equal(lot.href, `/players/${lot.who}/home-street/`, 'opens their home street page');
+          assert.equal(lot.href, `/players/${lot.who}/`, 'opens their profile, which draws the home street');
           assert.equal(lot.lazy, true);
         }
       }
@@ -214,17 +244,17 @@ describe('the Players page on a throwaway database', { skip: skipDb }, () => {
     assert.equal(r['hood cards link'], '/players/?sort=level');
   });
 
-  it('Visit a neighbour picks only listed players with a home street page, on the server, never the reader\'s own', () => {
+  it('Visit a neighbour picks only listed players with a home street picture, on the server, opens the profile, never the reader\'s own', () => {
     assert.equal(r['visit button'], '/players/?visit=1');
     assert.deepEqual(r['visit status'], [302, 'no-store']);
-    assert.deepEqual(r.visit, ['/players/zz-ada/home-street/', '/players/zz-bea/home-street/', '/players/zz-dee/home-street/'], 'every one with a page, in 60 tries; never Cy or Gus (no page), Eve (below level 5) or Fin (suspended)');
-    assert.deepEqual(r['visit as ada'], ['/players/zz-bea/home-street/', '/players/zz-dee/home-street/']);
+    assert.deepEqual(r.visit, ['/players/zz-ada/', '/players/zz-bea/', '/players/zz-dee/'], 'every one with a picture, in 60 tries; never Cy or Gus (no picture), Eve (below level 5) or Fin (suspended)');
+    assert.deepEqual(r['visit as ada'], ['/players/zz-bea/', '/players/zz-dee/']);
   });
 
   it('the helpers: days at the finest, the server\'s list cleaned, unknown options are the defaults', () => {
     assert.deepEqual(r.ago, ['today', 'today', 'yesterday', '3 days ago', '13 days ago', '2 weeks ago', '8 weeks ago', '2 months ago', '13 months ago', '2 years ago']);
     assert.deepEqual(r.snapshot, { checked: 100, ids: [5, 7] }, 'once each, never one marked off');
     assert.deepEqual(r['snapshot bad'], [null, null, null]);
-    assert.deepEqual(r.options, { sort: 'newest', filters: { snaps: true, tower: false, street: false, online: false }, view: 'cards', page: 1 });
+    assert.deepEqual(r.options, { sort: 'newest', filters: { snaps: true, tower: false, home: false }, view: 'cards', page: 1 });
   });
 });
