@@ -2814,9 +2814,29 @@
   "deployed": "2026-11-25"
  },
  "git": {
-  "commits": 3554,
+  "commits": 3558,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-25",
+    "kind": "fix",
+    "text": "A machine's Make stays open with \"You need to be online to do that.\" when the game is offline, instead of closing as if it started"
+   },
+   {
+    "date": "2026-11-25",
+    "kind": "fix",
+    "text": "Coming Back to the game from another page reconnects it, so machines, chat and every shared act work again"
+   },
+   {
+    "date": "2026-11-25",
+    "kind": "fix",
+    "text": "The street map's ring on a route's next signpost stays on the signpost instead of moving up and down as you walk"
+   },
+   {
+    "date": "2026-11-25",
+    "kind": "new",
+    "text": "The console's own addresses, from the game side: the builder's Console link and the checks"
+   },
    {
     "date": "2026-11-25",
     "kind": "fix",
@@ -2916,29 +2936,9 @@
     "date": "2026-11-25",
     "kind": "fix",
     "text": "Enter in Camera Mode no longer works the nearest item"
-   },
-   {
-    "date": "2026-11-25",
-    "kind": "fix",
-    "text": "Pictures for the public home pages leave out players, chat bubbles and name plates"
-   },
-   {
-    "date": "2026-11-25",
-    "kind": "new",
-    "text": "A Tower's cutaway is sent to its public page, 720 wide, after decorating or a Tower change"
-   },
-   {
-    "date": "2026-11-25",
-    "kind": "fix",
-    "text": "A house file link keeps the house it laid on reload without a storage key of its own"
-   },
-   {
-    "date": "2026-11-25",
-    "kind": "new",
-    "text": "A play link can load a whole house from a house file into solo play"
    }
   ]
  },
- "tests": 1389,
+ "tests": 1391,
  "generatedAt": "2026-11-25"
 }
