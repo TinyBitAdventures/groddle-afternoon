@@ -86,6 +86,7 @@ import { frameTexture, sourceFromUrl, textureFromUrl } from '../textures.js?v=b8
 import { grantMoodXp } from '../mood-xp.js?v=e311b45c';
 import { findRoute, loadStreetGraph, openRoads, roadsFor, streetGraphLoaded } from '../street-graph.js?v=d767f3a2';
 import { standOnFeet } from '../sprite-feet.js?v=6358a697';
+import { SUMMONED_Z, itemZ } from '../item-bands.js?v=e98b10bc';
 
 export const SMUGGLING_FEATURE_ID = 'smuggling';
 const ART = 'assets/sprites/smuggling/';
@@ -288,7 +289,9 @@ function makeNpc(engine, kind, prefix, x, y, anchor) {
   spr.anchor.set(anchor.x, anchor.y);
   spr.x = x;
   spr.y = y;
-  spr.zIndex = 9;
+  // They pop in beside the player: over every street item and deco (js/item-bands.js SUMMONED_Z),
+  // not at 9, under the decos' band, where a trant or a Mortar Barnacle hid them.
+  spr.zIndex = SUMMONED_Z;
   spr.visible = false;
   spr._worldHitW = kind === 'deim' ? 70 : SMUGGLER.hitW + 10;
   spr._worldHitH = kind === 'deim' ? 90 : SMUGGLER.hitH;
@@ -953,7 +956,8 @@ function caught(engine) {
   standOnFeet(box);
   box.x = deim.x;
   box.y = deim.y;
-  box.zIndex = 10;
+  // A dropped stack, as game.js draws one (contraband is a normal item).
+  box.zIndex = itemZ(CONTRABAND, 12);
   engine.entityLayer.addChild(box);
   dropped = { sprite: box, at: Date.now() + DEIMAGINATOR.dropMs };
   setClip(engine, deim, 'talk');

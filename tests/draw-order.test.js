@@ -379,6 +379,14 @@ describe('Austin 2026-11-25 (live): a summoned spinning wheel draws over the bar
     assert.ok(z < remoteAvatarZ(0) && z < PLAYER_Z, `wheel z ${z} under the players`);
   });
 
+  it('the Smugglers and the Deimaginator pop in over the street too; the dropped box draws as a dropped stack', () => {
+    const src = read('public/js/features/smuggling-feature.js');
+    const z = siteZ(src, 'function makeNpc(', 'spr');
+    for (const top of streetTops) assert.ok(z > top, `smuggler z ${z} over ${top}`);
+    assert.ok(z < remoteAvatarZ(0), `smuggler z ${z} under the players`);
+    assert.equal(siteZ(src, 'DEIMAGINATOR_TAKES_BOX', 'box'), itemZ('contraband', 12));
+  });
+
   it('SUMMONED_Z is the top of the foreground holder', () => {
     assert.equal(typeof itemBands.SUMMONED_Z, 'number');
     assert.ok(itemBands.SUMMONED_Z > itemZ('npc_piggy', 1000) && itemBands.SUMMONED_Z < 49);
