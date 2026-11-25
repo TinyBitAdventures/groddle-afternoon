@@ -2814,9 +2814,14 @@
   "deployed": "2026-11-25"
  },
  "git": {
-  "commits": 3571,
+  "commits": 3574,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-25",
+    "kind": "fix",
+    "text": "One click or tap on a garden plot does its job, as in Glitch; planting still asks which seeds"
+   },
    {
     "date": "2026-11-25",
     "kind": "new",
@@ -2931,14 +2936,9 @@
     "date": "2026-11-25",
     "kind": "fix",
     "text": "The whole-house picture shows the machines and the Crafty Bot on every floor"
-   },
-   {
-    "date": "2026-11-25",
-    "kind": "improve",
-    "text": "The whole-house picture stacks the floors without the attic and the earth"
    }
   ]
  },
- "tests": 1394,
+ "tests": 1395,
  "generatedAt": "2026-11-25"
 }
