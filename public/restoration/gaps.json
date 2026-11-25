@@ -1,6 +1,6 @@
 {
   "note": "Written by tools/gaps/build-data.mjs from tools/gaps/public-gaps.json and the coverage register. Edit those, never this file.",
-  "release": "v0.70.0",
+  "release": "v0.71.0",
   "states": {
     "fixing": {
       "label": "Being fixed",
@@ -42,7 +42,7 @@
     "fixing": 3,
     "known": 15,
     "unreleased": 0,
-    "fixed": 561,
+    "fixed": 573,
     "lost": 5,
     "purpose": 17,
     "idea": 10
@@ -1353,6 +1353,30 @@
           "text": "Expanding the house gave no sign you were ready; Glitch's expansion dialog is back.",
           "state": "fixed",
           "version": "v0.70.0"
+        },
+        {
+          "id": "G1285",
+          "text": "A play link can load a whole house from a house file into a solo practice copy.",
+          "state": "fixed",
+          "version": "v0.71.0"
+        },
+        {
+          "id": "G1287",
+          "text": "Wall pieces couldn't go as high as Glitch allowed.",
+          "state": "fixed",
+          "version": "v0.71.0"
+        },
+        {
+          "id": "G1288",
+          "text": "Set-down stacks and display boxes showed number badges Glitch never drew.",
+          "state": "fixed",
+          "version": "v0.71.0"
+        },
+        {
+          "id": "G1294",
+          "text": "A visitor didn't see Dirt Piles, Peat Bogs or Patches in a friend's back yard.",
+          "state": "fixed",
+          "version": "v0.71.0"
         },
         {
           "id": "G48",
@@ -2932,6 +2956,12 @@
           "text": "Garden beds on two streets stood in made-up spots, one inside an animal pen.",
           "state": "fixed",
           "version": "v0.54.0"
+        },
+        {
+          "id": "G1282",
+          "text": "A garden's Water all showed 2 energy whatever it would really spend.",
+          "state": "fixed",
+          "version": "v0.71.0"
         }
       ]
     },
@@ -4018,6 +4048,24 @@
           "text": "Snaps were saved small, cropped in the album, and could not be opened full size, downloaded or shared.",
           "state": "fixed",
           "version": "v0.65.0"
+        },
+        {
+          "id": "G1284",
+          "text": "Camera Mode can snap the whole house, Tower or home street at your own home.",
+          "state": "fixed",
+          "version": "v0.71.0"
+        },
+        {
+          "id": "G1286",
+          "text": "Enter in Camera Mode worked the nearest item in solo; solo snaps now save to your device.",
+          "state": "fixed",
+          "version": "v0.71.0"
+        },
+        {
+          "id": "G1291",
+          "text": "The whole-house picture left out machines and the Crafty Bot on other floors, and drew attic and earth bands.",
+          "state": "fixed",
+          "version": "v0.71.0"
         }
       ]
     },
@@ -4063,6 +4111,12 @@
           "text": "A Subway ticket played no teleport chime and stations played stand-in music.",
           "state": "fixed",
           "version": "v0.70.0"
+        },
+        {
+          "id": "G1293",
+          "text": "Sound stopped when the game's tab lost focus on a computer; it plays on there, with a setting.",
+          "state": "fixed",
+          "version": "v0.71.0"
         }
       ]
     },
@@ -4074,6 +4128,34 @@
           "text": "A gem found while mining never reached the activity log.",
           "state": "fixed",
           "version": "v0.70.0"
+        }
+      ]
+    },
+    {
+      "name": "Web",
+      "items": [
+        {
+          "id": "G1283",
+          "text": "Public pages for a home street and a Tower, as Glitch's site had.",
+          "state": "fixed",
+          "version": "v0.71.0"
+        }
+      ]
+    },
+    {
+      "name": "Music",
+      "items": [
+        {
+          "id": "G1295",
+          "text": "Playing a musicblock for someone showed no bubble or overlays.",
+          "state": "fixed",
+          "version": "v0.71.0"
+        },
+        {
+          "id": "G1296",
+          "text": "A musicblock's bubble could be held back after chatting.",
+          "state": "fixed",
+          "version": "v0.71.0"
         }
       ]
     }

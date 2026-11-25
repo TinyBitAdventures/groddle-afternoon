@@ -5628,6 +5628,120 @@
       "commits": [
         "game:868cd5ad74c"
       ]
+    },
+    {
+      "id": "G1282",
+      "area": "Gardens",
+      "text": "A garden's Water all showed 2 energy whatever it would really spend.",
+      "show": "fixing",
+      "commits": [
+        "game:e3599b5f276"
+      ]
+    },
+    {
+      "id": "G1283",
+      "area": "Web",
+      "text": "Public pages for a home street and a Tower, as Glitch's site had.",
+      "show": "fixing",
+      "commits": [
+        "game:9c7eb15cb2c",
+        "site:9b4ed98"
+      ]
+    },
+    {
+      "id": "G1284",
+      "area": "Snaps",
+      "text": "Camera Mode can snap the whole house, Tower or home street at your own home.",
+      "show": "fixing",
+      "commits": [
+        "game:19d5bde67e3",
+        "site:d732539"
+      ]
+    },
+    {
+      "id": "G1285",
+      "area": "Homes",
+      "text": "A play link can load a whole house from a house file into a solo practice copy.",
+      "show": "fixing",
+      "commits": [
+        "game:f1582115bb8",
+        "site:2a188cd"
+      ]
+    },
+    {
+      "id": "G1286",
+      "area": "Snaps",
+      "text": "Enter in Camera Mode worked the nearest item in solo; solo snaps now save to your device.",
+      "show": "fixing",
+      "commits": [
+        "game:9c8a3c6debf",
+        "game:bd6f6989f84"
+      ]
+    },
+    {
+      "id": "G1287",
+      "area": "Homes",
+      "text": "Wall pieces couldn't go as high as Glitch allowed.",
+      "show": "fixing",
+      "commits": [
+        "game:d8da9ba363e"
+      ]
+    },
+    {
+      "id": "G1288",
+      "area": "Homes",
+      "text": "Set-down stacks and display boxes showed number badges Glitch never drew.",
+      "show": "fixing",
+      "commits": [
+        "game:a7235d45c77",
+        "game:5c6eefae581"
+      ]
+    },
+    {
+      "id": "G1291",
+      "area": "Snaps",
+      "text": "The whole-house picture left out machines and the Crafty Bot on other floors, and drew attic and earth bands.",
+      "show": "fixing",
+      "commits": [
+        "game:4669783bfed",
+        "game:104337f2dd0"
+      ]
+    },
+    {
+      "id": "G1293",
+      "area": "Sound",
+      "text": "Sound stopped when the game's tab lost focus on a computer; it plays on there, with a setting.",
+      "show": "fixing",
+      "commits": [
+        "game:66da6ba2bf2"
+      ]
+    },
+    {
+      "id": "G1294",
+      "area": "Homes",
+      "text": "A visitor didn't see Dirt Piles, Peat Bogs or Patches in a friend's back yard.",
+      "show": "fixing",
+      "commits": [
+        "game:60b5bbed4fd"
+      ]
+    },
+    {
+      "id": "G1295",
+      "area": "Music",
+      "text": "Playing a musicblock for someone showed no bubble or overlays.",
+      "show": "fixing",
+      "commits": [
+        "game:be7576b1a4a"
+      ]
+    },
+    {
+      "id": "G1296",
+      "area": "Music",
+      "text": "A musicblock's bubble could be held back after chatting.",
+      "show": "fixing",
+      "commits": [
+        "server:9696271"
+      ]
     }
   ]
 }

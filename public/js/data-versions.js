@@ -10793,7 +10793,7 @@
       "landing/card-explore.webp": "7a2c1124",
       "landing/full/card-explore.webp": "cbce4e96",
       "play/houses/sample-house.json": "896a3ced",
-      "restoration/gaps.json": "236fbdb2",
+      "restoration/gaps.json": "37c458a1",
       "restoration/made.json": "523cebf2",
       "restoration/maps.json": "9725e490",
       "restoration/maps/2012/alakol.webp": "33373357",
