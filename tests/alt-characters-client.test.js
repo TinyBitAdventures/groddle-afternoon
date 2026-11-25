@@ -22,6 +22,7 @@ import { OTHER_CHARACTER_TEXT, statusText } from '../public/js/features/realtime
 import { CHARACTER_COPY, FRESH_HASH, SAVE_ALERT_COPY, characterChoices, continuesAs, createRefusalText, saveAlertFor } from '../public/js/online-boot.js?v=f1f2766b';
 import { SWITCHER_COPY, STYLE as SWITCHER_STYLE, cardUrl, popoverPlace, switcherChoices } from '../public/js/character-switcher.js?v=265e3b6a';
 import { LOCAL_STATES } from '../public/js/shared-quoins.js?v=7feb4ae3';
+import { offlineLine, sharedOffline } from '../public/js/online-request.js?v=09ac8a9c';
 import { menuRowFor } from '../public/js/ui/topbar.js?v=95c1fdb0';
 
 const root = join(import.meta.dirname, '..');
@@ -372,14 +373,17 @@ describe('realtime: close 4012, another character plays now', () => {
     assert.equal(made.length, 0);
   });
 
-  it('says so in the exact words, and shared things go back to local rules', () => {
+  it('says so in the exact words, and shared things stop (G1306: no local rules while another character plays)', () => {
     assert.equal(OTHER_CHARACTER_TEXT.note, "You're playing as another character in another window.");
     assert.equal(statusText('other-character'), 'Playing as another character');
-    assert.ok(LOCAL_STATES.has('other-character'));
+    // Before G1306 (Austin 2026-11-25) shared things fell back to the solo game's rules here; now they refuse.
+    assert.ok(!LOCAL_STATES.has('other-character'));
+    assert.equal(sharedOffline({ state: 'other-character' }), true);
+    assert.equal(offlineLine({ state: 'other-character' }), "You need to be online to do that.");
     const src = read('public/js/features/realtime-feature.js');
     assert.match(src, /if \(state === 'other-character'\) \{\n\s*addLog\(\{ note: true, text: OTHER_CHARACTER_TEXT\.note \}\);/);
     for (const rel of ['public/js/features/street-objects-feature.js', 'public/js/features/shared-patches-feature.js', 'public/js/features/shared-gardens-feature.js']) {
-      assert.match(read(rel), /'replaced', 'other-character', 'stopped'/, rel);
+      assert.doesNotMatch(read(rel), /'replaced', 'other-character', 'stopped'/, rel);
     }
   });
 });
