@@ -2814,9 +2814,14 @@
   "deployed": "2026-11-25"
  },
  "git": {
-  "commits": 3562,
+  "commits": 3564,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-25",
+    "kind": "fix",
+    "text": "A refused drop of an emblem past today's limit says when it can be dropped"
+   },
    {
     "date": "2026-11-25",
     "kind": "new",
@@ -2931,14 +2936,9 @@
     "date": "2026-11-25",
     "kind": "fix",
     "text": "Storage Display Boxes no longer show a 1 on every box"
-   },
-   {
-    "date": "2026-11-25",
-    "kind": "fix",
-    "text": "Wall pieces go as high up the wall as Glitch let them"
    }
   ]
  },
- "tests": 1393,
+ "tests": 1394,
  "generatedAt": "2026-11-25"
 }
