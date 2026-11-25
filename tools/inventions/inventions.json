@@ -6107,6 +6107,38 @@
     "G1301",
     "G331"
    ]
+  },
+  {
+   "id": "icon-place-refusal-words",
+   "title": "Place shows a disabled row saying why in someone else's home, instead of hiding it",
+   "kind": "UI",
+   "status": "proposed",
+   "where": [
+    {
+     "file": "public/js/features/giant-icons-feature.js",
+     "symbol": "PLACE_TEXT"
+    }
+   ],
+   "why": "Glitch's icon_place_conditions hid Place in someone else's POL (state null); the remake's menu explains refusals rather than hiding a verb.",
+   "rows": [
+    "G1302"
+   ]
+  },
+  {
+   "id": "machine-edge-check-at-drop",
+   "title": "A machine dropped at the pointer is checked against the room's walls where it lands",
+   "kind": "behaviour",
+   "status": "proposed",
+   "where": [
+    {
+     "file": "public/js/home-machines.js",
+     "symbol": "placeCheck"
+    }
+   ],
+   "why": "Glitch tested the wall gap from the player (pc.x) and let the drop land anywhere on the floor's plat line (HandOfDecorator.as checkXIsInBounds); checking where it lands keeps the art inside the walls.",
+   "rows": [
+    "G1303"
+   ]
   }
  ]
 }

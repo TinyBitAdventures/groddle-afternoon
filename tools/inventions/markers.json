@@ -397,7 +397,8 @@
     "ours: lie (rules and sources: js/feast-day.js; all ours,": "feast-day-piles"
   },
   "public/js/features/giant-icons-feature.js": {
-    "ours: // ours: a placed Icon is kept in your own save, so": "ours-giant-icons"
+    "ours: // ours: a placed Icon is kept in your own save, so": "ours-giant-icons",
+    "ours: // ours: icon_place_conditions hid Place in someone": "icon-place-refusal-words"
   },
   "public/js/features/groups-feature.js": {
     "ours: // G1300: a group of ours renamed by its administrator (the site's call,": "not-an-invention",
@@ -720,6 +721,7 @@
     "ours: 'You have a lot of machines out already.', // ours": "remake-copy",
     "ours: (label) => `You picked up the ${label}.`, // ours": "remake-copy",
     "ours: * - only its owner picks it up (ours: in the source isInCraftingAltar": "ours-home-machines",
+    "ours: * on where the machine goes (ours: Glitch tested pc.x and let the drop": "machine-edge-check-at-drop",
     "ours: => `You put your ${label} down here.`, // ours": "remake-copy",
     "ours: Ours: machines one home street keeps (the site keeps": "ours-home-machines",
     "ours: `${name} made something at your ${label}.`, // ours": "remake-copy",
