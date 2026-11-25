@@ -1,12 +1,13 @@
 /**
- * #698: a group's administrator changes its description (GameServerJS
- * groups/group.js:494-499 admin_edit, which the website's group pages
- * called; level 1, Administrator, held every permission, group.js:46-50,
- * 310). The site's route (groddle-afternoon-site src/Groups.php edit, PUT
+ * #698: a group's administrator renames it and changes its description
+ * (GameServerJS groups/group.js:494-499 admin_edit set label and desc, which
+ * the website's group pages called; level 1, Administrator, held every
+ * permission, group.js:46-50, 310; renaming is Austin's ruling, G1300). The
+ * site's route (groddle-afternoon-site src/Groups.php edit, PUT
  * groddle/v1/groups/{id}) is run on a throwaway MariaDB database by
  * tests/fixtures/groups/group-edit.php; the game's Edit button and form are
- * in tests/groups.test.js. Renaming (admin_edit's name) waits on a ruling:
- * a name sent is not read.
+ * in tests/groups.test.js, the realtime server's note in the server repo's
+ * group_rename_test.go.
  */
 import assert from 'node:assert/strict';
 import { before, describe, it } from 'node:test';
@@ -85,12 +86,50 @@ describe('#698: editing a group on a throwaway database (Groups::edit)', { skip:
     assert.deepEqual(r.empty, [200, '']);
   });
 
-  it('does not read a name (renaming waits on a ruling)', () => {
-    assert.equal(r.nameIgnored.status, 200);
-    assert.equal(r.nameIgnored.name, 'Sunday Club');
-    assert.equal(r.nameIgnored.row.name, 'Sunday Club');
-    assert.deepEqual([r.onlyName.status, r.onlyName.code], [400, 'groddle_group_unchanged']);
+  it('refuses a body with nothing to change, or the name it has now', () => {
     assert.deepEqual([r.nothing.status, r.nothing.code], [400, 'groddle_group_unchanged']);
+    assert.deepEqual([r.sameName.status, r.sameName.code], [400, 'groddle_group_unchanged']);
+    assert.equal(r.callsBefore, 0, 'no rename, no call to the realtime server');
+  });
+
+  it('G1300: the administrator renames the group; the server is told who and what, signed', () => {
+    assert.equal(r.renamed.status, 200);
+    assert.equal(r.renamed.row.name, 'Sunday Questers', 'spaces as Make a group trims them');
+    assert.equal(r.renamed.key, 'sunday questers');
+    assert.equal(r.renamed.row.description, WORDS);
+    assert.equal(r.renamed.body.name, 'Sunday Questers');
+    assert.deepEqual(r.renamed.body, r.renamed.show, 'the answer is show()\'s, as a member reads it after');
+    assert.equal(r.renamed.calls.length, 1);
+    assert.match(r.renamed.calls[0].url, /\/ws\?call=group_rename$/);
+    assert.deepEqual(r.renamed.calls[0].body, { group: r.renamed.body.id, name: 'Sunday Questers', by: 'Zz Ada' });
+    assert.equal(r.renamed.calls[0].signed, true, 'X-Groddle-Service, as every site call to the server');
+  });
+
+  it('a change of case only is the group\'s own name, not taken', () => {
+    assert.equal(r.caseOnly.status, 200);
+    assert.equal(r.caseOnlyRow, 'Sunday questers');
+  });
+
+  it('a name another group has is 409 with Make a group\'s words, and nothing changes', () => {
+    const TAKEN = 'There is already a group with that name. Try another.';
+    assert.deepEqual([r.taken.status, r.taken.code, r.taken.message], [409, 'groddle_group_taken', TAKEN]);
+    assert.deepEqual(r.taken.data, { fields: { name: TAKEN } });
+    assert.equal(r.afterNameRefusals.row.description, WORDS, 'the description sent with it was not kept');
+  });
+
+  it('a name Make a group would refuse is refused with its words; a member may not rename', () => {
+    const RULE = 'Group names are 3 to 32 letters, numbers, spaces, - or _, starting and ending with a letter or number.';
+    assert.deepEqual(r.bad.slice(0, 5).map((b) => [b.status, b.code, b.message]), Array(5).fill([400, 'groddle_group_invalid', RULE]));
+    assert.deepEqual(r.bad[0].data, { fields: { name: RULE } });
+    assert.deepEqual([r.bad[5].status, r.bad[5].code], [400, 'groddle_group_invalid'], 'the word filter');
+    assert.notEqual(r.bad[5].message, RULE);
+    assert.deepEqual([r.memberRename.status, r.memberRename.code], [403, 'groddle_group_not_admin']);
+    assert.equal(r.afterNameRefusals.row.name, 'Sunday questers', 'unchanged');
+    assert.equal(r.afterNameRefusals.calls, 2, 'the two renames only');
+  });
+
+  it('keeps the name when the realtime server does not answer', () => {
+    assert.deepEqual(r.offline, { status: 200, row: 'Sunday Club', tried: 1 });
   });
 
   it('the administrator worked out after the first leaves (group.js:826-884) may edit, nobody else', () => {

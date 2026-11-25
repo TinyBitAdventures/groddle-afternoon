@@ -4,8 +4,9 @@
  * group.js:494-499 admin_edit) against a throwaway MariaDB database and prints what happened as
  * JSON (tests/group-edit.test.js): the administrator changes the description; a member, a player
  * outside the group and one who cannot see a private group are refused; too long is refused; bad
- * words become a grawlix; a name sent is not read; the administrator worked out after the first
- * one leaves may edit. The database (test_groddle_groupedit_<hex>) is made here and dropped at
+ * words become a grawlix; the administrator renames the group with a new group's name rules
+ * (G1300) and the realtime server is told (a fake answers the signed group_rename call); the
+ * administrator worked out after the first one leaves may edit. The database (test_groddle_groupedit_<hex>) is made here and dropped at
  * the end. The players are made-up fixtures.
  *
  *   php tests/fixtures/groups/group-edit.php <engine public/minn> <groddle-afternoon-site> <host> <user> <pass>
@@ -16,6 +17,8 @@ declare(strict_types=1);
 [, $engine, $extension, $host, $user, $pass] = $argv;
 define('ABSPATH', sys_get_temp_dir() . '/');
 define('MINN_ENGINE_DIR', $engine);
+// A made-up secret, so the site signs its realtime calls; a fake answers them (nothing leaves the process).
+define('GRODDLE_REALTIME_SECRET', 'group-edit-test-secret-group-edit-test-secret');
 require $engine . '/src/Minn/Autoloader.php';
 Minn\Autoloader::register();
 spl_autoload_register(static function (string $class) use ($extension): void {
@@ -33,6 +36,7 @@ use Minn\Content\Reader;
 use Minn\Content\Site;
 use Minn\Db;
 use Minn\Extension\Seams;
+use Minn\Http\Fake;
 use Minn\Http\Method;
 use Minn\Http\Request;
 use Minn\Http\Response;
@@ -104,9 +108,10 @@ try {
             return ['status' => $e->status, 'code' => $e->errorCode, 'message' => $e->getMessage(), 'data' => $e->extra];
         }
     };
-    $edit = static function (int $as, int $gid, array $body) use ($db, $site, $caps, $request, $answer): array {
+    $server = new Fake(['*' => ['status' => 'ok']]);
+    $edit = static function (int $as, int $gid, array $body) use ($db, $site, $caps, $request, $answer, &$server): array {
         $r = $request(Method::Put, "/groddle/v1/groups/{$gid}", $body);
-        $g = new Groups(new Seams($db, $site, $r, Reader::forUser($as, $caps, '', 'token-' . $as)));
+        $g = new Groups(new Seams($db, $site, $r, Reader::forUser($as, $caps, '', 'token-' . $as), $server->http()));
         return $answer(static fn (): Response => $g->edit($r, (string) $gid));
     };
     $show = static function (int $as, int $gid) use ($db, $site, $caps, $request, $answer): array {
@@ -141,11 +146,28 @@ try {
     $out['grawlix'] = ($edit(ADA, $pub, ['description' => "Quests and   shit\nall night"])['body']['description'] ?? null);
     $out['empty'] = [$edit(ADA, $pub, ['description' => ''])['status'], $row($pub)['description']];
 
-    // == A name is not read (renaming waits on a ruling); a body with nothing to change is refused ==
-    $named = $edit(ADA, $pub, ['name' => 'Renamed Club', 'description' => $text]);
-    $out['nameIgnored'] = ['status' => $named['status'], 'name' => $named['body']['name'] ?? null, 'row' => $row($pub)];
-    $out['onlyName'] = $edit(ADA, $pub, ['name' => 'Renamed Club']);
+    // == Nothing to change is refused ==
     $out['nothing'] = $edit(ADA, $pub, []);
+    $out['sameName'] = $edit(ADA, $pub, ['name' => 'Sunday Club']);
+
+    // == The administrator renames the group (G1300): the rules of a new group's name ==
+    $calls = static fn (): array => array_map(static fn ($o): array => ['url' => $o->url, 'body' => json_decode((string) $o->body, true), 'signed' => preg_grep('/^X-Groddle-Service: \d+\.[0-9a-f]{16}\./', $o->headers) !== []], $server->sent());
+    $out['callsBefore'] = count($calls());
+    $renamed = $edit(ADA, $pub, ['name' => '  Sunday   Questers ', 'description' => $text]);
+    $out['renamed'] = ['status' => $renamed['status'], 'body' => $renamed['body'] ?? null, 'row' => $row($pub), 'key' => $db->value("SELECT name_key FROM {$groups} WHERE id = ?", [$pub]), 'show' => $show(DI, $pub)['body'] ?? null, 'calls' => $calls()];
+    $out['caseOnly'] = $edit(ADA, $pub, ['name' => 'Sunday questers']);
+    $out['caseOnlyRow'] = $row($pub)['name'];
+    $out['taken'] = $edit(ADA, $pub, ['name' => 'QUIET ONES', 'description' => 'Not kept']);
+    $out['bad'] = [];
+    foreach (['ab', '-Sunday', str_repeat('a', 33), 'Sunday!', ['x'], 'Shit Club'] as $i => $bad) {
+        $out['bad'][] = $edit(ADA, $pub, ['name' => $bad]);
+    }
+    $out['memberRename'] = $edit(BEA, $pub, ['name' => 'Bea Club']);
+    $out['afterNameRefusals'] = ['row' => $row($pub), 'calls' => count($calls())];
+    // The server not answering: the name is kept all the same.
+    $server = new Fake([]);
+    $offline = $edit(ADA, $pub, ['name' => 'Sunday Club']);
+    $out['offline'] = ['status' => $offline['status'], 'row' => $row($pub)['name'], 'tried' => count($server->sent())];
 
     // == The administrator leaves: the member who joined first takes over (group.js:826-884) and may edit ==
     $db->execute("DELETE FROM {$members} WHERE group_id = ? AND user_id = ?", [$pub, ADA]);
