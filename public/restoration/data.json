@@ -2814,9 +2814,14 @@
   "deployed": "2026-11-25"
  },
  "git": {
-  "commits": 3521,
+  "commits": 3524,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-25",
+    "kind": "fix",
+    "text": "Sound keeps playing in another tab on a computer, with a setting to choose"
+   },
    {
     "date": "2026-11-25",
     "kind": "new",
@@ -2931,14 +2936,9 @@
     "date": "2026-11-25",
     "kind": "new",
     "text": "Street pages show what stands on the street now, checked within the last day"
-   },
-   {
-    "date": "2026-11-25",
-    "kind": "fix",
-    "text": "A Peat Bog or rock no longer stands on the street's mailbox or Visiting Stone online"
    }
   ]
  },
- "tests": 1382,
+ "tests": 1383,
  "generatedAt": "2026-11-25"
 }
