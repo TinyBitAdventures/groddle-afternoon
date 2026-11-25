@@ -2814,9 +2814,14 @@
   "deployed": "2026-11-25"
  },
  "git": {
-  "commits": 3560,
+  "commits": 3562,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-25",
+    "kind": "new",
+    "text": "A group's administrator can edit its description from Menu, Groups"
+   },
    {
     "date": "2026-11-25",
     "kind": "improve",
@@ -2931,14 +2936,9 @@
     "date": "2026-11-25",
     "kind": "fix",
     "text": "Wall pieces go as high up the wall as Glitch let them"
-   },
-   {
-    "date": "2026-11-25",
-    "kind": "new",
-    "text": "Solo snaps save to your device, and a house file's practice copy can snap"
    }
   ]
  },
- "tests": 1392,
+ "tests": 1393,
  "generatedAt": "2026-11-25"
 }
