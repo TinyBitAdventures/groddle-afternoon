@@ -2814,9 +2814,14 @@
   "deployed": "2026-11-25"
  },
  "git": {
-  "commits": 3592,
+  "commits": 3594,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-25",
+    "kind": "improve",
+    "text": "In Decoration Mode a machine dragged from the pack is set down where you let go"
+   },
    {
     "date": "2026-11-25",
     "kind": "improve",
@@ -2931,14 +2936,9 @@
     "date": "2026-11-25",
     "kind": "fix",
     "text": "The Game Show ticket's spinning wheel draws in front of barnacles"
-   },
-   {
-    "date": "2026-11-25",
-    "kind": "improve",
-    "text": "A visitor walked out of a house keeps no copy of its inside"
    }
   ]
  },
- "tests": 1400,
+ "tests": 1401,
  "generatedAt": "2026-11-25"
 }
