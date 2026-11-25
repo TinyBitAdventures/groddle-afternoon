@@ -1320,6 +1320,9 @@
     "ours: * here are ours, on the source's own \"summon you to <place>\" and": "ours-summon",
     "ours: // Ours (inc_teleportation.js 663-665 dropped the friend": "ours-summon"
   },
+  "public/js/swoonerflies.js": {
+    "stand-in: vendors. The art is the Swoonerfly's own, not a stand-in:": "not-an-invention"
+  },
   "public/js/synth-sfx.js": {
     "stand-in: * return null: a synthesized stand-in for a song or a person would": "synth-stand-in-sounds",
     "stand-in: Each recipe here is a short, soft, whimsical stand-in": "ours-synth-sfx"
