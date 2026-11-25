@@ -3015,19 +3015,8 @@ function furnitureView(PIXI, item) {
     icon.y = displayIconY(item, upgradeId);
     icon.label = 'sdb-icon';
     box.addChild(icon);
-    const badge = new PIXI.Text({ text: String(item.display.count), style: {
-      fontFamily: WORLD_FONT_FAMILY,
-      fontSize: 11,
-      fontWeight: '700',
-      fill: 0xffffff,
-      stroke: { color: 0x3b2a1f, width: 3 },
-    } });
-    badge.anchor.set(1, 1);
-    badge.x = 28;
-    badge.y = -6;
-    // Ticket 51: the storage feature keeps a visited box's count up to date (home-storage-feature).
-    badge.label = 'sdb-count';
-    box.addChild(badge);
+    // G1287 (#669): no count on the box. Glitch drew only the item (bag_furniture_sdb.js getExtraConfig
+    // 909-930) and named the count in the hover (Itemstack.as getTooltip 509-521): the subtitle here.
   }
   box.x = item.x;
   box.y = item.y;

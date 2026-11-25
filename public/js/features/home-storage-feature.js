@@ -977,14 +977,12 @@ function bought(engine, msg) {
   if (resolve) resolve('');
 }
 
-/** The visited box's count badge (homes-feature furnitureView draws it from the owner's stored save). */
+/** The visited box's count (the hover names it, G1287) and its item faded once empty (homes-feature furnitureView). */
 function setVisitCount(engine, uid, stock) {
   const piece = (visit?.pieces || []).find((p) => Number(p.item?.id) === uid);
   if (!piece) return;
   if (piece.item.display) piece.item.display.count = stock;
-  const badge = piece.box?.children?.find?.((c) => c.label === 'sdb-count');
-  if (badge) badge.text = String(stock);
-  if (!stock) for (const c of piece.box?.children || []) if (c.label === 'sdb-count' || c.label === 'sdb-icon') c.alpha = 0.4;
+  if (!stock) for (const c of piece.box?.children || []) if (c.label === 'sdb-icon') c.alpha = 0.4;
 }
 
 function cabinetMoved(engine, msg) {

@@ -95,7 +95,12 @@ describe('it joins the house and the furniture sales without a second hit box', 
 
   it('a box with currants on it stays put, and a visited box\'s count can be kept up to date', () => {
     assert.match(homes, /engine\.query\?\.\('storagePickupIncome', id, engine\)/);
-    assert.match(homes, /badge\.label = 'sdb-count';/);
+    // G1287 (#669): no count badge on the box (Glitch named the count in the hover only, Itemstack.as
+    // getTooltip 509-521); the hover's subtitle names it, kept up to date for a visited box.
+    assert.doesNotMatch(homes, /sdb-count/);
+    assert.doesNotMatch(feature, /sdb-count/);
+    assert.match(feature, /else if \(row\.display\?\.count\) subtitle = `\$\{row\.display\.count\.toLocaleString\('en-US'\)\} \$\{row\.display\.count === 1 \? labelOf\(row\.display\.classTsid\) : pluralOf\(row\.display\.classTsid\)\}`;/);
+    assert.match(feature, /if \(piece\.item\.display\) piece\.item\.display\.count = stock;/);
     assert.match(homes, /refreshFurniture\(engine\) \{\s+if \(scene\?\.furnitureLayer\) renderFurniture\(engine\);/);
   });
 
