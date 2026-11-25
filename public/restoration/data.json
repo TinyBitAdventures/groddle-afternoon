@@ -2814,9 +2814,14 @@
   "deployed": "2026-11-25"
  },
  "git": {
-  "commits": 3602,
+  "commits": 3604,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-25",
+    "kind": "fix",
+    "text": "On a phone the \"choose from\" chooser stands above the controls instead of over Act, the stick and Jump"
+   },
    {
     "date": "2026-11-25",
     "kind": "improve",
@@ -2931,11 +2936,6 @@
     "date": "2026-11-25",
     "kind": "fix",
     "text": "The street map's ring on a route's next signpost stays on the signpost instead of moving up and down as you walk"
-   },
-   {
-    "date": "2026-11-25",
-    "kind": "new",
-    "text": "The console's own addresses, from the game side: the builder's Console link and the checks"
    }
   ]
  },
