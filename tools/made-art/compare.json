@@ -1,0 +1,561 @@
+{
+ "format": "groddle-compare/1",
+ "about": "The Our additions section of /restoration/ (Austin 2026-11-25, #699, G1308): each addition of ours that has a Tiny Speck original, the original beside ours. Every word players read is here; tools/made-art/build-data.mjs writes them into public/restoration/made.json `ours` with each picture's size read from its file, and the site's groddle/restoration-ours block draws them. `invention` names the entry in tools/inventions/inventions.json; every kept visual invention there names a compare entry here, \"made\" (the Made for Groddle band shows it) or says in `noCompare` why it has none (tests/inventions-register.test.js). Pictures under public/assets/made-art/compare/ are composed by tools/made-art/compare-art.mjs and recorded in `files` with their sha256; anything else is a shipped file of the game. `parts` steps the compare popup through pairs; `partsFrom` builds them from the game's data. Only Tiny Speck's CC0 art and our own: never a player's snap, footage or video frame.",
+ "entries": [
+  {
+   "id": "stat-icons",
+   "invention": "stat-icons",
+   "name": "Stat icons",
+   "decided": "2026-11-25",
+   "caption": "One icon and one colour for each stat, the same in the top bar, in speech bubbles, in the amounts that float up and on the reward card. Glitch drew each stat its own way in each place: a bolt beside the energy gauge, a green battery in a speech bubble. A player asked for one of each, so these were drawn for Groddle in its flat style, each after the Tiny Speck picture it stands in for. Later the same player asked for Tiny Speck's pictures back; Austin kept ours and gave the coin the two strokes of Tiny Speck's currant sign.",
+   "display": {
+    "h": 160
+   },
+   "original": {
+    "file": "public/assets/made-art/compare/stat-icons-original.webp",
+    "label": "Tiny Speck's speech bubble pictures, energy, mood, XP, iMG, currants and favor",
+    "alt": "Tiny Speck's six small stat pictures in two rows: a green battery, a green smile, a teal xp disc, a purple i, a brown coin with a crossed C and a maroon star.",
+    "pixelated": true
+   },
+   "image": {
+    "file": "public/assets/made-art/compare/stat-icons-ours.svg",
+    "label": "Ours, in the same order",
+    "alt": "Our six stat icons in two rows: an orange bolt, a green smile and a blue star on discs, a purple i, a gold coin with a crossed C and a plum star."
+   },
+   "facts": [
+    {
+     "label": "In the game",
+     "text": "The modern look shows these everywhere a stat appears. The classic look keeps Tiny Speck's own pictures."
+    }
+   ],
+   "licence": "code-MIT",
+   "parts": [
+    {
+     "name": "Energy",
+     "original": {
+      "file": "public/assets/classic/slug_energy_pos.webp",
+      "label": "Tiny Speck's speech bubble picture",
+      "alt": "Tiny Speck's green battery with a dark lightning bolt across it.",
+      "pixelated": true
+     },
+     "image": {
+      "file": "public/assets/made-art/compare/stat-energy-ours.svg",
+      "label": "Ours",
+      "alt": "Our orange disc with a white lightning bolt."
+     }
+    },
+    {
+     "name": "Mood",
+     "original": {
+      "file": "public/assets/classic/slug_mood_pos.webp",
+      "label": "Tiny Speck's speech bubble picture",
+      "alt": "Tiny Speck's green smiling face.",
+      "pixelated": true
+     },
+     "image": {
+      "file": "public/assets/made-art/compare/stat-mood-ours.svg",
+      "label": "Ours",
+      "alt": "Our green disc with a white smiling face."
+     }
+    },
+    {
+     "name": "XP",
+     "original": {
+      "file": "public/assets/classic/slug_xp_pos.webp",
+      "label": "Tiny Speck's speech bubble picture",
+      "alt": "Tiny Speck's teal disc with a white xp.",
+      "pixelated": true
+     },
+     "image": {
+      "file": "public/assets/made-art/compare/stat-xp-ours.svg",
+      "label": "Ours",
+      "alt": "Our blue disc with a white star."
+     }
+    },
+    {
+     "name": "iMG",
+     "original": {
+      "file": "public/assets/classic/slug_imagination_pos.webp",
+      "label": "Tiny Speck's speech bubble picture",
+      "alt": "Tiny Speck's purple rounded shape with a pale i.",
+      "pixelated": true
+     },
+     "image": {
+      "file": "public/assets/made-art/compare/stat-imagination-ours.svg",
+      "label": "Ours",
+      "alt": "Our purple pentagon with a white i."
+     }
+    },
+    {
+     "name": "iMG on the Imagination cards",
+     "original": {
+      "file": "public/assets/imagination/ui/moment_icon_imagination.svg",
+      "label": "Tiny Speck's iMG mark from the Imagination cards",
+      "alt": "Tiny Speck's lavender cloud with a white plus, ringed in white and dark grey."
+     },
+     "image": {
+      "file": "public/assets/made-art/compare/stat-imagination-ours.svg",
+      "label": "Ours",
+      "alt": "Our purple pentagon with a white i."
+     }
+    },
+    {
+     "name": "Currants",
+     "original": {
+      "file": "public/assets/classic/slug_currants_pos.webp",
+      "label": "Tiny Speck's speech bubble picture",
+      "alt": "Tiny Speck's brown coin with a pale C crossed by two diagonal lines.",
+      "pixelated": true
+     },
+     "image": {
+      "file": "public/assets/made-art/compare/stat-currants-ours.svg",
+      "label": "Ours",
+      "alt": "Our gold coin with a cream C crossed by two parallel strokes."
+     }
+    },
+    {
+     "name": "Currants on the Imagination cards",
+     "original": {
+      "file": "public/assets/made-art/compare/card-currant-original.svg",
+      "label": "Tiny Speck's currant from the Imagination cards",
+      "alt": "Tiny Speck's brown coin ringed in white and dark grey, with a white C crossed by two long diagonal strokes."
+     },
+     "image": {
+      "file": "public/assets/made-art/compare/stat-currants-ours.svg",
+      "label": "Ours",
+      "alt": "Our gold coin with a cream C crossed by two parallel strokes."
+     }
+    },
+    {
+     "name": "Favor",
+     "original": {
+      "file": "public/assets/classic/slug_favor_pos.webp",
+      "label": "Tiny Speck's speech bubble picture",
+      "alt": "Tiny Speck's small maroon star.",
+      "pixelated": true
+     },
+     "image": {
+      "file": "public/assets/made-art/compare/stat-favor-ours.svg",
+      "label": "Ours",
+      "alt": "Our plum star."
+     }
+    }
+   ]
+  },
+  {
+   "id": "wardrobe-reimagined",
+   "invention": "avatar-reimagined-wardrobe",
+   "name": "Reimagined clothes",
+   "decided": "2026-10-23",
+   "caption": "Tiny Speck left {count} clothing files as greyscale masters that Glitch never sold, so they never had colours. Groddle sells them in colours borrowed from the piece they match, or chosen from the same palette where none does, and marks them Reimagined in the wardrobe. The drawing is Tiny Speck's; only the colours are ours.",
+   "display": {
+    "h": 186
+   },
+   "original": {
+    "file": "public/assets/made-art/compare/wardrobe-strip-original.webp",
+    "label": "Tiny Speck's files as they are, in greyscale",
+    "alt": "A Glitch in a white banana hat beside one in a white teapot dress, both drawn in greys."
+   },
+   "image": {
+    "file": "public/assets/made-art/compare/wardrobe-strip-ours.webp",
+    "label": "Ours, in the colours we gave them",
+    "alt": "The same two Glitches: the banana hat now yellow, the teapot dress blue and white with gold trim."
+   },
+   "facts": [
+    {
+     "label": "In the game",
+     "text": "Each one is sold and worn like any other piece of clothing, with a Reimagined tag that says where its colours come from."
+    }
+   ],
+   "licence": "cc0-colours",
+   "partsFrom": "wardrobe",
+   "partsWords": {
+    "original": {
+     "label": "Tiny Speck's file, in greyscale",
+     "alt": "A Glitch wearing the {name} as Tiny Speck drew it, in greys."
+    },
+    "image": {
+     "label": "Ours, in {colours}",
+     "alt": "A Glitch wearing the {name} in our {colours}."
+    }
+   }
+  }
+ ],
+ "files": {
+  "public/assets/made-art/compare/card-currant-original.svg": {
+   "what": "Tiny Speck's icon_currant vector from the Imagination cards, cropped to the icon",
+   "w": 54,
+   "h": 54,
+   "sha256": "1b187d6cf0fe1ef636bc1d23949406129ec35a53e787ddf7422ef6dbb86e88c2",
+   "made": "the card's own SVG with its viewBox set round the drawing (rsvg-convert at 10x, trimmed, one unit of margin)",
+   "from": [
+    {
+     "file": "public/assets/imagination/cards/icon_currant.svg",
+     "sha256": "bc876f9cb87b3fc3a69542f210ff6ece86453ddd85a5bb45252abcd27fd3a2a9"
+    }
+   ]
+  },
+  "public/assets/made-art/compare/stat-currants-ours.svg": {
+   "what": "Our currants icon (js/stat-icons.js statIconSvg at 64 px)",
+   "w": 64,
+   "h": 64,
+   "sha256": "a5b25baf620f0ee71c08a7ab2df6989394078de290227dd6297099beb34a721f",
+   "made": "written from the code by compare-art.mjs"
+  },
+  "public/assets/made-art/compare/stat-energy-ours.svg": {
+   "what": "Our energy icon (js/stat-icons.js statIconSvg at 64 px)",
+   "w": 64,
+   "h": 64,
+   "sha256": "0988cec97298380cde3a746f8bbc65b26166056be85a4a4583316ba79f2b5ee6",
+   "made": "written from the code by compare-art.mjs"
+  },
+  "public/assets/made-art/compare/stat-favor-ours.svg": {
+   "what": "Our favor icon (js/stat-icons.js statIconSvg at 64 px)",
+   "w": 64,
+   "h": 64,
+   "sha256": "84225c505e794b0f51e0c02eb0506fa89749f1668b4a78783a9eef427b6bf50a",
+   "made": "written from the code by compare-art.mjs"
+  },
+  "public/assets/made-art/compare/stat-icons-original.webp": {
+   "what": "Tiny Speck's six slugs, three by two: slug_energy_pos, slug_mood_pos, slug_xp_pos, then slug_imagination_pos, slug_currants_pos, slug_favor_pos",
+   "w": 272,
+   "h": 160,
+   "sha256": "4b65d29bbc8cf22c48f0fba59b8af8b800cb86ff82a15df3a9acdcda2787f819",
+   "made": "each shipped slug at 4x nearest neighbour, centred in the cell our icon takes (magick -composite), cwebp -lossless -exact",
+   "from": [
+    {
+     "file": "public/assets/classic/slug_energy_pos.webp",
+     "sha256": "574d7408528e674ec962cad6958115b485c9b0e12f7c083c978b3f8d5c8145c4"
+    },
+    {
+     "file": "public/assets/classic/slug_mood_pos.webp",
+     "sha256": "bab3d7a1f9b69703a0b7d0ec44bc3ce99ab70592c4e8de3dbd06d8c24787072d"
+    },
+    {
+     "file": "public/assets/classic/slug_xp_pos.webp",
+     "sha256": "297e37dbab47f15362d6d060e584e97a8640a11b41b6c4776b8772f497a40d4a"
+    },
+    {
+     "file": "public/assets/classic/slug_imagination_pos.webp",
+     "sha256": "6b4f09252d34855ebcd0ac483bfa92c8bbfa993298ee8678c817636f98ddd01a"
+    },
+    {
+     "file": "public/assets/classic/slug_currants_pos.webp",
+     "sha256": "d5ba202c1013eef0fc7e6ce3b0454a3c7f4f2c49c69ec2e34f207fbe2bd9fd80"
+    },
+    {
+     "file": "public/assets/classic/slug_favor_pos.webp",
+     "sha256": "7f8b1bce5d103918a9334aab6386fb2d68d0dde9e9413ec581c245bc9815a073"
+    }
+   ]
+  },
+  "public/assets/made-art/compare/stat-icons-ours.svg": {
+   "what": "Our six stat icons, three by two: energy, mood, xp, then iMG, currants, favor",
+   "w": 272,
+   "h": 160,
+   "sha256": "4241349f0743471138b7e7e6a40d5ecfb43f659eed13cb186ef8f37a9be4c666",
+   "made": "written from the code by compare-art.mjs (statIconInner at 4x)"
+  },
+  "public/assets/made-art/compare/stat-imagination-ours.svg": {
+   "what": "Our imagination icon (js/stat-icons.js statIconSvg at 64 px)",
+   "w": 64,
+   "h": 64,
+   "sha256": "4e91583e4d1000fd8a826adbaed59b8f54efb976df017d2d09102a144b9143ad",
+   "made": "written from the code by compare-art.mjs"
+  },
+  "public/assets/made-art/compare/stat-mood-ours.svg": {
+   "what": "Our mood icon (js/stat-icons.js statIconSvg at 64 px)",
+   "w": 64,
+   "h": 64,
+   "sha256": "dfd156b7bed23021fe2d033f9d4dc55869bffea90c983a038ff47c6cb3515842",
+   "made": "written from the code by compare-art.mjs"
+  },
+  "public/assets/made-art/compare/stat-xp-ours.svg": {
+   "what": "Our xp icon (js/stat-icons.js statIconSvg at 64 px)",
+   "w": 64,
+   "h": 64,
+   "sha256": "1c8e4cca03124afd4e5f7a3c0b8d71d7833ceabf181807edd118336105340f9d",
+   "made": "written from the code by compare-art.mjs"
+  },
+  "public/assets/made-art/compare/wardrobe-alph_lem_mab-original.webp": {
+   "what": "alph_lem_mab on the default look: Tiny Speck's greyscale file as it is",
+   "w": 359,
+   "h": 463,
+   "sha256": "0ff94e99a79e1249cf3cd780b25a3f33c7f6ca59a31702249e69737b2f324a1f",
+   "made": "tools/avatar-compositor/showcase.mjs --figures --max 1 (the default look at the stand frame, scale 3), cwebp -q 90"
+  },
+  "public/assets/made-art/compare/wardrobe-alph_lem_mab-ours.webp": {
+   "what": "alph_lem_mab on the default look: our first colourway",
+   "w": 359,
+   "h": 463,
+   "sha256": "da3bcfec325e26909fc1b4489f39162ce31d49ce8d0bfecf13ce23abe2e35260",
+   "made": "tools/avatar-compositor/showcase.mjs --figures --max 1 (the default look at the stand frame, scale 3), cwebp -q 90"
+  },
+  "public/assets/made-art/compare/wardrobe-banana_coat-original.webp": {
+   "what": "banana_coat on the default look: Tiny Speck's greyscale file as it is",
+   "w": 359,
+   "h": 463,
+   "sha256": "e17f3e6b275ae4c0578cff267a56b9f43f46836996b39f8ee3fddd98fbf3e90a",
+   "made": "tools/avatar-compositor/showcase.mjs --figures --max 1 (the default look at the stand frame, scale 3), cwebp -q 90"
+  },
+  "public/assets/made-art/compare/wardrobe-banana_coat-ours.webp": {
+   "what": "banana_coat on the default look: our first colourway",
+   "w": 359,
+   "h": 463,
+   "sha256": "e95ed07b4e3b44d0496ba532e3af20c78c7b177201895ede82cbe13c677df353",
+   "made": "tools/avatar-compositor/showcase.mjs --figures --max 1 (the default look at the stand frame, scale 3), cwebp -q 90"
+  },
+  "public/assets/made-art/compare/wardrobe-banana_hat-original.webp": {
+   "what": "banana_hat on the default look: Tiny Speck's greyscale file as it is",
+   "w": 359,
+   "h": 463,
+   "sha256": "7832d892f3112e8c8a4463fa9a22bece76bfcb2b2663ac5cf02cefa8a0de6d75",
+   "made": "tools/avatar-compositor/showcase.mjs --figures --max 1 (the default look at the stand frame, scale 3), cwebp -q 90"
+  },
+  "public/assets/made-art/compare/wardrobe-banana_hat-ours.webp": {
+   "what": "banana_hat on the default look: our first colourway",
+   "w": 359,
+   "h": 463,
+   "sha256": "c4b49ecaa24c00438124e00b88c71112a8f5abc9f7e1144e189d36f5b948363d",
+   "made": "tools/avatar-compositor/showcase.mjs --figures --max 1 (the default look at the stand frame, scale 3), cwebp -q 90"
+  },
+  "public/assets/made-art/compare/wardrobe-bell_skirt-original.webp": {
+   "what": "bell_skirt on the default look: Tiny Speck's greyscale file as it is",
+   "w": 359,
+   "h": 463,
+   "sha256": "0a03eb0f710cb56d7d84ff23a0647f626794d0530941146d964d1c5e55f34d64",
+   "made": "tools/avatar-compositor/showcase.mjs --figures --max 1 (the default look at the stand frame, scale 3), cwebp -q 90"
+  },
+  "public/assets/made-art/compare/wardrobe-bell_skirt-ours.webp": {
+   "what": "bell_skirt on the default look: our first colourway",
+   "w": 359,
+   "h": 463,
+   "sha256": "65cf9b1e11e62dbad8d9828072d96bcd80acbd58ee73284202563d27a1fe640e",
+   "made": "tools/avatar-compositor/showcase.mjs --figures --max 1 (the default look at the stand frame, scale 3), cwebp -q 90"
+  },
+  "public/assets/made-art/compare/wardrobe-brazil_carnival_tail_skirt-original.webp": {
+   "what": "brazil_carnival_tail_skirt on the default look: Tiny Speck's greyscale file as it is",
+   "w": 359,
+   "h": 463,
+   "sha256": "ec0fe3e622d4126c41f3dca797175dc68402987993249ec782986d841bb0bd3e",
+   "made": "tools/avatar-compositor/showcase.mjs --figures --max 1 (the default look at the stand frame, scale 3), cwebp -q 90"
+  },
+  "public/assets/made-art/compare/wardrobe-brazil_carnival_tail_skirt-ours.webp": {
+   "what": "brazil_carnival_tail_skirt on the default look: our first colourway",
+   "w": 359,
+   "h": 463,
+   "sha256": "db0bf5ada6a5ad3761b2df138e1cd5a5a359090167f4ec793f7e488fccfa3588",
+   "made": "tools/avatar-compositor/showcase.mjs --figures --max 1 (the default look at the stand frame, scale 3), cwebp -q 90"
+  },
+  "public/assets/made-art/compare/wardrobe-chaulkywhite_shirtvest-original.webp": {
+   "what": "chaulkywhite_shirtvest on the default look: Tiny Speck's greyscale file as it is",
+   "w": 359,
+   "h": 463,
+   "sha256": "088c6d56855c80f825404a3868b1b4f44ed058d2c9f4f2c2489bba062ee2fe68",
+   "made": "tools/avatar-compositor/showcase.mjs --figures --max 1 (the default look at the stand frame, scale 3), cwebp -q 90"
+  },
+  "public/assets/made-art/compare/wardrobe-chaulkywhite_shirtvest-ours.webp": {
+   "what": "chaulkywhite_shirtvest on the default look: our first colourway",
+   "w": 359,
+   "h": 463,
+   "sha256": "fdf5b5235b00ec56df442484743e2e3fbb26e0feb7fdeea4b56ce92e5aea68ad",
+   "made": "tools/avatar-compositor/showcase.mjs --figures --max 1 (the default look at the stand frame, scale 3), cwebp -q 90"
+  },
+  "public/assets/made-art/compare/wardrobe-cola_bottle_shirt-original.webp": {
+   "what": "cola_bottle_shirt on the default look: Tiny Speck's greyscale file as it is",
+   "w": 359,
+   "h": 463,
+   "sha256": "525cd5df27afdc03281250e5a2d69ce6a0726938b1a21214f907a51e82985746",
+   "made": "tools/avatar-compositor/showcase.mjs --figures --max 1 (the default look at the stand frame, scale 3), cwebp -q 90"
+  },
+  "public/assets/made-art/compare/wardrobe-cola_bottle_shirt-ours.webp": {
+   "what": "cola_bottle_shirt on the default look: our first colourway",
+   "w": 359,
+   "h": 463,
+   "sha256": "0b8dd15a7faf36bd3fd2edae45773e33c916ccd8ffdc393b1a94fde8a6924b7d",
+   "made": "tools/avatar-compositor/showcase.mjs --figures --max 1 (the default look at the stand frame, scale 3), cwebp -q 90"
+  },
+  "public/assets/made-art/compare/wardrobe-frilly_tank_blouse_belly-original.webp": {
+   "what": "frilly_tank_blouse_belly on the default look: Tiny Speck's greyscale file as it is",
+   "w": 359,
+   "h": 463,
+   "sha256": "1991ac7fa859b8118438771cf248dad3b9df8d0a20f8b6da2eef89df22308ccb",
+   "made": "tools/avatar-compositor/showcase.mjs --figures --max 1 (the default look at the stand frame, scale 3), cwebp -q 90"
+  },
+  "public/assets/made-art/compare/wardrobe-frilly_tank_blouse_belly-ours.webp": {
+   "what": "frilly_tank_blouse_belly on the default look: our first colourway",
+   "w": 359,
+   "h": 463,
+   "sha256": "f68a7bb8e9e687014d618639159918b15f80b8523e78825733d552501b3108b7",
+   "made": "tools/avatar-compositor/showcase.mjs --figures --max 1 (the default look at the stand frame, scale 3), cwebp -q 90"
+  },
+  "public/assets/made-art/compare/wardrobe-glitchfashionShirt_loose-original.webp": {
+   "what": "glitchfashionShirt_loose on the default look: Tiny Speck's greyscale file as it is",
+   "w": 359,
+   "h": 463,
+   "sha256": "e41c4f30ab0de056360c9b0c7e24bf2ee497272f8118aebb057ffb90785085bd",
+   "made": "tools/avatar-compositor/showcase.mjs --figures --max 1 (the default look at the stand frame, scale 3), cwebp -q 90"
+  },
+  "public/assets/made-art/compare/wardrobe-glitchfashionShirt_loose-ours.webp": {
+   "what": "glitchfashionShirt_loose on the default look: our first colourway",
+   "w": 359,
+   "h": 463,
+   "sha256": "294f58ac0a47023394d3b3feea71465887aad47fb7587ebdf9503eb12b5c46c4",
+   "made": "tools/avatar-compositor/showcase.mjs --figures --max 1 (the default look at the stand frame, scale 3), cwebp -q 90"
+  },
+  "public/assets/made-art/compare/wardrobe-kiss_pants-original.webp": {
+   "what": "kiss_pants on the default look: Tiny Speck's greyscale file as it is",
+   "w": 359,
+   "h": 463,
+   "sha256": "ce7cbd4fa68394b86572869fe28f0cfbda0bcd15ede8658c053ffa5ebda56336",
+   "made": "tools/avatar-compositor/showcase.mjs --figures --max 1 (the default look at the stand frame, scale 3), cwebp -q 90"
+  },
+  "public/assets/made-art/compare/wardrobe-kiss_pants-ours.webp": {
+   "what": "kiss_pants on the default look: our first colourway",
+   "w": 359,
+   "h": 463,
+   "sha256": "b0812475fb28fad556c0c29de7f1ece3b6254911d576bdb9d105a83219108c99",
+   "made": "tools/avatar-compositor/showcase.mjs --figures --max 1 (the default look at the stand frame, scale 3), cwebp -q 90"
+  },
+  "public/assets/made-art/compare/wardrobe-mongolia_fighting_pants-original.webp": {
+   "what": "mongolia_fighting_pants on the default look: Tiny Speck's greyscale file as it is",
+   "w": 359,
+   "h": 463,
+   "sha256": "be667460c46401cbf7a57de125aaab2714a94cd39cdc1c314863bf1de85b9f2f",
+   "made": "tools/avatar-compositor/showcase.mjs --figures --max 1 (the default look at the stand frame, scale 3), cwebp -q 90"
+  },
+  "public/assets/made-art/compare/wardrobe-mongolia_fighting_pants-ours.webp": {
+   "what": "mongolia_fighting_pants on the default look: our first colourway",
+   "w": 359,
+   "h": 463,
+   "sha256": "ced01a4d384924d8ff54ad01339c1fa510251c21a21a3a55ece7e315a7ec18b0",
+   "made": "tools/avatar-compositor/showcase.mjs --figures --max 1 (the default look at the stand frame, scale 3), cwebp -q 90"
+  },
+  "public/assets/made-art/compare/wardrobe-mushroom_shirt_light-original.webp": {
+   "what": "mushroom_shirt_light on the default look: Tiny Speck's greyscale file as it is",
+   "w": 359,
+   "h": 463,
+   "sha256": "485fb420ae7c270cb1c4973832a504454791a73acdd36c63a697135ae805fe2e",
+   "made": "tools/avatar-compositor/showcase.mjs --figures --max 1 (the default look at the stand frame, scale 3), cwebp -q 90"
+  },
+  "public/assets/made-art/compare/wardrobe-mushroom_shirt_light-ours.webp": {
+   "what": "mushroom_shirt_light on the default look: our first colourway",
+   "w": 359,
+   "h": 463,
+   "sha256": "cbcfcdf624e91b9ab6e6c0c0fae8c86e2abb9acd7984a060c8f29e31ee4f9de7",
+   "made": "tools/avatar-compositor/showcase.mjs --figures --max 1 (the default look at the stand frame, scale 3), cwebp -q 90"
+  },
+  "public/assets/made-art/compare/wardrobe-nintendo_shirt_lighter-original.webp": {
+   "what": "nintendo_shirt_lighter on the default look: Tiny Speck's greyscale file as it is",
+   "w": 359,
+   "h": 463,
+   "sha256": "a5d8a3762fee4353823b58d6891238ba0992c2ce2c682d9dd8453d0be4755e8e",
+   "made": "tools/avatar-compositor/showcase.mjs --figures --max 1 (the default look at the stand frame, scale 3), cwebp -q 90"
+  },
+  "public/assets/made-art/compare/wardrobe-nintendo_shirt_lighter-ours.webp": {
+   "what": "nintendo_shirt_lighter on the default look: our first colourway",
+   "w": 359,
+   "h": 463,
+   "sha256": "68d5d1c5a9042d9a744226d1d81891d9b741b9e5b69643ff5042b3137278a80e",
+   "made": "tools/avatar-compositor/showcase.mjs --figures --max 1 (the default look at the stand frame, scale 3), cwebp -q 90"
+  },
+  "public/assets/made-art/compare/wardrobe-rainbow_leggings-original.webp": {
+   "what": "rainbow_leggings on the default look: Tiny Speck's greyscale file as it is",
+   "w": 359,
+   "h": 463,
+   "sha256": "eed5e0662bcc019bfe4d2ae25757e6c4353aa5d792e112e966e1cfe2d9a25277",
+   "made": "tools/avatar-compositor/showcase.mjs --figures --max 1 (the default look at the stand frame, scale 3), cwebp -q 90"
+  },
+  "public/assets/made-art/compare/wardrobe-rainbow_leggings-ours.webp": {
+   "what": "rainbow_leggings on the default look: our first colourway",
+   "w": 359,
+   "h": 463,
+   "sha256": "4fd37af7abfa979f80ac3a770fe2135c04e0f56f85dcbaa4690c99c8a0dde98d",
+   "made": "tools/avatar-compositor/showcase.mjs --figures --max 1 (the default look at the stand frame, scale 3), cwebp -q 90"
+  },
+  "public/assets/made-art/compare/wardrobe-real_bowler_hat-original.webp": {
+   "what": "real_bowler_hat on the default look: Tiny Speck's greyscale file as it is",
+   "w": 359,
+   "h": 463,
+   "sha256": "9017a64d8677bf80860759452c67865349a6df44835ddbe301a4d11e1a89e5dc",
+   "made": "tools/avatar-compositor/showcase.mjs --figures --max 1 (the default look at the stand frame, scale 3), cwebp -q 90"
+  },
+  "public/assets/made-art/compare/wardrobe-real_bowler_hat-ours.webp": {
+   "what": "real_bowler_hat on the default look: our first colourway",
+   "w": 359,
+   "h": 463,
+   "sha256": "d0a4c63414666c3c64c5e73456fd421e24fe50eaf05ec63e6d4a6b5a40e1bb38",
+   "made": "tools/avatar-compositor/showcase.mjs --figures --max 1 (the default look at the stand frame, scale 3), cwebp -q 90"
+  },
+  "public/assets/made-art/compare/wardrobe-slouch_boots-original.webp": {
+   "what": "slouch_boots on the default look: Tiny Speck's greyscale file as it is",
+   "w": 359,
+   "h": 463,
+   "sha256": "6c790ea7cabc29cb8b0af3cf53be2dd8c5b74d066886aec4d8e5442cf52860d5",
+   "made": "tools/avatar-compositor/showcase.mjs --figures --max 1 (the default look at the stand frame, scale 3), cwebp -q 90"
+  },
+  "public/assets/made-art/compare/wardrobe-slouch_boots-ours.webp": {
+   "what": "slouch_boots on the default look: our first colourway",
+   "w": 359,
+   "h": 463,
+   "sha256": "1db9d33f9b5e02796f93a696328ce57f3895f30a2f867814040698718c78a4b2",
+   "made": "tools/avatar-compositor/showcase.mjs --figures --max 1 (the default look at the stand frame, scale 3), cwebp -q 90"
+  },
+  "public/assets/made-art/compare/wardrobe-strip-original.webp": {
+   "what": "banana_hat, teaport side by side: Tiny Speck's greyscale files",
+   "w": 718,
+   "h": 463,
+   "sha256": "d2551cd54dfe0ad52de18720475e15584f3130c48fe2221b8af0dbe60b1592e9",
+   "made": "tools/avatar-compositor/showcase.mjs --figures --max 1 (the default look at the stand frame, scale 3), cwebp -q 90"
+  },
+  "public/assets/made-art/compare/wardrobe-strip-ours.webp": {
+   "what": "banana_hat, teaport side by side: our colourways",
+   "w": 718,
+   "h": 463,
+   "sha256": "2570f4f5cc2e29e7a6ccb99381b5460e07aa56afe898cc3459503d611d6ed82d",
+   "made": "tools/avatar-compositor/showcase.mjs --figures --max 1 (the default look at the stand frame, scale 3), cwebp -q 90"
+  },
+  "public/assets/made-art/compare/wardrobe-sweet_heart_shoes-original.webp": {
+   "what": "sweet_heart_shoes on the default look: Tiny Speck's greyscale file as it is",
+   "w": 359,
+   "h": 463,
+   "sha256": "83488a42a78dbe621a8b6c807f607e5e2fcdc6f428cc35784ae6bf7e053bd4eb",
+   "made": "tools/avatar-compositor/showcase.mjs --figures --max 1 (the default look at the stand frame, scale 3), cwebp -q 90"
+  },
+  "public/assets/made-art/compare/wardrobe-sweet_heart_shoes-ours.webp": {
+   "what": "sweet_heart_shoes on the default look: our first colourway",
+   "w": 359,
+   "h": 463,
+   "sha256": "51b36f3ae8297e43fe2c4c99032ff389a746eb6854deaaaced76073f76a21e6b",
+   "made": "tools/avatar-compositor/showcase.mjs --figures --max 1 (the default look at the stand frame, scale 3), cwebp -q 90"
+  },
+  "public/assets/made-art/compare/wardrobe-teaport-original.webp": {
+   "what": "teaport on the default look: Tiny Speck's greyscale file as it is",
+   "w": 359,
+   "h": 463,
+   "sha256": "feaed55542e18807e73a9c31325c8f0bab88d086e034d0fc2d8e4f0629c78fbc",
+   "made": "tools/avatar-compositor/showcase.mjs --figures --max 1 (the default look at the stand frame, scale 3), cwebp -q 90"
+  },
+  "public/assets/made-art/compare/wardrobe-teaport-ours.webp": {
+   "what": "teaport on the default look: our first colourway",
+   "w": 359,
+   "h": 463,
+   "sha256": "ac898a0c271cc6287f856d17be8481647d8adc89a0c7a5bc540e6c934f6fa99b",
+   "made": "tools/avatar-compositor/showcase.mjs --figures --max 1 (the default look at the stand frame, scale 3), cwebp -q 90"
+  },
+  "public/assets/made-art/compare/wardrobe-Women_Plain_Hat-original.webp": {
+   "what": "Women_Plain_Hat on the default look: Tiny Speck's greyscale file as it is",
+   "w": 359,
+   "h": 463,
+   "sha256": "1bbf7d8b08c2d452d6583f630bc8f3b6368cd4290cd9185ce1873b2a918e051c",
+   "made": "tools/avatar-compositor/showcase.mjs --figures --max 1 (the default look at the stand frame, scale 3), cwebp -q 90"
+  },
+  "public/assets/made-art/compare/wardrobe-Women_Plain_Hat-ours.webp": {
+   "what": "Women_Plain_Hat on the default look: our first colourway",
+   "w": 359,
+   "h": 463,
+   "sha256": "06c2a4b41b8b720f1ecc083c36e736c5b65f45ad4161a870dc2b51e330ed47e7",
+   "made": "tools/avatar-compositor/showcase.mjs --figures --max 1 (the default look at the stand frame, scale 3), cwebp -q 90"
+  }
+ }
+}

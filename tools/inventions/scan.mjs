@@ -36,6 +36,10 @@ const here = dirname(fileURLToPath(import.meta.url));
 export const ROOT = join(here, '..', '..');
 export const REGISTER_PATH = join(here, 'inventions.json');
 export const MARKERS_PATH = join(here, 'markers.json');
+/** The Our additions section's list (tools/made-art/compare.json): an addition of ours beside its Tiny Speck original. */
+export const COMPARE_PATH = join(ROOT, 'tools/made-art/compare.json');
+/** An entry's `compare` value for art the Made for Groddle band already shows beside its original (made.json pieces). */
+export const COMPARE_MADE = 'made';
 
 /** The claim for a hit that only uses a marker word (dialogue, a build step, a variable). */
 export const NOT_AN_INVENTION = 'not-an-invention';
@@ -332,6 +336,40 @@ export function registerProblems(register, root = ROOT) {
   return out;
 }
 
+/**
+ * PURE: the compare rule (Austin 2026-11-25, #699, G1308: "document the original artwork next to our
+ * addition, then standardize it"). Every kept visual entry either names where its Tiny Speck original
+ * is shown beside ours (`compare`: an entry id of tools/made-art/compare.json, or "made" for the Made
+ * for Groddle band) or says in `noCompare` why it has none; and every compare.json entry names a
+ * visual entry of the register that points back at it.
+ */
+export function compareProblems(register, compare = { entries: [] }) {
+  const out = [];
+  const entries = register.entries || [];
+  const byId = new Map(entries.map((e) => [e.id, e]));
+  const compareIds = new Set((compare.entries || []).map((c) => c.id));
+  for (const e of entries) {
+    if (e.compare !== undefined && e.noCompare !== undefined) out.push(`${e.id}: has both compare and noCompare`);
+    if (e.compare !== undefined && e.compare !== COMPARE_MADE && !compareIds.has(e.compare)) out.push(`${e.id}: compare ${e.compare} is not an entry of tools/made-art/compare.json (or "${COMPARE_MADE}")`);
+    if (e.noCompare !== undefined && !(typeof e.noCompare === 'string' && e.noCompare.trim().length >= 12)) out.push(`${e.id}: noCompare must say why there is no original to show`);
+    if (e.kind === 'visual' && e.status === 'kept' && e.compare === undefined && e.noCompare === undefined) {
+      out.push(`${e.id}: a kept visual invention needs compare (its Tiny Speck original beside ours, tools/made-art/compare.json) or noCompare (why it has none)`);
+    }
+  }
+  for (const c of compare.entries || []) {
+    const e = byId.get(c.invention);
+    if (!e) out.push(`compare ${c.id}: names no register entry (${c.invention})`);
+    else if (e.kind !== 'visual') out.push(`compare ${c.id}: ${e.id} is not a visual invention`);
+    else if (e.compare !== c.id) out.push(`compare ${c.id}: ${e.id} should say compare: "${c.id}"`);
+  }
+  return out;
+}
+
+/** compare.json from the checkout ({ entries: [] } when missing). */
+export function loadCompare(path = COMPARE_PATH) {
+  return existsSync(path) ? JSON.parse(readFileSync(path, 'utf8')) : { entries: [] };
+}
+
 /** PURE: hits nobody claimed, and claims that name no entry. */
 export function claimProblems(hits, markers, register) {
   const ids = new Set((register.entries || []).map((e) => e.id));
@@ -421,7 +459,7 @@ async function main(argv) {
   }
 
   const drift = await familyDrift(register);
-  const problems = registerProblems(register);
+  const problems = [...registerProblems(register), ...compareProblems(register, loadCompare())];
   const driftBad = drift.filter((d) => !d.skipped && (d.added.length || d.removed.length));
   console.log(`${register.entries.length} entries; ${hits.length} marker hits in ${new Set(hits.map((h) => h.file)).size} files; ${unclaimed.length} unclaimed; ${unknown.length} claims name no entry; ${staleClaims(hits, markers).length} stale`);
   for (const p of problems) console.log(`register: ${p}`);

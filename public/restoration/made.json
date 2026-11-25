@@ -1,5 +1,5 @@
 {
-  "note": "Written by tools/made-art/build-data.mjs from the provenance lists in tools/provenance/, tools/made-art/showcase.json and tools/made-art/pieces.json. Edit those, never this file.",
+  "note": "Written by tools/made-art/build-data.mjs from the provenance lists in tools/provenance/, tools/made-art/showcase.json, tools/made-art/pieces.json and (ours) tools/made-art/compare.json. Edit those, never this file.",
   "pieces": [
     {
       "id": "chicken_party_hat",
@@ -1029,6 +1029,554 @@
         {
           "label": "Licence",
           "text": "Dedicated to the public domain under CC0 1.0, like the Tiny Speck art it comes from."
+        }
+      ]
+    }
+  ],
+  "ours": [
+    {
+      "id": "stat-icons",
+      "invention": "stat-icons",
+      "anchor": "ours-stat-icons",
+      "name": "Stat icons",
+      "decided": "2026-11-25",
+      "when": "Kept 25 November 2026",
+      "caption": "One icon and one colour for each stat, the same in the top bar, in speech bubbles, in the amounts that float up and on the reward card. Glitch drew each stat its own way in each place: a bolt beside the energy gauge, a green battery in a speech bubble. A player asked for one of each, so these were drawn for Groddle in its flat style, each after the Tiny Speck picture it stands in for. Later the same player asked for Tiny Speck's pictures back; Austin kept ours and gave the coin the two strokes of Tiny Speck's currant sign.",
+      "display": {
+        "w": 272,
+        "h": 160
+      },
+      "image": {
+        "src": "/assets/made-art/compare/stat-icons-ours.svg",
+        "w": 272,
+        "h": 160,
+        "label": "Ours, in the same order",
+        "alt": "Our six stat icons in two rows: an orange bolt, a green smile and a blue star on discs, a purple i, a gold coin with a crossed C and a plum star."
+      },
+      "original": {
+        "src": "/assets/made-art/compare/stat-icons-original.webp",
+        "w": 272,
+        "h": 160,
+        "label": "Tiny Speck's speech bubble pictures, energy, mood, XP, iMG, currants and favor",
+        "alt": "Tiny Speck's six small stat pictures in two rows: a green battery, a green smile, a teal xp disc, a purple i, a brown coin with a crossed C and a maroon star.",
+        "pixelated": true,
+        "kind": "original"
+      },
+      "facts": [
+        {
+          "label": "In the game",
+          "text": "The modern look shows these everywhere a stat appears. The classic look keeps Tiny Speck's own pictures."
+        },
+        {
+          "label": "Licence",
+          "text": "Ours, drawn by the game's own code under the project's MIT licence. The Tiny Speck pictures beside them are CC0 1.0."
+        }
+      ],
+      "parts": [
+        {
+          "name": "Energy",
+          "original": {
+            "src": "/assets/classic/slug_energy_pos.webp",
+            "w": 20,
+            "h": 15,
+            "label": "Tiny Speck's speech bubble picture",
+            "alt": "Tiny Speck's green battery with a dark lightning bolt across it.",
+            "pixelated": true
+          },
+          "image": {
+            "src": "/assets/made-art/compare/stat-energy-ours.svg",
+            "w": 64,
+            "h": 64,
+            "label": "Ours",
+            "alt": "Our orange disc with a white lightning bolt."
+          }
+        },
+        {
+          "name": "Mood",
+          "original": {
+            "src": "/assets/classic/slug_mood_pos.webp",
+            "w": 17,
+            "h": 17,
+            "label": "Tiny Speck's speech bubble picture",
+            "alt": "Tiny Speck's green smiling face.",
+            "pixelated": true
+          },
+          "image": {
+            "src": "/assets/made-art/compare/stat-mood-ours.svg",
+            "w": 64,
+            "h": 64,
+            "label": "Ours",
+            "alt": "Our green disc with a white smiling face."
+          }
+        },
+        {
+          "name": "XP",
+          "original": {
+            "src": "/assets/classic/slug_xp_pos.webp",
+            "w": 17,
+            "h": 17,
+            "label": "Tiny Speck's speech bubble picture",
+            "alt": "Tiny Speck's teal disc with a white xp.",
+            "pixelated": true
+          },
+          "image": {
+            "src": "/assets/made-art/compare/stat-xp-ours.svg",
+            "w": 64,
+            "h": 64,
+            "label": "Ours",
+            "alt": "Our blue disc with a white star."
+          }
+        },
+        {
+          "name": "iMG",
+          "original": {
+            "src": "/assets/classic/slug_imagination_pos.webp",
+            "w": 14,
+            "h": 13,
+            "label": "Tiny Speck's speech bubble picture",
+            "alt": "Tiny Speck's purple rounded shape with a pale i.",
+            "pixelated": true
+          },
+          "image": {
+            "src": "/assets/made-art/compare/stat-imagination-ours.svg",
+            "w": 64,
+            "h": 64,
+            "label": "Ours",
+            "alt": "Our purple pentagon with a white i."
+          }
+        },
+        {
+          "name": "iMG on the Imagination cards",
+          "original": {
+            "src": "/assets/imagination/ui/moment_icon_imagination.svg",
+            "w": 57.85,
+            "h": 52.4,
+            "label": "Tiny Speck's iMG mark from the Imagination cards",
+            "alt": "Tiny Speck's lavender cloud with a white plus, ringed in white and dark grey."
+          },
+          "image": {
+            "src": "/assets/made-art/compare/stat-imagination-ours.svg",
+            "w": 64,
+            "h": 64,
+            "label": "Ours",
+            "alt": "Our purple pentagon with a white i."
+          }
+        },
+        {
+          "name": "Currants",
+          "original": {
+            "src": "/assets/classic/slug_currants_pos.webp",
+            "w": 17,
+            "h": 17,
+            "label": "Tiny Speck's speech bubble picture",
+            "alt": "Tiny Speck's brown coin with a pale C crossed by two diagonal lines.",
+            "pixelated": true
+          },
+          "image": {
+            "src": "/assets/made-art/compare/stat-currants-ours.svg",
+            "w": 64,
+            "h": 64,
+            "label": "Ours",
+            "alt": "Our gold coin with a cream C crossed by two parallel strokes."
+          }
+        },
+        {
+          "name": "Currants on the Imagination cards",
+          "original": {
+            "src": "/assets/made-art/compare/card-currant-original.svg",
+            "w": 54,
+            "h": 54,
+            "label": "Tiny Speck's currant from the Imagination cards",
+            "alt": "Tiny Speck's brown coin ringed in white and dark grey, with a white C crossed by two long diagonal strokes."
+          },
+          "image": {
+            "src": "/assets/made-art/compare/stat-currants-ours.svg",
+            "w": 64,
+            "h": 64,
+            "label": "Ours",
+            "alt": "Our gold coin with a cream C crossed by two parallel strokes."
+          }
+        },
+        {
+          "name": "Favor",
+          "original": {
+            "src": "/assets/classic/slug_favor_pos.webp",
+            "w": 12,
+            "h": 12,
+            "label": "Tiny Speck's speech bubble picture",
+            "alt": "Tiny Speck's small maroon star.",
+            "pixelated": true
+          },
+          "image": {
+            "src": "/assets/made-art/compare/stat-favor-ours.svg",
+            "w": 64,
+            "h": 64,
+            "label": "Ours",
+            "alt": "Our plum star."
+          }
+        }
+      ]
+    },
+    {
+      "id": "wardrobe-reimagined",
+      "invention": "avatar-reimagined-wardrobe",
+      "anchor": "ours-reimagined-clothes",
+      "name": "Reimagined clothes",
+      "decided": "2026-10-23",
+      "when": "Kept 23 October 2026",
+      "caption": "Tiny Speck left 19 clothing files as greyscale masters that Glitch never sold, so they never had colours. Groddle sells them in colours borrowed from the piece they match, or chosen from the same palette where none does, and marks them Reimagined in the wardrobe. The drawing is Tiny Speck's; only the colours are ours.",
+      "display": {
+        "w": 288,
+        "h": 186
+      },
+      "image": {
+        "src": "/assets/made-art/compare/wardrobe-strip-ours.webp",
+        "w": 718,
+        "h": 463,
+        "label": "Ours, in the colours we gave them",
+        "alt": "The same two Glitches: the banana hat now yellow, the teapot dress blue and white with gold trim."
+      },
+      "original": {
+        "src": "/assets/made-art/compare/wardrobe-strip-original.webp",
+        "w": 718,
+        "h": 463,
+        "label": "Tiny Speck's files as they are, in greyscale",
+        "alt": "A Glitch in a white banana hat beside one in a white teapot dress, both drawn in greys.",
+        "kind": "original"
+      },
+      "facts": [
+        {
+          "label": "In the game",
+          "text": "Each one is sold and worn like any other piece of clothing, with a Reimagined tag that says where its colours come from."
+        },
+        {
+          "label": "Licence",
+          "text": "The drawing is Tiny Speck's, under CC0 1.0; only the colours are ours, set in the game's own data."
+        }
+      ],
+      "parts": [
+        {
+          "name": "Plain lace hat",
+          "original": {
+            "src": "/assets/made-art/compare/wardrobe-Women_Plain_Hat-original.webp",
+            "w": 359,
+            "h": 463,
+            "label": "Tiny Speck's file, in greyscale",
+            "alt": "A Glitch wearing the Plain lace hat as Tiny Speck drew it, in greys."
+          },
+          "image": {
+            "src": "/assets/made-art/compare/wardrobe-Women_Plain_Hat-ours.webp",
+            "w": 359,
+            "h": 463,
+            "label": "Ours, in colours borrowed from the Plain lace dress",
+            "alt": "A Glitch wearing the Plain lace hat in our colours borrowed from the Plain lace dress."
+          }
+        },
+        {
+          "name": "Banana hat",
+          "original": {
+            "src": "/assets/made-art/compare/wardrobe-banana_hat-original.webp",
+            "w": 359,
+            "h": 463,
+            "label": "Tiny Speck's file, in greyscale",
+            "alt": "A Glitch wearing the Banana hat as Tiny Speck drew it, in greys."
+          },
+          "image": {
+            "src": "/assets/made-art/compare/wardrobe-banana_hat-ours.webp",
+            "w": 359,
+            "h": 463,
+            "label": "Ours, in colours chosen from the same palette",
+            "alt": "A Glitch wearing the Banana hat in our colours chosen from the same palette."
+          }
+        },
+        {
+          "name": "Real bowler hat",
+          "original": {
+            "src": "/assets/made-art/compare/wardrobe-real_bowler_hat-original.webp",
+            "w": 359,
+            "h": 463,
+            "label": "Tiny Speck's file, in greyscale",
+            "alt": "A Glitch wearing the Real bowler hat as Tiny Speck drew it, in greys."
+          },
+          "image": {
+            "src": "/assets/made-art/compare/wardrobe-real_bowler_hat-ours.webp",
+            "w": 359,
+            "h": 463,
+            "label": "Ours, in colours borrowed from the Bowler hat",
+            "alt": "A Glitch wearing the Real bowler hat in our colours borrowed from the Bowler hat."
+          }
+        },
+        {
+          "name": "Chaulkywhite shirt and vest",
+          "original": {
+            "src": "/assets/made-art/compare/wardrobe-chaulkywhite_shirtvest-original.webp",
+            "w": 359,
+            "h": 463,
+            "label": "Tiny Speck's file, in greyscale",
+            "alt": "A Glitch wearing the Chaulkywhite shirt and vest as Tiny Speck drew it, in greys."
+          },
+          "image": {
+            "src": "/assets/made-art/compare/wardrobe-chaulkywhite_shirtvest-ours.webp",
+            "w": 359,
+            "h": 463,
+            "label": "Ours, in colours borrowed from the Chaulkywhite coat, shirt and vest",
+            "alt": "A Glitch wearing the Chaulkywhite shirt and vest in our colours borrowed from the Chaulkywhite coat, shirt and vest."
+          }
+        },
+        {
+          "name": "Cola bottle shirt",
+          "original": {
+            "src": "/assets/made-art/compare/wardrobe-cola_bottle_shirt-original.webp",
+            "w": 359,
+            "h": 463,
+            "label": "Tiny Speck's file, in greyscale",
+            "alt": "A Glitch wearing the Cola bottle shirt as Tiny Speck drew it, in greys."
+          },
+          "image": {
+            "src": "/assets/made-art/compare/wardrobe-cola_bottle_shirt-ours.webp",
+            "w": 359,
+            "h": 463,
+            "label": "Ours, in colours chosen from the same palette",
+            "alt": "A Glitch wearing the Cola bottle shirt in our colours chosen from the same palette."
+          }
+        },
+        {
+          "name": "Frilly tank blouse belly",
+          "original": {
+            "src": "/assets/made-art/compare/wardrobe-frilly_tank_blouse_belly-original.webp",
+            "w": 359,
+            "h": 463,
+            "label": "Tiny Speck's file, in greyscale",
+            "alt": "A Glitch wearing the Frilly tank blouse belly as Tiny Speck drew it, in greys."
+          },
+          "image": {
+            "src": "/assets/made-art/compare/wardrobe-frilly_tank_blouse_belly-ours.webp",
+            "w": 359,
+            "h": 463,
+            "label": "Ours, in colours borrowed from the Frilly tank blouse",
+            "alt": "A Glitch wearing the Frilly tank blouse belly in our colours borrowed from the Frilly tank blouse."
+          }
+        },
+        {
+          "name": "Mushroom shirt light",
+          "original": {
+            "src": "/assets/made-art/compare/wardrobe-mushroom_shirt_light-original.webp",
+            "w": 359,
+            "h": 463,
+            "label": "Tiny Speck's file, in greyscale",
+            "alt": "A Glitch wearing the Mushroom shirt light as Tiny Speck drew it, in greys."
+          },
+          "image": {
+            "src": "/assets/made-art/compare/wardrobe-mushroom_shirt_light-ours.webp",
+            "w": 359,
+            "h": 463,
+            "label": "Ours, in colours borrowed from the Mushroom shirt",
+            "alt": "A Glitch wearing the Mushroom shirt light in our colours borrowed from the Mushroom shirt."
+          }
+        },
+        {
+          "name": "Nintendo shirt, lighter",
+          "original": {
+            "src": "/assets/made-art/compare/wardrobe-nintendo_shirt_lighter-original.webp",
+            "w": 359,
+            "h": 463,
+            "label": "Tiny Speck's file, in greyscale",
+            "alt": "A Glitch wearing the Nintendo shirt, lighter as Tiny Speck drew it, in greys."
+          },
+          "image": {
+            "src": "/assets/made-art/compare/wardrobe-nintendo_shirt_lighter-ours.webp",
+            "w": 359,
+            "h": 463,
+            "label": "Ours, in colours borrowed from the Nintendo shirt",
+            "alt": "A Glitch wearing the Nintendo shirt, lighter in our colours borrowed from the Nintendo shirt."
+          }
+        },
+        {
+          "name": "Glitchfashion shirt, loose",
+          "original": {
+            "src": "/assets/made-art/compare/wardrobe-glitchfashionShirt_loose-original.webp",
+            "w": 359,
+            "h": 463,
+            "label": "Tiny Speck's file, in greyscale",
+            "alt": "A Glitch wearing the Glitchfashion shirt, loose as Tiny Speck drew it, in greys."
+          },
+          "image": {
+            "src": "/assets/made-art/compare/wardrobe-glitchfashionShirt_loose-ours.webp",
+            "w": 359,
+            "h": 463,
+            "label": "Ours, in colours borrowed from the Glitchfashion shirt",
+            "alt": "A Glitch wearing the Glitchfashion shirt, loose in our colours borrowed from the Glitchfashion shirt."
+          }
+        },
+        {
+          "name": "Alph lem mab",
+          "original": {
+            "src": "/assets/made-art/compare/wardrobe-alph_lem_mab-original.webp",
+            "w": 359,
+            "h": 463,
+            "label": "Tiny Speck's file, in greyscale",
+            "alt": "A Glitch wearing the Alph lem mab as Tiny Speck drew it, in greys."
+          },
+          "image": {
+            "src": "/assets/made-art/compare/wardrobe-alph_lem_mab-ours.webp",
+            "w": 359,
+            "h": 463,
+            "label": "Ours, in colours borrowed from the Alph lem",
+            "alt": "A Glitch wearing the Alph lem mab in our colours borrowed from the Alph lem."
+          }
+        },
+        {
+          "name": "Banana coat",
+          "original": {
+            "src": "/assets/made-art/compare/wardrobe-banana_coat-original.webp",
+            "w": 359,
+            "h": 463,
+            "label": "Tiny Speck's file, in greyscale",
+            "alt": "A Glitch wearing the Banana coat as Tiny Speck drew it, in greys."
+          },
+          "image": {
+            "src": "/assets/made-art/compare/wardrobe-banana_coat-ours.webp",
+            "w": 359,
+            "h": 463,
+            "label": "Ours, in colours chosen from the same palette",
+            "alt": "A Glitch wearing the Banana coat in our colours chosen from the same palette."
+          }
+        },
+        {
+          "name": "Kiss pants",
+          "original": {
+            "src": "/assets/made-art/compare/wardrobe-kiss_pants-original.webp",
+            "w": 359,
+            "h": 463,
+            "label": "Tiny Speck's file, in greyscale",
+            "alt": "A Glitch wearing the Kiss pants as Tiny Speck drew it, in greys."
+          },
+          "image": {
+            "src": "/assets/made-art/compare/wardrobe-kiss_pants-ours.webp",
+            "w": 359,
+            "h": 463,
+            "label": "Ours, in colours borrowed from the Kissballoon hoodie",
+            "alt": "A Glitch wearing the Kiss pants in our colours borrowed from the Kissballoon hoodie."
+          }
+        },
+        {
+          "name": "Mongolian fighting pants",
+          "original": {
+            "src": "/assets/made-art/compare/wardrobe-mongolia_fighting_pants-original.webp",
+            "w": 359,
+            "h": 463,
+            "label": "Tiny Speck's file, in greyscale",
+            "alt": "A Glitch wearing the Mongolian fighting pants as Tiny Speck drew it, in greys."
+          },
+          "image": {
+            "src": "/assets/made-art/compare/wardrobe-mongolia_fighting_pants-ours.webp",
+            "w": 359,
+            "h": 463,
+            "label": "Ours, in colours borrowed from the Mongolian fighting top",
+            "alt": "A Glitch wearing the Mongolian fighting pants in our colours borrowed from the Mongolian fighting top."
+          }
+        },
+        {
+          "name": "Rainbow leggings",
+          "original": {
+            "src": "/assets/made-art/compare/wardrobe-rainbow_leggings-original.webp",
+            "w": 359,
+            "h": 463,
+            "label": "Tiny Speck's file, in greyscale",
+            "alt": "A Glitch wearing the Rainbow leggings as Tiny Speck drew it, in greys."
+          },
+          "image": {
+            "src": "/assets/made-art/compare/wardrobe-rainbow_leggings-ours.webp",
+            "w": 359,
+            "h": 463,
+            "label": "Ours, in colours borrowed from the Rainbow pants",
+            "alt": "A Glitch wearing the Rainbow leggings in our colours borrowed from the Rainbow pants."
+          }
+        },
+        {
+          "name": "Bell skirt",
+          "original": {
+            "src": "/assets/made-art/compare/wardrobe-bell_skirt-original.webp",
+            "w": 359,
+            "h": 463,
+            "label": "Tiny Speck's file, in greyscale",
+            "alt": "A Glitch wearing the Bell skirt as Tiny Speck drew it, in greys."
+          },
+          "image": {
+            "src": "/assets/made-art/compare/wardrobe-bell_skirt-ours.webp",
+            "w": 359,
+            "h": 463,
+            "label": "Ours, in colours borrowed from the Bell top",
+            "alt": "A Glitch wearing the Bell skirt in our colours borrowed from the Bell top."
+          }
+        },
+        {
+          "name": "Brazil carnival belt",
+          "original": {
+            "src": "/assets/made-art/compare/wardrobe-brazil_carnival_tail_skirt-original.webp",
+            "w": 359,
+            "h": 463,
+            "label": "Tiny Speck's file, in greyscale",
+            "alt": "A Glitch wearing the Brazil carnival belt as Tiny Speck drew it, in greys."
+          },
+          "image": {
+            "src": "/assets/made-art/compare/wardrobe-brazil_carnival_tail_skirt-ours.webp",
+            "w": 359,
+            "h": 463,
+            "label": "Ours, in colours borrowed from the Brazil carnival tail",
+            "alt": "A Glitch wearing the Brazil carnival belt in our colours borrowed from the Brazil carnival tail."
+          }
+        },
+        {
+          "name": "Teapot",
+          "original": {
+            "src": "/assets/made-art/compare/wardrobe-teaport-original.webp",
+            "w": 359,
+            "h": 463,
+            "label": "Tiny Speck's file, in greyscale",
+            "alt": "A Glitch wearing the Teapot as Tiny Speck drew it, in greys."
+          },
+          "image": {
+            "src": "/assets/made-art/compare/wardrobe-teaport-ours.webp",
+            "w": 359,
+            "h": 463,
+            "label": "Ours, in colours chosen from the same palette",
+            "alt": "A Glitch wearing the Teapot in our colours chosen from the same palette."
+          }
+        },
+        {
+          "name": "Slouch boots",
+          "original": {
+            "src": "/assets/made-art/compare/wardrobe-slouch_boots-original.webp",
+            "w": 359,
+            "h": 463,
+            "label": "Tiny Speck's file, in greyscale",
+            "alt": "A Glitch wearing the Slouch boots as Tiny Speck drew it, in greys."
+          },
+          "image": {
+            "src": "/assets/made-art/compare/wardrobe-slouch_boots-ours.webp",
+            "w": 359,
+            "h": 463,
+            "label": "Ours, in colours borrowed from the Fur-topped boots",
+            "alt": "A Glitch wearing the Slouch boots in our colours borrowed from the Fur-topped boots."
+          }
+        },
+        {
+          "name": "Sweet heart shoes",
+          "original": {
+            "src": "/assets/made-art/compare/wardrobe-sweet_heart_shoes-original.webp",
+            "w": 359,
+            "h": 463,
+            "label": "Tiny Speck's file, in greyscale",
+            "alt": "A Glitch wearing the Sweet heart shoes as Tiny Speck drew it, in greys."
+          },
+          "image": {
+            "src": "/assets/made-art/compare/wardrobe-sweet_heart_shoes-ours.webp",
+            "w": 359,
+            "h": 463,
+            "label": "Ours, in colours borrowed from the Sweet heart skirt",
+            "alt": "A Glitch wearing the Sweet heart shoes in our colours borrowed from the Sweet heart skirt."
+          }
         }
       ]
     }

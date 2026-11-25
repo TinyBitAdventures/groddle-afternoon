@@ -6,7 +6,9 @@
  * in one box at one size, so flipping between them (the arrow keys, the buttons, a click on the
  * picture, a swipe) shows the difference: the original first, then the made. A gallery card
  * (made.json `parts`: More region maps) steps through each region's two pictures in turn. Without
- * JavaScript the band stays as drawn: nothing here is in its markup. Styles: restoration.css
+ * JavaScript the band stays as drawn: nothing here is in its markup. The Our additions section
+ * (made.json `ours`, Austin 2026-11-25) is drawn with the same cards, each addition of ours beside
+ * the Tiny Speck original, and opens here too, its kicker from its list. Styles: restoration.css
  * (.made-modal, .mm-*). Austin 2026-11-13: "a modal popup with left/right arrows to do a true compare".
  */
 
@@ -50,7 +52,7 @@ export function setupMadeCompare(madeUrl) {
   // A gallery's regions one by one; without made.json each card compares its two pictures as drawn.
   const partsFor = fetch(madeUrl)
     .then((r) => (r.ok ? r.json() : null))
-    .then((d) => Object.fromEntries((d?.pieces || []).filter((p) => p.parts?.length).map((p) => [p.anchor, p.parts])))
+    .then((d) => Object.fromEntries([...(d?.pieces || []), ...(d?.ours || [])].filter((p) => p.parts?.length).map((p) => [p.anchor, p.parts])))
     .catch(() => ({}));
 
   /** A picture as drawn on the card: its keyed src, one frame's size, and its caption. */
@@ -71,8 +73,9 @@ export function setupMadeCompare(madeUrl) {
   const next = el('button', { type: 'button', class: 'mm-step mm-next', 'aria-label': 'Next picture' });
   const label = el('p', { class: 'mm-label', 'aria-live': 'polite' });
   const count = el('p', { class: 'mm-count' });
+  const kicker = el('p', { class: 'mm-kicker' }, 'Made for Groddle');
   const modal = el('dialog', { class: 'made-modal', id: 'made-modal', 'aria-labelledby': 'made-modal-title', tabindex: '-1' },
-    el('div', { class: 'mm-head' }, el('div', {}, el('p', { class: 'mm-kicker' }, 'Made for Groddle'), title), close),
+    el('div', { class: 'mm-head' }, el('div', {}, kicker, title), close),
     el('div', { class: 'mm-media' }, stage, prev, next),
     el('div', { class: 'mm-foot' }, label, count));
   document.body.append(modal);
@@ -120,6 +123,8 @@ export function setupMadeCompare(madeUrl) {
     drawn = -1;
     opener = from;
     title.textContent = $('.made-words h3', piece)?.textContent || '';
+    // Our additions (made.json `ours`, the restoration-ours block) say so above the title.
+    kicker.textContent = piece.closest('[data-kicker]')?.dataset.kicker || 'Made for Groddle';
     show();
     if (!modal.open) {
       modal.showModal();

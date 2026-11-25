@@ -550,7 +550,9 @@ function serve() {
 async function withPage(fn) {
   const { chromium } = await import('playwright');
   const server = await serve();
-  const browser = await chromium.launch();
+  // Real Chrome, as tools/qa/browser.mjs launches it (Playwright's own build is not installed on every machine).
+  const channel = process.env.GRODDLE_BROWSER_CHANNEL ?? 'chrome';
+  const browser = await chromium.launch(channel ? { channel } : {});
   try {
     const page = await browser.newPage();
     const errors = [];

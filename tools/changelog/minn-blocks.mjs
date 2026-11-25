@@ -135,6 +135,8 @@ function restorationTypes(leaf) {
     'restoration-gaps': { ...data('gaps', 'Restoration known gaps', 'The Known gaps page\'s list from gaps.json: the counts, the gaps by area with their state, the differences on purpose, or what Glitch never built.', { part: { type: 'string', enum: ['all', 'summary', 'list', 'purpose', 'ideas'], default: 'all' } }), keywords: ['restoration', 'gaps', 'report'] },
     // The report's Made for Groddle section (tools/made-art): drawn from made.json by the site's src/RestorationMade.php.
     'restoration-made': { ...data('made', 'Restoration made for Groddle', 'The art made for Groddle rather than restored, from made.json: each piece beside the Tiny Speck original it comes from, with how it was made and checked.'), keywords: ['restoration', 'art', 'report'] },
+    // The report's Our additions section (tools/made-art/compare.json, Austin 2026-11-25): made.json `ours`, drawn by the same src/RestorationMade.php.
+    'restoration-ours': { ...data('ours', 'Restoration our additions', 'Our additions beside the Tiny Speck originals they stand in for, from made.json: the stat icons, the reimagined clothes and every addition kept since, with the compare popup.'), keywords: ['restoration', 'art', 'compare', 'report'] },
   };
 }
 

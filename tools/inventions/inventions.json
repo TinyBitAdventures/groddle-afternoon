@@ -1,6 +1,6 @@
 {
  "format": "groddle-inventions/1",
- "about": "Everything the remake invented that Glitch did not have, in one place for review (root issue R16, Austin 2026-11-17). kind: behaviour | visual | data | placement | UI | content. status: kept (Austin ruled to keep; ruling says when and where) | proposed (a lane made it, no ruling yet) | under-review (flagged for Austin: looks like inventions he has dropped) | dropped (ruled out and gone; kept as precedent). where: file and symbol. rows: coverage register rows. family: the data family whose members must equal `members` (tools/inventions/scan.mjs FAMILIES). Entries named ours-<system> were seeded from the code's own \"ours\" marks, one per system; split or retitle them as they are reviewed. tools/inventions/markers.json says which entry claims each marker in the code; tests/inventions-register.test.js fails on a new unclaimed one.",
+ "about": "Everything the remake invented that Glitch did not have, in one place for review (root issue R16, Austin 2026-11-17). kind: behaviour | visual | data | placement | UI | content. status: kept (Austin ruled to keep; ruling says when and where) | proposed (a lane made it, no ruling yet) | under-review (flagged for Austin: looks like inventions he has dropped) | dropped (ruled out and gone; kept as precedent). where: file and symbol. rows: coverage register rows. family: the data family whose members must equal `members` (tools/inventions/scan.mjs FAMILIES). Entries named ours-<system> were seeded from the code's own \"ours\" marks, one per system; split or retitle them as they are reviewed. tools/inventions/markers.json says which entry claims each marker in the code; tests/inventions-register.test.js fails on a new unclaimed one. compare / noCompare (Austin 2026-11-25, #699, G1308): every kept visual entry either names where its Tiny Speck original is shown beside ours on /restoration/ (compare: an entry id of tools/made-art/compare.json, the Our additions section, or \"made\" for the Made for Groddle band) or says in noCompare why there is no original to show (lost art, a size or a mirror of Tiny Speck's own drawing, a colour that is not a picture). A new kept visual addition lands with its compare entry: add it to tools/made-art/compare.json (pictures by tools/made-art/compare-art.mjs), then node tools/made-art/build-data.mjs; tools/inventions/scan.mjs --check and tests/inventions-register.test.js fail until one of the two is there.",
  "entries": [
   {
    "id": "pumpkin-glow-rings",
@@ -384,6 +384,7 @@
    ],
    "why": "Accents for the collection page; nothing on the street.",
    "ruling": "Austin 2026-10-26 (G297)",
+   "noCompare": "Accent colours for the Musicblocks collection page, not a picture; Tiny Speck drew no such page to set beside it.",
    "rows": [
     "G297"
    ]
@@ -400,6 +401,7 @@
    ],
    "why": "The source size read too big.",
    "ruling": "Austin 2026-11-11",
+   "noCompare": "Tiny Speck's own shard drawing at a smaller size; nothing new was drawn.",
    "rows": []
   },
   {
@@ -529,6 +531,7 @@
    ],
    "why": "Glitch never mirrored a barnacle; facing in looked wrong on edges.",
    "ruling": "Austin 2026-11-17 (G936)",
+   "noCompare": "Tiny Speck's own barnacle drawing, mirrored; nothing new was drawn.",
    "rows": [
     "G936"
    ]
@@ -592,6 +595,7 @@
    ],
    "why": "17 SWF-only items had no colours.",
    "ruling": "Austin 2026-10-23 (G52): ship with borrowed sibling colourways, marked reimagined",
+   "compare": "wardrobe-reimagined",
    "rows": [
     "G52"
    ]
@@ -891,6 +895,7 @@
    ],
    "why": "Rooms and streets whose art was never archived.",
    "ruling": "Austin 2026-10-31 (level builder P6) and 2026-11-16 (snaps may be attached to prompts; output ships CC0 with provenance)",
+   "compare": "made",
    "rows": [
     "G316",
     "G922",
@@ -984,6 +989,7 @@
    ],
    "why": "Sharper maps than the surviving thumbnails; all 51 regions now show Tiny Speck's own 2012 paintings.",
    "ruling": "Austin 2026-11-14 (originals for the before images; lanes maps15-18)",
+   "compare": "made",
    "rows": [
     "G471",
     "G522",
@@ -1644,6 +1650,7 @@
    ],
    "why": "A placeholder so the verb shows something until the overlay renders.",
    "ruling": "Austin 2026-11-17 (G978, R16 calls): keep until the art exists",
+   "noCompare": "A placeholder where Tiny Speck's overlay art is lost: no original survives to set beside it.",
    "rows": [
     "G978"
    ]
@@ -1661,6 +1668,7 @@
    ],
    "why": "A door must show something.",
    "ruling": "Austin 2026-11-17 (G978, R16 calls): keep until the art exists",
+   "noCompare": "A placeholder for door art that was never recovered: no original survives to set beside it.",
    "rows": [
     "G978"
    ]
@@ -4885,6 +4893,7 @@
    ],
    "why": "#498: the flight itself is Glitch's FLOOR_TO_PACK (ItemstackAnimation.as 237-269: grow 1 s, sit 0.7 s, fly 0.5 s). Its float height came from the client's stylesheet (offsets.itemstack_animation_zenith) and the count's colour from its itemstack_animation_add class, neither of which survived; 60 px up and a white count with the source's dark glow fill them.",
    "ruling": "Austin 2026-11-18 (G1016, calls 64cHAfNFUXcFeypA13swjm): keep the flight's 60 px rise and white +N; the avatar's own \"+N <item>\" float for a flown item goes (Glitch showed only the flight)",
+   "noCompare": "A height and a text colour in motion, not a picture; the client's values were lost with its stylesheet.",
    "rows": [
     "G1016"
    ]
@@ -5176,6 +5185,7 @@
    "kind": "visual",
    "status": "kept",
    "ruling": "Claude's default in lane avk 2026-11-19; on Austin's decision page (Groddle Calls Nov 19 Eve, card placeholder)",
+   "noCompare": "Tiny Speck's placeholder skin is in the CC0 Avatar.swf, but the compositor cannot paint those parts yet, so there is no picture of the original to show; add a compare entry when it can.",
    "where": [
     {
      "file": "public/js/avatar-placeholder.js",
@@ -5206,6 +5216,7 @@
    ],
    "why": "#562 asked for one icon and colour per stat; Glitch's bar and its speech-bubble slugs drew each stat differently (a bolt by the gauge, a battery in the bubble). Ours are flat vectors in our palette; the classic skin keeps Tiny Speck's slug art. #699 asked to go back to Tiny Speck's art.",
    "ruling": "Austin 2026-11-25 (#699, G1308): keep ours; currant gains the ₵ strokes",
+   "compare": "stat-icons",
    "rows": [
     "G1308"
    ]

@@ -21,6 +21,12 @@
  * (tools/made-art/compose.py). Nothing else from the provenance (prompts,
  * hashes, file names) reaches the page.
  *
+ * made.json `ours` is the Our additions section (the site's groddle/restoration-ours block, Austin
+ * 2026-11-25, #699, G1308): each addition of ours that has a Tiny Speck original, the original
+ * beside ours, from tools/made-art/compare.json (buildOurs). Its composed pictures
+ * (public/assets/made-art/compare/, tools/made-art/compare-art.mjs) are checked against their
+ * sha256 there; sizes are read from the files, SVG included.
+ *
  *   node tools/made-art/build-data.mjs           write made.json
  *   node tools/made-art/build-data.mjs --check   exit 1 when made.json is stale or breaks the page's rules
  */
@@ -38,6 +44,8 @@ export const WORLD = join(GAME_DIR, 'tools/provenance/world-map-2x.json');
 export const MADE_DECOS = join(GAME_DIR, 'tools/provenance/made-decos.json');
 export const SHOWCASE = join(GAME_DIR, 'tools/made-art/showcase.json');
 export const CURATED = join(GAME_DIR, 'tools/made-art/pieces.json');
+export const COMPARE = join(GAME_DIR, 'tools/made-art/compare.json');
+export const CATALOG = join(GAME_DIR, 'public/assets/avatar/catalog.json');
 export const OUT = join(GAME_DIR, 'public/restoration/made.json');
 
 /** What each provenance licence means for players. */
@@ -80,8 +88,16 @@ export function jpegSize(buf) {
   }
   throw new Error('no JPEG frame header');
 }
-/** An image file's size: WebP or JPEG. */
-const imageSize = (buf) => (buf[0] === 0xff && buf[1] === 0xd8 ? jpegSize(buf) : webpSize(buf));
+/** An SVG file's width and height (its root element's width and height attributes). */
+export function svgSize(buf) {
+  const head = /<svg\b[^>]*>/.exec(buf.toString('utf8', 0, 4096))?.[0] || '';
+  const w = Number(/\swidth="([\d.]+)"/.exec(head)?.[1]);
+  const h = Number(/\sheight="([\d.]+)"/.exec(head)?.[1]);
+  if (!(w > 0 && h > 0)) throw new Error('an SVG with no width and height');
+  return { w, h };
+}
+/** An image file's size: WebP, JPEG or SVG. */
+const imageSize = (buf) => (buf[0] === 0xff && buf[1] === 0xd8 ? jpegSize(buf) : /^\s*<(?:\?xml|svg)\b/.test(buf.toString('utf8', 0, 64)) ? svgSize(buf) : webpSize(buf));
 
 /** The public URL of a file under public/. */
 const url = (file) => `/${file.replace(/^public\//, '')}`;
@@ -255,9 +271,97 @@ export function build(provenance, curated, read = (file) => readFileSync(join(GA
   };
 }
 
+/** What each licence of an addition of ours means for players. */
+const OURS_LICENCES = {
+  'code-MIT': 'Ours, drawn by the game\'s own code under the project\'s MIT licence. The Tiny Speck pictures beside them are CC0 1.0.',
+  'cc0-colours': 'The drawing is Tiny Speck\'s, under CC0 1.0; only the colours are ours, set in the game\'s own data.',
+};
+
+/**
+ * Pairs built from the game's data for an addition with `partsFrom` (tools/made-art/compare.json):
+ * 'wardrobe' is every reimagined article of public/assets/avatar/catalog.json, its greyscale file
+ * beside our first colourway (compare-art.mjs wardrobe-<name>-original/-ours.webp), with
+ * {name} and {colours} in the entry's `partsWords`.
+ */
+function partsFromData(c, data) {
+  if (c.partsFrom !== 'wardrobe') throw new Error(`${c.id}: no parts from ${c.partsFrom}`);
+  if (!data.catalog) throw new Error(`${c.id}: the avatar catalog is needed for its parts`);
+  const words = c.partsWords;
+  if (!words?.original || !words?.image) throw new Error(`${c.id}: partsFrom needs partsWords for each side`);
+  return Object.values(data.catalog.types).flat().filter((i) => i.reimagined).map((i) => {
+    const fill = (text) => text.replace(/\{(\w+)\}/g, (all, key) => {
+      const value = { name: i.label || i.name, colours: i.borrowedLabel ? `colours borrowed from the ${i.borrowedLabel}` : 'colours chosen from the same palette' }[key];
+      if (value === undefined) throw new Error(`${c.id}: nothing to fill {${key}} with in its parts`);
+      return value;
+    });
+    const side = (w, which) => ({ file: `public/assets/made-art/compare/wardrobe-${i.name}-${which}.webp`, label: fill(w.label), alt: fill(w.alt), ...(w.pixelated ? { pixelated: true } : {}) });
+    return { name: i.label || i.name, original: side(words.original, 'original'), image: side(words.image, 'ours') };
+  });
+}
+
+/**
+ * made.json `ours` from tools/made-art/compare.json: each addition of ours beside the Tiny Speck
+ * original it stands in for, as the Made for Groddle pieces are drawn (the same card and compare
+ * popup), newest ruling first. `read` reads a file under the game; `data.catalog` is the avatar
+ * catalog (for partsFrom 'wardrobe'). Throws on a missing file, a composed picture that no longer
+ * matches its record, an unknown licence or a record no entry shows.
+ */
+export function buildOurs(compare, read = (file) => readFileSync(join(GAME_DIR, file)), data = {}) {
+  const hash = (file) => createHash('sha256').update(read(file)).digest('hex');
+  const used = new Set();
+  const checked = (id, file) => {
+    if (file.startsWith('public/assets/made-art/compare/')) {
+      const row = compare.files?.[file];
+      if (!row) throw new Error(`${id}: ${file} is not recorded in tools/made-art/compare.json files`);
+      if (hash(file) !== row.sha256) throw new Error(`${id}: ${file} no longer matches its hash in tools/made-art/compare.json; run tools/made-art/compare-art.mjs`);
+      used.add(file);
+    } else if (!/^public\/assets\//.test(file)) throw new Error(`${id}: ${file} is not one of the game's pictures`);
+    return file;
+  };
+  const view = (id, side) => ({ ...picture(checked(id, side.file), null, read), label: side.label, alt: side.alt, ...(side.pixelated ? { pixelated: true } : {}) });
+  const ids = new Set();
+  const out = (compare.entries || []).map((c, order) => {
+    if (ids.has(c.id)) throw new Error(`${c.id}: two compare entries`);
+    ids.add(c.id);
+    const licence = OURS_LICENCES[c.licence];
+    if (!licence) throw new Error(`${c.id}: no words for the licence ${c.licence}`);
+    if (!c.original || !c.image) throw new Error(`${c.id}: an addition needs the original and ours`);
+    const parts = c.parts || (c.partsFrom ? partsFromData(c, data) : null);
+    const fill = (text) => text.replace(/\{(\w+)\}/g, (all, key) => {
+      const value = { count: parts?.length }[key];
+      if (value === undefined) throw new Error(`${c.id}: nothing to fill {${key}} with`);
+      return String(value);
+    });
+    const image = view(c.id, c.image);
+    const original = { ...view(c.id, c.original), kind: 'original' };
+    const h = c.display.h;
+    return {
+      order,
+      piece: {
+        id: c.id,
+        invention: c.invention,
+        anchor: `ours-${c.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')}`,
+        name: c.name,
+        decided: c.decided,
+        when: `Kept ${dateLabel(c.decided)}`,
+        caption: fill(c.caption),
+        display: { w: Math.round((h * image.w) / image.h), h },
+        image,
+        original,
+        facts: [...(c.facts || []).map((f) => ({ label: f.label, text: fill(f.text) })), { label: 'Licence', text: licence }],
+        ...(parts ? { parts: parts.map((p) => ({ name: p.name, original: view(c.id, p.original), image: view(c.id, p.image) })) } : {}),
+      },
+    };
+  });
+  const unused = Object.keys(compare.files || {}).filter((f) => !used.has(f));
+  if (unused.length) throw new Error(unused.map((f) => `${f}: in tools/made-art/compare.json files but on no addition`).join('\n'));
+  out.sort((a, b) => (a.piece.decided === b.piece.decided ? a.order - b.order : a.piece.decided < b.piece.decided ? 1 : -1));
+  return out.map((o) => o.piece);
+}
+
 /** What players read in made.json: every word, no URLs (they are the page's images, not its text). */
 export function playerWords(data) {
-  return data.pieces.map((p) => [p.name, p.madeLabel, p.caption, p.image.label, p.image.alt, p.original?.label, p.original?.alt, ...p.facts.flatMap((f) => [f.label, f.text]),
+  return [...data.pieces, ...(data.ours || [])].map((p) => [p.name, p.madeLabel, p.when, p.caption, p.image.label, p.image.alt, p.original?.label, p.original?.alt, ...p.facts.flatMap((f) => [f.label, f.text]),
     ...(p.parts || []).flatMap((part) => [part.name, part.original.label, part.original.alt, part.image.label, part.image.alt])].filter(Boolean));
 }
 
@@ -275,11 +379,20 @@ export function readMore() {
   return { subway: json(SUBWAY) || null, world: json(WORLD) || null, decos: json(MADE_DECOS), showcase: json(SHOWCASE) };
 }
 
+/** made.json in full: the made pieces, and our additions beside their originals. */
+export function buildAll() {
+  const data = build(JSON.parse(readFileSync(PROVENANCE, 'utf8')), JSON.parse(readFileSync(CURATED, 'utf8')), undefined, JSON.parse(readFileSync(MAPS, 'utf8')), readMore());
+  const ours = buildOurs(JSON.parse(readFileSync(COMPARE, 'utf8')), undefined, { catalog: JSON.parse(readFileSync(CATALOG, 'utf8')) });
+  return { ...data, note: NOTE, ours };
+}
+
+const NOTE = 'Written by tools/made-art/build-data.mjs from the provenance lists in tools/provenance/, tools/made-art/showcase.json, tools/made-art/pieces.json and (ours) tools/made-art/compare.json. Edit those, never this file.';
+
 const stringify = (data) => `${JSON.stringify(data, null, 2)}\n`;
 
 function main() {
   const check = process.argv.includes('--check');
-  const data = build(JSON.parse(readFileSync(PROVENANCE, 'utf8')), JSON.parse(readFileSync(CURATED, 'utf8')), undefined, JSON.parse(readFileSync(MAPS, 'utf8')), readMore());
+  const data = buildAll();
   const problems = wordProblems(data);
   if (problems.length) {
     console.error(`made: ${problems.length} problem(s):\n  ${problems.join('\n  ')}`);
@@ -291,11 +404,11 @@ function main() {
       console.error(`public/restoration/made.json is ${previous === null ? 'missing' : 'stale'}: run node tools/made-art/build-data.mjs`);
       process.exit(1);
     }
-    console.log(`made.json current (${data.pieces.length} pieces)`);
+    console.log(`made.json current (${data.pieces.length} pieces, ${data.ours.length} of ours)`);
     return;
   }
   writeFileSync(OUT, stringify(data));
-  console.log(`wrote public/restoration/made.json: ${data.pieces.map((p) => p.name).join(', ')}`);
+  console.log(`wrote public/restoration/made.json: ${data.pieces.map((p) => p.name).join(', ')}; ours: ${data.ours.map((p) => p.name).join(', ')}`);
 }
 
 if (import.meta.url === `file://${process.argv[1]}`) {

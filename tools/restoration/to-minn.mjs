@@ -34,6 +34,16 @@ export const madeBand = () => band('made', true, 'Made for Groddle', [
   data('made'),
 ]);
 
+/**
+ * The Our additions band (Austin 2026-11-25, #699, G1308): each addition of ours beside the Tiny
+ * Speck original it stands in for, drawn from made.json `ours` (tools/made-art/compare.json);
+ * tools/made-art/to-minn.mjs adds it after the Made for Groddle band on a page made before it.
+ */
+export const oursBand = () => band('ours', false, 'Our additions, beside the originals', [
+  p('section-lead', 'A few things in Groddle Afternoon are our own additions rather than Tiny Speck’s. Where Tiny Speck drew something for the same job, the original is shown beside ours, so it is clear what is theirs and what is new. Click either picture to flip between the two.'),
+  data('ours'),
+]);
+
 /** The page's blocks: the built page's words, around its data sections. */
 export function restorationContent() {
   const jump = [
@@ -97,6 +107,7 @@ export function restorationContent() {
       ]),
     ]),
     madeBand(),
+    oursBand(),
     group('div', 'wrap report-foot', null, [
       data('stamp'),
       p('', 'Screenshots are from the remake itself; recordings were used only as reference.'),

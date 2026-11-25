@@ -1618,6 +1618,22 @@
   "tools/job-obtainable.mjs": {
     "ours: 257 did that to the Card-Carrying Qualification; ours": "bureaucracy-card-for-badge-holders"
   },
+  "tools/made-art/build-data.mjs": {
+    "invented: invention:": "not-an-invention",
+    "ours: (compare-art.mjs wardrobe-<name>-original/-ours.webp),": "not-an-invention",
+    "ours: * 2026-11-25, #699, G1308): each addition of ours that has a Tiny Speck original, the": "not-an-invention",
+    "ours: * beside ours, from tools/made-art/compare.json (buildOurs).": "not-an-invention",
+    "ours: * made.json `ours` from tools/made-art/compare.json: each addition": "not-an-invention",
+    "ours: * made.json `ours` is the Our additions section (the site's": "not-an-invention",
+    "ours: What each licence of an addition of ours means for players.": "not-an-invention",
+    "reimagined: * 'wardrobe' is every reimagined article of public/assets/avatar/catalog.json,": "avatar-reimagined-wardrobe",
+    "reimagined: => i.reimagined).map((i) =>": "avatar-reimagined-wardrobe"
+  },
+  "tools/made-art/compare-art.mjs": {
+    "ours: * addition of ours beside the Tiny Speck original it stands in for.": "not-an-invention",
+    "reimagined: * wardrobe the reimagined wardrobe (G52): each article on the default": "avatar-reimagined-wardrobe",
+    "reimagined: => i.reimagined).map((i) =>": "avatar-reimagined-wardrobe"
+  },
   "tools/made-art/compose.py": {
     "ours: earch/art-briefs/ez-cookin/attach/01-measurements-ours.svg),": "made-maps",
     "stand-in: \"Breezy, EZ Cookin' with Tiny Speck's stand-ins: store_counter, store_lamp_01, k04_table_01": "made-maps",
