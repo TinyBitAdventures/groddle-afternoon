@@ -95,7 +95,7 @@ export const NEIGHBOURS_TEXT = Object.freeze({
   // inc_pols.js:466; inc_houses.js:89; inc_acl_keys.js:57.
   entered: (name) => `${name} just entered your house.`,
   letYouIn: (name) => `${name} has let you into their house.`,
-  /** G1018: the site would not show the house (the server's homes.go homeTextLocked; ours). */
+  /** G1018: the site would not show the house (the server's homes.go homeTextLocked, the remake's line). */
   houseLocked: 'That house is locked.',
   veryWell: 'Very well',
   keyGiven: (name) => `${name} sent you a key to their house! (Keys can be found at your Magic Rock.)`,
