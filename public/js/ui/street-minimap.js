@@ -117,6 +117,19 @@ export const ITEM_DOT = Object.freeze({ r: 5, ring: 2, fill: '#f8992a', stroke: 
 export const SIGNPOST_MARK = Object.freeze({ w: 10, h: 15 });
 /** #463: a subway entrance's mark, the hub map's subway icon (map_icon_subway, 24 x 23) at half size. */
 export const STATION_MARK = Object.freeze({ w: 12, h: 12 });
+/**
+ * PURE: where the goal ring stands ({ x, y } world px, or null). A goal with its own y stands there; a goal with
+ * only an x (the route card's walk to a signpost before 2026-11-25, any walk to an x) keeps the y it was first
+ * drawn at while the walk runs, so the ring stays put as you climb or fall (Austin 2026-11-25: it rode up and down
+ * with the player, read from your height on every update). A new x takes your height once, then holds it.
+ */
+export function destPoint(at, prev = null, youY = 0) {
+  if (!at || !Number.isFinite(at.x)) return null;
+  if (Number.isFinite(at.y)) return { x: at.x, y: at.y };
+  const same = prev && Number.isFinite(prev.y) && Math.abs(prev.x - at.x) < 0.5;
+  return { x: at.x, y: same ? prev.y : Number.isFinite(youY) ? youY : 0 };
+}
+
 /** The walk's goal ring (the remake's; the client drew none): its size in map units. */
 export const DEST_MARK = Object.freeze({ d: 8 });
 
@@ -1298,7 +1311,7 @@ export function createStreetMinimap(doc, host, opts = {}) {
     expand: (on = true) => setExpanded(Boolean(on)),
     /** The goal of the walk you started ({ x, y } world px), or null: a small ring on the map. */
     setDestination(at) {
-      const next = at && Number.isFinite(at.x) ? { x: at.x, y: Number.isFinite(at.y) ? at.y : you?.y ?? 0 } : null;
+      const next = destPoint(at, dest, you?.y ?? 0);
       if (!next && !dest) return;
       dest = next;
       root.dataset.dest = dest ? `${Math.round(dest.x)}` : '';

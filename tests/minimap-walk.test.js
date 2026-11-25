@@ -19,7 +19,7 @@ import {
   stepUserPath,
   walkInterrupts,
 } from '../public/js/user-path.js?fresh=minimap-walk';
-import { DEST_MARK, mapGeometry, mapToWorld, toMap } from '../public/js/ui/street-minimap.js?fresh=minimap-walk';
+import { DEST_MARK, destPoint, mapGeometry, mapToWorld, toMap } from '../public/js/ui/street-minimap.js?fresh=minimap-walk';
 import { walkFromMap } from '../public/js/features/street-minimap-feature.js?fresh=minimap-walk';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -142,6 +142,28 @@ describe('map walk: the click (mouseUpHandler)', () => {
 describe('map walk: game.js (startUserInitiatedPath)', () => {
   const game = read('public/game.js');
   const start = game.slice(game.indexOf('function startUserWalk('), game.indexOf('function endUserWalk('));
+
+  it('the goal ring stays put: a goal\'s own y, or the y it was first drawn at, never your height as you walk (Austin 2026-11-25)', () => {
+    assert.deepEqual(destPoint({ x: 900, y: 420 }, null, 700), { x: 900, y: 420 });
+    assert.equal(destPoint(null, { x: 1, y: 2 }, 3), null);
+    assert.equal(destPoint({ x: NaN }, null, 3), null);
+    // A goal with only an x: your height when the walk starts, then held while you climb or fall.
+    let ring = destPoint({ x: 900 }, null, 700);
+    assert.deepEqual(ring, { x: 900, y: 700 });
+    for (const youY of [650, 520, 812, 300]) {
+      ring = destPoint({ x: 900, y: null }, ring, youY);
+      assert.deepEqual(ring, { x: 900, y: 700 }, `you at ${youY}`);
+    }
+    assert.deepEqual(destPoint({ x: 1200 }, ring, 300), { x: 1200, y: 300 }, 'a new goal takes your height once');
+    const view = read('public/js/ui/street-minimap.js');
+    assert.match(view, /const next = destPoint\(at, dest, you\?\.y \?\? 0\);/);
+    assert.doesNotMatch(view, /y: Number\.isFinite\(at\.y\) \? at\.y : you\?\.y/);
+  });
+
+  it('the route card\'s walk names the post\'s foot, so the ring stands on the signpost (Austin 2026-11-25)', () => {
+    const src = read('public/js/features/map-routes-feature.js');
+    assert.match(src, /const y = Number\(highlight\.view\?\.y\);\n  if \(!engine\.walkTo\?\.\(Number\.isFinite\(y\) \? \{ kind: 'point', x, y \} : \{ kind: 'point', x \}\)\) return false;/);
+  });
 
   it('refused while the game\'s own walk runs, a menu or scene holds you, or in a Paradise course', () => {
     assert.match(start, /if \(avatarWalk && !avatarWalk\.user\) return false;/);

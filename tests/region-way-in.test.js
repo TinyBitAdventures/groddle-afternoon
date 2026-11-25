@@ -15,7 +15,7 @@ import { ROUTE_TEXT, regionWayIn, subwayRides } from '../public/js/map-routes.js
 import { streetGraph } from '../public/js/street-graph.js?v=d767f3a2';
 import { SUBWAY_STREETS, closedStreets, normalizeStreetJobState } from '../public/js/street-jobs.js?v=76471e42';
 import { locationLinkTarget, renderQuestText } from '../public/js/quest-text.js?v=d0d07996';
-import { mapRoutesFeature } from '../public/js/features/map-routes-feature.js?v=0ff1a4e4';
+import { mapRoutesFeature } from '../public/js/features/map-routes-feature.js?v=2b9956c1';
 import { createFeatureHost } from '../public/js/feature-host.js?v=b87e2cbc';
 import { applyStreetIndex } from '../public/js/street-loader.js?v=10376267';
 

@@ -37,7 +37,7 @@ import { partySpacesFeature } from './party-spaces-feature.js?v=d222c1b9';
 import { seasonsFeature } from './seasons-feature.js?v=044f4e7b';
 import { cameraModeFeature } from './camera-mode-feature.js?v=c3a8efbb';
 import { newxpFeature } from './newxp-feature.js?v=6c4394ab';
-import { streetMinimapFeature } from './street-minimap-feature.js?v=afd23226';
+import { streetMinimapFeature } from './street-minimap-feature.js?v=c75dfed3';
 
 export { questFlagsFeature };
 
@@ -135,7 +135,7 @@ import { hellTicketsFeature } from './hell-tickets-feature.js?v=87ce731b'; FEATU
 import { packTreeVerbsFeature } from './pack-tree-verbs-feature.js?v=0ffcfd94'; FEATURES.push(packTreeVerbsFeature);
 import { packToolVerbsFeature } from './pack-tool-verbs-feature.js?v=f00362ca'; FEATURES.push(packToolVerbsFeature);
 import { streetSpiritsFeature } from './street-spirits-feature.js?v=10a7e884'; FEATURES.push(streetSpiritsFeature);
-import { mapRoutesFeature } from './map-routes-feature.js?v=0ff1a4e4'; FEATURES.push(mapRoutesFeature);
+import { mapRoutesFeature } from './map-routes-feature.js?v=2b9956c1'; FEATURES.push(mapRoutesFeature);
 import { swfFeature } from './swf-feature.js?v=a6816a87'; FEATURES.push(swfFeature);
 import { machineArtFeature } from './machine-art-feature.js?v=793b8311'; FEATURES.push(machineArtFeature);
 import { conversationsFeature } from './conversations-feature.js?v=fa758e0d'; FEATURES.push(conversationsFeature);

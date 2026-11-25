@@ -30,7 +30,7 @@ import {
   ROUTE_STOPS_SHOWN,
   signpostToward,
 } from '../public/js/map-routes.js?v=52140ba2';
-import { mapRoutesFeature, hopInReach, DOOR_REACH_Y } from '../public/js/features/map-routes-feature.js?v=0ff1a4e4';
+import { mapRoutesFeature, hopInReach, DOOR_REACH_Y } from '../public/js/features/map-routes-feature.js?v=2b9956c1';
 import { hellTicketsFeature } from '../public/js/features/hell-tickets-feature.js?v=87ce731b';
 import { hellFeature } from '../public/js/features/hell-feature.js?v=74604dfc';
 import { createFeatureHost } from '../public/js/feature-host.js?v=b87e2cbc';
@@ -892,7 +892,8 @@ describe('G192 the GPS arrow walks you there', () => {
     mapRoutesFeature.mapRoute('set', { to: HELL_BAR, source: 'player' }, engine);
     mapRoutesFeature.onStreetEnter(engine.street, engine);
     mapRoutesFeature._arrowClick(engine);
-    assert.deepEqual(engine.log.walks, [{ kind: 'point', x: target.door.x }], 'GpsUI.as 104-106: startUserInitiatedPath');
+    // With the door's foot, so the street map's goal ring stands on it (Austin 2026-11-25).
+    assert.deepEqual(engine.log.walks, [{ kind: 'point', x: target.door.x, y: target.door.y }], 'GpsUI.as 104-106: startUserInitiatedPath');
     // The Map, Quests, Skills or chat open: busy() but nothing that holds the avatar.
     engine.busy = () => true;
     walkUntilDone(engine);

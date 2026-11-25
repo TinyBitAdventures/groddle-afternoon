@@ -910,7 +910,10 @@ function startWalk(engine, now) {
   if (!highlight || !engine.player) return false;
   aimSign(engine, true);
   const x = highlight.kind === 'sign' ? highlight.view.x : highlight.x;
-  if (!engine.walkTo?.({ kind: 'point', x })) return false;
+  // The post's (or door's) foot, so the street map's goal ring stands on it and stays there (Austin
+  // 2026-11-25: with only an x the ring followed your height as you walked).
+  const y = Number(highlight.view?.y);
+  if (!engine.walkTo?.(Number.isFinite(y) ? { kind: 'point', x, y } : { kind: 'point', x })) return false;
   // goalX: the street walk's own x (clamped to the street), to know it is still ours.
   const goalX = Number(engine.userWalkGoal?.x ?? x);
   walk = { engine, kind: highlight.kind, key: highlight.key, x, goalX, startedAt: now, lastX: engine.player.x, lastMoveAt: now, dir: 0 };

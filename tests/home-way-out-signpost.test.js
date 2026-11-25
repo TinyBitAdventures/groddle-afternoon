@@ -30,7 +30,7 @@ import {
   placementCheck,
 } from '../public/js/home-cultivation.js?v=2f71ba70';
 import { DISPATCHER_TEXT, SIGNPOST, dispatcherDefaultRx, dispatcherFits, signpostX, streetFixtures } from '../public/js/home-street-fixtures.js?v=4b4bc96f';
-import { sceneSignMarks } from '../public/js/ui/street-minimap.js?v=ccb6cb94';
+import { sceneSignMarks } from '../public/js/ui/street-minimap.js?v=faab86a5';
 import { HUB_TILES, hubTileBackground, hubTileForKey, hubTileState } from '../public/js/ui/imagination-hub.js?v=6928c5b7';
 import { HUB_CLOUDS, placeClouds } from '../public/js/classic/classic-hub.js?v=8141c730';
 
