@@ -41,14 +41,14 @@ import {
 } from '../public/js/tree-poison.js?v=646d1bc1';
 import { createPlot, killPlotTree, performPlotVerb, growTree } from '../public/js/patches.js?v=3498abf3';
 import { createFeatureHost } from '../public/js/feature-host.js?v=b87e2cbc';
-import { FEATURES } from '../public/js/features/index.js?v=be89d61e';
-import { adoptedPlan } from '../public/js/features/patches-feature.js?v=5c1671f0';
-import { patchesFeature } from '../public/js/features/patches-feature.js?v=5c1671f0';
+import { FEATURES } from '../public/js/features/index.js?v=20889dcb';
+import { adoptedPlan } from '../public/js/features/patches-feature.js?v=5dbc6102';
+import { patchesFeature } from '../public/js/features/patches-feature.js?v=5dbc6102';
 import {
   decorateTreeVerbs,
   streetTreeIndex,
   treeDeathFeature,
-} from '../public/js/features/tree-death-feature.js?v=9067b89c';
+} from '../public/js/features/tree-death-feature.js?v=b316360b';
 import { skillRemakeNote } from '../public/js/skill-tree.js?v=08772a4b';
 import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=2b7048b9';
 
