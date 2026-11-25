@@ -35,7 +35,7 @@ import { animalHusbandryFeature } from './animal-husbandry-feature.js?v=b86bfc54
 import { questInstancesFeature } from './quest-instances-feature.js?v=ef149cbc';
 import { partySpacesFeature } from './party-spaces-feature.js?v=0d4172c8';
 import { seasonsFeature } from './seasons-feature.js?v=d2768c3d';
-import { cameraModeFeature } from './camera-mode-feature.js?v=c3a8efbb';
+import { cameraModeFeature } from './camera-mode-feature.js?v=4ae80d21';
 import { newxpFeature } from './newxp-feature.js?v=6c4394ab';
 import { streetMinimapFeature } from './street-minimap-feature.js?v=f4db8ce2';
 
@@ -169,7 +169,7 @@ import { doorKeysFeature } from './door-keys-feature.js?v=7875c813'; FEATURES.pu
 import { boardsMpFeature } from './boards-mp-feature.js?v=9e544775'; FEATURES.push(boardsMpFeature);
 import { bugReportFeature } from './bug-report-feature.js?v=46b6b9fb'; FEATURES.push(bugReportFeature);
 import { playerVerbsMpFeature } from './player-verbs-mp-feature.js?v=b30e63df'; FEATURES.push(playerVerbsMpFeature);
-import { snapsFeature } from './snaps-feature.js?v=eccfc799'; FEATURES.push(snapsFeature);
+import { snapsFeature } from './snaps-feature.js?v=da783aa7'; FEATURES.push(snapsFeature);
 import { homeStreetMpFeature } from './home-street-mp-feature.js?v=de5cad5d'; FEATURES.push(homeStreetMpFeature);
 import { swoonerfliesFeature } from './swoonerflies-feature.js?v=138a4206'; FEATURES.push(swoonerfliesFeature);
 import { homePoolMpFeature } from './home-pool-mp-feature.js?v=eda3419c'; FEATURES.push(homePoolMpFeature);
