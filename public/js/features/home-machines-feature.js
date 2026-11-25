@@ -603,6 +603,11 @@ function createSession(engine, client) {
       return false;
     }
     if (mp) {
+      // #689: offline the act can't go: say so and keep the Make panel open (false), as a refusal does.
+      if (!client || client.state !== 'online') {
+        say(T.offline);
+        return false;
+      }
       // The ledger counts what the last save held: write it first, then ask.
       const go = () => send('use', cur, { key, qty: n });
       const f = saveStore?.flush?.();
