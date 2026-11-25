@@ -6,18 +6,24 @@
  * player saw an orange bolt for energy in the bar and a red battery in the
  * bubble; with one definition they cannot drift apart again.
  *
- * The icons are Tiny Speck's (CC0), redrawn as vectors so they stay sharp at
- * any pixel ratio:
- * - energy: the bolt the client set beside the energy gauge
- *   (PlayerInfoUI.as 160-162, energy_bolt.png), also on slug_energy_*.png;
- * - mood: the face of the mood gauge (mood_emoticons.png) and slug_mood_*.png,
+ * The icons are ours (Austin 2026-11-25, #699, G1308: he kept them over going
+ * back to Tiny Speck's slug art): flat vectors in our palette, one shape per
+ * stat, sharp at any pixel ratio. Each nods to the Tiny Speck original it
+ * stands in for, which the classic skin still shows:
+ * - energy: a bolt, as the client set beside the energy gauge
+ *   (PlayerInfoUI.as 160-162, energy_bolt.png); slug_energy_*.png is a battery;
+ * - mood: a face, as on the mood gauge (mood_emoticons.png) and slug_mood_*.png,
  *   smiling, flat or frowning;
- * - level and xp: a star on the stat's disc;
- * - imagination (iMG): img_icon.png, the purple "i" the client set beside an
- *   iMG amount (CultPickerUI.as 80-86; slug_imagination_*.png is the same art).
- *   The cloud (imagination_button.png) stays the Imagination menu's button;
- * - currants: the coin of currants_icon.png and slug_currants_*.png;
- * - favor: the star of slug_favor_*.png.
+ * - level and xp: a star on the stat's disc (slug_xp_*.png reads "xp");
+ * - imagination (iMG): a pentagon with an "i", after img_icon.png, the "i" the
+ *   client set beside an iMG amount (CultPickerUI.as 80-86). The cloud
+ *   (imagination_button.png) stays the Imagination menu's button;
+ * - currants: a coin with the colon sign's C and two strokes, after
+ *   currants_icon.png, slug_currants_*.png and the cards' icon_currant vector,
+ *   all a brown coin with a pale C crossed by two diagonal lines;
+ * - favor: a star, after slug_favor_*.png.
+ * The originals beside these sit in the website's compare section
+ * (tools/made-art/compare.json).
  *
  * Each icon is a list of shapes in a 16 x 16 box, drawn as SVG for the page
  * (statIconSvg, statIconUrl) and with Pixi for the canvas (drawStatIcon). The
@@ -116,6 +122,12 @@ const MOUTHS = {
 const BOLT = gp([7, 0.5, 2, 7, 5.2, 7, 4.6, 11.5, 10, 4.8, 6.6, 4.8]);
 const STAR = gp([6, 0.8, 7.6, 4.1, 11.2, 4.6, 8.6, 7.1, 9.2, 10.7, 6, 9, 2.8, 10.7, 3.4, 7.1, 0.8, 4.6, 4.4, 4.1]);
 
+/** The currant coin's two strokes (the colon sign's), as [x0, y0, x1, y1]: parallel, bottom left to top right. */
+export const CURRANT_STROKES = Object.freeze([
+  Object.freeze([6.4, 13, 8.4, 2.7]),
+  Object.freeze([8.8, 12.8, 10.7, 3]),
+]);
+
 function starPoints(cx, cy, outer, inner, points = 5) {
   const out = [];
   for (let i = 0; i < points * 2; i++) {
@@ -141,7 +153,7 @@ export function statIconShapes(type, { variant = '', negative = false } = {}) {
   }
   if (type === 'xp') return [disc(c), ['poly', STAR, { fill: WHITE }]];
   if (type === 'imagination') {
-    // img_icon.png: a rounded pentagon with a pale "i".
+    // A rounded pentagon with a pale "i" (after img_icon.png).
     const pent = [8, 1.4, 14.6, 6, 12.4, 14, 3.6, 14, 1.4, 6];
     return [
       ['poly', pent, { fill: c }],
@@ -151,16 +163,21 @@ export function statIconShapes(type, { variant = '', negative = false } = {}) {
     ];
   }
   if (type === 'currants') {
-    // currants_icon.png: a brown coin with a cream C.
+    // A coin with the colon sign (₵): a cream C crossed by two parallel strokes that run past it
+    // top and bottom, the right one into the C's mouth, as Tiny Speck's coins drew it. Placed so
+    // the strokes stay apart at 18 px (the top bar).
+    const cream = '#f6eedc';
     return [
       ['circle', 8, 8, 8, { fill: mixColor(c, '#000000', 0.45) }],
       ['circle', 8, 7.8, 7.2, { fill: mixColor(c, '#000000', 0.25) }],
       ['circle', 8, 7.8, 5.8, { fill: c }],
-      ['arc', 8, 7.9, 3.4, Math.PI * 0.3, Math.PI * 1.7, { stroke: '#f6eedc', width: 2.1 }],
+      ['arc', 7.5, 7.9, 3.4, Math.PI * 0.3, Math.PI * 1.7, { stroke: cream, width: 1.9 }],
+      ['line', CURRANT_STROKES[0], { stroke: cream, width: 1.2 }],
+      ['line', CURRANT_STROKES[1], { stroke: cream, width: 1.2 }],
     ];
   }
   if (type === 'favor') {
-    // slug_favor_*.png: a star.
+    // A star (after slug_favor_*.png).
     const pts = starPoints(8, 8.6, 7.4, 3.2);
     return [['poly', pts, { fill: c }], ['poly', pts, { stroke: c, width: 1, join: 'round' }]];
   }

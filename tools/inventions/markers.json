@@ -1253,6 +1253,9 @@
   "public/js/start-backdrop.js": {
     "remake-own: * The card is the remake's own (no client equivalent). At boot the street is": "ours-start-backdrop"
   },
+  "public/js/stat-icons.js": {
+    "ours: * The icons are ours (Austin 2026-11-25, #699, G1308: he kept them": "stat-icons"
+  },
   "public/js/store-icons.js": {
     "remake-own: * The remake's own: Glitch gave a store no picture of its own (the": "store-icons"
   },

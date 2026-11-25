@@ -11,6 +11,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import vm from 'node:vm';
 import {
+  CURRANT_STROKES,
   MOOD_FACES,
   STAT_COLORS,
   STAT_CSS_VARS,
@@ -167,6 +168,41 @@ describe('#562: one stat icon map for the top bar and the speech bubble', () => 
         assert.ok(Math.min(...v) >= -0.01 && Math.max(...v) <= 16.01, `${type} in its box`);
       }
     }
+  });
+
+  it('#699 (G1308): the currant coin carries the colon sign\'s two strokes, apart at 18 px', () => {
+    const shapes = statIconShapes('currants');
+    const face = shapes.find((s) => s[0] === 'circle' && s[3] < 7);
+    const c = shapes.find((s) => s[0] === 'arc');
+    const lines = shapes.filter((s) => s[0] === 'line');
+    assert.equal(lines.length, 2, 'two strokes across the C');
+    assert.deepEqual(lines.map((l) => l[1]), CURRANT_STROKES);
+    for (const l of lines) assert.equal(l[2].stroke, c[6].stroke, 'the strokes are the C\'s cream');
+    const [a, b] = CURRANT_STROKES;
+    const dir = (l) => [l[2] - l[0], l[3] - l[1]];
+    const [ax, ay] = dir(a);
+    const [bx, by] = dir(b);
+    // Parallel, leaning right as they rise (bottom left to top right), like the original's.
+    assert.ok(Math.abs(ax * by - ay * bx) < 0.1, 'parallel');
+    assert.ok(ax > 0 && ay < 0, 'they rise to the right');
+    // They run past the C top and bottom, and stay on the coin's face.
+    const cTop = c[2] - c[3] - c[6].width / 2;
+    const cBottom = c[2] + c[3] + c[6].width / 2;
+    for (const l of lines) {
+      assert.ok(Math.min(l[1][1], l[1][3]) < cTop && Math.max(l[1][1], l[1][3]) > cBottom, 'past the C');
+      for (const [x, y] of [[l[1][0], l[1][1]], [l[1][2], l[1][3]]]) assert.ok(Math.hypot(x - face[1], y - face[2]) <= face[3], 'on the face');
+    }
+    // At 18 px (the top bar), the gap between the strokes is at least one pixel.
+    const gap = Math.abs((b[0] - a[0]) * ay - (b[1] - a[1]) * ax) / Math.hypot(ax, ay) - lines[0][2].width;
+    assert.ok(gap * (18 / 16) >= 1, `gap ${gap}`);
+    // The SVG and the Pixi drawing both carry them.
+    assert.equal((statIconSvg('currants').match(/<path d="M[\d.]+ [\d.]+L/g) || []).length, 2);
+  });
+
+  it('#699: the stat icons are documented as ours, beside the originals they stand in for', () => {
+    const src = read('public/js/stat-icons.js');
+    assert.doesNotMatch(src, /Tiny Speck's \(CC0\), redrawn/);
+    assert.match(src, /The icons are ours/);
   });
 
   it('a stat icon works as an image address (the reward card)', () => {

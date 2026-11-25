@@ -5190,6 +5190,27 @@
    "rows": []
   },
   {
+   "id": "stat-icons",
+   "title": "One icon and colour per stat (energy, mood, xp, iMG, currants, favor) in the top bar, speech bubbles, floating amounts and the reward card; the currant coin carries the colon sign's two strokes",
+   "kind": "visual",
+   "status": "kept",
+   "where": [
+    {
+     "file": "public/js/stat-icons.js",
+     "symbol": "statIconShapes STAT_COLORS CURRANT_STROKES"
+    },
+    {
+     "file": "public/js/speech-slugs.js",
+     "symbol": "drawSlugGlyph"
+    }
+   ],
+   "why": "#562 asked for one icon and colour per stat; Glitch's bar and its speech-bubble slugs drew each stat differently (a bolt by the gauge, a battery in the bubble). Ours are flat vectors in our palette; the classic skin keeps Tiny Speck's slug art. #699 asked to go back to Tiny Speck's art.",
+   "ruling": "Austin 2026-11-25 (#699, G1308): keep ours; currant gains the ₵ strokes",
+   "rows": [
+    "G1308"
+   ]
+  },
+  {
    "id": "subway-route-card",
    "title": "The route card through a subway ride names the line to board, the stop to get off at and the steps up, in every view (#538).",
    "kind": "UI",
