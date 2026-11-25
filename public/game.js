@@ -16184,7 +16184,7 @@ function sizeDroppedItemSprite(spr) {
   placeDroppedCount(spr, width * scale, height * scale);
 }
 
-/** A stack's count badge at its art's top right corner, its lock pip at the top left (sprite-local units). */
+/** A stack's lock pip at its art's top left (sprite-local units). */
 function placeDroppedCount(spr, w, h) {
   const s = spr.scale.x || 1;
   const pip = spr.homePip;
@@ -16192,10 +16192,6 @@ function placeDroppedCount(spr, w, h) {
     pip.position.set((-w / 2 + HOME_PIP_PX / 2 - 2) / s, (-h + HOME_PIP_PX / 2 - 2) / s);
     pip.scale.set(1 / s);
   }
-  const badge = spr.countBadge;
-  if (!badge || badge.destroyed) return;
-  badge.position.set((w / 2 + 2) / s, (-h + 2) / s);
-  badge.scale.set(1 / s);
 }
 
 /**
@@ -16221,7 +16217,7 @@ function updateHomeStackPips() {
  * Render one persistent street stack using its official iconic item art. `mark`: its Decoration
  * Mode mark at your own home ('decor': a lock pip; 'shared': plain; js/home-stack-marks.js).
  */
-/** A put-down stack's sprite (its world art or icon, its count badge), not yet placed or registered. */
+/** A put-down stack's sprite (its world art or icon), not yet placed or registered. */
 function droppedStackSprite(stack) {
   const item = ITEM_CATALOG[stack.classTsid] || {
     label: stack.classTsid.replace(/_/g, ' '),
@@ -16234,23 +16230,9 @@ function droppedStackSprite(stack) {
   spr.label = 'world-item-stack';
   standOnFeet(spr);
   spr.worldArt = worldArt;
-  if (stack.count > 1) {
-    const badge = new PIXI.Container();
-    badge.eventMode = 'none';
-    const ring = new PIXI.Graphics();
-    ring.circle(0, 0, 9).fill({ color: 0x3b352d, alpha: 0.9 }).stroke({ width: 1, color: 0xfff7e6, alpha: 0.9 });
-    const count = new PIXI.Text({ text: String(stack.count), style: {
-      fontFamily: WORLD_FONT_FAMILY,
-      fontSize: 11,
-      fontWeight: '800',
-      fill: 0xffffff,
-      align: 'center',
-    } });
-    count.anchor.set(0.5);
-    badge.addChild(ring, count);
-    spr.countBadge = badge;
-    spr.addChild(badge);
-  }
+  // G1288 (#669, Austin 2026-11-25): no count badge. Glitch drew a put-down stack as its count's scene
+  // (worldArtFor above) and wrote the number nowhere on it (LocationItemstackView.as; only a pack slot
+  // has a count, PackItemstackView.as 158-163); the hover names it (Itemstack.as getTooltip 569).
   return { spr, item };
 }
 

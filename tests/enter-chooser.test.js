@@ -179,8 +179,18 @@ describe('game.js wiring', () => {
     // A drawn sprite with a count badge child is drawn from its own frame, without the badge.
     assert.match(icon, /const badged = Boolean\(spr\.countBadge \|\| spr\._countBadge\);/);
     assert.match(icon, /spr\.texture && \(!spr\.children\?\.length \|\| badged\) \? new PIXI\.Sprite\(spr\.texture\) : spr/);
-    // The stack's badge lives on the sprite as countBadge, the guano pile's as _countBadge.
-    assert.match(game, /spr\.countBadge = badge;\n\s+spr\.addChild\(badge\);/);
+    // The guano pile's badge lives on the sprite as _countBadge (a put-down stack has none, G1288).
+    assert.match(game, /spr\._countBadge|_countBadge/);
+  });
+
+  it('G1288 (#669, Austin 2026-11-25): a put-down stack draws its count\'s scene and no number', () => {
+    const at = game.indexOf('function droppedStackSprite(');
+    const body = game.slice(at, game.indexOf('\n}\n', at));
+    // Glitch: the count's scene (AbstractItemstackView.as 442, MCUtil.getHighestCountSceneName), no count text
+    // on a location stack (only PackItemstackView.as 158-163 writes one); the hover names the count.
+    assert.match(body, /worldArtFor\(stack\.classTsid, stack\.count, item\.icon\)/);
+    assert.doesNotMatch(body, /PIXI\.Text|countBadge/);
+    assert.match(game, /Dropped stack · \$\{stack\.count\} in this pile/);
   });
 });
 
