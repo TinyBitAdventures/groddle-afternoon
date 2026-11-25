@@ -14,7 +14,7 @@ import { REVIVED_TRANT, createPlot, reviveDeadTree, tickPlot } from '../public/j
 import { powdersFeature } from '../public/js/features/powders-feature.js?v=4eaa1696';
 import { HEADSPACE_SCENE, itemVerbsFeature, inGameLocation } from '../public/js/features/item-verbs-feature.js?v=ed5067f0';
 import { ROOK_WOODS_STREET_ID } from '../public/js/rook-woods.js?v=0aab151e';
-import { INSTANCES as GWENDOLYN_INSTANCES, ROOM_ID as GWENDOLYN_ROOM } from '../public/js/quest-rooms/gwendolyn.js?v=4feb438c';
+import { INSTANCES as GWENDOLYN_INSTANCES, ROOM_ID as GWENDOLYN_ROOM } from '../public/js/quest-rooms/gwendolyn.js?v=8c532c28';
 import { questSceneTsid } from '../public/js/quest-instance.js?v=15090adc';
 import { GAME_CHEAT_BLOCKS, SPINACH_TEXT, gameCheatBlock } from '../public/js/item-verbs.js?v=ecade42e';
 import { CROWNS_STREET } from '../public/js/game-of-crowns.js?v=e32f35f5';
