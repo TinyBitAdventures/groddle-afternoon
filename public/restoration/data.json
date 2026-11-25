@@ -2814,9 +2814,19 @@
   "deployed": "2026-11-25"
  },
  "git": {
-  "commits": 3524,
+  "commits": 3530,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-25",
+    "kind": "fix",
+    "text": "A musicblock played for you shows its block and notes over you, and its bubble to everyone else"
+   },
+   {
+    "date": "2026-11-25",
+    "kind": "fix",
+    "text": "Visitors see a friend's Dirt Pile, Peat Bog, barnacles, Fireflies and Patches in the back yard"
+   },
    {
     "date": "2026-11-25",
     "kind": "fix",
@@ -2926,19 +2936,9 @@
     "date": "2026-11-25",
     "kind": "fix",
     "text": "Quest rooms play the teleport chime going in and out, and the Door Drink plays it once"
-   },
-   {
-    "date": "2026-11-25",
-    "kind": "fix",
-    "text": "A Subway ticket plays the teleport chime, and stations play their region's music"
-   },
-   {
-    "date": "2026-11-25",
-    "kind": "new",
-    "text": "Street pages show what stands on the street now, checked within the last day"
    }
   ]
  },
- "tests": 1383,
+ "tests": 1384,
  "generatedAt": "2026-11-25"
 }
