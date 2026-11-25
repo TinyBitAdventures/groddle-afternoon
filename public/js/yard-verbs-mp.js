@@ -56,6 +56,15 @@ import { HOME_LIMITS } from './homes-catalog.js?v=0367f90f';
 export const YARD_VERBS_MP_ID = 'yard-verbs-mp';
 /** js/features/homes-feature.js HOME_STREET_TSID: where an owner's save keeps the home street. */
 export const YARD_STREET = 'RH_HOME_EXT';
+/**
+ * G1018 (M28): the back yard is the house's, and those allowed inside (the owner, a key-holder, a
+ * visitor let in: the realtime server's HOUSE_<owner>) use the same verbs on its own things. Its
+ * rocks, nodes and Patches are named with this prefix on the wire and at the site ("b:rock:0",
+ * "b:node:dirt_pile:0", "b:patch:0"); the visitor's copies and the owner's own slots use them bare.
+ */
+export const BACK_YARD_PREFIX = 'b:';
+/** js/features/homes-feature.js HOME_INTERIOR_TSID: where an owner's save keeps the house and its back yard. */
+export const BACK_YARD_STREET = 'RH_HOME_INT';
 export const YARD_APPLIED_KEEP = 200;
 
 /** cultivation_add_img_rewards amounts, by the handler that passes them. */
@@ -192,6 +201,23 @@ export function visitorHerdCap(cult) {
 }
 
 /** The site's GET homes/<id>/yard answer, checked: null unless it names an owner. */
+/**
+ * G1018: the site's back-yard answer (HomeYard::backYardView, ids "b:…") with its ids bare, for
+ * normalizeYardView and normalizeStockView; null for an answer that is not the back yard's.
+ */
+export function bareBackYardAnswer(answer) {
+  if (!answer || typeof answer !== 'object' || answer.place !== 'yard') return null;
+  const bare = (id) => (typeof id === 'string' && id.startsWith(BACK_YARD_PREFIX) ? id.slice(BACK_YARD_PREFIX.length) : null);
+  const rows = (list, field) => (Array.isArray(list) ? list : []).map((r) => ({ ...r, [field]: bare(r?.[field]) })).filter((r) => r[field]);
+  const mine = {};
+  for (const [k, n] of Object.entries(plain(answer.mine) || {})) {
+    const at = k.indexOf(':');
+    const id = at > 0 ? bare(k.slice(at + 1)) : null;
+    if (id) mine[`${k.slice(0, at)}:${id}`] = n;
+  }
+  return { ...answer, rocks: rows(answer.rocks, 'id'), nodes: rows(answer.nodes, 'id'), patches: rows(answer.patches, 'key'), animals: [], sticks: [], machines: [], mine };
+}
+
 export function normalizeYardView(answer) {
   const owner = Number(answer?.owner);
   if (!Number.isInteger(owner) || owner <= 0) return null;
@@ -358,9 +384,13 @@ export function undoVisitorReward(inv, pc, delta, { remove } = {}) {
 /** The waiting acts the site sends the owner (GET homes/yard), checked. */
 export function normalizeYardActs(list) {
   const out = [];
-  for (const a of Array.isArray(list) ? list : []) {
-    if (!/^yd-[0-9a-f]{16}$/.test(String(a?.id || ''))) continue;
-    if (!['animal', 'plot', 'tree', 'rock', 'node'].includes(a.kind)) continue;
+  for (const raw of Array.isArray(list) ? list : []) {
+    if (!/^yd-[0-9a-f]{16}$/.test(String(raw?.id || ''))) continue;
+    if (!['animal', 'plot', 'tree', 'rock', 'node'].includes(raw.kind)) continue;
+    // G1018: an act in the back yard ("b:…") is kept bare, with `back` (it has no animals).
+    const back = typeof raw.target === 'string' && raw.target.startsWith(BACK_YARD_PREFIX);
+    if (back && raw.kind === 'animal') continue;
+    const a = back ? { ...raw, target: raw.target.slice(BACK_YARD_PREFIX.length) } : raw;
     const okTarget = { animal: isAnimalId, rock: isRockId, node: isNodeId }[a.kind] || isPlotKey;
     if (!okTarget(a.target)) continue;
     if (!/^[a-z]{2,8}$/.test(String(a.verb || ''))) continue;
@@ -370,6 +400,7 @@ export function normalizeYardActs(list) {
     // MPVISIT: a rock's chunks or a node's uses left once the act landed (the site's word, for the copies).
     if (Number.isInteger(a.left) && a.left >= 0) row.left = a.left;
     if (a.verb === 'plant') row.what = String(a.what);
+    if (back) row.back = true;
     out.push(row);
   }
   return out;

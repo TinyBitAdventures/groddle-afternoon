@@ -7579,9 +7579,11 @@ function wearItem(engine, id, n = 1, st = activeCult()) {
  * my home street wears its cultivation as my own swing does (wearFromEvent);
  * a worn-out one turns into its proto. Returns addWear's answer, or null.
  */
-export function wearHomeCultivation(engine, itemId, n = 1) {
-  if (!cult.items.some((row) => row.id === Number(itemId) && !row.depleted)) return null;
-  return wearItem(engine, Number(itemId), n, cult);
+/** A use off one of my cultivations (yard 'back': the back yard's, G1018), as my own use wears it. */
+export function wearHomeCultivation(engine, itemId, n = 1, yard = 'street') {
+  const st = yard === 'back' ? backCult : cult;
+  if (!st.items.some((row) => row.id === Number(itemId) && !row.depleted)) return null;
+  return wearItem(engine, Number(itemId), n, st);
 }
 
 function wearFromNodes(engine, now) {
@@ -8197,7 +8199,8 @@ export function visitorHomeScene(engine, view = {}, room = 'street', opts = {}) 
           door.y = spec.y;
           door.zIndex = 8;
           eng.entityLayer.addChild(door);
-          const gardens = drawVisitorYard(eng, yard, BACK_YARD_GROUND_Y, homeStreetLayout(yard).houseX);
+          // G1018: only those allowed in see this; its rocks are yard-verbs-mp-feature's, to mine (as the street's).
+          const gardens = drawVisitorYard(eng, yard, BACK_YARD_GROUND_Y, homeStreetLayout(yard).houseX, { liveRocks: true });
           return { door, gardens, pieces, roomX: x0 };
         },
       };

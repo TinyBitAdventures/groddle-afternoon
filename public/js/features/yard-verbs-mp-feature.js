@@ -51,6 +51,21 @@
  *   machine has no verb for a visitor, as in the source for anyone without
  *   the owner's key.
  *
+ * - G1018 (M28; Austin 2026-11-25): the back yard, for those allowed into the
+ *   house (the owner, a key-holder, a visitor let in): in the house's visit
+ *   scene (MPH_<owner>_IN) the back yard's rocks, nodes and Patches are drawn
+ *   from the site's view of them (GET homes/<owner>/yard?place=yard, with the
+ *   realtime server's let-in proof), real state and all (a Dirt Pile's digs
+ *   left, a Peat Bog's, each Patch's stage), and take the same verbs through
+ *   the same server and site route, named "b:…" on the wire
+ *   (BACK_YARD_PREFIX): anyone inside digs a Dirt Pile with a working shovel
+ *   (dirt_pile.js verbs.dig 102-115), harvests a Peat Bog (peat_1.js 140-160),
+ *   scrapes a barnacle with a working scraper (mortar_barnacle.js), scoops a
+ *   Jellisac, mines a rock, digs, tends and plants a Patch. Wine of the Dead's
+ *   pour stays the owner's (dirt_pile.js 67). The owner's game applies those
+ *   acts to its back yard (RH_HOME_INT and the homes feature's backCult), so
+ *   one pile's digs are one count for everyone.
+ *
  * Multiplayer only (engine.mode and the realtime client): solo never runs any
  * of it.
  *
@@ -69,13 +84,15 @@ import { trantStatusLabel } from '../trants.js?v=864ea9ff';
 import { woodTreeStatusLabel } from '../woodcutting.js?v=9e9af511';
 import { animalStatusLabel } from '../animals.js?v=19981d8f';
 import { frameTexture, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js?v=b8e38103';
-import { homeStreetLayout, normalizeCultivationState } from '../home-cultivation.js?v=2f71ba70';
-import { readVisitScene } from '../neighbours-mp.js?v=1ea504ef';
+import { createBackYardState, homeStreetLayout, normalizeCultivationState } from '../home-cultivation.js?v=2f71ba70';
+import { insideQuery, readVisitScene } from '../neighbours-mp.js?v=1ea504ef';
 import { saveStore } from '../save-store.js?v=4e720735';
-import { STREET_GROUND_Y, homesFeature, wearHomeCultivation } from './homes-feature.js?v=b0eea316';
+import { BACK_YARD_GROUND_Y, STREET_GROUND_Y, homesFeature, wearHomeCultivation } from './homes-feature.js?v=5018619f';
 import { holdYardAnimal } from './animal-husbandry-feature.js?v=7f40b2d5';
 import { patchesFeature, treeFrameUrl } from './patches-feature.js?v=5dbc6102';
 import {
+  BACK_YARD_PREFIX,
+  BACK_YARD_STREET,
   YARD_STREET,
   YARD_TEXT as T,
   YARD_VERBS_MP_ID,
@@ -83,6 +100,7 @@ import {
   animalActs,
   animalUses,
   applyYardAct,
+  bareBackYardAnswer,
   keepApplied,
   normalizeYardActs,
   growIfReady,
@@ -163,7 +181,8 @@ function createSite() {
     throw new Error(T.failed);
   }
   return {
-    yard: (owner) => call(`homes/${Number(owner)}/yard`),
+    // G1018: place 'yard' is the back yard, shown to those let in with the realtime server's proof (?in=).
+    yard: (owner, place = 'street') => call(`homes/${Number(owner)}/yard${place === 'yard' ? `?place=yard${insideQuery(owner, '&')}` : ''}`),
     waiting: () => call('homes/yard'),
   };
 }
@@ -190,6 +209,13 @@ function createSession(engine, client) {
   let ownAt = 0;
   let ownBusy = false;
   let wasHome = false;
+  /** G1018: a back yard the site would not show (not let in): not asked again before this. */
+  const refusedUntil = new Map();
+
+  /** Where this visit's yard stands: the home street's ground, or the back yard's. */
+  const groundY = () => visit?.groundY ?? STREET_GROUND_Y;
+  /** An id as the server and site name it ("b:…" in the back yard). */
+  const wireId = (id) => `${visit?.prefix || ''}${id}`;
 
   function publish() {
     const v = visit;
@@ -241,7 +267,7 @@ function createSession(engine, client) {
       sprite.scale.set(row.scale);
       sprite.zIndex = itemZ(row.classTsid, { background: 7, normal: 3 });
       sprite.x = row.x;
-      sprite.y = STREET_GROUND_Y;
+      sprite.y = groundY();
       sprite._worldHitW = row.hitW;
       sprite._worldHitH = row.hitH;
       engine.entityLayer.addChild(sprite);
@@ -261,6 +287,7 @@ function createSession(engine, client) {
   }
 
   function houseX(view) {
+    if (view.place === 'yard') return homeStreetLayout(createBackYardState(view.cult || {})).houseX;
     return homeStreetLayout(normalizeCultivationState(view.cult || {})).houseX;
   }
 
@@ -353,7 +380,7 @@ function createSession(engine, client) {
       if (!state) return;
       const sprite = treeSprite(classId, state.maturity, i % 2 ? -1 : 1);
       sprite.x = x;
-      sprite.y = STREET_GROUND_Y + 2;
+      sprite.y = groundY() + 2;
       engine.entityLayer.addChild(sprite);
       const target = engine.register({ classId, label: plotLabel(plot), subtitle: treeSubtitle(classId, state), sprite, state, yardVisit: { kind: 'tree', id: p.key } });
       visit.trees.set(p.key, { key: p.key, x, i, classId, plot, state, sprite, target, snap: treeSnapshot(state) });
@@ -361,7 +388,7 @@ function createSession(engine, client) {
     }
     const sprite = soilSprite(plot);
     sprite.x = x;
-    sprite.y = STREET_GROUND_Y + 2;
+    sprite.y = groundY() + 2;
     engine.entityLayer.addChild(sprite);
     const target = engine.register({ classId: CLASS_PLOT, featureId: YARD_VERBS_MP_ID, label: plotLabel(plot), subtitle: plotStatusLabel(plot, Date.now()), sprite, yardVisit: { kind: 'plot', id: p.key } });
     visit.plots.set(p.key, { key: p.key, x, i, plot, sprite, target });
@@ -392,7 +419,7 @@ function createSession(engine, client) {
     const state = visitorAnimalState(row, visit.view.mine);
     const sprite = animalSprite(row.classId);
     sprite.x = row.x;
-    sprite.y = row.classId === 'npc_butterfly' ? STREET_GROUND_Y - 90 : STREET_GROUND_Y;
+    sprite.y = row.classId === 'npc_butterfly' ? groundY() - 90 : groundY();
     engine.entityLayer.addChild(sprite);
     const label = { npc_piggy: 'Piggy', npc_chicken: 'Chicken', npc_butterfly: 'Butterfly' }[row.classId];
     const target = engine.register({
@@ -411,7 +438,8 @@ function createSession(engine, client) {
 
   function draw(view, tsid, name) {
     clearVisit();
-    visit = { owner: view.owner, name, tsid, view, idsKey: yardIdsKey(view), plots: new Map(), trees: new Map(), animals: new Map(), rocks: new Map(), nodes: new Map(), fixtures: [], fixturesKey: '' };
+    const back = view.place === 'yard';
+    visit = { owner: view.owner, name, tsid, view, place: back ? 'yard' : 'street', prefix: back ? BACK_YARD_PREFIX : '', groundY: back ? BACK_YARD_GROUND_Y : STREET_GROUND_Y, idsKey: yardIdsKey(view), plots: new Map(), trees: new Map(), animals: new Map(), rocks: new Map(), nodes: new Map(), fixtures: [], fixturesKey: '' };
     const hx = houseX(view);
     view.patches.forEach((p, i) => drawPatch(p, hx + p.rx, i));
     for (const row of view.animals) drawAnimal(row);
@@ -431,7 +459,7 @@ function createSession(engine, client) {
     const rock = visitorRock(row);
     const root = new PIXI.Container();
     root.x = x;
-    root.y = STREET_GROUND_Y;
+    root.y = groundY();
     root.zIndex = itemZ(def.classTsid, 9.5);
     root.eventMode = 'static';
     root.cursor = 'pointer';
@@ -469,7 +497,7 @@ function createSession(engine, client) {
       const cls = row.key.split(':')[0];
       slot.nodes[row.key] = visitorNode(row, view.mine, dayKey);
       population.resourceNodeClasses.push(row.classTsid);
-      (points[`resource:${cls}`] ||= []).push({ x: hx + row.rx, y: STREET_GROUND_Y + row.dy });
+      (points[`resource:${cls}`] ||= []).push({ x: hx + row.rx, y: groundY() + row.dy });
       visit.nodes.set(row.id, { id: row.id, key: row.key, cls, target: null, node: null, refresh: null, ready: null });
     }
     const shim = Object.create(engine, {
@@ -559,7 +587,7 @@ function createSession(engine, client) {
     }
     req += 1;
     sent.set(req, { owner: visit.owner, kind: v.kind, id: v.id, verb, stock: true, target, verbId, at: Date.now() });
-    client.send('home_yard', { req, owner: visit.owner, kind: v.kind, id: v.id, verb });
+    client.send('home_yard', { req, owner: visit.owner, kind: v.kind, id: wireId(v.id), verb });
     last = `sent:${v.kind}:${v.id}:${verb}`;
     publish();
     return true;
@@ -604,16 +632,28 @@ function createSession(engine, client) {
     for (const e of flies) if (e.node.depleted) send('node', e.id, 'open');
   }
 
+  /** The site's answer for a yard, normalized: the street's, or (place 'yard') the back yard's with bare ids. */
+  function yardView(answer, place) {
+    const bare = place === 'yard' ? bareBackYardAnswer(answer) : answer;
+    const view = bare ? normalizeYardView(bare) : null;
+    if (!view) return null;
+    view.stock = normalizeStockView(bare);
+    view.place = place;
+    return view;
+  }
+
   async function loadVisit(tsid) {
     const scene = readVisitScene(tsid);
-    if (!scene || scene.room !== 'street' || loading === tsid) return;
+    if (!scene || (scene.room !== 'street' && scene.room !== 'interior') || loading === tsid) return;
+    if ((refusedUntil.get(tsid) || 0) > Date.now()) return;
+    const place = scene.room === 'interior' ? 'yard' : 'street';
     loading = tsid;
     try {
-      const answer = await site.yard(scene.owner);
-      const view = normalizeYardView(answer);
-      if (view) view.stock = normalizeStockView(answer);
+      const view = yardView(await site.yard(scene.owner, place), place);
       if (view && engine.streetTsid === tsid) draw(view, tsid, view.name || 'someone');
     } catch (err) {
+      // G1018: not let in (or no back yard to show): asked again in a while, not every tick.
+      if (place === 'yard') refusedUntil.set(tsid, Date.now() + OWN_FETCH_MS);
       console.warn('[yard]', err?.message || err);
     } finally {
       loading = '';
@@ -627,10 +667,8 @@ function createSession(engine, client) {
     // G944: what my own verbs changed goes to the site before the site's copy replaces mine.
     scan();
     try {
-      const answer = await site.yard(visit.owner);
-      const view = normalizeYardView(answer);
+      const view = yardView(await site.yard(visit.owner, visit.place), visit.place);
       if (!view || !visit || visit.tsid !== tsid) return;
-      view.stock = normalizeStockView(answer);
       // G944 (M1, M4): the owner added or took away a rock, node, Patch or animal since: the visit's
       // scene is built again (neighbours-mp-feature), which draws this yard afresh.
       if (yardIdsKey(view) !== visit.idsKey) {
@@ -728,7 +766,7 @@ function createSession(engine, client) {
     }
     req += 1;
     sent.set(req, { owner: visit.owner, kind, id, verb, reward });
-    client.send('home_yard', { req, owner: visit.owner, kind, id, verb });
+    client.send('home_yard', { req, owner: visit.owner, kind, id: wireId(id), verb });
     last = `sent:${kind}:${id}:${verb}`;
     publish();
   }
@@ -814,7 +852,7 @@ function createSession(engine, client) {
     const before = held();
     const result = performPlotVerb(e.plot, verbId, plotCtx());
     const x = e.sprite?.x ?? 0;
-    const y = e.sprite?.y ?? STREET_GROUND_Y;
+    const y = e.sprite?.y ?? groundY();
     if (!result.ok) {
       notice(result.msg, 2400);
       return true;
@@ -859,9 +897,10 @@ function createSession(engine, client) {
     const ask = { owner: visit.owner, kind: 'plot', id: e.key, verb: 'plant', plant: bean, verbId, at: Date.now() };
     sent.set(req, ask);
     const n = req;
+    const wire = wireId(e.key);
     const go = () => {
       if (sent.get(n) !== ask) return;
-      client.send('home_yard', { req: n, owner: ask.owner, kind: 'plot', id: e.key, verb: 'plant', what: bean });
+      client.send('home_yard', { req: n, owner: ask.owner, kind: 'plot', id: wire, verb: 'plant', what: bean });
     };
     // The ledger counts what the last save held: write it first, then ask.
     const f = saveStore?.flush?.();
@@ -956,8 +995,8 @@ function createSession(engine, client) {
       applyOwn([act]);
       return;
     }
-    // Someone else's act on the yard I am visiting: my copy follows.
-    if (!visit || Number(msg.owner) !== visit.owner) return;
+    // Someone else's act on the yard I am visiting: my copy follows (G1018: the back yard's on the back yard's).
+    if (!visit || Number(msg.owner) !== visit.owner || Boolean(act.back) !== Boolean(visit.prefix)) return;
     if (act.kind === 'rock' || act.kind === 'node') {
       if (Number(msg.from?.id) !== me()) setLeft(act.kind, act.target, act.left, act.at);
       publish();
@@ -996,10 +1035,13 @@ function createSession(engine, client) {
 
   // —— My own home: what visitors did ——
 
-  function ownSlots() {
-    const patches = engine.streetSlot?.('patches', YARD_STREET) || {};
+  /** My home's slots the acts land on: the home street's, or (back) the back yard's, which keeps no animals. */
+  function ownSlots(back = false) {
+    const patches = engine.streetSlot?.('patches', back ? BACK_YARD_STREET : YARD_STREET) || {};
+    if (!patches.plots || typeof patches.plots !== 'object') patches.plots = {};
+    if (back) return { plots: patches.plots, animals: [] };
     const husbandry = engine.streetSlot?.('animal-husbandry', YARD_STREET) || {};
-    return { plots: patches.plots || {}, animals: Array.isArray(husbandry.animals) ? husbandry.animals : [] };
+    return { plots: patches.plots, animals: Array.isArray(husbandry.animals) ? husbandry.animals : [] };
   }
 
   function stockEntry(kind, id) {
@@ -1008,23 +1050,25 @@ function createSession(engine, client) {
     return null;
   }
 
-  function onMyStreet() {
+  /** I am at home on my street (back: in my house, with its back yard). */
+  function onMyStreet(back = false) {
     const home = engine.homeContext?.() || {};
-    return Boolean(home.inHome) && engine.streetTsid === YARD_STREET;
+    return Boolean(home.inHome) && engine.streetTsid === (back ? BACK_YARD_STREET : YARD_STREET);
   }
 
   /** Applies acts to my home once each, tells me, and saves the ids the site drops. */
   function applyOwn(acts) {
     const fresh = acts.filter((a) => !applied.includes(a.id));
     if (!fresh.length) return 0;
-    const slots = ownSlots();
-    const here = onMyStreet();
     for (const act of fresh) {
+      // G1018: an act in my back yard lands on its own slots (RH_HOME_INT) and cultivations.
+      const back = act.back === true;
+      const here = onMyStreet(back);
       if (act.kind === 'rock' || act.kind === 'node') {
         applyOwnStock(act, here);
         continue;
       }
-      const changed = applyYardAct(slots, act);
+      const changed = applyYardAct(ownSlots(back), act);
       appliedCount += 1;
       last = `applied:${act.kind}:${act.target}:${act.verb}`;
       if (!changed) continue;
@@ -1061,9 +1105,11 @@ function createSession(engine, client) {
 
   /** MPVISIT: a visitor's swing or harvest on my street: off my rock or node, and one use off its cultivation. */
   function applyOwnStock(act, here) {
-    const cult = homesFeature._state?.().cult;
-    const world = engine.streetWorld?.(YARD_STREET);
-    const nodesSlot = engine.streetSlot?.('resource-nodes', YARD_STREET) || {};
+    const back = act.back === true;
+    const tsid = back ? BACK_YARD_STREET : YARD_STREET;
+    const cult = back ? homesFeature._state?.().backCult : homesFeature._state?.().cult;
+    const world = engine.streetWorld?.(tsid);
+    const nodesSlot = engine.streetSlot?.('resource-nodes', tsid) || {};
     if (!nodesSlot.nodes || typeof nodesSlot.nodes !== 'object') nodesSlot.nodes = {};
     appliedCount += 1;
     last = `applied:${act.kind}:${act.target}:${act.verb}`;
@@ -1072,7 +1118,7 @@ function createSession(engine, client) {
     if (!changed) return;
     // G778 (#360): a home rock wears once when a swing mines it out (include/mining.js 388-389), as the
     // owner's own (homes-feature wearFromEvent); nodes wear from their harvests (wearFromNodes).
-    if (changed.kind === 'rock' && changed.minedOut && changed.wearItem != null) wearHomeCultivation(engine, changed.wearItem, 1);
+    if (changed.kind === 'rock' && changed.minedOut && changed.wearItem != null) wearHomeCultivation(engine, changed.wearItem, 1, back ? 'back' : 'street');
 
     const line = STOCK_TEXT.acted(act.from.name, act.verb, changed.what);
     lastLine = line;
@@ -1140,7 +1186,7 @@ function createSession(engine, client) {
         nowMs,
         dtMs,
         held,
-        groundAt: () => STREET_GROUND_Y,
+        groundAt: () => groundY(),
       });
       if (chicken) {
         // The owner's page draws the same walk, so both see the same idle state at the same frame.
@@ -1166,7 +1212,7 @@ function createSession(engine, client) {
       const tsid = engine.streetTsid;
       const scene = readVisitScene(tsid);
       if (visit && visit.tsid !== tsid) clearVisit();
-      if (!visit && scene?.room === 'street') loadVisit(tsid);
+      if (!visit && (scene?.room === 'street' || scene?.room === 'interior')) loadVisit(tsid);
       stepAnimals(dtMs);
       if (now - scanAt >= SCAN_MS) {
         scanAt = now;
@@ -1174,7 +1220,7 @@ function createSession(engine, client) {
         bindNodes();
         tickStock();
       }
-      const home = onMyStreet();
+      const home = onMyStreet() || onMyStreet(true);
       if ((home && !wasHome) || (!ownAt && engine.started)) loadOwn();
       else if (home && now - ownAt > OWN_FETCH_MS * 4) loadOwn();
       wasHome = home;
