@@ -69,8 +69,8 @@ import {
   snapFileName, snapResolution, snapShareUrl, snapSteps, snapStreet, takePictureState, viewerActions, viewerStep, withCamera, WHOLE_SNAP,
 } from '../snaps.js?v=b5be8bff';
 import { VINTAGE_TEXT, applyFilter, filterComponents, filtersFor } from '../snap-filters.js?v=32315cf1';
-import { HOME_SHOT_COPY, homeShotState } from '../home-shot.js?v=4384d3a2';
-import { renderHomeLocation } from '../home-shot-render.js?v=cac82952';
+import { HOME_SHOT_COPY, homeShotState } from '../home-shot.js?v=8198618a';
+import { renderHomeLocation } from '../home-shot-render.js?v=b1875d75';
 
 export const SNAPS_FEATURE_ID = 'snaps';
 const VERB = 'take_picture';

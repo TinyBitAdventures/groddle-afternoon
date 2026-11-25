@@ -5,7 +5,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { FURNITURE_UPGRADES, pieceLabel } from '../public/js/furniture-upgrades.js?v=6cc0e2da';
-import { furnitureDef, pieceArt } from '../public/js/home-decor.js?v=adc6b830';
+import { furnitureDef, pieceArt } from '../public/js/home-decor.js?v=36f8d733';
 
 const src = readFileSync(join(import.meta.dirname, '../public/js/features/home-storage-feature.js'), 'utf8');
 

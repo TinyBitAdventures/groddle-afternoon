@@ -65,7 +65,7 @@ import { OVERLAY_BUBBLE_URL, OVERLAY_USES, overlayBubbleBox, playOverlay } from 
 import { SPEECH_BUBBLE_Z } from '../fx-z.js?v=18dda7e3';
 import { isPhoneDevice } from '../touch-controls.js?v=6e1b7f26';
 import { anchorBottomCentre } from '../sprite-feet.js?v=6358a697';
-import { HOME_SHOT_COPY } from '../home-shot.js?v=4384d3a2';
+import { HOME_SHOT_COPY } from '../home-shot.js?v=8198618a';
 
 export const CAMERA_FEATURE_ID = 'camera-mode';
 /** getCameraAbilities: range without Eyeballery, px from the avatar. */

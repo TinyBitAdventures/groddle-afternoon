@@ -28,7 +28,7 @@
  */
 import { readbackCanvas } from './render-probe.js?v=519c86ef';
 import { isLoaded, whenLoaded } from './textures.js?v=b8e38103';
-import { homeShotBands, homeShotRows, homeShotScale, homeShotSize } from './home-shot.js?v=4384d3a2';
+import { homeShotBands, homeShotRows, homeShotScale, homeShotSize } from './home-shot.js?v=8198618a';
 import { homeFrameFor } from './home-layout-scene.js?v=7f45c357';
 import { withPublicView } from './public-picture.js?v=1a0b03fa';
 

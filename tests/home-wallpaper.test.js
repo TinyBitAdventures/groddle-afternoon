@@ -18,7 +18,7 @@ import {
   swatchPiece,
   towerWallField,
   wallTargetAt,
-} from '../public/js/home-wallpaper.js?v=a882fa38';
+} from '../public/js/home-wallpaper.js?v=5d3594e4';
 import {
   INTERIOR,
   TOWER_ROOM,
@@ -29,7 +29,7 @@ import {
   normalizeHomeDecorState,
   setHomeTexture,
   wallSlots,
-} from '../public/js/home-decor.js?v=adc6b830';
+} from '../public/js/home-decor.js?v=36f8d733';
 import { TOWER_GEO } from '../public/js/home-tower.js?v=a7fc0cce';
 
 const root = join(import.meta.dirname, '..');

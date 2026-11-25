@@ -30,7 +30,7 @@ import {
 } from '../public/js/profiles.js?v=7caf2524';
 import { createMinnAccount } from '../public/js/minn-account.js?v=3d783519';
 import { drawTower, markHomeStale, profilesFeature, profilesState, towerTick, uploadTower } from '../public/js/features/profiles-feature.js?fresh=g1283';
-import { renderHomeShot } from '../public/js/home-shot-render.js?v=cac82952';
+import { renderHomeShot } from '../public/js/home-shot-render.js?v=b1875d75';
 import { PUBLIC_HIDE, publicHidden, withPublicView } from '../public/js/public-picture.js?v=1a0b03fa';
 import { GAME_DIR, HAS_SITE, SITE_DIR, skipWithoutSite } from '../tools/repos.mjs';
 

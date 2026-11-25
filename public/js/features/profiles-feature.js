@@ -87,7 +87,7 @@ import {
 } from '../profiles.js?v=7caf2524';
 import { homeLayoutJson, homeLayoutKeyOf, HOME_LAYOUT_LIMITS } from '../home-layout.js?v=c6ab27df';
 import { collectHomeLayout, homeFrameFor } from '../home-layout-scene.js?v=7f45c357';
-import { renderHomeLocation } from '../home-shot-render.js?v=cac82952';
+import { renderHomeLocation } from '../home-shot-render.js?v=b1875d75';
 import { withPublicView } from '../public-picture.js?v=1a0b03fa';
 
 export const PROFILES_FEATURE_ID = 'profiles';
