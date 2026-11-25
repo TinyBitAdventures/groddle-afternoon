@@ -28,6 +28,9 @@
  *   the street), beside the stick sideways, clear of its ring (the float stick's ring too,
  *   stickRegionOf); a tap opens its quest in Quests, as the old pin did (G1230);
  * - stick, act, jump: the touch controls, on the pack row;
+ * - snap: Camera Mode's round Snap button (G1314, features/camera-mode-feature.js; the controls step
+ *   aside while looking): upright at the right over Act and Jump, sideways left of Act at Jump's foot
+ *   (style.css), clear of Done and the whole-house button in the middle; the notices keep above it;
  * - pack: the pack row (measured where js/ui/pack-row.js centres it);
  * - sheet: the room one open sheet takes. The Map takes the whole height (sideways the whole
  *   screen, its header floating over it); Quests, Social, the Menu and the other side sheets dock
@@ -103,9 +106,10 @@ const num = (v, d = 0) => (Number.isFinite(Number(v)) ? Number(v) : d);
  * caption at the left, as tall as the strip (0 tall with no buff), the notices under it. `homes` the
  * measured { w, h } of the home's buttons row (Decorate, Cultivate, Change Style; or Decoration Mode's
  * banner), null when none shows: its slot `homes` is under the caption at the left, the buff strip
- * under it (null in the result when none shows).
+ * under it (null in the result when none shows). `snap` the measured box of Camera Mode's Snap button
+ * (G1314) while it shows: the notices keep above it (`snap` in the result, null under a sheet).
  */
-export function phoneRegions({ width, height, safe = {}, sheet = '', pack = null, packShown = true, bagTop = NaN, caption = null, captionUnder = null, pin = null, controls = null, buffs = null, homes = null, play = [] } = {}) {
+export function phoneRegions({ width, height, safe = {}, sheet = '', pack = null, packShown = true, bagTop = NaN, caption = null, captionUnder = null, pin = null, controls = null, buffs = null, homes = null, play = [], snap = null } = {}) {
   const W = Math.max(0, num(width));
   const H = Math.max(0, num(height));
   const st = Math.max(0, num(safe.t));
@@ -193,11 +197,13 @@ export function phoneRegions({ width, height, safe = {}, sheet = '', pack = null
     else sheetBox = box(0, strip.bottom + GAP, sl + Math.max(0, Math.min(COLUMN_W, W - sl - STREET_MIN_W)), floor - GAP);
   } else if (kind === 'bag' && Number.isFinite(Number(bagTop))) sheetBox = box(0, Number(bagTop), W, floor);
   const covered = kind !== '';
+  let snapBox = real(snap) ? box(snap.left, snap.top, snap.right, snap.bottom) : null;
   if (covered) {
     stick = null;
     act = null;
     jump = null;
     pinBox = null;
+    snapBox = null;
   }
   // The Map covers the caption (and, sideways, the strip and the pack row: the whole screen).
   let stripBox = strip;
@@ -251,7 +257,7 @@ export function phoneRegions({ width, height, safe = {}, sheet = '', pack = null
   else if (kind === 'half' && upright) bottom = sheetBox.top - GAP;
   else if (kind === 'bag' && sheetBox) bottom = sheetBox.top - GAP;
   else {
-    for (const b of [stick, act, jump, pinBox]) if (b) bottom = Math.min(bottom, b.top - GAP);
+    for (const b of [stick, act, jump, pinBox, snapBox]) if (b) bottom = Math.min(bottom, b.top - GAP);
   }
   const notices = box(left, top, W - sr - EDGE, Math.max(top, bottom));
 
@@ -262,7 +268,7 @@ export function phoneRegions({ width, height, safe = {}, sheet = '', pack = null
       ? { side: 'bottom', css: H - sheetBox.top, zoom: true }
       : { side: 'left', css: sheetBox.right, zoom: true };
   }
-  return { upright, strip: stripBox, caption: captionBox, homes: homesBox, buffs: buffBox, play: playBox, playAt, notices, pin: pinBox, stick, stickUp, act, jump, pack: packBox, sheet: sheetBox, dock };
+  return { upright, strip: stripBox, caption: captionBox, homes: homesBox, buffs: buffBox, play: playBox, playAt, notices, pin: pinBox, stick, stickUp, act, jump, snap: snapBox, pack: packBox, sheet: sheetBox, dock };
 }
 
 /**
@@ -656,6 +662,11 @@ export function mountPhoneLayout({ doc = globalThis.document, root, sheets = {},
       buffs: shown(buffEl) ? { w: buffEl.offsetWidth, h: buffEl.offsetHeight } : null,
       homes,
       play,
+      // G1314: Camera Mode's Snap button while it shows (the notices keep above it).
+      snap: (() => {
+        const el = doc.querySelector('#game-root .camera-mode:not([hidden]) .camera-mode-snap:not([hidden])');
+        return el?.getClientRects().length ? shift(rectOf(el)) : null;
+      })(),
       controls: Object.fromEntries(['stick', 'act', 'jump'].map((k) => {
         const el = doc.querySelector(`#game-root .touch-${k}`);
         let r = el?.getClientRects().length ? shift(rectOf(el)) : null;

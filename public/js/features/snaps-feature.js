@@ -56,6 +56,7 @@
  * owned filters, and shows it with Download (a blob: link to a JPEG named as the client named its
  * snapshot, snapFileName) and Close (openDownload). A remake addition (inventions:
  * camera-solo-download): Glitch had no solo game; its snaps always went to the site.
+ * QA (solo only): &snapcard=1 gives the player the Snapshottery card on arrival (G1314's phone Snap).
  */
 
 import { createMinnAccount } from '../minn-account.js?v=7e3d7279';
@@ -65,7 +66,7 @@ import { ITEM_CATALOG, countItem, ensureItem, itemIcon } from '../inventory.js?v
 import { STREET_INDEX, resolveIndexTsid } from '../street-loader.js?v=10376267';
 import {
   CAMERA_CLASS, CAPTION_MAX, FORGET_RECHARGE_SEC, RECHARGE_BUFF, SNAP_COPY as T, SNAP_MAX_BYTES, TRAVEL,
-  albumSnaps, base64Bytes, canSnap, cleanCaption, isSnapDownload, isSnapUrl, jpegBase64, savedActions, snapAuthor, snapDate, snapPlace,
+  SNAPSHOTTERY, albumSnaps, base64Bytes, canSnap, cleanCaption, isSnapDownload, isSnapUrl, jpegBase64, savedActions, snapAuthor, snapDate, snapPlace,
   snapFileName, snapResolution, snapShareUrl, snapSteps, snapStreet, takePictureState, viewerActions, viewerStep, withCamera, WHOLE_SNAP,
 } from '../snaps.js?v=b5be8bff';
 import { VINTAGE_TEXT, applyFilter, filterComponents, filtersFor } from '../snap-filters.js?v=32315cf1';
@@ -1261,6 +1262,14 @@ export const snapsFeature = {
     session = createSession(engine);
   },
 
+  onStreetEnter(street, engine) {
+    // QA (solo only): &snapcard=1 deals the Snapshottery card.
+    const pc = engine?.pc;
+    if (sessionFor(engine)?.solo && engine.param?.('snapcard') === '1' && pc && !canSnap(upgrades(engine))) {
+      pc.imaginationUpgrades = [...(pc.imaginationUpgrades || []), SNAPSHOTTERY];
+    }
+  },
+
   onStreetClear(engine) {
     if (sessionFor(engine)?.travel) closeTravel(engine, session);
   },
@@ -1303,6 +1312,14 @@ export const snapsFeature = {
     if (!sessionFor(engine) || !canSnap(upgrades(engine))) return null;
     const st = wholeState(engine);
     return st?.label || (st?.refused ? HOME_SHOT_COPY.house : null);
+  },
+
+  /**
+   * G1314: camera-mode-feature's phone Snap button shows when a Snap can be taken here (solo or
+   * online, with the Snapshottery card), as the computer's hint offers Enter only then.
+   */
+  cameraSnapReady(engine) {
+    return sessionFor(engine) && canSnap(upgrades(engine)) ? true : null;
   },
 
   /** G1284: the button or Shift+Enter in Camera Mode. Resolves true when handled. */

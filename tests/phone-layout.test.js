@@ -27,7 +27,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
   CHOOSER_MIN_W, GAP, PILL_IDS, STICK, TAP_H, boxesOverlap, chooserRoomOf, fullScreenWay, layoutProblems, menuRoomOf, phoneRegions, pillBadge, socialPillCount, stickRegionOf, streetFloorOf,
-} from '../public/js/ui/phone-layout.js?v=1d8b6006';
+} from '../public/js/ui/phone-layout.js?v=703775b3';
 import { phonePins } from '../public/js/ui/quest-pin-button.js?v=2931d81d';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -1361,5 +1361,172 @@ describe('a short scene on an upright phone leaves no flat dark band (Chrome, Au
       await ctx.close();
     }
     assert.deepEqual(bad, []);
+  });
+});
+
+describe('G1314: the notices keep above Camera Mode\'s Snap button (pure)', () => {
+  it('upright and sideways, the notices end above the Snap button while it shows, and under a sheet it is covered', () => {
+    for (const [w, h] of [[390, 844], [360, 629], [844, 390]]) {
+      const plain = phoneRegions({ width: w, height: h });
+      // Where style.css stands it: upright over Act at the right, sideways left of Act at Jump's foot.
+      const snap = h > w
+        ? { left: w - 12 - 68, top: plain.act.top - 12 - 68, right: w - 12, bottom: plain.act.top - 12 }
+        : { left: w - 170 - 68, top: plain.jump.bottom - 68, right: w - 170, bottom: plain.jump.bottom };
+      const r = phoneRegions({ width: w, height: h, snap });
+      assert.deepEqual(r.snap, snap);
+      assert.ok(r.notices.bottom <= snap.top - GAP, `${w}x${h}: notices end at ${r.notices.bottom}, the Snap button's top ${snap.top}`);
+      for (const k of ['stick', 'act', 'jump', 'pack', 'strip', 'caption']) assert.equal(boxesOverlap(snap, r[k]), false, `${w}x${h}: the Snap button on ${k}`);
+      assert.equal(phoneRegions({ width: w, height: h, snap, sheet: 'half' }).snap, null);
+    }
+  });
+});
+
+/**
+ * G1314 (Austin 2026-11-25: phone players could not snap, Enter was the only way): Camera Mode's round
+ * Snap button on a phone with the Snapshottery card keeps off the stick, Act and Jump (measured before
+ * Camera Mode, where they stand), Done, the whole-house button and every other piece, at 390x844,
+ * 360x629 and sideways, in the street and in the house; a tap takes the Snap (solo: the Download card).
+ */
+describe('G1314: Camera Mode\'s Snap button on a phone (Chrome)', { skip: !chromium && 'no playwright' }, () => {
+  const LOCK_WAIT_MS = 30 * 60_000;
+  const UA = 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1';
+  let server = null;
+  let chrome = null;
+  before(async () => {
+    const { openBrowser } = await import('../tools/qa/browser.mjs');
+    const { startServer } = await import('../tools/qa/serve.mjs');
+    chrome = await openBrowser({ label: 'phone-layout camera snap test', waitMs: LOCK_WAIT_MS });
+    server = await startServer({ root: join(root, 'public') });
+  }, { timeout: LOCK_WAIT_MS + 60_000 });
+  after(async () => {
+    await chrome?.close();
+    await server?.stop();
+  });
+
+  const ready = () => !document.body.classList.contains('is-booting') && document.getElementById('overlay')?.classList.contains('hidden') && document.documentElement.classList.contains('phone-layout');
+  /** Every piece on screen, and where the controls stand (Camera Mode hides them). */
+  const measure = () => {
+    const seen = (el) => el && el.checkVisibility({ visibilityProperty: true, opacityProperty: true }) && el.getBoundingClientRect().width > 0;
+    const rect = (el) => {
+      const r = el.getBoundingClientRect();
+      return { left: r.left, top: r.top, right: r.right, bottom: r.bottom };
+    };
+    const pieces = {
+      stats: document.getElementById('hud-stats'),
+      pill: document.querySelector('.top-bar .top-actions'),
+      caption: document.getElementById('street-nameplate'),
+      homes: document.getElementById('homes-modes'),
+      buffs: document.getElementById('buff-strip'),
+      notices: document.querySelector('.notify-notices:not(.is-waiting)'),
+      pin: document.getElementById('quest-pins'),
+      stick: document.querySelector('.touch-stick'),
+      act: document.querySelector('.touch-act'),
+      jump: document.querySelector('.touch-jump'),
+      pack: document.getElementById('pack-row'),
+      label: document.querySelector('.camera-mode-label'),
+      done: document.querySelector('.camera-mode-done'),
+      whole: document.querySelector('.camera-mode-whole'),
+      snap: document.querySelector('.camera-mode-snap'),
+    };
+    const out = {};
+    for (const [k, el] of Object.entries(pieces)) if (seen(el) && (k !== 'notices' || el.children.length)) out[k] = rect(el);
+    return out;
+  };
+  const open = async (q, w, h) => {
+    const base = `http://127.0.0.1:${server.address().port}`;
+    const ctx = await chrome.browser.newContext({ viewport: { width: w, height: h }, isMobile: true, hasTouch: true, deviceScaleFactor: 1, userAgent: UA });
+    await ctx.addInitScript(() => { try { localStorage.setItem('groddle-play-device', 'qa-game'); } catch { /* none */ } });
+    const tab = await ctx.newPage();
+    const errors = [];
+    tab.on('pageerror', (e) => errors.push(e.message));
+    await tab.goto(`${base}/play/?autostart=1&questoffer=off&hstip=0&fresh=1&resetgame=1&${q}`);
+    await tab.waitForFunction(ready, null, { timeout: 60_000 });
+    await tab.waitForTimeout(2000);
+    await tab.evaluate(() => { for (const b of document.querySelectorAll('button')) if (b.textContent.trim() === 'Got it' && b.offsetParent) b.click(); });
+    return { ctx, tab, errors };
+  };
+  /** Camera Mode by the Menu's row, as a phone player opens it. */
+  const enterCamera = async (tab) => {
+    await tab.tap('#more-btn');
+    await tab.tap('#menu-camera-btn');
+    await tab.waitForFunction(() => document.querySelector('#game-root canvas')?.dataset.cameraMode === '1', null, { timeout: 10_000 });
+    await tab.waitForTimeout(300);
+  };
+  const leaveCamera = async (tab) => {
+    await tab.tap('.camera-mode-done');
+    await tab.waitForFunction(() => document.querySelector('#game-root canvas')?.dataset.cameraMode === '0', null, { timeout: 10_000 });
+    await tab.waitForTimeout(300);
+  };
+
+  for (const [place, q, whole] of [['on a street', 'snapcard=1', false], ['in the house', 'snapcard=1&homedemo=interior', true]]) {
+    it(`${place}: the Snap button keeps off the controls' places and every other piece at 390x844, 360x629 and 844x390`, { timeout: 240_000 }, async () => {
+      const { ctx, tab, errors } = await open(q, 390, 844);
+      const bad = [];
+      for (const [w, h] of [[390, 844], [360, 629], [844, 390]]) {
+        await tab.setViewportSize({ width: w, height: h });
+        await tab.evaluate(() => {
+          dispatchEvent(new Event('resize'));
+          window.groddleQA?.questPins?.pin('animalkinship_pet_piggies');
+        });
+        await tab.waitForTimeout(900);
+        const before = await tab.evaluate(measure);
+        await enterCamera(tab);
+        // Notices while looking (a toast such as "Get the Snapshottery upgrade first." shows here) keep above it.
+        await tab.evaluate(() => {
+          for (let i = 0; i < 3; i++) window.groddleQA?.notify?.notice(`Notice ${i + 1} for the layout check, long enough for two lines on a phone.`, 6000);
+        });
+        await tab.waitForTimeout(700);
+        const during = await tab.evaluate(measure);
+        const where = `${w}x${h} ${place}`;
+        if (!during.snap) bad.push(`${where}: no Snap button`);
+        else {
+          for (const k of ['stick', 'act', 'jump']) if (!before[k]) bad.push(`${where}: no ${k} to measure`);
+          // Where the controls stand when they show (Camera Mode hides them).
+          for (const k of ['stick', 'act', 'jump', 'pin']) if (before[k] && boxesOverlap(during.snap, before[k])) bad.push(`${where}: the Snap button ${JSON.stringify(during.snap)} is on ${k}'s place ${JSON.stringify(before[k])}`);
+          for (const [k, b] of Object.entries(during)) if (k !== 'snap' && boxesOverlap(during.snap, b)) bad.push(`${where}: the Snap button ${JSON.stringify(during.snap)} overlaps ${k} ${JSON.stringify(b)}`);
+          if (during.snap.left < 0 || during.snap.top < 0 || during.snap.right > w || during.snap.bottom > h) bad.push(`${where}: the Snap button is off the screen`);
+          if (during.snap.right - during.snap.left < 44 || during.snap.bottom - during.snap.top < 44) bad.push(`${where}: the Snap button is under 44 px`);
+          // Upright: the Snap button stands where the thumb is, in the lower half, at the right.
+          if (h > w && (during.snap.top < h / 2 || during.snap.left < w / 2)) bad.push(`${where}: the Snap button is not in the lower right`);
+        }
+        if (!during.done) bad.push(`${where}: no Done`);
+        if (whole && !during.whole) bad.push(`${where}: no whole-house button at home`);
+        if (!whole && during.whole) bad.push(`${where}: a whole-house button away from home`);
+        await leaveCamera(tab);
+      }
+      await ctx.close();
+      assert.deepEqual(bad, []);
+      assert.deepEqual(errors, []);
+    });
+  }
+
+  it('a tap on Snap takes the Snap (solo: the Download card); without the card there is no button', { timeout: 180_000 }, async () => {
+    for (const [w, h] of [[390, 844], [360, 629]]) {
+      const { ctx, tab, errors } = await open('snapcard=1', w, h);
+      await enterCamera(tab);
+      await tab.tap('.camera-mode-snap');
+      await tab.waitForFunction(() => window.groddleSnaps?.state?.().dialog !== 'closed', null, { timeout: 10_000 });
+      const st = await tab.evaluate(() => ({ snaps: window.groddleSnaps.state(), taps: document.querySelector('#game-root canvas')?.dataset.cameraSnapTaps }));
+      assert.notEqual(st.snaps.dialog, 'closed', `${w}x${h}: the Snap's card opened`);
+      assert.match(String(st.snaps.size), /^\d+x\d+$/, `${w}x${h}: a picture was drawn`);
+      assert.equal(st.taps, '1');
+      assert.deepEqual(errors, []);
+      await ctx.close();
+    }
+    const { ctx, tab } = await open('', 390, 844);
+    await enterCamera(tab);
+    assert.equal(await tab.evaluate(() => Boolean(document.querySelector('.camera-mode-snap')?.checkVisibility())), false, 'no Snap button without the card');
+    await ctx.close();
+  });
+
+  it('computers keep Enter and no Snap button', { timeout: 120_000 }, async () => {
+    const base = `http://127.0.0.1:${server.address().port}`;
+    const ctx = await chrome.browser.newContext({ viewport: { width: 1280, height: 800 }, deviceScaleFactor: 1 });
+    const tab = await ctx.newPage();
+    await tab.goto(`${base}/play/?autostart=1&questoffer=off&hstip=0&fresh=1&resetgame=1&snapcard=1&camerademo=1`);
+    await tab.waitForFunction(() => document.querySelector('#game-root canvas')?.dataset.cameraMode === '1', null, { timeout: 60_000 });
+    await tab.waitForTimeout(300);
+    assert.equal(await tab.evaluate(() => Boolean(document.querySelector('.camera-mode-snap')?.checkVisibility())), false);
+    await ctx.close();
   });
 });

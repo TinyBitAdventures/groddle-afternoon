@@ -6833,6 +6833,35 @@ body.buff-purple-pulse::after {
 .camera-mode-whole[hidden] { display: none; }
 :root.touch-phone .camera-mode-whole { bottom: calc(var(--pack-live-height, 72px) + env(safe-area-inset-bottom, 0px) + var(--sp-8) + 56px); min-height: 44px; }
 :root.touch-phone.camera-mode-on .touch-controls { display: none; }
+/* G1314: a phone's round Snap button (Enter's Snap), kept off where the stick, Act and Jump stand (they
+   step aside while looking) and clear of Done and the whole-house button in the middle: upright at the
+   right, 12 px over Act's top (the controls' foot, Act's 44 px lift and its 60 px); sideways, where the
+   screen is short and the notices reach down to the controls, left of Act at Jump's foot (Act 76 px and
+   10 px in from Jump's right, its 60 px, 12 px). js/ui/phone-layout.js keeps the notices above it. */
+.camera-mode-snap {
+  position: absolute;
+  right: max(var(--sp-6), env(safe-area-inset-right, 0px));
+  bottom: calc(var(--pack-live-height, 72px) + env(safe-area-inset-bottom, 0px) + var(--sp-6) + 44px + 60px + var(--sp-6));
+  width: 68px;
+  height: 68px;
+  padding: 0;
+  border: 3px solid color-mix(in srgb, var(--c-white) 92%, transparent);
+  border-radius: var(--radius-round);
+  background: var(--accent);
+  color: var(--text-inverse);
+  box-shadow: var(--shadow-2);
+  font: var(--fw-heavy) var(--fs-base)/var(--lh-none) var(--font-ui);
+  pointer-events: auto;
+  touch-action: manipulation;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.camera-mode-snap:active { transform: scale(0.94); }
+.camera-mode-snap[hidden] { display: none; }
+@media (max-height: 500px) and (orientation: landscape) {
+  :root.touch-phone .camera-mode-snap { right: calc(max(var(--sp-6), env(safe-area-inset-right, 0px), var(--inset-r, 0px)) + 76px + var(--sp-5) + 60px + var(--sp-6)); bottom: calc(var(--pack-live-height, 72px) + max(0px, var(--safe-b) - 4px) + var(--sp-6)); }
+}
+@media (prefers-reduced-motion: reduce) { .camera-mode-snap:active { transform: none; } }
 
 /* Type-to-search picker (js/combobox.js) */
 .combo {

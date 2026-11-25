@@ -372,6 +372,9 @@
     "remake-own: own line shows through the word filter (the remake's own addition); the server filters what the Butler": "word-filter"
   },
   "public/js/features/camera-mode-feature.js": {
+    "glitch-had-none: stays beside it for what Shift+Enter does. Glitch had no": "camera-phone-snap",
+    "invented: * phone client, so this is ours (inventions: camera-phone-snap). Computers are": "camera-phone-snap",
+    "ours: * phone client, so this is ours (inventions: camera-phone-snap). Computers are": "camera-phone-snap",
     "ours: the touch way in is ours.": "ours-camera-mode",
     "remake-own: * { end }) to take it. A remake addition: Glitch's camera only ever snapped the": "camera-whole-house"
   },

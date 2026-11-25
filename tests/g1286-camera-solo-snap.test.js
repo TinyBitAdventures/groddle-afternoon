@@ -25,7 +25,7 @@ import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { cameraKey } from '../public/js/features/camera-mode-feature.js?v=c3a8efbb';
+import { cameraKey } from '../public/js/features/camera-mode-feature.js?v=4ae80d21';
 import { cameraModeFeature } from '../public/js/features/camera-mode-feature.js?fresh=g1286';
 import { snapsFeature } from '../public/js/features/snaps-feature.js?fresh=g1286';
 import { SNAP_COPY, snapFileName } from '../public/js/snaps.js?v=b5be8bff';
@@ -335,6 +335,23 @@ describe('solo snaps save to the device (fake page)', () => {
       assert.deepEqual(snapsFeature.packVerbs('camera', { ...engine, inv: { camera: 1 } }), []);
       assert.equal(snapsFeature.vendorProfile({ key: 'toys', offers: [] }, engine), null);
       assert.equal(page.body.querySelector('#snaps-btn'), null, 'no Menu Snaps (no album) in solo');
+    } finally {
+      page.done();
+    }
+  });
+
+  it('G1314: the phone\'s Snap button is offered with the card (cameraSnapReady), as the hint offers Enter; &snapcard=1 deals the card (QA)', () => {
+    const page = fakePage();
+    try {
+      const { engine } = soloEngine();
+      snapsFeature.init(engine);
+      assert.equal(snapsFeature.cameraSnapReady(engine), true);
+      const none = soloEngine({ card: false }).engine;
+      assert.equal(snapsFeature.cameraSnapReady(none), null, 'no card, no button');
+      assert.equal(snapsFeature.cameraSnapReady({ ...engine, mode: 'multiplayer' }), null, 'no online session here, no button');
+      snapsFeature.onStreetEnter({}, { ...none, param: (k) => (k === 'snapcard' ? '1' : null) });
+      assert.deepEqual(none.pc.imaginationUpgrades, ['snapshotting']);
+      assert.equal(snapsFeature.cameraSnapReady(none), true);
     } finally {
       page.done();
     }

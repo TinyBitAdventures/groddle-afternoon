@@ -6096,6 +6096,28 @@
    ]
   },
   {
+   "id": "camera-phone-snap",
+   "title": "A round Snap button in Camera Mode on phones: with the Snapshottery card, a tap takes the same Snap Enter takes (at your own home the whole-house button stays beside it, for Shift+Enter's whole-house Snap); computers unchanged",
+   "kind": "UI",
+   "status": "kept",
+   "where": [
+    {
+     "file": "public/js/features/camera-mode-feature.js"
+    },
+    {
+     "file": "public/js/features/snaps-feature.js"
+    },
+    {
+     "file": "public/style.css"
+    }
+   ],
+   "why": "Glitch had no phone client: its Camera Mode snapped with Enter only (CameraMan.as onEnterKey 679-683), which a phone has no key for, so phone players could not snap.",
+   "ruling": "Austin 2026-11-25 (G1314): a Snap button in Camera Mode on phones",
+   "rows": [
+    "G1314"
+   ]
+  },
+  {
    "id": "phone-sound-hush",
    "title": "Sound pauses when the page is hidden on a phone or tablet, with the setting \"Keep playing sound in the background\" (on by default on a computer, off on a phone or tablet)",
    "kind": "behaviour",

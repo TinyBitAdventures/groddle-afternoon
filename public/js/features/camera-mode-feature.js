@@ -53,11 +53,19 @@
  * asks snaps-feature `cameraWholeLabel` (engine) for the button and `cameraWholeSnap` (engine,
  * { end }) to take it. A remake addition: Glitch's camera only ever snapped the view.
  *
+ * G1314 (Austin 2026-11-25: "phone players can't snap"; Enter was the only way): on a phone with the
+ * Snapshottery card (snaps-feature `cameraSnapReady`), a round Snap button stands in the lower right,
+ * off where the stick, Act and Jump stand (they step aside while looking): upright over Act and Jump,
+ * sideways left of Act (style.css), clear of Done and the whole-house button in the middle; the notices
+ * keep above it (js/ui/phone-layout.js `snap`). A tap takes the same Snap Enter takes (takeSnap). At
+ * your own home the whole-house button (G1284) stays beside it for what Shift+Enter does. Glitch had no
+ * phone client, so this is ours (inventions: camera-phone-snap). Computers are unchanged.
+ *
  * QA: ?autostart=1&camerademo=1 opens it (&cameraskill=1 grants Eyeballery,
  * &cameralook=x,y pans; &eyeballdemo=1 also draws the bubble over your own
  * Glitch, as the others would see it). Canvas data: cameraMode, cameraLookX,
  * cameraLookY, cameraRange, cameraEyeballing (players drawn with the bubble),
- * cameraEyeballSent.
+ * cameraEyeballSent, cameraSnapTaps (G1314: the phone's Snap button's taps).
  */
 
 import { textureFromUrl } from '../textures.js?v=b8e38103';
@@ -242,6 +250,15 @@ let overlay = null;
 let onDone = null;
 /** G1284: the whole-house button's press (set by attach). */
 let onWhole = null;
+/** G1314: the phone's Snap button's press (set by attach). */
+let onSnap = null;
+/** G1314: a second tap this soon after a Snap is the same press (the polaroid opens after the flash). */
+const SNAP_TAP_GAP_MS = 800;
+let snapTapAt = 0;
+let snapTaps = 0;
+
+/** G1314: the phone's Snap button (round, above where Act and Jump stand). */
+export const CAMERA_SNAP_COPY = Object.freeze({ label: 'Snap', aria: 'Take a snap' });
 
 /**
  * The client refused Camera Mode only with no location or a location flagged no_camera_mode
@@ -288,6 +305,27 @@ function snapWholeNow(engine) {
   return true;
 }
 
+/** G332, G1286: Enter's Snap with Snapshottery (CameraManView.as 189, CameraMan.as snap), solo or online; G1314: the phone's Snap button too. */
+function takeSnap(engine) {
+  return engine.query?.('cameraSnap', engine, { end: () => setActive(engine, false) });
+}
+
+/** G1314: the phone's Snap button, shown on a phone with the Snapshottery card (snaps-feature cameraSnapReady). */
+function showSnap(ready) {
+  const btn = overlay?.querySelector('[data-camera-snap]');
+  if (btn) btn.hidden = !(ready && isPhoneDevice());
+}
+
+/** G1314: a tap on the phone's Snap button. */
+function snapTap(engine) {
+  const now = Date.now();
+  if (now - snapTapAt < SNAP_TAP_GAP_MS) return;
+  snapTapAt = now;
+  takeSnap(engine);
+  snapTaps += 1;
+  engine.setData?.('cameraSnapTaps', String(snapTaps));
+}
+
 function showOverlay(on, range, snapHint = null) {
   if (typeof document === 'undefined') return;
   if (!overlay) {
@@ -299,6 +337,7 @@ function showOverlay(on, range, snapHint = null) {
       <span class="camera-mode-reticle" aria-hidden="true"></span>
       <p class="camera-mode-label"><b>Camera Mode</b> <span data-camera-hint></span></p>
       <button type="button" class="camera-mode-whole" data-camera-whole hidden></button>
+      <button type="button" class="camera-mode-snap" data-camera-snap hidden></button>
       <button type="button" class="camera-mode-done" data-camera-done hidden></button>`;
     const done = overlay.querySelector('[data-camera-done]');
     done.textContent = CAMERA_PHONE_COPY.done;
@@ -311,6 +350,13 @@ function showOverlay(on, range, snapHint = null) {
       e.preventDefault();
       onWhole?.();
     });
+    const snap = overlay.querySelector('[data-camera-snap]');
+    snap.textContent = CAMERA_SNAP_COPY.label;
+    snap.setAttribute('aria-label', CAMERA_SNAP_COPY.aria);
+    snap.addEventListener('click', (e) => {
+      e.preventDefault();
+      onSnap?.();
+    });
     (document.getElementById('game-root') || document.body).appendChild(overlay);
   }
   overlay.hidden = !on;
@@ -319,7 +365,7 @@ function showOverlay(on, range, snapHint = null) {
   document.documentElement.classList.toggle('camera-mode-on', Boolean(on && phone));
   const hint = overlay.querySelector('[data-camera-hint]');
   if (hint && phone) {
-    // #271: no keys on a phone (a Snap needs Enter, so the snap line waits for a keyboard).
+    // #271: no keys on a phone (G1314: the Snap button takes a Snap, so the line keeps to the look).
     hint.textContent = Number.isFinite(range) ? CAMERA_PHONE_COPY.hintRange : CAMERA_PHONE_COPY.hint;
   } else if (hint && typeof snapHint === 'string' && snapHint) {
     hint.textContent = snapHint;
@@ -341,6 +387,7 @@ function setActive(engine, on) {
   const range = cameraRange(engine.learnedSkills);
   showOverlay(on, range, on ? engine.query?.('cameraSnapHint', engine, range) : null);
   showWhole(on ? engine.query?.('cameraWholeLabel', engine) : null);
+  showSnap(on ? engine.query?.('cameraSnapReady', engine) : null);
   sendEyeballing(engine, on);
   engine.playSound(on ? 'CAMERA_MODE_ON' : 'CAMERA_MODE_OFF', { volume: 0.4 });
   publish(engine);
@@ -390,7 +437,7 @@ function attach(engine) {
       // G1284: Shift+Enter snaps the whole house (Tower, street) at your own home, and says why not elsewhere.
       if (kept === 'whole' && snapWholeNow(engine)) return;
       // G332, G1286: Enter snaps with Snapshottery (CameraManView.as 189, CameraMan.as snap), solo or online.
-      engine.query?.('cameraSnap', engine, { end: () => setActive(engine, false) });
+      takeSnap(engine);
       return;
     }
     if (k === 'escape') {
@@ -414,6 +461,7 @@ function attach(engine) {
   listeners = { down, up, blur };
   onDone = () => setActive(engine, false);
   onWhole = () => snapWholeNow(engine);
+  onSnap = () => snapTap(engine);
   if (isPhoneDevice()) attachTouch(engine);
 }
 
