@@ -64,11 +64,15 @@ describe('links in the game\'s Reports window (js/ui/reports-sheet.js)', () => {
     assert.ok(list.listeners.click?.length, 'the list answers clicks on its links (the ask for another site)');
   });
 
-  it('the phone page draws its threads the same way, with the link and ask styles of its own', () => {
+  it('the phone page draws its threads the same way, loading the links only when a thread has an address', () => {
     const src = read('public/js/phone/companion.js');
-    assert.match(src, /appendLinkedText\(body, m\.body, \{ doc \}\)/);
-    assert.match(src, /bindChatLinks\(msgs, \{ doc \}\)/);
-    assert.doesNotMatch(src, /el\('p', \{ class: 'pc-message-body' \}, m\.body\)/);
+    // Lazy, as the lightbox: the page's first load stays under its budget (tests/phone-companion.test.js).
+    assert.doesNotMatch(src, /^import [^\n]*chat-links\.js/m);
+    assert.match(src, /const loadChatLinks = \(\) => \(chatLinksModule \|\|= import\('\.\.\/chat-links\.js(\?v=[0-9a-f]{8})?'\)/);
+    assert.match(src, /if \(\/https\?:\\\/\\\/\/i\.test\(String\(m\.body \|\| ''\)\)\) linkBodies\.push\(\[body, m\.body\]\);/);
+    assert.match(src, /linkMessages\(msgs, linkBodies\);\n  panel\.append\(msgs\);/);
+    assert.match(src, /appendLinkedText\(body, text, \{ doc \}\);/);
+    assert.match(src, /bindChatLinks\(list, \{ doc \}\)/);
     const css = read('public/play/phone/phone.css');
     for (const sel of ['.pc-message-body .chat-link', '.chat-link-confirm', '.chat-link-confirm-row', '.chat-link-confirm-open']) assert.ok(css.includes(sel), sel);
   });

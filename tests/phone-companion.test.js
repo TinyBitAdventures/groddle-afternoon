@@ -246,10 +246,13 @@ describe('play/phone/ (the companion page)', () => {
   // JPEG, about 10 KB); the pictures' lightbox loads at the first tap on one, so it is not counted.
   // 275 KB from 265 (2026-11-22, G808): Circle the spot on a photo about to go: the bar's and the rings'
   // styles in phone.css and the companion's hooks (about 5 KB); the rings module loads with the lightbox.
-  it('stays small: everything it loads before a panel opens is under 275 KB', () => {
+  // 280 KB from 275 (2026-11-25, #669 follow-up): links in a report's messages, the link and ask styles in phone.css
+  // and the loader (about 2.4 KB; v0.72.0 stood 16 bytes under 275); js/chat-links.js itself loads with the first
+  // thread that has an address, so it is not counted.
+  it('stays small: everything it loads before a panel opens is under 280 KB', () => {
     const files = ['play/phone/index.html', 'play/phone/phone.css', 'site/theme.js', 'site/site-nav.css', 'favicon.svg', ...eager];
     const bytes = files.reduce((n, f) => n + statSync(join(pub, f)).size, 0);
-    assert.ok(bytes < 275 * 1024, `${bytes} bytes`);
+    assert.ok(bytes < 280 * 1024, `${bytes} bytes`);
   });
 
   it('signs in with the game\'s own forms and the /play/online/ gate\'s session check', () => {
