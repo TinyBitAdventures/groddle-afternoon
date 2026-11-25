@@ -12,7 +12,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { layoutPack, stackMaxOf } from '../public/js/pack-slots.js?v=38e4aea5';
 import { createVendorSellQuote, listSellOffers, vendorSell } from '../public/js/vendor.js?v=f9bee39e';
-import { bagsFeature, rockChanges } from '../public/js/features/bags-feature.js?v=998fb6cc';
+import { bagsFeature, rockChanges } from '../public/js/features/bags-feature.js?v=3b0fb8a1';
 
 const root = join(import.meta.dirname, '..');
 const singles = (n) => Object.fromEntries(Array.from({ length: n }, (_, i) => [`zz_single_${i}`, 1]));

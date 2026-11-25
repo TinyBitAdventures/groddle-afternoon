@@ -94,8 +94,9 @@ export function createMinnAccount(opts = {}) {
      * expiresIn } }, the token being what the realtime server lets the
      * socket open group chat and the channels with (groups_watch).
      * searchGroups answers { q, groups } (public ones), group(id) one group
-     * with its people. A refusal throws with .status, .code and the site's
-     * .message (and .data.fields for a create).
+     * with its people; editGroup (the administrator only) answers as
+     * group(id) does. A refusal throws with .status, .code and the site's
+     * .message (and .data.fields for a create or an edit).
      */
     async groups() {
       return buddyCall('Loading groups', 'groups');
@@ -111,6 +112,13 @@ export function createMinnAccount(opts = {}) {
 
     async createGroup({ name, description = '', mode = 'public' }) {
       return buddyCall('Making a group', 'groups', { method: 'POST', body: { name: String(name ?? ''), description: String(description ?? ''), mode: String(mode) } });
+    },
+
+    /** The administrator changes a group (group.js:494-499 admin_edit): only the fields given are sent. */
+    async editGroup(id, { description } = {}) {
+      const body = {};
+      if (description !== undefined) body.description = String(description ?? '');
+      return buddyCall('Saving the group', `groups/${Number(id)}`, { method: 'PUT', body });
     },
 
     async joinGroup(id) {

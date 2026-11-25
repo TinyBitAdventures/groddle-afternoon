@@ -20,7 +20,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { pickRandomTeleport } from '../public/js/funpickle.js?v=95796317';
 import { applyStreetIndex } from '../public/js/street-loader.js?v=10376267';
-import { streetJobsFeature } from '../public/js/features/street-jobs-feature.js?v=5810585e';
+import { streetJobsFeature } from '../public/js/features/street-jobs-feature.js?v=4809b30d';
 
 const PUB = new URL('../public/', import.meta.url);
 const read = (rel) => readFileSync(new URL(rel, PUB), 'utf8');

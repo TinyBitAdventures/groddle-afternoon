@@ -22,7 +22,7 @@ import { GEM_ITEMS } from '../public/js/imagination-effects.js?v=70169933';
 import { dropItemName } from '../public/js/drop-tables.js?v=1ed0b596';
 import { ITEM_PLURALS } from '../public/js/item-plurals-data.js?v=62e96051';
 import { PACK_COPY } from '../public/js/pack-slots.js?v=38e4aea5';
-import { bagsFeature } from '../public/js/features/bags-feature.js?v=998fb6cc';
+import { bagsFeature } from '../public/js/features/bags-feature.js?v=3b0fb8a1';
 
 const ROOT = join(import.meta.dirname, '..');
 const GSJS = join(ROOT, '..', 'glitch-GameServerJS');

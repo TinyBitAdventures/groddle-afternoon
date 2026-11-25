@@ -15,12 +15,12 @@ import { execFileSync } from 'node:child_process';
 import { join } from 'node:path';
 import { homedir } from 'node:os';
 
-import { createMinnAccount, minnUrls } from '../public/js/minn-account.js?v=ca5f77b3';
+import { createMinnAccount, minnUrls } from '../public/js/minn-account.js?v=db081871';
 import { GATE_COPY, JUJU_BOSS_GATES, SAVE_ALERT_COPY, bootDataFrom, deliverHandoff, gateFor, saveAlertFor } from '../public/js/online-boot.js?v=f1f2766b';
 import { SAVE_STOPPED } from '../public/js/save-store.js?v=4e720735';
 import { FORM_COPY, SETTINGS_COPY, resetLinkFrom } from '../public/js/account-forms.js?v=683e1475';
-import { restoreNeedsAsking, sizeLabel, slotForNewBackup, accountBackupFeature } from '../public/js/features/account-backup-feature.js?v=d6f708c3';
-import { FEATURES } from '../public/js/features/index.js?v=6522a94b';
+import { restoreNeedsAsking, sizeLabel, slotForNewBackup, accountBackupFeature } from '../public/js/features/account-backup-feature.js?v=482a5c8e';
+import { FEATURES } from '../public/js/features/index.js?v=ad4f2289';
 import { multiplayerEntryUrl } from '../public/js/game-mode.js?v=1ecf2899';
 import { SAVE_ENTRY_NAMES, createMultiplayerSaveStore } from '../public/js/save-store.js?v=4e720735';
 import { HAS_SITE, SITE_DIR, serverPath, skipWithoutServer, skipWithoutSite } from '../tools/repos.mjs';
@@ -550,11 +550,11 @@ describe('createMinnAccount: the core and the game\'s calls', () => {
     for (const name of Object.keys(core)) assert.ok(name in full, name);
     // #636: profile() and saveAbout() moved to the core: the phone page's Account tab writes the description.
     for (const name of ['profile', 'saveAbout']) assert.equal(typeof core[name], 'function', name);
-    for (const name of ['realtimeTicket', 'addBuddy', 'groups', 'home', 'radiance', 'auctions', 'sendMail', 'snaps', 'listBackups', 'reportBug']) {
+    for (const name of ['realtimeTicket', 'addBuddy', 'groups', 'editGroup', 'home', 'radiance', 'auctions', 'sendMail', 'snaps', 'listBackups', 'reportBug']) {
       assert.equal(typeof full[name], 'function', name);
       assert.equal(core[name], undefined, `${name} stays out of the phone`);
     }
-    assert.equal(Object.keys(full).length, 94, 'no call lost in the move (G567 added deleteChannelLine; alternate characters seven; confirmEmail; G872 reportPlayer; G1213 nameChange and changeName; G1186 quarter; G1240 setSnapPublic; G1283 uploadTower)');
+    assert.equal(Object.keys(full).length, 95, 'no call lost in the move (G567 added deleteChannelLine; alternate characters seven; confirmEmail; G872 reportPlayer; G1213 nameChange and changeName; G1186 quarter; G1240 setSnapPublic; G1283 uploadTower; #698 editGroup)');
     assert.equal(minnUrls, coreUrls, 'one minnUrls, whichever file it is imported from');
   });
 

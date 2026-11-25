@@ -46,9 +46,9 @@ import {
   refusalText,
 } from '../player-im.js?v=87bdb8ec';
 import { purgeOf, withoutPurged } from '../chat-purge.js?v=6c41f62d';
-import { EARLIER_TEXT } from '../groups.js?v=d5a70dca';
+import { EARLIER_TEXT } from '../groups.js?v=f998f548';
 import { imKey } from '../chat-reactions.js?v=38460172';
-import { createMinnAccount } from '../minn-account.js?v=ca5f77b3';
+import { createMinnAccount } from '../minn-account.js?v=db081871';
 
 export const PLAYER_IM_FEATURE_ID = 'player-im';
 

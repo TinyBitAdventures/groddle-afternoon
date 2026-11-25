@@ -6,7 +6,7 @@
  */
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { meditationRng } from '../public/js/features/meditation-feature.js?v=f06731fe';
+import { meditationRng } from '../public/js/features/meditation-feature.js?v=9d77df6f';
 
 describe('the meditation roll (ticket 72)', () => {
   it('is random when the QA parameter is absent or empty', () => {

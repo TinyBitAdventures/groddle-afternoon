@@ -16,6 +16,7 @@ import {
   CHANNELS,
   CHANNEL_INTRO,
   CHANNEL_WELCOME,
+  DESCRIPTION_MAX,
   GROUPS_MAX,
   GROUP_TEXT,
   chatLabel,
@@ -32,10 +33,10 @@ import {
   tabCommand,
   tabOrder,
   writeMemory,
-} from '../public/js/groups.js?v=d5a70dca';
-import { createMinnAccount } from '../public/js/minn-account.js?v=ca5f77b3';
-import { groupsFeature } from '../public/js/features/groups-feature.js?v=16333399';
-import { FEATURES } from '../public/js/features/index.js?v=6522a94b';
+} from '../public/js/groups.js?v=f998f548';
+import { createMinnAccount } from '../public/js/minn-account.js?v=db081871';
+import { groupsFeature } from '../public/js/features/groups-feature.js?v=666e85cc';
+import { FEATURES } from '../public/js/features/index.js?v=ad4f2289';
 import { serverPath, sitePath, skipWithoutServer, skipWithoutSite } from '../tools/repos.mjs';
 
 const root = join(import.meta.dirname, '..');
@@ -165,6 +166,7 @@ describe('minn-account group calls', () => {
     await a.leaveGroup(12);
     await a.inviteToGroup(7, '4');
     await a.declineGroupInvite(9);
+    await a.editGroup('7', { description: 'Quests on Sundays.', name: 'Not Sent' });
     assert.deepEqual(calls.map((c) => [c.method || 'GET', c.url.replace(`${BASE}wp-json/groddle/v1/`, ''), c.body ?? null, c.headers['X-WP-Nonce']]), [
       ['GET', 'groups', null, 'abcdef0123'],
       ['GET', 'groups/search?q=zeb%20ra', null, 'abcdef0123'],
@@ -174,6 +176,7 @@ describe('minn-account group calls', () => {
       ['DELETE', 'groups/12/members', null, 'abcdef0123'],
       ['POST', 'groups/7/invites', '{"id":4}', 'abcdef0123'],
       ['DELETE', 'groups/9/invites', null, 'abcdef0123'],
+      ['PUT', 'groups/7', '{"description":"Quests on Sundays."}', 'abcdef0123'],
     ]);
   });
 
@@ -281,6 +284,16 @@ describe('groups feature (js/features/groups-feature.js)', () => {
         answer.watch = { token: 'gtok2.sig', expiresIn: 3600 };
       }
       if (method === 'POST' && path === 'groups') out = { status: 400, body: { code: 'groddle_group_limit', message: GROUP_TEXT.limit(20) } };
+      if (method === 'PUT' && path === 'groups/7') {
+        // #698: the site answers as show() does (Groups::edit).
+        const sent = JSON.parse(init.body);
+        events.push(`body:${init.body}`);
+        const g = answer.groups.find((x) => x.id === 7);
+        g.description = sent.description;
+        out = { ...g, member: true, invited: false, people: [{ id: 1, name: 'Ada', role: 'admin' }] };
+        delete out.role;
+      }
+      if (method === 'PUT' && path === 'groups/12') out = { status: 403, body: { code: 'groddle_group_not_admin', message: 'Only the group\'s administrator can change it.' } };
       if (out.status) return { status: out.status, ok: false, headers: { get: () => null }, json: async () => out.body };
       return { status: 200, ok: true, headers: { get: () => null }, json: async () => out };
     };
@@ -442,6 +455,53 @@ describe('groups feature (js/features/groups-feature.js)', () => {
     s.closePanel();
     assert.equal(engine.data.groupsPanel, 'closed');
   });
+
+  it('#698: the administrator gets Edit, a form filled with the description, and Save changes the row', async () => {
+    const s = globalThis.groddleGroups;
+    answer.groups.push({ id: 12, name: 'Zebra Club', description: 'Stripes.', mode: 'public', members: 3, role: 'member' });
+    answer.groups.find((g) => g.id === 7).description = 'Sunday nights.';
+    s.openPanel();
+    await wait(5);
+    const shade = document.body.children.find((c) => c.attrs?.id === 'groups-shade');
+    assert.ok(shade.find('data-group-edit', '7'), 'Edit on the group Ada runs');
+    assert.equal(shade.find('data-group-edit', '12'), undefined, 'no Edit for a plain member (group.js:46-50: level 1 held the permissions)');
+    assert.equal(shade.find('data-group-edit-form'), undefined, 'the form waits for Edit');
+    shade.find('data-group-edit', '7').click();
+    const box = shade.find('data-group-edit-description', '7');
+    assert.ok(box, 'the form opens under the row');
+    assert.equal(box.tagName, 'TEXTAREA');
+    assert.equal(box.value, 'Sunday nights.', 'filled with the words now');
+    assert.equal(box.attrs.maxlength, String(DESCRIPTION_MAX), 'the Make a group form\'s limit');
+    assert.match(shade.find('data-group-edit-form', '7').text(), /Description/);
+    assert.equal(shade.find('data-group-edit-name'), undefined, 'no name field: renaming waits on a ruling');
+    // What is typed survives a redraw (a chat line, a refresh).
+    box.value = 'Come work on quests that you need multiple people around for!';
+    box.fire('input');
+    await s.refresh();
+    const again = shade.find('data-group-edit-description', '7');
+    assert.equal(again.value, 'Come work on quests that you need multiple people around for!');
+    events.length = 0;
+    shade.find('data-group-edit-form', '7').fire('submit');
+    await wait(5);
+    assert.ok(events.includes('fetch:PUT groups/7'));
+    assert.ok(events.includes('body:{"description":"Come work on quests that you need multiple people around for!"}'), 'the description only');
+    assert.equal(s.list.groups.find((g) => g.id === 7).description, 'Come work on quests that you need multiple people around for!');
+    assert.equal(s.list.groups.find((g) => g.id === 7).role, 'admin', 'the row keeps its place in the list');
+    assert.ok(events.includes(`toast:${GROUP_TEXT.edited('apple pickers')}`));
+    assert.equal(shade.find('data-group-edit-form'), undefined, 'the form closes on saving');
+    assert.match(shade.find('data-group', '7').text(), /Come work on quests that you need multiple people around for!/);
+    // Cancel closes it without a call.
+    shade.find('data-group-edit', '7').click();
+    assert.equal(shade.find('data-group-edit-description', '7').value, 'Come work on quests that you need multiple people around for!');
+    events.length = 0;
+    shade.find('data-group-edit-cancel', '7').click();
+    assert.equal(shade.find('data-group-edit-form'), undefined);
+    assert.ok(!events.some((e) => e.startsWith('fetch:PUT')));
+    // The site's refusal is said in its words.
+    assert.equal(await s.edit({ id: 12, name: 'Zebra Club' }, { description: 'x' }), false);
+    assert.match(shade.text(), /Only the group's administrator can change it\./);
+    s.closePanel();
+  });
 });
 
 describe('Trade Channelling in multiplayer (imagination-feature)', () => {
@@ -465,7 +525,8 @@ describe('groups across the repos', () => {
     assert.ok(manifest.tables.groddle_group_invites.includes('PRIMARY KEY  (group_id,user_id)'));
     const php = readFileSync(sitePath('src/Groups.php'), 'utf8');
     for (const route of ["'/groddle/v1/groups'", "'/groddle/v1/groups/search'", "'/groddle/v1/groups/{id:\\d+}'", "'/groddle/v1/groups/{id:\\d+}/members'", "'/groddle/v1/groups/{id:\\d+}/invites'"]) assert.ok(php.includes(route), route);
-    assert.equal((php.match(/Access::SignedIn/g) || []).length, 8, 'every route is signed-in only');
+    assert.equal((php.match(/Access::SignedIn/g) || []).length, 9, 'every route is signed-in only');
+    assert.match(php, /#\[Route\(Method::Put, '\/groddle\/v1\/groups\/\{id:\\d\+\}'/, '#698: the administrator\'s edit');
     assert.ok(!/\$request->json\(\)\[['"](user|sub|user_id)/.test(php), 'the user never comes from the request');
     assert.ok(php.includes(`MAX_GROUPS = ${GROUPS_MAX}`));
     assert.ok(php.includes("'k' => 'groups'"));

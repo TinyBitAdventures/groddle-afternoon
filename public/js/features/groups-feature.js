@@ -22,7 +22,8 @@
  *   chats and the tab in front are remembered for next time.
  * - Menu, Groups: the channels (Open / Close; Live Help and the Trade
  *   Channel show the original's first-time dialog), your groups (Chat,
- *   Invite, Members, Leave), invitations (Join / Decline), Find Groups
+ *   Invite, Members, Leave, and Edit for the group's administrator: its
+ *   description, group.js:494-499 admin_edit), invitations (Join / Decline), Find Groups
  *   (public ones by name) and Make a group (name, description, public or
  *   private). At most 20 groups (config_prod.js:39 max_groups).
  * - The modern skin's Social drawer (engine.social): Global Chat is its Global
@@ -54,7 +55,7 @@
  */
 
 import { purgeOf, withoutPurged } from '../chat-purge.js?v=6c41f62d';
-import { createMinnAccount } from '../minn-account.js?v=ca5f77b3';
+import { createMinnAccount } from '../minn-account.js?v=db081871';
 import { saveStore } from '../save-store.js?v=4e720735';
 import {
   CHANNELS,
@@ -87,7 +88,7 @@ import {
   shownName,
   tabOrder,
   writeMemory,
-} from '../groups.js?v=d5a70dca';
+} from '../groups.js?v=f998f548';
 import { appendLinkedText } from '../chat-links.js?v=b717fac7';
 import { lineKey as reactKey } from '../chat-reactions.js?v=38460172';
 import { DELETE_TEXT, deletableChannel, lineLidOf, mayDelete } from '../chat-delete.js?v=c55a1043';
@@ -143,6 +144,7 @@ const STYLE = `
 .grp-panel .grp-none { opacity: 0.75; font-style: italic; }
 .grp-panel .grp-note { min-height: 1.4em; margin-top: var(--sp-5); font-weight: 600; color: var(--c-lime-49); }
 .grp-panel .grp-note[data-tone="bad"] { color: var(--text-danger); }
+.grp-panel form.grp-edit { flex: 1 1 100%; margin: var(--sp-1) 0 0; }
 .grp-panel .grp-picks { display: flex; flex-wrap: wrap; gap: 0.3rem; flex: 1 1 100%; }
 `;
 
@@ -187,6 +189,8 @@ function createSession(engine, client) {
   const people = new Map();
   /** group id: the invite picker is open. */
   let inviting = 0;
+  /** The edit form open under one of the administrator's groups: { id, description } (the words typed so far). */
+  let editing = null;
 
   // —— The dock: tabs and the chat box ——
   const style = el('style', { id: 'groups-css' });
@@ -653,6 +657,51 @@ function createSession(engine, client) {
     });
   }
 
+  /** The administrator saves the edit form (groddle/v1/groups/{id}); the row takes the site's answer. */
+  async function edit(group, { description }) {
+    if (busy) return false;
+    busy = true;
+    render();
+    try {
+      const changed = normalizeGroup(await account.editGroup(group.id, { description }));
+      const patch = (g) => (g.id === changed.id ? { ...g, name: changed.name, description: changed.description } : g);
+      if (list) list = { ...list, groups: list.groups.map(patch) };
+      if (search.groups) search.groups = search.groups.map(patch);
+      editing = null;
+      say0(GROUP_TEXT.edited(changed.name));
+      engine.toast?.(GROUP_TEXT.edited(changed.name), 3000);
+      return true;
+    } catch (err) {
+      say0(err?.message || GROUP_TEXT.failed, 'bad');
+      engine.toast?.(err?.message || GROUP_TEXT.failed, 3600);
+      return false;
+    } finally {
+      busy = false;
+      renderTabs();
+      render();
+    }
+  }
+
+  /** The edit form under a group's row: the Make a group form's Description, filled with the words now. */
+  function editForm(g) {
+    const f = el('form', { class: 'grp-edit', 'data-group-edit-form': String(g.id) });
+    const descIn = el('textarea', { maxlength: String(DESCRIPTION_MAX), 'data-group-edit-description': String(g.id) });
+    descIn.value = editing.description;
+    descIn.addEventListener('input', () => { if (editing?.id === g.id) editing.description = String(descIn.value || ''); });
+    const descLabel = el('label', {}, 'Description');
+    descLabel.append(descIn);
+    const row = el('div', { class: 'grp-row' });
+    const go = el('button', { type: 'submit', class: 'grp-go', 'data-group-edit-save': String(g.id) }, 'Save');
+    go.disabled = busy;
+    row.append(go, button('Cancel', { 'data-group-edit-cancel': String(g.id) }, () => { editing = null; render(); }));
+    f.append(descLabel, row);
+    f.addEventListener('submit', (e) => {
+      e.preventDefault?.();
+      edit(g, { description: String(descIn.value || '') });
+    });
+    return f;
+  }
+
   async function find(q) {
     search = { ...search, q, busy: true };
     render();
@@ -722,7 +771,7 @@ function createSession(engine, client) {
     if (g.invitedBy) bits.push(`invited by ${g.invitedBy.name}`);
     what.append(el('small', {}, [g.description, bits.join(' · ')].filter(Boolean).join(' · ')));
     li.append(what, ...buttons);
-    if (extra) li.append(extra);
+    for (const more of [extra].flat()) if (more) li.append(more);
     return li;
   }
 
@@ -760,6 +809,8 @@ function createSession(engine, client) {
         const ul = el('ul', { 'data-groups-mine': '' });
         for (const g of list.groups) {
           let extra = null;
+          const admin = g.role === 'admin';
+          if (editing?.id === g.id && !admin) editing = null;
           if (people.has(g.id) || inviting === g.id) {
             extra = el('div', { class: 'grp-people' });
             if (people.has(g.id)) extra.append(el('p', {}, people.get(g.id).map((p) => (p.role === 'admin' ? `${p.name} (${GROUP_TEXT.admin})` : p.name)).join(', ')));
@@ -775,8 +826,9 @@ function createSession(engine, client) {
             button('Chat', { 'data-group-chat': String(g.id) }, () => { openChat(groupChannel(g.id)); closePanel(); }),
             button('Invite', { 'data-group-invite': String(g.id) }, () => { inviting = inviting === g.id ? 0 : g.id; if (inviting && !people.has(g.id)) showPeople(g); else render(); }),
             button('Members', { 'data-group-members': String(g.id) }, () => showPeople(g)),
+            admin ? button('Edit', { 'data-group-edit': String(g.id) }, () => { editing = editing?.id === g.id ? null : { id: g.id, description: g.description }; render(); }) : null,
             button('Leave', { 'data-group-leave': String(g.id) }, () => confirmLeave(g)),
-          ], { extra }));
+          ].filter(Boolean), { extra: [editing?.id === g.id ? editForm(g) : null, extra] }));
         }
         panel.append(ul);
       }
@@ -985,6 +1037,7 @@ function createSession(engine, client) {
     leave,
     create,
     find,
+    edit,
     invite,
     decline,
     openPanel,

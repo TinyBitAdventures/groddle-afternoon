@@ -28,7 +28,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { SITE_DIR, sitePath, skipWithoutSite } from '../tools/repos.mjs';
 import { DELETE_CONFIRM_FOCUS, DELETE_TEXT, deletableChannel, deleteConfirmRows, lineLidOf, mayDelete } from '../public/js/chat-delete.js?v=c55a1043';
-import { createMinnAccount } from '../public/js/minn-account.js?v=ca5f77b3';
+import { createMinnAccount } from '../public/js/minn-account.js?v=db081871';
 import { bootDataFrom } from '../public/js/online-boot.js?v=f1f2766b';
 import { mountSocialDrawer } from '../public/js/ui/social-drawer.js?v=06c37291';
 import { createNotifier } from '../public/js/notify.js?v=4226f585';

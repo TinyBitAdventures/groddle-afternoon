@@ -75,6 +75,7 @@ export const GROUP_TEXT = Object.freeze({
   joined: (name) => `You joined ${name}.`,
   left: (name) => `You left ${name}.`,
   created: (name) => `You made ${name}.`,
+  edited: (name) => `You changed the description of ${name}.`,
   invited: (who, group) => `You invited ${who} to ${group}.`,
   invitedYou: (who, group) => `${who} invited you to ${group}.`,
   declined: (group) => `You declined ${group}.`,

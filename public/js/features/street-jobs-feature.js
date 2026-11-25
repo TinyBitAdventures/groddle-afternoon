@@ -151,8 +151,8 @@ import {
   leaderboard,
 } from '../street-jobs-mp.js?v=c99c5cd4';
 import { grantMoodXp } from '../mood-xp.js?v=e311b45c';
-import { createMinnAccount } from '../minn-account.js?v=ca5f77b3';
-import { normalizeGroups } from '../groups.js?v=d5a70dca';
+import { createMinnAccount } from '../minn-account.js?v=db081871';
+import { normalizeGroups } from '../groups.js?v=f998f548';
 import { frameTexture, sourceFromUrl, textureFromUrl } from '../textures.js?v=b8e38103';
 import { createJobIndicator, jobIndicatorTip, jobIndicatorView, jobPerc } from '../job-indicator.js?v=8bea518d';
 import { LOT_ART, LOT_CLASS, LOT_PLACEMENT, LOT_SIGN_BLOCKERS, LOT_SIGN_X, LOT_TEXT, floorYAt, lotFit, lotHeadline, lotVerb } from '../group-hall-lot.js?v=23e8fbd9';
