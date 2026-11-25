@@ -23,7 +23,7 @@ import { NAMES_SHOWN, REACTIONS } from '../public/js/chat-reactions.js?v=3846017
 import { NOTICE_MAX, communityNoticeHtml, communityNoticesFrom, normalCommunityNotice } from '../public/js/community-notices.js?v=f676c372';
 import { EARLIER_MAX, WEB_TAG, chatLine, historyKey, mergeEarlier, oldestLid, shownName } from '../public/js/groups.js?v=d5a70dca';
 import { mergeEarlierIms, oldestAt } from '../public/js/player-im.js?v=87bdb8ec';
-import { communityMpFeature, createCommunitySession } from '../public/js/features/community-mp-feature.js?v=dffac45d';
+import { communityMpFeature, createCommunitySession } from '../public/js/features/community-mp-feature.js?v=e2207d90';
 
 const root = join(import.meta.dirname, '..');
 const read = (p) => readFileSync(join(root, p), 'utf8');

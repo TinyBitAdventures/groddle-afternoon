@@ -148,6 +148,11 @@ export function createMinnAccount(opts = {}) {
       return buddyCall('Saving your home street', 'profile/home-layout', { method: 'PUT', body: { key, layout } });
     },
 
+    /** G1283: the Tower's cutaway (every floor, 720 wide) and its name, for the Tower's public page. */
+    async uploadTower({ key, tower, name }) {
+      return buddyCall('Saving your Tower picture', 'profile/tower', { method: 'PUT', body: { key, tower, name } });
+    },
+
     /**
      * Homes and house keys (register G328, groddle-afternoon-site/src/Neighbours.php).
      * home(id) and visitRandom() answer { owner: { id, name }, home: { owned,

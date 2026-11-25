@@ -194,6 +194,41 @@ export function staleRefreshDue({ staleAt = 0, now, lastTry = 0, failedAt = 0 })
 }
 
 /**
+ * G1283: a Tower's cutaway for its public page (site src/HomePicture.php 'tower', PlayerPages
+ * /players/<name>/tower/): every floor stacked (js/home-shot-render.js renderHomeLocation, kind
+ * 'tower'), 720 wide as Glitch's saveHomeImg posted it (TSFrontController.as 1515-1546, through
+ * APICall.as homeImage; the archived Tower pictures are all 720 wide, 909 to 2693 tall), WebP
+ * (JPEG where the browser cannot write WebP), within the site's limits.
+ */
+export const TOWER_SHOT_WIDTH = 720;
+export const TOWER_MAX = Object.freeze({ w: 1440, h: 3600 });
+export const TOWER_MAX_BYTES = 800 * 1024;
+/** The qualities tried, best first, until the cutaway fits TOWER_MAX_BYTES. */
+export const TOWER_QUALITIES = Object.freeze([0.85, 0.7]);
+
+/**
+ * PURE (G1283): the key a Tower's cutaway is made from: the drawing's version, the Tower's style,
+ * its floors (and a floor going up), its name and a HOME_REFRESH_MS bucket, as the home street's.
+ * Decorating inside marks it stale instead (homePictureStale).
+ */
+export function towerKeyOf(tower, now = Date.now()) {
+  const style = String(tower?.style || 'base').toLowerCase().replace(/[^a-z0-9_-]/g, '').slice(0, 16) || 'base';
+  const floors = Math.max(1, Math.min(99, Math.floor(Number(tower?.floors) || 1)));
+  return `t1-${style}-${floors}${tower?.expanding ? 'x' : ''}-${shortHash(tower?.name || '')}-${Math.floor(Number(now) / HOME_REFRESH_MS).toString(36)}`;
+}
+
+/**
+ * PURE (G1283): whether to send a Tower's cutaway now. Only for a built Tower of the player's own,
+ * to a site that takes one (its profile answer has a `tower` field); when the site holds none or
+ * one made from another key (shouldUpload), or the home changed HOME_STALE_DELAY_MS ago
+ * (decorating, a Tower change, cultivation: staleRefreshDue), as saveHomeImg after those.
+ */
+export function towerShotDue({ tower, profile, key, staleAt = 0, now, lastTry = 0, failedAt = 0 }) {
+  if (!tower?.built || !profile || !Object.hasOwn(profile, 'tower')) return false;
+  return shouldUpload({ held: profile.tower, key, now, lastTry, failedAt }) || staleRefreshDue({ staleAt, now, lastTry, failedAt });
+}
+
+/**
  * Whether to upload a picture now: the site has none, or one made from
  * another key; never twice within RETRY_MS, nor within FAILURE_BACKOFF_MS
  * of a failure.

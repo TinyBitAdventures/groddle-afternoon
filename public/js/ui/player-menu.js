@@ -29,7 +29,7 @@
  * for the features). QA: canvas data contextMenu "player:<id>", playerMenu here|list.
  */
 
-import { PROFILE_PAGE_VERB } from '../profiles.js?v=b1c63974';
+import { PROFILE_PAGE_VERB } from '../profiles.js?v=7caf2524';
 import { IM_VERB_ID } from '../player-im.js?v=87bdb8ec';
 import { BUDDY_VERBS } from '../buddies.js?v=4457d8a4';
 import { BUDDY_DESTINATION_VERB } from '../buddy-list.js?v=b418f3f2';

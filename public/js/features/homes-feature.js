@@ -227,11 +227,11 @@ import { RADIO_TEXT, radioOwned } from '../vine-radio.js?v=c001a82c';
 import { displayTopOf, itemstackOverlayPoint, overlayAlpha, overlayLifeMs, playPoofIn, trackOverlay } from '../overlay-art.js?v=e50bacca';
 import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=d787e3c3';
 import { fadeInNewNear } from '../poof-fade.js?v=57db6aea';
-import { projectApi } from './street-jobs-feature.js?v=e0b4265d';
+import { projectApi } from './street-jobs-feature.js?v=028298d2';
 import { TOWER_CHASSIS, TOWER_CONFIG, TOWER_DOOR_DX, TOWER_GEO, TOWER_PROTO, normalizeTowerState } from '../home-tower.js?v=a7fc0cce';
 import { drawTowerBench, drawTowerElevator, drawTowerExit, towerApi, visitorTowerView } from './home-tower-feature.js?v=ea8cb854';
 import { pieceUrl, roomPieces, surfaceAt, swatchPiece, wallTargetAt } from '../home-wallpaper.js?v=a882fa38';
-import { renderHomeLocation } from '../home-shot-render.js?v=cc17af36';
+import { renderHomeLocation } from '../home-shot-render.js?v=913b14b9';
 import { maxTextureSizeOf, sharpDeco, wantsHiresDecos } from '../deco-hires.js?v=34f36d77';
 import { SHARP_DECOS } from '../deco-sharp-list.js?v=7d615f20';
 import { resourceNodesFeature } from './resource-nodes-feature.js?v=8601e418';
@@ -9271,12 +9271,22 @@ export const homesFeature = {
     return x0 > 0 ? x0 + YARD_WALL_DX : null;
   },
 
-  /** G226: game.js dropped-stack key; each Tower floor has its own. */
   /** G1284 (js/home-shot-render.js): the home location a whole-home picture shows, or null. */
   homeShotSource(engine, kind = null) {
     return homeShotSource(engine, kind);
   },
 
+  /**
+   * G1283 (features/profiles-feature.js, the Tower's public page): the player's own Tower as its
+   * picture's key needs it ({ built, style, floors, expanding, name }), or null without a built one.
+   */
+  homeTowerInfo() {
+    const t = towerApi.state?.();
+    if (!t?.built) return null;
+    return { built: true, style: t.style || 'base', floors: t.floors, expanding: Boolean(t.expanding), name: t.name || '' };
+  },
+
+  /** G226: game.js dropped-stack key; each Tower floor has its own. */
   dropTsid(tsid) {
     if (tsid !== HOME_INTERIOR_TSID) return null;
     const floor = towerApi.currentFloor();

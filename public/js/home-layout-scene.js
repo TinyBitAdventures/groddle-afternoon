@@ -12,8 +12,8 @@
  * `walkHomeScene` takes the stage through a small adapter so tests can feed it
  * plain objects; `collectHomeLayout(engine)` is the game's call.
  */
-import { AVATAR_STILL } from './profiles.js?v=b1c63974';
-import { buildHomeLayout, describeHomeThing, homeViewFrame, splitFrameToSheet } from './home-layout.js?v=b1065709';
+import { AVATAR_STILL } from './profiles.js?v=7caf2524';
+import { buildHomeLayout, describeHomeThing, homeViewFrame, splitFrameToSheet } from './home-layout.js?v=c6ab27df';
 import { sceneViewCap } from './location-view.js?v=fa4d254b';
 
 /** The URL a texture source was loaded from (js/textures.js labels sources with it), or ''. */

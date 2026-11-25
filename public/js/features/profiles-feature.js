@@ -36,6 +36,16 @@
  *   QA in solo: &homelayoutdemo=1 gives window.groddleHomeShot() (the
  *   picture's frame as a canvas) and window.groddleHomeLayout() (the
  *   whole street now; ({ street: false }) for the view).
+ * - G1283: the Tower's cutaway, for the Tower's public page (site PlayerPages
+ *   /players/<name>/tower/, as Glitch's Tower location pages): every floor
+ *   stacked (js/home-shot-render.js renderHomeLocation, kind 'tower') 720 wide
+ *   as saveHomeImg posted it, sent to profile/tower with the Tower's name when
+ *   the player has a built Tower, is settled anywhere in their own home (not
+ *   on a visit), and the site holds none or one of another key (its style,
+ *   floors, name, or six hours), or the home changed (homePictureStale: 3 s
+ *   after decorating, a Tower change or cultivation). Only to a site whose
+ *   profile answer has a tower field. Never a house's inside: Glitch never
+ *   showed one.
  * - The description: Menu > Account gets "Your profile" (a text box with a
  *   character count, Save, and "See your profile"), through the
  *   accountProfile query account-backup-feature asks.
@@ -58,23 +68,26 @@
  * minutes after a failure; the site refuses a second within 15 s).
  * Multiplayer only: solo never loads a profile or draws anything.
  * QA: window.groddleProfiles (state, uploadAvatar, uploadHome, layout,
- * uploadLayout); canvas data profileAvatar / profileHome / profileHomeLayout
+ * uploadLayout, uploadTower); canvas data profileAvatar / profileHome / profileHomeLayout / profileTower
  * (idle, uploading, uploaded, failed),
  * profileAboutSaved (saved, failed), profilePage (the last opened page's path),
  * profilePages (id:public|none, the players looked up).
  */
 
-import { createMinnAccount } from '../minn-account.js?v=c6a70577';
+import { createMinnAccount } from '../minn-account.js?v=3d783519';
 import { drawListFor, loadCatalog, paintItems, prepareLook } from '../avatar-compositor.js?v=dfe4b032';
 import { drawListBounds } from '../avatar-rig.js?v=b67f0da8';
 import { lookKey, resolveLook } from '../avatar-looks.js?v=5a28384d';
 import {
   AVATAR_FRAME, AVATAR_STILL, AVATAR_TILE, FAILURE_BACKOFF_MS, HOME_BACKDROP, HOME_MAX_BYTES, HOME_QUALITY, HOME_RESOLUTION, HOME_SETTLE_MS, HOME_TYPES,
   PICTURE_RESOLUTION, PROFILE_COPY, PROFILE_PAGE_VERB,
+  TOWER_MAX, TOWER_MAX_BYTES, TOWER_QUALITIES, TOWER_SHOT_WIDTH,
   aboutCounter, profilePagePath, profilePageVerb, avatarKeyOf, base64Bytes, homeKeyOf, homeSizes, imageBase64, pngBase64, shouldUpload, staleRefreshDue, stillTransform,
-} from '../profiles.js?v=b1c63974';
-import { homeLayoutJson, homeLayoutKeyOf, HOME_LAYOUT_LIMITS } from '../home-layout.js?v=b1065709';
-import { collectHomeLayout, homeFrameFor } from '../home-layout-scene.js?v=d9213f99';
+  towerKeyOf, towerShotDue,
+} from '../profiles.js?v=7caf2524';
+import { homeLayoutJson, homeLayoutKeyOf, HOME_LAYOUT_LIMITS } from '../home-layout.js?v=c6ab27df';
+import { collectHomeLayout, homeFrameFor } from '../home-layout-scene.js?v=7f45c357';
+import { renderHomeLocation } from '../home-shot-render.js?v=913b14b9';
 
 export const PROFILES_FEATURE_ID = 'profiles';
 
@@ -155,11 +168,9 @@ export function lookUpPlayersHere(engine) {
   return null;
 }
 
-function create(engine) {
-  // The REST nonce /play/online/ booted with (js/online-boot.js), as buddies-feature and realtime-feature use.
-  const boot = globalThis.GRODDLE_MP_BOOT || {};
-  const account = createMinnAccount({ baseUri: document.baseURI, nonce: boot.nonce || '' });
-  const s = {
+/** The feature's state around a minn-account client (create; tests make one with a fake account). */
+export function profilesState(account) {
+  return {
     account,
     profile: null,
     loading: null,
@@ -169,18 +180,27 @@ function create(engine) {
     avatar: { lastTry: 0, failedAt: 0, busy: false, status: 'idle' },
     home: { lastTry: 0, failedAt: 0, busy: false, status: 'idle', picture: null, staleAt: 0, why: '' },
     layout: { lastTry: 0, failedAt: 0, busy: false, status: 'idle', bytes: 0, key: '', staleAt: 0 },
+    // G1283: the Tower's cutaway; since: when the player settled in their own home (any room).
+    tower: { lastTry: 0, failedAt: 0, busy: false, status: 'idle', picture: null, staleAt: 0, since: 0 },
   };
+}
+
+function create(engine) {
+  // The REST nonce /play/online/ booted with (js/online-boot.js), as buddies-feature and realtime-feature use.
+  const boot = globalThis.GRODDLE_MP_BOOT || {};
+  const s = profilesState(createMinnAccount({ baseUri: document.baseURI, nonce: boot.nonce || '' }));
   globalThis.groddleProfiles = {
-    state: () => ({ profile: s.profile, avatar: { ...s.avatar }, home: { ...s.home }, layout: { ...s.layout }, homeSince: s.homeSince }),
+    state: () => ({ profile: s.profile, avatar: { ...s.avatar }, home: { ...s.home }, layout: { ...s.layout }, tower: { ...s.tower }, homeSince: s.homeSince }),
     uploadAvatar: () => uploadAvatar(engine, s, { force: true }),
     uploadHome: () => uploadHome(engine, s, { force: true }),
     layout: () => collectHomeLayout(engine, { street: true }),
     uploadLayout: () => uploadLayout(engine, s, { force: true }),
+    uploadTower: () => uploadTower(engine, s, { force: true }),
   };
   return s;
 }
 
-const DATA_KEYS = { avatar: 'profileAvatar', home: 'profileHome', layout: 'profileHomeLayout' };
+const DATA_KEYS = { avatar: 'profileAvatar', home: 'profileHome', layout: 'profileHomeLayout', tower: 'profileTower' };
 
 function mark(engine, s, which, status) {
   s[which].status = status;
@@ -279,11 +299,11 @@ async function uploadAvatar(engine, s, { force = false } = {}) {
 const encoders = {};
 
 /** A canvas as a base64 picture of `type`, or null when the browser wrote another type. */
-async function encodeCanvas(canvas, type) {
+async function encodeCanvas(canvas, type, quality = HOME_QUALITY) {
   let dataUrl = '';
   if (typeof canvas.toBlob === 'function' && typeof FileReader === 'function') {
     // toBlob encodes off the main thread where the browser can.
-    const blob = await new Promise((resolve) => canvas.toBlob(resolve, type, HOME_QUALITY));
+    const blob = await new Promise((resolve) => canvas.toBlob(resolve, type, quality));
     if (!blob || blob.type !== type) return null;
     dataUrl = await new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -292,7 +312,7 @@ async function encodeCanvas(canvas, type) {
       reader.readAsDataURL(blob);
     });
   } else {
-    dataUrl = canvas.toDataURL(type, HOME_QUALITY);
+    dataUrl = canvas.toDataURL(type, quality);
   }
   const picture = imageBase64(dataUrl);
   return picture.type === type && picture.b64 ? picture : null;
@@ -409,6 +429,98 @@ async function uploadLayout(engine, s, { force = false } = {}) {
   }
 }
 
+/**
+ * G1283: the Tower's cutaway as the site keeps it: every floor (renderHomeLocation, kind 'tower')
+ * TOWER_SHOT_WIDTH wide, WebP (JPEG where the browser cannot write WebP) at the best of
+ * TOWER_QUALITIES that fits TOWER_MAX_BYTES. { b64, type, w, h, bytes } or null.
+ * `render` and `encode` are the renderer's and the encoder's (tests pass their own).
+ */
+export async function drawTower(engine, { render = renderHomeLocation, encode = encodeCanvas } = {}) {
+  const shot = await render(engine, { kind: 'tower', width: TOWER_SHOT_WIDTH });
+  const canvas = shot?.canvas;
+  if (!canvas?.width || !canvas?.height) return null;
+  try {
+    if (canvas.width > TOWER_MAX.w || canvas.height > TOWER_MAX.h) return null;
+    for (const type of HOME_TYPES) {
+      if (encoders[type] === false) continue;
+      for (const quality of TOWER_QUALITIES) {
+        const picture = await encode(canvas, type, quality);
+        if (!picture) {
+          encoders[type] = false;
+          break;
+        }
+        encoders[type] = true;
+        const bytes = base64Bytes(picture.b64);
+        if (bytes <= TOWER_MAX_BYTES) return { ...picture, w: canvas.width, h: canvas.height, bytes };
+      }
+    }
+    return null;
+  } finally {
+    canvas.width = 0;
+    canvas.height = 0;
+  }
+}
+
+/** G1283: the stale marks a home change leaves (homePictureStale): the home street's picture, its layout and the Tower's. */
+export function markHomeStale(s, why, now = Date.now()) {
+  s.home.staleAt = now;
+  s.home.why = String(why || '');
+  s.layout.staleAt = now;
+  s.tower.staleAt = now;
+}
+
+/**
+ * G1283: the Tower's cutaway, sent when towerShotDue says (or `force`): a built Tower of the
+ * player's own, to a site that takes one. `now` is the tick's clock; `render` and `encode` as
+ * drawTower's.
+ */
+export async function uploadTower(engine, s, { force = false, now = Date.now(), render, encode } = {}) {
+  if (s.tower.busy || (!force && s.tower.failedAt && now - s.tower.failedAt < FAILURE_BACKOFF_MS)) return false;
+  const tower = engine.query?.('homeTowerInfo', engine) || null;
+  if (!tower?.built) return false;
+  s.tower.busy = true;
+  try {
+    const profile = await load(s);
+    if (!profile || !Object.hasOwn(profile, 'tower')) return false;
+    const key = towerKeyOf(tower, now);
+    if (!force && !towerShotDue({ tower, profile, key, staleAt: s.tower.staleAt, now, lastTry: s.tower.lastTry, failedAt: s.tower.failedAt })) return false;
+    s.tower.lastTry = now;
+    s.tower.staleAt = 0;
+    mark(engine, s, 'tower', 'uploading');
+    const picture = await drawTower(engine, { ...(render ? { render } : {}), ...(encode ? { encode } : {}) });
+    if (!picture) throw new Error('the Tower could not be drawn small enough');
+    s.tower.picture = { type: picture.type, w: picture.w, h: picture.h, bytes: picture.bytes };
+    s.profile = await s.account.uploadTower({ key, tower: picture.b64, name: tower.name || '' });
+    s.tower.failedAt = 0;
+    mark(engine, s, 'tower', 'uploaded');
+    return true;
+  } catch (err) {
+    s.tower.failedAt = now;
+    mark(engine, s, 'tower', 'failed');
+    console.warn('[profiles] tower picture', err?.message || err);
+    return false;
+  } finally {
+    s.tower.busy = false;
+  }
+}
+
+/**
+ * G1283, each tick: in the player's own home (street, house or Tower; never on a visit), after
+ * HOME_SETTLE_MS there with nothing in front of the view (`clear`, asked only then), the Tower's
+ * cutaway is sent when due. Returns the upload under way, or null.
+ */
+export function towerTick(engine, s, t, { clear = () => true, ...opts } = {}) {
+  const ctx = engine.homeContext?.();
+  const own = Boolean(ctx?.inHome && ctx.owned) && !engine.query?.('neighboursVisiting', engine);
+  if (!own) {
+    s.tower.since = 0;
+    return null;
+  }
+  s.tower.since ||= t;
+  if (s.tower.busy || t - s.tower.since < HOME_SETTLE_MS || !clear()) return null;
+  return uploadTower(engine, s, { now: t, ...opts });
+}
+
 const STYLE = `
 .account-profile { margin-top: var(--sp-8); padding-top: 0.8rem; border-top: 1px solid var(--border); }
 .account-profile h3 { margin: 0 0 0.3rem; font-size: var(--fs-lg); }
@@ -522,7 +634,9 @@ export const profilesFeature = {
   },
 
   onStreetEnter() {
-    if (state) state.homeSince = 0;
+    if (!state) return;
+    state.homeSince = 0;
+    state.tower.since = 0;
   },
 
   onTick(dtMs, now, engine) {
@@ -546,6 +660,8 @@ export const profilesFeature = {
     } else {
       state.homeSince = 0;
     }
+    // G1283: the Tower's cutaway, from anywhere in the player's own home.
+    if (!state.tower.busy) towerTick(engine, state, t, { clear: () => viewClear(engine) });
   },
 
   /**
@@ -557,10 +673,8 @@ export const profilesFeature = {
    */
   homePictureStale(why, engine) {
     if (!state || engine?.mode !== 'multiplayer') return null;
-    const now = Date.now();
-    state.home.staleAt = now;
-    state.home.why = String(why || '');
-    state.layout.staleAt = now;
+    // G1283: the Tower's cutaway too.
+    markHomeStale(state, why);
     engine.setData?.('profileHomeStale', state.home.why);
     return true;
   },

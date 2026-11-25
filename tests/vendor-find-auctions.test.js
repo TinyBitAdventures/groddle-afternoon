@@ -12,7 +12,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { AUCTION_TEXT } from '../public/js/auctions.js?v=2b806ad4';
-import { auctionsFeature } from '../public/js/features/auctions-feature.js?v=0cba5176';
+import { auctionsFeature } from '../public/js/features/auctions-feature.js?v=fac3010c';
 
 const root = join(import.meta.dirname, '..');
 const read = (rel) => readFileSync(join(root, 'public', rel), 'utf8');

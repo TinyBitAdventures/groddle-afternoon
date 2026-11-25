@@ -18,9 +18,9 @@ import {
   AVATAR_STILL, AVATAR_TILE, FAILURE_BACKOFF_MS, HOME_BACKDROP, HOME_MAX, HOME_MAX_BYTES, HOME_QUALITY, HOME_REFRESH_MS, HOME_RESOLUTION, HOME_TYPES, HOME_WIDTHS,
   PROFILE_ABOUT_MAX, PROFILE_COPY, RETRY_MS,
   aboutCounter, aboutLength, avatarKeyOf, base64Bytes, cleanAbout, homeKeyOf, homeSizes, imageBase64, pngBase64, profileSlug, shortHash, shouldUpload, stillTransform,
-} from '../public/js/profiles.js?v=b1c63974';
-import { createMinnAccount } from '../public/js/minn-account.js?v=c6a70577';
-import { FEATURES } from '../public/js/features/index.js?v=66a4c6a4';
+} from '../public/js/profiles.js?v=7caf2524';
+import { createMinnAccount } from '../public/js/minn-account.js?v=3d783519';
+import { FEATURES } from '../public/js/features/index.js?v=f7b13181';
 import { SITE_DIR, skipWithoutSite } from '../tools/repos.mjs';
 import { loadContentCatalogsFromDir, getSkillCatalog } from '../public/js/content-catalogs.js?v=2b7048b9';
 import { skillTitle } from '../public/js/skill-tree.js?v=08772a4b';
@@ -204,7 +204,8 @@ describe('the profiles feature', () => {
   });
 
   it('writes WebP, and JPEG where the canvas cannot (Safari hands back a PNG for WebP)', () => {
-    assert.match(src, /canvas\.toBlob\(resolve, type, HOME_QUALITY\)/);
+    assert.match(src, /async function encodeCanvas\(canvas, type, quality = HOME_QUALITY\) \{/);
+    assert.match(src, /canvas\.toBlob\(resolve, type, quality\)/);
     assert.match(src, /if \(!blob \|\| blob\.type !== type\) return null;/);
     assert.match(src, /for \(const type of HOME_TYPES\)/);
     assert.match(src, /ctx\.fillStyle = HOME_BACKDROP;/, 'flattened on the sky, so a JPEG has no black');
@@ -236,16 +237,19 @@ describe('the site side (groddle-afternoon-site)', { skip: skipWithoutSite }, ()
       'Put /groddle/v1/profile/avatar SignedIn',
       'Put /groddle/v1/profile/home SignedIn',
       'Put /groddle/v1/profile/home-layout SignedIn',
+      'Put /groddle/v1/profile/tower SignedIn',
     ]);
     assert.deepEqual(routes('PlayerPages.php'), [
       'Get /players Public',
       'Get /players/ Public',
       'Get /players/{id:\\d+}/snaps/{snap:\\d+}/{kind:picture|small|download} Public',
-      'Get /players/{id:\\d+}/{kind:avatar|tile|home|home-small} Public',
+      'Get /players/{id:\\d+}/{kind:avatar|tile|home|home-small|tower-image} Public',
       'Get /players/{slug:[a-z0-9][a-z0-9.-]*} Public',
       'Get /players/{slug:[a-z0-9][a-z0-9.-]*}/ Public',
       'Get /players/{slug:[a-z0-9][a-z0-9.-]*}/snaps/{snap:\\d+} Public',
       'Get /players/{slug:[a-z0-9][a-z0-9.-]*}/snaps/{snap:\\d+}/ Public',
+      'Get /players/{slug:[a-z0-9][a-z0-9.-]*}/{place:home-street|tower} Public',
+      'Get /players/{slug:[a-z0-9][a-z0-9.-]*}/{place:home-street|tower}/ Public',
       'Get /players/{slug:[a-z0-9][a-z0-9.-]*}/{tab:snaps|skills|achievements|buddies} Public',
       'Get /players/{slug:[a-z0-9][a-z0-9.-]*}/{tab:snaps|skills|achievements|buddies}/ Public',
       'Post /players/{slug:[a-z0-9][a-z0-9.-]*}/buddy/ Public',

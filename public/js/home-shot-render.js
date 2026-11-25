@@ -25,7 +25,7 @@
 import { readbackCanvas } from './render-probe.js?v=519c86ef';
 import { isLoaded, whenLoaded } from './textures.js?v=b8e38103';
 import { homeShotBands, homeShotRows, homeShotScale, homeShotSize } from './home-shot.js?v=4384d3a2';
-import { homeFrameFor } from './home-layout-scene.js?v=d9213f99';
+import { homeFrameFor } from './home-layout-scene.js?v=7f45c357';
 
 /** How long a texture still loading is waited for before the picture is drawn anyway (ms). */
 export const HOME_SHOT_WAIT_MS = 4000;

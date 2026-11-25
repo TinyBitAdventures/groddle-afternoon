@@ -15,12 +15,12 @@ import { execFileSync } from 'node:child_process';
 import { join } from 'node:path';
 import { homedir } from 'node:os';
 
-import { createMinnAccount, minnUrls } from '../public/js/minn-account.js?v=c6a70577';
+import { createMinnAccount, minnUrls } from '../public/js/minn-account.js?v=3d783519';
 import { GATE_COPY, JUJU_BOSS_GATES, SAVE_ALERT_COPY, bootDataFrom, deliverHandoff, gateFor, saveAlertFor } from '../public/js/online-boot.js?v=f1f2766b';
 import { SAVE_STOPPED } from '../public/js/save-store.js?v=4e720735';
 import { FORM_COPY, SETTINGS_COPY, resetLinkFrom } from '../public/js/account-forms.js?v=683e1475';
-import { restoreNeedsAsking, sizeLabel, slotForNewBackup, accountBackupFeature } from '../public/js/features/account-backup-feature.js?v=5ce4b0a4';
-import { FEATURES } from '../public/js/features/index.js?v=66a4c6a4';
+import { restoreNeedsAsking, sizeLabel, slotForNewBackup, accountBackupFeature } from '../public/js/features/account-backup-feature.js?v=b3154c46';
+import { FEATURES } from '../public/js/features/index.js?v=f7b13181';
 import { multiplayerEntryUrl } from '../public/js/game-mode.js?v=1ecf2899';
 import { SAVE_ENTRY_NAMES, createMultiplayerSaveStore } from '../public/js/save-store.js?v=4e720735';
 import { HAS_SITE, SITE_DIR, serverPath, skipWithoutServer, skipWithoutSite } from '../tools/repos.mjs';
@@ -554,7 +554,7 @@ describe('createMinnAccount: the core and the game\'s calls', () => {
       assert.equal(typeof full[name], 'function', name);
       assert.equal(core[name], undefined, `${name} stays out of the phone`);
     }
-    assert.equal(Object.keys(full).length, 93, 'no call lost in the move (G567 added deleteChannelLine; alternate characters seven; confirmEmail; G872 reportPlayer; G1213 nameChange and changeName; G1186 quarter; G1240 setSnapPublic)');
+    assert.equal(Object.keys(full).length, 94, 'no call lost in the move (G567 added deleteChannelLine; alternate characters seven; confirmEmail; G872 reportPlayer; G1213 nameChange and changeName; G1186 quarter; G1240 setSnapPublic; G1283 uploadTower)');
     assert.equal(minnUrls, coreUrls, 'one minnUrls, whichever file it is imported from');
   });
 

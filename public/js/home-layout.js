@@ -42,7 +42,7 @@ import { HIRES_ICONS } from './icon-hires.js?v=60e2474b';
 import { CULTIVATION_CLASSES } from './homes-catalog.js?v=0367f90f';
 import { TOWER_CHASSIS, TOWER_PROTO } from './home-tower.js?v=a7fc0cce';
 import { GROWN_TREE_LABELS } from './patches.js?v=3498abf3';
-import { shortHash } from './profiles.js?v=b1c63974';
+import { shortHash } from './profiles.js?v=7caf2524';
 import { MIN_PACK_HEIGHT, VIEW_CEIL_H, VIEW_MAX_W, stageFor } from './location-view.js?v=fa4d254b';
 
 export const HOME_LAYOUT_VERSION = 1;

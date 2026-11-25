@@ -14,7 +14,7 @@
  */
 import { mountAccountSettings } from '../account-forms.js?v=683e1475';
 import { mountChangeName } from '../change-name.js?v=4685ccda';
-import { PROFILE_COPY, aboutCounter } from '../profiles.js?v=b1c63974';
+import { PROFILE_COPY, aboutCounter } from '../profiles.js?v=7caf2524';
 
 export const PHONE_ACCOUNT_TEXT = Object.freeze({
   playing: (name) => `Playing as ${name || 'you'}.`,

@@ -29,12 +29,12 @@ import {
   freshReverse,
   normalizeList,
 } from '../public/js/buddies.js?v=4457d8a4';
-import { createMinnAccount } from '../public/js/minn-account.js?v=c6a70577';
-import { buddiesFeature } from '../public/js/features/buddies-feature.js?v=d51d7588';
+import { createMinnAccount } from '../public/js/minn-account.js?v=3d783519';
+import { buddiesFeature } from '../public/js/features/buddies-feature.js?v=6252f9bc';
 import { BUDDY_DESTINATION_TEXT, BUDDY_DESTINATION_VERB, buddyDestination, buddyFaceUrl, createFaceMemory } from '../public/js/buddy-list.js?v=b418f3f2';
 import { STREET_INDEX } from '../public/js/street-loader.js?v=10376267';
-import { FROM_LIST_VERBS, playerMenuRows } from '../public/js/ui/player-menu.js?v=63abc18f';
-import { FEATURES } from '../public/js/features/index.js?v=66a4c6a4';
+import { FROM_LIST_VERBS, playerMenuRows } from '../public/js/ui/player-menu.js?v=01c94f35';
+import { FEATURES } from '../public/js/features/index.js?v=f7b13181';
 import { serverPath, sitePath, skipWithoutServer, skipWithoutSite } from '../tools/repos.mjs';
 
 const root = join(import.meta.dirname, '..');

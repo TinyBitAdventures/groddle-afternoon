@@ -50,7 +50,7 @@
  * snapsLast, snapViewer, snapSize. window.groddleSnaps in multiplayer.
  */
 
-import { createMinnAccount } from '../minn-account.js?v=c6a70577';
+import { createMinnAccount } from '../minn-account.js?v=3d783519';
 import { exposeQA } from '../qa-gate.js?v=f4e2cd82';
 import { worldCanvasFont } from '../world-text.js?v=6b49f88c';
 import { ITEM_CATALOG, countItem, ensureItem, itemIcon } from '../inventory.js?v=6414dbdc';
@@ -62,7 +62,7 @@ import {
 } from '../snaps.js?v=887f3da9';
 import { VINTAGE_TEXT, applyFilter, filterComponents, filtersFor } from '../snap-filters.js?v=32315cf1';
 import { HOME_SHOT_COPY, homeShotState } from '../home-shot.js?v=4384d3a2';
-import { renderHomeLocation } from '../home-shot-render.js?v=cc17af36';
+import { renderHomeLocation } from '../home-shot-render.js?v=913b14b9';
 
 export const SNAPS_FEATURE_ID = 'snaps';
 const VERB = 'take_picture';

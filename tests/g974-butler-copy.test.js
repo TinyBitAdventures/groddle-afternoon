@@ -20,7 +20,7 @@ import { applyButlerStock, mergeParcels, normalizeButlerStock, normalizeGiftAnsw
 import { leavingWire, receiveWire } from '../public/js/copy-picks.js?v=b368fd49';
 import { bindToolInventory, copyTags, createToolConditionState, setCopyTag, setToolRemaining, toolCopies } from '../public/js/tools.js?v=4156bba8';
 import { addItem, createInventory } from '../public/js/inventory.js?v=6414dbdc';
-import { createMinnAccount } from '../public/js/minn-account.js?v=c6a70577';
+import { createMinnAccount } from '../public/js/minn-account.js?v=3d783519';
 import { HAS_SITE, SITE_DIR } from '../tools/repos.mjs';
 
 const root = join(import.meta.dirname, '..');

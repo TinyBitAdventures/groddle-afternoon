@@ -16,7 +16,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { addItem } from '../public/js/inventory.js?v=6414dbdc';
 import { layoutPack, saleBags } from '../public/js/pack-slots.js?v=38e4aea5';
-import { bagsFeature } from '../public/js/features/bags-feature.js?v=af96f8bc';
+import { bagsFeature } from '../public/js/features/bags-feature.js?v=db26bbe1';
 import { VENDOR_BAG_HOLDS, createVendorSellQuote, vendorSell } from '../public/js/vendor.js?v=f9bee39e';
 import { TRADE_TEXT } from '../public/js/trade.js?v=5fb43d2f';
 
