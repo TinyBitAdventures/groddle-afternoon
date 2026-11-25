@@ -129,6 +129,9 @@
   "public/js/avatar-tiles.js": {
     "reimagined: * and Reimagined hooks the name chips had), its label as title": "ours-avatar-tiles"
   },
+  "public/js/background-sound.js": {
+    "glitch-had-none: * Glitch never did: the Flash client kept playing when its": "phone-sound-hush"
+  },
   "public/js/bag-names.js": {
     "ours: \"another player dropped it\" case never comes up. Ours: an answer of only spaces counts as empty": "ours-bag-names",
     "ours: (an empty one keeps the old name). Ours departs here": "ours-bag-names",

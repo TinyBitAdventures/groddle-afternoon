@@ -6034,6 +6034,26 @@
    "rows": [
     "G1286"
    ]
+  },
+  {
+   "id": "phone-sound-hush",
+   "title": "Sound pauses when the page is hidden on a phone or tablet, with the setting \"Keep playing sound in the background\" (on by default on a computer, off on a phone or tablet)",
+   "kind": "behaviour",
+   "status": "kept",
+   "where": [
+    {
+     "file": "public/js/background-sound.js"
+    },
+    {
+     "file": "public/js/audio-resume.js"
+    }
+   ],
+   "why": "Glitch's Flash client kept playing when its window lost focus (StageBeacon.onDeactivate only throttled the frame rate; SoundMaster had no focus handling). Phones put the browser away, where music playing on was a report (#660).",
+   "ruling": "Austin 2026-11-25 (#693): keep sound playing in the background on a computer as Glitch did; pause on phones and tablets; a setting to choose",
+   "rows": [
+    "G1266",
+    "G1293"
+   ]
   }
  ]
 }
