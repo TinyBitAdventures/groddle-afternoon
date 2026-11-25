@@ -189,7 +189,7 @@ function createSession(engine, client) {
   const people = new Map();
   /** group id: the invite picker is open. */
   let inviting = 0;
-  /** The edit form open under one of the administrator's groups: { id, description } (the words typed so far). */
+  /** The edit form open under one of the administrator's groups: { id, name, description } (the words typed so far). */
   let editing = null;
 
   // —— The dock: tabs and the chat box ——
@@ -657,19 +657,47 @@ function createSession(engine, client) {
     });
   }
 
-  /** The administrator saves the edit form (groddle/v1/groups/{id}); the row takes the site's answer. */
-  async function edit(group, { description }) {
+  /** A group's new name in every list this game holds (the site's answer, or the server's group_renamed); true when one changed. */
+  function renamed(id, name) {
+    let changed = false;
+    const patch = (g) => {
+      if (g.id !== id || g.name === name) return g;
+      changed = true;
+      return { ...g, name };
+    };
+    if (list) list = { ...list, groups: list.groups.map(patch), invites: list.invites.map(patch) };
+    if (search.groups) search.groups = search.groups.map(patch);
+    return changed;
+  }
+
+  /** The administrator saves the edit form (groddle/v1/groups/{id}): its name and description; the row takes the site's answer. */
+  async function edit(group, { name, description }) {
     if (busy) return false;
+    // A name is sent only when it changed, so an old name the rules have since tightened on never blocks a description.
+    const newName = name === undefined ? '' : name.replace(/\s+/g, ' ').trim();
+    const rename = name !== undefined && newName !== group.name;
+    if (rename) {
+      const problem = groupNameProblem(newName);
+      if (problem) {
+        say0(problem, 'bad');
+        return false;
+      }
+    }
     busy = true;
     render();
     try {
-      const changed = normalizeGroup(await account.editGroup(group.id, { description }));
-      const patch = (g) => (g.id === changed.id ? { ...g, name: changed.name, description: changed.description } : g);
+      const fields = { description };
+      if (rename) fields.name = newName;
+      const changed = normalizeGroup(await account.editGroup(group.id, fields));
+      const wasName = group.name;
+      renamed(changed.id, changed.name);
+      const patch = (g) => (g.id === changed.id ? { ...g, description: changed.description } : g);
       if (list) list = { ...list, groups: list.groups.map(patch) };
       if (search.groups) search.groups = search.groups.map(patch);
       editing = null;
-      say0(GROUP_TEXT.edited(changed.name));
-      engine.toast?.(GROUP_TEXT.edited(changed.name), 3000);
+      const said = changed.name !== wasName ? GROUP_TEXT.renamed(changed.name) : GROUP_TEXT.edited(changed.name);
+      say0(said);
+      engine.toast?.(said, 3000);
       return true;
     } catch (err) {
       say0(err?.message || GROUP_TEXT.failed, 'bad');
@@ -682,9 +710,14 @@ function createSession(engine, client) {
     }
   }
 
-  /** The edit form under a group's row: the Make a group form's Description, filled with the words now. */
+  /** The edit form under a group's row: the Make a group form's Name and Description, filled with what they are now. */
   function editForm(g) {
     const f = el('form', { class: 'grp-edit', 'data-group-edit-form': String(g.id) });
+    const nameIn = el('input', { type: 'text', maxlength: '32', autocomplete: 'off', 'data-group-edit-name': String(g.id) });
+    nameIn.value = editing.name;
+    nameIn.addEventListener('input', () => { if (editing?.id === g.id) editing.name = String(nameIn.value || ''); });
+    const nameLabel = el('label', {}, 'Name');
+    nameLabel.append(nameIn);
     const descIn = el('textarea', { maxlength: String(DESCRIPTION_MAX), 'data-group-edit-description': String(g.id) });
     descIn.value = editing.description;
     descIn.addEventListener('input', () => { if (editing?.id === g.id) editing.description = String(descIn.value || ''); });
@@ -694,10 +727,10 @@ function createSession(engine, client) {
     const go = el('button', { type: 'submit', class: 'grp-go', 'data-group-edit-save': String(g.id) }, 'Save');
     go.disabled = busy;
     row.append(go, button('Cancel', { 'data-group-edit-cancel': String(g.id) }, () => { editing = null; render(); }));
-    f.append(descLabel, row);
+    f.append(nameLabel, descLabel, row);
     f.addEventListener('submit', (e) => {
       e.preventDefault?.();
-      edit(g, { description: String(descIn.value || '') });
+      edit(g, { name: String(nameIn.value || ''), description: String(descIn.value || '') });
     });
     return f;
   }
@@ -826,7 +859,7 @@ function createSession(engine, client) {
             button('Chat', { 'data-group-chat': String(g.id) }, () => { openChat(groupChannel(g.id)); closePanel(); }),
             button('Invite', { 'data-group-invite': String(g.id) }, () => { inviting = inviting === g.id ? 0 : g.id; if (inviting && !people.has(g.id)) showPeople(g); else render(); }),
             button('Members', { 'data-group-members': String(g.id) }, () => showPeople(g)),
-            admin ? button('Edit', { 'data-group-edit': String(g.id) }, () => { editing = editing?.id === g.id ? null : { id: g.id, description: g.description }; render(); }) : null,
+            admin ? button('Edit', { 'data-group-edit': String(g.id) }, () => { editing = editing?.id === g.id ? null : { id: g.id, name: g.name, description: g.description }; render(); }) : null,
             button('Leave', { 'data-group-leave': String(g.id) }, () => confirmLeave(g)),
           ].filter(Boolean), { extra: [editing?.id === g.id ? editForm(g) : null, extra] }));
         }
@@ -1001,6 +1034,15 @@ function createSession(engine, client) {
     engine.setData?.('groupsPurged', `${p.player}:${p.since}`);
   });
   client.on('msg:channel_note', (msg) => addNote(String(msg.channel || ''), String(msg.text || '')));
+  // G1300: a group of ours renamed by its administrator (the site's call, channels.go group_rename.go): tabs and lists take the name now.
+  client.on('msg:group_renamed', (msg) => {
+    const id = Math.floor(Number(msg.group));
+    const name = String(msg.name ?? '').slice(0, 32).trim();
+    if (!(id > 0) || !name || !renamed(id, name)) return;
+    engine.setData?.('groupsRenamed', `${id}:${name}`);
+    renderTabs();
+    if (!shade.hidden) render();
+  });
   client.on('msg:party', (msg) => {
     inParty = Boolean(msg.party);
     if (!inParty && tab === 'party') tab = 'street';

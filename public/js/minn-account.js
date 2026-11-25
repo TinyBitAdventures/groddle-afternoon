@@ -114,9 +114,10 @@ export function createMinnAccount(opts = {}) {
       return buddyCall('Making a group', 'groups', { method: 'POST', body: { name: String(name ?? ''), description: String(description ?? ''), mode: String(mode) } });
     },
 
-    /** The administrator changes a group (group.js:494-499 admin_edit): only the fields given are sent. */
-    async editGroup(id, { description } = {}) {
+    /** The administrator changes a group (group.js:494-499 admin_edit: its name and description): only the fields given are sent. */
+    async editGroup(id, { name, description } = {}) {
       const body = {};
+      if (name !== undefined) body.name = String(name ?? '');
       if (description !== undefined) body.description = String(description ?? '');
       return buddyCall('Saving the group', `groups/${Number(id)}`, { method: 'PUT', body });
     },

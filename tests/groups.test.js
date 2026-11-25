@@ -166,7 +166,8 @@ describe('minn-account group calls', () => {
     await a.leaveGroup(12);
     await a.inviteToGroup(7, '4');
     await a.declineGroupInvite(9);
-    await a.editGroup('7', { description: 'Quests on Sundays.', name: 'Not Sent' });
+    await a.editGroup('7', { description: 'Quests on Sundays.' });
+    await a.editGroup('7', { name: 'Sunday Club', description: 'Quests on Sundays.' });
     assert.deepEqual(calls.map((c) => [c.method || 'GET', c.url.replace(`${BASE}wp-json/groddle/v1/`, ''), c.body ?? null, c.headers['X-WP-Nonce']]), [
       ['GET', 'groups', null, 'abcdef0123'],
       ['GET', 'groups/search?q=zeb%20ra', null, 'abcdef0123'],
@@ -177,6 +178,7 @@ describe('minn-account group calls', () => {
       ['POST', 'groups/7/invites', '{"id":4}', 'abcdef0123'],
       ['DELETE', 'groups/9/invites', null, 'abcdef0123'],
       ['PUT', 'groups/7', '{"description":"Quests on Sundays."}', 'abcdef0123'],
+      ['PUT', 'groups/7', '{"name":"Sunday Club","description":"Quests on Sundays."}', 'abcdef0123'],
     ]);
   });
 
@@ -289,6 +291,9 @@ describe('groups feature (js/features/groups-feature.js)', () => {
         const sent = JSON.parse(init.body);
         events.push(`body:${init.body}`);
         const g = answer.groups.find((x) => x.id === 7);
+        // G1300: a name another group has is the site's 409, with its words.
+        if (sent.name === 'Zebra Club') return { status: 409, ok: false, headers: { get: () => null }, json: async () => ({ code: 'groddle_group_taken', message: 'There is already a group with that name. Try another.', data: { fields: { name: 'There is already a group with that name. Try another.' } } }) };
+        if (sent.name !== undefined) g.name = sent.name;
         g.description = sent.description;
         out = { ...g, member: true, invited: false, people: [{ id: 1, name: 'Ada', role: 'admin' }] };
         delete out.role;
@@ -473,7 +478,11 @@ describe('groups feature (js/features/groups-feature.js)', () => {
     assert.equal(box.value, 'Sunday nights.', 'filled with the words now');
     assert.equal(box.attrs.maxlength, String(DESCRIPTION_MAX), 'the Make a group form\'s limit');
     assert.match(shade.find('data-group-edit-form', '7').text(), /Description/);
-    assert.equal(shade.find('data-group-edit-name'), undefined, 'no name field: renaming waits on a ruling');
+    const nameBox = shade.find('data-group-edit-name', '7');
+    assert.ok(nameBox, 'G1300: a Name field');
+    assert.equal(nameBox.value, 'apple pickers', 'filled with the name now');
+    assert.equal(nameBox.attrs.maxlength, '32', 'the Make a group form\'s limit');
+    assert.match(shade.find('data-group-edit-form', '7').text(), /Name/);
     // What is typed survives a redraw (a chat line, a refresh).
     box.value = 'Come work on quests that you need multiple people around for!';
     box.fire('input');
@@ -484,7 +493,7 @@ describe('groups feature (js/features/groups-feature.js)', () => {
     shade.find('data-group-edit-form', '7').fire('submit');
     await wait(5);
     assert.ok(events.includes('fetch:PUT groups/7'));
-    assert.ok(events.includes('body:{"description":"Come work on quests that you need multiple people around for!"}'), 'the description only');
+    assert.ok(events.includes('body:{"description":"Come work on quests that you need multiple people around for!"}'), 'the description only: the name was not changed');
     assert.equal(s.list.groups.find((g) => g.id === 7).description, 'Come work on quests that you need multiple people around for!');
     assert.equal(s.list.groups.find((g) => g.id === 7).role, 'admin', 'the row keeps its place in the list');
     assert.ok(events.includes(`toast:${GROUP_TEXT.edited('apple pickers')}`));
@@ -501,6 +510,69 @@ describe('groups feature (js/features/groups-feature.js)', () => {
     assert.equal(await s.edit({ id: 12, name: 'Zebra Club' }, { description: 'x' }), false);
     assert.match(shade.text(), /Only the group's administrator can change it\./);
     s.closePanel();
+  });
+
+  it('G1300: the administrator renames the group from the form; the row and the chat tab take the name', async () => {
+    const s = globalThis.groddleGroups;
+    await s.openChat(groupChannel(7));
+    client.msg({ t: 'channel_joined', channel: 'group:7', history: [] });
+    const tabLabel = (ch) => dock.find('data-groups-tab', ch)?.text().trim();
+    assert.equal(tabLabel('group:7'), 'apple pickers');
+    s.openPanel();
+    await wait(5);
+    const shade = document.body.children.find((c) => c.attrs?.id === 'groups-shade');
+    // A name Make a group would refuse is refused here, in the same words, before any call.
+    shade.find('data-group-edit', '7').click();
+    shade.find('data-group-edit-name', '7').value = 'Zz';
+    events.length = 0;
+    shade.find('data-group-edit-form', '7').fire('submit');
+    await wait(5);
+    assert.ok(!events.some((e) => e.startsWith('fetch:PUT')));
+    assert.match(shade.text(), /Group names are 3 to 32/);
+    // A name another group has: the site's words, and the row keeps its name.
+    shade.find('data-group-edit-name', '7').value = 'Zebra Club';
+    shade.find('data-group-edit-form', '7').fire('submit');
+    await wait(5);
+    assert.ok(events.includes('body:{"name":"Zebra Club","description":"Come work on quests that you need multiple people around for!"}'));
+    assert.match(shade.text(), /There is already a group with that name\. Try another\./);
+    assert.ok(events.includes('toast:There is already a group with that name. Try another.'));
+    assert.equal(s.list.groups.find((g) => g.id === 7).name, 'apple pickers');
+    assert.ok(shade.find('data-group-edit-form', '7'), 'the form stays open to try another');
+    // A good one: both fields are saved; the row, the tab and the toast take the new name.
+    shade.find('data-group-edit-name', '7').value = '  Apple   Pickers Club ';
+    shade.find('data-group-edit-description', '7').value = 'Orchards on Sundays.';
+    events.length = 0;
+    shade.find('data-group-edit-form', '7').fire('submit');
+    await wait(5);
+    assert.ok(events.includes('body:{"name":"Apple Pickers Club","description":"Orchards on Sundays."}'), 'name and description, spaces as Make a group sends them');
+    assert.equal(s.list.groups.find((g) => g.id === 7).name, 'Apple Pickers Club');
+    assert.equal(s.list.groups.find((g) => g.id === 7).description, 'Orchards on Sundays.');
+    assert.ok(events.includes(`toast:${GROUP_TEXT.renamed('Apple Pickers Club')}`));
+    assert.equal(GROUP_TEXT.renamed('Apple Pickers Club'), 'You renamed the group to Apple Pickers Club.');
+    assert.match(shade.find('data-group', '7').text(), /Apple Pickers Club/);
+    assert.equal(tabLabel('group:7'), 'Apple Pickers Club');
+    assert.equal(shade.find('data-group-edit-form'), undefined);
+    s.closePanel();
+  });
+
+  it('G1300: a member hears the server\'s group_renamed and note: the tab, the list and the chat say the new name', async () => {
+    const s = globalThis.groddleGroups;
+    if (!s.list.groups.some((g) => g.id === 12)) answer.groups.push({ id: 12, name: 'Zebra Club', description: 'Stripes.', mode: 'public', members: 3, role: 'member' });
+    await s.refresh();
+    await s.openChat(groupChannel(12));
+    client.msg({ t: 'channel_joined', channel: 'group:12', history: [] });
+    assert.equal(dock.find('data-groups-tab', 'group:12')?.text().trim(), 'Zebra Club');
+    client.msg({ t: 'channel_note', channel: 'group:12', text: 'Bo renamed the group to Stripes Club.', at: 1 });
+    client.msg({ t: 'group_renamed', group: 12, name: 'Stripes Club' });
+    assert.equal(s.list.groups.find((g) => g.id === 12).name, 'Stripes Club');
+    assert.equal(dock.find('data-groups-tab', 'group:12')?.text().trim(), 'Stripes Club');
+    assert.equal(engine.data.groupsRenamed, '12:Stripes Club');
+    assert.deepEqual(s.chats.get('group:12').lines.at(-1), { note: true, text: 'Bo renamed the group to Stripes Club.' });
+    // Nothing for a group not in the list, or a name that is none.
+    client.msg({ t: 'group_renamed', group: 55, name: 'Elsewhere' });
+    client.msg({ t: 'group_renamed', group: 12, name: '   ' });
+    assert.equal(engine.data.groupsRenamed, '12:Stripes Club');
+    assert.ok(!s.list.groups.some((g) => g.name === 'Elsewhere'));
   });
 });
 
@@ -527,6 +599,7 @@ describe('groups across the repos', () => {
     for (const route of ["'/groddle/v1/groups'", "'/groddle/v1/groups/search'", "'/groddle/v1/groups/{id:\\d+}'", "'/groddle/v1/groups/{id:\\d+}/members'", "'/groddle/v1/groups/{id:\\d+}/invites'"]) assert.ok(php.includes(route), route);
     assert.equal((php.match(/Access::SignedIn/g) || []).length, 9, 'every route is signed-in only');
     assert.match(php, /#\[Route\(Method::Put, '\/groddle\/v1\/groups\/\{id:\\d\+\}'/, '#698: the administrator\'s edit');
+    assert.match(php, /->post\('group_rename', \['group' => \$gid, 'name' => \$changes\['name'\], 'by' => \$by\]\)/, 'G1300: a new name is told to the realtime server');
     assert.ok(!/\$request->json\(\)\[['"](user|sub|user_id)/.test(php), 'the user never comes from the request');
     assert.ok(php.includes(`MAX_GROUPS = ${GROUPS_MAX}`));
     assert.ok(php.includes("'k' => 'groups'"));
@@ -541,6 +614,10 @@ describe('groups across the repos', () => {
     const go = readFileSync(p, 'utf8');
     for (const k of ['groups_watch', 'channel_join', 'channel_leave', 'channel_say', 'channel_who']) assert.ok(go.includes(`r.Handle("${k}"`), k);
     for (const k of ['groups_status', 'channel_joined', 'channel_left', 'channel_said', 'channel_note']) assert.ok(go.includes(`"${k}"`), k);
+    // G1300: the site's group_rename call, and what it sends the members.
+    const rename = readFileSync(serverPath('group_rename.go'), 'utf8');
+    assert.ok(rename.includes('serviceHandlers["group_rename"]'));
+    assert.ok(rename.includes('"group_renamed"') && rename.includes('" renamed the group to "'));
     assert.ok(go.includes('c.K != "groups"'));
     const feature = read('public/js/features/groups-feature.js');
     for (const k of ['groups_watch', 'channel_join', 'channel_leave', 'channel_say', 'channel_who', 'groups_status', 'channel_joined', 'channel_left', 'channel_said', 'channel_note']) assert.ok(feature.includes(k), k);
