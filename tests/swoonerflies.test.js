@@ -12,6 +12,7 @@
 import { describe, it } from 'node:test';
 import { imageSize } from '../tools/image-size.mjs';
 import assert from 'node:assert/strict';
+import { createHash } from 'node:crypto';
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -24,7 +25,7 @@ import {
   SWOONERFLY_STATE,
   swoonerflyPlacementGroups,
   swoonerfliesFor,
-} from '../public/js/swoonerflies.js?v=75b61747';
+} from '../public/js/swoonerflies.js?v=326c8103';
 import { setWildlifeCatalog } from '../public/js/wildlife.js?v=670c3a7f';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -103,12 +104,37 @@ describe('the archived placements', () => {
     const png = readFileSync(join(pub, SWOONERFLY_SHEET.path));
     assert.deepEqual([imageSize(png).w, imageSize(png).h], [SWOONERFLY_SHEET.fw * SWOONERFLY_SHEET.frames, SWOONERFLY_SHEET.fh]);
   });
+
+  it('is the Swoonerfly\'s own SWF in fly-rooked, rendered at 3x, not a stand-in', () => {
+    // npc_swoonerfly.swf is byte for byte npc_butterfly.swf; 'fly-rooked' is its sprite 9 'fly', frames 1-14.
+    const r = JSON.parse(readFileSync(join(root, 'tools/vector-sprites/results.json'), 'utf8'))[SWOONERFLY_SHEET.path];
+    assert.equal(r?.status, 'ok');
+    assert.equal(r.swf, 'misc/npc/npc_butterfly/npc_butterfly.swf');
+    assert.equal(r.sprite, 9);
+    assert.equal(r.label, 'fly');
+    assert.deepEqual(r.swfFrames, [1, SWOONERFLY_SHEET.frames]);
+    assert.equal(r.cells, SWOONERFLY_SHEET.frames);
+    const hires = join(pub, r.hires);
+    assert.ok(existsSync(hires));
+    assert.deepEqual([imageSize(readFileSync(hires)).w, imageSize(readFileSync(hires)).h], [3 * SWOONERFLY_SHEET.fw * SWOONERFLY_SHEET.frames, 3 * SWOONERFLY_SHEET.fh]);
+    assert.match(readFileSync(join(pub, 'js/sprite-hires.js'), 'utf8'), /\["assets\/sprites\/quest-rooms\/gwendolyn\/swoonerfly_fall\.webp", "assets\/sprites\/quest-rooms\/gwendolyn\/swoonerfly_fall@3x\.webp"\]/);
+    for (const file of ['js/swoonerflies.js', 'js/quest-rooms/gwendolyn.js']) {
+      assert.doesNotMatch(readFileSync(join(pub, file), 'utf8'), /recoloured butterfly/, file);
+    }
+  });
+
+  const items = join(root, '..', 'glitch-items');
+  it('npc_swoonerfly.swf is npc_butterfly.swf, byte for byte', { skip: !existsSync(items) && 'glitch-items not beside this worktree' }, () => {
+    const sha = (rel) => createHash('sha1').update(readFileSync(join(items, rel))).digest('hex');
+    assert.equal(sha('inhabitants/swoonerfly/npc_swoonerfly.swf'), '63bafbd0648a4e3a629adceba425c83d1e889f48');
+    assert.equal(sha('misc/npc/npc_butterfly/npc_butterfly.swf'), '63bafbd0648a4e3a629adceba425c83d1e889f48');
+  });
 });
 
 describe('the feature', () => {
   it('is registered and draws one looping, untargetable sprite per objref', async () => {
     assert.match(readFileSync(join(pub, 'js/features/index.js'), 'utf8'), /import \{ swoonerfliesFeature \} from '\.\/swoonerflies-feature\.js\?v=[0-9a-f]{8}'; FEATURES\.push\(swoonerfliesFeature\);/);
-    const { swoonerfliesFeature } = await import('../public/js/features/swoonerflies-feature.js?v=0e4de29e');
+    const { swoonerfliesFeature } = await import('../public/js/features/swoonerflies-feature.js?v=e75ea47f');
     class AnimatedSprite {
       constructor(textures) {
         this.textures = textures;

@@ -34,7 +34,7 @@
  * geometry GHF8DDDBTPF3P4U, is an imported street), every line of dialogue
  * and timing, and the NPC art (OGA npc_cactus, npc_squid squidBlue and
  * squidPurple, npc_gwendolyn, npc_butterfly rooked frames for the
- * swoonerflies, whose own SWF is a recoloured butterfly). The cactus's spot
+ * swoonerflies, whose own SWF is the butterfly's, byte for byte). The cactus's spot
  * is lost (its objref carries no x/y); it stands by the trailer, where the
  * three reference recordings (V51lCz1q0qI, 01_XPTF2lZ0, 89tShFGl3uc) show
  * it. The Outer Mind, The Inner Mind and the Chamber are lost and rebuilt

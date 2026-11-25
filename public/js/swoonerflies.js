@@ -20,9 +20,15 @@
  *
  * The objrefs keep only the tsid and label (no x, y or y_destination), so the
  * spot on the street is lost: the shared street planner picks one, as it does
- * for the vendors. The art is the sheet Gwendolyn's room plays while one falls:
- * OGA npc_butterfly fly-rooked, 14 cells of 70 x 65 (CC0; the swoonerfly's
- * own SWF is a recoloured butterfly).
+ * for the vendors. The art is the Swoonerfly's own, not a stand-in: Tiny
+ * Speck's CC0 glitch-items inhabitants/swoonerfly/npc_swoonerfly.swf is
+ * byte for byte npc_butterfly.swf (sha1 63bafbd0, also the Wayback
+ * npc_butterfly-1306966114.swf), and its .fla is the butterfly's 2010 source
+ * (it holds npc_butterfly.xfl). Glitch's 'fly-rooked' is that SWF's rooked
+ * orientation (sprite 9) playing 'fly', frames 1-14; the only other label
+ * there is 'rest' (frame 15). So the sheet Gwendolyn's room plays is it: OGA
+ * npc_butterfly fly-rooked, 14 cells of 70 x 65, with a 3x render of those
+ * SWF frames (tools/vector-sprites/characters.json, swoonerfly_fall@3x).
  */
 
 export const SWOONERFLY_CLASS = 'npc_swoonerfly';
