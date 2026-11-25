@@ -2814,9 +2814,24 @@
   "deployed": "2026-11-25"
  },
  "git": {
-  "commits": 3505,
+  "commits": 3509,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-25",
+    "kind": "fix",
+    "text": "Pictures for the public home pages leave out players, chat bubbles and name plates"
+   },
+   {
+    "date": "2026-11-25",
+    "kind": "new",
+    "text": "A Tower's cutaway is sent to its public page, 720 wide, after decorating or a Tower change"
+   },
+   {
+    "date": "2026-11-25",
+    "kind": "fix",
+    "text": "A house file link keeps the house it laid on reload without a storage key of its own"
+   },
    {
     "date": "2026-11-25",
     "kind": "new",
@@ -2921,24 +2936,9 @@
     "date": "2026-11-25",
     "kind": "fix",
     "text": "Groddle Ladder's sky crack shows the starry night, not its white mask"
-   },
-   {
-    "date": "2026-11-25",
-    "kind": "fix",
-    "text": "Door and subway buttons on the street map stand beside the entrance art, not on it"
-   },
-   {
-    "date": "2026-11-25",
-    "kind": "fix",
-    "text": "Rocks, nodes and street furniture keep off shrines, the vendor, signposts and doors"
-   },
-   {
-    "date": "2026-11-24",
-    "kind": "fix",
-    "text": "A lonely Firebog street spirit's porthole face cries and flickers instead of standing still"
    }
   ]
  },
- "tests": 1379,
+ "tests": 1380,
  "generatedAt": "2026-11-25"
 }
