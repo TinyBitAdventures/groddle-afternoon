@@ -2814,9 +2814,19 @@
   "deployed": "2026-11-25"
  },
  "git": {
-  "commits": 3616,
+  "commits": 3620,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-25",
+    "kind": "new",
+    "text": "A Snap button in Camera Mode on phones"
+   },
+   {
+    "date": "2026-11-25",
+    "kind": "fix",
+    "text": "The profile's home street picture no longer shows the owner standing in it"
+   },
    {
     "date": "2026-11-25",
     "kind": "fix",
@@ -2926,19 +2936,9 @@
     "date": "2026-11-25",
     "kind": "fix",
     "text": "A refused drop of an emblem past today's limit says when it can be dropped"
-   },
-   {
-    "date": "2026-11-25",
-    "kind": "new",
-    "text": "A group's administrator can edit its description from Menu, Groups"
-   },
-   {
-    "date": "2026-11-25",
-    "kind": "improve",
-    "text": "On a phone, Act and the stick move between a garden's plots while tending, so gardening is a tap, a drag and a tap"
    }
   ]
  },
- "tests": 1405,
+ "tests": 1406,
  "generatedAt": "2026-11-25"
 }
