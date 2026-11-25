@@ -74,7 +74,7 @@
  * profilePages (id:public|none, the players looked up).
  */
 
-import { createMinnAccount } from '../minn-account.js?v=3d783519';
+import { createMinnAccount } from '../minn-account.js?v=ca5f77b3';
 import { drawListFor, loadCatalog, paintItems, prepareLook } from '../avatar-compositor.js?v=dfe4b032';
 import { drawListBounds } from '../avatar-rig.js?v=b67f0da8';
 import { lookKey, resolveLook } from '../avatar-looks.js?v=5a28384d';

@@ -25,7 +25,7 @@ import { ITEM_CATALOG } from './inventory.js?v=6414dbdc';
 import { registerDropTarget } from './drop-targets.js?v=59e6edb4';
 import { draggedStack } from './drag-stack.js?v=80e43757';
 import { showWorldDropTip } from './features/world-drop-feature.js?v=744cb52d';
-import { VISITOR_BUTLER_TEXT } from './neighbours-mp.js?v=1ea504ef';
+import { VISITOR_BUTLER_TEXT } from './neighbours-mp.js?v=f06a47a2';
 
 /** leave_package's drop_tip (bag_butler.js 1003). */
 export const BUTLER_DROP_TIP = 'Leave a package with the Butler';

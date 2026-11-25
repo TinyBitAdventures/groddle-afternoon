@@ -85,9 +85,9 @@ import { woodTreeStatusLabel } from '../woodcutting.js?v=9e9af511';
 import { animalStatusLabel } from '../animals.js?v=19981d8f';
 import { frameTexture, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js?v=b8e38103';
 import { createBackYardState, homeStreetLayout, normalizeCultivationState } from '../home-cultivation.js?v=2f71ba70';
-import { insideQuery, readVisitScene } from '../neighbours-mp.js?v=1ea504ef';
+import { insideQuery, readVisitScene } from '../neighbours-mp.js?v=f06a47a2';
 import { saveStore } from '../save-store.js?v=4e720735';
-import { BACK_YARD_GROUND_Y, STREET_GROUND_Y, homesFeature, wearHomeCultivation } from './homes-feature.js?v=5018619f';
+import { BACK_YARD_GROUND_Y, STREET_GROUND_Y, homesFeature, wearHomeCultivation } from './homes-feature.js?v=fe6edf37';
 import { holdYardAnimal } from './animal-husbandry-feature.js?v=7f40b2d5';
 import { patchesFeature, treeFrameUrl } from './patches-feature.js?v=5dbc6102';
 import {
@@ -112,7 +112,7 @@ import {
   visitorRewardDelta,
   visitorRewardSnapshot,
   visitorTreeState,
-} from '../yard-verbs-mp.js?v=98aa6a48';
+} from '../yard-verbs-mp.js?v=14d12d1c';
 import { yardFixtureRows, yardFixtureVerbs, yardFixturesKey } from '../yard-fixtures-mp.js?v=dd022fe8';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
 import { followYardPath, holdYardWalk, stickForClass } from '../yard-wander.js?v=28f55f45';

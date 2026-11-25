@@ -14,9 +14,9 @@ import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { SITE_DIR, HAS_SITE, serverPath, sitePath, skipWithoutServer, skipWithoutSite } from '../tools/repos.mjs';
 import { BUDDY_VERBS, buddyVerbs, normalizeList } from '../public/js/buddies.js?v=4457d8a4';
-import { BLOCKED_PLAYER_VERBS, FROM_LIST_VERBS, blockedPlayerVerbs, playerMenuRows } from '../public/js/ui/player-menu.js?v=01c94f35';
+import { BLOCKED_PLAYER_VERBS, FROM_LIST_VERBS, blockedPlayerVerbs, playerMenuRows } from '../public/js/ui/player-menu.js?v=f1cf9098';
 import { PLAYER_REPORT_NOTE_MAX, PLAYER_REPORT_TEXT, playerReportView } from '../public/js/player-report.js?v=8d7e5653';
-import { createMinnAccount } from '../public/js/minn-account.js?v=3d783519';
+import { createMinnAccount } from '../public/js/minn-account.js?v=ca5f77b3';
 
 const root = join(import.meta.dirname, '..');
 const game = (f) => readFileSync(join(root, 'public', f), 'utf8');
