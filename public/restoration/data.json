@@ -2814,9 +2814,19 @@
   "deployed": "2026-11-25"
  },
  "git": {
-  "commits": 3588,
+  "commits": 3592,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-25",
+    "kind": "improve",
+    "text": "The padlock on your own things at home says \"Only you can pick this up\" on hover"
+   },
+   {
+    "date": "2026-11-25",
+    "kind": "improve",
+    "text": "On a computer, things in reach glow instead of a chip naming them as you walk past"
+   },
    {
     "date": "2026-11-25",
     "kind": "improve",
@@ -2926,19 +2936,9 @@
     "date": "2026-11-25",
     "kind": "improve",
     "text": "A visitor walked out of a house keeps no copy of its inside"
-   },
-   {
-    "date": "2026-11-25",
-    "kind": "fix",
-    "text": "A friend's back yard draws each rock, node and Patch once for those let in"
-   },
-   {
-    "date": "2026-11-25",
-    "kind": "improve",
-    "text": "Comment wording on the house-locked line"
    }
   ]
  },
- "tests": 1399,
+ "tests": 1400,
  "generatedAt": "2026-11-25"
 }
