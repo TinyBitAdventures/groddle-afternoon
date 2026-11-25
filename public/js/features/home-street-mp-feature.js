@@ -64,8 +64,8 @@ import { NOTE_POLE_CONTAINERS, NOTE_POLE_PARTS, NOTE_POLE_SIGN_Y } from '../note
 import { textureFromUrl } from '../textures.js?v=b8e38103';
 import { addSignBoard, signArmWidth, signLabel } from '../street-render.js?v=cfb77c44';
 import { openNotePicker, openNoteView } from '../note-view.js?v=c512b345';
-import { homeStreetName, possessive, readVisitScene } from '../neighbours-mp.js?v=1ea504ef';
-import { BACK_YARD_GROUND_Y, SIGN_PROMPT_LIFT, STREET_GROUND_Y, homesFeature, visitorHomeState } from './homes-feature.js?v=b0eea316';
+import { homeStreetName, insideQuery, possessive, readVisitScene } from '../neighbours-mp.js?v=1ea504ef';
+import { BACK_YARD_GROUND_Y, SIGN_PROMPT_LIFT, STREET_GROUND_Y, homesFeature, visitorHomeState } from './homes-feature.js?v=5018619f';
 import { BENCH_ART, towerApi } from './home-tower-feature.js?v=0721ea89';
 import { readTowerFloorWire, towerFloorProject, towerFloorWire } from '../home-tower.js?v=a7fc0cce';
 import { projectApi } from './street-jobs-feature.js?v=028298d2';
@@ -203,7 +203,8 @@ function createSite() {
     throw new Error(T.failed);
   }
   return {
-    street: (owner) => call(`homes/${Number(owner)}/street`),
+    // G1018: the house's Note Poles come to those let in with the realtime server's proof (?in=).
+    street: (owner) => call(`homes/${Number(owner)}/street${insideQuery(owner)}`),
     signpost: () => call('homes/signpost'),
     addNeighbor: (position, id) => call('homes/signpost', { method: 'PUT', body: { position, id } }),
     removeNeighbor: (position) => call(`homes/signpost/${Number(position)}`, { method: 'DELETE' }),

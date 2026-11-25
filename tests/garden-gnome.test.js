@@ -477,7 +477,7 @@ describe('someone else\'s gnome, on a visit (multiplayer)', () => {
     assert.equal(neighboursMpFeature.homeVisitGnomes({ mode: 'multiplayer', streetTsid: 'MPH_7' }), null);
   });
 
-  it('the site lists them from the owner\'s save, word-filtered; house phrases only for the owner and key-holders', { skip: skipSite }, () => {
+  it('the site lists them from the owner\'s save, word-filtered; house phrases only for those who may enter', { skip: skipSite }, () => {
     const state = { systems: { features: { 'garden-gnome': { placed: [
       { id: 'gs1', place: 'street', x: 812.4, y: 870, facingLeft: false, phrases: ['Hello  <b>there</b>', '  ', 'shit happens', 'four', 'five'] },
       { id: 'gh1', place: 'house', x: 300, y: 620, phrases: ['secret'] },
@@ -503,7 +503,8 @@ describe('someone else\'s gnome, on a visit (multiplayer)', () => {
     // What the game reads back is what the site sent.
     assert.deepEqual(normalizeVisitGnomes(noKey), noKey.map((g) => ({ facingLeft: g.facingLeft, phrases: g.phrases, id: g.id, place: g.place, x: g.x, y: g.y })));
     const src = readFileSync(sitePath('src', 'Neighbours.php'), 'utf8');
-    assert.match(src, /'gnomes' => self::gnomeRows\(\$theirs, \$key\),/);
+    // G1018: and for someone the owner let in; anyone who may not enter gets no gnome in the house (forVisitor).
+    assert.match(src, /'gnomes' => self::gnomeRows\(\$theirs, \$key \|\| \$letIn\),/);
     assert.match(src, new RegExp(`GNOMES_MAX = ${GNOME_VISIT_MAX};`));
     assert.match(src, new RegExp(`GNOME_PHRASE_MAX = ${GNOME_PHRASE_MAX};`));
   });

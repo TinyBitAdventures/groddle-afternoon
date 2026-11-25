@@ -165,8 +165,9 @@ export function createMinnAccount(opts = {}) {
      * proof the realtime server tells the holder with). A refusal throws
      * with .status, .code and the site's .message.
      */
-    async home(id) {
-      return buddyCall('Finding their home', `homes/${Number(id)}`);
+    /** G1018: `inside` is the realtime server's let-in proof (neighbours-mp insideQuery), if any. */
+    async home(id, inside = '') {
+      return buddyCall('Finding their home', `homes/${Number(id)}${inside ? `?in=${encodeURIComponent(inside)}` : ''}`);
     },
 
     async visitRandom() {

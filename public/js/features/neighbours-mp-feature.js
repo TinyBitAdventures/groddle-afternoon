@@ -178,6 +178,9 @@ import {
   takeFreshTendActs,
   visitedTowerName,
   visitSceneTsid,
+  forgetInside,
+  insideProof,
+  rememberInside,
 } from '../neighbours-mp.js?v=1ea504ef';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
 import { butlerCarries, registerButlerDrop } from '../butler-drop.js?v=359fb767';
@@ -335,7 +338,7 @@ function createSession(engine, client) {
 
   // R31 (#522): a fresh pass from the site before this one runs out, and whenever the server refuses one.
   const passes = createVisitPassKeeper({
-    fetchView: async (owner) => normalizeHomeView(await account.home(owner)),
+    fetchView: async (owner) => normalizeHomeView(await account.home(owner, insideProof(owner))),
     onView: (owner, view) => {
       if (visit?.owner !== owner) return;
       visit.view.pass = view.pass;
@@ -394,7 +397,7 @@ function createSession(engine, client) {
     busy = true;
     let view;
     try {
-      view = normalizeHomeView(random ? await account.visitRandom() : await account.home(ownerId));
+      view = normalizeHomeView(random ? await account.visitRandom() : await account.home(ownerId, insideProof(ownerId)));
     } catch (err) {
       notice(err?.message || T.failed, 3600);
       return false;
@@ -413,6 +416,8 @@ function createSession(engine, client) {
       // A Tower that is not built is no floor to land on: the home street then.
       const tower = room === 'tower' && visitorHomeState(view).tower;
       if (door) await show('street', { arrive: 'door' });
+      // G1018: the house only when the site shows it (the summons' proof, home_inside); else its door.
+      else if (room === 'interior' && !view.inside) await show('street', { arrive: 'door' });
       else await show(room === 'tower' && !tower ? 'street' : room, { floor, at });
       // inc_teleportation.js:676 achievements_increment('teleportation_others', 'summonee').
       engine.achievement?.('teleportation_others:summonee', 1);
@@ -561,7 +566,7 @@ function createSession(engine, client) {
       // My own garden acts not yet sent go first, so the site's copy has them.
       lastGardenScan = 0;
       scanGardens(Date.now());
-      const view = normalizeHomeView(await account.home(owner));
+      const view = normalizeHomeView(await account.home(owner, insideProof(owner)));
       if (!view || visit?.owner !== owner || !readVisitScene(engine.streetTsid)) return false;
       const same = !rebuild && visitSceneKey(view) === visitSceneKey(visit.view);
       visit.view = view;
@@ -1283,9 +1288,35 @@ function createSession(engine, client) {
     else await engine.enter(STREET_INDEX.default, { bypassFeatureGates: true });
   }
 
-  function goInside() {
-    if (!visit || visit.room !== 'street') return;
+  /**
+   * G1018: the house and back yard come from the site only to those it lets in (Neighbours::forVisitor):
+   * the street's answer has none for a visitor, so at the door the site is asked again, with the
+   * realtime server's let-in proof (rememberInside) for one let in, and in they go once it shows them.
+   */
+  let opening = false;
+  async function goInside() {
+    if (!visit || visit.room !== 'street' || opening) return;
     knocking = 0;
+    if (!visit.view.inside) {
+      const owner = visit.owner;
+      opening = true;
+      let view = null;
+      try {
+        view = normalizeHomeView(await account.home(owner, insideProof(owner)));
+      } catch (err) {
+        console.warn('[neighbours]', err?.message || err);
+      } finally {
+        opening = false;
+      }
+      if (!visit || visit.owner !== owner || visit.room !== 'street') return;
+      if (!view?.inside) {
+        notice(T.houseLocked, 3200);
+        return;
+      }
+      visit.view = { ...view, pass: view.pass || visit.view.pass, passTtl: view.pass ? view.passTtl : visit.view.passTtl };
+      visit.key = visit.key || view.key === true;
+      sendPass();
+    }
     show('interior');
   }
 
@@ -1506,6 +1537,7 @@ function createSession(engine, client) {
     if (msg.what === 'home' && visit && Number(msg.owner) === visit.owner) refreshHome();
   });
   client.on('msg:home_pass_ok', (msg) => {
+    if (msg.inside) rememberInside(msg.owner, msg.inside);
     if (!visit || Number(msg.owner) !== visit.owner) return;
     passes.accepted();
     visit.key = visit.key || msg.key === true;
@@ -1535,13 +1567,19 @@ function createSession(engine, client) {
     if (visit && Number(msg.owner) === visit.owner) knocking = 0;
     notice(String(msg.text || T.failed), 3600);
   });
+  // G668 / G1018: summoned into the house: the site's proof for that arrival (before summon_go).
+  client.on('msg:home_inside', (msg) => {
+    rememberInside(msg.owner, msg.inside);
+  });
   client.on('msg:home_open', (msg) => {
+    if (msg.inside) rememberInside(msg.owner, msg.inside);
     if (!visit || Number(msg.owner) !== visit.owner) return;
     if (msg.why === 'let_in') visit.letIn = true;
     goInside();
   });
   client.on('msg:home_let_in', (msg) => {
     const owner = Number(msg.owner?.id) || 0;
+    if (msg.inside) rememberInside(owner, msg.inside);
     if (!visit || owner !== visit.owner) return;
     visit.letIn = true;
     knocking = 0;
@@ -1558,8 +1596,11 @@ function createSession(engine, client) {
     notice(T.noAnswer(visit.name), 3200);
   });
   client.on('msg:home_out', (msg) => {
+    forgetInside(msg.owner);
     if (!visit || Number(msg.owner) !== visit.owner) return;
     visit.letIn = false;
+    // G1018: no longer let in (or the key taken back): the door asks the site again.
+    if (!visit.key || msg.why === 'revoked') visit.view.inside = false;
     if (msg.why === 'revoked') visit.key = false;
     notice(outText(msg.why, visit.name), 4200);
     if (visit.room === 'interior') goOutside();

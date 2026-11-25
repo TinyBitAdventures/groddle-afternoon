@@ -52,8 +52,8 @@ import { ELEMENT_CLASSES, NO_BAG_CLASSES, NO_SLOT_CLASSES } from '../pack-slots-
 import { TOOL_CONDITION_CATALOG, copyTagKind, copyTags, pickToolCopies, receiveToolCopy, setCopyTag, takeToolCopy } from '../tools.js?v=4156bba8';
 import { draggedStack, takeDragged } from '../drag-stack.js?v=80e43757';
 import { scriptFromTag, scriptLabel } from '../teleportation.js?v=cbbc673f';
-import { possessive, readVisitScene } from '../neighbours-mp.js?v=1ea504ef';
-import { homesFeature } from './homes-feature.js?v=b0eea316';
+import { insideQuery, possessive, readVisitScene } from '../neighbours-mp.js?v=1ea504ef';
+import { homesFeature } from './homes-feature.js?v=5018619f';
 import { saveStore, savedThrough } from '../save-store.js?v=4e720735';
 import {
   SDB_PRICE_MAX,
@@ -372,7 +372,7 @@ function createSite() {
     price: (uid, price) => call('homes/boxes', { method: 'PUT', body: { uid, price } }),
     stop: (uid) => call(`homes/boxes/${Number(uid)}`, { method: 'DELETE' }),
     collect: (uid, op) => call(`homes/boxes/${Number(uid)}/collect`, { method: 'POST', body: { op } }),
-    street: (owner) => call(`homes/${Number(owner)}/street`),
+    street: (owner) => call(`homes/${Number(owner)}/street${insideQuery(owner)}`),
     cabinet: (owner, uid) => call(`homes/${Number(owner)}/cabinets/${Number(uid)}`),
   };
 }

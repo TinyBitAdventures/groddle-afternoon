@@ -105,7 +105,7 @@ import { RECIPE_CATALOG } from '../making.js?v=1ec1075e';
 import { getSkillCatalog } from '../content-catalogs.js?v=2b7048b9';
 import { createBackYardState, homeStreetLayout, normalizeCultivationState } from '../home-cultivation.js?v=2f71ba70';
 import { lookOf, poseOf } from './realtime-feature.js?v=d1d08bf7';
-import { readVisitScene } from '../neighbours-mp.js?v=1ea504ef';
+import { insideQuery, readVisitScene } from '../neighbours-mp.js?v=1ea504ef';
 import { saveStore } from '../save-store.js?v=4e720735';
 import { frameTexture, sourceFromUrl, textureFromUrl } from '../textures.js?v=b8e38103';
 import { createSheetLoader } from '../sprite-sheets.js?v=d787e3c3';
@@ -174,7 +174,8 @@ function createSite() {
     throw new Error(T.failed);
   }
   return {
-    machines: (owner) => call(`homes/${Number(owner)}/machines`),
+    // G1018: the house's machines come to those let in with the realtime server's proof (?in=).
+    machines: (owner) => call(`homes/${Number(owner)}/machines${insideQuery(owner)}`),
     room: (place) => call(`machine-rooms/${roomName(place)}/machines`),
     mine: () => call('homes/machines'),
   };

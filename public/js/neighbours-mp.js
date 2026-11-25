@@ -95,6 +95,8 @@ export const NEIGHBOURS_TEXT = Object.freeze({
   // inc_pols.js:466; inc_houses.js:89; inc_acl_keys.js:57.
   entered: (name) => `${name} just entered your house.`,
   letYouIn: (name) => `${name} has let you into their house.`,
+  /** G1018: the site would not show the house (the server's homes.go homeTextLocked; ours). */
+  houseLocked: 'That house is locked.',
   veryWell: 'Very well',
   keyGiven: (name) => `${name} sent you a key to their house! (Keys can be found at your Magic Rock.)`,
   // Ours: the source sent the keyring's update alone.
@@ -293,6 +295,53 @@ export function visitRefused(err) {
  * fetchView(owner) -> normalized view; onView(owner, view) sends its pass; onGone(owner, err) for
  * a site refusal of the visit; onLost(owner) once after VISIT_PASS_TRIES asks the server never took.
  */
+/**
+ * G1018: the realtime server's let-in proofs (homes.go insideProof: home_let_in, home_open,
+ * home_inside, home_pass_ok "inside"), by owner, which the game hands the site (?in=) so it sends
+ * the house and back yard to someone the owner let in. One store for every feature that reads a
+ * home (neighbours-mp, yard-verbs-mp, home-machines, home-street-mp). A proof says when it runs
+ * out; a stale one is dropped.
+ */
+const insideProofs = new Map();
+
+/** Keeps a let-in proof for owner (anything not shaped like one is ignored). */
+export function rememberInside(owner, proof, now = Date.now()) {
+  const id = positiveId(owner);
+  const token = typeof proof === 'string' ? proof : '';
+  if (!id || token.length > 1024 || !/^[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+$/.test(token)) return false;
+  let exp = 0;
+  try {
+    const body = token.split('.')[0].replace(/-/g, '+').replace(/_/g, '/');
+    exp = Number(JSON.parse(atob(body + '='.repeat((4 - (body.length % 4)) % 4)))?.exp) || 0;
+  } catch { /* not a proof */ }
+  if (exp * 1000 <= now) return false;
+  insideProofs.set(id, { token, until: exp * 1000 });
+  return true;
+}
+
+/** The let-in proof held for owner now, or ''. */
+export function insideProof(owner, now = Date.now()) {
+  const id = positiveId(owner);
+  const p = id ? insideProofs.get(id) : null;
+  if (!p) return '';
+  if (p.until <= now) {
+    insideProofs.delete(id);
+    return '';
+  }
+  return p.token;
+}
+
+/** Forgets owner's let-in proof (walked out, or the owner went offline). */
+export function forgetInside(owner) {
+  insideProofs.delete(positiveId(owner));
+}
+
+/** `in=<proof>` for a site query, joined with `sep` ('?' or '&'), or ''. */
+export function insideQuery(owner, sep = '?', now = Date.now()) {
+  const token = insideProof(owner, now);
+  return token ? `${sep}in=${encodeURIComponent(token)}` : '';
+}
+
 export function createVisitPassKeeper({ fetchView, onView, onGone = () => {}, onLost = () => {}, now = () => Date.now() } = {}) {
   let owner = 0;
   let at = 0;
@@ -403,6 +452,9 @@ export function normalizeHomeView(answer) {
     home: { owned: true, style, house: visitHouse(answer.home.house) },
     homes: answer.homes && typeof answer.homes === 'object' && !Array.isArray(answer.homes) ? answer.homes : {},
     key: answer.key === true,
+    // G1018: whether this answer shows the house and back yard (Neighbours::forVisitor): the owner, a
+    // key-holder, or someone let in. A site from before it sends no `inside` and shows everything.
+    inside: answer.inside !== false,
     pass: typeof answer.pass?.token === 'string' && answer.pass.token ? answer.pass.token : '',
     // R31 (#522): how long the site said the pass is good for (Neighbours::PASS_TTL), in seconds.
     passTtl: typeof answer.pass?.token === 'string' && answer.pass.token ? visitPassTtl(answer.pass.expiresIn) : 0,
