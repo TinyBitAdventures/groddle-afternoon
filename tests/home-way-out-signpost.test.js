@@ -216,7 +216,7 @@ describe('online: a visitor\'s way out and the owner\'s', () => {
   const mp = read('js/features/neighbours-mp-feature.js');
 
   it('a visitor sees the same one post: its top arm Back to Ur takes them back where they came from', () => {
-    assert.match(mp, /const built = visitorHomeScene\(engine, visit\.view, room, \{ returnLabel: wayOutOf\(visit\.returnTo\)\.label(, floor, via)? \}\);/);
+    assert.match(mp, /const built = visitorHomeScene\(engine, visit\.view, room, \{ returnLabel: wayOutOf\(visit\.returnTo\)\.label(, floor, via(, doorX)?)? \}\);/);
     assert.match(mp, /t\.gate = engine\.register\(\{ classId: CLASS_GATE, featureId: NEIGHBOURS_MP_FEATURE_ID, label: 'Back to Ur', subtitle: `\$\{way\.label\}/);
     assert.match(mp, /if \(target\.classId === CLASS_GATE\) return \[\{ id: 'go_back'/);
     assert.match(mp, /else if \(verbId === 'go_back'\) goBack\(\);/);

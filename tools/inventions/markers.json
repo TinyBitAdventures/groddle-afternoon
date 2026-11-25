@@ -309,8 +309,7 @@
     "ours: * there. Ours there: a stack's x is kept from the house (the": "ours-drops",
     "ours: a moment, you are still moving something.', // ours, one move at a time": "ours-drops",
     "ours: by: (name) => `Dropped by ${name}`, // ours": "remake-copy",
-    "ours: moment, you are still picking something up.', // ours, one pickup at a time": "home-stack-marks",
-    "remake-own: * remake's own with no visitors, and stays": "ours-drops"
+    "ours: moment, you are still picking something up.', // ours, one pickup at a time": "home-stack-marks"
   },
   "public/js/eat-pick.js": {
     "remake-own: * list none); F was the remake's own and ate an apple. Now F opens the": "hotkeys-of-ours"
