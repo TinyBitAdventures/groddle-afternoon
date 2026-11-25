@@ -22,6 +22,10 @@
  * profile (the saved dialog's View, Download and Make public / Copy link,
  * as GlitchrSavedDialog.as 165-169 gave the photo's page, a download and a
  * short URL).
+ *
+ * G1286 (Austin 2026-11-25): solo snaps too, with the same card, render and filters, saved to the
+ * device instead of the site (snapFileName); a remake addition (inventions: camera-solo-download),
+ * as Glitch had no solo game.
  */
 
 import { filterText } from './word-filter.js?v=9a7a7ebb';
@@ -124,6 +128,11 @@ export const SNAP_COPY = Object.freeze({
   hintSnap: 'Arrows to look, Enter to snap · C to return',
   hintSnapStreet: 'Arrows to look, Enter to snap · C to return · Eyeballery lets you look across the whole street',
   hintNoCard: 'Arrows to look · C to return · Purchase the Snapshottery upgrade so you can take photos.',
+  // G1286: solo keeps no album, so its Snap goes to the device (snaps-feature openDownload).
+  hintDevice: 'Arrows to look, Enter saves a snap to your device · C to return',
+  hintDeviceStreet: 'Arrows to look, Enter saves a snap to your device · C to return · Eyeballery lets you look across the whole street',
+  soloNote: 'Solo snaps save to your device, not to an album.',
+  soloSaved: 'Saved to your downloads.',
   needCard: 'Get the Snapshottery upgrade first.',
   saving: "Hang on, I'm saving your photo right now!",
   caption: 'click to enter a caption...',
@@ -166,6 +175,18 @@ export const SNAP_COPY = Object.freeze({
   position: (n, of) => `${n} of ${of}`,
   failed: 'That didn\'t work. Try again in a moment.',
 });
+
+/**
+ * G1286: a solo Snap's file name, as the client named its snapshot (CameraMan.as snap 541: the
+ * location's label with "_" for spaces, then StringUtil.getUrlDate 387-389, YYYY_MM_DD-HH_MM_SS),
+ * as a .jpg (the Snap is the same JPEG online keeps). Characters a file name cannot hold are dropped.
+ */
+export function snapFileName(label, date = new Date()) {
+  const place = String(label || '').replace(/[\\/:*?"<>|\u0000-\u001f]+/g, '').trim().replace(/\s+/g, '_') || 'Snap';
+  const d = date instanceof Date && !Number.isNaN(date.getTime()) ? date : new Date();
+  const p = (n) => String(n).padStart(2, '0');
+  return `${place}_${d.getFullYear()}_${p(d.getMonth() + 1)}_${p(d.getDate())}-${p(d.getHours())}_${p(d.getMinutes())}_${p(d.getSeconds())}.jpg`;
+}
 
 /** take_picture's conditions (camera.js 104-111). */
 export function takePictureState({ recharging = false, dead = false } = {}) {

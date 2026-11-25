@@ -16,6 +16,10 @@
  *   keeps what you changed since; &resetgame=1 starts over.
  * - Nothing fails silently: unknown classes, styles, swatches, items and moved pieces are listed
  *   in the report (the first few on screen, all of them in the console).
+ * - G1286 (Austin 2026-11-25: "I wasn't able to take a photo of the inside"): the practice copy is
+ *   given the Snapshottery card (grantPracticeSnapshottery), so Camera Mode's Enter snaps the house
+ *   to the device at once. A new save has no cards, and Snaps keep Glitch's card rule
+ *   (players/player.js getCameraAbilities 2148-2173); only this copy is given it, never a real save.
  * QA: canvas data houseFile (loaded:<pieces> | kept | refused:<reason> | failed:<reason>);
  * window.groddleHouseFile { url, title, problems, counts }.
  */
@@ -23,6 +27,7 @@
 import { ITEM_CATALOG } from './inventory.js?v=6414dbdc';
 import { ownGroundPlaces } from './ground-stacks.js?v=22792362';
 import { isSolo } from './game-mode.js?v=1ecf2899';
+import { SNAPSHOTTERY } from './snaps.js?v=887f3da9';
 import {
   HOUSE_FILE_MAX_BYTES,
   HOUSE_FILE_PARAM,
@@ -38,6 +43,8 @@ import {
 } from './house-file.js?v=a0b6c7aa';
 
 const REPORT_LINES = 6;
+/** G1286: the report's line when the practice copy was given Snapshottery. */
+export const HOUSE_FILE_SNAP_NOTE = 'This practice copy has the Snapshottery upgrade: press C, then Enter to save a snap to your device.';
 
 /**
  * What a page's housefile param asks for: null (none, or not solo), or { ok, url } / { ok: false, msg }.
@@ -119,8 +126,21 @@ export function applyHouse(built, { engine, features, homeState, imagineHome, ur
   return { stacks: set };
 }
 
+/**
+ * G1286: a house file's practice copy can snap its house: the Snapshottery card, granted as the
+ * tutorial's cards are (imagination-feature grantTutorialUpgrade), in a practice copy only.
+ * Returns true when granted now, false when already owned or not a practice copy.
+ */
+export function grantPracticeSnapshottery({ engine, features, practice = globalThis.groddlePractice === true } = {}) {
+  if (!practice) return false;
+  if ((engine?.pc?.imaginationUpgrades || []).includes(SNAPSHOTTERY)) return false;
+  const granted = features?.get?.('imagination')?.grantTutorialUpgrade?.(SNAPSHOTTERY, engine) === true;
+  if (granted) engine?.save?.();
+  return granted;
+}
+
 /** The report: a small panel over the game, the summary and the first problems (all in the console). */
-export function showHouseFileReport(doc, { title = '', summary = '', problems = [], refused = '' } = {}) {
+export function showHouseFileReport(doc, { title = '', summary = '', problems = [], refused = '', note = '' } = {}) {
   if (!doc?.body) return null;
   doc.getElementById('house-file-report')?.remove();
   const box = doc.createElement('div');
@@ -134,6 +154,12 @@ export function showHouseFileReport(doc, { title = '', summary = '', problems = 
   const head = doc.createElement('div');
   head.textContent = refused || `House file loaded${title ? `: ${title}` : ''}. ${summary}.`;
   box.append(head);
+  if (note && !refused) {
+    const line = doc.createElement('div');
+    line.style.fontWeight = '400';
+    line.textContent = note;
+    box.append(line);
+  }
   if (problems.length) {
     const list = doc.createElement('ul');
     list.style.cssText = 'margin:4px 0 0;padding-left:18px;font-weight:400';
@@ -179,6 +205,7 @@ export async function bootHouseFile({ search, mode, baseUri, origin, doc, engine
   // Laid in already in this copy: walk in as it stands now.
   const mark = features?.get?.('homes')?.save?.()?.houseFile;
   if (hadSave && mark === req.url && homeState.owned) {
+    grantPracticeSnapshottery({ engine, features });
     engine?.setData?.('houseFile', 'kept');
     return { entered: true, kept: true };
   }
@@ -199,6 +226,7 @@ export async function bootHouseFile({ search, mode, baseUri, origin, doc, engine
   const built = buildHouse(checked.house);
   const problems = [...checked.problems, ...built.problems];
   applyHouse(built, { engine, features, homeState, imagineHome, url: req.url });
+  const snapCard = grantPracticeSnapshottery({ engine, features });
   const counts = houseCounts(built);
   const summary = houseSummary(built);
   console.info(`[housefile] ${req.url}: ${summary}.`);
@@ -208,6 +236,6 @@ export async function bootHouseFile({ search, mode, baseUri, origin, doc, engine
     console.groupEnd?.();
   }
   globalThis.groddleHouseFile = { url: req.url, title: built.title, problems, counts, perFloor: built.counts };
-  report(`loaded:${counts.pieces}`, { title: built.title, summary, problems });
+  report(`loaded:${counts.pieces}`, { title: built.title, summary, problems, note: snapCard ? HOUSE_FILE_SNAP_NOTE : '' });
   return { entered: true, kept: false, built, problems };
 }

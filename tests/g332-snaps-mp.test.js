@@ -215,8 +215,8 @@ function fakeEngine(over = {}) {
 
 const flush = async () => { for (let i = 0; i < 4; i++) await new Promise((r) => setImmediate(r)); };
 
-describe('snaps feature: solo is untouched', () => {
-  it('answers nothing outside multiplayer', () => {
+describe('snaps feature: the Camera item stays online (solo snaps to the device: tests/g1286-camera-solo-snap.test.js)', () => {
+  it('answers nothing outside multiplayer without a page', () => {
     const solo = { mode: 'solo', inv: { camera: 1 } };
     snapsFeature.init(solo);
     assert.deepEqual(snapsFeature.packVerbs('camera', solo), []);
@@ -226,22 +226,22 @@ describe('snaps feature: solo is untouched', () => {
     assert.equal(snapsFeature.cameraSnapHint(solo, 400), null);
   });
 
-  it('is registered before street-objects; vendorProfile answers chain; the card is dealt only online', async () => {
+  it('is registered before street-objects; vendorProfile answers chain; the card is dealt solo and online (G1286)', async () => {
     const ids = FEATURES.map((f) => f.id);
     assert.ok(ids.includes('snaps'));
     assert.ok(ids.indexOf('snaps') < ids.indexOf('street-objects'));
     const game = read('public/game.js');
     assert.match(game, /for \(const feature of features\.features\) \{\s*if \(typeof feature\.vendorProfile === 'function'\) activeVendor = feature\.vendorProfile\(activeVendor, engine\) \|\| activeVendor;/);
     const { remakeStatus, isOfferedInRemake, isOfferedOnline } = await import('../public/js/imagination-remake.js?v=c37ad887');
-    // Snapshottery and its filter packs (js/snap-filters.js) are dealt online only.
+    // Snapshottery and its filter packs (js/snap-filters.js): G1286, solo snaps to the device under the same card rule.
     for (const id of ['snapshotting', 'snapshottery_basic_filter_pack', 'snapshottery_filter_pack_1', 'snapshottery_filter_pack_2', 'snapshottery_filter_pack_3']) {
-      assert.equal(remakeStatus(id).status, 'online', id);
-      assert.equal(isOfferedInRemake(id), false, id);
+      assert.equal(remakeStatus(id).status, 'live', id);
+      assert.equal(isOfferedInRemake(id), true, id);
       assert.equal(isOfferedOnline(id), true, id);
     }
     assert.match(read('build-stores.mjs'), /entry\.class_tsid === 'camera'/, 'solo stores still leave the Camera out');
     const cam = read('public/js/features/camera-mode-feature.js');
-    assert.match(cam, /k === 'enter'[^\n]*engine\.query\?\.\('cameraSnap', engine, \{ end: \(\) => setActive\(engine, false\) \}\) === true/);
+    assert.match(cam, /engine\.query\?\.\('cameraSnap', engine, \{ end: \(\) => setActive\(engine, false\) \}\);/);
   });
 });
 

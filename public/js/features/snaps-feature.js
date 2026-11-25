@@ -1,6 +1,7 @@
 /**
- * Snaps between real players (register G332), multiplayer only; solo is
- * untouched (every hook returns nothing outside multiplayer).
+ * Snaps between real players (register G332). Solo (G1286) takes the same
+ * Snap and saves it to the device instead (below); the album, the Menu's
+ * Snaps, the Camera item and its travel are multiplayer only.
  *
  * - Taking a Snap: with the Snapshottery card (players/player.js 2148-2173
  *   getCameraAbilities), Enter in Camera Mode snaps the view (CameraMan.as
@@ -47,7 +48,14 @@
  * A Snap is drawn at the view's own pixels on this screen (snapResolution),
  * up to the site's 1920x1200, and smaller only to fit 1 MB (snapSteps).
  * Canvas data: snapStage, snapTravelStreet, snapDialog, snapsCount,
- * snapsLast, snapViewer, snapSize. window.groddleSnaps in multiplayer.
+ * snapsLast, snapViewer, snapSize, snapFile (solo's download). window.groddleSnaps.
+ *
+ * G1286 (Austin 2026-11-25: "I wasn't able to take a photo of the inside. Is that an issue with solo
+ * mode?"): solo keeps no album and no account, so Enter in Camera Mode (and Shift+Enter or the
+ * whole-house button at home) takes the same Snap, with the same Snapshottery card rule and the
+ * owned filters, and shows it with Download (a blob: link to a JPEG named as the client named its
+ * snapshot, snapFileName) and Close (openDownload). A remake addition (inventions:
+ * camera-solo-download): Glitch had no solo game; its snaps always went to the site.
  */
 
 import { createMinnAccount } from '../minn-account.js?v=3d783519';
@@ -58,7 +66,7 @@ import { STREET_INDEX, resolveIndexTsid } from '../street-loader.js?v=10376267';
 import {
   CAMERA_CLASS, CAPTION_MAX, FORGET_RECHARGE_SEC, RECHARGE_BUFF, SNAP_COPY as T, SNAP_MAX_BYTES, TRAVEL,
   albumSnaps, base64Bytes, canSnap, cleanCaption, isSnapDownload, isSnapUrl, jpegBase64, savedActions, snapAuthor, snapDate, snapPlace,
-  snapResolution, snapShareUrl, snapSteps, snapStreet, takePictureState, viewerActions, viewerStep, withCamera, WHOLE_SNAP,
+  snapFileName, snapResolution, snapShareUrl, snapSteps, snapStreet, takePictureState, viewerActions, viewerStep, withCamera, WHOLE_SNAP,
 } from '../snaps.js?v=887f3da9';
 import { VINTAGE_TEXT, applyFilter, filterComponents, filtersFor } from '../snap-filters.js?v=32315cf1';
 import { HOME_SHOT_COPY, homeShotState } from '../home-shot.js?v=4384d3a2';
@@ -95,6 +103,7 @@ const STYLE = `
 .snap-row { display: flex; gap: var(--sp-7); align-items: center; justify-content: center; margin-top: var(--sp-6); flex-wrap: wrap; }
 .snap-save { border: 0; border-radius: var(--radius-md); padding: var(--sp-4) var(--sp-8); font: 700 var(--fs-base)/var(--lh-tight) var(--font-ui); color: var(--text-inverse); background: linear-gradient(var(--c-lime-76), var(--c-green-61)); box-shadow: 0 2px 0 var(--c-green-48b); cursor: pointer; }
 .snap-save:disabled { filter: grayscale(0.7); cursor: default; }
+.snap-polaroid a.snap-save { display: inline-block; text-decoration: none; }
 .snap-link { border: 0; background: transparent; color: var(--c-violet-50); font: 600 var(--fs-md)/var(--lh-tight) var(--font-system); cursor: pointer; text-decoration: underline; padding: 0.2rem; }
 .snap-shade-win { position: fixed; inset: 0; z-index: calc(var(--z-dialog) + 4); background: color-mix(in srgb, var(--c-mauve-23) 28%, transparent); display: flex; align-items: flex-start; justify-content: center; padding: 7vh var(--sp-8) var(--sp-8); padding-top: 7dvh; pointer-events: auto; }
 .snap-shade-win[hidden] { display: none; }
@@ -169,6 +178,29 @@ function multiplayer(engine) {
   return engine?.mode === 'multiplayer';
 }
 
+/** The session for this game: an online one in multiplayer, a solo one (G1286) in solo, never the other's. */
+function sessionFor(engine) {
+  if (!session) return null;
+  return Boolean(session.solo) === !multiplayer(engine) ? session : null;
+}
+
+/** G1286: solo's session: no account, album or Menu row; the Snap goes to the device (openDownload). */
+function createSoloSession(engine) {
+  const s = { solo: true, dialog: null, last: '', size: '', download: '' };
+  if (!document.getElementById('snaps-style')) {
+    const style = el('style', { id: 'snaps-style' });
+    style.textContent = STYLE;
+    document.head.append(style);
+  }
+  exposeQA('groddleSnaps', {
+    state: () => ({ solo: true, dialog: s.dialog?.stage || 'closed', last: s.last, size: s.size, download: s.download }),
+    snap: () => snapNow(engine, s, {}),
+    snapWhole: () => snapWhole(engine, s, {}),
+  });
+  publish(engine, s);
+  return s;
+}
+
 function createSession(engine) {
   const boot = globalThis.GRODDLE_MP_BOOT || {};
   const account = createMinnAccount({ baseUri: document.baseURI, nonce: boot.nonce || '' });
@@ -217,6 +249,7 @@ function publish(engine, s) {
   engine.setData?.('snapsLast', s.last);
   engine.setData?.('snapViewer', s.viewer ? String(s.viewer.index) : '');
   engine.setData?.('snapSize', s.size);
+  engine.setData?.('snapFile', s.download || '');
 }
 
 function note(engine, s, line) {
@@ -493,6 +526,9 @@ function flash(onPeak) {
 
 function closeDialog(engine, s) {
   s.dialog?.el.remove();
+  // G1286: a solo download's blob: links go once the download has had its moment.
+  const urls = s.dialog?.urls || [];
+  if (urls.length) setTimeout(() => { for (const u of urls) URL.revokeObjectURL(u); }, 1000);
   s.dialog = null;
   publish(engine, s);
 }
@@ -580,6 +616,10 @@ async function snapWhole(engine, s, ctx) {
 }
 
 function openPolaroid(engine, s, picture, spot, ctx) {
+  if (s.solo) {
+    openDownload(engine, s, picture, ctx);
+    return;
+  }
   closeDialog(engine, s);
   const shade = el('div', { class: 'snap-shade', 'data-snap-dialog': '' });
   const card = el('div', { class: 'snap-polaroid', role: 'dialog', 'aria-label': 'Snap' });
@@ -644,6 +684,68 @@ function openPolaroid(engine, s, picture, spot, ctx) {
     e.stopPropagation();
     if (e.key === 'Escape') closeDialog(engine, s);
     else if (e.key === 'Enter' && e.target === input) doSave();
+  });
+}
+
+/** G1286: a JPEG's base64 as a blob: URL for a download link (a plain page: no upload, no album). */
+function jpegBlobUrl(b64) {
+  const bin = atob(b64);
+  const bytes = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i += 1) bytes[i] = bin.charCodeAt(i);
+  return URL.createObjectURL(new Blob([bytes], { type: 'image/jpeg' }));
+}
+
+/**
+ * G1286: solo's polaroid. The same picture and filter row as online (GlitchrSnapshotView.as), with
+ * Download in place of Save snap (the file goes to the device: no account, no album) and Close in
+ * place of discard. Download bakes the chosen filter in as it shows, as Save snap does, and leaves
+ * Camera Mode, as a save does online; Close keeps looking.
+ */
+function openDownload(engine, s, picture, ctx) {
+  closeDialog(engine, s);
+  const shade = el('div', { class: 'snap-shade', 'data-snap-dialog': '' });
+  const card = el('div', { class: 'snap-polaroid', role: 'dialog', 'aria-label': 'Snap' });
+  const img = el('img', { alt: '', src: picture.url, width: String(picture.w), height: String(picture.h) });
+  const row = el('div', { class: 'snap-row' });
+  const name = snapFileName(engine.street?.label || '', new Date());
+  const download = el('a', { class: 'snap-save', href: '#', download: name, 'data-snap-download': '' }, T.download);
+  const close = el('button', { type: 'button', class: 'snap-link', 'data-snap-close': '' }, T.close);
+  const msg = el('p', { class: 'snap-note', role: 'status', 'aria-live': 'polite' }, T.soloNote);
+  row.append(download, close);
+  const filters = filterRow(engine, s, picture, img);
+  card.append(img, ...(filters ? [filters.el] : []), row, msg);
+  shade.append(card);
+  root().append(shade);
+  s.dialog = { el: shade, stage: 'open', urls: [] };
+  publish(engine, s);
+  setTimeout(() => download.focus?.(), 30);
+
+  download.addEventListener('click', (e) => {
+    if (!s.dialog) return;
+    const kept = filters ? filters.picture() : picture;
+    if (!kept?.b64) {
+      e.preventDefault?.();
+      msg.textContent = T.error('the filtered picture is too large');
+      note(engine, s, 'download-error');
+      return;
+    }
+    // The link carries the picture as it shows now; the click's own default saves it.
+    const url = jpegBlobUrl(kept.b64);
+    s.dialog.urls.push(url);
+    download.setAttribute('href', url);
+    download.setAttribute('download', name);
+    if (filters?.tsid) note(engine, s, `filter:${filters.tsid}`);
+    s.dialog.stage = 'downloaded';
+    s.download = name;
+    s.size = `${kept.w || picture.w}x${kept.h || picture.h}`;
+    msg.textContent = T.soloSaved;
+    note(engine, s, `downloaded:${name}`);
+    ctx?.end?.();
+  });
+  close.addEventListener('click', () => closeDialog(engine, s));
+  shade.addEventListener('keydown', (e) => {
+    e.stopPropagation();
+    if (e.key === 'Escape') closeDialog(engine, s);
   });
 }
 
@@ -1147,7 +1249,12 @@ export const snapsFeature = {
   id: SNAPS_FEATURE_ID,
 
   init(engine) {
-    if (!multiplayer(engine) || typeof document === 'undefined' || globalThis.groddlePractice === true) return;
+    if (typeof document === 'undefined') return;
+    // G1286: solo (a practice copy too) snaps to the device.
+    if (!multiplayer(engine) || globalThis.groddlePractice === true) {
+      session = createSoloSession(engine);
+      return;
+    }
     if (!ITEM_CATALOG[CAMERA_CLASS]) {
       ensureItem(CAMERA_CLASS, { label: 'Camera', baseCost: 1000, stackMax: 1, isTool: true, icon: itemIcon(CAMERA_CLASS) });
     }
@@ -1155,33 +1262,35 @@ export const snapsFeature = {
   },
 
   onStreetClear(engine) {
-    if (session?.travel) closeTravel(engine, session);
+    if (sessionFor(engine)?.travel) closeTravel(engine, session);
   },
 
   /** catalog_stores.js 1455-1458: the Toy Vendor's Camera, in multiplayer. */
   vendorProfile(profile, engine) {
-    if (!multiplayer(engine) || !session) return null;
+    if (!multiplayer(engine) || !sessionFor(engine)) return null;
     return withCamera(profile);
   },
 
   packVerbs(classTsid, engine) {
-    if (classTsid !== CAMERA_CLASS || !multiplayer(engine) || !session) return [];
+    if (classTsid !== CAMERA_CLASS || !multiplayer(engine) || !sessionFor(engine)) return [];
     if (countItem(engine.inv, CAMERA_CLASS) < 1) return [];
     const st = takePictureState({ recharging: Boolean(engine.hasBuff?.(RECHARGE_BUFF)), dead: dead(engine) });
     return [{ id: VERB, label: T.verbLabel, enabled: st.enabled, reason: st.reason, tooltip: T.verbTip, primary: true }];
   },
 
   runPackVerb(classTsid, verbId, engine) {
-    if (classTsid !== CAMERA_CLASS || verbId !== VERB || !multiplayer(engine) || !session) return false;
+    if (classTsid !== CAMERA_CLASS || verbId !== VERB || !multiplayer(engine) || !sessionFor(engine)) return false;
     if (countItem(engine.inv, CAMERA_CLASS) < 1) return false;
     return openTravel(engine, session);
   },
 
-  /** camera-mode-feature: the hint with Enter to snap (CameraManView.as 189-196). */
+  /** camera-mode-feature: the hint with Enter to snap (CameraManView.as 189-196); solo's says the device (G1286). */
   cameraSnapHint(engine, range) {
-    if (!multiplayer(engine) || !session) return null;
+    const s = sessionFor(engine);
+    if (!s) return null;
     // getCameraAbilities 2155-2165: without the card, the Snapshottery line shows once Eyeballery's is gone.
     if (!canSnap(upgrades(engine))) return Number.isFinite(range) ? null : T.hintNoCard;
+    if (s.solo) return Number.isFinite(range) ? T.hintDeviceStreet : T.hintDevice;
     return Number.isFinite(range) ? T.hintSnapStreet : T.hintSnap;
   },
 
@@ -1191,20 +1300,20 @@ export const snapsFeature = {
    * Snapshottery card.
    */
   cameraWholeLabel(engine) {
-    if (!multiplayer(engine) || !session || !canSnap(upgrades(engine))) return null;
+    if (!sessionFor(engine) || !canSnap(upgrades(engine))) return null;
     const st = wholeState(engine);
     return st?.label || (st?.refused ? HOME_SHOT_COPY.house : null);
   },
 
   /** G1284: the button or Shift+Enter in Camera Mode. Resolves true when handled. */
   cameraWholeSnap(engine, ctx = {}) {
-    if (!multiplayer(engine) || !session) return null;
-    return snapWhole(engine, session, ctx);
+    const s = sessionFor(engine);
+    return s ? snapWhole(engine, s, ctx) : null;
   },
 
   /** camera-mode-feature: Enter while looking. ctx.end() leaves Camera Mode (after a save). */
   cameraSnap(engine, ctx = {}) {
-    if (!multiplayer(engine) || !session) return null;
-    return snapNow(engine, session, ctx);
+    const s = sessionFor(engine);
+    return s ? snapNow(engine, s, ctx) : null;
   },
 };

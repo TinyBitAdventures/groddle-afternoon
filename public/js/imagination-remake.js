@@ -170,13 +170,14 @@ const RULES = [
   // Interface conveniences.
   // player.js 3404-3406 canJoinTradeChat, inc_imagination.js 181-187 (G326: groups-feature, site Groups.php).
   [/^trade_channel$/, 'online', 'Opens the Trade Channel in the chat (online).'],
-  // player.js 2148-2173 getCameraAbilities (G332: snaps-feature, site Snaps.php).
-  [/^snapshotting$/, 'online', 'Snaps in Camera Mode (Enter), kept on the site for other players\' Cameras (online, where Snaps are).'],
+  // player.js 2148-2173 getCameraAbilities (G332: snaps-feature, site Snaps.php). G1286 (Austin 2026-11-25):
+  // solo snaps too, saved to the device, under the same card rule, so solo deals the card and its packs.
+  [/^snapshotting$/, 'live', 'Snaps in Camera Mode (Enter): online they are kept on the site for other players\' Cameras; solo they save to your device.'],
   // main.js 6871-6893 lists each pack's filters for Camera Mode; glitch-client glitchr/filters (js/snap-filters.js).
-  [/^snapshottery_basic_filter_pack$/, 'online', 'The Boost, B&W, Historic and Chilliwack filters for your Snaps (online).'],
-  [/^snapshottery_filter_pack_1$/, 'online', 'The Piggy, Beryl and Fire Fly filters for your Snaps (online).'],
-  [/^snapshottery_filter_pack_2$/, 'online', 'The Holga, Vintage and Ancient filters for your Snaps (online).'],
-  [/^snapshottery_filter_pack_3$/, 'online', 'The Dither, Shift and Outline filters for your Snaps (online).'],
+  [/^snapshottery_basic_filter_pack$/, 'live', 'The Boost, B&W, Historic and Chilliwack filters for your Snaps.'],
+  [/^snapshottery_filter_pack_1$/, 'live', 'The Piggy, Beryl and Fire Fly filters for your Snaps.'],
+  [/^snapshottery_filter_pack_2$/, 'live', 'The Holga, Vintage and Ancient filters for your Snaps.'],
+  [/^snapshottery_filter_pack_3$/, 'live', 'The Dither, Shift and Outline filters for your Snaps.'],
   // inc_data_imagination.js 3123-3144 / 5006-5027: secret, no rewards; the Flash client gave every player
   // inventory search and map search (InventorySearchManager.as, LocationSearchMap.as) without the card.
   [/^(map_search|inventory_search)$/, 'none', 'Secret card with no effect: the original gave everyone this search without it.'],

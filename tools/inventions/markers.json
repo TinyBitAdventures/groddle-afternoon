@@ -573,8 +573,11 @@
     "remake-own: false); the give Smuggler then stays hidden. The remake's own rule (Glitch had every": "smuggler-hidden-no-walkable-run"
   },
   "public/js/features/snaps-feature.js": {
+    "glitch-had-none: * camera-solo-download): Glitch had no solo game; its snaps always went to the": "camera-solo-download",
     "invented: * A remake addition (inventions: camera-whole-house): Glitch's camera snapped": "camera-whole-house",
-    "remake-own: * A remake addition (inventions: camera-whole-house): Glitch's": "camera-whole-house"
+    "invented: and Close (openDownload). A remake addition (inventions:": "camera-solo-download",
+    "remake-own: * A remake addition (inventions: camera-whole-house): Glitch's": "camera-whole-house",
+    "remake-own: snapFileName) and Close (openDownload). A remake addition": "camera-solo-download"
   },
   "public/js/features/street-jobs-feature.js": {
     "no-source: a gem ask still open (the remake's own line; no source).": "gem-hints",
@@ -1204,6 +1207,9 @@
     "remake-own: the 4 x riseFrames length and the easing are the remake's own.": "ball-hit-arc"
   },
   "public/js/snaps.js": {
+    "glitch-had-none: * as Glitch had no solo": "camera-solo-download",
+    "invented: of the site (snapFileName); a remake addition (inventions:": "camera-solo-download",
+    "remake-own: * device instead of the site (snapFileName); a remake addition (inventions:": "camera-solo-download",
     "remake-own: CAPTION_MAX).join('')); // the remake's own word filter (the site's Snaps::caption": "word-filter"
   },
   "public/js/solo-feats.js": {

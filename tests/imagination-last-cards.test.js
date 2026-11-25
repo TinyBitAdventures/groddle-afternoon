@@ -42,7 +42,8 @@ describe('every card is accounted for', () => {
       counts[s] = (counts[s] || 0) + 1;
     }
     assert.equal(Object.keys(IMAGINATION_UPGRADES).length, 275);
-    assert.deepEqual(counts, { live: 248, starter: 7, online: 14, none: 6 });
+    // G1286: Snapshottery and its four filter packs are dealt in solo too (snaps save to the device there).
+    assert.deepEqual(counts, { live: 253, starter: 7, online: 9, none: 6 });
     assert.deepEqual(Object.keys(IMAGINATION_UPGRADES).filter((id) => remakeStatus(id).status === 'none').sort(), [...NONE].sort());
   });
 
@@ -115,7 +116,7 @@ describe('the online cards are wired', () => {
 
   it('the filter packs add their filters to the Snap polaroid', () => {
     assert.deepEqual(Object.keys(FILTER_PACKS), ['snapshottery_basic_filter_pack', 'snapshottery_filter_pack_1', 'snapshottery_filter_pack_2', 'snapshottery_filter_pack_3']);
-    for (const id of Object.keys(FILTER_PACKS)) assert.equal(remakeStatus(id).status, 'online', id);
+    for (const id of Object.keys(FILTER_PACKS)) assert.equal(remakeStatus(id).status, 'live', id);
     const snaps = read('public/js/features/snaps-feature.js');
     assert.match(snaps, /const filters = filterRow\(engine, s, picture, img\);/);
     assert.match(snaps, /const kept = filters \? filters\.picture\(\) : picture;/);

@@ -6009,6 +6009,31 @@
    "rows": [
     "G1284"
    ]
+  },
+  {
+   "id": "camera-solo-download",
+   "title": "Solo Snaps saved to the device: in solo, Camera Mode's Enter (and Shift+Enter or \"Snap the whole house\" at home) takes the same Snap, with the same Snapshottery card rule and filters, and offers Download and Close instead of a save to the site; a house file's practice copy is given the card",
+   "kind": "behaviour",
+   "status": "kept",
+   "where": [
+    {
+     "file": "public/js/features/snaps-feature.js"
+    },
+    {
+     "file": "public/js/snaps.js"
+    },
+    {
+     "file": "public/js/imagination-remake.js"
+    },
+    {
+     "file": "public/js/house-file-loader.js"
+    }
+   ],
+   "why": "Glitch had no solo game: every snap went to the site (CameraMan.as snap, API.as snaps.upload). Solo keeps no album or account, so its Snap goes to the device, named as the client named its snapshot (CameraMan.as 541).",
+   "ruling": "Austin 2026-11-25 (lane camk, approved pending objection): solo snaps save to the device; same card rule as online; the house file practice copy can snap",
+   "rows": [
+    "G1286"
+   ]
   }
  ]
 }
