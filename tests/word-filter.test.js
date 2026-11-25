@@ -191,7 +191,9 @@ describe("the site's twin (src/WordFilter.php)", { skip: skipPhp }, () => {
     assert.match(readFileSync(sitePath('src/GoogleSignIn.php'), 'utf8'), /if \(WordFilter::has\(\$name\)\) \{\s*return self::refused\('name_refused', 400/);
     assert.match(readFileSync(sitePath('src/Characters.php'), 'utf8'), /WordFilter::has\(\$name\)/);
     const groups = readFileSync(sitePath('src/Groups.php'), 'utf8');
-    assert.match(groups, /elseif \(WordFilter::has\(\$name\)\) \{\s*\$fields\['name'\] = WordFilter::NAME_REFUSED;/);
+    // One name check for making and renaming a group (site 2d09702, rename).
+    assert.match(groups, /private static function nameProblem\(string \$name\): \?string\s*\{[\s\S]*?return WordFilter::has\(\$name\) \? WordFilter::NAME_REFUSED : null;/);
+    assert.equal((groups.match(/= self::nameProblem\(\$name\);/g) || []).length, 2, 'create and edit');
     assert.match(groups, /: WordFilter::text\(\$text\);/, 'descriptions filtered');
   });
 
