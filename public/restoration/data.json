@@ -2814,9 +2814,14 @@
   "deployed": "2026-11-25"
  },
  "git": {
-  "commits": 3558,
+  "commits": 3560,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-25",
+    "kind": "improve",
+    "text": "On a phone, Act and the stick move between a garden's plots while tending, so gardening is a tap, a drag and a tap"
+   },
    {
     "date": "2026-11-25",
     "kind": "fix",
@@ -2931,14 +2936,9 @@
     "date": "2026-11-25",
     "kind": "new",
     "text": "Solo snaps save to your device, and a house file's practice copy can snap"
-   },
-   {
-    "date": "2026-11-25",
-    "kind": "fix",
-    "text": "Enter in Camera Mode no longer works the nearest item"
    }
   ]
  },
- "tests": 1391,
+ "tests": 1392,
  "generatedAt": "2026-11-25"
 }
