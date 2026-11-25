@@ -83,7 +83,7 @@ import { emblemCostFor } from '../shrines.js?v=4dd7a44f';
 import { rollDropTable } from '../drop-tables.js?v=1ed0b596';
 import { openNoteView, noteViewOpen } from '../note-view.js?v=c512b345';
 import { payDrop } from './drops-feature.js?v=3e352062';
-import { fireflyJarCounts, setFireflyJar } from './resource-nodes-feature.js?v=a4e786f1';
+import { fireflyJarCounts, setFireflyJar } from './resource-nodes-feature.js?v=e1438358';
 import { SEASON_DATA } from '../seasons-data.js?v=b5174bc9';
 import { forceMetabolic, shiftMetabolic, topUpMetabolic } from '../metabolics.js?v=48f784bf';
 import {
@@ -141,7 +141,7 @@ import {
 } from '../seasons.js?v=5d8f545a';
 import { frameTexture, sourceFromUrl, textureFromUrl } from '../textures.js?v=b8e38103';
 import { playOverlay } from '../overlays.js?v=91dcee74';
-import { itemZ } from '../item-bands.js?v=e98b10bc';
+import { itemZ } from '../item-bands.js?v=ec366be3';
 import { MAIL_POST_SENDER } from '../mailbox.js?v=d50d0d05';
 import { filterText } from '../word-filter.js?v=9a7a7ebb';
 import { trophyGotText } from '../home-trophies.js?v=649b111e';

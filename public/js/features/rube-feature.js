@@ -45,7 +45,7 @@ import {
   streetCanHostRube,
 } from '../rube.js?v=0b98cc11';
 import { frameTexture, isLoaded, onLoaded, sourceFromUrl } from '../textures.js?v=b8e38103';
-import { itemZ } from '../item-bands.js?v=e98b10bc';
+import { itemZ } from '../item-bands.js?v=ec366be3';
 import { standOnFeet } from '../sprite-feet.js?v=6358a697';
 
 export const RUBE_FEATURE_ID = 'rube';

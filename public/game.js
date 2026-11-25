@@ -4,7 +4,7 @@
  */
 import { ITEM_ICONS, ITEM_LABELS, getVerbsFor, ordinaryItems, runVerb } from './content.js?v=ceaea1fe';
 import { createErrorOnce, createFeatureHost, createFrameStages } from './js/feature-host.js?v=b87e2cbc';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=7e47948c';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=efb9b5db';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl, drawTileArt } from './js/enter-chooser.js?v=92133ac8';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, bodyReachDistance, OUT_OF_REACH_LINE, playerClickBox } from './js/reach.js?v=456da8a8';
@@ -1175,7 +1175,7 @@ import { grantSoloStarterItems, isNewMultiplayerPlayer, newPlayerInventory, newP
 import { SPEECH_HOLD_MARGIN, clearSpeechOfBox, deepestSpeechTip, giveArtHeight, holdSpeechSide, hudColumnBox, limitSpeechShift, limitSpeechTip, placeSpeechTail, placeSpeechTip, settleSpeechMove, slideOffAvatars, speechBubbleOutline, speechOffsetFor, speechPushLimit, speechTipOnSide, standingFeet } from './js/speech-placement.js?v=0371ea0c';
 import { shrineDonationResponseKey, verbResponse } from './js/verb-responses.js?v=97df8351';
 import { RESULT_FLOAT_MAX_CHARS, resultLineRoute } from './js/verb-result-route.js?v=61b4fc9d';
-import { SUMMONED_Z, itemZ } from './js/item-bands.js?v=e98b10bc';
+import { SUMMONED_Z, itemZ } from './js/item-bands.js?v=ec366be3';
 import { outlinePoints } from './js/outline-points.js?v=c9edb089';
 import { STAT_PAINTS } from './js/stat-icons.js?v=b89600eb';
 import { SLUG_ANIMATION, SLUG_LAYOUT, SLUG_TARGETS, drawSlugGlyph, formatRawSlugs, formatSlugList, layoutSlugRow, slugBox, slugNumber, slugPaint, slugPillPath, slugSign, speechSlugList } from './js/speech-slugs.js?v=e79cecfa';

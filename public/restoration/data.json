@@ -2814,9 +2814,19 @@
   "deployed": "2026-11-25"
  },
  "git": {
-  "commits": 3543,
+  "commits": 3546,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-25",
+    "kind": "fix",
+    "text": "The Smugglers and the Deimaginator pop in in front of trees and barnacles"
+   },
+   {
+    "date": "2026-11-25",
+    "kind": "fix",
+    "text": "The Game Show ticket's spinning wheel draws in front of barnacles"
+   },
    {
     "date": "2026-11-25",
     "kind": "improve",
@@ -2926,16 +2936,6 @@
     "date": "2026-11-25",
     "kind": "new",
     "text": "Camera Mode can snap your whole house, Tower or home street, every floor stacked"
-   },
-   {
-    "date": "2026-11-25",
-    "kind": "fix",
-    "text": "A garden's Water all shows the energy it will really spend, not 2"
-   },
-   {
-    "date": "2026-11-25",
-    "kind": "fix",
-    "text": "A dead connection is found in seconds and says \"Reconnecting...\""
    }
   ]
  },

@@ -38,7 +38,7 @@ import { treeDeathFeature } from '../public/js/features/tree-death-feature.js?v=
 import { patchesFeature } from '../public/js/features/patches-feature.js?v=5dbc6102';
 import { streetObjectsFeature } from '../public/js/features/street-objects-feature.js?v=f9cff392';
 import { helpMineFeature, relabelOpenDig } from '../public/js/features/help-mine-feature.js?v=15486785';
-import { animalMoodFeature } from '../public/js/features/animal-mood-feature.js?v=4b0f6b53';
+import { animalMoodFeature } from '../public/js/features/animal-mood-feature.js?v=b1275741';
 
 // ---------------------------------------------------------------------------
 // Pure helpers

@@ -117,7 +117,7 @@ import { publicStreet } from '../shared-street.js?v=dce5694b';
 import { quoteAnimalKinship } from '../animal-kinship.js?v=75d3cb34';
 import { VERB_RESPONSE_POOLS } from '../verb-responses-data.js?v=0777b59b';
 import { captureVerbState, isFoodItem, itemLabel } from '../animal-husbandry.js?v=427fd853';
-import { ROOK_SHEETS, rookAttackFeature } from './rook-attack-feature.js?v=43738baa';
+import { ROOK_SHEETS, rookAttackFeature } from './rook-attack-feature.js?v=765a7892';
 import { ANIMAL_BODY, ANIMAL_PATROL, TREE_FOOTPRINT } from '../street-ecology.js?v=58aafb61';
 import {
   CHECK_ON_REMOVE,

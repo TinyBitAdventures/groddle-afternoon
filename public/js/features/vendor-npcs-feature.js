@@ -64,7 +64,7 @@ import {
   vendorStreetsFor,
   vendorStrip,
 } from '../vendor-npcs.js?v=90b0c123';
-import { itemZ } from '../item-bands.js?v=e98b10bc';
+import { itemZ } from '../item-bands.js?v=ec366be3';
 import { chickenSeed, walkerSpan } from '../street-creatures.js?v=5ca995d4';
 import { measuredGardenVendor } from '../garden-beds.js?v=2ac6a12c';
 import { followFloorY, landingY } from '../walk-surface.js?v=3c919d5b';

@@ -92,7 +92,7 @@
 
 import { ITEM_CATALOG, itemIcon } from '../inventory.js?v=6414dbdc';
 import { frameTexture, sourceFromUrl } from '../textures.js?v=b8e38103';
-import { questRoomConverse } from './quest-instances-feature.js?v=63e00102';
+import { questRoomConverse } from './quest-instances-feature.js?v=4d8f5204';
 import { hellFeature } from './hell-feature.js?v=74604dfc';
 import { DISPATCHER_ART, FROG_ART, MAIL_NPC_ART_DIR } from '../mail-npc-art.js?v=1ed97a5d';
 import { DISPATCHER_GAP, DISPATCHER_HALF, DISPATCHER_TEXT, SIGNPOST } from '../home-street-fixtures.js?v=4b4bc96f';
@@ -123,7 +123,7 @@ import {
 } from '../mail-courier.js?v=a210c94c';
 import { AUCTION_SENDER, mailSubject, mailText } from '../auctions.js?v=2b806ad4';
 import { formatStack } from '../gifts.js?v=37ce7d76';
-import { itemZ } from '../item-bands.js?v=e98b10bc';
+import { itemZ } from '../item-bands.js?v=ec366be3';
 
 export const MAIL_COURIER_FEATURE_ID = 'mail-courier';
 const FROG_CLASS = 'npc_yoga_frog';

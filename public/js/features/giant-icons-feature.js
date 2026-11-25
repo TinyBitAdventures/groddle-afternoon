@@ -73,7 +73,7 @@ import { grantMoodXp } from '../mood-xp.js?v=e311b45c';
 import { forceMetabolic, gainMetabolic } from '../metabolics.js?v=48f784bf';
 import { CONVERSATION_RULES, adoptLegacyTalks, conversationRecord, hasCompleted, toldRecord } from '../conversations.js?v=7cbdfea4';
 import { TELLERS } from '../conversations-data.js?v=f11b7e02';
-import { itemZ } from '../item-bands.js?v=e98b10bc';
+import { itemZ } from '../item-bands.js?v=ec366be3';
 import { publicStreet } from '../shared-street.js?v=dce5694b';
 import { standOnFeet } from '../sprite-feet.js?v=6358a697';
 

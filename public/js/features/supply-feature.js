@@ -100,7 +100,7 @@ import {
 } from '../bureaucracy.js?v=46df051e';
 import { frameTexture, sourceFromUrl } from '../textures.js?v=b8e38103';
 import { setMetalMakingMusic } from '../sound-moments.js?v=3e66996f';
-import { itemZ } from '../item-bands.js?v=e98b10bc';
+import { itemZ } from '../item-bands.js?v=ec366be3';
 import { topUpMetabolic } from '../metabolics.js?v=48f784bf';
 import { standOnFeet } from '../sprite-feet.js?v=6358a697';
 import { ownGroundRows } from '../ground-stacks.js?v=22792362';

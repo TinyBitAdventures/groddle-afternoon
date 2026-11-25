@@ -93,7 +93,7 @@ import {
   resetBaqalaTimes,
 } from '../ancestral-nostalgia.js?v=7c972d9f';
 import { NOSTALGIA_BOOT_STREETS } from '../ancestral-nostalgia-data.js?v=0adb9184';
-import { itemZ } from '../item-bands.js?v=e98b10bc';
+import { itemZ } from '../item-bands.js?v=ec366be3';
 
 export const JUJU_FEATURE_ID = 'juju-bandits';
 /** npc_juju_bandit is a foreground item (item-bands.js). */

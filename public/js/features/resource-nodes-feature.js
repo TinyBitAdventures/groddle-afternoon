@@ -111,7 +111,7 @@ import { OVERLAY_FADE, displayTopOf, itemstackOverlayPoint } from '../overlay-ar
 import { playItemOverlay } from '../item-overlay.js?v=b0086ba6';
 import { nodeToolOverlay, nodeToolSheet } from '../node-tools.js?v=47a93d54';
 import { vpSequence } from '../quest-rooms/vp-overlay.js?v=5ec02fe7';
-import { itemZ } from '../item-bands.js?v=e98b10bc';
+import { itemZ } from '../item-bands.js?v=ec366be3';
 import { salmonSwimAt } from '../street-creatures.js?v=5ca995d4';
 import { GAME_EPOCH_MS } from '../game-day.js?v=a532775d';
 import { topUpMetabolic } from '../metabolics.js?v=48f784bf';

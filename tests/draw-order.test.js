@@ -26,8 +26,8 @@ import { FRONT_FURNITURE_SLOTS, furnitureDrawsInFront } from '../public/js/home-
 import { FURNITURE_CATALOG } from '../public/js/homes-catalog.js?v=0367f90f';
 import { typingElsewhere } from '../public/js/screen-fx.js?v=39954e0b';
 import { SCREEN_SELECTOR, WINDOW_SELECTOR, isTopWindow, stackZ } from '../public/js/window-stack.js?v=a7104f02';
-import * as itemBands from '../public/js/item-bands.js?v=e98b10bc';
-import { BAND_Z, bandClass, itemBand, itemZ, knownItemClass } from '../public/js/item-bands.js?v=e98b10bc';
+import * as itemBands from '../public/js/item-bands.js?v=ec366be3';
+import { BAND_Z, bandClass, itemBand, itemZ, knownItemClass } from '../public/js/item-bands.js?v=ec366be3';
 import { BACKGROUND_CLASSES, FOREGROUND_CLASSES, FOREMOST_CLASSES, NORMAL_CLASSES } from '../public/js/item-bands-data.js?v=0ac4551c';
 import { buildItemBands, render as renderItemBands } from '../tools/build-item-bands.mjs';
 

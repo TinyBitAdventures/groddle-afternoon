@@ -24,7 +24,7 @@ import {
 } from '../public/js/garden.js?v=9c4cc027';
 import { getVerbsFor } from '../public/content.js?v=ceaea1fe';
 import { activeSeasons, parseSeasonDate } from '../public/js/seasons.js?v=5d8f545a';
-import { seasonsFeature } from '../public/js/features/seasons-feature.js?v=b8554fe4';
+import { seasonsFeature } from '../public/js/features/seasons-feature.js?v=044f4e7b';
 import { createInventory, addItem } from '../public/js/inventory.js?v=6414dbdc';
 
 const LINE = 'Pumpkins grow only during Zilloween and Pot Luck Day.';
