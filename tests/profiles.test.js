@@ -18,9 +18,9 @@ import {
   AVATAR_STILL, AVATAR_TILE, FAILURE_BACKOFF_MS, HOME_BACKDROP, HOME_MAX, HOME_MAX_BYTES, HOME_QUALITY, HOME_REFRESH_MS, HOME_RESOLUTION, HOME_TYPES, HOME_WIDTHS,
   PROFILE_ABOUT_MAX, PROFILE_COPY, RETRY_MS,
   aboutCounter, aboutLength, avatarKeyOf, base64Bytes, cleanAbout, homeKeyOf, homeSizes, imageBase64, pngBase64, profileSlug, shortHash, shouldUpload, stillTransform,
-} from '../public/js/profiles.js?v=7caf2524';
+} from '../public/js/profiles.js?v=7e94c96f';
 import { createMinnAccount } from '../public/js/minn-account.js?v=7e3d7279';
-import { FEATURES } from '../public/js/features/index.js?v=7dae65d4';
+import { FEATURES } from '../public/js/features/index.js?v=26fc78c5';
 import { SITE_DIR, skipWithoutSite } from '../tools/repos.mjs';
 import { loadContentCatalogsFromDir, getSkillCatalog } from '../public/js/content-catalogs.js?v=2b7048b9';
 import { skillTitle } from '../public/js/skill-tree.js?v=08772a4b';
@@ -55,8 +55,8 @@ describe('profile rules (js/profiles.js)', () => {
     assert.equal(homeKeyOf('meadow', t), homeKeyOf('meadow', t + 1000));
     assert.notEqual(homeKeyOf('meadow', t), homeKeyOf('firebog', t));
     assert.notEqual(homeKeyOf('meadow', t), homeKeyOf('meadow', t + HOME_REFRESH_MS));
-    assert.match(homeKeyOf('<script>', t), /^h2-script-/);
-    assert.match(homeKeyOf('', t), /^h2-meadow-/);
+    assert.match(homeKeyOf('<script>', t), /^h3-script-/);
+    assert.match(homeKeyOf('', t), /^h3-meadow-/);
     assert.match(homeKeyOf('meadow', t), /^[A-Za-z0-9:._-]{1,64}$/, 'a key the site takes');
   });
 

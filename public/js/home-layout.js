@@ -42,7 +42,7 @@ import { HIRES_ICONS } from './icon-hires.js?v=60e2474b';
 import { CULTIVATION_CLASSES } from './homes-catalog.js?v=0367f90f';
 import { TOWER_CHASSIS, TOWER_PROTO } from './home-tower.js?v=a7fc0cce';
 import { GROWN_TREE_LABELS } from './patches.js?v=3498abf3';
-import { shortHash } from './profiles.js?v=7caf2524';
+import { shortHash } from './profiles.js?v=7e94c96f';
 import { MIN_PACK_HEIGHT, VIEW_CEIL_H, VIEW_MAX_W, stageFor } from './location-view.js?v=fa4d254b';
 
 export const HOME_LAYOUT_VERSION = 1;
@@ -529,14 +529,22 @@ export function homeLayoutJson(layout) {
 }
 
 /**
+ * The drawing's revision, in a layout's key: a layout drawn by an older revision is out of date, so
+ * the next visit home replaces it. 2 (G1315, Austin 2026-11-25): no players, the owner included
+ * (js/home-layout-scene.js walkHomeScene), as Glitch's home pictures had none.
+ */
+export const HOME_LAYOUT_DRAWING = 2;
+
+/**
  * PURE: the key a layout is sent under (the site keeps it, like a picture's):
  * the version, the home's style, HOME_REFRESH_MS's bucket (the picture's own,
- * profiles.js homeKeyOf) and what is on the street: the spots' kinds and
- * class ids, never where the avatar stood, so a new layout goes up when the
- * picture would, or when something on the street changes.
+ * profiles.js homeKeyOf), the drawing's revision (HOME_LAYOUT_DRAWING) and what
+ * is on the street: the spots' kinds and class ids, never where an avatar stood
+ * (an older layout's), so a new layout goes up when the picture would, or when
+ * something on the street changes.
  */
 export function homeLayoutKeyOf(layout, pictureKey) {
   const things = (layout?.spots || []).filter((s) => s.k !== 'avatar').map((s) => [s.k, s.i || '', s.n ?? '', s.s || '', s.p ?? '', s.name || ''].join(':')).join('|');
   const base = String(pictureKey || '').replace(/^h\d+-/, '');
-  return `l${layout?.v === HOME_STREET_VERSION ? HOME_STREET_VERSION : HOME_LAYOUT_VERSION}-${base}-${shortHash(things)}`.slice(0, 64);
+  return `l${layout?.v === HOME_STREET_VERSION ? HOME_STREET_VERSION : HOME_LAYOUT_VERSION}-${base}-${shortHash(`d${HOME_LAYOUT_DRAWING}|${things}`)}`.slice(0, 64);
 }

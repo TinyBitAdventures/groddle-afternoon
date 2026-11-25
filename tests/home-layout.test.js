@@ -17,13 +17,13 @@ import { homedir } from 'node:os';
 import {
   HOME_LAYOUT_ART_ROOTS, HOME_LAYOUT_KINDS, HOME_LAYOUT_LIMITS, HOME_LAYOUT_TEXTS, HOME_LAYOUT_VERSION,
   HOME_FRAME_WINDOW, boxFromCorners, buildHomeLayout, describeHomeThing, hexColour, homeLayoutJson, homeLayoutKeyOf, homeViewFrame, layoutArtPath, splitFrameToSheet,
-} from '../public/js/home-layout.js?v=c6ab27df';
-import { collectHomeLayout, walkHomeScene } from '../public/js/home-layout-scene.js?v=7f45c357';
+} from '../public/js/home-layout.js?v=a28e9e4d';
+import { collectHomeLayout, walkHomeScene } from '../public/js/home-layout-scene.js?v=da9ddc63';
 import { phoneStage, stageFor } from '../public/js/location-view.js?v=fa4d254b';
-import { STREET_WORLD_H } from '../public/js/features/homes-feature.js?v=84a1194f';
-import { AVATAR_STILL, homeKeyOf } from '../public/js/profiles.js?v=7caf2524';
+import { STREET_WORLD_H } from '../public/js/features/homes-feature.js?v=2a83f537';
+import { AVATAR_STILL, homeKeyOf } from '../public/js/profiles.js?v=7e94c96f';
 import { HIRES_SPRITES, SPLIT_SPRITES } from '../public/js/sprite-hires.js?v=e96be5f1';
-import { HOUSE_STYLE_KEYS } from '../public/js/features/homes-feature.js?v=84a1194f';
+import { HOUSE_STYLE_KEYS } from '../public/js/features/homes-feature.js?v=2a83f537';
 import { SITE_DIR, skipWithoutSite } from '../tools/repos.mjs';
 import { PHP } from './php.js';
 
@@ -208,7 +208,7 @@ describe('the stage walk (walkHomeScene)', () => {
     assert.deepEqual(draw[1], { col: 0x123456, rect: [0, 40, 100, 10], alpha: 0.5, f: 1 });
   });
 
-  it('makes a target or a tagged object a spot owning the art under it, and the avatar the owner\'s still', () => {
+  it('makes a target or a tagged object a spot owning the art under it, and leaves the owner out (G1315)', () => {
     const plant = sprite('assets/sprites/garden/plant.png', 0, -20, 20, 20);
     const garden = node({ x: 100, y: 400, homeLayout: { k: 'cultivation', i: 'proto_herb_garden_small' }, bounds: { x: -50, y: -20, width: 100, height: 22 } }, [plant]);
     const door = node({ x: 300, y: 400, bounds: { x: -46, y: -150, width: 92, height: 150 } });
@@ -216,15 +216,13 @@ describe('the stage walk (walkHomeScene)', () => {
     const player = node({ x: 500, y: 400, scale: { y: AVATAR_STILL.scale }, facing: 'right' });
     const world = node({}, [garden, door, label, player]);
     const { draw, spots } = walkHomeScene(world, io(new Map([[door, { classId: 'home_door' }]]), player));
-    assert.deepEqual(spots.map((s) => s.desc), [{ k: 'cultivation', i: 'proto_herb_garden_small' }, { k: 'door' }, { k: 'avatar', f: 1 }]);
+    assert.deepEqual(spots.map((s) => s.desc), [{ k: 'cultivation', i: 'proto_herb_garden_small' }, { k: 'door' }]);
     assert.equal(draw[0].spot, 0);
     assert.deepEqual(spots[1].aabb, [254, 250, 346, 400]);
     assert.equal(draw[1].txt, 'way_out');
-    const av = draw[2];
-    assert.equal(av.avatar, true);
-    assert.deepEqual(av.rect.map(Math.round), [414, 156, AVATAR_STILL.w, AVATAR_STILL.h]);
+    assert.equal(draw.length, 2, 'no avatar drawn');
     const layout = buildHomeLayout({ w: 960, h: 476, draw, spots });
-    assert.deepEqual(layout.spots.map((s) => s.k), ['cultivation', 'door', 'avatar']);
+    assert.deepEqual(layout.spots.map((s) => s.k), ['cultivation', 'door']);
   });
 
   it('gives art drawn apart from its thing to that thing (a garden\'s bed beside its foot), drawn before or after it', () => {

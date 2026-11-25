@@ -33,6 +33,10 @@
  *   homeLayoutVersions gets version 2: the whole street in parallax layers,
  *   starting at that frame, which the page pans along like Camera Mode
  *   (groddle-afternoon-site players/home-pan.js); else version 1, the view.
+ *   G1315 (Austin 2026-11-25): neither the picture nor the layout has a
+ *   player in it, the owner included, as Glitch's saveHomeImg picture had
+ *   none (LocationRenderer.as 594-660 hid every PC); keys h3 and drawing 2
+ *   replace the ones drawn with the owner on the next visit home.
  *   QA in solo: &homelayoutdemo=1 gives window.groddleHomeShot() (the
  *   picture's frame as a canvas) and window.groddleHomeLayout() (the
  *   whole street now; ({ street: false }) for the view).
@@ -84,10 +88,10 @@ import {
   TOWER_MAX, TOWER_MAX_BYTES, TOWER_QUALITIES, TOWER_SHOT_WIDTH,
   aboutCounter, profilePagePath, profilePageVerb, avatarKeyOf, base64Bytes, homeKeyOf, homeSizes, imageBase64, pngBase64, shouldUpload, staleRefreshDue, stillTransform,
   towerKeyOf, towerShotDue,
-} from '../profiles.js?v=7caf2524';
-import { homeLayoutJson, homeLayoutKeyOf, HOME_LAYOUT_LIMITS } from '../home-layout.js?v=c6ab27df';
-import { collectHomeLayout, homeFrameFor } from '../home-layout-scene.js?v=7f45c357';
-import { renderHomeLocation } from '../home-shot-render.js?v=b1875d75';
+} from '../profiles.js?v=7e94c96f';
+import { homeLayoutJson, homeLayoutKeyOf, HOME_LAYOUT_LIMITS } from '../home-layout.js?v=a28e9e4d';
+import { collectHomeLayout, homeFrameFor } from '../home-layout-scene.js?v=da9ddc63';
+import { renderHomeLocation } from '../home-shot-render.js?v=c2236e1b';
 import { withPublicView } from '../public-picture.js?v=1a0b03fa';
 
 export const PROFILES_FEATURE_ID = 'profiles';
@@ -628,7 +632,8 @@ export const profilesFeature = {
       window.groddleHomeLayout = (opts = { street: true }) => collectHomeLayout(engine, opts);
       window.groddleHomeShot = () => {
         const frame = homeFrameFor(engine);
-        return { frame, canvas: engine.snapshotView?.({ resolution: 1, ...(frame ? { frame } : {}) }) || null };
+        // As drawHome draws it (G1315: no players, the owner included).
+        return { frame, canvas: withPublicView(engine, () => engine.snapshotView?.({ resolution: 1, ...(frame ? { frame } : {}) })) || null };
       };
     }
     if (engine.mode !== 'multiplayer' || typeof document === 'undefined' || globalThis.groddlePractice === true) return;

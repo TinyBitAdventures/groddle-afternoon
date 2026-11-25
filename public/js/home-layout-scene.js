@@ -4,16 +4,22 @@
  * the picture's own crop, back to front. Every Sprite whose texture came from
  * one of the game's art files becomes an image at its drawn box; the sky and
  * the field's flat bands come from their tags (homes-feature drawLandscape:
- * `homeLayoutSky`, `homeLayoutFills`); the avatar becomes the owner's own
- * still (the site has it: Profiles avatar); text, vector avatars and effects
- * are left out. A display object that is a registered target (engine.register)
+ * `homeLayoutSky`, `homeLayoutFills`); text, vector avatars and effects
+ * are left out. G1315 (Austin 2026-11-25): no players either, the owner
+ * included: Glitch's home pictures showed the street with nobody on it
+ * (TSFrontController.as 1524 saveHomeImg, getSnapshot with
+ * includeAlmostEverything false; LocationRenderer.as 594-660 hid every PC,
+ * the owner's own too), as js/public-picture.js leaves them out of the
+ * picture. The owner's Glitch (io.player) and every other player's
+ * (publicPicture 'hide', features/realtime-feature.js makeRemote) are skipped
+ * with all they hold. A display object that is a registered target (engine.register)
  * or carries a `homeLayout` description owns the art under it: that is a spot.
  *
  * `walkHomeScene` takes the stage through a small adapter so tests can feed it
  * plain objects; `collectHomeLayout(engine)` is the game's call.
  */
-import { AVATAR_STILL } from './profiles.js?v=7caf2524';
-import { buildHomeLayout, describeHomeThing, homeViewFrame, splitFrameToSheet } from './home-layout.js?v=c6ab27df';
+import { PUBLIC_HIDE } from './public-picture.js?v=1a0b03fa';
+import { buildHomeLayout, describeHomeThing, homeViewFrame, splitFrameToSheet } from './home-layout.js?v=a28e9e4d';
 import { sceneViewCap } from './location-view.js?v=fa4d254b';
 
 /** The URL a texture source was loaded from (js/textures.js labels sources with it), or ''. */
@@ -60,12 +66,10 @@ export function walkHomeScene(root, io) {
     // A parallax layer (homes-feature drawLandscape lc.parallaxF): everything under it scrolls at f.
     if (Number.isFinite(node.parallaxF)) par = node.parallaxF;
     if (io.skip?.has(node)) return;
+    // G1315: no players, the owner included (saveHomeImg's picture had none).
+    if (node === io.player || node.publicPicture === PUBLIC_HIDE) return;
     const a = alpha * (node.alpha == null ? 1 : Number(node.alpha));
     if (!(a > 0.01)) return;
-    if (node === io.player) {
-      avatar(node, a);
-      return;
-    }
     // A spot: a target the game registered, or art that says what it is; or art drawn apart
     // from its thing (a garden's bed beside the garden's foot: homeLayoutPartOf).
     if (node.homeLayoutPartOf) {
@@ -120,19 +124,6 @@ export function walkHomeScene(root, io) {
     if (node.tint != null && node.tint !== 0xffffff) rec.tint = node.tint;
     if (owner != null) rec.spot = owner;
     draw.push(rec);
-  };
-  // The avatar: the owner's profile still (172 x 248, scale 1.76, feet 4 px above its foot; js/profiles.js) where it stands.
-  const avatar = (node, a) => {
-    const foot = io.toStage(node.parent || node, [{ x: node.x, y: node.y }])[0];
-    const s = Math.abs(Number(node.scale?.y) || 1) * (io.parentScale ? io.parentScale(node) : 1);
-    const k = s / AVATAR_STILL.scale;
-    const w = AVATAR_STILL.w * k;
-    const h = AVATAR_STILL.h * k;
-    const box = [foot.x - w / 2, foot.y - h + 4 * k, foot.x + w / 2, foot.y + 4 * k];
-    // The still faces left (PNGUtil.as 100); facing right is the still mirrored.
-    const desc = { k: 'avatar', ...(node.facing === 'right' ? { f: 1 } : {}) };
-    spots.push({ desc, aabb: box });
-    draw.push({ avatar: true, rect: [box[0], box[1], w, h], mirrored: desc.f === 1, alpha: a, spot: spots.length - 1, f: 1 });
   };
   visit(root, 1, null);
   return { draw, spots };

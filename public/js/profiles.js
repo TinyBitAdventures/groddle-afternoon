@@ -140,12 +140,14 @@ export function avatarKeyOf(lookKeyText) {
 /**
  * The key a home picture is made from: the drawing's version, the home's
  * style and a HOME_REFRESH_MS bucket, so decorating shows within hours. h2
- * is the sharp 2x WebP picture: an h1 picture (960 PNG) is out of date, so
- * the next visit home replaces it.
+ * was the sharp 2x WebP picture (an h1 picture, 960 PNG, out of date); h3
+ * (G1315, Austin 2026-11-25) the street with no players, the owner included
+ * (js/public-picture.js), so a picture drawn with the owner in it is out of
+ * date and the next visit home replaces it.
  */
 export function homeKeyOf(style, now = Date.now()) {
   const safe = String(style || 'meadow').toLowerCase().replace(/[^a-z0-9_-]/g, '').slice(0, 24) || 'meadow';
-  return `h2-${safe}-${Math.floor(Number(now) / HOME_REFRESH_MS).toString(36)}`;
+  return `h3-${safe}-${Math.floor(Number(now) / HOME_REFRESH_MS).toString(36)}`;
 }
 
 /**
