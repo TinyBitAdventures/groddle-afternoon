@@ -2814,9 +2814,19 @@
   "deployed": "2026-11-25"
  },
  "git": {
-  "commits": 3502,
+  "commits": 3504,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-25",
+    "kind": "new",
+    "text": "A play link can load a whole house from a house file into solo play"
+   },
+   {
+    "date": "2026-11-25",
+    "kind": "improve",
+    "text": "A whole-house Snap of a tall Tower keeps a readable width"
+   },
    {
     "date": "2026-11-25",
     "kind": "new",
@@ -2926,19 +2936,9 @@
     "date": "2026-11-24",
     "kind": "fix",
     "text": "A lonely Firebog street spirit's porthole face cries and flickers instead of standing still"
-   },
-   {
-    "date": "2026-11-24",
-    "kind": "fix",
-    "text": "A gem found while mining shows in the activity log as \"You got 1 Showy Sapphire!\""
-   },
-   {
-    "date": "2026-11-24",
-    "kind": "fix",
-    "text": "A Batterfly's Guano falls where it is flying, onto the floor under it"
    }
   ]
  },
- "tests": 1378,
+ "tests": 1379,
  "generatedAt": "2026-11-25"
 }
