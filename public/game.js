@@ -1131,6 +1131,7 @@ import { createNotifier, effectTokens, floatKey, offerCardDrop, stackFloat, toke
 import { flyItemToPack, noteFlown, unflownItems } from './js/pack-flight.js?v=8da4ab78';
 import { createMusicVoice } from './js/music-voice.js?v=75c8cf57';
 import { contextNeedsResume, createAudioResumer } from './js/audio-resume.js?v=63a617ad';
+import { backgroundSound, backgroundSoundOn } from './js/background-sound.js?v=00000000';
 import { bubbleMs } from './js/read-time.js?v=3151fb1a';
 import { mountNotifyView } from './js/notify-view.js?v=0fbfad68';
 import { mountSocialDrawer } from './js/ui/social-drawer.js?v=06c37291';
@@ -3520,7 +3521,7 @@ const audio = {
   /** js/sound-board.js instance (playSound). */
   board: null,
 };
-/** #660: js/audio-resume.js, which also hushes every sound while the page is hidden. */
+/** #660: js/audio-resume.js, which also hushes every sound while the page is hidden (unless #693's setting keeps it playing). */
 let audioResumer = null;
 /** #660: the page is hidden and hushed: no new sound starts (the suspended context would play them all on its return). */
 const audioHushed = () => Boolean(audioResumer?.hushed());
@@ -36410,13 +36411,15 @@ async function main() {
   // pageshow) resumes the AudioContext and plays a street music element the system paused (never
   // one whose short loop runs from its buffer, #504). js/audio-resume.js. #660: the page hidden
   // (visibilitychange, pagehide) pauses every sound until it shows again; the game loop and the
-  // network carry on as before.
+  // network carry on as before. #693: only while "Keep playing sound in the background" is off
+  // (js/background-sound.js: off by default on a phone or tablet, on for a computer, as Glitch kept
+  // playing in a background tab).
   audioResumer = createAudioResumer({
     getCtx: () => audio.ctx,
     getVoice: () => audio.music,
     isMuted: () => state.muted,
     rebuildVoice: rebuildStreetMusic,
-    hushWhenHidden: true,
+    hushWhenHidden: () => !backgroundSoundOn(),
     onResume: (reason, plan) => setCanvasData('audioResume', `${reason}:${plan.ctx ? 'ctx' : ''}${plan.el ? '+el' : ''}${plan.rebuild ? '+rebuild' : ''}`),
   });
   // Panel open/close and dialog button clicks (client CLICK_SUCCESS/FAILURE).
@@ -36771,6 +36774,9 @@ async function main() {
         levels: { ...audioLevels },
         // G918: the "Let other apps' music keep playing" switch, the audio session asked for, and whether an element exists.
         otherMusic,
+        // #693: "Keep playing sound in the background", and whether the page is hushed now.
+        background: backgroundSoundOn(),
+        hushed: audioHushed(),
         session: navigator.audioSession?.type ?? null,
         trackElement: Boolean(audio.music),
         theme: ambientThemeId,
@@ -36976,7 +36982,7 @@ async function main() {
   // PHONE ZOOM: on a phone the bar's Zoom slider moves the phone's close-up level (js/world-zoom.js).
   const hudZoom = TOUCH_PHONE ? phoneZoom : { get: worldZoom, set: setWorldZoom, onChange: onZoomChange, fixed: zoomFixed, onFixedChange: onZoomFixedChange };
   installTopBar(document, {
-    audio: { levels: () => ({ ...audioLevels }), setLevel: setAudioLevel, otherMusic: { get: () => otherMusic, set: setOtherMusic } },
+    audio: { levels: () => ({ ...audioLevels }), setLevel: setAudioLevel, otherMusic: { get: () => otherMusic, set: setOtherMusic }, background: backgroundSound },
     zoom: hudZoom,
     nightTint,
     streetMap: streetMapSetting,

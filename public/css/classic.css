@@ -3466,14 +3466,17 @@
 /* === end build16a === */
 
 /* === fix28 (lane) === */
-/* G918 (#447): "Let other apps' music keep playing" in the volume panel, under Music, in the panel's words. */
-:root[data-ui="classic"] .top-bar #sound-pop .sound-other-music {
+/* G918 (#447): "Let other apps' music keep playing" in the volume panel, under Music, in the panel's words; #693's "Keep playing sound in the background" beside it. */
+:root[data-ui="classic"] .top-bar #sound-pop .sound-other-music,
+:root[data-ui="classic"] .top-bar #sound-pop .sound-background {
   padding: calc(4 * var(--cu)) calc(8 * var(--cu)) calc(6 * var(--cu));
   color: var(--c-classic-title);
   font: 700 var(--fs-classic-body)/var(--lh-snug) var(--font-classic-body);
 }
-:root[data-ui="classic"] .top-bar #sound-pop .sound-other-music input { margin: 0; accent-color: var(--c-classic-link); }
-:root[data-ui="classic"] .top-bar #sound-pop .sound-other-music small { color: var(--c-classic-text); font-weight: 400; }
+:root[data-ui="classic"] .top-bar #sound-pop .sound-other-music input,
+:root[data-ui="classic"] .top-bar #sound-pop .sound-background input { margin: 0; accent-color: var(--c-classic-link); }
+:root[data-ui="classic"] .top-bar #sound-pop .sound-other-music small,
+:root[data-ui="classic"] .top-bar #sound-pop .sound-background small { color: var(--c-classic-text); font-weight: 400; }
 :root[data-ui="classic"] .top-bar #sound-pop .hud-slider[data-other-music] { opacity: 0.5; }
 /* === end fix28 === */
 

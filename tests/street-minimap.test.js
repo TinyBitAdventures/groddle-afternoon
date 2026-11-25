@@ -332,7 +332,7 @@ describe('street map: the setting', () => {
     assert.match(read('public/game.js'), /streetMap: streetMapSetting,/);
     const prefs = read('public/js/classic/classic-prefs.js');
     assert.match(prefs, /parts\.streetMap\.addEventListener\('change', \(\) => setStreetMap\(parts\.streetMap\.checked\)\);/);
-    assert.match(prefs, /win\.append\([^)]*tintRow, mapRow, foot\);/);
+    assert.match(prefs, /win\.append\([^)]*tintRow, mapRow, (bgRow, )?foot\);/);
     const mod = read('public/js/ui/street-minimap.js');
     assert.match(mod, /class="smm-hide" aria-label="Hide the street map \(Shift\+M\)"/);
     assert.match(mod, /showBtn\.id = 'street-minimap-show';/);

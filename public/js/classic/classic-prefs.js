@@ -11,7 +11,8 @@
  * (js/world-zoom.js: Wide to Original; Original window size already is the
  * 2012 picture, so the slider rests while it is on) and Night tint (js/night-tint.js:
  * the world darkens with the game clock; the 2012 client had none) and Street map (G370,
- * js/ui/street-minimap.js: the map the 2012 client always showed). The original's six checkboxes
+ * js/ui/street-minimap.js: the map the 2012 client always showed), and "Keep playing sound in the
+ * background" (#693, js/background-sound.js, the same switch as the Sound popover's). The original's six checkboxes
  * have nothing behind them here and are left out. Changes apply at once, so the
  * window has Done where the original had Save.
  *
@@ -26,6 +27,7 @@ import { installClassicChrome } from './classic-chrome.js?v=f98b9d48';
 import { ZOOM_KEYS_HINT, clampZoom, onZoomChange, setWorldZoom, worldZoom, zoomLabel, zoomValueText } from '../world-zoom.js?v=38816228';
 import { NIGHT_TINT_HINT, NIGHT_TINT_LABEL, nightTintOn, onNightTintChange, setNightTint } from '../night-tint.js?v=1dfc9c89';
 import { STREET_MAP_HINT, STREET_MAP_LABEL, onStreetMapChange, setStreetMap, streetMapOn } from '../ui/street-minimap.js?v=ccb6cb94';
+import { BACKGROUND_SOUND_HINT, BACKGROUND_SOUND_LABEL, backgroundSoundOn, onBackgroundSoundChange, setBackgroundSound } from '../background-sound.js?v=00000000';
 import { focusBack } from '../ui/focus-return.js?v=da190597';
 
 export const PREFS_TITLE = 'Preferences';
@@ -108,6 +110,7 @@ export function createPreferences(doc) {
     parts.zoomHeld.hidden = !held;
     parts.tint.checked = nightTintOn();
     parts.streetMap.checked = streetMapOn();
+    parts.background.checked = backgroundSoundOn();
   };
 
   const build = () => {
@@ -172,10 +175,17 @@ export function createPreferences(doc) {
     const mapWords = el(doc, 'span', {}, STREET_MAP_LABEL);
     mapWords.append(el(doc, 'small', {}, STREET_MAP_HINT));
     mapRow.append(parts.streetMap, mapWords);
+    // #693: sound while the page is hidden, the same switch as the Sound popover's.
+    const bgRow = el(doc, 'label', { class: 'prefs-choice prefs-background-sound', 'data-background-sound-control': 'prefs' });
+    parts.background = el(doc, 'input', { type: 'checkbox', id: 'prefs-background-sound' });
+    parts.background.addEventListener('change', () => setBackgroundSound(parts.background.checked));
+    const bgWords = el(doc, 'span', {}, BACKGROUND_SOUND_LABEL);
+    bgWords.append(el(doc, 'small', {}, BACKGROUND_SOUND_HINT));
+    bgRow.append(parts.background, bgWords);
     const foot = el(doc, 'div', { class: 'prefs-foot' });
     const done = el(doc, 'button', { type: 'button', class: 'prefs-done' }, 'Done');
     foot.append(done);
-    win.append(close, title, group, parts.sizeRow, zoomBox, tintRow, mapRow, foot);
+    win.append(close, title, group, parts.sizeRow, zoomBox, tintRow, mapRow, bgRow, foot);
     shade.append(win);
     doc.body.append(shade);
     close.addEventListener('click', () => api.close());
@@ -193,6 +203,7 @@ export function createPreferences(doc) {
     onZoomChange(sync);
     onNightTintChange(sync);
     onStreetMapChange(sync);
+    onBackgroundSoundChange(sync);
   };
 
   const api = {

@@ -23,6 +23,7 @@
 import { vitalLevel, vitalTitle } from '../vitals.js?v=85a51302';
 import { loadAudioRestore, saveAudioRestore } from '../audio-pref.js?v=80d433c3';
 import { OTHER_MUSIC_HINT, OTHER_MUSIC_LABEL } from '../other-music.js?v=f58af5e6';
+import { BACKGROUND_SOUND_HINT, BACKGROUND_SOUND_LABEL } from '../background-sound.js?v=00000000';
 import { PHONE_ZOOM_HINT, ZOOM_FIXED_NOTE, ZOOM_KEYS_HINT, clampZoom, phoneSideways, phoneZoomEnds, phoneZoomLabel, phoneZoomValueText, zoomLabel, zoomValueText } from '../world-zoom.js?v=38816228';
 import { NIGHT_TINT_HINT, NIGHT_TINT_LABEL } from '../night-tint.js?v=1dfc9c89';
 import { STREET_MAP_HINT, STREET_MAP_LABEL } from './street-minimap.js?v=ccb6cb94';
@@ -1261,6 +1262,13 @@ function installSound(doc, audio) {
     if (mute) mute.before(other.row);
     else pop.append(other.row);
   }
+  // #693: "Keep playing sound in the background" (js/background-sound.js), above Mute.
+  const background = audio?.background ? backgroundSoundToggle(doc, audio.background, { id: 'sound-background' }) : null;
+  if (background && !doc.getElementById('sound-background')) {
+    const mute = pop.querySelector('#mute-btn');
+    if (mute) mute.before(background.row);
+    else pop.append(background.row);
+  }
   const draw = () => {
     const v = audio?.levels?.() || {};
     const othersOn = Boolean(audio?.otherMusic?.get?.());
@@ -1311,7 +1319,7 @@ function installSound(doc, audio) {
   other?.input.addEventListener('change', draw);
   // It only sets things: a click on Mute, a channel, a slider or the switch gives the world the keys (focus-return.js).
   pop.dataset.clickReleases = '';
-  popover(doc, btn, pop, { onOpen: () => { draw(); names(); other?.draw(); } });
+  popover(doc, btn, pop, { onOpen: () => { draw(); names(); other?.draw(); background?.draw(); } });
   names();
   draw();
 }
@@ -1321,19 +1329,35 @@ function installSound(doc, audio) {
  * `setting` is { get(), set(bool) }. Returns the row, the input and a draw().
  */
 export function otherMusicToggle(doc, setting, { id, className = 'hud-toggle sound-other-music' }) {
+  const made = soundSwitch(doc, setting, { id, className, label: OTHER_MUSIC_LABEL, hint: OTHER_MUSIC_HINT });
+  made.row.dataset.otherMusicControl = 'sound';
+  return made;
+}
+
+/**
+ * #693: the "Keep playing sound in the background" switch (js/background-sound.js).
+ * `setting` is { get(), set(bool) }. Returns the row, the input and a draw().
+ */
+export function backgroundSoundToggle(doc, setting, { id, className = 'hud-toggle sound-background' }) {
+  const made = soundSwitch(doc, setting, { id, className, label: BACKGROUND_SOUND_LABEL, hint: BACKGROUND_SOUND_HINT });
+  made.row.dataset.backgroundSoundControl = 'sound';
+  return made;
+}
+
+/** One switch row in the Sound popover: a checkbox with its words and hint. */
+function soundSwitch(doc, setting, { id, className, label, hint: hintText }) {
   const row = doc.createElement('label');
   row.className = className;
   row.htmlFor = id;
-  row.dataset.otherMusicControl = 'sound';
   const input = doc.createElement('input');
   Object.assign(input, { id, type: 'checkbox' });
   input.setAttribute('role', 'switch');
   input.setAttribute('aria-describedby', `${id}-hint`);
   const words = doc.createElement('span');
-  words.textContent = OTHER_MUSIC_LABEL;
+  words.textContent = label;
   const hint = doc.createElement('small');
   hint.id = `${id}-hint`;
-  hint.textContent = OTHER_MUSIC_HINT;
+  hint.textContent = hintText;
   row.append(input, words, hint);
   const draw = () => {
     const on = Boolean(setting?.get?.());

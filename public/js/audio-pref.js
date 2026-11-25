@@ -101,3 +101,28 @@ export function saveOtherMusic(on, storage = globalThis.localStorage) {
     /* the choice just won't be remembered */
   }
 }
+
+/**
+ * #693: "Keep playing sound in the background" (js/background-sound.js, the Sound popover and
+ * Preferences), kept in this browser beside the other sound settings. '1' on, '0' off; nothing
+ * stored (or storage blocked) is null, which leaves the device's default (on for a computer, off
+ * for a phone or tablet).
+ */
+export const BACKGROUND_SOUND_KEY = 'groddle.audio.background';
+
+export function loadBackgroundSound(storage = globalThis.localStorage) {
+  try {
+    const v = storage?.getItem(BACKGROUND_SOUND_KEY);
+    return v === '1' ? true : v === '0' ? false : null;
+  } catch {
+    return null;
+  }
+}
+
+export function saveBackgroundSound(on, storage = globalThis.localStorage) {
+  try {
+    storage?.setItem(BACKGROUND_SOUND_KEY, on ? '1' : '0');
+  } catch {
+    /* the choice just won't be remembered */
+  }
+}

@@ -6,6 +6,11 @@
  * the page again resumes the context and rebuilds the street track at the same point (the iPad
  * path from ed80947fd66, never the old element played on). A muted player stays muted.
  * The Flash client kept its sound on deactivate (StageBeacon.onDeactivate only throttled frames).
+ *
+ * #693 (Austin 2026-11-25): the hush now follows "Keep playing sound in the background"
+ * (js/background-sound.js): off by default on a phone or tablet, where every hush below still holds;
+ * on by default on a computer, where nothing hushes (as Glitch kept playing). These pages are phones
+ * unless they say otherwise; tests/background-sound-693.test.js covers the computer and the switch.
  */
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
@@ -13,6 +18,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { HUSH_EVENTS, RESUME_EVENTS, audioHushPlan, createAudioResumer } from '../public/js/audio-resume.js?v=63a617ad';
 import { createMusicVoice } from '../public/js/music-voice.js?v=75c8cf57';
+import { createBackgroundSound } from '../public/js/background-sound.js?v=00000000';
 
 const root = join(import.meta.dirname, '..');
 const tick = () => new Promise((r) => setTimeout(r, 0));
@@ -64,8 +70,8 @@ function element(at = 0) {
   return el;
 }
 
-/** The page with street music playing, wired as game.js wires it (hushWhenHidden, rebuildVoice). */
-function page({ muted = false, looped = false } = {}) {
+/** The page with street music playing, wired as game.js wires it (hushWhenHidden from the #693 setting, rebuildVoice). */
+function page({ muted = false, looped = false, device = 'phone' } = {}) {
   const doc = Object.assign(target(), { visibilityState: 'visible' });
   const win = target();
   const ctx = context();
@@ -75,12 +81,13 @@ function page({ muted = false, looped = false } = {}) {
   if (!state.muted) voice.play();
   if (looped) voice.handOver({ duration: 120 }); // the Vine Radio or a short street loop from its buffer
   const rebuilt = [];
+  const background = createBackgroundSound({ win: {}, device: () => device, load: () => null, save: () => {} });
   const resumer = createAudioResumer({
     getCtx: () => ctx,
     getVoice: () => voice,
     isMuted: () => state.muted,
     rebuildVoice: (v) => rebuilt.push({ url: v.url, time: v.time() }),
-    hushWhenHidden: true,
+    hushWhenHidden: () => !background.get(),
     doc,
     win,
   });
@@ -90,7 +97,7 @@ function page({ muted = false, looped = false } = {}) {
   return { doc, win, ctx, el, voice, state, rebuilt, resumer, pass, hide, show };
 }
 
-describe('#660 every sound pauses while the page is hidden', () => {
+describe('#660 every sound pauses while the page is hidden (a phone or tablet, #693)', () => {
   it('the hush plan suspends a running context and pauses only a streaming element that plays', () => {
     const el = (o = {}) => ({ paused: false, ended: false, ...o });
     assert.deepEqual(audioHushPlan({ ctxState: 'running', voice: { el: el() } }), { ctx: true, el: true });
@@ -184,6 +191,24 @@ describe('#660 every sound pauses while the page is hidden', () => {
     assert.equal(p.rebuilt.length, 1);
   });
 
+  it('a tablet (an iPad) hushes as a phone does; a computer pauses nothing (#693)', async () => {
+    const pad = page({ device: 'tablet' });
+    pad.hide();
+    await tick();
+    assert.equal(pad.ctx.state, 'suspended');
+    assert.equal(pad.el.paused, true);
+    const desk = page({ device: 'computer' });
+    desk.pass(5);
+    desk.hide();
+    desk.win.fire('pagehide');
+    await tick();
+    desk.pass(30);
+    assert.equal(desk.ctx.state, 'running');
+    assert.equal(desk.el.paused, false);
+    assert.equal(desk.el.currentTime, 77, 'the music played on in the background');
+    assert.equal(desk.resumer.hushed(), false);
+  });
+
   it('without hushWhenHidden the resumer keeps its old contract (nothing paused on hide)', async () => {
     const doc = Object.assign(target(), { visibilityState: 'visible' });
     const ctx = context();
@@ -194,9 +219,9 @@ describe('#660 every sound pauses while the page is hidden', () => {
     assert.equal(ctx.suspends, 0);
   });
 
-  it('game.js hushes when hidden and starts no sound while hushed', () => {
+  it('game.js hushes when hidden (unless the #693 setting keeps sound on) and starts no sound while hushed', () => {
     const game = readFileSync(join(root, 'public/game.js'), 'utf8');
-    assert.match(game, /audioResumer = createAudioResumer\(\{[^}]*rebuildVoice: rebuildStreetMusic,\n    hushWhenHidden: true,/);
+    assert.match(game, /audioResumer = createAudioResumer\(\{[^}]*rebuildVoice: rebuildStreetMusic,\n    hushWhenHidden: \(\) => !backgroundSoundOn\(\),/);
     assert.match(game, /const audioHushed = \(\) => Boolean\(audioResumer\?\.hushed\(\)\);/);
     assert.match(game, /function playSound\(key, opts = \{\}\) \{\n  if \(state\.muted \|\| audioHushed\(\) \|\| !audio\.board\) return null;/);
     assert.match(game, /isMuted: \(\) => state\.muted \|\| audioHushed\(\),/, 'the sound board skips late files while hushed');

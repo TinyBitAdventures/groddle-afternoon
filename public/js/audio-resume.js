@@ -36,6 +36,12 @@
  * The Flash client kept playing when the window lost focus: StageBeacon.onDeactivate only throttled
  * the frame rate after a while (power saving mode), and SoundMaster had no focus handling. A Flash
  * plugin in a background tab kept its sound too; a phone browser in the background is another case.
+ *
+ * #693: so the hush is a setting, "Keep playing sound in the background" (js/background-sound.js):
+ * hushWhenHidden may be a function, read each time the page hides. game.js passes the setting
+ * turned round: on (the default on a computer) nothing hushes and sound plays on as Glitch's did;
+ * off (the default on a phone or tablet) hushes as above. Either way the page coming back takes the
+ * rebuild path when its audio stopped while away.
  */
 
 /** Context states a resume() can bring back. */
@@ -80,12 +86,15 @@ export function audioHushPlan({ ctxState = '', voice = null } = {}) {
 /**
  * Wires the one resume path. getCtx/getVoice/isMuted read the game's live state; rebuildVoice
  * (optional, #660) makes the street music again at the same place; hushWhenHidden (#660) pauses
- * every sound while the page is hidden; onResume (optional) hears what was tried. Returns
+ * every sound while the page is hidden (a boolean, or a function asked each time the page hides,
+ * #693); onResume (optional) hears what was tried. Returns
  * { resume, dispose, hushed }: resume() runs the plan now, hushed() is true while hidden and hushed.
  */
 export function createAudioResumer({ getCtx, getVoice, isMuted, rebuildVoice = null, hushWhenHidden = false, doc = globalThis.document, win = globalThis.window, onResume = null } = {}) {
   let busy = false;
   let hushed = false;
+  // #693: the setting is read when the page hides, so a change applies from the next time.
+  const hushOn = () => Boolean(typeof hushWhenHidden === 'function' ? hushWhenHidden() : hushWhenHidden);
   // The context's suspend() a hush started, until it settles: a quick return waits for it first.
   let suspending = null;
   // #660: the page went to the background (away), and whether its context left "running" there.
@@ -131,7 +140,7 @@ export function createAudioResumer({ getCtx, getVoice, isMuted, rebuildVoice = n
       }
       watchCtx(ctx);
       // Before the busy check: a resume still waiting on the context must not keep the page loud.
-      if (hushWhenHidden) hush(ctx, voice);
+      if (hushOn()) hush(ctx, voice);
     } else {
       hushed = false;
     }
