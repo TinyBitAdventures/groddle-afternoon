@@ -397,6 +397,7 @@
     "ours: // ours: a placed Icon is kept in your own save, so": "ours-giant-icons"
   },
   "public/js/features/groups-feature.js": {
+    "ours: // G1300: a group of ours renamed by its administrator (the site's call,": "not-an-invention",
     "remake-own: thread reply is chat-threads-feature's. The remake's own:": "chat-threads"
   },
   "public/js/features/gwendolyn-room-23-feature.js": {
