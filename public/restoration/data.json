@@ -2814,9 +2814,14 @@
   "deployed": "2026-11-25"
  },
  "git": {
-  "commits": 3620,
+  "commits": 3623,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-25",
+    "kind": "new",
+    "text": "Key holders and visitors let in go upstairs in a friend's house, and share each floor as the ground floor"
+   },
    {
     "date": "2026-11-25",
     "kind": "new",
@@ -2931,14 +2936,9 @@
     "date": "2026-11-25",
     "kind": "fix",
     "text": "Things on a shelf stand near its front edge, where Glitch put them, not at the very back"
-   },
-   {
-    "date": "2026-11-25",
-    "kind": "fix",
-    "text": "A refused drop of an emblem past today's limit says when it can be dropped"
    }
   ]
  },
- "tests": 1406,
+ "tests": 1407,
  "generatedAt": "2026-11-25"
 }
