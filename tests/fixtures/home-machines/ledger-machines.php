@@ -155,8 +155,11 @@ try {
 
     // —— What a visitor's game is sent: each machine with its place ——
     $get = new Request(Method::Get, '/groddle/v1/homes/' . OWNER . '/machines', [], [], [], '', true, 'groddle.test');
-    $seen = json_decode((new HomeMachines($seams(VISITOR, $get)))->view_($get, (string) OWNER)->body, true);
+    // The owner's game (G1018: a house's machines go only to whoever may enter it; an uninvited visitor gets none).
+    $seen = json_decode((new HomeMachines($seams(OWNER, $get)))->view_($get, (string) OWNER)->body, true);
     $out['seen'] = array_map(static fn (array $m): array => [$m['id'] === $up ? 'up' : 'ground', $m['place'], $m['rx']], $seen['machines']);
+    $uninvited = json_decode((new HomeMachines($seams(VISITOR, $get)))->view_($get, (string) OWNER)->body, true);
+    $out['uninvited'] = array_map(static fn (array $m): string => (string) $m['place'], $uninvited['machines'] ?? []);
 
     // —— Picked up from the second floor; the ground floor's stays where it is ——
     $out['take'] = $act(['op' => op(), 'owner' => OWNER, 'actor' => OWNER, 'place' => 'house:1', 'verb' => 'take', 'id' => $up]);

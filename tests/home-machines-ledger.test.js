@@ -85,8 +85,9 @@ describe('G1249: a machine on an upper floor of the house, through the ledger (H
     assert.deepEqual(r.afterRefuel[9], { plank: 8 }, 'the visitor\'s ledger is untouched');
   });
 
-  it('a game asking for the home\'s machines is told each one\'s floor', () => {
+  it('a game asking for the home\'s machines is told each one\'s floor; an uninvited visitor is told none (G1018)', () => {
     assert.deepEqual([...r.seen].sort((a, b) => a[0].localeCompare(b[0])), [['ground', 'house', 400], ['up', 'house:1', 400]]);
+    assert.deepEqual(r.uninvited, [], 'the house is for whoever may enter it');
   });
 
   it('picks it up from the second floor, tank and all; the ground floor\'s stays where it is', () => {
