@@ -60,7 +60,7 @@ import { getSkillCatalog } from '../content-catalogs.js?v=2b7048b9';
 import { listRecipesProducing } from '../making.js?v=1ec1075e';
 import { GIANTS } from '../shrines.js?v=4dd7a44f';
 import { giantDisplayName } from '../giant-names.js?v=0e295891';
-import { teleportationFeature } from './teleportation-feature.js?v=dfcbdc75';
+import { teleportationFeature } from './teleportation-feature.js?v=f8d1b923';
 import {
   SOLO_DIVISOR,
   WORK_UNIT_MS,
@@ -151,7 +151,7 @@ import {
   leaderboard,
 } from '../street-jobs-mp.js?v=5b45cedc';
 import { grantMoodXp } from '../mood-xp.js?v=e311b45c';
-import { createMinnAccount } from '../minn-account.js?v=7c3bdd51';
+import { createMinnAccount } from '../minn-account.js?v=7e3d7279';
 import { normalizeGroups } from '../groups.js?v=a0391f9a';
 import { frameTexture, sourceFromUrl, textureFromUrl } from '../textures.js?v=b8e38103';
 import { createJobIndicator, jobIndicatorTip, jobIndicatorView, jobPerc } from '../job-indicator.js?v=8bea518d';

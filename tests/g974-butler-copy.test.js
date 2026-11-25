@@ -16,11 +16,11 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 import { giftOffer, giveGiftTo, nextHandover, normalizeButlerState, normalizeParcelBox, setGift, stackCopy } from '../public/js/butler.js?v=152429c8';
-import { applyButlerStock, mergeParcels, normalizeButlerStock, normalizeGiftAnswer, normalizeParcels } from '../public/js/neighbours-mp.js?v=c0128a48';
+import { applyButlerStock, mergeParcels, normalizeButlerStock, normalizeGiftAnswer, normalizeParcels } from '../public/js/neighbours-mp.js?v=e912be37';
 import { leavingWire, receiveWire } from '../public/js/copy-picks.js?v=b368fd49';
 import { bindToolInventory, copyTags, createToolConditionState, setCopyTag, setToolRemaining, toolCopies } from '../public/js/tools.js?v=4156bba8';
 import { addItem, createInventory } from '../public/js/inventory.js?v=6414dbdc';
-import { createMinnAccount } from '../public/js/minn-account.js?v=7c3bdd51';
+import { createMinnAccount } from '../public/js/minn-account.js?v=7e3d7279';
 import { HAS_SITE, SITE_DIR } from '../tools/repos.mjs';
 
 const root = join(import.meta.dirname, '..');

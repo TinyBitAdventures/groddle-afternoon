@@ -258,6 +258,20 @@ export function createMinnAccount(opts = {}) {
     },
 
     /**
+     * #697 (groddle-afternoon-site src/HomeIcons.php): a use of a Giant Icon placed in a home, the
+     * Icon's one shared count and last tither: iconAct(owner, { icon, place, act }, inside) answers
+     * { ok, icon: { id, place, actions, tither }, tither, tell } or { ok: false, code, text, icon };
+     * homeIcons() { icons } the owner's own as the site keeps them. `inside`: the let-in proof.
+     */
+    async iconAct(owner, body, inside = '') {
+      return buddyCall('Reaching the Icon', `homes/${Number(owner)}/icons${inside ? `?in=${encodeURIComponent(inside)}` : ''}`, { method: 'POST', body });
+    },
+
+    async homeIcons() {
+      return buddyCall('Checking your Icons', 'homes/icons');
+    },
+
+    /**
      * Transcendental Radiation (register G330, groddle-afternoon-site/src/Radiance.php):
      * { rank, cards, watch: { token, expiresIn } }, the skill and cards the save holds,
      * signed for the realtime server (radiance_watch).

@@ -48,7 +48,7 @@ import {
 import { purgeOf, withoutPurged } from '../chat-purge.js?v=6c41f62d';
 import { EARLIER_TEXT } from '../groups.js?v=a0391f9a';
 import { imKey } from '../chat-reactions.js?v=38460172';
-import { createMinnAccount } from '../minn-account.js?v=7c3bdd51';
+import { createMinnAccount } from '../minn-account.js?v=7e3d7279';
 
 export const PLAYER_IM_FEATURE_ID = 'player-im';
 

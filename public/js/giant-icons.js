@@ -78,6 +78,16 @@ const ICON_TO_GIANT = Object.fromEntries(GIANT_IDS.map((g) => [GIANT_ICON_DATA[g
 const whole = (v, max = 1e9) => Math.max(0, Math.min(max, Math.floor(Number(v) || 0)));
 const capitalize = (s) => String(s || '').charAt(0).toUpperCase() + String(s || '').slice(1);
 const asSet = (v) => (v instanceof Set ? v : new Set(Array.isArray(v) ? v : []));
+/** A shared Icon's last tither: a player's id (0: you, solo), or null. */
+const tidyTither = (v) => (Number.isInteger(v) && v >= 0 ? v : null);
+
+/**
+ * #697: an Icon placed in a home keeps its last tither on itself, for everyone there (icon.js
+ * this.tither = pc, icon_tithe 316; a pack or street Icon's is the save's own `state.tither`).
+ * Whether `me` (a player's id online, 0 solo) is it.
+ */
+export const isTither = (row, me) => tidyTither(row?.tither) != null && row.tither === me;
+
 /** Source randInt(lo, hi), inclusive. */
 export const randInt = (lo, hi, rng = Math.random) => lo + Math.floor(rng() * (hi - lo + 1));
 
@@ -110,7 +120,7 @@ export function createIconState(seed = {}) {
     if (!Array.isArray(rows)) continue;
     const list = rows
       .filter((r) => r && GIANT_ICON_DATA[r.giant])
-      .map((r) => ({ id: String(r.id || ''), giant: r.giant, x: Number(r.x) || 0, y: Number(r.y) || 0, actions: whole(r.actions, 10_000) }))
+      .map((r) => ({ id: String(r.id || ''), giant: r.giant, x: Number(r.x) || 0, y: Number(r.y) || 0, actions: whole(r.actions, 10_000), ...(tidyTither(r.tither) != null ? { tither: tidyTither(r.tither) } : {}) }))
       .filter((r) => r.id);
     if (list.length) placed[tsid] = list;
   }
@@ -273,12 +283,13 @@ function iconRef(state, ref) {
   // save, so it is acted on as it was shown, and its key names whose it is.
   if (ref.row) {
     const row = ref.row;
-    return GIANT_ICON_DATA[row?.giant] ? { row, key: `visit:${ref.owner || 0}:${row.id}`, giant: row.giant } : null;
+    return GIANT_ICON_DATA[row?.giant] ? { row, key: `visit:${ref.owner || 0}:${row.id}`, giant: row.giant, shared: true } : null;
   }
   if (ref.placedId) {
-    for (const rows of Object.values(state.placed)) {
+    for (const [where, rows] of Object.entries(state.placed)) {
       const row = rows.find((r) => r.id === ref.placedId);
-      if (row) return { row, key: `placed:${row.id}`, giant: row.giant };
+      // An Icon in a home keeps its tither on itself (shared); a street one in the save.
+      if (row) return { row, key: `placed:${row.id}`, giant: row.giant, shared: isHomePlaceKey(where) };
     }
     return null;
   }
@@ -318,6 +329,26 @@ export function adoreCheck(state, ref, verb, ctx = {}) {
   return { ok: true, found };
 }
 
+/** icon_ruminate 79-94: randInt(25, 100) scaled above level 20, x2 for the last tither, else Piety x1.2. */
+export function adoreAmount(ctx = {}, wasTither = false, rng = Math.random) {
+  const [lower, upper] = rewardRange(ctx.level || 0);
+  let amount = randInt(lower, upper, rng);
+  if (wasTither) amount *= 2;
+  else if (asSet(ctx.skills).has('piety_1')) amount = 1.2 * amount;
+  return Math.round(amount);
+}
+
+/**
+ * #697: a ruminate / revere / reflect the site already spent the shared Icon's action for
+ * (src/HomeIcons.php; wasTither: its answer): your day's use and your reward.
+ */
+export function adoreShared(state, giant, verb, ctx = {}, wasTither = false, rng = Math.random) {
+  const def = GIANT_ICON_DATA[giant];
+  if (!def || !ICON_VERBS[verb]) return { ok: false, msg: '' };
+  markUsed(state, def.iconClass, verb);
+  return { ok: true, giant, stat: ICON_VERBS[verb].stat, amount: adoreAmount(ctx, wasTither, rng), tither: wasTither, msg: `You ${ICON_VERBS[verb].past} an ${def.label}.` };
+}
+
 /**
  * ruminate (mood) / revere (energy) / reflect (iMG). Returns the amount to
  * pay; the caller applies it (mood/energy clamp to the tank).
@@ -328,17 +359,15 @@ export function adoreIcon(state, ref, verb, ctx = {}, rng = Math.random) {
   if (!check.ok) return check;
   const { found } = check;
   const def = GIANT_ICON_DATA[found.giant];
-  const [lower, upper] = rewardRange(ctx.level || 0);
-  let amount = randInt(lower, upper, rng);
   let tither = false;
-  if (state.tither && state.tither === found.key) {
-    amount *= 2;
+  if (found.shared) {
+    tither = isTither(found.row, ctx.me ?? 0);
+    if (tither) delete found.row.tither;
+  } else if (state.tither && state.tither === found.key) {
     tither = true;
     state.tither = null;
-  } else if (asSet(ctx.skills).has('piety_1')) {
-    amount = 1.2 * amount;
   }
-  amount = Math.round(amount);
+  const amount = adoreAmount(ctx, tither, rng);
   setActions(found, Math.max(0, found.row.actions - 1));
   markUsed(state, def.iconClass, verb);
   return {
@@ -370,18 +399,47 @@ export function titheIcon(state, ref, pc, ctx = {}) {
   const def = GIANT_ICON_DATA[found.giant];
   pc.currants = Math.max(0, (pc.currants || 0) - cost);
   const extra = [];
-  if (found.row.actions <= TITHE_THRESHOLD) {
-    setActions(found, found.row.actions + TITHE_ACTIONS);
-    extra.push('Your generous donation will contribute to the upkeep of the Icon.');
+  const added = found.row.actions <= TITHE_THRESHOLD;
+  if (added) setActions(found, found.row.actions + TITHE_ACTIONS);
+  if (found.shared) found.row.tither = ctx.me ?? 0;
+  else state.tither = found.key;
+  return { ok: true, cost, giant: found.giant, actions: found.row.actions, msg: titheMessage(found.giant, cost, added) };
+}
+
+/** icon_tithe's activity line (buildVerbMessage 'tithed N currants to' and its extra line). */
+export function titheMessage(giant, cost, added) {
+  const def = GIANT_ICON_DATA[giant];
+  return `You tithed ${cost} currants to an ${def.label}. ${added ? 'Your generous donation will contribute to the upkeep of the Icon.' : ''}`.trim();
+}
+
+/**
+ * #697: one act on a shared Icon's state, the site's own rule (src/HomeIcons.php apply, the same
+ * cases): a ruminate / revere / reflect spends one action (refused at none) and the actor's
+ * double; a tithe at 10 or fewer adds 5 and makes the actor the last tither (refused above 10);
+ * a bestowment spends the last tither's double (refused for anyone else). Returns { ok, row (a
+ * copy after), tither (the actor was the last tither) } or { ok: false, code }.
+ */
+export function applyIconAct(row, act, actor) {
+  const was = isTither(row, actor);
+  const out = { ...row };
+  if (ICON_VERBS[act]) {
+    if (out.actions <= 0) return { ok: false, code: 'tithe_due' };
+    out.actions -= 1;
+    if (was) out.tither = null;
+    return { ok: true, row: out, tither: was };
   }
-  state.tither = found.key;
-  return {
-    ok: true,
-    cost,
-    giant: found.giant,
-    actions: found.row.actions,
-    msg: `You tithed ${cost} currants to an ${def.label}. ${extra.join(' ')}`.trim(),
-  };
+  if (act === 'tithe') {
+    if (out.actions > TITHE_THRESHOLD) return { ok: false, code: 'no_tithe' };
+    out.actions += TITHE_ACTIONS;
+    out.tither = actor;
+    return { ok: true, row: out, tither: false };
+  }
+  if (act === 'bestow') {
+    if (!was) return { ok: false, code: 'not_tither' };
+    out.tither = null;
+    return { ok: true, row: out, tither: true };
+  }
+  return { ok: false, code: 'invalid' };
 }
 
 /* ------------------------------------------------------------- placing */
@@ -417,13 +475,14 @@ export function normalizeVisitIcons(list) {
   return (Array.isArray(list) ? list : [])
     .slice(0, ICON_VISIT_MAX * 4)
     .filter((r) => r && typeof r === 'object' && GIANT_ICON_DATA[r.giant] && Number.isFinite(Number(r.x)) && Number.isFinite(Number(r.y)))
-    .map((r) => ({ id: String(r.id || ''), giant: r.giant, place: String(r.place || ''), x: Math.round(Number(r.x)), y: Math.round(Number(r.y)), actions: whole(r.actions, 10_000) }))
+    .map((r) => ({ id: String(r.id || ''), giant: r.giant, place: String(r.place || ''), x: Math.round(Number(r.x)), y: Math.round(Number(r.y)), actions: whole(r.actions, 10_000), tither: Number.isInteger(r.tither) && r.tither > 0 ? r.tither : null }))
     .filter((r) => /^icon\d{1,9}$/.test(r.id) && /^(street|house|tower:\d)$/.test(r.place))
     .slice(0, ICON_VISIT_MAX);
 }
 
 /** Move one pack Icon onto a street (keeps its action counter). */
-export function placeIcon(state, inv, giant, tsid, x, y) {
+/** me: who you are (a player's id online, 0 solo): an Icon set down in a home keeps its tither on itself. */
+export function placeIcon(state, inv, giant, tsid, x, y, { me = 0 } = {}) {
   const def = GIANT_ICON_DATA[giant];
   if (!def || whole(inv?.[def.iconClass]) < 1) return { ok: false, msg: 'You have no Icon of that Giant.' };
   syncPackIcons(state, inv);
@@ -435,11 +494,16 @@ export function placeIcon(state, inv, giant, tsid, x, y) {
   const id = `icon${state.nextId++}`;
   const row = { id, giant, x: Math.round(x), y: Math.round(y), actions };
   (state.placed[tsid] ||= []).push(row);
-  if (state.tither === `pack:${giant}:${index}`) state.tither = `placed:${id}`;
+  if (state.tither === `pack:${giant}:${index}`) {
+    if (isHomePlaceKey(tsid)) {
+      row.tither = me;
+      state.tither = null;
+    } else state.tither = `placed:${id}`;
+  }
   return { ok: true, row, msg: `You placed an ${def.label}.` };
 }
 
-export function pickUpIcon(state, inv, tsid, id) {
+export function pickUpIcon(state, inv, tsid, id, { me = 0 } = {}) {
   const rows = state.placed[tsid] || [];
   const i = rows.findIndex((r) => r.id === id);
   if (i === -1) return { ok: false, msg: 'That Icon is not here any more.' };
@@ -448,7 +512,7 @@ export function pickUpIcon(state, inv, tsid, id) {
   const def = GIANT_ICON_DATA[row.giant];
   inv[def.iconClass] = whole(inv[def.iconClass]) + 1;
   (state.pack[row.giant] ||= []).push(row.actions);
-  if (state.tither === `placed:${row.id}`) state.tither = `pack:${row.giant}:${state.pack[row.giant].length - 1}`;
+  if (state.tither === `placed:${row.id}` || isTither(row, me)) state.tither = `pack:${row.giant}:${state.pack[row.giant].length - 1}`;
   return { ok: true, row, msg: `You picked up an ${def.label}.` };
 }
 
@@ -458,7 +522,10 @@ export function pickUpIcon(state, inv, tsid, id) {
  * doPlayerResponse on collision with a placed Icon. One check a minute per
  * Giant (6 s while testing). Returns null when nothing happens, a tithe
  * request bubble, or a bestowment { stat, amount } to apply.
- * ctx: { now, level, skills, upgrades, favor, favorMax, testing }
+ * ctx: { now, level, skills, upgrades, favor, favorMax, testing }; #697 shared (an Icon in a
+ * home, its tither on itself) with me: whether me is its tither, never changed here (the caller
+ * spends it: solo at once, online through the site); base and fallback are the amount before the
+ * double and without it.
  */
 export function bestowCheck(state, row, ctx = {}, rng = Math.random) {
   const now = ctx.now ?? Date.now();
@@ -481,8 +548,7 @@ export function bestowCheck(state, row, ctx = {}, rng = Math.random) {
   const favorMax = (ctx.favorMax || 0) - (piety ? 20 : 10);
   if (!((ctx.favor || 0) >= favorMax)) types.push('favor');
   const type = types[randInt(0, types.length - 1, rng)];
-  // ctx.key: another key for the tither check (#697: someone else's Icon on a visit).
-  const key = ctx.key || `placed:${row.id}`;
+  const key = `placed:${row.id}`;
   const level = ctx.level || 0;
   let amount;
   if (type === 'favor') {
@@ -492,20 +558,24 @@ export function bestowCheck(state, row, ctx = {}, rng = Math.random) {
     const [lower, upper] = rewardRange(level, true);
     amount = randInt(lower, upper, rng);
   }
+  const base = amount;
   let tither = false;
-  if (state.tither === key) {
-    amount *= 2;
+  if (ctx.shared) {
+    tither = isTither(row, ctx.me ?? 0);
+  } else if (state.tither === key) {
     tither = true;
     state.tither = null;
-  } else if (piety) {
-    amount *= 1.2;
   }
+  if (tither) amount *= 2;
+  else if (piety) amount *= 1.2;
   amount = Math.round(amount);
   state.bestowed += 1;
   return {
     kind: 'bestow',
     type,
     amount,
+    base,
+    fallback: Math.round(piety ? base * 1.2 : base),
     tither,
     favorGiant: giant === 'ti' ? 'ti' : giant,
     roll,

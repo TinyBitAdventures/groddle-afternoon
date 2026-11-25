@@ -28,7 +28,7 @@ import {
   sortWords,
 } from '../public/js/pack-slots.js?v=38e4aea5';
 import { ITEM_CATALOG, isToolItem } from '../public/js/inventory.js?v=6414dbdc';
-import { bagsFeature } from '../public/js/features/bags-feature.js?v=ff85dea5';
+import { bagsFeature } from '../public/js/features/bags-feature.js?v=17bcf98a';
 import { packSlotTip } from '../public/js/ui/pack-row.js?v=615f7790';
 import { CHECK_ICON, verbRowInner } from '../public/js/ui/verb-menu.js?v=4cb51d52';
 

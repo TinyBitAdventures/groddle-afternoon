@@ -29,7 +29,7 @@ import { THREAD_TEXT, replyFrame, siteKey, threadTarget } from '../chat-threads.
 import { chatLine, shownName } from '../groups.js?v=a0391f9a';
 import { drawerLine, normalLine } from '../player-im.js?v=87bdb8ec';
 import { imKey, lineKey, normalReactions } from '../chat-reactions.js?v=38460172';
-import { createMinnAccount } from '../minn-account.js?v=7c3bdd51';
+import { createMinnAccount } from '../minn-account.js?v=7e3d7279';
 
 export const CHAT_THREADS_FEATURE_ID = 'chat-threads';
 

@@ -20,10 +20,17 @@
  *    the visit, src/Neighbours.php iconRows, through neighbours-mp-feature
  *    homeVisitIcons) and may Ruminate, Revere and Reflect on them, once a game
  *    day per Icon class from their own save, the rewards theirs, and gets its
- *    bestowments from their own clock. A visitor's use does not wear down your
- *    Icon's actions and a visitor can't tithe it (ours: the source kept one
- *    counter on the Icon for everyone; ours has no shared counter yet). Public
- *    streets online stay refused (M20, G945). From level 10 it calls out and offers its
+ *    bestowments from their own clock. What the source kept on the Icon is the
+ *    Icon's, for everyone (Austin 2026-11-25: "match Glitch's shared use"):
+ *    its actions (every use, by anyone, spends one) and its last tither (a
+ *    visitor may Tithe it: the payer's currants, +5 actions, the payer's next
+ *    use or bestowment doubled). An Icon in a home keeps its tither on itself
+ *    (row.tither: a player's id, 0 solo). Online each use goes through the
+ *    site (src/HomeIcons.php: one count, checked under a lock) and its proof
+ *    through the realtime server (home_icon_tell, home_iconed) to the owner
+ *    and everyone there; the owner's game reads its Icons' count from the site
+ *    when it comes home (homeIcons). An upper house floor is the owner's alone
+ *    and stays in the save. Public streets online stay refused (M20, G945). From level 10 it calls out and offers its
  *    recorded "Voices of the Giants" message (111 iMG) by the source's
  *    conversation rules, and a walk-in that brings an offer bestows nothing
  *    (include/icon.js 565-575, G214); Talk to then tells it (G202: the shared record,
@@ -66,6 +73,7 @@ import {
   ICONIZE_COUNT,
   adoreCheck,
   adoreIcon,
+  adoreShared,
   bestowCheck,
   bestowMessage,
   createIconState,
@@ -84,8 +92,9 @@ import {
   titheCheck,
   titheCost,
   titheIcon,
+  titheMessage,
   useEmblem,
-} from '../giant-icons.js?v=9b71adf1';
+} from '../giant-icons.js?v=9c28aaf2';
 import { textureFromUrl } from '../textures.js?v=b8e38103';
 import { playSheetOverlay } from '../overlay-art.js?v=e50bacca';
 import { grantMoodXp } from '../mood-xp.js?v=e311b45c';
@@ -94,10 +103,12 @@ import { CONVERSATION_RULES, adoptLegacyTalks, conversationRecord, hasCompleted,
 import { TELLERS } from '../conversations-data.js?v=f11b7e02';
 import { itemZ } from '../item-bands.js?v=ec366be3';
 import { publicStreet } from '../shared-street.js?v=dce5694b';
-import { readVisitScene } from '../neighbours-mp.js?v=c0128a48';
+import { insideProof, readVisitScene } from '../neighbours-mp.js?v=e912be37';
+import { createMinnAccount } from '../minn-account.js?v=7e3d7279';
+import { saveStore, savedThrough } from '../save-store.js?v=4e720735';
 import { HOME_INTERIOR_TSID, HOME_STREET_TSID } from '../homes.js?v=dca6b2cd';
 import { gnomePlaceFor, visitGnomePlace } from '../garden-gnome.js?v=d9f8e52b';
-import { homesFeature } from './homes-feature.js?v=b114664c';
+import { homesFeature } from './homes-feature.js?v=77fb06d3';
 import { standOnFeet } from '../sprite-feet.js?v=6358a697';
 
 export const ICONS_FEATURE_ID = 'giant-icons';
@@ -123,7 +134,141 @@ let homePollAt = 0;
 const dayKey = () => getGameDayKey(Date.now());
 const owned = (engine) => engine.pc?.imaginationUpgrades || [];
 const level = (engine) => Math.max(1, Number(engine.pc?.level) || 1);
-const ctxFor = (engine, pol = false) => ({ level: level(engine), upgrades: owned(engine), skills: engine.learnedSkills || [], pol });
+const ctxFor = (engine, pol = false) => ({ level: level(engine), upgrades: owned(engine), skills: engine.learnedSkills || [], pol, me: meId(engine) });
+
+/* ------------------------------------------- #697: a home's Icons, shared online */
+
+/** The places a visitor can reach, whose Icons the site keeps one count for (HomeIcons::act). */
+const SHARED_PLACE = /^(street|house|tower:\d)$/;
+/** { client, account, busy } online (the realtime client and the site), or null solo. */
+let net = null;
+
+/** Who you are: your player id online, 0 solo (a home Icon's tither). */
+function meId(engine) {
+  if (engine?.mode !== 'multiplayer') return 0;
+  return Number(net?.client?.me?.id) || Number(globalThis.GRODDLE_MP_BOOT?.player?.id) || 0;
+}
+
+function online(engine) {
+  if (engine?.mode !== 'multiplayer') return null;
+  if (net) return net;
+  if (typeof document === 'undefined') return null;
+  const client = engine.query?.('realtimeClient');
+  if (!client) return null;
+  const boot = globalThis.GRODDLE_MP_BOOT || {};
+  return wireNet(engine, client, createMinnAccount({ baseUri: document.baseURI, nonce: boot.nonce || '' }));
+}
+
+function wireNet(engine, client, account) {
+  net = { client, account, busy: new Set(), synced: '' };
+  client.on?.('msg:home_iconed', (msg) => heardIcon(engine, msg));
+  // Back online: read my own Icons again on the next look.
+  client.on?.('hello', () => {
+    if (net) net.synced = '';
+  });
+  return net;
+}
+
+/** Where a drawn Icon's shared count is kept: { owner, place }, or null (solo, a street, an upper floor). */
+function sharedAt(engine, v) {
+  if (!v?.home || !online(engine)) return null;
+  const place = v.visit ? v.row.place : String(v.key).slice(HOME_PREFIX_LEN);
+  if (!SHARED_PLACE.test(place)) return null;
+  return { owner: v.visit ? v.visit.owner : meId(engine), place };
+}
+const HOME_PREFIX_LEN = homePlaceKey('x').length - 1;
+
+/** A shared Icon's count and tither as the site or the realtime server says them. */
+function setShared(v, icon) {
+  if (!icon) return;
+  if (Number.isFinite(Number(icon.actions ?? icon.n))) v.row.actions = Math.max(0, Math.floor(Number(icon.actions ?? icon.n)));
+  const t = 'tither' in icon ? icon.tither : icon.t;
+  if (Number.isInteger(t) && t > 0) v.row.tither = t;
+  else delete v.row.tither;
+  if (v.target) v.target.subtitle = subtitleFor(v.row, v.visit);
+}
+
+/**
+ * One act on a shared Icon through the site (POST groddle/v1/homes/{owner}/icons). Your own Icon
+ * just set down may not be in the stored save yet: write it and ask once more. Null when it could
+ * not be asked (the reason said); else the site's answer, already laid on the Icon and told.
+ */
+async function siteAct(engine, v, act) {
+  const n = online(engine);
+  const at = sharedAt(engine, v);
+  if (!n || !at || n.busy.has(v.row.id)) return null;
+  n.busy.add(v.row.id);
+  const ask = () => n.account.iconAct(at.owner, { icon: v.row.id, place: at.place, act }, v.visit && at.place === 'house' ? insideProof(at.owner) : '');
+  let res = null;
+  try {
+    try {
+      res = await ask();
+    } catch (err) {
+      if (v.visit || err?.code !== 'groddle_icon_gone') throw err;
+      engine.save?.();
+      await savedThrough(saveStore);
+      res = await ask();
+    }
+  } catch (err) {
+    say(engine, err?.message || "The Icon can't be reached right now.", false);
+    return null;
+  } finally {
+    n.busy.delete(v.row.id);
+  }
+  setShared(v, res?.icon);
+  if (typeof res?.tell === 'string' && res.tell) n.client.send?.('home_icon_tell', { token: res.tell });
+  if (!v.visit) engine.save?.();
+  publish(engine);
+  return res;
+}
+
+/** The view drawn for a shared Icon: yours by place and id, or one on the visit you are on. */
+function sharedView(owner, place, id, engine) {
+  return views.find((v) => v.home && v.row.id === id && (v.visit ? v.visit.owner === owner && v.row.place === place : owner === meId(engine) && v.key === homePlaceKey(place))) || null;
+}
+
+/** home_iconed (homes_help.go iconTell): someone used an Icon in a home: its new count. */
+function heardIcon(engine, msg) {
+  const owner = Number(msg?.owner) || 0;
+  const a = msg?.act || {};
+  const id = String(a.i || '');
+  const place = String(a.pl || '');
+  if (!owner || !id || !SHARED_PLACE.test(place)) return;
+  if (owner === meId(engine)) {
+    const row = (state.placed[homePlaceKey(place)] || []).find((r) => r.id === id);
+    if (!row) return;
+    setShared({ row, visit: null, target: sharedView(owner, place, id, engine)?.target }, a);
+    engine.save?.();
+  } else {
+    const v = sharedView(owner, place, id, engine);
+    if (v) setShared(v, a);
+  }
+  publish(engine);
+}
+
+/** Your own Icons' count as the site keeps it (the owner's catch-up: uses while you were away). */
+async function syncOwn(engine) {
+  const n = online(engine);
+  if (!n?.account?.homeIcons) return;
+  let answer;
+  try {
+    answer = await n.account.homeIcons();
+  } catch (err) {
+    console.warn('[giant-icons]', err?.message || err);
+    return;
+  }
+  let changed = false;
+  for (const icon of Array.isArray(answer?.icons) ? answer.icons : []) {
+    const place = String(icon?.place || '');
+    const row = (state.placed[homePlaceKey(place)] || []).find((r) => r.id === String(icon?.id || ''));
+    if (!row) continue;
+    const before = `${row.actions}:${row.tither ?? ''}`;
+    setShared({ row, visit: null, target: sharedView(meId(engine), place, row.id, engine)?.target }, icon);
+    if (`${row.actions}:${row.tither ?? ''}` !== before) changed = true;
+  }
+  if (changed) engine.save?.();
+  publish(engine);
+}
 
 /**
  * #697: the place in your own home you stand in (street, house, house:<floor>, tower:<floor>: the
@@ -326,7 +471,7 @@ function runIconVerb(giant, verbId, engine, ref = { giant }) {
     const x = (p?.x || 0) + 70 * (p?.scale?.x < 0 ? -1 : 1);
     const y = landingY(engine.platforms, x, (p?.y || engine.groundY) - 40) ?? p?.y ?? engine.groundY;
     const key = placeKey(engine);
-    const res = placeIcon(state, engine.inv, giant, key, x, y);
+    const res = placeIcon(state, engine.inv, giant, key, x, y, { me: meId(engine) });
     if (!res.ok) return say(engine, res.msg, false), true;
     if (!isHomePlaceKey(key) || key === drawnHome) spawnIcon(engine, res.row, { key });
     engine.playSound?.('ITEM_DROP', { volume: 0.5 });
@@ -409,6 +554,11 @@ function dropView(engine, v) {
 function redrawHome(engine, here) {
   for (const v of views.filter((x) => x.home)) dropView(engine, v);
   drawnHome = here?.key || null;
+  // Coming home online: the uses made while you were away (HomeIcons).
+  if (here?.own && online(engine) && net.synced !== here.key) {
+    net.synced = here.key;
+    syncOwn(engine);
+  }
   if (here && engine.PIXI && engine.entityLayer) {
     for (const row of here.rows) spawnIcon(engine, row, { key: here.key, visit: here.own ? null : { owner: here.owner, name: here.name } });
   }
@@ -418,6 +568,38 @@ function redrawHome(engine, here) {
 /** A placed Icon's adoration ref: yours by id, or (a visit) the owner's row as it was shown, never changed here. */
 function adoreRef(v) {
   return v.visit ? { row: { ...v.row }, owner: v.visit.owner, pol: true } : { placedId: v.row.id, pol: v.home };
+}
+
+/**
+ * #697: a tithe, ruminate, revere or reflect on a shared Icon online: your own checks first (your
+ * day's use, your level and currants, as the source checked the pc), then the site spends the
+ * Icon's action (or adds its tithe) and says whether you were its last tither; then your reward.
+ */
+async function sharedVerb(engine, v, verbId) {
+  const ctx = ctxFor(engine, true);
+  const ref = adoreRef(v);
+  if (verbId === 'tithe') {
+    const check = titheCheck(state, v.visit ? ref : { placedId: v.row.id }, { ...ctx, currants: engine.pc.currants });
+    if (!check.ok) return say(engine, check.msg, false);
+    const res = await siteAct(engine, v, 'tithe');
+    if (!res) return;
+    if (!res.ok) return say(engine, res.text || '', false);
+    engine.pc.currants = Math.max(0, (Number(engine.pc.currants) || 0) - check.cost);
+    engine.playSound?.('PAY_50_CURRANTS', { volume: 0.6 });
+    engine.updateHud?.();
+    say(engine, titheMessage(v.row.giant, check.cost, true));
+    engine.save?.();
+    return;
+  }
+  const check = adoreCheck(state, ref, verbId, ctx);
+  if (!check.ok) return say(engine, check.msg, false);
+  const res = await siteAct(engine, v, verbId);
+  if (!res) return;
+  if (!res.ok) return say(engine, res.code === 'tithe_due' ? adoreCheck(state, adoreRef(v), verbId, ctx).msg || res.text : res.text, false);
+  const out = adoreShared(state, v.row.giant, verbId, ctx, res.tither === true);
+  const actual = grant(engine, out.stat, out.amount);
+  say(engine, out.msg, true, { [out.stat]: actual });
+  engine.save?.();
 }
 
 /**
@@ -448,8 +630,9 @@ function bestowFor(engine, view, now) {
   const giant = view.row.giant;
   const favorGiant = giant;
   const res = bestowCheck(state, view.row, {
-    // A visited Icon's tither is never you (a visitor can't tithe it): its own key, not one of yours.
-    key: view.visit ? `visit:${view.visit.owner}:${view.row.id}` : undefined,
+    // #697: an Icon in a home keeps its last tither on itself.
+    shared: view.home,
+    me: meId(engine),
     now,
     level: level(engine),
     skills: engine.learnedSkills || [],
@@ -465,10 +648,23 @@ function bestowFor(engine, view, now) {
   }
   engine.setData?.('iconRoll', `${res.roll}/${10 * res.chance}`);
   if (res.kind !== 'bestow') return;
+  // The last tither's double is the Icon's to spend (icon.js 401-480: this.tither = null): solo at
+  // once, online through the site, which says whether someone else tithed since.
+  if (view.home && res.tither) {
+    if (sharedAt(engine, view)) {
+      siteAct(engine, view, 'bestow').then((r) => payBestow(engine, view, res, r?.ok ? res.amount : res.fallback));
+      return;
+    }
+    delete view.row.tither;
+  }
+  payBestow(engine, view, res, res.amount);
+}
+
+function payBestow(engine, view, res, amount) {
   engine.playSound?.('ICON_GIANT_LOVE', { volume: 0.7 });
   giantLoveFx(engine);
-  const actual = res.type === 'favor' ? grantFavor(engine, res.favorGiant, res.amount) : grant(engine, res.type, res.amount);
-  say(engine, bestowMessage(giant, res.type, actual));
+  const actual = res.type === 'favor' ? grantFavor(engine, res.favorGiant, amount) : grant(engine, res.type, amount);
+  say(engine, bestowMessage(view.row.giant, res.type, actual));
   engine.save?.();
 }
 
@@ -630,6 +826,8 @@ export const giantIconsFeature = {
   onStreetClear() {
     views = [];
     drawnHome = null;
+    // Each way into a home room reads its Icons' count again (syncOwn).
+    if (net) net.synced = '';
     for (const f of fx) f.stop();
     fx = [];
   },
@@ -696,9 +894,9 @@ export const giantIconsFeature = {
     const cost = titheCost(ctx.level, ctx.upgrades);
     // Talk to (verbs.talk_to, icon_alph.js 269-308) is added by the conversations feature while one is offered.
     const rows = [];
-    // ours (#697): a visitor's tithe would have nothing to add actions to (their Icon is in the owner's save).
-    if (!v.visit) {
-      const tithe = titheCheck(state, { placedId: v.row.id }, { ...ctx, currants: engine.pc.currants });
+    // icon_tithe_conditions (240-262): anyone may tithe, a visitor too (#697: the Icon's count is shared).
+    if (!v.visit || sharedAt(engine, v)) {
+      const tithe = titheCheck(state, v.visit ? adoreRef(v) : { placedId: v.row.id }, { ...ctx, currants: engine.pc.currants });
       rows.push({ id: 'tithe', label: `Tithe ${cost}c`, enabled: tithe.ok, reason: tithe.msg || '', tooltip: `Insert ${cost} currants to support the Icon`, durationMs: 0 });
     }
     // In a POL (a home) ruminate / revere / reflect show on a placed Icon (icon.js 52, 118, 183); elsewhere state null.
@@ -719,10 +917,14 @@ export const giantIconsFeature = {
     if (!v) return false;
     if (verbId === 'pickup') {
       if (v.visit) return false;
-      const res = pickUpIcon(state, engine.inv, v.key, v.row.id);
+      const res = pickUpIcon(state, engine.inv, v.key, v.row.id, { me: meId(engine) });
       if (res.ok) dropView(engine, v);
       say(engine, res.msg, res.ok);
       engine.save?.();
+      return true;
+    }
+    if ((verbId === 'tithe' || (ICON_VERBS[verbId] && v.home)) && sharedAt(engine, v)) {
+      sharedVerb(engine, v, verbId);
       return true;
     }
     if (verbId === 'tithe') {
@@ -731,7 +933,7 @@ export const giantIconsFeature = {
       target.subtitle = subtitleFor(v.row, v.visit);
       return true;
     }
-    if (ICON_VERBS[verbId] && v.home) {
+    if (ICON_VERBS[verbId] && v.home && !v.visit) {
       runIconVerb(v.row.giant, verbId, engine, adoreRef(v));
       target.subtitle = subtitleFor(v.row, v.visit);
       return true;
@@ -784,5 +986,10 @@ export const giantIconsFeature = {
     offerCollisions = 0;
     drawnHome = null;
     homePollAt = 0;
+    net = null;
+  },
+  /** Tests: the realtime client and the site account the online path uses. */
+  _setNet(engine, client, account) {
+    return wireNet(engine, client, account);
   },
 };

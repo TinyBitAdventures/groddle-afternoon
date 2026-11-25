@@ -107,7 +107,7 @@
  * multiplayer.
  */
 
-import { createMinnAccount } from '../minn-account.js?v=7c3bdd51';
+import { createMinnAccount } from '../minn-account.js?v=7e3d7279';
 import { runStreetTransition } from '../screen-fx.js?v=39954e0b';
 import { STREET_INDEX } from '../street-loader.js?v=10376267';
 import { ITEM_CATALOG, addItem, countItem, listPackItemSlots, removeItem } from '../inventory.js?v=6414dbdc';
@@ -116,8 +116,8 @@ import { cultivationDef, homeStreetLayout } from '../home-cultivation.js?v=2f71b
 import { getPlot, tickGarden } from '../garden.js?v=a7c6f521';
 import { BUTLER_RIG_SCALE, ButlerPainter, butlerRigNow, loadButlerRig } from '../butler-rig.js?v=3acda854';
 import { BUTLER, BUTLER_INFO, butlerInfoText, butlerPostRx, normalizeButlerParts } from '../butler.js?v=152429c8';
-import { butlerApi } from './butler-feature.js?v=097b3ad4';
-import { homesFeature, visitorHomeScene, visitorHomeState } from './homes-feature.js?v=b114664c';
+import { butlerApi } from './butler-feature.js?v=14057d65';
+import { homesFeature, visitorHomeScene, visitorHomeState } from './homes-feature.js?v=77fb06d3';
 import { visitRadio } from '../vine-radio.js?v=c001a82c';
 import { homeMusicFile } from '../homes.js?v=dca6b2cd';
 import { streetStyleFor } from '../home-styles.js?v=ec5d2f69';
@@ -181,9 +181,9 @@ import {
   forgetInside,
   insideProof,
   rememberInside,
-} from '../neighbours-mp.js?v=c0128a48';
+} from '../neighbours-mp.js?v=e912be37';
 import { itemZ } from '../item-bands.js?v=ec366be3';
-import { butlerCarries, registerButlerDrop } from '../butler-drop.js?v=c214194b';
+import { butlerCarries, registerButlerDrop } from '../butler-drop.js?v=ca9caf37';
 import { takeDragged } from '../drag-stack.js?v=4321c8c6';
 import { worldPoint } from './world-drop-feature.js?v=bd8479a1';
 import { clampToExpansion, elevatorStops, floorJobFor, TOWER_JOBS } from '../home-tower.js?v=a7fc0cce';
