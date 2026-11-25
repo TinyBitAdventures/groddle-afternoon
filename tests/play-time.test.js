@@ -126,6 +126,13 @@ describe('play time stays out of sight', { skip: skipWithoutSite }, () => {
     for (const f of readdirSync(sitePath('src'))) {
       if (f !== 'PlayTime.php') assert.doesNotMatch(src(f), keys, `site src/${f}`);
     }
+    // G1298 (Austin 2026-11-25): the Players page's "Recently played" sort reads the last time only, told in days,
+    // never for a player who appears offline. The seconds stay administrators' alone.
+    for (const f of readdirSync(sitePath('src'))) {
+      if (f === 'PlayTime.php') continue;
+      assert.doesNotMatch(src(f), /PlayTime::(?:META|BEFORE)\b/, `site src/${f}`);
+      if (f !== 'PlayerPages.php') assert.doesNotMatch(src(f), /PlayTime::LAST\b/, `site src/${f}`);
+    }
     const hits = spawnSync('git', ['-C', root, 'grep', '-I', '-lE', 'groddle_play_|admin/play-time', '--', 'public'], { encoding: 'utf8' }).stdout.trim();
     assert.equal(hits, '', 'the game never mentions it');
   });
