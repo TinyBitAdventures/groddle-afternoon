@@ -180,6 +180,19 @@ export function enterHintPick({ recent = null, hover = null, hoverInReach = fals
 }
 
 /**
+ * #701/#702 (2026-11-25): only a Sprite with a real texture can take the cyan rim. A target drawn as
+ * a PIXI.Graphics hit box (the home street's house door) has no art to trace; a rim copy given its
+ * non-texture threw inside Pixi's render with the rim's filter pushed, and every later frame broke
+ * (the world blinked out or went blank until a reload).
+ * @param {any} spr the target's sprite
+ * @param {{ Sprite: Function, Texture: { EMPTY: any } }} PIXI
+ */
+export function spriteHasRimArt(spr, PIXI) {
+  const tex = spr && !spr.destroyed && spr instanceof PIXI.Sprite ? spr.texture : null;
+  return Boolean(tex && tex !== PIXI.Texture.EMPTY && !tex.destroyed && tex.orig && tex.source);
+}
+
+/**
  * #669: the things that glow because they are in reach, as the client glowed each sprite in
  * _interaction_spV (computers only, beside enterHintPick). One per garden (groupHead), never the
  * thing under the mouse (it has its own hover rim), never while climbing (the client glowed

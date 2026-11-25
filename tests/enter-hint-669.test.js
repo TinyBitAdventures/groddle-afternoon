@@ -13,7 +13,7 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { enterHintPick, reachGlowTargets } from '../public/js/enter-chooser.js?v=de94bf7a';
+import { enterHintPick, reachGlowTargets } from '../public/js/enter-chooser.js?v=38d401c2';
 
 const ROOT = join(import.meta.dirname, '..');
 const read = (rel) => readFileSync(join(ROOT, rel), 'utf8');
@@ -73,7 +73,7 @@ describe('#669 point 3: no walk-past chip on a computer', () => {
     assert.match(game, /function reachGlowWanted\(\) \{\s*if \(reachGlowOff\(\)\) return \[\];/);
     assert.match(game, /reachGlowTargets\(near, \{ hover: hoverTarget, climbing: climb\.active \}\)/);
     assert.match(game, /reachGlows\.set\(t, addSpriteRim\(t\.sprite\)\)/);
-    assert.match(game, /dropReachGlow\(target\);\s*target\._hoverGlow = addSpriteRim\(target\.sprite\);/);
+    assert.match(game, /dropReachGlow\(target\);\s*if \(rimArt\(target\.sprite\)\) target\._hoverGlow = addSpriteRim\(target\.sprite\);/);
     assert.match(game, /run\('reach glow', updateReachGlow\);/);
     // A computer is what the phone gate does not call a phone (play/index.html GRODDLE_DEVICE).
     assert.match(game, /const TOUCH_PHONE = isPhoneDevice\(window\);/);
