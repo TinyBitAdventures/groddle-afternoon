@@ -15774,10 +15774,21 @@ body.is-booting .touch-controls { display: none; }
 /* The notices' region (js/notify-view.js keeps the stack in it); the Add to Home Screen tip starts there too. */
 :root.phone-layout .hs-tip.is-floating { top: var(--pr-notice-t, calc(env(safe-area-inset-top, 0px) + 64px)); }
 
-/* The pinned quest: the first one, small, over the stick (beside it sideways); a tap opens it in Quests. */
+/* The pinned quest: the first one, small; upright just above the pack row, under the stick (beside it
+   sideways); a tap opens it in Quests. G1307 (#653, a player's idea; Austin 2026-11-25): over the stick it
+   covered the street, so upright the stick stands up the card's height (js/ui/phone-layout.js stickUp),
+   its float corner too, kept as clear of the top bar as before; the prompts start over it. */
+:root.phone-layout[data-ui="modern"] #game-root .touch-stick { bottom: var(--pr-stick-up, 0px); }
+:root.phone-layout[data-ui="modern"] #game-root .touch-controls[data-float="on"] .touch-stick {
+  height: clamp(132px, 100dvh - var(--pack-live-height, 72px) - var(--hud-h) - 96px - var(--pr-stick-up, 0px), 300px);
+}
+:root.phone-layout[data-ui="modern"].touch-phone #game-root .prompt-stack { bottom: calc(var(--pack-live-height, 72px) + env(safe-area-inset-bottom, 0px) + 132px + var(--pr-stick-up, 0px) + var(--space-2)); }
 :root.phone-layout[data-ui="modern"] #game-root #quest-pins:not([hidden]) {
   top: auto; left: var(--pr-pin-l, var(--hud-inset)); bottom: var(--pr-pin-b, 220px);
   width: auto; max-width: 200px; padding: var(--space-1);
+  /* G1307: it hides at once under a bag or a sheet. WebKit (Safari's engine) at times kept it showing
+     through the shared visibility fade, beside the bag's tray now that it stands at the pack row. */
+  transition: none;
 }
 /* G1230 (#595): over the touch controls' layer (the same z-hud, later in the page), so the float stick's
    corner, which reaches up past the card, does not take the card's taps. */

@@ -23,9 +23,10 @@
  * - notices: the top-centre stack under the caption, down to the controls, the pinned quest or the
  *   open sheet; notices, tips and toasts go here and never land on the strip (js/notify-view.js
  *   `region`);
- * - pin: the first pinned quest, a small card bottom left over the stick (#595, a player's idea),
- *   beside the stick sideways, clear of its ring (the float stick's ring too, stickRegionOf); a tap
- *   opens its quest in Quests, as the old pin did (G1230);
+ * - pin: the first pinned quest, a small card bottom left: upright just above the pack row, under the
+ *   stick, which stands up the card's height (G1307, #653, a player's idea: over the stick it covered
+ *   the street), beside the stick sideways, clear of its ring (the float stick's ring too,
+ *   stickRegionOf); a tap opens its quest in Quests, as the old pin did (G1230);
  * - stick, act, jump: the touch controls, on the pack row;
  * - pack: the pack row (measured where js/ui/pack-row.js centres it);
  * - sheet: the room one open sheet takes. The Map takes the whole height (sideways the whole
@@ -160,17 +161,29 @@ export function phoneRegions({ width, height, safe = {}, sheet = '', pack = null
   const buffShown = buffH > 0 && buffW > 0;
   const buffFloor = buffShown ? buffBox.bottom : under;
 
-  // The pinned quest: over the stick upright; beside it sideways, clear of its ring.
+  // The pinned quest: upright just above the pack row, under the stick, which stands up the card's height
+  // to make room (G1307, #653, Austin 2026-11-25: a player's idea; over the stick it covered the street);
+  // beside the stick sideways, clear of its ring. `stickUp` is how far the stick stands up (style.css).
   let pinBox = null;
+  let stickUp = 0;
   if (pin && num(pin.h) > 0) {
     const pw = Math.min(PIN_W, Math.max(0, num(pin.w, PIN_W)));
     const ph = num(pin.h);
-    pinBox = upright
-      ? box(stick.left, stick.top - GAP - ph, stick.left + pw, stick.top - GAP)
-      : box(stick.right + GAP, base - ph, stick.right + GAP + pw, base);
-    // No room clear of the controls, the caption or the pack row: it waits (hidden) rather than cover one.
-    const keep = [stick, act, jump, packBox, captionBox, strip, buffShown ? buffBox : null, homesBox].filter(Boolean);
-    if (pinBox.top < Math.max(capUnder ? captionBox.bottom : strip.bottom, buffFloor) + GAP || keep.some((b) => boxesOverlap(pinBox, b))) pinBox = null;
+    let lifted = stick;
+    if (upright) {
+      pinBox = box(stick.left, base - ph, stick.left + pw, base);
+      lifted = box(stick.left, pinBox.top - GAP - (stick.bottom - stick.top), stick.right, pinBox.top - GAP);
+    } else pinBox = box(stick.right + GAP, base - ph, stick.right + GAP + pw, base);
+    // No room clear of the controls, the caption or the pack row: it waits (hidden) rather than cover one,
+    // and the stick stays on its band.
+    const keep = [lifted, act, jump, packBox, captionBox, strip, buffShown ? buffBox : null, homesBox].filter(Boolean);
+    const high = Math.min(pinBox.top, lifted.top);
+    const tops = [captionBox, strip, buffShown ? buffBox : null, homesBox].filter(Boolean);
+    if (high < Math.max(capUnder ? captionBox.bottom : strip.bottom, buffFloor) + GAP || keep.some((b) => boxesOverlap(pinBox, b)) || tops.some((b) => boxesOverlap(lifted, b))) pinBox = null;
+    else if (lifted !== stick) {
+      stickUp = stick.bottom - lifted.bottom;
+      stick = lifted;
+    }
   }
 
   let sheetBox = null;
@@ -228,7 +241,11 @@ export function phoneRegions({ width, height, safe = {}, sheet = '', pack = null
       top = b.bottom + GAP;
     }
   }
-  if (pinBox && playBox && boxesOverlap(pinBox, playBox)) pinBox = null;
+  if (pinBox && playBox && (boxesOverlap(pinBox, playBox) || boxesOverlap(stick, playBox))) {
+    pinBox = null;
+    if (stickUp) stick = box(stick.left, stick.top + stickUp, stick.right, stick.bottom + stickUp);
+    stickUp = 0;
+  }
   let bottom = floor - GAP;
   if (kind === 'map') bottom = top;
   else if (kind === 'half' && upright) bottom = sheetBox.top - GAP;
@@ -245,7 +262,7 @@ export function phoneRegions({ width, height, safe = {}, sheet = '', pack = null
       ? { side: 'bottom', css: H - sheetBox.top, zoom: true }
       : { side: 'left', css: sheetBox.right, zoom: true };
   }
-  return { upright, strip: stripBox, caption: captionBox, homes: homesBox, buffs: buffBox, play: playBox, playAt, notices, pin: pinBox, stick, act, jump, pack: packBox, sheet: sheetBox, dock };
+  return { upright, strip: stripBox, caption: captionBox, homes: homesBox, buffs: buffBox, play: playBox, playAt, notices, pin: pinBox, stick, stickUp, act, jump, pack: packBox, sheet: sheetBox, dock };
 }
 
 /**
@@ -465,6 +482,8 @@ export function mountPhoneLayout({ doc = globalThis.document, root, sheets = {},
   let seenOpen = new Set();
   let on = false;
   let current = null;
+  /** G1307: how far the stick stands up over the pinned quest's row (style.css --pr-stick-up). */
+  let stickUp = 0;
 
   const shown = (el) => Boolean(el && !el.hidden && el.getClientRects?.().length);
   const rectOf = (el) => {
@@ -541,6 +560,8 @@ export function mountPhoneLayout({ doc = globalThis.document, root, sheets = {},
     html.classList.remove('phone-layout');
     delete html.dataset.phoneSheet;
     engine?.setStageDock?.(null, 'phone');
+    html.style.removeProperty('--pr-stick-up');
+    stickUp = 0;
     current = null;
     last = null;
   }
@@ -607,7 +628,9 @@ export function mountPhoneLayout({ doc = globalThis.document, root, sheets = {},
       play,
       controls: Object.fromEntries(['stick', 'act', 'jump'].map((k) => {
         const el = doc.querySelector(`#game-root .touch-${k}`);
-        const r = el?.getClientRects().length ? shift(rectOf(el)) : null;
+        let r = el?.getClientRects().length ? shift(rectOf(el)) : null;
+        // G1307: measured where it stands on its band, before the pinned quest's room under it (stickUp).
+        if (r && k === 'stick' && stickUp) r = { ...r, top: r.top + stickUp, bottom: r.bottom + stickUp };
         // G1230: the float stick's corner is not its region; its ring's resting square is.
         return [k, k === 'stick' ? stickRegionOf(r, { float: el?.closest?.('.touch-controls')?.dataset.float === 'on' }) : r];
       })),
@@ -656,6 +679,12 @@ export function mountPhoneLayout({ doc = globalThis.document, root, sheets = {},
     if (regions.pin) {
       set('--pr-pin-l', regions.pin.left);
       set('--pr-pin-b', rr.height - regions.pin.bottom);
+    }
+    // G1307: the stick stands up over the card's row (it keeps its spot while covered, hidden then, so it
+    // does not jump as a sheet or a bag closes).
+    if (!s.kind && regions.stickUp !== stickUp) {
+      stickUp = regions.stickUp;
+      set('--pr-stick-up', stickUp);
     }
     engine?.setStageDock?.(regions.dock, 'phone');
     setData('phoneRegions', JSON.stringify(regions));

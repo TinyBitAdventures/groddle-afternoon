@@ -25,7 +25,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
   GAP, PILL_IDS, STICK, TAP_H, boxesOverlap, fullScreenWay, layoutProblems, menuRoomOf, phoneRegions, pillBadge, socialPillCount, stickRegionOf, streetFloorOf,
-} from '../public/js/ui/phone-layout.js?v=2ab28c97';
+} from '../public/js/ui/phone-layout.js?v=90ed47f1';
 import { phonePins } from '../public/js/ui/quest-pin-button.js?v=2931d81d';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -75,10 +75,17 @@ describe('phone layout: the regions (pure)', () => {
     assert.equal(TAP_H, 44);
   });
 
-  it('the pinned quest: over the stick upright, beside it sideways (clear of its ring), gone under a sheet', () => {
+  it('the pinned quest: under the stick, just above the pack row upright (G1307), beside it sideways (clear of its ring), gone under a sheet', () => {
+    const rest = phoneRegions({ width: 375, height: 667 });
     const up = phoneRegions({ width: 375, height: 667, pin: { w: 200, h: 50 } });
     assert.equal(up.pin.left, up.stick.left);
-    assert.equal(up.pin.bottom, up.stick.top - GAP);
+    // #653: the card stands where the stick stood (on its band, over the pack row), the stick up over it.
+    assert.equal(up.pin.bottom, rest.stick.bottom);
+    assert.ok(up.pin.bottom <= up.pack.top, 'over the pack row');
+    assert.equal(up.stick.bottom, up.pin.top - GAP, 'the stick just over the card');
+    assert.equal(up.stickUp, 50 + GAP);
+    assert.equal(rest.stickUp, 0, 'no card: the stick stays on its band');
+    for (const k of ['stick', 'act', 'jump', 'pack']) assert.ok(!boxesOverlap(up.pin, up[k]), k);
     const side = phoneRegions({ width: 812, height: 402, pin: { w: 200, h: 50 } });
     assert.ok(side.pin.left >= side.stick.right, 'beside the stick');
     assert.equal(side.stick.right - side.stick.left, STICK);
@@ -90,12 +97,15 @@ describe('phone layout: the regions (pure)', () => {
     // The tutorial hides the pack row but the controls keep standing on its band: measured, they win.
     const stick = { left: 8, top: 520, right: 140, bottom: 652 };
     const r = phoneRegions({ width: 390, height: 844, packShown: false, pin: { w: 200, h: 50 }, controls: { stick, act: { left: 232, top: 576, right: 292, bottom: 636 }, jump: { left: 302, top: 564, right: 378, bottom: 640 } } });
-    assert.deepEqual(r.stick, stick);
-    assert.equal(r.pin.bottom, stick.top - GAP);
-    assert.ok(!boxesOverlap(r.pin, r.stick));
-    // A stick so high there is no room above it under the caption: the card waits.
-    const high = phoneRegions({ width: 390, height: 844, pin: { w: 200, h: 50 }, controls: { stick: { left: 8, top: 80, right: 140, bottom: 212 } } });
+    assert.equal(r.pin.bottom, stick.bottom, 'on the band the stick stood on');
+    assert.deepEqual(r.stick, { ...stick, top: stick.top - 50 - GAP, bottom: stick.bottom - 50 - GAP }, 'the stick up over it');
+    for (const k of ['stick', 'act', 'jump']) assert.ok(!boxesOverlap(r.pin, r[k]), k);
+    // A stick so high that standing it up would reach the caption: the card waits and the stick stays.
+    const highStick = { left: 8, top: 110, right: 140, bottom: 242 };
+    const high = phoneRegions({ width: 390, height: 844, pin: { w: 200, h: 50 }, caption: { w: 200, h: 26 }, controls: { stick: highStick } });
     assert.equal(high.pin, null);
+    assert.deepEqual(high.stick, highStick);
+    assert.equal(high.stickUp, 0);
   });
 
   it('G1230 (#595, #632): with the float stick on, the card stands just over the stick\'s ring, not over its tall corner', () => {
@@ -105,11 +115,41 @@ describe('phone layout: the regions (pure)', () => {
     assert.deepEqual(stick, { left: 16, top: 660 - STICK, right: 16 + STICK, bottom: 660 });
     assert.deepEqual(stickRegionOf(corner), corner, 'the fixed stick is its own box');
     const r = phoneRegions({ width: 390, height: 844, pin: { w: 200, h: 50 }, controls: { stick } });
-    assert.equal(r.pin.bottom, 660 - STICK - GAP, 'just over the ring');
+    // G1307: the card on the corner's foot, the ring's resting square up over it.
+    assert.equal(r.pin.bottom, 660);
+    assert.equal(r.stick.bottom, 660 - 50 - GAP, 'the ring just over the card');
     assert.equal(r.pin.left, stick.left);
-    // As the game measured it before: the card over the whole corner, mid-left on the screen.
+    // As the game measured it before G1230 (the whole corner): the card went mid-left on the screen.
     const old = phoneRegions({ width: 390, height: 844, pin: { w: 200, h: 50 }, controls: { stick: corner } });
-    assert.ok(old.pin.bottom < r.pin.bottom - 150);
+    assert.ok(old.stick.top < r.stick.top - 150);
+  });
+
+  it('G1307 (#653): at iPhone and Android sizes the card stands under the stick over the pack row, clear of everything; sideways it stays beside the stick', () => {
+    const bad = [];
+    for (const [name, width, height, safe] of [
+      ['iPhone Home Screen app 402x874', 402, 874, { t: 86, b: 34 }],
+      ['iPhone Safari 402x874', 402, 874, { t: 76 }],
+      ['iPhone 390x844', 390, 844, { t: 14 }],
+      ['Android 360x629', 360, 629, { t: 14 }],
+      ['Android 384x748', 384, 748, { t: 14 }],
+    ]) {
+      // The pack row as pack-row.js centres it (56 tall, 8 px over the bottom inset), the card as tall as two lines.
+      const pack = { left: width / 2 - 140, right: width / 2 + 140, top: height - (safe.b || 0) - 64, bottom: height - (safe.b || 0) - 8 };
+      const r = phoneRegions({ width, height, safe, pack, caption: { w: 220, h: 26 }, pin: { w: 150, h: 50 } });
+      if (!r.pin) {
+        bad.push(`${name}: the card waits`);
+        continue;
+      }
+      if (!(r.pin.top >= r.stick.bottom + GAP)) bad.push(`${name}: the card is not under the stick`);
+      if (!(r.pin.bottom <= r.pack.top)) bad.push(`${name}: the card is not over the pack row`);
+      for (const p of layoutProblems(named(r), { width, height })) bad.push(`${name}: ${p}`);
+      // The street's floor is over the stick standing up, so the avatar never walks under the card.
+      if (streetFloorOf(r) > r.pin.top - GAP) bad.push(`${name}: the street's floor is under the card's top`);
+    }
+    assert.deepEqual(bad, []);
+    const side = phoneRegions({ width: 874, height: 402, pin: { w: 150, h: 50 } });
+    assert.equal(side.stickUp, 0, 'sideways the stick stays on its band');
+    assert.ok(side.pin.left >= side.stick.right && side.pin.bottom === side.stick.bottom, 'beside it, as before');
   });
 
   it('G1229 (#654): the free street area\'s floor is over the stick, Act, Jump and the pack row upright, over the pack row sideways, none under a sheet', () => {
@@ -212,6 +252,16 @@ describe('phone layout: wiring', () => {
     assert.match(css, /:root\.phone-layout\[data-ui="modern"\] body:not\(\.nx-hide-actions\) \.top-bar \.top-actions > :not\(#fullscreen-btn, #bug-btn, #social-btn, \.more-menu\) \{ display: none !important; \}/);
     // Quests is a Menu row on the phone layout (js/ui/topbar.js fitTopActions).
     assert.match(read('public/js/ui/topbar.js'), /classList\.contains\('phone-layout'\) && !steps\.includes\('quest'\) \? \['quest', \.\.\.steps\] : steps/);
+  });
+
+  it('G1307 (#653): the stick stands up over the card upright (its float corner and the prompts too), and the card hides at once', () => {
+    assert.match(css, /:root\.phone-layout\[data-ui="modern"\] #game-root \.touch-stick \{ bottom: var\(--pr-stick-up, 0px\); \}/);
+    assert.match(css, /\.touch-controls\[data-float="on"\] \.touch-stick \{\n  height: clamp\(132px, 100dvh - var\(--pack-live-height, 72px\) - var\(--hud-h\) - 96px - var\(--pr-stick-up, 0px\), 300px\);/);
+    assert.match(css, /\.prompt-stack \{ bottom: calc\([^}]*var\(--pr-stick-up, 0px\)/);
+    // WebKit at times kept the card showing through the shared visibility fade, beside an open bag's tray.
+    assert.match(css, /#game-root #quest-pins:not\(\[hidden\]\) \{\n  top: auto;[^}]*transition: none;\n\}/);
+    const layout = read('public/js/ui/phone-layout.js');
+    assert.match(layout, /set\('--pr-stick-up', stickUp\)/);
   });
 
   it('the pinned quest card stays out of the old phone button on the phone layout', () => {
@@ -687,6 +737,142 @@ describe('phone layout: no overlaps on the real game (Chrome)', { skip: !chromiu
 // space up top"): a 62 px inset plus style.css --ios-fog-clear, 24 px (40 in v0.65.0).
 const FOG_CLEAR = Number((/:root \{ --ios-fog-clear: (\d+)px; \}/.exec(css) || [])[1]);
 const HOME_T = 62 + FOG_CLEAR;
+// G1307 (#653, a player's idea; Austin 2026-11-25: "try it just above the pack row, under the stick, checked
+// at iPhone and Android sizes"): the pinned quest stood over the stick and covered the street at every zoom.
+// Upright it stands just above the pack row, under the stick (the stick stands up its height); it waits while
+// a bag is open and a tap still opens the quest. Sideways it stays beside the stick.
+describe('G1307 (#653): the pinned quest under the stick on the real game (Chrome)', { skip: !chromium && 'no playwright' }, () => {
+  const LOCK_WAIT_MS = 30 * 60_000;
+  const IOS = 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1';
+  const ANDROID = 'Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Mobile Safari/537.36';
+  let server = null;
+  let chrome = null;
+  before(async () => {
+    const { openBrowser } = await import('../tools/qa/browser.mjs');
+    const { startServer } = await import('../tools/qa/serve.mjs');
+    chrome = await openBrowser({ label: 'phone-layout pinned quest test', waitMs: LOCK_WAIT_MS });
+    server = await startServer({ root: join(root, 'public') });
+  }, { timeout: LOCK_WAIT_MS + 60_000 });
+  after(async () => {
+    await chrome?.close();
+    await server?.stop();
+  });
+
+  // [place, width, height, user agent, the Home Screen app (navigator.standalone and its insets), the float stick]
+  const PLACES = [
+    ['iPhone Home Screen app 402x874', 402, 874, IOS, true, false],
+    ['iPhone 390x844', 390, 844, IOS, false, false],
+    ['iPhone 390x844, stick follows your thumb', 390, 844, IOS, false, true],
+    ['Android 360x629', 360, 629, ANDROID, false, false],
+    ['Android 384x748', 384, 748, ANDROID, false, false],
+  ];
+  it('upright at iPhone and Android sizes: under the stick, over the pack row, clear of Act, Jump, the chooser and the action chip; gone while a bag is open; a tap opens the quest', { timeout: 300_000 }, async () => {
+    const base = `http://127.0.0.1:${server.address().port}`;
+    const bad = [];
+    for (const [place, w, h, ua, app, float] of PLACES) {
+      const ctx = await chrome.browser.newContext({ viewport: { width: w, height: h }, isMobile: true, hasTouch: true, deviceScaleFactor: 1, userAgent: ua });
+      await ctx.addInitScript(([standalone, fl]) => {
+        try {
+          localStorage.setItem('groddle-play-device', 'qa-game');
+          if (fl) localStorage.setItem('groddle.floatStick', 'on');
+        } catch { /* none */ }
+        if (standalone) Object.defineProperty(Navigator.prototype, 'standalone', { get: () => true, configurable: true });
+      }, [app, float]);
+      const tab = await ctx.newPage();
+      const cdp = await ctx.newCDPSession(tab);
+      await cdp.send('Emulation.setSafeAreaInsetsOverride', { insets: app ? { top: 62, bottom: 34, left: 0, right: 0 } : { top: 0, bottom: 0, left: 0, right: 0 } });
+      const errors = [];
+      tab.on('pageerror', (e) => errors.push(e.message));
+      await tab.goto(`${base}/play/?autostart=1&questoffer=off&hstip=0&fresh=1&resetgame=1`);
+      await tab.waitForFunction(() => !document.body.classList.contains('is-booting') && document.getElementById('overlay')?.classList.contains('hidden') && document.documentElement.classList.contains('phone-layout'), null, { timeout: 60_000 });
+      await tab.evaluate(() => {
+        for (const b of document.querySelectorAll('button')) if (b.textContent.trim() === 'Got it' && b.offsetParent) b.click();
+        window.groddleQA?.questPins?.pin('animalkinship_pet_piggies');
+      });
+      // Read again every 150 ms (the layout pass beats at 120 ms) until two readings agree.
+      const settled = async (read) => {
+        let prev = await read();
+        for (let i = 0; i < 20; i++) {
+          await tab.waitForTimeout(150);
+          const next = await read();
+          if (JSON.stringify(next) === JSON.stringify(prev)) return next;
+          prev = next;
+        }
+        return prev;
+      };
+      const measure = () => settled(() => tab.evaluate(() => {
+        const seen = (el) => el && !el.hidden && el.checkVisibility({ visibilityProperty: true, opacityProperty: true }) && el.getBoundingClientRect().width > 0;
+        const rect = (el) => {
+          const r = el.getBoundingClientRect();
+          return { left: r.left, top: r.top, right: r.right, bottom: r.bottom };
+        };
+        const chooser = document.getElementById('enter-chooser');
+        const verb = document.getElementById('verb-menu');
+        const pieces = {
+          pin: document.getElementById('quest-pins'),
+          stick: document.querySelector('.touch-stick'),
+          act: document.querySelector('.touch-act'),
+          jump: document.querySelector('.touch-jump'),
+          pack: document.getElementById('pack-row'),
+          chooser: seen(chooser) ? chooser.querySelector('.feed-picker-card, .verb-menu-card') || chooser : null,
+          verbMenu: seen(verb) ? verb.querySelector('.verb-menu-card') || verb : null,
+        };
+        const boxes = {};
+        for (const [k, el] of Object.entries(pieces)) if (seen(el)) boxes[k] = rect(el);
+        const pc = document.querySelector('#game-root canvas')?.dataset.promptCss;
+        if (pc) {
+          const [left, top, right, bottom] = pc.split(',').map(Number);
+          if (right > left) boxes.prompt = { left, top, right, bottom };
+        }
+        return boxes;
+      }));
+      // With a menu open only the card's pairs count here: the chooser is a centred dialog whose shade dims
+      // the stick and Jump by design (Act comes up over it), and the #5 test owns the menus against the controls.
+      const check = (boxes, when, only = null) => {
+        for (const p of layoutProblems(boxes, { width: w, height: h })) if (!only || p.split(' ').includes(only)) bad.push(`${place} ${when}: ${p}`);
+      };
+      const street = await measure();
+      if (!street.pin) bad.push(`${place}: no pinned quest shows`);
+      else {
+        if (!street.stick || street.pin.top < street.stick.bottom) bad.push(`${place}: the card ${JSON.stringify(street.pin)} is not under the stick ${JSON.stringify(street.stick)}`);
+        if (!street.pack || street.pin.bottom > street.pack.top) bad.push(`${place}: the card is not over the pack row`);
+        if (street.pin.left > 20) bad.push(`${place}: the card is not at the left`);
+      }
+      check(street, 'on the street');
+      // Act opens the chooser of several things (or the verb menu): its card keeps off the card and the controls.
+      const act = street.act;
+      if (act) {
+        await tab.touchscreen.tap((act.left + act.right) / 2, (act.top + act.bottom) / 2);
+        await tab.waitForTimeout(450);
+        const menu = await measure();
+        if (!menu.chooser && !menu.verbMenu) bad.push(`${place}: Act opened nothing`);
+        check(menu, 'with a menu open', 'pin');
+        await tab.keyboard.press('Escape');
+        await tab.waitForTimeout(400);
+      }
+      // A bag open: the card waits (Friendly: "it temporarily collapses while a bag is opened").
+      await tab.evaluate(() => document.querySelector('#pack-bags .pack-bag')?.click());
+      await tab.waitForTimeout(600);
+      const bag = await measure();
+      if (bag.pin) bad.push(`${place}: the card shows over an open bag`);
+      await tab.evaluate(() => document.querySelector('#pack-bags .pack-bag')?.click());
+      await tab.waitForTimeout(600);
+      const back = await measure();
+      if (JSON.stringify(back.pin) !== JSON.stringify(street.pin) || JSON.stringify(back.stick) !== JSON.stringify(street.stick)) bad.push(`${place}: the card or the stick moved after the bag closed`);
+      // A tap on the card opens its quest in Quests.
+      if (back.pin) {
+        await tab.touchscreen.tap(back.pin.left + 30, (back.pin.top + back.pin.bottom) / 2);
+        await tab.waitForTimeout(500);
+        const opened = await tab.evaluate(() => document.documentElement.dataset.phoneSheet === 'half' && Boolean(document.getElementById('quest-panel')?.checkVisibility()));
+        if (!opened) bad.push(`${place}: a tap on the card did not open Quests`);
+      }
+      if (errors.length) bad.push(`${place}: ${errors.join('; ')}`);
+      await ctx.close();
+    }
+    assert.deepEqual(bad, []);
+  });
+});
+
 describe('the buff strip has its own slot (Austin 2026-11-24)', () => {
   const chip = 60;
   it('the Home Screen app\'s top is the inset plus 24 px: the pills at 90, the caption at 136 (106 and 152 in v0.65.0)', () => {
