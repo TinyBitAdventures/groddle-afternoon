@@ -33,10 +33,10 @@ import {
   tabCommand,
   tabOrder,
   writeMemory,
-} from '../public/js/groups.js?v=a0391f9a';
+} from '../public/js/groups.js?v=c5e35964';
 import { createMinnAccount } from '../public/js/minn-account.js?v=7e3d7279';
-import { groupsFeature } from '../public/js/features/groups-feature.js?v=c92d576f';
-import { FEATURES } from '../public/js/features/index.js?v=d4905f5a';
+import { groupsFeature } from '../public/js/features/groups-feature.js?v=46cd41d4';
+import { FEATURES } from '../public/js/features/index.js?v=2020792c';
 import { serverPath, sitePath, skipWithoutServer, skipWithoutSite } from '../tools/repos.mjs';
 
 const root = join(import.meta.dirname, '..');
@@ -589,7 +589,8 @@ describe('groups feature (js/features/groups-feature.js)', () => {
     await wait(5);
     const details = shade.find('data-group-hall', '692');
     assert.ok(details, 'the details name the hall');
-    assert.equal(details.textContent, "This group owns the Group Hall on Archimedes Acres. The hall's own street will open in a later update.");
+    // G1312: Archimedes Acres' hall has its street now.
+    assert.equal(details.textContent, "This group owns the Group Hall on Archimedes Acres. Its members go in from the hall's lot there.");
     assert.ok(!/—/.test(details.textContent));
     shade.find('data-group-members', '7').click();
     delete answer.groups.find((g) => g.id === 7).hall;

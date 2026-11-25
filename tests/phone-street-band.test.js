@@ -20,7 +20,7 @@ import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { GAP, phoneRegions, streetBandOf } from '../public/js/ui/phone-layout.js?v=ebaad3fe';
-import { MIN_PACK_HEIGHT, stageFor, stageRoomBeside, stageRoomInBand, streetBandStage } from '../public/js/location-view.js?v=76a9ff86';
+import { MIN_PACK_HEIGHT, stageFor, stageRoomBeside, stageRoomInBand, streetBandStage } from '../public/js/location-view.js?v=4c2530a9';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const game = readFileSync(join(root, 'public/game.js'), 'utf8');

@@ -33,7 +33,7 @@ import {
 import { HOUSE_STYLE_IDS, houseLot } from '../public/js/home-house.js?v=3c88c47c';
 import { doorSaleArt } from '../public/js/door-sign-art.js?v=69daffff';
 import { arrivalInTarget } from '../public/js/location-navigation.js?v=e9221d85';
-import { quarterFeature, _quarterState, _resetQuarter } from '../public/js/features/quarter-feature.js?v=7259c7a8';
+import { quarterFeature, _quarterState, _resetQuarter } from '../public/js/features/quarter-feature.js?v=2c1125a9';
 import { quartersData } from '../tools/build-realtime-quarters.mjs';
 import { HAS_SERVER, HAS_SITE, SITE_DIR, serverPath } from '../tools/repos.mjs';
 import { Display, fakePixi } from './fake-scene.js';

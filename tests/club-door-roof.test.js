@@ -9,7 +9,7 @@
  */
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { CLUBHOUSE, DECKS, room, shutDoorColumn } from '../public/js/quest-rooms/clubhouse.js?v=2ebeb0d3';
+import { CLUBHOUSE, DECKS, room, shutDoorColumn } from '../public/js/quest-rooms/clubhouse.js?v=564b4d30';
 import { jumpApex } from '../public/js/avatar-step.js?v=8415ee96';
 
 const { x1, x2 } = CLUBHOUSE.door;

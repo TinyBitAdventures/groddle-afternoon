@@ -11,7 +11,7 @@ import assert from 'node:assert/strict';
 import { FakeEl, memoryStore, page } from './social-fake-dom.js';
 import { mountSocialDrawer } from '../public/js/ui/social-drawer.js?v=a60ac325';
 import { createNotifier } from '../public/js/notify.js?v=c9d79ec5';
-import { drawerChat } from '../public/js/groups.js?v=a0391f9a';
+import { drawerChat } from '../public/js/groups.js?v=c5e35964';
 
 const ANSWER = {
   max: 20,

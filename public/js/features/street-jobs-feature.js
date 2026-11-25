@@ -149,13 +149,15 @@ import {
   sharedSlice,
   topLine,
   leaderboard,
-} from '../street-jobs-mp.js?v=5b45cedc';
+} from '../street-jobs-mp.js?v=1ccfc0c0';
 import { grantMoodXp } from '../mood-xp.js?v=e311b45c';
 import { createMinnAccount } from '../minn-account.js?v=7e3d7279';
-import { normalizeGroups } from '../groups.js?v=a0391f9a';
+import { normalizeGroups } from '../groups.js?v=c5e35964';
 import { frameTexture, sourceFromUrl, textureFromUrl } from '../textures.js?v=b8e38103';
 import { createJobIndicator, jobIndicatorTip, jobIndicatorView, jobPerc } from '../job-indicator.js?v=8bea518d';
-import { LOT_ART, LOT_CLASS, LOT_PLACEMENT, LOT_SIGN_BLOCKERS, LOT_SIGN_X, LOT_TEXT, OWNED_TEXT, floorYAt, hallStreetName, lotFit, lotHeadline, lotJobIds, lotOwner, lotVerb, ownedVerb } from '../group-hall-lot.js?v=c4d38b81';
+import { LOT_ART, LOT_CLASS, LOT_PLACEMENT, LOT_SIGN_BLOCKERS, LOT_SIGN_X, LOT_TEXT, OWNED_TEXT, floorYAt, hallStreetName, lotFit, lotHeadline, lotJobIds, lotOwner, lotVerb, ownedVerb, hallStreetOpen } from '../group-hall-lot.js?v=045c799a';
+import { hallStreetOf } from '../group-hall-street.js?v=a7571bc1';
+import { enterHall, enterVerb } from './group-hall-street-feature.js?v=990fe798';
 import { JOB_WORK_BUBBLE, JOB_WORK_OVERLAY, JOB_WORK_REMOTE_BUBBLE_DY, avatarDrawnHeight, jobWorkBubbleY, jobWorkFloatPoint, jobWorkSoundKey, jobWorkToolScale, jobWorkToolSheet } from '../job-work-fx.js?v=a2dc6a5a';
 import { itemZ } from '../item-bands.js?v=ec366be3';
 import { SIGN_ARMS } from '../map-routes.js?v=52140ba2';
@@ -878,10 +880,15 @@ function clearLot(engine) {
   engine?.setData('streetJobLotX', '');
 }
 
-/** offerJobs (jobs.js 124-158): the lot's hall, given or open; a hall a group owns says its street is not open yet (G1301). */
+/**
+ * offerJobs (jobs.js 124-158): the lot's hall, given or open. A hall a group owns leads into its
+ * street when it has one (G1312, features/group-hall-street-feature.js enterHall: members only),
+ * else says its street is not open yet (G1301).
+ */
 function openLot(engine) {
   if (lot?.owner) {
-    engine.toast(`${OWNED_TEXT.name(lot.owner)}. ${OWNED_TEXT.closed}`, 3200);
+    if (hallStreetOf(lot.jobId)) enterHall(engine, lot.jobId);
+    else engine.toast(`${OWNED_TEXT.name(lot.owner)}. ${OWNED_TEXT.closed}`, 3200);
     return;
   }
   const head = lotHead(engine);
@@ -1300,7 +1307,7 @@ function finishHall(engine, jobId, job, contributions, note) {
     title: job.title,
     steps: [
       { text: `Hooray! The project ${job.title} has been completed! Your contributions: ${contributions}`, response: 'View Rewards' },
-      { text: HALL_TEXT.finished(group, hallStreetName(jobId)), response: 'Continue' },
+      { text: hallStreetOpen(jobId) ? HALL_TEXT.finishedOpen(group, hallStreetName(jobId)) : HALL_TEXT.finished(group, hallStreetName(jobId)), response: 'Continue' },
       { text: note, response: 'OK' },
     ],
   };
@@ -2037,7 +2044,7 @@ function renderPanel(engine) {
     // The Leaderboard below names the contributors (items/include/jobs.js getJobLeaderboard).
     statusLine.textContent = `${MP_TEXT.note}${row.top?.length ? '' : ' Nobody has put anything in yet.'}${work ? ` Working: ${work.units} units so far.` : ''}`;
   }
-  if (job.kind === 'hall' && status.status === 'done') statusLine.textContent = `${HALL_TEXT.owned(hall?.group?.name || 'A group')} ${HALL_TEXT.noStreet}`;
+  if (job.kind === 'hall' && status.status === 'done') statusLine.textContent = `${HALL_TEXT.owned(hall?.group?.name || 'A group')} ${hallStreetOpen(jobId) ? HALL_TEXT.openStreet : HALL_TEXT.noStreet}`;
   else if (unclaimed) statusLine.textContent = MP_TEXT.note;
   if (job.kind === 'restore' && (status.status === 'active' || status.status === 'open')) {
     const reward = Math.round((def.rewards?.xp || 0) * (Number(job.rewardMultiplier) || 1));
@@ -2344,7 +2351,7 @@ function createMp(engine, client) {
     if (job?.kind === 'hall' && msg.hall?.group?.name) {
       const row = state.jobs[jobId];
       if (row) row.hall = { ...(row.hall || {}), claimed: true, owned: true, group: { id: n0(msg.hall.group.id), name: String(msg.hall.group.name).slice(0, 40) } };
-      if (job.connecting.includes(engine.streetTsid)) engine.toast(HALL_TEXT.built(String(msg.hall.group.name).slice(0, 40), hallStreetName(jobId)), 5000);
+      if (job.connecting.includes(engine.streetTsid)) engine.toast((hallStreetOpen(jobId) ? HALL_TEXT.builtOpen : HALL_TEXT.built)(String(msg.hall.group.name).slice(0, 40), hallStreetName(jobId)), 5000);
     }
     drawBarricades(engine);
     refresh();
@@ -3745,7 +3752,12 @@ export const streetJobsFeature = {
 
   verbsFor(target, engine) {
     // Gap 1: the lot's talk_to (group_hall_lot_marker.js 39-61).
-    if (target.classId === LOT_CLASS) return !catalog ? [] : lot?.owner ? [ownedVerb({ group: lot.owner })] : [lotVerb(lotHead(engine))];
+    if (target.classId === LOT_CLASS) {
+      if (!catalog) return [];
+      if (!lot?.owner) return [lotVerb(lotHead(engine))];
+      // G1312: a hall with its street built is entered from its lot.
+      return [hallStreetOf(lot.jobId) ? enterVerb(lot.owner) : ownedVerb({ group: lot.owner })];
+    }
     if (target.classId !== BOARD_CLASS || !catalog) return [];
     const head = boardHeadline(engine);
     return [{ id: 'view', label: 'view project', enabled: Boolean(head), tooltip: head ? jobDef(catalog, head.jobId).title : '', durationMs: 0 }];
@@ -3760,6 +3772,18 @@ export const streetJobsFeature = {
     const head = boardHeadline(engine);
     if (head) openPanel(engine, head.jobId);
     return true;
+  },
+
+  /** G1312: a group hall's row from the server ({ owned, group: { id, name } }), or null (features/group-hall-street-feature.js). */
+  groupHallOwner(jobId) {
+    const hall = state.jobs?.[String(jobId || '')]?.hall;
+    return hall?.owned && hall.group ? { owned: true, group: { id: hall.group.id, name: hall.group.name } } : null;
+  },
+
+  /** G1312: where the lot of hall `jobId` stands on this street ({ x, y } world px, in front of its sign), or null. */
+  groupHallLotSpot(jobId) {
+    if (!lot || String(lot.jobId) !== String(jobId || '')) return null;
+    return { x: Math.round(lot.sign.x - lot.side * 60), y: Math.round(lot.sign.y) };
   },
 
   /** Streets whose road is still closed (signposts into them are blocked): map routes go round them (G177). */

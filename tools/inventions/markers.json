@@ -683,6 +683,16 @@
   "public/js/group-hall-lot.js": {
     "ours: G1301: the words for a finished hall (ours: Glitch opened its street, which the archive": "group-hall-owned"
   },
+  "public/js/group-hall-street.js": {
+    "invented: * Ours (inventions:": "group-hall-street-layout",
+    "ours: * Ours (inventions:": "group-hall-street-layout",
+    "ours: enter: 'enter', // ours (Glitch: the hall's signpost on the lot": "group-hall-street-layout",
+    "ours: notBuilt: \"This group hall isn't built yet.\", // ours": "group-hall-street-layout",
+    "ours: reached right now. Try again in a moment.\", // ours": "group-hall-street-layout",
+    "ours: solo: 'Group Halls are in the online game.', // ours": "group-hall-street-layout",
+    "ours: unnamed: 'A Group Hall', // ours": "group-hall-street-layout",
+    "ours: your groups. Try again in a moment.', // ours": "group-hall-street-layout"
+  },
   "public/js/groups.js": {
     "remake-own: (features/groups-feature.js channel_joined), the remake's own": "remake-copy",
     "remake-own: // The word filter (the remake's own addition): a name with a bad word is refused, as": "word-filter"
@@ -1321,6 +1331,7 @@
     "ours: a give with no answer before the wait ran out (ours).": "project-refusal-words",
     "ours: a group: make or join one in Menu, Groups.', // ours (JobIntroUI.as:410-413 needs": "remake-copy",
     "ours: currants to claim the project.`, // ours": "remake-copy",
+    "ours: is built (group-hall-lot.js hallStreetOpen). Ours.": "group-hall-street-layout",
     "ours: is claiming this project right now.', // ours (the server's": "remake-copy",
     "ours: pickGroup: 'For which group?', // ours": "remake-copy",
     "ours: the client's where it has them (file:line), else ours.": "ours-street-jobs",

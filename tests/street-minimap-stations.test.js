@@ -10,7 +10,7 @@ import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { STATION_MARK, markHasMenu, stationMarks, tipFor } from '../public/js/ui/street-minimap.js?v=895cd125';
-import { phoneSignRows } from '../public/js/features/street-minimap-feature.js?v=2a56662e';
+import { phoneSignRows } from '../public/js/features/street-minimap-feature.js?v=a014c61e';
 import { subwayFeature } from '../public/js/features/subway-feature.js?v=622d6fbc';
 import { STATIONS } from '../public/js/subway.js?v=ea6921ff';
 

@@ -10,8 +10,8 @@ import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { homedir } from 'node:os';
 
-import * as kit from '../public/js/quest-rooms/kit.js?v=bfdf3e5e';
-import { stageFor } from '../public/js/location-view.js?v=76a9ff86';
+import * as kit from '../public/js/quest-rooms/kit.js?v=2a4b0477';
+import { stageFor } from '../public/js/location-view.js?v=4c2530a9';
 import { cameraTargetY, cameraWorldHeightForGround } from '../public/js/movement.js?v=f4be1a05';
 import { Display, FakeEl, fakePixi } from './fake-scene.js';
 import {

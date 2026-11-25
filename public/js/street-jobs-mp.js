@@ -94,6 +94,10 @@ export const HALL_TEXT = Object.freeze({
   // to its members (quest.js:1844-1859); that street is not in the archive, so it comes later.
   noStreet: 'Its street will open in a later update.', // ours
   built: (group, street) => `${group} owns the Group Hall${street ? ` on ${street}` : ''}! Its street will open in a later update.`, // ours
+  // G1312: a hall whose street is built (group-hall-lot.js hallStreetOpen). Ours.
+  openStreet: 'Its members can go in from the lot.',
+  builtOpen: (group, street) => `${group} owns the Group Hall on ${street}! Its members can go in from the lot.`,
+  finishedOpen: (group, street) => `The Group Hall belongs to ${group} now. Its members can go in from its lot on ${street}.`,
   // G1301: the finish dialog's page about the hall (ours).
   finished: (group, street) => `The Group Hall belongs to ${group} now. Its street will open in a later update.${street ? ` Until then, its lot on ${street} and Menu > Groups show whose hall it is.` : ''}`,
   // #502: your own claim while the street asks the site (ours; JobDialog.as closes on "Yes, I can!" and waits).

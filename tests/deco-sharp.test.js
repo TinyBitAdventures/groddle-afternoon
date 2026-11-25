@@ -16,9 +16,9 @@ import { HIRES_DECOS } from '../public/js/deco-hires-list.js?v=bf6d4a0c';
 import { NEW_DECOS_HIRES } from '../public/js/deco-new-list.js?v=e9cba68f';
 import { FAR_SHARP_BUDGET_BYTES, FAR_SLACKS, SHARP_SLACK, SVG_MAX_PIXELS, SVG_MAX_SIDE, admitSharp, isSharpDeco, sharpDeco } from '../public/js/deco-hires.js?v=34f36d77';
 import { resolutionOfUrl } from '../public/js/textures.js?v=b8e38103';
-import { landscapeArt } from '../public/js/features/homes-feature.js?v=b2c608c6';
+import { landscapeArt } from '../public/js/features/homes-feature.js?v=d402e81f';
 import { EXTERIOR_STYLES, INTERIOR_STYLES, streetLook, yardLook } from '../public/js/home-styles.js?v=ec5d2f69';
-import { layoutArtPath } from '../public/js/home-layout.js?v=1e15983c';
+import { layoutArtPath } from '../public/js/home-layout.js?v=ecca788d';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const decoDir = join(root, 'public/assets/decos/groddle');

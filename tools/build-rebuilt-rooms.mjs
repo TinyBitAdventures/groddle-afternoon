@@ -18,6 +18,8 @@
  * quests' starts and the tutorial's EZ Cooking pick move you there).
  * Also the Quarter's first block (public/js/quarter.js, G1186): Marylpole Mount Quarter, 1100
  * block, laid on Whipping Cross Crossing, and the QUARTER signpost on Marylpole Mount that leads in.
+ * Also Archimedes Acres's Group Hall (public/js/group-hall-street.js, G1312): the hall job 692's own
+ * street, laid on Fanfoot Flare, its one signpost back to Archimedes Acres (the lot is the way in).
  * Each door's own connect x/y is kept and snapped to the rebuilt floor. Safe to
  * re-run; run it again after a street re-import or a build-street-navigation.mjs
  * pass.
@@ -111,6 +113,7 @@ import {
   quarterSignpost,
   quarterStreet,
 } from '../public/js/quarter.js?v=6eb35ef4';
+import { ARCHIMEDES_HALL, HALL_LAYOUT, HALL_TEMPLATE_TSID, groupHallIndexEntry, groupHallStreet } from '../public/js/group-hall-street.js?v=a7571bc1';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const streetsDir = join(root, 'public/assets/streets');
@@ -300,6 +303,22 @@ for (const [tsid, build, row] of [[EZ_COOKIN_TSID, ezCookinStreet, ezCookinIndex
   put(`${QUARTER_TSID}.json`, `${JSON.stringify(room)}\n`);
   put(`${QUARTER_PARENT_TSID}.json`, `${JSON.stringify(parent)}\n`);
   indexRow(QUARTER_TSID, quarterIndexEntry(room));
+}
+
+// G1312: Archimedes Acres's Group Hall (job 692), in by the lot's verb, out by its signpost.
+{
+  const lot = read(`${ARCHIMEDES_HALL.lot}.json`);
+  // The way out lands mid-street on Archimedes Acres; the game then stands you at the lot (its spot is planned at load).
+  const lotArrive = arrivalInTarget(lot, 0, -60);
+  if (!lotArrive?.snapped) throw new Error('no floor mid-street on Archimedes Acres');
+  const same = (a, b) => a.x === b.x && a.y === b.y;
+  if (!same(lotArrive, ARCHIMEDES_HALL.lotOut)) throw new Error(`ARCHIMEDES_HALL.lotOut is ${lotArrive.x},${lotArrive.y} now`);
+  const hall = groupHallStreet(read(`${HALL_TEMPLATE_TSID}.json`), '692', { lotArrive: { ...ARCHIMEDES_HALL.lotOut } });
+  const inside = arrivalInTarget(hall, HALL_LAYOUT.arrive.x, HALL_LAYOUT.arrive.y);
+  if (!inside?.snapped) throw new Error("no floor beside the hall's signpost");
+  if (!same(inside, ARCHIMEDES_HALL.inside)) throw new Error(`ARCHIMEDES_HALL.inside is ${inside.x},${inside.y} now`);
+  put(`${hall.tsid}.json`, `${JSON.stringify(hall)}\n`);
+  indexRow(hall.tsid, groupHallIndexEntry(hall));
 }
 
 if (indexChanged) put('index.json', `${JSON.stringify(index, null, 2)}\n`);

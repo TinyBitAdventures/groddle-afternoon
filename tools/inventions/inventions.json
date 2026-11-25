@@ -6374,6 +6374,42 @@
    "why": "A recipe that uses up Firefly Jars of any fill (the Fireplace takes 7, catalog_recipes.js 321) took them in bag order in Glitch (inc_making checkItemsInBag, items_destroy), so a jar of Fireflies could go while an empty one stayed. Ours: the empty jars go first, then the least full (ties: the later ones, as before); the kept jars keep their pack order. Solo and online make through the same code.",
    "ruling": "Austin 2026-11-26 (report #720 follow-up): spend empty jars before full ones",
    "rows": []
+  },
+  {
+   "id": "group-hall-street-layout",
+   "title": "Group Hall street (G1312): Archimedes Acres's hall laid on Fanfoot Flare with the Community Machine Room hut, its roof and a ladder; named \"<group>'s Group Hall\"; entered from the lot; empty of life; our refusal and wait words",
+   "kind": "content",
+   "status": "proposed",
+   "where": [
+    {
+     "file": "public/js/group-hall-street.js",
+     "symbol": "HALL_LAYOUT"
+    },
+    {
+     "file": "public/js/group-hall-street.js",
+     "symbol": "HALL_STREET_TEXT"
+    },
+    {
+     "file": "public/js/group-hall-street.js",
+     "symbol": "groupHallStreet"
+    },
+    {
+     "file": "public/js/features/group-hall-street-feature.js",
+     "symbol": "enterHall"
+    },
+    {
+     "file": "public/js/street-jobs-mp.js",
+     "symbol": "HALL_TEXT.openStreet"
+    }
+   ],
+   "why": "No hall street or group template survives (quest.js 1846 TODO; the ten target streets and the GOL templates are not in the archive). The shape follows GlitchAddict's video PUzIKuL2tPo (a three-tier Groddle street, one signpost back on the upper ledge, the Community Machine Room hut on the middle tier with a ladder to its roof); the template street, the hut's spot, the ladder, the name's suffix, the lot as the way in, the empty ecology and the words for not built, solo, offline and checking are ours. The refusal is inc_houses.js:500's.",
+   "rows": [
+    "G1312",
+    "G331"
+   ],
+   "rulingHints": [
+    "Austin 2026-11-25: one hall first, a layout for his review before the other nine"
+   ]
   }
  ]
 }

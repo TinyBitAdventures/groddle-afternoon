@@ -13,7 +13,7 @@
 import { hasBadWord, NAME_REFUSED } from './word-filter.js?v=9a7a7ebb';
 import { UNNAMED_PLAYER } from './player-names.js?v=f9b78094';
 import { CHAT_MAX_CHARS } from './ui/chat-input.js?v=8f2479a3';
-import { OWNED_TEXT, hallStreetName } from './group-hall-lot.js?v=c4d38b81';
+import { OWNED_TEXT, hallStreetName } from './group-hall-lot.js?v=045c799a';
 
 /** config_prod.js:39 max_groups. */
 export const GROUPS_MAX = 20;

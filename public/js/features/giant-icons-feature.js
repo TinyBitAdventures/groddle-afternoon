@@ -109,7 +109,7 @@ import { createMinnAccount } from '../minn-account.js?v=7e3d7279';
 import { saveStore, savedThrough } from '../save-store.js?v=4e720735';
 import { HOME_INTERIOR_TSID, HOME_STREET_TSID } from '../homes.js?v=dca6b2cd';
 import { gnomePlaceFor, visitGnomePlace } from '../garden-gnome.js?v=73026b57';
-import { homesFeature } from './homes-feature.js?v=b2c608c6';
+import { homesFeature } from './homes-feature.js?v=d402e81f';
 import { standOnFeet } from '../sprite-feet.js?v=6358a697';
 
 export const ICONS_FEATURE_ID = 'giant-icons';

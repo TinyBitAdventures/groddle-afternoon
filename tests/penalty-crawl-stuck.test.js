@@ -18,7 +18,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-import * as kit from '../public/js/quest-rooms/kit.js?v=bfdf3e5e';
+import * as kit from '../public/js/quest-rooms/kit.js?v=2a4b0477';
 import { BARS_X, BARS_WALL, FLOOR, PART_3, PATCH_X, SPAWN, W, cellBarriers, room } from '../public/js/quest-rooms/penalty.js?v=71ec5743';
 
 describe('1. the bars stop you', () => {

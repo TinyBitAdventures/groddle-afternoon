@@ -46,7 +46,7 @@ import {
   refusalText,
 } from '../player-im.js?v=87bdb8ec';
 import { purgeOf, withoutPurged } from '../chat-purge.js?v=6c41f62d';
-import { EARLIER_TEXT } from '../groups.js?v=a0391f9a';
+import { EARLIER_TEXT } from '../groups.js?v=c5e35964';
 import { imKey } from '../chat-reactions.js?v=38460172';
 import { createMinnAccount } from '../minn-account.js?v=7e3d7279';
 

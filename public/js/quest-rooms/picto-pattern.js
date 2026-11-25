@@ -35,7 +35,7 @@
  * meomi2 feltgrass tile, recoloured from the Snaps): tools/room-art picto_pattern.
  */
 
-import { JUMP_GAP, JUMP_RISE, pushOutOfSolids, spawnQuoins, takeQuoins } from './puzzle-kit.js?v=5b2aa60d';
+import { JUMP_GAP, JUMP_RISE, pushOutOfSolids, spawnQuoins, takeQuoins } from './puzzle-kit.js?v=895d4321';
 import { runOutcome } from '../autoplay-log.js?v=55bb4823';
 import { textureFromUrl } from '../textures.js?v=b8e38103';
 import { PICTO_PATTERN_FILES } from '../picto-pattern-art.js?v=72120af4';

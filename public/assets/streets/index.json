@@ -13383,6 +13383,15 @@
       "platforms": 1,
       "decos": 300,
       "reconstructed": true
+    },
+    "GA51318ODPB2UF7": {
+      "label": "A Group Hall",
+      "file": "assets/streets/GA51318ODPB2UF7.json",
+      "hubId": "58",
+      "hubName": "Groddle Meadow",
+      "platforms": 47,
+      "decos": 204,
+      "reconstructed": true
     }
   }
 }

@@ -80,9 +80,9 @@ describe('the zone schema (docs/level-builder/zone.schema.json)', () => {
   it('every shipped street fits $defs/street', () => {
     const street = compileSchema(schema, '#/$defs/street');
     const dir = join(root, 'public/assets/streets');
-    // Tiny Speck's 1,460, the 15 abandoned-tower floors (G144), Louise Pasture Villa (G371), the Interrogation room (G352), the two practice streets (G682) and the Quarter's first block (G1186); a published zone's streets (GZ, spec 11) are checked by tests/zones.test.js.
+    // Tiny Speck's 1,460, the 15 abandoned-tower floors (G144), Louise Pasture Villa (G371), the Interrogation room (G352), the two practice streets (G682), the Quarter's first block (G1186) and Archimedes Acres's Group Hall (G1312); a published zone's streets (GZ, spec 11) are checked by tests/zones.test.js.
     const files = readdirSync(dir).filter((f) => /^[GL][A-Z0-9]+\.json$/.test(f) && !/^[GL]Z[A-Z0-9]{13}\.json$/.test(f));
-    assert.equal(files.length, 1480);
+    assert.equal(files.length, 1481);
     const bad = [];
     for (const f of files) {
       const errors = street(JSON.parse(readFileSync(join(dir, f), 'utf8')), { limit: 3 });
@@ -127,7 +127,7 @@ describe('the deco catalog (tools/builder/deco-catalog.mjs, assets/content/deco-
     const manifest = json('public/assets/decos/manifest.json');
     assert.equal(cat.count, 2995); // + door_asset_striped_01a_newxpblack (G962, Mental Block), + rook_hall_placeholder_painting_frame (the Stoot shrine's empty frame)
     assert.equal(cat.decos.length, manifest.length);
-    assert.equal(cat.streetsScanned, 1480); // + the two practice streets (G682), the Quarter's block (G1186)
+    assert.equal(cat.streetsScanned, 1481); // + the two practice streets (G682), the Quarter's block (G1186), Archimedes Acres's Group Hall (G1312)
     assert.deepEqual(cat.decos.map((d) => d.name), [...manifest].sort((a, b) => (a < b ? -1 : a > b ? 1 : 0)));
     const placed = cat.decos.filter((d) => !d.neverPlaced);
     // The Interrogation room (G352) is the first street to place bureaucratic_hall_waitingroom_1: 138 before.
@@ -137,7 +137,7 @@ describe('the deco catalog (tools/builder/deco-catalog.mjs, assets/content/deco-
     assert.ok(cat.decos.every((d) => Object.keys(d.layers).every((r) => LAYER_ROLES.includes(r))));
     assert.ok(cat.decos.every((d) => Array.isArray(d.size2) && d.size2.length === 2));
     const total = cat.decos.reduce((n, d) => n + d.placements, 0);
-    assert.ok(total > 550000 && total <= 557314, `placements ${total}`); // + 1,371 on the 15 tower floors (G144), + 28 on Winter Walk (round 5), + the Quarter's block (G1186), + unnnn's frame
+    assert.ok(total > 550000 && total <= 557518, `placements ${total}`); // + 1,371 on the 15 tower floors (G144), + 28 on Winter Walk (round 5), + the Quarter's block (G1186), + unnnn's frame, + 204 on Archimedes Acres's Group Hall (G1312: Fanfoot Flare's decos and the hut)
     const bush = cat.decos.find((d) => d.name === 'bush_3');
     assert.equal(bush.family, 'bush');
     assert.equal(bush.source, 'groddle1.swf#bush_3');

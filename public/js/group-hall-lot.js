@@ -128,11 +128,22 @@ export const HALL_STREETS = Object.freeze({
 /** The street a hall job's lot stands on ("Archimedes Acres"), or '' for no hall. */
 export const hallStreetName = (jobId) => HALL_STREETS[String(jobId || '')]?.name || '';
 
+/**
+ * G1312: the halls whose own street is built (js/group-hall-street.js HALL_STREET_JOBS, the same
+ * ids; tests/g1312-group-hall-street.test.js keeps them equal). The others' lots still say later.
+ */
+export const OPEN_HALL_STREETS = Object.freeze(['692']);
+
+/** Has hall job `jobId` its own street yet? */
+export const hallStreetOpen = (jobId) => OPEN_HALL_STREETS.includes(String(jobId || ''));
+
 /** G1301: the words for a finished hall (ours: Glitch opened its street, which the archive lacks). */
 export const OWNED_TEXT = Object.freeze({
   name: (group) => `${group}'s Group Hall`,
   row: (street) => `Group Hall: ${street}`,
   details: (street) => `This group owns the Group Hall on ${street}. The hall's own street will open in a later update.`,
+  // G1312: a hall whose street is built.
+  detailsOpen: (street) => `This group owns the Group Hall on ${street}. Its members go in from the hall's lot there.`,
   closed: "This hall's street isn't open yet. It will open in a later update.",
   verb: 'visit',
 });

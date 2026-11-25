@@ -88,8 +88,8 @@ import {
   shownName,
   tabOrder,
   writeMemory,
-} from '../groups.js?v=a0391f9a';
-import { OWNED_TEXT } from '../group-hall-lot.js?v=c4d38b81';
+} from '../groups.js?v=c5e35964';
+import { OWNED_TEXT, hallStreetOpen } from '../group-hall-lot.js?v=045c799a';
 import { appendLinkedText } from '../chat-links.js?v=b717fac7';
 import { lineKey as reactKey } from '../chat-reactions.js?v=38460172';
 import { DELETE_TEXT, deletableChannel, lineLidOf, mayDelete } from '../chat-delete.js?v=c55a1043';
@@ -850,7 +850,7 @@ function createSession(engine, client) {
           if (people.has(g.id) || inviting === g.id) {
             extra = el('div', { class: 'grp-people' });
             if (people.has(g.id)) extra.append(el('p', {}, people.get(g.id).map((p) => (p.role === 'admin' ? `${p.name} (${GROUP_TEXT.admin})` : p.name)).join(', ')));
-            if (people.has(g.id) && g.hall) extra.append(el('p', { 'data-group-hall': g.hall.job }, OWNED_TEXT.details(g.hall.street)));
+            if (people.has(g.id) && g.hall) extra.append(el('p', { 'data-group-hall': g.hall.job }, hallStreetOpen(g.hall.job) ? OWNED_TEXT.detailsOpen(g.hall.street) : OWNED_TEXT.details(g.hall.street)));
             if (inviting === g.id) {
               const picks = el('div', { class: 'grp-picks' });
               const candidates = invitable(g);
@@ -1103,6 +1103,10 @@ function createSession(engine, client) {
       if (!chats.has(channel)) return false;
       return say(channel, t);
     },
+    /** G1312: your groups' ids from the site's list, or null before it has come. */
+    groupIds() {
+      return list ? list.groups.map((g) => g.id) : null;
+    },
     /** What the dock's submit does with a line (QA and tests). */
     submit(text) {
       if (!input) return false;
@@ -1137,6 +1141,15 @@ export const groupsFeature = {
   /** The chat a typed line is for ('street', 'party' or a channel), for realtime-feature's typing mark. */
   chatTab() {
     return session ? session.tab : null;
+  },
+
+  /**
+   * G1312: the ids of the groups the site's list says you are in (a group hall's street lets in its
+   * members), or null before the list has come.
+   */
+  myGroupIds(engine) {
+    if (engine?.mode !== 'multiplayer') return null;
+    return session?.groupIds?.() ?? null;
   },
 
   /** R5: chat-threads-feature's "Send in Global instead": the words said in that channel; true when sent. */

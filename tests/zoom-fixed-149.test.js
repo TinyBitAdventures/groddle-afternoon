@@ -11,7 +11,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { ZOOM_FIXED_NOTE, ZOOM_KEYS_HINT, createWorldZoom, zoomKeyToast } from '../public/js/world-zoom.js?v=38816228';
-import { zoomMovesStage, sceneViewWidthCap, sceneViewCap, MIN_PACK_HEIGHT } from '../public/js/location-view.js?v=76a9ff86';
+import { zoomMovesStage, sceneViewWidthCap, sceneViewCap, MIN_PACK_HEIGHT } from '../public/js/location-view.js?v=4c2530a9';
 import { zoomSlider } from '../public/js/ui/topbar.js?v=8831b556';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');

@@ -5,13 +5,13 @@
  * installs this, with the game's engine (its view snapshot, sounds and home) and the player's
  * avatar still (game.js ownerPortraitUrl) for the pictures the 2012 chrome showed.
  */
-import { installClassicFrame } from './classic-frame.js?v=5c425ed2';
-import { installClassicTopbar } from './classic-topbar.js?v=ba17e31d';
-import { installClassicGrowl } from './classic-growl.js?v=1617d6ae';
-import { installClassicPanes } from './classic-panes.js?v=f6185dc3';
-import { installClassicPack } from './classic-pack.js?v=1249d21d';
-import { installClassicHub } from './classic-hub.js?v=7c114f72';
-import { installClassicSkills } from './classic-skills.js?v=fb9c8f40';
+import { installClassicFrame } from './classic-frame.js?v=bc2c4035';
+import { installClassicTopbar } from './classic-topbar.js?v=806cfa49';
+import { installClassicGrowl } from './classic-growl.js?v=b4273733';
+import { installClassicPanes } from './classic-panes.js?v=6c0f939b';
+import { installClassicPack } from './classic-pack.js?v=dbe1131c';
+import { installClassicHub } from './classic-hub.js?v=e1ff387b';
+import { installClassicSkills } from './classic-skills.js?v=a442f417';
 
 let installed = null;
 

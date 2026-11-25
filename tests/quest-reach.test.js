@@ -22,13 +22,13 @@ import { loadContentCatalogsFromDir, resetContentCatalogs, getQuestCatalog } fro
 import { createQuestState } from '../public/js/quests.js?v=f68437db';
 import { acceptOffer, pendingQuestOffers, setQuestHeldCheck } from '../public/js/quest-offers.js?v=7e00498b';
 import { SUBWAY_STREETS, closedStreets, initializeStreetJobs, normalizeStreetJobState } from '../public/js/street-jobs.js?v=76471e42';
-import { applyWorld } from '../public/js/street-jobs-mp.js?v=5b45cedc';
+import { applyWorld } from '../public/js/street-jobs-mp.js?v=1ccfc0c0';
 import { routeGraph } from '../public/js/map-routes.js?v=52140ba2';
 import { TELEPORTERS } from '../public/js/hidden-floors.js?v=023336cb';
 import { WINTRY_PORTAL_TELEPORTERS } from '../public/js/wintry-portal.js?v=1437deda';
 import { holdNote, placeIndex, questHold, questPlaceNeeds } from '../public/js/quest-reach.js?v=1de854ff';
 import { fewestClosures, reachableStreets, streetGraph } from '../public/js/street-graph.js?v=d767f3a2';
-import { streetJobsFeature } from '../public/js/features/street-jobs-feature.js?v=f797ec18';
+import { streetJobsFeature } from '../public/js/features/street-jobs-feature.js?v=40113837';
 
 const root = join(import.meta.dirname, '..');
 const PUB = join(root, 'public');

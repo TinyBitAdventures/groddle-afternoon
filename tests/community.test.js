@@ -21,7 +21,7 @@ import { reactionsFile, reactionsJson } from '../tools/build-reactions.mjs';
 import { linkSegments } from '../public/js/chat-links.js?v=b717fac7';
 import { NAMES_SHOWN, REACTIONS } from '../public/js/chat-reactions.js?v=38460172';
 import { NOTICE_MAX, communityNoticeHtml, communityNoticesFrom, normalCommunityNotice } from '../public/js/community-notices.js?v=f676c372';
-import { EARLIER_MAX, WEB_TAG, chatLine, historyKey, mergeEarlier, oldestLid, shownName } from '../public/js/groups.js?v=a0391f9a';
+import { EARLIER_MAX, WEB_TAG, chatLine, historyKey, mergeEarlier, oldestLid, shownName } from '../public/js/groups.js?v=c5e35964';
 import { mergeEarlierIms, oldestAt } from '../public/js/player-im.js?v=87bdb8ec';
 import { communityMpFeature, createCommunitySession } from '../public/js/features/community-mp-feature.js?v=66281288';
 import { HAS_PHP, PHP } from './php.js';

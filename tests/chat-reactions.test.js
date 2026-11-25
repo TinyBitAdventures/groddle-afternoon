@@ -28,7 +28,7 @@ import { mountSocialDrawer } from '../public/js/ui/social-drawer.js?v=a60ac325';
 import { createNotifier } from '../public/js/notify.js?v=c9d79ec5';
 import { chatReactionsFeature } from '../public/js/features/chat-reactions-feature.js?v=704d27da';
 import { drawerLine, normalLine } from '../public/js/player-im.js?v=87bdb8ec';
-import { chatLine } from '../public/js/groups.js?v=a0391f9a';
+import { chatLine } from '../public/js/groups.js?v=c5e35964';
 import { FakeEl, FakeText, memoryStore, page } from './social-fake-dom.js';
 import { serverPath, skipWithoutServer } from '../tools/repos.mjs';
 
