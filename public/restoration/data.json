@@ -2814,9 +2814,14 @@
   "deployed": "2026-11-25"
  },
  "git": {
-  "commits": 3578,
+  "commits": 3580,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-25",
+    "kind": "fix",
+    "text": "Shared trees, rocks, quoins, gardens and Patches say \"Reconnecting...\" while offline instead of giving their harvest on your own page"
+   },
    {
     "date": "2026-11-25",
     "kind": "improve",
@@ -2931,14 +2936,9 @@
     "date": "2026-11-25",
     "kind": "fix",
     "text": "A musicblock played for you shows its block and notes over you, and its bubble to everyone else"
-   },
-   {
-    "date": "2026-11-25",
-    "kind": "fix",
-    "text": "Visitors see a friend's Dirt Pile, Peat Bog, barnacles, Fireflies and Patches in the back yard"
    }
   ]
  },
- "tests": 1396,
+ "tests": 1397,
  "generatedAt": "2026-11-25"
 }
