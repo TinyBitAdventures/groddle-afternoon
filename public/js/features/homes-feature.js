@@ -8883,6 +8883,11 @@ export const homesFeature = {
         return a && z ? { id: item.id, left: a.x, top: a.y, right: z.x, bottom: z.y, surfaceY: top?.y ?? null, x0: roomX0(), x: item.x, y: item.y, surface: surfaceHeight(item.classTsid, item.upgradeId) } : null;
       };
     }
+    // QA (G1285, home demos and house files): window.groddleHomeFloor(n, x) walks through to house floor n
+    // (0 the ground floor), standing at room x; the whole house's floors in turn for a comparison render.
+    if ((engine.param?.('homedemo') || engine.param?.('housefile')) && typeof window !== 'undefined') {
+      window.groddleHomeFloor = (floor, x) => goToHouseFloor(engine, Math.max(0, Math.floor(Number(floor) || 0)), x);
+    }
     if (engine.param?.('homedemo') && typeof window !== 'undefined') {
       // QA: window.groddleHomeRock() lists the rock's verbs; (verbId) runs one; ('house_sign') opens HouseSignDialog.
       window.groddleHomeRock = (verbId) => {

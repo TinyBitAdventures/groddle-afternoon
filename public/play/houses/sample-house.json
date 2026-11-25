@@ -1,0 +1,41 @@
+{
+  "format": "groddle-house",
+  "version": 1,
+  "title": "Sample house",
+  "source": "A small made-up house showing every part of the house file format (js/house-file.js).",
+  "segments": 8,
+  "exterior": { "style": "meadow" },
+  "floors": [
+    {
+      "name": "Ground floor",
+      "wall": "yellowgreen_molding",
+      "walls": { "5": "whitepillar_molding" },
+      "floor": "beige_carpet_blue",
+      "ceiling": "white_crappy",
+      "pieces": [
+        { "class": "furniture_rug", "style": 117, "x": 420 },
+        { "class": "furniture_sofa", "style": 359, "x": 420, "plat": "bookshelf" },
+        { "class": "furniture_coffeetable", "style": 194, "x": 420, "plat": "chair", "items": [{ "class": "cherry", "count": 3 }, { "class": "beer" }] },
+        { "class": "furniture_shelf", "style": 96, "x": 820, "y": 200, "ref": "mantel" },
+        { "class": "trophy_fruit", "on": "mantel", "x": 790 },
+        { "class": "bag_furniture_sdb", "style": 267, "x": 640, "y": 230, "show": { "class": "cherry", "count": 12 } },
+        { "class": "bag_furniture_smallcabinet", "x": 900, "contents": [{ "class": "plank", "count": 5 }, null, { "class": "board", "count": 2 }] },
+        { "class": "furniture_chair", "style": 39, "x": 230, "facing": "left" },
+        { "class": "furniture_door", "x": 980, "door": "up" }
+      ],
+      "items": [{ "class": "cherry", "count": 1, "x": 560 }]
+    },
+    {
+      "name": "Upstairs",
+      "wall": "red_brick",
+      "floor": "metal_spaceship_floor",
+      "ceiling": "spaceship_ceiling",
+      "pieces": [
+        { "class": "furniture_door", "style": 270, "x": 960, "door": "down" },
+        { "class": "bag_furniture_sdb", "style": 231, "x": 300, "y": 220, "show": { "class": "plank", "count": 1 } }
+      ],
+      "machines": [{ "class": "woodworker", "x": 420 }, { "class": "fuelmaker", "x": 680, "fuel": 120 }],
+      "craftybot": { "x": 860 }
+    }
+  ]
+}

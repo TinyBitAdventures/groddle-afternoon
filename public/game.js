@@ -4,7 +4,7 @@
  */
 import { ITEM_ICONS, ITEM_LABELS, getVerbsFor, ordinaryItems, runVerb } from './content.js?v=ceaea1fe';
 import { createErrorOnce, createFeatureHost, createFrameStages } from './js/feature-host.js?v=b87e2cbc';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=18a5c8e5';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=4daa82cd';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl, drawTileArt } from './js/enter-chooser.js?v=92133ac8';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, bodyReachDistance, OUT_OF_REACH_LINE, playerClickBox } from './js/reach.js?v=456da8a8';
@@ -740,6 +740,7 @@ import {
   resolveIndexTsid,
 } from './js/street-loader.js?v=10376267';
 import { showDraftBanner, startDraftPlay } from './js/builder/draft-play.js?v=3bb6e2f4';
+import { bootHouseFile } from './js/house-file-loader.js?v=760372ef';
 import {
   ladderTopDeck,
   groundBeneath,
@@ -34366,6 +34367,20 @@ async function main() {
     }
     if (homeState.owned) seedMailbox(mailboxState, Date.now());
   }
+  // G1285: ?housefile= lays a house file into this solo practice copy's own house (js/house-file-loader.js).
+  const houseFileBoot = await bootHouseFile({
+    search: location.search,
+    mode: GAME_MODE,
+    baseUri: document.baseURI,
+    origin: location.origin,
+    doc: document,
+    engine,
+    features,
+    homeState,
+    imagineHome,
+    hadSave: Boolean(savedPlayerState),
+    storage: (() => { try { return localStorage; } catch { return null; } })(),
+  });
   const resumeHomeAtBoot = homeState.owned && homeState.inHome;
   // One-time pack grants for solo saves from before the Wood Tree loop (a Hatchet) and the
   // Paradise slice (one ticket per supplied video; the nine reconstructed courses are dealt by
@@ -34755,7 +34770,7 @@ async function main() {
     // sends you on meanwhile (being followed, a feature's way on) waits for it instead of loading
     // beside it, so the street named and the scene drawn are the same street.
     await streetMove.run(() => enterStreet(startTsid, startOpts));
-    if (resumeHomeAtBoot || resumeHomeAt || ['home', 'interior', 'decorate', 'cultivate'].includes(homeDemo)) {
+    if (resumeHomeAtBoot || resumeHomeAt || houseFileBoot?.entered || ['home', 'interior', 'decorate', 'cultivate'].includes(homeDemo)) {
       if (resumeHomeAt) homeState.room = resumeHomeAt === HOME_INTERIOR_TSID ? 'interior' : 'street';
       if (!homeState.returnLocation) {
         homeState.returnLocation = {
@@ -34767,7 +34782,7 @@ async function main() {
         };
       }
       homeState.inHome = true;
-      homeState.room = ['interior', 'decorate'].includes(homeDemo)
+      homeState.room = ['interior', 'decorate'].includes(homeDemo) || (houseFileBoot?.entered && !houseFileBoot.kept)
         ? 'interior'
         : homeDemo === 'cultivate' ? 'street' : homeState.room || 'street';
       await renderHomeScene(homeState.room, { spawnX: homeState.room === 'interior' ? 1030 : 250 });

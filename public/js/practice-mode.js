@@ -16,6 +16,7 @@
  *
  * A level builder play-test (?draft=<id>, js/builder/draft-play.js, spec 6.8) is always a
  * practice copy: `draft` implies practice=1, so a draft street never reaches the real save.
+ * So is a house file link (?housefile=, G1285): the house it lays in never replaces the player's own.
  *
  * Classic script, loaded in play/index.html before the game modules so no
  * module sees the real localStorage first. If a shared multiplayer world is
@@ -28,7 +29,8 @@
   } catch {
     return;
   }
-  if (params.get('practice') !== '1' && !params.has('draft')) return;
+  // A house file (?housefile=, js/house-file-loader.js) is laid into a practice copy's house too.
+  if (params.get('practice') !== '1' && !params.has('draft') && !params.has('housefile')) return;
   // Practice copies are solo only (js/game-mode.js): a multiplayer entry page never practises.
   if (window.GRODDLE_MODE === 'multiplayer') return;
 
