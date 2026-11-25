@@ -10,6 +10,9 @@
  * - items/include/jobs.js canOffer 104-106: only the lot offers a group hall (job type 3); the Street
  *   Spirit offers types 1, 2 and 4. offerJobs 124-158: a given job first, else the first open one.
  * - quests/quest.js 1830-1840: a finished hall hides the lot (setAndBroadcastState 'visible:false').
+ *   1846-1859 then names the hall's location after its group ("A Private Group" for a private
+ *   one) and makes the group its owner. The hall's own street is not in the archive (G331), so
+ *   here the finished lot stays and says whose hall it is (G1301, #696, Austin 2026-11-25).
  * - group_hall_lot_marker.swf (one frame, no states): DefineShape4 1, the roped plot, at (0, 0);
  *   DefineSprite 3 "interaction_target", the sign, at (1483, 135) twips. The client hit-tests an
  *   item by its interaction_target, so the sign is what you click. Rendered by
@@ -147,6 +150,28 @@ export function lotJobIds(catalog, tsid) {
 export function lotHeadline(rows, catalog) {
   const halls = (rows || []).filter((r) => catalog?.jobs?.[r.jobId]?.kind === 'hall');
   return halls.find((r) => r.status !== 'done' && r.status !== 'built') || null;
+}
+
+/**
+ * G1301: the finished hall the street's lot now names, { jobId, group }, from status rows and the
+ * board's state rows (the server's row: hall.owned with its group's shown name, which is already
+ * "A Private Group" for a private group, group_halls.go hallJSON). null while a hall is still on
+ * offer here, or when none is owned (a finished hall the site has not settled yet stays hidden).
+ */
+export function lotOwner(rows, catalog, jobs) {
+  if (lotHeadline(rows, catalog)) return null;
+  for (const r of rows || []) {
+    if (catalog?.jobs?.[r.jobId]?.kind !== 'hall' || (r.status !== 'done' && r.status !== 'built')) continue;
+    const hall = jobs?.[r.jobId]?.hall;
+    const group = String(hall?.group?.name || '').trim();
+    if (hall?.owned && group) return { jobId: r.jobId, group };
+  }
+  return null;
+}
+
+/** G1301: the finished lot's one verb: visit, which says the hall's street is not open yet. */
+export function ownedVerb(owner) {
+  return { id: 'visit', label: OWNED_TEXT.verb, enabled: Boolean(owner), tooltip: owner ? OWNED_TEXT.name(owner.group) : '', durationMs: 0 };
 }
 
 /** The lot's verb (talk_to): enabled while it has a hall to offer (hasJobs: open or under way). */

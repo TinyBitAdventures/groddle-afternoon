@@ -152,10 +152,10 @@ import {
 } from '../street-jobs-mp.js?v=c99c5cd4';
 import { grantMoodXp } from '../mood-xp.js?v=e311b45c';
 import { createMinnAccount } from '../minn-account.js?v=7c3bdd51';
-import { normalizeGroups } from '../groups.js?v=b90d8099';
+import { normalizeGroups } from '../groups.js?v=a0391f9a';
 import { frameTexture, sourceFromUrl, textureFromUrl } from '../textures.js?v=b8e38103';
 import { createJobIndicator, jobIndicatorTip, jobIndicatorView, jobPerc } from '../job-indicator.js?v=8bea518d';
-import { LOT_ART, LOT_CLASS, LOT_PLACEMENT, LOT_SIGN_BLOCKERS, LOT_SIGN_X, LOT_TEXT, floorYAt, lotFit, lotHeadline, lotVerb } from '../group-hall-lot.js?v=afb8d974';
+import { LOT_ART, LOT_CLASS, LOT_PLACEMENT, LOT_SIGN_BLOCKERS, LOT_SIGN_X, LOT_TEXT, OWNED_TEXT, floorYAt, hallStreetName, lotFit, lotHeadline, lotJobIds, lotOwner, lotVerb, ownedVerb } from '../group-hall-lot.js?v=c4d38b81';
 import { JOB_WORK_BUBBLE, JOB_WORK_OVERLAY, JOB_WORK_REMOTE_BUBBLE_DY, avatarDrawnHeight, jobWorkBubbleY, jobWorkFloatPoint, jobWorkSoundKey, jobWorkToolScale, jobWorkToolSheet } from '../job-work-fx.js?v=a2dc6a5a';
 import { itemZ } from '../item-bands.js?v=ec366be3';
 import { SIGN_ARMS } from '../map-routes.js?v=52140ba2';
@@ -769,10 +769,15 @@ function drawPlate(engine) {
  * 104-106): the roped plot and its sign (group_hall_lot_marker.swf, js/group-hall-lot.js), the sign
  * being what you click (its interaction_target) with the job bubble over it (jobs.js onPlayerEnter,
  * items/group_hall_lot_marker.js 63-98, sends the status as the spirit's does). A finished hall
- * hides the lot (quest.js 1838 'visible:false'). Halls are multiplayer only (G331, mergeHalls),
- * so the lot is too.
+ * hid the lot (quest.js 1838 'visible:false') because its street opened; that street is not in the
+ * archive, so here a hall a group owns keeps the lot, with "<group>'s Group Hall" over its sign,
+ * and visiting it says the street opens later (G1301, #696, Austin 2026-11-25; lotOwner). Halls
+ * are multiplayer only (G331, mergeHalls), so the lot is too.
  */
-let lot = null; // { jobId, plot, sign, target, indicator, bubble }
+let lot = null; // { jobId, owner, at, plot, sign, plate, target, indicator, bubble }
+/** G1301: the street generation arrive() ran for, and whether this street has a hall (the lot may come or change after). */
+let lotGen = -1;
+let lotStreet = false;
 
 /** Does the lot give this job (a group hall)? */
 const lotOffers = (jobId) => jobDef(catalog, jobId)?.kind === 'hall';
@@ -783,7 +788,29 @@ function lotHead(engine) {
   return lotHeadline(streetJobs(state, catalog, engine.streetTsid, Date.now(), opts()), catalog);
 }
 
-function spawnLot(engine, at, head) {
+/** G1301: the finished hall a group owns here ({ jobId, group }), or null. */
+function lotOwnerHere(engine) {
+  if (!mpMode || demo || !catalog) return null;
+  return lotOwner(streetJobs(state, catalog, engine.streetTsid, Date.now(), opts()), catalog, state.jobs);
+}
+
+/**
+ * G1301: the lot as the street's halls want it now: offering one (head), naming its owner, or gone.
+ * The owner's row can come after the street is drawn (project_street follows project_world), so
+ * each frame on a hall street checks it and redraws the lot when it changes.
+ */
+function syncLot(engine) {
+  const head = lotHead(engine);
+  const owner = head ? null : lotOwnerHere(engine);
+  const want = head || owner;
+  if (lot && want && (lot.owner || '') === (owner?.group || '')) return head;
+  const at = lot?.at || engine.placement(LOT_PLACEMENT.key)[0] || { x: engine.player.x + 360, y: engine.player.y };
+  clearLot(engine);
+  if (want) spawnLot(engine, at, want, owner);
+  return head;
+}
+
+function spawnLot(engine, at, head, owner = null) {
   const { PIXI } = engine;
   const z = itemZ(LOT_CLASS);
   // The sign clear of the shrine, trees and the rest (lotFit): slid along its floor, or facing the other way.
@@ -812,13 +839,29 @@ function spawnLot(engine, at, head) {
   sign._worldHitW = Math.ceil(LOT_ART.sign.w);
   sign._worldHitH = Math.ceil(LOT_ART.sign.h);
   engine.entityLayer.addChild(plot, sign);
-  const target = engine.register({ classId: LOT_CLASS, featureId: STREET_JOBS_FEATURE_ID, label: LOT_TEXT.label, subtitle: LOT_TEXT.desc, sprite: sign });
+  // G1301: a hall a group owns names it over the sign, in the world's nameplate lettering (ours:
+  // Glitch renamed the hall's own location after the group, quest.js 1846-1852, which is not here).
+  let plate = null;
+  if (owner) {
+    plate = new PIXI.Text({ text: OWNED_TEXT.name(owner.group), style: { fontFamily: WORLD_FONT_FAMILY, fontSize: 13, fontWeight: '700', fill: 0xfff6dc, stroke: { color: 0x3a2a18, width: 3 }, padding: 2 } });
+    plate.resolution = 3;
+    anchorBottomCentre(plate, 'text');
+    plate.label = 'group-hall-lot-owner';
+    plate.x = sign.x;
+    plate.y = sign.y - LOT_ART.sign.h - 4;
+    plate.zIndex = itemZ(LOT_CLASS, 0.02);
+    engine.entityLayer.addChild(plate);
+  }
+  const target = owner
+    ? engine.register({ classId: LOT_CLASS, featureId: STREET_JOBS_FEATURE_ID, label: OWNED_TEXT.name(owner.group), subtitle: OWNED_TEXT.closed, sprite: sign })
+    : engine.register({ classId: LOT_CLASS, featureId: STREET_JOBS_FEATURE_ID, label: LOT_TEXT.label, subtitle: LOT_TEXT.desc, sprite: sign });
   const indicator = createJobIndicator(PIXI, { onClick: () => openLot(engine), textureFor: textureFromUrl });
   indicator.root.label = 'job-indicator-lot';
   indicator.root.x = sign.x;
   indicator.root.y = sign.y - LOT_ART.sign.h - 4;
-  (engine.fxLayer || engine.entityLayer).addChild(indicator.root);
-  lot = { jobId: head.jobId, plot, sign, target, indicator, bubble: '', x: point.x, side };
+  // A hall a group owns offers nothing: no bubble over its sign.
+  if (!owner) (engine.fxLayer || engine.entityLayer).addChild(indicator.root);
+  lot = { jobId: head.jobId, owner: owner?.group || '', at, plot, sign, plate, target, indicator, bubble: '', x: point.x, side };
   engine.setData('streetJobLot', head.jobId);
   engine.setData('streetJobLotX', String(Math.round(point.x)));
 }
@@ -829,22 +872,30 @@ function clearLot(engine) {
   if (engine?.unregister) engine.unregister(lot.target);
   else if (!lot.sign.destroyed) lot.sign.destroy({ children: true });
   if (!lot.plot.destroyed) lot.plot.destroy();
+  if (lot.plate && !lot.plate.destroyed) lot.plate.destroy();
   lot = null;
   engine?.setData('streetJobLot', '');
   engine?.setData('streetJobLotX', '');
 }
 
-/** offerJobs (jobs.js 124-158): the lot's hall, given or open. */
+/** offerJobs (jobs.js 124-158): the lot's hall, given or open; a hall a group owns says its street is not open yet (G1301). */
 function openLot(engine) {
+  if (lot?.owner) {
+    engine.toast(`${OWNED_TEXT.name(lot.owner)}. ${OWNED_TEXT.closed}`, 3200);
+    return;
+  }
   const head = lotHead(engine);
   if (head) openPanel(engine, head.jobId);
 }
 
-/** Each frame: the bubble; a hall built while you watch takes its lot away (quest.js 1838). */
+/**
+ * Each frame: the bubble; a hall built while you watch takes the offer away (quest.js 1838), and
+ * once the server's row says which group owns it the lot names that group (G1301).
+ */
 function tickLot(engine, now) {
-  if (!lot) return;
-  const head = lotHead(engine);
-  if (!head) return clearLot(engine);
+  if (lotGen !== generation || !lotStreet) return;
+  const head = syncLot(engine);
+  if (!lot || !head) return;
   lot.jobId = head.jobId;
   const v = indicatorView(head, now);
   lot.indicator.update(v, now);
@@ -2199,8 +2250,9 @@ function arrive(engine, mine) {
     const point = engine.placement('street-job-board')[0] || { x: engine.player.x + 220, y: engine.player.y };
     spawnBoard(engine, point);
   }
-  const hall = lotHead(engine);
-  if (hall && !lot) spawnLot(engine, engine.placement(LOT_PLACEMENT.key)[0] || { x: engine.player.x + 360, y: engine.player.y }, hall);
+  lotGen = mine;
+  lotStreet = lotJobIds(catalog, tsid).length > 0;
+  if (lotStreet) syncLot(engine);
   drawBarricades(engine);
   drawFlora(engine);
 }
@@ -3484,7 +3536,9 @@ export const streetJobsFeature = {
       out.push({ key: 'street-job-board', count: 1, clearance: 110 });
     }
     // Gap 1: the hall's lot wants a floor run as wide as its rope (the archive kept no x/y).
-    if (mpMode && lotHeadline(streetJobs(state, catalog, tsid, Date.now(), opts()), catalog)) out.push({ ...LOT_PLACEMENT });
+    // G1301: a hall a group owns keeps its lot.
+    const hallRows = mpMode ? streetJobs(state, catalog, tsid, Date.now(), opts()) : null;
+    if (hallRows && (lotHeadline(hallRows, catalog) || lotOwner(hallRows, catalog, state.jobs))) out.push({ ...LOT_PLACEMENT });
     const option = waitingWorld() ? null : appliedUpgrade(state, catalog, tsid);
     if (option && upgradeFeatures(option).flora.length) out.push({ key: 'street-job-flora', count: FLORA_COUNT, clearance: 60 });
     return out;
@@ -3691,7 +3745,7 @@ export const streetJobsFeature = {
 
   verbsFor(target, engine) {
     // Gap 1: the lot's talk_to (group_hall_lot_marker.js 39-61).
-    if (target.classId === LOT_CLASS) return catalog ? [lotVerb(lotHead(engine))] : [];
+    if (target.classId === LOT_CLASS) return !catalog ? [] : lot?.owner ? [ownedVerb({ group: lot.owner })] : [lotVerb(lotHead(engine))];
     if (target.classId !== BOARD_CLASS || !catalog) return [];
     const head = boardHeadline(engine);
     return [{ id: 'view', label: 'view project', enabled: Boolean(head), tooltip: head ? jobDef(catalog, head.jobId).title : '', durationMs: 0 }];
@@ -3751,7 +3805,7 @@ export const streetJobsFeature = {
 
   /** QA / tests. */
   _state() {
-    return { state, catalog, board: Boolean(board), giver: Boolean(giver), lot: lot ? { jobId: lot.jobId, x: Math.round(lot.x), side: lot.side, signX: Math.round(lot.sign.x) } : null, bubble: { spirit: giver?.bubble || '', board: board?.bubble || '', lot: lot?.bubble || '', at: giver?.indicator.root.getGlobalPosition?.() || null }, work, demo, barricades: barricades.length };
+    return { state, catalog, board: Boolean(board), giver: Boolean(giver), lot: lot ? { jobId: lot.jobId, x: Math.round(lot.x), side: lot.side, signX: Math.round(lot.sign.x), ...(lot.owner ? { owner: lot.owner, label: lot.target?.label || '', plate: Boolean(lot.plate) } : {}) } : null, bubble: { spirit: giver?.bubble || '', board: board?.bubble || '', lot: lot?.bubble || '', at: giver?.indicator.root.getGlobalPosition?.() || null }, work, demo, barricades: barricades.length };
   },
 };
 

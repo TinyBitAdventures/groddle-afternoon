@@ -88,8 +88,8 @@ import {
   shownName,
   tabOrder,
   writeMemory,
-} from '../groups.js?v=b90d8099';
-import { OWNED_TEXT } from '../group-hall-lot.js?v=afb8d974';
+} from '../groups.js?v=a0391f9a';
+import { OWNED_TEXT } from '../group-hall-lot.js?v=c4d38b81';
 import { appendLinkedText } from '../chat-links.js?v=b717fac7';
 import { lineKey as reactKey } from '../chat-reactions.js?v=38460172';
 import { DELETE_TEXT, deletableChannel, lineLidOf, mayDelete } from '../chat-delete.js?v=c55a1043';
