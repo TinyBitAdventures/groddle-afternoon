@@ -504,6 +504,9 @@
   "public/js/features/presence-mp-feature.js": {
     "remake-own: * blocks). The remake's own: Glitch had only the buddy list and the street's": "ours-presence"
   },
+  "public/js/features/profiles-feature.js": {
+    "glitch-had-none: has a tower field. Never a house's inside: Glitch never": "not-an-invention"
+  },
   "public/js/features/puzzles-feature.js": {
     "no-source: // The remake's own words (no source: the original had no Map": "puzzle-map-card",
     "remake-own: // The remake's own words (no source: the original had no Map": "puzzle-map-card",
