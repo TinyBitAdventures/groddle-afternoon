@@ -2814,9 +2814,14 @@
   "deployed": "2026-11-25"
  },
  "git": {
-  "commits": 3586,
+  "commits": 3588,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-25",
+    "kind": "improve",
+    "text": "On a phone held upright the pinned quest sits just above the pack row, under the stick, so it no longer covers the street"
+   },
    {
     "date": "2026-11-25",
     "kind": "new",
@@ -2931,11 +2936,6 @@
     "date": "2026-11-25",
     "kind": "improve",
     "text": "Comment wording on the house-locked line"
-   },
-   {
-    "date": "2026-11-25",
-    "kind": "new",
-    "text": "Key holders and visitors let in can dig, harvest and tend in a friend's back yard"
    }
   ]
  },
