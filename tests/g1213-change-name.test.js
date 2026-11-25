@@ -22,7 +22,7 @@ import { join } from 'node:path';
 import { SITE_DIR, serverPath, sitePath, skipWithoutServer, skipWithoutSite } from '../tools/repos.mjs';
 import { CHANGE_NAME_COPY, RENAME_COST, RENAME_DAYS, applyRename, mountChangeName, renameDate, renameProblem } from '../public/js/change-name.js?v=4685ccda';
 import { createMinnAccountCore } from '../public/js/minn-account-core.js?v=5baee954';
-import { createRealtimeClient } from '../public/js/realtime-client.js?v=f93e60d3';
+import { createRealtimeClient } from '../public/js/realtime-client.js?v=9471ca67';
 
 const root = join(import.meta.dirname, '..');
 const pub = (f) => readFileSync(join(root, 'public', f), 'utf8');

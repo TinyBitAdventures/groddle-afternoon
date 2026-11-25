@@ -13,7 +13,7 @@ import { loadFla } from '../tools/overlay-art/xfl-svg.mjs';
 import { SHRINE_SHEETS, shrineClassFor, shrineRegionForHub, shrineSheet, shrineVariantFor } from '../public/js/shrine-variants.js?v=832a5e61';
 import { checkVariants, variantFiles } from '../tools/shrine-variants/build.mjs';
 import { SLATHER_VERB, SPLATTER_STAGE_SIDE, splatterDy, slatherVerb } from '../public/js/features/quest-verbs-feature.js?v=bcd229ef';
-import { OVERLAY_EMOTES, EMOTES } from '../public/js/realtime-client.js?v=f93e60d3';
+import { OVERLAY_EMOTES, EMOTES } from '../public/js/realtime-client.js?v=9471ca67';
 import {
   GAME_TELEPORTER_DECO,
   GAME_TELEPORTER_PRICE,

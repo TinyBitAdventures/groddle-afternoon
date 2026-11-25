@@ -153,6 +153,45 @@ export function backoffMs(attempt, random = Math.random) {
   return Math.round(base * (0.75 + 0.5 * random()));
 }
 
+/** #689: states a page may leave in and connect again from when the back/forward cache brings it back. */
+export const PAGE_RETURN_STATES = Object.freeze(new Set(['idle', 'connecting', 'online', 'offline']));
+
+/**
+ * #689 (R25, the page lifecycle): pagehide stops the client (the street hears you leave, and a page
+ * holding an open socket can't go into the back/forward cache). A pageshow with `persisted` is the
+ * same page brought back by Chrome's or Safari's back/forward cache, still playing and saving: the
+ * client starts again the way a first connect does (start(): a new ticket, the socket, hello), so the
+ * street is joined again from the one wanted and every system re-syncs on its own hello/state
+ * listeners, as after a dropped socket. Only a page that left live or trying to be: one that left
+ * replaced (4001), booted, signed out, suspended or for another character stays as it was.
+ * Chrome's `resume` (after a freeze stopped the timers) probes the socket: a dead one connects at once.
+ * `win` and `doc` are the window and document (event targets). Returns an unbind.
+ */
+export function bindPageLifecycle(client, win = globalThis.window, doc = globalThis.document) {
+  let returnTo = false;
+  const onHide = () => {
+    returnTo = PAGE_RETURN_STATES.has(client.state);
+    client.stop();
+  };
+  const onShow = (event) => {
+    if (!event?.persisted) return;
+    const again = returnTo;
+    returnTo = false;
+    if (again && client.state === 'stopped') client.start();
+  };
+  const onResume = () => {
+    if (client.state === 'online') client.probe?.();
+  };
+  win?.addEventListener?.('pagehide', onHide);
+  win?.addEventListener?.('pageshow', onShow);
+  doc?.addEventListener?.('resume', onResume);
+  return () => {
+    win?.removeEventListener?.('pagehide', onHide);
+    win?.removeEventListener?.('pageshow', onShow);
+    doc?.removeEventListener?.('resume', onResume);
+  };
+}
+
 const sameMove = (a, b) => Boolean(a && b) && a.x === b.x && a.y === b.y && a.dir === b.dir && a.anim === b.anim;
 const round1 = (n) => Math.round((Number(n) || 0) * 10) / 10;
 

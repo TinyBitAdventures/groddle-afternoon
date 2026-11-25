@@ -60,7 +60,7 @@
 
 import { chatBubbleText } from '../ui/chat-input.js?v=8f2479a3';
 import { createMinnAccount } from '../minn-account.js?v=ca5f77b3';
-import { EMOTES, createRealtimeClient, createTrack, pushSample, sampleTrack } from '../realtime-client.js?v=f93e60d3';
+import { EMOTES, bindPageLifecycle, createRealtimeClient, createTrack, pushSample, sampleTrack } from '../realtime-client.js?v=9471ca67';
 import { ANIM_FPS, EMOTION_MS, animForState, crowdScaleX } from '../avatar-anims.js?v=fb921bf4';
 import { redrawFrame } from '../avatar-pack.js?v=65324246';
 import { movedLine } from '../admin-teleport.js?v=c4d28509';
@@ -674,7 +674,8 @@ function createSession(engine) {
     e.preventDefault();
     input.focus();
   });
-  window.addEventListener('pagehide', () => client.stop());
+  // #689: pagehide stops the socket; a page the back/forward cache brings back connects again.
+  bindPageLifecycle(client, window, document);
 
   const session = {
     client,
