@@ -2814,9 +2814,14 @@
   "deployed": "2026-11-25"
  },
  "git": {
-  "commits": 3564,
+  "commits": 3566,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-25",
+    "kind": "fix",
+    "text": "Things on a shelf stand near its front edge, where Glitch put them, not at the very back"
+   },
    {
     "date": "2026-11-25",
     "kind": "fix",
@@ -2931,11 +2936,6 @@
     "date": "2026-11-25",
     "kind": "improve",
     "text": "Stacks set down on furniture and floors show no number badge, as in Glitch"
-   },
-   {
-    "date": "2026-11-25",
-    "kind": "fix",
-    "text": "Storage Display Boxes no longer show a 1 on every box"
    }
   ]
  },
