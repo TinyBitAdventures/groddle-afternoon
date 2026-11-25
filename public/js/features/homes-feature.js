@@ -8765,7 +8765,7 @@ function towerShotDecor(index) {
 /** A floor's band in the stacked picture: its room's top, foot, bound and storey (home-wallpaper.js roomPieces). */
 function floorBand(index, state, opts = {}) {
   const room = roomPieces(state, { floorY: INTERIOR.floorY, construction: Boolean(opts.construction), leftOpen: Boolean(opts.yard) });
-  return { index, top: room.top, bottom: room.bottom, bound: room.bound, pitch: room.pitch, width: room.width };
+  return { index, top: room.top, bottom: room.bottom, frameTop: room.frameTop, bound: room.bound, pitch: room.pitch, width: room.width };
 }
 
 /**

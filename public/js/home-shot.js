@@ -18,12 +18,14 @@
  * The camera option is a remake addition (inventions: camera-whole-house): Glitch's camera never
  * snapped the whole house. It renders the whole place the way saveHomeImg did (off the camera, the
  * full location), every floor stacked as Glitch's house location stacked them: the top floor at
- * the top with the attic over it, each floor's frame shared with the one above, the ground floor's
- * basement at the foot (inc_homes.js homes_rebuild_floor / _attic / _basement).
+ * the top, each floor's frame shared with the one above (inc_homes.js homes_rebuild_floor). As a
+ * player's 2012 picture of a whole house shows (report #669, Austin 2026-11-25, G1289), it starts
+ * at the top floor's top frame and ends at the ground floor's floor frame: no attic, no earth.
  *
  * Remake: each floor is its own room (js/home-floors.js), so a floor the player is not on is drawn
- * from what the home keeps (its walls, floor, furniture, Doors and the owner's own stacks there);
- * the floor the player stands on is the live scene, players and all.
+ * from what the home keeps (its walls, floor, furniture, Doors, the machines and the Crafty Bot
+ * there, G1290, and the owner's own stacks there); the floor the player stands on is the live
+ * scene, players and all.
  */
 
 /** The words the option and its refusals use (the remake's own: Glitch's camera had no such option). */
@@ -58,24 +60,25 @@ export function homeShotState({ ctx = null, tower = false, visiting = false } = 
 
 /**
  * PURE: the bands of a stacked picture. `floors` lists each floor, ground floor first:
- * { index, top, bottom, bound, pitch } in that floor's own room y (home-wallpaper.js roomPieces:
- * top is the attic's top or the roof frame's, bottom the basement's foot or the bound, bound the
- * floor frame's foot, pitch one storey: the wall's 458 px and a frame). The top floor keeps all
- * above its interior (the attic, or a Tower's roof frame); each floor shows its storey down to its
- * bound (the frame under it, which is the top frame of the floor below); the ground floor keeps
- * all under it too. Returns { bands: [{ index, y0, y1, dy }], h }, the bands top floor first and dy
- * each band's place in the picture (from 0), or null with no floors.
+ * { index, frameTop, bound, pitch } in that floor's own room y (home-wallpaper.js roomPieces:
+ * frameTop the top frame's top, bound the floor frame's foot, pitch one storey: the wall's 458 px
+ * and a frame). G1289 (#669, Austin 2026-11-25): the floors stack as in Glitch's whole-house
+ * picture, the top floor from its top frame (no attic over it) and the ground floor down to its
+ * floor frame (no earth under it); each floor shows its storey down to its bound (the frame under
+ * it, which is the top frame of the floor below). A floor with no frameTop starts at `top`.
+ * Returns { bands: [{ index, y0, y1, dy }], h }, the bands top floor first and dy each band's
+ * place in the picture (from 0), or null with no floors.
  */
 export function homeShotBands(floors = []) {
-  const list = (Array.isArray(floors) ? floors : []).filter((f) => f && [f.top, f.bottom, f.bound, f.pitch].every(Number.isFinite));
+  const list = (Array.isArray(floors) ? floors : []).filter((f) => f && [f.bound, f.pitch].every(Number.isFinite) && (Number.isFinite(f.frameTop) || Number.isFinite(f.top)));
   if (!list.length) return null;
   const last = list.length - 1;
   const bands = [];
   let dy = 0;
   for (let i = last; i >= 0; i -= 1) {
     const f = list[i];
-    const y0 = i === last ? f.top : f.bound - f.pitch;
-    const y1 = i === 0 ? f.bottom : f.bound;
+    const y0 = i === last ? (Number.isFinite(f.frameTop) ? f.frameTop : f.top) : f.bound - f.pitch;
+    const y1 = f.bound;
     bands.push({ index: f.index ?? i, y0, y1, dy });
     dy += y1 - y0;
   }

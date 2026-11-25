@@ -50,7 +50,7 @@ function floorsOf(kind, n, { segments = 7, live = 0 } = {}) {
       ? createHomeDecorState({ layout: 'tower', wallSegments: 6, wall: 'grey_unfinished', floor: 'starter_crappy', ceiling: 'starter_crappy_ceiling' })
       : createHomeDecorState({ layout: 'house', wallSegments: segments });
     const room = roomPieces(state, { floorY: INTERIOR.floorY, leftOpen: kind === 'house' && i === 0 });
-    out.push({ index: i, top: room.top, bottom: room.bottom, bound: room.bound, pitch: room.pitch, width: room.width, x0: kind === 'house' && i === 0 ? 600 : 0, live: i === live });
+    out.push({ index: i, top: room.top, bottom: room.bottom, frameTop: room.frameTop, bound: room.bound, pitch: room.pitch, width: room.width, x0: kind === 'house' && i === 0 ? 600 : 0, live: i === live });
   }
   return out;
 }
@@ -94,11 +94,16 @@ describe('the bands cover every floor stacked, top floor first, with no gap', ()
       }
       assert.equal(y, plan.h);
       const f = floors[0];
-      // The top floor keeps all above it (the attic, the Tower's roof frame), the ground floor all below.
-      assert.equal(plan.bands[0].y0, f.top);
-      assert.equal(plan.bands.at(-1).y1, f.bottom);
-      // The place's height: what is over the top storey, a storey a floor, what is under the ground floor.
-      assert.equal(plan.h, (f.bound - f.pitch - f.top) + n * f.pitch + (f.bottom - f.bound));
+      // G1289 (#669, Austin 2026-11-25): the top floor from its top frame (no attic), the ground floor
+      // down to its floor frame (no earth), as the 2012 picture of a whole house shows.
+      assert.equal(plan.bands[0].y0, f.frameTop);
+      assert.equal(plan.bands.at(-1).y1, f.bound);
+      if (kind === 'house') {
+        assert.ok(f.frameTop > f.top, 'the attic is left out');
+        assert.ok(f.bottom > f.bound, 'the earth is left out');
+      }
+      // The place's height: the top frame, a storey a floor.
+      assert.equal(plan.h, (f.bound - f.pitch - f.frameTop) + n * f.pitch);
       // Each storey shows its whole wall: from the frame over it to the frame under it.
       for (const b of plan.bands.slice(1, -1)) assert.equal(b.y1 - b.y0, f.pitch);
     });
@@ -456,7 +461,7 @@ describe('Snap the whole house in Camera Mode (fake page)', () => {
       const plan = homeShotBands(floorsOf('house', 3));
       const scale = homeShotScale({ w: 1050, h: plan.h, resolution: 2, maxW: WHOLE_SNAP.maxW, maxH: WHOLE_SNAP.maxH });
       assert.equal(log.data.snapSize, `${Math.round(1050 * scale)}x${Math.round(plan.h * scale)}`, 'the whole house at the chosen scale (within a whole-home Snap\'s 1920x3600)');
-      assert.equal(log.data.snapSize, '1920x3123');
+      assert.equal(log.data.snapSize, '1920x2637', 'no attic or earth (G1289)');
       assert.equal(log.data.snapsLast, 'whole:house:3');
       assert.equal(log.data.snapDialog, 'open', 'the polaroid, as any Snap');
       page.body.querySelector('[data-snap-save]').click();

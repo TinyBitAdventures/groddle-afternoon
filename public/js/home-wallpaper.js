@@ -250,6 +250,8 @@ function housePieces(state, W, leftOpen = false) {
     elevator: null,
     top: atticBottom - F.atticH,
     bottom: B + F.basementH,
+    // G1289: the top frame's top (the attic stands on it), where the whole-house picture starts.
+    frameTop: atticBottom,
     // G1284: the floor frame's foot and one storey (the wall and a frame), for the stacked whole-house picture.
     bound: B,
     pitch: 458 + F.frameHeight,
@@ -331,6 +333,7 @@ function towerPieces(state, W, construction) {
     elevator: { piece: T.elevator, x: T.elevatorX, y: B, w: T.elevatorW, h: T.elevatorH },
     top: B - 458 - 2 * fh,
     bottom: B,
+    frameTop: B - 458 - 2 * fh,
     bound: B,
     pitch: 458 + fh,
     innerLeft: 130,
