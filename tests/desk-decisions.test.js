@@ -69,8 +69,11 @@ describe('DROPHOVER: a street Musicblock sits on the ground', () => {
 
   it('ticket 78: draws at the size of the same block put down (its world art, own size), not 1.65x its icon', () => {
     const spawn = fnBody(game, 'spawnDroppedItemStack');
-    assert.doesNotMatch(spawn, /baseScale = 1\.65|scale\.set\(1\.65/);
-    assert.match(spawn, /worldArtFor\(stack\.classTsid, stack\.count, item\.icon\)/);
+    // G1284: the sprite is made in droppedStackSprite (the whole-house picture draws other floors' stacks with it).
+    const sprite = fnBody(game, 'droppedStackSprite');
+    assert.match(spawn, /droppedStackSprite\(stack\)/);
+    assert.doesNotMatch(spawn + sprite, /baseScale = 1\.65|scale\.set\(1\.65/);
+    assert.match(sprite, /worldArtFor\(stack\.classTsid, stack\.count, item\.icon\)/);
     assert.match(spawn, /sizeDroppedItemSprite\(spr\)/);
     // musicblock_*.js adjusted_scale 1: the SWF's own size.
     if (haveGsjs) assert.match(gsjs('items/musicblock_d_blue_01.js'), /var adjusted_scale = 1;/);

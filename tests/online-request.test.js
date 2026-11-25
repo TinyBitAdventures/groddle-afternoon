@@ -185,6 +185,8 @@ const NOT_A_REQUEST = Object.freeze([
   'public/js/features/home-live-feature.js FIRST_WAIT_MS',
   'public/js/features/musicblocks-feature.js LAND_WAIT_MS',
   'public/js/hell.js HELL_ENTRY_PROMPT_TIMEOUT_MS',
+  // G1284: the whole-house picture waits for its textures to load, not for a server.
+  'public/js/home-shot-render.js HOME_SHOT_WAIT_MS',
   'public/js/home-live.js HOME_LIVE_WAIT_MS',
   'public/js/machine-rooms.js MACHINE_EXTRA_WAIT_MS',
   'public/js/making.js MACHINE_EXTRA_WAIT_MS',

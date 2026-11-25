@@ -23,8 +23,11 @@
  */
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
+import { spawnSync, execFileSync } from 'node:child_process';
+import { homedir } from 'node:os';
 import { dirname, join } from 'node:path';
+import { SITE_DIR } from '../tools/repos.mjs';
 import { fileURLToPath } from 'node:url';
 
 import { HOME_SHOT_COPY, homeShotBands, homeShotRows, homeShotScale, homeShotSize, homeShotState } from '../public/js/home-shot.js?v=4384d3a2';
@@ -32,7 +35,7 @@ import { renderHomeShot } from '../public/js/home-shot-render.js?v=cc17af36';
 import { roomPieces } from '../public/js/home-wallpaper.js?v=a882fa38';
 import { createHomeDecorState, INTERIOR } from '../public/js/home-decor.js?v=adc6b830';
 import { HOME_STALE_DELAY_MS, RETRY_MS, staleRefreshDue } from '../public/js/profiles.js?v=b1c63974';
-import { snapSteps, SNAP_MAX_H, SNAP_MAX_W } from '../public/js/snaps.js?v=11f3e41b';
+import { snapSteps, SNAP_MAX_H, SNAP_MAX_W, WHOLE_SNAP } from '../public/js/snaps.js?v=887f3da9';
 import { snapsFeature } from '../public/js/features/snaps-feature.js?fresh=g1284';
 import { profilesFeature } from '../public/js/features/profiles-feature.js?fresh=g1284';
 
@@ -139,6 +142,51 @@ describe('the picture is the place at the chosen scale, within the site\'s Snap 
       }
     });
   }
+});
+
+describe('a whole-home Snap may be taller (Austin 2026-11-25: a 9-floor Tower kept readable)', () => {
+  it('a 9-floor Tower keeps at least 960 px of width, within 1920x3600 and 2 MB', () => {
+    assert.deepEqual(WHOLE_SNAP, { maxW: 1920, maxH: 3600, maxBytes: 2_000_000 });
+    const floors = floorsOf('tower', 9);
+    const plan = homeShotBands(floors);
+    assert.equal(plan.h, 4402, 'the roof frame, nine 486 px storeys');
+    for (const resolution of [1, 2, 3]) {
+      const scale = homeShotScale({ w: floors[0].width, h: plan.h, resolution, maxW: WHOLE_SNAP.maxW, maxH: WHOLE_SNAP.maxH });
+      const size = homeShotSize(floors[0].width, plan.h, scale);
+      assert.deepEqual(size, { w: 963, h: 3600 }, `at ${resolution}x (it was 321 x 1200 under a Snap's 1200 high)`);
+      const first = snapSteps(size.w, size.h, WHOLE_SNAP)[0];
+      assert.deepEqual([first.w, first.h], [963, 3600], 'kept whole by the encoder under the whole-home limits');
+      for (const step of snapSteps(size.w, size.h, WHOLE_SNAP)) assert.ok(step.w <= 1920 && step.h <= 3600, JSON.stringify(step));
+    }
+    // A 3-floor house is drawn at the screen's own pixels on a 1x screen, as big as it is.
+    const house = homeShotBands(floorsOf('house', 3));
+    assert.equal(homeShotScale({ w: 1050, h: house.h, resolution: 1, maxW: WHOLE_SNAP.maxW, maxH: WHOLE_SNAP.maxH }), 1);
+    // An ordinary Snap keeps its own limits.
+    assert.deepEqual(snapSteps(963, 3600)[0], { w: 321, h: 1200, quality: 0.85 });
+  });
+
+  const engineDir = process.env.MINN_ENGINE_DIR || join(homedir(), 'Cove/Sites/minn-engine.localhost/public/minn');
+  const hasPhp = spawnSync('php', ['-v']).status === 0;
+  const gdArgs = hasPhp && spawnSync('php', ['-r', 'exit(function_exists("imagecreatetruecolor") ? 0 : 1);']).status !== 0 ? ['-d', 'extension=gd'] : [];
+  const haveSite = existsSync(join(SITE_DIR, 'src/SnapImage.php'));
+  it('the site takes the taller picture only from an upload that says whole (php)', { skip: !(hasPhp && haveSite && existsSync(join(engineDir, 'src/Minn/Autoloader.php'))) && 'php, the site or Minn Engine not found' }, () => {
+    const out = JSON.parse(execFileSync('php', [...gdArgs, join(here, 'fixtures/snaps/whole-snap.php'), engineDir, SITE_DIR], { encoding: 'utf8' }));
+    assert.deepEqual(out, {
+      limits: [1920, 1200, 1_000_000, WHOLE_SNAP.maxH, WHOLE_SNAP.maxBytes],
+      towerWhole: 'ok:963x3600:fits:small',
+      towerPlain: 'groddle_snap_size:400',
+      tooTallWhole: 'groddle_snap_size:400',
+      tooWideWhole: 'groddle_snap_size:400',
+      viewPlain: 'ok:1920x1200:fits:small',
+      bytesOverWhole: 'groddle_snap_too_large:413',
+      bytesOverPlain: 'groddle_snap_too_large:413',
+    });
+  });
+
+  it('Snaps::save asks for the whole-home limits only on a literal true', { skip: !haveSite && 'no site repo' }, () => {
+    const src = readFileSync(join(SITE_DIR, 'src/Snaps.php'), 'utf8');
+    assert.match(src, /SnapImage::accept\(\$body\['image'\] \?\? null, \(\$body\['whole'\] \?\? false\) === true\)/);
+  });
 });
 
 /* ------------------------------------------------------------------ */
@@ -406,8 +454,9 @@ describe('Snap the whole house in Camera Mode (fake page)', () => {
       // The flash peaks 100 ms in, then the polaroid (CameraMan.as snap).
       await new Promise((r) => setTimeout(r, 160));
       const plan = homeShotBands(floorsOf('house', 3));
-      const scale = homeShotScale({ w: 1050, h: plan.h, resolution: 2 });
-      assert.equal(log.data.snapSize, `${Math.round(1050 * scale)}x${Math.round(plan.h * scale)}`, 'the whole house at the chosen scale (within 1920x1200)');
+      const scale = homeShotScale({ w: 1050, h: plan.h, resolution: 2, maxW: WHOLE_SNAP.maxW, maxH: WHOLE_SNAP.maxH });
+      assert.equal(log.data.snapSize, `${Math.round(1050 * scale)}x${Math.round(plan.h * scale)}`, 'the whole house at the chosen scale (within a whole-home Snap\'s 1920x3600)');
+      assert.equal(log.data.snapSize, '1920x3123');
       assert.equal(log.data.snapsLast, 'whole:house:3');
       assert.equal(log.data.snapDialog, 'open', 'the polaroid, as any Snap');
       page.body.querySelector('[data-snap-save]').click();
@@ -415,6 +464,7 @@ describe('Snap the whole house in Camera Mode (fake page)', () => {
       await flush();
       assert.equal(saved.length, 1, JSON.stringify([log.data, page.calls]));
       assert.equal(Object.hasOwn(saved[0], 'public'), false, 'the save asks nothing about public: the site keeps it private');
+      assert.equal(saved[0].whole, true, 'a whole-home Snap says so, for the site\'s larger limits');
       assert.equal(saved[0].street, '', 'a home is a private place: no street to travel to');
       assert.match(saved[0].image, /^A+$/);
       assert.equal(log.data.snapDialog, 'saved');

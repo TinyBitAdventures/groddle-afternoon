@@ -44,6 +44,14 @@ export const SNAP_MAX_W = 1920;
 export const SNAP_MAX_H = 1200;
 export const SNAP_MIN_W = 320;
 export const SNAP_MIN_H = 160;
+/**
+ * G1284 (Austin 2026-11-25): a whole-home Snap (Camera Mode's "Snap the whole house", js/home-shot.js)
+ * may be taller and larger, so a 9-floor Tower (1178 x 4402 world px) keeps 963 px of width
+ * instead of 320: up to 1920 x 3600 and 2 MB. The game sends `whole: true` with it and the site
+ * checks these limits for those only (site SnapImage::WHOLE_MAX_H, WHOLE_MAX_BYTES).
+ */
+export const WHOLE_SNAP = Object.freeze({ maxW: 1920, maxH: 3600, maxBytes: 2_000_000 });
+
 /** The widths a Snap steps down to, widest first, when its own size is over the site's 1 MB. */
 export const SNAP_WIDTHS = Object.freeze([1920, 1600, 1280, 960, 800, 640]);
 export const SNAP_QUALITY = 0.85;
@@ -64,15 +72,15 @@ export function snapResolution({ viewW = 960, resolution = 1 } = {}) {
 
 /**
  * The sizes and qualities to try for a picture `width` x `height`, in order:
- * its own size (fitted into the site's 1920x1200) at SNAP_QUALITY, then at
+ * its own size (fitted into the site's 1920x1200, or `maxW` x `maxH`) at SNAP_QUALITY, then at
  * SNAP_QUALITY_LOW, then each smaller SNAP_WIDTHS width the same way; never
  * under the site's least size. The first that fits 1 MB is kept.
  */
-export function snapSteps(width, height) {
+export function snapSteps(width, height, { maxW = SNAP_MAX_W, maxH = SNAP_MAX_H } = {}) {
   const W = Math.round(Number(width) || 0);
   const H = Math.round(Number(height) || 0);
   if (W < 1 || H < 1) return [];
-  const fit = Math.min(1, SNAP_MAX_W / W, SNAP_MAX_H / H);
+  const fit = Math.min(1, maxW / W, maxH / H);
   const w0 = Math.max(1, Math.floor(W * fit));
   const widths = [w0, ...SNAP_WIDTHS.filter((w) => w < w0)];
   const out = [];

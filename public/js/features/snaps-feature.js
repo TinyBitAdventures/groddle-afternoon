@@ -58,8 +58,8 @@ import { STREET_INDEX, resolveIndexTsid } from '../street-loader.js?v=10376267';
 import {
   CAMERA_CLASS, CAPTION_MAX, FORGET_RECHARGE_SEC, RECHARGE_BUFF, SNAP_COPY as T, SNAP_MAX_BYTES, TRAVEL,
   albumSnaps, base64Bytes, canSnap, cleanCaption, isSnapDownload, isSnapUrl, jpegBase64, savedActions, snapAuthor, snapDate, snapPlace,
-  snapResolution, snapShareUrl, snapSteps, snapStreet, takePictureState, viewerActions, viewerStep, withCamera,
-} from '../snaps.js?v=11f3e41b';
+  snapResolution, snapShareUrl, snapSteps, snapStreet, takePictureState, viewerActions, viewerStep, withCamera, WHOLE_SNAP,
+} from '../snaps.js?v=887f3da9';
 import { VINTAGE_TEXT, applyFilter, filterComponents, filtersFor } from '../snap-filters.js?v=32315cf1';
 import { HOME_SHOT_COPY, homeShotState } from '../home-shot.js?v=4384d3a2';
 import { renderHomeLocation } from '../home-shot-render.js?v=cc17af36';
@@ -333,10 +333,15 @@ async function drawThumb(target, tsid) {
   target.src = small.toDataURL('image/png');
 }
 
-/** The picture as the site keeps it: a JPEG under the cap, its own size first, smaller or lower quality until it fits (snapSteps). */
-function encodeSnap(canvas) {
+/**
+ * The picture as the site keeps it: a JPEG under the cap, its own size first, smaller or lower
+ * quality until it fits (snapSteps). `limits` (G1284: WHOLE_SNAP for a whole-home Snap) are the
+ * size and bytes the site takes; the result carries them, so a filter re-encodes under the same.
+ */
+function encodeSnap(canvas, limits = null) {
   let c = null;
-  for (const step of snapSteps(canvas.width, canvas.height)) {
+  const maxBytes = limits?.maxBytes || SNAP_MAX_BYTES;
+  for (const step of snapSteps(canvas.width, canvas.height, limits || {})) {
     if (!c || c.width !== step.w || c.height !== step.h) {
       // On white (a JPEG has no alpha: Shift's edge would go black).
       c = document.createElement('canvas');
@@ -351,7 +356,7 @@ function encodeSnap(canvas) {
     }
     const url = c.toDataURL('image/jpeg', step.quality);
     const b64 = jpegBase64(url);
-    if (b64 && base64Bytes(b64) <= SNAP_MAX_BYTES) return { url, b64, w: c.width, h: c.height, canvas: c, quality: step.quality };
+    if (b64 && base64Bytes(b64) <= maxBytes) return { url, b64, w: c.width, h: c.height, canvas: c, quality: step.quality, ...(limits ? { limits } : {}) };
   }
   return null;
 }
@@ -451,7 +456,7 @@ function filterRow(engine, s, picture, img) {
       if (!state.tsid) return picture;
       if (!state.filtered) state.filtered = filterComponents(base, state.tsid);
       const out = canvasOf(applyFilter(base, state.tsid, state.alpha, { ...FILTER_OPTS, filtered: state.filtered }));
-      return encodeSnap(out);
+      return encodeSnap(out, picture.limits || null);
     },
     get tsid() { return state.tsid; },
   };
@@ -526,7 +531,7 @@ function wholeState(engine) {
 
 /**
  * G1284: the whole house (every floor stacked), Tower or home street as one Snap: drawn off the
- * camera at the screen's own resolution, fitted to the site's 1920x1200 and 1 MB (encodeSnap),
+ * camera at the screen's own resolution, fitted to a whole-home Snap's 1920x3600 and 2 MB (WHOLE_SNAP, encodeSnap),
  * then the same polaroid, save (private until made public), viewer and download as any Snap.
  * A remake addition (inventions: camera-whole-house): Glitch's camera snapped only the view
  * (CameraMan.as snap 492-515); its whole-home picture was saveHomeImg's, never the player's.
@@ -551,8 +556,8 @@ async function snapWhole(engine, s, ctx) {
   let picture = null;
   let shot = null;
   try {
-    shot = await renderHomeLocation(engine, { kind: st.kind, resolution: engine.renderer?.resolution || globalThis.devicePixelRatio || 1 });
-    picture = shot?.canvas ? encodeSnap(shot.canvas) : null;
+    shot = await renderHomeLocation(engine, { kind: st.kind, resolution: engine.renderer?.resolution || globalThis.devicePixelRatio || 1, maxW: WHOLE_SNAP.maxW, maxH: WHOLE_SNAP.maxH });
+    picture = shot?.canvas ? encodeSnap(shot.canvas, WHOLE_SNAP) : null;
   } catch (err) {
     console.warn('[snaps] whole house', err?.message || err);
   } finally {
@@ -610,7 +615,8 @@ function openPolaroid(engine, s, picture, spot, ctx) {
       if (!kept?.b64) throw Object.assign(new Error('the filtered picture is too large'), { code: 'too_large' });
       if (filters?.tsid) note(engine, s, `filter:${filters.tsid}`);
       shown = kept;
-      const out = await s.account.saveSnap({ image: kept.b64, caption: cleanCaption(input.value), street: spot.street, x: spot.x, y: spot.y });
+      // G1284: a whole-home Snap says so, and the site checks it against its larger limits.
+      const out = await s.account.saveSnap({ image: kept.b64, caption: cleanCaption(input.value), street: spot.street, x: spot.x, y: spot.y, ...(kept.limits === WHOLE_SNAP ? { whole: true } : {}) });
       setAlbum(s, out);
       s.size = `${kept.w || shown.w}x${kept.h || shown.h}`;
       note(engine, s, `saved:${out?.snap?.id || ''}`);

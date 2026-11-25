@@ -27,7 +27,7 @@ import { join } from 'node:path';
 import {
   SNAP_MAX_H, SNAP_MAX_W, SNAP_QUALITY, SNAP_QUALITY_LOW, SNAP_WIDTHS,
   isSnapUrl, savedActions, snapResolution, snapShareUrl, snapSteps, viewerActions, viewerStep,
-} from '../public/js/snaps.js?v=11f3e41b';
+} from '../public/js/snaps.js?v=887f3da9';
 import { snapsFeature } from '../public/js/features/snaps-feature.js?fresh=g1240';
 import { GAME_DIR, SITE_DIR } from '../tools/repos.mjs';
 
