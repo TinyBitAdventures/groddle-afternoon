@@ -2814,9 +2814,24 @@
   "deployed": "2026-11-25"
  },
  "git": {
-  "commits": 3574,
+  "commits": 3578,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-25",
+    "kind": "improve",
+    "text": "A finished Group Hall's dialog and toast say the hall is the group's and its street opens in a later update"
+   },
+   {
+    "date": "2026-11-25",
+    "kind": "new",
+    "text": "A finished Group Hall's lot stays on its street with \"<group>'s Group Hall\" over the sign"
+   },
+   {
+    "date": "2026-11-25",
+    "kind": "new",
+    "text": "Menu > Groups names the Group Hall a group owns, by its street"
+   },
    {
     "date": "2026-11-25",
     "kind": "fix",
@@ -2921,24 +2936,9 @@
     "date": "2026-11-25",
     "kind": "fix",
     "text": "Visitors see a friend's Dirt Pile, Peat Bog, barnacles, Fireflies and Patches in the back yard"
-   },
-   {
-    "date": "2026-11-25",
-    "kind": "fix",
-    "text": "Sound keeps playing in another tab on a computer, with a setting to choose"
-   },
-   {
-    "date": "2026-11-25",
-    "kind": "new",
-    "text": "House files can fold the Crafty Bot and fill the back yard"
-   },
-   {
-    "date": "2026-11-25",
-    "kind": "fix",
-    "text": "The whole-house picture shows the machines and the Crafty Bot on every floor"
    }
   ]
  },
- "tests": 1395,
+ "tests": 1396,
  "generatedAt": "2026-11-25"
 }
