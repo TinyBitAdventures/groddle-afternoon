@@ -8714,8 +8714,14 @@ function createSpriteOutline(source, opts = {}) {
       return;
     }
     const tex = src.texture;
+    // #703: a vendor's states each have their own anchor (vendor-npcs.js vendorAnchor), so the
+    // copies follow the anchor as well as the frame, or the rim sat off the body in some states.
+    const ax = src.anchor?.x;
+    const ay = src.anchor?.y;
     for (const s of outline._outlineCopies || []) {
-      if (!s.destroyed && s.texture !== tex) s.texture = tex;
+      if (s.destroyed) continue;
+      if (s.texture !== tex) s.texture = tex;
+      if (ax != null && (s.anchor.x !== ax || s.anchor.y !== ay)) s.anchor.set(ax, ay);
     }
     outline.position.set(src.x, src.y);
     outline.scale.copyFrom(src.scale);
