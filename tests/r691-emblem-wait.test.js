@@ -2,18 +2,19 @@
  * Report #691: "not able to drop emblems in my house ... 'you don't have enough of that item' and then
  * the emblem pops back into my inventory. I was able to drop a stack of meat."
  *
- * The site's ledger credits at most EMBLEM_DAILY shrine emblems a UTC day; up to EMBLEM_WAIT more wait
- * in the pack outside the ledger until a later day's count (groddle-afternoon-site src/LedgerMath.php
- * earned). A drop of a waiting one found the ledger short and was refused as "short", which the game
- * shows as the generic "You don't have enough of that item." The same refusal hit every class the
- * ledger holds back (Gameshow Tickets, beads, artifact pieces, #246's level-up currants) in drops,
- * gifts, trades, sales, letters and home machines.
+ * The site's ledger credited at most 4 shrine emblems a UTC day; up to 4 more waited in the pack
+ * outside the ledger until a later day's count, and a drop of a waiting one was refused as "short".
+ * Austin's ruling (2026-11-25, G1299): no emblem limit, as Glitch (items/emblem_alph.js 73 dropped
+ * them freely, with no daily count). The site's LedgerMath earned() now credits every emblem the
+ * save's shrine record gained, and an emblem the old count left waiting is credited by the next
+ * save write.
  *
- * Now the last save write's held goods are remembered for the day (LedgerMath WAIT_DAY), and every one
- * of those acts asks Ledger::waitingFor before it says "short": the answer is why "waiting", with words
+ * What the report also exposed stays for the classes the ledger still holds back (Gameshow
+ * Tickets, beads, artifact pieces, #246's level-up currants): the last save write's held goods are
+ * remembered for the day (LedgerMath WAIT_DAY), and a drop, gift, trade, sale, letter or home
+ * machine asks Ledger::waitingFor before it says "short": the answer is why "waiting", with words
  * that name the item and say when it clears (the next 00:00 UTC, when the day's first write credits
- * it) and clears. The limit itself is unchanged (Austin's call). Glitch had no such limit: emblems
- * simply dropped (items/emblem_alph.js 73); the daily count and its wait are ours.
+ * it) and clears. Those limits are ours.
  *
  * Run: GRODDLE_SITE_DIR=<site> node --test tests/r691-emblem-wait.test.js
  * (the database part needs a php with mysqli and a MariaDB, as tests/g560-shared-pickup.test.js)
@@ -25,7 +26,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { DROP_TEXT, dropRefusalText, nextUtcDay, untilText, waitingText } from '../public/js/drops-mp.js?v=ca287793';
+import { DROP_TEXT, dropRefusalText, nextUtcDay, untilText, waitingText } from '../public/js/drops-mp.js?v=499b0363';
 import { SITE_DIR, skipWithoutSite } from '../tools/repos.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -44,34 +45,43 @@ function php(body, input) {
 
 const GIANTS = ['grendaline', 'mab', 'friendly', 'lem', 'pot', 'cosma', 'spriggan', 'zille'];
 
+/** A save write's entries: the pack and the shrine record. */
+const entriesOf = (inv, emblems, donations = 50) => ({
+  playerState: JSON.stringify({
+    version: 7, inventory: inv, player: { currants: 0, xp: 5000, level: 5 },
+    systems: { quests: { completed: [] }, achievements: { unlocked: [] }, shrines: { emblems, favor: {}, donations }, features: {} },
+  }),
+});
+const CHECK = 'echo json_encode(LedgerMath::check($a[0], $a[1], [], $a[2], 0.0, 50000.0, Economy::shared(), null, fn (): int => 0));';
+
 describe('#691: a day of 8 shrine claims (the player\'s, read on live)', { skip }, () => {
   let r;
+  let t;
   before(() => {
     const inv = Object.fromEntries(GIANTS.map((g) => [`emblem_${g}`, 1]));
-    const entries = {
-      playerState: JSON.stringify({
-        version: 7, inventory: inv, player: { currants: 0, xp: 5000, level: 5 },
-        systems: { quests: { completed: [] }, achievements: { unlocked: [] }, shrines: { emblems: Object.fromEntries(GIANTS.map((g) => [g, 5])), favor: {}, donations: 0 }, features: {} },
-      }),
-    };
-    const credited = { base: { base: 1 }, base905: { base905: 1 }, level: { level: 5 }, mark: { base: 1, base905: 1, ...Object.fromEntries(GIANTS.map((g) => [`emblem:${g}`, 4])) } };
-    r = php('echo json_encode(LedgerMath::check($a[0], $a[1], [], $a[2], 0.0, 50000.0, Economy::shared(), null, fn (): int => 0));', [{ items: {}, currants: 0 }, credited, entries]);
+    const credited = { base: { base: 1 }, base905: { base905: 1 }, level: { level: 5 }, mark: { base: 1, base905: 1, donations: 50, ...Object.fromEntries(GIANTS.map((g) => [`emblem:${g}`, 4])) } };
+    r = php(CHECK, [{ items: {}, currants: 0 }, credited, entriesOf(inv, Object.fromEntries(GIANTS.map((g) => [g, 5])))]);
+    // A class the ledger still holds back: six Gameshow Tickets from six donations, TICKET_DAILY (4) credited.
+    t = php(CHECK, [{ items: {}, currants: 0 }, credited, entriesOf({ gameshow_ticket: 6 }, {}, 56)]);
   });
 
-  it('the limit stands: four credited, four waiting in the pack outside the ledger, none taken back', () => {
+  it('G1299: an emblem never waits; all eight are credited, none taken back', () => {
     const after = r.after.items || {};
-    const credited = GIANTS.filter((g) => after[`emblem_${g}`] === 1);
-    const waiting = GIANTS.filter((g) => r.held.items?.[`emblem_${g}`] === 1);
-    assert.equal(credited.length, 4, JSON.stringify(after));
-    assert.equal(waiting.length, 4, JSON.stringify(r.held));
-    assert.deepEqual([...credited, ...waiting].sort(), [...GIANTS].sort());
+    assert.deepEqual(GIANTS.filter((g) => after[`emblem_${g}`] === 1).sort(), [...GIANTS].sort(), JSON.stringify(after));
+    assert.deepEqual(Object.keys(r.held.items || {}), [], JSON.stringify(r.held));
     assert.deepEqual(r.reconciled.clamped.items, [], 'nothing clamped');
+    assert.deepEqual(r.rows.filter(([kind]) => kind === 'waitday'), [], 'no waiting rows');
   });
 
-  it('the write remembers what waits today (WAIT_DAY rows), so a drop of one can say why it is refused', () => {
-    const rows = r.rows.filter(([kind]) => kind === 'waitday');
-    const waiting = GIANTS.filter((g) => r.held.items?.[`emblem_${g}`] === 1).map((g) => `emblem_${g}`);
-    assert.deepEqual(rows.map(([, ref, n]) => [ref, n]).sort(), waiting.map((c) => [c, 1]).sort(), JSON.stringify(r.rows));
+  it('the limits it did not change: tickets past today\'s count wait in the pack, and the write remembers them (WAIT_DAY)', () => {
+    assert.deepEqual(t.after.items, { gameshow_ticket: 4 });
+    assert.deepEqual(t.held.items, { gameshow_ticket: 2 });
+    assert.deepEqual(t.reconciled.clamped.items, [], 'nothing clamped');
+    assert.deepEqual(t.rows.filter(([kind]) => kind === 'waitday'), [['waitday', 'gameshow_ticket', 2]], JSON.stringify(t.rows));
+  });
+
+  it('the site no longer has an emblem count', () => {
+    assert.doesNotMatch(readFileSync(join(SITE_DIR, 'src/LedgerMath.php'), 'utf8'), /EMBLEM_DAILY|EMBLEM_WAIT/);
   });
 
   it('a class that no longer waits gets its row back to 0, an unchanged one gets none', () => {
@@ -88,8 +98,8 @@ describe('#691: the words', () => {
   const NOW = Date.UTC(2026, 10, 25, 21, 0, 0);
 
   it('name the item, say it is past today\'s limit and when it clears; plain, no em dashes', () => {
-    const one = waitingText({ one: 'Emblem of Mab', n: 1, now: NOW });
-    assert.equal(one, "This Emblem of Mab is past today's limit, so it isn't counted yet. You can drop it after midnight UTC (in about 3 hours).");
+    const one = waitingText({ one: 'Gameshow Ticket', n: 1, now: NOW });
+    assert.equal(one, "This Gameshow Ticket is past today's limit, so it isn't counted yet. You can drop it after midnight UTC (in about 3 hours).");
     assert.equal(waitingText({ one: 'Gameshow Ticket', many: 'Gameshow Tickets', n: 3, k: 3, verb: 'give', now: NOW }), "These 3 Gameshow Tickets are past today's limit, so they aren't counted yet. You can give them after midnight UTC (in about 3 hours).");
     assert.equal(waitingText({ one: 'Gameshow Ticket', many: 'Gameshow Tickets', n: 3, k: 1, verb: 'sell', now: NOW }), "1 of these Gameshow Tickets is past today's limit, so it isn't counted yet. You can sell it after midnight UTC (in about 3 hours).");
     assert.equal(waitingText({ currants: true, n: 2000, k: 1500, verb: 'send', now: NOW }), "1,500 of your currants are past today's limit, so they aren't counted yet. You can send them after midnight UTC (in about 3 hours).");
@@ -106,10 +116,10 @@ describe('#691: the words', () => {
   });
 
   it('a waiting drop shows the site\'s words; without them, the drop\'s own say the same', () => {
-    const site = "This Emblem of Mab is past today's limit, so it isn't counted yet. You can drop it after midnight UTC (in about 3 hours).";
+    const site = "This Gameshow Ticket is past today's limit, so it isn't counted yet. You can drop it after midnight UTC (in about 3 hours).";
     assert.equal(dropRefusalText({ why: 'waiting', text: site }, 'HOUSE_7'), site);
-    assert.equal(dropRefusalText({ why: 'waiting' }, 'HOUSE_7', { n: 1, one: 'Emblem of Mab', many: 'Emblems of Mab' }, NOW), site);
-    assert.equal(dropRefusalText({ why: 'waiting', clears: Date.UTC(2026, 10, 25, 21, 25) / 1000 }, 'HOUSE_7', { n: 1, one: 'Emblem of Mab' }, NOW), "This Emblem of Mab is past today's limit, so it isn't counted yet. You can drop it after midnight UTC (in 25 minutes).");
+    assert.equal(dropRefusalText({ why: 'waiting' }, 'HOUSE_7', { n: 1, one: 'Gameshow Ticket', many: 'Gameshow Tickets' }, NOW), site);
+    assert.equal(dropRefusalText({ why: 'waiting', clears: Date.UTC(2026, 10, 25, 21, 25) / 1000 }, 'HOUSE_7', { n: 1, one: 'Gameshow Ticket' }, NOW), "This Gameshow Ticket is past today's limit, so it isn't counted yet. You can drop it after midnight UTC (in 25 minutes).");
     assert.equal(dropRefusalText({ why: 'short', text: "You don't have enough of that item." }, 'HOUSE_7', { n: 1, one: 'Meat' }), "You don't have enough of that item.");
     assert.equal(dropRefusalText({ why: 'full' }, 'HOUSE_7'), DROP_TEXT.full('house'));
   });
@@ -123,7 +133,7 @@ describe('#691: the words', () => {
 
   it('the site\'s words are the game\'s (LedgerMath::waitingText = drops-mp.js waitingText)', { skip }, () => {
     const cases = [
-      ['emblem_mab', 1, 1, 'drop', NOW], ['gameshow_ticket', 3, 3, 'give', NOW], ['gameshow_ticket', 3, 2, 'trade', NOW + 9000000], ['$', 2000, 1500, 'send', NOW + 10500000],
+      ['artifact_necklace_onyx_piece', 1, 1, 'drop', NOW], ['gameshow_ticket', 3, 3, 'give', NOW], ['gameshow_ticket', 3, 2, 'trade', NOW + 9000000], ['$', 2000, 1500, 'send', NOW + 10500000],
     ];
     const site = php('$e = Economy::shared(); echo json_encode(array_map(fn ($x) => LedgerMath::waitingText($e, $x[0], $x[1], $x[2], $x[3], intdiv($x[4], 1000), LedgerMath::nextDay(intdiv($x[4], 1000))), $a));', cases);
     const names = php('$e = Economy::shared(); echo json_encode(array_map(fn ($c) => [$e->name($c, 1), $e->name($c, 2)], $a));', cases.map(([c]) => c));
@@ -151,7 +161,9 @@ function mysql() {
 
 const engineDir = process.env.MINN_ENGINE_DIR || join(homedir(), 'Cove/Sites/minn-engine.localhost/public/minn');
 const db = mysql();
-const reachable = db && hasPhp && spawnSync('php', ['-r', 'mysqli_report(MYSQLI_REPORT_OFF); $m = @new mysqli($argv[1], $argv[2], $argv[3]); exit($m->connect_errno ? 1 : 0);', db.host, db.user, db.pass]).status === 0;
+// A PHP that has mysqli as a module only (Arch's) gets it loaded.
+const phpArgs = hasPhp && spawnSync('php', ['-r', 'exit(class_exists("mysqli") ? 0 : 1);']).status !== 0 ? ['-d', 'extension=mysqli'] : [];
+const reachable = db && hasPhp && spawnSync('php', [...phpArgs, '-r', 'mysqli_report(MYSQLI_REPORT_OFF); $m = @new mysqli($argv[1], $argv[2], $argv[3]); exit($m->connect_errno ? 1 : 0);', db.host, db.user, db.pass]).status === 0;
 const skipDb = skip
   || (!existsSync(join(engineDir, 'src/Minn/Autoloader.php')) && 'Minn Engine not found (set MINN_ENGINE_DIR)')
   || (!reachable && 'no MariaDB to make a throwaway database on (set GRODDLE_TEST_MYSQL)');
@@ -159,7 +171,7 @@ const skipDb = skip
 describe('#691: on the site\'s ledger (LedgerDrop, Ledger::settle, Ledger::waitingFor)', { skip: skipDb }, () => {
   let r;
   before(() => {
-    r = JSON.parse(execFileSync('php', [join(root, 'tests/fixtures/drops/ledger-drop-waiting.php'), engineDir, SITE_DIR, 'run', db.host, db.user, db.pass], { timeout: 90000 }).toString());
+    r = JSON.parse(execFileSync('php', [...phpArgs, join(root, 'tests/fixtures/drops/ledger-drop-waiting.php'), engineDir, SITE_DIR, 'run', db.host, db.user, db.pass], { timeout: 90000 }).toString());
   });
 
   it('ran on its own database and dropped it', () => {
@@ -168,38 +180,52 @@ describe('#691: on the site\'s ledger (LedgerDrop, Ledger::settle, Ledger::waiti
     assert.equal(r.dropped, true);
   });
 
-  it('the write credited four and remembered the four waiting', () => {
-    assert.equal(r.credited.length, 4);
-    assert.equal(r.waits.length, 4);
+  it('G1299: the write credited all eight emblems and the day\'s four tickets, and remembered the two tickets waiting', () => {
+    assert.deepEqual(r.credited.sort(), [...GIANTS].sort());
+    assert.deepEqual(r.waits, []);
+    assert.equal(r.tickets, 4);
     const day = new Date(r.now * 1000).toISOString().slice(0, 10);
-    assert.deepEqual(r.waitRows, Object.fromEntries(r.waits.map((g) => [`${day}:emblem_${g}`, 1])));
+    assert.deepEqual(r.waitRows, { [`${day}:gameshow_ticket`]: 2 });
   });
 
-  it('a credited emblem and the meat drop; a waiting emblem is refused as waiting, named, with when it clears', () => {
-    assert.deepEqual(r.dropCredited, { status: 'settled' });
+  it('#691: every emblem drops, and the meat', () => {
+    assert.deepEqual(r.dropEmblems, Object.fromEntries(GIANTS.map((g) => [g, 'settled'])));
     assert.deepEqual(r.dropMeat, { status: 'settled' });
-    const name = r.dropWaiting.c.replace(/^emblem_/, '');
+  });
+
+  it('tickets past today\'s count are refused as waiting, named, with when they clear', () => {
     assert.equal(r.dropWaiting.status, 'refused');
     assert.equal(r.dropWaiting.why, 'waiting', JSON.stringify(r.dropWaiting));
+    assert.equal(r.dropWaiting.c, 'gameshow_ticket');
     assert.equal(r.dropWaiting.clears, nextUtcDay(r.now * 1000) / 1000);
-    assert.match(r.dropWaiting.text, new RegExp(`^This Emblem of ${name[0].toUpperCase()}${name.slice(1)} is past today's limit, so it isn't counted yet\\. You can drop it after midnight UTC \\(in about 3 hours\\)\\.$`));
+    assert.equal(r.dropWaiting.text, "2 of these Gameshow Tickets are past today's limit, so they aren't counted yet. You can drop them after midnight UTC (in about 3 hours).");
     assert.deepEqual(r.dropWaitingAgain, r.dropWaiting, 'asked again, the same answer');
   });
 
   it('more than the pack holds is still a plain short', () => {
-    assert.equal(r.dropTwo.why, 'short');
     assert.equal(r.dropMore.why, 'short');
+    assert.equal(r.dropMoreMeat.why, 'short');
   });
 
-  it('a trade or a gift of a waiting emblem carries the waiting answer, in its own verb', () => {
+  it('a trade or a gift of waiting tickets carries the waiting answer, in its own verb', () => {
     assert.equal(r.trade.status, 'refused');
     assert.equal(r.trade.waiting?.why, 'waiting', JSON.stringify(r.trade));
-    assert.match(r.trade.waiting.text, /You can trade it after midnight UTC/);
-    assert.match(r.gift.waiting?.text || '', /You can give it after midnight UTC/);
+    assert.match(r.trade.waiting.text, /You can trade them after midnight UTC/);
+    assert.match(r.gift.waiting?.text || '', /You can give them after midnight UTC/);
   });
 
-  it('after midnight UTC the old row says nothing, and the day\'s first write credits it so it drops', () => {
+  it('after midnight UTC the old row says nothing, and the day\'s first write credits them so they drop', () => {
     assert.equal(r.nextDay, null);
     assert.deepEqual(r.dropTomorrow, { status: 'settled' });
+  });
+
+  it('G1299: an emblem the old count left waiting is credited by the next save write, with nothing newly earned', () => {
+    assert.equal(r.oldBefore.why, 'waiting', 'before the write: the state players have now');
+    assert.deepEqual(r.oldLedgerBefore, { emblem_mab: 1 });
+    assert.deepEqual(r.oldClamped, { items: [], currants: 0 }, JSON.stringify(r.oldClamped));
+    assert.deepEqual(r.oldLedgerAfter, { emblem_mab: 2 });
+    const day = new Date(r.now * 1000).toISOString().slice(0, 10);
+    assert.deepEqual(r.oldWaitRows, { [`${day}:emblem_mab`]: 0 }, 'its wait is cleared');
+    assert.deepEqual(r.oldAfter, { status: 'settled' });
   });
 });

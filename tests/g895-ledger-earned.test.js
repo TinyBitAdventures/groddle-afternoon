@@ -2,9 +2,9 @@
  * G895 (#432): what a save's own records say it earned is credited by the site's ledger outside
  * the earning budget (groddle-afternoon-site src/LedgerMath.php earned / markBaseline / check, run
  * through the php CLI on made-up fixture saves), so an honest pack is never corrected for it:
- * a shrine's emblems up to the emblems the shrine record gained, and Gameshow Tickets up to one a
- * shrine donation, each a few a day; a cracked Petrified Rock's pieces and beads up to what the
- * cracks could give, within the rocks the realtime server's Feat rewards handed out. A forged pile beyond the record or the day's count is still
+ * a shrine's emblems up to the emblems the shrine record gained, all of them (G1299: no daily count,
+ * as Glitch), and Gameshow Tickets up to one a shrine donation, a few a day; a cracked Petrified Rock's pieces and beads up to what the
+ * cracks could give, within the rocks the realtime server's Feat rewards handed out. A forged pile beyond the record (or a ticket's day's count) is still
  * taken back.
  */
 import assert from 'node:assert/strict';
@@ -35,8 +35,6 @@ function php(op, args) {
 }
 
 const constant = (name) => (skip ? 0 : Number(new RegExp(`const ${name} = (\\d+);`).exec(readFileSync(join(SITE_DIR, 'src/LedgerMath.php'), 'utf8'))?.[1]));
-const EMBLEM_DAILY = constant('EMBLEM_DAILY');
-const EMBLEM_WAIT = constant('EMBLEM_WAIT');
 const TICKET_DAILY = constant('TICKET_DAILY');
 const TICKET_WAIT = constant('TICKET_WAIT');
 
@@ -76,7 +74,7 @@ describe('G895: the ledger credits a shrine\'s emblems from the save\'s shrine r
     assert.deepEqual(r.reconciled.clamped, counts());
     assert.deepEqual(r.after.items, { emblem_lem: 4 });
     assert.deepEqual(rowsOf(r, 'mark'), [['mark', 'emblem:lem', 4]]);
-    assert.deepEqual(rowsOf(r, 'markday'), [['markday', 'emblem', 1]]);
+    assert.deepEqual(rowsOf(r, 'markday'), [], 'no day\'s count for emblems (G1299)');
     assert.deepEqual(r.credits.detail.earned, { emblem_lem: 1 });
   });
 
@@ -87,31 +85,29 @@ describe('G895: the ledger credits a shrine\'s emblems from the save\'s shrine r
     assert.deepEqual(rowsOf(r, 'mark'), []);
   });
 
-  it('a forged record and pile stand only up to the day\'s count; the next few wait, the rest go', () => {
-    const credited = creditedFrom([['mark', 'base', 1]]);
+  it('G1299: as many emblems as the record gained stand, with no daily count and none waiting', () => {
+    // Glitch (items/emblem_alph.js) had no limit; only the record bounds them (a pile past it goes, above).
+    const credited = creditedFrom([['mark', 'base', 1], ['markday', 'emblem', 4]]);
     const pile = 500;
-    const r = php('check', [counts(), credited, save({ inv: { emblem_zille: pile }, emblems: { zille: pile } }), 0]);
-    assert.deepEqual(r.after.items, { emblem_zille: EMBLEM_DAILY }, 'the day\'s count is credited');
-    assert.deepEqual(r.held.items, { emblem_zille: EMBLEM_WAIT }, 'a few wait in the save, outside the ledger');
-    assert.deepEqual(r.reconciled.clamped, counts({ emblem_zille: pile - EMBLEM_DAILY - EMBLEM_WAIT }));
-    assert.deepEqual(rowsOf(r, 'mark'), [['mark', 'emblem:zille', pile - EMBLEM_WAIT]], 'only the waiting ones stay owed');
-    // The same day again: the count is used, so only the waiting ones stand (still held), nothing new is credited.
-    const again = creditedFrom([['mark', 'base', 1], ['mark', 'emblem:zille', pile - EMBLEM_WAIT], ['markday', 'emblem', EMBLEM_DAILY]]);
-    const r2 = php('check', [counts({ emblem_zille: EMBLEM_DAILY }), again, save({ inv: { emblem_zille: pile }, emblems: { zille: pile } }), 0]);
-    assert.deepEqual(r2.after.items, { emblem_zille: EMBLEM_DAILY });
-    assert.deepEqual(r2.held.items, { emblem_zille: EMBLEM_WAIT });
+    const r = php('check', [counts(), credited, save({ inv: { emblem_zille: pile, emblem_lem: 9 }, emblems: { zille: pile, lem: 9 } }), 0]);
+    assert.deepEqual(r.after.items, { emblem_lem: 9, emblem_zille: pile });
+    assert.deepEqual(r.held.items, {}, 'nothing waits');
+    assert.deepEqual(r.reconciled.clamped, counts());
+    assert.deepEqual(rowsOf(r, 'mark'), [['mark', 'emblem:lem', 9], ['mark', 'emblem:zille', pile]]);
+    assert.deepEqual(rowsOf(r, 'markday'), []);
+    assert.deepEqual(rowsOf(r, 'waitday'), []);
   });
 
-  it('emblems of every Giant share the day\'s count, and one waiting is credited on a later day', () => {
-    const credited = creditedFrom([['mark', 'base', 1], ['markday', 'emblem', EMBLEM_DAILY - 1]]);
-    const r = php('check', [counts(), credited, save({ inv: { emblem_lem: 1, emblem_zille: 1 }, emblems: { lem: 1, zille: 1 } }), 0]);
-    assert.deepEqual(r.after.items, { emblem_lem: 1 });
-    assert.deepEqual(r.held.items, { emblem_zille: 1 });
-    assert.deepEqual(r.reconciled.clamped, counts(), 'an honest emblem past the count is never taken');
-    const tomorrow = creditedFrom([['mark', 'base', 1], ['mark', 'emblem:lem', 1]]);
-    const r2 = php('check', [counts({ emblem_lem: 1 }), tomorrow, save({ inv: { emblem_lem: 1, emblem_zille: 1 }, emblems: { lem: 1, zille: 1 } }), 0]);
-    assert.deepEqual(r2.after.items, { emblem_lem: 1, emblem_zille: 1 });
-    assert.deepEqual(rowsOf(r2, 'mark'), [['mark', 'emblem:zille', 1]]);
+  it('G1299: an emblem left waiting by the old daily count is credited by the next write, the same day', () => {
+    // What a write before G1299 stored for a day of 2 claims past the count: the ledger holds one, the
+    // mark keeps the other owed (record 2, mark 1), today's count was used and the wait remembered.
+    const credited = creditedFrom([['mark', 'base', 1], ['mark', 'emblem:zille', 1], ['markday', 'emblem', 4], ['waitday', 'emblem_zille', 1]]);
+    const r = php('check', [counts({ emblem_zille: 1 }), credited, save({ inv: { emblem_zille: 2 }, emblems: { zille: 2 } }), 0]);
+    assert.deepEqual(r.after.items, { emblem_zille: 2 }, 'the waiting one is in the ledger now');
+    assert.deepEqual(r.held.items, {});
+    assert.deepEqual(r.reconciled.clamped, counts());
+    assert.deepEqual(rowsOf(r, 'mark'), [['mark', 'emblem:zille', 2]]);
+    assert.deepEqual(rowsOf(r, 'waitday'), [['waitday', 'emblem_zille', 0]], 'its wait is cleared, so a drop no longer says it waits');
   });
 
   it('an emblem spent in the write that earned it is not kept owed for a forged one later', () => {

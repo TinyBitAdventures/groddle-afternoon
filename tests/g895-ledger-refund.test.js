@@ -81,10 +81,13 @@ describe('G895 refund: owedG895', { skip }, () => {
     const ECON = JSON.parse(readFileSync(join(SITE_DIR, 'data/economy.json'), 'utf8'));
     const src = readFileSync(join(SITE_DIR, 'src/LedgerMath.php'), 'utf8');
     const n = (name) => Number(new RegExp(`const ${name} = (\\d+);`).exec(src)[1]);
+    // G1299 took the emblem count out of LedgerMath; the refund keeps the G895 fix's own (G895_EMBLEM_DAY).
+    const emblemDay = Number(/const G895_EMBLEM_DAY = (\d+);/.exec(readFileSync(join(SITE_DIR, 'src/LedgerRefund.php'), 'utf8'))[1]);
+    assert.equal(emblemDay, 4);
     assert.deepEqual(owed(rows)[0].items, {
       artifact_necklace_onyx_piece: ECON.items.artifact_necklace_onyx_piece.cap,
-      emblem_lem: n('EMBLEM_DAILY'),
-      emblem_zille: n('EMBLEM_DAILY'),
+      emblem_lem: emblemDay,
+      emblem_zille: emblemDay,
       gameshow_ticket: n('TICKET_DAILY'),
       musicblock_d_blue_03: ECON.items.musicblock_d_blue_03.cap,
     });

@@ -123,7 +123,7 @@ import { ILMENSKIE_QUEST_ID } from '../public/js/ilmenskie-quest.js?v=0e9809ac';
 import { FIRST_SKILL_QUEST_ID } from '../public/js/quest-offers.js?v=ea6fde02';
 import { CAMERA_OFFER } from '../public/js/snaps.js?v=b5be8bff';
 // #670: the classes a player keeps their own on shared ground (a note, a Still), which the site's house-floor move reads.
-import { KEPT_OWN } from '../public/js/drops-mp.js?v=ca287793';
+import { KEPT_OWN } from '../public/js/drops-mp.js?v=499b0363';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 export const OUT = sitePath('data', 'economy.json');
@@ -372,7 +372,8 @@ export async function economyTable() {
   // The shrines give every Giant's emblem (js/shrines.js claimShrineEmblem builds `emblem_<giant>` at
   // run time, so job-obtainable never sees it; items/include/shrines.js give_emblem 78-166): an
   // ordinary class, not a drop capped at 5 a day. The site's ledger credits it from the save's shrine
-  // record, a few a day (G895, LedgerMath::earned), since donated goods no longer refill the budget (G742).
+  // record, every one the record gained with no daily count (G895, G1299, LedgerMath::earned), since
+  // donated goods no longer refill the budget (G742).
   for (const id of Object.keys(GIANTS)) ordinary.add(`emblem_${id}`);
   // G948 (G942 gap A21): the Toy Vendor sells the Camera online (js/snaps.js withCamera adds CAMERA_OFFER
   // to its stock at run time, so job-obtainable never sees it): an ordinary class, not a drop capped at
