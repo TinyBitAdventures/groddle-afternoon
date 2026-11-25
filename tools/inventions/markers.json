@@ -588,6 +588,7 @@
     "ours: * Ours (Austin 2026-11-19, after #520): online, a": "street-spirit-rest-countdown",
     "ours: `resting`: the spirit's rest countdown (ours).": "street-spirit-rest-countdown",
     "ours: street's (game.js clears it); only its bubble is ours.": "ours-street-jobs",
+    "ours: the sign, in the world's nameplate lettering (ours:": "group-hall-owned",
     "remake-own: gems are found, under a gem ask still open (the remake's own line; no": "gem-hints",
     "stand-in: // G1140: a stand-in's \"Ex Lane is back in N min\" counts down the": "featured-project",
     "stand-in: once (the first sync only shows it); G1140: a stand-in for": "featured-project"
@@ -663,6 +664,9 @@
     "ours: 'There is nobody here to give it to.', // ours": "remake-copy",
     "ours: boxFull: 'A Gift Box holds three stacks.', // ours (capacity": "remake-copy",
     "ours: hold this class (canContain)? Notes stay out (ours: a note's writing is given on its own).": "ours-gifts"
+  },
+  "public/js/group-hall-lot.js": {
+    "ours: G1301: the words for a finished hall (ours: Glitch opened its street, which the archive": "group-hall-owned"
   },
   "public/js/groups.js": {
     "remake-own: (features/groups-feature.js channel_joined), the remake's own": "remake-copy",
@@ -1279,13 +1283,14 @@
     "ours: only when no road gets there). A tunable guess, ours: Glitch found its paths in": "subway-ride-cost"
   },
   "public/js/street-jobs-mp.js": {
+    "ours: 'Its street will open in a later update.', // ours": "group-hall-owned",
     "ours: 'Opens once a group claims this project.', // ours": "remake-copy",
-    "ours: (group) => `${group} owns a new group hall!`, // ours": "remake-copy",
     "ours: // #502: no answer before the wait ran out (ours).": "project-refusal-words",
-    "ours: `Finished. ${group} owns this group hall.`, // ours": "remake-copy",
+    "ours: G1301: the finish dialog's page about the hall (ours).": "group-hall-owned",
+    "ours: Its street will open in a later update.`, // ours": "group-hall-owned",
+    "ours: This Group Hall belongs to ${group}.`, // ours": "group-hall-owned",
     "ours: a give with no answer before the wait ran out (ours).": "project-refusal-words",
     "ours: a group: make or join one in Menu, Groups.', // ours (JobIntroUI.as:410-413 needs": "remake-copy",
-    "ours: archive, and the original never made one.', // ours": "remake-copy",
     "ours: currants to claim the project.`, // ours": "remake-copy",
     "ours: is claiming this project right now.', // ours (the server's": "remake-copy",
     "ours: pickGroup: 'For which group?', // ours": "remake-copy",

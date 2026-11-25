@@ -6054,6 +6054,32 @@
     "G1266",
     "G1293"
    ]
+  },
+  {
+   "id": "group-hall-owned",
+   "title": "A finished Group Hall's lot stays on its street with the owning group's name over the sign, and its words say the hall's street opens later",
+   "kind": "UI",
+   "status": "kept",
+   "where": [
+    {
+     "file": "public/js/street-jobs-mp.js",
+     "symbol": "HALL_TEXT"
+    },
+    {
+     "file": "public/js/group-hall-lot.js",
+     "symbol": "OWNED_TEXT"
+    },
+    {
+     "file": "public/js/features/street-jobs-feature.js",
+     "symbol": "tickLot"
+    }
+   ],
+   "why": "No hall street survives in the archive (G331). Glitch hid the lot, named the hall after the group and opened a members-only signpost (quest.js 1831-1863); until hall streets exist, the lot and its words show whose hall it is.",
+   "ruling": "Austin 2026-11-25 (calls page, #696, G1301): show ownership now, hall streets next",
+   "rows": [
+    "G1301",
+    "G331"
+   ]
   }
  ]
 }
