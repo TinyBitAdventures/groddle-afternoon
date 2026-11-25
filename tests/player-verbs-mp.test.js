@@ -88,6 +88,7 @@ function fakeEngine(client, over = {}) {
     musicblockHeard: () => engine.heard,
     heard: {},
     playMusicblockAudio: (c) => (c === 'musicblock_d_green_01' ? 'Musicblock DG-1' : ''),
+    showMusicblockFx(c) { log.musicFx = [...(log.musicFx || []), c]; return true; },
     targetVerbs: () => [{ id: 'mp_trade', label: 'Offer to Trade' }],
     updateHud() {},
     refreshPack() {},
@@ -306,6 +307,18 @@ describe('player verbs: between two players (fake server)', () => {
     assert.ok(engine.pc.xp > 0, 'fresh tunes (50 before the mood scaling)');
     assert.ok(engine.heard.musicblock_d_green_01 > 0);
     assert.match(engine.log.activity.at(-1), /^You heard Musicblock DG-1\. Totally fresh tunes! Rad! It was generous of Bo to share some new music!/);
+    // musicblock_*.js 124-164: the block and notes over you, and its bubble over you for the others.
+    assert.deepEqual(engine.log.musicFx, ['musicblock_d_green_01']);
+  });
+
+  it('a block played for you shows its block, notes and bubble the way your own Play does', () => {
+    const game = readFileSync(join(PUBLIC, 'game.js'), 'utf8');
+    const api = game.slice(game.indexOf('  showMusicblockFx(classTsid) {'));
+    assert.match(api, /^  showMusicblockFx\(classTsid\) \{\n\s+const def = getMusicblock\(classTsid\);\n\s+if \(def\) showMusicblockFx\(def\);/);
+    const fx = game.slice(game.indexOf('function showMusicblockFx(def) {'), game.indexOf('let musicblockNotes = null;'));
+    assert.match(fx, /features\.query\('itemBubbleStarted', def\.classTsid, def\.durationMs, engine\);/, 'the bubble over you for everyone else');
+    assert.match(fx, /playOverlay\(PIXI, 'musicblock_notes'/, 'the notes');
+    assert.match(fx, /icon\._musicFx = 'block';/, 'the block');
   });
 
   it('counts Super Soaker once per player while it runs', () => {

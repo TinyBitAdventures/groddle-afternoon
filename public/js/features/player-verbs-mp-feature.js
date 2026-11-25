@@ -373,6 +373,8 @@ function createSession(engine, client) {
         const heard = hearMusicblock(engine.musicblockHeard?.() || {}, block, { now: Date.now(), from: from.name, dayOf: gameDayIndex });
         const xp = heard.xp ? grantMoodXp(player, heard.xp) : 0;
         const label = engine.playMusicblockAudio?.(block) || getMusicblock(block)?.label || 'a musicblock';
+        // musicblock_*.js 124-164: the block and its notes over you, its bubble over you for everyone else.
+        engine.showMusicblockFx?.(block);
         const fx = [mood ? `+${mood} mood` : '', xp ? `+${xp} iMG` : ''].filter(Boolean).join(', ');
         say(`${VERB_TEXT.heard(label, heard.lines)}${fx ? ` ${fx}` : ''}`, 4200);
         engine.achievement?.(`musicblocks_heard:${block}`, 1);

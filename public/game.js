@@ -14552,6 +14552,15 @@ const engine = {
     if (def) playMusicblockAudio(def);
     return def ? def.label : '';
   },
+  /**
+   * Player verbs: a block another player played for you shows as your own Play does (musicblock_*.js
+   * play_for 124-164): the block and its notes over you, and the block in a bubble over you for everyone else.
+   */
+  showMusicblockFx(classTsid) {
+    const def = getMusicblock(classTsid);
+    if (def) showMusicblockFx(def);
+    return Boolean(def);
+  },
   /** Player verbs: the Emotional Bear's upgrades (kiss, moon), for the player menu's emotes. */
   emotionalBearUpgrades: () => [...(emotionalBearState.upgrades || [])],
   /**
