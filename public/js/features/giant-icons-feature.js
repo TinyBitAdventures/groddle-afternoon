@@ -9,7 +9,21 @@
  *  - Placed on a street, an Icon checks once a minute per Giant as you walk
  *    past and, 5% of the time, bestows Giant Love (mood, energy, iMG or
  *    favor) with the ICON_GIANT_LOVE sound and a heart burst; out of actions
- *    it asks for a tithe. From level 10 it calls out and offers its
+ *    it asks for a tithe.
+ *  - #697 (G1302, Austin: as Glitch): your home is a POL (locations/inc_pols.js
+ *    731), so Place works on your home street, in your house and on a Tower
+ *    floor with no "picked up by anyone" prompt (include/icon.js 27-45); it
+ *    stands there, saved, and only you pick it up (canPickup 1-12); Ruminate,
+ *    Revere and Reflect show on it (52, 118, 183), and it bestows as anywhere.
+ *    Online, a visitor sees your Icons on your home street (in the house and
+ *    on a Tower floor too for whoever may be there, G1018: the site's list with
+ *    the visit, src/Neighbours.php iconRows, through neighbours-mp-feature
+ *    homeVisitIcons) and may Ruminate, Revere and Reflect on them, once a game
+ *    day per Icon class from their own save, the rewards theirs, and gets its
+ *    bestowments from their own clock. A visitor's use does not wear down your
+ *    Icon's actions and a visitor can't tithe it (ours: the source kept one
+ *    counter on the Icon for everyone; ours has no shared counter yet). Public
+ *    streets online stay refused (M20, G945). From level 10 it calls out and offers its
  *    recorded "Voices of the Giants" message (111 iMG) by the source's
  *    conversation rules, and a walk-in that brings an offer bestows nothing
  *    (include/icon.js 565-575, G214); Talk to then tells it (G202: the shared record,
@@ -28,6 +42,8 @@
  *     to it, answers every line, walks out and back in for a bestowment and
  *     picks it up (add &convo=dev for the source's dev-server offer rules, otherwise
  *     the offer waits 5 minutes after load and on donate_to_all_shrines).
+ *     &iconautoplay=home with &homedemo=home (#697) places the Alph icon on your
+ *     home street and ruminates on it there (canvas iconHere home:street).
  *     &icontesting=1 alone keeps placed icons in testing
  *     mode; &iconlover=1 adds 11 emblems of every Giant. Canvas: iconPack,
  *     iconPlaced, iconLast, iconBestowed, iconAutoplay, iconActions,
@@ -56,17 +72,20 @@ import {
   emblemVerbCheck,
   giantForEmblem,
   giantForIcon,
+  homePlaceKey,
   iconize,
+  isHomePlaceKey,
   legacyIconTalks,
   pickUpIcon,
   placeIcon,
   rollIconDay,
+  shiftHomeIcons,
   syncPackIcons,
   titheCheck,
   titheCost,
   titheIcon,
   useEmblem,
-} from '../giant-icons.js?v=0d6b4965';
+} from '../giant-icons.js?v=9b71adf1';
 import { textureFromUrl } from '../textures.js?v=b8e38103';
 import { playSheetOverlay } from '../overlay-art.js?v=e50bacca';
 import { grantMoodXp } from '../mood-xp.js?v=e311b45c';
@@ -75,6 +94,10 @@ import { CONVERSATION_RULES, adoptLegacyTalks, conversationRecord, hasCompleted,
 import { TELLERS } from '../conversations-data.js?v=f11b7e02';
 import { itemZ } from '../item-bands.js?v=ec366be3';
 import { publicStreet } from '../shared-street.js?v=dce5694b';
+import { readVisitScene } from '../neighbours-mp.js?v=c0128a48';
+import { HOME_INTERIOR_TSID, HOME_STREET_TSID } from '../homes.js?v=dca6b2cd';
+import { gnomePlaceFor, visitGnomePlace } from '../garden-gnome.js?v=d9f8e52b';
+import { homesFeature } from './homes-feature.js?v=b114664c';
 import { standOnFeet } from '../sprite-feet.js?v=6358a697';
 
 export const ICONS_FEATURE_ID = 'giant-icons';
@@ -93,17 +116,66 @@ let autoplayLog = [];
 let autoplayTalkUntil = 0;
 /** Collisions that made a conversation offer instead of a bestowment (QA: iconOfferCollisions). */
 let offerCollisions = 0;
+/** #697: the home place whose Icons are drawn now (home:<place>, or visit:<owner>:<place>), or null. */
+let drawnHome = null;
+let homePollAt = 0;
 
 const dayKey = () => getGameDayKey(Date.now());
 const owned = (engine) => engine.pc?.imaginationUpgrades || [];
 const level = (engine) => Math.max(1, Number(engine.pc?.level) || 1);
-const ctxFor = (engine) => ({ level: level(engine), upgrades: owned(engine), skills: engine.learnedSkills || [] });
+const ctxFor = (engine, pol = false) => ({ level: level(engine), upgrades: owned(engine), skills: engine.learnedSkills || [], pol });
+
+/**
+ * #697: the place in your own home you stand in (street, house, house:<floor>, tower:<floor>: the
+ * Garden Gnome's rule, js/garden-gnome.js gnomePlaceFor), or null: anywhere else, or online in
+ * someone else's home.
+ */
+function homePlace(engine) {
+  const tsid = engine.streetTsid;
+  const home = engine.homeContext?.() || {};
+  if (!home.inHome || engine.transientInstance?.()) return null;
+  if (engine.mode === 'multiplayer' && readVisitScene(tsid)) return null;
+  if (tsid !== HOME_STREET_TSID && tsid !== HOME_INTERIOR_TSID) return null;
+  // The homes feature's scene names the floor; before it has one, the home's own room.
+  const scene = homesFeature._state?.()?.scene || (home.room ? { room: home.room } : null);
+  if (scene?.room === 'street' && tsid !== HOME_STREET_TSID) return null;
+  if (scene?.room === 'interior' && tsid !== HOME_INTERIOR_TSID) return null;
+  return gnomePlaceFor(scene, { inHome: true });
+}
+
+/** Where a placed Icon here is kept in the save: home:<place> at home, else the street's tsid. */
+function placeKey(engine) {
+  return homePlaceKey(homePlace(engine)) || engine.streetTsid;
+}
+
+/**
+ * #697: the Icons to draw in a home room now: your own ({ key, own: true, rows }), or online on a
+ * visit the owner's in the room you stand in ({ key: visit:<owner>:<place>, own: false, owner,
+ * name, rows }); null anywhere else (a street's Icons are drawn on street entry).
+ */
+function homeShown(engine) {
+  const place = homePlace(engine);
+  if (place) {
+    const key = homePlaceKey(place);
+    return { key, own: true, rows: state.placed[key] || [] };
+  }
+  if (engine.mode !== 'multiplayer') return null;
+  const scene = readVisitScene(engine.streetTsid);
+  const there = visitGnomePlace(scene);
+  if (!there) return null;
+  const visit = engine.query?.('homeVisitIcons', engine);
+  if (!visit || visit.owner !== scene.owner) return null;
+  const rows = (Array.isArray(visit.icons) ? visit.icons : []).filter((r) => r.place === there);
+  return { key: `visit:${visit.owner}:${there}`, own: false, owner: visit.owner, name: String(visit.name || 'someone'), rows };
+}
 
 function publish(engine) {
   if (!engine?.setData) return;
   const inv = engine.inv || {};
   engine.setData('iconPack', GIANT_ICON_IDS.filter((g) => countItem(inv, GIANT_ICON_DATA[g].iconClass) > 0).map((g) => `${g}:${(state.pack[g] || []).join('/')}`).join(',') || 'none');
-  engine.setData('iconPlaced', (state.placed[engine.streetTsid] || []).map((r) => `${r.giant}:${r.actions}`).join(',') || 'none');
+  const here = drawnHome?.startsWith('visit:') ? views.filter((v) => v.visit).map((v) => v.row) : state.placed[drawnHome || engine.streetTsid] || [];
+  engine.setData('iconPlaced', here.map((r) => `${r.giant}:${r.actions}`).join(',') || 'none');
+  engine.setData('iconHere', drawnHome || '');
   engine.setData('iconLast', last || 'none');
   engine.setData('iconBestowed', String(state.bestowed));
   engine.setData('iconIconized', state.iconized.join(',') || 'none');
@@ -175,9 +247,11 @@ function emblemPackVerbs(giant, engine) {
   return rows;
 }
 
-/** Place's refusals: one not on a street, and (M20) one others share online. */
+/** Place's refusals: one not on a street or at home, someone else's home, and (M20) one others share online. */
 export const PLACE_TEXT = Object.freeze({
-  notStreet: 'Icons can only be placed on a street.',
+  notStreet: 'Icons can only be placed on a street or in your home.',
+  // ours: icon_place_conditions hid Place in someone else's POL (state null); a disabled row says why.
+  theirHome: 'You can only place an Icon in your own home.',
   // ours: a placed Icon is kept in your own save, so online others would never see or take it.
   shared: "Other players can't see a placed Icon yet, so it stays in your pack here.",
 });
@@ -185,11 +259,14 @@ export const PLACE_TEXT = Object.freeze({
 /**
  * Why Place is refused here, or ''. icon_place_conditions (include/icon.js 18-24) only refuses
  * someone else's POL, and on a public street icon_place warns "it can be picked up by anyone"
- * (icon.js 26-46, canPickup 1-12). Online (audit M20, G945) a placed Icon is still per player
+ * (icon.js 26-46, canPickup 1-12). Your own home is a POL (inc_pols.js 731): Place works there
+ * with no prompt (#697). Online (audit M20, G945) a placed Icon on a street is still per player
  * (no realtime code holds it), so on a street others share it stays in the pack until the
  * server can share it; a place Glitch kept to one player is yours alone, so Place works there.
  */
 function placeRefusal(engine) {
+  if (homePlace(engine)) return '';
+  if (engine.mode === 'multiplayer' && readVisitScene(engine.streetTsid)) return PLACE_TEXT.theirHome;
   if (engine.transientInstance?.() || engine.homeContext?.().inHome) return PLACE_TEXT.notStreet;
   if (engine.mode === 'multiplayer' && publicStreet(engine)) return PLACE_TEXT.shared;
   return '';
@@ -248,16 +325,17 @@ function runIconVerb(giant, verbId, engine, ref = { giant }) {
     const p = engine.player;
     const x = (p?.x || 0) + 70 * (p?.scale?.x < 0 ? -1 : 1);
     const y = landingY(engine.platforms, x, (p?.y || engine.groundY) - 40) ?? p?.y ?? engine.groundY;
-    const res = placeIcon(state, engine.inv, giant, engine.streetTsid, x, y);
+    const key = placeKey(engine);
+    const res = placeIcon(state, engine.inv, giant, key, x, y);
     if (!res.ok) return say(engine, res.msg, false), true;
-    spawnIcon(engine, res.row);
+    if (!isHomePlaceKey(key) || key === drawnHome) spawnIcon(engine, res.row, { key });
     engine.playSound?.('ITEM_DROP', { volume: 0.5 });
     say(engine, res.msg);
     engine.save?.();
     return true;
   }
   if (ICON_VERBS[verbId]) {
-    const res = adoreIcon(state, ref, verbId, ctx);
+    const res = adoreIcon(state, ref, verbId, ref.pol ? { ...ctx, pol: true } : ctx);
     if (!res.ok) return say(engine, res.msg, false), true;
     const actual = grant(engine, res.stat, res.amount);
     say(engine, res.msg, true, { [res.stat]: actual });
@@ -268,10 +346,11 @@ function runIconVerb(giant, verbId, engine, ref = { giant }) {
 }
 
 function confirmPlace(giant, engine) {
-  // icon_place on a public street: "it can be picked up by anyone. Proceed?"
+  // icon_place on a public street: "it can be picked up by anyone. Proceed?"; in a POL
+  // (your own home, #697) it is set down at once (takeable_drop, icon.js 42-44).
   const refused = placeRefusal(engine);
   if (refused) return say(engine, refused, false), true;
-  if (engine.param?.('iconautoplay')) return runIconVerb(giant, 'place', engine);
+  if (engine.param?.('iconautoplay') || homePlace(engine)) return runIconVerb(giant, 'place', engine);
   engine.offerQuestDialogue?.({
     title: GIANT_ICON_DATA[giant].label,
     kicker: 'Place',
@@ -285,7 +364,14 @@ function confirmPlace(giant, engine) {
 
 /* -------------------------------------------------------------- world */
 
-function spawnIcon(engine, row) {
+/** The line under a placed Icon's name. */
+const subtitleFor = (row, visit) => `${visit ? `${visit.name}'s Icon. ` : ''}${row.actions > 0 ? `${row.actions} actions before a tithe` : 'A tithe is due'}`;
+
+/**
+ * Draws a placed Icon. key: where it is kept (a street tsid, or home:<place> in your own home);
+ * visit: { owner, name } for someone else's Icon on a visit (#697), kept in their save.
+ */
+function spawnIcon(engine, row, { key = engine.streetTsid, visit = null } = {}) {
   const { PIXI } = engine;
   const def = GIANT_ICON_DATA[row.giant];
   const spr = new PIXI.Sprite(textureFromUrl(WORLD_ART(def.iconClass)));
@@ -300,23 +386,38 @@ function spawnIcon(engine, row) {
     classId: def.iconClass,
     featureId: ICONS_FEATURE_ID,
     label: def.label,
-    subtitle: row.actions > 0 ? `${row.actions} actions before a tithe` : 'A tithe is due',
+    subtitle: subtitleFor(row, visit),
     sprite: spr,
     iconId: row.id,
   });
-  views.push({ row, sprite: spr, target, baseY: spr.y, t: Math.random() * 6 });
+  views.push({ row, sprite: spr, target, baseY: spr.y, t: Math.random() * 6, key, home: isHomePlaceKey(key) || Boolean(visit), visit });
   publish(engine);
 }
 
-function viewFor(id) {
-  return views.find((v) => v.row.id === id) || null;
+function viewFor(target) {
+  if (!target) return null;
+  return views.find((v) => v.target === target) || views.find((v) => !v.visit && v.row.id === target.iconId) || null;
 }
 
-function removeView(engine, id) {
-  const v = viewFor(id);
-  if (!v) return;
+function dropView(engine, v) {
   engine.unregister?.(v.target);
+  if (v.sprite && !v.sprite.destroyed) v.sprite.destroy();
   views = views.filter((x) => x !== v);
+}
+
+/** #697: the home room's Icons drawn again (a new room, or a visit's list came). */
+function redrawHome(engine, here) {
+  for (const v of views.filter((x) => x.home)) dropView(engine, v);
+  drawnHome = here?.key || null;
+  if (here && engine.PIXI && engine.entityLayer) {
+    for (const row of here.rows) spawnIcon(engine, row, { key: here.key, visit: here.own ? null : { owner: here.owner, name: here.name } });
+  }
+  publish(engine);
+}
+
+/** A placed Icon's adoration ref: yours by id, or (a visit) the owner's row as it was shown, never changed here. */
+function adoreRef(v) {
+  return v.visit ? { row: { ...v.row }, owner: v.visit.owner, pol: true } : { placedId: v.row.id, pol: v.home };
 }
 
 /**
@@ -347,6 +448,8 @@ function bestowFor(engine, view, now) {
   const giant = view.row.giant;
   const favorGiant = giant;
   const res = bestowCheck(state, view.row, {
+    // A visited Icon's tither is never you (a visitor can't tithe it): its own key, not one of yours.
+    key: view.visit ? `visit:${view.visit.owner}:${view.row.id}` : undefined,
     now,
     level: level(engine),
     skills: engine.learnedSkills || [],
@@ -399,6 +502,13 @@ function demoSetup(engine) {
   publish(engine);
 }
 
+/** #697 QA (&iconautoplay=home, with &homedemo=home): place at home, ruminate on it there, keep it. */
+const AUTOPLAY_HOME = [
+  ['pack', 'emblem_alph', 'iconize'],
+  ['pack', 'icon_alph', 'place'],
+  ['placed', 'ruminate'],
+];
+
 const AUTOPLAY = [
   ['pack', 'emblem_alph', 'iconize'],
   ['pack', 'icon_alph', 'ruminate'],
@@ -419,7 +529,7 @@ const AUTOPLAY = [
 ];
 
 function autoplay(engine, now) {
-  const step = AUTOPLAY[autoplayStep];
+  const step = (engine.param('iconautoplay') === 'home' ? AUTOPLAY_HOME : AUTOPLAY)[autoplayStep];
   if (!step) {
     engine.setData('iconAutoplay', 'done');
     engine.setData('iconSteps', autoplayLog.join('|'));
@@ -438,6 +548,10 @@ function autoplay(engine, now) {
     if (step[2] === 'iconize') {
       for (const v of Object.keys(EMBLEM_VERBS)) giantIconsFeature.runPackVerb('emblem_alph', v, engine);
     }
+  } else if (step[0] === 'placed') {
+    const v = views[views.length - 1];
+    if (v) giantIconsFeature.runVerb(v.target, step[1], engine);
+    autoplayLog.push(`${step[1]}:${v ? last.slice(0, 28) : 'none'}`);
   } else if (step[0] === 'walk') {
     const v = views[views.length - 1];
     if (v) {
@@ -515,6 +629,7 @@ export const giantIconsFeature = {
 
   onStreetClear() {
     views = [];
+    drawnHome = null;
     for (const f of fx) f.stop();
     fx = [];
   },
@@ -524,6 +639,14 @@ export const giantIconsFeature = {
   },
 
   onTick(dtMs, now, engine) {
+    // #697: a home scene runs no street hooks (game.js renderHomeScene), so the room's Icons are
+    // drawn when the room changes, as the Garden Gnome's are.
+    if (engine.started !== false && now - homePollAt >= 250) {
+      homePollAt = now;
+      const here = homeShown(engine);
+      if (here) demoSetup(engine);
+      if ((here?.key || null) !== drawnHome) redrawHome(engine, here);
+    }
     if (autoplayAt && now >= autoplayAt) autoplay(engine, now);
     const p = engine.player;
     for (const v of views) {
@@ -567,34 +690,65 @@ export const giantIconsFeature = {
   },
 
   verbsFor(target, engine) {
-    const v = viewFor(target.iconId);
+    const v = viewFor(target);
     if (!v) return [];
-    const ctx = ctxFor(engine);
-    const tithe = titheCheck(state, { placedId: v.row.id }, { ...ctx, currants: engine.pc.currants });
+    const ctx = ctxFor(engine, v.home);
     const cost = titheCost(ctx.level, ctx.upgrades);
     // Talk to (verbs.talk_to, icon_alph.js 269-308) is added by the conversations feature while one is offered.
     const rows = [];
-    rows.push({ id: 'tithe', label: `Tithe ${cost}c`, enabled: tithe.ok, reason: tithe.msg || '', tooltip: `Insert ${cost} currants to support the Icon`, durationMs: 0 });
-    rows.push({ id: 'pickup', label: 'Pick up', enabled: true, tooltip: 'Put it in your pack', durationMs: 0 });
+    // ours (#697): a visitor's tithe would have nothing to add actions to (their Icon is in the owner's save).
+    if (!v.visit) {
+      const tithe = titheCheck(state, { placedId: v.row.id }, { ...ctx, currants: engine.pc.currants });
+      rows.push({ id: 'tithe', label: `Tithe ${cost}c`, enabled: tithe.ok, reason: tithe.msg || '', tooltip: `Insert ${cost} currants to support the Icon`, durationMs: 0 });
+    }
+    // In a POL (a home) ruminate / revere / reflect show on a placed Icon (icon.js 52, 118, 183); elsewhere state null.
+    if (v.home) {
+      for (const [verb, def] of Object.entries(ICON_VERBS)) {
+        const check = adoreCheck(state, adoreRef(v), verb, ctx);
+        if (check.hidden) continue;
+        rows.push({ id: verb, label: def.label, enabled: check.ok, reason: check.msg || '', tooltip: `${def.label}: ${def.stat === 'xp' ? 'iMG' : def.stat} from the Icon`, durationMs: 0 });
+      }
+    }
+    // canPickup (icon.js 1-12): in a POL only its owner picks it up.
+    if (!v.visit) rows.push({ id: 'pickup', label: 'Pick up', enabled: true, tooltip: 'Put it in your pack', durationMs: 0 });
     return rows;
   },
 
   runVerb(target, verbId, engine) {
-    const v = viewFor(target.iconId);
+    const v = viewFor(target);
     if (!v) return false;
     if (verbId === 'pickup') {
-      const res = pickUpIcon(state, engine.inv, engine.streetTsid, v.row.id);
-      if (res.ok) removeView(engine, v.row.id);
+      if (v.visit) return false;
+      const res = pickUpIcon(state, engine.inv, v.key, v.row.id);
+      if (res.ok) dropView(engine, v);
       say(engine, res.msg, res.ok);
       engine.save?.();
       return true;
     }
     if (verbId === 'tithe') {
+      if (v.visit) return false;
       runIconVerb(v.row.giant, 'tithe', engine, { placedId: v.row.id });
-      target.subtitle = v.row.actions > 0 ? `${v.row.actions} actions before a tithe` : 'A tithe is due';
+      target.subtitle = subtitleFor(v.row, v.visit);
+      return true;
+    }
+    if (ICON_VERBS[verbId] && v.home) {
+      runIconVerb(v.row.giant, verbId, engine, adoreRef(v));
+      target.subtitle = subtitleFor(v.row, v.visit);
       return true;
     }
     return false;
+  },
+
+  /**
+   * #697: homes-feature's shiftShownRoom says a home room's contents moved by dx (the home street
+   * grew to the left, or the back yard did): your Icons there move with the house, as a Garden
+   * Gnome does. homes-feature saves after asking. Null so every feature hears it.
+   */
+  homeRoomShifted(room, dx, engine) {
+    const moved = shiftHomeIcons(state, room, dx);
+    for (const v of views) if (!v.visit && moved.includes(v.row) && v.sprite && !v.sprite.destroyed) v.sprite.x = v.row.x;
+    if (moved.length && engine) publish(engine);
+    return null;
   },
 
   /** version 2: the conversations told live in the shared record (G202), not here. */
@@ -628,5 +782,7 @@ export const giantIconsFeature = {
     autoplayLog = [];
     autoplayTalkUntil = 0;
     offerCollisions = 0;
+    drawnHome = null;
+    homePollAt = 0;
   },
 };

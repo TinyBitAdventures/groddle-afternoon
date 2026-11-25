@@ -35,8 +35,13 @@
  *
  * ruminate/revere/reflect only work in the pack or a POL (container.is_bag ||
  * pols_is_pol); a public street icon offers tithe, talk to, pick up and the
- * bestowments. The remake's homes are scenes without the feature street
- * hooks, so icons are placed on streets only.
+ * bestowments. #697 (G1302): a home is a POL (locations/inc_pols.js 731), so
+ * an Icon is placed there too, with no "picked up by anyone" prompt
+ * (icon_place 27-45), only its owner picks it up (canPickup 1-12), and the
+ * three adoration verbs show on it (52, 118, 183). An Icon at home is kept
+ * under a home place key (homePlaceKey: home:street, home:house,
+ * home:house:<floor>, home:tower:<floor>) at its world x, which moves with
+ * the house as the Garden Gnome's does (shiftHomeIcons).
  */
 
 import { GIANT_ICON_DATA } from './giant-icons-data.js?v=5026b09c';
@@ -264,6 +269,12 @@ export function pickPackIcon(state, giant, { forTithe = false } = {}) {
 }
 
 function iconRef(state, ref) {
+  // #697: an Icon in someone else's home, seen on a visit (their save's row): it is not in this
+  // save, so it is acted on as it was shown, and its key names whose it is.
+  if (ref.row) {
+    const row = ref.row;
+    return GIANT_ICON_DATA[row?.giant] ? { row, key: `visit:${ref.owner || 0}:${row.id}`, giant: row.giant } : null;
+  }
   if (ref.placedId) {
     for (const rows of Object.values(state.placed)) {
       const row = rows.find((r) => r.id === ref.placedId);
@@ -297,7 +308,7 @@ export function adoreCheck(state, ref, verb, ctx = {}) {
   const found = iconRef(state, ref);
   if (!found) return { ok: false, msg: 'You have no Icon of that Giant.' };
   const def = GIANT_ICON_DATA[found.giant];
-  if (ref.placedId && !ctx.pol) return { ok: false, hidden: true, msg: '' };
+  if ((ref.placedId || ref.row) && !ctx.pol) return { ok: false, hidden: true, msg: '' };
   if (usedToday(state, def.iconClass, verb)) {
     return { ok: false, msg: `You've already ${ICON_VERBS[verb].done} an Icon of ${iconGiantName(found.giant)} today.` };
   }
@@ -375,6 +386,42 @@ export function titheIcon(state, ref, pc, ctx = {}) {
 
 /* ------------------------------------------------------------- placing */
 
+/** #697: the key an Icon placed in your own home is kept under (place: street, house, house:2, tower:1). */
+export const HOME_ICON_PREFIX = 'home:';
+export const homePlaceKey = (place) => (place ? `${HOME_ICON_PREFIX}${place}` : '');
+export const isHomePlaceKey = (key) => String(key || '').startsWith(HOME_ICON_PREFIX);
+
+/**
+ * #697: a home room's world x moved by `dx` (homes-feature shiftShownRoom: the home street grew to
+ * the left, or the back yard did and pushed the house along): the Icons set down there move with
+ * it, as the Garden Gnome does (js/garden-gnome.js shiftGnomes). `room`: 'street', or 'interior'
+ * for the house's ground floor; upper floors and Tower floors never move. Returns the rows moved.
+ */
+export function shiftHomeIcons(state, room, dx) {
+  const key = room === 'street' ? homePlaceKey('street') : room === 'interior' ? homePlaceKey('house') : '';
+  const by = Number(dx);
+  if (!key || !Number.isFinite(by) || !by) return [];
+  const rows = state.placed[key] || [];
+  for (const r of rows) r.x = Math.round(r.x + by);
+  return rows;
+}
+
+/** The most of an owner's Icons one visit shows (the site's Neighbours::ICONS_MAX). */
+export const ICON_VISIT_MAX = 24;
+
+/**
+ * #697: the site's list of a home owner's placed Icons (Neighbours::iconRows), checked: only the
+ * places a visitor can stand in (the home street, the house's ground floor, a Tower floor).
+ */
+export function normalizeVisitIcons(list) {
+  return (Array.isArray(list) ? list : [])
+    .slice(0, ICON_VISIT_MAX * 4)
+    .filter((r) => r && typeof r === 'object' && GIANT_ICON_DATA[r.giant] && Number.isFinite(Number(r.x)) && Number.isFinite(Number(r.y)))
+    .map((r) => ({ id: String(r.id || ''), giant: r.giant, place: String(r.place || ''), x: Math.round(Number(r.x)), y: Math.round(Number(r.y)), actions: whole(r.actions, 10_000) }))
+    .filter((r) => /^icon\d{1,9}$/.test(r.id) && /^(street|house|tower:\d)$/.test(r.place))
+    .slice(0, ICON_VISIT_MAX);
+}
+
 /** Move one pack Icon onto a street (keeps its action counter). */
 export function placeIcon(state, inv, giant, tsid, x, y) {
   const def = GIANT_ICON_DATA[giant];
@@ -434,7 +481,8 @@ export function bestowCheck(state, row, ctx = {}, rng = Math.random) {
   const favorMax = (ctx.favorMax || 0) - (piety ? 20 : 10);
   if (!((ctx.favor || 0) >= favorMax)) types.push('favor');
   const type = types[randInt(0, types.length - 1, rng)];
-  const key = `placed:${row.id}`;
+  // ctx.key: another key for the tither check (#697: someone else's Icon on a visit).
+  const key = ctx.key || `placed:${row.id}`;
   const level = ctx.level || 0;
   let amount;
   if (type === 'favor') {

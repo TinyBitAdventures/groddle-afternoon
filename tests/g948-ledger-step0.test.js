@@ -15,9 +15,9 @@ import { RARE_STORE } from '../public/js/quest-rooms/penalty.js?v=02a89c43';
 import { CAMERA_OFFER } from '../public/js/snaps.js?v=b5be8bff';
 
 import { ISLAND_CURRANTS, ISLAND_FLAGS, normalizeNewxpSave } from '../public/js/newxp.js?v=5aa81665';
-import { createIconState, pickUpIcon, placeIcon } from '../public/js/giant-icons.js?v=0d6b4965';
+import { createIconState, pickUpIcon, placeIcon } from '../public/js/giant-icons.js?v=9b71adf1';
 import { GNOME_CLASS } from '../public/js/garden-gnome.js?v=d9f8e52b';
-import { NOTE_POLE_CLASS } from '../public/js/home-street-mp.js?v=7bea3163';
+import { NOTE_POLE_CLASS } from '../public/js/home-street-mp.js?v=c93da7f0';
 import { FUNPICKLE } from '../public/js/funpickle.js?v=95796317';
 import { funpickleFeature } from '../public/js/features/funpickle-feature.js?v=214489b1';
 

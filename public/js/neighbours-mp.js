@@ -27,6 +27,7 @@
 import { SEED_CATALOG, applyFertilizer, sowPlot, wetPlot } from './garden.js?v=a7c6f521';
 import { normalizeParcelBox, stackCopy } from './butler.js?v=152429c8';
 import { normalizeVisitGnomes } from './garden-gnome.js?v=d9f8e52b';
+import { normalizeVisitIcons } from './giant-icons.js?v=9b71adf1';
 import { DROP_TEXT } from './drops-mp.js?v=6a16d73d';
 
 /** The realtime server's street for a player's home street (homes.go). */
@@ -464,6 +465,8 @@ export function normalizeHomeView(answer) {
     random: answer.random === true,
     // The owner's Garden Gnomes where they stand (Neighbours::gnomeRows; features/garden-gnome-feature.js draws them).
     gnomes: normalizeVisitGnomes(answer.gnomes),
+    // #697: the owner's placed Giant Icons where they stand (Neighbours::iconRows; features/giant-icons-feature.js draws them).
+    icons: normalizeVisitIcons(answer.icons),
     // G1190: what the owner keeps in their own save in the house and on the Tower floors (Neighbours::stackRows).
     stacks: normalizeOwnerStacks(answer.stacks),
     // Slice 2: the owner's Butler as it looks (Neighbours::butlerView), or null; `info` is its owner's leave info line (141 characters, bag_butler.js 3419).
