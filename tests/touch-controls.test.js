@@ -73,7 +73,8 @@ describe('the stick', () => {
   });
   it('holds the same keys a keyboard does, and Jump queues the Space key\'s jump', () => {
     // G876: the stick also notes what it holds (stickHeld), so reaching a ladder with it held Up is a press.
-    assert.match(game, /press: \(k\) => \{\s*keys\.add\(k\);\s*stickHeld\.add\(k\);\s*\},\s*release: \(k\) => \{\s*keys\.delete\(k\);\s*stickHeld\.delete\(k\);\s*\},\s*jump: \(\) => \{\s*queueJump\(jumpState, movementNow\(\)\);\s*window\.dispatchEvent\(new CustomEvent\(TOUCH_JUMP_EVENT\)\);\s*\},/);
+    // #695: while tending a garden the stick steps its plots first (gardenTendStick).
+    assert.match(game, /press: \(k\) => \{\s*\/\/[^\n]*\n\s*if \(gardenTendStick\(k\)\) return;\s*keys\.add\(k\);\s*stickHeld\.add\(k\);\s*\},\s*release: \(k\) => \{\s*gardenTendStickNext\.delete\(k\);\s*keys\.delete\(k\);\s*stickHeld\.delete\(k\);\s*\},\s*jump: \(\) => \{\s*queueJump\(jumpState, movementNow\(\)\);\s*window\.dispatchEvent\(new CustomEvent\(TOUCH_JUMP_EVENT\)\);\s*\},/);
     assert.match(mod, /press\(' '\);\s*jump\(\);/);
   });
 });

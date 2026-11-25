@@ -212,8 +212,8 @@ describe('climbing with the touch stick (#424, movement.js ladderArrivalPress)',
 
   it('is wired in handleInput and the touch controls (game.js)', () => {
     assert.match(game, /const stickHeld = new Set\(\);/);
-    assert.match(game, /press: \(k\) => \{\s*keys\.add\(k\);\s*stickHeld\.add\(k\);\s*\}/);
-    assert.match(game, /release: \(k\) => \{\s*keys\.delete\(k\);\s*stickHeld\.delete\(k\);\s*\}/);
+    assert.match(game, /press: \(k\) => \{\s*\/\/[^\n]*\n\s*if \(gardenTendStick\(k\)\) return;\s*keys\.add\(k\);\s*stickHeld\.add\(k\);\s*\}/);
+    assert.match(game, /release: \(k\) => \{\s*gardenTendStickNext\.delete\(k\);\s*keys\.delete\(k\);\s*stickHeld\.delete\(k\);\s*\}/);
     assert.match(game, /if \(up && ladderArrivalPress\(\{ stickUp: stickHeld\.has\('ArrowUp'\) && keys\.has\('ArrowUp'\), reach, wasReach: climb\.reach, jumpedSinceFloor: jumpState\.jumpedSinceFloor \}\)\) \{\s*ladderUp\.pressAt = now;\s*mountArgs\.upPressedMs = 0;\s*\}\s*climb\.reach = reach;/);
     assert.match(game, /if \(jumpResult\.ok\) \{\s*\/\/[^\n]*\n\s*spendLadderUp\(ladderUp\);\s*performPlayerJump\(/);
   });

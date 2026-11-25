@@ -6,7 +6,7 @@ import { ITEM_ICONS, ITEM_LABELS, getVerbsFor, ordinaryItems, runVerb } from './
 import { createErrorOnce, createFeatureHost, createFrameStages } from './js/feature-host.js?v=b87e2cbc';
 import { FEATURES, questFlagsFeature } from './js/features/index.js?v=6522a94b';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl, drawTileArt } from './js/enter-chooser.js?v=92133ac8';
-import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
+import { firstTendKey, STICK_TEND_DELAY_MS, STICK_TEND_DIRS, STICK_TEND_REPEAT_MS, stepTendKey, stepTendKeys, stickTendKey, tendKeyAction } from './js/garden-tend.js?v=8814f400';
 import { avatarHitBox, behindFloor, bodyReachDistance, OUT_OF_REACH_LINE, playerClickBox } from './js/reach.js?v=456da8a8';
 import { createVogOverlay } from './js/vog-overlay.js?v=e883b3e3';
 import { createPromptStack } from './js/prompt-stack.js?v=19885e1b';
@@ -11617,6 +11617,56 @@ function gardenTendKey(e) {
   }
   const garden = gardenTend.entity.state.garden;
   gardenTend.key = stepTendKey(gardenTend.key, action, garden.cols, garden.rows);
+  showGardenTendFocus();
+  return true;
+}
+/**
+ * #695 (phone, upright, plots 40 x 12 px): ACTPRESS for a garden being tended, as signpostActMenu is
+ * for a post. A drag on Act steps the lit plot (stepTendKeys), and a tap or the lift opens its menu,
+ * as Enter does (gardenTendKey), so tending is a tap, a drag and a tap. Null while not tending, or
+ * while a menu or window has the keys (the keyboard's rule).
+ */
+function gardenTendActMenu() {
+  if (!gardenTend || menuTarget || panelOnScreen()) return null;
+  return {
+    step(n) {
+      if (!gardenTend) return;
+      const garden = gardenTend.entity.state.garden;
+      gardenTend.key = stepTendKeys(gardenTend.key, n, garden.cols, garden.rows);
+      showGardenTendFocus();
+    },
+    choose() {
+      const plot = gardenTendPlot();
+      if (plot && !currentAction) openVerbMenu(plot);
+    },
+  };
+}
+/** #695: the stick's arrows stepping plots, each to when it steps again while held. */
+const gardenTendStickNext = new Map();
+/**
+ * #695: the phone's stick while tending moves the lit plot, as the client's arrows did (GardenView.as
+ * 588-672), stepping again while held (stickTendKey). Past the grid's left or right end it lets go of
+ * the garden and walks. True when the plot took the push (the avatar stands). An arrow the stick held
+ * before tending began walks on.
+ */
+function gardenTendStick(k) {
+  const dir = STICK_TEND_DIRS[k];
+  if (!dir || !gardenTend || menuTarget || panelOnScreen() || stickHeld.has(k)) {
+    gardenTendStickNext.delete(k);
+    return false;
+  }
+  const now = performance.now();
+  const next = gardenTendStickNext.get(k);
+  if (next !== undefined && now < next) return true;
+  const garden = gardenTend.entity.state.garden;
+  const key = stickTendKey(gardenTend.key, dir, garden.cols, garden.rows);
+  if (!key) {
+    gardenTendStickNext.clear();
+    stopGardenTend();
+    return false;
+  }
+  gardenTendStickNext.set(k, now + (next === undefined ? STICK_TEND_DELAY_MS : STICK_TEND_REPEAT_MS));
+  gardenTend.key = key;
   showGardenTendFocus();
   return true;
 }
@@ -36164,10 +36214,13 @@ async function main() {
     touchControls = installTouchControls({
       root: document.getElementById('game-root') || document.body,
       press: (k) => {
+        // #695: while tending, the stick moves between the plots.
+        if (gardenTendStick(k)) return;
         keys.add(k);
         stickHeld.add(k);
       },
       release: (k) => {
+        gardenTendStickNext.delete(k);
         keys.delete(k);
         stickHeld.delete(k);
       },
@@ -36193,7 +36246,9 @@ async function main() {
         // G851: a post held by Act's Enter (its roads) and a stack's own menu (the pack's item card) too.
         if (signpostFocus) return signpostActMenu();
         const pop = isPackPopoverOpen() ? document.getElementById('pack-popover') : null;
-        return pop ? { step: (n) => stepVerbRow(pop, n), choose: () => chooseVerbRow(pop) } : null;
+        if (pop) return { step: (n) => stepVerbRow(pop, n), choose: () => chooseVerbRow(pop) };
+        // #695: a garden being tended: a drag steps the lit plot, the lift opens its menu.
+        return gardenTendActMenu();
       },
       floatStick: createFloatStick({ win: window }),
       // A quick tap on the stick's corner on a thing behind it (an animal under it) is a tap on that thing;

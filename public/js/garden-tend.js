@@ -81,3 +81,36 @@ export function tendKeyAction(e) {
     default: return null;
   }
 }
+
+/**
+ * #695 (phone, upright): Act drives the plots while tending (ACTPRESS, js/touch-controls.js actMenu),
+ * one drag line for the whole grid: down steps as Right does, up as Left, with the client's wraps,
+ * so a drag reaches every plot and goes round.
+ */
+export function stepTendKeys(key, n, cols, rows) {
+  const k = Math.trunc(Number(n)) || 0;
+  let at = key;
+  for (let i = 0; i < Math.abs(k); i++) at = stepTendKey(at, k > 0 ? 'right' : 'left', cols, rows);
+  return at;
+}
+
+/** #695: the stick holds the arrow keys (js/touch-controls.js stickKeys); the direction each one steps. */
+export const STICK_TEND_DIRS = Object.freeze({ ArrowLeft: 'left', ArrowRight: 'right', ArrowUp: 'up', ArrowDown: 'down' });
+/** #695: a stick held on one way steps again after this long (ms), then every STICK_TEND_REPEAT_MS. */
+export const STICK_TEND_DELAY_MS = 450;
+export const STICK_TEND_REPEAT_MS = 220;
+
+/**
+ * #695: where the stick moves the lit plot ("c-r", r 1 at the back). The arrows step plots while
+ * tending (GardenView.as onKeyDown 588-672), but a phone has no Esc: the stick moves across the grid
+ * as it looks, resting at the back and front rows, and Left past the left end or Right past the right
+ * end lets go of the garden (null), so the same push walks the avatar off it.
+ */
+export function stickTendKey(key, dir, cols, rows) {
+  const [c, r] = String(key).split('-').map(Number);
+  if (dir === 'left') return c <= 1 ? null : `${c - 1}-${r}`;
+  if (dir === 'right') return c >= cols ? null : `${c + 1}-${r}`;
+  if (dir === 'up') return `${c}-${Math.max(1, r - 1)}`;
+  if (dir === 'down') return `${c}-${Math.min(rows, r + 1)}`;
+  return key;
+}
