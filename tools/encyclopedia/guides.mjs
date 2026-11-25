@@ -25,7 +25,7 @@ import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { GARDEN_LOCK_MS, SHARED_GARDEN_STREETS } from '../../public/js/shared-gardens.js?v=464472e5';
-import { GARDEN_WATER_MS, HERB_GARDEN_STREETS, SEED_CATALOG, gardenActionProfile } from '../../public/js/garden.js?v=0cbb65f0';
+import { GARDEN_WATER_MS, HERB_GARDEN_STREETS, SEED_CATALOG, gardenActionProfile } from '../../public/js/garden.js?v=9c4cc027';
 import { HERB_SEEDS } from '../../public/js/item-transforms.js?v=3a1b5812';
 import { DROP_TABLES } from '../../public/js/drop-tables-data.js?v=c51a6400';
 import { STONE_LEVEL } from '../../public/js/street-furniture.js?v=071203fc';

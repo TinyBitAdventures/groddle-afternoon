@@ -24,10 +24,10 @@ import {
   woodTreeSide,
 } from '../public/js/pack-tree-verbs.js?v=bfcb87be';
 import { packTreeVerbsFeature, runPackTreeVerb } from '../public/js/features/pack-tree-verbs-feature.js?v=0ffcfd94';
-import { getVerbsFor } from '../public/content.js?v=fc2948cd';
+import { getVerbsFor } from '../public/content.js?v=ceaea1fe';
 import { plotVerbs } from '../public/js/patches.js?v=3498abf3';
 import { createToolConditionState, setToolRemaining } from '../public/js/tools.js?v=4156bba8';
-import { FEATURES } from '../public/js/features/index.js?v=2626c949';
+import { FEATURES } from '../public/js/features/index.js?v=3346e382';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const gsjs = join(root, '..', 'glitch-GameServerJS');

@@ -2,7 +2,7 @@
 // plot wears, since Glitch showed the mode only through the verb it offered (hoe.js 70-126).
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { aggressiveHoeingFeature, hoeModeNote } from '../public/js/features/aggressive-hoeing-feature.js?v=977f9355';
+import { aggressiveHoeingFeature, hoeModeNote } from '../public/js/features/aggressive-hoeing-feature.js?v=af39cab5';
 import { packSlotTip } from '../public/js/ui/pack-row.js?v=615f7790';
 
 const CARD = ['hoeing_more_img_more_wear'];

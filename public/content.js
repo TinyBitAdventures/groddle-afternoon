@@ -21,6 +21,8 @@ import {
   listPlantableSeeds,
   plantSeedChoices,
   waterAllPlots,
+  waterAllPlan,
+  GARDEN_WATER_ALL_TIRED_LINE,
   gardenActionProfile,
   plantPlot,
   waterPlot,
@@ -37,7 +39,7 @@ import {
   GARDEN_FERTILIZE_MS,
   fertilizeCheck,
   fertilizePlot,
-} from './js/garden.js?v=0cbb65f0';
+} from './js/garden.js?v=9c4cc027';
 import { firstWorkingTool, HOE_TOOLS, WATERING_CAN_TOOLS } from './js/tools.js?v=4156bba8';
 import { miningGemHint } from './js/gem-hints.js?v=4b65f7ac';
 import {
@@ -848,13 +850,21 @@ export function getVerbsFor(target, ctx) {
     // greyed with onPour's line (potion_garden_water.js canPour/onPour), so it never plays
     // the can or costs energy for nothing.
     const dry = gardenNeedsWater(s.garden || s);
-    const waterAllCost = gardenActionProfile((s.garden || s).gardenType, 'water', ctx.skills?.learned || ctx.learned || []).energy;
+    // Austin 2026-11-25: the row's cost is the plots it would water now (each dry plot, in order,
+    // until energy runs out, include/master_garden.js 113-124) times the water package's
+    // energy_cost, as potion_garden_water.js 543 prices energy_cost by the plots; not one plot's 2.
+    // Too tired for even one plot greys it with canPour's line (potion_garden_water.js 544).
+    const plan = waterAllPlan(s.garden || s, pc, {
+      learned: ctx.skills?.learned || ctx.learned || [],
+      upgrades: ctx.imaginationUpgrades || pc.imaginationUpgrades || [],
+    });
+    const tired = dry && !plan.keys.length;
     add('water_all', 'water all', {
       sort: 10,
-      energy: 2,
-      ...(brokenOnly(WATERING_CAN_TOOLS) || (pc.energy || 0) <= waterAllCost ? { durationMs: 0 } : {}),
-      enabled: canWater && dry,
-      reason: !canWater ? 'Need a Watering Can' : dry ? '' : GARDEN_NO_DRY_PLOTS_LINE,
+      energy: plan.energy,
+      ...(brokenOnly(WATERING_CAN_TOOLS) || tired ? { durationMs: 0 } : {}),
+      enabled: canWater && dry && !tired,
+      reason: !canWater ? 'Need a Watering Can' : !dry ? GARDEN_NO_DRY_PLOTS_LINE : tired ? GARDEN_WATER_ALL_TIRED_LINE : '',
       tooltip: canWater
         ? 'Water every dry plot'
         : 'Requires a Watering Can in your pack',

@@ -60,11 +60,12 @@ import {
   fertilizeCheck,
   gardenActionProfile,
   gardenNeedsWater,
+  waterAllPlan,
   hasHoe,
   hasWateringCan,
   pickSeedToPlant,
   seedFitsGarden,
-} from '../garden.js?v=0cbb65f0';
+} from '../garden.js?v=9c4cc027';
 import { HOE_TOOLS, WATERING_CAN_TOOLS, canUseTool, firstWorkingTool } from '../tools.js?v=4156bba8';
 import { exposeQA } from '../qa-gate.js?v=f4e2cd82';
 import { addItem, countItem, ITEM_CATALOG, itemIcon } from '../inventory.js?v=6414dbdc';
@@ -446,13 +447,10 @@ function planVerb(engine, target, verbId) {
     const profile = gardenActionProfile(gType, 'water', learned(engine), upgrades(engine));
     if (!toolWorks(engine, WATERING_CAN_TOOLS, profile.toolWear)) return null;
     // waterAllPlots: each dry plot in order, its own roll and energy; out of energy, it stops.
+    // waterAllPlan is the same walk the verb row prices (content.js water_all).
     const ids = [];
     const rolls = [];
-    let left = energy;
-    for (const key of Object.keys(garden.plots || {})) {
-      if (garden.plots[key].wet) continue;
-      if (left <= profile.energy) break;
-      left -= profile.energy;
+    for (const key of waterAllPlan(garden, pc, { learned: learned(engine), upgrades: upgrades(engine) }).keys) {
       const roll = Math.random();
       rolls.push(roll);
       if (rollPasses(roll, profile.successRate)) ids.push(plotId(bk, key));

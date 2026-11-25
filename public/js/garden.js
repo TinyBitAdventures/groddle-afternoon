@@ -1933,6 +1933,33 @@ export function fertilizePlot(garden, key, inv, opts = {}) {
 }
 
 /**
+ * The plots Water all would water right now and what it would spend: every dry plot in the
+ * order waterAllPlots goes, each at the water package's energy, stopping where energy runs out
+ * (include/master_garden.js 113-124: the bed-wide water checks energy against energy_cost
+ * before each plot and stops with "You're too tired to do that."). A failed roll costs the
+ * same energy as a watered plot (include/garden.js 215), so the sum is what waterAllPlots spends.
+ * @returns {{ keys: string[], dry: number, cost: number, energy: number }}
+ */
+export function waterAllPlan(garden, pc, opts = {}) {
+  const now = opts.now ?? Date.now();
+  const cost = gardenActionProfile(garden?.gardenType, 'water', opts.learned, opts.upgrades).energy;
+  let left = Number(pc?.energy) || 0;
+  const keys = [];
+  let dry = 0;
+  for (const key of Object.keys(garden?.plots || {})) {
+    if (!plotNeedsWater(garden.plots[key], now, garden)) continue;
+    dry += 1;
+    if (left <= cost) continue;
+    left -= cost;
+    keys.push(key);
+  }
+  return { keys, dry, cost, energy: cost * keys.length };
+}
+
+/** potion_garden_water.js 543-544 canPour: the bed-wide water greyed when energy can't cover it. */
+export const GARDEN_WATER_ALL_TIRED_LINE = "You don't have enough energy to do that!";
+
+/**
  * Water every dry plot in the bed (potion_garden_water style, simplified with the can).
  * G537: empty and picked plots too, as master_garden.js potionTendGarden waters every plot;
  * with nothing dry it refuses before any energy is spent (onPour's line).

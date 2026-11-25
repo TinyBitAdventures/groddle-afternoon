@@ -55,10 +55,12 @@ import {
   plotNeedsWater,
   gardenNeedsWater,
   GARDEN_NO_DRY_PLOTS_LINE,
-} from '../public/js/garden.js?v=0cbb65f0';
-import { getVerbsFor, runVerb } from '../public/content.js?v=fc2948cd';
+  GARDEN_WATER_ALL_TIRED_LINE,
+  waterAllPlan,
+} from '../public/js/garden.js?v=9c4cc027';
+import { getVerbsFor, runVerb } from '../public/content.js?v=ceaea1fe';
 import { plotPieces } from '../public/js/garden-view.js?v=04fe8467';
-import { plotsFor } from '../public/js/master-garden.js?v=092fe346';
+import { plotsFor } from '../public/js/master-garden.js?v=efe69155';
 import {
   createInventory,
   countItem,
@@ -66,7 +68,7 @@ import {
   listPackToolSlots,
   isToolItem,
 } from '../public/js/inventory.js?v=6414dbdc';
-import { DEFAULT_VENDOR, vendorBuy } from '../public/js/vendor.js?v=ccb42243';
+import { DEFAULT_VENDOR, vendorBuy } from '../public/js/vendor.js?v=f9bee39e';
 import { HAS_SITE, SITE_DIR } from '../tools/repos.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -597,6 +599,59 @@ describe('G537: Water all waters every dry plot, an empty one too', () => {
 });
 
 // G561: a plot comes back as far as the time away carried it, as the site grows it.
+describe('Austin 2026-11-25: Water all shows what it will spend, not one plot\'s 2', () => {
+  const learned = ['croppery_1'];
+  const ctxFor = (pc, inv) => ({ pc, inv, learned, skills: { learned } });
+  const bed = (garden) => ({ classId: 'garden_new', state: { garden } });
+  // The water package's energy_cost (catalog_skill_packages.js croppery_water), not a literal.
+  const cost = gardenActionProfile('default', 'water', learned).energy;
+  const bedWithDry = (dry) => {
+    const garden = createGarden({ cols: 5, rows: 1, now: 0 });
+    listPlotKeys(garden).forEach((key, i) => {
+      if (i >= dry) Object.assign(getPlot(garden, key), { wet: true, wetAt: Date.now() });
+    });
+    return garden;
+  };
+  const row = (garden, pc) => getVerbsFor(bed(garden), ctxFor(pc, createInventory({ watering_can: 1 }))).find((v) => v.id === 'water_all');
+
+  for (const dry of [0, 1, 5]) {
+    it(`${dry} dry plot(s) show ${dry} x the package cost, and that is what it spends`, () => {
+      assert.ok(cost > 0);
+      const garden = bedWithDry(dry);
+      const pc = { energy: 200, mood: 40, imagination: 0, xp: 0 };
+      const verb = row(garden, pc);
+      assert.equal(verb.energy, dry * cost);
+      assert.equal(verb.enabled, dry > 0);
+      if (!dry) assert.equal(verb.reason, GARDEN_NO_DRY_PLOTS_LINE);
+      const r = runVerb(bed(garden), 'water_all', ctxFor(pc, createInventory({ watering_can: 1 })));
+      assert.equal(r.ok, dry > 0, r.msgs?.join(' '));
+      assert.equal(200 - pc.energy, verb.energy, 'the row\'s cost is the energy spent');
+    });
+  }
+
+  it('energy for only some plots shows those plots, waters them in order and stops', () => {
+    const garden = bedWithDry(5);
+    const pc = { energy: 3 * cost + 1, mood: 40, imagination: 0, xp: 0 };
+    const verb = row(garden, pc);
+    assert.equal(verb.energy, 3 * cost);
+    assert.equal(verb.enabled, true);
+    assert.deepEqual(waterAllPlan(garden, pc, { learned }).keys, listPlotKeys(garden).slice(0, 3));
+    const r = waterAllPlots(garden, pc, { inv: createInventory({ watering_can: 1 }), learned, rng: () => 0 });
+    assert.equal(r.watered, 3);
+    assert.equal(pc.energy, 1, 'spent exactly the shown cost');
+    assert.deepEqual(listPlotKeys(garden).map((k) => getPlot(garden, k).wet), [true, true, true, false, false]);
+  });
+
+  it('too tired for even one plot greys the row with canPour\'s line and no cost', () => {
+    const pc = { energy: cost, mood: 40, imagination: 0, xp: 0 };
+    const verb = row(bedWithDry(5), pc);
+    assert.equal(verb.enabled, false);
+    assert.equal(verb.energy, 0);
+    assert.equal(verb.reason, GARDEN_WATER_ALL_TIRED_LINE);
+    assert.equal(GARDEN_WATER_ALL_TIRED_LINE, "You don't have enough energy to do that!");
+  });
+});
+
 describe('the tick catches up across every stage the time covers (G561)', () => {
   const T0 = 1_700_000_000_000;
   const H = GARDEN_WATER_MS / 12;

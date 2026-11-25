@@ -103,7 +103,7 @@ import { XP_FOR_LEVEL, currantRewardForLevel } from '../public/js/progression.js
 import { IMAGINATION_UPGRADES } from '../public/js/imagination-data.js?v=4a85e7fe';
 import { SPINDLE_TOOLS } from '../public/js/making.js?v=1ec1075e';
 import { MACHINE_IDS } from '../public/js/machines.js?v=5d749d26';
-import { GARDEN_SKILL_PACKAGES, SEED_CATALOG } from '../public/js/garden.js?v=0cbb65f0';
+import { GARDEN_SKILL_PACKAGES, SEED_CATALOG } from '../public/js/garden.js?v=9c4cc027';
 import { SKILL_PACKAGES } from '../public/js/skill-packages-data.js?v=cb4e9ab3';
 import { creditedMultiplayerQuests } from '../public/js/quests-mp.js?v=e697cec3';
 import { FURNITURE_STARTER_KIT } from '../public/js/homes-catalog.js?v=0367f90f';
