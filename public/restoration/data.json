@@ -2814,9 +2814,14 @@
   "deployed": "2026-11-25"
  },
  "git": {
-  "commits": 3599,
+  "commits": 3602,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-25",
+    "kind": "improve",
+    "text": "Online, a machine dragged in Decoration Mode lands nearer another one when you stand 200 px from all of them"
+   },
    {
     "date": "2026-11-25",
     "kind": "improve",
@@ -2931,11 +2936,6 @@
     "date": "2026-11-25",
     "kind": "new",
     "text": "The console's own addresses, from the game side: the builder's Console link and the checks"
-   },
-   {
-    "date": "2026-11-25",
-    "kind": "fix",
-    "text": "The phone page loads the link code only when a report thread has an address, keeping its first load small"
    }
   ]
  },
