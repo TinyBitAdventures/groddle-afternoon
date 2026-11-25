@@ -33,6 +33,7 @@ import {
   placeFurniture,
 } from '../public/js/home-decor.js?v=31f37d9b';
 import { SITE_DIR, skipWithoutSite } from '../tools/repos.mjs';
+import { HAS_PHP, PHP } from './php.js';
 
 const root = join(import.meta.dirname, '..');
 const pub = join(root, 'public');
@@ -200,7 +201,7 @@ describe('wiring and copy', () => {
   });
 });
 
-const hasPhp = spawnSync('php', ['-v']).status === 0;
+const hasPhp = HAS_PHP;
 describe('multiplayer: the ledger takes the spend (site LedgerMath::reconcile)', { skip: skipWithoutSite || (!hasPhp && 'no php') }, () => {
   it('a save write 25,000 currants lower stands as a loss, nothing clamped', () => {
     const code = `
@@ -208,7 +209,7 @@ describe('multiplayer: the ledger takes the spend (site LedgerMath::reconcile)',
       use Groddle\\Minn\\{Economy, LedgerMath};
       $r = LedgerMath::reconcile(['items' => ['furniture_chair' => 1], 'currants' => 30000], ['items' => ['furniture_chair' => 1], 'currants' => 5000], 0.0, 50000.0, Economy::shared());
       echo json_encode([$r['delta']['currants'], $r['clamped']['currants'], $r['delta']['items']['furniture_chair'] ?? 0]);`;
-    const [delta, clamped, chairs] = JSON.parse(String(execFileSync('php', ['-r', code])));
+    const [delta, clamped, chairs] = JSON.parse(String(execFileSync(PHP, ['-r', code])));
     assert.deepEqual([delta, clamped, chairs], [-25_000, 0, 0]);
   });
 });

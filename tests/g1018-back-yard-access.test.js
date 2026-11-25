@@ -20,14 +20,15 @@ import { applyStockAct, normalizeStockView } from '../public/js/yard-stock-mp.js
 import { forgetInside, insideProof, insideQuery, normalizeHomeView, rememberInside, visitSceneTsid } from '../public/js/neighbours-mp.js?v=e912be37';
 import { getResourceNodeDef } from '../public/js/resource-nodes.js?v=90d75c60';
 import { HAS_SERVER, HAS_SITE, SITE_DIR, serverPath, sitePath } from '../tools/repos.mjs';
+import { HAS_PHP, PHP } from './php.js';
 
-const hasPhp = spawnSync('php', ['-v']).status === 0;
+const hasPhp = HAS_PHP;
 const skipSite = !HAS_SITE ? 'no groddle-afternoon-site checkout' : !hasPhp ? 'no php' : false;
 const SECRET = 'g1018-test-secret-g1018-test-secret-g1018';
 
 function php(classes, body) {
   const code = `foreach (${JSON.stringify(classes)} as $c) require ${JSON.stringify(SITE_DIR)} . "/src/$c.php"; ${body}`;
-  return JSON.parse(execFileSync('php', ['-r', code]).toString());
+  return JSON.parse(execFileSync(PHP, ['-r', code]).toString());
 }
 
 const b64 = (s) => Buffer.from(s).toString('base64url');

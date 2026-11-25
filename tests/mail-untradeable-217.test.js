@@ -21,17 +21,18 @@ import { MAIL_FULL_BAGS, MAIL_RESTRICTED, NO_MAIL, mailJson, mailTable } from '.
 import { playerMailCost } from '../public/js/player-mail.js?v=b6003af8';
 import { ITEM_BASE_COSTS } from '../public/js/store-catalog.js?v=c6ebb2bd';
 import { HAS_SITE, SITE_DIR, sitePath } from '../tools/repos.mjs';
+import { HAS_PHP, PHP } from './php.js';
 
 const root = join(import.meta.dirname, '..');
 const GSJS = join(root, '..', 'glitch-GameServerJS');
 const AS3 = join(root, '..', 'glitch-client');
-const hasPhp = spawnSync('php', ['-v']).status === 0;
+const hasPhp = HAS_PHP;
 const skipSite = !HAS_SITE ? 'no groddle-afternoon-site checkout' : !hasPhp ? 'no php' : false;
 const trade = JSON.parse(readFileSync(join(root, 'public/assets/content/trade-items.json'), 'utf8'));
 
 function php(body) {
   const code = `foreach (['Economy', 'LedgerMath', 'WordFilter', 'CopyTags', 'LedgerGift', 'LedgerMail', 'Ledger'] as $c) require ${JSON.stringify(SITE_DIR)} . "/src/$c.php"; use Groddle\\Minn\\LedgerMail; use Groddle\\Minn\\LedgerMath; use Groddle\\Minn\\Economy; use Groddle\\Minn\\Ledger; ${body}`;
-  return JSON.parse(execFileSync('php', ['-r', code]).toString());
+  return JSON.parse(execFileSync(PHP, ['-r', code]).toString());
 }
 
 describe('#217 the mail table lets through what Glitch let through', () => {

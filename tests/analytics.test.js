@@ -19,10 +19,11 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import vm from 'node:vm';
 import { SITE_DIR, serverPath, sitePath, skipWithoutServer, skipWithoutSite } from '../tools/repos.mjs';
+import { HAS_PHP, PHP } from './php.js';
 
 const root = join(import.meta.dirname, '..');
 const read = (f) => readFileSync(join(root, f), 'utf8');
-const hasPhp = spawnSync('php', ['-v']).status === 0;
+const hasPhp = HAS_PHP;
 const skip = skipWithoutSite || (!hasPhp && 'needs the php CLI');
 
 function php(op, args) {
@@ -42,7 +43,7 @@ function php(op, args) {
       'consts' => ['key' => PlayTime::TALLY_KEY, 'counters' => Analytics::COUNTERS, 'caps' => [Analytics::HIT_BYTES, Analytics::PAGEVIEWS_DAY_MAX, Analytics::SECTIONS_DAY_MAX]],
     };
     echo json_encode($out);`;
-  return JSON.parse(String(execFileSync('php', ['-r', code], { input: JSON.stringify({ op, args }) })));
+  return JSON.parse(String(execFileSync(PHP, ['-r', code], { input: JSON.stringify({ op, args }) })));
 }
 
 /** Runs public/site/theme.js with a stub page; returns the beacons it sent. */

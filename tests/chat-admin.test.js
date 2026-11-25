@@ -33,6 +33,7 @@ import { bootDataFrom } from '../public/js/online-boot.js?v=f1f2766b';
 import { mountSocialDrawer } from '../public/js/ui/social-drawer.js?v=06c37291';
 import { createNotifier } from '../public/js/notify.js?v=4226f585';
 import { FakeEl, memoryStore, page } from './social-fake-dom.js';
+import { HAS_PHP, PHP, phpSkip } from './php.js';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const game = (f) => readFileSync(join(root, 'public', f), 'utf8');
@@ -374,7 +375,7 @@ describe('the site: me says admin; the delete route stays administrators only (s
 
 // —— On a throwaway database (tests/fixtures/chat-admin/chat-admin.php) ——
 const engineDir = process.env.MINN_ENGINE_DIR || join(homedir(), 'Cove/Sites/minn-engine.localhost/public/minn');
-const hasPhp = spawnSync('php', ['-v']).status === 0;
+const hasPhp = HAS_PHP;
 function mysql() {
   const env = String(process.env.GRODDLE_TEST_MYSQL || '').trim();
   if (env) {
@@ -390,9 +391,9 @@ function mysql() {
   return host && user ? { host, user, pass: def('DB_PASSWORD') || '' } : null;
 }
 const db = mysql();
-const reachable = db && hasPhp && spawnSync('php', ['-r', 'mysqli_report(MYSQLI_REPORT_OFF); $m = @new mysqli($argv[1], $argv[2], $argv[3]); exit($m->connect_errno ? 1 : 0);', db.host, db.user, db.pass]).status === 0;
+const reachable = db && hasPhp && spawnSync(PHP, ['-r', 'mysqli_report(MYSQLI_REPORT_OFF); $m = @new mysqli($argv[1], $argv[2], $argv[3]); exit($m->connect_errno ? 1 : 0);', db.host, db.user, db.pass]).status === 0;
 const skipDb = skipWithoutSite
-  || (!hasPhp && 'no php')
+  || phpSkip('mysqli')
   || (!existsSync(join(engineDir, 'src/Minn/Autoloader.php')) && 'Minn Engine not found (set MINN_ENGINE_DIR)')
   || (!reachable && 'no MariaDB to make a throwaway database on (set GRODDLE_TEST_MYSQL)');
 
@@ -401,7 +402,7 @@ describe('on a throwaway database, with a fake clock', { skip: skipDb }, () => {
   const DAY = 86_400_000;
   const NOW = 1_794_096_000_000;
   before(() => {
-    r = JSON.parse(execFileSync('php', [join(root, 'tests/fixtures/chat-admin/chat-admin.php'), engineDir, SITE_DIR, db.host, db.user, db.pass], { timeout: 90000 }).toString());
+    r = JSON.parse(execFileSync(PHP, [join(root, 'tests/fixtures/chat-admin/chat-admin.php'), engineDir, SITE_DIR, db.host, db.user, db.pass], { timeout: 90000 }).toString());
   });
   const text = (rows, lid) => rows.find((x) => x.lid === lid).text;
 

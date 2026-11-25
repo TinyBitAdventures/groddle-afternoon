@@ -17,11 +17,12 @@ import { BUDDY_VERBS, buddyVerbs, normalizeList } from '../public/js/buddies.js?
 import { BLOCKED_PLAYER_VERBS, FROM_LIST_VERBS, blockedPlayerVerbs, playerMenuRows } from '../public/js/ui/player-menu.js?v=c573508b';
 import { PLAYER_REPORT_NOTE_MAX, PLAYER_REPORT_TEXT, playerReportView } from '../public/js/player-report.js?v=8d7e5653';
 import { createMinnAccount } from '../public/js/minn-account.js?v=7e3d7279';
+import { HAS_PHP, PHP } from './php.js';
 
 const root = join(import.meta.dirname, '..');
 const game = (f) => readFileSync(join(root, 'public', f), 'utf8');
 const site = (f) => readFileSync(sitePath(f), 'utf8');
-const hasPhp = spawnSync('php', ['-v']).status === 0;
+const hasPhp = HAS_PHP;
 
 describe('the Report row on another player\'s menu', () => {
   const list = normalizeList({ buddies: [], reverse: [], ignoring: [{ id: 9, name: 'Boz' }] });
@@ -107,7 +108,7 @@ describe('the report window', () => {
 });
 
 describe('the site: route, limits, the kept lines and the console', { skip: skipWithoutSite }, () => {
-  const php = (code) => JSON.parse(execFileSync('php', ['-r', `foreach (['BugReports', 'ChatHistory', 'AdminConsole', 'PlayerReports'] as $c) require ${JSON.stringify(SITE_DIR)} . "/src/$c.php"; use Groddle\\Minn\\PlayerReports as P; ${code}`]).toString());
+  const php = (code) => JSON.parse(execFileSync(PHP, ['-r', `foreach (['BugReports', 'ChatHistory', 'AdminConsole', 'PlayerReports'] as $c) require ${JSON.stringify(SITE_DIR)} . "/src/$c.php"; use Groddle\\Minn\\PlayerReports as P; ${code}`]).toString());
 
   it('keeps only street, public channel and party lines: an IM or a group line can never be kept', { skip: !hasPhp }, () => {
     const answer = {

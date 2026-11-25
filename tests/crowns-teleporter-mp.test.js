@@ -26,6 +26,7 @@ import {
 import { crownsFeature, crownsMpTeleport } from '../public/js/features/crowns-feature.js?v=8279217d';
 import { GAME_TELEPORTER_PRICE, GAME_TELEPORTER_STREET, GAME_TELEPORTER_TEXT } from '../public/js/features/game-teleporter-feature.js?v=3f4bb706';
 import { HAS_SERVER, HAS_SITE, SITE_DIR, serverPath, sitePath, skipWithoutServer } from '../tools/repos.mjs';
+import { HAS_PHP, PHP } from './php.js';
 
 const root = join(import.meta.dirname, '..');
 const read = (rel) => readFileSync(join(root, rel), 'utf8');
@@ -202,7 +203,7 @@ describe('the server (crowns_teleporter.go)', { skip: skipWithoutServer }, () =>
   });
 });
 
-const hasPhp = spawnSync('php', ['-v']).status === 0;
+const hasPhp = HAS_PHP;
 const skipSite = !HAS_SITE ? 'no groddle-afternoon-site checkout' : !hasPhp ? 'no php' : false;
 
 describe('the site\'s spend route takes the teleporter\'s 50 (LedgerSpend.php)', { skip: skipSite }, () => {
@@ -223,7 +224,7 @@ describe('the site\'s spend route takes the teleporter\'s 50 (LedgerSpend.php)',
         'party' => $for->invoke(null, 'party-00000000000000c1', 'game_teleporter'),
         'atm' => $for->invoke(null, '${SPEND}', 'party_atm'),
       ]);`;
-    const out = JSON.parse(execFileSync('php', ['-r', code]).toString());
+    const out = JSON.parse(execFileSync(PHP, ['-r', code]).toString());
     assert.deepEqual(out, { price: 50, fifty: true, more: false, items: false, op: true, mine: true, party: false, atm: false });
     assert.match(readFileSync(sitePath('src/LedgerSpend.php'), 'utf8'), /private const WHY = \['party_pack', 'party_atm', 'game_teleporter', 'feat_donation'\];/);
   });

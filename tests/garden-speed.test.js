@@ -48,6 +48,7 @@ import { applyPlot, localPlot, GARDEN_LOCK_MS } from '../public/js/shared-garden
 import { applyTendAct } from '../public/js/neighbours-mp.js?v=e912be37';
 import { potionTendGarden } from '../public/js/master-garden.js?v=60fdb23c';
 import { HAS_SITE, SITE_DIR } from '../tools/repos.mjs';
+import { HAS_PHP, PHP } from './php.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const GSJS_ITEMS = join(__dirname, '../../glitch-GameServerJS/items');
@@ -374,7 +375,7 @@ describe('crops in the ground when the speed changed', () => {
     assert.equal(plotStageMs(mine), 48_000);
   });
 
-  const hasPhp = spawnSync('php', ['-v']).status === 0;
+  const hasPhp = HAS_PHP;
   it('a home\'s stored plots on the site: old ones finish on the old clock, a visitor\'s act is on the new (src/HomeTending.php)', { skip: !HAS_SITE ? 'no groddle-afternoon-site checkout' : !hasPhp ? 'no php' : false }, () => {
     const code = `require ${JSON.stringify(SITE_DIR)} . '/src/HomeTending.php'; use Groddle\\Minn\\HomeTending as H; $seeds = H::seeds();
       $in = json_decode($argv[1]); $t0 = (int) $in->t0; $out = ['pace' => $seeds['pace'], 'waterMs' => $seeds['waterMs'], 'legacyWaterMs' => $seeds['legacyWaterMs']];
@@ -399,7 +400,7 @@ describe('crops in the ground when the speed changed', () => {
       H::tickPlot($d, $t0 + 360000, $seeds); $out['guano6b'] = $d->state;
       echo json_encode($out);`;
     const plots = oldSave(T0).plots;
-    const out = JSON.parse(execFileSync('php', ['-r', code, '--', JSON.stringify({ t0: T0, plots })], { encoding: 'utf8' }));
+    const out = JSON.parse(execFileSync(PHP, ['-r', code, '--', JSON.stringify({ t0: T0, plots })], { encoding: 'utf8' }));
     assert.deepEqual(out, {
       pace: 10,
       waterMs: GARDEN_WATER_MS,

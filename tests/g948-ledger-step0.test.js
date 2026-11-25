@@ -20,10 +20,11 @@ import { GNOME_CLASS } from '../public/js/garden-gnome.js?v=d9f8e52b';
 import { NOTE_POLE_CLASS } from '../public/js/home-street-mp.js?v=2b921da4';
 import { FUNPICKLE } from '../public/js/funpickle.js?v=95796317';
 import { funpickleFeature } from '../public/js/features/funpickle-feature.js?v=214489b1';
+import { HAS_PHP, PHP } from './php.js';
 
 const root = join(import.meta.dirname, '..');
 const economy = () => JSON.parse(readFileSync(join(SITE_DIR, 'data/economy.json'), 'utf8'));
-const hasPhp = spawnSync('php', ['-v']).status === 0;
+const hasPhp = HAS_PHP;
 const skip = skipWithoutSite || !hasPhp;
 
 function php(op, args) {
@@ -37,7 +38,7 @@ function php(op, args) {
       'holdings' => LedgerMath::holdings($a[0], Economy::shared()),
       'baseline' => LedgerMath::markBaseline905($a[0]),
     });`;
-  const out = execFileSync('php', ['-r', code], { input: JSON.stringify({ op, args }) });
+  const out = execFileSync(PHP, ['-r', code], { input: JSON.stringify({ op, args }) });
   return JSON.parse(String(out), (k, v) => (Array.isArray(v) && !v.length && ['items', 'made', 'runs', 'capped', 'detail', 'held', 'spent'].includes(k) ? {} : v));
 }
 

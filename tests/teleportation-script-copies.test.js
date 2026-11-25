@@ -50,6 +50,7 @@ import { cleanContents, createDroppedItemState, dropInventoryStack, pickupDroppe
 import { cabinetPut, cabinetTake, cleanHeldList, normalizeContents } from '../public/js/home-storage.js?v=b0225465';
 import { normalizeGroundStack, normalizeItem } from '../public/js/drops-mp.js?v=6a16d73d';
 import { goodsWithHeldTags, normalizeGoods } from '../public/js/trade.js?v=5fb43d2f';
+import { HAS_PHP, PHP } from './php.js';
 
 const root = join(import.meta.dirname, '..');
 const A = { tsid: 'GA5101HF7F429V5', x: 100, y: -68, label: 'Hechey Track', hubId: '58', hubName: 'Groddle Forest' };
@@ -447,9 +448,9 @@ describe('between players', () => {
     assert.deepEqual(game.tags.script, economy.tags.script);
   });
 
-  const hasPhp = spawnSync('php', ['-v']).status === 0;
+  const hasPhp = HAS_PHP;
   const classes = ['WordFilter', 'Economy', 'CopyTags', 'LedgerMath', 'LedgerCredits', 'Ledger', 'LedgerGift', 'LedgerDrop', 'LedgerMail'];
-  const php = (call, args) => JSON.parse(String(execFileSync('php', ['-r', `
+  const php = (call, args) => JSON.parse(String(execFileSync(PHP, ['-r', `
     foreach (${JSON.stringify(classes)} as $c) require ${JSON.stringify(SITE_DIR)} . "/src/$c.php";
     $a = json_decode(stream_get_contents(STDIN), true);
     echo json_encode(${call});`], { input: JSON.stringify(args) })));

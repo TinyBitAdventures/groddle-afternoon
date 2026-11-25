@@ -36,6 +36,7 @@ import { STREET_INDEX } from '../public/js/street-loader.js?v=10376267';
 import { FROM_LIST_VERBS, playerMenuRows } from '../public/js/ui/player-menu.js?v=c573508b';
 import { FEATURES } from '../public/js/features/index.js?v=3ca4e4c5';
 import { serverPath, sitePath, skipWithoutServer, skipWithoutSite } from '../tools/repos.mjs';
+import { PHP } from './php.js';
 
 const root = join(import.meta.dirname, '..');
 const read = (rel) => readFileSync(join(root, rel), 'utf8');
@@ -607,7 +608,7 @@ describe('buddies across the repos', () => {
   });
 
   it('the site encodes ids the way the server decodes them', { skip: skipWithoutSite }, () => {
-    const php = existsSync('/opt/homebrew/bin/php') ? '/opt/homebrew/bin/php' : 'php';
+    const php = PHP;
     const src = sitePath('src/Buddies.php');
     let out;
     try {
@@ -674,7 +675,7 @@ describe('"Add to buddy list" on a player\'s page (site PlayerPages, players/bud
   it('draws the button only for another signed-in player neither blocks, in glitch.com\'s words (php)', { skip: !existsSync(join(engine, 'src/Minn/Autoloader.php')) && 'Minn Engine not found (set MINN_ENGINE_DIR)' }, () => {
     let out;
     try {
-      out = JSON.parse(execFileSync('php', [join(root, 'tests/fixtures/profiles/profile-pages.php'), engine, sitePath(''), join(root, 'public')], { encoding: 'utf8' })).buddy;
+      out = JSON.parse(execFileSync(PHP, [join(root, 'tests/fixtures/profiles/profile-pages.php'), engine, sitePath(''), join(root, 'public')], { encoding: 'utf8' })).buddy;
     } catch (err) {
       if (err.code === 'ENOENT') return; // no php here
       throw err;

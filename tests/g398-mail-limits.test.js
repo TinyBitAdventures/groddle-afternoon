@@ -19,6 +19,7 @@ import { homedir } from 'node:os';
 
 import { FORM_COPY, TURNSTILE_SCRIPT, createAccountRequests } from '../public/js/account-forms.js?v=683e1475';
 import { HAS_SITE, SITE_DIR, skipWithoutSite } from '../tools/repos.mjs';
+import { PHP } from './php.js';
 
 const root = join(import.meta.dirname, '..');
 const read = (rel) => readFileSync(join(root, rel), 'utf8');
@@ -156,7 +157,7 @@ describe('the site: email limits and Turnstile (groddle-afternoon-site)', { skip
   const noEngine = !existsSync(join(engine, 'src/Minn/Autoloader.php')) && 'Minn Engine not found (set MINN_ENGINE_DIR)';
 
   it('the rules: /64 for IPv6, the reset decision, the ceiling option, Turnstile\'s answers (php)', { skip: noEngine }, () => {
-    const out = JSON.parse(execFileSync('php', [join(root, 'tests/fixtures/minn-accounts/mail-limits.php'), engine, SITE_DIR], { encoding: 'utf8' }));
+    const out = JSON.parse(execFileSync(PHP, [join(root, 'tests/fixtures/minn-accounts/mail-limits.php'), engine, SITE_DIR], { encoding: 'utf8' }));
     assert.deepEqual(out.addresses, {
       '203.0.113.7': '203.0.113.7',
       '2001:db8:abcd:12:1:2:3:4': '2001:db8:abcd:12::/64',

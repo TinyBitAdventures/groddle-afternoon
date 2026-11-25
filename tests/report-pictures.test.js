@@ -17,6 +17,7 @@ import { REPORT_PICTURE, REPORT_TEXT as T, createReportsApi, messagePictures, pi
 import { mountReportsSheet } from '../public/js/ui/reports-sheet.js?v=92486673';
 import { LIGHTBOX_TEXT, galleryStep, openLightbox } from '../public/js/ui/picture-lightbox.js?v=e049f063';
 import { SITE_DIR, sitePath, skipWithoutSite } from '../tools/repos.mjs';
+import { HAS_PHP, PHP, phpSkip } from './php.js';
 
 const root = join(import.meta.dirname, '..');
 const read = (p) => readFileSync(join(root, p), 'utf8');
@@ -26,7 +27,7 @@ const waitFor = async (ok, ms = 5000) => {
   while (!ok() && Date.now() < end) await wait(5);
   assert.ok(ok(), 'timed out');
 };
-const hasPhp = spawnSync('php', ['-v']).status === 0;
+const hasPhp = HAS_PHP;
 const engine = process.env.MINN_ENGINE_DIR || join(homedir(), 'Cove/Sites/minn-engine.localhost/public/minn');
 const noEngine = !existsSync(join(engine, 'src/Minn/Autoloader.php')) && 'Minn Engine not found (set MINN_ENGINE_DIR)';
 const JPEG = (tag) => `data:image/jpeg;base64,${Buffer.from(`jpeg ${tag} ${'x'.repeat(30)}`).toString('base64')}`;
@@ -480,8 +481,8 @@ describe('the site keeps several a message (groddle-afternoon-site)', { skip: sk
     assert.match(src('src/AdminTickets.php'), /"pictures" the message's own pictures in order/);
   });
 
-  it('the rules, run (php): addresses, the lists, the limits, the body', { skip: (!hasPhp && 'no php') || noEngine }, () => {
-    const out = JSON.parse(execFileSync('php', [join(root, 'tests/fixtures/minn-accounts/tickets.php'), engine, SITE_DIR], { encoding: 'utf8' })).replyPictures;
+  it('the rules, run (php): addresses, the lists, the limits, the body', { skip: phpSkip('gd') || noEngine }, () => {
+    const out = JSON.parse(execFileSync(PHP, [join(root, 'tests/fixtures/minn-accounts/tickets.php'), engine, SITE_DIR], { encoding: 'utf8' })).replyPictures;
     assert.deepEqual(out.byMessage['9'].map((p) => p.url), ['/report-pictures/3/9/1', '/report-pictures/3/9/2'], 'in order; a position past four is never listed');
     assert.deepEqual(out.out[1].pictures.map((p) => pictureSrc(p)), ['/report-pictures/3/9/1', '/report-pictures/3/9/2'], 'the game shows what the site sends');
     assert.deepEqual(out.out[2].pictures, [], 'an administrator\'s message has none');

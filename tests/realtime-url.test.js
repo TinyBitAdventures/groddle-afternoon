@@ -12,6 +12,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { socketUrl } from '../public/js/realtime-client.js?v=9471ca67';
+import { PHP } from './php.js';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const siteDir = process.env.GRODDLE_SITE_DIR || join(root, '..', 'groddle-afternoon-site');
@@ -19,7 +20,7 @@ const ticketPhp = join(siteDir, 'src/RealtimeTicket.php');
 
 function siteUrl(value) {
   const define = value === undefined ? '' : `define('GRODDLE_REALTIME_URL', ${JSON.stringify(value)});`;
-  return execFileSync('php', ['-r', `${define} require ${JSON.stringify(ticketPhp)}; echo json_encode(Groddle\\Minn\\RealtimeTicket::socketUrl());`], { encoding: 'utf8' }).trim();
+  return execFileSync(PHP, ['-r', `${define} require ${JSON.stringify(ticketPhp)}; echo json_encode(Groddle\\Minn\\RealtimeTicket::socketUrl());`], { encoding: 'utf8' }).trim();
 }
 
 describe('the realtime server address', () => {

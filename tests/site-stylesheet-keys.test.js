@@ -17,8 +17,9 @@ import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'nod
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { sitePath, skipWithoutSite } from '../tools/repos.mjs';
+import { HAS_PHP, PHP } from './php.js';
 
-const php = spawnSync('php', ['-v']).status === 0 ? 'php' : null;
+const php = HAS_PHP ? PHP : null;
 const skip = skipWithoutSite || (!php && 'no php');
 const key = (text) => createHash('sha256').update(text).digest('hex').slice(0, 8);
 

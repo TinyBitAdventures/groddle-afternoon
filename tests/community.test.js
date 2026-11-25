@@ -24,15 +24,16 @@ import { NOTICE_MAX, communityNoticeHtml, communityNoticesFrom, normalCommunityN
 import { EARLIER_MAX, WEB_TAG, chatLine, historyKey, mergeEarlier, oldestLid, shownName } from '../public/js/groups.js?v=a0391f9a';
 import { mergeEarlierIms, oldestAt } from '../public/js/player-im.js?v=87bdb8ec';
 import { communityMpFeature, createCommunitySession } from '../public/js/features/community-mp-feature.js?v=66281288';
+import { HAS_PHP, PHP } from './php.js';
 
 const root = join(import.meta.dirname, '..');
 const read = (p) => readFileSync(join(root, p), 'utf8');
-const hasPhp = spawnSync('php', ['-v']).status === 0;
+const hasPhp = HAS_PHP;
 const skipPhp = skipWithoutSite || (!hasPhp && 'no php');
 
 function php(body) {
   const code = `foreach (['WordFilter', 'BugReports', 'AdminConsole', 'CommunityText', 'Community', 'ChatHistory', 'Notifications', 'CommunityPages'] as $c) require ${JSON.stringify(SITE_DIR)} . "/src/$c.php"; use Groddle\\Minn\\CommunityText as T; use Groddle\\Minn\\ChatHistory; use Groddle\\Minn\\Notifications as N; use Groddle\\Minn\\CommunityPages as P; echo json_encode(${body}, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);`;
-  return JSON.parse(execFileSync('php', ['-r', code]).toString());
+  return JSON.parse(execFileSync(PHP, ['-r', code]).toString());
 }
 const phpString = (s) => `base64_decode('${Buffer.from(s).toString('base64')}')`;
 

@@ -150,7 +150,7 @@ try {
     $at = microtime(true) + 1.5;
     $procs = [];
     foreach ([BO, CY] as $who) {
-        $cmd = [PHP_BINARY, '-d', 'display_errors=stderr', '-d', 'extension=mysqli', __FILE__, $engine, $extension, $host, $user, $pass, 'race', $name, (string) $who, sprintf('%.6F', $at)];
+        $cmd = [getenv('GRODDLE_PHP') ?: PHP_BINARY, '-d', 'display_errors=stderr', '-d', 'extension=mysqli', __FILE__, $engine, $extension, $host, $user, $pass, 'race', $name, (string) $who, sprintf('%.6F', $at)];
         $p = proc_open($cmd, [1 => ['pipe', 'w'], 2 => ['pipe', 'w']], $pipes);
         $procs[] = [$p, $pipes];
     }

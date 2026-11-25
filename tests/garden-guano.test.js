@@ -29,6 +29,7 @@ import { actionDurationFor, actionLabelFor } from '../public/js/action-timing.js
 import { gardenPlotEvents } from '../public/js/quest-offers.js?v=ea6fde02';
 import { applyTendAct, normalizeTendActs, plotsSnapshot, tendAct, tendedText } from '../public/js/neighbours-mp.js?v=e912be37';
 import { guanoOver, plotHit } from '../public/js/features/garden-guano-feature.js?v=2468fc11';
+import { HAS_PHP, PHP } from './php.js';
 
 const NOW = 1_000_000_000;
 
@@ -228,7 +229,7 @@ describe('G403 by a key-holder on a visit', () => {
     assert.ok(normalizeTendActs(acts.map((act) => ({ id: 'x', garden: 'g', plot: '1-1', act }))).length === acts.length);
   });
 
-  it('the site keeps the same rules (src/HomeTending.php)', { skip: !HAS_SITE || spawnSync('php', ['-v']).status !== 0 }, () => {
+  it('the site keeps the same rules (src/HomeTending.php)', { skip: !HAS_SITE || !HAS_PHP }, () => {
     const code = `foreach (['Economy', 'LedgerMath', 'WordFilter', 'ButlerParcels', 'ButlerGifts', 'HomeTending'] as $c) require ${JSON.stringify(SITE_DIR)} . "/src/$c.php"; use Groddle\\Minn\\HomeTending;
       $seeds = ['waterMs' => 43200000, 'seeds' => ['seed_potato' => ['t' => 'default', 'g1' => 48000, 'g2' => 44000]]];
       $wet = fn (string $state, array $o = []) => (object) ($o + ['state' => $state, 'seed' => 'seed_potato', 'wet' => true, 'wetAt' => 0, 'stageStartedAt' => 0, 'growthMs' => 0, 'growModifier' => 1]);
@@ -254,7 +255,7 @@ describe('G403 by a key-holder on a visit', () => {
       HomeTending::applyAct($shoots, 'harvest', '', 9000, $seeds);
       $out[] = $shoots->fertilized;
       echo json_encode($out);`;
-    assert.deepEqual(JSON.parse(execFileSync('php', ['-r', code], { encoding: 'utf8' })), [
+    assert.deepEqual(JSON.parse(execFileSync(PHP, ['-r', code], { encoding: 'utf8' })), [
       null,
       null,
       'You need to water it more first!',

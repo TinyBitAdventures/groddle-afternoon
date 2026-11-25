@@ -23,6 +23,7 @@ import { SITE_DIR, serverPath, sitePath, skipWithoutServer, skipWithoutSite } fr
 import { CHANGE_NAME_COPY, RENAME_COST, RENAME_DAYS, applyRename, mountChangeName, renameDate, renameProblem } from '../public/js/change-name.js?v=4685ccda';
 import { createMinnAccountCore } from '../public/js/minn-account-core.js?v=5baee954';
 import { createRealtimeClient } from '../public/js/realtime-client.js?v=9471ca67';
+import { PHP } from './php.js';
 
 const root = join(import.meta.dirname, '..');
 const pub = (f) => readFileSync(join(root, 'public', f), 'utf8');
@@ -240,7 +241,7 @@ describe('G1213: the site keeps it and tells the realtime server', { skip: skipW
   });
 
   const engineDir = process.env.MINN_ENGINE_DIR || join(homedir(), 'Cove/Sites/minn-engine.localhost/public/minn');
-  const hasPhp = spawnSync('php', ['-r', 'exit(extension_loaded("mysqli") ? 0 : 1);']).status === 0;
+  const hasPhp = spawnSync(PHP, ['-r', 'exit(extension_loaded("mysqli") ? 0 : 1);']).status === 0;
   function mysql() {
     const env = String(process.env.GRODDLE_TEST_MYSQL || '').trim();
     if (env) {
@@ -254,13 +255,13 @@ describe('G1213: the site keeps it and tells the realtime server', { skip: skipW
     return def('DB_HOST') && def('DB_USER') ? { host: def('DB_HOST'), user: def('DB_USER'), pass: def('DB_PASSWORD') || '' } : null;
   }
   const db = mysql();
-  const reachable = db && hasPhp && spawnSync('php', ['-r', 'mysqli_report(MYSQLI_REPORT_OFF); $m = @new mysqli($argv[1], $argv[2], $argv[3]); exit($m->connect_errno ? 1 : 0);', db.host, db.user, db.pass]).status === 0;
+  const reachable = db && hasPhp && spawnSync(PHP, ['-r', 'mysqli_report(MYSQLI_REPORT_OFF); $m = @new mysqli($argv[1], $argv[2], $argv[3]); exit($m->connect_errno ? 1 : 0);', db.host, db.user, db.pass]).status === 0;
   const skipDb = (!hasPhp && 'no php with mysqli')
     || (!existsSync(join(engineDir, 'src/Minn/Autoloader.php')) && 'Minn Engine not found (set MINN_ENGINE_DIR)')
     || (!reachable && 'no MariaDB to make a throwaway database on (set GRODDLE_TEST_MYSQL)');
 
   it('on a throwaway database: the rules, the wait, the cost in the same transaction, the old address, formerly', { skip: skipDb }, () => {
-    const r = JSON.parse(execFileSync('php', [join(root, 'tests/fixtures/character-name/character-name.php'), engineDir, SITE_DIR, db.host, db.user, db.pass], { timeout: 90000 }).toString());
+    const r = JSON.parse(execFileSync(PHP, [join(root, 'tests/fixtures/character-name/character-name.php'), engineDir, SITE_DIR, db.host, db.user, db.pass], { timeout: 90000 }).toString());
     assert.equal(r.error, undefined, r.error);
     assert.equal(r.dropped, true);
     assert.deepEqual(r.before.body, { name: 'Ada', cost: 1000, days: 30, nextAt: null, currants: 1500, formerly: null });

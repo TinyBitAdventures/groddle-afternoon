@@ -29,9 +29,10 @@ import { FURNITURE_STARTER_KIT } from '../public/js/homes-catalog.js?v=0367f90f'
 import { arrangeStarterRoom, createHomeDecorState, grantStarterKit } from '../public/js/home-decor.js?v=31f37d9b';
 import { takeFromHouse } from '../public/js/ledger-house.js?v=b34f5c89';
 import { applyCorrection } from '../public/js/features/ledger-feature.js?v=aae43c2d';
+import { HAS_PHP, PHP } from './php.js';
 
 const root = join(import.meta.dirname, '..');
-const hasPhp = spawnSync('php', ['-v']).status === 0;
+const hasPhp = HAS_PHP;
 const skip = skipWithoutSite || !hasPhp;
 
 function php(op, args) {
@@ -48,7 +49,7 @@ function php(op, args) {
       'baseline' => LedgerMath::baseline($a[0], $e),
     };
     echo json_encode($out);`;
-  const out = execFileSync('php', ['-r', code], { input: JSON.stringify({ op, args }) });
+  const out = execFileSync(PHP, ['-r', code], { input: JSON.stringify({ op, args }) });
   return JSON.parse(String(out), (k, v) => (Array.isArray(v) && !v.length && ['items', 'made', 'runs', 'capped', 'detail'].includes(k) ? {} : v));
 }
 

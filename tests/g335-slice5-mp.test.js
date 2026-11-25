@@ -19,8 +19,9 @@ import { SERVER_DIR, SITE_DIR, skipWithoutServer, skipWithoutSite } from '../too
 import { actMessage } from '../public/js/street-objects.js?v=4ce8ad4f';
 import { powdersFeature } from '../public/js/features/powders-feature.js?v=83dfc135';
 import { tradeTable } from '../tools/build-realtime-trade.mjs';
+import { HAS_PHP, PHP } from './php.js';
 
-const hasPhp = spawnSync('php', ['-v']).status === 0;
+const hasPhp = HAS_PHP;
 const skip = skipWithoutSite || !hasPhp;
 const root = join(import.meta.dirname, '..');
 const read = (rel) => readFileSync(join(root, rel), 'utf8');
@@ -39,7 +40,7 @@ function php(op, args) {
       'classes' => LedgerUse::CLASSES,
     };
     echo json_encode($out);`;
-  return JSON.parse(String(execFileSync('php', ['-r', code], { input: JSON.stringify({ op, args }) })));
+  return JSON.parse(String(execFileSync(PHP, ['-r', code], { input: JSON.stringify({ op, args }) })));
 }
 
 /** A save's entries with this pack and these feature slices. */

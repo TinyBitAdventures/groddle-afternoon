@@ -18,6 +18,7 @@ import { execFileSync, spawnSync } from 'node:child_process';
 
 import { partySpacesFeature } from '../public/js/features/party-spaces-feature.js?v=0d4172c8';
 import { HAS_SERVER, HAS_SITE, SITE_DIR, serverPath, sitePath } from '../tools/repos.mjs';
+import { HAS_PHP, PHP } from './php.js';
 
 const PACK = 'party_pack_toxic_moon';
 const VIEW = { id: '00000000000000a1', street: 'PARTY_00000000000000A1', template: 'moon', label: 'Toxic Moon', pack: PACK, taster: false, creator: { id: 1, name: 'Ada' }, left: 3_600_000, extensions: 0, warned: false };
@@ -182,7 +183,7 @@ describe('the server keeps parties and gives spends back (party_persist.go, part
   });
 });
 
-const hasPhp = spawnSync('php', ['-v']).status === 0;
+const hasPhp = HAS_PHP;
 const skipSite = !HAS_SITE ? 'no groddle-afternoon-site checkout' : !hasPhp ? 'no php' : false;
 
 describe('the site\'s refund (LedgerSpend.php)', { skip: skipSite }, () => {
@@ -212,7 +213,7 @@ describe('the site\'s refund (LedgerSpend.php)', { skip: skipSite }, () => {
       $twice = LedgerMath::applyTrade($after, 'party-00000000000000a9-r', $none, $pack);
       $s = json_decode($twice['playerState'], true);
       echo json_encode(['view' => $view, 'inv' => $s['inventory'], 'applied' => LedgerMath::applied($twice)]);`;
-    const out = JSON.parse(execFileSync('php', ['-r', code]).toString());
+    const out = JSON.parse(execFileSync(PHP, ['-r', code]).toString());
     assert.deepEqual(out.view, { items: { party_pack_toxic_moon: 1 }, currants: 500 });
     assert.equal(out.inv.party_pack_toxic_moon, 1);
     assert.deepEqual(out.applied, ['party-00000000000000a9-r']);

@@ -16,10 +16,11 @@ import { ADMIN_TEXT, ADMIN_TEXT_MAX, adminGiveGoods, adminMessageText, applyAdmi
 import { CLOSE_BANNED, CLOSE_BOOTED, createRealtimeClient } from '../public/js/realtime-client.js?v=9471ca67';
 import { statusText } from '../public/js/features/realtime-feature.js?v=ff77623a';
 import { GATE_COPY, suspendedNow } from '../public/js/online-boot.js?v=f1f2766b';
+import { HAS_PHP, PHP } from './php.js';
 
 const root = join(import.meta.dirname, '..');
 const read = (p) => readFileSync(join(root, p), 'utf8');
-const hasPhp = spawnSync('php', ['-v']).status === 0;
+const hasPhp = HAS_PHP;
 const flush = () => new Promise((r) => setImmediate(r));
 
 function fakeEngine({ applied = [] } = {}) {
@@ -273,7 +274,7 @@ describe('the console page (groddle-afternoon-site console/console.js)', { skip:
 
 describe('the site routes (groddle-afternoon-site AdminConsole, AdminConsolePage)', { skip: skipWithoutSite || (!hasPhp && 'no php') }, () => {
   function php(code) {
-    const out = execFileSync('php', ['-r', `foreach (['ServiceCall', 'AdminConsole'] as $c) require ${JSON.stringify(SITE_DIR)} . "/src/$c.php"; use Groddle\\Minn\\{AdminConsole, ServiceCall}; echo json_encode(${code}, JSON_UNESCAPED_UNICODE);`]);
+    const out = execFileSync(PHP, ['-r', `foreach (['ServiceCall', 'AdminConsole'] as $c) require ${JSON.stringify(SITE_DIR)} . "/src/$c.php"; use Groddle\\Minn\\{AdminConsole, ServiceCall}; echo json_encode(${code}, JSON_UNESCAPED_UNICODE);`]);
     return JSON.parse(String(out));
   }
 
@@ -401,7 +402,7 @@ describe('the realtime server (groddle-afternoon-server admin.go)', { skip: skip
 
 describe('the chat log (Austin 2026-10-31: chat written down for spam and abuse moderation)', { skip: skipWithoutSite || skipWithoutServer }, async () => {
   const mod = HAS_SITE ? await import(pathToFileURL(sitePath('console/console.js')).href) : {};
-  const php = (code) => JSON.parse(String(execFileSync('php', ['-r', `foreach (['ServiceCall', 'AdminConsole'] as $c) require ${JSON.stringify(SITE_DIR)} . "/src/$c.php"; use Groddle\\Minn\\AdminConsole; echo json_encode(${code}, JSON_UNESCAPED_UNICODE);`])));
+  const php = (code) => JSON.parse(String(execFileSync(PHP, ['-r', `foreach (['ServiceCall', 'AdminConsole'] as $c) require ${JSON.stringify(SITE_DIR)} . "/src/$c.php"; use Groddle\\Minn\\AdminConsole; echo json_encode(${code}, JSON_UNESCAPED_UNICODE);`])));
 
   it('a player\'s menu has Chat history for anyone, yourself and the offline too, and it opens the tab filtered to them', () => {
     for (const [p, opts] of [[{ id: 9 }, { me: 1, online: false }], [{ id: 1, admin: true }, { me: 1, online: true }], [{ id: 9, banned: true }, { me: 1 }]]) {
@@ -513,7 +514,7 @@ describe('the chat log (Austin 2026-10-31: chat written down for spam and abuse 
 
 describe('ending a Rook attack from the console (Austin 2026-11-03: three players on Groddle Forest Junction could not fight one)', { skip: skipWithoutSite || skipWithoutServer }, async () => {
   const mod = HAS_SITE ? await import(pathToFileURL(sitePath('console/console.js')).href) : {};
-  const php = (code) => JSON.parse(String(execFileSync('php', ['-r', `foreach (['ServiceCall', 'AdminConsole'] as $c) require ${JSON.stringify(SITE_DIR)} . "/src/$c.php"; use Groddle\\Minn\\AdminConsole; echo json_encode(${code}, JSON_UNESCAPED_UNICODE);`])));
+  const php = (code) => JSON.parse(String(execFileSync(PHP, ['-r', `foreach (['ServiceCall', 'AdminConsole'] as $c) require ${JSON.stringify(SITE_DIR)} . "/src/$c.php"; use Groddle\\Minn\\AdminConsole; echo json_encode(${code}, JSON_UNESCAPED_UNICODE);`])));
 
   it('words each attack: phase, health, stun, wing beats, who is there; End attack only while it is not leaving', () => {
     const a = { street: { tsid: 'GCRC6VC9MAO1Q7F', label: 'Groddle Forest Junction' }, phase: 'build_up', health: 300, maxHealth: 300, stun: 0, maxStun: 200, wingBeats: 1, players: [{ id: 7, name: 'Ada' }, { id: 8, name: 'Bo' }, { id: 9, name: 'Cy' }] };

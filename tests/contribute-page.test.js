@@ -18,13 +18,14 @@ import { charges, contributeData, ledgerTotals, parseDate, toCents } from '../to
 import { BANDS, EMAIL, SPONSORS, contributeContent } from '../tools/contribute/to-minn.mjs';
 import { servedByMinn } from './minn-served.js';
 import { sitePath, skipWithoutSite } from '../tools/repos.mjs';
+import { PHP } from './php.js';
 
 const root = join(import.meta.dirname, '..');
 const data = JSON.parse(readFileSync(join(root, 'public/contribute/data.json'), 'utf8'));
 const ledger = JSON.parse(readFileSync(join(root, 'tools/contribute/ledger.json'), 'utf8'));
 
 let php = true;
-try { execFileSync('php', ['-v'], { stdio: 'ignore' }); } catch { php = false; }
+try { execFileSync(PHP, ['-v'], { stdio: 'ignore' }); } catch { php = false; }
 const skipPhp = skipWithoutSite || (php ? false : 'no php on PATH');
 
 /**
@@ -49,7 +50,7 @@ $d = json_decode(file_get_contents(${JSON.stringify(join(dir, 'data.json'))}), t
 ${body}
 }
 `);
-    return execFileSync('php', [join(dir, 'run.php')], { encoding: 'utf8' });
+    return execFileSync(PHP, [join(dir, 'run.php')], { encoding: 'utf8' });
   } finally {
     rmSync(dir, { recursive: true, force: true });
   }

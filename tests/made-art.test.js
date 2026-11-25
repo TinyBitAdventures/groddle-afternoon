@@ -16,6 +16,7 @@ import { build, dateLabel, playerWords, readMore, webpSize, wordProblems } from 
 import { FOOT, withMade } from '../tools/made-art/to-minn.mjs';
 import { madeBand, restorationContent } from '../tools/restoration/to-minn.mjs';
 import { GAME_DIR, SITE_DIR, sitePath, skipWithoutSite } from '../tools/repos.mjs';
+import { PHP } from './php.js';
 
 const readJson = (path) => JSON.parse(readFileSync(path, 'utf8'));
 const made = readJson(join(GAME_DIR, 'public/restoration/made.json'));
@@ -25,7 +26,7 @@ const builder = join(GAME_DIR, 'tools/made-art/build-data.mjs');
 
 let hasPhp = true;
 try {
-  execFileSync('php', ['-v'], { stdio: 'ignore' });
+  execFileSync(PHP, ['-v'], { stdio: 'ignore' });
 } catch {
   hasPhp = false;
 }
@@ -37,7 +38,7 @@ function draw(data) {
   const file = join(dir, 'in.json');
   writeFileSync(file, JSON.stringify(data));
   try {
-    return execFileSync('php', ['-r', `require ${JSON.stringify(join(SITE_DIR, 'src/RestorationMade.php'))}; echo Groddle\\Minn\\RestorationMade::draw(json_decode(file_get_contents(${JSON.stringify(file)}), true));`], { encoding: 'utf8' });
+    return execFileSync(PHP, ['-r', `require ${JSON.stringify(join(SITE_DIR, 'src/RestorationMade.php'))}; echo Groddle\\Minn\\RestorationMade::draw(json_decode(file_get_contents(${JSON.stringify(file)}), true));`], { encoding: 'utf8' });
   } finally {
     rmSync(dir, { recursive: true, force: true });
   }

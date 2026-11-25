@@ -41,6 +41,7 @@ import { cleanCaption } from '../public/js/snaps.js?v=b5be8bff';
 import { sauceLabel, sauceStreetLine } from '../public/js/potions.js?v=4f4c996d';
 import { groupNameProblem } from '../public/js/groups.js?v=a0391f9a';
 import { characterNameProblem } from '../public/js/account-forms.js?v=683e1475';
+import { HAS_PHP, PHP } from './php.js';
 
 const ROOT = join(import.meta.dirname, '..');
 const read = (rel) => readFileSync(join(ROOT, rel), 'utf8');
@@ -160,12 +161,12 @@ describe('the list reaches the server and the site (tools/build-word-filter.mjs)
   });
 });
 
-const hasPhp = spawnSync('php', ['-v']).status === 0;
+const hasPhp = HAS_PHP;
 const ENGINE = process.env.MINN_ENGINE_DIR || join(homedir(), 'Cove/Sites/minn-engine.localhost/public/minn');
 const skipPhp = !HAS_SITE ? 'no site checkout' : !hasPhp ? 'no php' : !existsSync(join(ENGINE, 'src/Minn/Autoloader.php')) ? 'Minn Engine not found (set MINN_ENGINE_DIR)' : false;
 
 describe("the site's twin (src/WordFilter.php)", { skip: skipPhp }, () => {
-  const out = skipPhp ? null : JSON.parse(execFileSync('php', [join(ROOT, 'tests/fixtures/word-filter/site.php'), ENGINE, SITE_DIR, VECTORS], { encoding: 'utf8' }));
+  const out = skipPhp ? null : JSON.parse(execFileSync(PHP, [join(ROOT, 'tests/fixtures/word-filter/site.php'), ENGINE, SITE_DIR, VECTORS], { encoding: 'utf8' }));
 
   it('passes the same vectors', () => {
     assert.equal(out.vectors, vectors.length);

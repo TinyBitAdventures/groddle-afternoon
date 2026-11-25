@@ -16,9 +16,10 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { SITE_DIR, sitePath, skipWithoutSite } from '../tools/repos.mjs';
+import { HAS_PHP, PHP } from './php.js';
 
 const root = join(import.meta.dirname, '..');
-const hasPhp = spawnSync('php', ['-v']).status === 0;
+const hasPhp = HAS_PHP;
 const skip = skipWithoutSite || (!hasPhp && 'needs the php CLI');
 
 /**
@@ -53,7 +54,7 @@ function watch({ writes = [], log = [], trades = [], context = {}, since = '2026
     foreach (['names', 'ledger', 'created'] as $k) $ctx[$k] = array_combine(array_map('intval', array_keys($ctx[$k] ?? [])), array_values($ctx[$k] ?? []));
     echo json_encode(LedgerWatch::report($acc, $ctx, $in['since'], $in['today'], $in['days']));`;
   const input = JSON.stringify({ writes, log, trades, context, since, today, days });
-  return JSON.parse(String(execFileSync('php', ['-r', code], { input })));
+  return JSON.parse(String(execFileSync(PHP, ['-r', code], { input })));
 }
 
 /** One PHP expression's value (the watch's constants and helpers). */
@@ -62,7 +63,7 @@ function phpValue(expr) {
     foreach (['Economy', 'LedgerMath', 'Ledger', 'Characters', 'LedgerWatch'] as $c) require ${JSON.stringify(SITE_DIR)} . "/src/$c.php";
     use Groddle\\Minn\\{Economy, LedgerMath, Ledger, LedgerWatch};
     echo json_encode(${expr});`;
-  return JSON.parse(String(execFileSync('php', ['-r', code])));
+  return JSON.parse(String(execFileSync(PHP, ['-r', code])));
 }
 
 const economy = () => JSON.parse(readFileSync(sitePath('data', 'economy.json'), 'utf8'));

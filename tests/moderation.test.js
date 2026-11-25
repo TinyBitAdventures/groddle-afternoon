@@ -17,11 +17,12 @@ import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { SITE_DIR, serverPath, sitePath, skipWithoutServer, skipWithoutSite } from '../tools/repos.mjs';
 import { purgeOf, purged, withoutPurged } from '../public/js/chat-purge.js?v=6c41f62d';
+import { HAS_PHP, PHP } from './php.js';
 
 const root = join(import.meta.dirname, '..');
 const game = (f) => readFileSync(join(root, 'public', f), 'utf8');
 const site = (f) => readFileSync(sitePath(f), 'utf8');
-const hasPhp = spawnSync('php', ['-v']).status === 0;
+const hasPhp = HAS_PHP;
 
 describe('nothing in the game reports an IM', () => {
   it('no Report on an IM line or a conversation, no report window, no report call, in either skin', () => {
@@ -138,7 +139,7 @@ describe('the site: the queue, the token and the routes', { skip: skipWithoutSit
         'bearer' => T::fromHeaders('Bearer ' . $t, null), 'header' => T::fromHeaders(null, $t), 'basic' => T::fromHeaders('Basic abc', null),
         'hash' => T::hash(str_repeat('A', 43)), 'caps' => T::CAPS,
       ]);`;
-    const out = JSON.parse(execFileSync('php', ['-r', php]).toString());
+    const out = JSON.parse(execFileSync(PHP, ['-r', php]).toString());
     assert.deepEqual(out.parse, ['0123456789abcdef', 'A'.repeat(43)]);
     assert.equal(out.bad, null);
     assert.ok(out.bearer.startsWith('gmod_') && out.header === out.bearer && out.basic === null);
@@ -153,7 +154,7 @@ describe('the site: the queue, the token and the routes', { skip: skipWithoutSit
     const php = `require ${JSON.stringify(SITE_DIR + '/src/ModTokens.php')}; use Groddle\\Minn\\ModTokens as T;
       $made = '2026-11-01 00:00:00'; $t = strtotime($made . ' UTC');
       echo json_encode(['days' => T::EXPIRE_DAYS, 'day89' => T::expired($made, $t + 89 * 86400), 'day90' => T::expired($made, $t + 90 * 86400), 'at' => T::expiresAt($made) - $t]);`;
-    const out = JSON.parse(execFileSync('php', ['-r', php]).toString());
+    const out = JSON.parse(execFileSync(PHP, ['-r', php]).toString());
     assert.deepEqual(out, { days: 90, day89: false, day90: true, at: 90 * 86400 });
     const tokens = site('src/ModTokens.php');
     const verify = tokens.slice(tokens.indexOf('public function verify('), tokens.indexOf('public static function expiresAt('));
@@ -166,7 +167,7 @@ describe('the site: the queue, the token and the routes', { skip: skipWithoutSit
     const php = `foreach (['ModTokens', 'Moderation'] as $c) require ${JSON.stringify(SITE_DIR)} . "/src/$c.php"; use Groddle\\Minn\\Moderation as M;
       $nine = range(1, 9); $ten = range(1, 10);
       echo json_encode(['cap' => M::TOKEN_DAILY_PLAYERS, 'ninth' => M::withinDaily($nine, 50), 'eleventh' => M::withinDaily($ten, 50), 'again' => M::withinDaily($ten, 3), 'repeats' => M::withinDaily([1, 1, 1, 2, 2, 3, 3, 4, 5, 6, 7, 8, 9], 50)]);`;
-    const out = JSON.parse(execFileSync('php', ['-r', php]).toString());
+    const out = JSON.parse(execFileSync(PHP, ['-r', php]).toString());
     assert.deepEqual(out, { cap: 10, ninth: true, eleventh: false, again: true, repeats: true });
     const mod = site('src/Moderation.php');
     for (const fn of ['ban', 'purge']) {

@@ -21,10 +21,11 @@ import { homedir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { SITE_DIR, skipWithoutSite } from '../tools/repos.mjs';
+import { HAS_PHP, PHP, phpSkip } from './php.js';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const engine = process.env.MINN_ENGINE_DIR || join(homedir(), 'Cove/Sites/minn-engine.localhost/public/minn');
-const hasPhp = spawnSync('php', ['-v']).status === 0;
+const hasPhp = HAS_PHP;
 
 /** The database to make the throwaway one on: GRODDLE_TEST_MYSQL, else the local groddle.localhost's wp-config. */
 function mysql() {
@@ -43,16 +44,16 @@ function mysql() {
 }
 
 const db = mysql();
-const reachable = db && hasPhp && spawnSync('php', ['-r', 'mysqli_report(MYSQLI_REPORT_OFF); $m = @new mysqli($argv[1], $argv[2], $argv[3]); exit($m->connect_errno ? 1 : 0);', db.host, db.user, db.pass]).status === 0;
+const reachable = db && hasPhp && spawnSync(PHP, ['-r', 'mysqli_report(MYSQLI_REPORT_OFF); $m = @new mysqli($argv[1], $argv[2], $argv[3]); exit($m->connect_errno ? 1 : 0);', db.host, db.user, db.pass]).status === 0;
 const skip = skipWithoutSite
-  || (!hasPhp && 'no php')
+  || phpSkip('mysqli')
   || (!existsSync(join(engine, 'src/Minn/Autoloader.php')) && 'Minn Engine not found (set MINN_ENGINE_DIR)')
   || (!reachable && 'no MariaDB to make a throwaway database on (set GRODDLE_TEST_MYSQL)');
 
 describe('G1249: a machine on an upper floor of the house, through the ledger (HomeMachines)', { skip }, () => {
   let r;
   before(() => {
-    r = JSON.parse(execFileSync('php', [join(root, 'tests/fixtures/home-machines/ledger-machines.php'), engine, SITE_DIR, db.host, db.user, db.pass], { timeout: 90000 }).toString());
+    r = JSON.parse(execFileSync(PHP, [join(root, 'tests/fixtures/home-machines/ledger-machines.php'), engine, SITE_DIR, db.host, db.user, db.pass], { timeout: 90000 }).toString());
   });
 
   it('ran on its own database and dropped it', () => {

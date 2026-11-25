@@ -22,6 +22,7 @@ import {
 import { snapsFeature } from '../public/js/features/snaps-feature.js?v=c7fe8214';
 import { FEATURES } from '../public/js/features/index.js?v=3ca4e4c5';
 import { HAS_SITE, SITE_DIR, skipWithoutSite } from '../tools/repos.mjs';
+import { PHP, phpSkip } from './php.js';
 
 const root = join(import.meta.dirname, '..');
 const read = (rel) => readFileSync(join(root, rel), 'utf8');
@@ -386,8 +387,8 @@ describe('snaps: the site (groddle-afternoon-site)', { skip: skipWithoutSite }, 
   });
 
   const engineDir = process.env.MINN_ENGINE_DIR || join(homedir(), 'Cove/Sites/minn-engine.localhost/public/minn');
-  it('checks pictures by their bytes and keeps only a new JPEG (php, when the engine is here)', { skip: !(HAS_SITE && existsSync(join(engineDir, 'src/Minn/Autoloader.php'))) && 'Minn Engine not found (set MINN_ENGINE_DIR)' }, () => {
-    const out = JSON.parse(execFileSync('php', [join(root, 'tests/fixtures/snaps/snap-image.php'), engineDir, SITE_DIR], { encoding: 'utf8' }));
+  it('checks pictures by their bytes and keeps only a new JPEG (php, when the engine is here)', { skip: (!(HAS_SITE && existsSync(join(engineDir, 'src/Minn/Autoloader.php'))) && 'Minn Engine not found (set MINN_ENGINE_DIR)') || phpSkip('gd') }, () => {
+    const out = JSON.parse(execFileSync(PHP, [join(root, 'tests/fixtures/snaps/snap-image.php'), engineDir, SITE_DIR], { encoding: 'utf8' }));
     assert.deepEqual(out, {
       jpeg: 'ok:960x540:image/jpeg:clean',
       png: 'ok:960x540:image/jpeg:clean',

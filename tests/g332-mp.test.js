@@ -31,15 +31,16 @@ import {
 } from '../public/js/gifts.js?v=37ce7d76';
 import { giftsFeature } from '../public/js/features/gifts-feature.js?v=bd822828';
 import { HAS_SERVER, HAS_SITE, SITE_DIR, serverPath, sitePath } from '../tools/repos.mjs';
+import { HAS_PHP, PHP } from './php.js';
 
 const root = join(import.meta.dirname, '..');
 const TABLE = JSON.parse(readFileSync(join(root, 'public/assets/content/trade-items.json'), 'utf8'));
-const hasPhp = spawnSync('php', ['-v']).status === 0;
+const hasPhp = HAS_PHP;
 const skipSite = !HAS_SITE ? 'no groddle-afternoon-site checkout' : !hasPhp ? 'no php' : false;
 
 function php(body) {
   const code = `foreach (['Economy', 'LedgerMath', 'WordFilter', 'LedgerGift'] as $c) require ${JSON.stringify(SITE_DIR)} . "/src/$c.php"; use Groddle\\Minn\\LedgerGift; use Groddle\\Minn\\LedgerMath; use Groddle\\Minn\\Economy; ${body}`;
-  return JSON.parse(execFileSync('php', ['-r', code]).toString());
+  return JSON.parse(execFileSync(PHP, ['-r', code]).toString());
 }
 
 const OP = 'gift-00000000000000a1';

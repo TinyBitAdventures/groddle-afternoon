@@ -41,11 +41,12 @@ import {
   roadClosure,
   soloNeed,
 } from '../public/js/street-jobs.js?v=76471e42';
+import { HAS_PHP, PHP } from './php.js';
 
 const root = join(import.meta.dirname, '..');
 const catalog = JSON.parse(readFileSync(join(root, 'public/assets/content/street-jobs.json'), 'utf8'));
 const feature = readFileSync(join(root, 'public/js/features/street-jobs-feature.js'), 'utf8');
-const hasPhp = spawnSync('php', ['-v']).status === 0;
+const hasPhp = HAS_PHP;
 
 const JOB = '62'; // Build Lowland Slough from GLI57DI72HI153U: one phase
 const CLS = 'job_standard4_for_new_streets';
@@ -249,7 +250,7 @@ describe('the feature keeps solo as it was', () => {
 
 describe('the site ledger counts project records (src/LedgerMath.php)', () => {
   const skip = skipWithoutSite || !hasPhp;
-  const php = (code, input) => JSON.parse(String(execFileSync('php', ['-r', `
+  const php = (code, input) => JSON.parse(String(execFileSync(PHP, ['-r', `
     foreach (['Economy', 'LedgerMath'] as $c) require ${JSON.stringify(SITE_DIR)} . "/src/$c.php";
     use Groddle\\Minn\\{Economy, LedgerMath};
     $in = json_decode(stream_get_contents(STDIN), true);

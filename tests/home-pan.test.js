@@ -22,6 +22,7 @@ import { HOME_LIMITS } from '../public/js/homes-catalog.js?v=0367f90f';
 import { HOUSE_LOT_W, YARD_SEGMENT_W } from '../public/js/home-cultivation.js?v=2f71ba70';
 import { CAMERA_RANGE } from '../public/js/features/camera-mode-feature.js?v=c3a8efbb';
 import { SITE_DIR, skipWithoutSite } from '../tools/repos.mjs';
+import { PHP } from './php.js';
 
 const root = join(import.meta.dirname, '..');
 const read = (rel) => readFileSync(join(root, rel), 'utf8');
@@ -202,7 +203,7 @@ describe('the site side, version 2 (groddle-afternoon-site)', { skip: skipWithou
   it('takes a good street, refuses bad ones, and draws it in layers starting at the game\'s frame (php)', { skip: !existsSync(join(engine, 'src/Minn/Autoloader.php')) && 'Minn Engine not found (set MINN_ENGINE_DIR)' }, () => {
     let out;
     try {
-      out = JSON.parse(execFileSync('php', [join(root, 'tests/fixtures/profiles/home-layout.php'), engine, SITE_DIR], { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 }));
+      out = JSON.parse(execFileSync(PHP, [join(root, 'tests/fixtures/profiles/home-layout.php'), engine, SITE_DIR], { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 }));
     } catch (err) {
       if (err.code === 'ENOENT') return;
       throw err;

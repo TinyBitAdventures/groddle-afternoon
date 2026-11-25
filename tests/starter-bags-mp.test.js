@@ -20,9 +20,10 @@ import { STACKMAX, TOOL_CLASSES } from '../public/js/pack-slots-data.js?v=800f66
 import { applyStarter, bagsFeature, starterMint, starterText } from '../public/js/features/bags-feature.js?v=17bcf98a';
 import { sitePackSlotsJson, OUT } from '../tools/build-site-pack-slots.mjs';
 import { HAS_SITE, SITE_DIR } from '../tools/repos.mjs';
+import { HAS_PHP, PHP } from './php.js';
 
 const root = join(import.meta.dirname, '..');
-const hasPhp = spawnSync('php', ['-v']).status === 0;
+const hasPhp = HAS_PHP;
 const skipSite = !HAS_SITE ? 'no groddle-afternoon-site checkout' : !hasPhp ? 'no php' : false;
 const TRADE = JSON.parse(readFileSync(join(root, 'public/assets/content/trade-items.json'), 'utf8')).items;
 const TRADEABLE = Object.keys(TRADE);
@@ -49,7 +50,7 @@ function php(cases) {
       };
     }
     echo json_encode($out);`;
-  return JSON.parse(String(execFileSync('php', ['-r', code], { input: JSON.stringify(cases), maxBuffer: 64 * 1024 * 1024 })));
+  return JSON.parse(String(execFileSync(PHP, ['-r', code], { input: JSON.stringify(cases), maxBuffer: 64 * 1024 * 1024 })));
 }
 
 let seed = 20261027;

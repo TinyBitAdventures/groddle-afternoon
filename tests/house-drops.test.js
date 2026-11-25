@@ -28,6 +28,7 @@ import { homeStreetMpFeature } from '../public/js/features/home-street-mp-featur
 import { neighboursMpFeature } from '../public/js/features/neighbours-mp-feature.js?v=993b2712';
 import { OWNER_STACK_TEXT, isOwnerStackId, normalizeHomeView, normalizeOwnerStacks, ownerStacksFor, sharedHomeStreet } from '../public/js/neighbours-mp.js?v=e912be37';
 import { GAME_DIR, HAS_SERVER, HAS_SITE, SITE_DIR, serverPath } from '../tools/repos.mjs';
+import { HAS_PHP, PHP } from './php.js';
 
 const OP = 'drop-00000000000000c1';
 const OP2 = 'drop-00000000000000c2';
@@ -251,14 +252,14 @@ describe('the server and the site', () => {
     assert.doesNotMatch(go, /The house, its back yard and the Tower's floors stay each player's own/);
   });
 
-  const hasPhp = spawnSync('php', ['-v']).status === 0;
+  const hasPhp = HAS_PHP;
   const skipSite = !HAS_SITE ? 'no groddle-afternoon-site checkout' : !hasPhp ? 'no php' : false;
   it('the site takes HOUSE-<owner> and TOWER-<owner>-<floor> as drop streets', { skip: skipSite }, () => {
     const code = `require ${JSON.stringify(SITE_DIR)} . "/src/LedgerDrop.php"; use Groddle\\Minn\\LedgerDrop; echo json_encode([
       LedgerDrop::call(['op' => '${OP}', 'id' => 9, 'street' => 'HOUSE-7', 'x' => -300, 'y' => 620, 'item' => ['c' => 'cherry', 'n' => 1]])['street'] ?? null,
       LedgerDrop::call(['op' => '${OP}', 'id' => 9, 'street' => 'TOWER-123456789012345678-9', 'x' => 0, 'y' => 620, 'item' => ['c' => 'cherry', 'n' => 1]])['street'] ?? null,
     ]);`;
-    assert.deepEqual(JSON.parse(execFileSync('php', ['-r', code]).toString()), ['HOUSE-7', 'TOWER-123456789012345678-9']);
+    assert.deepEqual(JSON.parse(execFileSync(PHP, ['-r', code]).toString()), ['HOUSE-7', 'TOWER-123456789012345678-9']);
   });
 
   it('the visit sends the owner\'s house and Tower stacks, x from the house', { skip: skipSite }, () => {
@@ -269,7 +270,7 @@ describe('the server and the site', () => {
       RH_HOME_FLOOR_1: [{ id: 'world-item-8', classTsid: 'cherry', count: 1, x: 1, y: 1 }],
     } };
     const code = `foreach (["WordFilter", "Neighbours"] as $c) require ${JSON.stringify(SITE_DIR)} . "/src/$c.php"; echo json_encode(Groddle\\Minn\\Neighbours::stackRows(json_decode(${JSON.stringify(JSON.stringify(dropped))}), json_decode('{"houseX":750}')));`;
-    const rows = JSON.parse(execFileSync('php', ['-r', code]).toString());
+    const rows = JSON.parse(execFileSync(PHP, ['-r', code]).toString());
     assert.deepEqual(rows, [
       { id: 'world-item-1', place: 'house', c: MB, n: 2, x: 150, y: 620 },
       { id: 'world-item-2', place: 'house', c: 'cherry', n: 1, x: 50, y: 500, on: 3 },

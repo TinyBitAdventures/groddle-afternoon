@@ -15,6 +15,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import vm from 'node:vm';
+import { HAS_PHP, PHP } from './php.js';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const SITE_DIR = process.env.GRODDLE_SITE_DIR || join(ROOT, '..', 'groddle-afternoon-site');
@@ -380,8 +381,8 @@ describe('online: a visitor and the owner\'s Icons (shared, as Glitch)', () => {
       const r = applyIconAct({ id: 'icon1', place: 'street', ...row }, act, me);
       return r.ok ? { ok: true, actions: r.row.actions, tither: r.row.tither, was: r.tither } : { ok: false, code: r.code };
     });
-    if (!HAS_SITE || spawnSync('php', ['-v']).status !== 0) return;
-    const php = JSON.parse(execFileSync('php', ['-r', `require ${JSON.stringify(SITE_DIR)} . "/src/HomeIcons.php"; $out = []; foreach (json_decode(${JSON.stringify(JSON.stringify(cases))}, true) as [$row, $act, $me]) { $r = Groddle\\Minn\\HomeIcons::apply(['id' => 'icon1', 'place' => 'street', 'actions' => $row['actions'], 'tither' => $row['tither']], $act, $me); $out[] = $r['ok'] ? ['ok' => true, 'actions' => $r['icon']['actions'], 'tither' => $r['icon']['tither'], 'was' => $r['tither']] : ['ok' => false, 'code' => $r['code']]; } echo json_encode($out);`]).toString());
+    if (!HAS_SITE || !HAS_PHP) return;
+    const php = JSON.parse(execFileSync(PHP, ['-r', `require ${JSON.stringify(SITE_DIR)} . "/src/HomeIcons.php"; $out = []; foreach (json_decode(${JSON.stringify(JSON.stringify(cases))}, true) as [$row, $act, $me]) { $r = Groddle\\Minn\\HomeIcons::apply(['id' => 'icon1', 'place' => 'street', 'actions' => $row['actions'], 'tither' => $row['tither']], $act, $me); $out[] = $r['ok'] ? ['ok' => true, 'actions' => $r['icon']['actions'], 'tither' => $r['icon']['tither'], 'was' => $r['tither']] : ['ok' => false, 'code' => $r['code']]; } echo json_encode($out);`]).toString());
     assert.deepEqual(php, js);
     assert.deepEqual(js.map((r) => (r.ok ? `${r.actions}/${r.tither}/${r.was}` : r.code)), ['10/null/false', 'tithe_due', '15/9/false', 'no_tithe', '4/null/true', 'not_tither', '5/null/true']);
   });
@@ -402,9 +403,9 @@ describe('online: a visitor and the owner\'s Icons (shared, as Glitch)', () => {
 });
 
 describe('the site sends a visitor the owner\'s placed Icons (Neighbours::iconRows)', () => {
-  const hasPhp = spawnSync('php', ['-v']).status === 0;
+  const hasPhp = HAS_PHP;
   const skip = !HAS_SITE ? 'no groddle-afternoon-site checkout' : !hasPhp ? 'no php' : false;
-  const php = (code) => JSON.parse(execFileSync('php', ['-r', `foreach (["WordFilter", "Neighbours"] as $c) require ${JSON.stringify(SITE_DIR)} . "/src/$c.php"; ${code}`]).toString());
+  const php = (code) => JSON.parse(execFileSync(PHP, ['-r', `foreach (["WordFilter", "Neighbours"] as $c) require ${JSON.stringify(SITE_DIR)} . "/src/$c.php"; ${code}`]).toString());
 
   it('reads the giant-icons slice: home places only, cleaned, the house left out for anyone outside', { skip }, () => {
     const state = { systems: { features: { 'giant-icons': { placed: {

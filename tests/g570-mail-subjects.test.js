@@ -14,10 +14,11 @@ import { deliveryMail, mailSubject } from '../public/js/auctions.js?v=2b806ad4';
 import { NEIGHBOURS, doChore, normalizeNeighbourState, postNoteReply, visitorLetter } from '../public/js/neighbours.js?v=13f35acd';
 import { PLAYER_MAIL_TEXT, letterRow } from '../public/js/player-mail.js?v=b6003af8';
 import { HAS_SITE, SITE_DIR } from '../tools/repos.mjs';
+import { HAS_PHP, PHP } from './php.js';
 
 const root = join(import.meta.dirname, '..');
 const read = (p) => readFileSync(join(root, p), 'utf8');
-const hasPhp = spawnSync('php', ['-v']).status === 0;
+const hasPhp = HAS_PHP;
 
 describe('G570: subjects on the game\'s own letters', () => {
   it('the reader titles a letter by its subject, else as before', () => {
@@ -102,7 +103,7 @@ describe('G570: subjects on the game\'s own letters', () => {
 });
 
 describe('G570: the site titles its letters from nobody (src/LedgerMail.php subject)', { skip: !HAS_SITE ? 'no groddle-afternoon-site checkout' : !hasPhp ? 'no php' : false }, () => {
-  const php = (body) => JSON.parse(execFileSync('php', ['-r', `foreach (['Economy', 'LedgerMath', 'WordFilter', 'LedgerGift', 'LedgerMail', 'GardenPayout', 'PatchPayout', 'LedgerRefund'] as $c) require ${JSON.stringify(SITE_DIR)} . "/src/$c.php"; use Groddle\\Minn\\LedgerMail as M; use Groddle\\Minn\\GardenPayout as P; use Groddle\\Minn\\PatchPayout as Q; ${body}`]).toString());
+  const php = (body) => JSON.parse(execFileSync(PHP, ['-r', `foreach (['Economy', 'LedgerMath', 'WordFilter', 'LedgerGift', 'LedgerMail', 'GardenPayout', 'PatchPayout', 'LedgerRefund'] as $c) require ${JSON.stringify(SITE_DIR)} . "/src/$c.php"; use Groddle\\Minn\\LedgerMail as M; use Groddle\\Minn\\GardenPayout as P; use Groddle\\Minn\\PatchPayout as Q; ${body}`]).toString());
 
   it('the gardens payout\'s crops are "Your garden crops"; a player\'s letter has no subject', () => {
     const out = php(`echo json_encode([

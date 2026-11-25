@@ -20,15 +20,16 @@ import { mergeParcels, normalizeParcels } from '../public/js/neighbours-mp.js?v=
 import { nextHandover, normalizeButlerState, normalizeParcelBox } from '../public/js/butler.js?v=152429c8';
 import { giftsFeature } from '../public/js/features/gifts-feature.js?v=bd822828';
 import { HAS_SITE, SITE_DIR } from '../tools/repos.mjs';
+import { HAS_PHP, PHP } from './php.js';
 
 const root = join(import.meta.dirname, '..');
 const read = (rel) => readFileSync(join(root, rel), 'utf8');
-const hasPhp = spawnSync('php', ['-v']).status === 0;
+const hasPhp = HAS_PHP;
 const skipSite = !HAS_SITE ? 'no groddle-afternoon-site checkout' : !hasPhp ? 'no php' : false;
 
 function php(body) {
   const code = `foreach (['Economy', 'LedgerMath', 'WordFilter', 'LedgerGift', 'ButlerParcels'] as $c) require ${JSON.stringify(SITE_DIR)} . "/src/$c.php"; use Groddle\\Minn\\ButlerParcels; ${body}`;
-  return JSON.parse(execFileSync('php', ['-r', code]).toString());
+  return JSON.parse(execFileSync(PHP, ['-r', code]).toString());
 }
 
 const P1 = 'butler-00000000000000b1';

@@ -28,9 +28,10 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { DROP_TEXT, dropRefusalText, nextUtcDay, untilText, waitingText } from '../public/js/drops-mp.js?v=6a16d73d';
 import { SITE_DIR, skipWithoutSite } from '../tools/repos.mjs';
+import { HAS_PHP, PHP } from './php.js';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
-const hasPhp = spawnSync('php', ['-v']).status === 0;
+const hasPhp = HAS_PHP;
 const skip = skipWithoutSite || (!hasPhp && 'no php');
 
 /** One PHP snippet against the site's LedgerMath, its input on STDIN. */
@@ -40,7 +41,7 @@ function php(body, input) {
     use Groddle\\Minn\\{Economy, LedgerMath};
     $a = json_decode(stream_get_contents(STDIN), true);
     ${body}`;
-  return JSON.parse(String(execFileSync('php', ['-r', code], { input: JSON.stringify(input) })));
+  return JSON.parse(String(execFileSync(PHP, ['-r', code], { input: JSON.stringify(input) })));
 }
 
 const GIANTS = ['grendaline', 'mab', 'friendly', 'lem', 'pot', 'cosma', 'spriggan', 'zille'];
@@ -162,8 +163,8 @@ function mysql() {
 const engineDir = process.env.MINN_ENGINE_DIR || join(homedir(), 'Cove/Sites/minn-engine.localhost/public/minn');
 const db = mysql();
 // A PHP that has mysqli as a module only (Arch's) gets it loaded.
-const phpArgs = hasPhp && spawnSync('php', ['-r', 'exit(class_exists("mysqli") ? 0 : 1);']).status !== 0 ? ['-d', 'extension=mysqli'] : [];
-const reachable = db && hasPhp && spawnSync('php', [...phpArgs, '-r', 'mysqli_report(MYSQLI_REPORT_OFF); $m = @new mysqli($argv[1], $argv[2], $argv[3]); exit($m->connect_errno ? 1 : 0);', db.host, db.user, db.pass]).status === 0;
+const phpArgs = hasPhp && spawnSync(PHP, ['-r', 'exit(class_exists("mysqli") ? 0 : 1);']).status !== 0 ? ['-d', 'extension=mysqli'] : [];
+const reachable = db && hasPhp && spawnSync(PHP, [...phpArgs, '-r', 'mysqli_report(MYSQLI_REPORT_OFF); $m = @new mysqli($argv[1], $argv[2], $argv[3]); exit($m->connect_errno ? 1 : 0);', db.host, db.user, db.pass]).status === 0;
 const skipDb = skip
   || (!existsSync(join(engineDir, 'src/Minn/Autoloader.php')) && 'Minn Engine not found (set MINN_ENGINE_DIR)')
   || (!reachable && 'no MariaDB to make a throwaway database on (set GRODDLE_TEST_MYSQL)');
@@ -171,7 +172,7 @@ const skipDb = skip
 describe('#691: on the site\'s ledger (LedgerDrop, Ledger::settle, Ledger::waitingFor)', { skip: skipDb }, () => {
   let r;
   before(() => {
-    r = JSON.parse(execFileSync('php', [...phpArgs, join(root, 'tests/fixtures/drops/ledger-drop-waiting.php'), engineDir, SITE_DIR, 'run', db.host, db.user, db.pass], { timeout: 90000 }).toString());
+    r = JSON.parse(execFileSync(PHP, [...phpArgs, join(root, 'tests/fixtures/drops/ledger-drop-waiting.php'), engineDir, SITE_DIR, 'run', db.host, db.user, db.pass], { timeout: 90000 }).toString());
   });
 
   it('ran on its own database and dropped it', () => {

@@ -182,7 +182,7 @@ try {
     $barrier = sys_get_temp_dir() . '/' . $name . '.go';
     $kids = [];
     foreach ([BUYER, RICH] as $who) {
-        $cmd = [PHP_BINARY, __FILE__, $engine, $extension, 'child', $host, $user, $pass, $name, op('sdb'), (string) $who, $barrier];
+        $cmd = [getenv('GRODDLE_PHP') ?: PHP_BINARY, __FILE__, $engine, $extension, 'child', $host, $user, $pass, $name, op('sdb'), (string) $who, $barrier];
         $p = proc_open($cmd, [1 => ['pipe', 'w'], 2 => ['pipe', 'w']], $pipes);
         $kids[] = [$p, $pipes];
     }

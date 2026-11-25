@@ -45,15 +45,16 @@ import { normalizeMailboxState } from '../public/js/mailbox.js?v=d50d0d05';
 import { MULTIPLAYER_QUESTS, MULTIPLAYER_QUESTS_LEFT_OUT, offerableMultiplayerQuest } from '../public/js/quests-mp.js?v=e697cec3';
 import { auctionJson } from '../tools/build-auctions.mjs';
 import { HAS_SITE, SITE_DIR, sitePath } from '../tools/repos.mjs';
+import { HAS_PHP, PHP } from './php.js';
 
 const root = join(import.meta.dirname, '..');
 const TABLE = JSON.parse(readFileSync(join(root, 'public/assets/content/trade-items.json'), 'utf8'));
-const hasPhp = spawnSync('php', ['-v']).status === 0;
+const hasPhp = HAS_PHP;
 const skipSite = !HAS_SITE ? 'no groddle-afternoon-site checkout' : !hasPhp ? 'no php' : false;
 
 function php(body) {
   const code = `foreach (['Economy', 'LedgerMath', 'LedgerAuction'] as $c) require ${JSON.stringify(SITE_DIR)} . "/src/$c.php"; use Groddle\\Minn\\LedgerAuction; use Groddle\\Minn\\Economy; ${body}`;
-  return JSON.parse(execFileSync('php', ['-r', code]).toString());
+  return JSON.parse(execFileSync(PHP, ['-r', code]).toString());
 }
 
 const ID = '00000000000000a1';

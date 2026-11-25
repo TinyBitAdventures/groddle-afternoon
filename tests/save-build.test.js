@@ -14,6 +14,7 @@ import { createPlayerSave, inspectPlayerSave, serializePlayerSave } from '../pub
 import { createMultiplayerSaveStore } from '../public/js/save-store.js?v=4e720735';
 import { stamp } from '../tools/deploy/build-id.mjs';
 import { SITE_DIR, skipWithoutSite } from '../tools/repos.mjs';
+import { HAS_PHP, PHP } from './php.js';
 
 const OLD = { id: 'aaaaaaaaaaaa', at: 1763000000 };
 const NEW = { id: 'bbbbbbbbbbbb', at: 1763100000 };
@@ -133,7 +134,7 @@ describe('the multiplayer page and the build', () => {
 });
 
 describe('the site keeps the build and refuses an older one (SaveShape.php)', () => {
-  const hasPhp = spawnSync('php', ['-v']).status === 0;
+  const hasPhp = HAS_PHP;
   it('agrees with the game on every case, and keeps the build through check, encode and with', { skip: skipWithoutSite || (!hasPhp && 'needs php') }, () => {
     // Minn's Json and RestError as the site uses them (compact JSON, unescaped slashes).
     const code = `namespace Minn {
@@ -156,7 +157,7 @@ describe('the site keeps the build and refuses an older one (SaveShape.php)', ()
       $out['none'] = SaveShape::buildOf(SaveShape::encode(SaveShape::check(['kind' => 'groddle-multiplayer', 'format' => 1, 'build' => ['id' => 'NOT HEX'], 'entries' => []], SaveShape::MULTIPLAYER)));
       echo json_encode($out);
       }`;
-    const res = spawnSync('php', ['-r', code], { input: JSON.stringify(CASES.map(([a, b]) => [a, b])), encoding: 'utf8' });
+    const res = spawnSync(PHP, ['-r', code], { input: JSON.stringify(CASES.map(([a, b]) => [a, b])), encoding: 'utf8' });
     assert.equal(res.status, 0, res.stderr);
     const php = JSON.parse(res.stdout);
     CASES.forEach(([stored, incoming, refused], i) => assert.equal(php.older[i], refused, JSON.stringify([stored, incoming])));

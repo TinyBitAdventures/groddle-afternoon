@@ -44,6 +44,7 @@ import { HOME_STREET_TSID } from '../public/js/homes.js?v=dca6b2cd';
 import { normalizeHomeView, readVisitScene } from '../public/js/neighbours-mp.js?v=e912be37';
 import { neighboursMpFeature } from '../public/js/features/neighbours-mp-feature.js?v=993b2712';
 import { HAS_SITE, SITE_DIR, sitePath } from '../tools/repos.mjs';
+import { HAS_PHP, PHP } from './php.js';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const GS = join(root, '../glitch-GameServerJS/items/npc_garden_gnome.js');
@@ -249,7 +250,7 @@ describe('a gnome keeps its place beside the house when the home grows (G640)', 
     { id: 'to', place: 'tower:2', x: 400, y: 620, facingLeft: true, phrases: [] },
   ];
   const xs = (list) => Object.fromEntries(list.map((g) => [g.id, g.x]));
-  const skipSite = !HAS_SITE ? 'no groddle-afternoon-site checkout' : spawnSync('php', ['-v']).status !== 0 ? 'no php' : false;
+  const skipSite = !HAS_SITE ? 'no groddle-afternoon-site checkout' : !HAS_PHP ? 'no php' : false;
 
   it('the source never moves what is set down: the house is x 0 and only the left edge moves', { skip: !existsSync(join(root, '../glitch-GameServerJS/locations/inc_homes.js')) && 'glitch-GameServerJS is not beside the game' }, () => {
     const src = readFileSync(join(root, '../glitch-GameServerJS/locations/inc_homes.js'), 'utf8');
@@ -305,7 +306,7 @@ describe('a gnome keeps its place beside the house when the home grows (G640)', 
     feature.restore({ placed: placed() });
     feature.homeRoomShifted('street', 600, null);
     const state = { systems: { features: { 'garden-gnome': feature.save() } } };
-    const out = JSON.parse(execFileSync('php', ['-r', `foreach (["WordFilter", "Neighbours"] as $c) require ${JSON.stringify(SITE_DIR)} . "/src/$c.php"; echo json_encode(Groddle\\Minn\\Neighbours::gnomeRows(json_decode(${JSON.stringify(JSON.stringify(state))}), true));`]).toString());
+    const out = JSON.parse(execFileSync(PHP, ['-r', `foreach (["WordFilter", "Neighbours"] as $c) require ${JSON.stringify(SITE_DIR)} . "/src/$c.php"; echo json_encode(Groddle\\Minn\\Neighbours::gnomeRows(json_decode(${JSON.stringify(JSON.stringify(state))}), true));`]).toString());
     assert.deepEqual(out.map((g) => [g.id, g.place, g.x]), [['st', 'street', 1400], ['ho', 'house', 1700], ['to', 'tower:2', 400]]);
   });
 });
@@ -381,7 +382,7 @@ describe('the 140 frames (npc_garden_gnome.swf sprite 31)', () => {
 });
 
 describe('someone else\'s gnome, on a visit (multiplayer)', () => {
-  const hasPhp = spawnSync('php', ['-v']).status === 0;
+  const hasPhp = HAS_PHP;
   const skipSite = !HAS_SITE ? 'no groddle-afternoon-site checkout' : !hasPhp ? 'no php' : false;
   const placed = [
     { id: 'gs1', place: 'street', x: 812, y: 870, facingLeft: false, phrases: ['Welcome!'] },
@@ -487,7 +488,7 @@ describe('someone else\'s gnome, on a visit (multiplayer)', () => {
       'junk',
       { id: 'g5', place: 'street', x: 'x', y: 1 },
     ], packed: [{ phrases: ['in the pack'] }] } } } };
-    const run2 = (s, key) => execFileSync('php', ['-r', `foreach (["WordFilter", "Neighbours"] as $c) require ${JSON.stringify(SITE_DIR)} . "/src/$c.php"; echo json_encode(Groddle\\Minn\\Neighbours::gnomeRows(json_decode(${JSON.stringify(JSON.stringify(s))}), ${key ? 'true' : 'false'}));`]).toString();
+    const run2 = (s, key) => execFileSync(PHP, ['-r', `foreach (["WordFilter", "Neighbours"] as $c) require ${JSON.stringify(SITE_DIR)} . "/src/$c.php"; echo json_encode(Groddle\\Minn\\Neighbours::gnomeRows(json_decode(${JSON.stringify(JSON.stringify(s))}), ${key ? 'true' : 'false'}));`]).toString();
     const noKey = JSON.parse(run2(state, false));
     assert.deepEqual(noKey.map((g) => [g.id, g.place, g.x, g.y, g.facingLeft]), [['gs1', 'street', 812, 870, false], ['gh1', 'house', 300, 620, true], ['gt2', 'tower:2', 55, 620, true]]);
     assert.equal(noKey[0].phrases.length, 3);

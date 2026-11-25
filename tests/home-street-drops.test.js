@@ -24,6 +24,7 @@ import { dropsMpFeature } from '../public/js/features/drops-mp-feature.js?fresh=
 import { homeStreetMpFeature } from '../public/js/features/home-street-mp-feature.js?v=02c88e46';
 import { sharedHomeStreet } from '../public/js/neighbours-mp.js?v=e912be37';
 import { HAS_SERVER, HAS_SITE, SITE_DIR, serverPath } from '../tools/repos.mjs';
+import { HAS_PHP, PHP } from './php.js';
 
 const OP = 'drop-00000000000000a1';
 const OP2 = 'drop-00000000000000a2';
@@ -234,13 +235,13 @@ describe('the server and the site', () => {
     assert.match(go, /dropHomeOwner\(s\.Street\) != s\.By/, 'the owner\'s own stacks stay on their home street');
   });
 
-  const hasPhp = spawnSync('php', ['-v']).status === 0;
+  const hasPhp = HAS_PHP;
   it('the site takes a home street as HOME-<owner>', { skip: !HAS_SITE ? 'no groddle-afternoon-site checkout' : !hasPhp ? 'no php' : false }, () => {
     const code = `require ${JSON.stringify(SITE_DIR)} . "/src/LedgerDrop.php"; use Groddle\\Minn\\LedgerDrop; echo json_encode([
       LedgerDrop::call(['op' => '${OP}', 'id' => 9, 'street' => 'HOME-7', 'x' => -300, 'y' => 850, 'item' => ['c' => 'cherry', 'n' => 1]]),
       LedgerDrop::call(['op' => '${OP}', 'id' => 9, 'street' => 'HOME_7', 'x' => -300, 'y' => 850, 'item' => ['c' => 'cherry', 'n' => 1]]),
     ]);`;
-    const [ok, bad] = JSON.parse(execFileSync('php', ['-r', code]).toString());
+    const [ok, bad] = JSON.parse(execFileSync(PHP, ['-r', code]).toString());
     assert.deepEqual(ok, { op: OP, id: 9, street: 'HOME-7', x: -300, y: 850, c: 'cherry', n: 1, r: null });
     assert.equal(bad, null);
   });

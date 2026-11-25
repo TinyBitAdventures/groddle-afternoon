@@ -30,6 +30,7 @@ import {
 } from '../public/js/snaps.js?v=b5be8bff';
 import { snapsFeature } from '../public/js/features/snaps-feature.js?fresh=g1240';
 import { GAME_DIR, SITE_DIR } from '../tools/repos.mjs';
+import { HAS_PHP, PHP, phpSkip } from './php.js';
 
 const site = (f) => readFileSync(join(SITE_DIR, f), 'utf8');
 const HAS_SITE = existsSync(join(SITE_DIR, 'src/Snaps.php'));
@@ -412,20 +413,20 @@ function mysql() {
   return host && user ? { host, user, pass: def('DB_PASSWORD') || '' } : null;
 }
 const engineDir = process.env.MINN_ENGINE_DIR || join(homedir(), 'Cove/Sites/minn-engine.localhost/public/minn');
-const hasPhp = spawnSync('php', ['-v']).status === 0;
+const hasPhp = HAS_PHP;
 const db = mysql();
-const reachable = db && hasPhp && spawnSync('php', ['-r', 'mysqli_report(MYSQLI_REPORT_OFF); $m = @new mysqli($argv[1], $argv[2], $argv[3]); exit($m->connect_errno ? 1 : 0);', db.host, db.user, db.pass]).status === 0;
+const reachable = db && hasPhp && spawnSync(PHP, ['-r', 'mysqli_report(MYSQLI_REPORT_OFF); $m = @new mysqli($argv[1], $argv[2], $argv[3]); exit($m->connect_errno ? 1 : 0);', db.host, db.user, db.pass]).status === 0;
 // GD makes the full-size picture the save is tried with; a PHP that has it as a module only gets it loaded.
-const gdArgs = hasPhp && spawnSync('php', ['-r', 'exit(function_exists("imagecreatetruecolor") ? 0 : 1);']).status !== 0 ? ['-d', 'extension=gd'] : [];
+const gdArgs = hasPhp && spawnSync(PHP, ['-r', 'exit(function_exists("imagecreatetruecolor") ? 0 : 1);']).status !== 0 ? ['-d', 'extension=gd'] : [];
 const skipDb = (!HAS_SITE && 'no site repo')
-  || (!hasPhp && 'no php')
+  || phpSkip('mysqli')
   || (!existsSync(join(engineDir, 'src/Minn/Autoloader.php')) && 'Minn Engine not found (set MINN_ENGINE_DIR)')
   || (!reachable && 'no MariaDB to make a throwaway database on (set GRODDLE_TEST_MYSQL)');
 
 describe('the site\'s Snaps routes on a throwaway database', { skip: skipDb }, () => {
   let r;
   before(() => {
-    r = JSON.parse(execFileSync('php', [...gdArgs, join(GAME_DIR, 'tests/fixtures/snaps/snaps-routes.php'), engineDir, SITE_DIR, join(GAME_DIR, 'public'), db.host, db.user, db.pass], { timeout: 90000 }).toString());
+    r = JSON.parse(execFileSync(PHP, [...gdArgs, join(GAME_DIR, 'tests/fixtures/snaps/snaps-routes.php'), engineDir, SITE_DIR, join(GAME_DIR, 'public'), db.host, db.user, db.pass], { timeout: 90000 }).toString());
   });
 
   it('ran on its own database and dropped it', () => {

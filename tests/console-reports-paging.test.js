@@ -16,9 +16,10 @@ import { homedir } from 'node:os';
 import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { HAS_SITE, SITE_DIR, sitePath, skipWithoutSite } from '../tools/repos.mjs';
+import { HAS_PHP, PHP } from './php.js';
 
 const src = (p) => readFileSync(sitePath(p), 'utf8');
-const hasPhp = spawnSync('php', ['-v']).status === 0;
+const hasPhp = HAS_PHP;
 const engine = process.env.MINN_ENGINE_DIR || join(homedir(), 'Cove/Sites/minn-engine.localhost/public/minn');
 const noEngine = !existsSync(join(engine, 'src/Minn/Autoloader.php')) && 'Minn Engine not found (set MINN_ENGINE_DIR)';
 
@@ -86,7 +87,7 @@ foreach (['-1', 'abc', '1.5', '1e3', '9999999999', ''] as $offset) {
 }
 echo json_encode($out);
 `;
-    const out = JSON.parse(execFileSync('php', ['--', engine, SITE_DIR], { input: script, encoding: 'utf8' }));
+    const out = JSON.parse(execFileSync(PHP, ['--', engine, SITE_DIR], { input: script, encoding: 'utf8' }));
     for (const bad of ['-1', 'abc', '1.5', '1e3', '9999999999', '']) assert.equal(out[bad], 'groddle_ticket_offset 400', bad);
   });
 

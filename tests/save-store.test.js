@@ -50,6 +50,7 @@ import { AUDIO_MUTED_KEY } from '../public/js/audio-pref.js?v=683f27c8';
 import { STORAGE_KEY as APPEARANCE_KEY, APPEARANCE_PRESETS, appearanceToJson, loadAppearance, saveAppearance } from '../public/js/character-builder.js?v=03768e2e';
 import { getGameDayKey, getLastNewDayKey, getLastNewDayTs, resetGameDayClock, setLastNewDayTs } from '../public/js/game-day.js?v=a532775d';
 import { createPlayerSave, parsePlayerSave, serializePlayerSave } from '../public/js/player-save.js?v=cf0ebffd';
+import { HAS_PHP, PHP } from './php.js';
 
 const pub = join(import.meta.dirname, '..', 'public');
 const read = (rel) => readFileSync(join(pub, rel), 'utf8');
@@ -986,7 +987,7 @@ describe('another tab of this browser takes the character (js/save-claim.js)', (
 });
 
 describe('the site\'s write rule (MultiplayerSave.php decide)', () => {
-  const hasPhp = spawnSync('php', ['-v']).status === 0;
+  const hasPhp = HAS_PHP;
   it('matches the model the store is tested against', { skip: skipWithoutSite || !hasPhp }, () => {
     const cases = [];
     for (const row of [null, { version: 4, writer: '', seq: 0 }, { version: 4, writer: 'aaaa1111', seq: 3 }, { version: 6, writer: 'aaaa1111', seq: 3 }, { version: 4, writer: 'bbbb2222', seq: 0 }]) {
@@ -1005,7 +1006,7 @@ describe('the site\'s write rule (MultiplayerSave.php decide)', () => {
         $out[] = Groddle\\Minn\\MultiplayerSave::decide($r === null ? null : $r['version'], $r['writer'] ?? '', $r['seq'] ?? 0, $w['version'], $w['writer'], $w['seq'], $w['takeover']);
       }
       echo json_encode($out);`;
-    const res = spawnSync('php', ['-r', code], { input: JSON.stringify(cases), encoding: 'utf8' });
+    const res = spawnSync(PHP, ['-r', code], { input: JSON.stringify(cases), encoding: 'utf8' });
     assert.equal(res.status, 0, res.stderr);
     const php = JSON.parse(res.stdout);
     cases.forEach((c, i) => assert.equal(php[i], decide(c.row, c.w), JSON.stringify(c)));

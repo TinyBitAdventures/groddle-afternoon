@@ -11,12 +11,13 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { lostList } from '../tools/build-restoration.mjs';
 import { SITE_DIR, skipWithoutSite } from '../tools/repos.mjs';
+import { HAS_PHP, PHP } from './php.js';
 
 const root = join(import.meta.dirname, '..');
 const json = (p) => JSON.parse(readFileSync(join(root, p), 'utf8'));
 const data = json('public/restoration/data.json');
 const gaps = json('public/restoration/gaps.json');
-const hasPhp = spawnSync('php', ['-v']).status === 0;
+const hasPhp = HAS_PHP;
 
 describe('G910: Gone for good', () => {
   it('lostList takes the lost checklist items first, then each Not possible gap under its area', () => {
@@ -48,7 +49,7 @@ describe('G910: Gone for good', () => {
       $m = new ReflectionMethod(Groddle\\Minn\\Restoration::class, 'lost'); $m->setAccessible(true);
       $d = json_decode(file_get_contents(${JSON.stringify(file)}), true);
       echo $m->invoke(null, $d), "\\n---\\n", $m->invoke(null, ['items' => $d['items']]); }`;
-    const [withList, oldData] = execFileSync('php', ['-r', code], { encoding: 'utf8' }).split('\n---\n');
+    const [withList, oldData] = execFileSync(PHP, ['-r', code], { encoding: 'utf8' }).split('\n---\n');
     const rows = withList.match(/<li>/g) || [];
     assert.equal(rows.length, data.lost.length);
     assert.match(withList, /<b>Sounds<\/b>: /);

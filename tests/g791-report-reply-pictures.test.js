@@ -20,11 +20,12 @@ import { REPORT_TEXT as T, createReportsApi, isPictureKey, pictureSrc } from '..
 import { REPORT_LEAVE_OUT } from '../public/js/features/bug-report-feature.js?v=46b6b9fb';
 import { hotkeySections } from '../public/js/client-hotkeys.js?v=5c5a4301';
 import { SITE_DIR, sitePath, skipWithoutSite } from '../tools/repos.mjs';
+import { HAS_PHP, PHP, phpSkip } from './php.js';
 
 const root = join(import.meta.dirname, '..');
 const read = (p) => readFileSync(join(root, p), 'utf8');
 const wait = (ms) => new Promise((r) => setTimeout(r, ms));
-const hasPhp = spawnSync('php', ['-v']).status === 0;
+const hasPhp = HAS_PHP;
 const engine = process.env.MINN_ENGINE_DIR || join(homedir(), 'Cove/Sites/minn-engine.localhost/public/minn');
 const noEngine = !existsSync(join(engine, 'src/Minn/Autoloader.php')) && 'Minn Engine not found (set MINN_ENGINE_DIR)';
 // A tiny JPEG data URL (the sheet only checks the prefix; the site checks the bytes).
@@ -315,8 +316,8 @@ describe('G791: the site keeps a reply\'s picture (groddle-afternoon-site)', { s
     assert.match(src('console/console.css'), /\.console-msg-picture img \{/);
   });
 
-  it('each message carries its picture or null, for both sides (php)', { skip: (!hasPhp && 'no php') || noEngine }, () => {
-    const out = JSON.parse(execFileSync('php', [join(root, 'tests/fixtures/minn-accounts/tickets.php'), engine, SITE_DIR], { encoding: 'utf8' })).replyPictures;
+  it('each message carries its picture or null, for both sides (php)', { skip: phpSkip('gd') || noEngine }, () => {
+    const out = JSON.parse(execFileSync(PHP, [join(root, 'tests/fixtures/minn-accounts/tickets.php'), engine, SITE_DIR], { encoding: 'utf8' })).replyPictures;
     assert.equal(out.reportUrl, '/report-pictures/3');
     assert.equal(out.replyUrl, '/report-pictures/3/9');
     assert.equal(out.nthUrl, '/report-pictures/3/9/2');

@@ -19,9 +19,10 @@ import { pathToFileURL } from 'node:url';
 import { HAS_SITE, SITE_DIR, sitePath, skipWithoutSite } from '../tools/repos.mjs';
 import { CAP, EXCLUDED, KINDS, citedTickets, cookieHeader, isLocal, pointsFor, proposalProblems, proposalsMarkdown, rank, readAllTickets, totalsFrom } from '../tools/reports/credits.mjs';
 import { BANDS, THANKS_LEAD, contributeContent, thanksBand, withCredits } from '../tools/contribute/to-minn.mjs';
+import { HAS_PHP, PHP } from './php.js';
 
 const root = join(import.meta.dirname, '..');
-const hasPhp = spawnSync('php', ['-v']).status === 0;
+const hasPhp = HAS_PHP;
 const engine = process.env.MINN_ENGINE_DIR || join(homedir(), 'Cove/Sites/minn-engine.localhost/public/minn');
 const noEngine = !existsSync(join(engine, 'src/Minn/Autoloader.php')) && 'Minn Engine not found (set MINN_ENGINE_DIR)';
 const src = (p) => readFileSync(sitePath(p), 'utf8');
@@ -224,7 +225,7 @@ describe('the site keeps a score per report (groddle-afternoon-site)', { skip: s
     let out;
     try {
       writeFileSync(join(dir, 'totals.json'), JSON.stringify(TOTALS));
-      out = JSON.parse(execFileSync('php', [join(root, 'tests/fixtures/minn-accounts/credits.php'), engine, SITE_DIR, join(dir, 'totals.json')], { encoding: 'utf8' }));
+      out = JSON.parse(execFileSync(PHP, [join(root, 'tests/fixtures/minn-accounts/credits.php'), engine, SITE_DIR, join(dir, 'totals.json')], { encoding: 'utf8' }));
     } finally {
       rmSync(dir, { recursive: true, force: true });
     }
@@ -278,7 +279,7 @@ describe('the site keeps a score per report (groddle-afternoon-site)', { skip: s
     let out;
     try {
       writeFileSync(join(dir, 'totals.json'), JSON.stringify(TOTALS));
-      out = JSON.parse(execFileSync('php', [join(root, 'tests/fixtures/minn-accounts/credits.php'), engine, SITE_DIR, join(dir, 'totals.json')], { encoding: 'utf8' }));
+      out = JSON.parse(execFileSync(PHP, [join(root, 'tests/fixtures/minn-accounts/credits.php'), engine, SITE_DIR, join(dir, 'totals.json')], { encoding: 'utf8' }));
     } finally {
       rmSync(dir, { recursive: true, force: true });
     }

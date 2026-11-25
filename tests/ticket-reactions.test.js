@@ -20,6 +20,7 @@ import { NAMES_SHOWN, REACTIONS } from '../public/js/chat-reactions.js?v=3846017
 import { REPORT_TEXT, createReportsApi } from '../public/js/reports.js?v=e861d5aa';
 import { parseReportReactionKey, reactorOf, reportReactionKey, reportReactions } from '../public/js/report-reactions.js?v=69462240';
 import { mountReportsSheet } from '../public/js/ui/reports-sheet.js?v=92486673';
+import { HAS_PHP, PHP, phpSkip } from './php.js';
 
 const root = join(import.meta.dirname, '..');
 const read = (p) => readFileSync(join(root, p), 'utf8');
@@ -338,7 +339,7 @@ describe('reactions on a report message: the site (groddle-afternoon-site)', { s
 
 // —— The rules on a throwaway database ——
 const engineDir = process.env.MINN_ENGINE_DIR || join(homedir(), 'Cove/Sites/minn-engine.localhost/public/minn');
-const hasPhp = spawnSync('php', ['-v']).status === 0;
+const hasPhp = HAS_PHP;
 function mysql() {
   const env = String(process.env.GRODDLE_TEST_MYSQL || '').trim();
   if (env) {
@@ -354,16 +355,16 @@ function mysql() {
   return host && user ? { host, user, pass: def('DB_PASSWORD') || '' } : null;
 }
 const db = mysql();
-const reachable = db && hasPhp && spawnSync('php', ['-r', 'mysqli_report(MYSQLI_REPORT_OFF); $m = @new mysqli($argv[1], $argv[2], $argv[3]); exit($m->connect_errno ? 1 : 0);', db.host, db.user, db.pass]).status === 0;
+const reachable = db && hasPhp && spawnSync(PHP, ['-r', 'mysqli_report(MYSQLI_REPORT_OFF); $m = @new mysqli($argv[1], $argv[2], $argv[3]); exit($m->connect_errno ? 1 : 0);', db.host, db.user, db.pass]).status === 0;
 const skipDb = skipWithoutSite
-  || (!hasPhp && 'no php')
+  || phpSkip('mysqli')
   || (!existsSync(join(engineDir, 'src/Minn/Autoloader.php')) && 'Minn Engine not found (set MINN_ENGINE_DIR)')
   || (!reachable && 'no MariaDB to make a throwaway database on (set GRODDLE_TEST_MYSQL)');
 
 describe('reactions on a report message: the rules on a throwaway database', { skip: skipDb }, () => {
   let r;
   before(() => {
-    r = JSON.parse(execFileSync('php', [join(import.meta.dirname, 'fixtures/ticket-reactions/ticket-reactions.php'), engineDir, SITE_DIR, db.host, db.user, db.pass], { timeout: 90000 }).toString());
+    r = JSON.parse(execFileSync(PHP, [join(import.meta.dirname, 'fixtures/ticket-reactions/ticket-reactions.php'), engineDir, SITE_DIR, db.host, db.user, db.pass], { timeout: 90000 }).toString());
   });
 
   it('ran on its own database and dropped it', () => {

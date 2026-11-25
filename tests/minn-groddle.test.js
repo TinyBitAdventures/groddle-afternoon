@@ -5,6 +5,7 @@ import { execFileSync } from 'node:child_process';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { SITE_DIR, skipWithoutSite } from '../tools/repos.mjs';
+import { PHP } from './php.js';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 // The theme + extension is its own repo, groddle-afternoon-site (tools/repos.mjs);
@@ -159,10 +160,10 @@ describe('Groddle on Minn (groddle-afternoon-site, a block theme that is also an
 
   it('is plain PHP the engine can load', { skip: skipWithoutSite }, (t) => {
     let php = true;
-    try { execFileSync('php', ['-v'], { stdio: 'ignore' }); } catch { php = false; }
+    try { execFileSync(PHP, ['-v'], { stdio: 'ignore' }); } catch { php = false; }
     if (!php) return t.skip('no php on PATH');
     for (const file of readdirSync(join(ext, 'src'))) {
-      const out = execFileSync('php', ['-l', join(ext, 'src', file)], { encoding: 'utf8' });
+      const out = execFileSync(PHP, ['-l', join(ext, 'src', file)], { encoding: 'utf8' });
       assert.match(out, /No syntax errors/, file);
     }
   });

@@ -19,10 +19,11 @@ import { SITE_DIR, sitePath, skipWithoutSite } from '../tools/repos.mjs';
 import { REPORT_MAX, REPORT_PICTURE, REPORT_TEXT, STATUS_WORDS, UNREAD_POLL_MS, base64Size, canEditFirst, createReportsApi, pictureRefused, pictureSize, pictureSrc, numberedLine, refusalWords, reportFromHash, reportNumber, ticketLine, unreadCount, whenWords } from '../public/js/reports.js?v=e861d5aa';
 import { mountReportsSheet } from '../public/js/ui/reports-sheet.js?v=92486673';
 import { BUG_TEXT, badgeFor, bugReportFeature, capturePicture } from '../public/js/features/bug-report-feature.js?v=46b6b9fb';
+import { HAS_PHP, PHP, phpSkip } from './php.js';
 
 const root = join(import.meta.dirname, '..');
 const read = (p) => readFileSync(join(root, p), 'utf8');
-const hasPhp = spawnSync('php', ['-v']).status === 0;
+const hasPhp = HAS_PHP;
 const engine = process.env.MINN_ENGINE_DIR || join(homedir(), 'Cove/Sites/minn-engine.localhost/public/minn');
 const noEngine = !existsSync(join(engine, 'src/Minn/Autoloader.php')) && 'Minn Engine not found (set MINN_ENGINE_DIR)';
 const flush = () => new Promise((r) => setImmediate(r));
@@ -666,8 +667,8 @@ describe('the site (groddle-afternoon-site)', { skip: skipWithoutSite }, () => {
     for (const w of Object.values(mod.TICKET_STATUS)) assert.ok(!/—/.test(w));
   });
 
-  it('the rules, the old posts and the email (php)', { skip: (!hasPhp && 'no php') || noEngine }, () => {
-    const out = JSON.parse(execFileSync('php', [join(root, 'tests/fixtures/minn-accounts/tickets.php'), engine, SITE_DIR], { encoding: 'utf8' }));
+  it('the rules, the old posts and the email (php)', { skip: phpSkip('gd') || noEngine }, () => {
+    const out = JSON.parse(execFileSync(PHP, [join(root, 'tests/fixtures/minn-accounts/tickets.php'), engine, SITE_DIR], { encoding: 'utf8' }));
     assert.deepEqual(out.subject, { short: 'Pigs float', long: `${'a'.repeat(59)}…`, longLen: 60, spaces: 'a b' });
     assert.deepEqual(out.statusAfter, ['open', 'answered']);
     assert.deepEqual(out.unread, { adminWroteNeverRead: true, adminWroteReadBefore: true, adminWroteReadAfter: false, playerWroteForPlayer: false, playerWroteForAdmin: true, playerWroteAdminRead: false });
@@ -782,8 +783,8 @@ describe('the site keeps a report\'s picture (groddle-afternoon-site)', { skip: 
     assert.match(src('src/AdminConsolePage.php'), /The picture could not be loaded\./);
   });
 
-  it('the picture rules (php)', { skip: (!hasPhp && 'no php') || noEngine }, () => {
-    const out = JSON.parse(execFileSync('php', [join(root, 'tests/fixtures/minn-accounts/tickets.php'), engine, SITE_DIR], { encoding: 'utf8' })).picture;
+  it('the picture rules (php)', { skip: phpSkip('gd') || noEngine }, () => {
+    const out = JSON.parse(execFileSync(PHP, [join(root, 'tests/fixtures/minn-accounts/tickets.php'), engine, SITE_DIR], { encoding: 'utf8' })).picture;
     assert.deepEqual(out.kept, { width: 640, height: 360, soi: true, fits: true, tagDropped: true });
     assert.deepEqual(out.bytesDecide, { ok: true }, 'a data URL\'s own type is not trusted');
     assert.deepEqual(out.pngNamedJpeg, { code: 'groddle_report_picture_type', status: 415 });
@@ -1021,8 +1022,8 @@ describe('Working on it and Edit until read (ticket 49)', () => {
       assert.equal(mod.messageWhen({ at: 'x', edited: null }, when), 'Nov 2');
     });
 
-    it('the rules (php): status set and clear, edit before read and refused after, owner only, length refused', { skip: (!hasPhp && 'no php') || noEngine }, () => {
-      const out = JSON.parse(execFileSync('php', [join(root, 'tests/fixtures/minn-accounts/tickets.php'), engine, SITE_DIR], { encoding: 'utf8' }));
+    it('the rules (php): status set and clear, edit before read and refused after, owner only, length refused', { skip: phpSkip('gd') || noEngine }, () => {
+      const out = JSON.parse(execFileSync(PHP, [join(root, 'tests/fixtures/minn-accounts/tickets.php'), engine, SITE_DIR], { encoding: 'utf8' }));
       assert.deepEqual(out.working, {
         statuses: ['open', 'answered', 'working', 'closed'], fitsColumn: true,
         playerWritesInWorking: 'working', adminWritesInWorking: 'working', playerWritesInClosed: 'open', adminWritesInOpen: 'answered',

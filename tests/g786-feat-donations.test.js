@@ -17,10 +17,11 @@ import { join } from 'node:path';
 import { DONATION_OP_RE, MP_DONATIONS, MP_PACE, donationOp, reportFor } from '../public/js/feats-mp.js?v=49ed2393';
 import { featTable } from '../tools/build-realtime-feats.mjs';
 import { HAS_SITE, SITE_DIR } from '../tools/repos.mjs';
+import { HAS_PHP, PHP } from './php.js';
 
 const root = join(import.meta.dirname, '..');
 const read = (rel) => readFileSync(join(root, rel), 'utf8');
-const hasPhp = spawnSync('php', ['-v']).status === 0;
+const hasPhp = HAS_PHP;
 const skipSite = !HAS_SITE ? 'no groddle-afternoon-site checkout' : !hasPhp ? 'no php' : false;
 
 describe('G786: a donation report names its spend', () => {
@@ -71,6 +72,6 @@ describe('G786: the site spends a donation from the ledger (LedgerSpend.php)', {
         LedgerSpend::accepts('fdon-00000000000000a1', 'game_teleporter', $g([], 50)),
         LedgerSpend::accepts('gtele-00000000000000a1', 'game_teleporter', $g([], 50)),
       ]);`;
-    assert.deepEqual(JSON.parse(execFileSync('php', ['-r', code]).toString()), [true, false, false, false, false, false, true]);
+    assert.deepEqual(JSON.parse(execFileSync(PHP, ['-r', code]).toString()), [true, false, false, false, false, false, true]);
   });
 });

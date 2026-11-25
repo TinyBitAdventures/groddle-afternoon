@@ -28,6 +28,7 @@ import { homedir } from 'node:os';
 import { join } from 'node:path';
 
 import { GAME_DIR, HAS_SITE, SITE_DIR, skipWithoutSite } from '../tools/repos.mjs';
+import { PHP, phpSkip } from './php.js';
 
 const site = (rel) => readFileSync(join(SITE_DIR, rel), 'utf8');
 
@@ -98,9 +99,9 @@ describe('the Players page\'s code (site repo)', { skip: skipWithoutSite }, () =
     }
   });
 
-  it('PHP lint', { skip: spawnSync('/usr/bin/php', ['-v']).status !== 0 && 'no /usr/bin/php' }, () => {
+  it('PHP lint', { skip: phpSkip() }, () => {
     for (const f of [join(SITE_DIR, 'src/PlayerList.php'), join(SITE_DIR, 'src/PlayerPages.php'), join(GAME_DIR, 'tests/fixtures/profiles/players-list.php')]) {
-      const r = spawnSync('/usr/bin/php', ['-l', f], { encoding: 'utf8' });
+      const r = spawnSync(PHP, ['-l', f], { encoding: 'utf8' });
       assert.equal(r.status, 0, r.stdout + r.stderr);
     }
   });
@@ -123,13 +124,13 @@ function mysql() {
 const engineDir = process.env.MINN_ENGINE_DIR || join(homedir(), 'Cove/Sites/minn-engine.localhost/public/minn');
 // A PHP with mysqli: `php` (Cove's FrankenPHP has it built in, though its `php -v` fails), else with the extension loaded.
 const phpArgs = (() => {
-  const has = (args) => spawnSync('php', [...args, '-r', 'exit(function_exists("mysqli_report") ? 0 : 1);']).status === 0;
+  const has = (args) => spawnSync(PHP, [...args, '-r', 'exit(function_exists("mysqli_report") ? 0 : 1);']).status === 0;
   if (has([])) return [];
   if (has(['-d', 'extension=mysqli'])) return ['-d', 'extension=mysqli'];
   return null;
 })();
 const db = mysql();
-const reachable = db && phpArgs && spawnSync('php', [...phpArgs, '-r', 'mysqli_report(MYSQLI_REPORT_OFF); $m = @new mysqli($argv[1], $argv[2], $argv[3]); exit($m->connect_errno ? 1 : 0);', db.host, db.user, db.pass]).status === 0;
+const reachable = db && phpArgs && spawnSync(PHP, [...phpArgs, '-r', 'mysqli_report(MYSQLI_REPORT_OFF); $m = @new mysqli($argv[1], $argv[2], $argv[3]); exit($m->connect_errno ? 1 : 0);', db.host, db.user, db.pass]).status === 0;
 const skipDb = (!HAS_SITE && 'no site repo')
   || (!phpArgs && 'no php with mysqli')
   || (!existsSync(join(engineDir, 'src/Minn/Autoloader.php')) && 'Minn Engine not found (set MINN_ENGINE_DIR)')
@@ -139,7 +140,7 @@ describe('the Players page on a throwaway database', { skip: skipDb }, () => {
   let r;
   const who = (cards) => cards.map((c) => c.who);
   before(() => {
-    r = JSON.parse(execFileSync('php', [...phpArgs, join(GAME_DIR, 'tests/fixtures/profiles/players-list.php'), engineDir, SITE_DIR, join(GAME_DIR, 'public'), db.host, db.user, db.pass], { timeout: 90000 }).toString());
+    r = JSON.parse(execFileSync(PHP, [...phpArgs, join(GAME_DIR, 'tests/fixtures/profiles/players-list.php'), engineDir, SITE_DIR, join(GAME_DIR, 'public'), db.host, db.user, db.pass], { timeout: 90000 }).toString());
   });
 
   it('ran on its own database and dropped it', () => {

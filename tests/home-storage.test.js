@@ -43,6 +43,7 @@ import {
 import { createHomeDecorState, normalizeHomeDecorState, pickUpFurniture } from '../public/js/home-decor.js?v=31f37d9b';
 import { takeFromHouse } from '../public/js/ledger-house.js?v=b34f5c89';
 import { SITE_DIR, skipWithoutSite } from '../tools/repos.mjs';
+import { HAS_PHP, PHP } from './php.js';
 
 const GSJS = join(homedir(), 'Documents/glitch-audit/glitch-GameServerJS/items');
 const read = (f) => {
@@ -52,11 +53,11 @@ const read = (f) => {
     return '';
   }
 };
-const hasPhp = spawnSync('php', ['-v']).status === 0;
+const hasPhp = HAS_PHP;
 const skipPhp = skipWithoutSite || (!hasPhp && 'no php');
 function php(body) {
   const code = `foreach (['Economy', 'LedgerMath', 'Neighbours', 'LedgerFurniture', 'LedgerStarter', 'LedgerBoxes'] as $c) require ${JSON.stringify(SITE_DIR)} . "/src/$c.php"; use Groddle\\Minn\\LedgerBoxes; use Groddle\\Minn\\LedgerMath; use Groddle\\Minn\\Economy; ${body}`;
-  return JSON.parse(execFileSync('php', ['-r', code]).toString());
+  return JSON.parse(execFileSync(PHP, ['-r', code]).toString());
 }
 
 function room(rows) {

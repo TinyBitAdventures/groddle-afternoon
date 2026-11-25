@@ -12,8 +12,9 @@ import { describe, it } from 'node:test';
 
 import { HAS_SITE, SITE_DIR, sitePath } from '../tools/repos.mjs';
 import { seedFile } from '../tools/patches/payout.mjs';
+import { HAS_PHP, PHP } from './php.js';
 
-const hasPhp = spawnSync('php', ['-v']).status === 0;
+const hasPhp = HAS_PHP;
 const PENTAL = 'GA9118S28492QCL';
 const DOON = 'GLIF37ASJFE1AVQ';
 const OLD_MAIN = 'GM4103L52ID23';
@@ -29,7 +30,7 @@ const seedling = (trantClass, beanClass, petted, plantedAt) => ({
 const save = (streets) => ({ world: { streets: Object.fromEntries(Object.entries(streets).map(([t, plots]) => [t, { features: { patches: { plots }, 'tree-death': {} } }])) } });
 
 describe('the street Patches payout (site src/PatchPayout.php)', { skip: !HAS_SITE ? 'no site checkout' : !hasPhp ? 'no php' : false }, () => {
-  const php = (body) => JSON.parse(execFileSync('php', ['-r', `foreach (['LedgerMath', 'Economy', 'LedgerMail', 'PatchPayout'] as $c) require ${JSON.stringify(SITE_DIR)} . "/src/$c.php"; use Groddle\\Minn\\PatchPayout as P; $d = P::data(); ${body}`]).toString());
+  const php = (body) => JSON.parse(execFileSync(PHP, ['-r', `foreach (['LedgerMath', 'Economy', 'LedgerMail', 'PatchPayout'] as $c) require ${JSON.stringify(SITE_DIR)} . "/src/$c.php"; use Groddle\\Minn\\PatchPayout as P; $d = P::data(); ${body}`]).toString());
   const arg = (v) => JSON.stringify(JSON.stringify(v));
 
   it('reads only planted plots on the shared streets, and every shared street with a slice', () => {

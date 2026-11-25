@@ -13,8 +13,9 @@ import { execFileSync, spawnSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { SITE_DIR, skipWithoutSite } from '../tools/repos.mjs';
+import { HAS_PHP, PHP } from './php.js';
 
-const hasPhp = spawnSync('php', ['-v']).status === 0;
+const hasPhp = HAS_PHP;
 const skip = skipWithoutSite || !hasPhp;
 
 function check(ledger, credited, entries, budget) {
@@ -23,7 +24,7 @@ function check(ledger, credited, entries, budget) {
     use Groddle\\Minn\\{Economy, LedgerMath};
     $a = json_decode(stream_get_contents(STDIN), true);
     echo json_encode(LedgerMath::check($a[0], $a[1], [], $a[2], (float) $a[3], 50000.0, Economy::shared(), null, fn (): int => 0));`;
-  const out = execFileSync('php', ['-r', code], { input: JSON.stringify([ledger, credited, entries, budget]) });
+  const out = execFileSync(PHP, ['-r', code], { input: JSON.stringify([ledger, credited, entries, budget]) });
   return JSON.parse(String(out), (k, v) => (Array.isArray(v) && !v.length && ['items', 'made', 'runs', 'capped', 'detail', 'held'].includes(k) ? {} : v));
 }
 

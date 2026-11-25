@@ -12,10 +12,11 @@ import { readFileSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { SITE_DIR, skipWithoutSite, skipWithoutServer } from '../tools/repos.mjs';
 import { unitValue, FALLBACK_VALUE } from '../tools/build-economy.mjs';
+import { HAS_PHP, PHP } from './php.js';
 
 const root = join(import.meta.dirname, '..');
 const gsjs = join(root, '..', 'glitch-GameServerJS');
-const hasPhp = spawnSync('php', ['-v']).status === 0;
+const hasPhp = HAS_PHP;
 const skip = skipWithoutSite || !hasPhp;
 
 /** Runs one LedgerMath call in PHP: op name and args in, the result out. */
@@ -38,7 +39,7 @@ function php(op, ...args) {
       'value' => $e->value($a[0]),
     };
     echo json_encode($out);`;
-  const out = execFileSync('php', ['-r', code], { input: JSON.stringify({ op, args }) });
+  const out = execFileSync(PHP, ['-r', code], { input: JSON.stringify({ op, args }) });
   // PHP writes an empty map as []: read it back as the {} it means.
   return JSON.parse(String(out), (k, v) => (k === 'items' && Array.isArray(v) && !v.length ? {} : v));
 }

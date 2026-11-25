@@ -29,6 +29,7 @@ import { isTakeOp, normalizeGroundStack, normalizeMine, pickupAsk, stackLeft } f
 import { dropsMpFeature } from '../public/js/features/drops-mp-feature.js?v=859fff13';
 import { pickupCountToAsk } from '../public/js/world-items.js?v=a5deb102';
 import { HAS_SERVER, SITE_DIR, serverPath, skipWithoutSite } from '../tools/repos.mjs';
+import { HAS_PHP, PHP, phpSkip } from './php.js';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const read = (p) => readFileSync(join(root, p), 'utf8');
@@ -209,18 +210,18 @@ function mysql() {
 }
 
 const engineDir = process.env.MINN_ENGINE_DIR || join(homedir(), 'Cove/Sites/minn-engine.localhost/public/minn');
-const hasPhp = spawnSync('php', ['-v']).status === 0;
+const hasPhp = HAS_PHP;
 const db = mysql();
-const reachable = db && hasPhp && spawnSync('php', ['-r', 'mysqli_report(MYSQLI_REPORT_OFF); $m = @new mysqli($argv[1], $argv[2], $argv[3]); exit($m->connect_errno ? 1 : 0);', db.host, db.user, db.pass]).status === 0;
+const reachable = db && hasPhp && spawnSync(PHP, ['-r', 'mysqli_report(MYSQLI_REPORT_OFF); $m = @new mysqli($argv[1], $argv[2], $argv[3]); exit($m->connect_errno ? 1 : 0);', db.host, db.user, db.pass]).status === 0;
 const skipDb = skipWithoutSite
-  || (!hasPhp && 'no php')
+  || phpSkip('mysqli')
   || (!existsSync(join(engineDir, 'src/Minn/Autoloader.php')) && 'Minn Engine not found (set MINN_ENGINE_DIR)')
   || (!reachable && 'no MariaDB to make a throwaway database on (set GRODDLE_TEST_MYSQL)');
 
 describe('the site records each part once (LedgerDrop)', { skip: skipDb }, () => {
   let r;
   before(() => {
-    const out = execFileSync('php', [join(root, 'tests/fixtures/drops/ledger-drop-take.php'), engineDir, SITE_DIR, 'run', db.host, db.user, db.pass], { timeout: 90000 }).toString();
+    const out = execFileSync(PHP, [join(root, 'tests/fixtures/drops/ledger-drop-take.php'), engineDir, SITE_DIR, 'run', db.host, db.user, db.pass], { timeout: 90000 }).toString();
     r = JSON.parse(out);
   });
   const DROPPER = '7';
@@ -315,7 +316,7 @@ describe('the site and the server agree on the words and the ids', () => {
       LedgerDrop::part('pickup', 10, 10), LedgerDrop::part('pickup', 0, 10), LedgerDrop::part('return', 4, 10), LedgerDrop::part('pickup', 4, null), LedgerDrop::part('pickup', 4, 10000),
       LedgerDrop::isTake('${OP}-t'), LedgerDrop::isTake('${OP}-t10'), LedgerDrop::isTake('${OP}-t0'), LedgerDrop::isTake('${OP}-t01'), LedgerDrop::isTake('${OP}'),
     ]);`;
-    assert.deepEqual(JSON.parse(execFileSync('php', ['-r', code]).toString()), [true, true, true, false, false, false, false, false, true, true, false, false, false]);
+    assert.deepEqual(JSON.parse(execFileSync(PHP, ['-r', code]).toString()), [true, true, true, false, false, false, false, false, true, true, false, false, false]);
   });
 
   it('drops.go sends the count and the street hears what is left', { skip: HAS_SERVER ? false : 'no server checkout' }, () => {

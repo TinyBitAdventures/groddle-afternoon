@@ -27,14 +27,15 @@ import { normalizeYardView, visitorHerdCap, yardStreetWidth } from '../public/js
 import { homeStreetLayout, normalizeCultivationState } from '../public/js/home-cultivation.js?v=2f71ba70';
 import { normalizeHusbandrySlot } from '../public/js/features/animal-husbandry-feature.js?v=b86bfc54';
 import { HAS_SITE, SITE_DIR, sitePath } from '../tools/repos.mjs';
+import { HAS_PHP, PHP } from './php.js';
 
 const root = join(import.meta.dirname, '..');
-const hasPhp = spawnSync('php', ['-v']).status === 0;
+const hasPhp = HAS_PHP;
 const skipSite = !HAS_SITE ? 'no groddle-afternoon-site checkout' : !hasPhp ? 'no php' : false;
 
 function php(body) {
   const code = `foreach (["HomePool", "HomeYard"] as $c) require ${JSON.stringify(SITE_DIR)} . "/src/$c.php"; use Groddle\\Minn\\HomeYard as Y; ${body}`;
-  return JSON.parse(execFileSync('php', ['-r', code], { maxBuffer: 64 * 1024 * 1024 }).toString());
+  return JSON.parse(execFileSync(PHP, ['-r', code], { maxBuffer: 64 * 1024 * 1024 }).toString());
 }
 
 const row = (n, classId) => ({ id: `a${n}`, classId, x: 100 + n, homeX: 100 + n, state: {} });

@@ -38,6 +38,7 @@ import { HOME_STALE_DELAY_MS, RETRY_MS, staleRefreshDue } from '../public/js/pro
 import { snapSteps, SNAP_MAX_H, SNAP_MAX_W, WHOLE_SNAP } from '../public/js/snaps.js?v=b5be8bff';
 import { snapsFeature } from '../public/js/features/snaps-feature.js?fresh=g1284';
 import { profilesFeature } from '../public/js/features/profiles-feature.js?fresh=g1284';
+import { HAS_PHP, PHP } from './php.js';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const read = (f) => readFileSync(join(here, '..', f), 'utf8');
@@ -171,11 +172,11 @@ describe('a whole-home Snap may be taller (Austin 2026-11-25: a 9-floor Tower ke
   });
 
   const engineDir = process.env.MINN_ENGINE_DIR || join(homedir(), 'Cove/Sites/minn-engine.localhost/public/minn');
-  const hasPhp = spawnSync('php', ['-v']).status === 0;
-  const gdArgs = hasPhp && spawnSync('php', ['-r', 'exit(function_exists("imagecreatetruecolor") ? 0 : 1);']).status !== 0 ? ['-d', 'extension=gd'] : [];
+  const hasPhp = HAS_PHP;
+  const gdArgs = hasPhp && spawnSync(PHP, ['-r', 'exit(function_exists("imagecreatetruecolor") ? 0 : 1);']).status !== 0 ? ['-d', 'extension=gd'] : [];
   const haveSite = existsSync(join(SITE_DIR, 'src/SnapImage.php'));
   it('the site takes the taller picture only from an upload that says whole (php)', { skip: !(hasPhp && haveSite && existsSync(join(engineDir, 'src/Minn/Autoloader.php'))) && 'php, the site or Minn Engine not found' }, () => {
-    const out = JSON.parse(execFileSync('php', [...gdArgs, join(here, 'fixtures/snaps/whole-snap.php'), engineDir, SITE_DIR], { encoding: 'utf8' }));
+    const out = JSON.parse(execFileSync(PHP, [...gdArgs, join(here, 'fixtures/snaps/whole-snap.php'), engineDir, SITE_DIR], { encoding: 'utf8' }));
     assert.deepEqual(out, {
       limits: [1920, 1200, 1_000_000, WHOLE_SNAP.maxH, WHOLE_SNAP.maxBytes],
       towerWhole: 'ok:963x3600:fits:small',

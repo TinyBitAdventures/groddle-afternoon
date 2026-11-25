@@ -12,7 +12,8 @@ import { execFileSync } from 'node:child_process';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { homeLiveParts, homeLivePrints } from '../public/js/home-live.js?v=9c7abae7';
-import { visitorHomeState } from '../public/js/features/homes-feature.js?v=5a17af25';
+import { visitorHomeState } from '../public/js/features/homes-feature.js?v=9a298adc';
+import { PHP } from './php.js';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const SITE_DIR = process.env.GRODDLE_SITE_DIR || join(root, '../groddle-afternoon-site');
@@ -40,7 +41,7 @@ describe("visitors see the owner's house (online)", () => {
     let out;
     try {
       const state = JSON.stringify({ systems: { home: { owned: true, house: { chassis: 'firebog', config: { door: 3, 'bad key': 2, top: 99 }, facingRight: true } } } });
-      out = execFileSync('/usr/bin/php', ['-r', `require ${JSON.stringify(join(SITE_DIR, 'src/Neighbours.php'))}; echo json_encode([Groddle\\Minn\\Neighbours::homeHouse(json_decode(${JSON.stringify(state)})), Groddle\\Minn\\Neighbours::homeHouse(json_decode('{}'))]);`], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] });
+      out = execFileSync(PHP, ['-r', `require ${JSON.stringify(join(SITE_DIR, 'src/Neighbours.php'))}; echo json_encode([Groddle\\Minn\\Neighbours::homeHouse(json_decode(${JSON.stringify(state)})), Groddle\\Minn\\Neighbours::homeHouse(json_decode('{}'))]);`], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] });
     } catch {
       return; // no php here
     }

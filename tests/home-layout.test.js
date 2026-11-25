@@ -25,6 +25,7 @@ import { AVATAR_STILL, homeKeyOf } from '../public/js/profiles.js?v=7caf2524';
 import { HIRES_SPRITES, SPLIT_SPRITES } from '../public/js/sprite-hires.js?v=e96be5f1';
 import { HOUSE_STYLE_KEYS } from '../public/js/features/homes-feature.js?v=5a17af25';
 import { SITE_DIR, skipWithoutSite } from '../tools/repos.mjs';
+import { PHP } from './php.js';
 
 const root = join(import.meta.dirname, '..');
 const read = (rel) => readFileSync(join(root, rel), 'utf8');
@@ -459,7 +460,7 @@ describe('the site side (groddle-afternoon-site src/HomeLayout.php)', { skip: sk
   it('takes a good layout, refuses bad ones, and draws only words it writes (php)', { skip: !existsSync(join(engine, 'src/Minn/Autoloader.php')) && 'Minn Engine not found (set MINN_ENGINE_DIR)' }, () => {
     let out;
     try {
-      out = JSON.parse(execFileSync('php', [join(root, 'tests/fixtures/profiles/home-layout.php'), engine, SITE_DIR], { encoding: 'utf8' }));
+      out = JSON.parse(execFileSync(PHP, [join(root, 'tests/fixtures/profiles/home-layout.php'), engine, SITE_DIR], { encoding: 'utf8' }));
     } catch (err) {
       if (err.code === 'ENOENT') return; // no php here
       throw err;
@@ -495,7 +496,7 @@ describe('the site side (groddle-afternoon-site src/HomeLayout.php)', { skip: sk
   it('draws a split 3x sheet\'s frame from its part on sharp screens, as the game does (php)', { skip: !existsSync(join(engine, 'src/Minn/Autoloader.php')) && 'Minn Engine not found (set MINN_ENGINE_DIR)' }, () => {
     let out;
     try {
-      out = JSON.parse(execFileSync('php', [join(root, 'tests/fixtures/profiles/home-layout.php'), engine, SITE_DIR, join(root, 'public')], { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 }));
+      out = JSON.parse(execFileSync(PHP, [join(root, 'tests/fixtures/profiles/home-layout.php'), engine, SITE_DIR, join(root, 'public')], { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 }));
     } catch (err) {
       if (err.code === 'ENOENT') return;
       throw err;
@@ -526,7 +527,7 @@ describe('the site side (groddle-afternoon-site src/HomeLayout.php)', { skip: sk
   it('draws a tall layout (an upright phone\'s) in the landscape frame, foot kept, centred where it was (php)', { skip: !existsSync(join(engine, 'src/Minn/Autoloader.php')) && 'Minn Engine not found (set MINN_ENGINE_DIR)' }, () => {
     let out;
     try {
-      out = JSON.parse(execFileSync('php', [join(root, 'tests/fixtures/profiles/home-layout.php'), engine, SITE_DIR], { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 }));
+      out = JSON.parse(execFileSync(PHP, [join(root, 'tests/fixtures/profiles/home-layout.php'), engine, SITE_DIR], { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 }));
     } catch (err) {
       if (err.code === 'ENOENT') return;
       throw err;

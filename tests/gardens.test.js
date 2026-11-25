@@ -70,6 +70,7 @@ import {
 } from '../public/js/inventory.js?v=6414dbdc';
 import { DEFAULT_VENDOR, vendorBuy } from '../public/js/vendor.js?v=474a80fd';
 import { HAS_SITE, SITE_DIR } from '../tools/repos.mjs';
+import { HAS_PHP, PHP } from './php.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -747,13 +748,13 @@ describe('the tick catches up across every stage the time covers (G561)', () => 
     assert.equal(tickOne(rewet, T0 + 20 * H + s.grow1Ms - 2000).plot.state, 'shoots');
   });
 
-  const hasPhp = spawnSync('php', ['-v']).status === 0;
+  const hasPhp = HAS_PHP;
   it('lands on the same plot as the site\'s tick (src/HomeTending.php tickPlot)', { skip: !HAS_SITE ? 'no groddle-afternoon-site checkout' : !hasPhp ? 'no php' : false }, () => {
     const code = `require ${JSON.stringify(SITE_DIR)} . '/src/HomeTending.php'; $seeds = Groddle\\Minn\\HomeTending::seeds(); $out = [];
       foreach (json_decode(file_get_contents('php://stdin')) as $c) { $p = $c->plot; Groddle\\Minn\\HomeTending::tickPlot($p, (int) $c->now, $seeds); $out[] = $p; }
       echo json_encode($out);`;
     // The cases go on stdin: as one argument they pass Linux's 128 KB limit on a single argv string.
-    const site = JSON.parse(execFileSync('php', ['-r', code], { encoding: 'utf8', input: JSON.stringify(cases) }));
+    const site = JSON.parse(execFileSync(PHP, ['-r', code], { encoding: 'utf8', input: JSON.stringify(cases) }));
     assert.equal(site.length, cases.length);
     const pick = (p) => ({ state: p.state, wet: p.wet, wetAt: p.wetAt ?? null, stageStartedAt: p.stageStartedAt, growthMs: p.growthMs, pace: p.pace ?? null, wetPace: p.wet ? p.wetPace ?? null : null, ripeAt: p.ripeAt ?? null });
     cases.forEach((c, i) => assert.deepEqual(pick(tickOne(c.plot, c.now).plot), pick(site[i]), c.name));

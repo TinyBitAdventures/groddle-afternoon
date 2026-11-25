@@ -31,6 +31,7 @@ import { dropsMpFeature } from '../public/js/features/drops-mp-feature.js?fresh=
 import { copyTags, createToolConditionState, keepsOwnStack } from '../public/js/tools.js?v=4156bba8';
 import { createDroppedItemState, dropInventoryStack } from '../public/js/world-items.js?v=a5deb102';
 import { SITE_DIR, skipWithoutSite } from '../tools/repos.mjs';
+import { PHP as PHP_BIN } from './php.js';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const OP = 'drop-00000000000000c7';
@@ -38,10 +39,10 @@ const WORDS = { hopper: 13, hooch: 39, workingSince: 0 };
 
 /** A PHP that runs (the FrankenPHP wrapper's php -v fails: tests that need PHP skip there). */
 function php() {
-  for (const cmd of [['php'], ['php', '-d', 'extension=mysqli']]) {
+  for (const cmd of [[PHP_BIN], [PHP_BIN, '-d', 'extension=mysqli']]) {
     if (spawnSync(cmd[0], [...cmd.slice(1), '-r', 'exit(function_exists("mysqli_report") ? 0 : 1);']).status === 0) return cmd;
   }
-  return spawnSync('php', ['-r', 'exit(0);']).status === 0 ? ['php'] : null;
+  return spawnSync(PHP_BIN, ['-r', 'exit(0);']).status === 0 ? [PHP_BIN] : null;
 }
 const PHP = php();
 const skipPhp = skipWithoutSite || (!PHP && 'no php');

@@ -16,12 +16,13 @@ import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { join } from 'node:path';
 import { SITE_DIR, sitePath, skipWithoutSite } from '../tools/repos.mjs';
+import { PHP } from './php.js';
 
 const root = join(import.meta.dirname, '..');
 const src = (f) => readFileSync(sitePath('src', f), 'utf8');
 const engine = process.env.MINN_ENGINE_DIR || join(homedir(), 'Cove/Sites/minn-engine.localhost/public/minn');
 // -r, not -v: the FrankenPHP wrapper some machines have first on PATH answers -v with an error.
-const hasPhp = spawnSync('php', ['-r', 'exit(0);']).status === 0;
+const hasPhp = spawnSync(PHP, ['-r', 'exit(0);']).status === 0;
 const skipPhp = skipWithoutSite || (!hasPhp && 'no php') || (!existsSync(join(engine, 'src/Minn/Autoloader.php')) && 'Minn Engine not found (set MINN_ENGINE_DIR)');
 
 describe('G1211: the game\'s own registrations skip Breakwater, nothing else does', { skip: skipWithoutSite }, () => {
@@ -47,7 +48,7 @@ describe('G1211: the game\'s own registrations skip Breakwater, nothing else doe
   });
 
   it('with a stand-in Breakwater on registration_errors: the game\'s registration goes through, any other is still refused (php)', { skip: skipPhp }, () => {
-    const out = JSON.parse(execFileSync('php', [join(root, 'tests/fixtures/minn-accounts/own-registration.php'), engine, SITE_DIR], { encoding: 'utf8' }));
+    const out = JSON.parse(execFileSync(PHP, [join(root, 'tests/fixtures/minn-accounts/own-registration.php'), engine, SITE_DIR], { encoding: 'utf8' }));
     assert.deepEqual(out.plain, ['breakwater'], 'the stand-in refuses as Breakwater did on live');
     assert.deepEqual(out.own, [], 'the game\'s own registration is not refused');
     assert.equal(out.ownInside, true, 'the skip is hooked while the registration runs');

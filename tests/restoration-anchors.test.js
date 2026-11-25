@@ -15,12 +15,13 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { SITE_DIR, skipWithoutSite } from '../tools/repos.mjs';
 import { MAX_MS, QUIET_MS, READER_EVENTS, freshVisit, hashTarget, settleHash } from '../public/restoration/hash-settle.js?v=834e5782';
+import { PHP } from './php.js';
 
 const root = join(import.meta.dirname, '..');
 const read = (p) => readFileSync(join(root, p), 'utf8');
 const hasPhp = (() => {
   try {
-    execFileSync('php', ['-v'], { stdio: 'ignore' });
+    execFileSync(PHP, ['-v'], { stdio: 'ignore' });
     return true;
   } catch {
     return false;
@@ -214,7 +215,7 @@ describe('the report keeps its shape before pictures and data arrive', () => {
     try {
       const file = join(dir, 'made.json');
       writeFileSync(file, read('public/restoration/made.json'));
-      const html = execFileSync('php', ['-r', `require ${JSON.stringify(join(SITE_DIR, 'src/RestorationMade.php'))}; echo Groddle\\Minn\\RestorationMade::draw(json_decode(file_get_contents(${JSON.stringify(file)}), true));`], { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 });
+      const html = execFileSync(PHP, ['-r', `require ${JSON.stringify(join(SITE_DIR, 'src/RestorationMade.php'))}; echo Groddle\\Minn\\RestorationMade::draw(json_decode(file_get_contents(${JSON.stringify(file)}), true));`], { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 });
       const imgs = html.match(/<img\b[^>]*>/g) || [];
       assert.ok(imgs.length >= 10, `${imgs.length} pictures`);
       for (const img of imgs) assert.match(img, / width="\d+" height="\d+"/, img);

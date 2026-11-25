@@ -21,6 +21,7 @@ import { join } from 'node:path';
 import { SITE_DIR, sitePath, skipWithoutSite } from '../tools/repos.mjs';
 import { LIVE_NOTE } from '../tools/encyclopedia/streets.mjs';
 import { agoText, fill, liveLines, load } from '../public/encyclopedia/street-live.js?v=1df27e44';
+import { HAS_PHP, PHP } from './php.js';
 
 const root = join(import.meta.dirname, '..');
 const page = (slug) => readFileSync(join(root, 'public/encyclopedia/streets', slug, 'index.html'), 'utf8');
@@ -145,7 +146,7 @@ describe('the built street pages (tools/encyclopedia/streets.mjs liveBlock)', ()
   });
 });
 
-const hasPhp = spawnSync('php', ['-v']).status === 0;
+const hasPhp = HAS_PHP;
 const skipPhp = skipWithoutSite || (!hasPhp && 'needs the php CLI');
 
 function php(op, args) {
@@ -162,7 +163,7 @@ function php(op, args) {
       'consts' => [StreetLive::REFRESH, StreetLive::RETRY, StreetLive::KEEP, StreetLive::MAX_AGE],
     };
     echo json_encode($out);`;
-  return JSON.parse(String(execFileSync('php', ['-r', code], { input: JSON.stringify({ op, args }) })));
+  return JSON.parse(String(execFileSync(PHP, ['-r', code], { input: JSON.stringify({ op, args }) })));
 }
 
 describe('the site keeps the count and serves it with its time (src/StreetLive.php)', { skip: skipPhp }, () => {

@@ -19,6 +19,7 @@ import { mgDetails, potionPlotCount, potionTooTired } from '../public/js/master-
 const settle = () => new Promise((res) => setTimeout(res, 2700));
 import { HAS_SITE, SITE_DIR, serverPath, sitePath, skipWithoutServer } from '../tools/repos.mjs';
 import { ANSWER_WAIT_FALLBACK_MS } from '../public/js/online-request.js?v=09ac8a9c';
+import { HAS_PHP, PHP } from './php.js';
 
 const read = (p) => readFileSync(new URL(`../${p}`, import.meta.url), 'utf8');
 const COMMUNITY = 'GCR101NQ4BU1SKS';
@@ -370,8 +371,8 @@ describe('Master Gardener potions on a shared bed (slice 2)', () => {
   });
 });
 
-describe('the one-time payout by mail (site GardenPayout.php)', { skip: !HAS_SITE ? 'no site checkout' : spawnSync('php', ['-v']).status !== 0 ? 'no php' : false }, () => {
-  const php = (body) => JSON.parse(execFileSync('php', ['-r', `foreach (['LedgerMath', 'Economy', 'LedgerMail', 'GardenPayout'] as $c) require ${JSON.stringify(SITE_DIR)} . "/src/$c.php"; use Groddle\\Minn\\GardenPayout as P; ${body}`]).toString());
+describe('the one-time payout by mail (site GardenPayout.php)', { skip: !HAS_SITE ? 'no site checkout' : !HAS_PHP ? 'no php' : false }, () => {
+  const php = (body) => JSON.parse(execFileSync(PHP, ['-r', `foreach (['LedgerMath', 'Economy', 'LedgerMail', 'GardenPayout'] as $c) require ${JSON.stringify(SITE_DIR)} . "/src/$c.php"; use Groddle\\Minn\\GardenPayout as P; ${body}`]).toString());
   const seeds = JSON.parse(readFileSync(sitePath('data', 'garden-seeds.json'), 'utf8'));
 
   it('the site lists the same ten streets, with each seed\'s crop and count', () => {

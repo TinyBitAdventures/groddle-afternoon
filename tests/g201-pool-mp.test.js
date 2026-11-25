@@ -24,16 +24,17 @@ import { GAME_DAY_MS, GAME_EPOCH_MS, getGameDayKey } from '../public/js/game-day
 import { normalizeToolConditionState } from '../public/js/tools.js?v=4156bba8';
 import { tradeTable } from '../tools/build-realtime-trade.mjs';
 import { HAS_SERVER, HAS_SITE, SITE_DIR, serverPath, sitePath } from '../tools/repos.mjs';
+import { HAS_PHP, PHP } from './php.js';
 
 const root = join(import.meta.dirname, '..');
 const GS = join(root, '../glitch-GameServerJS');
-const hasPhp = spawnSync('php', ['-v']).status === 0;
+const hasPhp = HAS_PHP;
 const skipSite = !HAS_SITE ? 'no groddle-afternoon-site checkout' : !hasPhp ? 'no php' : false;
 const OP = 'drop-00000000000000a1';
 
 function php(classes, body) {
   const code = `foreach (${JSON.stringify(classes)} as $c) require ${JSON.stringify(SITE_DIR)} . "/src/$c.php"; ${body}`;
-  return JSON.parse(execFileSync('php', ['-r', code]).toString());
+  return JSON.parse(execFileSync(PHP, ['-r', code]).toString());
 }
 
 describe('the pool as the source keeps it (site HomePool.php)', { skip: skipSite }, () => {

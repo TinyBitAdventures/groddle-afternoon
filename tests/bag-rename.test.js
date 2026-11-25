@@ -35,6 +35,7 @@ import { bagsFeature } from '../public/js/features/bags-feature.js?v=17bcf98a';
 import { pouchFeature } from '../public/js/features/elemental-pouch-feature.js?v=34fd0db8';
 import { POUCH_CLASS } from '../public/js/elemental-pouch.js?v=42702eda';
 import { HAS_SITE, SITE_DIR } from '../tools/repos.mjs';
+import { HAS_PHP, PHP } from './php.js';
 
 const ROOT = join(import.meta.dirname, '..');
 const GSJS = join(ROOT, '..', 'glitch-GameServerJS', 'items');
@@ -334,7 +335,7 @@ describe('the feature (bags-feature.js)', () => {
   });
 });
 
-const hasPhp = spawnSync('php', ['-v']).status === 0;
+const hasPhp = HAS_PHP;
 const skipSite = !HAS_SITE ? 'no groddle-afternoon-site checkout' : !hasPhp ? 'no php' : false;
 
 describe("the site's ledger ignores bag names (LedgerMath::holdings)", { skip: skipSite }, () => {
@@ -349,7 +350,7 @@ describe("the site's ledger ignores bag names (LedgerMath::holdings)", { skip: s
     const run = (named) => {
       const entries = JSON.stringify({ playerState: JSON.stringify(state(named)), droppedItems: JSON.stringify(dropped(named)) });
       const code = `foreach (['Economy', 'LedgerMath'] as $c) require ${JSON.stringify(SITE_DIR)} . "/src/$c.php"; use Groddle\\Minn\\LedgerMath; use Groddle\\Minn\\Economy; echo json_encode(LedgerMath::holdings(json_decode(${JSON.stringify(entries)}, true), Economy::shared()));`;
-      return JSON.parse(execFileSync('php', ['-r', code]).toString());
+      return JSON.parse(execFileSync(PHP, ['-r', code]).toString());
     };
     const plain = run(false);
     assert.deepEqual(run(true), plain);

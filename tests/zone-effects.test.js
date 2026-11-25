@@ -31,10 +31,11 @@ import * as textures from '../public/js/textures.js?v=b8e38103';
 import { installNewArt } from '../public/js/builder/new-art.js?v=29f0b13e';
 import { newStreet } from '../public/js/builder/templates.js?v=881dfa69';
 import { kindChange, costWords } from '../public/js/builder/editor-effects.js?v=65488813';
+import { HAS_PHP, PHP } from './php.js';
 
 const json = (p) => JSON.parse(readFileSync(join(GAME_DIR, p), 'utf8'));
-const hasPhp = spawnSync('php', ['-v']).status === 0;
-const php = (code, input) => execFileSync('php', ['-r', code], { input: JSON.stringify(input) }).toString();
+const hasPhp = HAS_PHP;
+const php = (code, input) => execFileSync(PHP, ['-r', code], { input: JSON.stringify(input) }).toString();
 const street = (extra = {}) => ({ tsid: 'GZTEST000000001', label: 'Cinder Steps', bounds: { l: -1500, r: 1500, t: -2400, b: 0 }, platforms: [{ id: 'plat_1', x1: -1480, y1: -60, x2: 1480, y2: -60, pc_perm: -1 }], layers: [{ id: 'sky', z: -3, w: 2200, h: 1800, decos: [] }, { id: 'middleground', z: 0, decos: [] }], ...extra });
 
 /** A stand-in Pixi with just what the effects view touches; it counts the sprites it makes. */

@@ -13,8 +13,9 @@ import { execFileSync, spawnSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { SITE_DIR, skipWithoutSite } from '../tools/repos.mjs';
+import { HAS_PHP, PHP } from './php.js';
 
-const hasPhp = spawnSync('php', ['-v']).status === 0;
+const hasPhp = HAS_PHP;
 const skip = skipWithoutSite || !hasPhp;
 
 /** One LedgerMath call in PHP. */
@@ -30,7 +31,7 @@ function php(op, args) {
       'baseline' => LedgerMath::markBaseline($a[0], (int) ($a[1] ?? 0)),
     };
     echo json_encode($out);`;
-  const out = execFileSync('php', ['-r', code], { input: JSON.stringify({ op, args }) });
+  const out = execFileSync(PHP, ['-r', code], { input: JSON.stringify({ op, args }) });
   return JSON.parse(String(out), (k, v) => (Array.isArray(v) && !v.length && ['items', 'made', 'runs', 'capped', 'detail', 'held'].includes(k) ? {} : v));
 }
 

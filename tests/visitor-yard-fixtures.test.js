@@ -16,18 +16,19 @@ import { normalizeYardView } from '../public/js/yard-verbs-mp.js?v=14d12d1c';
 import { MAGIC_STICKS, REMOTE_MACHINES } from '../public/js/animal-husbandry.js?v=427fd853';
 import { STICK_SCALE } from '../public/js/features/animal-husbandry-feature.js?v=b86bfc54';
 import { GAME_DIR, HAS_SITE, SITE_DIR, sitePath } from '../tools/repos.mjs';
+import { HAS_PHP, PHP } from './php.js';
 
 const read = (rel) => readFileSync(join(GAME_DIR, rel), 'utf8');
 const gsjs = join(GAME_DIR, '..', 'glitch-GameServerJS');
 const skipSource = !existsSync(join(gsjs, 'items', 'magic_pig_stick.js')) && 'glitch-GameServerJS is not beside the game';
 const sticks = Object.entries(YARD_FIXTURES).filter(([, def]) => def.kind === 'stick');
 const machines = Object.entries(YARD_FIXTURES).filter(([, def]) => def.kind === 'machine');
-const hasPhp = spawnSync('php', ['-v']).status === 0;
+const hasPhp = HAS_PHP;
 const skipSite = !HAS_SITE ? 'no groddle-afternoon-site checkout' : !hasPhp ? 'no php' : false;
 
 function php(classes, body) {
   const code = `foreach (${JSON.stringify(classes)} as $c) require ${JSON.stringify(SITE_DIR)} . "/src/$c.php"; ${body}`;
-  return JSON.parse(execFileSync('php', ['-r', code]).toString());
+  return JSON.parse(execFileSync(PHP, ['-r', code]).toString());
 }
 
 describe('a placed Magic Stick, as a visitor sees it', () => {

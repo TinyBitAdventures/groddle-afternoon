@@ -26,6 +26,7 @@ import { loadContentCatalogsFromDir, getSkillCatalog } from '../public/js/conten
 import { skillTitle } from '../public/js/skill-tree.js?v=08772a4b';
 import { skillArtFor } from '../public/js/familiar.js?v=b9597cd3';
 import { CARD_ART_LAYERS } from '../public/js/imagination-data.js?v=4a85e7fe';
+import { PHP } from './php.js';
 
 const root = join(import.meta.dirname, '..');
 const read = (rel) => readFileSync(join(root, rel), 'utf8');
@@ -318,7 +319,7 @@ describe('the site side (groddle-afternoon-site)', { skip: skipWithoutSite }, ()
   it('ProfilePng takes well formed PNGs within limits and refuses the rest; Profiles cleans text (php)', { skip: !existsSync(join(engine, 'src/Minn/Autoloader.php')) && 'Minn Engine not found (set MINN_ENGINE_DIR)' }, () => {
     let out;
     try {
-      out = JSON.parse(execFileSync('php', [join(root, 'tests/fixtures/profiles/profile-png.php'), engine, SITE_DIR], { encoding: 'utf8' }));
+      out = JSON.parse(execFileSync(PHP, [join(root, 'tests/fixtures/profiles/profile-png.php'), engine, SITE_DIR], { encoding: 'utf8' }));
     } catch (err) {
       if (err.code === 'ENOENT') return; // no php here
       throw err;
@@ -343,7 +344,7 @@ describe('the site side (groddle-afternoon-site)', { skip: skipWithoutSite }, ()
   it('HomePicture takes well formed WebP, JPEG and PNG within limits, keeps what GD writes with a phone copy, and refuses crafted files (php)', { skip: !existsSync(join(engine, 'src/Minn/Autoloader.php')) && 'Minn Engine not found (set MINN_ENGINE_DIR)' }, () => {
     let out;
     try {
-      out = JSON.parse(execFileSync('php', [join(root, 'tests/fixtures/profiles/home-picture.php'), engine, SITE_DIR], { encoding: 'utf8' }));
+      out = JSON.parse(execFileSync(PHP, [join(root, 'tests/fixtures/profiles/home-picture.php'), engine, SITE_DIR], { encoding: 'utf8' }));
     } catch (err) {
       if (err.code === 'ENOENT') return; // no php here
       throw err;
@@ -434,7 +435,7 @@ describe('a profile\'s pages: skills, badges and buddies (G338, Glitch\'s /profi
   it('names and pictures each skill as the game does (php against js/skill-tree.js skillTitle, js/familiar.js skillArtFor)', { skip: !existsSync(join(engine, 'src/Minn/Autoloader.php')) && 'Minn Engine not found (set MINN_ENGINE_DIR)' }, async () => {
     let out;
     try {
-      out = JSON.parse(execFileSync('php', [join(root, 'tests/fixtures/profiles/profile-pages.php'), engine, SITE_DIR, join(root, 'public')], { encoding: 'utf8' }));
+      out = JSON.parse(execFileSync(PHP, [join(root, 'tests/fixtures/profiles/profile-pages.php'), engine, SITE_DIR, join(root, 'public')], { encoding: 'utf8' }));
     } catch (err) {
       if (err.code === 'ENOENT') return; // no php here
       throw err;

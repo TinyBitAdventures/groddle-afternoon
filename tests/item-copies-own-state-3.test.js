@@ -40,6 +40,7 @@ import { FAVOR_GIANTS } from '../public/js/potions.js?v=4f4c996d';
 import { HOPPER_CEILING, STILL } from '../public/js/machines.js?v=5d749d26';
 import { teachPhrase } from '../public/js/seasons.js?v=5d8f545a';
 import { addItem, countItem, createInventory } from '../public/js/inventory.js?v=6414dbdc';
+import { HAS_PHP, PHP } from './php.js';
 
 /** A copy of the feature of its own (its realtime binding is module state). */
 const rookCopy = async (name) => (await import(`../public/js/features/rook-attack-feature.js?fresh=item-state-3-${name}`)).rookAttackFeature;
@@ -54,7 +55,7 @@ function pack(items = {}) {
   return { inv, toolState };
 }
 
-const hasPhp = spawnSync('php', ['-v']).status === 0;
+const hasPhp = HAS_PHP;
 const skipSite = skipWithoutSite || !hasPhp;
 
 /** One static call into the site's src (plain PHP, no engine). */
@@ -63,7 +64,7 @@ function php(classes, call, args) {
     foreach (${JSON.stringify(classes)} as $c) require ${JSON.stringify(SITE_DIR)} . "/src/$c.php";
     $a = json_decode(stream_get_contents(STDIN), true);
     echo json_encode(${call});`;
-  return JSON.parse(String(execFileSync('php', ['-r', code], { input: JSON.stringify(args) })));
+  return JSON.parse(String(execFileSync(PHP, ['-r', code], { input: JSON.stringify(args) })));
 }
 
 const pours = (toolState) => toolCopies(toolState, 'potion_rook_balm').map((c) => c.remaining);

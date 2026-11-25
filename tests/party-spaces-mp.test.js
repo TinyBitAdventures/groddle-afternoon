@@ -20,6 +20,7 @@ import { PARTY_PACKS, PARTY_SPACES, PARTY_TEXT, normalizePartyRecord } from '../
 import { partySpacesFeature } from '../public/js/features/party-spaces-feature.js?v=0d4172c8';
 import { sharedStreet } from '../public/js/features/realtime-feature.js?v=ff77623a';
 import { HAS_SERVER, HAS_SITE, SITE_DIR, serverPath, sitePath } from '../tools/repos.mjs';
+import { HAS_PHP, PHP } from './php.js';
 
 const root = join(import.meta.dirname, '..');
 const read = (rel) => readFileSync(join(root, rel), 'utf8');
@@ -379,7 +380,7 @@ describe('the server\'s Party Spaces (party_spaces.go)', { skip: skipServer }, (
   });
 });
 
-const hasPhp = spawnSync('php', ['-v']).status === 0;
+const hasPhp = HAS_PHP;
 const skipSite = !HAS_SITE ? 'no groddle-afternoon-site checkout' : !hasPhp ? 'no php' : false;
 
 describe('the site\'s spend route (LedgerSpend.php)', { skip: skipSite }, () => {
@@ -407,7 +408,7 @@ describe('the site\'s spend route (LedgerSpend.php)', { skip: skipSite }, () => 
       $twice = LedgerMath::applyTrade($after, 'party-00000000000000a9', $gave, $got);
       $s = json_decode($twice['playerState'], true);
       echo json_encode(['view' => $view, 'inv' => $s['inventory'], 'applied' => LedgerMath::applied($twice)]);`;
-    const out = JSON.parse(execFileSync('php', ['-r', code]).toString());
+    const out = JSON.parse(execFileSync(PHP, ['-r', code]).toString());
     assert.deepEqual(out.view, { items: { party_pack_toxic_moon: 1 }, currants: 500 });
     // The pack keeps a class it ran out of at 0, as the game does (G335 slice 2, LedgerMath::applyTrade).
     assert.equal(out.inv.party_pack_toxic_moon || 0, 0);

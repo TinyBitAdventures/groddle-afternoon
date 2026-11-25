@@ -13,8 +13,9 @@ import { execFileSync, spawnSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { SITE_DIR, skipWithoutSite } from '../tools/repos.mjs';
+import { HAS_PHP, PHP } from './php.js';
 
-const hasPhp = spawnSync('php', ['-v']).status === 0;
+const hasPhp = HAS_PHP;
 const skip = skipWithoutSite || !hasPhp;
 const HARNESS = join(import.meta.dirname, 'fixtures/ledger-refund/run-harness.php');
 
@@ -26,11 +27,11 @@ function owed(rows, paid = {}) {
     $paid = [];
     foreach ($in['paid'] as $u => $refs) $paid[(int) $u] = $refs;
     echo json_encode(LedgerRefund::owedG905($in['rows'], Economy::shared(), LedgerRefund::G905_FROM, $paid));`;
-  return JSON.parse(String(execFileSync('php', ['-r', code], { input: JSON.stringify({ rows, paid }) })));
+  return JSON.parse(String(execFileSync(PHP, ['-r', code], { input: JSON.stringify({ rows, paid }) })));
 }
 
 function run(input) {
-  return JSON.parse(String(execFileSync('php', [HARNESS], { input: JSON.stringify({ site: SITE_DIR, names: {}, credited: [], ...input }) })));
+  return JSON.parse(String(execFileSync(PHP, [HARNESS], { input: JSON.stringify({ site: SITE_DIR, names: {}, credited: [], ...input }) })));
 }
 
 let id = 0;

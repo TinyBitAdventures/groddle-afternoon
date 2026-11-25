@@ -14,15 +14,16 @@ import { existsSync, readFileSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { join } from 'node:path';
 import { SITE_DIR, sitePath, skipWithoutSite } from '../tools/repos.mjs';
+import { HAS_PHP, PHP } from './php.js';
 
-const hasPhp = spawnSync('php', ['-v']).status === 0;
+const hasPhp = HAS_PHP;
 const engine = process.env.MINN_ENGINE_DIR || join(homedir(), 'Cove/Sites/minn-engine.localhost/public/minn');
 const noEngine = !existsSync(join(engine, 'src/Minn/Autoloader.php')) && 'Minn Engine not found (set MINN_ENGINE_DIR)';
 const skipPhp = skipWithoutSite || (!hasPhp && 'no php') || noEngine;
 const src = (p) => readFileSync(sitePath(p), 'utf8');
 function php(body) {
   const code = `define('ABSPATH', sys_get_temp_dir() . '/'); define('MINN_ENGINE_DIR', ${JSON.stringify(engine)}); require ${JSON.stringify(engine)} . '/src/Minn/Autoloader.php'; Minn\\Autoloader::register(); foreach (['WordFilter', 'BugReports', 'AdminConsole', 'CommunityText', 'Community', 'ChatHistory', 'Notifications', 'CommunityPages'] as $c) require ${JSON.stringify(SITE_DIR)} . "/src/$c.php"; use Groddle\\Minn\\CommunityPages as P; echo json_encode(${body}, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);`;
-  return JSON.parse(execFileSync('php', ['-r', code]).toString());
+  return JSON.parse(execFileSync(PHP, ['-r', code]).toString());
 }
 
 describe('the boards\' words box grows (Bugs thread 6)', { skip: skipWithoutSite }, () => {

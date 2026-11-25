@@ -16,10 +16,11 @@ import { homeCrewMpFeature } from '../public/js/features/home-crew-mp-feature.js
 import { createMineRock } from '../public/js/mining.js?v=5e49efb3';
 import { createQuestState } from '../public/js/quests.js?v=c8d59839';
 import { HAS_SERVER, HAS_SITE, SITE_DIR, serverPath } from '../tools/repos.mjs';
+import { HAS_PHP, PHP } from './php.js';
 
 const root = join(import.meta.dirname, '..');
 const gsjs = join(root, '..', 'glitch-GameServerJS');
-const hasPhp = spawnSync('php', ['-v']).status === 0;
+const hasPhp = HAS_PHP;
 const skipSite = !HAS_SITE ? 'no groddle-afternoon-site checkout' : !hasPhp ? 'no php' : false;
 
 function fakeClient({ street = 'HOME_7', me = 7 } = {}) {
@@ -248,7 +249,7 @@ describe('the site takes and credits the crew\'s help (HomeYard::judgeStock)', {
     systems: { features: { homes: { cult: { items } } } },
     world: { streets: { RH_HOME_EXT: { rocks: [{ classId: 'rock_metal_1', rock: { chunksRemaining: 20, depleted: false, respawnAt: 0 } }] } } },
   };
-  const judge = (id, verb, help, waiting = '[]', started = 0) => JSON.parse(execFileSync('php', ['-r', `foreach (["HomePool", "HomeYard"] as $c) require ${JSON.stringify(SITE_DIR)} . "/src/$c.php"; use Groddle\\Minn\\HomeYard; $s = json_decode(${JSON.stringify(JSON.stringify(state))}, false); $h = HomeYard::crewHelp(json_decode(${JSON.stringify(JSON.stringify(help))}, true)); if (${started} > 0) { $h['started'] = ${started}; } echo json_encode(HomeYard::judgeStock(HomeYard::rules(), $s, ${waiting}, [], [], ${JSON.stringify(id.startsWith('rock') ? 'rock' : 'node')}, ${JSON.stringify(id)}, ${JSON.stringify(verb)}, 1800000000000, fn($a, $b) => $a, $h));`]).toString());
+  const judge = (id, verb, help, waiting = '[]', started = 0) => JSON.parse(execFileSync(PHP, ['-r', `foreach (["HomePool", "HomeYard"] as $c) require ${JSON.stringify(SITE_DIR)} . "/src/$c.php"; use Groddle\\Minn\\HomeYard; $s = json_decode(${JSON.stringify(JSON.stringify(state))}, false); $h = HomeYard::crewHelp(json_decode(${JSON.stringify(JSON.stringify(help))}, true)); if (${started} > 0) { $h['started'] = ${started}; } echo json_encode(HomeYard::judgeStock(HomeYard::rules(), $s, ${waiting}, [], [], ${JSON.stringify(id.startsWith('rock') ? 'rock' : 'node')}, ${JSON.stringify(id)}, ${JSON.stringify(verb)}, 1800000000000, fn($a, $b) => $a, $h));`]).toString());
 
   it('a swing\'s bonus comes off the rock with its own chunks and is credited', () => {
     const r = judge('rock:0', 'mine', { bonus: 3 });

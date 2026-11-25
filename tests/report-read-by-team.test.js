@@ -12,10 +12,11 @@ import { join } from 'node:path';
 import { mountReportsSheet } from '../public/js/ui/reports-sheet.js?v=92486673';
 import { REPORT_TEXT, matchesReport, readByTeamAt, readByTeamWords, readWhen } from '../public/js/reports.js?v=e861d5aa';
 import { SITE_DIR, sitePath, skipWithoutSite } from '../tools/repos.mjs';
+import { HAS_PHP, PHP, phpSkip } from './php.js';
 
 const root = join(import.meta.dirname, '..');
 const wait = (ms) => new Promise((r) => setTimeout(r, ms));
-const hasPhp = spawnSync('php', ['-v']).status === 0;
+const hasPhp = HAS_PHP;
 const engine = process.env.MINN_ENGINE_DIR || join(homedir(), 'Cove/Sites/minn-engine.localhost/public/minn');
 const noEngine = !existsSync(join(engine, 'src/Minn/Autoloader.php')) && 'Minn Engine not found (set MINN_ENGINE_DIR)';
 
@@ -144,8 +145,8 @@ describe('Read by the team on your reports', () => {
     for (const part of [fn, mark, summary]) assert.doesNotMatch(part, /[—–]/);
   });
 
-  it('the site: readByTeamAt from the read marks (php)', { skip: skipWithoutSite || (!hasPhp && 'no php') || noEngine }, () => {
-    const out = JSON.parse(execFileSync('php', [join(root, 'tests/fixtures/minn-accounts/tickets.php'), engine, SITE_DIR], { encoding: 'utf8' }));
+  it('the site: readByTeamAt from the read marks (php)', { skip: skipWithoutSite || phpSkip('gd') || noEngine }, () => {
+    const out = JSON.parse(execFileSync(PHP, [join(root, 'tests/fixtures/minn-accounts/tickets.php'), engine, SITE_DIR], { encoding: 'utf8' }));
     assert.deepEqual(out.readByTeam, {
       neverOpened: null,
       openedAfter: '2026-10-30T12:05:00Z',

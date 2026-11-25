@@ -41,6 +41,7 @@ import {
   unreadLetters,
   whereWords,
 } from '../public/js/phone/companion-data.js?v=464e4058';
+import { PHP } from './php.js';
 
 const pub = join(import.meta.dirname, '..', 'public');
 const read = (p) => readFileSync(join(pub, p), 'utf8');
@@ -529,7 +530,7 @@ describe('the site\'s look', () => {
 });
 
 describe('groddle/v1/buddies/online (groddle-afternoon-site)', { skip: skipWithoutSite }, () => {
-  const php = existsSync('/opt/homebrew/bin/php') ? '/opt/homebrew/bin/php' : 'php';
+  const php = PHP;
   const src = () => readFileSync(sitePath('src/BuddiesOnline.php'), 'utf8');
   const run = (code) => execFileSync(php, ['-r', `require ${JSON.stringify(sitePath('src/BuddiesOnline.php'))}; ${code}`], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] });
 

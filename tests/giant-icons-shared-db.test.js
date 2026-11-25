@@ -20,10 +20,11 @@ import { homedir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { SITE_DIR, skipWithoutSite } from '../tools/repos.mjs';
+import { HAS_PHP, PHP, phpSkip } from './php.js';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const engine = process.env.MINN_ENGINE_DIR || join(homedir(), 'Cove/Sites/minn-engine.localhost/public/minn');
-const hasPhp = spawnSync('php', ['-v']).status === 0;
+const hasPhp = HAS_PHP;
 
 /** The database to make the throwaway one on: GRODDLE_TEST_MYSQL, else the local groddle.localhost's wp-config. */
 function mysql() {
@@ -42,10 +43,10 @@ function mysql() {
 }
 
 const db = mysql();
-const reachable = db && hasPhp && spawnSync('php', ['-r', 'mysqli_report(MYSQLI_REPORT_OFF); $m = @new mysqli($argv[1], $argv[2], $argv[3]); exit($m->connect_errno ? 1 : 0);', db.host, db.user, db.pass]).status === 0;
-const hasPcntl = hasPhp && spawnSync('php', ['-r', 'exit(function_exists("proc_open") ? 0 : 1);']).status === 0;
+const reachable = db && hasPhp && spawnSync(PHP, ['-r', 'mysqli_report(MYSQLI_REPORT_OFF); $m = @new mysqli($argv[1], $argv[2], $argv[3]); exit($m->connect_errno ? 1 : 0);', db.host, db.user, db.pass]).status === 0;
+const hasPcntl = hasPhp && spawnSync(PHP, ['-r', 'exit(function_exists("proc_open") ? 0 : 1);']).status === 0;
 const skip = skipWithoutSite
-  || (!hasPhp && 'no php')
+  || phpSkip('mysqli')
   || (!hasPcntl && 'no proc_open in this php')
   || (!existsSync(join(engine, 'src/Minn/Autoloader.php')) && 'Minn Engine not found (set MINN_ENGINE_DIR)')
   || (!reachable && 'no MariaDB to make a throwaway database on (set GRODDLE_TEST_MYSQL)');
@@ -55,7 +56,7 @@ const proof = (token) => JSON.parse(Buffer.from(String(token).split('.')[0], 'ba
 describe('#697: one shared count per Icon placed in a home (HomeIcons)', { skip }, () => {
   let r;
   before(() => {
-    r = JSON.parse(execFileSync('php', [join(root, 'tests/fixtures/home-icons/shared-icons.php'), engine, SITE_DIR, db.host, db.user, db.pass], { timeout: 120000 }).toString());
+    r = JSON.parse(execFileSync(PHP, [join(root, 'tests/fixtures/home-icons/shared-icons.php'), engine, SITE_DIR, db.host, db.user, db.pass], { timeout: 120000 }).toString());
   });
 
   it('ran on its own database and dropped it', () => {

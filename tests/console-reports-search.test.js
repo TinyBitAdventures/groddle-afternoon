@@ -17,6 +17,7 @@ import { homedir } from 'node:os';
 import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { HAS_SITE, SITE_DIR, sitePath, skipWithoutSite } from '../tools/repos.mjs';
+import { HAS_PHP, PHP, phpSkip } from './php.js';
 
 const src = (p) => readFileSync(sitePath(p), 'utf8');
 
@@ -140,7 +141,7 @@ describe('the Reports search and menu in the console (console/console.js)', { sk
 
 // —— The routes on a throwaway database ——
 const engineDir = process.env.MINN_ENGINE_DIR || join(homedir(), 'Cove/Sites/minn-engine.localhost/public/minn');
-const hasPhp = spawnSync('php', ['-v']).status === 0;
+const hasPhp = HAS_PHP;
 function mysql() {
   const env = String(process.env.GRODDLE_TEST_MYSQL || '').trim();
   if (env) {
@@ -156,16 +157,16 @@ function mysql() {
   return host && user ? { host, user, pass: def('DB_PASSWORD') || '' } : null;
 }
 const db = mysql();
-const reachable = db && hasPhp && spawnSync('php', ['-r', 'mysqli_report(MYSQLI_REPORT_OFF); $m = @new mysqli($argv[1], $argv[2], $argv[3]); exit($m->connect_errno ? 1 : 0);', db.host, db.user, db.pass]).status === 0;
+const reachable = db && hasPhp && spawnSync(PHP, ['-r', 'mysqli_report(MYSQLI_REPORT_OFF); $m = @new mysqli($argv[1], $argv[2], $argv[3]); exit($m->connect_errno ? 1 : 0);', db.host, db.user, db.pass]).status === 0;
 const skipDb = skipWithoutSite
-  || (!hasPhp && 'no php')
+  || phpSkip('mysqli')
   || (!existsSync(join(engineDir, 'src/Minn/Autoloader.php')) && 'Minn Engine not found (set MINN_ENGINE_DIR)')
   || (!reachable && 'no MariaDB to make a throwaway database on (set GRODDLE_TEST_MYSQL)');
 
 describe('the search and the boards on a throwaway database', { skip: skipDb }, () => {
   let r;
   before(() => {
-    r = JSON.parse(execFileSync('php', [join(import.meta.dirname, 'fixtures/console-reports/console-reports.php'), engineDir, SITE_DIR, db.host, db.user, db.pass], { timeout: 120000 }).toString());
+    r = JSON.parse(execFileSync(PHP, [join(import.meta.dirname, 'fixtures/console-reports/console-reports.php'), engineDir, SITE_DIR, db.host, db.user, db.pass], { timeout: 120000 }).toString());
   });
 
   it('ran on its own database and dropped it', () => {

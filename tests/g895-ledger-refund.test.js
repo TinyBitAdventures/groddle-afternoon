@@ -11,8 +11,9 @@ import { execFileSync, spawnSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { SITE_DIR, skipWithoutSite } from '../tools/repos.mjs';
+import { HAS_PHP, PHP } from './php.js';
 
-const hasPhp = spawnSync('php', ['-v']).status === 0;
+const hasPhp = HAS_PHP;
 const skip = skipWithoutSite || !hasPhp;
 const HARNESS = join(import.meta.dirname, 'fixtures/ledger-refund/run-harness.php');
 
@@ -22,11 +23,11 @@ function owed(rows, from = null) {
     use Groddle\\Minn\\{Economy, LedgerRefund};
     $in = json_decode(stream_get_contents(STDIN), true);
     echo json_encode($in['from'] === null ? LedgerRefund::owedG895($in['rows'], Economy::shared()) : LedgerRefund::owedG895($in['rows'], Economy::shared(), $in['from']));`;
-  return JSON.parse(String(execFileSync('php', ['-r', code], { input: JSON.stringify({ rows, from }) })));
+  return JSON.parse(String(execFileSync(PHP, ['-r', code], { input: JSON.stringify({ rows, from }) })));
 }
 
 function run(input) {
-  return JSON.parse(String(execFileSync('php', [HARNESS], { input: JSON.stringify({ site: SITE_DIR, names: {}, credited: [], ...input }) })));
+  return JSON.parse(String(execFileSync(PHP, [HARNESS], { input: JSON.stringify({ site: SITE_DIR, names: {}, credited: [], ...input }) })));
 }
 
 const clamp = (id, at, items, extra = {}, user = 7) => ({ id, user_id: user, at, kind: 'clamp', detail: JSON.stringify({ clamped: { items, currants: 0 }, budget: 100, kept: 0, made: {}, ...extra }) });

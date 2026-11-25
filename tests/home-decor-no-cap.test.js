@@ -18,8 +18,9 @@ import { createFloorsState } from '../public/js/home-floors.js?v=459925ff';
 import { normalizeOwnerStacks } from '../public/js/neighbours-mp.js?v=e912be37';
 import { visitorHomeState } from '../public/js/features/homes-feature.js?v=5a17af25';
 import { HAS_SITE, SITE_DIR } from '../tools/repos.mjs';
+import { HAS_PHP, PHP } from './php.js';
 
-const hasPhp = spawnSync('php', ['-v']).status === 0;
+const hasPhp = HAS_PHP;
 const skipSite = !HAS_SITE ? 'no groddle-afternoon-site checkout' : !hasPhp ? 'no php' : false;
 
 const CLASSES = Object.keys(FURNITURE_CATALOG).filter((c) => !['furniture_chassis', 'furniture_tower_chassis', 'furniture_door'].includes(c));
@@ -80,7 +81,7 @@ describe('the site sends a house with many pieces whole', { skip: skipSite }, ()
   // The state goes in on stdin (a big house is past one argument's 128 KB).
   const php = (body, input = '') => {
     const code = `foreach (["WordFilter", "Neighbours"] as $c) require ${JSON.stringify(SITE_DIR)} . "/src/$c.php"; use Groddle\\Minn\\Neighbours; $in = json_decode(file_get_contents('php://stdin'), false); ${body}`;
-    return JSON.parse(execFileSync('php', ['-r', code], { input, maxBuffer: 64 * 1024 * 1024 }).toString());
+    return JSON.parse(execFileSync(PHP, ['-r', code], { input, maxBuffer: 64 * 1024 * 1024 }).toString());
   };
   const stateWith = (decor) => ({ systems: { features: { homes: { decor, cult: { items: [] }, backYard: {} } } } });
 

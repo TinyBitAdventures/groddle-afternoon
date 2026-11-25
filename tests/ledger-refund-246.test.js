@@ -9,8 +9,9 @@ import { execFileSync, spawnSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { SITE_DIR, skipWithoutSite } from '../tools/repos.mjs';
+import { HAS_PHP, PHP } from './php.js';
 
-const hasPhp = spawnSync('php', ['-v']).status === 0;
+const hasPhp = HAS_PHP;
 const skip = skipWithoutSite || !hasPhp;
 
 function php(op, args) {
@@ -23,7 +24,7 @@ function php(op, args) {
       'owed' => LedgerRefund::owed($a[0], Economy::shared()),
       'letters' => LedgerRefund::letters($a[0], $a[1]),
     });`;
-  return JSON.parse(String(execFileSync('php', ['-r', code], { input: JSON.stringify({ op, args }) })));
+  return JSON.parse(String(execFileSync(PHP, ['-r', code], { input: JSON.stringify({ op, args }) })));
 }
 
 const row = (id, at, kind, detail, user = 7) => ({ id, user_id: user, at, kind, detail: JSON.stringify(detail) });

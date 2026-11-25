@@ -44,16 +44,17 @@ import { isSharedJob } from '../public/js/street-jobs-mp.js?v=5b45cedc';
 import { homeStreetMpFeature } from '../public/js/features/home-street-mp-feature.js?v=02c88e46';
 import { projectTable } from '../tools/build-realtime-projects.mjs';
 import { HAS_SITE, SITE_DIR, serverPath } from '../tools/repos.mjs';
+import { HAS_PHP, PHP } from './php.js';
 
 const root = join(import.meta.dirname, '..');
 const read = (rel) => readFileSync(join(root, rel), 'utf8');
 const GSJS = join(process.env.HOME || '', 'Documents/glitch-audit/glitch-GameServerJS');
-const hasPhp = spawnSync('php', ['-v']).status === 0;
+const hasPhp = HAS_PHP;
 const skipSite = !HAS_SITE ? 'no groddle-afternoon-site checkout' : !hasPhp ? 'no php' : false;
 
 function php(body) {
   const code = `foreach (['Economy', 'LedgerMath', 'WordFilter', 'HomeSignpost', 'HomeStreet', 'LedgerFurniture'] as $c) require ${JSON.stringify(SITE_DIR)} . "/src/$c.php"; use Groddle\\Minn\\HomeStreet; use Groddle\\Minn\\LedgerFurniture; ${body}`;
-  return JSON.parse(execFileSync('php', ['-r', code]).toString());
+  return JSON.parse(execFileSync(PHP, ['-r', code]).toString());
 }
 
 describe('the signpost: friends\' homes on its arms (locations/home.js)', () => {

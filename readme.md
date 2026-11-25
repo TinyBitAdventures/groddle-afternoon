@@ -75,7 +75,10 @@ read the original sources from checkouts beside this repo:
 
 The multiplayer tests read the server and site repos from `../groddle-afternoon-server` and
 `../groddle-afternoon-site` (or `GRODDLE_SERVER_DIR` and `GRODDLE_SITE_DIR`), and skip with a
-clone hint when they are missing. A few tests check the item catalog against a research
+clone hint when they are missing. The site tests run PHP 8.3+ with mysqli and GD (with WebP),
+found by `tests/php.js`: `GRODDLE_PHP` when set, else a `php` on PATH, Homebrew's or `/usr/bin/php`,
+with a shipped extension that is switched off (Arch's mysqli and gd) switched on for the run. A test
+that needs a missing one skips and names it. A few tests check the item catalog against a research
 inventory kept outside the repo, and skip without it.
 
 `tools/shot.mjs` takes a screenshot of any route and `tools/playtest.mjs` plays the game like a

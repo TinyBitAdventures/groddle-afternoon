@@ -16,8 +16,9 @@ import { createHash } from 'node:crypto';
 import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { join, relative } from 'node:path';
 import { GAME_DIR, SITE_DIR, sitePath, skipWithoutSite } from '../tools/repos.mjs';
+import { HAS_PHP, PHP } from './php.js';
 
-const php = spawnSync('php', ['-v']).status === 0 ? 'php' : null;
+const php = HAS_PHP ? PHP : null;
 const skip = skipWithoutSite || (!php && 'no php');
 const THEME_URL = '/wp-content/themes/groddle/';
 const pub = join(GAME_DIR, 'public');

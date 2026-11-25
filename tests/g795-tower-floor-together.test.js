@@ -17,10 +17,11 @@ import { TOWER_JOBS, createTowerState, elevatorStops, finishSharedExpansion, flo
 import { normalizeTowers } from '../public/js/home-street-mp.js?v=2b921da4';
 import { projectTable } from '../tools/build-realtime-projects.mjs';
 import { SITE_DIR, sitePath, serverPath, skipWithoutServer, skipWithoutSite } from '../tools/repos.mjs';
+import { HAS_PHP, PHP } from './php.js';
 
 const root = join(import.meta.dirname, '..');
 const read = (p) => readFileSync(join(root, p), 'utf8');
-const hasPhp = spawnSync('php', ['-v']).status === 0;
+const hasPhp = HAS_PHP;
 const engine = process.env.MINN_ENGINE_DIR || join(homedir(), 'Cove/Sites/minn-engine.localhost/public/minn');
 const noEngine = !existsSync(join(engine, 'src/Minn/Autoloader.php')) && 'Minn Engine not found (set MINN_ENGINE_DIR)';
 
@@ -132,7 +133,7 @@ describe('G795: the site signs the floor (groddle-afternoon-site)', { skip: skip
   });
 
   it('only a built Tower building its next floor, and what was put in as whole counts (php)', { skip: (!hasPhp && 'no php') || noEngine }, () => {
-    const out = JSON.parse(execFileSync('php', [join(root, 'tests/fixtures/minn-accounts/home-tower.php'), engine, SITE_DIR], { encoding: 'utf8' }));
+    const out = JSON.parse(execFileSync(PHP, [join(root, 'tests/fixtures/minn-accounts/home-tower.php'), engine, SITE_DIR], { encoding: 'utf8' }));
     assert.deepEqual(out.building, { job: towerFloorWire(7, 2), floor: 3, got: { r1706: 5, r1707: 12 } });
     assert.equal(out.big.job, towerFloorWire(1000, 8));
     for (const k of ['notExpanding', 'notBuilt', 'tallest', 'noOwner', 'none']) assert.equal(out[k], null, k);

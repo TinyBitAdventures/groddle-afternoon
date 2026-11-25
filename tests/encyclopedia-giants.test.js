@@ -21,6 +21,7 @@ import { GSJS } from '../tools/catalog/build.mjs';
 import { gsjsVar } from '../tools/encyclopedia/giants.mjs';
 import { esc } from '../tools/encyclopedia/parts.mjs';
 import { sitePath, skipWithoutSite } from '../tools/repos.mjs';
+import { PHP } from './php.js';
 
 const root = join(import.meta.dirname, '..');
 const pub = join(root, 'public');
@@ -136,7 +137,7 @@ describe('the old /giants/ addresses (site src/MovedPages.php)', { skip: skipPhp
     const paths = ['/giants', '/giants/', '/giants/ti/', '/giants/?x=1', '/giantsx/', '/giants/../x'];
     let out;
     try {
-      out = JSON.parse(execFileSync('php', [join(root, 'tests/fixtures/moved-pages/moved-pages.php'), engine, sitePath(''), ...paths], { encoding: 'utf8' }));
+      out = JSON.parse(execFileSync(PHP, [join(root, 'tests/fixtures/moved-pages/moved-pages.php'), engine, sitePath(''), ...paths], { encoding: 'utf8' }));
     } catch (err) {
       if (err.code === 'ENOENT') return; // no php here
       throw err;

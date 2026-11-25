@@ -22,11 +22,12 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { SITE_DIR, sitePath, skipWithoutSite } from '../tools/repos.mjs';
 import { normalizeListings, normalizePiles } from '../public/js/home-street-mp.js?v=2b921da4';
+import { PHP } from './php.js';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const engine = process.env.MINN_ENGINE_DIR || join(homedir(), 'Cove/Sites/minn-engine.localhost/public/minn');
 // A php that runs scripts and has mysqli (php -v alone fails on some wrappers that run scripts fine).
-const hasPhp = spawnSync('php', ['-r', 'exit(function_exists("mysqli_report") ? 0 : 1);']).status === 0;
+const hasPhp = spawnSync(PHP, ['-r', 'exit(function_exists("mysqli_report") ? 0 : 1);']).status === 0;
 
 /** The database to make the throwaway one on: GRODDLE_TEST_MYSQL, else the local groddle.localhost's wp-config. */
 function mysql() {
@@ -45,7 +46,7 @@ function mysql() {
 }
 
 const db = mysql();
-const reachable = db && hasPhp && spawnSync('php', ['-r', 'mysqli_report(MYSQLI_REPORT_OFF); $m = @new mysqli($argv[1], $argv[2], $argv[3]); exit($m->connect_errno ? 1 : 0);', db.host, db.user, db.pass]).status === 0;
+const reachable = db && hasPhp && spawnSync(PHP, ['-r', 'mysqli_report(MYSQLI_REPORT_OFF); $m = @new mysqli($argv[1], $argv[2], $argv[3]); exit($m->connect_errno ? 1 : 0);', db.host, db.user, db.pass]).status === 0;
 const skipDb = skipWithoutSite
   || (!hasPhp && 'no php with mysqli')
   || (!existsSync(join(engine, 'src/Minn/Autoloader.php')) && 'Minn Engine not found (set MINN_ENGINE_DIR)')
@@ -92,7 +93,7 @@ describe('the game keeps every listing and pile the site sends (js/home-street-m
 describe('150 on sale, 250 bought, 250 piles collected, on a real database', { skip: skipDb }, () => {
   let r;
   before(() => {
-    r = JSON.parse(execFileSync('php', [join(root, 'tests/fixtures/furniture-sales/sales-unlimited.php'), engine, SITE_DIR, db.host, db.user, db.pass], { timeout: 180000 }).toString());
+    r = JSON.parse(execFileSync(PHP, [join(root, 'tests/fixtures/furniture-sales/sales-unlimited.php'), engine, SITE_DIR, db.host, db.user, db.pass], { timeout: 180000 }).toString());
   });
 
   it('ran on its own database and dropped it', () => {

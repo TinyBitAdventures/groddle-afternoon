@@ -34,6 +34,7 @@ import { drawTower, markHomeStale, profilesFeature, profilesState, towerTick, up
 import { renderHomeShot } from '../public/js/home-shot-render.js?v=b1875d75';
 import { PUBLIC_HIDE, publicHidden, withPublicView } from '../public/js/public-picture.js?v=1a0b03fa';
 import { GAME_DIR, HAS_SITE, SITE_DIR, skipWithoutSite } from '../tools/repos.mjs';
+import { HAS_PHP, PHP, phpSkip } from './php.js';
 
 const read = (rel) => readFileSync(join(GAME_DIR, rel), 'utf8');
 const site = (rel) => readFileSync(join(SITE_DIR, rel), 'utf8');
@@ -333,9 +334,9 @@ describe('the site side (groddle-afternoon-site)', { skip: skipWithoutSite }, ()
     assert.match(pages, /'tower-image' => \['tower', 'tower_at', 'tower_type'\],/);
   });
 
-  it('PHP lint', { skip: spawnSync('/usr/bin/php', ['-v']).status !== 0 && 'no /usr/bin/php' }, () => {
+  it('PHP lint', { skip: phpSkip() }, () => {
     for (const f of ['src/PlayerPages.php', 'src/Profiles.php', 'src/HomePicture.php', 'src/HomeLayout.php', join(GAME_DIR, 'tests/fixtures/profiles/home-pages.php')]) {
-      const r = spawnSync('/usr/bin/php', ['-l', f.startsWith('/') ? f : join(SITE_DIR, f)], { encoding: 'utf8' });
+      const r = spawnSync(PHP, ['-l', f.startsWith('/') ? f : join(SITE_DIR, f)], { encoding: 'utf8' });
       assert.equal(r.status, 0, `${f}: ${r.stdout}${r.stderr}`);
     }
   });
@@ -356,19 +357,19 @@ function mysql() {
   return host && user ? { host, user, pass: def('DB_PASSWORD') || '' } : null;
 }
 const engineDir = process.env.MINN_ENGINE_DIR || join(homedir(), 'Cove/Sites/minn-engine.localhost/public/minn');
-const hasPhp = spawnSync('php', ['-v']).status === 0;
+const hasPhp = HAS_PHP;
 const db = mysql();
-const reachable = db && hasPhp && spawnSync('php', ['-r', 'mysqli_report(MYSQLI_REPORT_OFF); $m = @new mysqli($argv[1], $argv[2], $argv[3]); exit($m->connect_errno ? 1 : 0);', db.host, db.user, db.pass]).status === 0;
-const gdArgs = hasPhp && spawnSync('php', ['-r', 'exit(function_exists("imagecreatetruecolor") ? 0 : 1);']).status !== 0 ? ['-d', 'extension=gd'] : [];
+const reachable = db && hasPhp && spawnSync(PHP, ['-r', 'mysqli_report(MYSQLI_REPORT_OFF); $m = @new mysqli($argv[1], $argv[2], $argv[3]); exit($m->connect_errno ? 1 : 0);', db.host, db.user, db.pass]).status === 0;
+const gdArgs = hasPhp && spawnSync(PHP, ['-r', 'exit(function_exists("imagecreatetruecolor") ? 0 : 1);']).status !== 0 ? ['-d', 'extension=gd'] : [];
 const skipDb = (!HAS_SITE && 'no site repo')
-  || (!hasPhp && 'no php')
+  || phpSkip('mysqli')
   || (!existsSync(join(engineDir, 'src/Minn/Autoloader.php')) && 'Minn Engine not found (set MINN_ENGINE_DIR)')
   || (!reachable && 'no MariaDB to make a throwaway database on (set GRODDLE_TEST_MYSQL)');
 
 describe('the public home pages on a throwaway database', { skip: skipDb }, () => {
   let r;
   before(() => {
-    r = JSON.parse(execFileSync('php', [...gdArgs, join(GAME_DIR, 'tests/fixtures/profiles/home-pages.php'), engineDir, SITE_DIR, join(GAME_DIR, 'public'), db.host, db.user, db.pass], { timeout: 90000 }).toString());
+    r = JSON.parse(execFileSync(PHP, [...gdArgs, join(GAME_DIR, 'tests/fixtures/profiles/home-pages.php'), engineDir, SITE_DIR, join(GAME_DIR, 'public'), db.host, db.user, db.pass], { timeout: 90000 }).toString());
   });
 
   it('ran on its own database and dropped it', () => {

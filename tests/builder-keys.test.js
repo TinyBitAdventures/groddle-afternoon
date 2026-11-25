@@ -17,8 +17,9 @@ import { SITE_DIR, GAME_DIR, sitePath, skipWithoutSite } from '../tools/repos.mj
 import { message, signKey, keySecret, workerSecret, signWorker, verifyWorker, canonicalQuery, parseKey, parseEnv, rfc3986 } from '../tools/builder/sign.mjs';
 import { SCOPES, RATES, RENDER } from '../tools/builder/limits.mjs';
 import { createWorker } from '../tools/builder/worker.mjs';
+import { HAS_PHP, PHP } from './php.js';
 
-const hasPhp = spawnSync('php', ['-v']).status === 0;
+const hasPhp = HAS_PHP;
 const MASTER = 'a'.repeat(16) + '0123456789abcdef0123456789abcdef';
 const KEY_ID = '0f1e2d3c4b5a6978';
 const CREATED = '2026-10-31 09:15:00';
@@ -63,7 +64,7 @@ describe('builder keys: the CLI and the site sign the same bytes', () => {
       echo json_encode($out);`;
     // PHP's parse_str keeps one value a name; a repeated name is sent as pairs (a=0&a=1 comes in as the list the router builds).
     const vectors = VECTORS.map((v) => (v.query === 'b=2&a=1&a=0' ? { ...v, query: 'b=2&a=1', pairs: { b: '2', a: '1' } } : v));
-    const out = JSON.parse(execFileSync('php', ['-r', php], { input: JSON.stringify({ master: MASTER, key: KEY_ID, created: CREATED, at: AT, nonce: NONCE, vectors }) }).toString());
+    const out = JSON.parse(execFileSync(PHP, ['-r', php], { input: JSON.stringify({ master: MASTER, key: KEY_ID, created: CREATED, at: AT, nonce: NONCE, vectors }) }).toString());
     assert.equal(out.secret, secret);
     assert.equal(out.worker, workerSecret(MASTER));
     vectors.forEach((v, i) => {
@@ -85,7 +86,7 @@ describe('the site refuses a stale, replayed, forged or out-of-scope key (Builde
   const body = '{"ops":[]}';
   const key = { key_id: KEY_ID, label: 'test', scopes: 'drafts:read drafts:write validate', created_by: 1, created_at: CREATED, expires_at: '2026-11-30 09:15:00', revoked_at: null };
   const sign = (o = {}) => signKey({ keyId: KEY_ID, secret, method: 'POST', route, body, at: AT, ...o });
-  const run = (calls, extra = {}) => JSON.parse(execFileSync('php', [join(GAME_DIR, 'tests/fixtures/builder/keys-harness.php')], { input: JSON.stringify({ site: SITE_DIR, master: MASTER, now: AT, key: { ...key, ...extra }, calls }) }).toString());
+  const run = (calls, extra = {}) => JSON.parse(execFileSync(PHP, [join(GAME_DIR, 'tests/fixtures/builder/keys-harness.php')], { input: JSON.stringify({ site: SITE_DIR, master: MASTER, now: AT, key: { ...key, ...extra }, calls }) }).toString());
   const call = (header, o = {}) => ({ header, method: 'POST', route, body, scope: 'drafts:write', kind: 'write', ...o });
 
   it('takes a good call once; the same nonce again is a replay', () => {
@@ -148,7 +149,7 @@ describe('the draft art route hands out only art the draft names, or the caller 
     const php = `require ${JSON.stringify(SITE_DIR)} . '/src/AdminBuilderAssets.php';
       $in = json_decode(stream_get_contents(STDIN)); $row = json_decode(json_encode($in->row), true);
       echo json_encode(Groddle\\Minn\\AdminBuilderAssets::artAllowed($in->zone, 'mount-test', $row, $in->author));`;
-    return JSON.parse(execFileSync('php', ['-r', php], { input: JSON.stringify({ zone, row, author }) }).toString());
+    return JSON.parse(execFileSync(PHP, ['-r', php], { input: JSON.stringify({ zone, row, author }) }).toString());
   };
   const row = { name: 'gz_ai_ash_cone', sha256: SHA, draft: 'mount-test', createdBy: 'key:0f1e2d3c4b5a6978' };
   const named = { assets: { gz_ai_ash_cone: { origin: 'new', sha256: SHA } } };

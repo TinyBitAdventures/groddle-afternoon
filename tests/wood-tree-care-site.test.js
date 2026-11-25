@@ -9,12 +9,13 @@ import { spawnSync } from 'node:child_process';
 import { describe, it } from 'node:test';
 import { fileURLToPath } from 'node:url';
 import { SITE_DIR, serverPath, skipWithoutServer, skipWithoutSite } from '../tools/repos.mjs';
+import { HAS_PHP, PHP } from './php.js';
 
-const hasPhp = spawnSync('php', ['-v']).status === 0;
+const hasPhp = HAS_PHP;
 describe('the site counts a visitor\'s Wood Tree care as the game and server do', { skip: skipWithoutServer || skipWithoutSite || (!hasPhp && 'no php') }, () => {
   it('replays testdata/wood-care.json through HomeYard::judge and plotNow', () => {
     const script = fileURLToPath(new URL('./fixtures/wood-care-site-replay.php', import.meta.url));
-    const r = spawnSync('php', [script, SITE_DIR, serverPath('testdata', 'wood-care.json')], { encoding: 'utf8' });
+    const r = spawnSync(PHP, [script, SITE_DIR, serverPath('testdata', 'wood-care.json')], { encoding: 'utf8' });
     assert.equal(r.status, 0, r.stdout + r.stderr);
     assert.match(r.stdout, /^ok \d+ cases/);
   });

@@ -15,8 +15,9 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { SITE_DIR, skipWithoutSite } from '../tools/repos.mjs';
 import { powdersFeature } from '../public/js/features/powders-feature.js?v=83dfc135';
+import { HAS_PHP, PHP } from './php.js';
 
-const hasPhp = spawnSync('php', ['-v']).status === 0;
+const hasPhp = HAS_PHP;
 const skip = skipWithoutSite || !hasPhp;
 const root = join(import.meta.dirname, '..');
 const read = (rel) => readFileSync(join(root, rel), 'utf8');
@@ -42,7 +43,7 @@ function php(op, args) {
       'consts' => ['rate' => Ledger::RATE, 'new' => Ledger::NEW_BUDGET, 'most' => LedgerCredits::ONLINE_MOST, 'classes' => LedgerUse::CLASSES, 'why' => LedgerCredits::WHY],
     };
     echo json_encode($out);`;
-  return JSON.parse(String(execFileSync('php', ['-r', code], { input: JSON.stringify({ op, args }) })));
+  return JSON.parse(String(execFileSync(PHP, ['-r', code], { input: JSON.stringify({ op, args }) })));
 }
 
 /** A save's entries with this pack and these feature slices (and the game's tool state, js/tools.js). */

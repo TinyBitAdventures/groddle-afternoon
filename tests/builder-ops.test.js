@@ -15,6 +15,7 @@ import { DEFAULT_GRADIENT, forkOps, forkStreet, newTsid, relayerPosition, street
 import { compileSchema } from '../public/js/builder/schema-check.js?v=cc9d1af4';
 import { DECO_TWINS } from '../public/js/street-render.js?v=cfb77c44';
 import { SITE_DIR, skipWithoutSite } from '../tools/repos.mjs';
+import { HAS_PHP, PHP } from './php.js';
 
 const root = join(import.meta.dirname, '..');
 const json = (p) => JSON.parse(readFileSync(join(root, p), 'utf8'));
@@ -22,7 +23,7 @@ const schema = json('docs/level-builder/zone.schema.json');
 const catalog = new Map(json('public/assets/content/deco-catalog.json').decos.map((d) => [d.name, d]));
 const ecology = json('public/assets/content/street-ecology.json').streets;
 const bytes = (z) => JSON.stringify(z);
-const hasPhp = spawnSync('php', ['-v']).status === 0;
+const hasPhp = HAS_PHP;
 
 /** A zone holding a fork of one shipped street. */
 function forkedZone(tsid = 'GLI2V0UN7RD1T2J', key = 'lane') {
@@ -368,7 +369,7 @@ describe('the site applies the same ops (groddle-afternoon-site src/BuilderOps.p
       $out = [];
       foreach ($in->ops as $op) { try { $r = Groddle\\Minn\\BuilderOps::apply($in->zone, $op); $out[] = $r['inverse']; } catch (Groddle\\Minn\\BuilderOpError $e) { $out[] = ['error' => $e->errorCode]; } }
       echo Groddle\\Minn\\BuilderOps::encode(['zone' => $in->zone, 'inverses' => $out]);`;
-    return execFileSync('php', ['-d', 'memory_limit=512M', '-r', code], { input: JSON.stringify({ zone, ops }), maxBuffer: 1 << 28 }).toString();
+    return execFileSync(PHP, ['-d', 'memory_limit=512M', '-r', code], { input: JSON.stringify({ zone, ops }), maxBuffer: 1 << 28 }).toString();
   };
 
   it('the same script gives the same zone and the same inverses, byte for byte', () => {
@@ -432,7 +433,7 @@ describe('the site applies the same ops (groddle-afternoon-site src/BuilderOps.p
   });
 
   it('checks the shape and limits before anything is kept', () => {
-    const code = (zone, id) => JSON.parse(execFileSync('php', ['-r', `require ${JSON.stringify(SITE_DIR)} . '/src/BuilderOpError.php'; require ${JSON.stringify(SITE_DIR)} . '/src/BuilderOps.php'; echo json_encode(Groddle\\Minn\\BuilderOps::check(json_decode(stream_get_contents(STDIN), false), ${JSON.stringify(id)}));`], { input: JSON.stringify(zone) }).toString());
+    const code = (zone, id) => JSON.parse(execFileSync(PHP, ['-r', `require ${JSON.stringify(SITE_DIR)} . '/src/BuilderOpError.php'; require ${JSON.stringify(SITE_DIR)} . '/src/BuilderOps.php'; echo json_encode(Groddle\\Minn\\BuilderOps::check(json_decode(stream_get_contents(STDIN), false), ${JSON.stringify(id)}));`], { input: JSON.stringify(zone) }).toString());
     const zone = json('tests/fixtures/builder/mossy-hollow.zone.json');
     assert.deepEqual(code(zone, 'mossy-hollow'), []);
     assert.deepEqual(code(forkedZone(), 'zz-test'), []);

@@ -12,8 +12,9 @@ import { readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { HAS_SITE, SITE_DIR, sitePath, skipWithoutSite } from '../tools/repos.mjs';
+import { HAS_PHP, PHP } from './php.js';
 
-const hasPhp = spawnSync('php', ['-v']).status === 0;
+const hasPhp = HAS_PHP;
 const src = (f) => readFileSync(sitePath(f), 'utf8');
 
 describe('the level builder on the site (groddle-afternoon-site)', { skip: skipWithoutSite }, async () => {
@@ -23,7 +24,7 @@ describe('the level builder on the site (groddle-afternoon-site)', { skip: skipW
     const files = readdirSync(join(SITE_DIR, 'src')).filter((f) => f.endsWith('.php'));
     assert.ok(files.includes('AdminBuilder.php') && files.includes('BuilderOps.php') && files.includes('BuilderStore.php') && files.includes('AdminBuilderPage.php'));
     for (const f of files) {
-      const r = spawnSync('php', ['-l', join(SITE_DIR, 'src', f)], { encoding: 'utf8' });
+      const r = spawnSync(PHP, ['-l', join(SITE_DIR, 'src', f)], { encoding: 'utf8' });
       assert.equal(r.status, 0, `${f}: ${r.stdout}${r.stderr}`);
     }
   });

@@ -13,11 +13,12 @@ import { readFileSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { SITE_DIR, sitePath, serverPath, skipWithoutSite, skipWithoutServer } from '../tools/repos.mjs';
 import { TP_TEXT, matchStreet, movedLine, parseTp, planTp, runTeleportCommand, streetKey } from '../public/js/admin-teleport.js?v=c4d28509';
-import { slashCommandsFeature } from '../public/js/features/slash-commands-feature.js?v=ace2748e';
+import { slashCommandsFeature } from '../public/js/features/slash-commands-feature.js?v=6680b2ce';
+import { HAS_PHP, PHP } from './php.js';
 
 const root = join(import.meta.dirname, '..');
 const read = (p) => readFileSync(join(root, p), 'utf8');
-const hasPhp = spawnSync('php', ['-v']).status === 0;
+const hasPhp = HAS_PHP;
 
 const STREETS = {
   GA1HECHEY: { label: 'Hechey Track' },
@@ -233,7 +234,7 @@ describe('/tp in the slash commands feature', () => {
 
 describe('the site route (groddle-afternoon-site AdminTeleport, TeleportPlace)', { skip: skipWithoutSite || (!hasPhp && 'no php') }, () => {
   function php(code) {
-    const out = execFileSync('php', ['-r', `foreach (['TeleportPlace', 'ServiceCall'] as $c) require ${JSON.stringify(SITE_DIR)} . "/src/$c.php"; use Groddle\\Minn\\{TeleportPlace, ServiceCall}; echo json_encode(${code});`]);
+    const out = execFileSync(PHP, ['-r', `foreach (['TeleportPlace', 'ServiceCall'] as $c) require ${JSON.stringify(SITE_DIR)} . "/src/$c.php"; use Groddle\\Minn\\{TeleportPlace, ServiceCall}; echo json_encode(${code});`]);
     return JSON.parse(String(out));
   }
 

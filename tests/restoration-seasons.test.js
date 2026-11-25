@@ -17,6 +17,7 @@ import { EGG_HUNT, SEASONS, SEASON_IDS, calendarSeasons, isDametimeZilloween } f
 import { dametimeParts } from '../public/js/game-day.js?v=a532775d';
 import { seasonsData } from '../tools/restoration/seasons.mjs';
 import { SITE_DIR, skipWithoutSite } from '../tools/repos.mjs';
+import { PHP } from './php.js';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const pub = join(root, 'public');
@@ -28,7 +29,7 @@ for (let t = Date.UTC(2026, 0, 1, 12); t < Date.UTC(2030, 0, 1); t += DAY) NOONS
 
 function php() {
   try {
-    execFileSync('php', ['-v'], { stdio: 'ignore' });
+    execFileSync(PHP, ['-v'], { stdio: 'ignore' });
     return true;
   } catch {
     return false;
@@ -41,7 +42,7 @@ function runPhp(code, input) {
   try {
     const file = join(dir, 'in.json');
     writeFileSync(file, JSON.stringify(input));
-    const out = execFileSync('php', ['-d', 'date.timezone=UTC', '-r', `require ${JSON.stringify(join(SITE_DIR, 'src/Seasons.php'))}; $in = json_decode(file_get_contents(${JSON.stringify(file)}), true); ${code}`], { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 });
+    const out = execFileSync(PHP, ['-d', 'date.timezone=UTC', '-r', `require ${JSON.stringify(join(SITE_DIR, 'src/Seasons.php'))}; $in = json_decode(file_get_contents(${JSON.stringify(file)}), true); ${code}`], { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 });
     return JSON.parse(out);
   } finally {
     rmSync(dir, { recursive: true, force: true });

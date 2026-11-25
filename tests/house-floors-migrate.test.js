@@ -21,6 +21,7 @@ import { homedir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { SITE_DIR, skipWithoutSite } from '../tools/repos.mjs';
+import { PHP as PHP_BIN } from './php.js';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -42,7 +43,7 @@ function mysql() {
 
 /** A PHP with mysqli: the one on PATH, else one that loads the module. */
 function php() {
-  for (const cmd of [['php'], ['php', '-d', 'extension=mysqli']]) {
+  for (const cmd of [[PHP_BIN], [PHP_BIN, '-d', 'extension=mysqli']]) {
     if (spawnSync(cmd[0], [...cmd.slice(1), '-r', 'exit(function_exists("mysqli_report") ? 0 : 1);']).status === 0) return cmd;
   }
   return null;

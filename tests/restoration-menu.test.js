@@ -14,11 +14,12 @@ import { join } from 'node:path';
 import { SITE_DIR, skipWithoutSite } from '../tools/repos.mjs';
 import { restorationContent } from '../tools/restoration/to-minn.mjs';
 import { committedMap } from '../tools/data-versions/build.mjs';
+import { PHP } from './php.js';
 
 const root = join(import.meta.dirname, '..');
 const hasPhp = (() => {
   try {
-    execFileSync('php', ['-v'], { stdio: 'ignore' });
+    execFileSync(PHP, ['-v'], { stdio: 'ignore' });
     return true;
   } catch {
     return false;
@@ -32,7 +33,7 @@ function php(cls, code, input) {
   try {
     const file = join(dir, 'in.json');
     writeFileSync(file, JSON.stringify(input));
-    return execFileSync('php', ['-r', `require ${JSON.stringify(join(SITE_DIR, `src/${cls}.php`))}; $in = json_decode(file_get_contents(${JSON.stringify(file)}), true); ${code}`], { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 });
+    return execFileSync(PHP, ['-r', `require ${JSON.stringify(join(SITE_DIR, `src/${cls}.php`))}; $in = json_decode(file_get_contents(${JSON.stringify(file)}), true); ${code}`], { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 });
   } finally {
     rmSync(dir, { recursive: true, force: true });
   }

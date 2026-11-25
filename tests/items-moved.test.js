@@ -14,6 +14,7 @@ import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { join, relative, resolve, sep } from 'node:path';
 import { sitePath, skipWithoutSite } from '../tools/repos.mjs';
+import { PHP } from './php.js';
 
 const root = join(import.meta.dirname, '..');
 const pub = join(root, 'public');
@@ -72,7 +73,7 @@ describe('the old /items/ addresses (site src/MovedPages.php)', { skip: skipPhp 
     const paths = ['/items', '/items/', '/items/?q=pick&status=source', '/items/apple/', '/items/data.json', '/itemsx/', '/encyclopedia/items/', '/items/../x', '/items//elsewhere.example'];
     let out;
     try {
-      out = JSON.parse(execFileSync('php', [join(root, 'tests/fixtures/moved-pages/moved-pages.php'), engine, sitePath(''), ...paths], { encoding: 'utf8' }));
+      out = JSON.parse(execFileSync(PHP, [join(root, 'tests/fixtures/moved-pages/moved-pages.php'), engine, sitePath(''), ...paths], { encoding: 'utf8' }));
     } catch (err) {
       if (err.code === 'ENOENT') return; // no php here
       throw err;

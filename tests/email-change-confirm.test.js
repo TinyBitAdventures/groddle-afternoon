@@ -20,6 +20,7 @@ import { createMinnAccountCore } from '../public/js/minn-account-core.js?v=5baee
 import { EMAIL_LINK_COPY, SETTINGS_COPY, emailLinkFrom, emailLinkOutcome, fillCopy, resetLinkFrom, verifyLinkFrom } from '../public/js/account-forms.js?v=683e1475';
 import { GATE_COPY } from '../public/js/online-boot.js?v=f1f2766b';
 import { SITE_DIR, sitePath, skipWithoutSite } from '../tools/repos.mjs';
+import { HAS_PHP, PHP, phpSkip } from './php.js';
 
 const root = join(import.meta.dirname, '..');
 const read = (rel) => readFileSync(join(root, rel), 'utf8');
@@ -148,7 +149,7 @@ describe('the site: the new email is held until its link is opened (groddle-afte
   });
 
   const engineDir = process.env.MINN_ENGINE_DIR || join(homedir(), 'Cove/Sites/minn-engine.localhost/public/minn');
-  const hasPhp = spawnSync('php', ['-v']).status === 0;
+  const hasPhp = HAS_PHP;
   function mysql() {
     const env = String(process.env.GRODDLE_TEST_MYSQL || '').trim();
     if (env) {
@@ -164,15 +165,15 @@ describe('the site: the new email is held until its link is opened (groddle-afte
     return host && user ? { host, user, pass: def('DB_PASSWORD') || '' } : null;
   }
   const db = mysql();
-  const reachable = db && hasPhp && spawnSync('php', ['-r', 'mysqli_report(MYSQLI_REPORT_OFF); $m = @new mysqli($argv[1], $argv[2], $argv[3]); exit($m->connect_errno ? 1 : 0);', db.host, db.user, db.pass]).status === 0;
-  const skipDb = (!hasPhp && 'no php')
+  const reachable = db && hasPhp && spawnSync(PHP, ['-r', 'mysqli_report(MYSQLI_REPORT_OFF); $m = @new mysqli($argv[1], $argv[2], $argv[3]); exit($m->connect_errno ? 1 : 0);', db.host, db.user, db.pass]).status === 0;
+  const skipDb = phpSkip('mysqli')
     || (!existsSync(join(engineDir, 'src/Minn/Autoloader.php')) && 'Minn Engine not found (set MINN_ENGINE_DIR)')
     || (!reachable && 'no MariaDB to make a throwaway database on (set GRODDLE_TEST_MYSQL)');
 
   describe('on a throwaway database', { skip: skipDb }, () => {
     let r;
     before(() => {
-      r = JSON.parse(execFileSync('php', [join(root, 'tests/fixtures/email-change/email-change.php'), engineDir, SITE_DIR, db.host, db.user, db.pass], { timeout: 90000 }).toString());
+      r = JSON.parse(execFileSync(PHP, [join(root, 'tests/fixtures/email-change/email-change.php'), engineDir, SITE_DIR, db.host, db.user, db.pass], { timeout: 90000 }).toString());
     });
 
     it('ran on its own database and dropped it', () => {

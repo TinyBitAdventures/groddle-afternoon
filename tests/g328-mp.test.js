@@ -40,6 +40,7 @@ import { neighboursMpApi, neighboursMpFeature } from '../public/js/features/neig
 import { FEATURES } from '../public/js/features/index.js?v=3ca4e4c5';
 import { YARD_STYLE_BY_KEY, streetLook, yardLook, yardStyleFor } from '../public/js/home-styles.js?v=ec5d2f69';
 import { serverPath, sitePath, skipWithoutServer, skipWithoutSite } from '../tools/repos.mjs';
+import { PHP } from './php.js';
 
 const root = join(import.meta.dirname, '..');
 const read = (rel) => readFileSync(join(root, rel), 'utf8');
@@ -453,7 +454,7 @@ describe('neighbours across the repos', () => {
   });
 
   it('the site checks visiting_can_opt_in in the source\'s order, and sends a visitor only the home', { skip: skipWithoutSite }, () => {
-    const phpBin = existsSync('/opt/homebrew/bin/php') ? '/opt/homebrew/bin/php' : 'php';
+    const phpBin = PHP;
     const src = sitePath('src/Neighbours.php');
     const run = (code) => execFileSync(phpBin, ['-r', `require ${JSON.stringify(src)}; ${code}`], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] });
     let out;

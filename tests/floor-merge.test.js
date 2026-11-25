@@ -34,6 +34,7 @@ import { dropsMpFeature } from '../public/js/features/drops-mp-feature.js?fresh=
 import { isTakeOp, normalizeMine } from '../public/js/drops-mp.js?v=6a16d73d';
 import { packToSharedFloor } from '../public/js/home-floor-share.js?v=3fa0382c';
 import { GAME_DIR, SITE_DIR } from '../tools/repos.mjs';
+import { HAS_PHP, PHP, phpSkip } from './php.js';
 
 const OP = 'drop-00000000000000a1';
 const OP2 = 'drop-00000000000000a2';
@@ -186,18 +187,18 @@ function mysql() {
   return host && user ? { host, user, pass: def('DB_PASSWORD') || '' } : null;
 }
 const engineDir = process.env.MINN_ENGINE_DIR || join(homedir(), 'Cove/Sites/minn-engine.localhost/public/minn');
-const hasPhp = spawnSync('php', ['-v']).status === 0;
+const hasPhp = HAS_PHP;
 const db = mysql();
-const reachable = db && hasPhp && spawnSync('php', ['-r', 'mysqli_report(MYSQLI_REPORT_OFF); $m = @new mysqli($argv[1], $argv[2], $argv[3]); exit($m->connect_errno ? 1 : 0);', db.host, db.user, db.pass]).status === 0;
+const reachable = db && hasPhp && spawnSync(PHP, ['-r', 'mysqli_report(MYSQLI_REPORT_OFF); $m = @new mysqli($argv[1], $argv[2], $argv[3]); exit($m->connect_errno ? 1 : 0);', db.host, db.user, db.pass]).status === 0;
 const skipDb = (!existsSync(join(SITE_DIR, 'src/LedgerDrop.php')) && 'no site repo')
-  || (!hasPhp && 'no php')
+  || phpSkip('mysqli')
   || (!existsSync(join(engineDir, 'src/Minn/Autoloader.php')) && 'Minn Engine not found (set MINN_ENGINE_DIR)')
   || (!reachable && 'no MariaDB to make a throwaway database on (set GRODDLE_TEST_MYSQL)');
 
 describe('the site merges on a house floor, once and atomically (LedgerDrop)', { skip: skipDb }, () => {
   let r;
   before(() => {
-    r = JSON.parse(execFileSync('php', [join(GAME_DIR, 'tests/fixtures/drops/ledger-drop-merge.php'), engineDir, SITE_DIR, 'run', db.host, db.user, db.pass], { timeout: 90000 }).toString());
+    r = JSON.parse(execFileSync(PHP, [join(GAME_DIR, 'tests/fixtures/drops/ledger-drop-merge.php'), engineDir, SITE_DIR, 'run', db.host, db.user, db.pass], { timeout: 90000 }).toString());
   });
   const OWNER = '7';
   const ADA = '9';

@@ -23,6 +23,7 @@ import { homedir } from 'node:os';
 import { createMinnAccount } from '../public/js/minn-account.js?v=7e3d7279';
 import { FORM_COPY, fillCopy, signUpOutcome, verifyLinkFrom, verifyOutcome, resetLinkFrom } from '../public/js/account-forms.js?v=683e1475';
 import { HAS_SITE, SITE_DIR, skipWithoutSite } from '../tools/repos.mjs';
+import { PHP } from './php.js';
 
 const root = join(import.meta.dirname, '..');
 const read = (rel) => readFileSync(join(root, rel), 'utf8');
@@ -220,7 +221,7 @@ describe('the site: no account until the email is proven (groddle-afternoon-site
   });
 
   it('the email: in the site\'s look, the character named and escaped, the link once, the rules as the table keeps them (php)', { skip: noEngine }, () => {
-    const out = JSON.parse(execFileSync('php', [join(root, 'tests/fixtures/minn-accounts/verify-mail.php'), engine, SITE_DIR], { encoding: 'utf8' }));
+    const out = JSON.parse(execFileSync(PHP, [join(root, 'tests/fixtures/minn-accounts/verify-mail.php'), engine, SITE_DIR], { encoding: 'utf8' }));
     assert.equal(out.subject, 'Finish making your Groddle Afternoon character');
     assert.deepEqual(out.headers, ['Content-Type: text/html; charset=UTF-8', 'From: Groddle Afternoon <noreply@groddle.example>']);
     assert.match(out.html, /Hi <strong>Zz &lt;b&gt;Bold&lt;\/b&gt; &amp; Co<\/strong>,/);

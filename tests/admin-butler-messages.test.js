@@ -8,8 +8,9 @@ import { describe, it } from 'node:test';
 import { execFileSync, spawnSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import { SITE_DIR, sitePath, skipWithoutSite } from '../tools/repos.mjs';
+import { HAS_PHP, PHP } from './php.js';
 
-const hasPhp = spawnSync('php', ['-v']).status === 0;
+const hasPhp = HAS_PHP;
 const skip = skipWithoutSite || (!hasPhp && 'needs the php CLI');
 
 function php(body, input = {}) {
@@ -18,7 +19,7 @@ function php(body, input = {}) {
     use Groddle\\Minn\\AdminButler;
     $in = json_decode(stream_get_contents(STDIN), true);
     ${body}`;
-  return JSON.parse(String(execFileSync('php', ['-r', code], { input: JSON.stringify(input) })));
+  return JSON.parse(String(execFileSync(PHP, ['-r', code], { input: JSON.stringify(input) })));
 }
 
 describe('admin butler messages (the team\'s Butlers only)', { skip }, () => {

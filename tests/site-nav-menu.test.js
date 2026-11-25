@@ -6,6 +6,7 @@ import { homedir } from 'node:os';
 import { join } from 'node:path';
 import { FALLBACK, SECTIONS, applyToHtml, currentChild, currentIndex, panelLinks, parseMenu, renderItem, renderLinks } from '../tools/site-nav/apply.mjs';
 import { sitePath, skipWithoutSite } from '../tools/repos.mjs';
+import { PHP } from './php.js';
 
 const root = join(import.meta.dirname, '..');
 const MENU = `<!-- wp:navigation-link {"label":"Restoration","url":"/restoration/","kind":"custom","isTopLevelLink":true} /-->
@@ -71,7 +72,7 @@ describe('the header menu in the built pages (tools/site-nav/apply.mjs)', () => 
   it('the theme marks the same link (php: SiteNav::current and nav)', { skip: (skipWithoutSite || (!existsSync(join(engine, 'src/Minn/Autoloader.php')) && 'Minn Engine not found (set MINN_ENGINE_DIR)')) }, () => {
     let out;
     try {
-      out = JSON.parse(execFileSync('php', [join(root, 'tests/fixtures/profiles/profile-pages.php'), engine, sitePath(''), join(root, 'public')], { encoding: 'utf8' }));
+      out = JSON.parse(execFileSync(PHP, [join(root, 'tests/fixtures/profiles/profile-pages.php'), engine, sitePath(''), join(root, 'public')], { encoding: 'utf8' }));
     } catch (err) {
       if (err.code === 'ENOENT') return; // no php here
       throw err;
@@ -337,7 +338,7 @@ describe('the header menu in the built pages (tools/site-nav/apply.mjs)', () => 
     for (const file of ['header-menu.html', 'submenus.html', 'grouped.html', 'nested.html']) {
       let out;
       try {
-        out = JSON.parse(execFileSync('php', [join(fixtures, 'site-nav.php'), engine, sitePath(''), join(fixtures, file), ...paths], { encoding: 'utf8' }));
+        out = JSON.parse(execFileSync(PHP, [join(fixtures, 'site-nav.php'), engine, sitePath(''), join(fixtures, file), ...paths], { encoding: 'utf8' }));
       } catch (err) {
         if (err.code === 'ENOENT') return; // no php here
         throw err;

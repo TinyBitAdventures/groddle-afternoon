@@ -17,8 +17,9 @@ import { join } from 'node:path';
 import { SITE_DIR, skipWithoutSite } from '../tools/repos.mjs';
 import { CAPPED_ROLLS, STARTS_WITHOUT_PREREQS, QUESTS_STARTED_WITHOUT_PREREQS } from '../tools/build-economy.mjs';
 import { currantRewardForLevel, XP_FOR_LEVEL } from '../public/js/progression.js?v=05ff0260';
+import { HAS_PHP, PHP } from './php.js';
 
-const hasPhp = spawnSync('php', ['-v']).status === 0;
+const hasPhp = HAS_PHP;
 const skip = skipWithoutSite || !hasPhp;
 
 /** One LedgerMath call in PHP; `table` swaps in a hand-made economy table. */
@@ -38,7 +39,7 @@ function php(op, args, table = null) {
       'round5' => LedgerMath::roundTo5((float) $a[0]),
     };
     echo json_encode($out);`;
-  const out = execFileSync('php', ['-r', code], { input: JSON.stringify({ op, args, table }) });
+  const out = execFileSync(PHP, ['-r', code], { input: JSON.stringify({ op, args, table }) });
   return JSON.parse(String(out), (k, v) => (Array.isArray(v) && !v.length && ['items', 'made', 'runs', 'capped', 'detail'].includes(k) ? {} : v));
 }
 

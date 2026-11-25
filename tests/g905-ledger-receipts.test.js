@@ -10,8 +10,9 @@ import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import { execFileSync, spawnSync } from 'node:child_process';
 import { SITE_DIR, skipWithoutSite } from '../tools/repos.mjs';
+import { HAS_PHP, PHP } from './php.js';
 
-const hasPhp = spawnSync('php', ['-v']).status === 0;
+const hasPhp = HAS_PHP;
 const skip = skipWithoutSite || !hasPhp;
 
 function check(ledger, entries, budget, receipts) {
@@ -21,7 +22,7 @@ function check(ledger, entries, budget, receipts) {
     $a = json_decode(stream_get_contents(STDIN), true);
     $credited = ['base' => ['base' => 1], 'level' => ['level' => 5], 'mark' => ['base' => 1, 'base905' => 1]];
     echo json_encode(LedgerMath::check($a[0], $credited, [], $a[1], (float) $a[2], 50000.0, Economy::shared(), $a[3], fn (): int => 0, 1763319600));`;
-  const out = execFileSync('php', ['-r', code], { input: JSON.stringify([ledger, entries, budget, receipts]) });
+  const out = execFileSync(PHP, ['-r', code], { input: JSON.stringify([ledger, entries, budget, receipts]) });
   return JSON.parse(String(out), (k, v) => (Array.isArray(v) && !v.length && ['items', 'made', 'runs', 'capped', 'detail', 'held', 'spent'].includes(k) ? {} : v));
 }
 

@@ -18,6 +18,7 @@ import { STATES, citedHashes, contentProblems, curatedProblems } from '../tools/
 import { LINK, PATH, gapsContent, withLink } from '../tools/gaps/to-minn.mjs';
 import { restorationContent } from '../tools/restoration/to-minn.mjs';
 import { GAME_DIR, SITE_DIR, sitePath, skipWithoutSite } from '../tools/repos.mjs';
+import { PHP } from './php.js';
 
 const readJson = (path) => JSON.parse(readFileSync(path, 'utf8'));
 const gaps = readJson(join(GAME_DIR, 'public/restoration/gaps.json'));
@@ -27,7 +28,7 @@ const listed = gaps.areas.flatMap((a) => a.items);
 
 let hasPhp = true;
 try {
-  execFileSync('php', ['-v'], { stdio: 'ignore' });
+  execFileSync(PHP, ['-v'], { stdio: 'ignore' });
 } catch {
   hasPhp = false;
 }
@@ -38,7 +39,7 @@ function draw(data, part = 'all') {
   const file = join(dir, 'in.json');
   writeFileSync(file, JSON.stringify(data));
   try {
-    return execFileSync('php', ['-r', `require ${JSON.stringify(join(SITE_DIR, 'src/RestorationGaps.php'))}; echo Groddle\\Minn\\RestorationGaps::draw(json_decode(file_get_contents(${JSON.stringify(file)}), true), ${JSON.stringify(part)});`], { encoding: 'utf8' });
+    return execFileSync(PHP, ['-r', `require ${JSON.stringify(join(SITE_DIR, 'src/RestorationGaps.php'))}; echo Groddle\\Minn\\RestorationGaps::draw(json_decode(file_get_contents(${JSON.stringify(file)}), true), ${JSON.stringify(part)});`], { encoding: 'utf8' });
   } finally {
     rmSync(dir, { recursive: true, force: true });
   }

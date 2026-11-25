@@ -21,8 +21,9 @@ import { mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'n
 import { homedir, tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { SITE_DIR, serverPath, sitePath, skipWithoutServer, skipWithoutSite } from '../tools/repos.mjs';
+import { HAS_PHP, PHP } from './php.js';
 
-const hasPhp = spawnSync('php', ['-v']).status === 0;
+const hasPhp = HAS_PHP;
 const skip = skipWithoutSite || (!hasPhp && 'needs the php CLI');
 const root = join(import.meta.dirname, '..');
 const ROUTE = '/groddle/v1/play-time';
@@ -41,7 +42,7 @@ function php(op, args) {
       'consts' => ['batch' => PlayTime::BATCH, 'most' => PlayTime::MOST, 'skew' => PlayTime::SKEW, 'per' => PlayTime::PER_WRITE, 'meta' => [PlayTime::META, PlayTime::LAST, PlayTime::BEFORE]],
     };
     echo json_encode($out);`;
-  return JSON.parse(String(execFileSync('php', ['-r', code], { input: JSON.stringify({ op, args }) })));
+  return JSON.parse(String(execFileSync(PHP, ['-r', code], { input: JSON.stringify({ op, args }) })));
 }
 
 /** The realtime server's X-Groddle-Service header (ledger.go signService). */

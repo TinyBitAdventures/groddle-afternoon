@@ -19,6 +19,7 @@ import { homedir } from 'node:os';
 import { join } from 'node:path';
 import vm from 'node:vm';
 import { sitePath, skipWithoutSite } from '../tools/repos.mjs';
+import { PHP } from './php.js';
 
 const root = join(import.meta.dirname, '..');
 const read = (p) => readFileSync(join(root, p), 'utf8');
@@ -165,7 +166,7 @@ describe('the site draws it only on the console (groddle-afternoon-site src/Site
     const fixtures = join(root, 'tests/fixtures/site-nav');
     let out;
     try {
-      out = JSON.parse(execFileSync('php', [join(fixtures, 'site-nav.php'), engine, sitePath(''), join(fixtures, 'header-menu.html'), '/', '/console/'], { encoding: 'utf8' }));
+      out = JSON.parse(execFileSync(PHP, [join(fixtures, 'site-nav.php'), engine, sitePath(''), join(fixtures, 'header-menu.html'), '/', '/console/'], { encoding: 'utf8' }));
     } catch (err) {
       if (err.code === 'ENOENT') return; // no php here
       throw err;

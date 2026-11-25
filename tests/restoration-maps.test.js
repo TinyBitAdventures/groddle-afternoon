@@ -18,6 +18,7 @@ import { DIR_2012, ENCODE, MAPS_DIR, STATES, VIEW, build, files2012, isRestored,
 import { webpSize } from '../tools/made-art/build-data.mjs';
 import { PATH, SLUG, TEMPLATE, mapsContent } from '../tools/restoration-maps/to-minn.mjs';
 import { GAME_DIR, SITE_DIR, skipWithoutSite } from '../tools/repos.mjs';
+import { PHP } from './php.js';
 
 const readJson = (path) => JSON.parse(readFileSync(path, 'utf8'));
 const maps = readJson(join(GAME_DIR, 'public/restoration/maps.json'));
@@ -29,7 +30,7 @@ const pub = (src) => join(GAME_DIR, 'public', src.replace(/^\//, ''));
 
 let hasPhp = true;
 try {
-  execFileSync('php', ['-v'], { stdio: 'ignore' });
+  execFileSync(PHP, ['-v'], { stdio: 'ignore' });
 } catch {
   hasPhp = false;
 }
@@ -40,7 +41,7 @@ function draw(data, part = 'all') {
   const file = join(dir, 'in.json');
   writeFileSync(file, JSON.stringify(data));
   try {
-    return execFileSync('php', ['-r', `require ${JSON.stringify(join(SITE_DIR, 'src/RestorationMaps.php'))}; echo Groddle\\Minn\\RestorationMaps::draw(json_decode(file_get_contents(${JSON.stringify(file)}), true), ${JSON.stringify(part)});`], { encoding: 'utf8' });
+    return execFileSync(PHP, ['-r', `require ${JSON.stringify(join(SITE_DIR, 'src/RestorationMaps.php'))}; echo Groddle\\Minn\\RestorationMaps::draw(json_decode(file_get_contents(${JSON.stringify(file)}), true), ${JSON.stringify(part)});`], { encoding: 'utf8' });
   } finally {
     rmSync(dir, { recursive: true, force: true });
   }

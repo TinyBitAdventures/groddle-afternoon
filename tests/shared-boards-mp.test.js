@@ -32,17 +32,18 @@ import { boardsMpFeature, createBoardsSession } from '../public/js/features/boar
 import { carriedNoteList, giveCarriedNote, streetFurnitureFeature } from '../public/js/features/street-furniture-feature.js?v=a9c1220a';
 import { boardsData } from '../tools/build-realtime-boards.mjs';
 import { HAS_SITE, SITE_DIR, serverPath, sitePath, skipWithoutServer, skipWithoutSite } from '../tools/repos.mjs';
+import { HAS_PHP, PHP } from './php.js';
 
 const root = join(import.meta.dirname, '..');
 const read = (p) => readFileSync(join(root, p), 'utf8');
-const hasPhp = spawnSync('php', ['-v']).status === 0;
+const hasPhp = HAS_PHP;
 const skipPhp = skipWithoutSite || (!hasPhp && 'no php');
 const OP = 'board-00000000000000a1';
 const SEED = 'board-seed-GA5134UPLRU29OH-0';
 
 function php(body) {
   const code = `foreach (['WordFilter', 'LedgerMath', 'LedgerGift', 'BugReports', 'AdminConsole', 'LedgerBoard', 'AdminBoards'] as $c) require ${JSON.stringify(SITE_DIR)} . "/src/$c.php"; use Groddle\\Minn\\LedgerBoard; use Groddle\\Minn\\AdminBoards; echo json_encode(${body}, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);`;
-  return JSON.parse(execFileSync('php', ['-r', code]).toString());
+  return JSON.parse(execFileSync(PHP, ['-r', code]).toString());
 }
 
 describe('the rules (js/boards-mp.js)', () => {

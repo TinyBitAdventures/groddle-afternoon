@@ -24,6 +24,7 @@ import { FEATURES } from '../public/js/features/index.js?v=3ca4e4c5';
 import { multiplayerEntryUrl } from '../public/js/game-mode.js?v=1ecf2899';
 import { SAVE_ENTRY_NAMES, createMultiplayerSaveStore } from '../public/js/save-store.js?v=4e720735';
 import { HAS_SITE, SITE_DIR, serverPath, skipWithoutServer, skipWithoutSite } from '../tools/repos.mjs';
+import { PHP } from './php.js';
 
 const root = join(import.meta.dirname, '..');
 const ext = SITE_DIR;
@@ -503,7 +504,7 @@ describe('Groddle extension: accounts (groddle-afternoon-site)', { skip: skipWit
 
   const engine = process.env.MINN_ENGINE_DIR || join(homedir(), 'Cove/Sites/minn-engine.localhost/public/minn');
   it('the reset email: HTML in the site\'s look, from Groddle Afternoon, the character named and escaped, the username only inside the link', { skip: !existsSync(join(engine, 'src/Minn/Autoloader.php')) && 'Minn Engine not found (set MINN_ENGINE_DIR)' }, () => {
-    const mail = JSON.parse(execFileSync('php', [join(root, 'tests/fixtures/minn-accounts/player-mail.php'), engine, ext], { encoding: 'utf8' }));
+    const mail = JSON.parse(execFileSync(PHP, [join(root, 'tests/fixtures/minn-accounts/player-mail.php'), engine, ext], { encoding: 'utf8' }));
     assert.equal(mail.subject, 'Reset your Groddle Afternoon password');
     assert.deepEqual(mail.headers, ['Content-Type: text/html; charset=UTF-8', 'From: Groddle Afternoon <noreply@groddle.example>']);
     assert.equal(mail.named[1], 'From: Groddle Afternoon <hello@groddle.example>', 'groddle_mail_from names the address');
@@ -518,7 +519,7 @@ describe('Groddle extension: accounts (groddle-afternoon-site)', { skip: skipWit
     assert.doesNotMatch(mail.html, /\u2014/, 'no em-dashes');
   });
   it('SaveShape checks the shape and the size, nothing more (php, when the engine is here)', { skip: !existsSync(join(engine, 'src/Minn/Autoloader.php')) && 'Minn Engine not found (set MINN_ENGINE_DIR)' }, () => {
-    const out = execFileSync('php', [join(root, 'tests/fixtures/minn-accounts/save-shape.php'), engine, ext], { encoding: 'utf8' });
+    const out = execFileSync(PHP, [join(root, 'tests/fixtures/minn-accounts/save-shape.php'), engine, ext], { encoding: 'utf8' });
     const rows = JSON.parse(out);
     assert.deepEqual(rows, {
       solo: 'ok',

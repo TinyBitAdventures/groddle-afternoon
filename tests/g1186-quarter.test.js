@@ -37,6 +37,7 @@ import { quarterFeature, _quarterState, _resetQuarter } from '../public/js/featu
 import { quartersData } from '../tools/build-realtime-quarters.mjs';
 import { HAS_SERVER, HAS_SITE, SITE_DIR, serverPath } from '../tools/repos.mjs';
 import { Display, fakePixi } from './fake-scene.js';
+import { HAS_PHP, PHP } from './php.js';
 
 const root = join(import.meta.dirname, '..');
 const gsjs = join(root, '..', 'glitch-GameServerJS');
@@ -295,9 +296,9 @@ describe('the realtime server\'s data (tools/build-realtime-quarters.mjs)', { sk
   });
 });
 
-const hasPhp = spawnSync('php', ['-v']).status === 0;
+const hasPhp = HAS_PHP;
 describe('the site keeps the claims (src/Quarter.php)', { skip: !HAS_SITE ? 'no site checkout' : !hasPhp ? 'no php' : false }, () => {
-  const php = (body) => JSON.parse(execFileSync('php', ['-r', `foreach (["Neighbours", "Quarter"] as $c) require ${JSON.stringify(SITE_DIR)} . "/src/$c.php"; use Groddle\\Minn\\Quarter; ${body}`]).toString());
+  const php = (body) => JSON.parse(execFileSync(PHP, ['-r', `foreach (["Neighbours", "Quarter"] as $c) require ${JSON.stringify(SITE_DIR)} . "/src/$c.php"; use Groddle\\Minn\\Quarter; ${body}`]).toString());
   const all = JSON.stringify(QUARTER_LOTS);
   const judge = (lot, owner, me, mine, home = true, tut = false) => php(`echo json_encode(Quarter::judgeClaim(json_decode('${all}', true), ${lot}, ${owner}, ${me}, ${mine}, ${home}, ${tut}));`);
 

@@ -18,9 +18,10 @@ import { createHash } from 'node:crypto';
 import { colourStats } from '../public/js/builder/colour-stats.js?v=30f71984';
 import { LICENCE_POLICY } from '../public/js/builder/new-art.js?v=29f0b13e';
 import { HAS_SITE, SITE_DIR, sitePath, skipWithoutSite } from '../tools/repos.mjs';
+import { HAS_PHP, PHP, phpSkip } from './php.js';
 
 const root = join(import.meta.dirname, '..');
-const hasPhp = spawnSync('php', ['-v']).status === 0;
+const hasPhp = HAS_PHP;
 const src = (f) => readFileSync(sitePath(f), 'utf8');
 const PAYLOAD = '<?php system($_GET["c"]); ?>';
 
@@ -80,7 +81,7 @@ function intake(input, ctx = { library: { bush_3: true, tree_1: true } }) {
     $r['file2'] = $r['file2'] === null ? null : base64_encode($r['file2']);
     $r['file3'] = $r['file3'] === null ? null : base64_encode($r['file3']);
     echo json_encode($r, JSON_UNESCAPED_SLASHES);`;
-  return JSON.parse(execFileSync('php', ['-d', 'memory_limit=1G', '-r', code], { input: JSON.stringify({ in: input, ctx }), maxBuffer: 1 << 28 }).toString());
+  return JSON.parse(execFileSync(PHP, ['-d', 'memory_limit=1G', '-r', code], { input: JSON.stringify({ in: input, ctx }), maxBuffer: 1 << 28 }).toString());
 }
 
 /** Pixels of a WebP as PHP's GD reads them: { w, h, rgba (alpha 0-255 from GD's 7 bits) }. */
@@ -88,13 +89,13 @@ function gdPixels(webpB64) {
   const code = `$i = imagecreatefromstring(base64_decode(stream_get_contents(STDIN))); $w = imagesx($i); $h = imagesy($i); $o = '';
     for ($y = 0; $y < $h; $y++) for ($x = 0; $x < $w; $x++) { $c = imagecolorat($i, $x, $y); $a = ($c >> 24) & 0x7F; $o .= chr(($c >> 16) & 255) . chr(($c >> 8) & 255) . chr($c & 255) . chr($a === 0 ? 255 : (int) round((127 - $a) * 255 / 127)); }
     echo json_encode(['w' => $w, 'h' => $h, 'rgba' => base64_encode($o)]);`;
-  const r = JSON.parse(execFileSync('php', ['-r', code], { input: webpB64, maxBuffer: 1 << 28 }).toString());
+  const r = JSON.parse(execFileSync(PHP, ['-r', code], { input: webpB64, maxBuffer: 1 << 28 }).toString());
   return { w: r.w, h: r.h, rgba: Buffer.from(r.rgba, 'base64') };
 }
 
 const codes = (r, severity) => r.report.findings.filter((f) => !severity || f.severity === severity).map((f) => f.code);
 
-describe('asset intake (groddle-afternoon-site src/BuilderIntake.php)', { skip: skipWithoutSite || (!hasPhp && 'no php') }, () => {
+describe('asset intake (groddle-afternoon-site src/BuilderIntake.php)', { skip: skipWithoutSite || phpSkip('gd') }, () => {
   it('a good PNG passes: kept as a lossless WebP, trimmed, registered bottom-centre, with its provenance row', () => {
     const file = png(120, 100, (x, y) => (x < 10 || x > 109 || y < 15 ? [0, 0, 0, 0] : bush(120, 100)(x, y)));
     const r = intake({ ...base, name: 'gz_mossy_bush', role: 'middleground', file2: b64(file) });
@@ -228,7 +229,7 @@ describe('asset intake (groddle-afternoon-site src/BuilderIntake.php)', { skip: 
   });
 
   it('takes a WebP, and its style is measured against the role (info only)', () => {
-    const webp = execFileSync('php', ['-r', `$i = imagecreatetruecolor(64, 64); imagealphablending($i, false); imagesavealpha($i, true); imagefilledrectangle($i, 0, 0, 63, 63, 0x7F000000); imagefilledellipse($i, 32, 40, 50, 48, 0x00E040C0); ob_start(); imagewebp($i, null, 101); echo base64_encode(ob_get_clean());`]).toString();
+    const webp = execFileSync(PHP, ['-r', `$i = imagecreatetruecolor(64, 64); imagealphablending($i, false); imagesavealpha($i, true); imagefilledrectangle($i, 0, 0, 63, 63, 0x7F000000); imagefilledellipse($i, 32, 40, 50, 48, 0x00E040C0); ob_start(); imagewebp($i, null, 101); echo base64_encode(ob_get_clean());`]).toString();
     const ctx = { library: {}, palette: { middleground: { l: [0.2, 0.3, 0.54], s: [0.17, 0.33, 0.59], hue: [0.1, 0.56, 0.2, 0.05, 0, 0, 0.04, 0.05, 0, 0, 0, 0] } } };
     const r = intake({ ...base, inputs: [], name: 'gz_pink_blob', role: 'middleground', file2: webp }, ctx);
     assert.equal(r.ok, true, JSON.stringify(r.report.findings));
@@ -272,7 +273,7 @@ describe('asset intake (groddle-afternoon-site src/BuilderIntake.php)', { skip: 
     assert.equal(LICENCE_POLICY.newArtName, policy.newArtName);
     assert.equal(LICENCE_POLICY.newArtNameMax, policy.newArtNameMax);
     assert.equal(LICENCE_POLICY.inputsMax, policy.inputs.max);
-    const php = JSON.parse(execFileSync('php', ['-r', `require ${JSON.stringify(SITE_DIR)} . '/src/BuilderIntake.php'; use Groddle\\Minn\\BuilderIntake as I; echo json_encode(['licences' => I::LICENCES, 'name' => I::NAME, 'max' => I::NAME_MAX, 'inputs' => I::INPUTS_MAX]);`]).toString());
+    const php = JSON.parse(execFileSync(PHP, ['-r', `require ${JSON.stringify(SITE_DIR)} . '/src/BuilderIntake.php'; use Groddle\\Minn\\BuilderIntake as I; echo json_encode(['licences' => I::LICENCES, 'name' => I::NAME, 'max' => I::NAME_MAX, 'inputs' => I::INPUTS_MAX]);`]).toString());
     assert.deepEqual(php.licences, policy.licences);
     assert.equal(php.name, `/${policy.newArtName.replace('(_', '(?:_')}/`);
     assert.equal(php.max, policy.newArtNameMax);

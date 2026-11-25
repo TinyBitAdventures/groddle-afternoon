@@ -16,6 +16,7 @@ import { createRenderer, renderInput, RENDERS_ANYWAY } from '../tools/builder/re
 import { loadValidatorContext } from '../tools/builder/validator-context.mjs';
 import { forkStreet } from '../public/js/builder/zone.js?v=ce289eb1';
 import { DECO_TWINS } from '../public/js/street-render.js?v=cfb77c44';
+import { HAS_PHP, PHP } from './php.js';
 
 const GOLDEN = join(GAME_DIR, 'tests/fixtures/builder/hechey-track-0.25.png');
 const pub = (p) => join(GAME_DIR, 'public', p);
@@ -140,7 +141,7 @@ describe('honest renders: art left out is named, never dropped silently (lane GR
     }
   });
 
-  it('the site sends the smallest pieces first up to 12 MB and names the rest (AdminBuilderAgent::pickArt)', { skip: skipWithoutSite || (spawnSync('php', ['-v']).status !== 0 && 'no php') }, () => {
+  it('the site sends the smallest pieces first up to 12 MB and names the rest (AdminBuilderAgent::pickArt)', { skip: skipWithoutSite || (!HAS_PHP && 'no php') }, () => {
     const z = zone();
     const street = z.streets[0].street;
     street.layers.find((l) => l.id === 'middleground').decos.push({ id: 'd_new2', sprite: 'gz_ai_unused', x: 0, y: -60, w: 10, h: 10, z: 1, r: 0 });
@@ -149,7 +150,7 @@ describe('honest renders: art left out is named, never dropped silently (lane GR
       $sizes = ['${sha('a')}' => 9, '${sha('b')}' => 4, '${sha('c')}' => null];
       [$art, $left] = Groddle\\Minn\\AdminBuilderAgent::pickArt($in->zone, $in->street, fn (string $s): ?string => $sizes[$s] === null ? null : str_repeat('x', $sizes[$s]), 10);
       echo json_encode(['sent' => array_keys($art), 'left' => $left, 'budget' => Groddle\\Minn\\AdminBuilderAgent::ART_BYTES]);`;
-    const r = JSON.parse(execFileSync('php', ['-r', code], { input: JSON.stringify({ zone: z, street }) }).toString());
+    const r = JSON.parse(execFileSync(PHP, ['-r', code], { input: JSON.stringify({ zone: z, street }) }).toString());
     assert.deepEqual(r.sent, [sha('b')], 'the 4-byte puff fits a 10-byte budget; the 9-byte rock does not');
     assert.deepEqual(r.left, ['gz_ai_rock', 'gz_ai_unused'], 'over the budget, and a kept file that is gone');
     assert.equal(r.budget, 12_000_000);

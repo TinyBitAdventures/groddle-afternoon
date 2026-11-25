@@ -13,8 +13,9 @@ import { execFileSync, spawnSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { SITE_DIR, skipWithoutSite } from '../tools/repos.mjs';
+import { HAS_PHP, PHP } from './php.js';
 
-const hasPhp = spawnSync('php', ['-v']).status === 0;
+const hasPhp = HAS_PHP;
 const skip = skipWithoutSite || !hasPhp;
 
 function php(op, args) {
@@ -27,7 +28,7 @@ function php(op, args) {
       'check' => LedgerMath::check($a[0], $a[1], [], $a[2], (float) $a[3], 50000.0, Economy::shared(), null, fn (): int => 0, 1763319600),
       'baseline' => LedgerMath::markBaseline905($a[0]),
     });`;
-  const out = execFileSync('php', ['-r', code], { input: JSON.stringify({ op, args }) });
+  const out = execFileSync(PHP, ['-r', code], { input: JSON.stringify({ op, args }) });
   return JSON.parse(String(out), (k, v) => (Array.isArray(v) && !v.length && ['items', 'made', 'runs', 'capped', 'detail', 'held', 'spent'].includes(k) ? {} : v));
 }
 

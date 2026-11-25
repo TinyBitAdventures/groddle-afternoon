@@ -24,6 +24,7 @@ import { homedir, tmpdir } from 'node:os';
 
 import { FORM_COPY, GOOGLE_SCRIPT, createAccountRequests, googleButtonOptions, googleOutcome } from '../public/js/account-forms.js?v=683e1475';
 import { HAS_SITE, SITE_DIR, skipWithoutSite } from '../tools/repos.mjs';
+import { PHP } from './php.js';
 
 const root = join(import.meta.dirname, '..');
 const read = (rel) => readFileSync(join(root, rel), 'utf8');
@@ -139,7 +140,7 @@ describe('the site: Google sign-in (groddle-afternoon-site)', { skip: skipWithou
   const noEngine = !existsSync(join(engine, 'src/Minn/Autoloader.php')) && 'Minn Engine not found (set MINN_ENGINE_DIR)';
 
   it('the ID token checks, with local keys and a fake key list (php)', { skip: noEngine }, () => {
-    const out = JSON.parse(execFileSync('php', [join(root, 'tests/fixtures/minn-accounts/google-token.php'), engine, SITE_DIR], { encoding: 'utf8' }));
+    const out = JSON.parse(execFileSync(PHP, [join(root, 'tests/fixtures/minn-accounts/google-token.php'), engine, SITE_DIR], { encoding: 'utf8' }));
     const c = out.cases;
     assert.deepEqual(c.good, ['ok', 1], 'a good token passes, the key list fetched once');
     assert.deepEqual(c.claims, ['110248495921238986420', 'zz-google@example.com']);

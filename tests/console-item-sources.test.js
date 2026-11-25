@@ -18,6 +18,7 @@ import { pathToFileURL } from 'node:url';
 import { HAS_SITE, SITE_DIR, sitePath, skipWithoutSite } from '../tools/repos.mjs';
 import { GSJS, INVENTORY_DB } from '../tools/catalog/build.mjs';
 import { KINDS, OBTAINABLE, WHY, sourceRow, supplyKind } from '../tools/build-item-sources.mjs';
+import { HAS_PHP, PHP } from './php.js';
 
 const root = join(import.meta.dirname, '..');
 const skipBuild = skipWithoutSite
@@ -154,7 +155,7 @@ describe('the Give pop-up\'s Browse view (console/console.js)', { skip: skipWith
     assert.match(js, /adminOnly\(it\) \? el\('span', \{ class: 'console-tag console-tag-bad', text: 'Admin only', title: itemWhere\(it, state\.itemKinds\) \}\) : null/, 'the search marks them too');
   });
 
-  it('the site joins the file onto the give catalog, administrators only', { skip: spawnSync('php', ['-v']).status !== 0 && 'no php' }, () => {
+  it('the site joins the file onto the give catalog, administrators only', { skip: !HAS_PHP && 'no php' }, () => {
     const php = readFileSync(sitePath('src/AdminConsole.php'), 'utf8');
     assert.match(php, /\$sourcesFile = dirname\(__DIR__\) \. '\/data\/item-sources\.json';/);
     assert.match(php, /\+ self::itemSource\(\$sources\['items'\]\[\$c\] \?\? null\)/);
@@ -162,7 +163,7 @@ describe('the Give pop-up\'s Browse view (console/console.js)', { skip: skipWith
     const engine = process.env.MINN_ENGINE_DIR || join(homedir(), 'Cove/Sites/minn-engine.localhost/public/minn');
     if (!existsSync(join(engine, 'src/Minn/Autoloader.php'))) return;
     const code = `define('ABSPATH', sys_get_temp_dir() . '/'); define('MINN_ENGINE_DIR', $argv[1]); require $argv[1] . '/src/Minn/Autoloader.php'; Minn\\Autoloader::register(); $site = $argv[2]; spl_autoload_register(function ($c) use ($site) { $p = 'Groddle\\\\Minn\\\\'; if (str_starts_with($c, $p)) require $site . '/src/' . substr($c, strlen($p)) . '.php'; }); echo json_encode([Groddle\\Minn\\AdminConsole::itemSource(['cat' => 'Food', 'src' => ['sold', 3], 'ok' => 1, 'price' => 5, 'rare' => 1]), Groddle\\Minn\\AdminConsole::itemSource(['cat' => 7, 'ok' => 0, 'price' => 0, 'why' => 'Never finished in Glitch']), Groddle\\Minn\\AdminConsole::itemSource(null)]);`;
-    const r = spawnSync('php', ['-r', code, engine, SITE_DIR], { encoding: 'utf8' });
+    const r = spawnSync(PHP, ['-r', code, engine, SITE_DIR], { encoding: 'utf8' });
     assert.equal(r.status, 0, r.stderr);
     assert.deepEqual(JSON.parse(r.stdout), [
       { cat: 'Food', src: ['sold'], ok: true, price: 5, rare: true },

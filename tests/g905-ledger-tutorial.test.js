@@ -17,8 +17,9 @@ import { EZ_FOOD, EZ_KNIFE_AND_BOARD, SOIL_TOOLS } from '../public/js/practice-s
 import { AWARD_ITEM } from '../public/js/funpickle.js?v=95796317';
 import { MUSICBLOCK_ENDGAME_GIFT, START_STREET_MUSICBLOCKS } from '../public/js/musicblocks.js?v=8e985753';
 import { musicblocksFeature } from '../public/js/features/musicblocks-feature.js?v=4668a393';
+import { HAS_PHP, PHP } from './php.js';
 
-const hasPhp = spawnSync('php', ['-v']).status === 0;
+const hasPhp = HAS_PHP;
 const skip = skipWithoutSite || !hasPhp;
 
 function php(op, args) {
@@ -31,7 +32,7 @@ function php(op, args) {
       'check' => LedgerMath::check($a[0], $a[1], [], $a[2], (float) $a[3], 50000.0, Economy::shared(), null, fn (): int => 0, 1763319600),
       'baseline' => LedgerMath::markBaseline905($a[0]),
     });`;
-  const out = execFileSync('php', ['-r', code], { input: JSON.stringify({ op, args }) });
+  const out = execFileSync(PHP, ['-r', code], { input: JSON.stringify({ op, args }) });
   return JSON.parse(String(out), (k, v) => (Array.isArray(v) && !v.length && ['items', 'made', 'runs', 'capped', 'detail', 'held', 'spent'].includes(k) ? {} : v));
 }
 
@@ -55,7 +56,7 @@ const sum = (rows) => rows.reduce((m, r) => ({ ...m, [r.classTsid]: (m[r.classTs
 describe('G905: the tutorial\'s gifts stand once per character by the save\'s record', { skip }, () => {
   it('the fixed sets match what the game hands out', () => {
     const code = `require ${JSON.stringify(SITE_DIR)} . '/src/LedgerMath.php'; echo json_encode(Groddle\\Minn\\LedgerMath::TUTORIAL_SETS);`;
-    const sets = JSON.parse(String(execFileSync('php', ['-r', code])));
+    const sets = JSON.parse(String(execFileSync(PHP, ['-r', code])));
     assert.deepEqual(sets.training2.items, sum([...TRAINING2_FOOD, ...TRAINING2_DRINKS]));
     assert.deepEqual(sets.ezc.items, { ...sum([EZ_KNIFE_AND_BOARD, ...EZ_FOOD]) });
     assert.deepEqual(sets.soil.items, sum(SOIL_TOOLS));
@@ -65,7 +66,7 @@ describe('G905: the tutorial\'s gifts stand once per character by the save\'s re
     // G938: the start street's block (its class from the record) and the 25-tune GNG gift.
     assert.deepEqual(sets.startblock, { gate: 'startblock', items: { startblock: 1 } });
     assert.deepEqual(sets.musicblockgift, { gate: 'musicblockgift', items: { [MUSICBLOCK_ENDGAME_GIFT]: 1 } });
-    const re = String(execFileSync('php', ['-r', `require ${JSON.stringify(SITE_DIR)} . '/src/LedgerMath.php'; echo Groddle\\Minn\\LedgerMath::START_BLOCK_CLASS;`]));
+    const re = String(execFileSync(PHP, ['-r', `require ${JSON.stringify(SITE_DIR)} . '/src/LedgerMath.php'; echo Groddle\\Minn\\LedgerMath::START_BLOCK_CLASS;`]));
     const pattern = new RegExp(re.slice(1, -1));
     const all = ['b_brown', 'd_blue', 'd_green', 'd_red', 'x_shiny'].flatMap((s) => [1, 2, 3, 4, 5].map((n) => `musicblock_${s}_0${n}`));
     assert.deepEqual(all.filter((c) => pattern.test(c)), [...START_STREET_MUSICBLOCKS].sort());

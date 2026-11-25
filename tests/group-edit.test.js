@@ -17,6 +17,7 @@ import { homedir } from 'node:os';
 import { join } from 'node:path';
 
 import { GAME_DIR, HAS_SITE, SITE_DIR } from '../tools/repos.mjs';
+import { HAS_PHP, PHP, phpSkip } from './php.js';
 
 function mysql() {
   const env = String(process.env.GRODDLE_TEST_MYSQL || '').trim();
@@ -33,13 +34,13 @@ function mysql() {
   return host && user ? { host, user, pass: def('DB_PASSWORD') || '' } : null;
 }
 const engineDir = process.env.MINN_ENGINE_DIR || join(homedir(), 'Cove/Sites/minn-engine.localhost/public/minn');
-const hasPhp = spawnSync('php', ['-v']).status === 0;
+const hasPhp = HAS_PHP;
 // A PHP that has mysqli as a module only (Arch's) gets it loaded.
-const phpArgs = hasPhp && spawnSync('php', ['-r', 'exit(class_exists("mysqli") ? 0 : 1);']).status !== 0 ? ['-d', 'extension=mysqli'] : [];
+const phpArgs = hasPhp && spawnSync(PHP, ['-r', 'exit(class_exists("mysqli") ? 0 : 1);']).status !== 0 ? ['-d', 'extension=mysqli'] : [];
 const db = mysql();
-const reachable = db && hasPhp && spawnSync('php', [...phpArgs, '-r', 'mysqli_report(MYSQLI_REPORT_OFF); $m = @new mysqli($argv[1], $argv[2], $argv[3]); exit($m->connect_errno ? 1 : 0);', db.host, db.user, db.pass]).status === 0;
+const reachable = db && hasPhp && spawnSync(PHP, [...phpArgs, '-r', 'mysqli_report(MYSQLI_REPORT_OFF); $m = @new mysqli($argv[1], $argv[2], $argv[3]); exit($m->connect_errno ? 1 : 0);', db.host, db.user, db.pass]).status === 0;
 const skipDb = (!HAS_SITE && 'no site repo')
-  || (!hasPhp && 'no php')
+  || phpSkip('mysqli')
   || (!existsSync(join(engineDir, 'src/Minn/Autoloader.php')) && 'Minn Engine not found (set MINN_ENGINE_DIR)')
   || (!reachable && 'no MariaDB to make a throwaway database on (set GRODDLE_TEST_MYSQL)');
 
@@ -48,7 +49,7 @@ const WORDS = 'Come work on quests that you need multiple people around for!';
 describe('#698: editing a group on a throwaway database (Groups::edit)', { skip: skipDb }, () => {
   let r;
   before(() => {
-    r = JSON.parse(execFileSync('php', [...phpArgs, join(GAME_DIR, 'tests/fixtures/groups/group-edit.php'), engineDir, SITE_DIR, db.host, db.user, db.pass], { timeout: 60000 }).toString());
+    r = JSON.parse(execFileSync(PHP, [...phpArgs, join(GAME_DIR, 'tests/fixtures/groups/group-edit.php'), engineDir, SITE_DIR, db.host, db.user, db.pass], { timeout: 60000 }).toString());
   });
 
   it('is PUT groddle/v1/groups/{id}, signed in, beside show', () => {
