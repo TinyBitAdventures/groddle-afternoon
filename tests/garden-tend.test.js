@@ -11,7 +11,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { firstTendKey, plotIdForKey, plotKeyForId, stepPlotId, stepTendKey, tendKeyAction } from '../public/js/garden-tend.js?v=8814f400';
+import { firstTendKey, plotIdForKey, plotKeyForId, stepPlotId, stepTendKey, tendKeyAction } from '../public/js/garden-tend.js?v=a7470c4a';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const game = readFileSync(join(root, 'public/game.js'), 'utf8');

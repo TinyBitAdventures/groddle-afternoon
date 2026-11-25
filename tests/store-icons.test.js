@@ -10,7 +10,7 @@ import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import { STORE_ICON_ITEMS, storeIconItem, storeIconUrl } from '../public/js/store-icons.js?v=94487095';
 import { STORE_CATALOG } from '../public/js/store-catalog.js?v=c6ebb2bd';
-import { VENDOR_PROFILES } from '../public/js/vendor.js?v=f9bee39e';
+import { VENDOR_PROFILES } from '../public/js/vendor.js?v=474a80fd';
 import { vendorFinderRows, vendorKinds } from '../public/js/vendor-finder.js?v=7fbfc51d';
 import { vendorIcon } from '../tools/catalog/build.mjs';
 

@@ -13,7 +13,7 @@ import { join } from 'node:path';
 
 import { CHEAP_BAG_PRICE, cheapBagPrice } from '../public/js/newxp.js?v=5aa81665';
 import { __newxpTest } from '../public/js/features/newxp-feature.js?v=6c4394ab';
-import { vendorBuy, vendorSell, vendorSellValue } from '../public/js/vendor.js?v=f9bee39e';
+import { vendorBuy, vendorSell, vendorSellValue } from '../public/js/vendor.js?v=474a80fd';
 import { createInventory, countItem } from '../public/js/inventory.js?v=6414dbdc';
 
 const GSJS = join(import.meta.dirname, '..', '..', 'glitch-GameServerJS');

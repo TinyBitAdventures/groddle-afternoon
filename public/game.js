@@ -2,11 +2,11 @@
  * Groddle Afternoon — original street geometry + layered decos
  * PixiJS 8 · locations-xml streets · CoU PNG decos · quests/items
  */
-import { ITEM_ICONS, ITEM_LABELS, getVerbsFor, ordinaryItems, runVerb } from './content.js?v=ceaea1fe';
+import { ITEM_ICONS, ITEM_LABELS, getVerbsFor, ordinaryItems, runVerb } from './content.js?v=9fe5fa56';
 import { createErrorOnce, createFeatureHost, createFrameStages } from './js/feature-host.js?v=b87e2cbc';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=1c01544f';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=da06d359';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl, drawTileArt } from './js/enter-chooser.js?v=92133ac8';
-import { firstTendKey, STICK_TEND_DELAY_MS, STICK_TEND_DIRS, STICK_TEND_REPEAT_MS, stepTendKey, stepTendKeys, stickTendKey, tendKeyAction } from './js/garden-tend.js?v=8814f400';
+import { firstTendKey, STICK_TEND_DELAY_MS, STICK_TEND_DIRS, STICK_TEND_REPEAT_MS, stepTendKey, stepTendKeys, stickTendKey, tendKeyAction } from './js/garden-tend.js?v=a7470c4a';
 import { avatarHitBox, behindFloor, bodyReachDistance, OUT_OF_REACH_LINE, playerClickBox } from './js/reach.js?v=456da8a8';
 import { createVogOverlay } from './js/vog-overlay.js?v=e883b3e3';
 import { createPromptStack } from './js/prompt-stack.js?v=19885e1b';
@@ -701,6 +701,8 @@ import {
   plotStatusLabel,
   plotGrowProgress,
   suggestedPlotAction,
+  plotClickAction,
+  PLOT_CLICK_LINES,
   ensureGardenItems,
   starterGardenSeeds,
   starterHerbSeeds,
@@ -712,7 +714,7 @@ import {
   hasHoe,
   plantSeedChoices,
   PLANT_PICK_TITLE,
-} from './js/garden.js?v=9c4cc027';
+} from './js/garden.js?v=a7c6f521';
 import { GARDEN_SCALE, PLOT_H as GARDEN_PLOT_H, PLOT_W as GARDEN_PLOT_W, gardenFrame, gardenLayout, gardenStyle, plotPieces } from './js/garden-view.js?v=04fe8467';
 import { nearestPlotIndex } from './js/garden-view.js?v=04fe8467';
 import {
@@ -942,7 +944,7 @@ import {
   vendorSellUnitPrice,
   vendorBuyUnitPrice,
   VENDOR_BAG_HOLDS,
-} from './js/vendor.js?v=f9bee39e';
+} from './js/vendor.js?v=474a80fd';
 import {
   createAnimalState,
   resetAnimalDay,
@@ -1154,7 +1156,7 @@ import { HOME_SCREEN_TIP_CACHE, iosSafari, mountHomeScreenTip, runsStandalone } 
 import { EAT_PICK_TEXT, bestFoodIndex, eatChoices, eatTip } from './js/eat-pick.js?v=8fb763d0';
 import { heldDirection, installHeldKeyGuard, isMacPlatform } from './js/held-keys.js?v=a28eb293';
 import { isOneClickDoor, oneClickChoice, signpostArmRows, worldContextAction } from './js/world-context-menu.js?v=e4c99c05';
-import { blockedPlayerVerbs, listPlayerTarget, opensPlayerMenu, playerMenuRows } from './js/ui/player-menu.js?v=2869da89';
+import { blockedPlayerVerbs, listPlayerTarget, opensPlayerMenu, playerMenuRows } from './js/ui/player-menu.js?v=c3332315';
 import { forgetTexture, frameTexture, isFailed, isLoaded, onFailed, onLoaded, textureFromUrl, whenLoaded } from './js/textures.js?v=b8e38103';
 import { FALLBACK_MAX as WORLD_ART_FALLBACK_MAX, worldArtFor } from './js/world-art.js?v=a67514c8';
 import { HOME_PIP_PX, drawLockPip, homeMarkNote, homePipShown, homeStackMark } from './js/home-stack-marks.js?v=0ff4c29f';
@@ -10091,7 +10093,7 @@ function pickMax(target, classTsid) {
 const FEED_PICKER_TITLES = { feed: 'Feed what?', incubate: 'Incubate what?', deposit: 'Deposit what?', plant: PLANT_PICK_TITLE, distill: 'Distill what?', lay: 'Lay what?' };
 const FEED_PICKER_VERB_LABELS = { feed: 'Feed', incubate: 'Incubate', deposit: 'Deposit', plant: 'Plant', distill: 'Distill', lay: 'Lay' };
 /** GardenView.as onPlotClick 500-509: a clean plot clicked with no seeds. */
-const PLANT_NO_SEEDS_LINE = "You don't have any seeds to plant!";
+const PLANT_NO_SEEDS_LINE = PLOT_CLICK_LINES.noSeeds;
 
 /** requires_target_item_count: the second step asks how many of the chosen stack. */
 function showFeedPickerQty(food) {
@@ -11551,7 +11553,8 @@ function tryOpenNearestMenu({ nearestFirst = false } = {}) {
 /**
  * Bug report #5 (js/garden-tend.js): tending a garden from the keyboard, as the client's
  * GardenManager.startEditing. The plot in focus glows (and the Enter chip names it); the arrows
- * or WASD move between plots, Enter or E opens that plot's menu, Esc or walking away stops.
+ * or WASD move between plots, Enter or E acts on that plot as a click does (G1305, clickGardenPlot),
+ * Esc or walking away stops.
  * QA: canvas data gardenTend (the plot key in focus, empty when not tending).
  */
 let gardenTend = null;
@@ -11611,8 +11614,9 @@ function gardenTendKey(e) {
   keys.delete(e.key.toLowerCase());
   keys.delete(e.key.toUpperCase());
   if (action === 'tend') {
+    // GardenView.as onKeyDown 657-660: Enter acts on the lit plot as a click on it does (onPlotClick).
     const plot = gardenTendPlot();
-    if (plot && !currentAction) openVerbMenu(plot);
+    if (plot && !currentAction) clickGardenPlot(plot);
     return true;
   }
   const garden = gardenTend.entity.state.garden;
@@ -11622,9 +11626,9 @@ function gardenTendKey(e) {
 }
 /**
  * #695 (phone, upright, plots 40 x 12 px): ACTPRESS for a garden being tended, as signpostActMenu is
- * for a post. A drag on Act steps the lit plot (stepTendKeys), and a tap or the lift opens its menu,
- * as Enter does (gardenTendKey), so tending is a tap, a drag and a tap. Null while not tending, or
- * while a menu or window has the keys (the keyboard's rule).
+ * for a post. A drag on Act steps the lit plot (stepTendKeys), and a tap or the lift acts on it as
+ * Enter does (gardenTendKey: its best action, G1305), so tending is a tap, a drag and a tap. Null while
+ * not tending, or while a menu or window has the keys (the keyboard's rule).
  */
 function gardenTendActMenu() {
   if (!gardenTend || menuTarget || panelOnScreen()) return null;
@@ -11637,9 +11641,45 @@ function gardenTendActMenu() {
     },
     choose() {
       const plot = gardenTendPlot();
-      if (plot && !currentAction) openVerbMenu(plot);
+      if (plot && !currentAction) clickGardenPlot(plot);
     },
   };
+}
+/**
+ * G1305 (#695, Austin 2026-11-25): one click or tap on a plot (or Enter and Act on the lit plot while
+ * tending) runs its best action, as Glitch's GardenView.as onPlotClick 454-538 (js/garden.js
+ * plotClickAction): harvest, clear, water or fertilize at once; an empty wet plot asks what to plant
+ * (the seed menu, even for one kind of seed: InteractionMenuController.as startGardenPlotMenu 1531-1560).
+ * Glitch's full plot menu was gone (its "old full menu", 1562-1600, never ran); here a right-click and
+ * a long press still open it (RIGHTCLICK, js/world-context-menu.js), as for the one-click things.
+ * The verb goes through requestVerb, so a shared garden's plot still asks the realtime server and
+ * another player's crop in its planter's minute is refused (G368).
+ */
+function clickGardenPlot(target) {
+  if (!target || currentAction) return;
+  const garden = target.state?.garden;
+  const pick = plotClickAction(getPlot(garden, target.state?.plotKey), inv, { garden });
+  setCanvasData('plotClick', `${target.state?.plotKey || ''}:${pick.action || 'none'}`);
+  const fail = (line) => {
+    playSound('CLICK_FAILURE', { volume: 0.45 });
+    if (line) toast(line);
+  };
+  if (!pick.action) return fail(pick.line);
+  const verb = menuVerbsFor(target).find((v) => v?.id === pick.action);
+  // A feature that takes the plot's menu over (rooks) has other verbs: its menu, as before.
+  if (!verb) return openVerbMenu(target);
+  if (verb.enabled === false) return fail(verb.reason || pick.line);
+  if (pick.action !== 'plant') return requestVerb(target, verb);
+  const menu = document.getElementById('verb-menu');
+  if (!menu) return undefined;
+  menuTarget = target;
+  dropVerbMenuActs(menu);
+  menu.hidden = false;
+  if (!openVerbPickLevel(target, { ...verb, picker: 'plant' }, null)) {
+    closeVerbMenu();
+    return fail(PLANT_NO_SEEDS_LINE);
+  }
+  return undefined;
 }
 /** #695: the stick's arrows stepping plots, each to when it steps again while held. */
 const gardenTendStickNext = new Map();
@@ -36197,6 +36237,11 @@ async function main() {
       // click when it is enabled, else the menu opens (TSFrontController.as 3736-3758); never while
       // decorating (3736). Enter, a right-click and a long press still open the full menu.
       // #385: a door's click goes through it (GLITCH_ONE_CLICK_DOORS, TSFrontController.as 3600-3607).
+      // G1305: a plot's click runs its best action (clickGardenPlot), never while decorating.
+      if (best.classId === 'garden_plot' && !features.query('homeEditMode', engine)) {
+        clickGardenPlot(best);
+        return;
+      }
       const one = !currentAction && !features.query('homeEditMode', engine) ? oneClickChoice(best, () => menuVerbsFor(best)) : null;
       if (one?.kind === 'run') {
         setCanvasData('oneClick', `${best.classId || ''}:${one.verb.id}`);
@@ -36247,7 +36292,7 @@ async function main() {
         if (signpostFocus) return signpostActMenu();
         const pop = isPackPopoverOpen() ? document.getElementById('pack-popover') : null;
         if (pop) return { step: (n) => stepVerbRow(pop, n), choose: () => chooseVerbRow(pop) };
-        // #695: a garden being tended: a drag steps the lit plot, the lift opens its menu.
+        // #695: a garden being tended: a drag steps the lit plot, the lift acts on it (G1305).
         return gardenTendActMenu();
       },
       floatStick: createFloatStick({ win: window }),
@@ -36986,7 +37031,7 @@ async function main() {
   }
   // Garden talkback QA (js/garden-talk-qa.js): ?gardentalkdemo=herb|crop.
   if (new URLSearchParams(location.search).has('gardentalkdemo')) {
-    import('./js/garden-talk-qa.js?v=d686a4e2').then((m) => m.runGardenTalkDemo({ engine, executeVerb, params: new URLSearchParams(location.search) }));
+    import('./js/garden-talk-qa.js?v=b436fa26').then((m) => m.runGardenTalkDemo({ engine, executeVerb, params: new URLSearchParams(location.search) }));
   }
   // MEMQA (ticket 21, Safari's memory reload in Naraka): ?memqa=1 lets a probe walk streets through the
   // real street trip (tools/qa/street-memory.mjs). Solo pages only: online pages drop their params.

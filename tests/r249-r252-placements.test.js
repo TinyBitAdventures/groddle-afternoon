@@ -35,7 +35,7 @@ import {
 } from '../public/js/street-ecology.js?v=58aafb61';
 import { resourcePlacementGroups, resourceSpawnPlan } from '../public/js/features/resource-nodes-feature.js?v=e1438358';
 import { JELLISAC_SPOTS, PEAT_SPOTS } from '../public/js/node-spots-data.js?v=97d4281c';
-import { bedKind, createGarden, fitGardenToBed, plantPlot } from '../public/js/garden.js?v=9c4cc027';
+import { bedKind, createGarden, fitGardenToBed, plantPlot } from '../public/js/garden.js?v=a7c6f521';
 import { bedKey, parsePlotId } from '../public/js/shared-gardens.js?v=464472e5';
 import { normalizeGardenSnapshot } from '../public/js/player-save.js?v=cf0ebffd';
 import { serverPath, skipWithoutServer } from '../tools/repos.mjs';

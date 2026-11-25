@@ -6,9 +6,10 @@
  * verb menu, chooser, signpost and pack card, not a garden, so a drag opened plot 1-2's menu.
  *
  * Glitch: while tending, the arrows moved between plots (GardenView.as onKeyDown 588-672) and Enter
- * opened the lit plot's menu. Now on a phone, as signpostActMenu drives a post:
+ * acted on the lit plot (onPlotClick 657-660). Now on a phone, as signpostActMenu drives a post:
  * - Act drives the plots (game.js gardenTendActMenu): a drag steps the lit plot round the grid
- *   (stepTendKeys, the Right arrow's order), the lift or a tap opens its menu;
+ *   (stepTendKeys, the Right arrow's order), the lift or a tap acts on it as Enter does (G1305: its
+ *   best action, game.js clickGardenPlot, tests/garden-plot-click.test.js);
  * - the stick moves the lit plot across the grid (stickTendKey), stepping again while held, and past
  *   the left or right end lets go of the garden and walks (a phone has no Esc).
  * Keyboard and desktop are unchanged.
@@ -19,7 +20,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { STICK_TEND_DIRS, stepTendKey, stepTendKeys, stickTendKey } from '../public/js/garden-tend.js?v=8814f400';
+import { STICK_TEND_DIRS, stepTendKey, stepTendKeys, stickTendKey } from '../public/js/garden-tend.js?v=a7470c4a';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const game = readFileSync(join(root, 'public/game.js'), 'utf8');
@@ -74,7 +75,7 @@ describe('#695 in Chrome, an Android phone upright (360x629, touch) in the back 
     await server?.stop();
   });
 
-  it('Act tends, the stick and a drag on Act step the lit plot, the lift opens its menu, the stick walks off', { timeout: 180_000 }, async () => {
+  it('Act tends, the stick and a drag on Act step the lit plot, the lift acts on it, the stick walks off', { timeout: 180_000 }, async () => {
     const base = `http://127.0.0.1:${server.address().port}`;
     const UA = 'Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Mobile Safari/537.36';
     const ctx = await chrome.browser.newContext({ viewport: { width: 360, height: 629 }, deviceScaleFactor: 3, userAgent: UA, hasTouch: true, isMobile: true });
@@ -127,7 +128,7 @@ describe('#695 in Chrome, an Android phone upright (360x629, touch) in the back 
       assert.equal(await lit(), '', 'past the left end the stick let go of the garden');
       assert.ok((await px()) < x1 - 20, 'and walked the avatar off it');
 
-      // A drag down on Act steps the lit plot; the lift opens that plot's menu.
+      // A drag down on Act steps the lit plot; the lift acts on that plot (G1305: its best action).
       await toGarden();
       await tapAct();
       assert.equal(await lit(), '1-2');
@@ -144,8 +145,8 @@ describe('#695 in Chrome, an Android phone upright (360x629, touch) in the back 
         document.querySelector('[data-touch-act]').dispatchEvent(new PointerEvent('pointerup', { pointerId: 77, pointerType: 'touch', isPrimary: true, clientX: x, clientY: y + 40, bubbles: true, cancelable: true }));
       }, { x: ax, y: ay });
       await page.waitForTimeout(400);
-      const opened = await page.evaluate(() => ({ menu: window.groddleQA.snapshot().menu, lit: document.querySelector('#game-root canvas').dataset.gardenTend }));
-      assert.ok(opened.menu, 'the lift opened the lit plot\'s menu');
+      const opened = await page.evaluate(() => ({ click: document.querySelector('#game-root canvas').dataset.plotClick || '', lit: document.querySelector('#game-root canvas').dataset.gardenTend }));
+      assert.match(opened.click, /^2-2:/, 'the lift acted on the lit plot, as a tap on it does');
       assert.equal(opened.lit, '2-2', 'on plot 2-2');
     } finally {
       await ctx.close();

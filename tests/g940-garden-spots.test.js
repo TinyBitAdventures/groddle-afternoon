@@ -24,7 +24,7 @@ import {
 import { platformYAt, platformsScreen, streetWidth } from '../public/js/street-model.js?v=a9a05f9d';
 import { GARDEN_SPOTS } from '../public/js/garden-spots-data.js?v=3c5d4164';
 import { CROP_GARDEN_STREETS_2012, gardenBedWidth, isCropGardenStreet, measuredGardenBeds, measuredGardenVendor, pictureGardenBeds } from '../public/js/garden-beds.js?v=2ac6a12c';
-import { BED_KEY_RE, SEED_CATALOG, bedKind, createGarden, harvestLostBeds, streetGardenBeds } from '../public/js/garden.js?v=9c4cc027';
+import { BED_KEY_RE, SEED_CATALOG, bedKind, createGarden, harvestLostBeds, streetGardenBeds } from '../public/js/garden.js?v=a7c6f521';
 import { bedKey, parsePlotId, plotId } from '../public/js/shared-gardens.js?v=464472e5';
 import { VENDOR_PLACEMENT_KEY, vendorNpcPlacementGroups, vendorNpcsFor } from '../public/js/vendor-npcs.js?v=90b0c123';
 import { normalizeWorldSnapshot } from '../public/js/player-save.js?v=cf0ebffd';

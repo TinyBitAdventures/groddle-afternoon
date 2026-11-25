@@ -1881,6 +1881,51 @@ export function fertilizeCheck(plot, now = Date.now()) {
 }
 
 /**
+ * G1305: why a plot click did nothing. GardenView.as 509-512 says the seeds line; the tool lines are
+ * the red tips Glitch's plot card showed under the pointer (GardenPlotDetails.as 127-129, 166-168),
+ * which the remake has no card for, so the click says them.
+ */
+export const PLOT_CLICK_LINES = Object.freeze({
+  noSeeds: "You don't have any seeds to plant!",
+  noHoe: 'You need a Hoe!',
+  noCan: 'Get a Watering Can!',
+});
+
+/**
+ * PURE (G1305, #695, Austin 2026-11-25): what one click (or tap, or Enter while tending) on a plot
+ * does, as Glitch's GardenView.as onPlotClick 476-528 chose it. In its order:
+ * 1. ripe (harvestable): harvest. Another player's crop in its planter's minute is refused by the
+ *    verb path (G368, GardenView.as 481-486), so it is a harvest here too.
+ * 2. dirty (mature_level 4): clear, when a Hoe is in the pack (HOE_TOOLS), else nothing.
+ * 3. a depleted garden's empty plot (mature_level 5): nothing.
+ * 4. empty and wet (mature_level 0, water_time > 0): plant, which asks what to plant (the seed
+ *    menu, 500-505), when seeds of the bed's kind are in the pack, else the no-seeds line.
+ * 5. needs water (doesPlotNeedWater 540-543, js/garden.js plotNeedsWater): water, when a Watering
+ *    Can is in the pack (WATER_TOOLS), else nothing. An empty dry plot lands here.
+ * 6. seeds or shoots, not fertilized, Guano in the pack, 80% watered: fertilize.
+ * 7. otherwise nothing (CLICK_FAILURE).
+ * Glitch asked only for the tool in the pack (hasItemsFromList): a worn one is the verb's refusal.
+ * @returns {{ action: 'harvest'|'clear'|'plant'|'water'|'fertilize'|null, line: string }}
+ */
+export function plotClickAction(plot, inv, { garden = null, gardenType = garden?.gardenType || 'default', now = Date.now() } = {}) {
+  const none = (line = '') => ({ action: null, line });
+  if (!plot) return none();
+  if (plot.state === 'crop') return { action: 'harvest', line: '' };
+  if (plot.state === 'dirty') return hasHoe(inv) ? { action: 'clear', line: '' } : none(PLOT_CLICK_LINES.noHoe);
+  if (plot.state === 'clean' && garden?.depleted) return none();
+  if (plot.state === 'clean' && plotWaterLeftMs(plot, now) > 0) {
+    return plantSeedChoices(inv, gardenType).length ? { action: 'plant', line: '' } : none(PLOT_CLICK_LINES.noSeeds);
+  }
+  if ((plot.state === 'clean' || plot.state === 'seeds' || plot.state === 'shoots') && plotNeedsWater(plot, now, garden)) {
+    return hasWateringCan(inv) ? { action: 'water', line: '' } : none(PLOT_CLICK_LINES.noCan);
+  }
+  if ((plot.state === 'seeds' || plot.state === 'shoots') && countItem(inv, GARDEN_FERTILIZER) > 0 && fertilizeCheck(plot, now).ok) {
+    return { action: 'fertilize', line: '' };
+  }
+  return none();
+}
+
+/**
  * include/garden.js 625-639 on one plot: seeds go straight to shoots (not marked fertilized, so
  * the shoots can take Guano of their own); shoots keep a tenth of what is left of their second
  * grow and are marked fertilized. Dung-Kicker Drops does the same (master_garden.js).

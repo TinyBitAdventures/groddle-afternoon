@@ -11,8 +11,8 @@ import assert from 'node:assert/strict';
 import { readFileSync, readdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { saleVerbs } from '../public/js/home-street-mp.js?v=3cf926a5';
-import { homeStorageFeature } from '../public/js/features/home-storage-feature.js?v=6105df52';
+import { saleVerbs } from '../public/js/home-street-mp.js?v=bacd5e64';
+import { homeStorageFeature } from '../public/js/features/home-storage-feature.js?v=2c5a10a4';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const read = (p) => readFileSync(join(root, p), 'utf8');
@@ -179,7 +179,7 @@ describe('names from neighbours-mp.js are imported wherever a feature calls them
 
 describe('#511 (G1027): the display box lists every item it takes', () => {
   it('no cap at 80: items late in the alphabet are offered', async () => {
-    const { depositChoices } = await import('../public/js/features/home-storage-feature.js?v=6105df52');
+    const { depositChoices } = await import('../public/js/features/home-storage-feature.js?v=2c5a10a4');
     const { ITEM_CATALOG } = await import('../public/js/inventory.js?v=6414dbdc');
     // 120 plain things in the pack (the catalog in node holds only the starter items).
     const added = [];

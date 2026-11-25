@@ -12,7 +12,7 @@
  *   plot glows with its details (highlightPlot 394-427); the first plot is the last child
  *   placed (108-158 lay the plots out backwards), plot 0, the front row's left end.
  * - GardenView.as 588-672 onKeyDown: Up/W, Down/S, Left/A and Right/D move between plots with the
- *   wraps below; Enter acts on the plot (onPlotClick, its menu). GardenManager.as 176-181: Esc
+ *   wraps below; Enter acts on the plot (onPlotClick: its best action, G1305). GardenManager.as 176-181: Esc
  *   stops tending, as does a click off the garden (165-174).
  *
  * Plot ids there are row * cols + col, row 0 at the front (GardenView.as 155: y = (rows-1-row)

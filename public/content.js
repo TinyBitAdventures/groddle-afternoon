@@ -39,7 +39,7 @@ import {
   GARDEN_FERTILIZE_MS,
   fertilizeCheck,
   fertilizePlot,
-} from './js/garden.js?v=9c4cc027';
+} from './js/garden.js?v=a7c6f521';
 import { firstWorkingTool, HOE_TOOLS, WATERING_CAN_TOOLS } from './js/tools.js?v=4156bba8';
 import { miningGemHint } from './js/gem-hints.js?v=4b65f7ac';
 import {
@@ -871,7 +871,7 @@ export function getVerbsFor(target, ctx) {
     });
   }
 
-  // Individual on-map plot (original Glitch: click plot → menu, not only a modal)
+  // Individual on-map plot: the menu a right-click or a long press opens (a click runs its best action, G1305: game.js clickGardenPlot)
   if (classId === 'garden_plot') {
     const plot = target.state?.plot;
     const garden = target.state?.garden;
