@@ -5,7 +5,7 @@
 import { ITEM_ICONS, ITEM_LABELS, getVerbsFor, ordinaryItems, runVerb } from './content.js?v=9fe5fa56';
 import { createErrorOnce, createFeatureHost, createFrameStages } from './js/feature-host.js?v=b87e2cbc';
 import { FEATURES, questFlagsFeature } from './js/features/index.js?v=3cfab6d1';
-import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl, drawTileArt } from './js/enter-chooser.js?v=92133ac8';
+import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, enterHintPick, reachGlowTargets, trimmedIconUrl, drawTileArt } from './js/enter-chooser.js?v=de94bf7a';
 import { firstTendKey, STICK_TEND_DELAY_MS, STICK_TEND_DIRS, STICK_TEND_REPEAT_MS, stepTendKey, stepTendKeys, stickTendKey, tendKeyAction } from './js/garden-tend.js?v=a7470c4a';
 import { avatarHitBox, behindFloor, bodyReachDistance, OUT_OF_REACH_LINE, playerClickBox } from './js/reach.js?v=456da8a8';
 import { createVogOverlay } from './js/vog-overlay.js?v=e883b3e3';
@@ -8721,7 +8721,9 @@ function createSpriteOutline(source, opts = {}) {
     // Always strictly behind the source
     outline.zIndex = (Number(src.zIndex) || 0) - 1;
     outline.alpha = src.alpha ?? 1;
-    outline.visible = !!src.visible && src.worldAlpha > 0.01;
+    // Pixi 8 has no Container.worldAlpha (only a render group's): read the alpha up the parents, or
+    // the rim never showed (#669: the hover and reach glows were invisible since the Pixi 8 move).
+    outline.visible = !!src.visible && (src.getGlobalAlpha?.(false) ?? src.alpha ?? 1) > 0.01;
   };
   outline.syncOutlineTexture();
   return outline;
@@ -8755,8 +8757,13 @@ function setHoverTarget(target) {
   clearHoverGlow();
   if (!target?.sprite || target.sprite.destroyed || !entityLayer) return;
   hoverTarget = target;
-  const spr = target.sprite;
+  // The reach glow's rim gives way to the hover's (#669: one rim per thing).
+  dropReachGlow(target);
+  target._hoverGlow = addSpriteRim(target.sprite);
+}
 
+/** The cyan rim (tsSprite_GlowA) behind a sprite on entityLayer: the hover's and the reach glow's. */
+function addSpriteRim(spr) {
   const outline = createSpriteOutline(spr, { color: 0xa8e4ff, thickness: 2 });
   // Insert just below the sprite in the child list, then rely on zIndex sort
   if (spr.parent === entityLayer) {
@@ -8769,7 +8776,48 @@ function setHoverTarget(target) {
   // Force draw order: outline under sprite
   entityLayer.sortableChildren = true;
   if (typeof entityLayer.sortChildren === 'function') entityLayer.sortChildren();
-  target._hoverGlow = outline;
+  return outline;
+}
+
+/**
+ * #669 (G1304, Austin 2026-11-25): on a computer what is in reach glows, as Glitch's
+ * _findInteractionSprites glowed every sprite the avatar touched (MiddleGroundRenderer.as 1092-1131),
+ * in the hover's rim; the walk-past chip is a phone's alone (enterHintPick). Re-read every 150 ms,
+ * the rims follow their sprites' frames each tick. QA: canvas data reachGlow, the glowing classes.
+ */
+const reachGlows = new Map();
+let reachGlowAt = 0;
+function dropReachGlow(target) {
+  const rim = reachGlows.get(target);
+  if (!rim) return;
+  reachGlows.delete(target);
+  if (!rim.destroyed) {
+    rim.parent?.removeChild(rim);
+    rim.destroy({ children: true });
+  }
+}
+function reachGlowWanted() {
+  if (TOUCH_PHONE || !state.started || menuTarget || currentAction || isScreenFxBlocking()) return [];
+  if (features.query('homeEditMode', engine) || streetMoving()) return [];
+  const near = [];
+  for (const t of interactables) {
+    const d = interactReach(t);
+    if (d < 100) near.push({ target: t, distance: d });
+  }
+  // A sprite with art to trace: a garden's bare cells and a bare hit box have none.
+  return reachGlowTargets(near, { hover: hoverTarget, climbing: climb.active })
+    .filter((t) => t?.sprite && !t.sprite.destroyed && t.sprite.texture && t.sprite.texture !== PIXI.Texture.EMPTY);
+}
+function updateReachGlow(now = performance.now()) {
+  if (now - reachGlowAt > 150) {
+    reachGlowAt = now;
+    const want = new Set(reachGlowWanted());
+    for (const t of [...reachGlows.keys()]) if (!want.has(t) || reachGlows.get(t).destroyed) dropReachGlow(t);
+    for (const t of want) if (!reachGlows.has(t) && entityLayer && !entityLayer.destroyed) reachGlows.set(t, addSpriteRim(t.sprite));
+    const line = [...reachGlows.keys()].map((t) => t.classId || '').join(',');
+    if (app?.canvas && app.canvas.dataset.reachGlow !== line) app.canvas.dataset.reachGlow = line;
+  }
+  for (const rim of reachGlows.values()) if (!rim.destroyed) rim.syncOutlineTexture();
 }
 
 function wireInteractableSprite(target) {
@@ -37266,6 +37314,7 @@ async function main() {
     if (hoverTarget?._hoverGlow?.syncOutlineTexture) {
       run('hover outline', () => hoverTarget._hoverGlow.syncOutlineTexture());
     }
+    run('reach glow', updateReachGlow);
 
     // Throttled map-location autosave while walking
     locSaveAccum += dt;
@@ -37310,10 +37359,17 @@ async function main() {
           hoverTarget?.sprite && !hoverTarget.sprite.destroyed
             ? hoverTarget
             : null;
-        const near =
-          recent || (nearHover && withinReach(nearHover, 160)
-            ? nearHover
-            : nearestInteractable(100));
+        // #669 (G1304): on a computer no walk-past chip, as Glitch: in reach glows (updateReachGlow),
+        // the mouse names a thing. A phone keeps the chip over the nearest thing (enterHintPick).
+        const hoverInReach = Boolean(nearHover && withinReach(nearHover, 160));
+        const pick = enterHintPick({
+          recent,
+          hover: nearHover,
+          hoverInReach,
+          nearest: TOUCH_PHONE && !recent && !hoverInReach ? nearestInteractable(100) : null,
+          phone: TOUCH_PHONE,
+        });
+        const near = pick?.target || null;
         const nearSign = currentStreet ? signpostNear(walkUpSignpostStreet(currentStreet), player.x, 140, player.y) : null;
         const postAtHand = signpostAtHand();
         showSignpostKeys(postAtHand);
@@ -37337,7 +37393,7 @@ async function main() {
           const box = spriteWorldHitBox(near.sprite, 0);
           let label = near.label || near.classId || 'interact';
           // G217: with several things in reach Enter asks which (tryOpenNearestMenu), so the chip says so.
-          if (near !== recent && near !== nearHover && !ENTER_CHOOSER_OFF) {
+          if (pick.via === 'walk-past' && !ENTER_CHOOSER_OFF) {
             const plan = enterPlanForPrompt();
             if (plan.mode === 'chooser') label = enterPromptLabel(plan, label);
           }
@@ -37346,7 +37402,8 @@ async function main() {
           // A feature's own overlay over the player (a street project's work bubble) asks for no hint
           // while it is up; Enter itself still works.
           if (!enterHeldBy() && !speakingNow(near) && features.query('quietEnterHint', engine) !== true) want = {
-            key: 'Enter',
+            // Under the mouse but out of reach: its name alone (Enter would not take it).
+            key: pick.via === 'name' ? '' : 'Enter',
             label,
             x: near.sprite.x,
             // FRIENDPOST: a post (the home street's signpost) has its hint over its top, clear of the arms.
@@ -37371,6 +37428,9 @@ async function main() {
         }
         // TOUCH: a phone's hint chips name a tap or the stick, not a key (js/touch-controls.js touchPrompt).
         settlePrompt(TOUCH_PHONE ? touchPrompt(want) : want, performance.now());
+        // QA: canvas data enterHint, "key|label" of the chip shown ('' for none).
+        const hintLine = prompt.visible ? `${prompt.promptKey}|${prompt.promptLabel}` : '';
+        if (app.canvas.dataset.enterHint !== hintLine) app.canvas.dataset.enterHint = hintLine;
         if (prompt.visible) {
           prompt.x = clampWorldOverlayX(prompt.x, prompt.width, 12);
           promptKeepClear(wantArms);
@@ -37382,6 +37442,7 @@ async function main() {
         prompt.visible = false;
         syncPromptCss(0);
         showSignpostKeys(null);
+        if (app.canvas.dataset.enterHint) app.canvas.dataset.enterHint = '';
       }
     });
   };

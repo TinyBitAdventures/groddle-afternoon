@@ -161,6 +161,42 @@ export function enterPromptLabel(plan, fallback = 'interact') {
   return fallback;
 }
 
+/**
+ * #669 (G1304, Austin 2026-11-25): what the Enter hint names this frame. On a computer Glitch put
+ * no words over things as you walked past them: what the avatar touched glowed
+ * (MiddleGroundRenderer.as _findInteractionSprites 1092-1131, glowRenderer 1157-1167) and a thing
+ * was named only under the mouse (LocationItemstackView.as getTip 503-533, TipDisplayManager). So
+ * on a computer the hint is for the keyboard chain's thing (`recent`) or the thing under the mouse
+ * (`hover`: with Enter while Enter takes it, `hoverInReach`, else its name alone). The walk-past
+ * chip over the nearest thing ("Tap · choose from 4") is kept on a phone only, where it is how
+ * Act's choices are found (the inventions register: enter-walk-past-chip).
+ * @returns {{ target: any, via: 'recent' | 'hover' | 'name' | 'walk-past' } | null}
+ */
+export function enterHintPick({ recent = null, hover = null, hoverInReach = false, nearest = null, phone = false } = {}) {
+  if (recent) return { target: recent, via: 'recent' };
+  if (hover && hoverInReach) return { target: hover, via: 'hover' };
+  if (phone) return nearest ? { target: nearest, via: 'walk-past' } : null;
+  return hover ? { target: hover, via: 'name' } : null;
+}
+
+/**
+ * #669: the things that glow because they are in reach, as the client glowed each sprite in
+ * _interaction_spV (computers only, beside enterHintPick). One per garden (groupHead), never the
+ * thing under the mouse (it has its own hover rim), never while climbing (the client glowed
+ * nothing on a ladder, _findInteractionSprites 1097).
+ * @param {{ target: any, distance: number }[]} near
+ */
+export function reachGlowTargets(near = [], { hover = null, climbing = false } = {}) {
+  if (climbing) return [];
+  const out = [];
+  for (const row of near) {
+    const head = groupHead(row?.target);
+    if (!head || head === hover || out.includes(head)) continue;
+    out.push(head);
+  }
+  return out;
+}
+
 /** The line under the title (InteractionMenu.updateAfterCUIFocus, TYPE_LOC_DISAMBIGUATOR). */
 export function describeChoice(choice) {
   if (!choice) return '';

@@ -5831,6 +5831,31 @@
    "rows": []
   },
   {
+   "id": "enter-walk-past-chip",
+   "title": "The walk-past Enter chip: a key chip over the nearest thing in reach naming it, or \"choose from N\" with several, shown as you walk past (phones only since #669)",
+   "kind": "UI",
+   "status": "kept",
+   "where": [
+    {
+     "file": "public/js/enter-chooser.js",
+     "symbol": "enterHintPick enterPromptLabel"
+    },
+    {
+     "file": "public/game.js",
+     "symbol": "run('prompt') updateReachGlow"
+    },
+    {
+     "file": "public/js/touch-controls.js",
+     "symbol": "touchPrompt"
+    }
+   ],
+   "why": "Glitch put no words over things as you walked past: what the avatar touched glowed (MiddleGroundRenderer.as _findInteractionSprites 1092-1131) and the mouse named a thing (LocationItemstackView.as getTip). A phone has no mouse to name things, and the chip is how Act's choices are found there.",
+   "ruling": "Austin 2026-11-25 (#669, G1304): on a computer no walk-past chip, as Glitch (things in reach glow, the hover names them, Enter opens the chooser as before); keep the chip on phones (the gate's 'phone' device; tablets play as computers)",
+   "rows": [
+    "G1304"
+   ]
+  },
+  {
    "id": "ours-study-time-hint",
    "title": "Skills sheet: one line under an open skill saying its study takes longer because more skills are known than the brain holds",
    "kind": "UI",

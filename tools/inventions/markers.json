@@ -315,6 +315,9 @@
   "public/js/eat-pick.js": {
     "remake-own: * list none); F was the remake's own and ate an apple. Now F opens the": "hotkeys-of-ours"
   },
+  "public/js/enter-chooser.js": {
+    "invented: * Act's choices are found (the inventions register:": "enter-walk-past-chip"
+  },
   "public/js/feast-day.js": {
     "glitch-had-none: * Ours (inventions register: feast-day-piles): Glitch never ran a Thanksgiving event. It leans": "feast-day-piles",
     "invented: * Ours (inventions register: feast-day-piles): Glitch never ran a": "feast-day-piles",

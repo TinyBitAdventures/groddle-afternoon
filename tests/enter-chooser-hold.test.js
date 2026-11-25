@@ -7,7 +7,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { buildEnterChoices, enterPromptLabel, planEnter } from '../public/js/enter-chooser.js?v=92133ac8';
+import { buildEnterChoices, enterPromptLabel, planEnter } from '../public/js/enter-chooser.js?v=de94bf7a';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const pub = join(here, '../public');
@@ -35,8 +35,9 @@ describe('the hint chip', () => {
     assert.doesNotMatch(enterPromptLabel(several), /—/);
   });
 
-  it('game.js uses it only where Enter would open the chooser (not a recent or hovered target)', () => {
-    assert.match(game, /if \(near !== recent && near !== nearHover && !ENTER_CHOOSER_OFF\) \{\s*const plan = enterPlanForPrompt\(\);\s*if \(plan\.mode === 'chooser'\) label = enterPromptLabel\(plan, label\);/);
+  it('game.js uses it only on the walk-past chip (a phone\'s; not a recent or hovered target)', () => {
+    // #669 (G1304): the walk-past chip is a phone's alone (tests/enter-hint-669.test.js).
+    assert.match(game, /if \(pick\.via === 'walk-past' && !ENTER_CHOOSER_OFF\) \{\s*const plan = enterPlanForPrompt\(\);\s*if \(plan\.mode === 'chooser'\) label = enterPromptLabel\(plan, label\);/);
     assert.match(game, /if \(now - enterPromptPlan\.at > 150\) enterPromptPlan = \{ at: now, plan: planEnter\(enterChoicesHere\(\)\) \};/);
   });
 });

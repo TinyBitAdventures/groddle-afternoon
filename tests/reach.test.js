@@ -195,7 +195,8 @@ describe('game.js wiring', () => {
     assert.match(game, /function enterBodyDistance\(t\) \{[\s\S]{0,260}return bodyReachDistance\(box, player\.x, player\.y, head\);/);
     assert.match(game, /withinReach\(recentInteractionTarget, 160\)\s*\) \{\s*openMenuOrDoor\(recentInteractionTarget\)/);
     assert.match(game, /withinReach\(hoverTarget, 160\)\) \{\s*openMenuOrDoor\(hoverTarget\)/);
-    assert.match(game, /recent \|\| \(nearHover && withinReach\(nearHover, 160\)/);
+    // #669 (G1304): the hint takes the hovered thing with Enter only in reach (enterHintPick).
+    assert.match(game, /const hoverInReach = Boolean\(nearHover && withinReach\(nearHover, 160\)\);/);
   });
 
   it('a click on a thing behind a floor that no walk-over reaches says the client\'s line instead of opening its menu', () => {
