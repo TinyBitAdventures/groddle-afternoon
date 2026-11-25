@@ -35,6 +35,7 @@
  * photo that is sent and shown on its thumbnail ("1 mark", [data-phone-photo-marks]).
  */
 
+import { appendLinkedText, bindChatLinks } from '../chat-links.js?v=b717fac7';
 import { createMinnAccountCore } from '../minn-account-core.js?v=5baee954';
 import { mountAccountForms, resetLinkFrom, verifyLinkFrom } from '../account-forms.js?v=683e1475';
 import { gateFor, quietSession, suspendedNow } from '../online-session.js?v=6f1348c8';
@@ -445,6 +446,7 @@ function drawThread(answer, status = '') {
   if (reportNumber(t)) meta.append(el('span', { class: 'pc-muted', 'data-phone-report-number': '' }, reportNumber(t)));
   panel.append(meta);
   const msgs = el('ol', { class: 'pc-messages', 'data-phone-messages': '' });
+  bindChatLinks(msgs, { doc });
   const pic = pictureSrc(answer?.picture);
   // #372: Edit as the game's window has it (js/ui/reports-sheet.js startEdit): your report's words, until the team reads it.
   const canEdit = canEditFirst(answer);
@@ -452,7 +454,9 @@ function drawThread(answer, status = '') {
     const li = el('li', { class: `pc-message pc-message-${m.author === 'admin' ? 'admin' : 'you'}`, 'data-edited': m.edited ? '1' : null });
     const head = el('div', { class: 'pc-message-head' });
     head.append(el('strong', {}, m.author === 'admin' ? REPORT_TEXT.admin : REPORT_TEXT.you), el('span', { class: 'pc-muted' }, `${whenWords(m.at)}${m.edited ? ` · ${REPORT_TEXT.edited}` : ''}`));
-    const body = el('p', { class: 'pc-message-body' }, m.body);
+    const body = el('p', { class: 'pc-message-body' });
+    // Addresses are links, as in the game's Reports window (js/chat-links.js).
+    appendLinkedText(body, m.body, { doc });
     li.append(head, body);
     if (i === 0 && canEdit) {
       const edit = el('button', { type: 'button', class: 'pc-linkish pc-message-edit', title: REPORT_TEXT.editHint, 'data-phone-edit': '' }, REPORT_TEXT.edit);

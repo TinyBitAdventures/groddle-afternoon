@@ -17,8 +17,8 @@ import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { SITE_DIR, sitePath, skipWithoutSite } from '../tools/repos.mjs';
 import { REPORT_MAX, REPORT_PICTURE, REPORT_TEXT, STATUS_WORDS, UNREAD_POLL_MS, base64Size, canEditFirst, createReportsApi, pictureRefused, pictureSize, pictureSrc, numberedLine, refusalWords, reportFromHash, reportNumber, ticketLine, unreadCount, whenWords } from '../public/js/reports.js?v=e861d5aa';
-import { mountReportsSheet } from '../public/js/ui/reports-sheet.js?v=d5a3f984';
-import { BUG_TEXT, badgeFor, bugReportFeature, capturePicture } from '../public/js/features/bug-report-feature.js?v=911a2d92';
+import { mountReportsSheet } from '../public/js/ui/reports-sheet.js?v=92486673';
+import { BUG_TEXT, badgeFor, bugReportFeature, capturePicture } from '../public/js/features/bug-report-feature.js?v=46b6b9fb';
 
 const root = join(import.meta.dirname, '..');
 const read = (p) => readFileSync(join(root, p), 'utf8');
@@ -241,7 +241,7 @@ describe('the Reports sheet (js/ui/reports-sheet.js)', () => {
     await flush();
     const body = byData(host, 'reportsMessages').children[0].children[1];
     assert.equal(body.textContent, '<img src=x onerror=alert(1)>', 'kept as text');
-    assert.equal(body.children.length, 0, 'never parsed into elements');
+    assert.ok(body.children.every((c) => c.tagName === '#TEXT'), 'never parsed into elements: text nodes only (addresses become links, js/chat-links.js)');
     assert.equal(byData(host, 'reportsCloseTicket').hidden, true, 'a closed report offers no Close');
     const reply = byId(host, 'reports-reply-text');
     byData(host, 'reportsSendReply').click();
@@ -655,10 +655,10 @@ describe('the site (groddle-afternoon-site)', { skip: skipWithoutSite }, () => {
   it('the console has a Reports tab: list, thread, reply, close and reopen, and the old reports\' button', async () => {
     const page = src('src/AdminConsolePage.php');
     for (const hook of ['data-console-tab="reports"', 'data-console-tickets', 'data-console-thread', 'data-console-reply', 'data-console-thread-close', 'data-console-thread-reopen', 'data-console-migrate', 'data-console-ticket-filter']) assert.ok(page.includes(hook), hook);
-    assert.match(page, /ASSET_KEY = 'skin-11'/);
+    assert.match(page, /ASSET_KEY = 'skin-12'/);
     const js = src('console/console.js');
     for (const route of ["admin/tickets?${ticketsParams(", "admin/tickets/${id}", "admin/tickets/${tickets.open}/reply", "admin/tickets/${tickets.open}/${kind}", "admin/tickets/migrate"]) assert.ok(js.includes(route), route);
-    assert.match(js, /el\('p', \{ class: 'console-msg-body', text: m\.body \}\)/, 'messages set as text');
+    assert.match(js, /linkedBody\(m\.body\)/, 'messages set as text, addresses as links (messageLinks: text nodes and textContent only; tests/report-links.test.js)');
     const mod = await import(pathToFileURL(sitePath('console/console.js')).href);
     assert.deepEqual(mod.contextRows({ street: 'GA5', streetName: 'Hechey Track', x: '1', y: '', errors: ['boom', ''] }), [['Street', 'Hechey Track'], ['Street id', 'GA5'], ['x', '1'], ['Error 1', 'boom']]);
     assert.equal(mod.logWords({ kind: 'reply', player: { name: 'Ada' }, detail: { subject: 'Pigs' }, delivery: 'mailed' }), 'replied to Ada\'s report “Pigs” (emailed)');

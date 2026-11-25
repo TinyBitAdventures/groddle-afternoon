@@ -14,7 +14,7 @@ import { homedir } from 'node:os';
 import { join } from 'node:path';
 import { PICTURE_TEXT as P, REPORT_PICTURES, convertPicture, dragHasFiles, fileName, filesOf, mayBePicture, pictureAttempts, pictureError, refusalWords, roomFor, takeForRoom } from '../public/js/report-pictures.js?v=84c52271';
 import { REPORT_PICTURE, REPORT_TEXT as T, createReportsApi, messagePictures, pictureSrc, picturesBody } from '../public/js/reports.js?v=e861d5aa';
-import { mountReportsSheet } from '../public/js/ui/reports-sheet.js?v=d5a3f984';
+import { mountReportsSheet } from '../public/js/ui/reports-sheet.js?v=92486673';
 import { LIGHTBOX_TEXT, galleryStep, openLightbox } from '../public/js/ui/picture-lightbox.js?v=e049f063';
 import { SITE_DIR, sitePath, skipWithoutSite } from '../tools/repos.mjs';
 

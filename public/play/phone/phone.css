@@ -231,6 +231,13 @@ p { margin: 0; }
 .pc-message-admin { background: color-mix(in srgb, var(--moss) 12%, var(--chip-solid)); border-color: color-mix(in srgb, var(--moss) 45%, var(--border)); }
 .pc-message-head { display: flex; justify-content: space-between; gap: 10px; font-size: 0.9rem; }
 .pc-message-body { white-space: pre-wrap; overflow-wrap: anywhere; }
+/* Links in a report's messages (js/chat-links.js, as the game's Reports window draws them); a link to another site asks first. */
+.pc-message-body .chat-link { color: var(--accent); text-decoration: underline; text-underline-offset: 2px; overflow-wrap: anywhere; }
+.chat-link-confirm { position: fixed; z-index: 60; box-sizing: border-box; width: max-content; max-width: min(300px, calc(100vw - 16px)); padding: 12px 14px; border: 1px solid var(--border); border-radius: var(--radius-lg); background: var(--surface); box-shadow: var(--shadow-1); color: var(--fg); }
+.chat-link-confirm-text { margin: 0 0 10px; overflow-wrap: anywhere; }
+.chat-link-confirm-row { display: flex; justify-content: flex-end; gap: 8px; }
+.chat-link-confirm-row :is(a, button) { display: inline-grid; place-items: center; min-height: 36px; padding: 0 14px; border: 1px solid var(--border); border-radius: var(--radius-pill); background: var(--surface); color: var(--fg); font: inherit; font-weight: 700; text-decoration: none; }
+.chat-link-confirm-open { border-color: var(--accent) !important; background: var(--accent) !important; color: var(--chip-solid) !important; }
 .pc-thread-picture img { display: block; max-width: 100%; height: auto; border-radius: 8px; border: 1px solid var(--border); }
 
 /* —— forms —— */

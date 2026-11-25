@@ -117,6 +117,7 @@ import { createReactionUI } from './reaction-strip.js?v=3de815f3';
 import { parseReportReactionKey, reactorOf, reportReactionKey, reportReactions } from '../report-reactions.js?v=69462240';
 import { PICTURE_TEXT as P, REPORT_PICTURES, convertPicture, dragHasFiles, filesOf, refusalWords as pictureRefusal, roomFor, takeForRoom } from '../report-pictures.js?v=84c52271';
 import { focusBack } from './focus-return.js?v=da190597';
+import { appendLinkedText, bindChatLinks } from '../chat-links.js?v=b717fac7';
 import { lightboxLink } from './picture-lightbox.js?v=e049f063';
 import { MARK_TEXT, bakeMarks, createMarkBook } from './picture-marks.js?v=85e99881';
 import { REPORT_MENU_TEXT, bindReportRowMenu, copyText, reportLink } from './report-row-menu.js?v=0728b50c';
@@ -261,6 +262,7 @@ export function mountReportsSheet({ doc = globalThis.document, host, api, contex
   const threadWhen = e('span', { class: 'reports-when' });
   threadHead.append(threadChip, threadWhen);
   const msgs = e('ol', { class: 'reports-messages', 'data-reports-messages': '', 'aria-label': 'Messages' });
+  bindChatLinks(msgs, { doc });
   // Read by the team: under the newest message (yours) once an administrator has opened it.
   const threadRead = e('p', { class: 'reports-read-note', title: T.readByTeamHint, hidden: true, 'data-reports-thread-read': '' });
   const closedNote = e('p', { class: 'reports-closed-note', hidden: true }, T.closed);
@@ -480,7 +482,13 @@ export function mountReportsSheet({ doc = globalThis.document, host, api, contex
       }
       li.append(who);
       if (i === 0 && editing) li.append(editLabel, editBox, editActs);
-      else li.append(e('p', { class: 'reports-msg-body' }, m.body));
+      else {
+        // Addresses in a message are links (a reply's game link, a player's picture link), drawn as chat
+        // lines draw them (js/chat-links.js: http and https only, text nodes only; another site asks first).
+        const words = e('p', { class: 'reports-msg-body' });
+        appendLinkedText(words, m.body, { doc });
+        li.append(words);
+      }
       // Under its words, each message's pictures as thumbnails, opened over the game together: the
       // report's own picture first under the report itself, then the message's own (G791, up to four).
       // Over the game, not a new tab (Austin 2026-11-03). After a pointer open or close focus goes

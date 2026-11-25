@@ -288,7 +288,7 @@ describe('chat links: the DOM', () => {
     assert.match(game, /wordWrapWidth: 246,\n\s+\/\/ LINKS[^\n]*\n\s+breakWords: true,/);
     const css = read('public/style.css');
     assert.match(css, /\.chat-link \{[^}]*text-decoration: underline;/);
-    assert.match(css, /\.chat-link-confirm \{[^}]*z-index: var\(--z-notice\);/);
+    assert.match(css, /\.chat-link-confirm \{[^}]*z-index: calc\(var\(--z-top\) \+ 1\);/, 'over any window that holds the link (the Reports window)');
     assert.match(read('public/css/classic.css'), /\.social-drawer \.chat-link \{ color: var\(--c-classic-link\); \}/);
   });
 });

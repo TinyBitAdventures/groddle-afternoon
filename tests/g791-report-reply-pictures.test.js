@@ -15,9 +15,9 @@ import { existsSync, readFileSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
-import { mountReportsSheet } from '../public/js/ui/reports-sheet.js?v=d5a3f984';
+import { mountReportsSheet } from '../public/js/ui/reports-sheet.js?v=92486673';
 import { REPORT_TEXT as T, createReportsApi, isPictureKey, pictureSrc } from '../public/js/reports.js?v=e861d5aa';
-import { REPORT_LEAVE_OUT } from '../public/js/features/bug-report-feature.js?v=911a2d92';
+import { REPORT_LEAVE_OUT } from '../public/js/features/bug-report-feature.js?v=46b6b9fb';
 import { hotkeySections } from '../public/js/client-hotkeys.js?v=5c5a4301';
 import { SITE_DIR, sitePath, skipWithoutSite } from '../tools/repos.mjs';
 

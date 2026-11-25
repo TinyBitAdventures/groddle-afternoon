@@ -9,7 +9,7 @@ import { execFileSync, spawnSync } from 'node:child_process';
 import { existsSync, readFileSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { join } from 'node:path';
-import { mountReportsSheet } from '../public/js/ui/reports-sheet.js?v=d5a3f984';
+import { mountReportsSheet } from '../public/js/ui/reports-sheet.js?v=92486673';
 import { REPORT_TEXT, matchesReport, readByTeamAt, readByTeamWords, readWhen } from '../public/js/reports.js?v=e861d5aa';
 import { SITE_DIR, sitePath, skipWithoutSite } from '../tools/repos.mjs';
 

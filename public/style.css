@@ -10619,10 +10619,11 @@ html[data-street-cards] .notify-notices { visibility: hidden; }
 .chat-link { color: var(--accent); text-decoration: underline; text-underline-offset: 2px; overflow-wrap: anywhere; cursor: pointer; }
 .chat-link:hover { text-decoration-thickness: 2px; }
 .chat-link:focus-visible { outline: 2px solid var(--focus); outline-offset: 1px; border-radius: var(--radius-xs); }
-/* A link to another site asks first, naming where it goes. */
+/* A link to another site asks first, naming where it goes. It opens from a click on a link, so it sits over
+   whatever window holds the link (the Reports window is at z-modal + 32; #669 follow-up, 2026-11-25). */
 .chat-link-confirm {
   position: fixed;
-  z-index: var(--z-notice);
+  z-index: calc(var(--z-top) + 1);
   box-sizing: border-box;
   width: max-content;
   max-width: min(300px, calc(100vw - 16px));
