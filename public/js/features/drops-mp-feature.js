@@ -69,7 +69,7 @@ import { createMinnAccount } from '../minn-account.js?v=db081871';
 import { saveStore, savedThrough } from '../save-store.js?v=4e720735';
 import { ownGroundRows } from '../ground-stacks.js?v=22792362';
 import { pileMaxOf } from '../world-items.js?v=a5deb102';
-import { DROP_OP, DROP_QUEUE_MAX, DROP_TEXT, bucketTake, dropEffect, dropRefusalText, eatenStack, groundFrom, homePlaceOf, isFloorPlace, isPublicStreet, likeSharedStack, normalizeGroundStack, normalizeItem, normalizeMine, pickupAsk, pigAnimalKey, shareReason, stackAt, stackLeft } from '../drops-mp.js?v=34a8fc84';
+import { DROP_OP, DROP_QUEUE_MAX, DROP_TEXT, bucketTake, dropEffect, dropRefusalText, eatenStack, groundFrom, homePlaceOf, isFloorPlace, isPublicStreet, likeSharedStack, normalizeGroundStack, normalizeItem, normalizeMine, pickupAsk, pigAnimalKey, shareReason, stackAt, stackLeft } from '../drops-mp.js?v=ca287793';
 
 export const DROPS_MP_FEATURE_ID = 'drops-mp';
 const TABLE_URL = 'assets/content/trade-items.json';
@@ -477,7 +477,8 @@ function createSession(engine, client) {
       endPending(q, { quiet: true });
       // The server would not share it: as in solo, the drop is the player's own.
       if (d && ['type', 'off', 'private'].includes(String(msg.why))) dropOwn(d);
-      else tell(dropRefusalText(msg, client.street || street));
+      // #691: "waiting" (past today's limit) keeps it in the pack like any refusal, with words that say why.
+      else tell(dropRefusalText(msg, client.street || street, d ? { n: d.n, one: itemLabel(d.c), many: itemLabel(d.c, 2) } : null));
       // A full place stays full for the drops behind it: they stay in the pack.
       if (String(msg.why) === 'full') dropQueue();
       pendingChanged();

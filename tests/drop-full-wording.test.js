@@ -8,7 +8,7 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { DROP_TEXT, dropRefusalText, fullPlaceName } from '../public/js/drops-mp.js?v=34a8fc84';
+import { DROP_TEXT, dropRefusalText, fullPlaceName } from '../public/js/drops-mp.js?v=ca287793';
 
 describe('the full refusal names the place', () => {
   it('house, Tower floor, street', () => {
@@ -32,7 +32,7 @@ describe('the full refusal names the place', () => {
 
   it('the drop answer uses it with the street the player is on', () => {
     const src = readFileSync(join(import.meta.dirname, '..', 'public', 'js', 'features', 'drops-mp-feature.js'), 'utf8');
-    assert.match(src, /else tell\(dropRefusalText\(msg, client\.street \|\| street\)\);/);
+    assert.match(src, /else tell\(dropRefusalText\(msg, client\.street \|\| street, d \? /); // #691: with the drop's names
     assert.doesNotMatch(src, /tell\(String\(msg\.text \|\| "That didn't work\."\)\)/);
   });
 });

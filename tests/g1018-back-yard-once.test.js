@@ -29,8 +29,8 @@ const pixi = new Proxy({ Container: Display, Graphics: Display, Sprite: Display,
 globalThis.PIXI = pixi;
 globalThis.Image ??= class { set src(_) {} };
 
-const { visitorHomeScene } = await import('../public/js/features/homes-feature.js?v=1c264731');
-const { normalizeHomeView, visitSceneTsid } = await import('../public/js/neighbours-mp.js?v=f06a47a2');
+const { visitorHomeScene } = await import('../public/js/features/homes-feature.js?v=8907127a');
+const { normalizeHomeView, visitSceneTsid } = await import('../public/js/neighbours-mp.js?v=9cbf7e03');
 
 const item = (id, protoClass, endClass, rx) => ({ id, protoClass, endClass, rx, wear: 0, lifeSteps: 0, placedAt: Date.now() - 60_000 });
 /** A back yard with one of each: a rock, a Dirt Pile (a node), a Patch, and a garden. */
@@ -103,7 +103,7 @@ describe('an allowed visitor: each back-yard thing is drawn exactly once, the ro
     };
     const engine = new Proxy(base, { get: (t, k) => (k in t ? t[k] : typeof k === 'symbol' || String(k).startsWith('spawn') ? undefined : () => undefined) });
     try {
-      const { yardVerbsMpFeature } = await import('../public/js/features/yard-verbs-mp-feature.js?v=8e8bfed3');
+      const { yardVerbsMpFeature } = await import('../public/js/features/yard-verbs-mp-feature.js?v=55573131');
       yardVerbsMpFeature.onTick(16, 1, engine);
       for (let i = 0; i < 40 && !globalThis.groddleYard?.visit; i += 1) await new Promise((r) => setTimeout(r, 5));
       const visit = globalThis.groddleYard?.visit;

@@ -122,10 +122,52 @@ export function fullPlaceName(street) {
   return 'street';
 }
 
-/** The words for a drop the server refused: its own, but a full place named as what it is. */
-export function dropRefusalText(msg, street = '') {
+/**
+ * The words for a drop the server refused: its own, but a full place named as what it is. Report #691:
+ * "waiting" (the site's Ledger::waitingFor) is an item in the pack past today's limit, not in the ledger
+ * until the next 00:00 UTC: the site's words name it and say when, and should they not come (an older
+ * site), the drop's own (`drop`: { n, one, many }, the class's names) say the same.
+ */
+export function dropRefusalText(msg, street = '', drop = null, now = Date.now()) {
   if (String(msg?.why || '') === 'full') return DROP_TEXT.full(fullPlaceName(street || msg?.street));
+  if (String(msg?.why || '') === 'waiting' && !msg?.text && drop) {
+    const clears = Number(msg?.clears) > 0 ? Number(msg.clears) * 1000 : nextUtcDay(now);
+    return waitingText({ ...drop, verb: 'drop', now, clears });
+  }
   return String(msg?.text || "That didn't work.");
+}
+
+/** #691: the next 00:00 UTC after `now` (ms), when the day's limits start again (the site's LedgerMath::nextDay). */
+export function nextUtcDay(now) {
+  return (Math.floor((Number(now) || 0) / 86400000) + 1) * 86400000;
+}
+
+/** #691: "in 25 minutes", "in about 3 hours" (the site's LedgerMath::untilText). */
+export function untilText(ms) {
+  const m = Math.max(1, Math.ceil((Number(ms) || 0) / 60000));
+  if (m < 60) return m === 1 ? 'in 1 minute' : `in ${m} minutes`;
+  const h = Math.max(1, Math.round(m / 60));
+  return h === 1 ? 'in about 1 hour' : `in about ${h} hours`;
+}
+
+/**
+ * #691: why an act is refused when `k` of the `n` it takes are in the pack but past today's limit
+ * (emblems past the day's four, tickets, beads ...): the same words as the site's LedgerMath::waitingText,
+ * "This Emblem of Mab is past today's limit, so it isn't counted yet. You can drop it after midnight UTC
+ * (in about 3 hours)." `one` and `many` are the class's names; `currants` names the player's currants.
+ */
+export function waitingText({ one = 'item', many = one, n = 1, k = n, verb = 'drop', now = Date.now(), clears = nextUtcDay(now), currants = false } = {}) {
+  const count = (x) => Number(x).toLocaleString('en-US');
+  let single = k === 1;
+  let who;
+  if (currants) who = `${count(k)} of your currants`;
+  else if (n === 1) who = `This ${one}`;
+  else if (k === n) {
+    who = `These ${count(n)} ${many}`;
+    single = false;
+  } else who = `${count(k)} of these ${many}`;
+  const rest = single ? ` is past today's limit, so it isn't counted yet. You can ${verb} it` : ` are past today's limit, so they aren't counted yet. You can ${verb} them`;
+  return `${who}${rest} after midnight UTC (${untilText(clears - now)}).`;
 }
 
 /** A public street others share (realtime-feature sharedStreet; drops.go dropShared: no "_" in the id). */

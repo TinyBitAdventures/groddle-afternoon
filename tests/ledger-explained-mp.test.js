@@ -192,7 +192,8 @@ describe('exact credits once per character (LedgerMath::credits, check)', { skip
     assert.deepEqual(today.reconciled.clamped, none, 'the pack keeps the level\'s currants');
     assert.equal(today.after.currants, 500, 'but the ledger has not credited them yet');
     assert.deepEqual(today.held, counts({}, reward));
-    assert.deepEqual(today.rows, [['level', 'level', 10], ['lvlwait', '10', reward]]);
+    // #691: what waits is remembered for the day (WAIT_DAY), so an act it is short for says why.
+    assert.deepEqual(today.rows, [['level', 'level', 10], ['lvlwait', '10', reward], ['waitday', '$', reward]]);
     // A later day's count credits the waiting level: the ledger and the save agree, nothing is paid twice.
     const waiting = { ...base, level: { level: 10 }, lvlwait: { 10: reward } };
     const tomorrow = write(counts({}, 500), waiting, save({ currants: 500 + reward, level: 10, xp: XP_FOR_LEVEL[8] }));
@@ -316,7 +317,7 @@ describe('progression credits: a day\'s room, levels in order, quest prerequisit
     assert.deepEqual(w.reconciled.clamped, none);
     assert.equal(w.credits.goods.currants, 5_000);
     assert.deepEqual(w.held, counts({}, 5_000));
-    assert.deepEqual(w.rows, [['quest', 'mini_me_mini_you', 1], ['progwait', 'quest:mini_me_mini_you', 5_000], ['progday', 'currants', 40_000]]);
+    assert.deepEqual(w.rows, [['quest', 'mini_me_mini_you', 1], ['progwait', 'quest:mini_me_mini_you', 5_000], ['progday', 'currants', 40_000], ['waitday', '$', 5_000]]);
     // The next day: the waiting 5,000 first, then the ledger and the pack agree.
     const next = write(w.after, { ...base, quest: { mini_me_mini_you: 1 }, progwait: { 'quest:mini_me_mini_you': 5_000 } }, save({ currants: 10_500, quests: ['mini_me_mini_you'] }));
     assert.deepEqual(next.reconciled.clamped, none);
@@ -342,7 +343,7 @@ describe('progression credits: a day\'s room, levels in order, quest prerequisit
     assert.deepEqual(w45.reconciled.clamped, none);
     assert.equal(w45.credits.goods.currants, PROGRESSION_DAILY);
     assert.deepEqual(w45.held, counts({}, r45 - PROGRESSION_DAILY));
-    assert.deepEqual(w45.rows, [['level', 'level', 45], ['progwait', 'level:45', r45 - PROGRESSION_DAILY], ['lvlday', 'level', 2], ['progday', 'currants', PROGRESSION_DAILY]]);
+    assert.deepEqual(w45.rows, [['level', 'level', 45], ['progwait', 'level:45', r45 - PROGRESSION_DAILY], ['lvlday', 'level', 2], ['progday', 'currants', PROGRESSION_DAILY], ['waitday', '$', r45 - PROGRESSION_DAILY]]);
     // A quest that day also goes through the room (here already used up): it waits too.
     const q = write(w45.after, { ...sameDay, level: { level: 45 }, progday: { free: 1, currants: PROGRESSION_DAILY }, progwait: { 'level:45': r45 - PROGRESSION_DAILY } }, save({ currants: 500 + 97_570 + r45 + 10_000, level: 45, xp: XP_FOR_LEVEL[43], quests: ['mini_me_mini_you'] }));
     assert.equal(q.credits.goods.currants, 0);
@@ -357,7 +358,7 @@ describe('progression credits: a day\'s room, levels in order, quest prerequisit
     assert.equal(w.credits.goods.currants, PROGRESSION_DAILY, 'a jump of two or more levels is not the day\'s free level-up');
     assert.deepEqual(w.reconciled.clamped, none, 'what waits stays in the pack, out of trades');
     assert.deepEqual(w.held, counts({}, r60 - PROGRESSION_DAILY));
-    assert.deepEqual(w.rows, [['level', 'level', 60], ['progwait', 'level:60', r60 - PROGRESSION_DAILY], ['lvlday', 'level', 1], ['progday', 'currants', PROGRESSION_DAILY]]);
+    assert.deepEqual(w.rows, [['level', 'level', 60], ['progwait', 'level:60', r60 - PROGRESSION_DAILY], ['lvlday', 'level', 1], ['progday', 'currants', PROGRESSION_DAILY], ['waitday', '$', r60 - PROGRESSION_DAILY]]);
     // The free level-up is still there for a single step that day.
     const honest = write(ledger, { ...base, level: { level: 39 } }, save({ currants: 500 + 97_570, level: 40, xp: XP_FOR_LEVEL[38] }));
     assert.equal(honest.credits.goods.currants, 97_570);
