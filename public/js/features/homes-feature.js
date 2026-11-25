@@ -229,8 +229,9 @@ import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=d787e3c3';
 import { fadeInNewNear } from '../poof-fade.js?v=57db6aea';
 import { projectApi } from './street-jobs-feature.js?v=e0b4265d';
 import { TOWER_CHASSIS, TOWER_CONFIG, TOWER_DOOR_DX, TOWER_GEO, TOWER_PROTO, normalizeTowerState } from '../home-tower.js?v=a7fc0cce';
-import { drawTowerBench, drawTowerElevator, drawTowerExit, towerApi, visitorTowerView } from './home-tower-feature.js?v=c6166c0d';
-import { pieceUrl, roomPieces, surfaceAt, swatchPiece, wallTargetAt } from '../home-wallpaper.js?v=99228166';
+import { drawTowerBench, drawTowerElevator, drawTowerExit, towerApi, visitorTowerView } from './home-tower-feature.js?v=ea8cb854';
+import { pieceUrl, roomPieces, surfaceAt, swatchPiece, wallTargetAt } from '../home-wallpaper.js?v=a882fa38';
+import { renderHomeLocation } from '../home-shot-render.js?v=cc17af36';
 import { maxTextureSizeOf, sharpDeco, wantsHiresDecos } from '../deco-hires.js?v=34f36d77';
 import { SHARP_DECOS } from '../deco-sharp-list.js?v=7d615f20';
 import { resourceNodesFeature } from './resource-nodes-feature.js?v=8601e418';
@@ -2922,6 +2923,8 @@ function applyHouse(engine, next, what) {
   publishHouse(engine);
   lookAtHouse(engine);
   refreshHousePicker();
+  // G1284: ChassisManager.as 552 took the home's picture again after a house change.
+  homePictureStale(engine, 'house');
   return result;
 }
 
@@ -4986,6 +4989,8 @@ export function cultivationIcon(protoClass) {
 function setMode(engine, next) {
   if (next && !scene) return;
   const endsCultivation = mode === 'cultivate' && next !== 'cultivate';
+  // G1284: leaving Decoration or Cultivation Mode, as saveHomeImg after HandOfDecorator.as 952 / CultManager.as 201.
+  const endsEditing = (mode === 'decorate' || mode === 'cultivate') && next !== mode ? mode : '';
   closeUpgradePicker(true);
   // HandOfDecorator.as 937: leaving Decoration Mode ends HouseExpandDialog.
   if (next !== 'decorate') closeHouseExpandDialog(engine);
@@ -5013,6 +5018,7 @@ function setMode(engine, next) {
   renderBar(engine);
   publish(engine);
   if (endsCultivation) endCultivationMode(engine);
+  if (endsEditing) homePictureStale(engine, endsEditing);
 }
 
 /**
@@ -7587,17 +7593,26 @@ function demoFurniture(engine) {
 /**
  * QA (G153): &homefloordemo=door puts a Door in furniture storage and 100
  * Planks in the pack and opens Decorate on the ground floor; =built also
- * builds the second floor at once (a Door at room x 600 and its floor).
+ * builds the second floor at once (a Door at room x 600 and its floor); =built3 the third too
+ * (=built3up then stands on the second floor).
  */
 let floorDemoDone = false;
 function floorDemo(engine) {
   const want = String(engine.param('homefloordemo') || '');
   if (!want || floorDemoDone || houseFloorHere() !== 0) return;
   floorDemoDone = true;
-  if (want === 'built' && floorCount(floors) === 1 && !floors.pending) {
+  if ((want === 'built' || want === 'built3' || want === 'built3up') && floorCount(floors) === 1 && !floors.pending) {
     houseDecor.placed.push({ id: houseDecor.nextId++, classTsid: DOOR_CLASS, slot: 'floor', x: 600, y: floorRestY(DOOR_CLASS), facingRight: true, z: 1, on: null });
     noteDoorPlaced(floors, 0, houseDecor.nextId - 1);
     addFloor(floors, houseDecor);
+    // G1284: =built3 builds the third floor too (a Door at room x 300 on the second floor); =built3up then stands on the second.
+    if (want === 'built3' || want === 'built3up') {
+      const second = houseFloorDecor(1);
+      second.placed.push({ id: second.nextId++, classTsid: DOOR_CLASS, slot: 'floor', x: 300, y: floorRestY(DOOR_CLASS), facingRight: true, z: 1, on: null });
+      noteDoorPlaced(floors, 1, second.nextId - 1);
+      addFloor(floors, houseDecor);
+      if (want === 'built3up') floors.at = 1;
+    }
     doorLast = 'demo:built';
     engine.save();
     setTimeout(() => engine.refreshHomeScene?.(), 0);
@@ -8655,6 +8670,168 @@ function afterEnter(engine) {
 }
 
 // ---------------------------------------------------------------------------
+// The whole home as one picture (G1284, js/home-shot.js, js/home-shot-render.js)
+// ---------------------------------------------------------------------------
+
+/**
+ * One floor the player is not on, drawn from what the home keeps (a container in that floor's
+ * room coordinates, the house's left at x0 as in its own scene): the walls, floor and ceiling
+ * (drawRoomShell), the furniture in its order, the Doors with their art for that floor, the
+ * front door on the ground floor, a Tower's elevator, exit and Workbench, and the owner's own
+ * stacks kept for that floor (engine.drawOwnStacks). Players and shared stacks on a floor nobody
+ * here stands on are not known to this page, so they are not drawn.
+ */
+function floorShotContainer(engine, { floorDecor, x0 = 0, yard = false, construction = false, towerFloor = null, houseFloor = null, dropTsid = '' }) {
+  const { PIXI } = engine;
+  const root = new PIXI.Container();
+  root.sortableChildren = true;
+  const shim = Object.create(engine, { entityLayer: { value: root } });
+  const keep = decor;
+  try {
+    decor = floorDecor;
+    let room;
+    if (yard) {
+      // The ground floor opens onto the back yard: its landscape shows through the way out, as in the scene.
+      const bg = interiorBackground(engine, { yard: true });
+      bg.zIndex = -1000;
+      root.addChild(bg);
+      const top = room0Top(floorDecor);
+      bg.updateParallax?.(x0, top.y, top.w, top.h);
+      ({ room } = bg);
+    } else {
+      const shell = new PIXI.Container();
+      shell.x = x0;
+      shell.zIndex = -1000;
+      root.addChild(shell);
+      room = drawRoomShell(engine, shell, { yard, construction });
+    }
+    const back = new PIXI.Container();
+    const front = new PIXI.Container();
+    back.sortableChildren = true;
+    front.sortableChildren = true;
+    back.x = x0;
+    front.x = x0;
+    back.zIndex = FURNITURE_Z;
+    front.zIndex = FURNITURE_FRONT_Z;
+    root.addChild(back, front);
+    const layers = { back, front };
+    renderOrder(floorDecor).forEach((item, i) => {
+      if (houseFloor != null && item.classTsid === DOOR_CLASS && doorRole(floors, houseFloor, item.id)) {
+        const spr = new PIXI.Sprite(textureFromUrl(doorArtUrl(item, houseFloor)));
+        anchorBottomCentre(spr, 'deco');
+        dressDoorSprite(spr, item, houseFloor);
+        spr.x = x0 + item.x;
+        spr.y = item.y;
+        spr.zIndex = FURNITURE_Z - 1;
+        root.addChild(spr);
+        return;
+      }
+      const view = furnitureView(PIXI, item);
+      view.zIndex = i;
+      furnitureHolder(layers, item).addChild(view);
+    });
+    if (houseFloor === 0 && room.door) {
+      const door = new PIXI.Sprite(textureFromUrl(pieceUrl(room.door.piece, wantsHiresPieces(engine))));
+      anchorBottomCentre(door, 'deco');
+      door.width = room.door.w;
+      door.height = room.door.h;
+      door.x = x0 + room.door.x;
+      door.y = room.door.y;
+      door.zIndex = 8;
+      root.addChild(door);
+    }
+    if (towerFloor != null) {
+      drawTowerElevator(shim, { floor: towerFloor, groundY: GROUND_Y });
+      if (towerFloor === 0) drawTowerExit(shim, { doorX: TOWER_GEO.exitX, groundY: GROUND_Y });
+      if (construction) drawTowerBench(shim, { groundY: GROUND_Y });
+    }
+    if (dropTsid) engine.drawOwnStacks?.(dropTsid, root);
+    return root;
+  } finally {
+    decor = keep;
+  }
+}
+
+/** The view a whole-house picture's ground floor is seen through (its room's width and height), for the yard's parallax. */
+function room0Top(state) {
+  const room = roomPieces(state, { floorY: INTERIOR.floorY, leftOpen: true });
+  return { y: room.top, w: room.width, h: room.bottom - room.top };
+}
+
+/** A Tower floor's decor as the home keeps it (towerFloorDecor without adding a row for a floor never visited). */
+function towerShotDecor(index) {
+  const slice = towerDecor[index] || createHomeDecorState({
+    wall: TOWER_CONFIG.START_TEXTURE_WALL,
+    floor: TOWER_CONFIG.START_TEXTURE_FLOOR,
+    ceiling: TOWER_CONFIG.START_TEXTURE_CEILING,
+    wallSegments: TOWER_GEO.wallSegments,
+    layout: 'tower',
+    starterKit: true,
+  });
+  return { ...slice, wallSegments: TOWER_GEO.wallSegments, layout: 'tower', storage: houseDecor.storage, styles: houseDecor.styles || {} };
+}
+
+/** A floor's band in the stacked picture: its room's top, foot, bound and storey (home-wallpaper.js roomPieces). */
+function floorBand(index, state, opts = {}) {
+  const room = roomPieces(state, { floorY: INTERIOR.floorY, construction: Boolean(opts.construction), leftOpen: Boolean(opts.yard) });
+  return { index, top: room.top, bottom: room.bottom, bound: room.bound, pitch: room.pitch, width: room.width };
+}
+
+/**
+ * PURE (given the home): the place a whole-home picture shows (js/home-shot-render.js), or null.
+ * `kind` 'house', 'tower' or 'street' (null: where the player stands). The house: every floor,
+ * ground floor first, the floor the player stands on live; the Tower the same (with the floor
+ * going up while a new one is built); the street: the whole home street.
+ */
+export function homeShotSource(engine, kind = null) {
+  const here = !scene ? null : scene.room === 'street' ? 'street' : scene.tower != null ? 'tower' : 'house';
+  const want = kind || here;
+  if (!want || !engine?.PIXI) return null;
+  if (want === 'street') return here === 'street' ? { kind: 'street' } : null;
+  if (want === 'tower') {
+    const t = towerApi.state?.();
+    if (!t?.built) return null;
+    const count = Math.max(1, Math.floor(Number(t.floors) || 1));
+    const total = t.expanding ? count + 1 : count;
+    const live = here === 'tower' ? towerApi.currentFloor() : null;
+    const out = [];
+    for (let i = 0; i < total; i += 1) {
+      const construction = i === count;
+      const state = construction ? constructionDecor() : towerShotDecor(i);
+      const band = floorBand(i, state, { construction });
+      if (i === live) out.push({ ...band, x0: 0, live: true });
+      else out.push({ ...band, x0: 0, build: () => floorShotContainer(engine, { floorDecor: state, construction, towerFloor: i, dropTsid: towerDropTsid(i) }) });
+    }
+    return { kind: 'tower', width: out[0].width, floors: out };
+  }
+  const count = floorCount(floors);
+  const live = here === 'house' ? houseFloorHere() : null;
+  const x0 = houseX0();
+  const out = [];
+  for (let i = 0; i < count; i += 1) {
+    const state = i === 0 ? houseDecor : houseFloorDecor(i);
+    if (!state) continue;
+    const yard = i === 0;
+    const band = floorBand(i, state, { yard });
+    const fx0 = i === 0 ? x0 : 0;
+    if (i === live) out.push({ ...band, x0: fx0, live: true });
+    else out.push({ ...band, x0: fx0, build: () => floorShotContainer(engine, { floorDecor: state, x0: fx0, yard, houseFloor: i, dropTsid: i === 0 ? HOME_INTERIOR_TSID : `${HOUSE_FLOOR_DROP_PREFIX}${i}` }) });
+  }
+  if (!out.length) return null;
+  return { kind: 'house', width: out[0].width, floors: out };
+}
+
+/**
+ * Glitch refreshed the home's picture after decorating (HandOfDecorator.as 952), a house change
+ * (ChassisManager.as 552) and cultivation (CultManager.as 201): TSFrontController.saveHomeImg.
+ * Here features/profiles-feature.js hears it (homePictureStale) and takes the profile's home
+ * street picture and layout again at its next settled moment there.
+ */
+function homePictureStale(engine, why) {
+  engine?.query?.('homePictureStale', why, engine);
+}
+
+// ---------------------------------------------------------------------------
 // Feature
 // ---------------------------------------------------------------------------
 
@@ -8665,6 +8842,17 @@ export const homesFeature = {
     ensureFurnitureItems();
     towerApi.connect(towerBridge);
     houseVisits = qaHouseVisits(engine) ?? houseVisits;
+    // QA (G1284, solo too): &homeshotdemo=1 gives window.groddleWholeShot(kind?): the whole house,
+    // Tower or street drawn as the camera's option draws it ({ url (JPEG), w, h, floors, scale }); nothing is sent.
+    if (engine.param?.('homeshotdemo') && typeof window !== 'undefined') {
+      window.groddleWholeShot = async (kind = null, opts = {}) => {
+        const shot = await renderHomeLocation(engine, { kind, resolution: engine.renderer?.resolution || 1, ...opts });
+        if (!shot?.canvas) return null;
+        const url = shot.canvas.toDataURL('image/jpeg', 0.9);
+        engine.setData?.('homeWholeShot', `${shot.kind}:${shot.floors}:${shot.w}x${shot.h}`);
+        return { url, w: shot.w, h: shot.h, floors: shot.floors, scale: shot.scale, kind: shot.kind, placeW: shot.placeW, placeH: shot.placeH };
+      };
+    }
     // QA (home demos only): window.groddleHomeStyle(key) redraws the street in that style, free.
     if (engine.param?.('homedemo') && typeof window !== 'undefined') {
       // Inside the house a GSJS interior key redraws the back yard instead.
@@ -9074,6 +9262,11 @@ export const homesFeature = {
   },
 
   /** G226: game.js dropped-stack key; each Tower floor has its own. */
+  /** G1284 (js/home-shot-render.js): the home location a whole-home picture shows, or null. */
+  homeShotSource(engine, kind = null) {
+    return homeShotSource(engine, kind);
+  },
+
   dropTsid(tsid) {
     if (tsid !== HOME_INTERIOR_TSID) return null;
     const floor = towerApi.currentFloor();

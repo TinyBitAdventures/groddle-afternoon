@@ -18,7 +18,7 @@ import {
   swatchPiece,
   towerWallField,
   wallTargetAt,
-} from '../public/js/home-wallpaper.js?v=99228166';
+} from '../public/js/home-wallpaper.js?v=a882fa38';
 import {
   INTERIOR,
   TOWER_ROOM,

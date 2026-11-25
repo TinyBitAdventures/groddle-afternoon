@@ -250,6 +250,9 @@ function housePieces(state, W, leftOpen = false) {
     elevator: null,
     top: atticBottom - F.atticH,
     bottom: B + F.basementH,
+    // G1284: the floor frame's foot and one storey (the wall and a frame), for the stacked whole-house picture.
+    bound: B,
+    pitch: 458 + F.frameHeight,
     innerLeft: SEG - 74,
     innerRight: width - 76,
     // homes_rebuild_floor left-open: the floor starts at 56 and a ramp runs down to the yard
@@ -328,6 +331,8 @@ function towerPieces(state, W, construction) {
     elevator: { piece: T.elevator, x: T.elevatorX, y: B, w: T.elevatorW, h: T.elevatorH },
     top: B - 458 - 2 * fh,
     bottom: B,
+    bound: B,
+    pitch: 458 + fh,
     innerLeft: 130,
     innerRight: width - 76,
     // #508: the floor and ceiling tiles run to 1200 and the right side wall (with its shadows) to

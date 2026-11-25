@@ -168,7 +168,8 @@ describe('world art (tools/world-art/render.py)', () => {
 
   it('game.js draws a dropped stack from it, still, at its own size', () => {
     const game = readFileSync(join(pub, 'game.js'), 'utf8');
-    const spawn = game.slice(game.indexOf('function spawnDroppedItemStack('), game.indexOf('function droppedStacksTsid('));
+    // G1284: the sprite is made in droppedStackSprite (the whole-house picture draws other floors' stacks with it).
+    const spawn = game.slice(game.indexOf('function droppedStackSprite('), game.indexOf('function droppedStacksTsid('));
     assert.match(spawn, /worldArtFor\(stack\.classTsid, stack\.count, item\.icon\)/);
     assert.doesNotMatch(spawn, /\.bob\b/);
     assert.doesNotMatch(game, /for \(const stack of droppedItemSprites\) \{\s*stack\.bob/);

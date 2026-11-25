@@ -17,13 +17,13 @@ import { homedir } from 'node:os';
 import {
   HOME_LAYOUT_ART_ROOTS, HOME_LAYOUT_KINDS, HOME_LAYOUT_LIMITS, HOME_LAYOUT_TEXTS, HOME_LAYOUT_VERSION,
   HOME_FRAME_WINDOW, boxFromCorners, buildHomeLayout, describeHomeThing, hexColour, homeLayoutJson, homeLayoutKeyOf, homeViewFrame, layoutArtPath, splitFrameToSheet,
-} from '../public/js/home-layout.js?v=c2f0b753';
-import { collectHomeLayout, walkHomeScene } from '../public/js/home-layout-scene.js?v=1633e998';
+} from '../public/js/home-layout.js?v=b1065709';
+import { collectHomeLayout, walkHomeScene } from '../public/js/home-layout-scene.js?v=d9213f99';
 import { phoneStage, stageFor } from '../public/js/location-view.js?v=fa4d254b';
-import { STREET_WORLD_H } from '../public/js/features/homes-feature.js?v=5a5c2042';
-import { AVATAR_STILL, homeKeyOf } from '../public/js/profiles.js?v=054ca723';
+import { STREET_WORLD_H } from '../public/js/features/homes-feature.js?v=4c0065b3';
+import { AVATAR_STILL, homeKeyOf } from '../public/js/profiles.js?v=b1c63974';
 import { HIRES_SPRITES, SPLIT_SPRITES } from '../public/js/sprite-hires.js?v=e96be5f1';
-import { HOUSE_STYLE_KEYS } from '../public/js/features/homes-feature.js?v=5a5c2042';
+import { HOUSE_STYLE_KEYS } from '../public/js/features/homes-feature.js?v=4c0065b3';
 import { SITE_DIR, skipWithoutSite } from '../tools/repos.mjs';
 
 const root = join(import.meta.dirname, '..');
@@ -394,7 +394,8 @@ describe('the game sends it (features/profiles-feature.js and the tags)', () => 
   it('sends the layout at the picture\'s settled moment, only to a site that takes layouts, in multiplayer only', () => {
     assert.match(src, /if \(!profile \|\| !Object\.hasOwn\(profile, 'homeLayout'\)\) return false;/);
     assert.match(src, /s\.account\.uploadHomeLayout\(\{ key, layout \}\)/);
-    assert.match(src, /if \(!state\.layout\.busy\) uploadLayout\(engine, state\);\n\s*if \(!state\.home\.busy\) uploadHome\(engine, state\);/);
+    // G1284: forced again after a change to the home (homePictureStale, as saveHomeImg).
+    assert.match(src, /if \(!state\.layout\.busy\) uploadLayout\(engine, state(?:, \{ force: layoutStale \})?\);\n\s*if \(!state\.home\.busy\) uploadHome\(engine, state(?:, \{ force: homeStale \})?\);/);
     assert.match(read('public/js/minn-account.js'), /buddyCall\('Saving your home street', 'profile\/home-layout', \{ method: 'PUT', body: \{ key, layout \} \}\)/);
   });
 

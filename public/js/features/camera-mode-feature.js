@@ -37,6 +37,11 @@
  * keyboard only (C, TSFrontController.as maybeStartCameraManUserMode); the touch way in is ours.
  * Computers are unchanged.
  *
+ * G1284 (report #669): at your own home, with the Snapshottery card, the overlay adds a "Snap the
+ * whole house" button (Tower, street) under the label, pressed by a click, a tap or Shift+Enter: it
+ * asks snaps-feature `cameraWholeLabel` (engine) for the button and `cameraWholeSnap` (engine,
+ * { end }) to take it. A remake addition: Glitch's camera only ever snapped the view.
+ *
  * QA: ?autostart=1&camerademo=1 opens it (&cameraskill=1 grants Eyeballery,
  * &cameralook=x,y pans; &eyeballdemo=1 also draws the bubble over your own
  * Glitch, as the others would see it). Canvas data: cameraMode, cameraLookX,
@@ -49,6 +54,7 @@ import { OVERLAY_BUBBLE_URL, OVERLAY_USES, overlayBubbleBox, playOverlay } from 
 import { SPEECH_BUBBLE_Z } from '../fx-z.js?v=18dda7e3';
 import { isPhoneDevice } from '../touch-controls.js?v=6e1b7f26';
 import { anchorBottomCentre } from '../sprite-feet.js?v=6358a697';
+import { HOME_SHOT_COPY } from '../home-shot.js?v=4384d3a2';
 
 export const CAMERA_FEATURE_ID = 'camera-mode';
 /** getCameraAbilities: range without Eyeballery, px from the avatar. */
@@ -201,6 +207,8 @@ let listeners = null;
 let overlay = null;
 /** #271: Done on the phone's overlay ends Camera Mode (set by attach). */
 let onDone = null;
+/** G1284: the whole-house button's press (set by attach). */
+let onWhole = null;
 
 /**
  * The client refused Camera Mode only with no location or a location flagged no_camera_mode
@@ -217,6 +225,36 @@ export function homeEditing(engine) {
   return Boolean(engine?.query?.('homeEditMode', engine));
 }
 
+/**
+ * G1284 (report #669): the "Snap the whole house" button (snaps-feature cameraWholeLabel: your own
+ * house, Tower or home street, with the Snapshottery card), shown on a computer and a phone alike.
+ */
+function showWhole(label) {
+  const btn = overlay?.querySelector('[data-camera-whole]');
+  if (!btn) return;
+  btn.hidden = !label;
+  btn.disabled = false;
+  if (label) {
+    btn.textContent = label;
+    btn.title = isPhoneDevice() ? label : `${label} (${HOME_SHOT_COPY.keyHint})`;
+  }
+}
+
+/** G1284: the button or Shift+Enter: the whole place as a Snap (the button waits while it draws). */
+function snapWholeNow(engine) {
+  const btn = overlay?.querySelector('[data-camera-whole]');
+  if (btn?.disabled) return true;
+  const out = engine.query?.('cameraWholeSnap', engine, { end: () => setActive(engine, false) });
+  if (out == null) return false;
+  if (btn) btn.disabled = true;
+  Promise.resolve(out).finally(() => {
+    if (btn) btn.disabled = false;
+    engine.setData?.('cameraWhole', 'done');
+  });
+  engine.setData?.('cameraWhole', 'snapping');
+  return true;
+}
+
 function showOverlay(on, range, snapHint = null) {
   if (typeof document === 'undefined') return;
   if (!overlay) {
@@ -227,6 +265,7 @@ function showOverlay(on, range, snapHint = null) {
       <div class="camera-mode-frame" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
       <span class="camera-mode-reticle" aria-hidden="true"></span>
       <p class="camera-mode-label"><b>Camera Mode</b> <span data-camera-hint></span></p>
+      <button type="button" class="camera-mode-whole" data-camera-whole hidden></button>
       <button type="button" class="camera-mode-done" data-camera-done hidden></button>`;
     const done = overlay.querySelector('[data-camera-done]');
     done.textContent = CAMERA_PHONE_COPY.done;
@@ -234,6 +273,10 @@ function showOverlay(on, range, snapHint = null) {
     done.addEventListener('click', (e) => {
       e.preventDefault();
       onDone?.();
+    });
+    overlay.querySelector('[data-camera-whole]').addEventListener('click', (e) => {
+      e.preventDefault();
+      onWhole?.();
     });
     (document.getElementById('game-root') || document.body).appendChild(overlay);
   }
@@ -264,6 +307,7 @@ function setActive(engine, on) {
   }
   const range = cameraRange(engine.learnedSkills);
   showOverlay(on, range, on ? engine.query?.('cameraSnapHint', engine, range) : null);
+  showWhole(on ? engine.query?.('cameraWholeLabel', engine) : null);
   sendEyeballing(engine, on);
   engine.playSound(on ? 'CAMERA_MODE_ON' : 'CAMERA_MODE_OFF', { volume: 0.4 });
   publish(engine);
@@ -299,6 +343,12 @@ function attach(engine) {
       return;
     }
     if (!active) return;
+    // G1284: Shift+Enter snaps the whole house (Tower, street) at your own home, and says why not elsewhere.
+    if (k === 'enter' && e.shiftKey && !e.metaKey && !e.ctrlKey && !e.altKey && snapWholeNow(engine)) {
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      return;
+    }
     // G332: Enter snaps in multiplayer with Snapshottery (CameraManView.as 189, CameraMan.as snap).
     if (k === 'enter' && !e.metaKey && !e.ctrlKey && !e.altKey && engine.query?.('cameraSnap', engine, { end: () => setActive(engine, false) }) === true) {
       e.preventDefault();
@@ -325,6 +375,7 @@ function attach(engine) {
   window.addEventListener('blur', blur);
   listeners = { down, up, blur };
   onDone = () => setActive(engine, false);
+  onWhole = () => snapWholeNow(engine);
   if (isPhoneDevice()) attachTouch(engine);
 }
 

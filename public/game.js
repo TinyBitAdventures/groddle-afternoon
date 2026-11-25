@@ -4,7 +4,7 @@
  */
 import { ITEM_ICONS, ITEM_LABELS, getVerbsFor, ordinaryItems, runVerb } from './content.js?v=ceaea1fe';
 import { createErrorOnce, createFeatureHost, createFrameStages } from './js/feature-host.js?v=b87e2cbc';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=3346e382';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=51ff095e';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl, drawTileArt } from './js/enter-chooser.js?v=92133ac8';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, bodyReachDistance, OUT_OF_REACH_LINE, playerClickBox } from './js/reach.js?v=456da8a8';
@@ -1152,7 +1152,7 @@ import { HOME_SCREEN_TIP_CACHE, iosSafari, mountHomeScreenTip, runsStandalone } 
 import { EAT_PICK_TEXT, bestFoodIndex, eatChoices, eatTip } from './js/eat-pick.js?v=8fb763d0';
 import { heldDirection, installHeldKeyGuard, isMacPlatform } from './js/held-keys.js?v=a28eb293';
 import { isOneClickDoor, oneClickChoice, signpostArmRows, worldContextAction } from './js/world-context-menu.js?v=e4c99c05';
-import { blockedPlayerVerbs, listPlayerTarget, opensPlayerMenu, playerMenuRows } from './js/ui/player-menu.js?v=7032816f';
+import { blockedPlayerVerbs, listPlayerTarget, opensPlayerMenu, playerMenuRows } from './js/ui/player-menu.js?v=63abc18f';
 import { forgetTexture, frameTexture, isFailed, isLoaded, onFailed, onLoaded, textureFromUrl, whenLoaded } from './js/textures.js?v=b8e38103';
 import { FALLBACK_MAX as WORLD_ART_FALLBACK_MAX, worldArtFor } from './js/world-art.js?v=a67514c8';
 import { HOME_PIP_PX, drawLockPip, homeMarkNote, homePipShown, homeStackMark } from './js/home-stack-marks.js?v=0ff4c29f';
@@ -14211,6 +14211,8 @@ const engine = {
   get started() {
     return state.started === true;
   },
+  /** G1284: the player's own stacks kept for `tsid` drawn into `layer` (drawOwnStacksInto). */
+  drawOwnStacks: (tsid, layer) => drawOwnStacksInto(tsid, layer),
   get entityLayer() {
     return entityLayer;
   },
@@ -16218,7 +16220,8 @@ function updateHomeStackPips() {
  * Render one persistent street stack using its official iconic item art. `mark`: its Decoration
  * Mode mark at your own home ('decor': a lock pip; 'shared': plain; js/home-stack-marks.js).
  */
-function spawnDroppedItemStack(stack, mark = '') {
+/** A put-down stack's sprite (its world art or icon, its count badge), not yet placed or registered. */
+function droppedStackSprite(stack) {
   const item = ITEM_CATALOG[stack.classTsid] || {
     label: stack.classTsid.replace(/_/g, ' '),
     icon: `assets/sprites/icons/${stack.classTsid}.webp`,
@@ -16247,6 +16250,31 @@ function spawnDroppedItemStack(stack, mark = '') {
     spr.countBadge = badge;
     spr.addChild(badge);
   }
+  return { spr, item };
+}
+
+/**
+ * G1284 (the whole-house picture, js/home-shot-render.js): the player's own stacks kept for a
+ * place they are not in (a house or Tower floor's drop key) drawn into `layer` where they lie,
+ * with nothing registered. Returns how many.
+ */
+function drawOwnStacksInto(tsid, layer) {
+  if (!layer || !tsid) return 0;
+  const stacks = listDroppedStacks(droppedItemState, tsid);
+  for (const stack of stacks) {
+    const { spr } = droppedStackSprite(stack);
+    sizeDroppedItemSprite(spr);
+    if (!isLoaded(spr.texture?.source)) onLoaded(spr.texture?.source, () => sizeDroppedItemSprite(spr));
+    spr.x = stack.x;
+    spr.y = stack.y;
+    spr.zIndex = itemZ(stack.classTsid, 12);
+    layer.addChild(spr);
+  }
+  return stacks.length;
+}
+
+function spawnDroppedItemStack(stack, mark = '') {
+  const { spr, item } = droppedStackSprite(stack);
   spr.homeMark = mark;
   if (mark === 'decor') {
     spr.homePip = drawLockPip(PIXI);

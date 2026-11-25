@@ -307,7 +307,7 @@ function select(id, { quiet = false } = {}) {
 }
 
 let accountModule = null;
-const loadAccountModule = () => (accountModule ||= import('./account-tab.js?v=0966a80a').catch((err) => { accountModule = null; throw err; }));
+const loadAccountModule = () => (accountModule ||= import('./account-tab.js?v=4f32299f').catch((err) => { accountModule = null; throw err; }));
 
 async function loadAccount() {
   const panel = panels.account;

@@ -5978,6 +5978,37 @@
     "G1265"
    ],
    "ruling": "Austin 2026-11-24 (lane flyk calls): keep the remake's pace"
+  },
+  {
+   "id": "camera-whole-house",
+   "title": "Camera Mode's \"Snap the whole house\" (and \"Snap the whole Tower\", \"Snap the whole street\"): at your own home, a Snap of every floor stacked (or the whole home street) drawn off the camera, saved as an ordinary private Snap (Glitch's camera snapped only the view; its whole-home picture was the automatic saveHomeImg)",
+   "kind": "UI",
+   "status": "kept",
+   "where": [
+    {
+     "file": "public/js/home-shot.js"
+    },
+    {
+     "file": "public/js/home-shot-render.js"
+    },
+    {
+     "file": "public/js/features/snaps-feature.js"
+    },
+    {
+     "file": "public/js/features/camera-mode-feature.js"
+    },
+    {
+     "file": "public/js/features/homes-feature.js"
+    },
+    {
+     "file": "public/style.css"
+    }
+   ],
+   "why": "Report #669: a player sent a 2012 picture of their whole house and asked for the same. Glitch rendered the whole home location off the camera only for the website (TSFrontController.as saveHomeImg 1515-1546); its camera kept to the viewport (CameraMan.as snap 492-515).",
+   "ruling": "Austin 2026-11-25 (report #669): \"can we expand the snapshot feature to take a photo of the entire house like in Glitch?\"; own home only until he rules on visitors",
+   "rows": [
+    "G1284"
+   ]
   }
  ]
 }

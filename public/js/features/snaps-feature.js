@@ -61,6 +61,8 @@ import {
   snapResolution, snapShareUrl, snapSteps, snapStreet, takePictureState, viewerActions, viewerStep, withCamera,
 } from '../snaps.js?v=11f3e41b';
 import { VINTAGE_TEXT, applyFilter, filterComponents, filtersFor } from '../snap-filters.js?v=32315cf1';
+import { HOME_SHOT_COPY, homeShotState } from '../home-shot.js?v=4384d3a2';
+import { renderHomeLocation } from '../home-shot-render.js?v=cc17af36';
 
 export const SNAPS_FEATURE_ID = 'snaps';
 const VERB = 'take_picture';
@@ -201,6 +203,7 @@ function createSession(engine) {
     openViewer: (index = 0) => openViewer(engine, s, index),
     takePicture: () => openTravel(engine, s),
     snap: () => snapNow(engine, s, {}),
+    snapWhole: () => snapWhole(engine, s, {}),
   });
   publish(engine, s);
   return s;
@@ -506,6 +509,66 @@ function snapNow(engine, s, ctx) {
   }
   s.size = `${picture.w}x${picture.h}`;
   publish(engine, s);
+  const spot = snapSpot(engine);
+  flash(() => openPolaroid(engine, s, picture, spot, ctx));
+  return true;
+}
+
+/**
+ * G1284 (report #669): what "Snap the whole house" does here (js/home-shot.js homeShotState):
+ * { kind, label } in your own house, Tower or home street, { refused } on a visit, else null.
+ */
+function wholeState(engine) {
+  const visiting = Boolean(engine.query?.('neighboursVisiting', engine));
+  const source = visiting ? null : engine.query?.('homeShotSource', engine, null);
+  return homeShotState({ ctx: engine.homeContext?.() || null, tower: source?.kind === 'tower', visiting });
+}
+
+/**
+ * G1284: the whole house (every floor stacked), Tower or home street as one Snap: drawn off the
+ * camera at the screen's own resolution, fitted to the site's 1920x1200 and 1 MB (encodeSnap),
+ * then the same polaroid, save (private until made public), viewer and download as any Snap.
+ * A remake addition (inventions: camera-whole-house): Glitch's camera snapped only the view
+ * (CameraMan.as snap 492-515); its whole-home picture was saveHomeImg's, never the player's.
+ */
+async function snapWhole(engine, s, ctx) {
+  if (s.dialog || s.wholeBusy) return true;
+  const st = wholeState(engine) || { refused: HOME_SHOT_COPY.refusedAway };
+  if (st.refused) {
+    engine.playSound?.('CLICK_FAILURE', { volume: 0.5 });
+    engine.toast?.(st.refused, 3000);
+    note(engine, s, 'whole-refused');
+    return true;
+  }
+  if (!canSnap(upgrades(engine))) {
+    engine.playSound?.('CLICK_FAILURE', { volume: 0.5 });
+    engine.toast?.(T.needCard, 2600);
+    note(engine, s, 'no-card');
+    return true;
+  }
+  s.wholeBusy = true;
+  engine.playSound?.('CAMERA_SHUTTER', { volume: 0.6 });
+  let picture = null;
+  let shot = null;
+  try {
+    shot = await renderHomeLocation(engine, { kind: st.kind, resolution: engine.renderer?.resolution || globalThis.devicePixelRatio || 1 });
+    picture = shot?.canvas ? encodeSnap(shot.canvas) : null;
+  } catch (err) {
+    console.warn('[snaps] whole house', err?.message || err);
+  } finally {
+    s.wholeBusy = false;
+    if (shot?.canvas) {
+      shot.canvas.width = 0;
+      shot.canvas.height = 0;
+    }
+  }
+  if (!picture) {
+    engine.toast?.(HOME_SHOT_COPY.failed, 3000);
+    note(engine, s, 'whole-failed');
+    return true;
+  }
+  s.size = `${picture.w}x${picture.h}`;
+  note(engine, s, `whole:${st.kind}:${shot.floors}`);
   const spot = snapSpot(engine);
   flash(() => openPolaroid(engine, s, picture, spot, ctx));
   return true;
@@ -1114,6 +1177,23 @@ export const snapsFeature = {
     // getCameraAbilities 2155-2165: without the card, the Snapshottery line shows once Eyeballery's is gone.
     if (!canSnap(upgrades(engine))) return Number.isFinite(range) ? null : T.hintNoCard;
     return Number.isFinite(range) ? T.hintSnapStreet : T.hintSnap;
+  },
+
+  /**
+   * G1284: camera-mode-feature's "Snap the whole house" button (and Shift+Enter): its label in
+   * your home (or on a visit, where it says why not), null where it is not offered or without the
+   * Snapshottery card.
+   */
+  cameraWholeLabel(engine) {
+    if (!multiplayer(engine) || !session || !canSnap(upgrades(engine))) return null;
+    const st = wholeState(engine);
+    return st?.label || (st?.refused ? HOME_SHOT_COPY.house : null);
+  },
+
+  /** G1284: the button or Shift+Enter in Camera Mode. Resolves true when handled. */
+  cameraWholeSnap(engine, ctx = {}) {
+    if (!multiplayer(engine) || !session) return null;
+    return snapWhole(engine, session, ctx);
   },
 
   /** camera-mode-feature: Enter while looking. ctx.end() leaves Camera Mode (after a save). */

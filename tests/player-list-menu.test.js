@@ -7,8 +7,8 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { FROM_LIST_VERBS, PLAYER_TARGET_FEATURE, listPlayerTarget, opensPlayerMenu, playerMenuRows } from '../public/js/ui/player-menu.js?v=7032816f';
-import { PROFILE_PAGE_VERB } from '../public/js/profiles.js?v=054ca723';
+import { FROM_LIST_VERBS, PLAYER_TARGET_FEATURE, listPlayerTarget, opensPlayerMenu, playerMenuRows } from '../public/js/ui/player-menu.js?v=63abc18f';
+import { PROFILE_PAGE_VERB } from '../public/js/profiles.js?v=b1c63974';
 import { IM_VERB_ID } from '../public/js/player-im.js?v=87bdb8ec';
 import { BUDDY_VERBS } from '../public/js/buddies.js?v=4457d8a4';
 import { VISIT_VERB } from '../public/js/neighbours-mp.js?v=1ea504ef';

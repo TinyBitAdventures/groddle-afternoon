@@ -13,7 +13,7 @@ import { readFileSync, existsSync } from 'node:fs';
 import { describe, it } from 'node:test';
 
 import { EXTERIOR_STYLES, streetLook } from '../public/js/home-styles.js?v=ec5d2f69';
-import { stylePreviewLayout } from '../public/js/features/homes-feature.js?v=5a5c2042';
+import { stylePreviewLayout } from '../public/js/features/homes-feature.js?v=4c0065b3';
 import { TILE_MAX_DPR, createTilePainter, drawOps, shrinkSource, sourceHeights, tileOps } from '../public/js/ui/style-tile-paint.js?v=d0e1312b';
 
 const DECO = new URL('../public/assets/decos/groddle/', import.meta.url);

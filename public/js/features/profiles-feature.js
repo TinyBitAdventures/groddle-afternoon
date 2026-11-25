@@ -17,8 +17,9 @@
  *   (engine.snapshotView, the Pixi stage only, so none of the HUD; HOMESHOT:
  *   js/home-layout.js homeViewFrame, the same on a phone held upright) at 2x
  *   after a few settled seconds on their own home street, when the site has
- *   none or the home's key moved on (its style, or six hours: decorating
- *   shows the next visit). Up to 1920 wide as WebP, or JPEG where the
+ *   none or the home's key moved on (its style, or six hours), and (G1284,
+ *   as saveHomeImg) again after decorating, a house or Tower change or
+ *   cultivation (homePictureStale), 3 s after the change at the soonest. Up to 1920 wide as WebP, or JPEG where the
  *   browser cannot write WebP (profiles.js HOME_*). The website's profile
  *   header was a panorama of the home street (homes/.../header-*.jpg).
  * - The home street as a layout (js/home-layout.js, js/home-layout-scene.js):
@@ -70,10 +71,10 @@ import { lookKey, resolveLook } from '../avatar-looks.js?v=5a28384d';
 import {
   AVATAR_FRAME, AVATAR_STILL, AVATAR_TILE, FAILURE_BACKOFF_MS, HOME_BACKDROP, HOME_MAX_BYTES, HOME_QUALITY, HOME_RESOLUTION, HOME_SETTLE_MS, HOME_TYPES,
   PICTURE_RESOLUTION, PROFILE_COPY, PROFILE_PAGE_VERB,
-  aboutCounter, profilePagePath, profilePageVerb, avatarKeyOf, base64Bytes, homeKeyOf, homeSizes, imageBase64, pngBase64, shouldUpload, stillTransform,
-} from '../profiles.js?v=054ca723';
-import { homeLayoutJson, homeLayoutKeyOf, HOME_LAYOUT_LIMITS } from '../home-layout.js?v=c2f0b753';
-import { collectHomeLayout, homeFrameFor } from '../home-layout-scene.js?v=1633e998';
+  aboutCounter, profilePagePath, profilePageVerb, avatarKeyOf, base64Bytes, homeKeyOf, homeSizes, imageBase64, pngBase64, shouldUpload, staleRefreshDue, stillTransform,
+} from '../profiles.js?v=b1c63974';
+import { homeLayoutJson, homeLayoutKeyOf, HOME_LAYOUT_LIMITS } from '../home-layout.js?v=b1065709';
+import { collectHomeLayout, homeFrameFor } from '../home-layout-scene.js?v=d9213f99';
 
 export const PROFILES_FEATURE_ID = 'profiles';
 
@@ -166,8 +167,8 @@ function create(engine) {
     checkAt: 0,
     homeSince: 0,
     avatar: { lastTry: 0, failedAt: 0, busy: false, status: 'idle' },
-    home: { lastTry: 0, failedAt: 0, busy: false, status: 'idle', picture: null },
-    layout: { lastTry: 0, failedAt: 0, busy: false, status: 'idle', bytes: 0, key: '' },
+    home: { lastTry: 0, failedAt: 0, busy: false, status: 'idle', picture: null, staleAt: 0, why: '' },
+    layout: { lastTry: 0, failedAt: 0, busy: false, status: 'idle', bytes: 0, key: '', staleAt: 0 },
   };
   globalThis.groddleProfiles = {
     state: () => ({ profile: s.profile, avatar: { ...s.avatar }, home: { ...s.home }, layout: { ...s.layout }, homeSince: s.homeSince }),
@@ -348,6 +349,7 @@ async function uploadHome(engine, s, { force = false } = {}) {
     const now = Date.now();
     if (!force && !shouldUpload({ held: profile?.home, key, now, lastTry: s.home.lastTry, failedAt: s.home.failedAt })) return false;
     s.home.lastTry = now;
+    s.home.staleAt = 0;
     mark(engine, s, 'home', 'uploading');
     const picture = await drawHome(engine);
     if (!picture) throw new Error('the view could not be drawn small enough');
@@ -389,6 +391,7 @@ async function uploadLayout(engine, s, { force = false } = {}) {
     const { bytes } = homeLayoutJson(layout);
     if (bytes > HOME_LAYOUT_LIMITS.bytes) throw new Error(`the layout is ${bytes} bytes`);
     s.layout.lastTry = now;
+    s.layout.staleAt = 0;
     s.layout.bytes = bytes;
     s.layout.key = key;
     mark(engine, s, 'layout', 'uploading');
@@ -534,12 +537,32 @@ export const profilesFeature = {
     if (ctx?.inHome && ctx.room === 'street') {
       state.homeSince ||= t;
       if (t - state.homeSince >= HOME_SETTLE_MS && viewClear(engine)) {
-        if (!state.layout.busy) uploadLayout(engine, state);
-        if (!state.home.busy) uploadHome(engine, state);
+        // G1284: after decorating, a house change or cultivation (saveHomeImg), taken again whatever its key.
+        const layoutStale = staleRefreshDue({ staleAt: state.layout.staleAt, now: t, lastTry: state.layout.lastTry, failedAt: state.layout.failedAt });
+        const homeStale = staleRefreshDue({ staleAt: state.home.staleAt, now: t, lastTry: state.home.lastTry, failedAt: state.home.failedAt });
+        if (!state.layout.busy) uploadLayout(engine, state, { force: layoutStale });
+        if (!state.home.busy) uploadHome(engine, state, { force: homeStale });
       }
     } else {
       state.homeSince = 0;
     }
+  },
+
+  /**
+   * G1284: the home changed (homes-feature: Decoration or Cultivation Mode ended, the house's
+   * style; home-tower-feature: the Tower's), as Glitch's saveHomeImg was called after decorating
+   * (HandOfDecorator.as 952), a chassis change (ChassisManager.as 552) and cultivation
+   * (CultManager.as 201). The profile's home street picture and layout are taken again at the
+   * next settled moment on the home street, HOME_STALE_DELAY_MS after the change at the soonest.
+   */
+  homePictureStale(why, engine) {
+    if (!state || engine?.mode !== 'multiplayer') return null;
+    const now = Date.now();
+    state.home.staleAt = now;
+    state.home.why = String(why || '');
+    state.layout.staleAt = now;
+    engine.setData?.('profileHomeStale', state.home.why);
+    return true;
   },
 
   /**

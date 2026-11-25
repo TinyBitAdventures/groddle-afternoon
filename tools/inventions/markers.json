@@ -366,7 +366,8 @@
     "remake-own: own line shows through the word filter (the remake's own addition); the server filters what the Butler": "word-filter"
   },
   "public/js/features/camera-mode-feature.js": {
-    "ours: the touch way in is ours.": "ours-camera-mode"
+    "ours: the touch way in is ours.": "ours-camera-mode",
+    "remake-own: * { end }) to take it. A remake addition: Glitch's camera only ever snapped the": "camera-whole-house"
   },
   "public/js/features/crabs-feature.js": {
     "ours: * G1245 (ours, Austin 2026-11-24): every tune a crab hears": "ours-vine-radio"
@@ -568,6 +569,10 @@
   "public/js/features/smuggling-feature.js": {
     "remake-own: false); the give Smuggler then stays hidden. The remake's own rule (Glitch had every": "smuggler-hidden-no-walkable-run"
   },
+  "public/js/features/snaps-feature.js": {
+    "invented: * A remake addition (inventions: camera-whole-house): Glitch's camera snapped": "camera-whole-house",
+    "remake-own: * A remake addition (inventions: camera-whole-house): Glitch's": "camera-whole-house"
+  },
   "public/js/features/street-jobs-feature.js": {
     "no-source: a gem ask still open (the remake's own line; no source).": "gem-hints",
     "ours: * Ours (Austin 2026-11-19, after #520): online, a": "street-spirit-rest-countdown",
@@ -702,6 +707,11 @@
     "ours: Ours: machines one home street keeps (the site keeps": "ours-home-machines",
     "ours: `${name} made something at your ${label}.`, // ours": "remake-copy",
     "ours: your Tower) or in a Community Machine Room.', // ours": "remake-copy"
+  },
+  "public/js/home-shot.js": {
+    "invented: * The camera option is a remake addition (inventions: camera-whole-house): Glitch's camera": "camera-whole-house",
+    "remake-own: * The camera option is a remake addition (inventions: camera-whole-house): Glitch's": "camera-whole-house",
+    "remake-own: The words the option and its refusals use (the remake's own: Glitch's camera had no such option).": "camera-whole-house"
   },
   "public/js/home-stack-marks.js": {
     "invented: and which are freebies\"). The remake's own UI (inventions": "home-stack-marks",

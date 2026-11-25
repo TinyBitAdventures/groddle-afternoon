@@ -174,6 +174,26 @@ export function homeSizes(viewW, viewH, { widths = HOME_WIDTHS, max = HOME_MAX }
 }
 
 /**
+ * G1284: TSFrontController.as saveHomeImg posted the home's picture 3 s after it was taken
+ * (StageBeacon.setTimeout(api_call.homeImage, 3000)), taken after decorating, a house change or
+ * cultivation. Here such a change marks the home street's picture stale; it is taken again this
+ * long after the change, at the next settled moment on the home street.
+ */
+export const HOME_STALE_DELAY_MS = 3000;
+
+/**
+ * PURE (G1284): whether a stale home picture (`staleAt`, when the home last changed) is due now:
+ * HOME_STALE_DELAY_MS after the change, and still never within RETRY_MS of the last try nor
+ * FAILURE_BACKOFF_MS of a failure (shouldUpload's own throttle).
+ */
+export function staleRefreshDue({ staleAt = 0, now, lastTry = 0, failedAt = 0 }) {
+  if (!staleAt || now - staleAt < HOME_STALE_DELAY_MS) return false;
+  if (lastTry && now - lastTry < RETRY_MS) return false;
+  if (failedAt && now - failedAt < FAILURE_BACKOFF_MS) return false;
+  return true;
+}
+
+/**
  * Whether to upload a picture now: the site has none, or one made from
  * another key; never twice within RETRY_MS, nor within FAILURE_BACKOFF_MS
  * of a failure.

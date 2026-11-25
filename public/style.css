@@ -6802,6 +6802,31 @@ body.buff-purple-pulse::after {
   touch-action: manipulation;
 }
 .camera-mode-done[hidden] { display: none; }
+/* G1284 (report #669): "Snap the whole house" (or Tower, or street) at your own home, at the foot of the
+   frame (clear of the house's own buttons under the label), over Done on a phone; a click, a tap or Shift+Enter. */
+.camera-mode-whole {
+  position: absolute;
+  left: 50%;
+  bottom: calc(150px + var(--sp-6));
+  transform: translateX(-50%);
+  min-height: 40px;
+  max-width: calc(100% - 40px);
+  padding: var(--sp-2) var(--sp-8);
+  border: 2px solid color-mix(in srgb, var(--c-white) 85%, transparent);
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--c-navy-23) 72%, transparent);
+  color: var(--text-inverse);
+  font: inherit;
+  font-size: var(--fs-md);
+  font-weight: 700;
+  pointer-events: auto;
+  touch-action: manipulation;
+  cursor: pointer;
+}
+.camera-mode-whole:hover, .camera-mode-whole:focus-visible { background: var(--accent); }
+.camera-mode-whole:disabled { opacity: 0.6; cursor: progress; }
+.camera-mode-whole[hidden] { display: none; }
+:root.touch-phone .camera-mode-whole { bottom: calc(var(--pack-live-height, 72px) + env(safe-area-inset-bottom, 0px) + var(--sp-8) + 56px); min-height: 44px; }
 :root.touch-phone.camera-mode-on .touch-controls { display: none; }
 
 /* Type-to-search picker (js/combobox.js) */

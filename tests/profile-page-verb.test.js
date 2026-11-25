@@ -10,8 +10,8 @@ import { afterEach, describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { PROFILE_LISTED_LEVEL, PROFILE_PAGE_COPY, PROFILE_PAGE_VERB, profilePagePath, profilePageVerb, profileSlug } from '../public/js/profiles.js?v=054ca723';
-import { lookUpPlayersHere, profilesFeature } from '../public/js/features/profiles-feature.js?v=44732938';
+import { PROFILE_LISTED_LEVEL, PROFILE_PAGE_COPY, PROFILE_PAGE_VERB, profilePagePath, profilePageVerb, profileSlug } from '../public/js/profiles.js?v=b1c63974';
+import { lookUpPlayersHere, profilesFeature } from '../public/js/features/profiles-feature.js?v=bb7cd540';
 import { SITE_DIR, skipWithoutSite } from '../tools/repos.mjs';
 
 const realFetch = globalThis.fetch;
