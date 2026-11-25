@@ -5772,6 +5772,149 @@
       "commits": [
         "site:07936be"
       ]
+    },
+    {
+      "id": "G1299",
+      "area": "Economy",
+      "text": "Emblems earned past four in a day could not be dropped, given or traded.",
+      "show": "fixing",
+      "commits": [
+        "site:6dd3ecd",
+        "site:92cbdb7",
+        "game:e76dd61109f",
+        "server:6f96387"
+      ]
+    },
+    {
+      "id": "G1300",
+      "area": "Groups",
+      "text": "A group's name and description could not be changed after it was made.",
+      "show": "fixing",
+      "commits": [
+        "site:b1717b6",
+        "site:2d09702",
+        "server:d03a7e4",
+        "game:eced6ebb2ca",
+        "game:5d2e3a6c1c5"
+      ]
+    },
+    {
+      "id": "G1301",
+      "area": "Groups",
+      "text": "A finished Group Hall showed nothing to say whose it was.",
+      "show": "fixing",
+      "commits": [
+        "game:0233ab60b83",
+        "game:73acf0e6f96",
+        "game:8adee9d2d97",
+        "site:aa40200"
+      ]
+    },
+    {
+      "id": "G1302",
+      "area": "Homes",
+      "text": "Giant Icons could not be placed on your home street or in your house.",
+      "show": "fixing",
+      "commits": [
+        "game:47859e119ae",
+        "game:cdc40ffd740",
+        "site:050ffa6",
+        "site:0f4ad7a",
+        "server:b87b752"
+      ]
+    },
+    {
+      "id": "G1303",
+      "area": "Homes",
+      "text": "Machines could not stand as close together as they did in Glitch.",
+      "show": "fixing",
+      "commits": [
+        "game:b5490cefb0a",
+        "game:02d3849fe83",
+        "site:34980f9",
+        "server:ec197e7"
+      ]
+    },
+    {
+      "id": "G1304",
+      "area": "Interface",
+      "text": "A label naming nearby things followed you as you walked, and the padlock on your things at home had no words.",
+      "show": "fixing",
+      "commits": [
+        "game:9106fcb0d73",
+        "game:805371dc4f7"
+      ]
+    },
+    {
+      "id": "G1305",
+      "area": "Gardens",
+      "text": "Each garden plot needed two clicks or taps to tend.",
+      "show": "fixing",
+      "commits": [
+        "game:215246dc923",
+        "game:536e5edf05d"
+      ]
+    },
+    {
+      "id": "G1306",
+      "area": "Multiplayer",
+      "text": "While the connection was lost, shared trees, rocks and quoins could still be harvested on your own screen.",
+      "show": "fixing",
+      "commits": [
+        "game:03111f108b0"
+      ]
+    },
+    {
+      "id": "G1307",
+      "area": "Phones",
+      "text": "On a phone held upright the pinned quest covered part of the street.",
+      "show": "fixing",
+      "commits": [
+        "game:8ef3c71f8a6"
+      ]
+    },
+    {
+      "id": "G1308",
+      "area": "Drawing",
+      "text": "The stat icons are our own drawings, kept on purpose; Tiny Speck's originals are shown beside them on the Restoration page.",
+      "show": "purpose"
+    },
+    {
+      "id": "F123",
+      "area": "Multiplayer",
+      "text": "After using the browser's back button, machines, chat and other shared actions stopped working until you signed in again.",
+      "show": "fixing",
+      "commits": [
+        "game:8d093a1c51c",
+        "game:c2c89f994eb"
+      ]
+    },
+    {
+      "id": "F124",
+      "area": "Homes",
+      "text": "Things on shelves stood at the very back of the shelf.",
+      "show": "fixing",
+      "commits": [
+        "game:fef8f18582e"
+      ]
+    },
+    {
+      "id": "F125",
+      "area": "Map",
+      "text": "The ring on the street map's next signpost moved up and down as you walked.",
+      "show": "fixing",
+      "commits": [
+        "game:af202690d59"
+      ]
+    },
+    {
+      "id": "F126",
+      "area": "Phones",
+      "text": "On a phone the choose from box covered the stick, Act and Jump.",
+      "show": "fixing",
+      "commits": [
+        "game:d8d22a99877"
+      ]
     }
   ]
 }

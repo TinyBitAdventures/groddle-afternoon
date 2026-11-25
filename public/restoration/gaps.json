@@ -1,6 +1,6 @@
 {
   "note": "Written by tools/gaps/build-data.mjs from tools/gaps/public-gaps.json and the coverage register. Edit those, never this file.",
-  "release": "v0.72.0",
+  "release": "v0.73.0",
   "states": {
     "fixing": {
       "label": "Being fixed",
@@ -42,9 +42,9 @@
     "fixing": 3,
     "known": 15,
     "unreleased": 0,
-    "fixed": 576,
+    "fixed": 589,
     "lost": 5,
-    "purpose": 17,
+    "purpose": 18,
     "idea": 10
   },
   "areas": [
@@ -876,6 +876,12 @@
           "text": "Show the way took a locked door you had no key for.",
           "state": "fixed",
           "version": "v0.69.0"
+        },
+        {
+          "id": "F125",
+          "text": "The ring on the street map's next signpost moved up and down as you walked.",
+          "state": "fixed",
+          "version": "v0.73.0"
         }
       ]
     },
@@ -1383,6 +1389,24 @@
           "text": "Visitors could see inside any house and act on nothing in its back yard; now only key holders and visitors let in see it, and they can dig and gather there.",
           "state": "fixed",
           "version": "v0.72.0"
+        },
+        {
+          "id": "G1302",
+          "text": "Giant Icons could not be placed on your home street or in your house.",
+          "state": "fixed",
+          "version": "v0.73.0"
+        },
+        {
+          "id": "G1303",
+          "text": "Machines could not stand as close together as they did in Glitch.",
+          "state": "fixed",
+          "version": "v0.73.0"
+        },
+        {
+          "id": "F124",
+          "text": "Things on shelves stood at the very back of the shelf.",
+          "state": "fixed",
+          "version": "v0.73.0"
         },
         {
           "id": "G48",
@@ -2094,6 +2118,18 @@
           "text": "A dead connection took 50 seconds to notice.",
           "state": "fixed",
           "version": "v0.70.0"
+        },
+        {
+          "id": "G1306",
+          "text": "While the connection was lost, shared trees, rocks and quoins could still be harvested on your own screen.",
+          "state": "fixed",
+          "version": "v0.73.0"
+        },
+        {
+          "id": "F123",
+          "text": "After using the browser's back button, machines, chat and other shared actions stopped working until you signed in again.",
+          "state": "fixed",
+          "version": "v0.73.0"
         }
       ]
     },
@@ -2577,6 +2613,18 @@
           "text": "The phone's stick could stay held after a loading card.",
           "state": "fixed",
           "version": "v0.70.0"
+        },
+        {
+          "id": "G1307",
+          "text": "On a phone held upright the pinned quest covered part of the street.",
+          "state": "fixed",
+          "version": "v0.73.0"
+        },
+        {
+          "id": "F126",
+          "text": "On a phone the choose from box covered the stick, Act and Jump.",
+          "state": "fixed",
+          "version": "v0.73.0"
         }
       ]
     },
@@ -2968,6 +3016,12 @@
           "text": "A garden's Water all showed 2 energy whatever it would really spend.",
           "state": "fixed",
           "version": "v0.71.0"
+        },
+        {
+          "id": "G1305",
+          "text": "Each garden plot needed two clicks or taps to tend.",
+          "state": "fixed",
+          "version": "v0.73.0"
         }
       ]
     },
@@ -3542,6 +3596,12 @@
           "text": "Some earned things were taken back by the save checker: the Rube Shaped Potato, artifacts, Spinning Wheel prizes, a Craftybot's work, picked-up gnomes and icons, racing Cubimals, the Funpickle.",
           "state": "fixed",
           "version": "v0.47.1"
+        },
+        {
+          "id": "G1299",
+          "text": "Emblems earned past four in a day could not be dropped, given or traded.",
+          "state": "fixed",
+          "version": "v0.73.0"
         }
       ]
     },
@@ -3810,6 +3870,12 @@
           "text": "Players standing in front of a dirt pile or rock blocked clicking it.",
           "state": "fixed",
           "version": "v0.58.1"
+        },
+        {
+          "id": "G1304",
+          "text": "A label naming nearby things followed you as you walked, and the padlock on your things at home had no words.",
+          "state": "fixed",
+          "version": "v0.73.0"
         }
       ]
     },
@@ -4181,6 +4247,23 @@
           "version": "v0.72.0"
         }
       ]
+    },
+    {
+      "name": "Groups",
+      "items": [
+        {
+          "id": "G1300",
+          "text": "A group's name and description could not be changed after it was made.",
+          "state": "fixed",
+          "version": "v0.73.0"
+        },
+        {
+          "id": "G1301",
+          "text": "A finished Group Hall showed nothing to say whose it was.",
+          "state": "fixed",
+          "version": "v0.73.0"
+        }
+      ]
     }
   ],
   "purpose": [
@@ -4269,6 +4352,11 @@
       "id": "G28",
       "text": "A few original sounds survive only in copies we are not free to share, so they keep a stand-in.",
       "area": "Sounds"
+    },
+    {
+      "id": "G1308",
+      "text": "The stat icons are our own drawings, kept on purpose; Tiny Speck's originals are shown beside them on the Restoration page.",
+      "area": "Drawing"
     }
   ],
   "ideas": [
