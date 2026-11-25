@@ -197,7 +197,7 @@ describe('Our additions on the restoration page and in the popup', () => {
     const band = oursBand();
     assert.equal(band.split('<!-- wp:groddle/restoration-ours /-->').length, 2);
     assert.match(band, /<section class="wp-block-group band" id="ours">/);
-    assert.match(band, /<h2 class="wp-block-heading" id="ours-h">Our additions, beside the originals<\/h2>/);
+    assert.match(band, /<h2 class="wp-block-heading" id="ours-h">Our additions<\/h2>/);
     assert.doesNotMatch(band, /wp:html|—/);
     const fresh = restorationContent();
     assert.ok(fresh.indexOf('id="made"') < fresh.indexOf('id="ours"') && fresh.indexOf('id="ours"') < fresh.indexOf('report-foot'));

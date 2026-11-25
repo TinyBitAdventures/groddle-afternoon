@@ -57,6 +57,7 @@ describe('restoration section menu (ReportMenu.php)', () => {
       ['#recent', 'Recently restored', false],
       ['#honest', 'What can’t come back', false],
       ['#made', 'Made for Groddle', false],
+      ['#ours', 'Our additions', false],
       ['/compare/', 'Other remakes compared', true],
     ]);
     // Every anchor lands on a band of the page.

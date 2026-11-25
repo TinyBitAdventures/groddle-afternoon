@@ -39,7 +39,7 @@ export const madeBand = () => band('made', true, 'Made for Groddle', [
  * Speck original it stands in for, drawn from made.json `ours` (tools/made-art/compare.json);
  * tools/made-art/to-minn.mjs adds it after the Made for Groddle band on a page made before it.
  */
-export const oursBand = () => band('ours', false, 'Our additions, beside the originals', [
+export const oursBand = () => band('ours', false, 'Our additions', [
   p('section-lead', 'A few things in Groddle Afternoon are our own additions rather than Tiny Speck’s. Where Tiny Speck drew something for the same job, the original is shown beside ours, so it is clear what is theirs and what is new. Click either picture to flip between the two.'),
   data('ours'),
 ]);
