@@ -26,6 +26,7 @@ import { FRONT_FURNITURE_SLOTS, furnitureDrawsInFront } from '../public/js/home-
 import { FURNITURE_CATALOG } from '../public/js/homes-catalog.js?v=0367f90f';
 import { typingElsewhere } from '../public/js/screen-fx.js?v=39954e0b';
 import { SCREEN_SELECTOR, WINDOW_SELECTOR, isTopWindow, stackZ } from '../public/js/window-stack.js?v=a7104f02';
+import * as itemBands from '../public/js/item-bands.js?v=e98b10bc';
 import { BAND_Z, bandClass, itemBand, itemZ, knownItemClass } from '../public/js/item-bands.js?v=e98b10bc';
 import { BACKGROUND_CLASSES, FOREGROUND_CLASSES, FOREMOST_CLASSES, NORMAL_CLASSES } from '../public/js/item-bands-data.js?v=0ac4551c';
 import { buildItemBands, render as renderItemBands } from '../tools/build-item-bands.mjs';
@@ -344,9 +345,43 @@ describe('item bands from the source (ITEMBANDS)', () => {
     const files = ['public/game.js', ...['street-jobs', 'seasons', 'street-furniture', 'resource-nodes', 'foxes', 'heli-kitties', 'juju-bandits', 'butler', 'craftybot', 'rube', 'supply', 'giant-icons', 'mail-courier', 'rook-attack', 'animal-husbandry', 'yard-verbs-mp', 'neighbours-mp', 'small-items', 'item-verbs-more', 'vendor-npcs', 'potions', 'swoonerflies'].map((f) => `public/js/features/${f}-feature.js`)];
     for (const f of files) {
       const src = read(f);
-      assert.match(src, /import \{ itemZ \} from '\.\.?\/(js\/)?item-bands\.js\?v=[0-9a-f]{8}';/, f);
+      assert.match(src, /import \{ (?:[A-Z_]+, )*itemZ \} from '\.\.?\/(js\/)?item-bands\.js\?v=[0-9a-f]{8}';/, f);
       for (const m of src.matchAll(/itemZ\('([a-z0-9_]+)'/g)) assert.ok(knownItemClass(m[1]), `${f}: ${m[1]}`);
     }
+  });
+});
+
+/**
+ * The zIndex a site sets: the expression after `<name>.zIndex = ` within `span` chars after
+ * `marker`, worked out with the item-band helpers in scope.
+ */
+function siteZ(src, marker, name, span = 1600) {
+  const at = src.indexOf(marker);
+  assert.ok(at >= 0, `marker not found: ${marker}`);
+  const m = new RegExp(`\\b${name}\\.zIndex = ([^;\\n]+);`).exec(src.slice(at, at + span));
+  assert.ok(m, `no zIndex after ${marker}`);
+  // eslint-disable-next-line no-new-func
+  return Number(new Function('itemZ', 'SUMMONED_Z', 'CONTRABAND', `return (${m[1]});`)(itemZ, itemBands.SUMMONED_Z, 'contraband'));
+}
+
+describe('Austin 2026-11-25 (live): a summoned spinning wheel draws over the barnacles', () => {
+  // Every street item at the top of its own band, and the spots that draw barnacles and pods
+  // (resource-nodes-feature.js Z.ground).
+  const streetTops = [
+    itemZ('mortar_barnacle', { background: 9.2, normal: 1 }),
+    itemZ('barnacle_pod', { background: 9.2, normal: 1 }),
+    itemZ('trant_spice', 1000), itemZ('sign_stake', 1000), itemZ('npc_piggy', 1000), itemZ('quoin', 1000),
+  ];
+
+  it('the ticket\'s wheel draws over every street item and deco, under the players', () => {
+    const z = siteZ(read('public/game.js'), 'function spawnSpinningWheel(', 'sprite');
+    for (const top of streetTops) assert.ok(z > top, `wheel z ${z} over ${top}`);
+    assert.ok(z < remoteAvatarZ(0) && z < PLAYER_Z, `wheel z ${z} under the players`);
+  });
+
+  it('SUMMONED_Z is the top of the foreground holder', () => {
+    assert.equal(typeof itemBands.SUMMONED_Z, 'number');
+    assert.ok(itemBands.SUMMONED_Z > itemZ('npc_piggy', 1000) && itemBands.SUMMONED_Z < 49);
   });
 });
 

@@ -1175,7 +1175,7 @@ import { grantSoloStarterItems, isNewMultiplayerPlayer, newPlayerInventory, newP
 import { SPEECH_HOLD_MARGIN, clearSpeechOfBox, deepestSpeechTip, giveArtHeight, holdSpeechSide, hudColumnBox, limitSpeechShift, limitSpeechTip, placeSpeechTail, placeSpeechTip, settleSpeechMove, slideOffAvatars, speechBubbleOutline, speechOffsetFor, speechPushLimit, speechTipOnSide, standingFeet } from './js/speech-placement.js?v=0371ea0c';
 import { shrineDonationResponseKey, verbResponse } from './js/verb-responses.js?v=97df8351';
 import { RESULT_FLOAT_MAX_CHARS, resultLineRoute } from './js/verb-result-route.js?v=61b4fc9d';
-import { itemZ } from './js/item-bands.js?v=e98b10bc';
+import { SUMMONED_Z, itemZ } from './js/item-bands.js?v=e98b10bc';
 import { outlinePoints } from './js/outline-points.js?v=c9edb089';
 import { STAT_PAINTS } from './js/stat-icons.js?v=b89600eb';
 import { SLUG_ANIMATION, SLUG_LAYOUT, SLUG_TARGETS, drawSlugGlyph, formatRawSlugs, formatSlugList, layoutSlugRow, slugBox, slugNumber, slugPaint, slugPillPath, slugSign, speechSlugList } from './js/speech-slugs.js?v=e79cecfa';
@@ -11931,7 +11931,9 @@ function spawnSpinningWheel({ now = Date.now(), ticket = null } = {}) {
   sprite.scale.set(0.72);
   sprite.x = clamp(player.x + 100, 95, Math.max(95, WORLD_W - 100));
   sprite.y = resolveGround(sprite.x, player.y);
-  sprite.zIndex = itemZ('npc_spinning_wheel', 9);
+  // A summoned wheel draws over every street item (js/item-bands.js SUMMONED_Z): Glitch's BG_ITEM
+  // left it under a Mortar Barnacle on the wall behind it.
+  sprite.zIndex = SUMMONED_Z;
   // The 514×450 animation cell includes transparent registration padding.
   sprite._worldHitW = 155;
   sprite._worldHitH = 215;

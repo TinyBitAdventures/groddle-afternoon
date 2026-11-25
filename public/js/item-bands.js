@@ -11,12 +11,26 @@
  *
  * Bands in the entity layer: background 10-19, normal 20-34, foreground 35-48, other players 49.x,
  * your avatar 50, foremost 60 (only the Crusher). Decos and door/signpost dressing stay under 10.
+ * A thing summoned beside the player for a short while draws at SUMMONED_Z (below).
  */
 import { BACKGROUND_CLASSES, FOREGROUND_CLASSES, FOREMOST_CLASSES, NORMAL_CLASSES } from './item-bands-data.js?v=0ac4551c';
 
 export const BAND_Z = Object.freeze({ background: 10, normal: 20, foreground: 35, foremost: 60 });
 /** Exclusive top of each band: an offset never reaches the next band. */
 const BAND_TOP = Object.freeze({ background: 20, normal: 35, foreground: 49, foremost: 100 });
+
+/**
+ * A thing that pops in beside the player for a short while and waits for them: the Game Show
+ * ticket's spinning wheel (gameshow_ticket.js 114-123 puts it 100 px in front of the player), the
+ * Smugglers and the Deimaginator. It draws at the top of the foreground holder, over every street
+ * item, deco and animal (over the cap itemZ gives any foreground item), under other players (49.x)
+ * and your avatar (50).
+ * Glitch drew the wheel and the Smuggler in BG_ITEM (in_background), the newest at the top of that
+ * holder (MiddleGroundRenderer.addBackgroundItem 242-244, LayerRenderer.addUnder 144-147), so a
+ * Mortar Barnacle (a normal item on the wall behind it) drew over the wheel. Austin 2026-11-25 (live):
+ * the wheel showed under barnacles; the remake lifts summoned things over the street on purpose.
+ */
+export const SUMMONED_Z = BAND_TOP.foreground - 0.005;
 
 /**
  * Remake ids that are not GameServerJS classes, mapped to the class they stand in for.
