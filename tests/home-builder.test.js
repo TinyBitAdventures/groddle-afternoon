@@ -206,7 +206,7 @@ describe('pack items on shelves and tables (the dropped-stack model)', () => {
 
   it('drops through game.js as Drop does: the same block reasons and the same dropped-stack record', () => {
     const game = read('public/game.js');
-    const fn = game.slice(game.indexOf('dropPackStackAt(classTsid, count, x, y, { beforeRemove = null, floor = false, beforeShare = null, into = null, merge = true } = {}) {'));
+    const fn = game.slice(game.indexOf('dropPackStackAt(classTsid, count, x, y, { beforeRemove = null, floor = false, beforeShare = null, into = null, merge = true, pointer = false, copy = null } = {}) {'));
     assert.match(fn.slice(0, 1200), /const blocked = packDropBlockReason\(classTsid\);/);
     assert.match(fn.slice(0, 2000), /dropInventoryStack\(droppedItemState, inv, droppedStacksTsid\(\), classTsid, n, \{ x, y \}/);
     assert.match(fn.slice(0, 2400), /saveDroppedItems\(\);\s+refreshDroppedWorldItems\(\);/);
@@ -214,7 +214,7 @@ describe('pack items on shelves and tables (the dropped-stack model)', () => {
     // #515: the dragged stack's count, and that stack is the one set down (js/drag-stack.js).
     assert.match(homes, /engine\.dropPackStackAt\?\.\(was\.classTsid, count, target\.x \+ roomX0\(\), target\.y, packDropOpts\(engine, was, target\)\)/);
     // R9 (G967): the pack's drag reaches Decoration Mode's drop through the drop registry (js/drop-targets.js).
-    assert.match(homes, /id: 'home-decorate',[\s\S]{0,300}if \(st\.from !== 'pack' \|\| st\.tool \|\| st\.bag \|\| mode !== 'decorate'/);
+    assert.match(homes, /id: 'home-decorate',[\s\S]{0,500}if \(st\.from !== 'pack' \|\| \(st\.tool && !machine\) \|\| st\.bag \|\| mode !== 'decorate'/);
   });
 });
 

@@ -145,7 +145,7 @@ describe('every drop target hands on the dragged stack (#515)', () => {
     const dep = part(homes, 'function depositInBox(', '// --- pack items onto shelves');
     assert.ok(dep.indexOf('takeDragged(engine, ds, n)') < dep.indexOf('displayDeposit('), 'marked before the count goes down');
     const game = read('game.js');
-    const at = part(game, 'dropPackStackAt(classTsid, count, x, y, { beforeRemove = null, floor = false, beforeShare = null, into = null, merge = true } = {}) {', 'takeDroppedStack(id)');
+    const at = part(game, 'dropPackStackAt(classTsid, count, x, y, { beforeRemove = null, floor = false, beforeShare = null, into = null, merge = true, pointer = false, copy = null } = {}) {', 'takeDroppedStack(id)');
     assert.ok(at.indexOf('beforeRemove?.(n);') > 0 && at.indexOf('beforeRemove?.(n);') < at.indexOf('leavingToolPoints(classTsid, n)'), 'before the wear that goes down is read');
   });
 

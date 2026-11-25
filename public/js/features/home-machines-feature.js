@@ -94,7 +94,7 @@ import {
   expireSolo,
   tankOf,
   TAKEN_KEEP,
-} from '../home-machines.js?v=fe3d2424';
+} from '../home-machines.js?v=7b36bf51';
 import { CALL_PLAYER_LINES, MACHINE_HITBOX, MACHINE_SKILLS, collectLine, machineJobMs, machineMadeLine, refuelCount, runningSoundKey, takeJobIngredients } from '../machine-rooms.js?v=ca927ffd';
 import { MACHINE_ART_SHEETS, LOW_FUEL_BUBBLE_MS, LOW_FUEL_LINE, isLowFuel, machineFrame, machineFrameRect, machineSheetDef, roomMachineState } from '../machine-art.js?v=d3381a4b';
 import { FUEL_CELL, FUEL_PER_CELL, MAX_FUEL } from '../machines.js?v=5d749d26';
@@ -109,7 +109,7 @@ import { insideQuery, readVisitScene } from '../neighbours-mp.js?v=e912be37';
 import { saveStore } from '../save-store.js?v=4e720735';
 import { frameTexture, sourceFromUrl, textureFromUrl } from '../textures.js?v=b8e38103';
 import { createSheetLoader } from '../sprite-sheets.js?v=d787e3c3';
-import { STREET_GROUND_Y, homesFeature } from './homes-feature.js?v=77fb06d3';
+import { STREET_GROUND_Y, homesFeature } from './homes-feature.js?v=9a298adc';
 import { payAltarBonus } from './machine-rooms-feature.js?v=e27c6152';
 import { worldToScreen } from '../street-model.js?v=a9a05f9d';
 import { nearestSurfaceY } from '../walk-surface.js?v=3c919d5b';
@@ -663,13 +663,22 @@ function createSession(engine, client) {
     else go();
   }
 
-  /** Set a machine down from the pack: `copy`, the one its menu was about (its place among the class's copies). */
-  function placeFromPack(classTsid, copy = null) {
+  /**
+   * Set a machine down from the pack: `copy`, the one its menu was about (its place among the class's copies).
+   * G1303 (#669): `dropX`, a world x, is where a Decoration Mode drag let it go (HandOfDecorator.as
+   * dropItemFromPackOnTargetPlatform 1673-1690 sent drop_x / drop_y and takeable.js 164-170 put it
+   * there); without it, at your feet (takeable.js:164 dest_x = pc.x). The 200 px is from you either way
+   * (placeCheck `from`: canDrop's findCloseStack measured from the player).
+   */
+  function placeFromPack(classTsid, copy = null, dropX = null) {
     const at = where();
     if (!at || at.kind === 'visit' || !home || home.kind !== at.kind) return say(T.placeHome, 2600);
     if (countItem(engine.inv, classTsid) < 1) return false;
-    const rx = Math.round((engine.player?.x || 0) - home.x0);
-    const check = placeCheck({ machines: [...machines.values()], rx, layout: home.layout, span: home.span, classTsid, fixed: home.fixed || [] });
+    const p = engine.player;
+    const feet = Math.round((p?.x || 0) - home.x0);
+    const rx = Number.isFinite(dropX) ? Math.round(dropX - home.x0) : feet;
+    const from = { rx: feet, dy: Number.isFinite(p?.y) ? p.y - home.groundY : 0 };
+    const check = placeCheck({ machines: [...machines.values()], rx, layout: home.layout, span: home.span, classTsid, fixed: home.fixed || [], from });
     if (!check.ok) return say(check.msg, 2600);
     const one = Number.isInteger(copy) && copy >= 0 && copy < countItem(engine.inv, classTsid) ? copy : null;
     const fuel = engine.toolState ? takeToolCopy(engine.toolState, classTsid, { copy: one ?? undefined, take: false }) : null;
@@ -1218,6 +1227,21 @@ export const homeMachinesFeature = {
     if (verbId !== 'machine_place' || !isHomeMachineClass(classTsid)) return false;
     ensure(engine)?.placeFromPack(classTsid, opts?.copy ?? null);
     return true;
+  },
+
+  /**
+   * G1303 (#669, Austin 2026-11-25): a machine dragged from the pack in Decoration Mode is set down
+   * where it is let go (`at.pointer`, from homes-feature's Decorate drop: HandOfDecorator.as
+   * dropItemFromPackOnTargetPlatform 1673-1690), the 200 px still measured from you. Any other drop
+   * of a machine keeps the general rules (null).
+   */
+  packDrop(classTsid, at, engine) {
+    if (!isHomeMachineClass(classTsid) || !at?.pointer || !Number.isFinite(at.x)) return null;
+    const s = ensure(engine);
+    if (!s) return null;
+    const copy = Number.isInteger(at.copy) ? at.copy : null;
+    if (!s.placeFromPack(classTsid, copy, at.x)) return { ok: false, reason: 'blocked', msg: '' };
+    return { ok: true, classTsid, count: 1, own: true };
   },
 
   /**

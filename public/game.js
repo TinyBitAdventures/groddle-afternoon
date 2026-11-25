@@ -4,7 +4,7 @@
  */
 import { ITEM_ICONS, ITEM_LABELS, getVerbsFor, ordinaryItems, runVerb } from './content.js?v=9fe5fa56';
 import { createErrorOnce, createFeatureHost, createFrameStages } from './js/feature-host.js?v=b87e2cbc';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=3cfab6d1';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=13710d66';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, enterHintPick, reachGlowTargets, trimmedIconUrl, drawTileArt } from './js/enter-chooser.js?v=de94bf7a';
 import { firstTendKey, STICK_TEND_DELAY_MS, STICK_TEND_DIRS, STICK_TEND_REPEAT_MS, stepTendKey, stepTendKeys, stickTendKey, tendKeyAction } from './js/garden-tend.js?v=a7470c4a';
 import { avatarHitBox, behindFloor, bodyReachDistance, OUT_OF_REACH_LINE, playerClickBox } from './js/reach.js?v=456da8a8';
@@ -676,7 +676,7 @@ import {
   recipeToolChosen,
   pluralizeItem,
 } from './js/making.js?v=1ec1075e';
-import { MAKE_FUEL_TIP, makeFuelView } from './js/home-machines.js?v=fe3d2424';
+import { MAKE_FUEL_TIP, makeFuelView } from './js/home-machines.js?v=7b36bf51';
 import { outputIconsHtml, outputsPhrase, productHaveRows, recipeOutputRows } from './js/ui/recipe-outputs.js?v=610c067f';
 import { MAKE_TOOL_SHEETS } from './js/make-tool-sheets.js?v=6f758e09';
 import { createTestTubePanel, tryTileHtml, TRY_TILE_LABEL } from './js/test-tube-panel.js?v=e5bfa842';
@@ -15302,12 +15302,14 @@ const engine = {
    * marks the dragged stack for the server's answer; `into` the like shared stack it was set on (it
    * joins it, up to its pile: no stack limit at home), `merge: false` beside one. On a shelf or table, or wherever the floor is
    * not shared (solo, offline, a class the server does not carry), it stays the owner's own decor.
+   * `pointer`: Decoration Mode let it go there (G1303: a machine is set down at that x), `copy` the
+   * copy dragged; both go to a feature's packDrop.
    */
-  dropPackStackAt(classTsid, count, x, y, { beforeRemove = null, floor = false, beforeShare = null, into = null, merge = true } = {}) {
+  dropPackStackAt(classTsid, count, x, y, { beforeRemove = null, floor = false, beforeShare = null, into = null, merge = true, pointer = false, copy = null } = {}) {
     if (!state.started || !currentStreetTsid) return { ok: false, reason: 'not_started' };
     const blocked = packDropBlockReason(classTsid);
-    // A class a feature puts down itself (the Crafty Bot): its own drop and its own reason.
-    const own = features.query('packDrop', classTsid, { x, y }, engine);
+    // A class a feature puts down itself (the Crafty Bot, a machine): its own drop and its own reason.
+    const own = features.query('packDrop', classTsid, { x, y, ...(pointer ? { pointer: true } : {}), ...(Number.isInteger(copy) ? { copy } : {}) }, engine);
     if (own?.ok) closePackPopover();
     if (own) return own;
     if (blocked) return { ok: false, reason: 'blocked', msg: blocked };

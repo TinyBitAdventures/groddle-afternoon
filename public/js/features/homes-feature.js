@@ -316,7 +316,7 @@ import { WORLD_FONT_FAMILY } from '../world-text.js?v=6b49f88c';
 import { HOUSE_ART_DIR, HOUSE_FROM_HOME_STYLE, HOUSE_STYLE_IDS, composeHouse, houseFitViewH, houseLabel, houseLot, normalizeHouse } from '../home-house.js?v=3c88c47c';
 import { closeHousePicker, housePickerOpen, openHousePicker, refreshHousePicker } from '../ui/house-picker.js?v=67f03b99';
 import { YARD_WALL_DX } from '../yard-wander.js?v=28f55f45';
-import { housePlace, towerPlace } from '../home-machines.js?v=fe3d2424';
+import { housePlace, isHomeMachineClass, towerPlace } from '../home-machines.js?v=7b36bf51';
 
 export const HOMES_FEATURE_ID = 'homes';
 const HOME_STREET_TSID = 'RH_HOME_EXT';
@@ -6112,8 +6112,11 @@ function depositInBox(engine, box, cls, count, ds = null) {
 
 // --- pack items onto shelves and tables (HandOfDecorator startWithItemFromPack, dropItemFromPackOnTargetPlatform)
 
-function packDropTarget(engine, e) {
+function packDropTarget(engine, e, what = packDrag) {
   const p = toRoom(worldPoint(engine, e));
+  // G1303 (#669): a machine stands on the floor, at the pointer's x (HandOfDecorator.as 1673-1690 sent the
+  // floor point under the pointer; features/home-machines-feature.js packDrop sets it down there).
+  if (what?.machine) return { x: p.x, y: INTERIOR.floorY, on: null };
   return stackSurfaceAt(decor, p.x, p.y);
 }
 
@@ -6152,6 +6155,19 @@ function endPackDrag(engine) {
 }
 
 /**
+ * G1303 (#669, Austin 2026-11-25): a machine dragged from the pack in Decoration Mode is set down at the
+ * pointer's x on this floor (HandOfDecorator.as dropItemFromPackOnTargetPlatform 1673-1690 sent the floor
+ * point under the pointer); features/home-machines-feature.js packDrop measures the 200 px from where you stand.
+ */
+function dropMachineAtPointer(engine, was, e) {
+  const target = packDropTarget(engine, e, was);
+  endPackDrag(engine);
+  const res = engine.dropPackStackAt?.(was.classTsid, 1, target.x + roomX0(), target.y, { pointer: true, copy: was.copy });
+  if (!res?.ok) engine.playSound?.('CLICK_FAILURE', { volume: 0.4 });
+  engine.setData('homeDropLast', res?.ok ? `machine:${was.classTsid}:${Math.round(target.x)}` : `refused:${res?.reason || ''}`);
+}
+
+/**
  * R9 (G967): Decoration Mode's drop (a pack stack onto a shelf, a table, a box or the floor; furniture
  * placed where it is let go) is a target of the drop registry (js/drop-targets.js): the mouse and the
  * touch lift both reach it. It asks before players, plots and things (DragVO.as 147: no gifts while
@@ -6163,9 +6179,11 @@ const decorateTarget = (engine) => ({
   scope: gameCanvas,
   start(d) {
     const st = d.stack;
-    if (st.from !== 'pack' || st.tool || st.bag || mode !== 'decorate' || scene?.room !== 'interior' || scene.construction) return;
+    // G1303 (#669): a machine (a pack tool here) is dragged into the room too, and set down where it is let go.
+    const machine = isHomeMachineClass(st.cls);
+    if (st.from !== 'pack' || (st.tool && !machine) || st.bag || mode !== 'decorate' || scene?.room !== 'interior' || scene.construction) return;
     // #515: the stack dragged is the one that goes (HandOfDecorator.as 527: startWithItemFromPack(dragged_itemstack.tsid)).
-    packDrag = { classTsid: st.cls, count: Math.max(1, Math.floor(Number(st.count) || 1)), furniture: Boolean(FURNITURE_CATALOG[st.cls]), ds: draggedStack(engine, st) };
+    packDrag = { classTsid: st.cls, count: Math.max(1, Math.floor(Number(st.count) || 1)), furniture: Boolean(FURNITURE_CATALOG[st.cls]), ds: draggedStack(engine, st), ...(machine ? { machine: true, copy: Number.isInteger(st.copy) ? st.copy : null } : {}) };
     if (packDrag.furniture) {
       beginPlacing(engine, st.cls, 'pack');
       carryBy = 'pointer';
@@ -6179,6 +6197,11 @@ const decorateTarget = (engine) => ({
     if (packDrag.furniture) {
       pointer = { ...worldPoint(engine, e), inside: true };
       updateGhost(engine);
+      return { ok: true };
+    }
+    if (packDrag.machine) {
+      drawPackMarker(engine, packDropTarget(engine, e));
+      engine.setData('homeDrag', `pack:${packDrag.classTsid}:machine`);
       return { ok: true };
     }
     const hit = displayDropAt(toRoom(worldPoint(engine, e)), packDrag.classTsid);
@@ -6203,6 +6226,10 @@ const decorateTarget = (engine) => ({
       const res = placeAtPointer(engine, toRoom(pointer));
       engine.setData('homeDropLast', res?.ok ? 'placed' : `refused:${res?.reason || ''}`);
       endPackDrag(engine);
+      return;
+    }
+    if (was.machine) {
+      dropMachineAtPointer(engine, was, e);
       return;
     }
     const hit = displayDropAt(toRoom(worldPoint(engine, e)), was.classTsid);

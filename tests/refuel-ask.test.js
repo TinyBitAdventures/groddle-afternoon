@@ -15,7 +15,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { REFUEL_COUNT_TITLE, machineTank, refuelCount, roomMachineVerbs } from '../public/js/machine-rooms.js?v=ca927ffd';
-import { normalizeMachine, placedMachineVerbs } from '../public/js/home-machines.js?v=fe3d2424';
+import { normalizeMachine, placedMachineVerbs } from '../public/js/home-machines.js?v=7b36bf51';
 import { refuelMachine } from '../public/js/machines.js?v=5d749d26';
 import { createInventory, countItem } from '../public/js/inventory.js?v=6414dbdc';
 import { createToolConditionState, getToolCondition } from '../public/js/tools.js?v=4156bba8';

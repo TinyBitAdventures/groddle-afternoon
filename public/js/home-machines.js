@@ -230,8 +230,20 @@ export const machineLabel = (classTsid) => MACHINE_LABELS[classTsid] || String(c
  * from the house, the street runs from -houseX to width - houseX.
  * machines: the placed ones ({ rx }) in the same place. In a room `span`
  * ({ lo, hi } in room x, roomSpan) stands for the street's ends.
+ *
+ * G1303 (#669): the 200 px is measured from the player, as Glitch measured
+ * it: canDrop asks pc.findCloseStack (machine_stand.js 775-783), which takes
+ * the distance from this.x / this.y, the player, to every stand and machine
+ * in the location (player.js 1152-1186, Euclidean). The stand itself went
+ * where the drop said (takeable.js 164-170 drop_x / drop_y), so a stand
+ * dragged in Decoration Mode could land nearer another machine than the
+ * player stood. `from` is the player: { rx, dy } in the same x as rx, and
+ * how far above or below the walk line they stand. Without it the player
+ * stands where the machine goes (a Place at your feet). The edge check is
+ * on where the machine goes (ours: Glitch tested pc.x and let the drop land
+ * anywhere on the floor's plat line, HandOfDecorator.as checkXIsInBounds).
  */
-export function placeCheck({ machines = [], rx, layout, span, classTsid, fixed = [] } = {}) {
+export function placeCheck({ machines = [], rx, layout, span, classTsid, fixed = [], from = null } = {}) {
   const label = machineLabel(classTsid);
   if (!isHomeMachineClass(classTsid)) return { ok: false, why: 'class', msg: 'That is not a machine.' };
   if (machines.length >= HOME_MACHINES_MAX) return { ok: false, why: 'many', msg: HOME_MACHINE_TEXT.placeMany };
@@ -243,7 +255,10 @@ export function placeCheck({ machines = [], rx, layout, span, classTsid, fixed =
     const wx = layout.houseX + x;
     if (wx <= MACHINE_EDGE || wx >= layout.width - MACHINE_EDGE) return { ok: false, why: 'edge', msg: HOME_MACHINE_TEXT.placeHere(label) };
   }
-  if (machines.some((m) => Math.abs(finite(m.rx) - x) < MACHINE_SPACING) || fixed.some((fx) => Math.abs(finite(fx) - x) < MACHINE_SPACING)) return { ok: false, why: 'near', msg: HOME_MACHINE_TEXT.placeHere(label) };
+  const px = Number.isFinite(Number(from?.rx)) ? Number(from.rx) : x;
+  const dy = Number.isFinite(Number(from?.dy)) ? Number(from.dy) : 0;
+  const near = (mx) => Math.hypot(finite(mx) - px, dy) < MACHINE_SPACING;
+  if (machines.some((m) => near(m.rx)) || fixed.some(near)) return { ok: false, why: 'near', msg: HOME_MACHINE_TEXT.placeHere(label) };
   return { ok: true, rx: x };
 }
 

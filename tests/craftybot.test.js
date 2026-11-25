@@ -402,8 +402,8 @@ describe('delivery and wiring', () => {
 
 describe('craftybot feature: the ingredient source and the job menu', async () => {
   // The feature imports these with their browser cache tags; load the same module instances.
-  const { craftybotFeature } = await import('../public/js/features/craftybot-feature.js?v=457743ef');
-  const { homesFeature } = await import('../public/js/features/homes-feature.js?v=77fb06d3');
+  const { craftybotFeature } = await import('../public/js/features/craftybot-feature.js?v=bc24f40c');
+  const { homesFeature } = await import('../public/js/features/homes-feature.js?v=9a298adc');
   const cbMod = await import('../public/js/craftybot.js?v=fecab8dc');
   const making = await import('../public/js/making.js?v=1ec1075e');
 
@@ -622,7 +622,7 @@ describe('craftybot feature: the ingredient source and the job menu', async () =
     it('game.js sends every drop of it to the feature, and draws no second Drop row', () => {
       const game = readFileSync(join(PUBLIC, 'game.js'), 'utf8');
       assert.match(game, /if \(!isElementClass\(classTsid\) && !features\.query\('packOwnDrop', classTsid, engine\)\) rows\.push\(\{\s*attrs: 'data-pack-drop',/);
-      assert.match(game, /dropPackStackAt\(classTsid, count, x, y, \{ beforeRemove = null, floor = false, beforeShare = null, into = null, merge = true \} = \{\}\) \{[\s\S]{0,360}const own = features\.query\('packDrop', classTsid, \{ x, y \}, engine\);\s*if \(own\?\.ok\) closePackPopover\(\);\s*if \(own\) return own;\s*if \(blocked\)/);
+      assert.match(game, /dropPackStackAt\(classTsid, count, x, y, \{ beforeRemove = null, floor = false, beforeShare = null, into = null, merge = true, pointer = false, copy = null \} = \{\}\) \{[\s\S]{0,360}const own = features\.query\('packDrop', classTsid, \{ x, y, [^}]*\} : \{\}\), [^}]*\} : \{\}\) \}, engine\);\s*if \(own\?\.ok\) closePackPopover\(\);\s*if \(own\) return own;\s*if \(blocked\)/);
       assert.match(game, /function dropPackItem\(classTsid, requested = 1\) \{[\s\S]{0,320}const own = features\.query\('packDrop', classTsid, null, engine\);\s*if \(own\) \{[\s\S]{0,120}return;\s*\}\s*if \(blocked\) \{/);
       // The item keeps no_drop, so storage boxes, the butler and trades still leave it alone.
       assert.match(readFileSync(join(PUBLIC, 'js/features/craftybot-feature.js'), 'utf8'), /tags: \['no_rube', 'no_trade', 'no_bag', 'no_drop'\]/);
@@ -685,7 +685,7 @@ describe('the quantity box follows the count as it is typed', () => {
 // sheet still loading draws nothing until it arrives. The original client had the whole SWF at
 // once, so the bot keeps its frame until the next sheet is in.
 describe('G538: the bot never draws a sheet that is still loading', async () => {
-  const { showClipWhenLoaded } = await import('../public/js/features/craftybot-feature.js?v=457743ef');
+  const { showClipWhenLoaded } = await import('../public/js/features/craftybot-feature.js?v=bc24f40c');
   const fakeIo = () => {
     const loaded = new Set();
     const waiting = [];
