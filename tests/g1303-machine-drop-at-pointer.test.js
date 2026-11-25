@@ -14,7 +14,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 import { MACHINE_SPACING, placeCheck, roomFixedXs, roomMachineSpan, roomSpan } from '../public/js/home-machines.js?v=7b36bf51';
-import { homeMachinesFeature } from '../public/js/features/home-machines-feature.js?v=2893e626';
+import { homeMachinesFeature } from '../public/js/features/home-machines-feature.js?v=3642a04a';
 import { Display, FakeEl, fakePixi } from './fake-scene.js';
 
 const root = join(import.meta.dirname, '..');

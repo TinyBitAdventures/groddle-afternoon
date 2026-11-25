@@ -28,7 +28,7 @@ import { PHONE_ZOOM_HINT, ZOOM_FIXED_NOTE, ZOOM_KEYS_HINT, clampZoom, phoneSidew
 import { NIGHT_TINT_HINT, NIGHT_TINT_LABEL } from '../night-tint.js?v=1dfc9c89';
 import { STREET_MAP_HINT, STREET_MAP_LABEL } from './street-minimap.js?v=faab86a5';
 import { focusBack } from './focus-return.js?v=da190597';
-import { applyStatColors, paintStatIcons } from '../stat-icons.js?v=b89600eb';
+import { applyStatColors, paintStatIcons } from '../stat-icons.js?v=36d17f30';
 import { VENDOR_FINDER_TEXT } from '../vendor-finder.js?v=7fbfc51d';
 
 /** The Menu's groups, in the mock's order; Social shows only when something is in it. */

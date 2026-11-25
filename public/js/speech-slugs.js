@@ -29,7 +29,7 @@
  */
 
 import { outlinePoints } from './outline-points.js?v=c9edb089';
-import { drawStatIcon, statChipPaints } from './stat-icons.js?v=b89600eb';
+import { drawStatIcon, statChipPaints } from './stat-icons.js?v=36d17f30';
 
 /** SortTools.as 96. */
 export const SLUG_ORDER = Object.freeze(['imagination', 'xp', 'energy', 'mood', 'currants', 'favor']);

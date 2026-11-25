@@ -37,7 +37,7 @@
  * kittyHiddenVerbs, kittyDemo.
  */
 
-import { slugsFromEffects } from '../speech-slugs.js?v=e79cecfa';
+import { slugsFromEffects } from '../speech-slugs.js?v=d5cc8b6f';
 import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=d787e3c3';
 import { followPath } from '../street-creatures.js?v=5ca995d4';
 import { followFloorY, landingY, nearestSurfaceY, walkSurfaceY } from '../walk-surface.js?v=3c919d5b';

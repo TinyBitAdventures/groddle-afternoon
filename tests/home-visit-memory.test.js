@@ -10,7 +10,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { HOME_VISITS_KEEP, homeVisitKey, homeVisitSeen, normalizeNeighboursSlice } from '../public/js/neighbours-mp.js?v=e912be37';
-import { polVisitLine } from '../public/js/screen-fx.js?v=39954e0b';
+import { polVisitLine } from '../public/js/screen-fx.js?v=b8548dc8';
 import { GAME_DIR } from '../tools/repos.mjs';
 
 const MIN = 60000;

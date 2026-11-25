@@ -25,8 +25,8 @@ import {
   statIconShapes,
   statIconSvg,
   statIconUrl,
-} from '../public/js/stat-icons.js?v=b89600eb';
-import { MODERN_SLUG_ICON, SLUG_STYLES, drawSlugGlyph, slugBox, slugPaint } from '../public/js/speech-slugs.js?v=e79cecfa';
+} from '../public/js/stat-icons.js?v=36d17f30';
+import { MODERN_SLUG_ICON, SLUG_STYLES, drawSlugGlyph, slugBox, slugPaint } from '../public/js/speech-slugs.js?v=d5cc8b6f';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const read = (p) => readFileSync(join(ROOT, p), 'utf8');

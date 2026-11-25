@@ -9,7 +9,7 @@
 
 import { ACHIEVEMENT_DROP, ACHIEVEMENT_ROCK_WH, achievementBubbleText, easeOutBounce, mountPetRock } from './familiar.js?v=b9597cd3';
 import { formatLoadingTime, ordinal } from './exploration.js?v=8f19e25d';
-import { artDensity, bodyFade, bodyFit, isModernSkin, momentArt, momentArtCap, momentArtShape, momentSharpUrl, rewardChips } from './ui/moment-card.js?v=35252236';
+import { artDensity, bodyFade, bodyFit, isModernSkin, momentArt, momentArtCap, momentArtShape, momentSharpUrl, rewardChips } from './ui/moment-card.js?v=00f76fc9';
 import { decodeEntities, htmlToText } from './html-text.js?v=6bbf4d1f';
 import { READ_PER_WORD_MS, wordCount } from './read-time.js?v=3151fb1a';
 

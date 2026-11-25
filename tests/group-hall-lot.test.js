@@ -16,7 +16,7 @@ import { join } from 'node:path';
 
 import { streetJobsFeature, projectApi } from '../public/js/features/street-jobs-feature.js?v=d32ec0b3';
 import { LOT_ART, LOT_CLASS, LOT_PLACEMENT, LOT_SIGN_X, LOT_TEXT, floorYAt, lotFit, lotHeadline, lotJobIds, lotVerb } from '../public/js/group-hall-lot.js?v=c4d38b81';
-import { batterflyPlacementGroups } from '../public/js/features/animal-husbandry-feature.js?v=de7aaa5d';
+import { batterflyPlacementGroups } from '../public/js/features/animal-husbandry-feature.js?v=b86bfc54';
 import { imageSize } from '../tools/image-size.mjs';
 import { Display, FakeEl, fakePixi } from './fake-scene.js';
 

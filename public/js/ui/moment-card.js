@@ -12,7 +12,7 @@
  */
 
 import { MOMENT_SHARP } from '../moment-art-list.js?v=e51336e6';
-import { statIconUrl } from '../stat-icons.js?v=b89600eb';
+import { statIconUrl } from '../stat-icons.js?v=36d17f30';
 
 /**
  * The award card's quest book (2026-11-12, Austin: "ship it if it matches"): a faithful 6x redraw

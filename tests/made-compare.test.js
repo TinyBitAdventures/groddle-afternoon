@@ -11,7 +11,7 @@ import { join } from 'node:path';
 
 import { GAME_DIR } from '../tools/repos.mjs';
 import { build, readMore } from '../tools/made-art/build-data.mjs';
-import { boxOf, compareSteps, openingStep, partView, stepFrom } from '../public/restoration/made-compare.js?v=bbd8d187';
+import { boxOf, compareSteps, openingStep, partView, stepFrom } from '../public/restoration/made-compare.js?v=274ff8a4';
 
 const readJson = (file) => JSON.parse(readFileSync(join(GAME_DIR, file), 'utf8'));
 const made = readJson('public/restoration/made.json');

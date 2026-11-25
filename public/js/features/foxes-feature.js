@@ -47,7 +47,7 @@
  * unchanged.
  */
 
-import { slugsFromEffects } from '../speech-slugs.js?v=e79cecfa';
+import { slugsFromEffects } from '../speech-slugs.js?v=d5cc8b6f';
 import { addItem, countItem, removeItem } from '../inventory.js?v=6414dbdc';
 import { getToolCondition } from '../tools.js?v=4156bba8';
 import { worldToScreen } from '../street-model.js?v=a9a05f9d';

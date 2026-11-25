@@ -9,7 +9,7 @@ import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { speechSlugList, slugsFromEffects } from '../public/js/speech-slugs.js?v=e79cecfa';
+import { speechSlugList, slugsFromEffects } from '../public/js/speech-slugs.js?v=d5cc8b6f';
 import {
   failureResponseKey,
   resourceNodeResponseKey,
@@ -18,12 +18,12 @@ import {
   verbResponse,
 } from '../public/js/verb-responses.js?v=97df8351';
 import { VERB_RESPONSE_POOLS } from '../public/js/verb-responses-data.js?v=0777b59b';
-import { runVerb } from '../public/content.js?v=9fe5fa56';
+import { runVerb } from '../public/content.js?v=3cefd46f';
 import { setTrantTables, createTrantState } from '../public/js/trants.js?v=864ea9ff';
 import { setMetabolicLossGate } from '../public/js/metabolics.js?v=48f784bf';
 import { createResourceNode, harvestResourceNode } from '../public/js/resource-nodes.js?v=90d75c60';
-import { talkbackFor } from '../public/js/features/resource-nodes-feature.js?v=e1438358';
-import { plotVerbSlugs } from '../public/js/features/patches-feature.js?v=5dbc6102';
+import { talkbackFor } from '../public/js/features/resource-nodes-feature.js?v=2f4c13e8';
+import { plotVerbSlugs } from '../public/js/features/patches-feature.js?v=00a40d74';
 import { createKitty, petKitty } from '../public/js/heli-kitties.js?v=e4af4096';
 import { createToolConditionState } from '../public/js/tools.js?v=4156bba8';
 

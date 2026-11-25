@@ -18,12 +18,12 @@ import {
   momentMoreText,
   rewardChips,
   rewardIcon,
-} from '../public/js/ui/moment-card.js?v=35252236';
-import { awardRewardTokens, awardTokens } from '../public/js/screen-fx.js?v=39954e0b';
+} from '../public/js/ui/moment-card.js?v=00f76fc9';
+import { awardRewardTokens, awardTokens } from '../public/js/screen-fx.js?v=b8548dc8';
 import { questRewardSummary } from '../public/js/quests.js?v=c8d59839';
 import { questAwardPayload } from '../public/js/quest-offers.js?v=ea6fde02';
 import { readTokens } from '../tools/tokens/css-sources.mjs';
-import { statIconUrl } from '../public/js/stat-icons.js?v=b89600eb';
+import { statIconUrl } from '../public/js/stat-icons.js?v=36d17f30';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const PUBLIC = join(root, 'public');

@@ -2814,9 +2814,24 @@
   "deployed": "2026-11-25"
  },
  "git": {
-  "commits": 3594,
+  "commits": 3599,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-25",
+    "kind": "improve",
+    "text": "The Our additions band is headed \"Our additions\", so the report's section menu reads short"
+   },
+   {
+    "date": "2026-11-25",
+    "kind": "new",
+    "text": "Restoration's \"Our additions\" section shows each addition beside the Tiny Speck original"
+   },
+   {
+    "date": "2026-11-25",
+    "kind": "improve",
+    "text": "The currant coin shows the colon sign's two strokes, like Tiny Speck's coin"
+   },
    {
     "date": "2026-11-25",
     "kind": "improve",
@@ -2921,24 +2936,9 @@
     "date": "2026-11-25",
     "kind": "fix",
     "text": "The phone page loads the link code only when a report thread has an address, keeping its first load small"
-   },
-   {
-    "date": "2026-11-25",
-    "kind": "improve",
-    "text": "Links in a report's messages can be clicked, in the game's Reports window and on the phone page"
-   },
-   {
-    "date": "2026-11-25",
-    "kind": "fix",
-    "text": "The Smugglers and the Deimaginator pop in in front of trees and barnacles"
-   },
-   {
-    "date": "2026-11-25",
-    "kind": "fix",
-    "text": "The Game Show ticket's spinning wheel draws in front of barnacles"
    }
   ]
  },
- "tests": 1401,
+ "tests": 1402,
  "generatedAt": "2026-11-25"
 }

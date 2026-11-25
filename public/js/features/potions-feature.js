@@ -136,10 +136,10 @@ import {
   usePotion,
 } from '../potions.js?v=4f4c996d';
 import { itemVerbAchievementCounters } from '../item-verbs.js?v=ecade42e';
-import { patchesFeature } from './patches-feature.js?v=5dbc6102';
-import { homesFeature } from './homes-feature.js?v=9a298adc';
-import { streetTreeIndex } from './tree-death-feature.js?v=b316360b';
-import { questRoomConverse } from './quest-instances-feature.js?v=d2566bcd';
+import { patchesFeature } from './patches-feature.js?v=00a40d74';
+import { homesFeature } from './homes-feature.js?v=5a17af25';
+import { streetTreeIndex } from './tree-death-feature.js?v=38f181f1';
+import { questRoomConverse } from './quest-instances-feature.js?v=7b93c036';
 import { itemZ } from '../item-bands.js?v=ec366be3';
 import { copyChargesLeft, copyFromLedger, keepsCopies, spendCopyCharge, verbCopy } from '../copy-charges.js?v=ab07e909';
 import { copyTag, migrateClassTag, migrateClassValue, setCopyTag, toolCopies } from '../tools.js?v=4156bba8';

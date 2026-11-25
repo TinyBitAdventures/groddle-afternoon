@@ -57,7 +57,7 @@
  *   armed:<s> | busy | start | active | qa), rookArmor, rookBalmPoints, rookDemo, rookArt, rookStats.
  */
 
-import { slugsFromEffects } from '../speech-slugs.js?v=e79cecfa';
+import { slugsFromEffects } from '../speech-slugs.js?v=d5cc8b6f';
 import { addItem, countItem, ensureItem, removeItem, ITEM_CATALOG } from '../inventory.js?v=6414dbdc';
 import { bindCountField, countKeyValue, countStepMarkup, openCountField } from '../ui/count-chooser.js?v=75f69512';
 import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=d787e3c3';

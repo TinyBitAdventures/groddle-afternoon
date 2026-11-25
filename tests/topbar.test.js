@@ -24,7 +24,7 @@ import {
   vitalRing,
   volumeLevel,
   soundChannelToggle,
-} from '../public/js/ui/topbar.js?v=95c1fdb0';
+} from '../public/js/ui/topbar.js?v=654340a1';
 
 import { GIANTS, canClaimEmblem, createShrineState, emblemCostFor, favorDisplayGiant, favorPanelRows, giantForStreet } from '../public/js/shrines.js?v=4dd7a44f';
 

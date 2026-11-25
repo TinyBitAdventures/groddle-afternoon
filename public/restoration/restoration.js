@@ -9,7 +9,7 @@
  */
 
 import { dametimeParts } from '../js/game-day.js?v=a532775d';
-import { setupMadeCompare } from './made-compare.js?v=bbd8d187';
+import { setupMadeCompare } from './made-compare.js?v=274ff8a4';
 import { settleHash } from './hash-settle.js?v=834e5782';
 
 // A #link lands on its heading after the sections below fill and grow the page (hash-settle.js), so it starts first.

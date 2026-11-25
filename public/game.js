@@ -2,14 +2,14 @@
  * Groddle Afternoon — original street geometry + layered decos
  * PixiJS 8 · locations-xml streets · CoU PNG decos · quests/items
  */
-import { ITEM_ICONS, ITEM_LABELS, getVerbsFor, ordinaryItems, runVerb } from './content.js?v=9fe5fa56';
+import { ITEM_ICONS, ITEM_LABELS, getVerbsFor, ordinaryItems, runVerb } from './content.js?v=3cefd46f';
 import { createErrorOnce, createFeatureHost, createFrameStages } from './js/feature-host.js?v=b87e2cbc';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=13710d66';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=c85fbc44';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, enterHintPick, reachGlowTargets, trimmedIconUrl, drawTileArt } from './js/enter-chooser.js?v=de94bf7a';
 import { firstTendKey, STICK_TEND_DELAY_MS, STICK_TEND_DIRS, STICK_TEND_REPEAT_MS, stepTendKey, stepTendKeys, stickTendKey, tendKeyAction } from './js/garden-tend.js?v=a7470c4a';
 import { avatarHitBox, behindFloor, bodyReachDistance, OUT_OF_REACH_LINE, playerClickBox } from './js/reach.js?v=456da8a8';
 import { createVogOverlay } from './js/vog-overlay.js?v=e883b3e3';
-import { createPromptStack } from './js/prompt-stack.js?v=19885e1b';
+import { createPromptStack } from './js/prompt-stack.js?v=09286c9b';
 import { createWindowStack } from './js/window-stack.js?v=a7104f02';
 import { HOG_HAUL_SPLASH, createGameSplash, splashFor } from './js/game-splash.js?v=dbbf1de0';
 import {
@@ -866,8 +866,8 @@ import {
   streetCardUp,
   STREET_CARD_UP,
   POL_OWNER_SIZE,
-} from './js/screen-fx.js?v=39954e0b';
-import { momentMoreText } from './js/ui/moment-card.js?v=35252236';
+} from './js/screen-fx.js?v=b8548dc8';
+import { momentMoreText } from './js/ui/moment-card.js?v=00f76fc9';
 import { CHAT_MAX_CHARS, chatBubbleText } from './js/ui/chat-input.js?v=8f2479a3';
 // HUB: the hub is the Modern skin's; Classic owns X in its skin (js/classic/classic-hub.js).
 import { MODERN, onUiModeChange, readUiCache, uiState, writeUiCache } from './js/classic/ui-mode.js?v=792d8160';
@@ -880,7 +880,7 @@ import { mountImaginationHub } from './js/ui/imagination-hub.js?v=6928c5b7';
 import { newDayBubble, shuffleNewDayMessages, waitForScreenGates } from './js/screen-queue.js?v=cf0132c0';
 import { applyFamiliarLook, familiarCardHeading, familiarLook, skillArtFor, skillLearnedActivity } from './js/familiar.js?v=b9597cd3';
 import { placeDialogueBySpeaker } from './js/speaker-card.js?v=94220469';
-import { armPromptTimeout, promptTimeoutMs } from './js/prompt-timeout.js?v=6ef50f61';
+import { armPromptTimeout, promptTimeoutMs } from './js/prompt-timeout.js?v=e358070c';
 import {
   planTravel,
   listMapDestinations,
@@ -1122,7 +1122,7 @@ import { installHiresDecos, maxTextureSizeOf } from './js/deco-hires.js?v=34f36d
 import { loadAudioLevels, loadMutedPreference, loadOtherMusic, saveAudioLevel, saveMutedPreference, saveOtherMusic } from './js/audio-pref.js?v=683f27c8';
 import { createAudioBuses, fadeGain } from './js/audio-buses.js?v=af167b54';
 import { applyAudioSession, streetMusicWanted } from './js/other-music.js?v=f58af5e6';
-import { drawHudCount, installTopBar, renderTopBar } from './js/ui/topbar.js?v=95c1fdb0';
+import { drawHudCount, installTopBar, renderTopBar } from './js/ui/topbar.js?v=654340a1';
 import { focusBack, installFocusReturn, lastInput } from './js/ui/focus-return.js?v=da190597';
 import { installContextGuard } from './js/ui/context-guard.js?v=0f71ac17';
 import { QUOIN_FRAME_BOB, advanceQuoinClock, quoinBobBetweenFrames } from './js/quoin-motion.js?v=ea0bd408';
@@ -1179,8 +1179,8 @@ import { shrineDonationResponseKey, verbResponse } from './js/verb-responses.js?
 import { RESULT_FLOAT_MAX_CHARS, resultLineRoute } from './js/verb-result-route.js?v=61b4fc9d';
 import { SUMMONED_Z, itemZ } from './js/item-bands.js?v=ec366be3';
 import { outlinePoints } from './js/outline-points.js?v=c9edb089';
-import { STAT_PAINTS } from './js/stat-icons.js?v=b89600eb';
-import { SLUG_ANIMATION, SLUG_LAYOUT, SLUG_TARGETS, drawSlugGlyph, formatRawSlugs, formatSlugList, layoutSlugRow, slugBox, slugNumber, slugPaint, slugPillPath, slugSign, speechSlugList } from './js/speech-slugs.js?v=e79cecfa';
+import { STAT_PAINTS } from './js/stat-icons.js?v=36d17f30';
+import { SLUG_ANIMATION, SLUG_LAYOUT, SLUG_TARGETS, drawSlugGlyph, formatRawSlugs, formatSlugList, layoutSlugRow, slugBox, slugNumber, slugPaint, slugPillPath, slugSign, speechSlugList } from './js/speech-slugs.js?v=d5cc8b6f';
 import { filterText } from './js/word-filter.js?v=9a7a7ebb'; // the remake's own word filter
 import { mountStartStreet } from './js/start-street.js?v=7d8ce49c'; // #349: the start card names the save's street
 import { arrangeMapCards, fitMapExtras } from './js/map-extras.js?v=16e261b1'; // the Map's Shortcuts

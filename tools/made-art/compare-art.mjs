@@ -29,7 +29,7 @@ import { join } from 'node:path';
 
 import { GAME_DIR } from '../repos.mjs';
 import { imageSize } from '../image-size.mjs';
-import { statIconInner, statIconSvg } from '../../public/js/stat-icons.js';
+import { statIconInner, statIconSvg } from '../../public/js/stat-icons.js?v=36d17f30';
 
 export const COMPARE = join(GAME_DIR, 'tools/made-art/compare.json');
 export const DIR = 'public/assets/made-art/compare';

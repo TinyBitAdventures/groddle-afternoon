@@ -26,7 +26,7 @@ import {
   screenInput,
   showAwardScreen,
   showNewDayScreen,
-} from '../public/js/screen-fx.js?v=39954e0b';
+} from '../public/js/screen-fx.js?v=b8548dc8';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const PUBLIC = join(root, 'public');

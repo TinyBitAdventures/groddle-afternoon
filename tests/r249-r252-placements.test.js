@@ -33,7 +33,7 @@ import {
   streetGardenBoxes,
   streetReservedSpots,
 } from '../public/js/street-ecology.js?v=58aafb61';
-import { resourcePlacementGroups, resourceSpawnPlan } from '../public/js/features/resource-nodes-feature.js?v=e1438358';
+import { resourcePlacementGroups, resourceSpawnPlan } from '../public/js/features/resource-nodes-feature.js?v=2f4c13e8';
 import { JELLISAC_SPOTS, PEAT_SPOTS } from '../public/js/node-spots-data.js?v=97d4281c';
 import { bedKind, createGarden, fitGardenToBed, plantPlot } from '../public/js/garden.js?v=a7c6f521';
 import { bedKey, parsePlotId } from '../public/js/shared-gardens.js?v=464472e5';

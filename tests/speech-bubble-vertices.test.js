@@ -15,7 +15,7 @@ import { fileURLToPath } from 'node:url';
 import vm from 'node:vm';
 import { outlinePoints, OUTLINE_EPSILON } from '../public/js/outline-points.js?v=c9edb089';
 import { placeSpeechTail, speechBubbleOutline, SPEECH_BUBBLE_RADIUS } from '../public/js/speech-placement.js?v=0371ea0c';
-import { SLUG_LAYOUT, SLUG_STYLES, drawSlugIcon, slugBox, slugPillPath } from '../public/js/speech-slugs.js?v=e79cecfa';
+import { SLUG_LAYOUT, SLUG_STYLES, drawSlugIcon, slugBox, slugPillPath } from '../public/js/speech-slugs.js?v=d5cc8b6f';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const read = (p) => readFileSync(join(ROOT, p), 'utf8');
