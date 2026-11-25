@@ -19,6 +19,7 @@ import {
   flipFurniture,
   furnishDemoRoom,
   furnitureScale,
+  furnitureSize,
   grantStarterKit,
   interiorWidth,
   listPlaceable,
@@ -135,6 +136,22 @@ describe('decorating the house', () => {
     const rug = placeFurniture(state, inv, 'furniture_rug', { x: 500 });
     assert.equal(rug.item.slot, 'rug');
     assert.equal(placeFurniture(state, inv, 'furniture_chair', { x: 500 }).reason, 'none');
+  });
+
+  it('G1292 (#669): a wall piece goes as high as Glitch let it, its top on the wall plane 355 px over the walk line', () => {
+    // inc_homes.js 1514-1522: the wall plat 75 px over the walk line with a 280 px plane;
+    // HandOfDecorator.as 1164-1169: the point may rise while height_it_takes stays under the plane.
+    const state = createHomeDecorState();
+    const inv = { bag_furniture_sdb: 2, furniture_shelf: 1 };
+    const box = placeFurniture(state, inv, 'bag_furniture_sdb', { x: 500, y: 0 }).item;
+    const { h } = furnitureSize('bag_furniture_sdb');
+    assert.equal(box.y - h, INTERIOR.floorY - 355);
+    assert.equal(INTERIOR.floorY - box.y, 355 - h);
+    const shelf = placeFurniture(state, inv, 'furniture_shelf', { x: 800, y: INTERIOR.floorY - 300 }).item;
+    assert.equal(INTERIOR.floorY - shelf.y, Math.min(300, 355 - furnitureSize('furniture_shelf').h));
+    // A save keeps a piece Glitch allowed where it is (fitPlacements clamps with the same rule).
+    const saved = createHomeDecorState({ placed: [{ id: 1, classTsid: 'bag_furniture_sdb', slot: 'wall', x: 500, y: INTERIOR.floorY - 355 + h, z: 1 }] });
+    assert.equal(saved.placed[0].y, INTERIOR.floorY - 355 + h);
   });
 
   it('clamps onto the bookshelf plat, clear of the end caps (inc_homes.js 1497-1532)', () => {

@@ -71,9 +71,22 @@ export const INTERIOR = Object.freeze({
   ceilingTop: 620 - 428,
   floorFront: 620 + 43,
   endCapW: 76,
-  wallMarginTop: 14,
   wallMarginBottom: 22,
 });
+/**
+ * The wall placement plat (inc_homes.js homes_rebuild_floor 1514-1522, inc_geo_builder.js
+ * geo_builder_room_plats 134-142): 118 + frame_height up, the walk line being 43 + frame_height
+ * up (inc_homes.js 930-931), so 75 px over the walk line, with a placement plane 280 px tall.
+ * HandOfDecorator.as 1164-1169 lets a wall piece's point go up the plane as long as the art it
+ * takes (height_it_takes, from the point to the art's top, 1144-1149) stays under the plane's top:
+ * the art's top no higher than 355 px over the walk line (G1292, report #669).
+ */
+export const WALL_PLAT = Object.freeze({ rise: 75, planeHeight: 280 });
+
+/** The highest a wall piece `h` px tall may stand (its art's bottom, world y): its top on the wall plane's top. */
+export function wallTopY(h) {
+  return INTERIOR.floorY - WALL_PLAT.rise - WALL_PLAT.planeHeight + h;
+}
 /** tower.js tower_get_geo_config / tower_get_bounds: one tower floor. */
 export const TOWER_ROOM = Object.freeze({
   wallSegments: 6,
@@ -475,7 +488,7 @@ function fitPlacements(state, legacy) {
     else if (set) row.y = restY(row.classTsid, set, row.upgradeId);
     else if (row.slot === 'wall') {
       const h = furnitureSize(row.classTsid, row.upgradeId).h;
-      const top = INTERIOR.wallTop + INTERIOR.wallMarginTop + h;
+      const top = wallTopY(h);
       const bottom = INTERIOR.floorY - INTERIOR.wallMarginBottom;
       row.y = Math.round(Math.max(top, Math.min(bottom, row.y)));
     }
@@ -727,7 +740,7 @@ export function snapPlacement(state, classTsid, at = {}, excludeId = null, upgra
   const x = horizontalClamp(state, classTsid, at.x, upgradeId, set);
   const { h } = furnitureSize(classTsid, upgradeId);
   if (def.slot === 'wall') {
-    const top = INTERIOR.wallTop + INTERIOR.wallMarginTop + h;
+    const top = wallTopY(h);
     const bottom = INTERIOR.floorY - INTERIOR.wallMarginBottom;
     const y = Math.round(Math.max(top, Math.min(bottom, finite(at.y, (top + bottom) / 2))));
     return { x, y, slot: 'wall', on: null };
