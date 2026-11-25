@@ -89,9 +89,13 @@ export const HALL_TEXT = Object.freeze({
   locked: 'Opens once a group claims this project.', // ours
   shucks: 'Aw, shucks', // quest.js:1367
   paid: (n) => `You paid ${n.toLocaleString()} currants to claim the project.`, // ours
-  owned: (group) => `Finished. ${group} owns this group hall.`, // ours (quest.js:1849-1861)
-  noStreet: 'Only its members may enter, once there is a street to enter: the hall\'s own street is not in the public archive, and the original never made one.', // ours (quest.js:1844)
-  built: (group) => `${group} owns a new group hall!`, // ours
+  owned: (group) => `Finished. This Group Hall belongs to ${group}.`, // ours (quest.js:1849-1861)
+  // G1301 (#696, Austin 2026-11-25): plain about the street. Glitch opened the hall's own street
+  // to its members (quest.js:1844-1859); that street is not in the archive, so it comes later.
+  noStreet: 'Its street will open in a later update.', // ours
+  built: (group, street) => `${group} owns the Group Hall${street ? ` on ${street}` : ''}! Its street will open in a later update.`, // ours
+  // G1301: the finish dialog's page about the hall (ours).
+  finished: (group, street) => `The Group Hall belongs to ${group} now. Its street will open in a later update.${street ? ` Until then, its lot on ${street} and Menu > Groups show whose hall it is.` : ''}`,
   // #502: your own claim while the street asks the site (ours; JobDialog.as closes on "Yes, I can!" and waits).
   yourClaim: 'Claiming this hall for your group... the street is checking with the ledger.',
   // #502: no answer before the wait ran out (ours).

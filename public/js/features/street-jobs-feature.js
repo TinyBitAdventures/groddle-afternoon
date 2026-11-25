@@ -149,7 +149,7 @@ import {
   sharedSlice,
   topLine,
   leaderboard,
-} from '../street-jobs-mp.js?v=c99c5cd4';
+} from '../street-jobs-mp.js?v=5b45cedc';
 import { grantMoodXp } from '../mood-xp.js?v=e311b45c';
 import { createMinnAccount } from '../minn-account.js?v=7c3bdd51';
 import { normalizeGroups } from '../groups.js?v=a0391f9a';
@@ -1295,12 +1295,12 @@ function finishJob(engine, jobId, out, solo) {
  * the archive, so there is no script and no road.
  */
 function finishHall(engine, jobId, job, contributions, note) {
-  const group = state.jobs[jobId]?.hall?.group?.name || 'The group';
+  const group = state.jobs[jobId]?.hall?.group?.name || 'its group';
   return {
     title: job.title,
     steps: [
       { text: `Hooray! The project ${job.title} has been completed! Your contributions: ${contributions}`, response: 'View Rewards' },
-      { text: `The hall is built for ${group}. ${HALL_TEXT.noStreet}`, response: 'Continue' },
+      { text: HALL_TEXT.finished(group, hallStreetName(jobId)), response: 'Continue' },
       { text: note, response: 'OK' },
     ],
   };
@@ -2344,7 +2344,7 @@ function createMp(engine, client) {
     if (job?.kind === 'hall' && msg.hall?.group?.name) {
       const row = state.jobs[jobId];
       if (row) row.hall = { ...(row.hall || {}), claimed: true, owned: true, group: { id: n0(msg.hall.group.id), name: String(msg.hall.group.name).slice(0, 40) } };
-      if (job.connecting.includes(engine.streetTsid)) engine.toast(HALL_TEXT.built(String(msg.hall.group.name).slice(0, 40)), 3200);
+      if (job.connecting.includes(engine.streetTsid)) engine.toast(HALL_TEXT.built(String(msg.hall.group.name).slice(0, 40), hallStreetName(jobId)), 5000);
     }
     drawBarricades(engine);
     refresh();

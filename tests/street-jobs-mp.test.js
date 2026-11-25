@@ -31,7 +31,7 @@ import {
   sharedSlice,
   topLine,
   leaderboard,
-} from '../public/js/street-jobs-mp.js?v=c99c5cd4';
+} from '../public/js/street-jobs-mp.js?v=5b45cedc';
 import {
   isJobBuilt,
   jobStatus,
@@ -284,7 +284,7 @@ describe('the site ledger counts project records (src/LedgerMath.php)', () => {
 
 describe('ticket 190: the final card of a shared project names your share', () => {
   it('contributedKey is the key markContributed records', async () => {
-    const { contributedKey } = await import('../public/js/street-jobs-mp.js?v=c99c5cd4');
+    const { contributedKey } = await import('../public/js/street-jobs-mp.js?v=5b45cedc');
     const state = { phasesContributed: [] };
     markContributed(state, 'job-g-123', 'job_street_baq_12');
     assert.deepEqual(state.phasesContributed, [contributedKey('job-g-123', 'job_street_baq_12')]);

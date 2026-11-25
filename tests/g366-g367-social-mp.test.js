@@ -14,9 +14,9 @@ import { readZip } from '../tools/avatar-compositor/xfl.mjs';
 import { createRealtimeClient, CORE_KINDS } from '../public/js/realtime-client.js?v=9471ca67';
 import { TYPING_EVERY_MS, TYPING_MS, TYPING_OVERLAY, typingCounts } from '../public/js/features/realtime-feature.js?v=258fc1f0';
 import { BUTLER_IM_TEXT, BUTLER_IM_VERBS, HELP_AGAIN_MS, commandHelp, imDelayMs, imLine, imText, normalizeImPrefs, parseButlerIm } from '../public/js/butler-im.js?v=44783638';
-import { butlerImFeature, BUTLER_TAB } from '../public/js/features/butler-im-feature.js?v=724b7c14';
-import { slashCommandsFeature } from '../public/js/features/slash-commands-feature.js?v=5f30b1d0';
-import { FEATURES } from '../public/js/features/index.js?v=99156436';
+import { butlerImFeature, BUTLER_TAB } from '../public/js/features/butler-im-feature.js?v=fe0485e8';
+import { slashCommandsFeature } from '../public/js/features/slash-commands-feature.js?v=0e14688e';
+import { FEATURES } from '../public/js/features/index.js?v=9245908b';
 
 const root = join(import.meta.dirname, '..');
 const read = (rel) => readFileSync(join(root, rel), 'utf8');
@@ -199,7 +199,7 @@ describe('G367 the Butler IM: the feature', () => {
     // tick(1000) this used to take on the real clock, and one Jeeves line was missing.
     t.mock.timers.enable({ apis: ['setTimeout', 'Date'], now: 1_000_000 });
     t.mock.method(Math, 'random', () => 0.999);
-    const { butlerApi } = await import('../public/js/features/butler-feature.js?v=8c32b4bd');
+    const { butlerApi } = await import('../public/js/features/butler-feature.js?v=47610a80');
     t.mock.method(butlerApi, 'owned', () => true);
     t.mock.method(butlerApi, 'label', () => 'Jeeves');
     const streetSaid = [];
@@ -254,7 +254,7 @@ describe('G367 the Butler IM: the feature', () => {
     // The delays are spaced by Date.now while the timers keep their own clock: under load the two
     // drift apart, and a slow first IM once showed after a quick second one (full suite 2026-11-04).
     t.mock.timers.enable({ apis: ['setTimeout'] });
-    const { butlerApi } = await import('../public/js/features/butler-feature.js?v=8c32b4bd');
+    const { butlerApi } = await import('../public/js/features/butler-feature.js?v=47610a80');
     t.mock.method(butlerApi, 'owned', () => true);
     t.mock.method(butlerApi, 'label', () => 'Jeeves');
     let clock = 1_000_000;

@@ -12,6 +12,7 @@
  * - On the hall's street the lot stays, Tiny Speck's roped plot and sign with "<group>'s Group
  *   Hall" over it (the server's row: hall.owned and the group's shown name), and visiting it says
  *   the street is not open yet.
+ * - The finish dialog and the toast say the hall is the group's and its street opens later.
  *
  * Run: GRODDLE_SITE_DIR=<site checkout> node --test tests/g1301-group-hall-owned.test.js
  */
@@ -22,8 +23,9 @@ import { existsSync, readFileSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { join } from 'node:path';
 
-import { streetJobsFeature, projectApi } from '../public/js/features/street-jobs-feature.js?v=b79619d8';
+import { streetJobsFeature, projectApi } from '../public/js/features/street-jobs-feature.js?v=8501a8d0';
 import { HALL_STREETS, LOT_CLASS, LOT_PLACEMENT, LOT_SIGN_X, OWNED_TEXT, hallStreetName, lotOwner, ownedVerb } from '../public/js/group-hall-lot.js?v=c4d38b81';
+import { HALL_TEXT } from '../public/js/street-jobs-mp.js?v=5b45cedc';
 import { hallOf, normalizeGroup, normalizeGroups } from '../public/js/groups.js?v=a0391f9a';
 import { Display, FakeEl, fakePixi } from './fake-scene.js';
 import { GAME_DIR, HAS_SITE, SITE_DIR } from '../tools/repos.mjs';
@@ -51,10 +53,12 @@ describe('the hall streets (js/group-hall-lot.js HALL_STREETS)', () => {
     assert.equal(OWNED_TEXT.name('Experimental Builder'), "Experimental Builder's Group Hall");
     assert.equal(OWNED_TEXT.name('A Private Group'), "A Private Group's Group Hall");
     assert.equal(OWNED_TEXT.row('Archimedes Acres'), 'Group Hall: Archimedes Acres');
-    for (const t of [OWNED_TEXT.name('X'), OWNED_TEXT.row('Y'), OWNED_TEXT.details('Y'), OWNED_TEXT.closed]) {
+    for (const t of [OWNED_TEXT.name('X'), OWNED_TEXT.row('Y'), OWNED_TEXT.details('Y'), OWNED_TEXT.closed, HALL_TEXT.noStreet, HALL_TEXT.owned('X'), HALL_TEXT.built('X', 'Y'), HALL_TEXT.finished('X', 'Y')]) {
       assert.ok(!t.includes('—'), t);
       assert.ok(!/public archive|never made one/.test(t), t);
     }
+    assert.equal(HALL_TEXT.built('Experimental Builder', 'Archimedes Acres'), 'Experimental Builder owns the Group Hall on Archimedes Acres! Its street will open in a later update.');
+    assert.equal(HALL_TEXT.finished('Experimental Builder', 'Archimedes Acres'), 'The Group Hall belongs to Experimental Builder now. Its street will open in a later update. Until then, its lot on Archimedes Acres and Menu > Groups show whose hall it is.');
   });
 });
 
@@ -206,6 +210,27 @@ describe('the lot on the hall\'s street (multiplayer)', () => {
     streetJobsFeature.onTick(16, Date.now(), engine);
     assert.equal(streetJobsFeature._state().lot.label, "A Private Group's Group Hall");
     assert.equal(engine.entityLayer.children.filter((c) => c.label === 'group-hall-lot-owner' && !c.destroyed).length, 1, 'one name, redrawn');
+  });
+
+  it('the toast says whose hall it is and that its street opens later', () => {
+    toasts.length = 0;
+    emit({ t: 'project_built', now: Date.now(), job: '692', at: Date.now(), option: '', rest: {}, hall: { group: { id: 3, name: 'Experimental Builder' } } });
+    assert.ok(toasts.includes('Experimental Builder owns the Group Hall on Archimedes Acres! Its street will open in a later update.'), toasts.join(' | '));
+  });
+
+  it('the finish dialog says the hall belongs to the group and its street opens later', async () => {
+    const job = catalog.halls.jobs['692'];
+    const [p0, p1] = job.phases.map((p) => p.classTsid);
+    awards.length = 0;
+    emit({
+      t: 'project_reward', id: 'job-r-692-1-g1301-1', job: '692', phase: 1, cls: p1, final: true, share: 0, participation: 0,
+      rewards: { xp: 0, currants: 0, mood: 0, energy: 0, favor: [] }, performance: { xp: 0, mood: 0, energy: 0, currants: 0, items: [], favor: [] },
+      winner: false, top5: false, phases: 1, option: '', readyAt: 0, count: 3, cost: 0, total: 100, finisher: false, shares: { [p0]: 50, [p1]: 50 }, complete: true,
+    });
+    await wait(5);
+    const text = JSON.stringify(awards);
+    assert.match(text, /The Group Hall belongs to Experimental Builder now\. Its street will open in a later update\. Until then, its lot on Archimedes Acres and Menu > Groups show whose hall it is\./);
+    assert.doesNotMatch(text, /public archive|never made one/);
   });
 });
 
