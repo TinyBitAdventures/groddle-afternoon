@@ -12,11 +12,11 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { createAudioResumer } from '../public/js/audio-resume.js?v=63a617ad';
+import { createAudioResumer } from '../public/js/audio-resume.js?v=d5628e7b';
 import { createMusicVoice } from '../public/js/music-voice.js?v=75c8cf57';
-import { BACKGROUND_SOUND_LABEL, backgroundSoundDefault, createBackgroundSound } from '../public/js/background-sound.js?v=00000000';
-import { BACKGROUND_SOUND_KEY, loadBackgroundSound, saveBackgroundSound } from '../public/js/audio-pref.js?v=80d433c3';
-import { backgroundSoundToggle } from '../public/js/ui/topbar.js?v=42e72cdd';
+import { BACKGROUND_SOUND_LABEL, backgroundSoundDefault, createBackgroundSound } from '../public/js/background-sound.js?v=d40d26b7';
+import { BACKGROUND_SOUND_KEY, loadBackgroundSound, saveBackgroundSound } from '../public/js/audio-pref.js?v=683f27c8';
+import { backgroundSoundToggle } from '../public/js/ui/topbar.js?v=2bae59d5';
 
 const root = join(import.meta.dirname, '..');
 const read = (rel) => readFileSync(join(root, rel), 'utf8');

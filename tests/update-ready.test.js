@@ -429,7 +429,7 @@ describe('the offer on an upright phone (G926, #455)', () => {
     assert.match(portrait, /\.more-list #menu-update-btn:not\(\[hidden\]\) \{ display: flex;/);
     assert.match(portrait, /\.more-menu:has\(#menu-update-btn:not\(\[hidden\]\)\) #more-btn::before \{ content: '';/, 'a dot on the Menu');
     assert.match(src, /^#menu-update-btn \{ display: none; \}$/m, 'off a phone held upright the row never shows');
-    const { menuRowFor } = await import('../public/js/ui/topbar.js?v=42e72cdd');
+    const { menuRowFor } = await import('../public/js/ui/topbar.js?v=2bae59d5');
     assert.deepEqual(menuRowFor('menu-update-btn', { phone: true }), { group: 'now', rank: -1 });
   });
 });

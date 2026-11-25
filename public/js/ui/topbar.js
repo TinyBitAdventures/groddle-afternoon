@@ -21,9 +21,9 @@
  * The pure helpers below are tested without a DOM (tests/topbar.test.js).
  */
 import { vitalLevel, vitalTitle } from '../vitals.js?v=85a51302';
-import { loadAudioRestore, saveAudioRestore } from '../audio-pref.js?v=80d433c3';
+import { loadAudioRestore, saveAudioRestore } from '../audio-pref.js?v=683f27c8';
 import { OTHER_MUSIC_HINT, OTHER_MUSIC_LABEL } from '../other-music.js?v=f58af5e6';
-import { BACKGROUND_SOUND_HINT, BACKGROUND_SOUND_LABEL } from '../background-sound.js?v=00000000';
+import { BACKGROUND_SOUND_HINT, BACKGROUND_SOUND_LABEL } from '../background-sound.js?v=d40d26b7';
 import { PHONE_ZOOM_HINT, ZOOM_FIXED_NOTE, ZOOM_KEYS_HINT, clampZoom, phoneSideways, phoneZoomEnds, phoneZoomLabel, phoneZoomValueText, zoomLabel, zoomValueText } from '../world-zoom.js?v=38816228';
 import { NIGHT_TINT_HINT, NIGHT_TINT_LABEL } from '../night-tint.js?v=1dfc9c89';
 import { STREET_MAP_HINT, STREET_MAP_LABEL } from './street-minimap.js?v=ccb6cb94';

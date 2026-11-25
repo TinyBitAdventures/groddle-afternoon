@@ -22,7 +22,7 @@
  * Controls: the Sound popover (js/ui/topbar.js, Modern and Classic) and Preferences on `,`
  * (js/classic/classic-prefs.js).
  */
-import { loadBackgroundSound, saveBackgroundSound } from './audio-pref.js?v=80d433c3';
+import { loadBackgroundSound, saveBackgroundSound } from './audio-pref.js?v=683f27c8';
 
 export const BACKGROUND_SOUND_LABEL = 'Keep playing sound in the background';
 export const BACKGROUND_SOUND_HINT = 'Music and sounds go on while you are in another tab or app.';

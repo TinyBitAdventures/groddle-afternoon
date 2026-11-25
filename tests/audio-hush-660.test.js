@@ -16,9 +16,9 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { HUSH_EVENTS, RESUME_EVENTS, audioHushPlan, createAudioResumer } from '../public/js/audio-resume.js?v=63a617ad';
+import { HUSH_EVENTS, RESUME_EVENTS, audioHushPlan, createAudioResumer } from '../public/js/audio-resume.js?v=d5628e7b';
 import { createMusicVoice } from '../public/js/music-voice.js?v=75c8cf57';
-import { createBackgroundSound } from '../public/js/background-sound.js?v=00000000';
+import { createBackgroundSound } from '../public/js/background-sound.js?v=d40d26b7';
 
 const root = join(import.meta.dirname, '..');
 const tick = () => new Promise((r) => setTimeout(r, 0));

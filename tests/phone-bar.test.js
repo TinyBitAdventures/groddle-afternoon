@@ -10,7 +10,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { MENU_GROUPS, MENU_ROWS, PHONE_MENU_GROUP, menuRowFor, phoneBar, studyRowDetail } from '../public/js/ui/topbar.js?v=42e72cdd';
+import { MENU_GROUPS, MENU_ROWS, PHONE_MENU_GROUP, menuRowFor, phoneBar, studyRowDetail } from '../public/js/ui/topbar.js?v=2bae59d5';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const css = readFileSync(join(root, 'public/style.css'), 'utf8');
