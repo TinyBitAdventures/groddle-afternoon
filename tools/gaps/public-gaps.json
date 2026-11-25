@@ -5742,6 +5742,36 @@
       "commits": [
         "server:9696271"
       ]
+    },
+    {
+      "id": "G1018",
+      "area": "Homes",
+      "text": "Visitors could see inside any house and act on nothing in its back yard; now only key holders and visitors let in see it, and they can dig and gather there.",
+      "show": "fixing",
+      "commits": [
+        "game:fad4e7d80d0",
+        "site:f557a40",
+        "server:52340a7"
+      ]
+    },
+    {
+      "id": "G1297",
+      "area": "Drawing",
+      "text": "The Game Show wheel, the Smugglers and the Deimaginator drew behind barnacles and trees.",
+      "show": "fixing",
+      "commits": [
+        "game:0eb6a6ec08c",
+        "game:223c4c61b43"
+      ]
+    },
+    {
+      "id": "G1298",
+      "area": "Web",
+      "text": "The Players page sorted only by newest and name.",
+      "show": "fixing",
+      "commits": [
+        "site:07936be"
+      ]
     }
   ]
 }

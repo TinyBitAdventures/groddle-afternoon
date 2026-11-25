@@ -1,6 +1,6 @@
 {
   "note": "Written by tools/gaps/build-data.mjs from tools/gaps/public-gaps.json and the coverage register. Edit those, never this file.",
-  "release": "v0.71.0",
+  "release": "v0.72.0",
   "states": {
     "fixing": {
       "label": "Being fixed",
@@ -42,7 +42,7 @@
     "fixing": 3,
     "known": 15,
     "unreleased": 0,
-    "fixed": 573,
+    "fixed": 576,
     "lost": 5,
     "purpose": 17,
     "idea": 10
@@ -1377,6 +1377,12 @@
           "text": "A visitor didn't see Dirt Piles, Peat Bogs or Patches in a friend's back yard.",
           "state": "fixed",
           "version": "v0.71.0"
+        },
+        {
+          "id": "G1018",
+          "text": "Visitors could see inside any house and act on nothing in its back yard; now only key holders and visitors let in see it, and they can dig and gather there.",
+          "state": "fixed",
+          "version": "v0.72.0"
         },
         {
           "id": "G48",
@@ -4139,6 +4145,12 @@
           "text": "Public pages for a home street and a Tower, as Glitch's site had.",
           "state": "fixed",
           "version": "v0.71.0"
+        },
+        {
+          "id": "G1298",
+          "text": "The Players page sorted only by newest and name.",
+          "state": "fixed",
+          "version": "v0.72.0"
         }
       ]
     },
@@ -4156,6 +4168,17 @@
           "text": "A musicblock's bubble could be held back after chatting.",
           "state": "fixed",
           "version": "v0.71.0"
+        }
+      ]
+    },
+    {
+      "name": "Drawing",
+      "items": [
+        {
+          "id": "G1297",
+          "text": "The Game Show wheel, the Smugglers and the Deimaginator drew behind barnacles and trees.",
+          "state": "fixed",
+          "version": "v0.72.0"
         }
       ]
     }
