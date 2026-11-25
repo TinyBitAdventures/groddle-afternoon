@@ -17,7 +17,18 @@
  * snapshot quests that went), so with the card Enter takes a Snap there:
  * this feature asks `cameraSnap` (engine, { end }) on Enter and
  * `cameraSnapHint` (engine, range) for the line under "Camera Mode". Solo
- * answers neither and stays the looking part only.
+ * (G1286) answers both too: the same Snap, saved to the device instead of the site.
+ *
+ * G1286 (Austin 2026-11-25, a house file in solo: "pressing enter to take a shot started to interact
+ * with the items, like the machine tools"): while Camera Mode is on, the street's own keys and clicks
+ * never reach the world, solo or online. Glitch's Camera Mode took the focus (CameraMan.as
+ * startUserMode 420-423: requestFocus), and TSMainView.blur (538-559) called
+ * LocationInputHandler.stopListeningForControlEvts (115-131), which took away the street's click and
+ * double click and its keys (stopListeningForKeyEvts 149-163: ENTER and the number keys 1-5, NUMPAD
+ * 1-5 and H); CameraMan's own Enter snapped (onEnterKey 679-683), C and Esc left (664-677). Here
+ * cameraKey says which key Camera Mode keeps: Enter (a Snap; Shift+Enter the whole house), and E, the
+ * Menu key or Shift+F10 and the emote keys 1-5 (nothing at all). A phone's Act presses Enter
+ * (game.js touchAct) and is hidden meanwhile (html.camera-mode-on); its press does nothing either.
  *
  * G387 (main.js doCameraModeStarted 6853-6868, doCameraModeEnded 6896-6899):
  * everyone else on the street sees Tiny Speck's eyeballing bubble over a
@@ -69,6 +80,28 @@ const PAN_KEYS = {
   arrowup: [0, -1], w: [0, -1],
   arrowdown: [0, 1], s: [0, 1],
 };
+
+/**
+ * PURE (G1286): what Camera Mode does with a keydown that is not C, Esc or a pan key: 'snap' (Enter),
+ * 'whole' (Shift+Enter), 'held' (a key that would act on the street: E, the Menu key or Shift+F10,
+ * the emote keys 1-5; LocationInputHandler.as 134-163 listened to Enter, 1-5 and H), or null (the
+ * key goes on: the map, panels and the rest, which end Camera Mode as before). A phone's Act (its
+ * scripted Enter, touchAct) is 'held': Act never snaps or works the street while looking.
+ */
+export function cameraKey(e) {
+  if (!e || e.metaKey || e.ctrlKey || e.altKey) return null;
+  const key = String(e.key || '');
+  const k = key.toLowerCase();
+  if (k === 'enter') {
+    if (e.touchAct) return 'held';
+    return e.shiftKey ? 'whole' : 'snap';
+  }
+  if (key === 'ContextMenu' || (key === 'F10' && e.shiftKey)) return 'held';
+  if (e.shiftKey) return null;
+  if (k === 'e') return 'held';
+  if (/^[1-5]$/.test(key) || /^(?:Digit|Numpad)[1-5]$/.test(String(e.code || ''))) return 'held';
+  return null;
+}
 
 /** The pan limit for a player: 400 px, or unlimited with Eyeballery. */
 export function cameraRange(learned = []) {
@@ -343,16 +376,21 @@ function attach(engine) {
       return;
     }
     if (!active) return;
-    // G1284: Shift+Enter snaps the whole house (Tower, street) at your own home, and says why not elsewhere.
-    if (k === 'enter' && e.shiftKey && !e.metaKey && !e.ctrlKey && !e.altKey && snapWholeNow(engine)) {
-      e.preventDefault();
+    // A Snap's own dialog (the polaroid, solo's Download) takes its own keys (by its class: the
+    // canvas carries data-snap-dialog as QA data).
+    if (e.target?.closest?.('.snap-shade')) return;
+    // G1286: the street never hears Enter, E, the Menu key or the emote keys while looking (cameraKey).
+    const kept = cameraKey(e);
+    if (kept) {
+      // A focused button (the whole-house button, Done) still answers its own Enter.
+      const onButton = Boolean(e.target?.closest?.('button, a[href]'));
+      if (!onButton) e.preventDefault();
       e.stopImmediatePropagation();
-      return;
-    }
-    // G332: Enter snaps in multiplayer with Snapshottery (CameraManView.as 189, CameraMan.as snap).
-    if (k === 'enter' && !e.metaKey && !e.ctrlKey && !e.altKey && engine.query?.('cameraSnap', engine, { end: () => setActive(engine, false) }) === true) {
-      e.preventDefault();
-      e.stopImmediatePropagation();
+      if (onButton || e.repeat || kept === 'held') return;
+      // G1284: Shift+Enter snaps the whole house (Tower, street) at your own home, and says why not elsewhere.
+      if (kept === 'whole' && snapWholeNow(engine)) return;
+      // G332, G1286: Enter snaps with Snapshottery (CameraManView.as 189, CameraMan.as snap), solo or online.
+      engine.query?.('cameraSnap', engine, { end: () => setActive(engine, false) });
       return;
     }
     if (k === 'escape') {

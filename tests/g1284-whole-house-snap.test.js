@@ -484,7 +484,8 @@ describe('Camera Mode wiring and the home picture refresh', () => {
     const src = read('public/js/features/camera-mode-feature.js');
     assert.match(src, /data-camera-whole/);
     assert.match(src, /cameraWholeLabel/);
-    assert.match(src, /k === 'enter' && e\.shiftKey[^\n]*snapWholeNow\(engine\)/);
+    assert.match(src, /if \(kept === 'whole' && snapWholeNow\(engine\)\) return;/);
+    assert.match(src, /return e\.shiftKey \? 'whole' : 'snap';/, 'cameraKey: Shift+Enter is the whole picture (G1286)');
     const css = read('public/style.css');
     assert.match(css, /\.camera-mode-whole \{/);
     assert.match(css, /:root\.touch-phone \.camera-mode-whole/, 'a phone gets a tap-sized button');
