@@ -18,7 +18,7 @@ import { execFileSync, spawnSync } from 'node:child_process';
 import { MP_PARTY_TEXT, MP_SPACE_STREET_RE, kickVerb, mpActivationBlock, normalizeSpace, partyFromSpace } from '../public/js/party-spaces-mp.js?v=4d6c5b85';
 import { PARTY_PACKS, PARTY_SPACES, PARTY_TEXT, normalizePartyRecord } from '../public/js/party-spaces.js?v=b026ad60';
 import { partySpacesFeature } from '../public/js/features/party-spaces-feature.js?v=93d68cdb';
-import { sharedStreet } from '../public/js/features/realtime-feature.js?v=b94e0fbd';
+import { sharedStreet } from '../public/js/features/realtime-feature.js?v=258fc1f0';
 import { HAS_SERVER, HAS_SITE, SITE_DIR, serverPath, sitePath } from '../tools/repos.mjs';
 
 const root = join(import.meta.dirname, '..');

@@ -58,7 +58,7 @@
  * camera-solo-download): Glitch had no solo game; its snaps always went to the site.
  */
 
-import { createMinnAccount } from '../minn-account.js?v=db081871';
+import { createMinnAccount } from '../minn-account.js?v=7c3bdd51';
 import { exposeQA } from '../qa-gate.js?v=f4e2cd82';
 import { worldCanvasFont } from '../world-text.js?v=6b49f88c';
 import { ITEM_CATALOG, countItem, ensureItem, itemIcon } from '../inventory.js?v=6414dbdc';

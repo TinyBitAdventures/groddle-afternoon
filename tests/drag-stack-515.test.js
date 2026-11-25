@@ -21,7 +21,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { addItem, createInventory, removeItem } from '../public/js/inventory.js?v=6414dbdc';
-import { bagsFeature } from '../public/js/features/bags-feature.js?v=3b0fb8a1';
+import { bagsFeature } from '../public/js/features/bags-feature.js?v=ff85dea5';
 import { bindToolInventory, createToolConditionState, setToolRemaining, toolCopies } from '../public/js/tools.js?v=4156bba8';
 import { draggedCount, draggedHere, draggedStack, markDragged, takeDragged } from '../public/js/drag-stack.js?v=80e43757';
 import { runDrop } from '../public/js/features/world-drop-feature.js?v=744cb52d';

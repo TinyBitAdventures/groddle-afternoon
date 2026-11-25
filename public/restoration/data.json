@@ -2814,9 +2814,14 @@
   "deployed": "2026-11-25"
  },
  "git": {
-  "commits": 3566,
+  "commits": 3571,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-25",
+    "kind": "new",
+    "text": "A group's administrator can rename the group from Menu, Groups, and members' chat tabs take the new name"
+   },
    {
     "date": "2026-11-25",
     "kind": "fix",
@@ -2931,11 +2936,6 @@
     "date": "2026-11-25",
     "kind": "improve",
     "text": "The whole-house picture stacks the floors without the attic and the earth"
-   },
-   {
-    "date": "2026-11-25",
-    "kind": "improve",
-    "text": "Stacks set down on furniture and floors show no number badge, as in Glitch"
    }
   ]
  },

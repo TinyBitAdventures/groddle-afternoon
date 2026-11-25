@@ -19,8 +19,8 @@ import { describe, it } from 'node:test';
 import { readFileSync } from 'node:fs';
 import { pathToFileURL } from 'node:url';
 import { HAS_SITE, serverPath, sitePath, skipWithoutServer, skipWithoutSite } from '../tools/repos.mjs';
-import { dropLid } from '../public/js/groups.js?v=f998f548';
-import { deletedSummary } from '../public/js/features/chat-threads-feature.js?v=bbd05010';
+import { dropLid } from '../public/js/groups.js?v=2a2c49ab';
+import { deletedSummary } from '../public/js/features/chat-threads-feature.js?v=a6452db9';
 
 const src = (f) => readFileSync(sitePath(f), 'utf8');
 const game = (f) => readFileSync(new URL(`../public/js/${f}`, import.meta.url), 'utf8');

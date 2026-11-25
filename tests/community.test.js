@@ -21,9 +21,9 @@ import { reactionsFile, reactionsJson } from '../tools/build-reactions.mjs';
 import { linkSegments } from '../public/js/chat-links.js?v=b717fac7';
 import { NAMES_SHOWN, REACTIONS } from '../public/js/chat-reactions.js?v=38460172';
 import { NOTICE_MAX, communityNoticeHtml, communityNoticesFrom, normalCommunityNotice } from '../public/js/community-notices.js?v=f676c372';
-import { EARLIER_MAX, WEB_TAG, chatLine, historyKey, mergeEarlier, oldestLid, shownName } from '../public/js/groups.js?v=f998f548';
+import { EARLIER_MAX, WEB_TAG, chatLine, historyKey, mergeEarlier, oldestLid, shownName } from '../public/js/groups.js?v=2a2c49ab';
 import { mergeEarlierIms, oldestAt } from '../public/js/player-im.js?v=87bdb8ec';
-import { communityMpFeature, createCommunitySession } from '../public/js/features/community-mp-feature.js?v=ccec08fb';
+import { communityMpFeature, createCommunitySession } from '../public/js/features/community-mp-feature.js?v=fe869e90';
 
 const root = join(import.meta.dirname, '..');
 const read = (p) => readFileSync(join(root, p), 'utf8');

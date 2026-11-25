@@ -55,7 +55,7 @@
  */
 
 import { purgeOf, withoutPurged } from '../chat-purge.js?v=6c41f62d';
-import { createMinnAccount } from '../minn-account.js?v=db081871';
+import { createMinnAccount } from '../minn-account.js?v=7c3bdd51';
 import { saveStore } from '../save-store.js?v=4e720735';
 import {
   CHANNELS,
@@ -88,7 +88,7 @@ import {
   shownName,
   tabOrder,
   writeMemory,
-} from '../groups.js?v=f998f548';
+} from '../groups.js?v=2a2c49ab';
 import { appendLinkedText } from '../chat-links.js?v=b717fac7';
 import { lineKey as reactKey } from '../chat-reactions.js?v=38460172';
 import { DELETE_TEXT, deletableChannel, lineLidOf, mayDelete } from '../chat-delete.js?v=c55a1043';

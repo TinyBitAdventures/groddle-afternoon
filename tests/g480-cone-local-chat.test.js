@@ -11,7 +11,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 import { createRealtimeClient } from '../public/js/realtime-client.js?v=9471ca67';
-import { LOCAL_SUSPENDED } from '../public/js/features/realtime-feature.js?v=b94e0fbd';
+import { LOCAL_SUSPENDED } from '../public/js/features/realtime-feature.js?v=258fc1f0';
 import { SITE_DIR, skipWithoutSite } from '../tools/repos.mjs';
 
 const root = join(import.meta.dirname, '..');

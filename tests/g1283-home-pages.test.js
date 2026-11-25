@@ -29,7 +29,7 @@ import {
   FAILURE_BACKOFF_MS, HOME_REFRESH_MS, HOME_SETTLE_MS, HOME_STALE_DELAY_MS, RETRY_MS, TOWER_MAX, TOWER_MAX_BYTES, TOWER_QUALITIES, TOWER_SHOT_WIDTH,
   towerKeyOf, towerShotDue,
 } from '../public/js/profiles.js?v=7caf2524';
-import { createMinnAccount } from '../public/js/minn-account.js?v=db081871';
+import { createMinnAccount } from '../public/js/minn-account.js?v=7c3bdd51';
 import { drawTower, markHomeStale, profilesFeature, profilesState, towerTick, uploadTower } from '../public/js/features/profiles-feature.js?fresh=g1283';
 import { renderHomeShot } from '../public/js/home-shot-render.js?v=b1875d75';
 import { PUBLIC_HIDE, publicHidden, withPublicView } from '../public/js/public-picture.js?v=1a0b03fa';
