@@ -64,12 +64,12 @@ import { NOTE_POLE_CONTAINERS, NOTE_POLE_PARTS, NOTE_POLE_SIGN_Y } from '../note
 import { textureFromUrl } from '../textures.js?v=b8e38103';
 import { addSignBoard, signArmWidth, signLabel } from '../street-render.js?v=cd2b2649';
 import { openNotePicker, openNoteView } from '../note-view.js?v=c512b345';
-import { homeStreetName, insideQuery, possessive, readVisitScene } from '../neighbours-mp.js?v=e912be37';
-import { BACK_YARD_GROUND_Y, SIGN_PROMPT_LIFT, STREET_GROUND_Y, homesFeature, visitorHomeState } from './homes-feature.js?v=2a83f537';
+import { homeStreetName, insideQuery, possessive, readVisitScene } from '../neighbours-mp.js?v=f43b50c8';
+import { BACK_YARD_GROUND_Y, SIGN_PROMPT_LIFT, STREET_GROUND_Y, homesFeature, visitorHomeState } from './homes-feature.js?v=7d259b4d';
 import { BENCH_ART, towerApi } from './home-tower-feature.js?v=0721ea89';
 import { readTowerFloorWire, towerFloorProject, towerFloorWire } from '../home-tower.js?v=a7fc0cce';
-import { projectApi } from './street-jobs-feature.js?v=15b3553e';
-import { giveCarriedNote, takeCarriedNote, writtenCarriedNotes } from './street-furniture-feature.js?v=62ba9888';
+import { projectApi } from './street-jobs-feature.js?v=dc66b964';
+import { giveCarriedNote, takeCarriedNote, writtenCarriedNotes } from './street-furniture-feature.js?v=6557ce42';
 import { saveStore, savedThrough } from '../save-store.js?v=4e720735';
 import {
   GOOD_NEIGHBOUR_AT,
@@ -107,7 +107,7 @@ import {
   saleVerbs,
   signpostArms,
   signpostCandidates,
-} from '../home-street-mp.js?v=2b921da4';
+} from '../home-street-mp.js?v=01294fc8';
 import { standOnFeet } from '../sprite-feet.js?v=6358a697';
 import { WORLD_FONT_FAMILY } from '../world-text.js?v=6b49f88c';
 
@@ -296,7 +296,7 @@ function createSession(engine, client) {
   function currentPoles() {
     const w = where();
     if (w === 'street' || w === 'house') return slice.poles.filter((p) => p.room === w);
-    if (w === 'visit') return (visit?.data?.poles || []).map(normalizePole).filter((p) => p && p.room === (visit.room === 'interior' ? 'house' : 'street'));
+    if (w === 'visit') return visit?.floor ? [] : (visit?.data?.poles || []).map(normalizePole).filter((p) => p && p.room === (visit.room === 'interior' ? 'house' : 'street'));
     return [];
   }
 
@@ -732,7 +732,9 @@ function createSession(engine, client) {
   async function onVisit(info) {
     // Ticket 51: the storage feature draws the visited house's cabinets and boxes.
     engine.query?.('homeStorageVisit', info, engine);
-    visit = { owner: info.owner, name: info.name, room: info.room, key: info.key === true, view: info.view, data: null, listed: new Map(),
+    // R5 (G1313): an upper floor of the house (floor 1 or 2) is the house too, its x its own; its Note
+    // Poles, sales and restorations are the ground floor's and the yard's, so none show up there.
+    visit = { owner: info.owner, name: info.name, room: info.room, floor: info.room === 'interior' ? Number(info.floor) || 0 : 0, key: info.key === true, view: info.view, data: null, listed: new Map(),
       pieces: info.spots?.pieces || [], roomX: Number(info.spots?.roomX) || 0, houseX: 0 };
     const v = visitorHomeState(info.view);
     visit.houseX = homeStreetLayout(v.cult).houseX;
@@ -755,7 +757,7 @@ function createSession(engine, client) {
   }
 
   function drawVisit() {
-    if (!visit?.data || where() !== 'visit') return;
+    if (!visit?.data || where() !== 'visit' || visit.floor > 0) return;
     for (const e of drawn.protos.values()) drop(e);
     drawn.protos = new Map();
     if (visit.room === 'street') {
@@ -1369,7 +1371,8 @@ function createSession(engine, client) {
     /**
      * G1190: the home place I stand in, mine or one I visit, for drops-mp-feature: { owner, room
      * ('street' | 'interior' | 'tower'), floor, houseX (the house's x as drawn here: on the street,
-     * or the house's left end indoors), own }, or null (an upper floor of the house, anywhere else).
+     * or the house's left end on its ground floor; an upper floor and a Tower floor start at 0), own },
+     * or null anywhere else. Every floor of the house is the house (R5, G1313).
      */
     dropOrigin() {
       const w = where();
@@ -1379,13 +1382,14 @@ function createSession(engine, client) {
       if (seen?.room === 'tower') return { owner: seen.owner, room: 'tower', floor: seen.floor, houseX: 0, own: false };
       if (w === 'visit') {
         if (visit.room === 'street' && seen?.room === 'street') return { owner: visit.owner, room: 'street', floor: 0, houseX: visit.houseX, own: false };
-        if (visit.room === 'interior' && seen?.room === 'interior') return { owner: visit.owner, room: 'interior', floor: 0, houseX: visit.roomX, own: false };
+        if (visit.room === 'interior' && seen?.room === 'interior' && seen.floor === (visit.floor || 0)) return { owner: visit.owner, room: 'interior', floor: seen.floor, houseX: seen.floor ? 0 : visit.roomX, own: false };
         return null;
       }
-      // My own Tower floor (the homes feature's scene: a room with a tower floor).
+      // My own Tower floor or upper house floor (the homes feature's scene: a room with a tower floor, or houseFloor).
       const home = engine.homeContext?.() || {};
       const scene = homesFeature._state?.()?.scene;
       if (home.inHome && scene?.room === 'interior' && Number.isInteger(scene.tower) && scene.tower >= 0) return { owner: me(), room: 'tower', floor: scene.tower, houseX: 0, own: true };
+      if (home.inHome && scene?.room === 'interior' && scene.tower == null && Number(scene.houseFloor) > 0) return { owner: me(), room: 'interior', floor: Number(scene.houseFloor), houseX: 0, own: true };
       return null;
     },
     saleLock(decor, id) {

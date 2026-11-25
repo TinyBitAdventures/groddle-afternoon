@@ -116,8 +116,8 @@ import { cultivationDef, homeStreetLayout } from '../home-cultivation.js?v=2f71b
 import { getPlot, tickGarden } from '../garden.js?v=a7c6f521';
 import { BUTLER_RIG_SCALE, ButlerPainter, butlerRigNow, loadButlerRig } from '../butler-rig.js?v=3acda854';
 import { BUTLER, BUTLER_INFO, butlerInfoText, butlerPostRx, normalizeButlerParts } from '../butler.js?v=152429c8';
-import { butlerApi } from './butler-feature.js?v=a968be64';
-import { homesFeature, visitorHomeScene, visitorHomeState } from './homes-feature.js?v=2a83f537';
+import { butlerApi } from './butler-feature.js?v=415f45f2';
+import { homesFeature, visitorHomeScene, visitorHomeState } from './homes-feature.js?v=7d259b4d';
 import { visitRadio } from '../vine-radio.js?v=c001a82c';
 import { homeMusicFile } from '../homes.js?v=dca6b2cd';
 import { streetStyleFor } from '../home-styles.js?v=ec5d2f69';
@@ -181,9 +181,9 @@ import {
   forgetInside,
   insideProof,
   rememberInside,
-} from '../neighbours-mp.js?v=e912be37';
+} from '../neighbours-mp.js?v=f43b50c8';
 import { itemZ } from '../item-bands.js?v=ec366be3';
-import { butlerCarries, registerButlerDrop } from '../butler-drop.js?v=ca9caf37';
+import { butlerCarries, registerButlerDrop } from '../butler-drop.js?v=1c38769b';
 import { takeDragged } from '../drag-stack.js?v=4321c8c6';
 import { worldPoint } from './world-drop-feature.js?v=bd8479a1';
 import { clampToExpansion, elevatorStops, floorJobFor, TOWER_JOBS } from '../home-tower.js?v=a7fc0cce';
@@ -197,6 +197,8 @@ const CLASS_FRONT = 'mp_home_front_door';
 const CLASS_TOWER = 'mp_home_tower';
 const CLASS_LIFT = 'mp_home_tower_elevator';
 const CLASS_TOWER_EXIT = 'mp_home_tower_exit';
+/** R5 (G1313): a Door between the visited house's floors (furniture_door.js: no verb asks who you are). */
+const CLASS_STAIRS = 'mp_home_floor_door';
 /** G795: the Workbench on the floor under construction (tower_expander). */
 const CLASS_BENCH = 'mp_home_tower_bench';
 /** gifts-feature's wrapped Gift Box (js/gifts.js GIFT_WRAPPED). */
@@ -290,7 +292,7 @@ function createSession(engine, client) {
   const me = () => Number(client.me?.id) || 0;
 
   function publish() {
-    engine.setData?.('neighboursVisit', visit ? `${visit.owner}:${visit.room}${visit.room === 'tower' ? `:${visit.floor}` : ''}` : '');
+    engine.setData?.('neighboursVisit', visit ? `${visit.owner}:${visit.room}${visit.room === 'tower' || (visit.room === 'interior' && visit.floor) ? `:${visit.floor}` : ''}` : '');
     engine.setData?.('neighboursKeys', keys ? `${keys.given.length}/${keys.received.length}` : '');
     engine.setData?.('neighboursLast', last);
     engine.setData?.('neighboursAllow', visitors ? String(visitors.allow === true) : '');
@@ -430,18 +432,18 @@ function createSession(engine, client) {
   }
 
   /** The visit scene for a room, through the loading card. */
-  async function show(room, { arrive = '', floor = 0, via = '', at = null } = {}) {
+  async function show(room, { arrive = '', floor = 0, via = '', at = null, doorX = null } = {}) {
     if (!visit) return;
     showing += 1;
     try {
-      await showScene(room, { arrive, floor, via, at });
+      await showScene(room, { arrive, floor, via, at, doorX });
     } finally {
       showing -= 1;
     }
   }
 
-  async function showScene(room, { arrive, floor, via, at, quiet = false }) {
-    const built = visitorHomeScene(engine, visit.view, room, { returnLabel: wayOutOf(visit.returnTo).label, floor, via });
+  async function showScene(room, { arrive, floor, via, at, doorX = null, quiet = false }) {
+    const built = visitorHomeScene(engine, visit.view, room, { returnLabel: wayOutOf(visit.returnTo).label, floor, via, doorX });
     const tower = room === 'tower' ? visitorHomeState(visit.view).tower : null;
     const stop = tower ? elevatorStops(tower).find((row) => row.index === built.floor) : null;
     const label = room === 'interior' ? houseName(visit.name) : room === 'tower' ? visitedTowerName(visit.name, tower) : homeStreetName(visit.name);
@@ -476,7 +478,8 @@ function createSession(engine, client) {
     const setup = () => {
       if (!visit) return;
       visit.room = room;
-      visit.floor = room === 'tower' ? built.floor : 0;
+      // R5 (G1313): a floor of the house too (0 the ground floor), as a Tower floor.
+      visit.floor = room === 'tower' || room === 'interior' ? Number(built.floor) || 0 : 0;
       visit.construction = room === 'tower' && built.construction === true;
       engine.enterScene(scene);
       dropButler();
@@ -486,7 +489,7 @@ function createSession(engine, client) {
       engine.redrawDroppedStacks?.();
       registerTargets(room, spots);
       // HOMES3 (features/home-street-mp-feature.js): the signpost, Note Poles, furniture for sale and restorations here.
-      if (room !== 'tower') engine.query?.('homeStreetVisit', { owner: visit.owner, name: visit.name, room, key: visit.key, view: visit.view, built, spots }, engine);
+      if (room !== 'tower') engine.query?.('homeStreetVisit', { owner: visit.owner, name: visit.name, room, floor: visit.floor, key: visit.key, view: visit.view, built, spots }, engine);
       // G1245: the owner's Vine Radio (features/vine-radio-feature.js draws it, its notes and label; null when none stands here).
       engine.query?.('homeRadioVisit', { owner: visit.owner, name: visit.name, room, radio: room === 'street' ? spots?.radio || null : null, quiet: quiet === true }, engine);
       if (room === 'street') {
@@ -534,7 +537,9 @@ function createSession(engine, client) {
       // G795: the floor going up has its Workbench, and anyone here may help build it.
       if (spots.workbench) t.bench = engine.register({ classId: CLASS_BENCH, featureId: NEIGHBOURS_MP_FEATURE_ID, label: 'Workbench', subtitle: `Construct ${TOWER_JOBS[floorJobFor(tw.floors)]?.title || 'a new floor'}`, sprite: spots.workbench, state: { owner: visit.owner } });
     } else {
-      t.front = engine.register({ classId: CLASS_FRONT, featureId: NEIGHBOURS_MP_FEATURE_ID, label: 'Front Door', subtitle: `Back to ${homeStreetName(visit.name)}`, sprite: spots.door, state: { owner: visit.owner } });
+      // Only the ground floor has the front door (homes_get_floor_config); every floor its Doors between floors (R5).
+      if (spots.door) t.front = engine.register({ classId: CLASS_FRONT, featureId: NEIGHBOURS_MP_FEATURE_ID, label: 'Front Door', subtitle: `Back to ${homeStreetName(visit.name)}`, sprite: spots.door, state: { owner: visit.owner } });
+      t.stairs = (spots.doors || []).map((d) => engine.register({ classId: CLASS_STAIRS, featureId: NEIGHBOURS_MP_FEATURE_ID, label: 'Door', subtitle: d.label, sprite: d.sprite, state: { owner: visit.owner, dest: d.dest } }));
     }
     visit.targets = t;
     visit.gardens = new Set(spots.gardens || []);
@@ -1325,6 +1330,16 @@ function createSession(engine, client) {
     show('street', { arrive: 'door' });
   }
 
+  /**
+   * R5 (G1313): through a Door between the house's floors, standing at the Door it leads to (the
+   * owner's goToHouseFloor). The realtime server lets in whoever it let into the house (homes.go gate).
+   */
+  function goFloor(dest) {
+    if (!visit || visit.room !== 'interior' || !dest || !Number.isInteger(dest.floor) || dest.floor === visit.floor) return;
+    engine.playSound?.('DOOR_OPEN', { volume: 0.5 });
+    show('interior', { floor: dest.floor, doorX: dest.x, via: 'door' });
+  }
+
   /** MPVISIT: the floors a visitor may ride to; G795: the floor under construction too (its Workbench takes help). */
   function towerStops(tw) {
     return elevatorStops(tw);
@@ -1604,6 +1619,7 @@ function createSession(engine, client) {
     if (!visit.key || msg.why === 'revoked') {
       const homes = { ...(visit.view.homes || {}) };
       delete homes.decor;
+      delete homes.floors;
       delete homes.backYard;
       delete homes.yardStyle;
       visit.view = { ...visit.view, homes, inside: false, backYardLive: false };
@@ -1847,8 +1863,8 @@ function createSession(engine, client) {
       }
       if (visit && readVisitScene(engine.streetTsid)?.owner !== visit.owner) return '';
       const scene = homesFeature._state?.().scene;
-      // An upper house floor (G153, home-floors.js) is a room of its own, a street of the owner's alone
-      // (G1249: its machines are the server's word); a Tower floor is shared with its visitors (MPVISIT).
+      // An upper house floor (G153, home-floors.js) is a room of its own, a street of its own (G1249: its
+      // machines are the server's word), shared with the house's visitors (R5, G1313) as a Tower floor (MPVISIT).
       const houseFloor = Number(scene?.houseFloor) > 0 ? Number(scene.houseFloor) : 0;
       const ownTowerFloor = Number.isInteger(scene?.tower) ? scene.tower : null;
       return sharedHomeStreet({ visit, me: me(), inHome: home.inHome === true, room: home.room, houseFloor, ownTowerFloor });
@@ -1872,6 +1888,11 @@ function createSession(engine, client) {
       if (target.classId === CLASS_DOOR) return doorVerbs({ key: visit.key, letIn: visit.letIn, ownerName: visit.name });
       if (target.classId === CLASS_GATE) return [{ id: 'go_back', label: T.goBackVerb, tooltip: `Back to ${labelOf(visit.returnTo)}`, enabled: true, reason: '' }];
       if (target.classId === CLASS_FRONT) return [{ id: 'go_outside', label: T.outsideVerb, tooltip: `Back to ${homeStreetName(visit.name)}`, enabled: true, reason: '' }];
+      // R5 (G1313): furniture_door.js's way between floors, the owner's own Door verb (homes-feature doorVerbs).
+      if (target.classId === CLASS_STAIRS) {
+        const dest = target.state?.dest;
+        return dest ? [{ id: 'floor_go', label: dest.dir === 'up' ? 'Go up' : 'Go down', tooltip: target.subtitle || '', enabled: true, reason: '', primary: true }] : [];
+      }
       if (target.classId === CLASS_TOWER) return [{ id: 'enter_tower', label: 'enter', tooltip: `Go inside ${target.label}`, enabled: true, reason: '' }];
       if (target.classId === CLASS_TOWER_EXIT) return [{ id: 'leave_tower', label: 'leave tower', tooltip: `Back to ${homeStreetName(visit.name)}`, enabled: true, reason: '' }];
       // G795: tower_expander construct, "Construct a new floor" (anyone; the owner alone starts one).
@@ -1891,6 +1912,7 @@ function createSession(engine, client) {
       else if (verbId === 'knock') knock();
       else if (verbId === 'go_back') goBack();
       else if (verbId === 'go_outside') goOutside();
+      else if (verbId === 'floor_go' && target.classId === CLASS_STAIRS) goFloor(target.state?.dest);
       else return false;
       return true;
     },
@@ -1952,7 +1974,7 @@ function createSession(engine, client) {
     /** QA, ticket 112: my Butler's gift on the site and the visits noted (class:count/visitors). */
     get stock() { return stockLast; },
     loadTending,
-    /** QA: stand beside the visited Butler ('butler'), your own ('ownbutler'), or the first garden bed ('garden'), then E opens its menu. */
+    /** QA: stand beside the visited Butler ('butler'), your own ('ownbutler'), the first garden bed ('garden') or a Door between floors ('stairs'), then E opens its menu. */
     standNear(what = 'butler') {
       const p = engine.player;
       let x = null;
@@ -1962,6 +1984,7 @@ function createSession(engine, client) {
         const e = visit ? [...visit.beds.keys()][0] : (engine.interactables || []).find((t) => t.classId === 'garden_new');
         x = e?.sprite?.x;
       } else if (['tower', 'lift', 'exit'].includes(what) && visit?.targets?.[what]) x = visit.targets[what].sprite?.x;
+      else if (what === 'stairs') x = visit?.targets?.stairs?.[0]?.sprite?.x;
       if (!p || !Number.isFinite(x)) return false;
       p.x = x;
       p.vx = 0;

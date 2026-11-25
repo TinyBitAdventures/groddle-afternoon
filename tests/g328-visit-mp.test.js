@@ -26,8 +26,8 @@ import {
   visitorRock,
 } from '../public/js/yard-stock-mp.js?v=c91f13b7';
 import { normalizeYardActs } from '../public/js/yard-verbs-mp.js?v=14d12d1c';
-import { nodeKeyMap, rockItems } from '../public/js/features/homes-feature.js?v=2a83f537';
-import { homeStreetFor, readVisitScene, sharedHomeStreet, visitSceneTsid } from '../public/js/neighbours-mp.js?v=e912be37';
+import { nodeKeyMap, rockItems } from '../public/js/features/homes-feature.js?v=7d259b4d';
+import { homeStreetFor, readVisitScene, sharedHomeStreet, visitSceneTsid } from '../public/js/neighbours-mp.js?v=f43b50c8';
 import { streetObjectsFeature } from '../public/js/features/street-objects-feature.js?v=30392f9b';
 import { HAS_SERVER, HAS_SITE, SITE_DIR, serverPath } from '../tools/repos.mjs';
 import { HAS_PHP, PHP } from './php.js';
@@ -181,10 +181,10 @@ describe('a Tower floor is a street of its own, the same for its owner and visit
     assert.equal(homeStreetFor(7, 'tower', 3), 'TOWER_7_3');
     assert.equal(visitSceneTsid(7, 'tower', 2), 'MPH_7_T2');
     assert.deepEqual(readVisitScene('MPH_7_T2'), { owner: 7, room: 'tower', floor: 2 });
-    assert.deepEqual(readVisitScene('MPH_7_IN'), { owner: 7, room: 'interior' });
+    assert.deepEqual(readVisitScene('MPH_7_IN'), { owner: 7, room: 'interior', floor: 0 });
     assert.equal(sharedHomeStreet({ visit: { owner: 7, room: 'tower', floor: 1 } }), 'TOWER_7_1');
     assert.equal(sharedHomeStreet({ me: 7, inHome: true, ownTowerFloor: 1, towerFloor: false }), 'TOWER_7_1');
-    assert.equal(sharedHomeStreet({ me: 7, inHome: true, towerFloor: true }), '', 'an upper house floor stays the owner\'s room');
+    assert.equal(sharedHomeStreet({ me: 7, inHome: true, towerFloor: true }), '', 'a room with no floor named shares no street');
   });
 });
 

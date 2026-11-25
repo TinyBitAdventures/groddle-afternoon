@@ -36,13 +36,13 @@ import {
   teachMenu,
   tickGnome,
   visitGnomePlace,
-} from '../public/js/garden-gnome.js?v=d9f8e52b';
-import { gardenGnomeFeature as feature } from '../public/js/features/garden-gnome-feature.js?v=15f01fad';
+} from '../public/js/garden-gnome.js?v=73026b57';
+import { gardenGnomeFeature as feature } from '../public/js/features/garden-gnome-feature.js?v=766babf9';
 import { worldArtFor } from '../public/js/world-art.js?v=a67514c8';
 import { GNOME_ART, GNOME_ART_DIR } from '../public/js/garden-gnome-art.js?v=994b7c76';
 import { HOME_STREET_TSID } from '../public/js/homes.js?v=dca6b2cd';
-import { normalizeHomeView, readVisitScene } from '../public/js/neighbours-mp.js?v=e912be37';
-import { neighboursMpFeature } from '../public/js/features/neighbours-mp-feature.js?v=4d6a7b7b';
+import { normalizeHomeView, readVisitScene } from '../public/js/neighbours-mp.js?v=f43b50c8';
+import { neighboursMpFeature } from '../public/js/features/neighbours-mp-feature.js?v=54c421f3';
 import { HAS_SITE, SITE_DIR, sitePath } from '../tools/repos.mjs';
 import { HAS_PHP, PHP } from './php.js';
 
@@ -307,7 +307,8 @@ describe('a gnome keeps its place beside the house when the home grows (G640)', 
     feature.homeRoomShifted('street', 600, null);
     const state = { systems: { features: { 'garden-gnome': feature.save() } } };
     const out = JSON.parse(execFileSync(PHP, ['-r', `foreach (["WordFilter", "Neighbours"] as $c) require ${JSON.stringify(SITE_DIR)} . "/src/$c.php"; echo json_encode(Groddle\\Minn\\Neighbours::gnomeRows(json_decode(${JSON.stringify(JSON.stringify(state))}), true));`]).toString());
-    assert.deepEqual(out.map((g) => [g.id, g.place, g.x]), [['st', 'street', 1400], ['ho', 'house', 1700], ['to', 'tower:2', 400]]);
+    // R5 (G1313): an upper floor's gnome goes to whoever may enter too, its x its own (it never moved).
+    assert.deepEqual(out.map((g) => [g.id, g.place, g.x]), [['st', 'street', 1400], ['ho', 'house', 1700], ['up', 'house:1', 300], ['to', 'tower:2', 400]]);
   });
 });
 
@@ -406,10 +407,14 @@ describe('someone else\'s gnome, on a visit (multiplayer)', () => {
   it('names the room a visitor stands in as the owner\'s gnome does', () => {
     assert.equal(visitGnomePlace(readVisitScene('MPH_7')), 'street');
     assert.equal(visitGnomePlace(readVisitScene('MPH_7_IN')), 'house');
+    // R5 (G1313): an upper floor of the house is a room a visitor reaches.
+    assert.equal(visitGnomePlace(readVisitScene('MPH_7_IN1')), 'house:1');
+    assert.equal(visitGnomePlace(readVisitScene('MPH_7_IN2')), 'house:2');
+    assert.equal(readVisitScene('MPH_7_IN3'), null);
     assert.equal(visitGnomePlace(readVisitScene('MPH_7_T2')), 'tower:2');
     assert.equal(visitGnomePlace(readVisitScene('GLI2V0UN7RD1T2J')), null);
     assert.equal(visitGnomePlace({ room: 'tower', floor: 12 }), null);
-    // The owner's own names for the same rooms (an upper house floor is no room a visitor reaches).
+    // The owner's own names for the same rooms.
     assert.equal(gnomePlaceFor({ room: 'street' }, { inHome: true }), 'street');
     assert.equal(gnomePlaceFor({ room: 'interior' }, { inHome: true }), 'house');
     assert.equal(gnomePlaceFor({ room: 'interior', tower: 2 }, { inHome: true }), 'tower:2');
@@ -420,15 +425,16 @@ describe('someone else\'s gnome, on a visit (multiplayer)', () => {
     const list = normalizeVisitGnomes([
       ...placed,
       { id: 'up', place: 'house:1', x: 1, y: 1 },
+      { id: 'up3', place: 'house:3', x: 1, y: 1 },
       { id: 'bad id', place: 'street', x: 1, y: 1 },
       { id: 'nox', place: 'street', y: 1 },
       { id: 'talk', place: 'street', x: 9.6, y: 870.2, phrases: ['a', '', 'b', 'c', 'd', 'x'.repeat(400)] },
       'junk',
       null,
     ]);
-    assert.deepEqual(list.map((g) => g.id), ['gs1', 'gh1', 'gt2', 'talk']);
+    assert.deepEqual(list.map((g) => g.id), ['gs1', 'gh1', 'gt2', 'up', 'talk']);
     assert.deepEqual(list[0], { facingLeft: false, phrases: ['Welcome!'], id: 'gs1', place: 'street', x: 812, y: 870 });
-    assert.deepEqual([list[3].x, list[3].y, list[3].phrases], [10, 870, ['a', 'b', 'c']]);
+    assert.deepEqual([list[4].x, list[4].y, list[4].phrases], [10, 870, ['a', 'b', 'c']]);
     assert.deepEqual(normalizeVisitGnomes(null), []);
     assert.equal(normalizeVisitGnomes(Array.from({ length: 200 }, (_, i) => ({ id: `g${i}`, place: 'street', x: i, y: 0 }))).length, GNOME_VISIT_MAX);
     // The visit's view carries them; a site from before the list gives none.
@@ -490,14 +496,17 @@ describe('someone else\'s gnome, on a visit (multiplayer)', () => {
     ], packed: [{ phrases: ['in the pack'] }] } } } };
     const run2 = (s, key) => execFileSync(PHP, ['-r', `foreach (["WordFilter", "Neighbours"] as $c) require ${JSON.stringify(SITE_DIR)} . "/src/$c.php"; echo json_encode(Groddle\\Minn\\Neighbours::gnomeRows(json_decode(${JSON.stringify(JSON.stringify(s))}), ${key ? 'true' : 'false'}));`]).toString();
     const noKey = JSON.parse(run2(state, false));
-    assert.deepEqual(noKey.map((g) => [g.id, g.place, g.x, g.y, g.facingLeft]), [['gs1', 'street', 812, 870, false], ['gh1', 'house', 300, 620, true], ['gt2', 'tower:2', 55, 620, true]]);
+    // R5 (G1313): an upper floor's gnome is listed as the ground floor's is (forVisitor keeps both from anyone outside).
+    assert.deepEqual(noKey.map((g) => [g.id, g.place, g.x, g.y, g.facingLeft]), [['gs1', 'street', 812, 870, false], ['gh1', 'house', 300, 620, true], ['gu1', 'house:1', 300, 620, true], ['gt2', 'tower:2', 55, 620, true]]);
     assert.equal(noKey[0].phrases.length, 3);
     assert.equal(noKey[0].phrases[0], 'Hello there');
     assert.match(noKey[0].phrases[1], /^\S{4} happens$/);
     assert.doesNotMatch(noKey[0].phrases[1], /shit/);
     assert.deepEqual(noKey[1].phrases, [], 'a gnome in the house is silent for someone without the key');
+    assert.deepEqual(noKey[2].phrases, [], 'and upstairs');
     assert.deepEqual(JSON.parse(run2(state, true))[1].phrases, ['secret']);
-    assert.doesNotMatch(run2(state, true), /in the pack|upstairs/);
+    assert.deepEqual(JSON.parse(run2(state, true))[2].phrases, ['upstairs']);
+    assert.doesNotMatch(run2(state, true), /in the pack/);
     assert.equal(run2({}, true), '[]');
     const many = { systems: { features: { 'garden-gnome': { placed: Array.from({ length: 90 }, (_, i) => ({ id: `g${i}`, place: 'street', x: i, y: 0 })) } } } };
     assert.equal(JSON.parse(run2(many, false)).length, GNOME_VISIT_MAX);

@@ -22,6 +22,8 @@
  *   so only the one who bumped it sees that hop.
  */
 
+import { housePlace, isHousePlace } from './home-floors.js?v=444d18d7';
+
 export const GNOME_CLASS = 'npc_garden_gnome';
 export const GNOME_MAX_PHRASES = 3;
 export const GNOME_PHRASE_MAX = 150;
@@ -126,13 +128,14 @@ export function shiftGnomes(placed, room, dx) {
 export const GNOME_VISIT_MAX = 24;
 
 /**
- * The place a visitor stands in, as a gnome's `place` names it, or null: the home street, the
- * house's ground floor, a Tower floor (js/neighbours-mp.js readVisitScene's { room, floor }).
+ * The place a visitor stands in, as a gnome's `place` names it, or null: the home street, any floor
+ * of the house (R5, G1313: "house", "house:1", "house:2"), a Tower floor (js/neighbours-mp.js
+ * readVisitScene's { room, floor }).
  */
 export function visitGnomePlace(scene) {
   if (!scene) return null;
   if (scene.room === 'street') return 'street';
-  if (scene.room === 'interior') return 'house';
+  if (scene.room === 'interior') return housePlace(scene.floor);
   if (scene.room === 'tower' && Number.isInteger(scene.floor) && scene.floor >= 0 && scene.floor <= 9) return `tower:${scene.floor}`;
   return null;
 }
@@ -143,7 +146,7 @@ export function normalizeVisitGnomes(list) {
     .slice(0, GNOME_VISIT_MAX * 4)
     .filter((g) => g && typeof g === 'object' && Number.isFinite(Number(g.x)) && Number.isFinite(Number(g.y)))
     .map(normalizePlaced)
-    .filter((g) => /^[A-Za-z0-9_-]{1,40}$/.test(g.id) && /^(street|house|tower:\d)$/.test(g.place))
+    .filter((g) => /^[A-Za-z0-9_-]{1,40}$/.test(g.id) && (/^(street|tower:\d)$/.test(g.place) || isHousePlace(g.place)))
     .slice(0, GNOME_VISIT_MAX);
 }
 

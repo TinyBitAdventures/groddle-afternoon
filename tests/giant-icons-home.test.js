@@ -44,9 +44,9 @@ globalThis.Image = FakeImage;
 const { installPixiFixes } = await import('../public/js/pixi-fixes.js?v=0f42b75e');
 installPixiFixes(PIXI);
 
-const { PLACE_TEXT, giantIconsFeature } = await import('../public/js/features/giant-icons-feature.js?v=f8c1b502');
-const { GIANT_ICON_IDS, applyIconAct, bestowCheck, createIconState, homePlaceKey, normalizeVisitIcons, pickUpIcon, placeIcon, shiftHomeIcons } = await import('../public/js/giant-icons.js?v=9c28aaf2');
-const { normalizeHomeView } = await import('../public/js/neighbours-mp.js?v=e912be37');
+const { PLACE_TEXT, giantIconsFeature } = await import('../public/js/features/giant-icons-feature.js?v=a2196397');
+const { GIANT_ICON_IDS, applyIconAct, bestowCheck, createIconState, homePlaceKey, normalizeVisitIcons, pickUpIcon, placeIcon, shiftHomeIcons } = await import('../public/js/giant-icons.js?v=3f078775');
+const { normalizeHomeView } = await import('../public/js/neighbours-mp.js?v=f43b50c8');
 
 const HOME_STREET = 'RH_HOME_EXT';
 const HOME_HOUSE = 'RH_HOME_INT';
@@ -397,6 +397,8 @@ describe('online: a visitor and the owner\'s Icons (shared, as Glitch)', () => {
     ] });
     assert.deepEqual(view.icons, [
       { id: 'icon1', giant: 'alph', place: 'street', x: 1, y: 2, actions: 3, tither: 9 },
+      // R5 (G1313): an upper floor of the house is a place a visitor can reach.
+      { id: 'icon3', giant: 'mab', place: 'house:2', x: 1, y: 2, actions: 0, tither: null },
       { id: 'icon5', giant: 'ti', place: 'tower:3', x: 1, y: 2, actions: 0, tither: null },
     ]);
   });
@@ -419,13 +421,15 @@ describe('the site sends a visitor the owner\'s placed Icons (Neighbours::iconRo
     assert.deepEqual(rows, [
       { id: 'icon2', giant: 'mab', place: 'street', x: 470, y: 600, actions: 7, tither: 9 },
       { id: 'icon3', giant: 'ti', place: 'house', x: 300, y: 500, actions: 0, tither: null },
+      // R5 (G1313): an upper floor's, for whoever may enter.
+      { id: 'icon4', giant: 'lem', place: 'house:2', x: 1, y: 1, actions: 1, tither: null },
       { id: 'icon5', giant: 'pot', place: 'tower:1', x: 2, y: 2, actions: 10000, tither: null },
     ]);
     assert.deepEqual(normalizeVisitIcons(rows), rows, 'the game reads what the site sends');
     const outside = php(`echo json_encode(Groddle\\Minn\\Neighbours::forVisitor(["icons" => json_decode(${JSON.stringify(JSON.stringify(rows))}, true)], false));`);
     assert.deepEqual(outside.icons.map((r) => r.id), ['icon2', 'icon5']);
     const inside = php(`echo json_encode(Groddle\\Minn\\Neighbours::forVisitor(["icons" => json_decode(${JSON.stringify(JSON.stringify(rows))}, true)], true));`);
-    assert.equal(inside.icons.length, 3);
+    assert.equal(inside.icons.length, 4);
     // Every Giant the game knows, the site knows.
     assert.deepEqual(php('echo json_encode(Groddle\\Minn\\Neighbours::ICON_GIANTS);'), [...GIANT_ICON_IDS]);
   });

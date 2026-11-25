@@ -9,8 +9,8 @@
  *
  * Multiplayer only (engine.mode and engine.query('realtimeClient')). In solo
  * this feature answers nothing, so every drop is the player's own as always.
- * In multiplayer the same holds for a private place (a party space, a race,
- * an upper floor of the house), for food the owner drops on their own home street
+ * In multiplayer the same holds for a private place (a party space, a race),
+ * for food the owner drops on their own home street
  * (their animals there eat it from their own stacks: js/drops-mp.js), for a class the ledger does not carry, a note
  * (its writing would not travel), and whenever the server is out of reach: game.js drops those as it
  * always did.
@@ -70,7 +70,7 @@ import { saveStore, savedThrough } from '../save-store.js?v=4e720735';
 import { ownGroundRows } from '../ground-stacks.js?v=22792362';
 import { pileMaxOf } from '../world-items.js?v=a5deb102';
 import { offlineLine, sharedOffline } from '../online-request.js?v=09ac8a9c';
-import { DROP_OP, DROP_QUEUE_MAX, DROP_TEXT, bucketTake, dropEffect, dropRefusalText, eatenStack, groundFrom, homePlaceOf, isFloorPlace, isPublicStreet, likeSharedStack, normalizeGroundStack, normalizeItem, normalizeMine, pickupAsk, pigAnimalKey, shareReason, stackAt, stackLeft } from '../drops-mp.js?v=6a16d73d';
+import { DROP_OP, DROP_QUEUE_MAX, DROP_TEXT, bucketTake, dropEffect, dropRefusalText, eatenStack, groundFrom, homePlaceOf, isFloorPlace, isPublicStreet, likeSharedStack, normalizeGroundStack, normalizeItem, normalizeMine, pickupAsk, pigAnimalKey, shareReason, stackAt, stackLeft } from '../drops-mp.js?v=189efccc';
 
 export const DROPS_MP_FEATURE_ID = 'drops-mp';
 const TABLE_URL = 'assets/content/trade-items.json';
@@ -317,8 +317,9 @@ function createSession(engine, client) {
     const place = homePlaceOf(s);
     if (!place) return null;
     const o = engine.query?.('homeDropOrigin', engine);
-    if (!o || Number(o.owner) !== place.owner || o.room !== place.room || (place.room === 'tower' && Number(o.floor) !== place.floor)) return null;
-    const ox = place.room === 'tower' ? 0 : Number(o.houseX);
+    // R5 (G1313): a floor of the house is matched by its floor as a Tower floor is; an upper floor's x is its own.
+    if (!o || Number(o.owner) !== place.owner || o.room !== place.room || (place.room !== 'street' && (Number(o.floor) || 0) !== place.floor)) return null;
+    const ox = place.room === 'tower' || place.floor > 0 ? 0 : Number(o.houseX);
     if (!Number.isFinite(ox)) return null;
     return { street: s, key: String(engine.dropTsid || scene), ox: Math.round(ox), ownHome: o.own === true };
   }

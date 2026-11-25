@@ -31,7 +31,7 @@ import { homedir } from 'node:os';
 import { join } from 'node:path';
 import { createFeatureHost } from '../public/js/feature-host.js?v=b87e2cbc';
 import { dropsMpFeature } from '../public/js/features/drops-mp-feature.js?fresh=floormerge';
-import { isTakeOp, normalizeMine } from '../public/js/drops-mp.js?v=6a16d73d';
+import { isTakeOp, normalizeMine } from '../public/js/drops-mp.js?v=189efccc';
 import { packToSharedFloor } from '../public/js/home-floor-share.js?v=3fa0382c';
 import { GAME_DIR, SITE_DIR } from '../tools/repos.mjs';
 import { HAS_PHP, PHP, phpSkip } from './php.js';

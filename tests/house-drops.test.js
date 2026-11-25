@@ -14,7 +14,8 @@
  * locked to them, and visitors see it (the site's Neighbours::stackRows) with
  * Pick up greyed, as they see the owner's stacks dropped there before G1190
  * (kept, never moved). In the house x is kept from the house's left end; a
- * Tower floor keeps its own x. An upper floor of the house stays private.
+ * Tower floor keeps its own x. Every floor of the house is the house (R5, G1313): an upper floor is
+ * shared too, its x its own.
  * The server's side is drops_test.go (TestAHousesAndATowerFloorsDropsAreShared).
  */
 import { after, before, describe, it } from 'node:test';
@@ -22,11 +23,11 @@ import assert from 'node:assert/strict';
 import { execFileSync, spawnSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { homePlaceOf, isSharedStreet, shareReason } from '../public/js/drops-mp.js?v=6a16d73d';
+import { homePlaceOf, isSharedStreet, shareReason } from '../public/js/drops-mp.js?v=189efccc';
 import { dropsMpFeature } from '../public/js/features/drops-mp-feature.js?fresh=housedrops';
-import { homeStreetMpFeature } from '../public/js/features/home-street-mp-feature.js?v=de5cad5d';
-import { neighboursMpFeature } from '../public/js/features/neighbours-mp-feature.js?v=4d6a7b7b';
-import { OWNER_STACK_TEXT, isOwnerStackId, normalizeHomeView, normalizeOwnerStacks, ownerStacksFor, sharedHomeStreet } from '../public/js/neighbours-mp.js?v=e912be37';
+import { homeStreetMpFeature } from '../public/js/features/home-street-mp-feature.js?v=1dabedd5';
+import { neighboursMpFeature } from '../public/js/features/neighbours-mp-feature.js?v=54c421f3';
+import { OWNER_STACK_TEXT, isOwnerStackId, normalizeHomeView, normalizeOwnerStacks, ownerStacksFor, sharedHomeStreet } from '../public/js/neighbours-mp.js?v=f43b50c8';
 import { GAME_DIR, HAS_SERVER, HAS_SITE, SITE_DIR, serverPath } from '../tools/repos.mjs';
 import { HAS_PHP, PHP } from './php.js';
 
@@ -40,7 +41,9 @@ describe('where a drop is everyone\'s at a home', () => {
     assert.deepEqual(homePlaceOf('HOME_7'), { owner: 7, room: 'street', floor: 0 });
     assert.deepEqual(homePlaceOf('HOUSE_7'), { owner: 7, room: 'interior', floor: 0 });
     assert.deepEqual(homePlaceOf('TOWER_7_3'), { owner: 7, room: 'tower', floor: 3 });
-    for (const s of ['', 'HOUSE_07', 'HOUSE_', 'TOWER_7', 'TOWER_7_10', 'TOWER_0_1', 'PARTY_7', 'MPH_7_IN', 'RH_HOME_INT']) assert.equal(homePlaceOf(s), null, s);
+    assert.deepEqual(homePlaceOf('HOUSE_7_1'), { owner: 7, room: 'interior', floor: 1 }, 'R5: an upper floor is the house');
+    assert.deepEqual(homePlaceOf('HOUSE_7_2'), { owner: 7, room: 'interior', floor: 2 });
+    for (const s of ['', 'HOUSE_07', 'HOUSE_', 'HOUSE_7_0', 'HOUSE_7_3', 'TOWER_7', 'TOWER_7_10', 'TOWER_0_1', 'PARTY_7', 'MPH_7_IN', 'RH_HOME_INT']) assert.equal(homePlaceOf(s), null, s);
     for (const s of ['HOUSE_7', 'TOWER_7_0', 'TOWER_7_9']) assert.equal(isSharedStreet(s), true, s);
     assert.equal(shareReason(MB, TABLE, { street: 'HOUSE_7' }), '', 'a visitor in the house');
     assert.equal(shareReason(MB, TABLE, { street: 'TOWER_7_2', ownHome: true }), '', 'the owner on a Tower floor');
@@ -174,10 +177,27 @@ describe('the feature in the house and on a Tower floor', () => {
     assert.equal(dropsMpFeature.sharedDrop({ classTsid: MB, count: 1, x: 500, y: 620 }, engine), null, 'the server\'s floor and the scene\'s must agree');
   });
 
-  it('an upper floor of the house, or a home scene that is not this one, keeps drops the player\'s own', () => {
+  it('R5 (G1313): an upper floor of the house is shared with its own x, and only the floor the scene shows', async () => {
+    client.street = 'HOUSE_7_1';
+    engine.streetTsid = 'RH_HOME_INT';
+    engine.dropTsid = 'RH_HOME_FLOOR_1';
+    origin = { owner: 7, room: 'interior', floor: 1, houseX: 0, own: true };
+    assert.equal(dropsMpFeature.sharedDrop({ classTsid: MB, count: 1, x: 400, y: 620 }, engine), true);
+    await tick();
+    const [kind, sent] = client.sent.at(-1);
+    assert.equal(kind, 'ground_drop');
+    assert.equal(sent.ox, undefined, 'an upper floor sends no origin');
+    origin = { owner: 7, room: 'interior', floor: 2, houseX: 0, own: true };
+    assert.equal(dropsMpFeature.sharedDrop({ classTsid: MB, count: 1, x: 400, y: 620 }, engine), null, 'the server\'s floor and the scene\'s must agree');
+    origin = { owner: 7, room: 'interior', floor: 0, houseX: 750, own: true };
+    assert.equal(dropsMpFeature.sharedDrop({ classTsid: MB, count: 1, x: 400, y: 620 }, engine), null, 'nor the ground floor for the second');
+    client.emit('msg:ground_dropped', { ref: sent.ref, status: 'refused', why: 'gone', text: 'x' });
+  });
+
+  it('a home scene that is not this one keeps drops the player\'s own', () => {
     client.street = 'HOUSE_7';
     engine.dropTsid = 'RH_HOME_FLOOR_1';
-    origin = null; // homeDropOrigin: an upper floor of the house is no home place
+    origin = null;
     assert.equal(dropsMpFeature.sharedDrop({ classTsid: MB, count: 1, x: 0, y: 0 }, engine), null);
     origin = { owner: 8, room: 'interior', floor: 0, houseX: 750, own: false };
     assert.equal(dropsMpFeature.sharedDrop({ classTsid: MB, count: 1, x: 0, y: 0 }, engine), null, 'someone else\'s house');
@@ -268,12 +288,15 @@ describe('the server and the site', () => {
       RH_HOME_TOWER_2: [{ id: 'world-item-3', classTsid: 'cherry', count: 4, x: 500, y: 620 }],
       RH_HOME_EXT: [{ id: 'world-item-9', classTsid: 'cherry', count: 1, x: 1, y: 1 }],
       RH_HOME_FLOOR_1: [{ id: 'world-item-8', classTsid: 'cherry', count: 1, x: 1, y: 1 }],
+      RH_HOME_FLOOR_3: [{ id: 'world-item-7', classTsid: 'cherry', count: 1, x: 1, y: 1 }],
     } };
     const code = `foreach (["WordFilter", "Neighbours"] as $c) require ${JSON.stringify(SITE_DIR)} . "/src/$c.php"; echo json_encode(Groddle\\Minn\\Neighbours::stackRows(json_decode(${JSON.stringify(JSON.stringify(dropped))}), json_decode('{"houseX":750}')));`;
     const rows = JSON.parse(execFileSync(PHP, ['-r', code]).toString());
     assert.deepEqual(rows, [
       { id: 'world-item-1', place: 'house', c: MB, n: 2, x: 150, y: 620 },
       { id: 'world-item-2', place: 'house', c: 'cherry', n: 1, x: 50, y: 500, on: 3 },
+      // R5 (G1313): an upper floor's, its own x.
+      { id: 'world-item-8', place: 'house:1', c: 'cherry', n: 1, x: 1, y: 1 },
       { id: 'world-item-3', place: 'tower:2', c: 'cherry', n: 4, x: 500, y: 620 },
     ]);
     assert.match(readFileSync(join(SITE_DIR, 'src', 'Neighbours.php'), 'utf8'), /'stacks' => self::stackRows\(self::savedEntry\(\$db, \$owner, 'droppedItems'\), self::feature\(\$theirs, 'homes'\)\)/);
@@ -287,8 +310,9 @@ describe('G1190: a visitor sees the owner\'s stacks where the owner set them', (
     const visit = /\/(\^MPH_[^/]+)\/\.test/.exec(fn);
     assert.ok(visit, 'restingStackY checks the visit scene tsid');
     const re = new RegExp(visit[1]);
-    for (const t of ['MPH_42_IN', 'MPH_42_T0', 'MPH_42_T3']) assert.ok(re.test(t), t);
-    for (const t of ['MPH_42', 'RH_HOME_EXT', 'LIF101']) assert.ok(!re.test(t), t);
+    // R5 (G1313): an upper floor of the house too.
+    for (const t of ['MPH_42_IN', 'MPH_42_IN1', 'MPH_42_IN2', 'MPH_42_T0', 'MPH_42_T3']) assert.ok(re.test(t), t);
+    for (const t of ['MPH_42', 'MPH_42_IN3', 'RH_HOME_EXT', 'LIF101']) assert.ok(!re.test(t), t);
     assert.ok(fn.indexOf(visit[0]) < fn.indexOf('stackRestY('), 'kept before the floor search');
   });
 });

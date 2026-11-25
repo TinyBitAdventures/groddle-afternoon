@@ -85,9 +85,9 @@ import { woodTreeStatusLabel } from '../woodcutting.js?v=9e9af511';
 import { animalStatusLabel } from '../animals.js?v=19981d8f';
 import { frameTexture, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js?v=b8e38103';
 import { createBackYardState, homeStreetLayout, normalizeCultivationState } from '../home-cultivation.js?v=2f71ba70';
-import { insideQuery, readVisitScene } from '../neighbours-mp.js?v=e912be37';
+import { insideQuery, readVisitScene } from '../neighbours-mp.js?v=f43b50c8';
 import { saveStore } from '../save-store.js?v=4e720735';
-import { BACK_YARD_GROUND_Y, STREET_GROUND_Y, homesFeature, wearHomeCultivation } from './homes-feature.js?v=2a83f537';
+import { BACK_YARD_GROUND_Y, STREET_GROUND_Y, homesFeature, wearHomeCultivation } from './homes-feature.js?v=7d259b4d';
 import { holdYardAnimal } from './animal-husbandry-feature.js?v=b86bfc54';
 import { patchesFeature, treeFrameUrl } from './patches-feature.js?v=00a40d74';
 import {
@@ -645,7 +645,8 @@ function createSession(engine, client) {
 
   async function loadVisit(tsid) {
     const scene = readVisitScene(tsid);
-    if (!scene || (scene.room !== 'street' && scene.room !== 'interior') || loading === tsid) return;
+    // Only the ground floor opens onto the back yard (homes_get_floor_config); an upper floor has none.
+    if (!scene || (scene.room !== 'street' && scene.room !== 'interior') || scene.floor > 0 || loading === tsid) return;
     if ((refusedUntil.get(tsid) || 0) > Date.now()) return;
     const place = scene.room === 'interior' ? 'yard' : 'street';
     loading = tsid;
@@ -1213,7 +1214,7 @@ function createSession(engine, client) {
       const tsid = engine.streetTsid;
       const scene = readVisitScene(tsid);
       if (visit && visit.tsid !== tsid) clearVisit();
-      if (!visit && (scene?.room === 'street' || scene?.room === 'interior')) loadVisit(tsid);
+      if (!visit && (scene?.room === 'street' || (scene?.room === 'interior' && !scene.floor))) loadVisit(tsid);
       stepAnimals(dtMs);
       if (now - scanAt >= SCAN_MS) {
         scanAt = now;

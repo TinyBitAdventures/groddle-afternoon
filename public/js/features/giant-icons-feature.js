@@ -29,8 +29,8 @@
  *    site (src/HomeIcons.php: one count, checked under a lock) and its proof
  *    through the realtime server (home_icon_tell, home_iconed) to the owner
  *    and everyone there; the owner's game reads its Icons' count from the site
- *    when it comes home (homeIcons). An upper house floor is the owner's alone
- *    and stays in the save. Public streets online stay refused (M20, G945). From level 10 it calls out and offers its
+ *    when it comes home (homeIcons). Every floor of the house is the house (R5,
+ *    G1313): an upper floor's Icons are shared as the ground floor's. Public streets online stay refused (M20, G945). From level 10 it calls out and offers its
  *    recorded "Voices of the Giants" message (111 iMG) by the source's
  *    conversation rules, and a walk-in that brings an offer bestows nothing
  *    (include/icon.js 565-575, G214); Talk to then tells it (G202: the shared record,
@@ -94,7 +94,7 @@ import {
   titheIcon,
   titheMessage,
   useEmblem,
-} from '../giant-icons.js?v=9c28aaf2';
+} from '../giant-icons.js?v=3f078775';
 import { textureFromUrl } from '../textures.js?v=b8e38103';
 import { playSheetOverlay } from '../overlay-art.js?v=e50bacca';
 import { grantMoodXp } from '../mood-xp.js?v=e311b45c';
@@ -103,12 +103,13 @@ import { CONVERSATION_RULES, adoptLegacyTalks, conversationRecord, hasCompleted,
 import { TELLERS } from '../conversations-data.js?v=f11b7e02';
 import { itemZ } from '../item-bands.js?v=ec366be3';
 import { publicStreet } from '../shared-street.js?v=dce5694b';
-import { insideProof, readVisitScene } from '../neighbours-mp.js?v=e912be37';
+import { insideProof, readVisitScene } from '../neighbours-mp.js?v=f43b50c8';
+import { isHousePlace } from '../home-floors.js?v=444d18d7';
 import { createMinnAccount } from '../minn-account.js?v=7e3d7279';
 import { saveStore, savedThrough } from '../save-store.js?v=4e720735';
 import { HOME_INTERIOR_TSID, HOME_STREET_TSID } from '../homes.js?v=dca6b2cd';
-import { gnomePlaceFor, visitGnomePlace } from '../garden-gnome.js?v=d9f8e52b';
-import { homesFeature } from './homes-feature.js?v=2a83f537';
+import { gnomePlaceFor, visitGnomePlace } from '../garden-gnome.js?v=73026b57';
+import { homesFeature } from './homes-feature.js?v=7d259b4d';
 import { standOnFeet } from '../sprite-feet.js?v=6358a697';
 
 export const ICONS_FEATURE_ID = 'giant-icons';
@@ -138,8 +139,8 @@ const ctxFor = (engine, pol = false) => ({ level: level(engine), upgrades: owned
 
 /* ------------------------------------------- #697: a home's Icons, shared online */
 
-/** The places a visitor can reach, whose Icons the site keeps one count for (HomeIcons::act). */
-const SHARED_PLACE = /^(street|house|tower:\d)$/;
+/** The places a visitor can reach, whose Icons the site keeps one count for (HomeIcons::act): every floor of the house too (R5, G1313). */
+const SHARED_PLACE = { test: (place) => /^(street|tower:\d)$/.test(String(place || '')) || isHousePlace(place) };
 /** { client, account, busy } online (the realtime client and the site), or null solo. */
 let net = null;
 
@@ -169,7 +170,7 @@ function wireNet(engine, client, account) {
   return net;
 }
 
-/** Where a drawn Icon's shared count is kept: { owner, place }, or null (solo, a street, an upper floor). */
+/** Where a drawn Icon's shared count is kept: { owner, place }, or null (solo, a public street). */
 function sharedAt(engine, v) {
   if (!v?.home || !online(engine)) return null;
   const place = v.visit ? v.row.place : String(v.key).slice(HOME_PREFIX_LEN);
@@ -198,7 +199,7 @@ async function siteAct(engine, v, act) {
   const at = sharedAt(engine, v);
   if (!n || !at || n.busy.has(v.row.id)) return null;
   n.busy.add(v.row.id);
-  const ask = () => n.account.iconAct(at.owner, { icon: v.row.id, place: at.place, act }, v.visit && at.place === 'house' ? insideProof(at.owner) : '');
+  const ask = () => n.account.iconAct(at.owner, { icon: v.row.id, place: at.place, act }, v.visit && isHousePlace(at.place) ? insideProof(at.owner) : '');
   let res = null;
   try {
     try {

@@ -227,7 +227,7 @@ import { RADIO_TEXT, radioOwned } from '../vine-radio.js?v=c001a82c';
 import { displayTopOf, itemstackOverlayPoint, overlayAlpha, overlayLifeMs, playPoofIn, trackOverlay } from '../overlay-art.js?v=e50bacca';
 import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=d787e3c3';
 import { fadeInNewNear } from '../poof-fade.js?v=57db6aea';
-import { projectApi } from './street-jobs-feature.js?v=15b3553e';
+import { projectApi } from './street-jobs-feature.js?v=dc66b964';
 import { TOWER_CHASSIS, TOWER_CONFIG, TOWER_DOOR_DX, TOWER_GEO, TOWER_PROTO, normalizeTowerState } from '../home-tower.js?v=a7fc0cce';
 import { drawTowerBench, drawTowerElevator, drawTowerExit, towerApi, visitorTowerView } from './home-tower-feature.js?v=0721ea89';
 import { pieceUrl, roomPieces, surfaceAt, swatchPiece, wallTargetAt } from '../home-wallpaper.js?v=5d3594e4';
@@ -308,7 +308,7 @@ import {
   quoteHouseUnexpand,
   slideDoor,
   unexpandHouseFloors,
-} from '../home-floors.js?v=459925ff';
+} from '../home-floors.js?v=444d18d7';
 import { topUpMetabolic } from '../metabolics.js?v=48f784bf';
 import { anchorBottomCentre, standOnFeet } from '../sprite-feet.js?v=6358a697';
 import { autoplayLog } from '../autoplay-log.js?v=55bb4823';
@@ -316,7 +316,7 @@ import { WORLD_FONT_FAMILY } from '../world-text.js?v=6b49f88c';
 import { HOUSE_ART_DIR, HOUSE_FROM_HOME_STYLE, HOUSE_STYLE_IDS, composeHouse, houseFitViewH, houseLabel, houseLot, normalizeHouse } from '../home-house.js?v=3c88c47c';
 import { closeHousePicker, housePickerOpen, openHousePicker, refreshHousePicker } from '../ui/house-picker.js?v=67f03b99';
 import { YARD_WALL_DX } from '../yard-wander.js?v=28f55f45';
-import { housePlace, isHomeMachineClass, towerPlace } from '../home-machines.js?v=7b36bf51';
+import { housePlace, isHomeMachineClass, towerPlace } from '../home-machines.js?v=41e9a72b';
 
 export const HOMES_FEATURE_ID = 'homes';
 const HOME_STREET_TSID = 'RH_HOME_EXT';
@@ -7999,6 +7999,19 @@ function runRestoreAutoplay(engine) {
 // Another player's home, for a visitor (G328, multiplayer)
 // ---------------------------------------------------------------------------
 
+/** R5 (G1313): a visit's upper floors (home-floors.js createFloorsState), each with the ground floor's styles. */
+function visitorFloors(seed, ground) {
+  const g = normalizeHomeDecorState(ground || {});
+  const fs = createFloorsState(seed && typeof seed === 'object' ? { upper: seed.upper, links: seed.links } : {}, g);
+  for (const row of fs.upper) {
+    row.styles = g.styles || {};
+    row.layout = 'house';
+  }
+  fs.pending = null;
+  fs.at = 0;
+  return fs;
+}
+
 /** G328: the homes slice a visitor is shown, normalized as restore() does (no rock; MPVISIT: the Tower and its floors). */
 export function visitorHomeState(view = {}) {
   const slice = view?.homes && typeof view.homes === 'object' ? view.homes : {};
@@ -8014,6 +8027,9 @@ export function visitorHomeState(view = {}) {
       .map((row) => normalizeHomeDecorState({ ...row, wallSegments: TOWER_GEO.wallSegments, layout: 'tower', starterKit: true })),
     style,
     decor: normalizeHomeDecorState(slice.decor || {}),
+    // R5 (G1313): the upper floors and the Doors joining them (Neighbours::homesSlice floors), as the
+    // owner's own house reads them; none for a viewer the site keeps outside (forVisitor).
+    floors: visitorFloors(slice.floors, slice.decor),
     cult: normalizeCultivationState(slice.cult || {}),
     backCult: createBackYardState(slice.backYard || {}),
     streetStyle: STREET_STYLE_BY_KEY[slice.streetStyle]?.built ? slice.streetStyle : null,
@@ -8028,10 +8044,12 @@ export function visitorHomeState(view = {}) {
  * visitor's own home.
  */
 function withOwnersHome(v, fn) {
-  const keep = { decor, houseDecor, cult, backCult, streetStyle, yardStyle, stylePreview, yardPreview, scene, mode };
+  const keep = { decor, houseDecor, floors, upgradePreview, cult, backCult, streetStyle, yardStyle, stylePreview, yardPreview, scene, mode };
   try {
     decor = v.decor;
     houseDecor = v.decor;
+    floors = v.floors || createFloorsState({}, v.decor);
+    upgradePreview = null;
     cult = v.cult;
     backCult = v.backCult;
     streetStyle = v.streetStyle;
@@ -8042,7 +8060,7 @@ function withOwnersHome(v, fn) {
     mode = null;
     return fn();
   } finally {
-    ({ decor, houseDecor, cult, backCult, streetStyle, yardStyle, stylePreview, yardPreview, scene, mode } = keep);
+    ({ decor, houseDecor, floors, upgradePreview, cult, backCult, streetStyle, yardStyle, stylePreview, yardPreview, scene, mode } = keep);
   }
 }
 
@@ -8127,6 +8145,78 @@ function drawVisitorYard(engine, st, groundY, houseX, opts = {}) {
 }
 
 /**
+ * R5 (G1313): the Doors between floors on floor `floor` of a visit (home-floors.js doorRole): id ->
+ * where it leads ({ floor, x: the other Door's room x, dir }). A Door being built leads nowhere yet.
+ */
+function visitorDoors(v, floor) {
+  const out = new Map();
+  for (const l of v.floors?.links || []) {
+    if (l.floor === floor) out.set(l.up, { floor: floor + 1, x: l.downX, dir: 'up' });
+    if (l.floor + 1 === floor) out.set(l.down, { floor: l.floor, x: l.upX, dir: 'down' });
+  }
+  return out;
+}
+
+/** R5: draws a visit floor's Doors between floors in their own art (as spawnDoorTargets), each with where it leads. */
+function drawVisitorDoors(engine, floorDecorNow, stairs, floor, x0 = 0) {
+  const { PIXI } = engine;
+  const out = [];
+  for (const item of floorDecorNow.placed) {
+    const dest = stairs.get(item.id);
+    if (item.classTsid !== DOOR_CLASS || !dest) continue;
+    const spr = new PIXI.Sprite(textureFromUrl(doorArtUrl(item, floor)));
+    anchorBottomCentre(spr, 'deco');
+    dressDoorSprite(spr, item, floor);
+    spr.x = x0 + item.x;
+    spr.y = item.y;
+    spr.zIndex = FURNITURE_Z - 1;
+    engine.entityLayer.addChild(spr);
+    out.push({ sprite: spr, id: item.id, dest, label: `${dest.dir === 'up' ? 'Up' : 'Down'} to the ${floorName(dest.floor)}` });
+  }
+  return out;
+}
+
+/**
+ * R5 (G1313, Austin 2026-11-25: "as Glitch: key holders and let-in visitors go upstairs"): an upper
+ * floor of a real player's house for a visitor, as the owner's houseFloorScene draws it: its own
+ * room closed at both ends, its furniture and its Doors down (and up). Glitch's floors were one
+ * location joined by Doors no verb guarded (furniture_door.js), so whoever was let in walked them.
+ */
+function visitorUpperFloor(shim, v, floorNo, opts = {}) {
+  decor = v.floors.upper[floorNo - 1];
+  const floorDecorNow = decor;
+  const background = interiorBackground(shim, {});
+  const width = interiorWidth(floorDecorNow);
+  const furniture = renderOrder(floorDecorNow).map((item) => ({ ...item }));
+  const stairs = visitorDoors(v, floorNo);
+  const down = v.floors.links.find((l) => l.floor + 1 === floorNo);
+  const arrive = Number.isFinite(Number(opts.doorX)) ? Math.round(Number(opts.doorX)) : down ? down.downX : Math.round(width / 2);
+  return {
+    width,
+    height: background.worldH,
+    groundY: GROUND_Y,
+    background,
+    platforms: background.platformsScreen,
+    spawnX: Math.max(80, Math.min(width - 80, arrive)),
+    floor: floorNo,
+    populate(eng) {
+      const { PIXI } = eng;
+      const layers = addFurnitureLayers(eng, 0);
+      const pieces = [];
+      furniture.forEach((item, i) => {
+        if (stairs.has(item.id)) return;
+        const box = furnitureView(PIXI, item);
+        box.zIndex = i;
+        furnitureHolder(layers, item).addChild(box);
+        pieces.push({ item, box });
+      });
+      const doors = withOwnersHome(v, () => drawVisitorDoors(eng, floorDecorNow, stairs, floorNo, 0));
+      return { door: null, doors, gardens: [], pieces, roomX: 0 };
+    },
+  };
+}
+
+/**
  * G328: a real player's home street or house as they keep it, for a visitor
  * in multiplayer (features/neighbours-mp-feature.js). `view` is the site's
  * answer (groddle-afternoon-site src/Neighbours.php: the owner's homes slice
@@ -8189,6 +8279,10 @@ export function visitorHomeScene(engine, view = {}, room = 'street', opts = {}) 
     });
   }
   if (room === 'interior') {
+    // R5 (G1313): an upper floor the owner's house has (opts.floor 1 or 2), else the ground floor.
+    const asked = Math.floor(Number(opts.floor) || 0);
+    const floorNo = asked > 0 && v.floors.upper[asked - 1] ? asked : 0;
+    if (floorNo > 0) return withOwnersHome(v, () => visitorUpperFloor(shim, v, floorNo, opts));
     return withOwnersHome(v, () => {
       const background = interiorBackground(shim, { yard: true });
       const x0 = background.houseX;
@@ -8196,6 +8290,7 @@ export function visitorHomeScene(engine, view = {}, room = 'street', opts = {}) 
       const width = x0 + roomW;
       const doorX = x0 + interiorDoorX();
       const furniture = renderOrder(v.decor).map((item) => ({ ...item }));
+      const stairs = visitorDoors(v, 0);
       const yard = v.backCult;
       return {
         width,
@@ -8203,8 +8298,10 @@ export function visitorHomeScene(engine, view = {}, room = 'street', opts = {}) 
         groundY: GROUND_Y,
         background,
         platforms: background.platformsScreen,
-        spawnX: doorX - 80,
+        // Down a Door from upstairs: beside the Door it leads to (doorDestination's x, room x).
+        spawnX: Number.isFinite(Number(opts.doorX)) ? Math.max(40, Math.min(width - 40, x0 + Math.round(Number(opts.doorX)))) : doorX - 80,
         doorX,
+        floor: 0,
         populate(eng) {
           const { PIXI } = eng;
           // The owner's ceiling pieces hang over every visitor, as in your own house (FG_FURN).
@@ -8212,11 +8309,13 @@ export function visitorHomeScene(engine, view = {}, room = 'street', opts = {}) 
           // HOMES3: each piece's box, so a sale can take it away (home-street-mp-feature).
           const pieces = [];
           furniture.forEach((item, i) => {
+            if (stairs.has(item.id)) return;
             const box = furnitureView(PIXI, item);
             box.zIndex = i;
             furnitureHolder(layers, item).addChild(box);
             pieces.push({ item, box });
           });
+          const doors = withOwnersHome(v, () => drawVisitorDoors(eng, v.decor, stairs, 0, x0));
           const spec = background.room?.door || { piece: 'door_asset_entry_basic', x: interiorDoorX(), y: GROUND_Y + 18, w: 75, h: 236 };
           const door = new PIXI.Sprite(textureFromUrl(pieceUrl(spec.piece, wantsHiresPieces(eng))));
           anchorBottomCentre(door, 'deco');
@@ -8229,7 +8328,7 @@ export function visitorHomeScene(engine, view = {}, room = 'street', opts = {}) 
           // G1018: for a viewer who may act in it (the site's answer says so: backYardLive), its rocks, nodes
           // and Patches are yard-verbs-mp-feature's, to use, drawn once there; anyone who only looks gets stills.
           const gardens = drawVisitorYard(eng, yard, BACK_YARD_GROUND_Y, homeStreetLayout(yard).houseX, { live: view.backYardLive === true, drawn: opts.drawn });
-          return { door, gardens, pieces, roomX: x0 };
+          return { door, doors, gardens, pieces, roomX: x0 };
         },
       };
     });

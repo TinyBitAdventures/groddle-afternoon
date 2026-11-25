@@ -14,9 +14,9 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { FURNITURE_CATALOG } from '../public/js/homes-catalog.js?v=0367f90f';
 import { createHomeDecorState, interiorWidth, normalizeHomeDecorState, placeFurniture, renderOrder } from '../public/js/home-decor.js?v=31f37d9b';
-import { createFloorsState } from '../public/js/home-floors.js?v=459925ff';
-import { normalizeOwnerStacks } from '../public/js/neighbours-mp.js?v=e912be37';
-import { visitorHomeState } from '../public/js/features/homes-feature.js?v=2a83f537';
+import { createFloorsState } from '../public/js/home-floors.js?v=444d18d7';
+import { normalizeOwnerStacks } from '../public/js/neighbours-mp.js?v=f43b50c8';
+import { visitorHomeState } from '../public/js/features/homes-feature.js?v=7d259b4d';
 import { HAS_SITE, SITE_DIR } from '../tools/repos.mjs';
 import { HAS_PHP, PHP } from './php.js';
 

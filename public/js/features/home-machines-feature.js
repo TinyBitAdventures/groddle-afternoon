@@ -94,7 +94,7 @@ import {
   expireSolo,
   tankOf,
   TAKEN_KEEP,
-} from '../home-machines.js?v=7b36bf51';
+} from '../home-machines.js?v=41e9a72b';
 import { CALL_PLAYER_LINES, MACHINE_HITBOX, MACHINE_SKILLS, collectLine, machineJobMs, machineMadeLine, refuelCount, runningSoundKey, takeJobIngredients } from '../machine-rooms.js?v=ca927ffd';
 import { MACHINE_ART_SHEETS, LOW_FUEL_BUBBLE_MS, LOW_FUEL_LINE, isLowFuel, machineFrame, machineFrameRect, machineSheetDef, roomMachineState } from '../machine-art.js?v=d3381a4b';
 import { FUEL_CELL, FUEL_PER_CELL, MAX_FUEL } from '../machines.js?v=5d749d26';
@@ -105,11 +105,11 @@ import { RECIPE_CATALOG } from '../making.js?v=1ec1075e';
 import { getSkillCatalog } from '../content-catalogs.js?v=2b7048b9';
 import { createBackYardState, homeStreetLayout, normalizeCultivationState } from '../home-cultivation.js?v=2f71ba70';
 import { lookOf, poseOf } from './realtime-feature.js?v=ff77623a';
-import { insideQuery, readVisitScene } from '../neighbours-mp.js?v=e912be37';
+import { insideQuery, readVisitScene } from '../neighbours-mp.js?v=f43b50c8';
 import { saveStore } from '../save-store.js?v=4e720735';
 import { frameTexture, sourceFromUrl, textureFromUrl } from '../textures.js?v=b8e38103';
 import { createSheetLoader } from '../sprite-sheets.js?v=d787e3c3';
-import { STREET_GROUND_Y, homesFeature } from './homes-feature.js?v=2a83f537';
+import { STREET_GROUND_Y, homesFeature } from './homes-feature.js?v=7d259b4d';
 import { payAltarBonus } from './machine-rooms-feature.js?v=e27c6152';
 import { worldToScreen } from '../street-model.js?v=a9a05f9d';
 import { nearestSurfaceY } from '../walk-surface.js?v=3c919d5b';
@@ -220,10 +220,10 @@ function createSession(engine, client) {
 
   // —— Where we are ——
 
-  /** The place in a home a visit scene shows (MPH_<id>, _IN, _T<n>). */
+  /** The place in a home a visit scene shows (MPH_<id>, _IN, _IN<n> an upper floor: R5, G1313, _T<n>). */
   function visitPlace(scene) {
     if (scene.room === 'street') return PLACE_STREET;
-    if (scene.room === 'interior') return PLACE_HOUSE;
+    if (scene.room === 'interior') return housePlace(scene.floor);
     if (scene.room === 'tower') return towerPlace(scene.floor);
     return '';
   }
@@ -247,7 +247,7 @@ function createSession(engine, client) {
     if (s.room === 'street' && tsid === HOME_MACHINES_STREET) return { kind: 'own', owner, place: PLACE_STREET, key: `own:${PLACE_STREET}`, scene: s };
     if (s.room !== 'interior' || tsid !== HOME_MACHINES_INTERIOR) return null;
     // A Tower floor (scene.tower its index), or a floor of the house: G1249 (#669), Glitch's house was one
-    // location, so a machine stood on any floor of it; an upper floor is the owner's own room (G153).
+    // location, so a machine stood on any floor of it, and whoever may enter reaches every floor (R5, G1313).
     if (s.tower != null) return { kind: 'own', owner, place: towerPlace(s.tower), key: `own:${towerPlace(s.tower)}`, scene: s };
     const place = housePlace(s.houseFloor);
     return { kind: 'own', owner, place, key: `own:${place}`, scene: s };

@@ -26,9 +26,10 @@
 
 import { SEED_CATALOG, applyFertilizer, sowPlot, wetPlot } from './garden.js?v=a7c6f521';
 import { normalizeParcelBox, stackCopy } from './butler.js?v=152429c8';
-import { normalizeVisitGnomes } from './garden-gnome.js?v=d9f8e52b';
-import { normalizeVisitIcons } from './giant-icons.js?v=9c28aaf2';
-import { DROP_TEXT } from './drops-mp.js?v=6a16d73d';
+import { normalizeVisitGnomes } from './garden-gnome.js?v=73026b57';
+import { normalizeVisitIcons } from './giant-icons.js?v=3f078775';
+import { DROP_TEXT, homePlaceOf } from './drops-mp.js?v=189efccc';
+import { housePlace, isHousePlace } from './home-floors.js?v=444d18d7';
 
 /** The realtime server's street for a player's home street (homes.go). */
 export const HOME_STREET_PREFIX = 'HOME_';
@@ -183,35 +184,37 @@ function towerFloorOf(value) {
   return Number.isInteger(n) && n >= 0 && n <= 9 ? n : 0;
 }
 
-/** The realtime server's street for a home: HOME_<id>, HOUSE_<id>, or TOWER_<id>_<floor>. */
+/** config_base.js home_limits MAX_FLOORS: a house's upper floors are 1 and 2 (homes.go houseFloorsMax). */
+const HOUSE_UPPER_FLOORS = 2;
+
+/** A floor of the house: 0 the ground floor, 1 and 2 the upper ones (anything else the ground floor). */
+function houseFloorOf(value) {
+  const n = Number(value);
+  return Number.isInteger(n) && n >= 1 && n <= HOUSE_UPPER_FLOORS ? n : 0;
+}
+
+/**
+ * The realtime server's street for a home: HOME_<id>, HOUSE_<id> (the house's ground floor),
+ * HOUSE_<id>_<floor> (an upper floor, G1249), or TOWER_<id>_<floor>. Every floor of the house is the
+ * house (R5, G1313; js/home-floors.js): homes.go opens each to whoever may enter the house.
+ */
 export function homeStreetFor(ownerId, room = 'street', floor = 0) {
   const id = positiveId(ownerId);
   if (!id) return '';
   if (room === 'tower') return `${TOWER_STREET_PREFIX}${id}_${towerFloorOf(floor)}`;
-  return `${room === 'interior' ? HOUSE_STREET_PREFIX : HOME_STREET_PREFIX}${id}`;
+  if (room !== 'interior') return `${HOME_STREET_PREFIX}${id}`;
+  const f = houseFloorOf(floor);
+  return f ? `${HOUSE_STREET_PREFIX}${id}_${f}` : `${HOUSE_STREET_PREFIX}${id}`;
 }
 
-/** config_base.js home_limits MAX_FLOORS: a house's upper floors are 1 and 2 (homes.go houseFloorsMax). */
-const HOUSE_UPPER_FLOORS = 2;
-
-/**
- * G1249 (#669): the realtime server's street for an upper floor of the owner's house,
- * HOUSE_<id>_<floor> (homes.go houseFloorOwner), or ''. The floor is the owner's own room (G153):
- * the server lets nobody else onto it, and readHomeStreet reads none, so nothing shared (drops,
- * summons, visits) happens there; the owner's machines there are the server's word (home_machines.go).
- */
+/** G1249 (#669): the realtime server's street for an upper floor of the owner's house, HOUSE_<id>_<floor>, or ''. */
 export function houseFloorStreet(ownerId, floor) {
-  const id = positiveId(ownerId);
-  const f = Number(floor);
-  return id && Number.isInteger(f) && f >= 1 && f <= HOUSE_UPPER_FLOORS ? `${HOUSE_STREET_PREFIX}${id}_${f}` : '';
+  return houseFloorOf(floor) && Number(floor) === houseFloorOf(floor) ? homeStreetFor(ownerId, 'interior', floor) : '';
 }
 
-/** { owner, room, floor } a realtime home street names (homeStreetFor's inverse), or null. */
+/** { owner, room, floor } a realtime home street names (homeStreetFor's inverse), or null: the one parser, drops-mp.js homePlaceOf. */
 export function readHomeStreet(street) {
-  const m = /^(HOME|HOUSE)_([1-9]\d{0,17})$|^TOWER_([1-9]\d{0,17})_(\d)$/.exec(String(street || ''));
-  if (!m) return null;
-  if (m[3]) return { owner: Number(m[3]), room: 'tower', floor: Number(m[4]) };
-  return { owner: Number(m[2]), room: m[1] === 'HOUSE' ? 'interior' : 'street', floor: 0 };
+  return homePlaceOf(street);
 }
 
 /**
@@ -222,7 +225,7 @@ export function readHomeStreet(street) {
  * street or Tower floor (public, inc_pols.js 448-458) may too, and the realtime server refuses a
  * target that owner blocks (summon.go homePlace); from inside someone else's house too, and the
  * friend lands at that house's front door outside (summon.go doorOf, inc_teleportation.js
- * 663-665). An upper floor of your own house is shared with nobody, so nobody can be summoned to it.
+ * 663-665). Every floor of the house is the house (R5, G1313): the owner summons into any of them.
  */
 export function summonHomePlace({ street = '', me = 0, inHome = false, visiting = false } = {}) {
   const home = readHomeStreet(street);
@@ -230,34 +233,39 @@ export function summonHomePlace({ street = '', me = 0, inHome = false, visiting 
   return '';
 }
 
-/** The visit scene's tsid (engine.enterScene): MPH_<id> on the street, MPH_<id>_IN in the house, MPH_<id>_T<n> on a Tower floor. */
+/**
+ * The visit scene's tsid (engine.enterScene): MPH_<id> on the street, MPH_<id>_IN on the house's
+ * ground floor, MPH_<id>_IN<n> on an upper floor (R5, G1313), MPH_<id>_T<n> on a Tower floor.
+ */
 export function visitSceneTsid(ownerId, room = 'street', floor = 0) {
   const id = positiveId(ownerId);
   if (!id) return '';
   if (room === 'tower') return `${VISIT_SCENE_PREFIX}${id}_T${towerFloorOf(floor)}`;
-  return `${VISIT_SCENE_PREFIX}${id}${room === 'interior' ? '_IN' : ''}`;
+  if (room !== 'interior') return `${VISIT_SCENE_PREFIX}${id}`;
+  const f = houseFloorOf(floor);
+  return `${VISIT_SCENE_PREFIX}${id}_IN${f || ''}`;
 }
 
-/** { owner, room, floor? } a visit scene tsid names, or null. */
+/** { owner, room, floor } a visit scene tsid names (floor 0 on the street and the house's ground floor), or null. */
 export function readVisitScene(tsid) {
-  const m = /^MPH_([1-9]\d{0,17})(_IN|_T\d)?$/.exec(String(tsid || ''));
+  const m = /^MPH_([1-9]\d{0,17})(_IN[12]?|_T\d)?$/.exec(String(tsid || ''));
   if (!m) return null;
   if (m[2]?.startsWith('_T')) return { owner: Number(m[1]), room: 'tower', floor: Number(m[2].slice(2)) };
-  return { owner: Number(m[1]), room: m[2] ? 'interior' : 'street' };
+  if (m[2]) return { owner: Number(m[1]), room: 'interior', floor: Number(m[2].slice(3)) || 0 };
+  return { owner: Number(m[1]), room: 'street', floor: 0 };
 }
 
 /**
  * The street others share with the player now (realtime-feature's
  * realtimeStreet query): someone's home they visit, or their own home when
  * they are there. A Tower floor is TOWER_<id>_<floor> for its owner and its
- * visitors alike (MPVISIT); an upper house floor stays the owner's own room, a street of their
- * own (houseFloorStreet, G1249).
+ * visitors alike (MPVISIT), and so is an upper house floor, HOUSE_<id>_<floor> (G1249; R5, G1313).
  */
 export function sharedHomeStreet({ visit = null, me = 0, inHome = false, room = 'street', towerFloor = false, ownTowerFloor = null, houseFloor = 0 } = {}) {
   if (visit?.owner) return homeStreetFor(visit.owner, visit.room, visit.floor);
   if (!inHome || !positiveId(me)) return '';
   if (Number.isInteger(ownTowerFloor) && ownTowerFloor >= 0) return homeStreetFor(me, 'tower', ownTowerFloor);
-  // G1249: an upper house floor is a street of the owner's alone (machines stand there, as in Glitch's one-location house).
+  // G1249: an upper house floor is a street of its own, shared as the ground floor is (R5, G1313).
   if (Number(houseFloor) > 0) return houseFloorStreet(me, Number(houseFloor));
   if (towerFloor) return '';
   return homeStreetFor(me, room === 'interior' ? 'interior' : 'street');
@@ -488,7 +496,7 @@ export function normalizeHomeView(answer) {
 export const OWNER_STACK_PREFIX = 'home-own-';
 export const OWNER_STACK_TEXT = Object.freeze({ locked: 'You are not allowed to pick this up.' }); // takeable.js:34
 
-/** The site's rows, checked: [{ id, place: 'house' | 'tower:<n>', c, n, x, y, on? }]. */
+/** The site's rows, checked: [{ id, place: 'house' | 'house:<1|2>' | 'tower:<n>', c, n, x, y, on? }]. */
 export function normalizeOwnerStacks(rows) {
   if (!Array.isArray(rows)) return [];
   const out = [];
@@ -499,10 +507,10 @@ export function normalizeOwnerStacks(rows) {
     const x = Number(r?.x);
     const y = Number(r?.y);
     const place = String(r?.place ?? '');
-    if (!/^[A-Za-z0-9_-]{1,40}$/.test(id) || !/^[a-z0-9_]{1,64}$/.test(c) || !(n >= 1 && n <= 9999) || !Number.isFinite(x) || !Number.isFinite(y) || !/^(house|tower:[0-9])$/.test(place)) continue;
+    if (!/^[A-Za-z0-9_-]{1,40}$/.test(id) || !/^[a-z0-9_]{1,64}$/.test(c) || !(n >= 1 && n <= 9999) || !Number.isFinite(x) || !Number.isFinite(y) || !(/^tower:[0-9]$/.test(place) || isHousePlace(place))) continue;
     out.push({ id, place, c, n, x: Math.round(x), y: Math.round(y), ...(Number.isInteger(r?.on) && r.on > 0 ? { on: r.on } : {}) });
-    // The site's STACKS_MAX (1000) for each of 11 rooms: the house and the Tower's 10 floors.
-    if (out.length >= 11000) break;
+    // The site's STACKS_MAX (1000) for each of 13 rooms: the house's 3 floors and the Tower's 10.
+    if (out.length >= 13000) break;
   }
   return out;
 }
@@ -514,14 +522,16 @@ export function isOwnerStackId(id) {
 
 /**
  * The owner's stacks for one room of a visit, as game.js draws a dropped stack (spawnDroppedItemStack):
- * room 'interior' (x from the house's left end, drawn from roomX) or 'tower' (floor: the floor's own x).
+ * room 'interior' (floor 0: x from the house's left end, drawn from roomX; an upper floor, R5: its
+ * own x) or 'tower' (floor: the floor's own x).
  */
 export function ownerStacksFor(view, room, { floor = 0, roomX = 0, tsid = '' } = {}) {
-  const place = room === 'interior' ? 'house' : room === 'tower' ? `tower:${towerFloorOf(floor)}` : '';
+  const upper = room === 'interior' ? houseFloorOf(floor) : 0;
+  const place = room === 'interior' ? housePlace(upper) : room === 'tower' ? `tower:${towerFloorOf(floor)}` : '';
   if (!place) return [];
   const owner = positiveId(view?.owner?.id);
   const name = String(view?.owner?.name || 'Someone');
-  const dx = room === 'interior' ? Math.round(Number(roomX) || 0) : 0;
+  const dx = room === 'interior' && !upper ? Math.round(Number(roomX) || 0) : 0;
   return (Array.isArray(view?.stacks) ? view.stacks : []).filter((r) => r.place === place).map((r) => ({
     id: `${OWNER_STACK_PREFIX}${owner}-${r.id}`,
     streetTsid: String(tsid || ''),

@@ -52,8 +52,8 @@ import { ELEMENT_CLASSES, NO_BAG_CLASSES, NO_SLOT_CLASSES } from '../pack-slots-
 import { TOOL_CONDITION_CATALOG, copyTagKind, copyTags, pickToolCopies, receiveToolCopy, setCopyTag, takeToolCopy } from '../tools.js?v=4156bba8';
 import { draggedStack, takeDragged } from '../drag-stack.js?v=4321c8c6';
 import { scriptFromTag, scriptLabel } from '../teleportation.js?v=cbbc673f';
-import { insideQuery, possessive, readVisitScene } from '../neighbours-mp.js?v=e912be37';
-import { homesFeature } from './homes-feature.js?v=2a83f537';
+import { insideQuery, possessive, readVisitScene } from '../neighbours-mp.js?v=f43b50c8';
+import { homesFeature } from './homes-feature.js?v=7d259b4d';
 import { saveStore, savedThrough } from '../save-store.js?v=4e720735';
 import {
   SDB_PRICE_MAX,
@@ -151,7 +151,8 @@ function notice(engine, text, ms = 3600) {
 
 /** 'own' (inside my own house, any floor), 'visit' (inside someone's house, multiplayer), or ''. */
 function where(engine) {
-  if (visit && readVisitScene(engine.streetTsid)?.owner === visit.owner && readVisitScene(engine.streetTsid)?.room === 'interior') return 'visit';
+  // A visit's boxes and cabinets are the ground floor's (the site's LedgerBoxes, the server's home_boxes.go).
+  if (visit && readVisitScene(engine.streetTsid)?.owner === visit.owner && readVisitScene(engine.streetTsid)?.room === 'interior' && !readVisitScene(engine.streetTsid)?.floor) return 'visit';
   if (!engine.homeContext?.()?.inHome) return '';
   const st = homesFeature._state?.();
   if (st?.scene?.room !== 'interior' || st.scene.construction) return '';
@@ -1221,10 +1222,13 @@ export const homeStorageFeature = {
     if (mp(engine) && where(engine) === 'own') loadOwn(engine, { force: true });
   },
 
-  /** home-street-mp-feature onVisit: a visit scene was built ({ owner, name, room, key, spots }). */
+  /**
+   * home-street-mp-feature onVisit: a visit scene was built ({ owner, name, room, floor, key, spots }).
+   * The boxes and cabinets visitors reach are the ground floor's (LedgerBoxes): none on an upper floor.
+   */
   homeStorageVisit(info, engine) {
-    if (engine?.mode !== 'multiplayer' || info?.room !== 'interior') {
-      if (info?.room !== 'interior') visit = null;
+    if (engine?.mode !== 'multiplayer' || info?.room !== 'interior' || Number(info?.floor) > 0) {
+      visit = null;
       return null;
     }
     visit = { owner: Number(info.owner), name: String(info.name || ''), key: info.key === true, roomX: Number(info.spots?.roomX) || 0, pieces: info.spots?.pieces || [], data: null };

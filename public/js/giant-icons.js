@@ -45,6 +45,7 @@
  */
 
 import { GIANT_ICON_DATA } from './giant-icons-data.js?v=5026b09c';
+import { isHousePlace } from './home-floors.js?v=444d18d7';
 import { giantDisplayName } from './giant-names.js?v=0e295891';
 // The Icon conversations' one copy, with every other teller's (G214); the key every importer uses.
 import { TELLERS } from './conversations-data.js?v=f11b7e02';
@@ -469,14 +470,14 @@ export const ICON_VISIT_MAX = 24;
 
 /**
  * #697: the site's list of a home owner's placed Icons (Neighbours::iconRows), checked: only the
- * places a visitor can stand in (the home street, the house's ground floor, a Tower floor).
+ * places a visitor can stand in (the home street, any floor of the house: R5, G1313, a Tower floor).
  */
 export function normalizeVisitIcons(list) {
   return (Array.isArray(list) ? list : [])
     .slice(0, ICON_VISIT_MAX * 4)
     .filter((r) => r && typeof r === 'object' && GIANT_ICON_DATA[r.giant] && Number.isFinite(Number(r.x)) && Number.isFinite(Number(r.y)))
     .map((r) => ({ id: String(r.id || ''), giant: r.giant, place: String(r.place || ''), x: Math.round(Number(r.x)), y: Math.round(Number(r.y)), actions: whole(r.actions, 10_000), tither: Number.isInteger(r.tither) && r.tither > 0 ? r.tither : null }))
-    .filter((r) => /^icon\d{1,9}$/.test(r.id) && /^(street|house|tower:\d)$/.test(r.place))
+    .filter((r) => /^icon\d{1,9}$/.test(r.id) && (/^(street|tower:\d)$/.test(r.place) || isHousePlace(r.place)))
     .slice(0, ICON_VISIT_MAX);
 }
 

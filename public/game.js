@@ -4,7 +4,7 @@
  */
 import { ITEM_ICONS, ITEM_LABELS, getVerbsFor, ordinaryItems, runVerb } from './content.js?v=3cefd46f';
 import { createErrorOnce, createFeatureHost, createFrameStages } from './js/feature-host.js?v=b87e2cbc';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=34fc86e4';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=7f456157';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, enterHintPick, reachGlowTargets, trimmedIconUrl, drawTileArt } from './js/enter-chooser.js?v=de94bf7a';
 import { firstTendKey, STICK_TEND_DELAY_MS, STICK_TEND_DIRS, STICK_TEND_REPEAT_MS, stepTendKey, stepTendKeys, stickTendKey, tendKeyAction } from './js/garden-tend.js?v=a7470c4a';
 import { avatarHitBox, behindFloor, bodyReachDistance, OUT_OF_REACH_LINE, playerClickBox } from './js/reach.js?v=456da8a8';
@@ -676,7 +676,7 @@ import {
   recipeToolChosen,
   pluralizeItem,
 } from './js/making.js?v=1ec1075e';
-import { MAKE_FUEL_TIP, makeFuelView } from './js/home-machines.js?v=7b36bf51';
+import { MAKE_FUEL_TIP, makeFuelView } from './js/home-machines.js?v=41e9a72b';
 import { outputIconsHtml, outputsPhrase, productHaveRows, recipeOutputRows } from './js/ui/recipe-outputs.js?v=610c067f';
 import { MAKE_TOOL_SHEETS } from './js/make-tool-sheets.js?v=6f758e09';
 import { createTestTubePanel, tryTileHtml, TRY_TILE_LABEL } from './js/test-tube-panel.js?v=e5bfa842';
@@ -1157,7 +1157,7 @@ import { HOME_SCREEN_TIP_CACHE, iosSafari, mountHomeScreenTip, runsStandalone } 
 import { EAT_PICK_TEXT, bestFoodIndex, eatChoices, eatTip } from './js/eat-pick.js?v=8fb763d0';
 import { heldDirection, installHeldKeyGuard, isMacPlatform } from './js/held-keys.js?v=a28eb293';
 import { isOneClickDoor, oneClickChoice, signpostArmRows, worldContextAction } from './js/world-context-menu.js?v=e4c99c05';
-import { blockedPlayerVerbs, listPlayerTarget, opensPlayerMenu, playerMenuRows } from './js/ui/player-menu.js?v=9c5da3d6';
+import { blockedPlayerVerbs, listPlayerTarget, opensPlayerMenu, playerMenuRows } from './js/ui/player-menu.js?v=11d5c75e';
 import { forgetTexture, frameTexture, isFailed, isLoaded, onFailed, onLoaded, textureFromUrl, whenLoaded } from './js/textures.js?v=b8e38103';
 import { FALLBACK_MAX as WORLD_ART_FALLBACK_MAX, worldArtFor } from './js/world-art.js?v=a67514c8';
 import { HOME_PIP_PX, HOME_PIP_WORDS, drawLockPip, drawPipWords, homeMarkNote, homePipShown, homePipWordsShown, homeStackMark } from './js/home-stack-marks.js?v=a41ed26e';
@@ -16535,8 +16535,8 @@ function spawnDroppedItemStack(stack, mark = '') {
  */
 function restingStackY(x, y) {
   if (homeIsInstanced() && currentStreetTsid === HOME_INTERIOR_TSID) return y;
-  // G1190: a visitor's house and Tower scenes show the owner's stacks where the owner set them (a table, a shelf).
-  if (/^MPH_\d+(?:_IN|_T\d+)$/.test(String(currentStreetTsid || ''))) return y;
+  // G1190: a visitor's house (every floor of it, R5) and Tower scenes show the owner's stacks where the owner set them (a table, a shelf).
+  if (/^MPH_\d+(?:_IN[12]?|_T\d+)$/.test(String(currentStreetTsid || ''))) return y;
   return stackRestY(streetPlatforms, x, y) ?? y;
 }
 

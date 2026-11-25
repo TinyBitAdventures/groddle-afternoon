@@ -32,7 +32,8 @@
  *   stacked in it (locations/inc_homes.js homes_add_floor_at 189-219), so a
  *   machine stood on any floor. The ground floor is "house" (HOUSE_<id>, the
  *   room visitors share); an upper floor is "house:1" / "house:2"
- *   (HOUSE_<id>_<floor> on the realtime server, the owner's own room, G153),
+ *   (HOUSE_<id>_<floor> on the realtime server; whoever may enter the house
+ *   reaches it, R5, G1313),
  *   with the house's walls and x from its own left end.
  * - Anyone standing there could use it, refuel it and collect what they made
  *   (verbs.use 633-684, refuel 442-558, collect 560-631: no owner check);
@@ -108,6 +109,7 @@ import {
 import { ASSEMBLY_SKILL, FUEL_PER_CELL, MAX_FUEL, isMachine } from './machines.js?v=5d749d26';
 import { INTERIOR, interiorBounds } from './home-decor.js?v=31f37d9b';
 import { machineRoomLayout } from './machine-rooms.js?v=ca927ffd';
+import { housePlace, isHousePlace } from './home-floors.js?v=444d18d7';
 
 export const HOME_MACHINES_ID = 'home-machines';
 
@@ -149,13 +151,8 @@ export const roomMachineSpan = () => ({ lo: MACHINE_ROOM_BOUNDS.l, hi: MACHINE_R
 export const roomFixedXs = (place) => (machineRoomLayout(roomTsidOf(place))?.machines || []).map((m) => m.x);
 /** isInCraftingAltar (fuelmaker.js 1197-1199): a machine in a machine room rolls the Altar bonus. */
 export const placeIsAltar = (p) => isRoomPlace(p);
-/** G1249: the house's floor `floor` (0 the ground floor, 1 and 2 the upper ones: home_limits MAX_FLOORS 3). */
-export const housePlace = (floor) => {
-  const f = Math.max(0, Math.min(2, Math.floor(Number(floor) || 0)));
-  return f ? `${PLACE_HOUSE}:${f}` : PLACE_HOUSE;
-};
-/** Whether a place is a floor of the house (any of them). */
-export const isHousePlace = (p) => /^house(:[12])?$/.test(String(p || ''));
+/** G1249: the house's floor `floor` (0 the ground floor, 1 and 2 the upper ones), and whether a place is one (R5, js/home-floors.js). */
+export { housePlace, isHousePlace };
 export const towerPlace = (floor) => `tower:${Math.max(0, Math.min(8, Math.floor(Number(floor) || 0)))}`;
 /** Only the home street is a home's public half that pays the pool (inc_cultivation.js:170, inc_houses.js 1706-1709). */
 export const placePays = (p) => (p || PLACE_STREET) === PLACE_STREET;

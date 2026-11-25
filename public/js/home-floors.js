@@ -45,6 +45,18 @@
  *    tall location. The house outside does not grow.
  *  - Words the source has none for (why a Door cannot go somewhere, why a
  *    wall cannot be added while building) are short and ours.
+ *
+ * R5, every floor of the house is the house (G1313, Austin 2026-11-25: "as
+ * Glitch: key holders and let-in visitors go upstairs; upper floors shared
+ * like the ground floor"). In the source the floors were one location and its
+ * Doors had no verb that asked who you were (furniture_door.js), so whoever
+ * pols_canEnter let into the house walked every floor, and whatever stood on
+ * one was there for them as on the ground floor. Online each floor is a place
+ * of its own, "house" (the ground floor, HOUSE_<id> on the realtime server)
+ * and "house:1" / "house:2" (HOUSE_<id>_<floor>): housePlace names it,
+ * isHousePlace says a place is one of them, and everything a visitor shares on
+ * the ground floor (drops, machines, Icons, gnomes, the owner's locked
+ * stacks) is shared on every floor through it.
  */
 
 import { HOME_LIMITS } from './homes-catalog.js?v=0367f90f';
@@ -102,6 +114,22 @@ export function createFloorsState(seed = {}, ground = null) {
   }
   const at = Math.max(0, Math.min(floors - 1, whole(seed?.at, 0)));
   return { upper, links, pending, at };
+}
+
+/** R5: a floor of the house as a place: "house" (0, the ground floor), "house:1", "house:2". */
+export function housePlace(floor) {
+  const f = Math.max(0, Math.min(MAX_FLOORS - 1, Math.floor(Number(floor) || 0)));
+  return f ? `house:${f}` : 'house';
+}
+
+/** R5: any floor of the house. */
+export const HOUSE_PLACE_RE = /^house(:[12])?$/;
+export const isHousePlace = (place) => HOUSE_PLACE_RE.test(String(place || ''));
+
+/** R5: the floor a house place names (0 the ground floor), or -1 for any other place. */
+export function housePlaceFloor(place) {
+  if (!isHousePlace(place)) return -1;
+  return place === 'house' ? 0 : Number(String(place).slice(6));
 }
 
 export function floorCount(fs) {

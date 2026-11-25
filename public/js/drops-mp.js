@@ -42,8 +42,9 @@
  * see it locked (neighbours-mp-feature, the site's Neighbours::stackRows),
  * as they see the owner's stacks dropped there before G1190. In the house x
  * is kept from the house's left end, as on the home street; a Tower floor
- * keeps its own x. An upper floor of the house (G153) is a room of the
- * remake's own with no visitors, and stays private.
+ * keeps its own x. Every floor of the house is the house (R5, G1313): an
+ * upper floor (HOUSE_<owner>_<floor>, G153) is shared as the ground floor is,
+ * its x its own.
  *
  * Ours: a class the ledger does not carry (the trade table), a note (its
  * writing would not travel) and anything dropped in a private place (a
@@ -184,13 +185,16 @@ export function homeStreetOwner(street) {
 }
 
 /**
- * The home a realtime street is (homes.go: HOME_<owner>, HOUSE_<owner>, TOWER_<owner>_<floor>):
- * { owner, room: 'street' | 'interior' | 'tower', floor }, or null for any other street.
+ * The home a realtime street is (homes.go: HOME_<owner>, HOUSE_<owner>, HOUSE_<owner>_<floor>,
+ * TOWER_<owner>_<floor>): { owner, room: 'street' | 'interior' | 'tower', floor }, or null for any
+ * other street. Every floor of the house is the house (R5, G1313; js/home-floors.js): an upper
+ * floor is room 'interior' with its floor (1 or 2), shared as the ground floor is.
  */
 export function homePlaceOf(street) {
-  const m = /^(HOME|HOUSE)_([1-9][0-9]{0,17})$|^TOWER_([1-9][0-9]{0,17})_([0-9])$/.exec(String(street || ''));
+  const m = /^(HOME|HOUSE)_([1-9][0-9]{0,17})$|^TOWER_([1-9][0-9]{0,17})_([0-9])$|^HOUSE_([1-9][0-9]{0,17})_([12])$/.exec(String(street || ''));
   if (!m) return null;
   if (m[3]) return { owner: Number(m[3]), room: 'tower', floor: Number(m[4]) };
+  if (m[5]) return { owner: Number(m[5]), room: 'interior', floor: Number(m[6]) };
   return { owner: Number(m[2]), room: m[1] === 'HOUSE' ? 'interior' : 'street', floor: 0 };
 }
 
