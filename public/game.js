@@ -5,7 +5,7 @@
 import { ITEM_ICONS, ITEM_LABELS, getVerbsFor, ordinaryItems, runVerb } from './content.js?v=3cefd46f';
 import { createErrorOnce, createFeatureHost, createFrameStages } from './js/feature-host.js?v=b87e2cbc';
 import { FEATURES, questFlagsFeature } from './js/features/index.js?v=3ca4e4c5';
-import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, enterHintPick, reachGlowTargets, trimmedIconUrl, drawTileArt } from './js/enter-chooser.js?v=de94bf7a';
+import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, enterHintPick, reachGlowTargets, spriteHasRimArt, trimmedIconUrl, drawTileArt } from './js/enter-chooser.js?v=38d401c2';
 import { firstTendKey, STICK_TEND_DELAY_MS, STICK_TEND_DIRS, STICK_TEND_REPEAT_MS, stepTendKey, stepTendKeys, stickTendKey, tendKeyAction } from './js/garden-tend.js?v=a7470c4a';
 import { avatarHitBox, behindFloor, bodyReachDistance, OUT_OF_REACH_LINE, playerClickBox } from './js/reach.js?v=456da8a8';
 import { createVogOverlay } from './js/vog-overlay.js?v=e883b3e3';
@@ -8631,6 +8631,9 @@ function pickInteractableAt(worldX, worldY) {
  * @param {PIXI.Sprite|PIXI.AnimatedSprite} source
  * @param {{ color?: number, thickness?: number }} [opts]
  */
+/** #701/#702: only a Sprite with a real texture takes the rim (spriteHasRimArt, js/enter-chooser.js). */
+const rimArt = (spr) => spriteHasRimArt(spr, PIXI);
+
 function createSpriteOutline(source, opts = {}) {
   // Soft cool rim like original selection glow
   const color = opts.color ?? 0xa8e8ff;
@@ -8670,7 +8673,7 @@ function createSpriteOutline(source, opts = {}) {
   }
 
   for (const [dx, dy] of ring) {
-    const s = new PIXI.Sprite(source.texture);
+    const s = new PIXI.Sprite(rimArt(source) ? source.texture : PIXI.Texture.EMPTY);
     if (source.anchor) s.anchor.copyFrom(source.anchor);
     s.position.set(dx, dy);
     s.alpha = 0.7;
@@ -8706,7 +8709,7 @@ function createSpriteOutline(source, opts = {}) {
   outline._outlineSource = source;
   outline.syncOutlineTexture = () => {
     const src = outline._outlineSource;
-    if (!src || src.destroyed) {
+    if (!src || src.destroyed || !rimArt(src)) {
       outline.visible = false;
       return;
     }
@@ -8759,7 +8762,7 @@ function setHoverTarget(target) {
   hoverTarget = target;
   // The reach glow's rim gives way to the hover's (#669: one rim per thing).
   dropReachGlow(target);
-  target._hoverGlow = addSpriteRim(target.sprite);
+  if (rimArt(target.sprite)) target._hoverGlow = addSpriteRim(target.sprite);
 }
 
 /** The cyan rim (tsSprite_GlowA) behind a sprite on entityLayer: the hover's and the reach glow's. */
@@ -8806,7 +8809,7 @@ function reachGlowWanted() {
   }
   // A sprite with art to trace: a garden's bare cells and a bare hit box have none.
   return reachGlowTargets(near, { hover: hoverTarget, climbing: climb.active })
-    .filter((t) => t?.sprite && !t.sprite.destroyed && t.sprite.texture && t.sprite.texture !== PIXI.Texture.EMPTY);
+    .filter((t) => rimArt(t?.sprite));
 }
 function updateReachGlow(now = performance.now()) {
   if (now - reachGlowAt > 150) {
