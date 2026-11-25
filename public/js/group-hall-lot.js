@@ -103,6 +103,37 @@ export const LOT_TEXT = Object.freeze({
   tooltip: 'Build a new Group Hall', // 48
 });
 
+/**
+ * G1301 (#696): each hall job's street, the public street its lot stands on (the job's
+ * connecting street in street-jobs.json, its label in assets/streets/index.json). Menu > Groups
+ * names a group's hall by it without loading the projects catalog; tests/g1301-group-hall-owned
+ * checks it against both files.
+ */
+export const HALL_STREETS = Object.freeze({
+  689: Object.freeze({ tsid: 'GLI32KHF0UD1AOK', name: 'Estevan Hummock' }),
+  690: Object.freeze({ tsid: 'GCR10U5VHMK112O', name: 'Bailestorth Shin' }),
+  691: Object.freeze({ tsid: 'GLI334UG2UD1IKQ', name: 'Waylon Way' }),
+  692: Object.freeze({ tsid: 'GLI32N0F1UD114O', name: 'Archimedes Acres' }),
+  693: Object.freeze({ tsid: 'GCRVT5V0BDO1HLF', name: 'Welldale' }),
+  694: Object.freeze({ tsid: 'GCR10157DMK1L0G', name: 'Addingfoot Trip' }),
+  695: Object.freeze({ tsid: 'GCR13JCI5MK1EF4', name: 'Hellenturret Pass' }),
+  696: Object.freeze({ tsid: 'GCR13KDF9MK1QJK', name: 'Evanfell Craine' }),
+  697: Object.freeze({ tsid: 'GLIF37ASJFE1AVQ', name: 'Doon Way' }),
+  698: Object.freeze({ tsid: 'GCR103UREMK11MT', name: 'Fairgower Lane' }),
+});
+
+/** The street a hall job's lot stands on ("Archimedes Acres"), or '' for no hall. */
+export const hallStreetName = (jobId) => HALL_STREETS[String(jobId || '')]?.name || '';
+
+/** G1301: the words for a finished hall (ours: Glitch opened its street, which the archive lacks). */
+export const OWNED_TEXT = Object.freeze({
+  name: (group) => `${group}'s Group Hall`,
+  row: (street) => `Group Hall: ${street}`,
+  details: (street) => `This group owns the Group Hall on ${street}. The hall's own street will open in a later update.`,
+  closed: "This hall's street isn't open yet. It will open in a later update.",
+  verb: 'visit',
+});
+
 /** The street's group hall jobs (catalog.byStreet after mergeHalls), in board order. */
 export function lotJobIds(catalog, tsid) {
   const g = String(tsid || '').replace(/^L/, 'G');

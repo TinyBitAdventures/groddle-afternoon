@@ -32,7 +32,7 @@ import { fileURLToPath } from 'node:url';
 import { FFDEC, JAVA } from '../vector-sprites/swf-labels.mjs';
 import { encodeLosslessWebp } from '../webp-lossless.mjs';
 import { imageSize } from '../image-size.mjs';
-import { LOT_ART } from '../../public/js/group-hall-lot.js?v=23e8fbd9';
+import { LOT_ART } from '../../public/js/group-hall-lot.js?v=afb8d974';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
 const SWF = join(os.homedir(), 'Documents/glitch-audit/glitch-items/misc/group_hall_lot_marker/group_hall_lot_marker.swf');

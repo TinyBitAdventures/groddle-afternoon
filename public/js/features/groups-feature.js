@@ -88,7 +88,8 @@ import {
   shownName,
   tabOrder,
   writeMemory,
-} from '../groups.js?v=2a2c49ab';
+} from '../groups.js?v=b90d8099';
+import { OWNED_TEXT } from '../group-hall-lot.js?v=afb8d974';
 import { appendLinkedText } from '../chat-links.js?v=b717fac7';
 import { lineKey as reactKey } from '../chat-reactions.js?v=38460172';
 import { DELETE_TEXT, deletableChannel, lineLidOf, mayDelete } from '../chat-delete.js?v=c55a1043';
@@ -802,6 +803,8 @@ function createSession(engine, client) {
     const bits = [`${g.members} ${g.members === 1 ? 'member' : 'members'}`];
     if (g.role === 'admin' && list?.groups.some((m) => m.id === g.id)) bits.push(GROUP_TEXT.admin);
     if (g.invitedBy) bits.push(`invited by ${g.invitedBy.name}`);
+    // G1301 (#696): the hall the group owns, by its street.
+    if (g.hall) bits.push(OWNED_TEXT.row(g.hall.street));
     what.append(el('small', {}, [g.description, bits.join(' · ')].filter(Boolean).join(' · ')));
     li.append(what, ...buttons);
     for (const more of [extra].flat()) if (more) li.append(more);
@@ -847,6 +850,7 @@ function createSession(engine, client) {
           if (people.has(g.id) || inviting === g.id) {
             extra = el('div', { class: 'grp-people' });
             if (people.has(g.id)) extra.append(el('p', {}, people.get(g.id).map((p) => (p.role === 'admin' ? `${p.name} (${GROUP_TEXT.admin})` : p.name)).join(', ')));
+            if (people.has(g.id) && g.hall) extra.append(el('p', { 'data-group-hall': g.hall.job }, OWNED_TEXT.details(g.hall.street)));
             if (inviting === g.id) {
               const picks = el('div', { class: 'grp-picks' });
               const candidates = invitable(g);

@@ -27,9 +27,9 @@ import {
   validateHouseFile,
 } from '../public/js/house-file.js?v=326ab019';
 import { applyHouse, bootHouseFile, houseFileRequest } from '../public/js/house-file-loader.js?v=098dae8f';
-import { homesFeature } from '../public/js/features/homes-feature.js?v=f67e4d36';
-import { homeMachinesFeature } from '../public/js/features/home-machines-feature.js?v=531861a0';
-import { craftybotFeature } from '../public/js/features/craftybot-feature.js?v=150bfd01';
+import { homesFeature } from '../public/js/features/homes-feature.js?v=92e952c9';
+import { homeMachinesFeature } from '../public/js/features/home-machines-feature.js?v=80d0481e';
+import { craftybotFeature } from '../public/js/features/craftybot-feature.js?v=04807a85';
 import { createHomeState, imagineHome } from '../public/js/homes.js?v=dca6b2cd';
 import { normalizeDroppedItemState, setDownStack } from '../public/js/world-items.js?v=a5deb102';
 

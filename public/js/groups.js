@@ -13,6 +13,7 @@
 import { hasBadWord, NAME_REFUSED } from './word-filter.js?v=9a7a7ebb';
 import { UNNAMED_PLAYER } from './player-names.js?v=f9b78094';
 import { CHAT_MAX_CHARS } from './ui/chat-input.js?v=8f2479a3';
+import { OWNED_TEXT, hallStreetName } from './group-hall-lot.js?v=afb8d974';
 
 /** config_prod.js:39 max_groups. */
 export const GROUPS_MAX = 20;
@@ -103,7 +104,19 @@ export function normalizeGroup(g) {
     members: n0(g?.members),
     role: g?.role === 'admin' ? 'admin' : 'member',
     member: g?.member === true,
+    hall: hallOf(g?.hall),
   };
+}
+
+/**
+ * G1301 (#696): the group hall a group owns (Groups::card's `hall`, the site's LedgerHall row
+ * once the hall is built): its job and the street its lot stands on (group-hall-lot.js
+ * HALL_STREETS), or null. Glitch made the group the hall's owner (quest.js 1846-1859).
+ */
+export function hallOf(h) {
+  const job = String(h?.job ?? '').replace(/[^0-9]/g, '').slice(0, 8);
+  const street = hallStreetName(job);
+  return job && street ? { job, street } : null;
 }
 
 /** The site's answer for the caller (Groups::answer), checked. */

@@ -33,10 +33,10 @@ import {
   tabCommand,
   tabOrder,
   writeMemory,
-} from '../public/js/groups.js?v=2a2c49ab';
+} from '../public/js/groups.js?v=b90d8099';
 import { createMinnAccount } from '../public/js/minn-account.js?v=7c3bdd51';
-import { groupsFeature } from '../public/js/features/groups-feature.js?v=5d8de2f1';
-import { FEATURES } from '../public/js/features/index.js?v=da06d359';
+import { groupsFeature } from '../public/js/features/groups-feature.js?v=7b76fcca';
+import { FEATURES } from '../public/js/features/index.js?v=293106a2';
 import { serverPath, sitePath, skipWithoutServer, skipWithoutSite } from '../tools/repos.mjs';
 
 const root = join(import.meta.dirname, '..');
@@ -573,6 +573,27 @@ describe('groups feature (js/features/groups-feature.js)', () => {
     client.msg({ t: 'group_renamed', group: 12, name: '   ' });
     assert.equal(engine.data.groupsRenamed, '12:Stripes Club');
     assert.ok(!s.list.groups.some((g) => g.name === 'Elsewhere'));
+  });
+
+  it('G1301 #696: a group that owns a hall says so on its row and in its details, by the hall\'s street', async () => {
+    const s = globalThis.groddleGroups;
+    // The site's card (Groups::card hall, the LedgerHall row once built): job 692 is Archimedes Acres' hall.
+    answer.groups.find((g) => g.id === 7).hall = { job: '692' };
+    s.openPanel();
+    await wait(5);
+    const shade = document.body.children.find((c) => c.attrs?.id === 'groups-shade');
+    assert.match(shade.find('data-group', '7').text(), /Group Hall: Archimedes Acres/);
+    assert.doesNotMatch(shade.find('data-group', '12').text(), /Group Hall/, 'a group with no hall says nothing');
+    assert.equal(shade.find('data-group-hall'), undefined, 'the details wait for Members');
+    shade.find('data-group-members', '7').click();
+    await wait(5);
+    const details = shade.find('data-group-hall', '692');
+    assert.ok(details, 'the details name the hall');
+    assert.equal(details.textContent, "This group owns the Group Hall on Archimedes Acres. The hall's own street will open in a later update.");
+    assert.ok(!/—/.test(details.textContent));
+    shade.find('data-group-members', '7').click();
+    delete answer.groups.find((g) => g.id === 7).hall;
+    s.closePanel();
   });
 });
 
