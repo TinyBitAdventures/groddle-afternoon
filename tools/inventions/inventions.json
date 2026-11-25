@@ -5866,7 +5866,7 @@
   },
   {
    "id": "enter-walk-past-chip",
-   "title": "The walk-past Enter chip: a key chip over the nearest thing in reach naming it, or \"choose from N\" with several, shown as you walk past (phones only since #669)",
+   "title": "The walk-past chips: a key chip over the nearest thing in reach naming it, or \"choose from N\" with several, and the signpost and ladder chips (\"Enter · Choose a road\", \"↑ climb\"), shown as you walk past (phones only since #669 and G1310)",
    "kind": "UI",
    "status": "kept",
    "where": [
@@ -5876,17 +5876,18 @@
     },
     {
      "file": "public/game.js",
-     "symbol": "run('prompt') updateReachGlow"
+     "symbol": "run('prompt') updateReachGlow syncPostGlow"
     },
     {
      "file": "public/js/touch-controls.js",
      "symbol": "touchPrompt"
     }
    ],
-   "why": "Glitch put no words over things as you walked past: what the avatar touched glowed (MiddleGroundRenderer.as _findInteractionSprites 1092-1131) and the mouse named a thing (LocationItemstackView.as getTip). A phone has no mouse to name things, and the chip is how Act's choices are found there.",
-   "ruling": "Austin 2026-11-25 (#669, G1304): on a computer no walk-past chip, as Glitch (things in reach glow, the hover names them, Enter opens the chooser as before); keep the chip on phones (the gate's 'phone' device; tablets play as computers)",
+   "why": "Glitch put no words over things as you walked past: what the avatar touched glowed (MiddleGroundRenderer.as _findInteractionSprites 1092-1131), signposts and ladders too (glowSignPosts, glowLadders; SignpostView.as glow 612-617), a signpost's arms named their roads and the mouse named a thing (LocationItemstackView.as getTip). A phone has no mouse to name things, and the chips are how Act's choices are found there.",
+   "ruling": "Austin 2026-11-25 (#669, G1304): on a computer no walk-past chip, as Glitch (things in reach glow, the hover names them, Enter opens the chooser as before); keep the chip on phones (the gate's 'phone' device; tablets play as computers). Austin 2026-11-25 evening (G1310): the signpost and ladder chips too, glow only, as Glitch: on a computer the post at hand glows (no chip while climbing or at a ladder either), Enter still takes hold of the post and Up still climbs; phones keep both chips",
    "rows": [
-    "G1304"
+    "G1304",
+    "G1310"
    ]
   },
   {

@@ -69,7 +69,8 @@ describe('#669 point 3: no walk-past chip on a computer', () => {
 
   it('game.js: the reach glow is a computer\'s, in the hover\'s rim, every frame', () => {
     const game = read('public/game.js');
-    assert.match(game, /function reachGlowWanted\(\) \{\s*if \(TOUCH_PHONE \|\| !state\.started \|\| menuTarget \|\| currentAction \|\| isScreenFxBlocking\(\)\) return \[\];/);
+    assert.match(game, /function reachGlowOff\(\) \{\s*if \(TOUCH_PHONE \|\| !state\.started \|\| menuTarget \|\| currentAction \|\| isScreenFxBlocking\(\)\) return true;/);
+    assert.match(game, /function reachGlowWanted\(\) \{\s*if \(reachGlowOff\(\)\) return \[\];/);
     assert.match(game, /reachGlowTargets\(near, \{ hover: hoverTarget, climbing: climb\.active \}\)/);
     assert.match(game, /reachGlows\.set\(t, addSpriteRim\(t\.sprite\)\)/);
     assert.match(game, /dropReachGlow\(target\);\s*target\._hoverGlow = addSpriteRim\(target\.sprite\);/);

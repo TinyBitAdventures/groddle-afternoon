@@ -8,7 +8,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
-import { decoWhollyAboveTop } from '../public/js/street-render.js?v=cfb77c44';
+import { decoWhollyAboveTop } from '../public/js/street-render.js?v=cd2b2649';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', 'public');
 const street = (tsid) => JSON.parse(readFileSync(join(ROOT, `assets/streets/${tsid}.json`), 'utf8'));

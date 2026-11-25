@@ -4,7 +4,7 @@
  */
 import { ITEM_ICONS, ITEM_LABELS, getVerbsFor, ordinaryItems, runVerb } from './content.js?v=3cefd46f';
 import { createErrorOnce, createFeatureHost, createFrameStages } from './js/feature-host.js?v=b87e2cbc';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=cfe74a7f';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=7dae65d4';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, enterHintPick, reachGlowTargets, trimmedIconUrl, drawTileArt } from './js/enter-chooser.js?v=de94bf7a';
 import { firstTendKey, STICK_TEND_DELAY_MS, STICK_TEND_DIRS, STICK_TEND_REPEAT_MS, stepTendKey, stepTendKeys, stickTendKey, tendKeyAction } from './js/garden-tend.js?v=a7470c4a';
 import { avatarHitBox, behindFloor, bodyReachDistance, OUT_OF_REACH_LINE, playerClickBox } from './js/reach.js?v=456da8a8';
@@ -741,7 +741,7 @@ import {
   ensureStreetIndex,
   resolveIndexTsid,
 } from './js/street-loader.js?v=10376267';
-import { showDraftBanner, startDraftPlay } from './js/builder/draft-play.js?v=3bb6e2f4';
+import { showDraftBanner, startDraftPlay } from './js/builder/draft-play.js?v=18d6b9e3';
 import { bootHouseFile } from './js/house-file-loader.js?v=098dae8f';
 import {
   ladderTopDeck,
@@ -774,7 +774,8 @@ import {
   setSignpostHover,
   setSignpostKeys,
   signpostBoardAt,
-} from './js/street-render.js?v=cfb77c44';
+  signpostGlowParts,
+} from './js/street-render.js?v=cd2b2649';
 import {
   GAME_DAY_MS,
   GAME_EPOCH_MS,
@@ -8796,9 +8797,13 @@ function dropReachGlow(target) {
     rim.destroy({ children: true });
   }
 }
+/** No reach glow: a phone (its chips name things), before the start, under a menu, an act, a mode or a move. */
+function reachGlowOff() {
+  if (TOUCH_PHONE || !state.started || menuTarget || currentAction || isScreenFxBlocking()) return true;
+  return Boolean(features.query('homeEditMode', engine) || streetMoving());
+}
 function reachGlowWanted() {
-  if (TOUCH_PHONE || !state.started || menuTarget || currentAction || isScreenFxBlocking()) return [];
-  if (features.query('homeEditMode', engine) || streetMoving()) return [];
+  if (reachGlowOff()) return [];
   const near = [];
   for (const t of interactables) {
     const d = interactReach(t);
@@ -8816,8 +8821,44 @@ function updateReachGlow(now = performance.now()) {
     for (const t of want) if (!reachGlows.has(t) && entityLayer && !entityLayer.destroyed) reachGlows.set(t, addSpriteRim(t.sprite));
     const line = [...reachGlows.keys()].map((t) => t.classId || '').join(',');
     if (app?.canvas && app.canvas.dataset.reachGlow !== line) app.canvas.dataset.reachGlow = line;
+    syncPostGlow();
   }
   for (const rim of reachGlows.values()) if (!rim.destroyed) rim.syncOutlineTexture();
+  for (const rim of postGlow.rims) if (!rim.destroyed) rim.syncOutlineTexture();
+}
+
+/**
+ * G1310 (Austin 2026-11-25): on a computer the post at hand glows instead of a chip ("Enter ·
+ * Choose a road"), as the client glowed a signpost the avatar touched (MiddleGroundRenderer.as
+ * glowSignPosts 1169-1177, SignpostView.as glow 612-617), and not while the post has hold
+ * (SignpostView.as glow: `if (!has_focus)`; the lit arm glows then). Its arms still name their
+ * roads, and Enter still takes hold of it. The post's art and arms each take the hover's rim, in
+ * their own holder (signpostGlowParts). QA: canvas data postGlow, the rims drawn.
+ */
+const postGlow = { views: [], rims: [] };
+function postGlowWanted() {
+  if (reachGlowOff() || signpostFocus) return [];
+  return (signpostAtHand()?.views || []).filter((v) => v && !v.destroyed);
+}
+function syncPostGlow() {
+  const views = postGlowWanted();
+  const same = views.length === postGlow.views.length && views.every((v, i) => v === postGlow.views[i]) && postGlow.rims.every((rim) => !rim.destroyed);
+  if (same) return;
+  for (const rim of postGlow.rims) {
+    if (rim.destroyed) continue;
+    rim.parent?.removeChild(rim);
+    rim.destroy({ children: true });
+  }
+  postGlow.views = views;
+  postGlow.rims = [];
+  for (const part of views.flatMap((v) => signpostGlowParts(v))) {
+    const rim = createSpriteOutline(part, { color: 0xa8e4ff, thickness: 2 });
+    // Just under the part in its own holder (the post's holder, an arm's), so it follows the tilt.
+    part.parent.addChildAt(rim, part.parent.getChildIndex(part));
+    rim.syncOutlineTexture();
+    postGlow.rims.push(rim);
+  }
+  if (app?.canvas) app.canvas.dataset.postGlow = String(postGlow.rims.length);
 }
 
 function wireInteractableSprite(target) {
@@ -37409,13 +37450,17 @@ async function main() {
           : null;
         let want = null;
         let wantArms = null;
+        // G1310 (Austin 2026-11-25): on a computer no chip at a ladder or a post, as Glitch: the post
+        // in reach glows (syncPostGlow), Up climbs and Enter takes hold of the post as before. A
+        // phone keeps both chips (the gate's 'phone'), where they say which tap does it.
+        const placeHints = TOUCH_PHONE;
         if (climb.active) {
-          want = { key: '↑↓', label: 'climb · Space jump', x: player.x, y: player.y - 80 };
+          if (placeHints) want = { key: '↑↓', label: 'climb · Space jump', x: player.x, y: player.y - 80 };
         } else if (armHover) {
           const v = armHover.view;
           const live = postAtHand?.boards?.some(({ board }) => board === armHover.board);
           want = { key: live ? armHover.board.key : '', label: signBoardLabel(armHover.board), x: v.x, y: v.y - (v._promptLift || 207) };
-        } else if (nearClimb && (!near || Math.abs(player.x - nearClimb.x) < 50)) {
+        } else if (placeHints && nearClimb && (!near || Math.abs(player.x - nearClimb.x) < 50)) {
           want = { key: '↑', label: 'climb', x: nearClimb.x, y: Math.min(player.y, nearClimb.yBot) - 70 };
         } else if (near) {
           const box = spriteWorldHitBox(near.sprite, 0);
@@ -37437,7 +37482,7 @@ async function main() {
             // FRIENDPOST: a post (the home street's signpost) has its hint over its top, clear of the arms.
             y: near.sprite._promptLift ? near.sprite.y - near.sprite._promptLift : (box ? box.top : near.sprite.y - 74) - 12,
           };
-        } else if (nearSign) {
+        } else if (placeHints && nearSign) {
           const conn = pickAwayConnection(nearSign.signpost, currentStreetTsid, availableStreetTsids());
           // Above the post, clear of the arms (SignpostView post 246px at 0.8). SIGNFOCUS: Enter
           // takes the one arm, holds a post of several, and while held goes to the lit arm.

@@ -756,6 +756,30 @@ export function setSignpostHover(g, on, boardIndex = null) {
 }
 
 /**
+ * G1310 (Austin 2026-11-25): the parts of a post that glow while it is in reach on a computer, as
+ * the client glowed the whole SignpostView (MiddleGroundRenderer.as glowSignPosts, SignpostView.as
+ * glow 612-617: tsSprite_GlowA on its interaction_target, the post with its arms, or a lift's deco).
+ * The post, each arm and a lift's art: sprites with art to trace (game.js draws their rims), not
+ * the shadow, the words, the key caps or a Graphics arm drawn while the art is missing.
+ * @param {PIXI.Container} g  a view from buildSignpostSprite, buildSignDecoView or a scene's post
+ * @returns {any[]}
+ */
+export function signpostGlowParts(g) {
+  const out = [];
+  const walk = (node) => {
+    for (const child of node?.children || []) {
+      if (!child || child.destroyed || child.label === 'hover-outline') continue;
+      if (SIGN_GLOW_PARTS.has(child.label)) {
+        if (child.texture && child.texture.width > 1) out.push(child);
+      } else if (child.children?.length) walk(child);
+    }
+  };
+  if (g && !g.destroyed) walk(g);
+  return out;
+}
+const SIGN_GLOW_PARTS = new Set(['sign-post', 'sign-arm', 'sign-deco-art']);
+
+/**
  * Hit-test one destination board in world/Pixi coordinates. The post and other
  * arms deliberately do not count, matching the original per-destination UI.
  * SIGNTAP: `pad` (world px, a phone's tap) also takes a point that far outside a
