@@ -12,7 +12,8 @@
  *   relative same-origin path, ending in .json (resolveHouseFileUrl). The fetch never follows a
  *   redirect, sends no cookies off the site, reads at most HOUSE_FILE_MAX_BYTES and parses JSON
  *   only (no script, no HTML).
- * - Laid in once a copy: a reload keeps what you changed since; &resetgame=1 starts over.
+ * - Laid in once a copy: the homes slice of the save keeps the file's URL (houseFile), so a reload
+ *   keeps what you changed since; &resetgame=1 starts over.
  * - Nothing fails silently: unknown classes, styles, swatches, items and moved pieces are listed
  *   in the report (the first few on screen, all of them in the console).
  * QA: canvas data houseFile (loaded:<pieces> | kept | refused:<reason> | failed:<reason>);
@@ -34,10 +35,8 @@ import {
   parseHouseFileText,
   resolveHouseFileUrl,
   validateHouseFile,
-} from './house-file.js?v=5449814a';
+} from './house-file.js?v=a0b6c7aa';
 
-/** The practice copy's note of the house file it was laid from (a reload keeps the house). */
-export const HOUSE_FILE_MARK_KEY = 'groddle.housefile.v1';
 const REPORT_LINES = 6;
 
 /**
@@ -90,12 +89,12 @@ async function knownItems(classes, fetchImpl) {
 }
 
 /** Lay a built house into the save's own house (homes, home-machines and craftybot slices, the floors' stacks). */
-export function applyHouse(built, { engine, features, homeState, imagineHome }) {
+export function applyHouse(built, { engine, features, homeState, imagineHome, url = '' }) {
   // A copy that owns no house yet imagines one in the file's style (a copy that owns one keeps its own).
   if (!homeState.owned) imagineHome(homeState, built.style || 'meadow', Date.now() - 60_000);
   const homes = features.get('homes');
   const was = homes.save() || {};
-  homes.restore({ ...was, decor: built.decors[0], floors: built.floors }, engine);
+  homes.restore({ ...was, decor: built.decors[0], floors: built.floors, ...(url ? { houseFile: url } : {}) }, engine);
   const machines = features.get('home-machines');
   if (machines) {
     const slice = machines.save() || {};
@@ -165,7 +164,7 @@ export function showHouseFileReport(doc, { title = '', summary = '', problems = 
  * Boot: the whole housefile route. Returns null (no housefile here), or { entered } when the house
  * is ready to walk into (laid in now, or kept from earlier in this copy).
  */
-export async function bootHouseFile({ search, mode, baseUri, origin, doc, engine, features, homeState, imagineHome, hadSave, storage, fetchImpl = globalThis.fetch }) {
+export async function bootHouseFile({ search, mode, baseUri, origin, doc, engine, features, homeState, imagineHome, hadSave, fetchImpl = globalThis.fetch }) {
   const req = houseFileRequest({ search, mode, baseUri, origin });
   if (!req) return null;
   const report = (data, info) => {
@@ -178,8 +177,7 @@ export async function bootHouseFile({ search, mode, baseUri, origin, doc, engine
     return null;
   }
   // Laid in already in this copy: walk in as it stands now.
-  let mark = null;
-  try { mark = storage?.getItem(HOUSE_FILE_MARK_KEY); } catch { mark = null; }
+  const mark = features?.get?.('homes')?.save?.()?.houseFile;
   if (hadSave && mark === req.url && homeState.owned) {
     engine?.setData?.('houseFile', 'kept');
     return { entered: true, kept: true };
@@ -200,8 +198,7 @@ export async function bootHouseFile({ search, mode, baseUri, origin, doc, engine
   }
   const built = buildHouse(checked.house);
   const problems = [...checked.problems, ...built.problems];
-  applyHouse(built, { engine, features, homeState, imagineHome });
-  try { storage?.setItem(HOUSE_FILE_MARK_KEY, req.url); } catch { /* the copy re-lays it next time */ }
+  applyHouse(built, { engine, features, homeState, imagineHome, url: req.url });
   const counts = houseCounts(built);
   const summary = houseSummary(built);
   console.info(`[housefile] ${req.url}: ${summary}.`);

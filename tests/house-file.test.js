@@ -25,11 +25,11 @@ import {
   parseHouseFileText,
   resolveHouseFileUrl,
   validateHouseFile,
-} from '../public/js/house-file.js?v=5449814a';
-import { applyHouse, bootHouseFile, houseFileRequest } from '../public/js/house-file-loader.js?v=760372ef';
-import { homesFeature } from '../public/js/features/homes-feature.js?v=a46ef792';
-import { homeMachinesFeature } from '../public/js/features/home-machines-feature.js?v=13688790';
-import { craftybotFeature } from '../public/js/features/craftybot-feature.js?v=2da8a283';
+} from '../public/js/house-file.js?v=a0b6c7aa';
+import { applyHouse, bootHouseFile, houseFileRequest } from '../public/js/house-file-loader.js?v=5c6102c5';
+import { homesFeature } from '../public/js/features/homes-feature.js?v=855d2b11';
+import { homeMachinesFeature } from '../public/js/features/home-machines-feature.js?v=ec04e7c6';
+import { craftybotFeature } from '../public/js/features/craftybot-feature.js?v=0573d803';
 import { createHomeState, imagineHome } from '../public/js/homes.js?v=dca6b2cd';
 import { normalizeDroppedItemState, setDownStack } from '../public/js/world-items.js?v=a5deb102';
 
@@ -242,9 +242,7 @@ describe('the loader lays the whole file into a fresh solo save', () => {
       if (opts.method === 'HEAD') return { ok: true };
       return { ok: true, headers: { get: (h) => (h === 'content-type' ? 'application/json' : null) }, text: async () => JSON.stringify(SAMPLE) };
     };
-    const storage = new Map();
-    const store = { getItem: (k) => storage.get(k) ?? null, setItem: (k, v) => storage.set(k, v) };
-    const args = { search: '?autostart=1&housefile=play%2Fhouses%2Fsample-house.json', mode: 'solo', ...SITE, doc: null, engine, features, homeState, imagineHome, storage: store, fetchImpl };
+    const args = { search: '?autostart=1&housefile=play%2Fhouses%2Fsample-house.json', mode: 'solo', ...SITE, doc: null, engine, features, homeState, imagineHome, fetchImpl };
     const res = await bootHouseFile({ ...args, hadSave: false });
     assert.equal(res.entered, true);
     assert.equal(engine.data.houseFile, `loaded:${SAMPLE.floors.reduce((n, f) => n + f.pieces.length, 0)}`);
@@ -252,6 +250,10 @@ describe('the loader lays the whole file into a fresh solo save', () => {
     assert.equal(url, 'https://groddleafternoon.com/play/houses/sample-house.json');
     assert.equal(opts.redirect, 'error');
     assert.equal(opts.credentials, 'same-origin');
+    // The save itself remembers the file (the homes slice), not a storage key of its own.
+    assert.equal(homesFeature.save().houseFile, 'https://groddleafternoon.com/play/houses/sample-house.json');
+    homesFeature.restore(clone(homesFeature.save()), engine);
+    assert.equal(homesFeature.save().houseFile, 'https://groddleafternoon.com/play/houses/sample-house.json', 'kept through a save and load');
     // A reload of the same copy keeps the house (and what you changed in it).
     calls.length = 0;
     const again = await bootHouseFile({ ...args, hadSave: true });
@@ -262,7 +264,7 @@ describe('the loader lays the whole file into a fresh solo save', () => {
   it('boot: a refused link fetches nothing and says why', async () => {
     const engine = fakeEngine();
     let fetched = 0;
-    const res = await bootHouseFile({ search: `?housefile=${encodeURIComponent('https://evil.example/wp-content/uploads/h.json')}`, mode: 'solo', ...SITE, doc: null, engine, features, homeState: createHomeState(), imagineHome, storage: null, hadSave: false, fetchImpl: async () => { fetched += 1; } });
+    const res = await bootHouseFile({ search: `?housefile=${encodeURIComponent('https://evil.example/wp-content/uploads/h.json')}`, mode: 'solo', ...SITE, doc: null, engine, features, homeState: createHomeState(), imagineHome, hadSave: false, fetchImpl: async () => { fetched += 1; } });
     assert.equal(res, null);
     assert.equal(fetched, 0);
     assert.equal(engine.data.houseFile, 'refused:origin');

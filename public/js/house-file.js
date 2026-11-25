@@ -16,7 +16,7 @@
  * copy (js/practice-mode.js), so the player's own solo save is never touched.
  *
  * ---------------------------------------------------------------------------------------------
- * The format (version 1). Every field the game does not know is reported, never guessed.
+ * The format (version 1). Every field the game does not know is reported, and left out or set to its default.
  *
  * {
  *   "format": "groddle-house",        required, exactly this

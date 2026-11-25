@@ -91,6 +91,7 @@ describe('67: the stay at home follows where you are', () => {
 
   it('a reload whose way back is your home resumes in it', () => {
     assert.match(game, /const resumeHomeAt = homeState\.owned && !resumeHomeAtBoot && isHomePlaceTsid\(bootHomeTsid\) \? bootHomeTsid : null;/);
-    assert.match(game, /if \(resumeHomeAtBoot \|\| resumeHomeAt \|\| \['home', 'interior', 'decorate', 'cultivate'\]\.includes\(homeDemo\)\) \{\s*if \(resumeHomeAt\) homeState\.room = resumeHomeAt === HOME_INTERIOR_TSID \? 'interior' : 'street';/);
+    // G1285: a house file just laid in (houseFileBoot) enters the house too; a reload still resumes where you were.
+    assert.match(game, /if \(resumeHomeAtBoot \|\| resumeHomeAt \|\| houseFileBoot\?\.entered \|\| \['home', 'interior', 'decorate', 'cultivate'\]\.includes\(homeDemo\)\) \{\s*if \(resumeHomeAt\) homeState\.room = resumeHomeAt === HOME_INTERIOR_TSID \? 'interior' : 'street';/);
   });
 });

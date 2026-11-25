@@ -603,6 +603,8 @@ let cult = createCultivationState();
 let backCult = createBackYardState();
 /** The house's left end (interior world x) the stacks dropped indoors were saved against; null: not yet known. */
 let savedHouseX = null;
+/** G1285: the house file this house was laid from (js/house-file-loader.js), so a reload keeps the house as changed since. */
+let houseFileFrom = null;
 let mode = null; // 'decorate' | 'cultivate' | null
 let tab = 'furniture';
 let placing = null; // { kind: 'furniture'|'cultivation'|'fixture', classTsid|protoClass, moveId?, id? (a fixture's) }
@@ -8923,6 +8925,8 @@ export const homesFeature = {
       streetHouseX: savedStreetHouseX ?? homeStreetLayout(cult).houseX,
       // G232: the game day the rock's iMG was handed over (cultivation_img_rewards).
       rockImgDay,
+      // G1285: the house file the house was laid from (a practice copy's only).
+      ...(houseFileFrom ? { houseFile: houseFileFrom } : {}),
     };
   },
 
@@ -8949,6 +8953,7 @@ export const homesFeature = {
     const sx = Number(slice?.streetHouseX);
     savedStreetHouseX = slice?.streetHouseX != null && Number.isFinite(sx) ? sx : null;
     floors = createFloorsState(slice?.floors || {}, houseDecor);
+    houseFileFrom = typeof slice?.houseFile === 'string' && slice.houseFile ? slice.houseFile.slice(0, 2048) : null;
     floorArrivalX = null;
     doorLast = '';
     towerDecor = (Array.isArray(slice?.towerDecor) ? slice.towerDecor : [])
