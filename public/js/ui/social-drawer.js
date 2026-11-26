@@ -131,6 +131,11 @@ export const OPEN_MIN_WIDTH = 1440;
 /** A time line goes into the scrollback when this long has passed since the line before. */
 export const TIME_GAP_MS = 5 * 60 * 1000;
 export const LINE_LIMIT = 200;
+/**
+ * A Local note and an Activity notice with the same words this close together are one event said
+ * twice (a toast and its Local line): the Classic Local Chat / Activity pane shows it once.
+ */
+export const SAID_TWICE_MS = 2000;
 export const HISTORY_LIMIT = 50;
 /** The Global tab before groups-feature has joined Global Chat. */
 export const GLOBAL_WAIT = 'Joining Global Chat…';
@@ -2385,15 +2390,19 @@ export function mountSocialDrawer({
     /**
      * Some tabs' logs as one, oldest first, with the time lines, drawn as this drawer draws them (the
      * Classic skin's "Local Chat / Activity" pane: Local's lines and the Activity log together).
+     * A notice that is also a note on Local (a feature's toast and its Local line, "This window was
+     * asleep. Play here?") is one event: the Local note shows, its Activity copy does not.
      */
     logNodes(ids = [], { cache = 'logNodes' } = {}) {
-      const items = [];
+      let items = [];
       for (const id of ids) {
         const t = tabs.get(id);
         if (!t) continue;
         if (t.kind === 'activity') for (const e of notifier.entries) items.push({ at: Number(e.at) || 0, e, act: true, id });
         else if (t.kind === 'chat') for (const l of t.lines) items.push({ at: l.at, e: l, act: false, id });
       }
+      const notes = items.filter((x) => !x.act && x.e.note);
+      if (notes.length) items = items.filter((x) => !(x.act && x.e.kind === 'info' && notes.some((n) => Math.abs(n.at - x.at) <= SAID_TWICE_MS && sameWords(n.e.text, x.e.text))));
       items.sort((a, b) => a.at - b.at);
       // `cache` names the container the rows go in (one row can only be in one place); each keeps its rows.
       return keyedRows(items, {
