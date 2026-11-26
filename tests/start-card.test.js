@@ -380,7 +380,7 @@ describe('the start card layout', () => {
   it('fits the frame: two columns on desktop, one on a phone, scrolling inside itself', () => {
     const raw = read('style.css');
     assert.match(raw, /\.start-card \{\n  display: grid;\n  grid-template-columns: minmax\(0, 0\.92fr\) minmax\(0, 1\.2fr\);[\s\S]*?max-height: 100%;\n  overflow-y: auto;/);
-    assert.match(raw, /\[data-ui="modern"\] #overlay \{\n  padding: calc\(var\(--hud-h\) \+ var\(--sp-8\)\) calc\(var\(--sp-8\) \+ var\(--inset-r, 0px\)\) 72px/);
+    assert.match(raw, /\[data-ui="modern"\] #overlay \{\n  padding: calc\(var\(--hud-h\) \+ var\(--sp-8\) \+ var\(--safe-t\)\) calc\(var\(--sp-8\) \+ var\(--inset-r, 0px\)\) 72px/);
     assert.match(raw, /\[data-ui="classic"\] #overlay \{ padding-bottom: calc\(var\(--cband-h, calc\(132 \* var\(--cu\)\)\) \+ var\(--sp-6\)\); \}/);
     assert.match(raw, /\.start-key-open \{ grid-column: 2; grid-row: 1 \/ span 2; \}/);
     // The Social drawer's inset is measured again once the loading card lifts (it read 0 under it), so the

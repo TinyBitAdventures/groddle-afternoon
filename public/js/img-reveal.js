@@ -182,7 +182,7 @@ export function artViewBox(box, pad = 4) {
 
 const CSS = `
 .img-reveal{position:absolute;z-index:var(--z-screen);box-sizing:border-box;display:flex;overflow:hidden auto;overscroll-behavior:contain;
-  border-radius:0;padding:env(safe-area-inset-top,0px) env(safe-area-inset-right,0px) env(safe-area-inset-bottom,0px) env(safe-area-inset-left,0px);background:color-mix(in srgb,var(--c-sky-88) 72%,transparent);
+  border-radius:0;padding:var(--safe-t,0px) var(--safe-r,0px) var(--safe-b,0px) var(--safe-l,0px);background:color-mix(in srgb,var(--c-sky-88) 72%,transparent);
   -webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px);box-shadow:var(--shadow-3);opacity:0;transition:opacity ${REVEAL_FADE_MS}ms linear;font-family:var(--font-round);color:var(--text);text-align:center}
 .img-reveal[hidden]{display:none!important}
 .img-reveal.is-shown{opacity:1}

@@ -12,7 +12,7 @@ import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { fakeControls } from './touch-fake-dom.js';
-import { pressIsOver } from '../public/js/touch-controls.js?v=6e1b7f26';
+import { pressIsOver } from '../public/js/touch-controls.js?v=8bc690ac';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const game = readFileSync(join(root, 'public/game.js'), 'utf8');

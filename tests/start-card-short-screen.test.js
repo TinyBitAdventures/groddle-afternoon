@@ -18,7 +18,7 @@ describe('the start card on a short screen', () => {
     assert.ok(at > 0);
     const block = css.slice(at, css.indexOf('}\n}', at) + 3);
     assert.match(block, /@media \(max-height: 500px\) \{/);
-    assert.match(block, /\[data-ui="modern"\] #overlay \{ padding-top: calc\(var\(--hud-h\) \+ var\(--sp-4\)\); padding-bottom: var\(--sp-4\); \}/);
+    assert.match(block, /\[data-ui="modern"\] #overlay \{ padding-top: calc\(var\(--hud-h\) \+ var\(--sp-4\) \+ var\(--safe-t\)\); padding-bottom: var\(--sp-4\); \}/);
     assert.match(block, /#game-root:has\(> #overlay:not\(\.hidden\)\) :is\(\.pack-bar, \.street-nameplate\) \{ visibility: hidden; \}/);
     // After the narrow-frame rule it overrides.
     assert.ok(at > css.indexOf('[data-ui="modern"] #overlay { padding: calc(var(--hud-h) * 2 + var(--sp-6)) var(--sp-4) 72px; }'));

@@ -72,7 +72,7 @@ describe('the pinned quests card stays in view beside an open side sheet', () =>
   it('the panel shell keeps every side sheet docked left and measures --inset-l from it', () => {
     const shell = read('js/ui/panel-shell.js');
     assert.match(shell, /return w \? Math\.round\(left \+ w \+ gap\) : 0;/);
-    assert.match(css, /\.ui-sheet:not\(\.ui-sheet-center\),[^{]*\{\s*position: absolute;\s*inset: calc\(var\(--hud-h\) \+ 6px\) auto auto var\(--hud-inset\);/);
+    assert.match(css, /\.ui-sheet:not\(\.ui-sheet-center\),[^{]*\{\s*position: absolute;\s*inset: calc\(var\(--hud-h\) \+ 6px \+ var\(--safe-t\)\) auto auto var\(--hud-inset\);/);
     for (const id of ['make-panel', 'vendor-panel', 'quest-panel']) {
       assert.match(game, new RegExp(`\\{ id: '${id}', close: `), `${id} is a side sheet (no kind: 'center')`);
     }

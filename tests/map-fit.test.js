@@ -204,7 +204,7 @@ describe('ticket 76: the Map grows with the window (MAPSIZE)', () => {
 
   it('the room is between the top bar and the pack, inside the side sheets and the Social drawer (both skins)', () => {
     const css = read('public/style.css');
-    assert.match(css, /\[data-ui="modern"\] #map-panel\.ui-sheet-center \{\n  padding: calc\(var\(--hud-h\) \+ 6px\) max\(var\(--hud-inset\), var\(--inset-r, 0px\)\) 0 max\(var\(--hud-inset\), var\(--inset-l, 0px\)\);/);
+    assert.match(css, /\[data-ui="modern"\] #map-panel\.ui-sheet-center \{\n  padding: calc\(var\(--hud-h\) \+ 6px \+ var\(--safe-t\)\) max\(var\(--hud-inset\), var\(--inset-r, 0px\)\) 0 max\(var\(--hud-inset\), var\(--inset-l, 0px\)\);/);
     assert.match(css, /\.map-card\.map-hub\[data-map-fit\] \{\n[^}]*width: min\(max\(var\(--map-card-min\), var\(--map-card-w, 820px\)\), 100%\);/, 'the map\'s own width');
     assert.match(css, /\.map-card\.map-hub \{\n  --map-card-min: 520px;/);
     assert.match(css, /\.map-card\.map-hub\[data-map-fit="on"\] > \.map-canvas \{\n  flex: 0 1 auto;\n  align-self: center;\n  width: var\(--map-fit-w, 100%\);\n  height: var\(--map-fit-h\);/);

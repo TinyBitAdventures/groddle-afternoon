@@ -74,7 +74,7 @@ import { parseTp, runTeleportCommand, TP_TEXT } from '../admin-teleport.js?v=c4d
 import { minnUrls } from '../minn-account.js?v=7e3d7279';
 import { saveStore } from '../save-store.js?v=4e720735';
 import { STREET_INDEX } from '../street-loader.js?v=10376267';
-import { isPhoneDevice } from '../touch-controls.js?v=6e1b7f26';
+import { isPhoneDevice } from '../touch-controls.js?v=8bc690ac';
 
 export const SLASH_COMMANDS_FEATURE_ID = 'slash-commands';
 

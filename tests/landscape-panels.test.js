@@ -69,7 +69,7 @@ describe('compact sheets sideways (#2)', () => {
 describe('Imagination upgrade cards sideways (#3)', () => {
   const rule = sidewaysRule('/* UPGRADES SIDEWAYS (#3)');
   it('runs the window from under the top bar to the floor, title row shared with the tabs', () => {
-    assert.match(rule, /#imagination-panel\.ui-sheet-center \{ bottom: 0; align-items: flex-start; padding-top: calc\(var\(--hud-h\) \+ 4px\);/);
+    assert.match(rule, /#imagination-panel\.ui-sheet-center \{ bottom: 0; align-items: flex-start; padding-top: calc\(var\(--hud-h\) \+ 4px \+ var\(--safe-t\)\);/);
     assert.match(rule, /#imagination-panel \.img-card-shell > \.img-head \{ display: contents; \}/);
     assert.match(rule, /#imagination-panel \.img-card-shell > \.img-tabs \{ grid-row: 1; grid-column: 2;/);
   });
@@ -95,7 +95,7 @@ describe('Mail sideways (#4)', () => {
 describe('the report window sideways (#9)', () => {
   const rule = sidewaysRule('/* REPORT SIDEWAYS (#9)');
   it('outranks the feature\'s own phone rule (injected after style.css) for the window\'s padding', () => {
-    assert.match(rule, /#game-root #bug-report-panel\.reports-panel \{ padding: calc\(var\(--hud-h\) \+ 4px\)/);
+    assert.match(rule, /#game-root #bug-report-panel\.reports-panel \{ padding: calc\(var\(--hud-h\) \+ 4px \+ var\(--safe-t\)\)/);
   });
   it('keeps Send at the foot while the rest scrolls, with a three-line box', () => {
     assert.match(rule, /#bug-report-panel \.reports-actions \{ position: sticky; bottom: 0;/);
@@ -107,7 +107,7 @@ describe('the report window sideways (#9)', () => {
 describe('Cultivate and Decorate sideways (#6)', () => {
   const rule = sidewaysRule('/* HOME BUILDER SIDEWAYS (#6)');
   it('puts the banner right under the top bar, slim, so it clears the stick and Jump on the tray', () => {
-    assert.match(rule, /\.hb-banner \{ top: calc\(var\(--hud-h\) \+ 4px\);/);
+    assert.match(rule, /\.hb-banner \{ top: calc\(var\(--hud-h\) \+ 4px \+ var\(--safe-t\)\);/);
     assert.match(rule, /\.hb-banner \.hb-hint \{ display: none; \}/);
   });
   it('lays Cultivate\'s tray in one row without its footer line, with smaller tiles', () => {

@@ -146,11 +146,23 @@ p { margin: 0; }
 [hidden] { display: none !important; }
 :focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
 
+/* —— the safe area —— the game's rule (style.css LANDSCAPE-HUD): upright, nothing but a background sits in the
+   status bar's fade. --safe-t is the top inset plus 14 px in a Safari tab, plus --ios-fog-clear in the Home Screen
+   app (display-mode standalone on iOS, or .ios-home-app from js/phone/companion.js); 0 on a computer. */
+:root { --safe-t: env(safe-area-inset-top, 0px); --safe-b: env(safe-area-inset-bottom, 0px); --ios-fog-clear: 24px; }
+@media (orientation: portrait) {
+  :root { --safe-t: calc(env(safe-area-inset-top, 0px) + min(14px, env(safe-area-inset-top, 0px) * 1000)); }
+  :root.ios-home-app { --safe-t: calc(env(safe-area-inset-top, 0px) + min(var(--ios-fog-clear), env(safe-area-inset-top, 0px) * 1000)); }
+}
+@media (orientation: portrait) and (display-mode: standalone) {
+  @supports (-webkit-touch-callout: none) { :root { --safe-t: calc(env(safe-area-inset-top, 0px) + min(var(--ios-fog-clear), env(safe-area-inset-top, 0px) * 1000)); } }
+}
+
 /* —— the bar —— */
 .pc-top {
   position: sticky; top: 0; z-index: 10;
   display: flex; align-items: center; justify-content: space-between; gap: 12px;
-  padding: calc(8px + env(safe-area-inset-top)) 16px 8px;
+  padding: calc(8px + var(--safe-t)) 16px 8px;
   background: color-mix(in srgb, var(--surface) 92%, transparent);
   border-bottom: 1px solid var(--border);
   -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
@@ -271,7 +283,7 @@ p { margin: 0; }
 .picture-lightbox[data-zoomed] .picture-lightbox-stage { overflow: auto; }
 .picture-lightbox-img { flex: none; display: block; margin: auto; max-width: 92vw; max-height: 80vh; width: auto; height: auto; border-radius: 8px; user-select: none; -webkit-user-drag: none; touch-action: none; }
 .picture-lightbox[data-zoomed] .picture-lightbox-img { max-width: none; max-height: none; border-radius: 0; }
-.picture-lightbox-bar { position: absolute; top: max(12px, env(safe-area-inset-top)); right: 12px; display: flex; align-items: center; gap: 8px; }
+.picture-lightbox-bar { position: absolute; top: max(12px, var(--safe-t)); right: 12px; display: flex; align-items: center; gap: 8px; }
 .picture-lightbox-btn { display: inline-grid; place-items: center; width: 44px; height: 44px; margin: 0; padding: 0; border: 1px solid var(--border); border-radius: 50%; background: var(--surface); color: var(--fg); font-weight: 800; font-size: 24px; line-height: 1; cursor: pointer; }
 .picture-lightbox-tab { display: inline-flex; align-items: center; min-height: 44px; padding: 0 14px; border-radius: 22px; border: 1px solid var(--border); background: var(--surface); color: var(--fg); font-weight: 800; text-decoration: none; }
 .picture-lightbox-nav { position: absolute; top: 50%; transform: translateY(-50%); }
@@ -283,7 +295,7 @@ p { margin: 0; }
 .picture-lightbox-frame { position: relative; flex: none; display: block; margin: auto; line-height: 0; }
 .picture-lightbox[data-markable] .picture-lightbox-stage { bottom: calc(150px + env(safe-area-inset-bottom)); }
 .picture-lightbox[data-markable] .picture-lightbox-img { max-height: calc(100vh - 230px); }
-.picture-lightbox[data-markable] .picture-lightbox-count { bottom: auto; top: max(12px, env(safe-area-inset-top)); left: 12px; transform: none; }
+.picture-lightbox[data-markable] .picture-lightbox-count { bottom: auto; top: max(12px, var(--safe-t)); left: 12px; transform: none; }
 .picture-marks-layer { position: absolute; inset: 0; width: 100%; height: 100%; overflow: hidden; pointer-events: none; border-radius: 8px; }
 .picture-lightbox[data-marking] .picture-marks-layer { pointer-events: auto; cursor: crosshair; touch-action: none; }
 .picture-marks-layer:focus { outline: none; }

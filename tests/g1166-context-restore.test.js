@@ -14,7 +14,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { redrawCachedTextures } from '../public/js/pixi-fixes.js?v=0f42b75e';
 import { renderProbeLine } from '../public/js/render-probe.js?v=519c86ef';
-import { reportContext } from '../public/js/features/bug-report-feature.js?v=46b6b9fb';
+import { reportContext } from '../public/js/features/bug-report-feature.js?v=d4d7be10';
 
 const PUBLIC = join(import.meta.dirname, '..', 'public');
 const read = (p) => readFileSync(join(PUBLIC, p), 'utf8');

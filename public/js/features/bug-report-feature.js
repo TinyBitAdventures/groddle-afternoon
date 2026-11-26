@@ -755,7 +755,7 @@ export async function capturePictureWithUi(engine, doc = globalThis.document, li
 
 const STYLE = `
 /* G791: the bar while a picture for a report waits to be taken (both skins). */
-.report-shutter { position: fixed; top: calc(var(--hud-h) + 10px); left: 50%; transform: translateX(-50%); z-index: calc(var(--z-modal) + 40); display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: var(--space-2); max-width: calc(100vw - 16px); box-sizing: border-box; padding: var(--space-2) var(--space-3); border: 1px solid var(--border); border-radius: var(--radius-l); background: var(--surface); color: var(--text); box-shadow: var(--shadow-3); font: var(--fw-bold) var(--fs-s)/var(--lh-tight) var(--font-ui); pointer-events: auto; }
+.report-shutter { position: fixed; top: calc(var(--hud-h) + 10px + var(--safe-t)); left: 50%; transform: translateX(-50%); z-index: calc(var(--z-modal) + 40); display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: var(--space-2); max-width: calc(100vw - 16px); box-sizing: border-box; padding: var(--space-2) var(--space-3); border: 1px solid var(--border); border-radius: var(--radius-l); background: var(--surface); color: var(--text); box-shadow: var(--shadow-3); font: var(--fw-bold) var(--fs-s)/var(--lh-tight) var(--font-ui); pointer-events: auto; }
 .report-shutter[hidden] { display: none !important; }
 .report-shutter-text { flex: 1 1 12rem; min-width: 0; }
 .report-shutter button { flex: none; min-height: 32px; margin: 0; padding: 0 var(--space-4); border: 1px solid var(--border-strong); border-radius: var(--radius-pill); background: var(--surface-raised); color: var(--text); font: inherit; cursor: pointer; }
@@ -768,7 +768,7 @@ const STYLE = `
 .bug-btn { display: inline-flex; align-items: center; justify-content: center; padding: var(--sp-2) 0.45rem; position: relative; }
 .bug-btn img { width: 23px; height: 20px; display: block; }
 .bug-btn .bug-unread[hidden], .reports-panel[hidden], .reports-view[hidden], .reports-panel [hidden] { display: none !important; }
-[data-ui="modern"] #game-root #bug-report-panel { position: absolute; inset: 0; z-index: calc(var(--z-modal) + 32); display: grid; place-items: center; padding: calc(var(--hud-h) + 12px) var(--hud-inset) calc(var(--pack-live-height, 72px) + 8px); background: var(--scrim); }
+[data-ui="modern"] #game-root #bug-report-panel { position: absolute; inset: 0; z-index: calc(var(--z-modal) + 32); display: grid; place-items: center; padding: calc(var(--hud-h) + 12px + var(--safe-t)) var(--hud-inset) calc(var(--pack-live-height, 72px) + 8px); background: var(--scrim); }
 [data-ui="modern"] #bug-report-panel .reports-card { display: flex; flex-direction: column; width: min(560px, 100%); height: min(620px, 100%); max-height: 100%; overflow: hidden; border: 1px solid var(--border); border-radius: var(--radius-l); background: var(--surface); box-shadow: var(--shadow-3); color: var(--text); font-family: var(--font-ui); font-size: var(--fs-m); animation: ui-sheet-center-in var(--motion-med) var(--ease-out); }
 [data-ui="modern"] #bug-report-panel .reports-head { flex: none; flex-wrap: nowrap; }
 [data-ui="modern"] #bug-report-panel .reports-head h2 { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -961,7 +961,7 @@ const STYLE = `
    screen is tall, so its preview (up to 45% of the row across) stood about 270 px high. On a phone the
    window runs nearly to the foot of the screen (over the pack row), the preview is a short thumbnail and
    the box starts smaller, so Send shows without a scroll. */
-:root.touch-phone[data-ui="modern"] #game-root #bug-report-panel { padding: calc(var(--hud-h) + 8px) var(--sp-2) var(--sp-4); }
+:root.touch-phone[data-ui="modern"] #game-root #bug-report-panel { padding: calc(var(--hud-h) + 8px + var(--safe-t)) var(--sp-2) var(--sp-4); }
 :root.touch-phone[data-ui="modern"] #bug-report-panel .reports-new-view .reports-text { min-height: 6rem; }
 :root.touch-phone[data-ui="modern"] #bug-report-panel .reports-picture-thumb { width: auto; max-width: 35%; }
 :root.touch-phone[data-ui="modern"] #bug-report-panel .reports-picture-thumb img { width: auto; max-width: 100%; max-height: 96px; }

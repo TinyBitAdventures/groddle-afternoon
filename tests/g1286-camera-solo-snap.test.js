@@ -25,7 +25,7 @@ import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { cameraKey } from '../public/js/features/camera-mode-feature.js?v=4ae80d21';
+import { cameraKey } from '../public/js/features/camera-mode-feature.js?v=3e2e8721';
 import { cameraModeFeature } from '../public/js/features/camera-mode-feature.js?fresh=g1286';
 import { snapsFeature } from '../public/js/features/snaps-feature.js?fresh=g1286';
 import { SNAP_COPY, snapFileName } from '../public/js/snaps.js?v=b5be8bff';

@@ -16,7 +16,7 @@ import {
   createLabelPicker,
   playAreaRect,
   revealContent,
-} from '../public/js/img-reveal.js?v=0386b354';
+} from '../public/js/img-reveal.js?v=4356662d';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const pub = join(here, '..', 'public');

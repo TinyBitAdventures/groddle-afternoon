@@ -57,7 +57,7 @@
  * R24: the route planned again when the gate's answer changed).
  */
 
-import { isPhoneDevice } from '../touch-controls.js?v=6e1b7f26';
+import { isPhoneDevice } from '../touch-controls.js?v=8bc690ac';
 import { STREET_INDEX } from '../street-loader.js?v=10376267';
 import { SUBWAY_STREETS } from '../street-jobs.js?v=76471e42';
 import { CARD_BADGE, STATIONS, SUBWAY_LINE, TEXT as SUBWAY_TEXT, gateFor, isCarTsid, papersHint, stationByTsid, surfaceStation } from '../subway.js?v=ea6921ff';

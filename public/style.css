@@ -1078,7 +1078,7 @@ body.is-booting:not(.online-gated) #wrap ~ * { visibility: hidden; }
 .hs-tip button { flex: none; min-height: 32px; padding: var(--sp-2) var(--sp-5); border: 0; border-radius: var(--radius-pill); font: inherit; font-weight: 700; cursor: pointer;
   color: var(--text-inverse); background: var(--c-violet-54); }
 .hs-tip.is-floating { position: fixed; z-index: var(--z-overlay); left: 50%; transform: translateX(-50%); width: min(380px, calc(100% - 32px));
-  top: calc(env(safe-area-inset-top, 0px) + 64px); }
+  top: calc(var(--safe-t) + 64px); }
 /* G1117 (#592): the step bar under the words (js/boot-progress.js sets --boot-progress). */
 .boot-loader-card .boot-loader-bar { display: block; height: 6px; margin-top: var(--sp-2); border-radius: var(--radius-pill); overflow: hidden; background: color-mix(in srgb, var(--c-lime-51b) 18%, transparent); }
 .boot-loader-card .boot-loader-bar[hidden] { display: none; }
@@ -1388,7 +1388,7 @@ kbd {
 /* Modern: clear of the top bar and the pack, which float over the frame (solo; online the card is over them),
    and centred in the width an open Social drawer leaves (--inset-r, as the quest HUDs). */
 [data-ui="modern"] #overlay {
-  padding: calc(var(--hud-h) + var(--sp-8)) calc(var(--sp-8) + var(--inset-r, 0px)) 72px calc(var(--sp-8) + var(--inset-l, 0px));
+  padding: calc(var(--hud-h) + var(--sp-8) + var(--safe-t)) calc(var(--sp-8) + var(--inset-r, 0px)) 72px calc(var(--sp-8) + var(--inset-l, 0px));
 }
 /* Classic: clear of the pack band at the world's foot (classic.css #game-root::after), which is over the world. */
 [data-ui="classic"] #overlay { padding-bottom: calc(var(--cband-h, calc(132 * var(--cu))) + var(--sp-6)); }
@@ -1549,7 +1549,7 @@ kbd {
 @media (max-width: 720px) {
   #overlay { padding: var(--sp-4); }
   /* The nameplate drops under the top bar on a narrow frame. */
-  [data-ui="modern"] #overlay { padding: calc(var(--hud-h) * 2 + var(--sp-6)) var(--sp-4) 72px; }
+  [data-ui="modern"] #overlay { padding: calc(var(--hud-h) * 2 + var(--sp-6) + var(--safe-t)) var(--sp-4) 72px; }
   .start-card { grid-template-columns: minmax(0, 1fr); padding: var(--sp-10) var(--sp-8); }
   .start-card h2 { font-size: var(--fs-3xl); }
   .start-card .start-lede { margin-bottom: var(--sp-8); font-size: var(--fs-base); }
@@ -1570,7 +1570,7 @@ kbd {
    pack row, where a tap hit the pack. While the card is up the pack and the street's name wait (nothing
    in the pack acts before Start; the card has its own title), and the card takes the height under the top bar. */
 @media (max-height: 500px) {
-  [data-ui="modern"] #overlay { padding-top: calc(var(--hud-h) + var(--sp-4)); padding-bottom: var(--sp-4); }
+  [data-ui="modern"] #overlay { padding-top: calc(var(--hud-h) + var(--sp-4) + var(--safe-t)); padding-bottom: var(--sp-4); }
   [data-ui="modern"] #game-root:has(> #overlay:not(.hidden)) :is(.pack-bar, .street-nameplate) { visibility: hidden; }
 }
 
@@ -4715,7 +4715,7 @@ button.play-context-head:focus-visible {
   z-index: calc(var(--z-modal) + 30);
   display: grid;
   place-items: center;
-  padding: var(--sp-12);
+  padding: calc(var(--sp-12) + var(--safe-t)) var(--sp-12) var(--sp-12);
 }
 .quest-dialogue[hidden] { display: none; }
 /* G192: prompts and conversations wait for the street loading card (PromptView.as 420/440). */
@@ -4818,7 +4818,7 @@ html[data-street-cards] .quest-dialogue { visibility: hidden; }
   z-index: calc(var(--z-modal) + 40);
   display: grid;
   place-items: center;
-  padding: var(--sp-12);
+  padding: calc(var(--sp-12) + var(--safe-t)) var(--sp-12) var(--sp-12);
 }
 .rook-museum-exhibit[hidden] { display: none; }
 .rook-museum-exhibit-shade {
@@ -5706,6 +5706,8 @@ body.buff-purple-pulse::after {
   background: color-mix(in srgb, var(--c-sage-30) 22%, transparent);
   line-height: var(--lh-normal);
   color: var(--text);
+  /* An upright phone's status bar and its fade (LANDSCAPE-HUD --safe-t; 0 elsewhere): the card centres under it. */
+  padding-top: var(--safe-t);
 }
 .glitch-modal[hidden] { display: none !important; }
 .glitch-modal-card {
@@ -8186,7 +8188,7 @@ header.top-bar + .sub { display: none; }
   inset: 0;
   display: grid;
   place-items: center;
-  padding: var(--sp-10);
+  padding: calc(var(--sp-10) + var(--safe-t)) var(--sp-10) var(--sp-10);
 }
 .hog-haul-screen[hidden] { display: none; }
 .hog-haul-screen-shade {
@@ -9239,7 +9241,7 @@ header.top-bar + .sub { display: none; }
   z-index: calc(var(--z-top) + 100);
   display: grid;
   place-items: center;
-  padding: 78px var(--sp-12) 112px;
+  padding: calc(78px + var(--safe-t)) var(--sp-12) 112px;
   background: color-mix(in srgb, var(--c-mauve-23) 64%, transparent);
   backdrop-filter: blur(3px);
 }
@@ -10011,8 +10013,8 @@ header.top-bar + .sub { display: none; }
 .quest-dialogue[data-look="conversation"] .mr-kicker,
 .quest-dialogue[data-look="conversation"] .quest-dialogue-card h2 { display: none; }
 .quest-dialogue[data-look="conversation"] .quest-dialogue-card {
-  position: absolute; left: var(--fam-vp-cx, 50%); top: 30px; transform: translateX(-50%); transform-origin: 50% -30px;
-  box-sizing: border-box; width: 360px; max-width: calc(var(--fam-vp-w, 100%) - 16px); max-height: calc(100% - 40px); overflow: auto;
+  position: absolute; left: var(--fam-vp-cx, 50%); top: calc(30px + var(--safe-t)); transform: translateX(-50%); transform-origin: 50% -30px;
+  box-sizing: border-box; width: 360px; max-width: calc(var(--fam-vp-w, 100%) - 16px); max-height: calc(100% - 40px - var(--safe-t) - var(--safe-b)); overflow: auto;
   padding: 0 25px 25px; border: 0; border-radius: var(--radius-lg); background: color-mix(in srgb, var(--surface-navy) 90%, transparent); box-shadow: none;
   color: var(--text-inverse); text-align: left; font-size: var(--fs-md); line-height: var(--lh-normal);
 }
@@ -10099,9 +10101,9 @@ header.top-bar + .sub { display: none; }
 /* FamiliarDialog SKILL_LEARNED: grows out of the header centre (scale 0.02 to 1,
    0.3 s easeInCubic), centred 30 px under the header, 0x0a181d at 0.9, radius 10. */
 .familiar-dialog {
-  position: absolute; z-index: calc(var(--z-modal) + 25); top: 30px; left: 50%;
+  position: absolute; z-index: calc(var(--z-modal) + 25); top: calc(30px + var(--safe-t)); left: 50%;
   box-sizing: border-box; width: min(510px, calc(100% - 16px)); min-height: 220px;
-  max-height: calc(100% - 40px); overflow: auto;
+  max-height: calc(100% - 40px - var(--safe-t) - var(--safe-b)); overflow: auto;
   padding: var(--sp-10); border-radius: var(--radius-lg); background: color-mix(in srgb, var(--surface-navy) 90%, transparent); color: var(--text-inverse);
   transform: translateX(-50%); transform-origin: 50% -30px;
   font-size: var(--fs-md); line-height: var(--lh-normal); text-align: left;
@@ -10143,7 +10145,7 @@ html[data-street-cards] .familiar-dialog,
   color: var(--c-sky-64); font: inherit; font-size: var(--fs-sm); text-decoration: underline;
 }
 @media (max-width: 560px) {
-  .familiar-dialog { top: 12px; min-height: 0; padding: var(--sp-8); }
+  .familiar-dialog { top: calc(12px + var(--safe-t)); max-height: calc(100% - 24px - var(--safe-t) - var(--safe-b)); min-height: 0; padding: var(--sp-8); }
   .fam-learned { grid-template-columns: 64px minmax(0, 1fr); column-gap: var(--sp-6); }
   .fam-learned-icon { width: 64px; height: 64px; }
   .fam-learned-title { font-size: var(--fs-lg); }
@@ -10197,7 +10199,7 @@ html[data-street-cards] .familiar-dialog,
   display: flex;
   justify-content: center;
   align-items: flex-start;
-  padding: min(100px, 8vh) 16px 20px;
+  padding: calc(min(100px, 8vh) + var(--safe-t)) 16px 20px;
   background: var(--overlay-dim);
   overflow-y: auto;
   pointer-events: none;
@@ -11572,7 +11574,7 @@ html.stage-pinned[data-ui="modern"] header.top-bar { left: calc(var(--sp-5) + va
 [data-ui="modern"] .top-bar .meta-stat.currants:focus-visible { outline: none; box-shadow: inset 0 0 0 2px var(--focus); }
 [data-ui="modern"] .vendor-finder-pop {
   width: 400px; max-width: calc(100vw - 2 * var(--hud-inset));
-  max-height: calc(100dvh - var(--hud-h) - 96px); overflow-y: auto; overscroll-behavior: contain;
+  max-height: calc(100dvh - var(--hud-h) - 96px - var(--safe-t)); overflow-y: auto; overscroll-behavior: contain;
 }
 [data-ui="modern"] .vf-list { list-style: none; margin: 0; padding: 0; }
 /* G1074 (#564): each store's icon first, an item it sells (js/store-icons.js), in the favor rows' 20 px box. */
@@ -11703,7 +11705,7 @@ html.stage-pinned[data-ui="modern"] header.top-bar { left: calc(var(--sp-5) + va
 /* Squeezed between the pills (a phone held sideways, js/ui/topbar.js nameplateLeft): under them, centred. */
 /* Report #261: under the pills the name (or the quest pill, its Leave last) keeps clear of the Social rail
    (--inset-r, js/ui/social-drawer.js) on both sides, so it stays centred; never under 12rem. */
-[data-ui="modern"] .street-nameplate.is-placed.is-under { top: calc(var(--hud-h) + var(--space-2)); left: 50%; transform: translateX(-50%); max-width: max(12rem, calc(100% - 2 * max(var(--hud-inset), var(--inset-r, 0px)))); }
+[data-ui="modern"] .street-nameplate.is-placed.is-under { top: calc(var(--hud-h) + var(--space-2) + var(--safe-t)); left: 50%; transform: translateX(-50%); max-width: max(12rem, calc(100% - 2 * max(var(--hud-inset), var(--inset-r, 0px)))); }
 [data-ui="modern"] .street-nameplate #street-name { flex: 0 1 auto; min-width: 2em; overflow: hidden; text-overflow: ellipsis; }
 [data-ui="modern"] .street-nameplate .street-name-street { font-weight: var(--fw-heavy); }
 [data-ui="modern"] .street-nameplate .street-time-divider { margin: 0; color: var(--text-muted); }
@@ -11721,13 +11723,13 @@ html.stage-pinned[data-ui="modern"] header.top-bar { left: calc(var(--sp-5) + va
 }
 /* Under the pills: the HUD that sat at the top of #game-root starts below the band
    (the buff strip, and the side panels: Quests, Badges, Feat, Skills, Buffs, Vendor). */
-[data-ui="modern"] #buff-strip { top: calc(var(--hud-h) + var(--space-3)); left: var(--hud-inset); }
-[data-ui="modern"] #game-root .side-panel { top: calc(var(--hud-h) + var(--space-3)); }
+[data-ui="modern"] #buff-strip { top: calc(var(--hud-h) + var(--space-3) + var(--safe-t)); left: var(--hud-inset); }
+[data-ui="modern"] #game-root .side-panel { top: calc(var(--hud-h) + var(--space-3) + var(--safe-t)); }
 [data-ui="modern"] #game-root .hog-haul-hud,
-[data-ui="modern"] #game-root .play-context { top: calc(var(--hud-h) + var(--space-3)); }
+[data-ui="modern"] #game-root .play-context { top: calc(var(--hud-h) + var(--space-3) + var(--safe-t)); }
 /* The route card sits left of the Social drawer (its rail, or the open drawer): --inset-r. */
 [data-ui="modern"] #game-root .route-gps {
-  top: calc(var(--hud-h) + var(--space-3));
+  top: calc(var(--hud-h) + var(--space-3) + var(--safe-t));
   right: max(var(--hud-inset), var(--inset-r));
   max-width: calc(100% - var(--inset-r) - var(--hud-inset) * 2);
 }
@@ -11741,10 +11743,10 @@ html.stage-pinned[data-ui="modern"] header.top-bar { left: calc(var(--sp-5) + va
   [data-ui="modern"] .top-bar #mail-btn,
   [data-ui="modern"] .top-bar .hud-div { display: none; }
   [data-ui="modern"] .street-nameplate,
-  [data-ui="modern"] .street-nameplate.is-placed { top: calc(var(--hud-h) + var(--space-2)); left: 50%; transform: translateX(-50%); max-width: max(12rem, calc(100% - 2 * max(var(--hud-inset), var(--inset-r, 0px)))); }
-  [data-ui="modern"] #buff-strip { top: calc(2 * var(--hud-h) + var(--space-4)); }
+  [data-ui="modern"] .street-nameplate.is-placed { top: calc(var(--hud-h) + var(--space-2) + var(--safe-t)); left: 50%; transform: translateX(-50%); max-width: max(12rem, calc(100% - 2 * max(var(--hud-inset), var(--inset-r, 0px)))); }
+  [data-ui="modern"] #buff-strip { top: calc(2 * var(--hud-h) + var(--space-4) + var(--safe-t)); }
   /* The street map steps down under the nameplate too, or it covers the street's name. */
-  [data-ui="modern"] .street-minimap { top: calc(2 * var(--hud-h) + var(--space-4)); }
+  [data-ui="modern"] .street-minimap { top: calc(2 * var(--hud-h) + var(--space-4) + var(--safe-t)); }
 }
 /* Mail, Imagination and (under 560 px) the currants live in the Menu then (js/ui/topbar.js
    installNarrowRows): a currants line at the top of Me, Mail with its unread count, and a dot on the
@@ -12064,7 +12066,7 @@ html.stage-pinned[data-ui="modern"] header.top-bar { left: calc(var(--sp-5) + va
   /* One column the screen's own width (Austin's iPhone, 2026-11-12: the card's 460 px least width
      made an auto column wider than a 402 px phone, so the card sat right and ran off the edge). */
   grid-template-columns: minmax(0, 1fr);
-  padding: calc(var(--hud-h) + var(--space-5)) var(--space-4) var(--space-4);
+  padding: calc(var(--hud-h) + var(--space-5) + var(--safe-t)) var(--space-4) var(--space-4);
   box-sizing: border-box;
   background: var(--scrim-strong);
 }
@@ -12848,11 +12850,11 @@ body:has(#quest-dialogue:not([hidden])) .prompt-stack { z-index: calc(var(--z-mo
 [data-ui="modern"] #game-root #skills-panel,
 [data-ui="modern"] #game-root #buffs-panel {
   position: absolute;
-  inset: calc(var(--hud-h) + 6px) auto auto var(--hud-inset);
+  inset: calc(var(--hud-h) + 6px + var(--safe-t)) auto auto var(--hud-inset);
   z-index: var(--z-panel);
   width: var(--sheet-w);
   max-width: calc(100% - 2 * var(--hud-inset));
-  max-height: calc(100% - var(--hud-h) - 6px - var(--pack-live-height, 72px) - 8px);
+  max-height: calc(100% - var(--hud-h) - 6px - var(--pack-live-height, 72px) - 8px - var(--safe-t));
   display: flex;
   flex-direction: column;
   align-items: stretch;
@@ -12875,7 +12877,7 @@ body:has(#quest-dialogue:not([hidden])) .prompt-stack { z-index: calc(var(--z-mo
   [data-ui="modern"] #game-root .ui-sheet:not(.ui-sheet-center),
   [data-ui="modern"] #game-root #achieve-panel,
   [data-ui="modern"] #game-root #skills-panel,
-  [data-ui="modern"] #game-root #buffs-panel { max-height: calc(100% - var(--hud-h) - 6px - 8px); }
+  [data-ui="modern"] #game-root #buffs-panel { max-height: calc(100% - var(--hud-h) - 6px - 8px - var(--safe-t)); }
 }
 
 [data-ui="modern"] #game-root .ui-sheet[hidden],
@@ -13409,7 +13411,7 @@ body:has(#quest-dialogue:not([hidden])) .prompt-stack { z-index: calc(var(--z-mo
 /* MAPSIZE: the Map's room is the window between the top bar and the pack (the panel already stops
    above it), inside an open side sheet (--inset-l) and the Social drawer or its rail (--inset-r). */
 [data-ui="modern"] #map-panel.ui-sheet-center {
-  padding: calc(var(--hud-h) + 6px) max(var(--hud-inset), var(--inset-r, 0px)) 0 max(var(--hud-inset), var(--inset-l, 0px));
+  padding: calc(var(--hud-h) + 6px + var(--safe-t)) max(var(--hud-inset), var(--inset-r, 0px)) 0 max(var(--hud-inset), var(--inset-l, 0px));
 }
 /* MAPFRAME (Austin 2026-11-04): two short rows over the map (the head; the Shortcuts and the route on
    one line) and one quiet line under it: the region's line ("40 streets · ...") with the keys at its
@@ -13480,7 +13482,7 @@ body:has(#quest-dialogue:not([hidden])) .prompt-stack { z-index: calc(var(--z-mo
 .quest-pins { display: none; }
 [data-ui="modern"] #game-root #quest-pins:not([hidden]) {
   position: absolute;
-  top: calc(var(--hud-h) + 6px);
+  top: calc(var(--hud-h) + 6px + var(--safe-t));
   left: var(--hud-inset);
   z-index: var(--z-hud);
   display: block;
@@ -13565,7 +13567,7 @@ body:has(#quest-dialogue:not([hidden])) .prompt-stack { z-index: calc(var(--z-mo
 [data-ui="modern"] #quest-pins .tq-foot { display: flex; flex-wrap: wrap; gap: var(--space-2); font-size: var(--fs-xs); color: var(--text-muted); }
 [data-ui="modern"] #quest-pins .tq-done { color: var(--good); font-weight: var(--fw-bold); }
 /* The buff strip steps down under the tracker, which stands beside an open sheet too (above). */
-[data-ui="modern"] #game-root #quest-pins:not([hidden]) ~ #buff-strip { top: calc(var(--hud-h) + 6px + var(--quest-pins-h, 0px) + var(--space-2)); }
+[data-ui="modern"] #game-root #quest-pins:not([hidden]) ~ #buff-strip { top: calc(var(--hud-h) + 6px + var(--quest-pins-h, 0px) + var(--space-2) + var(--safe-t)); }
 /* Report #125: an open side sheet (Make, a grinder's window, Quests ...) covered the strip, so a running
    buff could not be watched. It stands beside the sheet as the tracker does, and wraps in the width left. */
 [data-ui="modern"] #game-root #buff-strip { transition: opacity 0.2s ease, left var(--motion-med) var(--ease-out); }
@@ -13575,11 +13577,11 @@ body:has(#quest-dialogue:not([hidden])) .prompt-stack { z-index: calc(var(--z-mo
   flex-wrap: wrap;
 }
 @media (max-width: 760px) {
-  [data-ui="modern"] #game-root #quest-pins:not([hidden]) { top: calc(2 * var(--hud-h) + var(--space-4)); }
+  [data-ui="modern"] #game-root #quest-pins:not([hidden]) { top: calc(2 * var(--hud-h) + var(--space-4) + var(--safe-t)); }
   [data-ui="modern"] #game-root[data-sheet] #quest-pins { opacity: 0; visibility: hidden; transform: translateX(-8px); pointer-events: none; }
-  [data-ui="modern"] #game-root:not([data-sheet]) #quest-pins:not([hidden]) ~ #buff-strip { top: calc(2 * var(--hud-h) + var(--space-4) + var(--quest-pins-h, 0px) + var(--space-2)); }
+  [data-ui="modern"] #game-root:not([data-sheet]) #quest-pins:not([hidden]) ~ #buff-strip { top: calc(2 * var(--hud-h) + var(--space-4) + var(--quest-pins-h, 0px) + var(--space-2) + var(--safe-t)); }
   /* The tracker hides beside a sheet at this width (above), so the strip has no one to step under. */
-  [data-ui="modern"] #game-root[data-sheet] #quest-pins:not([hidden]) ~ #buff-strip { top: calc(2 * var(--hud-h) + var(--space-4)); }
+  [data-ui="modern"] #game-root[data-sheet] #quest-pins:not([hidden]) ~ #buff-strip { top: calc(2 * var(--hud-h) + var(--space-4) + var(--safe-t)); }
 }
 /* A phone: a 320 px sheet leaves one narrow column. The chips stack there, icon over time, under the
    Social rail; on a phone too narrow for even that they stay over the sheet's edge, in sight. */
@@ -13587,7 +13589,7 @@ body:has(#quest-dialogue:not([hidden])) .prompt-stack { z-index: calc(var(--z-mo
   [data-ui="modern"] #game-root[data-sheet] #buff-strip,
   [data-ui="modern"] #game-root[data-sheet] #quest-pins:not([hidden]) ~ #buff-strip {
     z-index: calc(var(--z-panel) + 1);
-    top: calc(2 * var(--hud-h) + var(--space-4) + 56px);
+    top: calc(2 * var(--hud-h) + var(--space-4) + 56px + var(--safe-t));
     left: min(var(--inset-l, 0px), calc(100% - 50px));
     width: 46px;
     max-width: none;
@@ -13862,7 +13864,7 @@ body:has(#quest-dialogue:not([hidden])) .prompt-stack { z-index: calc(var(--z-mo
   display: flex;
   flex-direction: column;
   width: min(760px, calc(100% - 2 * var(--hud-inset)));
-  max-height: min(700px, calc(100% - var(--hud-h) - 12px));
+  max-height: min(700px, calc(100% - var(--hud-h) - 12px - var(--safe-t)));
   padding: 0;
   overflow: hidden;
   border: 1px solid var(--border);
@@ -13930,7 +13932,7 @@ body:has(#quest-dialogue:not([hidden])) .prompt-stack { z-index: calc(var(--z-mo
 }
 /* Snaps (features/snaps-feature.js, multiplayer: Menu, Snaps): the shell's centred frame over a scrim.
    G1240: wider, so the cards (each in its Snap's own shape) are big enough to see; a click opens the viewer. */
-[data-ui="modern"] .snap-shade-win.ui-sheet-center { align-items: center; padding: calc(var(--hud-h) + 12px) var(--hud-inset) var(--space-4); background: var(--scrim); }
+[data-ui="modern"] .snap-shade-win.ui-sheet-center { align-items: center; padding: calc(var(--hud-h) + 12px + var(--safe-t)) var(--hud-inset) var(--space-4); background: var(--scrim); }
 [data-ui="modern"] .snap-shade-win .snap-win {
   width: min(1000px, 100%);
   max-height: min(860px, 100%);
@@ -13997,7 +13999,7 @@ body:has(#quest-dialogue:not([hidden])) .prompt-stack { z-index: calc(var(--z-mo
 /* G1240 on a phone: the album and the viewer fill the screen (the safe areas kept), one card a row,
    and the viewer's buttons are a thumb's size; Previous and Next sit over the picture's edges. */
 :root.touch-phone .snap-shade-win.ui-sheet-center,
-:root.touch-phone[data-ui="modern"] .snap-shade-win.ui-sheet-center { padding: env(safe-area-inset-top, 0px) env(safe-area-inset-right, 0px) env(safe-area-inset-bottom, 0px) env(safe-area-inset-left, 0px); align-items: stretch; }
+:root.touch-phone[data-ui="modern"] .snap-shade-win.ui-sheet-center { padding: var(--safe-t) var(--safe-r) var(--safe-b) var(--safe-l); align-items: stretch; }
 :root.touch-phone .snap-shade-win .snap-win,
 :root.touch-phone[data-ui="modern"] .snap-shade-win .snap-win { width: 100%; height: 100%; max-width: none; max-height: none; border-radius: 0; border: 0; }
 :root.touch-phone .snap-shade-win .snap-grid,
@@ -14008,7 +14010,7 @@ body:has(#quest-dialogue:not([hidden])) .prompt-stack { z-index: calc(var(--z-mo
 :root.touch-phone .snap-viewer-info { padding: var(--sp-2) var(--sp-4) var(--sp-5); }
 /* Home and Mail: the shell's centred frame over a scrim (Home narrow, Mail wide for its two panes). */
 [data-ui="modern"] #game-root :is(#home-panel, #mail-panel).ui-sheet-center {
-  padding: calc(var(--hud-h) + 12px) var(--hud-inset) calc(var(--pack-live-height, 72px) + 8px);
+  padding: calc(var(--hud-h) + 12px + var(--safe-t)) var(--hud-inset) calc(var(--pack-live-height, 72px) + 8px);
   background: var(--scrim);
   backdrop-filter: none;
 }
@@ -14230,7 +14232,7 @@ body:has(#quest-dialogue:not([hidden])) .prompt-stack { z-index: calc(var(--z-mo
 /* Modern: Warm paper, compact. */
 [data-ui="modern"] #game-root .hb-builder { font-family: var(--font-ui); color: var(--text); }
 [data-ui="modern"] #game-root .hb-banner {
-  top: calc(var(--hud-h) + var(--hud-inset) + var(--space-2));
+  top: calc(var(--hud-h) + var(--hud-inset) + var(--space-2) + var(--safe-t));
   gap: var(--space-3);
   padding: var(--space-1) var(--space-1) var(--space-1) var(--space-4);
   border: 1px solid var(--border);
@@ -14641,7 +14643,7 @@ body:has(#quest-dialogue:not([hidden])) .prompt-stack { z-index: calc(var(--z-mo
   bottom: var(--vm-bottom, auto);
   box-sizing: border-box;
   width: var(--vm-w);
-  max-height: calc(100% - var(--hud-h) - 16px);
+  max-height: calc(100% - var(--hud-h) - 16px - var(--safe-t));
   overflow: auto;
   padding: var(--space-3);
   border: 1px solid var(--border);
@@ -14745,7 +14747,7 @@ body:has(#quest-dialogue:not([hidden])) .prompt-stack { z-index: calc(var(--z-mo
   --mm-u: 1.2;
   position: absolute;
   z-index: var(--z-hud);
-  top: calc(var(--hud-h) + var(--space-3));
+  top: calc(var(--hud-h) + var(--space-3) + var(--safe-t));
   right: max(var(--hud-inset), var(--inset-r));
   width: var(--mm-w);
   font-family: var(--font-ui);
@@ -14865,7 +14867,7 @@ body:has(#quest-dialogue:not([hidden])) .prompt-stack { z-index: calc(var(--z-mo
 [data-ui="modern"] .street-minimap .smm-hide:hover { color: var(--text); }
 .smm-show {
   position: absolute; z-index: var(--z-hud);
-  top: calc(var(--hud-h) + var(--space-3)); right: max(var(--hud-inset), var(--inset-r));
+  top: calc(var(--hud-h) + var(--space-3) + var(--safe-t)); right: max(var(--hud-inset), var(--inset-r));
   display: grid; place-items: center; width: 32px; height: 32px; padding: 0; cursor: pointer;
   border: 0; border-radius: var(--radius-round);
   background: var(--surface-card); color: var(--text); box-shadow: 0 0 0 1px var(--border), var(--shadow-2);
@@ -14875,7 +14877,7 @@ body:has(#quest-dialogue:not([hidden])) .prompt-stack { z-index: calc(var(--z-mo
   [data-ui="modern"] .street-minimap .smm-hide { transition: none; }
 }
 /* The route card (To: / Next:) stacks under the map: --minimap-h is what the map takes (0 when hidden). */
-[data-ui="modern"] #game-root .route-gps { top: calc(var(--hud-h) + var(--space-3) + var(--minimap-h, 0px)); }
+[data-ui="modern"] #game-root .route-gps { top: calc(var(--hud-h) + var(--space-3) + var(--minimap-h, 0px) + var(--safe-t)); }
 /* #348: under 760 px the street's name drops under the pills (and the map under it): the card goes under both.
    One stack under the name: the map stands top right, the pinned quests and under them the buff strip
    top left, and the card (the width of a phone) goes under the taller side. G860 (#416): it lay over
@@ -14903,7 +14905,7 @@ body:has(#quest-dialogue:not([hidden])) .prompt-stack { z-index: calc(var(--z-mo
 .smm-sheet {
   position: fixed; inset: 0; z-index: var(--z-dialog); box-sizing: border-box;
   display: flex; align-items: center; justify-content: center;
-  padding: max(var(--space-3), env(safe-area-inset-top, 0px)) max(var(--space-3), env(safe-area-inset-right, 0px)) max(var(--space-3), env(safe-area-inset-bottom, 0px)) max(var(--space-3), env(safe-area-inset-left, 0px));
+  padding: max(var(--space-3), var(--safe-t)) max(var(--space-3), var(--safe-r)) max(var(--space-3), var(--safe-b)) max(var(--space-3), var(--safe-l));
   background: var(--scrim); font-family: var(--font-ui); touch-action: none;
 }
 .smm-sheet-card {
@@ -15045,6 +15047,19 @@ body:has(#quest-dialogue:not([hidden])) .prompt-stack { z-index: calc(var(--z-mo
   background: var(--c-grey-29);
   z-index: var(--z-hud);
   pointer-events: none;
+}
+/* SAFE FRAME (Austin's iPhone 2026-11-26, the Home Screen app upright: "some dialogs or screens still enter the
+   hazy part"): the rule is the HUD's, for everything. Whatever can sit at an upright phone's top edge keeps its
+   words and buttons below --safe-t, and at the foot above --safe-b; a background may run under the status bar
+   (as the new-day screen's does). So: every top offset measured from the screen's top adds var(--safe-t)
+   (under the top bar: calc(var(--hud-h) + ... + var(--safe-t)); a shade's padding; the skill and Magic Rock
+   cards' 30 px under the header), a full-screen shade's padding reads --safe-* (never the raw env() inset,
+   which misses the fade), and a height under the bar takes --safe-t off. --safe-t is 0 on a computer and on a
+   phone held sideways, so nothing moves there. tests/safe-frame.test.js lints it and opens the surfaces in
+   WebKit and Chrome with the clearance forced. The foot, upright only (sideways keeps its own room): */
+@media (orientation: portrait) {
+  :root.touch-phone[data-ui="modern"] #avatar-panel { padding-bottom: var(--safe-b); }
+  :root.touch-phone .st-progress { bottom: calc(20px + var(--safe-b)); }
 }
 /* The top bar's two pills. */
 [data-ui="modern"] header.top-bar,
@@ -15387,7 +15402,7 @@ body.is-booting .touch-controls { display: none; }
    the room left (the card's own shape) with the upright phone's small type (#265, #266,
    imagination-feature.js), so each card's words and Get Upgrade show. */
 @media (max-height: 500px) and (orientation: landscape) {
-  :root.touch-phone[data-ui="modern"] #game-root #imagination-panel.ui-sheet-center { bottom: 0; align-items: flex-start; padding-top: calc(var(--hud-h) + 4px); z-index: var(--z-dialog); }
+  :root.touch-phone[data-ui="modern"] #game-root #imagination-panel.ui-sheet-center { bottom: 0; align-items: flex-start; padding-top: calc(var(--hud-h) + 4px + var(--safe-t)); z-index: var(--z-dialog); }
   :root.touch-phone[data-ui="modern"] #game-root #imagination-panel .img-card-shell {
     display: grid; grid-template-columns: auto minmax(0, 1fr) auto auto; grid-template-rows: auto minmax(0, 1fr) auto; align-items: center;
     width: min(760px, calc(100% - 2 * var(--hud-inset) - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px)));
@@ -15425,7 +15440,7 @@ body.is-booting .touch-controls { display: none; }
    close share one row, the footer line goes, and the list and the letter stand side by side again. */
 @media (max-height: 500px) and (orientation: landscape) {
   :root.touch-phone[data-ui="modern"] #game-root #mail-panel.ui-sheet-center {
-    padding: calc(var(--hud-h) + 4px) calc(var(--hud-inset) + env(safe-area-inset-right, 0px)) 4px calc(var(--hud-inset) + env(safe-area-inset-left, 0px));
+    padding: calc(var(--hud-h) + 4px + var(--safe-t)) calc(var(--hud-inset) + env(safe-area-inset-right, 0px)) 4px calc(var(--hud-inset) + env(safe-area-inset-left, 0px));
     z-index: var(--z-dialog);
   }
   :root.touch-phone[data-ui="modern"] #mail-panel .mail-card { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; grid-template-rows: auto minmax(0, 1fr) auto; align-items: center; }
@@ -15450,7 +15465,7 @@ body.is-booting .touch-controls { display: none; }
    500 px tall: a one-row head, no footer line, the box starts at three lines (it still grows as you type
    or drag it), and Send stays at the window's foot while the rest scrolls (a picture's thumbnail too). */
 @media (max-height: 500px) and (orientation: landscape) {
-  :root.touch-phone[data-ui="modern"] #game-root #bug-report-panel.reports-panel { padding: calc(var(--hud-h) + 4px) calc(var(--sp-2) + env(safe-area-inset-right, 0px)) 4px calc(var(--sp-2) + env(safe-area-inset-left, 0px)); }
+  :root.touch-phone[data-ui="modern"] #game-root #bug-report-panel.reports-panel { padding: calc(var(--hud-h) + 4px + var(--safe-t)) calc(var(--sp-2) + env(safe-area-inset-right, 0px)) 4px calc(var(--sp-2) + env(safe-area-inset-left, 0px)); }
   :root.touch-phone[data-ui="modern"] #game-root #bug-report-panel .reports-head { padding-top: 0; padding-bottom: 0; }
   :root.touch-phone[data-ui="modern"] #game-root #bug-report-panel .reports-foot { display: none; }
   :root.touch-phone[data-ui="modern"] #game-root #bug-report-panel .reports-new-view .reports-text { min-height: 3.6rem; }
@@ -15463,7 +15478,7 @@ body.is-booting .touch-controls { display: none; }
    footer line), Decorate's tabs, filters and store share the row over its strip, and the banner sits
    right under the top bar, one slim row, so it clears the stick and Jump. */
 @media (max-height: 500px) and (orientation: landscape) {
-  :root.touch-phone[data-ui="modern"] #game-root .hb-banner { top: calc(var(--hud-h) + 4px); padding-top: 2px; padding-bottom: 2px; }
+  :root.touch-phone[data-ui="modern"] #game-root .hb-banner { top: calc(var(--hud-h) + 4px + var(--safe-t)); padding-top: 2px; padding-bottom: 2px; }
   :root.touch-phone[data-ui="modern"] #game-root .hb-banner .hb-hint { display: none; }
   :root.touch-phone[data-ui="modern"] #game-root .hb-banner .hb-close { width: 36px; height: 36px; min-height: 36px; }
   :root.touch-phone[data-ui="modern"] #game-root .hb-tray { bottom: max(var(--sp-2), env(safe-area-inset-bottom, 0px)); padding: var(--sp-2) var(--sp-2) var(--sp-2); gap: var(--sp-2) var(--space-3); }
@@ -15668,7 +15683,7 @@ body.is-booting .touch-controls { display: none; }
 :root.touch-phone[data-ui="modern"] #game-root #map-panel.ui-sheet-center {
   bottom: 0;
   z-index: var(--z-dialog);
-  padding: calc(var(--hud-h) + var(--sp-3)) var(--sp-2) var(--sp-4);
+  padding: calc(var(--hud-h) + var(--sp-3) + var(--safe-t)) var(--sp-2) var(--sp-4);
 }
 :root.touch-phone[data-ui="modern"]:has(#map-panel:not([hidden])) :is(.pack-bar, .touch-controls) { visibility: hidden; }
 /* end PHONEKEYS */
@@ -15711,7 +15726,7 @@ body.is-booting .touch-controls { display: none; }
 :root.touch-phone[data-ui="modern"] .more-list #menu-featured-btn .fp-bar { flex: none; width: 3rem; height: 0.35rem; margin-left: auto; border-radius: var(--radius-pill); background: var(--border); overflow: hidden; }
 :root.touch-phone[data-ui="modern"] .more-list #menu-featured-btn .fp-bar i { display: block; height: 100%; width: var(--p, 0%); background: var(--accent); }
 /* HOME: Cultivate and Change Style sat over the street's name; they go under it, with room. */
-:root.touch-phone[data-ui="modern"] #game-root .homes-modes { top: calc(2 * var(--hud-h) + var(--space-2) + var(--space-3)); }
+:root.touch-phone[data-ui="modern"] #game-root .homes-modes { top: calc(2 * var(--hud-h) + var(--space-2) + var(--space-3) + var(--safe-t)); }
 /* PROMPTS: a prompt (a Street Spirit's "set that as your destination?") sat over the stick and Jump;
    on a phone the stack starts above them (js/touch-controls.js: the stick's 132 px corner over the pack). */
 :root.touch-phone #game-root .prompt-stack { bottom: calc(var(--pack-live-height, 72px) + env(safe-area-inset-bottom, 0px) + 132px + var(--space-2)); }
@@ -15730,7 +15745,7 @@ body.is-booting .touch-controls { display: none; }
 /* SAVES (G737): a save that did not go in, or one this page must not write over (js/save-trouble.js).
    A small card at the top centre, over the HUD and panels, never modal: the game goes on under it. */
 #save-trouble {
-  position: fixed; top: calc(var(--hud-h) + var(--space-3)); left: 50%; transform: translateX(-50%); z-index: calc(var(--z-dialog) + 1);
+  position: fixed; top: calc(var(--hud-h) + var(--space-3) + var(--safe-t)); left: 50%; transform: translateX(-50%); z-index: calc(var(--z-dialog) + 1);
   display: grid; grid-template-columns: 1fr auto; gap: var(--space-1) var(--space-3); align-items: center;
   width: min(30rem, calc(100vw - 2 * var(--space-3))); padding: var(--space-3) var(--space-4);
   border: 2px solid var(--status-danger); border-radius: var(--radius-l); background: var(--surface-raised); color: var(--text);
@@ -15745,7 +15760,7 @@ body.is-booting .touch-controls { display: none; }
 }
 #save-trouble .save-trouble-btn:hover { background: var(--accent-hover); }
 #save-trouble .save-trouble-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-:root.touch-phone #save-trouble { grid-template-columns: 1fr; top: calc(2 * var(--hud-h) + var(--space-2)); }
+:root.touch-phone #save-trouble { grid-template-columns: 1fr; top: calc(2 * var(--hud-h) + var(--space-2) + var(--safe-t)); }
 :root.touch-phone #save-trouble .save-trouble-btn { grid-column: 1; grid-row: auto; justify-self: start; }
 /* end SAVES */
 
@@ -15830,7 +15845,7 @@ body.is-booting .touch-controls { display: none; }
 }
 
 /* The notices' region (js/notify-view.js keeps the stack in it); the Add to Home Screen tip starts there too. */
-:root.phone-layout .hs-tip.is-floating { top: var(--pr-notice-t, calc(env(safe-area-inset-top, 0px) + 64px)); }
+:root.phone-layout .hs-tip.is-floating { top: var(--pr-notice-t, calc(var(--safe-t) + 64px)); }
 
 /* The pinned quest: the first one, small; upright just above the pack row, under the stick (beside it
    sideways); a tap opens it in Quests. G1307 (#653, a player's idea; Austin 2026-11-25): over the stick it

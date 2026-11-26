@@ -734,7 +734,10 @@ export function watchPhoneKeyboard({ doc = globalThis.document, win = globalThis
 
 
 let insetProbe = null;
-/** The screen's safe-area insets in CSS px (env(safe-area-inset-*); 0 where there are none). */
+/**
+ * The screen's safe area in CSS px as the layout keeps it (style.css LANDSCAPE-HUD --safe-*: the
+ * env(safe-area-inset-*) insets, and upright on a phone the status bar's fade too); 0 where there are none.
+ */
 export function safeAreaInsets(doc = globalThis.document) {
   const zero = { top: 0, right: 0, bottom: 0, left: 0 };
   if (!doc?.body) return zero;
@@ -742,7 +745,7 @@ export function safeAreaInsets(doc = globalThis.document) {
     insetProbe = doc.createElement('div');
     insetProbe.setAttribute('aria-hidden', 'true');
     insetProbe.style.cssText = 'position:fixed;left:0;top:0;width:0;height:0;visibility:hidden;pointer-events:none;'
-      + 'padding:env(safe-area-inset-top,0px) env(safe-area-inset-right,0px) env(safe-area-inset-bottom,0px) env(safe-area-inset-left,0px)';
+      + 'padding:var(--safe-t,0px) var(--safe-r,0px) var(--safe-b,0px) var(--safe-l,0px)';
     doc.body.appendChild(insetProbe);
   }
   const cs = doc.defaultView?.getComputedStyle?.(insetProbe);

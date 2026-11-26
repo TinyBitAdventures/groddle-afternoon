@@ -5,7 +5,7 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 
-import { FLOAT_STICK_LABEL, createFloatStick, keepFloatStickSwitch } from '../public/js/touch-controls.js?v=6e1b7f26';
+import { FLOAT_STICK_LABEL, createFloatStick, keepFloatStickSwitch } from '../public/js/touch-controls.js?v=8bc690ac';
 
 /** A small tree: ids, data-menu-group, children, remove, and a MutationObserver fired by hand. */
 function fakePage() {

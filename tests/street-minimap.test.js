@@ -358,14 +358,14 @@ describe('street map: placement', () => {
   it('modern: top right under the bar, left of the Social drawer (--inset-r)', () => {
     const rule = block.match(/\n\.street-minimap \{([^}]*)\}/);
     assert.ok(rule, 'the card rule');
-    assert.match(rule[1], /top: calc\(var\(--hud-h\) \+ var\(--space-3\)\);/);
+    assert.match(rule[1], /top: calc\(var\(--hud-h\) \+ var\(--space-3\) \+ var\(--safe-t\)\);/);
     assert.match(rule[1], /right: max\(var\(--hud-inset\), var\(--inset-r\)\);/);
     assert.match(rule[1], /z-index: var\(--z-hud\);/);
     assert.match(block, /\.smm-show \{[^}]*right: max\(var\(--hud-inset\), var\(--inset-r\)\);/);
   });
 
   it('the route card stacks under it in both skins (--minimap-h)', () => {
-    assert.match(block, /\[data-ui="modern"\] #game-root \.route-gps \{ top: calc\(var\(--hud-h\) \+ var\(--space-3\) \+ var\(--minimap-h, 0px\)\); \}/);
+    assert.match(block, /\[data-ui="modern"\] #game-root \.route-gps \{ top: calc\(var\(--hud-h\) \+ var\(--space-3\) \+ var\(--minimap-h, 0px\) \+ var\(--safe-t\)\); \}/);
     assert.ok(css.indexOf('/* —— MINIMAP —— */') > css.indexOf('[data-ui="modern"] #game-root .route-gps {'), 'after the PAPER rule, so it wins');
     assert.match(read('public/css/classic.css'), /:root\[data-ui="classic"\] #game-root \.route-gps \{ top: calc\(var\(--minimap-h, 0px\) \+ 10 \* var\(--cu\)\); \}/);
     assert.match(read('public/js/features/street-minimap-feature.js'), /setProperty\('--minimap-h', `\$\{h > 0 \? h \+ 12 : 0\}px`\)/);

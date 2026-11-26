@@ -184,7 +184,10 @@ const ONLINE_STYLE = `  <style>
     /* G320: the start card over the street, the chat dock and the pack, inside the game frame (it scrolls when the
        frame is shorter); the street's toasts, activity lines and Qurazy banner wait for it to close (game.js holds the
        toast's clock, qurazy-feature the banner). */
-    #overlay:not(.hidden) { z-index: var(--z-screen); padding: var(--sp-4); box-sizing: border-box; }
+    #overlay:not(.hidden) { z-index: var(--z-screen); padding: calc(var(--sp-4) + var(--safe-t)) var(--sp-4) var(--sp-4); box-sizing: border-box; }
+    /* Austin's iPhone 2026-11-26 (the Home Screen app, upright): the card ran up under the status bar's fade and down over the
+       home bar. Upright it keeps inside --safe-t and --safe-b (style.css LANDSCAPE-HUD; both 0 on a computer). */
+    @media (orientation: portrait) { #overlay:not(.hidden) { padding-bottom: calc(var(--sp-4) + var(--safe-b)); } }
     #overlay:not(.hidden) > .card { max-height: 100%; overflow-y: auto; overscroll-behavior: contain; box-sizing: border-box; }
     #game-root:has(> #overlay:not(.hidden)) :is(.notify-notices, .qurazy-overlay) { visibility: hidden; }
     body:has(#overlay:not(.hidden)) .save-pill { z-index: calc(var(--z-screen) + 1); }

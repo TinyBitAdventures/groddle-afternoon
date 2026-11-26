@@ -15,7 +15,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { watchPhoneKeyboard } from '../public/js/touch-controls.js?v=6e1b7f26';
+import { watchPhoneKeyboard } from '../public/js/touch-controls.js?v=8bc690ac';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const css = readFileSync(join(root, 'public/style.css'), 'utf8');

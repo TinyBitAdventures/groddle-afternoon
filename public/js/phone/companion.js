@@ -43,6 +43,8 @@ import { PICTURE_TEXT, REPORT_PICTURES, convertPicture, refusalWords as pictureR
 import { DEVICE_KEY, PHONE_TEXT as T, PLAY_ONCE_HASH, PLAY_ONCE_KEY, POLL_MS, createPresenceApi, friendsView, fullGameHref, itemNamesFrom, itemWords, mailRows, mailboxFromSave, mergePlayerMail, phoneContext, phoneDevice, takenMailIds, unreadLetters } from './companion-data.js?v=464e4058';
 
 const doc = globalThis.document;
+// #653: the iOS Home Screen app (navigator.standalone is iOS only) clears the status bar's fade (phone.css --safe-t).
+if (globalThis.navigator?.standalone === true) doc?.documentElement.classList.add('ios-home-app');
 
 function el(tag, attrs = {}, text = '') {
   const node = doc.createElement(tag);

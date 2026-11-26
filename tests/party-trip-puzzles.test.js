@@ -15,7 +15,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { normalizeHeldPuzzle, normalizePuzzleSave } from '../public/js/puzzle-triggers.js?v=221b67a9';
 import { normalizeHeldScene, normalizeSceneSave } from '../public/js/puzzle-scenes.js?v=04413a6d';
-import { puzzlesFeature } from '../public/js/features/puzzles-feature.js?v=a36df6c4';
+import { puzzlesFeature } from '../public/js/features/puzzles-feature.js?v=12ca7213';
 import { puzzleScenesFeature } from '../public/js/features/puzzle-scenes-feature.js?v=fca3ec23';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');

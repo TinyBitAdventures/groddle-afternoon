@@ -92,7 +92,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="robots" content="noindex" />
   <title>Groddle Afternoon · Multiplayer</title>
-    <link rel="stylesheet" href="style.css?v=a479063f" />
+    <link rel="stylesheet" href="style.css?v=c4814991" />
   <!-- The UI font, self-hosted (style.css @font-face; OFL in assets/fonts/nunito/): the roman latin file, before first paint. -->
   <link rel="preload" href="assets/fonts/nunito/nunito-roman-latin.woff2" as="font" type="font/woff2" crossorigin />
   <!-- The Classic interface (js/classic/ui-mode.js sets <html data-ui="classic">); every rule is scoped to it. -->
@@ -246,7 +246,10 @@
     /* G320: the start card over the street, the chat dock and the pack, inside the game frame (it scrolls when the
        frame is shorter); the street's toasts, activity lines and Qurazy banner wait for it to close (game.js holds the
        toast's clock, qurazy-feature the banner). */
-    #overlay:not(.hidden) { z-index: var(--z-screen); padding: var(--sp-4); box-sizing: border-box; }
+    #overlay:not(.hidden) { z-index: var(--z-screen); padding: calc(var(--sp-4) + var(--safe-t)) var(--sp-4) var(--sp-4); box-sizing: border-box; }
+    /* Austin's iPhone 2026-11-26 (the Home Screen app, upright): the card ran up under the status bar's fade and down over the
+       home bar. Upright it keeps inside --safe-t and --safe-b (style.css LANDSCAPE-HUD; both 0 on a computer). */
+    @media (orientation: portrait) { #overlay:not(.hidden) { padding-bottom: calc(var(--sp-4) + var(--safe-b)); } }
     #overlay:not(.hidden) > .card { max-height: 100%; overflow-y: auto; overscroll-behavior: contain; box-sizing: border-box; }
     #game-root:has(> #overlay:not(.hidden)) :is(.notify-notices, .qurazy-overlay) { visibility: hidden; }
     body:has(#overlay:not(.hidden)) .save-pill { z-index: calc(var(--z-screen) + 1); }
@@ -1210,6 +1213,6 @@
   <!-- G1117: ahead of game.js, so the loading card counts the game's code as it downloads. -->
   <script type="module" src="js/boot-progress.js?v=d84b898d"></script>
   <!-- game.js loads once the multiplayer save is in memory (js/online-boot.js). -->
-  <script type="module" id="online-boot" src="js/online-boot.js?v=f1f2766b" data-game="game.js?v=c3c4d0df"></script>
+  <script type="module" id="online-boot" src="js/online-boot.js?v=f1f2766b" data-game="game.js?v=32ccb49c"></script>
 </body>
 </html>

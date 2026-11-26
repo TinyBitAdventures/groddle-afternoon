@@ -379,7 +379,7 @@ describe('G225 familiar follow-ups', () => {
     assert.equal(FAMILIAR_DIALOG_MIN_W, 330);
     const css = resolveTokens(read('style.css'));
     assert.doesNotMatch(css, /quest-dialogue-orb/);
-    assert.match(css, /\.quest-dialogue\[data-look="conversation"\] \.quest-dialogue-card \{[^}]*top: 30px;[^}]*width: 360px;[^}]*rgba\(10, 24, 29, 0\.9\)/);
+    assert.match(css, /\.quest-dialogue\[data-look="conversation"\] \.quest-dialogue-card \{[^}]*top: calc\(30px \+ var\(--safe-t\)\);[^}]*width: 360px;[^}]*rgba\(10, 24, 29, 0\.9\)/);
     assert.match(css, /\.quest-dialogue\[data-look="conversation"\] \.fam-head \{[^}]*border-bottom: 1px solid #49514f/);
     assert.match(css, /@keyframes famConvGrow \{ from \{ transform: translateX\(-50%\) scale\(0\.02\); \}/);
     const qi = read('js/features/quest-instances-feature.js');

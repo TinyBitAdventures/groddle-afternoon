@@ -17,11 +17,11 @@ const css = readFileSync(join(root, 'public/style.css'), 'utf8');
 
 describe('side sheets on a short screen', () => {
   it('run to the floor, after the rule that stops them above the pack', () => {
-    const base = css.indexOf('  max-height: calc(100% - var(--hud-h) - 6px - var(--pack-live-height, 72px) - 8px);');
+    const base = css.indexOf('  max-height: calc(100% - var(--hud-h) - 6px - var(--pack-live-height, 72px) - 8px - var(--safe-t));');
     const at = css.indexOf('/* A short screen (the mobile QA, 2026-11-12: a phone held sideways, 343 px): a sheet');
     assert.ok(base > 0 && at > base);
     const block = css.slice(at, css.indexOf('}\n}', at) + 3);
-    assert.match(block, /@media \(max-height: 500px\) \{[\s\S]*#game-root \.ui-sheet:not\(\.ui-sheet-center\),[\s\S]*#skills-panel,[\s\S]*\{ max-height: calc\(100% - var\(--hud-h\) - 6px - 8px\); \}/);
+    assert.match(block, /@media \(max-height: 500px\) \{[\s\S]*#game-root \.ui-sheet:not\(\.ui-sheet-center\),[\s\S]*#skills-panel,[\s\S]*\{ max-height: calc\(100% - var\(--hud-h\) - 6px - 8px - var\(--safe-t\)\); \}/);
   });
   it('the pack row steps aside for a sheet that reaches below its top', () => {
     assert.deepEqual(packRowClearance({ rowTop: 279, left: { inset: 336, bottom: 335 } }), { left: 336, right: 0 });

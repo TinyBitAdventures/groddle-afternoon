@@ -116,8 +116,8 @@ describe('#278 the Auctions window stops above Safari\'s toolbar', () => {
   for (const [file, shade, win] of [['js/features/auctions-feature.js', 'auc-shade', 'auc-win'], ['js/features/snaps-feature.js', 'snap-shade-win', 'snap-win']]) {
     it(`${win}: its top gap and height are of the screen Safari leaves (dvh), vh kept as the fallback`, () => {
       const src = read(file);
-      assert.match(src.match(new RegExp(`\\.${shade} \\{[^}]*\\}`))[0], /padding: 7vh var\(--sp-8\) var\(--sp-8\); padding-top: 7dvh;/);
-      assert.match(src.match(new RegExp(`\\.${win} \\{[^}]*\\}`))[0], /max-height: 84vh; max-height: 84dvh;/);
+      assert.match(src.match(new RegExp(`\\.${shade} \\{[^}]*\\}`))[0], /padding: calc\(7vh \+ var\(--safe-t, 0px\)\) var\(--sp-8\) var\(--sp-8\); padding-top: calc\(7dvh \+ var\(--safe-t, 0px\)\);/);
+      assert.match(src.match(new RegExp(`\\.${win} \\{[^}]*\\}`))[0], /max-height: calc\(84vh - var\(--safe-t, 0px\)\); max-height: calc\(84dvh - var\(--safe-t, 0px\)\);/);
     });
   }
 });

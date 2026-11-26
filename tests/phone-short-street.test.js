@@ -79,7 +79,7 @@ describe('G860 (#416) and #539: under 760 px the route card goes under the pinne
   });
   it('#539 (384 x 644): the card starts under the chips, which stand where the card did', () => {
     // The strip's narrow top (no pins) is the card's base without the notch inset.
-    assert.ok(css.includes('  [data-ui="modern"] #buff-strip { top: calc(2 * var(--hud-h) + var(--space-4)); }'));
+    assert.ok(css.includes('  [data-ui="modern"] #buff-strip { top: calc(2 * var(--hud-h) + var(--space-4) + var(--safe-t)); }'));
     const hudH = 44, space2 = 8, space4 = 16, chips = 38; // .buff-chip height
     const stripTop = 2 * hudH + space4;
     const cardTop = 2 * hudH + space4 + Math.max(0, 0 + chips + space2);
@@ -87,7 +87,7 @@ describe('G860 (#416) and #539: under 760 px the route card goes under the pinne
     // Measured in Chrome at 384 x 644: chips 104 to 142, the card from 150 (it was 104, under them).
   });
   it('the pins stand at the card\'s height, and game.js keeps --quest-pins-h', () => {
-    assert.match(css, /@media \(max-width: 760px\) \{\n\s+\[data-ui="modern"\] #game-root #quest-pins:not\(\[hidden\]\) \{ top: calc\(2 \* var\(--hud-h\) \+ var\(--space-4\)\); \}/);
+    assert.match(css, /@media \(max-width: 760px\) \{\n\s+\[data-ui="modern"\] #game-root #quest-pins:not\(\[hidden\]\) \{ top: calc\(2 \* var\(--hud-h\) \+ var\(--space-4\) \+ var\(--safe-t\)\); \}/);
     assert.match(readFileSync(join(root, 'public/game.js'), 'utf8'), /root\.style\.setProperty\('--quest-pins-h', `\$\{h\}px`\)/);
   });
 });
