@@ -27724,14 +27724,10 @@ async function enterStreet(tsid, opts = {}) {
   // Signposts, doors and ladder feet stay clear (street-ecology.js streetReservedSpots,
   // shared with the realtime server's layout).
   const reserved = streetReservedSpots(data);
-  // Multiplayer: no per-player reservation, so every player's street (and the
-  // realtime server's layout, tools/build-realtime-objects.mjs) puts each
-  // rock, tree and node in the same place.
-  if (GAME_MODE !== 'multiplayer' && Number.isFinite(opts.spawnX) && Number.isFinite(opts.spawnY)) {
-    reserved.push({ x: opts.spawnX, y: opts.spawnY, key: 'saved-arrival', clearance: 210 });
-  } else if (GAME_MODE !== 'multiplayer' && entry) {
-    reserved.push({ x: entry.x, y: entry.y, key: 'saved-arrival', clearance: 210 });
-  }
+  // #718: no per-player reservation, solo or online, so every street puts each rock, tree, node and
+  // animal in one place, the realtime server's (tools/build-realtime-objects.mjs), however you came in.
+  // Glitch kept each thing on a street at its own spot for everyone; solo once kept its arrival clear,
+  // which reseated the whole plan (Clam Calumny's floor Jellisacs stood 700 px from the server's).
   currentStreetPlacement = planStreetPlacements(
     streetPlatforms,
     [

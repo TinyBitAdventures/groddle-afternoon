@@ -352,7 +352,8 @@ describe('the server data', () => {
     const keys = [...list.matchAll(/\{ key: '([A-Za-z]+)', count: ([^,]+), clearance: (\d+) \}/g)].map((m) => [m[1], m[3]]);
     const pop = { treeClasses: [], gardens: 0, vendor: false, shrine: false, rockClasses: [], piggies: 0, chickens: 0, butterflies: 0, flyingButterflies: 0, apples: 0, musicblocks: 0, quoins: 0 };
     assert.deepEqual(placementRequests(pop).map((r) => [r.key, String(r.clearance)]), keys);
-    assert.match(game, /key: 'saved-arrival'/, 'the one reservation the server leaves out is per player');
+    // #718: solo keeps no per-player reservation either, so its quoins stand where the server's do.
+    assert.doesNotMatch(game, /key: 'saved-arrival'/, 'no page keeps its own arrival clear');
     assert.match(game, /q\.baseY = opts\.useExactY \? spot\.y : spot\.y - 58 - \(phaseIndex % 3\) \* 34;/);
   });
 

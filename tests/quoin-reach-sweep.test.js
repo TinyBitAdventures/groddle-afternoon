@@ -6,8 +6,8 @@
  * The avatar walks between EDGE_MARGIN and the street's width less EDGE_MARGIN (js/avatar-step.js
  * stepAvatar) and stands on the lines isStandable allows. A natural quoin floats 58, 92 or 126 px over
  * a planner spot (game.js spawnWorldQuoin, by its index), and the planner's spots are
- * buildPlatformCandidates' (js/street-ecology.js): where a quoin lands depends on the arrival in solo
- * (the saved-arrival keep-clear), so the sweep takes every spot the planner could pick at all three
+ * buildPlatformCandidates' (js/street-ecology.js): where a quoin lands once depended on the arrival in solo
+ * (a keep-clear dropped by #718), so the sweep takes every spot the planner could pick at all three
  * heights, which covers solo and the realtime server's layout (tools/build-realtime-quoins.mjs) alike.
  * A touch is js/quoins.js quoinTouches, the source's player box over the drawn coin (quoin.js
  * onPlayerCollision 156). Since player report 37 the coin's own box counts, not a 60 px one: the 58 and

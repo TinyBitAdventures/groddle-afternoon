@@ -115,8 +115,10 @@ describe('game.js: every arrival with no spot takes the default arrival', () => 
     assert.match(enter, /player\.x = opts\.spawnX \?\? sourceSpawnX \?\? WORLD_W \* 0\.5;\s*player\.y = opts\.spawnY \?\? sourceSpawnY \?\? GROUND_Y;/);
   });
 
-  it('solo keeps the arrival clear as it keeps a given spot clear; multiplayer reserves neither (the shared layout)', () => {
-    assert.match(enter, /\} else if \(GAME_MODE !== 'multiplayer' && entry\) \{\s*reserved\.push\(\{ x: entry\.x, y: entry\.y, key: 'saved-arrival', clearance: 210 \}\);/);
+  it('#718: neither solo nor multiplayer keeps the arrival clear: one layout, the server\'s, however you came in', () => {
+    assert.doesNotMatch(enter, /key: 'saved-arrival'/);
+    assert.match(enter, /const reserved = streetReservedSpots\(data\);[\s\S]{0,600}currentStreetPlacement = planStreetPlacements\(/);
+    assert.doesNotMatch(enter.slice(enter.indexOf('const reserved = streetReservedSpots(data);'), enter.indexOf('currentStreetPlacement = planStreetPlacements(')), /reserved\.push/);
   });
 
   it('the paths that come with no spot: a fresh boot, Skip to Ur, the in-game skip, a failed save', () => {

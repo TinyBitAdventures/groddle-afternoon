@@ -54,8 +54,7 @@
  *     data/trade.json's "cost" (tools/build-realtime-trade.mjs).
  *
  * What differs from a solo layout, on purpose (as tools/build-realtime-quoins.mjs):
- * no saved-arrival reservation (that one is per player; in multiplayer game.js
- * leaves it out so everyone's street matches) and no feature ecology overrides
+ * no feature ecology overrides
  * (those streets are private instances, never shared), except a street
  * upgrade's: the street-jobs feature answers ecologyOverride with
  * js/street-jobs.js upgradeEcologyEntry once the street's upgrade project is

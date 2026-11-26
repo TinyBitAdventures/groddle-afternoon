@@ -168,7 +168,8 @@ describe('street objects: mining takes the server\'s roll', () => {
     const game = read('public/game.js');
     assert.match(game, /features\.query\('sharedVerbGrant', target, verbId, engine\)/);
     assert.match(game, /sharedChunks: sharedGrant\?\.chunks/);
-    assert.match(game, /GAME_MODE !== 'multiplayer' && Number\.isFinite\(opts\.spawnX\)/);
+    // #718: no per-player keep-clear spot, solo or online (tests/client-server-placement.test.js).
+    assert.doesNotMatch(game, /key: 'saved-arrival'/);
     assert.match(game, /rockIndex: index,/);
     assert.match(game, /treeIndex: i,/);
     assert.match(read('public/content.js'), /chunks: ctx\.sharedChunks/);

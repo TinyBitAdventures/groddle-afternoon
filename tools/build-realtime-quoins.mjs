@@ -8,9 +8,7 @@
  * writes each spot's place, type and class, plus the class table from
  * js/quoins.js QUOIN_CLASSES (items/quoin.js onPropsChanged 318-662).
  *
- * What differs from a solo layout, on purpose: no saved-arrival reservation
- * (that one is per player; in multiplayer everyone stands the quoins where
- * the server says) and no feature ecology overrides (those streets are
+ * What differs from a solo layout, on purpose: no feature ecology overrides (those streets are
  * private instances, rebuilt rooms or empty stations, never shared), but
  * one: a party street's own (party-spaces.js partyEcologyEntry, the
  * archived template's quoins), since a Party Space's party shares them

@@ -2,8 +2,8 @@
  * G1236 (root R2, "stands clear of what is drawn"): in a fresh solo game on Hechey Track a starter rock
  * stood on the Shrine to Mab, so clicking the shrine opened the rock's menu. The starter rocks are seated
  * late (STARTER_ROCK_SPOTS), and a fresh game's arrival (the incoming spot nearest the middle) moved the
- * planned shrine onto one. The sweep: on every street, shared (the server's layout) and solo (with the
- * arrival kept clear, as game.js enterStreet does), no planned rock, tree, garden, node or piece of
+ * planned shrine onto one. The sweep: on every street, shared (the server's layout) and solo (the archived
+ * street; since #718 no page keeps its arrival clear), no planned rock, tree, garden, node or piece of
  * street furniture stands on a shrine, the vendor, a signpost, a door, a mailbox or a Visiting Stone.
  * Glitch set every one of them by hand, clear of each other (the archived streets).
  * R43 (#680): online the page draws each rock, tree and node at the server's spot and plans its own
@@ -32,7 +32,6 @@ import {
   setStreetEcologyCatalog,
   streetReservedSpots,
 } from '../public/js/street-ecology.js?v=f1c11a2d';
-import { defaultArrival } from '../public/js/street-arrival.js?v=ee7223c5';
 import { resourceSpawnPlan } from '../public/js/features/resource-nodes-feature.js?v=abc828a8';
 import { creatureRequests, plannedStreet, setCreatureEcology, streetEcology, streetObjectLayout } from '../tools/build-realtime-objects.mjs';
 
@@ -40,7 +39,6 @@ const root = join(import.meta.dirname, '..');
 const streetsDir = join(root, 'public/assets/streets');
 const catalog = JSON.parse(readFileSync(join(root, 'public/assets/content/street-ecology.json'), 'utf8'));
 const index = JSON.parse(readFileSync(join(streetsDir, 'index.json'), 'utf8'));
-const arrivals = JSON.parse(readFileSync(join(root, 'public/assets/content/street-arrivals.json'), 'utf8'));
 const HECHEY = 'GLI2V0UN7RD1T2J';
 setStreetEcologyCatalog(catalog);
 setCreatureEcology(catalog);
@@ -64,10 +62,8 @@ async function overlaps(tsid) {
   // Online the page plans the street the builder lays it out from (plannedStreet: a Party Space keeps
   // only its exit signpost) with no arrival kept clear, and draws each rock, tree and node at the
   // server's spot (R43, #587; tools/build-realtime-objects.mjs streetObjectLayout, data/objects.json).
-  // Solo it plans the archived street with the arrival kept clear and draws its own spots.
-  const entry = defaultArrival(loaded, arrivals, { worldW });
-  const variants = [['shared', plannedStreet(loaded), streetEcology(tsid), []]];
-  if (entry) variants.push(['solo', loaded, ecologyForStreet(tsid), [{ x: entry.x, y: entry.y, key: 'saved-arrival', clearance: 210 }]]);
+  // Solo it plans the archived street and draws its own spots (#718: with no arrival kept clear, as online).
+  const variants = [['shared', plannedStreet(loaded), streetEcology(tsid), []], ['solo', loaded, ecologyForStreet(tsid), []]];
   for (const [mode, data, ecology, keep] of variants) {
     const pop = populationForStreet(tsid, ecology, { starter });
     const reserved = [...streetReservedSpots(data), ...keep];

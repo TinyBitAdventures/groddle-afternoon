@@ -76,10 +76,10 @@ describe('game.js enterStreet: x only takes the ground; x and y, or a save, unch
   const start = game.indexOf('async function enterStreet(tsid, opts = {}) {');
   const enter = game.slice(start, game.indexOf('const summerStory = ensureSummersDayStory(questState);', start));
 
-  it('fills the height from groundAt at the clamped x, before the planner reserves the spot', () => {
+  it('fills the height from groundAt at the clamped x, before the avatar stands there', () => {
     const fill = enter.search(/if \(Number\.isFinite\(opts\.spawnX\) && !Number\.isFinite\(opts\.spawnY\)\) \{\s*const groundY = groundAt\(streetPlatforms, clamp\(opts\.spawnX, 40, Math\.max\(80, WORLD_W - 40\)\), \{ tsid: data\.tsid \}\);\s*if \(groundY != null\) opts = \{ \.\.\.opts, spawnY: groundY \};/);
     assert.ok(fill > 0);
-    assert.ok(fill < enter.indexOf("reserved.push({ x: opts.spawnX, y: opts.spawnY, key: 'saved-arrival'"));
+    assert.ok(fill < enter.indexOf('player.y = opts.spawnY ?? sourceSpawnY ?? GROUND_Y;'));
     assert.ok(enter.indexOf('streetPlatforms = bgLayer.platformsScreen;') < fill);
   });
 
