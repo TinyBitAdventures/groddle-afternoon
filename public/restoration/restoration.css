@@ -259,12 +259,13 @@ h3 { font-size: 22px; margin: 0 0 10px; }
 }
 @keyframes sheet-piggy { to { background-position-x: -704px; } }
 .piggy-walk { display: block; animation: piggy-walk 9s ease-in-out infinite; }
+/* The piggy sheet faces right: unflipped walking right, flipped walking back. */
 @keyframes piggy-walk {
-  0% { transform: translateX(0) scaleX(-1); }
-  45% { transform: translateX(56px) scaleX(-1); }
-  50% { transform: translateX(56px) scaleX(1); }
-  95% { transform: translateX(0) scaleX(1); }
-  100% { transform: translateX(0) scaleX(-1); }
+  0% { transform: translateX(0) scaleX(1); }
+  45% { transform: translateX(56px) scaleX(1); }
+  50% { transform: translateX(56px) scaleX(-1); }
+  95% { transform: translateX(0) scaleX(-1); }
+  100% { transform: translateX(0) scaleX(1); }
 }
 .sheet-chicken {
   width: 148px; height: 110px;
