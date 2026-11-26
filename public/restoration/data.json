@@ -2814,9 +2814,19 @@
   "deployed": "2026-11-26"
  },
  "git": {
-  "commits": 3731,
+  "commits": 3734,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-26",
+    "kind": "fix",
+    "text": "A machine dragged from the pack onto the floor outside Decoration Mode is set down at your feet, not left as a loose item"
+   },
+   {
+    "date": "2026-11-26",
+    "kind": "fix",
+    "text": "A machine set down too near the others says to stand further from them, and Decoration Mode shows where you stand while you drag one"
+   },
    {
     "date": "2026-11-26",
     "kind": "fix",
@@ -2926,19 +2936,9 @@
     "date": "2026-11-26",
     "kind": "new",
     "text": "Street map door buttons show a dino, a portal or a door"
-   },
-   {
-    "date": "2026-11-26",
-    "kind": "improve",
-    "text": "The Map's home card shows House only once you have a home street"
-   },
-   {
-    "date": "2026-11-26",
-    "kind": "new",
-    "text": "Who's here's online count is a link to the website's chat, to see everyone online"
    }
   ]
  },
- "tests": 1445,
+ "tests": 1446,
  "generatedAt": "2026-11-26"
 }
