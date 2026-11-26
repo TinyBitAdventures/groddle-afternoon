@@ -198,7 +198,7 @@ export function spriteHasRimArt(spr, PIXI) {
  * around its body and name, the magic rock, a garden plot) gives the art Sprites inside it, as
  * Glitch glowed every interaction sprite in reach whatever it was built from
  * (MiddleGroundRenderer.as _findInteractionSprites 1092-1131). Never a Graphics box, a texture-less
- * sprite (spriteHasRimArt), a hidden part (a spirit's stand-in body), a shadow, or a rim itself.
+ * sprite (spriteHasRimArt), a hidden part (a spirit's spare body), a shadow, or a rim itself.
  * A Container may name its art instead (`rimArt`), as an invisible hit box over art drawn elsewhere.
  * @param {any} spr the target's sprite
  * @param {{ Sprite: Function, Graphics?: Function, Texture: { EMPTY: any } }} PIXI

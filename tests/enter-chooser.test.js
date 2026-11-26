@@ -16,7 +16,7 @@ import {
   itemSortValue,
   orderChoices,
   planEnter,
-} from '../public/js/enter-chooser.js?v=28f69f85';
+} from '../public/js/enter-chooser.js?v=44aef7b2';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const game = readFileSync(join(here, '../public/game.js'), 'utf8');
@@ -208,7 +208,7 @@ describe('client source', { skip: !existsSync(client) && 'glitch-client not besi
 
 describe('tile art crop', () => {
   it('finds the drawn box in an RGBA buffer', async () => {
-    const { alphaBox } = await import('../public/js/enter-chooser.js?v=28f69f85');
+    const { alphaBox } = await import('../public/js/enter-chooser.js?v=44aef7b2');
     const w = 4;
     const h = 3;
     const rgba = new Uint8ClampedArray(w * h * 4);
@@ -245,7 +245,7 @@ describe('tile art at the tile\'s pixel size', () => {
   }
 
   it('fills the tile at the device pixel ratio, from the art and not the frame', async () => {
-    const { tileArtResolution, TILE_ICON_CSS } = await import('../public/js/enter-chooser.js?v=28f69f85');
+    const { tileArtResolution, TILE_ICON_CSS } = await import('../public/js/enter-chooser.js?v=44aef7b2');
     assert.equal(TILE_ICON_CSS, 50);
     assert.equal(tileArtResolution(50, 50, { dpr: 2 }), 2);
     assert.equal(tileArtResolution(100, 100, { dpr: 3 }), 1.5);
@@ -259,7 +259,7 @@ describe('tile art at the tile\'s pixel size', () => {
   });
 
   it('draws a young tree (small art at the foot of a tall cell) sharp: art px >= tile px', async () => {
-    const { drawTileArt, alphaBox } = await import('../public/js/enter-chooser.js?v=28f69f85');
+    const { drawTileArt, alphaBox } = await import('../public/js/enter-chooser.js?v=44aef7b2');
     // A trant cell, anchored at its foot: 220 x 270 units; the young tree 40 x 45 at the bottom.
     const bounds = { x: -110, y: -270, width: 220, height: 270 };
     const art = { x: -18, y: -59, width: 40, height: 45 };
@@ -283,7 +283,7 @@ describe('tile art at the tile\'s pixel size', () => {
   });
 
   it('keeps a thing that fills its frame (a MoeBot) at the same sharpness', async () => {
-    const { drawTileArt } = await import('../public/js/enter-chooser.js?v=28f69f85');
+    const { drawTileArt } = await import('../public/js/enter-chooser.js?v=44aef7b2');
     const bounds = { x: -30, y: -80, width: 60, height: 80 };
     const { extract, calls } = fakeThing(bounds, bounds);
     const canvas = drawTileArt({ extract, bounds, dpr: 2 });
@@ -293,7 +293,7 @@ describe('tile art at the tile\'s pixel size', () => {
   });
 
   it('returns null for nothing drawn or no bounds', async () => {
-    const { drawTileArt } = await import('../public/js/enter-chooser.js?v=28f69f85');
+    const { drawTileArt } = await import('../public/js/enter-chooser.js?v=44aef7b2');
     const bounds = { x: 0, y: 0, width: 10, height: 10 };
     assert.equal(drawTileArt({ extract: fakeThing(bounds, { x: 0, y: 0, width: 0, height: 0 }).extract, bounds }), null);
     assert.equal(drawTileArt({ extract: () => null, bounds: { x: 0, y: 0, width: 0, height: 0 } }), null);

@@ -173,7 +173,7 @@ export function installClassicPanes({ doc = globalThis.document, win = globalThi
   added.push(lower);
 
   // Names: each player's own slot (#709, js/name-colours.js, set by the drawer as data-name-colour),
-  // the one their bubble uses; a name without one, in the order they first speak (as Glitch did).
+  // the one their bubble uses; a name without one, in the order they first speak, as in the 2012 client.
   const seen = new Map();
   function colourNames(scope) {
     for (const b of scope.querySelectorAll('.social-msg:not(.is-mine) > b')) {
