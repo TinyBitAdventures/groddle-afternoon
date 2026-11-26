@@ -12,7 +12,7 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { createAudioResumer } from '../public/js/audio-resume.js?v=d5628e7b';
+import { createAudioResumer } from '../public/js/audio-resume.js?v=440d0096';
 import { createMusicVoice } from '../public/js/music-voice.js?v=75c8cf57';
 import { BACKGROUND_SOUND_LABEL, backgroundSoundDefault, createBackgroundSound } from '../public/js/background-sound.js?v=d40d26b7';
 import { BACKGROUND_SOUND_KEY, loadBackgroundSound, saveBackgroundSound } from '../public/js/audio-pref.js?v=683f27c8';

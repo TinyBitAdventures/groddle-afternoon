@@ -42,6 +42,16 @@
  * turned round: on (the default on a computer) nothing hushes and sound plays on as Glitch's did;
  * off (the default on a phone or tablet) hushes as above. Either way the page coming back takes the
  * rebuild path when its audio stopped while away.
+ *
+ * #658/#660 (root R25): on an iPad with that setting off, coming back left every sound silent until
+ * a reload (taps and new streets too). Coming back waited on WebKit's suspend() or resume() promise
+ * while holding busy, and iOS can leave that promise pending (the context "interrupted"), so every
+ * later event returned at the busy check. Now no wait under busy lasts longer than SETTLE_MS, and
+ * every gesture (pointerdown, touchend, keydown) calls ctx.resume() right inside the gesture,
+ * before anything else, whenever the context is not running (iOS only lets a gesture start audio),
+ * then runs the resume path again once that resume settles, so the street music is made again.
+ * A context that starts running on its own while the page is back does the same. With the setting
+ * on the game never suspends the context itself, and nothing here changes that.
  */
 
 /** Context states a resume() can bring back. */
@@ -55,6 +65,19 @@ export const RESUME_EVENTS = Object.freeze({
 
 /** Events that hush the page besides visibilitychange to hidden (a page put away or into the back-forward cache). */
 export const HUSH_EVENTS = Object.freeze({ win: Object.freeze(['pagehide']) });
+
+/** Gestures: the events in which a browser lets a page start audio (#658). */
+export const GESTURE_EVENTS = Object.freeze(['pointerdown', 'keydown', 'touchend']);
+
+/** Longest the resume path waits on a context's suspend() or resume() (#658: iOS can leave one pending). */
+export const SETTLE_MS = 300;
+
+/** p settled (either way) or ms passed, whichever is first; never rejects. */
+export function settleWithin(p, ms = SETTLE_MS) {
+  let timer = null;
+  const late = new Promise((r) => { timer = setTimeout(r, ms); });
+  return Promise.race([Promise.resolve(p).catch(() => {}), late]).finally(() => clearTimeout(timer));
+}
 
 /** Whether an AudioContext in this state should be resumed. */
 export const contextNeedsResume = (ctxState) => RESUMABLE_CONTEXT.includes(String(ctxState || ''));
@@ -92,6 +115,8 @@ export function audioHushPlan({ ctxState = '', voice = null } = {}) {
  */
 export function createAudioResumer({ getCtx, getVoice, isMuted, rebuildVoice = null, hushWhenHidden = false, doc = globalThis.document, win = globalThis.window, onResume = null } = {}) {
   let busy = false;
+  // #658: a gesture's own ctx.resume() is under way (its statechange is the gesture's to follow up).
+  let kicking = false;
   let hushed = false;
   // #693: the setting is read when the page hides, so a change applies from the next time.
   const hushOn = () => Boolean(typeof hushWhenHidden === 'function' ? hushWhenHidden() : hushWhenHidden);
@@ -101,7 +126,12 @@ export function createAudioResumer({ getCtx, getVoice, isMuted, rebuildVoice = n
   let away = false;
   let awayCtx = null;
   let ctxStopped = false;
-  const onCtxState = () => { if (awayCtx && awayCtx.state !== 'running') ctxStopped = true; };
+  const onCtxState = () => {
+    if (!awayCtx) return;
+    if (awayCtx.state !== 'running') ctxStopped = true;
+    // #658: back, and the context ran again on its own (a resume() that answered late): make the music again.
+    else if (!kicking && doc?.visibilityState !== 'hidden' && !hushed) resume('statechange');
+  };
   const watchCtx = (ctx) => {
     if (awayCtx === ctx) return;
     awayCtx?.removeEventListener?.('statechange', onCtxState);
@@ -144,11 +174,21 @@ export function createAudioResumer({ getCtx, getVoice, isMuted, rebuildVoice = n
     } else {
       hushed = false;
     }
+    // #658: a gesture resumes the context inside the gesture (iOS starts audio from nothing else),
+    // whatever the path below is waiting on. A path already waiting looks at the context again when
+    // its wait ends; otherwise the path below follows on from this resume.
+    let kick = null;
+    if (!hidden && GESTURE_EVENTS.includes(reason) && !isMuted?.() && ctx && ctx.state !== 'running' && ctx.state !== 'closed') {
+      kicking = true;
+      try { kick = Promise.resolve(ctx.resume()).catch(() => {}); } catch { /* the next gesture tries again */ }
+      kicking = false;
+      suspending = null;
+    }
     if (busy) return null;
     if (!hidden && suspending) {
-      // Back before the hush's suspend() settled: resuming now would be undone by it.
+      // Back before the hush's suspend() settled: resuming now would be undone by it (never for long, #658).
       busy = true;
-      try { await suspending; } finally { busy = false; suspending = null; }
+      try { await settleWithin(suspending); } finally { busy = false; suspending = null; }
       return resume(reason);
     }
     const back = Boolean(rebuildVoice) && away;
@@ -161,7 +201,8 @@ export function createAudioResumer({ getCtx, getVoice, isMuted, rebuildVoice = n
     busy = true;
     try {
       if (plan.ctx) {
-        try { await ctx.resume(); } catch { /* still interrupted: the next event tries again */ }
+        // #658: not for ever: iOS can leave the promise pending, and busy would hold every later event.
+        try { await settleWithin(kick || ctx.resume()); } catch { /* still interrupted: the next event tries again */ }
       }
       if (plan.rebuild) {
         // Once the context runs again: a new element would otherwise start its clock on a stopped graph.
