@@ -41,8 +41,8 @@
   "counts": {
     "fixing": 3,
     "known": 15,
-    "unreleased": 0,
-    "fixed": 605,
+    "unreleased": 3,
+    "fixed": 602,
     "lost": 5,
     "purpose": 18,
     "idea": 10
@@ -4296,6 +4296,11 @@
       "name": "Music",
       "items": [
         {
+          "id": "F133",
+          "text": "Notes played on Piano Party's keys and stars were heard only by the player who played them.",
+          "state": "unreleased"
+        },
+        {
           "id": "G1295",
           "text": "Playing a musicblock for someone showed no bubble or overlays.",
           "state": "fixed",
@@ -4306,12 +4311,6 @@
           "text": "A musicblock's bubble could be held back after chatting.",
           "state": "fixed",
           "version": "v0.71.0"
-        },
-        {
-          "id": "F133",
-          "text": "Notes played on Piano Party's keys and stars were heard only by the player who played them.",
-          "state": "fixed",
-          "version": "v0.74.0"
         }
       ]
     },
@@ -4349,8 +4348,7 @@
         {
           "id": "F135",
           "text": "Each player had their own Dust Traps instead of sharing them on the street, and the visit clock stopped while the game's tab was in the background.",
-          "state": "fixed",
-          "version": "v0.74.0"
+          "state": "unreleased"
         }
       ]
     },
@@ -4360,8 +4358,7 @@
         {
           "id": "F141",
           "text": "Playing on from a game copy older than a day could lose things you were given or got back since.",
-          "state": "fixed",
-          "version": "v0.74.0"
+          "state": "unreleased"
         }
       ]
     },
