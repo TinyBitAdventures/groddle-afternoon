@@ -106,6 +106,23 @@ describe('the home page street', () => {
     assert.ok(!/sh-pill"><span class="sheet sheet-quoin/.test(hero));
   });
 
+  it('draws every sprite from its 3x copy on sharp screens (image-set or srcset beside the 1x file)', () => {
+    const rcss = readFileSync(join(pub, 'restoration', 'restoration.css'), 'utf8');
+    for (const [file, text, dir] of [['landing.css', css, 'landing'], ['restoration.css', rcss, 'restoration']]) {
+      for (const [, url] of text.matchAll(/url\(["']?(\.\.\/assets\/sprites\/[^"')?]+\.webp)/g)) {
+        if (url.includes('@3x')) continue;
+        const hi = url.replace(/\.webp$/, '@3x.webp');
+        if (!existsSync(resolve(pub, dir, hi))) continue;
+        assert.ok(new RegExp(`image-set\\(url\\(["']${url.replace(/[.?]/g, '\\$&')}[^)]*\\) 1x, url\\(["']${hi.replace(/[.?]/g, '\\$&')}`).test(text), `${file}: ${url} has its 3x copy`);
+      }
+    }
+    for (const [, tag] of home.matchAll(/<img ([^>]*src="assets\/sprites\/[^"]+"[^>]*)>/g)) {
+      const src = tag.match(/src="([^"?]+)/)[1];
+      if (src.includes('@3x') || !existsSync(join(pub, src.replace(/\.webp$/, '@3x.webp')))) continue;
+      assert.match(tag, /srcset="[^"]+@3x\.webp[^"]* 3x"/, src);
+    }
+  });
+
   it('scales the 1200 px street to the window, never below 0.72', () => {
     assert.equal(stageScale(1440), 1.2);
     assert.equal(stageScale(400), 0.72);

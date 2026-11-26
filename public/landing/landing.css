@@ -159,19 +159,19 @@ body.landing { background-color: var(--bg); overflow-x: hidden; }
 .sh-walk-piggy { left: 840px; bottom: 95px; animation: sh-piggy-path 11s ease-in-out infinite, sh-turn-mid 11s steps(1) infinite; }
 @keyframes sh-piggy-path { 0%, 100% { translate: 0; } 45%, 55% { translate: 100px; } }
 @keyframes sh-turn-mid { 0% { scale: 1 1; } 50% { scale: -1 1; } }
-.sh-piggy { display: block; width: 88px; height: 62px; background: url("../assets/sprites/npc_piggy__x1_walk_png_1354829432.webp?v=4774a7f0") 0 0 no-repeat; animation: sheet-piggy 0.75s steps(8) infinite; }
+.sh-piggy { display: block; width: 88px; height: 62px; background: url("../assets/sprites/npc_piggy__x1_walk_png_1354829432.webp?v=4774a7f0") 0 0 no-repeat; background-image: image-set(url("../assets/sprites/npc_piggy__x1_walk_png_1354829432.webp?v=4774a7f0") 1x, url("../assets/sprites/npc_piggy__x1_walk_png_1354829432@3x.webp?v=4774a7f0") 3x); animation: sheet-piggy 0.75s steps(8) infinite; }
 .sh-walk-chicken { left: 1000px; bottom: 87px; animation: sh-chicken-path 9s ease-in-out infinite, sh-turn-first 9s steps(1) infinite; }
 @keyframes sh-chicken-path { 0%, 100% { translate: 0; } 50% { translate: -50px; } }
 @keyframes sh-turn-first { 0% { scale: -1 1; } 50% { scale: 1 1; } }
 .sh-chicken {
   display: block; width: 56px; height: 110px; transform: scale(0.7); transform-origin: 50% 100%;
-  background: url("../assets/sprites/npc_chicken__x1_walk_png_1354830385.webp?v=4774a7f0") -75px 0 no-repeat; animation: sh-chicken-sheet 0.6s steps(6) infinite;
+  background: url("../assets/sprites/npc_chicken__x1_walk_png_1354830385.webp?v=4774a7f0") -75px 0 no-repeat; background-image: image-set(url("../assets/sprites/npc_chicken__x1_walk_png_1354830385.webp?v=4774a7f0") 1x, url("../assets/sprites/npc_chicken__x1_walk_png_1354830385@3x.webp?v=4774a7f0") 3x); animation: sh-chicken-sheet 0.6s steps(6) infinite;
 }
 @keyframes sh-chicken-sheet { from { background-position-x: -75px; } to { background-position-x: -963px; } }
 .sh-walk-chicken.sh-shadow::before { bottom: 6px; width: 30px; }
 .sh-fly { animation: sh-flutter 7s ease-in-out infinite, sh-turn-mid 7s steps(1) infinite; }
 @keyframes sh-flutter { 25% { translate: 40px -24px; } 50% { translate: 80px 6px; } 75% { translate: 30px 20px; } }
-.sh-bfly { display: block; width: 70px; height: 65px; background: url("../assets/sprites/npc_butterfly__x1_fly-side_png_1354829525.webp?v=4774a7f0") 0 0 no-repeat; animation: sheet-butterfly 0.7s steps(14) infinite; }
+.sh-bfly { display: block; width: 70px; height: 65px; background: url("../assets/sprites/npc_butterfly__x1_fly-side_png_1354829525.webp?v=4774a7f0") 0 0 no-repeat; background-image: image-set(url("../assets/sprites/npc_butterfly__x1_fly-side_png_1354829525.webp?v=4774a7f0") 1x, url("../assets/sprites/npc_butterfly__x1_fly-side_png_1354829525@3x.webp?v=4774a7f0") 3x); animation: sheet-butterfly 0.7s steps(14) infinite; }
 /* Quoins float, as they do in Ur. Rows of the quoin sheet: iMG 0, mood 1, energy 2, currants 3, Qurazy 7. */
 .sh-quoin { width: 40px; height: 45px; animation: sh-bob 3.2s ease-in-out infinite, sh-back 0.4s ease-out; }
 .sh-quoin .sheet-quoin { display: block; }
@@ -283,8 +283,8 @@ body.landing { background-color: var(--bg); overflow-x: hidden; }
 .todo-badge .sheet-glitch { scale: 0.38; }
 .todo-badge .sheet-piggy { scale: 0.56; }
 .todo-badge img { width: auto; height: 40px; aspect-ratio: auto; object-fit: contain; }
-.todo-bfly { display: block; width: 70px; height: 65px; scale: 0.8; background: url("../assets/sprites/npc_butterfly__x1_fly-side_png_1354829525.webp?v=4774a7f0") 0 0 no-repeat; animation: sheet-butterfly 0.7s steps(14) infinite; }
-.todo-rook { display: block; width: 108px; height: 127px; scale: 0.44; background: url("../assets/sprites/rooks/rook-head-idle1.webp?v=4774a7f0") 0 0 no-repeat; animation: todo-rook 1s steps(9) infinite; }
+.todo-bfly { display: block; width: 70px; height: 65px; scale: 0.8; background: url("../assets/sprites/npc_butterfly__x1_fly-side_png_1354829525.webp?v=4774a7f0") 0 0 no-repeat; background-image: image-set(url("../assets/sprites/npc_butterfly__x1_fly-side_png_1354829525.webp?v=4774a7f0") 1x, url("../assets/sprites/npc_butterfly__x1_fly-side_png_1354829525@3x.webp?v=4774a7f0") 3x); animation: sheet-butterfly 0.7s steps(14) infinite; }
+.todo-rook { display: block; width: 108px; height: 127px; scale: 0.44; background: url("../assets/sprites/rooks/rook-head-idle1.webp?v=4774a7f0") 0 0 no-repeat; background-image: image-set(url("../assets/sprites/rooks/rook-head-idle1.webp?v=4774a7f0") 1x, url("../assets/sprites/rooks/rook-head-idle1@3x.webp?v=4774a7f0") 3x); animation: todo-rook 1s steps(9) infinite; }
 @keyframes todo-rook { to { background-position-x: -972px; } }
 .todo:not(:hover):not(:focus-within) .todo-badge * { animation-play-state: paused; }
 @media (max-width: 1100px) { .todo-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
