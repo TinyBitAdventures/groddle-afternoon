@@ -1103,6 +1103,44 @@ export function createResourceNode(classTsid, opts = {}) {
   return node;
 }
 
+/** dust_trap.js doPlayerResponse (132-145): reset_time, 2 x the time it stood ready, clamped (ms). */
+function dustTrapResetMs(def, node, now) {
+  const readyFor = node.readySince ? Math.max(0, (now - node.readySince) / 1000) : 0;
+  let reset = node.readySince ? 2 * readyFor : def.reset.minMs / 1000;
+  if (reset < def.reset.minMs / 1000 || reset / 2 > def.reset.fullResetMs / 1000) reset = def.reset.minMs / 1000;
+  else if (reset > def.reset.maxMs / 1000) reset = def.reset.maxMs / 1000;
+  return Math.round(reset * 1000);
+}
+
+/** items/dust_trap.js onPlayerEnter (207-212): is_chance(0.2) with no one else on the street. */
+export const DUST_TRAP_EMPTY_CHANCE = 0.2;
+
+/**
+ * A player arriving alone on a street (Austin's ruling 2026-11-26: as Glitch). Each ready Dust
+ * Trap's onPlayerEnter (items/dust_trap.js 207-212) sprang it empty 20% of the time when the street
+ * had no other active player: doPlayerResponse(null) (119-164) set the same reset timer as a
+ * player's spring, and with no player went straight to stayDown (160-161: no smackDown, no drop, no
+ * sound, no Juju). Solo the player is always alone (the realtime server rolls it online,
+ * objects_dust_trap.go). `items` are { key, classTsid, node }; returns the keys sprung.
+ */
+export function springDustTrapsOnArrival(items, { now = Date.now(), rng = Math.random } = {}) {
+  const def = RESOURCE_NODE_CATALOG.dust_trap;
+  const sprung = [];
+  for (const item of items || []) {
+    const node = item?.node;
+    if (item?.classTsid !== 'dust_trap' || !node || node.depleted || node.units < 1) continue;
+    if (!(rng() < DUST_TRAP_EMPTY_CHANCE)) continue;
+    const resetMs = dustTrapResetMs(def, node, now);
+    node.units = 0;
+    node.depleted = true;
+    // stayDown at once: the frame rule plays smackDown for 2 s after triggeredAt.
+    node.triggeredAt = now - 2000;
+    node.respawnAt = now + resetMs + 1250;
+    sprung.push(item.key);
+  }
+  return sprung;
+}
+
 /** Harvestable right now (ignores tools, skills, energy and daily limits). */
 export function isResourceNodeHarvestable(node) {
   const def = getResourceNodeDef(node?.classTsid);
@@ -1637,11 +1675,7 @@ export function harvestResourceNode(node, inv, pc, ctx = {}) {
         outputs.push(...rollDropTable('dust_trap', rng));
         if (rng() < DUST_TRAP_RARE_KEY_CHANCE) outputs.push(...rollDropTable('dust_trap_rare_keys', rng));
       }
-      const readyFor = node.readySince ? Math.max(0, (now - node.readySince) / 1000) : 0;
-      let reset = node.readySince ? 2 * readyFor : def.reset.minMs / 1000;
-      if (reset < def.reset.minMs / 1000 || reset / 2 > def.reset.fullResetMs / 1000) reset = def.reset.minMs / 1000;
-      else if (reset > def.reset.maxMs / 1000) reset = def.reset.maxMs / 1000;
-      plan = { resetMs: Math.round(reset * 1000) };
+      plan = { resetMs: dustTrapResetMs(def, node, now) };
       achievementCounters.push({ counter: 'dust_trap:trigger', amount: 1 });
       break;
     }

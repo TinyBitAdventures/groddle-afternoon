@@ -103,7 +103,8 @@ import {
   swimmingSalmonCount,
   takeDueSnails,
   tickResourceNode,
-} from '../resource-nodes.js?v=90d75c60';
+  springDustTrapsOnArrival,
+} from '../resource-nodes.js?v=7059a7bd';
 import { frameTexture as sheetFrameTexture, loadTexture, sourceFromUrl, textureFromUrl } from '../textures.js?v=b8e38103';
 import { acceptOffer, markOffered, npcQuestOffers, putOffOffer, questStatus } from '../quest-offers.js?v=7e00498b';
 import { OVERLAY_USES, playOverlay } from '../overlays.js?v=91dcee74';
@@ -2046,6 +2047,8 @@ export const resourceNodesFeature = {
     const slot = engine.streetSlot(RESOURCE_FEATURE_ID);
     const planned = resourceSpawnPlan(engine.population, (key) => engine.placement(key), street);
     const items = prepareStreetResourceNodes(slot, planned, { tsid: engine.streetTsid, now: Date.now() });
+    // items/dust_trap.js onPlayerEnter: alone on the street, a trap is empty 20% of the time (online the server rolls it).
+    if (engine.mode !== 'multiplayer') springDustTrapsOnArrival(items, { now: Date.now() });
     const all = setupDemo(engine, items).map((item) => (
       item.demo ? { ...item, node: createResourceNode(item.classTsid, { seed: item.key, now: Date.now() }) } : item
     ));

@@ -87,9 +87,9 @@ import { frameTexture, onLoaded, sourceFromUrl, textureFromUrl } from '../textur
 import { createBackYardState, homeStreetLayout, normalizeCultivationState } from '../home-cultivation.js?v=b2868d29';
 import { insideQuery, readVisitScene } from '../neighbours-mp.js?v=f43b50c8';
 import { saveStore } from '../save-store.js?v=4e720735';
-import { BACK_YARD_GROUND_Y, STREET_GROUND_Y, homesFeature, wearHomeCultivation } from './homes-feature.js?v=932f7b68';
+import { BACK_YARD_GROUND_Y, STREET_GROUND_Y, homesFeature, wearHomeCultivation } from './homes-feature.js?v=cb2b98b9';
 import { holdYardAnimal } from './animal-husbandry-feature.js?v=b43362db';
-import { patchesFeature, treeFrameUrl } from './patches-feature.js?v=1ab37fb6';
+import { patchesFeature, treeFrameUrl } from './patches-feature.js?v=c9c97392';
 import {
   BACK_YARD_PREFIX,
   BACK_YARD_STREET,
@@ -112,7 +112,7 @@ import {
   visitorRewardDelta,
   visitorRewardSnapshot,
   visitorTreeState,
-} from '../yard-verbs-mp.js?v=d3078da4';
+} from '../yard-verbs-mp.js?v=d31dcffb';
 import { yardFixtureRows, yardFixtureVerbs, yardFixturesKey } from '../yard-fixtures-mp.js?v=dd022fe8';
 import { itemZ } from '../item-bands.js?v=ec366be3';
 import { followYardPath, holdYardWalk, stickForClass } from '../yard-wander.js?v=cf235545';
@@ -120,10 +120,10 @@ import { showsChickenIdle, yardChickenPose } from '../chicken-idle-art.js?v=e320
 import { chickenWaitPose } from '../chicken-idles.js?v=eef0279b';
 import { countItem, removeItem } from '../inventory.js?v=6414dbdc';
 import { ROCK_CATALOG, rockStatusLabel, tickMineRock } from '../mining.js?v=5e49efb3';
-import { getResourceNodeDef, regrowDelayMs } from '../resource-nodes.js?v=90d75c60';
+import { getResourceNodeDef, regrowDelayMs } from '../resource-nodes.js?v=7059a7bd';
 import { getGameDayKey } from '../game-day.js?v=a532775d';
-import { rockReady } from '../street-objects.js?v=f7a66837';
-import { resourceNodesFeature } from './resource-nodes-feature.js?v=abc828a8';
+import { rockReady } from '../street-objects.js?v=9f9929ed';
+import { resourceNodesFeature } from './resource-nodes-feature.js?v=f555da55';
 import {
   ROCK_RESPAWN_MS,
   STOCK_NODE_VERBS,
@@ -132,7 +132,7 @@ import {
   normalizeStockView,
   visitorNode,
   visitorRock,
-} from '../yard-stock-mp.js?v=bb32f8f6';
+} from '../yard-stock-mp.js?v=c5aabf69';
 import { standOnFeet } from '../sprite-feet.js?v=6358a697';
 import { offlineLine } from '../online-request.js?v=09ac8a9c';
 
