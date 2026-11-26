@@ -141,7 +141,7 @@ import {
 } from '../quest-offers.js?v=7e00498b';
 import { parseQuestConversation } from '../quests.js?v=f68437db';
 import { getQuestCatalog } from '../content-catalogs.js?v=c9b84764';
-import { addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=6414dbdc';
+import { addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=3be7988a';
 import { runStreetTransition } from '../screen-fx.js?v=7cd62cca';
 import { tripSound } from '../street-trip.js?v=04c3258c';
 import { HOME_INTERIOR_TSID, HOME_STREET_TSID } from '../homes.js?v=dca6b2cd';
@@ -215,7 +215,7 @@ const ROOM_MODULES = {
   top_of_tree: () => import('../quest-rooms/top-of-tree.js?v=a9458e4e'),
   color_unblocking: () => import('../quest-rooms/color-unblocking.js?v=d7ef1296'),
   vision_quest: () => import('../quest-rooms/vision-quest.js?v=391c84ac'),
-  kids_room: () => import('../quest-rooms/kids-room.js?v=9786bfa2'),
+  kids_room: () => import('../quest-rooms/kids-room.js?v=f548ec36'),
   rube_yard: () => import('../quest-rooms/rube-yard.js?v=bb619dbb'),
   le_miserable: () => import('../quest-rooms/le-miserable.js?v=1e808ee9'),
   juju_camp: () => import('../quest-rooms/juju-camp.js?v=c594bd6b'),
@@ -224,13 +224,13 @@ const ROOM_MODULES = {
   an_autumn_day: () => import('../quest-rooms/an-autumn-day.js?v=e78fb51e'),
   being_watched: () => import('../quest-rooms/being-watched.js?v=ed31857e'),
   back_alley: () => import('../quest-rooms/back-alley.js?v=bc38a1ea'),
-  clubhouse: () => import('../quest-rooms/clubhouse.js?v=ba7c86cd'),
+  clubhouse: () => import('../quest-rooms/clubhouse.js?v=2ebeb0d3'),
   light_perspective: () => import('../quest-rooms/light-perspective.js?v=1b1c1732'),
   tile_puzzle: () => import('../quest-rooms/tile-puzzle.js?v=4304ce8b'),
   operation_grow: () => import('../quest-rooms/operation-grow.js?v=f3ab7974'),
   gwendolyn: () => import('../quest-rooms/gwendolyn.js?v=c278d2e8'),
   mental_block: () => import('../quest-rooms/mental-block.js?v=28fff433'),
-  penalty: () => import('../quest-rooms/penalty.js?v=313ef9e3'),
+  penalty: () => import('../quest-rooms/penalty.js?v=71ec5743'),
   esquibeth: () => import('../quest-rooms/esquibeth.js?v=09145fa7'),
   ez_cookin: () => import('../quest-rooms/ez-cookin.js?v=3cf44954'),
   soil_appreciation: () => import('../quest-rooms/soil-appreciation.js?v=778a8d20'),

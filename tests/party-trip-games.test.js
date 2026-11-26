@@ -12,8 +12,8 @@ import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { racesFeature } from '../public/js/features/races-feature.js?v=d0c6a0f1';
-import { crownsFeature } from '../public/js/features/crowns-feature.js?v=8279217d';
+import { racesFeature } from '../public/js/features/races-feature.js?v=189ff57f';
+import { crownsFeature } from '../public/js/features/crowns-feature.js?v=1f0251c9';
 import { mayhemFeature } from '../public/js/features/mayhem-feature.js?v=6aea206e';
 import { hogHaulMpFeature } from '../public/js/features/hog-haul-mp-feature.js?v=d8134654';
 

@@ -57,18 +57,18 @@ import {
   GARDEN_NO_DRY_PLOTS_LINE,
   GARDEN_WATER_ALL_TIRED_LINE,
   waterAllPlan,
-} from '../public/js/garden.js?v=a7c6f521';
-import { getVerbsFor, runVerb } from '../public/content.js?v=10c358ca';
+} from '../public/js/garden.js?v=fefa7bcd';
+import { getVerbsFor, runVerb } from '../public/content.js?v=48634256';
 import { plotPieces } from '../public/js/garden-view.js?v=04fe8467';
-import { plotsFor } from '../public/js/master-garden.js?v=60fdb23c';
+import { plotsFor } from '../public/js/master-garden.js?v=e37b75ec';
 import {
   createInventory,
   countItem,
   listPackItemSlots,
   listPackToolSlots,
   isToolItem,
-} from '../public/js/inventory.js?v=6414dbdc';
-import { DEFAULT_VENDOR, vendorBuy } from '../public/js/vendor.js?v=0e64bf8d';
+} from '../public/js/inventory.js?v=3be7988a';
+import { DEFAULT_VENDOR, vendorBuy } from '../public/js/vendor.js?v=7a07f478';
 import { HAS_SITE, SITE_DIR } from '../tools/repos.mjs';
 import { HAS_PHP, PHP } from './php.js';
 

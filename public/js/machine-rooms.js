@@ -54,7 +54,7 @@
 
 import { FOREST_MACHINE_ROOM_HELD, FOREST_MACHINE_ROOM_TSID } from './forest-machine-room.js?v=5f7e4589';
 import { MACHINE_ROOMS } from './exploration.js?v=8f19e25d';
-import { FRESH_FUEL, FUEL_PER_CELL, MAX_FUEL } from './machines.js?v=5d749d26';
+import { FRESH_FUEL, FUEL_PER_CELL, MAX_FUEL } from './machines.js?v=93a736f2';
 import { MAKING_BUSY } from './make-tools.js?v=86877c3e';
 
 /** config_prod.js:1332 machine_rooms, as built (G prefix). */

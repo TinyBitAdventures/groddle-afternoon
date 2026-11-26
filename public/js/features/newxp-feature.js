@@ -137,7 +137,7 @@ import {
   TUTORIAL_NAME_MAX,
 } from '../newxp.js?v=0d81aa52';
 import { countWords } from '../words.js?v=274023af';
-import { ITEM_CATALOG, addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=6414dbdc';
+import { ITEM_CATALOG, addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=3be7988a';
 import { QUOIN_SHEET, QUOIN_TYPES, qrazyRewardForLevel } from '../quoins.js?v=5abad2c7';
 import { loadRoadsFor, reachableStreets } from '../street-graph.js?v=d767f3a2';
 import { soundForQuoin } from '../sound-moments.js?v=3e66996f';
@@ -152,8 +152,8 @@ import { frameTexture, onLoaded, sourceFromUrl, textureFromUrl, whenLoaded } fro
 import { upgradeSource } from '../sprite-hires.js?v=e96be5f1';
 import { grantMoodXp } from '../mood-xp.js?v=e311b45c';
 import { displayTopOf, itemstackOverlayPoint, playPoofIn, playSheetOverlay, poofInAlpha } from '../overlay-art.js?v=e50bacca';
-import { HOME_MACHINE } from '../home-ticket.js?v=caa88887';
-import { createAnimalState } from '../animals.js?v=be536ce6';
+import { HOME_MACHINE } from '../home-ticket.js?v=e2f2ee78';
+import { createAnimalState } from '../animals.js?v=49be8a12';
 import {
   AK_ANIMALS,
   AK_BUBBLE,

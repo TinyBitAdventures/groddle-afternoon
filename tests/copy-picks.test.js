@@ -13,7 +13,7 @@ import assert from 'node:assert/strict';
 import { readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 
-import { addItem, countItem, createInventory, removeItem } from '../public/js/inventory.js?v=6414dbdc';
+import { addItem, countItem, createInventory, removeItem } from '../public/js/inventory.js?v=3be7988a';
 import {
   TOOL_CONDITION_CATALOG,
   bindToolInventory,
@@ -25,7 +25,7 @@ import {
 } from '../public/js/tools.js?v=4156bba8';
 import { copyNote, copyPicks, copyWire, markLeaving, packPicks, pickKey, pickRanks, takeCopies } from '../public/js/copy-picks.js?v=b368fd49';
 import { scriptTag } from '../public/js/teleportation.js?v=cbbc673f';
-import { playerMailFeature } from '../public/js/features/player-mail-feature.js?v=d0ceeb81';
+import { playerMailFeature } from '../public/js/features/player-mail-feature.js?v=22d75ac3';
 import { MAIL_COMPANIONS, createMailboxState, sendMail } from '../public/js/mailbox.js?v=d50d0d05';
 
 const root = join(import.meta.dirname, '..');

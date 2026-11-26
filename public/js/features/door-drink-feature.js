@@ -18,7 +18,7 @@
  *     doorDrinkLast, doorDrinkPour, doorDrinkHere, doorDrinkAutoplay.
  */
 
-import { ITEM_CATALOG, ensureItem } from '../inventory.js?v=6414dbdc';
+import { ITEM_CATALOG, ensureItem } from '../inventory.js?v=3be7988a';
 import { frameTexture, sourceFromUrl, textureFromUrl } from '../textures.js?v=b8e38103';
 import {
   CLOSE_AFTER_MS,

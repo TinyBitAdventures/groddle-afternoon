@@ -10,8 +10,8 @@ import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { RECIPE_CATALOG, TOOL_CATALOG, canCraft, ensureMakingItems, listMakingTools, loadRecipeCatalogFromFile, makeCountLine, makeEmptyLine, makePanelIcon, recipeBlockedHtml, recipeBlockedLine, recipeKnownHere, recipeMissingLine } from '../public/js/making.js?v=6cfac327';
-import { createInventory } from '../public/js/inventory.js?v=6414dbdc';
+import { RECIPE_CATALOG, TOOL_CATALOG, canCraft, ensureMakingItems, listMakingTools, loadRecipeCatalogFromFile, makeCountLine, makeEmptyLine, makePanelIcon, recipeBlockedHtml, recipeBlockedLine, recipeKnownHere, recipeMissingLine } from '../public/js/making.js?v=96afba25';
+import { createInventory } from '../public/js/inventory.js?v=3be7988a';
 import { createToolConditionState, setToolRemaining } from '../public/js/tools.js?v=4156bba8';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');

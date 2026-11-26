@@ -16,9 +16,9 @@ import { execFileSync, spawnSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-import { mergeParcels, normalizeParcels } from '../public/js/neighbours-mp.js?v=f43b50c8';
+import { mergeParcels, normalizeParcels } from '../public/js/neighbours-mp.js?v=e59e6b47';
 import { nextHandover, normalizeButlerState, normalizeParcelBox } from '../public/js/butler.js?v=152429c8';
-import { giftsFeature } from '../public/js/features/gifts-feature.js?v=5720c827';
+import { giftsFeature } from '../public/js/features/gifts-feature.js?v=a21e38fd';
 import { HAS_SITE, SITE_DIR } from '../tools/repos.mjs';
 import { HAS_PHP, PHP } from './php.js';
 

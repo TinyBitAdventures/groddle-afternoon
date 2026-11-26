@@ -44,7 +44,7 @@
  * window.groddleAuctions in multiplayer.
  */
 
-import { ITEM_CATALOG, addItem, countItem, itemIcon, listPackSlots, removeItem } from '../inventory.js?v=6414dbdc';
+import { ITEM_CATALOG, addItem, countItem, itemIcon, listPackSlots, removeItem } from '../inventory.js?v=3be7988a';
 import { scriptFromTag, scriptLabel } from '../teleportation.js?v=cbbc673f';
 import { TOOL_CONDITION_CATALOG, copyTagKind, leavingCopyTag, leavingToolWear, receiveToolCopy } from '../tools.js?v=4156bba8';
 import { createMinnAccount } from '../minn-account.js?v=7e3d7279';

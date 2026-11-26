@@ -31,7 +31,7 @@
 
 import { runOutcome } from '../autoplay-log.js?v=55bb4823';
 import { applyRewards } from '../quests.js?v=f68437db';
-import { ITEM_CATALOG, isToolItem } from '../inventory.js?v=6414dbdc';
+import { ITEM_CATALOG, isToolItem } from '../inventory.js?v=3be7988a';
 import { frameTexture, isLoaded, onLoaded, sourceFromUrl } from '../textures.js?v=b8e38103';
 import { playPoofIn } from '../overlay-art.js?v=e50bacca';
 import { KIDS_ROOM_FLOOR, KIDS_ROOM_H, KIDS_ROOM_W, buildKidsRoomScene } from '../kids-room-scene.js?v=5c44234d';

@@ -24,7 +24,7 @@
  * window.groddleHouseFile { url, title, problems, counts }.
  */
 
-import { ITEM_CATALOG } from './inventory.js?v=6414dbdc';
+import { ITEM_CATALOG } from './inventory.js?v=3be7988a';
 import { ownGroundPlaces } from './ground-stacks.js?v=22792362';
 import { isSolo } from './game-mode.js?v=1ecf2899';
 import { SNAPSHOTTERY } from './snaps.js?v=b5be8bff';
@@ -40,7 +40,7 @@ import {
   parseHouseFileText,
   resolveHouseFileUrl,
   validateHouseFile,
-} from './house-file.js?v=793b3089';
+} from './house-file.js?v=7e63d391';
 
 const REPORT_LINES = 6;
 /** G1286: the report's line when the practice copy was given Snapshottery. */

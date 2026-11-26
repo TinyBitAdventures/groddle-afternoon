@@ -14,10 +14,10 @@ import { execFileSync, spawnSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-import { ITEM_CATALOG, isToolItem } from '../public/js/inventory.js?v=6414dbdc';
+import { ITEM_CATALOG, isToolItem } from '../public/js/inventory.js?v=3be7988a';
 import { BAG_DEFS, PACK_CAPACITY, STARTER_FLOOR, arrangeIntoBags, isBagClass, layoutPack, packIntoBags, starterKit } from '../public/js/pack-slots.js?v=38e4aea5';
 import { STACKMAX, TOOL_CLASSES } from '../public/js/pack-slots-data.js?v=800f664c';
-import { applyStarter, bagsFeature, starterMint, starterText } from '../public/js/features/bags-feature.js?v=17bcf98a';
+import { applyStarter, bagsFeature, starterMint, starterText } from '../public/js/features/bags-feature.js?v=426f342b';
 import { sitePackSlotsJson, OUT } from '../tools/build-site-pack-slots.mjs';
 import { HAS_SITE, SITE_DIR } from '../tools/repos.mjs';
 import { HAS_PHP, PHP } from './php.js';

@@ -26,7 +26,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { DROP_TEXT, dropRefusalText, nextUtcDay, untilText, waitingText } from '../public/js/drops-mp.js?v=189efccc';
+import { DROP_TEXT, dropRefusalText, nextUtcDay, untilText, waitingText } from '../public/js/drops-mp.js?v=351593a6';
 import { SITE_DIR, skipWithoutSite } from '../tools/repos.mjs';
 import { HAS_PHP, PHP } from './php.js';
 

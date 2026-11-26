@@ -26,10 +26,10 @@ import { existsSync, readFileSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { KEPT_OWN, shareReason } from '../public/js/drops-mp.js?v=189efccc';
+import { KEPT_OWN, shareReason } from '../public/js/drops-mp.js?v=351593a6';
 import { dropsMpFeature } from '../public/js/features/drops-mp-feature.js?fresh=r670';
 import { copyTags, createToolConditionState, keepsOwnStack } from '../public/js/tools.js?v=4156bba8';
-import { createDroppedItemState, dropInventoryStack } from '../public/js/world-items.js?v=a5deb102';
+import { createDroppedItemState, dropInventoryStack } from '../public/js/world-items.js?v=93313aad';
 import { SITE_DIR, skipWithoutSite } from '../tools/repos.mjs';
 import { PHP as PHP_BIN } from './php.js';
 

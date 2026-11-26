@@ -11,7 +11,7 @@ import { createHash } from 'node:crypto';
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { createInventory, countItem } from '../public/js/inventory.js?v=6414dbdc';
+import { createInventory, countItem } from '../public/js/inventory.js?v=3be7988a';
 import { createToolConditionState } from '../public/js/tools.js?v=4156bba8';
 import {
   MACHINE_ASSEMBLIES,
@@ -23,10 +23,10 @@ import {
   machineWorkSounds,
   startAssembly,
   startDisassembly,
-} from '../public/js/machines.js?v=5d749d26';
+} from '../public/js/machines.js?v=93a736f2';
 import { resolveSound } from '../public/js/sound-board.js?v=fb6a6c26';
 import { SOUND_ALIASES, SOUND_FILES } from '../public/js/sound-keys.js?v=8b36c250';
-import { supplyFeature } from '../public/js/features/supply-feature.js?v=c4f57ae7';
+import { supplyFeature } from '../public/js/features/supply-feature.js?v=a948ba88';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const GSJS = join(ROOT, '..', 'glitch-GameServerJS', 'items');

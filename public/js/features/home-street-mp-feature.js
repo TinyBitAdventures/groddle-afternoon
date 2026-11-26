@@ -52,8 +52,8 @@
  */
 
 import { announceCharacterChanged, characterHeaders, characterOf, isCharacterChanged } from '../character-guard.js?v=510034a7';
-import { ITEM_CATALOG, addItem, countItem, ensureItem, itemIcon, removeItem } from '../inventory.js?v=6414dbdc';
-import { RECIPE_CATALOG, isRecipeCatalogReady, setRecipeCatalog } from '../making.js?v=6cfac327';
+import { ITEM_CATALOG, addItem, countItem, ensureItem, itemIcon, removeItem } from '../inventory.js?v=3be7988a';
+import { RECIPE_CATALOG, isRecipeCatalogReady, setRecipeCatalog } from '../making.js?v=96afba25';
 import { furnitureDef, furnitureScale, furnitureSize, pieceArt } from '../home-decor.js?v=31f37d9b';
 import { isStorageClass, storageHasContents } from '../home-storage.js?v=b0225465';
 import { pieceLabel } from '../furniture-upgrades.js?v=f563b304';
@@ -64,12 +64,12 @@ import { NOTE_POLE_CONTAINERS, NOTE_POLE_PARTS, NOTE_POLE_SIGN_Y } from '../note
 import { textureFromUrl } from '../textures.js?v=b8e38103';
 import { addSignBoard, signArmWidth, signLabel } from '../street-render.js?v=dab4ec4b';
 import { openNotePicker, openNoteView } from '../note-view.js?v=c512b345';
-import { homeStreetName, insideQuery, possessive, readVisitScene } from '../neighbours-mp.js?v=f43b50c8';
-import { BACK_YARD_GROUND_Y, SIGN_PROMPT_LIFT, STREET_GROUND_Y, homesFeature, visitorHomeState } from './homes-feature.js?v=83b60999';
-import { BENCH_ART, towerApi } from './home-tower-feature.js?v=dbc79f63';
+import { homeStreetName, insideQuery, possessive, readVisitScene } from '../neighbours-mp.js?v=e59e6b47';
+import { BACK_YARD_GROUND_Y, SIGN_PROMPT_LIFT, STREET_GROUND_Y, homesFeature, visitorHomeState } from './homes-feature.js?v=b2c608c6';
+import { BENCH_ART, towerApi } from './home-tower-feature.js?v=93b1bf27';
 import { readTowerFloorWire, towerFloorProject, towerFloorWire } from '../home-tower.js?v=a7fc0cce';
-import { projectApi } from './street-jobs-feature.js?v=b6071981';
-import { giveCarriedNote, takeCarriedNote, writtenCarriedNotes } from './street-furniture-feature.js?v=229ceb67';
+import { projectApi } from './street-jobs-feature.js?v=f797ec18';
+import { giveCarriedNote, takeCarriedNote, writtenCarriedNotes } from './street-furniture-feature.js?v=f6a64061';
 import { saveStore, savedThrough } from '../save-store.js?v=4e720735';
 import {
   GOOD_NEIGHBOUR_AT,
@@ -107,7 +107,7 @@ import {
   saleVerbs,
   signpostArms,
   signpostCandidates,
-} from '../home-street-mp.js?v=01294fc8';
+} from '../home-street-mp.js?v=11a669f8';
 import { standOnFeet } from '../sprite-feet.js?v=6358a697';
 import { WORLD_FONT_FAMILY } from '../world-text.js?v=6b49f88c';
 

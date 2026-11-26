@@ -28,7 +28,7 @@
  * potLuckLast.
  */
 
-import { addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=6414dbdc';
+import { addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=3be7988a';
 import { getGameDayKey } from '../game-day.js?v=a532775d';
 import { askedUrl, frameTexture, isLoaded, onLoaded, sourceFromUrl } from '../textures.js?v=b8e38103';
 import {

@@ -10,11 +10,11 @@ import { execFileSync, spawnSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import { describe, it } from 'node:test';
 
-import { SEED_CATALOG, createGarden, harvestPlot, plantPlot, tickGarden, waterAllPlots, waterPlot } from '../public/js/garden.js?v=a7c6f521';
+import { SEED_CATALOG, createGarden, harvestPlot, plantPlot, tickGarden, waterAllPlots, waterPlot } from '../public/js/garden.js?v=fefa7bcd';
 import { GARDEN_LOCK_MS, LOCK_LINE, SHARED_GARDEN_STREETS, applyPlot, isSharedGardenStreet, localPlot, lockedFor, parsePlotId, plotId, rollPasses } from '../public/js/shared-gardens.js?v=464472e5';
-import { sharedGardensFeature } from '../public/js/features/shared-gardens-feature.js?v=fd202086';
-import { FEATURES } from '../public/js/features/index.js?v=6be18ba1';
-import { mgDetails, potionPlotCount, potionTooTired } from '../public/js/master-garden.js?v=60fdb23c';
+import { sharedGardensFeature } from '../public/js/features/shared-gardens-feature.js?v=cdbfd9aa';
+import { FEATURES } from '../public/js/features/index.js?v=d4905f5a';
+import { mgDetails, potionPlotCount, potionTooTired } from '../public/js/master-garden.js?v=e37b75ec';
 // A fresh pick's save waits for the server's receipt (GRANT_SAVE_DELAY_MS): the tests wait it out.
 const settle = () => new Promise((res) => setTimeout(res, 2700));
 import { HAS_SITE, SITE_DIR, serverPath, sitePath, skipWithoutServer } from '../tools/repos.mjs';
@@ -230,8 +230,8 @@ describe('the feature', () => {
   });
 
   it('Austin 2026-11-25: the shared bed\'s Water all row costs the plots it will send, not one plot\'s 2', async (t) => {
-    const { getVerbsFor } = await import('../public/content.js?v=10c358ca');
-    const { gardenActionProfile } = await import('../public/js/garden.js?v=a7c6f521');
+    const { getVerbsFor } = await import('../public/content.js?v=48634256');
+    const { gardenActionProfile } = await import('../public/js/garden.js?v=fefa7bcd');
     const cost = gardenActionProfile('default', 'water', []).energy;
     t.mock.method(Math, 'random', () => 0);
     for (const [energy, dry, sentN] of [[500, 0, 0], [500, 1, 1], [500, 5, 5], [3 * cost + 1, 5, 3]]) {
@@ -502,7 +502,7 @@ function rig({ street = COMMUNITY }) {
 
 describe('report 188: the Herb Gardens streets grow herbs in both beds', () => {
   it('streetGardenBed gives two herb beds there (herb2, herb) and crop then herb everywhere else', async () => {
-    const { HERB_GARDEN_STREETS, bedKind, streetGardenBed } = await import('../public/js/garden.js?v=a7c6f521');
+    const { HERB_GARDEN_STREETS, bedKind, streetGardenBed } = await import('../public/js/garden.js?v=fefa7bcd');
     assert.deepEqual([...HERB_GARDEN_STREETS].sort(), ['GA95U14319524O9', 'GA97L62229522GS', 'GA99U5PI39524GN']);
     for (const tsid of HERB_GARDEN_STREETS) {
       assert.deepEqual(streetGardenBed(tsid, 0), { bed: 'herb2', gardenType: 'herb', cols: 4 });

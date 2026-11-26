@@ -6,7 +6,8 @@
  *  - The piles: 16 spots right of the table (js/feast-day.js FEAST_SPOTS), each one food drawn as its own put-down art for its
  *    bites (js/world-art.js count states, no number badge), one feature sprite each, created once and
  *    removed one at a time (as Hell One's grapes, hell-feature spawnGrapes), never picked up.
- *  - Eat takes one bite: the pack Eat's refusals first (engine.eatGate: full energy, stuffed, dead),
+ *  - Eat (Drink for a drink, #723) takes one bite: the pack Eat's or Drink's refusals first
+ *    (engine.eatGate: full energy, stuffed, dead; a drink: dead, a mood drink at full mood),
  *    then the bite is the server's to give online (feast_day.go, the first eater wins it) or the
  *    save's solo; the food's energy, mood, fullness, variety iMG, buffs and badge counters come from
  *    the pack's own Eat on a one-item stock (engine.eatFromStock), so it never enters the pack.
@@ -21,7 +22,7 @@
  * Canvas data: feastDay (on|off), feastDayPiles, feastDayLeft, feastDayAte, feastDayLast.
  */
 
-import { ITEM_CATALOG } from '../inventory.js?v=6414dbdc';
+import { ITEM_CATALOG, getItemUseInfo } from '../inventory.js?v=3be7988a';
 import { parseSeasonDate } from '../seasons.js?v=5d8f545a';
 import { landingY, nearestSurfaceY } from '../walk-surface.js?v=3c919d5b';
 import { isLoaded, onLoaded, textureFromUrl } from '../textures.js?v=b8e38103';
@@ -41,7 +42,7 @@ import {
   refillDue,
   servingsLeft,
   settleFeastDay,
-} from '../feast-day.js?v=c5ec0820';
+} from '../feast-day.js?v=3f2d4603';
 
 export const FEAST_DAY_FEATURE_ID = 'feast-day';
 
@@ -65,6 +66,8 @@ let engineRef = null;
 const nowForCalendar = (engine) => qaDate ?? parseSeasonDate(engine?.param?.('seasondate')) ?? Date.now();
 const onStreet = (engine) => String(engine?.streetTsid || '') === TABLE_STREET;
 const label = (cls) => ITEM_CATALOG[cls]?.label || String(cls || '').replace(/_/g, ' ');
+/** #723: a drink's pile is drunk (its pack verb is Drink, include/drink.js verbs.drink), a food's eaten. */
+const isDrink = (cls) => getItemUseInfo(cls)?.kind === 'drink';
 
 function liveClient(engine) {
   return engine.mode === 'multiplayer' ? engine.query?.('realtimeClient') || null : null;
@@ -363,13 +366,14 @@ export const feastDayFeature = {
     if (target?.classId !== FEAST_PILE_CLASS) return null;
     const v = view(engine);
     const room = v.ate < v.cap;
+    const drink = isDrink(pileAt(engine, Number(target.feastSpot))?.c);
     return [{
-      id: 'eat',
-      label: FEAST_DAY_LINES.verb,
+      id: drink ? 'drink' : 'eat',
+      label: drink ? FEAST_DAY_LINES.drinkVerb : FEAST_DAY_LINES.verb,
       sort: 10,
       enabled: v.on && room,
       reason: v.on ? FEAST_DAY_LINES.full : FEAST_DAY_LINES.noSeason,
-      tooltip: `${FEAST_DAY_LINES.verbTip} (${FEAST_DAY_LINES.bitesLeft(Math.max(0, v.cap - v.ate))})`,
+      tooltip: `${drink ? FEAST_DAY_LINES.drinkTip : FEAST_DAY_LINES.verbTip} (${FEAST_DAY_LINES.bitesLeft(Math.max(0, v.cap - v.ate))})`,
       energy: 0,
       durationMs: 0,
     }];
@@ -377,7 +381,7 @@ export const feastDayFeature = {
 
   runVerb(target, verbId, engine) {
     if (target?.classId !== FEAST_PILE_CLASS) return false;
-    if (verbId === 'eat') bite(engine, Number(target.feastSpot));
+    if (verbId === 'eat' || verbId === 'drink') bite(engine, Number(target.feastSpot));
     return true;
   },
 

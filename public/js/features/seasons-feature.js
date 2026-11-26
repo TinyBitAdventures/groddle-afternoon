@@ -35,11 +35,11 @@
  *     pack), seasonTrophy, seasonPlaced.
  */
 
-import { addItem, countItem, ensureItem, removeItem, registerItemUse, ITEM_CATALOG } from '../inventory.js?v=6414dbdc';
+import { addItem, countItem, ensureItem, removeItem, registerItemUse, ITEM_CATALOG } from '../inventory.js?v=3be7988a';
 import { dametimeParts, getGameDayKey } from '../game-day.js?v=a532775d';
-import { SEASONAL_SEEDS, seedInSeason, seedSeasonLine, seedSeasons, setSeasonalSeedCheck as setGardenSeasonGate } from '../garden.js?v=a7c6f521';
-import { setSeasonalSeedCheck as setMasterGardenSeasonGate } from '../garden.js?v=a7c6f521';
-import { setSeasonalRecipeCheck } from '../making.js?v=6cfac327';
+import { SEASONAL_SEEDS, seedInSeason, seedSeasonLine, seedSeasons, setSeasonalSeedCheck as setGardenSeasonGate } from '../garden.js?v=fefa7bcd';
+import { setSeasonalSeedCheck as setMasterGardenSeasonGate } from '../garden.js?v=fefa7bcd';
+import { setSeasonalRecipeCheck } from '../making.js?v=96afba25';
 import { getToolCondition, copyForVerb, copyTag, migrateClassTag, setCopyTag, takeToolCopy } from '../tools.js?v=4156bba8';
 import { standOnFeet, anchorBottomCentre } from '../sprite-feet.js?v=6358a697';
 
@@ -78,12 +78,12 @@ function takePumpkin(engine, cls, copy) {
 }
 import { landingY, nearestSurfaceY } from '../walk-surface.js?v=3c919d5b';
 import { isStandable } from '../street-model.js?v=a9a05f9d';
-import { isBatterflyHabitat } from '../animal-husbandry.js?v=c2e4c509';
-import { emblemCostFor } from '../shrines.js?v=da102ddd';
+import { isBatterflyHabitat } from '../animal-husbandry.js?v=c66fc912';
+import { emblemCostFor } from '../shrines.js?v=f5eb7690';
 import { rollDropTable } from '../drop-tables.js?v=1ed0b596';
 import { openNoteView, noteViewOpen } from '../note-view.js?v=c512b345';
-import { payDrop } from './drops-feature.js?v=61ef6ace';
-import { fireflyJarCounts, setFireflyJar } from './resource-nodes-feature.js?v=f77f9f92';
+import { payDrop } from './drops-feature.js?v=67036c6e';
+import { fireflyJarCounts, setFireflyJar } from './resource-nodes-feature.js?v=9d032d86';
 import { SEASON_DATA } from '../seasons-data.js?v=b5174bc9';
 import { forceMetabolic, shiftMetabolic, topUpMetabolic } from '../metabolics.js?v=48f784bf';
 import {

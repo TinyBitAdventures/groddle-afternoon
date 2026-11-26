@@ -19,10 +19,10 @@ import { after, before, describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { execFileSync, spawnSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
-import { homeStreetOwner, isPublicStreet, isSharedStreet, normalizeGroundStack, shareReason, stackAt } from '../public/js/drops-mp.js?v=189efccc';
+import { homeStreetOwner, isPublicStreet, isSharedStreet, normalizeGroundStack, shareReason, stackAt } from '../public/js/drops-mp.js?v=351593a6';
 import { dropsMpFeature } from '../public/js/features/drops-mp-feature.js?fresh=homedrops';
-import { homeStreetMpFeature } from '../public/js/features/home-street-mp-feature.js?v=6d409758';
-import { sharedHomeStreet } from '../public/js/neighbours-mp.js?v=f43b50c8';
+import { homeStreetMpFeature } from '../public/js/features/home-street-mp-feature.js?v=a0547176';
+import { sharedHomeStreet } from '../public/js/neighbours-mp.js?v=e59e6b47';
 import { HAS_SERVER, HAS_SITE, SITE_DIR, serverPath } from '../tools/repos.mjs';
 import { HAS_PHP, PHP } from './php.js';
 

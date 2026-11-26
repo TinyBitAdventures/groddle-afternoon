@@ -20,8 +20,8 @@ import {
   plotClickAction,
   sowPlot,
   wetPlot,
-} from '../public/js/garden.js?v=a7c6f521';
-import { createInventory } from '../public/js/inventory.js?v=6414dbdc';
+} from '../public/js/garden.js?v=fefa7bcd';
+import { createInventory } from '../public/js/inventory.js?v=3be7988a';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const game = readFileSync(join(root, 'public/game.js'), 'utf8');

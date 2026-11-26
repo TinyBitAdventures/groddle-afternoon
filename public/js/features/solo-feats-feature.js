@@ -94,7 +94,7 @@
  * owed lists (qurazyOwed, questOwed) of older saves are read into it once.
  */
 
-import { addItem } from '../inventory.js?v=6414dbdc';
+import { addItem } from '../inventory.js?v=3be7988a';
 import { GAME_DAY_MS, getGameDayKey } from '../game-day.js?v=a532775d';
 import {
   CAP_OWNERS,
@@ -143,7 +143,7 @@ import {
 } from '../feat-owed.js?v=ef5e6463';
 import { gainMetabolic } from '../metabolics.js?v=48f784bf';
 import { grantMoodXp } from '../mood-xp.js?v=e311b45c';
-import { GIANTS } from '../shrines.js?v=da102ddd';
+import { GIANTS } from '../shrines.js?v=f5eb7690';
 import {
   MP_DONATIONS,
   MP_TEXT,

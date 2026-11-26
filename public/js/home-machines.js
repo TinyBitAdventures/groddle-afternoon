@@ -105,10 +105,10 @@ import {
   roomMachineVerbs,
   secondsToString,
   tankFuel,
-} from './machine-rooms.js?v=ca927ffd';
-import { ASSEMBLY_SKILL, FUEL_PER_CELL, MAX_FUEL, isMachine } from './machines.js?v=5d749d26';
+} from './machine-rooms.js?v=a99c4d01';
+import { ASSEMBLY_SKILL, FUEL_PER_CELL, MAX_FUEL, isMachine } from './machines.js?v=93a736f2';
 import { INTERIOR, interiorBounds } from './home-decor.js?v=31f37d9b';
-import { machineRoomLayout } from './machine-rooms.js?v=ca927ffd';
+import { machineRoomLayout } from './machine-rooms.js?v=a99c4d01';
 import { housePlace, isHousePlace } from './home-floors.js?v=444d18d7';
 
 export const HOME_MACHINES_ID = 'home-machines';

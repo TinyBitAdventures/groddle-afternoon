@@ -84,12 +84,12 @@ import {
   raceLoadingColors,
   renderRaceCourse,
 } from '../race-render.js?v=5b88f830';
-import { addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=6414dbdc';
+import { addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=3be7988a';
 import { runStreetTransition } from '../screen-fx.js?v=7cd62cca';
 import { CROWNS_STREET, CROWNS_TICKET, CROWNS_TITLE } from '../game-of-crowns.js?v=e32f35f5';
 import { HOG_HAUL_STREET_ID } from '../hog-haul.js?v=50d2e072';
 import { QUOIN_GRAB_SPLASH, RACE_SPLASH, splashFor } from '../game-splash.js?v=dbbf1de0';
-import { crownsMpChallenge, startCrowns } from './crowns-feature.js?v=8279217d';
+import { crownsMpChallenge, startCrowns } from './crowns-feature.js?v=1f0251c9';
 import { startHogHaulMp } from './hog-haul-mp-feature.js?v=d8134654';
 import { textureFromUrl } from '../textures.js?v=b8e38103';
 import { QUOIN_SHEET, QUOIN_TYPES } from '../quoins.js?v=5abad2c7';

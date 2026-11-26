@@ -50,17 +50,17 @@
  */
 
 import { pluralize } from '../words.js?v=274023af';
-import { ITEM_CATALOG, addItem, countItem, ensureItem, itemIcon, packStamp, removeItem } from '../inventory.js?v=6414dbdc';
+import { ITEM_CATALOG, addItem, countItem, ensureItem, itemIcon, packStamp, removeItem } from '../inventory.js?v=3be7988a';
 import { canUseTool, useToolCondition, workStepCost } from '../tools.js?v=4156bba8';
 import { ecologyForStreet } from '../street-ecology.js?v=f1c11a2d';
 import { worldToScreen } from '../street-model.js?v=a9a05f9d';
 import { signArmWidth } from '../street-render.js?v=dab4ec4b';
 import { WORLD_FONT_FAMILY } from '../world-text.js?v=6b49f88c';
 import { getSkillCatalog } from '../content-catalogs.js?v=c9b84764';
-import { listRecipesProducing } from '../making.js?v=6cfac327';
-import { GIANTS } from '../shrines.js?v=da102ddd';
+import { listRecipesProducing } from '../making.js?v=96afba25';
+import { GIANTS } from '../shrines.js?v=f5eb7690';
 import { giantDisplayName } from '../giant-names.js?v=0e295891';
-import { teleportationFeature } from './teleportation-feature.js?v=4565e0e4';
+import { teleportationFeature } from './teleportation-feature.js?v=6c413af1';
 import {
   SOLO_DIVISOR,
   WORK_UNIT_MS,

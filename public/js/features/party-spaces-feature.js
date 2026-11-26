@@ -52,7 +52,7 @@
  * Solo is untouched.
  */
 
-import { addItem, countItem, ensureItem, removeItem, ITEM_CATALOG, itemIcon } from '../inventory.js?v=6414dbdc';
+import { addItem, countItem, ensureItem, removeItem, ITEM_CATALOG, itemIcon } from '../inventory.js?v=3be7988a';
 import { teleportEnergyCost } from '../teleportation.js?v=cbbc673f';
 import {
   PARTY_GUESTS,
@@ -86,7 +86,7 @@ import {
   teleporterPhase,
 } from '../party-spaces.js?v=4e1ca2a5';
 import { frameTexture, sourceFromUrl, textureFromUrl } from '../textures.js?v=b8e38103';
-import { readVisitScene } from '../neighbours-mp.js?v=f43b50c8';
+import { readVisitScene } from '../neighbours-mp.js?v=e59e6b47';
 import { STREET_INDEX } from '../street-loader.js?v=10376267';
 import { isNeighbourSceneTsid } from '../neighbours.js?v=13f35acd';
 import { energyMax as tankEnergyMax, loseEnergy } from '../metabolics.js?v=48f784bf';

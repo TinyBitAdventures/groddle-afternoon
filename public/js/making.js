@@ -16,7 +16,7 @@ import {
   itemIcon,
   ensureItem,
   registerItemUse,
-} from './inventory.js?v=6414dbdc';
+} from './inventory.js?v=3be7988a';
 import { GRINDER_TOOLS, TOOL_CONDITION_CATALOG, brokenToolIcon, canUseTool, firstWorkingTool, pickToolCopies, setToolRemaining, toolCopies, useToolCondition } from './tools.js?v=4156bba8';
 import { getSkillPackageOverride, highestSkillLevel, skillPackageDetails } from './skill-packages.js?v=bfb87281';
 import {

@@ -63,14 +63,14 @@
  * window.groddleDrops.
  */
 
-import { ITEM_CATALOG, addItem, countItem, removeItem } from '../inventory.js?v=6414dbdc';
+import { ITEM_CATALOG, addItem, countItem, removeItem } from '../inventory.js?v=3be7988a';
 import { TOOL_CONDITION_CATALOG, leavingCopyTag, leavingToolWear, receiveToolCopy, takeToolCopy } from '../tools.js?v=4156bba8';
 import { createMinnAccount } from '../minn-account.js?v=7e3d7279';
 import { saveStore, savedThrough } from '../save-store.js?v=4e720735';
 import { ownGroundRows } from '../ground-stacks.js?v=22792362';
-import { pileMaxOf } from '../world-items.js?v=a5deb102';
+import { pileMaxOf } from '../world-items.js?v=93313aad';
 import { offlineLine, sharedOffline } from '../online-request.js?v=09ac8a9c';
-import { DROP_OP, DROP_QUEUE_MAX, DROP_TEXT, bucketTake, dropEffect, dropRefusalText, eatenStack, groundFrom, homePlaceOf, isFloorPlace, isPublicStreet, likeSharedStack, normalizeGroundStack, normalizeItem, normalizeMine, pickupAsk, pigAnimalKey, shareReason, stackAt, stackLeft } from '../drops-mp.js?v=189efccc';
+import { DROP_OP, DROP_QUEUE_MAX, DROP_TEXT, bucketTake, dropEffect, dropRefusalText, eatenStack, groundFrom, homePlaceOf, isFloorPlace, isPublicStreet, likeSharedStack, normalizeGroundStack, normalizeItem, normalizeMine, pickupAsk, pigAnimalKey, shareReason, stackAt, stackLeft } from '../drops-mp.js?v=351593a6';
 
 export const DROPS_MP_FEATURE_ID = 'drops-mp';
 const TABLE_URL = 'assets/content/trade-items.json';

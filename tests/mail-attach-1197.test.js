@@ -13,7 +13,7 @@ import { describe, it } from 'node:test';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-import { ITEM_CATALOG, ensureItem, listPackSlots } from '../public/js/inventory.js?v=6414dbdc';
+import { ITEM_CATALOG, ensureItem, listPackSlots } from '../public/js/inventory.js?v=3be7988a';
 import { MAIL_REFUSED, mailAttachSlots } from '../public/js/mailbox.js?v=d50d0d05';
 import { SCRIPT_CLASS, SCRIPT_IMBUED_CLASS, SCRIPT_ITEM } from '../public/js/teleportation.js?v=cbbc673f';
 import { mailTable } from '../tools/build-mail.mjs';

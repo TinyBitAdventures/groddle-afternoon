@@ -21,10 +21,10 @@ import {
   spendMetabolic,
   topUpMetabolic,
 } from '../public/js/metabolics.js?v=48f784bf';
-import { metabolicGate, normalizeHellState } from '../public/js/hell.js?v=d77f15ef';
+import { metabolicGate, normalizeHellState } from '../public/js/hell.js?v=b4dcc7d2';
 import { applyDropResult } from '../public/js/drop-tables.js?v=1ed0b596';
 import { performEmotionalBearAction, normalizeEmotionalBearState } from '../public/js/emotional-bear.js?v=1c88a46a';
-import { createInventory, useItem } from '../public/js/inventory.js?v=6414dbdc';
+import { createInventory, useItem } from '../public/js/inventory.js?v=3be7988a';
 import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=c9b84764';
 import { applySetFree } from '../public/js/animal-set-free.js?v=6fcd8355';
 import { butterUpChicken } from '../public/js/animal-flattery.js?v=3374cf3a';

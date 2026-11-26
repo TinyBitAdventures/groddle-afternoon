@@ -28,10 +28,10 @@
  * hellBarTickets, hellBarWine, hellBarLast.
  */
 
-import { addItem, countItem, removeItem } from '../inventory.js?v=6414dbdc';
+import { addItem, countItem, removeItem } from '../inventory.js?v=3be7988a';
 import { frameTexture, sourceFromUrl, textureFromUrl } from '../textures.js?v=b8e38103';
 import { pixiSpeed } from '../sprite-sheets.js?v=d787e3c3';
-import { ensureHellItems, HELL_BARTENDER, HELL_SPRITES } from '../hell.js?v=d77f15ef';
+import { ensureHellItems, HELL_BARTENDER, HELL_SPRITES } from '../hell.js?v=b4dcc7d2';
 import { questFlagsFeature } from './quest-flags-feature.js?v=17c6ef48';
 import {
   BARTENDER,
@@ -49,7 +49,7 @@ import {
   isHellBarTsid,
   pickBartenderLine,
   talkStateFor,
-} from '../hell-bar.js?v=60c97c46';
+} from '../hell-bar.js?v=be2dd4a1';
 import { standOnFeet, anchorBottomCentre } from '../sprite-feet.js?v=6358a697';
 
 export const HELL_BAR_FEATURE_ID = 'hell-bar';

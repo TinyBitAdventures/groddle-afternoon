@@ -22,7 +22,7 @@ import { join } from 'node:path';
 import { applyStreetIndex, loadStreetDataFromFs, setZoneStreetsShown } from '../public/js/street-loader.js?v=10376267';
 import { platformsScreen, streetWidth } from '../public/js/street-model.js?v=a9a05f9d';
 import { planStreetPlacements, populationForStreet, setStreetEcologyCatalog, streetReservedSpots } from '../public/js/street-ecology.js?v=f1c11a2d';
-import { crabPlacementGroups } from '../public/js/crabs.js?v=5a43743d';
+import { crabPlacementGroups } from '../public/js/crabs.js?v=6b3e014e';
 import { fireDragonPlacementGroups } from '../public/js/fire-dragon.js?v=b7f3d751';
 import { isZoneTsid } from '../public/js/zone-streets.js?v=b40010d5';
 import { creatureRequests, plannedStreet, setCreatureEcology, streetEcology } from '../tools/build-realtime-objects.mjs';

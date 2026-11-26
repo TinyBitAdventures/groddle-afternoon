@@ -27,7 +27,7 @@ import { requireSite, sitePath } from './repos.mjs';
 export const OUT = sitePath('data', 'garden-seeds.json');
 
 export async function gardenSeedsJson() {
-  const { SEED_CATALOG, GARDEN_WATER_MS, GARDEN_SPEEDUP, LEGACY_GARDEN, legacyGrowMs } = await import('../public/js/garden.js?v=a7c6f521');
+  const { SEED_CATALOG, GARDEN_WATER_MS, GARDEN_SPEEDUP, LEGACY_GARDEN, legacyGrowMs } = await import('../public/js/garden.js?v=fefa7bcd');
   const { SHARED_GARDEN_STREETS } = await import('../public/js/shared-gardens.js?v=464472e5');
   const seeds = Object.keys(SEED_CATALOG).sort().map((id) => {
     const s = SEED_CATALOG[id];

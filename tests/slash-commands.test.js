@@ -18,14 +18,14 @@ import {
   slashWords,
   unknownLine,
 } from '../public/js/slash-commands.js?v=bb2569aa';
-import { slashCommandsFeature, slashContext } from '../public/js/features/slash-commands-feature.js?v=3859afdc';
-import { smallItemsFeature } from '../public/js/features/small-items-feature.js?v=abaacf9a';
-import { towerApi } from '../public/js/features/home-tower-feature.js?v=dbc79f63';
+import { slashCommandsFeature, slashContext } from '../public/js/features/slash-commands-feature.js?v=b5a48e6c';
+import { smallItemsFeature } from '../public/js/features/small-items-feature.js?v=b3a86e56';
+import { towerApi } from '../public/js/features/home-tower-feature.js?v=93b1bf27';
 import { BUTLER_STRINGS } from '../public/js/butler.js?v=152429c8';
-import { butlerFeature } from '../public/js/features/butler-feature.js?v=bc1242b5';
-import { FEATURES } from '../public/js/features/index.js?v=6be18ba1';
+import { butlerFeature } from '../public/js/features/butler-feature.js?v=fe7b76e3';
+import { FEATURES } from '../public/js/features/index.js?v=d4905f5a';
 import { createFeatureHost } from '../public/js/feature-host.js?v=b87e2cbc';
-import { countItem } from '../public/js/inventory.js?v=6414dbdc';
+import { countItem } from '../public/js/inventory.js?v=3be7988a';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const gsjs = join(root, '..', 'glitch-GameServerJS');

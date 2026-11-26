@@ -20,8 +20,8 @@ import { fileURLToPath } from 'node:url';
 import { loadContentCatalogsFromDir, resetContentCatalogs } from '../public/js/content-catalogs.js?v=c9b84764';
 import { assignQuest, createQuestState } from '../public/js/quests.js?v=f68437db';
 import { createAchievementState } from '../public/js/achievements.js?v=535c8952';
-import { countItem, createInventory } from '../public/js/inventory.js?v=6414dbdc';
-import { createPlayerSave, restorePlayerSave } from '../public/js/player-save.js?v=f7062a6d';
+import { countItem, createInventory } from '../public/js/inventory.js?v=3be7988a';
+import { createPlayerSave, restorePlayerSave } from '../public/js/player-save.js?v=6968e8fc';
 import { STATION_X, stationScreen, surfaceStation } from '../public/js/subway.js?v=ea6921ff';
 import {
   LEGALIZE_BACK_ALLEY_TSID,
@@ -38,8 +38,8 @@ import {
   legalizeObjective,
   legalizeReloadLocation,
   legalizeWayBack,
-} from '../public/js/legalize-it.js?v=8178339d';
-import { closeQuestRoomConverse } from '../public/js/features/quest-instances-feature.js?v=e51259d0';
+} from '../public/js/legalize-it.js?v=1fd33e0e';
+import { closeQuestRoomConverse } from '../public/js/features/quest-instances-feature.js?v=f0fd2eca';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const game = fs.readFileSync(path.join(root, 'public/game.js'), 'utf8');

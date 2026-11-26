@@ -30,7 +30,7 @@
  * musicblockGift (given or none).
  */
 
-import { addItem, countItem, removeItem } from '../inventory.js?v=6414dbdc';
+import { addItem, countItem, removeItem } from '../inventory.js?v=3be7988a';
 import { STREET_INDEX } from '../street-loader.js?v=10376267';
 import {
   MUSICBLOCK_CATALOG,
@@ -40,7 +40,7 @@ import {
   chooseStartStreetMusicblock,
   endgameGiftDue,
   startStreetMusicblockDue,
-} from '../musicblocks.js?v=8e985753';
+} from '../musicblocks.js?v=900c3245';
 import { groundStacks } from '../ground-stacks.js?v=22792362';
 
 const SYNC_MS = 1_000;

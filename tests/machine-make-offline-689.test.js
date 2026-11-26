@@ -11,9 +11,9 @@ import { after as afterAll, before as beforeAll, describe, it } from 'node:test'
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-import { homeMachinesFeature } from '../public/js/features/home-machines-feature.js?v=69f849ea';
-import { RECIPE_CATALOG, setRecipeCatalog } from '../public/js/making.js?v=6cfac327';
-import { MAX_FUEL } from '../public/js/machines.js?v=5d749d26';
+import { homeMachinesFeature } from '../public/js/features/home-machines-feature.js?v=ee31068e';
+import { RECIPE_CATALOG, setRecipeCatalog } from '../public/js/making.js?v=96afba25';
+import { MAX_FUEL } from '../public/js/machines.js?v=93a736f2';
 import { fakePixi } from './fake-scene.js';
 
 const root = join(import.meta.dirname, '..');

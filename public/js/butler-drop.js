@@ -21,11 +21,11 @@
  * (none | over:ok | over:no), butlerDropLast (left:<class>:<count> | refused).
  */
 
-import { ITEM_CATALOG } from './inventory.js?v=6414dbdc';
+import { ITEM_CATALOG } from './inventory.js?v=3be7988a';
 import { registerDropTarget } from './drop-targets.js?v=59e6edb4';
 import { draggedStack } from './drag-stack.js?v=4321c8c6';
-import { showWorldDropTip } from './features/world-drop-feature.js?v=60599674';
-import { VISITOR_BUTLER_TEXT } from './neighbours-mp.js?v=f43b50c8';
+import { showWorldDropTip } from './features/world-drop-feature.js?v=8087164c';
+import { VISITOR_BUTLER_TEXT } from './neighbours-mp.js?v=e59e6b47';
 
 /** leave_package's drop_tip (bag_butler.js 1003). */
 export const BUTLER_DROP_TIP = 'Leave a package with the Butler';

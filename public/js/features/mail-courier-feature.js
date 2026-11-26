@@ -90,10 +90,10 @@
  *   mailParcels, mailCourierLast, mailCourierDelivered, mailCourierAutoplay.
  */
 
-import { ITEM_CATALOG, itemIcon } from '../inventory.js?v=6414dbdc';
+import { ITEM_CATALOG, itemIcon } from '../inventory.js?v=3be7988a';
 import { frameTexture, sourceFromUrl } from '../textures.js?v=b8e38103';
-import { questRoomConverse } from './quest-instances-feature.js?v=e51259d0';
-import { hellFeature } from './hell-feature.js?v=74604dfc';
+import { questRoomConverse } from './quest-instances-feature.js?v=f0fd2eca';
+import { hellFeature } from './hell-feature.js?v=b3f6bb33';
 import { DISPATCHER_ART, FROG_ART, MAIL_NPC_ART_DIR } from '../mail-npc-art.js?v=1ed97a5d';
 import { DISPATCHER_GAP, DISPATCHER_HALF, DISPATCHER_TEXT, SIGNPOST } from '../home-street-fixtures.js?v=d4e5b56a';
 import { MAIL_POST_SENDER } from '../mailbox.js?v=d50d0d05';

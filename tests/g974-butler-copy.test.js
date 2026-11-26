@@ -16,10 +16,10 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 import { giftOffer, giveGiftTo, nextHandover, normalizeButlerState, normalizeParcelBox, setGift, stackCopy } from '../public/js/butler.js?v=152429c8';
-import { applyButlerStock, mergeParcels, normalizeButlerStock, normalizeGiftAnswer, normalizeParcels } from '../public/js/neighbours-mp.js?v=f43b50c8';
+import { applyButlerStock, mergeParcels, normalizeButlerStock, normalizeGiftAnswer, normalizeParcels } from '../public/js/neighbours-mp.js?v=e59e6b47';
 import { leavingWire, receiveWire } from '../public/js/copy-picks.js?v=b368fd49';
 import { bindToolInventory, copyTags, createToolConditionState, setCopyTag, setToolRemaining, toolCopies } from '../public/js/tools.js?v=4156bba8';
-import { addItem, createInventory } from '../public/js/inventory.js?v=6414dbdc';
+import { addItem, createInventory } from '../public/js/inventory.js?v=3be7988a';
 import { createMinnAccount } from '../public/js/minn-account.js?v=7e3d7279';
 import { HAS_SITE, SITE_DIR } from '../tools/repos.mjs';
 import { HAS_PHP, PHP } from './php.js';

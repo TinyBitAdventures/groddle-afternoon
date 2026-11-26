@@ -48,7 +48,7 @@
  */
 
 import { slugsFromEffects } from '../speech-slugs.js?v=d5cc8b6f';
-import { addItem, countItem, removeItem } from '../inventory.js?v=6414dbdc';
+import { addItem, countItem, removeItem } from '../inventory.js?v=3be7988a';
 import { getToolCondition } from '../tools.js?v=4156bba8';
 import { worldToScreen } from '../street-model.js?v=a9a05f9d';
 import { OVERLAY_USES, playOverlay } from '../overlays.js?v=91dcee74';
@@ -86,9 +86,9 @@ import {
   rangerGreeting,
   splitConversation,
   stepFox,
-} from '../foxes.js?v=4497a984';
-import { FOX_FLURRY_COUNTER, foxLegFrom, foxOnLeg, igniteBaitXs, normalizeBaits, normalizeFoxes, preserveOverCapacity, serverId } from '../foxes-mp.js?v=0a1438dc';
-import { clockOffset } from '../street-creatures.js?v=ec4785db';
+} from '../foxes.js?v=c0ce235f';
+import { FOX_FLURRY_COUNTER, foxLegFrom, foxOnLeg, igniteBaitXs, normalizeBaits, normalizeFoxes, preserveOverCapacity, serverId } from '../foxes-mp.js?v=20b2e4f9';
+import { clockOffset } from '../street-creatures.js?v=3e018c03';
 import { itemZ } from '../item-bands.js?v=ec366be3';
 import { topUpMetabolic } from '../metabolics.js?v=48f784bf';
 import { offlineLine, sharedOffline } from '../online-request.js?v=09ac8a9c';

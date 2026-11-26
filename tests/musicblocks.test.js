@@ -31,11 +31,11 @@ import {
   START_STREET_MUSICBLOCKS,
   startStreetMusicblockDue,
   starterMusicblocks,
-} from '../public/js/musicblocks.js?v=8e985753';
+} from '../public/js/musicblocks.js?v=900c3245';
 import { SOUND_ALIASES, SOUND_FILES } from '../public/js/sound-keys.js?v=8b36c250';
 import { DROP_TABLES } from '../public/js/drop-tables-data.js?v=c51a6400';
-import { SOIL_DROP_TABLES } from '../public/js/patches.js?v=3498abf3';
-import { SPINNING_WHEEL_DROP_TABLE } from '../public/js/spinning-wheel.js?v=00148471';
+import { SOIL_DROP_TABLES } from '../public/js/patches.js?v=d5136729';
+import { SPINNING_WHEEL_DROP_TABLE } from '../public/js/spinning-wheel.js?v=6fe4257d';
 import { ISLAND_MUSICBLOCKS } from '../public/js/newxp.js?v=0d81aa52';
 import { AWARD_ITEM } from '../public/js/funpickle.js?v=95796317';
 import {
@@ -43,8 +43,8 @@ import {
   addItem,
   countItem,
   createInventory,
-} from '../public/js/inventory.js?v=6414dbdc';
-import { getVerbsFor } from '../public/content.js?v=10c358ca';
+} from '../public/js/inventory.js?v=3be7988a';
+import { getVerbsFor } from '../public/content.js?v=48634256';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const publicRoot = join(here, '../public');
@@ -254,7 +254,7 @@ function fakeEngine({ streetTsid, inv, stacks = [] } = {}) {
 }
 
 async function freshFeature() {
-  const mod = await import('../public/js/features/musicblocks-feature.js?v=4668a393');
+  const mod = await import('../public/js/features/musicblocks-feature.js?v=3af1adf4');
   mod.musicblocksFeature._reset();
   return mod;
 }
@@ -491,7 +491,7 @@ describe('Musicblock game integration', () => {
 
 describe('Musicblock collection badges from any source', () => {
   it('emits in_inventory the first time a block reaches the pack', async () => {
-    const { musicblocksFeature, newlyOwnedMusicblocks } = await import('../public/js/features/musicblocks-feature.js?v=4668a393');
+    const { musicblocksFeature, newlyOwnedMusicblocks } = await import('../public/js/features/musicblocks-feature.js?v=3af1adf4');
     assert.deepEqual(newlyOwnedMusicblocks(new Set(['musicblock_d_blue_01']), {
       musicblock_d_blue_01: 2, musicblock_d_blue_02: 1, apple: 3, musicblock_trumpets: 1,
     }), ['musicblock_d_blue_02']);

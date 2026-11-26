@@ -24,13 +24,13 @@ import {
   smallEnlightenmentSeconds,
   smeltItDealtItFreeSmelts,
 } from '../public/js/buff-triggers.js?v=9fd877c4';
-import { MIRRORED_BUFFS, buffTriggersFeature } from '../public/js/features/buff-triggers-feature.js?v=f2ecaf90';
-import { meditationFeature } from '../public/js/features/meditation-feature.js?v=2d804438';
-import { teleportationFeature } from '../public/js/features/teleportation-feature.js?v=4565e0e4';
-import { rookAttackFeature } from '../public/js/features/rook-attack-feature.js?v=1b9d25e2';
-import { rubeFeature } from '../public/js/features/rube-feature.js?v=cb9009c6';
-import { smugglingFeature } from '../public/js/features/smuggling-feature.js?v=d81337bf';
-import { normalizeHusbandryPack } from '../public/js/animal-husbandry.js?v=c2e4c509';
+import { MIRRORED_BUFFS, buffTriggersFeature } from '../public/js/features/buff-triggers-feature.js?v=1f7d036c';
+import { meditationFeature } from '../public/js/features/meditation-feature.js?v=fb4d0cac';
+import { teleportationFeature } from '../public/js/features/teleportation-feature.js?v=6c413af1';
+import { rookAttackFeature } from '../public/js/features/rook-attack-feature.js?v=66fb41be';
+import { rubeFeature } from '../public/js/features/rube-feature.js?v=80c7874a';
+import { smugglingFeature } from '../public/js/features/smuggling-feature.js?v=fc598c0c';
+import { normalizeHusbandryPack } from '../public/js/animal-husbandry.js?v=c66fc912';
 import {
   BUFF_ITEM_CATALOG,
   activateBuffItem,
@@ -43,9 +43,9 @@ import {
   tickBuffs,
 } from '../public/js/buffs.js?v=a4f7377b';
 import { getSkillPackageOverride, skillPackageDetails } from '../public/js/skill-packages.js?v=bfb87281';
-import { miningProfile } from '../public/js/mining.js?v=29eaf67f';
+import { miningProfile } from '../public/js/mining.js?v=7ecaa572';
 import { resolveAnimalKinshipPackage } from '../public/js/animal-kinship.js?v=eaa3a6f2';
-import { RECIPE_CATALOG, buildCraftBatchResult, craftRecipe, ensureMakingItems, makingSkillAdjustments } from '../public/js/making.js?v=6cfac327';
+import { RECIPE_CATALOG, buildCraftBatchResult, craftRecipe, ensureMakingItems, makingSkillAdjustments } from '../public/js/making.js?v=96afba25';
 import { sessionPackage } from '../public/js/meditation.js?v=96f23682';
 import { accelerateActiveStudy, createSkillState, startSkillStudy } from '../public/js/skills.js?v=3c6dbdff';
 import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=c9b84764';

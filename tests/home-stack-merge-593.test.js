@@ -14,7 +14,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { likeStackAt, mergeDroppedStacks, normalizeDroppedItemState, PLACED_MERGE_RADIUS } from '../public/js/world-items.js?v=a5deb102';
+import { likeStackAt, mergeDroppedStacks, normalizeDroppedItemState, PLACED_MERGE_RADIUS } from '../public/js/world-items.js?v=93313aad';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const read = (p) => readFileSync(join(root, p), 'utf8');

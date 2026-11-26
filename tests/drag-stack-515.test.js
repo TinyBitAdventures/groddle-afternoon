@@ -20,12 +20,12 @@ import { describe, it, beforeEach } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { addItem, createInventory, removeItem } from '../public/js/inventory.js?v=6414dbdc';
-import { bagsFeature } from '../public/js/features/bags-feature.js?v=17bcf98a';
+import { addItem, createInventory, removeItem } from '../public/js/inventory.js?v=3be7988a';
+import { bagsFeature } from '../public/js/features/bags-feature.js?v=426f342b';
 import { bindToolInventory, createToolConditionState, setToolRemaining, toolCopies } from '../public/js/tools.js?v=4156bba8';
 import { draggedCount, draggedHere, draggedStack, markDragged, takeDragged } from '../public/js/drag-stack.js?v=4321c8c6';
-import { runDrop } from '../public/js/features/world-drop-feature.js?v=60599674';
-import { registerButlerDrop } from '../public/js/butler-drop.js?v=ef952469';
+import { runDrop } from '../public/js/features/world-drop-feature.js?v=8087164c';
+import { registerButlerDrop } from '../public/js/butler-drop.js?v=22951d8a';
 import { beginDrag, dragDrop, endDrag } from '../public/js/drop-targets.js?v=59e6edb4';
 
 const root = join(import.meta.dirname, '..', 'public');

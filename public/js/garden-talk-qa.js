@@ -11,7 +11,7 @@
  * Canvas: data-garden-talk (running|done|missing), data-garden-talk-step,
  * data-last-speech, data-last-speech-slugs.
  */
-import { SEED_CATALOG } from './garden.js?v=a7c6f521';
+import { SEED_CATALOG } from './garden.js?v=fefa7bcd';
 import { topUpMetabolic } from './metabolics.js?v=48f784bf';
 
 const STEPS = ['clear', 'plant', 'water', 'harvest'];

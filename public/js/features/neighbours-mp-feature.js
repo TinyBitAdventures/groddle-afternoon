@@ -110,14 +110,14 @@
 import { createMinnAccount } from '../minn-account.js?v=7e3d7279';
 import { runStreetTransition } from '../screen-fx.js?v=7cd62cca';
 import { STREET_INDEX } from '../street-loader.js?v=10376267';
-import { ITEM_CATALOG, addItem, countItem, listPackItemSlots, removeItem } from '../inventory.js?v=6414dbdc';
+import { ITEM_CATALOG, addItem, countItem, listPackItemSlots, removeItem } from '../inventory.js?v=3be7988a';
 import { copyPicks, leavingWire, markLeaving, receiveWire, takeCopies } from '../copy-picks.js?v=b368fd49';
 import { cultivationDef, homeStreetLayout } from '../home-cultivation.js?v=b2868d29';
-import { getPlot, tickGarden } from '../garden.js?v=a7c6f521';
+import { getPlot, tickGarden } from '../garden.js?v=fefa7bcd';
 import { BUTLER_RIG_SCALE, ButlerPainter, butlerRigNow, loadButlerRig } from '../butler-rig.js?v=3acda854';
 import { BUTLER, BUTLER_INFO, butlerInfoText, butlerPostRx, normalizeButlerParts } from '../butler.js?v=152429c8';
-import { butlerApi } from './butler-feature.js?v=bc1242b5';
-import { homesFeature, visitorHomeScene, visitorHomeState } from './homes-feature.js?v=83b60999';
+import { butlerApi } from './butler-feature.js?v=fe7b76e3';
+import { homesFeature, visitorHomeScene, visitorHomeState } from './homes-feature.js?v=b2c608c6';
 import { visitRadio } from '../vine-radio.js?v=5436aa09';
 import { homeMusicFile } from '../homes.js?v=dca6b2cd';
 import { streetStyleFor } from '../home-styles.js?v=ec5d2f69';
@@ -181,11 +181,11 @@ import {
   forgetInside,
   insideProof,
   rememberInside,
-} from '../neighbours-mp.js?v=f43b50c8';
+} from '../neighbours-mp.js?v=e59e6b47';
 import { itemZ } from '../item-bands.js?v=ec366be3';
-import { butlerCarries, registerButlerDrop } from '../butler-drop.js?v=ef952469';
+import { butlerCarries, registerButlerDrop } from '../butler-drop.js?v=22951d8a';
 import { takeDragged } from '../drag-stack.js?v=4321c8c6';
-import { worldPoint } from './world-drop-feature.js?v=60599674';
+import { worldPoint } from './world-drop-feature.js?v=8087164c';
 import { clampToExpansion, elevatorStops, floorJobFor, TOWER_JOBS } from '../home-tower.js?v=a7fc0cce';
 
 export const NEIGHBOURS_MP_FEATURE_ID = 'neighbours-mp';

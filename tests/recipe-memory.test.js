@@ -9,9 +9,9 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { BEAKER_BADGES, TAUGHT_FOODS, TAUGHT_POWDERS, normalizeKeptRecipes, stampKeptRecipes } from '../public/js/recipe-memory.js?v=3c72d749';
-import { RECIPE_MEMORY_FEATURE_ID, recipeMemoryFeature, recipesLearnedFrom } from '../public/js/features/recipe-memory-feature.js?v=f3bba1ef';
-import { RECIPE_CATALOG, canCraft, recipeKnown, searchRecipes } from '../public/js/making.js?v=6cfac327';
-import { createPlayerSave, parsePlayerSave, serializePlayerSave } from '../public/js/player-save.js?v=f7062a6d';
+import { RECIPE_MEMORY_FEATURE_ID, recipeMemoryFeature, recipesLearnedFrom } from '../public/js/features/recipe-memory-feature.js?v=ede86999';
+import { RECIPE_CATALOG, canCraft, recipeKnown, searchRecipes } from '../public/js/making.js?v=96afba25';
+import { createPlayerSave, parsePlayerSave, serializePlayerSave } from '../public/js/player-save.js?v=6968e8fc';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const recipes = JSON.parse(readFileSync(join(root, 'public/assets/content/recipes.json'), 'utf8'));

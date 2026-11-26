@@ -19,9 +19,9 @@ import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import { readFileSync } from 'node:fs';
 import { PACED_WAITS, ROCK_RESPAWN_EXTRA_AFTER, ROCK_RESPAWN_EXTRA_MS, ROCK_RESPAWN_MS, pacedWaitMs, rockRespawnMs } from '../public/js/pace.js?v=c07dfbd8';
-import { createMineRock, crumbleRock, mineRock, rockChunksTaken, tickMineRock } from '../public/js/mining.js?v=29eaf67f';
-import { ROCK_RESPAWN_MS as YARD_ROCK_RESPAWN_MS, applyStockAct } from '../public/js/yard-stock-mp.js?v=59fb1980';
-import { createInventory } from '../public/js/inventory.js?v=6414dbdc';
+import { createMineRock, crumbleRock, mineRock, rockChunksTaken, tickMineRock } from '../public/js/mining.js?v=7ecaa572';
+import { ROCK_RESPAWN_MS as YARD_ROCK_RESPAWN_MS, applyStockAct } from '../public/js/yard-stock-mp.js?v=3c2c80d3';
+import { createInventory } from '../public/js/inventory.js?v=3be7988a';
 import { ruleTables } from '../tools/build-realtime-objects.mjs';
 import { serverPath, sitePath, skipWithoutServer, skipWithoutSite } from '../tools/repos.mjs';
 

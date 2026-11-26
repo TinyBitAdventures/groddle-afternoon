@@ -31,7 +31,7 @@ import { SITE_DIR } from '../tools/repos.mjs';
 import { fileURLToPath } from 'node:url';
 
 import { HOME_SHOT_COPY, homeShotBands, homeShotRows, homeShotScale, homeShotSize, homeShotState } from '../public/js/home-shot.js?v=8198618a';
-import { renderHomeShot } from '../public/js/home-shot-render.js?v=6aa01a97';
+import { renderHomeShot } from '../public/js/home-shot-render.js?v=b32df29b';
 import { roomPieces } from '../public/js/home-wallpaper.js?v=5d3594e4';
 import { createHomeDecorState, INTERIOR } from '../public/js/home-decor.js?v=31f37d9b';
 import { HOME_STALE_DELAY_MS, RETRY_MS, staleRefreshDue } from '../public/js/profiles.js?v=7e94c96f';

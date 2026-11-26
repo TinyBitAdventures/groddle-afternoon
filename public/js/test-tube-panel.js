@@ -15,7 +15,7 @@
  * The rules are js/test-tube.js. The DOM is the Make window's own (#make-detail, #make-progress,
  * #make-result), so nothing is added to the pages.
  */
-import { countItem, ITEM_CATALOG } from './inventory.js?v=6414dbdc';
+import { countItem, ITEM_CATALOG } from './inventory.js?v=3be7988a';
 import {
   EXPERIMENT_ELEMENTS,
   EXPERIMENT_PROGRESS_LINE,
@@ -29,7 +29,7 @@ import {
   setSlotCount,
   slotMax,
   slotsToInputs,
-} from './test-tube.js?v=fac12235';
+} from './test-tube.js?v=ad6c29f3';
 
 /** MakingRecipeUI.as 64. */
 export const TRY_TILE_LABEL = 'Try to make something new';

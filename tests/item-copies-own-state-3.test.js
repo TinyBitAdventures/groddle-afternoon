@@ -32,14 +32,14 @@ import {
 import { COPY_TAG_RULES, cleanCopyTagOf } from '../public/js/copy-tags.js?v=7eec7d48';
 import { goodsWithHeldTags, normalizeGoods, normalizeSlice, sameGoods, settleDone } from '../public/js/trade.js?v=5fb43d2f';
 import { giftEffects, normalizeGift, normalizeGiftsSlice, wrapBox } from '../public/js/gifts.js?v=37ce7d76';
-import { dropEffect, normalizeGroundStack, normalizeItem } from '../public/js/drops-mp.js?v=189efccc';
+import { dropEffect, normalizeGroundStack, normalizeItem } from '../public/js/drops-mp.js?v=351593a6';
 import { normalizeListing } from '../public/js/auctions.js?v=2b806ad4';
 import { cabinetMove, cabinetPut, cabinetTake, normalizeContents } from '../public/js/home-storage.js?v=b0225465';
-import { CUBIMAL_NAMING } from '../public/js/cubimals.js?v=07f59f2f';
+import { CUBIMAL_NAMING } from '../public/js/cubimals.js?v=b83d6145';
 import { FAVOR_GIANTS } from '../public/js/potions.js?v=4f4c996d';
-import { HOPPER_CEILING, STILL } from '../public/js/machines.js?v=5d749d26';
+import { HOPPER_CEILING, STILL } from '../public/js/machines.js?v=93a736f2';
 import { teachPhrase } from '../public/js/seasons.js?v=5d8f545a';
-import { addItem, countItem, createInventory } from '../public/js/inventory.js?v=6414dbdc';
+import { addItem, countItem, createInventory } from '../public/js/inventory.js?v=3be7988a';
 import { HAS_PHP, PHP } from './php.js';
 
 /** A copy of the feature of its own (its realtime binding is module state). */

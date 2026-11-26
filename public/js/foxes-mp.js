@@ -15,7 +15,7 @@
  *   three baits 300 px apart from randInt(x, x - 400).
  */
 
-import { baitDropPlan } from './foxes.js?v=4497a984';
+import { baitDropPlan } from './foxes.js?v=c0ce235f';
 
 /** inc_npcs.js:132: max_foxes = getNumActivePlayers() / 3. */
 export const FOX_PLAYERS_PER_FOX = 3;

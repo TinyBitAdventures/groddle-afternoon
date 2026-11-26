@@ -34,11 +34,11 @@
  *   (rolled with the shared js/drop-tables.js runDropTable).
  */
 
-import { ITEM_CATALOG, ensureItem, getItemUseInfo } from './inventory.js?v=6414dbdc';
+import { ITEM_CATALOG, ensureItem, getItemUseInfo } from './inventory.js?v=3be7988a';
 import { DROP_TABLES, applyDropResult, rollDropTable } from './drop-tables.js?v=1ed0b596';
 import { gainMetabolic, loseEnergy, loseMood } from './metabolics.js?v=48f784bf';
 import { grantMoodXp } from './mood-xp.js?v=e311b45c';
-import { musicblockItemMeta } from './musicblocks.js?v=8e985753';
+import { musicblockItemMeta } from './musicblocks.js?v=900c3245';
 import { isEnchantedForest } from './enchanted-forests.js?v=17ac01e4';
 import { isSymphoniousTsid } from './symphonious-maximus.js?v=91af7672';
 import { isMissingFloorTsid } from './hidden-floors.js?v=023336cb';

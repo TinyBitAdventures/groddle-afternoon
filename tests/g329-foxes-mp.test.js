@@ -11,7 +11,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, it } from 'node:test';
 
-import { FOX_TIMING, canSpawnFox } from '../public/js/foxes.js?v=4497a984';
+import { FOX_TIMING, canSpawnFox } from '../public/js/foxes.js?v=c0ce235f';
 import {
   FOX_FLURRY_COUNTER,
   FOX_LEAVE_MS,
@@ -26,7 +26,7 @@ import {
   serverCanSpawn,
   serverId,
   spawnIsFlurry,
-} from '../public/js/foxes-mp.js?v=0a1438dc';
+} from '../public/js/foxes-mp.js?v=20b2e4f9';
 import { foxesData, preserveStreets } from '../tools/build-realtime-foxes.mjs';
 import { serverPath, skipWithoutServer } from '../tools/repos.mjs';
 

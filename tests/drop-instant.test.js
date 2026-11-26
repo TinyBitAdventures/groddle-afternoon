@@ -23,8 +23,8 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { layoutHeld, layoutPack } from '../public/js/pack-slots.js?v=38e4aea5';
-import { createDroppedItemState, setDownStack } from '../public/js/world-items.js?v=a5deb102';
-import { ITEM_CATALOG } from '../public/js/inventory.js?v=6414dbdc';
+import { createDroppedItemState, setDownStack } from '../public/js/world-items.js?v=93313aad';
+import { ITEM_CATALOG } from '../public/js/inventory.js?v=3be7988a';
 import { GAME_DIR } from '../tools/repos.mjs';
 
 const SLOW_MS = 400;

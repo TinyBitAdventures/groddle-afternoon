@@ -19,7 +19,7 @@ import {
   ensureItem,
   itemIcon,
   ITEM_CATALOG,
-} from './inventory.js?v=6414dbdc';
+} from './inventory.js?v=3be7988a';
 import { GRINDER_TOOLS, canUseTool, firstWorkingTool, useToolCondition } from './tools.js?v=4156bba8';
 import { SKILL_PACKAGES, skillPackageDetails } from './skill-packages.js?v=bfb87281';
 import { pace, rockRespawnMs } from './pace.js?v=c07dfbd8';

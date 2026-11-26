@@ -42,8 +42,8 @@ import {
   visitRadio,
   withOursQuests,
 } from '../public/js/vine-radio.js?v=5436aa09';
-import { CRAB_STREETS } from '../public/js/crabs.js?v=5a43743d';
-import { MUSICBLOCK_CATALOG } from '../public/js/musicblocks.js?v=8e985753';
+import { CRAB_STREETS } from '../public/js/crabs.js?v=6b3e014e';
+import { MUSICBLOCK_CATALOG } from '../public/js/musicblocks.js?v=900c3245';
 import { getAmbientMusicConfig, resolveAmbientTheme, setAmbientMusicConfig } from '../public/js/ambient-music.js?v=4b3c6041';
 import { streetGraph } from '../public/js/street-graph.js?v=d767f3a2';
 import { closedForEveryone, freeWays, openWorld } from '../public/js/open-roads.js?v=2e03b0a6';
@@ -65,8 +65,8 @@ import {
   setRadioState,
 } from '../public/js/home-cultivation.js?v=b2868d29';
 import { MOVABLE_FIXTURES, MOVABLE_FIXTURE_IDS, RADIO_USUAL_DX, fixtureFits, fixtureText, radioOut } from '../public/js/home-street-fixtures.js?v=d4e5b56a';
-import { homesFeature } from '../public/js/features/homes-feature.js?v=83b60999';
-import { radioFeature } from '../public/js/features/vine-radio-feature.js?v=1223b1a9';
+import { homesFeature } from '../public/js/features/homes-feature.js?v=b2c608c6';
+import { radioFeature } from '../public/js/features/vine-radio-feature.js?v=9c7062b9';
 import { SIDE_SHEET_IDS } from '../public/js/ui/panel-shell.js?v=5efb38c6';
 import { page } from './social-fake-dom.js';
 import { CULTIVATION_CLASSES } from '../public/js/homes-catalog.js?v=0367f90f';

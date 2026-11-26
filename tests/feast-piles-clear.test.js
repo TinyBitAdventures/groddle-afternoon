@@ -16,7 +16,7 @@ import { applyStreetIndex, setZoneStreetsShown } from '../public/js/street-loade
 import { platformsScreen, streetWidth } from '../public/js/street-model.js?v=a9a05f9d';
 import { PLACEMENT_FOOTPRINTS, ecologyForStreet, planStreetPlacements, populationForStreet, setStreetEcologyCatalog, streetReservedSpots } from '../public/js/street-ecology.js?v=f1c11a2d';
 import { placementRequests } from '../tools/build-realtime-objects.mjs';
-import { FEAST_SPOTS, PILE_HALF, PILE_MARGIN } from '../public/js/feast-day.js?v=c5ec0820';
+import { FEAST_SPOTS, PILE_HALF, PILE_MARGIN } from '../public/js/feast-day.js?v=3f2d4603';
 import { TABLE_AT, TABLE_STREET } from '../public/js/pot-luck-feast.js?v=971888be';
 import { worldArtFor } from '../public/js/world-art.js?v=a67514c8';
 

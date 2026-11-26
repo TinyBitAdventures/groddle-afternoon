@@ -11,15 +11,15 @@ import { join } from 'node:path';
 import { execFileSync, spawnSync } from 'node:child_process';
 import { SITE_DIR, skipWithoutSite } from '../tools/repos.mjs';
 import { gameFiles, gameText } from '../tools/build-economy.mjs';
-import { RARE_STORE } from '../public/js/quest-rooms/penalty.js?v=313ef9e3';
+import { RARE_STORE } from '../public/js/quest-rooms/penalty.js?v=71ec5743';
 import { CAMERA_OFFER } from '../public/js/snaps.js?v=b5be8bff';
 
 import { ISLAND_CURRANTS, ISLAND_FLAGS, normalizeNewxpSave } from '../public/js/newxp.js?v=0d81aa52';
 import { createIconState, pickUpIcon, placeIcon } from '../public/js/giant-icons.js?v=3f078775';
 import { GNOME_CLASS } from '../public/js/garden-gnome.js?v=73026b57';
-import { NOTE_POLE_CLASS } from '../public/js/home-street-mp.js?v=01294fc8';
+import { NOTE_POLE_CLASS } from '../public/js/home-street-mp.js?v=11a669f8';
 import { FUNPICKLE } from '../public/js/funpickle.js?v=95796317';
-import { funpickleFeature } from '../public/js/features/funpickle-feature.js?v=6266cfaf';
+import { funpickleFeature } from '../public/js/features/funpickle-feature.js?v=74d8989f';
 import { HAS_PHP, PHP } from './php.js';
 
 const root = join(import.meta.dirname, '..');

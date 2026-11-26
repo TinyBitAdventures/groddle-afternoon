@@ -13,13 +13,13 @@ import assert from 'node:assert/strict';
 import { afterEach, beforeEach, describe, it } from 'node:test';
 
 import { OFFLINE_LINE, RECONNECTING_LINE } from '../public/js/online-request.js?v=09ac8a9c';
-import { streetObjectsFeature } from '../public/js/features/street-objects-feature.js?v=7fe26c34';
-import { heliKittiesFeature } from '../public/js/features/heli-kitties-feature.js?v=cd2b74ad';
-import { crabsFeature } from '../public/js/features/crabs-feature.js?v=a78447d7';
-import { fireDragonFeature } from '../public/js/features/fire-dragon-feature.js?v=bec487f9';
+import { streetObjectsFeature } from '../public/js/features/street-objects-feature.js?v=48d4239d';
+import { heliKittiesFeature } from '../public/js/features/heli-kitties-feature.js?v=6988b94e';
+import { crabsFeature } from '../public/js/features/crabs-feature.js?v=b65c5cc6';
+import { fireDragonFeature } from '../public/js/features/fire-dragon-feature.js?v=e2dcfdf8';
 import { setWildlifeCatalog } from '../public/js/wildlife.js?v=670c3a7f';
-import { MUSICBLOCK_CATALOG } from '../public/js/musicblocks.js?v=8e985753';
-import { createInventory } from '../public/js/inventory.js?v=6414dbdc';
+import { MUSICBLOCK_CATALOG } from '../public/js/musicblocks.js?v=900c3245';
+import { createInventory } from '../public/js/inventory.js?v=3be7988a';
 
 /** Hechey Track: one of the eight archived crab streets. */
 const STREET = 'GLI2V0UN7RD1T2J';

@@ -14,7 +14,7 @@ import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { YARD_EDGE, YARD_RANGE, YARD_WALL_DX, YARD_WALL_GAP, wallBetween, yardWanderAt, yardWindow } from '../public/js/yard-wander.js?v=af6accdf';
+import { YARD_EDGE, YARD_RANGE, YARD_WALL_DX, YARD_WALL_GAP, wallBetween, yardWanderAt, yardWindow } from '../public/js/yard-wander.js?v=79144483';
 import { GAME_DIR } from '../tools/repos.mjs';
 
 const WALL = 750 + YARD_WALL_DX; // a 750 px back yard: the house starts at x 750

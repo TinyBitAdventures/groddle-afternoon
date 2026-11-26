@@ -29,10 +29,10 @@ import {
   BAG_RENAME_HINT,
 } from '../public/js/bag-names.js?v=bba085e1';
 import { BAG_DEFS, PACK_CAPACITY, giveBag, layoutPack, moveStack, normalizePrefs, renameBag, takeBag } from '../public/js/pack-slots.js?v=38e4aea5';
-import { ITEM_CATALOG, isToolItem } from '../public/js/inventory.js?v=6414dbdc';
-import { createDroppedItemState, dropInventoryStack, parseDroppedItemState, placeDroppedBag, serializeDroppedItemState } from '../public/js/world-items.js?v=a5deb102';
-import { bagsFeature } from '../public/js/features/bags-feature.js?v=17bcf98a';
-import { pouchFeature } from '../public/js/features/elemental-pouch-feature.js?v=3501d7db';
+import { ITEM_CATALOG, isToolItem } from '../public/js/inventory.js?v=3be7988a';
+import { createDroppedItemState, dropInventoryStack, parseDroppedItemState, placeDroppedBag, serializeDroppedItemState } from '../public/js/world-items.js?v=93313aad';
+import { bagsFeature } from '../public/js/features/bags-feature.js?v=426f342b';
+import { pouchFeature } from '../public/js/features/elemental-pouch-feature.js?v=c6bded2b';
 import { POUCH_CLASS } from '../public/js/elemental-pouch.js?v=42702eda';
 import { HAS_SITE, SITE_DIR } from '../tools/repos.mjs';
 import { HAS_PHP, PHP } from './php.js';

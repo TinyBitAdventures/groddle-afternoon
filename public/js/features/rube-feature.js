@@ -20,9 +20,9 @@
  *     rubeLast, rubeAutoplay, rubeChance.
  */
 
-import { ITEM_CATALOG, ensureItem } from '../inventory.js?v=6414dbdc';
+import { ITEM_CATALOG, ensureItem } from '../inventory.js?v=3be7988a';
 import { getGameDayKey } from '../game-day.js?v=a532775d';
-import { hellFeature } from './hell-feature.js?v=74604dfc';
+import { hellFeature } from './hell-feature.js?v=b3f6bb33';
 import { landingY, walkSurfaceY } from '../walk-surface.js?v=3c919d5b';
 import {
   RUBE_CLASS,

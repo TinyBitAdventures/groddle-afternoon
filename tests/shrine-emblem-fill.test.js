@@ -19,7 +19,7 @@ import {
   isNoDonate,
   listShrineDonationOptions,
   quoteShrineDonation,
-} from '../public/js/shrines.js?v=da102ddd';
+} from '../public/js/shrines.js?v=f5eb7690';
 
 const game = readFileSync(join(import.meta.dirname, '..', 'public', 'game.js'), 'utf8');
 

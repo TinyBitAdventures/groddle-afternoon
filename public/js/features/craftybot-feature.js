@@ -49,11 +49,11 @@
  *   craftybotPanel, craftybotLast, craftybotAutoplay.
  */
 
-import { ITEM_CATALOG, addItem, countItem, ensureItem, itemIcon, removeItem } from '../inventory.js?v=6414dbdc';
+import { ITEM_CATALOG, addItem, countItem, ensureItem, itemIcon, removeItem } from '../inventory.js?v=3be7988a';
 import { canUseTool, getToolCondition, setToolRemaining } from '../tools.js?v=4156bba8';
-import { MAKING_TOOL_SKILLS, listRecipes, recipeKnown, TOOL_CATALOG } from '../making.js?v=6cfac327';
-import { listDroppedStacks } from '../world-items.js?v=a5deb102';
-import { BACK_YARD_GROUND_Y, homesFeature } from './homes-feature.js?v=83b60999';
+import { MAKING_TOOL_SKILLS, listRecipes, recipeKnown, TOOL_CATALOG } from '../making.js?v=96afba25';
+import { listDroppedStacks } from '../world-items.js?v=93313aad';
+import { BACK_YARD_GROUND_Y, homesFeature } from './homes-feature.js?v=b2c608c6';
 import { cabinetTake, isCabinetClass } from '../home-storage.js?v=b0225465';
 import {
   CRAFTYBOT,

@@ -19,7 +19,7 @@
  * plain objects; `collectHomeLayout(engine)` is the game's call.
  */
 import { PUBLIC_HIDE } from './public-picture.js?v=1a0b03fa';
-import { buildHomeLayout, describeHomeThing, homeViewFrame, splitFrameToSheet } from './home-layout.js?v=f2125495';
+import { buildHomeLayout, describeHomeThing, homeViewFrame, splitFrameToSheet } from './home-layout.js?v=1e15983c';
 import { sceneViewCap } from './location-view.js?v=76a9ff86';
 
 /** The URL a texture source was loaded from (js/textures.js labels sources with it), or ''. */

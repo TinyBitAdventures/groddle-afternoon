@@ -30,10 +30,10 @@ import {
   rollCrack,
   stackMaxFor,
 } from '../public/js/artifacts.js?v=fc419ecf';
-import { artifactsFeature, finishCrack } from '../public/js/features/artifacts-feature.js?v=9ccc0455';
-import { FEATURES } from '../public/js/features/index.js?v=6be18ba1';
+import { artifactsFeature, finishCrack } from '../public/js/features/artifacts-feature.js?v=32d11520';
+import { FEATURES } from '../public/js/features/index.js?v=d4905f5a';
 import { DROP_ITEMS, DROP_TABLES, rollDropTable } from '../public/js/drop-tables.js?v=1ed0b596';
-import { ITEM_CATALOG } from '../public/js/inventory.js?v=6414dbdc';
+import { ITEM_CATALOG } from '../public/js/inventory.js?v=3be7988a';
 import { createToolConditionState, getToolCondition } from '../public/js/tools.js?v=4156bba8';
 import { HIRES_ICONS } from '../public/js/icon-hires.js?v=60e2474b';
 

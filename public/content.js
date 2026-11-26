@@ -39,7 +39,7 @@ import {
   GARDEN_FERTILIZE_MS,
   fertilizeCheck,
   fertilizePlot,
-} from './js/garden.js?v=a7c6f521';
+} from './js/garden.js?v=fefa7bcd';
 import { firstWorkingTool, HOE_TOOLS, WATERING_CAN_TOOLS } from './js/tools.js?v=4156bba8';
 import { miningGemHint } from './js/gem-hints.js?v=4b65f7ac';
 import {
@@ -54,21 +54,21 @@ import {
   noPickLine,
   rockStatusLabel,
   ensureMiningItems,
-} from './js/mining.js?v=29eaf67f';
+} from './js/mining.js?v=7ecaa572';
 import { takeToolChoice } from './js/tool-choice.js?v=e0dcb60e';
 import {
   ANIMAL_CLASS_IDS,
   ensureAnimalState,
   listAnimalFeedOptions,
   feedAnimal,
-} from './js/animals.js?v=be536ce6';
+} from './js/animals.js?v=49be8a12';
 import {
   quoteAnimalKinship,
   ANIMAL_KINSHIP_CLICK_REFUSALS,
   performAnimalKinship,
   highestAnimalKinshipRank,
 } from './js/animal-kinship.js?v=eaa3a6f2';
-import { MUSICBLOCK_CATALOG } from './js/musicblocks.js?v=8e985753';
+import { MUSICBLOCK_CATALOG } from './js/musicblocks.js?v=900c3245';
 import { nextDialogue, formatSpokenLine } from './js/dialogue.js?v=fcfed1af';
 import {
   ensureWoodTreeState,
@@ -86,7 +86,7 @@ import {
   namingVerbs,
   queuePlops,
   startIncubation,
-} from './js/animal-husbandry.js?v=c2e4c509';
+} from './js/animal-husbandry.js?v=c66fc912';
 import { loseEnergy, metabolicGain, moodMax } from './js/metabolics.js?v=48f784bf';
 import { SET_FREE, setFreeVerbState } from './js/animal-set-free.js?v=6fcd8355';
 import { BUTTER_UP, SING_TO, butterUpVerbState, butterUpChicken, singToVerbState, singToButterfly } from './js/animal-flattery.js?v=3374cf3a';
@@ -94,7 +94,7 @@ import { levelInfoForXp } from './js/progression.js?v=05ff0260';
 import { getGameDayKey } from './js/game-day.js?v=a532775d';
 import { PACK_COPY, isElementClass } from './js/pack-slots.js?v=38e4aea5';
 import { hasPouch } from './js/elemental-pouch.js?v=42702eda';
-import { ITEM_CATALOG, countItem } from './js/inventory.js?v=6414dbdc';
+import { ITEM_CATALOG, countItem } from './js/inventory.js?v=3be7988a';
 import { slugsFromEffects } from './js/speech-slugs.js?v=d5cc8b6f';
 import { animalResponseKey, failureResponseKey, trantCareResponseKey, rockResponseKey, verbResponse } from './js/verb-responses.js?v=97df8351';
 

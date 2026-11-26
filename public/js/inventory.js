@@ -423,6 +423,19 @@ export function packStamp(inv, pc = {}, toolState = null) {
 }
 
 /**
+ * Why a drink is refused now, or null: include/drink.js 38-42 drink_drink refuses a mood drink only
+ * at full mood (metabolics_get_percentage('mood') == 100, the player's own maximum; ticket 93: not a
+ * fixed 100). The pack's Drink and a Thanksgiving Day feast pile's (#723) both ask it.
+ * @param {{ mood?: number }} pc
+ * @param {string} classTsid
+ */
+export function drinkRefusal(pc, classTsid, info = getItemUseInfo(classTsid)) {
+  if (info?.kind !== 'drink' || !((info.effects?.mood || 0) > 0) || (pc?.mood || 0) < moodMax(pc)) return null;
+  const label = ITEM_CATALOG[classTsid]?.label || classTsid;
+  return `You tried to drink ${label}, but you're already in a perfectly good mood, so then you didn't do it.`;
+}
+
+/**
  * Use an inventory item (pack verb).
  * @param {Inventory} inv
  * @param {{ energy: number, mood: number }} pc
@@ -434,16 +447,8 @@ export function useItem(inv, pc, classTsid) {
   }
   const info = getItemUseInfo(classTsid);
   if (!info.usable) return { ok: false, msgs: [info.reason] };
-  // include/drink.js 38-42 drink_drink: a mood drink is refused only at full mood
-  // (metabolics_get_percentage('mood') == 100, the player's own maximum; ticket 93: not a fixed 100).
-  if (info.kind === 'drink' && (info.effects.mood || 0) > 0 && (pc.mood || 0) >= moodMax(pc)) {
-    const label = ITEM_CATALOG[classTsid]?.label || classTsid;
-    return {
-      ok: false,
-      reason: 'mood_full',
-      msgs: [`You tried to drink ${label}, but you're already in a perfectly good mood, so then you didn't do it.`],
-    };
-  }
+  const refused = drinkRefusal(pc, classTsid, info);
+  if (refused) return { ok: false, reason: 'mood_full', msgs: [refused] };
   if (!removeItem(inv, classTsid, 1)) {
     return { ok: false, msgs: [`No ${classTsid} in pack.`] };
   }

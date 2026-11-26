@@ -16,7 +16,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 import { PARTY_SPACES, normalizePartyRecord, startParty } from '../public/js/party-spaces.js?v=4e1ca2a5';
-import { partySpacesFeature } from '../public/js/features/party-spaces-feature.js?v=bbc1fcb7';
+import { partySpacesFeature } from '../public/js/features/party-spaces-feature.js?v=cdcffabd';
 import { INTERROGATION_FALLBACK } from '../public/js/interrogation-room.js?v=f621c3b9';
 
 const root = join(import.meta.dirname, '..');

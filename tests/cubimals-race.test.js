@@ -33,13 +33,13 @@ import {
   rollCubimalRace,
   sanitizeCubimalName,
   setCubimalFree,
-} from '../public/js/cubimals.js?v=07f59f2f';
-import { addItem, countItem, createInventory } from '../public/js/inventory.js?v=6414dbdc';
+} from '../public/js/cubimals.js?v=b83d6145';
+import { addItem, countItem, createInventory } from '../public/js/inventory.js?v=3be7988a';
 import { bindToolInventory, copyTags, createToolConditionState } from '../public/js/tools.js?v=4156bba8';
 import { applyAchievementProgress, createAchievementState } from '../public/js/achievements.js?v=535c8952';
 import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=c9b84764';
-import { FEATURES } from '../public/js/features/index.js?v=6be18ba1';
-import { cubimalRaceFeature, CUBIMAL_RACE_FEATURE_ID } from '../public/js/features/cubimal-race-feature.js?v=4a3dc201';
+import { FEATURES } from '../public/js/features/index.js?v=d4905f5a';
+import { cubimalRaceFeature, CUBIMAL_RACE_FEATURE_ID } from '../public/js/features/cubimal-race-feature.js?v=16cd16c4';
 import { holdKeepsBusy } from '../public/js/instance-holds.js?v=ff3a63a3';
 import { FIRST_DRAW_SPRITES, HIRES_SPRITES } from '../public/js/sprite-hires.js?v=e96be5f1';
 

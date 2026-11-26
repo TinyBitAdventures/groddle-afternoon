@@ -49,11 +49,11 @@
  */
 
 import { playOverlay } from '../overlays.js?v=91dcee74';
-import { ITEM_CATALOG, countItem, ensureItem, itemIcon } from '../inventory.js?v=6414dbdc';
+import { ITEM_CATALOG, countItem, ensureItem, itemIcon } from '../inventory.js?v=3be7988a';
 import { canUseTool, useToolCondition, workStepCost } from '../tools.js?v=4156bba8';
 import { acceptOffer, npcQuestOffers } from '../quest-offers.js?v=7e00498b';
 import { getQuestCatalog, getSkillCatalog } from '../content-catalogs.js?v=c9b84764';
-import { listRecipesProducing } from '../making.js?v=6cfac327';
+import { listRecipesProducing } from '../making.js?v=96afba25';
 import { JOB_ASK_TEXT, itemAskSubject, itemGetHref, itemMakeNote, skillRankLabel } from '../street-job-asks.js?v=84b712a3';
 import { XP_FOR_LEVEL } from '../progression.js?v=05ff0260';
 import {

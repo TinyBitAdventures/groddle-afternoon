@@ -25,13 +25,13 @@ import {
   parseHouseFileText,
   resolveHouseFileUrl,
   validateHouseFile,
-} from '../public/js/house-file.js?v=793b3089';
-import { applyHouse, bootHouseFile, houseFileRequest } from '../public/js/house-file-loader.js?v=c28ab8ba';
-import { homesFeature } from '../public/js/features/homes-feature.js?v=83b60999';
-import { homeMachinesFeature } from '../public/js/features/home-machines-feature.js?v=69f849ea';
-import { craftybotFeature } from '../public/js/features/craftybot-feature.js?v=5dbb57da';
+} from '../public/js/house-file.js?v=7e63d391';
+import { applyHouse, bootHouseFile, houseFileRequest } from '../public/js/house-file-loader.js?v=a045a795';
+import { homesFeature } from '../public/js/features/homes-feature.js?v=b2c608c6';
+import { homeMachinesFeature } from '../public/js/features/home-machines-feature.js?v=ee31068e';
+import { craftybotFeature } from '../public/js/features/craftybot-feature.js?v=3d864073';
 import { createHomeState, imagineHome } from '../public/js/homes.js?v=dca6b2cd';
-import { normalizeDroppedItemState, setDownStack } from '../public/js/world-items.js?v=a5deb102';
+import { normalizeDroppedItemState, setDownStack } from '../public/js/world-items.js?v=93313aad';
 
 const root = join(import.meta.dirname, '..', 'public');
 const read = (p) => readFileSync(join(root, p), 'utf8');

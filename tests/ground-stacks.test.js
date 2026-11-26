@@ -18,7 +18,7 @@ import assert from 'node:assert/strict';
 import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { join, relative } from 'node:path';
 import { groundKey, groundStacks, ownGroundPlaces, ownGroundRows, ownGroundState, pruneOwnGround, sharedGroundStacks } from '../public/js/ground-stacks.js?v=22792362';
-import { createDroppedItemState, setDownStack } from '../public/js/world-items.js?v=a5deb102';
+import { createDroppedItemState, setDownStack } from '../public/js/world-items.js?v=93313aad';
 import { dropsMpFeature } from '../public/js/features/drops-mp-feature.js?fresh=groundstacks';
 import { homeLivePrints, changedHomeKinds } from '../public/js/home-live.js?v=9c7abae7';
 import { GAME_DIR } from '../tools/repos.mjs';

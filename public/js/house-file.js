@@ -90,7 +90,7 @@ import {
 } from './home-decor.js?v=31f37d9b';
 import { cleanUpgradeId } from './furniture-upgrades.js?v=f563b304';
 import { CABINETS, SDB_CLASS, SDB_COUNT_MAX, isCabinetClass, normalizeContents } from './home-storage.js?v=b0225465';
-import { MACHINE_LABELS } from './machine-rooms.js?v=ca927ffd';
+import { MACHINE_LABELS } from './machine-rooms.js?v=a99c4d01';
 import { stackMaxOf } from './pack-slots.js?v=38e4aea5';
 
 export const HOUSE_FILE_FORMAT = 'groddle-house';

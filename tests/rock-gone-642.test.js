@@ -10,7 +10,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { createMineRock, crumbleRock, rockShown, tickMineRock } from '../public/js/mining.js?v=29eaf67f';
+import { createMineRock, crumbleRock, rockShown, tickMineRock } from '../public/js/mining.js?v=7ecaa572';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const game = readFileSync(join(root, 'public/game.js'), 'utf8');

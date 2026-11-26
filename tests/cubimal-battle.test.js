@@ -31,14 +31,14 @@ import {
   nextLevelAmount,
   ownedBattleLabel,
   rollBattleStrike,
-} from '../public/js/cubimal-battle.js?v=f91166b0';
-import { ensureCubimalItems } from '../public/js/cubimals.js?v=07f59f2f';
-import { addItem, countItem, createInventory } from '../public/js/inventory.js?v=6414dbdc';
+} from '../public/js/cubimal-battle.js?v=82bf52c9';
+import { ensureCubimalItems } from '../public/js/cubimals.js?v=b83d6145';
+import { addItem, countItem, createInventory } from '../public/js/inventory.js?v=3be7988a';
 import { bindToolInventory, copyTags, createToolConditionState, setCopyTag } from '../public/js/tools.js?v=4156bba8';
 import { cleanCopyTagOf } from '../public/js/copy-tags.js?v=7eec7d48';
-import { FEATURES } from '../public/js/features/index.js?v=6be18ba1';
-import { cubimalBattleFeature, CUBIMAL_BATTLE_FEATURE_ID } from '../public/js/features/cubimal-battle-feature.js?v=57ce328b';
-import { cubimalRaceFeature } from '../public/js/features/cubimal-race-feature.js?v=4a3dc201';
+import { FEATURES } from '../public/js/features/index.js?v=d4905f5a';
+import { cubimalBattleFeature, CUBIMAL_BATTLE_FEATURE_ID } from '../public/js/features/cubimal-battle-feature.js?v=b560ac6a';
+import { cubimalRaceFeature } from '../public/js/features/cubimal-race-feature.js?v=16cd16c4';
 import { holdKeepsBusy } from '../public/js/instance-holds.js?v=ff3a63a3';
 import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=c9b84764';
 import { applyAchievementProgress, createAchievementState } from '../public/js/achievements.js?v=535c8952';

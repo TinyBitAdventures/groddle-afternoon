@@ -51,7 +51,7 @@
  *     data-supply-permits).
  */
 
-import { ITEM_CATALOG, addItem, countItem, ensureItem } from '../inventory.js?v=6414dbdc';
+import { ITEM_CATALOG, addItem, countItem, ensureItem } from '../inventory.js?v=3be7988a';
 import { getToolCondition, copyForVerb, copyTag, copyTags, migrateClassTag, setCopyTag } from '../tools.js?v=4156bba8';
 import {
   MACHINE_ASSEMBLIES,
@@ -85,10 +85,10 @@ import {
   stillOnPickup,
   stillStopsAt,
   stillWaitsToStart,
-} from '../machines.js?v=5d749d26';
+} from '../machines.js?v=93a736f2';
 import { STILL_ART_BOX, STILL_ART_CELL, stillArtFrame, stillArtState, stillSheetDef } from '../still-art.js?v=2eeb65ff';
 import { createSheetLoader } from '../sprite-sheets.js?v=d787e3c3';
-import { HERB_SEEDS, ITEM_TRANSFORMS, listTransformVerbs, runTransform, transformVerbCount } from '../item-transforms.js?v=3a1b5812';
+import { HERB_SEEDS, ITEM_TRANSFORMS, listTransformVerbs, runTransform, transformVerbCount } from '../item-transforms.js?v=35fd8c6e';
 import {
   BUREAUCRACY_ITEMS,
   HALL_STREETS,
@@ -97,7 +97,7 @@ import {
   clerkOffers,
   completePapers,
   completePapersCheck,
-} from '../bureaucracy.js?v=46df051e';
+} from '../bureaucracy.js?v=2154f98b';
 import { frameTexture, sourceFromUrl } from '../textures.js?v=b8e38103';
 import { setMetalMakingMusic } from '../sound-moments.js?v=3e66996f';
 import { itemZ } from '../item-bands.js?v=ec366be3';

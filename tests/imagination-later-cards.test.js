@@ -22,7 +22,7 @@ import {
   rollSlothBonusSnails,
   taskLimitMultiplier,
 } from '../public/js/imagination-effects.js?v=70169933';
-import { createInventory, countItem } from '../public/js/inventory.js?v=6414dbdc';
+import { createInventory, countItem } from '../public/js/inventory.js?v=3be7988a';
 import { createToolConditionState, getToolCondition, setToolRemaining } from '../public/js/tools.js?v=4156bba8';
 import {
   DEFAULT_TASK_LIMIT,
@@ -32,7 +32,7 @@ import {
   loadRecipeCatalogFromFile,
   makingSkillAdjustments,
   recipeTaskLimit,
-} from '../public/js/making.js?v=6cfac327';
+} from '../public/js/making.js?v=96afba25';
 import {
   assemblyCheck,
   assemblyEnergy,
@@ -43,7 +43,7 @@ import {
   finishMachineWork,
   startAssembly,
   startDisassembly,
-} from '../public/js/machines.js?v=5d749d26';
+} from '../public/js/machines.js?v=93a736f2';
 import {
   finishMeditation,
   levitationMinEnergy,
@@ -54,12 +54,12 @@ import {
 } from '../public/js/meditation.js?v=96f23682';
 import { skillPackageDetails } from '../public/js/skill-packages.js?v=bfb87281';
 import { strikeDamageFor } from '../public/js/rook-attack.js?v=5e62a79f';
-import { createMineRock, mineRock, tickMineRock } from '../public/js/mining.js?v=29eaf67f';
+import { createMineRock, mineRock, tickMineRock } from '../public/js/mining.js?v=7ecaa572';
 import { ROCK_RESPAWN_MS } from '../public/js/pace.js?v=c07dfbd8';
-import { runTransform, shuckDetails } from '../public/js/item-transforms.js?v=3a1b5812';
-import { brushFox, createFox, foxFiberRange } from '../public/js/foxes.js?v=4497a984';
+import { runTransform, shuckDetails } from '../public/js/item-transforms.js?v=35fd8c6e';
+import { brushFox, createFox, foxFiberRange } from '../public/js/foxes.js?v=c0ce235f';
 import { soundForMakingTool } from '../public/js/sound-moments.js?v=3e66996f';
-import { supplyFeature } from '../public/js/features/supply-feature.js?v=c4f57ae7';
+import { supplyFeature } from '../public/js/features/supply-feature.js?v=a948ba88';
 
 const SPIKE = join(dirname(fileURLToPath(import.meta.url)), '..', 'public');
 const seq = (...values) => {

@@ -119,7 +119,7 @@ import { PEAT_TEXT, retireSoloPeatQuest } from '../peat-quest.js?v=654cdb1b';
 import { retireDeadQuests, retiredQuestLine } from '../retired-quests.js?v=61758261';
 import { parseQuestConversation, questUnlockNotices } from '../quests.js?v=f68437db';
 import { questRequirementText, renderQuestText, withQuestMarkup } from '../quest-text.js?v=d0d07996';
-import { addItem, removeItem, countItem } from '../inventory.js?v=6414dbdc';
+import { addItem, removeItem, countItem } from '../inventory.js?v=3be7988a';
 import { getQuestCatalog } from '../content-catalogs.js?v=c9b84764';
 
 const OFFER_CHECK_MS = 30_000;

@@ -19,7 +19,7 @@ import {
   snoConeMelted,
   snoConeVerbLine,
 } from '../public/js/sno-cones.js?v=64e34b89';
-import { BEMOAN_VERB, snoConesFeature } from '../public/js/features/sno-cones-feature.js?v=141035ab';
+import { BEMOAN_VERB, snoConesFeature } from '../public/js/features/sno-cones-feature.js?v=5487f05c';
 import {
   applyAchievementProgress,
   createAchievementState,

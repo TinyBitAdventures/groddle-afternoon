@@ -53,7 +53,7 @@
  *   cubimalStep, cubimalInPack.
  */
 
-import { addItem, countItem, removeItem } from '../inventory.js?v=6414dbdc';
+import { addItem, countItem, removeItem } from '../inventory.js?v=3be7988a';
 import { copyForVerb, copyTag, copyTags, migrateClassTag, setCopyTag, takeToolCopy } from '../tools.js?v=4156bba8';
 import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=d787e3c3';
 import { landingY, walkSurfaceY } from '../walk-surface.js?v=3c919d5b';
@@ -77,10 +77,10 @@ import {
   isCubimal,
   nameCubimal,
   rollCubimalRace,
-} from '../cubimals.js?v=07f59f2f';
+} from '../cubimals.js?v=b83d6145';
 import { cleanCopyTagOf } from '../copy-tags.js?v=7eec7d48';
 import { packSlotFor } from '../pack-slot-qa.js?v=1d74bf2d';
-import { cubimalBattleLabel, cubimalBattleStats, cubimalTagName, cubimalTagWith } from '../cubimal-battle.js?v=f91166b0';
+import { cubimalBattleLabel, cubimalBattleStats, cubimalTagName, cubimalTagWith } from '../cubimal-battle.js?v=82bf52c9';
 import { standOnFeet } from '../sprite-feet.js?v=6358a697';
 
 export const CUBIMAL_RACE_FEATURE_ID = 'cubimal-race';
