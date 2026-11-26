@@ -8,7 +8,7 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { wordsOverNotices } from '../public/js/notify.js?v=4226f585';
+import { wordsOverNotices } from '../public/js/notify.js?v=c9d79ec5';
 
 const root = join(import.meta.dirname, '..');
 

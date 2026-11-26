@@ -594,7 +594,8 @@ function createSession(engine) {
       r.typingUntil = 0;
     }
     // The bubble shows a long line's start; Local keeps every word (chatBubbleText).
-    if (r) engine.say?.(r.target, chatBubbleText(text), BUBBLE_MS, { speaker: name });
+    // NAMES (#709): the bubble's name wears the colour their id gives it in chat.
+    if (r) engine.say?.(r.target, chatBubbleText(text), BUBBLE_MS, { speaker: name, speakerId: Number(id) || 0 });
     // RIGHTCLICK: who said it, so their name in Local opens their menu (js/ui/player-menu.js).
     // REACTIONS: the line's key (features/chat-reactions-feature.js claims your own lines' keys).
     (engine.hearLocal || engine.chatLine)?.(name, text, { playerId: Number(id) || 0, rk: lineKey(lid) });

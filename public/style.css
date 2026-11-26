@@ -878,6 +878,14 @@
   --c-classic-name-3: #55349f;            /* FROM FRAME */
   --c-classic-name-4: #34739f;            /* FROM FRAME */
   --c-classic-name-5: #6c5745;            /* FROM FRAME */
+  /* Modern's chat names and every speech bubble's name (#709, js/name-colours.js NAME_PALETTE): the six
+     above, the green and olive a shade darker again so each reads 4.5:1 on the cream panel (#fbf5ea). */
+  --c-chat-name-0: #5c7827;
+  --c-chat-name-1: #344b9f;
+  --c-chat-name-2: #806e29;
+  --c-chat-name-3: #55349f;
+  --c-chat-name-4: #34739f;
+  --c-chat-name-5: #6c5745;
   --c-classic-online-text: #4a7500;       /* an online contact's name: #548500 (code default) darkened to 4.5:1 on the strip */
   --c-classic-row-rule: #e2e2e2;          /* the Quest Log's row dividers: QuestsDialog.as 52-392 */
   --c-classic-req-done: #dbdbdb;          /* a met requirement pill, at .6: QuestsDialog.as */
@@ -10633,6 +10641,13 @@ html[data-street-cards] .notify-notices { visibility: hidden; }
 .social-msg { margin: 0; overflow-wrap: anywhere; }
 .social-msg b { font-weight: 800; color: var(--text); }
 .social-msg.is-mine b { color: var(--accent); }
+/* NAMES (#709, js/name-colours.js): another player's name wears their own colour, fixed by their id. */
+.social-msg b[data-name-colour="0"] { color: var(--c-chat-name-0); }
+.social-msg b[data-name-colour="1"] { color: var(--c-chat-name-1); }
+.social-msg b[data-name-colour="2"] { color: var(--c-chat-name-2); }
+.social-msg b[data-name-colour="3"] { color: var(--c-chat-name-3); }
+.social-msg b[data-name-colour="4"] { color: var(--c-chat-name-4); }
+.social-msg b[data-name-colour="5"] { color: var(--c-chat-name-5); }
 /* RIGHTCLICK (js/ui/player-menu.js): another player's name is a button that opens their menu; it
    reads as the name it was, with a pointer and an underline on hover, and the focus ring for the keys. */
 .social-msg .social-name {

@@ -11,7 +11,7 @@ import { readFileSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { READ_MAX_MS, READ_MIN_MS, READ_PER_WORD_MS, bubbleMs, holdMs, readMs, wordCount } from '../public/js/read-time.js?v=3151fb1a';
-import { NOTICE_KEEP_MS, createNotifier } from '../public/js/notify.js?v=4226f585';
+import { NOTICE_KEEP_MS, createNotifier } from '../public/js/notify.js?v=c9d79ec5';
 import { MEDITATION_TEXT } from '../public/js/meditation.js?v=96f23682';
 import { BUTLER_STRINGS, ownerGreeting } from '../public/js/butler.js?v=152429c8';
 

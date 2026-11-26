@@ -243,10 +243,10 @@ export function createNotifier({
   }
 
   /** Writes a line to the log (no notice). */
-  function log(text, { kind = 'info', html = null } = {}) {
+  function log(text, { kind = 'info', html = null, mine = false } = {}) {
     const plain = plainText(text);
     if (!plain) return null;
-    const entry = pushEntry({ id: ++seq, kind, text: plain, html, count: 1, at: clock() });
+    const entry = pushEntry({ id: ++seq, kind, text: plain, html, count: 1, at: clock(), ...(mine ? { mine: true } : {}) });
     changed('log');
     return entry;
   }
@@ -379,11 +379,11 @@ export function createNotifier({
     return log(text, { kind: 'moment' });
   }
 
-  /** A local chat line: the log in solo (scrollback), nothing in multiplayer (the chat log has it). */
-  function chat(text, { online = false } = {}) {
+  /** A local chat line: the log in solo (scrollback), nothing in multiplayer (the chat log has it). `mine`: yours (#709: your name keeps your colour). */
+  function chat(text, { online = false, mine = false } = {}) {
     if (online) return null;
     stats.chats += 1;
-    return log(text, { kind: 'chat' });
+    return log(text, { kind: 'chat', mine });
   }
 
   /**

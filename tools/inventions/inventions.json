@@ -6251,6 +6251,21 @@
    "rows": [
     "G681"
    ]
+  },
+  {
+   "id": "name-colours-per-player",
+   "title": "A player's name keeps one colour in chat and in their bubbles, fixed by their player id",
+   "kind": "UI",
+   "status": "kept",
+   "where": [
+    {
+     "file": "public/js/name-colours.js",
+     "symbol": "playerNameSlot"
+    }
+   ],
+   "why": "Glitch gave each speaker the next chat_element_others_N colour in the order they first spoke that session (RightSideManager.as 803-822 getPCColorIndex), so a name's colour changed between sessions; the bubbles used the same colour (AvaChatBubbleManager.as 117-119). Ours: the colour comes from the player's stable id, so it is the same across days and devices; your own name stays Modern's violet.",
+   "ruling": "Austin 2026-11-26 (report #709): colour names in Modern chat and speech bubbles, one fixed colour per player keyed by id, Glitch's palette, your own violet",
+   "rows": []
   }
  ]
 }

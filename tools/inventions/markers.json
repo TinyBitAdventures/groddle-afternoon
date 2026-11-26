@@ -44,6 +44,7 @@
     "ours: // G1246 (ours, Austin 2026-11-24: Glitch never showed a bag's": "ours-bag-sort-badge",
     "ours: // Only ours (important): Pixi's own inline size stays, under": "not-an-invention",
     "ours: // menu of ours ([data-ctx]) or a plain HUD button; text fields,": "right-click-menus",
+    "ours: 117-119); fixed by the player's id (ours), yours violet (Classic: Glitch's": "name-colours-per-player",
     "ours: Q+V render switch, 1916-1921), so this one is ours.": "ours-game-js-walkinput",
     "ours: hint for a line you already said in the chain (ours; Glitch said nothing), once a session.": "featured-project",
     "ours: in the back alley (npc_bureaucrat.js 897), not ours.": "not-an-invention",
@@ -875,6 +876,9 @@
   "public/js/musicblocks.js": {
     "no-source: * uncollected street\" had no source and is gone. Blocks come": "musicblock-street-blocks",
     "remake-own: * block waiting on every street: the remake's own \"one unowned block on": "musicblock-street-blocks"
+  },
+  "public/js/name-colours.js": {
+    "ours: * Ours (Austin 2026-11-26, #709): one fixed colour per": "name-colours-per-player"
   },
   "public/js/neighbours-mp.js": {
     "glitch-had-none: * on their home street to do that.\" Ours (Glitch had no pass: pols_canEnter read the": "visit-pass-renewal",

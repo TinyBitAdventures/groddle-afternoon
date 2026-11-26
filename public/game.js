@@ -4,7 +4,7 @@
  */
 import { ITEM_ICONS, ITEM_LABELS, getVerbsFor, ordinaryItems, runVerb } from './content.js?v=a87eb482';
 import { createErrorOnce, createFeatureHost, createFrameStages } from './js/feature-host.js?v=b87e2cbc';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=2dfc13c1';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=6a7f48ab';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, enterHintPick, reachGlowTargets, spriteHasRimArt, trimmedIconUrl, drawTileArt } from './js/enter-chooser.js?v=38d401c2';
 import { firstTendKey, STICK_TEND_DELAY_MS, STICK_TEND_DIRS, STICK_TEND_REPEAT_MS, stepTendKey, stepTendKeys, stickTendKey, tendKeyAction } from './js/garden-tend.js?v=a7470c4a';
 import { avatarHitBox, behindFloor, bodyReachDistance, OUT_OF_REACH_LINE, playerClickBox } from './js/reach.js?v=456da8a8';
@@ -1132,16 +1132,17 @@ import { QUOIN_FRAME_BOB, advanceQuoinClock, quoinBobBetweenFrames } from './js/
 import { installHiresFirstDraw, installHiresSprites, upgradeSource } from './js/sprite-hires.js?v=e96be5f1';
 import { textureBytes } from './js/onscreen-sharp.js?v=75b8a30d';
 import { wholeStatAmounts, wholeEffects } from './js/stat-text.js?v=f96d8fd3';
-import { createNotifier, effectTokens, floatKey, offerCardDrop, stackFloat, tokenText, wordsOverNotices } from './js/notify.js?v=4226f585';
+import { createNotifier, effectTokens, floatKey, offerCardDrop, stackFloat, tokenText, wordsOverNotices } from './js/notify.js?v=c9d79ec5';
 import { flyItemToPack, noteFlown, unflownItems } from './js/pack-flight.js?v=8da4ab78';
 import { createMusicVoice } from './js/music-voice.js?v=75c8cf57';
 import { contextNeedsResume, createAudioResumer } from './js/audio-resume.js?v=440d0096';
 import { backgroundSound, backgroundSoundOn } from './js/background-sound.js?v=d40d26b7';
 import { bubbleMs } from './js/read-time.js?v=3151fb1a';
-import { mountNotifyView } from './js/notify-view.js?v=0fbfad68';
-import { mountSocialDrawer } from './js/ui/social-drawer.js?v=06c37291';
+import { mountNotifyView } from './js/notify-view.js?v=18b4efca';
+import { mountSocialDrawer } from './js/ui/social-drawer.js?v=140c3302';
 import { installPhonePill, mountPhoneLayout, socialPillCount } from './js/ui/phone-layout.js?v=703775b3';
 import { bindChatLinks } from './js/chat-links.js?v=b717fac7';
+import { playerNameColour } from './js/name-colours.js?v=9819bb8a';
 import { SIDE_SHEET_IDS, bindTabs, inSideSheet, mountPanelShell, sheetKeyToWorld } from './js/ui/panel-shell.js?v=5efb38c6';
 import { createQuestSheet, failedQuestPin, questLogNeedsSwap, questStep, visibleRowCount } from './js/ui/quest-sheet.js?v=e2f83677';
 import { resolveQuestPins } from './js/features/quest-pins-feature.js?v=0e07d9a1';
@@ -1188,7 +1189,7 @@ import { filterText } from './js/word-filter.js?v=9a7a7ebb'; // the remake's own
 import { mountStartStreet } from './js/start-street.js?v=7d8ce49c'; // #349: the start card names the save's street
 import { arrangeMapCards, fitMapExtras } from './js/map-extras.js?v=16e261b1'; // the Map's Shortcuts
 // The interface skin (js/classic/ui-mode.js) sets <html data-ui> as it loads: before main(), so before the boot cover lifts.
-import { installInterfaceSettings } from './js/classic/classic-prefs.js?v=fb284753';
+import { installInterfaceSettings } from './js/classic/classic-prefs.js?v=669e179a';
 import { standOnFeet, anchorBottomCentre } from './js/sprite-feet.js?v=6358a697';
 import { markLeaving, packPicks, takeCopies } from './js/copy-picks.js?v=b368fd49';
 import { holdKeepsBusy } from './js/instance-holds.js?v=ff3a63a3';
@@ -9265,10 +9266,17 @@ function showSpeechBubble(target, speech) {
   } });
   // G357: only a player's bubble names its speaker; the tail already shows who an NPC is.
   const named = target.classId === 'pc_player' || target.classId === 'pc_remote';
-  const speaker = new PIXI.Text({ text: named ? String(speech.speaker || target.label || '') : '', style: {
+  const speakerName = named ? String(speech.speaker || target.label || '') : '';
+  // NAMES (#709, js/name-colours.js): the name in the colour it wears in chat, as Glitch's bubbles did
+  // (AvaChatBubbleManager.as 117-119); fixed by the player's id (ours), yours violet (Classic: Glitch's red).
+  const speakerFill = playerNameColour(speech.speakerId ?? target.playerId, speakerName, {
+    mine: target.classId === 'pc_player',
+    classic: document.documentElement.dataset.ui === 'classic',
+  });
+  const speaker = new PIXI.Text({ text: speakerName, style: {
     fontFamily: WORLD_FONT_FAMILY,
     fontSize: 12,
-    fill: 0x7f6c55,
+    fill: speakerFill,
     fontWeight: '700',
     letterSpacing: 0.4,
   } });
@@ -30116,7 +30124,7 @@ function sayLocalChat(message, participant = 'Ur', { quietActivity = false } = {
   } else if (!quietActivity && participant === 'Ur' && !socialDrawer) {
     // NOTIFY: chat stays in chat (bubble and dock); solo keeps it in the Activity log for scrollback
     // (the modern skin's drawer already logged it through showLocalChatBubble).
-    notify.chat(`${shown}: ${text}`, { online: GAME_MODE === 'multiplayer' });
+    notify.chat(`${shown}: ${text}`, { online: GAME_MODE === 'multiplayer', mine: true });
   }
   return result;
 }

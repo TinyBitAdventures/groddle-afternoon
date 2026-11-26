@@ -13,7 +13,7 @@
  */
 import { uiState, onUiModeChange } from './ui-mode.js?v=792d8160';
 import { readMs } from '../read-time.js?v=3151fb1a';
-import { NOTICE_KEEP_MS } from '../notify.js?v=4226f585';
+import { NOTICE_KEEP_MS } from '../notify.js?v=c9d79ec5';
 
 export const GROWL_IN_MS = 200;
 export const GROWL_HOLD_MS = 4000;

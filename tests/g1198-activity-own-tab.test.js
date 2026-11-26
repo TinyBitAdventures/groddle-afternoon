@@ -6,8 +6,8 @@
  */
 import { describe, it, before, after } from 'node:test';
 import assert from 'node:assert/strict';
-import { mountSocialDrawer } from '../public/js/ui/social-drawer.js?v=06c37291';
-import { createNotifier } from '../public/js/notify.js?v=4226f585';
+import { mountSocialDrawer } from '../public/js/ui/social-drawer.js?v=140c3302';
+import { createNotifier } from '../public/js/notify.js?v=c9d79ec5';
 import { memoryStore, page } from './social-fake-dom.js';
 
 describe('G1198: Activity lines stay in the Activity tab online', () => {

@@ -29,7 +29,7 @@ import {
   NOTICE_KEEP_MS,
   NOTICE_WAIT_LIMIT,
   NOTICE_MAX_MS,
-} from '../public/js/notify.js?v=4226f585';
+} from '../public/js/notify.js?v=c9d79ec5';
 import { readMs } from '../public/js/read-time.js?v=3151fb1a';
 import { REMAKE_SCREEN_GATES, SCREEN_GATES, screenQueueHold, waitForScreenGates } from '../public/js/screen-queue.js?v=cf0132c0';
 

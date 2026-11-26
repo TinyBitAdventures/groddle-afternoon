@@ -242,7 +242,7 @@ describe('the chat box: wired', () => {
     assert.match(game, /showLocalCompanionSpeech\(participant, chatBubbleText\(text\), \{/);
     assert.match(game, /showLocalChatBubble\(shown, text, \{/, 'the chat gets the whole line');
     const rt = read('public/js/features/realtime-feature.js');
-    assert.match(rt, /engine\.say\?\.\(r\.target, chatBubbleText\(text\), BUBBLE_MS, \{ speaker: name \}\);/);
+    assert.match(rt, /engine\.say\?\.\(r\.target, chatBubbleText\(text\), BUBBLE_MS, \{ speaker: name, speakerId: Number\(id\) \|\| 0 \}\);/);
     assert.match(rt, /\(engine\.hearLocal \|\| engine\.chatLine\)\?\.\(name, text, \{/, 'Local gets the whole line');
   });
 

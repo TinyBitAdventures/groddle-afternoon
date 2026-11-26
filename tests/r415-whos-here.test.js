@@ -9,8 +9,8 @@ import { describe, it, before, after } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { memoryStore, page } from './social-fake-dom.js';
-import { mountSocialDrawer } from '../public/js/ui/social-drawer.js?v=06c37291';
-import { createNotifier } from '../public/js/notify.js?v=4226f585';
+import { mountSocialDrawer } from '../public/js/ui/social-drawer.js?v=140c3302';
+import { createNotifier } from '../public/js/notify.js?v=c9d79ec5';
 import { WHOS_HERE_TEXT, streetOthers, whosHereView } from '../public/js/whos-here.js?v=cb52c987';
 
 describe('js/whos-here.js', () => {

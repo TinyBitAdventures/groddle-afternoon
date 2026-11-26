@@ -107,11 +107,12 @@
  * socialChats (the list's ids in order), socialUnread (id:n,... for every tab and conversation with
  * news, chats:n the Chats total); window.groddleSocial.
  */
-import { colorizeAmounts } from '../notify-view.js?v=0fbfad68';
+import { colorizeAmounts } from '../notify-view.js?v=18b4efca';
 import { bindContextTrigger, MORE_KEYS_LABEL } from './context-menu.js?v=587d8585';
 import { IM_VERB_ID } from '../player-im.js?v=87bdb8ec';
 import { selectionCovers } from './context-guard.js?v=0f71ac17';
 import { appendLinkedText, linkifyTextNodes } from '../chat-links.js?v=b717fac7';
+import { playerNameSlot } from '../name-colours.js?v=9819bb8a';
 import { bindChatInput } from './chat-input.js?v=8f2479a3';
 import { createNodeCache, pressLeavesKeys, reconcileChildren, uniqueKeys } from './keyed-nodes.js?v=9ab4de5c';
 import { createReactionUI } from './reaction-strip.js?v=3de815f3';
@@ -1027,8 +1028,10 @@ export function mountSocialDrawer({
   function lineNode(line) {
     if (line.sep) return el('div', { class: 'social-time', 'data-social-time': '' }, line.sep);
     if (line.note) return el('p', { class: 'social-msg is-note' }, line.text);
-    const p = el('p', { class: `social-msg${line.mine ? ' is-mine' : ''}${line.feat ? ' is-feat' : ''}` });
-    const who = el('b', {});
+    const yours = line.mine || line.own;
+    const p = el('p', { class: `social-msg${yours ? ' is-mine' : ''}${line.feat ? ' is-feat' : ''}` });
+    // NAMES (#709, js/name-colours.js): another player's name wears their own colour, the one their bubble uses.
+    const who = el('b', yours ? {} : { 'data-name-colour': String(playerNameSlot(line.playerId, line.name || 'Someone')) });
     if (online && playerMenu && !line.mine && line.playerId > 0) who.append(nameButton(line));
     else who.textContent = line.mine ? 'You' : line.name || 'Someone';
     p.append(who, document.createTextNode(' '));
@@ -1082,7 +1085,8 @@ export function mountSocialDrawer({
     if (e.sep) return lineNode(e);
     if (e.kind === 'chat') {
       const said = splitChat(e.text);
-      if (said) return lineNode({ name: said.name, text: said.text });
+      // #709: your own line keeps your name and your colour (violet), not a palette one.
+      if (said) return lineNode({ name: said.name, text: said.text, own: Boolean(e.mine) });
       return el('p', { class: 'social-msg' }, e.text);
     }
     const row = el('div', { class: 'social-act', 'data-kind': e.kind });
@@ -2335,7 +2339,7 @@ export function mountSocialDrawer({
     localLine(name, text, { mine = false, feat = false, playerId = 0, rk = '' } = {}) {
       if (online) return api.push('local', { name, text, mine, feat, playerId, rk });
       if (mine) saidOwn('activity');
-      notifier.chat(`${name}: ${text}`);
+      notifier.chat(`${name}: ${text}`, { mine });
       return true;
     },
     /** The notifier changed (game.js notify onChange). */

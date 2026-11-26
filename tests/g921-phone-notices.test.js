@@ -11,7 +11,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { BESIDE_MIN_W, clearOfControls, noticesBetweenControls } from '../public/js/notify-view.js?v=0fbfad68';
+import { BESIDE_MIN_W, clearOfControls, noticesBetweenControls } from '../public/js/notify-view.js?v=18b4efca';
 import { PIN_LINE_GAP, pinLineDrop } from '../public/js/ui/quest-pin-button.js?v=2931d81d';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');

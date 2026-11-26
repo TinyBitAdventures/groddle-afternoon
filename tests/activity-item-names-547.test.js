@@ -5,7 +5,7 @@
  */
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
-import { colorizeAmounts } from '../public/js/notify-view.js?v=0fbfad68';
+import { colorizeAmounts } from '../public/js/notify-view.js?v=18b4efca';
 
 const gains = (html) => [...html.matchAll(/<span class="act-(gain|loss)">([^<]*)<\/span>/g)].map((m) => `${m[1]}:${m[2]}`);
 
