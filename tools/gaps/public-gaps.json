@@ -6199,6 +6199,82 @@
       "commits": [
         "game:0b33cf6e607"
       ]
+    },
+    {
+      "id": "F158",
+      "area": "Multiplayer",
+      "text": "A laptop window left open and asleep could take your character back when it woke, hiding your house's floor things on the device you were using.",
+      "show": "fixing",
+      "commits": [
+        "game:f12aed2a10c",
+        "game:88c9dd8e9e3"
+      ]
+    },
+    {
+      "id": "F159",
+      "area": "Multiplayer",
+      "text": "Choosing Keep this window's game could lose something the site had just given back, such as a returned Still, on the window's next save.",
+      "show": "fixing",
+      "commits": [
+        "game:923369f7bc3",
+        "site:94ceedb"
+      ]
+    },
+    {
+      "id": "F160",
+      "area": "Phones",
+      "text": "On a phone, the Menu listed Social near the bottom.",
+      "show": "fixing",
+      "commits": [
+        "game:b8d5e38b542"
+      ]
+    },
+    {
+      "id": "F161",
+      "area": "Homes",
+      "text": "A thing that ended up under the house floor could not be reached or picked up.",
+      "show": "fixing",
+      "commits": [
+        "game:13ff6a59809"
+      ]
+    },
+    {
+      "id": "F162",
+      "area": "Items",
+      "text": "A long description in an item's menu squeezed its actions into two or three rows.",
+      "show": "fixing",
+      "commits": [
+        "game:6203462daac"
+      ]
+    },
+    {
+      "id": "F163",
+      "area": "Phones",
+      "text": "On an iPad, the Change your street style pictures stayed blank.",
+      "show": "fixing",
+      "commits": [
+        "game:e63fd99d456"
+      ]
+    },
+    {
+      "id": "F164",
+      "area": "Homes",
+      "text": "A machine refused for standing too close to the others never said why, and a machine dragged from the pack outside Decoration Mode was left as a loose item.",
+      "show": "fixing",
+      "commits": [
+        "game:1f1b5562942",
+        "game:7643094a298",
+        "site:9ffca6e"
+      ]
+    },
+    {
+      "id": "F165",
+      "area": "Streets",
+      "text": "A few Visiting Stones, East Spice's among them, stood away from their street's end.",
+      "show": "fixing",
+      "commits": [
+        "game:b73bfdfab23"
+      ]
     }
   ]
 }

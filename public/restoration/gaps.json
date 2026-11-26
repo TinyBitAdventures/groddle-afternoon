@@ -1,6 +1,6 @@
 {
   "note": "Written by tools/gaps/build-data.mjs from tools/gaps/public-gaps.json and the coverage register. Edit those, never this file.",
-  "release": "v0.76.0",
+  "release": "v0.77.0",
   "states": {
     "fixing": {
       "label": "Being fixed",
@@ -42,7 +42,7 @@
     "fixing": 3,
     "known": 15,
     "unreleased": 0,
-    "fixed": 620,
+    "fixed": 628,
     "lost": 5,
     "purpose": 18,
     "idea": 10
@@ -780,6 +780,12 @@
           "text": "Progress Way's camera pan to the Street Spirit and the cave-in hint in Intate Treats never happened.",
           "state": "fixed",
           "version": "v0.76.0"
+        },
+        {
+          "id": "F165",
+          "text": "A few Visiting Stones, East Spice's among them, stood away from their street's end.",
+          "state": "fixed",
+          "version": "v0.77.0"
         }
       ]
     },
@@ -1127,6 +1133,12 @@
           "text": "Old Teleportation Scripts couldn't be sold or given to a shrine.",
           "state": "fixed",
           "version": "v0.63.0"
+        },
+        {
+          "id": "F162",
+          "text": "A long description in an item's menu squeezed its actions into two or three rows.",
+          "state": "fixed",
+          "version": "v0.77.0"
         },
         {
           "id": "G174",
@@ -1509,6 +1521,18 @@
           "text": "In Decoration Mode, moving a thing from the floor onto a table was refused unless you stood next to it.",
           "state": "fixed",
           "version": "v0.75.0"
+        },
+        {
+          "id": "F161",
+          "text": "A thing that ended up under the house floor could not be reached or picked up.",
+          "state": "fixed",
+          "version": "v0.77.0"
+        },
+        {
+          "id": "F164",
+          "text": "A machine refused for standing too close to the others never said why, and a machine dragged from the pack outside Decoration Mode was left as a loose item.",
+          "state": "fixed",
+          "version": "v0.77.0"
         },
         {
           "id": "G48",
@@ -2250,6 +2274,18 @@
           "text": "After using the browser's back button, machines, chat and other shared actions stopped working until you signed in again.",
           "state": "fixed",
           "version": "v0.73.0"
+        },
+        {
+          "id": "F158",
+          "text": "A laptop window left open and asleep could take your character back when it woke, hiding your house's floor things on the device you were using.",
+          "state": "fixed",
+          "version": "v0.77.0"
+        },
+        {
+          "id": "F159",
+          "text": "Choosing Keep this window's game could lose something the site had just given back, such as a returned Still, on the window's next save.",
+          "state": "fixed",
+          "version": "v0.77.0"
         }
       ]
     },
@@ -2757,6 +2793,18 @@
           "text": "On an iPhone held upright, some dialogs and cards sat under the status bar's haze.",
           "state": "fixed",
           "version": "v0.75.0"
+        },
+        {
+          "id": "F160",
+          "text": "On a phone, the Menu listed Social near the bottom.",
+          "state": "fixed",
+          "version": "v0.77.0"
+        },
+        {
+          "id": "F163",
+          "text": "On an iPad, the Change your street style pictures stayed blank.",
+          "state": "fixed",
+          "version": "v0.77.0"
         }
       ]
     },
