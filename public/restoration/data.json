@@ -2814,9 +2814,24 @@
   "deployed": "2026-11-26"
  },
  "git": {
-  "commits": 3714,
+  "commits": 3717,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-26",
+    "kind": "fix",
+    "text": "Online pages no longer log a 404 in the console for each player below level 5 on the street"
+   },
+   {
+    "date": "2026-11-26",
+    "kind": "improve",
+    "text": "on a phone the Menu shows Social right after Now"
+   },
+   {
+    "date": "2026-11-26",
+    "kind": "fix",
+    "text": "a window that slept shows \"Play here\" instead of taking your character back"
+   },
    {
     "date": "2026-11-26",
     "kind": "fix",
@@ -2921,24 +2936,9 @@
     "date": "2026-11-26",
     "kind": "fix",
     "text": "Apple a Day gives its +5 energy when it ends, and timed buffs' end effects land"
-   },
-   {
-    "date": "2026-11-26",
-    "kind": "fix",
-    "text": "Floating gains (harvest, mining, petting, items, mood, energy, iMG) stay up 2.4 s, as Glitch's did"
-   },
-   {
-    "date": "2026-11-26",
-    "kind": "fix",
-    "text": "Rocks, trees, nodes and animals stand in the same spots solo as online"
-   },
-   {
-    "date": "2026-11-26",
-    "kind": "fix",
-    "text": "Animated decos drawn larger than their art are sharp again"
    }
   ]
  },
- "tests": 1437,
+ "tests": 1438,
  "generatedAt": "2026-11-26"
 }
