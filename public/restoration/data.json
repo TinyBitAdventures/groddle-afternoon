@@ -2814,9 +2814,14 @@
   "deployed": "2026-11-25"
  },
  "git": {
-  "commits": 3645,
+  "commits": 3647,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-25",
+    "kind": "fix",
+    "text": "A new player taken off Gentle Island mid-tutorial is no longer refused every road onward"
+   },
    {
     "date": "2026-11-25",
     "kind": "fix",
@@ -2926,14 +2931,9 @@
     "date": "2026-11-25",
     "kind": "improve",
     "text": "On a phone held upright the pinned quest sits just above the pack row, under the stick, so it no longer covers the street"
-   },
-   {
-    "date": "2026-11-25",
-    "kind": "new",
-    "text": "A Giant Icon placed in a home is shared: everyone's uses spend its actions, and visitors can tithe it"
    }
   ]
  },
- "tests": 1413,
+ "tests": 1414,
  "generatedAt": "2026-11-25"
 }
