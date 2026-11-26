@@ -240,9 +240,11 @@ describe('the site side (groddle-afternoon-site)', { skip: skipWithoutSite }, ()
       'Put /groddle/v1/profile/home-layout SignedIn',
       'Put /groddle/v1/profile/tower SignedIn',
     ]);
+    // G1326: the game's Open Profile Page asks this instead of fetching the page; a REST route, so it is
+    // never among PlayerPages' page routes (v0.54.0 had it there and it answered only outside /wp-json/).
+    assert.deepEqual(routes('PlayerPageListing.php'), ['Get /groddle/v1/players/{id:[1-9][0-9]{0,18}}/page Public']);
+    assert.match(ext, /\$minn->rest\([^;]*new PlayerPageListing\(\$minn\)/);
     assert.deepEqual(routes('PlayerPages.php'), [
-      // G1326: the game's Open Profile Page asks this instead of fetching the page.
-      'Get /groddle/v1/players/{id:[1-9][0-9]{0,18}}/page Public',
       'Get /players Public',
       'Get /players/ Public',
       'Get /players/{id:\\d+}/snaps/{snap:\\d+}/{kind:picture|small|download} Public',

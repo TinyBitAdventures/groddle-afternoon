@@ -6,7 +6,7 @@
  * (PlayerPages.php find), and says why when they have no public page (below level 5:
  * Profiles::LISTED_LEVEL). Multiplayer only.
  *
- * G1326 (Austin 2026-11-26): the game asks the site groddle/v1/players/<id>/page (PlayerPages.php
+ * G1326 (Austin 2026-11-26): the game asks the site groddle/v1/players/<id>/page (PlayerPageListing.php
  * listing(): 200 { listed, url }) instead of fetching each street player's page, which logged a
  * console 404 for every player below level 5. The route and the page read one rule (shown()); on a
  * throwaway database (tests/fixtures/profiles/page-listing.php) the two agree for every reader. A
@@ -25,7 +25,7 @@ import { HAS_PHP, PHP, phpSkip } from './php.js';
 
 const realFetch = globalThis.fetch;
 const ROUTE = (id) => `https://groddle.localhost/wp-json/groddle/v1/players/${id}/page`;
-/** The site's answer to the route (PlayerPages.php listing()). */
+/** The site's answer to the route (PlayerPageListing.php listing()). */
 const listed = (body, status = 200) => ({ ok: status >= 200 && status < 300, status, url: '', json: async () => body });
 afterEach(() => {
   globalThis.fetch = realFetch;
@@ -237,14 +237,20 @@ describe('the game wiring and the site', () => {
     assert.match(profiles, new RegExp(`public const LISTED_LEVEL = ${PROFILE_LISTED_LEVEL};`));
   });
 
-  it('the site answers groddle/v1/players/<id>/page, and the page and the route read one rule (shown())', { skip: skipWithoutSite }, () => {
+  it('the site answers groddle/v1/players/<id>/page as a REST route, and the page and the route read one rule (shown())', { skip: skipWithoutSite }, () => {
     const pages = readFileSync(join(SITE_DIR, 'src/PlayerPages.php'), 'utf8');
-    assert.match(pages, /#\[Route\(Method::Get, '\/groddle\/v1\/players\/\{id:\[1-9\]\[0-9\]\{0,18\}\}\/page', policy: new Policy\(Access::Public\)\)\]\n\s+public function listing\(/);
+    const listingSrc = readFileSync(join(SITE_DIR, 'src/PlayerPageListing.php'), 'utf8');
+    assert.match(listingSrc, /#\[Route\(Method::Get, '\/groddle\/v1\/players\/\{id:\[1-9\]\[0-9\]\{0,18\}\}\/page', policy: new Policy\(Access::Public\)\)\]\n\s+public function listing\(/);
+    // v0.54.0 had it among PlayerPages' page routes, so it answered at /groddle/v1/... and the game's /wp-json/ call got a 404:
+    // it must be a REST controller (Seams::rest) and never a page route.
+    const ext = readFileSync(join(SITE_DIR, 'src/Extension.php'), 'utf8');
+    assert.match(ext, /\$minn->rest\([^;]*new PlayerPageListing\(\$minn\)/);
+    assert.doesNotMatch(pages, /\/groddle\/v1\//, 'no REST path among the page routes');
     const who = pages.slice(pages.indexOf('private function who('), pages.indexOf("'buddyCount' =>"));
     assert.match(who, /self::shown\(\$db, \$id, \$this->minn->reader->userId\) \?\? throw new RouteMiss\(\)/);
     assert.doesNotMatch(who, /LISTED_LEVEL|banned\(/, 'the rule lives in shown() alone');
-    const listing = pages.slice(pages.indexOf('public function listing('));
-    assert.match(listing.slice(0, listing.indexOf('\n    }\n')), /self::shown\(/);
+    const listing = listingSrc.slice(listingSrc.indexOf('public function listing('));
+    assert.match(listing.slice(0, listing.indexOf('\n    }\n')), /PlayerPages::shown\(/);
   });
 
   it('PHP lint', { skip: phpSkip() || skipWithoutSite }, () => {

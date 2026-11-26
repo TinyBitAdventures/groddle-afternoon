@@ -1,7 +1,7 @@
 <?php
 /**
  * Runs the site repo's groddle/v1/players/<id>/page (G1326: groddle-afternoon-site
- * src/PlayerPages.php listing(), shown()) against a throwaway MariaDB database and prints what
+ * src/PlayerPageListing.php listing(), PlayerPages::shown()) against a throwaway MariaDB database and prints what
  * happened as JSON (tests/profile-page-verb.test.js): for each made-up character and reader, what
  * the route answers and what the profile page itself answers, so the two are seen to follow one
  * rule. The database (test_groddle_listing_<hex>) is made here and dropped at the end.
@@ -30,6 +30,7 @@ use Groddle\Minn\AdminConsole;
 use Groddle\Minn\Characters;
 use Groddle\Minn\Logins;
 use Groddle\Minn\MultiplayerSave;
+use Groddle\Minn\PlayerPageListing;
 use Groddle\Minn\PlayerPages;
 use Groddle\Minn\Profiles;
 use Groddle\Minn\StaticRoot;
@@ -124,9 +125,9 @@ try {
         }
     };
     $pages = static fn (int $as, Request $r): PlayerPages => new PlayerPages($seams($as, $r), StaticRoot::fromSite($seams($as, $r)));
-    $listing = static function (int $as, int $id) use ($request, $pages, $answer): array {
+    $listing = static function (int $as, int $id) use ($request, $seams, $answer): array {
         $r = $request(Method::Get, "/groddle/v1/players/{$id}/page");
-        return $answer(static fn (): Response => $pages($as, $r)->listing($r, (string) $id));
+        return $answer(static fn (): Response => (new PlayerPageListing($seams($as, $r)))->listing($r, (string) $id));
     };
     $profile = static function (int $as, string $slug) use ($request, $pages, $answer): int {
         $r = $request(Method::Get, "/players/{$slug}/");
@@ -134,7 +135,7 @@ try {
     };
 
     // The route's shape: attribute, method and path, public and read-only.
-    $method = new ReflectionMethod(PlayerPages::class, 'listing');
+    $method = new ReflectionMethod(PlayerPageListing::class, 'listing');
     $route = $method->getAttributes(Minn\Http\Route::class)[0]->newInstance();
     $out['route'] = [$route->method->name, $route->pattern, $route->policy?->access->name];
 
