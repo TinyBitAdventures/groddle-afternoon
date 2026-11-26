@@ -627,8 +627,11 @@ export function signDecoDrawn(street, signpost) {
  * middleground's filters, null for none), as the client's posts, children of the middleground,
  * took that layer's filters: on a dark street (Lotha Harte, Kristel Kaos) the post and arms are
  * near black. The words stay as they are (the 2012 Lotha Harte street template shows white words
- * on the dark arms), and so do the hover and route glows. A lift drawn as its deco takes it on
- * its art and plate. One filter, shared by the parts.
+ * on the dark arms). An arm's hover glow takes it after its blur (#721): the client's street filter
+ * sat on SignpostView's holder (ApplyLayerFiltersToViewCmd.as 47), round the arms and the glow on
+ * each arm (SignpostView.as 367 tsSprite_GlowA), so in a greyscale region (Brillah) the glow is grey.
+ * The route glow (map-routes-feature placeSignGlow) is ours and stays yellow. A lift drawn as its
+ * deco takes it on its art, plate and glow. One filter, shared by the parts.
  * @param {PIXI.Container} g  a view from buildSignpostSprite or buildSignDecoView
  * @param {any} colour
  * @returns {number} how many parts took it
@@ -641,6 +644,9 @@ export function colourSignpost(g, colour) {
       if (SIGN_WOOD.has(child.label)) {
         child.filters = [colour];
         n += 1;
+      } else if (SIGN_GLOWS.has(child.label)) {
+        child.filters = [...(child.filters || []).filter((f) => f !== colour), colour];
+        n += 1;
       } else if (child.children?.length) walk(child);
     }
   };
@@ -650,6 +656,8 @@ export function colourSignpost(g, colour) {
 }
 /** The parts of a signpost that are painted wood (colourSignpost). */
 const SIGN_WOOD = new Set(['sign-shadow', 'sign-post', 'sign-arm', 'sign-deco-art', 'sign-deco-plate']);
+/** The hover glows, which take the colour after their blur (colourSignpost, #721). */
+const SIGN_GLOWS = new Set(['sign-glow', 'sign-deco-glow']);
 
 /** The most arms a post draws: one for each number key. */
 export const SIGN_MAX_ARMS = 9;
