@@ -20,7 +20,7 @@ import {
   aboutCounter, aboutLength, avatarKeyOf, base64Bytes, cleanAbout, homeKeyOf, homeSizes, imageBase64, pngBase64, profileSlug, shortHash, shouldUpload, stillTransform,
 } from '../public/js/profiles.js?v=7e94c96f';
 import { createMinnAccount } from '../public/js/minn-account.js?v=7e3d7279';
-import { FEATURES } from '../public/js/features/index.js?v=43e5be3a';
+import { FEATURES } from '../public/js/features/index.js?v=41adcc62';
 import { SITE_DIR, skipWithoutSite } from '../tools/repos.mjs';
 import { loadContentCatalogsFromDir, getSkillCatalog } from '../public/js/content-catalogs.js?v=c9b84764';
 import { skillTitle } from '../public/js/skill-tree.js?v=a67622a8';
@@ -241,6 +241,8 @@ describe('the site side (groddle-afternoon-site)', { skip: skipWithoutSite }, ()
       'Put /groddle/v1/profile/tower SignedIn',
     ]);
     assert.deepEqual(routes('PlayerPages.php'), [
+      // G1326: the game's Open Profile Page asks this instead of fetching the page.
+      'Get /groddle/v1/players/{id:[1-9][0-9]{0,18}}/page Public',
       'Get /players Public',
       'Get /players/ Public',
       'Get /players/{id:\\d+}/snaps/{snap:\\d+}/{kind:picture|small|download} Public',
@@ -280,8 +282,11 @@ describe('the site side (groddle-afternoon-site)', { skip: skipWithoutSite }, ()
   it('a suspended player is off the Players page, and their page and pictures answer 404 briefly cached', () => {
     const pages = site('src/PlayerPages.php');
     assert.match(pages, /\$listed \.= ' AND NOT ' \. AdminConsole::bannedSql\(\$db, 'c\.user_id'\);/);
+    // The profile's rule (shown(), G1326), which every page of a profile and groddle/v1/players/<id>/page read.
     const tab = pages.slice(pages.indexOf('private function tab('), pages.indexOf('public function buddy('));
-    assert.match(tab, /if \(AdminConsole::banned\(\$db, \$id\) !== null\) \{\s+throw new RouteMiss\(\);/);
+    assert.match(tab, /self::shown\(\$db, \$id, \$this->minn->reader->userId\) \?\? throw new RouteMiss\(\);/);
+    const shown = pages.slice(pages.indexOf('public static function shown('), pages.indexOf('public function listing('));
+    assert.match(shown, /if \(AdminConsole::banned\(\$db, \$id\) !== null\) \{\s+return null;/);
     const image = pages.slice(pages.indexOf('public function image('), pages.indexOf('private function find('));
     assert.match(image, /AdminConsole::banned\(\$db, \(int\) \$id\) !== null\) \{\s+return new Response\(404, \[[^\]]*'Cache-Control' => 'public, max-age=' \. self::MISS_KEEP/);
     assert.match(pages, /public const MISS_KEEP = 60;/);
@@ -394,7 +399,7 @@ describe('only characters from level 5 are public (Austin 2026-10-26)', () => {
     const pages = readFileSync(join(SITE_DIR, 'src/PlayerPages.php'), 'utf8');
     assert.match(prof, /public const LISTED_LEVEL = 5;/);
     assert.match(pages, /AND " \. Profiles::levelSql\('s'\) \. ' >= ' \. Profiles::LISTED_LEVEL;/);
-    assert.match(pages, /if \(\$facts\['level'\] < Profiles::LISTED_LEVEL && !\$own\) \{\n\s+throw new RouteMiss\(\);/);
+    assert.match(pages, /if \(\$facts\['level'\] < Profiles::LISTED_LEVEL && \$reader !== \$id\) \{\n\s+return null;/, 'shown(), the profile\'s rule (G1326)');
     assert.match(pages, /if \(!\$listed && \$this->minn->reader->userId !== \(int\) \$id\) \{\n\s+throw new RouteMiss\(\);/);
     assert.match(pages, /!\$listed \? 'private, no-store'/);
   });
@@ -410,7 +415,7 @@ describe('a profile\'s pages: skills, badges and buddies (G338, Glitch\'s /profi
     assert.match(src, /private const TABS = \['' => 'Profile', 'snaps' => 'Snaps', 'skills' => 'Skills', 'achievements' => 'Badges', 'buddies' => 'Buddies'\];/);
     assert.match(src, /public function profile\(Request \$request, string \$slug\): Response\n\s+\{\n\s+return \$this->tab\(\$request, \$slug, ''\);/);
     assert.match(src, /public function subpage\(Request \$request, string \$slug, string \$tab\): Response\n\s+\{\n\s+return \$this->tab\(\$request, \$slug, \$tab\);/);
-    assert.equal([...src.matchAll(/Profiles::LISTED_LEVEL && !\$own\)/g)].length, 1, 'one level check, shared by all four pages');
+    assert.equal([...src.matchAll(/Profiles::LISTED_LEVEL && \$reader !== \$id\)/g)].length, 1, 'one level check (shown()), shared by all four pages and groddle/v1/players/<id>/page');
   });
 
   it('lists only buddies who are public, and never one who ignores the player or whom they ignore', () => {

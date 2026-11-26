@@ -125,9 +125,50 @@ function pageFor(id, name) {
 }
 
 /**
- * Looks up one player's page (a same-origin GET; below level 5 the site answers 404). The entry
- * is in `pages` at once (status '' until the answer), so a menu drawn meanwhile does not ask again.
- * When the answer lands, a menu open for that player is drawn again (engine.refreshPlayerMenu).
+ * G1326: whether the site has groddle/v1/players/<id>/page (PlayerPages.php listing()). An older
+ * site answers the route itself 404; from then on this page asks the profile page, as before.
+ */
+let listingRoute = true;
+
+/** The page's own address as the site gives it (/players/<slug>/), else null. */
+const OWN_PAGE = /^\/players\/[a-z0-9][a-z0-9.-]*\/$/;
+
+/**
+ * Asks the site whether a player's page opens (G1326: 200 { listed, url }, never a 404 for a player
+ * with no page, so a street of new players logs nothing). { status, path }, or null when the site
+ * has no such route.
+ */
+async function askListing(id, path) {
+  const r = await fetch(new URL(`/wp-json/groddle/v1/players/${id}/page`, document.baseURI).href, { credentials: 'same-origin', headers: { Accept: 'application/json' } });
+  if (r.status === 404) {
+    listingRoute = false;
+    return null;
+  }
+  if (!r.ok) return { status: 'failed', path };
+  let data = null;
+  try { data = await r.json(); } catch { /* not JSON */ }
+  if (typeof data?.listed !== 'boolean') return { status: 'failed', path };
+  if (!data.listed) return { status: 'none', path };
+  return { status: 'public', path: typeof data.url === 'string' && OWN_PAGE.test(data.url) ? data.url : path };
+}
+
+/** The lookup as before the route: the page itself (a same-origin GET; below level 5 the site answers 404). */
+async function fetchPage(path) {
+  const r = await fetch(new URL(path, document.baseURI).href, { credentials: 'same-origin', redirect: 'follow', headers: { Accept: 'text/html' } });
+  let found = { status: r.status === 404 ? 'none' : 'failed', path };
+  if (r.ok) {
+    // The page's own address (the site sends /players/<slug>.<id>/ on to it).
+    try { found = { status: 'public', path: new URL(r.url).pathname || path }; } catch { found = { status: 'public', path }; }
+  }
+  r.body?.cancel?.().catch?.(() => {});
+  return found;
+}
+
+/**
+ * Looks up one player's page: the site's answer (askListing), or on a site without that route the
+ * page itself (fetchPage). The entry is in `pages` at once (status '' until the answer), so a menu
+ * drawn meanwhile does not ask again. When the answer lands, a menu open for that player is drawn
+ * again (engine.refreshPlayerMenu).
  */
 function lookUpPage(id, name, engine) {
   const key = String(id);
@@ -135,15 +176,12 @@ function lookUpPage(id, name, engine) {
   if (!path || typeof fetch !== 'function' || typeof document === 'undefined') return null;
   const entry = { status: '', path, at: Date.now(), pending: null };
   pages.set(key, entry);
+  const n = Number(id);
   entry.pending = (async () => {
     try {
-      const r = await fetch(new URL(path, document.baseURI).href, { credentials: 'same-origin', redirect: 'follow', headers: { Accept: 'text/html' } });
-      if (r.ok) {
-        entry.status = 'public';
-        // The page's own address (the site sends /players/<slug>.<id>/ on to it).
-        try { entry.path = new URL(r.url).pathname || path; } catch { entry.path = path; }
-      } else entry.status = r.status === 404 ? 'none' : 'failed';
-      r.body?.cancel?.().catch?.(() => {});
+      const found = (listingRoute && Number.isInteger(n) && n > 0 ? await askListing(n, path) : null) || await fetchPage(path);
+      entry.status = found.status;
+      entry.path = found.path;
     } catch {
       entry.status = 'failed';
     }
