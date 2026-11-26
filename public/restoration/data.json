@@ -2814,9 +2814,24 @@
   "deployed": "2026-11-26"
  },
  "git": {
-  "commits": 3698,
+  "commits": 3702,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-26",
+    "kind": "fix",
+    "text": "The signpost's in-reach glow takes the street's colour, grey in Brillah"
+   },
+   {
+    "date": "2026-11-26",
+    "kind": "fix",
+    "text": "On a computer the mouse-over glow shows only on things in reach"
+   },
+   {
+    "date": "2026-11-26",
+    "kind": "fix",
+    "text": "Progress Way's spirit pan and Intate Treats' cave-in hint work again"
+   },
    {
     "date": "2026-11-26",
     "kind": "new",
@@ -2921,24 +2936,9 @@
     "date": "2026-11-25",
     "kind": "fix",
     "text": "Open water and shafts no longer stop you on an invisible floor"
-   },
-   {
-    "date": "2026-11-25",
-    "kind": "fix",
-    "text": "On an upright phone the street stands between the top bar and the controls"
-   },
-   {
-    "date": "2026-11-25",
-    "kind": "fix",
-    "text": "Rocks, Street Spirits and home cabinets glow in reach and under the mouse"
-   },
-   {
-    "date": "2026-11-25",
-    "kind": "fix",
-    "text": "Online, a Dust Trap is sprung for everyone on the street and resets for everyone"
    }
   ]
  },
- "tests": 1436,
+ "tests": 1437,
  "generatedAt": "2026-11-26"
 }

@@ -10872,7 +10872,7 @@
       "encyclopedia/facts/streets.json": "87eedf49",
       "encyclopedia/items/data.json": "f9e99879",
       "encyclopedia/items/facts.json": "81a34a46",
-      "encyclopedia/search.json": "79b3a36c",
+      "encyclopedia/search.json": "0d5d05db",
       "landing/card-explore.webp": "7a2c1124",
       "landing/full/card-explore.webp": "cbce4e96",
       "play/houses/sample-house.json": "896a3ced",
