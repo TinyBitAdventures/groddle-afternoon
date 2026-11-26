@@ -79,7 +79,7 @@ import {
   redeclareDelay,
   stealChanceForSeconds,
   withinReach,
-} from '../juju-bandits.js?v=6cf92f4f';
+} from '../juju-bandits.js?v=737fdcd7';
 import {
   NOSTALGIA_BUFF,
   NOSTALGIA_TEXT,
@@ -115,6 +115,13 @@ let clock = ancestralClock();
 let relog = false;
 let presetDone = false;
 let lastTickAt = 0;
+/** When the last street entry (or leaving home) set the visit going: the clock counts from here, not from an older frame. */
+let enteredAt = 0;
+/** The hidden tab's own clock (watchHidden): the interval while the page is hidden, and the engine it ticks. */
+let hiddenTimer = null;
+let hiddenWatch = false;
+let engineRef = null;
+const HIDDEN_TICK_MS = 1000;
 let publishedSecond = -1;
 /**
  * Ancestral Nostalgia (js/ancestral-nostalgia.js), saved beside the clock:
@@ -388,7 +395,7 @@ function trackRegion(street, engine, now) {
   } else if (savanna && !clock.inside && !overwhelmed) ancestralEnter(clock, now);
   else if (!savanna && clock.inside) ancestralLeave(clock, now, false);
   applyPresets(engine, savanna);
-  lastTickAt = now;
+  enteredAt = now;
 
   if (savanna && overwhelmed) {
     // savanna_on_enter 6-18: "Oh, this is too much!" and OK sends you away (no clock, no buff).
@@ -758,6 +765,54 @@ function walk(engine, dtMs) {
   if (bandit.state !== 'walk') setState(engine, 'walk');
 }
 
+/**
+ * Report #700 (Austin's ruling 2026-11-26: as Glitch): the visit's clock is wall-clock time, as
+ * get_baqala_buff_time was on Glitch's server (time_spent + time() - entry_time,
+ * inc_special_locations.js 114-116), so the whole gap since the last frame counts, a hidden tab's
+ * too. It counts from the later of the last frame and the entry into the Ancestral Lands
+ * (trackRegion), so nothing from before the visit (a street still loading) counts.
+ */
+function tickClock(engine, now) {
+  if (clock.inside) {
+    // A last frame later than now (the system clock set back) is no start.
+    const from = Math.max(lastTickAt <= now ? lastTickAt : 0, enteredAt);
+    ancestralTick(clock, from ? now - from : 0);
+    if (Math.floor(ancestralSeconds(clock)) !== publishedSecond) publishClock(engine);
+  }
+  lastTickAt = now;
+}
+
+/**
+ * A hidden tab runs no frames (requestAnimationFrame stops), so while the page is hidden a timer
+ * keeps the visit going: the clock, the buff, and the kick when the time runs out, on time, as
+ * Glitch's server sent you away whether or not you were watching (the buff's on_remove,
+ * check_baqala_boot, inc_special_locations.js 151-168). The browser may slow the timer to once a
+ * minute; the clock is wall-clock, so each run catches up.
+ */
+function backgroundTick(engine, now = Date.now()) {
+  if (!engine) return;
+  leaveForHome(engine, now);
+  tickClock(engine, now);
+  tickNostalgia(engine, now);
+}
+
+function watchHidden(engine) {
+  engineRef = engine;
+  const doc = globalThis.document;
+  if (hiddenWatch || !doc || typeof doc.addEventListener !== 'function') return;
+  hiddenWatch = true;
+  const sync = () => {
+    if (doc.visibilityState === 'hidden') {
+      if (hiddenTimer == null) hiddenTimer = setInterval(() => backgroundTick(engineRef), HIDDEN_TICK_MS);
+    } else if (hiddenTimer != null) {
+      clearInterval(hiddenTimer);
+      hiddenTimer = null;
+    }
+  };
+  doc.addEventListener('visibilitychange', sync);
+  sync();
+}
+
 /** Every frame: the buff on the clock, the kick when it runs out, too_much_nostalgia's end. */
 function tickNostalgia(engine, now) {
   if (warnAt && now >= warnAt) {
@@ -811,6 +866,15 @@ function curse(engine, mode = null) {
 
 export const jujuBanditsFeature = {
   id: JUJU_FEATURE_ID,
+
+  init(engine) {
+    watchHidden(engine);
+  },
+
+  /** Report #700: what the hidden tab's timer runs (QA / tests). */
+  backgroundTick(engine, now) {
+    backgroundTick(engine, now);
+  },
 
   save() {
     return { escaped, ancestral: { ...clock }, nostalgia: { ...nostalgia } };
@@ -901,13 +965,9 @@ export const jujuBanditsFeature = {
   },
 
   onTick(dtMs, now, engine) {
+    engineRef = engine;
     leaveForHome(engine, now);
-    // Real play time: wall-clock frame gaps, capped so a paused ticker adds nothing.
-    if (clock.inside) {
-      ancestralTick(clock, lastTickAt ? now - lastTickAt : 0);
-      if (Math.floor(ancestralSeconds(clock)) !== publishedSecond) publishClock(engine);
-    }
-    lastTickAt = now;
+    tickClock(engine, now);
     tickNostalgia(engine, now);
     if (pendingCurseAt && now >= pendingCurseAt) {
       pendingCurseAt = 0;

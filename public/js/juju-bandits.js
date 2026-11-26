@@ -108,7 +108,6 @@ export const ANCESTRAL_CLOCK = Object.freeze({
   graceFrom: 600, // start_baqala_buff: time_spent >= 600 ...
   graceTo: 585, // ... becomes 585
   decay: 0.5, // time_spent -= (now - exit_time) / 2
-  maxTickMs: 1000, // one frame never counts more than this (a hidden tab pauses the ticker)
 });
 
 /** A clock from a save slice (or a fresh one): seconds banked, inside the Savanna, exit time (ms), left by logging out. */
@@ -146,9 +145,15 @@ export function ancestralLeave(clock, nowMs, logout = false) {
   return clock;
 }
 
-/** Count real milliseconds while inside (capped per frame). */
+/**
+ * Count real milliseconds while inside, the whole gap however long (report #700, Austin's ruling
+ * 2026-11-26: as Glitch). get_baqala_buff_time was wall-clock on the server (time_spent + time() -
+ * entry_time, inc_special_locations.js 114-116), so a visit ran on while the player's window was in
+ * the background; capping each frame at a second stopped the clock in a hidden tab, where the
+ * browser runs no frames.
+ */
 export function ancestralTick(clock, ms) {
-  if (clock.inside) clock.spent += Math.min(ANCESTRAL_CLOCK.maxTickMs, Math.max(0, Number(ms) || 0)) / 1000;
+  if (clock.inside) clock.spent += Math.max(0, Number(ms) || 0) / 1000;
   return clock;
 }
 

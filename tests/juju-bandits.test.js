@@ -30,11 +30,11 @@ import {
   redeclareDelay,
   stealChanceForSeconds,
   withinReach,
-} from '../public/js/juju-bandits.js?v=6cf92f4f';
+} from '../public/js/juju-bandits.js?v=737fdcd7';
 import { DROP_TABLES } from '../public/js/drop-tables.js?v=1ed0b596';
 import { REMAKE_QUEST_NPCS } from '../public/js/quest-offers.js?v=7e00498b';
 import { OFFER_OVERRIDES } from '../public/js/quest-rooms/catalog.js?v=f37a25ba';
-import { FEATURES } from '../public/js/features/index.js?v=b689c2f9';
+import { FEATURES } from '../public/js/features/index.js?v=5d7ea778';
 import { remakeStatus } from '../public/js/imagination-remake.js?v=99997003';
 
 const spike = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -169,15 +169,17 @@ describe('juju bandit rules (npc_juju_bandit.js, juju_bandit_curse, dust_trap.js
 describe('the Ancestral Lands clock (baqala_times, G39: no kick)', () => {
   const MIN = 60 * 1000;
 
-  it('counts only inside, capped per frame, and starts fresh with nothing banked', () => {
+  it('counts only inside, every millisecond of a gap, and starts fresh with nothing banked', () => {
     const c = ancestralEnter(ancestralClock(), 0);
     assert.deepEqual([c.spent, c.inside, c.exitAt], [0, true, null]);
     ancestralTick(c, 500);
-    ancestralTick(c, 5 * MIN); // a hidden tab's gap counts one capped frame
-    assert.equal(ancestralSeconds(c), 0.5 + ANCESTRAL_CLOCK.maxTickMs / 1000);
+    // #700: a hidden tab's gap counts in full, as get_baqala_buff_time was wall-clock on the server.
+    ancestralTick(c, 5 * MIN);
+    assert.equal(ancestralSeconds(c), 0.5 + 300);
+    assert.equal('maxTickMs' in ANCESTRAL_CLOCK, false, 'no per-frame cap');
     ancestralLeave(c, 10_000);
     ancestralTick(c, 1000);
-    assert.equal(ancestralSeconds(c), 1.5, 'nothing counts outside');
+    assert.equal(ancestralSeconds(c), 300.5, 'nothing counts outside');
   });
 
   it('loses half the time away on re-entry, floored at 0', () => {
