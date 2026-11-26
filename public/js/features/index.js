@@ -206,9 +206,9 @@ import { skillBubblesFeature } from './skill-bubbles-feature.js?v=c74e18c4'; FEA
 import { homeCrewMpFeature } from './home-crew-mp-feature.js?v=6aae7990'; FEATURES.push(homeCrewMpFeature);
 // TODAYCARD: the start card's Today panel and nudge for a returning player (asks solo-feats for startCardFeat).
 import { startTodayFeature } from './start-today-feature.js?v=07488661'; FEATURES.push(startTodayFeature);
-import { chickenScareFeature } from './chicken-scare-feature.js?v=16cc44cb'; FEATURES.push(chickenScareFeature);
 // G1312: a finished Group Hall's street, members only, entered from its lot (street-jobs-feature).
 import { groupHallStreetFeature } from './group-hall-street-feature.js?v=990fe798'; FEATURES.push(groupHallStreetFeature);
+import { chickenScareFeature } from './chicken-scare-feature.js?v=16cc44cb'; FEATURES.push(chickenScareFeature);
 import { gameTeleporterFeature } from './game-teleporter-feature.js?v=4124fcaf'; FEATURES.push(gameTeleporterFeature);
 import { levelUpMpFeature } from './level-up-mp-feature.js?v=22659e6d'; FEATURES.push(levelUpMpFeature);
 // G982 Pot Luck Day, part A: the chicken costumes (after seasons-feature, whose seasonOn it asks).
