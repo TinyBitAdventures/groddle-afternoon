@@ -5933,6 +5933,136 @@
       "commits": [
         "game:47dd4f09383"
       ]
+    },
+    {
+      "id": "F129",
+      "area": "Streets",
+      "text": "On Hetuhila and a few other deep streets an invisible floor stopped you above open water, so coins below it could not be reached.",
+      "show": "fixing",
+      "commits": [
+        "game:0c9fa9e3ae9"
+      ]
+    },
+    {
+      "id": "F130",
+      "area": "Travel",
+      "text": "The loading card between some regions showed one colour instead of the region you leave on the left and the new one on the right.",
+      "show": "fixing",
+      "commits": [
+        "game:bc5d3f9b6e1"
+      ]
+    },
+    {
+      "id": "F131",
+      "area": "World",
+      "text": "Rocks and the Street Spirit vendors did not glow when in reach or under the mouse.",
+      "show": "fixing",
+      "commits": [
+        "game:da96e37b715"
+      ]
+    },
+    {
+      "id": "F132",
+      "area": "Streets",
+      "text": "The secret passage behind the trunk in Koulato Cluster led nowhere. It goes to Ruta Asuncion again, landing at its entrance, since Glitch's exact spot was not saved.",
+      "show": "fixing",
+      "commits": [
+        "game:f6a03601a7f"
+      ]
+    },
+    {
+      "id": "F133",
+      "area": "Music",
+      "text": "Notes played on Piano Party's keys and stars were heard only by the player who played them.",
+      "show": "fixing",
+      "commits": [
+        "game:fe971b78195",
+        "server:4ab9af2"
+      ]
+    },
+    {
+      "id": "F134",
+      "area": "Chat",
+      "text": "Players' names were all one colour in the Modern chat and in speech bubbles.",
+      "show": "fixing",
+      "commits": [
+        "game:95e910429bf"
+      ]
+    },
+    {
+      "id": "F135",
+      "area": "Ancestral Lands",
+      "text": "Each player had their own Dust Traps instead of sharing them on the street, and the visit clock stopped while the game's tab was in the background.",
+      "show": "fixing",
+      "commits": [
+        "game:693d9bbeea5",
+        "game:43e3d11a417",
+        "server:6832cd9"
+      ]
+    },
+    {
+      "id": "F136",
+      "area": "Streets",
+      "text": "The demon in the Stoot shrine held up nothing. It holds an empty frame now; the photo in it showed a real person, so it stays out.",
+      "show": "fixing",
+      "commits": [
+        "game:24a03f15187"
+      ]
+    },
+    {
+      "id": "F137",
+      "area": "Phones",
+      "text": "On an upright phone the street ran under the top bar and the controls.",
+      "show": "fixing",
+      "commits": [
+        "game:c5390864d51"
+      ]
+    },
+    {
+      "id": "F138",
+      "area": "Animals",
+      "text": "Batterfly Guano on Level 3 East fell where it could not be picked up.",
+      "show": "fixing",
+      "commits": [
+        "game:955101ef5ca"
+      ]
+    },
+    {
+      "id": "F139",
+      "area": "Quests",
+      "text": "Tunes for Crabs did not say the Vine Radio it gives waits in Cultivate.",
+      "show": "fixing",
+      "commits": [
+        "game:e9707a45733"
+      ]
+    },
+    {
+      "id": "F140",
+      "area": "Sound",
+      "text": "On an iPad, sound did not come back after the browser was minimized.",
+      "show": "fixing",
+      "commits": [
+        "game:64699c7a5e3"
+      ]
+    },
+    {
+      "id": "F141",
+      "area": "Saves",
+      "text": "Playing on from a game copy older than a day could lose things you were given or got back since.",
+      "show": "fixing",
+      "commits": [
+        "site:17bb7fc",
+        "game:3303647e1c8"
+      ]
+    },
+    {
+      "id": "F142",
+      "area": "New players",
+      "text": "A new player taken off Gentle Island in the middle of the tutorial was refused every road onward.",
+      "show": "fixing",
+      "commits": [
+        "game:826dba14553"
+      ]
     }
   ]
 }
