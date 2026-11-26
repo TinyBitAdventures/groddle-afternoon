@@ -2814,9 +2814,24 @@
   "deployed": "2026-11-26"
  },
  "git": {
-  "commits": 3688,
+  "commits": 3692,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-26",
+    "kind": "fix",
+    "text": "The street map shows no portal button for a secret teleporter or a jump puzzle"
+   },
+   {
+    "date": "2026-11-26",
+    "kind": "new",
+    "text": "Walk-in teleporters show as portal buttons on the street map"
+   },
+   {
+    "date": "2026-11-26",
+    "kind": "new",
+    "text": "Street map door buttons show a dino, a portal or a door"
+   },
    {
     "date": "2026-11-26",
     "kind": "improve",
@@ -2921,24 +2936,9 @@
     "date": "2026-11-25",
     "kind": "fix",
     "text": "The demon in the Stoot shrine holds up an empty wooden frame, not nothing"
-   },
-   {
-    "date": "2026-11-25",
-    "kind": "fix",
-    "text": "Players' names are coloured in Modern chat and in speech bubbles, one colour each"
-   },
-   {
-    "date": "2026-11-25",
-    "kind": "fix",
-    "text": "A note one player plays on Piano Party's keys and stars is heard by everyone on the street"
-   },
-   {
-    "date": "2026-11-25",
-    "kind": "improve",
-    "text": "Koulato Cluster's firefly jars come out every 10th arrival"
    }
   ]
  },
- "tests": 1432,
+ "tests": 1434,
  "generatedAt": "2026-11-26"
 }
