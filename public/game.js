@@ -4,7 +4,7 @@
  */
 import { ITEM_ICONS, ITEM_LABELS, getVerbsFor, ordinaryItems, runVerb } from './content.js?v=35911ed6';
 import { createErrorOnce, createFeatureHost, createFrameStages } from './js/feature-host.js?v=b87e2cbc';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=dc2b7a4a';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=1ed87631';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, enterHintPick, reachGlowTargets, spriteHasRimArt, rimArtParts, trimmedIconUrl, drawTileArt } from './js/enter-chooser.js?v=44aef7b2';
 import { firstTendKey, STICK_TEND_DELAY_MS, STICK_TEND_DIRS, STICK_TEND_REPEAT_MS, stepTendKey, stepTendKeys, stickTendKey, tendKeyAction } from './js/garden-tend.js?v=a7470c4a';
 import { avatarHitBox, behindFloor, bodyReachDistance, OUT_OF_REACH_LINE, playerClickBox } from './js/reach.js?v=456da8a8';
@@ -28700,7 +28700,8 @@ function renderHomeMapCallout(panel) {
     else openHomePanel();
   });
   // #722 (ours): House and Tower beside it, run as /house and /tower (features/slash-commands-feature.js
-  // mapHomeShortcut), with the commands' own checks and travel. Tower once it is built.
+  // mapHomeShortcut), with the commands' own checks and travel. House once you have a home street,
+  // Tower once it is built.
   const actions = document.createElement('div');
   actions.className = 'map-home-actions';
   actions.append(button);

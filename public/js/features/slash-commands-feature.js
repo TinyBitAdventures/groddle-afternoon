@@ -394,18 +394,21 @@ export function runStuckFromMenu(engine) {
 /**
  * #722 (ours, Austin 2026-11-26): the Map's home card (game.js renderHomeMapCallout) has House and
  * Tower buttons beside its Home button. Glitch's map had no home buttons, only these commands, so
- * a button runs its command here, with the command's own checks and travel. House is always there;
- * Tower once the Tower is built, the check /tower makes (slashContext towerBuilt).
+ * a button runs its command here, with the command's own checks and travel. House once you have a
+ * home street; Tower once the Tower is built, the check /tower makes (slashContext towerBuilt).
  */
 export const MAP_HOME_SHORTCUTS = Object.freeze([
   Object.freeze({ command: '/house', label: 'House', tip: 'Go inside your house' }),
   Object.freeze({ command: '/tower', label: 'Tower', tip: 'Go to your tower' }),
 ]);
 
-/** The home card's buttons for now: House, and Tower once it is built. */
+/**
+ * The home card's buttons for now: House once you have a home street (without one the card's own
+ * button is "Get your home street", which /house would only repeat), Tower once it is built.
+ */
 export function mapHomeShortcuts(engine) {
-  const built = slashContext(engine).towerBuilt;
-  return MAP_HOME_SHORTCUTS.filter((s) => s.command !== '/tower' || built);
+  const ctx = slashContext(engine);
+  return MAP_HOME_SHORTCUTS.filter((s) => (s.command === '/tower' ? ctx.towerBuilt : ctx.home.owned === true));
 }
 
 /**

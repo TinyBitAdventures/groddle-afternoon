@@ -6253,8 +6253,8 @@
      "file": "public/style.css"
     }
    ],
-   "why": "Player request (#722). Glitch's map had no home buttons, only the /home, /house and /tower chat commands (main.js doChatCommand); the home card itself is ours. The buttons run /house and /tower, with their own checks and travel; Tower shows once the Tower is built.",
-   "ruling": "Austin 2026-11-26 (report #722): add House and Tower beside Home on the Shortcuts' home card; House always, Tower once built; solo and online, Modern and Classic, phones",
+   "why": "Player request (#722). Glitch's map had no home buttons, only the /home, /house and /tower chat commands (main.js doChatCommand); the home card itself is ours. The buttons run /house and /tower, with their own checks and travel; House shows once you have a home street, Tower once the Tower is built.",
+   "ruling": "Austin 2026-11-26 (report #722): add House and Tower beside Home on the Shortcuts' home card; House once you have a home street (follow-up the same day: not beside Get your home street), Tower once built; solo and online, Modern and Classic, phones",
    "rows": []
   },
   {

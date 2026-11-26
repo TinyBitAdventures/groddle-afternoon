@@ -13,7 +13,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { LADDER_POCKETS } from '../public/js/ladder-pockets-data.js?v=eb8f9176';
 import { STREET_TRAPS } from '../public/js/street-traps-data.js?v=a1151641';
-import { LADDER_POCKET_DWELL_MS, ladderPocketText, onTrapFloor, slashCommandsFeature, trapLinesOn } from '../public/js/features/slash-commands-feature.js?v=0143949f';
+import { LADDER_POCKET_DWELL_MS, ladderPocketText, onTrapFloor, slashCommandsFeature, trapLinesOn } from '../public/js/features/slash-commands-feature.js?v=6f63a1fa';
 import { STUCK_TEXT } from '../public/js/slash-commands.js?v=bb2569aa';
 import { ladderMount } from '../public/js/movement.js?v=f4be1a05';
 import { LADDER_GRAB_BELOW, platformYAt } from '../public/js/street-model.js?v=a9a05f9d';

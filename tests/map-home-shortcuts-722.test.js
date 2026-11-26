@@ -2,8 +2,9 @@
  * #722 (a player asked; ours, Austin 2026-11-26): the Map's Shortcuts home card has House and
  * Tower buttons beside its Home button. Glitch's map had no home buttons, only the /home, /house
  * and /tower chat commands (main.js doChatCommand), so the buttons run those commands' own checks
- * and travel (features/slash-commands-feature.js runSlashCommand), not a copy of them. House is
- * always there; Tower once the Tower is built (the check /tower makes, slashContext towerBuilt).
+ * and travel (features/slash-commands-feature.js runSlashCommand), not a copy of them. House once
+ * you have a home street (without one the card's button is "Get your home street"); Tower once the
+ * Tower is built (the check /tower makes, slashContext towerBuilt).
  *
  * Run: node --test tests/map-home-shortcuts-722.test.js
  */
@@ -12,7 +13,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { MAP_HOME_SHORTCUTS, mapHomeShortcuts, slashCommandsFeature } from '../public/js/features/slash-commands-feature.js?v=0143949f';
+import { MAP_HOME_SHORTCUTS, mapHomeShortcuts, slashCommandsFeature } from '../public/js/features/slash-commands-feature.js?v=6f63a1fa';
 import { towerApi } from '../public/js/features/home-tower-feature.js?v=dbc79f63';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -52,7 +53,7 @@ afterEach(() => {
 });
 
 describe('#722 House and Tower on the Map\'s home card', () => {
-  it('House always, Tower only once the Tower is built (what /tower checks)', () => {
+  it('House once you have a home street, Tower only once the Tower is built (what /tower checks)', () => {
     const engine = fakeEngine();
     assert.deepEqual(MAP_HOME_SHORTCUTS.map((s) => s.command), ['/house', '/tower']);
     assert.deepEqual(mapHomeShortcuts(engine).map((s) => s.label), ['House']);
@@ -60,6 +61,10 @@ describe('#722 House and Tower on the Map\'s home card', () => {
     towerApi.state().built = true;
     assert.deepEqual(mapHomeShortcuts(engine).map((s) => s.label), ['House', 'Tower']);
     for (const s of MAP_HOME_SHORTCUTS) assert.doesNotMatch(`${s.label} ${s.tip}`, /—/);
+    // No home street yet: the card's own button is "Get your home street", so no House beside it.
+    towerApi.state().built = false;
+    const homeless = fakeEngine({ homeContext: () => ({ owned: false, inHome: false, room: 'street' }) });
+    assert.deepEqual(mapHomeShortcuts(homeless), []);
   });
 
   it('House travels as /house does: away, into the house; from the tower, to the house', async () => {
