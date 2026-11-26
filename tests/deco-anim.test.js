@@ -14,8 +14,8 @@ import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { homedir } from 'node:os';
 import { fileURLToPath } from 'node:url';
-import { ANIM_DECOS } from '../public/js/deco-anim-list.js?v=ecfee655';
-import { ANIM_FPS, clockFrame, isAnimatedDeco, pickStrip, stripFrames, timelineTextures } from '../public/js/deco-anim.js?v=de95df20';
+import { ANIM_DECOS } from '../public/js/deco-anim-list.js?v=e5f4d34a';
+import { ANIM_FPS, clockFrame, isAnimatedDeco, pickStrip, stripFrames, timelineTextures } from '../public/js/deco-anim.js?v=e9c5140f';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const read = (rel) => readFileSync(join(root, rel), 'utf8');
@@ -139,6 +139,45 @@ describe('frame strips (tools/deco-pipeline/animate.py)', () => {
         assert.deepEqual(webpSize(join(root, `public/assets/decos/groddle/${n}.webp`)), d.size, `${n}: still and strip size`);
       }
     }
+  });
+
+  it('sizes a magnified deco\'s strips to its placements, as the SWF drew it sharp (#717)', () => {
+    // Downside Up draws miniparty_piggy (an 88 x 16 still) at 435 x 79 and miniparty_miner (42 x 40)
+    // at 159 x 152: the strips stopped at the still's size, 0.2 texels per world px, blocky on any
+    // screen. Flash drew them as vectors. A strip is cut at 3 texels per world px where the 3x strip
+    // draws (near, unblurred), 2 where the 2x strip draws (far layers), the bake's density on a
+    // blurred layer, unless the strip is at its byte budget or the street's cap.
+    const bake = (blur) => { const w = Math.min(2, 4 / blur); return w >= 2 ? 2 : w >= 1 ? 1 : 0.5; };
+    const short = [];
+    for (const f of readdirSync(streetsDir)) {
+      if (!/^[GL][A-Z0-9]+\.json$/.test(f)) continue;
+      const s = JSON.parse(readFileSync(join(streetsDir, f), 'utf8'));
+      const layers = s.layers || [];
+      const mi = layers.findIndex((l) => l.id === 'middleground');
+      const mz = mi < 0 ? null : (layers[mi].z ?? mi);
+      layers.forEach((l, li) => {
+        const z = l.z ?? li;
+        const b = Math.trunc(Number(l.filters?.blur) || 0);
+        const blur = b > 1 ? b : 0;
+        const far = mz !== null && z < mz;
+        for (const d of l.decos || []) {
+          if (!d.animated || !ANIM_DECOS.has(d.sprite) || !d.w || !d.h) continue;
+          const j = anim(d.sprite);
+          const dens = Math.min(j.size[0] / Math.abs(d.w), j.size[1] / Math.abs(d.h));
+          const near = !far && !blur;
+          const want = blur ? bake(blur) : near ? 3 : 2;
+          if (want / dens <= 1.5) continue; // within the still's 3x: the strips as cut before
+          const strip = near ? j.strips[j.strips.length - 1] : j.strips[0];
+          const budget = strip.density > 1 ? 16 << 20 : 24 << 20;
+          const at = rows[d.sprite].strips.find((x) => x.file === strip.file);
+          const capped = strip.density === 1 && rows[d.sprite].cap && strip.res >= rows[d.sprite].cap * 0.95;
+          if (strip.res * dens >= want * 0.95 || at.decoded > budget * 0.5 || capped) continue;
+          short.push(`${d.sprite} on ${s.label} ${l.id}: ${(strip.res * dens).toFixed(2)} texels per world px`);
+        }
+      });
+    }
+    assert.deepEqual(short.filter((x) => /^miniparty_(piggy|miner) on Downside Up/.test(x)), [], 'the #717 pig and miner');
+    assert.deepEqual([...new Set(short)], []);
   });
 
   it('keeps the art within budget', () => {
@@ -290,7 +329,7 @@ describe('street-render plays flagged decos and pauses them off screen', () => {
       return { ok: true, json: async () => anim(m[1]) };
     };
     try {
-      const { buildStreetView } = await import('../public/js/street-render.js?v=9ba02537');
+      const { buildStreetView } = await import('../public/js/street-render.js?v=9a889516');
       const manifest = new Set(JSON.parse(read('public/assets/decos/manifest.json')));
       const s = { ...JSON.parse(read('public/assets/streets/GUVBP2STKQJ24PT.json')), gradient: null, signposts: [] };
       // The fake has no colour filters: drop the layers' filters so nothing bakes.

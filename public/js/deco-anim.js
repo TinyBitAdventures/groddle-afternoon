@@ -20,7 +20,7 @@
  *
  * Rebuilt rooms play a few decos with no placement at all through sceneAnim (below).
  */
-import { ANIM_DECOS } from './deco-anim-list.js?v=ecfee655';
+import { ANIM_DECOS } from './deco-anim-list.js?v=e5f4d34a';
 import { wantsHiresDecos } from './deco-hires.js?v=34f36d77';
 import { isLoaded, onFailed, onLoaded, textureFromUrl } from './textures.js?v=b8e38103';
 

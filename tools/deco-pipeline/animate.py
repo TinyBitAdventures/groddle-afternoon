@@ -26,7 +26,12 @@ it most, as recover.py picks):
   alpha, lossless where lossy shows). Size to need: a strip is drawn smaller than the still's
   size when every animated placement draws it at under NEED_TEXELS texels per world pixel (and
   blurred-layer placements at their bake's density), and smaller again past MAX_BYTES decoded
-  (MAX_BYTES_3X for the 3x strip, which is left out under MIN_3X times the 2x density). A street
+  (MAX_BYTES_3X for the 3x strip, which is left out under MIN_3X times the 2x density). A deco a
+  street draws magnified past its still's 3x (Downside Up's pig, 88 x 16 drawn 435 x 79: #717;
+  Flash drew it as vectors) gets strips larger than the still (strip_scales): the 3x strip at
+  NEED_TEXELS, the 2x strip (far layers, screens under the 3x scale) at 2 texels per world px or
+  the bake's density, or one strip at NEED_TEXELS where the budgets leave no 3x strip clearly
+  sharper (magnified_targets), the SWF rendered at the zoom they need (render_zoom). A street
   holds at most STREET_BYTES of 2x strips, counting each colour layer's recoloured copy
   (js/street-render.js bakeLayerColour): past it, the strips that cost that street most are drawn
   smaller (street_caps, from each strip's bytes at full size in the last build: run twice on a
@@ -70,6 +75,9 @@ NEED_TEXELS = 3.0   # texels per world px a strip never needs to exceed (js/deco
 MAX_BYTES = 24 << 20  # decoded RGBA bytes of one 2x strip
 MAX_BYTES_3X = 16 << 20  # and of one 3x strip
 MIN_3X = 1.2        # a 3x strip under 1.2 times the 2x one's density is not made
+NEED_TEXELS_2X = 2.0  # texels per world px the 2x strip needs where a deco is magnified (it draws up to HIRES_DECO_SCALE 2.25)
+MAGNIFIED = 1.55    # need (times the still's size) past which a deco is drawn magnified: past its 3x, with rounding slack
+MAX_ZOOM = 16       # FFDec render zoom for a magnified deco's strips
 STREET_BYTES = 80 << 20  # decoded 2x strips one street holds, recoloured copies included
 MAX_SIDE = 4096     # atlas side (every WebGL 2 GPU)
 PAD = 2             # transparent px between packed frames
@@ -402,16 +410,60 @@ def street_caps(rows, budget=STREET_BYTES):
     return scale
 
 
-def need_scale(size2, places):
-    """Largest fraction of the still's pixel size any animated placement can use (<= 1)."""
+def need_scale(size2, places, texels=NEED_TEXELS):
+    """Largest multiple of the still's pixel size any animated placement can use at `texels` per
+    world px (blurred-layer placements at their bake's density); 1 with no sized placement."""
     best = 0.0
     for p in places:
         if not p['w'] or not p['h']:
             continue
         dens = min(size2[0] / p['w'], size2[1] / p['h'])  # texels per world px of the 2x strip
-        need = bake_res(p['blur']) if p['blur'] else NEED_TEXELS
+        need = bake_res(p['blur']) if p['blur'] else texels
         best = max(best, need / dens)
-    return min(1.0, best) if best else 1.0
+    return best or 1.0
+
+
+def strip_scales(need, need2):
+    """(2x strip scale, 3x strip scale) as multiples of the still's pixel size. `need`: at
+    NEED_TEXELS, `need2`: at NEED_TEXELS_2X (need_scale). Within the still's 3x (need <= 1.5) the
+    2x strip stops at the still's size and the 3x one at 1.5 times it. A deco drawn magnified past
+    that (#717) gets its 3x strip at the need and its 2x strip at need2, never under the still."""
+    if need <= MAGNIFIED:
+        return min(need, 1.0), min(1.5, need * 1.5)
+    return max(1.0, need2), need
+
+
+def magnified(r):
+    return r['need'] > MAGNIFIED
+
+
+def magnified_targets(r, area1=None):
+    """[2x strip scale, 3x strip scale or None] a magnified deco is cut at before the street cap.
+    Where the byte budgets leave no 3x strip clearly sharper than the 2x one (by the last build's
+    bytes at the still's size, `area1`), the one strip takes the 3x need."""
+    s2, s3 = strip_scales(r['need'], r['need2'])
+    if area1:
+        e2 = min(s2, math.sqrt(MAX_BYTES * 0.85 / area1))
+        e3 = min(s3, math.sqrt(MAX_BYTES_3X * 0.85 / area1))
+        if e3 < MIN_3X * max(1.0, e2):
+            return [round(s3, 4), None]
+    return [round(s2, 4), round(s3, 4)]
+
+
+def render_zoom(r, size2, area1=None):
+    """FFDec zoom for a deco's strips: 3 for a still with a 3x file, else 2; a magnified deco's
+    the largest strip it will get (by its last build's bytes, `area1`) over the stage, whole."""
+    base = 3 if r['hires'] else 2
+    if not magnified(r):
+        return base
+    t2, t3 = r['targets']
+    s = min(t2, r.get('cap', t2))
+    if area1:
+        s = min(s, math.sqrt(MAX_BYTES * 0.85 / area1))
+    if t3:
+        s = max(s, min(t3, math.sqrt(MAX_BYTES_3X * 0.85 / area1)) if area1 else t3)
+    px = s * max(size2[0] / r['stage'][0], size2[1] / r['stage'][1])
+    return int(min(MAX_ZOOM, max(base, math.ceil(px - 1e-6))))
 
 
 # ---------- frames ----------
@@ -555,7 +607,8 @@ def js_text(plan):
         '/**\n'
         ' * Street decos the client played when a placement is flagged animated (DecoRenderer.as\n'
         ' * 301-305), as frame strips: assets/decos/animated/<name>.json (loop, sequence, frame rects) with\n'
-        ' * <name>.webp (the still\'s 2x size) and, where the still has a 3x file, <name>@1.5x.webp.\n'
+        ' * <name>.webp (the still\'s 2x size, larger where a street draws it magnified) and, where the\n'
+        ' * still has a 3x file or a street draws it magnified, <name>@1.5x.webp.\n'
         ' * name -> [timeline frames at 30 fps, loop start frame, has a 3x strip]. Generated by\n'
         ' * tools/deco-pipeline/animate.py; do not edit by hand.\n'
         ' */\n'
@@ -631,6 +684,7 @@ def cmd_build(args):
     plan['settings'] = SETTINGS
     only = set(args.only.split(',')) if args.only else None
     todo = []
+    places_of = {r['name']: places for r, _, places in rows}
     for r, swf, places in rows:
         n = r['name']
         if only and n not in only:
@@ -650,7 +704,12 @@ def cmd_build(args):
         todo.append((r, swf))
     # The street budget, from each strip's bytes at full size in the last build.
     prev = {n: row for n, row in plan['decos'].items() if row.get('area1')}
-    est = [(r['name'], prev[r['name']]['area1'], min(r['need'], math.sqrt(MAX_BYTES / prev[r['name']]['area1'])), r['copies'])
+    for r, _ in todo:
+        if magnified(r):
+            r['need2'] = round(need_scale(r['size'], places_of[r['name']], NEED_TEXELS_2X), 3)
+            r['targets'] = magnified_targets(r, (prev.get(r['name']) or {}).get('area1'))
+    first = lambda r: r['targets'][0] if magnified(r) else min(r['need'], 1.0)
+    est = [(r['name'], prev[r['name']]['area1'], min(first(r), math.sqrt(MAX_BYTES / prev[r['name']]['area1'])), r['copies'])
            for r, _ in todo if r['name'] in prev]
     others = [(n, row['area1'], row['strips'][0]['res'], row.get('copies_by_street') or {}) for n, row in prev.items()
               if row.get('strips') and n not in {r['name'] for r, _ in todo}]
@@ -658,13 +717,15 @@ def cmd_build(args):
     for r, _ in todo:
         if r['name'] in caps:
             r['cap'] = round(caps[r['name']], 4)
+    for r, _ in todo:
+        r['zoom'] = render_zoom(r, r['size'], (prev.get(r['name']) or {}).get('area1'))
     for i in range(0, len(todo), args.batch):
         chunk = todo[i:i + args.batch]
         while os.getloadavg()[0] > args.max_load:
             print(f'  load {os.getloadavg()[0]:.0f}: waiting', flush=True)
             time.sleep(30)
-        for zoom in (2, 3):
-            items = [(r, swf) for r, swf in chunk if (3 if r['hires'] else 2) == zoom]
+        for zoom in sorted({r['zoom'] for r, _ in chunk}):
+            items = [(r, swf) for r, swf in chunk if r['zoom'] == zoom]
             if not items:
                 continue
             src = os.path.join(work, f'src-{zoom}')
@@ -681,7 +742,11 @@ def cmd_build(args):
                 if r.get('erase'):
                     eraser_drawn(dst, os.path.join(src, r['name'] + DRAWN + '.swf'))
             t0 = time.time()
-            build.ffdec('-zoom', zoom, '-ignorebackground', '-format', 'frame:png', '-export', 'frame', out, src, heap='4g')
+            rc = build.ffdec('-zoom', zoom, '-ignorebackground', '-format', 'frame:png', '-export', 'frame', out, src, heap='4g')
+            for r, _ in items:  # no render reads as blank frames: stop before they overwrite the strips
+                d = os.path.join(out, r['name'] + '.swf')
+                if rc or not os.path.isdir(d) or not any(f.endswith('.png') for f in os.listdir(d)):
+                    sys.exit(f"FFDec rendered nothing for {r['name']} (exit {rc}; java: {build.JAVA}, set GRODDLE_JAVA)")
             for r, _ in items:
                 drawn = os.path.join(out, r['name'] + DRAWN + '.swf') if r.get('erase') else None
                 process(r, os.path.join(out, r['name'] + '.swf'), zoom, work, drawn)
@@ -704,21 +769,25 @@ def process(r, render_dir, zoom, work, drawn_dir=None):
     strips = []
     seq2 = None
     tmp = os.path.join(work, 'enc')
-    for density in ((1, 1.5) if r['hires'] else (1,)):
+    s2, s3 = r['targets'] if magnified(r) else strip_scales(r['need'], None)
+    for density in (1, 1.5) if (s3 if magnified(r) else r['hires']) else (1,):
         budget = MAX_BYTES if density == 1 else MAX_BYTES_3X
         # The 3x strip only goes as far as the need, and only where it is clearly sharper.
-        scale = min(r['need'], r.get('cap', 1)) if density == 1 else min(1.5, r['need'] * 1.5)
+        scale = min(s2, r.get('cap', s2)) if density == 1 else s3
+        floor = MIN_3X * max(1.0, strips[0]['res'] if strips else 1.0)
+        # A magnified 2x strip over budget tries the still's size (the cut before #717) before less.
+        shrink = lambda old, new: 1.0 if density == 1 and magnified(r) and new < 1.0 < old else new
         frames = None
-        while density == 1 or scale >= MIN_3X:
+        while density == 1 or scale >= floor:
             frames, seq, px = make_strip(render_dir, r['frames'], stage, zoom, size2, scale, None if density == 1 else seq2, drawn_dir)
             if strip_bytes(frames) > budget * 0.9 and scale > 0.25:
-                scale *= math.sqrt(budget * 0.85 / strip_bytes(frames))
+                scale = shrink(scale, scale * math.sqrt(budget * 0.85 / strip_bytes(frames)))
                 frames = None
                 continue
             dst = os.path.join(OUT, n + ('@1.5x' if density > 1 else '') + '.webp')
             res = write_strip(frames, px, dst, tmp)
             if res is None or res['decoded'] > budget:
-                scale *= 0.85
+                scale = shrink(scale, scale * 0.85)
                 frames = None
                 continue
             break

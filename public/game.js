@@ -4,7 +4,7 @@
  */
 import { ITEM_ICONS, ITEM_LABELS, getVerbsFor, ordinaryItems, runVerb } from './content.js?v=c976f55a';
 import { createErrorOnce, createFeatureHost, createFrameStages } from './js/feature-host.js?v=b87e2cbc';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=9e1d52da';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=8a036c65';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, enterHintPick, reachGlowTargets, spriteHasRimArt, rimArtParts, trimmedIconUrl, drawTileArt } from './js/enter-chooser.js?v=44aef7b2';
 import { firstTendKey, STICK_TEND_DELAY_MS, STICK_TEND_DIRS, STICK_TEND_REPEAT_MS, stepTendKey, stepTendKeys, stickTendKey, tendKeyAction } from './js/garden-tend.js?v=a7470c4a';
 import { avatarHitBox, behindFloor, bodyReachDistance, OUT_OF_REACH_LINE, playerClickBox } from './js/reach.js?v=456da8a8';
@@ -741,7 +741,7 @@ import {
   ensureStreetIndex,
   resolveIndexTsid,
 } from './js/street-loader.js?v=10376267';
-import { showDraftBanner, startDraftPlay } from './js/builder/draft-play.js?v=2e32858a';
+import { showDraftBanner, startDraftPlay } from './js/builder/draft-play.js?v=e6140cf0';
 import { bootHouseFile } from './js/house-file-loader.js?v=c28ab8ba';
 import {
   ladderTopDeck,
@@ -775,7 +775,7 @@ import {
   setSignpostKeys,
   signpostBoardAt,
   signpostGlowParts,
-} from './js/street-render.js?v=9ba02537';
+} from './js/street-render.js?v=9a889516';
 import {
   GAME_DAY_MS,
   GAME_EPOCH_MS,
@@ -1164,7 +1164,7 @@ import { blockedPlayerVerbs, listPlayerTarget, opensPlayerMenu, playerMenuRows }
 import { forgetTexture, frameTexture, isFailed, isLoaded, onFailed, onLoaded, textureFromUrl, whenLoaded } from './js/textures.js?v=b8e38103';
 import { FALLBACK_MAX as WORLD_ART_FALLBACK_MAX, worldArtFor } from './js/world-art.js?v=a67514c8';
 import { HOME_PIP_PX, HOME_PIP_WORDS, drawLockPip, drawPipWords, homeMarkNote, homePipShown, homePipWordsShown, homeStackMark } from './js/home-stack-marks.js?v=a41ed26e';
-import { attachAnim, sceneAnim, syncAnim } from './js/deco-anim.js?v=de95df20';
+import { attachAnim, sceneAnim, syncAnim } from './js/deco-anim.js?v=e9c5140f';
 import { revealStartCard, whenSceneDrawn } from './js/start-backdrop.js?v=8510d51e';
 import { cancelAllOverlays, displayTopOf, itemstackOverlayPoint, playPoofIn, setOverlayResolution } from './js/overlay-art.js?v=e50bacca';
 import * as textureUrls from './js/textures.js?v=b8e38103';

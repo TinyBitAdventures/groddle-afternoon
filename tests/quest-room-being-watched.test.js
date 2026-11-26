@@ -32,7 +32,7 @@ import {
   napPlatforms,
   room,
   watching,
-} from '../public/js/quest-rooms/being-watched.js?v=dba51c66';
+} from '../public/js/quest-rooms/being-watched.js?v=ed31857e';
 import { QUEST_ROOMS } from '../public/js/quest-rooms/catalog.js?v=f37a25ba';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
