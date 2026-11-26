@@ -27,7 +27,7 @@
  *  - Chicken party hats: hatsOn(now) (December 31 and January 1 on Ur's clock).
  */
 
-import { GAME_DAY_MS, GAME_EPOCH_MS, GAME_HOUR_MS, dametimeParts } from './game-day.js?v=a532775d';
+import { GAME_DAY_MS, GAME_EPOCH_MS, GAME_HOUR_MS, dametimeParts } from './game-day.js?v=beeaa24b';
 import { SEASON_TIME_ZONE, urDate } from './seasons.js?v=5d8f545a';
 
 export const NEW_UR_SEASON = 'new_ur';

@@ -78,8 +78,8 @@
  * street per Feat (MP_ACTS).
  */
 
-import { FEAT_BY_ID, QUICK_MS, REWARD_ITEM, SOLO_FEATS, WIRED_FEATS, vogTextFor } from './solo-feats.js?v=0ec0bd95';
-import { GAME_DAY_MS, GAME_EPOCH_MS } from './game-day.js?v=a532775d';
+import { FEAT_BY_ID, QUICK_MS, REWARD_ITEM, SOLO_FEATS, WIRED_FEATS, vogTextFor } from './solo-feats.js?v=d5445d67';
+import { GAME_DAY_MS, GAME_EPOCH_MS } from './game-day.js?v=beeaa24b';
 import { giantDisplayName } from './giant-names.js?v=0e295891';
 import { UNNAMED_PLAYER } from './player-names.js?v=f9b78094';
 

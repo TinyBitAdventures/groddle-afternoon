@@ -41,7 +41,7 @@ import { TOOL_CONDITION_CATALOG, leavingCopyTag, leavingToolWear, receiveToolCop
 import { createMinnAccount } from '../minn-account.js?v=7e3d7279';
 import { copyWire, markLeaving, packPicks, takeCopies } from '../copy-picks.js?v=b368fd49';
 import { ITEM_BASE_COSTS } from '../store-catalog.js?v=c6ebb2bd';
-import { saveStore, savedThrough } from '../save-store.js?v=4e720735';
+import { saveStore, savedThrough } from '../save-store.js?v=71f717ea';
 import {
   LETTER_ROW,
   PLAYER_MAIL_RULES as R,

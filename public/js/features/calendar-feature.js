@@ -17,7 +17,7 @@
  * Canvas: calendarOpen (0 | 1), calendarYear, calendarEvents (ids on now and coming), calendarFeat.
  */
 
-import { DAY_NAMES, dametimeParts } from '../game-day.js?v=a532775d';
+import { DAY_NAMES, dametimeParts } from '../game-day.js?v=beeaa24b';
 import {
   CALENDAR_TEXT,
   aboutWhen,
@@ -32,7 +32,7 @@ import {
   urDateLine,
   urHolidaysOn,
   urYear,
-} from '../calendar.js?v=0168d61b';
+} from '../calendar.js?v=e35525bd';
 
 export const CALENDAR_FEATURE_ID = 'calendar';
 export const CALENDAR_EVENT = 'groddle:calendar';

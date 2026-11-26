@@ -49,14 +49,14 @@ const {
   graveVerbs,
   normalizeGraveDone,
   normalizeGraveMourned,
-} = await import('../public/js/graves-mp.js?v=73e701b3');
-const { createHellState, croak, resurrect } = await import('../public/js/hell.js?v=b4dcc7d2');
-const { normalizeHellTicketsState, remoteGraveVisit } = await import('../public/js/hell-tickets.js?v=c96d7115');
+} = await import('../public/js/graves-mp.js?v=fb42823d');
+const { createHellState, croak, resurrect } = await import('../public/js/hell.js?v=d7a75e16');
+const { normalizeHellTicketsState, remoteGraveVisit } = await import('../public/js/hell-tickets.js?v=5ac45ca5');
 const { createQuestState } = await import('../public/js/quests.js?v=f68437db');
-const { hellFeature } = await import('../public/js/features/hell-feature.js?v=b3f6bb33');
-const { hellTicketsFeature } = await import('../public/js/features/hell-tickets-feature.js?v=ebee35dc');
-const { gravesMpFeature } = await import('../public/js/features/graves-mp-feature.js?v=27e2be66');
-const { FEATURES } = await import('../public/js/features/index.js?v=7b1e75df');
+const { hellFeature } = await import('../public/js/features/hell-feature.js?v=02f5451d');
+const { hellTicketsFeature } = await import('../public/js/features/hell-tickets-feature.js?v=88c9c705');
+const { gravesMpFeature } = await import('../public/js/features/graves-mp-feature.js?v=65303db0');
+const { FEATURES } = await import('../public/js/features/index.js?v=6ac8bd22');
 
 const STREET = 'GLI2V0UN7RD1T2J';
 const HELL_ONE = 'GA5PPFP86NF2FOS';

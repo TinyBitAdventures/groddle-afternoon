@@ -5,7 +5,7 @@
 // Every photo opens full size in the viewer (landing/viewer.js); the street at the top is landing/street.js.
 import { mountViewer } from './viewer.js?v=9a919381';
 import { landingStats, landingBars } from './stats.js?v=78817d10';
-import { mountStreet } from './street.js?v=43593198';
+import { mountStreet } from './street.js?v=b8181aeb';
 
 const fmt = (n) => Number(n || 0).toLocaleString('en-US');
 

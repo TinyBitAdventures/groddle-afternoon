@@ -50,7 +50,7 @@ import { hasRaceDispenser } from '../races.js?v=ab22a079';
 import { OVERLAY_USES, locationRect, playCountdownArt, playWindowOverlay } from '../overlays.js?v=91dcee74';
 import { textureFromUrl } from '../textures.js?v=b8e38103';
 import { grantMoodXp } from '../mood-xp.js?v=e311b45c';
-import { saveStore, savedThrough } from '../save-store.js?v=4e720735';
+import { saveStore, savedThrough } from '../save-store.js?v=71f717ea';
 import { standOnFeet } from '../sprite-feet.js?v=6358a697';
 import { WORLD_FONT_FAMILY } from '../world-text.js?v=6b49f88c';
 

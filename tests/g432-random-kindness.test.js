@@ -12,7 +12,7 @@ import { describe, it } from 'node:test';
 import { KINDNESS_AMOUNT, PLAYER_VERBS, RANDOM_KINDNESS, VERB_TEXT, kindnessStat, doerSide } from '../public/js/player-verbs-mp.js?v=4d0315f5';
 import { OVERLAY_USES } from '../public/js/overlays.js?v=91dcee74';
 import { TOOL_CONDITION_CATALOG } from '../public/js/tools.js?v=4156bba8';
-import { playerVerbsMpFeature } from '../public/js/features/player-verbs-mp-feature.js?v=8b7c8cb8';
+import { playerVerbsMpFeature } from '../public/js/features/player-verbs-mp-feature.js?v=0fb1d3d3';
 import { SITE_DIR, skipWithoutSite } from '../tools/repos.mjs';
 
 const root = join(import.meta.dirname, '..');

@@ -46,15 +46,15 @@
 
 import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=d787e3c3';
 import { addItem, countItem, ensureItem, registerItemUse, removeItem } from '../inventory.js?v=3be7988a';
-import { MUSICBLOCK_CATALOG, ensureMusicblockItems } from '../musicblocks.js?v=900c3245';
+import { MUSICBLOCK_CATALOG, ensureMusicblockItems } from '../musicblocks.js?v=1390d9b2';
 import { gainMetabolic, loseMood, shiftMetabolic } from '../metabolics.js?v=48f784bf';
 import { grantMoodXp } from '../mood-xp.js?v=e311b45c';
 import { slugsFromEffects } from '../speech-slugs.js?v=d5cc8b6f';
-import { getGameDayKey } from '../game-day.js?v=a532775d';
+import { getGameDayKey } from '../game-day.js?v=beeaa24b';
 import { cleanQuestMarkup } from '../quests.js?v=f68437db';
 import { acceptOffer, npcQuestOffers } from '../quest-offers.js?v=7e00498b';
 import { CRAB_TUNES_COUNTER, RADIO_QUEST_ID } from '../vine-radio.js?v=5436aa09';
-import { followPath } from '../street-creatures.js?v=9e1c554e';
+import { followPath } from '../street-creatures.js?v=89662639';
 import { followFloorY, walkSurfaceY } from '../walk-surface.js?v=f21ce37b';
 import { isStandable } from '../street-model.js?v=a9a05f9d';
 import {
@@ -87,7 +87,7 @@ import {
   musicblocksInPack,
   normalizeCrabMemory,
   playToday,
-} from '../crabs.js?v=6b3e014e';
+} from '../crabs.js?v=0d17853d';
 import { standOnFeet } from '../sprite-feet.js?v=6358a697';
 
 const ART = 'assets/sprites/crabs/';

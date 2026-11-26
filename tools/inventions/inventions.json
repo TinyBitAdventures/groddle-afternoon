@@ -6410,6 +6410,22 @@
    "rulingHints": [
     "Austin 2026-11-25: one hall first, a layout for his review before the other nine"
    ]
+  },
+  {
+   "id": "save-takeover-reloads-stored-save",
+   "title": "Keep this window's game reloads the stored save when the site added what the copy missed",
+   "kind": "behaviour",
+   "status": "proposed",
+   "where": [
+    {
+     "file": "public/js/save-store.js",
+     "symbol": "createSaveSync onReload"
+    }
+   ],
+   "why": "Glitch kept one copy of each player on its server, so there was never a second copy to keep. Ours: a takeover write whose answer says reload (the site applied trades, gifts or a put-back the copy missed, Ledger::reapply) stops the page writing and reloads it, so the next write cannot take them out again (report #670).",
+   "rows": [
+    "G1329"
+   ]
   }
  ]
 }

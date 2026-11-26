@@ -11,7 +11,7 @@ import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { itemMakeNote, skillRankLabel } from '../public/js/street-job-asks.js?v=84b712a3';
-import { listRecipesProducing, loadRecipeCatalogFromFile } from '../public/js/making.js?v=96afba25';
+import { listRecipesProducing, loadRecipeCatalogFromFile } from '../public/js/making.js?v=2a62a71a';
 import { TOWER_JOBS } from '../public/js/home-tower.js?v=a7fc0cce';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');

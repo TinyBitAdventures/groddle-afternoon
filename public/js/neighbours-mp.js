@@ -25,7 +25,7 @@
  */
 
 import { SEED_CATALOG, applyFertilizer, sowPlot, wetPlot } from './garden.js?v=fefa7bcd';
-import { normalizeParcelBox, stackCopy } from './butler.js?v=152429c8';
+import { normalizeParcelBox, stackCopy } from './butler.js?v=4a41a7fb';
 import { normalizeVisitGnomes } from './garden-gnome.js?v=73026b57';
 import { normalizeVisitIcons } from './giant-icons.js?v=3f078775';
 import { DROP_TEXT, homePlaceOf } from './drops-mp.js?v=351593a6';

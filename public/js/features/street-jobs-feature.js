@@ -57,10 +57,10 @@ import { worldToScreen } from '../street-model.js?v=a9a05f9d';
 import { signArmWidth } from '../street-render.js?v=ff7afb98';
 import { WORLD_FONT_FAMILY } from '../world-text.js?v=6b49f88c';
 import { getSkillCatalog } from '../content-catalogs.js?v=c9b84764';
-import { listRecipesProducing } from '../making.js?v=96afba25';
-import { GIANTS } from '../shrines.js?v=f5eb7690';
+import { listRecipesProducing } from '../making.js?v=2a62a71a';
+import { GIANTS } from '../shrines.js?v=394d048e';
 import { giantDisplayName } from '../giant-names.js?v=0e295891';
-import { teleportationFeature } from './teleportation-feature.js?v=6c413af1';
+import { teleportationFeature } from './teleportation-feature.js?v=87633b61';
 import {
   SOLO_DIVISOR,
   WORK_UNIT_MS,
@@ -124,7 +124,7 @@ import { fewestClosures, loadStreetGraph, reachableStreets, streetGraph, worldRo
 import { doorKeysHeld } from '../doors.js?v=f815e7c8';
 import { openWorld } from '../open-roads.js?v=2e03b0a6';
 import { getQuestCatalog as questCatalog } from '../content-catalogs.js?v=c9b84764';
-import { saveStore, savedThrough } from '../save-store.js?v=4e720735';
+import { saveStore, savedThrough } from '../save-store.js?v=71f717ea';
 import {
   HALL_TEXT,
   MP_TEXT,

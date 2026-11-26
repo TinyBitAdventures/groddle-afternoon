@@ -18,8 +18,8 @@ import {
   visitGardenPlots,
   visitSceneKey,
 } from '../public/js/home-live.js?v=9c7abae7';
-import { createHomeLive, homeLiveFeature } from '../public/js/features/home-live-feature.js?v=84b01b4b';
-import { YARD_ACT_HOLD_MS, YARD_LINGER_MS, followYardPath, holdYardWalk } from '../public/js/yard-wander.js?v=8f5a82ef';
+import { createHomeLive, homeLiveFeature } from '../public/js/features/home-live-feature.js?v=a3b0d3a2';
+import { YARD_ACT_HOLD_MS, YARD_LINGER_MS, followYardPath, holdYardWalk } from '../public/js/yard-wander.js?v=941310a6';
 
 const root = join(import.meta.dirname, '..');
 const read = (rel) => readFileSync(join(root, rel), 'utf8');

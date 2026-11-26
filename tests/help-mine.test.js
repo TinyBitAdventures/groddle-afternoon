@@ -37,7 +37,7 @@ import {
   turnInQuest,
 } from '../public/js/quest-offers.js?v=7e00498b';
 import { createMineRock } from '../public/js/mining.js?v=7ecaa572';
-import { rockId } from '../public/js/street-objects.js?v=2599de2a';
+import { rockId } from '../public/js/street-objects.js?v=af409b82';
 import { createQuestState } from '../public/js/quests.js?v=f68437db';
 
 const here = import.meta.dirname;

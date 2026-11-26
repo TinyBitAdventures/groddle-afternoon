@@ -12,7 +12,7 @@ import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import { QUIET_MS, SLEPT_MS, bindPageLifecycle, createRealtimeClient } from '../public/js/realtime-client.js?v=eb1515a8';
 import { ENDED_STATES } from '../public/js/online-request.js?v=dac938db';
-import { ASLEEP_TEXT, statusText } from '../public/js/features/realtime-feature.js?v=04c7bfd9';
+import { ASLEEP_TEXT, statusText } from '../public/js/features/realtime-feature.js?v=d8663229';
 
 const BASE = 'https://groddle.localhost/play/online/';
 const flush = () => new Promise((r) => setImmediate(r));

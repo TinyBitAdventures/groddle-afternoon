@@ -19,10 +19,10 @@ import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { FEATURES } from '../public/js/features/index.js?v=7b1e75df';
-import { streetObjectsFeature } from '../public/js/features/street-objects-feature.js?v=30be3c51';
-import { SHARED_NODE_CLASSES, applyNodeState, createStreetCopy, freshenNode, stateFor, takeObjs } from '../public/js/street-objects.js?v=2599de2a';
-import { createResourceNode, resourceNodeFrame } from '../public/js/resource-nodes.js?v=e2d1cbc9';
+import { FEATURES } from '../public/js/features/index.js?v=6ac8bd22';
+import { streetObjectsFeature } from '../public/js/features/street-objects-feature.js?v=2e62fe42';
+import { SHARED_NODE_CLASSES, applyNodeState, createStreetCopy, freshenNode, stateFor, takeObjs } from '../public/js/street-objects.js?v=af409b82';
+import { createResourceNode, resourceNodeFrame } from '../public/js/resource-nodes.js?v=7d42d002';
 import { applyBuff, createBuffState, hasBuff, removeBuff } from '../public/js/buffs.js?v=a4f7377b';
 import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=c9b84764';
 import { NOSTALGIA_BOOT_STREETS } from '../public/js/ancestral-nostalgia-data.js?v=0adb9184';

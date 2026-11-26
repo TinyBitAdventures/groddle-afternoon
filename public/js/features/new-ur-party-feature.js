@@ -28,11 +28,11 @@
  */
 
 import { addItem, countItem, ensureItem, registerItemUse, removeItem } from '../inventory.js?v=3be7988a';
-import { RECIPE_CATALOG, isRecipeCatalogReady, setRecipeCatalog } from '../making.js?v=96afba25';
+import { RECIPE_CATALOG, isRecipeCatalogReady, setRecipeCatalog } from '../making.js?v=2a62a71a';
 import { gainMetabolic } from '../metabolics.js?v=48f784bf';
 import { exposeQA } from '../qa-gate.js?v=f4e2cd82';
 import { parseSeasonDate, urDate } from '../seasons.js?v=5d8f545a';
-import { hatsOn, sparklyBatterflies } from '../new-ur.js?v=96c11429';
+import { hatsOn, sparklyBatterflies } from '../new-ur.js?v=b3ca5e5a';
 import {
   BUBBLY,
   BUBBLY_DRINK,

@@ -21,10 +21,10 @@ import { before, describe, it } from 'node:test';
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-import { FLIER_LIFT, FLY_WANDER, flierAt, flierPlan, flierSeed, flightFloor, hourlyGuanoDrops, pathTime } from '../public/js/street-creatures.js?v=9e1c554e';
+import { FLIER_LIFT, FLY_WANDER, flierAt, flierPlan, flierSeed, flightFloor, hourlyGuanoDrops, pathTime } from '../public/js/street-creatures.js?v=89662639';
 import { platformsScreen, streetWidth } from '../public/js/street-model.js?v=a9a05f9d';
 import { serverPath, skipWithoutServer } from '../tools/repos.mjs';
-import { GAME_EPOCH_MS } from '../public/js/game-day.js?v=a532775d';
+import { GAME_EPOCH_MS } from '../public/js/game-day.js?v=beeaa24b';
 
 const root = join(import.meta.dirname, '..');
 const read = (rel) => readFileSync(join(root, rel), 'utf8');

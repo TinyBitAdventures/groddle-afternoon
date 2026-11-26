@@ -1197,6 +1197,7 @@
     "stand-in: * G892 (stand-ins audit A10): the birds over the wood are rooks,": "ours-rook-woods"
   },
   "public/js/save-store.js": {
+    "ours: * (ours: Glitch kept one copy per player on its server).": "save-takeover-reloads-stored-save",
     "stand-in: /** The opt-in stand-in Glitches (?companions=1|0, remembered): a solo": "solo-stand-ins"
   },
   "public/js/screen-fx.js": {

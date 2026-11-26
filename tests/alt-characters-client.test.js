@@ -16,9 +16,9 @@ import { SITE_DIR, skipWithoutSite } from '../tools/repos.mjs';
 
 import { CHARACTER_CHANGED, CHARACTER_CHANGED_EVENT, CHARACTER_HEADER, characterHeaders, characterOf, isCharacterChanged } from '../public/js/character-guard.js?v=510034a7';
 import { createMinnAccountCore } from '../public/js/minn-account-core.js?v=5baee954';
-import { createSaveSync } from '../public/js/save-store.js?v=4e720735';
+import { createSaveSync } from '../public/js/save-store.js?v=71f717ea';
 import { CLOSE_OTHER_CHARACTER, createRealtimeClient } from '../public/js/realtime-client.js?v=eb1515a8';
-import { OTHER_CHARACTER_TEXT, statusText } from '../public/js/features/realtime-feature.js?v=04c7bfd9';
+import { OTHER_CHARACTER_TEXT, statusText } from '../public/js/features/realtime-feature.js?v=d8663229';
 import { CHARACTER_COPY, FRESH_HASH, SAVE_ALERT_COPY, characterChoices, continuesAs, createRefusalText, saveAlertFor } from '../public/js/online-boot.js?v=f1f2766b';
 import { SWITCHER_COPY, STYLE as SWITCHER_STYLE, cardUrl, popoverPlace, switcherChoices } from '../public/js/character-switcher.js?v=265e3b6a';
 import { LOCAL_STATES } from '../public/js/shared-quoins.js?v=32ec999a';

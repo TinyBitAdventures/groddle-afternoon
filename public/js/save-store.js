@@ -166,7 +166,12 @@ function entriesOf(value) {
  * claimed the save (elsewhere) or someone else wrote over it (conflict):
  * writing stops, the game goes on in memory, and the player chooses;
  * takeover() writes this copy back over the other (the site first applies
- * the trades this copy missed, MultiplayerSave.php). The REST nonce the
+ * the trades this copy missed, MultiplayerSave.php). When that changed the
+ * copy, the answer says reload (G1329, report #670): what came in (a Still put
+ * back on the floor, a gift, a trade) is in the stored save only, and this
+ * page's next write of its own copy would take it out again. So nothing more
+ * is written, keepalive copies included, and onReload() loads the stored save
+ * (ours: Glitch kept one copy per player on its server). The REST nonce the
  * server hands back on each answer is kept. An answer whose ledger corrected
  * the save (groddle-afternoon-site src/Ledger.php, G335: what the site could
  * not account for was taken out of the stored save) goes to
@@ -200,6 +205,7 @@ export function createSaveSync({
   onState = () => {},
   onLedger = () => {},
   onFinal = () => {},
+  onReload = () => {},
 } = {}) {
   let state = 'saved';
   let dirty = false;
@@ -213,13 +219,15 @@ export function createSaveSync({
   let landed = 0; // the newest of them the site accepted
   let takingOver = false;
   let yielding = false;
+  /** G1329: a takeover's answer said the stored save holds more than this page: nothing more is written. */
+  let reloading = false;
   let current = { version, nonce, confirmedAt };
   let lastError = null;
   let refused = {};
   /** Another character is signed in now: this page never writes again. */
   let characterGone = false;
   const playing = characterId(character);
-  const blocked = () => SAVE_STOPPED.includes(state) || yielding;
+  const blocked = () => SAVE_STOPPED.includes(state) || yielding || reloading;
   const setState = (next, detail = {}) => {
     if (next === state && !detail.force) return;
     state = next;
@@ -283,6 +291,7 @@ export function createSaveSync({
       if (data.ledger?.corrected && typeof data.ledger.corrected === 'object') {
         try { onLedger(data.ledger); } catch { /* a listener's trouble is not the save's */ }
       }
+      if (data.took === true && data.reload === true) reloading = true;
       failures = 0;
       nonceRetried = false;
       lastError = null;
@@ -309,7 +318,7 @@ export function createSaveSync({
   }
   /** Writes now (when something changed and nothing blocks); resolves when this write is done. */
   function flush({ keepalive = false } = {}) {
-    if (!fetchFn || SAVE_STOPPED.includes(state)) return inFlight || Promise.resolve(state);
+    if (!fetchFn || SAVE_STOPPED.includes(state) || reloading) return inFlight || Promise.resolve(state);
     if (inFlight) {
       if (keepalive && dirty && !takingOver) {
         // The page is going away mid-write: send the newest copy beside it. Its seq is newer, so
@@ -345,6 +354,15 @@ export function createSaveSync({
       if (state === 'held') {
         // Held while this write was out: it was the last.
         if (outcome === 'ok') landed = Math.max(landed, number);
+        return state;
+      }
+      if (outcome === 'ok' && reloading) {
+        // G1329: the stored save is this copy and what the takeover added; the page loads it.
+        landed = Math.max(landed, number);
+        takingOver = false;
+        clear();
+        setState('saved', { force: true, reload: true });
+        try { onReload(); } catch { /* the stored save is right; a manual reload loads it */ }
         return state;
       }
       if (outcome === 'ok') {
@@ -390,7 +408,7 @@ export function createSaveSync({
    * claiming the save back (the other window then stops writing and says so).
    */
   function takeover() {
-    if (!['conflict', 'elsewhere'].includes(state) || yielding || characterGone) return Promise.resolve(state);
+    if (!['conflict', 'elsewhere'].includes(state) || yielding || characterGone || reloading) return Promise.resolve(state);
     takingOver = true;
     dirty = true;
     state = 'pending';
@@ -467,6 +485,8 @@ export function createSaveSync({
     get version() { return current.version; },
     get nonce() { return current.nonce; },
     get dirty() { return dirty; },
+    /** G1329: the takeover's answer asked for the stored save; this page writes nothing more. */
+    get reloading() { return reloading; },
     get lastError() { return lastError; },
     get writer() { return writer; },
     /** The site's time of this page's last save that it confirmed (or of the boot read). */
@@ -501,7 +521,7 @@ function announceLedger(scope, ledger) {
  * The multiplayer store: the whole save in memory from boot data
  * (window.GRODDLE_MP_BOOT, set by js/online-boot.js from groddle/v1/save),
  * written back through createSaveSync. With no boot data it refuses.
- * @param {{ boot?: object, scope?: object, fetch?: Function, timers?: object, now?: () => number, debounceMs?: number, maxWaitMs?: number }} [opts]
+ * @param {{ boot?: object, scope?: object, fetch?: Function, timers?: object, now?: () => number, debounceMs?: number, maxWaitMs?: number, reload?: Function }} [opts]
  */
 export function createMultiplayerSaveStore(opts = {}) {
   const scope = opts.scope ?? globalThis;
@@ -531,6 +551,11 @@ export function createMultiplayerSaveStore(opts = {}) {
     onState: (state, detail) => announceSaveState(scope, state, detail),
     onLedger: (ledger) => announceLedger(scope, ledger),
     onFinal: (body) => leaveHandoff({ scope, player: boot.player?.id, body }),
+    // G1329: the kept game plus what the site added since: load it, as "Load the other save" does.
+    onReload: () => {
+      if (typeof opts.reload === 'function') opts.reload();
+      else scope?.location?.reload?.();
+    },
   });
   if (typeof scope?.addEventListener === 'function') {
     scope.addEventListener('pagehide', () => { sync.flush({ keepalive: true }); });
@@ -593,6 +618,8 @@ export function createMultiplayerSaveStore(opts = {}) {
     hold: (reason) => sync.hold(reason),
     get state() { return sync.state; },
     get version() { return sync.version; },
+    /** G1329: reloading the stored save after a takeover; nothing more is written. */
+    get reloading() { return sync.reloading; },
     /** This page's name on the save (MultiplayerSave.php writer). */
     writer,
     /** Stops answering other tabs' claims (tests). */

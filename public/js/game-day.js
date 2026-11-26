@@ -6,7 +6,7 @@
  * one game hour is 10 real minutes, and one game day is four real hours.
  */
 
-import { saveStore } from './save-store.js?v=4e720735';
+import { saveStore } from './save-store.js?v=71f717ea';
 import { energyMax, forceMetabolic, moodMax } from './metabolics.js?v=48f784bf';
 
 export const SPEED_MULTIPLIER = 6;

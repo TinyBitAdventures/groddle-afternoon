@@ -29,14 +29,14 @@
  */
 
 import { getAmbientMusicConfig } from '../ambient-music.js?v=4b3c6041';
-import { MUSICBLOCK_CATALOG } from '../musicblocks.js?v=900c3245';
-import { musicblocksInPack } from '../crabs.js?v=6b3e014e';
+import { MUSICBLOCK_CATALOG } from '../musicblocks.js?v=1390d9b2';
+import { musicblocksInPack } from '../crabs.js?v=0d17853d';
 import { standOnFeet } from '../sprite-feet.js?v=6358a697';
 import { textureFromUrl } from '../textures.js?v=b8e38103';
 import { WORLD_FONT_FAMILY } from '../world-text.js?v=6b49f88c';
 import { SIDE_SHEET_IDS, bindTabs, selectTab } from '../ui/panel-shell.js?v=5efb38c6';
-import { homeStreetName, possessive, visitSceneTsid } from '../neighbours-mp.js?v=e59e6b47';
-import { visitorHomeScene } from './homes-feature.js?v=f38b53bd';
+import { homeStreetName, possessive, visitSceneTsid } from '../neighbours-mp.js?v=4d16b7e4';
+import { visitorHomeScene } from './homes-feature.js?v=949bca85';
 import {
   PREVIEW_MS,
   RADIO_ART,

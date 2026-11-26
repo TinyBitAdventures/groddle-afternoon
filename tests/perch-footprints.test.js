@@ -31,8 +31,8 @@ import {
 } from '../public/js/street-ecology.js?v=f1c11a2d';
 import { placementRequests } from '../tools/build-realtime-objects.mjs';
 import { SHRINE_SHEETS } from '../public/js/shrine-variants.js?v=832a5e61';
-import { adoptedPlan } from '../public/js/features/patches-feature.js?v=59b123b0';
-import { createPlot } from '../public/js/patches.js?v=d5136729';
+import { adoptedPlan } from '../public/js/features/patches-feature.js?v=86cac496';
+import { createPlot } from '../public/js/patches.js?v=24ecef1c';
 import { serverPath, skipWithoutServer } from '../tools/repos.mjs';
 
 const root = join(import.meta.dirname, '..');

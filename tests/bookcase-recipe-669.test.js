@@ -11,7 +11,7 @@ import { describe, it, before } from 'node:test';
 import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { RECIPE_CATALOG, canCraft, craftRecipe, listRecipesForTool, loadRecipeCatalogFromFile } from '../public/js/making.js?v=96afba25';
+import { RECIPE_CATALOG, canCraft, craftRecipe, listRecipesForTool, loadRecipeCatalogFromFile } from '../public/js/making.js?v=2a62a71a';
 import { createInventory, countItem } from '../public/js/inventory.js?v=3be7988a';
 import { FURNITURE_CATALOG } from '../public/js/homes-catalog.js?v=0367f90f';
 import { TURNED_BACK_ON, loadRecipes } from '../build-recipes.mjs';

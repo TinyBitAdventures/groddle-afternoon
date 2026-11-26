@@ -36,10 +36,10 @@
  */
 
 import { addItem, countItem, ensureItem, removeItem, registerItemUse, ITEM_CATALOG } from '../inventory.js?v=3be7988a';
-import { dametimeParts, getGameDayKey } from '../game-day.js?v=a532775d';
+import { dametimeParts, getGameDayKey } from '../game-day.js?v=beeaa24b';
 import { SEASONAL_SEEDS, seedInSeason, seedSeasonLine, seedSeasons, setSeasonalSeedCheck as setGardenSeasonGate } from '../garden.js?v=fefa7bcd';
 import { setSeasonalSeedCheck as setMasterGardenSeasonGate } from '../garden.js?v=fefa7bcd';
-import { setSeasonalRecipeCheck } from '../making.js?v=96afba25';
+import { setSeasonalRecipeCheck } from '../making.js?v=2a62a71a';
 import { getToolCondition, copyForVerb, copyTag, migrateClassTag, setCopyTag, takeToolCopy } from '../tools.js?v=4156bba8';
 import { standOnFeet, anchorBottomCentre } from '../sprite-feet.js?v=6358a697';
 
@@ -78,12 +78,12 @@ function takePumpkin(engine, cls, copy) {
 }
 import { landingY, nearestSurfaceY } from '../walk-surface.js?v=f21ce37b';
 import { isStandable } from '../street-model.js?v=a9a05f9d';
-import { isBatterflyHabitat } from '../animal-husbandry.js?v=c66fc912';
-import { emblemCostFor } from '../shrines.js?v=f5eb7690';
+import { isBatterflyHabitat } from '../animal-husbandry.js?v=8418c3cb';
+import { emblemCostFor } from '../shrines.js?v=394d048e';
 import { rollDropTable } from '../drop-tables.js?v=1ed0b596';
 import { openNoteView, noteViewOpen } from '../note-view.js?v=c512b345';
-import { payDrop } from './drops-feature.js?v=67036c6e';
-import { fireflyJarCounts, setFireflyJar } from './resource-nodes-feature.js?v=181936b1';
+import { payDrop } from './drops-feature.js?v=3d999c08';
+import { fireflyJarCounts, setFireflyJar } from './resource-nodes-feature.js?v=f7e6c591';
 import { SEASON_DATA } from '../seasons-data.js?v=b5174bc9';
 import { forceMetabolic, shiftMetabolic, topUpMetabolic } from '../metabolics.js?v=48f784bf';
 import {

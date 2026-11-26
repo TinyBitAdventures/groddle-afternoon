@@ -42,8 +42,8 @@ import {
   settleSolo,
   soloRow,
 } from '../public/js/home-machines.js?v=7379f47f';
-import { homeMachinesFeature } from '../public/js/features/home-machines-feature.js?v=ce3365ea';
-import { RECIPE_CATALOG, setRecipeCatalog } from '../public/js/making.js?v=96afba25';
+import { homeMachinesFeature } from '../public/js/features/home-machines-feature.js?v=0df3457f';
+import { RECIPE_CATALOG, setRecipeCatalog } from '../public/js/making.js?v=2a62a71a';
 import { HAS_SERVER, HAS_SITE, SITE_DIR, serverPath } from '../tools/repos.mjs';
 import { HAS_PHP, PHP } from './php.js';
 

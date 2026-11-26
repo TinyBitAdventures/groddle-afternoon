@@ -14,7 +14,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { EGG_HUNT, SEASONS, SEASON_IDS, calendarSeasons, isDametimeZilloween } from '../public/js/seasons.js?v=5d8f545a';
-import { dametimeParts } from '../public/js/game-day.js?v=a532775d';
+import { dametimeParts } from '../public/js/game-day.js?v=beeaa24b';
 import { seasonsData } from '../tools/restoration/seasons.mjs';
 import { SITE_DIR, skipWithoutSite } from '../tools/repos.mjs';
 import { PHP } from './php.js';
