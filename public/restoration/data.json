@@ -2814,9 +2814,14 @@
   "deployed": "2026-11-26"
  },
  "git": {
-  "commits": 3720,
+  "commits": 3722,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-26",
+    "kind": "fix",
+    "text": "Keeping this window's game reloads the saved game when the site added something, so a returned Still stays"
+   },
    {
     "date": "2026-11-26",
     "kind": "fix",
@@ -2931,14 +2936,9 @@
     "date": "2026-11-26",
     "kind": "improve",
     "text": "The energy and mood rings change colour with how full they are, as in Glitch"
-   },
-   {
-    "date": "2026-11-26",
-    "kind": "fix",
-    "text": "Making a Fireplace uses your empty Firefly Jars first and keeps the full ones"
    }
   ]
  },
- "tests": 1440,
+ "tests": 1441,
  "generatedAt": "2026-11-26"
 }
