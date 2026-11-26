@@ -160,6 +160,38 @@ export function ancestralTick(clock, ms) {
 /** get_baqala_buff_time, in seconds. */
 export const ancestralSeconds = (clock) => Math.max(0, Number(clock?.spent) || 0);
 
+/**
+ * Sleep grace (Austin's ruling 2026-11-26: as Glitch). A Glitch client that slept was logged out:
+ * leave_savanna(logout) banked time_spent and set logged_out (inc_special_locations.js 88-109), and
+ * Overwhelming Ancestral Nostalgia is not an offline buff (catalog_buffs.js 21-27), so
+ * buffs_logout froze it (inc_buffs.js 107-112). Logging in ran start_baqala_buff, whose grace
+ * period gave a visit already over 15 s more (37-40: time_spent >= 600 becomes 585). Our clock is
+ * wall-clock (#700), so a computer asleep used the whole visit up and the kick came on waking.
+ */
+export const ANCESTRAL_WAKE_GRACE = ANCESTRAL_CLOCK.graceFrom - ANCESTRAL_CLOCK.graceTo;
+
+/**
+ * A gap between frames this long is the computer asleep (or the tab frozen), not a hidden tab: the
+ * hidden tab's own timer (features/juju-bandits-feature.js watchHidden) runs at least once a minute
+ * even when the browser throttles it (Chrome's intensive throttling), so a hidden tab is still
+ * sent away on time.
+ */
+export const ANCESTRAL_SLEEP_GAP_MS = 90_000;
+
+/**
+ * Coming back from a logout (asleep, or the realtime socket down): a visit that ran out since
+ * (`spentBefore` seconds when it stopped being watched, now past `limitSeconds`) is left with the
+ * grace's 15 s, or what it had left if that was less (time_spent 585-599 stayed). Returns true when
+ * it changed the clock.
+ */
+export function ancestralWake(clock, spentBefore, limitSeconds) {
+  const limit = Number(limitSeconds);
+  const before = Math.max(0, Number(spentBefore) || 0);
+  if (!clock?.inside || !(limit > 0) || ancestralSeconds(clock) < limit || before >= limit) return false;
+  clock.spent = Math.max(before, limit - ANCESTRAL_WAKE_GRACE);
+  return true;
+}
+
 /** npc_juju_bandit.js copy, verbatim ({pc} is the player's name). */
 export const JUJU_TEXT = Object.freeze({
   alertOffer: 'One of the notorious Juju Bandits has appeared, and he… needs your help?',

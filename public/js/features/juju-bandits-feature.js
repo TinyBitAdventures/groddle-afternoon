@@ -68,6 +68,8 @@ import {
   ancestralLeave,
   ancestralSeconds,
   ancestralTick,
+  ancestralWake,
+  ANCESTRAL_SLEEP_GAP_MS,
   isSavannaHub,
   jujuAnchor,
   jujuCurse,
@@ -79,7 +81,7 @@ import {
   redeclareDelay,
   stealChanceForSeconds,
   withinReach,
-} from '../juju-bandits.js?v=737fdcd7';
+} from '../juju-bandits.js?v=0d3af5fe';
 import {
   NOSTALGIA_BUFF,
   NOSTALGIA_TEXT,
@@ -122,6 +124,13 @@ let hiddenTimer = null;
 let hiddenWatch = false;
 let engineRef = null;
 const HIDDEN_TICK_MS = 1000;
+/**
+ * Online, the realtime socket down after it was up is a logout (sleep grace, ancestralWake): the
+ * client watched, and the clock's seconds when it dropped (null: not in the visit then).
+ */
+let realtimeWatched = null;
+let realtimeDown = false;
+let spentAtDrop = null;
 let publishedSecond = -1;
 /**
  * Ancestral Nostalgia (js/ancestral-nostalgia.js), saved beside the clock:
@@ -776,10 +785,53 @@ function tickClock(engine, now) {
   if (clock.inside) {
     // A last frame later than now (the system clock set back) is no start.
     const from = Math.max(lastTickAt <= now ? lastTickAt : 0, enteredAt);
-    ancestralTick(clock, from ? now - from : 0);
+    const gap = from ? now - from : 0;
+    const before = ancestralSeconds(clock);
+    ancestralTick(clock, gap);
+    // Asleep (ancestralWake): a visit that ran out in the gap keeps Glitch's 15 s of grace.
+    if (gap >= ANCESTRAL_SLEEP_GAP_MS) wake(engine, before);
     if (Math.floor(ancestralSeconds(clock)) !== publishedSecond) publishClock(engine);
   }
   lastTickAt = now;
+}
+
+/** ancestralWake on the clock, from `before` seconds when the player was last there. */
+function wake(engine, before) {
+  if (!ancestralWake(clock, before, nostalgiaLimitSeconds(ownedCards(engine)))) return false;
+  publishedSecond = -1;
+  nostalgiaLast = 'woke';
+  return true;
+}
+
+/**
+ * Online, the realtime socket dropping and coming back is a logout and login, as a Glitch client
+ * that lost its connection was logged out (ancestralWake): no kick while it is down, and a visit
+ * that ran out meanwhile has its 15 s once it is back.
+ */
+function watchRealtime(engine) {
+  if (engine?.mode !== 'multiplayer') return;
+  const client = engine.query?.('realtimeClient');
+  if (!client || client === realtimeWatched || typeof client.on !== 'function') return;
+  realtimeWatched = client;
+  realtimeDown = false;
+  spentAtDrop = null;
+  client.on('state', (detail) => {
+    if (realtimeWatched !== client) return;
+    const online = detail?.state === 'online';
+    if (!online && !realtimeDown) {
+      realtimeDown = true;
+      spentAtDrop = clock.inside ? ancestralSeconds(clock) : null;
+    } else if (online && realtimeDown) {
+      realtimeDown = false;
+      const before = spentAtDrop;
+      spentAtDrop = null;
+      if (before != null && engineRef && wake(engineRef, before)) {
+        syncNostalgiaBuff(engineRef, Date.now());
+        publishClock(engineRef);
+        publishNostalgia(engineRef);
+      }
+    }
+  });
 }
 
 /**
@@ -821,9 +873,10 @@ function tickNostalgia(engine, now) {
   }
   if (clock.inside) {
     if (nostalgiaLeft(engine) > 0) syncNostalgiaBuff(engine, now);
-    else if (inSavanna(engine)) requestBoot('expired');
+    else if (inSavanna(engine) && !realtimeDown) requestBoot('expired');
     else {
-      // Out of time in a quest room or scene: the tray holds at a second until you are back.
+      // Out of time in a quest room or scene, or logged out (the realtime socket down, watchRealtime):
+      // the tray holds at a second until you are back.
       const row = engine.buffRow?.(NOSTALGIA_BUFF);
       if (row) row.expiresAt = now + 1000;
     }
@@ -966,6 +1019,7 @@ export const jujuBanditsFeature = {
 
   onTick(dtMs, now, engine) {
     engineRef = engine;
+    watchRealtime(engine);
     leaveForHome(engine, now);
     tickClock(engine, now);
     tickNostalgia(engine, now);
