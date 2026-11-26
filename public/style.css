@@ -11118,6 +11118,14 @@ html:not(.stage-pinned) #game-root[data-stage-sky-fill]::before {
   /* 0, first in the root: over the canvas (not positioned), under every positioned piece after it. */
   z-index: 0;
 }
+/* STREET BAND (#654, Austin's ruling 2026-11-25): upright on the phone layout the canvas stands between
+   the top bar and the controls (game.js activeStageFrame, js/ui/phone-layout.js streetBandOf), as
+   Glitch's viewport stood under its header and over its pack. The room under it, where the stick, Act,
+   Jump and the pack row stand, is the dark band (G880), not more sky: the root's own background, so
+   it stands under every HUD piece. */
+html:not(.stage-pinned) #game-root[data-stage-framed] {
+  background-image: linear-gradient(to top, var(--c-grey-29) var(--stage-foot, 0px), transparent var(--stage-foot, 0px));
+}
 /* The band's colour follows the scene's top edge as the camera moves (game.js sampleStageSkyEdge): a soft change, not a flick. */
 html:not(.stage-pinned) #game-root[data-stage-sky-fill] { transition: background-color 0.4s ease; }
 /* Over a light sky the caption's white letters need a darker halo than the street's own art gives them. */

@@ -4,7 +4,7 @@
  */
 import { ITEM_ICONS, ITEM_LABELS, getVerbsFor, ordinaryItems, runVerb } from './content.js?v=a87eb482';
 import { createErrorOnce, createFeatureHost, createFrameStages } from './js/feature-host.js?v=b87e2cbc';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=46151ef4';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=3f575b82';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, enterHintPick, reachGlowTargets, spriteHasRimArt, rimArtParts, trimmedIconUrl, drawTileArt } from './js/enter-chooser.js?v=28f69f85';
 import { firstTendKey, STICK_TEND_DELAY_MS, STICK_TEND_DIRS, STICK_TEND_REPEAT_MS, stepTendKey, stepTendKeys, stickTendKey, tendKeyAction } from './js/garden-tend.js?v=a7470c4a';
 import { avatarHitBox, behindFloor, bodyReachDistance, OUT_OF_REACH_LINE, playerClickBox } from './js/reach.js?v=456da8a8';
@@ -137,7 +137,7 @@ import {
 } from './js/legalize-it.js?v=8178339d';
 import { HALL, HALL_LAYOUT, HALL_OFFICE, HALL_QUESTIONS } from './js/bureaucratic-hall.js?v=7ea53899';
 import { STATION_X, stationArrival, stationScreen, surfaceStation } from './js/subway.js?v=ea6921ff';
-import { ALLEY, SHADY, drawAlley, inEnteredBox } from './js/quest-rooms/back-alley-set.js?v=57a7bc1a';
+import { ALLEY, SHADY, drawAlley, inEnteredBox } from './js/quest-rooms/back-alley-set.js?v=bf5593d2';
 import { WINTER_WALK_BOUNDS, WINTER_WALK_PASSAGE } from './js/winter-walk-streets.js?v=c921bf92';
 import {
   WINTER_HAVEN_STREET_ID,
@@ -840,7 +840,7 @@ import { easeCameraAxis } from './js/camera-feel.js?v=e668afc5';
 import { renderResolution, resolutionCap, RESOLUTION_STEP, phoneZoomResolution } from './js/render-density.js?v=74c6f5f9';
 // g458: low energy and mood turn amber and red, and a click offers something from the pack.
 import { makingNeeds, vitalMenuEmpty, vitalMenuHeading, vitalSnacks } from './js/vitals.js?v=85a51302';
-import { DEFAULT_VP_H, LOCATION_VIEW_W, VIEW_CEIL_H, stageFor, sceneViewCap, sceneViewWidthCap, zoomMovesStage, phoneZoomSpan, phoneCameraAnchor, phoneFeetWorldHeight, phoneGroundWorldHeight, phoneSceneDrop, reachableFloorY, sceneBottomLine, sceneGroundLine, stageBandColour, stageEdgeColour, stageEdgeSampler, stageRoomBeside } from './js/location-view.js?v=fa4d254b';
+import { DEFAULT_VP_H, LOCATION_VIEW_W, VIEW_CEIL_H, stageFor, sceneViewCap, sceneViewWidthCap, zoomMovesStage, phoneZoomSpan, phoneCameraAnchor, phoneFeetWorldHeight, phoneGroundWorldHeight, phoneSceneDrop, reachableFloorY, sceneBottomLine, sceneGroundLine, stageBandColour, stageEdgeColour, stageEdgeSampler, stageRoomBeside, stageRoomInBand } from './js/location-view.js?v=76a9ff86';
 import {
   levelInfoForXp,
   reconcilePlayerProgression,
@@ -871,12 +871,12 @@ import {
 import { momentMoreText } from './js/ui/moment-card.js?v=b383144f';
 import { CHAT_MAX_CHARS, chatBubbleText } from './js/ui/chat-input.js?v=8f2479a3';
 // HUB: the hub is the Modern skin's; Classic owns X in its skin (js/classic/classic-hub.js).
-import { MODERN, onUiModeChange, readUiCache, uiState, writeUiCache } from './js/classic/ui-mode.js?v=792d8160';
+import { MODERN, onUiModeChange, readUiCache, uiState, writeUiCache } from './js/classic/ui-mode.js?v=f5e733fb';
 // ZOOM: the world zoom (a device preference) and Classic's frame scale under it; both load before main().
 import { worldZoom, setWorldZoom, stepWorldZoom, onZoomChange, zoomKeyAction, zoomKeyToast, zoomFixed, setZoomFixed, onZoomFixedChange, phoneZoom } from './js/world-zoom.js?v=38816228';
 import { nightTint, nightTintOn, onNightTintChange, worldTintOpacity } from './js/night-tint.js?v=1dfc9c89';
 import { streetMapSetting, toggleStreetMap } from './js/ui/street-minimap.js?v=faab86a5';
-import './js/classic/classic-zoom.js?v=46b85c5d';
+import './js/classic/classic-zoom.js?v=8e75bcdb';
 import { mountImaginationHub } from './js/ui/imagination-hub.js?v=6928c5b7';
 import { newDayBubble, shuffleNewDayMessages, waitForScreenGates } from './js/screen-queue.js?v=cf0132c0';
 import { applyFamiliarLook, familiarCardHeading, familiarLook, skillArtFor, skillLearnedActivity } from './js/familiar.js?v=b9597cd3';
@@ -1140,7 +1140,7 @@ import { backgroundSound, backgroundSoundOn } from './js/background-sound.js?v=d
 import { bubbleMs } from './js/read-time.js?v=3151fb1a';
 import { mountNotifyView } from './js/notify-view.js?v=18b4efca';
 import { mountSocialDrawer } from './js/ui/social-drawer.js?v=140c3302';
-import { installPhonePill, mountPhoneLayout, socialPillCount } from './js/ui/phone-layout.js?v=703775b3';
+import { installPhonePill, mountPhoneLayout, socialPillCount } from './js/ui/phone-layout.js?v=ebaad3fe';
 import { bindChatLinks } from './js/chat-links.js?v=b717fac7';
 import { playerNameColour } from './js/name-colours.js?v=9819bb8a';
 import { SIDE_SHEET_IDS, bindTabs, inSideSheet, mountPanelShell, sheetKeyToWorld } from './js/ui/panel-shell.js?v=5efb38c6';
@@ -1189,7 +1189,7 @@ import { filterText } from './js/word-filter.js?v=9a7a7ebb'; // the remake's own
 import { mountStartStreet } from './js/start-street.js?v=7d8ce49c'; // #349: the start card names the save's street
 import { arrangeMapCards, fitMapExtras } from './js/map-extras.js?v=16e261b1'; // the Map's Shortcuts
 // The interface skin (js/classic/ui-mode.js) sets <html data-ui> as it loads: before main(), so before the boot cover lifts.
-import { installInterfaceSettings } from './js/classic/classic-prefs.js?v=669e179a';
+import { installInterfaceSettings } from './js/classic/classic-prefs.js?v=a1eb74c4';
 import { standOnFeet, anchorBottomCentre } from './js/sprite-feet.js?v=6358a697';
 import { markLeaving, packPicks, takeCopies } from './js/copy-picks.js?v=b368fd49';
 import { holdKeepsBusy } from './js/instance-holds.js?v=ff3a63a3';
@@ -2224,6 +2224,25 @@ function activeStageDock() {
 }
 
 /**
+ * #654 (Austin's ruling 2026-11-25): upright on the phone layout, the street's band between the top
+ * bar and the controls ({ top, bottom } in #game-root's px, js/ui/phone-layout.js streetBandOf, set by
+ * engine.setStageFrame), or null. The canvas fits that band (js/location-view.js stageRoomInBand), so
+ * the top bar and the stick, Act, Jump and the pack row sit outside the street, as Glitch's header and
+ * pack sat outside its viewport (TSMainView.as resizeToStage 1229-1257). Before, the street ran the
+ * whole screen under both and fitted between them only where #617's ground line left it so.
+ */
+let stageFrame = null;
+function activeStageFrame() {
+  if (!TOUCH_PHONE || PINNED_VIEW_H > 0 || !stageFrame || !modernUi()) return null;
+  const root = document.getElementById('game-root');
+  return root && root.clientHeight > root.clientWidth ? stageFrame : null;
+}
+/** #654: the canvas's room in #game-root: beside a docked window (G1178), inside the street's band upright. */
+function stageRoom(root, dock = activeStageDock()) {
+  return stageRoomInBand(stageRoomBeside(root.clientWidth, root.clientHeight, dock), activeStageFrame());
+}
+
+/**
  * PINCH PREVIEW (Austin 2026-11-13 on his iPhone: "The phone zoom in/out flickers and is mostly
  * black during the zoom itself"): a pinch set the phone zoom once a frame in a requestAnimationFrame
  * that ran after Pixi's own, and each level resized the renderer, which clears the canvas: the
@@ -2253,7 +2272,9 @@ function stageArgs() {
   }
   // G1178 (#625): a window docked on a phone (the house's Customize sheet) leaves the canvas the rest.
   const dock = activeStageDock();
-  const room = stageRoomBeside(root.clientWidth, root.clientHeight, dock);
+  const whole = stageRoomBeside(root.clientWidth, root.clientHeight, dock);
+  // #654: upright on the phone layout, inside the band between the top bar and the controls.
+  const room = stageRoomInBand(whole, activeStageFrame());
   return {
     width: room.width,
     height: room.height,
@@ -2277,6 +2298,9 @@ function stageArgs() {
     topBand: dock ? 0 : phoneTopBand(),
     // SKY FILL: the house and a Tower floor take a narrower floor upright (js/features/homes-feature.js phoneMinViewW).
     minViewW: bgLayer?.phoneMinViewW,
+    // #654: upright on the phone layout the room is the street's band (the scale the whole room's).
+    streetBand: room.top > 0,
+    fullHeight: whole.height,
   };
 }
 
@@ -2475,7 +2499,11 @@ function syncLocationViewHeight({ keepFraming = false } = {}) {
   if (root && !stage.pinned && !pinchPreview) {
     // Only a view held under the window's height (a portrait phone) leaves a band above the canvas.
     // G1178: a docked canvas sits at the top, beside the window, with no band.
-    const band = dock ? 0 : root.clientHeight - stage.cssHeight;
+    // #654: upright on the phone layout the canvas stands in the street's band, on its foot: the top
+    // bar over it, the controls under it (--stage-foot, style.css STREET BAND).
+    const room = stageRoom(root, dock);
+    const framed = room.top > 0;
+    const band = framed ? room.top + room.height - stage.cssHeight : dock ? 0 : root.clientHeight - stage.cssHeight;
     if (band >= 1) {
       root.style.setProperty('--stage-h', `${stage.cssHeight.toFixed(2)}px`);
       root.style.setProperty('--stage-gap', `${band.toFixed(2)}px`);
@@ -2483,10 +2511,17 @@ function syncLocationViewHeight({ keepFraming = false } = {}) {
       root.style.removeProperty('--stage-h');
       root.style.removeProperty('--stage-gap');
     }
+    if (framed) {
+      root.dataset.stageFramed = '1';
+      root.style.setProperty('--stage-foot', `${Math.max(0, root.clientHeight - room.top - room.height).toFixed(2)}px`);
+    } else {
+      delete root.dataset.stageFramed;
+      root.style.removeProperty('--stage-foot');
+    }
     // G1178: a docked canvas is the size of the room the window leaves, beside it (pinStageCanvasSize).
     if (dock) {
       root.dataset.stageDocked = dock.side;
-      dockCanvasSize = { w: stage.cssWidth, h: stage.cssHeight, left: stageRoomBeside(root.clientWidth, root.clientHeight, dock).left };
+      dockCanvasSize = { w: stage.cssWidth, h: stage.cssHeight, left: room.left };
     } else {
       delete root.dataset.stageDocked;
       dockCanvasSize = null;
@@ -2506,7 +2541,7 @@ function syncLocationViewHeight({ keepFraming = false } = {}) {
     // computer's narrow window. SKY FILL (Austin's iPhone 2026-11-24): on an upright phone the band is
     // the scene's own sky carried on up, faded over the canvas's top edge (js/location-view.js
     // stageBandColour, style.css data-stage-sky-fill); syncStageSky follows the camera each frame.
-    stageSkyFill = band >= 1 && Boolean(stage.phone) && !stage.landscape;
+    stageSkyFill = band >= 1 && Boolean(stage.phone) && !stage.landscape && !dock;
     if (stageSkyFill) root.dataset.stageSkyFill = '1';
     else delete root.dataset.stageSkyFill;
     // A new scene, or no band: the old read-back is not this one's, and the scene's first drawn frame
@@ -15031,6 +15066,21 @@ const engine = {
     const next = stageDockOf(stageDocks);
     if ((next?.side || '') === (stageDock?.side || '') && (next?.css || 0) === (stageDock?.css || 0) && Boolean(next?.zoom) === Boolean(stageDock?.zoom)) return false;
     stageDock = next;
+    if (!TOUCH_PHONE) return false;
+    window.dispatchEvent(new Event('resize'));
+    return true;
+  },
+  /**
+   * #654: upright on the phone layout, the street's band between the top bar and the controls
+   * ({ top, bottom } in #game-root's px, js/ui/phone-layout.js streetBandOf), or null for none. The
+   * canvas fits it (activeStageFrame). Computers ignore it.
+   */
+  setStageFrame(frame = null) {
+    const t = Math.round(Number(frame?.top));
+    const b = Math.round(Number(frame?.bottom));
+    const next = Number.isFinite(t) && Number.isFinite(b) && b > t ? { top: t, bottom: b } : null;
+    if ((next?.top ?? -1) === (stageFrame?.top ?? -1) && (next?.bottom ?? -1) === (stageFrame?.bottom ?? -1)) return false;
+    stageFrame = next;
     if (!TOUCH_PHONE) return false;
     window.dispatchEvent(new Event('resize'));
     return true;

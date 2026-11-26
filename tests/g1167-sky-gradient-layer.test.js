@@ -24,7 +24,7 @@ import {
   groundBelowSpan,
   skirtFadeColour,
 } from '../public/js/street-render.js?v=2b7abfd2';
-import { PHONE_HOME_MIN_VIEW_W, PHONE_PORTRAIT_MIN_VIEW_W, SHORT_SCENE_BAND, STAGE_EDGE_GAP_MS, STAGE_EDGE_MOVE, STAGE_EDGE_SETTLE_MS, STAGE_SKY_FADE, phoneStage, shortSceneBand, stageBandColour, stageEdgeColour, stageEdgeSampler, stageFor } from '../public/js/location-view.js?v=fa4d254b';
+import { PHONE_HOME_MIN_VIEW_W, PHONE_PORTRAIT_MIN_VIEW_W, SHORT_SCENE_BAND, STAGE_EDGE_GAP_MS, STAGE_EDGE_MOVE, STAGE_EDGE_SETTLE_MS, STAGE_SKY_FADE, phoneStage, shortSceneBand, stageBandColour, stageEdgeColour, stageEdgeSampler, stageFor } from '../public/js/location-view.js?v=76a9ff86';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const read = (rel) => readFileSync(join(here, '..', rel), 'utf8');
@@ -373,7 +373,7 @@ describe('SKY FILL: a short scene on an upright phone leaves no flat dark band',
 
   it('game.js paints it on an upright phone and follows the camera; style.css fades it over the canvas top', () => {
     const game = read('public/game.js');
-    assert.match(game, /stageSkyFill = band >= 1 && Boolean\(stage\.phone\) && !stage\.landscape;/);
+    assert.match(game, /stageSkyFill = band >= 1 && Boolean\(stage\.phone\) && !stage\.landscape && !dock;/);
     assert.match(game, /const sceneSky = band >= 1 \? stageBandColour\(sceneBandSky\(viewSceneLayer\), \{ phone: stageSkyFill \}\) : '';\n    syncStageSky\(stageSkyFill && stageSkyEdge \? stageSkyEdge : sceneSky, sceneSky\);/);
     // The canvas's top edge is read back right after the render, only on the frames the sampler names, and wins over the scene's colour.
     assert.match(game, /app\.ticker\.add\(\(\) => run\('sky fill', sampleStageSkyEdge\), null, PIXI\.UPDATE_PRIORITY\?\.UTILITY \?\? -50\);/);

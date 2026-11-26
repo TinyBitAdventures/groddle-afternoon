@@ -27,7 +27,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
   CHOOSER_MIN_W, GAP, PILL_IDS, STICK, TAP_H, boxesOverlap, chooserRoomOf, fullScreenWay, layoutProblems, menuRoomOf, phoneRegions, pillBadge, socialPillCount, stickRegionOf, streetFloorOf,
-} from '../public/js/ui/phone-layout.js?v=703775b3';
+} from '../public/js/ui/phone-layout.js?v=ebaad3fe';
 import { phonePins } from '../public/js/ui/quest-pin-button.js?v=2931d81d';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -1267,7 +1267,12 @@ describe('a short scene on an upright phone leaves no flat dark band (Chrome, Au
           const hud = [...document.querySelectorAll('#hud-stats, .top-bar .top-actions, #street-nameplate, #homes-modes, #buff-strip, .notify-notices > *, .touch-stick, .touch-act, .touch-jump, .street-prompt, .quoin-notice')]
             .filter((el) => el.checkVisibility() && el.getBoundingClientRect().width > 0)
             .map((el) => { const r = el.getBoundingClientRect(); return [r.left, r.top, r.right, r.bottom]; });
-          return { top: c.top, strip, hud, app: document.documentElement.classList.contains('ios-home-app') };
+          // #654: upright the canvas stands in the street's band, under the top bar; the band over it carries the
+          // canvas's own top edge on up (the colour read back there, game.js sampleStageSkyEdge).
+          const canvas = document.querySelector('#game-root > canvas[role="application"]');
+          const framed = document.getElementById('game-root').hasAttribute('data-stage-framed');
+          const edge = /^#[0-9a-f]{6}$/i.test(canvas.dataset.stageSkyEdge || '') ? [1, 3, 5].map((i) => parseInt(canvas.dataset.stageSkyEdge.slice(i, i + 2), 16)) : null;
+          return { top: c.top, strip, hud, app: document.documentElement.classList.contains('ios-home-app'), framed, edge };
         });
         if (m.app !== app) bad.push(`${place}: the Home Screen hook is ${m.app}`);
         // The scene reaches the strip, or the band left over it is the scene carried on up.
@@ -1299,6 +1304,11 @@ describe('a short scene on an upright phone leaves no flat dark band (Chrome, Au
             const main = [...groups.values()].sort((a, b) => b.length - a.length)[0];
             return { band: spots.map(([x, y]) => at(x, y)), row: [0, 1, 2].map((i) => Math.round(main.reduce((t, p) => t + p[i], 0) / main.length)) };
           }, [shot, spots, under, w]);
+          // #654: under the top bar the canvas's top row 30 px down is often under the notices; its edge as read back is the scene's top colour.
+          if (m.framed) {
+            if (!m.edge) bad.push(`${place}: no colour read back from the canvas's top edge`);
+            else got.row = m.edge;
+          }
           if (spots.length < 4) bad.push(`${place}: only ${spots.length} spots of the band clear of the HUD`);
           for (const [i, [x, y]] of spots.entries()) {
             const px = got.band[i];
@@ -1319,6 +1329,8 @@ describe('a short scene on an upright phone leaves no flat dark band (Chrome, Au
   // yard fills a Safari tab whole with no band left; the read-back budget is kept on scenes that still
   // leave one (a Towers hall, Hell Bar).
   const BAND_SCENES = [SCENES[1], ['Hell Bar', 'streetdemo=GA5FPUNAI7P2NVF']];
+  // #654 (Austin's ruling 2026-11-25): upright the street stands between the top bar and the controls, so the
+  // yard fills that band (the street's room) with no held band left inside it, not the screen from its top.
   it('#681: the back yard fills a Safari tab 402x874 whole from its top, with no band left', { timeout: 120_000 }, async () => {
     const base = `http://127.0.0.1:${server.address().port}`;
     const ctx = await chrome.browser.newContext({ viewport: { width: 402, height: 874 }, isMobile: true, hasTouch: true, deviceScaleFactor: 1, userAgent: UA });
@@ -1330,12 +1342,13 @@ describe('a short scene on an upright phone leaves no flat dark band (Chrome, Au
     const m = await tab.evaluate(() => {
       const c = document.querySelector('#game-root > canvas[role="application"]');
       const root = document.getElementById('game-root');
-      return { top: c.getBoundingClientRect().top - root.getBoundingClientRect().top, fill: root.hasAttribute('data-stage-sky-fill'), camY: Number(c.dataset.cameraY) };
+      const regions = JSON.parse(c.dataset.phoneRegions || '{}');
+      return { top: c.getBoundingClientRect().top - root.getBoundingClientRect().top, bottom: c.getBoundingClientRect().bottom - root.getBoundingClientRect().top, band: regions.street };
     });
     await ctx.close();
-    assert.ok(m.top <= 1, `the canvas reaches the screen's top (${m.top} px band)`);
-    assert.equal(m.fill, false, 'no band to fill');
-    assert.ok(m.camY <= 0, `the camera's top is the yard's top or above it (${m.camY})`);
+    assert.ok(m.band, 'an upright street band');
+    assert.ok(Math.abs(m.top - m.band.top) <= 1, `the canvas reaches the band's top (${m.top} vs ${m.band.top})`);
+    assert.ok(Math.abs(m.bottom - m.band.bottom) <= 1, `the canvas reaches the band's foot (${m.bottom} vs ${m.band.bottom})`);
   });
   it('the band reads the canvas back on arrival, then not at all while the camera holds still (Safari tab 402x874)', { timeout: 180_000 }, async (t) => {
     const base = `http://127.0.0.1:${server.address().port}`;

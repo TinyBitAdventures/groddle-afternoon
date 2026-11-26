@@ -12,7 +12,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { defaultHouseConfig } from '../public/js/home-house.js?v=3c88c47c';
 import { createHomeState, setHomeHouse } from '../public/js/homes.js?v=dca6b2cd';
-import { homesFeature } from '../public/js/features/homes-feature.js?v=0a967a90';
+import { homesFeature } from '../public/js/features/homes-feature.js?v=6243f555';
 import { HOUSE_PICKER_TEXT } from '../public/js/ui/house-picker.js?v=67f03b99';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -60,7 +60,7 @@ describe('the Customize window on a phone (G1178)', () => {
   });
 
   it('the street fits the room the sheet leaves, the whole house in it, for every house', async () => {
-    const { stageFor, stageRoomBeside } = await import('../public/js/location-view.js?v=fa4d254b');
+    const { stageFor, stageRoomBeside } = await import('../public/js/location-view.js?v=76a9ff86');
     const { HOUSE_HEADROOM, HOUSE_STYLE_IDS, houseFitViewH, houseLot } = await import('../public/js/home-house.js?v=3c88c47c');
     assert.deepEqual(stageRoomBeside(402, 812, null), { width: 402, height: 812, left: 0 });
     assert.deepEqual(stageRoomBeside(402, 812, { side: 'bottom', css: 357 }), { width: 402, height: 455, left: 0 });
@@ -93,7 +93,8 @@ describe('the Customize window on a phone (G1178)', () => {
     const homes = read('public/js/features/homes-feature.js');
     assert.match(homes, /onDock: \(dock\) => \{\n\s+houseDocked = Boolean\(dock\);\n\s+engine\.setStageDock\?\.\(dock\);/);
     const game = read('public/game.js');
-    assert.match(game, /const room = stageRoomBeside\(root\.clientWidth, root\.clientHeight, dock\);\n\s+return \{\n\s+width: room\.width,\n\s+height: room\.height,/);
+    // #654: upright on the phone layout the room is then cut to the street's band (stageRoomInBand).
+    assert.match(game, /const whole = stageRoomBeside\(root\.clientWidth, root\.clientHeight, dock\);\n.*\n\s+const room = stageRoomInBand\(whole, activeStageFrame\(\)\);\n\s+return \{\n\s+width: room\.width,\n\s+height: room\.height,/);
     assert.match(game, /function activeStageDock\(\) \{\n\s+return TOUCH_PHONE && PINNED_VIEW_H <= 0 && stageDock \? stageDock : null;/);
   });
 });

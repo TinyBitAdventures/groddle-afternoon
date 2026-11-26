@@ -273,11 +273,18 @@ export function stageFor({
   topBand,
   minViewW,
   sceneDrop,
+  streetBand = false,
+  fullHeight,
 } = {}) {
   const W = finite(width);
   const H = finite(height);
   const pack = finite(packReserve, MIN_PACK_HEIGHT);
   const pinned = finite(pinnedHeight);
+  // STREET BAND (#654): the phone's own stage for the whole room (`fullHeight`), cut to the band.
+  if (streetBand && phone && !(pinned > 0) && W > 0 && H > 0) {
+    const full = stageFor({ width: W, height: Math.max(H, finite(fullHeight, H)), packReserve: pack, sceneWidth, sceneHeight, zoom, phone, closeup, fitViewH, groundLine, topBand, minViewW });
+    return streetBandStage(full, { width: W, height: H, packReserve: pack, sceneDrop });
+  }
   if (phone && !(pinned > 0) && W > 0 && H > W) return phoneStage({ width: W, height: H, packReserve: pack, sceneWidth, sceneHeight, closeup, groundLine, topBand, minViewW, sceneDrop });
   if (phone && !(pinned > 0) && W > 0 && H > 0) return landscapePhoneStage({ width: W, height: H, packReserve: pack, sceneWidth, sceneHeight, zoom, closeup, fitViewH });
   return computerStage({ width: W, height: H, packReserve: pack, sceneWidth, sceneHeight, pinnedHeight: pinned, zoom, borders: sceneBorders, fitViewH, groundFit });
@@ -610,6 +617,61 @@ export function stageRoomBeside(width, height, dock) {
   if (dock.side === 'bottom') return { width: W, height: Math.max(1, H - css), left: 0 };
   if (dock.side === 'left') return { width: Math.max(1, W - css), height: H, left: Math.min(css, W - 1) };
   return { width: W, height: H, left: 0 };
+}
+
+/**
+ * PURE (#654, Austin's ruling 2026-11-25): the canvas's room inside an upright phone's street band.
+ * The band ({ top, bottom } in the root's px, js/ui/phone-layout.js streetBandOf) runs from under the
+ * top bar to over the stick, Act, Jump and the pack row, so neither bar stands over the street:
+ * Glitch drew its location viewport under the header and over the pack (TSMainView.as resizeToStage
+ * 1229-1257: loc_vp_h is the stage less the header and the pack). `room` is stageRoomBeside's; a
+ * window docked at the bottom (a sheet, an open bag) ends the band at its top edge too. With no band
+ * (sideways, computers, Classic) the room is as given, at the top. The stage is worked out for the
+ * room (stageFor) and the canvas laid `top` px down the root.
+ * @returns {{ width: number, height: number, left: number, top: number }}
+ */
+export function stageRoomInBand(room, band) {
+  const r = { width: finite(room?.width, 0), height: finite(room?.height, 0), left: finite(room?.left, 0) };
+  const t = finite(band?.top);
+  const b = finite(band?.bottom);
+  if (!(b > t)) return { ...r, top: 0 };
+  const foot = Math.min(b, r.height);
+  const top = Math.max(0, Math.min(t, foot - 1));
+  return { ...r, top, height: Math.max(1, foot - top) };
+}
+
+/**
+ * PURE (#654, Austin's ruling 2026-11-25): an upright phone's stage cut to its street band. `full` is
+ * the stage the phone takes for its whole room (phoneStage, or landscapePhoneStage beside a docked
+ * window), worked out as before; `height` is the band's (stageRoomInBand). The scale stays the whole
+ * room's, so the avatar is as big as it was and a pinch reaches as close (Glitch's viewport kept its
+ * scale and its camera scrolled a street taller than it, CameraMan.as): only the view gets shorter,
+ * the camera scrolling the street up and down in it. The pack reserve's rows (132 world px) are
+ * street the canvas shows, the pack row standing under the canvas now, not over its foot. A scene
+ * shorter than the band is held in it, on its foot, as before (`sceneDrop`, #681).
+ */
+export function streetBandStage(full, { width, height, packReserve = MIN_PACK_HEIGHT, sceneDrop = 0 } = {}) {
+  const W = finite(width);
+  const H = finite(height);
+  const pack = finite(packReserve, MIN_PACK_HEIGHT);
+  const scale = finite(full?.scale);
+  if (!(scale > 0) || !(W > 0) || !(H > 0)) return full;
+  const room = Math.floor(H / scale + 1e-6) - pack;
+  const drop = Math.max(0, Math.ceil(finite(sceneDrop, 0)));
+  const viewH = Math.max(1, Math.min(room, finite(full.viewH, room) + drop));
+  const held = viewH < room;
+  return {
+    scale,
+    viewW: Math.round(W / scale),
+    viewH,
+    canvasH: viewH + pack,
+    cssWidth: W,
+    cssHeight: held ? (viewH + pack) * scale : H,
+    pinned: false,
+    phone: true,
+    streetBand: true,
+    ...(full.landscape ? { landscape: true } : {}),
+  };
 }
 
 /**

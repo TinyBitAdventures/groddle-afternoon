@@ -108,6 +108,8 @@ const num = (v, d = 0) => (Number.isFinite(Number(v)) ? Number(v) : d);
  * banner), null when none shows: its slot `homes` is under the caption at the left, the buff strip
  * under it (null in the result when none shows). `snap` the measured box of Camera Mode's Snap button
  * (G1314) while it shows: the notices keep above it (`snap` in the result, null under a sheet).
+ * `street` (#654) is the street's band upright, { top, bottom } between the top bar and the controls
+ * (streetBandOf), the canvas's room (engine.setStageFrame); null sideways.
  */
 export function phoneRegions({ width, height, safe = {}, sheet = '', pack = null, packShown = true, bagTop = NaN, caption = null, captionUnder = null, pin = null, controls = null, buffs = null, homes = null, play = [], snap = null } = {}) {
   const W = Math.max(0, num(width));
@@ -190,6 +192,12 @@ export function phoneRegions({ width, height, safe = {}, sheet = '', pack = null
     }
   }
 
+  // #654 (G1229 follow-up, Austin's ruling 2026-11-25): upright the street stands between the top bar
+  // (the strip and the caption under it) and the controls (the stick, Act, Jump and the pack row), as
+  // Glitch drew its viewport under the header and over the pack (TSMainView.as resizeToStage 1229-1257).
+  // Worked out before a sheet covers the controls, so the street keeps its band while one is open.
+  let streetBand = upright ? streetBandOf({ strip, caption: captionBox, pack: packBox, stick, act, jump, height: H, safeB: sb }) : null;
+
   let sheetBox = null;
   if (kind === 'map') sheetBox = upright ? box(0, strip.bottom + GAP, W, H) : box(0, 0, W, H);
   else if (kind === 'half') {
@@ -251,6 +259,7 @@ export function phoneRegions({ width, height, safe = {}, sheet = '', pack = null
     pinBox = null;
     if (stickUp) stick = box(stick.left, stick.top + stickUp, stick.right, stick.bottom + stickUp);
     stickUp = 0;
+    if (upright) streetBand = streetBandOf({ strip, caption: captionBox, pack: packBox, stick, act, jump, height: H, safeB: sb });
   }
   let bottom = floor - GAP;
   if (kind === 'map') bottom = top;
@@ -268,7 +277,7 @@ export function phoneRegions({ width, height, safe = {}, sheet = '', pack = null
       ? { side: 'bottom', css: H - sheetBox.top, zoom: true }
       : { side: 'left', css: sheetBox.right, zoom: true };
   }
-  return { upright, strip: stripBox, caption: captionBox, homes: homesBox, buffs: buffBox, play: playBox, playAt, notices, pin: pinBox, stick, stickUp, act, jump, snap: snapBox, pack: packBox, sheet: sheetBox, dock };
+  return { upright, strip: stripBox, caption: captionBox, homes: homesBox, buffs: buffBox, play: playBox, playAt, notices, pin: pinBox, stick, stickUp, act, jump, snap: snapBox, pack: packBox, sheet: sheetBox, dock, street: streetBand };
 }
 
 /**
@@ -343,6 +352,23 @@ export function streetFloorOf(regions) {
   if (regions.upright) tops.push(regions.stick, regions.act, regions.jump);
   const shown = tops.filter((b) => b && b.bottom > b.top).map((b) => b.top);
   return shown.length ? Math.min(...shown) - GAP : NaN;
+}
+
+/**
+ * PURE (#654, Austin's ruling 2026-11-25): an upright phone's street band in the root's px, { top,
+ * bottom }: under the top bar (the strip, and the caption where it shows) and over the controls (the
+ * stick as it stands, Act, Jump and the pack row), GAP clear of each. The canvas fits this band
+ * (game.js stageArgs), so the top bar and the controls sit outside the street, as Glitch's header and
+ * pack sat outside its viewport (TSMainView.as resizeToStage 1229-1257). null when the band would be
+ * empty. Sideways and on computers there is none (phoneRegions gives it upright only).
+ */
+export function streetBandOf({ strip, caption, pack, stick, act, jump, height, safeB = 0 } = {}) {
+  const real = (b) => b && b.bottom > b.top;
+  const tops = [strip, caption].filter(real).map((b) => b.bottom);
+  const lows = [pack, stick, act, jump].filter(real).map((b) => b.top);
+  const top = Math.round((tops.length ? Math.max(...tops) : 0) + GAP);
+  const bottom = Math.round(lows.length ? Math.min(...lows) - GAP : num(height) - Math.max(0, num(safeB)));
+  return bottom - top > 0 ? { top, bottom } : null;
 }
 
 /** PURE: true when two boxes share any area. */
@@ -500,7 +526,8 @@ export function installPhonePill(doc, { standalone = false, canTip = true, showT
 /**
  * Mount the layout pass. `sheets` maps a sheet id (map, quests, social, menu) to { isOpen(), close() }
  * with its kind ('map' or 'half'); `others()` lists any other open side sheet (Skills, Make, Mail...)
- * as { id, close() }. `engine` takes the dock (setStageDock(dock, 'phone')). `onBand(px)` hears the
+ * as { id, close() }. `engine` takes the dock (setStageDock(dock, 'phone')) and, upright, the street's
+ * band (setStageFrame({ top, bottom }), #654). `onBand(px)` hears the
  * bottom band the controls stand on. Returns { frame(), layout(), regions(), noticeRegion(),
  * isActive(), destroy() }.
  * @param {{ doc?: Document, root: HTMLElement, sheets?: Record<string, { kind: 'map'|'half', isOpen: () => boolean, close: () => void }>,
@@ -595,6 +622,7 @@ export function mountPhoneLayout({ doc = globalThis.document, root, sheets = {},
     html.classList.remove('phone-layout');
     delete html.dataset.phoneSheet;
     engine?.setStageDock?.(null, 'phone');
+    engine?.setStageFrame?.(null);
     html.style.removeProperty('--pr-stick-up');
     for (const k of ['t', 'l', 'r', 'b']) html.style.removeProperty(`--pr-chooser-${k}`);
     stickUp = 0;
@@ -737,6 +765,8 @@ export function mountPhoneLayout({ doc = globalThis.document, root, sheets = {},
       set('--pr-stick-up', stickUp);
     }
     engine?.setStageDock?.(regions.dock, 'phone');
+    // #654: upright the street fits the band between the top bar and the controls (in the root's px).
+    engine?.setStageFrame?.(regions.street);
     setData('phoneRegions', JSON.stringify(regions));
     setData('phoneDock', regions.dock ? `${regions.dock.side}:${regions.dock.css}` : '');
   }
