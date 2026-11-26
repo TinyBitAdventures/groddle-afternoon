@@ -1,6 +1,6 @@
 {
   "note": "Written by tools/gaps/build-data.mjs from tools/gaps/public-gaps.json and the coverage register. Edit those, never this file.",
-  "release": "v0.74.0",
+  "release": "v0.75.0",
   "states": {
     "fixing": {
       "label": "Being fixed",
@@ -42,7 +42,7 @@
     "fixing": 3,
     "known": 15,
     "unreleased": 0,
-    "fixed": 605,
+    "fixed": 616,
     "lost": 5,
     "purpose": 18,
     "idea": 10
@@ -744,6 +744,30 @@
           "text": "The demon in the Stoot shrine held up nothing. It holds an empty frame now; the photo in it showed a real person, so it stays out.",
           "state": "fixed",
           "version": "v0.74.0"
+        },
+        {
+          "id": "F143",
+          "text": "Animated decorations drawn larger than their art, such as Downside Up's pig and miner, looked blurry.",
+          "state": "fixed",
+          "version": "v0.75.0"
+        },
+        {
+          "id": "F144",
+          "text": "An empty Jellisac socket showed past the right end of Clam Calumny.",
+          "state": "fixed",
+          "version": "v0.75.0"
+        },
+        {
+          "id": "F145",
+          "text": "Playing alone placed some rocks, trees, nodes and animals in different spots than playing online.",
+          "state": "fixed",
+          "version": "v0.75.0"
+        },
+        {
+          "id": "F146",
+          "text": "Signpost glows stayed blue in grey regions such as Brillah.",
+          "state": "fixed",
+          "version": "v0.75.0"
         }
       ]
     },
@@ -804,6 +828,24 @@
           "text": "Rocks and the Street Spirit vendors did not glow when in reach or under the mouse.",
           "state": "fixed",
           "version": "v0.74.0"
+        },
+        {
+          "id": "F148",
+          "text": "Floating gains from harvests, mining and pickups were gone in under a second.",
+          "state": "fixed",
+          "version": "v0.75.0"
+        },
+        {
+          "id": "F151",
+          "text": "A computer that slept during an Ancestral Lands visit used up the whole visit and sent you away on waking.",
+          "state": "fixed",
+          "version": "v0.75.0"
+        },
+        {
+          "id": "F152",
+          "text": "Dust Traps were never found already sprung when you arrived alone, as they sometimes were in Glitch.",
+          "state": "fixed",
+          "version": "v0.75.0"
         }
       ]
     },
@@ -1445,6 +1487,12 @@
           "version": "v0.73.1"
         },
         {
+          "id": "F147",
+          "text": "In Decoration Mode, moving a thing from the floor onto a table was refused unless you stood next to it.",
+          "state": "fixed",
+          "version": "v0.75.0"
+        },
+        {
           "id": "G48",
           "text": "The name sign on a player tower and the lettering of its floor numbers have no free source, so they look different from Glitch.",
           "state": "lost"
@@ -1869,6 +1917,12 @@
           "text": "Batterfly Guano on Level 3 East fell where it could not be picked up.",
           "state": "fixed",
           "version": "v0.74.0"
+        },
+        {
+          "id": "F153",
+          "text": "Every croaking Piggy on a street croaked at once as you arrived.",
+          "state": "fixed",
+          "version": "v0.75.0"
         }
       ]
     },
@@ -1926,6 +1980,12 @@
           "report": 324,
           "state": "fixed",
           "version": "v0.39.0"
+        },
+        {
+          "id": "F149",
+          "text": "Apple a Day's +5 energy at the end never came, and other buffs' end effects were lost too.",
+          "state": "fixed",
+          "version": "v0.75.0"
         }
       ]
     },
@@ -2673,6 +2733,12 @@
           "text": "On an upright phone the street ran under the top bar and the controls.",
           "state": "fixed",
           "version": "v0.74.0"
+        },
+        {
+          "id": "F150",
+          "text": "On an iPhone held upright, some dialogs and cards sat under the status bar's haze.",
+          "state": "fixed",
+          "version": "v0.75.0"
         }
       ]
     },

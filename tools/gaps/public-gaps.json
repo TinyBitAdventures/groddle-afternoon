@@ -6063,6 +6063,106 @@
       "commits": [
         "game:826dba14553"
       ]
+    },
+    {
+      "id": "F143",
+      "area": "Streets",
+      "text": "Animated decorations drawn larger than their art, such as Downside Up's pig and miner, looked blurry.",
+      "show": "fixing",
+      "commits": [
+        "game:37ecdfa42fe"
+      ]
+    },
+    {
+      "id": "F144",
+      "area": "Streets",
+      "text": "An empty Jellisac socket showed past the right end of Clam Calumny.",
+      "show": "fixing",
+      "commits": [
+        "game:43b80eae17a"
+      ]
+    },
+    {
+      "id": "F145",
+      "area": "Streets",
+      "text": "Playing alone placed some rocks, trees, nodes and animals in different spots than playing online.",
+      "show": "fixing",
+      "commits": [
+        "game:f99166649c9"
+      ]
+    },
+    {
+      "id": "F146",
+      "area": "Streets",
+      "text": "Signpost glows stayed blue in grey regions such as Brillah.",
+      "show": "fixing",
+      "commits": [
+        "game:9932b63ea02"
+      ]
+    },
+    {
+      "id": "F147",
+      "area": "Homes",
+      "text": "In Decoration Mode, moving a thing from the floor onto a table was refused unless you stood next to it.",
+      "show": "fixing",
+      "commits": [
+        "server:07e7375"
+      ]
+    },
+    {
+      "id": "F148",
+      "area": "World",
+      "text": "Floating gains from harvests, mining and pickups were gone in under a second.",
+      "show": "fixing",
+      "commits": [
+        "game:83460096b48"
+      ]
+    },
+    {
+      "id": "F149",
+      "area": "Food, buffs and making",
+      "text": "Apple a Day's +5 energy at the end never came, and other buffs' end effects were lost too.",
+      "show": "fixing",
+      "commits": [
+        "game:5ae8c446371"
+      ]
+    },
+    {
+      "id": "F150",
+      "area": "Phones",
+      "text": "On an iPhone held upright, some dialogs and cards sat under the status bar's haze.",
+      "show": "fixing",
+      "commits": [
+        "game:68d292fcbe8"
+      ]
+    },
+    {
+      "id": "F151",
+      "area": "World",
+      "text": "A computer that slept during an Ancestral Lands visit used up the whole visit and sent you away on waking.",
+      "show": "fixing",
+      "commits": [
+        "game:887c1e7bcaa"
+      ]
+    },
+    {
+      "id": "F152",
+      "area": "World",
+      "text": "Dust Traps were never found already sprung when you arrived alone, as they sometimes were in Glitch.",
+      "show": "fixing",
+      "commits": [
+        "game:859298f70fd",
+        "server:85ec5b1"
+      ]
+    },
+    {
+      "id": "F153",
+      "area": "Animals",
+      "text": "Every croaking Piggy on a street croaked at once as you arrived.",
+      "show": "fixing",
+      "commits": [
+        "game:32297b86c0b"
+      ]
     }
   ]
 }
