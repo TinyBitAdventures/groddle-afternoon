@@ -4,7 +4,7 @@
  */
 import { ITEM_ICONS, ITEM_LABELS, getVerbsFor, ordinaryItems, runVerb } from './content.js?v=35911ed6';
 import { createErrorOnce, createFeatureHost, createFrameStages } from './js/feature-host.js?v=b87e2cbc';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=59c5a883';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=dc2b7a4a';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, enterHintPick, reachGlowTargets, spriteHasRimArt, rimArtParts, trimmedIconUrl, drawTileArt } from './js/enter-chooser.js?v=44aef7b2';
 import { firstTendKey, STICK_TEND_DELAY_MS, STICK_TEND_DIRS, STICK_TEND_REPEAT_MS, stepTendKey, stepTendKeys, stickTendKey, tendKeyAction } from './js/garden-tend.js?v=a7470c4a';
 import { avatarHitBox, behindFloor, bodyReachDistance, OUT_OF_REACH_LINE, playerClickBox } from './js/reach.js?v=456da8a8';
@@ -28665,6 +28665,7 @@ function renderHomeMapCallout(panel) {
   const box = document.createElement('section');
   box.className = 'map-home-card';
   const copy = document.createElement('div');
+  copy.className = 'map-home-copy';
   const title = document.createElement('strong');
   const detail = document.createElement('span');
   const unread = unreadMailCount(mailboxState, Date.now());
@@ -28698,7 +28699,25 @@ function renderHomeMapCallout(panel) {
     else if (homeState.owned) teleportHome();
     else openHomePanel();
   });
-  box.append(copy, button);
+  // #722 (ours): House and Tower beside it, run as /house and /tower (features/slash-commands-feature.js
+  // mapHomeShortcut), with the commands' own checks and travel. Tower once it is built.
+  const actions = document.createElement('div');
+  actions.className = 'map-home-actions';
+  actions.append(button);
+  for (const shortcut of features.query('mapHomeShortcuts', engine) || []) {
+    const extra = document.createElement('button');
+    extra.type = 'button';
+    extra.className = 'content-action-btn';
+    extra.textContent = shortcut.label;
+    extra.title = shortcut.tip;
+    extra.dataset.mapHomeShortcut = shortcut.command.slice(1);
+    extra.addEventListener('click', () => {
+      closeMap();
+      features.query('mapHomeShortcut', shortcut.command, engine);
+    });
+    actions.append(extra);
+  }
+  box.append(copy, actions);
   const card = panel.querySelector('.map-card');
   const mapCanvas = panel.querySelector('.map-canvas');
   if (card && mapCanvas) card.insertBefore(box, mapCanvas);

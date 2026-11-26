@@ -9773,8 +9773,9 @@ header.top-bar + .sub { display: none; }
 
 .map-home-card {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: var(--sp-6);
+  gap: var(--sp-3) var(--sp-6);
   margin: var(--sp-5) var(--sp-9) var(--sp-7);
   padding: 11px 13px;
   border: 2px solid var(--c-gold-83);
@@ -9794,7 +9795,17 @@ header.top-bar + .sub { display: none; }
   font-size: var(--fs-xs);
 }
 
-.map-home-card button {
+/* #722: the Home button with House and Tower beside it; on a narrow card they go under the words. */
+.map-home-copy {
+  flex: 1 1 12rem;
+  min-width: 0;
+}
+
+.map-home-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--sp-3);
   margin-left: auto;
 }
 

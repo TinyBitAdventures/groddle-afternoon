@@ -15,6 +15,8 @@
  *   the house and the street. Without a home the Home panel opens.
  * - /tower: the Tower's ground floor at its teleport point (towerApi.goToFloor
  *   via 'door'); "You don't have a tower!" until it is built.
+ * - #722 (ours): the Map's home card has House and Tower buttons (MAP_HOME_SHORTCUTS),
+ *   which run /house and /tower here (mapHomeShortcut); Tower only once it is built.
  * - /butler: the Butler's click response, 0.5 to 1 s later (bag_butler.js
  *   sendIM), in the activity log; silent without a Butler, as in the source.
  *   In multiplayer the IM goes to the Butler's chat, and "/butler <command>"
@@ -389,8 +391,28 @@ export function runStuckFromMenu(engine) {
   return true;
 }
 
-/** Answer one slash line; null when this feature does not know it. */
-export function runSlashCommand(engine, text) {
+/**
+ * #722 (ours, Austin 2026-11-26): the Map's home card (game.js renderHomeMapCallout) has House and
+ * Tower buttons beside its Home button. Glitch's map had no home buttons, only these commands, so
+ * a button runs its command here, with the command's own checks and travel. House is always there;
+ * Tower once the Tower is built, the check /tower makes (slashContext towerBuilt).
+ */
+export const MAP_HOME_SHORTCUTS = Object.freeze([
+  Object.freeze({ command: '/house', label: 'House', tip: 'Go inside your house' }),
+  Object.freeze({ command: '/tower', label: 'Tower', tip: 'Go to your tower' }),
+]);
+
+/** The home card's buttons for now: House, and Tower once it is built. */
+export function mapHomeShortcuts(engine) {
+  const built = slashContext(engine).towerBuilt;
+  return MAP_HOME_SHORTCUTS.filter((s) => s.command !== '/tower' || built);
+}
+
+/**
+ * Answer one slash line; null when this feature does not know it. `typed` false (a Map button)
+ * leaves has_used_house_command / has_used_tower_command alone: the Butler's hints teach typing them.
+ */
+export function runSlashCommand(engine, text, { typed = true } = {}) {
   if (isCommandHelp(text)) {
     const where = showLocalLines(engine, commandHelpLines());
     lastLine = COMMAND_HELP_INTRO;
@@ -405,8 +427,8 @@ export function runSlashCommand(engine, text) {
   }
   const plan = slashPlan(text, slashContext(engine));
   if (!plan) return null;
-  if (plan.command === '/house') used.house = true;
-  if (plan.command === '/tower') used.tower = true;
+  if (typed && plan.command === '/house') used.house = true;
+  if (typed && plan.command === '/tower') used.tower = true;
   if (plan.say) {
     activity(engine, plan.say);
     last = `${plan.command}:say`;
@@ -547,6 +569,17 @@ export const slashCommandsFeature = {
   /** game.js local chat: main.js doChatCommand, the commands a player can use. */
   chatCommand(text, engine) {
     return runSlashCommand(engine, text);
+  },
+
+  /** #722 game.js renderHomeMapCallout: the home card's House and Tower buttons. */
+  mapHomeShortcuts(engine) {
+    return mapHomeShortcuts(engine);
+  },
+
+  /** #722: one of those buttons, run as its command; null for anything else. */
+  mapHomeShortcut(command, engine) {
+    if (!MAP_HOME_SHORTCUTS.some((s) => s.command === command)) return null;
+    return runSlashCommand(engine, command, { typed: false });
   },
 
   /** game.js local chat, after every feature passed: main.js:1931. */

@@ -41,6 +41,7 @@
     "no-source: 16973-16978, 679); the old hub label had no source.": "not-an-invention",
     "no-source: perms (paradiseSourceGeometry). A course with no source street gets": "not-an-invention",
     "ours: * G1009 (ours, inventions feast-day-piles): whether": "feast-day-piles",
+    "ours: // #722 (ours): House and Tower beside it, run as /house and": "map-home-shortcuts",
     "ours: // G1246 (ours, Austin 2026-11-24: Glitch never showed a bag's": "ours-bag-sort-badge",
     "ours: // Only ours (important): Pixi's own inline size stays, under": "not-an-invention",
     "ours: // menu of ours ([data-ctx]) or a plain HUD button; text fields,": "right-click-menus",
@@ -580,6 +581,8 @@
     "ours: 'overlay' event); other overlay words are not ours.": "not-an-invention"
   },
   "public/js/features/slash-commands-feature.js": {
+    "ours: * #722 (ours, Austin 2026-11-26): the Map's home card": "map-home-shortcuts",
+    "ours: * - #722 (ours): the Map's home card has House and Tower": "map-home-shortcuts",
     "remake-own: * - /stuck (the remake's own; js/slash-commands.js STUCK_TEXT,": "stuck-command"
   },
   "public/js/features/small-items-feature.js": {
