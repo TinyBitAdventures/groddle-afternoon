@@ -29,6 +29,13 @@
   --track: #e7ecdc;
   --row-line: #eef1e6;
   --chip-solid: #fff;
+  /* Page titles (Austin 2026-11-25): the game's rounded Nunito, served from this site. */
+  --font-title: Nunito, ui-rounded, 'SF Pro Rounded', var(--font-body);
+  /* The lift under a hovered card. */
+  --lift-shadow: rgba(48, 70, 44, 0.32);
+ 
+  /* The light bands' wavy edge ("Site polish" below), the same in both themes. */
+  --wave: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 24' preserveAspectRatio='none'%3E%3Cpath d='M0 24L0 14.0L10 14.5L20 14.4L30 14.0L40 13.8L50 13.7L60 13.9L70 14.1L80 14.1L90 13.8L100 13.2L110 12.6L120 12.2L130 12.3L140 12.9L150 14.0L160 15.0L170 15.7L180 15.7L190 14.8L200 13.2L210 11.4L220 9.6L230 8.1L240 7.2L250 6.7L260 6.4L270 6.1L280 5.8L290 5.4L300 5.2L310 5.6L320 6.5L330 8.0L340 9.6L350 11.2L360 12.1L370 12.3L380 11.9L390 11.0L400 10.2L410 9.8L420 9.9L430 10.6L440 11.5L450 12.5L460 13.3L470 13.8L480 14.1L490 14.4L500 15.0L510 15.8L520 16.7L530 17.4L540 17.4L550 16.7L560 15.2L570 13.1L580 10.9L590 9.1L600 8.0L610 7.5L620 7.6L630 8.0L640 8.2L650 8.3L660 8.1L670 7.9L680 7.9L690 8.2L700 8.8L710 9.4L720 9.8L730 9.7L740 9.1L750 8.0L760 7.0L770 6.3L780 6.3L790 7.2L800 8.8L810 10.6L820 12.4L830 13.9L840 14.8L850 15.3L860 15.6L870 15.9L880 16.2L890 16.6L900 16.8L910 16.4L920 15.5L930 14.0L940 12.4L950 10.8L960 9.9L970 9.7L980 10.1L990 11.0L1000 11.8L1010 12.2L1020 12.1L1030 11.4L1040 10.5L1050 9.5L1060 8.7L1070 8.2L1080 7.9L1090 7.6L1100 7.0L1110 6.2L1120 5.3L1130 4.6L1140 4.6L1150 5.3L1160 6.8L1170 8.9L1180 11.1L1190 12.9L1200 14.0L1200 24Z'/%3E%3C/svg%3E");
   color-scheme: light;
 }
 
@@ -54,6 +61,7 @@
     --track: #2b372c;
     --row-line: #2c382d;
     --chip-solid: #2a352b;
+    --lift-shadow: rgba(0, 0, 0, 0.55);
     color-scheme: dark;
   }
 }
@@ -76,6 +84,7 @@
   --track: #2b372c;
   --row-line: #2c382d;
   --chip-solid: #2a352b;
+  --lift-shadow: rgba(0, 0, 0, 0.55);
   color-scheme: dark;
 }
 
@@ -105,7 +114,7 @@ h1, h2, h3 { text-wrap: balance; font-family: var(--font-display); font-weight: 
 /* —— Masthead —— */
 .masthead { padding: 64px 0 40px; }
 .kicker { margin: 0 0 8px; font-size: 13px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); font-weight: 700; }
-h1 { font-size: clamp(40px, 6vw, 72px); line-height: 1.02; margin: 0 0 18px; }
+h1 { font-family: var(--font-title); font-weight: 900; letter-spacing: -0.015em; font-size: clamp(40px, 6vw, 72px); line-height: 1.02; margin: 0 0 18px; }
 .lead { font-size: 19px; max-width: 46em; margin: 0 0 28px; color: var(--lead); }
 
 .scoreboard {
@@ -642,6 +651,37 @@ a.play-link:focus-visible { outline: 3px solid var(--accent); outline-offset: 2p
 .history-older p { margin: 0; color: var(--muted); }
 .history-older a { font-weight: 700; color: var(--moss); }
 @media (max-width: 640px) { .history-item { grid-template-columns: 1fr; gap: 2px; } }
+
+/* —— Site polish (Austin 2026-11-25): what the home page's refresh brought to every page ——
+   Nunito: the game's own font (The Nunito Project Authors, SIL OFL 1.1: ../assets/fonts/nunito/OFL.txt),
+   served from this site, never from Google. */
+@font-face {
+  font-family: Nunito; font-style: normal; font-weight: 200 1000; font-display: swap;
+  src: url("../assets/fonts/nunito/nunito-roman-latin.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: Nunito; font-style: normal; font-weight: 200 1000; font-display: swap;
+  src: url("../assets/fonts/nunito/nunito-roman-latin-ext.woff2") format("woff2");
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+/* Cards you can click lift a little under the pointer, on every page. Not the catalog's tiles: their grid
+   cells use content-visibility: auto, which clips a lifted tile's top edge and shadow (they keep their border). */
+@media (prefers-reduced-motion: no-preference) {
+  :is(.note-card, a.ency-card, a.how-tile, .pj-card, .player-tile, .todo, a.dev-card, .season-card) { transition: transform .2s ease, box-shadow .2s ease, border-color .15s ease; }
+  :is(.note-card, a.ency-card, a.how-tile, .pj-card, .player-tile, .todo, a.dev-card, .season-card):is(:hover, :focus-within) { transform: translateY(-3px); box-shadow: 0 16px 30px -20px var(--lift-shadow); }
+}
+
+/* The light bands meet the page in a soft wavy edge, top and bottom: the band's own colour (inherit),
+   cut by a wave that repeats every 1200 px without a seam (a sum of three sines). */
+.band-alt { position: relative; border-block: 0; }
+.band-alt::before, .band-alt::after {
+  content: ""; position: absolute; left: 0; right: 0; height: 18px; background: inherit; pointer-events: none;
+  -webkit-mask: var(--wave) 0 0 / 1200px 18px repeat-x; mask: var(--wave) 0 0 / 1200px 18px repeat-x;
+}
+.band-alt::before { bottom: 100%; }
+.band-alt::after { top: 100%; transform: scaleY(-1); }
 
 /* —— Every change: commits by day (history/heatmap.js) ——
    Shades mix the moss tone into the empty track, so both themes keep their own ramp. */

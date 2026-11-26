@@ -373,19 +373,33 @@ a.ency-card:hover { border-color: var(--moss); }
 }
 
 /* #668 "How do I…" guides (tools/encyclopedia/guides.mjs, guide-pages.mjs): the home's strip, the guide pages and the links a covered page shows. */
-.how-strip {
-  margin: 0 0 18px; padding: 14px 18px 16px; background: color-mix(in srgb, var(--moss) 9%, var(--surface));
-  border: 1px solid color-mix(in srgb, var(--moss) 40%, var(--border)); border-radius: var(--radius-lg);
-}
-.how-strip h2 { margin: 0 0 8px; font-size: 22px; }
+/* The home's guide cards: each guide's picture, its topic and its question, three across. */
+.how-strip { margin: 0 0 26px; }
+.how-strip-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin: 0 0 10px; }
+.how-strip h2 { margin: 0; font-size: 24px; }
 .how-strip h2 a { color: var(--fg); text-decoration: none; }
 .how-strip h2 a:hover { color: var(--moss); }
-.how-strip-list { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); gap: 6px 18px; }
-.how-strip-list a, .how-links a { color: var(--moss); font-weight: 700; text-decoration: none; }
-.how-strip-list a:hover, .how-links a:hover { text-decoration: underline; }
+.how-all { color: var(--moss); font-weight: 700; text-decoration: none; white-space: nowrap; }
+.how-all::after { content: " \2192"; }
+.how-all:hover { text-decoration: underline; }
+.how-tiles { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.how-tile {
+  display: flex; align-items: center; gap: 14px; height: 100%; box-sizing: border-box; padding: 14px 16px; color: var(--fg); text-decoration: none;
+  background: color-mix(in srgb, var(--moss) 7%, var(--surface)); border: 1px solid color-mix(in srgb, var(--moss) 35%, var(--border)); border-radius: var(--radius-lg);
+}
+.how-tile:hover { border-color: var(--moss); }
+.how-tile:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.how-tile-ic { flex: none; width: 56px; height: 56px; object-fit: contain; }
+.how-tile-text { min-width: 0; }
+.how-tile-topic { display: block; font-family: var(--font-title); font-weight: 800; font-size: 17px; line-height: 1.2; }
+.how-tile-q { display: block; margin-top: 3px; color: var(--muted); font-size: 14px; line-height: 1.35; }
+@media (max-width: 900px) { .how-tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 560px) { .how-tiles { grid-template-columns: 1fr; } }
+.how-links a { color: var(--moss); font-weight: 700; text-decoration: none; }
+.how-links a:hover { text-decoration: underline; }
 .how-links { list-style: none; margin: 0 0 12px; padding: 0; display: grid; gap: 6px; }
-.how-links li, .how-strip-list li { position: relative; padding-left: 22px; }
-.how-links li::before, .how-strip-list li::before { content: "?"; position: absolute; left: 0; top: 1px; width: 16px; height: 16px; border-radius: 50%; background: var(--moss); color: var(--surface); font-size: 11px; font-weight: 800; line-height: 16px; text-align: center; }
+.how-links li { position: relative; padding-left: 22px; }
+.how-links li::before { content: "?"; position: absolute; left: 0; top: 1px; width: 16px; height: 16px; border-radius: 50%; background: var(--moss); color: var(--surface); font-size: 11px; font-weight: 800; line-height: 16px; text-align: center; }
 .how-answer { max-width: 40em; font-size: 19px; }
 .how-part p, .how-part li { max-width: 44em; font-size: 17px; line-height: 1.55; }
 .how-part a, .how-answer a { color: var(--moss); font-weight: 700; }

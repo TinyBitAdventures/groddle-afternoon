@@ -982,7 +982,7 @@ function homePage(bySection, items, info, nameOf, stations = 0) {
     <div class="wrap">
       <p class="cat-count" id="count" aria-live="polite"></p>
       <div id="results"></div>
-      ${howStrip()}
+      ${howStrip((key) => P.img(info(key)?.icon, 'how-tile-ic', 56))}
       <ul class="ency-cards" id="cards">
         ${cards.join('\n        ')}
       </ul>

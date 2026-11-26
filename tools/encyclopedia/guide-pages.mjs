@@ -118,10 +118,15 @@ export function guidesIndex(ctx) {
   return { title: `${HOW_TITLE} · Groddle Encyclopedia`, description: `${fmt(GUIDES.length)} short guides to questions players ask about Groddle Afternoon: ${GUIDES.map((g) => g.short.toLowerCase()).join(', ')}.`, body };
 }
 
-/** The strip on the Encyclopedia's home (`p` its way to the encyclopedia, ''): every question, and the index. */
-export function howStrip() {
+/**
+ * The guide cards on the Encyclopedia's home (Austin 2026-11-25: the plain list of questions "looks weak"):
+ * one card per guide with its own picture (`pic(key)`, the builder's picture with its sharp files), its
+ * short topic as the title and the question under it, and a link to the index.
+ */
+export function howStrip(pic = () => '') {
+  const base = HOW_PATH.slice('encyclopedia/'.length);
   return `<section class="how-strip" id="how" aria-labelledby="how-strip-h">
-        <h2 id="how-strip-h"><a href="${HOW_PATH.slice('encyclopedia/'.length)}">${esc(HOW_TITLE)}</a></h2>
-        <ul class="how-strip-list">${GUIDES.map((g) => `<li><a href="${HOW_PATH.slice('encyclopedia/'.length)}${esc(g.slug)}/">${esc(g.question)}</a></li>`).join('')}</ul>
+        <div class="how-strip-head"><h2 id="how-strip-h"><a href="${base}">${esc(HOW_TITLE)}</a></h2><a class="how-all" href="${base}">All guides</a></div>
+        <ul class="how-tiles">${GUIDES.map((g) => `<li><a class="how-tile" href="${base}${esc(g.slug)}/">${pic(g.icon)}<span class="how-tile-text"><span class="how-tile-topic">${esc(g.short)}<span class="ency-sep">.</span></span> <span class="how-tile-q">${esc(g.question)}</span></span></a></li>`).join('')}</ul>
       </section>`;
 }
