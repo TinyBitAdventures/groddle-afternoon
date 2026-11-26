@@ -2814,9 +2814,19 @@
   "deployed": "2026-11-26"
  },
  "git": {
-  "commits": 3717,
+  "commits": 3720,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-26",
+    "kind": "fix",
+    "text": "A long description in an item's menu no longer squeezes its verbs down to two or three rows"
+   },
+   {
+    "date": "2026-11-26",
+    "kind": "fix",
+    "text": "A thing left under the house floor comes back up onto the floor, in reach and above the Decoration Mode tray"
+   },
    {
     "date": "2026-11-26",
     "kind": "fix",
@@ -2926,19 +2936,9 @@
     "date": "2026-11-26",
     "kind": "fix",
     "text": "Making a Fireplace uses your empty Firefly Jars first and keeps the full ones"
-   },
-   {
-    "date": "2026-11-26",
-    "kind": "fix",
-    "text": "Dialogs, sheets and cards on an upright phone keep clear of the status bar's haze"
-   },
-   {
-    "date": "2026-11-26",
-    "kind": "fix",
-    "text": "Apple a Day gives its +5 energy when it ends, and timed buffs' end effects land"
    }
   ]
  },
- "tests": 1438,
+ "tests": 1440,
  "generatedAt": "2026-11-26"
 }
