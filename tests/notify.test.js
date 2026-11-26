@@ -512,8 +512,8 @@ describe('one module: no direct notice DOM writes outside it', () => {
 
   it('reduced motion: floats do not rise, cards do not slide', () => {
     const game = read('public/game.js');
-    assert.match(game, /t\._vy = notifyView\?\.reducedMotion\(\) \? 0 : -0\.7;/);
-    assert.match(game, /t\.y \+= \(t\._vy \?\? -0\.55\) \* dt;/);
+    // Report #181: a float's pose (js/gain-float.js) holds still and fades in place under reduced motion.
+    assert.match(game, /still: Boolean\(notifyView\?\.reducedMotion\(\)\)/);
     const css = read('public/style.css');
     assert.match(css, /@media \(prefers-reduced-motion: reduce\) \{\n\s+\.notify-card, \.activity-log \{ animation: none; \}/);
   });

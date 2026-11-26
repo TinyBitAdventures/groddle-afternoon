@@ -541,6 +541,7 @@ import { HELD_AT_ONCE, HELD_AT_ONCE_TEXT } from './js/collection-trophies.js?v=e
 import { PACK_COPY, bagSortIcon, bagSortText, isBagClass, isElementClass, layoutHeld, ownBagLabel, unitRankAt } from './js/pack-slots.js?v=38e4aea5';
 import { beginDrag, installDropRegistry, packStackOf, registerDropTarget, touchLift } from './js/drop-targets.js?v=59e6edb4';
 import { FLOAT_TEXT_Z, SPEECH_BUBBLE_Z } from './js/fx-z.js?v=18dda7e3';
+import { GAIN_FLOAT, GAIN_FLOAT_MS, gainFloatPose, gainFloatSinks } from './js/gain-float.js?v=fa16d5c3';
 import { hasPouch } from './js/elemental-pouch.js?v=42702eda';
 import { createPackRow, mountPackClearance, packBandRange, packCountText, packSearchEntries, packSearchResults, packSlotTip } from './js/ui/pack-row.js?v=615f7790';
 import { listAnimalFeedOptions, piggyFeedTip } from './js/animals.js?v=4dc2d7b8';
@@ -9633,6 +9634,8 @@ function recentFloatText(text, ms) {
  * spot stack a line apart instead of drawing on each other (js/notify.js stackFloat); a gain the
  * avatar already floated for the same amount gives way to the caller's own float. With
  * prefers-reduced-motion it fades where it is. `opts.life` (frames) keeps longer words up.
+ * Report #181: each one grows in, nods, holds and rises away over 2.4 s at 15 px, as Glitch's
+ * StatBurst.as drew a stat change (js/gain-float.js); it used to be gone in 0.9 s.
  */
 /** A floated gain's icon: pack icons are about 40 px, drawn at 0.7 (about 28 px) beside 15 px words. */
 const FLOAT_ICON_SCALE = 0.7;
@@ -9642,17 +9645,18 @@ function floatText(x, y, text, color = 0xfff4d6, opts = {}) {
   const words = wholeStatAmounts(text);
   const now = performance.now();
   const key = floatKey(words);
-  while (recentFloats.length && now - recentFloats[0].t > 1500) recentFloats.shift();
+  while (recentFloats.length && now - recentFloats[0].t > GAIN_FLOAT_MS) recentFloats.shift();
   // The caller's own float of an amount the avatar just floated replaces that one.
   for (const f of recentFloats) {
     if (f.key !== key || now - f.t > 300 || !f.sprite?._autoGain || f.sprite.destroyed) continue;
     f.sprite.parent?.removeChild(f.sprite);
     f.sprite.destroy();
   }
-  const placed = stackFloat(recentFloats.filter((f) => f.sprite && !f.sprite.destroyed), x, y, now);
+  // Amounts stay up 2.4 s, so a new one sits a line above any still showing near it.
+  const placed = stackFloat(recentFloats.filter((f) => f.sprite && !f.sprite.destroyed && f.sprite.parent), x, y, now, { ms: GAIN_FLOAT_MS });
   const t = new PIXI.Text({ text: words, style: {
     fontFamily: WORLD_FONT_FAMILY,
-    fontSize: 15,
+    fontSize: GAIN_FLOAT.text,
     fill: color,
     fontWeight: '700',
     dropShadow: { blur: 2, color: 0x000000, distance: 1 },
@@ -9672,8 +9676,11 @@ function floatText(x, y, text, color = 0xfff4d6, opts = {}) {
     t.x = FLOAT_ICON_W + 4 - shift;
     float.addChild(icon, t);
   }
-  float.x = x; float.y = placed; float._life = 0; float._vy = notifyView?.reducedMotion() ? 0 : -0.7;
-  if (Number(opts.life) > 0) float._fade = Number(opts.life);
+  float.x = x; float.y = placed;
+  // Drawn each frame from gainFloatPose (the FX loop): seconds since raised, where it was raised.
+  float._gainFloat = { t: 0, y: placed, sink: gainFloatSinks(words), still: Boolean(notifyView?.reducedMotion()),
+    holdSec: Number(opts.life) > 0 ? Number(opts.life) / 60 - (GAIN_FLOAT_MS / 1000 - GAIN_FLOAT.textHoldSec) : 0 };
+  float.scale.set(0);
   // Ticket 245: over a speech balloon (js/fx-z.js), which used to hide the words.
   float.zIndex = FLOAT_TEXT_Z;
   fxLayer.addChild(float);
@@ -9695,7 +9702,7 @@ function quoinGotText(x, y, text, color = 0xffffff) {
   if (!drawn?.node) return floatText(x, y - 20, text, color);
   quoinGotNodes.push(drawn.node);
   const now = performance.now();
-  while (recentFloats.length && now - recentFloats[0].t > 1500) recentFloats.shift();
+  while (recentFloats.length && now - recentFloats[0].t > GAIN_FLOAT_MS) recentFloats.shift();
   recentFloats.push({ x: drawn.x, y: drawn.y, t: now, key: floatKey(words), sprite: drawn.node });
   return drawn.node;
 }
@@ -18435,6 +18442,17 @@ function physics(dt) {
   for (let i = fxLayer.children.length - 1; i >= 0; i--) {
     const t = fxLayer.children[i];
     if (t === prompt || t._speechFx) continue;
+    if (t._gainFloat) {
+      // Report #181: a gain's amount, timed as Glitch's StatBurst.as (js/gain-float.js).
+      const g = t._gainFloat;
+      g.t += dt / 60;
+      const pose = gainFloatPose(g.t, g);
+      t.scale.set(pose.scale);
+      t.y = g.y + pose.y;
+      t.alpha = pose.alpha;
+      if (pose.done) fxLayer.removeChild(t);
+      continue;
+    }
     if (t._musicFx) {
       t._life += dt;
       const localLife = t._life - (t._delay || 0);
