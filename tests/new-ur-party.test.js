@@ -36,8 +36,8 @@ import {
 import { bigMidnight, firstUrDay, hatsOn, sparklyBatterflies } from '../public/js/new-ur.js?v=96c11429';
 import { SEASONAL_STOCK, seasonalConversions, seasonalSources } from '../public/js/seasons.js?v=5d8f545a';
 import { COSTUME_SHEETS, SHEET_COSTUMES, CHICKEN_SHEETS, costumeFrame } from '../public/js/pot-luck.js?v=e704c060';
-import { canCraft, setSeasonalRecipeCheck } from '../public/js/making.js?v=1ec1075e';
-import { newUrPartyFeature, PARTY_HAT } from '../public/js/features/new-ur-party-feature.js?v=62874ea6';
+import { canCraft, setSeasonalRecipeCheck } from '../public/js/making.js?v=6cfac327';
+import { newUrPartyFeature, PARTY_HAT } from '../public/js/features/new-ur-party-feature.js?v=2b129547';
 import { HIRES_ICONS } from '../public/js/icon-hires.js?v=60e2474b';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');

@@ -16,7 +16,7 @@ import {
   ensureMakingItems,
   loadRecipeCatalogFromFile,
   makingXpCeiling,
-} from '../public/js/making.js?v=1ec1075e';
+} from '../public/js/making.js?v=6cfac327';
 import { createInventory } from '../public/js/inventory.js?v=6414dbdc';
 import { GAME_DAY_MS } from '../public/js/game-day.js?v=a532775d';
 import { XP_FOR_LEVEL } from '../public/js/progression.js?v=05ff0260';

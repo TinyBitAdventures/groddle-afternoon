@@ -17,7 +17,7 @@ import {
   ensureItem,
   registerItemUse,
 } from './inventory.js?v=6414dbdc';
-import { GRINDER_TOOLS, TOOL_CONDITION_CATALOG, brokenToolIcon, canUseTool, firstWorkingTool, setToolRemaining, toolCopies, useToolCondition } from './tools.js?v=4156bba8';
+import { GRINDER_TOOLS, TOOL_CONDITION_CATALOG, brokenToolIcon, canUseTool, firstWorkingTool, pickToolCopies, setToolRemaining, toolCopies, useToolCondition } from './tools.js?v=4156bba8';
 import { getSkillPackageOverride, highestSkillLevel, skillPackageDetails } from './skill-packages.js?v=bfb87281';
 import {
   adjustedTaskLimit,
@@ -1126,6 +1126,26 @@ function emptyFullInputs(recipe, toolState) {
   }
 }
 
+/**
+ * #720 (Austin 2026-11-26): a recipe that uses up jars (the Fireplace's 7 Firefly Jars, any fill,
+ * catalog_recipes.js 321) spends the emptiest first, so a full jar stays while an empty one could
+ * go. Ours: Glitch took them in bag order (inc_making checkItemsInBag, items_destroy). The `qty`
+ * emptiest copies move last (ties: the later ones, as before), so the count going down takes them.
+ * Only for a pack the copies follow (bound to `inv`), and only contents classes (a jar's fill).
+ */
+function spendEmptiestCopies(inv, input, toolState) {
+  if (!toolState || toolState.inv !== inv || !TOOL_CONDITION_CATALOG[input.classTsid]?.contents) return;
+  const copies = toolCopies(toolState, input.classTsid);
+  if (copies.length <= input.qty) return;
+  const ranks = copies
+    .map((c, i) => ({ r: c.remaining, i }))
+    .sort((a, b) => a.r - b.r || b.i - a.i)
+    .slice(0, input.qty)
+    .map((c) => c.i)
+    .sort((a, b) => a - b);
+  pickToolCopies(toolState, input.classTsid, ranks);
+}
+
 /** crystallizer.js 290: the line when no jar is full. */
 export const FULL_JAR_LINE = 'You need a full Firefly Jar.';
 
@@ -1336,6 +1356,7 @@ export function craftRecipe(inv, pc, recipeKey, opts = {}) {
   for (const inp of recipe.inputs || []) {
     // #219: a full jar stays in the pack; its Fireflies go into the crystal.
     if (inp.full > 0) continue;
+    if (countItem(inv, inp.classTsid) >= inp.qty) spendEmptiestCopies(inv, inp, opts.toolState);
     if (!removeItem(inv, inp.classTsid, inp.qty)) {
       Object.assign(inv, beforeInv);
       return { ok: false, reason: 'ingredients', msgs: ['Not enough ingredients.'] };

@@ -9,7 +9,7 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { RECIPE_CATALOG, ensureMakingItems, loadRecipeCatalogFromFile, toolSkillLine, toolSkillMissing } from '../public/js/making.js?v=1ec1075e';
+import { RECIPE_CATALOG, ensureMakingItems, loadRecipeCatalogFromFile, toolSkillLine, toolSkillMissing } from '../public/js/making.js?v=6cfac327';
 
 const root = join(import.meta.dirname, '..');
 await loadRecipeCatalogFromFile(join(root, 'public/assets/content/recipes.json'));

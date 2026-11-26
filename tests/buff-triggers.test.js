@@ -24,12 +24,12 @@ import {
   smallEnlightenmentSeconds,
   smeltItDealtItFreeSmelts,
 } from '../public/js/buff-triggers.js?v=9fd877c4';
-import { MIRRORED_BUFFS, buffTriggersFeature } from '../public/js/features/buff-triggers-feature.js?v=e1f15afc';
+import { MIRRORED_BUFFS, buffTriggersFeature } from '../public/js/features/buff-triggers-feature.js?v=2880cc69';
 import { meditationFeature } from '../public/js/features/meditation-feature.js?v=2d804438';
 import { teleportationFeature } from '../public/js/features/teleportation-feature.js?v=4565e0e4';
 import { rookAttackFeature } from '../public/js/features/rook-attack-feature.js?v=1b9d25e2';
 import { rubeFeature } from '../public/js/features/rube-feature.js?v=cb9009c6';
-import { smugglingFeature } from '../public/js/features/smuggling-feature.js?v=d70a7a37';
+import { smugglingFeature } from '../public/js/features/smuggling-feature.js?v=a37fb31f';
 import { normalizeHusbandryPack } from '../public/js/animal-husbandry.js?v=496e9589';
 import {
   BUFF_ITEM_CATALOG,
@@ -45,7 +45,7 @@ import {
 import { getSkillPackageOverride, skillPackageDetails } from '../public/js/skill-packages.js?v=bfb87281';
 import { miningProfile } from '../public/js/mining.js?v=5e49efb3';
 import { resolveAnimalKinshipPackage } from '../public/js/animal-kinship.js?v=75d3cb34';
-import { RECIPE_CATALOG, buildCraftBatchResult, craftRecipe, ensureMakingItems, makingSkillAdjustments } from '../public/js/making.js?v=1ec1075e';
+import { RECIPE_CATALOG, buildCraftBatchResult, craftRecipe, ensureMakingItems, makingSkillAdjustments } from '../public/js/making.js?v=6cfac327';
 import { sessionPackage } from '../public/js/meditation.js?v=96f23682';
 import { accelerateActiveStudy, createSkillState, startSkillStudy } from '../public/js/skills.js?v=3c6dbdff';
 import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=c9b84764';

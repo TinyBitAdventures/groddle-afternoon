@@ -842,6 +842,7 @@
     "remake-own: * The Make window is the remake's own (Glitch made things from each tool's own menu),": "make-window"
   },
   "public/js/making.js": {
+    "ours: * go. Ours: Glitch took them in bag order (inc_making": "making-spends-emptiest-jars",
     "ours: Pi's line is inc_making.js's; Pot Luck Day's is ours (G982).": "pot-luck-stuffing",
     "stand-in: * grand_ol_grinder.js 530); else the first owned stand-in that can take `wear`": "not-an-invention",
     "stand-in: The recipe tool whose recipes a stand-in makes (grand_ol_grinder -> ore_grinder).": "not-an-invention",
