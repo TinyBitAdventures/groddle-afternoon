@@ -54,7 +54,7 @@
  */
 
 import { cultivationDef, hiveFireflySpots } from './home-cultivation.js?v=b2868d29';
-import { createMineRock, tickMineRock } from './mining.js?v=5e49efb3';
+import { createMineRock, tickMineRock } from './mining.js?v=29eaf67f';
 import { ROCK_RESPAWN_MS } from './pace.js?v=c07dfbd8';
 import { createResourceNode, getResourceNodeDef, normalizeResourceNode, regrowDelayMs, tickResourceNode } from './resource-nodes.js?v=7059a7bd';
 

@@ -29,7 +29,7 @@ import { HAS_SERVER, HAS_SITE, SITE_DIR, serverPath, sitePath, skipWithoutSite }
 import { bagLabel } from '../public/js/bag-names.js?v=bba085e1';
 import { BAG_DEFS, PACK_CAPACITY, layoutPack, normalizePrefs, ownBagLabel, renameBag } from '../public/js/pack-slots.js?v=38e4aea5';
 import { ITEM_CATALOG, isToolItem } from '../public/js/inventory.js?v=6414dbdc';
-import { nameAnimal, namedAnimalLabel } from '../public/js/animal-husbandry.js?v=496e9589';
+import { nameAnimal, namedAnimalLabel } from '../public/js/animal-husbandry.js?v=7fd232d6';
 import { kittyLabel, nameKitty } from '../public/js/heli-kitties.js?v=e4af4096';
 import { nameCubimal } from '../public/js/cubimals.js?v=07f59f2f';
 import { createButlerState, renameButler, teachButler } from '../public/js/butler.js?v=152429c8';

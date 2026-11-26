@@ -51,14 +51,14 @@
 
 import { isCostume } from './pot-luck.js?v=e704c060';
 import { GAME_EPOCH_MS } from './game-day.js?v=a532775d';
-import { INCUBATION } from './animal-husbandry.js?v=496e9589';
+import { INCUBATION } from './animal-husbandry.js?v=7fd232d6';
 import { isStandable } from './street-model.js?v=a9a05f9d';
 import { ANIMAL_BODY, TREE_FOOTPRINT } from './street-ecology.js?v=f1c11a2d';
 import { KITTY_MOTION, KITTY_PAUSE_CHOICES } from './heli-kitties.js?v=e4af4096';
 import { CRAB_WALK } from './crabs.js?v=5a43743d';
 import { FIRE_DRAGON_WALK } from './fire-dragon.js?v=b7f3d751';
 import { walkSurfaceY } from './walk-surface.js?v=3c919d5b';
-import { EAT_PAUSE_MS } from './animal-mood.js?v=a49495fc';
+import { EAT_PAUSE_MS } from './animal-mood.js?v=c8cc8797';
 import { CHICKEN_PAUSE_STATES } from './chicken-idles.js?v=eef0279b';
 
 export const CREATURE_KINDS = Object.freeze(['chicken', 'butterfly', 'batterfly']);

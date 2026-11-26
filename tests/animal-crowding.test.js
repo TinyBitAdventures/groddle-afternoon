@@ -27,12 +27,12 @@ import {
   sadnessStart,
   streetWidth,
 } from '../public/js/animal-crowding.js?v=64dee3e0';
-import { SAD_PIGGY_LINES, ensurePiggyMood } from '../public/js/animal-mood.js?v=a49495fc';
-import { createAnimalState } from '../public/js/animals.js?v=4dc2d7b8';
+import { SAD_PIGGY_LINES, ensurePiggyMood } from '../public/js/animal-mood.js?v=c8cc8797';
+import { createAnimalState } from '../public/js/animals.js?v=89aa76e2';
 import { GAME_DAY_MS, getGameDayStartMs } from '../public/js/game-day.js?v=a532775d';
-import { advanceYard, capturePiggy, createMachine, normalizeHusbandryPack } from '../public/js/animal-husbandry.js?v=496e9589';
-import { getVerbsFor } from '../public/content.js?v=c976f55a';
-import { animalCrowdChanged, animalMoodFeature, crowdLimit } from '../public/js/features/animal-mood-feature.js?v=af8f5d0a';
+import { advanceYard, capturePiggy, createMachine, normalizeHusbandryPack } from '../public/js/animal-husbandry.js?v=7fd232d6';
+import { getVerbsFor } from '../public/content.js?v=35911ed6';
+import { animalCrowdChanged, animalMoodFeature, crowdLimit } from '../public/js/features/animal-mood-feature.js?v=bb995cb4';
 
 const GSJS = join(homedir(), 'Documents/glitch-audit/glitch-GameServerJS');
 const fixed = (v) => () => v;

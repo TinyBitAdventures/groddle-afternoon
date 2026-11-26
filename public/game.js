@@ -2,9 +2,9 @@
  * Groddle Afternoon — original street geometry + layered decos
  * PixiJS 8 · locations-xml streets · CoU PNG decos · quests/items
  */
-import { ITEM_ICONS, ITEM_LABELS, getVerbsFor, ordinaryItems, runVerb } from './content.js?v=c976f55a';
+import { ITEM_ICONS, ITEM_LABELS, getVerbsFor, ordinaryItems, runVerb } from './content.js?v=35911ed6';
 import { createErrorOnce, createFeatureHost, createFrameStages } from './js/feature-host.js?v=b87e2cbc';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=6b9089ac';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=59c5a883';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, enterHintPick, reachGlowTargets, spriteHasRimArt, rimArtParts, trimmedIconUrl, drawTileArt } from './js/enter-chooser.js?v=44aef7b2';
 import { firstTendKey, STICK_TEND_DELAY_MS, STICK_TEND_DIRS, STICK_TEND_REPEAT_MS, stepTendKey, stepTendKeys, stickTendKey, tendKeyAction } from './js/garden-tend.js?v=a7470c4a';
 import { avatarHitBox, behindFloor, bodyReachDistance, OUT_OF_REACH_LINE, playerClickBox } from './js/reach.js?v=456da8a8';
@@ -17,7 +17,7 @@ import {
   createTimedAction,
   advanceTimedAction,
   cancelTimedAction,
-} from './js/action-timing.js?v=b82133f0';
+} from './js/action-timing.js?v=73cbc6f5';
 import { createWordProgressView, wordAnchor, heldActionDelta, MAX_PUSH_DOWN } from './js/word-progress.js?v=98366023';
 // G374/G375/G378: Tiny Speck's quoin-limit and super-harvest rainbows and the musicblock notes.
 import { OVERLAY_USES, playCountdownArt, playOverlay, rainbowSound, showRainbow } from './js/overlays.js?v=91dcee74';
@@ -544,8 +544,8 @@ import { FLOAT_TEXT_Z, SPEECH_BUBBLE_Z } from './js/fx-z.js?v=18dda7e3';
 import { GAIN_FLOAT, GAIN_FLOAT_MS, gainFloatPose, gainFloatSinks } from './js/gain-float.js?v=caf16853';
 import { hasPouch } from './js/elemental-pouch.js?v=42702eda';
 import { createPackRow, mountPackClearance, packBandRange, packCountText, packSearchEntries, packSearchResults, packSlotTip } from './js/ui/pack-row.js?v=615f7790';
-import { listAnimalFeedOptions, piggyFeedTip } from './js/animals.js?v=4dc2d7b8';
-import { pickerEmptyLine, pickerMaxCount, pickerOptionsFor, pickerTakesCount } from './js/animals.js?v=4dc2d7b8';
+import { listAnimalFeedOptions, piggyFeedTip } from './js/animals.js?v=89aa76e2';
+import { pickerEmptyLine, pickerMaxCount, pickerOptionsFor, pickerTakesCount } from './js/animals.js?v=89aa76e2';
 import {
   createDroppedItemState,
   parseDroppedItemState,
@@ -723,6 +723,7 @@ import {
   ROCK_SHAPE_SHEETS,
   rockShapeSheet,
   createMineRock,
+  MEGA_ROCK_LINE,
   tickMineRock,
   rockStatusLabel,
   rockShown,
@@ -733,7 +734,7 @@ import {
   STARTER_MINING_SKILLS,
   findWorkingPick,
   miningToolWear,
-} from './js/mining.js?v=5e49efb3';
+} from './js/mining.js?v=29eaf67f';
 import { PICK_SHEETS, mineStandX, nodeToolOverlay } from './js/node-tools.js?v=47a93d54';
 import {
   loadStreetData,
@@ -946,12 +947,12 @@ import {
   vendorSellUnitPrice,
   vendorBuyUnitPrice,
   VENDOR_BAG_HOLDS,
-} from './js/vendor.js?v=474a80fd';
+} from './js/vendor.js?v=0e64bf8d';
 import {
   createAnimalState,
   resetAnimalDay,
   animalStatusLabel,
-} from './js/animals.js?v=4dc2d7b8';
+} from './js/animals.js?v=89aa76e2';
 import {
   ensureWoodTreeState,
   pickWoodTool,
@@ -1096,7 +1097,7 @@ import {
   ROCK_SHAPE_WIDTHS,
   flightGroundFor,
 } from './js/street-ecology.js?v=f1c11a2d';
-import { CHICKEN_PAUSE, chickenPauseRoll, flierAt, flierSeed, flightFloorFor, followPath, PATH_STEP } from './js/street-creatures.js?v=a43444d0';
+import { CHICKEN_PAUSE, chickenPauseRoll, flierAt, flierSeed, flightFloorFor, followPath, PATH_STEP } from './js/street-creatures.js?v=c29092b2';
 import { chickenPose, chickenIdleSheetsAsked } from './js/chicken-idle-art.js?v=e320e159';
 import { chickenWaitPose } from './js/chicken-idles.js?v=eef0279b';
 import { itemOverlayStats } from './js/item-overlay.js?v=b0086ba6';
@@ -34166,9 +34167,17 @@ function tickAllMineRocks(now = Date.now()) {
   for (const t of mineRocks) {
     const rock = t.state?.rock;
     if (!rock) continue;
+    const dueAt = Number(rock.respawnAt) || 0;
     if (tickMineRock(rock, now)) {
       refreshMineRockVisual(t);
       pushActivity(`${t.label} reforms and is ready to mine.`);
+      // #172: a rock that reforms huge says so a second later, for 5 s (include/mining.js onMegaRoxx),
+      // only to whoever is there when it does: not to a player who walks in to a rock that reformed meanwhile.
+      if (rock.mega && now - dueAt < 2000) {
+        setTimeout(() => {
+          if (t.sprite && !t.sprite.destroyed && mineRocks.includes(t)) showSpeechBubble(t, { text: MEGA_ROCK_LINE.text, durationMs: MEGA_ROCK_LINE.ms, exact: true });
+        }, MEGA_ROCK_LINE.delayMs);
+      }
     } else if (rock.depleted) {
       // Keep subtitle countdown fresh occasionally
       t.subtitle = rockStatusLabel(rock);

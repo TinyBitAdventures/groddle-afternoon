@@ -25,16 +25,16 @@ import {
   useToolCondition,
 } from '../public/js/tools.js?v=4156bba8';
 import { addItem, createInventory, removeItem } from '../public/js/inventory.js?v=6414dbdc';
-import { createMineRock, mineRock, MINING_COSTS } from '../public/js/mining.js?v=5e49efb3';
-import { VENDOR_PROFILES, vendorBuy } from '../public/js/vendor.js?v=474a80fd';
+import { createMineRock, mineRock, MINING_COSTS } from '../public/js/mining.js?v=29eaf67f';
+import { VENDOR_PROFILES, vendorBuy } from '../public/js/vendor.js?v=0e64bf8d';
 import { harvestWoodTree } from '../public/js/woodcutting.js?v=9e9af511';
 import { createGarden, plantPlot, waterPlot } from '../public/js/garden.js?v=a7c6f521';
 import { createPlayerSave, normalizePlayerSave } from '../public/js/player-save.js?v=f7062a6d';
 import { createDroppedItemState, dropInventoryStack, pickupDroppedStack } from '../public/js/world-items.js?v=a5deb102';
 import { layoutPack, unitPlaces, unitRankAt } from '../public/js/pack-slots.js?v=38e4aea5';
 import { toolBreakEvents } from '../public/js/quest-offers.js?v=7e00498b';
-import { performAnimalKinship } from '../public/js/animal-kinship.js?v=75d3cb34';
-import { createAnimalState } from '../public/js/animals.js?v=4dc2d7b8';
+import { performAnimalKinship } from '../public/js/animal-kinship.js?v=eaa3a6f2';
+import { createAnimalState } from '../public/js/animals.js?v=89aa76e2';
 
 const remaining = (tools, cls) => toolCopies(tools, cls).map((c) => c.remaining);
 

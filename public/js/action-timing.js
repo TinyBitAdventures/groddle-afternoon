@@ -3,7 +3,7 @@
  * Pure state helpers keep timing deterministic for tests and the Pixi ticker.
  */
 
-import { MINING_COSTS } from './mining.js?v=5e49efb3';
+import { MINING_COSTS } from './mining.js?v=29eaf67f';
 
 const INSTANT_VERBS = new Set(['browse', 'talk_to', 'inspect', 'open', 'buy', 'sell']);
 

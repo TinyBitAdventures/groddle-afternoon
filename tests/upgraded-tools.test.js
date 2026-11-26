@@ -40,7 +40,7 @@ import {
   getToolCondition,
   setToolRemaining,
 } from '../public/js/tools.js?v=4156bba8';
-import { crushOre } from '../public/js/mining.js?v=5e49efb3';
+import { crushOre } from '../public/js/mining.js?v=29eaf67f';
 import { createDroppedItemState, dropInventoryStack } from '../public/js/world-items.js?v=a5deb102';
 import { MAKE_TOOL_SHEETS } from '../public/js/make-tool-sheets.js?v=6f758e09';
 import { clearPlot, createGarden, getPlot, hasHoe, hasWateringCan, plantPlot, waterPlot } from '../public/js/garden.js?v=a7c6f521';

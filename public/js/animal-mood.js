@@ -102,6 +102,18 @@ export function forcedRoll(raw) {
 
 /** onCroaking runs on apiSetInterval(..., 1): once a minute. */
 export const CROAK_INTERVAL_MS = 60 * 1000;
+
+/**
+ * #172 (G629): when a croaking Piggy's next "I'm about to croak!" comes. The interval belongs to
+ * the Piggy, not to whoever is watching: onTwiceDaily sets it (npc_piggy.js 1960) and its first
+ * call is a minute on, so a tick that starts it croaks 60 s later (`started`). A player who walks
+ * onto the street meets it anywhere in its minute (a random point of it), not all at once 2 s in.
+ */
+export function nextCroakDelayMs({ started = false, rng = Math.random } = {}) {
+  if (started) return CROAK_INTERVAL_MS;
+  const roll = Number(rng());
+  return Math.floor((Number.isFinite(roll) ? Math.min(Math.max(roll, 0), 0.999999) : 0) * CROAK_INTERVAL_MS);
+}
 /** onSadnessInterval repeats every 30 s. */
 export const SAD_INTERVAL_MS = 30 * 1000;
 /** onFoodPathing eats food within this radius of where the piggy stops. */

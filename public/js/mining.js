@@ -571,6 +571,12 @@ export function crumbleRock(rock, upgrades = [], { now = Date.now(), rng = Math.
 }
 
 /**
+ * include/mining.js onRespawn 163-165 / onMegaRoxx 173-175: a rock that reforms huge says so
+ * 1 s later, for 5 s, to whoever is on the street (#172).
+ */
+export const MEGA_ROCK_LINE = Object.freeze({ text: 'I am huuuuuuuuuge!', delayMs: 1000, ms: 5000 });
+
+/**
  * Respawn depleted rock if timer elapsed.
  * @param {ReturnType<typeof createMineRock>} rock
  * @param {number} [now]
@@ -579,7 +585,7 @@ export function tickMineRock(rock, now = Date.now()) {
   if (!rock?.depleted) return false;
   if (now < (rock.respawnAt || 0)) return false;
   rock.chunksRemaining = rock.respawnChunks > 0 ? rock.respawnChunks : rock.chunksMax || 50;
-  // onMegaRoxx: "I am huuuuuuuuuge!" (read it from rock.mega).
+  // onMegaRoxx: MEGA_ROCK_LINE (read it from rock.mega).
   rock.mega = rock.respawnChunks > 0;
   rock.respawnChunks = 0;
   rock.depleted = false;

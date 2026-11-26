@@ -21,7 +21,7 @@ import {
 import { SKILL_PACKAGES, getSkillPackageOverride, skillPackageDetails } from './skill-packages.js?v=bfb87281';
 import { loseEnergy, shiftMetabolic } from './metabolics.js?v=48f784bf';
 import { grantMoodXp } from './mood-xp.js?v=e311b45c';
-import { petPiggy, piggyNibbleRefusal } from './animal-mood.js?v=a49495fc';
+import { petPiggy, piggyNibbleRefusal } from './animal-mood.js?v=c8cc8797';
 
 export const ANIMAL_KINSHIP_RANK_IDS = Object.freeze(
   Array.from({ length: 7 }, (_, index) => `animalkinship_${index + 1}`)

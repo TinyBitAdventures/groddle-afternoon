@@ -154,17 +154,17 @@ import {
   treeReady,
   treeSkill,
   waitingIds,
-} from '../street-objects.js?v=9f9929ed';
+} from '../street-objects.js?v=8aef1ed1';
 import { ENDED_STATES, NO_REALTIME_STATES, answerWaitMs, createOnlineRequests, offlineLine, sharedOffline, waitLine } from '../online-request.js?v=09ac8a9c';
-import { ROCK_CATALOG } from '../mining.js?v=5e49efb3';
+import { MEGA_ROCK_LINE, ROCK_CATALOG } from '../mining.js?v=29eaf67f';
 import { TRANT_META, trantStatusLabel } from '../trants.js?v=864ea9ff';
 import { quoteWoodTreeHarvest } from '../woodcutting.js?v=9e9af511';
 import { highestLightGreenThumbRank, quoteTrantCare } from '../trant-care.js?v=cb7f539b';
-import { animalStatusLabel, pickerMaxCount } from '../animals.js?v=4dc2d7b8';
-import { highestAnimalKinshipRank, quoteAnimalKinship } from '../animal-kinship.js?v=75d3cb34';
+import { animalStatusLabel, pickerMaxCount } from '../animals.js?v=89aa76e2';
+import { highestAnimalKinshipRank, quoteAnimalKinship } from '../animal-kinship.js?v=eaa3a6f2';
 import { CREW_NODES } from '../help-dig.js?v=7a854b00';
 import { animalPatrolRange, ANIMAL_BODY, flightGroundFor, TREE_FOOTPRINT } from '../street-ecology.js?v=f1c11a2d';
-import { INCUBATION, PIGGY_FEED, itemBaseCost, namedAnimalLabel, resetIncubation } from '../animal-husbandry.js?v=496e9589';
+import { INCUBATION, PIGGY_FEED, itemBaseCost, namedAnimalLabel, resetIncubation } from '../animal-husbandry.js?v=7fd232d6';
 import {
   applyCreatureState,
   batterflyPerks,
@@ -190,7 +190,7 @@ import {
   dragonWalkAt,
   kittyWalkAt,
   walkerSpan,
-} from '../street-creatures.js?v=a43444d0';
+} from '../street-creatures.js?v=c29092b2';
 
 export const STREET_OBJECTS_FEATURE_ID = 'street-objects';
 const RECONCILE_MS = 250;
@@ -655,7 +655,7 @@ function redraw(engine, obj, before = null) {
     if (obj.target) engine.refreshRock?.(obj.target);
     // include/mining.js onMegaRoxx 173-175, a second after a mega respawn.
     if (before && !before.mega && obj.rock.mega && obj.target) {
-      setTimeout(() => engine.say?.(obj.target, COPY.mega, 5000, { speaker: obj.target.label }), 1000);
+      setTimeout(() => engine.say?.(obj.target, MEGA_ROCK_LINE.text, MEGA_ROCK_LINE.ms, { speaker: obj.target.label, exact: true }), MEGA_ROCK_LINE.delayMs);
     }
   } else if (obj.kind === 'tree') {
     if (obj.target) obj.target.subtitle = trantStatusLabel(obj.state, TRANT_META[obj.classId]);

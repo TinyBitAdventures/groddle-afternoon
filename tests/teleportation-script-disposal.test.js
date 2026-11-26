@@ -11,7 +11,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { addItem, createInventory, ensureItem } from '../public/js/inventory.js?v=6414dbdc';
 import { SCRIPT_CLASS, SCRIPT_ITEM } from '../public/js/teleportation.js?v=cbbc673f';
-import { vendorSellValue } from '../public/js/vendor.js?v=474a80fd';
+import { vendorSellValue } from '../public/js/vendor.js?v=0e64bf8d';
 import { createShrineState, quoteShrineDonation } from '../public/js/shrines.js?v=da102ddd';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');

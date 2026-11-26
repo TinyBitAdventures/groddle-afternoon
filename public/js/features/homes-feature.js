@@ -234,8 +234,8 @@ import { pieceUrl, roomPieces, surfaceAt, swatchPiece, wallTargetAt } from '../h
 import { renderHomeLocation } from '../home-shot-render.js?v=6aa01a97';
 import { maxTextureSizeOf, sharpDeco, wantsHiresDecos } from '../deco-hires.js?v=34f36d77';
 import { SHARP_DECOS } from '../deco-sharp-list.js?v=7d615f20';
-import { resourceNodeStill, resourceNodesFeature } from './resource-nodes-feature.js?v=f555da55';
-import { patchesFeature, plotStill } from './patches-feature.js?v=c9c97392';
+import { resourceNodeStill, resourceNodesFeature } from './resource-nodes-feature.js?v=bbf67817';
+import { patchesFeature, plotStill } from './patches-feature.js?v=923a2f3d';
 import { GROWN_TREE_LABELS, createPlot, growTree, plotLabel } from '../patches.js?v=3498abf3';
 import { WOTD_DEPLETE_MS, WOTD_TEXT, nearestPourTarget, pourButton, pourConditions, pourConfirmText } from '../wine-pour.js?v=6daa23a7';
 import { WOTD_TOOL, pourApproach, pourDropTip } from '../wine-pour-fx.js?v=364e22d2';
@@ -259,7 +259,7 @@ import {
 import { frameTexture, isLoaded, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js?v=b8e38103';
 import { FALLBACK_MAX as WORLD_ART_FALLBACK_MAX, worldArtFor } from '../world-art.js?v=a67514c8';
 import { oneArmSignpost } from '../street-render.js?v=dab4ec4b';
-import { ROCK_CATALOG } from '../mining.js?v=5e49efb3';
+import { ROCK_CATALOG } from '../mining.js?v=29eaf67f';
 import {
   HOUSE_SIGN,
   IMG_BUBBLE_MS,
@@ -315,7 +315,7 @@ import { autoplayLog } from '../autoplay-log.js?v=55bb4823';
 import { WORLD_FONT_FAMILY } from '../world-text.js?v=6b49f88c';
 import { HOUSE_ART_DIR, HOUSE_FROM_HOME_STYLE, HOUSE_STYLE_IDS, composeHouse, houseFitViewH, houseLabel, houseLot, normalizeHouse } from '../home-house.js?v=3c88c47c';
 import { closeHousePicker, housePickerOpen, openHousePicker, refreshHousePicker } from '../ui/house-picker.js?v=67f03b99';
-import { YARD_WALL_DX } from '../yard-wander.js?v=cf235545';
+import { YARD_WALL_DX } from '../yard-wander.js?v=6711b158';
 import { housePlace, isHomeMachineClass, towerPlace } from '../home-machines.js?v=41e9a72b';
 
 export const HOMES_FEATURE_ID = 'homes';

@@ -32,7 +32,7 @@ import {
   createShrineState,
   donateToShrine,
 } from '../public/js/shrines.js?v=da102ddd';
-import { getVerbsFor } from '../public/content.js?v=c976f55a';
+import { getVerbsFor } from '../public/content.js?v=35911ed6';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 

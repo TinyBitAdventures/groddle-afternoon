@@ -111,12 +111,12 @@ import { displayTopOf, itemstackOverlayPoint, playSheetOverlay } from '../overla
 import { isInHell } from '../hell.js?v=d77f15ef';
 import { HOG_HAUL_STREET_ID } from '../hog-haul.js?v=50d2e072';
 import { TRANT_META, trantStatusLabel } from '../trants.js?v=864ea9ff';
-import { animalStatusLabel } from '../animals.js?v=4dc2d7b8';
+import { animalStatusLabel } from '../animals.js?v=89aa76e2';
 import { LOCAL_STATES } from '../shared-quoins.js?v=7feb4ae3';
 import { publicStreet } from '../shared-street.js?v=dce5694b';
-import { quoteAnimalKinship } from '../animal-kinship.js?v=75d3cb34';
+import { quoteAnimalKinship } from '../animal-kinship.js?v=eaa3a6f2';
 import { VERB_RESPONSE_POOLS } from '../verb-responses-data.js?v=0777b59b';
-import { captureVerbState, isFoodItem, itemLabel } from '../animal-husbandry.js?v=496e9589';
+import { captureVerbState, isFoodItem, itemLabel } from '../animal-husbandry.js?v=7fd232d6';
 import { ROOK_SHEETS, rookAttackFeature } from './rook-attack-feature.js?v=1b9d25e2';
 import { ANIMAL_BODY, ANIMAL_PATROL, TREE_FOOTPRINT } from '../street-ecology.js?v=f1c11a2d';
 import {
@@ -142,6 +142,7 @@ import {
 import { GAME_DAY_MS, setLastNewDayTs } from '../game-day.js?v=a532775d';
 import {
   CROAK_INTERVAL_MS,
+  nextCroakDelayMs,
   EAT_PAUSE_MS,
   EAT_RADIUS,
   NIBBLE_NA_FAIL,
@@ -161,9 +162,9 @@ import {
   piggyWalkSpeed,
   sadPiggyClip,
   satePiggy,
-} from '../animal-mood.js?v=a49495fc';
+} from '../animal-mood.js?v=c8cc8797';
 import { ownGroundRows, pruneOwnGround } from '../ground-stacks.js?v=22792362';
-import { wallBetween } from '../yard-wander.js?v=cf235545';
+import { wallBetween } from '../yard-wander.js?v=6711b158';
 
 export const ANIMAL_MOOD_FEATURE_ID = 'animal-mood';
 const YARD_TSID = 'RH_HOME_EXT';
@@ -1290,7 +1291,9 @@ function handleTickEvents(engine, results, { live }) {
     for (const ev of events) {
       if (ev.type === 'happy' && live) say(engine, row.target, ev.line, 3000, true);
       if (ev.type === 'croak') {
-        recordFor(row.target).nextCroakAt = Math.min(recordFor(row.target).nextCroakAt || Infinity, now() + 1500);
+        // #172: onTwiceDaily sets the minute's interval (npc_piggy.js 1960): a live tick croaks a
+        // minute on; a replayed one leaves it to the arrival below (anywhere in its minute).
+        if (live) recordFor(row.target).nextCroakAt = now() + nextCroakDelayMs({ started: true });
         lastEvent = `croak:tick:${isExtra(row.target) ? 'owned' : 'ecology'}`;
       }
       if (ev.type === 'seek' && live && !ev.ate) {
@@ -1333,7 +1336,8 @@ function adoptNew(engine) {
   for (const t of fresh) {
     const r = recordFor(t);
     if (isSadIn('npc_piggy', depressing) && !isRooked(t, engine)) startSad(engine, r);
-    if (t.state.croaking && Number(t.state.hunger) >= PIGGY_HUNGER.max) r.nextCroakAt = now() + 2000;
+    // #172: its interval runs whether you watch or not; you walk in somewhere in its minute.
+    if (t.state.croaking && Number(t.state.hunger) >= PIGGY_HUNGER.max) r.nextCroakAt = now() + nextCroakDelayMs();
   }
   applyQaParams(engine);
 }
@@ -1577,7 +1581,7 @@ export const animalMoodFeature = {
           say(engine, target, PIGGY_LINES.croak, PIGGY_LINES.croakMs, true);
           r.nextCroakAt = time + CROAK_INTERVAL_MS;
           lastEvent = 'croak';
-        } else if (!r.nextCroakAt) r.nextCroakAt = time + CROAK_INTERVAL_MS;
+        } else if (!r.nextCroakAt) r.nextCroakAt = time + nextCroakDelayMs();
       } else if (target.state.croaking) target.state.croaking = false;
     }
     publish(engine);
@@ -1633,7 +1637,7 @@ export const animalMoodFeature = {
     if (target?.classId !== 'npc_piggy' || !target.sprite || target.sprite.destroyed) return null;
     const r = recordFor(target);
     if (ev === 'happy') say(engine, target, PIGGY_LINES.happy, 3000, true);
-    else if (ev === 'croak') r.nextCroakAt = Math.min(r.nextCroakAt || Infinity, now() + 1500);
+    else if (ev === 'croak') r.nextCroakAt = now() + nextCroakDelayMs({ started: true }); // the server's tick, as onTwiceDaily (#172)
     else if (ev === 'fed' && r.mode === 'idle' && !isRooked(target, engine)) playClip(engine, r, PIGGY_MOOD_SHEETS.chew); // someone else's feed (G334)
     else if (ev === 'ate' && engine.query?.('sharedPiggyTrips', target, engine) === true) {
       // The server walked it to the food on its shared path (its trip) and it just got there:

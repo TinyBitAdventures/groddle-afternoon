@@ -27,7 +27,7 @@ import { applyVerbReward, getVerbReward } from '../public/js/verb-rewards.js?v=4
 import { createInventory, countItem } from '../public/js/inventory.js?v=6414dbdc';
 import { startAssembly, startDisassembly } from '../public/js/machines.js?v=5d749d26';
 import { createToolConditionState, repairToolCondition, setToolRemaining } from '../public/js/tools.js?v=4156bba8';
-import { smeltMetalRocks } from '../public/js/mining.js?v=5e49efb3';
+import { smeltMetalRocks } from '../public/js/mining.js?v=29eaf67f';
 import { craftRecipe } from '../public/js/making.js?v=6cfac327';
 import { doChore, neighbourById, normalizeNeighbourState } from '../public/js/neighbours.js?v=13f35acd';
 

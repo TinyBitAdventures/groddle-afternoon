@@ -33,13 +33,13 @@
  * keeps a dig crew (diggers) as a rock keeps miners.
  */
 
-import { ROCK_CATALOG, findWorkingPick, miningProfile, miningToolWear } from './mining.js?v=5e49efb3';
+import { MEGA_ROCK_LINE, ROCK_CATALOG, findWorkingPick, miningProfile, miningToolWear } from './mining.js?v=29eaf67f';
 import { MINING_EXPERT_UPGRADES } from './imagination-effects.js?v=70169933';
 import { TRANT_META, canHarvestTrant, fruitCapacityAt, resolveArborologyPackage } from './trants.js?v=864ea9ff';
 import { highestLightGreenThumbRank, quoteTrantCare } from './trant-care.js?v=cb7f539b';
 import { RESOURCE_NODE_ALIASES, RESOURCE_NODE_CATALOG, resolveResourceSkillPackage } from './resource-nodes.js?v=7059a7bd';
-import { highestAnimalKinshipRank } from './animal-kinship.js?v=75d3cb34';
-import { applyAnimalName, applyCreatureState, clockOffset, pathFrom } from './street-creatures.js?v=a43444d0';
+import { highestAnimalKinshipRank } from './animal-kinship.js?v=eaa3a6f2';
+import { applyAnimalName, applyCreatureState, clockOffset, pathFrom } from './street-creatures.js?v=c29092b2';
 
 /** The resource-node classes whose stock is shared (the "N uses left, then regrows" nodes). */
 /**
@@ -77,7 +77,7 @@ export const COPY = Object.freeze({
   connecting: 'The street is still connecting. Try again in a moment.',
   timeout: 'The street did not answer. Try again.',
   busy: 'Hold on, still asking the street.',
-  mega: 'I am huuuuuuuuuge!', // include/mining.js:174 onMegaRoxx
+  mega: MEGA_ROCK_LINE.text, // include/mining.js:174 onMegaRoxx
 });
 
 /**
