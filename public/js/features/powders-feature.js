@@ -115,7 +115,7 @@ import {
 import { itemVerbAchievementCounters } from '../item-verbs.js?v=ecade42e';
 import { copyChargesLeft, copyFromLedger, keepsCopies, spendCopyCharge, verbCopy } from '../copy-charges.js?v=357d4cbb';
 import { migrateClassValue } from '../tools.js?v=4156bba8';
-import { offlineLine, sharedOffline } from '../online-request.js?v=09ac8a9c';
+import { offlineLine, sharedOffline } from '../online-request.js?v=dac938db';
 import { DEAD_TRANT_CLASSES } from '../patches.js?v=d5136729';
 import { COPY as SHARED_PATCH_COPY } from '../shared-patches.js?v=f10f4d59';
 import { hellFeature } from './hell-feature.js?v=b3f6bb33';

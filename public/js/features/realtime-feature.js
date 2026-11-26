@@ -60,7 +60,7 @@
 
 import { chatBubbleText } from '../ui/chat-input.js?v=8f2479a3';
 import { createMinnAccount } from '../minn-account.js?v=7e3d7279';
-import { EMOTES, bindPageLifecycle, createRealtimeClient, createTrack, pushSample, sampleTrack } from '../realtime-client.js?v=9471ca67';
+import { EMOTES, bindPageLifecycle, createRealtimeClient, createTrack, pushSample, sampleTrack } from '../realtime-client.js?v=eb1515a8';
 import { ANIM_FPS, EMOTION_MS, animForState, crowdScaleX } from '../avatar-anims.js?v=fb921bf4';
 import { redrawFrame } from '../avatar-pack.js?v=65324246';
 import { movedLine } from '../admin-teleport.js?v=c4d28509';
@@ -124,6 +124,15 @@ export const OTHER_CHARACTER_TEXT = Object.freeze({
   note: "You're playing as another character in another window.",
 });
 
+/**
+ * #670 (G1324): the window slept or went silent a long time, so it did not connect again by itself
+ * (realtime-client.js SLEPT_MS; Glitch asked to reload, NetController.as 596-603). Play here does.
+ */
+export const ASLEEP_TEXT = Object.freeze({
+  state: 'This window was asleep',
+  note: 'This window was asleep. Play here?',
+});
+
 /** The pill's words for a client state (plain remake copy, no em-dashes). */
 export function statusText(state, { here = 0, attempt = 0 } = {}) {
   switch (state) {
@@ -131,6 +140,7 @@ export function statusText(state, { here = 0, attempt = 0 } = {}) {
     case 'connecting': return attempt > 0 ? 'Offline, retrying' : 'Connecting';
     case 'offline': return 'Offline, retrying';
     case 'replaced': return 'Playing somewhere else';
+    case 'asleep': return ASLEEP_TEXT.state;
     case 'other-character': return OTHER_CHARACTER_TEXT.state;
     case 'signed-out': return 'Signed out';
     case 'off': return 'Others are off on this site';
@@ -193,7 +203,7 @@ const STYLE = `
 .mp-state { display: inline-flex; align-items: center; gap: var(--sp-3); padding: 0.2rem 0.55rem; border-radius: var(--radius-pill); color: var(--c-green-34); background: color-mix(in srgb, var(--surface-moss) 94%, transparent); box-shadow: var(--shadow-1); }
 .mp-state::before { content: ''; width: 7px; height: 7px; border-radius: var(--radius-round); background: var(--c-gold-76); }
 .mp-state[data-state="online"]::before { background: var(--c-lime-67); }
-.mp-state[data-state="offline"]::before, .mp-state[data-state="replaced"]::before, .mp-state[data-state="signed-out"]::before, .mp-state[data-state="stopped"]::before, .mp-state[data-state="booted"]::before, .mp-state[data-state="suspended"]::before, .mp-state[data-state="other-character"]::before { background: var(--c-red-59); }
+.mp-state[data-state="offline"]::before, .mp-state[data-state="replaced"]::before, .mp-state[data-state="asleep"]::before, .mp-state[data-state="signed-out"]::before, .mp-state[data-state="stopped"]::before, .mp-state[data-state="booted"]::before, .mp-state[data-state="suspended"]::before, .mp-state[data-state="other-character"]::before { background: var(--c-red-59); }
 .mp-state[data-state="off"]::before { background: var(--c-sand-67); }
 .mp-bar button { font: inherit; border: 0; border-radius: var(--radius-pill); padding: 0.2rem var(--sp-5); cursor: pointer; color: var(--text-heading); background: color-mix(in srgb, var(--surface-card) 92%, transparent); box-shadow: var(--shadow-1); }
 .mp-bar button[aria-pressed="true"] { background: var(--c-mauve-93); }
@@ -319,7 +329,7 @@ function createSession(engine) {
     const s = client.state;
     pill.dataset.state = s === 'connecting' && client.attempt > 0 ? 'offline' : s;
     pill.textContent = statusText(s, { here: client.here, attempt: client.attempt });
-    hereBtn.hidden = s !== 'replaced';
+    hereBtn.hidden = s !== 'replaced' && s !== 'asleep';
     social?.refresh();
     engine.setData?.('realtimeState', s);
     engine.setData?.('realtimeHere', String(client.here));
@@ -556,6 +566,10 @@ function createSession(engine) {
       const line = 'You are playing in another window, so the street sees you there. Play here brings you back.';
       addLog({ note: true, text: line });
       engine.toast?.(line, 5200);
+    }
+    if (state === 'asleep') {
+      addLog({ note: true, text: ASLEEP_TEXT.note });
+      engine.toast?.(ASLEEP_TEXT.note, 5200);
     }
     if (state === 'signed-out') addLog({ note: true, text: 'You are signed out, so others cannot see you. Log in again to rejoin.' });
     if (state === 'other-character') {

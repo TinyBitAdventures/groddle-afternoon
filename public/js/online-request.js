@@ -57,7 +57,7 @@ export const RECONNECTING_LINE = 'Reconnecting...';
  */
 export const NO_REALTIME_STATES = Object.freeze(new Set(['off']));
 /** G1306: states the client does not leave by itself (realtime-feature says why); never "Reconnecting...". */
-export const ENDED_STATES = Object.freeze(new Set(['off', 'signed-out', 'replaced', 'other-character', 'booted', 'suspended']));
+export const ENDED_STATES = Object.freeze(new Set(['off', 'signed-out', 'replaced', 'other-character', 'booted', 'suspended', 'asleep']));
 /** G1306: a shared act refused while this page cannot reach the street and will not by itself (home-machines.js offline). */
 export const OFFLINE_LINE = 'You need to be online to do that.';
 

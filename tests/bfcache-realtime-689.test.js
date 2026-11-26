@@ -17,7 +17,7 @@ import { readFileSync } from 'node:fs';
 import { createServer } from 'node:http';
 import { join } from 'node:path';
 
-import { PAGE_RETURN_STATES, bindPageLifecycle, createRealtimeClient } from '../public/js/realtime-client.js?v=9471ca67';
+import { PAGE_RETURN_STATES, bindPageLifecycle, createRealtimeClient } from '../public/js/realtime-client.js?v=eb1515a8';
 
 const root = join(import.meta.dirname, '..');
 const read = (rel) => readFileSync(join(root, rel), 'utf8');

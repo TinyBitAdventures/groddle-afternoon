@@ -12,13 +12,13 @@ import { describe, it } from 'node:test';
 
 import { SEED_CATALOG, createGarden, harvestPlot, plantPlot, tickGarden, waterAllPlots, waterPlot } from '../public/js/garden.js?v=fefa7bcd';
 import { GARDEN_LOCK_MS, LOCK_LINE, SHARED_GARDEN_STREETS, applyPlot, isSharedGardenStreet, localPlot, lockedFor, parsePlotId, plotId, rollPasses } from '../public/js/shared-gardens.js?v=464472e5';
-import { sharedGardensFeature } from '../public/js/features/shared-gardens-feature.js?v=cdbfd9aa';
-import { FEATURES } from '../public/js/features/index.js?v=2079158f';
+import { sharedGardensFeature } from '../public/js/features/shared-gardens-feature.js?v=48e149ca';
+import { FEATURES } from '../public/js/features/index.js?v=43e5be3a';
 import { mgDetails, potionPlotCount, potionTooTired } from '../public/js/master-garden.js?v=e37b75ec';
 // A fresh pick's save waits for the server's receipt (GRANT_SAVE_DELAY_MS): the tests wait it out.
 const settle = () => new Promise((res) => setTimeout(res, 2700));
 import { HAS_SITE, SITE_DIR, serverPath, sitePath, skipWithoutServer } from '../tools/repos.mjs';
-import { ANSWER_WAIT_FALLBACK_MS } from '../public/js/online-request.js?v=09ac8a9c';
+import { ANSWER_WAIT_FALLBACK_MS } from '../public/js/online-request.js?v=dac938db';
 import { HAS_PHP, PHP } from './php.js';
 
 const read = (p) => readFileSync(new URL(`../${p}`, import.meta.url), 'utf8');

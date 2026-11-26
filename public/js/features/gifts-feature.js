@@ -41,7 +41,7 @@ import { unitRankAt } from '../pack-slots.js?v=38e4aea5';
 import { createMinnAccount } from '../minn-account.js?v=7e3d7279';
 import { createItemPicker } from '../ui/item-picker.js?v=548fd590';
 // The same key as features/index.js: one module instance holds the carried notes.
-import { giveCarriedNote, takeCarriedNote, writtenCarriedNotes } from './street-furniture-feature.js?v=a8a102ee';
+import { giveCarriedNote, takeCarriedNote, writtenCarriedNotes } from './street-furniture-feature.js?v=489ef3dc';
 import {
   BOX_KEEP,
   BOX_SLOTS,
@@ -65,7 +65,7 @@ import {
 } from '../gifts.js?v=37ce7d76';
 import { UNNAMED_PLAYER } from '../player-names.js?v=f9b78094';
 import { registerDropTarget } from '../drop-targets.js?v=59e6edb4';
-import { draggedHere, draggedStack } from '../drag-stack.js?v=4321c8c6';
+import { draggedHere, draggedStack } from '../drag-stack.js?v=e0138d76';
 
 export const GIFTS_FEATURE_ID = 'gifts';
 export const GIFT_VERB = 'gift_give';

@@ -22,7 +22,9 @@
  * 'booted' (4010, stopped for this page), 'suspended' (4011, or the ticket
  * route's 403 groddle_suspended, stopped), 'other-character' (4012, or the
  * ticket route's 409 character_changed: another character of this login
- * plays now, stopped), 'stopped' (stop() was called).
+ * plays now, stopped), 'asleep' (#670: no frame for SLEPT_MS, a laptop that
+ * slept or a long silence: it does not reconnect by itself, Play here does),
+ * 'stopped' (stop() was called).
  */
 import { UNNAMED_PLAYER } from './player-names.js?v=f9b78094';
 
@@ -49,6 +51,15 @@ export const QUIET_MS = 50000;
  * A phone that lost its connection had waited QUIET_MS (and the answer's whole wait) to notice.
  */
 export const PROBE_TIMEOUT_MS = 2500;
+/**
+ * #670 (Austin's ruling 2026-11-26, G1324): no frame for this long and the socket is gone: the window
+ * slept (a closed laptop lid) or the line was silent a long time. It does not connect again by itself,
+ * since a fresh ticket would take the character from the device the player is using now (the server's
+ * newest wins); it waits on Play here (state 'asleep'). A short drop still reconnects. Glitch asked for
+ * a reload after 3.5 minutes of silence and never reconnected silently (NetController.as
+ * disconnectHandler 596-603: "It's been a while since I spoke to the game server").
+ */
+export const SLEPT_MS = 3.5 * 60 * 1000;
 export const BACKOFF_MIN_MS = 1000;
 export const BACKOFF_MAX_MS = 30000;
 /** The server's limits (hub.go maxChat; maxLook is 4096 bytes of JSON). */
@@ -165,10 +176,13 @@ export const PAGE_RETURN_STATES = Object.freeze(new Set(['idle', 'connecting', '
  * listeners, as after a dropped socket. Only a page that left live or trying to be: one that left
  * replaced (4001), booted, signed out, suspended or for another character stays as it was.
  * Chrome's `resume` (after a freeze stopped the timers) probes the socket: a dead one connects at once.
+ * #670: a page shown again after being hidden SLEPT_MS or more probes too, so a socket that died in
+ * the meantime is found now; with nothing heard for that long the client waits on Play here.
  * `win` and `doc` are the window and document (event targets). Returns an unbind.
  */
-export function bindPageLifecycle(client, win = globalThis.window, doc = globalThis.document) {
+export function bindPageLifecycle(client, win = globalThis.window, doc = globalThis.document, now = () => Date.now()) {
   let returnTo = false;
+  let hiddenAt = doc?.visibilityState === 'hidden' ? now() : 0;
   const onHide = () => {
     returnTo = PAGE_RETURN_STATES.has(client.state);
     client.stop();
@@ -182,13 +196,24 @@ export function bindPageLifecycle(client, win = globalThis.window, doc = globalT
   const onResume = () => {
     if (client.state === 'online') client.probe?.();
   };
+  const onVisibility = () => {
+    if (doc?.visibilityState === 'hidden') {
+      hiddenAt = now();
+      return;
+    }
+    const away = hiddenAt ? now() - hiddenAt : 0;
+    hiddenAt = 0;
+    if (away >= SLEPT_MS) onResume();
+  };
   win?.addEventListener?.('pagehide', onHide);
   win?.addEventListener?.('pageshow', onShow);
   doc?.addEventListener?.('resume', onResume);
+  doc?.addEventListener?.('visibilitychange', onVisibility);
   return () => {
     win?.removeEventListener?.('pagehide', onHide);
     win?.removeEventListener?.('pageshow', onShow);
     doc?.removeEventListener?.('resume', onResume);
+    doc?.removeEventListener?.('visibilitychange', onVisibility);
   };
 }
 
@@ -321,8 +346,15 @@ export function createRealtimeClient({
     attempt += 1;
   }
 
+  /** #670: this page was online and has heard nothing for SLEPT_MS (it slept, or a long silence). */
+  function slept() {
+    return wasOnline && lastFrameAt > 0 && now() - lastFrameAt > SLEPT_MS;
+  }
+
   async function connect() {
-    if (['replaced', 'signed-out', 'off', 'booted', 'suspended', 'other-character', 'stopped'].includes(state)) return;
+    if (['replaced', 'signed-out', 'off', 'booted', 'suspended', 'other-character', 'asleep', 'stopped'].includes(state)) return;
+    // #670: a retry that comes due after a long sleep or silence waits on Play here.
+    if (slept()) return stopFor('asleep');
     const gen = ++generation;
     setState('connecting');
     let t;
@@ -381,6 +413,8 @@ export function createRealtimeClient({
     if (code === CLOSE_BANNED) return setState('suspended', { code });
     if (code === CLOSE_OTHER_CHARACTER) return setState('other-character', { code });
     if (state === 'stopped') return;
+    // #670: the socket went with nothing heard for SLEPT_MS: no reconnect by itself, Play here does.
+    if (slept()) return stopFor('asleep');
     if (code === CLOSE_TICKET && ticketRetries < 2) {
       // A used or expired ticket: a new one straight away (twice, then back off).
       ticketRetries += 1;
@@ -599,18 +633,20 @@ export function createRealtimeClient({
       state = 'idle';
       attempt = 0;
       ticketRetries = 0;
+      lastFrameAt = 0;
       connect();
     },
 
     /**
      * Connect again now, from any state (Play here after 4001 takes the
-     * character back from the other window). The street wanted is kept.
+     * character back from the other window, or after a sleep). The street wanted is kept.
      */
     restart() {
       stopFor('stopped');
       state = 'idle';
       attempt = 0;
       ticketRetries = 0;
+      lastFrameAt = 0;
       connect();
     },
 

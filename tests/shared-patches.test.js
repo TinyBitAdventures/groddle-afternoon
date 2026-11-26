@@ -34,9 +34,9 @@ import {
   soilRolls,
   stripSharedPlots,
 } from '../public/js/shared-patches.js?v=f10f4d59';
-import { sharedPatchesFeature } from '../public/js/features/shared-patches-feature.js?v=f05df74a';
+import { sharedPatchesFeature } from '../public/js/features/shared-patches-feature.js?v=8ce1a8d6';
 import { patchesFeature, soilSpawnPlan } from '../public/js/features/patches-feature.js?v=ae1f8b31';
-import { FEATURES } from '../public/js/features/index.js?v=2079158f';
+import { FEATURES } from '../public/js/features/index.js?v=43e5be3a';
 import { getStreetEcologyCatalog, setStreetEcologyCatalog } from '../public/js/street-ecology.js?v=f1c11a2d';
 import { HAS_SERVER, serverPath } from '../tools/repos.mjs';
 

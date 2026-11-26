@@ -39,8 +39,8 @@ import {
   treeReady,
   treeSkill,
 } from '../public/js/street-objects.js?v=597472b8';
-import { streetObjectsFeature } from '../public/js/features/street-objects-feature.js?v=48d4239d';
-import { FEATURES } from '../public/js/features/index.js?v=2079158f';
+import { streetObjectsFeature } from '../public/js/features/street-objects-feature.js?v=3cb486ee';
+import { FEATURES } from '../public/js/features/index.js?v=43e5be3a';
 import { createMineRock, mineRock } from '../public/js/mining.js?v=7ecaa572';
 import { createResourceNode } from '../public/js/resource-nodes.js?v=e2d1cbc9';
 import { createTrantState, fruitCapacityAt, setTrantTables } from '../public/js/trants.js?v=864ea9ff';
@@ -48,7 +48,7 @@ import { placementRequests, ruleTables, streetObjectLayout } from '../tools/buil
 import { STREET_INDEX, applyStreetIndex, loadStreetDataFromFs } from '../public/js/street-loader.js?v=10376267';
 import { PLANNED_NODE_CAPS, measuredNodeSpots, setStreetEcologyCatalog } from '../public/js/street-ecology.js?v=f1c11a2d';
 import { serverPath, skipWithoutServer } from '../tools/repos.mjs';
-import { ANSWER_WAIT_FALLBACK_MS } from '../public/js/online-request.js?v=09ac8a9c';
+import { ANSWER_WAIT_FALLBACK_MS } from '../public/js/online-request.js?v=dac938db';
 
 const root = join(import.meta.dirname, '..');
 const read = (rel) => readFileSync(join(root, rel), 'utf8');

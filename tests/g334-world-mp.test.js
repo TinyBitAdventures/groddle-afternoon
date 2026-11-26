@@ -36,9 +36,9 @@ import { createResourceNode, harvestResourceNode } from '../public/js/resource-n
 import { isPoisoned, TREE_ANTIDOTE, TREE_POISON, BOTANY_SKILL } from '../public/js/tree-poison.js?v=646d1bc1';
 import { treeDeathFeature } from '../public/js/features/tree-death-feature.js?v=1a6cd3d9';
 import { patchesFeature } from '../public/js/features/patches-feature.js?v=ae1f8b31';
-import { streetObjectsFeature } from '../public/js/features/street-objects-feature.js?v=48d4239d';
+import { streetObjectsFeature } from '../public/js/features/street-objects-feature.js?v=3cb486ee';
 import { helpMineFeature, relabelOpenDig } from '../public/js/features/help-mine-feature.js?v=0163cc83';
-import { animalMoodFeature } from '../public/js/features/animal-mood-feature.js?v=c21a22da';
+import { animalMoodFeature } from '../public/js/features/animal-mood-feature.js?v=1e7c3b13';
 
 // ---------------------------------------------------------------------------
 // Pure helpers

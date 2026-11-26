@@ -69,7 +69,7 @@ import { createMinnAccount } from '../minn-account.js?v=7e3d7279';
 import { saveStore, savedThrough } from '../save-store.js?v=4e720735';
 import { ownGroundRows } from '../ground-stacks.js?v=22792362';
 import { pileMaxOf } from '../world-items.js?v=93313aad';
-import { offlineLine, sharedOffline } from '../online-request.js?v=09ac8a9c';
+import { offlineLine, sharedOffline } from '../online-request.js?v=dac938db';
 import { DROP_OP, DROP_QUEUE_MAX, DROP_TEXT, bucketTake, dropEffect, dropRefusalText, eatenStack, groundFrom, homePlaceOf, isFloorPlace, isPublicStreet, likeSharedStack, normalizeGroundStack, normalizeItem, normalizeMine, pickupAsk, pigAnimalKey, shareReason, stackAt, stackLeft } from '../drops-mp.js?v=351593a6';
 
 export const DROPS_MP_FEATURE_ID = 'drops-mp';

@@ -26,7 +26,7 @@ import {
   skillToolClass,
   skillToolFor,
 } from '../public/js/skill-bubbles.js?v=4f5a475a';
-import { SKILL_BUBBLE_WORD } from '../public/js/realtime-client.js?v=9471ca67';
+import { SKILL_BUBBLE_WORD } from '../public/js/realtime-client.js?v=eb1515a8';
 import { onSkillBubble, skillBubblesFeature } from '../public/js/features/skill-bubbles-feature.js?v=c74e18c4';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
