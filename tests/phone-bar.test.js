@@ -10,7 +10,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { MENU_GROUPS, MENU_ROWS, PHONE_MENU_GROUP, menuRowFor, phoneBar, studyRowDetail } from '../public/js/ui/topbar.js?v=8831b556';
+import { MENU_GROUPS, MENU_ROWS, PHONE_MENU_GROUP, menuGroupOrder, menuRowFor, phoneBar, studyRowDetail } from '../public/js/ui/topbar.js?v=efebad7d';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const css = readFileSync(join(root, 'public/style.css'), 'utf8');
@@ -35,6 +35,14 @@ describe('the phone Menu: Now first, then the rest', () => {
     // A row with no phone place is the same row either way.
     assert.equal(menuRowFor('skills-btn', { phone: true }), MENU_ROWS['skills-btn']);
   });
+  it('#264 (Austin 2026-11-26, G1325): a phone shows Social second, after Now; computers keep the mock order', () => {
+    assert.deepEqual(menuGroupOrder({ phone: true }).map((g) => g.id), ['now', 'social', 'me', 'world', 'settings']);
+    assert.deepEqual(menuGroupOrder({ phone: true }).map((g) => g.label), ['Now', 'Social', 'Me', 'World', 'Settings']);
+    assert.deepEqual(menuGroupOrder().map((g) => g.id), ['me', 'world', 'social', 'settings']);
+    assert.deepEqual(menuGroupOrder({ phone: false }), MENU_GROUPS);
+    // The same groups either way, Now aside: nothing is lost on a phone.
+    assert.equal(menuGroupOrder({ phone: true })[0], PHONE_MENU_GROUP);
+  });
   it('the study row reads as the bar pill did', () => {
     assert.equal(studyRowDetail({ hidden: false, skill: 'animalkinship_1', name: 'Animal Kinship I', short: '1:53' }), 'learning Animal Kinship I · 1:53');
     assert.equal(studyRowDetail({ hidden: false, skill: '', name: 'Skills', short: '5' }), '5 available');
@@ -49,8 +57,9 @@ describe('the phone Menu: Now first, then the rest', () => {
     assert.equal(phoneBar(null), false);
   });
   it('the rows click the bar buttons, the Now group comes first, a skin switch re-sorts', () => {
-    assert.match(src, /for \(const g of phone \? \[PHONE_MENU_GROUP, \.\.\.MENU_GROUPS\] : MENU_GROUPS\)/);
-    assert.match(src, /if \(g === PHONE_MENU_GROUP\) list\.prepend\(box\);/);
+    assert.match(src, /for \(const g of menuGroupOrder\(\{ phone \}\)\)/);
+    // The groups are in the page already (play/index.html): each one moves into its place.
+    assert.match(src, /list\.append\(box\);\s*groups\.set\(g\.id, box\);/);
     assert.match(src, /const row = menuRowFor\(btn\.id, \{ phone: onPhone \}\);/);
     assert.match(src, /row\('menu-study-btn', [^\n]*\(\) => doc\.getElementById\('skills-btn'\)\?\.click\(\)\);/);
     assert.match(src, /row\('menu-sound-btn', [^\n]*\(\) => sound\?\.click\(\)\);/);

@@ -23,7 +23,7 @@ import { CHARACTER_COPY, FRESH_HASH, SAVE_ALERT_COPY, characterChoices, continue
 import { SWITCHER_COPY, STYLE as SWITCHER_STYLE, cardUrl, popoverPlace, switcherChoices } from '../public/js/character-switcher.js?v=265e3b6a';
 import { LOCAL_STATES } from '../public/js/shared-quoins.js?v=32ec999a';
 import { offlineLine, sharedOffline } from '../public/js/online-request.js?v=dac938db';
-import { menuRowFor } from '../public/js/ui/topbar.js?v=8831b556';
+import { menuRowFor } from '../public/js/ui/topbar.js?v=efebad7d';
 
 const root = join(import.meta.dirname, '..');
 const read = (rel) => readFileSync(join(root, rel), 'utf8');

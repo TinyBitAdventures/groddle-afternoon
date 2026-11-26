@@ -14,6 +14,7 @@
  * On a phone (html.touch-phone, Modern; Austin 2026-11-12) the right pill holds only Quests,
  * Report a problem and the Menu: the skill being learned, Make, Mail and Sound open from the
  * Menu's first rows (installPhoneRows), and the Menu button rings the study's progress.
+ * Its groups read Now, Social, Me, World, Settings there (menuGroupOrder, #264).
  *
  * Tooltips with key caps replace the bar's native titles. Everything here is
  * scoped to <html data-ui="modern"> in style.css, and the game state stays in
@@ -121,6 +122,17 @@ export function menuRowFor(id, { phone = false } = {}) {
 
 /** A phone's first Menu group (installMenu adds it there only): the study, Make, Mail and Sound. */
 export const PHONE_MENU_GROUP = Object.freeze({ id: 'now', label: 'Now' });
+
+/**
+ * PURE: the Menu's groups in order. #264 (Austin 2026-11-26, G1325): a phone puts Social right after
+ * Now (Now, Social, Me, World, Settings), upright and sideways, in either skin, since the two-column
+ * Menu left it more than a scroll down; computers keep the mock's order.
+ */
+export function menuGroupOrder({ phone = false } = {}) {
+  if (!phone) return MENU_GROUPS;
+  const by = Object.fromEntries(MENU_GROUPS.map((g) => [g.id, g]));
+  return [PHONE_MENU_GROUP, by.social, by.me, by.world, by.settings];
+}
 
 /** The phone bar: the phone gate's device (game.js adds html.touch-phone) in the Modern skin. */
 export function phoneBar(doc) {
@@ -645,7 +657,7 @@ function installMenu(doc) {
   const ROW = 'button, a[href]';
   const groups = new Map();
   const phone = Boolean(doc.documentElement?.classList?.contains('touch-phone'));
-  for (const g of phone ? [PHONE_MENU_GROUP, ...MENU_GROUPS] : MENU_GROUPS) {
+  for (const g of menuGroupOrder({ phone })) {
     let box = list.querySelector(`[data-menu-group="${g.id}"]`);
     if (!box) {
       box = doc.createElement('div');
@@ -654,9 +666,9 @@ function installMenu(doc) {
       box.setAttribute('role', 'group');
       box.setAttribute('aria-label', g.label);
       box.innerHTML = `<div class="menu-group-label" aria-hidden="true">${g.label}</div>`;
-      if (g === PHONE_MENU_GROUP) list.prepend(box);
-      else list.append(box);
     }
+    // The page holds Me, World, Social and Settings already: each one moves into its place (#264).
+    list.append(box);
     groups.set(g.id, box);
   }
   const sync = () => {
