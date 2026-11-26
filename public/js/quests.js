@@ -10,7 +10,7 @@
  *   questRewardSummary(rewards, { multiplier }) award-screen lines without applying anything
  */
 
-import { getQuestCatalog } from './content-catalogs.js?v=2b7048b9';
+import { getQuestCatalog } from './content-catalogs.js?v=c9b84764';
 import { questRewardModifier } from './imagination-effects.js?v=70169933';
 import { gainMetabolic } from './metabolics.js?v=48f784bf';
 import { giantDisplayName } from './giant-names.js?v=0e295891';
@@ -341,6 +341,32 @@ function questRewardRows(bucket) {
 const giantLabel = (giant) => giantDisplayName(giant || '');
 
 /**
+ * #705: a quest reward that is not an item in the pack but something the quest unlocks elsewhere
+ * (ours: Glitch had no such reward). `rewards.unlock`: { label, icon, where, notice } or a list of
+ * them. Each comes back as { label, icon, text, notice }: `text` for the award card ("Vine Radio,
+ * waiting in Cultivate on your home street"), `notice` for the Activity line when the quest is done.
+ */
+export function questUnlockRows(unlock) {
+  return (Array.isArray(unlock) ? unlock : unlock ? [unlock] : [])
+    .map((row) => {
+      const label = String(row?.label || '').trim();
+      const where = String(row?.where || '').trim();
+      return {
+        label,
+        icon: String(row?.icon || ''),
+        text: where ? `${label}, waiting in ${where}` : label,
+        notice: String(row?.notice || '').trim() || (where ? `Your ${label} is waiting in ${where}.` : `You got the ${label}.`),
+      };
+    })
+    .filter((row) => row.label);
+}
+
+/** The Activity lines a turned-in quest's unlocks add (questUnlockRows `notice`). */
+export function questUnlockNotices(summary = {}) {
+  return (Array.isArray(summary?.unlocks) ? summary.unlocks : []).map((row) => row.notice).filter(Boolean);
+}
+
+/**
  * Reward lines for the award screen (screen-fx.js awardRewardTokens reads the
  * ` · `-joined subtitle). Nothing is applied.
  * @param {object} rewards  quest def rewards
@@ -369,6 +395,7 @@ export function questRewardSummary(rewards = {}, opts = {}) {
         label: String(row?.label || ''),
       }))
       .filter((row) => row.recipeId),
+    unlocks: questUnlockRows(rewards?.unlock),
   };
   // #492: the award card takes these rows as they are (questAwardPayload `rewards`), one chip each
   // with its own icon (glitch-client Slug.as getIcon 223-245: a slug per reward, items with their icon).
@@ -380,6 +407,7 @@ export function questRewardSummary(rewards = {}, opts = {}) {
   for (const entry of summary.favor) rows.push({ kind: 'favor', amount: entry.points, giant: entry.giant, text: `+${entry.points} ${giantLabel(entry.giant)} favor` });
   for (const item of summary.items) rows.push({ kind: 'item', amount: item.count, classTsid: item.classTsid, text: `${item.count}× ${item.label}` });
   for (const recipe of summary.recipes) rows.push({ kind: 'recipe', recipeId: recipe.recipeId, text: `Recipe: ${recipe.label || recipe.recipeId}` });
+  for (const unlock of summary.unlocks) rows.push({ kind: 'unlock', icon: unlock.icon, text: unlock.text });
   summary.rows = rows;
   summary.lines = rows.map((row) => row.text);
   summary.subtitle = summary.lines.join(' · ');

@@ -42,8 +42,8 @@ import {
   streetKeyFor,
   triggerSecretSpot,
 } from '../public/js/secret-spots.js?v=59a37384';
-import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=2b7048b9';
-import { applyAchievementProgress, createAchievementState } from '../public/js/achievements.js?v=4add7f73';
+import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=c9b84764';
+import { applyAchievementProgress, createAchievementState } from '../public/js/achievements.js?v=535c8952';
 import { SOUND_CATEGORIES } from '../public/js/sound-keys.js?v=8b36c250';
 import { SYNTH_RECIPES, recipeForKey } from '../public/js/synth-sfx.js?v=c30a1709';
 

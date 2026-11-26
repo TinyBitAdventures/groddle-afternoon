@@ -29,7 +29,7 @@ describe('saves move onto the original houses (migration)', () => {
     assert.equal(home.house.config.skull, 3);
     assert.equal(home.house.facingRight, true);
     // A stored save is normalized on load (player-save normalizeSystemsSnapshot), so it moves there.
-    const { normalizeSystemsSnapshot } = await import('../public/js/player-save.js?v=cf0ebffd');
+    const { normalizeSystemsSnapshot } = await import('../public/js/player-save.js?v=7c3df906');
     assert.equal(normalizeSystemsSnapshot({ home: { owned: true, style: 'uralia' } }).home.house.chassis, 'hominid');
     assert.equal(normalizeSystemsSnapshot({ home: seed }).home.house.chassis, 'bone');
   });

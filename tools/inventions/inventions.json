@@ -5982,9 +5982,13 @@
     {
      "file": "public/game.js",
      "symbol": "setAmbientForStreet"
+    },
+    {
+     "file": "public/js/quests.js",
+     "symbol": "questUnlockRows"
     }
    ],
-   "why": "A player asked for a jukebox (#661, G1245). Glitch had no radio, jukebox or record player a player could own (glitch-GameServerJS items: none). Ours: the Tunes for Crabs quest (6 tunes, the 10-for-8 Austin asked scaled to the 5 crabs on the open world), the vine radio decoration (Tiny Speck, CC0, Ix set) stood on the home street in Cultivate, the Choose music sheet (regions by visiting, theme tracks by hearing them, musicblocks by owning them), street-only playback that is louder near the radio, and a visitor's opt-out. Only music the game already ships; the party's lively stand-in is left out.",
+   "why": "A player asked for a jukebox (#661, G1245). Glitch had no radio, jukebox or record player a player could own (glitch-GameServerJS items: none). Ours: the Tunes for Crabs quest (6 tunes, the 10-for-8 Austin asked scaled to the 5 crabs on the open world), the vine radio decoration (Tiny Speck, CC0, Ix set) stood on the home street in Cultivate, the Choose music sheet (regions by visiting, theme tracks by hearing them, musicblocks by owning them), street-only playback that is louder near the radio, and a visitor's opt-out. Only music the game already ships; the party's lively stand-in is left out. #705: the radio never goes in the pack, so a quest reward kind for an unlock (rewards.unlock) names it on the award card with its art and adds an Activity line saying it waits in Cultivate on your home street; it is not put out by itself.",
    "ruling": "Austin 2026-11-24 (#661, G1245): build the Vine Radio, Option A (a Music Crab quest), street only, louder near the radio, region names, Classic as fits.",
    "rows": [
     "G1245"

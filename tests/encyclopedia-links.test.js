@@ -25,11 +25,11 @@ import {
   encyclopediaSearchHref,
   isEncyclopediaKey,
 } from '../public/js/encyclopedia-links.js?v=0c3b2863';
-import { GIANTS } from '../public/js/shrines.js?v=4dd7a44f';
+import { GIANTS } from '../public/js/shrines.js?v=da102ddd';
 import { VENDOR_PROFILES } from '../public/js/vendor.js?v=474a80fd';
 import { CLIENT_KEY_TABLE, clientKeyAction } from '../public/js/client-hotkeys.js?v=5c5a4301';
 import { MENU_ROWS } from '../public/js/ui/topbar.js?v=654340a1';
-import { questCardMenuRows } from '../public/js/ui/quest-sheet.js?v=3e7ac77b';
+import { questCardMenuRows } from '../public/js/ui/quest-sheet.js?v=e2f83677';
 import { ISLAND_CONFIRM, ISLAND_LINES } from '../public/js/newxp.js?v=5aa81665';
 
 const here = dirname(fileURLToPath(import.meta.url));

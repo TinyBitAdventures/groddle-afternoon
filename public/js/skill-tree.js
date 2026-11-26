@@ -15,8 +15,8 @@
  *   studied as 1,000 favor would (shrines.js quoteEmblemSpend).
  */
 
-import { getSkillCatalog } from './content-catalogs.js?v=2b7048b9';
-import { SKILL_POINTS_PER_SECOND, canLearnSkill, getStudyStatus, studySecondsForSkill } from './skills.js?v=dfbf499b';
+import { getSkillCatalog } from './content-catalogs.js?v=c9b84764';
+import { SKILL_POINTS_PER_SECOND, canLearnSkill, getStudyStatus, studySecondsForSkill } from './skills.js?v=3c6dbdff';
 
 export const SKILL_CATEGORIES = Object.freeze({
   6: 'Alchemy',

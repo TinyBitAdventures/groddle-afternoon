@@ -17,11 +17,11 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { loadContentCatalogsFromDir, resetContentCatalogs } from '../public/js/content-catalogs.js?v=2b7048b9';
-import { assignQuest, createQuestState } from '../public/js/quests.js?v=c8d59839';
-import { createAchievementState } from '../public/js/achievements.js?v=4add7f73';
+import { loadContentCatalogsFromDir, resetContentCatalogs } from '../public/js/content-catalogs.js?v=c9b84764';
+import { assignQuest, createQuestState } from '../public/js/quests.js?v=f68437db';
+import { createAchievementState } from '../public/js/achievements.js?v=535c8952';
 import { countItem, createInventory } from '../public/js/inventory.js?v=6414dbdc';
-import { createPlayerSave, restorePlayerSave } from '../public/js/player-save.js?v=cf0ebffd';
+import { createPlayerSave, restorePlayerSave } from '../public/js/player-save.js?v=7c3df906';
 import { STATION_X, stationScreen, surfaceStation } from '../public/js/subway.js?v=ea6921ff';
 import {
   LEGALIZE_BACK_ALLEY_TSID,
@@ -38,8 +38,8 @@ import {
   legalizeObjective,
   legalizeReloadLocation,
   legalizeWayBack,
-} from '../public/js/legalize-it.js?v=d26b33dc';
-import { closeQuestRoomConverse } from '../public/js/features/quest-instances-feature.js?v=228c8ecc';
+} from '../public/js/legalize-it.js?v=8178339d';
+import { closeQuestRoomConverse } from '../public/js/features/quest-instances-feature.js?v=c1076b5b';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const game = fs.readFileSync(path.join(root, 'public/game.js'), 'utf8');

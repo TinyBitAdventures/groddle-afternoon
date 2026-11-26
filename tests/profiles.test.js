@@ -20,10 +20,10 @@ import {
   aboutCounter, aboutLength, avatarKeyOf, base64Bytes, cleanAbout, homeKeyOf, homeSizes, imageBase64, pngBase64, profileSlug, shortHash, shouldUpload, stillTransform,
 } from '../public/js/profiles.js?v=7e94c96f';
 import { createMinnAccount } from '../public/js/minn-account.js?v=7e3d7279';
-import { FEATURES } from '../public/js/features/index.js?v=7f456157';
+import { FEATURES } from '../public/js/features/index.js?v=365584bb';
 import { SITE_DIR, skipWithoutSite } from '../tools/repos.mjs';
-import { loadContentCatalogsFromDir, getSkillCatalog } from '../public/js/content-catalogs.js?v=2b7048b9';
-import { skillTitle } from '../public/js/skill-tree.js?v=08772a4b';
+import { loadContentCatalogsFromDir, getSkillCatalog } from '../public/js/content-catalogs.js?v=c9b84764';
+import { skillTitle } from '../public/js/skill-tree.js?v=a67622a8';
 import { skillArtFor } from '../public/js/familiar.js?v=b9597cd3';
 import { CARD_ART_LAYERS } from '../public/js/imagination-data.js?v=4a85e7fe';
 import { PHP } from './php.js';

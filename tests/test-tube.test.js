@@ -31,8 +31,8 @@ import {
 } from '../public/js/test-tube.js?v=e1b34dd2';
 import { COMPOUND_DISCOVERY_FEATURE_ID, compoundDiscoveryFeature } from '../public/js/features/compound-discovery-feature.js?v=fb490c50';
 import { RECIPE_CATALOG, TOOL_CATALOG, canCraft, compoundKnown, ensureMakingItems, loadRecipeCatalogFromFile, recipeBlockedLine, recipeKnown, searchRecipes } from '../public/js/making.js?v=1ec1075e';
-import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=2b7048b9';
-import { createPlayerSave, parsePlayerSave, serializePlayerSave } from '../public/js/player-save.js?v=cf0ebffd';
+import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=c9b84764';
+import { createPlayerSave, parsePlayerSave, serializePlayerSave } from '../public/js/player-save.js?v=7c3df906';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const read = (path) => readFileSync(join(root, path), 'utf8');

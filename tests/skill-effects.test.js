@@ -9,7 +9,7 @@ import { before, describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { join } from 'node:path';
 
-import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=2b7048b9';
+import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=c9b84764';
 import {
   SKILL_PACKAGES,
   skillPackageDetails,

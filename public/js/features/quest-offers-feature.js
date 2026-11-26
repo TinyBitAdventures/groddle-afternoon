@@ -114,13 +114,13 @@ import {
   COLD_COMFORT_LEAVE_TEXT,
   HOME_TREE_GROWN_TEXT,
   SEED_TO_SCYTHE,
-} from '../quest-offers.js?v=ea6fde02';
+} from '../quest-offers.js?v=7e00498b';
 import { PEAT_TEXT, retireSoloPeatQuest } from '../peat-quest.js?v=654cdb1b';
 import { retireDeadQuests, retiredQuestLine } from '../retired-quests.js?v=61758261';
-import { parseQuestConversation } from '../quests.js?v=c8d59839';
+import { parseQuestConversation, questUnlockNotices } from '../quests.js?v=f68437db';
 import { questRequirementText, renderQuestText, withQuestMarkup } from '../quest-text.js?v=d0d07996';
 import { addItem, removeItem, countItem } from '../inventory.js?v=6414dbdc';
-import { getQuestCatalog } from '../content-catalogs.js?v=2b7048b9';
+import { getQuestCatalog } from '../content-catalogs.js?v=c9b84764';
 
 const OFFER_CHECK_MS = 30_000;
 /** QuestElementUI.as setTryButton 247-258 and ConversationManager.as 584. */
@@ -247,6 +247,7 @@ function finish(rows, engine) {
     engine.playSound('COMPLETE_QUEST_REQUIREMENT', { volume: 0.6 });
     engine.award(questAwardPayload(row.def, done.rewards || {}));
     engine.pushActivity(`Quest complete: ${row.def.title}`);
+    for (const line of questUnlockNotices(done.rewards)) engine.pushActivity(line);
     engine.refreshPack();
     engine.save();
     nextOfferCheckAt = Math.min(nextOfferCheckAt, Date.now() + STREET_ENTER_DELAY_MS);

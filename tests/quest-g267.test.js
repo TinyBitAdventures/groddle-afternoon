@@ -21,8 +21,8 @@ import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { getQuestCatalog, loadContentCatalogsFromDir, resetContentCatalogs } from '../public/js/content-catalogs.js?v=2b7048b9';
-import { applyQuestProgress, createQuestState } from '../public/js/quests.js?v=c8d59839';
+import { getQuestCatalog, loadContentCatalogsFromDir, resetContentCatalogs } from '../public/js/content-catalogs.js?v=c9b84764';
+import { applyQuestProgress, createQuestState } from '../public/js/quests.js?v=f68437db';
 import {
   BOOT_STARTER_LEFTOVERS,
   acceptOffer,
@@ -30,8 +30,8 @@ import {
   ensureQuestOfferState,
   routeQuestEvent,
   routesCounter,
-} from '../public/js/quest-offers.js?v=ea6fde02';
-import { racesFeature } from '../public/js/features/races-feature.js?v=248ce40a';
+} from '../public/js/quest-offers.js?v=7e00498b';
+import { racesFeature } from '../public/js/features/races-feature.js?v=a58b1929';
 import { raceSceneTsid } from '../public/js/races.js?v=ab22a079';
 import { HOG_HAUL_STREET_ID } from '../public/js/hog-haul.js?v=50d2e072';
 import { CROWNS_STREET } from '../public/js/game-of-crowns.js?v=e32f35f5';

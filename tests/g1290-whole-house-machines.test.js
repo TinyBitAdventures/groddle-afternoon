@@ -9,8 +9,8 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { homeMachinesFeature, homeShotMachineSprite } from '../public/js/features/home-machines-feature.js?v=b9601a8b';
-import { craftybotFeature } from '../public/js/features/craftybot-feature.js?v=d4076522';
+import { homeMachinesFeature, homeShotMachineSprite } from '../public/js/features/home-machines-feature.js?v=3aaff121';
+import { craftybotFeature } from '../public/js/features/craftybot-feature.js?v=3068f6c6';
 import { MACHINE_ART_SHEETS } from '../public/js/machine-art-sheets.js?v=0fd6183b';
 import { INTERIOR } from '../public/js/home-decor.js?v=31f37d9b';
 

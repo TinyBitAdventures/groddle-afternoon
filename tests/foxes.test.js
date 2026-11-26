@@ -33,7 +33,7 @@ import {
 } from '../public/js/foxes.js?v=4497a984';
 import { createToolConditionState, getToolCondition } from '../public/js/tools.js?v=4156bba8';
 import { ITEM_CATALOG } from '../public/js/inventory.js?v=6414dbdc';
-import { getAchievementCatalog, loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=2b7048b9';
+import { getAchievementCatalog, loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=c9b84764';
 import {
   inReach,
   isPreserveRow,

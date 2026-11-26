@@ -23,7 +23,7 @@ import {
   verbBatchWornLine,
 } from '../public/js/making.js?v=1ec1075e';
 import { getToolCondition, createToolConditionState } from '../public/js/tools.js?v=4156bba8';
-import { makingOutputAchievementCounters } from '../public/js/achievements.js?v=4add7f73';
+import { makingOutputAchievementCounters } from '../public/js/achievements.js?v=535c8952';
 
 const root = join(import.meta.dirname, '..');
 const recipes = JSON.parse(readFileSync(join(root, 'public/assets/content/recipes.json'), 'utf8'));

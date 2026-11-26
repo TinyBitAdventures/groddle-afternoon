@@ -35,9 +35,9 @@ const pixi = new Proxy({ Container: Display, Graphics: Display, Sprite: Display,
 globalThis.PIXI = pixi;
 globalThis.Image ??= class { set src(_) {} };
 
-const { visitorHomeScene, visitorHomeState, yardDrawParts } = await import('../public/js/features/homes-feature.js?v=7d259b4d');
+const { visitorHomeScene, visitorHomeState, yardDrawParts } = await import('../public/js/features/homes-feature.js?v=b1d2b7d4');
 const { CULTIVATION_CLASSES } = await import('../public/js/homes-catalog.js?v=0367f90f');
-const { homeStreetLayout } = await import('../public/js/home-cultivation.js?v=2f71ba70');
+const { homeStreetLayout } = await import('../public/js/home-cultivation.js?v=b2868d29');
 
 const root = join(import.meta.dirname, '..');
 const read = (rel) => readFileSync(join(root, rel), 'utf8');

@@ -1114,6 +1114,10 @@
     "ours: Facts the ours-triggers test (features/quests-mp-feature.js": "ours-quests",
     "ours: player on the street (Super Soaker's offer, ours).": "ours-quests"
   },
+  "public/js/quests.js": {
+    "glitch-had-none: * (ours: Glitch had no such reward). `rewards.unlock`: { label, icon,": "ours-vine-radio",
+    "ours: * (ours: Glitch had no such reward). `rewards.unlock`: {": "ours-vine-radio"
+  },
   "public/js/quoin-shards.js": {
     "ours: // Ours: the remake's longer lines (\"Mood already full\")": "quoin-shard-size",
     "ours: // too big, so ours is 20 (Austin": "quoin-shard-size",

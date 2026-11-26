@@ -15,9 +15,9 @@ import {
   filterSkillTree,
   skillTreeCounts,
   skillTitle,
-} from './skill-tree.js?v=08772a4b';
-import { formatStudyTime, listStudyQueue } from './skills.js?v=dfbf499b';
-import { getSkillCatalog } from './content-catalogs.js?v=2b7048b9';
+} from './skill-tree.js?v=a67622a8';
+import { formatStudyTime, listStudyQueue } from './skills.js?v=3c6dbdff';
+import { getSkillCatalog } from './content-catalogs.js?v=c9b84764';
 import { learningTimeModifier } from './imagination-effects.js?v=70169933';
 
 const ui = {

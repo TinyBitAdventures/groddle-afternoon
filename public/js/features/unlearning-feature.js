@@ -25,8 +25,8 @@
  *     unlearnDone, unlearnLast, unlearnAutoplay, unlearnLearned.
  */
 
-import { getQuestCatalog, getSkillCatalog } from '../content-catalogs.js?v=2b7048b9';
-import { focusSkillInPanel } from '../skills-panel.js?v=4b306f47';
+import { getQuestCatalog, getSkillCatalog } from '../content-catalogs.js?v=c9b84764';
+import { focusSkillInPanel } from '../skills-panel.js?v=622c45f0';
 import { XP_FOR_LEVEL } from '../progression.js?v=05ff0260';
 import {
   UNLEARN_CARD,
@@ -38,7 +38,7 @@ import {
   unlearnCheck,
   unlearnSkillName,
   unlearnStatus,
-} from '../unlearning.js?v=3da82f04';
+} from '../unlearning.js?v=74c2b454';
 
 export const UNLEARNING_FEATURE_ID = 'unlearning';
 

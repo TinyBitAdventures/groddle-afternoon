@@ -48,7 +48,7 @@
  * the street as `radioRx` and `radioOut` (only a saved true stands it out), so visitors see it there.
  */
 
-import { RADIO_CLASS, RADIO_HALF, RADIO_OUT_KEY, RADIO_TALL, RADIO_TEXT } from './vine-radio.js?v=c001a82c';
+import { RADIO_CLASS, RADIO_HALF, RADIO_OUT_KEY, RADIO_TALL, RADIO_TEXT } from './vine-radio.js?v=5436aa09';
 
 /** The dispatcher art's drawn half width (dispatcher_left.png: x 8..107 around its origin 59). */
 export const DISPATCHER_HALF = 52;

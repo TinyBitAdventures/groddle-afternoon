@@ -20,7 +20,7 @@ import {
   rockItems,
   soilKeyMap,
   yardSoilInput,
-} from '../public/js/features/homes-feature.js?v=7d259b4d';
+} from '../public/js/features/homes-feature.js?v=b1d2b7d4';
 import { patchesFeature, soilSpawnPlan } from '../public/js/features/patches-feature.js?v=00a40d74';
 import { WALLPAPER_MAPS } from '../public/js/home-wallpaper-art.js?v=129c514f';
 import { HOME_TEXTURE_CONFIGS } from '../public/js/homes-catalog.js?v=0367f90f';
@@ -30,7 +30,7 @@ import { MIN_GROUND_CLEARANCE, cameraTargetY, cameraWorldHeightForGround, yCamOf
 import { INTERIOR } from '../public/js/home-decor.js?v=31f37d9b';
 import { EXTERIOR_STYLES, INTERIOR_STYLES, streetLook, yardLook } from '../public/js/home-styles.js?v=ec5d2f69';
 import { gardenLayout, gardenStyle } from '../public/js/garden-view.js?v=04fe8467';
-import { listCultivationClasses } from '../public/js/home-cultivation.js?v=2f71ba70';
+import { listCultivationClasses } from '../public/js/home-cultivation.js?v=b2868d29';
 
 const root = join(import.meta.dirname, '..', 'public');
 

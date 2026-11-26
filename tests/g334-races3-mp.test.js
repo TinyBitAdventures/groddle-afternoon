@@ -14,11 +14,11 @@ import { before, describe, it } from 'node:test';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-import { loadContentCatalogsFromDir, getQuestCatalog } from '../public/js/content-catalogs.js?v=2b7048b9';
-import { createQuestState } from '../public/js/quests.js?v=c8d59839';
-import { pendingQuestOffers } from '../public/js/quest-offers.js?v=ea6fde02';
+import { loadContentCatalogsFromDir, getQuestCatalog } from '../public/js/content-catalogs.js?v=c9b84764';
+import { createQuestState } from '../public/js/quests.js?v=f68437db';
+import { pendingQuestOffers } from '../public/js/quest-offers.js?v=7e00498b';
 import { MP_RACE_QUESTS, MULTIPLAYER_QUESTS, offerableMultiplayerQuest } from '../public/js/quests-mp.js?v=e697cec3';
-import { questOffersFeature } from '../public/js/features/quest-offers-feature.js?v=f77bb003';
+import { questOffersFeature } from '../public/js/features/quest-offers-feature.js?v=4f23aec1';
 import { HUB_MAP_STREETS } from '../public/js/hub-maps-data.js?v=ffe222f1';
 import { HELL_LOCATION } from '../public/js/hell.js?v=d77f15ef';
 import { HOG_MP_COURSE } from '../public/js/hog-haul-mp.js?v=67f873fe';
@@ -170,7 +170,7 @@ describe('the dead do not race', () => {
   });
 
   it('a race_match that reaches a dead page is left at once (races-feature)', async () => {
-    const { racesFeature } = await import('../public/js/features/races-feature.js?v=248ce40a');
+    const { racesFeature } = await import('../public/js/features/races-feature.js?v=a58b1929');
     const client = fakeClient(7);
     const toasts = [];
     const engine = {

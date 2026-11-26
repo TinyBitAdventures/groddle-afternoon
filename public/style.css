@@ -7963,7 +7963,8 @@ header.top-bar + .sub { display: none; }
 .award-reward--mood { background: var(--c-plum-87); }
 .award-reward--currants { background: var(--c-gold-89b); }
 .award-reward--favor { background: var(--c-plum-86); }
-.award-reward--item { background: var(--c-lime-92); }
+.award-reward--item,
+.award-reward--unlock { background: var(--c-lime-92); }
 .award-screen[data-paged="true"] .award-close {
   position: absolute;
   z-index: calc(var(--z-raised) + 1);

@@ -202,6 +202,8 @@ export function questRewardChips(rewards = {}) {
   if (n(rewards.mood) > 0) out.push(`+${n(rewards.mood)} mood`);
   const favor = Object.values(rewards.favor || {}).reduce((sum, f) => sum + n(f?.points), 0);
   if (favor > 0) out.push(`+${favor} favor`);
+  // #705: an unlock (quests.js questUnlockRows) by its name: "Vine Radio".
+  for (const u of Array.isArray(rewards.unlock) ? rewards.unlock : rewards.unlock ? [rewards.unlock] : []) if (u?.label) out.push(String(u.label));
   return out;
 }
 

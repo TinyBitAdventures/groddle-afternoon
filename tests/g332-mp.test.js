@@ -29,7 +29,7 @@ import {
   unwrapPack,
   wrapBox,
 } from '../public/js/gifts.js?v=37ce7d76';
-import { giftsFeature } from '../public/js/features/gifts-feature.js?v=0e204e98';
+import { giftsFeature } from '../public/js/features/gifts-feature.js?v=e6c7e608';
 import { HAS_SERVER, HAS_SITE, SITE_DIR, serverPath, sitePath } from '../tools/repos.mjs';
 import { HAS_PHP, PHP } from './php.js';
 

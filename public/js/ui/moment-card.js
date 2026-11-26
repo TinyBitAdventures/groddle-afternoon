@@ -89,8 +89,8 @@ export function momentArtShape(url = '') {
 
 /**
  * A reward's icon: iMG, energy, mood, currants and a Giant's favor have one, and an item given as a
- * reward row (`classTsid`) its own (glitch-client Slug.as getIcon 228-233, ItemIconView); the rest
- * show words only. #562: the stats' icons are the top bar's and the speech bubble's (js/stat-icons.js).
+ * reward row (`classTsid`) its own (glitch-client Slug.as getIcon 228-233, ItemIconView), an unlock
+ * its `icon`; the rest show words only. #562: the stats' icons are the top bar's and the speech bubble's (js/stat-icons.js).
  */
 export function rewardIcon(text = '', kind = '', row = {}) {
   if (kind === 'img') return statIconUrl('imagination');
@@ -102,6 +102,8 @@ export function rewardIcon(text = '', kind = '', row = {}) {
     return m ? `assets/sprites/icons/emblem_${m[1]}@3x.webp` : null;
   }
   if (kind === 'item' && /^[a-z0-9_]+$/.test(String(row?.classTsid || ''))) return `assets/sprites/icons/${row.classTsid}.webp`;
+  // #705: an unlock (quests.js questUnlockRows) brings its own art, a path under assets/.
+  if (kind === 'unlock' && /^assets\/[a-z0-9_/.-]+\.(webp|png|svg)$/i.test(String(row?.icon || ''))) return row.icon;
   return null;
 }
 

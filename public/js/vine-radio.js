@@ -324,7 +324,8 @@ export const RADIO_QUEST = Object.freeze({
   offer: `Hey! Hey! {pc_label}! You have taste. For a non-crab.<split butt_txt="Thanks, I think?" />Me and my crab pals are starved for tunes. Play us ${RADIO_QUEST_TUNES}, one per crab per day, and you get something special.<split butt_txt="Like what?" />A Vine Radio! It grows right out of your home street and plays the music of every place you have been. Deal?`,
   completion: `${RADIO_QUEST_TUNES === 6 ? 'Six' : RADIO_QUEST_TUNES} tunes! The crabs are still bopping. Here is your Vine Radio, as promised. Put it out on your home street in Cultivate and let the music grow.`,
   requirements: Object.freeze([Object.freeze({ id: 'rvr1', type: 'counter', name: CRAB_TUNES_COUNTER, num: RADIO_QUEST_TUNES, classId: 'npc_crab', desc: `Play ${RADIO_QUEST_TUNES} tunes for crabs` })]),
-  rewards: Object.freeze({ xp: 300, mood: 100 }),
+  // #705: the radio never goes in the pack, so the award card and Activity say where it waits.
+  rewards: Object.freeze({ xp: 300, mood: 100, unlock: Object.freeze({ label: 'Vine Radio', icon: RADIO_ART.url, where: 'Cultivate on your home street' }) }),
   prereqQuests: Object.freeze([]),
   isJob: false,
   autoComplete: false,

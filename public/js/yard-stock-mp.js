@@ -53,7 +53,7 @@
  *   7); the owner's own catches pay nothing (inc_cultivation.js:171).
  */
 
-import { cultivationDef, hiveFireflySpots } from './home-cultivation.js?v=2f71ba70';
+import { cultivationDef, hiveFireflySpots } from './home-cultivation.js?v=b2868d29';
 import { createMineRock, tickMineRock } from './mining.js?v=5e49efb3';
 import { ROCK_RESPAWN_MS } from './pace.js?v=c07dfbd8';
 import { createResourceNode, getResourceNodeDef, normalizeResourceNode, regrowDelayMs, tickResourceNode } from './resource-nodes.js?v=90d75c60';

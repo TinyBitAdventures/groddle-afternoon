@@ -4,12 +4,12 @@
  */
 import { ITEM_ICONS, ITEM_LABELS, getVerbsFor, ordinaryItems, runVerb } from './content.js?v=3cefd46f';
 import { createErrorOnce, createFeatureHost, createFrameStages } from './js/feature-host.js?v=b87e2cbc';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=7f456157';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=365584bb';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, enterHintPick, reachGlowTargets, spriteHasRimArt, trimmedIconUrl, drawTileArt } from './js/enter-chooser.js?v=38d401c2';
 import { firstTendKey, STICK_TEND_DELAY_MS, STICK_TEND_DIRS, STICK_TEND_REPEAT_MS, stepTendKey, stepTendKeys, stickTendKey, tendKeyAction } from './js/garden-tend.js?v=a7470c4a';
 import { avatarHitBox, behindFloor, bodyReachDistance, OUT_OF_REACH_LINE, playerClickBox } from './js/reach.js?v=456da8a8';
 import { createVogOverlay } from './js/vog-overlay.js?v=e883b3e3';
-import { createPromptStack } from './js/prompt-stack.js?v=09286c9b';
+import { createPromptStack } from './js/prompt-stack.js?v=065026d9';
 import { createWindowStack } from './js/window-stack.js?v=a7104f02';
 import { HOG_HAUL_SPLASH, createGameSplash, splashFor } from './js/game-splash.js?v=dbbf1de0';
 import {
@@ -33,12 +33,12 @@ import {
   cleanQuestMarkup,
   questDoneAt,
   paidRewardBits,
-} from './js/quests.js?v=c8d59839';
+} from './js/quests.js?v=f68437db';
 // Quest copy is Flash htmlText: <b>/<i>/<br> drawn as formatting, the rest dropped, never innerHTML.
 import { locationLinkTarget, questRequirementText, renderQuestText, withQuestMarkup } from './js/quest-text.js?v=d0d07996';
 // G267: the world-verb quest counters skip offer-system quests; old saves drop the boot Moloko quest.
-import { dropSpiritRepeatOffers, SPIRIT_REPEAT_QUESTS } from './js/spirit-reminisce.js?v=0a83b329';
-import { FIRST_SKILL_QUEST_ID, acceptOffer, claimFirstSkillQuest, dropBootStarterQuests, questMoveNote, routesCounter, worldVerbQuestEvents, gardenPlotEvents, makingUnitQuestEvents, shrineDonationQuestEvents } from './js/quest-offers.js?v=ea6fde02';
+import { dropSpiritRepeatOffers, SPIRIT_REPEAT_QUESTS } from './js/spirit-reminisce.js?v=a50b40dc';
+import { FIRST_SKILL_QUEST_ID, acceptOffer, claimFirstSkillQuest, dropBootStarterQuests, questMoveNote, routesCounter, worldVerbQuestEvents, gardenPlotEvents, makingUnitQuestEvents, shrineDonationQuestEvents } from './js/quest-offers.js?v=7e00498b';
 import {
   PHANTOM_QUEST_ID,
   REMEMBER_QUEST_ID,
@@ -134,7 +134,7 @@ import {
   qualificationVerb,
   requestLegalizeQualification,
   travelToGregarious,
-} from './js/legalize-it.js?v=d26b33dc';
+} from './js/legalize-it.js?v=8178339d';
 import { HALL, HALL_LAYOUT, HALL_OFFICE, HALL_QUESTIONS } from './js/bureaucratic-hall.js?v=7ea53899';
 import { STATION_X, stationArrival, stationScreen, surfaceStation } from './js/subway.js?v=ea6921ff';
 import { ALLEY, SHADY, drawAlley, inEnteredBox } from './js/quest-rooms/back-alley-set.js?v=57a7bc1a';
@@ -450,7 +450,7 @@ import {
   resetAchievementCounter,
   purchaseAchievementUpdates,
   getAchievementProgress,
-} from './js/achievements.js?v=4add7f73';
+} from './js/achievements.js?v=535c8952';
 import {
   applyStreetVisit,
   topUpCompletists,
@@ -487,10 +487,10 @@ import {
   grantSkillWithPrereqs,
   canLearnSkill,
   listLearnedSkills,
-} from './js/skills.js?v=dfbf499b';
-import { skillTitle, skillTreeCounts, skillTreeEntry, spendEmblemForSkill, studyPillName } from './js/skill-tree.js?v=08772a4b';
+} from './js/skills.js?v=3c6dbdff';
+import { skillTitle, skillTreeCounts, skillTreeEntry, spendEmblemForSkill, studyPillName } from './js/skill-tree.js?v=a67622a8';
 import { CARD_ART_LAYERS } from './js/imagination-data.js?v=4a85e7fe';
-import { renderSkillTreePanel, focusSkillInPanel } from './js/skills-panel.js?v=4b306f47';
+import { renderSkillTreePanel, focusSkillInPanel } from './js/skills-panel.js?v=622c45f0';
 import {
   createBuffState,
   applyBuff,
@@ -510,7 +510,7 @@ import {
   formatBuffRemaining,
   consumeRewardBuff,
   studyBuffBlockReason,
-} from './js/buffs.js?v=607f96df';
+} from './js/buffs.js?v=1016728d';
 import { grantMoodXp, moodXpMultiplierFor, setMoodXpEnv } from './js/mood-xp.js?v=e311b45c';
 import {
   loadContentCatalogs,
@@ -519,7 +519,7 @@ import {
   getAchievementCatalog,
   getSkillCatalog,
   getBuffCatalog,
-} from './js/content-catalogs.js?v=2b7048b9';
+} from './js/content-catalogs.js?v=c9b84764';
 import {
   createInventory,
   useItem,
@@ -565,7 +565,7 @@ import {
   inspectPlayerSave,
   serializePlayerSave,
   restorePlayerSave,
-} from './js/player-save.js?v=cf0ebffd';
+} from './js/player-save.js?v=7c3df906';
 import {
   HOME_INTERIOR_TSID,
   HOME_STREET_TSID,
@@ -742,7 +742,7 @@ import {
   resolveIndexTsid,
 } from './js/street-loader.js?v=10376267';
 import { showDraftBanner, startDraftPlay } from './js/builder/draft-play.js?v=18d6b9e3';
-import { bootHouseFile } from './js/house-file-loader.js?v=098dae8f';
+import { bootHouseFile } from './js/house-file-loader.js?v=c28ab8ba';
 import {
   ladderTopDeck,
   groundBeneath,
@@ -867,8 +867,8 @@ import {
   streetCardUp,
   STREET_CARD_UP,
   POL_OWNER_SIZE,
-} from './js/screen-fx.js?v=b8548dc8';
-import { momentMoreText } from './js/ui/moment-card.js?v=00f76fc9';
+} from './js/screen-fx.js?v=29b5b3e1';
+import { momentMoreText } from './js/ui/moment-card.js?v=b383144f';
 import { CHAT_MAX_CHARS, chatBubbleText } from './js/ui/chat-input.js?v=8f2479a3';
 // HUB: the hub is the Modern skin's; Classic owns X in its skin (js/classic/classic-hub.js).
 import { MODERN, onUiModeChange, readUiCache, uiState, writeUiCache } from './js/classic/ui-mode.js?v=792d8160';
@@ -881,7 +881,7 @@ import { mountImaginationHub } from './js/ui/imagination-hub.js?v=6928c5b7';
 import { newDayBubble, shuffleNewDayMessages, waitForScreenGates } from './js/screen-queue.js?v=cf0132c0';
 import { applyFamiliarLook, familiarCardHeading, familiarLook, skillArtFor, skillLearnedActivity } from './js/familiar.js?v=b9597cd3';
 import { placeDialogueBySpeaker } from './js/speaker-card.js?v=94220469';
-import { armPromptTimeout, promptTimeoutMs } from './js/prompt-timeout.js?v=e358070c';
+import { armPromptTimeout, promptTimeoutMs } from './js/prompt-timeout.js?v=5014ae42';
 import {
   planTravel,
   listMapDestinations,
@@ -992,7 +992,7 @@ import {
   formatSpeedUpTime,
   learnFasterOpen,
   learnFasterSummary,
-} from './js/shrines.js?v=4dd7a44f';
+} from './js/shrines.js?v=da102ddd';
 import { shrineSheet, shrineVariantFor } from './js/shrine-variants.js?v=832a5e61';
 import { giantDisplayName } from './js/giant-names.js?v=0e295891';
 import { shrinePowderOptions, shrinePowderAchievementCounters } from './js/powders.js?v=316a1f66';
@@ -1141,7 +1141,7 @@ import { mountSocialDrawer } from './js/ui/social-drawer.js?v=06c37291';
 import { installPhonePill, mountPhoneLayout, socialPillCount } from './js/ui/phone-layout.js?v=703775b3';
 import { bindChatLinks } from './js/chat-links.js?v=b717fac7';
 import { SIDE_SHEET_IDS, bindTabs, inSideSheet, mountPanelShell, sheetKeyToWorld } from './js/ui/panel-shell.js?v=5efb38c6';
-import { createQuestSheet, failedQuestPin, questLogNeedsSwap, questStep, visibleRowCount } from './js/ui/quest-sheet.js?v=3e7ac77b';
+import { createQuestSheet, failedQuestPin, questLogNeedsSwap, questStep, visibleRowCount } from './js/ui/quest-sheet.js?v=e2f83677';
 import { resolveQuestPins } from './js/features/quest-pins-feature.js?v=0e07d9a1';
 import { createQuestTracker } from './js/ui/quest-tracker.js?v=2990cd8e';
 import { bindContextTrigger, createContextMenu, isContextMenuKey as isMenuKey, MORE_KEYS_LABEL } from './js/ui/context-menu.js?v=587d8585';
@@ -1186,7 +1186,7 @@ import { filterText } from './js/word-filter.js?v=9a7a7ebb'; // the remake's own
 import { mountStartStreet } from './js/start-street.js?v=7d8ce49c'; // #349: the start card names the save's street
 import { arrangeMapCards, fitMapExtras } from './js/map-extras.js?v=16e261b1'; // the Map's Shortcuts
 // The interface skin (js/classic/ui-mode.js) sets <html data-ui> as it loads: before main(), so before the boot cover lifts.
-import { installInterfaceSettings } from './js/classic/classic-prefs.js?v=f703ed07';
+import { installInterfaceSettings } from './js/classic/classic-prefs.js?v=fb284753';
 import { standOnFeet, anchorBottomCentre } from './js/sprite-feet.js?v=6358a697';
 import { markLeaving, packPicks, takeCopies } from './js/copy-picks.js?v=b368fd49';
 import { holdKeepsBusy } from './js/instance-holds.js?v=ff3a63a3';

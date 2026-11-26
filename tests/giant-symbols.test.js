@@ -10,7 +10,7 @@ import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { GIANTS, createShrineState, favorPanelRows, giantSymbolUrl } from '../public/js/shrines.js?v=4dd7a44f';
+import { GIANTS, createShrineState, favorPanelRows, giantSymbolUrl } from '../public/js/shrines.js?v=da102ddd';
 import { CARVING, SHAPE_IDS, carvingSvg } from '../tools/giant-symbols/build.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');

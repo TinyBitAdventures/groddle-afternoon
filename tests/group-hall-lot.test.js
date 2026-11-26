@@ -14,9 +14,9 @@ import { execFileSync } from 'node:child_process';
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 
-import { streetJobsFeature, projectApi } from '../public/js/features/street-jobs-feature.js?v=dc66b964';
+import { streetJobsFeature, projectApi } from '../public/js/features/street-jobs-feature.js?v=0128fc00';
 import { LOT_ART, LOT_CLASS, LOT_PLACEMENT, LOT_SIGN_X, LOT_TEXT, floorYAt, lotFit, lotHeadline, lotJobIds, lotVerb } from '../public/js/group-hall-lot.js?v=c4d38b81';
-import { batterflyPlacementGroups } from '../public/js/features/animal-husbandry-feature.js?v=b86bfc54';
+import { batterflyPlacementGroups } from '../public/js/features/animal-husbandry-feature.js?v=34d7bd7a';
 import { imageSize } from '../tools/image-size.mjs';
 import { Display, FakeEl, fakePixi } from './fake-scene.js';
 

@@ -12,7 +12,7 @@ import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { MOMENT_SHARP } from '../public/js/moment-art-list.js?v=e51336e6';
-import { artDensity, momentArt, momentArtCap, momentSharpUrl } from '../public/js/ui/moment-card.js?v=00f76fc9';
+import { artDensity, momentArt, momentArtCap, momentSharpUrl } from '../public/js/ui/moment-card.js?v=b383144f';
 import { imageSize } from '../tools/image-size.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');

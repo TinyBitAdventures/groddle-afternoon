@@ -18,7 +18,7 @@ import {
   awardRewardTokens,
   runStreetTransition,
   showAwardScreen,
-} from '../public/js/screen-fx.js?v=b8548dc8';
+} from '../public/js/screen-fx.js?v=29b5b3e1';
 
 describe('screen-fx timings (LoadingLocationView / BaseScreenView)', () => {
   it('uses the street card windows and the BaseScreenView fades (seconds)', () => {
@@ -166,7 +166,7 @@ describe('badge + loading asset maps (local pack)', () => {
 
 describe('award card text', () => {
   it('drops GSJS item links and tags but keeps the words', async () => {
-    const { awardText, normalizeAwardPages } = await import('../public/js/screen-fx.js?v=b8548dc8');
+    const { awardText, normalizeAwardPages } = await import('../public/js/screen-fx.js?v=29b5b3e1');
     assert.equal(
       awardText('Give 6 <a href="event:item|npc_piggy">Piggies</a> the pleasuring of a lifetime. By petting them, of course.'),
       'Give 6 Piggies the pleasuring of a lifetime. By petting them, of course.',
@@ -177,7 +177,7 @@ describe('award card text', () => {
   });
 });
 
-import { LOAD_STATUS, loadStatusLabel, loadingSplit, cssColor } from '../public/js/screen-fx.js?v=b8548dc8';
+import { LOAD_STATUS, loadStatusLabel, loadingSplit, cssColor } from '../public/js/screen-fx.js?v=29b5b3e1';
 
 describe('loading card status and hub split (LoadingLocationView.as)', () => {
   it('uses the client status labels with the TimerBar percent', () => {
@@ -225,7 +225,7 @@ import {
   polGradient,
   polNeighbours,
   polVisitLine,
-} from '../public/js/screen-fx.js?v=b8548dc8';
+} from '../public/js/screen-fx.js?v=29b5b3e1';
 
 describe('home loading card (G249, LoadingLocationPOLView.as)', () => {
   it('names the place as setText does (215-235)', () => {
@@ -306,7 +306,7 @@ describe('home loading card (G249, LoadingLocationPOLView.as)', () => {
 
 describe('home loading card on a narrow screen', () => {
   it('scales the holder and the fill to fit with 16 px gutters', async () => {
-    const { polCardScale } = await import('../public/js/screen-fx.js?v=b8548dc8');
+    const { polCardScale } = await import('../public/js/screen-fx.js?v=29b5b3e1');
     const house = polCardLayout('interior');
     assert.equal(polCardScale(house, 1280), 1);
     assert.equal(polCardScale(house, 390), (390 - 32) / 616);
@@ -315,7 +315,7 @@ describe('home loading card on a narrow screen', () => {
   });
 });
 
-import { LOAD_LIST_MAX_MS, LOAD_LIST_MIN_MS, loadCardHoldMs, loadListReadMs } from '../public/js/screen-fx.js?v=b8548dc8';
+import { LOAD_LIST_MAX_MS, LOAD_LIST_MIN_MS, loadCardHoldMs, loadListReadMs } from '../public/js/screen-fx.js?v=29b5b3e1';
 
 describe('#478 the loading card holds its Home to: list (G993, invention loading-card-min-hold)', () => {
   const list = (n) => `<b>Home to:</b><ul>${Array.from({ length: n }, (_, i) => `<li>${i + 2} Piggies</li>`).join('')}</ul>`;

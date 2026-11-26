@@ -39,8 +39,8 @@ import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=d787e3c3';
 import { loadWildlifeCatalog, wildlifeCatalog } from '../wildlife.js?v=670c3a7f';
 import { VENDOR_PROFILES } from '../vendor.js?v=474a80fd';
 import { addItem, countItem, removeItem } from '../inventory.js?v=6414dbdc';
-import { parseQuestConversation } from '../quests.js?v=c8d59839';
-import { getQuestCatalog } from '../content-catalogs.js?v=2b7048b9';
+import { parseQuestConversation, questUnlockNotices } from '../quests.js?v=f68437db';
+import { getQuestCatalog } from '../content-catalogs.js?v=c9b84764';
 import {
   acceptOffer,
   declineOffer,
@@ -48,7 +48,7 @@ import {
   npcQuestOffers,
   questAwardPayload,
   turnInQuest,
-} from '../quest-offers.js?v=ea6fde02';
+} from '../quest-offers.js?v=7e00498b';
 import {
   GOT_QUEST_TEXT,
   VENDOR_NPCS,
@@ -302,6 +302,7 @@ function turnIn(engine, npc, row) {
     engine.playSound('COMPLETE_QUEST_REQUIREMENT', { volume: 0.6 });
     engine.award(questAwardPayload(def, done.rewards || {}));
     engine.pushActivity(`Quest complete: ${def.title}`);
+    for (const line of questUnlockNotices(done.rewards)) engine.pushActivity(line);
     engine.refreshPack();
     engine.save();
     last = `turnin:${row.classTsid}`;

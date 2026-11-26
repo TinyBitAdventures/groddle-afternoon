@@ -15,7 +15,7 @@ import { afterEach, beforeEach, describe, it } from 'node:test';
 import { OFFLINE_LINE, RECONNECTING_LINE } from '../public/js/online-request.js?v=09ac8a9c';
 import { streetObjectsFeature } from '../public/js/features/street-objects-feature.js?v=30392f9b';
 import { heliKittiesFeature } from '../public/js/features/heli-kitties-feature.js?v=2e817f11';
-import { crabsFeature } from '../public/js/features/crabs-feature.js?v=3bf51c39';
+import { crabsFeature } from '../public/js/features/crabs-feature.js?v=6dd0b672';
 import { fireDragonFeature } from '../public/js/features/fire-dragon-feature.js?v=d73092b3';
 import { setWildlifeCatalog } from '../public/js/wildlife.js?v=670c3a7f';
 import { MUSICBLOCK_CATALOG } from '../public/js/musicblocks.js?v=8e985753';
