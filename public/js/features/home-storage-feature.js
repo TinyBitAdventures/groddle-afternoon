@@ -53,7 +53,7 @@ import { TOOL_CONDITION_CATALOG, copyTagKind, copyTags, pickToolCopies, receiveT
 import { draggedStack, takeDragged } from '../drag-stack.js?v=e0138d76';
 import { scriptFromTag, scriptLabel } from '../teleportation.js?v=cbbc673f';
 import { insideQuery, possessive, readVisitScene } from '../neighbours-mp.js?v=e59e6b47';
-import { homesFeature } from './homes-feature.js?v=859cbcad';
+import { homesFeature } from './homes-feature.js?v=f38b53bd';
 import { saveStore, savedThrough } from '../save-store.js?v=4e720735';
 import {
   SDB_PRICE_MAX,
@@ -90,7 +90,7 @@ import {
   openPriceDialog,
   openStoreDialog,
   storageWindowKind,
-} from '../ui/storage-windows.js?v=6e34133f';
+} from '../ui/storage-windows.js?v=6b92c103';
 import { anchorBottomCentre } from '../sprite-feet.js?v=6358a697';
 import { WORLD_FONT_FAMILY } from '../world-text.js?v=6b49f88c';
 

@@ -274,7 +274,11 @@ function setDetail(el, row) {
   if (!detail) return;
   const { text, bad } = row ? rowDetail(row) : { text: el.dataset.vmDefault || '', bad: false };
   const shown = text || el.dataset.vmDefault || '';
-  if (detail.textContent !== shown) detail.textContent = shown;
+  if (detail.textContent !== shown) {
+    detail.textContent = shown;
+    // A capped footer (fitVerbMenuRows) starts each line at its top.
+    detail.scrollTop = 0;
+  }
   detail.classList.toggle('bad', bad);
   // A locked menu keeps its footer's room even when a row has nothing to say (lockVerbMenuSize).
   detail.hidden = !shown && !el.dataset.vmLock;
@@ -377,6 +381,8 @@ export function lockVerbMenuSize(el) {
   if (el.dataset.vmLock === key) return;
   const was = { text: detail.textContent, hidden: detail.hidden };
   detail.style.minHeight = '';
+  // Measured at full height (fitVerbMenuRows may have capped it for the last thing).
+  detail.style.maxHeight = '';
   let h = 0;
   for (const text of lines) {
     detail.textContent = text;
@@ -386,6 +392,7 @@ export function lockVerbMenuSize(el) {
   // Not laid out yet (hidden, or a skin without the footer): measure again next time.
   if (h > 0) {
     detail.style.minHeight = `${Math.ceil(h)}px`;
+    if (detail.dataset) detail.dataset.vmLockH = String(Math.ceil(h));
     el.dataset.vmLock = key;
   }
   detail.textContent = was.text;
@@ -555,10 +562,32 @@ export function menuRowsCap({ card, rows, room, min = MIN_ROWS_BOX }) {
   return Math.max(Math.min(r, min), Math.floor(r - (c - space)));
 }
 
+/** The least a capped footer keeps (about three lines of a description), so its words still read. */
+export const MIN_DETAIL_BOX = 64;
+
+/**
+ * PURE (#728): the verbs first. A card `card` px tall, with rows `rows` px and a footer (the
+ * description or a row's explanation) `detail` px, over `room` px: the footer gives up what the card
+ * is over, down to MIN_DETAIL_BOX (it then scrolls), and only then the rows (menuRowsCap's rule).
+ * Before, only the rows gave way: a long description kept its whole height and left about three rows
+ * (report #728, 1536x702: "I can only see 2 lines of the menu"). Returns { rows, detail }: each a
+ * max-height in px, or null when that part keeps its size.
+ */
+export function menuFitCaps({ card, rows, detail = 0, room, min = MIN_ROWS_BOX, minDetail = MIN_DETAIL_BOX }) {
+  const c = Number(card) || 0;
+  const d = Math.max(0, Number(detail) || 0);
+  const space = Number(room);
+  if (!(space > 0) || c <= space) return { rows: null, detail: null };
+  const give = Math.max(0, Math.min(Math.ceil(c - space), Math.floor(d - Math.min(d, minDetail))));
+  const detailCap = give > 0 ? Math.floor(d - give) : null;
+  return { rows: menuRowsCap({ card: c - give, rows, room: space, min }), detail: detailCap };
+}
+
 /**
  * Fit a menu in `room` px of height (ticket 87: Very Stinky Cheese's menu, many verbs and a long
- * description, ran off the top): its rows box (`rowsEl`) gets a max-height and scrolls when the
- * card is too tall, and loses both when it fits again. Returns the cap, or null.
+ * description, ran off the top): its footer (.vm-detail) and then its rows box (`rowsEl`) get a
+ * max-height and scroll when the card is too tall (menuFitCaps: the verbs keep their room first,
+ * #728), and lose both when it fits again. Returns the rows' cap, or null.
  * @param {HTMLElement} card the card that is placed
  * @param {HTMLElement} rowsEl the rows box inside it
  * @param {number} room the height it may take
@@ -567,13 +596,28 @@ export function fitVerbMenuRows(card, rowsEl, room) {
   if (!card || !rowsEl) return null;
   rowsEl.style.maxHeight = '';
   rowsEl.style.overflowY = '';
-  const cap = menuRowsCap({ card: card.offsetHeight, rows: rowsEl.offsetHeight, room });
-  if (cap != null) {
-    rowsEl.style.maxHeight = `${cap}px`;
+  const detail = card.querySelector?.('.vm-detail') || null;
+  if (detail) {
+    // Back to the height lockVerbMenuSize gave it (the tallest line), uncapped.
+    detail.style.minHeight = detail.dataset?.vmLockH ? `${detail.dataset.vmLockH}px` : '';
+    detail.style.maxHeight = '';
+    detail.style.overflowY = '';
+  }
+  const caps = menuFitCaps({ card: card.offsetHeight, rows: rowsEl.offsetHeight, detail: detail && !detail.hidden ? detail.offsetHeight : 0, room });
+  if (detail) {
+    if (caps.detail != null) {
+      detail.style.minHeight = `${caps.detail}px`;
+      detail.style.maxHeight = `${caps.detail}px`;
+      detail.style.overflowY = 'auto';
+    }
+    detail.classList.toggle('vm-scroll', caps.detail != null);
+  }
+  if (caps.rows != null) {
+    rowsEl.style.maxHeight = `${caps.rows}px`;
     rowsEl.style.overflowY = 'auto';
   }
-  rowsEl.classList.toggle('vm-scroll', cap != null);
-  return cap;
+  rowsEl.classList.toggle('vm-scroll', caps.rows != null);
+  return caps.rows;
 }
 
 /** A row that can't be done (now): its reason in the footer, with a shake. */

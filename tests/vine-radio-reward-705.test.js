@@ -18,7 +18,7 @@ import { loadContentCatalogsFromDir, resetContentCatalogs } from '../public/js/c
 import { createQuestState, questUnlockNotices, questUnlockRows } from '../public/js/quests.js?v=f68437db';
 import { acceptOffer, routeQuestEvent, turnInQuest } from '../public/js/quest-offers.js?v=7e00498b';
 import { rewardChips } from '../public/js/ui/moment-card.js?v=b383144f';
-import { questRewardChips } from '../public/js/ui/quest-sheet.js?v=e2f83677';
+import { questRewardChips } from '../public/js/ui/quest-sheet.js?v=7409d5d8';
 
 const ROOT = join(import.meta.dirname, '..');
 const read = (rel) => readFileSync(join(ROOT, rel), 'utf8');

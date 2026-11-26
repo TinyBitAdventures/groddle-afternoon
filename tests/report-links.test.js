@@ -8,7 +8,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
-import { mountReportsSheet } from '../public/js/ui/reports-sheet.js?v=92486673';
+import { mountReportsSheet } from '../public/js/ui/reports-sheet.js?v=408d8843';
 import { HAS_SITE, sitePath, skipWithoutSite } from '../tools/repos.mjs';
 
 const root = join(import.meta.dirname, '..');

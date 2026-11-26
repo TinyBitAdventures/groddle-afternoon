@@ -26,7 +26,7 @@
  */
 
 import { bindCountField, countKeyValue, countStepMarkup, keepCountCaret, openCountField } from './count-chooser.js?v=75f69512';
-import { bindContextTrigger } from './context-menu.js?v=587d8585';
+import { bindContextTrigger } from './context-menu.js?v=0266831a';
 import { beginDrag, registerDropTarget, touchLift } from '../drop-targets.js?v=59e6edb4';
 
 const CSS = `

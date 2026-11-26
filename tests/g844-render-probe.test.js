@@ -12,9 +12,9 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { canvasTransparent, configureReadback, ensureDepthStencil, pixelsTransparent, probeRenderTexture, renderProbeLine } from '../public/js/render-probe.js?v=519c86ef';
-import { snapshotEmpty, snapshotStreetView } from '../public/js/ui/street-minimap.js?v=895cd125';
+import { snapshotEmpty, snapshotStreetView } from '../public/js/ui/street-minimap.js?v=faab9586';
 import { SKIRT_DEEP_SHADE, shadeColour, skirtFadeColour } from '../public/js/street-render.js?v=ff7afb98';
-import { captureFrame, reportContext } from '../public/js/features/bug-report-feature.js?v=d4d7be10';
+import { captureFrame, reportContext } from '../public/js/features/bug-report-feature.js?v=191cfb5e';
 
 const PUBLIC = join(import.meta.dirname, '..', 'public');
 const read = (p) => readFileSync(join(PUBLIC, p), 'utf8');

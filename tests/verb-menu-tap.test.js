@@ -11,7 +11,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { bindVerbMenu } from '../public/js/ui/verb-menu.js?v=4cb51d52';
+import { bindVerbMenu } from '../public/js/ui/verb-menu.js?v=1ad4f969';
 import { STICK_TAP_MS, isTapThrough } from '../public/js/touch-controls.js?v=8bc690ac';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');

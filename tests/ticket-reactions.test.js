@@ -19,7 +19,7 @@ import { reactionsJson } from '../tools/build-reactions.mjs';
 import { NAMES_SHOWN, REACTIONS } from '../public/js/chat-reactions.js?v=38460172';
 import { REPORT_TEXT, createReportsApi } from '../public/js/reports.js?v=e861d5aa';
 import { parseReportReactionKey, reactorOf, reportReactionKey, reportReactions } from '../public/js/report-reactions.js?v=69462240';
-import { mountReportsSheet } from '../public/js/ui/reports-sheet.js?v=92486673';
+import { mountReportsSheet } from '../public/js/ui/reports-sheet.js?v=408d8843';
 import { HAS_PHP, PHP, phpSkip } from './php.js';
 
 const root = join(import.meta.dirname, '..');

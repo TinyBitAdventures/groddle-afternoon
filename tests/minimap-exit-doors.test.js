@@ -9,8 +9,8 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { SCENE_DOOR_CLASSES, doorMarks, sceneDoorMarks, stationMarks, tipFor, markHasMenu } from '../public/js/ui/street-minimap.js?v=895cd125';
-import { phoneSignRows } from '../public/js/features/street-minimap-feature.js?v=cb78fbb2';
+import { SCENE_DOOR_CLASSES, doorMarks, sceneDoorMarks, stationMarks, tipFor, markHasMenu } from '../public/js/ui/street-minimap.js?v=faab9586';
+import { phoneSignRows } from '../public/js/features/street-minimap-feature.js?v=b57b3ccb';
 import { subwayFeature } from '../public/js/features/subway-feature.js?v=77386ca9';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');

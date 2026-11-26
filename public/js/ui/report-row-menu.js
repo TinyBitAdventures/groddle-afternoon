@@ -26,7 +26,7 @@
  * QA: canvas data contextMenu ("report:<id>") and reportMenu (<id>), "" when closed.
  */
 
-import { createContextMenu, bindContextTrigger } from './context-menu.js?v=587d8585';
+import { createContextMenu, bindContextTrigger } from './context-menu.js?v=0266831a';
 
 /** The menu's words. */
 export const REPORT_MENU_TEXT = Object.freeze({

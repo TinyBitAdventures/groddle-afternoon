@@ -13,7 +13,7 @@ import { BUTLER, butlerPostRx, createButler, createButlerState, normalizeButlerS
 import { HOME_LIMITS } from '../public/js/homes-catalog.js?v=0367f90f';
 import { createCultivationState, homeStreetLayout } from '../public/js/home-cultivation.js?v=b2868d29';
 import { BUTLER_BOX, STREET_ROCK } from '../public/js/home-street-fixtures.js?v=d4e5b56a';
-import { HOUSE_STYLE_KEYS, houseDoorway } from '../public/js/features/homes-feature.js?v=859cbcad';
+import { HOUSE_STYLE_KEYS, houseDoorway } from '../public/js/features/homes-feature.js?v=f38b53bd';
 
 const ROOT = join(import.meta.dirname, '..');
 const read = (rel) => readFileSync(join(ROOT, 'public', 'js', rel), 'utf8');

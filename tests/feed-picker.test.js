@@ -6,7 +6,7 @@ import { fileURLToPath } from 'node:url';
 
 import { getVerbsFor, runVerb } from '../public/content.js?v=48634256';
 import { createAnimalState, listAnimalFeedOptions } from '../public/js/animals.js?v=49be8a12';
-import { centerVerbMenu, fitPickGridCols, makePickTile, menuRowsCap, pickGridCols, pickGridStep, placeVerbMenu } from '../public/js/ui/verb-menu.js?v=4cb51d52';
+import { centerVerbMenu, fitPickGridCols, makePickTile, menuRowsCap, pickGridCols, pickGridStep, placeVerbMenu } from '../public/js/ui/verb-menu.js?v=1ad4f969';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const publicDir = join(here, '../public');

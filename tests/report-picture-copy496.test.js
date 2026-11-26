@@ -8,7 +8,7 @@ import { join } from 'node:path';
 import {
   unicodeRangeKey, loadedFontFaces, fontFaceCss, fontsSettled, redrawCount, MIN_REDRAWS,
   markScrolls, restoreScrolls,
-} from '../public/js/features/bug-report-feature.js?v=d4d7be10';
+} from '../public/js/features/bug-report-feature.js?v=191cfb5e';
 
 const root = join(import.meta.dirname, '..');
 const src = readFileSync(join(root, 'public/js/features/bug-report-feature.js'), 'utf8');

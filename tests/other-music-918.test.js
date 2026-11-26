@@ -12,7 +12,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { OTHER_MUSIC_HINT, OTHER_MUSIC_LABEL, applyAudioSession, streetMusicWanted } from '../public/js/other-music.js?v=f58af5e6';
 import { OTHER_MUSIC_KEY, loadOtherMusic, saveOtherMusic } from '../public/js/audio-pref.js?v=683f27c8';
-import { otherMusicToggle } from '../public/js/ui/topbar.js?v=efebad7d';
+import { otherMusicToggle } from '../public/js/ui/topbar.js?v=7c194020';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const game = readFileSync(join(root, 'public/game.js'), 'utf8');

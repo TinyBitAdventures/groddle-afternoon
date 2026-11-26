@@ -6,7 +6,7 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { setVerbMenuIcon } from '../public/js/ui/verb-menu.js?v=4cb51d52';
+import { setVerbMenuIcon } from '../public/js/ui/verb-menu.js?v=1ad4f969';
 
 const root = join(import.meta.dirname, '..');
 const read = (rel) => readFileSync(join(root, rel), 'utf8');
