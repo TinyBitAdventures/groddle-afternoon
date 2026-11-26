@@ -85,7 +85,7 @@ describe("G681: Yellow Yawning's end goes back to Shim Shiri", () => {
 
   it('the hidden-floors feature runs it with the other teleporters', () => {
     const src = readFileSync(join(pub, 'js/features/hidden-floors-feature.js'), 'utf8');
-    assert.match(src, /\.\.\.collisionTeleportersOn\(street\.tsid\)/);
+    assert.match(src, /\.\.\.collisionTeleportersOn\(tsid\)\];/);
     assert.deepEqual(collisionTeleportersOn('LA9UIKNQ7LD3SN0').map((r) => r.id), ['yellow_yawning_to_shim_shiri']);
     assert.deepEqual(collisionTeleportersOn(SHIM_SHIRI_TSID), []);
   });

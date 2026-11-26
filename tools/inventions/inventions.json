@@ -5148,24 +5148,28 @@
   },
   {
    "id": "minimap-door-kind-icons",
-   "title": "The street map's door buttons show what kind of way out each is: a dinosaur's mouth (door_dino_01), a portal (the teleport dialog's teleporter) or a plain door (furniture_door), each Tiny Speck's CC0 art scaled down, the kind read off the door's own art (#645).",
+   "title": "The street map's door buttons show what kind of way out each is: a dinosaur's mouth (door_dino_01), a portal (the teleport dialog's teleporter) or a plain door (furniture_door), each Tiny Speck's CC0 art scaled down, the kind read off the door's own art; every wired walk-in teleporter (the Vortex back doors, the wintry portal, the hidden floors, pits and beams) is a portal button too, and a click on it travels where walking into it does (#645).",
    "kind": "UI",
    "status": "kept",
    "where": [
     {
      "file": "public/js/ui/street-minimap.js",
-     "symbol": "DOOR_LOOKS doorLook DOOR_ART doorArtName withDoorArt"
+     "symbol": "DOOR_LOOKS doorLook DOOR_ART doorArtName withDoorArt teleporterMarks"
     },
     {
      "file": "public/js/features/street-minimap-feature.js",
-     "symbol": "phoneSignRows phoneOpen"
+     "symbol": "phoneSignRows phoneOpen walkFromMap"
+    },
+    {
+     "file": "public/js/features/hidden-floors-feature.js",
+     "symbol": "walkInTeleportersOn minimapTeleporters teleportFromMap"
     },
     {
      "file": "tools/build-minimap-door-icons.py"
     }
    ],
    "why": "Glitch's street map had no door buttons (MiniMapView.as maybeAddSignpost), so it had no icons for them; the first door buttons (G1232) all used one drawn door. The icons are ours as icons but not drawn: each is Tiny Speck's own art, cropped and scaled.",
-   "ruling": "Austin 2026-11-26 (#645): each kind of entrance gets its own icon, dino door, portal and plain door, made from Tiny Speck's CC0 art; picks shown on a contact sheet",
+   "ruling": "Austin 2026-11-26 (#645): each kind of entrance gets its own icon, dino door, portal and plain door, made from Tiny Speck's CC0 art (the contact sheet's picks approved); the walk-in teleporters get a portal button too, which travels where walking into it does",
    "rows": [
     "G1232"
    ]

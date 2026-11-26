@@ -9,8 +9,8 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { SCENE_DOOR_CLASSES, doorMarks, sceneDoorMarks, stationMarks, tipFor, markHasMenu } from '../public/js/ui/street-minimap.js?v=9eabe65f';
-import { phoneSignRows } from '../public/js/features/street-minimap-feature.js?v=5f0a5397';
+import { SCENE_DOOR_CLASSES, doorMarks, sceneDoorMarks, stationMarks, tipFor, markHasMenu } from '../public/js/ui/street-minimap.js?v=895cd125';
+import { phoneSignRows } from '../public/js/features/street-minimap-feature.js?v=2a56662e';
 import { subwayFeature } from '../public/js/features/subway-feature.js?v=50d6e916';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -79,7 +79,7 @@ describe('doors out on the street map (G1232, #645)', () => {
     ], { x: 600, y: 572 });
     assert.deepEqual(rows.map((r) => [r.kind, r.side, r.text]), [['door', 'left', 'Gregarious Grange'], ['door', 'right', 'Door']]);
     const feature = read('public/js/features/street-minimap-feature.js');
-    assert.match(feature, /\.\.\.stationMarks\(engine\.street\), \.\.\.doorMarks\(engine\.street\), \.\.\.\(live \? sceneDoorMarks\(engine\.interactables \|\| \[\]\) : \[\]\)\];/);
+    assert.match(feature, /\.\.\.stationMarks\(engine\.street\), \.\.\.doorMarks\(engine\.street\), \.\.\.\(live \? sceneDoorMarks\(engine\.interactables \|\| \[\]\) : \[\]\), /);
     assert.match(feature, /row\.kind === 'door' \? `Walk to the door to \$\{row\.text\}`/);
   });
 

@@ -342,6 +342,26 @@ export function doorMarks(street) {
   return out;
 }
 
+/**
+ * PURE (#645, Austin 2026-11-26): the walk-in teleporters a street has wired (Collision-triggered
+ * Teleporters, the `teleporter` item, items/teleporter.js: the Vortex of Random's back doors, the
+ * wintry portal, the hidden floors, the pits and beams; rows { id, label, box: { x, y, w, h } }, its
+ * box bottom-centre in street space, from the hidden-floors feature's minimapTeleporters) as door
+ * marks, a portal by the same kind rule (doorLook of the row's sprite, else of the teleporter item).
+ * The box is the art a mark stands beside (G1237). A click travels through it (walkFromMap).
+ */
+export function teleporterMarks(rows = []) {
+  const out = [];
+  for (const row of rows || []) {
+    const b = row?.box;
+    const x = Number(b?.x);
+    const y = Number(b?.y);
+    if (!row?.id || !Number.isFinite(x) || !Number.isFinite(y)) continue;
+    out.push({ kind: 'door', id: `teleporter:${row.id}`, look: doorLook(row.sprite || 'teleporter'), x, y, tip: String(row.label || '').trim() || null, w: Number(b.w) || 0, h: Number(b.h) || 0 });
+  }
+  return out;
+}
+
 /** The way-out things a scene registers itself that the map shows as doors (the hall's glass doors). */
 export const SCENE_DOOR_CLASSES = Object.freeze(['bureaucratic_hall_exit']);
 
@@ -748,6 +768,8 @@ const MAP_SVG = '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stro
  *   onHide()           the card's hide button (the setting goes off)
  *   onShow()           the show button (the setting goes on)
  *   onLayout(px)       the height the card takes now (0 hidden), for what stacks under it
+ *   teleporters(street) #645: the street's walk-in teleporter rows, drawn as portal buttons
+ *                      (teleporterMarks)
  *   onWalk(goal, how)  a click (or Enter) on the map: { kind: 'sign'|'player'|'item'|'point',
  *                      id, x, y } in world px; how.keyboard true from a key
  *   onReady(on)        READY: the card has its picture and shows (true), or waits for it (false)
@@ -1218,9 +1240,13 @@ export function createStreetMinimap(doc, host, opts = {}) {
       // G1232 (#645): the doors out beside them (the remake's own, as the subway entrances).
       const doors = doorMarks(street);
       for (const mark of doors) addSign(mark);
+      // #645: the walk-in teleporters as portal buttons beside them.
+      const ports = street ? teleporterMarks(opts.teleporters?.(street) || []) : [];
+      for (const mark of ports) addSign(mark);
       root.dataset.signs = String(signCount());
       root.dataset.stations = String(stations.length);
       root.dataset.doors = String(doors.length);
+      root.dataset.teleporters = String(ports.length);
       layout();
     },
     /**

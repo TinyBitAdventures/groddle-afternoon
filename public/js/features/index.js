@@ -37,7 +37,7 @@ import { partySpacesFeature } from './party-spaces-feature.js?v=bbc1fcb7';
 import { seasonsFeature } from './seasons-feature.js?v=b66cb70c';
 import { cameraModeFeature } from './camera-mode-feature.js?v=3e2e8721';
 import { newxpFeature } from './newxp-feature.js?v=22c6b653';
-import { streetMinimapFeature } from './street-minimap-feature.js?v=5f0a5397';
+import { streetMinimapFeature } from './street-minimap-feature.js?v=2a56662e';
 
 export { questFlagsFeature };
 
@@ -98,7 +98,7 @@ import { hiSignsFeature } from './hi-signs-feature.js?v=26a49665'; FEATURES.push
 import { gwendolynRoom23Feature } from './gwendolyn-room-23-feature.js?v=d25a1b87'; FEATURES.push(gwendolynRoom23Feature);
 import { cubimalRaceFeature } from './cubimal-race-feature.js?v=4a3dc201'; FEATURES.push(cubimalRaceFeature);
 import { symphoniousMaximusFeature } from './symphonious-maximus-feature.js?v=9a54b747'; FEATURES.push(symphoniousMaximusFeature);
-import { hiddenFloorsFeature } from './hidden-floors-feature.js?v=e2d65ebc'; FEATURES.push(hiddenFloorsFeature);
+import { hiddenFloorsFeature } from './hidden-floors-feature.js?v=6d9c928c'; FEATURES.push(hiddenFloorsFeature);
 import { vicarsPeakFeature } from './vicars-peak-feature.js?v=cb444319'; FEATURES.push(vicarsPeakFeature);
 import { thornfadLettersFeature } from './thornfad-letters-feature.js?v=d64406da'; FEATURES.push(thornfadLettersFeature);
 import { streetToysFeature } from './street-toys-feature.js?v=6078a5a9'; FEATURES.push(streetToysFeature);

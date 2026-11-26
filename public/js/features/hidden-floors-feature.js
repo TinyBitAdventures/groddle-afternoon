@@ -75,6 +75,14 @@ import { WIRED_TELEPORTERS, collisionTeleportersOn } from '../collision-teleport
 import { WORLD_FONT_FAMILY } from '../world-text.js?v=6b49f88c';
 
 export const HIDDEN_FLOORS_FEATURE_ID = 'hidden-floors';
+
+/** Every walk-in teleporter wired on a street (the boxes this feature runs there). */
+export function walkInTeleportersOn(tsid) {
+  return [...teleportersOn(tsid), ...narakaTeleportersOn(tsid), ...wintryPortalTeleportersOn(tsid), ...cavePitTeleportersOn(tsid), ...seamTeleportersOn(tsid), ...collisionTeleportersOn(tsid)];
+}
+
+/** No boxes in a home or an instance (onStreetEnter). */
+const noTeleporters = (street, engine) => !street || engine?.transientInstance?.() || engine?.homeContext?.().inHome;
 const CHECK_MS = 60;
 const ARRIVAL_GRACE_MS = 800;
 const DATA_MS = 250;
@@ -219,11 +227,11 @@ export const hiddenFloorsFeature = {
   onStreetEnter(street, engine) {
     clear();
     enteredAt = Date.now();
-    if (!street || engine.transientInstance?.() || engine.homeContext?.().inHome) {
+    if (noTeleporters(street, engine)) {
       publish(engine, enteredAt, true);
       return;
     }
-    boxes = [...teleportersOn(street.tsid), ...narakaTeleportersOn(street.tsid), ...wintryPortalTeleportersOn(street.tsid), ...cavePitTeleportersOn(street.tsid), ...seamTeleportersOn(street.tsid), ...collisionTeleportersOn(street.tsid)];
+    boxes = walkInTeleportersOn(street.tsid);
     zone = clientPhysicsZone(street);
     if (isIlmenskieTsid(street.tsid)) ceilings = ceilingsScreen(street);
     const row = exitSignOn(street.tsid);
@@ -236,6 +244,21 @@ export const hiddenFloorsFeature = {
 
   onStreetClear() {
     clear();
+  },
+
+  /** #645 (Austin 2026-11-26): the street's teleporters, for the street map's portal buttons (ui/street-minimap.js teleporterMarks). */
+  minimapTeleporters(street, engine) {
+    if (noTeleporters(street, engine)) return null;
+    const rows = walkInTeleportersOn(street.tsid);
+    return rows.length ? rows : null;
+  },
+
+  /** #645: a portal button's click travels where walking into its box does (the same teleport, travelGate first). */
+  teleportFromMap(id, engine) {
+    const row = boxes.find((b) => b.id === id);
+    if (!row || teleporting) return null;
+    teleport(engine, row);
+    return true;
   },
 
   onTick(_dtMs, now, engine) {

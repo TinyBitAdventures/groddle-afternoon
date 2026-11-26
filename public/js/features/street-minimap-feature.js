@@ -70,7 +70,7 @@
  */
 
 import { STREET_ENTITY_KINDS } from '../street-render.js?v=dab4ec4b';
-import { DOOR_LOOKS, createPictureCache, createStreetMinimap, doorArtName, doorMarks, markArt, minimapVisibility, onStreetMapChange, sceneDoorMarks, sceneSignMarks, setStreetMap, signpostMarks, snapshotStreetView, snapsWithScene, stationMarks, streetMapOn, withDoorArt } from '../ui/street-minimap.js?v=9eabe65f';
+import { DOOR_LOOKS, createPictureCache, createStreetMinimap, doorArtName, doorMarks, markArt, minimapVisibility, onStreetMapChange, sceneDoorMarks, sceneSignMarks, setStreetMap, signpostMarks, snapshotStreetView, snapsWithScene, stationMarks, streetMapOn, teleporterMarks, withDoorArt } from '../ui/street-minimap.js?v=895cd125';
 import { classicArtHd, classicArtUrl } from '../classic/classic-art.js?v=87cb1722';
 import { onUiModeChange } from '../classic/ui-mode.js?v=f5e733fb';
 import { focusBack } from '../ui/focus-return.js?v=da190597';
@@ -502,6 +502,12 @@ export function walkFromMap(engine, goal, { keyboard = false, doc = globalThis.d
     const active = doc?.activeElement;
     if (active?.matches?.('input, textarea, select, [contenteditable="true"]')) active.blur?.();
   }
+  // #645: a teleporter's portal button travels where walking into it does (the hidden-floors feature's teleport).
+  if (String(goal?.id || '').startsWith('teleporter:')) {
+    const ok = engine.query?.('teleportFromMap', goal.id.slice('teleporter:'.length), engine) === true;
+    engine.setData?.('streetMapWalk', ok ? goal.id : 'refused');
+    return ok;
+  }
   const ok = Boolean(engine.walkTo?.(goal));
   engine.setData?.('streetMapWalk', ok ? `${goal.kind}:${Math.round(goal.x)}` : 'refused');
   if (ok) view?.setDestination(engine.userWalkGoal || null);
@@ -638,7 +644,7 @@ function phoneOpen(engine) {
   phone.sheet = sheet;
   // The signposts' destinations, a tap away.
   const live = isLiveScene(engine.streetView);
-  const marks = [...signpostMarks(engine.street), ...(live ? sceneSignMarks(engine.interactables || []) : []), ...stationMarks(engine.street), ...doorMarks(engine.street), ...(live ? sceneDoorMarks(engine.interactables || []) : [])];
+  const marks = [...signpostMarks(engine.street), ...(live ? sceneSignMarks(engine.interactables || []) : []), ...stationMarks(engine.street), ...doorMarks(engine.street), ...(live ? sceneDoorMarks(engine.interactables || []) : []), ...teleporterMarks(engine.query?.('minimapTeleporters', engine.street, engine) || [])];
   const rows = phoneSignRows(marks, engine.player ? { x: engine.player.x, y: engine.player.y } : null);
   phone.signs = [];
   if (rows.length) {
@@ -681,6 +687,7 @@ function phoneOpen(engine) {
     artUrl: classicArtUrl,
     artHd: classicArtHd,
     crisp: () => true,
+    teleporters: (s) => engine.query?.('minimapTeleporters', s, engine) || [],
     reducedMotion: () => true,
     onHide: () => phoneClose(engine),
     onShow: () => {},
@@ -793,6 +800,7 @@ export const streetMinimapFeature = {
       // takes the traces on a high-DPI screen.
       artHd: classicArtHd,
       crisp: () => document.documentElement.dataset.ui !== 'classic',
+      teleporters: (s) => engine.query?.('minimapTeleporters', s, engine) || [],
       reducedMotion,
       onHide: () => setStreetMap(false),
       onShow: () => {
