@@ -467,6 +467,8 @@ async function checks() {
   await A.p.keyboard.press('-');
   await wait(900);
   const zMinus = await zoomInfo(A);
+  await dismiss(A);
+  await blur(A);
   await A.p.keyboard.press('0');
   await wait(800);
   const zReset = await zoomInfo(A);
