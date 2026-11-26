@@ -14,7 +14,7 @@ import { fileURLToPath } from 'node:url';
 import { HUB_MAP_BACKGROUNDS } from '../public/js/hub-map-backgrounds.js?v=d6a23c90';
 import { WORLD_MAP } from '../public/js/map-views-data.js?v=07734585';
 import { bindWorldMap, worldCardFile, worldCardFiles } from '../public/js/map-views.js?v=ad712b91';
-import { MAP_THUMB_SOFT, buildHubMapView, renderHubMapSvg } from '../public/js/map-graph.js?v=b035dfb3';
+import { MAP_THUMB_SOFT, buildHubMapView, renderHubMapSvg } from '../public/js/map-graph.js?v=803cc6cd';
 import {
   MAP_BG_FADE_MS,
   MAP_BG_GIVE_UP_MS,

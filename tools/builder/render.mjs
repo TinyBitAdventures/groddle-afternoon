@@ -17,7 +17,7 @@ import { openBrowser } from '../qa/browser.mjs';
 import { validateZone, placementRequests, hash16 } from '../../public/js/builder/validate.js?v=ed009a5d';
 import { planStreetPlacements, populationForStreet, streetReservedSpots } from '../../public/js/street-ecology.js?v=f1c11a2d';
 import { platformsScreen, streetWidth } from '../../public/js/street-model.js?v=a9a05f9d';
-import { plannedSpots } from '../../public/js/builder/editor-zone.js?v=333b4867';
+import { plannedSpots } from '../../public/js/builder/editor-zone.js?v=c013630f';
 
 /** Rules only a render makes (validateZone never does): new art the render could not carry. */
 export const RENDER_ONLY = Object.freeze(['AST-007']);

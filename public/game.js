@@ -4,12 +4,12 @@
  */
 import { ITEM_ICONS, ITEM_LABELS, getVerbsFor, ordinaryItems, runVerb } from './content.js?v=a87eb482';
 import { createErrorOnce, createFeatureHost, createFrameStages } from './js/feature-host.js?v=b87e2cbc';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=946b1281';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=344df873';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, enterHintPick, reachGlowTargets, spriteHasRimArt, trimmedIconUrl, drawTileArt } from './js/enter-chooser.js?v=38d401c2';
 import { firstTendKey, STICK_TEND_DELAY_MS, STICK_TEND_DIRS, STICK_TEND_REPEAT_MS, stepTendKey, stepTendKeys, stickTendKey, tendKeyAction } from './js/garden-tend.js?v=a7470c4a';
 import { avatarHitBox, behindFloor, bodyReachDistance, OUT_OF_REACH_LINE, playerClickBox } from './js/reach.js?v=456da8a8';
 import { createVogOverlay } from './js/vog-overlay.js?v=e883b3e3';
-import { createPromptStack } from './js/prompt-stack.js?v=065026d9';
+import { createPromptStack } from './js/prompt-stack.js?v=c4e1f87d';
 import { createWindowStack } from './js/window-stack.js?v=a7104f02';
 import { HOG_HAUL_SPLASH, createGameSplash, splashFor } from './js/game-splash.js?v=dbbf1de0';
 import {
@@ -867,7 +867,7 @@ import {
   streetCardUp,
   STREET_CARD_UP,
   POL_OWNER_SIZE,
-} from './js/screen-fx.js?v=29b5b3e1';
+} from './js/screen-fx.js?v=7cd62cca';
 import { momentMoreText } from './js/ui/moment-card.js?v=b383144f';
 import { CHAT_MAX_CHARS, chatBubbleText } from './js/ui/chat-input.js?v=8f2479a3';
 // HUB: the hub is the Modern skin's; Classic owns X in its skin (js/classic/classic-hub.js).
@@ -881,7 +881,7 @@ import { mountImaginationHub } from './js/ui/imagination-hub.js?v=6928c5b7';
 import { newDayBubble, shuffleNewDayMessages, waitForScreenGates } from './js/screen-queue.js?v=cf0132c0';
 import { applyFamiliarLook, familiarCardHeading, familiarLook, skillArtFor, skillLearnedActivity } from './js/familiar.js?v=b9597cd3';
 import { placeDialogueBySpeaker } from './js/speaker-card.js?v=94220469';
-import { armPromptTimeout, promptTimeoutMs } from './js/prompt-timeout.js?v=5014ae42';
+import { armPromptTimeout, promptTimeoutMs } from './js/prompt-timeout.js?v=7044a503';
 import {
   planTravel,
   listMapDestinations,
@@ -1067,7 +1067,8 @@ import {
   MAP_INDEX_URL,
   HUB_56_MAP_URL,
   PUBLIC_HUBS,
-} from './js/map-graph.js?v=b035dfb3';
+} from './js/map-graph.js?v=803cc6cd';
+import { withHubColours } from './js/hub-colour.js?v=51e3ad0e';
 // G471: the world map and the subway map in the Map's window.
 import { MAP_VIEW_TITLES, bindSubwayMap, bindWorldMap, mapViewSubtitle, nearestStation, renderSubwayMapSvg, renderWorldMapSvg, worldCardFile, worldCardFiles, worldRegionList } from './js/map-views.js?v=ad712b91';
 // MAPLOAD: a region's painting fetched ahead of the click, its thumb in its place while it loads.
@@ -1273,7 +1274,8 @@ async function loadHubMapData(hubId) {
     res = await fetch(HUB_56_MAP_URL);
   }
   if (!res.ok) throw new Error(`Hub map ${id} load failed: ${res.status}`);
-  const data = await res.json();
+  // #713: the hub's colours with their '#' (js/hub-colour.js; 19 hub files store them bare).
+  const data = withHubColours(await res.json());
   hubMapCache.set(id, data);
   return data;
 }
@@ -3878,7 +3880,8 @@ async function resolveHubColors(hubId) {
     }
     const res = await fetch(hubMeta.file);
     if (!res.ok) return { top: null, bottom: null };
-    const hub = await res.json();
+    // #713: colours read the Glitch way, '#' or not (StringUtil.cssHexToUint; js/hub-colour.js).
+    const hub = withHubColours(await res.json());
     hubColorCache[id] = hub;
     return { top: hub.top_color || null, bottom: hub.btm_color || null };
   } catch {

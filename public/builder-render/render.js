@@ -25,7 +25,7 @@ import * as textureUrls from '../js/textures.js?v=b8e38103';
 import { installPixiFixes } from '../js/pixi-fixes.js?v=0f42b75e';
 import { installHiresDecos } from '../js/deco-hires.js?v=34f36d77';
 import { installNewArt, withNewArt } from '../js/builder/new-art.js?v=29f0b13e';
-import { spotGroup } from '../js/builder/editor-zone.js?v=333b4867';
+import { spotGroup } from '../js/builder/editor-zone.js?v=c013630f';
 import { drawGeometryOverlay, drawReachOverlay, drawArrivals, OVERLAY_COLOURS } from '../js/builder/overlays.js?v=c656dda1';
 import { createStreetEffects, normaliseEmitter, emitterAnchor, EFFECT_WORDS } from '../js/street-effects.js?v=18ee8a33';
 

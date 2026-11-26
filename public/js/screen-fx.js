@@ -12,6 +12,7 @@ import { formatLoadingTime, ordinal } from './exploration.js?v=8f19e25d';
 import { artDensity, bodyFade, bodyFit, isModernSkin, momentArt, momentArtCap, momentArtShape, momentSharpUrl, rewardChips } from './ui/moment-card.js?v=b383144f';
 import { decodeEntities, htmlToText } from './html-text.js?v=6bbf4d1f';
 import { READ_PER_WORD_MS, wordCount } from './read-time.js?v=3151fb1a';
+import { hubColour } from './hub-colour.js?v=51e3ad0e';
 
 /**
  * Street-load timings (seconds), Glitch's own (#478): the card fades in over 0.2 s
@@ -479,9 +480,13 @@ export function loadStatusLabel(text, percent = 0) {
   return p ? `${text} ${p}%` : text;
 }
 
-/** 0xRRGGBB or '#rrggbb' to a CSS colour. */
+/**
+ * 0xRRGGBB, '#rrggbb' or a hub file's bare 'rrggbb' to a CSS colour (#713: hubColour puts the
+ * '#' back, as StringUtil.cssHexToUint read it). Other CSS colour strings pass through.
+ */
 export function cssColor(value, fallback) {
-  if (typeof value === 'number' && Number.isFinite(value)) return `#${(value >>> 0).toString(16).padStart(6, '0').slice(-6)}`;
+  const hex = hubColour(value);
+  if (hex) return hex;
   if (typeof value === 'string' && value.trim()) return value.trim();
   return fallback;
 }
@@ -494,6 +499,27 @@ export function loadingSplit({ fromHub = '', toHub = '', fromTop, fromBottom, to
   if (!fromHub || !toHub || fromHub === toHub) return { split: false, leaving: false, welcome: false };
   const same = cssColor(fromTop, '') === cssColor(toTop, '') && cssColor(fromBottom, '') === cssColor(toBottom, '');
   return { split: true, leaving: !same, welcome: Boolean(toHub) };
+}
+
+/**
+ * The card's hub gradients (LoadingLocationView 457-518, top_color / bottom_color): on a hub
+ * change the left half keeps the old hub's colours and the scalloped right half has the new
+ * one's; otherwise the whole card has the new hub's (`left`, `right` null).
+ */
+export function loadingCardBackgrounds(opts = {}) {
+  const top = cssColor(opts.topColor, '#1a2830');
+  const bot = cssColor(opts.bottomColor, '#1e2a24');
+  const gradient = (a, b) => `linear-gradient(180deg, ${a} 0%, ${b} 100%)`;
+  const split = loadingSplit({
+    fromHub: opts.fromHub,
+    toHub: opts.toHub,
+    fromTop: opts.fromTopColor ?? opts.topColor,
+    fromBottom: opts.fromBottomColor ?? opts.bottomColor,
+    toTop: opts.topColor,
+    toBottom: opts.bottomColor,
+  });
+  if (!split.split) return { ...split, left: gradient(top, bot), right: null };
+  return { ...split, left: gradient(cssColor(opts.fromTopColor, top), cssColor(opts.fromBottomColor, bot)), right: gradient(top, bot) };
 }
 
 /* ------------------------------------------------------------------ */
@@ -864,29 +890,14 @@ async function streetTransition(el, opts) {
   const leaving = q('[data-st-leaving]');
   const welcoming = q('[data-st-welcoming]');
 
-  // Hub gradient (LoadingLocationView top_color / bottom_color).
-  const top = cssColor(opts.topColor, '#1a2830');
-  const bot = cssColor(opts.bottomColor, '#1e2a24');
-  const gradient = (a, b) => `linear-gradient(180deg, ${a} 0%, ${b} 100%)`;
-  const split = loadingSplit({
-    fromHub: opts.fromHub,
-    toHub: opts.toHub,
-    fromTop: opts.fromTopColor ?? opts.topColor,
-    fromBottom: opts.fromBottomColor ?? opts.bottomColor,
-    toTop: opts.topColor,
-    toBottom: opts.bottomColor,
-  });
-  if (split.split) {
-    // Left half keeps the old hub's colours; the scalloped right half has the new one.
-    el.style.background = gradient(cssColor(opts.fromTopColor, top), cssColor(opts.fromBottomColor, bot));
-    if (splitEl) {
-      splitEl.style.background = gradient(top, bot);
+  const split = loadingCardBackgrounds(opts);
+  el.style.background = split.left;
+  if (splitEl) {
+    if (split.split) {
+      splitEl.style.background = split.right;
       splitEl.classList.toggle('has-shadow', split.leaving);
-      splitEl.hidden = false;
     }
-  } else {
-    el.style.background = gradient(top, bot);
-    if (splitEl) splitEl.hidden = true;
+    splitEl.hidden = !split.split;
   }
   if (leaving) {
     leaving.hidden = !split.leaving;

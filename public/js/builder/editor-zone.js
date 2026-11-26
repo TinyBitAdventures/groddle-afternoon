@@ -14,6 +14,7 @@
  */
 import { TEMPLATES, WIDTH, HEIGHT, MAP_W, MAP_H, templateOf, newStreet, newStreetOps, newHub, nextHubId, mapWithStreet } from './templates.js?v=881dfa69';
 import { streetKeyFrom, POPULATION_CLASSES } from './zone.js?v=ce289eb1';
+import { hubColour } from '../hub-colour.js?v=51e3ad0e';
 
 /** Plain words for the population classes (street-ecology.json counts). */
 export const POPULATION_WORDS = Object.freeze({
@@ -270,12 +271,12 @@ export function hubMapDialog(ctx) {
     if (!map) return;
     const defs = svg('defs');
     const grad = svg('linearGradient', { id: 'builder-hubmap-sky', x1: 0, y1: 0, x2: 0, y2: 1 });
-    grad.append(svg('stop', { offset: '0', 'stop-color': map.top_color || '#989cb6' }), svg('stop', { offset: '1', 'stop-color': map.btm_color || '#6a6d7f' }));
+    grad.append(svg('stop', { offset: '0', 'stop-color': hubColour(map.top_color, '#989cb6') }), svg('stop', { offset: '1', 'stop-color': hubColour(map.btm_color, '#6a6d7f') }));
     defs.append(grad);
     drawing.append(defs, svg('rect', { x: 0, y: 0, width: W, height: H, fill: 'url(#builder-hubmap-sky)' }));
     (map.streets || []).forEach((s, i) => {
       const g = svg('g', { class: 'builder-hubmap-street', 'data-street': s.tsid });
-      const line = svg('line', { x1: s.x1, y1: s.y1, x2: s.x2, y2: s.y2, class: 'builder-hubmap-line', stroke: map.color || '#1d3a80', 'data-hubmap': `street:${i}:line` });
+      const line = svg('line', { x1: s.x1, y1: s.y1, x2: s.x2, y2: s.y2, class: 'builder-hubmap-line', stroke: hubColour(map.color, '#1d3a80'), 'data-hubmap': `street:${i}:line` });
       const text = svg('text', { x: (s.x1 + s.x2) / 2, y: (s.y1 + s.y2) / 2 - 12, class: 'builder-hubmap-label', 'text-anchor': 'middle' });
       text.textContent = s.name;
       g.append(line, text, handle('street', i, 'a', s.x1, s.y1, `${s.name}: one end, at ${s.x1}, ${s.y1}`), handle('street', i, 'b', s.x2, s.y2, `${s.name}: other end, at ${s.x2}, ${s.y2}`));
@@ -303,7 +304,7 @@ export function hubMapDialog(ctx) {
     const syncBtn = btn('Draw the zone\'s streets', { class: 'builder-mini', 'data-builder-hubmap-sync': '', disabled: !missing.length && !extra.length ? true : null, title: 'Add a line for each street not on the map, and take off lines for streets not in the zone' });
     syncBtn.addEventListener('click', () => save(mapForStreets(map, want), 'hub map streets'));
     const colour = (name, label) => {
-      const input = el('input', { type: 'color', name: `hubmap-${name}`, value: map[name] || '#000000' });
+      const input = el('input', { type: 'color', name: `hubmap-${name}`, value: hubColour(map[name], '#000000') });
       input.addEventListener('change', () => save({ ...map, [name]: input.value }, 'hub map colour'));
       return field(label, input);
     };

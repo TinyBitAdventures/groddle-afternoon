@@ -42,7 +42,7 @@ import { worldArtFor } from '../public/js/world-art.js?v=a67514c8';
 import { GNOME_ART, GNOME_ART_DIR } from '../public/js/garden-gnome-art.js?v=994b7c76';
 import { HOME_STREET_TSID } from '../public/js/homes.js?v=dca6b2cd';
 import { normalizeHomeView, readVisitScene } from '../public/js/neighbours-mp.js?v=f43b50c8';
-import { neighboursMpFeature } from '../public/js/features/neighbours-mp-feature.js?v=7c8f1c9e';
+import { neighboursMpFeature } from '../public/js/features/neighbours-mp-feature.js?v=09fff873';
 import { HAS_SITE, SITE_DIR, sitePath } from '../tools/repos.mjs';
 import { HAS_PHP, PHP } from './php.js';
 

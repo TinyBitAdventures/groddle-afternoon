@@ -13,7 +13,7 @@ import assert from 'node:assert/strict';
 import { readFileSync, readdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { buildHubMapView } from '../public/js/map-graph.js?v=b035dfb3';
+import { buildHubMapView } from '../public/js/map-graph.js?v=803cc6cd';
 import { ecologyForStreet, populationForStreet, setStreetEcologyCatalog, shrineStreetsFor } from '../public/js/street-ecology.js?v=f1c11a2d';
 import { upgradeEcologyEntry } from '../public/js/street-jobs.js?v=76471e42';
 import { serverPath, skipWithoutServer } from '../tools/repos.mjs';

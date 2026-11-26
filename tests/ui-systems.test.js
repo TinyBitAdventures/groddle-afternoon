@@ -52,7 +52,7 @@ import {
   segmentMid,
   listHubsFromIndex,
   resolveHubId,
-} from '../public/js/map-graph.js?v=b035dfb3';
+} from '../public/js/map-graph.js?v=803cc6cd';
 import { STREET_INDEX } from '../public/js/street-loader.js?v=10376267';
 import { listMapDestinations } from '../public/js/travel.js?v=7fd6e363';
 import { readFileSync } from 'node:fs';

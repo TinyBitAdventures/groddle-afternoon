@@ -12,7 +12,7 @@ import { join } from 'node:path';
 import { tokensOf, searchDecos, facetCounts, passesFacets, sizeClass, drawnSize, hubPlacements, newArtRows, thumbUrl, decoFor, textScore, queryWords, NEW_ART_BUNDLE } from '../public/js/builder/deco-search.js?v=fda9b16b';
 import { TEMPLATES, newStreet, newStreetOps, groundStrip, templateLayers, gradientFrom, hslHex, filtersFor, nextHubId, newHub, nextMapLine, mapWithStreet, mapWithoutStreet, profileOf, tallLayerHeight, FLOOR_Y, MAP_W, MAP_H } from '../public/js/builder/templates.js?v=881dfa69';
 import { parallaxLayerOffset } from '../public/js/street-render.js?v=cd2b2649';
-import { populationWith, plannedSpots, moveMapLine, mapForStreets, spotGroup } from '../public/js/builder/editor-zone.js?v=333b4867';
+import { populationWith, plannedSpots, moveMapLine, mapForStreets, spotGroup } from '../public/js/builder/editor-zone.js?v=c013630f';
 import { intakeBody, base64Of } from '../public/js/builder/editor-picker.js?v=724352b6';
 import { streetWithEdits, editsOn, linkEdit, streetStats } from '../public/js/builder/zone.js?v=ce289eb1';
 import { applyZoneEdits } from '../public/js/builder/draft-play.js?v=aa509611';

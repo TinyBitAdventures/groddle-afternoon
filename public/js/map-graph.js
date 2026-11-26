@@ -7,6 +7,7 @@
 import { listMapDestinations, planTravel, resolveLoadedTsid, tsidAliases } from './travel.js?v=7fd6e363';
 import { HUB_MAP_BACKGROUNDS } from './hub-map-backgrounds.js?v=d6a23c90';
 import { HUB_COLOURS } from './map-views-data.js?v=07734585';
+import { hubColour } from './hub-colour.js?v=51e3ad0e';
 
 /** Map catalog + per-hub files. */
 export const MAP_INDEX_URL = 'assets/maps/index.json';
@@ -239,7 +240,7 @@ export function buildHubMapView(hubData, currentTsid, streetIndex = {}, { shrine
     bgSoftHi,
     bgRepainted,
     bgPlaceholder,
-    color: hubData.color || '#5f721d',
+    color: hubColour(hubData.color, '#5f721d'),
     currentTsid: currentResolved,
     streets,
     hubs,
@@ -257,9 +258,7 @@ export const GO_FALLBACK_COLOUR = '#cc0000';
  * a missing "#" put back; the ring filled with it 145-150, "To: <region>" written in it 81).
  */
 export function goColour(exit, colours = HUB_COLOURS) {
-  const own = String(exit?.color || '').trim();
-  const c = /^#?[0-9a-f]{6}$/i.test(own) ? own : colours[String(exit?.hub_id ?? exit?.hubId ?? '')] || GO_FALLBACK_COLOUR;
-  return (c[0] === '#' ? c : `#${c}`).toLowerCase();
+  return hubColour(exit?.color) || hubColour(colours[String(exit?.hub_id ?? exit?.hubId ?? '')]) || GO_FALLBACK_COLOUR;
 }
 
 /**

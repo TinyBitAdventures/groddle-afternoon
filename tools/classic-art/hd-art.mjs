@@ -20,7 +20,7 @@
  *
  * Pure: hdSvg(name) is the file's text; build.mjs writes it and --check compares bytes.
  */
-import { MAP_ICON_ART } from '../../public/js/map-graph.js?v=b035dfb3';
+import { MAP_ICON_ART } from '../../public/js/map-graph.js?v=803cc6cd';
 
 /** The signpost, in teensy_signpost.png's 10 x 15 grid (x right, y down, a pixel is 1 x 1). */
 export const SIGNPOST_TRACE = Object.freeze({

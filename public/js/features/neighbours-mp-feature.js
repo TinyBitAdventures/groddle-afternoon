@@ -108,7 +108,7 @@
  */
 
 import { createMinnAccount } from '../minn-account.js?v=7e3d7279';
-import { runStreetTransition } from '../screen-fx.js?v=29b5b3e1';
+import { runStreetTransition } from '../screen-fx.js?v=7cd62cca';
 import { STREET_INDEX } from '../street-loader.js?v=10376267';
 import { ITEM_CATALOG, addItem, countItem, listPackItemSlots, removeItem } from '../inventory.js?v=6414dbdc';
 import { copyPicks, leavingWire, markLeaving, receiveWire, takeCopies } from '../copy-picks.js?v=b368fd49';

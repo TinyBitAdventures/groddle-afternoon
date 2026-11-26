@@ -60,6 +60,7 @@ import { fileURLToPath } from 'node:url';
 import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import vm from 'node:vm';
+import { hubColour } from '../../public/js/hub-colour.js?v=51e3ad0e';
 import { readZip } from '../avatar-compositor/xfl.mjs';
 import { frameSvg, loadFla, playhead, stateFrames } from '../overlay-art/xfl-svg.mjs';
 
@@ -123,7 +124,7 @@ export function hubColours(src = readFileSync(join(audit, GSJS_MAPS), 'utf8')) {
   for (const id of Object.keys(box.maps).sort((a, b) => Number(a) - Number(b))) {
     const c = String(box.maps[id]?.color || '').trim();
     if (!/^#?[0-9a-f]{6}$/i.test(c)) continue;
-    out[id] = (c[0] === '#' ? c : `#${c}`).toLowerCase();
+    out[id] = hubColour(c);
   }
   return out;
 }

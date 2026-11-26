@@ -13,7 +13,7 @@ import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { renderHubMapSvg } from '../public/js/map-graph.js?v=b035dfb3';
+import { renderHubMapSvg } from '../public/js/map-graph.js?v=803cc6cd';
 import { hubMapSubtitle } from '../public/js/panel-copy.js?v=f854d1dd';
 
 const root = join(import.meta.dirname, '..');
