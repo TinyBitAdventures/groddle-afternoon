@@ -49,7 +49,7 @@ test('the climb has no clock: the 2*60 exit delay is "Are you stuck?", and time 
 });
 
 test('G1148: on an upright phone the tree is in view and the camera stops 53 px under the ground', async () => {
-  const { MIN_PACK_HEIGHT, phoneGroundWorldHeight, sceneGroundLine, stageFor } = await import('../public/js/location-view.js?v=fa4d254b');
+  const { MIN_PACK_HEIGHT, phoneGroundWorldHeight, sceneGroundLine, stageFor } = await import('../public/js/location-view.js?v=76a9ff86');
   const { cameraTargetY, cameraWorldHeightForGround } = await import('../public/js/movement.js?v=f4be1a05');
   // quests/high_jump.js 74: the player is set down at y -53, a floor 53 px over the location's bottom.
   if (fs.existsSync(path.join(gsjs, 'quests/high_jump.js'))) {

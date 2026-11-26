@@ -16,7 +16,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { GAP, PLAY_PIECES, TAP_H, boxesOverlap, layoutProblems, phoneRegions } from '../public/js/ui/phone-layout.js?v=703775b3';
+import { GAP, PLAY_PIECES, TAP_H, boxesOverlap, layoutProblems, phoneRegions } from '../public/js/ui/phone-layout.js?v=ebaad3fe';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const css = readFileSync(join(root, 'public/style.css'), 'utf8');

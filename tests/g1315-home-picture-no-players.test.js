@@ -24,8 +24,8 @@ import { describe, it } from 'node:test';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-import { walkHomeScene } from '../public/js/home-layout-scene.js?v=da9ddc63';
-import { buildHomeLayout, homeLayoutKeyOf } from '../public/js/home-layout.js?v=a28e9e4d';
+import { walkHomeScene } from '../public/js/home-layout-scene.js?v=44627ef6';
+import { buildHomeLayout, homeLayoutKeyOf } from '../public/js/home-layout.js?v=f2125495';
 import { homeKeyOf, shortHash } from '../public/js/profiles.js?v=7e94c96f';
 import { PUBLIC_HIDE } from '../public/js/public-picture.js?v=1a0b03fa';
 
