@@ -303,6 +303,8 @@ async function openGame(pl) {
 }
 
 async function dismiss(pl) {
+  // A card still entering (its OK not yet ready) is waited for, up to 3 s, before giving up.
+  for (let w = 0; w < 6 && await pl.p.evaluate(() => Boolean(document.querySelector('.award-screen.is-visible:not([data-award-input="ready"])'))); w++) await wait(500);
   for (let i = 0; i < 16; i++) {
     const did = await pl.p.evaluate(() => {
       for (const s of ['#quest-dialogue-cancel', '#quest-dialogue-close', '#quest-dialogue-next', '[data-award-close]', '[data-award-next]', '[data-nd-ok]', '#start-btn']) {
@@ -449,6 +451,9 @@ async function checks() {
     return { stored, world: document.querySelector('#game-root canvas')?.dataset.worldZoom, slider: s ? { value: s.value, label: out } : null };
   });
   const z0 = { A: await zoomInfo(A), B: await zoomInfo(B) };
+  // A seasonal card (Pot Luck Day's feast, 2026-11-26) can open a moment after arrival, over the buttons.
+  await dismiss(A);
+  await dismiss(B);
   await blur(A);
   await A.p.click('#sound-btn');
   await wait(600);
