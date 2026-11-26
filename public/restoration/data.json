@@ -2814,9 +2814,19 @@
   "deployed": "2026-11-26"
  },
  "git": {
-  "commits": 3696,
+  "commits": 3698,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-26",
+    "kind": "new",
+    "text": "Archimedes Acres's Group Hall has its own street, and its group's members go in from the hall's lot"
+   },
+   {
+    "date": "2026-11-26",
+    "kind": "fix",
+    "text": "A drink at the Thanksgiving feast offers Drink, and drinking it works"
+   },
    {
     "date": "2026-11-26",
     "kind": "fix",
@@ -2926,19 +2936,9 @@
     "date": "2026-11-25",
     "kind": "fix",
     "text": "Online, a Dust Trap is sprung for everyone on the street and resets for everyone"
-   },
-   {
-    "date": "2026-11-25",
-    "kind": "fix",
-    "text": "The Ancestral Lands clock keeps running while the game's tab is in the background"
-   },
-   {
-    "date": "2026-11-25",
-    "kind": "fix",
-    "text": "The demon in the Stoot shrine holds up an empty wooden frame, not nothing"
    }
   ]
  },
- "tests": 1434,
+ "tests": 1436,
  "generatedAt": "2026-11-26"
 }
