@@ -4,8 +4,8 @@
  */
 import { ITEM_ICONS, ITEM_LABELS, getVerbsFor, ordinaryItems, runVerb } from './content.js?v=a87eb482';
 import { createErrorOnce, createFeatureHost, createFrameStages } from './js/feature-host.js?v=b87e2cbc';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=3703a202';
-import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, enterHintPick, reachGlowTargets, spriteHasRimArt, trimmedIconUrl, drawTileArt } from './js/enter-chooser.js?v=38d401c2';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=46151ef4';
+import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, enterHintPick, reachGlowTargets, spriteHasRimArt, rimArtParts, trimmedIconUrl, drawTileArt } from './js/enter-chooser.js?v=28f69f85';
 import { firstTendKey, STICK_TEND_DELAY_MS, STICK_TEND_DIRS, STICK_TEND_REPEAT_MS, stepTendKey, stepTendKeys, stickTendKey, tendKeyAction } from './js/garden-tend.js?v=a7470c4a';
 import { avatarHitBox, behindFloor, bodyReachDistance, OUT_OF_REACH_LINE, playerClickBox } from './js/reach.js?v=456da8a8';
 import { createVogOverlay } from './js/vog-overlay.js?v=e883b3e3';
@@ -8639,6 +8639,8 @@ function pickInteractableAt(worldX, worldY) {
  */
 /** #701/#702: only a Sprite with a real texture takes the rim (spriteHasRimArt, js/enter-chooser.js). */
 const rimArt = (spr) => spriteHasRimArt(spr, PIXI);
+/** #712: the art Sprites a target's rims trace (its own Sprite, or the art inside its Container). */
+const rimParts = (target) => rimArtParts(target?.sprite, PIXI);
 
 function createSpriteOutline(source, opts = {}) {
   // Soft cool rim like original selection glow
@@ -8647,11 +8649,19 @@ function createSpriteOutline(source, opts = {}) {
   const outline = new PIXI.Container();
   outline.eventMode = 'none';
   outline.label = 'hover-outline';
+  // #712: a rim inside a target's Container stays out of its bounds (its hit box, reach and
+  // bubbles measure the Container: a Street Spirit's has no explicit hit size). The copies and
+  // their filter sit one level in, which stays measurable: a filter on an unmeasured container has
+  // no area and drew nothing.
+  outline.measurable = false;
+  const ring = new PIXI.Container();
+  ring.eventMode = 'none';
+  outline.addChild(ring);
 
   /** @type {PIXI.Sprite[]} */
   const copies = [];
   // 8-neighbor ring only (1–2px) — enough for a rim, not a filled slab
-  const ring = [];
+  const offsets = [];
   for (let dy = -thickness; dy <= thickness; dy++) {
     for (let dx = -thickness; dx <= thickness; dx++) {
       if (dx === 0 && dy === 0) continue;
@@ -8659,11 +8669,11 @@ function createSpriteOutline(source, opts = {}) {
       // keep only outer ring so stacked copies don't form a solid body
       if (d2 < thickness * thickness - 0.01) continue;
       if (d2 > (thickness + 0.6) * (thickness + 0.6)) continue;
-      ring.push([dx, dy]);
+      offsets.push([dx, dy]);
     }
   }
   // Always include cardinals/diagonals at exact thickness
-  if (!ring.length) {
+  if (!offsets.length) {
     for (const [dx, dy] of [
       [-1, 0],
       [1, 0],
@@ -8674,18 +8684,18 @@ function createSpriteOutline(source, opts = {}) {
       [-1, 1],
       [1, 1],
     ]) {
-      ring.push([dx * thickness, dy * thickness]);
+      offsets.push([dx * thickness, dy * thickness]);
     }
   }
 
-  for (const [dx, dy] of ring) {
+  for (const [dx, dy] of offsets) {
     const s = new PIXI.Sprite(rimArt(source) ? source.texture : PIXI.Texture.EMPTY);
     if (source.anchor) s.anchor.copyFrom(source.anchor);
     s.position.set(dx, dy);
     s.alpha = 0.7;
     s.eventMode = 'none';
     copies.push(s);
-    outline.addChild(s);
+    ring.addChild(s);
   }
 
   // Solid rim color from alpha (preserves silhouette; main sprite paints over center)
@@ -8703,7 +8713,7 @@ function createSpriteOutline(source, opts = {}) {
     ];
     // Padding so filter RT doesn't clip wide trant arms
     cm.padding = 12;
-    outline.filters = [cm];
+    ring.filters = [cm];
   } else {
     for (const s of copies) {
       s.tint = color;
@@ -8733,8 +8743,9 @@ function createSpriteOutline(source, opts = {}) {
     outline.scale.copyFrom(src.scale);
     outline.rotation = src.rotation || 0;
     if (src.pivot) outline.pivot.copyFrom(src.pivot);
-    // Always strictly behind the source
-    outline.zIndex = (Number(src.zIndex) || 0) - 1;
+    // Always strictly behind the source (on entityLayer one below it; in a target's own Container
+    // level with it, inserted just below, so it stays there when the Container sorts).
+    outline.zIndex = (Number(src.zIndex) || 0) - (outline._zGap ?? 1);
     outline.alpha = src.alpha ?? 1;
     // Pixi 8 has no Container.worldAlpha (only a render group's): read the alpha up the parents, or
     // the rim never showed (#669: the hover and reach glows were invisible since the Pixi 8 move).
@@ -8747,16 +8758,12 @@ function createSpriteOutline(source, opts = {}) {
 function clearHoverGlow() {
   if (!hoverTarget) return;
   const t = hoverTarget;
-  if (t._hoverGlow) {
-    try {
-      if (t._hoverGlow.parent) t._hoverGlow.parent.removeChild(t._hoverGlow);
-      t._hoverGlow.destroy({ children: true });
-    } catch {
-      /* already removed */
-    }
-  }
+  dropRims(t._hoverGlow);
   t._hoverGlow = null;
-  if (app?.canvas) app.canvas.dataset.hoverTarget = '';
+  if (app?.canvas) {
+    app.canvas.dataset.hoverTarget = '';
+    app.canvas.dataset.hoverRims = '';
+  }
   // Only the tint: nothing lifts a hovered sprite now, and putting back the y it had when the
   // pointer came over it dropped a Chicken or Piggy that had walked up or down a slope since
   // (game.js followWalkFloor) into the ground or the air (lane CHICKLOOP, Austin 2026-11-01).
@@ -8775,16 +8782,52 @@ function setHoverTarget(target) {
   hoverTarget = target;
   // The reach glow's rim gives way to the hover's (#669: one rim per thing).
   dropReachGlow(target);
-  if (rimArt(target.sprite)) target._hoverGlow = addSpriteRim(target.sprite);
-  // R54 QA (tests/rim-walk-r54.test.js): the thing under the mouse, as reachGlow names the glowing ones.
-  if (app?.canvas) app.canvas.dataset.hoverTarget = target.classId || '';
+  target._hoverGlow = addTargetRims(target);
+  // R54 QA (tests/rim-walk-r54.test.js): the thing under the mouse, as reachGlow names the glowing
+  // ones; hoverRims, how many rims it drew (#712: 0 for a thing with no art to trace).
+  if (app?.canvas) {
+    app.canvas.dataset.hoverTarget = target.classId || '';
+    app.canvas.dataset.hoverRims = String(target._hoverGlow.length);
+  }
 }
 
-/** The cyan rim (tsSprite_GlowA) behind a sprite on entityLayer: the hover's and the reach glow's. */
+/**
+ * #712: a target's rims, one per art part (rimParts): the hover's and the reach glow's. Each rim
+ * sits in its part's own holder just below it, as the signpost glow's do (syncPostGlow), so a rim
+ * for a rock's art or a Street Spirit's body follows the Container's place, scale and flip.
+ */
+function addTargetRims(target) {
+  return rimParts(target).map(addSpriteRim);
+}
+function dropRims(rims) {
+  for (const rim of rims || []) {
+    if (!rim || rim.destroyed) continue;
+    try {
+      rim.parent?.removeChild(rim);
+      rim.destroy({ children: true });
+    } catch {
+      /* already removed */
+    }
+  }
+}
+/** A rim whose part has gone (destroyed or taken out of its holder) is made again. */
+const rimsStale = (rims) => !rims?.length || rims.some((rim) => {
+  const src = rim._outlineSource;
+  return rim.destroyed || !src || src.destroyed || (src.parent && src.parent !== rim.parent);
+});
+
+/** The cyan rim (tsSprite_GlowA) behind one art sprite, in the sprite's own holder. */
 function addSpriteRim(spr) {
   const outline = createSpriteOutline(spr, { color: 0xa8e4ff, thickness: 2 });
+  const holder = spr.parent;
+  if (holder && holder !== entityLayer) {
+    outline._zGap = 0;
+    holder.addChildAt(outline, holder.getChildIndex(spr));
+    outline.syncOutlineTexture();
+    return outline;
+  }
   // Insert just below the sprite in the child list, then rely on zIndex sort
-  if (spr.parent === entityLayer) {
+  if (holder === entityLayer) {
     const idx = entityLayer.getChildIndex(spr);
     entityLayer.addChildAt(outline, Math.max(0, idx));
   } else {
@@ -8806,13 +8849,10 @@ function addSpriteRim(spr) {
 const reachGlows = new Map();
 let reachGlowAt = 0;
 function dropReachGlow(target) {
-  const rim = reachGlows.get(target);
-  if (!rim) return;
+  const rims = reachGlows.get(target);
+  if (!rims) return;
   reachGlows.delete(target);
-  if (!rim.destroyed) {
-    rim.parent?.removeChild(rim);
-    rim.destroy({ children: true });
-  }
+  dropRims(rims);
 }
 /** No reach glow: a phone (its chips name things), before the start, under a menu, an act, a mode or a move. */
 function reachGlowOff() {
@@ -8826,21 +8866,21 @@ function reachGlowWanted() {
     const d = interactReach(t);
     if (d < 100) near.push({ target: t, distance: d });
   }
-  // A sprite with art to trace: a garden's bare cells and a bare hit box have none.
+  // Art to trace (#712: a Container's art Sprites too): a garden's bare cells and a bare hit box have none.
   return reachGlowTargets(near, { hover: hoverTarget, climbing: climb.active })
-    .filter((t) => rimArt(t?.sprite));
+    .filter((t) => rimParts(t).length > 0);
 }
 function updateReachGlow(now = performance.now()) {
   if (now - reachGlowAt > 150) {
     reachGlowAt = now;
     const want = new Set(reachGlowWanted());
-    for (const t of [...reachGlows.keys()]) if (!want.has(t) || reachGlows.get(t).destroyed) dropReachGlow(t);
-    for (const t of want) if (!reachGlows.has(t) && entityLayer && !entityLayer.destroyed) reachGlows.set(t, addSpriteRim(t.sprite));
+    for (const t of [...reachGlows.keys()]) if (!want.has(t) || rimsStale(reachGlows.get(t))) dropReachGlow(t);
+    for (const t of want) if (!reachGlows.has(t) && entityLayer && !entityLayer.destroyed) reachGlows.set(t, addTargetRims(t));
     const line = [...reachGlows.keys()].map((t) => t.classId || '').join(',');
     if (app?.canvas && app.canvas.dataset.reachGlow !== line) app.canvas.dataset.reachGlow = line;
     syncPostGlow();
   }
-  for (const rim of reachGlows.values()) if (!rim.destroyed) rim.syncOutlineTexture();
+  for (const rims of reachGlows.values()) for (const rim of rims) if (!rim.destroyed) rim.syncOutlineTexture();
   for (const rim of postGlow.rims) if (!rim.destroyed) rim.syncOutlineTexture();
 }
 
@@ -37407,8 +37447,8 @@ async function main() {
 
     run('garden tend', updateGardenTend);
     // Keep selection outline locked to animated sprite frames (pigs, chickens, …)
-    if (hoverTarget?._hoverGlow?.syncOutlineTexture) {
-      run('hover outline', () => hoverTarget._hoverGlow.syncOutlineTexture());
+    if (hoverTarget?._hoverGlow?.length) {
+      run('hover outline', () => { for (const rim of hoverTarget._hoverGlow) if (!rim.destroyed) rim.syncOutlineTexture(); });
     }
     run('reach glow', updateReachGlow);
 

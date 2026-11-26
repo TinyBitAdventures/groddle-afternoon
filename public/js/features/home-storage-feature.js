@@ -258,6 +258,12 @@ function draw(engine) {
       box.addChild(g);
       box._worldHitW = bw;
       box._worldHitH = h;
+      // #712: the cyan rim traces the piece's own art in the room (homes-feature furnitureView), as
+      // Glitch glowed the cabinet itself; the box is only an invisible hit box over it.
+      box.rimArt = () => {
+        const views = homesFeature._state?.()?.scene?.furnitureViews;
+        return (views?.get(row.id) || views?.get(Number(row.id)))?.art || null;
+      };
       engine.entityLayer.addChild(box);
       e.box = box;
       const name = pieceLabel(row, def.label) || def.label;

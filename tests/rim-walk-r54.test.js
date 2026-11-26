@@ -12,12 +12,20 @@
  * every interactable and every signpost (the reach glow, the signpost glow) and the mouse points at
  * each (the hover rim). It fails on any render or frame stage throw (groddleQA.frameStageThrows)
  * or any page error.
+ * #712 (desktop 1453x805): the rim never showed on rocks and Street Spirits. Their targets are
+ * Containers (a rock's root around its art, a spirit around its body and name) and only a Sprite took
+ * a rim. Glitch glowed every interaction sprite in reach (MiddleGroundRenderer.as
+ * _findInteractionSprites 1092-1131). On Flogan Shames a rock and the Street Spirit now glow in reach
+ * and under the mouse, and on every street each thing the mouse finds draws a rim (canvas data
+ * hoverRims) unless it is one of the few with no art at all (noArt: the home street's house door, a
+ * Graphics box the house art paints over; a new garden's bare bed).
  * Run: node --test tests/rim-walk-r54.test.js
  */
 import { after as afterAll, before as beforeAll, describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { decodePng } from '../tools/builder/art-image.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -26,10 +34,12 @@ try { chromium = (await import('playwright')).chromium; } catch { /* no Playwrig
 
 const BASE_QUERY = 'autostart=1&fresh=1&resetgame=1&questoffer=off';
 const STREETS = [
-  { name: 'the home street (the house door is a Graphics hit box)', query: 'homedemo=home', tsid: 'RH_HOME_EXT', hover: 'home_door' },
-  { name: 'the house, its back yard and garden', query: 'homedemo=interior&homeyarddemo=cultivate', tsid: 'RH_HOME_INT', escape: true },
+  { name: 'the home street (the house door is a Graphics hit box)', query: 'homedemo=home', tsid: 'RH_HOME_EXT', hover: 'home_door', noArt: ['home_door'] },
+  { name: 'the house, its back yard and garden', query: 'homedemo=interior&homeyarddemo=cultivate', tsid: 'RH_HOME_INT', escape: true, noArt: ['garden_new'], rims: [/^home_storage$/] },
   { name: 'a vendor street (West Spice)', query: 'streetdemo=GM413RQ6LRG9N', tsid: 'GM413RQ6LRG9N' },
-  { name: 'signposts and a garden (Hechey Track, the default start)', query: '', tsid: 'GLI2V0UN7RD1T2J', signposts: true },
+  { name: 'signposts and a garden (Hechey Track, the default start)', query: '', tsid: 'GLI2V0UN7RD1T2J', signposts: true, noArt: ['garden_new'] },
+  // #712: rocks and a Street Spirit (Containers) glow in reach and under the mouse.
+  { name: 'rocks and a Street Spirit (Flogan Shames, #712)', query: 'streetdemo=GHV1F2U5M212P9C', tsid: 'GHV1F2U5M212P9C', rims: [/^rock_/, /^street_spirit_/], look: true },
 ];
 
 describe('R54: walking to and pointing at every target draws without a render throw (Chrome)', { skip: !chromium && 'no playwright' }, () => {
@@ -83,10 +93,15 @@ describe('R54: walking to and pointing at every target draws without a render th
 
       const hovered = new Set();
       const glowed = new Set();
+      const rimmed = new Set(); // hovered and drew at least one rim
+      const bare = new Set(); // hovered and drew none
+      const readGlow = () => page.evaluate(() => document.querySelector('#game-root canvas')?.dataset.reachGlow || '');
       for (const stop of stops) {
         // Beside it, a little above its feet: the avatar lands on its floor (the reach glow, the signpost glow).
+        await page.mouse.move(5, 5); // nothing under the mouse: the thing beside the avatar glows in reach
         await page.evaluate(({ x, y }) => window.groddleQA.placeAvatar(x - 45, y - 6), stop);
         await page.waitForTimeout(260);
+        for (const id of (await readGlow()).split(',').filter(Boolean)) glowed.add(id);
         // Then the mouse on it where the camera has it now (the hover rim).
         const at = await page.evaluate(({ i, post }) => {
           const s = window.groddleQA.snapshot();
@@ -96,12 +111,20 @@ describe('R54: walking to and pointing at every target draws without a render th
         if (at && at.x > 0 && at.y > 0 && at.x < 1453 && at.y < 805) {
           await page.mouse.move(at.x, at.y);
           await page.waitForTimeout(180);
+          // The camera may still be easing after the avatar's move: aim again where it is now.
+          const again = await page.evaluate(({ i }) => window.groddleQA.snapshot().interactables[i]?.page || null, stop);
+          if (again && Math.hypot(again.x - at.x, again.y - at.y) > 4 && again.x > 0 && again.y > 0 && again.x < 1453 && again.y < 805) {
+            await page.mouse.move(5, 5);
+            await page.mouse.move(again.x, again.y);
+            await page.waitForTimeout(180);
+          }
         }
         const seen = await page.evaluate(() => {
           const c = document.querySelector('#game-root canvas');
-          return { hover: c?.dataset.hoverTarget || '', glow: c?.dataset.reachGlow || '' };
+          return { hover: c?.dataset.hoverTarget || '', rims: Number(c?.dataset.hoverRims || 0), glow: c?.dataset.reachGlow || '' };
         });
         if (seen.hover) hovered.add(seen.hover);
+        if (seen.hover) (seen.rims > 0 ? rimmed : bare).add(seen.hover);
         for (const id of seen.glow.split(',').filter(Boolean)) glowed.add(id);
         await clean(`beside ${stop.what} on ${street.tsid}`);
       }
@@ -109,10 +132,42 @@ describe('R54: walking to and pointing at every target draws without a render th
       await page.mouse.move(5, 5);
       await page.waitForTimeout(300);
       await clean(`after the walk on ${street.tsid}`);
-      t.diagnostic(`${street.tsid}: ${stops.length} stops; hovered ${[...hovered].join(',')}; glowed ${[...glowed].join(',')}`);
+      t.diagnostic(`${street.tsid}: ${stops.length} stops; hovered ${[...hovered].join(',')}; rimmed ${[...rimmed].join(',')}; no rim ${[...bare].join(',')}; glowed ${[...glowed].join(',')}`);
       assert.ok(hovered.size > 0, `the mouse found a target on ${street.tsid} (the hover rim's path ran)`);
       if (street.hover) assert.ok(hovered.has(street.hover), `the mouse found ${street.hover} on ${street.tsid}: ${[...hovered]}`);
       assert.ok(glowed.size > 0, `something glowed in reach on ${street.tsid}`);
+      // #712: whatever the mouse finds draws a rim, but the few things with no art to trace.
+      const noArt = new Set(street.noArt || []);
+      const unrimmed = [...bare].filter((id) => !noArt.has(id) && !rimmed.has(id));
+      assert.deepEqual(unrimmed, [], `under the mouse with no rim on ${street.tsid}`);
+      for (const want of street.rims || []) {
+        assert.ok([...glowed].some((id) => want.test(id)), `a ${want} glowed in reach on ${street.tsid}: ${[...glowed]}`);
+        // Beside the first one, the camera settled: the rim shows in reach, then under the mouse.
+        const i = snap.interactables.findIndex((o) => want.test(o.classId));
+        const what = snap.interactables[i].classId;
+        await page.mouse.move(5, 5);
+        await page.evaluate(({ x, y }) => window.groddleQA.placeAvatar(x - 110, y - 6), snap.interactables[i]);
+        await page.waitForTimeout(1300);
+        const at = await page.evaluate((i) => window.groddleQA.snapshot().interactables[i].page, i);
+        if (street.look) {
+          // The pale cyan (0xa8e4ff over the art's edge) on the far side of the thing from the
+          // avatar: a filter on a rim kept out of its holder's bounds drew nothing.
+          const png = decodePng(await page.screenshot({ clip: { x: Math.round(at.x), y: Math.max(0, Math.round(at.y) - 190), width: 150, height: 230 } }));
+          let cyan = 0;
+          for (let o = 0; o < png.px.length; o += 4) {
+            const [r, g, b] = [png.px[o], png.px[o + 1], png.px[o + 2]];
+            if (b >= 120 && b - r >= 20 && g - r >= 12) cyan++;
+          }
+          t.diagnostic(`${what}: ${cyan} rim pixels in reach`);
+          assert.ok(cyan > 150, `the rim shows on ${what} in reach (${cyan} rim-coloured pixels)`);
+        }
+        await page.mouse.move(at.x, at.y - 20);
+        await page.waitForTimeout(250);
+        const hover = await page.evaluate(() => { const c = document.querySelector('#game-root canvas'); return { id: c?.dataset.hoverTarget || '', rims: Number(c?.dataset.hoverRims || 0) }; });
+        assert.equal(hover.id, what, `the mouse is on ${what}`);
+        assert.ok(hover.rims > 0, `${what} drew a rim under the mouse`);
+        await clean(`at ${what} on ${street.tsid}`);
+      }
     });
   }
 });

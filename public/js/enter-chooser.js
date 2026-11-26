@@ -193,6 +193,46 @@ export function spriteHasRimArt(spr, PIXI) {
 }
 
 /**
+ * #712 (2026-11-25): the art a target's rim traces. A target that is a Sprite with art is its own;
+ * a target registered as a Container (a mine rock's root around its rockSprite, a Street Spirit
+ * around its body and name, the magic rock, a garden plot) gives the art Sprites inside it, as
+ * Glitch glowed every interaction sprite in reach whatever it was built from
+ * (MiddleGroundRenderer.as _findInteractionSprites 1092-1131). Never a Graphics box, a texture-less
+ * sprite (spriteHasRimArt), a hidden part (a spirit's stand-in body), a shadow, or a rim itself.
+ * A Container may name its art instead (`rimArt`), as an invisible hit box over art drawn elsewhere.
+ * @param {any} spr the target's sprite
+ * @param {{ Sprite: Function, Graphics?: Function, Texture: { EMPTY: any } }} PIXI
+ * @returns {any[]}
+ */
+export function rimArtParts(spr, PIXI) {
+  if (spriteHasRimArt(spr, PIXI)) return [spr];
+  // An invisible hit box over art drawn elsewhere names that art (rimArt: a sprite, or a function
+  // that finds it now; a home's storage box gives its piece's art in the room).
+  if (spr && !spr.destroyed && spr.rimArt) {
+    let own = null;
+    try {
+      own = typeof spr.rimArt === 'function' ? spr.rimArt() : spr.rimArt;
+    } catch {
+      own = null;
+    }
+    return (Array.isArray(own) ? own : [own]).filter((part) => spriteHasRimArt(part, PIXI));
+  }
+  const out = [];
+  const walk = (node, depth) => {
+    if (!node || node.destroyed || !Array.isArray(node.children) || depth > 3) return;
+    if (PIXI.Graphics && node instanceof PIXI.Graphics) return;
+    for (const child of node.children) {
+      if (!child || child.destroyed || child.visible === false || child.label === 'hover-outline') continue;
+      if (/shadow/i.test(String(child.label || ''))) continue;
+      if (spriteHasRimArt(child, PIXI)) out.push(child);
+      else walk(child, depth + 1);
+    }
+  };
+  walk(spr, 0);
+  return out;
+}
+
+/**
  * #669: the things that glow because they are in reach, as the client glowed each sprite in
  * _interaction_spV (computers only, beside enterHintPick). One per garden (groupHead), never the
  * thing under the mouse (it has its own hover rim), never while climbing (the client glowed
