@@ -20,7 +20,7 @@
  * game.js: it calls renderTopBar() from updateHud and installTopBar() once.
  * The pure helpers below are tested without a DOM (tests/topbar.test.js).
  */
-import { vitalLevel, vitalTitle } from '../vitals.js?v=85a51302';
+import { energyGaugeStep, moodGauge, vitalLevel, vitalTitle } from '../vitals.js?v=5efac5f3';
 import { loadAudioRestore, saveAudioRestore } from '../audio-pref.js?v=683f27c8';
 import { OTHER_MUSIC_HINT, OTHER_MUSIC_LABEL } from '../other-music.js?v=f58af5e6';
 import { BACKGROUND_SOUND_HINT, BACKGROUND_SOUND_LABEL } from '../background-sound.js?v=d40d26b7';
@@ -202,8 +202,9 @@ export function drawHudCount(doc, el, n, short, whole = String(n ?? 0)) {
 
 /**
  * What an energy or mood ring shows: the number inside, the state (js/vitals.js), the
- * tooltip and its second line, and the accessible name (vitalTitle: the numbers, the
- * state in words and the click).
+ * tooltip and its second line, the accessible name (vitalTitle: the numbers, the
+ * state in words and the click), and the colour step by fullness (#699: Glitch's energy
+ * ramp, energyGaugeStep, and mood face, moodGauge; '' with no maximum).
  */
 export function vitalRing(stat, now, max) {
   const level = vitalLevel(now, max);
@@ -219,6 +220,7 @@ export function vitalRing(stat, now, max) {
     tip: `${name} ${text}`,
     sub,
     label: vitalTitle(stat, text, level),
+    gauge: String((stat === 'mood' ? moodGauge(now, max) : energyGaugeStep(now, max)) ?? ''),
   };
 }
 
@@ -334,6 +336,8 @@ function drawVital(doc, stat, now, max) {
   if (!pill) return 'ok';
   const r = vitalRing(stat, now, max);
   pill.dataset.vital = r.level;
+  if (r.gauge) pill.dataset.gauge = r.gauge;
+  else delete pill.dataset.gauge;
   setAttr(pill.querySelector('.ring-fill'), 'stroke-dasharray', r.dash);
   drawNum(pill.querySelector('.ring-num'), r.num);
   setAttr(pill, 'data-tip', r.tip);

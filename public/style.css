@@ -679,6 +679,21 @@
   --c-red-53e: #bf3127;
   --c-blue-61: #3e86d6;
   --c-blue-57: #1f6feb;
+  --c-red-54c: #cb202e;
+  --c-red-62b: #e4491a;
+  --c-orange-67: #f1600e;
+  --c-orange-66: #d57607;
+  --c-gold-65b: #ba8408;
+  --c-gold-65c: #b18904;
+  --c-yellow-65: #a08f04;
+  --c-yellow-64: #879606;
+  --c-lime-63b: #6b9c1b;
+  --c-lime-63c: #5f9e22;
+  --c-sky-64b: #349ba9;
+  --c-green-63d: #29a07d;
+  --c-yellow-64b: #939248;
+  --c-orange-61: #b0734b;
+  --c-mauve-43: #644849;
   /* palette:end */
 
   /* Surfaces */
@@ -732,6 +747,26 @@
   --energy-hud: var(--energy);
   --mood: var(--c-green-64);
   --xp: var(--c-blue-61);
+  /* #699: the energy and mood rings take their colour from how full they are, as Glitch's gauges did.
+     Energy: energy_mood_gradient.png sampled at pixels 0, 20 ... 180, 199 (EnergyGauge.as 122-127);
+     mood: the face's states (PlayerFaceUI.as 37-45). Glitch's hue, darkened where needed to 3:1 on
+     --surface (its yellows read 1.6:1 on cream); Classic draws Glitch's own (--c-classic-ramp-*, -mood-*). */
+  --energy-gauge-0: var(--c-red-54c);         /* #cb202e */
+  --energy-gauge-1: var(--c-red-62b);         /* #e4491a */
+  --energy-gauge-2: var(--c-orange-67);       /* #f36213 */
+  --energy-gauge-3: var(--c-orange-66);       /* #f98b06 */
+  --energy-gauge-4: var(--c-gold-65b);        /* #f8b100 */
+  --energy-gauge-5: var(--c-gold-65c);        /* #f6bf00 */
+  --energy-gauge-6: var(--c-yellow-65);       /* #d1bc1a */
+  --energy-gauge-7: var(--c-yellow-64);       /* #a7b933 */
+  --energy-gauge-8: var(--c-lime-63b);        /* #83b63d */
+  --energy-gauge-9: var(--c-lime-63c);        /* #73b43d */
+  --energy-gauge-10: var(--c-green-61);       /* #6bb745 */
+  --mood-gauge-sun: var(--c-sky-64b);         /* 90% and up: #6bcddb */
+  --mood-gauge-glow: var(--c-green-63d);      /* 80%: #64d2ad */
+  --mood-gauge-fair: var(--c-yellow-64b);     /* 70%: #cac97e */
+  --mood-gauge-meh: var(--c-orange-61);       /* 20%: #b0734b */
+  --mood-gauge-low: var(--c-mauve-43);        /* under 20%: #644849 */
   --currants: var(--c-gold-65);
   --imagination: var(--c-violet-55d);
   --img: var(--imagination);
@@ -11313,7 +11348,27 @@ html.stage-pinned[data-ui="modern"] header.top-bar { left: calc(var(--sp-5) + va
 [data-ui="modern"] .top-bar .ring[data-stat="energy"] { --c: var(--energy); }
 [data-ui="modern"] .top-bar .ring[data-stat="mood"] { --c: var(--mood); }
 [data-ui="modern"] .top-bar .ring[data-stat="level"] { --c: var(--xp); }
-/* Low and very low (js/vitals.js): amber, then red with a slow pulse; the number keeps 4.5:1
+/* #699: by how full, as Glitch's gauges were (js/vitals.js energyGaugeStep, moodGauge). Two attributes
+   outrank the low and very low colour below, so the stroke and badge keep the step while the number,
+   the "!" and the pulse still say low. */
+[data-ui="modern"] .top-bar .ring[data-stat="energy"][data-gauge="0"] { --c: var(--energy-gauge-0); }
+[data-ui="modern"] .top-bar .ring[data-stat="energy"][data-gauge="1"] { --c: var(--energy-gauge-1); }
+[data-ui="modern"] .top-bar .ring[data-stat="energy"][data-gauge="2"] { --c: var(--energy-gauge-2); }
+[data-ui="modern"] .top-bar .ring[data-stat="energy"][data-gauge="3"] { --c: var(--energy-gauge-3); }
+[data-ui="modern"] .top-bar .ring[data-stat="energy"][data-gauge="4"] { --c: var(--energy-gauge-4); }
+[data-ui="modern"] .top-bar .ring[data-stat="energy"][data-gauge="5"] { --c: var(--energy-gauge-5); }
+[data-ui="modern"] .top-bar .ring[data-stat="energy"][data-gauge="6"] { --c: var(--energy-gauge-6); }
+[data-ui="modern"] .top-bar .ring[data-stat="energy"][data-gauge="7"] { --c: var(--energy-gauge-7); }
+[data-ui="modern"] .top-bar .ring[data-stat="energy"][data-gauge="8"] { --c: var(--energy-gauge-8); }
+[data-ui="modern"] .top-bar .ring[data-stat="energy"][data-gauge="9"] { --c: var(--energy-gauge-9); }
+[data-ui="modern"] .top-bar .ring[data-stat="energy"][data-gauge="10"] { --c: var(--energy-gauge-10); }
+[data-ui="modern"] .top-bar .ring[data-stat="mood"][data-gauge="sun"] { --c: var(--mood-gauge-sun); }
+[data-ui="modern"] .top-bar .ring[data-stat="mood"][data-gauge="glow"] { --c: var(--mood-gauge-glow); }
+[data-ui="modern"] .top-bar .ring[data-stat="mood"][data-gauge="fair"] { --c: var(--mood-gauge-fair); }
+[data-ui="modern"] .top-bar .ring[data-stat="mood"][data-gauge="meh"] { --c: var(--mood-gauge-meh); }
+[data-ui="modern"] .top-bar .ring[data-stat="mood"][data-gauge="low"] { --c: var(--mood-gauge-low); }
+/* Low and very low (js/vitals.js): amber, then red with a slow pulse (the stroke only when a ring has no
+   #699 step above, so with no maximum); the number keeps 4.5:1
    (--warn 5.1:1, --danger 5.3:1 on --surface); the mood face and the energy pill say it in shape and words. */
 [data-ui="modern"] .top-bar .ring[data-vital="low"] { --c: var(--warn-fill); background: transparent; box-shadow: none; animation: none; }
 [data-ui="modern"] .top-bar .ring[data-vital="low"] .ring-num { color: var(--warn); }

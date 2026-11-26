@@ -26,6 +26,48 @@ export function vitalLevel(now, max) {
   return 'ok';
 }
 
+const share = (now, max) => {
+  const n = Number(now);
+  const m = Number(max);
+  return Number.isFinite(n) && m > 0 ? n / m : null;
+};
+
+/**
+ * Glitch's energy gauge colour (EnergyGauge.as 122-127, EnergyBar.as 140-142): pixel
+ * floor(share * 200) of energy_mood_gradient.png, the share held in [0, 1) so a full
+ * gauge is the last pixel. Over the maximum reads full (Glitch raised the maximum).
+ * null when there is no maximum.
+ */
+export function energyGaugePixel(now, max) {
+  const s = share(now, max);
+  if (s === null) return null;
+  return Math.floor(Math.min(0.9999999999, Math.max(0, s)) * 200);
+}
+
+/**
+ * The energy ring's step 0..10 (#699): of the ramp's 200 pixels the ring uses every 20th and the
+ * last (0, 20, ... 180, 199; style.css --energy-gauge-0..10, Classic's --c-classic-ramp-0..10),
+ * the one nearest Glitch's pixel. null when there is no maximum.
+ */
+export function energyGaugeStep(now, max) {
+  const px = energyGaugePixel(now, max);
+  return px === null ? null : Math.min(10, Math.round(px / 20));
+}
+
+/** The mood face's states, fullest first (PlayerFaceUI.as 37-45). */
+export const MOOD_GAUGES = Object.freeze(['sun', 'glow', 'fair', 'meh', 'low']);
+
+/** The mood ring's step (#699): Glitch's face at 90, 80, 70 and 20% (PlayerFaceUI.as 232-252). null with no maximum. */
+export function moodGauge(now, max) {
+  const s = share(now, max);
+  if (s === null) return null;
+  if (s >= 0.9) return 'sun';
+  if (s >= 0.8) return 'glow';
+  if (s >= 0.7) return 'fair';
+  if (s >= 0.2) return 'meh';
+  return 'low';
+}
+
 /** The meter's tooltip and accessible name: the numbers, the state in words, the click. */
 export function vitalTitle(stat, text, level) {
   const name = stat === 'mood' ? 'Mood' : 'Energy';

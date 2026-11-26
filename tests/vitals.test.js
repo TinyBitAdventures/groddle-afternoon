@@ -14,7 +14,7 @@ import {
   vitalMenuHeading,
   vitalSnacks,
   vitalTitle,
-} from '../public/js/vitals.js?v=85a51302';
+} from '../public/js/vitals.js?v=5efac5f3';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 

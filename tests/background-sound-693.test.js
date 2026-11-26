@@ -16,7 +16,7 @@ import { createAudioResumer } from '../public/js/audio-resume.js?v=440d0096';
 import { createMusicVoice } from '../public/js/music-voice.js?v=75c8cf57';
 import { BACKGROUND_SOUND_LABEL, backgroundSoundDefault, createBackgroundSound } from '../public/js/background-sound.js?v=d40d26b7';
 import { BACKGROUND_SOUND_KEY, loadBackgroundSound, saveBackgroundSound } from '../public/js/audio-pref.js?v=683f27c8';
-import { backgroundSoundToggle } from '../public/js/ui/topbar.js?v=654340a1';
+import { backgroundSoundToggle } from '../public/js/ui/topbar.js?v=78373487';
 
 const root = join(import.meta.dirname, '..');
 const read = (rel) => readFileSync(join(root, rel), 'utf8');
