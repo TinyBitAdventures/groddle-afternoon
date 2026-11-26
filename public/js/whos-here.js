@@ -13,6 +13,10 @@
  *
  * Only what the street already shows: the names over the Glitches walking there. Nobody you
  * block (buddies-feature isIgnoring), as their chat, arrivals and emotes are hidden elsewhere.
+ *
+ * The online line is ours (Glitch's tip named only the street): the count, a link to the
+ * website's /chat/, whose Who's around panel lists everyone online, in a new tab so the game
+ * keeps running (#415 follow-up, Austin 2026-11-26). No count (solo, or not yet known), no line.
  */
 
 export const WHOS_HERE_TEXT = Object.freeze({
@@ -25,7 +29,9 @@ export const WHOS_HERE_TEXT = Object.freeze({
   /** RightSideManager.as localTooltip: alone on the street. */
   alone: 'Just you!',
   /** The server's presence_count: the others online in the game (not you, as it counts them). */
-  online: (n) => `${n} other ${n === 1 ? 'player' : 'players'} online`,
+  online: (n) => `${n} other ${n === 1 ? 'player' : 'players'} online. See who`,
+  /** The website's chat, whose Who's around panel lists everyone online. */
+  chatHref: '/chat/',
 });
 
 /**
@@ -55,17 +61,19 @@ export function streetOthers(players = [], { meId = 0, hidden = () => false } = 
 
 /**
  * PURE: the list: its head ("People here (N)", you counted), the rows (you first, then the
- * others), the line for being alone, and the online line when the count is known.
+ * others), the line for being alone, and the online line (with its link) when the count is known.
  */
 export function whosHereView({ me = null, players = [], hidden = () => false, online = null } = {}) {
   const meId = Number(me?.id) || 0;
   const others = streetOthers(players, { meId, hidden });
   const rows = [{ id: meId, name: WHOS_HERE_TEXT.you, you: true }, ...others.map((o) => ({ ...o, you: false }))];
   const n = Number(online);
+  const known = online !== null && online !== undefined && Number.isFinite(n);
   return {
     head: WHOS_HERE_TEXT.head(rows.length),
     rows,
     alone: others.length ? '' : WHOS_HERE_TEXT.alone,
-    online: online === null || online === undefined || !Number.isFinite(n) ? '' : WHOS_HERE_TEXT.online(Math.max(0, Math.floor(n))),
+    online: known ? WHOS_HERE_TEXT.online(Math.max(0, Math.floor(n))) : '',
+    onlineHref: known ? WHOS_HERE_TEXT.chatHref : '',
   };
 }

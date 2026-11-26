@@ -120,7 +120,7 @@ import { sameWords } from '../chat-reactions.js?v=38460172';
 import { THREAD_TEXT, mergeReplies, normalSummary, summaryText } from '../chat-threads.js?v=2ba621c8';
 import { buddyFaceUrl } from '../buddy-list.js?v=b418f3f2';
 import { avatarOf, createBuddyFaces } from './buddy-face.js?v=cb11f179';
-import { WHOS_HERE_TEXT, streetOthers, whosHereView } from '../whos-here.js?v=cb52c987';
+import { WHOS_HERE_TEXT, streetOthers, whosHereView } from '../whos-here.js?v=82e3aca7';
 import { DELETE_CONFIRM_FOCUS, DELETE_TEXT, deleteConfirmRows } from '../chat-delete.js?v=c55a1043';
 import { htmlToText } from '../html-text.js?v=6bbf4d1f';
 import { BUDDY_SORTS, BUDDY_SORT_TEXT } from '../buddies.js?v=4457d8a4';
@@ -1181,7 +1181,13 @@ export function mountSocialDrawer({
     }
     const out = [el('p', { class: 'social-who-head', 'data-social-who-head': '' }, v.head), ul];
     if (v.alone) out.push(el('p', { class: 'social-empty' }, v.alone));
-    if (v.online) out.push(el('p', { class: 'social-note', 'data-social-who-online': '' }, v.online));
+    // The website's /chat/ lists everyone online; a new tab, so the game keeps running. A chat link
+    // home (js/chat-links.js): no confirm, and a press keeps the keys in the world.
+    if (v.online) {
+      const line = el('p', { class: 'social-note', 'data-social-who-online': '' });
+      line.append(el('a', { class: 'chat-link', 'data-chat-link': 'home', href: v.onlineHref, target: '_blank', rel: 'noopener', 'data-social-who-chat': '' }, v.online));
+      out.push(line);
+    }
     whoList.replaceChildren(...out);
     whoNames = v.rows.filter((r) => !r.you).map((r) => r.name).join(',');
   }

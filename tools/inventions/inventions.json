@@ -6258,6 +6258,27 @@
    "rows": []
   },
   {
+   "id": "whos-here-online-link",
+   "title": "Who's here's online count line, a link to the website's chat (\"8 other players online. See who\")",
+   "kind": "UI",
+   "status": "kept",
+   "where": [
+    {
+     "file": "public/js/whos-here.js",
+     "symbol": "WHOS_HERE_TEXT"
+    },
+    {
+     "file": "public/js/ui/social-drawer.js",
+     "symbol": "renderWho"
+    }
+   ],
+   "why": "Glitch's Local pane tip named only the people on the street (RightSideManager.as localTooltip); the count of players online in the game (the server's presence_count, ours-presence) is ours. The line opens /chat/ in a new tab, whose Who's around panel lists everyone online, so the game keeps running.",
+   "ruling": "Austin 2026-11-26 (#415 follow-up): make the online count line a link to /chat/ in a new tab; solo shows nothing new",
+   "rows": [
+    "G884"
+   ]
+  },
+  {
    "id": "koulato-wormhole-landing",
    "title": "Koulato Cluster's wormhole to Ruta Asuncion: the box at the hidden ladder's top and the landing at Ruta Asuncion's entrance",
    "kind": "placement",

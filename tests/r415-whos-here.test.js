@@ -9,9 +9,9 @@ import { describe, it, before, after } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { memoryStore, page } from './social-fake-dom.js';
-import { mountSocialDrawer } from '../public/js/ui/social-drawer.js?v=140c3302';
+import { mountSocialDrawer } from '../public/js/ui/social-drawer.js?v=a60ac325';
 import { createNotifier } from '../public/js/notify.js?v=c9d79ec5';
-import { WHOS_HERE_TEXT, streetOthers, whosHereView } from '../public/js/whos-here.js?v=cb52c987';
+import { WHOS_HERE_TEXT, streetOthers, whosHereView } from '../public/js/whos-here.js?v=82e3aca7';
 
 describe('js/whos-here.js', () => {
   it('the others on the street: roster order, each id once, never you, nobody you block', () => {
@@ -27,12 +27,15 @@ describe('js/whos-here.js', () => {
     assert.equal(v.head, 'People here (2)');
     assert.deepEqual(v.rows.map((r) => [r.name, r.you]), [['You', true], ['Fi', false]]);
     assert.equal(v.alone, '');
-    assert.equal(v.online, '8 other players online');
+    assert.equal(v.online, '8 other players online. See who');
+    assert.equal(v.onlineHref, '/chat/');
     const alone = whosHereView({ me: { id: 1 }, players: [], online: null });
     assert.equal(alone.head, 'People here (1)');
     assert.equal(alone.alone, 'Just you!');
     assert.equal(alone.online, '');
-    assert.equal(whosHereView({ online: 1 }).online, '1 other player online');
+    assert.equal(alone.onlineHref, '', 'no count (solo, or not yet known): nothing to link');
+    assert.equal(whosHereView({ online: 1 }).online, '1 other player online. See who');
+    assert.doesNotMatch(WHOS_HERE_TEXT.online(3), /—/);
     assert.equal(WHOS_HERE_TEXT.button, "Who's here");
   });
 });
@@ -117,7 +120,18 @@ describe('the Social drawer\'s Who\'s here (online)', () => {
     assert.equal(row(9), null, 'someone you block is not listed');
     assert.match(row(1).textContent, /You/);
     assert.equal(row(1).getAttribute('data-ctx'), null, 'your own row has no menu');
-    assert.equal(list().querySelector('[data-social-who-online]').textContent, '8 other players online');
+    // The website's /chat/ lists everyone online (its Who's around panel), in a new tab so the game keeps running.
+    const line = list().querySelector('[data-social-who-online]');
+    assert.equal(line.textContent, '8 other players online. See who');
+    const link = line.querySelector('a[data-social-who-chat]');
+    assert.ok(link, 'the online line is a link');
+    assert.equal(link.getAttribute('href'), '/chat/');
+    assert.equal(link.getAttribute('target'), '_blank');
+    assert.equal(link.getAttribute('rel'), 'noopener');
+    // A chat link home (js/chat-links.js): styled as the chat's links, opened without the away-link confirm.
+    assert.equal(link.getAttribute('class'), 'chat-link');
+    assert.equal(link.getAttribute('data-chat-link'), 'home');
+    assert.equal(link.textContent, '8 other players online. See who');
     assert.equal(data.socialWhoNames, 'Fi,Moss');
     // Each row shows the site's face where it has one (the circle stays under it).
     assert.equal(row(6).querySelector('img').getAttribute('src'), '/players/6/tile');
@@ -182,6 +196,16 @@ describe('G884: /who leaves out players you block, as the list does', () => {
     assert.match(body, /session\.client\.players\.filter\(\(p\) => !engine\?\.query\?\.\('realtimeHidden', p\.id\)\)\.map\(\(p\) => p\.name\)/);
     const game = readFileSync(new URL('../public/game.js', import.meta.url), 'utf8');
     assert.match(game, /whoIsHere: \(\) => \[[^\n]*features\.query\('remotePlayerNames', engine\)/);
+  });
+});
+
+describe('#415 follow-up: the online line is ours', () => {
+  it('is in the Inventions list', () => {
+    const reg = JSON.parse(readFileSync(new URL('../tools/inventions/inventions.json', import.meta.url), 'utf8'));
+    const entry = reg.entries.find((e) => e.id === 'whos-here-online-link');
+    assert.ok(entry, 'whos-here-online-link entry');
+    assert.equal(entry.status, 'kept');
+    assert.match(entry.ruling, /#415/);
   });
 });
 
