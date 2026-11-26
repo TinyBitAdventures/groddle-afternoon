@@ -1992,6 +1992,9 @@ function checkTraps(engine) {
     if (entity.classTsid !== 'dust_trap' || entity.node.depleted || !entity.view) continue;
     // GSJS hitbox 25 x 200 above the trap's foot.
     if (Math.abs(player.x - entity.x) <= 18 && player.y <= entity.y + 10 && player.y >= entity.y - 200) {
+      // G946 (#700): online the trap is the street's, and the server says who sprang it first.
+      const go = () => { if (entities.includes(entity) && !entity.node.depleted) triggerTrap(engine, entity); };
+      if (entity !== demoEntity && engine.query?.('sharedTrapTrigger', entity.key, go, engine) != null) continue;
       triggerTrap(engine, entity);
     }
   }

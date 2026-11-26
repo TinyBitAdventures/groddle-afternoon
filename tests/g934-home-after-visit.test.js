@@ -15,7 +15,7 @@ import { after, before, describe, it } from 'node:test';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-import { neighboursMpFeature } from '../public/js/features/neighbours-mp-feature.js?v=9a6232b4';
+import { neighboursMpFeature } from '../public/js/features/neighbours-mp-feature.js?v=fd27ae7e';
 import { createErrorOnce, createFeatureHost, reportPageError } from '../public/js/feature-host.js?v=b87e2cbc';
 import { pageErrorLine, rememberError } from '../public/js/features/bug-report-feature.js?v=46b6b9fb';
 import { Display, FakeEl, fakePixi } from './fake-scene.js';

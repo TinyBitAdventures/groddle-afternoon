@@ -21,7 +21,7 @@
  *         obj_no  { req, id, verb, code, message, obj? }
  *         objs    { street, snap?, none?, objs: [state] }
  * A state is { id, chunks, mega, in } (rock), { id, units, in, petted?,
- * watered?, reset?, diggers? } (node), { id, fruit, cap, health, maturity, petted,
+ * watered?, reset?, diggers?, sprung? } (node; sprung: a Dust Trap down that long, ms), { id, fruit, cap, health, maturity, petted,
  * watered, poison?, dead?, by? } (tree), { id, maturity, count, pets?, waters?, petted?,
  * watered?, poison?, dead?, by? } (a Wood Tree) or { id, mood, hunger, petted, daily,
  * croak, in } (pig: a street Piggy, objects_pigs.go); `in`, `reset` and
@@ -49,7 +49,16 @@ import { applyAnimalName, applyCreatureState, clockOffset, pathFrom } from './st
  * spawn_interval), so the server keeps whether each is there; where it swims is one path from the
  * server's clock (js/salmon-swim.js).
  */
-export const SHARED_NODE_CLASSES = Object.freeze(['mortar_barnacle', 'ice_knob', 'jellisac', 'dirt_pile', 'peat_1', 'paper_tree', 'npc_salmon']);
+/**
+ * Dust Traps too (G946, report #700, Austin's ruling 2026-11-26: as Glitch): items/dust_trap.js was
+ * one item on the street, so whoever walked into it first sprang it (doPlayerResponse: this.ready,
+ * then this.ready = false) and it stayed down for everyone, setAndBroadcastState('smackDown' /
+ * 'down' / 'up', 'idle' at makeReady), for 2 x the time it had stood ready, 3 min to 1 h. The server
+ * decides who sprang it and when it is back (objects_dust_trap.go); the drop and the remnant are the
+ * player's own roll, as in solo. Walked into, not chosen from a menu: features/street-objects-feature.js
+ * sharedTrapTrigger asks for it.
+ */
+export const SHARED_NODE_CLASSES = Object.freeze(['mortar_barnacle', 'ice_knob', 'jellisac', 'dirt_pile', 'peat_1', 'paper_tree', 'npc_salmon', 'dust_trap']);
 
 /** The verbs that change shared state, per kind. Everything else stays local. */
 export const SHARED_VERBS = Object.freeze({
@@ -294,6 +303,7 @@ export function freshenNode(node) {
     node.watered = false;
     node.needsResetAt = 0;
   }
+  if (def.classTsid === 'dust_trap') node.triggeredAt = 0;
   return node;
 }
 
@@ -307,6 +317,11 @@ export function applyNodeState(node, s, now = Date.now()) {
     node.depleted = node.units < 1;
     node.respawnAt = node.depleted ? deadline(s.in, now) || now + (def.respawnMs || 10000) : 0;
     node.regrowAt = 0;
+  }
+  if (def.classTsid === 'dust_trap') {
+    // G946: down for everyone; `sprung` is how long ago it went down (its smackDown, then down, then up).
+    const sprung = Number(s.sprung);
+    node.triggeredAt = node.depleted ? now - (Number.isFinite(sprung) && sprung > 0 ? sprung : 0) : 0;
   }
   if (def.classTsid === 'paper_tree') {
     node.petted = s.petted === true;
@@ -561,6 +576,8 @@ export function stateFor(copy, id, now = Date.now()) {
   if (Number(s.in) > 0) s.in = Math.max(1, s.in - gone);
   if (Number(s.reset) > 0) s.reset = Math.max(1, s.reset - gone);
   if (Number(s.poison) > 0) s.poison = Math.max(1, s.poison - gone);
+  // A Dust Trap's time down grows (objects_dust_trap.go).
+  if (Number(s.sprung) > 0) s.sprung = Number(s.sprung) + gone;
   // A Piggy's name: how long ago it was given, which grows (objects_pigs.go namePig).
   if (s.name && Number.isFinite(Number(s.named))) s.named = Math.max(0, Number(s.named)) + gone;
   return s;

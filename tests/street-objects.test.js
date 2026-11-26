@@ -38,9 +38,9 @@ import {
   takeObjs,
   treeReady,
   treeSkill,
-} from '../public/js/street-objects.js?v=6061b946';
-import { streetObjectsFeature } from '../public/js/features/street-objects-feature.js?v=b4590ff9';
-import { FEATURES } from '../public/js/features/index.js?v=5d7ea778';
+} from '../public/js/street-objects.js?v=5bd00776';
+import { streetObjectsFeature } from '../public/js/features/street-objects-feature.js?v=e93cd4d4';
+import { FEATURES } from '../public/js/features/index.js?v=3703a202';
 import { createMineRock, mineRock } from '../public/js/mining.js?v=5e49efb3';
 import { createResourceNode } from '../public/js/resource-nodes.js?v=90d75c60';
 import { createTrantState, fruitCapacityAt, setTrantTables } from '../public/js/trants.js?v=864ea9ff';
@@ -67,7 +67,9 @@ describe('street objects: the pure rules', () => {
   });
 
   it('shares the stock verbs only', () => {
-    assert.deepEqual(SHARED_NODE_CLASSES, ['mortar_barnacle', 'ice_knob', 'jellisac', 'dirt_pile', 'peat_1', 'paper_tree', 'npc_salmon']);
+    assert.deepEqual(SHARED_NODE_CLASSES, ['mortar_barnacle', 'ice_knob', 'jellisac', 'dirt_pile', 'peat_1', 'paper_tree', 'npc_salmon', 'dust_trap']);
+    // G946: a Dust Trap is walked into (auto), never a menu verb: sharedTrapTrigger asks for it.
+    assert.equal(sharedNodeVerb('dust_trap', 'trigger'), false);
     assert.equal(sharedNodeVerb('peat_2', 'harvest'), true);
     assert.equal(sharedNodeVerb('dirt_pile', 'dig'), true);
     assert.equal(sharedNodeVerb('paper_tree', 'pet'), true);

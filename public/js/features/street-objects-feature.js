@@ -154,7 +154,7 @@ import {
   treeReady,
   treeSkill,
   waitingIds,
-} from '../street-objects.js?v=6061b946';
+} from '../street-objects.js?v=5bd00776';
 import { ENDED_STATES, NO_REALTIME_STATES, answerWaitMs, createOnlineRequests, offlineLine, sharedOffline, waitLine } from '../online-request.js?v=09ac8a9c';
 import { ROCK_CATALOG } from '../mining.js?v=5e49efb3';
 import { TRANT_META, trantStatusLabel } from '../trants.js?v=864ea9ff';
@@ -209,6 +209,8 @@ let copy = createStreetCopy();
 let syncedStreet = '';
 let syncAskedAt = 0;
 let reqSeq = 0;
+/** G946: a Dust Trap the server just refused is not asked again for a second (still in its box, a "slow down"). */
+const trapWait = new Map();
 /** R26: the requests out (js/online-request.js): the wait is the server's, a late answer still lands. */
 // #676: a request 3 s with no answer asks whether the socket is still there (realtime-client.js probe).
 const pending = createOnlineRequests({ waitMs: () => answerWaitMs(client), probe: () => client?.probe?.() });
@@ -1089,6 +1091,23 @@ function landAnswer(engine, msg, ok) {
     engine.query?.('sharedNameLanded', p.target, String(msg.name || ''), engine);
     return;
   }
+  // G946 (#700): a Dust Trap walked into. Sprung by this player: the trap's own roll and grant run
+  // on the ready trap the server sprang (resource-nodes-feature triggerTrap). Sprung by someone else
+  // first: nothing, as the source's collision with a trap not ready did nothing.
+  if (typeof p.trap === 'function') {
+    if (!ok) trapWait.set(String(msg.id), Date.now() + 1000);
+    const obj = localObjects(engine).find((row) => row.id === msg.id);
+    if (ok && obj && msg.before) applyKnown(obj, msg.before);
+    if (ok) p.trap();
+    if (obj) {
+      const s = stateFor(copy, obj.id, Date.now());
+      if (s) applyKnown(obj, s);
+      seen.set(stateKey(obj), copy.version);
+      dirty.delete(obj.id);
+      redraw(engine, obj);
+    }
+    return;
+  }
   // A word to the server with nothing to run here (a Piggy ate food only this player saw).
   if (p.silent) {
     reconcileAll(engine);
@@ -1586,6 +1605,32 @@ export const streetObjectsFeature = {
     return client.send('obj_dig', { id: nodeId(n.key), do: what }) !== false;
   },
 
+  /**
+   * G946 (#700): the player walked into the Dust Trap `key` (resource-nodes-feature checkTraps).
+   * Online on a street whose server shares it, the server decides who sprang it (objects_dust_trap.go,
+   * items/dust_trap.js doPlayerResponse: the first one in while it is ready) and `go` runs when that
+   * was this player. True while the street decides (asked, waiting on an answer, or not live yet:
+   * the trap waits); null when the trap is the player's own (solo, a private place, a server that
+   * does not share it).
+   */
+  sharedTrapTrigger(key, go, engine) {
+    if (engine?.mode !== 'multiplayer' || typeof go !== 'function') return null;
+    const c = bind(engine);
+    if (!c || LOCAL_STATES.has(c.state) || !roomIsStreet(engine, c) || noneHere(engine)) return null;
+    const id = nodeId(key);
+    if (!shared(engine)) return true;
+    // An older server lays out no trap: it stays the player's own there.
+    if (!snapshotPlace(copy, id, 'node')) return null;
+    for (const p of pending.values()) if (p.id === id && !p.late) return true;
+    if ((trapWait.get(id) || 0) > Date.now()) return true;
+    reqSeq += 1;
+    const req = reqSeq;
+    if (!sendOut(req, { id, target: null, verbId: 'trigger', trap: go, silent: true }, () => c.send('obj_act', actMessage({ req, id, verb: 'trigger' })))) {
+      pending.take(req);
+    }
+    return true;
+  },
+
   /** game.js runVerb: the server's rolls for the verb it just allowed (and, for a pour, the ledger's use of the bottle). */
   sharedVerbGrant(target, verbId) {
     if (!grant || grant.target !== target || grant.verbId !== verbId) return null;
@@ -1621,6 +1666,7 @@ export const streetObjectsFeature = {
     reset();
     known = { room: '', none: false, animals: new Set() };
     pending.clear();
+    trapWait.clear();
     grant = null;
     reqSeq = 0;
     syncAskedAt = 0;

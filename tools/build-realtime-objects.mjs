@@ -20,7 +20,8 @@
  *     more once more than `after` chunks were taken, Glitch's 0-16 min at the same pace);
  *   - js/resource-nodes.js RESOURCE_NODE_CATALOG stock / regrow / tend rows
  *     (mortar_barnacle.js 199-207, ice_knob.js 198-205, jellisac.js 126-131,
- *     dirt_pile.js 176 + 467, peat_1.js 224-229, paper_tree.js);
+ *     dirt_pile.js 176 + 467, peat_1.js 224-229, paper_tree.js) and the Dust
+ *     Trap's reset row (dust_trap.js doPlayerResponse 121-150, G946);
  *   - js/trants.js ARBOROLOGY_HARVEST bonus amounts (catalog_skill_packages.js
  *     gardening_harvest) and assets/content/trants.json fruitCapMap
  *     (include/trants.js 1026-1041 updateFruitCap) and fruitProdMap (rules.prod:
@@ -101,15 +102,15 @@ import { TRANT_CARE_PACKAGES } from '../public/js/trant-care.js?v=cb7f539b';
 import { WOOD_TREE_MATURITY_MAP } from '../public/js/woodcutting.js?v=9e9af511';
 import { ANIMAL_KINSHIP_PACKAGES } from '../public/js/animal-kinship.js?v=75d3cb34';
 import { locationIsDepressing } from '../public/js/animal-mood.js?v=a49495fc';
-import { resourcePlacementGroups, resourceSpawnPlan } from '../public/js/features/resource-nodes-feature.js?v=ae39bd8a';
-import { soilCountsForStreet, soilPlacementGroups } from '../public/js/features/patches-feature.js?v=725990dd';
+import { resourcePlacementGroups, resourceSpawnPlan } from '../public/js/features/resource-nodes-feature.js?v=4f192eec';
+import { soilCountsForStreet, soilPlacementGroups } from '../public/js/features/patches-feature.js?v=58b78dee';
 import { KITTY_GROUP, kittyPlacementGroups } from '../public/js/features/heli-kitties-feature.js?v=cb979dbd';
 import { BATTERFLY_GROUP, batterflyPlacementGroups } from '../public/js/features/animal-husbandry-feature.js?v=1635c5d6';
 import { hasRaceDispenser } from '../public/js/races.js?v=ab22a079';
 import { setWildlifeCatalog, wildlifeFor } from '../public/js/wildlife.js?v=670c3a7f';
 import { boardSpotRow, furnitureFor, furniturePlacementGroups, stoneSpotRow } from '../public/js/street-furniture.js?v=071203fc';
 import { INCUBATION } from '../public/js/animal-husbandry.js?v=e5462668';
-import { SHARED_NODE_CLASSES, freshTreePlan } from '../public/js/street-objects.js?v=6061b946';
+import { SHARED_NODE_CLASSES, freshTreePlan } from '../public/js/street-objects.js?v=5bd00776';
 import { PIGGY_TRIP } from '../public/js/street-creatures.js?v=d54fb515';
 import { CRAB_PLACEMENT_KEY, CRAB_WALK, crabPlacementGroups } from '../public/js/crabs.js?v=5a43743d';
 import { KITTY_PET } from '../public/js/heli-kitties.js?v=e4af4096';
@@ -341,6 +342,8 @@ export function ruleTables(trantTables) {
     // A Salmon comes back one at a time, respawnMs after it was pocketed (spawner.js spawn_interval).
     else if (def.stock.model === 'respawn' && def.respawnMs) row.regrow = [def.respawnMs, def.respawnMs, def.respawnMs];
     if (def.tend) row.tend = { refill: def.tend.refill, resetMs: def.tend.resetMs };
+    // G946: a Dust Trap stays down 2 x the time it stood ready, clamped (dust_trap.js doPlayerResponse).
+    if (def.reset) row.reset = [def.reset.minMs, def.reset.maxMs, def.reset.fullResetMs];
     nodes[id] = row;
   }
   const harvest = {};
