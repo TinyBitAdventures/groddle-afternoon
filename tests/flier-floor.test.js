@@ -34,12 +34,12 @@ import {
   flightFloorFor,
   floorProfile,
   floorUnder,
-} from '../public/js/street-creatures.js?v=3e018c03';
+} from '../public/js/street-creatures.js?v=9e1c554e';
 import { setCreatureEcology, streetObjectLayout } from '../tools/build-realtime-objects.mjs';
 import { STREET_INDEX, applyStreetIndex, loadStreetDataFromFs, setZoneStreetsShown } from '../public/js/street-loader.js?v=10376267';
 import { flightGroundFor, setStreetEcologyCatalog } from '../public/js/street-ecology.js?v=f1c11a2d';
 import { platformsScreen, streetWidth, isItemSolid } from '../public/js/street-model.js?v=a9a05f9d';
-import { nearestSurfaceY } from '../public/js/walk-surface.js?v=3c919d5b';
+import { nearestSurfaceY } from '../public/js/walk-surface.js?v=f21ce37b';
 
 const root = join(import.meta.dirname, '..');
 const read = (rel) => readFileSync(join(root, rel), 'utf8');

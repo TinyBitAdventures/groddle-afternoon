@@ -104,6 +104,7 @@
 import { countItem, ensureItem, ITEM_CATALOG, removeItem } from '../inventory.js?v=3be7988a';
 import { likeStackAt, mergeDroppedStacks, pickupCountTitle } from '../world-items.js?v=93313aad';
 import { groundKey, groundStacks, ownGroundRows, ownGroundState } from '../ground-stacks.js?v=22792362';
+import { underFloorRestY } from '../walk-surface.js?v=f21ce37b';
 import { keepsOwnStack } from '../tools.js?v=4156bba8';
 import { PHONE_HOME_MIN_VIEW_W } from '../location-view.js?v=4c2530a9';
 import { createCountChooser } from '../ui/count-chooser.js?v=75f69512';
@@ -234,8 +235,8 @@ import { pieceUrl, roomPieces, surfaceAt, swatchPiece, wallTargetAt } from '../h
 import { renderHomeLocation } from '../home-shot-render.js?v=bb321fb2';
 import { maxTextureSizeOf, sharpDeco, wantsHiresDecos } from '../deco-hires.js?v=34f36d77';
 import { SHARP_DECOS } from '../deco-sharp-list.js?v=7d615f20';
-import { resourceNodeStill, resourceNodesFeature } from './resource-nodes-feature.js?v=9d032d86';
-import { patchesFeature, plotStill } from './patches-feature.js?v=ae1f8b31';
+import { resourceNodeStill, resourceNodesFeature } from './resource-nodes-feature.js?v=181936b1';
+import { patchesFeature, plotStill } from './patches-feature.js?v=59b123b0';
 import { GROWN_TREE_LABELS, createPlot, growTree, plotLabel } from '../patches.js?v=d5136729';
 import { WOTD_DEPLETE_MS, WOTD_TEXT, nearestPourTarget, pourButton, pourConditions, pourConfirmText } from '../wine-pour.js?v=6daa23a7';
 import { WOTD_TOOL, pourApproach, pourDropTip } from '../wine-pour-fx.js?v=364e22d2';
@@ -315,7 +316,7 @@ import { autoplayLog } from '../autoplay-log.js?v=55bb4823';
 import { WORLD_FONT_FAMILY } from '../world-text.js?v=6b49f88c';
 import { HOUSE_ART_DIR, HOUSE_FROM_HOME_STYLE, HOUSE_STYLE_IDS, composeHouse, houseFitViewH, houseLabel, houseLot, normalizeHouse } from '../home-house.js?v=3c88c47c';
 import { closeHousePicker, housePickerOpen, openHousePicker, refreshHousePicker } from '../ui/house-picker.js?v=67f03b99';
-import { YARD_WALL_DX } from '../yard-wander.js?v=79144483';
+import { YARD_WALL_DX } from '../yard-wander.js?v=8f5a82ef';
 import { housePlace, isHomeMachineClass, towerPlace } from '../home-machines.js?v=7379f47f';
 
 export const HOMES_FEATURE_ID = 'homes';
@@ -1001,6 +1002,41 @@ function glowTexture(PIXI) {
 }
 
 /**
+ * PURE: the house's lines in world px, `room` its pieces (home-wallpaper.js roomPieces), `x0` where
+ * the room starts (the back yard's width) and `width` the scene's. homes_rebuild_floor left-open:
+ * the yard, the ramp (x -20 at y 0 to x 56 on the floor), the floor; a Tower floor has the floor only.
+ */
+export function housePlatforms(room, x0, width) {
+  return room?.leftOpen
+    ? [
+      { id: 'home-yard', x1: 0, y1: room.groundY, x2: x0 + room.rampX, y2: room.groundY, pc_perm: -1 },
+      { id: 'home-yard-ramp', x1: x0 + room.rampX, y1: room.groundY, x2: x0 + room.floorStart, y2: GROUND_Y, pc_perm: -1 },
+      { id: 'home-floor', x1: x0 + room.floorStart, y1: GROUND_Y, x2: width, y2: GROUND_Y, pc_perm: -1 },
+    ]
+    : [{ id: 'home-floor', x1: 0, y1: GROUND_Y, x2: width, y2: GROUND_Y, pc_perm: -1 }];
+}
+
+/**
+ * #728: stacks lying under the house's floor come up onto it (walk-surface.js underFloorRestY):
+ * a stack set down in the back yard (its ground 60 px under the floor) was kept where it lay when
+ * the house later stood over that spot, drawn in the soil band under the floor, out of reach and
+ * under Decoration Mode's tray. A stack on a piece (`on`) rests on that piece (settleStacks).
+ * Mutates the rows (only y); returns how many came up.
+ */
+export function liftStacksOntoFloor(rows, platforms) {
+  if (!Array.isArray(rows)) return 0;
+  let moved = 0;
+  for (const row of rows) {
+    if (!row || row.on != null) continue;
+    const y = underFloorRestY(platforms, Number(row.x), Number(row.y));
+    if (y == null || y === row.y) continue;
+    row.y = Math.round(y);
+    moved += 1;
+  }
+  return moved;
+}
+
+/**
  * The house room. With `opts.yard` (the house, not a Tower floor) the back
  * yard comes first: the room starts at x0 = the yard's width, and the yard's
  * landscape (its style's look) fills x 0..x0 behind it.
@@ -1049,14 +1085,7 @@ function interiorBackground(engine, opts = {}) {
   // pc_perm 1 is an underside (street-model.js isStandable): with it the avatar stood on the yard's
   // line 60 px under the room's floor, and that floor then lay between the avatar and everything set
   // on a shelf or a table, so a click on it said "Could not get close enough :(" (Austin 2026-11-01).
-  root.platformsScreen = room.leftOpen
-    ? [
-      // homes_rebuild_floor left-open: the yard, the ramp (x -20 at y 0 to x 56 on the floor), the floor.
-      { id: 'home-yard', x1: 0, y1: room.groundY, x2: x0 + room.rampX, y2: room.groundY, pc_perm: -1 },
-      { id: 'home-yard-ramp', x1: x0 + room.rampX, y1: room.groundY, x2: x0 + room.floorStart, y2: GROUND_Y, pc_perm: -1 },
-      { id: 'home-floor', x1: x0 + room.floorStart, y1: GROUND_Y, x2: width, y2: GROUND_Y, pc_perm: -1 },
-    ]
-    : [{ id: 'home-floor', x1: 0, y1: GROUND_Y, x2: width, y2: GROUND_Y, pc_perm: -1 }];
+  root.platformsScreen = housePlatforms(room, x0, width);
   root.redraw = (preview = null) => {
     root.room = drawRoomShell(engine, shell, preview ? { ...opts, preview } : opts);
     drawStampMarks(engine);
@@ -6438,7 +6467,14 @@ function roomStackRows(engine) {
  * as HandOfDecorator.as startWithItemFromLocation 1250-1323 dragged any stack you could pick up.
  */
 function roomStacks(engine) {
-  return groundStacks(engine);
+  // #728: a shared stack the server keeps under the floor is shown on it (game.js restingStackY draws it
+  // there); a move in Decoration Mode then sets it down where it is dragged to, as any other.
+  const lines = scene?.background?.platformsScreen;
+  return groundStacks(engine).map((row) => {
+    if (!row.shared || row.on != null) return row;
+    const y = underFloorRestY(lines, Number(row.x), Number(row.y));
+    return y == null ? row : { ...row, y: Math.round(y) };
+  });
 }
 
 function stackRow(engine, id) {
@@ -6467,7 +6503,8 @@ function stackAt(engine, p) {
 /** Every stack in the room rests on what holds it now (js/home-decor.js settleStacks). */
 function settleRoomStacks(engine) {
   if (!scene?.furnitureLayer || scene.room !== 'interior' || !ownGroundState(engine)) return 0;
-  const moved = settleStacks(decor, roomStackRows(engine), roomX0());
+  const rows = roomStackRows(engine);
+  const moved = settleStacks(decor, rows, roomX0()) + liftStacksOntoFloor(rows, scene.background?.platformsScreen);
   if (moved) engine.droppedItemsChanged?.();
   return moved;
 }

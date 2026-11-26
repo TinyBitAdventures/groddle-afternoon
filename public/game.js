@@ -4,7 +4,7 @@
  */
 import { ITEM_ICONS, ITEM_LABELS, getVerbsFor, ordinaryItems, runVerb } from './content.js?v=48634256';
 import { createErrorOnce, createFeatureHost, createFrameStages } from './js/feature-host.js?v=b87e2cbc';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=41adcc62';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=34aabf8a';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, enterHintPick, groupHead, hoverRimShown, reachGlowTargets, spriteHasRimArt, rimArtParts, trimmedIconUrl, drawTileArt } from './js/enter-chooser.js?v=74f4964a';
 import { firstTendKey, STICK_TEND_DELAY_MS, STICK_TEND_DIRS, STICK_TEND_REPEAT_MS, stepTendKey, stepTendKeys, stickTendKey, tendKeyAction } from './js/garden-tend.js?v=a7470c4a';
 import { avatarHitBox, behindFloor, bodyReachDistance, OUT_OF_REACH_LINE, playerClickBox } from './js/reach.js?v=456da8a8';
@@ -897,7 +897,7 @@ import {
 } from './js/travel.js?v=7fd6e363';
 import { facingScaleX, facingFromVelocity } from './js/avatar.js?v=c4da73ea';
 import { AFK_TIMEOUT_MS, ANIMS, ANIM_FPS, CORE_FRAMES, EMOTIONS, EMOTION_MS, IDLE_SHEETS, RANDOM_IDLE_MS, RANDOM_IDLE_WAIT_MS, animForState, avatarAnimState, createIdleClock, crowdScaleX, idleSheetFor } from './js/avatar-anims.js?v=fb921bf4';
-import { followFloorY, landingY, stackRestY, walkerFloorY, walkSurfaceY } from './js/walk-surface.js?v=3c919d5b';
+import { followFloorY, landingY, stackRestY, underFloorRestY, walkerFloorY, walkSurfaceY } from './js/walk-surface.js?v=f21ce37b';
 import { holdCloseToFloor } from './js/slope-walk.js?v=9af1e505';
 import { JUMP_SPEED, MAX_TICK_FRAMES, WALK_MAX, avatarGround, coastX, frameSteps, stepAvatar, steerAccel, steerX, streetPhysicsExtras } from './js/avatar-step.js?v=8415ee96';
 import { PATH_END_ALLOWANCE, createUserPath, stepUserPath, walkInterrupts } from './js/user-path.js?v=68e6892c';
@@ -1102,7 +1102,7 @@ import {
   ROCK_SHAPE_WIDTHS,
   flightGroundFor,
 } from './js/street-ecology.js?v=f1c11a2d';
-import { CHICKEN_PAUSE, chickenPauseRoll, flierAt, flierSeed, flightFloorFor, followPath, PATH_STEP } from './js/street-creatures.js?v=3e018c03';
+import { CHICKEN_PAUSE, chickenPauseRoll, flierAt, flierSeed, flightFloorFor, followPath, PATH_STEP } from './js/street-creatures.js?v=9e1c554e';
 import { chickenPose, chickenIdleSheetsAsked } from './js/chicken-idle-art.js?v=e320e159';
 import { chickenWaitPose } from './js/chicken-idles.js?v=eef0279b';
 import { itemOverlayStats } from './js/item-overlay.js?v=b0086ba6';
@@ -16714,12 +16714,15 @@ function spawnDroppedItemStack(stack, mark = '') {
  * Where a stack set down here at (x, y) comes to rest (walk-surface.js stackRestY: the first line
  * under it that holds items, as a stack obeying physics falls in the original), else where it
  * was put. In a home's rooms homes-feature sets each stack on the shelf, table or seat that holds
- * it (home-decor.js settleStacks): furniture tops are not street lines, so those stay as set.
+ * it (home-decor.js settleStacks): furniture tops are not street lines, so those stay as set,
+ * except a stack under the floor itself (#728).
  */
 function restingStackY(x, y) {
-  if (homeIsInstanced() && currentStreetTsid === HOME_INTERIOR_TSID) return y;
+  // #728: except under the floor (a stack set down in the back yard before the house stood over it):
+  // that one comes up onto the floor (walk-surface.js underFloorRestY).
+  if (homeIsInstanced() && currentStreetTsid === HOME_INTERIOR_TSID) return underFloorRestY(streetPlatforms, x, y) ?? y;
   // G1190: a visitor's house (every floor of it, R5) and Tower scenes show the owner's stacks where the owner set them (a table, a shelf).
-  if (/^MPH_\d+(?:_IN[12]?|_T\d+)$/.test(String(currentStreetTsid || ''))) return y;
+  if (/^MPH_\d+(?:_IN[12]?|_T\d+)$/.test(String(currentStreetTsid || ''))) return underFloorRestY(streetPlatforms, x, y) ?? y;
   return stackRestY(streetPlatforms, x, y) ?? y;
 }
 

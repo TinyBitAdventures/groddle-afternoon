@@ -13,8 +13,8 @@ import { describe, it } from 'node:test';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-import { COPY } from '../public/js/street-objects.js?v=597472b8';
-import { streetObjectsFeature } from '../public/js/features/street-objects-feature.js?v=3cb486ee';
+import { COPY } from '../public/js/street-objects.js?v=2599de2a';
+import { streetObjectsFeature } from '../public/js/features/street-objects-feature.js?v=30be3c51';
 import { createResourceNode, harvestResourceNode, resourceNodeVerbs } from '../public/js/resource-nodes.js?v=e2d1cbc9';
 
 const root = join(import.meta.dirname, '..');

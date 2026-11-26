@@ -83,6 +83,28 @@ export function stackRestY(platforms, x, y, solid = isItemSolid) {
   return landingY(platforms, x, y - STACK_SINK_PX, solid);
 }
 
+/**
+ * #728: where a stack lying under every line at x comes back up to, or null when a line holds it
+ * (at its point, a few px over it, or anywhere under it: a shelf or table top over the floor keeps
+ * its stack). In the original nothing could lie under a room's floor: a stack set down fell to the
+ * plat under it (HandOfDecorator.as calculateTargetPlatformLineForRegStackFromPt), and the floor is
+ * the lowest plat. A stack saved under it (set down in the back yard, 60 px under the house's floor,
+ * before the house moved over that spot) was drawn in the soil band, out of reach ("Could not get
+ * close enough") and under Decoration Mode's tray. It comes up onto the lowest line over it.
+ */
+export function underFloorRestY(platforms, x, y, solid = isItemSolid) {
+  if (!Number.isFinite(x) || !Number.isFinite(y)) return null;
+  let over = null;
+  for (const p of platforms || []) {
+    if (!solid(p)) continue;
+    const py = platformYAt(p, x, 0);
+    if (py == null) continue;
+    if (py >= y - STACK_SINK_PX) return null;
+    if (over == null || py > over) over = py;
+  }
+  return over;
+}
+
 /** The surface at x nearest a reference y in either direction (spawning on the right floor). */
 export function nearestSurfaceY(platforms, x, refY, solid = isItemSolid) {
   let best = null;

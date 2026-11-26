@@ -6,7 +6,7 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { walkerFloorY, WALKER_REACH_PX } from '../public/js/walk-surface.js?v=3c919d5b';
+import { walkerFloorY, WALKER_REACH_PX } from '../public/js/walk-surface.js?v=f21ce37b';
 import { platformYAt } from '../public/js/street-model.js?v=a9a05f9d';
 
 const root = join(import.meta.dirname, '..');

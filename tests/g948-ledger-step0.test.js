@@ -19,7 +19,7 @@ import { createIconState, pickUpIcon, placeIcon } from '../public/js/giant-icons
 import { GNOME_CLASS } from '../public/js/garden-gnome.js?v=73026b57';
 import { NOTE_POLE_CLASS } from '../public/js/home-street-mp.js?v=11a669f8';
 import { FUNPICKLE } from '../public/js/funpickle.js?v=95796317';
-import { funpickleFeature } from '../public/js/features/funpickle-feature.js?v=56ef379c';
+import { funpickleFeature } from '../public/js/features/funpickle-feature.js?v=112263f7';
 import { HAS_PHP, PHP } from './php.js';
 
 const root = join(import.meta.dirname, '..');

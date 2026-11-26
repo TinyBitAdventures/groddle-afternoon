@@ -62,7 +62,7 @@ import { getGameDayKey } from '../game-day.js?v=a532775d';
 import { XP_FOR_LEVEL } from '../progression.js?v=05ff0260';
 import { emblemCostFor } from '../shrines.js?v=f5eb7690';
 import { giantDisplayName } from '../giant-names.js?v=0e295891';
-import { landingY } from '../walk-surface.js?v=3c919d5b';
+import { landingY } from '../walk-surface.js?v=f21ce37b';
 import {
   EMBLEM_VERBS,
   GIANT_ICON_DATA,
@@ -109,7 +109,7 @@ import { createMinnAccount } from '../minn-account.js?v=7e3d7279';
 import { saveStore, savedThrough } from '../save-store.js?v=4e720735';
 import { HOME_INTERIOR_TSID, HOME_STREET_TSID } from '../homes.js?v=dca6b2cd';
 import { gnomePlaceFor, visitGnomePlace } from '../garden-gnome.js?v=73026b57';
-import { homesFeature } from './homes-feature.js?v=40aefd9c';
+import { homesFeature } from './homes-feature.js?v=859cbcad';
 import { standOnFeet } from '../sprite-feet.js?v=6358a697';
 
 export const ICONS_FEATURE_ID = 'giant-icons';
