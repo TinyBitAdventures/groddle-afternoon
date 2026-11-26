@@ -12,14 +12,14 @@
 import { readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { landingStats, stampStats } from '../../public/landing/stats.js?v=26a4d16f';
+import { landingStats, landingBars, stampStats } from '../../public/landing/stats.js?v=78817d10';
 
 export function writeLandingStats(dir) {
   const data = JSON.parse(readFileSync(join(dir, 'restoration', 'data.json'), 'utf8'));
   const page = join(dir, 'index.html');
   const stats = landingStats(data);
   const html = readFileSync(page, 'utf8');
-  const next = stampStats(html, stats);
+  const next = stampStats(html, stats, landingBars(data));
   if (next !== html) writeFileSync(page, next);
   return stats;
 }

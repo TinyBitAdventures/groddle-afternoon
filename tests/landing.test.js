@@ -3,7 +3,7 @@ import { describe, it } from 'node:test';
 import { existsSync, readFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { servedByMinn } from './minn-served.js';
-import { landingStats, stampStats } from '../public/landing/stats.js?v=26a4d16f';
+import { landingStats, landingBars, stampStats } from '../public/landing/stats.js?v=78817d10';
 
 const pub = join(import.meta.dirname, '..', 'public');
 const read = (p) => readFileSync(join(pub, p), 'utf8');
@@ -22,7 +22,7 @@ describe('home page and /play/', () => {
 
   it('links to the game, the reports and its own assets, all of which exist', () => {
     const list = refs(home);
-    for (const want of ['play/', 'restoration/', 'compare/', 'landing/landing.css', 'landing/landing.js', 'landing/hero.webp']) {
+    for (const want of ['play/', 'restoration/', 'compare/', 'landing/landing.css', 'landing/landing.js', 'landing/hero.webp', 'assets/sprites/icons/magic_rock@3x.webp']) {
       assert.ok(list.includes(want), want);
     }
     for (const ref of list.filter((r) => !servedByMinn(r))) {
@@ -57,7 +57,15 @@ describe('home page and /play/', () => {
     assert.equal(stampStats(stamped, stats), stamped, 'idempotent');
     assert.equal(stampStats(home, {}), home);
     const t = data.tally;
-    assert.equal(stats.systems, `${t.source + t.rebuilt + t.solo + t.reimagined} of ${Object.values(t).reduce((a, b) => a + b, 0)}`);
+    assert.equal(stats.systems, String(t.source + t.rebuilt + t.solo + t.reimagined), 'the count alone, no "of" total (Austin 2026-11-25)');
+    for (const text of Object.values(stats)) assert.doesNotMatch(text, / of /);
+    const bars = landingBars(data);
+    assert.deepEqual(Object.keys(bars).sort(), ['cards', 'rooms', 'skills', 'systems']);
+    const barKeys = [...home.matchAll(/<i data-bar="([a-z]+)" style="--w: [0-9.]+%">/g)].map((m) => m[1]);
+    assert.deepEqual(barKeys.sort(), Object.keys(bars).sort(), 'one bar per count with a total');
+    const withBars = stampStats(home, stats, bars);
+    for (const [key, w] of Object.entries(bars)) assert.ok(withBars.includes(`data-bar="${key}" style="--w: ${w}"`), key);
+    assert.equal(bars.rooms, `${Math.round((data.rooms.built / data.rooms.total) * 1000) / 10}%`);
     assert.match(read('landing/landing.js'), /landingStats\(data\)/);
     assert.match(readFileSync(join(pub, '..', 'tools/deploy/kinsta.sh'), 'utf8'), /landing-stats\.mjs" "\$GAME"/);
   });

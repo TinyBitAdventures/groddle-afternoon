@@ -2,9 +2,10 @@
 // report's data (restoration/data.json, rebuilt with every commit). The HTML
 // carries the same numbers as of the last build (tools/deploy/landing-stats.mjs), so the page reads
 // true if this fetch fails.
-// Every photo opens full size in the viewer (landing/viewer.js).
+// Every photo opens full size in the viewer (landing/viewer.js); the street at the top is landing/street.js.
 import { mountViewer } from './viewer.js?v=9a919381';
-import { landingStats } from './stats.js?v=26a4d16f';
+import { landingStats, landingBars } from './stats.js?v=78817d10';
+import { mountStreet } from './street.js?v=63c70a68';
 
 const fmt = (n) => Number(n || 0).toLocaleString('en-US');
 
@@ -29,6 +30,10 @@ async function main() {
   }
 
   for (const [key, text] of Object.entries(landingStats(data))) setStat(key, text);
+  for (const [key, w] of Object.entries(landingBars(data))) {
+    const bar = document.querySelector(`[data-bar="${key}"]`);
+    if (bar) bar.style.setProperty('--w', w);
+  }
 
   const recent = (data.git?.recent || []).filter((r) => r.kind === 'new' || r.kind === 'improve' || r.kind === 'fix').slice(0, 5);
   const list = document.getElementById('log-list');
@@ -52,4 +57,5 @@ async function main() {
 }
 
 mountViewer();
+mountStreet();
 main();

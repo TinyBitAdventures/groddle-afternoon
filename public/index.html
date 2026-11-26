@@ -10,7 +10,7 @@
     if (location.search) location.replace('play/' + location.search + location.hash);
   </script>
   <link rel="stylesheet" href="restoration/restoration.css?v=7daf9888" />
-  <link rel="stylesheet" href="landing/landing.css?v=0d3ff2ef" />
+  <link rel="stylesheet" href="landing/landing.css?v=53c41f72" />
   <link rel="stylesheet" href="site/site-nav.css?v=9d7f9314" />
   <!-- Content keys for data and art URLs (js/data-urls.js): before every other script but the redirect. -->
   <script src="js/data-versions.js?v=cbdd3f1c"></script>
@@ -35,50 +35,115 @@
     </div>
   </nav>
 
-  <header class="hero">
-    <div class="wrap hero-grid">
-      <div class="hero-copy">
-        <p class="kicker">A fan remake of Glitch (2009 to 2012)</p>
+  <header class="street-hero" id="street-hero" data-phase="day">
+    <div class="sh-sky" aria-hidden="true"></div>
+    <div class="sh-stars" aria-hidden="true"></div>
+    <img class="sh-cloud" src="assets/decos/groddle/cloud_fluffy_1.webp?v=4774a7f0" alt="" style="top: 30px; width: 260px; animation-duration: 95s; animation-delay: -30s" />
+    <img class="sh-cloud" src="assets/decos/groddle/cloud_fluffy_2.webp?v=4774a7f0" alt="" style="top: 110px; width: 320px; animation-duration: 125s; animation-delay: -85s" />
+    <img class="sh-cloud" src="assets/decos/groddle/cloud_fluffy_1.webp?v=4774a7f0" alt="" style="top: 6px; width: 180px; animation-duration: 150s; animation-delay: -12s; opacity: 0.6" />
+
+    <div class="wrap sh-copy">
+      <div class="sh-plate">
+        <p class="kicker">A fan remake of Glitch <span class="kicker-years">2009 to 2012</span></p>
         <h1>Groddle Afternoon</h1>
         <p class="lead">
           Tiny Speck's Glitch was a gentle, funny world made of imagination: you squeezed chickens, petted piggies,
-          talked to trees and found quoins floating over the streets of Ur. It closed in December 2012. Tiny Speck
-          gave its art and code to the public domain and published its music for everyone to download, and Groddle
-          Afternoon puts them back together in your browser.
+          talked to trees and found quoins floating over the streets of Ur. Groddle Afternoon puts it back together in
+          your browser, from the art and code Tiny Speck gave to everyone.
         </p>
         <div class="hero-actions">
           <a class="btn btn-play" href="play/online/">Play in your browser</a>
           <a class="btn btn-quiet" href="restoration/">See what's been restored</a>
         </div>
-        <p class="hero-note">New to Ur? Start fresh on Gentle Island, the original tutorial, map reveal and all. Free. Play solo with no account, saved in this browser, or sign in to play multiplayer with other players. Plays on a computer with a keyboard.</p>
+        <p class="hero-note">Free. Play solo with no account, or sign in to play with other players. Plays on a computer with a keyboard.</p>
       </div>
-      <button class="hero-shot shot" type="button" data-full="landing/full/hero.webp" data-title="Hechey Track, Groddle Forest" aria-haspopup="dialog" aria-describedby="shot-hint">
-        <img src="landing/hero.webp?v=4774a7f0" width="1600" height="900" alt="The game on Hechey Track in Groddle Forest: a player with silver hair under a blossoming fruit tree, the Grand Mile signpost, the Sparkly Rock and a floating quoin to the left, the herb garden and a chicken to the right, the top bar and the street map above, and the pack below." />
-      </button>
+      <p class="sh-hint" aria-hidden="true">Grab a quoin, or say hi to the piggy.</p>
+    </div>
+
+    <div class="sh-scene" aria-label="Hechey Track, Groddle Forest">
+      <div class="sh-stage">
+        <div class="sh-layer" style="--d: 0.12" aria-hidden="true">
+          <img class="sh-far" src="assets/decos/groddle/wallpaper_tree_short_1.webp?v=2048000b" alt="" style="left: -140px" />
+          <img class="sh-far" src="assets/decos/groddle/wallpaper_tree_short_1.webp?v=2048000b" alt="" style="left: 560px; transform: scaleX(-1)" />
+        </div>
+        <div class="sh-layer" style="--d: 0.35" aria-hidden="true">
+          <img class="sh-pine" src="assets/decos/groddle/tree_coniferous_fg_1.webp?v=faa4c611" alt="" style="left: 40px; width: 122px" />
+          <img class="sh-pine" src="assets/decos/groddle/tree_coniferous_fg_2.webp?v=6ec109b7" alt="" style="left: 300px; width: 136px" />
+          <img class="sh-pine" src="assets/decos/groddle/tree_coniferous_fg_1.webp?v=faa4c611" alt="" style="left: 640px; width: 116px" />
+          <img class="sh-pine" src="assets/decos/groddle/tree_coniferous_fg_2.webp?v=6ec109b7" alt="" style="left: 930px; width: 130px" />
+        </div>
+        <div class="sh-layer" style="--d: 0.6" aria-hidden="true">
+          <img class="sh-bush" src="assets/decos/groddle/bush_3.webp?v=cffbc417" alt="" style="left: 180px; width: 250px" />
+          <img class="sh-bush" src="assets/decos/groddle/bush_3.webp?v=cffbc417" alt="" style="left: 760px; width: 230px; transform: scaleX(-1)" />
+        </div>
+        <div class="sh-layer sh-street" style="--d: 1">
+          <div class="sh-ground" aria-hidden="true"></div>
+          <img class="sh-on" src="assets/decos/groddle/groddle_bush1.webp?v=ccd112aa" alt="" style="left: -30px; width: 170px; bottom: 100px" />
+          <img class="sh-on" src="assets/decos/groddle/groddle_bush1.webp?v=ccd112aa" alt="" style="left: 1100px; width: 150px; bottom: 100px; transform: scaleX(-1)" />
+          <img class="sh-on" src="assets/decos/groddle/vendor.webp?v=cdc9f459" alt="" style="left: 60px; width: 100px" />
+          <span class="sh-on sh-rock" aria-hidden="true"><span class="sheet sheet-rock"></span></span>
+          <button class="sh-on sh-tap sh-tree" type="button" data-talk="trant_fruit" data-name="Fruit Tree" aria-label="Talk to the fruit tree"><img src="assets/sprites/trants/frames/trant_fruit_m10.webp?v=4774a7f0" alt="" width="214" height="197" /></button>
+          <span class="sh-on sh-walk-glitch sh-shadow" aria-hidden="true"><span class="sheet sheet-glitch"></span></span>
+          <button class="sh-on sh-tap sh-walk-piggy sh-shadow" type="button" data-talk="npc_piggy" data-name="Piggy" aria-label="Talk to the piggy"><span class="sh-piggy"></span></button>
+          <button class="sh-on sh-tap sh-walk-chicken sh-shadow" type="button" data-talk="npc_chicken" data-name="Chicken" aria-label="Talk to the chicken"><span class="sh-chicken"></span></button>
+          <button class="sh-on sh-tap sh-magic-rock" type="button" data-talk="magic_rock" data-name="Magic Rock" aria-label="Talk to the Magic Rock"><img src="assets/sprites/icons/magic_rock@3x.webp?v=4774a7f0" alt="" width="50" height="60" /></button>
+          <span class="sh-on sh-shrine" aria-hidden="true"><span class="sheet sheet-shrine"></span></span>
+          <button class="sh-tap sh-fly" type="button" data-talk="npc_butterfly" data-name="Butterfly" aria-label="Talk to the butterfly" style="left: 560px; bottom: 300px"><span class="sh-bfly"></span></button>
+          <button class="sh-tap sh-fly" type="button" data-talk="npc_butterfly" data-name="Butterfly" aria-label="Talk to the butterfly" style="left: 880px; bottom: 330px; animation-delay: -3.5s"><span class="sh-bfly" style="animation-delay: -0.3s"></span></button>
+          <button class="sh-tap sh-quoin" type="button" data-quoin="+3 iMG" data-img="3" aria-label="Collect an iMG quoin" style="left: 700px; bottom: 250px"><span class="sheet sheet-quoin"></span></button>
+          <button class="sh-tap sh-quoin" type="button" data-quoin="+5 mood" aria-label="Collect a mood quoin" style="left: 780px; bottom: 292px; animation-delay: -0.7s"><span class="sheet sheet-quoin q-mood"></span></button>
+          <button class="sh-tap sh-quoin" type="button" data-quoin="+8 currants" aria-label="Collect a currants quoin" style="left: 850px; bottom: 236px; animation-delay: -1.4s"><span class="sheet sheet-quoin q-currants"></span></button>
+          <button class="sh-tap sh-quoin" type="button" data-quoin="+42 iMG" data-img="42" aria-label="Collect a Qurazy quoin" style="left: 636px; bottom: 334px; animation-delay: -2.1s"><span class="sheet sheet-quoin sheet-quoin-qurazy"></span></button>
+          <button class="sh-tap sh-quoin" type="button" data-quoin="+4 energy" aria-label="Collect an energy quoin" style="left: 960px; bottom: 272px; animation-delay: -2.8s"><span class="sheet sheet-quoin q-energy"></span></button>
+          <img class="sh-tuft" src="assets/decos/groddle/groddle_grass_2.webp?v=7784aaa2" alt="" style="left: 260px; width: 60px" />
+          <img class="sh-tuft" src="assets/decos/groddle/groddle_grass_2.webp?v=7784aaa2" alt="" style="left: 690px; width: 70px; animation-delay: -1s" />
+          <img class="sh-tuft" src="assets/decos/groddle/groddle_grass_2.webp?v=7784aaa2" alt="" style="left: 945px; width: 64px; animation-delay: -2s" />
+        </div>
+        <div class="sh-tint" aria-hidden="true"></div>
+      </div>
+      <div class="sh-hud">
+        <span class="sh-pill"><span class="sheet sheet-quoin" aria-hidden="true"></span><span data-street-img>0</span>&nbsp;iMG</span>
+        <span class="sh-pill">Hechey Track · <span data-street-clock>12:00 PM</span></span>
+      </div>
+      <p class="visually-hidden" aria-live="polite" data-street-said></p>
     </div>
   </header>
 
   <main>
     <section class="band numbers" aria-labelledby="numbers-h">
-      <div class="wrap">
-        <div class="section-head">
-          <h2 id="numbers-h">How much of Ur is back</h2>
-          <a class="more" href="restoration/">Full restoration report</a>
+      <div class="wrap numbers-grid">
+        <div>
+          <div class="section-head">
+            <h2 id="numbers-h">How much of Ur is back</h2>
+            <a class="more" href="restoration/">Full restoration report</a>
+          </div>
+          <ul class="stat-grid" id="stats" aria-live="polite">
+            <li class="stat"><span class="stat-num" data-stat="systems">76</span><span class="stat-label">game systems playable</span><span class="stat-bar" aria-hidden="true"><i data-bar="systems" style="--w: 98.7%"></i></span></li>
+            <li class="stat"><span class="stat-num" data-stat="rooms">24</span><span class="stat-label">private quest rooms rebuilt</span><span class="stat-bar" aria-hidden="true"><i data-bar="rooms" style="--w: 100%"></i></span></li>
+            <li class="stat"><span class="stat-num" data-stat="skills">104</span><span class="stat-label">skills to learn</span><span class="stat-bar" aria-hidden="true"><i data-bar="skills" style="--w: 94.5%"></i></span></li>
+            <li class="stat"><span class="stat-num" data-stat="cards">260</span><span class="stat-label">imagination upgrade cards</span><span class="stat-bar" aria-hidden="true"><i data-bar="cards" style="--w: 94.5%"></i></span></li>
+            <li class="stat"><span class="stat-num" data-stat="quests">193</span><span class="stat-label">quests you can play</span></li>
+            <li class="stat"><span class="stat-num" data-stat="jobs">689</span><span class="stat-label">street projects to build</span></li>
+            <li class="stat"><span class="stat-num" data-stat="streets">1,368</span><span class="stat-label">streets of the world map</span></li>
+            <li class="stat"><span class="stat-num" data-stat="sounds">564</span><span class="stat-label">sounds from the original game</span></li>
+          </ul>
         </div>
-        <ul class="stat-grid" id="stats" aria-live="polite">
-          <li class="stat"><span class="stat-num" data-stat="systems">73 of 74</span><span class="stat-label">game systems playable</span></li>
-          <li class="stat"><span class="stat-num" data-stat="quests">195</span><span class="stat-label">quests you can play</span></li>
-          <li class="stat"><span class="stat-num" data-stat="rooms">22 of 22</span><span class="stat-label">private quest rooms rebuilt</span></li>
-          <li class="stat"><span class="stat-num" data-stat="jobs">689</span><span class="stat-label">street projects to build</span></li>
-          <li class="stat"><span class="stat-num" data-stat="streets">1,368</span><span class="stat-label">streets of the world map</span></li>
-          <li class="stat"><span class="stat-num" data-stat="skills">104 of 110</span><span class="stat-label">skills to learn</span></li>
-          <li class="stat"><span class="stat-num" data-stat="cards">252 of 275</span><span class="stat-label">imagination upgrade cards</span></li>
-          <li class="stat"><span class="stat-num" data-stat="sounds">514</span><span class="stat-label">sounds from the original game</span></li>
-        </ul>
+        <figure class="game-shot">
+          <div class="game-shot-frame">
+            <button class="hero-shot shot" type="button" data-full="landing/full/hero.webp" data-title="Hechey Track, Groddle Forest" aria-haspopup="dialog" aria-describedby="shot-hint">
+              <img src="landing/hero.webp?v=4774a7f0" width="1600" height="900" alt="The game on Hechey Track in Groddle Forest: a player with silver hair under a blossoming fruit tree, the Grand Mile signpost, the Sparkly Rock and a floating quoin to the left, the herb garden and a chicken to the right, the top bar and the street map above, and the pack below." />
+            </button>
+            <span class="game-shot-ledge" aria-hidden="true"><span class="game-shot-walker"><span class="sheet sheet-piggy"></span></span></span>
+          </div>
+          <figcaption>The game itself, on the same street.</figcaption>
+        </figure>
       </div>
     </section>
 
-    <section class="band band-alt" aria-labelledby="todo-h">
+    <section class="band band-alt todo-band" aria-labelledby="todo-h">
+      <svg class="band-edge" viewBox="0 0 1200 40" preserveAspectRatio="none" aria-hidden="true" focusable="false"><path d="M0 40 L0 24 Q 60 4 130 20 T 270 16 T 420 22 T 560 12 T 720 22 T 880 10 T 1030 22 T 1200 14 L1200 40 Z" /></svg>
+      <img class="band-tuft" src="assets/decos/groddle/groddle_grass_2.webp?v=7784aaa2" alt="" style="left: 7%" />
+      <img class="band-tuft" src="assets/decos/groddle/groddle_grass_2.webp?v=7784aaa2" alt="" style="left: 71%; animation-delay: -2s" />
       <div class="wrap">
         <div class="section-head">
           <h2 id="todo-h">Things to do in Ur</h2>
@@ -88,6 +153,7 @@
             <button class="shot" type="button" data-full="landing/full/card-grow.webp" data-title="Grow, harvest and cook" aria-haspopup="dialog" aria-describedby="shot-hint">
               <img src="landing/card-grow.webp?v=4774a7f0" width="1200" height="511" loading="lazy" alt="A player on the herb garden's beds on Hechey Track, with a fruit tree, a chicken and a piggy." />
             </button>
+            <span class="todo-badge" aria-hidden="true"><span class="todo-bfly"></span></span>
             <h3>Grow, harvest and cook</h3>
             <p>Plant gardens, water and pet trees, milk butterflies and cook what you grow. Poison a tree and it dies; clear it, and plant a new one.</p>
           </li>
@@ -95,6 +161,7 @@
             <button class="shot" type="button" data-full="landing/full/card-mine.webp" data-title="Mine, make and build" aria-haspopup="dialog" aria-describedby="shot-hint">
               <img src="landing/card-mine.webp?v=4774a7f0" width="1200" height="511" loading="lazy" alt="A player at a metal rock on Hechey Track, beside a fruit tree, a piggy and the signpost to Scribe's Weald." />
             </button>
+            <span class="todo-badge" aria-hidden="true"><span class="sheet sheet-rock"></span></span>
             <h3>Mine, make and build</h3>
             <p>Swing a pick, run Woodworkers and Blockmakers, and help build 689 new streets through the original street projects.</p>
           </li>
@@ -102,6 +169,7 @@
             <button class="shot" type="button" data-full="landing/full/card-quests.webp" data-title="Quests and secret rooms" aria-haspopup="dialog" aria-describedby="shot-hint">
               <img src="landing/card-quests.webp?v=4774a7f0" width="1200" height="511" loading="lazy" alt="Winter Walk: a tent and a campfire in the snow, with the quest's timer card over them." />
             </button>
+            <span class="todo-badge" aria-hidden="true"><img src="assets/sprites/icons/magic_rock@3x.webp?v=4774a7f0" alt="" width="34" height="40" /></span>
             <h3>Quests and secret rooms</h3>
             <p>Story quests from the Magic Rock, all 22 private quest rooms, pilgrimages and the secret rooms of Jethimadh Tower.</p>
           </li>
@@ -109,6 +177,7 @@
             <button class="shot" type="button" data-full="landing/full/card-rook.webp" data-title="Fight off the Rook" aria-haspopup="dialog" aria-describedby="shot-hint">
               <img src="landing/card-rook.webp?v=4774a7f0" width="1200" height="511" loading="lazy" alt="The Rook swoops low over a player on Hechey Track, its health badge in the corner." />
             </button>
+            <span class="todo-badge" aria-hidden="true"><span class="todo-rook"></span></span>
             <h3>Fight off the Rook</h3>
             <p>When the Rook attacks, prime the shrines, stun it with a Focusing Orb and nurse the street back to life, alone or with everyone on the street.</p>
           </li>
@@ -116,6 +185,7 @@
             <button class="shot" type="button" data-full="landing/full/card-races.webp" data-title="Races and Paradise" aria-haspopup="dialog" aria-describedby="shot-hint">
               <img src="landing/card-races.webp?v=4774a7f0" width="1200" height="511" loading="lazy" alt="Grab 'Em Good: a night race through giant trees for floating quoins, with the scores and the lead timer." />
             </button>
+            <span class="todo-badge" aria-hidden="true"><span class="sheet sheet-glitch"></span></span>
             <h3>Races and Paradise</h3>
             <p>Race rivals or other players in Grab 'Em Good, wrangle piggies in the Great Hog Haul, and fly through Cloud Rings and Radial Heights.</p>
           </li>
@@ -123,6 +193,7 @@
             <button class="shot" type="button" data-full="landing/full/card-home.webp" data-title="A home of your own" aria-haspopup="dialog" aria-describedby="shot-hint">
               <img src="landing/card-home.webp?v=4774a7f0" width="1200" height="511" loading="lazy" alt="Decoration Mode: a furnished room full screen, with the tray of furniture tiles, tabs and filters below it." />
             </button>
+            <span class="todo-badge" aria-hidden="true"><img src="assets/sprites/street-furniture/mailbox-left-idle.webp?v=4774a7f0" alt="" width="32" height="48" /></span>
             <h3>A home of your own</h3>
             <p>Drag furniture around a full-screen room, paper it wall by wall with Tiny Speck's own 109 wallpapers, floors and ceilings, cultivate your yard and raise a tower.</p>
           </li>
@@ -130,6 +201,7 @@
             <button class="shot" type="button" data-full="landing/full/card-explore.webp" data-title="Explore Ur" aria-haspopup="dialog" aria-describedby="shot-hint">
               <img src="landing/card-explore.webp?v=7a2c1124" width="1200" height="511" loading="lazy" alt="The Groddle Forest region map: its streets, a red star where you are, GO buttons to the next regions, and small vendor, shrine and subway icons." />
             </button>
+            <span class="todo-badge" aria-hidden="true"><span class="sheet sheet-piggy"></span></span>
             <h3>Explore Ur</h3>
             <p>Read the region maps, with every vendor, shrine and subway station marked, jump into the Great Hole to Ix, and help the Juju Bandits out of the Savanna.</p>
           </li>
@@ -137,6 +209,7 @@
             <button class="shot" type="button" data-full="landing/full/card-skills.webp" data-title="Skills and imagination" aria-haspopup="dialog" aria-describedby="shot-hint">
               <img src="landing/card-skills.webp?v=4774a7f0" width="1200" height="511" loading="lazy" alt="The imagination shop: three upgrade cards to choose from." />
             </button>
+            <span class="todo-badge" aria-hidden="true"><span class="sheet sheet-quoin"></span></span>
             <h3>Skills and imagination</h3>
             <p>Learn 99 skills and spend imagination on 247 of the original upgrade cards, from bigger batches to longer levitation.</p>
           </li>
@@ -307,6 +380,6 @@
     </div>
   </footer>
 
-  <script src="landing/landing.js?v=1d84015e" type="module"></script>
+  <script src="landing/landing.js?v=2dc12d7d" type="module"></script>
 </body>
 </html>
