@@ -2814,9 +2814,24 @@
   "deployed": "2026-11-26"
  },
  "git": {
-  "commits": 3702,
+  "commits": 3711,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-26",
+    "kind": "fix",
+    "text": "A failed trip out of a Group Hall no longer pulls you to the lot on a later visit"
+   },
+   {
+    "date": "2026-11-26",
+    "kind": "fix",
+    "text": "The Group Hall's hut ladder is drawn with placed wood ladder tiles, not a tiling"
+   },
+   {
+    "date": "2026-11-26",
+    "kind": "fix",
+    "text": "The Group Hall street registers above the pinned last features"
+   },
    {
     "date": "2026-11-26",
     "kind": "fix",
@@ -2921,21 +2936,6 @@
     "date": "2026-11-26",
     "kind": "fix",
     "text": "Animated decos drawn larger than their art are sharp again"
-   },
-   {
-    "date": "2026-11-26",
-    "kind": "fix",
-    "text": "No empty Jellisac socket past a street's right end"
-   },
-   {
-    "date": "2026-11-26",
-    "kind": "fix",
-    "text": "Signpost arm hover glow takes the street's colour, grey in Brillah"
-   },
-   {
-    "date": "2026-11-25",
-    "kind": "fix",
-    "text": "Open water and shafts no longer stop you on an invisible floor"
    }
   ]
  },
