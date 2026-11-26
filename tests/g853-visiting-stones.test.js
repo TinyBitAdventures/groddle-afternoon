@@ -15,13 +15,11 @@ import { platformsScreen, streetWidth } from '../public/js/street-model.js?v=a9a
 import {
   ecologyForStreet,
   footOverAir,
-  frontDecoCovers,
-  hiddenBehindFront,
   planStreetPlacements,
   populationForStreet,
   setStreetEcologyCatalog,
   streetReservedSpots,
-} from '../public/js/street-ecology.js?v=f1c11a2d';
+} from '../public/js/street-ecology.js?v=8f50537c';
 import {
   FURNITURE_GROUPS,
   STONE_DEAD_END_PX,
@@ -84,37 +82,32 @@ describe('Visiting Stones at dead ends', () => {
 
   it('every planned stone stands within 800 px of its dead end, on a floor with both ends over it', async () => {
     let planned = 0;
-    let offZone = 0;
+    const noDeadEnd = [];
     for (const [rowTsid, row] of Object.entries(catalog.furniture)) {
       if (!row.visiting_stone) continue;
       const tsid = `G${rowTsid.slice(1)}`;
       if (!index.streets[tsid] || STONE_SPOTS[tsid]) continue;
       const data = await loadStreetDataFromFs(tsid, streetsDir);
       const zone = stoneDeadEndZone(data);
-      if (!zone) continue;
+      if (!zone) {
+        noDeadEnd.push(tsid);
+        continue;
+      }
       const pop = populationForStreet(tsid, ecologyForStreet(tsid), { starter: tsid === index.default });
       const platforms = platformsScreen(data);
       const plan = planStreetPlacements(platforms, creatureRequests(pop, data, catalog), { worldW: streetWidth(data), seed: tsid, reserved: streetReservedSpots(data) });
       const [stone] = plan.groups[FURNITURE_GROUPS.visiting_stone.key] || [];
       assert.ok(stone, `${data.label}: no stone`);
-      // G1084 (#574): a dead end all behind the front art (Chuff Chase 1's acacia, East Spice's gear
-      // trees) sends its stone out of the zone to the nearest spot players can see it.
-      const offFront = plan.moved.some((m) => m.key === FURNITURE_GROUPS.visiting_stone.key);
-      if (offFront && (stone.x < zone.lo || stone.x > zone.hi)) {
-        offZone += 1;
-        assert.ok(!hiddenBehindFront(stone, FURNITURE_GROUPS.visiting_stone.key, frontDecoCovers(data)), `${data.label}: stone still behind the front art`);
-      } else {
-        assert.ok(stone.x >= zone.lo && stone.x <= zone.hi, `${data.label}: stone at ${Math.round(stone.x)}, dead end ${zone.lo}-${zone.hi}`);
-      }
+      // #731 (G1330): a stone stays in its dead end, as in Glitch. Off the front art (East Spice's gear
+      // trees, Chuff Chase 1's acacia, Puckell Peck's conifer) it moves within the dead end only, to
+      // the spot the drawn art leaves seen (street-ecology.js reseatHiddenNodes, frontArtShare).
+      assert.ok(stone.x >= zone.lo && stone.x <= zone.hi, `${data.label}: stone at ${Math.round(stone.x)}, dead end ${zone.lo}-${zone.hi}`);
       assert.ok(footOverAir(platforms, stone, 45) <= 12, `${data.label}: stone over air`);
       planned += 1;
     }
     assert.ok(planned >= 90, `${planned} planned stones checked`);
-    // G1236: Patchouli Preamble's dead end is all front art but the Street Spirit's spot, and a stone no
-    // longer stands on the vendor, so it goes out to the nearest clear floor too.
-    // R43 (#680): a stone keeps off the rocks and nodes too. Konka Brink's dead end is front art but
-    // for its measured Mortar Barnacles, Puckell Peck's but for the floor under Rock 1, so each goes
-    // out to the nearest clear floor (231 and 191 px out).
-    assert.ok(offZone <= 5, `${offZone} stones moved out of their dead end off the front art`);
+    // Signposts on both halves (or none): no dead end the rule finds, so the planner picks (Curling
+    // Lake's stands 2,451 px from an end). Memento Sana, Ginseng Grope, Slippery Climb, Curling Lake.
+    assert.deepEqual(noDeadEnd.sort(), ['GA5D59PVEL13KNQ', 'GA92VDUR8D82E3F', 'GHF6UMCMHOD387H', 'GHFN5KCGS5D3IFC']);
   });
 });

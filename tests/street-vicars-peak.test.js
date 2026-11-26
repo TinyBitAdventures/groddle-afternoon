@@ -12,7 +12,7 @@ import { fileURLToPath } from 'node:url';
 import { assertStreetGeometry } from '../public/js/street-model.js?v=a9a05f9d';
 import { arrivalInTarget } from '../public/js/location-navigation.js?v=e9221d85';
 import { reachStreet } from '../public/js/builder/reach-graph.js?v=687006d3';
-import { planStreetPlacements, populationForStreet } from '../public/js/street-ecology.js?v=f1c11a2d';
+import { planStreetPlacements, populationForStreet } from '../public/js/street-ecology.js?v=8f50537c';
 import {
   BOTTOM_DOOR,
   LADDER_SPOTS,

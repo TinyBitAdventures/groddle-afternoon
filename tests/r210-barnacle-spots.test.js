@@ -26,7 +26,7 @@ import {
   populationForStreet,
   setStreetEcologyCatalog,
   steadyFloor,
-} from '../public/js/street-ecology.js?v=f1c11a2d';
+} from '../public/js/street-ecology.js?v=8f50537c';
 import {
   prepareStreetResourceNodes,
   resourcePlacementGroups,

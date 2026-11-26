@@ -24,6 +24,8 @@ import { DIRT_PILE_PICTURE_SPOTS, PEAT_PICTURE_SPOTS, TREE_PICTURE_SPOTS } from 
 import { SHRINE_SPOTS } from './shrine-spots-data.js?v=c45dc2c2';
 import { gardenBedWidth, measuredGardenBeds, pictureGardenBeds } from './garden-beds.js?v=2ac6a12c';
 import { JELLISAC_HOLE_SPOTS } from './jellisac-hole-spots-data.js?v=256c00e9';
+import { STONE_FRONT_MASKS } from './stone-front-masks-data.js?v=31b2b54a';
+import { decoCovers } from './barnacle-walls.js?v=75e568c3';
 import { SLOTH_SPOTS } from './sloth-spots-data.js?v=7396e9db';
 import { slothSpotFromRow } from './sloth-trees.js?v=a3299191';
 
@@ -1611,12 +1613,14 @@ export function frontDecoCovers(street) {
       const r = Number(d.r) || 0;
       const key = `front:${layer.name || layer.id}:${i}`;
       const slide = drift ? { drift } : null;
+      // #731: the art as drawn (frontArtShare reads its opaque pixels, STONE_FRONT_MASKS).
+      const art = { sprite: String(d.sprite || ''), w, h, r, flip: Boolean(d.flip) };
       if (w >= FRONT_DECO_MIN.w && h >= FRONT_DECO_MIN.h && !r) {
-        out.push({ x: d.x, y: d.y, key, front: true, block: { l: d.x - w / 2, r: d.x + w / 2, t: d.y - h, b: d.y }, ...slide });
+        out.push({ x: d.x, y: d.y, key, front: true, block: { l: d.x - w / 2, r: d.x + w / 2, t: d.y - h, b: d.y }, art, ...slide });
         return;
       }
       if (w < FRONT_FILL_MIN.w || h < FRONT_FILL_MIN.h) return;
-      out.push({ x: d.x, y: d.y, key, front: true, fill: true, r, w, h, block: turnedBox(d.x, d.y, w, h, r), ...slide });
+      out.push({ x: d.x, y: d.y, key, front: true, fill: true, r, w, h, block: turnedBox(d.x, d.y, w, h, r), art, ...slide });
     });
   }
   return out;
@@ -1708,6 +1712,43 @@ export function frontCoverShare(spot, w, h, fronts) {
   return hit / (cols * rows);
 }
 
+/** #731: the sample grid for frontArtShare (columns x rows; about 9 px a cell on a Visiting Stone). */
+const ART_SAMPLES = Object.freeze([9, 14]);
+/** #574, #731: the most of a Visiting Stone's box the front art may cover where it stands in its dead end. */
+export const STONE_SEEN_SHARE = 0.3;
+
+/**
+ * PURE (#731): the share (0..1) of a w x h box standing on `spot` that the front decos' drawn art
+ * covers, by its opaque pixels (alpha over half, STONE_FRONT_MASKS, measured by
+ * tools/build-stone-front-masks.mjs) as street-render.js draws the deco (anchor bottom centre, sized
+ * w x h, mirrored, turned), not by its box: bare branches leave a stone seen, a trunk hides it. A
+ * deco with no mask measured counts by its box (frontCoverShare's rule), one with no art not at all.
+ */
+export function frontArtShare(spot, w, h, fronts, masks = STONE_FRONT_MASKS) {
+  if (!fronts?.length) return 0;
+  const l = spot.x - w / 2;
+  const t = spot.y - h;
+  const near = [];
+  for (const f of fronts) {
+    const d = frontDrift(f.drift, spot);
+    const b = f.block;
+    if (!(b.r + d.x > l && b.l + d.x < l + w && b.b + d.y > t && b.t + d.y < spot.y)) continue;
+    const mask = f.art && Object.prototype.hasOwnProperty.call(masks, f.art.sprite) ? masks[f.art.sprite] : undefined;
+    if (mask !== null) near.push([f, d, mask]);
+  }
+  if (!near.length) return 0;
+  const [cols, rows] = ART_SAMPLES;
+  let hit = 0;
+  for (let i = 0; i < cols; i += 1) {
+    const px = l + ((i + 0.5) * w) / cols;
+    for (let j = 0; j < rows; j += 1) {
+      const py = t + ((j + 0.5) * h) / rows;
+      if (near.some(([f, d, mask]) => (f.art && mask ? decoCovers(f.art, f.x, f.y, mask, px - d.x, py - d.y) : insideFront(f, px - d.x, py - d.y)))) hit += 1;
+    }
+  }
+  return hit / (cols * rows);
+}
+
 /**
  * The boxes the front check uses for things players walk up to that are not REACH_BOXES (the
  * reach check is about floors): a shrine (one 151 x 188 cell at spawnShrine's 0.78) and the
@@ -1779,9 +1820,10 @@ export const FRONT_FIND_KEYS = Object.freeze(['shrine', 'vendor', 'resource:jell
 export const NODE_FRONT_KEYS = Object.freeze(Object.keys(FRONT_BOXES).filter((k) => !FRONT_FIND_KEYS.includes(k)));
 /**
  * #574: the planned street furniture among them (street-furniture.js FURNITURE_GROUPS). A player goes
- * looking for a Visiting Stone, a mailbox or a board, so when its own stretch has no clear spot it
- * moves past its zone (a stone's dead end, the planner's own second choice) or to a crowded spot
- * rather than stay behind the art: Puckell Peck's dead end is all behind one front conifer.
+ * looking for a mailbox or a board, so when its own stretch has no clear spot it moves past its zone
+ * or to a crowded spot rather than stay behind the art. #731: a Visiting Stone moves within its dead
+ * end only, as in Glitch: where the art's boxes cover it all, to the spot its drawn art leaves seen
+ * (frontArtShare; Puckell Peck's conifer trunk, East Spice's gear trees).
  */
 export const FURNITURE_FRONT_KEYS = Object.freeze(['furnitureStone', 'furnitureMailbox', 'furnitureBoard']);
 
@@ -2266,7 +2308,12 @@ export function planStreetPlacements(
       // Furniture (FURNITURE_FRONT_KEYS) may leave its zone, last: `miss` ranks the spots out of it.
       // R43 (#680): outside it, the nearer the better (as the planner ranks a zone, by 400 px bands):
       // Konka Brink's stone, kept off the measured barnacles in its dead end, went to the far end of the street.
-      fits.set(request.key, { fit, loose, miss: (c) => Math.ceil(zoneMiss(c) / 400), pool });
+      // #731 (G1330): a Visiting Stone stays in its dead end, as in Glitch (East Spice's stood at the far
+      // end, behind the thin branches of its gear trees): off the art it moves within it only, and when
+      // the art's boxes cover every spot there, to the one its drawn art leaves seen (frontArtShare).
+      // A street with no dead end the planner finds (stoneDeadEndZone null) keeps the rule above.
+      const inZone = request.key === 'furnitureStone' && zone ? (c) => !zoneMiss(c) : null;
+      fits.set(request.key, { fit, loose, inZone, miss: (c) => Math.ceil(zoneMiss(c) / 400), pool });
     }
     for (let index = groups[request.key].length; index < count; index += 1) {
       if (fixedAt?.has(index)) {
@@ -2478,7 +2525,7 @@ function reseatHiddenNodes({ groups, occupied, candidates, used, fronts, fits, k
   if (!fronts.length) return moved;
   for (const key of keys) {
     if (!fits.has(key)) continue;
-    const { fit, loose, miss, pool } = fits.get(key);
+    const { fit, loose, inZone, miss, pool } = fits.get(key);
     for (const [index, point] of (groups[key] || []).entries()) {
       if (point.fixed || !hiddenBehindFront(point, key, fronts)) continue;
       // The nearest spot clear of every other thing's clearance, else the nearest at half of it (the
@@ -2491,7 +2538,7 @@ function reseatHiddenNodes({ groups, occupied, candidates, used, fronts, fits, k
       for (const c of pool || candidates) {
         const d = Math.abs(c.x - point.x) + Math.abs(c.y - point.y);
         if (d >= bestRank[2] && bestRank[0] === 0 && bestRank[1] === 0) continue;
-        if (!fit(c) || hiddenBehindFront(c, key, fronts)) continue;
+        if (!fit(c) || (inZone && !inZone(c)) || hiddenBehindFront(c, key, fronts)) continue;
         let near = Infinity;
         for (const o of occupied) if (o !== point) near = Math.min(near, scaledDistance(c, o) / Math.max(1, point.clearance + o.clearance));
         const tier = near >= 1 ? 0 : near >= 0.5 ? 1 : 2;
@@ -2501,10 +2548,32 @@ function reseatHiddenNodes({ groups, occupied, candidates, used, fronts, fits, k
         best = c;
         bestRank = rank;
       }
+      // #731, #574: a stone whose dead end the art's boxes cover takes the spot there its drawn art
+      // leaves seen (under STONE_SEEN_SHARE), the nearest to its own (which counts: it may stay), less
+      // crowded first; with none, the least covered one (tests/visiting-stone-dead-end-731.test.js).
+      let share = null;
+      if (!best && inZone) {
+        const [w, h] = FRONT_BOXES[key];
+        let pick = null;
+        for (const c of pool || candidates) {
+          if (!inZone(c) || !(c.id === point.id || fit(c))) continue;
+          const d = Math.abs(c.x - point.x) + Math.abs(c.y - point.y);
+          const seen = frontArtShare(c, w, h, fronts);
+          let near = Infinity;
+          for (const o of occupied) if (o !== point) near = Math.min(near, scaledDistance(c, o) / Math.max(1, point.clearance + o.clearance));
+          const rank = seen < STONE_SEEN_SHARE ? [0, near >= 0.5 ? 0 : 1, d] : [1, seen, d];
+          if (pick && better(rank, pick.rank) >= 0) continue;
+          pick = { c, rank, seen };
+        }
+        if (pick && pick.c.id !== point.id) {
+          best = pick.c;
+          share = Math.round(pick.seen * 100) / 100;
+        }
+      }
       if (!best) continue;
       used.delete(point.id);
       used.add(best.id);
-      moved.push({ key, index, from: { x: point.x, y: point.y } });
+      moved.push({ key, index, from: { x: point.x, y: point.y }, ...(share != null ? { share } : {}) });
       Object.assign(point, { x: best.x, y: best.y, id: best.id, room: best.room || 0 });
       if (best.afloat) point.afloat = true;
       else delete point.afloat;

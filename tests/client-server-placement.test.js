@@ -29,7 +29,7 @@ import { streetGardenBeds } from '../public/js/garden.js?v=fefa7bcd';
 import { isZoneTsid } from '../public/js/zone-streets.js?v=b40010d5';
 import { partySpaceForStreet } from '../public/js/party-spaces.js?v=4e1ca2a5';
 import { setWildlifeCatalog } from '../public/js/wildlife.js?v=670c3a7f';
-import { arrivalsFor, defaultArrival } from '../public/js/street-arrival.js?v=ee7223c5';
+import { arrivalsFor, defaultArrival } from '../public/js/street-arrival.js?v=c7294edc';
 import { streetQuoinLayout } from '../tools/build-realtime-quoins.mjs';
 import { serverPath, skipWithoutServer } from '../tools/repos.mjs';
 

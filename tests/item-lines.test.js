@@ -23,7 +23,7 @@ import {
   resolveGround,
   streetWidth,
 } from '../public/js/street-model.js?v=a9a05f9d';
-import { buildPlatformCandidates, planStreetPlacements } from '../public/js/street-ecology.js?v=f1c11a2d';
+import { buildPlatformCandidates, planStreetPlacements } from '../public/js/street-ecology.js?v=8f50537c';
 import { landingY, nearestSurfaceY, walkSurfaceY } from '../public/js/walk-surface.js?v=f21ce37b';
 import { parseLocationEvents, runLocationEvent, createEventRuntime } from '../public/js/location-events.js?v=48938c8f';
 import { convertLocationXml } from '../public/js/location-xml.js?v=32377f99';

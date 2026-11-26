@@ -747,7 +747,7 @@ import {
   ensureStreetIndex,
   resolveIndexTsid,
 } from './js/street-loader.js?v=10376267';
-import { showDraftBanner, startDraftPlay } from './js/builder/draft-play.js?v=ea1bc8cd';
+import { showDraftBanner, startDraftPlay } from './js/builder/draft-play.js?v=46e5c40e';
 import { bootHouseFile } from './js/house-file-loader.js?v=a045a795';
 import {
   ladderTopDeck,
@@ -767,7 +767,7 @@ import {
   stuckWay,
 } from './js/street-model.js?v=a9a05f9d';
 import { climberAtLadderTop, ladderTopSignpostFor, walkUpSignpostStreet } from './js/ladder-top-signposts.js?v=0192e447';
-import { STUCK_ARRIVAL_WAYS, defaultArrival, groundAt, loadStreetArrivals, stuckArrivalSpot } from './js/street-arrival.js?v=ee7223c5';
+import { STUCK_ARRIVAL_WAYS, defaultArrival, groundAt, loadStreetArrivals, stuckArrivalSpot } from './js/street-arrival.js?v=c7294edc';
 import {
   buildStreetView,
   glitchLayerMatrix,
