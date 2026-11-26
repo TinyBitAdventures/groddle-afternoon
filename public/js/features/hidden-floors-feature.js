@@ -22,7 +22,7 @@
  *   Yellow Yawning's right end back to Shim Shiri (js/collision-teleporters.js, G681, with the
  *   census of every street's Collision-triggered Teleporters), and the Vortex of Random's back
  *   doors there: Ain't That Dry and Chiti Tiga to each other, Harrisa Hara to Snowed In and back
- *   (reports #707, #708).
+ *   (reports #707, #708), and Koulato Cluster's hidden-ladder wormhole to Ruta Asuncion (#710).
  * - The painted "EXIT" on both floors: the forgotten floor's archived
  *   sign_txt and, on the lost floor, the word read off the footage.
  * - Goorsh Gam's canopy and Ilmenskie's cave mouth: there the avatar walks
@@ -41,7 +41,8 @@
  *   street that has it (goorsh_to_lost, lost_to_goorsh, odena_to_forgotten,
  *   forgotten_to_odena, ilmenskie_to_missing, missing_to_ilmenskie,
  *   level3west_pit_left, level3west_pit_right, aint_that_dry_to_chiti_tiga,
- *   chiti_tiga_to_aint_that_dry, harrisa_hara_to_snowed_in, snowed_in_to_harrisa_hara). Canvas
+ *   chiti_tiga_to_aint_that_dry, harrisa_hara_to_snowed_in, snowed_in_to_harrisa_hara,
+ *   koulato_cluster_to_ruta_asuncion). Canvas
  *   data: hiddenFloorBoxes, hiddenFloorSign, hiddenFloorLast,
  *   hiddenFloorTeleports, hiddenFloorFeet (feet height over the street's
  *   lowest box bottom, for jump QA), hiddenFloorCanopy (client physics on),
@@ -70,7 +71,7 @@ import { narakaTeleportersOn } from '../hell.js?v=d77f15ef';
 import { wintryPortalTeleportersOn } from '../wintry-portal.js?v=1437deda';
 import { cavePitTeleportersOn } from '../cave-pit.js?v=81e62950';
 import { seamTeleportersOn } from '../seam-teleporters.js?v=09d11340';
-import { WIRED_TELEPORTERS, collisionTeleportersOn } from '../collision-teleporters.js?v=fe8ad3a2';
+import { WIRED_TELEPORTERS, collisionTeleportersOn } from '../collision-teleporters.js?v=73c97f41';
 import { WORLD_FONT_FAMILY } from '../world-text.js?v=6b49f88c';
 
 export const HIDDEN_FLOORS_FEATURE_ID = 'hidden-floors';

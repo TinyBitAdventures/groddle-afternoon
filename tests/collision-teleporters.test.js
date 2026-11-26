@@ -8,7 +8,7 @@ import { describe, it } from 'node:test';
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { AINT_THAT_DRY_TSID, CHITI_TIGA_TSID, HARRISA_HARA_TSID, SHIM_SHIRI_TSID, SNOWED_IN_TSID, TELEPORTER_CENSUS, WIRED_TELEPORTERS, YELLOW_YAWNING_TSID, collisionTeleportersOn } from '../public/js/collision-teleporters.js?v=fe8ad3a2';
+import { AINT_THAT_DRY_TSID, CHITI_TIGA_TSID, HARRISA_HARA_TSID, SHIM_SHIRI_TSID, SNOWED_IN_TSID, TELEPORTER_CENSUS, WIRED_TELEPORTERS, YELLOW_YAWNING_TSID, collisionTeleportersOn } from '../public/js/collision-teleporters.js?v=73c97f41';
 import { SNOWED_IN_TSID as REBUILT_SNOWED_IN_TSID } from '../public/js/rebuilt-rooms.js?v=5ef5618f';
 import { reachStreet } from '../public/js/builder/reach-graph.js?v=467ca20f';
 import { inTeleporter } from '../public/js/hidden-floors.js?v=18714dfa';
@@ -48,7 +48,7 @@ describe('G681: every Collision-triggered Teleporter is accounted for', () => {
       if (r.state === 'here') assert.ok(collisionTeleportersOn(r.tsid).length, `${r.label} wired here`);
     }
     const by = (state) => TELEPORTER_CENSUS.filter((r) => r.state === state).length;
-    assert.deepEqual([by('wired'), by('stand-in'), by('here'), by('inert')], [19, 3, 4, 9]);
+    assert.deepEqual([by('wired'), by('stand-in'), by('here'), by('inert')], [19, 3, 5, 8]);
   });
 
   it('no inert one sits on a street a plain jump can get stuck on', () => {

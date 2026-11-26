@@ -6217,6 +6217,23 @@
     "G620",
     "G681"
    ]
+  },
+  {
+   "id": "koulato-wormhole-landing",
+   "title": "Koulato Cluster's wormhole to Ruta Asuncion: the box at the hidden ladder's top and the landing at Ruta Asuncion's entrance",
+   "kind": "placement",
+   "status": "kept",
+   "where": [
+    {
+     "file": "public/js/collision-teleporters.js",
+     "symbol": "WIRED_TELEPORTERS"
+    }
+   ],
+   "why": "Glitch had this wormhole (LIF10RP1DBU11NU.xml lists Collision-triggered Teleporter IA9AM2L1AN42QFA; the glitch forum, 2012: climb the hidden ladder behind the pillar, jump to the right, sent to Ruta Asuncion; Glitch Strategy Quick Tip #16) but its instanceProps were never archived. Ours: the box (world x -1820..-1640, y -845..-1200, the foot of the steep slope right of the ladder top, where a jump to the right lands) and the landing (Ruta Asuncion world 1100, -195, the ground-floor arrival its Baby Steppes and Guillermo Gamera Way posts already use).",
+   "ruling": "Austin 2026-11-26 (report #710): wire it to Ruta Asuncion; Glitch's landing spot was not archived, so land players at Ruta Asuncion's entrance and mark the landing as ours",
+   "rows": [
+    "G681"
+   ]
   }
  ]
 }

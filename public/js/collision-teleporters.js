@@ -61,6 +61,25 @@ export const HARRISA_HARA_TSID = 'GA957DNLVGN2F0S';
 /** Snowed In (js/rebuilt-rooms.js SNOWED_IN_TSID; kept literal so this file stays pure data). */
 export const SNOWED_IN_TSID = 'GA9RLGSQ05F3Q69';
 
+/**
+ * Koulato Cluster's wormhole to Ruta Asuncion (report #710; register G681). The street's file lists
+ * one Collision-triggered Teleporter (LIF10RP1DBU11NU.xml 1120: IA9AM2L1AN42QFA). Players told the
+ * way in (glitch forum, research/community/raw/glitch-forum/threads.jsonl 740 and 812, 2012): "go
+ * behind the pillar closest to the street sign and press up to climb a hidden ladder, once you stop
+ * climbing jump to the right, you will then be sent to Ruta Asuncion"; Glitch Strategy Quick Tip #16
+ * (community/raw/glitch-strategy/2012_04_wormhole-strategy.html): "Behind the support beam, up the
+ * ladder, to the right". The hidden ladder is ladder_1308363631935 (world x -1850, top -844); its top
+ * holds a short ledge (plat_1308363631937) and a steep slope rising right from it
+ * (plat_1308363631936, to world -1387, -1483) that nothing else reaches. One way: the forum calls
+ * it a one-way portal, and nothing on record leads back.
+ * Ours: the box and the landing. The box covers the slope's foot right of the ladder top, where a
+ * jump to the right (or a walk) from the top carries the feet, and leaves the ladder itself and
+ * its top clear. Glitch's landing was never archived, so the wormhole puts you at Ruta Asuncion's
+ * entrance: the ground-floor arrival its Baby Steppes and Guillermo Gamera Way posts already use.
+ */
+export const KOULATO_CLUSTER_TSID = 'GIF10RP1DBU11NU';
+export const RUTA_ASUNCION_TSID = 'GM410TMR0S2S1';
+
 // Screen space (street x + 3000, y + 1000), bottom-centre: the passage floor (plat_1351189425427,
 // y -448..-444) from x 2860 to the street's end, up to its ceiling (plat_1351202243944, y -605).
 export const WIRED_TELEPORTERS = Object.freeze([
@@ -124,6 +143,20 @@ export const WIRED_TELEPORTERS = Object.freeze([
     arrive: Object.freeze({ x: 5648, y: 483 }),
     why: 'Ours: the way back the pair implies, from Snowed In\'s beam to the step beside Harrisa Hara\'s beam.',
   }),
+  // Koulato Cluster screen space is world + (2500, 1500): the ladder top stands at (650, 652), the
+  // slope runs from (673, 651) up to (1113, 17). Box: world x -1820..-1640, y -845..-1200.
+  Object.freeze({
+    id: 'koulato_cluster_to_ruta_asuncion',
+    objref: 'IA9AM2L1AN42QFA',
+    from: KOULATO_CLUSTER_TSID,
+    to: RUTA_ASUNCION_TSID,
+    label: 'Ruta Asuncion',
+    box: Object.freeze({ x: 770, y: 655, w: 180, h: 355 }),
+    // Ruta Asuncion world (1100, -195): the ground floor by its Baby Steppes post, where that post's
+    // and Guillermo Gamera Way's links put you (Ruta Asuncion screen space, world + (1500, 3000)).
+    arrive: Object.freeze({ x: 2600, y: 2805 }),
+    why: 'The hidden ladder\'s top, jump to the right, to Ruta Asuncion (glitch forum 2012; Glitch Strategy Quick Tip #16).',
+  }),
 ]);
 
 const sameTsid = (a, b) => String(a || '').slice(1) === String(b || '').slice(1);
@@ -166,14 +199,14 @@ export const TELEPORTER_CENSUS = Object.freeze([
   row(HARRISA_HARA_TSID, 'Harrisa Hara', 1, 'here', 'WIRED_TELEPORTERS: the ledge top beam into Snowed In (snap 265988, 2012-12-09); back from Snowed In is ours'),
   row(AINT_THAT_DRY_TSID, "Ain't That Dry", 1, 'here', 'WIRED_TELEPORTERS: the left end beam to Chiti Tiga (footage u93BSqMeF9E 3119-3143 s)'),
   row(CHITI_TIGA_TSID, 'Chiti Tiga', 1, 'here', 'WIRED_TELEPORTERS: the ledge top beam to Ain\'t That Dry (the Glitchen wiki\'s Folivoria page)'),
+  row(KOULATO_CLUSTER_TSID, 'Koulato Cluster', 1, 'here', 'WIRED_TELEPORTERS: the hidden ladder\'s top, jump right, to Ruta Asuncion (glitch forum 2012, Quick Tip #16); the landing is ours'),
   // Inert: target lost, nothing traps.
   row('GA54AT4AK613NBL', 'Facta Verba', 1, 'inert', 'no walls, every arrival reaches all three posts; target lost'),
   row('GA5S44RM9OE2416', 'Valuka Himsa', 1, 'inert', 'no walls, both posts reached; the one floor no one reaches is a 96 px rock island over the middle (plat_1330395190073), likely where it went, but from where is lost'),
   row('GCR144H8APK1OJS', 'Buckward Vale', 1, 'inert', 'its two walls hang from the ceiling over the floor (x 1045, 1136, y -996..-813), both posts reached; target lost'),
-  row('GIF10RP1DBU11NU', 'Koulato Cluster', 1, 'inert', 'the post reached from its arrival; with the firefly jar script and its three lost boxes, target lost'),
   row('GLI104NPBDC1DC2', 'Market St', 1, 'inert', 'Old Groddle Forest: every connect hidden, nothing arrives'),
   row('GM113VSD6922MRJ', 'Tharon Spelunk', 1, 'inert', 'its walls are open (pc_perm 0) or low, all three posts reached; target lost'),
-  row('GM410TMR0S2S1', 'Ruta Asuncion', 1, 'inert', 'all four exits reached (two posts, two doors to itself); target lost'),
+  row(RUTA_ASUNCION_TSID, 'Ruta Asuncion', 1, 'inert', 'all four exits reached (two posts, two doors to itself); target lost (Koulato Cluster\'s wormhole lands here, one way)'),
   row('GM4109NI2R640', 'Guillermo Gamera Way', 1, 'inert', 'the race street (js/races.js); all exits reached; target lost'),
   row('GTJ11TPQUMO197U', 'Mucid Memes', 1, 'inert', 'no walls, both posts reached; target lost'),
 ]);

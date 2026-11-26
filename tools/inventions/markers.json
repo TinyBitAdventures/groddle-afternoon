@@ -256,6 +256,7 @@
   },
   "public/js/collision-teleporters.js": {
     "ours: * Ours: the Snowed In to Harrisa Hara leg (the pair's": "vortex-back-door-teleporters",
+    "ours: * Ours: the box and the landing. The box covers the": "koulato-wormhole-landing",
     "stand-in: 'The Great Hole to Ix', 1, 'stand-in', 'the hole between its one-way walls (x -2752,": "teleporter-stand-ins",
     "stand-in: * - 'stand-in': a signpost the source left beside it carries": "teleporter-stand-ins",
     "stand-in: 3 West', 1, 'wired', 'js/cave-pit.js: our own stand-in, each end of the pit back up": "teleporter-stand-ins",
