@@ -2814,9 +2814,19 @@
   "deployed": "2026-11-25"
  },
  "git": {
-  "commits": 3628,
+  "commits": 3633,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-25",
+    "kind": "fix",
+    "text": "The glow around a vendor stays on their body through every animation"
+   },
+   {
+    "date": "2026-11-25",
+    "kind": "fix",
+    "text": "The world no longer blinks out or goes blank after you walk up to or point at your house"
+   },
    {
     "date": "2026-11-25",
     "kind": "fix",
@@ -2926,16 +2936,6 @@
     "date": "2026-11-25",
     "kind": "new",
     "text": "A finished Group Hall's lot stays on its street with \"<group>'s Group Hall\" over the sign"
-   },
-   {
-    "date": "2026-11-25",
-    "kind": "new",
-    "text": "Menu > Groups names the Group Hall a group owns, by its street"
-   },
-   {
-    "date": "2026-11-25",
-    "kind": "fix",
-    "text": "One click or tap on a garden plot does its job, as in Glitch; planting still asks which seeds"
    }
   ]
  },

@@ -1,6 +1,6 @@
 {
   "note": "Written by tools/gaps/build-data.mjs from tools/gaps/public-gaps.json and the coverage register. Edit those, never this file.",
-  "release": "v0.73.0",
+  "release": "v0.73.1",
   "states": {
     "fixing": {
       "label": "Being fixed",
@@ -41,8 +41,8 @@
   "counts": {
     "fixing": 3,
     "known": 15,
-    "unreleased": 2,
-    "fixed": 589,
+    "unreleased": 0,
+    "fixed": 591,
     "lost": 5,
     "purpose": 18,
     "idea": 10
@@ -1054,11 +1054,6 @@
           "state": "known"
         },
         {
-          "id": "F127",
-          "text": "Walking up to or pointing at your house could blank out the world, on every street, until a reload.",
-          "state": "unreleased"
-        },
-        {
           "id": "G640",
           "text": "Visitors see the owner's Garden Gnomes, Magic Sticks and animal machines on a home street.",
           "state": "fixed",
@@ -1412,6 +1407,12 @@
           "text": "Things on shelves stood at the very back of the shelf.",
           "state": "fixed",
           "version": "v0.73.0"
+        },
+        {
+          "id": "F127",
+          "text": "Walking up to or pointing at your house could blank out the world, on every street, until a reload.",
+          "state": "fixed",
+          "version": "v0.73.1"
         },
         {
           "id": "G48",
@@ -2894,11 +2895,6 @@
       "name": "Vendors",
       "items": [
         {
-          "id": "F128",
-          "text": "The glow around Helga sat off her body during some animations.",
-          "state": "unreleased"
-        },
-        {
           "id": "F69",
           "text": "A vendor's shelf jumped back to the top after each sale.",
           "report": 288,
@@ -2941,6 +2937,12 @@
           "text": "The lonely Firebog spirit's porthole face stood still.",
           "state": "fixed",
           "version": "v0.70.0"
+        },
+        {
+          "id": "F128",
+          "text": "The glow around Helga sat off her body during some animations.",
+          "state": "fixed",
+          "version": "v0.73.1"
         }
       ]
     },
