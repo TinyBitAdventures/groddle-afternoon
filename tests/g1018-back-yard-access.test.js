@@ -278,8 +278,8 @@ describe('in the house, a guest gets the back yard and acts on it as "b:"; the o
     const token = sign({ k: 'house_in', sub: 9, o: 7, exp: now + 600 });
     rememberInside(7, token);
     try {
-      const { yardVerbsMpFeature } = await import('../public/js/features/yard-verbs-mp-feature.js?v=944f5df0');
-      const { homesFeature } = await import('../public/js/features/homes-feature.js?v=b89989d4');
+      const { yardVerbsMpFeature } = await import('../public/js/features/yard-verbs-mp-feature.js?v=3751adc0');
+      const { homesFeature } = await import('../public/js/features/homes-feature.js?v=e875a7e2');
       yardVerbsMpFeature.onTick(16, 1, engine);
       for (let i = 0; i < 40 && !globalThis.groddleYard?.visit; i += 1) await new Promise((r) => setTimeout(r, 5));
       const yard = globalThis.groddleYard;

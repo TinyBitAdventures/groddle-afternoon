@@ -132,12 +132,13 @@ describe('the deco catalog (tools/builder/deco-catalog.mjs, assets/content/deco-
     const placed = cat.decos.filter((d) => !d.neverPlaced);
     // The Interrogation room (G352) is the first street to place bureaucratic_hall_waitingroom_1: 138 before.
     // G962: Mental Block's striped end door is placed by its room's code, not by a street, so it joins the never-placed list.
-    assert.equal(cat.decos.length - placed.length, 138, 'spec 2.4: 138 library decos never placed (the Enchanted Forest door is a door sprite)');
+    // G1312: the Group Hall street's ladder is the first to place the basicWood ladder tiles (136 since).
+    assert.equal(cat.decos.length - placed.length, 136, 'spec 2.4: 136 library decos never placed (the Enchanted Forest door is a door sprite)');
     assert.ok(placed.every((d) => Object.keys(d.layers).length > 0 && d.drawn && d.streets > 0));
     assert.ok(cat.decos.every((d) => Object.keys(d.layers).every((r) => LAYER_ROLES.includes(r))));
     assert.ok(cat.decos.every((d) => Array.isArray(d.size2) && d.size2.length === 2));
     const total = cat.decos.reduce((n, d) => n + d.placements, 0);
-    assert.ok(total > 550000 && total <= 557518, `placements ${total}`); // + 1,371 on the 15 tower floors (G144), + 28 on Winter Walk (round 5), + the Quarter's block (G1186), + unnnn's frame, + 204 on Archimedes Acres's Group Hall (G1312: Fanfoot Flare's decos and the hut)
+    assert.ok(total > 550000 && total <= 557525, `placements ${total}`); // + 1,371 on the 15 tower floors (G144), + 28 on Winter Walk (round 5), + the Quarter's block (G1186), + unnnn's frame, + 211 on Archimedes Acres's Group Hall (G1312: Fanfoot Flare's decos, the hut and its ladder's 7 tiles)
     const bush = cat.decos.find((d) => d.name === 'bush_3');
     assert.equal(bush.family, 'bush');
     assert.equal(bush.source, 'groddle1.swf#bush_3');

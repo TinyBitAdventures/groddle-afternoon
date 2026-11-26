@@ -34,8 +34,8 @@
  *   hills, banks and plants as they are; its hidden box left out.
  * - The Community Machine Room's exterior (community_machine_room_ext, its arched door drawn in),
  *   with the walkable roof Tiny Speck gave it on Middle Valley Clearing (GLI23FELDHD1O3C: the roof
- *   line 210 px left and 152 px right of the hut's middle, 353 px up), and a wooden ladder
- *   (ladder_tile_*_basicWood).
+ *   line 210 px left and 152 px right of the hut's middle, 353 px up), and a wooden ladder drawn
+ *   with placed decos (groddle_ladder_tile_*_basicWood, Groddle Ladder's tiles).
  *
  * Ours (inventions: group-hall-street-layout):
  * - The template street, where the hut stands on it (the middle tier's flattest run), the ladder on
@@ -88,12 +88,28 @@ export const HALL_LAYOUT = Object.freeze({
   ladder: Object.freeze({ dx: 185, w: 50, h: 350 }),
 });
 
-/** The wood ladder's tiles (as Archimedes Acres's neighbour streets draw theirs). */
-const LADDER_TILING = Object.freeze({
-  cap_0: { sprite: 'ladder_tile_center_00_basicWood', w: 60, h: 50 },
-  cap_1: { sprite: 'ladder_tile_cap_1_basicWood', w: 60, h: 50 },
-  centers: [{ sprite: 'ladder_tile_center_00_basicWood', w: 60, h: 50 }],
-});
+/**
+ * The wood ladder's art: placed middleground decos, as Tiny Speck drew the ladders of streets laid by
+ * hand (Vicar's Peak's tree ladders, the basement rooms' interior ones); a ladder `tiling` is only
+ * what the location XML gave nine ladders. The shipped basicWood tiles (Groddle Ladder's), 60 x 50:
+ * the foot cap, then a rung tile every 50 px up to the top.
+ */
+const LADDER_ART = Object.freeze({ foot: 'groddle_ladder_tile_cap_1_basicWood', rung: 'groddle_ladder_tile_center_00_basicWood', w: 60, h: 50 });
+
+/** The ladder's decos, foot first (x centre, y the tile's bottom), above `z`. */
+export function ladderDecos(ladder, z) {
+  const n = Math.floor(ladder.h / LADDER_ART.h);
+  return Array.from({ length: n }, (_, i) => ({
+    sprite: i === 0 ? LADDER_ART.foot : LADDER_ART.rung,
+    id: `deco_group_hall_ladder_${i}`,
+    x: ladder.x,
+    y: ladder.y - i * LADDER_ART.h,
+    w: LADDER_ART.w,
+    h: LADDER_ART.h,
+    z: z + i,
+    r: 0,
+  }));
+}
 
 export const HALL_STREET_TEXT = Object.freeze({
   /** inc_houses.js:500 (its <b> left out). */
@@ -201,8 +217,10 @@ export function groupHallStreet(template, jobId, { lotArrive }) {
     ...mg.decos.map((d) => (d.z >= z ? { ...d, z: d.z + 1 } : d)),
     { ...p.hut, id: 'deco_group_hall_hut', z, r: 0 },
   ];
+  // The ladder in front of the hut and the plants, as a tiling drew it (above every middleground deco).
+  mg.decos.push(...ladderDecos(p.ladder, 1 + Math.max(...mg.decos.map((d) => d.z))));
   platforms.push(p.roof);
-  const ladders = [{ ...p.ladder, tiling: { ...clone(LADDER_TILING), pattern: [] } }];
+  const ladders = [{ ...p.ladder }];
   const sign = template.signposts.find((s) => s.id === HALL_LAYOUT.signId);
   if (!sign) throw new Error(`${template.label} has no ${HALL_LAYOUT.signId}`);
   const signposts = [{

@@ -184,7 +184,7 @@ Counted 2026-10-30:
 | With an SVG sharp copy | 992 | `public/js/deco-sharp-list.js` |
 | Animated (frame strips) | 60 | `public/assets/decos/animated/*.json` |
 | Distinct sprites placed on shipped streets | 2,891 (555,837 placements) | street scan |
-| Library decos never placed | 138 (door_asset_woodtreedoor_01a_et1 is drawn as the Enchanted Forests' door, not placed as a deco) | street scan |
+| Library decos never placed | 136 (door_asset_woodtreedoor_01a_et1 is drawn as the Enchanted Forests' door, not placed as a deco; the Group Hall street places the basicWood ladder tiles) | street scan |
 | Placed names with no file | 38 | street scan; `street-render.js:1522-1529` draws placeholders for some |
 | Sprites on one street only | 855 (median: 3 streets; p90: 49) | street scan |
 | SWF bundles (art sets) | 41 (groddle1 487, firebog 373, leavens1 373, zutto1 366, ...) | `tools/deco-pipeline/plan.json` |

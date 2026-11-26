@@ -113,7 +113,7 @@ import {
   quarterSignpost,
   quarterStreet,
 } from '../public/js/quarter.js?v=6eb35ef4';
-import { ARCHIMEDES_HALL, HALL_LAYOUT, HALL_TEMPLATE_TSID, groupHallIndexEntry, groupHallStreet } from '../public/js/group-hall-street.js?v=a7571bc1';
+import { ARCHIMEDES_HALL, HALL_LAYOUT, HALL_TEMPLATE_TSID, groupHallIndexEntry, groupHallStreet } from '../public/js/group-hall-street.js?v=fa1921ad';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const streetsDir = join(root, 'public/assets/streets');

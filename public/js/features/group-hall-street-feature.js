@@ -22,7 +22,7 @@
  * refused:<why> | out:<job> | lot:<job>).
  */
 
-import { HALL_STREET_JOBS, HALL_STREET_TEXT, hallEntry, hallLabel, hallStreetEcology, hallStreetJob, hallStreetOf } from '../group-hall-street.js?v=a7571bc1';
+import { HALL_STREET_JOBS, HALL_STREET_TEXT, hallEntry, hallLabel, hallStreetEcology, hallStreetJob, hallStreetOf } from '../group-hall-street.js?v=fa1921ad';
 
 export const GROUP_HALL_STREET_FEATURE_ID = 'group-hall-street';
 
