@@ -9,8 +9,8 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { SCENE_DOOR_CLASSES, doorMarks, sceneDoorMarks, stationMarks, tipFor, markHasMenu } from '../public/js/ui/street-minimap.js?v=faab86a5';
-import { phoneSignRows } from '../public/js/features/street-minimap-feature.js?v=2162b984';
+import { SCENE_DOOR_CLASSES, doorMarks, sceneDoorMarks, stationMarks, tipFor, markHasMenu } from '../public/js/ui/street-minimap.js?v=9eabe65f';
+import { phoneSignRows } from '../public/js/features/street-minimap-feature.js?v=5f0a5397';
 import { subwayFeature } from '../public/js/features/subway-feature.js?v=50d6e916';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -41,8 +41,8 @@ describe('doors out on the street map (G1232, #645)', () => {
       { id: 'e', x: 90, y: 20, destinations: [{ tsid: 'X' }] },
     ] });
     assert.deepEqual(marks, [
-      { kind: 'door', id: 'door:a', x: 10, y: 20, tip: 'Out' },
-      { kind: 'door', id: 'door:e', x: 90, y: 20, tip: null },
+      { kind: 'door', id: 'door:a', look: 'door', x: 10, y: 20, tip: 'Out' },
+      { kind: 'door', id: 'door:e', look: 'door', x: 90, y: 20, tip: null },
     ]);
     assert.deepEqual(doorMarks({}), []);
   });
@@ -53,7 +53,7 @@ describe('doors out on the street map (G1232, #645)', () => {
       { classId: 'bureaucratic_hall_exit', label: 'Gregarious Grange', sprite: { x: 72.4, y: 572 } },
       { classId: 'npc_bureaucrat', label: 'Assistant', sprite: { x: 1700, y: 538 } },
     ]);
-    assert.deepEqual(marks, [{ kind: 'door', id: 'scene:door:bureaucratic_hall_exit:0', x: 72, y: 572, tip: 'Gregarious Grange' }]);
+    assert.deepEqual(marks, [{ kind: 'door', id: 'scene:door:bureaucratic_hall_exit:0', look: 'door', x: 72, y: 572, tip: 'Gregarious Grange' }]);
     const feature = read('public/js/features/street-minimap-feature.js');
     assert.match(feature, /const marks = \[\.\.\.sceneSignMarks\(engine\.interactables \|\| \[\]\), \.\.\.sceneDoorMarks\(engine\.interactables \|\| \[\]\)\];/);
   });

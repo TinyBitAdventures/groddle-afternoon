@@ -5129,7 +5129,7 @@
    "where": [
     {
      "file": "public/js/ui/street-minimap.js",
-     "symbol": "doorMarks sceneDoorMarks SCENE_DOOR_CLASSES DOOR_SVG"
+     "symbol": "doorMarks sceneDoorMarks SCENE_DOOR_CLASSES"
     },
     {
      "file": "public/js/features/street-minimap-feature.js",
@@ -5142,6 +5142,30 @@
    ],
    "why": "Glitch's minimap showed only signposts (MiniMapView.as maybeAddSignpost); a player asked for the Bureaucratic Hall's way out and every door on the map, as the subway entrances have (#645).",
    "ruling": "Austin 2026-11-24 (G1232): yes, as with the subway buttons, unless the door is meant to be hidden",
+   "rows": [
+    "G1232"
+   ]
+  },
+  {
+   "id": "minimap-door-kind-icons",
+   "title": "The street map's door buttons show what kind of way out each is: a dinosaur's mouth (door_dino_01), a portal (the teleport dialog's teleporter) or a plain door (furniture_door), each Tiny Speck's CC0 art scaled down, the kind read off the door's own art (#645).",
+   "kind": "UI",
+   "status": "kept",
+   "where": [
+    {
+     "file": "public/js/ui/street-minimap.js",
+     "symbol": "DOOR_LOOKS doorLook DOOR_ART doorArtName withDoorArt"
+    },
+    {
+     "file": "public/js/features/street-minimap-feature.js",
+     "symbol": "phoneSignRows phoneOpen"
+    },
+    {
+     "file": "tools/build-minimap-door-icons.py"
+    }
+   ],
+   "why": "Glitch's street map had no door buttons (MiniMapView.as maybeAddSignpost), so it had no icons for them; the first door buttons (G1232) all used one drawn door. The icons are ours as icons but not drawn: each is Tiny Speck's own art, cropped and scaled.",
+   "ruling": "Austin 2026-11-26 (#645): each kind of entrance gets its own icon, dino door, portal and plain door, made from Tiny Speck's CC0 art; picks shown on a contact sheet",
    "rows": [
     "G1232"
    ]

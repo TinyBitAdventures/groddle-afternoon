@@ -110,7 +110,7 @@ describe('SHARP MARKS: the street map\'s signposts and subway icons stay sharp w
 
   it('the phone sheet\'s map and rows and the Modern card use the traces; Classic only from 2x', () => {
     const open = feature.slice(feature.indexOf('function phoneOpen(engine)'), feature.indexOf('function phoneClose('));
-    assert.match(open, /markArt\(row\.kind === 'station' \? 'map_icon_subway' : 'teensy_signpost', \{ artUrl: classicArtUrl, artHd: classicArtHd, crisp: true \}\)/, 'the rows\' icons');
+    assert.match(open, /markArt\(row\.kind === 'door' \? doorArtName\(row\.look\) : row\.kind === 'station' \? 'map_icon_subway' : 'teensy_signpost', withDoorArt\(\{ artUrl: classicArtUrl, artHd: classicArtHd, crisp: true \}\)\)/, 'the rows\' icons');
     assert.match(open, /createStreetMinimap\(doc, mapBox, \{\s+artUrl: classicArtUrl,\s+artHd: classicArtHd,\s+crisp: \(\) => true,/, 'the sheet\'s map');
     const init = feature.slice(feature.indexOf('view = createStreetMinimap(document, host, {'));
     assert.match(init, /artHd: classicArtHd,\s+crisp: \(\) => document\.documentElement\.dataset\.ui !== 'classic',/, 'the corner card');

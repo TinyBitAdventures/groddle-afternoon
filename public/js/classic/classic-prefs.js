@@ -26,7 +26,7 @@ import { CLASSIC_MIN_W, CLASSIC_MIN_H } from './classic-layout.js?v=aa61f5c1';
 import { installClassicChrome } from './classic-chrome.js?v=59cfb15a';
 import { ZOOM_KEYS_HINT, clampZoom, onZoomChange, setWorldZoom, worldZoom, zoomLabel, zoomValueText } from '../world-zoom.js?v=38816228';
 import { NIGHT_TINT_HINT, NIGHT_TINT_LABEL, nightTintOn, onNightTintChange, setNightTint } from '../night-tint.js?v=1dfc9c89';
-import { STREET_MAP_HINT, STREET_MAP_LABEL, onStreetMapChange, setStreetMap, streetMapOn } from '../ui/street-minimap.js?v=faab86a5';
+import { STREET_MAP_HINT, STREET_MAP_LABEL, onStreetMapChange, setStreetMap, streetMapOn } from '../ui/street-minimap.js?v=9eabe65f';
 import { BACKGROUND_SOUND_HINT, BACKGROUND_SOUND_LABEL, backgroundSoundOn, onBackgroundSoundChange, setBackgroundSound } from '../background-sound.js?v=d40d26b7';
 import { focusBack } from '../ui/focus-return.js?v=da190597';
 

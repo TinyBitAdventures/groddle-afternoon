@@ -14847,7 +14847,7 @@ body:has(#quest-dialogue:not([hidden])) .prompt-stack { z-index: calc(var(--z-mo
 .street-minimap .smm-sign.smm-station img { object-fit: contain; }
 /* G1232 (#645): a door out, sized as a subway entrance (the remake's own). */
 .street-minimap .smm-sign.smm-door { width: calc(12px * var(--mm-u)); height: calc(12px * var(--mm-u)); }
-.street-minimap .smm-sign.smm-door svg { display: block; width: 100%; height: 100%; }
+.street-minimap .smm-sign.smm-door img { object-fit: contain; }
 .street-minimap .smm-sign:hover,
 .street-minimap .smm-sign:focus-visible { outline: none; filter: drop-shadow(0 0 1px var(--minimap-sign-hover)) drop-shadow(0 0 1px var(--minimap-sign-hover)) drop-shadow(0 0 1px var(--minimap-sign-hover)); }
 /* A dot: the circle and its 2 px ring (Flash strokes straddle the edge: the fill shows r - 1). */
@@ -15020,7 +15020,8 @@ body:has(#quest-dialogue:not([hidden])) .prompt-stack { z-index: calc(var(--z-mo
 }
 .smm-sheet-sign img { flex: none; width: 14px; height: 21px; }
 .smm-sheet-sign[data-kind="station"] img { object-fit: contain; }
-.smm-sheet-sign[data-kind="door"] svg { flex: none; width: 14px; height: 14px; }
+/* #645: a door's icon (a dinosaur's mouth, a portal or a door) is square: 21 px, its text in line with the posts'. */
+.smm-sheet-sign[data-kind="door"] img { width: 21px; height: 21px; margin: 0 -3.5px; object-fit: contain; }
 .smm-sheet-sign span { flex: 1 1 auto; min-width: 0; }
 /* #534: the way each stands from you, live, in eight directions: left-hand ways before the name, the rest after.
    One arrow glyph turned, so the diagonals match the straight ones (a font's own diagonal arrows draw heavier). */

@@ -281,9 +281,50 @@ export function stationMarks(street) {
 }
 
 /**
+ * The kinds of way out a door mark's icon tells apart (#645, Austin 2026-11-26): a dinosaur's mouth, a
+ * portal, and a plain door.
+ */
+export const DOOR_LOOKS = Object.freeze(['dino', 'portal', 'door']);
+
+/**
+ * PURE (#645): which kind of way out a door is, read off the art the street draws it with (its `sprite`,
+ * Tiny Speck's own class name), so a new door needs no list: door_dino_* is a dinosaur's mouth
+ * (Teobocci Shasha, Cinnabar Chibe and four more); a glowing orb, portal or teleporter is a portal
+ * (glowing_orb_dull, Ethereal Endeavour's way to Doonboggle Trail); anything else (a door, stairs, a
+ * hole, a scene's own way out) is a door.
+ */
+export function doorLook(sprite) {
+  const s = String(sprite || '');
+  if (/^door_dino_/.test(s)) return 'dino';
+  if (/(?:^|_)(?:glowing_orb|portal|teleporter)(?:_|$)/i.test(s)) return 'portal';
+  return 'door';
+}
+
+/**
+ * #645 (Austin 2026-11-26): the door marks' icons, one per DOOR_LOOKS kind. Ours: Glitch's street map
+ * had no door marks, so it had no icon for one; each is Tiny Speck's CC0 art scaled down by
+ * tools/build-minimap-door-icons.py, nothing drawn: door_dino_01 (the blue dinosaur entrance), the
+ * client's teleport dialog teleporter (familiar_dialog_teleport) and the house's wooden door
+ * (furniture_door). `one` is the card's 12 px, `hd` 96 px for a scaled-up map or a high-DPI screen
+ * (markArt).
+ */
+export const DOOR_ART = Object.freeze(Object.fromEntries(DOOR_LOOKS.map((look) => [`door_look_${look}`, Object.freeze({
+  one: `assets/ui/minimap/door_look_${look}.webp`,
+  hd: `assets/ui/minimap/door_look_${look}_hd.webp`,
+})])));
+
+/** A door mark's art name in DOOR_ART (a plain door for an unknown look). */
+export const doorArtName = (look) => `door_look_${DOOR_LOOKS.includes(look) ? look : 'door'}`;
+
+/** The art lookups markArt takes, with the door icons ahead of `artUrl` / `artHd` (the classic art). */
+export function withDoorArt({ artUrl = () => '', artHd = () => null, crisp = true } = {}) {
+  return { artUrl: (name) => DOOR_ART[name]?.one || artUrl(name), artHd: (name) => DOOR_ART[name]?.hd || artHd(name), crisp };
+}
+
+/**
  * PURE (G1232, #645, Austin 2026-11-24: the remake's own, as the subway entrances are): the
  * street's shown doors and portals out, as marks like the signposts' (kind 'door', its tip where it
- * leads). A door meant to be hidden stays off the map: a hidden door, or one whose way out is
+ * leads, its look the DOOR_LOOKS kind its icon shows). A door meant to be hidden stays off the map: a hidden door, or one whose way out is
  * hidden (getSnapshot's hide_hidden_doors, LocationRenderer.as 647-656); a subway entrance is a
  * station (stationMarks). Doors are in street space already (bottom-centre).
  */
@@ -296,7 +337,7 @@ export function doorMarks(street) {
     const x = Number(door.x);
     const y = Number(door.y);
     if (!Number.isFinite(x) || !Number.isFinite(y)) continue;
-    out.push({ kind: 'door', id: `door:${door.id || out.length}`, x, y, tip: tip || null, ...artSize(door) });
+    out.push({ kind: 'door', id: `door:${door.id || out.length}`, look: doorLook(door.sprite), x, y, tip: tip || null, ...artSize(door) });
   }
   return out;
 }
@@ -311,7 +352,7 @@ export function sceneDoorMarks(targets = []) {
     if (!t || !SCENE_DOOR_CLASSES.includes(t.classId)) continue;
     const sp = t.sprite;
     if (!sp || sp.destroyed || !Number.isFinite(sp.x) || !Number.isFinite(sp.y)) continue;
-    out.push({ kind: 'door', id: `scene:door:${t.classId}:${out.length}`, x: Math.round(sp.x), y: Math.round(sp.y), tip: String(t.label || '').trim() || null });
+    out.push({ kind: 'door', id: `scene:door:${t.classId}:${out.length}`, look: 'door', x: Math.round(sp.x), y: Math.round(sp.y), tip: String(t.label || '').trim() || null });
   }
   return out;
 }
@@ -680,8 +721,6 @@ const esc = (v) => String(v ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<
 const easeOut = (k) => 1 - (1 - k) ** 3;
 const easeIn = (k) => k ** 3;
 
-/** G1232: a door mark's icon (ours: the client has no map icon for a door). */
-export const DOOR_SVG = '<svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2.5 11.5V3.2C2.5 1.7 4 .5 6 .5s3.5 1.2 3.5 2.7v8.3z" fill="#7a5130" stroke="#3d2a14" stroke-width="1" /><circle cx="7.6" cy="7" r=".9" fill="#f0d27a" /></svg>';
 /**
  * PURE (SHARP MARKS): a mark's <img> for the 1x piece `name`. With a high-resolution trace
  * (artHd(name)) a crisp view draws the trace; otherwise the bitmap at 1x and the trace from 2x
@@ -716,7 +755,7 @@ const MAP_SVG = '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stro
  */
 export function createStreetMinimap(doc, host, opts = {}) {
   const artUrl = opts.artUrl || (() => '');
-  const artOpts = () => ({ artUrl, artHd: opts.artHd || (() => null), crisp: opts.crisp ? Boolean(opts.crisp()) : true });
+  const artOpts = () => withDoorArt({ artUrl, artHd: opts.artHd || (() => null), crisp: opts.crisp ? Boolean(opts.crisp()) : true });
   const reducedMotion = opts.reducedMotion || (() => false);
   const now = opts.now || (() => performance.now());
   const raf = opts.raf || ((fn) => (typeof requestAnimationFrame === 'function' ? requestAnimationFrame(fn) : setTimeout(() => fn(now()), 16)));
@@ -1091,7 +1130,7 @@ export function createStreetMinimap(doc, host, opts = {}) {
   function addSign(mark) {
     const station = mark.kind === 'station';
     const door = mark.kind === 'door';
-    const el = markButton(station ? 'station' : door ? 'door' : 'sign', mark.id);
+    const el = markButton(station ? 'station' : door ? 'door' : 'sign', mark.id, mark.look);
     el.setAttribute('aria-label', station ? mark.tip || 'Subway station' : door ? (mark.tip ? `Door to ${mark.tip}` : 'Door') : mark.tip ? `Signpost to ${mark.tip.split('\n').join(', ')}` : 'Signpost');
     signsEl.append(el);
     signs.set(mark.id, { mark, el });
@@ -1100,17 +1139,18 @@ export function createStreetMinimap(doc, host, opts = {}) {
   /** The signposts among the marks (a subway entrance or a door is not one). */
   const signCount = () => [...signs.values()].filter((s) => s.mark.kind === 'sign').length;
 
-  function markButton(kind, id) {
+  function markButton(kind, id, look) {
     const el = doc.createElement('button');
     el.type = 'button';
     el.className = kind === 'sign' ? 'smm-sign' : kind === 'station' ? 'smm-sign smm-station' : kind === 'door' ? 'smm-sign smm-door' : `smm-dot smm-${kind}`;
     el.dataset.mark = id;
     el.dataset.kind = kind;
-    if (kind === 'sign' || kind === 'station') {
-      el.dataset.art = kind === 'sign' ? 'teensy_signpost' : 'map_icon_subway';
+    if (kind === 'sign' || kind === 'station' || kind === 'door') {
+      // #645: a door's icon says what kind of way out it is (DOOR_LOOKS).
+      el.dataset.art = kind === 'sign' ? 'teensy_signpost' : kind === 'station' ? 'map_icon_subway' : doorArtName(look);
+      if (kind === 'door') el.dataset.look = DOOR_LOOKS.includes(look) ? look : 'door';
       el.innerHTML = el.artHtml = markArt(el.dataset.art, artOpts());
     }
-    if (kind === 'door') el.innerHTML = DOOR_SVG;
     return el;
   }
 

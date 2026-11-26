@@ -70,7 +70,7 @@
  */
 
 import { STREET_ENTITY_KINDS } from '../street-render.js?v=dab4ec4b';
-import { DOOR_SVG, createPictureCache, createStreetMinimap, doorMarks, markArt, minimapVisibility, onStreetMapChange, sceneDoorMarks, sceneSignMarks, setStreetMap, signpostMarks, snapshotStreetView, snapsWithScene, stationMarks, streetMapOn } from '../ui/street-minimap.js?v=faab86a5';
+import { DOOR_LOOKS, createPictureCache, createStreetMinimap, doorArtName, doorMarks, markArt, minimapVisibility, onStreetMapChange, sceneDoorMarks, sceneSignMarks, setStreetMap, signpostMarks, snapshotStreetView, snapsWithScene, stationMarks, streetMapOn, withDoorArt } from '../ui/street-minimap.js?v=9eabe65f';
 import { classicArtHd, classicArtUrl } from '../classic/classic-art.js?v=87cb1722';
 import { onUiModeChange } from '../classic/ui-mode.js?v=f5e733fb';
 import { focusBack } from '../ui/focus-return.js?v=da190597';
@@ -590,7 +590,7 @@ export function phoneSignRows(marks = [], you = null) {
       const side = Number.isFinite(at.x) ? phoneSignDir(m.x - at.x, dy) : 'here';
       const kind = m.kind === 'station' || m.kind === 'door' ? m.kind : 'sign';
       const text = String(m.tip || '').split('\n').filter(Boolean).join(', ') || (kind === 'station' ? 'Subway station' : kind === 'door' ? 'Door' : 'Signpost');
-      return { id: m.id, kind, x: m.x, y: m.y, text, side };
+      return { id: m.id, kind, ...(kind === 'door' ? { look: DOOR_LOOKS.includes(m.look) ? m.look : 'door' } : {}), x: m.x, y: m.y, text, side };
     });
 }
 
@@ -652,7 +652,9 @@ function phoneOpen(engine) {
       b.dataset.signId = row.id;
       b.dataset.kind = row.kind;
       // SHARP MARKS: the row's icon is the trace (14 x 21 CSS px from a 10 x 15 bitmap, 3x on a phone).
-      b.innerHTML = `${row.kind === 'door' ? DOOR_SVG : markArt(row.kind === 'station' ? 'map_icon_subway' : 'teensy_signpost', { artUrl: classicArtUrl, artHd: classicArtHd, crisp: true })}<span></span>`;
+      // #645: a door's row shows its kind's icon (a dinosaur's mouth, a portal or a door).
+      if (row.kind === 'door') b.dataset.look = row.look;
+      b.innerHTML = `${markArt(row.kind === 'door' ? doorArtName(row.look) : row.kind === 'station' ? 'map_icon_subway' : 'teensy_signpost', withDoorArt({ artUrl: classicArtUrl, artHd: classicArtHd, crisp: true }))}<span></span>`;
       b.querySelector('span').textContent = row.text;
       phone.signs.push({ el: b, x: row.x, y: row.y, side: row.side });
       b.setAttribute('aria-label', row.kind === 'station' ? `Walk to ${row.text}` : row.kind === 'door' ? `Walk to the door to ${row.text}` : `Walk to the signpost to ${row.text}`);

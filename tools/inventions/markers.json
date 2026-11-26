@@ -1428,7 +1428,7 @@
   },
   "public/js/ui/street-minimap.js": {
     "ours: // RIGHTCLICK: the map is ours; only a player's dot and a signpost open a": "right-click-menus",
-    "ours: G1232: a door mark's icon (ours: the client has no map icon for a door).": "minimap-exit-doors",
+    "ours: the door marks' icons, one per DOOR_LOOKS kind. Ours: Glitch's street": "minimap-door-kind-icons",
     "remake-own: * PURE (#463, the remake's own: Glitch's minimap showed only signposts,": "minimap-subway-stations",
     "remake-own: * PURE (G1232, #645, Austin 2026-11-24: the remake's own, as the subway entrances are):": "minimap-exit-doors",
     "remake-own: // G1232 (#645): the doors out beside them (the remake's own, as the subway": "minimap-exit-doors",
