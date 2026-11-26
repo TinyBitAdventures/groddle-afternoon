@@ -462,6 +462,7 @@ async function checks() {
   await escape(A, 1);
   if (await A.p.evaluate(() => !document.getElementById('sound-pop')?.hidden)) await A.p.click('#sound-btn');
   await wait(300);
+  await dismiss(A); // a quest offer can open late and take the key (Pot Luck Day's, 2026-11-26)
   await blur(A);
   await A.p.keyboard.press('-');
   await wait(900);
