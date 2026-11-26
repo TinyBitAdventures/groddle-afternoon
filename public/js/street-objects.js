@@ -39,7 +39,7 @@ import { TRANT_META, canHarvestTrant, fruitCapacityAt, resolveArborologyPackage 
 import { highestLightGreenThumbRank, quoteTrantCare } from './trant-care.js?v=cb7f539b';
 import { RESOURCE_NODE_ALIASES, RESOURCE_NODE_CATALOG, resolveResourceSkillPackage } from './resource-nodes.js?v=433a3e48';
 import { highestAnimalKinshipRank } from './animal-kinship.js?v=eaa3a6f2';
-import { applyAnimalName, applyCreatureState, clockOffset, pathFrom } from './street-creatures.js?v=563717d8';
+import { applyAnimalName, applyCreatureState, clockOffset, pathFrom } from './street-creatures.js?v=e75e6b18';
 
 /** The resource-node classes whose stock is shared (the "N uses left, then regrows" nodes). */
 /**

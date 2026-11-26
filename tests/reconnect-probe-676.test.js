@@ -15,8 +15,8 @@ import { join } from 'node:path';
 
 import { CLOSE_QUIET, PROBE_TIMEOUT_MS, QUIET_MS, createRealtimeClient } from '../public/js/realtime-client.js?v=eb1515a8';
 import { PROBE_AFTER_MS, RECONNECTING_LINE, createOnlineRequests, waitLine } from '../public/js/online-request.js?v=dac938db';
-import { COPY } from '../public/js/street-objects.js?v=eaf5d836';
-import { streetObjectsFeature } from '../public/js/features/street-objects-feature.js?v=8a016230';
+import { COPY } from '../public/js/street-objects.js?v=fc42867a';
+import { streetObjectsFeature } from '../public/js/features/street-objects-feature.js?v=58af0e63';
 import { createTrantState } from '../public/js/trants.js?v=864ea9ff';
 
 const root = join(import.meta.dirname, '..');

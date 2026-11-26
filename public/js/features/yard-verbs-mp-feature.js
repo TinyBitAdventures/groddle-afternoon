@@ -82,14 +82,14 @@ import { performPlotVerb, plotArtPath, plotLabel, plotStatusLabel, plotVerbs } f
 import { exposeQA } from '../qa-gate.js?v=f4e2cd82';
 import { trantStatusLabel } from '../trants.js?v=864ea9ff';
 import { woodTreeStatusLabel } from '../woodcutting.js?v=9e9af511';
-import { animalStatusLabel } from '../animals.js?v=ad941d13';
+import { animalStatusLabel } from '../animals.js?v=ca4d0ae5';
 import { frameTexture, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js?v=b8e38103';
 import { createBackYardState, homeStreetLayout, normalizeCultivationState } from '../home-cultivation.js?v=b2868d29';
 import { insideQuery, readVisitScene } from '../neighbours-mp.js?v=83f2fdf4';
 import { saveStore } from '../save-store.js?v=1ccb1d6b';
-import { BACK_YARD_GROUND_Y, STREET_GROUND_Y, homesFeature, wearHomeCultivation } from './homes-feature.js?v=0e319512';
-import { holdYardAnimal } from './animal-husbandry-feature.js?v=2e0b422c';
-import { patchesFeature, treeFrameUrl } from './patches-feature.js?v=d15a3f88';
+import { BACK_YARD_GROUND_Y, STREET_GROUND_Y, homesFeature, wearHomeCultivation } from './homes-feature.js?v=272962cf';
+import { holdYardAnimal } from './animal-husbandry-feature.js?v=85730cf2';
+import { patchesFeature, treeFrameUrl } from './patches-feature.js?v=c2617f1c';
 import {
   BACK_YARD_PREFIX,
   BACK_YARD_STREET,
@@ -112,18 +112,18 @@ import {
   visitorRewardDelta,
   visitorRewardSnapshot,
   visitorTreeState,
-} from '../yard-verbs-mp.js?v=3132b1b5';
+} from '../yard-verbs-mp.js?v=34ea6632';
 import { yardFixtureRows, yardFixtureVerbs, yardFixturesKey } from '../yard-fixtures-mp.js?v=dd022fe8';
 import { itemZ } from '../item-bands.js?v=ec366be3';
-import { followYardPath, holdYardWalk, stickForClass } from '../yard-wander.js?v=cb7fd979';
+import { followYardPath, holdYardWalk, stickForClass } from '../yard-wander.js?v=19038780';
 import { showsChickenIdle, yardChickenPose } from '../chicken-idle-art.js?v=e320e159';
 import { chickenWaitPose } from '../chicken-idles.js?v=eef0279b';
 import { countItem, removeItem } from '../inventory.js?v=3be7988a';
 import { ROCK_CATALOG, rockStatusLabel, tickMineRock } from '../mining.js?v=7ecaa572';
 import { getResourceNodeDef, regrowDelayMs } from '../resource-nodes.js?v=433a3e48';
 import { getGameDayKey } from '../game-day.js?v=57fecfcb';
-import { rockReady } from '../street-objects.js?v=eaf5d836';
-import { resourceNodesFeature } from './resource-nodes-feature.js?v=b146ea0b';
+import { rockReady } from '../street-objects.js?v=fc42867a';
+import { resourceNodesFeature } from './resource-nodes-feature.js?v=edca549e';
 import {
   ROCK_RESPAWN_MS,
   STOCK_NODE_VERBS,

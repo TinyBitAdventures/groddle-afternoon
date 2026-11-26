@@ -34,7 +34,7 @@ import {
   flightFloorFor,
   floorProfile,
   floorUnder,
-} from '../public/js/street-creatures.js?v=563717d8';
+} from '../public/js/street-creatures.js?v=e75e6b18';
 import { setCreatureEcology, streetObjectLayout } from '../tools/build-realtime-objects.mjs';
 import { STREET_INDEX, applyStreetIndex, loadStreetDataFromFs, setZoneStreetsShown } from '../public/js/street-loader.js?v=10376267';
 import { flightGroundFor, setStreetEcologyCatalog } from '../public/js/street-ecology.js?v=8f50537c';

@@ -2814,13 +2814,33 @@
   "deployed": "2026-11-26"
  },
  "git": {
-  "commits": 3725,
+  "commits": 3731,
   "since": "2026-10-19",
   "recent": [
    {
     "date": "2026-11-26",
+    "kind": "fix",
+    "text": "A Visiting Stone stays in its street's dead end, where the front art leaves it seen"
+   },
+   {
+    "date": "2026-11-26",
+    "kind": "fix",
+    "text": "The Classic interface says \"This window was asleep\" once in chat, not twice"
+   },
+   {
+    "date": "2026-11-26",
+    "kind": "fix",
+    "text": "A window that slept offers only \"Load the other save\""
+   },
+   {
+    "date": "2026-11-26",
     "kind": "new",
     "text": "A browser zoomed far out gets one notice saying how to reset it"
+   },
+   {
+    "date": "2026-11-26",
+    "kind": "fix",
+    "text": "Change Style tile pictures draw on an iPad, and the furniture and house pickers get the same guard"
    },
    {
     "date": "2026-11-26",
@@ -2916,29 +2936,9 @@
     "date": "2026-11-26",
     "kind": "new",
     "text": "Who's here's online count is a link to the website's chat, to see everyone online"
-   },
-   {
-    "date": "2026-11-26",
-    "kind": "new",
-    "text": "House and Tower buttons beside Home on the Map's Shortcuts home card"
-   },
-   {
-    "date": "2026-11-26",
-    "kind": "fix",
-    "text": "Croaking Piggies no longer all speak the moment you arrive, and a rock that reforms huge says so solo too"
-   },
-   {
-    "date": "2026-11-26",
-    "kind": "fix",
-    "text": "A Dust Trap is sometimes found empty when you arrive alone on a street"
-   },
-   {
-    "date": "2026-11-26",
-    "kind": "fix",
-    "text": "A computer asleep mid-visit to the Ancestral Lands comes back to the visit with 15 seconds left"
    }
   ]
  },
- "tests": 1442,
+ "tests": 1445,
  "generatedAt": "2026-11-26"
 }
