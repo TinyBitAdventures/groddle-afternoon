@@ -90,7 +90,22 @@ export const ISLAND_BOXES = Object.freeze({
   // newbie_island.js hitBox street4_check / gentle_island_exit.
   street4_check: { tsid: GENTLE_ISLAND.progress_way, x: 4700, y: 950, w: 200, h: 200 },
   gentle_island_exit: { tsid: GENTLE_ISLAND.exit, x: 5724, y: 1122, w: 600, h: 300 },
+  // G1168: newbie_island.js hitBox street_spirit_pan (30-39), Progress Way's middle.
+  street_spirit_pan: { tsid: GENTLE_ISLAND.progress_way, x: 2296, y: 1000, w: 100, h: 400 },
 });
+
+/**
+ * G1168: newbie_island.js hitBox street_spirit_pan: with qurazy_got and not yet panned, the camera
+ * centres on the street spirit for 5000 ms (pc.centerCamera, TSFrontController.as setCameraCenter),
+ * once. upgradeGranted (258-263) set qurazy_got when an upgrade was bought on that street; the
+ * remake keeps it as the per-save flag qurazy_got, set on Progress Way only (its sole reader).
+ */
+export const SPIRIT_PAN = Object.freeze({ ms: 5000 });
+
+/** PURE: the box pans now (qurazy_got, and street_spirit_pan not yet set). */
+export function spiritPanDue(flags = []) {
+  return flags.includes('qurazy_got') && !flags.includes('street_spirit_pan');
+}
 
 /**
  * The three first skills (magic_rock.js showSkillChooser / onOverlayClicked)
@@ -1235,6 +1250,8 @@ export const ISLAND_FLAGS = Object.freeze([
   // G948: the rock's ISLAND_CURRANTS were paid (set in the same tick, so a reload never pays twice and the
   // site's ledger credits them once, LedgerMath::TUTORIAL_SETS islandcurrants).
   'island_currants',
+  // G1168: an upgrade was granted on Progress Way (upgradeGranted's qurazy_got), and its pan ran.
+  'qurazy_got', 'street_spirit_pan',
 ]);
 
 /** The island event boxes on one street. */

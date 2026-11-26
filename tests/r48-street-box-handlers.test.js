@@ -54,8 +54,6 @@ const SKIP = {
   misc: "the map editor's default box id; Glitch's location.js had no case for it (logged as an unhandled box)",
   flamingo_talk2: "Glitch's final scripts for both practice streets (skillquest_ak.js, skillquest_lgt_v2.js) never wait for it; only the retired skillquest_ezc.js did",
   quickstart_account_check: 'Gentle Island held quickstart players without an account (newbie_island.js 41-53); the remake has no account-less play to hold',
-  street_spirit_pan: 'open gap: Progress Way panned the camera 5 s to the street spirit after the Qurazy quoin (newbie_island.js 30-39); the spirit\'s spot was not archived',
-  caveIn: "open gap: Intate Treats' familiar hint \"Looks like you can't get in this way, kid...\" (teleportation_rescue_pig.js callback_caveIn 70-79)",
 };
 
 /** SKIP ids whose name is an ordinary word the code uses for other things (not proof of a handler). */

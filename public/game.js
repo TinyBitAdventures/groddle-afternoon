@@ -4,7 +4,7 @@
  */
 import { ITEM_ICONS, ITEM_LABELS, getVerbsFor, ordinaryItems, runVerb } from './content.js?v=48634256';
 import { createErrorOnce, createFeatureHost, createFrameStages } from './js/feature-host.js?v=b87e2cbc';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=2020792c';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=c7f0ccca';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, enterHintPick, reachGlowTargets, spriteHasRimArt, rimArtParts, trimmedIconUrl, drawTileArt } from './js/enter-chooser.js?v=44aef7b2';
 import { firstTendKey, STICK_TEND_DELAY_MS, STICK_TEND_DIRS, STICK_TEND_REPEAT_MS, stepTendKey, stepTendKeys, stickTendKey, tendKeyAction } from './js/garden-tend.js?v=a7470c4a';
 import { avatarHitBox, behindFloor, bodyReachDistance, OUT_OF_REACH_LINE, playerClickBox } from './js/reach.js?v=456da8a8';
@@ -89,16 +89,19 @@ import {
 import { KIDS_ROOM_W, buildKidsRoomScene } from './js/kids-room-scene.js?v=5c44234d';
 import {
   AXIS_DENYDE_STREET_ID,
+  CAVE_IN_BOX_ID,
+  CAVE_IN_STREET_ID,
   HOGTIED_JONES_ID,
   ILMENSKIE_QUEST_ID,
   canReleaseIlmenskieJones,
+  caveInHint,
   ensureIlmenskieState,
   ilmenskieObjective,
   meetIlmenskieJones,
   pickupIlmenskieJones,
   releaseIlmenskieJones,
   rememberIlmenskieSource,
-} from './js/ilmenskie-quest.js?v=0e9809ac';
+} from './js/ilmenskie-quest.js?v=433ca65b';
 import {
   LEGALIZE_BACK_ALLEY_BEATS,
   LEGALIZE_BACK_ALLEY_TSID,
@@ -583,7 +586,7 @@ import {
   isHomePlaceTsid,
   setHomeHouse,
 } from './js/homes.js?v=dca6b2cd';
-import { HOME_MACHINE, offerHomeTicket, renderTicketMachine } from './js/home-ticket.js?v=e2f2ee78';
+import { HOME_MACHINE, offerHomeTicket, renderTicketMachine } from './js/home-ticket.js?v=13473847';
 import {
   MAIL_COMPANIONS,
   archiveMail,
@@ -26207,6 +26210,29 @@ function ilmenskieStory() {
   return ensureIlmenskieState(questState);
 }
 
+/** G1168: the caveIn box the avatar stands in on Intate Treats ({ tsid, ids }). */
+let ilmenskieCaveInside = { tsid: '', ids: new Set() };
+
+/**
+ * G1168: Intate Treats' caveIn box, per frame. Glitch ran a walk-in box's quest callback for the
+ * player's active quests; teleportation_rescue_pig.js callback_caveIn (70-79) has the familiar
+ * explain the rocks once a run (explained_cavein), unless Jones is already in the pack.
+ */
+function stepIlmenskieCaveIn() {
+  if (!player || !currentStreet || currentStreetTsid !== CAVE_IN_STREET_ID) return;
+  if (ilmenskieCaveInside.tsid !== currentStreetTsid) ilmenskieCaveInside = { tsid: currentStreetTsid, ids: new Set() };
+  const boxes = (currentStreet.boxes || []).filter((b) => b?.id === CAVE_IN_BOX_ID);
+  const entered = greedyBoxesEntered(boxes, ilmenskieCaveInside.ids, player.x, player.y);
+  if (!entered.length || !questState.active?.[ILMENSKIE_QUEST_ID]) return;
+  const text = caveInHint(ilmenskieStory(), { carryingJones: countItem(inv, HOGTIED_JONES_ID) > 0 });
+  if (!text) return;
+  savePlayerState();
+  const beats = parseQuestConversation(text);
+  if (beats.length) beats[beats.length - 1].response ||= 'OK';
+  if (app?.canvas) app.canvas.dataset.ilmenskieCaveIn = 'explained';
+  openScriptedQuestDialogue({ title: 'Magic Rock', kicker: 'Magic Rock', look: 'conversation', beats });
+}
+
 function spawnIlmenskieJones({ released = false } = {}) {
   if (!entityLayer || !questState.active?.[ILMENSKIE_QUEST_ID]) return null;
   const rescue = ilmenskieStory();
@@ -37509,6 +37535,7 @@ async function main() {
     run('de-embiggenify', () => updateDeEmbiggenify(dt));
     run('paradise flight', () => updateParadiseFlight(dt));
     run('ilmenskie autoplay', updateIlmenskieAutoplay);
+    run('ilmenskie cave-in', stepIlmenskieCaveIn);
     run('spinning wheel', updateSpinningWheel);
     run('features', () => features.tick(ms, Date.now(), engine));
     run('home lock pips', updateHomeStackPips);

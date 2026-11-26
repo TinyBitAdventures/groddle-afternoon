@@ -73,6 +73,8 @@ import {
   ISLAND_SIGNS,
   ISLAND_TICKET_AT,
   SPIRIT_SING,
+  SPIRIT_PAN,
+  spiritPanDue,
   islandBoxesFor,
   islandHand,
   reduceToHand,
@@ -135,7 +137,7 @@ import {
   vogPages,
   tutorialNameDefault,
   TUTORIAL_NAME_MAX,
-} from '../newxp.js?v=0d81aa52';
+} from '../newxp.js?v=43f8df2c';
 import { countWords } from '../words.js?v=274023af';
 import { ITEM_CATALOG, addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=3be7988a';
 import { QUOIN_SHEET, QUOIN_TYPES, qrazyRewardForLevel } from '../quoins.js?v=5abad2c7';
@@ -152,7 +154,7 @@ import { frameTexture, onLoaded, sourceFromUrl, textureFromUrl, whenLoaded } fro
 import { upgradeSource } from '../sprite-hires.js?v=e96be5f1';
 import { grantMoodXp } from '../mood-xp.js?v=e311b45c';
 import { displayTopOf, itemstackOverlayPoint, playPoofIn, playSheetOverlay, poofInAlpha } from '../overlay-art.js?v=e50bacca';
-import { HOME_MACHINE } from '../home-ticket.js?v=e2f2ee78';
+import { HOME_MACHINE } from '../home-ticket.js?v=13473847';
 import { createAnimalState } from '../animals.js?v=49be8a12';
 import {
   AK_ANIMALS,
@@ -3620,9 +3622,72 @@ async function spiritOh(engine, t, who) {
   }
 }
 
+/**
+ * G1168: Progress Way's street_spirit_pan box (newbie_island.js hitBox 30-39). upgradeGranted set
+ * qurazy_got when an upgrade was bought on this street (an island card or the iMG menu); walking
+ * into the box after that centres the camera on the spirit for 5 s, once (pc.centerCamera). The
+ * camera holds the spirit's spot while you walk, as camera_center_pt did, then comes back.
+ */
+function spiritPanTick(engine, now, p) {
+  const d = run.data;
+  if (engine.streetTsid !== GENTLE_ISLAND.progress_way) {
+    releaseSpiritPan(engine);
+    return;
+  }
+  const owned = Array.isArray(engine.pc?.imaginationUpgrades) ? engine.pc.imaginationUpgrades.length : 0;
+  if (d.pwOwned == null) d.pwOwned = owned;
+  else if (owned > d.pwOwned) {
+    d.pwOwned = owned;
+    setFlag('qurazy_got');
+  }
+  if (d.spiritPan) {
+    const pan = d.spiritPan;
+    const look = engine.cameraLook || { x: 0, y: 0 };
+    // Camera Mode or another look took the camera: let it have it.
+    if (now >= pan.until || look.x !== pan.dx || look.y !== pan.dy) releaseSpiritPan(engine);
+    else {
+      pan.dx = Math.round(pan.x - p.x);
+      pan.dy = Math.round(pan.y - p.y);
+      engine.setCameraLook(pan.dx, pan.dy);
+    }
+  }
+  const inside = inHitBox(ISLAND_BOXES.street_spirit_pan, p.x, p.y);
+  if (!inside || d.inPanBox) {
+    d.inPanBox = inside;
+    return;
+  }
+  d.inPanBox = true;
+  if (!spiritPanDue(save.flags) || typeof engine.setCameraLook !== 'function') return;
+  const look = engine.cameraLook || { x: 0, y: 0 };
+  if (look.x || look.y) return;
+  const who = spiritWho(engine);
+  const head = who?.head();
+  if (!head) return;
+  setFlag('street_spirit_pan');
+  const pan = { x: who.x, y: head.y + 130, until: now + SPIRIT_PAN.ms };
+  pan.dx = Math.round(pan.x - p.x);
+  pan.dy = Math.round(pan.y - p.y);
+  d.spiritPan = pan;
+  engine.setCameraLook(pan.dx, pan.dy);
+  engine.setData('newxpSpiritPan', 'panned');
+  // A run that ends mid-pan still gives the camera back.
+  setTimeout(() => releaseSpiritPan(engine, pan), SPIRIT_PAN.ms + 1000);
+}
+
+function releaseSpiritPan(engine, only = null) {
+  const pan = run?.data?.spiritPan || only;
+  if (!pan || (only && run?.data?.spiritPan && run.data.spiritPan !== only)) return;
+  const look = engine?.cameraLook;
+  if (look && look.x === pan.dx && look.y === pan.dy) engine.setCameraLook(0, 0);
+  if (run?.data) run.data.spiritPan = null;
+}
+
 /** Per street entry on Gentle Island during the tutorial. */
 function islandStreetScripts(engine) {
   const tsid = engine.streetTsid;
+  // G1168: upgrades bought from here on count for this street (spiritPanTick).
+  run.data.pwOwned = null;
+  run.data.inPanBox = false;
   islandHud(engine);
   islandSigns(engine);
   islandQuoins(engine);
@@ -3643,6 +3708,7 @@ function islandScriptsTick(engine, now) {
   islandBoxes(engine, p);
   islandHints(engine);
   spiritTick(engine, now, p);
+  spiritPanTick(engine, now, p);
 }
 
 /** Autoplay: the island's own beats (the Qurazy and Mappery, the gully's quoins, the side streets). */

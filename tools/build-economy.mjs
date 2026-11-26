@@ -118,7 +118,7 @@ import { ROOK_HALL_QUEST_ID, ROOK_HALL_START_QUEST_ID } from '../public/js/rook-
 import { DE_EMBIGGENIFY_QUEST_ID, DE_EMBIGGENIFY_PART2_QUEST_ID } from '../public/js/de-embiggenify.js?v=db347ac1';
 import { PHANTOM_QUEST_ID, REMEMBER_QUEST_ID } from '../public/js/ghost-quest.js?v=5f3cc133';
 import { HOG_HAUL_QUEST_ID } from '../public/js/hog-haul.js?v=50d2e072';
-import { ILMENSKIE_QUEST_ID } from '../public/js/ilmenskie-quest.js?v=0e9809ac';
+import { ILMENSKIE_QUEST_ID } from '../public/js/ilmenskie-quest.js?v=433ca65b';
 // G979: Buy a Bag starts with the first skill learned, without its prerequisites (learn_first_skill.js 74-76).
 import { FIRST_SKILL_QUEST_ID } from '../public/js/quest-offers.js?v=7e00498b';
 import { CAMERA_OFFER } from '../public/js/snaps.js?v=b5be8bff';

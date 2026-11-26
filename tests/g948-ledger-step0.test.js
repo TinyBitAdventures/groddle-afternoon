@@ -14,12 +14,12 @@ import { gameFiles, gameText } from '../tools/build-economy.mjs';
 import { RARE_STORE } from '../public/js/quest-rooms/penalty.js?v=71ec5743';
 import { CAMERA_OFFER } from '../public/js/snaps.js?v=b5be8bff';
 
-import { ISLAND_CURRANTS, ISLAND_FLAGS, normalizeNewxpSave } from '../public/js/newxp.js?v=0d81aa52';
+import { ISLAND_CURRANTS, ISLAND_FLAGS, normalizeNewxpSave } from '../public/js/newxp.js?v=43f8df2c';
 import { createIconState, pickUpIcon, placeIcon } from '../public/js/giant-icons.js?v=3f078775';
 import { GNOME_CLASS } from '../public/js/garden-gnome.js?v=73026b57';
 import { NOTE_POLE_CLASS } from '../public/js/home-street-mp.js?v=11a669f8';
 import { FUNPICKLE } from '../public/js/funpickle.js?v=95796317';
-import { funpickleFeature } from '../public/js/features/funpickle-feature.js?v=74d8989f';
+import { funpickleFeature } from '../public/js/features/funpickle-feature.js?v=56ef379c';
 import { HAS_PHP, PHP } from './php.js';
 
 const root = join(import.meta.dirname, '..');

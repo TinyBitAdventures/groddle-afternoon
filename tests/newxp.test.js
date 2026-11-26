@@ -21,6 +21,8 @@ import {
   ISLAND_QUOINS,
   ISLAND_SIGNS,
   ISLAND_TICKET_AT,
+  SPIRIT_PAN,
+  spiritPanDue,
   islandHand,
   reduceToHand,
   sourceToStreet,
@@ -64,7 +66,7 @@ import {
   training2MeterFull,
   tutorialPhysics,
   vogPages,
-} from '../public/js/newxp.js?v=0d81aa52';
+} from '../public/js/newxp.js?v=43f8df2c';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', 'public');
 const street = (tsid) => JSON.parse(readFileSync(join(ROOT, 'assets/streets', `${tsid}.json`), 'utf8'));
@@ -685,5 +687,33 @@ describe('tutorial pill (player report 2026-11-01)', () => {
     assert.match(readFileSync(join(ROOT, 'js/features/newxp-feature.js'), 'utf8'), /tutorialPillSpot\(frame, document\.querySelector\('#hud-stats'\)\?\.getBoundingClientRect\(\)\)/);
     // TOUCH (Austin 2026-11-12): a phone measures from the screen's safe area, never the stage's letterboxed top.
     assert.match(readFileSync(join(ROOT, 'js/features/newxp-feature.js'), 'utf8'), /const frame = globalThis\.GRODDLE_DEVICE === 'phone' \? phoneScreenFrame\(window\.innerWidth, window\.innerHeight, safeAreaInsets\(document\)\) : r;/);
+  });
+});
+
+describe('G1168 Progress Way street_spirit_pan box', () => {
+  it('pans once, only after an upgrade was granted on Progress Way (newbie_island.js hitBox 30-39)', () => {
+    assert.equal(ISLAND_BOXES.street_spirit_pan.tsid, GENTLE_ISLAND.progress_way);
+    assert.equal(SPIRIT_PAN.ms, 5000);
+    assert.equal(spiritPanDue([]), false, 'no qurazy_got: nothing');
+    assert.equal(spiritPanDue(['qurazy_got']), true);
+    assert.equal(spiritPanDue(['qurazy_got', 'street_spirit_pan']), false, 'once');
+    for (const f of ['qurazy_got', 'street_spirit_pan']) assert.ok(ISLAND_FLAGS.includes(f), f);
+    assert.deepEqual(normalizeNewxpSave({ flags: ['qurazy_got', 'street_spirit_pan'] }).flags, ['qurazy_got', 'street_spirit_pan']);
+  });
+
+  it('the island feature reads the box and centres the camera on the spirit', () => {
+    const src = readFileSync(join(ROOT, 'js/features/newxp-feature.js'), 'utf8');
+    assert.match(src, /ISLAND_BOXES\.street_spirit_pan/);
+    assert.match(src, /spiritPanDue\(save\.flags\)/);
+    assert.match(src, /setFlag\('qurazy_got'\)/);
+    assert.match(src, /engine\.setCameraLook\(/);
+  });
+
+  it('quotes the source', () => {
+    if (!existsSync(join(GS, 'locations/newbie_island.js'))) return;
+    const src = readFileSync(join(GS, 'locations/newbie_island.js'), 'utf8');
+    assert.ok(src.includes("else if (id == 'street_spirit_pan'){\n\t\tif (this.qurazy_got && !this.street_spirit_pan){"));
+    assert.ok(src.includes('pc.centerCamera({x: spirit.x, y: spirit.y}, 5000);'));
+    assert.ok(src.includes('function upgradeGranted(pc, upgrade_id){\n\tthis.qurazy_got = true;'));
   });
 });

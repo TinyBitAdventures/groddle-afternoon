@@ -40,7 +40,7 @@ import {
   recordPower,
   shouldPlaceFind,
 } from '../public/js/funpickle.js?v=95796317';
-import { funpickleFeature, endComedian } from '../public/js/features/funpickle-feature.js?v=74d8989f';
+import { funpickleFeature, endComedian } from '../public/js/features/funpickle-feature.js?v=56ef379c';
 import { applyStreetIndex } from '../public/js/street-loader.js?v=10376267';
 
 const here = dirname(fileURLToPath(import.meta.url));

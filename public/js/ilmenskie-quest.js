@@ -1,6 +1,11 @@
 export const ILMENSKIE_QUEST_ID = 'teleportation_rescue_pig';
 export const AXIS_DENYDE_STREET_ID = 'GHFIV4V8J6J2I7U';
 export const HOGTIED_JONES_ID = 'hogtied_piggy_explorer';
+/** G1168: the walk-in box on Intate Treats, by the rocks that block the way in. */
+export const CAVE_IN_STREET_ID = 'GHFR6PV2Q2D24KJ';
+export const CAVE_IN_BOX_ID = 'caveIn';
+/** teleportation_rescue_pig.js callback_caveIn 70-79: the familiar's alert, verbatim. */
+export const CAVE_IN_HINT = "Looks like you can't get in this way, kid. Those rocks aren't going anywhere.<split butt_txt=\"Hm…\" />You're going to need to find another way in.";
 export const ILMENSKIE_REWARD = Object.freeze({
   xp: 450,
   mood: 250,
@@ -22,6 +27,7 @@ export function createIlmenskieState(sourceLocation = null) {
     metJones: false,
     pickedUpJones: false,
     releasedJones: false,
+    explainedCaveIn: false,
   };
 }
 
@@ -44,6 +50,7 @@ export function ensureIlmenskieState(questState, sourceLocation = null) {
   state.metJones = Boolean(state.metJones);
   state.pickedUpJones = Boolean(state.pickedUpJones);
   state.releasedJones = Boolean(state.releasedJones);
+  state.explainedCaveIn = Boolean(state.explainedCaveIn);
   questState.story.ilmenskie = state;
   return state;
 }
@@ -56,6 +63,17 @@ export function rememberIlmenskieSource(state, location) {
     y: Number(location.y) || 0,
   };
   return state;
+}
+
+/**
+ * G1168: walking into the caveIn box while the quest runs (Glitch ran a box's quest callback for
+ * the active quests): the familiar explains the rocks once a quest run (explained_cavein), and
+ * never with Jones already in the pack. Returns the alert text, or null.
+ */
+export function caveInHint(state, { carryingJones = false } = {}) {
+  if (!state || state.explainedCaveIn || carryingJones) return null;
+  state.explainedCaveIn = true;
+  return CAVE_IN_HINT;
 }
 
 export function meetIlmenskieJones(state) {

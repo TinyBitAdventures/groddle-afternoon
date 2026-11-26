@@ -277,7 +277,7 @@ import {
   ROCK_VERB_IDS,
 } from '../magic-rock-home.js?v=c07b2327';
 import { getGameDayKey } from '../game-day.js?v=a532775d';
-import { HOME_TICKET, HOME_TICKET_CLASS } from '../home-ticket.js?v=e2f2ee78';
+import { HOME_TICKET, HOME_TICKET_CLASS } from '../home-ticket.js?v=13473847';
 import { MIN_GROUND_CLEARANCE, yCamOffsetAnchor } from '../movement.js?v=f4be1a05';
 import { LANDSCAPE_VIEW_W, landscapeWindow, rowRange, soilTiles } from '../landscape-reach.js?v=2f2d7cb3';
 import { takeFromHouse } from '../ledger-house.js?v=b34f5c89';

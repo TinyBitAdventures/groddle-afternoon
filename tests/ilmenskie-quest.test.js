@@ -6,6 +6,10 @@ import { fileURLToPath } from 'node:url';
 
 import {
   AXIS_DENYDE_STREET_ID,
+  CAVE_IN_BOX_ID,
+  CAVE_IN_HINT,
+  CAVE_IN_STREET_ID,
+  caveInHint,
   HOGTIED_JONES_ID,
   ILMENSKIE_QUEST_ID,
   ILMENSKIE_REWARD,
@@ -17,7 +21,7 @@ import {
   pickupIlmenskieJones,
   releaseIlmenskieJones,
   rememberIlmenskieSource,
-} from '../public/js/ilmenskie-quest.js?v=0e9809ac';
+} from '../public/js/ilmenskie-quest.js?v=433ca65b';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const publicDir = path.join(here, '..', 'public');
@@ -81,4 +85,30 @@ test('the story-quest offer waits for teleportation_4, the skill whose quest it 
     assert.match(src, /const ILMENSKIE_SKILL_ID = 'teleportation_4';/);
     const fn = src.slice(src.indexOf('function canOfferStoryQuest('), src.indexOf('function appendStoryQuestOffers('));
     assert.match(fn, /classTsid === ILMENSKIE_QUEST_ID\) return \(skillState\.learned \|\| \[\]\)\.includes\(ILMENSKIE_SKILL_ID\)/);
+});
+
+test('G1168: Intate Treats caveIn box gives the familiar hint once (teleportation_rescue_pig.js callback_caveIn 70-79)', () => {
+  assert.equal(CAVE_IN_BOX_ID, 'caveIn');
+  const street = JSON.parse(fs.readFileSync(path.join(publicDir, 'assets/streets', `${CAVE_IN_STREET_ID}.json`), 'utf8'));
+  assert.equal(street.label, 'Intate Treats');
+  assert.ok((street.boxes || []).some((b) => b.id === CAVE_IN_BOX_ID));
+  assert.equal(
+    CAVE_IN_HINT,
+    'Looks like you can\'t get in this way, kid. Those rocks aren\'t going anywhere.<split butt_txt="Hm…" />You\'re going to need to find another way in.',
+  );
+  const state = createIlmenskieState();
+  assert.equal(caveInHint(state, { carryingJones: true }), null, 'not with Jones in the pack');
+  assert.equal(caveInHint(state), CAVE_IN_HINT);
+  assert.equal(state.explainedCaveIn, true);
+  assert.equal(caveInHint(state), null, 'once a quest run');
+  const qs = { story: { ilmenskie: { ...state } } };
+  assert.equal(ensureIlmenskieState(qs).explainedCaveIn, true, 'kept across a reload');
+  const gs = path.join(here, '..', '..', 'glitch-GameServerJS', 'quests/teleportation_rescue_pig.js');
+  if (fs.existsSync(gs)) {
+    const src = fs.readFileSync(gs, 'utf8');
+    assert.ok(src.includes(`'txt': "${CAVE_IN_HINT.replace(/"/g, '\\"')}",`));
+  }
+  const game = fs.readFileSync(path.join(publicDir, 'game.js'), 'utf8');
+  assert.match(game, /caveInHint\(ilmenskieStory\(\), \{ carryingJones: countItem\(inv, HOGTIED_JONES_ID\) > 0 \}\)/);
+  assert.match(game, /run\('ilmenskie cave-in', stepIlmenskieCaveIn\)/);
 });
