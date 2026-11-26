@@ -246,7 +246,8 @@ describe('nothing reads the save\'s floor store but js/ground-stacks.js', () => 
 
   it('Decoration Mode selects from every stack on the floor, and claims a shared one it moves', () => {
     const src = readFileSync(join(GAME_DIR, 'public/js/features/homes-feature.js'), 'utf8');
-    assert.match(src, /function roomStacks\(engine\) \{\n\s+return groundStacks\(engine\);/);
+    // #728: a shared stack under the floor is lifted onto it, still read through groundStacks.
+    assert.match(src, /function roomStacks\(engine\) \{[\s\S]{0,400}?return groundStacks\(engine\)[.;]/);
     assert.match(src, /function stackAt\(engine, p\) \{\n\s+const rows = roomStacks\(engine\);/);
     assert.match(src, /function stackRow\(engine, id\) \{\n\s+return roomStacks\(engine\)/);
     assert.match(src, /if \(row\.shared\) return claimShared\(engine, row, target, into\);/);
