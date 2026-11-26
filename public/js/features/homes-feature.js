@@ -317,7 +317,8 @@ import { WORLD_FONT_FAMILY } from '../world-text.js?v=6b49f88c';
 import { HOUSE_ART_DIR, HOUSE_FROM_HOME_STYLE, HOUSE_STYLE_IDS, composeHouse, houseFitViewH, houseLabel, houseLot, normalizeHouse } from '../home-house.js?v=3c88c47c';
 import { closeHousePicker, housePickerOpen, openHousePicker, refreshHousePicker } from '../ui/house-picker.js?v=20aaba5c';
 import { YARD_WALL_DX } from '../yard-wander.js?v=19038780';
-import { housePlace, isHomeMachineClass, towerPlace } from '../home-machines.js?v=7379f47f';
+import { housePlace, isHomeMachineClass, towerPlace } from '../home-machines.js?v=5a45be0c';
+import { drawStandMark } from '../home-stack-marks.js?v=67b44287';
 
 export const HOMES_FEATURE_ID = 'homes';
 const HOME_STREET_TSID = 'RH_HOME_EXT';
@@ -6173,11 +6174,38 @@ function drawPackMarker(engine, target, what = packDrag) {
   scene.packMarker = g;
 }
 
+/**
+ * #730 (G1333, Austin 2026-11-26): ours. While a machine is dragged, a faint mark at your Glitch's feet
+ * (a floor ring and an outline your height; the avatar is hidden in Decoration Mode, setAvatarHidden):
+ * the spot the 200 px between machines is measured from (home-machines-feature placeFromPack `from`).
+ * Gone when the drag ends (js/home-stack-marks.js drawStandMark).
+ */
+function drawStandMarker(engine, show) {
+  const p = engine?.player;
+  if (!show || !scene || !p || !Number.isFinite(p.x) || !Number.isFinite(p.y)) {
+    if (scene?.standMarker && !scene.standMarker.destroyed) scene.standMarker.destroy({ children: true });
+    if (scene) scene.standMarker = null;
+    engine?.setData?.('homeStandMark', '');
+    return;
+  }
+  if (!scene.standMarker || scene.standMarker.destroyed || scene.standMarker.parent !== engine.entityLayer) {
+    if (scene.standMarker && !scene.standMarker.destroyed) scene.standMarker.destroy({ children: true });
+    const g = drawStandMark(engine.PIXI);
+    g.zIndex = 94;
+    engine.entityLayer.addChild(g);
+    scene.standMarker = g;
+  }
+  scene.standMarker.x = p.x;
+  scene.standMarker.y = p.y;
+  engine.setData('homeStandMark', `${Math.round(p.x - roomX0())}`);
+}
+
 function endPackDrag(engine) {
   packDrag = null;
   lastClient = null;
   edgeSince = 0;
   drawPackMarker(engine, null);
+  drawStandMarker(engine, false);
   clearDisplayTarget(engine);
   if (placing?.from === 'pack' && !drag) cancelCarry(engine);
   engine.setData('homeDrag', '');
@@ -6218,6 +6246,7 @@ const decorateTarget = (engine) => ({
       carryBy = 'pointer';
     }
     engine.setData('homeDrag', `pack:${st.cls}:`);
+    if (machine) drawStandMarker(engine, true);
   },
   over(d, at) {
     if (!packDrag || mode !== 'decorate') return null;
@@ -6230,6 +6259,7 @@ const decorateTarget = (engine) => ({
     }
     if (packDrag.machine) {
       drawPackMarker(engine, packDropTarget(engine, e));
+      drawStandMarker(engine, true);
       engine.setData('homeDrag', `pack:${packDrag.classTsid}:machine`);
       return { ok: true };
     }

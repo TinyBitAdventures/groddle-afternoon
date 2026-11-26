@@ -19,8 +19,8 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { execFileSync, spawnSync } from 'node:child_process';
 
-import { MACHINE_SPACING, placeCheck, roomFixedXs, roomMachineSpan, roomSpan } from '../public/js/home-machines.js?v=7379f47f';
-import { homeMachinesFeature } from '../public/js/features/home-machines-feature.js?v=42e1a801';
+import { MACHINE_SPACING, placeCheck, roomFixedXs, roomMachineSpan, roomSpan } from '../public/js/home-machines.js?v=5a45be0c';
+import { homeMachinesFeature } from '../public/js/features/home-machines-feature.js?v=7ca23ab8';
 import { Display, FakeEl, fakePixi } from './fake-scene.js';
 import { HAS_SERVER, HAS_SITE, SITE_DIR, serverPath } from '../tools/repos.mjs';
 
@@ -171,7 +171,7 @@ describe('the feature: a drag let go at the pointer sets the machine down there'
     engine.player.x = s.home.x0 + 250; // 150 px from the one just set at 100
     const res = homeMachinesFeature.packDrop('woodworker', { x: s.home.x0 + 290, y: 570, pointer: true }, engine);
     assert.equal(res?.ok, false);
-    assert.equal(toasts.at(-1), 'This Woodworker cannot be placed here.');
+    assert.equal(toasts.at(-1), 'Stand further from the other machines to set this one down.', '#730: the refusal says why');
     assert.equal(s.state().machines.length, 1);
   });
 

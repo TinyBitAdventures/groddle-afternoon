@@ -143,3 +143,42 @@ export function drawLockPip(PIXI) {
   pip.addChild(g);
   return pip;
 }
+
+/**
+ * #730 (G1333, Austin 2026-11-26): ours. While a machine is dragged in Decoration Mode a faint mark
+ * shows where your Glitch stands, the spot the 200 px between machines is measured from
+ * (js/home-machines.js placeCheck `from`): a ring on the floor at your feet and a soft upright
+ * outline your height above it (Decoration Mode's view can put the floor under its tray). Decoration
+ * Mode hides the avatar (homes-feature setAvatarHidden), so nothing showed where that was; Glitch hid
+ * the player too and said only "cannot be placed here". Its colours are tokens (style.css
+ * --decor-stand-mark and its rim; classic.css gives the Classic skin its own), read from the page.
+ */
+export const STAND_MARK_SIZE = Object.freeze({ w: 64, h: 16, tall: 112, wide: 40 });
+
+/** PURE: the mark's dress from the tokens (token(name, fallback) reads one). */
+export function standMarkStyle(token = tokenColour) {
+  return {
+    fill: token('--decor-stand-mark', '#fff8ee'),
+    rim: token('--decor-stand-mark-rim', '#1e1a16'),
+    fillAlpha: 0.2,
+    rimAlpha: 0.35,
+  };
+}
+
+/** The mark, a Pixi container with the feet at (0, 0): the floor ring and the upright outline over it. */
+export function drawStandMark(PIXI, token = tokenColour) {
+  const st = standMarkStyle(token);
+  const { w, h, tall, wide } = STAND_MARK_SIZE;
+  const mark = new PIXI.Container();
+  mark.label = 'home-stand-mark';
+  mark.eventMode = 'none';
+  const g = new PIXI.Graphics();
+  // The upright: a rounded outline your height, the light line inside a dark one so it shows on any wall.
+  g.roundRect(-wide / 2, -tall, wide, tall - h / 2, wide / 2).fill({ color: st.fill, alpha: st.fillAlpha * 0.6 }).stroke({ width: 3, color: st.rim, alpha: st.rimAlpha * 0.5 });
+  g.roundRect(-wide / 2 + 1.5, -tall + 1.5, wide - 3, tall - h / 2 - 3, wide / 2 - 1.5).stroke({ width: 1.5, color: st.fill, alpha: 0.6 });
+  // The ring on the floor.
+  g.ellipse(0, 0, w / 2, h / 2).fill({ color: st.fill, alpha: st.fillAlpha }).stroke({ width: 3, color: st.rim, alpha: st.rimAlpha * 0.5 });
+  g.ellipse(0, 0, w / 2 - 2, h / 2 - 1.5).stroke({ width: 1.5, color: st.fill, alpha: 0.7 });
+  mark.addChild(g);
+  return mark;
+}

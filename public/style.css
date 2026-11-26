@@ -728,6 +728,9 @@
   --ink: var(--text);
   --text-tip: var(--c-cream-98);            /* on --surface-tip: 16.4:1 */
   --text-tip-muted: var(--c-sand-85b);      /* 10.8:1 */
+  /* #730: where you stand while a machine is dragged in Decoration Mode (js/home-stack-marks.js drawStandMark) */
+  --decor-stand-mark: var(--text-tip);
+  --decor-stand-mark-rim: var(--surface-tip);
 
   /* Borders */
   --border: var(--c-sand-87);

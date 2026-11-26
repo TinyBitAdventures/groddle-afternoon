@@ -192,6 +192,9 @@ export const HOME_MACHINE_TEXT = Object.freeze({
   placeTip: 'Set it down here, for anyone here to use',
   placeHome: 'You can only set a machine down in your own home (on your home street, in your house or in your Tower) or in a Community Machine Room.', // ours
   placeHere: (label) => `This ${label} cannot be placed here.`, // machine_stand.js canDrop
+  // #730 (G1333, Austin 2026-11-26): ours. Glitch said only placeHere for this too, and the 200 px is
+  // measured from where you stand, which Decoration Mode hides (homes-feature setAvatarHidden).
+  placeNear: 'Stand further from the other machines to set this one down.',
   placeMany: 'You have a lot of machines out already.', // ours
   placed: (label) => `You put your ${label} down here.`, // ours
   pickupVerb: 'Pick up',
@@ -239,6 +242,7 @@ export const machineLabel = (classTsid) => MACHINE_LABELS[classTsid] || String(c
  * stands where the machine goes (a Place at your feet). The edge check is
  * on where the machine goes (ours: Glitch tested pc.x and let the drop land
  * anywhere on the floor's plat line, HandOfDecorator.as checkXIsInBounds).
+ * #730: too near says so (placeNear, ours); the edge and a bad x keep placeHere.
  */
 export function placeCheck({ machines = [], rx, layout, span, classTsid, fixed = [], from = null } = {}) {
   const label = machineLabel(classTsid);
@@ -255,7 +259,7 @@ export function placeCheck({ machines = [], rx, layout, span, classTsid, fixed =
   const px = Number.isFinite(Number(from?.rx)) ? Number(from.rx) : x;
   const dy = Number.isFinite(Number(from?.dy)) ? Number(from.dy) : 0;
   const near = (mx) => Math.hypot(finite(mx) - px, dy) < MACHINE_SPACING;
-  if (machines.some((m) => near(m.rx)) || fixed.some(near)) return { ok: false, why: 'near', msg: HOME_MACHINE_TEXT.placeHere(label) };
+  if (machines.some((m) => near(m.rx)) || fixed.some(near)) return { ok: false, why: 'near', msg: HOME_MACHINE_TEXT.placeNear };
   return { ok: true, rx: x };
 }
 

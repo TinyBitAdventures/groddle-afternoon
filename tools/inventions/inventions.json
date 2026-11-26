@@ -6428,6 +6428,39 @@
    ]
   },
   {
+   "id": "machine-stand-spot",
+   "title": "Machines too near: the refusal says \"Stand further from the other machines to set this one down.\", and while a machine is dragged in Decoration Mode a faint ring and outline show where your Glitch stands (the spot the 200 px is measured from)",
+   "kind": "UI",
+   "status": "kept",
+   "where": [
+    {
+     "file": "public/js/home-machines.js",
+     "symbol": "HOME_MACHINE_TEXT.placeNear placeCheck"
+    },
+    {
+     "file": "public/js/home-stack-marks.js",
+     "symbol": "standMarkStyle drawStandMark"
+    },
+    {
+     "file": "public/js/features/homes-feature.js",
+     "symbol": "drawStandMarker"
+    },
+    {
+     "file": "public/style.css",
+     "symbol": "--decor-stand-mark"
+    },
+    {
+     "file": "public/css/classic.css",
+     "symbol": "--decor-stand-mark"
+    }
+   ],
+   "why": "Glitch measured the 200 px from the player (machine_stand.js canDrop 770-794) but hid the player in Decoration Mode and said only \"This Machine Stand cannot be placed here.\", so a drag next to a machine was refused with no reason anyone could see (report #730). The site's refusal (HomeMachines::TEXT_NEAR) says the same words online.",
+   "ruling": "Austin 2026-11-26 (#730): say why, and show your spot while dragging; ours, Glitch had the bare wording and hid the player",
+   "rows": [
+    "G1333"
+   ]
+  },
+  {
    "id": "zoomed-out-browser-hint",
    "title": "A one-time notice when the browser is zoomed far out: the zoom it reads and the key that resets it",
    "kind": "UI",

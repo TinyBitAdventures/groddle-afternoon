@@ -25,6 +25,11 @@
 @media (max-width: 1312.98px) {
   :root[data-ui="classic"] { --cu-c: 88; }
 }
+/* #730: the stand ring in Decoration Mode in the client's own tip colours (js/home-stack-marks.js drawStandMark). */
+:root[data-ui="classic"] {
+  --decor-stand-mark: var(--c-classic-tip);
+  --decor-stand-mark-rim: var(--c-classic-ink);
+}
 :root[data-ui="classic"][data-ui-size="original"] {
   --cu: 1px;
   --cf-gutter-r: max(20px, (100vw - 1000px - var(--cf-right-w)) / 2);

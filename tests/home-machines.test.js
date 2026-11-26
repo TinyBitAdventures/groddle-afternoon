@@ -41,8 +41,8 @@ import {
   isHousePlace,
   settleSolo,
   soloRow,
-} from '../public/js/home-machines.js?v=7379f47f';
-import { homeMachinesFeature } from '../public/js/features/home-machines-feature.js?v=42e1a801';
+} from '../public/js/home-machines.js?v=5a45be0c';
+import { homeMachinesFeature } from '../public/js/features/home-machines-feature.js?v=7ca23ab8';
 import { RECIPE_CATALOG, setRecipeCatalog } from '../public/js/making.js?v=dc595568';
 import { HAS_SERVER, HAS_SITE, SITE_DIR, serverPath } from '../tools/repos.mjs';
 import { HAS_PHP, PHP } from './php.js';
@@ -100,7 +100,9 @@ describe('placing', () => {
     assert.equal(placeCheck({ machines: Array.from({ length: HOME_MACHINES_MAX }, (_, i) => ({ rx: i * 300 })), rx: -900, layout, classTsid: 'fuelmaker' }).why, 'many');
     assert.equal(placeCheck({ machines: [], rx: 0, layout, classTsid: 'still' }).why, 'class');
     assert.equal(placeCheck({ machines: [], rx: 0, layout, classTsid: 'fuelmaker' }).msg, undefined);
-    assert.equal(placeCheck({ machines: [{ rx: 0 }], rx: 10, layout, classTsid: 'fuelmaker' }).msg, 'This Fuelmaker cannot be placed here.');
+    // #730: too near says so; the ends keep Glitch's words.
+    assert.equal(placeCheck({ machines: [{ rx: 0 }], rx: 10, layout, classTsid: 'fuelmaker' }).msg, 'Stand further from the other machines to set this one down.');
+    assert.equal(placeCheck({ machines: [], rx: -935, layout, classTsid: 'fuelmaker' }).msg, 'This Fuelmaker cannot be placed here.');
   });
 });
 
@@ -231,6 +233,7 @@ describe('lane machines (#152): the Community Machine Rooms', () => {
     assert.equal(s.jobs['hm-00000000000000ad'].place, undefined);
     assert.match(HOME_MACHINE_TEXT.placeHome, /Community Machine Room/);
     assert.doesNotMatch(HOME_MACHINE_TEXT.placeHome, /\u2014|Glitch/);
+    assert.doesNotMatch(HOME_MACHINE_TEXT.placeNear, /\u2014|\d|px/, '#730: one plain sentence');
   });
 });
 
@@ -400,6 +403,11 @@ describe('the site decides (src/HomeMachines.php)', { skip: skipSite }, () => {
     assert.equal(php('echo json_encode(H::placeWhy($R, [["rx" => 0]], "fuelmaker", 199));'), 'near');
     assert.equal(php('echo json_encode(H::placeWhy($R, [["rx" => 0]], "fuelmaker", 200));'), null);
     assert.equal(php('echo json_encode(H::placeWhy($R, [], "still", 0));'), 'class');
+    // #730 (G1333): too near is refused in the game's own words (placeNear), the rest keep canDrop's.
+    assert.equal(php('echo json_encode(H::TEXT_NEAR);'), HOME_MACHINE_TEXT.placeNear);
+    const site = readFileSync(join(SITE_DIR, 'src/HomeMachines.php'), 'utf8');
+    assert.match(site, /'near' => self::TEXT_NEAR,/);
+    assert.match(site, /default => sprintf\(self::TEXT_HERE,/);
     assert.deepEqual(php('echo json_encode([H::refuelFit($R, 151, 4), H::refuelFit($R, 150, 4), H::refuelFit($R, 50, 1), H::refuelFit($R, 0, 4)]);'), [0, 1, 1, 4]);
     assert.equal(php('echo json_encode(H::jobFuel($R, "blockmaker", 5, 10, ["blockmaking_save_fuel_1"]));'), jobFuel('blockmaker', 5, 10, ['blockmaking_save_fuel_1']));
   });
