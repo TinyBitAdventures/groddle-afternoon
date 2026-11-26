@@ -2814,9 +2814,14 @@
   "deployed": "2026-11-25"
  },
  "git": {
-  "commits": 3635,
+  "commits": 3637,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-25",
+    "kind": "fix",
+    "text": "Tunes for Crabs names the Vine Radio on its award card and in Activity"
+   },
    {
     "date": "2026-11-25",
     "kind": "fix",
@@ -2931,14 +2936,9 @@
     "date": "2026-11-25",
     "kind": "improve",
     "text": "A finished Group Hall's dialog and toast say the hall is the group's and its street opens in a later update"
-   },
-   {
-    "date": "2026-11-25",
-    "kind": "new",
-    "text": "A finished Group Hall's lot stays on its street with \"<group>'s Group Hall\" over the sign"
    }
   ]
  },
- "tests": 1408,
+ "tests": 1409,
  "generatedAt": "2026-11-25"
 }
