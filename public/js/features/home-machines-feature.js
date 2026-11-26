@@ -1236,15 +1236,18 @@ export const homeMachinesFeature = {
   /**
    * G1303 (#669, Austin 2026-11-25): a machine dragged from the pack in Decoration Mode is set down
    * where it is let go (`at.pointer`, from homes-feature's Decorate drop: HandOfDecorator.as
-   * dropItemFromPackOnTargetPlatform 1673-1690), the 200 px still measured from you. Any other drop
-   * of a machine keeps the general rules (null).
+   * dropItemFromPackOnTargetPlatform 1673-1690), the 200 px still measured from you. #730 (G1333):
+   * any other drop of a machine (a drag onto the street outside Decoration Mode, Drop) is set down at
+   * your feet as Place is, or refused with Place's reason, never left as a loose stack: Glitch's drop
+   * ran the machine's canDrop at pc.x (takeable.js 164, machine_stand.js 770-794).
    */
   packDrop(classTsid, at, engine) {
-    if (!isHomeMachineClass(classTsid) || !at?.pointer || !Number.isFinite(at.x)) return null;
+    if (!isHomeMachineClass(classTsid)) return null;
     const s = ensure(engine);
     if (!s) return null;
-    const copy = Number.isInteger(at.copy) ? at.copy : null;
-    if (!s.placeFromPack(classTsid, copy, at.x)) return { ok: false, reason: 'blocked', msg: '' };
+    const pointer = Boolean(at?.pointer) && Number.isFinite(at?.x);
+    const copy = Number.isInteger(at?.copy) ? at.copy : null;
+    if (!s.placeFromPack(classTsid, copy, pointer ? at.x : null)) return { ok: false, reason: 'blocked', msg: '' };
     return { ok: true, classTsid, count: 1, own: true };
   },
 

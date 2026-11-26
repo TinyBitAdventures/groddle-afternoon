@@ -20,7 +20,7 @@ import { join } from 'node:path';
 import { execFileSync, spawnSync } from 'node:child_process';
 
 import { MACHINE_SPACING, placeCheck, roomFixedXs, roomMachineSpan, roomSpan } from '../public/js/home-machines.js?v=5a45be0c';
-import { homeMachinesFeature } from '../public/js/features/home-machines-feature.js?v=7ca23ab8';
+import { homeMachinesFeature } from '../public/js/features/home-machines-feature.js?v=54f826c5';
 import { Display, FakeEl, fakePixi } from './fake-scene.js';
 import { HAS_SERVER, HAS_SITE, SITE_DIR, serverPath } from '../tools/repos.mjs';
 
@@ -175,15 +175,28 @@ describe('the feature: a drag let go at the pointer sets the machine down there'
     assert.equal(s.state().machines.length, 1);
   });
 
-  it('without the pointer (Drop, or outside Decoration Mode) the general rules run; Place stays at your feet', () => {
+  it('without the pointer (Drop, or outside Decoration Mode) it goes at your feet as Place does (#730); Place stays at your feet', () => {
     const s = globalThis.groddleHomeMachines;
-    assert.equal(homeMachinesFeature.packDrop('woodworker', null, engine), null);
-    assert.equal(homeMachinesFeature.packDrop('woodworker', { x: s.home.x0 + 290, y: 570 }, engine), null);
+    // #730 (G1333): never the general drop (a loose stack): refused while you stand near one, wherever the drop said.
+    engine.player.x = s.home.x0 + 250;
+    assert.equal(homeMachinesFeature.packDrop('woodworker', null, engine)?.ok, false);
+    assert.equal(homeMachinesFeature.packDrop('woodworker', { x: s.home.x0 + 600, y: 570 }, engine)?.ok, false);
+    assert.equal(toasts.at(-1), 'Stand further from the other machines to set this one down.');
+    assert.equal(s.state().machines.length, 1);
     assert.equal(homeMachinesFeature.packDrop('fuel_cell', { x: 0, y: 0, pointer: true }, engine), null);
-    // Place from the pack menu: at your feet, the 200 px from there (span -700..700).
+    // Standing clear of them all (221 px from -29, 236 from -486): set down at your feet, the drop's x ignored.
     assert.deepEqual(roomMachineSpan(), { lo: -700, hi: 700 });
     engine.player.x = s.home.x0 - 250;
+    const res = homeMachinesFeature.packDrop('woodworker', { x: s.home.x0 + 600, y: 570 }, engine);
+    assert.equal(res?.ok, true, toasts.at(-1));
+    assert.equal(res.own, true);
+    assert.deepEqual(s.state().machines.map((m) => m.rx), [100, -250]);
+    assert.equal(engine.inv.woodworker, 1);
+    // Place from the pack menu: at your feet, the 200 px from there, the same rule and words.
     assert.equal(homeMachinesFeature.runPackVerb('woodworker', 'machine_place', engine), true);
+    assert.equal(toasts.at(-1), 'Stand further from the other machines to set this one down.');
+    engine.player.x = s.home.x0 + 300;
+    assert.equal(homeMachinesFeature.packDrop('woodworker', null, engine)?.ok, false, '196 px from the room\'s own at 496');
     assert.deepEqual(s.state().machines.map((m) => m.rx), [100, -250]);
   });
 });
