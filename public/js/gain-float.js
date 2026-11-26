@@ -9,7 +9,7 @@
  * (`final_y_delta = val > 0 ? -40 : 40`). end_text_size = 18 px. So each amount was on screen
  * 2.4 s. Glitch drew it at the stat's gauge in the top bar (StatBurstController.as) after the
  * reward slug flew there (SlugAnimator.as), or in the giver's speech balloon, which stays at
- * least 4 s (LisChatBubbleManager.as 112); ours rises over the avatar or the giver
+ * least 4 s (LisChatBubbleManager.as 112); here it rises over the avatar or the giver
  * instead, so it keeps the burst's timing without its white circle.
  *
  * Before this, an amount faded from its first frame and was gone in 55 frames (0.9 s).
@@ -17,7 +17,7 @@
 
 export const GAIN_FLOAT = Object.freeze({
   // StatBurst.as end_text_size: 18 px on the 2012 1000x600 stage. Today's world view is larger, so
-  // ours scales it as the quoin's 24 became 20 (Austin 2026-11-11, js/quoin-shards.js QUOIN_SHARD_FX):
+  // it is scaled as the quoin's 24 became 20 (Austin 2026-11-11, js/quoin-shards.js QUOIN_SHARD_FX):
   // 18 x 20 / 24 = 15 px.
   glitchText: 18,
   stageScale: 20 / 24,

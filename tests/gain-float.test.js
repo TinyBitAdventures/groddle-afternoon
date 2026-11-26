@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { GAIN_FLOAT, GAIN_FLOAT_MS, GAIN_FLOAT_SEC, gainFloatPose, gainFloatSinks } from '../public/js/gain-float.js?v=fa16d5c3';
+import { GAIN_FLOAT, GAIN_FLOAT_MS, GAIN_FLOAT_SEC, gainFloatPose, gainFloatSinks } from '../public/js/gain-float.js?v=caf16853';
 import { QUOIN_SHARD_FX } from '../public/js/quoin-shards.js?v=121156a0';
 import { stackFloat, FLOAT_LINE_PX } from '../public/js/notify.js?v=c9d79ec5';
 

@@ -11,7 +11,7 @@ import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { DECO_TWINS } from '../public/js/street-render.js?v=9a889516';
+import { DECO_TWINS } from '../public/js/street-render.js?v=dab4ec4b';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const read = (rel) => readFileSync(join(root, rel), 'utf8');
@@ -108,7 +108,7 @@ describe('the Stoot shrine: the demon holds an empty frame, never the held photo
       return { ok: false };
     };
     try {
-      const { buildStreetView } = await import('../public/js/street-render.js?v=9a889516');
+      const { buildStreetView } = await import('../public/js/street-render.js?v=dab4ec4b');
       const manifest = new Set(JSON.parse(read('public/assets/decos/manifest.json')));
       const s = { ...JSON.parse(read(`public/assets/streets/${SHRINE}.json`)), gradient: null, signposts: [] };
       s.layers = s.layers.map((l) => ({ ...l, filters: null }));

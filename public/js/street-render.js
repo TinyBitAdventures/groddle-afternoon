@@ -630,7 +630,7 @@ export function signDecoDrawn(street, signpost) {
  * on the dark arms). An arm's hover glow takes it after its blur (#721): the client's street filter
  * sat on SignpostView's holder (ApplyLayerFiltersToViewCmd.as 47), round the arms and the glow on
  * each arm (SignpostView.as 367 tsSprite_GlowA), so in a greyscale region (Brillah) the glow is grey.
- * The route glow (map-routes-feature placeSignGlow) is ours and stays yellow. A lift drawn as its
+ * The route glow (map-routes-feature placeSignGlow) stays yellow and unfiltered, as the door route glow (G200). A lift drawn as its
  * deco takes it on its art, plate and glow. One filter, shared by the parts.
  * @param {PIXI.Container} g  a view from buildSignpostSprite or buildSignDecoView
  * @param {any} colour

@@ -4,7 +4,7 @@
  */
 import { ITEM_ICONS, ITEM_LABELS, getVerbsFor, ordinaryItems, runVerb } from './content.js?v=c976f55a';
 import { createErrorOnce, createFeatureHost, createFrameStages } from './js/feature-host.js?v=b87e2cbc';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=4c3a8c47';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=58a1d902';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, enterHintPick, reachGlowTargets, spriteHasRimArt, rimArtParts, trimmedIconUrl, drawTileArt } from './js/enter-chooser.js?v=44aef7b2';
 import { firstTendKey, STICK_TEND_DELAY_MS, STICK_TEND_DIRS, STICK_TEND_REPEAT_MS, stepTendKey, stepTendKeys, stickTendKey, tendKeyAction } from './js/garden-tend.js?v=a7470c4a';
 import { avatarHitBox, behindFloor, bodyReachDistance, OUT_OF_REACH_LINE, playerClickBox } from './js/reach.js?v=456da8a8';
@@ -541,7 +541,7 @@ import { HELD_AT_ONCE, HELD_AT_ONCE_TEXT } from './js/collection-trophies.js?v=e
 import { PACK_COPY, bagSortIcon, bagSortText, isBagClass, isElementClass, layoutHeld, ownBagLabel, unitRankAt } from './js/pack-slots.js?v=38e4aea5';
 import { beginDrag, installDropRegistry, packStackOf, registerDropTarget, touchLift } from './js/drop-targets.js?v=59e6edb4';
 import { FLOAT_TEXT_Z, SPEECH_BUBBLE_Z } from './js/fx-z.js?v=18dda7e3';
-import { GAIN_FLOAT, GAIN_FLOAT_MS, gainFloatPose, gainFloatSinks } from './js/gain-float.js?v=fa16d5c3';
+import { GAIN_FLOAT, GAIN_FLOAT_MS, gainFloatPose, gainFloatSinks } from './js/gain-float.js?v=caf16853';
 import { hasPouch } from './js/elemental-pouch.js?v=42702eda';
 import { createPackRow, mountPackClearance, packBandRange, packCountText, packSearchEntries, packSearchResults, packSlotTip } from './js/ui/pack-row.js?v=615f7790';
 import { listAnimalFeedOptions, piggyFeedTip } from './js/animals.js?v=4dc2d7b8';
@@ -742,7 +742,7 @@ import {
   ensureStreetIndex,
   resolveIndexTsid,
 } from './js/street-loader.js?v=10376267';
-import { showDraftBanner, startDraftPlay } from './js/builder/draft-play.js?v=e6140cf0';
+import { showDraftBanner, startDraftPlay } from './js/builder/draft-play.js?v=671eceb9';
 import { bootHouseFile } from './js/house-file-loader.js?v=c28ab8ba';
 import {
   ladderTopDeck,
@@ -776,7 +776,7 @@ import {
   setSignpostKeys,
   signpostBoardAt,
   signpostGlowParts,
-} from './js/street-render.js?v=9a889516';
+} from './js/street-render.js?v=dab4ec4b';
 import {
   GAME_DAY_MS,
   GAME_EPOCH_MS,

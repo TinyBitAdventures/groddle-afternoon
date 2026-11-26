@@ -2814,9 +2814,44 @@
   "deployed": "2026-11-26"
  },
  "git": {
-  "commits": 3670,
+  "commits": 3678,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-26",
+    "kind": "fix",
+    "text": "Dialogs, sheets and cards on an upright phone keep clear of the status bar's haze"
+   },
+   {
+    "date": "2026-11-26",
+    "kind": "fix",
+    "text": "Apple a Day gives its +5 energy when it ends, and timed buffs' end effects land"
+   },
+   {
+    "date": "2026-11-26",
+    "kind": "fix",
+    "text": "Floating gains (harvest, mining, petting, items, mood, energy, iMG) stay up 2.4 s, as Glitch's did"
+   },
+   {
+    "date": "2026-11-26",
+    "kind": "fix",
+    "text": "Rocks, trees, nodes and animals stand in the same spots solo as online"
+   },
+   {
+    "date": "2026-11-26",
+    "kind": "fix",
+    "text": "Animated decos drawn larger than their art are sharp again"
+   },
+   {
+    "date": "2026-11-26",
+    "kind": "fix",
+    "text": "No empty Jellisac socket past a street's right end"
+   },
+   {
+    "date": "2026-11-26",
+    "kind": "fix",
+    "text": "Signpost arm hover glow takes the street's colour, grey in Brillah"
+   },
    {
     "date": "2026-11-25",
     "kind": "fix",
@@ -2901,44 +2936,9 @@
     "date": "2026-11-25",
     "kind": "fix",
     "text": "The teleporters on Ain't That Dry, Chiti Tiga and Harrisa Hara take you where they did in Glitch"
-   },
-   {
-    "date": "2026-11-25",
-    "kind": "fix",
-    "text": "A new player taken off Gentle Island mid-tutorial is no longer refused every road onward"
-   },
-   {
-    "date": "2026-11-25",
-    "kind": "fix",
-    "text": "Batterflies fly over the walking platforms on Level 3 East, so their Guano lands where you can pick it up"
-   },
-   {
-    "date": "2026-11-25",
-    "kind": "fix",
-    "text": "Sound comes back after the iPad browser was minimized, with background sound off"
-   },
-   {
-    "date": "2026-11-25",
-    "kind": "fix",
-    "text": "Tunes for Crabs names the Vine Radio on its award card and in Activity"
-   },
-   {
-    "date": "2026-11-25",
-    "kind": "fix",
-    "text": "The glow around a vendor stays on their body through every animation"
-   },
-   {
-    "date": "2026-11-25",
-    "kind": "fix",
-    "text": "The world no longer blinks out or goes blank after you walk up to or point at your house"
-   },
-   {
-    "date": "2026-11-25",
-    "kind": "fix",
-    "text": "The glow around a vendor stays on their body through every animation"
    }
   ]
  },
- "tests": 1424,
- "generatedAt": "2026-11-25"
+ "tests": 1426,
+ "generatedAt": "2026-11-26"
 }
