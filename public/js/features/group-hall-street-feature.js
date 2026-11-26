@@ -77,13 +77,20 @@ export function enterHall(engine, job) {
   return true;
 }
 
-/** Out of the hall to its lot street, in front of the lot, saying why when the server sent you. */
-function leaveHall(engine, job, text = '') {
+/**
+ * Out of the hall to its lot street, in front of the lot, saying why when the server sent you.
+ * R46: a trip that failed (engine.enter's false, already said) leaves you here, so nothing waits
+ * for the lot. Answers whether you left.
+ */
+async function leaveHall(engine, job, text = '') {
   const hall = hallStreetOf(job);
-  if (!hall) return;
+  if (!hall) return false;
   if (text) engine.toast?.(text, 4200);
-  toLot = { job: String(job), until: Date.now() + LOT_WAIT_MS };
-  engine.enter?.(hall.lot, { spawnX: hall.lotOut.x, spawnY: hall.lotOut.y });
+  const wait = { job: String(job), until: Date.now() + LOT_WAIT_MS };
+  toLot = wait;
+  const ok = (await engine.enter?.(hall.lot, { spawnX: hall.lotOut.x, spawnY: hall.lotOut.y })) !== false;
+  if (!ok && toLot === wait) toLot = null;
+  return ok;
 }
 
 function bind(engine) {

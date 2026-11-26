@@ -30,7 +30,7 @@ import {
 } from '../public/js/group-hall-street.js?v=fa1921ad';
 import { OPEN_HALL_STREETS, hallStreetOpen } from '../public/js/group-hall-lot.js?v=045c799a';
 import { HALL_TEXT } from '../public/js/street-jobs-mp.js?v=1ccfc0c0';
-import { enterHall, enterVerb, groupHallStreetFeature as F, resetGroupHallStreet } from '../public/js/features/group-hall-street-feature.js?v=bf80ce67';
+import { enterHall, enterVerb, groupHallStreetFeature as F, resetGroupHallStreet } from '../public/js/features/group-hall-street-feature.js?v=59e2a499';
 import { arrivalInTarget } from '../public/js/location-navigation.js?v=e9221d85';
 import { ladderTopDeck } from '../public/js/street-model.js?v=a9a05f9d';
 
@@ -256,5 +256,20 @@ describe('the feature (features/group-hall-street-feature.js)', () => {
     assert.equal(engine.data.groupHallLast, 'out:692');
     emit('msg:hall_out', { job: '692', text: 'x' });
     assert.equal(engine.enters.length, 2, 'not in the hall any more: nothing to do');
+  });
+
+  it('R46: a trip out that fails (engine.enter false) leaves nothing waiting for the lot', async () => {
+    engine.streetTsid = HALL;
+    engine.enter = function enter(tsid, opts) { this.enters.push([tsid, opts]); return Promise.resolve(false); };
+    F.onTick(16, 0, engine);
+    emit('msg:hall_out', { job: '692', text: 'out' });
+    assert.equal(engine.enters.length, 1);
+    await new Promise((r) => setImmediate(r));
+    // Still in the hall; a later visit to the lot street is not pulled to the lot.
+    engine.streetTsid = LOT;
+    engine.lotSpot = { x: 1340, y: 900 };
+    F.onTick(16, 0, engine);
+    assert.equal(engine.player.x, 100);
+    assert.equal(engine.data.groupHallLast, 'out:692');
   });
 });

@@ -20,7 +20,7 @@ import { join } from 'node:path';
 import { execFileSync, spawnSync } from 'node:child_process';
 
 import { MACHINE_SPACING, placeCheck, roomFixedXs, roomMachineSpan, roomSpan } from '../public/js/home-machines.js?v=7379f47f';
-import { homeMachinesFeature } from '../public/js/features/home-machines-feature.js?v=7a25dd61';
+import { homeMachinesFeature } from '../public/js/features/home-machines-feature.js?v=1733e246';
 import { Display, FakeEl, fakePixi } from './fake-scene.js';
 import { HAS_SERVER, HAS_SITE, SITE_DIR, serverPath } from '../tools/repos.mjs';
 
