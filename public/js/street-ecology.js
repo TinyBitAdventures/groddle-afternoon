@@ -602,6 +602,23 @@ export async function loadStreetEcologyCatalog(fetchImpl = globalThis.fetch) {
 }
 
 /**
+ * #704: the floor a street's Butterflies and Batterflies fly over, in `street`'s screen y (world y
+ * less bounds.t), from the location's ground_y (the catalog's groundY section, written by
+ * build-street-ecology.mjs from the geometry XML), or null where it has none. Glitch flew them in
+ * the band over it (npc_batterfly.js flyAround 1047-1051: floor = geo.b, or geo.ground_y when set;
+ * npc_butterfly.js flyAround the same); js/street-creatures.js flightFloor takes it.
+ */
+export function flightGroundFor(street, source = catalog) {
+  const t = Number(street?.bounds?.t);
+  if (!Number.isFinite(t)) return null;
+  for (const alias of streetEcologyAliases(street?.tsid)) {
+    const g = source?.groundY?.[alias];
+    if (Number.isFinite(g)) return g - t;
+  }
+  return null;
+}
+
+/**
  * Ticket 64: the floor runs nobody reaches on a street ({ [line id]: [[x1, x2]] },
  * screen x), from the catalog's unreachedFloors section (tools/ecology/build-unreached-floors.mjs:
  * the builder's reach graph from every arrival; each line's runs kept as "x1-x2 x1-x2").

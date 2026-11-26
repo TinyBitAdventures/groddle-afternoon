@@ -4,8 +4,8 @@ import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { getVerbsFor, runVerb } from '../public/content.js?v=3cefd46f';
-import { createAnimalState, listAnimalFeedOptions } from '../public/js/animals.js?v=19981d8f';
+import { getVerbsFor, runVerb } from '../public/content.js?v=a87eb482';
+import { createAnimalState, listAnimalFeedOptions } from '../public/js/animals.js?v=3b065ee0';
 import { centerVerbMenu, fitPickGridCols, makePickTile, menuRowsCap, pickGridCols, pickGridStep, placeVerbMenu } from '../public/js/ui/verb-menu.js?v=4cb51d52';
 
 const here = dirname(fileURLToPath(import.meta.url));

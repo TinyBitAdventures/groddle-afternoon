@@ -62,7 +62,7 @@ import { nearestSurfaceY, stackRestY } from '../walk-surface.js?v=3c919d5b';
 import { displayTopOf, itemstackOverlayPoint, playSheetOverlay } from '../overlay-art.js?v=e50bacca';
 import { SET_FREE, applySetFree, canSetFree, setFreeGoneLine, setFreePrompt } from '../animal-set-free.js?v=6fcd8355';
 import { GAME_EPOCH_MS, getGameDayKey } from '../game-day.js?v=a532775d';
-import { createAnimalState, resetAnimalDay, animalStatusLabel, listAnimalFeedOptions } from '../animals.js?v=19981d8f';
+import { createAnimalState, resetAnimalDay, animalStatusLabel, listAnimalFeedOptions } from '../animals.js?v=3b065ee0';
 import { standOnFeet } from '../sprite-feet.js?v=6358a697';
 import {
   BABY_ANIMALS,
@@ -111,15 +111,16 @@ import {
   resetIncubation,
   stepHogtie,
   stickPlaceState,
-} from '../animal-husbandry.js?v=427fd853';
-import { batterflyResponseFor, flierAt, flierSeed, flightFloorFor, followPath, hourlyGuanoDrops, PATH_STEP } from '../street-creatures.js?v=5ca995d4';
+} from '../animal-husbandry.js?v=e5462668';
+import { batterflyResponseFor, flierAt, flierSeed, flightFloorFor, followPath, hourlyGuanoDrops, PATH_STEP } from '../street-creatures.js?v=d54fb515';
+import { flightGroundFor } from '../street-ecology.js?v=f1c11a2d';
 import { loseEnergy, shiftMetabolic, topUpMetabolic } from '../metabolics.js?v=48f784bf';
 import { textureFromUrl } from '../textures.js?v=b8e38103';
 import { PIGGY_DEATH_DROPS, PIGGY_DEATH_PUFF, SAD_BABY, forcedRoll, isSadIn } from '../animal-mood.js?v=a49495fc';
-import { animalCrowdChanged, animalCrowdSad, animalPlaceIsDepressing, crowdLimit, ownsPlace, smokePuff as sharedSmokePuff } from './animal-mood-feature.js?v=d79f3338';
+import { animalCrowdChanged, animalCrowdSad, animalPlaceIsDepressing, crowdLimit, ownsPlace, smokePuff as sharedSmokePuff } from './animal-mood-feature.js?v=6fd40030';
 import { grantMoodXp } from '../mood-xp.js?v=e311b45c';
 import { itemZ } from '../item-bands.js?v=ec366be3';
-import { followYardPath, freeYardSpot, holdYardWalk } from '../yard-wander.js?v=28f55f45';
+import { followYardPath, freeYardSpot, holdYardWalk } from '../yard-wander.js?v=93029ecf';
 import { showsChickenIdle, yardChickenPose } from '../chicken-idle-art.js?v=e320e159';
 import { chickenWaitPose } from '../chicken-idles.js?v=eef0279b';
 import { PACKED_SHEETS } from '../packed-sheets-data.js?v=192c6f15';
@@ -295,7 +296,7 @@ function batterflyFlight(engine, key, x, groundY) {
     kind: 'batterfly',
     seed: flierSeed('batterfly', m ? Number(m[1]) : 0, x),
     worldW,
-    floor: flightFloorFor(engine?.platforms, worldW),
+    floor: flightFloorFor(engine?.platforms, worldW, flightGroundFor(engine?.street)),
     groundY,
   };
 }

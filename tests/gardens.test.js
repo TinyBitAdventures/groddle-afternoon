@@ -58,7 +58,7 @@ import {
   GARDEN_WATER_ALL_TIRED_LINE,
   waterAllPlan,
 } from '../public/js/garden.js?v=a7c6f521';
-import { getVerbsFor, runVerb } from '../public/content.js?v=3cefd46f';
+import { getVerbsFor, runVerb } from '../public/content.js?v=a87eb482';
 import { plotPieces } from '../public/js/garden-view.js?v=04fe8467';
 import { plotsFor } from '../public/js/master-garden.js?v=60fdb23c';
 import {

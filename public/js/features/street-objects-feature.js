@@ -154,17 +154,17 @@ import {
   treeReady,
   treeSkill,
   waitingIds,
-} from '../street-objects.js?v=4ce8ad4f';
+} from '../street-objects.js?v=6061b946';
 import { ENDED_STATES, NO_REALTIME_STATES, answerWaitMs, createOnlineRequests, offlineLine, sharedOffline, waitLine } from '../online-request.js?v=09ac8a9c';
 import { ROCK_CATALOG } from '../mining.js?v=5e49efb3';
 import { TRANT_META, trantStatusLabel } from '../trants.js?v=864ea9ff';
 import { quoteWoodTreeHarvest } from '../woodcutting.js?v=9e9af511';
 import { highestLightGreenThumbRank, quoteTrantCare } from '../trant-care.js?v=cb7f539b';
-import { animalStatusLabel, pickerMaxCount } from '../animals.js?v=19981d8f';
+import { animalStatusLabel, pickerMaxCount } from '../animals.js?v=3b065ee0';
 import { highestAnimalKinshipRank, quoteAnimalKinship } from '../animal-kinship.js?v=75d3cb34';
 import { CREW_NODES } from '../help-dig.js?v=7a854b00';
-import { animalPatrolRange, ANIMAL_BODY, TREE_FOOTPRINT } from '../street-ecology.js?v=58aafb61';
-import { INCUBATION, PIGGY_FEED, itemBaseCost, namedAnimalLabel, resetIncubation } from '../animal-husbandry.js?v=427fd853';
+import { animalPatrolRange, ANIMAL_BODY, flightGroundFor, TREE_FOOTPRINT } from '../street-ecology.js?v=f1c11a2d';
+import { INCUBATION, PIGGY_FEED, itemBaseCost, namedAnimalLabel, resetIncubation } from '../animal-husbandry.js?v=e5462668';
 import {
   applyCreatureState,
   batterflyPerks,
@@ -190,7 +190,7 @@ import {
   dragonWalkAt,
   kittyWalkAt,
   walkerSpan,
-} from '../street-creatures.js?v=5ca995d4';
+} from '../street-creatures.js?v=d54fb515';
 
 export const STREET_OBJECTS_FEATURE_ID = 'street-objects';
 const RECONCILE_MS = 250;
@@ -493,7 +493,7 @@ function setPath(engine, obj) {
       kind: 'butterfly',
       seed: flierSeed('butterfly', obj.index, spot.x),
       worldW,
-      floor: flightFloorFor(engine.platforms, worldW),
+      floor: flightFloorFor(engine.platforms, worldW, flightGroundFor(engine.street)),
       groundY: Number.isFinite(spot.y) ? spot.y : spr.y,
     };
     pointAt = () => flierAt(home, pathTime(t.sharedPath, Date.now(), copy.offset));
@@ -523,7 +523,7 @@ function setPath(engine, obj) {
     if (!placed) return;
     // At random over the whole street in the 400 px over the floor (js/street-creatures.js flierAt),
     // as its solo flight (animal-husbandry-feature stepBatterfly): the same seed on every page.
-    const home = { ...placed, floor: flightFloorFor(engine.platforms, Number(engine.worldW) || 2000) };
+    const home = { ...placed, floor: flightFloorFor(engine.platforms, Number(engine.worldW) || 2000, flightGroundFor(engine.street)) };
     pointAt = () => flierAt(home, pathTime(t.sharedPath, Date.now(), copy.offset));
     step = (dt) => {
       const p = pointAt();

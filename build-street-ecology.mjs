@@ -322,7 +322,18 @@ const vendors = {};
 const swoonerflies = {};
 const animalEvidence = { piggies: {}, chickens: {}, butterflies: {}, batterflies: {} };
 const census = await animalCensus();
+const groundY = {};
 for (const [tsid, meta] of Object.entries(index.streets || {})) {
+  // The location's ground_y (#704): the floor a Butterfly or Batterfly flies over (npc_batterfly.js
+  // flyAround 1047-1051: floor = geo.b, or geo.ground_y when set). Only the G-prefixed geometry file
+  // carries it, and 0 is unset there (`if (g.ground_y)`).
+  try {
+    const geo = await readFile(join(locationRoot, `${tsid}.xml`), 'utf8');
+    const g = Number(/<int id="ground_y">(-?\d+)<\/int>/.exec(geo)?.[1]);
+    if (g) groundY[tsid] = g;
+  } catch {
+    // No geometry file (a published zone): its fliers keep the street's own floor.
+  }
   const candidates = locationAliases(tsid).map((alias) => join(locationRoot, `${alias}.xml`));
   const sourcePath = await firstReadable(candidates);
   if (!sourcePath) continue;
@@ -416,6 +427,9 @@ const catalog = {
   butterflies: animalEvidence.butterflies,
   batterflyStreetCount: Object.keys(animalEvidence.batterflies).length,
   batterflies: animalEvidence.batterflies,
+  groundYNote: 'Each location\'s ground_y (world y), the floor its fliers fly over (js/street-ecology.js flightGroundFor); streets without one fly over their own floor.',
+  groundYStreetCount: Object.keys(groundY).length,
+  groundY,
 };
 
 mergeZoneEcology(catalog, listZones(files(root)).map((z) => z.zone));

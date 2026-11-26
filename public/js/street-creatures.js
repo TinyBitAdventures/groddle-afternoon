@@ -51,9 +51,9 @@
 
 import { isCostume } from './pot-luck.js?v=e704c060';
 import { GAME_EPOCH_MS } from './game-day.js?v=a532775d';
-import { INCUBATION } from './animal-husbandry.js?v=427fd853';
+import { INCUBATION } from './animal-husbandry.js?v=e5462668';
 import { isStandable } from './street-model.js?v=a9a05f9d';
-import { ANIMAL_BODY, TREE_FOOTPRINT } from './street-ecology.js?v=58aafb61';
+import { ANIMAL_BODY, TREE_FOOTPRINT } from './street-ecology.js?v=f1c11a2d';
 import { KITTY_MOTION, KITTY_PAUSE_CHOICES } from './heli-kitties.js?v=e4af4096';
 import { CRAB_WALK } from './crabs.js?v=5a43743d';
 import { FIRE_DRAGON_WALK } from './fire-dragon.js?v=b7f3d751';
@@ -729,6 +729,11 @@ export function chickenSeed(index, baseX) {
  *     `ease` px either side (ease <= reach), so the path rises before a step instead of at it and
  *     never comes below the floor within `ease` px of it (a flier's half width is under 50 px).
  * A gap with no floor (a pit, past the street's ends) takes the higher of the floors beside it.
+ * Where the location sets a ground_y (#704, street-ecology.js flightGroundFor), that is the floor as
+ * in Glitch wherever the lines under the flier are lower: Level 3 East's walking plats are at its
+ * ground_y with the water 300-490 px under them, and a band over the water flew the Batterflies
+ * under the plats and dropped their Guano in the water. Ground rising over the ground_y still
+ * lifts the band (Middle Arbor's climb).
  */
 export const FLIGHT_FLOOR = Object.freeze({ band: 200, join: 6, ground: 24, reach: 120, ease: 60 });
 
@@ -794,12 +799,16 @@ export function floorProfile(platforms, worldW, opts = {}) {
   return row;
 }
 
-/** The smoothed floor fliers keep above, for a street (see FLIGHT_FLOOR), or null with no floor. */
+/**
+ * The smoothed floor fliers keep above, for a street (see FLIGHT_FLOOR), or null with no floor.
+ * opts.groundY: the location's ground_y in screen y (flightGroundFor); the floor is never lower.
+ */
 export function flightFloor(platforms, worldW, opts = {}) {
-  const { reach, ease } = { ...FLIGHT_FLOOR, ...opts };
+  const { reach, ease, groundY = null } = { ...FLIGHT_FLOOR, ...opts };
   const raw = floorProfile(platforms, worldW, opts);
   const n = raw.length;
   if (!raw.some((y) => y != null)) return null;
+  if (Number.isFinite(groundY)) for (let x = 0; x < n; x += 1) if (raw[x] != null && raw[x] > groundY) raw[x] = groundY;
   // The highest floor within reach either side (smaller y is higher): a sliding minimum.
   const r = Math.max(0, Math.round(reach));
   const env = new Array(n).fill(null);
@@ -842,13 +851,17 @@ export function flightFloor(platforms, worldW, opts = {}) {
 
 const floorCache = new WeakMap();
 
-/** flightFloor, kept per platforms array (a street's lines; game.js and the features share it). */
-export function flightFloorFor(platforms, worldW) {
+/**
+ * flightFloor, kept per platforms array (a street's lines; game.js and the features share it).
+ * groundY: the location's ground_y in screen y (street-ecology.js flightGroundFor), or null.
+ */
+export function flightFloorFor(platforms, worldW, groundY = null) {
   if (!platforms || typeof platforms !== 'object') return null;
+  const ground = Number.isFinite(groundY) ? groundY : null;
   const hit = floorCache.get(platforms);
-  if (hit && hit.worldW === worldW && hit.count === platforms.length) return hit.floor;
-  const floor = flightFloor(platforms, worldW);
-  floorCache.set(platforms, { worldW, count: platforms.length, floor });
+  if (hit && hit.worldW === worldW && hit.count === platforms.length && hit.ground === ground) return hit.floor;
+  const floor = flightFloor(platforms, worldW, { groundY: ground });
+  floorCache.set(platforms, { worldW, count: platforms.length, ground, floor });
   return floor;
 }
 

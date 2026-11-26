@@ -29,7 +29,7 @@ const pixi = new Proxy({ Container: Display, Graphics: Display, Sprite: Display,
 globalThis.PIXI = pixi;
 globalThis.Image ??= class { set src(_) {} };
 
-const { visitorHomeScene } = await import('../public/js/features/homes-feature.js?v=b1d2b7d4');
+const { visitorHomeScene } = await import('../public/js/features/homes-feature.js?v=a4906049');
 const { normalizeHomeView, visitSceneTsid } = await import('../public/js/neighbours-mp.js?v=f43b50c8');
 
 const item = (id, protoClass, endClass, rx) => ({ id, protoClass, endClass, rx, wear: 0, lifeSteps: 0, placedAt: Date.now() - 60_000 });
@@ -103,7 +103,7 @@ describe('an allowed visitor: each back-yard thing is drawn exactly once, the ro
     };
     const engine = new Proxy(base, { get: (t, k) => (k in t ? t[k] : typeof k === 'symbol' || String(k).startsWith('spawn') ? undefined : () => undefined) });
     try {
-      const { yardVerbsMpFeature } = await import('../public/js/features/yard-verbs-mp-feature.js?v=241b3963');
+      const { yardVerbsMpFeature } = await import('../public/js/features/yard-verbs-mp-feature.js?v=2414af0a');
       yardVerbsMpFeature.onTick(16, 1, engine);
       for (let i = 0; i < 40 && !globalThis.groddleYard?.visit; i += 1) await new Promise((r) => setTimeout(r, 5));
       const visit = globalThis.groddleYard?.visit;

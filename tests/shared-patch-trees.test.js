@@ -27,18 +27,18 @@ import {
   sharedTreeReady,
   sharedTreeSkill,
   TRANTSFORM_VERB,
-} from '../public/js/shared-patches.js?v=59d5b9d0';
-import { sharedPatchesFeature } from '../public/js/features/shared-patches-feature.js?v=f6e3ba41';
-import { patchesFeature } from '../public/js/features/patches-feature.js?v=00a40d74';
-import { treeDeathFeature, decorateTreeVerbs } from '../public/js/features/tree-death-feature.js?v=38f181f1';
-import { potionsFeature } from '../public/js/features/potions-feature.js?v=cc01f952';
-import { powdersFeature, runPowder } from '../public/js/features/powders-feature.js?v=83dfc135';
-import { streetObjectsFeature } from '../public/js/features/street-objects-feature.js?v=30392f9b';
+} from '../public/js/shared-patches.js?v=38171dd9';
+import { sharedPatchesFeature } from '../public/js/features/shared-patches-feature.js?v=6f301bb2';
+import { patchesFeature } from '../public/js/features/patches-feature.js?v=725990dd';
+import { treeDeathFeature, decorateTreeVerbs } from '../public/js/features/tree-death-feature.js?v=b4a19e67';
+import { potionsFeature } from '../public/js/features/potions-feature.js?v=e4c216e3';
+import { powdersFeature, runPowder } from '../public/js/features/powders-feature.js?v=4f87d939';
+import { streetObjectsFeature } from '../public/js/features/street-objects-feature.js?v=b4590ff9';
 import { rookKeyFor } from '../public/js/rook-attack.js?v=5e62a79f';
 import { rookedFromServer, syncKeys } from '../public/js/rook-mp.js?v=dda37008';
-import { runVerb } from '../public/content.js?v=3cefd46f';
+import { runVerb } from '../public/content.js?v=a87eb482';
 import { isPoisoned, POISON_DURATION_MS, TREE_ANTIDOTE, TREE_POISON } from '../public/js/tree-poison.js?v=646d1bc1';
-import { getStreetEcologyCatalog, setStreetEcologyCatalog } from '../public/js/street-ecology.js?v=58aafb61';
+import { getStreetEcologyCatalog, setStreetEcologyCatalog } from '../public/js/street-ecology.js?v=f1c11a2d';
 
 const read = (p) => readFileSync(new URL(`../${p}`, import.meta.url), 'utf8');
 const OLD_MAIN = 'GM4103L52ID23';

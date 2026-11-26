@@ -15,9 +15,9 @@ import { describe, it } from 'node:test';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-import { populationForStreet } from '../public/js/street-ecology.js?v=58aafb61';
+import { populationForStreet } from '../public/js/street-ecology.js?v=f1c11a2d';
 import { normalizeWorldSnapshot } from '../public/js/player-save.js?v=7c3df906';
-import { getVerbsFor } from '../public/content.js?v=3cefd46f';
+import { getVerbsFor } from '../public/content.js?v=a87eb482';
 import { ITEM_CATALOG } from '../public/js/inventory.js?v=6414dbdc';
 
 const root = join(import.meta.dirname, '..');

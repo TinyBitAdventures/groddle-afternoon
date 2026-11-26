@@ -34,10 +34,10 @@ import {
   flightFloorFor,
   floorProfile,
   floorUnder,
-} from '../public/js/street-creatures.js?v=5ca995d4';
+} from '../public/js/street-creatures.js?v=d54fb515';
 import { setCreatureEcology, streetObjectLayout } from '../tools/build-realtime-objects.mjs';
 import { STREET_INDEX, applyStreetIndex, loadStreetDataFromFs, setZoneStreetsShown } from '../public/js/street-loader.js?v=10376267';
-import { setStreetEcologyCatalog } from '../public/js/street-ecology.js?v=58aafb61';
+import { flightGroundFor, setStreetEcologyCatalog } from '../public/js/street-ecology.js?v=f1c11a2d';
 import { platformsScreen, streetWidth, isItemSolid } from '../public/js/street-model.js?v=a9a05f9d';
 import { nearestSurfaceY } from '../public/js/walk-surface.js?v=3c919d5b';
 
@@ -165,7 +165,7 @@ describe('fliers keep above the floor under them', () => {
     // floor keeps it over the street wherever it flies, in the original's 200 px band.
     const [, sx, sy] = street.layout.butterflies.find((row) => row[3]);
     assert.ok(Number.isFinite(sy));
-    const floor = flightFloor(platforms, worldW);
+    const floor = flightFloor(platforms, worldW, { groundY: flightGroundFor(street.data) });
     const home = { kind: 'butterfly', seed: flierSeed('butterfly', 0, sx), worldW, floor, groundY: sy };
     const plan = flierPlan(home);
     let left = Infinity;
@@ -187,7 +187,8 @@ describe('fliers keep above the floor under them', () => {
     for (const street of streets) {
       const platforms = platformsScreen(street.data);
       const worldW = streetWidth(street.data);
-      const floor = flightFloor(platforms, worldW);
+      // As the game flies it: over the location's ground_y where the lines are lower (#704).
+      const floor = flightFloor(platforms, worldW, { groundY: flightGroundFor(street.data) });
       const row = floorProfile(platforms, worldW);
       for (const kind of kindsOf(street.layout)) {
         if (kind === 'butterfly') butterflies += 1;
@@ -210,14 +211,14 @@ describe('fliers keep above the floor under them', () => {
 
   it('the shared path (online) and the solo step draw a flier over the same floor', () => {
     const game = read('public/game.js');
-    assert.match(game, /floor: flightFloorFor\(streetPlatforms, WORLD_W\),/);
+    assert.match(game, /floor: flightFloorFor\(streetPlatforms, WORLD_W, flightGroundFor\(currentStreet\)\),/);
     assert.match(game, /const p = flierAt\(b\._flight, b\._flyClock\);/);
     const shared = read('public/js/features/street-objects-feature.js');
-    assert.match(shared, /floor: flightFloorFor\(engine\.platforms, worldW\),/);
-    assert.match(shared, /const home = \{ \.\.\.placed, floor: flightFloorFor\(engine\.platforms, Number\(engine\.worldW\) \|\| 2000\) \};/);
+    assert.match(shared, /floor: flightFloorFor\(engine\.platforms, worldW, flightGroundFor\(engine\.street\)\),/);
+    assert.match(shared, /const home = \{ \.\.\.placed, floor: flightFloorFor\(engine\.platforms, Number\(engine\.worldW\) \|\| 2000, flightGroundFor\(engine\.street\)\) \};/);
     assert.match(shared, /pointAt = \(\) => flierAt\(home, pathTime\(t\.sharedPath, Date\.now\(\), copy\.offset\)\);/);
     const husbandry = read('public/js/features/animal-husbandry-feature.js');
-    assert.match(husbandry, /floor: flightFloorFor\(engine\?\.platforms, worldW\),/);
+    assert.match(husbandry, /floor: flightFloorFor\(engine\?\.platforms, worldW, flightGroundFor\(engine\?\.street\)\),/);
     assert.match(husbandry, /flierAt\(entity\.home, entity\.clock\)/);
     // Never under the floor, however far the floor rises across the street.
     const platforms = [{ x1: 0, y1: 900, x2: 400, y2: 600 }, { x1: 400, y1: 600, x2: 1200, y2: 600 }];

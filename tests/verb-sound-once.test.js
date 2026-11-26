@@ -13,7 +13,7 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { actionLoopFor, createToolLoopLedger, soundForGardenAction, soundForVerb } from '../public/js/sound-moments.js?v=3e66996f';
-import { sfxFor } from '../public/js/features/resource-nodes-feature.js?v=6963f42a';
+import { sfxFor } from '../public/js/features/resource-nodes-feature.js?v=ae39bd8a';
 
 const game = readFileSync(new URL('../public/game.js', import.meta.url), 'utf8');
 

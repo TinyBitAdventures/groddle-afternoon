@@ -2,9 +2,9 @@
  * Groddle Afternoon — original street geometry + layered decos
  * PixiJS 8 · locations-xml streets · CoU PNG decos · quests/items
  */
-import { ITEM_ICONS, ITEM_LABELS, getVerbsFor, ordinaryItems, runVerb } from './content.js?v=3cefd46f';
+import { ITEM_ICONS, ITEM_LABELS, getVerbsFor, ordinaryItems, runVerb } from './content.js?v=a87eb482';
 import { createErrorOnce, createFeatureHost, createFrameStages } from './js/feature-host.js?v=b87e2cbc';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=365584bb';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=d63b0634';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, enterHintPick, reachGlowTargets, spriteHasRimArt, trimmedIconUrl, drawTileArt } from './js/enter-chooser.js?v=38d401c2';
 import { firstTendKey, STICK_TEND_DELAY_MS, STICK_TEND_DIRS, STICK_TEND_REPEAT_MS, stepTendKey, stepTendKeys, stickTendKey, tendKeyAction } from './js/garden-tend.js?v=a7470c4a';
 import { avatarHitBox, behindFloor, bodyReachDistance, OUT_OF_REACH_LINE, playerClickBox } from './js/reach.js?v=456da8a8';
@@ -543,8 +543,8 @@ import { beginDrag, installDropRegistry, packStackOf, registerDropTarget, touchL
 import { FLOAT_TEXT_Z, SPEECH_BUBBLE_Z } from './js/fx-z.js?v=18dda7e3';
 import { hasPouch } from './js/elemental-pouch.js?v=42702eda';
 import { createPackRow, mountPackClearance, packBandRange, packCountText, packSearchEntries, packSearchResults, packSlotTip } from './js/ui/pack-row.js?v=615f7790';
-import { listAnimalFeedOptions, piggyFeedTip } from './js/animals.js?v=19981d8f';
-import { pickerEmptyLine, pickerMaxCount, pickerOptionsFor, pickerTakesCount } from './js/animals.js?v=19981d8f';
+import { listAnimalFeedOptions, piggyFeedTip } from './js/animals.js?v=3b065ee0';
+import { pickerEmptyLine, pickerMaxCount, pickerOptionsFor, pickerTakesCount } from './js/animals.js?v=3b065ee0';
 import {
   createDroppedItemState,
   parseDroppedItemState,
@@ -741,7 +741,7 @@ import {
   ensureStreetIndex,
   resolveIndexTsid,
 } from './js/street-loader.js?v=10376267';
-import { showDraftBanner, startDraftPlay } from './js/builder/draft-play.js?v=18d6b9e3';
+import { showDraftBanner, startDraftPlay } from './js/builder/draft-play.js?v=aa509611';
 import { bootHouseFile } from './js/house-file-loader.js?v=c28ab8ba';
 import {
   ladderTopDeck,
@@ -761,7 +761,7 @@ import {
   stuckWay,
 } from './js/street-model.js?v=a9a05f9d';
 import { climberAtLadderTop, ladderTopSignpostFor, walkUpSignpostStreet } from './js/ladder-top-signposts.js?v=0192e447';
-import { STUCK_ARRIVAL_WAYS, defaultArrival, groundAt, loadStreetArrivals, stuckArrivalSpot } from './js/street-arrival.js?v=f1231c33';
+import { STUCK_ARRIVAL_WAYS, defaultArrival, groundAt, loadStreetArrivals, stuckArrivalSpot } from './js/street-arrival.js?v=ee7223c5';
 import {
   buildStreetView,
   glitchLayerMatrix,
@@ -950,7 +950,7 @@ import {
   createAnimalState,
   resetAnimalDay,
   animalStatusLabel,
-} from './js/animals.js?v=19981d8f';
+} from './js/animals.js?v=3b065ee0';
 import {
   ensureWoodTreeState,
   pickWoodTool,
@@ -1092,8 +1092,9 @@ import {
   treePlacementRequest,
   gardenPlacementRequest,
   ROCK_SHAPE_WIDTHS,
-} from './js/street-ecology.js?v=58aafb61';
-import { CHICKEN_PAUSE, chickenPauseRoll, flierAt, flierSeed, flightFloorFor, followPath, PATH_STEP } from './js/street-creatures.js?v=5ca995d4';
+  flightGroundFor,
+} from './js/street-ecology.js?v=f1c11a2d';
+import { CHICKEN_PAUSE, chickenPauseRoll, flierAt, flierSeed, flightFloorFor, followPath, PATH_STEP } from './js/street-creatures.js?v=d54fb515';
 import { chickenPose, chickenIdleSheetsAsked } from './js/chicken-idle-art.js?v=e320e159';
 import { chickenWaitPose } from './js/chicken-idles.js?v=eef0279b';
 import { itemOverlayStats } from './js/item-overlay.js?v=b0086ba6';
@@ -16111,7 +16112,7 @@ function spawnButterflies(xs, flyingSpots) {
       kind: 'butterfly',
       seed: flierSeed('butterfly', flyIndex, spotX),
       worldW: WORLD_W,
-      floor: flightFloorFor(streetPlatforms, WORLD_W),
+      floor: flightFloorFor(streetPlatforms, WORLD_W, flightGroundFor(currentStreet)),
       groundY: Number.isFinite(spot.y) ? spot.y : GROUND_Y,
     };
     b._flyClock = Date.now() - GAME_EPOCH_MS;
