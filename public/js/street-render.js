@@ -2820,9 +2820,11 @@ export function wholeTexels(size, res = 1) {
 /**
  * EDGE MIRROR (#380, Austin 2026-11-15): art that looks like something to use (ladders, signposts,
  * doors, stairs, climbing trees and ropes) is left out of the reflection, so nothing past a
- * street's real end invites a walk there.
+ * street's real end invites a walk there. #718: so are the ground hollows Jellisac Growths sit in
+ * (ground_cutaway_hollow1-3): the growth is a node, never reflected, so a mirrored hollow read as
+ * a socket with its Jellisac missing.
  */
-export const EDGE_MIRROR_USABLE = /ladder|signpost|sign_|_sign|door|stairs|steps?(?:_|\d|$)|climb|elevator|portal|vine_rope/i;
+export const EDGE_MIRROR_USABLE = /ladder|signpost|sign_|_sign|door|stairs|steps?(?:_|\d|$)|climb|elevator|portal|vine_rope|cutaway_hollow/i;
 
 /** PURE (EDGE MIRROR, #380): a deco sprite (or a ladder's tiling) left out of the reflection. */
 export function edgeMirrorLeavesOut(child) {

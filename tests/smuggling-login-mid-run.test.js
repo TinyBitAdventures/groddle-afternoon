@@ -14,8 +14,8 @@ import { join } from 'node:path';
 
 import { CONTRABAND, SMUGGLING_QUEST } from '../public/js/smuggling.js?v=2fde7da3';
 import { applyStreetIndex } from '../public/js/street-loader.js?v=10376267';
-import { streetJobsFeature, projectApi } from '../public/js/features/street-jobs-feature.js?v=f9997588';
-import { smugglingFeature } from '../public/js/features/smuggling-feature.js?v=d7e1189f';
+import { streetJobsFeature, projectApi } from '../public/js/features/street-jobs-feature.js?v=96e36b17';
+import { smugglingFeature } from '../public/js/features/smuggling-feature.js?v=03d40ce5';
 import { createInventory, addItem } from '../public/js/inventory.js?v=6414dbdc';
 
 const PUB = join(import.meta.dirname, '..', 'public');

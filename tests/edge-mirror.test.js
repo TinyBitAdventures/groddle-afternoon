@@ -9,6 +9,7 @@
  */
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 import {
   EDGE_MIRROR_BYTES,
   EDGE_MIRROR_MARGIN,
@@ -22,7 +23,7 @@ import {
   edgeMirrorWidths,
   parallaxLayerOffset,
   wholeTexels,
-} from '../public/js/street-render.js?v=dbc8bce5';
+} from '../public/js/street-render.js?v=9ba02537';
 import { cameraTargetX } from '../public/js/movement.js?v=f4be1a05';
 
 describe('edge mirror widths', () => {
@@ -419,6 +420,28 @@ describe('edge mirror leaves out what looks usable and fades the walkable layers
     // A ladder's tiling (addLadderTiles) carries its ladder id, even an empty one.
     assert.equal(edgeMirrorLeavesOut({ glitchLadderId: '' }), true);
     assert.equal(edgeMirrorLeavesOut(null), false);
+  });
+
+  it('#718: leaves out the Jellisac hollows, so no empty socket shows past the end (Clam Calumny)', () => {
+    // The hollows are where Jellisac Growths sit; the growth is a node, never in the reflection, so
+    // a mirrored hollow read as a socket with its Jellisac missing.
+    for (const sprite of ['ground_cutaway_hollow1', 'ground_cutaway_hollow2', 'ground_cutaway_hollow3']) {
+      assert.equal(edgeMirrorLeavesOut({ glitchDecoSprite: sprite }), true, sprite);
+    }
+    // The fossils and fish in the same cutaway family are scenery and stay.
+    for (const sprite of ['ground_cutaway_fossil1', 'ground_cutaway_fish2']) {
+      assert.equal(edgeMirrorLeavesOut({ glitchDecoSprite: sprite }), false, sprite);
+    }
+    // Clam Calumny: its last hollow ends 6 px from the street's right end, inside the strip the
+    // camera shows past it at the report's 1536 px wide screen.
+    const street = JSON.parse(readFileSync(new URL('../public/assets/streets/GTJ1024R2DQ1B5S.json', import.meta.url), 'utf8'));
+    const W = street.bounds.r - street.bounds.l;
+    const { right } = edgeMirrorWidths({ parallax: false, streetW: W, vpW: 1069, maxInset: 220 });
+    const mid = street.layers.find((l) => l.name === 'middleground');
+    const inStrip = mid.decos.filter((d) => d.x - street.bounds.l + d.w / 2 > W - right);
+    const hollows = inStrip.filter((d) => /cutaway_hollow/.test(d.sprite));
+    assert.ok(hollows.length >= 1, 'a hollow lies in the mirrored strip');
+    for (const d of hollows) assert.equal(edgeMirrorLeavesOut({ glitchDecoSprite: d.sprite }), true, `${d.sprite} at ${d.x}`);
   });
 
   it('keeps the seam whole and is gone before the outer edge', () => {
