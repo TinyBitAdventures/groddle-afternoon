@@ -1,6 +1,6 @@
 {
   "note": "Written by tools/gaps/build-data.mjs from tools/gaps/public-gaps.json and the coverage register. Edit those, never this file.",
-  "release": "v0.73.1",
+  "release": "v0.74.0",
   "states": {
     "fixing": {
       "label": "Being fixed",
@@ -42,7 +42,7 @@
     "fixing": 3,
     "known": 15,
     "unreleased": 0,
-    "fixed": 591,
+    "fixed": 605,
     "lost": 5,
     "purpose": 18,
     "idea": 10
@@ -404,6 +404,12 @@
           "text": "Respect for the Beginnings was never offered, so the spirits' first talks and the Esquibeth chain never came.",
           "state": "fixed",
           "version": "v0.69.0"
+        },
+        {
+          "id": "F139",
+          "text": "Tunes for Crabs did not say the Vine Radio it gives waits in Cultivate.",
+          "state": "fixed",
+          "version": "v0.74.0"
         }
       ]
     },
@@ -720,6 +726,24 @@
           "text": "Online, Peat Bogs and rocks could stand on a mailbox or Visiting Stone.",
           "state": "fixed",
           "version": "v0.70.0"
+        },
+        {
+          "id": "F129",
+          "text": "On Hetuhila and a few other deep streets an invisible floor stopped you above open water, so coins below it could not be reached.",
+          "state": "fixed",
+          "version": "v0.74.0"
+        },
+        {
+          "id": "F132",
+          "text": "The secret passage behind the trunk in Koulato Cluster led nowhere. It goes to Ruta Asuncion again, landing at its entrance, since Glitch's exact spot was not saved.",
+          "state": "fixed",
+          "version": "v0.74.0"
+        },
+        {
+          "id": "F136",
+          "text": "The demon in the Stoot shrine held up nothing. It holds an empty frame now; the photo in it showed a real person, so it stays out.",
+          "state": "fixed",
+          "version": "v0.74.0"
         }
       ]
     },
@@ -774,6 +798,12 @@
           "text": "A failed load at start could leave streets bare for the whole session.",
           "state": "fixed",
           "version": "v0.55.0"
+        },
+        {
+          "id": "F131",
+          "text": "Rocks and the Street Spirit vendors did not glow when in reach or under the mouse.",
+          "state": "fixed",
+          "version": "v0.74.0"
         }
       ]
     },
@@ -1833,6 +1863,12 @@
           "text": "Street Butterflies and Batterflies looped across the street instead of wandering it, and Guano fell under a Batterfly's spot.",
           "state": "fixed",
           "version": "v0.69.0"
+        },
+        {
+          "id": "F138",
+          "text": "Batterfly Guano on Level 3 East fell where it could not be picked up.",
+          "state": "fixed",
+          "version": "v0.74.0"
         }
       ]
     },
@@ -2631,6 +2667,12 @@
           "text": "On a phone the choose from box covered the stick, Act and Jump.",
           "state": "fixed",
           "version": "v0.73.0"
+        },
+        {
+          "id": "F137",
+          "text": "On an upright phone the street ran under the top bar and the controls.",
+          "state": "fixed",
+          "version": "v0.74.0"
         }
       ]
     },
@@ -3689,6 +3731,12 @@
           "text": "Long chat lines in Global, Help, Trade, groups and IMs were cut short for the people reading them.",
           "state": "fixed",
           "version": "v0.61.0"
+        },
+        {
+          "id": "F134",
+          "text": "Players' names were all one colour in the Modern chat and in speech bubbles.",
+          "state": "fixed",
+          "version": "v0.74.0"
         }
       ]
     },
@@ -3956,6 +4004,12 @@
           "text": "The Map could route you by subway even when the gate would turn you back for want of papers.",
           "state": "fixed",
           "version": "v0.57.0"
+        },
+        {
+          "id": "F130",
+          "text": "The loading card between some regions showed one colour instead of the region you leave on the left and the new one on the right.",
+          "state": "fixed",
+          "version": "v0.74.0"
         }
       ]
     },
@@ -4201,6 +4255,12 @@
           "text": "Sound stopped when the game's tab lost focus on a computer; it plays on there, with a setting.",
           "state": "fixed",
           "version": "v0.71.0"
+        },
+        {
+          "id": "F140",
+          "text": "On an iPad, sound did not come back after the browser was minimized.",
+          "state": "fixed",
+          "version": "v0.74.0"
         }
       ]
     },
@@ -4246,6 +4306,12 @@
           "text": "A musicblock's bubble could be held back after chatting.",
           "state": "fixed",
           "version": "v0.71.0"
+        },
+        {
+          "id": "F133",
+          "text": "Notes played on Piano Party's keys and stars were heard only by the player who played them.",
+          "state": "fixed",
+          "version": "v0.74.0"
         }
       ]
     },
@@ -4274,6 +4340,39 @@
           "text": "A finished Group Hall showed nothing to say whose it was.",
           "state": "fixed",
           "version": "v0.73.0"
+        }
+      ]
+    },
+    {
+      "name": "Ancestral Lands",
+      "items": [
+        {
+          "id": "F135",
+          "text": "Each player had their own Dust Traps instead of sharing them on the street, and the visit clock stopped while the game's tab was in the background.",
+          "state": "fixed",
+          "version": "v0.74.0"
+        }
+      ]
+    },
+    {
+      "name": "Saves",
+      "items": [
+        {
+          "id": "F141",
+          "text": "Playing on from a game copy older than a day could lose things you were given or got back since.",
+          "state": "fixed",
+          "version": "v0.74.0"
+        }
+      ]
+    },
+    {
+      "name": "New players",
+      "items": [
+        {
+          "id": "F142",
+          "text": "A new player taken off Gentle Island in the middle of the tutorial was refused every road onward.",
+          "state": "fixed",
+          "version": "v0.74.0"
         }
       ]
     }
