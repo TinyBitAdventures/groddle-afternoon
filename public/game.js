@@ -8751,6 +8751,7 @@ function clearHoverGlow() {
     }
   }
   t._hoverGlow = null;
+  if (app?.canvas) app.canvas.dataset.hoverTarget = '';
   // Only the tint: nothing lifts a hovered sprite now, and putting back the y it had when the
   // pointer came over it dropped a Chicken or Piggy that had walked up or down a slope since
   // (game.js followWalkFloor) into the ground or the air (lane CHICKLOOP, Austin 2026-11-01).
@@ -8770,6 +8771,8 @@ function setHoverTarget(target) {
   // The reach glow's rim gives way to the hover's (#669: one rim per thing).
   dropReachGlow(target);
   if (rimArt(target.sprite)) target._hoverGlow = addSpriteRim(target.sprite);
+  // R54 QA (tests/rim-walk-r54.test.js): the thing under the mouse, as reachGlow names the glowing ones.
+  if (app?.canvas) app.canvas.dataset.hoverTarget = target.classId || '';
 }
 
 /** The cyan rim (tsSprite_GlowA) behind a sprite on entityLayer: the hover's and the reach glow's. */
