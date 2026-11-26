@@ -1,6 +1,6 @@
 {
   "note": "Written by tools/gaps/build-data.mjs from tools/gaps/public-gaps.json and the coverage register. Edit those, never this file.",
-  "release": "v0.75.0",
+  "release": "v0.76.0",
   "states": {
     "fixing": {
       "label": "Being fixed",
@@ -42,7 +42,7 @@
     "fixing": 3,
     "known": 15,
     "unreleased": 0,
-    "fixed": 616,
+    "fixed": 620,
     "lost": 5,
     "purpose": 18,
     "idea": 10
@@ -768,6 +768,18 @@
           "text": "Signpost glows stayed blue in grey regions such as Brillah.",
           "state": "fixed",
           "version": "v0.75.0"
+        },
+        {
+          "id": "F156",
+          "text": "The glow when standing at a signpost stayed blue in grey regions such as Brillah.",
+          "state": "fixed",
+          "version": "v0.76.0"
+        },
+        {
+          "id": "F157",
+          "text": "Progress Way's camera pan to the Street Spirit and the cave-in hint in Intate Treats never happened.",
+          "state": "fixed",
+          "version": "v0.76.0"
         }
       ]
     },
@@ -846,6 +858,12 @@
           "text": "Dust Traps were never found already sprung when you arrived alone, as they sometimes were in Glitch.",
           "state": "fixed",
           "version": "v0.75.0"
+        },
+        {
+          "id": "F155",
+          "text": "On a computer, anything under the mouse glowed however far away, so faraway things looked reachable.",
+          "state": "fixed",
+          "version": "v0.76.0"
         }
       ]
     },
@@ -4117,6 +4135,12 @@
           "text": "On Pot Luck Day a dressed Chicken could not be dressed again, so a few players could use up a whole region's Chickens.",
           "state": "fixed",
           "version": "v0.58.2"
+        },
+        {
+          "id": "F154",
+          "text": "At the Pot Luck Day feast, drinks offered only Eat and then could not be had.",
+          "state": "fixed",
+          "version": "v0.76.0"
         }
       ]
     },

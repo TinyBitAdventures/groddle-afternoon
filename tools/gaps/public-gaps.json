@@ -6163,6 +6163,42 @@
       "commits": [
         "game:32297b86c0b"
       ]
+    },
+    {
+      "id": "F154",
+      "area": "Seasons",
+      "text": "At the Pot Luck Day feast, drinks offered only Eat and then could not be had.",
+      "show": "fixing",
+      "commits": [
+        "game:186c21df966"
+      ]
+    },
+    {
+      "id": "F155",
+      "area": "World",
+      "text": "On a computer, anything under the mouse glowed however far away, so faraway things looked reachable.",
+      "show": "fixing",
+      "commits": [
+        "game:3bce9cd2a4b"
+      ]
+    },
+    {
+      "id": "F156",
+      "area": "Streets",
+      "text": "The glow when standing at a signpost stayed blue in grey regions such as Brillah.",
+      "show": "fixing",
+      "commits": [
+        "game:fdd90d356ef"
+      ]
+    },
+    {
+      "id": "F157",
+      "area": "Streets",
+      "text": "Progress Way's camera pan to the Street Spirit and the cave-in hint in Intate Treats never happened.",
+      "show": "fixing",
+      "commits": [
+        "game:0b33cf6e607"
+      ]
     }
   ]
 }
