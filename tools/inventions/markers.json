@@ -1520,6 +1520,9 @@
     "ours: only that the act landed, not how long it plays: ours, a pet's": "flyer-hover-bob",
     "remake-own: The remake's own window without a stick (animal-husbandry-feature": "flyer-hover-bob"
   },
+  "public/js/zoom-hint.js": {
+    "ours: is zoomed out to 50%. Press Cmd+0 to reset it.\" Ours: Glitch was a": "zoomed-out-browser-hint"
+  },
   "public/style.css": {
     "ours: G1245 Vine Radio (#661, ours; js/features/vine-radio-feature.js): Choose": "ours-vine-radio",
     "ours: G1246 (ours, Austin 2026-11-24): a sorted bag's badge, its": "ours-bag-sort-badge",

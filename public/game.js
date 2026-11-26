@@ -1164,6 +1164,7 @@ import { ENCYCLOPEDIA_MENU_LABEL, createEncyclopedia, isEncyclopediaKey } from '
 import { createEncyclopediaSheet, isHomeScreenApp } from './js/ui/encyclopedia-sheet.js?v=987bd24f';
 import { bootStep } from './js/boot-progress.js?v=d84b898d';
 import { HOME_SCREEN_TIP_CACHE, iosSafari, mountHomeScreenTip, runsStandalone } from './js/home-screen-tip.js?v=f2287991';
+import { ZOOM_HINT_CACHE, ZOOM_HINT_MS, watchZoomHint } from './js/zoom-hint.js?v=75b745c7';
 import { EAT_PICK_TEXT, bestFoodIndex, eatChoices, eatTip } from './js/eat-pick.js?v=8fb763d0';
 import { heldDirection, installHeldKeyGuard, isMacPlatform } from './js/held-keys.js?v=a28eb293';
 import { isOneClickDoor, oneClickChoice, signpostArmRows, worldContextAction } from './js/world-context-menu.js?v=e4c99c05';
@@ -36750,6 +36751,16 @@ async function main() {
       // A phone has no keyboard: its toast names the street only (PHONEKEYS, style.css).
       toast(`${currentStreet?.label || 'Hechey Track'} loaded.${TOUCH_PHONE ? '' : ' Press L for look · G for map.'}`);
       pushActivity(`A new afternoon begins on ${currentStreet?.label || 'Hechey Track'}.`);
+    }
+    // G1328 (#726): a browser zoomed far out draws the HUD tiny; one notice, once per browser, says how to
+    // reset it (js/zoom-hint.js; after the arrival line, and again on a later resize until it has shown).
+    if (!TOUCH_PHONE) {
+      setTimeout(() => watchZoomHint({
+        win: window,
+        store: { get: () => readUiCache(ZOOM_HINT_CACHE), set: (v) => writeUiCache(ZOOM_HINT_CACHE, v) },
+        ready: () => state.started,
+        notice: (text) => toast(text, ZOOM_HINT_MS),
+      }), 2500);
     }
     if (buffDemoItem && bootParams.get('buffactivate') === '1') {
       usePackItem(buffDemoItem);

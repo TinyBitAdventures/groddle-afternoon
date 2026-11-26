@@ -6426,6 +6426,27 @@
    "rows": [
     "G1329"
    ]
+  },
+  {
+   "id": "zoomed-out-browser-hint",
+   "title": "A one-time notice when the browser is zoomed far out: the zoom it reads and the key that resets it",
+   "kind": "UI",
+   "status": "kept",
+   "where": [
+    {
+     "file": "public/js/zoom-hint.js",
+     "symbol": "readZoomOut"
+    },
+    {
+     "file": "public/game.js",
+     "symbol": "watchZoomHint"
+    }
+   ],
+   "why": "Glitch was a Flash app sized by the plugin, so a browser's page zoom never shrank its HUD and it had nothing like this. Ours: on a desktop browser zoomed below about 80% (outerWidth / innerWidth, with the height agreeing, never on phones, in an iframe or an installed app window) one notice names the zoom and Cmd+0 or Ctrl+0, once per browser (report #726).",
+   "ruling": "Austin 2026-11-26 (report #726): add a one-time hint, as ours",
+   "rows": [
+    "G1328"
+   ]
   }
  ]
 }
