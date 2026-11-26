@@ -182,6 +182,9 @@ const NOT_A_REQUEST = Object.freeze([
   'public/js/familiar.js ROCK_SHEET_WAIT_MS',
   'public/js/features/animal-mood-feature.js ROOT_TREE_WAIT_MS',
   'public/js/features/bug-report-feature.js FONT_WAIT_MS',
+  // G1312: out of a hall, how long the lot street waits for the hall's lot to be drawn before you stay
+  // where you landed (street-jobs draws it from the rows it already holds); it sends no request.
+  'public/js/features/group-hall-street-feature.js LOT_WAIT_MS',
   'public/js/features/home-live-feature.js FIRST_WAIT_MS',
   'public/js/features/musicblocks-feature.js LAND_WAIT_MS',
   'public/js/hell.js HELL_ENTRY_PROMPT_TIMEOUT_MS',
