@@ -58,7 +58,7 @@ import { QUEST_ROOMS } from '../../public/js/quest-rooms/catalog.js?v=f37a25ba';
 import { placeIndex, questHold } from '../../public/js/quest-reach.js?v=1de854ff';
 import { SUBWAY_STREETS, closedStreets, initializeStreetJobs, normalizeStreetJobState } from '../../public/js/street-jobs.js?v=76471e42';
 import { routeGraph } from '../../public/js/map-routes.js?v=52140ba2';
-import { TELEPORTERS } from '../../public/js/hidden-floors.js?v=18714dfa';
+import { TELEPORTERS } from '../../public/js/hidden-floors.js?v=17a8b20b';
 import { WINTRY_PORTAL_TELEPORTERS } from '../../public/js/wintry-portal.js?v=1437deda';
 import { reachableStreets, streetGraph } from '../../public/js/street-graph.js?v=d767f3a2';
 

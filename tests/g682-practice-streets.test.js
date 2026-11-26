@@ -12,7 +12,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { imageSize } from '../tools/image-size.mjs';
 import { assertStreetGeometry, platformYAt } from '../public/js/street-model.js?v=a9a05f9d';
-import { reachStreet } from '../public/js/builder/reach-graph.js?v=b7f3033e';
+import { reachStreet } from '../public/js/builder/reach-graph.js?v=687006d3';
 import {
   EZ_BOUGHS,
   EZ_COOKIN_BOUNDS,
@@ -49,7 +49,7 @@ import {
 } from '../public/js/practice-streets.js?v=557238c1';
 import { NEW_DECOS, NEW_DECOS_HIRES } from '../public/js/deco-new-list.js?v=e9cba68f';
 import { BUILT_ROOMS, QUEST_ROOMS } from '../public/js/quest-rooms/catalog.js?v=f37a25ba';
-import { FIRST_SKILLS, PRACTICE_TOOLS, firstSkill, practiceToolToPlace } from '../public/js/newxp.js?v=f02bc05e';
+import { FIRST_SKILLS, PRACTICE_TOOLS, firstSkill, practiceToolToPlace } from '../public/js/newxp.js?v=0d81aa52';
 import { HELLO as EZ_HELLO, room as ezRoom } from '../public/js/quest-rooms/ez-cookin.js?v=3cf44954';
 import { HELLO as SOIL_HELLO, TEND_FIRST, patchArt, patchVerbs, room as soilRoom } from '../public/js/quest-rooms/soil-appreciation.js?v=778a8d20';
 

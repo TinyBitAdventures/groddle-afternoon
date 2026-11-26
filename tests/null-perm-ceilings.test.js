@@ -6,7 +6,7 @@
  * pc_perm) stay plain floors, and Penumbra, rebuilt from video, uses -1 floors.
  */
 import assert from 'node:assert/strict';
-import { JUMP_SPEED, NORMAL_BUFF, avatarFall } from '../public/js/avatar-step.js?v=39d7b1af';
+import { JUMP_SPEED, NORMAL_BUFF, avatarFall } from '../public/js/avatar-step.js?v=8415ee96';
 import { describe, it } from 'node:test';
 import { readFileSync } from 'node:fs';
 import { avatarHeadReach, headCeiling, isSolidFromBelow, isStandable, platformYAt, platformsScreen } from '../public/js/street-model.js?v=a9a05f9d';

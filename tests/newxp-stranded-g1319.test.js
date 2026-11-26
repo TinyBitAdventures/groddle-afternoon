@@ -17,8 +17,8 @@ import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { GENTLE_ISLAND, GENTLE_ISLAND_TSIDS, exitBoxAction, islandHomeReturn } from '../public/js/newxp.js?v=f02bc05e';
-import { __newxpTest, newxpFeature } from '../public/js/features/newxp-feature.js?v=b5a0877e';
+import { GENTLE_ISLAND, GENTLE_ISLAND_TSIDS, exitBoxAction, islandHomeReturn } from '../public/js/newxp.js?v=0d81aa52';
+import { __newxpTest, newxpFeature } from '../public/js/features/newxp-feature.js?v=5bf31c9f';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const BASEMENT = 'GDONEDVHC4030KF';

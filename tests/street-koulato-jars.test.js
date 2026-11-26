@@ -9,7 +9,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { JAR_ARRIVALS, JAR_BOXES, JAR_DECOS, JAR_FLIES, countArrival, inJarBox, isKoulatoCluster, litJars, normalizeJarSave } from '../public/js/koulato-jars.js?v=384a33e3';
 import { createEventRuntime, runLocationEvent } from '../public/js/location-events.js?v=48938c8f';
-import { koulatoJarsFeature } from '../public/js/features/koulato-jars-feature.js?v=3f2ec4f7';
+import { koulatoJarsFeature } from '../public/js/features/koulato-jars-feature.js?v=00832931';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const street = () => JSON.parse(readFileSync(join(root, 'public/assets/streets/GIF10RP1DBU11NU.json'), 'utf8'));

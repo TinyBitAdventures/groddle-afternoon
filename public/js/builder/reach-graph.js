@@ -24,7 +24,7 @@
  * Pure: no DOM, no Pixi.
  */
 import { platformsScreen, barriersScreen, wallsScreen, isStandable, platformYAt, resolveGround, ladderTopDeck, worldToScreen, streetWidth, streetHeight, navigableSignposts, isBuriedSignpost, blockBarrierCrossing, LADDER_GRAB_BELOW } from '../street-model.js?v=a9a05f9d';
-import { stepAvatar, avatarGround, steerX, NORMAL_BUFF, JUMP_SPEED, WALK_MAX, OFF_LADDER_RATIO } from '../avatar-step.js?v=39d7b1af';
+import { stepAvatar, avatarGround, steerX, NORMAL_BUFF, JUMP_SPEED, WALK_MAX, OFF_LADDER_RATIO, UNDER_LINE_SLACK, FOOT_RADIUS, STREET_END_FEET } from '../avatar-step.js?v=8415ee96';
 import { ladderTopSignpostLadder } from '../ladder-top-signposts.js?v=0192e447';
 import { physicsMultipliers } from '../location-events.js?v=48938c8f';
 
@@ -93,19 +93,28 @@ export function streetWorld(street, { buff = null, scale = null, tripleJump = fa
     const z = Math.min(ncol - 1, Math.floor((Math.max(p.x1, p.x2) + COL_PAD) / COL));
     for (let i = a; i <= z; i += 1) cols[i].push(p);
   }
-  const bottom = lines.reduce((m, p) => Math.max(m, p.y1, p.y2), 0);
+  // #714: the street's bottom (location.b), the floor where no line is under the feet, as the
+  // game's ground resolve (avatar-step.js avatarGround) and the client's bounds have it.
+  const bottom = H;
   const col = (x) => cols[Math.max(0, Math.min(ncol - 1, Math.floor(x / COL)))];
-  // The world's floor: where no standable line is within 8 px across, the game's ground resolve
-  // stands the avatar at the lowest line's height (avatar-step.js avatarGround), so a seam or a
-  // missing stretch of floor is walked over. Those stretches are virtual lines in the graph only.
-  const covered = lines.filter(isStandable).map((p) => [Math.min(p.x1, p.x2) - 8, Math.max(p.x1, p.x2) + 8]).sort((a, b) => a[0] - b[0]);
+  // The world's floor: where no standable line is within the client's foot circle across
+  // (FOOT_RADIUS, read no nearer the street's ends than STREET_END_FEET), the avatar falls to the
+  // street's bottom and walks there (avatar-step.js avatarGround). Those stretches are virtual
+  // lines in the graph only (not carried on under a line far over the bottom, where the game's
+  // avatar walks on too).
+  const covered = lines.filter(isStandable).map((p) => [Math.min(p.x1, p.x2) - FOOT_RADIUS, Math.max(p.x1, p.x2) + FOOT_RADIUS]).sort((a, b) => a[0] - b[0]);
   const floors = [];
-  let at = 24;
+  let at = STREET_END_FEET;
   for (const [a, z] of covered) {
     if (a > at + 1) floors.push([at, a - 1]);
     at = Math.max(at, z + 1);
   }
-  if (at < W - 24) floors.push([at, W - 24]);
+  if (at < W - STREET_END_FEET) floors.push([at, W - STREET_END_FEET]);
+  // The avatar's own feet reach 24 px from the ends (EDGE_MARGIN): a stretch at an end runs there.
+  for (const f of floors) {
+    if (f[0] <= STREET_END_FEET) f[0] = 24;
+    if (f[1] >= W - STREET_END_FEET) f[1] = W - 24;
+  }
   const graphLines = [...lines];
   if (lines.length) {
     for (const [a, z] of floors) graphLines.push({ id: `floor@${Math.round(a)}`, x1: a, y1: bottom, x2: z, y2: bottom, pcPerm: -1, virtual: true });
@@ -133,7 +142,7 @@ export function streetWorld(street, { buff = null, scale = null, tripleJump = fa
     scale: scale || b.scale,
     approximate: b.approximate,
     tripleJump: tripleJump === true,
-    ground: (x, y, vy) => avatarGround(col(x), x, y, vy, { street, bottom }),
+    ground: (x, y, vy) => avatarGround(col(x), x, y, vy, { street, bottom, fallback: bottom }),
   };
   return world;
 }
@@ -429,8 +438,9 @@ export function buildReachGraph(street, opts = {}) {
       }
       if (!joined) dangling.push([end, side]);
       // A stretch of the world's floor meets real lines: walking on from it, the ground resolve
-      // stands the avatar on the lowest line there, however high (avatarGround); walking off that
-      // line drops back to the floor.
+      // stands the avatar on the lowest line there when that is within a step of the bottom
+      // (UNDER_LINE_SLACK, avatarGround; #714: a line far over the bottom is walked under, not
+      // stood on); walking off that line drops back to the floor.
       if (lines[i].virtual) {
         let low = null;
         for (const q of world.gcol(ex + side * 9)) {
@@ -438,7 +448,7 @@ export function buildReachGraph(street, opts = {}) {
           const qy = platformYAt(q, ex + side * 9, 8);
           if (qy != null && (!low || qy > low.y)) low = { q, y: qy };
         }
-        if (low) {
+        if (low && low.y >= ey - UNDER_LINE_SLACK) {
           const n = nearestOn(low.q.index, ex + side * 9);
           g.edge(end, n);
           g.edge(n, end);

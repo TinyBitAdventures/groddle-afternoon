@@ -32,7 +32,7 @@
 import { readFileSync, writeFileSync, existsSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
-import { flatJump, NORMAL_BUFF, WALK_MAX, JUMP_SPEED, avatarFall } from '../../public/js/avatar-step.js?v=39d7b1af';
+import { flatJump, NORMAL_BUFF, WALK_MAX, JUMP_SPEED, avatarFall } from '../../public/js/avatar-step.js?v=8415ee96';
 import { isStandable, climbWallsWorld } from '../../public/js/street-model.js?v=a9a05f9d';
 import { physicsMultipliers } from '../../public/js/location-events.js?v=48938c8f';
 

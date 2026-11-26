@@ -26,9 +26,9 @@ import {
   shakePouch,
 } from '../public/js/elemental-pouch.js?v=42702eda';
 import { bagsFeature } from '../public/js/features/bags-feature.js?v=17bcf98a';
-import { runMoreVerb } from '../public/js/features/item-verbs-more-feature.js?v=adc49566';
+import { runMoreVerb } from '../public/js/features/item-verbs-more-feature.js?v=f8c836bf';
 import { pouchFeature } from '../public/js/features/elemental-pouch-feature.js?v=88321634';
-import { FEATURES } from '../public/js/features/index.js?v=3f575b82';
+import { FEATURES } from '../public/js/features/index.js?v=944cfc16';
 import { ITEM_CATALOG, countItem, createInventory } from '../public/js/inventory.js?v=6414dbdc';
 import { STORE_CATALOG } from '../public/js/store-catalog.js?v=c6ebb2bd';
 import { VENDOR_PROFILES, vendorBuy } from '../public/js/vendor.js?v=474a80fd';

@@ -64,9 +64,9 @@
  */
 
 import { BUTLER_STRINGS } from '../butler.js?v=152429c8';
-import { butlerApi } from './butler-feature.js?v=f02d7958';
+import { butlerApi } from './butler-feature.js?v=ce6cd5f9';
 import { hellFeature } from './hell-feature.js?v=74604dfc';
-import { locationEventsApi } from './location-events-feature.js?v=3d20f596';
+import { locationEventsApi } from './location-events-feature.js?v=13175520';
 import { towerApi } from './home-tower-feature.js?v=49b38fe7';
 import { platformYAt, platformsScreen } from '../street-model.js?v=a9a05f9d';
 import { COMMAND_HELP_INTRO, STUCK_COOLDOWN_MS, STUCK_MENU, STUCK_TEXT, bareCommand, commandHelpLines, commandHint, isCommandHelp, misplacedCommand, slashPlan, strayLetterCommand, unknownLine } from '../slash-commands.js?v=bb2569aa';
@@ -190,7 +190,7 @@ export function onTrapFloor(lines, player, jump = 1) {
  */
 let trapData = null;
 function loadTraps() {
-  trapData ||= import('../street-traps-data.js?v=f6eb19ad').then((m) => m.STREET_TRAPS).catch(() => null);
+  trapData ||= import('../street-traps-data.js?v=a1151641').then((m) => m.STREET_TRAPS).catch(() => null);
   return trapData;
 }
 

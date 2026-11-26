@@ -28,9 +28,9 @@ import {
   pruneTakeoffs,
   takeoffDue,
   trailingX,
-} from '../public/js/follow-mp.js?v=129ab9f3';
-import { followMpFeature } from '../public/js/features/follow-mp-feature.js?v=7ca5d0c4';
-import { coastX, NORMAL_BUFF, WALK_MAX } from '../public/js/avatar-step.js?v=39d7b1af';
+} from '../public/js/follow-mp.js?v=dfe94dc1';
+import { followMpFeature } from '../public/js/features/follow-mp-feature.js?v=b83f8f33';
+import { coastX, NORMAL_BUFF, WALK_MAX } from '../public/js/avatar-step.js?v=8415ee96';
 import { createJumpState, matchLeaderJumpStep, queueJump, resolveQueuedJump } from '../public/js/movement.js?v=f4be1a05';
 
 const ROOT = join(import.meta.dirname, '..');

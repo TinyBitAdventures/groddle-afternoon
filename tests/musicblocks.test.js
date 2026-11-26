@@ -36,7 +36,7 @@ import { SOUND_ALIASES, SOUND_FILES } from '../public/js/sound-keys.js?v=8b36c25
 import { DROP_TABLES } from '../public/js/drop-tables-data.js?v=c51a6400';
 import { SOIL_DROP_TABLES } from '../public/js/patches.js?v=3498abf3';
 import { SPINNING_WHEEL_DROP_TABLE } from '../public/js/spinning-wheel.js?v=00148471';
-import { ISLAND_MUSICBLOCKS } from '../public/js/newxp.js?v=f02bc05e';
+import { ISLAND_MUSICBLOCKS } from '../public/js/newxp.js?v=0d81aa52';
 import { AWARD_ITEM } from '../public/js/funpickle.js?v=95796317';
 import {
   ITEM_CATALOG,
@@ -44,7 +44,7 @@ import {
   countItem,
   createInventory,
 } from '../public/js/inventory.js?v=6414dbdc';
-import { getVerbsFor } from '../public/content.js?v=a87eb482';
+import { getVerbsFor } from '../public/content.js?v=c976f55a';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const publicRoot = join(here, '../public');

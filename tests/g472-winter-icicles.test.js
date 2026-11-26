@@ -8,7 +8,7 @@ import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { reachStreet } from '../public/js/builder/reach-graph.js?v=b7f3033e';
+import { reachStreet } from '../public/js/builder/reach-graph.js?v=687006d3';
 import {
   ICICLE_CHIME,
   ICICLE_CHIME_VERB,

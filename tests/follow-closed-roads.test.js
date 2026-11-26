@@ -10,8 +10,8 @@ import { after, before, describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { applyStreetIndex } from '../public/js/street-loader.js?v=10376267';
-import { streetJobsFeature } from '../public/js/features/street-jobs-feature.js?v=246f0319';
-import { followMpFeature } from '../public/js/features/follow-mp-feature.js?v=7ca5d0c4';
+import { streetJobsFeature } from '../public/js/features/street-jobs-feature.js?v=b2d193ef';
+import { followMpFeature } from '../public/js/features/follow-mp-feature.js?v=b83f8f33';
 
 const PUB = new URL('../public/', import.meta.url);
 const read = (rel) => readFileSync(new URL(rel, PUB), 'utf8');

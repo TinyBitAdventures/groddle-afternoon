@@ -77,7 +77,7 @@ import {
   startDelayMessage,
   tickRace,
 } from '../races.js?v=ab22a079';
-import { platformUnder, raceCourse, RACE_COURSE_IDS } from '../race-courses.js?v=565822aa';
+import { platformUnder, raceCourse, RACE_COURSE_IDS } from '../race-courses.js?v=57ba6aa7';
 import {
   drawCheckpointFlag,
   drawFinishGate,

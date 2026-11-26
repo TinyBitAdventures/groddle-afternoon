@@ -24,8 +24,8 @@ import { addItem, createInventory, removeItem } from '../public/js/inventory.js?
 import { bagsFeature } from '../public/js/features/bags-feature.js?v=17bcf98a';
 import { bindToolInventory, createToolConditionState, setToolRemaining, toolCopies } from '../public/js/tools.js?v=4156bba8';
 import { draggedCount, draggedHere, draggedStack, markDragged, takeDragged } from '../public/js/drag-stack.js?v=4321c8c6';
-import { runDrop } from '../public/js/features/world-drop-feature.js?v=c05d6686';
-import { registerButlerDrop } from '../public/js/butler-drop.js?v=296d8f69';
+import { runDrop } from '../public/js/features/world-drop-feature.js?v=a4b4c5d7';
+import { registerButlerDrop } from '../public/js/butler-drop.js?v=08dc4e9f';
 import { beginDrag, dragDrop, endDrag } from '../public/js/drop-targets.js?v=59e6edb4';
 
 const root = join(import.meta.dirname, '..', 'public');

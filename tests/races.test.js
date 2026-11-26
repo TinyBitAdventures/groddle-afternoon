@@ -55,7 +55,7 @@ import {
   startDelayMessage,
   tickRace,
 } from '../public/js/races.js?v=ab22a079';
-import { RACE_COURSE_IDS, platformUnder, raceCourse } from '../public/js/race-courses.js?v=565822aa';
+import { RACE_COURSE_IDS, platformUnder, raceCourse } from '../public/js/race-courses.js?v=57ba6aa7';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..', 'public');
 

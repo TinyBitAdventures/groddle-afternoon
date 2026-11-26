@@ -45,8 +45,8 @@ import {
   winterStreetEcology,
 } from '../public/js/winter-walk-streets.js?v=c921bf92';
 import { rebuiltRoomsFeature } from '../public/js/features/rebuilt-rooms-feature.js?v=0f928a67';
-import { reachStreet } from '../public/js/builder/reach-graph.js?v=b7f3033e';
-import { GRAVITY, JUMP_SPEED, WALK_MAX } from '../public/js/avatar-step.js?v=39d7b1af';
+import { reachStreet } from '../public/js/builder/reach-graph.js?v=687006d3';
+import { GRAVITY, JUMP_SPEED, WALK_MAX } from '../public/js/avatar-step.js?v=8415ee96';
 
 const spike = join(dirname(fileURLToPath(import.meta.url)), '..');
 const pub = join(spike, 'public');

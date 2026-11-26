@@ -290,8 +290,8 @@ class CourseBuilder {
 
   build(def) {
     if (def.floor) {
-      // A full-width floor keeps game.js resolveGround's deepest-platform
-      // fallback below every gap; void/pit/lava floors respawn the racer.
+      // A full-width floor under every gap (with no line under the feet the
+      // avatar falls to the course's bottom); void/pit/lava floors respawn the racer.
       this.plat(0, def.floor.y, def.width, def.floor.y, `floor-${def.floor.kind}`, { floor: true, hazard: def.floor.kind !== 'ground' });
     }
     return Object.freeze({

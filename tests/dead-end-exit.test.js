@@ -16,16 +16,16 @@ import { DEAD_END_EXIT_CLASS, deadEndActive, deadEndsFeature as de } from '../pu
 import { loadStreetIndexObject } from '../public/js/street-loader.js?v=10376267';
 import { STRAY_FALLBACK_TSID, streetsReachingUr } from '../public/js/quest-instance.js?v=15090adc';
 import { ROOM_STREETS } from '../public/js/quest-rooms/catalog.js?v=f37a25ba';
-import { FIRST_SKILLS } from '../public/js/newxp.js?v=f02bc05e';
+import { FIRST_SKILLS } from '../public/js/newxp.js?v=0d81aa52';
 import { COLOUR_LEVEL_STREETS, NO_EXIT_PUZZLE_STREETS } from '../public/js/puzzle-triggers.js?v=221b67a9';
-import { hiddenFloorsFeature } from '../public/js/features/hidden-floors-feature.js?v=b3b92e75';
+import { hiddenFloorsFeature } from '../public/js/features/hidden-floors-feature.js?v=e2d65ebc';
 import { midTowerFeature } from '../public/js/features/mid-tower-feature.js?v=12df1fa2';
-import { questInstancesFeature as qi } from '../public/js/features/quest-instances-feature.js?v=3cffe9ef';
-import { puzzlesFeature as pz } from '../public/js/features/puzzles-feature.js?v=8c18417f';
+import { questInstancesFeature as qi } from '../public/js/features/quest-instances-feature.js?v=ea6a0980';
+import { puzzlesFeature as pz } from '../public/js/features/puzzles-feature.js?v=a36df6c4';
 import { hellFeature } from '../public/js/features/hell-feature.js?v=74604dfc';
 import { subwayFeature } from '../public/js/features/subway-feature.js?v=91e5d519';
 import { interrogationRoomFeature } from '../public/js/features/interrogation-room-feature.js?v=3b2769d5';
-import { newxpFeature } from '../public/js/features/newxp-feature.js?v=b5a0877e';
+import { newxpFeature } from '../public/js/features/newxp-feature.js?v=5bf31c9f';
 import { Display, fakePixi } from './fake-scene.js';
 
 /** fake-scene's Pixi, with a texture source js/textures.js can wait on (the image never loads in Node). */

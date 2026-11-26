@@ -10,7 +10,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { STATIONS, STATION_BUTTON, STATION_FLOOR, STATION_GATE_WALL, STATION_X, stationScreen } from '../public/js/subway.js?v=ea6921ff';
-import { JUMP_SPEED, NORMAL_BUFF, avatarGround, stepAvatar, steerX } from '../public/js/avatar-step.js?v=39d7b1af';
+import { JUMP_SPEED, NORMAL_BUFF, avatarGround, stepAvatar, steerX } from '../public/js/avatar-step.js?v=8415ee96';
 import { barriersScreen, platformsScreen } from '../public/js/street-model.js?v=a9a05f9d';
 
 const PUB = join(import.meta.dirname, '..', 'public');

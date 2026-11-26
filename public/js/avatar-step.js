@@ -195,7 +195,7 @@ export function streetPhysicsFreeFall(body, buff, dt) {
 
 /**
  * The floor under the feet (screen y): the street ground resolve, else the lowest standable line
- * near x (imported streets have seams, so a small gap is bridged), else the bottom of every line.
+ * near x (imported streets have seams, so a small gap is bridged), else the street's bottom.
  * The near line is read at x, not at its middle (ticket 98): a sloped flight's middle height made
  * a flat ledge in the air over its low half, and a fall stopped on it.
  * A gap over a buried signpost is a hole to jump into (the Great Hole to Ix): fall, and never get
@@ -203,6 +203,22 @@ export function streetPhysicsFreeFall(body, buff, dt) {
  */
 /** How far under a line the feet may be and still be put on it (a seam or a slope's step). */
 export const UNDER_LINE_SLACK = 24;
+
+/**
+ * #714: the client's foot circle (ColliderAvatar.as radius 15) still rests on a line's end this far
+ * past it, and its feet never come nearer the street's ends than half the avatar's width
+ * (AvatarPhysicsHandler.as setAndBoundPositionOnSelf: min_x location.l + round(63 / 2)). Where the
+ * 8 px seam bridge finds no line, these decide whether the feet fall to the street's bottom.
+ */
+export const FOOT_RADIUS = 15;
+export const STREET_END_FEET = 32;
+
+/** The street's bottom (location.b) in screen y, or null for a street with no bounds. */
+export function streetBottomY(street, px = 0) {
+  const b = Number(street?.bounds?.b);
+  if (!Number.isFinite(b) || !Number.isFinite(Number(street.bounds.t))) return null;
+  return worldToScreen(street, px, b).y;
+}
 
 export function avatarGround(platforms, px, py, vy, { street = null, fallback = 0, bottom = null } = {}) {
   // A street that asks for it (puzzles-feature patchStreet, `lineEndsAtWalls`): no floor past a
@@ -235,8 +251,31 @@ export function avatarGround(platforms, px, py, vy, { street = null, fallback = 
     // the only line at that x, the gut's upper bend.
     if (best != null && py >= best - 80 && py <= best + UNDER_LINE_SLACK && !(hole && py > best + 24)) return best;
     if (hole) return worldToScreen(street, px, street.bounds?.b ?? 0).y;
-    // `bottom`: the lowest line of the whole street when `platforms` is only the lines near x.
-    return bottom ?? platforms.reduce((m, p) => Math.max(m, p.y1, p.y2), 0);
+    if (best == null) {
+      // A line the client's foot circle still touches (FOOT_RADIUS past its end, read where the
+      // client's feet could be: never nearer the street's ends than STREET_END_FEET) holds the
+      // feet before the bottom does, so a seam or a street's end Glitch walked over is no hole.
+      const W = street?.bounds ? Number(street.bounds.r) - Number(street.bounds.l) : NaN;
+      const fx = W > 2 * STREET_END_FEET ? Math.min(W - STREET_END_FEET, Math.max(STREET_END_FEET, px)) : px;
+      let end = null;
+      for (const p of platforms) {
+        if (!isStandable(p)) continue;
+        const minX = Math.min(p.x1, p.x2);
+        const maxX = Math.max(p.x1, p.x2);
+        if (fx < minX - FOOT_RADIUS || fx > maxX + FOOT_RADIUS) continue;
+        const y = platformYAt(p, Math.min(maxX, Math.max(minX, fx)), 0);
+        if (y != null && py >= y - 80 && py <= y + UNDER_LINE_SLACK && (end == null || y > end)) end = y;
+      }
+      if (end != null) return end;
+    }
+    // #714: with no line under the feet the street's bottom (location.b) is the floor, as the
+    // client's: it bounded the avatar's y there and nowhere else (AvatarPhysicsHandler.as
+    // setAndBoundPositionOnSelf 470-480), so open water or a shaft under a street's deepest line
+    // is fallen through to the bottom. Before, the deepest line was a floor across every gap
+    // (Hetuhila: an invisible floor at y 1362 over 1,000 px of water and 14 quoins).
+    // `bottom` (screen y) overrides the street's own; with neither, the deepest line.
+    const floor = bottom ?? streetBottomY(street, px);
+    return floor ?? platforms.reduce((m, p) => Math.max(m, p.y1, p.y2), 0);
   }
   return fallback;
 }

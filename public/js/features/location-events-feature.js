@@ -59,7 +59,7 @@ import {
   runLocationEvent,
   streetOwner,
 } from '../location-events.js?v=48938c8f';
-import { JUMP_SPEED } from '../avatar-step.js?v=39d7b1af';
+import { JUMP_SPEED } from '../avatar-step.js?v=8415ee96';
 import { STREET_SOUND, streetSoundEvent, streetSoundsFor } from '../street-sounds-mp.js?v=c9c290e0';
 
 export const LOCATION_EVENTS_FEATURE_ID = 'location-events';
