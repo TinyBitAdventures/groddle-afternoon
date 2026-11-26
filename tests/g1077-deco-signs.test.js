@@ -14,7 +14,7 @@ import { readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 
 import { DEFAULT_SIGN_CLASS, SIGN_CLASS_STYLES, SIGN_WORDS_ELSEWHERE, parseSignMarkup, signWords, signWordsElsewhere } from '../public/js/deco-sign.js?v=e98e50f9';
-import { ISLAND_SIGNS } from '../public/js/newxp.js?v=5aa81665';
+import { ISLAND_SIGNS } from '../public/js/newxp.js?v=f02bc05e';
 import { AK_SIGNS } from '../public/js/skillquest-ak.js?v=397a9d19';
 
 const root = join(import.meta.dirname, '..');

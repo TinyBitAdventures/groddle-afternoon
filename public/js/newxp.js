@@ -657,6 +657,18 @@ export function exitBoxAction(save) {
   return 'teleport';
 }
 
+/**
+ * G1319: Back to world from home while the tutorial's island stage runs. inc_houses.js
+ * houses_get_previous_location 1312-1325 sends a player still on the island's quests back to the
+ * island: the spot they left from when it was on the island, else street 3 (LIF8LHA3HT336O0, Old
+ * Progress Way, which newbie_island.js 325 maps to Progress Way). null: the home's usual way back.
+ */
+export function islandHomeReturn(save, back) {
+  if (save?.status !== 'active' || save?.stage !== 'island' || save?.island === 'exited') return null;
+  if (back?.tsid && GENTLE_ISLAND_TSIDS.includes(back.tsid)) return null;
+  return { tsid: GENTLE_ISLAND.progress_way };
+}
+
 /** The Welcoming Flamingo's name box holds 19 letters (newxp_training1.js 582, input_max_chars: 19). */
 export const TUTORIAL_NAME_MAX = 19;
 

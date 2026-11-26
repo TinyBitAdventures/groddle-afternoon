@@ -17,8 +17,8 @@ import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 import { getVerbsFor } from '../public/content.js?v=a87eb482';
 import { SIGN_FIRST_ARM_Y, SIGN_POST_W, SIGN_SCALE } from '../public/js/street-render.js?v=cd2b2649';
-import { WAY_OUT_ARM, WAY_OUT_HIT, wayOutTarget } from '../public/js/features/homes-feature.js?v=a4906049';
-import { FRIENDS_HIT_H } from '../public/js/features/home-street-mp-feature.js?v=6d573b56';
+import { WAY_OUT_ARM, WAY_OUT_HIT, wayOutTarget } from '../public/js/features/homes-feature.js?v=d77aa5b7';
+import { FRIENDS_HIT_H } from '../public/js/features/home-street-mp-feature.js?v=2c27170c';
 import {
   SIGNPOST_POST_HALF,
   createCultivationState,
@@ -95,7 +95,8 @@ describe('one signpost at home: its top arm says Back to Ur', () => {
     assert.match(homes, /classId: 'home_return_marker',\n\s+label: words\.label,\n\s+subtitle: words\.subtitle,/);
     // The remembered street, else your arrival street, as returnFromHome goes (game.js).
     const game = read('game.js');
-    assert.match(game, /function homeReturnDestination\(back = homeState\.returnLocation\) \{\n\s+const tsid = back\?\.tsid \|\| STREET_INDEX\.default;/);
+    // G1319: the tutorial's island stage may lead it back to Gentle Island first (homeReturnTo).
+    assert.match(game, /function homeReturnDestination\(back = homeState\.returnLocation\) \{\n(?:\s+\/\/[^\n]*\n|\s+const held = [^\n]*\n|\s+if \(held[^\n]*\n)*\s+const tsid = back\?\.tsid \|\| STREET_INDEX\.default;/);
     assert.match(game, /const destination = homeReturnDestination\(result\.returnLocation\);/);
   });
 

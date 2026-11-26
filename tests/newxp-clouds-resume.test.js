@@ -9,7 +9,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { cloudUnder, cloudsLayout, cloudsResume, normalizeNewxpSave, startNewxp } from '../public/js/newxp.js?v=5aa81665';
+import { cloudUnder, cloudsLayout, cloudsResume, normalizeNewxpSave, startNewxp } from '../public/js/newxp.js?v=f02bc05e';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const feature = readFileSync(join(root, 'public/js/features/newxp-feature.js'), 'utf8');

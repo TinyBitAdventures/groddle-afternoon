@@ -111,6 +111,7 @@ import {
   isNewxpSceneTsid,
   islandExitOpen,
   exitBoxAction,
+  islandHomeReturn,
   nextStage,
   normalizeNewxpSave,
   pickNewxpExit,
@@ -134,7 +135,7 @@ import {
   vogPages,
   tutorialNameDefault,
   TUTORIAL_NAME_MAX,
-} from '../newxp.js?v=5aa81665';
+} from '../newxp.js?v=f02bc05e';
 import { countWords } from '../words.js?v=274023af';
 import { ITEM_CATALOG, addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=6414dbdc';
 import { QUOIN_SHEET, QUOIN_TYPES, qrazyRewardForLevel } from '../quoins.js?v=5abad2c7';
@@ -151,7 +152,7 @@ import { frameTexture, onLoaded, sourceFromUrl, textureFromUrl, whenLoaded } fro
 import { upgradeSource } from '../sprite-hires.js?v=e96be5f1';
 import { grantMoodXp } from '../mood-xp.js?v=e311b45c';
 import { displayTopOf, itemstackOverlayPoint, playPoofIn, playSheetOverlay, poofInAlpha } from '../overlay-art.js?v=e50bacca';
-import { HOME_MACHINE } from '../home-ticket.js?v=9702a3d3';
+import { HOME_MACHINE } from '../home-ticket.js?v=c7f32c27';
 import { createAnimalState } from '../animals.js?v=3b065ee0';
 import {
   AK_ANIMALS,
@@ -3032,7 +3033,8 @@ let exitBoxBusy = false;
  * newbie_island.js hitBox gentle_island_exit (24-29): the box at the end of Gentle Island Exit, under
  * the down arrow, sends anyone in it to a newxp exit (player.js teleportHome 2041-2045), whether or not
  * the tutorial is running. The tutorial's last step goes through leaveIsland (islandTick); everyone
- * else is just taken off the island, the save left as it is.
+ * else is just taken off the island, the save left as it is (G1319: off the island the travel gate
+ * refuses nothing, so a save still on an earlier island step walks on from the exit street).
  */
 function exitBoxTick(engine) {
   const box = ISLAND_BOXES.gentle_island_exit;
@@ -4162,8 +4164,19 @@ export const newxpFeature = {
     if (!active()) return null;
     // Multiplayer has no Skip (G334), so only solo is told about it.
     if (inTutorialScene(engine)) return { ok: false, msg: engine?.mode === 'multiplayer' ? 'Follow the tutorial for now.' : 'Follow the tutorial (or skip it from the Tutorial card).' };
-    if (save.stage === 'island' && save.island !== 'exited' && !GENTLE_ISLAND_TSIDS.includes(tsid)) return { ok: false, msg: 'You can\'t do that yet' };
+    // G1319: the island stage holds a player on Gentle Island only while they stand on it. Glitch
+    // refused no trip between ordinary streets; the island held you by its own shape (the street4_check
+    // push, newbie_island.js 9-22) and the first ordinary street flagged the leave (location.js
+    // 686-688). A player already off the island (the exit box before the leave, Back to world) was
+    // refused every road here and stranded.
+    const onIsland = GENTLE_ISLAND_TSIDS.includes(engine?.streetTsid);
+    if (save.stage === 'island' && save.island !== 'exited' && !GENTLE_ISLAND_TSIDS.includes(tsid) && onIsland) return { ok: false, msg: 'You can\'t do that yet' };
     return null;
+  },
+
+  /** G1319: Back to world from home leads back to Gentle Island while the island stage runs (islandHomeReturn). */
+  homeReturnTo(back) {
+    return islandHomeReturn(save, back);
   },
 
   mapCards(engine) {

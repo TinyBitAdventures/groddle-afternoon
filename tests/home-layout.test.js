@@ -20,10 +20,10 @@ import {
 } from '../public/js/home-layout.js?v=a28e9e4d';
 import { collectHomeLayout, walkHomeScene } from '../public/js/home-layout-scene.js?v=da9ddc63';
 import { phoneStage, stageFor } from '../public/js/location-view.js?v=fa4d254b';
-import { STREET_WORLD_H } from '../public/js/features/homes-feature.js?v=a4906049';
+import { STREET_WORLD_H } from '../public/js/features/homes-feature.js?v=d77aa5b7';
 import { AVATAR_STILL, homeKeyOf } from '../public/js/profiles.js?v=7e94c96f';
 import { HIRES_SPRITES, SPLIT_SPRITES } from '../public/js/sprite-hires.js?v=e96be5f1';
-import { HOUSE_STYLE_KEYS } from '../public/js/features/homes-feature.js?v=a4906049';
+import { HOUSE_STYLE_KEYS } from '../public/js/features/homes-feature.js?v=d77aa5b7';
 import { SITE_DIR, skipWithoutSite } from '../tools/repos.mjs';
 import { PHP } from './php.js';
 

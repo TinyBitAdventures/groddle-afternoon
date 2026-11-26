@@ -36,7 +36,7 @@ import { SOUND_ALIASES, SOUND_FILES } from '../public/js/sound-keys.js?v=8b36c25
 import { DROP_TABLES } from '../public/js/drop-tables-data.js?v=c51a6400';
 import { SOIL_DROP_TABLES } from '../public/js/patches.js?v=3498abf3';
 import { SPINNING_WHEEL_DROP_TABLE } from '../public/js/spinning-wheel.js?v=00148471';
-import { ISLAND_MUSICBLOCKS } from '../public/js/newxp.js?v=5aa81665';
+import { ISLAND_MUSICBLOCKS } from '../public/js/newxp.js?v=f02bc05e';
 import { AWARD_ITEM } from '../public/js/funpickle.js?v=95796317';
 import {
   ITEM_CATALOG,
