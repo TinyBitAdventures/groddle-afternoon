@@ -5148,7 +5148,7 @@
   },
   {
    "id": "minimap-door-kind-icons",
-   "title": "The street map's door buttons show what kind of way out each is: a dinosaur's mouth (door_dino_01), a portal (the teleport dialog's teleporter) or a plain door (furniture_door), each Tiny Speck's CC0 art scaled down, the kind read off the door's own art; every wired walk-in teleporter (the Vortex back doors, the wintry portal, the hidden floors, pits and beams) is a portal button too, and a click on it travels where walking into it does (#645).",
+   "title": "The street map's door buttons show what kind of way out each is: a dinosaur's mouth (door_dino_01), a portal (the teleport dialog's teleporter) or a plain door (furniture_door), each Tiny Speck's CC0 art scaled down, the kind read off the door's own art; every walk-in teleporter a player reaches straight from the floor (the Vortex back doors, the wintry portal, the pits and beams, the ways out of the hidden floors) is a portal button too, and a click on it travels where walking into it does; secrets and jump puzzles (the ways into the hidden floors, Koulato Cluster's hidden ladder) get none (#645).",
    "kind": "UI",
    "status": "kept",
    "where": [
@@ -5162,14 +5162,14 @@
     },
     {
      "file": "public/js/features/hidden-floors-feature.js",
-     "symbol": "walkInTeleportersOn minimapTeleporters teleportFromMap"
+     "symbol": "walkInTeleportersOn teleporterFloorGap mapShowsTeleporter minimapTeleporters teleportFromMap"
     },
     {
      "file": "tools/build-minimap-door-icons.py"
     }
    ],
    "why": "Glitch's street map had no door buttons (MiniMapView.as maybeAddSignpost), so it had no icons for them; the first door buttons (G1232) all used one drawn door. The icons are ours as icons but not drawn: each is Tiny Speck's own art, cropped and scaled.",
-   "ruling": "Austin 2026-11-26 (#645): each kind of entrance gets its own icon, dino door, portal and plain door, made from Tiny Speck's CC0 art (the contact sheet's picks approved); the walk-in teleporters get a portal button too, which travels where walking into it does",
+   "ruling": "Austin 2026-11-26 (#645): each kind of entrance gets its own icon, dino door, portal and plain door, made from Tiny Speck's CC0 art (the contact sheet's picks approved); the walk-in teleporters get a portal button too, which travels where walking into it does, but never one that gives away a secret or skips a jump puzzle",
    "rows": [
     "G1232"
    ]

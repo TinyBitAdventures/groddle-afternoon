@@ -15,7 +15,7 @@ import {
   styleRingHint,
   styleRingQuestion,
   styleRingStep,
-} from '../public/js/features/newxp-feature.js?v=22c6b653';
+} from '../public/js/features/newxp-feature.js?v=141f74b7';
 
 const src = readFileSync(new URL('../public/js/features/newxp-feature.js', import.meta.url), 'utf8');
 

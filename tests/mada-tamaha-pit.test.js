@@ -17,7 +17,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { reachStreet } from '../public/js/builder/reach-graph.js?v=687006d3';
 import { MADA_TAMAHA_TSID, NARAKA_TELEPORTERS, narakaTeleportersOn } from '../public/js/hell.js?v=d77f15ef';
-import { inTeleporter } from '../public/js/hidden-floors.js?v=17a8b20b';
+import { inTeleporter } from '../public/js/hidden-floors.js?v=023336cb';
 
 const spike = join(dirname(fileURLToPath(import.meta.url)), '..');
 const street = JSON.parse(readFileSync(join(spike, 'public/assets/streets', `${MADA_TAMAHA_TSID}.json`), 'utf8'));

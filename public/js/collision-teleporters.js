@@ -156,6 +156,10 @@ export const WIRED_TELEPORTERS = Object.freeze([
     // and Guillermo Gamera Way's links put you (Ruta Asuncion screen space, world + (1500, 3000)).
     arrive: Object.freeze({ x: 2600, y: 2805 }),
     why: 'The hidden ladder\'s top, jump to the right, to Ruta Asuncion (glitch forum 2012; Glitch Strategy Quick Tip #16).',
+    // A secret (its ladder is hidden; players passed it on as a tip): the street map shows no button
+    // for it (#645, hidden-floors-feature mapShowsTeleporter). Nothing in the street data marks the
+    // ladder hidden, so the flag is here.
+    secret: true,
   }),
 ]);
 

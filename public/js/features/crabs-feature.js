@@ -54,7 +54,7 @@ import { getGameDayKey } from '../game-day.js?v=a532775d';
 import { cleanQuestMarkup } from '../quests.js?v=f68437db';
 import { acceptOffer, npcQuestOffers } from '../quest-offers.js?v=7e00498b';
 import { CRAB_TUNES_COUNTER, RADIO_QUEST_ID } from '../vine-radio.js?v=5436aa09';
-import { followPath } from '../street-creatures.js?v=c29092b2';
+import { followPath } from '../street-creatures.js?v=ec4785db';
 import { followFloorY, walkSurfaceY } from '../walk-surface.js?v=3c919d5b';
 import { isStandable } from '../street-model.js?v=a9a05f9d';
 import {

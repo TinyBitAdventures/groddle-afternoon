@@ -14,13 +14,13 @@ import { join } from 'node:path';
 
 import { createStreetMinimap, doorLook, teleporterMarks } from '../public/js/ui/street-minimap.js?fresh=minimap-teleporter-portals';
 import { phoneSignRows, walkFromMap } from '../public/js/features/street-minimap-feature.js?fresh=minimap-teleporter-portals';
-import { hiddenFloorsFeature, walkInTeleportersOn } from '../public/js/features/hidden-floors-feature.js?fresh=minimap-teleporter-portals';
-import { TELEPORTERS } from '../public/js/hidden-floors.js?v=17a8b20b';
+import { hiddenFloorsFeature, mapShowsTeleporter, teleporterFloorGap, walkInTeleportersOn } from '../public/js/features/hidden-floors-feature.js?fresh=minimap-teleporter-portals';
+import { PLAIN_JUMP_APEX, TELEPORTERS } from '../public/js/hidden-floors.js?v=023336cb';
 import { NARAKA_TELEPORTERS } from '../public/js/hell.js?v=d77f15ef';
 import { WINTRY_PORTAL_TELEPORTERS } from '../public/js/wintry-portal.js?v=1437deda';
 import { CAVE_PIT_TELEPORTERS } from '../public/js/cave-pit.js?v=81e62950';
 import { SEAM_TELEPORTERS } from '../public/js/seam-teleporters.js?v=09d11340';
-import { WIRED_TELEPORTERS, AINT_THAT_DRY_TSID, CHITI_TIGA_TSID } from '../public/js/collision-teleporters.js?v=73c97f41';
+import { WIRED_TELEPORTERS, AINT_THAT_DRY_TSID, CHITI_TIGA_TSID } from '../public/js/collision-teleporters.js?v=e57be0e9';
 
 const root = join(import.meta.dirname, '..');
 const read = (rel) => readFileSync(join(root, rel), 'utf8');
@@ -98,16 +98,38 @@ describe('walk-in teleporters as portal buttons on the street map (#645)', () =>
     assert.equal(hiddenFloorsFeature.minimapTeleporters(streetJson('GA5AAB0VNKR2VRN'), fakeEngine()), null);
   });
 
+  it('no button for a secret or a jump puzzle: the ways into the hidden floors, Koulato\'s hidden ladder; 17 of the 21 shown', () => {
+    const shown = ALL.filter((t) => mapShowsTeleporter(streetJson(t.from), t)).map((t) => t.id);
+    const hidden = ALL.map((t) => t.id).filter((id) => !shown.includes(id));
+    assert.deepEqual(hidden.sort(), ['goorsh_to_lost', 'ilmenskie_to_missing', 'koulato_cluster_to_ruta_asuncion', 'odena_to_forgotten']);
+    assert.equal(ALL.length, 21);
+    assert.equal(shown.length, 17);
+    for (const id of ['aint_that_dry_to_chiti_tiga', 'chiti_tiga_to_aint_that_dry', 'harrisa_hara_to_snowed_in', 'snowed_in_to_harrisa_hara', 'northwest_to_wintry']) assert.ok(shown.includes(id), id);
+    // Every button stands within a plain jump of the floor under it; Odena Odes' pocket is far over it.
+    for (const t of ALL.filter((r) => shown.includes(r.id))) assert.ok(teleporterFloorGap(streetJson(t.from), t) <= PLAIN_JUMP_APEX, t.id);
+    const odena = TELEPORTERS.find((t) => t.id === 'odena_to_forgotten');
+    assert.ok(teleporterFloorGap(streetJson(odena.from), odena) > PLAIN_JUMP_APEX);
+    assert.ok(mapShowsTeleporter(streetJson(odena.from), { ...odena, to: 'GXXX' }) === false, 'the jump alone keeps it off');
+    // The feature's answer and its teleport follow the same rule.
+    for (const tsid of ['GIF16GDJ89724E3', 'GA9KL9UE1D82RFO', 'GIF102FDNU11314', 'GIF10RP1DBU11NU']) {
+      assert.equal(hiddenFloorsFeature.minimapTeleporters(streetJson(tsid), fakeEngine()), null, tsid);
+    }
+    const engine = fakeEngine({ street: streetJson('GIF16GDJ89724E3') });
+    hiddenFloorsFeature.onStreetEnter(engine.street, engine);
+    assert.equal(hiddenFloorsFeature.teleportFromMap('goorsh_to_lost', engine), null);
+    hiddenFloorsFeature.onStreetClear();
+  });
+
   it('a click on the button travels where walking in does: the feature\'s own teleport, through the travel gate', async () => {
-    const engine = fakeEngine();
-    hiddenFloorsFeature.onStreetEnter(streetJson(AINT_THAT_DRY_TSID), engine);
+    const engine = fakeEngine({ street: streetJson(AINT_THAT_DRY_TSID) });
+    hiddenFloorsFeature.onStreetEnter(engine.street, engine);
     assert.equal(hiddenFloorsFeature.teleportFromMap('nope', engine), null);
     assert.equal(hiddenFloorsFeature.teleportFromMap('aint_that_dry_to_chiti_tiga', engine), true);
     await new Promise((r) => setTimeout(r, 0));
     const t = WIRED_TELEPORTERS.find((r) => r.id === 'aint_that_dry_to_chiti_tiga');
     assert.deepEqual(engine.calls, [['enter', t.to, { spawnX: t.arrive.x, spawnY: t.arrive.y }]]);
-    const gated = fakeEngine({ travelGate: () => ({ ok: false, msg: 'Not now' }) });
-    hiddenFloorsFeature.onStreetEnter(streetJson(AINT_THAT_DRY_TSID), gated);
+    const gated = fakeEngine({ street: streetJson(AINT_THAT_DRY_TSID), travelGate: () => ({ ok: false, msg: 'Not now' }) });
+    hiddenFloorsFeature.onStreetEnter(gated.street, gated);
     hiddenFloorsFeature.teleportFromMap('aint_that_dry_to_chiti_tiga', gated);
     await new Promise((r) => setTimeout(r, 0));
     assert.deepEqual(gated.calls, [], 'the travel gate still says no');

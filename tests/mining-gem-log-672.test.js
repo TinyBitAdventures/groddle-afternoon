@@ -14,7 +14,7 @@ import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { runVerb } from '../public/content.js?v=35911ed6';
+import { runVerb } from '../public/content.js?v=10c358ca';
 import { createInventory, countItem } from '../public/js/inventory.js?v=6414dbdc';
 import { createMineRock, setMiningBuffs } from '../public/js/mining.js?v=29eaf67f';
 import { createToolConditionState } from '../public/js/tools.js?v=4156bba8';

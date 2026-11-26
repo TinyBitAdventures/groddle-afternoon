@@ -90,6 +90,9 @@ export const MISSING_FLOOR_SOURCE =
 
 const isTsid = (tsid, g) => String(tsid || '').slice(1) === g.slice(1);
 export const isLostFloorTsid = (tsid) => isTsid(tsid, LOST_FLOOR_TSID);
+/** The three hidden floors: secret rooms reached only through their teleporters. */
+export const HIDDEN_FLOOR_TSIDS = Object.freeze([LOST_FLOOR_TSID, FORGOTTEN_FLOOR_TSID, MISSING_FLOOR_TSID]);
+export const isHiddenFloorTsid = (tsid) => HIDDEN_FLOOR_TSIDS.some((g) => isTsid(tsid, g));
 export const isMissingFloorTsid = (tsid) => isTsid(tsid, MISSING_FLOOR_TSID);
 export const isIlmenskieTsid = (tsid) => isTsid(tsid, ILMENSKIE_TSID);
 

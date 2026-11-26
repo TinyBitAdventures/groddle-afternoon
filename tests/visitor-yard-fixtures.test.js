@@ -12,9 +12,9 @@ import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 import { STICK_PICKUP, YARD_FIXTURES, YARD_MACHINES_MAX, normalizeYardMachines, yardFixtureRows, yardFixtureVerbs, yardFixturesKey } from '../public/js/yard-fixtures-mp.js?v=dd022fe8';
-import { normalizeYardView } from '../public/js/yard-verbs-mp.js?v=fa57e52f';
-import { MAGIC_STICKS, REMOTE_MACHINES } from '../public/js/animal-husbandry.js?v=7fd232d6';
-import { STICK_SCALE } from '../public/js/features/animal-husbandry-feature.js?v=4b5fdc7c';
+import { normalizeYardView } from '../public/js/yard-verbs-mp.js?v=5f05b566';
+import { MAGIC_STICKS, REMOTE_MACHINES } from '../public/js/animal-husbandry.js?v=c2e4c509';
+import { STICK_SCALE } from '../public/js/features/animal-husbandry-feature.js?v=3df693fe';
 import { GAME_DIR, HAS_SITE, SITE_DIR, sitePath } from '../tools/repos.mjs';
 import { HAS_PHP, PHP } from './php.js';
 

@@ -51,6 +51,8 @@
 
 import {
   CANOPY_PHYSICS,
+  PLAIN_JUMP_APEX,
+  isHiddenFloorTsid,
   ILMENSKIE_CEILINGS,
   LOST_FLOOR_LABEL,
   TELEPORTERS,
@@ -66,12 +68,12 @@ import {
   isLostFloorTsid,
   isMissingFloorTsid,
   teleportersOn,
-} from '../hidden-floors.js?v=17a8b20b';
+} from '../hidden-floors.js?v=023336cb';
 import { narakaTeleportersOn } from '../hell.js?v=d77f15ef';
 import { wintryPortalTeleportersOn } from '../wintry-portal.js?v=1437deda';
 import { cavePitTeleportersOn } from '../cave-pit.js?v=81e62950';
 import { seamTeleportersOn } from '../seam-teleporters.js?v=09d11340';
-import { WIRED_TELEPORTERS, collisionTeleportersOn } from '../collision-teleporters.js?v=73c97f41';
+import { WIRED_TELEPORTERS, collisionTeleportersOn } from '../collision-teleporters.js?v=e57be0e9';
 import { WORLD_FONT_FAMILY } from '../world-text.js?v=6b49f88c';
 
 export const HIDDEN_FLOORS_FEATURE_ID = 'hidden-floors';
@@ -79,6 +81,44 @@ export const HIDDEN_FLOORS_FEATURE_ID = 'hidden-floors';
 /** Every walk-in teleporter wired on a street (the boxes this feature runs there). */
 export function walkInTeleportersOn(tsid) {
   return [...teleportersOn(tsid), ...narakaTeleportersOn(tsid), ...wintryPortalTeleportersOn(tsid), ...cavePitTeleportersOn(tsid), ...seamTeleportersOn(tsid), ...collisionTeleportersOn(tsid)];
+}
+
+/**
+ * PURE (#645): how far over the floor under it a teleporter's box starts (world px; 0 or less: the feet
+ * are in it standing there), from the street's walkable lines across its x; null with no floor under it.
+ */
+export function teleporterFloorGap(street, row) {
+  const b = row?.box;
+  const bounds = street?.bounds;
+  if (!b || !bounds) return null;
+  const x = b.x + Number(bounds.l);
+  const bottom = b.y + Number(bounds.t);
+  const top = bottom - b.h;
+  let floor = null;
+  for (const p of street.platforms || []) {
+    if (Number(p?.pc_perm) === 1) continue; // a ceiling, solid only from below
+    const x1 = Math.min(p.x1, p.x2);
+    const x2 = Math.max(p.x1, p.x2);
+    if (x < x1 || x > x2) continue;
+    const y = p.x1 === p.x2 ? Math.max(p.y1, p.y2) : p.y1 + ((p.y2 - p.y1) * (x - p.x1)) / (p.x2 - p.x1);
+    if (y >= top && (floor === null || y < floor)) floor = y;
+  }
+  return floor === null ? null : Math.round(floor - bottom);
+}
+
+/**
+ * PURE (#645, Austin 2026-11-26): whether the street map gives a teleporter a portal button. A map
+ * button must not give away a secret or skip a jump puzzle, so only one a player walks (or hops)
+ * straight into from the floor gets one: not a way into a hidden floor (the lost, forgotten and
+ * missing floors: Goorsh Gam's treetop, Odena Odes' pocket, Ilmenskie's ledge), not a row its data
+ * marks `secret` (Koulato Cluster's hidden ladder), and not a box more than a plain jump over the
+ * floor under it. The ways back out of the hidden floors, the pits, the beams, the Vortex back doors
+ * and the wintry portal (a hop from its walkway) keep theirs.
+ */
+export function mapShowsTeleporter(street, row) {
+  if (!row || row.secret || isHiddenFloorTsid(row.to)) return false;
+  const gap = teleporterFloorGap(street, row);
+  return gap !== null && gap <= PLAIN_JUMP_APEX;
 }
 
 /** No boxes in a home or an instance (onStreetEnter). */
@@ -249,14 +289,14 @@ export const hiddenFloorsFeature = {
   /** #645 (Austin 2026-11-26): the street's teleporters, for the street map's portal buttons (ui/street-minimap.js teleporterMarks). */
   minimapTeleporters(street, engine) {
     if (noTeleporters(street, engine)) return null;
-    const rows = walkInTeleportersOn(street.tsid);
+    const rows = walkInTeleportersOn(street.tsid).filter((row) => mapShowsTeleporter(street, row));
     return rows.length ? rows : null;
   },
 
   /** #645: a portal button's click travels where walking into its box does (the same teleport, travelGate first). */
   teleportFromMap(id, engine) {
     const row = boxes.find((b) => b.id === id);
-    if (!row || teleporting) return null;
+    if (!row || teleporting || !mapShowsTeleporter(engine.street, row)) return null;
     teleport(engine, row);
     return true;
   },

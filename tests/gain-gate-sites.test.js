@@ -15,14 +15,14 @@ import { setMetabolicGainGate, setMetabolicLossGate } from '../public/js/metabol
 import { createInventory, useItem } from '../public/js/inventory.js?v=6414dbdc';
 import { createShrineState, donateToShrine } from '../public/js/shrines.js?v=da102ddd';
 import { createToolConditionState, repairToolCondition, setToolRemaining } from '../public/js/tools.js?v=4156bba8';
-import { HERDKEEPING, capturePiggy, normalizeHusbandryPack } from '../public/js/animal-husbandry.js?v=7fd232d6';
+import { HERDKEEPING, capturePiggy, normalizeHusbandryPack } from '../public/js/animal-husbandry.js?v=c2e4c509';
 import { KITTY_PET, createKitty, petKitty } from '../public/js/heli-kitties.js?v=e4af4096';
 import { createMusicblockState, playMusicblock } from '../public/js/musicblocks.js?v=8e985753';
 import { runTransform } from '../public/js/item-transforms.js?v=3a1b5812';
 import { applyTreePoison, performAntidotePour } from '../public/js/tree-poison.js?v=646d1bc1';
 import { createPlot, performPlotVerb } from '../public/js/patches.js?v=3498abf3';
 import { doChore, neighbourById, normalizeNeighbourState } from '../public/js/neighbours.js?v=13f35acd';
-import { runVerb } from '../public/content.js?v=35911ed6';
+import { runVerb } from '../public/content.js?v=10c358ca';
 import { applySetFree } from '../public/js/animal-set-free.js?v=6fcd8355';
 import { RESOURCE_SKILL_PACKAGES, createResourceNode, harvestResourceNode } from '../public/js/resource-nodes.js?v=7059a7bd';
 import { room as topOfTree } from '../public/js/quest-rooms/top-of-tree.js?v=a9458e4e';
