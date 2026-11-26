@@ -7,9 +7,9 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { JAR_ARRIVALS, JAR_BOXES, JAR_DECOS, JAR_FLIES, countArrival, inJarBox, isKoulatoCluster, litJars, normalizeJarSave } from '../public/js/koulato-jars.js?v=5838b30a';
+import { JAR_ARRIVALS, JAR_BOXES, JAR_DECOS, JAR_FLIES, countArrival, inJarBox, isKoulatoCluster, litJars, normalizeJarSave } from '../public/js/koulato-jars.js?v=384a33e3';
 import { createEventRuntime, runLocationEvent } from '../public/js/location-events.js?v=44ee645e';
-import { koulatoJarsFeature } from '../public/js/features/koulato-jars-feature.js?v=2ad3cc85';
+import { koulatoJarsFeature } from '../public/js/features/koulato-jars-feature.js?v=99518a02';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const street = () => JSON.parse(readFileSync(join(root, 'public/assets/streets/GIF10RP1DBU11NU.json'), 'utf8'));
@@ -44,13 +44,17 @@ describe('Koulato Cluster jars (G679)', () => {
     }
   });
 
-  test('the jars come out every 30th arrival (player_enter, reset_vars)', () => {
+  test('the jars come out every 10th arrival (ours, #711: the source\'s player_enter waited for 30)', () => {
+    assert.equal(JAR_ARRIVALS, 10);
     const save = normalizeJarSave(null);
     for (let i = 1; i < JAR_ARRIVALS; i++) assert.equal(countArrival(save), false);
     assert.equal(countArrival(save), true);
     assert.deepEqual(save, { arrivals: 0, placed: true });
     assert.deepEqual(normalizeJarSave({ arrivals: 'x', placed: 1 }), { arrivals: 0, placed: false });
-    assert.deepEqual(normalizeJarSave({ arrivals: 12.7, placed: true }), { arrivals: 12, placed: true });
+    assert.deepEqual(normalizeJarSave({ arrivals: 7.7, placed: true }), { arrivals: 7, placed: true });
+    // A count saved under the old 30 at or past 10: the next arrival brings the jars out.
+    const old = normalizeJarSave({ arrivals: 25, placed: false });
+    assert.equal(countArrival(old), true);
   });
 
   test('a jar lights for any Glitch on it; all three at once is the street\'s three-player puzzle', () => {

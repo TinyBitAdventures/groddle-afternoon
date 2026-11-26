@@ -11,9 +11,9 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { TOY_CLICK, catchUpDangles, catchUpKoulato, catchUpLotha, createToyTracker, ownJars, toyEvents, toyMessageFor, toyServerState } from '../public/js/street-toys-mp.js?v=9eca3893';
 import { STREET_TOYS } from '../public/js/street-toys.js?v=09630452';
-import { JAR_BOXES, JAR_FLIES, KOULATO_TSID } from '../public/js/koulato-jars.js?v=5838b30a';
+import { JAR_ARRIVALS, JAR_BOXES, JAR_FLIES, KOULATO_TSID } from '../public/js/koulato-jars.js?v=384a33e3';
 import { createEventRuntime, runLocationEvent } from '../public/js/location-events.js?v=44ee645e';
-import { koulatoJarsFeature } from '../public/js/features/koulato-jars-feature.js?v=2ad3cc85';
+import { koulatoJarsFeature } from '../public/js/features/koulato-jars-feature.js?v=99518a02';
 import { serverPath, skipWithoutServer } from '../tools/repos.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -159,11 +159,11 @@ function fakeEngine(client, mode = 'multiplayer') {
 
 describe('Koulato Cluster online (koulato-jars-feature)', () => {
   test('the game counts no arrival of its own and completes nothing alone: the server says', () => {
-    koulatoJarsFeature.restore({ arrivals: 29, placed: false });
+    koulatoJarsFeature.restore({ arrivals: 9, placed: false });
     const client = fakeClient();
     const engine = fakeEngine(client);
     koulatoJarsFeature.onStreetEnter({ tsid: KOULATO_TSID }, engine);
-    assert.deepEqual(koulatoJarsFeature._state().save, { arrivals: 29, placed: false }, 'the 30th solo arrival is not counted online');
+    assert.deepEqual(koulatoJarsFeature._state().save, { arrivals: 9, placed: false }, 'the 10th solo arrival is not counted online');
     client.emit('msg:toy_state', { t: 'toy_state', street: KOULATO_TSID, toys: 'koulato', arrivals: 12, out: true, jars: [false, true, false] });
     koulatoJarsFeature.onTick(16, 0, engine);
     assert.equal(engine.data.koulatoArrivals, 12);
@@ -239,6 +239,7 @@ describe('the server\'s table matches the game', { skip: skipWithoutServer }, ()
       assert.ok(Math.abs(under - dy) <= 1, `jar ${box.n} rests at ${under}, the server places it at ${dy}`);
     });
     assert.match(src, /koulatoFlies = 7/);
-    assert.match(src, /koulatoArrivals = 30/);
+    // Ours (#711): every 10th arrival, the same count online and solo.
+    assert.match(src, new RegExp(`koulatoArrivals = ${JAR_ARRIVALS}\\b`));
   });
 });

@@ -1,15 +1,16 @@
 /**
  * Koulato Cluster's firefly jars (register G679; rules and sources in js/koulato-jars.js).
  *
- * Every 30th arrival on the street sets out three jars (place_jars). A Glitch standing on the ledge
- * in front of a jar lights it (jarN_on, a light pool and fireflies) and stepping off puts it out
+ * Every 10th arrival on the street sets out three jars (place_jars; ours, Glitch's was the 30th). A
+ * Glitch standing on the ledge in front of a jar lights it (jarN_on, a light pool and fireflies) and
+ * stepping off puts it out
  * (jarN_off). All three lit at once completes the street (complete, turn_off): the lights flare and go
  * out, the jars are put away, and the Firefly Jar that falls at your jar (7 Fireflies) is yours.
  * The events are the street's own, run through location-events-feature's locationEventsApi.
  *
  * Online (js/street-toys-mp.js, the server's streettoys.go) the street is everyone's, as loc.num and
  * the jars were the location's: the server counts every player's arrival, brings the jars out for
- * everyone at the 30th, lights each jar from the positions it has, and decides the completion; this
+ * everyone at the 10th, lights each jar from the positions it has, and decides the completion; this
  * game only draws what it is told (toy_played, and toy_state on arrival) and counts nothing itself.
  * The three Firefly Jars are the server's ground stacks (drops.go, first pickup wins, each placed under
  * the player standing on that jar); one the server could not share comes back "own" and is put down
@@ -21,7 +22,7 @@
  *   koulatoPlaced (1 while the jars are out), koulatoLit (e.g. 010), koulatoDone (completions this visit).
  */
 
-import { JAR_BOXES, JAR_DECOS, JAR_FLIES, countArrival, isKoulatoCluster, litJars, normalizeJarSave } from '../koulato-jars.js?v=5838b30a';
+import { JAR_BOXES, JAR_DECOS, JAR_FLIES, countArrival, isKoulatoCluster, litJars, normalizeJarSave } from '../koulato-jars.js?v=384a33e3';
 import { locationEventsApi } from './location-events-feature.js?v=ac6acbc9';
 import { catchUpKoulato, createToyTracker, ownJars, toyEvents, toyMessageFor } from '../street-toys-mp.js?v=9eca3893';
 
@@ -153,7 +154,7 @@ export const koulatoJarsFeature = {
     }
     if (active) {
       if (engine.param?.('koulatojars')) save.placed = true;
-      // player_enter: count this arrival; the jars come out at 30 (or are still out from before).
+      // player_enter: count this arrival; the jars come out at 10 (or are still out from before).
       if (countArrival(save) || save.placed) pending = true;
     }
     publish(engine, true);

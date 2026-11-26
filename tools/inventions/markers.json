@@ -454,6 +454,9 @@
   "public/js/features/juju-bandits-feature.js": {
     "stand-in: // A body-sized stand-in so bubbles sit on the Juju, not its 254 px": "not-an-invention"
   },
+  "public/js/features/koulato-jars-feature.js": {
+    "ours: on the street sets out three jars (place_jars; ours, Glitch's was the 30th).": "koulato-jars-every-tenth-arrival"
+  },
   "public/js/features/location-events-feature.js": {
     "stand-in: sound-key catalog plays recovered files or synth stand-ins;": "synth-stand-in-sounds"
   },
@@ -800,7 +803,9 @@
     "ours: // G656 (ours): the featured project's star, gold with a dark": "featured-project"
   },
   "public/js/koulato-jars.js": {
-    "ours: * Ours: the arrivals counted are this player's own": "ours-koulato-jars"
+    "ours: * (ours: every 10th,": "koulato-jars-every-tenth-arrival",
+    "ours: * Ours: the arrivals counted are this player's own": "ours-koulato-jars",
+    "ours: * player_enter: loc.num >= 30 calls place_jars. Ours: every 10th arrival brings the jars": "koulato-jars-every-tenth-arrival"
   },
   "public/js/ladder-top-signposts.js": {
     "stand-in: // Buried under the floor is the other stand-in (street-model.js": "teleporter-stand-ins",

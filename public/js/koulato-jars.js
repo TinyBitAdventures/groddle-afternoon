@@ -4,7 +4,8 @@
  *
  * What survives in source (LIF10RP1DBU11NU.xml events, all of them in the street JSON):
  * - player_enter: loc.num += 1; at 30, place_jars (reset_vars: num = 0, j1-3 false; the three jar5
- *   decos fade in; flag jars_on set, completed cleared). So the jars come out once every 30 arrivals.
+ *   decos fade in; flag jars_on set, completed cleared). So the jars came out once every 30 arrivals
+ *   (ours: every 10th, JAR_ARRIVALS).
  * - jarN_on / jarN_off (guarded by jars_on): a light pool and fireflies fade in or out over jar N and
  *   loc.jN follows; jarN_on then runs check_done: when j1, j2 and j3 are all true, complete and
  *   turn_off. Three Collision-triggered Event Boxes (objrefs IHV5MK0AH2E36A6, IHV5M2S9H2E3QCB,
@@ -30,8 +31,11 @@
 
 export const KOULATO_TSID = 'GIF10RP1DBU11NU';
 
-/** player_enter: loc.num >= 30 calls place_jars. */
-export const JAR_ARRIVALS = 30;
+/**
+ * player_enter: loc.num >= 30 calls place_jars. Ours: every 10th arrival brings the jars out
+ * (Austin 2026-11-25, #711; the realtime server's streettoys.go koulatoArrivals is the same).
+ */
+export const JAR_ARRIVALS = 10;
 
 /** firefly_jar.setInstanceProp('num_flies', 7). */
 export const JAR_FLIES = 7;

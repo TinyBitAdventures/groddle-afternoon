@@ -2774,6 +2774,23 @@
    "rows": []
   },
   {
+   "id": "koulato-jars-every-tenth-arrival",
+   "title": "Koulato Cluster's firefly jars come out every 10th arrival, not every 30th",
+   "kind": "behaviour",
+   "status": "kept",
+   "where": [
+    {
+     "file": "public/js/koulato-jars.js",
+     "symbol": "JAR_ARRIVALS"
+    }
+   ],
+   "why": "The street's own script (LIF10RP1DBU11NU.xml player_enter) ran place_jars when loc.num reached 30. Ours: the 10th arrival, solo (JAR_ARRIVALS) and online (the realtime server's streettoys.go koulatoArrivals), so players see the puzzle more often.",
+   "ruling": "Austin 2026-11-25 (report #711)",
+   "rows": [
+    "G679"
+   ]
+  },
+  {
    "id": "ours-legalize-it",
    "title": "legalize-it: connect target LIF101O8CDQ1AMU, a real location). Glitch had no private copy: the quest",
    "kind": "behaviour",
