@@ -177,6 +177,12 @@ function entriesOf(value) {
  * not account for was taken out of the stored save) goes to
  * onLedger({ corrected: { items, currants }, text }).
  *
+ * A window that slept (#670, Austin's ruling 2026-11-26: windowSlept(), from the realtime 'asleep'
+ * state, js/realtime-client.js SLEPT_MS) never keeps its own game over another save: takeover()
+ * writes nothing, and every state it announces says slept, so the card offers only the stored
+ * save. Its copy is from before the sleep and would replace what was played on the other device
+ * since. Glitch asked for a reload after 3.5 minutes of silence (NetController.as 596-603).
+ *
  * Writes are counted: mark() is the number of the first write that holds
  * everything set so far, and written the newest write the site accepted, so
  * written >= mark() says a change is in the stored save even when more
@@ -226,12 +232,17 @@ export function createSaveSync({
   let refused = {};
   /** Another character is signed in now: this page never writes again. */
   let characterGone = false;
+  /** #670: the window slept; it never takes the save back with its own copy. */
+  let slept = false;
+  /** The detail of the state announced last, so a sleep can announce it again. */
+  let said = {};
   const playing = characterId(character);
   const blocked = () => SAVE_STOPPED.includes(state) || yielding || reloading;
   const setState = (next, detail = {}) => {
     if (next === state && !detail.force) return;
     state = next;
-    onState(next, { version: current.version, ...detail });
+    said = detail;
+    onState(next, { version: current.version, ...detail, ...(slept ? { slept: true } : {}) });
   };
   const clear = () => {
     if (timer !== null) timers.clearTimeout(timer);
@@ -408,7 +419,7 @@ export function createSaveSync({
    * claiming the save back (the other window then stops writing and says so).
    */
   function takeover() {
-    if (!['conflict', 'elsewhere'].includes(state) || yielding || characterGone || reloading) return Promise.resolve(state);
+    if (!['conflict', 'elsewhere'].includes(state) || yielding || characterGone || reloading || slept) return Promise.resolve(state);
     takingOver = true;
     dirty = true;
     state = 'pending';
@@ -457,6 +468,16 @@ export function createSaveSync({
     setState('outdated', { confirmedAt: current.confirmedAt, force: true });
     return state;
   }
+  /**
+   * #670: the window slept (the realtime 'asleep' state). Its game never goes back over another
+   * save; a stopped save says so again, so the card offers only the stored save.
+   */
+  function windowSlept() {
+    if (slept) return state;
+    slept = true;
+    if (SAVE_STOPPED.includes(state)) setState(state, { ...said, force: true });
+    return state;
+  }
   /** Another call heard the site's character_changed: stop writing now, as a refused write would. */
   function characterChanged() {
     if (characterGone) return state;
@@ -475,6 +496,9 @@ export function createSaveSync({
     hold,
     outdated,
     characterChanged,
+    windowSlept,
+    /** #670: the window slept, so takeover() writes nothing. */
+    get slept() { return slept; },
     /** The character every write names (0: none). */
     get character() { return playing; },
     /** The first write that holds everything set so far: the next one while a change waits, else the last begun (0: the loaded save). */
@@ -612,6 +636,9 @@ export function createMultiplayerSaveStore(opts = {}) {
     takeover: () => sync.takeover(),
     /** Writes again after the site refused a write (state error). */
     retry: () => sync.retry(),
+    /** #670: the window slept (realtime 'asleep'): it never keeps its own game over another save. */
+    windowSlept: () => sync.windowSlept(),
+    get slept() { return sync.slept; },
     /** Saves the last change, then stops writing: another window plays now. */
     yieldTo: (detail) => sync.yieldTo(detail),
     /** G737: never writes again from this page (game.js holdSaves). */

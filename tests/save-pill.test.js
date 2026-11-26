@@ -5,7 +5,7 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { pillStateFor, SAVING_SHOWN_AFTER_MS } from '../public/js/online-boot.js?v=f1f2766b';
+import { pillStateFor, SAVING_SHOWN_AFTER_MS } from '../public/js/online-boot.js?v=a0f37b71';
 
 const root = join(import.meta.dirname, '..');
 const boot = readFileSync(join(root, 'public/js/online-boot.js'), 'utf8');

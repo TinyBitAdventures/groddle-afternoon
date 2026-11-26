@@ -16,7 +16,7 @@ import { createStreetMinimap, doorLook, teleporterMarks } from '../public/js/ui/
 import { phoneSignRows, walkFromMap } from '../public/js/features/street-minimap-feature.js?fresh=minimap-teleporter-portals';
 import { hiddenFloorsFeature, mapShowsTeleporter, teleporterFloorGap, walkInTeleportersOn } from '../public/js/features/hidden-floors-feature.js?fresh=minimap-teleporter-portals';
 import { PLAIN_JUMP_APEX, TELEPORTERS } from '../public/js/hidden-floors.js?v=023336cb';
-import { NARAKA_TELEPORTERS } from '../public/js/hell.js?v=d7a75e16';
+import { NARAKA_TELEPORTERS } from '../public/js/hell.js?v=0dba5774';
 import { WINTRY_PORTAL_TELEPORTERS } from '../public/js/wintry-portal.js?v=1437deda';
 import { CAVE_PIT_TELEPORTERS } from '../public/js/cave-pit.js?v=81e62950';
 import { SEAM_TELEPORTERS } from '../public/js/seam-teleporters.js?v=09d11340';

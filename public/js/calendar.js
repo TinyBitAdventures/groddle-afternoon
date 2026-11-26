@@ -38,11 +38,11 @@ import {
   MONTH_LENGTHS,
   MONTH_NAMES,
   dametimeParts,
-} from './game-day.js?v=beeaa24b';
+} from './game-day.js?v=57fecfcb';
 import { SEASONS, SEASON_TIME_ZONE, potLuckWindow, urDate } from './seasons.js?v=5d8f545a';
-import { MP_ORDER, RUN_EPOCH_MS, RUN_MS, runAt } from './feats-mp.js?v=17e84113';
-import { FEAT_BY_ID } from './solo-feats.js?v=d5445d67';
-import { NEW_UR_TEXT, newUrMidnights } from './new-ur.js?v=b3ca5e5a';
+import { MP_ORDER, RUN_EPOCH_MS, RUN_MS, runAt } from './feats-mp.js?v=e1fc8239';
+import { FEAT_BY_ID } from './solo-feats.js?v=2224a7a6';
+import { NEW_UR_TEXT, newUrMidnights } from './new-ur.js?v=cec82e41';
 
 export const CALENDAR_TEXT = Object.freeze({
   title: 'Calendar',

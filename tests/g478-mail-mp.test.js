@@ -32,7 +32,7 @@ import {
   playerMailCost,
   sentRow,
 } from '../public/js/player-mail.js?v=b6003af8';
-import { playerMailFeature } from '../public/js/features/player-mail-feature.js?v=f2efd40f';
+import { playerMailFeature } from '../public/js/features/player-mail-feature.js?v=d86a9d9e';
 import { createMailboxState, deliverMail, listMailboxMessages, mailCost, normalizeMailboxState, recordSentMail } from '../public/js/mailbox.js?v=d50d0d05';
 import { handOver, isExpressPending, sendDueToMailbox } from '../public/js/mail-courier.js?v=a210c94c';
 import { mailText } from '../public/js/ui/topbar.js?v=7c194020';

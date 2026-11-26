@@ -13,8 +13,8 @@ import { join } from 'node:path';
 
 import { androidBrowser, badgeCandidates, featTile, pickNudge, pickTip, projectTile, skillTile, START_TIPS, studyLeft, tipText } from '../public/js/start-today.js?v=e73894d1';
 import { FEATURED_MEMO_KEY, FEATURED_MEMO_MAX_MS, featuredFromServer, readFeaturedMemo, writeFeaturedMemo } from '../public/js/featured-project.js?v=5b2ee7c1';
-import { runAt } from '../public/js/feats-mp.js?v=17e84113';
-import { FEAT_BY_ID } from '../public/js/solo-feats.js?v=d5445d67';
+import { runAt } from '../public/js/feats-mp.js?v=e1fc8239';
+import { FEAT_BY_ID } from '../public/js/solo-feats.js?v=2224a7a6';
 
 const read = (rel) => readFileSync(join(import.meta.dirname, '..', rel), 'utf8');
 

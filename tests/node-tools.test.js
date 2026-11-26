@@ -15,7 +15,7 @@ import { MINE_STAND_X, NODE_TOOLS, NODE_TOOL_DELTAS, mineStandX, nodeToolOverlay
 import { miningProfile } from '../public/js/mining.js?v=7ecaa572';
 import { PACKED_SHEETS } from '../public/js/packed-sheets-data.js?v=192c6f15';
 import { packedCell, packedFrameAt } from '../public/js/packed-sheets.js?v=80b50384';
-import { RESOURCE_NODE_CATALOG } from '../public/js/resource-nodes.js?v=7d42d002';
+import { RESOURCE_NODE_CATALOG } from '../public/js/resource-nodes.js?v=433a3e48';
 import { imageSize } from '../tools/image-size.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');

@@ -12,8 +12,8 @@ import {
   inspectPlayerSave,
   migratePlayerSave,
   serializePlayerSave,
-} from '../public/js/player-save.js?v=89e19e82';
-import { UNREADABLE_SAVE_KEY, createSaveSync, keepUnreadableSave } from '../public/js/save-store.js?v=71f717ea';
+} from '../public/js/player-save.js?v=0794c268';
+import { UNREADABLE_SAVE_KEY, createSaveSync, keepUnreadableSave } from '../public/js/save-store.js?v=1ccb1d6b';
 
 const memoryStorage = (seed = {}) => {
   const map = new Map(Object.entries(seed));

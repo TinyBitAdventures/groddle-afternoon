@@ -46,7 +46,7 @@
  * online too; whichever recognizes the grave first wins.
  */
 
-import { HELL_QUESTS, normalizeHellState } from './hell.js?v=d7a75e16';
+import { HELL_QUESTS, normalizeHellState } from './hell.js?v=0dba5774';
 import { LOCAL_COMPANION_PROFILES } from './local-companions.js?v=188f756c';
 
 export const HELL_TICKETS_VERSION = 1;

@@ -65,7 +65,7 @@ import { ANIM_FPS, EMOTION_MS, animForState, crowdScaleX } from '../avatar-anims
 import { redrawFrame } from '../avatar-pack.js?v=65324246';
 import { movedLine } from '../admin-teleport.js?v=c4d28509';
 import { ADMIN_TEXT, applyAdminGive, applyAdminRefill, showAdminMessage, showBooted } from '../admin-console-mp.js?v=75d3b611';
-import { saveStore } from '../save-store.js?v=71f717ea';
+import { saveStore } from '../save-store.js?v=1ccb1d6b';
 import { STREET_INDEX } from '../street-loader.js?v=10376267';
 import { appendLinkedText } from '../chat-links.js?v=b717fac7';
 import { lineKey } from '../chat-reactions.js?v=38460172';
@@ -297,6 +297,8 @@ function createSession(engine) {
   });
   // The other window may have saved since this one loaded (the save pill says
   // so): reload for the newest save, which also takes the character back.
+  // Play here reloads: the page loads the stored save, never keeps this window's copy over it
+  // (#670: a window that slept may hold a copy from before the sleep; its store refuses a takeover).
   hereBtn.addEventListener('click', () => {
     client.stop();
     location.reload();
@@ -568,6 +570,8 @@ function createSession(engine) {
       engine.toast?.(line, 5200);
     }
     if (state === 'asleep') {
+      // #670 (Austin's ruling 2026-11-26): the save card offers only the stored save from now on.
+      saveStore.windowSlept?.();
       addLog({ note: true, text: ASLEEP_TEXT.note });
       engine.toast?.(ASLEEP_TEXT.note, 5200);
     }

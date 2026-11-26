@@ -50,12 +50,12 @@
  */
 
 import { isCostume } from './pot-luck.js?v=e704c060';
-import { GAME_EPOCH_MS } from './game-day.js?v=beeaa24b';
-import { INCUBATION } from './animal-husbandry.js?v=8418c3cb';
+import { GAME_EPOCH_MS } from './game-day.js?v=57fecfcb';
+import { INCUBATION } from './animal-husbandry.js?v=d50c05fb';
 import { isStandable } from './street-model.js?v=a9a05f9d';
 import { ANIMAL_BODY, TREE_FOOTPRINT } from './street-ecology.js?v=f1c11a2d';
 import { KITTY_MOTION, KITTY_PAUSE_CHOICES } from './heli-kitties.js?v=e4af4096';
-import { CRAB_WALK } from './crabs.js?v=0d17853d';
+import { CRAB_WALK } from './crabs.js?v=eb0bdc39';
 import { FIRE_DRAGON_WALK } from './fire-dragon.js?v=b7f3d751';
 import { walkSurfaceY } from './walk-surface.js?v=f21ce37b';
 import { EAT_PAUSE_MS } from './animal-mood.js?v=c8cc8797';

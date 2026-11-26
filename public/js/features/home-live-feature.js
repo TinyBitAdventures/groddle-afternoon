@@ -24,7 +24,7 @@
  */
 
 import { exposeQA } from '../qa-gate.js?v=f4e2cd82';
-import { saveStore, savedThrough } from '../save-store.js?v=71f717ea';
+import { saveStore, savedThrough } from '../save-store.js?v=1ccb1d6b';
 import { HOME_LIVE_STACK_PLACES, HOME_LIVE_WAIT_MS, changedHomeKinds, homeLivePrints, homeRefreshFrames } from '../home-live.js?v=9c7abae7';
 import { ownGroundRows } from '../ground-stacks.js?v=22792362';
 

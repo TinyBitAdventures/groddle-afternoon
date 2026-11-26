@@ -21,7 +21,7 @@ import { fileURLToPath } from 'node:url';
 import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=c9b84764';
 import { createQuestState } from '../public/js/quests.js?v=f68437db';
 import { acceptOffer, routeQuestEvent } from '../public/js/quest-offers.js?v=7e00498b';
-import { RECIPE_CATALOG, craftRecipe, loadRecipeCatalogFromFile } from '../public/js/making.js?v=2a62a71a';
+import { RECIPE_CATALOG, craftRecipe, loadRecipeCatalogFromFile } from '../public/js/making.js?v=dc595568';
 import { stationForRecipe } from '../public/js/make-tools.js?v=86877c3e';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');

@@ -31,7 +31,7 @@
  * save: a save that existed before the stamp keeps all sixteen; a new character starts with none.
  */
 import { addItem, countItem, ITEM_CATALOG, removeItem } from './inventory.js?v=3be7988a';
-import { makingRequiredSkill, pluralizeItem, RECIPE_CATALOG } from './making.js?v=2a62a71a';
+import { makingRequiredSkill, pluralizeItem, RECIPE_CATALOG } from './making.js?v=dc595568';
 import { grantMoodXp } from './mood-xp.js?v=e311b45c';
 import { loseEnergy } from './metabolics.js?v=48f784bf';
 

@@ -10,8 +10,8 @@ import { spawnSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { buildRefuses, pageBuild, saveStampOf } from '../public/js/save-build.js?v=588eae75';
-import { createPlayerSave, inspectPlayerSave, serializePlayerSave } from '../public/js/player-save.js?v=89e19e82';
-import { createMultiplayerSaveStore } from '../public/js/save-store.js?v=71f717ea';
+import { createPlayerSave, inspectPlayerSave, serializePlayerSave } from '../public/js/player-save.js?v=0794c268';
+import { createMultiplayerSaveStore } from '../public/js/save-store.js?v=1ccb1d6b';
 import { stamp } from '../tools/deploy/build-id.mjs';
 import { SITE_DIR, skipWithoutSite } from '../tools/repos.mjs';
 import { HAS_PHP, PHP } from './php.js';
@@ -120,7 +120,7 @@ describe('the multiplayer page and the build', () => {
   });
 
   it('online-boot hands the stored build to the page and says how to carry on', async () => {
-    const { bootDataFrom, saveAlertFor } = await import('../public/js/online-boot.js?v=f1f2766b');
+    const { bootDataFrom, saveAlertFor } = await import('../public/js/online-boot.js?v=a0f37b71');
     const data = bootDataFrom({
       account: { urls: { api: '/wp-json/groddle/v1/', nonce: '/n' }, nonce: 'n' },
       session: { player: { id: 3 } },

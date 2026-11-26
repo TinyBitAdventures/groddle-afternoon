@@ -55,7 +55,7 @@
  */
 
 import { addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=3be7988a';
-import { getGameDayKey } from '../game-day.js?v=beeaa24b';
+import { getGameDayKey } from '../game-day.js?v=57fecfcb';
 import { canUseTool, copyForVerb, copyTag, copyTags, setCopyTag, takeToolCopy, useToolCondition } from '../tools.js?v=4156bba8';
 import {
   PAPER_CLASS,
@@ -87,7 +87,7 @@ import {
 } from '../teleportation.js?v=cbbc673f';
 import { energyMax, forceMetabolic, loseEnergy, topUpMetabolic } from '../metabolics.js?v=48f784bf';
 import { HOME_STREET_TSID } from '../homes.js?v=dca6b2cd';
-import { readVisitScene } from '../neighbours-mp.js?v=4d16b7e4';
+import { readVisitScene } from '../neighbours-mp.js?v=83f2fdf4';
 
 export const TELEPORT_FEATURE_ID = 'teleportation';
 /** inc_teleportation.js 920-937: the cost is a share of your own energy tank (metabolics_get_max_energy). */

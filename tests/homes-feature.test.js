@@ -20,11 +20,11 @@ import {
   rockItems,
   soilKeyMap,
   yardSoilInput,
-} from '../public/js/features/homes-feature.js?v=efc20d2c';
-import { patchesFeature, soilSpawnPlan } from '../public/js/features/patches-feature.js?v=86cac496';
+} from '../public/js/features/homes-feature.js?v=0e319512';
+import { patchesFeature, soilSpawnPlan } from '../public/js/features/patches-feature.js?v=d15a3f88';
 import { WALLPAPER_MAPS } from '../public/js/home-wallpaper-art.js?v=129c514f';
 import { HOME_TEXTURE_CONFIGS } from '../public/js/homes-catalog.js?v=0367f90f';
-import { SOIL_SPAWN_CAPS, canPlantBean } from '../public/js/patches.js?v=24ecef1c';
+import { SOIL_SPAWN_CAPS, canPlantBean } from '../public/js/patches.js?v=3068579c';
 import { TOWER_PART_CHOICES, TOWER_STYLES, composeTower, towerBounds } from '../public/js/home-tower.js?v=a7fc0cce';
 import { MIN_GROUND_CLEARANCE, cameraTargetY, cameraWorldHeightForGround, yCamOffsetAnchor } from '../public/js/movement.js?v=f4be1a05';
 import { INTERIOR } from '../public/js/home-decor.js?v=31f37d9b';

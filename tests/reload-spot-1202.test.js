@@ -13,7 +13,7 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 
-import { createMultiplayerSaveStore } from '../public/js/save-store.js?v=71f717ea';
+import { createMultiplayerSaveStore } from '../public/js/save-store.js?v=1ccb1d6b';
 import { SPOT_KEY, leaveSpot, newerSpot, spotSavedAt } from '../public/js/save-claim.js?v=f538f8c7';
 
 const spot = (tsid, x, savedAt) => JSON.stringify({ tsid, x, y: -100, savedAt });

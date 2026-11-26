@@ -48,7 +48,7 @@ import { ITEM_CATALOG, addItem, countItem, itemIcon, listPackSlots, removeItem }
 import { scriptFromTag, scriptLabel } from '../teleportation.js?v=cbbc673f';
 import { TOOL_CONDITION_CATALOG, copyTagKind, leavingCopyTag, leavingToolWear, receiveToolCopy } from '../tools.js?v=4156bba8';
 import { createMinnAccount } from '../minn-account.js?v=7e3d7279';
-import { saveStore, savedThrough } from '../save-store.js?v=71f717ea';
+import { saveStore, savedThrough } from '../save-store.js?v=1ccb1d6b';
 import { createItemPicker } from '../ui/item-picker.js?v=548fd590';
 import { copyPicks, copyWire, markLeaving, packPicks, pickKey, takeCopies } from '../copy-picks.js?v=b368fd49';
 import {

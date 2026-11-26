@@ -31,10 +31,10 @@ import {
   qaClockOffset,
   recordMidnight,
   takeTrip,
-} from '../public/js/new-ur.js?v=b3ca5e5a';
-import { GAME_DAY_MS, dametimeParts, getGameDayStartMs } from '../public/js/game-day.js?v=beeaa24b';
+} from '../public/js/new-ur.js?v=cec82e41';
+import { GAME_DAY_MS, dametimeParts, getGameDayStartMs } from '../public/js/game-day.js?v=57fecfcb';
 import { SEASONS, SEASONAL_STOCK, activeSeasons, daysLeft, seasonYearKey } from '../public/js/seasons.js?v=5d8f545a';
-import { calendarEvents, midnightsLine, newUrEve } from '../public/js/calendar.js?v=e35525bd';
+import { calendarEvents, midnightsLine, newUrEve } from '../public/js/calendar.js?v=d8506d36';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const read = (rel) => readFileSync(join(ROOT, rel), 'utf8');
@@ -181,7 +181,7 @@ describe('hooks for the later pieces', () => {
 
 describe('the dragon\'s glow', () => {
   it('sits in the stone dragon\'s mouth, where Tiny Speck\'s lit Unnu Slight template lights it', async () => {
-    const { DRAGON_AT } = await import('../public/js/new-ur.js?v=b3ca5e5a');
+    const { DRAGON_AT } = await import('../public/js/new-ur.js?v=cec82e41');
     // The lit patch of "Unnu Slight (dragon)" (3000 x 1600, the street's own size) has its middle at (642, 1059).
     assert.ok(Math.abs(DRAGON_AT.x - 642) <= 20 && Math.abs(DRAGON_AT.y - 1059) <= 20, JSON.stringify(DRAGON_AT));
     const street = JSON.parse(read('public/assets/streets/GIFUNGIBHQ1243A.json'));

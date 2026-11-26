@@ -38,17 +38,17 @@
  */
 
 import { withArticle } from './words.js?v=274023af';
-import { createAnimalState } from './animals.js?v=be02c11e';
+import { createAnimalState } from './animals.js?v=ad941d13';
 import { petPiggy } from './animal-mood.js?v=c8cc8797';
 import { trantFruitCycle } from './trant-care.js?v=cb7f539b';
 import { fruitCapacityAt, resetTrantDay } from './trants.js?v=864ea9ff';
 import { ensureWoodTreeState, noteWoodCare } from './woodcutting.js?v=9e9af511';
-import { GROWN_TREE_LABELS, SEASONED_BEANS, SOIL_TIMERS, growTree, seedlingTimings } from './patches.js?v=24ecef1c';
-import { GAME_DAY_MS, GAME_EPOCH_MS } from './game-day.js?v=beeaa24b';
-import { isNodeId, isRockId } from './yard-stock-mp.js?v=44904555';
-import { STICK_ANIMAL } from './yard-wander.js?v=941310a6';
+import { GROWN_TREE_LABELS, SEASONED_BEANS, SOIL_TIMERS, growTree, seedlingTimings } from './patches.js?v=3068579c';
+import { GAME_DAY_MS, GAME_EPOCH_MS } from './game-day.js?v=57fecfcb';
+import { isNodeId, isRockId } from './yard-stock-mp.js?v=551bf9e9';
+import { STICK_ANIMAL } from './yard-wander.js?v=cb7fd979';
 import { normalizeYardMachines } from './yard-fixtures-mp.js?v=dd022fe8';
-import { capYardAnimals, yardClassCap } from './animal-crowding.js?v=1d19c205';
+import { capYardAnimals, yardClassCap } from './animal-crowding.js?v=50ebbe5d';
 import { HOUSE_LOT_W, YARD_SEGMENT_W } from './home-cultivation.js?v=b2868d29';
 import { forceMetabolic } from './metabolics.js?v=48f784bf';
 import { HOME_LIMITS } from './homes-catalog.js?v=0367f90f';

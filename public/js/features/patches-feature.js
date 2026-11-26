@@ -72,11 +72,11 @@ import {
   soilSpawnClasses,
   soilSpritePaths,
   tickPlot,
-} from '../patches.js?v=24ecef1c';
+} from '../patches.js?v=3068579c';
 import { frameTexture, isLoaded, onFailed, onLoaded, textureFromUrl } from '../textures.js?v=b8e38103';
 import { HOE_TOOLS, firstWorkingTool } from '../tools.js?v=4156bba8';
 import { slugsFromEffects } from '../speech-slugs.js?v=d5cc8b6f';
-import { plotSignature, replayRng } from '../shared-patches.js?v=075b4055';
+import { plotSignature, replayRng } from '../shared-patches.js?v=4c730242';
 import { topUpMetabolic } from '../metabolics.js?v=48f784bf';
 
 export const PATCHES_FEATURE_ID = 'patches';

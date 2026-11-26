@@ -10,7 +10,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { DUST_TRAP_EMPTY_CHANCE, createResourceNode, resourceNodeFrame, springDustTrapsOnArrival } from '../public/js/resource-nodes.js?v=7d42d002';
+import { DUST_TRAP_EMPTY_CHANCE, createResourceNode, resourceNodeFrame, springDustTrapsOnArrival } from '../public/js/resource-nodes.js?v=433a3e48';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const GSJS = join(root, '../glitch-GameServerJS');

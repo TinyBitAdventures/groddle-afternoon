@@ -52,7 +52,7 @@ import {
   qaClockOffset,
   recordMidnight,
   takeTrip,
-} from '../new-ur.js?v=b3ca5e5a';
+} from '../new-ur.js?v=cec82e41';
 
 export const NEW_UR_FEATURE_ID = 'new-ur';
 

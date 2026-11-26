@@ -9,7 +9,7 @@
 //   keyframes (js/game-day.js daylightState), and the clock pill shows the time.
 // With reduced motion the CSS stops the walking and drifting; clicks still work.
 import { dialoguePool } from '../js/dialogue.js?v=fcfed1af';
-import { daylightState, dametimeParts } from '../js/game-day.js?v=beeaa24b';
+import { daylightState, dametimeParts } from '../js/game-day.js?v=57fecfcb';
 
 /** The Magic Rock's two hellos, items/magic_rock.js 499 and 989 (pc.label as "friend", like quest copy). */
 export const MAGIC_ROCK_LINES = Object.freeze([

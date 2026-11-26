@@ -22,13 +22,13 @@ import { REMAKE_STATUS_RULES, isOfferedInRemake, remakeStatus } from '../public/
 import { applyRewards } from '../public/js/quests.js?v=f68437db';
 import { createInventory, countItem, ensureItem } from '../public/js/inventory.js?v=3be7988a';
 import { createMineRock, miningProfile, mineRock, smeltMetalRocks } from '../public/js/mining.js?v=7ecaa572';
-import { craftRecipe, makingSkillAdjustments } from '../public/js/making.js?v=2a62a71a';
+import { craftRecipe, makingSkillAdjustments } from '../public/js/making.js?v=dc595568';
 import { createToolConditionState, getToolCondition, repairToolCondition, setToolRemaining } from '../public/js/tools.js?v=4156bba8';
 import { quoteWoodTreeHarvest } from '../public/js/woodcutting.js?v=9e9af511';
 import { resolveAnimalKinshipPackage } from '../public/js/animal-kinship.js?v=eaa3a6f2';
 import { createGarden, getPlot, plantPlot, plotKey } from '../public/js/garden.js?v=fefa7bcd';
 import { vendorBuy, vendorSell, vendorBuyUnitPrice } from '../public/js/vendor.js?v=7a07f478';
-import { normalizePlayerSnapshot } from '../public/js/player-save.js?v=89e19e82';
+import { normalizePlayerSnapshot } from '../public/js/player-save.js?v=0794c268';
 import { loadContentCatalogsFromDir, resetContentCatalogs } from '../public/js/content-catalogs.js?v=c9b84764';
 import { createSkillState, getStudyStatus, pauseSkillStudy, startSkillStudy } from '../public/js/skills.js?v=3c6dbdff';
 

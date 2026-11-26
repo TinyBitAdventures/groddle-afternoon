@@ -16,11 +16,11 @@ import {
   ensureMakingItems,
   loadRecipeCatalogFromFile,
   makingXpCeiling,
-} from '../public/js/making.js?v=2a62a71a';
+} from '../public/js/making.js?v=dc595568';
 import { createInventory } from '../public/js/inventory.js?v=3be7988a';
-import { GAME_DAY_MS } from '../public/js/game-day.js?v=beeaa24b';
+import { GAME_DAY_MS } from '../public/js/game-day.js?v=57fecfcb';
 import { XP_FOR_LEVEL } from '../public/js/progression.js?v=05ff0260';
-import { normalizePlayerSnapshot } from '../public/js/player-save.js?v=89e19e82';
+import { normalizePlayerSnapshot } from '../public/js/player-save.js?v=0794c268';
 
 before(async () => {
   await loadRecipeCatalogFromFile(join(fileURLToPath(new URL('../public/assets/content', import.meta.url)), 'recipes.json'));

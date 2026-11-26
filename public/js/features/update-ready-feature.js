@@ -31,7 +31,7 @@
  */
 
 import { UPDATE_TEXT, blockingDetail, buildUrl, createHiddenNudge, createReachReminder, createUpdateCheck, ownBuild, saveThenReload, updateLine } from '../update-check.js?v=380fa5a3';
-import { saveStore } from '../save-store.js?v=71f717ea';
+import { saveStore } from '../save-store.js?v=1ccb1d6b';
 
 export const UPDATE_READY_FEATURE_ID = 'update-ready';
 /** How often the pill looks for blocking UI while an update waits. */

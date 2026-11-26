@@ -13,7 +13,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createInventory, countItem } from '../public/js/inventory.js?v=3be7988a';
 import { createToolConditionState, getToolCondition } from '../public/js/tools.js?v=4156bba8';
-import { RECIPE_CATALOG, craftRecipe, loadRecipeCatalogFromFile } from '../public/js/making.js?v=2a62a71a';
+import { RECIPE_CATALOG, craftRecipe, loadRecipeCatalogFromFile } from '../public/js/making.js?v=dc595568';
 import { BUREAUCRACY_ITEMS, CARD_BADGE, buyDocument, clerkOffers } from '../public/js/bureaucracy.js?v=2154f98b';
 import { phaseRequirements, normalizeStreetJobState, contributeItems } from '../public/js/street-jobs.js?v=76471e42';
 import { loadRetiredItems, retireRequirement } from '../tools/retired-items.mjs';

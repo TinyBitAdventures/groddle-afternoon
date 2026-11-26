@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { before, describe, it } from 'node:test';
 import { join } from 'node:path';
-import { RECIPE_CATALOG, craftRecipe, craftRecipeBatch, ensureMakingItems, loadRecipeCatalogFromFile, recipeInputHave } from '../public/js/making.js?v=2a62a71a';
+import { RECIPE_CATALOG, craftRecipe, craftRecipeBatch, ensureMakingItems, loadRecipeCatalogFromFile, recipeInputHave } from '../public/js/making.js?v=dc595568';
 import { TOOL_CONDITION_CATALOG, bindToolInventory, createToolConditionState, setToolRemaining, toolCopies } from '../public/js/tools.js?v=4156bba8';
 
 const root = join(import.meta.dirname, '..');

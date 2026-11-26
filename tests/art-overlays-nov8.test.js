@@ -22,7 +22,7 @@ import {
   gameTeleporterFeature,
   payForCrowns,
   teleporterPoint,
-} from '../public/js/features/game-teleporter-feature.js?v=81506530';
+} from '../public/js/features/game-teleporter-feature.js?v=a5894931';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const pub = join(root, 'public');

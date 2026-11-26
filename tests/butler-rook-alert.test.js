@@ -13,9 +13,9 @@ import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { BUTLER, ROOK_ALERTS_KEPT, createButlerState, normalizeButlerState, rookAlert, rookAlertLine } from '../public/js/butler.js?v=4a41a7fb';
+import { BUTLER, ROOK_ALERTS_KEPT, createButlerState, normalizeButlerState, rookAlert, rookAlertLine } from '../public/js/butler.js?v=5d1199a7';
 import { attacksFromServer } from '../public/js/rook-mp.js?v=dda37008';
-import { rookAttackFeature } from '../public/js/features/rook-attack-feature.js?v=a78adf00';
+import { rookAttackFeature } from '../public/js/features/rook-attack-feature.js?v=ea5a4091';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const gsjs = join(root, '..', 'glitch-GameServerJS');

@@ -24,10 +24,10 @@ import { GARDEN_SPEEDUP,
   gardenActionProfile,
   gardenTalkbackKey,
 } from '../public/js/garden.js?v=fefa7bcd';
-import { getVerbsFor, runVerb } from '../public/content.js?v=dd5c5cb5';
+import { getVerbsFor, runVerb } from '../public/content.js?v=dc977569';
 import { actionDurationFor, actionLabelFor } from '../public/js/action-timing.js?v=283e65ce';
 import { gardenPlotEvents } from '../public/js/quest-offers.js?v=7e00498b';
-import { applyTendAct, normalizeTendActs, plotsSnapshot, tendAct, tendedText } from '../public/js/neighbours-mp.js?v=4d16b7e4';
+import { applyTendAct, normalizeTendActs, plotsSnapshot, tendAct, tendedText } from '../public/js/neighbours-mp.js?v=83f2fdf4';
 import { guanoOver, plotHit } from '../public/js/features/garden-guano-feature.js?v=f588f27e';
 import { HAS_PHP, PHP } from './php.js';
 

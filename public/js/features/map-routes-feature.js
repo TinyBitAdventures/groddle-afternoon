@@ -62,7 +62,7 @@ import { STREET_INDEX } from '../street-loader.js?v=10376267';
 import { SUBWAY_STREETS } from '../street-jobs.js?v=76471e42';
 import { CARD_BADGE, STATIONS, SUBWAY_LINE, TEXT as SUBWAY_TEXT, gateFor, isCarTsid, papersHint, stationByTsid, surfaceStation } from '../subway.js?v=ea6921ff';
 import { countItem } from '../inventory.js?v=3be7988a';
-import { hellFeature } from './hell-feature.js?v=02f5451d';
+import { hellFeature } from './hell-feature.js?v=a9f2ff9a';
 import { postReachY } from '../street-model.js?v=a9a05f9d';
 import {
   ROUTE_COLOR,

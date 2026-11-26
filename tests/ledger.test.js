@@ -236,7 +236,7 @@ describe('service calls (ServiceCall, ledger.go)', { skip }, () => {
 
 describe('the game side of a correction (save-store.js, features/ledger-feature.js)', () => {
   it('passes a corrected answer on, and only that', async () => {
-    const { createSaveSync } = await import('../public/js/save-store.js?v=71f717ea');
+    const { createSaveSync } = await import('../public/js/save-store.js?v=1ccb1d6b');
     const answers = [
       { version: 4, ledger: { corrected: { items: { apple: 2 }, currants: 40 }, text: 'Your pack was corrected: 2 Apples and 40 currants could not be accounted for.' } },
       { version: 5 },
@@ -258,7 +258,7 @@ describe('the game side of a correction (save-store.js, features/ledger-feature.
   });
 
   it('takes a correction out of the pack and purse as changes, never below what is there', async () => {
-    const { applyCorrection } = await import('../public/js/features/ledger-feature.js?v=a2b76d99');
+    const { applyCorrection } = await import('../public/js/features/ledger-feature.js?v=2825b888');
     const inv = { apple: 5, cherry: 1 };
     const pc = { currants: 30 };
     const taken = applyCorrection(inv, pc, { items: { apple: 2, cherry: 4, pick: 1 }, currants: 50 });

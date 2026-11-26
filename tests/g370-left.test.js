@@ -30,8 +30,8 @@ import { createQuestState } from '../public/js/quests.js?v=f68437db';
 import { COUNTER_ROUTES, acceptOffer, routeQuestEvent } from '../public/js/quest-offers.js?v=7e00498b';
 import { applyBuff, createBuffState } from '../public/js/buffs.js?v=a4f7377b';
 import { BUFF_ICONS } from '../public/js/buff-triggers.js?v=9fd877c4';
-import { FEAT_BY_ID, UNWIRED_FEATS, WIRED_FEATS, featsInEpic } from '../public/js/solo-feats.js?v=d5445d67';
-import { MP_ACTS, MP_ORDER, MP_PACE, mpGoals, reportFor } from '../public/js/feats-mp.js?v=17e84113';
+import { FEAT_BY_ID, UNWIRED_FEATS, WIRED_FEATS, featsInEpic } from '../public/js/solo-feats.js?v=2224a7a6';
+import { MP_ACTS, MP_ORDER, MP_PACE, mpGoals, reportFor } from '../public/js/feats-mp.js?v=e1fc8239';
 import { featTable } from '../tools/build-realtime-feats.mjs';
 import { endComedian } from '../public/js/features/funpickle-feature.js?v=112263f7';
 

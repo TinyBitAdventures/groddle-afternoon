@@ -16,7 +16,7 @@ import { arrivalsFor, defaultArrival, loadStreetArrivals, STREET_ARRIVALS_URL } 
 import { applyStreetIndex, loadStreetDataFromFs } from '../public/js/street-loader.js?v=10376267';
 import { platformYAt, platformsScreen, streetWidth } from '../public/js/street-model.js?v=a9a05f9d';
 import { planStreetPlacements, streetReservedSpots } from '../public/js/street-ecology.js?v=f1c11a2d';
-import { newxpFeature, pickOpenExit } from '../public/js/features/newxp-feature.js?v=a993984a';
+import { newxpFeature, pickOpenExit } from '../public/js/features/newxp-feature.js?v=42be1b1c';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const read = (p) => readFileSync(join(root, p), 'utf8');

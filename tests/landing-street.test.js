@@ -4,8 +4,8 @@ import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import { existsSync, readFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
-import { streetLines, streetLight, stageScale, bubblePlacement, MAGIC_ROCK_LINES, MAX_LINE, SKY } from '../public/landing/street.js?v=b8181aeb';
-import { daylightState, GAME_DAY_MS } from '../public/js/game-day.js?v=beeaa24b';
+import { streetLines, streetLight, stageScale, bubblePlacement, MAGIC_ROCK_LINES, MAX_LINE, SKY } from '../public/landing/street.js?v=82fae819';
+import { daylightState, GAME_DAY_MS } from '../public/js/game-day.js?v=57fecfcb';
 import { dialoguePool } from '../public/js/dialogue.js?v=fcfed1af';
 
 const pub = join(import.meta.dirname, '..', 'public');

@@ -88,6 +88,8 @@ export const SAVE_ALERT_COPY = {
     title: 'You are signed out',
     body: 'Your game is not being saved while you are signed out. Sign in again to carry on.',
   },
+  // #670 (Austin's ruling 2026-11-26): a window that slept offers only the stored save.
+  asleepBody: 'This window was asleep, so it loads your saved game.',
   load: 'Load the other save',
   keep: "Keep this window's game",
   keepNote: "Keep this window's game replaces the other save with this one.",
@@ -114,6 +116,12 @@ function clockTime(iso) {
  * The alert's words and buttons for a save state and its event detail, or null when
  * the save is fine. Buttons: load (reload: the saved game), keep (this window's game
  * over the other), retry, signIn (reload: the gate signs in).
+ *
+ * #670 (Austin's ruling 2026-11-26): a window that slept (detail.slept, the realtime 'asleep'
+ * state: nothing heard for 3.5 minutes) offers only Load the other save. Its copy is from before
+ * the sleep, and keeping it would replace what was played on the other device since. Glitch asked
+ * for a reload after that long a silence and never offered to keep the old copy (NetController.as
+ * 596-603).
  */
 export function saveAlertFor(state, detail = {}) {
   const C = SAVE_ALERT_COPY;
@@ -128,6 +136,7 @@ export function saveAlertFor(state, detail = {}) {
     const other = clockTime(detail.otherUpdatedAt);
     if (mine) lines.push(C.lastSaved(mine));
     if (other && detail.otherUpdatedAt !== detail.confirmedAt) lines.push(C.otherSaved(other));
+    if (detail.slept) return { ...C[state], body: C.asleepBody, lines, buttons: [['load', C.load]] };
     lines.push(C.keepNote);
     return { ...C[state], lines, buttons: [['load', C.load], ['keep', C.keep]] };
   }

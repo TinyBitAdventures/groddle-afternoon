@@ -65,16 +65,16 @@
  *     slashLine (the last line shown).
  */
 
-import { BUTLER_STRINGS } from '../butler.js?v=4a41a7fb';
-import { butlerApi } from './butler-feature.js?v=e9813854';
-import { hellFeature } from './hell-feature.js?v=02f5451d';
+import { BUTLER_STRINGS } from '../butler.js?v=5d1199a7';
+import { butlerApi } from './butler-feature.js?v=742b4fdc';
+import { hellFeature } from './hell-feature.js?v=a9f2ff9a';
 import { locationEventsApi } from './location-events-feature.js?v=13175520';
-import { towerApi } from './home-tower-feature.js?v=1d02ccc1';
+import { towerApi } from './home-tower-feature.js?v=f409a04d';
 import { platformYAt, platformsScreen } from '../street-model.js?v=a9a05f9d';
 import { COMMAND_HELP_INTRO, STUCK_COOLDOWN_MS, STUCK_MENU, STUCK_TEXT, bareCommand, commandHelpLines, commandHint, isCommandHelp, misplacedCommand, slashPlan, strayLetterCommand, unknownLine } from '../slash-commands.js?v=bb2569aa';
 import { parseTp, runTeleportCommand, TP_TEXT } from '../admin-teleport.js?v=c4d28509';
 import { minnUrls } from '../minn-account.js?v=7e3d7279';
-import { saveStore } from '../save-store.js?v=71f717ea';
+import { saveStore } from '../save-store.js?v=1ccb1d6b';
 import { STREET_INDEX } from '../street-loader.js?v=10376267';
 import { isPhoneDevice } from '../touch-controls.js?v=8bc690ac';
 

@@ -12,7 +12,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { runVerb } from '../public/content.js?v=dd5c5cb5';
+import { runVerb } from '../public/content.js?v=dc977569';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const game = readFileSync(join(root, 'public/game.js'), 'utf8');

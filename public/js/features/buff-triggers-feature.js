@@ -56,16 +56,16 @@ import {
   removeSkillPackageOverride,
   skillPackageDetails,
 } from '../skill-packages.js?v=bfb87281';
-import { husbandryPack } from '../animal-husbandry.js?v=8418c3cb';
+import { husbandryPack } from '../animal-husbandry.js?v=d50c05fb';
 import { itemVerbAchievementCounters } from '../item-verbs.js?v=ecade42e';
 // The same module instances js/features/index.js registers (tests/buff-triggers.test.js checks the tags).
-import { meditationFeature } from './meditation-feature.js?v=12fa67b1';
-import { teleportationFeature } from './teleportation-feature.js?v=87633b61';
-import { rookAttackFeature } from './rook-attack-feature.js?v=a78adf00';
-import { rubeFeature } from './rube-feature.js?v=acefd8b8';
-import { smugglingFeature } from './smuggling-feature.js?v=57320387';
-import { hellFeature } from './hell-feature.js?v=02f5451d';
-import { isPooped } from '../hell.js?v=d7a75e16';
+import { meditationFeature } from './meditation-feature.js?v=b9a4b7d4';
+import { teleportationFeature } from './teleportation-feature.js?v=c52c0ed2';
+import { rookAttackFeature } from './rook-attack-feature.js?v=ea5a4091';
+import { rubeFeature } from './rube-feature.js?v=5af7e3ed';
+import { smugglingFeature } from './smuggling-feature.js?v=5d085c99';
+import { hellFeature } from './hell-feature.js?v=a9f2ff9a';
+import { isPooped } from '../hell.js?v=0dba5774';
 import { forceMetabolic } from '../metabolics.js?v=48f784bf';
 
 export const BUFF_TRIGGERS_FEATURE_ID = 'buff-triggers';

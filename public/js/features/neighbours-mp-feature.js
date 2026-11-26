@@ -115,9 +115,9 @@ import { copyPicks, leavingWire, markLeaving, receiveWire, takeCopies } from '..
 import { cultivationDef, homeStreetLayout } from '../home-cultivation.js?v=b2868d29';
 import { getPlot, tickGarden } from '../garden.js?v=fefa7bcd';
 import { BUTLER_RIG_SCALE, ButlerPainter, butlerRigNow, loadButlerRig } from '../butler-rig.js?v=3acda854';
-import { BUTLER, BUTLER_INFO, butlerInfoText, butlerPostRx, normalizeButlerParts } from '../butler.js?v=4a41a7fb';
-import { butlerApi } from './butler-feature.js?v=e9813854';
-import { homesFeature, visitorHomeScene, visitorHomeState } from './homes-feature.js?v=efc20d2c';
+import { BUTLER, BUTLER_INFO, butlerInfoText, butlerPostRx, normalizeButlerParts } from '../butler.js?v=5d1199a7';
+import { butlerApi } from './butler-feature.js?v=742b4fdc';
+import { homesFeature, visitorHomeScene, visitorHomeState } from './homes-feature.js?v=0e319512';
 import { visitRadio } from '../vine-radio.js?v=5436aa09';
 import { homeMusicFile } from '../homes.js?v=dca6b2cd';
 import { streetStyleFor } from '../home-styles.js?v=ec5d2f69';
@@ -181,11 +181,11 @@ import {
   forgetInside,
   insideProof,
   rememberInside,
-} from '../neighbours-mp.js?v=4d16b7e4';
+} from '../neighbours-mp.js?v=83f2fdf4';
 import { itemZ } from '../item-bands.js?v=ec366be3';
-import { butlerCarries, registerButlerDrop } from '../butler-drop.js?v=05b023a8';
+import { butlerCarries, registerButlerDrop } from '../butler-drop.js?v=c4f584df';
 import { takeDragged } from '../drag-stack.js?v=e0138d76';
-import { worldPoint } from './world-drop-feature.js?v=c48f8472';
+import { worldPoint } from './world-drop-feature.js?v=fa38c659';
 import { clampToExpansion, elevatorStops, floorJobFor, TOWER_JOBS } from '../home-tower.js?v=a7fc0cce';
 
 export const NEIGHBOURS_MP_FEATURE_ID = 'neighbours-mp';

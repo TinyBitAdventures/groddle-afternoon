@@ -65,10 +65,10 @@ import {
   vendorStrip,
 } from '../vendor-npcs.js?v=90b0c123';
 import { itemZ } from '../item-bands.js?v=ec366be3';
-import { chickenSeed, walkerSpan } from '../street-creatures.js?v=89662639';
+import { chickenSeed, walkerSpan } from '../street-creatures.js?v=563717d8';
 import { measuredGardenVendor } from '../garden-beds.js?v=2ac6a12c';
 import { followFloorY, landingY } from '../walk-surface.js?v=f21ce37b';
-import { GAME_EPOCH_MS } from '../game-day.js?v=beeaa24b';
+import { GAME_EPOCH_MS } from '../game-day.js?v=57fecfcb';
 import {
   VENDOR_POSES,
   VENDOR_REACH,
@@ -81,7 +81,7 @@ import {
   vendorHeld,
   vendorPlan,
   vendorWalkAt,
-} from '../vendor-walk.js?v=0d41c1e3';
+} from '../vendor-walk.js?v=8f1791d7';
 
 export const VENDOR_NPCS_FEATURE_ID = 'vendor-npcs';
 const ATTRACT_RADIUS = 200; // npc_gardening_vendor.js onPathing: players within 200px

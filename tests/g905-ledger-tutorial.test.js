@@ -15,8 +15,8 @@ import { SITE_DIR, skipWithoutSite } from '../tools/repos.mjs';
 import { PRACTICE_TOOLS, TRAINING2_DRINKS, TRAINING2_FOOD } from '../public/js/newxp.js?v=43f8df2c';
 import { EZ_FOOD, EZ_KNIFE_AND_BOARD, SOIL_TOOLS } from '../public/js/practice-streets.js?v=557238c1';
 import { AWARD_ITEM } from '../public/js/funpickle.js?v=95796317';
-import { MUSICBLOCK_ENDGAME_GIFT, START_STREET_MUSICBLOCKS } from '../public/js/musicblocks.js?v=1390d9b2';
-import { musicblocksFeature } from '../public/js/features/musicblocks-feature.js?v=a57563cf';
+import { MUSICBLOCK_ENDGAME_GIFT, START_STREET_MUSICBLOCKS } from '../public/js/musicblocks.js?v=e4c81eb7';
+import { musicblocksFeature } from '../public/js/features/musicblocks-feature.js?v=17fdc59f';
 import { HAS_PHP, PHP } from './php.js';
 
 const hasPhp = HAS_PHP;

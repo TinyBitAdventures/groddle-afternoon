@@ -11,13 +11,13 @@ import { join } from 'node:path';
 import { execFileSync, spawnSync } from 'node:child_process';
 import { SITE_DIR, skipWithoutSite } from '../tools/repos.mjs';
 import { gameFiles, gameText } from '../tools/build-economy.mjs';
-import { RARE_STORE } from '../public/js/quest-rooms/penalty.js?v=0650668c';
+import { RARE_STORE } from '../public/js/quest-rooms/penalty.js?v=67b7e4dd';
 import { CAMERA_OFFER } from '../public/js/snaps.js?v=b5be8bff';
 
 import { ISLAND_CURRANTS, ISLAND_FLAGS, normalizeNewxpSave } from '../public/js/newxp.js?v=43f8df2c';
 import { createIconState, pickUpIcon, placeIcon } from '../public/js/giant-icons.js?v=3f078775';
 import { GNOME_CLASS } from '../public/js/garden-gnome.js?v=73026b57';
-import { NOTE_POLE_CLASS } from '../public/js/home-street-mp.js?v=61e813f4';
+import { NOTE_POLE_CLASS } from '../public/js/home-street-mp.js?v=6ad3a79b';
 import { FUNPICKLE } from '../public/js/funpickle.js?v=95796317';
 import { funpickleFeature } from '../public/js/features/funpickle-feature.js?v=112263f7';
 import { HAS_PHP, PHP } from './php.js';

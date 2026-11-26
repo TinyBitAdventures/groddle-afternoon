@@ -8,8 +8,8 @@ import { join } from 'node:path';
 import { collectQuoin, createQuoinState } from '../public/js/quoins.js?v=5abad2c7';
 import { MAX_XP, XP_FOR_LEVEL, reconcilePlayerProgression } from '../public/js/progression.js?v=05ff0260';
 import { loseMood, setMetabolicGainGate, setMoodLossNotice } from '../public/js/metabolics.js?v=48f784bf';
-import { gameDayIndex } from '../public/js/musicblocks.js?v=1390d9b2';
-import { GAME_EPOCH_MS, GAME_DAY_MS } from '../public/js/game-day.js?v=beeaa24b';
+import { gameDayIndex } from '../public/js/musicblocks.js?v=e4c81eb7';
+import { GAME_EPOCH_MS, GAME_DAY_MS } from '../public/js/game-day.js?v=57fecfcb';
 import { levelUpStreetLine } from '../public/js/features/level-up-mp-feature.js?v=22659e6d';
 
 const pub = (...p) => readFileSync(join(import.meta.dirname, '..', 'public', ...p), 'utf8');

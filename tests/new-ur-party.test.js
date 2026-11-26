@@ -33,11 +33,11 @@ import {
   listNames,
   popperColour,
 } from '../public/js/new-ur-party.js?v=05952cd9';
-import { bigMidnight, firstUrDay, hatsOn, sparklyBatterflies } from '../public/js/new-ur.js?v=b3ca5e5a';
+import { bigMidnight, firstUrDay, hatsOn, sparklyBatterflies } from '../public/js/new-ur.js?v=cec82e41';
 import { SEASONAL_STOCK, seasonalConversions, seasonalSources } from '../public/js/seasons.js?v=5d8f545a';
 import { COSTUME_SHEETS, SHEET_COSTUMES, CHICKEN_SHEETS, costumeFrame } from '../public/js/pot-luck.js?v=e704c060';
-import { canCraft, setSeasonalRecipeCheck } from '../public/js/making.js?v=2a62a71a';
-import { newUrPartyFeature, PARTY_HAT } from '../public/js/features/new-ur-party-feature.js?v=bea024d4';
+import { canCraft, setSeasonalRecipeCheck } from '../public/js/making.js?v=dc595568';
+import { newUrPartyFeature, PARTY_HAT } from '../public/js/features/new-ur-party-feature.js?v=73d30d79';
 import { HIRES_ICONS } from '../public/js/icon-hires.js?v=60e2474b';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');

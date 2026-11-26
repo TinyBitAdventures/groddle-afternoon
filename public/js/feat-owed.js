@@ -27,7 +27,7 @@
  * This keeps that "every contribution counts" across a network.
  */
 
-import { DONATION_OP_RE, MP_ACTS, MP_PACE, reportFor } from './feats-mp.js?v=17e84113';
+import { DONATION_OP_RE, MP_ACTS, MP_PACE, reportFor } from './feats-mp.js?v=e1fc8239';
 
 /** The most reports kept owed (a long time offline on a busy Feat day; plain reports merge). */
 export const OWED_MAX = 200;

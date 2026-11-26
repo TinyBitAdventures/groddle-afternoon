@@ -21,7 +21,7 @@ import {
   spendMetabolic,
   topUpMetabolic,
 } from '../public/js/metabolics.js?v=48f784bf';
-import { metabolicGate, normalizeHellState } from '../public/js/hell.js?v=d7a75e16';
+import { metabolicGate, normalizeHellState } from '../public/js/hell.js?v=0dba5774';
 import { applyDropResult } from '../public/js/drop-tables.js?v=1ed0b596';
 import { performEmotionalBearAction, normalizeEmotionalBearState } from '../public/js/emotional-bear.js?v=1c88a46a';
 import { createInventory, useItem } from '../public/js/inventory.js?v=3be7988a';

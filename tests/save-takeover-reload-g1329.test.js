@@ -24,7 +24,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { SITE_DIR, skipWithoutSite } from '../tools/repos.mjs';
 import { PHP as PHP_BIN } from './php.js';
-import { SAVE_CHOICE_EVENT, createMultiplayerSaveStore } from '../public/js/save-store.js?v=71f717ea';
+import { SAVE_CHOICE_EVENT, createMultiplayerSaveStore } from '../public/js/save-store.js?v=1ccb1d6b';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 

@@ -16,7 +16,7 @@ import {
   SLIP_N_SLIDE_MOON,
   paradiseSkyColorAt,
   paradiseSkyStops,
-} from '../public/js/paradise-flight.js?v=2ca6d035';
+} from '../public/js/paradise-flight.js?v=c6838cae';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const read = (rel) => readFileSync(join(root, rel), 'utf8');
