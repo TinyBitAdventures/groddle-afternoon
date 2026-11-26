@@ -41,8 +41,8 @@
   "counts": {
     "fixing": 3,
     "known": 15,
-    "unreleased": 0,
-    "fixed": 628,
+    "unreleased": 2,
+    "fixed": 626,
     "lost": 5,
     "purpose": 18,
     "idea": 10
@@ -1156,6 +1156,11 @@
           "state": "known"
         },
         {
+          "id": "F164",
+          "text": "A machine refused for standing too close to the others never said why, and a machine dragged from the pack outside Decoration Mode was left as a loose item.",
+          "state": "unreleased"
+        },
+        {
           "id": "G640",
           "text": "Visitors see the owner's Garden Gnomes, Magic Sticks and animal machines on a home street.",
           "state": "fixed",
@@ -1525,12 +1530,6 @@
         {
           "id": "F161",
           "text": "A thing that ended up under the house floor could not be reached or picked up.",
-          "state": "fixed",
-          "version": "v0.77.0"
-        },
-        {
-          "id": "F164",
-          "text": "A machine refused for standing too close to the others never said why, and a machine dragged from the pack outside Decoration Mode was left as a loose item.",
           "state": "fixed",
           "version": "v0.77.0"
         },
@@ -2126,6 +2125,11 @@
           "state": "known"
         },
         {
+          "id": "F159",
+          "text": "Choosing Keep this window's game could lose something the site had just given back, such as a returned Still, on the window's next save.",
+          "state": "unreleased"
+        },
+        {
           "id": "F35",
           "text": "Appear offline still shows you to players on the same street.",
           "state": "fixed",
@@ -2278,12 +2282,6 @@
         {
           "id": "F158",
           "text": "A laptop window left open and asleep could take your character back when it woke, hiding your house's floor things on the device you were using.",
-          "state": "fixed",
-          "version": "v0.77.0"
-        },
-        {
-          "id": "F159",
-          "text": "Choosing Keep this window's game could lose something the site had just given back, such as a returned Still, on the window's next save.",
           "state": "fixed",
           "version": "v0.77.0"
         }
