@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import { existsSync, readFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
-import { streetLines, streetLight, stageScale, MAGIC_ROCK_LINES, MAX_LINE, SKY } from '../public/landing/street.js?v=63c70a68';
+import { streetLines, streetLight, stageScale, bubblePlacement, MAGIC_ROCK_LINES, MAX_LINE, SKY } from '../public/landing/street.js?v=43593198';
 import { daylightState, GAME_DAY_MS } from '../public/js/game-day.js?v=a532775d';
 import { dialoguePool } from '../public/js/dialogue.js?v=fcfed1af';
 
@@ -76,7 +76,7 @@ describe('the home page street', () => {
     assert.equal(bottom('.sh-walk-chicken'), Math.round(96 - 13 * 0.7)); // 13 rows, drawn at 0.7
     assert.equal(bottom('.sh-walk-glitch'), 92); // restoration.css's -4px margin under the Glitch sheet + its 4 rows
     // The path band the walkers stand on runs 22 to 37 px down a 124 px ground: 87 to 102 px up.
-    assert.match(css, /\.sh-ground \{[^}]*height: 124px;[^}]*var\(--path\) 22px 34px/);
+    assert.match(css, /\.sh-ground \{[^}]*bottom: -90px; height: 214px;[^}]*var\(--path\) 22px 34px/);
   });
 
   it('says the years without brackets, in a smaller tag', () => {
@@ -87,6 +87,23 @@ describe('the home page street', () => {
   it('every picture the street and the page\'s stylesheet name exists', () => {
     for (const [, url] of css.matchAll(/url\("(\.\.\/[^"?]+)/g)) assert.ok(existsSync(resolve(pub, 'landing', url)), url);
     for (const [, src] of hero.matchAll(/src="([^"?]+)/g)) assert.ok(existsSync(join(pub, src)), src);
+  });
+
+  it('hangs a bubble under its speaker when there is no room above it in the hero', () => {
+    assert.deepEqual(bubblePlacement(200, 70, 260), { under: false, top: 200 });
+    assert.deepEqual(bubblePlacement(60, 70, 120), { under: true, top: 120 });
+    assert.match(css, /\.sh-bubble\.is-below \{ transform: translate\(-50%, 0\); \}/);
+  });
+
+  it('the ground runs below the stage, so parallax never shows a gap under it', () => {
+    assert.match(css, /\.sh-ground \{\n  left: -2000px; right: -2000px; bottom: -90px; height: 214px;/);
+    assert.match(css, /\.sh-layer \{[^}]*calc\(var\(--py\) \* var\(--d\) \* -0\.4px\)/);
+    // The largest vertical shift: 15 (half the 30 range) x 0.4 x d 1 = 6 px, well inside the 90 px.
+  });
+
+  it('draws the iMG mark from the game\'s vector file, not the 1x quoin sheet', () => {
+    assert.match(hero, /<span class="sh-pill"><img src="assets\/imagination\/ui\/moment_icon_imagination\.svg/);
+    assert.ok(!/sh-pill"><span class="sheet sheet-quoin/.test(hero));
   });
 
   it('scales the 1200 px street to the window, never below 0.72', () => {

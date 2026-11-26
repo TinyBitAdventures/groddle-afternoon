@@ -132,8 +132,9 @@ body.landing { background-color: var(--bg); overflow-x: hidden; }
 .sh-far { bottom: 110px; width: 820px; opacity: 0.42; filter: brightness(1.3) saturate(0.6); }
 .sh-pine { bottom: 112px; filter: brightness(0.82) saturate(0.85); }
 .sh-bush { bottom: 104px; }
+/* The ground's top is 124 px up the stage; it runs 90 px below the stage, so a parallax shift never shows a gap under it. */
 .sh-ground {
-  left: -2000px; right: -2000px; bottom: 0; height: 124px;
+  left: -2000px; right: -2000px; bottom: -90px; height: 214px;
   background:
     radial-gradient(15px 10px at 50% 100%, var(--grass-hi) 96%, transparent 100%) 0 0 / 28px 10px repeat-x,
     linear-gradient(transparent 0 9px, var(--grass-hi) 9px 16px, var(--grass) 16px 22px, var(--path) 22px 34px, var(--path-dk) 34px 37px, var(--soil) 37px, var(--soil-dk));
@@ -192,16 +193,19 @@ body.landing { background-color: var(--bg); overflow-x: hidden; }
   font-family: Nunito, var(--font-body); font-weight: 900; font-size: 14px; color: var(--fg); font-variant-numeric: tabular-nums;
   background: color-mix(in srgb, var(--surface) 93%, transparent); border: 2px solid var(--plate-line);
 }
-.sh-pill .sheet-quoin { display: block; scale: 0.6; margin: -9px -8px -9px -6px; animation-duration: 1.6s; }
+.sh-pill img { display: block; width: 22px; height: auto; }
 .sh-pill.is-bump { animation: sh-bump 0.35s ease-out; }
 @keyframes sh-bump { 40% { scale: 1.12; } }
 .sh-bubble {
-  position: absolute; z-index: 5; max-width: 260px; margin: 0; padding: 8px 12px; transform: translate(-50%, -100%);
+  position: absolute; z-index: 6; width: max-content; max-width: min(260px, calc(100vw - 32px)); margin: 0; padding: 8px 12px; transform: translate(-50%, -100%);
   background: var(--bubble-bg); color: var(--bubble-ink); border: 2px solid var(--bubble-line); border-radius: 14px;
   font-family: Nunito, var(--font-body); font-size: 14px; font-weight: 700; line-height: 1.3;
   box-shadow: 0 6px 14px -8px var(--shadow); pointer-events: none; animation: sh-bubble-in 0.25s ease-out;
 }
 .sh-bubble::after { content: ""; position: absolute; left: 50%; bottom: -9px; width: 14px; height: 14px; background: var(--bubble-bg); border-right: 2px solid var(--bubble-line); border-bottom: 2px solid var(--bubble-line); transform: translateX(-50%) rotate(45deg); }
+/* No room above the speaker (a butterfly near the top): the bubble hangs below it, tail up. */
+.sh-bubble.is-below { transform: translate(-50%, 0); }
+.sh-bubble.is-below::after { bottom: auto; top: -9px; rotate: 180deg; }
 .sh-bubble b { display: block; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--bubble-who); }
 @keyframes sh-bubble-in { from { opacity: 0; translate: 0 8px; } }
 .sh-pop {
@@ -278,7 +282,6 @@ body.landing { background-color: var(--bg); overflow-x: hidden; }
 .todo-badge .sheet-rock { transform: none; scale: 0.36; }
 .todo-badge .sheet-glitch { scale: 0.38; }
 .todo-badge .sheet-piggy { scale: 0.56; }
-.todo-badge .sheet-quoin { scale: 0.9; }
 .todo-badge img { width: auto; height: 40px; aspect-ratio: auto; object-fit: contain; }
 .todo-bfly { display: block; width: 70px; height: 65px; scale: 0.8; background: url("../assets/sprites/npc_butterfly__x1_fly-side_png_1354829525.webp?v=4774a7f0") 0 0 no-repeat; animation: sheet-butterfly 0.7s steps(14) infinite; }
 .todo-rook { display: block; width: 108px; height: 127px; scale: 0.44; background: url("../assets/sprites/rooks/rook-head-idle1.webp?v=4774a7f0") 0 0 no-repeat; animation: todo-rook 1s steps(9) infinite; }

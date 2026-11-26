@@ -50,6 +50,12 @@ export function streetLight(now = Date.now()) {
   };
 }
 
+/** Where a bubble goes: above the speaker (its bottom at `above`) when its height fits under the
+ * hero's top with 8 px to spare, else under the speaker (its top at `below`). */
+export function bubblePlacement(above, height, below) {
+  return above - height - 14 >= 8 ? { under: false, top: above } : { under: true, top: below };
+}
+
 /** The stage's scale for a hero this wide: the 1200 px street fills it, never below 0.72 (phones crop the middle). */
 export function stageScale(width) {
   return Math.max(0.72, width / 1200);
@@ -102,7 +108,9 @@ export function mountStreet(root = document.getElementById('street-hero')) {
     const line = lines[turns[el.dataset.talk]];
     bubble?.remove();
     clearTimeout(bubbleTimer);
-    const rb = scene.getBoundingClientRect();
+    // The bubble lives on the hero (over the words and the street) and hangs below the speaker
+    // when there is no room above it inside the hero.
+    const rb = root.getBoundingClientRect();
     const rt = el.getBoundingClientRect();
     bubble = document.createElement('p');
     bubble.className = 'sh-bubble';
@@ -111,8 +119,11 @@ export function mountStreet(root = document.getElementById('street-hero')) {
     bubble.append(who, line);
     const x = Math.max(140, Math.min(rb.width - 140, rt.left + rt.width / 2 - rb.left));
     bubble.style.left = `${x}px`;
-    bubble.style.top = `${Math.max(76, rt.top - rb.top - 6)}px`;
-    scene.append(bubble);
+    root.append(bubble);
+    const above = rt.top - rb.top - 6;
+    const below = bubblePlacement(above, bubble.offsetHeight, rt.bottom - rb.top + 14);
+    bubble.classList.toggle('is-below', below.under);
+    bubble.style.top = `${below.top}px`;
     if (live) live.textContent = `${who.textContent}: ${line}`;
     bubbleTimer = setTimeout(() => { bubble?.remove(); bubble = null; }, 5200);
   }));
