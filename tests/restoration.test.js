@@ -171,7 +171,9 @@ describe('every-change heatmap', () => {
     const { changes, activity } = historyLog();
     assert.ok(activity && activity.repos[0] === 'game', 'activity has the game first');
     const games = Object.values(activity.days).reduce((n, d) => n + Object.values(d.game || {}).reduce((a, b) => a + b, 0), 0);
-    assert.equal(games, Number(execFileSync('git', ['rev-list', '--count', 'HEAD'], { cwd: root, encoding: 'utf8' }).trim()));
+    // Every commit once: a hotfix's cherry-pick (same author time and subject as main's) counts once.
+    const unique = new Set(execFileSync('git', ['log', '--format=%aI%x1f%s', 'HEAD'], { cwd: root, encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 }).split('\n').filter(Boolean));
+    assert.equal(games, unique.size);
     const byDay = listed(changes);
     for (const date of new Set([...Object.keys(byDay), ...Object.keys(activity.days)])) {
       assert.equal(heat.listedCount(activity, date), byDay[date] || 0, date);

@@ -262,14 +262,20 @@ function gitStats() {
  */
 export function historyLog({ refs = {}, playerNames = undefined } = {}) {
   try {
-    const raw = execFileSync('git', ['log', '--format=%h%x1f%cs%x1f%s%x1f%b%x1e'], { cwd: root, encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 });
+    const raw = execFileSync('git', ['log', '--format=%h%x1f%cs%x1f%aI%x1f%s%x1f%b%x1e'], { cwd: root, encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 });
     const kinds = { '📦 NEW': 'new', '👌 IMPROVE': 'improve', '🐛 FIX': 'fix' };
     const names = playerNames === undefined ? loadPlayerNames() : playerNames;
     const changes = [];
+    // A hotfix's cherry-pick keeps the author time and subject of the commit on main: listed once,
+    // under the same key the heatmap counts it once by (dayActivity).
+    const seen = new Set();
     for (const rec of raw.split('\x1e')) {
-      const [hash, date, subject, body = ''] = rec.replace(/^\n+/, '').split('\x1f');
+      const [hash, date, at, subject, body = ''] = rec.replace(/^\n+/, '').split('\x1f');
       const m = /^(📦 NEW|👌 IMPROVE|🐛 FIX):\s*(.*)$/u.exec(subject || '');
       if (!m) continue;
+      const key = `${at}\x1f${subject}`;
+      if (seen.has(key)) continue;
+      seen.add(key);
       const details = body.split('\n').filter((l) => /^- /.test(l)).map((l) => l.slice(2).trim()).filter(Boolean);
       // No player names in a public file (tools/restoration/player-names.mjs: the private list).
       changes.push(scrubChange({ hash, date, kind: kinds[m[1]], text: m[2].trim(), details }, names));
