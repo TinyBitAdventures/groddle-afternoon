@@ -2814,7 +2814,7 @@
   "deployed": "2026-11-25"
  },
  "git": {
-  "commits": 3637,
+  "commits": 3639,
   "since": "2026-10-19",
   "recent": [
    {
@@ -2931,14 +2931,9 @@
     "date": "2026-11-25",
     "kind": "fix",
     "text": "Shared trees, rocks, quoins, gardens and Patches say \"Reconnecting...\" while offline instead of giving their harvest on your own page"
-   },
-   {
-    "date": "2026-11-25",
-    "kind": "improve",
-    "text": "A finished Group Hall's dialog and toast say the hall is the group's and its street opens in a later update"
    }
   ]
  },
- "tests": 1409,
+ "tests": 1410,
  "generatedAt": "2026-11-25"
 }
