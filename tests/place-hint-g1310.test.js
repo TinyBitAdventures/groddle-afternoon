@@ -45,7 +45,8 @@ describe('G1310: the post at hand glows on a computer', () => {
   it('game.js: the post at hand takes the hover rim, none while it has hold or on a phone', () => {
     const game = read('public/game.js');
     assert.match(game, /function postGlowWanted\(\) \{\s*if \(reachGlowOff\(\) \|\| signpostFocus\) return \[\];\s*return \(signpostAtHand\(\)\?\.views \|\| \[\]\)/);
-    assert.match(game, /for \(const part of views\.flatMap\(\(v\) => signpostGlowParts\(v\)\)\.filter\(rimArt\)\) \{\s*const rim = createSpriteOutline\(part, \{ color: 0xa8e4ff, thickness: 2 \}\);/);
+    // #721: each rim takes its post's street colour (signpostGlowFilters), so the loop keeps the view.
+    assert.match(game, /for \(const \[view, part\] of views\.flatMap\(\(v\) => signpostGlowParts\(v\)\.filter\(rimArt\)\.map\(\(part\) => \[v, part\]\)\)\) \{[\s\S]{0,200}?const rim = createSpriteOutline\(part, \{ color: 0xa8e4ff, thickness: 2, filters: signpostGlowFilters\(view\) \}\);/);
     assert.match(game, /syncPostGlow\(\);\n\s*\}/);
     assert.match(game, /function reachGlowOff\(\) \{\s*if \(TOUCH_PHONE \|\|/);
     assert.match(game, /app\.canvas\.dataset\.postGlow = String\(postGlow\.rims\.length\)/);
