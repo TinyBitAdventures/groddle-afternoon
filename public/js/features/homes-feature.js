@@ -162,7 +162,7 @@ import {
 import { isTrophyDecor, placedTrophies } from '../home-trophies.js?v=649b111e';
 import { applyBonusUpgrade, applyUpgrade, bonusUpgradeLine, currantsText, hasUpgrades, pieceLabel, rollBonusUpgrade, upgradeRow, upgradeVerb, UPGRADE_TEXT } from '../furniture-upgrades.js?v=f563b304';
 import { LONG_PRESS_MS, LONG_PRESS_SLOP, ECHO_MS, createContextMenu } from '../ui/context-menu.js?v=0266831a';
-import { DOCK_GAP, DOCK_W, chooseUpgrade, closeUpgradePicker, openUpgradePicker, placeUpgradePicker, saveUpgrade, upgradePickerOpen, upgradePickerState } from '../furniture-upgrade-picker.js?v=aac69065';
+import { DOCK_GAP, DOCK_W, chooseUpgrade, closeUpgradePicker, openUpgradePicker, placeUpgradePicker, saveUpgrade, upgradePickerOpen, upgradePickerState } from '../furniture-upgrade-picker.js?v=33c63a1f';
 import {
   BUILDER_TEXT,
   DRAG_DIST,
@@ -315,7 +315,7 @@ import { anchorBottomCentre, standOnFeet } from '../sprite-feet.js?v=6358a697';
 import { autoplayLog } from '../autoplay-log.js?v=55bb4823';
 import { WORLD_FONT_FAMILY } from '../world-text.js?v=6b49f88c';
 import { HOUSE_ART_DIR, HOUSE_FROM_HOME_STYLE, HOUSE_STYLE_IDS, composeHouse, houseFitViewH, houseLabel, houseLot, normalizeHouse } from '../home-house.js?v=3c88c47c';
-import { closeHousePicker, housePickerOpen, openHousePicker, refreshHousePicker } from '../ui/house-picker.js?v=67f03b99';
+import { closeHousePicker, housePickerOpen, openHousePicker, refreshHousePicker } from '../ui/house-picker.js?v=20aaba5c';
 import { YARD_WALL_DX } from '../yard-wander.js?v=941310a6';
 import { housePlace, isHomeMachineClass, towerPlace } from '../home-machines.js?v=7379f47f';
 
@@ -3955,14 +3955,14 @@ const CSS = `
 .homes-styles .hs-actions button.primary{background:var(--c-blue-63);border-color:var(--c-blue-63);color:var(--text-inverse)}
 .homes-styles .hs-actions button:disabled{opacity:.45;cursor:not-allowed}
 .homes-styles .hs-note{margin:var(--sp-3) var(--sp-6) 0;font-size:var(--fs-sm);color:var(--c-brown-53)}
-.homes-styles .hs-grid{flex:1;overflow:auto;display:grid;grid-template-columns:repeat(auto-fill,minmax(122px,1fr));gap:var(--sp-4);padding:var(--sp-5) var(--sp-6) var(--sp-6)}
+.homes-styles .hs-grid{flex:1;overflow:auto;isolation:isolate;display:grid;grid-template-columns:repeat(auto-fill,minmax(122px,1fr));gap:var(--sp-4);padding:var(--sp-5) var(--sp-6) var(--sp-6)}
 .homes-styles .hs-tile{display:flex;flex-direction:column;gap:var(--sp-2);border:2px solid transparent;background:var(--surface-parchment);border-radius:var(--radius-lg);padding:var(--sp-2);cursor:pointer;text-align:left;font:inherit;color:var(--c-sand-33)}
 .homes-styles .hs-tile:hover{border-color:var(--mood)}
 .homes-styles .hs-tile.on{border-color:var(--c-orange-69);background:var(--status-warn-soft)}
 .homes-styles .hs-tile.current .hs-label::after{content:" (yours)";color:var(--moss);font-weight:700}
 .homes-styles .hs-label{font-size:var(--fs-xs);font-weight:700;line-height:var(--lh-tight);padding:0 var(--sp-1)}
-.homes-styles .hs-prev{position:relative;display:block;height:64px;border-radius:var(--radius-md);overflow:hidden}
-.homes-styles .hs-prev .hs-pic{position:absolute;inset:0;width:100%;height:100%;display:block;pointer-events:none}
+.homes-styles .hs-prev{display:block;height:64px;border-radius:var(--radius-md);overflow:hidden}
+.homes-styles .hs-prev .hs-pic{width:100%;height:100%;display:block;pointer-events:none}
 .homes-modes button{white-space:nowrap}
 .homes-sign{position:absolute;left:50%;top:132px;transform:translateX(-50%);z-index:calc(var(--z-panel) + 10);width:200px;background:var(--surface-card);border-radius:var(--radius-2xl);box-shadow:0 12px 32px color-mix(in srgb, var(--c-sand-24) 28%, transparent);border:1px solid color-mix(in srgb, var(--c-umber-41) 18%, transparent);font-family:var(--font-ui);color:var(--text);overflow:hidden}
 .homes-sign[hidden]{display:none}

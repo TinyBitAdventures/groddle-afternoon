@@ -65,7 +65,7 @@ const CSS = `
 .furn-upgrade .fu-prev .fu-box{width:150px;height:150px;border-radius:var(--radius-lg);background:var(--surface-parchment);display:flex;align-items:center;justify-content:center}
 .furn-upgrade .fu-prev img{max-width:138px;max-height:138px;object-fit:contain}
 .furn-upgrade .fu-prev strong{font-size:var(--fs-md);text-align:center}
-.furn-upgrade .fu-grid{flex:1;overflow:auto;display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:var(--sp-3);align-content:start}
+.furn-upgrade .fu-grid{flex:1;overflow:auto;isolation:isolate;display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:var(--sp-3);align-content:start}
 .furn-upgrade .fu-tile{position:relative;display:flex;flex-direction:column;align-items:center;gap:3px;border:2px solid transparent;background:var(--surface-parchment);border-radius:var(--radius-lg);padding:5px var(--sp-2);cursor:pointer;font:inherit;font-size:var(--fs-xs);line-height:var(--lh-tight);color:var(--c-sand-33);text-align:center}
 .furn-upgrade .fu-tile:hover{border-color:var(--mood)}
 .furn-upgrade .fu-tile.on{border-color:var(--c-orange-69);background:var(--status-warn-soft)}

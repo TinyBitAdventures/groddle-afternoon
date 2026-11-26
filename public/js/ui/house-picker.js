@@ -44,14 +44,15 @@ export const HOUSE_PICKER_TEXT = Object.freeze({
 const CSS = `
 .house-picker{position:fixed;inset:0;z-index:var(--z-panel);display:flex;justify-content:flex-start;align-items:flex-start;padding:var(--sp-4);pointer-events:none}
 .house-picker[hidden]{display:none}
-.house-picker .hp-card{pointer-events:auto;width:min(390px,94vw);max-height:100%;overflow:auto;display:flex;flex-direction:column;gap:var(--sp-3);padding:var(--sp-5);border-radius:var(--radius-md);background:var(--surface-card);border:1px solid var(--border);box-shadow:var(--shadow-2);color:var(--text)}
+.house-picker .hp-card{pointer-events:auto;width:min(390px,94vw);max-height:100%;overflow:auto;isolation:isolate;display:flex;flex-direction:column;gap:var(--sp-3);padding:var(--sp-5);border-radius:var(--radius-md);background:var(--surface-card);border:1px solid var(--border);box-shadow:var(--shadow-2);color:var(--text)}
 .house-picker .hp-head{display:flex;align-items:flex-start;gap:var(--sp-3)}
 .house-picker .hp-head>div{flex:1 1 auto}
 .house-picker .hp-kicker{margin:0;font-size:var(--fs-sm);font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--c-gold-55)}
 .house-picker h2{margin:0;font-size:var(--fs-lg)}
 .house-picker button{font:inherit;font-size:var(--fs-sm);font-weight:700;border-radius:var(--radius-md);border:1px solid var(--c-gold-78);background:var(--surface-bright);color:var(--c-umber-45);padding:.3rem var(--sp-4);cursor:pointer}
 .house-picker .hp-x{border:0;background:transparent;font-size:var(--fs-xl);line-height:var(--lh-none);padding:0 var(--sp-2);color:var(--text-muted)}
-.house-picker .hp-styles{display:grid;grid-template-columns:repeat(5,1fr);gap:var(--sp-2)}
+.house-picker .hp-body{isolation:isolate}
+.house-picker .hp-styles{isolation:isolate;display:grid;grid-template-columns:repeat(5,1fr);gap:var(--sp-2)}
 .house-picker .hp-style{display:flex;flex-direction:column;align-items:center;gap:var(--sp-1);padding:var(--sp-2) var(--sp-1);white-space:normal;font-size:var(--fs-xs);line-height:var(--lh-tight)}
 .house-picker .hp-style[aria-pressed="true"]{background:var(--c-cream-96c);border-color:var(--c-gold-79);box-shadow:0 0 0 2px color-mix(in srgb, var(--c-gold-79) 35%, transparent)}
 .house-picker .hp-thumb{position:relative;display:block;width:100%;height:52px;overflow:hidden}
