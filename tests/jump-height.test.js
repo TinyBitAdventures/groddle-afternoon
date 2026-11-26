@@ -17,7 +17,7 @@ import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { AIR_FRICTION, GRAVITY, JUMP_SPEED, MAX_TICK_FRAMES, NORMAL_BUFF, REMAKE_ROOM_PHYSICS, TERMINAL_VY, flatJump, frameSteps, jumpApex, stepAvatar, avatarGround } from '../public/js/avatar-step.js?v=8415ee96';
 import { questInstancesFeature } from '../public/js/features/quest-instances-feature.js?v=db214713';
-import { buffPhysics } from '../public/js/buffs.js?v=1016728d';
+import { buffPhysics } from '../public/js/buffs.js?v=a4f7377b';
 import { physicsMultipliers } from '../public/js/location-events.js?v=48938c8f';
 import { NEWXP_DEFAULT_PHYSICS, NEWXP_UPGRADES, reachFor } from '../public/js/newxp.js?v=0d81aa52';
 import { NO_UPGRADE_PHYSICS_STREETS, ignoresUpgradePhysics, remakeMovementMultipliers } from '../public/js/imagination.js?v=1bdfd77c';

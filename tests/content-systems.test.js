@@ -53,7 +53,7 @@ import {
   listActiveBuffs,
   hasBuff,
   listBuffCatalog,
-} from '../public/js/buffs.js?v=1016728d';
+} from '../public/js/buffs.js?v=a4f7377b';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const CONTENT = join(__dirname, '../public/assets/content');

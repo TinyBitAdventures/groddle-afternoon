@@ -32,7 +32,7 @@ import {
   seedAchievementNearCompletion,
   worldVerbAchievementCounters,
 } from '../public/js/achievements.js?v=535c8952';
-import { applyBuff, buffPhysics, createBuffState, getBuffItemInfo, tickBuffs } from '../public/js/buffs.js?v=1016728d';
+import { applyBuff, buffPhysics, createBuffState, getBuffItemInfo, tickBuffs } from '../public/js/buffs.js?v=a4f7377b';
 import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=c9b84764';
 
 const publicRoot = join(dirname(fileURLToPath(import.meta.url)), '../public');

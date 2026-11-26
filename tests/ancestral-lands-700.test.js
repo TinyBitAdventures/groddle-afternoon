@@ -23,7 +23,7 @@ import { FEATURES } from '../public/js/features/index.js?v=8a036c65';
 import { streetObjectsFeature } from '../public/js/features/street-objects-feature.js?v=afed8562';
 import { SHARED_NODE_CLASSES, applyNodeState, createStreetCopy, freshenNode, stateFor, takeObjs } from '../public/js/street-objects.js?v=f7a66837';
 import { createResourceNode, resourceNodeFrame } from '../public/js/resource-nodes.js?v=90d75c60';
-import { applyBuff, createBuffState, hasBuff, removeBuff } from '../public/js/buffs.js?v=1016728d';
+import { applyBuff, createBuffState, hasBuff, removeBuff } from '../public/js/buffs.js?v=a4f7377b';
 import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=c9b84764';
 import { NOSTALGIA_BOOT_STREETS } from '../public/js/ancestral-nostalgia-data.js?v=0adb9184';
 import { ruleTables } from '../tools/build-realtime-objects.mjs';

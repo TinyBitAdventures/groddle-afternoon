@@ -41,7 +41,7 @@ import {
   hasBuff,
   removeBuff,
   tickBuffs,
-} from '../public/js/buffs.js?v=1016728d';
+} from '../public/js/buffs.js?v=a4f7377b';
 import { getSkillPackageOverride, skillPackageDetails } from '../public/js/skill-packages.js?v=bfb87281';
 import { miningProfile } from '../public/js/mining.js?v=5e49efb3';
 import { resolveAnimalKinshipPackage } from '../public/js/animal-kinship.js?v=75d3cb34';

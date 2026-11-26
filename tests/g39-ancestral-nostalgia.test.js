@@ -21,7 +21,7 @@ import {
 import { NOSTALGIA_BOOT_STREETS } from '../public/js/ancestral-nostalgia-data.js?v=0adb9184';
 import { BOOT_SOURCE_TSIDS, buildRows, render } from '../tools/build-ancestral-nostalgia.mjs';
 import { ancestralClock, stealChanceForSeconds } from '../public/js/juju-bandits.js?v=737fdcd7';
-import { applyBuff, createBuffState, hasBuff, removeBuff } from '../public/js/buffs.js?v=1016728d';
+import { applyBuff, createBuffState, hasBuff, removeBuff } from '../public/js/buffs.js?v=a4f7377b';
 import { getBuffCatalog, loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=c9b84764';
 import { IMAGINATION_UPGRADES, buildDeck, upgradeStatus } from '../public/js/imagination.js?v=1bdfd77c';
 import { isOfferedInRemake, remakeStatus } from '../public/js/imagination-remake.js?v=99997003';

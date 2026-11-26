@@ -218,44 +218,40 @@ export function listBuffItemsInPack(inv = {}) {
     .filter((row) => row.count > 0 && row.def);
 }
 
-/** Remove expired rows. Tick processing should run first when exact end ticks matter. */
-export function expireBuffs(state, now = Date.now()) {
-  const expired = [];
-  for (const [id, row] of Object.entries(activeRows(state))) {
-    if (row.expiresAt != null && row.expiresAt <= now) {
-      expired.push({ classTsid: id, row });
-      delete state.active[id];
-    }
-  }
-  return expired;
+/**
+ * Report #207: a row past its end is over for every reader, but only tickBuffs removes it, so its
+ * last tick (Apple a Day's +5 at 30 s), its on_remove (Hungover's +10 mood +10 energy), its follow-up
+ * (Smashed into Hungover) and its "faded" line still fire. Readers used to delete it, and the game
+ * reads every frame (buffPhysics) but ticks every 24, so those ends were lost.
+ */
+function liveRow(row, now) {
+  return Boolean(row) && (row.expiresAt == null || row.expiresAt > now);
 }
 
 export function listActiveBuffs(state, now = Date.now()) {
-  expireBuffs(state, now);
   return Object.values(activeRows(state))
-    .filter((row) => (row.appliedAt || 0) <= now && row.activated !== false)
+    .filter((row) => liveRow(row, now) && (row.appliedAt || 0) <= now && row.activated !== false)
     .sort((a, b) => (a.expiresAt ?? Infinity) - (b.expiresAt ?? Infinity));
 }
 
 export function listPendingBuffs(state, now = Date.now()) {
-  expireBuffs(state, now);
   return Object.values(activeRows(state))
-    .filter((row) => (row.appliedAt || 0) > now || row.activated === false)
+    .filter((row) => liveRow(row, now) && ((row.appliedAt || 0) > now || row.activated === false))
     .sort((a, b) => (a.appliedAt || 0) - (b.appliedAt || 0));
 }
 
 export function hasBuff(state, classTsid, now = Date.now()) {
-  expireBuffs(state, now);
-  return !!activeRows(state)[classTsid];
+  return liveRow(activeRows(state)[classTsid], now);
 }
 
 function syncPcBuffFlags(state, pc, now = Date.now()) {
   if (!pc) return;
   const active = listActiveBuffs(state, now);
   pc.activeBuffs = active.map((row) => row.classTsid);
-  pc.rewardMultiplier = state.active.gift_of_gab && state.active.gift_of_gab.activated !== false
+  const live = (id) => liveRow(state.active[id], now) && state.active[id].activated !== false;
+  pc.rewardMultiplier = live('gift_of_gab')
     ? 1.2
-    : state.active.silvertongue && state.active.silvertongue.activated !== false
+    : live('silvertongue')
       ? 1.05
       : 1;
 }

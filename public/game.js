@@ -510,7 +510,7 @@ import {
   formatBuffRemaining,
   consumeRewardBuff,
   studyBuffBlockReason,
-} from './js/buffs.js?v=1016728d';
+} from './js/buffs.js?v=a4f7377b';
 import { grantMoodXp, moodXpMultiplierFor, setMoodXpEnv } from './js/mood-xp.js?v=e311b45c';
 import {
   loadContentCatalogs,
