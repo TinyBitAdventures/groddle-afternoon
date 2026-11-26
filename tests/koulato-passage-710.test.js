@@ -13,7 +13,7 @@ import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { KOULATO_CLUSTER_TSID, RUTA_ASUNCION_TSID, TELEPORTER_CENSUS, collisionTeleportersOn } from '../public/js/collision-teleporters.js?v=73c97f41';
-import { jumpArc, reachStreet, runArc, streetWorld } from '../public/js/builder/reach-graph.js?v=467ca20f';
+import { jumpArc, reachStreet, runArc, streetWorld } from '../public/js/builder/reach-graph.js?v=b7f3033e';
 import { inTeleporter } from '../public/js/hidden-floors.js?v=18714dfa';
 
 const spike = join(dirname(fileURLToPath(import.meta.url)), '..');

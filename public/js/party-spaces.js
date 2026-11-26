@@ -40,7 +40,7 @@
  *   so each space's one signpost is the way back to where you came from.
  */
 
-import { applyPhysicsAdjustments, physicsMultipliers } from './location-events.js?v=44ee645e';
+import { applyPhysicsAdjustments, physicsMultipliers } from './location-events.js?v=48938c8f';
 
 export const PARTY_FULL_SECONDS = 60 * 60;
 export const PARTY_TASTER_SECONDS = 10 * 60;

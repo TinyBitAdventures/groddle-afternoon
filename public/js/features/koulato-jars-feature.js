@@ -23,7 +23,7 @@
  */
 
 import { JAR_BOXES, JAR_DECOS, JAR_FLIES, countArrival, isKoulatoCluster, litJars, normalizeJarSave } from '../koulato-jars.js?v=384a33e3';
-import { locationEventsApi } from './location-events-feature.js?v=ac6acbc9';
+import { locationEventsApi } from './location-events-feature.js?v=3d20f596';
 import { catchUpKoulato, createToyTracker, ownJars, toyEvents, toyMessageFor } from '../street-toys-mp.js?v=9eca3893';
 
 export const KOULATO_JARS_FEATURE_ID = 'koulato-jars';

@@ -10,7 +10,7 @@ import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { normalizePuzzleData, stepTriggers } from '../public/js/puzzle-triggers.js?v=221b67a9';
-import { createEventRuntime, runLocationEvent } from '../public/js/location-events.js?v=44ee645e';
+import { createEventRuntime, runLocationEvent } from '../public/js/location-events.js?v=48938c8f';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const raw = JSON.parse(readFileSync(join(root, 'public/assets/content/puzzle-triggers.json'), 'utf8'));

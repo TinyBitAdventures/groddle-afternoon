@@ -128,7 +128,7 @@ import {
 import { loadStreetGraph, worldRoads } from '../street-graph.js?v=d767f3a2';
 import { FAMILIAR_GATES, QUEST_ROOMS, REMINISCE_ITEMS, ROOM_ITEMS, isBuiltRoom, questGiver, roomForStreet, roomHub, roomModulePath } from '../quest-rooms/catalog.js?v=f37a25ba';
 import * as kit from '../quest-rooms/kit.js?v=37eae9f8';
-import { locationEventsApi } from './location-events-feature.js?v=ac6acbc9';
+import { locationEventsApi } from './location-events-feature.js?v=3d20f596';
 import {
   acceptOffer,
   ensureQuestOfferState,

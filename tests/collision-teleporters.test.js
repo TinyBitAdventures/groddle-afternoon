@@ -10,7 +10,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { AINT_THAT_DRY_TSID, CHITI_TIGA_TSID, HARRISA_HARA_TSID, SHIM_SHIRI_TSID, SNOWED_IN_TSID, TELEPORTER_CENSUS, WIRED_TELEPORTERS, YELLOW_YAWNING_TSID, collisionTeleportersOn } from '../public/js/collision-teleporters.js?v=73c97f41';
 import { SNOWED_IN_TSID as REBUILT_SNOWED_IN_TSID } from '../public/js/rebuilt-rooms.js?v=5ef5618f';
-import { reachStreet } from '../public/js/builder/reach-graph.js?v=467ca20f';
+import { reachStreet } from '../public/js/builder/reach-graph.js?v=b7f3033e';
 import { inTeleporter } from '../public/js/hidden-floors.js?v=18714dfa';
 import { STREET_TRAPS } from '../public/js/street-traps-data.js?v=f6eb19ad';
 

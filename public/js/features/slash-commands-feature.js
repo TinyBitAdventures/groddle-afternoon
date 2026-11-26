@@ -66,7 +66,7 @@
 import { BUTLER_STRINGS } from '../butler.js?v=152429c8';
 import { butlerApi } from './butler-feature.js?v=4b14038b';
 import { hellFeature } from './hell-feature.js?v=74604dfc';
-import { locationEventsApi } from './location-events-feature.js?v=ac6acbc9';
+import { locationEventsApi } from './location-events-feature.js?v=3d20f596';
 import { towerApi } from './home-tower-feature.js?v=49b38fe7';
 import { platformYAt, platformsScreen } from '../street-model.js?v=a9a05f9d';
 import { COMMAND_HELP_INTRO, STUCK_COOLDOWN_MS, STUCK_MENU, STUCK_TEXT, bareCommand, commandHelpLines, commandHint, isCommandHelp, misplacedCommand, slashPlan, strayLetterCommand, unknownLine } from '../slash-commands.js?v=bb2569aa';

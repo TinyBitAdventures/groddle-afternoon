@@ -16,7 +16,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 import { populationForStreet } from '../public/js/street-ecology.js?v=f1c11a2d';
-import { normalizeWorldSnapshot } from '../public/js/player-save.js?v=7c3df906';
+import { normalizeWorldSnapshot } from '../public/js/player-save.js?v=f7062a6d';
 import { getVerbsFor } from '../public/content.js?v=a87eb482';
 import { ITEM_CATALOG } from '../public/js/inventory.js?v=6414dbdc';
 

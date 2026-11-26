@@ -8,7 +8,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { PARTY_TEXT } from '../public/js/party-spaces.js?v=b026ad60';
+import { PARTY_TEXT } from '../public/js/party-spaces.js?v=4e1ca2a5';
 import { SKILL_REMAKE_NOTES } from '../public/js/skill-tree.js?v=a67622a8';
 import { SETTINGS_COPY } from '../public/js/account-forms.js?v=683e1475';
 

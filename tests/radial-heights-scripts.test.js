@@ -18,7 +18,7 @@ import {
   radialStarEvents,
   radialStarNumbers,
   radialTick,
-} from '../public/js/radial-heights.js?v=57df1ee2';
+} from '../public/js/radial-heights.js?v=90fcc768';
 import {
   PARADISE_COURSES,
   RADIAL_HEIGHTS_STAR_ART,
@@ -26,8 +26,8 @@ import {
   collectParadisePickup,
   createParadiseRun,
   paradiseSourcePoints,
-} from '../public/js/paradise-flight.js?v=165732ba';
-import { parseEventCode } from '../public/js/location-events.js?v=44ee645e';
+} from '../public/js/paradise-flight.js?v=1bc7c0c5';
+import { parseEventCode } from '../public/js/location-events.js?v=48938c8f';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', 'public');
 const data = JSON.parse(readFileSync(join(ROOT, 'assets/streets/GHFQOLEIHN63P27.json'), 'utf8'));

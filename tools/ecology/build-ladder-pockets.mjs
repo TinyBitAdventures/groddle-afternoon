@@ -34,7 +34,7 @@ import { cpus } from 'node:os';
 import { Worker, isMainThread, parentPort, workerData } from 'node:worker_threads';
 import { fileURLToPath } from 'node:url';
 import { GAME_DIR } from '../repos.mjs';
-import { buildReachGraph, streetBuff, streetWorld, streetTargets, jumpArc, runArc, MAX_FRAMES, DOOR_REACH_X, POST_REACH_X, POST_BELOW } from '../../public/js/builder/reach-graph.js?v=467ca20f';
+import { buildReachGraph, streetBuff, streetWorld, streetTargets, jumpArc, runArc, MAX_FRAMES, DOOR_REACH_X, POST_REACH_X, POST_BELOW } from '../../public/js/builder/reach-graph.js?v=b7f3033e';
 import { isStandable, platformYAt, resolveGround, LADDER_GRAB_BELOW } from '../../public/js/street-model.js?v=a9a05f9d';
 import { TRAP_JUMPS, trapEntry } from './build-street-traps.mjs';
 

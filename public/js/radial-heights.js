@@ -20,7 +20,7 @@
  *   finish. Which box fired which events was not archived; this order is the one in which both
  *   endings the script was written for can happen.
  */
-import { createEventRuntime, dueEventTimers, runLocationEvent } from './location-events.js?v=44ee645e';
+import { createEventRuntime, dueEventTimers, runLocationEvent } from './location-events.js?v=48938c8f';
 
 /** The events Radial Heights runs as you arrive (location.js: instance first, then the player). */
 export const RADIAL_ARRIVAL_EVENTS = Object.freeze(['instance_created', 'player_enter']);

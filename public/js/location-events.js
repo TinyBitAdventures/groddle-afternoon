@@ -575,9 +575,16 @@ export function createEventRuntime() {
  * @param {object} runtime createEventRuntime()
  * @param {Record<string, object[]>} events
  * @param {string} name
- * @param {{ now?: number, target?: boolean, depth?: number, firedAt?: number }} ctx
+ *
+ * ctx.echo ({ light: Set of deco ids }, from echoLight): another player's run heard here (#715).
+ * Only what Glitch sent every player there comes out: play_sound with all_players and the
+ * decos in `light`; flags are neither read nor set (the sender's run already passed them), and
+ * nothing else (platforms, physics, quest flags, code) runs. Delayed chained events keep the echo.
+ * @param {{ now?: number, target?: boolean, depth?: number, firedAt?: number, echo?: { light: Set<string> } }} ctx
  */
 export function runLocationEvent(runtime, events, name, ctx = {}) {
+  const echo = ctx.echo || null;
+  if (echo) return runEcho(runtime, events, name, ctx, echo);
   const effects = [];
   const now = num(ctx.now, 0);
   const depth = num(ctx.depth, 0);
@@ -657,6 +664,70 @@ export function runLocationEvent(runtime, events, name, ctx = {}) {
     }
   }
   return effects;
+}
+
+/** An echo's run (runLocationEvent ctx.echo): all-player sounds and the light decos, chains followed. */
+function runEcho(runtime, events, name, ctx, echo) {
+  const effects = [];
+  const now = num(ctx.now, 0);
+  const depth = num(ctx.depth, 0);
+  const actions = events?.[name];
+  if (!actions || depth > MAX_EVENT_DEPTH) return effects;
+  for (const act of actions) {
+    if ((act.type === 'deco_show' || act.type === 'deco_hide') && act.deco && echo.light?.has(act.deco)) {
+      effects.push({ type: 'deco', id: act.deco, visible: act.type === 'deco_show', fade: act.fade });
+    } else if (act.type === 'play_sound' && act.all && act.name) {
+      effects.push({ type: 'sound', name: act.name, loops: act.loops || 1, stop: false });
+    } else if (act.type === 'event' && act.event) {
+      if (act.delay > 0) runtime.timers.push({ at: now + act.delay, event: act.event, target: false, firedAt: now, echo });
+      else effects.push(...runEcho(runtime, events, act.event, { now, depth: depth + 1 }, echo));
+    }
+  }
+  return effects;
+}
+
+/** The events one event runs at once (itself and its undelayed chained events, depth-capped). */
+function immediateEvents(events, name, seen = new Set(), depth = 0) {
+  if (!events?.[name] || seen.has(name) || depth > MAX_EVENT_DEPTH) return seen;
+  seen.add(name);
+  for (const act of events[name]) {
+    if (act.type === 'event' && act.event && !(act.delay > 0)) immediateEvents(events, act.event, seen, depth + 1);
+  }
+  return seen;
+}
+
+/**
+ * #715: the events a player's run shares with everyone on the street: those that play a sound for
+ * all players at once (play_sound all_players, in the event or an undelayed chained one). Glitch
+ * sent such a sound to every active player there (locations/inc_events.js 399-404, 531-538), fired
+ * by whoever bumped the box (items/cteb.js onEvent, broadcastLocationEvents). Arrival events are
+ * each player's own and left out. Sorted.
+ */
+export function sharedSoundEvents(events) {
+  const out = [];
+  for (const name of Object.keys(events || {})) {
+    if (ARRIVAL_EVENTS.includes(name)) continue;
+    const plays = [...immediateEvents(events, name)].some((n) => events[n].some((a) => a.type === 'play_sound' && a.all && a.name));
+    if (plays) out.push(name);
+  }
+  return out.sort();
+}
+
+/**
+ * #715: the light an echo of `name` shows: each deco its chain (delays included) both shows and
+ * hides again, as a piano key's light spot flashes and goes out. A deco left shown or hidden for
+ * good is the street's puzzle state on the sender's side and stays theirs.
+ */
+export function echoLight(events, name) {
+  const shown = new Set();
+  const hidden = new Set();
+  for (const n of reachableEvents(events, [name])) {
+    for (const act of events[n] || []) {
+      if (act.type === 'deco_show' && act.deco) shown.add(act.deco);
+      if (act.type === 'deco_hide' && act.deco) hidden.add(act.deco);
+    }
+  }
+  return new Set([...shown].filter((id) => hidden.has(id)));
 }
 
 /** Arrival events in source order, with whether each carries the player. */

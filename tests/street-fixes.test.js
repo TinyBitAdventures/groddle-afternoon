@@ -14,7 +14,7 @@ import { LADDER_GAP_FIXES } from '../public/js/ladder-gap-fixes.js?v=6da8a701';
 import { findLadderGaps, LADDER_ART, LADDER_PIECE } from '../tools/ladder-gaps.mjs';
 import { vineTiles } from '../public/js/tower-rooms.js?v=4f1f6af7';
 import { STREET_FIXES_FEATURE_ID, streetFixesFeature } from '../public/js/features/street-fixes-feature.js?v=06e9f5a2';
-import { FEATURES } from '../public/js/features/index.js?v=ec89a56e';
+import { FEATURES } from '../public/js/features/index.js?v=2dfc13c1';
 
 const pub = join(dirname(fileURLToPath(import.meta.url)), '..', 'public');
 const street = (tsid) => JSON.parse(readFileSync(join(pub, 'assets/streets', `${tsid}.json`), 'utf8'));

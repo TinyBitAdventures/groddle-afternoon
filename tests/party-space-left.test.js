@@ -11,8 +11,8 @@ import { after, before, describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { PARTY_LEFT_TEXT, PARTY_SPACES, partySpaceLeftLine } from '../public/js/party-spaces.js?v=b026ad60';
-import { partySpacesFeature } from '../public/js/features/party-spaces-feature.js?v=4482722a';
+import { PARTY_LEFT_TEXT, PARTY_SPACES, partySpaceLeftLine } from '../public/js/party-spaces.js?v=4e1ca2a5';
+import { partySpacesFeature } from '../public/js/features/party-spaces-feature.js?v=bbc1fcb7';
 import { partyFeature } from '../public/js/features/party-feature.js?fresh=party-space-left';
 import { FakeEl } from './fake-scene.js';
 

@@ -146,7 +146,7 @@ import { EZ_COOKIN_TSID, EZ_FOOD, practiceScreen } from '../practice-streets.js?
 import { assignQuest, completeQuest } from '../quests.js?v=f68437db';
 import { acceptOffer, enqueueQuestOffer, questAwardPayload, turnInQuest } from '../quest-offers.js?v=7e00498b';
 import { getQuestCatalog } from '../content-catalogs.js?v=c9b84764';
-import { locationEventsApi } from './location-events-feature.js?v=ac6acbc9';
+import { locationEventsApi } from './location-events-feature.js?v=3d20f596';
 import * as kit from '../quest-rooms/kit.js?v=37eae9f8';
 import { frameTexture, onLoaded, sourceFromUrl, textureFromUrl, whenLoaded } from '../textures.js?v=b8e38103';
 import { upgradeSource } from '../sprite-hires.js?v=e96be5f1';

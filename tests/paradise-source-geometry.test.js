@@ -18,8 +18,8 @@ import {
   paradiseSourcePoints,
   paradiseSpawnFeet,
   radialStartPenOpens,
-} from '../public/js/paradise-flight.js?v=165732ba';
-import { RADIAL_FLITTERBUG_EVENTS, applyGeometryEffects, createRadialSession, radialFire } from '../public/js/radial-heights.js?v=57df1ee2';
+} from '../public/js/paradise-flight.js?v=1bc7c0c5';
+import { RADIAL_FLITTERBUG_EVENTS, applyGeometryEffects, createRadialSession, radialFire } from '../public/js/radial-heights.js?v=90fcc768';
 import { platformYAt } from '../public/js/street-model.js?v=a9a05f9d';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', 'public');

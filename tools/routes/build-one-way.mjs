@@ -34,7 +34,7 @@ import { join, dirname } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { flatJump, NORMAL_BUFF, WALK_MAX, JUMP_SPEED, avatarFall } from '../../public/js/avatar-step.js?v=39d7b1af';
 import { isStandable, climbWallsWorld } from '../../public/js/street-model.js?v=a9a05f9d';
-import { physicsMultipliers } from '../../public/js/location-events.js?v=44ee645e';
+import { physicsMultipliers } from '../../public/js/location-events.js?v=48938c8f';
 
 const check = process.argv.includes('--check');
 const report = process.argv.includes('--report');

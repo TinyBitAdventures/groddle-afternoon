@@ -15,7 +15,7 @@ import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { reachStreet } from '../public/js/builder/reach-graph.js?v=467ca20f';
+import { reachStreet } from '../public/js/builder/reach-graph.js?v=b7f3033e';
 import { MADA_TAMAHA_TSID, NARAKA_TELEPORTERS, narakaTeleportersOn } from '../public/js/hell.js?v=d77f15ef';
 import { inTeleporter } from '../public/js/hidden-floors.js?v=18714dfa';
 

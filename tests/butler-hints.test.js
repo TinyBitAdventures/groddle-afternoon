@@ -17,7 +17,7 @@ import { BUTLER_HINTS, createButlerState, pickHint } from '../public/js/butler.j
 import { ownerHintCtx } from '../public/js/features/butler-feature.js?v=4b14038b';
 import { countHouseVisit, homesFeature } from '../public/js/features/homes-feature.js?v=d77aa5b7';
 import { homeTowerFeature, towerApi } from '../public/js/features/home-tower-feature.js?v=49b38fe7';
-import { slashCommandsFeature } from '../public/js/features/slash-commands-feature.js?v=4904a45f';
+import { slashCommandsFeature } from '../public/js/features/slash-commands-feature.js?v=4d7c6246';
 import { createFeatureHost } from '../public/js/feature-host.js?v=b87e2cbc';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');

@@ -35,6 +35,13 @@
  * waiting for the menu to close, G217). Data: eventStreet, eventCount, eventBoxes,
  * eventFired, eventLast, eventEffects, eventPhysics, eventUnsupported,
  * eventTeleport, eventDemo.
+ *
+ * Online (#715, js/street-sounds-mp.js): an event that plays a sound for every player there
+ * (play_sound all_players), fired by this player (a trigger feature through locationEventsApi.fire, or
+ * a box underfoot), goes to the realtime server as street_sound; the others' games run it as an echo
+ * (the sound and a light that flashes and goes out, on a runtime of their own: their flags and
+ * puzzle stay theirs). Glitch sent such a sound to everyone on the location. Data: eventShared
+ * (street_sound sent this visit), eventEchoed (echoes run).
  */
 
 import {
@@ -43,6 +50,7 @@ import {
   arrivalEvents,
   createEventRuntime,
   dueEventTimers,
+  echoLight,
   eventPhysicsAdjustments,
   inEventBox,
   physicsMultipliers,
@@ -50,8 +58,9 @@ import {
   recoverableToggles,
   runLocationEvent,
   streetOwner,
-} from '../location-events.js?v=44ee645e';
+} from '../location-events.js?v=48938c8f';
 import { JUMP_SPEED } from '../avatar-step.js?v=39d7b1af';
+import { STREET_SOUND, streetSoundEvent, streetSoundsFor } from '../street-sounds-mp.js?v=c9c290e0';
 
 export const LOCATION_EVENTS_FEATURE_ID = 'location-events';
 const DATA_MS = 250;
@@ -72,6 +81,9 @@ let clock = 0;
 // Other features (puzzle triggers) that rebuild a street's lost triggers:
 // { strict(street, engine) -> true } turns the walkable fallback off there.
 const streetHooks = [];
+// #715: the realtime client watched for street_sound, and its listener's off.
+let soundClient = null;
+let soundOff = null;
 
 function inactive(engine) {
   return !current || (engine.transientInstance() && !current.instanced) || engine.homeContext?.().inHome;
@@ -245,11 +257,53 @@ function applyEffects(engine, effects, now) {
   }
 }
 
-function fire(engine, name, target, now) {
+/** `share`: this player fired it (a trigger, a box), so a sound for everyone goes to the street online. */
+function fire(engine, name, target, now, share = false) {
   if (!current?.events?.[name]) return false;
-  applyEffects(engine, runLocationEvent(current.runtime, current.events, name, { now, target }), now);
+  const effects = runLocationEvent(current.runtime, current.events, name, { now, target });
+  if (share) shareSound(engine, name, effects);
+  applyEffects(engine, effects, now);
   engine.setData('eventLast', name);
   return true;
+}
+
+/* ------------------------------------------------------------------ */
+/* Street sounds online (#715)                                         */
+/* ------------------------------------------------------------------ */
+
+function liveClient(engine) {
+  return engine.mode === 'multiplayer' ? engine.query?.('realtimeClient') || null : null;
+}
+
+/** Online on this street: the sound this run played for everyone goes to the others. */
+function shareSound(engine, name, effects) {
+  if (!current?.shared.has(name) || !effects.some((fx) => fx.type === 'sound' && !fx.stop)) return;
+  const c = liveClient(engine);
+  if (!c || c.state !== 'online' || !sameStreet(c.street, current.tsid)) return;
+  if (c.send(STREET_SOUND, { event: name })) current.sharedSent += 1;
+}
+
+/** Another player's shared event: its all-player sounds and its flash of light, on the echo runtime. */
+function echo(engine, name, now) {
+  if (!current?.shared.has(name) || inactive(engine)) return false;
+  applyEffects(engine, runLocationEvent(current.echo, current.events, name, { now, echo: { light: echoLight(current.events, name) } }), now);
+  current.echoed += 1;
+  return true;
+}
+
+/** Listen from the first frame online (another player's street_sound for the street shown here). */
+function watchSounds(engine) {
+  const c = liveClient(engine);
+  if (c === soundClient) return;
+  soundOff?.();
+  soundOff = null;
+  soundClient = c;
+  if (!c?.on) return;
+  soundOff = c.on(`msg:${STREET_SOUND}`, (msg) => {
+    const name = current ? streetSoundEvent(msg, current.tsid) : '';
+    if (!name || (c.me?.id != null && Number(msg.by) === Number(c.me.id))) return;
+    echo(engine, name, clock);
+  });
 }
 
 /* ------------------------------------------------------------------ */
@@ -279,7 +333,7 @@ function stepBoxes(engine, now) {
     if (inside === was) continue;
     if (inside) current.inside.add(box.id);
     else current.inside.delete(box.id);
-    for (const name of (inside ? box.onEnter : box.onExit) || []) fire(engine, name, true, now);
+    for (const name of (inside ? box.onEnter : box.onExit) || []) fire(engine, name, true, now, true);
   }
 }
 
@@ -335,6 +389,8 @@ function publish(engine, now, mult) {
   engine.setData('eventEffects', Object.entries(effectCounts).map(([k, v]) => `${k}:${v}`).join(','));
   engine.setData('eventPhysics', Object.entries(eventPhysicsAdjustments(current.runtime, now)).map(([k, v]) => `${k}=${v}`).join(','));
   engine.setData('eventUnsupported', unsupported);
+  engine.setData('eventShared', current.sharedSent);
+  engine.setData('eventEchoed', current.echoed);
 }
 
 /* ------------------------------------------------------------------ */
@@ -457,10 +513,13 @@ export const locationEventsApi = {
   active: () => current?.tsid || null,
   strict: () => current?.strict === true,
   has: (name) => Boolean(current?.events?.[name]),
-  /** Run one event with the player as target_pc (as a collision box did). */
+  /**
+   * Run one event with the player as target_pc (as a collision box did). Online, a sound it plays for
+   * every player there is heard by the others on the street too (#715).
+   */
   fire(engine, name, target = true) {
     if (!current || inactive(engine)) return false;
-    return fire(engine, name, target, clock);
+    return fire(engine, name, target, clock, true);
   },
   flag: (name) => Boolean(current?.runtime.flags.has(name)),
   /**
@@ -554,6 +613,12 @@ export const locationEventsFeature = {
         runtime: createEventRuntime(),
         inside: new Set(),
         instanced,
+        // #715: the events shared with the street online (none inside an instance), and the runtime
+        // other players' echoes run on.
+        shared: new Set(instanced ? [] : streetSoundsFor(street.tsid, street.events)),
+        echo: createEventRuntime(),
+        sharedSent: 0,
+        echoed: 0,
       };
       // Platforms the arrival chain switches on start in their source state
       // (pc_perm 0), taken out of the list until an event puts them back with
@@ -613,6 +678,7 @@ export const locationEventsFeature = {
     if (!engine.started) return;
     clock += Math.max(0, Number(dtMs) || 0);
     const now = clock;
+    watchSounds(engine);
     demoStep(engine, wallNow);
     if (inactive(engine)) {
       if (scale.applied !== 1) restoreScale();
@@ -626,6 +692,9 @@ export const locationEventsFeature = {
         firedAt: timer.firedAt,
       }), now);
       if (!current) return; // a teleport cleared the street
+    }
+    for (const timer of dueEventTimers(current.echo, now)) {
+      applyEffects(engine, runLocationEvent(current.echo, current.events, timer.event, { now, echo: timer.echo }), now);
     }
     stepBoxes(engine, now);
     if (!current) return;

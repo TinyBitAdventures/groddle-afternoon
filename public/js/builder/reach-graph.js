@@ -26,7 +26,7 @@
 import { platformsScreen, barriersScreen, wallsScreen, isStandable, platformYAt, resolveGround, ladderTopDeck, worldToScreen, streetWidth, streetHeight, navigableSignposts, isBuriedSignpost, blockBarrierCrossing, LADDER_GRAB_BELOW } from '../street-model.js?v=a9a05f9d';
 import { stepAvatar, avatarGround, steerX, NORMAL_BUFF, JUMP_SPEED, WALK_MAX, OFF_LADDER_RATIO } from '../avatar-step.js?v=39d7b1af';
 import { ladderTopSignpostLadder } from '../ladder-top-signposts.js?v=0192e447';
-import { physicsMultipliers } from '../location-events.js?v=44ee645e';
+import { physicsMultipliers } from '../location-events.js?v=48938c8f';
 
 export const STAND_STEP = 8;
 export const JUMP_STEP = 16;

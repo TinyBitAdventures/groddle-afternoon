@@ -51,7 +51,7 @@ import {
   streetQuoinClass,
   streetQuoinPoints,
 } from '../public/js/quoins.js?v=5abad2c7';
-import { isPartyStreet, partyEcologyEntry, partySpaceForStreet } from '../public/js/party-spaces.js?v=b026ad60';
+import { isPartyStreet, partyEcologyEntry, partySpaceForStreet } from '../public/js/party-spaces.js?v=4e1ca2a5';
 import { isZoneTsid } from '../public/js/zone-streets.js?v=b40010d5';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');

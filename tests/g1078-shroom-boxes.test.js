@@ -11,7 +11,7 @@ import { describe, it } from 'node:test';
 import { readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 
-import { SHROOM_CAP_ART, inEventBox, shroomCapBox } from '../public/js/location-events.js?v=44ee645e';
+import { SHROOM_CAP_ART, inEventBox, shroomCapBox } from '../public/js/location-events.js?v=48938c8f';
 import { NORMAL_BUFF, avatarGround, coastX, stepAvatar } from '../public/js/avatar-step.js?v=39d7b1af';
 import { platformsScreen } from '../public/js/street-model.js?v=a9a05f9d';
 

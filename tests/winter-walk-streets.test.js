@@ -13,7 +13,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { assertStreetGeometry } from '../public/js/street-model.js?v=a9a05f9d';
-import { OWNED_STREETS, streetOwner } from '../public/js/location-events.js?v=44ee645e';
+import { OWNED_STREETS, streetOwner } from '../public/js/location-events.js?v=48938c8f';
 import { JUMP_GAP } from '../public/js/quest-rooms/puzzle-kit.js?v=36509d09';
 import { WINTER_HAVEN_STREET_ID, WINTER_WALK_STREET_ID } from '../public/js/winter-walk.js?v=89f8dc32';
 import {
@@ -45,7 +45,7 @@ import {
   winterStreetEcology,
 } from '../public/js/winter-walk-streets.js?v=c921bf92';
 import { rebuiltRoomsFeature } from '../public/js/features/rebuilt-rooms-feature.js?v=0f928a67';
-import { reachStreet } from '../public/js/builder/reach-graph.js?v=467ca20f';
+import { reachStreet } from '../public/js/builder/reach-graph.js?v=b7f3033e';
 import { GRAVITY, JUMP_SPEED, WALK_MAX } from '../public/js/avatar-step.js?v=39d7b1af';
 
 const spike = join(dirname(fileURLToPath(import.meta.url)), '..');

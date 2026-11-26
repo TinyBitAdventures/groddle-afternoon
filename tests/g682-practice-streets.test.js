@@ -12,7 +12,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { imageSize } from '../tools/image-size.mjs';
 import { assertStreetGeometry, platformYAt } from '../public/js/street-model.js?v=a9a05f9d';
-import { reachStreet } from '../public/js/builder/reach-graph.js?v=467ca20f';
+import { reachStreet } from '../public/js/builder/reach-graph.js?v=b7f3033e';
 import {
   EZ_BOUGHS,
   EZ_COOKIN_BOUNDS,

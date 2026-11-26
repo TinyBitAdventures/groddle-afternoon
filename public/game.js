@@ -4,7 +4,7 @@
  */
 import { ITEM_ICONS, ITEM_LABELS, getVerbsFor, ordinaryItems, runVerb } from './content.js?v=a87eb482';
 import { createErrorOnce, createFeatureHost, createFrameStages } from './js/feature-host.js?v=b87e2cbc';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=ec89a56e';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=2dfc13c1';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, enterHintPick, reachGlowTargets, spriteHasRimArt, trimmedIconUrl, drawTileArt } from './js/enter-chooser.js?v=38d401c2';
 import { firstTendKey, STICK_TEND_DELAY_MS, STICK_TEND_DIRS, STICK_TEND_REPEAT_MS, stepTendKey, stepTendKeys, stickTendKey, tendKeyAction } from './js/garden-tend.js?v=a7470c4a';
 import { avatarHitBox, behindFloor, bodyReachDistance, OUT_OF_REACH_LINE, playerClickBox } from './js/reach.js?v=456da8a8';
@@ -414,7 +414,7 @@ import {
   slipTerrainY,
   starlitMoonPlainAlpha,
   starlitRevealAlpha,
-} from './js/paradise-flight.js?v=165732ba';
+} from './js/paradise-flight.js?v=1bc7c0c5';
 import {
   RADIAL_ARRIVAL_EVENTS,
   RADIAL_FLITTERBUG_EVENTS,
@@ -425,7 +425,7 @@ import {
   radialStarEvents,
   radialStarNumbers,
   radialTick,
-} from './js/radial-heights.js?v=57df1ee2';
+} from './js/radial-heights.js?v=90fcc768';
 import { paradiseControls, resolveParadiseCourseAlias } from './js/paradise-courses.js?v=eb5c7fd9';
 import {
   buildParadiseCourseArt,
@@ -565,7 +565,7 @@ import {
   inspectPlayerSave,
   serializePlayerSave,
   restorePlayerSave,
-} from './js/player-save.js?v=7c3df906';
+} from './js/player-save.js?v=f7062a6d';
 import {
   HOME_INTERIOR_TSID,
   HOME_STREET_TSID,
@@ -1047,7 +1047,7 @@ import {
   creditMetabolicReward,
   streetQuoinPoints,
 } from './js/quoins.js?v=5abad2c7';
-import { isPartyStreet } from './js/party-spaces.js?v=b026ad60'; // G869: a Party Space's quoins are the party classes
+import { isPartyStreet } from './js/party-spaces.js?v=4e1ca2a5'; // G869: a Party Space's quoins are the party classes
 import { greedyReplayEvents, heldPlaceHold, heldPlaceKind, shiftHeldClock } from './js/party-held-places.js?v=c34cb987'; // G911
 import {
   buildHubMapView,
