@@ -746,7 +746,7 @@ def cmd_build(args):
             for r, _ in items:  # no render reads as blank frames: stop before they overwrite the strips
                 d = os.path.join(out, r['name'] + '.swf')
                 if rc or not os.path.isdir(d) or not any(f.endswith('.png') for f in os.listdir(d)):
-                    sys.exit(f"FFDec rendered nothing for {r['name']} (exit {rc}; java: {build.JAVA}, set GRODDLE_JAVA)")
+                    sys.exit(f"FFDec rendered nothing for {r['name']} (exit {rc}; set GRODDLE_JAVA to a working Java 21)")
             for r, _ in items:
                 drawn = os.path.join(out, r['name'] + DRAWN + '.swf') if r.get('erase') else None
                 process(r, os.path.join(out, r['name'] + '.swf'), zoom, work, drawn)
