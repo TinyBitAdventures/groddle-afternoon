@@ -5915,6 +5915,24 @@
       "commits": [
         "game:d8d22a99877"
       ]
+    },
+    {
+      "id": "F127",
+      "area": "Homes",
+      "text": "Walking up to or pointing at your house could blank out the world, on every street, until a reload.",
+      "show": "fixing",
+      "commits": [
+        "game:d81446f454a"
+      ]
+    },
+    {
+      "id": "F128",
+      "area": "Vendors",
+      "text": "The glow around Helga sat off her body during some animations.",
+      "show": "fixing",
+      "commits": [
+        "game:47dd4f09383"
+      ]
     }
   ]
 }
