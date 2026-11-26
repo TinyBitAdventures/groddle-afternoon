@@ -4,7 +4,7 @@
  */
 import { ITEM_ICONS, ITEM_LABELS, getVerbsFor, ordinaryItems, runVerb } from './content.js?v=48634256';
 import { createErrorOnce, createFeatureHost, createFrameStages } from './js/feature-host.js?v=b87e2cbc';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=c7f0ccca';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=572036a9';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, enterHintPick, groupHead, hoverRimShown, reachGlowTargets, spriteHasRimArt, rimArtParts, trimmedIconUrl, drawTileArt } from './js/enter-chooser.js?v=74f4964a';
 import { firstTendKey, STICK_TEND_DELAY_MS, STICK_TEND_DIRS, STICK_TEND_REPEAT_MS, stepTendKey, stepTendKeys, stickTendKey, tendKeyAction } from './js/garden-tend.js?v=a7470c4a';
 import { avatarHitBox, behindFloor, bodyReachDistance, OUT_OF_REACH_LINE, playerClickBox } from './js/reach.js?v=456da8a8';
@@ -747,7 +747,7 @@ import {
   ensureStreetIndex,
   resolveIndexTsid,
 } from './js/street-loader.js?v=10376267';
-import { showDraftBanner, startDraftPlay } from './js/builder/draft-play.js?v=671eceb9';
+import { showDraftBanner, startDraftPlay } from './js/builder/draft-play.js?v=ea1bc8cd';
 import { bootHouseFile } from './js/house-file-loader.js?v=a045a795';
 import {
   ladderTopDeck,
@@ -780,8 +780,9 @@ import {
   setSignpostHover,
   setSignpostKeys,
   signpostBoardAt,
+  signpostGlowFilters,
   signpostGlowParts,
-} from './js/street-render.js?v=dab4ec4b';
+} from './js/street-render.js?v=ff7afb98';
 import {
   GAME_DAY_MS,
   GAME_EPOCH_MS,
@@ -8685,7 +8686,8 @@ function pickInteractableAt(worldX, worldY) {
  * (Pixi draws children above the sprite texture → solid fill bug).
  * No BlurFilter: blur render-targets clip tall/wide art (egg plants, trees).
  * @param {PIXI.Sprite|PIXI.AnimatedSprite} source
- * @param {{ color?: number, thickness?: number }} [opts]
+ * @param {{ color?: number, thickness?: number, filters?: any[] }} [opts]  `filters`: after the rim
+ *   colour, on the ring (#721: a signpost's street colour; a rim on entityLayer has the layer's)
  */
 /** #701/#702: only a Sprite with a real texture takes the rim (spriteHasRimArt, js/enter-chooser.js). */
 const rimArt = (spr) => spriteHasRimArt(spr, PIXI);
@@ -8763,7 +8765,8 @@ function createSpriteOutline(source, opts = {}) {
     ];
     // Padding so filter RT doesn't clip wide trant arms
     cm.padding = 12;
-    ring.filters = [cm];
+    const after = (opts.filters || []).filter(Boolean);
+    ring.filters = [cm, ...after];
   } else {
     for (const s of copies) {
       s.tint = color;
@@ -9002,8 +9005,9 @@ function syncPostGlow() {
   }
   postGlow.views = views;
   postGlow.rims = [];
-  for (const part of views.flatMap((v) => signpostGlowParts(v)).filter(rimArt)) {
-    const rim = createSpriteOutline(part, { color: 0xa8e4ff, thickness: 2 });
+  for (const [view, part] of views.flatMap((v) => signpostGlowParts(v).filter(rimArt).map((part) => [v, part]))) {
+    // #721: the street's colour after the rim's (grey in Brillah), as the post's wood takes it.
+    const rim = createSpriteOutline(part, { color: 0xa8e4ff, thickness: 2, filters: signpostGlowFilters(view) });
     // Just under the part in its own holder (the post's holder, an arm's), so it follows the tilt.
     part.parent.addChildAt(rim, part.parent.getChildIndex(part));
     rim.syncOutlineTexture();

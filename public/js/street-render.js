@@ -654,6 +654,17 @@ export function colourSignpost(g, colour) {
   g.signColour = colour;
   return n;
 }
+/**
+ * #721: the filters the in-reach post glow (game.js syncPostGlow) takes after its rim colour: the
+ * street colour colourSignpost gave the post, as the client's street filter sat on SignpostView's
+ * holder round its glow (ApplyLayerFiltersToViewCmd.as 47, SignpostView.as glow 612-617). An
+ * uncoloured post (a scene's, a street with no filter) has none.
+ * @param {any} g  a signpost view
+ * @returns {any[]}
+ */
+export function signpostGlowFilters(g) {
+  return g?.signColour ? [g.signColour] : [];
+}
 /** The parts of a signpost that are painted wood (colourSignpost). */
 const SIGN_WOOD = new Set(['sign-shadow', 'sign-post', 'sign-arm', 'sign-deco-art', 'sign-deco-plate']);
 /** The hover glows, which take the colour after their blur (colourSignpost, #721). */

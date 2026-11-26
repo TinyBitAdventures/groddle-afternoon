@@ -2,7 +2,9 @@
  * G1154: signposts take the middleground's colour filter, as Glitch's posts (children of the
  * middleground) took that layer's filters; on a dark street (Lotha Harte) the post is near black,
  * its words stay white (the 2012 Lotha Harte street template). #721: the arm hover glow takes it too
- * (the filter sat on SignpostView's holder, round the arm glows); the route glow does not.
+ * (the filter sat on SignpostView's holder, round the arm glows); the route glow does not. The
+ * in-reach post glow (game.js syncPostGlow, SignpostView.as glow 612-617 on the same holder) takes it
+ * after its rim colour, so in Brillah it is grey too.
  * Run: node --test tests/g1154-signpost-filters.test.js
  */
 import { describe, it } from 'node:test';
@@ -10,7 +12,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { buildSignDecoView, colourSignpost, glitchLayerMatrix } from '../public/js/street-render.js?v=dab4ec4b';
+import { buildSignDecoView, colourSignpost, glitchLayerMatrix, signpostGlowFilters } from '../public/js/street-render.js?v=ff7afb98';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const street = (tsid) => JSON.parse(readFileSync(join(root, 'public/assets/streets', `${tsid}.json`), 'utf8'));
@@ -74,5 +76,19 @@ describe('G1154: signposts take the middleground filter', () => {
     const src = readFileSync(join(root, 'public/js/street-render.js'), 'utf8');
     assert.match(src, /const signColour = colourFilter\(PIXI, \(street\.layers \|\| \[\]\)\.find\(\(l\) => l\.id === 'middleground'/);
     assert.match(src, /buildSignpostSprite\(PIXI, s, pos\);\n\s*colourSignpost\(g, signColour\);/);
+  });
+  it('#721: the in-reach post glow takes the street colour after its rim colour; no filter, none', () => {
+    const colour = { matrix: [] };
+    const g = node('', [node('', [node('sign-post'), node('sign-arm-holder', [node('sign-arm')])])]);
+    colourSignpost(g, colour);
+    assert.deepEqual(signpostGlowFilters(g), [colour]);
+    assert.deepEqual(signpostGlowFilters(node('', [node('sign-post')])), [], 'an uncoloured post (a scene post, a street with no filter)');
+    colourSignpost(g, null);
+    assert.deepEqual(signpostGlowFilters(g), [colour], 'a null colour leaves the post as it was');
+    const game = readFileSync(join(root, 'public/game.js'), 'utf8');
+    const sync = game.slice(game.indexOf('function syncPostGlow('), game.indexOf('function wireInteractableSprite('));
+    assert.match(sync, /createSpriteOutline\(part, \{ color: 0xa8e4ff, thickness: 2, filters: signpostGlowFilters\(view\) \}\)/);
+    const outline = game.slice(game.indexOf('function createSpriteOutline('), game.indexOf('function clearHoverGlow('));
+    assert.match(outline, /ring\.filters = \[cm, \.\.\.after\];/, 'the street colour after the rim colour, on the measurable ring');
   });
 });

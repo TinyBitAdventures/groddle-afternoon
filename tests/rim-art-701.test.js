@@ -63,7 +63,7 @@ describe('#701/#702: only real sprite art takes the cyan rim', () => {
     assert.match(game, /target\._hoverGlow = addTargetRims\(target\);/);
     assert.match(game, /\.filter\(\(t\) => rimParts\(t\)\.length > 0\);/);
     assert.doesNotMatch(game, /addSpriteRim\(t(arget)?\.sprite\)/, 'no rim straight on a target\'s sprite');
-    assert.match(game, /signpostGlowParts\(v\)\)\.filter\(rimArt\)/);
+    assert.match(game, /signpostGlowParts\(v\)\.filter\(rimArt\)/);
     assert.match(game, /if \(!src \|\| src\.destroyed \|\| !rimArt\(src\)\) \{\s*outline\.visible = false;/);
     assert.match(game, /new PIXI\.Sprite\(rimArt\(source\) \? source\.texture : PIXI\.Texture\.EMPTY\)/);
   });
