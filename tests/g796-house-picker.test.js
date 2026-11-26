@@ -12,8 +12,8 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { defaultHouseConfig } from '../public/js/home-house.js?v=3c88c47c';
 import { createHomeState, setHomeHouse } from '../public/js/homes.js?v=dca6b2cd';
-import { homesFeature } from '../public/js/features/homes-feature.js?v=949bca85';
-import { HOUSE_PICKER_TEXT } from '../public/js/ui/house-picker.js?v=67f03b99';
+import { homesFeature } from '../public/js/features/homes-feature.js?v=efc20d2c';
+import { HOUSE_PICKER_TEXT } from '../public/js/ui/house-picker.js?v=20aaba5c';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const read = (p) => readFileSync(join(root, p), 'utf8');
@@ -51,7 +51,7 @@ describe('the Customize window', () => {
 // (ChassisManager.as scaleVP 189-247); the phone now docks the window and fits the street beside it.
 describe('the Customize window on a phone (G1178)', () => {
   it('docks as a sheet along the bottom upright and a column at the left sideways', async () => {
-    const { housePickerDockOf } = await import('../public/js/ui/house-picker.js?v=67f03b99');
+    const { housePickerDockOf } = await import('../public/js/ui/house-picker.js?v=20aaba5c');
     const rootRect = { left: 0, top: 0, right: 402, bottom: 812, width: 402, height: 812 };
     assert.deepEqual(housePickerDockOf({ left: 0, top: 455, right: 402, bottom: 812, width: 402, height: 357 }, rootRect, true), { side: 'bottom', css: 357 });
     const wide = { left: 0, top: 0, right: 812, bottom: 402, width: 812, height: 402 };

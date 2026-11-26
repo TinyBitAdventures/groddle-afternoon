@@ -44,7 +44,7 @@ globalThis.Image = FakeImage;
 const { installPixiFixes } = await import('../public/js/pixi-fixes.js?v=0f42b75e');
 installPixiFixes(PIXI);
 
-const { PLACE_TEXT, giantIconsFeature } = await import('../public/js/features/giant-icons-feature.js?v=bce67673');
+const { PLACE_TEXT, giantIconsFeature } = await import('../public/js/features/giant-icons-feature.js?v=4439e1ac');
 const { GIANT_ICON_IDS, applyIconAct, bestowCheck, createIconState, homePlaceKey, normalizeVisitIcons, pickUpIcon, placeIcon, shiftHomeIcons } = await import('../public/js/giant-icons.js?v=3f078775');
 const { normalizeHomeView } = await import('../public/js/neighbours-mp.js?v=4d16b7e4');
 
