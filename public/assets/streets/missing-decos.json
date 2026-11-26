@@ -1,7 +1,7 @@
 {
-  "referenced": 2893,
-  "present": 2857,
-  "missingCount": 36,
+  "referenced": 2903,
+  "present": 2868,
+  "missingCount": 35,
   "missing": [
     "House_back_Large_noWindows_01",
     "House_back_Large_noWindows_02",
@@ -36,7 +36,6 @@
     "patch_grass_4",
     "patch_grass_6",
     "patch_hill4",
-    "rook_hall_placeholder_painting",
     "sky_ceruleanGradient",
     "sky_pinkGradient"
   ]

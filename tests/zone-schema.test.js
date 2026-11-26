@@ -125,7 +125,7 @@ describe('the deco catalog (tools/builder/deco-catalog.mjs, assets/content/deco-
 
   it('has one row per library deco, with layer usage, sizes and flags', () => {
     const manifest = json('public/assets/decos/manifest.json');
-    assert.equal(cat.count, 2994); // + door_asset_striped_01a_newxpblack (G962, Mental Block)
+    assert.equal(cat.count, 2995); // + door_asset_striped_01a_newxpblack (G962, Mental Block), + rook_hall_placeholder_painting_frame (the Stoot shrine's empty frame)
     assert.equal(cat.decos.length, manifest.length);
     assert.equal(cat.streetsScanned, 1480); // + the two practice streets (G682), the Quarter's block (G1186)
     assert.deepEqual(cat.decos.map((d) => d.name), [...manifest].sort((a, b) => (a < b ? -1 : a > b ? 1 : 0)));
@@ -137,7 +137,7 @@ describe('the deco catalog (tools/builder/deco-catalog.mjs, assets/content/deco-
     assert.ok(cat.decos.every((d) => Object.keys(d.layers).every((r) => LAYER_ROLES.includes(r))));
     assert.ok(cat.decos.every((d) => Array.isArray(d.size2) && d.size2.length === 2));
     const total = cat.decos.reduce((n, d) => n + d.placements, 0);
-    assert.ok(total > 550000 && total <= 557313, `placements ${total}`); // + 1,371 on the 15 tower floors (G144), + 28 on Winter Walk (round 5), + the Quarter's block (G1186)
+    assert.ok(total > 550000 && total <= 557314, `placements ${total}`); // + 1,371 on the 15 tower floors (G144), + 28 on Winter Walk (round 5), + the Quarter's block (G1186), + unnnn's frame
     const bush = cat.decos.find((d) => d.name === 'bush_3');
     assert.equal(bush.family, 'bush');
     assert.equal(bush.source, 'groddle1.swf#bush_3');

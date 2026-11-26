@@ -1,4 +1,4 @@
-{"format":"groddle-deco-palette/1","count":2994,"decos":[
+{"format":"groddle-deco-palette/1","count":2995,"decos":[
 {"name":"Brain_stem_large","bytes":81734,"w":1580,"h":916,"l":0.451,"s":0.402,"hue":[0,0,0,0,0,0.084,0.915,0,0,0,0,0],"cover":0.116},
 {"name":"Brain_stem_single","bytes":24482,"w":954,"h":510,"l":0.46,"s":0.289,"hue":[0,0,0,0,0,0.279,0.721,0,0,0,0,0],"cover":0.024},
 {"name":"Brain_stem_single_blur","bytes":15950,"w":954,"h":510,"l":0.455,"s":0.265,"hue":[0,0,0,0,0,0.385,0.615,0,0,0,0,0],"cover":0.024},
@@ -2378,6 +2378,7 @@
 {"name":"rolled_up_paper","bytes":4566,"w":204,"h":78,"l":0.703,"s":0.436,"hue":[0.001,0.998,0.001,0,0,0,0,0,0,0,0,0],"cover":0.692},
 {"name":"rook_hall_placeholder_caveman","bytes":25498,"w":267,"h":347,"l":0.845,"s":0.679,"hue":[0,0,0,0,0,0.003,0.98,0.009,0.007,0,0,0],"cover":0.177},
 {"name":"rook_hall_placeholder_old_shrine","bytes":13108,"w":444,"h":278,"l":0.286,"s":0.311,"hue":[0.651,0.349,0,0,0,0,0,0,0,0,0,0],"cover":0.695},
+{"name":"rook_hall_placeholder_painting_frame","bytes":34736,"w":859,"h":652,"l":0.266,"s":0.513,"hue":[0.579,0.404,0.017,0,0,0,0,0,0,0,0,0],"cover":0.243},
 {"name":"rook_nest","bytes":7236,"w":388,"h":166,"l":0,"s":0,"hue":[0,0,0,0,0,0,0,0,0,0,0,0],"cover":0.533},
 {"name":"rookhall_spotlight","bytes":36000,"w":352,"h":1260,"l":0.638,"s":0.881,"hue":[0,0.996,0.004,0,0,0,0,0,0,0,0,0],"cover":0.078},
 {"name":"room_background1","bytes":25852,"w":1152,"h":904,"l":0.174,"s":0.558,"hue":[0.485,0.515,0,0,0,0,0,0,0,0,0,0],"cover":0.529},

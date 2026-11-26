@@ -42,6 +42,9 @@ export const DECO_TWINS = Object.freeze({
   // G1153: Hauki Seeks Manor's and Hakusan Heaps Towers' lifts name the noBG cut of the lift art,
   // which the deco pipeline never rendered; the lift art itself (door and plate) stands in.
   signpost_asset_elevator_noBG: 'signpost_asset_elevator',
+  // unnnn's painting is a photo of a real person and is held (tools/deco-pipeline/recover.py HELD);
+  // the demon holds up the same deco's wooden frame instead, empty, its plaque blank (CUTS, ours).
+  rook_hall_placeholder_painting: 'rook_hall_placeholder_painting_frame',
 });
 const PLACEHOLDER = 0x5a7a4a;
 /** Original engine art from TSEngineAssets (SignpostView.as). */

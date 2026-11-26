@@ -4,7 +4,7 @@
  */
 import { ITEM_ICONS, ITEM_LABELS, getVerbsFor, ordinaryItems, runVerb } from './content.js?v=a87eb482';
 import { createErrorOnce, createFeatureHost, createFrameStages } from './js/feature-host.js?v=b87e2cbc';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=6a7f48ab';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=b689c2f9';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, enterHintPick, reachGlowTargets, spriteHasRimArt, trimmedIconUrl, drawTileArt } from './js/enter-chooser.js?v=38d401c2';
 import { firstTendKey, STICK_TEND_DELAY_MS, STICK_TEND_DIRS, STICK_TEND_REPEAT_MS, stepTendKey, stepTendKeys, stickTendKey, tendKeyAction } from './js/garden-tend.js?v=a7470c4a';
 import { avatarHitBox, behindFloor, bodyReachDistance, OUT_OF_REACH_LINE, playerClickBox } from './js/reach.js?v=456da8a8';
@@ -741,7 +741,7 @@ import {
   ensureStreetIndex,
   resolveIndexTsid,
 } from './js/street-loader.js?v=10376267';
-import { showDraftBanner, startDraftPlay } from './js/builder/draft-play.js?v=aa509611';
+import { showDraftBanner, startDraftPlay } from './js/builder/draft-play.js?v=354cd4ba';
 import { bootHouseFile } from './js/house-file-loader.js?v=c28ab8ba';
 import {
   ladderTopDeck,
@@ -775,7 +775,7 @@ import {
   setSignpostKeys,
   signpostBoardAt,
   signpostGlowParts,
-} from './js/street-render.js?v=cd2b2649';
+} from './js/street-render.js?v=2b7abfd2';
 import {
   GAME_DAY_MS,
   GAME_EPOCH_MS,

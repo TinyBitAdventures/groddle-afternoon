@@ -39,9 +39,12 @@ describe('recovered street decos (G431)', () => {
   it('keeps out the placeholder photo', () => {
     for (const n of ['rook_hall_placeholder_painting']) {
       assert.ok(!manifest.has(n), `${n} held`);
-      assert.ok(missing.missing.includes(n), `${n} listed missing`);
       assert.match(tool, new RegExp(`'${n}': '`), `${n} has a reason in recover.py HELD`);
     }
+    // Its empty frame (a CUTS entry, ours) is drawn in its place, so it is no longer missing.
+    assert.ok(manifest.has('rook_hall_placeholder_painting_frame'));
+    assert.ok(rec.rook_hall_placeholder_painting_frame.cut);
+    assert.ok(!missing.missing.includes('rook_hall_placeholder_painting'));
   });
 
   it('ships the decos the client only played once they play (G435: their frame 1 is the still)', () => {

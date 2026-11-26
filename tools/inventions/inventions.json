@@ -6266,6 +6266,28 @@
    "why": "Glitch gave each speaker the next chat_element_others_N colour in the order they first spoke that session (RightSideManager.as 803-822 getPCColorIndex), so a name's colour changed between sessions; the bubbles used the same colour (AvaChatBubbleManager.as 117-119). Ours: the colour comes from the player's stable id, so it is the same across days and devices; your own name stays Modern's violet.",
    "ruling": "Austin 2026-11-26 (report #709): colour names in Modern chat and speech bubbles, one fixed colour per player keyed by id, Glitch's palette, your own violet",
    "rows": []
+  },
+  {
+   "id": "stoot-shrine-empty-frame",
+   "title": "The Stoot shrine's demon holds an empty frame with a blank plaque, where Glitch had a framed photo",
+   "kind": "visual",
+   "status": "kept",
+   "where": [
+    {
+     "file": "tools/deco-pipeline/recover.py",
+     "symbol": "CUTS"
+    },
+    {
+     "file": "public/js/street-render.js",
+     "symbol": "DECO_TWINS"
+    },
+    {
+     "file": "public/assets/decos/groddle/rook_hall_placeholder_painting_frame.webp"
+    }
+   ],
+   "why": "On unnnn (GIFPV9EMLT72DP4), Glitch's flash_crasher_demon held up rook_hall_placeholder_painting, a framed photo of a real person, which the remake does not ship (recover.py HELD), so the demon held nothing and players saw the shrine as broken. Ours: the same deco's own wooden frame from firebog.swf (Tiny Speck, CC0) with the photo and the plaque's words taken out (FFDec swf2xml edit), at the painting's placement (layer T_1311832165202, x 517, y 426, 375 x 284). No pixel of the photo is used.",
+   "ruling": "Austin 2026-11-25 (live chat about the Stoot shrine): keep the photo out, give the demon an empty frame, marked ours",
+   "noCompare": "The original is a photo of a real person, which the remake does not ship or show."
   }
  ]
 }

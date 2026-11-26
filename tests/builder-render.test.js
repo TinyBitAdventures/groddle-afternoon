@@ -15,7 +15,7 @@ import { GAME_DIR } from '../tools/repos.mjs';
 import { createRenderer, renderInput, RENDERS_ANYWAY } from '../tools/builder/render.mjs';
 import { loadValidatorContext } from '../tools/builder/validator-context.mjs';
 import { forkStreet } from '../public/js/builder/zone.js?v=ce289eb1';
-import { DECO_TWINS } from '../public/js/street-render.js?v=cd2b2649';
+import { DECO_TWINS } from '../public/js/street-render.js?v=2b7abfd2';
 import { HAS_PHP, PHP } from './php.js';
 
 const GOLDEN = join(GAME_DIR, 'tests/fixtures/builder/hechey-track-0.25.png');
@@ -31,7 +31,7 @@ function hecheyZone() {
 }
 
 describe('the render page\'s frame (pure)', async () => {
-  const { renderFrame, gridLines } = await import('../public/builder-render/render.js?v=c946b0d6');
+  const { renderFrame, gridLines } = await import('../public/builder-render/render.js?v=dab877b7');
   const street = { bounds: { l: -1500, r: 1500, t: -1000, b: 0 } };
   it('full: the whole street at the scale, at most 4096 px a side', () => {
     const f = renderFrame(street, { view: 'full', scale: 0.25 });

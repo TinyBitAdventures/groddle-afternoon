@@ -27,7 +27,7 @@ import { existsSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { ALL_TOWER_ROOMS } from '../../public/js/tower-challenge-rooms.js?v=01f1c620';
-import { MID_TOWER_ROOMS } from '../../public/js/tower-mid-rooms.js?v=07360655';
+import { MID_TOWER_ROOMS } from '../../public/js/tower-mid-rooms.js?v=2dd1122c';
 import { GWENDOLYN_ROOMS } from '../../public/js/gwendolyn-room-23.js?v=918c0f6b';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '../..');

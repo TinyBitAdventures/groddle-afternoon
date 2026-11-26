@@ -1335,7 +1335,8 @@
   },
   "public/js/street-render.js": {
     "glitch-had-none: * about it) lies over the street's top. Glitch never showed one: CameraMan kept the view inside": "not-an-invention",
-    "glitch-had-none: art parked wholly over the street's top, which Glitch never": "not-an-invention"
+    "glitch-had-none: art parked wholly over the street's top, which Glitch never": "not-an-invention",
+    "ours: frame instead, empty, its plaque blank (CUTS, ours).": "stoot-shrine-empty-frame"
   },
   "public/js/subway-mp.js": {
     "ours: * Ours: a lone rider (nobody else on the platform)": "ours-subway"
@@ -1616,6 +1617,7 @@
   },
   "tools/deco-pipeline/recover.py": {
     "no-source: print('no source:', ', '.join(r['name'] for r in": "not-an-invention",
+    "ours: Cuts of ours: a placed deco's own SWF with a piece taken out,": "stoot-shrine-empty-frame",
     "ours: places them (the placement is ours).": "ours-tools-deco-pipeline",
     "stand-in: stand-in, js/street-render.js) is skipped: whatever sat": "ours-tools-deco-pipeline"
   },

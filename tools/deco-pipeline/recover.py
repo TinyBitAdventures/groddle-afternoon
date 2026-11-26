@@ -51,9 +51,66 @@ HELD = {
     # bubble_test and stars_fade (animated on every or all but one placement) were held here until
     # G435 made the renderer play animated placements (tools/deco-pipeline/animate.py): their frame 1
     # is the still those placements start from.
-    # A photograph of a real person, a designer placeholder on the dev street unnnn only.
+    # A photograph of a real person, a designer placeholder on the dev street unnnn only. CUTS below
+    # ships its frame alone, which js/street-render.js DECO_TWINS draws in its place.
     'rook_hall_placeholder_painting': 'a photo of a real person (placeholder on unnnn); a product call',
 }
+
+
+def _cut_placeholder_painting(text):
+    """rook_hall_placeholder_painting with its photograph and its plaque words taken out (ours,
+    Austin 2026-11-25): the photo is DefineBitsJPEG3 character 2, the only clipped bitmap fill of
+    shape 3 (the 400 x 244 window); the words are the two glyph colours of shape 18, the plaque
+    (light emboss 249,236,186 and dark letters 81,67,31), made fully transparent. The wood frame
+    (textures 1 and 9), its shadows, twine and the blank brass plaque stay Tiny Speck's own."""
+    import re
+    text, jpeg = re.subn(r'\s*<item type="DefineBitsJPEG3Tag" [^>]*characterID="2" [^>]*/>', '', text)
+    i = text.index('shapeId="3"')
+    j = text.index('<item type="PlaceObject2Tag" characterId="3"', i)
+    shape, fill = re.subn(r'fillStyle1="2"', 'fillStyle1="0"', text[i:j], count=1)
+    shape, ref = re.subn(r'bitmapId="2"', 'bitmapId="65535"', shape)
+    text = text[:i] + shape + text[j:]
+    if (jpeg, fill, ref) != (1, 1, 1) or 'characterID="2"' in text or 'bitmapId="2"' in text:
+        raise SystemExit(f'rook_hall_placeholder_painting: photo not found as expected ({jpeg}, {fill}, {ref})')
+    i = text.index('shapeId="18"')
+    j = text.index('<item type="PlaceObject2Tag" characterId="18"', i)
+    shape, words = re.subn(r'(<color type="RGBA" )alpha="255"( blue="(?:186" green="236" red="249|31" green="67" red="81)"/>)',
+                           r'\1alpha="0"\2', text[i:j])
+    if words != 72:  # 72 glyph fills: the title and the artist's name, each letter twice
+        raise SystemExit(f'rook_hall_placeholder_painting: expected 72 plaque glyph fills, found {words}')
+    return text[:i] + shape + text[j:]
+
+
+# Cuts of ours: a placed deco's own SWF with a piece taken out, shipped under a new name that
+# js/street-render.js DECO_TWINS draws where the streets place the original. name -> source deco,
+# its bundle, the source SWF's sha (a different copy fails), what the cut is, and the XML edit.
+CUTS = {
+    'rook_hall_placeholder_painting_frame': {
+        'from': 'rook_hall_placeholder_painting', 'bundle': 'firebog.swf', 'swf_sha': '40ea649d70d127ec',
+        'cut': "unnnn's painting frame, empty: its photo of a real person and the plaque's words taken out (ours)",
+        'edit': _cut_placeholder_painting,
+    },
+}
+
+
+def cut_swf(work, name, index):
+    """Write the cut's SWF to the work dir (FFDec swf2xml, edit, xml2swf on a copy; data only, never run)."""
+    c = CUTS[name]
+    src = audit.bundled_swf(work, c['bundle'], c['from'], index)
+    if sha(src)[:16] != c['swf_sha']:
+        raise SystemExit(f"{name}: {c['bundle']}#{c['from']} is not the copy the cut was made for")
+    d = os.path.join(work, 'cut', name)
+    shutil.rmtree(d, ignore_errors=True)
+    os.makedirs(d)
+    xml = os.path.join(d, 'deco.xml')
+    build.ffdec('-swf2xml', src, xml)
+    open(os.path.join(d, 'cut.xml'), 'w', encoding='utf-8').write(c['edit'](open(xml, encoding='utf-8').read()))
+    out = os.path.join(d, name + '.swf')
+    build.ffdec('-xml2swf', os.path.join(d, 'cut.xml'), out)
+    os.remove(xml)
+    if not os.path.exists(out):
+        raise SystemExit(f'{name}: xml2swf failed')
+    return src, out
 
 
 # Decos no archived street places, for rooms the remake rebuilds because their location is lost.
@@ -233,6 +290,17 @@ def cmd_recover(args):
     miss = [n for n in miss if n not in HELD]
     rec = read_json(RECOVERED, {'about': 'G431: decos recovered by tools/deco-pipeline/recover.py', 'decos': {}})
     todo = []
+    for n in CUTS:
+        if n in manifest or (args.only and n not in set(args.only.split(','))):
+            continue
+        src, swf = cut_swf(work, n, index)
+        root, longest = audit.swf_frames(swf)
+        info = audit.swfinfo.read(swf)
+        todo.append((n, swf, {
+            'swf': audit.swf_label(src, work), 'swf_sha': sha(src)[:16], 'stage': info['stage'],
+            'root_frames': root, 'sprite_frames': longest, 'frame': 1, 'variants_differ': [],
+            'placed': 0, 'streets': 0, 'cut': CUTS[n]['cut'],
+        }))
     for n in miss:
         srcs = sources(n, place, index, cands)
         if not srcs:
@@ -361,6 +429,14 @@ def cmd_check(args):
     for n in SCENE_DECOS:
         if n not in rec:
             problems.append(f'{n}: a rebuilt room draws it but it is not recovered (run --only {n})')
+    twins = sharp.deco_twins()
+    for n, c in CUTS.items():
+        if n not in rec:
+            problems.append(f'{n}: a cut not recovered (run --only {n})')
+        elif rec[n].get('swf_sha') != c['swf_sha'] or rec[n].get('cut') != c['cut']:
+            problems.append(f'{n}: recovered.json row differs from CUTS (run --only {n})')
+        if twins.get(c['from']) != n:
+            problems.append(f"{n}: js/street-render.js DECO_TWINS should draw it for {c['from']}")
     for n in HELD:
         if n in manifest or n in rec:
             problems.append(f'{n}: held ({HELD[n]}) but shipped')

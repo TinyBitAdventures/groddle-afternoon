@@ -4621,6 +4621,26 @@
    ],
    "png_sha": "bd129874fea450a6"
   },
+  "rook_hall_placeholder_painting_frame": {
+   "swf": "bundle:firebog.swf#rook_hall_placeholder_painting",
+   "swf_sha": "40ea649d70d127ec",
+   "stage": [
+    429.05,
+    325.65
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 0,
+   "streets": 0,
+   "cut": "unnnn's painting frame, empty: its photo of a real person and the plaque's words taken out (ours)",
+   "png": [
+    859,
+    652
+   ],
+   "png_sha": "f18cd58af7f5e2c0"
+  },
   "shadow_generic_02": {
    "swf": "bundle:leavens1.swf#shadow_generic_02",
    "swf_sha": "608ea0617fad83cf",

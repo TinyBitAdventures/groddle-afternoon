@@ -31,6 +31,5 @@ patch_grass_2
 patch_grass_4
 patch_grass_6
 patch_hill4
-rook_hall_placeholder_painting
 sky_ceruleanGradient
 sky_pinkGradient

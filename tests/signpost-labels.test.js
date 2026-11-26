@@ -12,7 +12,7 @@ import { describe, it } from 'node:test';
 import { existsSync, readFileSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import { join } from 'node:path';
-import { SIGN_FONT_FAMILY, SIGN_TEXT_FILL, SIGN_TEXT_FILL_UNBUILT, loadSignFont, loadSignpostTextures, signLabel } from '../public/js/street-render.js?v=cd2b2649';
+import { SIGN_FONT_FAMILY, SIGN_TEXT_FILL, SIGN_TEXT_FILL_UNBUILT, loadSignFont, loadSignpostTextures, signLabel } from '../public/js/street-render.js?v=2b7abfd2';
 import { WORLD_FONT_FACES } from '../public/js/world-text.js?v=6b49f88c';
 
 const root = join(import.meta.dirname, '..');
