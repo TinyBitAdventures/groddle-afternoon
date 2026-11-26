@@ -41,7 +41,7 @@
   "counts": {
     "fixing": 3,
     "known": 15,
-    "unreleased": 0,
+    "unreleased": 2,
     "fixed": 589,
     "lost": 5,
     "purpose": 18,
@@ -1052,6 +1052,11 @@
           "id": "G223",
           "text": "Some house styles are still to come, including more interior and back yard styles.",
           "state": "known"
+        },
+        {
+          "id": "F127",
+          "text": "Walking up to or pointing at your house could blank out the world, on every street, until a reload.",
+          "state": "unreleased"
         },
         {
           "id": "G640",
@@ -2888,6 +2893,11 @@
     {
       "name": "Vendors",
       "items": [
+        {
+          "id": "F128",
+          "text": "The glow around Helga sat off her body during some animations.",
+          "state": "unreleased"
+        },
         {
           "id": "F69",
           "text": "A vendor's shelf jumped back to the top after each sale.",
