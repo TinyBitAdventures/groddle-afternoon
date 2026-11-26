@@ -1,5 +1,6 @@
 /**
- * The Collision-triggered Teleporter census and Yellow Yawning's way back (js/collision-teleporters.js, register G681).
+ * The Collision-triggered Teleporter census, Yellow Yawning's way back and the Vortex of Random's back doors
+ * (js/collision-teleporters.js, register G620, G681; reports #707, #708).
  * Run: node --test tests/collision-teleporters.test.js
  */
 import assert from 'node:assert/strict';
@@ -7,7 +8,9 @@ import { describe, it } from 'node:test';
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { SHIM_SHIRI_TSID, TELEPORTER_CENSUS, WIRED_TELEPORTERS, YELLOW_YAWNING_TSID, collisionTeleportersOn } from '../public/js/collision-teleporters.js?v=b1214a65';
+import { AINT_THAT_DRY_TSID, CHITI_TIGA_TSID, HARRISA_HARA_TSID, SHIM_SHIRI_TSID, SNOWED_IN_TSID, TELEPORTER_CENSUS, WIRED_TELEPORTERS, YELLOW_YAWNING_TSID, collisionTeleportersOn } from '../public/js/collision-teleporters.js?v=fe8ad3a2';
+import { SNOWED_IN_TSID as REBUILT_SNOWED_IN_TSID } from '../public/js/rebuilt-rooms.js?v=5ef5618f';
+import { reachStreet } from '../public/js/builder/reach-graph.js?v=467ca20f';
 import { inTeleporter } from '../public/js/hidden-floors.js?v=18714dfa';
 import { STREET_TRAPS } from '../public/js/street-traps-data.js?v=f6eb19ad';
 
@@ -45,7 +48,7 @@ describe('G681: every Collision-triggered Teleporter is accounted for', () => {
       if (r.state === 'here') assert.ok(collisionTeleportersOn(r.tsid).length, `${r.label} wired here`);
     }
     const by = (state) => TELEPORTER_CENSUS.filter((r) => r.state === state).length;
-    assert.deepEqual([by('wired'), by('stand-in'), by('here'), by('inert')], [19, 3, 1, 12]);
+    assert.deepEqual([by('wired'), by('stand-in'), by('here'), by('inert')], [19, 3, 4, 9]);
   });
 
   it('no inert one sits on a street a plain jump can get stuck on', () => {
@@ -86,4 +89,70 @@ describe("G681: Yellow Yawning's end goes back to Shim Shiri", () => {
     assert.deepEqual(collisionTeleportersOn('LA9UIKNQ7LD3SN0').map((r) => r.id), ['yellow_yawning_to_shim_shiri']);
     assert.deepEqual(collisionTeleportersOn(SHIM_SHIRI_TSID), []);
   });
+});
+
+describe("#707 #708: the Vortex of Random's back doors (Ain't That Dry, Chiti Tiga, Harrisa Hara, Snowed In)", () => {
+  // [id, from, to]: Austin 2026-11-26, all four legs.
+  const LEGS = [
+    ['aint_that_dry_to_chiti_tiga', AINT_THAT_DRY_TSID, CHITI_TIGA_TSID],
+    ['chiti_tiga_to_aint_that_dry', CHITI_TIGA_TSID, AINT_THAT_DRY_TSID],
+    ['harrisa_hara_to_snowed_in', HARRISA_HARA_TSID, SNOWED_IN_TSID],
+    ['snowed_in_to_harrisa_hara', SNOWED_IN_TSID, HARRISA_HARA_TSID],
+  ];
+  const leg = (id) => WIRED_TELEPORTERS.find((r) => r.id === id);
+  /** The street's beam: its Teleporter_Base deco (world, bottom-centre), in screen space. */
+  const beamOf = (s) => {
+    const d = s.layers.flatMap((l) => (l.name === 'middleground' ? l.decos || [] : [])).find((x) => x.sprite === 'Teleporter_Base');
+    return { x: d.x - s.bounds.l };
+  };
+  const lowestFloorAt = (s, x) => Math.max(...s.platforms
+    .filter((p) => p.pc_perm !== 1 && p.pc_perm !== null && Math.min(p.x1, p.x2) <= x && Math.max(p.x1, p.x2) >= x)
+    .map((p) => p.y1 + ((p.y2 - p.y1) * (x - p.x1)) / ((p.x2 - p.x1) || 1)));
+
+  it('Snowed In is the rebuilt room off Abbasid River', () => {
+    assert.equal(SNOWED_IN_TSID, REBUILT_SNOWED_IN_TSID);
+  });
+
+  for (const [id, from, to] of LEGS) {
+    describe(id, () => {
+      const row = leg(id);
+      const src = street(from);
+      const dst = street(to);
+
+      it('is wired from its street to its partner, and runs on that street', () => {
+        assert.ok(row, `${id} wired`);
+        assert.equal(row.from, from);
+        assert.equal(row.to, to);
+        assert.ok(index[from] && index[to]);
+        assert.ok(collisionTeleportersOn(from).some((r) => r.id === id));
+        assert.ok(WIRED_TELEPORTERS.some((r) => r.from === to && r.to === from), 'the partner beam leads back');
+      });
+
+      it('walking into its beam triggers it: the box covers the floor under the beam', () => {
+        const beam = beamOf(src);
+        assert.ok(Math.abs(row.box.x - beam.x) <= 5, `box ${row.box.x} at the beam ${beam.x}`);
+        for (const dx of [-row.box.w / 2 + 2, -25, 0, 25, row.box.w / 2 - 2]) {
+          const sx = row.box.x + dx;
+          const wx = sx + src.bounds.l;
+          assert.ok(inTeleporter(row, sx, floorAt(src, wx) - src.bounds.t), `feet on the floor at world ${wx}`);
+        }
+        // On a ledge, the ground floor under it does not teleport.
+        const low = lowestFloorAt(src, beam.x + src.bounds.l);
+        if (low - floorAt(src, beam.x + src.bounds.l) > 60) assert.ok(!inTeleporter(row, beam.x, low - src.bounds.t), 'not from the floor under the ledge');
+      });
+
+      it('lands on a floor line beside the partner beam, clear of its box, and walks to the exits', () => {
+        const wx = row.arrive.x + dst.bounds.l;
+        const floor = floorAt(dst, wx);
+        assert.ok(floor !== null, `a floor under world ${wx}`);
+        assert.ok(Math.abs(row.arrive.y - (floor - dst.bounds.t)) <= 2, `arrive y ${row.arrive.y} on the floor ${floor - dst.bounds.t}`);
+        for (const back of collisionTeleportersOn(to)) assert.ok(!inTeleporter(back, row.arrive.x, row.arrive.y), `clear of ${back.id}`);
+        const d = Math.abs(row.arrive.x - beamOf(dst).x);
+        assert.ok(d > 0 && d <= 200, `beside the partner beam (${d} px)`);
+        const r = reachStreet(dst, [{ x: row.arrive.x, y: row.arrive.y, from: id }]);
+        assert.ok(r.arrivals[0].stands, 'stands where it lands');
+        for (const t of r.targets) assert.ok(t.reached, `${t.label} reached on foot`);
+      });
+    });
+  }
 });

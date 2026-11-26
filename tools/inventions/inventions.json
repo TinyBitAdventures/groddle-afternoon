@@ -6199,6 +6199,24 @@
    "rows": [
     "G1303"
    ]
+  },
+  {
+   "id": "vortex-back-door-teleporters",
+   "title": "The Vortex of Random back-door teleporters: exact boxes and landings, and Snowed In back to Harrisa Hara",
+   "kind": "placement",
+   "status": "kept",
+   "where": [
+    {
+     "file": "public/js/collision-teleporters.js",
+     "symbol": "WIRED_TELEPORTERS"
+    }
+   ],
+   "why": "Glitch wired these beams (footage u93BSqMeF9E: Ain't That Dry to Chiti Tiga; the Glitchen wiki: Chiti Tiga to Ain't That Dry; snap 265988: Harrisa Hara to Snowed In) but their instanceProps were never archived. Ours: the exact x/y of every box (over each Teleporter_Base pad) and landing (Chiti Tiga world 2680, -325; Ain't That Dry -2760, -168; Snowed In -860, -115; Harrisa Hara 2648, -517), and the whole Snowed In to Harrisa Hara leg, inferred from the pair.",
+   "ruling": "Austin 2026-11-26 (reports #707, #708): wire all four legs, Harrisa Hara's beam lands inside Snowed In, the two less-certain return legs ship marked as ours",
+   "rows": [
+    "G620",
+    "G681"
+   ]
   }
  ]
 }

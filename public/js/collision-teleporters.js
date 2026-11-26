@@ -34,6 +34,33 @@
 export const YELLOW_YAWNING_TSID = 'GA9UIKNQ7LD3SN0';
 export const SHIM_SHIRI_TSID = 'GA9BT2I0ILD340S';
 
+/**
+ * The Vortex of Random's back doors (reports #707, #708; register G620, G681; Austin 2026-11-26:
+ * wire all four legs). One editor placed the three street teleporters on 2012-11-29, 21:47 to
+ * 22:11 UTC (Ain't That Dry first got a signpost and a door, both deleted, then the teleporter:
+ * LA9RMUNU05F3EI8.xml 23-36), the day before the Vortex of Random (hub 143) opened. Each beam is
+ * drawn where its Teleporter_Base deco stands (middleground), on a raised pad or ledge top.
+ * - Ain't That Dry to Chiti Tiga (certain): YouTube u93BSqMeF9E at about 3119-3143 s, a player
+ *   walks left into the beam at the street's left end, the card reads "Leaving Vortex of Random /
+ *   Welcome to Folivoria / Entering Chiti Tiga", then stands on the ledge beside Chiti Tiga's beam.
+ * - Chiti Tiga to Ain't That Dry (high): the Glitchen wiki's Folivoria page, "There is a teleporter
+ *   in Chiti Tiga to Ain't That Dry in Vortex of Random" (research/community/raw/glitchen/
+ *   wikitext-main.json, key Folivoria, revision 2019-05-23; the page asks for it to be confirmed).
+ * - Harrisa Hara to Snowed In (medium-high): player snap 265988 (2012-12-09), taken in Snowed In,
+ *   captioned "Entered Vortex of Random via the teleporter (not door) in Harrisa Hara."
+ *   (research/wayback/raw/snaps-2026-11-22/c6-2012/index.tsv line 157). Snowed In is the room off
+ *   Abbasid River (js/rebuilt-rooms.js), whose picture has a beam at its left.
+ * Ours: the Snowed In to Harrisa Hara leg (the pair's way back, inferred: Snowed In's beam is drawn
+ * and goes nowhere else on record), and the exact x/y of every box and landing: each box covers
+ * its pad's floor under the beam, each landing stands on a floor line beside the partner beam and
+ * clear of its box, and the builder's reach graph walks from each landing to the street's exits.
+ */
+export const AINT_THAT_DRY_TSID = 'GA9RMUNU05F3EI8';
+export const CHITI_TIGA_TSID = 'GDOF2V2INVQ2M9D';
+export const HARRISA_HARA_TSID = 'GA957DNLVGN2F0S';
+/** Snowed In (js/rebuilt-rooms.js SNOWED_IN_TSID; kept literal so this file stays pure data). */
+export const SNOWED_IN_TSID = 'GA9RLGSQ05F3Q69';
+
 // Screen space (street x + 3000, y + 1000), bottom-centre: the passage floor (plat_1351189425427,
 // y -448..-444) from x 2860 to the street's end, up to its ceiling (plat_1351202243944, y -605).
 export const WIRED_TELEPORTERS = Object.freeze([
@@ -47,6 +74,55 @@ export const WIRED_TELEPORTERS = Object.freeze([
     // Yellow Yawning signpost_2's connect arrive (Shim Shiri screen space).
     arrive: Object.freeze({ x: 908, y: 113 }),
     why: 'The tube\'s right end, in front of its buried Shim Shiri post (world 2917, -234), to where that post\'s link puts you.',
+  }),
+  // Screen space: the 6000-wide streets are world + (3000, 1000), Snowed In world + (1555, 642).
+  // Ain't That Dry's pad: world x -2925..-2858 at y -202, ramps down to -166 / -171 either side.
+  Object.freeze({
+    id: 'aint_that_dry_to_chiti_tiga',
+    objref: null,
+    from: AINT_THAT_DRY_TSID,
+    to: CHITI_TIGA_TSID,
+    label: 'Chiti Tiga',
+    box: Object.freeze({ x: 108, y: 832, w: 120, h: 200 }),
+    // Chiti Tiga world (2680, -325): the ledge step right of its beam (plat_1332276372016).
+    arrive: Object.freeze({ x: 5680, y: 675 }),
+    why: 'The beam on the pad at the left end (world -2892) to the ledge beside Chiti Tiga\'s beam (footage u93BSqMeF9E 3119-3143 s).',
+  }),
+  // Chiti Tiga's ledge top: world x 2527..2596 at y -368, sloping down to -338 / -333 either side.
+  Object.freeze({
+    id: 'chiti_tiga_to_aint_that_dry',
+    objref: null,
+    from: CHITI_TIGA_TSID,
+    to: AINT_THAT_DRY_TSID,
+    label: "Ain't That Dry",
+    box: Object.freeze({ x: 5560, y: 660, w: 120, h: 200 }),
+    // Ain't That Dry world (-2760, -168): the floor right of its pad (plat_1307647515500).
+    arrive: Object.freeze({ x: 240, y: 832 }),
+    why: 'The beam on the ledge top (world 2560) to the floor right of Ain\'t That Dry\'s beam (the Glitchen wiki\'s Folivoria page).',
+  }),
+  // Harrisa Hara's ledge top: world x 2704..2774 at y -567, steps down to -530 / -548 either side.
+  Object.freeze({
+    id: 'harrisa_hara_to_snowed_in',
+    objref: null,
+    from: HARRISA_HARA_TSID,
+    to: SNOWED_IN_TSID,
+    label: 'Snowed In',
+    box: Object.freeze({ x: 5739, y: 455, w: 100, h: 200 }),
+    // Snowed In world (-860, -115): the hall floor right of its beam (world -972).
+    arrive: Object.freeze({ x: 695, y: 527 }),
+    why: 'The beam on the ledge top (world 2739) into Snowed In beside its beam (snap 265988, 2012-12-09).',
+  }),
+  // Snowed In's beam: world x -972 on the hall floor (y -115).
+  Object.freeze({
+    id: 'snowed_in_to_harrisa_hara',
+    objref: null,
+    from: SNOWED_IN_TSID,
+    to: HARRISA_HARA_TSID,
+    label: 'Harrisa Hara',
+    box: Object.freeze({ x: 583, y: 532, w: 120, h: 200 }),
+    // Harrisa Hara world (2648, -517): the step left of its beam (plat_1328228121849).
+    arrive: Object.freeze({ x: 5648, y: 483 }),
+    why: 'Ours: the way back the pair implies, from Snowed In\'s beam to the step beside Harrisa Hara\'s beam.',
   }),
 ]);
 
@@ -87,10 +163,10 @@ export const TELEPORTER_CENSUS = Object.freeze([
   row('GUV174V0QUB3JT4', 'Ambu Jal', 1, 'stand-in', 'the buried Indri Slope post (y 75, isBuriedSignpost); a swim street, no trap'),
   // Wired here.
   row(YELLOW_YAWNING_TSID, 'Yellow Yawning', 2, 'here', 'WIRED_TELEPORTERS: the right end to Shim Shiri by its buried post; the second not on record, no trap'),
+  row(HARRISA_HARA_TSID, 'Harrisa Hara', 1, 'here', 'WIRED_TELEPORTERS: the ledge top beam into Snowed In (snap 265988, 2012-12-09); back from Snowed In is ours'),
+  row(AINT_THAT_DRY_TSID, "Ain't That Dry", 1, 'here', 'WIRED_TELEPORTERS: the left end beam to Chiti Tiga (footage u93BSqMeF9E 3119-3143 s)'),
+  row(CHITI_TIGA_TSID, 'Chiti Tiga', 1, 'here', 'WIRED_TELEPORTERS: the ledge top beam to Ain\'t That Dry (the Glitchen wiki\'s Folivoria page)'),
   // Inert: target lost, nothing traps.
-  row('GA957DNLVGN2F0S', 'Harrisa Hara', 1, 'inert', 'G620: no walls, the Teleporter_Base deco, target lost, no footage'),
-  row('GA9RMUNU05F3EI8', "Ain't That Dry", 1, 'inert', 'G620: no walls, the Teleporter_Base deco, target lost, no footage'),
-  row('GDOF2V2INVQ2M9D', 'Chiti Tiga', 1, 'inert', 'G620: no walls, the Teleporter_Base deco, target lost, no footage'),
   row('GA54AT4AK613NBL', 'Facta Verba', 1, 'inert', 'no walls, every arrival reaches all three posts; target lost'),
   row('GA5S44RM9OE2416', 'Valuka Himsa', 1, 'inert', 'no walls, both posts reached; the one floor no one reaches is a 96 px rock island over the middle (plat_1330395190073), likely where it went, but from where is lost'),
   row('GCR144H8APK1OJS', 'Buckward Vale', 1, 'inert', 'its two walls hang from the ceiling over the floor (x 1045, 1136, y -996..-813), both posts reached; target lost'),

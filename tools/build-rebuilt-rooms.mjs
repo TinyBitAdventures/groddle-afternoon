@@ -58,7 +58,7 @@ import {
   martlebyStreet,
   snowedInIndexEntry,
   snowedInStreet,
-} from '../public/js/rebuilt-rooms.js?v=8c2eaf24';
+} from '../public/js/rebuilt-rooms.js?v=5ef5618f';
 import {
   WINTER_HAVEN_TSID,
   WINTER_WALK_TSID,

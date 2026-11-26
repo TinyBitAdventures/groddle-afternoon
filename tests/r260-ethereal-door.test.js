@@ -12,7 +12,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { GENTLE_ISLAND_TSIDS } from '../public/js/newxp.js?v=f02bc05e';
-import { DOONBOGGLE_KEY, DOONBOGGLE_TSID, ETHEREAL_TSID } from '../public/js/rebuilt-rooms.js?v=8c2eaf24';
+import { DOONBOGGLE_KEY, DOONBOGGLE_TSID, ETHEREAL_TSID } from '../public/js/rebuilt-rooms.js?v=5ef5618f';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const gsjsPath = join(here, '../../glitch-GameServerJS/inc_data_maps_prod.js');

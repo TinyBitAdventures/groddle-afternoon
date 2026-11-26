@@ -44,7 +44,7 @@ import {
   isWinterStreetTsid,
   winterStreetEcology,
 } from '../public/js/winter-walk-streets.js?v=c921bf92';
-import { rebuiltRoomsFeature } from '../public/js/features/rebuilt-rooms-feature.js?v=fd719c29';
+import { rebuiltRoomsFeature } from '../public/js/features/rebuilt-rooms-feature.js?v=0f928a67';
 import { reachStreet } from '../public/js/builder/reach-graph.js?v=467ca20f';
 import { GRAVITY, JUMP_SPEED, WALK_MAX } from '../public/js/avatar-step.js?v=39d7b1af';
 

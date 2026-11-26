@@ -18,7 +18,7 @@ import { STRAY_FALLBACK_TSID, streetsReachingUr } from '../public/js/quest-insta
 import { ROOM_STREETS } from '../public/js/quest-rooms/catalog.js?v=f37a25ba';
 import { FIRST_SKILLS } from '../public/js/newxp.js?v=f02bc05e';
 import { COLOUR_LEVEL_STREETS, NO_EXIT_PUZZLE_STREETS } from '../public/js/puzzle-triggers.js?v=221b67a9';
-import { hiddenFloorsFeature } from '../public/js/features/hidden-floors-feature.js?v=f5824d9a';
+import { hiddenFloorsFeature } from '../public/js/features/hidden-floors-feature.js?v=78df170c';
 import { midTowerFeature } from '../public/js/features/mid-tower-feature.js?v=35aae422';
 import { questInstancesFeature as qi } from '../public/js/features/quest-instances-feature.js?v=15c60dfe';
 import { puzzlesFeature as pz } from '../public/js/features/puzzles-feature.js?v=de36160d';

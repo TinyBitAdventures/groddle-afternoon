@@ -51,9 +51,9 @@ import {
   SNOWED_IN_TSID,
   isRebuiltRoomTsid,
   rebuiltRoomEcology,
-} from '../public/js/rebuilt-rooms.js?v=8c2eaf24';
-import { rebuiltRoomsFeature } from '../public/js/features/rebuilt-rooms-feature.js?v=fd719c29';
-import { FEATURES } from '../public/js/features/index.js?v=bad872b3';
+} from '../public/js/rebuilt-rooms.js?v=5ef5618f';
+import { rebuiltRoomsFeature } from '../public/js/features/rebuilt-rooms-feature.js?v=0f928a67';
+import { FEATURES } from '../public/js/features/index.js?v=43e2a8b1';
 
 const spike = join(dirname(fileURLToPath(import.meta.url)), '..');
 const pub = join(spike, 'public');

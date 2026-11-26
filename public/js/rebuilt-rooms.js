@@ -37,8 +37,8 @@
  *   deco_stool_wooden_ghtest, juju_grandma_campfire_01a_al1 and
  *   juju_grandma_papers. The green mat is left out (rug_green, the only green
  *   rug, reads as a hole from the side). The hall doors are art (no apartments behind them
- *   survive); the teleporter is art (its Collision-triggered Teleporter item
- *   and target were never archived). The picture's flagstone floor is the
+ *   survive); the teleporter's beam is wired in js/collision-teleporters.js
+ *   (Harrisa Hara's beam lands here, snap 265988; this one leads back there). The picture's flagstone floor is the
  *   hall's plank floor here (no CC0 flagstone hall floor), cooled by the
  *   layer's colour.
  *

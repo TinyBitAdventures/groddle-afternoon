@@ -36,7 +36,7 @@
  *   soilappreciation_1); the tutorial's pick: &newxp=skill&newxpskill=ezcooking_1.
  */
 
-import { isRebuiltRoomTsid, rebuiltRoomEcology } from '../rebuilt-rooms.js?v=8c2eaf24';
+import { isRebuiltRoomTsid, rebuiltRoomEcology } from '../rebuilt-rooms.js?v=5ef5618f';
 import { isLouiseVillaTsid, louiseVillaEcology } from '../louise-pasture-villa.js?v=01066f39';
 import { isPracticeStreetTsid, practiceExitSign, practiceStreetEcology } from '../practice-streets.js?v=557238c1';
 import { textureFromUrl } from '../textures.js?v=b8e38103';
