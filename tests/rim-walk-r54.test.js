@@ -18,7 +18,8 @@
  * _findInteractionSprites 1092-1131). On Flogan Shames a rock and the Street Spirit now glow in reach
  * and under the mouse, and on every street each thing the mouse finds draws a rim (canvas data
  * hoverRims) unless it is one of the few with no art at all (noArt: the home street's house door, a
- * Graphics box the house art paints over; a new garden's bare bed).
+ * Graphics box the house art paints over; a new garden's bare bed). #669 (2026-11-26): a mouse-over
+ * rims only a thing in reach (canvas data hoverRimShown), so only those count.
  * Run: node --test tests/rim-walk-r54.test.js
  */
 import { after as afterAll, before as beforeAll, describe, it } from 'node:test';
@@ -121,10 +122,11 @@ describe('R54: walking to and pointing at every target draws without a render th
         }
         const seen = await page.evaluate(() => {
           const c = document.querySelector('#game-root canvas');
-          return { hover: c?.dataset.hoverTarget || '', rims: Number(c?.dataset.hoverRims || 0), glow: c?.dataset.reachGlow || '' };
+          return { hover: c?.dataset.hoverTarget || '', rims: Number(c?.dataset.hoverRims || 0), shown: c?.dataset.hoverRimShown === '1', glow: c?.dataset.reachGlow || '' };
         });
         if (seen.hover) hovered.add(seen.hover);
-        if (seen.hover) (seen.rims > 0 ? rimmed : bare).add(seen.hover);
+        // #669 (2026-11-26): a mouse-over rims a thing only in reach (hoverRimShown).
+        if (seen.hover && seen.shown) (seen.rims > 0 ? rimmed : bare).add(seen.hover);
         for (const id of seen.glow.split(',').filter(Boolean)) glowed.add(id);
         await clean(`beside ${stop.what} on ${street.tsid}`);
       }

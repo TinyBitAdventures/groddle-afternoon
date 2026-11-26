@@ -5,7 +5,7 @@
 import { ITEM_ICONS, ITEM_LABELS, getVerbsFor, ordinaryItems, runVerb } from './content.js?v=48634256';
 import { createErrorOnce, createFeatureHost, createFrameStages } from './js/feature-host.js?v=b87e2cbc';
 import { FEATURES, questFlagsFeature } from './js/features/index.js?v=c7f0ccca';
-import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, enterHintPick, reachGlowTargets, spriteHasRimArt, rimArtParts, trimmedIconUrl, drawTileArt } from './js/enter-chooser.js?v=44aef7b2';
+import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, enterHintPick, groupHead, hoverRimShown, reachGlowTargets, spriteHasRimArt, rimArtParts, trimmedIconUrl, drawTileArt } from './js/enter-chooser.js?v=74f4964a';
 import { firstTendKey, STICK_TEND_DELAY_MS, STICK_TEND_DIRS, STICK_TEND_REPEAT_MS, stepTendKey, stepTendKeys, stickTendKey, tendKeyAction } from './js/garden-tend.js?v=a7470c4a';
 import { avatarHitBox, behindFloor, bodyReachDistance, OUT_OF_REACH_LINE, playerClickBox } from './js/reach.js?v=456da8a8';
 import { createVogOverlay } from './js/vog-overlay.js?v=02f04426';
@@ -8600,6 +8600,8 @@ function notifyZoneViewBox() {
 // —— Hover / pick targeting (crowded entities) ——
 /** @type {any|null} */
 let hoverTarget = null;
+/** #669: the hover came from the mouse (its rim only in reach on a computer, syncHoverRims). */
+let hoverByPointer = false;
 
 function clearSignpostBoardHover() {
   if (!hoveredSignBoard) return;
@@ -8808,34 +8810,77 @@ function clearHoverGlow() {
   const t = hoverTarget;
   dropRims(t._hoverGlow);
   t._hoverGlow = null;
+  t._hoverRimOn = false;
   if (app?.canvas) {
     app.canvas.dataset.hoverTarget = '';
     app.canvas.dataset.hoverRims = '';
+    app.canvas.dataset.hoverRimShown = '';
   }
   // Only the tint: nothing lifts a hovered sprite now, and putting back the y it had when the
   // pointer came over it dropped a Chicken or Piggy that had walked up or down a slope since
   // (game.js followWalkFloor) into the ground or the air (lane CHICKLOOP, Austin 2026-11-01).
   if (t.sprite && !t.sprite.destroyed) t.sprite.tint = 0xffffff;
   hoverTarget = null;
+  hoverByPointer = false;
 }
 
 /**
  * Soft cyan silhouette rim behind the sprite (original Glitch selection look).
+ * #669 (Austin 2026-11-26): `pointer` for a mouse-over, whose rim shows on a computer only while the
+ * thing is in reach (syncHoverRims); its name tip shows at any distance.
  * @param {any|null} target
+ * @param {{ pointer?: boolean }} [opts]
  */
-function setHoverTarget(target) {
-  if (hoverTarget === target) return;
+function setHoverTarget(target, { pointer = false } = {}) {
+  if (hoverTarget === target) {
+    if (target && hoverByPointer !== pointer) {
+      hoverByPointer = pointer;
+      syncHoverRims();
+    }
+    return;
+  }
   clearHoverGlow();
   if (!target?.sprite || target.sprite.destroyed || !entityLayer) return;
   hoverTarget = target;
-  // The reach glow's rim gives way to the hover's (#669: one rim per thing).
-  dropReachGlow(target);
-  target._hoverGlow = addTargetRims(target);
+  hoverByPointer = pointer;
+  target._hoverGlow = [];
   // R54 QA (tests/rim-walk-r54.test.js): the thing under the mouse, as reachGlow names the glowing
-  // ones; hoverRims, how many rims it drew (#712: 0 for a thing with no art to trace).
+  // ones; hoverRims, how many rims it drew (#712: 0 for a thing with no art to trace; #669: 0 for a
+  // mouse-over out of reach on a computer).
+  if (app?.canvas) app.canvas.dataset.hoverTarget = target.classId || '';
+  syncHoverRims();
+}
+
+/**
+ * #669: the in-reach glow's rule (reachGlowWanted) for one thing: within 100 of interactReach, by
+ * garden (groupHead), not on a ladder, not under a menu, an act or a mode, never on a phone.
+ */
+function inGlowReach(target) {
+  if (!target || reachGlowOff() || climb.active) return false;
+  const head = groupHead(target);
+  return interactables.some((t) => groupHead(t) === head && interactReach(t) < 100);
+}
+
+/** The hovered thing's rims, drawn or dropped as hoverRimShown says (re-read with the reach glow). */
+function syncHoverRims() {
+  const target = hoverTarget;
+  if (!target?.sprite || target.sprite.destroyed) return;
+  const want = hoverRimShown({ pointer: hoverByPointer, phone: TOUCH_PHONE, inReach: inGlowReach(hoverTarget) });
+  const has = Boolean(target._hoverRimOn);
+  if (want && (!has || rimsStale(target._hoverGlow))) {
+    dropRims(target._hoverGlow);
+    // The reach glow's rim gives way to the hover's (#669: one rim per thing).
+    dropReachGlow(target);
+    target._hoverGlow = addTargetRims(target);
+    target._hoverRimOn = true;
+  } else if (!want && has) {
+    dropRims(target._hoverGlow);
+    target._hoverGlow = [];
+    target._hoverRimOn = false;
+  }
   if (app?.canvas) {
-    app.canvas.dataset.hoverTarget = target.classId || '';
-    app.canvas.dataset.hoverRims = String(target._hoverGlow.length);
+    app.canvas.dataset.hoverRims = String(target._hoverGlow?.length || 0);
+    app.canvas.dataset.hoverRimShown = want ? '1' : '0';
   }
 }
 
@@ -8926,6 +8971,7 @@ function updateReachGlow(now = performance.now()) {
     for (const t of want) if (!reachGlows.has(t) && entityLayer && !entityLayer.destroyed) reachGlows.set(t, addTargetRims(t));
     const line = [...reachGlows.keys()].map((t) => t.classId || '').join(',');
     if (app?.canvas && app.canvas.dataset.reachGlow !== line) app.canvas.dataset.reachGlow = line;
+    syncHoverRims();
     syncPostGlow();
   }
   for (const rims of reachGlows.values()) for (const rim of rims) if (!rim.destroyed) rim.syncOutlineTexture();
@@ -8976,7 +9022,7 @@ function wireInteractableSprite(target) {
   spr.on('pointerover', () => {
     // A post's arm under the pointer is its own target (FRIENDPOST): the post's outline stays off.
     if (!state.started || menuTarget || isScreenFxBlocking() || hoveredSignBoard) return;
-    setHoverTarget(target);
+    setHoverTarget(target, { pointer: true });
   });
   spr.on('pointerout', () => {
     if (hoverTarget === target) clearHoverGlow();
@@ -36446,7 +36492,7 @@ async function main() {
       return;
     }
     const hit = pickInteractableAt(wx, wy);
-    if (hit) setHoverTarget(hit);
+    if (hit) setHoverTarget(hit, { pointer: true });
     else if (hoverTarget) clearHoverGlow();
   });
   app.canvas.addEventListener('pointerleave', clearSignpostBoardHover);

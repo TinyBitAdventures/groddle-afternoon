@@ -233,6 +233,18 @@ export function rimArtParts(spr, PIXI) {
 }
 
 /**
+ * #669 (Austin 2026-11-26): whether the thing under the mouse takes its rim. On a computer a
+ * mouse-over rims it only in reach (the in-reach glow's rule), as Glitch glowed only what the avatar
+ * touched (MiddleGroundRenderer.as glowRenderer 1157-1165) and a mouse-over only named a thing
+ * (LocationItemstackView.as _mouseOverHandler 665-668). A phone, a click, a garden's tend focus and
+ * a drop target keep their rim at any distance.
+ * @param {{ pointer?: boolean, phone?: boolean, inReach?: boolean }} o
+ */
+export function hoverRimShown({ pointer = false, phone = false, inReach = false } = {}) {
+  return !pointer || phone || inReach;
+}
+
+/**
  * #669: the things that glow because they are in reach, as the client glowed each sprite in
  * _interaction_spV (computers only, beside enterHintPick). One per garden (groupHead), never the
  * thing under the mouse (it has its own hover rim), never while climbing (the client glowed
