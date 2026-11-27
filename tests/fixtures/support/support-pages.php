@@ -348,6 +348,24 @@ try {
     $out['nonce'] = ['status' => $bad['status'], 'kept' => $count($answered) > $before, 'said' => preg_match('/data-tone="bad">([^<]*)</', $bad['body'] ?? '', $m) ? $m[1] : null, 'wordsKept' => str_contains($bad['body'] ?? '', 'No nonce here.</textarea>')];
     $big = $page(ADA, $request(Method::Post, "/chat/support/{$answered}/reply/", [], [], [], ['content-length' => '90000000']), static fn (Seams $s) => (new SupportPages($s))->reply($request(Method::Post, "/chat/support/{$answered}/reply/", [], [], [], ['content-length' => '90000000']), (string) $answered));
     $out['tooBig'] = ['status' => $big['status'], 'said' => preg_match('/data-tone="bad">([^<]*)</', $big['body'] ?? '', $m) ? $m[1] : null];
+    // As a real server has it: the length is CONTENT_LENGTH (a CGI variable), not an HTTP_ header, and PHP dropped every field.
+    $cgi = static function (string $length, string $path, \Closure $call) use ($page, $request): array {
+        $_SERVER['CONTENT_LENGTH'] = $length;
+        try {
+            return $page(ADA, $request(Method::Post, $path), static fn (Seams $s) => $call(new SupportPages($s), $request(Method::Post, $path)));
+        } finally {
+            unset($_SERVER['CONTENT_LENGTH']);
+        }
+    };
+    $said = static fn (array $r): ?string => preg_match('/data-tone="bad">([^<]*)</', $r['body'] ?? '', $m) ? html_entity_decode($m[1], ENT_QUOTES) : null;
+    $dropped = $cgi('9000000', "/chat/support/{$answered}/reply/", static fn (SupportPages $p, Request $r) => $p->reply($r, (string) $answered));
+    $droppedNew = $cgi('9000000', '/chat/support/new/', static fn (SupportPages $p, Request $r) => $p->create($r));
+    $underLimit = $cgi('1000', "/chat/support/{$answered}/reply/", static fn (SupportPages $p, Request $r) => $p->reply($r, (string) $answered));
+    $out['postDropped'] = [
+        'reply' => ['status' => $dropped['status'], 'said' => $said($dropped), 'page' => str_contains($dropped['body'] ?? '', 'data-support-reply="' . $answered . '"')],
+        'new' => ['status' => $droppedNew['status'], 'said' => $said($droppedNew), 'page' => str_contains($droppedNew['body'] ?? '', 'data-support-new=""')],
+        'under' => ['status' => $underLimit['status'], 'said' => $said($underLimit)],
+    ];
 
     // == The reply limit: the game's REPLY_PER_WINDOW, the same on the web ==
     $limited = [];

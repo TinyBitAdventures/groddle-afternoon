@@ -44,6 +44,16 @@ const gd = HAS_PHP && spawnSync(PHP, [...phpArgs, '-r', 'exit(function_exists("i
 const reachable = db && HAS_PHP && spawnSync(PHP, [...phpArgs, '-r', 'mysqli_report(MYSQLI_REPORT_OFF); $m = @new mysqli($argv[1], $argv[2], $argv[3]); exit($m->connect_errno ? 1 : 0);', db.host, db.user, db.pass]).status === 0;
 const skipDb = skipWithoutSite || (!HAS_PHP && 'no php') || (!gd && 'no gd with WebP') || (!db && 'no database') || (!reachable && 'database not reachable') || (!existsSync(join(ENGINE, 'src/Minn/Autoloader.php')) && 'Minn Engine not found (set MINN_ENGINE_DIR)');
 
+/** SupportPages' pure limits run by PHP (no database): php -r with the site's classes. */
+function phpRun(code) {
+  const pre = ['ReportPicture', 'ReportFile', 'SupportPages'].map((c) => `require ${JSON.stringify(sitePath(`src/${c}.php`))};`).join(' ');
+  return JSON.parse(execFileSync(PHP, ['-d', 'display_errors=stderr', '-r', `${pre} use Groddle\\Minn\\SupportPages as S; echo json_encode(${code});`], { encoding: 'utf8' }));
+}
+function phpLimits() {
+  const l = phpRun('S::limits()');
+  return { ...l, ...phpRun(`['fileWords' => S::sizeWords(${l.file}), 'textWords' => S::sizeWords(${l.text})]`) };
+}
+
 /** The main pane of a page (the app's conversation), where the player's words and ours are. */
 const pane = (html) => String(html || '').slice(String(html || '').indexOf('data-cx-pane'), String(html || '').lastIndexOf('</main>'));
 
@@ -200,7 +210,19 @@ describe('Support on the website: a player manages their own reports (php, throw
     assert.equal(r.nonce.said, 'This page was open a long time. Try again.');
     assert.equal(r.nonce.wordsKept, true);
     assert.equal(r.tooBig.status, 413);
-    assert.match(r.tooBig.said, /too large to send at once/);
+    assert.match(r.tooBig.said, /^Those files were too big to send together\. Send fewer at a time\./);
+  });
+
+  it('a POST PHP dropped for being over post_max_size (CONTENT_LENGTH, no fields) says so on the same page, never the nonce', () => {
+    const words = 'Those files were too big to send together. Send fewer at a time. Your words weren\'t kept.';
+    for (const k of ['reply', 'new']) {
+      assert.equal(r.postDropped[k].status, 413, k);
+      assert.equal(r.postDropped[k].said, words, k);
+      assert.equal(r.postDropped[k].page, true, `${k}: the same form again`);
+    }
+    // An empty post under the limit is not a dropped one: the nonce's own refusal.
+    assert.equal(r.postDropped.under.status, 403);
+    assert.equal(r.postDropped.under.said, 'This page was open a long time. Try again.');
   });
 
   it('the game\'s reply limit holds on the web (Tickets::REPLY_PER_WINDOW)', () => {
@@ -238,7 +260,7 @@ describe('Support on the website: a player manages their own reports (php, throw
     assert.match(rp, /<input type="hidden" name="_wpnonce" value="[0-9a-f]{10}" \/>/);
     for (const html of [r.list.html, r.thread.html, r.reportPage, r.signedOut.body]) {
       assert.doesNotMatch(pane(html), /\u2014/, 'no em dashes');
-      assert.match(html, /community\.css\?v=community-21/);
+      assert.match(html, /community\.css\?v=community-22/);
       assert.match(html, /\/site\/theme\.js/, 'the theme script sets light or dark before paint');
     }
   });
@@ -254,6 +276,13 @@ describe('Support on the website: a player manages their own reports (php, throw
       assert.match(form, /<p class="csaid csupport-drop-said" role="status" aria-live="polite" data-drop-said=""><\/p>/);
       assert.match(form, /<label class="csupport-attach"><span>Add pictures or a text file<\/span><input type="file" name="files\[\]" multiple accept="\.jpg,\.jpeg,\.png,\.webp,\.txt,\.log,[^"]*" \/><\/label>/, `${name}: the plain field as before`);
       assert.ok(form.indexOf('data-drop=""') < form.indexOf('name="files[]"'), `${name}: the zone above the field`);
+      // The server's real limits for the script (this PHP: upload_max_filesize 2M, post_max_size 8M, as on live), and the plain line names them.
+      const lim = phpLimits();
+      assert.match(form, new RegExp(`data-file-max="${lim.file}" data-text-max="${lim.text}" data-post-max="${lim.post}">`), `${name}: the limits on the form`);
+      const line = html.match(/<p class="chint" data-drop-hint="([^"]*)">([^<]*)<\/p>/);
+      assert.ok(line, `${name}: the limits line`);
+      assert.equal(line[2], `Up to 4 pictures (JPEG, PNG or WebP, up to ${lim.fileWords} each) and 2 text files (.txt or .log, up to ${lim.textWords}) a message. Only you and the team can see them.`);
+      assert.equal(line[1], `Up to 4 pictures and 2 text files (.txt or .log, up to ${lim.textWords}) a message. Big pictures are made smaller before they go. Only you and the team can see them.`);
     }
     assert.match(pane(r.newReport.form.html), /data-support-new=""/);
   });
@@ -333,6 +362,21 @@ describe('Support: the site code (groddle-afternoon-site)', { skip: skipWithoutS
     assert.match(src('src/AdminConsolePage.php'), /ASSET_KEY = 'skin-15'/);
   });
 
+  it('the server\'s real limits: php.ini sizes read, the per-file limit the smaller of ours and upload_max_filesize, the request post_max_size', { skip: !HAS_PHP && 'no php' }, () => {
+    assert.deepEqual(phpRun('array_map([S::class, "iniBytes"], ["8M", "2M", "512K", "1G", "-1", "0", "", "1048576", " 16m "])'),
+      [8388608, 2097152, 524288, 1073741824, 0, 0, 0, 1048576, 16777216]);
+    assert.deepEqual(phpRun('S::limits("2M", "8M")'), { file: 2097152, text: 262144, post: 8388608 }, 'Kinsta: 2 MB a file, 8 MB a request');
+    assert.deepEqual(phpRun('S::limits("64M", "128M")'), { file: 10485760, text: 262144, post: 134217728 }, 'ours when the server allows more');
+    assert.deepEqual(phpRun('S::limits("128K", "-1")'), { file: 131072, text: 131072, post: 0 }, 'a text file too; no request limit');
+    assert.deepEqual(phpRun('S::limits("-1", "8M")'), { file: 10485760, text: 262144, post: 8388608 });
+    assert.deepEqual(phpRun('[S::droppedPost([], [], 9000000, 8388608), S::droppedPost([], [], 1000, 8388608), S::droppedPost(["message" => "x"], [], 9000000, 8388608), S::droppedPost([], [], 0, 8388608), S::droppedPost([], [], 5, 0)]'),
+      [true, false, false, false, true]);
+    assert.deepEqual(phpRun('[S::sizeWords(2097152), S::sizeWords(10485760), S::sizeWords(262144), S::sizeWords(1572864), S::sizeWords(131072)]'), ['2 MB', '10 MB', '256 KB', '1.5 MB', '128 KB']);
+    const php = src('src/SupportPages.php');
+    assert.match(php, /\$length = \(int\) \(\$request->header\('content-length'\) \?\? \(\$_SERVER\['CONTENT_LENGTH'\] \?\? '0'\)\);/, 'the CGI length, which Request::header misses');
+    assert.match(php, /'That picture is larger than ' \. self::sizeWords\(\$limits\['file'\]\)/, 'the server names its real per-file limit');
+  });
+
   it('the drop zone\'s script is loaded with the page\'s key for both forms, and its styles are tokens', () => {
     const js = src('community/community.js');
     assert.match(js, /document\.querySelector\('form\[data-support-reply\], form\[data-support-new\]'\)/);
@@ -344,7 +388,7 @@ describe('Support: the site code (groddle-afternoon-site)', { skip: skipWithoutS
     assert.match(css, /\.csupport-drop\[data-over\] \.csupport-drop-zone \{[^}]*border-color: var\(--accent\)/, 'lit while files are dragged over');
     assert.match(css, /@media \(hover: hover\) \{ \.csupport-drop-zone:hover \{[^}]*border-color: var\(--accent\)/, 'a hover look where there is a mouse (never stuck after a tap)');
     assert.match(css, /@media \(hover: none\) and \(pointer: coarse\) \{\s*\.csupport-drop-mouse \{ display: none; \}/, 'a phone reads Tap to add');
-    assert.match(src('src/CommunityPages.php'), /ASSET_KEY = 'community-21'/);
+    assert.match(src('src/CommunityPages.php'), /ASSET_KEY = 'community-22'/);
   });
 
   it('the rail has a Support entry for signed-in players', () => {
@@ -431,6 +475,47 @@ describe('Support: the drop zone\'s checks, as the server\'s (community/support-
     assert.equal(f.uploadName('page.html', 'text/html'), 'page.html', 'never renamed into something allowed');
     assert.equal(f.uploadName('evil.html', 'image/png'), 'evil.html', 'an ending it has is kept, to be refused by it');
     assert.equal(f.uploadName('clip', 'image/gif', { pasted: 3 }), 'clip');
+  });
+
+  it('shrinking: a 4000x3000 photo is drawn again at 1600x1200; a small PNG screenshot goes as it is', () => {
+    assert.equal(f.MAX_SIDE, 1600);
+    assert.equal(f.QUALITY, 0.85);
+    assert.deepEqual(f.shrinkPlan({ width: 4000, height: 3000, bytes: 4 * 1024 * KB }), { width: 1600, height: 1200, redraw: true });
+    assert.deepEqual(f.shrinkPlan({ width: 3000, height: 4000, bytes: 3 * 1024 * KB }), { width: 1200, height: 1600, redraw: true }, 'upright (the EXIF turn applied first)');
+    assert.deepEqual(f.shrinkPlan({ width: 300, height: 200, bytes: 20 * KB }), { width: 300, height: 200, redraw: false });
+    assert.deepEqual(f.shrinkPlan({ width: 1440, height: 900, bytes: 900 * KB }), { width: 1440, height: 900, redraw: true }, 'a big PNG screenshot within 1600 px: drawn again as JPEG at its size');
+    assert.deepEqual(f.shrinkPlan({ width: 1600, height: 1000, bytes: 300 * KB }), { width: 1600, height: 1000, redraw: false });
+    assert.deepEqual(f.shrinkPlan({ width: 8000, height: 200, bytes: 2 * 1024 * KB }), { width: 2560, height: 64, redraw: true }, 'never under the server\'s 64 pixels a side');
+    assert.equal(f.jpegName('IMG_0412.HEIC.png'), 'IMG_0412.HEIC.jpg');
+    assert.equal(f.jpegName('shot.png'), 'shot.jpg');
+    // The same photo dropped twice is one, though the first went up smaller and renamed.
+    const photo = file('IMG_1.jpeg', 4 * 1024 * KB, 9);
+    const small = { name: 'IMG_1.jpg', size: 380 * KB, lastModified: 9, origin: photo };
+    assert.equal(f.addFiles([small], [photo]).refused[0].why, 'IMG_1.jpeg is already added.');
+    assert.equal(f.addFiles([], [{ ...file('tiny.png', 300), tooSmall: true }]).refused[0].why, 'tiny.png was not added: a picture is at least 64 pixels on each side.');
+    assert.equal(f.addFiles([], [{ ...file('x.jpg', 0), unread: true }]).refused[0].why, 'x.jpg was not added: that picture could not be read.');
+  });
+
+  it('the server\'s real limits from the form, and the whole message within an 8 MB request', () => {
+    const live = f.limitsFrom({ fileMax: '2097152', textMax: '262144', postMax: '8388608' });
+    assert.deepEqual([live.pictureBytes, live.textBytes, live.postBytes, live.pictures, live.texts], [2097152, 262144, 8388608, 4, 2]);
+    const none = f.limitsFrom({});
+    assert.deepEqual([none.pictureBytes, none.textBytes, none.postBytes], [10485760, 262144, 0], 'its own limits without the data');
+    assert.equal(f.limitsFrom({ fileMax: 'lots', postMax: '-1' }).pictureBytes, 10485760);
+    // Per file: a 3 MB picture that could not be made smaller is over the server's 2 MB.
+    assert.equal(f.addFiles([], [file('raw.png', 3 * 1024 * KB)], live).refused[0].why, 'raw.png was not added: a picture can be up to 2 MB.');
+    // The whole request: four 1.95 MB pictures fit 8 MB less room for the words; a text file on top does not.
+    const four = [1, 2, 3, 4].map((n) => file(`p${n}.jpg`, 1.95 * 1024 * KB, n));
+    let r = f.addFiles([], four, live);
+    assert.equal(r.files.length, 4);
+    r = f.addFiles(r.files, [file('console.log', 250 * KB)], live);
+    assert.equal(r.refused[0].why, 'console.log was not added: together the files would be too big to send. Send fewer at a time.');
+    r = f.addFiles(f.removeFile(r.files, 0), [file('console.log', 250 * KB)], live);
+    assert.deepEqual(r.files.map((x) => x.name), ['p2.jpg', 'p3.jpg', 'p4.jpg', 'console.log'], 'room again after a Remove');
+    // Shrunk photos are a few hundred KB: four of them and two logs are far inside.
+    r = f.addFiles([], [...[1, 2, 3, 4].map((n) => file(`s${n}.jpg`, 420 * KB, n)), file('a.log', 256 * KB), file('b.txt', 256 * KB)], live);
+    assert.equal(r.files.length, 6);
+    assert.equal(f.addFiles([], [file('big.jpg', 9 * 1024 * KB)], none).refused.length, 0, 'no request limit known: only the per-file one');
   });
 
   it('the lines a player reads: sizes as the server writes them, what was added and what was not, no em dashes', () => {
