@@ -34,7 +34,8 @@
  * - pack: the pack row (measured where js/ui/pack-row.js centres it);
  * - sheet: the room one open sheet takes. The Map takes the whole height (sideways the whole
  *   screen, its header floating over it); Quests, Social, the Menu and the other side sheets dock
- *   above the pack row upright and in a column at the left sideways; an open bag's tray is a sheet
+ *   above the pack row upright and in a column at the left sideways (inside the left safe-area inset,
+ *   #738); an open bag's tray is a sheet
  *   too. Only one is open at a time: one that opens closes the others.
  *
  * While a sheet or an open bag covers the bottom of the street, the street fits the room it leaves
@@ -202,7 +203,10 @@ export function phoneRegions({ width, height, safe = {}, sheet = '', pack = null
   if (kind === 'map') sheetBox = upright ? box(0, strip.bottom + GAP, W, H) : box(0, 0, W, H);
   else if (kind === 'half') {
     if (upright) sheetBox = box(0, floor - GAP - Math.round((floor - GAP - under - GAP) * HALF_SHARE), W, floor - GAP);
-    else sheetBox = box(0, strip.bottom + GAP, sl + Math.max(0, Math.min(COLUMN_W, W - sl - STREET_MIN_W)), floor - GAP);
+    // #738 (an iPhone sideways, the Home Screen app): the column's card starts at the safe-area inset, as
+    // the stats pill and the pack row do, not under the camera cut-out. The street still docks beside the
+    // column's whole width (the dock below); the room under the cut-out is the page's colour (style.css).
+    else sheetBox = box(sl, strip.bottom + GAP, sl + Math.max(0, Math.min(COLUMN_W, W - sl - STREET_MIN_W)), floor - GAP);
   } else if (kind === 'bag' && Number.isFinite(Number(bagTop))) sheetBox = box(0, Number(bagTop), W, floor);
   const covered = kind !== '';
   let snapBox = real(snap) ? box(snap.left, snap.top, snap.right, snap.bottom) : null;

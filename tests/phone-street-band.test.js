@@ -19,7 +19,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { GAP, phoneRegions, streetBandOf } from '../public/js/ui/phone-layout.js?v=ebaad3fe';
+import { GAP, phoneRegions, streetBandOf } from '../public/js/ui/phone-layout.js?v=351488b7';
 import { MIN_PACK_HEIGHT, stageFor, stageRoomBeside, stageRoomInBand, streetBandStage } from '../public/js/location-view.js?v=4c2530a9';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');

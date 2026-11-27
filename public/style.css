@@ -15946,6 +15946,15 @@ body.is-booting .touch-controls { display: none; }
 
 /* Docked beside a sheet or a bag (engine.setStageDock), the room the canvas leaves is the dark band (G880). */
 :root.phone-layout[data-ui="modern"] #game-root[data-stage-docked] { background-color: var(--c-grey-29); }
+/* #738 (an iPhone sideways, the Home Screen app; Austin's ruling 2026-11-26): beside a sideways half sheet's
+   column (Quests, Social, the Menu and its side sheets, js/ui/phone-layout.js) the room the street leaves,
+   above and below the card and under the camera cut-out, is the page's surface, not the dark band: in the
+   dark it read as an overlay over the street. The caption's white words standing over it take the darker
+   halo they take over a light sky. */
+:root.phone-layout[data-ui="modern"][data-phone-sheet="half"] #game-root[data-stage-docked="left"] { background-color: var(--surface); }
+:root.phone-layout[data-ui="modern"][data-phone-sheet="half"] #game-root[data-stage-docked="left"] #street-nameplate {
+  text-shadow: 0 0 2px color-mix(in srgb, var(--c-black) 85%, transparent), 0 1px 3px color-mix(in srgb, var(--c-black) 75%, transparent), 0 0 10px color-mix(in srgb, var(--c-black) 55%, transparent);
+}
 /* The buff strip (Austin's iPhone 2026-11-24, upright: a buff chip lay over the stats and the start of
    the street's name; its top never took the top inset): its own slot from js/ui/phone-layout.js, under
    the caption at the left (under the pills sideways, beside a sideways half sheet), the chips wrapping

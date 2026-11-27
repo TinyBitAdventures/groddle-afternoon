@@ -5871,7 +5871,7 @@
     }
    ],
    "why": "R1: every phone HUD piece placed itself against a few neighbours and they overlapped; Glitch only ran on computers.",
-   "ruling": "Austin 2026-11-23 (G1194, root R1): direction C, Glitch-like compact, on the shared region model",
+   "ruling": "Austin 2026-11-23 (G1194, root R1): direction C, Glitch-like compact, on the shared region model; 2026-11-26 (#738): keep the street docked beside the sideways column, the column's card inside the safe-area inset, the room beside it the page's surface colour, not the dark band",
    "rows": [
     "G1194"
    ]
