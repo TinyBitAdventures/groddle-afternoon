@@ -2814,9 +2814,39 @@
   "deployed": "2026-11-26"
  },
  "git": {
-  "commits": 3775,
+  "commits": 3784,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-27",
+    "kind": "fix",
+    "text": "The Magic Rock's New Quest card stays below an upright iPhone's clock, and the Hi sign board and Calendar rise over it"
+   },
+   {
+    "date": "2026-11-27",
+    "kind": "fix",
+    "text": "In Classic the pressed Furniture Store button looks pushed in, not just a different text colour"
+   },
+   {
+    "date": "2026-11-27",
+    "kind": "fix",
+    "text": "The vendor's purse line writes your currants with commas, as the prices above it do"
+   },
+   {
+    "date": "2026-11-27",
+    "kind": "improve",
+    "text": "Every price in the game reads the number then ₡: storage tags, the storage store, halls, parties, tithes and hires"
+   },
+   {
+    "date": "2026-11-27",
+    "kind": "fix",
+    "text": "The hall's waiting area reaches the last two chairs and the Please Wait stand, and its prompt points the right way"
+   },
+   {
+    "date": "2026-11-27",
+    "kind": "fix",
+    "text": "A street tree keeps its own picture while its new fruit count loads, instead of flashing a full tree after each harvest"
+   },
    {
     "date": "2026-11-26",
     "kind": "improve",
@@ -2906,39 +2936,9 @@
     "date": "2026-11-26",
     "kind": "fix",
     "text": "A Jellisac Super Harvest shows the Super Harvest rainbow and plays its sound"
-   },
-   {
-    "date": "2026-11-26",
-    "kind": "fix",
-    "text": "Whole street fits the phone's street band, and opening the Menu keeps the zoom you chose"
-   },
-   {
-    "date": "2026-11-26",
-    "kind": "fix",
-    "text": "Sideways, Quests, Social and the Menu stay clear of the camera cut-out, with no dark room beside them"
-   },
-   {
-    "date": "2026-11-26",
-    "kind": "new",
-    "text": "Older reports at the end of your Reports list loads the reports past the first 200"
-   },
-   {
-    "date": "2026-11-26",
-    "kind": "fix",
-    "text": "The Bureaucratic Hall's lizards call you by your name online, not \"Ur\""
-   },
-   {
-    "date": "2026-11-26",
-    "kind": "fix",
-    "text": "You stand on the floor of the Bureaucratic Hall and other built rooms again"
-   },
-   {
-    "date": "2026-11-26",
-    "kind": "fix",
-    "text": "A street's Notice Board keeps its pinned notes while the window waits on Play here"
    }
   ]
  },
- "tests": 1462,
- "generatedAt": "2026-11-26"
+ "tests": 1463,
+ "generatedAt": "2026-11-27"
 }
