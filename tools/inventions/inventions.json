@@ -6315,6 +6315,24 @@
    "rows": []
   },
   {
+   "id": "bureaucratic-hall-wait-prompt-follows-you",
+   "title": "The hall's \"Please move into the waiting area\" prompt points at the area from either side and turns round if you walk past it",
+   "kind": "behaviour",
+   "status": "proposed",
+   "where": [
+    {
+     "file": "public/js/bureaucratic-hall.js",
+     "symbol": "waitPromptFor"
+    },
+    {
+     "file": "public/js/bureaucratic-hall.js",
+     "symbol": "createHallFlow"
+    }
+   ],
+   "why": "Glitch picked left or right once, at the greeting, by the -220 line inside its own waiting area (npc_bureaucrat.js 433-438). Ours spans the eight chairs (#734), so the prompt points at the area from whichever side you stand and is replaced when you cross past it.",
+   "rows": []
+  },
+  {
    "id": "house-floor-holes",
    "title": "Holes in an upper house floor: the Shortcut to Urth crack and the Manhole rugs drop you to the floor below",
    "kind": "behaviour",

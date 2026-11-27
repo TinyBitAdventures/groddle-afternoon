@@ -2,7 +2,9 @@
  * #734 (Austin 2026-11-27): the Bureaucratic Hall's decos as the 2012 footage shows them. Eight
  * waiting chairs (the backdrop's six and two more by the counter's dividing wall, copied from the
  * backdrop's own chair), and the signs, the TV, the lights and the glass doors where the original
- * hung them. The positions are stage pixels on bureaucratic_hall_bg (2212 x 700).
+ * hung them. The positions are stage pixels on bureaucratic_hall_bg (2212 x 700). The waiting
+ * area runs to the last chair (the Please Wait stand inside it), and the greeting's prompt points
+ * at the area from wherever you stand.
  * Run: node --test tests/hall-decos-734.test.js
  */
 import { describe, it } from 'node:test';
@@ -10,7 +12,7 @@ import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { HALL, HALL_DECOS, HALL_EXIT_DOOR_Y, HALL_EXTRA_CHAIRS } from '../public/js/bureaucratic-hall.js?v=f79567fd';
+import { HALL, HALL_DECOS, HALL_EXIT_DOOR_Y, HALL_EXTRA_CHAIRS, HALL_LAYOUT, HALL_TEXT, createHallFlow, inWaitingArea, waitPromptFor } from '../public/js/bureaucratic-hall.js?v=5e28f221';
 import { CHAIR_PATHS } from '../tools/interrogation/build-chair.mjs';
 import { PAINTED_CHAIR_BOX } from '../tools/bureaucratic-hall/build-chairs.mjs';
 
@@ -116,5 +118,95 @@ describe('#734 the hall decos follow the 2012 footage', () => {
     assert.doesNotMatch(draw, /deco\('bureaucratic_hall_(sign_1|tv_1|light_1)', \d/, 'no hand-placed signs left');
     const feature = pub('js/features/bureaucratic-halls-feature.js');
     assert.match(feature, /door\.position\.set\(EXIT_X, HALL_EXIT_DOOR_Y\);/);
+  });
+});
+
+/** The visit's host, enough for the greeting and the walk to the area. */
+function host() {
+  const prompts = [];
+  const removed = [];
+  const pos = { x: HALL_LAYOUT.arrival.x, y: HALL.ground };
+  let answer = null;
+  return {
+    pos,
+    prompts,
+    removed,
+    answer: async (value) => {
+      answer(value);
+      await new Promise((r) => setImmediate(r));
+    },
+    host: {
+      now: () => 1000,
+      player: () => pos,
+      pcLabel: () => 'Ur',
+      clerkCount: 4,
+      clerkLabel: (i) => `Clerk ${i}`,
+      drawClerk() {},
+      say() {},
+      converse: () => new Promise((resolve) => { answer = resolve; }),
+      prompt: (opts) => {
+        prompts.push(opts.text);
+        return `p${prompts.length}`;
+      },
+      removePrompt: (uid) => removed.push(uid),
+      applyBuff() {},
+      removeBuff() {},
+      acting: () => false,
+      learned: () => [],
+      achievements: () => [],
+      buy: () => 'ok',
+      setData() {},
+      rng: () => 0,
+    },
+  };
+}
+
+describe('#734 the waiting area reaches the eight chairs and the Please Wait stand', () => {
+  it('the area runs from the tipped chair to the last chair, the stand inside', () => {
+    const lastChairRight = HALL_EXTRA_CHAIRS.x + HALL_EXTRA_CHAIRS.w;
+    assert.deepEqual([...HALL_LAYOUT.waitingArea], [647, lastChairRight]);
+    for (const x of [PAINTED.three[2] + HALL_EXTRA_CHAIRS.dx[0], PAINTED.three[2] + HALL_EXTRA_CHAIRS.dx[1], at('bureaucratic_hall_sign_wait_1').x]) {
+      assert.ok(inWaitingArea(x), `x ${x} is in the waiting area`);
+    }
+    assert.ok(lastChairRight < DIVIDING_WALL_X && lastChairRight < HALL_LAYOUT.greetMin, 'it stops at the dividing wall, short of the counter');
+  });
+
+  it('the prompt points at the area from either side of it', () => {
+    assert.equal(waitPromptFor(HALL_LAYOUT.arrival.x), HALL_TEXT.waitRight);
+    assert.equal(waitPromptFor(HALL_LAYOUT.waitingArea[0] - 1), HALL_TEXT.waitRight);
+    assert.equal(waitPromptFor(HALL_LAYOUT.waitingArea[1] + 1), HALL_TEXT.waitLeft);
+    assert.equal(waitPromptFor(HALL_LAYOUT.greetMin), HALL_TEXT.waitLeft);
+  });
+
+  it('standing at the stand ends go_wait: Please Wait starts there', async () => {
+    const h = host();
+    const flow = createHallFlow(h.host);
+    flow.tick(16);
+    flow.hurryClerks();
+    flow.tick(16);
+    await h.answer('greeting-ok');
+    assert.equal(flow.state.waiting, true);
+    h.pos.x = at('bureaucratic_hall_sign_wait_1').x;
+    flow.tick(16);
+    assert.equal(flow.state.waiting, false, 'the stand is in the waiting area');
+    assert.equal(flow.state.buffOn, true, 'Please Wait');
+  });
+
+  it('walk past the area while sent to it and the prompt turns round', async () => {
+    const h = host();
+    const flow = createHallFlow(h.host);
+    flow.tick(16);
+    flow.hurryClerks();
+    flow.tick(16);
+    await h.answer('greeting-ok');
+    assert.deepEqual(h.prompts, [HALL_TEXT.waitRight]);
+    // Past the area on the counter side (jumped or ran through): now it is to your left.
+    h.pos.x = HALL_LAYOUT.greetMin;
+    flow.tick(16);
+    assert.deepEqual(h.prompts, [HALL_TEXT.waitRight, HALL_TEXT.waitLeft]);
+    assert.deepEqual(h.removed, ['p1'], 'the old prompt goes');
+    flow.tick(16);
+    assert.equal(h.prompts.length, 2, 'once per turn, not every frame');
+    assert.equal(flow.state.waiting, true);
   });
 });

@@ -185,10 +185,12 @@
   "public/js/bureaucratic-hall.js": {
     "ours: * 700 - 128 = 572. The two hitboxes are lost: ours are the desk room": "ours-bureaucratic-hall",
     "ours: * The room (ours, from Tiny Speck's art): the hall's location XML": "ours-bureaucratic-hall",
+    "ours: * fell inside Glitch's waiting area; ours (#734) points at the area itself from either": "bureaucratic-hall-wait-prompt-follows-you",
     "ours: * once you held its badge; ours sells it to badge holders too (G1180, as": "bureaucracy-card-for-badge-holders",
+    "ours: * waiting_area (ours): the floor in front of the chairs, from the": "ours-bureaucratic-hall",
     "ours: /** The counter's left end (ours, just right of the helpers' limit).": "ours-bureaucratic-hall",
     "ours: /** bureaucratic_hall_entered (ours): the desk room, left of the partition at x 625.": "ours-bureaucratic-hall",
-    "ours: /** waiting_area (ours): the floor in front of the chairs (backdrop x": "ours-bureaucratic-hall",
+    "ours: // #734 (ours): walk past the area while told to go there and": "bureaucratic-hall-wait-prompt-follows-you",
     "ours: The glass doors on the desk room's side wall (ours).": "ours-bureaucratic-hall",
     "ours: promised next and never reached is let go (ours).": "ours-bureaucratic-hall",
     "ours: the back line; out on the floor, at the floor (ours).": "ours-bureaucratic-hall",

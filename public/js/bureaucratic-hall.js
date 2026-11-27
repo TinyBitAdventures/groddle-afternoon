@@ -81,8 +81,12 @@ export const HALL_LAYOUT = Object.freeze({
   exitX: 72,
   /** bureaucratic_hall_entered (ours): the desk room, left of the partition at x 625. */
   enteredBox: Object.freeze([0, 625]),
-  /** waiting_area (ours): the floor in front of the chairs (backdrop x 647-1233). */
-  waitingArea: Object.freeze([647, 1233]),
+  /**
+   * waiting_area (ours): the floor in front of the chairs, from the tipped one (backdrop x 647)
+   * to the right edge of the last of the eight (#734: HALL_EXTRA_CHAIRS ends at 1451), so the
+   * Please Wait stand in front of it (1382) is inside too.
+   */
+  waitingArea: Object.freeze([647, 1451]),
   /** npc_bureaucrat.js 433: left of -220 you are sent right, else left. */
   waitingLine: hallX(-220),
   /** greeting_onEnter: max(pc.x + 100, 384). */
@@ -345,9 +349,17 @@ export function fillHallText(text, { pcLabel = '', item = null, bureaucrat = '',
   return out.replace(/{pc_label}/g, pcLabel);
 }
 
-/** Which way the greeting's prompt sends you (npc_bureaucrat.js 433-438). */
+/**
+ * Which way the greeting's prompt sends you. npc_bureaucrat.js 433-438 split at the -220 line, which
+ * fell inside Glitch's waiting area; ours (#734) points at the area itself from either side of it,
+ * and keeps the source's line only inside it (where the area takes you at once anyway).
+ */
 export function waitPromptFor(playerX) {
-  return Number(playerX) < HALL_LAYOUT.waitingLine ? HALL_TEXT.waitRight : HALL_TEXT.waitLeft;
+  const x = Number(playerX);
+  const [l, r] = HALL_LAYOUT.waitingArea;
+  if (x < l) return HALL_TEXT.waitRight;
+  if (x > r) return HALL_TEXT.waitLeft;
+  return x < HALL_LAYOUT.waitingLine ? HALL_TEXT.waitRight : HALL_TEXT.waitLeft;
 }
 
 export const inWaitingArea = (x) => x >= HALL_LAYOUT.waitingArea[0] && x <= HALL_LAYOUT.waitingArea[1];
@@ -398,6 +410,7 @@ export function createHallFlow(host, { script = null, start = null, shared = nul
     started: false, // pc['!bureaucracy_started']
     waiting: false, // pc['!bureaucracy_waiting']
     waitPrompt: '', // pc['!bureaucracy_waiting_prompt']
+    waitText: '', // #734: which way that prompt points
     step: 0, // pc['!bureaucracy_step']
     item: null, // pc['!bureaucracy_item']
     helperIndex: -1, // pc['!bureaucracy_helper']
@@ -546,6 +559,7 @@ export function createHallFlow(host, { script = null, start = null, shared = nul
     if (answer === 'greeting-ok' || answer === null) {
       v.waiting = true;
       const text = waitPromptFor(host.player().x);
+      v.waitText = text;
       v.waitPrompt = host.prompt({ text, choices: [{ label: 'OK', value: 'ok' }] }) || '';
       setPhase('go_wait', text === HALL_TEXT.waitRight ? 'wait:right' : 'wait:left');
     }
@@ -845,6 +859,16 @@ export function createHallFlow(host, { script = null, start = null, shared = nul
             v.started = true;
             greet(c);
           }
+        }
+      }
+      // #734 (ours): walk past the area while told to go there and the prompt turns round with you.
+      if (v.waiting && v.waitPrompt && !inWaitingArea(p.x)) {
+        const text = waitPromptFor(p.x);
+        if (text !== v.waitText) {
+          host.removePrompt?.(v.waitPrompt);
+          v.waitText = text;
+          v.waitPrompt = host.prompt({ text, choices: [{ label: 'OK', value: 'ok' }] }) || '';
+          setPhase('go_wait', text === HALL_TEXT.waitRight ? 'wait:right' : 'wait:left');
         }
       }
       // waiting_area (only while flagged waiting).
