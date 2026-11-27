@@ -72,7 +72,7 @@
 
 import { addItem, countItem, ITEM_CATALOG } from '../inventory.js?v=3be7988a';
 import { exposeQA } from '../qa-gate.js?v=f4e2cd82';
-import { ENDED_STATES, NO_REALTIME_STATES, answerWaitMs, createOnlineRequests, sharedOffline, waitLine } from '../online-request.js?v=dac938db';
+import { ENDED_STATES, NO_REALTIME_STATES, answerWaitMs, createOnlineRequests, sharedOffline, waitLine } from '../online-request.js?v=f4d87a22';
 import { saveStore, savedThrough } from '../save-store.js?v=1ccb1d6b';
 import { patchesFeature } from './patches-feature.js?v=36616769';
 import {

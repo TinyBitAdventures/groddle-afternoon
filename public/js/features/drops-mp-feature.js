@@ -69,7 +69,7 @@ import { createMinnAccount } from '../minn-account.js?v=7e3d7279';
 import { saveStore, savedThrough } from '../save-store.js?v=1ccb1d6b';
 import { ownGroundRows } from '../ground-stacks.js?v=22792362';
 import { pileMaxOf } from '../world-items.js?v=93313aad';
-import { offlineLine, sharedOffline } from '../online-request.js?v=dac938db';
+import { PLAY_HERE_STATES, offlineLine, sharedOffline } from '../online-request.js?v=f4d87a22';
 import { DROP_OP, DROP_QUEUE_MAX, DROP_TEXT, bucketTake, dropEffect, dropRefusalText, eatenStack, groundFrom, homePlaceOf, isFloorPlace, isPublicStreet, likeSharedStack, normalizeGroundStack, normalizeItem, normalizeMine, pickupAsk, pigAnimalKey, shareReason, stackAt, stackLeft } from '../drops-mp.js?v=351593a6';
 
 export const DROPS_MP_FEATURE_ID = 'drops-mp';
@@ -77,12 +77,12 @@ const TABLE_URL = 'assets/content/trade-items.json';
 const SYNC_EVERY_MS = 60000;
 const WAIT_MS = 15000;
 /**
- * #733 (Austin's ruling 2026-11-27): states where the window waits on Play here (realtime-feature
- * shows the button for these). The floor last seen stays drawn, not interactive, until Play here;
- * Glitch asked for a reload after a long silence and never emptied the room (NetController.as
- * 596-603). A drop that reconnects by itself still clears and re-syncs on hello.
+ * #733 (Austin's ruling 2026-11-27): states where the window waits on Play here (js/online-request.js
+ * PLAY_HERE_STATES). The floor last seen stays drawn, not interactive, until Play here; Glitch asked
+ * for a reload after a long silence and never emptied the room (NetController.as 596-603). A drop
+ * that reconnects by itself still clears and re-syncs on hello.
  */
-export const PLAY_HERE_STATES = Object.freeze(new Set(['asleep', 'replaced']));
+export { PLAY_HERE_STATES };
 
 let multiplayer = false;
 
@@ -1042,6 +1042,17 @@ export const dropsMpFeature = {
   sharedPickup(target, engine, count) {
     if (!multiplayer || !session || engine?.mode !== 'multiplayer') return null;
     return session.pickup(target, count);
+  },
+
+  /**
+   * game.js beginVerbAction, and the verb menu while the window waits on Play here: a shared floor
+   * stack is not picked up while this page is not online (pickup says the same after the swing).
+   */
+  verbRefusedNow(target, verbId, engine) {
+    if (verbId !== 'pickup' || !multiplayer || !session || engine?.mode !== 'multiplayer') return null;
+    const id = String(target?.state?.id || target?.worldItemId || '');
+    if (!DROP_OP.test(id) || session.client.state === 'online') return null;
+    return offlineLine(session.client);
   },
 
   /** R50 (homes-feature Decoration Mode): the owner moved a shared stack; it is set down in their save when the site says it moved. */

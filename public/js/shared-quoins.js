@@ -22,7 +22,7 @@
  * player standing in it does not ask every frame.
  */
 
-import { NO_REALTIME_STATES } from './online-request.js?v=dac938db';
+import { NO_REALTIME_STATES } from './online-request.js?v=f4d87a22';
 
 /**
  * G1306 (Austin's ruling 2026-11-25): the realtime states in which a street's quoins follow the solo

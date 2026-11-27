@@ -75,6 +75,7 @@ import { publicStreet } from '../shared-street.js?v=dce5694b';
 import { anchorBottomCentre } from '../sprite-feet.js?v=849541a8';
 import { NAMEPLATE_STYLE } from '../world-text.js?v=6b49f88c';
 import { PUBLIC_HIDE } from '../public-picture.js?v=1a0b03fa';
+import { PLAY_HERE_STATES } from '../online-request.js?v=f4d87a22';
 
 export const REALTIME_FEATURE_ID = 'realtime';
 /** Lines kept in the chat log. */
@@ -132,6 +133,32 @@ export const ASLEEP_TEXT = Object.freeze({
   state: 'This window was asleep',
   note: 'This window was asleep. Play here?',
 });
+
+/** #733: what a greyed emote says while the window waits on Play here. */
+export const PLAY_HERE_TIP = 'Press Play here to play in this window again';
+
+/**
+ * #733 (Austin 2026-11-27): while the window waits on Play here (js/online-request.js
+ * PLAY_HERE_STATES) the emote buttons (and a phone's Hi) reach nobody, the client having left every
+ * street: they are greyed with PLAY_HERE_TIP, so Play here is the one thing to press. Back online,
+ * each gets its own tip back.
+ */
+export function greyForPlayHere(buttons, state) {
+  const waiting = PLAY_HERE_STATES.has(state);
+  for (const b of buttons || []) {
+    if (Boolean(b.disabled) === waiting) continue;
+    b.disabled = waiting;
+    if (waiting) {
+      b.dataset.playHereTitle = b.getAttribute('title') || '';
+      b.setAttribute('title', PLAY_HERE_TIP);
+    } else if (b.dataset.playHereTitle !== undefined) {
+      if (b.dataset.playHereTitle) b.setAttribute('title', b.dataset.playHereTitle);
+      else b.removeAttribute('title');
+      delete b.dataset.playHereTitle;
+    }
+  }
+  return waiting;
+}
 
 /** The pill's words for a client state (plain remake copy, no em-dashes). */
 export function statusText(state, { here = 0, attempt = 0 } = {}) {
@@ -215,6 +242,9 @@ const STYLE = `
 .mp-log li b { color: var(--c-violet-50); }
 .mp-log li.is-note { color: var(--text-muted); font-style: italic; }
 .mp-log .mp-emotes { display: flex; gap: 0.3rem; flex-wrap: wrap; margin-top: var(--sp-3); }
+.mp-emotes button:disabled { opacity: 0.45; cursor: not-allowed; }
+.social-status-slot [data-realtime-play-here] { min-height: 28px; padding: 0 var(--sp-5); border: 1px solid var(--accent); border-radius: var(--radius-pill); background: var(--accent); color: var(--accent-text); font: inherit; font-size: var(--fs-sm); font-weight: 800; cursor: pointer; }
+.social-status-slot [data-realtime-play-here][hidden] { display: none; }
 .mp-log .mp-emotes button { font: 600 var(--fs-xs)/var(--lh-snug) var(--font-system); border: 0; border-radius: var(--radius-pill); padding: 0.2rem var(--sp-5); cursor: pointer; color: var(--text-moss); background: var(--surface-moss); box-shadow: inset 0 0 0 1px var(--c-lime-85); }
 `;
 
@@ -331,7 +361,8 @@ function createSession(engine) {
     const s = client.state;
     pill.dataset.state = s === 'connecting' && client.attempt > 0 ? 'offline' : s;
     pill.textContent = statusText(s, { here: client.here, attempt: client.attempt });
-    hereBtn.hidden = s !== 'replaced' && s !== 'asleep';
+    hereBtn.hidden = !PLAY_HERE_STATES.has(s);
+    greyForPlayHere(emoteRow.querySelectorAll('button'), s);
     social?.refresh();
     engine.setData?.('realtimeState', s);
     engine.setData?.('realtimeHere', String(client.here));

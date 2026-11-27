@@ -58,6 +58,14 @@ export const RECONNECTING_LINE = 'Reconnecting...';
 export const NO_REALTIME_STATES = Object.freeze(new Set(['off']));
 /** G1306: states the client does not leave by itself (realtime-feature says why); never "Reconnecting...". */
 export const ENDED_STATES = Object.freeze(new Set(['off', 'signed-out', 'replaced', 'other-character', 'booted', 'suspended', 'asleep']));
+/**
+ * #733 (Austin's ruling 2026-11-27): the states where the window waits on Play here: another window
+ * took over ('replaced') or this one slept ('asleep', #670). realtime-feature shows the button for
+ * these; the floor and boards last seen stay drawn (drops-mp, boards-mp), and what cannot act is
+ * greyed (game.js menuVerbsFor, realtime-feature's emotes). Glitch asked for a reload
+ * (NetController.as 596-603).
+ */
+export const PLAY_HERE_STATES = Object.freeze(new Set(['asleep', 'replaced']));
 /** G1306: a shared act refused while this page cannot reach the street and will not by itself (home-machines.js offline). */
 export const OFFLINE_LINE = 'You need to be online to do that.';
 

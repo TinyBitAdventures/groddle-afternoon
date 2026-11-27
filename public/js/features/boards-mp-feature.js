@@ -29,19 +29,19 @@ import { createMinnAccount } from '../minn-account.js?v=7e3d7279';
 import { saveStore, savedThrough } from '../save-store.js?v=1ccb1d6b';
 import { BOARD_MP_TEXT, BOARD_NOTE_ID, boardFrom, carriedFromBoard, normalizeBoardNote, normalizeMineBoard, pinPayload, sameWords } from '../boards-mp.js?v=ba766683';
 // The same key as features/index.js: one module instance holds the carried notes and draws the boards.
-import { carriedNoteList, giveCarriedNote, refreshSharedBoards, takeCarriedNote } from './street-furniture-feature.js?v=b738d795';
+import { carriedNoteList, giveCarriedNote, refreshSharedBoards, takeCarriedNote } from './street-furniture-feature.js?v=fb5a247b';
 import { noteContent } from '../street-furniture.js?v=071203fc';
+import { PLAY_HERE_STATES } from '../online-request.js?v=f4d87a22';
 
 export const BOARDS_MP_FEATURE_ID = 'boards-mp';
 const SYNC_EVERY_MS = 60000;
 const WAIT_MS = 15000;
 const NOTE = 'note';
 /**
- * #733 (Austin's ruling 2026-11-27): states where the window waits on Play here (realtime-feature
- * shows the button for these). The board last seen keeps its notes drawn and readable; pin and take
- * are refused until Play here. A drop that reconnects by itself still clears and re-reads on hello.
+ * #733 (Austin's ruling 2026-11-27): while the window waits on Play here (js/online-request.js
+ * PLAY_HERE_STATES) the board last seen keeps its notes drawn and readable; pin and take are refused
+ * until Play here. A drop that reconnects by itself still clears and re-reads on hello.
  */
-const PLAY_HERE_STATES = new Set(['asleep', 'replaced']);
 
 let multiplayer = false;
 

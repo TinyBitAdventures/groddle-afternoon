@@ -111,8 +111,8 @@ import { createCountChooser } from '../ui/count-chooser.js?v=75f69512';
 import { createTilePainter } from '../ui/style-tile-paint.js?v=d0e1312b';
 import { isBagClass } from '../pack-slots.js?v=38e4aea5';
 import { registerDropTarget } from '../drop-targets.js?v=59e6edb4';
-import { showWorldDropTip } from './world-drop-feature.js?v=df9fde3f';
-import { DRAG_TAKE_SOON_MS, draggedCount, draggedStack, markDragged, takeDragged } from '../drag-stack.js?v=e0138d76';
+import { showWorldDropTip } from './world-drop-feature.js?v=380c0a8e';
+import { DRAG_TAKE_SOON_MS, draggedCount, draggedStack, markDragged, takeDragged } from '../drag-stack.js?v=9a24e5c4';
 import { createCombobox } from '../combobox.js?v=d43209e8';
 import {
   CULTIVATION_CLASSES,

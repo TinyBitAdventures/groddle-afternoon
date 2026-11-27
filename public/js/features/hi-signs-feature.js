@@ -66,10 +66,10 @@
  */
 
 import { isPhoneDevice } from '../touch-controls.js?v=8bc690ac';
-import { butlerApi } from './butler-feature.js?v=d339386a';
+import { butlerApi } from './butler-feature.js?v=aefd8360';
 import { gainMetabolic, metabolicGain, moodMax } from '../metabolics.js?v=48f784bf';
 import { frameTexture, sourceFromUrl } from '../textures.js?v=b8e38103';
-import { offlineLine } from '../online-request.js?v=dac938db';
+import { offlineLine } from '../online-request.js?v=f4d87a22';
 import {
   HI,
   HI_BUTLER_ID,

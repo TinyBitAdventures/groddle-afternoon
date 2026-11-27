@@ -12,8 +12,8 @@
 import assert from 'node:assert/strict';
 import { afterEach, beforeEach, describe, it } from 'node:test';
 
-import { OFFLINE_LINE, RECONNECTING_LINE } from '../public/js/online-request.js?v=dac938db';
-import { streetObjectsFeature } from '../public/js/features/street-objects-feature.js?v=841cb1ef';
+import { OFFLINE_LINE, RECONNECTING_LINE } from '../public/js/online-request.js?v=f4d87a22';
+import { streetObjectsFeature } from '../public/js/features/street-objects-feature.js?v=0c28e3f6';
 import { heliKittiesFeature } from '../public/js/features/heli-kitties-feature.js?v=9d7a6e66';
 import { crabsFeature } from '../public/js/features/crabs-feature.js?v=69b0fef3';
 import { fireDragonFeature } from '../public/js/features/fire-dragon-feature.js?v=76e632e5';

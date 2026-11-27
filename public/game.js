@@ -4,7 +4,7 @@
  */
 import { ITEM_ICONS, ITEM_LABELS, getVerbsFor, ordinaryItems, runVerb } from './content.js?v=9c775db5';
 import { createErrorOnce, createFeatureHost, createFrameStages } from './js/feature-host.js?v=b87e2cbc';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=58733213';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=45d97e6b';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, enterHintPick, hoverText, stackHoverLabel, groupHead, hoverRimShown, reachGlowTargets, spriteHasRimArt, rimArtParts, trimmedIconUrl, drawTileArt } from './js/enter-chooser.js?v=297c6d15';
 import { firstTendKey, STICK_TEND_DELAY_MS, STICK_TEND_DIRS, STICK_TEND_REPEAT_MS, stepTendKey, stepTendKeys, stickTendKey, tendKeyAction } from './js/garden-tend.js?v=a7470c4a';
 import { avatarHitBox, behindFloor, bodyReachDistance, OUT_OF_REACH_LINE, playerClickBox } from './js/reach.js?v=456da8a8';
@@ -1151,6 +1151,7 @@ import { contextNeedsResume, createAudioResumer } from './js/audio-resume.js?v=4
 import { backgroundSound, backgroundSoundOn } from './js/background-sound.js?v=d40d26b7';
 import { bubbleMs } from './js/read-time.js?v=3151fb1a';
 import { mountNotifyView } from './js/notify-view.js?v=1ff8a878';
+import { PLAY_HERE_STATES } from './js/online-request.js?v=f4d87a22';
 import { mountSocialDrawer } from './js/ui/social-drawer.js?v=a45b925c';
 import { installPhonePill, mountPhoneLayout, socialPillCount } from './js/ui/phone-layout.js?v=7ebe8992';
 import { bindChatLinks } from './js/chat-links.js?v=b717fac7';
@@ -9920,7 +9921,22 @@ function menuVerbsFor(target) {
   }), engine);
   // Another player you block (buddies-feature realtimeHidden): only the rows Glitch kept (js/ui/player-menu.js).
   if (target?.classId === 'pc_remote' && target.playerId && features.query('realtimeHidden', Number(target.playerId), engine)) return blockedPlayerVerbs(verbs);
-  return verbs;
+  return playHereVerbs(target, verbs);
+}
+
+/**
+ * #733 (Austin 2026-11-27): while the window waits on Play here (another window took over, or this
+ * one slept: js/online-request.js PLAY_HERE_STATES), a verb a feature would refuse now
+ * (verbRefusedNow: a shared tree, rock, animal, Patch, garden or floor stack, "You need to be online
+ * to do that.") is greyed with that line, instead of offered as if it worked and refused after.
+ */
+function playHereVerbs(target, verbs) {
+  if (!PLAY_HERE_STATES.has(features.query('realtimeClient', engine)?.state) || !Array.isArray(verbs)) return verbs;
+  return verbs.map((v) => {
+    if (!v?.enabled) return v;
+    const line = features.query('verbRefusedNow', target, v.id, engine);
+    return line ? { ...v, enabled: false, reason: line } : v;
+  });
 }
 
 function openVerbMenu(target) {

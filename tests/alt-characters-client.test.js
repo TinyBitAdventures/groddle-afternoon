@@ -18,11 +18,11 @@ import { CHARACTER_CHANGED, CHARACTER_CHANGED_EVENT, CHARACTER_HEADER, character
 import { createMinnAccountCore } from '../public/js/minn-account-core.js?v=5baee954';
 import { createSaveSync } from '../public/js/save-store.js?v=1ccb1d6b';
 import { CLOSE_OTHER_CHARACTER, createRealtimeClient } from '../public/js/realtime-client.js?v=eb1515a8';
-import { OTHER_CHARACTER_TEXT, statusText } from '../public/js/features/realtime-feature.js?v=5f3320d1';
+import { OTHER_CHARACTER_TEXT, statusText } from '../public/js/features/realtime-feature.js?v=fbc1ba77';
 import { CHARACTER_COPY, FRESH_HASH, SAVE_ALERT_COPY, characterChoices, continuesAs, createRefusalText, saveAlertFor } from '../public/js/online-boot.js?v=a0f37b71';
 import { SWITCHER_COPY, STYLE as SWITCHER_STYLE, cardUrl, popoverPlace, switcherChoices } from '../public/js/character-switcher.js?v=ae702217';
-import { LOCAL_STATES } from '../public/js/shared-quoins.js?v=32ec999a';
-import { offlineLine, sharedOffline } from '../public/js/online-request.js?v=dac938db';
+import { LOCAL_STATES } from '../public/js/shared-quoins.js?v=85bef22c';
+import { offlineLine, sharedOffline } from '../public/js/online-request.js?v=f4d87a22';
 import { menuRowFor } from '../public/js/ui/topbar.js?v=7c194020';
 
 const root = join(import.meta.dirname, '..');
