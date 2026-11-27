@@ -27,7 +27,7 @@ const inventory = await import('../public/js/inventory.js?v=3be7988a');
 const buffs = await import('../public/js/buffs.js?v=09184e60');
 const { stockUseVerb } = await import('../public/js/stock-use.js?v=6b422ccf');
 const { createFeatureHost } = await import('../public/js/feature-host.js?v=b87e2cbc');
-const { FEATURES } = await import('../public/js/features/index.js?v=92065871');
+const { FEATURES } = await import('../public/js/features/index.js?v=0dc2ea44');
 const { snoConesFeature } = await import('../public/js/features/sno-cones-feature.js?v=aea8620b');
 const { cropClasses, dishClasses, layableKind, STUFFING, STUFFING_ITEM } = await import('../public/js/pot-luck-feast.js?v=971888be');
 const { FEAST_DAY_LINES } = await import('../public/js/feast-day.js?v=29d69db5');

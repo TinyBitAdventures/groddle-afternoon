@@ -79,6 +79,7 @@ import { BUREAUCRAT_CLASS, HALL, HALL_EXIT_DOOR_Y, HALL_LAYOUT, HALL_TEXT, PLEAS
 import { closeQuestRoomConverse, questRoomConverse } from './quest-instances-feature.js?v=c8dd7fd7';
 import { HALL_MP_TEXT, HALL_POSE_MS, clerkAt, clerkRow, poseChanged } from '../halls-mp.js?v=044b5c5a';
 import { standOnFeet } from '../sprite-feet.js?v=849541a8';
+import { pcLabel } from '../pc-label.js?v=e19212a2';
 
 export const HALLS_FEATURE_ID = 'bureaucratic-halls';
 export const HALL_ENTER_VERB = 'hall_enter';
@@ -236,7 +237,7 @@ function hallHost(engine, targets, { label = 'Bureaucratic Hall', buy = null } =
   return {
     now: () => Date.now(),
     player: () => ({ x: Number(engine.player?.x) || 0, y: Number(engine.player?.y) || 0 }),
-    pcLabel: () => escapeHtml(engine.playerLabel || 'Ur'),
+    pcLabel: () => escapeHtml(pcLabel(engine)),
     clerkCount: targets.length,
     clerkLabel: (i) => targets[i]?.label || 'Bureaucrat',
     drawClerk: (i, pose) => poseClerk(targets[i]?.sprite, pose),

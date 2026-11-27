@@ -14,7 +14,8 @@
  * Second, the hall's lizards called the player "Ur": engine.playerLabel was always the player's
  * speech target's label, set once to 'Ur'. Glitch's {pc_label} is the player's name (items/item.js
  * 1054, npc_bureaucrat.js 425 "Attention, <name>!"). Online it is now the account name
- * (realtime-feature playerChatName); solo has no character name and keeps "Ur".
+ * (realtime-feature playerChatName). Solo has no character name, so the lizards say "friend", as
+ * the other solo speakers (conversations, Street Spirits, quests) do: one fallback, js/pc-label.js.
  * Run: node --test tests/r734-built-room-floors.test.js
  */
 import assert from 'node:assert/strict';
@@ -32,6 +33,8 @@ import { buildVoyageScene, VOYAGE_FLOOR, VOYAGE_H, VOYAGE_W } from '../public/js
 import { buildKidsRoomScene, KIDS_ROOM_FLOOR, KIDS_ROOM_H, KIDS_ROOM_W } from '../public/js/kids-room-scene.js?v=30860f0d';
 import * as kit from '../public/js/quest-rooms/kit.js?v=68db2a09';
 import { FakeEl, fakePixi } from './fake-scene.js';
+import { SOLO_PC_LABEL, pcLabel } from '../public/js/pc-label.js?v=e19212a2';
+import { offerBubble } from '../public/js/conversations.js?v=1c039467';
 
 const read = (p) => readFileSync(new URL(`../${p}`, import.meta.url), 'utf8');
 const game = read('public/game.js');
@@ -133,21 +136,30 @@ describe('#734 the world calls you by your name ({pc_label})', () => {
     { query: (hook) => (hook === 'playerChatName' ? chatName : null) }, {}, { name: 'Ur', label: 'Ur' },
   );
 
-  it('online the lizards say your account name; solo, with no character name, "Ur"', () => {
+  it('engine.playerLabel is your account name online; solo, with no character name, you are "Ur"', () => {
     assert.equal(playerLabel('Pickle'), 'Pickle');
     assert.equal(fillHallText('Attention, {pc_label}! When you’re ready?', { pcLabel: playerLabel('Pickle') }), 'Attention, Pickle! When you’re ready?');
     assert.equal(playerLabel(null), 'Ur');
   });
 
-  it('the hall, the loading card and the new-day bubble read engine.playerLabel', () => {
-    assert.match(read('public/js/features/bureaucratic-halls-feature.js'), /pcLabel: \(\) => escapeHtml\(engine\.playerLabel/);
+  it('the loading card and the new-day bubble show you as engine.playerLabel', () => {
     assert.match(game, /playerLabel: engine\.playerLabel,/);
     assert.match(game, /speaker: engine\.playerLabel,/);
   });
 
+  it('solo the lizards say "friend", the one solo fallback the other speakers share', () => {
+    const engine = (chatName) => ({ query: (hook) => (hook === 'playerChatName' ? chatName : null) });
+    assert.equal(SOLO_PC_LABEL, 'friend');
+    assert.equal(pcLabel(engine(null)), 'friend');
+    assert.equal(pcLabel(engine('Pickle')), 'Pickle');
+    assert.equal(fillHallText('Attention, {pc_label}! When you’re ready?', { pcLabel: pcLabel(engine(null)) }), 'Attention, friend! When you’re ready?');
+    assert.match(read('public/js/features/bureaucratic-halls-feature.js'), /pcLabel: \(\) => escapeHtml\(pcLabel\(engine\)\),/);
+    assert.match(offerBubble(0.99), /friend/i);
+  });
+
   it('online the call-out bubbles of conversations and street spirits say your name too', () => {
     for (const f of ['public/js/features/conversations-feature.js', 'public/js/features/street-spirits-feature.js']) {
-      assert.match(read(f), /offerBubble\(undefined, engine\.query\?\.\('playerChatName', engine\) \|\| 'friend'\)/, f);
+      assert.match(read(f), /offerBubble\(undefined, pcLabel\(engine\)\)/, f);
     }
   });
 });

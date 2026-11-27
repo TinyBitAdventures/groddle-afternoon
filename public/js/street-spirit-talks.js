@@ -45,6 +45,7 @@
  * The world side is features/street-spirits-feature.js.
  */
 
+import { SOLO_PC_LABEL } from './pc-label.js?v=e19212a2';
 import {
   CONVERSATION_RULES,
   CONVO_BUBBLE_CHOICES,
@@ -57,7 +58,7 @@ import {
   offerRules,
   offeredForClass,
   recordOffer,
-} from './conversations.js?v=ca848555';
+} from './conversations.js?v=1c039467';
 
 export { CONVO_BUBBLE_CHOICES };
 
@@ -300,6 +301,6 @@ export function talkBeats(id) {
 }
 
 /** The call-out bubble (js/conversations.js offerBubble). */
-export function offerBubble(pick = Math.random(), label = 'friend') {
+export function offerBubble(pick = Math.random(), label = SOLO_PC_LABEL) {
   return recordOfferBubble(pick, label);
 }

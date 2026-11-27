@@ -44,7 +44,7 @@ import {
   offerNext,
   offeredFor,
   talkBeats,
-} from '../public/js/street-spirit-talks.js?v=9706c05e';
+} from '../public/js/street-spirit-talks.js?v=e8f8ae1b';
 import { runVerb } from '../public/content.js?v=9c775db5';
 import { CONVERSATIONS } from '../public/js/conversations-data.js?v=f11b7e02';
 
@@ -524,7 +524,7 @@ test.describe('conversations against GameServerJS (G185)', () => {
     // conversations_login: once per load, the street's spirit in the source's 300 x 150 range.
     assert.match(feature, /function resumeTick\(engine, now\) \{[\s\S]*?resumeTarget\(record\(\), \{ street: engine\.streetTsid, player: engine\.player,[\s\S]*?startConversation\(engine, t, now, \{ id: st\.id, step: st\.step \}\);/);
     assert.match(feature, /shrinesDoneAt: questDoneAt\(engine\.questState \|\| \{\}, TALK_RULES\.shrineQuest\)/);
-    assert.match(feature, /engine\.say\(t, offerBubble\(undefined, engine\.query\?\.\('playerChatName', engine\) \|\| 'friend'\), TALK_RULES\.bubbleMs\);/);
+    assert.match(feature, /engine\.say\(t, offerBubble\(undefined, pcLabel\(engine\)\), TALK_RULES\.bubbleMs\);/);
     // The ledger is the shared record (js/conversations.js); the old saved slice is handed over on restore.
     assert.match(feature, /const record = \(\) => conversationRecord\(\);/);
     assert.match(feature, /save\(\) \{\n    return \{ moved: 'conversations' \};/);
@@ -554,7 +554,7 @@ test.describe('conversations against GameServerJS (G185)', () => {
   });
 
   test('&spiritautoplay=far keeps the spirit in view on a short deck (G239, Somewhat Sump)', async () => {
-    const { spiritFarSpot } = await import('../public/js/features/street-spirits-feature.js?v=e8e9ac09');
+    const { spiritFarSpot } = await import('../public/js/features/street-spirits-feature.js?v=df0a22c8');
     // A flat street: 330 px to the right on the spirit's own floor, camera untouched.
     const flat = [{ x1: 0, y1: 900, x2: 3000, y2: 900 }];
     assert.deepEqual(spiritFarSpot(flat, 1000, 900), { x: 1330, y: 900, lookY: 0 });

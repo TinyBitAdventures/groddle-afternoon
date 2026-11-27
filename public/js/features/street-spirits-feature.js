@@ -88,7 +88,7 @@ import {
   offerNext,
   offeredFor,
   talkBeats,
-} from '../street-spirit-talks.js?v=9706c05e';
+} from '../street-spirit-talks.js?v=e8f8ae1b';
 import { CONVERSATIONS } from '../conversations-data.js?v=f11b7e02';
 import {
   adoptLegacyTalks,
@@ -99,7 +99,8 @@ import {
   markHeard,
   resumeTarget,
   setCurrentState,
-} from '../conversations.js?v=ca848555';
+} from '../conversations.js?v=1c039467';
+import { pcLabel } from '../pc-label.js?v=e19212a2';
 import { acceptOffer, npcQuestOffers, questStatus } from '../quest-offers.js?v=7e00498b';
 import { getQuestCatalog } from '../content-catalogs.js?v=c9b84764';
 import { questRoomConverse } from './quest-instances-feature.js?v=c8dd7fd7';
@@ -206,7 +207,7 @@ function tickOffer(engine, now) {
     return;
   }
   lastTalk = `offered:${res.id}`;
-  engine.say(t, offerBubble(undefined, engine.query?.('playerChatName', engine) || 'friend'), TALK_RULES.bubbleMs);
+  engine.say(t, offerBubble(undefined, pcLabel(engine)), TALK_RULES.bubbleMs);
   engine.save();
 }
 

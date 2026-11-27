@@ -59,6 +59,7 @@
  */
 
 import { CONVERSATIONS, TELLERS } from './conversations-data.js?v=f11b7e02';
+import { SOLO_PC_LABEL } from './pc-label.js?v=e19212a2';
 
 export const CONVERSATION_RULES_SOURCE = 'tinyspeck/glitch-GameServerJS players/inc_conversations.js (CC0)';
 
@@ -97,7 +98,7 @@ export const CONVO_BUBBLE_CHOICES = Object.freeze([
 ]);
 
 /** The call-out bubble (choose_one in the source; `pick` in [0, 1)). {pc_label} is your name online (#734), "friend" in solo, which has no character name. */
-export function offerBubble(pick = Math.random(), label = 'friend') {
+export function offerBubble(pick = Math.random(), label = SOLO_PC_LABEL) {
   const i = Math.min(CONVO_BUBBLE_CHOICES.length - 1, Math.max(0, Math.floor(pick * CONVO_BUBBLE_CHOICES.length)));
   // A name opening a sentence is capitalized, as the source's player names were.
   const cap = label.charAt(0).toUpperCase() + label.slice(1);

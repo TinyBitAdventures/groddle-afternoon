@@ -4,7 +4,7 @@
  */
 import { ITEM_ICONS, ITEM_LABELS, getVerbsFor, ordinaryItems, runVerb } from './content.js?v=9c775db5';
 import { createErrorOnce, createFeatureHost, createFrameStages } from './js/feature-host.js?v=b87e2cbc';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=92065871';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=0dc2ea44';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, enterHintPick, hoverText, stackHoverLabel, groupHead, hoverRimShown, reachGlowTargets, spriteHasRimArt, rimArtParts, trimmedIconUrl, drawTileArt } from './js/enter-chooser.js?v=297c6d15';
 import { firstTendKey, STICK_TEND_DELAY_MS, STICK_TEND_DIRS, STICK_TEND_REPEAT_MS, stepTendKey, stepTendKeys, stickTendKey, tendKeyAction } from './js/garden-tend.js?v=a7470c4a';
 import { avatarHitBox, behindFloor, bodyReachDistance, OUT_OF_REACH_LINE, playerClickBox } from './js/reach.js?v=456da8a8';
@@ -14630,7 +14630,8 @@ const engine = {
   /**
    * The name the world calls you by ({pc_label}, the player's name in Glitch: items/item.js 1054,
    * npc_bureaucrat.js 425 "Attention, <name>!"): your account name online (#734), "Ur" in solo,
-   * which has no character name.
+   * which has no character name. This is the name you are shown as (your bubbles, the loading
+   * card); speakers who address you in solo say "friend" (js/pc-label.js).
    */
   get playerLabel() {
     return features.query('playerChatName', engine) || playerSpeechTarget?.label || 'Ur';

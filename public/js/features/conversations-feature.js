@@ -91,7 +91,8 @@ import {
   resumeTarget,
   setCurrentState,
   talkableFor,
-} from '../conversations.js?v=ca848555';
+} from '../conversations.js?v=1c039467';
+import { pcLabel } from '../pc-label.js?v=e19212a2';
 
 export const CONVERSATIONS_FEATURE_ID = 'conversations';
 export const CONVO_TALK_VERB = 'convo_talk';
@@ -250,7 +251,7 @@ function collide(engine, target, now, busy) {
     return false;
   }
   lastConvo = `offered:${cls}:${res.id}`;
-  engine.say(target, offerBubble(undefined, engine.query?.('playerChatName', engine) || 'friend'), CONVERSATION_RULES.bubbleMs);
+  engine.say(target, offerBubble(undefined, pcLabel(engine)), CONVERSATION_RULES.bubbleMs);
   engine.save();
   return true;
 }
