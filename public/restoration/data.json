@@ -2814,9 +2814,14 @@
   "deployed": "2026-11-27"
  },
  "git": {
-  "commits": 3857,
+  "commits": 3860,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-27",
+    "kind": "improve",
+    "text": "Eight more reactions: 👏 😊 🤔 😍 🔥 👀 😅 💯"
+   },
    {
     "date": "2026-11-27",
     "kind": "fix",
@@ -2931,11 +2936,6 @@
     "date": "2026-11-27",
     "kind": "fix",
     "text": "Solo, the Bureaucratic Hall's lizards call you \"friend\", not \"Ur\""
-   },
-   {
-    "date": "2026-11-27",
-    "kind": "new",
-    "text": "After an update the loading card shows what is new"
    }
   ]
  },
