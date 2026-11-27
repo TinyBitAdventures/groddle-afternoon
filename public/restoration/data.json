@@ -2814,7 +2814,7 @@
   "deployed": "2026-11-27"
  },
  "git": {
-  "commits": 3865,
+  "commits": 3868,
   "since": "2026-10-19",
   "recent": [
    {
@@ -2931,11 +2931,6 @@
     "date": "2026-11-27",
     "kind": "fix",
     "text": "A page open over the game stays on top when a quest offer pops up"
-   },
-   {
-    "date": "2026-11-27",
-    "kind": "fix",
-    "text": "The low-mood rain shows over the face again in Classic, and now in Modern too"
    }
   ]
  },
