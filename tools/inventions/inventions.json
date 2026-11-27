@@ -6638,6 +6638,7 @@
    ],
    "why": "Glitch told players nothing about an update beyond its Reload is Coming debuff before a deploy. Ours: play/whats-new.json lists each release's few player-facing lines (written at release from the Emoji-Log draft), and a browser that last loaded an older version sees the top three on the loading card, rolled up across every release since a visit within a week, else the newest release only; a first visit shows nothing. Nothing waits for it, so a fast load can hide it.",
    "ruling": "Austin 2026-11-27 (#745): option 3, the notes on the loading card, not a centred card or a corner notice",
+   "rows": []
   },
   {
    "id": "day-night-skies",
