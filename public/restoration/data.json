@@ -2814,9 +2814,14 @@
   "deployed": "2026-11-27"
  },
  "git": {
-  "commits": 3800,
+  "commits": 3802,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-27",
+    "kind": "fix",
+    "text": "A Sloth's Knocker hangs on its trunk, and the sloth's branch reaches the trunk"
+   },
    {
     "date": "2026-11-27",
     "kind": "fix",
@@ -2931,14 +2936,9 @@
     "date": "2026-11-26",
     "kind": "improve",
     "text": "Prices read the number then Glitch's ₡ in the shops, vendors, the Furniture Store, storage stores, mail and auctions"
-   },
-   {
-    "date": "2026-11-26",
-    "kind": "improve",
-    "text": "The Furniture Store button in Decoration Mode is a toggle: pressed while the store is open, a tap closes it"
    }
   ]
  },
- "tests": 1467,
+ "tests": 1468,
  "generatedAt": "2026-11-27"
 }
