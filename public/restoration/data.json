@@ -2814,9 +2814,19 @@
   "deployed": "2026-11-27"
  },
  "git": {
-  "commits": 3870,
+  "commits": 3873,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-27",
+    "kind": "fix",
+    "text": "Acting on a thing just removed from the street no longer breaks the game"
+   },
+   {
+    "date": "2026-11-27",
+    "kind": "fix",
+    "text": "Walking right off the last island on Level 3 West drops you to the pit floor instead of bouncing you back up"
+   },
    {
     "date": "2026-11-27",
     "kind": "fix",
@@ -2911,19 +2921,9 @@
     "date": "2026-11-27",
     "kind": "new",
     "text": "Outdoor streets' skies follow the clock, with stars at night"
-   },
-   {
-    "date": "2026-11-27",
-    "kind": "fix",
-    "text": "Things on the floor by the right wall move over when the house is un-expanded, instead of ending up past the wall"
-   },
-   {
-    "date": "2026-11-27",
-    "kind": "improve",
-    "text": "While a window waits on Play here, what can't act is greyed"
    }
   ]
  },
- "tests": 1483,
+ "tests": 1485,
  "generatedAt": "2026-11-27"
 }
