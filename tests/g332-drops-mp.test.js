@@ -23,7 +23,7 @@ import {
   normalizeMine,
   shareReason,
 } from '../public/js/drops-mp.js?v=351593a6';
-import { dropsMpFeature } from '../public/js/features/drops-mp-feature.js?v=7daf01b0';
+import { dropsMpFeature } from '../public/js/features/drops-mp-feature.js?v=350b8ff3';
 import { giftsFeature } from '../public/js/features/gifts-feature.js?v=1df967b1';
 import { HAS_SERVER, HAS_SITE, SITE_DIR, serverPath, sitePath } from '../tools/repos.mjs';
 import { HAS_PHP, PHP } from './php.js';

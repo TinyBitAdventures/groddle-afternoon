@@ -76,6 +76,13 @@ export const DROPS_MP_FEATURE_ID = 'drops-mp';
 const TABLE_URL = 'assets/content/trade-items.json';
 const SYNC_EVERY_MS = 60000;
 const WAIT_MS = 15000;
+/**
+ * #733 (Austin's ruling 2026-11-27): states where the window waits on Play here (realtime-feature
+ * shows the button for these). The floor last seen stays drawn, not interactive, until Play here;
+ * Glitch asked for a reload after a long silence and never emptied the room (NetController.as
+ * 596-603). A drop that reconnects by itself still clears and re-syncs on hello.
+ */
+export const PLAY_HERE_STATES = Object.freeze(new Set(['asleep', 'replaced']));
 
 let multiplayer = false;
 
@@ -99,6 +106,8 @@ function createSession(engine, client) {
   /** The street the server last listed and its stacks (id -> stack). */
   let street = '';
   const stacks = new Map();
+  /** #733: the window waits on Play here; the stacks above are the last floor it saw, drawn only. */
+  let frozen = false;
   /** The drop the server is weighing: { ref, c, n, r?, x, y, at }. */
   let dropping = null;
   /**
@@ -307,6 +316,12 @@ function createSession(engine, client) {
   function here() {
     if (client.state !== 'online') return null;
     return placeOf(String(client.street || ''));
+  }
+
+  /** #733: where the stacks drawn are: here() online, or the last floor seen while the window waits on Play here. */
+  function drawnHere() {
+    if (client.state === 'online') return here();
+    return frozen && street ? placeOf(street) : null;
   }
 
   /** The place of realtime room `s` when it is the scene this game shows (here() for the room joined). */
@@ -551,8 +566,10 @@ function createSession(engine, client) {
   });
 
   client.on('state', ({ state } = {}) => {
-    if (state === 'online') sync();
-    else {
+    if (state === 'online') {
+      frozen = false;
+      sync();
+    } else {
       // Off the server: its stacks are not drawn, and an answer under way comes back through the site's list.
       // The drops still waiting stay in the pack.
       dropping = null;
@@ -561,7 +578,11 @@ function createSession(engine, client) {
       picking = null;
       dropQueue();
       endAllPending();
-      if (stacks.size) {
+      // #733: a window waiting on Play here keeps the last floor it saw drawn (Play here reloads; a
+      // 'stopped' on the way there keeps it too). Anything else clears and the next hello re-syncs.
+      frozen = Boolean(street) && (PLAY_HERE_STATES.has(state) || (frozen && state === 'stopped'));
+      if (frozen) redraw();
+      else if (stacks.size) {
         stacks.clear();
         street = '';
         redraw();
@@ -791,6 +812,8 @@ function createSession(engine, client) {
     const sid = String(id || '');
     if (/^pend-/.test(sid)) return { ok: false, reason: 'busy', msg: DROP_TEXT.busy };
     if (!DROP_OP.test(sid)) return null;
+    // #733: a floor drawn while the window waits on Play here is not the owner's to move.
+    if (frozen && client.state !== 'online') return { ok: false, reason: 'offline', msg: offlineLine(client) };
     if (!p?.ownHome || !homePlaceOf(p.street)) return { ok: false, reason: 'place', msg: DROP_TEXT.notHome };
     const s = stacks.get(sid);
     if (!s) {
@@ -865,6 +888,7 @@ function createSession(engine, client) {
     const sid = String(id || '');
     if (/^pend-/.test(sid)) return { ok: false, reason: 'busy', msg: DROP_TEXT.busy };
     if (!DROP_OP.test(sid)) return null;
+    if (frozen && client.state !== 'online') return { ok: false, reason: 'offline', msg: offlineLine(client) };
     const place = p ? homePlaceOf(p.street) : null;
     if (!p?.ownHome || !place || (place.room !== 'interior' && place.room !== 'tower')) return { ok: false, reason: 'place', msg: DROP_TEXT.notHome };
     if (!stacks.has(sid)) {
@@ -918,7 +942,7 @@ function createSession(engine, client) {
   }
 
   function list(tsid) {
-    const p = here();
+    const p = drawnHere();
     if (!p || tsid !== p.key || street !== p.street) return [];
     const all = [...view(p).values()];
     return [...(p.ox ? all.map((s) => stackAt(s, p.ox)) : all), ...claimsShown(p.key)];
@@ -931,6 +955,7 @@ function createSession(engine, client) {
     get table() { return table; },
     get street() { return street; },
     get stacks() { return [...stacks.values()]; },
+    get frozen() { return frozen; },
     get dropping() { return dropping; },
     get queued() { return queue.map((q) => ({ ...q })); },
     get picking() { return picking; },
@@ -949,8 +974,9 @@ function createSession(engine, client) {
     here,
     sync,
     tick(now) {
-      // A street change empties the list until the server's ground_state for the new one.
-      if (street && street !== client.street) {
+      // A street change empties the list until the server's ground_state for the new one (#733: not
+      // while the window waits on Play here, whose client has left every street).
+      if (street && !frozen && street !== client.street) {
         street = '';
         stacks.clear();
         redraw();
