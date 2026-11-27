@@ -69,7 +69,7 @@ import { createMinnAccount } from '../minn-account.js?v=7e3d7279';
 import { saveStore, savedThrough } from '../save-store.js?v=1ccb1d6b';
 import { ownGroundRows } from '../ground-stacks.js?v=22792362';
 import { pileMaxOf } from '../world-items.js?v=93313aad';
-import { PLAY_HERE_STATES, offlineLine, sharedOffline } from '../online-request.js?v=f4d87a22';
+import { PLAY_HERE_STATES, createOnlineRequests, offlineLine, sharedOffline, shiftAnswerWaitMs } from '../online-request.js?v=f4d87a22';
 import { DROP_OP, DROP_QUEUE_MAX, DROP_TEXT, bucketTake, dropEffect, dropRefusalText, eatenStack, groundFrom, homePlaceOf, isFloorPlace, isPublicStreet, likeSharedStack, normalizeGroundStack, normalizeItem, normalizeMine, pickupAsk, pigAnimalKey, shareReason, stackAt, stackLeft } from '../drops-mp.js?v=351593a6';
 
 export const DROPS_MP_FEATURE_ID = 'drops-mp';
@@ -80,8 +80,6 @@ const WAIT_MS = 15000;
 const SHIFT_DX = 150;
 const SHIFT_TRIES = 10;
 const SHIFT_AGAIN_MS = 1000;
-/** drops_shift.go waits up to 10 s for drops on their way, then up to 5 minutes on the site. */
-const SHIFT_WAIT_MS = 6 * 60 * 1000;
 /**
  * #733 (Austin's ruling 2026-11-27): states where the window waits on Play here (js/online-request.js
  * PLAY_HERE_STATES). The floor last seen stays drawn, not interactive, until Play here; Glitch asked
@@ -133,6 +131,9 @@ function createSession(engine, client) {
   // G1327: un-expands told to the server (drops.go ground_shift), one at a time, and how the last one went.
   const shifts = [];
   let shiftLast = '';
+  // R26: the one sent waits on js/online-request.js, as long as drops_shift.go can take (shiftAnswerWaitMs);
+  // past it the next goes, and an answer that comes after is still its own shift's.
+  const shiftReqs = createOnlineRequests({ waitMs: shiftAnswerWaitMs });
   let syncing = false;
   let syncedAt = 0;
   let refN = 0;
@@ -536,8 +537,18 @@ function createSession(engine, client) {
   // G1327: the server's word on an un-expand's shift (drops_shift.go); the stacks moved come as ground_state.
   // Busy (one still waiting there): asked again shortly. Any other refusal leaves them where they were, as before.
   client.on('msg:ground_shifted', (msg) => {
-    const q = shifts[0];
-    if (!q?.sent) return;
+    // One shift is out at a time; one given up as late may still be on the server. The site's answer (it
+    // carries the op) is the oldest one's; a refusal at once (busy, place, bad: no op) the newest one's.
+    const out = [...shiftReqs.entries()].map(([req]) => req);
+    const q = msg.op ? out[0] : out.at(-1);
+    if (!q) return;
+    shiftReqs.take(q);
+    if (q !== shifts[0]) {
+      // Given up as unanswered and the next one sent: its late word still says how it went.
+      shiftLast = msg.status === 'settled' ? `settled:${Number(msg.n) || 0}` : `refused:${String(msg.why || '')}`;
+      publish();
+      return;
+    }
     if (msg.status !== 'settled' && msg.why === 'busy' && q.tries < SHIFT_TRIES) {
       q.sent = false;
       q.at = Date.now() + SHIFT_AGAIN_MS;
@@ -967,7 +978,8 @@ function createSession(engine, client) {
       sendShift(now);
       return;
     }
-    q.sent = client.send('ground_shift', { from: q.from, dx: q.dx });
+    shiftReqs.open(q, q);
+    q.sent = shiftReqs.send(q, () => client.send('ground_shift', { from: q.from, dx: q.dx })) === 'sent';
     q.tries += 1;
     q.at = now;
   }
@@ -1035,8 +1047,8 @@ function createSession(engine, client) {
     tick(now) {
       // G1327: a shift waiting to be asked again (refused busy: not applied). One sent is never sent again (the
       // server may have applied it): with no answer in time it is given up, the next one goes.
-      if (shifts[0]?.sent && now - shifts[0].at >= SHIFT_WAIT_MS) {
-        shifts.shift();
+      for (const q of shiftReqs.expire()) {
+        if (shifts[0] === q) shifts.shift();
         shiftLast = 'no-answer';
         publish();
       }

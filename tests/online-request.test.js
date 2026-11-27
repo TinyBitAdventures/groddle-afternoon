@@ -14,12 +14,14 @@ import {
   ACT_LEDGER_CHAIN,
   ANSWER_WAIT_FALLBACK_MS,
   ANSWER_WAIT_MAX_MS,
+  DROP_SHIFT_CALL,
   LATE_KEEP_MS,
   LEDGER_CALL,
   SAVE_FIRST_MS,
   answerWaitMs,
   createOnlineRequests,
   ledgerCallWorstMs,
+  shiftAnswerWaitMs,
 } from '../public/js/online-request.js?v=f4d87a22';
 import { serverPath, skipWithoutServer } from '../tools/repos.mjs';
 
@@ -69,6 +71,25 @@ describe('R26 online requests: the wait follows the server', () => {
     assert.equal(num(/actLedgerChain\s*=\s*(\d+)/), ACT_LEDGER_CHAIN);
     assert.equal(num(/actAnswerMargin\s*=\s*(\d+)\s*\*\s*time\.Second/) * 1000, ACT_ANSWER_MARGIN_MS);
     assert.match(readFileSync(serverPath('hub.go'), 'utf8'), /"wait":\s*actAnswerWait\(\)\.Milliseconds\(\)/, 'hello says the wait');
+  });
+
+  it('G1327: an un-expand\'s shift waits drops_shift.go\'s worst case: 10 s for drops to land, 21 site calls, 20 pauses', () => {
+    assert.equal(shiftAnswerWaitMs(), 10_000 + 21 * 16_200 + 20 * 15_000 + 2000);
+  });
+
+  it('ties the shift\'s wait to the server\'s own numbers (drops_shift.go, drops.go)', { skip: skipWithoutServer }, () => {
+    const shift = readFileSync(serverPath('drops_shift.go'), 'utf8');
+    const drops = readFileSync(serverPath('drops.go'), 'utf8');
+    const num = (go, re) => {
+      const m = re.exec(go);
+      assert.ok(m, `the server no longer has ${re}`);
+      return Number(m[1]);
+    };
+    assert.equal(num(shift, /shiftWait\s*=\s*(\d+)\s*\*\s*time\.Millisecond/), DROP_SHIFT_CALL.stillStepMs);
+    assert.equal(num(shift, /shiftWaits\s*=\s*(\d+)/), DROP_SHIFT_CALL.stillSteps);
+    assert.equal(num(shift, /shiftRetries\s*=\s*(\d+)/), DROP_SHIFT_CALL.retries);
+    assert.equal(num(drops, /dropLoadRetry\s*=\s*(\d+)\s*\*\s*time\.Second/) * 1000, DROP_SHIFT_CALL.retryMs);
+    assert.match(shift, /a := site\.dropShift\(call\)/, 'one site call per try (dropAsk: ledgerTries)');
   });
 
   it('takes hello\'s wait when the server says, within bounds', () => {

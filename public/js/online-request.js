@@ -32,6 +32,22 @@ export function ledgerCallWorstMs(call = LEDGER_CALL) {
 
 /** The answer's wait when the server does not say (an older server): ledger.go actAnswerWait. */
 export const ANSWER_WAIT_FALLBACK_MS = ACT_LEDGER_CHAIN * ledgerCallWorstMs() + ACT_ANSWER_MARGIN_MS;
+/**
+ * G1327: an un-expand's shift (ground_shift) on the server, groddle-afternoon-server drops_shift.go:
+ * up to `stillSteps` waits of `stillStepMs` for the drops on their way to land (shiftWait, shiftWaits),
+ * then the site's call, asked again `retries` times `retryMs` apart while it does not answer
+ * (shiftRetries, drops.go dropLoadRetry). Not an act: hello's wait does not cover it.
+ */
+export const DROP_SHIFT_CALL = Object.freeze({ stillStepMs: 250, stillSteps: 40, retries: 20, retryMs: 15_000 });
+
+/** The longest a shift's answer can take: the drops landing, every call and every pause between, plus the margin. */
+export function shiftAnswerWaitMs(shift = DROP_SHIFT_CALL, call = LEDGER_CALL) {
+  return shift.stillSteps * shift.stillStepMs
+    + (shift.retries + 1) * ledgerCallWorstMs(call)
+    + shift.retries * shift.retryMs
+    + ACT_ANSWER_MARGIN_MS;
+}
+
 /** The server's word is kept within these bounds. */
 export const ANSWER_WAIT_MIN_MS = 5000;
 export const ANSWER_WAIT_MAX_MS = 120_000;

@@ -29,6 +29,7 @@ import { homedir } from 'node:os';
 import { join } from 'node:path';
 import { shiftInteriorRows, shiftRowsFrom } from '../public/js/features/homes-feature.js?v=a3591fc6';
 import { dropsMpFeature } from '../public/js/features/drops-mp-feature.js?fresh=g1327';
+import { shiftAnswerWaitMs } from '../public/js/online-request.js?v=f4d87a22';
 import { GAME_DIR, SITE_DIR } from '../tools/repos.mjs';
 import { HAS_PHP, PHP, phpSkip } from './php.js';
 
@@ -175,6 +176,43 @@ describe('un-expanding the house moves what lies in its last 300 px 150 px left 
     assert.equal(dropsMpFeature.homeStacksShifted({ from: 1750, dx: -300 }, engine), null);
     assert.equal(dropsMpFeature.homeStacksShifted({ from: 'x', dx: -150 }, engine), null);
     assert.equal(shiftsSent().length, 0);
+  });
+
+  it('R26: a shift sent waits as long as the server can take, on js/online-request.js, and a late answer stays its own', () => {
+    const realNow = Date.now;
+    let t = realNow() + 2000;
+    Date.now = () => t;
+    try {
+      client.sent.length = 0;
+      // The 1600 shift refused as busy above goes again after its moment.
+      dropsMpFeature.onTick(16, 0, engine);
+      assert.deepEqual(shiftsSent(), [['ground_shift', { from: 1600, dx: -150 }]]);
+      // drops_shift.go can take 10 s, then 21 site calls with 20 pauses of 15 s: over 6 minutes is not given up.
+      t += 6 * 60 * 1000 + 1;
+      dropsMpFeature.onTick(16, 0, engine);
+      assert.equal(globalThis.groddleDrops.shifts.length, 1, 'still waiting on its answer');
+      assert.notEqual(engine.data.dropShift, 'no-answer');
+      t += shiftAnswerWaitMs() - 6 * 60 * 1000;
+      dropsMpFeature.onTick(16, 0, engine);
+      assert.equal(globalThis.groddleDrops.shifts.length, 0);
+      assert.equal(engine.data.dropShift, 'no-answer');
+      // The next un-expand goes; a busy refusal (at once, no op) is its own, the site's late word the old one's.
+      assert.equal(dropsMpFeature.homeStacksShifted({ from: 1450, dx: -150 }, engine), true);
+      assert.deepEqual(shiftsSent().at(-1), ['ground_shift', { from: 1450, dx: -150 }]);
+      client.emit('msg:ground_shifted', { status: 'refused', why: 'busy', n: 0 });
+      assert.equal(globalThis.groddleDrops.shifts[0]?.from, 1450);
+      assert.equal(globalThis.groddleDrops.shifts[0]?.sent, false, 'asked again after a moment');
+      client.emit('msg:ground_shifted', { op: 'shift-0000000000000002', status: 'settled', n: 2 });
+      assert.equal(engine.data.dropShift, 'settled:2');
+      assert.equal(globalThis.groddleDrops.shifts[0]?.from, 1450, 'the late answer does not settle the next one');
+      t += 1001;
+      dropsMpFeature.onTick(16, 0, engine);
+      client.emit('msg:ground_shifted', { op: 'shift-0000000000000003', status: 'settled', n: 0 });
+      assert.equal(globalThis.groddleDrops.shifts.length, 0);
+      assert.equal(engine.data.dropShift, 'settled:0');
+    } finally {
+      Date.now = realNow;
+    }
   });
 });
 
