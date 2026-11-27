@@ -17,7 +17,8 @@
  * at a time; never reconnect).
  *
  * States: 'idle' (not started), 'connecting', 'online', 'offline' (retrying
- * with backoff), 'replaced' (4001, stopped), 'signed-out' (the ticket route
+ * with backoff), 'replaced' (4001, or another tab of this browser took the
+ * character: yieldedToTab; stopped), 'signed-out' (the ticket route
  * said 401, stopped), 'off' (503: the site has no realtime, stopped),
  * 'booted' (4010, stopped for this page), 'suspended' (4011, or the ticket
  * route's 403 groddle_suspended, stopped), 'other-character' (4012, or the
@@ -648,6 +649,18 @@ export function createRealtimeClient({
       ticketRetries = 0;
       lastFrameAt = 0;
       connect();
+    },
+
+    /**
+     * Another tab of this browser took the character (js/save-claim.js, the save's yield): leave the
+     * street and wait on Play here now ('replaced'), as the server's 4001 would once that tab
+     * connects. A page still on its Welcome card (idle) never connects, so its Start does not take
+     * the character back. An ended state is kept.
+     */
+    yieldedToTab() {
+      if (!['idle', 'connecting', 'online', 'offline'].includes(state)) return;
+      if (ws && state === 'online') send({ t: 'leave' });
+      stopFor('replaced');
     },
 
     /** Close for good (page leaving). */

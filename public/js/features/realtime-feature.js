@@ -160,6 +160,15 @@ export function greyForPlayHere(buttons, state) {
   return waiting;
 }
 
+/**
+ * Welcome card tab (2026-11-27): the save's yield to another tab of this browser (js/save-store.js
+ * yieldTo: 'elsewhere' by 'window', which offers only Play here). A save taken on another device
+ * offers Keep this window's game, so it is not one.
+ */
+export function tabYielded(detail) {
+  return detail?.state === 'elsewhere' && detail?.by === 'window';
+}
+
 /** The pill's words for a client state (plain remake copy, no em-dashes). */
 export function statusText(state, { here = 0, attempt = 0 } = {}) {
   switch (state) {
@@ -332,6 +341,11 @@ function createSession(engine) {
   hereBtn.addEventListener('click', () => {
     client.stop();
     location.reload();
+  });
+  // Another tab of this browser took the character as it loaded (its Welcome card up): this window
+  // waits on Play here now, greyed like any replaced window, not only once that tab presses Start.
+  window.addEventListener('groddle:save-state', (e) => {
+    if (tabYielded(e?.detail)) client.yieldedToTab();
   });
 
   function renderLog() {
