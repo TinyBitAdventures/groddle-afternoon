@@ -2814,9 +2814,14 @@
   "deployed": "2026-11-27"
  },
  "git": {
-  "commits": 3833,
+  "commits": 3837,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-27",
+    "kind": "fix",
+    "text": "Paradise courses, A Summer's Day, Storyland, Winter Walk, Eesti and Rooks' Woods ask \"Are you stuck?\" instead of sending you back when a clock runs out"
+   },
    {
     "date": "2026-11-27",
     "kind": "improve",
@@ -2931,14 +2936,9 @@
     "date": "2026-11-27",
     "kind": "fix",
     "text": "A cultivation set against the house in the back yard says to keep the way in clear, not to expand the yard"
-   },
-   {
-    "date": "2026-11-27",
-    "kind": "fix",
-    "text": "The Magic Rock's New Quest card stays below an upright iPhone's clock, and the Hi sign board and Calendar rise over it"
    }
   ]
  },
- "tests": 1477,
+ "tests": 1478,
  "generatedAt": "2026-11-27"
 }
