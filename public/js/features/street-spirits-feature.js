@@ -62,7 +62,7 @@
  */
 
 import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=37ad5c9f';
-import { nearestSurfaceY, walkSurfaceY } from '../walk-surface.js?v=f21ce37b';
+import { nearestSurfaceY, walkSurfaceY } from '../walk-surface.js?v=76def2f6';
 import { STREET_SPIRIT_SPEECH_OFFSET } from '../speech-placement.js?v=0371ea0c';
 import {
   STREET_SPIRIT_ART,
@@ -103,7 +103,7 @@ import {
 import { pcLabel } from '../pc-label.js?v=e19212a2';
 import { acceptOffer, npcQuestOffers, questStatus } from '../quest-offers.js?v=7e00498b';
 import { getQuestCatalog } from '../content-catalogs.js?v=c9b84764';
-import { questRoomConverse } from './quest-instances-feature.js?v=8a447eb4';
+import { questRoomConverse } from './quest-instances-feature.js?v=888f38f2';
 import { SPIRIT_REMINISCE_TEXT, isStreetSpiritClass, spiritReminisceOffers, withReminisceVerb } from '../spirit-reminisce.js?v=a50b40dc';
 import { questDoneAt } from '../quests.js?v=f68437db';
 

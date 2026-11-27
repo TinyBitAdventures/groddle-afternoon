@@ -22,9 +22,9 @@ import { JUJU_BANDIT } from '../public/js/juju-bandits.js?v=0d3af5fe';
 import { LOW_FUEL_BUBBLE_MS, LOW_FUEL_REPEAT_MS } from '../public/js/machine-art.js?v=57cc0f50';
 import { MEGA_ROCK_LINE } from '../public/js/mining.js?v=7ecaa572';
 import { LONELY_RULES } from '../public/js/spirit-loneliness.js?v=9259917d';
-import { COPY as STREET_OBJECT_COPY } from '../public/js/street-objects.js?v=5f39fb79';
+import { COPY as STREET_OBJECT_COPY } from '../public/js/street-objects.js?v=b92964f9';
 import { POISON_BUBBLE_EVERY_MS, POISON_BUBBLE_SHOW_MS, POISON_FIRST_BUBBLE_MS } from '../public/js/tree-poison.js?v=646d1bc1';
-import { animalMoodFeature } from '../public/js/features/animal-mood-feature.js?v=a7f2a390';
+import { animalMoodFeature } from '../public/js/features/animal-mood-feature.js?v=ffb992d1';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const GSJS = [join(ROOT, '..', 'glitch-GameServerJS', 'items'), join(homedir(), 'Documents/glitch-audit/glitch-GameServerJS/items')].find((p) => existsSync(p));

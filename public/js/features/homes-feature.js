@@ -104,7 +104,7 @@
 import { countItem, ensureItem, ITEM_CATALOG, removeItem } from '../inventory.js?v=3be7988a';
 import { likeStackAt, mergeDroppedStacks, pickupCountTitle } from '../world-items.js?v=93313aad';
 import { groundKey, groundStacks, ownGroundRows, ownGroundState } from '../ground-stacks.js?v=22792362';
-import { underFloorRestY } from '../walk-surface.js?v=f21ce37b';
+import { restingStackYAt, settleStackY, STACK_SINK_PX } from '../walk-surface.js?v=76def2f6';
 import { keepsOwnStack } from '../tools.js?v=4156bba8';
 import { PHONE_HOME_MIN_VIEW_W } from '../location-view.js?v=b178fe66';
 import { createCountChooser } from '../ui/count-chooser.js?v=75f69512';
@@ -231,15 +231,15 @@ import { RADIO_TEXT, radioOwned } from '../vine-radio.js?v=5436aa09';
 import { displayTopOf, itemstackOverlayPoint, overlayAlpha, overlayLifeMs, playPoofIn, trackOverlay } from '../overlay-art.js?v=e50bacca';
 import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=37ad5c9f';
 import { fadeInNewNear } from '../poof-fade.js?v=57db6aea';
-import { projectApi } from './street-jobs-feature.js?v=0f97ed98';
+import { projectApi } from './street-jobs-feature.js?v=703fc311';
 import { TOWER_CHASSIS, TOWER_CONFIG, TOWER_DOOR_DX, TOWER_GEO, TOWER_PROTO, normalizeTowerState } from '../home-tower.js?v=a7fc0cce';
 import { drawTowerBench, drawTowerElevator, drawTowerExit, towerApi, visitorTowerView } from './home-tower-feature.js?v=a39637c6';
 import { pieceUrl, roomPieces, surfaceAt, swatchPiece, wallTargetAt } from '../home-wallpaper.js?v=5d3594e4';
 import { renderHomeLocation } from '../home-shot-render.js?v=a03860d4';
 import { maxTextureSizeOf, sharpDeco, wantsHiresDecos } from '../deco-hires.js?v=34f36d77';
 import { SHARP_DECOS } from '../deco-sharp-list.js?v=7d615f20';
-import { resourceNodeStill, resourceNodesFeature } from './resource-nodes-feature.js?v=feb26d63';
-import { patchesFeature, plotStill } from './patches-feature.js?v=6d2e5d31';
+import { resourceNodeStill, resourceNodesFeature } from './resource-nodes-feature.js?v=75b2dcd5';
+import { patchesFeature, plotStill } from './patches-feature.js?v=732789bc';
 import { GROWN_TREE_LABELS, createPlot, growTree, plotLabel } from '../patches.js?v=54430bb9';
 import { WOTD_DEPLETE_MS, WOTD_TEXT, nearestPourTarget, pourButton, pourConditions, pourConfirmText } from '../wine-pour.js?v=6daa23a7';
 import { WOTD_TOOL, pourApproach, pourDropTip } from '../wine-pour-fx.js?v=364e22d2';
@@ -320,7 +320,7 @@ import { autoplayLog } from '../autoplay-log.js?v=55bb4823';
 import { WORLD_FONT_FAMILY } from '../world-text.js?v=6b49f88c';
 import { HOUSE_ART_DIR, HOUSE_FROM_HOME_STYLE, HOUSE_STYLE_IDS, composeHouse, houseFitViewH, houseLabel, houseLot, normalizeHouse } from '../home-house.js?v=3c88c47c';
 import { closeHousePicker, housePickerOpen, openHousePicker, refreshHousePicker } from '../ui/house-picker.js?v=20aaba5c';
-import { YARD_WALL_DX } from '../yard-wander.js?v=91482900';
+import { YARD_WALL_DX } from '../yard-wander.js?v=697237e0';
 import { housePlace, isHomeMachineClass, towerPlace } from '../home-machines.js?v=cab883cd';
 import { drawStandMark } from '../home-stack-marks.js?v=67b44287';
 
@@ -1054,20 +1054,50 @@ export function housePlatforms(room, x0, width) {
 }
 
 /**
- * #728: stacks lying under the house's floor come up onto it (walk-surface.js underFloorRestY):
- * a stack set down in the back yard (its ground 60 px under the floor) was kept where it lay when
- * the house later stood over that spot, drawn in the soil band under the floor, out of reach and
- * under Decoration Mode's tray. A stack on a piece (`on`) rests on that piece (settleStacks).
- * Mutates the rows (only y); returns how many came up.
+ * R57 (#728): every saved stack in a house room, on a Tower floor, in the back yard or on the home
+ * street settles onto what is under it when the place loads, as a stack always fell onto the plat
+ * beneath it in the original (takeable.js takeable_drop 164-167; HandOfDecorator.as
+ * calculateTargetPlatformLineForRegStackFromPt). A floor line moved between releases left rows
+ * where the old floor was: set down Oct 27-30 74 px over the house's floor (floating), Oct 31-Nov 1
+ * 60 px under it (in the soil band), and nothing set them back on the floor when it moved again.
+ * - A stack on a piece (`on` naming a piece in `state`: a shelf, a table, a seat) is that piece's
+ *   (home-decor.js settleStacks keeps it at the piece's surface): left alone.
+ * - With `state` (the room's decor, `x0` its world x), a stack over a piece's surface falls onto
+ *   that surface (stackSurfaceAt) and keeps the piece as `on`; one whose `on` names a piece no
+ *   longer there falls like any other.
+ * - Every other stack settles onto the lines (walk-surface.js settleStackY): down onto the line
+ *   under it, or up onto the lowest one over it when it lies under every line.
+ * Mutates the rows (y, and `on` for a piece landed on); returns how many moved.
  */
-export function liftStacksOntoFloor(rows, platforms) {
+export function settleStacksOntoFloor(rows, platforms, state = null, x0 = 0) {
   if (!Array.isArray(rows)) return 0;
+  const pieces = state && Array.isArray(state.placed) ? new Set(state.placed.map((row) => row.id)) : null;
+  const roomW = state ? interiorWidth(state) : 0;
   let moved = 0;
   for (const row of rows) {
-    if (!row || row.on != null) continue;
-    const y = underFloorRestY(platforms, Number(row.x), Number(row.y));
-    if (y == null || y === row.y) continue;
-    row.y = Math.round(y);
+    if (!row) continue;
+    const x = Number(row.x);
+    const y = Number(row.y);
+    if (!Number.isFinite(x) || !Number.isFinite(y)) continue;
+    // Without the room's decor (a visit, a shared stack) a stack's piece is taken to be there.
+    if (row.on != null && (!pieces || pieces.has(row.on))) continue;
+    const lostPiece = row.on != null;
+    let rest = settleStackY(platforms, x, y);
+    let on = null;
+    // Falling, it lands on a piece's surface on its way down (a table top, a shelf's plank).
+    const rx = x - x0;
+    if (state && rest != null && rest - y > STACK_SINK_PX && rx >= 0 && rx <= roomW) {
+      const hit = stackSurfaceAt(state, rx, y, { give: STACK_SINK_PX });
+      if (hit.on != null && hit.y < rest) {
+        rest = hit.y;
+        on = hit.on;
+      }
+    }
+    const ny = rest == null ? y : Math.round(rest);
+    if (ny === y && on == null && !lostPiece) continue;
+    row.y = ny;
+    if (on != null) row.on = on;
+    else delete row.on;
     moved += 1;
   }
   return moved;
@@ -5482,7 +5512,7 @@ function refundList(items) {
  * save's own stacks on every floor of the house (or on the Tower floor stood on) here, and the
  * shared ones (drops.go) through the server, which moves them on its floors in one go. `edge`: the
  * room x the stretch starts at. A server or a game from before leaves the shared ones where they
- * were (the floor's lowest line still holds them up, walk-surface.js underFloorRestY).
+ * were (the floor's lowest line still holds them up, they settle onto it, walk-surface.js settleStackY).
  */
 function shiftUnexpandedStacks(engine, edge) {
   if (!Number.isFinite(edge)) return 0;
@@ -6617,6 +6647,8 @@ function packDropOpts(engine, was, target) {
     beforeRemove: (n) => takeDragged(engine, was.ds, n),
     floor: target?.on == null,
     beforeShare: (n) => markDragged(engine, was.ds, n),
+    // R57: on a piece it is that piece's from the start (game.js restingStackY keeps it at its height).
+    ...(target?.on != null ? { on: target.on } : {}),
     // Set on a like shared stack it joins it (drops.go "Merging"); beside one, on its own
     // (HandOfDecorator.as shouldMerge 1656-1670 sent no_merge unless dropped directly on a stack).
     ...(into ? { into } : { merge: false }),
@@ -6667,13 +6699,14 @@ function roomStackRows(engine) {
  * as HandOfDecorator.as startWithItemFromLocation 1250-1323 dragged any stack you could pick up.
  */
 function roomStacks(engine) {
-  // #728: a shared stack the server keeps under the floor is shown on it (game.js restingStackY draws it
-  // there); a move in Decoration Mode then sets it down where it is dragged to, as any other.
+  // R57 (#728): a shared stack the server keeps off the floor (under it, or over it from before the
+  // floor moved) is shown on it (game.js restingStackY draws it there, walk-surface.js restingStackYAt);
+  // a move in Decoration Mode then sets it down where it is dragged to, as any other.
   const lines = scene?.background?.platformsScreen;
   return groundStacks(engine).map((row) => {
     if (!row.shared || row.on != null) return row;
-    const y = underFloorRestY(lines, Number(row.x), Number(row.y));
-    return y == null ? row : { ...row, y: Math.round(y) };
+    const y = Math.round(restingStackYAt(lines, Number(row.x), Number(row.y), { place: 'room' }));
+    return !Number.isFinite(y) || y === row.y ? row : { ...row, y };
   });
 }
 
@@ -6704,7 +6737,8 @@ function stackAt(engine, p) {
 function settleRoomStacks(engine) {
   if (!scene?.furnitureLayer || scene.room !== 'interior' || !ownGroundState(engine)) return 0;
   const rows = roomStackRows(engine);
-  const moved = settleStacks(decor, rows, roomX0()) + liftStacksOntoFloor(rows, scene.background?.platformsScreen);
+  // R57: what is on a piece rests on it as it stands now; everything else settles onto the floor under it.
+  const moved = settleStacks(decor, rows, roomX0()) + settleStacksOntoFloor(rows, scene.background?.platformsScreen, decor, roomX0());
   if (moved) engine.droppedItemsChanged?.();
   return moved;
 }
@@ -8726,6 +8760,20 @@ function liftOldStreetSave(engine) {
   if (moved) engine.save?.();
 }
 
+/**
+ * R57 (#728): building the home street, every stack the save keeps there and Animal Husbandry's
+ * Guano and Piggy Plop piles settle onto its ground (settleStacksOntoFloor), whatever line they were
+ * saved on: a later move of STREET_GROUND_Y up or down leaves none floating or buried (Glitch: a
+ * stack always lay on the plat beneath it). The shared stacks are drawn the same way (game.js
+ * restingStackY). Returns how many of the save's stacks moved (the piles are saved here).
+ */
+export function settleHomeStreetSave(engine, lines) {
+  const moved = settleStacksOntoFloor(ownGroundRows(engine, HOME_STREET_TSID), lines);
+  const husbandry = engine.streetSlot?.('animal-husbandry', HOME_STREET_TSID);
+  if (settleStacksOntoFloor(husbandry?.guano, lines) + settleStacksOntoFloor(husbandry?.plops, lines)) engine.save?.();
+  return moved;
+}
+
 function towerFloorScene(engine, floor) {
   const construction = towerApi.isConstructionFloor(floor);
   decor = construction ? constructionDecor() : towerFloorDecor(floor);
@@ -9161,6 +9209,7 @@ function homeScene(room, engine) {
   // G796: the house as it stands (a save from before it moves to its style's original).
   const background = streetBackground(engine, shownStreetStyle(engine), engine.homeContext?.().house || style);
   const layout = homeStreetLayout(cult);
+  const streetSettled = settleHomeStreetSave(engine, background.platformsScreen);
   return {
     width: layout.width,
     // renderHomeScene sets the world's GROUND_Y (engine.groundY) from this.
@@ -9182,6 +9231,8 @@ function homeScene(room, engine) {
       return spawnStreetTargets(engine);
     },
     enter() {
+      // R57: the stacks settled onto the ground are saved there (and drawn there already).
+      if (streetSettled) engine.droppedItemsChanged?.();
       spawnCultivations(engine);
       afterEnter(engine);
       publishHouse(engine);

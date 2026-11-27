@@ -92,7 +92,7 @@ import { ITEM_CATALOG, addItem, countItem, ensureItem, removeItem } from '../inv
 import { topUpMetabolic } from '../metabolics.js?v=48f784bf';
 import { getSkillCatalog } from '../content-catalogs.js?v=c9b84764';
 import { worldToScreen } from '../street-model.js?v=a9a05f9d';
-import { nearestSurfaceY } from '../walk-surface.js?v=f21ce37b';
+import { nearestSurfaceY } from '../walk-surface.js?v=76def2f6';
 import { textureFromUrl } from '../textures.js?v=b8e38103';
 import { createSheetLoader } from '../sprite-sheets.js?v=37ad5c9f';
 import {

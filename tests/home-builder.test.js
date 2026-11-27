@@ -206,7 +206,7 @@ describe('pack items on shelves and tables (the dropped-stack model)', () => {
 
   it('drops through game.js as Drop does: the same block reasons and the same dropped-stack record', () => {
     const game = read('public/game.js');
-    const fn = game.slice(game.indexOf('dropPackStackAt(classTsid, count, x, y, { beforeRemove = null, floor = false, beforeShare = null, into = null, merge = true, pointer = false, copy = null } = {}) {'));
+    const fn = game.slice(game.indexOf('dropPackStackAt(classTsid, count, x, y, { beforeRemove = null, floor = false, beforeShare = null, into = null, merge = true, pointer = false, copy = null, on = null } = {}) {'));
     assert.match(fn.slice(0, 1200), /const blocked = packDropBlockReason\(classTsid\);/);
     assert.match(fn.slice(0, 2000), /dropInventoryStack\(droppedItemState, inv, droppedStacksTsid\(\), classTsid, n, \{ x, y \}/);
     assert.match(fn.slice(0, 2400), /saveDroppedItems\(\);\s+refreshDroppedWorldItems\(\);/);

@@ -63,7 +63,7 @@ import { getGameDayKey } from '../game-day.js?v=57fecfcb';
 import { XP_FOR_LEVEL } from '../progression.js?v=05ff0260';
 import { emblemCostFor } from '../shrines.js?v=48318bec';
 import { giantDisplayName } from '../giant-names.js?v=0e295891';
-import { landingY } from '../walk-surface.js?v=f21ce37b';
+import { landingY } from '../walk-surface.js?v=76def2f6';
 import {
   EMBLEM_VERBS,
   GIANT_ICON_DATA,
@@ -104,13 +104,13 @@ import { CONVERSATION_RULES, adoptLegacyTalks, conversationRecord, hasCompleted,
 import { TELLERS } from '../conversations-data.js?v=f11b7e02';
 import { itemZ } from '../item-bands.js?v=ec366be3';
 import { publicStreet } from '../shared-street.js?v=dce5694b';
-import { insideProof, readVisitScene } from '../neighbours-mp.js?v=d270297d';
+import { insideProof, readVisitScene } from '../neighbours-mp.js?v=5323ddea';
 import { isHousePlace } from '../home-floors.js?v=17371532';
 import { createMinnAccount } from '../minn-account.js?v=7e3d7279';
 import { saveStore, savedThrough } from '../save-store.js?v=1ccb1d6b';
 import { HOME_INTERIOR_TSID, HOME_STREET_TSID } from '../homes.js?v=dca6b2cd';
 import { gnomePlaceFor, visitGnomePlace } from '../garden-gnome.js?v=20dd4af8';
-import { homesFeature } from './homes-feature.js?v=aa371a62';
+import { homesFeature } from './homes-feature.js?v=85c0b5c0';
 import { standOnFeet } from '../sprite-feet.js?v=849541a8';
 
 export const ICONS_FEATURE_ID = 'giant-icons';

@@ -539,6 +539,9 @@ export function ownerStacksFor(view, room, { floor = 0, roomX = 0, tsid = '' } =
     count: r.n,
     x: r.x + dx,
     y: r.y,
+    // R57: on a piece of the owner's (a shelf, a table) it keeps its height there; every other stack
+    // settles onto the floor under it (game.js restingStackY).
+    ...(r.on != null ? { on: r.on } : {}),
     droppedAt: 0,
     ownerLocked: true,
     subtitle: `${DROP_TEXT.by(name)} · ${r.n} in this pile`,

@@ -40,7 +40,7 @@ installPixiFixes(PIXI);
 
 const { FEAST_PILE_CLASS } = await import('../public/js/feast-day.js?v=29d69db5');
 const { TABLE_STREET } = await import('../public/js/pot-luck-feast.js?v=971888be');
-const { feastDayFeature } = await import('../public/js/features/feast-day-feature.js?v=4c869b81');
+const { feastDayFeature } = await import('../public/js/features/feast-day-feature.js?v=dbb7f7e8');
 const inventory = await import('../public/js/inventory.js?v=3be7988a');
 const { stockUseVerb } = await import('../public/js/stock-use.js?v=6b422ccf');
 

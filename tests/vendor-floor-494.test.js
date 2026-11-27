@@ -15,11 +15,11 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { isItemSolid, platformYAt, platformsScreen, streetWidth } from '../public/js/street-model.js?v=a9a05f9d';
 import { ecologyForStreet, planStreetPlacements, populationForStreet, setStreetEcologyCatalog, streetReservedSpots } from '../public/js/street-ecology.js?v=dde3c62d';
-import { chickenSeed, walkerSpan } from '../public/js/street-creatures.js?v=ab90881f';
+import { chickenSeed, walkerSpan } from '../public/js/street-creatures.js?v=8171dc9b';
 import { VENDOR_PLACEMENT_KEY, vendorNpcList, vendorNpcPlacementGroups, vendorNpcsFor } from '../public/js/vendor-npcs.js?v=90b0c123';
 import { measuredGardenVendor } from '../public/js/garden-beds.js?v=2ac6a12c';
-import { VENDOR_REACH, VENDOR_WALK, vendorPlan, vendorWalkAt } from '../public/js/vendor-walk.js?v=7504803e';
-import { followFloorY, walkSurfaceY } from '../public/js/walk-surface.js?v=f21ce37b';
+import { VENDOR_REACH, VENDOR_WALK, vendorPlan, vendorWalkAt } from '../public/js/vendor-walk.js?v=90d860ad';
+import { followFloorY, walkSurfaceY } from '../public/js/walk-surface.js?v=76def2f6';
 import { placementRequests } from '../tools/build-realtime-objects.mjs';
 import { applyStreetIndex, loadStreetDataFromFs, setZoneStreetsShown } from '../public/js/street-loader.js?v=10376267';
 

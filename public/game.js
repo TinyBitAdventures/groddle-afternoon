@@ -4,7 +4,7 @@
  */
 import { ITEM_ICONS, ITEM_LABELS, getVerbsFor, ordinaryItems, runVerb } from './content.js?v=79a980f7';
 import { createErrorOnce, createFeatureHost, createFrameStages } from './js/feature-host.js?v=b87e2cbc';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=11ae2643';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=77cecea7';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, enterHintPick, hoverText, stackHoverLabel, groupHead, hoverRimShown, reachGlowTargets, spriteHasRimArt, rimArtParts, trimmedIconUrl, drawTileArt } from './js/enter-chooser.js?v=297c6d15';
 import { firstTendKey, STICK_TEND_DELAY_MS, STICK_TEND_DIRS, STICK_TEND_REPEAT_MS, stepTendKey, stepTendKeys, stickTendKey, tendKeyAction } from './js/garden-tend.js?v=a7470c4a';
 import { avatarHitBox, behindFloor, bodyReachDistance, OUT_OF_REACH_LINE, playerClickBox } from './js/reach.js?v=456da8a8';
@@ -898,7 +898,7 @@ import {
 } from './js/travel.js?v=7fd6e363';
 import { facingScaleX, facingFromVelocity } from './js/avatar.js?v=c4da73ea';
 import { AFK_TIMEOUT_MS, ANIMS, ANIM_FPS, CORE_FRAMES, EMOTIONS, EMOTION_MS, IDLE_SHEETS, RANDOM_IDLE_MS, RANDOM_IDLE_WAIT_MS, animForState, avatarAnimState, createIdleClock, crowdScaleX, idleSheetFor } from './js/avatar-anims.js?v=fb921bf4';
-import { followFloorY, landingY, stackRestY, underFloorRestY, walkerFloorY, walkSurfaceY } from './js/walk-surface.js?v=f21ce37b';
+import { followFloorY, landingY, restingStackYAt, walkerFloorY, walkSurfaceY } from './js/walk-surface.js?v=76def2f6';
 import { holdCloseToFloor } from './js/slope-walk.js?v=9af1e505';
 import { JUMP_SPEED, MAX_TICK_FRAMES, WALK_MAX, avatarGround, coastX, frameSteps, stepAvatar, steerAccel, steerX, streetPhysicsExtras } from './js/avatar-step.js?v=8415ee96';
 import { PATH_END_ALLOWANCE, createUserPath, stepUserPath, walkInterrupts } from './js/user-path.js?v=68e6892c';
@@ -1103,7 +1103,7 @@ import {
   ROCK_SHAPE_WIDTHS,
   flightGroundFor,
 } from './js/street-ecology.js?v=dde3c62d';
-import { CHICKEN_PAUSE, chickenPauseRoll, flierAt, flierSeed, flightFloorFor, followPath, PATH_STEP } from './js/street-creatures.js?v=ab90881f';
+import { CHICKEN_PAUSE, chickenPauseRoll, flierAt, flierSeed, flightFloorFor, followPath, PATH_STEP } from './js/street-creatures.js?v=8171dc9b';
 import { chickenPose, chickenIdleSheetsAsked } from './js/chicken-idle-art.js?v=969d7db1';
 import { chickenWaitPose } from './js/chicken-idles.js?v=eef0279b';
 import { itemOverlayStats } from './js/item-overlay.js?v=33acf5ff';
@@ -1171,7 +1171,7 @@ import { ZOOM_HINT_CACHE, ZOOM_HINT_MS, watchZoomHint } from './js/zoom-hint.js?
 import { EAT_PICK_TEXT, bestFoodIndex, eatChoices, eatTip } from './js/eat-pick.js?v=8fb763d0';
 import { heldDirection, installHeldKeyGuard, isMacPlatform } from './js/held-keys.js?v=a28eb293';
 import { isOneClickDoor, oneClickChoice, signpostArmRows, worldContextAction } from './js/world-context-menu.js?v=e4c99c05';
-import { blockedPlayerVerbs, listPlayerTarget, opensPlayerMenu, playerMenuRows } from './js/ui/player-menu.js?v=c3907fa6';
+import { blockedPlayerVerbs, listPlayerTarget, opensPlayerMenu, playerMenuRows } from './js/ui/player-menu.js?v=3b1f59c2';
 import { forgetTexture, frameTexture, isFailed, isLoaded, onFailed, onLoaded, textureFromUrl, whenLoaded } from './js/textures.js?v=b8e38103';
 import { FALLBACK_MAX as WORLD_ART_FALLBACK_MAX, worldArtFor } from './js/world-art.js?v=a67514c8';
 import { HOME_PIP_PX, HOME_PIP_WORDS, drawLockPip, drawPipWords, homeMarkNote, homePipShown, homePipWordsShown, homeStackMark } from './js/home-stack-marks.js?v=67b44287';
@@ -15601,7 +15601,7 @@ const engine = {
    * `pointer`: Decoration Mode let it go there (G1303: a machine is set down at that x), `copy` the
    * copy dragged; both go to a feature's packDrop.
    */
-  dropPackStackAt(classTsid, count, x, y, { beforeRemove = null, floor = false, beforeShare = null, into = null, merge = true, pointer = false, copy = null } = {}) {
+  dropPackStackAt(classTsid, count, x, y, { beforeRemove = null, floor = false, beforeShare = null, into = null, merge = true, pointer = false, copy = null, on = null } = {}) {
     if (!state.started || !currentStreetTsid) return { ok: false, reason: 'not_started' };
     const blocked = packDropBlockReason(classTsid);
     // A class a feature puts down itself (the Crafty Bot, a machine): its own drop and its own reason.
@@ -15624,6 +15624,12 @@ const engine = {
     // G1224: marked as the owner's decor (the site's move of old floor drops leaves it in the save).
     const result = dropInventoryStack(droppedItemState, inv, droppedStacksTsid(), classTsid, n, { x, y }, { now: Date.now(), mergeRadius: 12, pile: true, ...(keepsOwnStack(classTsid) ? { merge: false } : {}), points: leavingToolPoints(classTsid, n), tags: leavingToolTags(classTsid, n), decor: true });
     if (!result.ok) return result;
+    // R57: set on a piece (a shelf, a table), it is that piece's from the start, so it is drawn there
+    // and not settled onto the floor under it (restingStackY).
+    if (on != null && !floor) {
+      const row = (droppedItemState.streets?.[droppedStacksTsid()] || []).find((r) => r?.id === result.stack?.id);
+      if (row && row.on == null) row.on = on;
+    }
     closePackPopover();
     saveDroppedItems();
     refreshDroppedWorldItems();
@@ -16750,7 +16756,7 @@ function spawnDroppedItemStack(stack, mark = '') {
   spr.x = stack.x;
   // It rests on the line under its point (a stack set down in the air before 10-30, a shared
   // stack the server put in at the dropper's feet - 20 as takeable.js 166-167 does).
-  spr.baseY = restingStackY(stack.x, stack.y);
+  spr.baseY = restingStackY(stack.x, stack.y, stack);
   spr.y = spr.baseY;
   // Dropped stacks must stay legible in front of large vendors/gardens at crowded spawns.
   spr.zIndex = itemZ(stack.classTsid, 12);
@@ -16791,19 +16797,30 @@ function spawnDroppedItemStack(stack, mark = '') {
 }
 
 /**
- * Where a stack set down here at (x, y) comes to rest (walk-surface.js stackRestY: the first line
- * under it that holds items, as a stack obeying physics falls in the original), else where it
- * was put. In a home's rooms homes-feature sets each stack on the shelf, table or seat that holds
- * it (home-decor.js settleStacks): furniture tops are not street lines, so those stay as set,
- * except a stack under the floor itself (#728).
+ * Where a stack set down here at (x, y) comes to rest (walk-surface.js restingStackYAt): on a public
+ * street it falls to the first line under it that holds items (stackRestY, as a stack obeying physics
+ * falls in the original), else stays where it was put. R57 (#728): at a home (a house floor with its
+ * back yard, a Tower floor, the home street; the player's own or a visit's) every stack settles onto
+ * the floor under it, down or up, as Glitch kept none floating or under a floor, so a floor line moved
+ * between releases takes its stacks with it. Only a stack on a piece of furniture (`stack.on`, a
+ * shelf, a table, a seat: home-decor.js settleStacks keeps it at the piece's surface; furniture tops
+ * are not lines) keeps its height.
  */
-function restingStackY(x, y) {
-  // #728: except under the floor (a stack set down in the back yard before the house stood over it):
-  // that one comes up onto the floor (walk-surface.js underFloorRestY).
-  if (homeIsInstanced() && currentStreetTsid === HOME_INTERIOR_TSID) return underFloorRestY(streetPlatforms, x, y) ?? y;
-  // G1190: a visitor's house (every floor of it, R5) and Tower scenes show the owner's stacks where the owner set them (a table, a shelf).
-  if (/^MPH_\d+(?:_IN[12]?|_T\d+)$/.test(String(currentStreetTsid || ''))) return underFloorRestY(streetPlatforms, x, y) ?? y;
-  return stackRestY(streetPlatforms, x, y) ?? y;
+function restingStackY(x, y, stack = null) {
+  return restingStackYAt(streetPlatforms, x, y, { place: homeStackPlace(), on: stack?.on ?? null });
+}
+
+/**
+ * R57: which kind of home place this scene is for restingStackY: 'room' (your house, any floor of it
+ * with its back yard, or a Tower floor: HOME_INTERIOR_TSID; G1190, R5: a visit's house floors
+ * MPH_<id>_IN, _IN<n> and Tower floors _T<n>), 'home-street' (yours, or a visit's MPH_<id>), or ''.
+ */
+function homeStackPlace() {
+  const tsid = String(currentStreetTsid || '');
+  if (homeIsInstanced()) return tsid === HOME_INTERIOR_TSID ? 'room' : 'home-street';
+  const visit = /^MPH_\d+(_IN[12]?|_T\d+)?$/.exec(tsid);
+  if (!visit) return '';
+  return visit[1] ? 'room' : 'home-street';
 }
 
 /** QA (js/home-stack-marks.js): &homemarks=demo shows the Decoration Mode marks in solo. */

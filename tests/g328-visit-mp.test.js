@@ -25,10 +25,10 @@ import {
   visitorNode,
   visitorRock,
 } from '../public/js/yard-stock-mp.js?v=38af0730';
-import { normalizeYardActs } from '../public/js/yard-verbs-mp.js?v=0f91260b';
-import { nodeKeyMap, rockItems } from '../public/js/features/homes-feature.js?v=aa371a62';
-import { homeStreetFor, readVisitScene, sharedHomeStreet, visitSceneTsid } from '../public/js/neighbours-mp.js?v=d270297d';
-import { streetObjectsFeature } from '../public/js/features/street-objects-feature.js?v=223216be';
+import { normalizeYardActs } from '../public/js/yard-verbs-mp.js?v=5753252a';
+import { nodeKeyMap, rockItems } from '../public/js/features/homes-feature.js?v=85c0b5c0';
+import { homeStreetFor, readVisitScene, sharedHomeStreet, visitSceneTsid } from '../public/js/neighbours-mp.js?v=5323ddea';
+import { streetObjectsFeature } from '../public/js/features/street-objects-feature.js?v=ba7fd33e';
 import { HAS_SERVER, HAS_SITE, SITE_DIR, serverPath } from '../tools/repos.mjs';
 import { HAS_PHP, PHP } from './php.js';
 

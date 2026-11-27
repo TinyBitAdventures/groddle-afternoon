@@ -25,7 +25,7 @@ import { bagsFeature } from '../public/js/features/bags-feature.js?v=426f342b';
 import { bindToolInventory, createToolConditionState, setToolRemaining, toolCopies } from '../public/js/tools.js?v=4156bba8';
 import { draggedCount, draggedHere, draggedStack, markDragged, takeDragged } from '../public/js/drag-stack.js?v=c7008276';
 import { runDrop } from '../public/js/features/world-drop-feature.js?v=91163785';
-import { registerButlerDrop } from '../public/js/butler-drop.js?v=850a2231';
+import { registerButlerDrop } from '../public/js/butler-drop.js?v=289f8280';
 import { beginDrag, dragDrop, endDrag } from '../public/js/drop-targets.js?v=d5325567';
 
 const root = join(import.meta.dirname, '..', 'public');
@@ -145,7 +145,7 @@ describe('every drop target hands on the dragged stack (#515)', () => {
     const dep = part(homes, 'function depositInBox(', '// --- pack items onto shelves');
     assert.ok(dep.indexOf('takeDragged(engine, ds, n)') < dep.indexOf('displayDeposit('), 'marked before the count goes down');
     const game = read('game.js');
-    const at = part(game, 'dropPackStackAt(classTsid, count, x, y, { beforeRemove = null, floor = false, beforeShare = null, into = null, merge = true, pointer = false, copy = null } = {}) {', 'takeDroppedStack(id)');
+    const at = part(game, 'dropPackStackAt(classTsid, count, x, y, { beforeRemove = null, floor = false, beforeShare = null, into = null, merge = true, pointer = false, copy = null, on = null } = {}) {', 'takeDroppedStack(id)');
     assert.ok(at.indexOf('beforeRemove?.(n);') > 0 && at.indexOf('beforeRemove?.(n);') < at.indexOf('leavingToolPoints(classTsid, n)'), 'before the wear that goes down is read');
   });
 

@@ -58,7 +58,7 @@
 
 import { slugsFromEffects } from '../speech-slugs.js?v=d5cc8b6f';
 import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=37ad5c9f';
-import { nearestSurfaceY, stackRestY } from '../walk-surface.js?v=f21ce37b';
+import { nearestSurfaceY, stackRestY } from '../walk-surface.js?v=76def2f6';
 import { displayTopOf, itemstackOverlayPoint, playSheetOverlay } from '../overlay-art.js?v=e50bacca';
 import { SET_FREE, applySetFree, canSetFree, setFreeGoneLine, setFreePrompt } from '../animal-set-free.js?v=6fcd8355';
 import { GAME_EPOCH_MS, getGameDayKey } from '../game-day.js?v=57fecfcb';
@@ -112,15 +112,15 @@ import {
   stepHogtie,
   stickPlaceState,
 } from '../animal-husbandry.js?v=17d8fc11';
-import { batterflyResponseFor, flierAt, flierSeed, flightFloorFor, followPath, hourlyGuanoDrops, PATH_STEP } from '../street-creatures.js?v=ab90881f';
+import { batterflyResponseFor, flierAt, flierSeed, flightFloorFor, followPath, hourlyGuanoDrops, PATH_STEP } from '../street-creatures.js?v=8171dc9b';
 import { flightGroundFor } from '../street-ecology.js?v=dde3c62d';
 import { loseEnergy, shiftMetabolic, topUpMetabolic } from '../metabolics.js?v=48f784bf';
 import { textureFromUrl } from '../textures.js?v=b8e38103';
 import { PIGGY_DEATH_DROPS, PIGGY_DEATH_PUFF, SAD_BABY, forcedRoll, isSadIn } from '../animal-mood.js?v=c8cc8797';
-import { animalCrowdChanged, animalCrowdSad, animalPlaceIsDepressing, crowdLimit, ownsPlace, smokePuff as sharedSmokePuff } from './animal-mood-feature.js?v=a7f2a390';
+import { animalCrowdChanged, animalCrowdSad, animalPlaceIsDepressing, crowdLimit, ownsPlace, smokePuff as sharedSmokePuff } from './animal-mood-feature.js?v=ffb992d1';
 import { grantMoodXp } from '../mood-xp.js?v=e311b45c';
 import { itemZ } from '../item-bands.js?v=ec366be3';
-import { followYardPath, freeYardSpot, holdYardWalk } from '../yard-wander.js?v=91482900';
+import { followYardPath, freeYardSpot, holdYardWalk } from '../yard-wander.js?v=697237e0';
 import { showsChickenIdle, yardChickenPose } from '../chicken-idle-art.js?v=969d7db1';
 import { chickenWaitPose } from '../chicken-idles.js?v=eef0279b';
 import { PACKED_SHEETS } from '../packed-sheets-data.js?v=192c6f15';

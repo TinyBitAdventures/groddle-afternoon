@@ -17,12 +17,12 @@ import { before, describe, it } from 'node:test';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-import { flierAt, flierPlan, flierSeed, flightFloor, flightFloorAt, flightFloorFor, floorUnder } from '../public/js/street-creatures.js?v=ab90881f';
+import { flierAt, flierPlan, flierSeed, flightFloor, flightFloorAt, flightFloorFor, floorUnder } from '../public/js/street-creatures.js?v=8171dc9b';
 import { setCreatureEcology, streetObjectLayout } from '../tools/build-realtime-objects.mjs';
 import { STREET_INDEX, applyStreetIndex, loadStreetDataFromFs, setZoneStreetsShown } from '../public/js/street-loader.js?v=10376267';
 import * as ecologyModule from '../public/js/street-ecology.js?v=dde3c62d';
 import { platformsScreen, streetWidth, isItemSolid } from '../public/js/street-model.js?v=a9a05f9d';
-import { stackRestY, landingY } from '../public/js/walk-surface.js?v=f21ce37b';
+import { stackRestY, landingY } from '../public/js/walk-surface.js?v=76def2f6';
 
 const { setStreetEcologyCatalog } = ecologyModule;
 const root = join(import.meta.dirname, '..');

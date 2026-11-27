@@ -105,6 +105,35 @@ export function underFloorRestY(platforms, x, y, solid = isItemSolid) {
   return over;
 }
 
+/**
+ * R57 (#728): where a stack saved at (x, y) lies once it has settled onto the floor under it, as a
+ * stack obeying physics always did in the original (takeable.js takeable_drop 164-167, item
+ * obey_physics; HandOfDecorator.as calculateTargetPlatformLineForRegStackFromPt): it falls to the
+ * first line that holds items at or below its point (stackRestY), and one lying under every line at
+ * x comes up onto the lowest line over it (underFloorRestY: nothing lay under a floor in Glitch).
+ * Null with no line at x at all. A floor line moved between releases (the house's in Oct 2026, the
+ * home street's 620 -> 870) so leaves no stack floating over it or buried under it.
+ */
+export function settleStackY(platforms, x, y, solid = isItemSolid) {
+  if (!Number.isFinite(x) || !Number.isFinite(y)) return null;
+  return stackRestY(platforms, x, y, solid) ?? underFloorRestY(platforms, x, y, solid);
+}
+
+/**
+ * R57: where game.js draws a stack saved at (x, y) (restingStackY). `place`:
+ * - 'room': a house floor (with its back yard) or a Tower floor, the player's own or a visit's. A
+ *   stack resting on a piece of furniture (`on`, a piece id: a shelf, a table, a seat) keeps the
+ *   height its piece gives it (home-decor.js settleStacks; furniture tops are not lines); every other
+ *   stack settles onto the floor under it (settleStackY).
+ * - 'home-street': a home street (own or visited): settles onto its ground (settleStackY).
+ * - anything else (a public street): falls to the line under it (stackRestY), else where it was put.
+ */
+export function restingStackYAt(platforms, x, y, { place = '', on = null } = {}, solid = isItemSolid) {
+  if (place === 'room' && on != null) return y;
+  if (place === 'room' || place === 'home-street') return settleStackY(platforms, x, y, solid) ?? y;
+  return stackRestY(platforms, x, y, solid) ?? y;
+}
+
 /** The surface at x nearest a reference y in either direction (spawning on the right floor). */
 export function nearestSurfaceY(platforms, x, refY, solid = isItemSolid) {
   let best = null;

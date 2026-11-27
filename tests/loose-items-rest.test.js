@@ -28,7 +28,7 @@ import { before, describe, it } from 'node:test';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-import { STACK_SINK_PX, landingY, stackRestY } from '../public/js/walk-surface.js?v=f21ce37b';
+import { STACK_SINK_PX, landingY, stackRestY } from '../public/js/walk-surface.js?v=76def2f6';
 import { placementRequests } from '../tools/build-realtime-objects.mjs';
 import { STREET_INDEX, applyStreetIndex, loadStreetDataFromFs, setZoneStreetsShown } from '../public/js/street-loader.js?v=10376267';
 import { ecologyForStreet, planStreetPlacements, populationForStreet, setStreetEcologyCatalog, streetReservedSpots } from '../public/js/street-ecology.js?v=dde3c62d';
@@ -84,10 +84,11 @@ describe('the game draws loose street things at rest', () => {
 
   it('every dropped or created stack rests on the line under it', () => {
     const rest = fnText(src, 'restingStackY');
-    assert.match(rest, /stackRestY\(streetPlatforms, x, y\) \?\? y/);
-    assert.match(rest, /homeIsInstanced\(\) && currentStreetTsid === HOME_INTERIOR_TSID\) return underFloorRestY\(streetPlatforms, x, y\) \?\? y/, 'home rooms keep their furniture tops (a stack under the floor comes up onto it, #728)');
+    // walk-surface.js restingStackYAt: a public street falls (stackRestY); a home settles up or down, a
+    // stack on a piece of furniture keeps its height (R57, #728: tests/r728-floor-moves.test.js).
+    assert.match(rest, /restingStackYAt\(streetPlatforms, x, y, \{ place: homeStackPlace\(\), on: stack\?\.on \?\? null \}\)/);
     const spawn = fnText(src, 'spawnDroppedItemStack');
-    assert.match(spawn, /spr\.baseY = restingStackY\(stack\.x, stack\.y\);\n\s+spr\.y = spr\.baseY;/, 'drawn at rest (shared stacks too)');
+    assert.match(spawn, /spr\.baseY = restingStackY\(stack\.x, stack\.y, stack\);\n\s+spr\.y = spr\.baseY;/, 'drawn at rest (shared stacks too)');
     assert.match(src, /dropWorldStack\(classTsid, count, x, y, points = undefined, tags = undefined, \{ merge = false \} = \{\}\) \{\n\s+\/\/[^\n]*\n\s+y = restingStackY\(x, y\);/, 'created stacks fall to the line');
     assert.match(fnText(src, 'dropPackItem'), /landingY\(streetPlatforms, x, player\.y - 20\)/, 'a player drop lands (takeable.js 166-167)');
   });

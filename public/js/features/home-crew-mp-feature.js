@@ -21,7 +21,7 @@
  * QA: canvas data homeCrew ("rock:0=7+9|node:dirt_pile:0=9", "none"), homeCrewLast.
  */
 
-import { HOME_CREW_ID, homeCrewId, homeCrewOwner, normalizeHomeCrews } from '../home-crew-mp.js?v=bcbc1f64';
+import { HOME_CREW_ID, homeCrewId, homeCrewOwner, normalizeHomeCrews } from '../home-crew-mp.js?v=c8b2c7e6';
 
 export const HOME_CREW_MP_ID = 'home-crew-mp';
 

@@ -23,8 +23,8 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { STACK_SINK_PX, underFloorRestY } from '../public/js/walk-surface.js?v=f21ce37b';
-import { BACK_YARD_GROUND_Y, housePlatforms, liftStacksOntoFloor } from '../public/js/features/homes-feature.js?v=aa371a62';
+import { STACK_SINK_PX, underFloorRestY } from '../public/js/walk-surface.js?v=76def2f6';
+import { BACK_YARD_GROUND_Y, housePlatforms, settleStacksOntoFloor } from '../public/js/features/homes-feature.js?v=85c0b5c0';
 import { createHomeDecorState, INTERIOR, interiorWidth } from '../public/js/home-decor.js?v=c63e5e16';
 import { roomPieces } from '../public/js/home-wallpaper.js?v=5d3594e4';
 import { avatarHitBox, behindFloor } from '../public/js/reach.js?v=456da8a8';
@@ -72,26 +72,26 @@ describe('#728: a stack under the house floor', () => {
     assert.equal(underFloorRestY(lines, Number.NaN, 700), null);
   });
 
-  it('the save\'s own stacks under the floor come up and stay up (settleRoomStacks); stacks on a piece are the piece\'s', () => {
+  it('the save\'s own stacks under the floor come up and stay up (settleRoomStacks, R57 settleStacksOntoFloor); stacks on a piece are the piece\'s', () => {
     const rows = [
       { id: 'world-item-1', classTsid: 'play_cube', count: 1, x: X0 + 300, y: BACK_YARD_GROUND_Y },
       { id: 'world-item-2', classTsid: 'cherry', count: 4, x: X0 - 300, y: BACK_YARD_GROUND_Y },
       { id: 'world-item-3', classTsid: 'apple', count: 1, x: X0 + 400, y: 560, on: 7 },
       { id: 'world-item-4', classTsid: 'grain', count: 2, x: X0 + 500, y: INTERIOR.floorY },
     ];
-    assert.equal(liftStacksOntoFloor(rows, lines), 1);
+    assert.equal(settleStacksOntoFloor(rows, lines), 1);
     assert.deepEqual(rows.map((r) => r.y), [INTERIOR.floorY, BACK_YARD_GROUND_Y, 560, INTERIOR.floorY]);
-    assert.equal(liftStacksOntoFloor(rows, lines), 0, 'once');
+    assert.equal(settleStacksOntoFloor(rows, lines), 0, 'once');
   });
 
   it('the game draws the house\'s stacks (the owner\'s, the shared ones, a visitor\'s view) through that rule', () => {
+    // R57 (tests/r728-floor-moves.test.js): a room's stacks settle onto the floor, up or down.
     const at = game.indexOf('function restingStackY(');
     const fn = game.slice(at, game.indexOf('\nfunction ', at + 10));
-    assert.match(fn, /currentStreetTsid === HOME_INTERIOR_TSID\) return underFloorRestY\(streetPlatforms, x, y\) \?\? y;/);
-    assert.match(fn, /_T\\d\+\)\$\/\.test\(String\(currentStreetTsid \|\| ''\)\)\) return underFloorRestY\(streetPlatforms, x, y\) \?\? y;/);
+    assert.match(fn, /restingStackYAt\(streetPlatforms, x, y, \{ place: homeStackPlace\(\), on: stack\?\.on \?\? null \}\)/);
     const homes = readFileSync(join(root, 'public', 'js', 'features', 'homes-feature.js'), 'utf8');
     assert.match(homes, /root\.platformsScreen = housePlatforms\(room, x0, width\);/);
-    assert.match(homes, /settleStacks\(decor, rows, roomX0\(\)\) \+ liftStacksOntoFloor\(rows, scene\.background\?\.platformsScreen\)/);
-    assert.match(homes, /const y = underFloorRestY\(lines, Number\(row\.x\), Number\(row\.y\)\);\n\s+return y == null \? row : \{ \.\.\.row, y: Math\.round\(y\) \};/, 'Decoration Mode picks a shared stack where it is drawn');
+    assert.match(homes, /settleStacks\(decor, rows, roomX0\(\)\) \+ settleStacksOntoFloor\(rows, scene\.background\?\.platformsScreen, decor, roomX0\(\)\)/);
+    assert.match(homes, /restingStackYAt\(lines, Number\(row\.x\), Number\(row\.y\), \{ place: 'room' \}\)/, 'Decoration Mode picks a shared stack where it is drawn');
   });
 });

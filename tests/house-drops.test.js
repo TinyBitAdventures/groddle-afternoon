@@ -25,9 +25,9 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { homePlaceOf, isSharedStreet, shareReason } from '../public/js/drops-mp.js?v=351593a6';
 import { dropsMpFeature } from '../public/js/features/drops-mp-feature.js?fresh=housedrops';
-import { homeStreetMpFeature } from '../public/js/features/home-street-mp-feature.js?v=ca1e7512';
-import { neighboursMpFeature } from '../public/js/features/neighbours-mp-feature.js?v=7984ead6';
-import { OWNER_STACK_TEXT, isOwnerStackId, normalizeHomeView, normalizeOwnerStacks, ownerStacksFor, sharedHomeStreet } from '../public/js/neighbours-mp.js?v=d270297d';
+import { homeStreetMpFeature } from '../public/js/features/home-street-mp-feature.js?v=ab8eb0f7';
+import { neighboursMpFeature } from '../public/js/features/neighbours-mp-feature.js?v=6681e660';
+import { OWNER_STACK_TEXT, isOwnerStackId, normalizeHomeView, normalizeOwnerStacks, ownerStacksFor, sharedHomeStreet } from '../public/js/neighbours-mp.js?v=5323ddea';
 import { GAME_DIR, HAS_SERVER, HAS_SITE, SITE_DIR, serverPath } from '../tools/repos.mjs';
 import { HAS_PHP, PHP } from './php.js';
 
@@ -304,15 +304,18 @@ describe('the server and the site', () => {
 });
 
 describe('G1190: a visitor sees the owner\'s stacks where the owner set them', () => {
-  it('house and Tower visit scenes keep a stack\'s height instead of dropping it to the floor', () => {
+  it('house and Tower visit scenes keep a stack\'s height on its piece instead of dropping it to the floor', () => {
     const game = readFileSync(join(GAME_DIR, 'public', 'game.js'), 'utf8');
-    const fn = game.slice(game.indexOf('function restingStackY('), game.indexOf('function droppedStacksTsid('));
-    const visit = /\/(\^MPH_[^/]+)\/\.test/.exec(fn);
-    assert.ok(visit, 'restingStackY checks the visit scene tsid');
+    const fn = game.slice(game.indexOf('function homeStackPlace('), game.indexOf('function droppedStacksTsid('));
+    const visit = /\/(\^MPH_[^/]+)\/\.exec/.exec(fn);
+    assert.ok(visit, 'homeStackPlace reads the visit scene tsid');
     const re = new RegExp(visit[1]);
-    // R5 (G1313): an upper floor of the house too.
-    for (const t of ['MPH_42_IN', 'MPH_42_IN1', 'MPH_42_IN2', 'MPH_42_T0', 'MPH_42_T3']) assert.ok(re.test(t), t);
-    for (const t of ['MPH_42', 'MPH_42_IN3', 'RH_HOME_EXT', 'LIF101']) assert.ok(!re.test(t), t);
-    assert.ok(fn.indexOf(visit[0]) < fn.indexOf('stackRestY('), 'kept before the floor search');
+    // R5 (G1313): an upper floor of the house too. R57: a visit's rooms are rooms, its street the home street.
+    for (const t of ['MPH_42_IN', 'MPH_42_IN1', 'MPH_42_IN2', 'MPH_42_T0', 'MPH_42_T3']) assert.ok(re.exec(t)?.[1], t);
+    for (const t of ['MPH_42_IN3', 'RH_HOME_EXT', 'LIF101']) assert.ok(!re.test(t), t);
+    // A stack on a piece keeps its height (walk-surface.js restingStackYAt), the owner's `on` passed through.
+    assert.match(game.slice(game.indexOf('function restingStackY('), game.indexOf('function homeStackPlace(')), /on: stack\?\.on \?\? null/);
+    const [onShelf] = ownerStacksFor(normalizeHomeView({ owner: { id: 7, name: 'Ada' }, home: { owned: true }, stacks: [{ id: 'w1', place: 'house', c: 'cherry', n: 1, x: 50, y: 500, on: 3 }] }), 'interior', { roomX: 100 });
+    assert.equal(onShelf.on, 3);
   });
 });

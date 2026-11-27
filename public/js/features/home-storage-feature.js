@@ -53,8 +53,8 @@ import { ELEMENT_CLASSES, NO_BAG_CLASSES, NO_SLOT_CLASSES } from '../pack-slots-
 import { TOOL_CONDITION_CATALOG, copyTagKind, copyTags, pickToolCopies, receiveToolCopy, setCopyTag, takeToolCopy } from '../tools.js?v=4156bba8';
 import { draggedStack, takeDragged } from '../drag-stack.js?v=c7008276';
 import { scriptFromTag, scriptLabel } from '../teleportation.js?v=cbbc673f';
-import { insideQuery, possessive, readVisitScene } from '../neighbours-mp.js?v=d270297d';
-import { homesFeature } from './homes-feature.js?v=aa371a62';
+import { insideQuery, possessive, readVisitScene } from '../neighbours-mp.js?v=5323ddea';
+import { homesFeature } from './homes-feature.js?v=85c0b5c0';
 import { saveStore, savedThrough } from '../save-store.js?v=1ccb1d6b';
 import {
   SDB_PRICE_MAX,

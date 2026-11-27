@@ -15,7 +15,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { setStreetEcologyCatalog } from '../public/js/street-ecology.js?v=dde3c62d';
-import { animalHusbandryFeature, husbandryPendingRows } from '../public/js/features/animal-husbandry-feature.js?v=a74de98a';
+import { animalHusbandryFeature, husbandryPendingRows } from '../public/js/features/animal-husbandry-feature.js?v=33f92914';
 import { homeToFeatures, streetFeaturesFromTargets } from '../public/js/exploration.js?v=8f19e25d';
 
 const pub = join(import.meta.dirname, '../public');
