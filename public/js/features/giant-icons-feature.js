@@ -100,7 +100,7 @@ import { textureFromUrl } from '../textures.js?v=b8e38103';
 import { playSheetOverlay } from '../overlay-art.js?v=e50bacca';
 import { grantMoodXp } from '../mood-xp.js?v=e311b45c';
 import { forceMetabolic, gainMetabolic } from '../metabolics.js?v=48f784bf';
-import { CONVERSATION_RULES, adoptLegacyTalks, conversationRecord, hasCompleted, toldRecord } from '../conversations.js?v=1c039467';
+import { CONVERSATION_RULES, adoptLegacyTalks, conversationRecord, hasCompleted, toldRecord } from '../conversations.js?v=713258bc';
 import { TELLERS } from '../conversations-data.js?v=f11b7e02';
 import { itemZ } from '../item-bands.js?v=ec366be3';
 import { publicStreet } from '../shared-street.js?v=dce5694b';
@@ -110,7 +110,7 @@ import { createMinnAccount } from '../minn-account.js?v=7e3d7279';
 import { saveStore, savedThrough } from '../save-store.js?v=1ccb1d6b';
 import { HOME_INTERIOR_TSID, HOME_STREET_TSID } from '../homes.js?v=dca6b2cd';
 import { gnomePlaceFor, visitGnomePlace } from '../garden-gnome.js?v=f1410394';
-import { homesFeature } from './homes-feature.js?v=a99d2418';
+import { homesFeature } from './homes-feature.js?v=78d0151e';
 import { standOnFeet } from '../sprite-feet.js?v=849541a8';
 
 export const ICONS_FEATURE_ID = 'giant-icons';

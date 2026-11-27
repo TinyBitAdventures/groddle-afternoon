@@ -25,7 +25,7 @@ import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { CHAIR_PATHS } from '../interrogation/build-chair.mjs';
-import { HALL_EXTRA_CHAIRS } from '../../public/js/bureaucratic-hall.js?v=074510f2';
+import { HALL_EXTRA_CHAIRS } from '../../public/js/bureaucratic-hall.js?v=43a5a02b';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '../..');
 export const CHAIRS_OUT = `public/${HALL_EXTRA_CHAIRS.url}`;

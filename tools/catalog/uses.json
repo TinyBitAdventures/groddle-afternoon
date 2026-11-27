@@ -1341,6 +1341,15 @@
    "public/game.js:4119-4134 'Attach Lips' on the bear; 4153-4155 Lips' own 'Show Emotional Bear' row"
   ]
  },
+ "machine_stand": {
+  "lines": [
+   "Use a machine you've built and set down yourself; machine room machines can't be taken apart."
+  ],
+  "evidence": [
+   "public/js/machine-rooms.js:11-16 a Community Machine Room machine has no disassemble (machine_base isInCraftingAltar, fuelmaker.js:64, :310)",
+   "public/js/machine-rooms.js:63-70 PIT_STOP_QUEST, PIT_STOP_HINT (Machine Shop Pit Stop: assemble and disassemble in 2 minutes)"
+  ]
+ },
  "magic_butterfly_stick": {
   "lines": [
    "Place it in your back yard (you need Herdkeeping): your Butterflies there stay within 250 pixels of it. Change radius sets how far they roam, from very tight to very wide."

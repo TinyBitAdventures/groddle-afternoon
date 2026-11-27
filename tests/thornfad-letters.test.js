@@ -9,8 +9,8 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { LETTER_BOX, LETTER_INDICATOR, THORNFAD_LAYERS_TSID, inLetterBox, isThornfadLayers, letterOverlayKey, parseForcedLetter, rollStreetLetter } from '../public/js/thornfad-letters.js?v=1efc7d8d';
 import { LETTER_WEIGHTS } from '../public/js/potions.js?v=4f4c996d';
-import { LETTER_WORDS, LETTER_WORD_OFF, OVERLAY_EMOTES, letterFromWord, letterWord } from '../public/js/realtime-client.js?v=eb1515a8';
-import { thornfadLettersFeature, onRemoteLetter } from '../public/js/features/thornfad-letters-feature.js?v=b88a132f';
+import { LETTER_WORDS, LETTER_WORD_OFF, OVERLAY_EMOTES, letterFromWord, letterWord } from '../public/js/realtime-client.js?v=7e402304';
+import { thornfadLettersFeature, onRemoteLetter } from '../public/js/features/thornfad-letters-feature.js?v=c28e6fac';
 import { OVERLAY_USES } from '../public/js/overlays.js?v=91dcee74';
 import { LETTER_KEYS, OVERLAYS } from '../tools/overlays/build.mjs';
 

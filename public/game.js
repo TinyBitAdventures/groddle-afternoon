@@ -4,7 +4,7 @@
  */
 import { ITEM_ICONS, ITEM_LABELS, getVerbsFor, ordinaryItems, runVerb } from './content.js?v=da2b8879';
 import { createErrorOnce, createFeatureHost, createFrameStages } from './js/feature-host.js?v=b87e2cbc';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=9bd7a9cf';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=5dff0048';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, enterHintPick, hoverText, stackHoverLabel, groupHead, hoverRimShown, reachGlowTargets, spriteHasRimArt, rimArtParts, trimmedIconUrl, drawTileArt } from './js/enter-chooser.js?v=297c6d15';
 import { firstTendKey, STICK_TEND_DELAY_MS, STICK_TEND_DIRS, STICK_TEND_REPEAT_MS, stepTendKey, stepTendKeys, stickTendKey, tendKeyAction } from './js/garden-tend.js?v=a7470c4a';
 import { avatarHitBox, behindFloor, bodyReachDistance, OUT_OF_REACH_LINE, playerClickBox } from './js/reach.js?v=456da8a8';
@@ -140,7 +140,7 @@ import {
   requestLegalizeQualification,
   travelToGregarious,
 } from './js/legalize-it.js?v=53865df2';
-import { HALL, HALL_DECOS, HALL_EXTRA_CHAIRS, HALL_OFFICE, HALL_QUESTIONS } from './js/bureaucratic-hall.js?v=074510f2';
+import { HALL, HALL_DECOS, HALL_EXTRA_CHAIRS, HALL_OFFICE, HALL_QUESTIONS } from './js/bureaucratic-hall.js?v=43a5a02b';
 import { STATION_X, stationArrival, stationScreen, surfaceStation } from './js/subway.js?v=ea6921ff';
 import { ALLEY, SHADY, drawAlley, inEnteredBox } from './js/quest-rooms/back-alley-set.js?v=0bbff84f';
 import { WINTER_WALK_BOUNDS, WINTER_WALK_PASSAGE } from './js/winter-walk-streets.js?v=c921bf92';
@@ -680,7 +680,7 @@ import {
   recipeToolChosen,
   pluralizeItem,
 } from './js/making.js?v=dc595568';
-import { MAKE_FUEL_TIP, makeFuelView } from './js/home-machines.js?v=cae787a7';
+import { MAKE_FUEL_TIP, makeFuelView } from './js/home-machines.js?v=c72cb353';
 import { outputIconsHtml, outputsPhrase, productHaveRows, recipeOutputRows } from './js/ui/recipe-outputs.js?v=610c067f';
 import { MAKE_TOOL_SHEETS } from './js/make-tool-sheets.js?v=6f758e09';
 import { createTestTubePanel, tryTileHtml, TRY_TILE_LABEL } from './js/test-tube-panel.js?v=1ac36255';
@@ -748,7 +748,7 @@ import {
   resolveIndexTsid,
 } from './js/street-loader.js?v=10376267';
 import { showDraftBanner, startDraftPlay } from './js/builder/draft-play.js?v=0642d72a';
-import { bootHouseFile } from './js/house-file-loader.js?v=ea21f53a';
+import { bootHouseFile } from './js/house-file-loader.js?v=014960b6';
 import {
   ladderTopDeck,
   groundBeneath,
@@ -1129,6 +1129,7 @@ import { MOOD_DECAY_TEXT } from './js/mood-decay.js?v=49175993';
 import { installHiresIcons } from './js/icon-hires.js?v=60e2474b';
 import { IT_TAKES_TWO_HINT, IT_TAKES_TWO_QUEST } from './js/help-dig.js?v=7a854b00';
 import { MEDITATE_TOGETHER_HINT, MEDITATE_TOGETHER_QUEST } from './js/quests-mp.js?v=e697cec3';
+import { PIT_STOP_HINT, PIT_STOP_QUEST } from './js/machine-rooms.js?v=4b6ade29';
 import { installHiresDecos, maxTextureSizeOf } from './js/deco-hires.js?v=34f36d77';
 import { loadAudioLevels, loadMutedPreference, loadOtherMusic, saveAudioLevel, saveMutedPreference, saveOtherMusic } from './js/audio-pref.js?v=683f27c8';
 import { createAudioBuses, fadeGain } from './js/audio-buses.js?v=af167b54';
@@ -1148,7 +1149,7 @@ import { backgroundSound, backgroundSoundOn } from './js/background-sound.js?v=d
 import { bubbleMs } from './js/read-time.js?v=3151fb1a';
 import { mountNotifyView } from './js/notify-view.js?v=1ff8a878';
 import { PLAY_HERE_STATES } from './js/online-request.js?v=5fa7a635';
-import { mountSocialDrawer } from './js/ui/social-drawer.js?v=dca299d0';
+import { mountSocialDrawer } from './js/ui/social-drawer.js?v=0eba1119';
 import { installPhonePill, mountPhoneLayout, socialPillCount } from './js/ui/phone-layout.js?v=7ebe8992';
 import { bindChatLinks } from './js/chat-links.js?v=b717fac7';
 import { playerNameColour } from './js/name-colours.js?v=9819bb8a';
@@ -7072,6 +7073,13 @@ function drawQuestLogCard(p) {
     const hint = document.createElement('div');
     hint.className = 'q-req q-hint';
     hint.textContent = MEDITATE_TOGETHER_HINT;
+    card.appendChild(hint);
+  }
+  // Machine Shop Pit Stop keeps Tiny Speck's words; our hint says a machine room's machine won't do (js/machine-rooms.js).
+  if (p.active && p.def.classTsid === PIT_STOP_QUEST) {
+    const hint = document.createElement('div');
+    hint.className = 'q-req q-hint';
+    hint.textContent = PIT_STOP_HINT;
     card.appendChild(hint);
   }
   if (p.active && p.def.classTsid === PHANTOM_QUEST_ID) {

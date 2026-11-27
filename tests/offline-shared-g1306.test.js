@@ -14,7 +14,7 @@ import { describe, it } from 'node:test';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-import { createRealtimeClient } from '../public/js/realtime-client.js?v=eb1515a8';
+import { createRealtimeClient } from '../public/js/realtime-client.js?v=7e402304';
 import { ENDED_STATES, NO_REALTIME_STATES, OFFLINE_LINE, RECONNECTING_LINE, offlineLine, sharedOffline, waitLine } from '../public/js/online-request.js?v=5fa7a635';
 import { COPY } from '../public/js/street-objects.js?v=dd03ab9d';
 import { LOCAL_STATES } from '../public/js/shared-quoins.js?v=393445d8';

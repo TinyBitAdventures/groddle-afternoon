@@ -12,7 +12,7 @@ import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { HALL, HALL_DECOS, HALL_EXIT_DOOR_Y, HALL_EXTRA_CHAIRS, HALL_LAYOUT, HALL_TEXT, createHallFlow, inWaitingArea, waitPromptFor } from '../public/js/bureaucratic-hall.js?v=074510f2';
+import { HALL, HALL_DECOS, HALL_EXIT_DOOR_Y, HALL_EXTRA_CHAIRS, HALL_LAYOUT, HALL_TEXT, createHallFlow, inWaitingArea, waitPromptFor } from '../public/js/bureaucratic-hall.js?v=43a5a02b';
 import { CHAIR_PATHS } from '../tools/interrogation/build-chair.mjs';
 import { PAINTED_CHAIR_BOX } from '../tools/bureaucratic-hall/build-chairs.mjs';
 

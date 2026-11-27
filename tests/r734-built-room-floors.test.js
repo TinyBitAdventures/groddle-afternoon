@@ -24,7 +24,7 @@ import { after, before, describe, it } from 'node:test';
 
 import { avatarGround } from '../public/js/avatar-step.js?v=8415ee96';
 import { isStandable, platformYAt } from '../public/js/street-model.js?v=a9a05f9d';
-import { HALL, fillHallText } from '../public/js/bureaucratic-hall.js?v=074510f2';
+import { HALL, fillHallText } from '../public/js/bureaucratic-hall.js?v=43a5a02b';
 import { ALLEY } from '../public/js/quest-rooms/back-alley-set.js?v=0bbff84f';
 import { ROOK_MUSEUM_WORLD } from '../public/js/rook-museum.js?v=cc091e1c';
 import { NEIGHBOUR_SCENE } from '../public/js/neighbours.js?v=13f35acd';
@@ -33,8 +33,8 @@ import { buildVoyageScene, VOYAGE_FLOOR, VOYAGE_H, VOYAGE_W } from '../public/js
 import { buildKidsRoomScene, KIDS_ROOM_FLOOR, KIDS_ROOM_H, KIDS_ROOM_W } from '../public/js/kids-room-scene.js?v=30860f0d';
 import * as kit from '../public/js/quest-rooms/kit.js?v=a2eeb5d2';
 import { FakeEl, fakePixi } from './fake-scene.js';
-import { SOLO_PC_LABEL, pcLabel } from '../public/js/pc-label.js?v=e19212a2';
-import { offerBubble } from '../public/js/conversations.js?v=1c039467';
+import { SOLO_PC_LABEL, pcLabel } from '../public/js/pc-label.js?v=81bf3550';
+import { offerBubble } from '../public/js/conversations.js?v=713258bc';
 
 const read = (p) => readFileSync(new URL(`../${p}`, import.meta.url), 'utf8');
 const game = read('public/game.js');

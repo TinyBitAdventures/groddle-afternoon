@@ -24,7 +24,7 @@ import { MEGA_ROCK_LINE } from '../public/js/mining.js?v=7ecaa572';
 import { LONELY_RULES } from '../public/js/spirit-loneliness.js?v=9259917d';
 import { COPY as STREET_OBJECT_COPY } from '../public/js/street-objects.js?v=dd03ab9d';
 import { POISON_BUBBLE_EVERY_MS, POISON_BUBBLE_SHOW_MS, POISON_FIRST_BUBBLE_MS } from '../public/js/tree-poison.js?v=646d1bc1';
-import { animalMoodFeature } from '../public/js/features/animal-mood-feature.js?v=6248fff7';
+import { animalMoodFeature } from '../public/js/features/animal-mood-feature.js?v=ab23917c';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const GSJS = [join(ROOT, '..', 'glitch-GameServerJS', 'items'), join(homedir(), 'Documents/glitch-audit/glitch-GameServerJS/items')].find((p) => existsSync(p));

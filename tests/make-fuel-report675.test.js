@@ -11,8 +11,8 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { MAKE_FUEL_TIP, jobFuel, makeFuelView, tankOf } from '../public/js/home-machines.js?v=cae787a7';
-import { machineTank } from '../public/js/machine-rooms.js?v=a99c4d01';
+import { MAKE_FUEL_TIP, jobFuel, makeFuelView, tankOf } from '../public/js/home-machines.js?v=c72cb353';
+import { machineTank } from '../public/js/machine-rooms.js?v=4b6ade29';
 
 const root = join(import.meta.dirname, '..');
 const read = (p) => readFileSync(join(root, p), 'utf8');

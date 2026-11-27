@@ -60,7 +60,7 @@
  * No placement of the signs survives either: they hang where the 2012
  * footage shows them (#734, HALL_DECOS).
  */
-import { sentenceLabel } from './pc-label.js?v=e19212a2';
+import { sentenceLabel } from './pc-label.js?v=81bf3550';
 
 export const BUREAUCRAT_CLASS = 'npc_bureaucrat';
 export const PLEASE_WAIT_BUFF = 'please_wait';

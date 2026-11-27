@@ -6733,6 +6733,31 @@
    "rows": [
     "G1334"
    ]
+  },
+  {
+   "id": "pit-stop-machine-room-hint",
+   "title": "Machine Shop Pit Stop: one help line in the quest log and on the Machine Stand page, \"Use a machine you've built and set down yourself; machine room machines can't be taken apart.\"",
+   "kind": "UI",
+   "status": "kept",
+   "where": [
+    {
+     "file": "public/js/machine-rooms.js",
+     "symbol": "PIT_STOP_HINT"
+    },
+    {
+     "file": "public/game.js",
+     "symbol": "drawQuestLogCard"
+    },
+    {
+     "file": "tools/catalog/uses.json",
+     "symbol": "machine_stand"
+    }
+   ],
+   "why": "A player tried the quest on a Community Machine Room machine and could not finish it: room machines can't be taken apart, as in Glitch (machine_base isInCraftingAltar hides disassemble: fuelmaker.js:64, :310), and Glitch never said so. Tiny Speck's quest text (quests/engineering_assemble_machine.js) stays as written; the line is ours.",
+   "ruling": "Austin 2026-11-27 (trace calls, \"quest\"): add one line to the Machine Stand page and the quest log help",
+   "rows": [
+    "G443"
+   ]
   }
  ]
 }

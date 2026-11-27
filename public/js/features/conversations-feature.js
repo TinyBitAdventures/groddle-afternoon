@@ -91,8 +91,8 @@ import {
   resumeTarget,
   setCurrentState,
   talkableFor,
-} from '../conversations.js?v=1c039467';
-import { pcLabel } from '../pc-label.js?v=e19212a2';
+} from '../conversations.js?v=713258bc';
+import { pcLabel } from '../pc-label.js?v=81bf3550';
 
 export const CONVERSATIONS_FEATURE_ID = 'conversations';
 export const CONVO_TALK_VERB = 'convo_talk';

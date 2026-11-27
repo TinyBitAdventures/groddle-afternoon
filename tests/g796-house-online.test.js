@@ -12,7 +12,7 @@ import { execFileSync } from 'node:child_process';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { homeLiveParts, homeLivePrints } from '../public/js/home-live.js?v=9c7abae7';
-import { visitorHomeState } from '../public/js/features/homes-feature.js?v=a99d2418';
+import { visitorHomeState } from '../public/js/features/homes-feature.js?v=78d0151e';
 import { PHP } from './php.js';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');

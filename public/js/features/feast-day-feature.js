@@ -44,7 +44,7 @@ import {
   refillDue,
   servingsLeft,
   settleFeastDay,
-} from '../feast-day.js?v=29d69db5';
+} from '../feast-day.js?v=4609da69';
 
 export const FEAST_DAY_FEATURE_ID = 'feast-day';
 

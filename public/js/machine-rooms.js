@@ -59,6 +59,15 @@ import { MAKING_BUSY } from './make-tools.js?v=86877c3e';
 
 /** config_prod.js:1332 machine_rooms, as built (G prefix). */
 export const MACHINE_ROOM_TSIDS = Object.freeze([...MACHINE_ROOMS]);
+
+/** Machine Shop Pit Stop (quests/engineering_assemble_machine.js, G443): assemble and take apart a machine in 2 minutes. */
+export const PIT_STOP_QUEST = 'engineering_assemble_machine';
+/**
+ * Ours (Austin 2026-11-27): the quest log's help line for it, and the Machine Stand page's
+ * (tools/catalog/uses.json). A room machine can't be taken apart (above), so the quest can't be
+ * done on one; Glitch never said so. Tiny Speck's quest text stays as written.
+ */
+export const PIT_STOP_HINT = "Use a machine you've built and set down yourself; machine room machines can't be taken apart.";
 export const isMachineRoomTsid = (tsid) => MACHINE_ROOMS.has(String(tsid || '').replace(/^L/, 'G'));
 
 /** fuelmaker.js:863. */

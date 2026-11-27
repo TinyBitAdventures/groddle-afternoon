@@ -872,6 +872,10 @@
   "public/js/machine-art.js": {
     "ours: (browsers rewrite url('') quotes, so compare our own": "not-an-invention"
   },
+  "public/js/machine-rooms.js": {
+    "glitch-had-none: * done on one; Glitch never said so. Tiny Speck's quest text stays as": "pit-stop-machine-room-hint",
+    "ours: * Ours (Austin 2026-11-27): the quest log's help line": "pit-stop-machine-room-hint"
+  },
   "public/js/mailbox.js": {
     "ours: G570: the subjects of the game's own letters (ours; plain and short).": "ours-mailbox",
     "ours: reader. The game's own letters carry a subject (ours:": "ours-mailbox",

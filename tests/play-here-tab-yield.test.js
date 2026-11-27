@@ -16,7 +16,7 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import { readFileSync } from 'node:fs';
-import { createRealtimeClient } from '../public/js/realtime-client.js?v=eb1515a8';
+import { createRealtimeClient } from '../public/js/realtime-client.js?v=7e402304';
 import { PLAY_HERE_STATES } from '../public/js/online-request.js?v=5fa7a635';
 import { tabYielded } from '../public/js/features/realtime-feature.js?fresh=play-here-tab-yield';
 

@@ -11,7 +11,7 @@ import { execFileSync } from 'node:child_process';
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { socketUrl } from '../public/js/realtime-client.js?v=eb1515a8';
+import { socketUrl } from '../public/js/realtime-client.js?v=7e402304';
 import { PHP } from './php.js';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');

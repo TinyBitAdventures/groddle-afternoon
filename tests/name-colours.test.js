@@ -12,7 +12,7 @@ import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { NAME_PALETTE, YOU_CLASSIC, YOU_MODERN, nameColourKey, nameColourSlot, playerNameColour, playerNameSlot } from '../public/js/name-colours.js?v=9819bb8a';
-import { mountSocialDrawer } from '../public/js/ui/social-drawer.js?v=dca299d0';
+import { mountSocialDrawer } from '../public/js/ui/social-drawer.js?v=0eba1119';
 import { createNotifier } from '../public/js/notify.js?v=c9d79ec5';
 import { memoryStore, page } from './social-fake-dom.js';
 import { readTokens } from '../tools/tokens/css-sources.mjs';
