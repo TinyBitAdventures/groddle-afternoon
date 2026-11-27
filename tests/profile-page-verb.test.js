@@ -19,7 +19,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { join } from 'node:path';
 import { PROFILE_LISTED_LEVEL, PROFILE_PAGE_COPY, PROFILE_PAGE_VERB, profilePagePath, profilePageVerb, profileSlug } from '../public/js/profiles.js?v=7e94c96f';
-import { lookUpPlayersHere, profilesFeature } from '../public/js/features/profiles-feature.js?v=3eecefb8';
+import { lookUpPlayersHere, profilesFeature } from '../public/js/features/profiles-feature.js?v=b74e2959';
 import { GAME_DIR, HAS_SITE, SITE_DIR, skipWithoutSite } from '../tools/repos.mjs';
 import { HAS_PHP, PHP, phpSkip } from './php.js';
 
@@ -226,7 +226,7 @@ describe('the game wiring and the site', () => {
     const index = readFileSync(join(pub, 'js/features/index.js'), 'utf8');
     const at = (name) => index.indexOf(`FEATURES.push(${name})`);
     for (const other of ['partyFeature', 'tradeFeature', 'buddiesFeature']) assert.ok(at(other) < at('profilesFeature'), other);
-    assert.match(readFileSync(join(pub, 'js/features/profiles-feature.js'), 'utf8'), /window\.open\(url, '_blank', 'noopener'\);/);
+    assert.match(readFileSync(join(pub, 'js/features/profiles-feature.js'), 'utf8'), /openSitePage\(url\);/, '#741: a new tab, or the Home Screen app\'s page viewer (js/site-pages.js)');
   });
 
   it('the site takes /players/<slug>.<id>/ and hides pages below the listed level', { skip: skipWithoutSite }, () => {

@@ -9,8 +9,8 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { SHEET_TEXT, isHomeScreenApp, sheetLinkPlan } from '../public/js/ui/encyclopedia-sheet.js?v=987bd24f';
-import { createEncyclopedia } from '../public/js/encyclopedia-links.js?v=0c3b2863';
+import { SHEET_TEXT, isHomeScreenApp, sheetLinkPlan } from '../public/js/ui/encyclopedia-sheet.js?v=7a51c71e';
+import { createEncyclopedia } from '../public/js/encyclopedia-links.js?v=bcec7921';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', 'public');
 const game = readFileSync(join(ROOT, 'game.js'), 'utf8');
@@ -57,12 +57,12 @@ describe('#401: the Encyclopedia from a Home Screen app', () => {
     assert.deepEqual(shown, ['open https://g.test/encyclopedia/', 'open ', 'later https://g.test/encyclopedia/items/cherry/']);
   });
 
-  it('game.js uses the sheet only in a Home Screen app, for the Menu row, i and the links', () => {
-    assert.match(game, /const encyclopediaSheet = isHomeScreenApp\(window\) \? createEncyclopediaSheet\(/);
-    assert.match(game, /encyclopediaSheet\?\.catchLinks\(document\);/);
-    assert.match(game, /createEncyclopedia\(\{[\s\S]{0,160}\n\s*\.\.\.\(encyclopediaSheet \? \{ openWindow: \(url\) => encyclopediaSheet\.open\(url\) \} : \{\}\),\n\}\);/);
-    // The links it catches are the ones createEncyclopedia draws (class ency-link, target encyclopedia).
-    assert.match(sheetSrc, /a\.ency-link\[href\], a\[target="encyclopedia"\]\[href\]/);
+  it('game.js uses the sheet only in a Home Screen app, for the Menu row, i and the links (one rule since #741, js/site-pages.js)', () => {
+    assert.match(game, /const sitePageSheet = isHomeScreenApp\(window\) \? createEncyclopediaSheet\(/);
+    assert.match(game, /setSitePageViewer\(\(url, opts\) => sitePageSheet\.open\(url, opts\)\);\n\s*catchSiteLinks\(window\);/);
+    // createEncyclopedia opens through openSitePage, which is the sheet once the viewer is set; its links are caught as every site link.
+    assert.match(readFileSync(join(ROOT, 'js/encyclopedia-links.js'), 'utf8'), /openWindow = \(url, name\) => openSitePage\(url, \{ name, features: '' \}\)/);
+    assert.doesNotMatch(sheetSrc, /catchLinks/);
   });
 
   it('the sheet never adds to the app\'s history, and gives a way back to the game', () => {

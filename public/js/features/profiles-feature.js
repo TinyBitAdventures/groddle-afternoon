@@ -93,6 +93,7 @@ import { homeLayoutJson, homeLayoutKeyOf, HOME_LAYOUT_LIMITS } from '../home-lay
 import { collectHomeLayout, homeFrameFor } from '../home-layout-scene.js?v=ae8a0d27';
 import { renderHomeLocation } from '../home-shot-render.js?v=94336d6a';
 import { withPublicView } from '../public-picture.js?v=1a0b03fa';
+import { openSitePage } from '../site-pages.js?v=ed00aa3c';
 
 export const PROFILES_FEATURE_ID = 'profiles';
 
@@ -750,7 +751,8 @@ export const profilesFeature = {
     const path = pageFor(target.playerId, target.label || target.name || '');
     if (!path || typeof window === 'undefined') return true;
     const url = new URL(path, document.baseURI).href;
-    window.open(url, '_blank', 'noopener');
+    // #741: the Home Screen app's page viewer, else a new tab (js/site-pages.js).
+    openSitePage(url);
     engine?.setData?.('profilePage', path);
     return true;
   },

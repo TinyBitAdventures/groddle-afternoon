@@ -431,6 +431,8 @@ export function lightboxLink(link, { onOpen = () => {}, gallery = null, index = 
     const wait = typeof ready === 'function' ? ready() : null;
     return wait && typeof wait.then === 'function' ? wait.then(now, now) : now();
   };
+  // #741: the game opens it over itself, so the Home Screen app's page viewer leaves it be (js/site-pages.js).
+  link.setAttribute('data-opens-here', '');
   link.addEventListener('click', (ev) => {
     if (!plainClick(ev)) return;
     ev.preventDefault();

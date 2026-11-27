@@ -1,0 +1,238 @@
+/**
+ * #741 (iPhone Home Screen app, 402x812): Support the game and "N players online. See who" opened a
+ * new tab, which in a Home Screen app replaces the game with no way back; only the Encyclopedia opened
+ * in the in-game sheet with "Back to the game" (#401). Austin's ruling (2026-11-27): there, every link
+ * to our own site opens in that viewer. One rule (js/site-pages.js): catchSiteLinks takes every link,
+ * openSitePage every page the code opens. Glitch kept the game open behind every site page
+ * (TSFrontController.as 4353-4400, each in its own named window).
+ *
+ * The bypass guard: game code that opens a window or leaves the page itself (window.open,
+ * location.href =) fails here unless it is openSitePage or a reviewed exception below; a link
+ * anywhere in the game's page is caught by the one catch (the browser sweep clicks every one).
+ * Run: node --test tests/r741-site-pages.test.js
+ */
+import { after, before, describe, it } from 'node:test';
+import assert from 'node:assert/strict';
+import { readFileSync, readdirSync, statSync } from 'node:fs';
+import { dirname, join, relative } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { openSitePage, plainLinkClick, setSitePageViewer, sitePageHref } from '../public/js/site-pages.js?v=ed00aa3c';
+
+const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
+const PUB = join(ROOT, 'public');
+const read = (p) => readFileSync(join(ROOT, p), 'utf8');
+
+describe('#741 the one rule (js/site-pages.js)', () => {
+  const at = { base: 'https://groddleafternoon.com/', pageHref: 'https://groddleafternoon.com/play/online/' };
+
+  it("sitePageHref: this site's pages go to the viewer; play pages, other sites and non-web addresses do not", () => {
+    assert.equal(sitePageHref('contribute/', at), 'https://groddleafternoon.com/contribute/', 'Support the game (relative to the play pages\' <base>)');
+    assert.equal(sitePageHref('/chat/', at), 'https://groddleafternoon.com/chat/', 'See who');
+    assert.equal(sitePageHref('/chat/bugs/', at), 'https://groddleafternoon.com/chat/bugs/', 'solo Bugs');
+    assert.equal(sitePageHref('/privacy-policy/', at), 'https://groddleafternoon.com/privacy-policy/');
+    assert.equal(sitePageHref('https://www.groddleafternoon.com/chat/general/12/', at), 'https://groddleafternoon.com/chat/general/12/', 'the live site\'s other host is this site, at the page\'s origin');
+    assert.equal(sitePageHref('https://groddleafternoon.com/chat/', { base: 'http://127.0.0.1:8966/' }), '', 'a dev copy is not the live site');
+    assert.equal(sitePageHref('play/online/', at), '', 'a play page is the game itself');
+    assert.equal(sitePageHref('https://groddleafternoon.com/play/', at), '');
+    assert.equal(sitePageHref('https://github.com/sponsors/x', at), '', 'another site (payments) leaves the app, the game under it');
+    assert.equal(sitePageHref('mailto:a@b.c', at), '');
+    assert.equal(sitePageHref('blob:https://groddleafternoon.com/1-2', at), 'blob:https://groddleafternoon.com/1-2', 'a picture the game made');
+    assert.equal(sitePageHref('blob:https://example.org/1-2', at), '');
+  });
+
+  it('openSitePage: the viewer when one is set, else window.open as before', () => {
+    const opened = [];
+    const win = { document: { baseURI: at.base }, location: { href: at.pageHref }, open: (...a) => { opened.push(a); return { tab: true }; } };
+    assert.deepEqual(openSitePage('/players/7-ann/', { win }), { tab: true });
+    assert.deepEqual(opened.at(-1), ['/players/7-ann/', '_blank', 'noopener'], 'no viewer (a browser tab): a new tab');
+    assert.equal(openSitePage('', { name: 'encyclopedia', features: '', win }).tab, true);
+    assert.deepEqual(opened.at(-1), ['', 'encyclopedia', ''], "the Encyclopedia's own window, as today");
+    const shown = [];
+    setSitePageViewer((url, opts) => { shown.push([url, opts.title]); return { sheet: true }; });
+    try {
+      assert.deepEqual(openSitePage('/players/7-ann/', { win }), { sheet: true });
+      assert.deepEqual(openSitePage('', { win }), { sheet: true }, 'empty: the viewer, the page to come');
+      openSitePage('https://example.org/', { win });
+      assert.deepEqual(opened.at(-1), ['https://example.org/', '_blank', 'noopener'], 'another site still opens outside');
+      assert.deepEqual(shown, [['https://groddleafternoon.com/players/7-ann/', ''], ['', '']]);
+    } finally {
+      setSitePageViewer(null);
+    }
+    assert.equal(plainLinkClick({ button: 0 }), true);
+    assert.equal(plainLinkClick({ button: 0, metaKey: true }), false, 'a modified click keeps its own tab');
+  });
+
+  it('game.js sets the viewer and the catch only in a Home Screen app', () => {
+    const game = read('public/game.js');
+    assert.match(game, /const sitePageSheet = isHomeScreenApp\(window\) \? createEncyclopediaSheet\(/);
+    assert.match(game, /if \(sitePageSheet\) \{\n\s*setSitePageViewer\(\(url, opts\) => sitePageSheet\.open\(url, opts\)\);\n\s*catchSiteLinks\(window\);\n\}/);
+    assert.match(read('public/js/encyclopedia-links.js'), /openWindow = \(url, name\) => openSitePage\(url, \{ name, features: '' \}\)/);
+  });
+});
+
+/** In-game code: the game and every module it can load (not the level builder's or the phone page's own). */
+function gameFiles() {
+  const out = ['public/game.js'];
+  const walk = (dir) => {
+    for (const f of readdirSync(dir)) {
+      const p = join(dir, f);
+      if (statSync(p).isDirectory()) {
+        if (!['vendor', 'builder', 'phone'].includes(f)) walk(p);
+      } else if (f.endsWith('.js')) out.push(relative(ROOT, p));
+    }
+  };
+  walk(join(PUB, 'js'));
+  return out;
+}
+
+/**
+ * The reviewed places game code opens a window or moves its own page. Each says why it is not a page
+ * of this site the game should keep: a new one fails until it goes through openSitePage or is added here.
+ */
+const ALLOWED = [
+  ['public/js/site-pages.js', /win\?\.open\?\.\(url, name/, 'the opener itself'],
+  ['public/js/ui/encyclopedia-sheet.js', /else if \(plan === 'out'\) win\?\.open\?\.\(href, '_blank', 'noopener'\)/, 'a link in the viewer to another site (sheetLinkPlan out)'],
+  ['public/js/character-switcher.js', /win\.location\.href = to\.href/, 'another character: a play page'],
+  ['public/js/classic/classic-panes.js', /win\.location\.assign\('play\/online\/'\)/, 'the online game'],
+  ['public/js/features/account-backup-feature.js', /location\.href = (?:multiplayerEntryUrl\(document\.baseURI\)|account\.urls\.online)/, 'the online game'],
+];
+
+describe('#741 nothing in the game bypasses the one rule', () => {
+  const OPEN = /\b(?:window|globalThis|win|self|top|parent)\??\.open\??\.?\(/;
+  const LEAVE = /\b(?:location\.(?:assign|replace)\(|location\.href\s*=(?!=)|(?:window|globalThis|win|self|top|document)\.location\s*=(?!=))/;
+
+  it('no window.open or leaving the page outside openSitePage and the reviewed exceptions', () => {
+    const bad = [];
+    for (const f of gameFiles()) {
+      const lines = read(f).split('\n');
+      lines.forEach((line, i) => {
+        const code = line.replace(/\/\/.*$/, '');
+        if (/^\s*\*/.test(line) || /^\s*\/\*\*/.test(line)) return;
+        if (!OPEN.test(code) && !LEAVE.test(code)) return;
+        // The viewer's own frame (contentWindow.location.replace) is the viewer.
+        if (/contentWindow\??\.location|frame\.contentWindow|w\.location\.href = url/.test(code) && /encyclopedia-(?:sheet|links)\.js$/.test(f)) return;
+        if (ALLOWED.some(([file, re]) => file === f && re && re.test(code))) return;
+        bad.push(`${f}:${i + 1}: ${line.trim()}`);
+      });
+    }
+    assert.deepEqual(bad, [], 'open the page with openSitePage (js/site-pages.js), or add a reviewed exception');
+  });
+
+  it('only the picture lightbox opts a link out of the catch (it opens the picture over the game)', () => {
+    const users = gameFiles().filter((f) => /data-opens-here|OPENS_HERE_ATTR/.test(read(f)));
+    assert.deepEqual(users.sort(), ['public/js/site-pages.js', 'public/js/ui/picture-lightbox.js']);
+  });
+});
+
+let wk = null;
+try { await import('../tools/qa/playwright-env.mjs'); wk = await import('playwright'); } catch { /* no Playwright */ }
+
+describe('#741 an iPhone Home Screen app, 402x812 (WebKit)', { skip: !wk && 'no playwright' }, () => {
+  const LOCK_WAIT_MS = 30 * 60_000;
+  let br = null;
+  let server = null;
+  let base = '';
+  before(async () => {
+    const { startServer } = await import('../tools/qa/serve.mjs');
+    const { openBrowser } = await import('../tools/qa/browser.mjs');
+    server = await startServer({ root: PUB, port: 0 });
+    base = `http://127.0.0.1:${server.port ?? server.address().port}`;
+    br = await openBrowser({ engine: 'webkit', label: 'r741 site pages test', waitMs: LOCK_WAIT_MS });
+  }, { timeout: LOCK_WAIT_MS + 60_000 });
+  after(async () => { await br?.close(); await server?.stop?.(); });
+
+  const ctxOpts = () => ({ ...wk.devices['iPhone 15 Pro'], viewport: { width: 402, height: 812 } });
+  async function game(query) {
+    const ctx = await br.browser.newContext(ctxOpts());
+    // The play page's device choice made (the QA device), as the #741 trace does.
+    await ctx.addInitScript(() => { try { localStorage.setItem('groddle-play-device', 'qa-game'); } catch { /* none */ } });
+    const tab = await ctx.newPage();
+    const errors = [];
+    tab.on('pageerror', (e) => errors.push(String(e?.message || e)));
+    tab.errors = errors;
+    await tab.goto(`${base}/play/?autostart=1&fresh=1&resetgame=1&questoffer=off&hstip=0${query}`);
+    try {
+      await tab.waitForFunction(() => !document.body.classList.contains('is-booting') && document.getElementById('overlay')?.classList.contains('hidden'), null, { timeout: 45_000 });
+    } catch (err) {
+      await ctx.close();
+      throw new Error(`the game did not start: ${err.message}; page errors: ${JSON.stringify(errors)}`);
+    }
+    const popups = [];
+    ctx.on('page', (p) => popups.push(p.url()));
+    return { ctx, tab, popups };
+  }
+  /** Clicks the link `sel` (built first by `make`, as the game builds it) and says where it went. */
+  const press = (tab, sel) => tab.evaluate(async (s) => {
+    const a = document.querySelector(s);
+    if (!a) return { missing: s };
+    a.click();
+    await new Promise((r) => setTimeout(r, 300));
+    const sheet = document.getElementById('ency-sheet');
+    const open = Boolean(sheet && !sheet.hidden);
+    let at = '';
+    try { at = sheet?.querySelector('iframe')?.contentWindow?.location.href || ''; } catch { at = '?'; }
+    const title = sheet?.querySelector('.ency-sheet-close')?.textContent || '';
+    sheet?.querySelector('[data-ency-sheet-close]')?.click();
+    return { open, at, close: title, href: a.href };
+  }, sel);
+
+  it('Support the game, See who, a notice, a chat link home, the privacy policy and a picture tab open in the viewer, with Back to the game; and the sweep: every link to the site in the game page does', { timeout: 180_000 }, async () => {
+    const { ctx, tab, popups } = await game('&homescreen=1');
+    // The links as the game draws them (each module's own markup, loaded in the page).
+    await tab.evaluate(async () => {
+      const root = document.getElementById('game-root');
+      const { communityNoticeHtml } = await import('/js/community-notices.js');
+      const { appendLinkedText } = await import('/js/chat-links.js');
+      const note = document.createElement('p');
+      note.innerHTML = communityNoticeHtml({ id: 1, text: 'A new post', url: '/chat/general/12-a-post/' });
+      note.querySelector('a').id = 't-notice';
+      const line = document.createElement('p');
+      appendLinkedText(line, `see ${location.origin}/changelog/ now`, { homeHosts: [location.hostname] });
+      line.querySelector('a').id = 't-chat';
+      const mk = (id, attrs) => Object.assign(document.createElement('a'), { id, ...attrs });
+      // social-drawer.js 1193 (See who), account-forms.js 474 (privacy), picture-lightbox.js 157 (its tab).
+      const who = mk('t-who', { className: 'chat-link', href: '/chat/', target: '_blank', rel: 'noopener', textContent: 'See who' });
+      who.dataset.chatLink = 'home';
+      const privacy = mk('t-privacy', { href: '/privacy-policy/', target: '_blank', rel: 'noopener', textContent: 'Privacy' });
+      const pic = mk('t-pic', { className: 'picture-lightbox-tab', href: '/assets/ui/bug_icon.webp', target: '_blank', rel: 'noopener', textContent: 'Open in a new tab' });
+      root.append(note, line, who, privacy, pic);
+    });
+    const results = {};
+    for (const [k, sel] of [['encyclopedia', '#encyclopedia-btn'], ['support', '#support-btn'], ['seeWho', '#t-who'], ['notice', '#t-notice'], ['chat', '#t-chat'], ['privacy', '#t-privacy'], ['picture', '#t-pic']]) results[k] = await press(tab, sel);
+    const r = await tab.evaluate(async () => {
+      const { sitePageHref } = await import('/js/site-pages.js');
+      const links = [...document.querySelectorAll('a[href]')].filter((a) => !a.closest('#ency-sheet') && !a.hasAttribute('download') && !a.closest('[data-opens-here]') && !a.getAttribute('href').startsWith('#') && sitePageHref(a.href, { base: document.baseURI, pageHref: location.href }));
+      const out = [];
+      for (const a of links) {
+        a.click();
+        await new Promise((res) => setTimeout(res, 120));
+        const sheet = document.getElementById('ency-sheet');
+        out.push({ href: a.getAttribute('href'), id: a.id, open: Boolean(sheet && !sheet.hidden) });
+        sheet?.querySelector('[data-ency-sheet-close]')?.click();
+      }
+      return { left: location.pathname, out };
+    });
+    await ctx.close();
+    for (const [k, r] of Object.entries(results)) {
+      assert.equal(r.missing, undefined, `${k}: ${r.missing} is there`);
+      assert.equal(r.open, true, `${k} opens in the viewer (${JSON.stringify(r)})`);
+      assert.equal(r.close, 'Back to the game', k);
+      if (k !== 'encyclopedia') assert.equal(r.at, r.href, `${k}: the viewer shows its page`);
+    }
+    assert.match(results.support.at, /\/contribute\/$/);
+    assert.deepEqual(popups, [], 'no new window: the game stays');
+    assert.ok(r.out.some((l) => l.id === 'support-btn'), 'the sweep reaches the Menu');
+    assert.ok(r.out.length >= 3, `links swept: ${r.out.length}`);
+    assert.deepEqual(r.out.filter((l) => !l.open), [], 'every one opens in the viewer');
+    assert.equal(r.left, '/play/', 'the game page never left');
+  });
+
+  it('outside a Home Screen app Support the game keeps its new tab (no viewer)', { timeout: 120_000 }, async () => {
+    const { ctx, tab, popups } = await game('');
+    const r = await press(tab, '#support-btn');
+    await tab.waitForTimeout(500);
+    await ctx.close();
+    assert.equal(r.open, false);
+    assert.equal(popups.length, 1, 'a new tab, as before');
+  });
+});

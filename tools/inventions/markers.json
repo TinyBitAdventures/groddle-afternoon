@@ -47,6 +47,7 @@
     "ours: // menu of ours ([data-ctx]) or a plain HUD button; text fields,": "right-click-menus",
     "ours: 117-119); fixed by the player's id (ours), yours violet (Classic: Glitch's": "name-colours-per-player",
     "ours: Q+V render switch, 1916-1921), so this one is ours.": "ours-game-js-walkinput",
+    "ours: Screen app (one window, no tabs) every page of our own site the": "home-screen-page-viewer",
     "ours: hint for a line you already said in the chain (ours; Glitch said nothing), once a session.": "featured-project",
     "ours: in the back alley (npc_bureaucrat.js 897), not ours.": "not-an-invention",
     "reimagined: Official archived art first, then the reimagined generator output.": "badge-art-reimagined",
@@ -1240,6 +1241,11 @@
     "ours: The player's words use the Giant's name as ours spells": "ours-shrines",
     "remake-own: * #443 (Austin 2026-11-19): the remake's own line in the emblem confirm when the": "emblem-half-cap-line"
   },
+  "public/js/site-pages.js": {
+    "ours: * The viewer over the game is ours, for the one window a Home Screen app": "home-screen-page-viewer",
+    "ours: * and every other link from the game to our own site opened a new tab. A Home Screen app has": "home-screen-page-viewer",
+    "ours: in the Home Screen app every link to our own site opens in the in-game page": "home-screen-page-viewer"
+  },
   "public/js/skills-panel.js": {
     "ours: longer than its points say, in one plain line. Ours": "ours-study-time-hint"
   },
@@ -1412,6 +1418,7 @@
     "ours: * not ours); `open(thing, { at, keys, swallowClick, event": "right-click-menus"
   },
   "public/js/ui/encyclopedia-sheet.js": {
+    "ours: * our own site the game links to (Support the game, See": "home-screen-page-viewer",
     "ours: with location.replace and a Back list of our own, so nothing": "not-an-invention"
   },
   "public/js/ui/featured-project.js": {

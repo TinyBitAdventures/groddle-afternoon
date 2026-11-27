@@ -24,7 +24,7 @@ import {
   encyclopediaPage,
   encyclopediaSearchHref,
   isEncyclopediaKey,
-} from '../public/js/encyclopedia-links.js?v=0c3b2863';
+} from '../public/js/encyclopedia-links.js?v=bcec7921';
 import { GIANTS } from '../public/js/shrines.js?v=48318bec';
 import { VENDOR_PROFILES } from '../public/js/vendor.js?v=7a07f478';
 import { CLIENT_KEY_TABLE, clientKeyAction } from '../public/js/client-hotkeys.js?v=5c5a4301';

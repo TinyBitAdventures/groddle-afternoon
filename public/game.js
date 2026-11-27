@@ -4,7 +4,7 @@
  */
 import { ITEM_ICONS, ITEM_LABELS, getVerbsFor, ordinaryItems, runVerb } from './content.js?v=68a61ef7';
 import { createErrorOnce, createFeatureHost, createFrameStages } from './js/feature-host.js?v=b87e2cbc';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=df6e8ee9';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=5bb0fe3a';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, enterHintPick, groupHead, hoverRimShown, reachGlowTargets, spriteHasRimArt, rimArtParts, trimmedIconUrl, drawTileArt } from './js/enter-chooser.js?v=74f4964a';
 import { firstTendKey, STICK_TEND_DELAY_MS, STICK_TEND_DIRS, STICK_TEND_REPEAT_MS, stepTendKey, stepTendKeys, stickTendKey, tendKeyAction } from './js/garden-tend.js?v=a7470c4a';
 import { avatarHitBox, behindFloor, bodyReachDistance, OUT_OF_REACH_LINE, playerClickBox } from './js/reach.js?v=456da8a8';
@@ -1160,8 +1160,9 @@ import { createScrollKeep } from './js/ui/scroll-keep.js?v=2898b5b1';
 import { actVerbMenu, bindVerbMenu, centerVerbMenu, chooseVerbRow, dropVerbMenuActs, fitPickGrid, fitVerbMenuRows, focusVerbRow, lockVerbMenuSize, makePickTile, makeVerbRow, pickGridCols, placeVerbMenu, plainWords, refuseVerbRow, setVerbMenuIcon, settleVerbMenu, stepVerbRow, syncVerbDetail, verbMenuKey, verbMenuWaiting, verbRowAttrs, verbRowInner, verbRowKeys } from './js/ui/verb-menu.js?v=1ad4f969';
 import { createPromptSettler, promptId, promptSideStep } from './js/prompt-settle.js?v=cb790f3a';
 import { clientKeyAction, createHotkeysSheet, emoteKeyAction, isHotkeySheetRelease, isPlainKey } from './js/client-hotkeys.js?v=5c5a4301';
-import { ENCYCLOPEDIA_MENU_LABEL, createEncyclopedia, isEncyclopediaKey } from './js/encyclopedia-links.js?v=0c3b2863';
-import { createEncyclopediaSheet, isHomeScreenApp } from './js/ui/encyclopedia-sheet.js?v=987bd24f';
+import { ENCYCLOPEDIA_MENU_LABEL, createEncyclopedia, isEncyclopediaKey } from './js/encyclopedia-links.js?v=bcec7921';
+import { createEncyclopediaSheet, isHomeScreenApp } from './js/ui/encyclopedia-sheet.js?v=7a51c71e';
+import { catchSiteLinks, setSitePageViewer } from './js/site-pages.js?v=ed00aa3c';
 import { bootStep } from './js/boot-progress.js?v=d84b898d';
 import { HOME_SCREEN_TIP_CACHE, iosSafari, mountHomeScreenTip, runsStandalone } from './js/home-screen-tip.js?v=f2287991';
 import { ZOOM_HINT_CACHE, ZOOM_HINT_MS, watchZoomHint } from './js/zoom-hint.js?v=75b745c7';
@@ -1841,11 +1842,17 @@ function openLookBuilderOn(slot) {
 const hotkeysSheet = createHotkeysSheet(document, { keyring: () => Boolean(document.getElementById('keys-btn')), hub: () => modernUi(), reports: () => Boolean(document.getElementById('bug-btn')) });
 
 /**
- * #401: in an iPhone Home Screen app (one window, no tabs) the Encyclopedia opens in a sheet over the
- * game (js/ui/encyclopedia-sheet.js), never in the game's own window; a browser tab keeps its new tab.
+ * #401, #741: in an iPhone Home Screen app (one window, no tabs) every page of our own site the game
+ * opens (the Encyclopedia, Support the game, See who, the boards, a profile) opens in the sheet over
+ * the game (js/ui/encyclopedia-sheet.js) with "Back to the game", never in the game's own window. One
+ * rule (js/site-pages.js): catchSiteLinks takes every link to the site, openSitePage every page the
+ * code opens. A browser tab keeps its new tab (no viewer is set).
  */
-const encyclopediaSheet = isHomeScreenApp(window) ? createEncyclopediaSheet({ setData: (key, value) => setCanvasData(key, value) }) : null;
-encyclopediaSheet?.catchLinks(document);
+const sitePageSheet = isHomeScreenApp(window) ? createEncyclopediaSheet({ setData: (key, value) => setCanvasData(key, value) }) : null;
+if (sitePageSheet) {
+  setSitePageViewer((url, opts) => sitePageSheet.open(url, opts));
+  catchSiteLinks(window);
+}
 
 /**
  * ENCYC (Austin 2026-11-05, js/encyclopedia-links.js): the Encyclopedia from the game. Its index
@@ -1858,7 +1865,6 @@ const encyclopedia = createEncyclopedia({
     if (isSkillsOpen()) renderSkillsPanel();
     if (isShrineOpen()) renderShrinePanel();
   },
-  ...(encyclopediaSheet ? { openWindow: (url) => encyclopediaSheet.open(url) } : {}),
 });
 
 /** ENCYC: a world thing as an Encyclopedia subject (a dropped stack is its item; players have no page). */

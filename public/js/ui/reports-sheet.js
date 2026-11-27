@@ -123,7 +123,7 @@ import { parseReportReactionKey, reactorOf, reportReactionKey, reportReactions }
 import { PICTURE_TEXT as P, REPORT_PICTURES, convertPicture, dragHasFiles, filesOf, refusalWords as pictureRefusal, roomFor, takeForRoom } from '../report-pictures.js?v=fe05b74d';
 import { focusBack } from './focus-return.js?v=da190597';
 import { appendLinkedText, bindChatLinks } from '../chat-links.js?v=b717fac7';
-import { lightboxLink } from './picture-lightbox.js?v=a869d517';
+import { lightboxLink } from './picture-lightbox.js?v=709c5bd1';
 import { MARK_TEXT, bakeMarks, createMarkBook } from './picture-marks.js?v=315bb1da';
 import { REPORT_MENU_TEXT, bindReportRowMenu, copyText, reportLink } from './report-row-menu.js?v=bce12edc';
 

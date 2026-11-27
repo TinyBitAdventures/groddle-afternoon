@@ -23,6 +23,8 @@
  * the client's did (its target 'encyclopedia'), so a second press reuses the Encyclopedia's tab.
  */
 
+import { openSitePage } from './site-pages.js?v=ed00aa3c';
+
 /** The home page and the index, relative to the game root (the play pages' <base>). */
 export const ENCYCLOPEDIA_HOME = 'encyclopedia/';
 export const ENCYCLOPEDIA_INDEX = 'encyclopedia/search.json';
@@ -126,12 +128,12 @@ export function isEncyclopediaKey(e) {
 /**
  * The game's Encyclopedia: the index (loaded once, on load() or the first open), the links and
  * the window. `fetchJson(url)` resolves to the parsed index; `openWindow(url, name)` is
- * window.open; `resolve(href)` makes an address absolute (against the page's <base>).
+ * js/site-pages.js openSitePage (window.open, or the Home Screen app's page viewer, #741); `resolve(href)` makes an address absolute (against the page's <base>).
  * `onReady()` runs once the index is in, so open sheets can draw their links.
  */
 export function createEncyclopedia({
   fetchJson = (url) => globalThis.fetch(url).then((r) => (r.ok ? r.json() : Promise.reject(new Error(`HTTP ${r.status}`)))),
-  openWindow = (url, name) => globalThis.open?.(url, name) || null,
+  openWindow = (url, name) => openSitePage(url, { name, features: '' }),
   resolve = (href) => new URL(href, globalThis.document?.baseURI || globalThis.location?.href).href,
   onReady = () => {},
   wait = 4000,

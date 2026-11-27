@@ -15,6 +15,11 @@
  * behind it can never leave the game). A link to a play page closes the sheet (you are in the game);
  * a link to another site opens outside the app (iOS shows it over the app, the game still under it).
  *
+ * #741 (Austin 2026-11-27): the same sheet is the Home Screen app's page viewer for every page of
+ * our own site the game links to (Support the game, See who, the boards, a profile, the privacy
+ * policy): js/site-pages.js catchSiteLinks and openSitePage send them all here. Its title is the
+ * page's own once it loads ("Encyclopedia" or the site's name until then).
+ *
  * QA: `?homescreen=1` opens it in a browser tab too; canvas data `encyclopediaSheet` is the address shown.
  */
 
@@ -51,6 +56,8 @@ export function sheetLinkPlan(href, { origin = '', playRoot = '' } = {}) {
 
 export const SHEET_TEXT = Object.freeze({
   title: 'Encyclopedia',
+  /** Any other page's title until its own loads. */
+  site: 'Groddle Afternoon',
   back: 'Back',
   backLabel: 'Back to the page before',
   close: 'Back to the game',
@@ -76,7 +83,7 @@ const CSS = `
 /**
  * The sheet, built on first use in `root`. open(url) shows the page and returns a window-like
  * handle for js/encyclopedia-links.js createEncyclopedia (focus(), closed, location.href = later
- * address). catchLinks() makes the game's "In the Encyclopedia" links open here.
+ * address). The game's links reach it through js/site-pages.js (catchSiteLinks, openSitePage).
  */
 export function createEncyclopediaSheet({ doc = globalThis.document, win = globalThis.window, root = null, setData = () => {} } = {}) {
   let el = null;
@@ -128,9 +135,7 @@ export function createEncyclopediaSheet({ doc = globalThis.document, win = globa
     closeBtn.dataset.encySheetClose = '';
     closeBtn.textContent = SHEET_TEXT.close;
     bar.append(backBtn, titleEl, closeBtn);
-    frame = doc.createElement('iframe');
-    frame.className = 'ency-sheet-frame';
-    frame.title = SHEET_TEXT.title;
+    frame = makeFrame();
     el.append(bar, frame);
     // On the page itself, not in the game's frame (a fixed box there can sit inside its box).
     (root || doc.body).append(el);
@@ -143,13 +148,32 @@ export function createEncyclopediaSheet({ doc = globalThis.document, win = globa
         close();
       }
     });
-    frame.addEventListener('load', onFrameLoad);
   }
 
+  /** An empty frame for the pages. */
+  function makeFrame() {
+    const f = doc.createElement('iframe');
+    f.className = 'ency-sheet-frame';
+    f.title = SHEET_TEXT.title;
+    f.addEventListener('load', onFrameLoad);
+    return f;
+  }
+
+  /** The bar's title (and the dialog's name): the page's own, or `t`. */
+  function setTitle(t) {
+    titleEl.textContent = t;
+    el.setAttribute('aria-label', t);
+    frame.title = t;
+  }
+
+  /** The title a page has until its own loads. */
+  const titleFor = (url) => (/\/encyclopedia\//.test(String(url || '')) ? SHEET_TEXT.title : SHEET_TEXT.site);
+
   /** Shows `url` in the frame without adding to the app's history. */
-  function show(url) {
+  function show(url, title = '') {
     current = String(url || '');
     setData('encyclopediaSheet', current);
+    if (current || title) setTitle(title || titleFor(current));
     backBtn.hidden = behind.length === 0;
     if (!current) return;
     // replace(), never src: a frame's src change after its first page adds to the app's history.
@@ -166,7 +190,7 @@ export function createEncyclopediaSheet({ doc = globalThis.document, win = globa
     try { fdoc = frame.contentDocument; } catch { fdoc = null; }
     if (!fdoc || !fdoc.body) return;
     const t = String(fdoc.title || '').trim();
-    titleEl.textContent = t || SHEET_TEXT.title;
+    setTitle(t || titleFor(current));
     // The page's own address after its redirects and searches (?q=), for Back.
     try { if (frame.contentWindow.location.href !== 'about:blank') current = frame.contentWindow.location.href; } catch { /* kept */ }
     fdoc.addEventListener('click', (e) => {
@@ -196,14 +220,15 @@ export function createEncyclopediaSheet({ doc = globalThis.document, win = globa
     show(behind.pop());
   }
 
-  function open(url = '') {
+  /** Opens the sheet on `url` (or, open already, goes there); `title` until the page's own loads. */
+  function open(url = '', { title = '' } = {}) {
     build();
     const wasHidden = el.hidden;
     if (wasHidden) {
       behind.length = 0;
       returnFocus = doc.activeElement && doc.activeElement !== doc.body ? doc.activeElement : null;
       el.hidden = false;
-      show(url);
+      show(url, title);
       closeBtn.focus?.({ preventScroll: true });
     } else if (url) go(url);
     return handle;
@@ -215,8 +240,11 @@ export function createEncyclopediaSheet({ doc = globalThis.document, win = globa
     behind.length = 0;
     current = '';
     setData('encyclopediaSheet', '');
-    // An empty frame holds no page (and no sound or timers) while the game plays on.
-    try { frame.contentWindow?.location.replace('about:blank'); } catch { frame.src = 'about:blank'; }
+    // A new empty frame in the page's place: no page (and no sound or timers) while the game plays on,
+    // and no navigation of the old one left to land after the next open (#741, open, close, open again).
+    const old = frame;
+    frame = makeFrame();
+    old.replaceWith(frame);
     try { returnFocus?.focus?.({ preventScroll: true }); } catch { /* gone */ }
     returnFocus = null;
   }
@@ -233,16 +261,5 @@ export function createEncyclopediaSheet({ doc = globalThis.document, win = globa
     },
   };
 
-  /** The game's "In the Encyclopedia" links (and any link aimed at its window) open in the sheet. */
-  function catchLinks(target = doc) {
-    target.addEventListener('click', (e) => {
-      if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
-      const a = e.target?.closest?.('a.ency-link[href], a[target="encyclopedia"][href]');
-      if (!a) return;
-      e.preventDefault();
-      open(a.href);
-    }, true);
-  }
-
-  return { open, close, isOpen, catchLinks, get current() { return current; } };
+  return { open, close, isOpen, get current() { return current; } };
 }

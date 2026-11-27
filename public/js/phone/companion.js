@@ -596,7 +596,7 @@ function linkMessages(list, bodies) {
 }
 /** The pictures over the page (js/ui/picture-lightbox.js, plain DOM), loaded at the first tap on a picture. */
 let lightboxModule = null;
-const loadLightbox = () => (lightboxModule ||= import('../ui/picture-lightbox.js?v=a869d517').catch((err) => { lightboxModule = null; throw err; }));
+const loadLightbox = () => (lightboxModule ||= import('../ui/picture-lightbox.js?v=709c5bd1').catch((err) => { lightboxModule = null; throw err; }));
 /** G808: the rings module, loaded with the lightbox at the first tap on a photo about to go. */
 let marksModule = null;
 const loadMarks = () => (marksModule ||= import('../ui/picture-marks.js?v=315bb1da').catch((err) => { marksModule = null; throw err; }));
