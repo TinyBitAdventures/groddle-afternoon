@@ -93,6 +93,6 @@ describe('#318 Radiant Glare bulbs click from anywhere', () => {
 
   it('the click handler and requestVerb still go through these two checks', () => {
     assert.match(game, /if \(!\/\^pc_\/\.test\(String\(best\.classId \|\| ''\)\) && behindFloorFromPlayer\(best\) && !walkOverReaches\(best\)\) \{/);
-    assert.match(game, /function requestVerb\(target, verb, \{ label = '', run = null \} = \{\}\) \{[\s\S]{0,200}if \(verbReachFrom\(target, verb\.id\)\) return [^;]*go\(\);/);
+    assert.match(game, /function requestVerb\(target, verb, \{ label = '', run = null \} = \{\}\) \{[\s\S]{0,320}if \(verbReachFrom\(target, verb\.id\)\) return [^;]*go\(\);/);
   });
 });

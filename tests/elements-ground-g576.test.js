@@ -44,7 +44,7 @@ describe('#139 Drop', () => {
     assert.match(game, /box\.slots\.some\(\(s\) => packDropBlockReason\(s\.cls, \{ inBag: true \}\)\)/);
     // Drop, the drop chooser and Decoration Mode all ask packDropBlockReason first.
     assert.match(game, /function dropPackItem\(classTsid, requested = 1\) \{\s*if \([^)]*\) return;\s*const blocked = packDropBlockReason\(classTsid\);/);
-    assert.match(game, /dropPackStackAt\(classTsid, count, x, y, \{ beforeRemove = null, floor = false, beforeShare = null, into = null, merge = true, pointer = false, copy = null \} = \{\}\) \{[\s\S]{0,140}const blocked = packDropBlockReason\(classTsid\);/);
+    assert.match(game, /dropPackStackAt\(classTsid, count, x, y, \{ beforeRemove = null, floor = false, beforeShare = null, into = null, merge = true, pointer = false, copy = null, on = null \} = \{\}\) \{[\s\S]{0,140}const blocked = packDropBlockReason\(classTsid\);/);
   });
 
   it("an element's pack menu has no Drop row (state null hides it)", () => {
