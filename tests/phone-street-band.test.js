@@ -6,8 +6,8 @@
  * Glitch drew its location viewport under the header and over the pack (TSMainView.as resizeToStage
  * 1229-1257). Sideways phones and computers are unchanged.
  * - pure: phoneRegions gives the band upright only (js/ui/phone-layout.js streetBandOf), the canvas's
- *   room is cut to it (js/location-view.js stageRoomInBand) and the stage keeps the whole room's scale
- *   (streetBandStage), so the avatar is as big as before and a pinch reaches as close;
+ *   room is cut to it (js/location-view.js stageRoomInBand) and the closest level keeps the whole room's
+ *   scale (streetBandStage), so a pinch reaches as close; Whole street fits the band (#740, streetBandScale);
  * - Chrome at 384x748 (the reporter's phone) and WebKit as an iPhone 15 Pro, on Kala Close: the
  *   canvas's rect is under the top bar and over the controls, and #617's guarantees hold: the feet
  *   stand in the street over the controls, Act and the pack row take taps on arrival, after a pinch
@@ -20,7 +20,7 @@ import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { GAP, phoneRegions, streetBandOf } from '../public/js/ui/phone-layout.js?v=351488b7';
-import { MIN_PACK_HEIGHT, stageFor, stageRoomBeside, stageRoomInBand, streetBandStage } from '../public/js/location-view.js?v=4c2530a9';
+import { MIN_PACK_HEIGHT, stageFor, stageRoomBeside, stageRoomInBand, streetBandStage } from '../public/js/location-view.js?v=04d55c40';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const game = readFileSync(join(root, 'public/game.js'), 'utf8');
@@ -53,14 +53,17 @@ describe('#654: the street band (pure)', () => {
     assert.deepEqual(stageRoomInBand(stageRoomBeside(384, 748, null), null), { width: 384, height: 748, left: 0, top: 0 });
   });
 
-  it('the stage keeps the whole room\'s scale (the avatar\'s size, the pinch\'s reach); only the view gets shorter', () => {
+  it('the closest level keeps the whole room\'s scale (the pinch\'s reach); Whole street fits the band (#740); only the view gets shorter', () => {
     for (const [W, H, band] of [[384, 748, 456], [393, 659, 367], [375, 667, 375], [360, 629, 340]]) {
       for (const closeup of [0, 0.5, 1]) {
         const args = { width: W, packReserve: MIN_PACK_HEIGHT, sceneWidth: 4000, sceneHeight: 1200, phone: true, closeup };
         const full = stageFor({ ...args, height: H });
         const cut = stageFor({ ...args, height: band, streetBand: true, fullHeight: H });
-        assert.equal(cut.scale, full.scale, `${W}x${H} at ${closeup}`);
-        assert.equal(cut.viewW, full.viewW);
+        if (closeup === 1) assert.equal(cut.scale, full.scale, `${W}x${H} at ${closeup}`);
+        // #740: Whole street shows the street's whole height (VIEW_HOLD_H, 1000 px) in the band, the canvas the band's height.
+        else if (closeup === 0) assert.ok(Math.abs((cut.viewH + MIN_PACK_HEIGHT) * cut.scale - band) <= cut.scale + 0.01 && Math.abs(band / cut.scale - 1000) < 1.5, `${W}x${H}: Whole street ${band / cut.scale} world px tall`);
+        else assert.ok(cut.scale < full.scale, `${W}x${H} at ${closeup}: between the band's Whole street and the closest`);
+        assert.equal(cut.viewW, Math.round(W / cut.scale));
         assert.ok(!cut.landscape, `${W}x${H}: a band as wide as tall is still upright`);
         assert.ok(Math.abs(cut.cssHeight - band) < 0.01, `${W}x${H}: the canvas fills the band (${cut.cssHeight})`);
         assert.ok(Math.abs((cut.viewH + MIN_PACK_HEIGHT) * cut.scale - band) <= cut.scale + 0.01);

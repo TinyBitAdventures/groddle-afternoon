@@ -381,7 +381,7 @@ print(json.dumps(out))`;
   });
 
   test('the 3x covers the wheel\'s draw scale on a 2x laptop at Original zoom, and loads before it plays', async () => {
-    const { stageFor } = await import('../public/js/location-view.js?v=4c2530a9');
+    const { stageFor } = await import('../public/js/location-view.js?v=04d55c40');
     const game = fs.readFileSync(path.join(root, 'public/game.js'), 'utf8');
     const scale = Number(/new PIXI\.AnimatedSprite\(textures\.wheelAppear\.frames\);\n\s+standOnFeet\(sprite\);\n\s+sprite\.scale\.set\(([\d.]+)\);/.exec(game)?.[1]);
     assert.equal(scale, 0.72);

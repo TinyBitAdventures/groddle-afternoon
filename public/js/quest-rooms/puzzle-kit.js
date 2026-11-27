@@ -11,7 +11,7 @@
  */
 
 import { textureFromUrl } from '../textures.js?v=b8e38103';
-import { touchesQuoin } from './kit.js?v=2a4b0477';
+import { touchesQuoin } from './kit.js?v=3bd05cd3';
 import { anchorBottomCentre } from '../sprite-feet.js?v=6358a697';
 
 export const JUMP_RISE = 100;

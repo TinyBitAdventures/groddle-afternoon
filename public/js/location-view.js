@@ -256,34 +256,50 @@ export function phoneZoomSpan(args = {}) {
  * the page width with that location height (the canvas may then outgrow the
  * window, as before); zoom does not apply to it.
  */
-export function stageFor({
-  width,
-  height,
-  packReserve = MIN_PACK_HEIGHT,
-  sceneWidth,
-  sceneHeight,
-  pinnedHeight,
-  zoom = 0,
-  phone = false,
-  closeup = 0,
-  sceneBorders = false,
-  fitViewH,
-  groundLine,
-  groundFit,
-  topBand,
-  minViewW,
-  sceneDrop,
-  streetBand = false,
-  fullHeight,
-} = {}) {
+export function stageFor(args = {}) {
+  const {
+    width,
+    height,
+    packReserve = MIN_PACK_HEIGHT,
+    sceneWidth,
+    sceneHeight,
+    pinnedHeight,
+    zoom = 0,
+    phone = false,
+    closeup = 0,
+    sceneBorders = false,
+    fitViewH,
+    groundLine,
+    groundFit,
+    topBand,
+    minViewW,
+    sceneDrop,
+    streetBand = false,
+    fullHeight,
+    undocked,
+  } = args;
   const W = finite(width);
   const H = finite(height);
   const pack = finite(packReserve, MIN_PACK_HEIGHT);
   const pinned = finite(pinnedHeight);
-  // STREET BAND (#654): the phone's own stage for the whole room (`fullHeight`), cut to the band.
+  // #740 (Austin's ruling 2026-11-26): beside a docked sheet or bag the phone keeps the stage it has
+  // with nothing docked (`undocked`: that room's width, height, band and top strip), cut to the room
+  // the window leaves (dockedStage), so the level the player chose looks the same with the Menu open.
+  if (undocked && phone && !(pinned > 0) && W > 0 && H > 0) {
+    const free = stageFor({ ...args, ...undocked, sceneDrop: 0, undocked: null });
+    return dockedStage(free, { width: W, height: H, packReserve: pack, sceneDrop });
+  }
+  // STREET BAND (#654): cut to the band, at a scale between the band's own Whole street and the whole
+  // room's closest (streetBandScale).
   if (streetBand && phone && !(pinned > 0) && W > 0 && H > 0) {
-    const full = stageFor({ width: W, height: Math.max(H, finite(fullHeight, H)), packReserve: pack, sceneWidth, sceneHeight, zoom, phone, closeup, fitViewH, groundLine, topBand, minViewW });
-    return streetBandStage(full, { width: W, height: H, packReserve: pack, sceneDrop });
+    const fullH = Math.max(H, finite(fullHeight, H));
+    const full = stageFor({ width: W, height: fullH, packReserve: pack, sceneWidth, sceneHeight, zoom, phone, closeup, fitViewH, groundLine, topBand, minViewW });
+    if (full.landscape) return streetBandStage(full, { width: W, height: H, packReserve: pack, sceneDrop });
+    // The pack row stands under the band, so the reserve's rows are street too: the band's whole height holds the scene.
+    const fit = phoneStage({ width: W, height: H, packReserve: 0, sceneWidth, sceneHeight, groundLine, minViewW });
+    const near = finite(closeup, 0) >= 1 ? full : stageFor({ width: W, height: fullH, packReserve: pack, sceneWidth, sceneHeight, zoom, phone, closeup: 1, fitViewH, groundLine, topBand, minViewW });
+    const scale = streetBandScale({ fit: fit.scale, closest: near.scale, closeup });
+    return streetBandStage({ scale, viewH: fit.viewH }, { width: W, height: H, packReserve: pack, sceneDrop });
   }
   if (phone && !(pinned > 0) && W > 0 && H > W) return phoneStage({ width: W, height: H, packReserve: pack, sceneWidth, sceneHeight, closeup, groundLine, topBand, minViewW, sceneDrop });
   if (phone && !(pinned > 0) && W > 0 && H > 0) return landscapePhoneStage({ width: W, height: H, packReserve: pack, sceneWidth, sceneHeight, zoom, closeup, fitViewH });
@@ -672,6 +688,41 @@ export function streetBandStage(full, { width, height, packReserve = MIN_PACK_HE
     streetBand: true,
     ...(full.landscape ? { landscape: true } : {}),
   };
+}
+
+/**
+ * PURE (#740, Austin's ruling 2026-11-26: keep the band, make Whole street fit it): an upright phone's
+ * scale in its street band. #654 kept the whole screen's scale in the shorter band, so Whole street
+ * (closeup 0) showed about two thirds of a 1000 px street at 402 x 874. Here level 0 is the band's own
+ * whole-street fit (`fit`: phoneStage for the band with no pack reserve, since the pack row stands
+ * under the band: the scene's height, or its ground line, fills the band's) and level 1 the
+ * whole room's closest (`closest`), so a pinch still reaches as close as it did; between them
+ * geometrically, as every phone zoom moves. A fit already as close: the fit.
+ */
+export function streetBandScale({ fit, closest, closeup = 0 } = {}) {
+  const far = finite(fit);
+  const near = finite(closest);
+  if (!(far > 0)) return near;
+  if (!(near > far)) return far;
+  const c = Math.min(1, Math.max(0, finite(closeup, 0)));
+  return far * (near / far) ** c;
+}
+
+/**
+ * PURE (#740, Austin's ruling 2026-11-26): a phone's stage beside a docked sheet, the Social drawer or
+ * an open bag (G1178, G1194). `free` is the stage for the room with nothing docked (the band upright,
+ * the whole screen sideways); the canvas keeps its scale and shows the part of it the window leaves
+ * (`width` x `height`), the camera scrolling the rest. Fitting the street anew into the docked room
+ * flipped an upright phone to the sideways rule (the Menu leaves 402 x 247, wider than tall) and a
+ * sideways one to a computer's 960 px floor (452 x 402 beside the column), so opening the Menu zoomed
+ * the street out. Glitch fitted its viewport beside the house's Customize window (ChassisManager.as
+ * scaleVP), which keeps its own fit (a dock without `zoom`); ours: a phone's sheets dock the street.
+ */
+export function dockedStage(free, { width, height, packReserve = MIN_PACK_HEIGHT, sceneDrop = 0 } = {}) {
+  const cut = streetBandStage(free, { width, height, packReserve, sceneDrop });
+  if (!cut || cut === free) return cut;
+  if (!free.streetBand) delete cut.streetBand;
+  return { ...cut, docked: true };
 }
 
 /**

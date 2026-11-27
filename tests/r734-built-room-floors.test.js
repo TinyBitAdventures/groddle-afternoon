@@ -24,13 +24,13 @@ import { after, before, describe, it } from 'node:test';
 import { avatarGround } from '../public/js/avatar-step.js?v=8415ee96';
 import { isStandable, platformYAt } from '../public/js/street-model.js?v=a9a05f9d';
 import { HALL, fillHallText } from '../public/js/bureaucratic-hall.js?v=7ea53899';
-import { ALLEY } from '../public/js/quest-rooms/back-alley-set.js?v=bec8deeb';
+import { ALLEY } from '../public/js/quest-rooms/back-alley-set.js?v=65690248';
 import { ROOK_MUSEUM_WORLD } from '../public/js/rook-museum.js?v=cc091e1c';
 import { NEIGHBOUR_SCENE } from '../public/js/neighbours.js?v=13f35acd';
 import { neighbourPlatforms } from '../public/js/features/neighbour-scene.js?v=7f1a2ab6';
-import { buildVoyageScene, VOYAGE_FLOOR, VOYAGE_H, VOYAGE_W } from '../public/js/purple-journey-scene.js?v=a2a3852c';
+import { buildVoyageScene, VOYAGE_FLOOR, VOYAGE_H, VOYAGE_W } from '../public/js/purple-journey-scene.js?v=8d73c56a';
 import { buildKidsRoomScene, KIDS_ROOM_FLOOR, KIDS_ROOM_H, KIDS_ROOM_W } from '../public/js/kids-room-scene.js?v=30860f0d';
-import * as kit from '../public/js/quest-rooms/kit.js?v=2a4b0477';
+import * as kit from '../public/js/quest-rooms/kit.js?v=3bd05cd3';
 import { FakeEl, fakePixi } from './fake-scene.js';
 
 const read = (p) => readFileSync(new URL(`../${p}`, import.meta.url), 'utf8');

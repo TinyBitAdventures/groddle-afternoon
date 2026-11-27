@@ -8,8 +8,8 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { viewFromCanvas } from '../public/js/classic/classic-frame.js?v=bc2c4035';
-import { railFor, chromeWidth } from '../public/js/classic/classic-layout.js?v=9d27edcd';
+import { viewFromCanvas } from '../public/js/classic/classic-frame.js?v=4c5424bb';
+import { railFor, chromeWidth } from '../public/js/classic/classic-layout.js?v=ea93ef0e';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const read = (p) => readFileSync(join(root, p), 'utf8');

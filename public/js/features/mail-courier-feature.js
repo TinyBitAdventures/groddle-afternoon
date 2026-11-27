@@ -92,7 +92,7 @@
 
 import { ITEM_CATALOG, itemIcon } from '../inventory.js?v=3be7988a';
 import { frameTexture, sourceFromUrl } from '../textures.js?v=b8e38103';
-import { questRoomConverse } from './quest-instances-feature.js?v=ae747dde';
+import { questRoomConverse } from './quest-instances-feature.js?v=0597eeff';
 import { hellFeature } from './hell-feature.js?v=a9f2ff9a';
 import { DISPATCHER_ART, FROG_ART, MAIL_NPC_ART_DIR } from '../mail-npc-art.js?v=1ed97a5d';
 import { DISPATCHER_GAP, DISPATCHER_HALF, DISPATCHER_TEXT, SIGNPOST } from '../home-street-fixtures.js?v=d4e5b56a';

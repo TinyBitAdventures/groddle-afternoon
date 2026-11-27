@@ -11,7 +11,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { minimapOffOnDevice } from '../public/js/features/street-minimap-feature.js?v=b57b3ccb';
+import { minimapOffOnDevice } from '../public/js/features/street-minimap-feature.js?v=93ffee50';
 import { hubMapSubtitle } from '../public/js/panel-copy.js?v=f854d1dd';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');

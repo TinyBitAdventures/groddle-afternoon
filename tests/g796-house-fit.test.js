@@ -11,7 +11,7 @@ import { fileURLToPath } from 'node:url';
 
 import { HOUSE_HEADROOM, HOUSE_STYLE_IDS, houseFitViewH, houseLot } from '../public/js/home-house.js?v=3c88c47c';
 import { homeStreetLayout } from '../public/js/home-cultivation.js?v=b2868d29';
-import { LANDSCAPE_PHONE_FIT_MIN_SHARE, MIN_PACK_HEIGHT, stageFor } from '../public/js/location-view.js?v=4c2530a9';
+import { LANDSCAPE_PHONE_FIT_MIN_SHARE, MIN_PACK_HEIGHT, stageFor } from '../public/js/location-view.js?v=04d55c40';
 import { MIN_GROUND_CLEARANCE, cameraTargetY, cameraWorldHeightForGround, yCamOffsetAnchor } from '../public/js/movement.js?v=f4be1a05';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');

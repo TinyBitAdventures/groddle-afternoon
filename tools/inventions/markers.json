@@ -840,6 +840,7 @@
     "stand-in: * the named solo stand-ins shared by Collaborative Feats and Emotional": "solo-stand-ins"
   },
   "public/js/location-view.js": {
+    "ours: which keeps its own fit (a dock without `zoom`); ours: a phone's sheets dock the": "phone-compact-layout",
     "remake-own: * Remake choices: the smallest view is the remake's old fixed 408": "ours-location-view"
   },
   "public/js/location-xml.js": {
