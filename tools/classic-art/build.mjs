@@ -127,7 +127,9 @@ export function cleanSvg(text, { stage = false, prefix = '' } = {}) {
     if (!bg.test(s)) throw new Error('a stage export without its background rect: FFDec changed?');
     s = s.replace(bg, '');
   }
-  if (prefix) s = s.replace(/\sid="([^"]+)"/g, ` id="${prefix}$1"`).replace(/(xlink:href|href)="#([^"]+)"/g, `$1="#${prefix}$2"`);
+  // Every reference too: a href and a paint server's url(#id) (a strip's gradients drew nothing while
+  // their fill still named the bare id, so avatar_rain's streaks never showed).
+  if (prefix) s = s.replace(/\sid="([^"]+)"/g, ` id="${prefix}$1"`).replace(/(xlink:href|href)="#([^"]+)"/g, `$1="#${prefix}$2"`).replace(/url\(#([^)]+)\)/g, `url(#${prefix}$1)`);
   const fresh = `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">`;
   s = s.replace(root, fresh);
   return { svg: `${s.trim()}\n`, w, h };

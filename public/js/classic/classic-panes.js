@@ -25,7 +25,7 @@
  * Everything here shows only under Classic (inline display, so Modern is untouched).
  */
 import { uiState, onUiModeChange, readUiCache, writeUiCache } from './ui-mode.js?v=12843953';
-import { classicArtUrl } from './classic-art.js?v=87cb1722';
+import { classicArtUrl } from './classic-art.js?v=0f6f02a3';
 import { CHAT_MAX_CHARS, bindChatInput } from '../ui/chat-input.js?v=8f2479a3';
 import { pressLeavesKeys, reconcileChildren } from '../ui/keyed-nodes.js?v=9ab4de5c';
 

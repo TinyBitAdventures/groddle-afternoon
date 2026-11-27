@@ -33,7 +33,7 @@ import {
 } from '../public/js/map-graph.js?v=803cc6cd';
 import { mapIconStep, mapIconTipPlace } from '../public/js/ui/map-icon-tips.js?v=6b3eb3f9';
 import { selectVendorProfile } from '../public/js/vendor.js?v=7a07f478';
-import { CLASSIC_ART } from '../public/js/classic/classic-art.js?v=87cb1722';
+import { CLASSIC_ART } from '../public/js/classic/classic-art.js?v=0f6f02a3';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const GSJS = join(root, '..', 'glitch-GameServerJS');

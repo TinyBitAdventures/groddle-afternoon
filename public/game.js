@@ -4,7 +4,7 @@
  */
 import { ITEM_ICONS, ITEM_LABELS, getVerbsFor, ordinaryItems, runVerb } from './content.js?v=9c775db5';
 import { createErrorOnce, createFeatureHost, createFrameStages } from './js/feature-host.js?v=b87e2cbc';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=0dc2ea44';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=69dd777d';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, enterHintPick, hoverText, stackHoverLabel, groupHead, hoverRimShown, reachGlowTargets, spriteHasRimArt, rimArtParts, trimmedIconUrl, drawTileArt } from './js/enter-chooser.js?v=297c6d15';
 import { firstTendKey, STICK_TEND_DELAY_MS, STICK_TEND_DIRS, STICK_TEND_REPEAT_MS, stepTendKey, stepTendKeys, stickTendKey, tendKeyAction } from './js/garden-tend.js?v=a7470c4a';
 import { avatarHitBox, behindFloor, bodyReachDistance, OUT_OF_REACH_LINE, playerClickBox } from './js/reach.js?v=456da8a8';
@@ -1203,7 +1203,7 @@ import { filterText } from './js/word-filter.js?v=9a7a7ebb'; // the remake's own
 import { mountStartStreet } from './js/start-street.js?v=7d8ce49c'; // #349: the start card names the save's street
 import { arrangeMapCards, fitMapExtras } from './js/map-extras.js?v=16e261b1'; // the Map's Shortcuts
 // The interface skin (js/classic/ui-mode.js) sets <html data-ui> as it loads: before main(), so before the boot cover lifts.
-import { installInterfaceSettings } from './js/classic/classic-prefs.js?v=e6eaefa0';
+import { installInterfaceSettings } from './js/classic/classic-prefs.js?v=f0302799';
 import { standOnFeet, anchorBottomCentre } from './js/sprite-feet.js?v=849541a8';
 import { markLeaving, packPicks, takeCopies } from './js/copy-picks.js?v=b368fd49';
 import { holdKeepsBusy } from './js/instance-holds.js?v=ff3a63a3';
@@ -37080,15 +37080,16 @@ async function main() {
     /** NOTIFY QA: raise a notice, read the notices and the Activity log, earn a badge (its screen and log line). */
     /**
      * PHONE LAYOUT QA (G1194, #595): big counts on the top bar, as a long-time player has them:
-     * { currants, imagination, favor } (favor with the street's Giant). Returns what was set.
+     * { currants, imagination, favor } (favor with the street's Giant), and mood (the low-mood rain). Returns what was set.
      */
-    hudStats({ currants, imagination, favor } = {}) {
+    hudStats({ currants, imagination, favor, mood } = {}) {
       if (Number.isFinite(Number(currants))) pc.currants = Math.max(0, Math.floor(Number(currants)));
+      if (mood !== undefined && Number.isFinite(Number(mood))) pc.mood = Math.max(0, Math.floor(Number(mood)));
       if (Number.isFinite(Number(imagination))) pc.imagination = Math.max(0, Math.floor(Number(imagination)));
       const giant = currentStreet ? giantForStreet(currentStreet) : null;
       if (giant && Number.isFinite(Number(favor))) shrineState.favor = { ...(shrineState.favor || {}), [giant.id]: Math.max(0, Math.floor(Number(favor))) };
       updateHud();
-      return { currants: pc.currants, imagination: pc.imagination, favor: giant ? shrineState.favor[giant.id] : null };
+      return { currants: pc.currants, imagination: pc.imagination, favor: giant ? shrineState.favor[giant.id] : null, mood: pc.mood, moodMax: moodMax(pc) };
     },
     notify: {
       notice: (text, ms) => toast(String(text || ''), ms),

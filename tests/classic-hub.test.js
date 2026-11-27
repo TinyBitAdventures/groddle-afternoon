@@ -7,8 +7,8 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { HUB_CLOUDS, hubKey, isHubKey, coverRect, placeClouds, CLOUD_SIZE } from '../public/js/classic/classic-hub.js?v=0bbfeae2';
-import { CLASSIC_ART } from '../public/js/classic/classic-art.js?v=87cb1722';
+import { HUB_CLOUDS, hubKey, isHubKey, coverRect, placeClouds, CLOUD_SIZE } from '../public/js/classic/classic-hub.js?v=4334dd1f';
+import { CLASSIC_ART } from '../public/js/classic/classic-art.js?v=0f6f02a3';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 

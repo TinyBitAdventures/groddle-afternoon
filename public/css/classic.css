@@ -398,7 +398,7 @@
   z-index: var(--z-raised);
   width: calc(113.9 * var(--cu));
   height: calc(96.65 * var(--cu));
-  background: url("../assets/classic/avatar_rain.svg?v=4774a7f0") 0 0 / calc(1139 * var(--cu)) 100% no-repeat;
+  background: url("../assets/classic/avatar_rain.svg?v=43206daa") 0 0 / calc(1139 * var(--cu)) 100% no-repeat;
   animation: classic-rain 0.42s steps(10) infinite;
   pointer-events: none;
 }

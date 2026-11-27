@@ -41,7 +41,7 @@ import { SKILL_CATEGORIES, SKILL_CATEGORY_ORDER } from '../skill-tree.js?v=a6762
 import { skillArtFor } from '../familiar.js?v=b9597cd3';
 import { CARD_ART_LAYERS } from '../imagination-data.js?v=4a85e7fe';
 import { WINDOW_SELECTOR } from '../window-stack.js?v=f25edd09';
-import { classicArtUrl } from './classic-art.js?v=87cb1722';
+import { classicArtUrl } from './classic-art.js?v=0f6f02a3';
 
 /** The Skills cloud's icons: five at most, three to a row (ImgMenuSkills.as 120-136). */
 export const CLOUD_ICONS_MAX = 5;

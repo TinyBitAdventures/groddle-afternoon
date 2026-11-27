@@ -29,9 +29,9 @@
  * the loading or start card is up, or while the upgrade cards are open (X closes those, as before).
  */
 import { uiState, onUiModeChange, readUiCache, writeUiCache } from './ui-mode.js?v=12843953';
-import { classicArtUrl } from './classic-art.js?v=87cb1722';
+import { classicArtUrl } from './classic-art.js?v=0f6f02a3';
 import { focusBack } from '../ui/focus-return.js?v=da190597';
-import { skillsCloud, skillIconUrl, CLOUD_ICONS_ROW } from './classic-skills.js?v=98f1e2c8';
+import { skillsCloud, skillIconUrl, CLOUD_ICONS_ROW } from './classic-skills.js?v=58546d8e';
 
 /** The clouds, in the client's two rows (ImgMenuView.as 343-415). */
 export const HUB_CLOUDS = Object.freeze([

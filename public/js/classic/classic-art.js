@@ -5,7 +5,7 @@ export const CLASSIC_ART = Object.freeze({
   audio_control_icon: {"url":"assets/classic/audio_control_icon.webp","w":34,"h":136,"bytes":714,"sha1":"048866967433efaddabca8284abe050a92d2f651","kind":"copy","src":"graphics/audio_control_icon.png","frames":4,"cell":[34,34],"perRow":1},
   audio_music: {"url":"assets/classic/audio_music.webp","w":15,"h":17,"bytes":202,"sha1":"92aeb2ae5447da77622fbf2ead62c7756ff2ff98","kind":"copy","src":"graphics/audio_music.png"},
   audio_sfx: {"url":"assets/classic/audio_sfx.webp","w":16,"h":16,"bytes":236,"sha1":"0ccc6ded477ace7f9f9de163392cf69d17bb73a6","kind":"copy","src":"graphics/audio_sfx.png"},
-  avatar_rain: {"url":"assets/classic/avatar_rain.svg","w":1139,"h":96.65,"bytes":16857,"sha1":"036477c167d9415adc021c292139cfb29bc31e0c","kind":"svg","src":"swfs/avatar_rain.swf","frames":10,"strip":true},
+  avatar_rain: {"url":"assets/classic/avatar_rain.svg","w":1139,"h":96.65,"bytes":16888,"sha1":"118b4770b8f06d76b44d52fc19f3ace77176e3c8","kind":"svg","src":"swfs/avatar_rain.swf","frames":10,"strip":true},
   back_arrow: {"url":"assets/classic/back_arrow.webp","w":10,"h":7,"bytes":112,"sha1":"540faae7fe6f2d161c2d6beb57205e69270ec128","kind":"copy","src":"graphics/back_arrow.png"},
   back_arrow_disabled: {"url":"assets/classic/back_arrow_disabled.webp","w":10,"h":7,"bytes":118,"sha1":"e2866f17498bb2d868ee4d60625a2d493879bc4f","kind":"copy","src":"graphics/back_arrow_disabled.png"},
   back_arrow_hover: {"url":"assets/classic/back_arrow_hover.webp","w":10,"h":7,"bytes":126,"sha1":"f514983be8af5757c5caf31154d35b536d4a7e27","kind":"copy","src":"graphics/back_arrow_hover.png"},

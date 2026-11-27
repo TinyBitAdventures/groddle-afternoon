@@ -11395,6 +11395,30 @@ html.stage-pinned[data-ui="modern"] header.top-bar { left: calc(var(--sp-5) + va
 [data-ui="modern"] .top-bar .ring[data-stat="mood"][data-gauge="fair"] { --c: var(--mood-gauge-fair); }
 [data-ui="modern"] .top-bar .ring[data-stat="mood"][data-gauge="meh"] { --c: var(--mood-gauge-meh); }
 [data-ui="modern"] .top-bar .ring[data-stat="mood"][data-gauge="low"] { --c: var(--mood-gauge-low); }
+/* Under 20%: the raincloud over the face, Glitch's only rain (PlayerFaceUI.as 127-132, 289-290:
+   avatar_rain.swf at (-20, -10) on the 73 px face while the state is low). Classic draws it in
+   css/classic.css; here it is the same art and frames, scaled from the 73 px face to the ring. Its
+   streaks are white (on Glitch's dark low-mood face); on the light bar they are drawn as a mask in the
+   ring's own colour, so they show. */
+[data-ui="modern"] .top-bar .ring[data-stat="mood"][data-gauge="low"]::after {
+  --rain-u: calc(var(--hit) / 73);
+  content: "";
+  position: absolute;
+  left: calc(-20 * var(--rain-u));
+  top: calc(-10 * var(--rain-u));
+  z-index: var(--z-raised);
+  width: calc(113.9 * var(--rain-u));
+  height: calc(96.65 * var(--rain-u));
+  background: var(--c);
+  -webkit-mask: url("assets/classic/avatar_rain.svg?v=43206daa") 0 0 / calc(1139 * var(--rain-u)) 100% no-repeat;
+  mask: url("assets/classic/avatar_rain.svg?v=43206daa") 0 0 / calc(1139 * var(--rain-u)) 100% no-repeat;
+  animation: hud-mood-rain 0.42s steps(10) infinite;
+  pointer-events: none;
+}
+@keyframes hud-mood-rain { to { -webkit-mask-position: calc(-1139 * var(--rain-u)) 0; mask-position: calc(-1139 * var(--rain-u)) 0; } }
+@media (prefers-reduced-motion: reduce) {
+  [data-ui="modern"] .top-bar .ring[data-stat="mood"][data-gauge="low"]::after { animation: none; }
+}
 /* Low and very low (js/vitals.js): amber, then red with a slow pulse (the stroke only when a ring has no
    #699 step above, so with no maximum); the number keeps 4.5:1
    (--warn 5.1:1, --danger 5.3:1 on --surface); the mood face and the energy pill say it in shape and words. */

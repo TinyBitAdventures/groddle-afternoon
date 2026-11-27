@@ -9,7 +9,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 import { createStreetMinimap, markArt } from '../public/js/ui/street-minimap.js?fresh=street-minimap-hd';
-import { CLASSIC_ART, classicArtHd, classicArtUrl } from '../public/js/classic/classic-art.js?v=87cb1722';
+import { CLASSIC_ART, classicArtHd, classicArtUrl } from '../public/js/classic/classic-art.js?v=0f6f02a3';
 import { HD_ART, SIGNPOST_SAMPLES, hdSvg, signpostSampleProblems } from '../tools/classic-art/hd-art.mjs';
 import { ASSETS, artSize, check } from '../tools/classic-art/build.mjs';
 import { decodePng } from '../tools/builder/art-image.mjs';
