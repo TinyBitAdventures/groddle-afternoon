@@ -1094,8 +1094,10 @@ describe('every save read and write goes through the store', () => {
   // js/ui/projects-sheet.js keeps the Projects sheet's All / Open / Done chip (G1116), a device preference;
   // js/ui/featured-project.js remembers that the featured line's one-time hint was shown (G805), a device preference.
   // js/touch-controls.js keeps a phone's "Stick follows your thumb" setting (02c12d4bf2), a device preference;
+  // js/whats-new.js remembers the newest version this browser loaded and when (#745, groddle-whats-new-seen), for the
+  // loading card before any save is loaded (a multiplayer save is not there yet), a device record, never a save.
   // js/shared-patches.js reads one QA flag (groddle.qa.sharedPatches, G564) that turns the dark shared Patches on in this browser, never a save.
-  const ALLOWED = new Set(['js/buddies.js', 'js/touch-controls.js', 'js/shared-patches.js', 'js/ui/quest-sheet.js', 'js/ui/projects-sheet.js', 'js/ui/featured-project.js', 'js/save-store.js', 'js/practice-mode.js', 'js/audio-pref.js', 'js/online-boot.js', 'js/features/groups-feature.js', 'js/ui/social-drawer.js', 'js/classic/ui-mode.js', 'js/world-zoom.js', 'js/night-tint.js', 'js/ui/street-minimap.js', 'js/builder/editor.js', 'js/phone/companion.js', 'js/save-claim.js']);
+  const ALLOWED = new Set(['js/buddies.js', 'js/touch-controls.js', 'js/shared-patches.js', 'js/ui/quest-sheet.js', 'js/ui/projects-sheet.js', 'js/ui/featured-project.js', 'js/save-store.js', 'js/practice-mode.js', 'js/audio-pref.js', 'js/online-boot.js', 'js/features/groups-feature.js', 'js/ui/social-drawer.js', 'js/classic/ui-mode.js', 'js/world-zoom.js', 'js/night-tint.js', 'js/ui/street-minimap.js', 'js/builder/editor.js', 'js/phone/companion.js', 'js/save-claim.js', 'js/whats-new.js']);
 
   it('game.js and js/ make no direct localStorage or sessionStorage calls', () => {
     const offenders = [];
