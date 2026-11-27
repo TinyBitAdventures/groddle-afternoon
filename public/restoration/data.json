@@ -2814,9 +2814,29 @@
   "deployed": "2026-11-26"
  },
  "git": {
-  "commits": 3764,
+  "commits": 3769,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-26",
+    "kind": "fix",
+    "text": "The Encyclopedia's tips, its links, the hotkey sheet, Where to get it and Open Profile Page say they open over the game in the Home Screen app"
+   },
+   {
+    "date": "2026-11-26",
+    "kind": "fix",
+    "text": "Support the game's tip and the picture's open link say they open over the game in the Home Screen app"
+   },
+   {
+    "date": "2026-11-26",
+    "kind": "fix",
+    "text": "In the Home Screen app every link to our own site opens over the game with Back to the game"
+   },
+   {
+    "date": "2026-11-26",
+    "kind": "fix",
+    "text": "An open bag held sideways fits the street beside it again, so the action chip stays clear of the street's name"
+   },
    {
     "date": "2026-11-26",
     "kind": "fix",
@@ -2916,29 +2936,9 @@
     "date": "2026-11-26",
     "kind": "new",
     "text": "Walking onto a crack or Manhole rug on an upper floor of your house drops you to the floor below"
-   },
-   {
-    "date": "2026-11-26",
-    "kind": "fix",
-    "text": "A machine dragged from the pack onto the floor outside Decoration Mode is set down at your feet, not left as a loose item"
-   },
-   {
-    "date": "2026-11-26",
-    "kind": "fix",
-    "text": "A machine set down too near the others says to stand further from them, and Decoration Mode shows where you stand while you drag one"
-   },
-   {
-    "date": "2026-11-26",
-    "kind": "fix",
-    "text": "A Visiting Stone stays in its street's dead end, where the front art leaves it seen"
-   },
-   {
-    "date": "2026-11-26",
-    "kind": "fix",
-    "text": "The Classic interface says \"This window was asleep\" once in chat, not twice"
    }
   ]
  },
- "tests": 1459,
+ "tests": 1460,
  "generatedAt": "2026-11-26"
 }
