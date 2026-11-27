@@ -20,7 +20,7 @@ import {
 import {
   ALL_FILE, FILE as RECENT_FILE, checkFile, draftFromBody, draftLines, highlightOf, publishedDay, recentOf, tagsAt, withBackfill, withRelease,
 } from '../tools/release/whats-new.mjs';
-import { WHATS_NEW_MENU, installWhatsNewWindow, releaseDate, versionRows } from '../public/js/ui/whats-new-window.js?v=026c3558';
+import { WHATS_NEW_MENU, installWhatsNewWindow, releaseDate, versionRows } from '../public/js/ui/whats-new-window.js?v=0d9a7a93';
 import { menuRowFor } from '../public/js/ui/topbar.js?v=820dd86c';
 import { FakeEl, page } from './social-fake-dom.js';
 
@@ -313,7 +313,7 @@ describe('#745: the What\'s new window, opened only when asked', () => {
     assert.equal(win.isOpen(), false);
   });
 
-  it('All versions lists every release, newest first with its date, each opening to its highlights', async () => {
+  it('All versions is a picker of every release, newest first with its date; picking one shows it in the same card', async () => {
     const { doc, urls, fetch } = gamePage();
     const win = installWhatsNewWindow({ doc, fetch, ready: () => true });
     await win.open();
@@ -324,30 +324,101 @@ describe('#745: the What\'s new window, opened only when asked', () => {
     const w = doc.getElementById('whats-new-window');
     assert.equal(doc.getElementById('whats-new-title').textContent, 'All versions');
     assert.equal(w.querySelector('.wn-eyebrow').textContent, '6 versions');
-    const rows = w.querySelectorAll('.wn-ver');
-    assert.deepEqual(rows.map((r) => r.dataset.version), ['v0.80.0', 'v0.79.1', 'v0.79.0', 'v0.78.0', 'v0.2.0', 'v0.1.0']);
-    assert.deepEqual(rows.map((r) => r.querySelector('.wn-ver-head').textContent), ['v0.80Nov 29, 2026', 'v0.79.1Nov 28, 2026', 'v0.79Nov 28, 2026', 'v0.78Nov 27, 2026', 'v0.2Oct 28, 2026', 'v0.1Oct 27, 2026']);
-    // The newest is open; the rest open on a click, and close again.
-    const head = (i) => rows[i].querySelector('.wn-ver-head');
-    const lines = (i) => rows[i].querySelector('.wn-ver-lines');
-    assert.equal(head(0).getAttribute('aria-expanded'), 'true');
-    assert.equal(lines(0).hidden, false);
-    assert.equal(lines(5).hidden, true);
+    assert.equal(w.querySelector('.wn-sub').textContent, 'Newest first. Pick one to see its highlights.');
+    const rows = () => w.querySelectorAll('.wn-ver');
+    assert.deepEqual(rows().map((r) => r.dataset.version), ['v0.80.0', 'v0.79.1', 'v0.79.0', 'v0.78.0', 'v0.2.0', 'v0.1.0']);
+    const head = (i) => rows()[i].querySelector('.wn-ver-head');
+    assert.deepEqual(rows().map((r, i) => head(i).textContent), ['v0.80Nov 29, 2026', 'v0.79.1Nov 28, 2026', 'v0.79Nov 28, 2026', 'v0.78Nov 27, 2026', 'v0.2Oct 28, 2026', 'v0.1Oct 27, 2026']);
+    // Austin 2026-11-27: a selector, not an expand/collapse list. The version on show is marked; nothing expands.
+    assert.equal(head(0).getAttribute('aria-current'), 'true');
+    assert.equal(head(5).getAttribute('aria-current'), null);
+    assert.equal(w.querySelectorAll('.wn-ver-lines').length, 0);
+    assert.equal(head(0).getAttribute('aria-expanded'), null);
+    // Picking the oldest shows it in the card, as the newest is shown.
     head(5).click();
-    assert.equal(head(5).getAttribute('aria-expanded'), 'true');
-    assert.equal(lines(5).hidden, false);
-    assert.deepEqual(lines(5).children.map((li) => li.textContent), ['One.', 'Uno.']);
-    head(5).click();
-    assert.equal(lines(5).hidden, true);
-    // Back returns to the newest release; nothing here is a link away from the game.
+    await tick();
+    assert.equal(win.view(), 'latest');
+    assert.equal(w.dataset.version, 'v0.1.0');
+    assert.equal(doc.getElementById('whats-new-title').textContent, "What's new in v0.1");
+    assert.equal(w.querySelector('.wn-eyebrow').textContent, 'v0.1.0', 'an older version is not "Updated"');
+    assert.equal(w.querySelector('.wn-sub').textContent, 'Released Oct 27, 2026.');
+    assert.deepEqual(w.querySelector('.wn-list').children.map((li) => li.children[1].textContent), ['One.', 'Uno.']);
+    assert.equal(w.querySelector('[data-whats-new-all]').hidden, false);
+    assert.equal(w.querySelector('[data-whats-new-back]').hidden, true);
+    // All versions again marks it; Back returns to the version that was on show.
+    w.querySelector('[data-whats-new-all]').click();
+    await tick();
+    assert.equal(head(5).getAttribute('aria-current'), 'true');
+    assert.equal(head(0).getAttribute('aria-current'), null);
     w.querySelector('[data-whats-new-back]').click();
     await tick();
     assert.equal(win.view(), 'latest');
+    assert.equal(doc.getElementById('whats-new-title').textContent, "What's new in v0.1");
+    // Picking the newest says "Updated" again; the Menu always opens on the newest.
+    assert.equal(await win.showVersion('v0.80.0'), true);
+    assert.equal(w.querySelector('.wn-eyebrow').textContent, 'Updated · v0.80.0');
+    assert.equal(await win.showVersion('v9.9.9'), false);
+    await win.showVersion('v0.2.0');
+    win.close();
+    await win.open();
     assert.equal(doc.getElementById('whats-new-title').textContent, "What's new in v0.80");
     assert.equal(w.querySelectorAll('a').length, 0);
     assert.deepEqual(versionRows(ALL).map((r) => r.short), ['v0.80', 'v0.79.1', 'v0.79', 'v0.78', 'v0.2', 'v0.1']);
     assert.equal(releaseDate('2026-01-05'), 'Jan 5, 2026');
     assert.equal(releaseDate('soon'), '');
+  });
+
+  it('‹ › and the Left and Right arrow keys step to the older and newer version (Austin 2026-11-27)', async () => {
+    const { doc, urls, fetch } = gamePage();
+    const win = installWhatsNewWindow({ doc, fetch, ready: () => true });
+    await win.open();
+    const w = doc.getElementById('whats-new-window');
+    const older = w.querySelector('[data-whats-new-older]');
+    const newer = w.querySelector('[data-whats-new-newer]');
+    const title = () => doc.getElementById('whats-new-title').textContent;
+    const key = async (k) => { const e = w.dispatch('keydown', { key: k }); await tick(); return e; };
+    // On the newest: nothing newer; older names the next one down.
+    assert.equal(newer.disabled, true);
+    assert.equal(older.disabled, false);
+    assert.equal(older.getAttribute('aria-label'), 'Older version, v0.79.1 (Left arrow)');
+    assert.equal((await key('ArrowLeft')).defaultPrevented, true);
+    assert.equal(title(), "What's new in v0.79.1");
+    assert.equal(w.querySelector('.wn-eyebrow').textContent, 'v0.79.1');
+    assert.equal(newer.disabled, false);
+    assert.equal(newer.getAttribute('aria-label'), 'Newer version, v0.80 (Right arrow)');
+    await key('ArrowRight');
+    assert.equal(title(), "What's new in v0.80");
+    assert.equal(w.querySelector('.wn-eyebrow').textContent, 'Updated · v0.80.0');
+    // The buttons do the same; past the newest file's last release the whole history is fetched.
+    assert.ok(!urls.includes(`https://groddle.localhost/${WHATS_NEW_ALL_PATH}`));
+    older.click(); await tick();
+    older.click(); await tick();
+    older.click(); await tick();
+    assert.equal(title(), "What's new in v0.78");
+    older.click(); await tick();
+    assert.ok(urls.includes(`https://groddle.localhost/${WHATS_NEW_ALL_PATH}`), 'fetched only when the short file ran out');
+    assert.equal(title(), "What's new in v0.2");
+    await key('ArrowLeft');
+    assert.equal(title(), "What's new in v0.1");
+    assert.equal(older.disabled, true, 'the first version has nothing older');
+    await key('ArrowLeft');
+    assert.equal(title(), "What's new in v0.1");
+    // In the picker the arrows are hidden and the keys do nothing.
+    w.querySelector('[data-whats-new-all]').click(); await tick();
+    assert.equal(w.querySelector('.wn-steps').hidden, true);
+    await key('ArrowRight');
+    assert.equal(win.view(), 'all');
+  });
+
+  it('without the whole history the older arrow stops at the newest file\'s last release', async () => {
+    const { doc, fetch } = gamePage();
+    const win = installWhatsNewWindow({ doc, fetch: (url) => (url.endsWith(WHATS_NEW_ALL_PATH) ? Promise.resolve({ ok: false, status: 500 }) : fetch(url)), ready: () => true });
+    await win.open();
+    await win.showVersion('v0.78.0');
+    const w = doc.getElementById('whats-new-window');
+    assert.equal(await win.step(-1), false);
+    assert.equal(doc.getElementById('whats-new-title').textContent, "What's new in v0.78");
+    assert.equal(w.querySelector('[data-whats-new-older]').disabled, true);
   });
 
   it('without the whole history it lists the newest releases and says so', async () => {

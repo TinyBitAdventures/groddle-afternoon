@@ -309,14 +309,13 @@
   border-top: 1px solid var(--c-classic-rule);
   border-bottom: 1px solid var(--c-classic-rule);
 }
-:root[data-ui="classic"] .wn-window .wn-list li,
-:root[data-ui="classic"] .wn-window .wn-ver-lines { color: var(--c-classic-text); font-size: var(--fs-classic-body); }
+:root[data-ui="classic"] .wn-window .wn-list li { color: var(--c-classic-text); font-size: var(--fs-classic-body); }
 :root[data-ui="classic"] .wn-window .wn-list li > i { background: var(--c-classic-panel); color: var(--c-classic-online); }
 :root[data-ui="classic"] .wn-window .wn-note { color: var(--c-classic-text); font-size: var(--fs-classic-body); }
 :root[data-ui="classic"] .wn-window .wn-ver-head { border-radius: var(--radius-xs); color: var(--c-classic-link); font: 700 var(--fs-classic-body)/var(--lh-normal) var(--font-classic-body); }
 :root[data-ui="classic"] .wn-window .wn-ver-head span { color: var(--c-classic-text); font-weight: 400; }
 :root[data-ui="classic"] .wn-window .wn-ver-head:hover,
-:root[data-ui="classic"] .wn-window .wn-ver-head[aria-expanded="true"] { background: var(--c-classic-panel); }
+:root[data-ui="classic"] .wn-window .wn-ver-head[aria-current="true"] { background: var(--c-classic-panel); }
 :root[data-ui="classic"] .wn-window .wn-ver-head::after { color: var(--c-classic-link); }
 :root[data-ui="classic"] .wn-window .wn-actions { margin: 0; padding: var(--sp-5) var(--sp-10); }
 :root[data-ui="classic"] .wn-window .wn-btn {
@@ -329,6 +328,8 @@
   font: 800 var(--fs-classic-body)/var(--lh-normal) var(--font-classic-title);
 }
 :root[data-ui="classic"] .wn-window .wn-btn.wn-quiet { border-color: transparent; background: none; box-shadow: none; color: var(--c-classic-link); }
+:root[data-ui="classic"] .wn-window .wn-btn.wn-step { min-width: 32px; padding-inline: var(--sp-3); font-size: var(--fs-classic-window); }
+:root[data-ui="classic"] .wn-window .wn-btn.wn-step:disabled { color: var(--c-classic-text); opacity: 0.4; cursor: default; }
 :root[data-ui="classic"] .wn-window .wn-close {
   top: 6px;
   right: 16px;

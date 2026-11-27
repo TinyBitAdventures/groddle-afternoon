@@ -7,9 +7,12 @@
  *   requestWhatsNew), which waits for the game to be ready (no loading card, no start card). Never by
  *   itself: the loading card's three lines are the only notice an update gets.
  * - It shows the newest release first: its highlights from play/whats-new.json (the mockup's centred
- *   card, "1. Centred card"). "All versions" swaps in the list of every release, newest first with its
- *   date, each one opening to its highlights; that list reads play/whats-new-all.json, fetched the first
- *   time it opens. Everything stays in the game: no link out.
+ *   card, "1. Centred card"). "All versions" swaps in a picker of every release, newest first with its
+ *   date (Austin 2026-11-27: "a selector instead of an expand/collapse list"); picking one shows that
+ *   version in the same card, and "All versions" there goes back to the picker. The picker reads
+ *   play/whats-new-all.json, fetched the first time it opens. The card's ‹ and › buttons, or the Left and
+ *   Right arrow keys, step to the older and newer version (Austin 2026-11-27). Everything stays in the
+ *   game: no link out.
  * - Esc, the close button, Got it or a press on the shade close it, and focus goes back the usual way
  *   (js/ui/focus-return.js). Keys pressed in it stay in it, so the avatar never walks under it.
  *   It is a role=dialog aria-modal window, so js/window-stack.js puts the newest window on top.
@@ -38,13 +41,16 @@ export function releaseDate(iso) {
 /** The words (plain, no em dashes). */
 export const WHATS_NEW_WINDOW_TEXT = Object.freeze({
   eyebrow: (v) => `Updated · ${v}`,
+  olderEyebrow: (v) => v,
   title: (v) => `What's new in ${shortVersion(v)}`,
   released: (date) => (releaseDate(date) ? `Released ${releaseDate(date)}.` : ''),
   allEyebrow: (n) => `${n} ${n === 1 ? 'version' : 'versions'}`,
   allTitle: 'All versions',
-  allSub: 'Newest first. Open one to see its highlights.',
+  allSub: 'Newest first. Pick one to see its highlights.',
   all: 'All versions',
   back: 'Back',
+  older: (v) => (v ? `Older version, ${shortVersion(v)} (Left arrow)` : 'Older version (Left arrow)'),
+  newer: (v) => (v ? `Newer version, ${shortVersion(v)} (Right arrow)` : 'Newer version (Right arrow)'),
   done: 'Got it',
   close: 'Close',
   loading: 'Loading the notes.',
@@ -85,14 +91,16 @@ export const WHATS_NEW_WINDOW_STYLE = `
 .wn-versions { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--sp-2); }
 .wn-ver-head { display: flex; align-items: center; gap: var(--sp-4); width: 100%; box-sizing: border-box; padding: var(--sp-4) var(--sp-5); border: 0; border-radius: var(--radius-lg); background: transparent;
   color: var(--text-heading); font: inherit; font-size: var(--fs-base); text-align: left; cursor: pointer; }
-.wn-ver-head:hover, .wn-ver-head[aria-expanded="true"] { background: var(--surface-raised); }
+.wn-ver-head:hover, .wn-ver-head[aria-current="true"] { background: var(--surface-raised); }
 .wn-ver-head b { font-weight: var(--fw-heavy); min-width: 4.5em; }
 .wn-ver-head span { flex: 1; color: var(--text-muted); }
-.wn-ver-head::after { content: '+'; color: var(--accent); font-weight: var(--fw-heavy); font-size: var(--fs-l); line-height: var(--lh-none); }
-.wn-ver-head[aria-expanded="true"]::after { content: '−'; }
-.wn-ver-lines { margin: var(--sp-2) 0 var(--sp-5); padding: 0 var(--sp-5) 0 calc(var(--sp-5) + 18px); display: grid; gap: var(--sp-3); font-size: var(--fs-md); line-height: var(--lh-snug); color: var(--text-heading); }
-.wn-ver-lines[hidden] { display: none; }
+.wn-ver-head::after { content: '›'; color: var(--accent); font-weight: var(--fw-heavy); font-size: var(--fs-l); line-height: var(--lh-none); }
 .wn-actions { display: flex; gap: var(--sp-4); justify-content: flex-end; align-items: center; margin-top: var(--sp-10); flex: 0 0 auto; }
+.wn-steps { display: flex; gap: var(--sp-1); margin-right: auto; }
+.wn-steps[hidden] { display: none; }
+.wn-btn.wn-step { min-width: 40px; padding-inline: var(--sp-4); font-size: var(--fs-xl); line-height: var(--lh-none); border-radius: var(--radius-pill); }
+.wn-btn.wn-step:hover:not(:disabled) { background: var(--surface-raised); }
+.wn-btn.wn-step:disabled { color: var(--text-muted); cursor: default; opacity: 0.45; }
 .wn-btn { border: 0; border-radius: var(--radius-pill); padding: 10px 20px; font: inherit; font-size: var(--fs-base); font-weight: var(--fw-heavy); cursor: pointer; }
 .wn-btn[hidden] { display: none; }
 .wn-btn.wn-primary { background: var(--accent); color: var(--accent-text); }
@@ -136,6 +144,8 @@ export function createWhatsNewWindow(doc = globalThis.document, { fetch: fetchFn
   let shade = null;
   let returnFocus = null;
   let view = 'latest';
+  let shown = null;
+  let allFailed = false;
   const parts = {};
   const cache = new Map();
 
@@ -169,7 +179,11 @@ export function createWhatsNewWindow(doc = globalThis.document, { fetch: fetchFn
     parts.all = el(doc, 'button', { type: 'button', class: 'wn-btn wn-quiet', 'data-whats-new-all': '' }, WHATS_NEW_WINDOW_TEXT.all);
     parts.back = el(doc, 'button', { type: 'button', class: 'wn-btn wn-quiet', 'data-whats-new-back': '', hidden: true }, WHATS_NEW_WINDOW_TEXT.back);
     parts.done = el(doc, 'button', { type: 'button', class: 'wn-btn wn-primary', 'data-whats-new-done': '' }, WHATS_NEW_WINDOW_TEXT.done);
-    actions.append(parts.all, parts.back, parts.done);
+    parts.steps = el(doc, 'div', { class: 'wn-steps' });
+    parts.older = el(doc, 'button', { type: 'button', class: 'wn-btn wn-quiet wn-step', 'data-whats-new-older': '' }, '‹');
+    parts.newer = el(doc, 'button', { type: 'button', class: 'wn-btn wn-quiet wn-step', 'data-whats-new-newer': '' }, '›');
+    parts.steps.append(parts.older, parts.newer);
+    actions.append(parts.steps, parts.all, parts.back, parts.done);
     win.append(close, parts.eyebrow, parts.title, parts.sub, parts.body, actions);
     shade.append(win);
     parts.win = win;
@@ -177,10 +191,13 @@ export function createWhatsNewWindow(doc = globalThis.document, { fetch: fetchFn
     close.addEventListener('click', () => api.close());
     parts.done.addEventListener('click', () => api.close());
     parts.all.addEventListener('click', () => api.showAll());
-    parts.back.addEventListener('click', () => api.showLatest());
+    parts.older.addEventListener('click', () => api.step(-1));
+    parts.newer.addEventListener('click', () => api.step(1));
+    parts.back.addEventListener('click', () => { if (shown) api.showVersion(shown); else api.showLatest(); });
     parts.versions.addEventListener('click', (e) => {
       const head = e.target?.closest?.('.wn-ver-head');
-      if (head) toggleVersion(head);
+      const v = head?.closest?.('.wn-ver')?.getAttribute('data-version');
+      if (v) api.showVersion(v);
     });
     shade.addEventListener('pointerdown', (e) => { if (e.target === shade) api.close(); });
     // Keys pressed in the window stay in it: the game's movement keys must not fire under it.
@@ -189,6 +206,9 @@ export function createWhatsNewWindow(doc = globalThis.document, { fetch: fetchFn
       if (e.key === 'Escape') {
         e.preventDefault();
         api.close();
+      } else if ((e.key === 'ArrowLeft' || e.key === 'ArrowRight') && view === 'latest' && shown && !e.altKey && !e.ctrlKey && !e.metaKey) {
+        e.preventDefault();
+        api.step(e.key === 'ArrowLeft' ? -1 : 1);
       }
     });
   };
@@ -204,12 +224,16 @@ export function createWhatsNewWindow(doc = globalThis.document, { fetch: fetchFn
     parts.list.hidden = next !== 'latest';
     parts.versions.hidden = next !== 'all';
     parts.all.hidden = next !== 'latest';
+    parts.steps.hidden = next !== 'latest';
     parts.back.hidden = next !== 'all';
     if (parts.body.scrollTop) parts.body.scrollTop = 0;
   };
 
-  const fillLatest = (release) => {
-    parts.eyebrow.textContent = WHATS_NEW_WINDOW_TEXT.eyebrow(release.version);
+  /** The card for one release: the newest says "Updated", an older one names its version. */
+  const fillLatest = (release, newest = true) => {
+    shown = release.version;
+    parts.win.setAttribute('data-version', release.version);
+    parts.eyebrow.textContent = newest ? WHATS_NEW_WINDOW_TEXT.eyebrow(release.version) : WHATS_NEW_WINDOW_TEXT.olderEyebrow(release.version);
     parts.title.textContent = WHATS_NEW_WINDOW_TEXT.title(release.version);
     parts.sub.textContent = WHATS_NEW_WINDOW_TEXT.released(release.date);
     parts.sub.hidden = !parts.sub.textContent;
@@ -220,27 +244,49 @@ export function createWhatsNewWindow(doc = globalThis.document, { fetch: fetchFn
     }));
   };
 
-  function toggleVersion(head, open = head.getAttribute('aria-expanded') !== 'true') {
-    head.setAttribute('aria-expanded', String(open));
-    const lines = doc.getElementById(head.getAttribute('aria-controls'));
-    if (lines) lines.hidden = !open;
-  }
+  /** The ‹ › buttons: names and ends for the version on show (older stays on until the whole history says it's the first). */
+  const updateSteps = () => {
+    const list = knownReleases();
+    const at = list.findIndex((r) => r.version === shown);
+    const older = at >= 0 ? list[at + 1] : null;
+    const newer = at > 0 ? list[at - 1] : null;
+    const more = !cache.has(WHATS_NEW_ALL_PATH) && !allFailed;
+    parts.older.disabled = at < 0 || (!older && !more);
+    parts.newer.disabled = !newer;
+    for (const [btn, text] of [[parts.older, WHATS_NEW_WINDOW_TEXT.older(older?.version)], [parts.newer, WHATS_NEW_WINDOW_TEXT.newer(newer?.version)]]) {
+      btn.setAttribute('aria-label', text);
+      btn.setAttribute('title', text);
+    }
+  };
+
+  /** Every release the window has: the whole history once fetched, else the newest file's. */
+  const knownReleases = () => {
+    for (const path of [WHATS_NEW_ALL_PATH, WHATS_NEW_PATH]) {
+      if (cache.has(path)) {
+        const list = releasesOf(cache.get(path));
+        if (list.length) return list;
+      }
+    }
+    return [];
+  };
 
   const fillVersions = (rows) => {
     parts.eyebrow.textContent = WHATS_NEW_WINDOW_TEXT.allEyebrow(rows.length);
     parts.title.textContent = WHATS_NEW_WINDOW_TEXT.allTitle;
     parts.sub.textContent = WHATS_NEW_WINDOW_TEXT.allSub;
     parts.sub.hidden = false;
-    parts.versions.replaceChildren(...rows.map((r, i) => {
+    let current = null;
+    parts.versions.replaceChildren(...rows.map((r) => {
       const li = el(doc, 'li', { class: 'wn-ver', 'data-version': r.version });
-      const id = versionDomId(r.version);
-      const head = el(doc, 'button', { type: 'button', class: 'wn-ver-head', 'aria-expanded': i === 0 ? 'true' : 'false', 'aria-controls': id });
+      const here = r.version === shown;
+      const head = el(doc, 'button', { type: 'button', id: versionDomId(r.version), class: 'wn-ver-head', 'aria-current': here ? 'true' : false });
       head.append(el(doc, 'b', {}, r.short), el(doc, 'span', {}, r.date));
-      const lines = el(doc, 'ul', { id, class: 'wn-ver-lines', hidden: i !== 0 });
-      lines.append(...r.lines.map((t) => el(doc, 'li', {}, t)));
-      li.append(head, lines);
+      li.append(head);
+      if (here) current = head;
       return li;
     }));
+    // The version on show stays in view in a long list.
+    current?.scrollIntoView?.({ block: 'center' });
   };
 
   const api = {
@@ -258,6 +304,7 @@ export function createWhatsNewWindow(doc = globalThis.document, { fetch: fetchFn
         const newest = releasesOf(await load(WHATS_NEW_PATH))[0];
         if (!newest) throw new Error('no releases');
         fillLatest(newest);
+        updateSteps();
         note('');
       } catch {
         parts.eyebrow.textContent = '';
@@ -279,11 +326,42 @@ export function createWhatsNewWindow(doc = globalThis.document, { fetch: fetchFn
         note('');
       } catch {
         // The short file still lists the newest releases.
+        allFailed = true;
         rows = cache.has(WHATS_NEW_PATH) ? versionRows(cache.get(WHATS_NEW_PATH)) : [];
         note(rows.length ? WHATS_NEW_WINDOW_TEXT.partial : WHATS_NEW_WINDOW_TEXT.failed);
       }
       if (view === 'all') fillVersions(rows);
       return rows.length;
+    },
+    /** One version in the card (from the picker); false when the window doesn't have it. */
+    async showVersion(version) {
+      const list = knownReleases();
+      const at = list.findIndex((r) => r.version === version);
+      if (at < 0) return false;
+      setView('latest');
+      fillLatest(list[at], at === 0);
+      note('');
+      updateSteps();
+      parts.title.focus?.({ preventScroll: true });
+      return true;
+    },
+    /** One version older (-1) or newer (+1) than the one on show; the whole history is fetched when the newest file runs out. */
+    async step(dir) {
+      if (view !== 'latest' || !shown) return false;
+      let list = knownReleases();
+      let at = list.findIndex((r) => r.version === shown);
+      if (dir < 0 && at >= 0 && at + 1 >= list.length && !cache.has(WHATS_NEW_ALL_PATH)) {
+        try {
+          await load(WHATS_NEW_ALL_PATH);
+        } catch {
+          allFailed = true; // only the newest file: nothing older to show
+        }
+        list = knownReleases();
+        at = list.findIndex((r) => r.version === shown);
+        updateSteps();
+      }
+      const next = at < 0 ? null : list[at - Math.sign(dir)];
+      return next ? api.showVersion(next.version) : false;
     },
     async showLatest() {
       setView('latest');
@@ -291,6 +369,7 @@ export function createWhatsNewWindow(doc = globalThis.document, { fetch: fetchFn
       const newest = cache.has(WHATS_NEW_PATH) ? releasesOf(cache.get(WHATS_NEW_PATH))[0] : null;
       if (newest) {
         fillLatest(newest);
+        updateSteps();
         note('');
       } else await api.open();
     },
