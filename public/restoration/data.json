@@ -2814,9 +2814,39 @@
   "deployed": "2026-11-27"
  },
  "git": {
-  "commits": 3886,
+  "commits": 3894,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-27",
+    "kind": "new",
+    "text": "Machine Shop Pit Stop says to use a machine you built, not a machine room's"
+   },
+   {
+    "date": "2026-11-27",
+    "kind": "fix",
+    "text": "The Social drawer's tabs and counts show with AdGuard's Social media list on"
+   },
+   {
+    "date": "2026-11-27",
+    "kind": "fix",
+    "text": "On a phone a tap on a Thanksgiving feast pile opens that pile, not its neighbour"
+   },
+   {
+    "date": "2026-11-27",
+    "kind": "fix",
+    "text": "The Bureaucratic Hall lizards say \"Friend!\" in solo, with a capital"
+   },
+   {
+    "date": "2026-11-27",
+    "kind": "fix",
+    "text": "A window whose character opens in another tab greys at once, not when that tab presses Start"
+   },
+   {
+    "date": "2026-11-27",
+    "kind": "fix",
+    "text": "While a window waits on Play here, a Rooked Piggy's Revive is greyed too"
+   },
    {
     "date": "2026-11-27",
     "kind": "fix",
@@ -2906,29 +2936,9 @@
     "date": "2026-11-27",
     "kind": "fix",
     "text": "The What's new styles and window code pass the Classic naming rule and the site-link sweep"
-   },
-   {
-    "date": "2026-11-27",
-    "kind": "fix",
-    "text": "Paradise courses, A Summer's Day, Storyland, Winter Walk, Eesti and Rooks' Woods ask \"Are you stuck?\" instead of sending you back when a clock runs out"
-   },
-   {
-    "date": "2026-11-27",
-    "kind": "improve",
-    "text": "The loading card shows the newest update's highlights on every load, not only after an update"
-   },
-   {
-    "date": "2026-11-27",
-    "kind": "fix",
-    "text": "The QA hook that sets mood for the low-mood rain goes through the stat API"
-   },
-   {
-    "date": "2026-11-27",
-    "kind": "fix",
-    "text": "An un-expand's floor shift waits as long as the server can take before it is given up, and a late answer no longer settles the next one"
    }
   ]
  },
- "tests": 1492,
+ "tests": 1498,
  "generatedAt": "2026-11-27"
 }
