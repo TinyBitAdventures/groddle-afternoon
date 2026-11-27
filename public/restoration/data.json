@@ -2814,9 +2814,24 @@
   "deployed": "2026-11-27"
  },
  "git": {
-  "commits": 3796,
+  "commits": 3800,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-27",
+    "kind": "fix",
+    "text": "\"Are you stuck?\" asks in Beam Me Down, Four Letter Words and the Back Alley"
+   },
+   {
+    "date": "2026-11-27",
+    "kind": "fix",
+    "text": "Feast piles of herbs and Sno Cones can be eaten, each with its own verb"
+   },
+   {
+    "date": "2026-11-27",
+    "kind": "fix",
+    "text": "Hovering a Storage Display Box or a stack names the count, \"12 Cherries (in a Storage Display Box)\""
+   },
    {
     "date": "2026-11-27",
     "kind": "improve",
@@ -2921,24 +2936,9 @@
     "date": "2026-11-26",
     "kind": "improve",
     "text": "The Furniture Store button in Decoration Mode is a toggle: pressed while the store is open, a tap closes it"
-   },
-   {
-    "date": "2026-11-26",
-    "kind": "fix",
-    "text": "Decoration Mode's tray keeps its width beside a Furniture Store that ends above it"
-   },
-   {
-    "date": "2026-11-26",
-    "kind": "fix",
-    "text": "On a phone the Furniture Store and Make open as a sheet under Decoration Mode's Expand bar and above its tray"
-   },
-   {
-    "date": "2026-11-26",
-    "kind": "fix",
-    "text": "The Hi sign leaderboard, the Calendar, Gifts, Trade and storage windows stay below an upright iPhone's clock and camera"
    }
   ]
  },
- "tests": 1463,
+ "tests": 1467,
  "generatedAt": "2026-11-27"
 }
