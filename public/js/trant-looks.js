@@ -180,3 +180,35 @@ export function loadTrantLook(look) {
   trantLookTexture(look);
   return drawn.get(look.key)?.promise ?? Promise.resolve(null);
 }
+
+/**
+ * #735 review: start loading what any fruit count of this look's maturity is drawn from (its full
+ * and bare stills, the bare still and pieces at the density draw() takes), so the next harvest's
+ * look is a canvas draw away instead of a download. Street trees warm theirs when they are drawn.
+ */
+export function warmTrantLook(look) {
+  const full = `${TRANT_FRAMES}/${look.classTsid}_m${look.stage}.webp?v=${TRANT_FRAME_VERSION}`;
+  try {
+    textureFromUrl(full);
+    if (!look.base) return;
+    textureFromUrl(look.base);
+    const hi = hiresSpriteUrl(look.base);
+    bitmap(hi || look.base).catch(() => {});
+    bitmap(hi ? at3x(look.atlas) : look.atlas).catch(() => {});
+  } catch {
+    // No Pixi or no fetch (Node): nothing to warm.
+  }
+}
+
+/**
+ * #735 review: what a tree whose look changed shows now: its new look once that is ready, else the
+ * picture it already shows (never a stand-in of another maturity or fruit count, which flashed a
+ * full tree for half a second after every harvest), and only a tree with no picture yet takes
+ * `standIn()`. Patch trees already wait for their look (features/patches-feature.js).
+ * @param {ReturnType<typeof trantLook>} look
+ * @param {any} current the Texture the tree shows, or null
+ * @param {() => any} [standIn]
+ */
+export function trantShownTexture(look, current, standIn = () => null) {
+  return trantLookTexture(look) || current || standIn();
+}

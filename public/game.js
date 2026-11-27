@@ -4,7 +4,7 @@
  */
 import { ITEM_ICONS, ITEM_LABELS, getVerbsFor, ordinaryItems, runVerb } from './content.js?v=68a61ef7';
 import { createErrorOnce, createFeatureHost, createFrameStages } from './js/feature-host.js?v=b87e2cbc';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=af80bfa5';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=6a503b00';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, enterHintPick, groupHead, hoverRimShown, reachGlowTargets, spriteHasRimArt, rimArtParts, trimmedIconUrl, drawTileArt } from './js/enter-chooser.js?v=74f4964a';
 import { firstTendKey, STICK_TEND_DELAY_MS, STICK_TEND_DIRS, STICK_TEND_REPEAT_MS, stepTendKey, stepTendKeys, stickTendKey, tendKeyAction } from './js/garden-tend.js?v=a7470c4a';
 import { avatarHitBox, behindFloor, bodyReachDistance, OUT_OF_REACH_LINE, playerClickBox } from './js/reach.js?v=456da8a8';
@@ -864,7 +864,7 @@ import {
   maturityLabel,
   trantStatusLabel,
 } from './js/trants.js?v=cf0fe1a3';
-import { trantFrameUrl, trantLook, trantLookTexture, trantStage } from './js/trant-looks.js?v=06301984';
+import { loadTrantLook, trantFrameUrl, trantLook, trantLookTexture, trantShownTexture, trantStage, warmTrantLook } from './js/trant-looks.js?v=011c4eea';
 import { growStreetTrant } from './js/patches.js?v=54430bb9';
 import {
   runStreetTransition,
@@ -15230,7 +15230,18 @@ const engine = {
     if (target?.classId === 'wood_tree' && !target.grownFromBean) return refreshWoodTreeVisual(target);
     const meta = TRANT_META[target?.classId];
     if (!meta || !target.sprite || !target.state || target.grownFromBean) return;
-    const tex = textureForTrant(target.classId, target.state.maturity, target.state);
+    // #735 review: the new look once it is ready; until then the tree keeps the picture it shows
+    // (a stand-in of the nearest preloaded maturity flashed a full tree after every harvest), and
+    // swaps the moment its look has loaded or been drawn.
+    const look = trantLook(target.classId, target.state.maturity ?? 7, target.state);
+    warmTrantLook(look);
+    const ready = trantLookTexture(look);
+    const tex = trantShownTexture(look, target.sprite.texture, () => textureForTrant(target.classId, target.state.maturity, target.state));
+    if (!ready) {
+      loadTrantLook(look).then((t) => {
+        if (t && target.sprite && !target.sprite.destroyed && trantLook(target.classId, target.state.maturity ?? 7, target.state).key === look.key) engine.refreshTreeVisual(target);
+      });
+    }
     if (tex) {
       // A tree sprite re-reads its foot when its texture changes (js/sprite-feet.js standOnFeet).
       target.sprite.texture = tex;
@@ -16379,6 +16390,8 @@ function spawnTrees(spots) {
       // The maturity cycles it ran while you were away (online the server holds street trees).
       if (GAME_MODE !== 'multiplayer') growStreetTrant(trantState, classId);
       tex = textureForTrant(classId, trantState.maturity, trantState);
+      // #735 review: what its other fruit counts are drawn from, so a harvest swaps without a wait.
+      warmTrantLook(trantLook(classId, trantState.maturity, trantState));
     }
     if (!tex) return;
     // Linear filtering without a mip chain (Pixi 8 sources have none by default).
