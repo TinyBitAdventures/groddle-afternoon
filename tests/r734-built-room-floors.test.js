@@ -23,7 +23,7 @@ import { after, before, describe, it } from 'node:test';
 
 import { avatarGround } from '../public/js/avatar-step.js?v=8415ee96';
 import { isStandable, platformYAt } from '../public/js/street-model.js?v=a9a05f9d';
-import { HALL, fillHallText } from '../public/js/bureaucratic-hall.js?v=f79567fd';
+import { HALL, fillHallText } from '../public/js/bureaucratic-hall.js?v=5e28f221';
 import { ALLEY } from '../public/js/quest-rooms/back-alley-set.js?v=4e04295a';
 import { ROOK_MUSEUM_WORLD } from '../public/js/rook-museum.js?v=cc091e1c';
 import { NEIGHBOUR_SCENE } from '../public/js/neighbours.js?v=13f35acd';
