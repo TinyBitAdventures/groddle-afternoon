@@ -256,7 +256,7 @@ describe('Vision Quest (vision_quest)', () => {
 
 describe("Mr. Block's playroom (kids_room)", () => {
   it('has the 24 source words, the doneSpelling tiers and letter gifts', async () => {
-    const mod = await import('../public/js/quest-rooms/kids-room.js?v=f548ec36');
+    const mod = await import('../public/js/quest-rooms/kids-room.js?v=4de35d95');
     assert.equal(mod.WORD_UP_WORDS.length, 24);
     assert.equal(mod.SPELL_MS, 180_000);
     // The 5*60 exit delay is the "Are you stuck?" prompt; Word Up's 3:00 is the room's only clock.
@@ -441,7 +441,7 @@ describe('G311: a failed room quest is Try again in the quest log', () => {
   };
 
   it('a run lost to a reload marks a startable quest failed, not a retry prompt', async () => {
-    const { questInstancesFeature } = await import('../public/js/features/quest-instances-feature.js?v=e52010b7');
+    const { questInstancesFeature } = await import('../public/js/features/quest-instances-feature.js?v=ae747dde');
     const { ensureQuestOfferState } = await import('../public/js/quest-offers.js?v=7e00498b');
     assert.equal(getQuestCatalog().mental_block?.needsStart, true);
     assert.notEqual(getQuestCatalog().help_juju_bandits?.needsStart, true, 'no onStarted in GSJS');
@@ -505,7 +505,7 @@ describe('G313: failed room quests the source removes', () => {
   });
 
   it('a reload removes a source-removed quest and its offers, and keeps the prompt for the three', async () => {
-    const { questInstancesFeature } = await import('../public/js/features/quest-instances-feature.js?v=e52010b7');
+    const { questInstancesFeature } = await import('../public/js/features/quest-instances-feature.js?v=ae747dde');
     const { questStatus } = await import('../public/js/quest-offers.js?v=7e00498b');
     const t = Date.now() - 60_000;
     questInstancesFeature.restore({ memory: {}, retry: { tower_quest: t, le_miserable_part_2: t, smuggle_the_smuggler_part2: t } });
@@ -533,7 +533,7 @@ describe('G313: failed room quests the source removes', () => {
   });
 
   it('has no map card', async () => {
-    const { questInstancesFeature } = await import('../public/js/features/quest-instances-feature.js?v=e52010b7');
+    const { questInstancesFeature } = await import('../public/js/features/quest-instances-feature.js?v=ae747dde');
     assert.equal(questInstancesFeature.mapCards, undefined);
     const src = readFileSync(join(root, 'public/js/features/quest-instances-feature.js'), 'utf8');
     assert.doesNotMatch(src, /Unfinished quest places/);
@@ -554,7 +554,7 @@ describe('#107: a choice dialog can be dismissed', () => {
   const src = readFileSync(join(root, 'public/js/features/quest-instances-feature.js'), 'utf8');
 
   it('Escape and a click outside make the cancel choice (ChoicesDialog.as _escKeyHandler: cancel_value first)', async () => {
-    const { cancelChoice } = await import('../public/js/features/quest-instances-feature.js?v=e52010b7');
+    const { cancelChoice } = await import('../public/js/features/quest-instances-feature.js?v=ae747dde');
     const memories = [{ label: 'Four Letter Words', value: 'letter_block_2' }, { label: 'Hog Haul', value: 'hogtie_piggies' }, { label: 'Never mind', value: '', cancel: true }];
     assert.equal(cancelChoice(memories), '');
     assert.equal(cancelChoice([{ label: 'Stay', value: 'stay', cancel: true }, { label: 'Leave', value: 'leave' }]), 'stay');
@@ -610,7 +610,7 @@ describe('G1120: quest room memory survives a reload', () => {
   });
 
   it('writes through the feature, saves, reloads and reads the same row', async () => {
-    const { questInstancesFeature: f } = await import('../public/js/features/quest-instances-feature.js?v=e52010b7');
+    const { questInstancesFeature: f } = await import('../public/js/features/quest-instances-feature.js?v=ae747dde');
     f.restore({});
     for (const [room, keys] of Object.entries(ROOM_KEYS)) {
       for (const key of keys) f._roomMemory(room, key).mark = `${room}/${key}`;

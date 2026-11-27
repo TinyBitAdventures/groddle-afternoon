@@ -66,7 +66,7 @@ import {
   purpleTimeline,
   scionWords,
 } from '../purple-journey.js?v=5e078ed8';
-import { VOYAGE_FLOOR, VOYAGE_H, VOYAGE_OFFSET, VOYAGE_W, buildVoyageScene } from '../purple-journey-scene.js?v=3e0f9d8c';
+import { VOYAGE_FLOOR, VOYAGE_H, VOYAGE_OFFSET, VOYAGE_W, buildVoyageScene } from '../purple-journey-scene.js?v=a2a3852c';
 import { homesFeature } from './homes-feature.js?v=e17aa680';
 
 export const PURPLE_FEATURE_ID = 'purple-journey';

@@ -129,7 +129,7 @@ describe('room parallax layers stand on the floor in every view (G999, #495)', (
   });
 
   it("a layer that is the sky keeps to the view's top (the Purple Journey's gradient at 0.05)", async () => {
-    const { buildVoyageScene } = await import('../public/js/purple-journey-scene.js?v=3e0f9d8c');
+    const { buildVoyageScene } = await import('../public/js/purple-journey-scene.js?v=a2a3852c');
     const built = buildVoyageScene(fakePixi);
     const root = built.background || built;
     const sky = root.children.find((c) => c.factor === 0.05);

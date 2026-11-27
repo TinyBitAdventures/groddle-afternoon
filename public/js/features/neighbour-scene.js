@@ -312,7 +312,7 @@ export function buildNeighbourBackground(PIXI, neighbour) {
 /** Collision for enterScene: one flat ground line across the street. */
 export function neighbourPlatforms() {
   const { width, groundY } = NEIGHBOUR_SCENE;
-  return [{ id: 'neighbour-ground', x1: 0, y1: groundY, x2: width, y2: groundY, pc_perm: 1 }];
+  return [{ id: 'neighbour-ground', x1: 0, y1: groundY, x2: width, y2: groundY, pc_perm: -1 }];
 }
 
 /** Loading-screen colours per look. */

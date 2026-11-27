@@ -258,6 +258,6 @@ export function buildVoyageScene(PIXI) {
   }
   return {
     background: root,
-    platforms: [{ id: 'voyage-floor', x1: 0, y1: floor, x2: W, y2: floor, pc_perm: 1 }],
+    platforms: [{ id: 'voyage-floor', x1: 0, y1: floor, x2: W, y2: floor, pc_perm: -1 }],
   };
 }

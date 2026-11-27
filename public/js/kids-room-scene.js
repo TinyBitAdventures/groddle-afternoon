@@ -137,7 +137,7 @@ export function buildKidsRoomScene(PIXI, { width = KIDS_ROOM_W, label = 'kids-ro
   root.label = label;
   root.worldW = width;
   root.worldH = KIDS_ROOM_H;
-  root.platformsScreen = [{ id: 'kids-room-floor', x1: 0, y1: KIDS_ROOM_FLOOR, x2: width, y2: KIDS_ROOM_FLOOR, pc_perm: 1 }];
+  root.platformsScreen = [{ id: 'kids-room-floor', x1: 0, y1: KIDS_ROOM_FLOOR, x2: width, y2: KIDS_ROOM_FLOOR, pc_perm: -1 }];
   root.pieces = {};
 
   // Behind everything, in case a texture is still loading: the wallpaper and carpet colours.

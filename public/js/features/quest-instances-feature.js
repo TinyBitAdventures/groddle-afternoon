@@ -215,7 +215,7 @@ const ROOM_MODULES = {
   top_of_tree: () => import('../quest-rooms/top-of-tree.js?v=a9458e4e'),
   color_unblocking: () => import('../quest-rooms/color-unblocking.js?v=0a592bd9'),
   vision_quest: () => import('../quest-rooms/vision-quest.js?v=391c84ac'),
-  kids_room: () => import('../quest-rooms/kids-room.js?v=f548ec36'),
+  kids_room: () => import('../quest-rooms/kids-room.js?v=4de35d95'),
   rube_yard: () => import('../quest-rooms/rube-yard.js?v=bb619dbb'),
   le_miserable: () => import('../quest-rooms/le-miserable.js?v=1e808ee9'),
   juju_camp: () => import('../quest-rooms/juju-camp.js?v=c594bd6b'),

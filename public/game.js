@@ -4,7 +4,7 @@
  */
 import { ITEM_ICONS, ITEM_LABELS, getVerbsFor, ordinaryItems, runVerb } from './content.js?v=c46159de';
 import { createErrorOnce, createFeatureHost, createFrameStages } from './js/feature-host.js?v=b87e2cbc';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=c09a9616';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=2834bfac';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, enterHintPick, groupHead, hoverRimShown, reachGlowTargets, spriteHasRimArt, rimArtParts, trimmedIconUrl, drawTileArt } from './js/enter-chooser.js?v=74f4964a';
 import { firstTendKey, STICK_TEND_DELAY_MS, STICK_TEND_DIRS, STICK_TEND_REPEAT_MS, stepTendKey, stepTendKeys, stickTendKey, tendKeyAction } from './js/garden-tend.js?v=a7470c4a';
 import { avatarHitBox, behindFloor, bodyReachDistance, OUT_OF_REACH_LINE, playerClickBox } from './js/reach.js?v=456da8a8';
@@ -86,7 +86,7 @@ import {
   spinFourLetterBlock,
   startFourLetterPuzzle,
 } from './js/four-letter-quest.js?v=a5574ac7';
-import { KIDS_ROOM_W, buildKidsRoomScene } from './js/kids-room-scene.js?v=5c44234d';
+import { KIDS_ROOM_W, buildKidsRoomScene } from './js/kids-room-scene.js?v=30860f0d';
 import {
   AXIS_DENYDE_STREET_ID,
   CAVE_IN_BOX_ID,
@@ -20197,12 +20197,17 @@ function renderLegalizeHud() {
   }
 }
 
+/**
+ * A built room's floor is solid from the top (pc_perm -1, as Tiny Speck's own built floors:
+ * inc_homes.js platform_pc_perm -1). pc_perm 1 is an underside (street-model.js isStandable):
+ * #734, the player stood at the room's bottom, 128 px under the hall's floor.
+ */
 function legalizeRoomBase(name, width = 1600, height = 760, groundY = 620) {
   const layer = new PIXI.Container();
   layer.name = name;
   layer.worldH = height;
   layer.platformsScreen = [
-    { id: `${name}-floor`, x1: 0, y1: groundY, x2: width, y2: groundY, pc_perm: 1 },
+    { id: `${name}-floor`, x1: 0, y1: groundY, x2: width, y2: groundY, pc_perm: -1 },
   ];
   return layer;
 }
@@ -20390,7 +20395,7 @@ function spawnLegalizeBackAlley() {
   const layer = drawAlley(PIXI);
   layer.name = 'legalize-back-alley';
   layer.groundY = ALLEY.FLOOR;
-  layer.platformsScreen = [{ id: 'ba_floor', x1: 0, y1: ALLEY.FLOOR, x2: ALLEY.W, y2: ALLEY.FLOOR, pc_perm: 1 }];
+  layer.platformsScreen = [{ id: 'ba_floor', x1: 0, y1: ALLEY.FLOOR, x2: ALLEY.W, y2: ALLEY.FLOOR, pc_perm: -1 }];
   installLegalizeScene(layer, {
     tsid: LEGALIZE_BACK_ALLEY_TSID,
     label: 'The Back Alley',
@@ -23350,7 +23355,7 @@ function drawRookMuseumBackground() {
   addRookMuseumDeco(root, 'bench', hall.bench.x, floor + 4, hall.bench.w, hall.bench.h, { z: -920 });
 
   root.platformsScreen = [
-    { id: 'rook-museum-floor', x1: 0, y1: floor, x2: root.worldW, y2: floor, pc_perm: 1 },
+    { id: 'rook-museum-floor', x1: 0, y1: floor, x2: root.worldW, y2: floor, pc_perm: -1 },
   ];
   root.signViews = [];
   return root;
@@ -27111,7 +27116,7 @@ function drawHomeBackground(styleId, room) {
     house.alpha = 0.98;
     container.addChild(house);
   }
-  container.platformsScreen = [{ id: 'home-ground', x1: 0, y1: 620, x2: 1500, y2: 620, pc_perm: 1 }];
+  container.platformsScreen = [{ id: 'home-ground', x1: 0, y1: 620, x2: 1500, y2: 620, pc_perm: -1 }];
   return container;
 }
 
