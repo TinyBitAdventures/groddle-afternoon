@@ -2814,9 +2814,14 @@
   "deployed": "2026-11-27"
  },
  "git": {
-  "commits": 3878,
+  "commits": 3880,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-27",
+    "kind": "fix",
+    "text": "Four quoins on Candy Cane Lane, Bright Day and Drooping Drift hang where a player can reach them, not over ice blocks only a triple jump gets onto"
+   },
    {
     "date": "2026-11-27",
     "kind": "fix",
@@ -2921,19 +2926,9 @@
     "date": "2026-11-27",
     "kind": "fix",
     "text": "Ice Nubbins in Nottis hang on the icy walls in clusters, a few high enough to jump for, instead of standing on the path"
-   },
-   {
-    "date": "2026-11-27",
-    "kind": "fix",
-    "text": "A New Quest card, a notice or a prompt that pops up mid-drag no longer drops the dragged stack, and level up and badge screens wait for the drop"
-   },
-   {
-    "date": "2026-11-27",
-    "kind": "fix",
-    "text": "A pack stack held at the view's edge scrolls the room over the Currants counter and the rest of the HUD, and can be let go there"
    }
   ]
  },
- "tests": 1488,
+ "tests": 1489,
  "generatedAt": "2026-11-27"
 }
