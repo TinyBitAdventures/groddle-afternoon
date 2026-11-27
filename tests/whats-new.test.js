@@ -20,7 +20,7 @@ import {
 import {
   ALL_FILE, FILE as RECENT_FILE, checkFile, draftFromBody, draftLines, highlightOf, publishedDay, recentOf, tagsAt, withBackfill, withRelease,
 } from '../tools/release/whats-new.mjs';
-import { WHATS_NEW_MENU, installWhatsNewWindow, releaseDate, versionRows } from '../public/js/ui/whats-new-window.js?v=eb99934c';
+import { WHATS_NEW_MENU, installWhatsNewWindow, releaseDate, versionRows } from '../public/js/ui/whats-new-window.js?v=026c3558';
 import { menuRowFor } from '../public/js/ui/topbar.js?v=820dd86c';
 import { FakeEl, page } from './social-fake-dom.js';
 

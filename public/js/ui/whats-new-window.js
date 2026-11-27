@@ -312,12 +312,12 @@ export function createWhatsNewWindow(doc = globalThis.document, { fetch: fetchFn
  * A request waits, checking every `poll` ms, until gameReady. Returns the window.
  */
 export function installWhatsNewWindow({ doc = globalThis.document, fetch: fetchFn, poll = 400, ready = () => gameReady(doc) } = {}) {
-  const win = createWhatsNewWindow(doc, fetchFn ? { fetch: fetchFn } : undefined);
+  const notes = createWhatsNewWindow(doc, fetchFn ? { fetch: fetchFn } : undefined);
   const list = doc.getElementById?.('more-list');
   if (list && !doc.getElementById(WHATS_NEW_MENU.id)) {
     const row = el(doc, 'button', { type: 'button', id: WHATS_NEW_MENU.id, class: 'chrome-btn', title: WHATS_NEW_MENU.tip }, WHATS_NEW_MENU.label);
     // The Menu closes on a pick (game.js installMoreMenu).
-    row.addEventListener('click', () => { win.open(); });
+    row.addEventListener('click', () => { notes.open(); });
     list.append(row);
   }
   let timer = null;
@@ -331,9 +331,9 @@ export function installWhatsNewWindow({ doc = globalThis.document, fetch: fetchF
     if (timer) clearInterval(timer);
     timer = null;
     takeWhatsNewRequest(doc);
-    win.open();
+    notes.open();
   };
   doc.addEventListener?.(WHATS_NEW_REQUEST_EVENT, serve);
   serve();
-  return win;
+  return notes;
 }

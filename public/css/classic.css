@@ -272,7 +272,7 @@
   box-shadow: 0 0 0 2px var(--c-classic-focus);
 }
 
-/* == What's new (#745, js/ui/whats-new-window.js; ours: Glitch had none) in the same dialog shell as
+/* == What's new (#745, js/ui/whats-new-window.js; ours: the 2012 client had none) in the same dialog shell as
    Preferences: Dialog.as 34-488 and BigDialog.as, a white window over the live game with no shade, the
    title on white, the body in the grey well between two rules, the red-cross close. */
 :root[data-ui="classic"] .wn-shade { background: transparent; pointer-events: none; }

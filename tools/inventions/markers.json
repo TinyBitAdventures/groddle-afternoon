@@ -25,9 +25,8 @@
     "remake-own: no Truly Outrageous card how gems are found (the remake's own": "gem-hints"
   },
   "public/css/classic.css": {
-    "glitch-had-none: new (#745, js/ui/whats-new-window.js; ours: Glitch had none) in the same dialog shell": "whats-new-loading-card",
     "no-original: as small page-colour controls; the help line has no original.": "ours-classic-css",
-    "ours: == What's new (#745, js/ui/whats-new-window.js; ours: Glitch had none) in the same dialog shell": "whats-new-loading-card",
+    "ours: == What's new (#745, js/ui/whats-new-window.js; ours: the 2012 client had none) in the same dialog": "whats-new-loading-card",
     "ours: G1246 (ours): a sorted bag's strip shows its sort's icon at": "ours-bag-sort-badge",
     "reimagined: #avatar-panel .avatar-reimagined-tag { background: var(--c-classic-tip); color:": "ours-classic-css",
     "reimagined: #avatar-panel .avatar-tile .avatar-reimagined-tag { border-radius: 0 0 3px 3px;": "ours-classic-css",
