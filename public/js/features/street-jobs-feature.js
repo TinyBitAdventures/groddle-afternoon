@@ -170,9 +170,10 @@ import { trophyGotText } from '../home-trophies.js?v=649b111e';
 import { FEATURED_TEXT, featuredChanged, featuredFromServer, featuredNeedsLine, featuredToast, featuredWaitMins, readFeaturedMemo, writeFeaturedMemo } from '../featured-project.js?v=5b2ee7c1';
 import { featuredStore, renderFeaturedLine, renderFeaturedRow } from '../ui/featured-project.js?v=ed9eded9';
 import { GEM_HINTS, isGem } from '../gem-hints.js?v=4b65f7ac';
-import { JOB_ASK_TEXT, itemAskSubject, itemGetHref, itemMakeNote, showAskRule, skillRankLabel, workSkillMissing, workSkillNote } from '../street-job-asks.js?v=84b712a3';
+import { JOB_ASK_TEXT, itemAskSubject, itemGetHref, itemMakeNote, showAskRule, skillRankLabel, workSkillMissing, workSkillNote } from '../street-job-asks.js?v=32adbe89';
 import { applySoloScale, hopsFromStart, soloAmountsLine } from '../street-jobs-solo.js?v=40d84989';
 import { standOnFeet, anchorBottomCentre } from '../sprite-feet.js?v=849541a8';
+import { sitePageWhere } from '../site-pages.js?v=9b3049cf';
 
 export const STREET_JOBS_FEATURE_ID = 'street-jobs';
 const BOARD_CLASS = 'street_job_board';
@@ -1874,7 +1875,7 @@ function askGetLink(engine, subject) {
   }
   a.href = itemGetHref(a.href);
   a.textContent = JOB_ASK_TEXT.getIt;
-  a.title = JOB_ASK_TEXT.getItTip;
+  a.title = JOB_ASK_TEXT.getItTip(sitePageWhere(a.href));
   a.dataset.sjGet = subject.id;
   return a;
 }

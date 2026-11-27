@@ -10,7 +10,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { itemMakeNote, skillRankLabel } from '../public/js/street-job-asks.js?v=84b712a3';
+import { itemMakeNote, skillRankLabel } from '../public/js/street-job-asks.js?v=32adbe89';
 import { listRecipesProducing, loadRecipeCatalogFromFile } from '../public/js/making.js?v=dc595568';
 import { TOWER_JOBS } from '../public/js/home-tower.js?v=a7fc0cce';
 

@@ -17,10 +17,13 @@
  *   links to (js/encyclopedia-links.js). An item with no page gets no link; nothing is made up here.
  */
 
+import { SITE_PAGE_WHERE } from './site-pages.js?v=9b3049cf';
+
 export const JOB_ASK_TEXT = Object.freeze({
   rule: 'Anyone can give items. Skills are only needed for tool work.',
   getIt: 'Where to get it',
-  getItTip: 'Opens its Encyclopedia page in a new tab',
+  /** `where`: js/site-pages.js sitePageWhere (over the game in the Home Screen app, else in a new tab). */
+  getItTip: (where = SITE_PAGE_WHERE.tab) => `Opens its Encyclopedia page ${where}`,
   noSkillNearStart: 'no skill needed this close to the start',
   // G802: after the skill's name when you have not learned it.
   notLearned: "you don't know it yet",

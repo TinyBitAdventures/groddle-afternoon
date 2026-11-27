@@ -35,10 +35,15 @@ export function setSitePageViewer(open) {
 /** Whether a viewer is set (the Home Screen app). */
 export const hasSitePageViewer = () => Boolean(viewer);
 
-/** What a link to a page says it does: over the game (the viewer) or in a new tab. */
+/** Where a page of the site opens: over the game (the viewer) or in a new tab. */
+export const SITE_PAGE_WHERE = Object.freeze({
+  here: 'over the game',
+  tab: 'in a new tab',
+});
+/** What a link to a page says it does. */
 export const SITE_PAGE_TEXT = Object.freeze({
-  here: 'opens over the game',
-  tab: 'opens in a new tab',
+  here: `opens ${SITE_PAGE_WHERE.here}`,
+  tab: `opens ${SITE_PAGE_WHERE.tab}`,
 });
 
 /**
@@ -51,9 +56,23 @@ export function opensOverGame(href, win = globalThis.window ?? globalThis) {
   return Boolean(sitePageHref(href, { base, pageHref: win?.location?.href || base }));
 }
 
+/**
+ * Where a link to `href` opens, for words that say so: "over the game" or "in a new tab". Every
+ * game word about where a page opens comes from here (tests/r741-site-pages.test.js holds the game
+ * to it), so the words follow the one rule.
+ */
+export function sitePageWhere(href, win) {
+  return opensOverGame(href, win) ? SITE_PAGE_WHERE.here : SITE_PAGE_WHERE.tab;
+}
+
+/** "Opens over the game" or "Opens in a new tab", a tip on its own. */
+export function sitePageTip(href, win) {
+  return `Opens ${sitePageWhere(href, win)}`;
+}
+
 /** A link's tip: "<label>, opens over the game" or "<label>, opens in a new tab". */
 export function siteLinkTip(label, href, win) {
-  return `${label}, ${opensOverGame(href, win) ? SITE_PAGE_TEXT.here : SITE_PAGE_TEXT.tab}`;
+  return `${label}, opens ${sitePageWhere(href, win)}`;
 }
 
 const pageBase = (win = globalThis) => win?.document?.baseURI || win?.location?.href || '';

@@ -23,7 +23,7 @@
  * the client's did (its target 'encyclopedia'), so a second press reuses the Encyclopedia's tab.
  */
 
-import { openSitePage } from './site-pages.js?v=1ca3760c';
+import { openSitePage, sitePageTip } from './site-pages.js?v=9b3049cf';
 
 /** The home page and the index, relative to the game root (the play pages' <base>). */
 export const ENCYCLOPEDIA_HOME = 'encyclopedia/';
@@ -33,7 +33,8 @@ export const ENCYCLOPEDIA_WINDOW = 'encyclopedia';
 /** The links' words and the Menu row's. */
 export const ENCYCLOPEDIA_LINK_LABEL = 'In the Encyclopedia';
 export const ENCYCLOPEDIA_MENU_LABEL = 'Encyclopedia';
-export const ENCYCLOPEDIA_TIP = 'Opens in a new tab';
+/** A link's tip (#741: "Opens over the game" in the Home Screen app's viewer, else "Opens in a new tab"). */
+export const encyclopediaTip = (href = ENCYCLOPEDIA_HOME) => sitePageTip(href);
 
 /** Lower case with accents and punctuation folded (encyclopedia.js fold), for names. */
 export function foldName(s) {
@@ -200,7 +201,7 @@ export function createEncyclopedia({
     a.className = `ency-link${className ? ` ${className}` : ''}`;
     a.href = href;
     a.target = ENCYCLOPEDIA_WINDOW;
-    a.title = ENCYCLOPEDIA_TIP;
+    a.title = encyclopediaTip(href);
     a.dataset.encyclopedia = encyclopediaPage(index, subject);
     a.textContent = ENCYCLOPEDIA_LINK_LABEL;
     return a;
@@ -211,7 +212,7 @@ export function createEncyclopedia({
     const href = pageFor(subject);
     if (!href) return '';
     const attr = (s) => String(s).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
-    return `<a class="ency-link${className ? ` ${attr(className)}` : ''}" href="${attr(href)}" target="${ENCYCLOPEDIA_WINDOW}" title="${ENCYCLOPEDIA_TIP}" data-encyclopedia="${attr(encyclopediaPage(index, subject))}">${ENCYCLOPEDIA_LINK_LABEL}</a>`;
+    return `<a class="ency-link${className ? ` ${attr(className)}` : ''}" href="${attr(href)}" target="${ENCYCLOPEDIA_WINDOW}" title="${attr(encyclopediaTip(href))}" data-encyclopedia="${attr(encyclopediaPage(index, subject))}">${ENCYCLOPEDIA_LINK_LABEL}</a>`;
   }
 
   return {

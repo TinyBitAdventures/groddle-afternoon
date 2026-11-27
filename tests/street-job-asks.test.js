@@ -12,9 +12,9 @@ import { after, before, describe, it } from 'node:test';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { normalizeStreetJobState, phaseRequirements } from '../public/js/street-jobs.js?v=76471e42';
-import { ITEM_GET_ANCHOR, JOB_ASK_TEXT, itemAskSubject, itemGetHref, showAskRule, workSkillMissing, workSkillNote } from '../public/js/street-job-asks.js?v=84b712a3';
+import { ITEM_GET_ANCHOR, JOB_ASK_TEXT, itemAskSubject, itemGetHref, showAskRule, workSkillMissing, workSkillNote } from '../public/js/street-job-asks.js?v=32adbe89';
 
-import { streetJobsFeature, projectApi } from '../public/js/features/street-jobs-feature.js?v=0a36a0e5';
+import { streetJobsFeature, projectApi } from '../public/js/features/street-jobs-feature.js?v=ea3b2025';
 import { createToolConditionState } from '../public/js/tools.js?v=4156bba8';
 import { Display, FakeEl, fakePixi } from './fake-scene.js';
 
@@ -54,7 +54,7 @@ describe('G1073: the street project board explains who can give what', () => {
 
   it('the rule line: plain, short, shown while the project takes items or work', () => {
     assert.equal(JOB_ASK_TEXT.rule, 'Anyone can give items. Skills are only needed for tool work.');
-    for (const t of Object.values(JOB_ASK_TEXT)) assert.doesNotMatch(t, /[–—]/);
+    for (const t of Object.values(JOB_ASK_TEXT)) assert.doesNotMatch(typeof t === 'function' ? t() : t, /[–—]/);
     assert.equal(showAskRule(reqs, true), true);
     assert.equal(showAskRule(reqs, false), false);
     assert.equal(showAskRule(reqs.map((r) => ({ ...r, done: true })), true), false);

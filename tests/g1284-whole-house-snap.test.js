@@ -31,10 +31,10 @@ import { SITE_DIR } from '../tools/repos.mjs';
 import { fileURLToPath } from 'node:url';
 
 import { HOME_SHOT_COPY, homeShotBands, homeShotRows, homeShotScale, homeShotSize, homeShotState } from '../public/js/home-shot.js?v=8198618a';
-import { renderHomeShot } from '../public/js/home-shot-render.js?v=94336d6a';
+import { renderHomeShot } from '../public/js/home-shot-render.js?v=a03860d4';
 import { roomPieces } from '../public/js/home-wallpaper.js?v=5d3594e4';
 import { createHomeDecorState, INTERIOR } from '../public/js/home-decor.js?v=0fd93a2f';
-import { HOME_STALE_DELAY_MS, RETRY_MS, staleRefreshDue } from '../public/js/profiles.js?v=7e94c96f';
+import { HOME_STALE_DELAY_MS, RETRY_MS, staleRefreshDue } from '../public/js/profiles.js?v=1daccbb9';
 import { snapSteps, SNAP_MAX_H, SNAP_MAX_W, WHOLE_SNAP } from '../public/js/snaps.js?v=b5be8bff';
 import { snapsFeature } from '../public/js/features/snaps-feature.js?fresh=g1284';
 import { profilesFeature } from '../public/js/features/profiles-feature.js?fresh=g1284';

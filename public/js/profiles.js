@@ -10,6 +10,8 @@
  * saveSinglesFromAvatarMc 77-160).
  */
 
+import { SITE_PAGE_WHERE, sitePageWhere } from './site-pages.js?v=9b3049cf';
+
 /** The description's cap in characters (site src/Profiles.php ABOUT_MAX). */
 export const PROFILE_ABOUT_MAX = 500;
 
@@ -97,7 +99,8 @@ export const PROFILE_PAGE_VERB = 'profile_page';
 export const PROFILE_PAGE_COPY = Object.freeze({
   label: 'Open Profile Page',
   // The client's tooltip, then where it goes.
-  tooltip: 'View more information about this person: their page on the Groddle site, in a new tab.',
+  /** `where`: js/site-pages.js sitePageWhere (over the game in the Home Screen app, else in a new tab). */
+  tooltip: (where = SITE_PAGE_WHERE.tab) => `View more information about this person: their page on the Groddle site, ${where}.`,
   none: (name) => `${name || 'This player'} has no public page yet. Pages show from level ${PROFILE_LISTED_LEVEL}.`,
   looking: (name) => `Looking for ${name || 'this player'}'s page on the Groddle site.`,
   failed: () => 'The Groddle site did not answer just now. Open the menu again in a moment.',
@@ -114,7 +117,7 @@ export function profilePageVerb(name, status = '') {
   return {
     id: PROFILE_PAGE_VERB,
     label: PROFILE_PAGE_COPY.label,
-    tooltip: PROFILE_PAGE_COPY.tooltip,
+    tooltip: PROFILE_PAGE_COPY.tooltip(sitePageWhere('players/')),
     enabled: open,
     reason,
     durationMs: 0,

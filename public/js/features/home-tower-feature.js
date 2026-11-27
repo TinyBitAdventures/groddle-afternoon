@@ -54,7 +54,7 @@ import { canUseTool, useToolCondition, workStepCost } from '../tools.js?v=4156bb
 import { acceptOffer, npcQuestOffers } from '../quest-offers.js?v=7e00498b';
 import { getQuestCatalog, getSkillCatalog } from '../content-catalogs.js?v=c9b84764';
 import { listRecipesProducing } from '../making.js?v=dc595568';
-import { JOB_ASK_TEXT, itemAskSubject, itemGetHref, itemMakeNote, skillRankLabel } from '../street-job-asks.js?v=84b712a3';
+import { JOB_ASK_TEXT, itemAskSubject, itemGetHref, itemMakeNote, skillRankLabel } from '../street-job-asks.js?v=32adbe89';
 import { XP_FOR_LEVEL } from '../progression.js?v=05ff0260';
 import {
   BUILD_A_TOWER,
@@ -124,6 +124,7 @@ import { topUpMetabolic } from '../metabolics.js?v=48f784bf';
 import { standOnFeet, anchorBottomCentre } from '../sprite-feet.js?v=849541a8';
 import { WORLD_FONT_FAMILY } from '../world-text.js?v=6b49f88c';
 import { CHASSIS_ICONS } from '../chassis-icons.js?v=1a19ac08';
+import { sitePageWhere } from '../site-pages.js?v=9b3049cf';
 
 /** 3x tower pieces where the screen has more than 2.25 backing pixels per world pixel. */
 function hires(engine) {
@@ -1005,7 +1006,7 @@ function getItLink(engine, subject) {
   }
   a.href = itemGetHref(a.href);
   a.textContent = JOB_ASK_TEXT.getIt;
-  a.title = JOB_ASK_TEXT.getItTip;
+  a.title = JOB_ASK_TEXT.getItTip(sitePageWhere(a.href));
   a.dataset.htGet = subject.id;
   return a;
 }

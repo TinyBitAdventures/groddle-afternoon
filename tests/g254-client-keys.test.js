@@ -30,7 +30,7 @@ import {
   hotkeyText,
   isHotkeySheetRelease,
   isPlainKey,
-} from '../public/js/client-hotkeys.js?v=5c5a4301';
+} from '../public/js/client-hotkeys.js?v=401d994d';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const PUBLIC = join(here, '../public');

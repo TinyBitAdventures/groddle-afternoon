@@ -10,7 +10,7 @@ import { after, before, describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { applyStreetIndex } from '../public/js/street-loader.js?v=10376267';
-import { streetJobsFeature } from '../public/js/features/street-jobs-feature.js?v=0a36a0e5';
+import { streetJobsFeature } from '../public/js/features/street-jobs-feature.js?v=ea3b2025';
 import { followMpFeature } from '../public/js/features/follow-mp-feature.js?v=b83f8f33';
 
 const PUB = new URL('../public/', import.meta.url);

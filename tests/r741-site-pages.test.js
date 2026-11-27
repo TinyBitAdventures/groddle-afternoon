@@ -16,7 +16,11 @@ import assert from 'node:assert/strict';
 import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { dirname, join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { SITE_PAGE_TEXT, openSitePage, plainLinkClick, setSitePageViewer, siteLinkTip, sitePageHref } from '../public/js/site-pages.js?v=1ca3760c';
+import { SITE_PAGE_TEXT, openSitePage, plainLinkClick, setSitePageViewer, siteLinkTip, sitePageHref, sitePageTip, sitePageWhere } from '../public/js/site-pages.js?v=9b3049cf';
+import { createEncyclopedia, encyclopediaTip } from '../public/js/encyclopedia-links.js?v=b2caa8de';
+import { hotkeySections } from '../public/js/client-hotkeys.js?v=401d994d';
+import { JOB_ASK_TEXT } from '../public/js/street-job-asks.js?v=32adbe89';
+import { PROFILE_PAGE_COPY, profilePageVerb } from '../public/js/profiles.js?v=1daccbb9';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const PUB = join(ROOT, 'public');
@@ -82,6 +86,50 @@ describe('#741 the one rule (js/site-pages.js)', () => {
     assert.match(lb, /overGame: 'Open over the game'/);
   });
 
+  it('the Encyclopedia, its links, the hotkey sheet, a job ask\'s Where to get it and the profile row say where they open too', async () => {
+    const encyNote = () => hotkeySections().flatMap((sec) => sec.rows || []).find((r) => r[0] === 'Encyclopedia')?.[2];
+    const ency = createEncyclopedia({ fetchJson: async () => ({ entries: [{ s: 'skills', id: 'x', n: 'X', h: 'encyclopedia/skills/x/' }] }), resolve: (h) => `https://groddleafternoon.com/${h}` });
+    await ency.load();
+    const encyLinkTitle = () => /title="([^"]*)"/.exec(ency.linkMarkup({ section: 'skills', id: 'x' }))?.[1];
+    const words = () => ({
+      tip: encyclopediaTip(),
+      link: encyLinkTitle(),
+      hotkey: encyNote(),
+      ask: JOB_ASK_TEXT.getItTip(sitePageWhere('encyclopedia/items/cherry/')),
+      profile: profilePageVerb('Ann', 'public').tooltip,
+    });
+    const saved = globalThis.window;
+    globalThis.window = { document: { baseURI: 'https://groddleafternoon.com/' }, location: { href: 'https://groddleafternoon.com/play/' } };
+    try {
+      assert.deepEqual(words(), {
+        tip: 'Opens in a new tab',
+        link: 'Opens in a new tab',
+        hotkey: '(Opens in a new tab, on what you are looking at)',
+        ask: 'Opens its Encyclopedia page in a new tab',
+        profile: 'View more information about this person: their page on the Groddle site, in a new tab.',
+      }, 'a browser tab');
+      setSitePageViewer(() => null);
+      assert.deepEqual(words(), {
+        tip: 'Opens over the game',
+        link: 'Opens over the game',
+        hotkey: '(Opens over the game, on what you are looking at)',
+        ask: 'Opens its Encyclopedia page over the game',
+        profile: 'View more information about this person: their page on the Groddle site, over the game.',
+      }, 'the Home Screen app');
+      assert.equal(sitePageTip('https://example.org/'), 'Opens in a new tab', 'another site');
+      assert.equal(PROFILE_PAGE_COPY.tooltip(), 'View more information about this person: their page on the Groddle site, in a new tab.');
+    } finally {
+      setSitePageViewer(null);
+      globalThis.window = saved;
+    }
+    assert.match(read('public/js/encyclopedia-links.js'), /a\.title = encyclopediaTip\(href\);/);
+    assert.match(read('public/js/encyclopedia-links.js'), /title="\$\{attr\(encyclopediaTip\(href\)\)\}"/);
+    assert.match(read('public/game.js'), /ency\.title = siteLinkTip\('Encyclopedia \(I\)', 'encyclopedia\/'\)/);
+    for (const page of ['public/play/index.html', 'public/play/online/index.html']) {
+      assert.match(read(page), new RegExp(`id="encyclopedia-btn"[^>]*title="Encyclopedia \\(I\\), ${SITE_PAGE_TEXT.tab}"`), page);
+    }
+  });
+
   it('game.js sets the viewer and the catch only in a Home Screen app', () => {
     const game = read('public/game.js');
     assert.match(game, /const sitePageSheet = isHomeScreenApp\(window\) \? createEncyclopediaSheet\(/);
@@ -136,6 +184,21 @@ describe('#741 nothing in the game bypasses the one rule', () => {
       });
     }
     assert.deepEqual(bad, [], 'open the page with openSitePage (js/site-pages.js), or add a reviewed exception');
+  });
+
+  it('no game words say "new tab" except through js/site-pages.js (and the lightbox\'s pair, chosen by opensOverGame)', () => {
+    const bad = [];
+    for (const f of gameFiles()) {
+      if (f === 'public/js/site-pages.js') continue;
+      read(f).split('\n').forEach((line, i) => {
+        if (/^\s*(\*|\/\/|\/\*)/.test(line)) return;
+        const code = line.replace(/\/\/.*$/, '');
+        if (!/new tab/i.test(code)) return;
+        if (f === 'public/js/ui/picture-lightbox.js' && /newTab: 'Open in a new tab'/.test(code)) return;
+        bad.push(`${f}:${i + 1}: ${line.trim()}`);
+      });
+    }
+    assert.deepEqual(bad, [], 'say where a page opens with sitePageWhere, sitePageTip or siteLinkTip (js/site-pages.js)');
   });
 
   it('only the picture lightbox opts a link out of the catch (it opens the picture over the game)', () => {
@@ -226,9 +289,9 @@ describe('#741 an iPhone Home Screen app, 402x812 (WebKit)', { skip: !wk && 'no 
       const box = openLightbox({ src: '/assets/ui/bug_icon.webp', host: document.body });
       const tabWords = document.querySelector('[data-picture-lightbox-tab]')?.textContent || '';
       box?.close?.({ focus: false });
-      return { support: document.getElementById('support-btn').title, tab: tabWords };
+      return { support: document.getElementById('support-btn').title, ency: document.getElementById('encyclopedia-btn').title, tab: tabWords };
     }, LIGHTBOX_URL);
-    assert.deepEqual(words, { support: 'Support the game, opens over the game', tab: 'Open over the game' }, 'the words say it opens over the game');
+    assert.deepEqual(words, { support: 'Support the game, opens over the game', ency: 'Encyclopedia (I), opens over the game', tab: 'Open over the game' }, 'the words say it opens over the game');
     const results = {};
     for (const [k, sel] of [['encyclopedia', '#encyclopedia-btn'], ['support', '#support-btn'], ['seeWho', '#t-who'], ['notice', '#t-notice'], ['chat', '#t-chat'], ['privacy', '#t-privacy'], ['picture', '#t-pic']]) results[k] = await press(tab, sel);
     const r = await tab.evaluate(async () => {
@@ -266,9 +329,9 @@ describe('#741 an iPhone Home Screen app, 402x812 (WebKit)', { skip: !wk && 'no 
       const box = openLightbox({ src: '/assets/ui/bug_icon.webp', host: document.body });
       const tabWords = document.querySelector('[data-picture-lightbox-tab]')?.textContent || '';
       box?.close?.({ focus: false });
-      return { support: document.getElementById('support-btn').title, tab: tabWords };
+      return { support: document.getElementById('support-btn').title, ency: document.getElementById('encyclopedia-btn').title, tab: tabWords };
     }, LIGHTBOX_URL);
-    assert.deepEqual(words, { support: 'Support the game, opens in a new tab', tab: 'Open in a new tab' }, 'a browser tab keeps its words');
+    assert.deepEqual(words, { support: 'Support the game, opens in a new tab', ency: 'Encyclopedia (I), opens in a new tab', tab: 'Open in a new tab' }, 'a browser tab keeps its words');
     const r = await press(tab, '#support-btn');
     await tab.waitForTimeout(500);
     await ctx.close();

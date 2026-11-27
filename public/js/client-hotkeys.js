@@ -17,6 +17,7 @@
  */
 
 import { COMMAND_HELP } from './slash-commands.js?v=bb2569aa';
+import { sitePageTip } from './site-pages.js?v=9b3049cf';
 
 /**
  * Every client key the coverage row G254 named, with the remake's answer:
@@ -118,7 +119,8 @@ export function hotkeySections({ keyring = false, hub = false, reports = false }
         // Ticket 81: the remake's Projects panel (the client had no P).
         ['Projects', [['P']]],
         // ENCYC: the client's I was Info mode; here it opens the Encyclopedia (js/encyclopedia-links.js).
-        ['Encyclopedia', [['I']], '(Opens in a new tab, on what you are looking at)'],
+        // #741: over the game in the Home Screen app's viewer, else a new tab (js/site-pages.js).
+        ['Encyclopedia', [['I']], `(${sitePageTip('encyclopedia/')}, on what you are looking at)`],
       ],
     },
     {

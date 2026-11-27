@@ -17,7 +17,7 @@ import { join } from 'node:path';
 import { INVENTORY_DB, mergeWays } from '../tools/catalog/build.mjs';
 import { disambiguate, entryQualifier, foldsOf, itemQualifier, loadEncyclopedia, sameThingOf } from '../tools/encyclopedia/data.mjs';
 import { pathOf } from '../tools/encyclopedia/parts.mjs';
-import { buildEncyclopediaIndex, encyclopediaPage } from '../public/js/encyclopedia-links.js?v=bc92035a';
+import { buildEncyclopediaIndex, encyclopediaPage } from '../public/js/encyclopedia-links.js?v=b2caa8de';
 
 const pub = join(import.meta.dirname, '..', 'public');
 const skip = existsSync(INVENTORY_DB) ? false : `needs the coverage inventory at ${INVENTORY_DB}`;

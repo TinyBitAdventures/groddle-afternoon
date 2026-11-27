@@ -18,9 +18,9 @@ import {
   AVATAR_STILL, AVATAR_TILE, FAILURE_BACKOFF_MS, HOME_BACKDROP, HOME_MAX, HOME_MAX_BYTES, HOME_QUALITY, HOME_REFRESH_MS, HOME_RESOLUTION, HOME_TYPES, HOME_WIDTHS,
   PROFILE_ABOUT_MAX, PROFILE_COPY, RETRY_MS,
   aboutCounter, aboutLength, avatarKeyOf, base64Bytes, cleanAbout, homeKeyOf, homeSizes, imageBase64, pngBase64, profileSlug, shortHash, shouldUpload, stillTransform,
-} from '../public/js/profiles.js?v=7e94c96f';
+} from '../public/js/profiles.js?v=1daccbb9';
 import { createMinnAccount } from '../public/js/minn-account.js?v=7e3d7279';
-import { FEATURES } from '../public/js/features/index.js?v=5bb0fe3a';
+import { FEATURES } from '../public/js/features/index.js?v=f1126f3e';
 import { SITE_DIR, skipWithoutSite } from '../tools/repos.mjs';
 import { loadContentCatalogsFromDir, getSkillCatalog } from '../public/js/content-catalogs.js?v=c9b84764';
 import { skillTitle } from '../public/js/skill-tree.js?v=a67622a8';

@@ -88,12 +88,12 @@ import {
   TOWER_MAX, TOWER_MAX_BYTES, TOWER_QUALITIES, TOWER_SHOT_WIDTH,
   aboutCounter, profilePagePath, profilePageVerb, avatarKeyOf, base64Bytes, homeKeyOf, homeSizes, imageBase64, pngBase64, shouldUpload, staleRefreshDue, stillTransform,
   towerKeyOf, towerShotDue,
-} from '../profiles.js?v=7e94c96f';
-import { homeLayoutJson, homeLayoutKeyOf, HOME_LAYOUT_LIMITS } from '../home-layout.js?v=84b69e98';
-import { collectHomeLayout, homeFrameFor } from '../home-layout-scene.js?v=ae8a0d27';
-import { renderHomeLocation } from '../home-shot-render.js?v=94336d6a';
+} from '../profiles.js?v=1daccbb9';
+import { homeLayoutJson, homeLayoutKeyOf, HOME_LAYOUT_LIMITS } from '../home-layout.js?v=99b09c80';
+import { collectHomeLayout, homeFrameFor } from '../home-layout-scene.js?v=a8228cd0';
+import { renderHomeLocation } from '../home-shot-render.js?v=a03860d4';
 import { withPublicView } from '../public-picture.js?v=1a0b03fa';
-import { openSitePage } from '../site-pages.js?v=1ca3760c';
+import { openSitePage } from '../site-pages.js?v=9b3049cf';
 
 export const PROFILES_FEATURE_ID = 'profiles';
 

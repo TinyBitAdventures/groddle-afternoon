@@ -10,7 +10,7 @@ import { readFileSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { SHEET_TEXT, isHomeScreenApp, sheetLinkPlan } from '../public/js/ui/encyclopedia-sheet.js?v=7a51c71e';
-import { createEncyclopedia } from '../public/js/encyclopedia-links.js?v=bc92035a';
+import { createEncyclopedia } from '../public/js/encyclopedia-links.js?v=b2caa8de';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', 'public');
 const game = readFileSync(join(ROOT, 'game.js'), 'utf8');

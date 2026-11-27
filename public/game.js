@@ -4,7 +4,7 @@
  */
 import { ITEM_ICONS, ITEM_LABELS, getVerbsFor, ordinaryItems, runVerb } from './content.js?v=68a61ef7';
 import { createErrorOnce, createFeatureHost, createFrameStages } from './js/feature-host.js?v=b87e2cbc';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=5bb0fe3a';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=f1126f3e';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, enterHintPick, groupHead, hoverRimShown, reachGlowTargets, spriteHasRimArt, rimArtParts, trimmedIconUrl, drawTileArt } from './js/enter-chooser.js?v=74f4964a';
 import { firstTendKey, STICK_TEND_DELAY_MS, STICK_TEND_DIRS, STICK_TEND_REPEAT_MS, stepTendKey, stepTendKeys, stickTendKey, tendKeyAction } from './js/garden-tend.js?v=a7470c4a';
 import { avatarHitBox, behindFloor, bodyReachDistance, OUT_OF_REACH_LINE, playerClickBox } from './js/reach.js?v=456da8a8';
@@ -1159,17 +1159,17 @@ import { bindCountField, countKeyValue, countStepMarkup, createCountChooser, foc
 import { createScrollKeep } from './js/ui/scroll-keep.js?v=2898b5b1';
 import { actVerbMenu, bindVerbMenu, centerVerbMenu, chooseVerbRow, dropVerbMenuActs, fitPickGrid, fitVerbMenuRows, focusVerbRow, lockVerbMenuSize, makePickTile, makeVerbRow, pickGridCols, placeVerbMenu, plainWords, refuseVerbRow, setVerbMenuIcon, settleVerbMenu, stepVerbRow, syncVerbDetail, verbMenuKey, verbMenuWaiting, verbRowAttrs, verbRowInner, verbRowKeys } from './js/ui/verb-menu.js?v=1ad4f969';
 import { createPromptSettler, promptId, promptSideStep } from './js/prompt-settle.js?v=cb790f3a';
-import { clientKeyAction, createHotkeysSheet, emoteKeyAction, isHotkeySheetRelease, isPlainKey } from './js/client-hotkeys.js?v=5c5a4301';
-import { ENCYCLOPEDIA_MENU_LABEL, createEncyclopedia, isEncyclopediaKey } from './js/encyclopedia-links.js?v=bc92035a';
+import { clientKeyAction, createHotkeysSheet, emoteKeyAction, isHotkeySheetRelease, isPlainKey } from './js/client-hotkeys.js?v=401d994d';
+import { ENCYCLOPEDIA_MENU_LABEL, createEncyclopedia, isEncyclopediaKey } from './js/encyclopedia-links.js?v=b2caa8de';
 import { createEncyclopediaSheet, isHomeScreenApp } from './js/ui/encyclopedia-sheet.js?v=7a51c71e';
-import { catchSiteLinks, setSitePageViewer, siteLinkTip } from './js/site-pages.js?v=1ca3760c';
+import { catchSiteLinks, setSitePageViewer, siteLinkTip } from './js/site-pages.js?v=9b3049cf';
 import { bootStep } from './js/boot-progress.js?v=d84b898d';
 import { HOME_SCREEN_TIP_CACHE, iosSafari, mountHomeScreenTip, runsStandalone } from './js/home-screen-tip.js?v=f2287991';
 import { ZOOM_HINT_CACHE, ZOOM_HINT_MS, watchZoomHint } from './js/zoom-hint.js?v=75b745c7';
 import { EAT_PICK_TEXT, bestFoodIndex, eatChoices, eatTip } from './js/eat-pick.js?v=8fb763d0';
 import { heldDirection, installHeldKeyGuard, isMacPlatform } from './js/held-keys.js?v=a28eb293';
 import { isOneClickDoor, oneClickChoice, signpostArmRows, worldContextAction } from './js/world-context-menu.js?v=e4c99c05';
-import { blockedPlayerVerbs, listPlayerTarget, opensPlayerMenu, playerMenuRows } from './js/ui/player-menu.js?v=2f2a9e64';
+import { blockedPlayerVerbs, listPlayerTarget, opensPlayerMenu, playerMenuRows } from './js/ui/player-menu.js?v=143b68b7';
 import { forgetTexture, frameTexture, isFailed, isLoaded, onFailed, onLoaded, textureFromUrl, whenLoaded } from './js/textures.js?v=b8e38103';
 import { FALLBACK_MAX as WORLD_ART_FALLBACK_MAX, worldArtFor } from './js/world-art.js?v=a67514c8';
 import { HOME_PIP_PX, HOME_PIP_WORDS, drawLockPip, drawPipWords, homeMarkNote, homePipShown, homePipWordsShown, homeStackMark } from './js/home-stack-marks.js?v=67b44287';
@@ -1852,9 +1852,11 @@ const sitePageSheet = isHomeScreenApp(window) ? createEncyclopediaSheet({ setDat
 if (sitePageSheet) {
   setSitePageViewer((url, opts) => sitePageSheet.open(url, opts));
   catchSiteLinks(window);
-  // Its tip says what really happens (the page's own markup says a new tab, a browser tab's way).
+  // Their tips say what really happens (the page's own markup says a new tab, a browser tab's way).
   const support = document.getElementById('support-btn');
   if (support) support.title = siteLinkTip('Support the game', support.href);
+  const ency = document.getElementById('encyclopedia-btn');
+  if (ency) ency.title = siteLinkTip('Encyclopedia (I)', 'encyclopedia/');
 }
 
 /**

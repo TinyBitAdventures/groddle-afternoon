@@ -13,8 +13,8 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { MAP_HOME_SHORTCUTS, mapHomeShortcuts, slashCommandsFeature } from '../public/js/features/slash-commands-feature.js?v=08effc23';
-import { towerApi } from '../public/js/features/home-tower-feature.js?v=9515b81d';
+import { MAP_HOME_SHORTCUTS, mapHomeShortcuts, slashCommandsFeature } from '../public/js/features/slash-commands-feature.js?v=93c97f28';
+import { towerApi } from '../public/js/features/home-tower-feature.js?v=a39637c6';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const read = (rel) => readFileSync(join(root, rel), 'utf8');

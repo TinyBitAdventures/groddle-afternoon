@@ -10,7 +10,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { GIANTS } from '../public/js/shrines.js?v=48318bec';
-import { buildEncyclopediaIndex, encyclopediaPage } from '../public/js/encyclopedia-links.js?v=bc92035a';
+import { buildEncyclopediaIndex, encyclopediaPage } from '../public/js/encyclopedia-links.js?v=b2caa8de';
 
 const PUBLIC = join(dirname(fileURLToPath(import.meta.url)), '..', 'public');
 const game = readFileSync(join(PUBLIC, 'game.js'), 'utf8');

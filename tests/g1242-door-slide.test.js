@@ -25,7 +25,7 @@ import {
   unexpandHouseFloors,
 } from '../public/js/home-floors.js?v=cb981157';
 import { createHomeDecorState, placeFurniture, placementSpan, furnitureSize, interiorWidth } from '../public/js/home-decor.js?v=0fd93a2f';
-import { homesFeature, visitorHomeState } from '../public/js/features/homes-feature.js?v=2dbd4b40';
+import { homesFeature, visitorHomeState } from '../public/js/features/homes-feature.js?v=70059ddd';
 
 const GLITCH = join(homedir(), 'Documents/glitch-audit');
 const read = (f) => (existsSync(join(GLITCH, f)) ? readFileSync(join(GLITCH, f), 'utf8') : null);

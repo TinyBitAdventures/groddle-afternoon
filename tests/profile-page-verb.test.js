@@ -18,8 +18,8 @@ import { execFileSync, spawnSync } from 'node:child_process';
 import { existsSync, readFileSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { join } from 'node:path';
-import { PROFILE_LISTED_LEVEL, PROFILE_PAGE_COPY, PROFILE_PAGE_VERB, profilePagePath, profilePageVerb, profileSlug } from '../public/js/profiles.js?v=7e94c96f';
-import { lookUpPlayersHere, profilesFeature } from '../public/js/features/profiles-feature.js?v=b74e2959';
+import { PROFILE_LISTED_LEVEL, PROFILE_PAGE_COPY, PROFILE_PAGE_VERB, profilePagePath, profilePageVerb, profileSlug } from '../public/js/profiles.js?v=1daccbb9';
+import { lookUpPlayersHere, profilesFeature } from '../public/js/features/profiles-feature.js?v=2e051d49';
 import { GAME_DIR, HAS_SITE, SITE_DIR, skipWithoutSite } from '../tools/repos.mjs';
 import { HAS_PHP, PHP, phpSkip } from './php.js';
 

@@ -36,7 +36,7 @@
 
 import { focusBackTarget, lastInput, pressedBy } from './focus-return.js?v=da190597';
 import { createMarker } from './picture-marks.js?v=315bb1da';
-import { opensOverGame } from '../site-pages.js?v=1ca3760c';
+import { opensOverGame } from '../site-pages.js?v=9b3049cf';
 
 export const LIGHTBOX_TEXT = Object.freeze({
   label: 'Picture',

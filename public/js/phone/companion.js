@@ -309,7 +309,7 @@ function select(id, { quiet = false } = {}) {
 }
 
 let accountModule = null;
-const loadAccountModule = () => (accountModule ||= import('./account-tab.js?v=2ae69d56').catch((err) => { accountModule = null; throw err; }));
+const loadAccountModule = () => (accountModule ||= import('./account-tab.js?v=9c101916').catch((err) => { accountModule = null; throw err; }));
 
 async function loadAccount() {
   const panel = panels.account;
@@ -596,7 +596,7 @@ function linkMessages(list, bodies) {
 }
 /** The pictures over the page (js/ui/picture-lightbox.js, plain DOM), loaded at the first tap on a picture. */
 let lightboxModule = null;
-const loadLightbox = () => (lightboxModule ||= import('../ui/picture-lightbox.js?v=709c5bd1').catch((err) => { lightboxModule = null; throw err; }));
+const loadLightbox = () => (lightboxModule ||= import('../ui/picture-lightbox.js?v=9ede59ba').catch((err) => { lightboxModule = null; throw err; }));
 /** G808: the rings module, loaded with the lightbox at the first tap on a photo about to go. */
 let marksModule = null;
 const loadMarks = () => (marksModule ||= import('../ui/picture-marks.js?v=315bb1da').catch((err) => { marksModule = null; throw err; }));
