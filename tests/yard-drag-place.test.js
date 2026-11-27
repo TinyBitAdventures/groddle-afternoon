@@ -302,6 +302,57 @@ describe('review 2026-11-27 in Chrome (1352x802, solo, Modern)', { skip: !chromi
     return Number((await t.data()).homeHouseX);
   }
 
+  it('item 2: a pack stack held at the view\'s edge scrolls the room, its marker staying under the pointer', { timeout: 40_000 }, async () => {
+    const page = t.page();
+    await yard();
+    const r = await t.canvasRect();
+    const at = { x: Math.round(r.right - 20), y: Math.round(r.top + (r.bottom - r.top) * 0.6) };
+    const camBefore = (await page.evaluate(() => window.groddleQA.cameraFrame())).camX;
+    assert.ok(await t.reg('begin', { cls: 'cherry', count: 1 }));
+    assert.equal(await t.reg('over', at), 'home-place');
+    const markBefore = Number((await t.data()).homePackMark.split(',')[0]);
+    await page.waitForTimeout(2500);
+    const camAfter = (await page.evaluate(() => window.groddleQA.cameraFrame())).camX;
+    const markAfter = Number((await t.data()).homePackMark.split(',')[0]);
+    await t.reg('end');
+    assert.ok(camAfter > camBefore + 150, `the view scrolled right: ${camBefore} -> ${camAfter}`);
+    assert.ok(markAfter > markBefore + 150, `the marker went with it: ${markBefore} -> ${markAfter}`);
+  });
+
+  it('item 1: Decoration Mode scrolls into the yard, and a stack there is selected and moved', { timeout: 50_000 }, async () => {
+    const page = t.page();
+    await yard();
+    // A Cherry set down at the yard's far end (world x 80), then Decoration Mode.
+    const drop = await t.client(80, 600);
+    await t.reg('begin', { cls: 'cherry', count: 1 });
+    await t.reg('drop', drop);
+    await page.waitForTimeout(600);
+    assert.equal((await t.data()).homeDropAt, '80,680');
+    await page.click('#homes-decorate-btn');
+    await page.waitForTimeout(800);
+    // A sideways wheel pans the decorate camera (HandOfDecorator onMouseWheel), as the arrows do.
+    const r = await t.canvasRect();
+    await page.mouse.move((r.left + r.right) / 2, (r.top + r.bottom) / 2);
+    for (let i = 0; i < 24; i += 1) await page.mouse.wheel(-120, 0);
+    await page.waitForTimeout(1500);
+    const at = await t.client(80, 664);
+    const trayTop = await t.trayTop();
+    assert.ok(at.y < trayTop - 4, `the yard's ground shows over Decoration Mode's tray: ${at.y} < ${trayTop}`);
+    assert.ok(at.x > r.left + 10 && at.x < r.right - 10, `the yard's far end is in view in Decoration Mode: ${JSON.stringify(at)} in ${JSON.stringify(r)}`);
+    const to = await t.client(420, 600);
+    await page.mouse.move(at.x, at.y);
+    await page.mouse.down();
+    assert.match((await t.data()).homeSelected, /^stack:/, 'the press selects it');
+    await page.mouse.move(at.x + 10, at.y - 10, { steps: 2 });
+    await page.mouse.move(to.x, to.y, { steps: 10 });
+    await page.waitForTimeout(200);
+    await page.mouse.up();
+    await page.waitForTimeout(700);
+    await t.shot('decorate-yard-1352x802.png');
+    const cherry = (await t.stacks()).find((s) => /cherr/i.test(s.label));
+    assert.ok(cherry && Math.abs(cherry.x - 420) <= NEAR && cherry.y === 680, `moved on the yard: ${JSON.stringify(await t.stacks())} ${(await t.data()).homeStackLast}`);
+  });
+
   it('item 5: Classic shows the yard\'s ground over its pack panel, as Modern does', { timeout: 40_000 }, async () => {
     const page = t.page();
     for (const flag of ['', '&ui=classic']) {

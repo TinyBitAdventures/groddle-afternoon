@@ -6511,6 +6511,8 @@ let placeDrag = null; // { classTsid, count, ds } a pack stack dragged in your o
 
 function endPlaceDrag(engine) {
   placeDrag = null;
+  lastClient = null;
+  edgeSince = 0;
   drawPackMarker(engine, null);
 }
 
@@ -6526,12 +6528,17 @@ const placeTarget = (engine) => ({
   },
   over(d, at) {
     if (!placeDrag || !boxDropHere(engine)) return null;
+    // The view scrolls while it is held at an edge (tickDecorPan).
+    lastClient = { x: at.x, y: at.y };
     drawPackMarker(engine, packDropTarget(engine, { clientX: at.x, clientY: at.y }), placeDrag);
     engine.setData('homeDrag', `place:${placeDrag.classTsid}`);
     return { ok: true };
   },
   leave() {
-    if (placeDrag) drawPackMarker(engine, null);
+    if (!placeDrag) return;
+    drawPackMarker(engine, null);
+    lastClient = null;
+    edgeSince = 0;
   },
   drop(d, at) {
     if (!placeDrag || !boxDropHere(engine)) return;
@@ -7567,9 +7574,10 @@ function tickDecorPan(engine, range, dtMs) {
   let { dx, dy } = panDirection(heldPan);
   dx *= speed;
   dy *= speed;
-  const dragging = Boolean(lastClient && (drag || packDrag));
+  const dragging = Boolean(lastClient && (drag || packDrag || placeDrag));
   if (dragging) {
-    const edge = edgePan(lastClient.x, lastClient.y, ui?.builder?.roomRect?.());
+    // Outside the modes there may be no bar yet: the canvas is the area the room shows in.
+    const edge = edgePan(lastClient.x, lastClient.y, ui?.builder?.roomRect?.() || canvasFrame(engine)?.rect);
     const now = Date.now();
     if (edge.dx || edge.dy) {
       if (!edgeSince) edgeSince = now;
@@ -7592,6 +7600,11 @@ function tickDecorPan(engine, range, dtMs) {
       updateGhost(engine);
     }
   }
+  // A pack stack's marker stays under the still pointer too (a shelf, the floor or the yard's ground there).
+  const stackWhat = placeDrag || (packDrag && !packDrag.furniture && !packDrag.machine ? packDrag : null);
+  if (dragging && stackWhat && !drag && (before.x !== decorCamX || before.y !== decorPan) && canvasFrame(engine)) {
+    drawPackMarker(engine, packDropTarget(engine, { clientX: lastClient.x, clientY: lastClient.y }, stackWhat), stackWhat);
+  }
   return true;
 }
 
@@ -7600,10 +7613,30 @@ function yardTrayDrag() {
   return mode === 'cultivate' && inHouse() && drag?.source === 'tray' && placing?.kind === 'cultivation';
 }
 
-/** What a drag at the view's edge may scroll across: the house, and in Cultivate its back yard too (world x 0). */
+/** The back yard's ground, a little under it: what Decoration Mode keeps over its tray while the yard is in view. */
+export const YARD_FLOOR_FRONT = BACK_YARD_GROUND_Y + 12;
+
+/**
+ * The lowest line Decoration Mode keeps over its tray: the house floor's front edge, or the back yard's ground
+ * (60 px under the floor) while any of the yard is in view, so its stacks can be pressed (review 2026-11-27).
+ */
+function decorFloorFront(engine) {
+  if (!inHouse() || !(roomX0() > 0)) return INTERIOR.floorFront;
+  const w = engine?.camera?.w || 960;
+  const left = (decorCamX ?? engine?.player?.x ?? 0) - w / 2;
+  return left < roomX0() ? Math.max(INTERIOR.floorFront, YARD_FLOOR_FRONT) : INTERIOR.floorFront;
+}
+
+/**
+ * What the view may scroll across: the house, and its back yard too (world x 0) in Decoration Mode, while a
+ * Cultivate tile is dragged and while a pack stack is dragged in the house (review 2026-11-27: Decoration
+ * Mode stopped at the house's wall, so the yard's stacks could not be reached, and a drag at the edge
+ * landed just outside it). A carried piece of furniture still goes only in the house (snapPlacement).
+ */
 function panSpan() {
   const span = roomSpan();
-  return yardTrayDrag() ? { left: 0, right: span.right } : span;
+  const yard = inHouse() && roomX0() > 0 && (mode === 'decorate' || yardTrayDrag() || Boolean(placeDrag));
+  return yard ? { left: 0, right: span.right } : span;
 }
 
 function interiorCameraLook(engine, dtMs) {
@@ -7625,7 +7658,8 @@ function interiorCameraLook(engine, dtMs) {
     // A Cultivate tile dragged over the back yard scrolls the view at its edge, as Decorate's drag does,
     // so the whole yard is in reach of the drag.
     const yardDrag = yardTrayDrag();
-    if (drag?.loose || yardDrag) tickDecorPan(engine, { lo: wantY, hi: wantY, floor: wantY, ceiling: wantY }, dtMs);
+    // Review 2026-11-27: a pack stack dragged in the house or its yard scrolls at the edge too.
+    if (drag?.loose || yardDrag || placeDrag) tickDecorPan(engine, { lo: wantY, hi: wantY, floor: wantY, ceiling: wantY }, dtMs);
     else if (!upgradePickerOpen()) decorCamX = null;
     decorPan = null;
     if (decorCamX != null) {
@@ -7641,12 +7675,12 @@ function interiorCameraLook(engine, dtMs) {
     }
   } else {
     const ins = decorInsets(engine);
-    const range = decorLook({ playerY, anchor, view, top: ins.top, bottom: ins.bottom, ceilingTop: INTERIOR.ceilingTop, floorFront: INTERIOR.floorFront });
+    const range = decorLook({ playerY, anchor, view, top: ins.top, bottom: ins.bottom, ceilingTop: INTERIOR.ceilingTop, floorFront: decorFloorFront(engine) });
     tickDecorPan(engine, range, dtMs);
     const auto = ceilingInHand() ? range.ceiling : range.floor;
     wantY = decorPan != null ? Math.max(range.lo, Math.min(range.hi, decorPan)) : auto;
     kind = decorPan != null ? 'pan' : wantY === range.floor ? 'walk' : 'ceiling';
-    const span = roomSpan();
+    const span = panSpan();
     decorCamX = clampRoomX(decorCamX ?? engine.player?.x ?? span.left, { left: span.left, right: span.right, view: engine.camera?.w || 960 });
     wantX = Math.round(decorCamX - (engine.player?.x ?? 0));
   }
@@ -7666,13 +7700,13 @@ function panDecorCamera(engine, deltaX, deltaY, sideways = false) {
   const dx = sideways && !deltaX ? deltaY : deltaX;
   const dy = sideways && !deltaX ? 0 : deltaY;
   if (dx) {
-    const span = roomSpan();
+    const span = panSpan();
     decorCamX = clampRoomX((decorCamX ?? engine.player?.x ?? 0) + Math.sign(dx) * Math.min(80, Math.max(10, Math.abs(dx))), { left: span.left, right: span.right, view: engine.camera?.w || 960 });
   }
   if (dy) {
     const playerY = engine.player?.y ?? INTERIOR.floorY;
     const ins = decorInsets(engine);
-    const range = decorLook({ playerY, anchor: roomAnchor(engine), view: engine.camera?.h || LOOK_VIEW_H, top: ins.top, bottom: ins.bottom, ceilingTop: INTERIOR.ceilingTop, floorFront: INTERIOR.floorFront });
+    const range = decorLook({ playerY, anchor: roomAnchor(engine), view: engine.camera?.h || LOOK_VIEW_H, top: ins.top, bottom: ins.bottom, ceilingTop: INTERIOR.ceilingTop, floorFront: decorFloorFront(engine) });
     const from = decorPan ?? (ceilingInHand() ? range.ceiling : range.floor);
     decorPan = Math.max(range.lo, Math.min(range.hi, Math.round(from + Math.sign(dy) * Math.min(60, Math.max(10, Math.abs(dy))))));
   }
@@ -7695,11 +7729,11 @@ function dragDecorCamera(engine, press, e) {
   const sx = (b.x - a.x) / 100 || f.k;
   const sy = (b.y - a.y) / 100 || f.k;
   const want = decorDragTarget({ from: press.from, dx: (e.clientX - press.x) * sx, dy: (e.clientY - press.y) * sy, playerX: engine.player?.x ?? 0 });
-  const span = roomSpan();
+  const span = panSpan();
   decorCamX = clampRoomX(want.x, { left: span.left, right: span.right, view: engine.camera?.w || 960 });
   if (want.y != null) {
     const ins = decorInsets(engine);
-    const range = decorLook({ playerY: engine.player?.y ?? INTERIOR.floorY, anchor: roomAnchor(engine), view: engine.camera?.h || LOOK_VIEW_H, top: ins.top, bottom: ins.bottom, ceilingTop: INTERIOR.ceilingTop, floorFront: INTERIOR.floorFront });
+    const range = decorLook({ playerY: engine.player?.y ?? INTERIOR.floorY, anchor: roomAnchor(engine), view: engine.camera?.h || LOOK_VIEW_H, top: ins.top, bottom: ins.bottom, ceilingTop: INTERIOR.ceilingTop, floorFront: decorFloorFront(engine) });
     const from = press.from.y ?? (ceilingInHand() ? range.ceiling : range.floor);
     decorPan = Math.max(range.lo, Math.min(range.hi, Math.round(from + want.y)));
   }
