@@ -2814,9 +2814,34 @@
   "deployed": "2026-11-26"
  },
  "git": {
-  "commits": 3753,
+  "commits": 3759,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-26",
+    "kind": "improve",
+    "text": "Prices read the number then Glitch's ₡ in the shops, vendors, the Furniture Store, storage stores, mail and auctions"
+   },
+   {
+    "date": "2026-11-26",
+    "kind": "improve",
+    "text": "The Furniture Store button in Decoration Mode is a toggle: pressed while the store is open, a tap closes it"
+   },
+   {
+    "date": "2026-11-26",
+    "kind": "fix",
+    "text": "Decoration Mode's tray keeps its width beside a Furniture Store that ends above it"
+   },
+   {
+    "date": "2026-11-26",
+    "kind": "fix",
+    "text": "On a phone the Furniture Store and Make open as a sheet under Decoration Mode's Expand bar and above its tray"
+   },
+   {
+    "date": "2026-11-26",
+    "kind": "fix",
+    "text": "The Hi sign leaderboard, the Calendar, Gifts, Trade and storage windows stay below an upright iPhone's clock and camera"
+   },
    {
     "date": "2026-11-26",
     "kind": "fix",
@@ -2911,34 +2936,9 @@
     "date": "2026-11-26",
     "kind": "fix",
     "text": "Change Style tile pictures draw on an iPad, and the furniture and house pickers get the same guard"
-   },
-   {
-    "date": "2026-11-26",
-    "kind": "fix",
-    "text": "Keeping this window's game reloads the saved game when the site added something, so a returned Still stays"
-   },
-   {
-    "date": "2026-11-26",
-    "kind": "fix",
-    "text": "A long description in an item's menu no longer squeezes its verbs down to two or three rows"
-   },
-   {
-    "date": "2026-11-26",
-    "kind": "fix",
-    "text": "A thing left under the house floor comes back up onto the floor, in reach and above the Decoration Mode tray"
-   },
-   {
-    "date": "2026-11-26",
-    "kind": "fix",
-    "text": "Online pages no longer log a 404 in the console for each player below level 5 on the street"
-   },
-   {
-    "date": "2026-11-26",
-    "kind": "improve",
-    "text": "on a phone the Menu shows Social right after Now"
    }
   ]
  },
- "tests": 1456,
+ "tests": 1457,
  "generatedAt": "2026-11-26"
 }
