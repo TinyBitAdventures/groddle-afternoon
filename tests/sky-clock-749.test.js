@@ -23,7 +23,7 @@ import {
   skyPhaseWeights,
   starField,
 } from '../public/js/sky-clock.js?v=6b9184e9';
-import { ecologyForStreet, setStreetEcologyCatalog } from '../public/js/street-ecology.js?v=1d97eefe';
+import { ecologyForStreet, setStreetEcologyCatalog } from '../public/js/street-ecology.js?v=f6185033';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const read = (rel) => readFileSync(join(here, '..', rel), 'utf8');

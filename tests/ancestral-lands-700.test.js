@@ -19,9 +19,9 @@ import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { FEATURES } from '../public/js/features/index.js?v=932379c5';
-import { streetObjectsFeature } from '../public/js/features/street-objects-feature.js?v=0c28e3f6';
-import { SHARED_NODE_CLASSES, applyNodeState, createStreetCopy, freshenNode, stateFor, takeObjs } from '../public/js/street-objects.js?v=4c07576e';
+import { FEATURES } from '../public/js/features/index.js?v=8e2d4562';
+import { streetObjectsFeature } from '../public/js/features/street-objects-feature.js?v=6715d040';
+import { SHARED_NODE_CLASSES, applyNodeState, createStreetCopy, freshenNode, stateFor, takeObjs } from '../public/js/street-objects.js?v=fcc07592';
 import { createResourceNode, resourceNodeFrame } from '../public/js/resource-nodes.js?v=c2eb46b1';
 import { applyBuff, createBuffState, hasBuff, removeBuff } from '../public/js/buffs.js?v=09184e60';
 import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=c9b84764';

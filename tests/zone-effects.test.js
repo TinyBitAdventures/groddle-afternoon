@@ -25,7 +25,7 @@ import {
   createRumbleClock, rumbleShare, rumbleEnvelope, createStreetEffects, seededRandom,
 } from '../public/js/street-effects.js?v=18ee8a33';
 import { zoneEffectsFeature } from '../public/js/features/zone-effects-feature.js?v=75786bbd';
-import { useDraftArt } from '../public/js/builder/draft-play.js?v=f30474c9';
+import { useDraftArt } from '../public/js/builder/draft-play.js?v=cbd3a92e';
 import { run, effectOps, rumbleOps, effectsReport, placeOps, ladderTiling, LADDER_TILINGS } from '../tools/builder/cli.mjs';
 import * as textures from '../public/js/textures.js?v=b8e38103';
 import { installNewArt } from '../public/js/builder/new-art.js?v=29f0b13e';

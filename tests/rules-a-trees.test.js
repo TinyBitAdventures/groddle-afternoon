@@ -10,14 +10,14 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { getVerbsFor, runVerb } from '../public/content.js?v=9c775db5';
+import { getVerbsFor, runVerb } from '../public/content.js?v=eb86c077';
 import { createTrantState, setTrantTables, fruitCapacityAt } from '../public/js/trants.js?v=cf0fe1a3';
 import { quoteTrantCare } from '../public/js/trant-care.js?v=63846e5e';
 import { harvestWoodTree, noteWoodCare, quoteWoodTreeHarvest, WOOD_TREE_MATURITY_MAP } from '../public/js/woodcutting.js?v=9e9af511';
 import { growStreetTrant, maturityCycleMs } from '../public/js/patches.js?v=54430bb9';
 import { createToolConditionState } from '../public/js/tools.js?v=4156bba8';
-import { patchesFeature } from '../public/js/features/patches-feature.js?v=36616769';
-import { treeDeathFeature, WOOD_CLEARED_TO_PATCH_MS } from '../public/js/features/tree-death-feature.js?v=b98a2187';
+import { patchesFeature } from '../public/js/features/patches-feature.js?v=903260eb';
+import { treeDeathFeature, WOOD_CLEARED_TO_PATCH_MS } from '../public/js/features/tree-death-feature.js?v=27657eff';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 setTrantTables(JSON.parse(fs.readFileSync(path.join(root, 'public/assets/content/trants.json'), 'utf8')));

@@ -14,8 +14,8 @@ import { describe, it, before } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { setStreetEcologyCatalog } from '../public/js/street-ecology.js?v=1d97eefe';
-import { animalHusbandryFeature, husbandryPendingRows } from '../public/js/features/animal-husbandry-feature.js?v=aab2c55c';
+import { setStreetEcologyCatalog } from '../public/js/street-ecology.js?v=f6185033';
+import { animalHusbandryFeature, husbandryPendingRows } from '../public/js/features/animal-husbandry-feature.js?v=f66eefe0';
 import { homeToFeatures, streetFeaturesFromTargets } from '../public/js/exploration.js?v=8f19e25d';
 
 const pub = join(import.meta.dirname, '../public');

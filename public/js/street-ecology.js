@@ -27,6 +27,7 @@ import { JELLISAC_HOLE_SPOTS } from './jellisac-hole-spots-data.js?v=256c00e9';
 import { STONE_FRONT_MASKS } from './stone-front-masks-data.js?v=31b2b54a';
 import { decoCovers } from './barnacle-walls.js?v=75e568c3';
 import { SLOTH_SPOTS } from './sloth-spots-data.js?v=b8730c99';
+import { ICE_NUBBIN_SPOTS } from './ice-nubbin-spots-data.js?v=9a2eedc4';
 import { slothSpotFromRow } from './sloth-trees.js?v=a44a0ed8';
 
 export const STREET_ECOLOGY_URL = 'assets/content/street-ecology.json?v=official-ecology-6';
@@ -209,6 +210,10 @@ export const MEASURED_NODE_SPOTS = Object.freeze({
   // #633 (G1182): Dirt Piles were set by hand too (dirt_pile.js obey_physics false); no snap shows
   // one, so only a street picture places one (Bonelington Hole's, in the cave): the rest are planned.
   dirt_pile: Object.freeze({ variantPrefix: 'dirt', streets: DIRT_PILE_PICTURE_SPOTS }),
+  // G1323 (#725): Ice Nubbins were set by hand on the icy walls (ice_knob.js obey_physics false); every
+  // one the files name has a wall spot, measured on a picture or by js/ice-nubbin-walls.js's rule
+  // (tools/build-ice-nubbin-spots.mjs), so none is planned on the path.
+  ice_knob: Object.freeze({ variantPrefix: 'knob', streets: ICE_NUBBIN_SPOTS }),
   // A Paper Tree's art follows its paper and care, never a variant: its spots carry none (null).
   paper_tree: Object.freeze({ variantPrefix: '', streets: PAPER_TREE_SPOTS }),
   // A rock's variant is the class of the shape the snap shows (rock_metal_2: items/rock_metal_2.js, proxy_item rock_metal_1).
@@ -1423,7 +1428,7 @@ export function streetReservedSpots(street) {
 }
 
 /**
- * Report #319: the measured Peat Bogs, Jellisacs, Mortar Barnacles, Paper Trees and Dirt Piles (measuredNodeSpots,
+ * Report #319: the measured Peat Bogs, Jellisacs, Mortar Barnacles, Ice Nubbins (G1323), Paper Trees and Dirt Piles (measuredNodeSpots,
  * drawn where the snaps show them, resource-nodes-feature resourceSpawnPlan) as keep-clear spots, so
  * a planned shrine, tree, rock, vendor, garden or animal never stands on one and a quoin keeps its
  * distance, as of a measured rock or tree (Viscid Pud's shrine was planned 32 px from its peat).
@@ -1440,6 +1445,8 @@ export const MEASURED_NODE_COVERS = Object.freeze({
   peat_1: Object.freeze({ clearance: 115, cells: Object.freeze({ peat1: [211, 52], peat2: [166, 46], peat3: [178, 57] }) }),
   // #633: resource-nodes.js dirt_pile sheets dirt1 and dirt2, 195 x 71.
   dirt_pile: Object.freeze({ clearance: 110, cells: Object.freeze({ dirt1: [195, 71], dirt2: [195, 71] }) }),
+  // G1323: resource-nodes.js ice_knob sheets knob1-4: frame width x height.
+  ice_knob: Object.freeze({ clearance: 46, cells: Object.freeze({ knob1: [45, 69], knob2: [54, 68], knob3: [46, 71], knob4: [72, 52] }) }),
   // One art for every Paper Tree (its sheet follows its care): 232 x 216.
   paper_tree: Object.freeze({ clearance: 135, cells: Object.freeze({ '': [232, 216] }) }),
 });

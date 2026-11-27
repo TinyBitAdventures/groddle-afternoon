@@ -21,7 +21,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { applyStreetIndex, loadStreetDataFromFs, setZoneStreetsShown } from '../public/js/street-loader.js?v=10376267';
 import { platformsScreen, streetWidth } from '../public/js/street-model.js?v=a9a05f9d';
-import { planStreetPlacements, populationForStreet, setStreetEcologyCatalog, streetReservedSpots } from '../public/js/street-ecology.js?v=1d97eefe';
+import { planStreetPlacements, populationForStreet, setStreetEcologyCatalog, streetReservedSpots } from '../public/js/street-ecology.js?v=f6185033';
 import { crabPlacementGroups } from '../public/js/crabs.js?v=eb0bdc39';
 import { fireDragonPlacementGroups } from '../public/js/fire-dragon.js?v=b7f3d751';
 import { isZoneTsid } from '../public/js/zone-streets.js?v=b40010d5';
