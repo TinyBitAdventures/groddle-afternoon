@@ -276,6 +276,20 @@
    "rows": []
   },
   {
+   "id": "support-pages",
+   "title": "Support on the website: your own bug reports in the Community app, by status, with replies, pictures, text files, Close and Reopen",
+   "kind": "UI",
+   "status": "proposed",
+   "where": [
+    {
+     "file": "tests/support-pages.test.js",
+     "symbol": "Support on the website"
+    }
+   ],
+   "why": "Austin 2026-11-27: \"power users would like to be able to manage their bug reports outside of the game ... bolted into the community section as a new support channel but with more abilities like photo/file uploads and filter by status.\" Glitch's bug form (BootError.as 280-290) kept no list and had no web page for it. Site: src/SupportPages.php (/chat/support/), src/TicketFiles.php, src/ReportFile.php, src/ReportPicture.php acceptUpload, the table groddle_ticket_files; every write is the game's Tickets rules.",
+   "rows": []
+  },
+  {
    "id": "chat-threads",
    "title": "Threaded replies on chat lines",
    "kind": "UI",
