@@ -4,7 +4,7 @@
  */
 import { ITEM_ICONS, ITEM_LABELS, getVerbsFor, ordinaryItems, runVerb } from './content.js?v=79a980f7';
 import { createErrorOnce, createFeatureHost, createFrameStages } from './js/feature-host.js?v=b87e2cbc';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=5737489e';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=9989f327';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, enterHintPick, hoverText, stackHoverLabel, groupHead, hoverRimShown, reachGlowTargets, spriteHasRimArt, rimArtParts, trimmedIconUrl, drawTileArt } from './js/enter-chooser.js?v=297c6d15';
 import { firstTendKey, STICK_TEND_DELAY_MS, STICK_TEND_DIRS, STICK_TEND_REPEAT_MS, stepTendKey, stepTendKeys, stickTendKey, tendKeyAction } from './js/garden-tend.js?v=a7470c4a';
 import { avatarHitBox, behindFloor, bodyReachDistance, OUT_OF_REACH_LINE, playerClickBox } from './js/reach.js?v=456da8a8';
@@ -15074,6 +15074,8 @@ const engine = {
   streetCardUp: () => streetCardUp(),
   /** An award or new-day screen is showing (G213: a quest offer check retries shortly instead of waiting 30 s). */
   screenFxScreenUp: () => isAwardScreenUp(),
+  /** What stops a press on the world (worldPress's own gates): a non-modal card such as New Quest does not. */
+  worldPressBlocked: () => !state.started || Boolean(menuTarget) || isMapOpen() || isScreenFxBlocking(),
   /** Resolves once no street loading card is up (G192). */
   afterStreetCard: () => afterStreetCard(),
   /** Travel by a signpost board as a click on it would (G192, the GPS arrow): { label, arrive }. */

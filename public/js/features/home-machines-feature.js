@@ -767,7 +767,9 @@ function createSession(engine, client) {
     if (slide || (ev.pointerType === 'mouse' && (ev.button !== 0 || ev.ctrlKey))) return;
     const editing = homesFeature.homeEditMode?.() || null;
     if (editing && editing !== 'decorate') return;
-    if (!editing && engine.busy?.({ ignoreHome: true })) return;
+    // A slide starts wherever a click on the world would act (worldPress's gates), so a New Quest card
+    // or a notice up on the screen doesn't turn the drag into a text selection.
+    if (!editing && (engine.worldPressBlocked ? engine.worldPressBlocked() || engine.acting?.() : engine.busy?.({ ignoreHome: true }))) return;
     const hit = slidableAt(ev);
     if (!hit) return;
     const touch = ev.pointerType !== 'mouse';

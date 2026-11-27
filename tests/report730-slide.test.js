@@ -30,7 +30,7 @@ import { join } from 'node:path';
 import { execFileSync } from 'node:child_process';
 
 import * as HM from '../public/js/home-machines.js?v=cab883cd';
-import { homeMachinesFeature } from '../public/js/features/home-machines-feature.js?v=236cf87c';
+import { homeMachinesFeature } from '../public/js/features/home-machines-feature.js?v=50e65394';
 import { homesFeature } from '../public/js/features/homes-feature.js?v=aa371a62';
 import { Display, FakeEl, fakePixi } from './fake-scene.js';
 import { HAS_SERVER, HAS_SITE, SITE_DIR, serverPath } from '../tools/repos.mjs';
@@ -66,6 +66,17 @@ describe('#730: Glitch slid a placed machine, in play and in Decoration Mode (th
     assert.match(line(join(gsjs, 'main.js'), 4853), /houses_is_at_home\(\)\) return pc\.apiSendMsg\(make_fail_rsp\(msg, 0, "You are not at home"\)\);/);
     assert.match(line(join(gsjs, 'main.js'), 4867), /pc\.location\.apiPutItemIntoPosition\(item, msg\.x, msg\.y\);/);
     assert.match(line(join(client, 'control/HandOfDecorator.as'), 1600), /new NetOutgoingItemstackModifyVO\(/);
+  });
+});
+
+describe('a slide starts wherever a world click would act (#730 review)', () => {
+  it('a New Quest card up on the screen does not stop it; a verb menu or the map does', () => {
+    const feat = readFileSync(join(root, 'public/js/features/home-machines-feature.js'), 'utf8');
+    assert.match(feat, /if \(!editing && \(engine\.worldPressBlocked \? engine\.worldPressBlocked\(\) \|\| engine\.acting\?\.\(\) : engine\.busy\?\.\(\{ ignoreHome: true \}\)\)\) return;/);
+    const game = readFileSync(join(root, 'public/game.js'), 'utf8');
+    assert.match(game, /worldPressBlocked: \(\) => !state\.started \|\| Boolean\(menuTarget\) \|\| isMapOpen\(\) \|\| isScreenFxBlocking\(\),/);
+    // The same gates worldPress itself checks first.
+    assert.match(game, /function worldPress\(e\) \{\n\s+if \(!state\.started \|\| menuTarget \|\| isMapOpen\(\) \|\| isScreenFxBlocking\(\)\) return;/);
   });
 });
 
