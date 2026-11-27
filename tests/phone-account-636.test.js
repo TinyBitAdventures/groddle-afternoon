@@ -10,7 +10,7 @@ import assert from 'node:assert/strict';
 import { readFileSync, statSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { PHONE_TEXT } from '../public/js/phone/companion-data.js?v=464e4058';
+import { PHONE_TEXT } from '../public/js/phone/companion-data.js?v=fbe7f87a';
 import { createMinnAccountCore } from '../public/js/minn-account-core.js?v=5baee954';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');

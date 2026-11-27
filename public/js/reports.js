@@ -83,6 +83,11 @@ export const REPORT_TEXT = Object.freeze({
   edited: 'edited',
   editHint: 'You can change this until an administrator reads it.',
   meta: (n) => (n === 0 ? 'No reports yet' : n === 1 ? '1 report' : `${n} reports`),
+  // #744: the list comes a page at a time (the site's TicketStore::LIST_MAX); Older reports at its end loads the next.
+  metaMore: (n) => `${n} reports so far, more at the end of the list`,
+  older: 'Older reports',
+  olderLoading: 'Loading older reports…',
+  olderFailed: 'Your older reports did not load. Try again in a moment.',
   // Ticket 58: a search box over your own reports' subjects.
   filterLabel: 'Search your reports',
   filterPlaceholder: 'Search your reports',
@@ -267,6 +272,27 @@ export const REPORT_MAX = 4000;
 /** How often the bug icon asks for new replies while the game is online (ms). */
 export const UNREAD_POLL_MS = 60000;
 
+/**
+ * #744: a later page of the list added after the rows already here, each report once (one the
+ * game already holds, opened from a link or just sent, keeps its place). A new array.
+ */
+export function appendReports(rows, page) {
+  const out = Array.isArray(rows) ? rows.slice() : [];
+  const have = new Set(out.map((t) => t?.id));
+  for (const t of Array.isArray(page) ? page : []) {
+    if (!t || have.has(t.id)) continue;
+    have.add(t.id);
+    out.push(t);
+  }
+  return out;
+}
+
+/** #744: GET tickets for the page from offset (the rows the site has given so far; the first page asks plain). */
+export function listPath(offset = 0) {
+  const n = Math.floor(Number(offset));
+  return Number.isFinite(n) && n > 0 ? `tickets?offset=${n}` : 'tickets';
+}
+
 /** How many tickets carry a reply the player has not read. */
 export function unreadCount(tickets) {
   return (Array.isArray(tickets) ? tickets : []).filter((t) => t && t.unread === true).length;
@@ -422,8 +448,8 @@ export function createReportsApi({ baseUri, fetch: fetchFn = globalThis.fetch?.b
   }
 
   return {
-    /** { tickets, unread } */
-    list: () => call('tickets'),
+    /** { tickets, unread, more }: a page from offset (#744; a site from before paging sends no more). */
+    list: (offset = 0) => call(listPath(offset)),
     /** { unread } */
     unread: () => call('tickets/unread'),
     /** { ticket, messages, picture }; marks it read. */

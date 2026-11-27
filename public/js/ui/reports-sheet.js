@@ -50,7 +50,7 @@
  * #reports-filter [data-reports-filter] (the search box, shown from REPORT_FILTER_MIN reports), [data-reports-no-match];
  * ticket 115: [data-reports-tabs] (role tablist) with tabs #reports-tab-<all|open|answered|working|closed>
  * [data-reports-tab=<tab>] carrying data-count and data-unread, #reports-tabpanel [data-reports-tabpanel],
- * [data-reports-tab-empty]; #225: [data-reports-replied] (Has a reply, js/reports.js showsReplied) on a row;
+ * [data-reports-tab-empty]; #744: [data-reports-older] (Older reports, after the list while the site has more); #225: [data-reports-replied] (Has a reply, js/reports.js showsReplied) on a row;
  * #585: #reports-extensions [data-reports-extensions] (Browser extensions you use, optional; sent as context.extensions).
  * Read by the team (Austin 2026-11-12): [data-reports-read] in a row's line and, in a thread,
  * [data-reports-thread-read] under the newest message (js/reports.js readByTeamWords; datetime on both).
@@ -59,6 +59,11 @@
  * and a red count on a tab holding a reply you have not read. A real tablist: one tab in the Tab
  * order, the arrow keys, Home and End move between them (and show them). The list itself is in the
  * site's order (js/reports.js sortReports): unread first, then answered, open, working, closed.
+ *
+ * #744 (a player with 234 reports saw 200 and thought the rest were deleted): the site sends the
+ * list a page at a time (GET tickets?offset=, TicketStore::LIST_MAX each, the same order) and says
+ * whether more exist. Older reports at the end of the list loads the next page and adds it after the
+ * rows here; a refresh asks again for as many rows as were loaded, so the older ones stay.
  *
  * G791 (#216, #281: a bug gone before the report window opened): a reply can carry a picture,
  * one taken on purpose. Take a picture (under the reply box) hands over to the feature's
@@ -112,14 +117,14 @@
  * [data-react-add], [data-react-chip], [data-react-picker], [data-react-pick]; canvas data reportReact.
  */
 
-import { REPORT_EXTENSIONS_MAX, REPORT_FILTER_MIN, REPORT_MAX, REPORT_TABS, REPORT_TEXT as T, STATUS_WORDS, canEditFirst, inTab, matchesReport, messagePictures, numberedLine, pictureRefused, pictureSrc, readByTeamAt, readByTeamWords, refusalWords, reportNumber, showsReplied, sortReports, tabCounts, tabLabel, unreadCount, whenWords } from '../reports.js?v=e861d5aa';
+import { REPORT_EXTENSIONS_MAX, REPORT_FILTER_MIN, REPORT_MAX, REPORT_TABS, REPORT_TEXT as T, STATUS_WORDS, canEditFirst, inTab, matchesReport, messagePictures, numberedLine, pictureRefused, pictureSrc, readByTeamAt, readByTeamWords, refusalWords, reportNumber, showsReplied, sortReports, tabCounts, tabLabel, unreadCount, whenWords, appendReports } from '../reports.js?v=3c805cc4';
 import { createReactionUI } from './reaction-strip.js?v=3de815f3';
 import { parseReportReactionKey, reactorOf, reportReactionKey, reportReactions } from '../report-reactions.js?v=69462240';
-import { PICTURE_TEXT as P, REPORT_PICTURES, convertPicture, dragHasFiles, filesOf, refusalWords as pictureRefusal, roomFor, takeForRoom } from '../report-pictures.js?v=84c52271';
+import { PICTURE_TEXT as P, REPORT_PICTURES, convertPicture, dragHasFiles, filesOf, refusalWords as pictureRefusal, roomFor, takeForRoom } from '../report-pictures.js?v=fe05b74d';
 import { focusBack } from './focus-return.js?v=da190597';
 import { appendLinkedText, bindChatLinks } from '../chat-links.js?v=b717fac7';
-import { lightboxLink } from './picture-lightbox.js?v=e049f063';
-import { MARK_TEXT, bakeMarks, createMarkBook } from './picture-marks.js?v=85e99881';
+import { lightboxLink } from './picture-lightbox.js?v=a869d517';
+import { MARK_TEXT, bakeMarks, createMarkBook } from './picture-marks.js?v=315bb1da';
 import { REPORT_MENU_TEXT, bindReportRowMenu, copyText, reportLink } from './report-row-menu.js?v=bce12edc';
 
 /** How long Send waits for a picture still drawing before it sends the world-only one (ms). */
@@ -165,6 +170,11 @@ export function mountReportsSheet({ doc = globalThis.document, host, api, contex
   let state = 'closed';
   let view = 'list';
   let tickets = [];
+  // #744: whether the site has older reports than the pages here, how many rows its pages gave
+  // (the next page's offset), and an Older reports load under way.
+  let more = false;
+  let fetched = 0;
+  let olderBusy = false;
   // Ticket 115: the tab the list shows (js/reports.js REPORT_TABS).
   let tab = 'all';
   let unread = 0;
@@ -253,7 +263,10 @@ export function mountReportsSheet({ doc = globalThis.document, host, api, contex
   }
   const tabEmpty = e('p', { class: 'reports-empty', 'data-reports-tab-empty': '', hidden: true }, T.tabNone);
   const tabPanel = e('div', { id: 'reports-tabpanel', class: 'reports-tabpanel', role: 'tabpanel', 'aria-labelledby': `reports-tab-${tab}`, 'data-reports-tabpanel': '' });
-  tabPanel.append(filter, list, empty, noMatch, tabEmpty);
+  // #744: the next page of the list, after it (shown while the site has more).
+  const olderBtn = e('button', { type: 'button', class: 'reports-btn is-quiet reports-older', hidden: true, 'data-reports-older': '' }, T.older);
+  olderBtn.addEventListener('click', () => loadOlder());
+  tabPanel.append(filter, list, empty, noMatch, tabEmpty, olderBtn);
   listView.append(tabs, tabPanel);
   // A thread.
   const threadView = e('section', { class: 'reports-view reports-thread-view', 'data-reports-thread-view': '', hidden: true });
@@ -382,7 +395,8 @@ export function mountReportsSheet({ doc = globalThis.document, host, api, contex
 
   function listMeta() {
     const q = filter.hidden ? '' : filter.value.trim();
-    return q || tab !== 'all' ? T.filterMeta(shownTickets().length, tickets.length) : T.meta(tickets.length);
+    if (q || tab !== 'all') return T.filterMeta(shownTickets().length, tickets.length);
+    return more ? T.metaMore(tickets.length) : T.meta(tickets.length);
   }
 
   /** Ticket 115: each tab's name, how many it holds and, in red, how many have a reply you have not read. */
@@ -448,6 +462,9 @@ export function mountReportsSheet({ doc = globalThis.document, host, api, contex
       return li;
     }));
     empty.hidden = tickets.length > 0 || loading;
+    olderBtn.hidden = !more;
+    olderBtn.disabled = olderBusy;
+    olderBtn.textContent = olderBusy ? T.olderLoading : T.older;
     if (focusedId && list.contains?.(doc.activeElement) === false) {
       // Gone from this tab (closed under Open): the row now in its place, else the tab, else the title.
       const btns = list.querySelectorAll?.('.reports-row-btn') || [];
@@ -791,8 +808,21 @@ export function mountReportsSheet({ doc = globalThis.document, host, api, contex
     loading = tickets.length === 0;
     if (loading && view === 'list') say(T.loading);
     try {
-      const r = await api.list();
-      tickets = Array.isArray(r?.tickets) ? r.tickets : [];
+      // #744: as many rows as Older reports had loaded come again, so they stay in the list.
+      const keep = fetched;
+      let r = await api.list();
+      let rows = Array.isArray(r?.tickets) ? r.tickets : [];
+      let got = rows.length;
+      while (r?.more === true && got < keep) {
+        r = await api.list(got);
+        const page = Array.isArray(r?.tickets) ? r.tickets : [];
+        if (!page.length) break;
+        got += page.length;
+        rows = appendReports(rows, page);
+      }
+      tickets = rows;
+      fetched = got;
+      more = r?.more === true && got > 0;
       loading = false;
       setUnread(unreadCount(tickets));
       drawList();
@@ -801,6 +831,35 @@ export function mountReportsSheet({ doc = globalThis.document, host, api, contex
       loading = false;
       drawList();
       if (view === 'list') say(refusalWords(err, T.loadFailed), true);
+    }
+    return tickets;
+  }
+
+  /** #744: Older reports: the site's next page, added after the rows here; the focus goes to the first new row shown. */
+  async function loadOlder() {
+    if (olderBusy || !more) return tickets;
+    olderBusy = true;
+    const had = shownTickets().length;
+    drawList();
+    say(T.olderLoading);
+    try {
+      const r = await api.list(fetched);
+      const page = Array.isArray(r?.tickets) ? r.tickets : [];
+      fetched += page.length;
+      tickets = appendReports(tickets, page);
+      more = r?.more === true && page.length > 0;
+      olderBusy = false;
+      setUnread(unreadCount(tickets));
+      drawList();
+      if (view === 'list') say(listMeta());
+      const next = shownTickets()[had];
+      const to = (next && rowBtn(next.id)) || (more ? olderBtn : null) || (tabs.hidden ? null : tabBtns.get(tab)) || title;
+      to?.focus?.({ preventScroll: true });
+    } catch (err) {
+      olderBusy = false;
+      drawList();
+      if (view === 'list') say(refusalWords(err, T.olderFailed), true);
+      olderBtn.focus?.({ preventScroll: true });
     }
     return tickets;
   }
@@ -1456,6 +1515,10 @@ export function mountReportsSheet({ doc = globalThis.document, host, api, contex
     send,
     openTicket: (id) => { open('list'); return openTicket(Number(id)); },
     refresh,
+    /** #744: Older reports, as its button does. */
+    loadOlder,
+    /** #744: whether the site has older reports than the list holds. */
+    get more() { return more; },
     setUnread,
     /** G791: keep a picture for the next reply or new report (null lets them all go); true when kept. */
     hold,

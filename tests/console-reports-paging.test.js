@@ -4,7 +4,7 @@
  * loaded ("Reports 200" with 218 tickets), so old closed reports vanished.
  * Now the route takes an offset and gives more + total, the header shows the
  * total for the filter, and Show older appends the next page. The player's
- * own list (listFor) stays one capped page. Site repo only
+ * own list (listFor) pages the same way since #744 (tests/g744-reports-older.test.js). Site repo only
  * (groddle-afternoon-site src/TicketStore.php, src/AdminTickets.php,
  * src/AdminConsolePage.php, console/console.js); skipped without it.
  */
@@ -35,7 +35,7 @@ describe('the Reports list pages (groddle-afternoon-site)', { skip: skipWithoutS
     assert.equal(mod.reportsCount(), '');
   });
 
-  it('TicketStore::listAll pages by offset in the same order; listFor stays one page', () => {
+  it('TicketStore::listAll pages by offset in the same order', () => {
     const store = src('src/TicketStore.php');
     assert.match(store, /public const LIST_MAX = 200;/);
     assert.match(store, /public function listAll\(\?string \$status, int \$offset = 0, string \$q = ''\): array/);
@@ -43,9 +43,6 @@ describe('the Reports list pages (groddle-afternoon-site)', { skip: skipWithoutS
     assert.match(store, /ORDER BY admin_unread DESC, FIELD\(status, 'open', 'working', 'answered', 'closed'\), last_message_at DESC, id DESC LIMIT " \. \(self::LIST_MAX \+ 1\) \. ' OFFSET ' \. \$offset/);
     assert.match(store, /'more' => count\(\$rows\) > self::LIST_MAX,/);
     assert.match(store, /'total' => \(int\) \$this->db->value\("SELECT COUNT\(\*\) FROM \{\$t\} \{\$where\}", \$args\),/);
-    const mine = store.slice(store.indexOf('public function listFor('), store.indexOf('public function unreadCount('));
-    assert.match(mine, /LIMIT " \. self::LIST_MAX, \[\$player\]\);/);
-    assert.doesNotMatch(mine, /OFFSET/i);
   });
 
   it('GET admin/tickets takes a digits-only offset and gives more and total', () => {

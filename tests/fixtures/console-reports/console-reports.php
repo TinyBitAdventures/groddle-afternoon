@@ -3,7 +3,8 @@
  * The console's Reports search and the testers boards without the team (Austin 2026-11-24;
  * groddle-afternoon-site src/TicketStore.php listAll, src/AdminTickets.php index, src/Team.php,
  * src/ReportCredits.php, src/AdminReportCredits.php, src/ContributeCredits.php) on a throwaway
- * MariaDB database, printed as JSON (tests/console-reports-search.test.js). The database
+ * MariaDB database, printed as JSON (tests/console-reports-search.test.js); #744's player pages
+ * (src/Tickets.php index, TicketStore::listFor) on the same reports (tests/g744-reports-older.test.js). The database
  * (test_groddle_console_<hex>: users, usermeta, options and every table of the site's minn.json) is
  * made here and dropped at the end; nothing else is touched.
  *
@@ -32,6 +33,7 @@ use Groddle\Minn\ContributeCredits;
 use Groddle\Minn\Logins;
 use Groddle\Minn\ReportCredits;
 use Groddle\Minn\Team;
+use Groddle\Minn\Tickets;
 use Groddle\Minn\TicketStore;
 use Minn\Auth\Capabilities;
 use Minn\Content\Reader;
@@ -200,6 +202,34 @@ try {
         'board' => array_map(static fn (array $b): int => $b['player']['id'], $console['body']['board']),
         'unscored' => array_map(static fn (array $u): array => ['id' => $u['id'], 'player' => $u['player']['id'], 'admin' => $u['player']['admin']], $console['body']['unscored']),
         'credits' => array_map(static fn (array $c): array => ['ticket' => $c['ticket'], 'admin' => $c['player']['admin']], $console['body']['credits']),
+    ];
+
+    // == #744: a player's own list in pages (GET tickets?offset=), Bea's 206 in the order of one long
+    // list: two of the older ones made unread (an administrator's reply) and one closed, so the order
+    // is more than the newest first ==
+    $store->add($bulk[3], 900, TicketStore::ADMIN, 'Seen this one.', $now - 500);
+    $store->add($bulk[40], 900, TicketStore::ADMIN, 'And this.', $now - 400);
+    $store->setStatus($bulk[7], TicketStore::CLOSED, $now - 300, TicketStore::ADMIN);
+    $mine = static function (int $as, array $query) use ($request, $seams, $answer): array {
+        $r = $request(Method::Get, '/groddle/v1/tickets', $query);
+        $a = $answer(static fn (): Response => (new Tickets($seams($as, $r)))->index($r));
+        if (($a['status'] ?? 0) !== 200) {
+            return $a;
+        }
+        $b = $a['body'];
+        return ['ids' => array_map(static fn (array $t): int => $t['id'], $b['tickets']), 'more' => $b['more'] ?? null, 'unread' => $b['unread']];
+    };
+    $out['player'] = [
+        'first' => $mine(911, []),
+        'zero' => $mine(911, ['offset' => '0']),
+        'second' => $mine(911, ['offset' => (string) TicketStore::LIST_MAX]),
+        'past' => $mine(911, ['offset' => '400']),
+        'ada' => $mine(910, []),
+        'bad' => array_map(static fn (string $o): array => $mine(911, ['offset' => $o]), ['-1' => '-1', 'abc' => 'abc', '1.5' => '1.5', '1e3' => '1e3', 'long' => '9999999999', 'blank' => '']),
+        // The order of one long list: the store's own ORDER BY with no limit.
+        'order' => array_map('intval', array_column($db->rows('SELECT id FROM ' . $db->table(TicketStore::TABLE) . " WHERE player_user_id = ? ORDER BY (last_author_role = 'admin' AND (player_read_at IS NULL OR player_read_at < last_message_at)) DESC, FIELD(status, 'answered', 'open', 'working', 'closed'), updated_at DESC, id DESC", [911]), 'id')),
+        'unreadIds' => [$bulk[3], $bulk[40]],
+        'closedId' => $bulk[7],
     ];
 } catch (Throwable $e) {
     $out['error'] = get_class($e) . ': ' . $e->getMessage() . ' @' . $e->getFile() . ':' . $e->getLine();

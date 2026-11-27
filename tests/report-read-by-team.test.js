@@ -9,8 +9,8 @@ import { execFileSync, spawnSync } from 'node:child_process';
 import { existsSync, readFileSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { join } from 'node:path';
-import { mountReportsSheet } from '../public/js/ui/reports-sheet.js?v=408d8843';
-import { REPORT_TEXT, matchesReport, readByTeamAt, readByTeamWords, readWhen } from '../public/js/reports.js?v=e861d5aa';
+import { mountReportsSheet } from '../public/js/ui/reports-sheet.js?v=b5216c90';
+import { REPORT_TEXT, matchesReport, readByTeamAt, readByTeamWords, readWhen } from '../public/js/reports.js?v=3c805cc4';
 import { SITE_DIR, sitePath, skipWithoutSite } from '../tools/repos.mjs';
 import { HAS_PHP, PHP, phpSkip } from './php.js';
 
@@ -137,7 +137,7 @@ describe('Read by the team on your reports', () => {
     const php = readFileSync(sitePath('src/Tickets.php'), 'utf8');
     assert.match(php, /readByTeamAt: time\|null/);
     assert.match(php, /'ticket' => TicketStore::summary\(\$row, TicketStore::PLAYER\)/);
-    assert.match(php, /TicketStore::summary\(\$r, TicketStore::PLAYER\), \$store->listFor\(\$me->id\)/);
+    assert.match(php, /TicketStore::summary\(\$r, TicketStore::PLAYER\), \$page\['rows'\]\)/);
     // The console's open (and /groddle-check, the same route) is the administrators' read.
     assert.match(readFileSync(sitePath('src/AdminTickets.php'), 'utf8'), /markRead\(\(int\) \$row\['id'\], TicketStore::ADMIN, time\(\)\)/);
     const fn = store.slice(store.indexOf('public static function readByTeamAt('), store.indexOf('Writing', store.indexOf('public static function readByTeamAt(')) - 6);

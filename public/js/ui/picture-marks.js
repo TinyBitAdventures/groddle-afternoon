@@ -27,8 +27,8 @@
  * [data-picture-marks-count], [data-picture-marks-live].
  */
 
-import { REPORT_PICTURE, base64Size } from '../reports.js?v=e861d5aa';
-import { pictureAttempts } from '../report-pictures.js?v=84c52271';
+import { REPORT_PICTURE, base64Size } from '../reports.js?v=3c805cc4';
+import { pictureAttempts } from '../report-pictures.js?v=fe05b74d';
 
 export const MARKS = Object.freeze({
   /** The most rings one picture takes. */

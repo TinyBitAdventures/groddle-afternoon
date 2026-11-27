@@ -257,6 +257,25 @@
    "rows": []
   },
   {
+   "id": "reports-older-pages",
+   "title": "Older reports: the game's Reports list in pages, the next one at the end of the list",
+   "kind": "UI",
+   "status": "kept",
+   "where": [
+    {
+     "file": "public/js/ui/reports-sheet.js",
+     "symbol": "loadOlder"
+    },
+    {
+     "file": "public/js/reports.js",
+     "symbol": "appendReports"
+    }
+   ],
+   "why": "Report #744: a player with 234 reports saw 200 and thought the older ones were deleted. Glitch's bug form (BootError.as 280-290) kept no list of your reports; ours pages the site's GET tickets (src/TicketStore.php listFor, LIST_MAX each, the console's Show older's way).",
+   "ruling": "Austin 2026-11-27 (report #744): add paging so players can reach all their reports",
+   "rows": []
+  },
+  {
    "id": "chat-threads",
    "title": "Threaded replies on chat lines",
    "kind": "UI",

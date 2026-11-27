@@ -38,9 +38,9 @@
 import { createMinnAccountCore } from '../minn-account-core.js?v=5baee954';
 import { mountAccountForms, resetLinkFrom, verifyLinkFrom } from '../account-forms.js?v=683e1475';
 import { gateFor, quietSession, suspendedNow } from '../online-session.js?v=6f1348c8';
-import { REPORT_MAX, REPORT_TEXT, STATUS_WORDS, canEditFirst, createReportsApi, messagePictures, numberedLine, pictureRefused, pictureSrc, refusalWords, reportFromHash, reportNumber, unreadCount, whenWords } from '../reports.js?v=e861d5aa';
-import { PICTURE_TEXT, REPORT_PICTURES, convertPicture, refusalWords as pictureRefusal, roomFor, takeForRoom } from '../report-pictures.js?v=84c52271';
-import { DEVICE_KEY, PHONE_TEXT as T, PLAY_ONCE_HASH, PLAY_ONCE_KEY, POLL_MS, createPresenceApi, friendsView, fullGameHref, itemNamesFrom, itemWords, mailRows, mailboxFromSave, mergePlayerMail, phoneContext, phoneDevice, takenMailIds, unreadLetters } from './companion-data.js?v=464e4058';
+import { REPORT_MAX, REPORT_TEXT, STATUS_WORDS, canEditFirst, createReportsApi, messagePictures, numberedLine, pictureRefused, pictureSrc, refusalWords, reportFromHash, reportNumber, unreadCount, whenWords } from '../reports.js?v=3c805cc4';
+import { PICTURE_TEXT, REPORT_PICTURES, convertPicture, refusalWords as pictureRefusal, roomFor, takeForRoom } from '../report-pictures.js?v=fe05b74d';
+import { DEVICE_KEY, PHONE_TEXT as T, PLAY_ONCE_HASH, PLAY_ONCE_KEY, POLL_MS, createPresenceApi, friendsView, fullGameHref, itemNamesFrom, itemWords, mailRows, mailboxFromSave, mergePlayerMail, phoneContext, phoneDevice, takenMailIds, unreadLetters } from './companion-data.js?v=fbe7f87a';
 
 const doc = globalThis.document;
 // #653: the iOS Home Screen app (navigator.standalone is iOS only) clears the status bar's fade (phone.css --safe-t).
@@ -596,10 +596,10 @@ function linkMessages(list, bodies) {
 }
 /** The pictures over the page (js/ui/picture-lightbox.js, plain DOM), loaded at the first tap on a picture. */
 let lightboxModule = null;
-const loadLightbox = () => (lightboxModule ||= import('../ui/picture-lightbox.js?v=e049f063').catch((err) => { lightboxModule = null; throw err; }));
+const loadLightbox = () => (lightboxModule ||= import('../ui/picture-lightbox.js?v=a869d517').catch((err) => { lightboxModule = null; throw err; }));
 /** G808: the rings module, loaded with the lightbox at the first tap on a photo about to go. */
 let marksModule = null;
-const loadMarks = () => (marksModule ||= import('../ui/picture-marks.js?v=85e99881').catch((err) => { marksModule = null; throw err; }));
+const loadMarks = () => (marksModule ||= import('../ui/picture-marks.js?v=315bb1da').catch((err) => { marksModule = null; throw err; }));
 
 /**
  * A picture link that opens `gallery` (each { src, width, height, alt }) at `index` over the page on

@@ -3686,6 +3686,9 @@
 /* Ticket 49: Working on it, an administrator's mark. */
 :root[data-ui="classic"] #bug-report-panel .reports-chip.is-working { border-color: var(--c-classic-link); color: var(--c-classic-link); }
 :root[data-ui="classic"] #bug-report-panel .reports-empty { margin: calc(16 * var(--cu)) 0; color: var(--c-classic-offline); text-align: center; }
+/* #744: Older reports, the next page of the list, centred after it (a finger's height on a phone). */
+:root[data-ui="classic"] #bug-report-panel .reports-older { display: block; margin: calc(10 * var(--cu)) auto calc(4 * var(--cu)); }
+@media (max-width: 600px), (pointer: coarse) { :root[data-ui="classic"] #bug-report-panel .reports-older { min-height: 40px; } }
 :root[data-ui="classic"] #bug-report-panel .reports-thread-head { display: flex; align-items: center; gap: calc(8 * var(--cu)); }
 /* Ticket 21: the thread scrolls in the well (the body), every message at its full height, with the chat log's scrollbar. */
 :root[data-ui="classic"] #bug-report-panel .reports-thread-view { flex: 1 0 auto; }

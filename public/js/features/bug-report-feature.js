@@ -82,9 +82,9 @@
  * window.groddleBugReport.open('list'|'new'), .openTicket(id), .refresh() in multiplayer.
  */
 
-import { createReportsApi, REPORT_PICTURE, REPORT_TEXT, UNREAD_POLL_MS, base64Size, isPictureKey, pictureSize, reportFromHash } from '../reports.js?v=e861d5aa';
-import { mountReportsSheet } from '../ui/reports-sheet.js?v=408d8843';
-import { PICTURE_TEXT } from '../report-pictures.js?v=84c52271';
+import { createReportsApi, REPORT_PICTURE, REPORT_TEXT, UNREAD_POLL_MS, base64Size, isPictureKey, pictureSize, reportFromHash } from '../reports.js?v=3c805cc4';
+import { mountReportsSheet } from '../ui/reports-sheet.js?v=b5216c90';
+import { PICTURE_TEXT } from '../report-pictures.js?v=fe05b74d';
 import { canvasTransparent } from '../render-probe.js?v=519c86ef';
 import { marksLine, startBaitCheck } from '../extension-marks.js?v=36c70f4b';
 import { imageFailureLine } from '../textures.js?v=b8e38103';
@@ -819,6 +819,9 @@ const STYLE = `
 /* Ticket 49: Working on it, an administrator's mark. */
 [data-ui="modern"] #bug-report-panel .reports-chip.is-working { background: color-mix(in srgb, var(--status-warn) 24%, transparent); color: var(--warn); }
 [data-ui="modern"] #bug-report-panel .reports-empty { margin: var(--space-4) 0; color: var(--text-muted); line-height: var(--lh-body); text-align: center; }
+/* #744: Older reports, the next page of the list, centred after it (a finger's height on a phone). */
+[data-ui="modern"] #bug-report-panel .reports-older { align-self: center; margin: var(--space-2) 0 var(--space-1); }
+@media (max-width: 600px), (pointer: coarse) { [data-ui="modern"] #bug-report-panel .reports-older { min-height: 40px; } }
 [data-ui="modern"] #bug-report-panel .reports-thread-head { display: flex; align-items: center; gap: var(--space-2); }
 /* Ticket 21: a thread is read in the sheet's one scroller (its body, with a scrollbar you can see), every message at its full height. */
 [data-ui="modern"] #bug-report-panel .reports-thread-view { flex: 1 0 auto; }

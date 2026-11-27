@@ -12,10 +12,10 @@ import { execFileSync, spawnSync } from 'node:child_process';
 import { existsSync, readFileSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { join } from 'node:path';
-import { PICTURE_TEXT as P, REPORT_PICTURES, convertPicture, dragHasFiles, fileName, filesOf, mayBePicture, pictureAttempts, pictureError, refusalWords, roomFor, takeForRoom } from '../public/js/report-pictures.js?v=84c52271';
-import { REPORT_PICTURE, REPORT_TEXT as T, createReportsApi, messagePictures, pictureSrc, picturesBody } from '../public/js/reports.js?v=e861d5aa';
-import { mountReportsSheet } from '../public/js/ui/reports-sheet.js?v=408d8843';
-import { LIGHTBOX_TEXT, galleryStep, openLightbox } from '../public/js/ui/picture-lightbox.js?v=e049f063';
+import { PICTURE_TEXT as P, REPORT_PICTURES, convertPicture, dragHasFiles, fileName, filesOf, mayBePicture, pictureAttempts, pictureError, refusalWords, roomFor, takeForRoom } from '../public/js/report-pictures.js?v=fe05b74d';
+import { REPORT_PICTURE, REPORT_TEXT as T, createReportsApi, messagePictures, pictureSrc, picturesBody } from '../public/js/reports.js?v=3c805cc4';
+import { mountReportsSheet } from '../public/js/ui/reports-sheet.js?v=b5216c90';
+import { LIGHTBOX_TEXT, galleryStep, openLightbox } from '../public/js/ui/picture-lightbox.js?v=a869d517';
 import { SITE_DIR, sitePath, skipWithoutSite } from '../tools/repos.mjs';
 import { HAS_PHP, PHP, phpSkip } from './php.js';
 

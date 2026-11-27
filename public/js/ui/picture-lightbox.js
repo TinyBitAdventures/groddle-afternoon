@@ -35,7 +35,7 @@
  */
 
 import { focusBackTarget, lastInput, pressedBy } from './focus-return.js?v=da190597';
-import { createMarker } from './picture-marks.js?v=85e99881';
+import { createMarker } from './picture-marks.js?v=315bb1da';
 
 export const LIGHTBOX_TEXT = Object.freeze({
   label: 'Picture',

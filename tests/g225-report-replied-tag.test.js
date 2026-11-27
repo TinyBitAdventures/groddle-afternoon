@@ -7,8 +7,8 @@ import { execFileSync, spawnSync } from 'node:child_process';
 import { existsSync, readFileSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { join } from 'node:path';
-import { mountReportsSheet } from '../public/js/ui/reports-sheet.js?v=408d8843';
-import { REPORT_TEXT, matchesReport, showsReplied } from '../public/js/reports.js?v=e861d5aa';
+import { mountReportsSheet } from '../public/js/ui/reports-sheet.js?v=b5216c90';
+import { REPORT_TEXT, matchesReport, showsReplied } from '../public/js/reports.js?v=3c805cc4';
 import { SITE_DIR, sitePath, skipWithoutSite } from '../tools/repos.mjs';
 import { HAS_PHP, PHP, phpSkip } from './php.js';
 

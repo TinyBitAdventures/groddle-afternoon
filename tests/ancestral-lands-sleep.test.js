@@ -16,7 +16,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { FEATURES } from '../public/js/features/index.js?v=79d41771';
+import { FEATURES } from '../public/js/features/index.js?v=16c58da5';
 import { ANCESTRAL_CLOCK, ANCESTRAL_SLEEP_GAP_MS, ANCESTRAL_WAKE_GRACE, ancestralWake } from '../public/js/juju-bandits.js?v=0d3af5fe';
 import { applyBuff, createBuffState, hasBuff, removeBuff } from '../public/js/buffs.js?v=a4f7377b';
 import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=c9b84764';
