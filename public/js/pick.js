@@ -126,14 +126,15 @@ function pictureReady(texture) {
  * picture and frame it was built from: a texture filled in when its image arrives, or given a
  * sharper copy, is read again.
  */
-export function textureMask(texture, readPixels = canvasPixels) {
+export function textureMask(texture, pixelsOf = canvasPixels) {
   if (!texture || typeof texture !== 'object' || !texture.frame) return null;
   const res = texture.source?.resource;
   const { width: fw, height: fh } = texture.frame;
   const had = masks.get(texture);
   if (had && had.res === res && had.fw === fw && had.fh === fh) return had.mask;
   if (!pictureReady(texture)) return null;
-  const px = readPixels(texture);
+  // A 2D canvas read of the picture file (canvasPixels), never a GL readback (R29 is about those).
+  const px = pixelsOf(texture);
   const mask = px ? alphaMask(px.rgba, px.w, px.h) : null;
   if (had?.mask) stats.bytes -= had.mask.bits.byteLength;
   if (mask) {
@@ -157,7 +158,7 @@ function shown(node) {
  * (anchor, scale and a flip undone by toLocal), then in its texture's trimmed frame.
  * true / false; null when its texture cannot be read (the caller treats its rectangle as the art).
  */
-export function spriteSolidAt(part, global, readPixels = canvasPixels) {
+export function spriteSolidAt(part, global, pixelsOf = canvasPixels) {
   const tex = part?.texture;
   if (!tex?.frame || typeof part.toLocal !== 'function') return null;
   const local = part.toLocal(global);
@@ -171,7 +172,7 @@ export function spriteSolidAt(part, global, readPixels = canvasPixels) {
   const fh = tex.frame.height;
   const reach = PICK_REACH;
   if (u < -reach || v < -reach || u >= fw + reach || v >= fh + reach) return false;
-  const mask = textureMask(tex, readPixels);
+  const mask = textureMask(tex, pixelsOf);
   if (!mask) return null;
   // The reach is a pixel of the art as drawn (Glitch's stage px): three of a 3x render's.
   const kx = mask.w / fw;
@@ -257,9 +258,9 @@ function targetArt(t, PIXI, artParts) {
 }
 
 /** Whether a drawn candidate has a solid pixel at the point (its parts front first). */
-function drawnSolid(d, global, x, y, readPixels) {
+function drawnSolid(d, global, x, y, pixelsOf) {
   for (const part of [...d.parts].sort((a, b) => drawOrderCompare(drawPath(b), drawPath(a)))) {
-    const s = spriteSolidAt(part, global, readPixels);
+    const s = spriteSolidAt(part, global, pixelsOf);
     // An unreadable texture counts as solid over its rectangle (the old behaviour for it).
     if (s === true || (s === null && pointInHitBox(spriteWorldHitBox(d.t.sprite, 0), x, y))) return true;
   }
@@ -297,12 +298,12 @@ function overlapOf(hits, PIXI, artParts) {
  * @param {{ x: number, y: number }} global
  * @param {(item: T) => any} artOf the item's art Sprite (or null)
  */
-export function pickFront(items, global, artOf, readPixels = canvasPixels) {
+export function pickFront(items, global, artOf, pixelsOf = canvasPixels) {
   if (items.length < 2) return items[0] ?? null;
   for (const item of items) {
     const art = artOf(item);
     if (!art || !shown(art)) continue;
-    const s = spriteSolidAt(art, global, readPixels);
+    const s = spriteSolidAt(art, global, pixelsOf);
     if (s !== false) return item;
   }
   return items[0];
@@ -310,10 +311,10 @@ export function pickFront(items, global, artOf, readPixels = canvasPixels) {
 
 /** QA (game.js pickAt): every rectangle under the point, drawn ones front first with whether their art is solid there. */
 export function pickExplain(targets, x, y, opts = {}) {
-  const { PIXI = null, layer = null, artParts = null, readPixels = canvasPixels } = opts;
+  const { PIXI = null, layer = null, artParts = null, pixelsOf = canvasPixels } = opts;
   const global = layer?.toGlobal ? layer.toGlobal({ x, y }) : { x, y };
   const { drawn, plain } = overlapOf(rectangleHits(targets, x, y), PIXI, artParts);
-  return [...drawn.map((d) => ({ t: d.t, solid: drawnSolid(d, global, x, y, readPixels) })), ...plain.map((h) => ({ t: h.t, solid: null }))];
+  return [...drawn.map((d) => ({ t: d.t, solid: drawnSolid(d, global, x, y, pixelsOf) })), ...plain.map((h) => ({ t: h.t, solid: null }))];
 }
 
 /**
@@ -321,9 +322,9 @@ export function pickExplain(targets, x, y, opts = {}) {
  * @param {any[]} targets the registered interactables
  * @param {number} x
  * @param {number} y
- * @param {{ PIXI?: any, layer?: any, nearestPlotIndex?: Function, artParts?: (t: any) => any[], readPixels?: Function }} [opts]
+ * @param {{ PIXI?: any, layer?: any, nearestPlotIndex?: Function, artParts?: (t: any) => any[], pixelsOf?: Function }} [opts]
  *   layer: the Container the targets' x,y are in (to reach the art's own px); artParts and
- *   readPixels stand in for Pixi and the canvas in tests.
+ *   pixelsOf stand in for Pixi and the canvas in tests.
  */
 /** Every target whose padded rectangle holds the point, with its area for the old rule. */
 function rectangleHits(targets, x, y) {
@@ -344,14 +345,14 @@ export function pickByRectangle(targets, x, y, { nearestPlotIndex = null } = {})
 }
 
 export function pickTarget(targets, x, y, opts = {}) {
-  const { PIXI = null, layer = null, nearestPlotIndex = null, artParts = null, readPixels = canvasPixels } = opts;
+  const { PIXI = null, layer = null, nearestPlotIndex = null, artParts = null, pixelsOf = canvasPixels } = opts;
   const hits = rectangleHits(targets, x, y);
   if (!hits.length) return null;
   stats.picks++;
   if (hits.length === 1) return hits[0].t;
   const global = layer?.toGlobal ? layer.toGlobal({ x, y }) : { x, y };
   const { drawn, plain } = overlapOf(hits, PIXI, artParts);
-  const art = drawn.find((d) => drawnSolid(d, global, x, y, readPixels)) || null;
+  const art = drawn.find((d) => drawnSolid(d, global, x, y, pixelsOf)) || null;
   if (!art) return byArea(hits, x, y, nearestPlotIndex);
   stats.artPicks++;
   // A hit area drawn behind the art loses to it (a stack lying on a garden's plots); one drawn in

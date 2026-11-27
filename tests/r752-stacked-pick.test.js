@@ -24,7 +24,7 @@ import { isStorageClass } from '../public/js/home-storage.js?v=17bf7f79';
 import { worldArtFor } from '../public/js/world-art.js?v=a67514c8';
 import { itemZ } from '../public/js/item-bands.js?v=ec366be3';
 import { nearestPlotIndex } from '../public/js/garden-view.js?v=04fe8467';
-import { PICK_REACH, SOLID_ALPHA, pickByRectangle, pickFront, pickTarget, resetPickMasks, pickStats } from '../public/js/pick.js?v=0357aca9';
+import { PICK_REACH, SOLID_ALPHA, pickByRectangle, pickFront, pickTarget, resetPickMasks, pickStats } from '../public/js/pick.js?v=8137f9fc';
 
 let magick = true;
 try {
@@ -102,7 +102,7 @@ function texture(path, w, h, cell = null) {
   return { frame, orig: { width: frame.width, height: frame.height }, trim: null, source: { width: sw, resource: { width: img.w }, img } };
 }
 /** The canvas reader's stand-in: the frame's pixels out of the file, at the file's resolution. */
-function readPixels(tex) {
+function pixelsOf(tex) {
   const { img } = tex.source;
   const k = img.w / tex.source.width;
   const w = Math.round(tex.frame.width * k);
@@ -214,7 +214,7 @@ function addStack(layer, targets, classTsid, x, y, artMap) {
   return t;
 }
 
-const opts = (layer) => ({ PIXI, layer, nearestPlotIndex, readPixels });
+const opts = (layer) => ({ PIXI, layer, nearestPlotIndex, pixelsOf });
 const pick = (room, x, y) => pickTarget(room.targets, x, y, opts(room.entityLayer));
 
 /** Decoration Mode's furnitureAt as homes-feature.js now runs it (front first, rectangles, then pickFront). */
@@ -226,7 +226,7 @@ function furnitureAt(room, point) {
     const t = item.slot === 'ceiling' ? item.y : item.y - h;
     return point.x >= item.x - w / 2 && point.x <= item.x + w / 2 && point.y >= t && point.y <= t + h;
   });
-  return { under, item: under.length < 2 ? under[0] || null : pickFront(under, room.back.toGlobal(point), (it) => room.views.get(it.id)?.art, readPixels) };
+  return { under, item: under.length < 2 ? under[0] || null : pickFront(under, room.back.toGlobal(point), (it) => room.views.get(it.id)?.art, pixelsOf) };
 }
 
 // The report's boxes: four styles of one size (61 x 72), feet 57 px apart (its picture).

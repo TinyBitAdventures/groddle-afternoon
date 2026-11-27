@@ -16,7 +16,7 @@ import { FURNITURE_CATALOG } from '../public/js/homes-catalog.js?v=0367f90f';
 import { createHomeDecorState, interiorWidth, normalizeHomeDecorState, placeFurniture, renderOrder } from '../public/js/home-decor.js?v=c63e5e16';
 import { createFloorsState } from '../public/js/home-floors.js?v=17371532';
 import { normalizeOwnerStacks } from '../public/js/neighbours-mp.js?v=d270297d';
-import { visitorHomeState } from '../public/js/features/homes-feature.js?v=f3728b27';
+import { visitorHomeState } from '../public/js/features/homes-feature.js?v=aa371a62';
 import { HAS_SITE, SITE_DIR } from '../tools/repos.mjs';
 import { HAS_PHP, PHP } from './php.js';
 

@@ -34,7 +34,8 @@ describe('#642: a mined-out rock is gone until it reforms', () => {
   it('the street hides it and leaves it out of the pointer and the Enter key, with no ghost', () => {
     assert.doesNotMatch(game, /rockSprite\.alpha = rock\.depleted \? 0\.35/);
     assert.match(game, /root\.visible = rockShown\(rock\);\n\s+root\.rockSprite\.alpha = 1;\n\s+target\.absent = !root\.visible;/);
-    assert.match(game, /if \(!t\.sprite \|\| t\.sprite\.destroyed \|\| t\.absent\) continue;/, 'the pointer');
+    // #752 moved the pointer's pick into js/pick.js; it still skips an absent target.
+    assert.match(readFileSync(join(root, 'public/js/pick.js'), 'utf8'), /if \(!t\?\.sprite \|\| t\.sprite\.destroyed \|\| t\.absent\) continue;/, 'the pointer');
     assert.match(game, /if \(!t\?\.sprite \|\| t\.sprite\.destroyed \|\| t\.absent\) return Infinity;/, 'the Enter key');
   });
 });

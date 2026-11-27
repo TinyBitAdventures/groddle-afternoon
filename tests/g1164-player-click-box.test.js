@@ -15,7 +15,7 @@ import { describe, it } from 'node:test';
 import { readFileSync } from 'node:fs';
 import { AVATAR_HIT_BOX, playerClickBox } from '../public/js/reach.js?v=456da8a8';
 import { orderChoices, buildEnterChoices } from '../public/js/enter-chooser.js?v=297c6d15';
-import { pickTarget, spriteWorldHitBox } from '../public/js/pick.js?v=0357aca9';
+import { pickTarget, spriteWorldHitBox } from '../public/js/pick.js?v=8137f9fc';
 
 const game = readFileSync(new URL('../public/game.js', import.meta.url), 'utf8');
 const party = readFileSync(new URL('../public/js/features/party-feature.js', import.meta.url), 'utf8');

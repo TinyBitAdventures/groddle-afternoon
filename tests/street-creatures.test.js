@@ -40,7 +40,7 @@ import {
 } from '../public/js/street-creatures.js?v=ab90881f';
 import { actMessage, createStreetCopy, guanoPiles, idKind, reconcile, takeObjs } from '../public/js/street-objects.js?v=5f39fb79';
 import { streetObjectsFeature } from '../public/js/features/street-objects-feature.js?v=0f57a367';
-import { FEATURES } from '../public/js/features/index.js?v=bfdee4b1';
+import { FEATURES } from '../public/js/features/index.js?v=84714820';
 import { GAME_EPOCH_MS } from '../public/js/game-day.js?v=57fecfcb';
 import { creatureRequests, setCreatureEcology, streetObjectLayout } from '../tools/build-realtime-objects.mjs';
 import { STREET_INDEX, applyStreetIndex, loadStreetDataFromFs } from '../public/js/street-loader.js?v=10376267';
