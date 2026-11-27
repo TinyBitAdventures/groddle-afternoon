@@ -1168,7 +1168,7 @@ import { clientKeyAction, createHotkeysSheet, emoteKeyAction, isHotkeySheetRelea
 import { ENCYCLOPEDIA_MENU_LABEL, createEncyclopedia, isEncyclopediaKey } from './js/encyclopedia-links.js?v=b2caa8de';
 import { createEncyclopediaSheet, isHomeScreenApp } from './js/ui/encyclopedia-sheet.js?v=7a51c71e';
 import { catchSiteLinks, setSitePageViewer, siteLinkTip } from './js/site-pages.js?v=9b3049cf';
-import { bootStep } from './js/boot-progress.js?v=d84b898d';
+import { bootStep } from './js/boot-progress.js?v=f13d90b4';
 import { HOME_SCREEN_TIP_CACHE, iosSafari, mountHomeScreenTip, runsStandalone } from './js/home-screen-tip.js?v=f2287991';
 import { ZOOM_HINT_CACHE, ZOOM_HINT_MS, watchZoomHint } from './js/zoom-hint.js?v=75b745c7';
 import { EAT_PICK_TEXT, bestFoodIndex, eatChoices, eatTip } from './js/eat-pick.js?v=8fb763d0';
