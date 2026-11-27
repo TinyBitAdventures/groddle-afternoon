@@ -154,7 +154,7 @@ describe('SAFE FRAME: the lint', () => {
   });
 
   it('the Hi sign leaderboard and the Calendar are windows: the newest is on top, and a press raises one (a New Quest card no longer keeps their Close and Calendar under it)', async () => {
-    const { WINDOW_SELECTOR } = await import('../public/js/window-stack.js?v=f25edd09');
+    const { WINDOW_SELECTOR } = await import('../public/js/window-stack.js?v=d8e13764');
     for (const sel of ['.hi-board', '.ur-calendar']) assert.ok(WINDOW_SELECTOR.split(', ').includes(sel), sel);
   });
 

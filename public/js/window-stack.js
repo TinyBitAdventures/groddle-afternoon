@@ -50,9 +50,16 @@ export const START_CARD_SELECTOR = '#overlay';
  * (its copy of the bug icon is on top of them). The remake's own window: the client had no such one.
  */
 export const REPORT_WINDOW_SELECTOR = '#bug-report-panel';
-/** Over the screens: the start card and the report window. */
+/**
+ * The site page viewer (js/ui/encyclopedia-sheet.js, the Home Screen app's sheet for the
+ * Encyclopedia and every page of our site, #401 and #741) is a page over the game, not one of its
+ * windows: a quest offer or a dialog that opens while a page is up goes in under it, as the client's
+ * pages sat in their own browser window over the game (TSFrontController.as 4353-4400). Ours.
+ */
+export const PAGE_VIEWER_SELECTOR = '#ency-sheet';
+/** Over the screens: the start card, the report window and the site page viewer. */
 export function isTopWindow(el) {
-  return Boolean(el?.matches?.(START_CARD_SELECTOR) || el?.matches?.(REPORT_WINDOW_SELECTOR));
+  return Boolean(el?.matches?.(START_CARD_SELECTOR) || el?.matches?.(REPORT_WINDOW_SELECTOR) || el?.matches?.(PAGE_VIEWER_SELECTOR));
 }
 /** Not windows: the docked prompt stack, the player menu, the pack's item card, the hotkey sheet. */
 export const NOT_WINDOW_SELECTOR = '.prompt-stack, #player-menu, #pack-popover, .hotkeys-shade, .boot-loader';

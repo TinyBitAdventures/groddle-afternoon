@@ -9,7 +9,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { SHEET_TEXT, isHomeScreenApp, sheetLinkPlan } from '../public/js/ui/encyclopedia-sheet.js?v=7a51c71e';
+import { SHEET_TEXT, isHomeScreenApp, sheetLinkPlan } from '../public/js/ui/encyclopedia-sheet.js?v=ea3b0ad5';
 import { createEncyclopedia } from '../public/js/encyclopedia-links.js?v=b2caa8de';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', 'public');
@@ -72,6 +72,6 @@ describe('#401: the Encyclopedia from a Home Screen app', () => {
     // Its colours, sizes and layer are the game's tokens.
     const css = sheetSrc.slice(sheetSrc.indexOf('const CSS = `'), sheetSrc.indexOf('`;', sheetSrc.indexOf('const CSS = `')));
     assert.doesNotMatch(css, /#[0-9a-f]{3,8}\b|rgba?\(|font-size: \d|z-index: \d/i);
-    assert.match(css, /z-index: var\(--z-top\)/);
+    assert.match(css, /z-index: var\(--z-viewer\)/);
   });
 });

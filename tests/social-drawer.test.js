@@ -29,7 +29,7 @@ import {
   splitChat,
   withTimeLines,
   writeChoice,
-} from '../public/js/ui/social-drawer.js?v=9cf0ec2d';
+} from '../public/js/ui/social-drawer.js?v=e1b76ef6';
 import { createNotifier } from '../public/js/notify.js?v=c9d79ec5';
 import { resolveTokens } from './css-tokens.js';
 

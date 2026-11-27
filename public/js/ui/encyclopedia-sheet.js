@@ -65,7 +65,7 @@ export const SHEET_TEXT = Object.freeze({
 
 const CSS = `
 /* The id: the phone's cap on dialogs (style.css, max-width 100vw - 8px) is not for a whole-screen sheet. */
-#ency-sheet.ency-sheet { position: fixed; inset: 0; z-index: var(--z-top); display: flex; flex-direction: column; margin: 0; max-width: none; max-height: none;
+#ency-sheet.ency-sheet { position: fixed; inset: 0; z-index: var(--z-viewer); display: flex; flex-direction: column; margin: 0; max-width: none; max-height: none;
   background: var(--surface-card); color: var(--text); font-family: var(--font-round);
   padding: var(--safe-t, 0px) var(--safe-r, 0px) 0 var(--safe-l, 0px); }
 #ency-sheet.ency-sheet[hidden] { display: none; }

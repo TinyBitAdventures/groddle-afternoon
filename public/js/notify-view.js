@@ -16,7 +16,7 @@
  * sideInset() says how much, and the stack centres in the width that is left.
  */
 import { placeBelow, placeBeside, plainText } from './notify.js?v=c9d79ec5';
-import { REPORT_WINDOW_SELECTOR } from './window-stack.js?v=f25edd09';
+import { REPORT_WINDOW_SELECTOR } from './window-stack.js?v=d8e13764';
 
 const STACK_ID = 'notify-notices';
 const LOG_ID = 'activity-log';

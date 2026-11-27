@@ -4,13 +4,13 @@
  */
 import { ITEM_ICONS, ITEM_LABELS, getVerbsFor, ordinaryItems, runVerb } from './content.js?v=9c775db5';
 import { createErrorOnce, createFeatureHost, createFrameStages } from './js/feature-host.js?v=b87e2cbc';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=69dd777d';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=58733213';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, enterHintPick, hoverText, stackHoverLabel, groupHead, hoverRimShown, reachGlowTargets, spriteHasRimArt, rimArtParts, trimmedIconUrl, drawTileArt } from './js/enter-chooser.js?v=297c6d15';
 import { firstTendKey, STICK_TEND_DELAY_MS, STICK_TEND_DIRS, STICK_TEND_REPEAT_MS, stepTendKey, stepTendKeys, stickTendKey, tendKeyAction } from './js/garden-tend.js?v=a7470c4a';
 import { avatarHitBox, behindFloor, bodyReachDistance, OUT_OF_REACH_LINE, playerClickBox } from './js/reach.js?v=456da8a8';
 import { createVogOverlay } from './js/vog-overlay.js?v=02f04426';
 import { createPromptStack } from './js/prompt-stack.js?v=c4e1f87d';
-import { createWindowStack } from './js/window-stack.js?v=f25edd09';
+import { createWindowStack } from './js/window-stack.js?v=d8e13764';
 import { HOG_HAUL_SPLASH, createGameSplash, splashFor } from './js/game-splash.js?v=dbbf1de0';
 import {
   actionDurationFor,
@@ -1150,8 +1150,8 @@ import { createMusicVoice } from './js/music-voice.js?v=75c8cf57';
 import { contextNeedsResume, createAudioResumer } from './js/audio-resume.js?v=440d0096';
 import { backgroundSound, backgroundSoundOn } from './js/background-sound.js?v=d40d26b7';
 import { bubbleMs } from './js/read-time.js?v=3151fb1a';
-import { mountNotifyView } from './js/notify-view.js?v=ebba6fd4';
-import { mountSocialDrawer } from './js/ui/social-drawer.js?v=9cf0ec2d';
+import { mountNotifyView } from './js/notify-view.js?v=1ff8a878';
+import { mountSocialDrawer } from './js/ui/social-drawer.js?v=e1b76ef6';
 import { installPhonePill, mountPhoneLayout, socialPillCount } from './js/ui/phone-layout.js?v=7ebe8992';
 import { bindChatLinks } from './js/chat-links.js?v=b717fac7';
 import { playerNameColour } from './js/name-colours.js?v=9819bb8a';
@@ -1166,7 +1166,7 @@ import { actVerbMenu, bindVerbMenu, centerVerbMenu, chooseVerbRow, dropVerbMenuA
 import { createPromptSettler, promptId, promptSideStep } from './js/prompt-settle.js?v=cb790f3a';
 import { clientKeyAction, createHotkeysSheet, emoteKeyAction, isHotkeySheetRelease, isPlainKey } from './js/client-hotkeys.js?v=401d994d';
 import { ENCYCLOPEDIA_MENU_LABEL, createEncyclopedia, isEncyclopediaKey } from './js/encyclopedia-links.js?v=b2caa8de';
-import { createEncyclopediaSheet, isHomeScreenApp } from './js/ui/encyclopedia-sheet.js?v=7a51c71e';
+import { createEncyclopediaSheet, isHomeScreenApp } from './js/ui/encyclopedia-sheet.js?v=ea3b0ad5';
 import { catchSiteLinks, setSitePageViewer, siteLinkTip } from './js/site-pages.js?v=9b3049cf';
 import { bootStep } from './js/boot-progress.js?v=f13d90b4';
 import { HOME_SCREEN_TIP_CACHE, iosSafari, mountHomeScreenTip, runsStandalone } from './js/home-screen-tip.js?v=f2287991';
@@ -1203,7 +1203,7 @@ import { filterText } from './js/word-filter.js?v=9a7a7ebb'; // the remake's own
 import { mountStartStreet } from './js/start-street.js?v=7d8ce49c'; // #349: the start card names the save's street
 import { arrangeMapCards, fitMapExtras } from './js/map-extras.js?v=16e261b1'; // the Map's Shortcuts
 // The interface skin (js/classic/ui-mode.js) sets <html data-ui> as it loads: before main(), so before the boot cover lifts.
-import { installInterfaceSettings } from './js/classic/classic-prefs.js?v=f0302799';
+import { installInterfaceSettings } from './js/classic/classic-prefs.js?v=c7aeb9ef';
 import { standOnFeet, anchorBottomCentre } from './js/sprite-feet.js?v=849541a8';
 import { markLeaving, packPicks, takeCopies } from './js/copy-picks.js?v=b368fd49';
 import { holdKeepsBusy } from './js/instance-holds.js?v=ff3a63a3';

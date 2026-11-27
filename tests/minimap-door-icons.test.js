@@ -13,7 +13,7 @@ import { join } from 'node:path';
 
 import { DOOR_ART, DOOR_LOOKS, createStreetMinimap, doorArtName, doorLook, doorMarks, markArt, sceneDoorMarks, withDoorArt } from '../public/js/ui/street-minimap.js?fresh=minimap-door-icons';
 import { phoneSignRows } from '../public/js/features/street-minimap-feature.js?v=200f5165';
-import { subwayFeature } from '../public/js/features/subway-feature.js?v=c9ba320d';
+import { subwayFeature } from '../public/js/features/subway-feature.js?v=850b6c70';
 import { imageSize } from '../tools/image-size.mjs';
 import { python311 } from './python311.js';
 
