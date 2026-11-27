@@ -2814,9 +2814,19 @@
   "deployed": "2026-11-27"
  },
  "git": {
-  "commits": 3817,
+  "commits": 3820,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-27",
+    "kind": "fix",
+    "text": "A New Quest card, a notice or a prompt that pops up mid-drag no longer drops the dragged stack, and level up and badge screens wait for the drop"
+   },
+   {
+    "date": "2026-11-27",
+    "kind": "fix",
+    "text": "A pack stack held at the view's edge scrolls the room over the Currants counter and the rest of the HUD, and can be let go there"
+   },
    {
     "date": "2026-11-27",
     "kind": "new",
@@ -2926,19 +2936,9 @@
     "date": "2026-11-27",
     "kind": "fix",
     "text": "A street tree keeps its own picture while its new fruit count loads, instead of flashing a full tree after each harvest"
-   },
-   {
-    "date": "2026-11-26",
-    "kind": "improve",
-    "text": "Avatar part art can be hosted on another origin"
-   },
-   {
-    "date": "2026-11-26",
-    "kind": "improve",
-    "text": "Things dragged from the pack land where you let go in your back yard, and a Cultivate tile dragged there shows where it lands and why it can't"
    }
   ]
  },
- "tests": 1475,
+ "tests": 1476,
  "generatedAt": "2026-11-27"
 }
