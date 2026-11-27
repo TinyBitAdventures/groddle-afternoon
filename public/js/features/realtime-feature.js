@@ -75,7 +75,7 @@ import { publicStreet } from '../shared-street.js?v=dce5694b';
 import { anchorBottomCentre } from '../sprite-feet.js?v=849541a8';
 import { NAMEPLATE_STYLE } from '../world-text.js?v=6b49f88c';
 import { PUBLIC_HIDE } from '../public-picture.js?v=1a0b03fa';
-import { PLAY_HERE_STATES } from '../online-request.js?v=f4d87a22';
+import { PLAY_HERE_STATES } from '../online-request.js?v=5fa7a635';
 
 export const REALTIME_FEATURE_ID = 'realtime';
 /** Lines kept in the chat log. */

@@ -27,9 +27,9 @@ import { execFileSync, spawnSync } from 'node:child_process';
 import { existsSync, readFileSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { join } from 'node:path';
-import { shiftInteriorRows, shiftRowsFrom } from '../public/js/features/homes-feature.js?v=a3591fc6';
+import { shiftInteriorRows, shiftRowsFrom } from '../public/js/features/homes-feature.js?v=2a2f83cb';
 import { dropsMpFeature } from '../public/js/features/drops-mp-feature.js?fresh=g1327';
-import { shiftAnswerWaitMs } from '../public/js/online-request.js?v=f4d87a22';
+import { shiftAnswerWaitMs } from '../public/js/online-request.js?v=5fa7a635';
 import { GAME_DIR, SITE_DIR } from '../tools/repos.mjs';
 import { HAS_PHP, PHP, phpSkip } from './php.js';
 

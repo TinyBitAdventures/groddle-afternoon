@@ -8,7 +8,7 @@
  */
 import assert from 'node:assert/strict';
 import { after, before, describe, it } from 'node:test';
-import { ASLEEP_TEXT } from '../public/js/features/realtime-feature.js?v=fbc1ba77';
+import { ASLEEP_TEXT } from '../public/js/features/realtime-feature.js?v=d6f4ef39';
 import { mountSocialDrawer } from '../public/js/ui/social-drawer.js?v=a45b925c';
 import { createNotifier } from '../public/js/notify.js?v=c9d79ec5';
 import { memoryStore, page as fakePage } from './social-fake-dom.js';

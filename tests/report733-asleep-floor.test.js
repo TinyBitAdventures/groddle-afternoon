@@ -15,7 +15,7 @@ import { after, before, describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { createFeatureHost } from '../public/js/feature-host.js?v=b87e2cbc';
 import { createDroppedItemState } from '../public/js/world-items.js?v=93313aad';
-import { OFFLINE_LINE } from '../public/js/online-request.js?v=f4d87a22';
+import { OFFLINE_LINE } from '../public/js/online-request.js?v=5fa7a635';
 import { dropsMpFeature } from '../public/js/features/drops-mp-feature.js?fresh=report733';
 import { createBoardsSession } from '../public/js/features/boards-mp-feature.js?fresh=report733';
 import { BOARD_MP_TEXT } from '../public/js/boards-mp.js?v=ba766683';

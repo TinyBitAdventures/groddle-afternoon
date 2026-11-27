@@ -14,7 +14,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 import { COPY } from '../public/js/street-objects.js?v=fcc07592';
-import { streetObjectsFeature } from '../public/js/features/street-objects-feature.js?v=6715d040';
+import { streetObjectsFeature } from '../public/js/features/street-objects-feature.js?v=a9c9fed2';
 import { createResourceNode, harvestResourceNode, resourceNodeVerbs } from '../public/js/resource-nodes.js?v=c2eb46b1';
 
 const root = join(import.meta.dirname, '..');

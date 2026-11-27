@@ -91,7 +91,7 @@ import { FOX_FLURRY_COUNTER, foxLegFrom, foxOnLeg, igniteBaitXs, normalizeBaits,
 import { clockOffset } from '../street-creatures.js?v=c7dde46a';
 import { itemZ } from '../item-bands.js?v=ec366be3';
 import { topUpMetabolic } from '../metabolics.js?v=48f784bf';
-import { offlineLine, sharedOffline } from '../online-request.js?v=f4d87a22';
+import { offlineLine, sharedOffline } from '../online-request.js?v=5fa7a635';
 
 export const FOX_FEATURE_ID = 'foxes';
 /** {name} in the Fox Ranger's lines: the remake has no player names in solo, so "friend", as quests.js fills {pc_label}. */

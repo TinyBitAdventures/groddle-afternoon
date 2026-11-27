@@ -2814,9 +2814,24 @@
   "deployed": "2026-11-27"
  },
  "git": {
-  "commits": 3825,
+  "commits": 3833,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-27",
+    "kind": "improve",
+    "text": "The loading card shows the newest update's highlights on every load, not only after an update"
+   },
+   {
+    "date": "2026-11-27",
+    "kind": "fix",
+    "text": "The QA hook that sets mood for the low-mood rain goes through the stat API"
+   },
+   {
+    "date": "2026-11-27",
+    "kind": "fix",
+    "text": "An un-expand's floor shift waits as long as the server can take before it is given up, and a late answer no longer settles the next one"
+   },
    {
     "date": "2026-11-27",
     "kind": "new",
@@ -2921,21 +2936,6 @@
     "date": "2026-11-27",
     "kind": "fix",
     "text": "The Magic Rock's New Quest card stays below an upright iPhone's clock, and the Hi sign board and Calendar rise over it"
-   },
-   {
-    "date": "2026-11-27",
-    "kind": "fix",
-    "text": "In Classic the pressed Furniture Store button looks pushed in, not just a different text colour"
-   },
-   {
-    "date": "2026-11-27",
-    "kind": "fix",
-    "text": "The vendor's purse line writes your currants with commas, as the prices above it do"
-   },
-   {
-    "date": "2026-11-27",
-    "kind": "improve",
-    "text": "Every price in the game reads the number then ₡: storage tags, the storage store, halls, parties, tithes and hires"
    }
   ]
  },

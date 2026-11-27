@@ -71,7 +71,7 @@ import {
   wisdomCheck,
   wisdomMessage,
 } from '../public/js/potions.js?v=4f4c996d';
-import { potionsFeature, usePotionNow, pourSauce } from '../public/js/features/potions-feature.js?v=ee5a8f6b';
+import { potionsFeature, usePotionNow, pourSauce } from '../public/js/features/potions-feature.js?v=2bdaea67';
 import { husbandryPack } from '../public/js/animal-husbandry.js?v=9c446552';
 import { XP_FOR_LEVEL } from '../public/js/progression.js?v=05ff0260';
 import { moodScaledXp } from '../public/js/mood-xp.js?v=e311b45c';

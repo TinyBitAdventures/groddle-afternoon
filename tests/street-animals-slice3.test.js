@@ -18,7 +18,7 @@ import { foxLegFrom, foxOnLeg } from '../public/js/foxes-mp.js?v=20b2e4f9';
 import { FOX_TIMING } from '../public/js/foxes.js?v=c0ce235f';
 import { SHARED_NODE_CLASSES, applyNodeState, freshenNode, sharedNodeVerb } from '../public/js/street-objects.js?v=fcc07592';
 import { createResourceNode } from '../public/js/resource-nodes.js?v=c2eb46b1';
-import { streetObjectsFeature } from '../public/js/features/street-objects-feature.js?v=6715d040';
+import { streetObjectsFeature } from '../public/js/features/street-objects-feature.js?v=a9c9fed2';
 import { serverPath, skipWithoutServer } from '../tools/repos.mjs';
 
 describe('a shared Salmon', () => {

@@ -4,7 +4,7 @@
  */
 import { ITEM_ICONS, ITEM_LABELS, getVerbsFor, ordinaryItems, runVerb } from './content.js?v=eb86c077';
 import { createErrorOnce, createFeatureHost, createFrameStages } from './js/feature-host.js?v=b87e2cbc';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=8e2d4562';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=679fbc6a';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, enterHintPick, hoverText, stackHoverLabel, groupHead, hoverRimShown, reachGlowTargets, spriteHasRimArt, rimArtParts, trimmedIconUrl, drawTileArt } from './js/enter-chooser.js?v=297c6d15';
 import { firstTendKey, STICK_TEND_DELAY_MS, STICK_TEND_DIRS, STICK_TEND_REPEAT_MS, stepTendKey, stepTendKeys, stickTendKey, tendKeyAction } from './js/garden-tend.js?v=a7470c4a';
 import { avatarHitBox, behindFloor, bodyReachDistance, OUT_OF_REACH_LINE, playerClickBox } from './js/reach.js?v=456da8a8';
@@ -1152,7 +1152,7 @@ import { contextNeedsResume, createAudioResumer } from './js/audio-resume.js?v=4
 import { backgroundSound, backgroundSoundOn } from './js/background-sound.js?v=d40d26b7';
 import { bubbleMs } from './js/read-time.js?v=3151fb1a';
 import { mountNotifyView } from './js/notify-view.js?v=1ff8a878';
-import { PLAY_HERE_STATES } from './js/online-request.js?v=f4d87a22';
+import { PLAY_HERE_STATES } from './js/online-request.js?v=5fa7a635';
 import { mountSocialDrawer } from './js/ui/social-drawer.js?v=a45b925c';
 import { installPhonePill, mountPhoneLayout, socialPillCount } from './js/ui/phone-layout.js?v=7ebe8992';
 import { bindChatLinks } from './js/chat-links.js?v=b717fac7';
@@ -1170,7 +1170,7 @@ import { clientKeyAction, createHotkeysSheet, emoteKeyAction, isHotkeySheetRelea
 import { ENCYCLOPEDIA_MENU_LABEL, createEncyclopedia, isEncyclopediaKey } from './js/encyclopedia-links.js?v=b2caa8de';
 import { createEncyclopediaSheet, isHomeScreenApp } from './js/ui/encyclopedia-sheet.js?v=ea3b0ad5';
 import { catchSiteLinks, setSitePageViewer, siteLinkTip } from './js/site-pages.js?v=9b3049cf';
-import { bootStep } from './js/boot-progress.js?v=46ea420f';
+import { bootStep } from './js/boot-progress.js?v=53ba3156';
 import { HOME_SCREEN_TIP_CACHE, iosSafari, mountHomeScreenTip, runsStandalone } from './js/home-screen-tip.js?v=f2287991';
 import { ZOOM_HINT_CACHE, ZOOM_HINT_MS, watchZoomHint } from './js/zoom-hint.js?v=75b745c7';
 import { EAT_PICK_TEXT, bestFoodIndex, eatChoices, eatTip } from './js/eat-pick.js?v=8fb763d0';
@@ -1206,7 +1206,7 @@ import { mountStartStreet } from './js/start-street.js?v=7d8ce49c'; // #349: the
 import { arrangeMapCards, fitMapExtras } from './js/map-extras.js?v=16e261b1'; // the Map's Shortcuts
 // The interface skin (js/classic/ui-mode.js) sets <html data-ui> as it loads: before main(), so before the boot cover lifts.
 import { installInterfaceSettings } from './js/classic/classic-prefs.js?v=c7aeb9ef';
-import { installWhatsNewWindow } from './js/ui/whats-new-window.js?v=9d37f2dc';
+import { installWhatsNewWindow } from './js/ui/whats-new-window.js?v=eb99934c';
 import { standOnFeet, anchorBottomCentre } from './js/sprite-feet.js?v=849541a8';
 import { markLeaving, packPicks, takeCopies } from './js/copy-picks.js?v=b368fd49';
 import { holdKeepsBusy } from './js/instance-holds.js?v=ff3a63a3';

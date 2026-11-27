@@ -20,7 +20,7 @@
  */
 import {
   WHATS_NEW_ALL_PATH, WHATS_NEW_PATH, WHATS_NEW_REQUEST_EVENT, releasesOf, shortVersion, takeWhatsNewRequest, whatsNewRequested,
-} from '../whats-new.js?v=c410d2ba';
+} from '../whats-new.js?v=b7e58496';
 import { focusBack } from './focus-return.js?v=da190597';
 
 /** The Menu row (js/ui/topbar.js MENU_ROWS places it in World, after Encyclopedia). */

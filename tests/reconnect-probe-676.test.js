@@ -14,9 +14,9 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 import { CLOSE_QUIET, PROBE_TIMEOUT_MS, QUIET_MS, createRealtimeClient } from '../public/js/realtime-client.js?v=eb1515a8';
-import { PROBE_AFTER_MS, RECONNECTING_LINE, createOnlineRequests, waitLine } from '../public/js/online-request.js?v=f4d87a22';
+import { PROBE_AFTER_MS, RECONNECTING_LINE, createOnlineRequests, waitLine } from '../public/js/online-request.js?v=5fa7a635';
 import { COPY } from '../public/js/street-objects.js?v=fcc07592';
-import { streetObjectsFeature } from '../public/js/features/street-objects-feature.js?v=6715d040';
+import { streetObjectsFeature } from '../public/js/features/street-objects-feature.js?v=a9c9fed2';
 import { createTrantState } from '../public/js/trants.js?v=cf0fe1a3';
 
 const root = join(import.meta.dirname, '..');

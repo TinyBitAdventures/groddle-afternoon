@@ -155,7 +155,7 @@ import {
   treeSkill,
   waitingIds,
 } from '../street-objects.js?v=fcc07592';
-import { ENDED_STATES, NO_REALTIME_STATES, answerWaitMs, createOnlineRequests, offlineLine, sharedOffline, waitLine } from '../online-request.js?v=f4d87a22';
+import { ENDED_STATES, NO_REALTIME_STATES, answerWaitMs, createOnlineRequests, offlineLine, sharedOffline, waitLine } from '../online-request.js?v=5fa7a635';
 import { MEGA_ROCK_LINE, ROCK_CATALOG } from '../mining.js?v=7ecaa572';
 import { TRANT_META, trantStatusLabel } from '../trants.js?v=cf0fe1a3';
 import { quoteWoodTreeHarvest } from '../woodcutting.js?v=9e9af511';
