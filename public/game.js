@@ -37127,7 +37127,7 @@ async function main() {
      */
     hudStats({ currants, imagination, favor, mood } = {}) {
       if (Number.isFinite(Number(currants))) pc.currants = Math.max(0, Math.floor(Number(currants)));
-      if (mood !== undefined && Number.isFinite(Number(mood))) pc.mood = Math.max(0, Math.floor(Number(mood)));
+      if (mood !== undefined && Number.isFinite(Number(mood))) forceMetabolic(pc, 'mood', Math.floor(Number(mood)));
       if (Number.isFinite(Number(imagination))) pc.imagination = Math.max(0, Math.floor(Number(imagination)));
       const giant = currentStreet ? giantForStreet(currentStreet) : null;
       if (giant && Number.isFinite(Number(favor))) shrineState.favor = { ...(shrineState.favor || {}), [giant.id]: Math.max(0, Math.floor(Number(favor))) };
