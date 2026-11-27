@@ -36,6 +36,12 @@ export const BOARDS_MP_FEATURE_ID = 'boards-mp';
 const SYNC_EVERY_MS = 60000;
 const WAIT_MS = 15000;
 const NOTE = 'note';
+/**
+ * #733 (Austin's ruling 2026-11-27): states where the window waits on Play here (realtime-feature
+ * shows the button for these). The board last seen keeps its notes drawn and readable; pin and take
+ * are refused until Play here. A drop that reconnects by itself still clears and re-reads on hello.
+ */
+const PLAY_HERE_STATES = new Set(['asleep', 'replaced']);
 
 let multiplayer = false;
 
@@ -54,6 +60,8 @@ export function createBoardsSession(engine, client, { account = null, me = 0, fl
   let street = '';
   let capacity = 10;
   let notes = [];
+  /** #733: the window waits on Play here; street and notes are the last board it saw, to read only. */
+  let frozen = false;
   /** The pin the server is weighing: { ref, noteId, note, at }. */
   let pinning = null;
   /** The take the server is weighing: { id, at }. */
@@ -172,12 +180,18 @@ export function createBoardsSession(engine, client, { account = null, me = 0, fl
   });
 
   client.on('state', ({ state } = {}) => {
-    if (state === 'online') sync();
-    else {
+    if (state === 'online') {
+      frozen = false;
+      sync();
+    } else {
       // Off the server: its notes are not shown, and an answer under way comes back through the site's list.
       pinning = null;
       taking = null;
-      if (street) {
+      // #733: a window waiting on Play here keeps the last board it saw (Play here reloads; a 'stopped'
+      // on the way there keeps it too).
+      frozen = Boolean(street) && (PLAY_HERE_STATES.has(state) || (frozen && state === 'stopped'));
+      if (frozen) redraw();
+      else if (street) {
         street = '';
         notes = [];
         redraw();
@@ -212,6 +226,7 @@ export function createBoardsSession(engine, client, { account = null, me = 0, fl
   function board(tsid) {
     const s = String(tsid || '');
     if (!s || s.includes('_') || s !== String(engine.streetTsid || '')) return null;
+    if (frozen && client.state !== 'online') return street === s ? { ready: true, capacity, notes } : { ready: false, capacity, notes: [] };
     if (!here()) return { ready: false, capacity, notes: [] };
     return { ready: street === s, capacity, notes: street === s ? notes : [] };
   }
@@ -289,6 +304,7 @@ export function createBoardsSession(engine, client, { account = null, me = 0, fl
     client,
     get street() { return street; },
     get notes() { return [...notes]; },
+    get frozen() { return frozen; },
     get pinning() { return pinning; },
     get taking() { return taking; },
     board,
@@ -298,7 +314,7 @@ export function createBoardsSession(engine, client, { account = null, me = 0, fl
     sync,
     tick(now) {
       // A street change empties the board until the server's board_state for the new one.
-      if (street && street !== client.street) {
+      if (street && !frozen && street !== client.street) {
         street = '';
         notes = [];
         redraw();

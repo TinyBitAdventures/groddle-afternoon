@@ -8,7 +8,8 @@
  *
  * Austin's ruling (2026-11-27): while a window waits on Play here ('asleep', 'replaced'), keep
  * showing the last floor it saw, not interactive, with Play here as now. A real drop that
- * reconnects by itself still clears and re-syncs on hello.
+ * reconnects by itself still clears and re-syncs on hello. The same holds for a street's Notice
+ * Board (boards-mp-feature): the notes players pinned stay on it, readable, while the window sleeps.
  */
 import { after, before, describe, it } from 'node:test';
 import assert from 'node:assert/strict';
@@ -16,6 +17,8 @@ import { createFeatureHost } from '../public/js/feature-host.js?v=b87e2cbc';
 import { createDroppedItemState } from '../public/js/world-items.js?v=93313aad';
 import { OFFLINE_LINE } from '../public/js/online-request.js?v=dac938db';
 import { dropsMpFeature } from '../public/js/features/drops-mp-feature.js?fresh=report733';
+import { createBoardsSession } from '../public/js/features/boards-mp-feature.js?fresh=report733';
+import { BOARD_MP_TEXT } from '../public/js/boards-mp.js?v=ba766683';
 
 const TABLE = { items: { honey: { max: 40 }, apple: { max: 40 } }, untradeable: {} };
 
@@ -132,3 +135,42 @@ describe('#733 the owner\'s house floor while the window waits on Play here', ()
   });
 });
 
+describe('#733 a street\'s Notice Board while the window waits on Play here', () => {
+  const STREET = 'GA5134UPLRU29OH';
+  const NOTE = { id: 'board-00000000000000a1', title: 'Lost hat', body: 'Blue.', author: { id: 7, name: 'Ada' }, remake: false, at: 1 };
+  function setup() {
+    const toasts = [];
+    const engine = {
+      mode: 'multiplayer', streetTsid: STREET, inv: {},
+      query: () => null, toast: (t) => toasts.push(t), pushActivity() {}, setData() {}, playSound() {}, refreshPack() {}, updateHud() {}, save() {},
+    };
+    const client = fakeClient(STREET);
+    const s = createBoardsSession(engine, client, { account: { boards: async () => ({ boards: [] }) }, me: 9, flush: () => true });
+    client.emit('msg:board_state', { street: STREET, capacity: 10, boards: [{ board: 0, notes: [NOTE] }] });
+    return { s, client, toasts };
+  }
+
+  it('asleep: the pinned notes stay on the board, readable; take and pin are refused', () => {
+    const { s, client, toasts } = setup();
+    assert.equal(s.board(STREET).notes.length, 1);
+    client.to('asleep');
+    s.tick(Date.now());
+    const b = s.board(STREET);
+    assert.equal(b.ready, true, 'the board opens');
+    assert.deepEqual(b.notes.map((n) => n.id), [NOTE.id], 'the board looked empty while the window slept');
+    const sent = client.sent.length;
+    assert.equal(s.take(NOTE.id), false);
+    assert.equal(s.pin({ id: 'n1', title: 'Mine', body: 'x' }), false);
+    assert.deepEqual(toasts, [BOARD_MP_TEXT.offline, BOARD_MP_TEXT.offline]);
+    assert.equal(client.sent.length, sent);
+  });
+
+  it('a real drop still clears the board until the server lists it again', () => {
+    const { s, client } = setup();
+    client.to('offline');
+    assert.deepEqual(s.board(STREET), { ready: false, capacity: 10, notes: [] });
+    client.to('online', STREET);
+    client.emit('msg:board_state', { street: STREET, capacity: 10, boards: [{ board: 0, notes: [NOTE] }] });
+    assert.equal(s.board(STREET).notes.length, 1);
+  });
+});
