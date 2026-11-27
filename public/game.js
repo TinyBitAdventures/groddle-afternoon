@@ -1147,7 +1147,7 @@ import { backgroundSound, backgroundSoundOn } from './js/background-sound.js?v=d
 import { bubbleMs } from './js/read-time.js?v=3151fb1a';
 import { mountNotifyView } from './js/notify-view.js?v=18b4efca';
 import { mountSocialDrawer } from './js/ui/social-drawer.js?v=21504099';
-import { installPhonePill, mountPhoneLayout, socialPillCount } from './js/ui/phone-layout.js?v=351488b7';
+import { installPhonePill, mountPhoneLayout, socialPillCount } from './js/ui/phone-layout.js?v=d65ffc01';
 import { bindChatLinks } from './js/chat-links.js?v=b717fac7';
 import { playerNameColour } from './js/name-colours.js?v=9819bb8a';
 import { SIDE_SHEET_IDS, bindTabs, inSideSheet, mountPanelShell, sheetKeyToWorld } from './js/ui/panel-shell.js?v=5efb38c6';
@@ -1692,6 +1692,9 @@ function syncStreetFront() {
  * too), and the notices in their own region (js/ui/phone-layout.js). The sheets keep their own
  * buttons and closers.
  */
+/** #743: the shell's sheets without the side-panel class that the phone layout docks as it docks Quests. */
+const PHONE_SHEET_PANELS = Object.freeze(['make-panel', 'vendor-panel']);
+
 function installPhoneLayout() {
   if (!TOUCH_PHONE || phoneLayout) return;
   const root = document.getElementById('game-root');
@@ -1716,10 +1719,13 @@ function installPhoneLayout() {
       social: { kind: 'half', isOpen: () => Boolean(socialDrawer?.isOpen()), close: () => socialDrawer?.close() },
       menu: { kind: 'half', isOpen: () => Boolean(moreList && !moreList.hidden), close: () => { if (moreList && !moreList.hidden) click('more-btn'); } },
     },
-    // A side sheet opened from the Menu (Skills, Make, Badges...) takes the same room.
+    // A side sheet opened from the Menu (Skills, Badges...) takes the same room; so do Make and a
+    // vendor (the Furniture Store too), sheets of the shell without the side-panel class (#743: they kept
+    // their computer place, under Decoration Mode's banner and over its tray).
     others: () => {
       const id = panelShell?.open() || '';
-      return id && id !== 'quest-panel' && document.getElementById(id)?.classList.contains('side-panel') ? [{ id, close: () => panelShell.closeOpen() }] : [];
+      const sheet = id && id !== 'quest-panel' ? document.getElementById(id) : null;
+      return sheet && (sheet.classList.contains('side-panel') || PHONE_SHEET_PANELS.includes(id)) ? [{ id, close: () => panelShell.closeOpen() }] : [];
     },
     setData: setCanvasData,
     active: () => modernUi(),

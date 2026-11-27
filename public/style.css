@@ -14225,7 +14225,9 @@ body:has(#quest-dialogue:not([hidden])) .prompt-stack { z-index: calc(var(--z-mo
    swatch tabs, the cultivation picker), actions floating by the selected piece and a Place button
    under what you carry. Layout for both skins here; the Modern look under [data-ui="modern"];
    the Classic look in css/classic.css. */
-#game-root .homes-bar.hb-builder { position: absolute; inset: 0; z-index: var(--z-panel); display: block; pointer-events: none; }
+/* #743: one under the panels (--z-panel): an open sheet (the Furniture Store, Make, Quests) is over the banner and
+   the tray where they meet, instead of the banner (added later, the same z) taking the sheet's taps. */
+#game-root .homes-bar.hb-builder { position: absolute; inset: 0; z-index: calc(var(--z-panel) - 1); display: block; pointer-events: none; }
 #game-root .homes-bar.hb-builder[hidden] { display: none; }
 #game-root .hb-builder > :not(.hb-sr) { pointer-events: auto; }
 .hb-sr { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
@@ -16025,13 +16027,15 @@ body.is-booting .touch-controls { display: none; }
 
 /* The sheets: Quests, the side sheets from the Menu, Social and the Menu itself, in the room the
    layout pass gives them (above the pack row upright, a column at the left sideways). */
-:root.phone-layout[data-ui="modern"][data-phone-sheet="half"] #game-root :is(.side-panel, #local-chat-dock.is-open):not([hidden]),
+:root.phone-layout[data-ui="modern"][data-phone-sheet="half"] #game-root :is(.side-panel, #make-panel, #vendor-panel, #local-chat-dock.is-open):not([hidden]),
 :root.phone-layout[data-ui="modern"][data-phone-sheet="half"] .top-bar #more-list:not([hidden]) {
   position: fixed !important; top: var(--pr-sheet-t) !important; left: var(--pr-sheet-l) !important; right: auto !important; bottom: auto !important;
   width: var(--pr-sheet-w) !important; height: var(--pr-sheet-h) !important; max-width: none !important; max-height: none !important;
   margin: 0 !important; transform: none !important; box-sizing: border-box;
 }
 :root.phone-layout[data-ui="modern"][data-phone-sheet="half"] #game-root .side-panel:not([hidden]) > .side-card { height: 100%; max-height: none; box-sizing: border-box; }
+/* #743: Make and a vendor (the Furniture Store) dock there too (game.js PHONE_SHEET_PANELS), their card the sheet's height. */
+:root.phone-layout[data-ui="modern"][data-phone-sheet="half"] #game-root :is(#make-panel, #vendor-panel):not([hidden]) > .ui-sheet-card { flex: 1 1 auto; height: 100%; max-height: none; }
 :root.phone-layout[data-ui="modern"][data-phone-sheet="half"] .top-bar #more-list:not([hidden]) { overflow-y: auto; }
 
 /* The Map: the whole height under the top row upright; sideways the whole screen, its head floating over the map. */

@@ -110,9 +110,12 @@ const num = (v, d = 0) => (Number.isFinite(Number(v)) ? Number(v) : d);
  * under it (null in the result when none shows). `snap` the measured box of Camera Mode's Snap button
  * (G1314) while it shows: the notices keep above it (`snap` in the result, null under a sheet).
  * `street` (#654) is the street's band upright, { top, bottom } between the top bar and the controls
- * (streetBandOf), the canvas's room (engine.setStageFrame); null sideways.
+ * (streetBandOf), the canvas's room (engine.setStageFrame); null sideways. `tray` the measured box of
+ * Decoration or Cultivation Mode's tray (js/ui/home-builder.js) while it shows: upright a half sheet
+ * (the Furniture Store, Make) ends above it and starts under the home's row (Decoration Mode's banner),
+ * so the tray's Furniture Store button and the banner's Expand and Un-expand keep their taps (#743).
  */
-export function phoneRegions({ width, height, safe = {}, sheet = '', pack = null, packShown = true, bagTop = NaN, caption = null, captionUnder = null, pin = null, controls = null, buffs = null, homes = null, play = [], snap = null } = {}) {
+export function phoneRegions({ width, height, safe = {}, sheet = '', pack = null, packShown = true, bagTop = NaN, caption = null, captionUnder = null, pin = null, controls = null, buffs = null, homes = null, play = [], snap = null, tray = null } = {}) {
   const W = Math.max(0, num(width));
   const H = Math.max(0, num(height));
   const st = Math.max(0, num(safe.t));
@@ -202,7 +205,13 @@ export function phoneRegions({ width, height, safe = {}, sheet = '', pack = null
   let sheetBox = null;
   if (kind === 'map') sheetBox = upright ? box(0, strip.bottom + GAP, W, H) : box(0, 0, W, H);
   else if (kind === 'half') {
-    if (upright) sheetBox = box(0, floor - GAP - Math.round((floor - GAP - under - GAP) * HALF_SHARE), W, floor - GAP);
+    if (upright) {
+      // #743: above the builder's tray and under the home's row (Decoration Mode's banner), not over them.
+      const foot = real(tray) && tray.top > under + GAP ? Math.min(floor, tray.top) : floor;
+      let sheetTop = foot - GAP - Math.round((foot - GAP - under - GAP) * HALF_SHARE);
+      if (homesBox) sheetTop = Math.max(sheetTop, homesBox.bottom + GAP);
+      sheetBox = box(0, sheetTop, W, foot - GAP);
+    }
     // #738 (an iPhone sideways, the Home Screen app): the column's card starts at the safe-area inset, as
     // the stats pill and the pack row do, not under the camera cut-out. The street still docks beside the
     // column's whole width (the dock below); the room under the cut-out is the page's colour (style.css).
@@ -693,6 +702,11 @@ export function mountPhoneLayout({ doc = globalThis.document, root, sheets = {},
       pin: pins && !pins.hidden && pins.getClientRects().length ? { w: pins.offsetWidth, h: pins.offsetHeight } : null,
       buffs: shown(buffEl) ? { w: buffEl.offsetWidth, h: buffEl.offsetHeight } : null,
       homes,
+      // #743: Decoration or Cultivation Mode's tray (an upright sheet ends above it).
+      tray: (() => {
+        const el = doc.querySelector('#game-root .hb-builder:not([hidden]) .hb-tray:not([hidden])');
+        return shown(el) ? shift(rectOf(el)) : null;
+      })(),
       play,
       // G1314: Camera Mode's Snap button while it shows (the notices keep above it).
       snap: (() => {
