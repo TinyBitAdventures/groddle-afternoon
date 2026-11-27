@@ -4,7 +4,7 @@
  */
 import { ITEM_ICONS, ITEM_LABELS, getVerbsFor, ordinaryItems, runVerb } from './content.js?v=68a61ef7';
 import { createErrorOnce, createFeatureHost, createFrameStages } from './js/feature-host.js?v=b87e2cbc';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=8b13e227';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=9f008cd7';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, enterHintPick, hoverText, stackHoverLabel, groupHead, hoverRimShown, reachGlowTargets, spriteHasRimArt, rimArtParts, trimmedIconUrl, drawTileArt } from './js/enter-chooser.js?v=297c6d15';
 import { firstTendKey, STICK_TEND_DELAY_MS, STICK_TEND_DIRS, STICK_TEND_REPEAT_MS, stepTendKey, stepTendKeys, stickTendKey, tendKeyAction } from './js/garden-tend.js?v=a7470c4a';
 import { avatarHitBox, behindFloor, bodyReachDistance, OUT_OF_REACH_LINE, playerClickBox } from './js/reach.js?v=456da8a8';
@@ -75,6 +75,7 @@ import {
 import {
   FOUR_LETTER_BASE_STREET_ID,
   FOUR_LETTER_BLOCKS,
+  FOUR_LETTER_EXIT_PROMPT_MS,
   FOUR_LETTER_LAYOUT,
   FOUR_LETTER_QUEST_ID,
   FOUR_LETTER_RIDDLES,
@@ -85,7 +86,7 @@ import {
   fourLetterWord,
   spinFourLetterBlock,
   startFourLetterPuzzle,
-} from './js/four-letter-quest.js?v=a5574ac7';
+} from './js/four-letter-quest.js?v=9540cc6f';
 import { KIDS_ROOM_W, buildKidsRoomScene } from './js/kids-room-scene.js?v=30860f0d';
 import {
   AXIS_DENYDE_STREET_ID,
@@ -103,6 +104,7 @@ import {
   rememberIlmenskieSource,
 } from './js/ilmenskie-quest.js?v=433ca65b';
 import {
+  LEGALIZE_ALLEY_EXIT_PROMPT_MS,
   LEGALIZE_BACK_ALLEY_BEATS,
   LEGALIZE_BACK_ALLEY_TSID,
   LEGALIZE_CARD_COST,
@@ -137,7 +139,7 @@ import {
   qualificationVerb,
   requestLegalizeQualification,
   travelToGregarious,
-} from './js/legalize-it.js?v=1fd33e0e';
+} from './js/legalize-it.js?v=53865df2';
 import { HALL, HALL_DECOS, HALL_EXTRA_CHAIRS, HALL_OFFICE, HALL_QUESTIONS } from './js/bureaucratic-hall.js?v=074510f2';
 import { STATION_X, stationArrival, stationScreen, surfaceStation } from './js/subway.js?v=ea6921ff';
 import { ALLEY, SHADY, drawAlley, inEnteredBox } from './js/quest-rooms/back-alley-set.js?v=4e04295a';
@@ -541,6 +543,7 @@ import {
   removeItem,
   isToolItem,
 } from './js/inventory.js?v=3be7988a';
+import { createStuckAsker } from './js/stuck-prompt.js?v=35415987';
 import { stockUseVerb } from './js/stock-use.js?v=6b422ccf';
 import { TROPHY_FIND_TEXT, trophyOfBadge } from './js/home-trophies.js?v=649b111e';
 import { HELD_AT_ONCE, HELD_AT_ONCE_TEXT } from './js/collection-trophies.js?v=e45565a7';
@@ -19730,6 +19733,25 @@ const FOUR_LETTER_FINAL_DIALOGUE = [
   },
 ];
 
+/**
+ * "Are you stuck? Do you want to leave this place?" for the instances game.js runs itself (js/stuck-prompt.js):
+ * Four Letter Words' playroom (letter_block_2.js 191, five minutes) and Legalize It's Back Alley
+ * (card_carrying_qualification.js 88, three minutes). The quest rooms ask in quest-instances-feature.
+ */
+const roomStuck = createStuckAsker();
+function roomStuckHost() {
+  return {
+    prompt: (opts) => engine.prompt(opts),
+    removePrompt: (uid) => engine.removePrompt(uid),
+    isDead: () => playerIsDead(),
+    busy: () => engine.busy({ ignoreInstance: true }),
+    setData: (k, v) => {
+      if (app?.canvas) app.canvas.dataset[k] = v;
+    },
+    param: (k) => new URLSearchParams(location.search).get(k),
+  };
+}
+
 function fourLetterIsInstanced() {
   return Boolean(fourLetterState && heldPlace?.kind !== 'four-letter' && currentStreetTsid === FOUR_LETTER_ROOM_ID);
 }
@@ -19859,6 +19881,8 @@ function confirmLeaveFourLetterQuest() {
 
 function finishFourLetterQuest() {
   if (!fourLetterState || fourLetterState.status !== 'solved') return;
+  // inc_quests.js 747: a quest finished in its instance takes "Are you stuck?" away.
+  roomStuck.cancel('four-letter', roomStuckHost());
   const updates = applyQuestProgress(questState, 'riddles_solved', 1, pc);
   announceQuestCompletions(
     updates.map((update) =>
@@ -19983,6 +20007,7 @@ async function startFourLetterQuest(opts = {}) {
     savePlayerLocation(fourLetterSourceLocation);
     renderFourLetterHud();
     updateHud();
+    roomStuck.arm('four-letter', FOUR_LETTER_EXIT_PROMPT_MS, roomStuckHost());
     pushActivity('You shrink down and arrive in Mr. Block’s Playroom.');
     toast('Everything suddenly looks enormous.', 3200);
     openScriptedQuestDialogue({
@@ -20007,6 +20032,7 @@ async function startFourLetterQuest(opts = {}) {
 
 async function leaveFourLetterQuest({ abandon = false } = {}) {
   if (!fourLetterState || !fourLetterSourceLocation?.tsid) return false;
+  roomStuck.cancel('four-letter', roomStuckHost());
   const destination = { ...fourLetterSourceLocation };
   if (abandon) {
     delete questState.active[FOUR_LETTER_QUEST_ID];
@@ -20037,6 +20063,12 @@ async function leaveFourLetterQuest({ abandon = false } = {}) {
 }
 
 function updateFourLetterQuest() {
+  // Yes, please: out, and an unfinished quest is given up (letter_block_2.js onExitLocation, the Leave button's).
+  roomStuck.tick('four-letter', roomStuckHost(), {
+    here: fourLetterIsInstanced(),
+    moving: Boolean(fourLetterStartPromise),
+    onYes: () => leaveFourLetterQuest({ abandon: fourLetterState?.status !== 'solved' }),
+  });
   if (!fourLetterIsInstanced()) return;
   const now = Date.now();
   for (const target of fourLetterTargets) {
@@ -20657,7 +20689,10 @@ function handleLegalizeTarget(target, verbId) {
     let message = '';
     if (action === 'depart_back_alley' && verbId === 'travel') {
       result = departForBackAlley(legalizeRun);
-      spawn = () => legalizeSceneTransition('The Back Alley', spawnLegalizeBackAlley);
+      spawn = async () => {
+        await legalizeSceneTransition('The Back Alley', spawnLegalizeBackAlley);
+        roomStuck.arm('legalize-alley', LEGALIZE_ALLEY_EXIT_PROMPT_MS, roomStuckHost());
+      };
       activity = 'You are whisked away to The Back Alley.';
       message = 'Find the Shady Bureaucrat in the forest.';
     } else if (action === 'exit_gregarious_station' && verbId === 'exit') {
@@ -20838,6 +20873,12 @@ function confirmLeaveLegalizeIt() {
 }
 
 function updateLegalizeIt() {
+  // Yes, please: instances_exit('back_alley'), as the Bureaucrat's own way out (legalizeExitAlley).
+  roomStuck.tick('legalize-alley', roomStuckHost(), {
+    here: legalizeIsInstanced(),
+    moving: legalizeTransitionBusy,
+    onYes: () => legalizeExitAlley(),
+  });
   if (!legalizeOnRoute() || legalizeTransitionBusy || !player) return;
   const now = Date.now();
   for (const target of legalizeTargets) {

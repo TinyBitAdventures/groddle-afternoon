@@ -14,6 +14,14 @@
  *   it costs the ticket price and counts in the day's 11.
  * Both leave by their EXIT door back to the street they were entered from;
  * map travel waits for the door, and a reload resumes on that street.
+ * - Beam Me Down's door is on the floor at the far right, off screen from the landing, and there is
+ *   no way back up: four minutes after the ticket takes you in, Glitch asked "Are you stuck? Do you
+ *   want to leave this place?" (paradise_ticket_beam_me_down.js 296, players/inc_instances.js
+ *   317-370), and so does this. Yes, please takes you back as the EXIT does; No thanks asks again two
+ *   minutes later; a dead player is asked a minute later. Leaving by any way takes it away
+ *   (location.js onPlayerExit 770), a party trip too, and a trip back in does not ask again.
+ *   Constellation, an underground puzzle level, never asked.
+ *   QA: &stuckpromptms=<ms> replaces the four minutes and the two. Canvas data: stuckPrompt (js/stuck-prompt.js).
  *
  * G904: a party teleporter taken in either scene holds it (Glitch kept an instance left for
  * another instance: groups/instance.js player_exited_location 343-363): the scene is parked whole
@@ -49,8 +57,9 @@ import {
   nextStarIndex,
   normalizeSceneSave,
   sceneTsid,
-} from '../puzzle-scenes.js?v=04413a6d';
+} from '../puzzle-scenes.js?v=5c9798c3';
 import { gainMetabolic } from '../metabolics.js?v=48f784bf';
+import { createStuckAsker } from '../stuck-prompt.js?v=35415987';
 import { frameTexture, isLoaded, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js?v=b8e38103';
 import { grantMoodXp } from '../mood-xp.js?v=e311b45c';
 import { partySpaceForStreet } from '../party-spaces.js?v=91ce15c5';
@@ -70,6 +79,7 @@ let lastData = 0;
 // G904: away at a party with the scene held ({ parked, x, y, scale }).
 let away = null;
 let resumeOnBoot = false;
+const stuck = createStuckAsker();
 
 ensureItem(TICKET, {
   label: 'Ticket To Beam Me Down',
@@ -444,6 +454,8 @@ function startScene(engine, id, opts = {}) {
     status: id === 'constellation' ? 'connecting' : 'falling',
     reward: '',
   };
+  // "Are you stuck?" (the header): armed by a fresh entry, not by a rebuild after a party trip.
+  if (scene.exitPromptMs && !opts.returnTo) stuck.arm(id, scene.exitPromptMs, stuckHost(engine));
   // A smaller avatar so the whole sky (or beam) reads at once, as in the video.
   const p = engine.player;
   if (p && scene.avatarScale && !active.scaled) {
@@ -466,6 +478,18 @@ function startScene(engine, id, opts = {}) {
   return true;
 }
 
+/** js/stuck-prompt.js's host: the prompt stack, Hell's dead, and a dialog, card or verb on screen. */
+function stuckHost(engine) {
+  return {
+    prompt: (opts) => engine.prompt?.(opts),
+    removePrompt: (uid) => engine.removePrompt?.(uid),
+    isDead: () => engine.query?.('isDead', engine) === true,
+    busy: () => Boolean(engine.busy?.({ ignoreInstance: true })),
+    setData: (k, v) => engine.setData?.(k, v),
+    param: (k) => engine.param?.(k),
+  };
+}
+
 /**
  * Ticket To Beam Me Down is a Ticket to Paradise (paradise_ticket_beam_me_down.js, parent
  * paradise_ticket): Activate asks, costs calc_img_cost (20 x the quoin multiplier, more above x40)
@@ -484,6 +508,8 @@ function activateTicket(engine) {
 
 /** G904: hold the scene for a party trip; answers the party's way back. */
 function departForParty(engine) {
+  // location.js onPlayerExit 770: leaving the instance, for a party too, drops "Are you stuck?".
+  stuck.cancel(active.id, stuckHost(engine));
   const p = engine.player;
   const spot = { x: Math.round(Number(p?.x) || 0), y: Math.round(Number(p?.y) || 0) };
   const scale = active.scaled && p?.baseScale ? p.baseScale / active.scaled.base : 1;
@@ -548,6 +574,7 @@ async function leaveScene(engine) {
 
 function cleanup(engine) {
   if (!active) return;
+  stuck.cancel(active.id, stuckHost(engine));
   const p = engine.player;
   if (active.scaled && p && !p.destroyed) p.baseScale = active.scaled.base;
   active.scaled = null;
@@ -877,6 +904,7 @@ export const puzzleScenesFeature = {
         stepConstellation();
       }
       else stepBeam(engine);
+      if (!away) stuck.tick(active.id, stuckHost(engine), { now, onYes: () => leaveScene(engine) });
     }
     publish(engine, now);
   },

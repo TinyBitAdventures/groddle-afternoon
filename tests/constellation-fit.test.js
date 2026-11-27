@@ -10,7 +10,7 @@ import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { CONSTELLATION, SKY_BOX, doorBox, fieldStars, fieldStarsIn, fitSky, skyPoint } from '../public/js/puzzle-scenes.js?v=04413a6d';
+import { CONSTELLATION, SKY_BOX, doorBox, fieldStars, fieldStarsIn, fitSky, skyPoint } from '../public/js/puzzle-scenes.js?v=5c9798c3';
 
 const root = join(import.meta.dirname, '..');
 const inside = (p, o, r = 0) => p.x + r > o.x && p.x - r < o.x + o.w && p.y + r > o.y && p.y - r < o.y + o.h;

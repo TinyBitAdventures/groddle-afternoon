@@ -12,6 +12,8 @@
 export const FOUR_LETTER_QUEST_ID = 'letter_block_2';
 export const FOUR_LETTER_ROOM_ID = 'LIF149EVS2A22H1';
 export const FOUR_LETTER_BASE_STREET_ID = 'GCR101Q98A12EHH';
+/** letter_block_2.js 191: questInstanceLocation(pc, 'kids_room', -1528, -143, 5*60): "Are you stuck?" after five minutes (js/stuck-prompt.js). */
+export const FOUR_LETTER_EXIT_PROMPT_MS = 5 * 60 * 1000;
 
 export const FOUR_LETTER_BLOCKS = Object.freeze([
   Object.freeze({ id: 'block_1', letters: Object.freeze(['M', 'T', 'B']), initial: 'B' }),

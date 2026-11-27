@@ -236,6 +236,9 @@ export const BEAM_ME_DOWN = Object.freeze({
   startCloud: Object.freeze({ x0: 170, x1: 470, y: 420 }),
   // G962: the full-street snaps stand the EXIT at the far right against the right cloud bank (x 868 of 900).
   exit: Object.freeze({ x: 1300, y: 5100 }),
+  // paradise_ticket_beam_me_down.js 296 (every Ticket to Paradise): instances_schedule_exit_prompt(id,
+  // 4*60), "Are you stuck?" four minutes after the ticket takes you in (features/puzzle-scenes-feature).
+  exitPromptMs: 4 * 60 * 1000,
   beamLength: 540,
   beamTop: 150,
   beamBottom: 300,

@@ -38,7 +38,7 @@ import {
   legalizeObjective,
   legalizeReloadLocation,
   legalizeWayBack,
-} from '../public/js/legalize-it.js?v=1fd33e0e';
+} from '../public/js/legalize-it.js?v=53865df2';
 import { closeQuestRoomConverse } from '../public/js/features/quest-instances-feature.js?v=9a2136b3';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');

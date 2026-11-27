@@ -14,6 +14,8 @@ import { countItem, removeItem } from './inventory.js?v=3be7988a';
 
 export const LEGALIZE_QUEST_ID = 'card_carrying_qualification';
 export const LEGALIZE_BACK_ALLEY_TSID = 'LIF177DTS6T1KFG';
+/** card_carrying_qualification.js 88: the back_alley instance's exit_delay 3*60, "Are you stuck?" after three minutes (js/stuck-prompt.js). */
+export const LEGALIZE_ALLEY_EXIT_PROMPT_MS = 3 * 60 * 1000;
 export const LEGALIZE_GRANGE_TSID = 'LLI32G3NUTD100I';
 /**
  * The Bureaucratic Hall behind Gregarious Grange's door (location XML door_1300484753304:
