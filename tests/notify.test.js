@@ -451,8 +451,8 @@ describe('zones', () => {
     assert.match(game, /modal\.style\.setProperty\('--fam-drop', `\$\{drop\}px`\);/);
     assert.match(read('public/js/notify-view.js'), /bannerBoxes\(\) \{\n\s+return \[\.\.\.zones\.banner\];/);
     const css = read('public/style.css');
-    assert.match(css, /\.quest-dialogue\[data-look="familiar"\] \{ place-items: start center; padding: calc\(80px \+ var\(--fam-drop, 0px\)\) /);
-    assert.match(css, /\.quest-dialogue\[data-look="familiar"\] \{ padding-top: calc\(56px \+ var\(--fam-drop, 0px\)\); \}/);
+    assert.match(css, /\.quest-dialogue\[data-look="familiar"\] \{ place-items: start center; padding: calc\(80px \+ var\(--fam-drop, 0px\) \+ var\(--safe-t\)\) /);
+    assert.match(css, /\.quest-dialogue\[data-look="familiar"\] \{ padding-top: calc\(56px \+ var\(--fam-drop, 0px\) \+ var\(--safe-t\)\); \}/);
   });
 
   it('floats near one spot stack a line apart', () => {

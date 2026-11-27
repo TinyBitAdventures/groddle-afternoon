@@ -10,7 +10,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { BESIDE_MIN_W, NOTICE_W, SHORT_SCREEN_H, noticesBesideAvatar } from '../public/js/notify-view.js?v=18b4efca';
+import { BESIDE_MIN_W, NOTICE_W, SHORT_SCREEN_H, noticesBesideAvatar } from '../public/js/notify-view.js?v=ebba6fd4';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const read = (rel) => readFileSync(join(root, rel), 'utf8');

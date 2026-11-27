@@ -7928,7 +7928,7 @@ header.top-bar + .sub { display: none; }
 /* Original quest-completion view: a player-paced dark panel over the live street. */
 .award-screen[data-paged="true"] {
   place-items: start center;
-  padding-top: clamp(42px, 7vh, 78px);
+  padding-top: calc(clamp(42px, 7vh, 78px) + var(--safe-t));
   background: transparent;
   cursor: default;
 }
@@ -9820,7 +9820,7 @@ header.top-bar + .sub { display: none; }
 @media (max-width: 760px) {
   .home-panel,
   .mail-panel {
-    padding: 64px var(--sp-4) 94px;
+    padding: calc(64px + var(--safe-t)) var(--sp-4) 94px;
   }
 
   .home-style-grid {
@@ -9948,7 +9948,8 @@ header.top-bar + .sub { display: none; }
 /* QuestConversationUI.as: rock 80 px with a white glow, a 462 px bubble in
    0x0a181d at 0.9 pointing at it, centred 80 px under the header, no shade. */
 /* POLISH: --fam-drop (game.js keepOfferCardClear) moves a street card under a banner that is up (the Qurazy line). */
-.quest-dialogue[data-look="familiar"] { place-items: start center; padding: calc(80px + var(--fam-drop, 0px)) var(--sp-4) var(--sp-4); }
+/* Review 2026-11-26 (#742's sibling): 80 px under the header, the header under an upright phone's status bar (--safe-t). */
+.quest-dialogue[data-look="familiar"] { place-items: start center; padding: calc(80px + var(--fam-drop, 0px) + var(--safe-t)) var(--sp-4) var(--sp-4); }
 .quest-dialogue[data-look="familiar"] .quest-dialogue-shade,
 .quest-dialogue[data-look="familiar"] #quest-dialogue-kicker { display: none; }
 .quest-dialogue[data-look="familiar"] .quest-dialogue-card {
@@ -10014,7 +10015,7 @@ header.top-bar + .sub { display: none; }
 .quest-dialogue[data-look="familiar"] .quest-dialogue-actions button[hidden],
 .quest-dialogue[data-look="vog"] .quest-dialogue-actions button[hidden] { display: none; }
 @media (max-width: 560px) {
-  .quest-dialogue[data-look="familiar"] { padding-top: calc(56px + var(--fam-drop, 0px)); }
+  .quest-dialogue[data-look="familiar"] { padding-top: calc(56px + var(--fam-drop, 0px) + var(--safe-t)); }
   .quest-dialogue[data-look="familiar"] .quest-dialogue-card { grid-template-columns: 52px minmax(0, 1fr); column-gap: var(--sp-4); }
   .quest-dialogue[data-look="familiar"] .fam-rock { transform: scale(0.65); margin-left: -14px; }
 }

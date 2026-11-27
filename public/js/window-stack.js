@@ -31,6 +31,10 @@ export const WINDOW_SELECTOR = [
   '.mail-panel',
   '.home-panel',
   '.rook-museum-exhibit',
+  // The clock's dialog (HiLeaderboard.as in DateTimeDialog.as) and its Calendar: Dialogs, so the newest is on top
+  // and a press raises one (a Magic Rock card that came first no longer covers their Close and Calendar).
+  '.hi-board',
+  '.ur-calendar',
   '[role="dialog"][aria-modal="true"]',
 ].join(', ');
 /** Full-screen views (BaseScreenView): over every dialog, as changeDialogsZ puts them. */

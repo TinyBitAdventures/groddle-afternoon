@@ -14,6 +14,9 @@
  * #742: the Hi sign leaderboard and the Calendar wrote their tops in a feature's CSS string (top: 3.2rem, 3rem),
  * which the lint never read; now every fixed window's top, in a stylesheet or a CSS string, adds --safe-t, and
  * both are checked in the browsers (with Gifts, Trade and the storage windows fixed by the same lint).
+ * The review (2026-11-26) found the Magic Rock's New Quest card, placed by its shade's padding-top (calc(56px + ...)),
+ * still under the clock: every full-screen shade that places its card by padding-top adds --safe-t too, and the card
+ * is checked in WebKit and Chrome.
  * Run: node --test tests/safe-frame.test.js
  */
 import { after, before, describe, it } from 'node:test';
@@ -40,6 +43,8 @@ function sources() {
   for (const d of ['js', 'css', 'play']) walk(join(pub, d));
   return [...out, 'public/style.css', 'public/game.js'];
 }
+/** Each rule (or a feature's style string) as { sel, body }; a selector's attribute quotes are kept (only a template's backtick cuts it). */
+const cssBlocks = (src) => [...src.matchAll(/([^{}]*)\{([^{}]*)\}/g)].map((m) => ({ sel: m[1].split('`').pop().trim(), body: m[2] }));
 const stripComments = (s) => s.replace(/\/\*[\s\S]*?\*\//g, '').replace(/<!--[\s\S]*?-->/g, '').replace(/^\s*\/\/.*$/gm, '');
 
 /** Each top, padding, padding-top or inset declaration and its value (CSS, or a feature's CSS string). */
@@ -98,7 +103,7 @@ describe('SAFE FRAME: the lint', () => {
     for (const f of files) {
       const src = stripComments(read(f));
       // Each rule (or style string) and its selector; a selector made fixed anywhere in the file keeps the check in its @media rules.
-      const blocks = [...src.matchAll(/([^{}]*)\{([^{}]*)\}/g)].map((m) => ({ sel: m[1].split(/[`'"]/).pop().trim(), body: m[2] }));
+      const blocks = cssBlocks(src);
       const fixed = new Set();
       for (const b of blocks) if (/position\s*:\s*fixed/.test(b.body)) for (const s of b.sel.split(',')) fixed.add(s.trim());
       for (const b of blocks) {
@@ -111,6 +116,46 @@ describe('SAFE FRAME: the lint', () => {
       }
     }
     assert.deepEqual(bad, []);
+  });
+
+  // Review 2026-11-26 (#742's sibling): the Magic Rock's New Quest card on the street (the familiar look) is placed by
+  // its full-screen shade's padding-top, calc(56px + ...) under 560 px, with no --safe-t: upright it sat under the clock.
+  it('every full-screen shade (fixed or absolute, inset: 0) that places its card by padding-top adds --safe-t', () => {
+    const LENGTH = /\d(px|rem|em|vh|dvh|svh|lvh)\b/;
+    const last = (sel) => sel.trim().split(/[\s>+~]+/).pop();
+    const bad = [];
+    for (const f of files) {
+      const blocks = cssBlocks(stripComments(read(f)));
+      const shades = new Set();
+      for (const b of blocks) {
+        if (/position\s*:\s*(fixed|absolute)/.test(b.body) && /(?<![\w-])inset\s*:\s*0(px)?\s*(;|$)/m.test(b.body)) for (const s of b.sel.split(',')) shades.add(last(s));
+      }
+      // The shade itself, or the same element in a state (.quest-dialogue[data-look="familiar"], .award-screen[data-paged]).
+      const isShade = (sel) => sel.split(',').some((s) => [...shades].some((k) => k && (last(s) === k || (last(s).startsWith(k) && /^[[:.]/.test(last(s).slice(k.length))))));
+      for (const b of blocks) {
+        if (!isShade(b.sel)) continue;
+        for (const m of b.body.matchAll(/(?<![\w-])(padding-top|padding)\s*:\s*([^;}`'"\n]+)/g)) {
+          let v = m[2].trim();
+          if (m[1] === 'padding') { // the shorthand's first value is the top
+            let d = 0;
+            let i = 0;
+            for (; i < v.length; i += 1) {
+              if (v[i] === '(') d += 1;
+              else if (v[i] === ')') d -= 1;
+              else if (v[i] === ' ' && d === 0) break;
+            }
+            v = v.slice(0, i);
+          }
+          if (LENGTH.test(v) && !v.includes('--safe-t')) bad.push(`${f}: ${b.sel.trim().slice(-60)} { ${m[1]}: ${m[2].trim().slice(0, 60)} }`);
+        }
+      }
+    }
+    assert.deepEqual(bad, []);
+  });
+
+  it('the Hi sign leaderboard and the Calendar are windows: the newest is on top, and a press raises one (a New Quest card no longer keeps their Close and Calendar under it)', async () => {
+    const { WINDOW_SELECTOR } = await import('../public/js/window-stack.js?v=f25edd09');
+    for (const sel of ['.hi-board', '.ur-calendar']) assert.ok(WINDOW_SELECTOR.split(', ').includes(sel), sel);
   });
 
   it('the surfaces Austin saw, and their kin, keep below --safe-t', () => {
@@ -253,6 +298,11 @@ async function cssSurfaces(browser, ctxOpts) {
   bad.push(...await tab.evaluate(outsideFrame, ['#overlay', SAFE_T, SAFE_B]));
   await tab.setContent(`<!doctype html><html data-ui="modern" class="touch-phone phone-layout"><head><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><style>${css}</style><style>${frame}</style></head><body><div id="game-root">
     <div class="quest-dialogue" data-look="conversation"><div class="quest-dialogue-card"><p class="fam-head"><span>Magic Rock</span></p><button type="button" class="fam-close">Close</button><p class="quest-dialogue-copy">I have a ticket for you.</p></div></div>
+  </div></body></html>`);
+  bad.push(...await tab.evaluate(outsideFrame, ['.quest-dialogue', SAFE_T, SAFE_B]));
+  // The review's sibling of #742: the Magic Rock's New Quest card on the street (the familiar look), placed by its shade's padding-top.
+  await tab.setContent(`<!doctype html><html data-ui="modern" class="touch-phone phone-layout"><head><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><style>${css}</style><style>${frame}</style></head><body><div id="game-root">
+    <div class="quest-dialogue" data-look="familiar"><div class="quest-dialogue-shade"></div><div class="quest-dialogue-card"><div class="quest-dialogue-bubble"><p class="fam-head"><span>New Quest</span></p><button type="button" class="fam-close" aria-label="Not right now"></button><h2>Pot's Empty Table</h2><p class="quest-dialogue-copy">Psst. Pot sent word. Pot wants a feast!</p><div class="quest-dialogue-actions"><button type="button" class="btn-glitch-primary">A feast?</button></div></div></div></div>
   </div></body></html>`);
   bad.push(...await tab.evaluate(outsideFrame, ['.quest-dialogue', SAFE_T, SAFE_B]));
   await tab.setContent(`<!doctype html><html data-ui="modern" class="touch-phone phone-layout"><head><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><style>${css}</style><style>${frame}</style></head><body><div id="game-root">
