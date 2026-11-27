@@ -10615,7 +10615,7 @@ html[data-street-cards] .notify-notices { visibility: hidden; }
 /* Option A (2026-11-02): five tabs that always fit the 300 px drawer, no scrolling. They share what
    is left over. When counts on most of them would cut a label (js fitTabs), the fixed tabs' counts
    become dots (.is-tight), then the Chats tab drops its word for its icon and count (.is-tighter). */
-.social-drawer .social-tab {
+.social-drawer .sd-tab {
   display: inline-flex;
   flex: 1 1 auto;
   min-width: 0;
@@ -10634,16 +10634,16 @@ html[data-street-cards] .notify-notices { visibility: hidden; }
   cursor: pointer;
 }
 .social-tab-label { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
-.social-drawer .social-tab.is-chats { flex: 0 0 auto; padding: 0 var(--sp-2); }
+.social-drawer .sd-tab.is-chats { flex: 0 0 auto; padding: 0 var(--sp-2); }
 .social-tab-icon svg { width: 14px; height: 14px; }
-.social-tab:hover { color: var(--text); background: var(--surface-parchment); }
-.social-tab[aria-selected="true"] { color: var(--text); box-shadow: inset 0 -2px 0 var(--accent); }
-.social-tab:focus-visible { outline-offset: -2px; }
+.sd-tab:hover { color: var(--text); background: var(--surface-parchment); }
+.sd-tab[aria-selected="true"] { color: var(--text); box-shadow: inset 0 -2px 0 var(--accent); }
+.sd-tab:focus-visible { outline-offset: -2px; }
 /* Ticket 37: while a tab has the keyboard the arrow keys are the row's, not the avatar's; the row says so. */
-.social-tabs:has(.social-tab:focus-visible) { box-shadow: inset 0 0 0 2px var(--accent); border-radius: var(--radius-sm) var(--radius-sm) 0 0; }
-.social-tab .social-badge { flex: none; min-width: 14px; height: 14px; padding: 0 var(--sp-1); font-size: var(--fs-2xs); box-shadow: none; }
-.social-tabs.is-tight .social-tab:not(.is-chats) .social-badge { min-width: 8px; width: 8px; height: 8px; padding: 0; font-size: 0; }
-.social-tabs.is-tighter .social-tab.is-chats .social-tab-label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+.social-tabs:has(.sd-tab:focus-visible) { box-shadow: inset 0 0 0 2px var(--accent); border-radius: var(--radius-sm) var(--radius-sm) 0 0; }
+.sd-tab .social-badge { flex: none; min-width: 14px; height: 14px; padding: 0 var(--sp-1); font-size: var(--fs-2xs); box-shadow: none; }
+.social-tabs.is-tight .sd-tab:not(.is-chats) .social-badge { min-width: 8px; width: 8px; height: 8px; padding: 0; font-size: 0; }
+.social-tabs.is-tighter .sd-tab.is-chats .social-tab-label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
 /* The Chats list: Private, Groups, Channels; each row its circle, name and note, last line, count. */
 .social-log[data-social-list] { gap: var(--sp-1); padding: var(--sp-3) var(--sp-4); }
 .social-chat-sec { display: grid; gap: var(--sp-1); }
@@ -10987,7 +10987,7 @@ html[data-street-cards] .notify-notices { visibility: hidden; }
 .social-act[data-kind="moment"] { border-left-color: var(--imagination); }
 .social-act[data-kind="moment"] .social-act-text { font-weight: 800; }
 .social-act-when { display: flex; align-items: center; gap: var(--sp-3); font-size: var(--fs-sm); color: var(--text-muted); }
-.social-count { padding: 0 var(--sp-3); border-radius: var(--radius-pill); background: var(--surface-parchment); font-weight: 700; }
+.sd-count { padding: 0 var(--sp-3); border-radius: var(--radius-pill); background: var(--surface-parchment); font-weight: 700; }
 .social-log .act-gain { color: var(--c-green-42); font-weight: 700; }
 .social-log .act-loss { color: var(--c-red-45); font-weight: 700; }
 .social-log .act-base { font-weight: 700; }
@@ -15933,7 +15933,7 @@ body.is-booting .touch-controls { display: none; }
 :root.phone-layout[data-ui="modern"] #menu-quest-btn[data-count]::after { content: "· " attr(data-count); margin-left: var(--space-1); color: var(--accent); }
 /* G1230 (#595): the Activity log's count is not on the pill (chat and IMs are); it is its own small,
    quiet count on the Activity tab inside the drawer, so a chat's red count stands out beside it. */
-:root.phone-layout[data-ui="modern"] #local-chat-dock .social-tab[data-social-tab="activity"] .social-badge {
+:root.phone-layout[data-ui="modern"] #local-chat-dock .sd-tab[data-social-tab="activity"] .social-badge {
   min-width: 12px; height: 12px; padding: 0 3px; font-size: var(--fs-2xs); font-weight: var(--fw-bold);
   background: var(--surface-sunken); color: var(--text-muted); box-shadow: 0 0 0 1px var(--border);
 }

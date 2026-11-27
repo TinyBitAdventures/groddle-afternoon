@@ -865,7 +865,7 @@ export function mountSocialDrawer({
         type: 'button',
         role: 'tab',
         id: `social-tab-${id.replace(/[^\w-]/g, '-')}`,
-        class: chats ? 'social-tab is-chats' : 'social-tab',
+        class: chats ? 'sd-tab is-chats' : 'sd-tab',
         'aria-selected': String(id === sel),
         'aria-controls': 'social-view',
         tabindex: id === sel ? '0' : '-1',
@@ -1101,7 +1101,7 @@ export function mountSocialDrawer({
     linkifyTextNodes(body, { doc: document });
     const meta = el('div', { class: 'social-act-when' });
     meta.append(el('time', {}, clockLabel(e.at)));
-    if (e.count > 1) meta.append(el('span', { class: 'social-count' }, `×${e.count}`));
+    if (e.count > 1) meta.append(el('span', { class: 'sd-count' }, `×${e.count}`));
     row.append(body, meta);
     return row;
   }

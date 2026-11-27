@@ -265,7 +265,7 @@ describe('G1230 (#595): the Social pill counts chat and IMs, not the Activity lo
     assert.match(game, /pill\?\.setBadge\(socialDrawer \? socialPillCount\(socialDrawer\.tabs, \(id\) => socialDrawer\.unread\(id\)\) : 0\)/);
   });
   it('the Activity tab keeps its own small count inside the drawer', () => {
-    assert.match(css, /#local-chat-dock \.social-tab\[data-social-tab="activity"\] \.social-badge \{\n  min-width: 12px; height: 12px;/);
+    assert.match(css, /#local-chat-dock \.sd-tab\[data-social-tab="activity"\] \.social-badge \{\n  min-width: 12px; height: 12px;/);
     // The drawer draws a count on every tab that is not showing (js/ui/social-drawer.js renderTabs).
     assert.match(read('public/js/ui/social-drawer.js'), /if \(n\) b\.append\(el\('span', \{ class: 'social-badge', 'aria-hidden': 'true' \}, badgeText\(n\)\)\);/);
   });

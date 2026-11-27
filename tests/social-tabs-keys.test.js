@@ -70,6 +70,6 @@ describe('ticket 37: the chat tabs and the arrow keys', () => {
   });
 
   it('the row shows a ring while a tab has the keyboard', () => {
-    assert.match(read('public/style.css'), /\.social-tabs:has\(\.social-tab:focus-visible\) \{ box-shadow: inset 0 0 0 2px var\(--accent\);/);
+    assert.match(read('public/style.css'), /\.social-tabs:has\(\.sd-tab:focus-visible\) \{ box-shadow: inset 0 0 0 2px var\(--accent\);/);
   });
 });

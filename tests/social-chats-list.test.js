@@ -331,9 +331,9 @@ describe('the Chats list: in the drawer', () => {
     const css = read('public/style.css');
     assert.match(css, /\.social-tabs \{[^}]*overflow: hidden;/);
     assert.doesNotMatch(css, /\.social-tabs \{[^}]*overflow-x: auto/);
-    assert.match(css, /\.social-drawer \.social-tab \{[^}]*flex: 1 1 auto;[^}]*min-width: 0;/);
-    assert.match(css, /\.social-tab\.is-chats \{ flex: 0 0 auto;/);
-    assert.match(css, /\.social-tabs\.is-tight \.social-tab:not\(\.is-chats\) \.social-badge \{[^}]*font-size: 0;/, 'counts become dots when tight');
+    assert.match(css, /\.social-drawer \.sd-tab \{[^}]*flex: 1 1 auto;[^}]*min-width: 0;/);
+    assert.match(css, /\.sd-tab\.is-chats \{ flex: 0 0 auto;/);
+    assert.match(css, /\.social-tabs\.is-tight \.sd-tab:not\(\.is-chats\) \.social-badge \{[^}]*font-size: 0;/, 'counts become dots when tight');
     for (const sel of ['.social-chat-row', '.social-chat-sec-title', '.social-conv-head', '.social-back']) assert.ok(css.includes(`${sel} {`), sel);
   });
 });

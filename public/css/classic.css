@@ -939,8 +939,8 @@
 :root[data-ui="classic"] .social-drawer[data-social-mode="solo"] .social-title { font-size: 0; }
 :root[data-ui="classic"] .social-drawer[data-social-mode="solo"] .social-title::before { content: "Local Chat / Activity"; font-size: var(--fs-classic-pane); }
 :root[data-ui="classic"] .social-drawer .social-tabs { margin: 0 calc(12 * var(--cu)); padding: 0; border-bottom: 1px solid var(--c-classic-title-rule); }
-:root[data-ui="classic"] .social-drawer .social-tab { color: var(--c-classic-tab-off); font: 800 var(--fs-classic-body)/var(--lh-normal) var(--font-classic-title); border-radius: 0; }
-:root[data-ui="classic"] .social-drawer .social-tab[aria-selected="true"] { color: var(--c-classic-title); box-shadow: inset 0 -2px 0 var(--c-classic-link); }
+:root[data-ui="classic"] .social-drawer .sd-tab { color: var(--c-classic-tab-off); font: 800 var(--fs-classic-body)/var(--lh-normal) var(--font-classic-title); border-radius: 0; }
+:root[data-ui="classic"] .social-drawer .sd-tab[aria-selected="true"] { color: var(--c-classic-title); box-shadow: inset 0 -2px 0 var(--c-classic-link); }
 :root[data-ui="classic"] .social-drawer .social-log {
   padding: calc(6 * var(--cu)) calc(12 * var(--cu));
   gap: calc(4 * var(--cu));
@@ -958,7 +958,7 @@
 }
 :root[data-ui="classic"] .social-drawer .social-act[data-kind="gain"] { border-left-color: var(--c-classic-slug-gain); }
 :root[data-ui="classic"] .social-drawer .social-act-when time { display: none; }
-:root[data-ui="classic"] .social-drawer .social-count { background: none; color: var(--c-classic-offline); }
+:root[data-ui="classic"] .social-drawer .sd-count { background: none; color: var(--c-classic-offline); }
 :root[data-ui="classic"] .social-drawer .social-msg b { color: var(--c-classic-link); }
 :root[data-ui="classic"] .social-drawer .social-msg.is-mine b { color: var(--c-classic-you); }
 :root[data-ui="classic"] .social-drawer .social-empty,
