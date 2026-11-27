@@ -39,7 +39,7 @@ import {
   legalizeReloadLocation,
   legalizeWayBack,
 } from '../public/js/legalize-it.js?v=53865df2';
-import { closeQuestRoomConverse } from '../public/js/features/quest-instances-feature.js?v=f33540fb';
+import { closeQuestRoomConverse } from '../public/js/features/quest-instances-feature.js?v=a5cd4f8a';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const game = fs.readFileSync(path.join(root, 'public/game.js'), 'utf8');

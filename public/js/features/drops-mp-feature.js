@@ -76,6 +76,12 @@ export const DROPS_MP_FEATURE_ID = 'drops-mp';
 const TABLE_URL = 'assets/content/trade-items.json';
 const SYNC_EVERY_MS = 60000;
 const WAIT_MS = 15000;
+/** G1327: homes_unexpand's one shift (inc_homes.js:170), and how a shift refused as busy is asked again. */
+const SHIFT_DX = 150;
+const SHIFT_TRIES = 10;
+const SHIFT_AGAIN_MS = 1000;
+/** drops_shift.go waits up to 10 s for drops on their way, then up to 5 minutes on the site. */
+const SHIFT_WAIT_MS = 6 * 60 * 1000;
 /**
  * #733 (Austin's ruling 2026-11-27): states where the window waits on Play here (js/online-request.js
  * PLAY_HERE_STATES). The floor last seen stays drawn, not interactive, until Play here; Glitch asked
@@ -124,6 +130,9 @@ function createSession(engine, client) {
   let moving = null;
   let lastLine = '';
   let lastEaten = '';
+  // G1327: un-expands told to the server (drops.go ground_shift), one at a time, and how the last one went.
+  const shifts = [];
+  let shiftLast = '';
   let syncing = false;
   let syncedAt = 0;
   let refN = 0;
@@ -162,6 +171,7 @@ function createSession(engine, client) {
     engine.setData?.('dropLast', lastLine);
     engine.setData?.('dropEaten', lastEaten);
     engine.setData?.('dropPending', String(pending.filter((q) => !q.done).length));
+    engine.setData?.('dropShift', shiftLast);
   }
 
   /** The pack's view of what the drops shown take out of it ({ class: n }), or null. */
@@ -521,6 +531,22 @@ function createSession(engine, client) {
     apply(String(msg.op || ''), 'dropped', it ? { c: it.c, n: it.n } : s ? { c: s.classTsid, n: s.count } : d ? { c: d.c, n: d.n } : null, shown(s || joined), d?.copy ?? null, null, { sounded: Boolean(q) });
     pendingChanged();
     pump();
+  });
+
+  // G1327: the server's word on an un-expand's shift (drops_shift.go); the stacks moved come as ground_state.
+  // Busy (one still waiting there): asked again shortly. Any other refusal leaves them where they were, as before.
+  client.on('msg:ground_shifted', (msg) => {
+    const q = shifts[0];
+    if (!q?.sent) return;
+    if (msg.status !== 'settled' && msg.why === 'busy' && q.tries < SHIFT_TRIES) {
+      q.sent = false;
+      q.at = Date.now() + SHIFT_AGAIN_MS;
+    } else {
+      shifts.shift();
+      shiftLast = msg.status === 'settled' ? `settled:${Number(msg.n) || 0}` : `refused:${String(msg.why || '')}`;
+    }
+    publish();
+    sendShift();
   });
 
   // The owner's floor move settled or was refused (drops.go moveFrame); where it went comes as ground_added.
@@ -915,6 +941,37 @@ function createSession(engine, client) {
     return { ok: true };
   }
 
+  /**
+   * G1327: the owner un-expanded the house or the Tower floor they stand on (homes-feature unexpandHouse):
+   * homes_unexpand moved every item in the last 300 px 150 px left (inc_homes.js 166-172), so the server
+   * moves the shared stacks there (every floor of the house, or that Tower floor) as the save's own moved.
+   * `from`: the room x the moved stretch starts at. Only online, at the owner's own house or Tower floor.
+   */
+  function shift(from, dx) {
+    const p = here();
+    if (!p?.ownHome || !isFloorPlace(p.street) || !Number.isFinite(Number(from)) || Number(dx) !== -SHIFT_DX) return false;
+    shifts.push({ street: p.street, from: Math.max(0, Math.round(Number(from))), dx: -SHIFT_DX, sent: false, tries: 0, at: 0 });
+    sendShift();
+    return true;
+  }
+
+  /** The first shift waiting goes to the server, on the floor it was made on. */
+  function sendShift(now = Date.now()) {
+    const q = shifts[0];
+    if (!q || q.sent || now < q.at || client.state !== 'online') return;
+    if (client.street !== q.street && homePlaceOf(client.street)?.owner !== homePlaceOf(q.street)?.owner) {
+      // Left the home before it went: the stacks stay where they were, as before.
+      shifts.shift();
+      shiftLast = 'left';
+      publish();
+      sendShift(now);
+      return;
+    }
+    q.sent = client.send('ground_shift', { from: q.from, dx: q.dx });
+    q.tries += 1;
+    q.at = now;
+  }
+
   /** Whether a pack stack of this class would be dropped for everyone here now. */
   function wouldShare(classTsid) {
     const p = here();
@@ -973,7 +1030,17 @@ function createSession(engine, client) {
     fits,
     here,
     sync,
+    shift,
+    get shifts() { return shifts.map((q) => ({ ...q })); },
     tick(now) {
+      // G1327: a shift waiting to be asked again (refused busy: not applied). One sent is never sent again (the
+      // server may have applied it): with no answer in time it is given up, the next one goes.
+      if (shifts[0]?.sent && now - shifts[0].at >= SHIFT_WAIT_MS) {
+        shifts.shift();
+        shiftLast = 'no-answer';
+        publish();
+      }
+      if (shifts[0] && !shifts[0].sent) sendShift(now);
       // A street change empties the list until the server's ground_state for the new one (#733: not
       // while the window waits on Play here, whose client has left every street).
       if (street && !frozen && street !== client.street) {
@@ -1059,6 +1126,12 @@ export const dropsMpFeature = {
   claimSharedStack(id, to, engine) {
     if (!multiplayer || !session || engine?.mode !== 'multiplayer') return null;
     return session.claim(id, to);
+  },
+
+  /** G1327 (homes-feature unexpandHouse): the house or Tower floor was un-expanded; the shared stacks from `from` (room x) move by dx. */
+  homeStacksShifted(shift, engine) {
+    if (!multiplayer || !session || engine?.mode !== 'multiplayer') return null;
+    return session.shift(shift?.from, shift?.dx) ? true : null;
   },
 
   /** homes-feature Decoration Mode: the owner moved a shared stack along their floor; it stays shared (drops.go moveFrame). */

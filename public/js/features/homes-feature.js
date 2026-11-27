@@ -150,6 +150,7 @@ import {
   quoteInteriorExpansion,
   quoteInteriorUnexpand,
   renderOrder,
+  SEGMENT_W,
   restackFurniture,
   setHomeTexture,
   snapPlacement,
@@ -537,6 +538,22 @@ export function shiftInteriorRows(rows, dx) {
   for (const row of rows) {
     const x = Number(row?.x);
     if (!Number.isFinite(x)) continue;
+    row.x = Math.round(x + dx);
+    moved += 1;
+  }
+  return moved;
+}
+
+/**
+ * G1327 (homes_unexpand 166-172): rows at x `from` or right of it move by `dx`. Pure; returns how
+ * many moved.
+ */
+export function shiftRowsFrom(rows, from, dx) {
+  if (!Array.isArray(rows) || !dx || !Number.isFinite(from)) return 0;
+  let moved = 0;
+  for (const row of rows) {
+    const x = Number(row?.x);
+    if (!Number.isFinite(x) || x < from) continue;
     row.x = Math.round(x + dx);
     moved += 1;
   }
@@ -5458,6 +5475,27 @@ function refundList(items) {
   return parts.length > 1 ? `${parts.slice(0, -1).join(', ')} and ${parts[parts.length - 1]}` : parts.join('');
 }
 
+/**
+ * G1327: what lies on the ground in the last 300 px moves 150 px left with the furniture
+ * (inc_homes.js homes_unexpand 166-172 moved every item in the location, the stacks too): the
+ * save's own stacks on every floor of the house (or on the Tower floor stood on) here, and the
+ * shared ones (drops.go) through the server, which moves them on its floors in one go. `edge`: the
+ * room x the stretch starts at. A server or a game from before leaves the shared ones where they
+ * were (the floor's lowest line still holds them up, walk-surface.js underFloorRestY).
+ */
+function shiftUnexpandedStacks(engine, edge) {
+  if (!Number.isFinite(edge)) return 0;
+  const places = inTower()
+    ? [[towerDropTsid(scene.tower), 0]]
+    : [[HOME_INTERIOR_TSID, savedHouseX ?? houseX0()], ...floors.upper.map((_, i) => [`${HOUSE_FLOOR_DROP_PREFIX}${i + 1}`, 0])];
+  let moved = 0;
+  for (const [tsid, x0] of places) moved += shiftRowsFrom(ownGroundRows(engine, tsid), x0 + edge, -SEGMENT_W);
+  if (moved) engine.droppedItemsChanged?.();
+  engine.query?.('homeStacksShifted', { from: edge, dx: -SEGMENT_W }, engine);
+  engine.setData('homeUnexpandStacks', String(moved));
+  return moved;
+}
+
 /** DecorateToolbarUI Un-expand -> HouseExpandDialog -> its confirm dialog -> houses_unexpand. */
 function confirmUnexpand(engine) {
   const quote = inTower() ? quoteInteriorUnexpand(decor) : quoteHouseUnexpand(floors, houseDecor);
@@ -5488,6 +5526,7 @@ function unexpandHouse(engine) {
   // homes_unexpand moves players standing in the last 300 px over too.
   const p = engine.player;
   if (p && scene?.room === 'interior' && scene.tower == null && p.x - roomX0() >= result.edge) p.x -= 150;
+  shiftUnexpandedStacks(engine, result.edge);
   engine.pushActivity(`You un-expanded your house. Refunded: ${refundList(result.items)}.`);
   engine.refreshPack();
   engine.save();
