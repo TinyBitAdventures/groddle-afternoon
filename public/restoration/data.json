@@ -2814,9 +2814,29 @@
   "deployed": "2026-11-26"
  },
  "git": {
-  "commits": 3784,
+  "commits": 3792,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-27",
+    "kind": "improve",
+    "text": "Decoration Mode scrolls into the back yard to pick up and move what lies there, and a pack stack held at the view's edge scrolls the room"
+   },
+   {
+    "date": "2026-11-27",
+    "kind": "fix",
+    "text": "In Classic the back yard's ground shows over the pack panel, and in Decoration and Cultivation Mode over their tray"
+   },
+   {
+    "date": "2026-11-27",
+    "kind": "fix",
+    "text": "On an iPhone a Cultivate tile dragged by a finger keeps going after the tray redraws"
+   },
+   {
+    "date": "2026-11-27",
+    "kind": "fix",
+    "text": "A cultivation set against the house in the back yard says to keep the way in clear, not to expand the yard"
+   },
    {
     "date": "2026-11-27",
     "kind": "fix",
@@ -2916,26 +2936,6 @@
     "date": "2026-11-26",
     "kind": "fix",
     "text": "The Hi sign leaderboard, the Calendar, Gifts, Trade and storage windows stay below an upright iPhone's clock and camera"
-   },
-   {
-    "date": "2026-11-26",
-    "kind": "fix",
-    "text": "The Bureaucratic Hall has its eight waiting chairs, and its signs, TV, lights and glass doors hang where the original had them"
-   },
-   {
-    "date": "2026-11-26",
-    "kind": "improve",
-    "text": "The street Ball flies by the street's gravity, so on Plexus it floats far"
-   },
-   {
-    "date": "2026-11-26",
-    "kind": "fix",
-    "text": "The map's region button is now \"Go to my location\", an action that never stays lit"
-   },
-   {
-    "date": "2026-11-26",
-    "kind": "fix",
-    "text": "A Jellisac Super Harvest shows the Super Harvest rainbow and plays its sound"
    }
   ]
  },
