@@ -2814,9 +2814,69 @@
   "deployed": "2026-11-26"
  },
  "git": {
-  "commits": 3739,
+  "commits": 3753,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-26",
+    "kind": "fix",
+    "text": "The Bureaucratic Hall has its eight waiting chairs, and its signs, TV, lights and glass doors hang where the original had them"
+   },
+   {
+    "date": "2026-11-26",
+    "kind": "improve",
+    "text": "The street Ball flies by the street's gravity, so on Plexus it floats far"
+   },
+   {
+    "date": "2026-11-26",
+    "kind": "fix",
+    "text": "The map's region button is now \"Go to my location\", an action that never stays lit"
+   },
+   {
+    "date": "2026-11-26",
+    "kind": "fix",
+    "text": "A Jellisac Super Harvest shows the Super Harvest rainbow and plays its sound"
+   },
+   {
+    "date": "2026-11-26",
+    "kind": "fix",
+    "text": "Whole street fits the phone's street band, and opening the Menu keeps the zoom you chose"
+   },
+   {
+    "date": "2026-11-26",
+    "kind": "fix",
+    "text": "Sideways, Quests, Social and the Menu stay clear of the camera cut-out, with no dark room beside them"
+   },
+   {
+    "date": "2026-11-26",
+    "kind": "new",
+    "text": "Older reports at the end of your Reports list loads the reports past the first 200"
+   },
+   {
+    "date": "2026-11-26",
+    "kind": "fix",
+    "text": "The Bureaucratic Hall's lizards call you by your name online, not \"Ur\""
+   },
+   {
+    "date": "2026-11-26",
+    "kind": "fix",
+    "text": "You stand on the floor of the Bureaucratic Hall and other built rooms again"
+   },
+   {
+    "date": "2026-11-26",
+    "kind": "fix",
+    "text": "A street's Notice Board keeps its pinned notes while the window waits on Play here"
+   },
+   {
+    "date": "2026-11-26",
+    "kind": "fix",
+    "text": "A window asleep after a long sleep keeps showing your house floor until Play here"
+   },
+   {
+    "date": "2026-11-26",
+    "kind": "new",
+    "text": "Walking onto a crack or Manhole rug on an upper floor of your house drops you to the floor below"
+   },
    {
     "date": "2026-11-26",
     "kind": "fix",
@@ -2876,69 +2936,9 @@
     "date": "2026-11-26",
     "kind": "improve",
     "text": "on a phone the Menu shows Social right after Now"
-   },
-   {
-    "date": "2026-11-26",
-    "kind": "fix",
-    "text": "a window that slept shows \"Play here\" instead of taking your character back"
-   },
-   {
-    "date": "2026-11-26",
-    "kind": "fix",
-    "text": "A failed trip out of a Group Hall no longer pulls you to the lot on a later visit"
-   },
-   {
-    "date": "2026-11-26",
-    "kind": "fix",
-    "text": "The Group Hall's hut ladder is drawn with placed wood ladder tiles, not a tiling"
-   },
-   {
-    "date": "2026-11-26",
-    "kind": "fix",
-    "text": "The Group Hall street registers above the pinned last features"
-   },
-   {
-    "date": "2026-11-26",
-    "kind": "fix",
-    "text": "The signpost's in-reach glow takes the street's colour, grey in Brillah"
-   },
-   {
-    "date": "2026-11-26",
-    "kind": "fix",
-    "text": "On a computer the mouse-over glow shows only on things in reach"
-   },
-   {
-    "date": "2026-11-26",
-    "kind": "fix",
-    "text": "Progress Way's spirit pan and Intate Treats' cave-in hint work again"
-   },
-   {
-    "date": "2026-11-26",
-    "kind": "new",
-    "text": "Archimedes Acres's Group Hall has its own street, and its group's members go in from the hall's lot"
-   },
-   {
-    "date": "2026-11-26",
-    "kind": "fix",
-    "text": "A drink at the Thanksgiving feast offers Drink, and drinking it works"
-   },
-   {
-    "date": "2026-11-26",
-    "kind": "fix",
-    "text": "The street map shows no portal button for a secret teleporter or a jump puzzle"
-   },
-   {
-    "date": "2026-11-26",
-    "kind": "new",
-    "text": "Walk-in teleporters show as portal buttons on the street map"
-   },
-   {
-    "date": "2026-11-26",
-    "kind": "new",
-    "text": "Street map door buttons show a dino, a portal or a door"
    }
   ]
  },
- "tests": 1447,
+ "tests": 1456,
  "generatedAt": "2026-11-26"
 }
