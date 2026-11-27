@@ -2789,22 +2789,24 @@
  },
  "rock_metal_1": {
   "lines": [
-   "Mine it with a Pick or Fancy Pick (you need Mining I) for 3 to 9 Chunks of Metal Rock a swing.",
+   "Mine it with a working Fancy Pick (a plain Pick won't do; you need Mining I) for 3 to 9 Chunks of Metal Rock a swing.",
    "It holds 50 chunks, then crumbles and reforms a little later."
   ],
   "evidence": [
-   "public/content.js:910-948 mine verb (working Pick, Mining I) and inspect on ROCK_CATALOG rocks",
+   "public/content.js:910-948 mine verb (working Fancy Pick for metal_rock, Mining I) and inspect on ROCK_CATALOG rocks",
+   "public/js/mining.js:342 FANCY_PICK_ROCK takes only fancy_pick; 439-440 the verb check (rock_metal_1.js 198-202)",
    "public/js/mining.js:47-110 ROCK_CATALOG rock_metal_1 chunkLabel, minChunks 3, maxChunks 9, chunksMax 50; 300-420 mineRock (addItem chunkId, respawn 45 s, mega roll)",
    "public/js/imagination-effects.js:394-400 MEGA_ROCK_CHANCE metal_rock 0, MEGA_ROCK_CHUNKS 150"
   ]
  },
  "rock_metal_2": {
   "lines": [
-   "Mine it with a Pick or Fancy Pick (you need Mining I) for 3 to 9 Chunks of Metal Rock a swing.",
+   "Mine it with a working Fancy Pick (a plain Pick won't do; you need Mining I) for 3 to 9 Chunks of Metal Rock a swing.",
    "It holds 50 chunks, then crumbles and reforms a little later."
   ],
   "evidence": [
-   "public/content.js:910-948 mine verb (working Pick, Mining I) and inspect on ROCK_CATALOG rocks",
+   "public/content.js:910-948 mine verb (working Fancy Pick for metal_rock, Mining I) and inspect on ROCK_CATALOG rocks",
+   "public/js/mining.js:342 FANCY_PICK_ROCK takes only fancy_pick; 439-440 the verb check (rock_metal_1.js 198-202)",
    "public/js/mining.js:47-110 ROCK_CATALOG rock_metal_1 chunkLabel, minChunks 3, maxChunks 9, chunksMax 50; 300-420 mineRock (addItem chunkId, respawn 45 s, mega roll)",
    "public/js/imagination-effects.js:394-400 MEGA_ROCK_CHANCE metal_rock 0, MEGA_ROCK_CHUNKS 150",
    "tools/inventory/detectors.mjs:439-450 art variant rock_metal_2 runs as rock_metal_1 (proxy_item)"
@@ -2812,11 +2814,12 @@
  },
  "rock_metal_3": {
   "lines": [
-   "Mine it with a Pick or Fancy Pick (you need Mining I) for 3 to 9 Chunks of Metal Rock a swing.",
+   "Mine it with a working Fancy Pick (a plain Pick won't do; you need Mining I) for 3 to 9 Chunks of Metal Rock a swing.",
    "It holds 50 chunks, then crumbles and reforms a little later."
   ],
   "evidence": [
-   "public/content.js:910-948 mine verb (working Pick, Mining I) and inspect on ROCK_CATALOG rocks",
+   "public/content.js:910-948 mine verb (working Fancy Pick for metal_rock, Mining I) and inspect on ROCK_CATALOG rocks",
+   "public/js/mining.js:342 FANCY_PICK_ROCK takes only fancy_pick; 439-440 the verb check (rock_metal_1.js 198-202)",
    "public/js/mining.js:47-110 ROCK_CATALOG rock_metal_1 chunkLabel, minChunks 3, maxChunks 9, chunksMax 50; 300-420 mineRock (addItem chunkId, respawn 45 s, mega roll)",
    "public/js/imagination-effects.js:394-400 MEGA_ROCK_CHANCE metal_rock 0, MEGA_ROCK_CHUNKS 150",
    "tools/inventory/detectors.mjs:439-450 art variant rock_metal_3 runs as rock_metal_1 (proxy_item)"
