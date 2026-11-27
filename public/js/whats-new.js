@@ -1,5 +1,5 @@
 /**
- * What's new (#745, Austin 2026-11-27, option 3): after an update the loading card shows what
+ * What's new (#745, Austin 2026-11-27, option 3): on every load the loading card shows what
  * changed, a few short lines under the progress bar, while the game loads. Ours: Glitch had nothing
  * like it (only its "Reload is Coming" debuff before a deploy).
  *
@@ -8,7 +8,8 @@
  * - This browser remembers the newest version it loaded and when (localStorage, SEEN_KEY). On a load
  *   with a newer one, the card shows the top SHOW_LINES lines: across every release since the last
  *   visit when that visit was within ROLL_UP_MS, else the newest release's alone.
- * - A first visit shows nothing (a new player needs no changelog) and only remembers the version.
+ * - Every other load (a first visit, or the same version again) shows the newest release's top
+ *   SHOW_LINES lines ("New in vX.Y"): Austin 2026-11-27, always show the latest.
  * - Nothing waits for it: on a fast load the card may be gone before the lines arrive.
  *
  * - The card's "See all notes" asks for the What's new window (js/ui/whats-new-window.js), which opens
@@ -97,17 +98,18 @@ export function releasesOf(data) {
 }
 
 /**
- * PURE: what the card shows on this load, or null. `seen` is what this browser stored ({ version, at })
- * or null on a first visit.
+ * PURE: what the card shows on this load (null only with no release to show). `seen` is what this
+ * browser stored ({ version, at }) or null on a first visit.
  */
 export function whatsNewFor(data, seen, now = Date.now()) {
   const releases = releasesOf(data);
   const newest = releases[0];
-  if (!newest || !seen || typeof seen !== 'object') return null;
-  const last = String(seen.version || '');
-  if (VERSION.test(last) && compareVersions(newest.version, last) <= 0) return null;
-  const at = Number(seen.at);
-  const recent = VERSION.test(last) && Number.isFinite(at) && at <= now && now - at <= ROLL_UP_MS;
+  if (!newest) return null;
+  const last = seen && typeof seen === 'object' ? String(seen.version || '') : '';
+  // Austin 2026-11-27: always show the latest. Only an update since a recent visit rolls up.
+  const updated = VERSION.test(last) && compareVersions(newest.version, last) > 0;
+  const at = Number(seen?.at);
+  const recent = updated && Number.isFinite(at) && at <= now && now - at <= ROLL_UP_MS;
   const pick = recent ? releases.filter((r) => compareVersions(r.version, last) > 0) : [newest];
   const shown = [];
   for (const r of pick) for (const text of r.lines) if (shown.length < SHOW_LINES) shown.push({ text, version: r.version });
@@ -176,7 +178,7 @@ function writeSeen(storage, value) {
   try {
     storage?.setItem(SEEN_KEY, JSON.stringify(value));
   } catch {
-    /* private window or storage off: the next load is a first visit again, which shows nothing */
+    /* private window or storage off: the next load is a first visit again, which shows the newest release */
   }
 }
 

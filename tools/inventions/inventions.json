@@ -6623,7 +6623,7 @@
   },
   {
    "id": "whats-new-loading-card",
-   "title": "What's new: the loading card's top three lines after an update, and a What's new window from the Menu with every version's highlights",
+   "title": "What's new: the loading card's top three lines on every load, and a What's new window from the Menu with every version's highlights",
    "kind": "UI",
    "status": "kept",
    "where": [
@@ -6644,8 +6644,8 @@
      "symbol": "withBackfill"
     }
    ],
-   "why": "Glitch told players nothing about an update beyond its Reload is Coming debuff before a deploy. Ours: play/whats-new.json lists each release's few player-facing lines (written at release from the Emoji-Log draft), and a browser that last loaded an older version sees the top three on the loading card, rolled up across every release since a visit within a week, else the newest release only; a first visit shows nothing. Nothing waits for it, so a fast load can hide it. Also ours: the What's new window (the mockup's centred card), opened only from the Menu's What's new row (World, after Encyclopedia) or the loading card's See all notes (queued until the game is ready), never by itself; it shows the newest release's highlights and an All versions list of every release since v0.1.0, each opening to its highlights, read from play/whats-new-all.json (backfilled from the published release notes by tools/release/whats-new.mjs --backfill, then edited by hand).",
-   "ruling": "Austin 2026-11-27 (#745): option 3, the notes on the loading card, not a centred card or a corner notice; then the centred card as a window too, never opened automatically, a Menu link, See all notes kept in the game as a list of versions, and every earlier version's highlights backfilled",
+   "why": "Glitch told players nothing about an update beyond its Reload is Coming debuff before a deploy. Ours: play/whats-new.json lists each release's few player-facing lines (written at release from the Emoji-Log draft), and the loading card shows the top three on every load: the newest release's on a first visit or the same version again (Austin 2026-11-27: always show the latest), and after an update rolled up across every release since a visit within a week, else the newest release only. Nothing waits for it, so a fast load can hide it. Also ours: the What's new window (the mockup's centred card), opened only from the Menu's What's new row (World, after Encyclopedia) or the loading card's See all notes (queued until the game is ready), never by itself; it shows the newest release's highlights and an All versions list of every release since v0.1.0, each opening to its highlights, read from play/whats-new-all.json (backfilled from the published release notes by tools/release/whats-new.mjs --backfill, then edited by hand).",
+   "ruling": "Austin 2026-11-27 (#745): option 3, the notes on the loading card, not a centred card or a corner notice; then the centred card as a window too, never opened automatically, a Menu link, See all notes kept in the game as a list of versions, and every earlier version's highlights backfilled; then the loading card's lines on every load, always the latest",
    "rows": []
   },
   {

@@ -1,8 +1,9 @@
 /**
- * #745 (Austin 2026-11-27, option 3): after an update the loading card shows what changed, the top
- * three lines from play/whats-new.json, while the game loads. Rolled up across every release since
- * the last visit when that was within a week, else the newest release alone; nothing on a first
- * visit. Ours: Glitch had nothing like it.
+ * #745 (Austin 2026-11-27, option 3): the loading card shows what changed, the top three lines from
+ * play/whats-new.json, while the game loads. After an update rolled up across every release since
+ * the last visit when that was within a week, else the newest release alone; on every other load
+ * (a first visit, the same version again) the newest release (Austin 2026-11-27: always show the
+ * latest). Ours: Glitch had nothing like it.
  * Then (Austin 2026-11-27, "the popup style ... I just don't want to automatically open that for
  * folks"): the What's new window (js/ui/whats-new-window.js), opened only from the Menu or the loading
  * card's "See all notes", with an All versions list of every release (play/whats-new-all.json,
@@ -71,13 +72,15 @@ function fakeStorage(init = {}) {
 const fetchOf = (data, seen = []) => async (url) => { seen.push(url); return { ok: true, json: async () => data }; };
 
 describe('#745: What\'s new on the loading card', () => {
-  it('a first visit shows nothing, and only remembers the version', async () => {
+  it('a first visit shows the newest release, and remembers the version (Austin 2026-11-27: always show the latest)', async () => {
     const doc = fakeDoc();
     const storage = fakeStorage();
     const urls = [];
-    assert.equal(await startWhatsNew(doc, { fetch: fetchOf(FILE, urls), storage, now: () => NOW }), null);
+    const shown = await startWhatsNew(doc, { fetch: fetchOf(FILE, urls), storage, now: () => NOW });
+    assert.deepEqual(shown, { title: 'New in v0.80', lines: ['Eighty one.', 'Eighty two.'], version: 'v0.80.0' });
     assert.equal(urls[0], `https://groddle.test/${WHATS_NEW_PATH}`);
-    assert.equal(doc.card.children.length, 0);
+    assert.equal(doc.card.children.length, 1);
+    assert.equal(doc.card.children[0].children[2].textContent, 'See all notes');
     assert.deepEqual(JSON.parse(storage.map.get(SEEN_KEY)), { version: 'v0.80.0', at: NOW });
   });
 
@@ -102,10 +105,10 @@ describe('#745: What\'s new on the loading card', () => {
     assert.equal(more.disabled, true);
     assert.equal(more.textContent, 'The notes open once the game is ready.');
     assert.deepEqual(JSON.parse(storage.map.get(SEEN_KEY)), { version: 'v0.80.0', at: NOW });
-    // The next load of the same version shows nothing.
+    // The next load of the same version shows the newest release again.
     const again = fakeDoc();
-    assert.equal(await startWhatsNew(again, { fetch: fetchOf(FILE), storage, now: () => NOW + 1000 }), null);
-    assert.equal(again.card.children.length, 0);
+    assert.deepEqual(await startWhatsNew(again, { fetch: fetchOf(FILE), storage, now: () => NOW + 1000 }), shown);
+    assert.equal(again.card.children.length, 1);
   });
 
   it('within a week it rolls up every release since, the top three, newest first', () => {
@@ -120,22 +123,26 @@ describe('#745: What\'s new on the loading card', () => {
     assert.deepEqual(shown, { title: 'New in v0.80', lines: ['Eighty one.', 'Eighty two.'], version: 'v0.80.0' });
   });
 
-  it('nothing for the same or a newer stored version; a stored version is never moved back', () => {
-    assert.equal(whatsNewFor(FILE, { version: 'v0.80.0', at: NOW }, NOW), null);
-    assert.equal(whatsNewFor(FILE, { version: 'v0.81.0', at: NOW }, NOW), null);
-    assert.equal(whatsNewFor(FILE, null, NOW), null);
+  it('the same or a newer stored version, or none, shows the newest release; a stored version is never moved back', () => {
+    const latest = { title: 'New in v0.80', lines: ['Eighty one.', 'Eighty two.'], version: 'v0.80.0' };
+    assert.deepEqual(whatsNewFor(FILE, { version: 'v0.80.0', at: NOW }, NOW), latest);
+    assert.deepEqual(whatsNewFor(FILE, { version: 'v0.80.0', at: NOW - 6 * DAY }, NOW), latest, 'no roll-up without an update');
+    assert.deepEqual(whatsNewFor(FILE, { version: 'v0.81.0', at: NOW }, NOW), latest);
+    assert.deepEqual(whatsNewFor(FILE, null, NOW), latest);
+    assert.equal(whatsNewFor({ format: 'groddle-whats-new/1', releases: [] }, null, NOW), null, 'nothing to show');
     assert.equal(nextSeen(FILE, { version: 'v0.81.0', at: 1 }, NOW).version, 'v0.81.0');
     assert.equal(compareVersions('v0.79.10', 'v0.79.9') > 0, true);
     // A stored value that makes no sense is treated as a long absence: the newest release only.
     assert.equal(whatsNewFor(FILE, { version: 'nonsense', at: NOW }, NOW).title, 'New in v0.80');
   });
 
-  it('a failed fetch or blocked storage changes nothing and never throws', async () => {
+  it('a failed fetch changes nothing; blocked storage is a first visit; neither throws', async () => {
     const doc = fakeDoc();
     assert.equal(await startWhatsNew(doc, { fetch: async () => { throw new Error('offline'); }, storage: fakeStorage(), now: () => NOW }), null);
-    const blocked = { getItem() { throw new Error('denied'); }, setItem() { throw new Error('denied'); } };
-    assert.equal(await startWhatsNew(doc, { fetch: fetchOf(FILE), storage: blocked, now: () => NOW }), null);
     assert.equal(doc.card.children.length, 0);
+    const blocked = { getItem() { throw new Error('denied'); }, setItem() { throw new Error('denied'); } };
+    assert.equal((await startWhatsNew(doc, { fetch: fetchOf(FILE), storage: blocked, now: () => NOW }))?.title, 'New in v0.80');
+    assert.equal(doc.card.children.length, 1);
   });
 
   it('the committed files are valid, agree, and not behind the newest tag (--check)', () => {

@@ -10,8 +10,8 @@
  * same instance and calls bootStep() as main() goes. Nothing here is needed for the game to run: with
  * no card on the page, or no PerformanceObserver, every call does nothing.
  *
- * #745: it also starts What's new (js/whats-new.js), the lines about the update the card shows after
- * one, so they come up as early as the card does.
+ * #745: it also starts What's new (js/whats-new.js), the newest update's lines the card shows on every
+ * load, so they come up as early as the card does.
  */
 import { startWhatsNew } from './whats-new.js?v=c410d2ba';
 
