@@ -111,6 +111,7 @@ import { createCountChooser } from '../ui/count-chooser.js?v=75f69512';
 import { createTilePainter } from '../ui/style-tile-paint.js?v=d0e1312b';
 import { isBagClass } from '../pack-slots.js?v=38e4aea5';
 import { registerDropTarget } from '../drop-targets.js?v=59e6edb4';
+import { showWorldDropTip } from './world-drop-feature.js?v=707fc5a0';
 import { DRAG_TAKE_SOON_MS, draggedCount, draggedStack, markDragged, takeDragged } from '../drag-stack.js?v=e0138d76';
 import { createCombobox } from '../combobox.js?v=d43209e8';
 import {
@@ -5700,10 +5701,40 @@ function makeGhost(engine) {
     art.y = -6;
     g.addChild(art);
     g.art = art;
+    // The pin over it (cultivationPin): where it lands, seen over the tray when the ground is behind it.
+    const pin = new PIXI.Graphics();
+    g.addChild(pin);
+    g.pin = pin;
   }
   engine.entityLayer.addChild(g);
   scene.ghost = g;
   updateGhost(engine);
+}
+
+/** How far over the carried art's top the pin's head stands (world px), and its head's size. */
+export const CULTIVATION_PIN = Object.freeze({ rise: 26, head: 14, half: 9, least: 64 });
+
+/**
+ * Ours: a pin over a carried cultivation, its point down at the spot it lands (the pack marker's pale gold
+ * where it fits, red where it won't). At 1352x802 the back yard's ground stands at the Cultivate tray's top edge (the camera
+ * stops at the room's art, which ends a little under the ground), so a flat Patch or Dirt Pile and its
+ * ground pad hid behind the tray while dragged (in Classic, whose tray is taller, the whole ground did); the pin stands
+ * at least `least` px over the ground, and over the tray's edge when the ground is under it. Glitch
+ * had its CultCarryUI box and placement pointers (CultManager.as 550-645) over a view the picker never
+ * covered. PURE: `artH` is the art's drawn height, `hidden` how far the ground is under the tray's top edge
+ * (world px, 0 or less when it shows); y up from the foot (negative), { top, head, stem, half }.
+ */
+export function cultivationPin(artH = 0, hidden = 0, { rise, head, half, least } = CULTIVATION_PIN) {
+  // `hidden`: how far the ground is under the tray's top edge (world px; Classic's taller tray covers it whole).
+  const top = -Math.max(least, Math.round((Number(artH) || 0) + 6 + rise), Math.round((Number(hidden) || 0) + head + 18));
+  return { top, head, half, stem: Math.max(0, -top - head - 12) };
+}
+
+/** The tray's top edge in world y (the bottom of what the room shows over it), or null with no bar up. */
+function trayEdgeY(engine) {
+  const r = ui?.builder?.roomRect?.();
+  if (!r || !canvasFrame(engine)) return null;
+  return worldPoint(engine, { clientX: r.left, clientY: r.bottom }).y;
 }
 
 /** The pointer as the carried piece's foot: offset by where a moved piece was grabbed (beginMove). */
@@ -5753,6 +5784,15 @@ function updateGhost(engine) {
   g.ok = ok;
   g.x = at.x;
   g.y = yardGroundY(st);
+  const edge = trayEdgeY(engine);
+  const pin = cultivationPin(g.art?.height || 0, edge == null ? 0 : g.y - edge);
+  // The pack marker's pale gold where it fits (drawPackMarker), red where not; a dark rim for the grass.
+  const pinColor = ok ? 0xfff1b0 : 0xe0574a;
+  g.pin?.clear();
+  g.pin?.rect(-1.5, pin.top + pin.head, 3, pin.stem).fill({ color: pinColor, alpha: 0.9 });
+  g.pin?.poly([-pin.half, pin.top, pin.half, pin.top, 0, pin.top + pin.head]).fill({ color: pinColor, alpha: 1 }).stroke({ width: 2, color: 0x4a3218, alpha: 0.85 });
+  // QA: the carried cultivation's foot (world x, y), whether it fits there, and the pin's top (world y).
+  engine.setData('homeGhostAt', `${Math.round(g.x)},${Math.round(g.y)},${ok ? 'ok' : 'no'},${Math.round(g.y + pin.top)}`);
   g.pad.clear();
   g.pad.roundRect(-g.half, -10, g.half * 2, 20, 10).fill({ color: ok ? 0x7cc35a : 0xe0574a, alpha: 0.35 });
   g.pad.roundRect(-g.half, -10, g.half * 2, 20, 10).stroke({ width: 2, color: ok ? 0x7cc35a : 0xe0574a, alpha: 0.95 });
@@ -5826,6 +5866,7 @@ function cancelCarry(engine) {
   const wasMove = placing?.moveId;
   placing = null;
   drag = null;
+  showWorldDropTip('');
   carryBy = 'pointer';
   destroyGhost();
   ui?.builder?.tray?.classList.remove('is-drop-target');
@@ -5875,7 +5916,21 @@ function moveDrag(engine, e) {
   if (drag.over === 'room') pointer = { ...worldPoint(engine, e), inside: true };
   updateGhost(engine);
   syncFloating(engine);
+  dragFitTip(e);
   engine.setData('homeDrag', `${drag.source}:${placing?.classTsid || placing?.protoClass || ''}:${drag.over || ''}`);
+}
+
+/**
+ * Ours: a cultivation dragged over ground it can't go on says why by the pointer (placementCheck's words:
+ * too close to another, the way into the house, the yard's end), as a pack stack's refused drop does
+ * (world-drop-feature.js showWorldDropTip); the ghost turns red there. Glitch carried it at your feet and
+ * showed only the red carry UI (CultCarryUI.as bad()). Hidden over the tray, on good ground and after the drag.
+ */
+function dragFitTip(e) {
+  if (!drag || !e || placing?.kind !== 'cultivation' || drag.over !== 'room') return showWorldDropTip('');
+  const st = activeCult();
+  const fit = placementCheck(st, placing.protoClass, Math.round(pointer.x - homeStreetLayout(st).houseX), placing.moveId || null);
+  showWorldDropTip(fit.ok ? '' : fit.msg || '', true, e.clientX, e.clientY);
 }
 
 function endDrag(engine, e, { cancelled = false, overTray = false } = {}) {
@@ -5883,6 +5938,7 @@ function endDrag(engine, e, { cancelled = false, overTray = false } = {}) {
   const was = drag;
   if (e) moveDrag(engine, e);
   drag = null;
+  showWorldDropTip('');
   lastClient = null;
   edgeSince = 0;
   ui?.builder?.tray?.classList.remove('is-drop-target');
@@ -6181,12 +6237,38 @@ function packDropTarget(engine, e, what = packDrag) {
   // G1303 (#669): a machine stands on the floor, at the pointer's x (HandOfDecorator.as 1673-1690 sent the
   // floor point under the pointer; features/home-machines-feature.js packDrop sets it down there).
   if (what?.machine) return { x: p.x, y: INTERIOR.floorY, on: null };
-  return stackSurfaceAt(decor, p.x, p.y);
+  // The back yard is part of the house's location (can_decorate held there too): a stack let go over it
+  // lands on the yard's ground under the pointer, not on the house's nearest floor.
+  return stackSpotAt(p);
+}
+
+/** Where a stack set down at room point `p` rests: the back yard's ground under it (yardDropSpot), else a shelf, table or the floor. */
+function stackSpotAt(p) {
+  return (inHouse() ? yardDropSpot(p.x, roomX0()) : null) || stackSurfaceAt(decor, p.x, p.y);
+}
+
+/** How far from the yard's far end and from the foot of the house's ramp a stack set down in the yard keeps. */
+export const YARD_DROP_EDGE = 24;
+
+/**
+ * Where a pack stack let go over the back yard lands, or null when the point is over the house (room x 0
+ * and on: its own floor, stackSurfaceAt). The yard runs left of the house, room x -yardW..0, and its ground
+ * is BACK_YARD_GROUND_Y; the stack falls to that ground under the pointer, as a stack let go in the air
+ * falls to the line under it (takeable_drop, HandOfDecorator.as dropItemFromPackOnTargetPlatform), kept
+ * YARD_DROP_EDGE off the yard's far end and the ramp up into the house. Room x. PURE.
+ */
+export function yardDropSpot(roomX, yardW) {
+  const w = Number(yardW);
+  const x = Number(roomX);
+  if (!(w > YARD_DROP_EDGE * 2) || !Number.isFinite(x) || x >= 0) return null;
+  return { x: Math.round(Math.max(-w + YARD_DROP_EDGE, Math.min(-YARD_DROP_EDGE, x))), y: BACK_YARD_GROUND_Y, on: null, yard: true };
 }
 
 function drawPackMarker(engine, target, what = packDrag) {
   if (scene?.packMarker && !scene.packMarker.destroyed) scene.packMarker.destroy({ children: true });
   if (scene) scene.packMarker = null;
+  // QA: where the marker stands (world x, y), '' when none.
+  engine?.setData?.('homePackMark', target && what && scene ? `${Math.round(target.x + roomX0())},${Math.round(target.y)}` : '');
   if (!target || !what || !scene) return;
   const { PIXI } = engine;
   const g = new PIXI.Container();
@@ -6354,7 +6436,8 @@ const decorateTarget = (engine) => ({
         engine.toast(BUILDER_TEXT.stackHint, 4200);
       }
     }
-    engine.setData('homeDropLast', res?.ok ? `stack:${was.classTsid}:${target.on ?? 'floor'}` : `refused:${res?.reason || ''}`);
+    engine.setData('homeDropLast', res?.ok ? `stack:${was.classTsid}:${target.on ?? (target.yard ? 'yard' : 'floor')}` : `refused:${res?.reason || ''}`);
+    if (res?.ok) engine.setData('homeDropAt', `${Math.round(target.x + roomX0())},${Math.round(target.y)}`);
   },
   end() {
     if (packDrag) endPackDrag(engine);
@@ -6461,7 +6544,8 @@ const placeTarget = (engine) => ({
       if (res?.msg) engine.toast(res.msg);
       engine.playSound?.('CLICK_FAILURE', { volume: 0.4 });
     } else settleRoomStacks(engine);
-    engine.setData('homeDropLast', res?.ok ? `place:${was.classTsid}:${target.on ?? 'floor'}` : `refused:${res?.reason || ''}`);
+    engine.setData('homeDropLast', res?.ok ? `place:${was.classTsid}:${target.on ?? (target.yard ? 'yard' : 'floor')}` : `refused:${res?.reason || ''}`);
+    if (res?.ok) engine.setData('homeDropAt', `${Math.round(target.x + roomX0())},${Math.round(target.y)}`);
   },
   end() {
     if (placeDrag) endPlaceDrag(engine);
@@ -6631,7 +6715,7 @@ function moveStack(engine, id, p) {
   const row = stackRow(engine, id);
   if (!row) return { ok: false, reason: 'gone' };
   closeStackCount(engine);
-  const target = stackSurfaceAt(decor, p.x, p.y);
+  const target = stackSpotAt(p);
   const into = moveJoins(engine, row, target);
   if (row.shared) return claimShared(engine, row, target, into);
   // On the floor the lock comes off (doModifyItem deletes house_lock and sets it again only on a
@@ -6895,7 +6979,7 @@ function moveStackDrag(engine, e) {
   document.getElementById('pack-bar')?.classList.toggle('is-drop-target', toPack);
   const hit = drag.over === 'room' && row ? displayDropAt(toRoom(worldPoint(engine, e)), row.classTsid) : null;
   drawDisplayTarget(engine, hit);
-  const target = drag.over === 'room' && row && !hit ? stackSurfaceAt(decor, toRoom(worldPoint(engine, e)).x, toRoom(worldPoint(engine, e)).y) : null;
+  const target = drag.over === 'room' && row && !hit ? stackSpotAt(toRoom(worldPoint(engine, e))) : null;
   // Over a like stack it joins (#593): the marker sits on that stack.
   const join = moveJoins(engine, row, target);
   drawPackMarker(engine, join ? { x: join.x - roomX0(), y: join.y } : target, row);
@@ -7013,7 +7097,9 @@ function syncFloating(engine, force = false) {
   if (popModel && !drag && !placing && !stackCarry && !upgradePickerOpen()) b.setPop(popModel, popAnchor(engine));
   else b.setPop(null);
   const g = scene.ghost;
-  if (!placing || !g || g.destroyed || (packDrag && !packDrag.furniture) || drag?.over === 'tray') {
+  // A cultivation dragged from the tray is bought where it is let go: no Place button over it, where it
+  // hid the ghost's ground marker (the yard's ground stands just over the tray at 1352x802).
+  if (!placing || !g || g.destroyed || (packDrag && !packDrag.furniture) || drag?.over === 'tray' || (drag?.source === 'tray' && placing.kind === 'cultivation')) {
     b.setPlace(null);
     return;
   }
@@ -7076,7 +7162,7 @@ function bindPointer(engine) {
     if (stackCarry && mode === 'decorate') {
       const row = stackRow(engine, stackCarry.id);
       const r = toRoom(p);
-      drawPackMarker(engine, row ? stackSurfaceAt(decor, r.x, r.y) : null, row);
+      drawPackMarker(engine, row ? stackSpotAt(r) : null, row);
       return;
     }
     if (mode === 'decorate') setHover(engine, stackAt(engine, p) ? null : furnitureAt(toRoom(p))?.id ?? null);
@@ -7494,7 +7580,7 @@ function tickDecorPan(engine, range, dtMs) {
     } else edgeSince = 0;
   }
   if (!dx && !dy) return false;
-  const span = roomSpan();
+  const span = panSpan();
   const before = { x: decorCamX, y: decorPan };
   decorCamX = clampRoomX((decorCamX ?? engine.player?.x ?? 0) + dx, { left: span.left, right: span.right, view: engine.camera?.w || 960 });
   if (dy) decorPan = Math.max(range.lo, Math.min(range.hi, Math.round((decorPan ?? (ceilingInHand() ? range.ceiling : range.floor)) + dy)));
@@ -7507,6 +7593,17 @@ function tickDecorPan(engine, range, dtMs) {
     }
   }
   return true;
+}
+
+/** A Cultivate tray tile being dragged in the house (over its back yard). */
+function yardTrayDrag() {
+  return mode === 'cultivate' && inHouse() && drag?.source === 'tray' && placing?.kind === 'cultivation';
+}
+
+/** What a drag at the view's edge may scroll across: the house, and in Cultivate its back yard too (world x 0). */
+function panSpan() {
+  const span = roomSpan();
+  return yardTrayDrag() ? { left: 0, right: span.right } : span;
 }
 
 function interiorCameraLook(engine, dtMs) {
@@ -7525,17 +7622,20 @@ function interiorCameraLook(engine, dtMs) {
     heldPan.clear();
     // G369: a drag scrolls at the view's edge (HandOfDecorator onEnterFrame, maybeScrollVPByDragging) and
     // the style picker holds the camera on its piece (FurnUpgradeDialog.as 401-408); else it follows you.
-    if (drag?.loose) tickDecorPan(engine, { lo: look.walk, hi: look.walk, floor: look.walk, ceiling: look.walk }, dtMs);
+    // A Cultivate tile dragged over the back yard scrolls the view at its edge, as Decorate's drag does,
+    // so the whole yard is in reach of the drag.
+    const yardDrag = yardTrayDrag();
+    if (drag?.loose || yardDrag) tickDecorPan(engine, { lo: wantY, hi: wantY, floor: wantY, ceiling: wantY }, dtMs);
     else if (!upgradePickerOpen()) decorCamX = null;
     decorPan = null;
     if (decorCamX != null) {
-      const span = roomSpan();
+      const span = panSpan();
       decorCamX = clampRoomX(decorCamX, { left: span.left, right: span.right, view: engine.camera?.w || 960 });
       wantX = Math.round(decorCamX - (engine.player?.x ?? 0));
       kind = 'carry';
     }
     // The room slid under a still pointer (a walk, the edge): what you carry stays under it.
-    if (drag?.loose && lastClient) {
+    if ((drag?.loose || (yardDrag && drag.over === 'room')) && lastClient) {
       pointer = { ...worldPoint(engine, { clientX: lastClient.x, clientY: lastClient.y }), inside: true };
       updateGhost(engine);
     }

@@ -36,7 +36,7 @@ const pixi = new Proxy({ Container: Display, Graphics: Display, Sprite: Display,
 globalThis.PIXI = pixi;
 globalThis.Image ??= class { set src(_) {} };
 
-const { visitorHomeScene, visitorHomeState } = await import('../public/js/features/homes-feature.js?v=70059ddd');
+const { visitorHomeScene, visitorHomeState } = await import('../public/js/features/homes-feature.js?v=495714d1');
 const { housePlace, housePlaceFloor, isHousePlace } = await import('../public/js/home-floors.js?v=cb981157');
 const { homeStreetFor, houseFloorStreet, normalizeHomeView, ownerStacksFor, readHomeStreet, readVisitScene, sharedHomeStreet, visitSceneTsid } = await import('../public/js/neighbours-mp.js?v=6d97fefa');
 const { homePlaceOf, isFloorPlace, isSharedStreet } = await import('../public/js/drops-mp.js?v=351593a6');

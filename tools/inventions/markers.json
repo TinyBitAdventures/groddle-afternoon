@@ -434,6 +434,8 @@
     "glitch-had-none: back of #473's floor-to-box drag (stackIntoBox). Glitch had no such verb": "decorate-box-set-down",
     "ours: * #669 (ours, Austin 2026-11-27): each frame in the house,": "house-floor-holes",
     "ours: * #730 (G1333, Austin 2026-11-26): ours. While a machine is dragged, a faint mark at": "machine-stand-spot",
+    "ours: * Ours: a cultivation dragged over ground it can't go": "cultivate-drag-pin-and-reason",
+    "ours: * Ours: a pin over a carried cultivation, its point": "cultivate-drag-pin-and-reason",
     "ours: // G1245: so can the Vine Radio (ours); it keeps its music for when it is put out": "ours-vine-radio",
     "ours: // Ours (#743, Austin's ruling 2026-11-26): a toggle,": "furniture-store-tray-toggle",
     "ours: // Report 153: the Mail Dispatcher (our own addition to the street) can be put": "ours-homes",

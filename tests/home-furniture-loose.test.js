@@ -125,7 +125,7 @@ describe('G369 after the drop', () => {
 
   it('the camera scrolls at the edge while carrying and holds on the piece for the picker', () => {
     const look = fn(homes, '\nfunction interiorCameraLook(');
-    assert.match(look, /if \(drag\?\.loose\) tickDecorPan\(/);
+    assert.match(look, /if \(drag\?\.loose \|\| yardDrag\) tickDecorPan\(/);
     assert.match(look, /else if \(!upgradePickerOpen\(\)\) decorCamX = null;/);
     assert.match(fn(homes, '\nfunction frameUpgradePiece('), /if \(scene\?\.room !== 'interior'\) return false;/);
   });

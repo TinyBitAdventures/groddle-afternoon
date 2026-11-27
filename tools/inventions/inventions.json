@@ -6583,6 +6583,23 @@
    ],
    "why": "Glitch kept the game open behind every site page by opening each in its own named browser window (TSFrontController.as 4353-4400). A Home Screen app has one window and no tabs, so a new window replaced the game. Ours: the pages open in a sheet over the game instead (#401 for the Encyclopedia, #741 for every other page: Support the game, See who, the boards, profiles, the privacy policy). Browser tabs keep the new window.",
    "ruling": "Austin 2026-11-27 (#741): in the Home Screen app every link to our own site opens in the in-game page viewer with Back to the game, Contribute included; one rule, not a list of cases",
+  },
+  {
+   "id": "cultivate-drag-pin-and-reason",
+   "title": "Dragging a cultivation from the Cultivate tray: a pin over it marks where it lands (gold or red), the reason it can't go there shows by the pointer, and no Place button while dragging",
+   "kind": "UI",
+   "status": "proposed",
+   "where": [
+    {
+     "file": "public/js/features/homes-feature.js",
+     "symbol": "dragFitTip"
+    },
+    {
+     "file": "public/js/features/homes-feature.js",
+     "symbol": "cultivationPin"
+    }
+   ],
+   "why": "Glitch carried a cultivation at your feet and showed its red or green carry box and placement pointers where it could go (CultCarryUI.as, CultManager.as 550-645), over a view its picker never covered; the tray drag is ours. In the back yard at 1352x802 the ground stands at the tray's top edge, so a flat Patch and its ground pad hid behind the tray and the Place button sat on what showed. Ours: a pin stands over the carried cultivation at the spot it lands (pale gold where it fits, red where not), placementCheck's own words show by the pointer when it won't fit (the drop's toast says the same), and the Place button stays away while dragging (letting go buys it). Austin 2026-11-27: drag and drop placing in the back yard.",
    "rows": []
   }
  ]

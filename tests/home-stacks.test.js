@@ -302,7 +302,7 @@ describe('Decoration Mode moves and takes back what is set down', () => {
     // DECOPOLISH: onto a Storage Display Box it goes in the box (tests/decor-display-box.test.js), else it moves.
     assert.match(end.slice(0, 1200), /const p = toRoom\(worldPoint\(engine, e\)\);[\s\S]{0,200}return moveStack\(engine, was\.id, p\);/);
     const move = homes.slice(homes.indexOf('function moveStack('));
-    assert.match(move.slice(0, 500), /const target = stackSurfaceAt\(decor, p\.x, p\.y\);/);
+    assert.match(move.slice(0, 500), /const target = stackSpotAt\(p\);/); // tests/yard-drag-place.test.js: the back yard's ground first
   });
 
   it('Pick up is the item\'s own pickup (the pack and the ledger see one move), and a moved piece takes its stacks', () => {
