@@ -79,7 +79,7 @@
  */
 
 import { createMinnAccount } from '../minn-account.js?v=7e3d7279';
-import { drawListFor, loadCatalog, paintItems, prepareLook } from '../avatar-compositor.js?v=dfe4b032';
+import { drawListFor, loadCatalog, paintItems, prepareLook } from '../avatar-compositor.js?v=1d3df23e';
 import { drawListBounds } from '../avatar-rig.js?v=b67f0da8';
 import { lookKey, resolveLook } from '../avatar-looks.js?v=5a28384d';
 import {

@@ -224,6 +224,9 @@ function loadJson(url) {
 function loadImage(url) {
   return new Promise((resolve, reject) => {
     const img = new Image();
+    // Part art may be hosted on another origin (a CDN): ask for it with CORS, so the canvases it is painted on
+    // stay readable (tintedBitmap's getImageData, a baked sheet's toBlob). No change for same-origin files.
+    img.crossOrigin = 'anonymous';
     img.onload = () => resolve(img);
     img.onerror = () => reject(new Error(`image ${url}`));
     img.src = url;

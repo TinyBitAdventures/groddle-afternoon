@@ -20,7 +20,7 @@ import { CORE_FRAMES } from '../public/js/avatar-anims.js?v=fb921bf4';
 import {
   NONE_TYPES, TILE_FRAME, TILE_MIN_SPAN, TILE_PAGE, createTileArt, filterOptions, focusIn, itemsOf, pageCount, pageFor,
   pickPart, refocus, renderPartSwitch, renderPartTiles, tileFields, tileFrame, tileJob,
-} from '../public/js/avatar-tiles.js?v=7aeef276';
+} from '../public/js/avatar-tiles.js?v=90f436b8';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const read = (p) => readFileSync(join(root, p), 'utf8');
