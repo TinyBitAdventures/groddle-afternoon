@@ -282,6 +282,7 @@ import {
 } from '../magic-rock-home.js?v=c07b2327';
 import { getGameDayKey } from '../game-day.js?v=57fecfcb';
 import { HOME_TICKET, HOME_TICKET_CLASS } from '../home-ticket.js?v=13473847';
+import { pickFront } from '../pick.js?v=0357aca9';
 import { MIN_GROUND_CLEARANCE, yCamOffsetAnchor } from '../movement.js?v=f4be1a05';
 import { LANDSCAPE_VIEW_W, landscapeWindow, rowRange, soilTiles } from '../landscape-reach.js?v=2f2d7cb3';
 import { takeFromHouse } from '../ledger-house.js?v=b34f5c89';
@@ -5875,11 +5876,16 @@ function furnitureAt(point) {
   // Front-most first: the ceiling pieces over the avatars, then the rest from the top down.
   const top = renderOrder(decor).reverse();
   const order = [...top.filter(furnitureDrawsInFront), ...top.filter((item) => !furnitureDrawsInFront(item))];
-  for (const item of order) {
+  const under = order.filter((item) => {
     const b = furnitureBounds(item);
-    if (point.x >= b.x && point.x <= b.x + b.w && point.y >= b.y && point.y <= b.y + b.h) return item;
-  }
-  return null;
+    return point.x >= b.x && point.x <= b.x + b.w && point.y >= b.y && point.y <= b.y + b.h;
+  });
+  // R56 (#752): where pieces overlap, the front one whose art is solid under the pointer, as the
+  // pointer's pick everywhere (js/pick.js, Glitch's LocationRenderer.as getMostLikelyItemstackFromList).
+  const layer = scene?.furnitureLayer;
+  if (under.length < 2 || !layer?.toGlobal) return under[0] || null;
+  const views = scene.furnitureViews;
+  return pickFront(under, layer.toGlobal({ x: point.x, y: point.y }), (item) => views?.get(item.id)?.art || null);
 }
 
 // ---------------------------------------------------------------------------

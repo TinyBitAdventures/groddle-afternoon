@@ -114,8 +114,12 @@ describe('report #204: the plot under the pointer', () => {
 
   it('game.js and the Guano drag use the rule; hover and clicks share pickInteractableAt', () => {
     const game = readFileSync(new URL('../public/game.js', import.meta.url), 'utf8');
+    // R56: game.js hands the pick to js/pick.js with nearestPlotIndex; plots are picked by their base there.
     const body = game.slice(game.indexOf('function pickInteractableAt('), game.indexOf('function createSpriteOutline('));
-    assert.match(body, /nearestPlotIndex\(plots\.map\(\(t\) => t\.sprite\), worldX, worldY\)/);
+    assert.match(body, /pickTarget\(interactables, worldX, worldY, \{ PIXI, layer: entityLayer, nearestPlotIndex \}\)/);
+    const pick = readFileSync(new URL('../public/js/pick.js', import.meta.url), 'utf8');
+    assert.match(pick, /nearestPlotIndex\(plots\.map\(\(t\) => t\.sprite\), x, y\)/);
+    assert.match(pick, /if \(t\.classId === 'garden_plot'\) return \[\];/, 'a plot is never picked by its art');
     assert.match(game, /cell\._gardenBaseH = layout\.plotH;/);
     assert.match(game, /const hit = pickInteractableAt\(wx, wy\);\s*\n\s*if \(hit\) setHoverTarget\(hit, \{ pointer: true \}\);/, 'hover');
     assert.match(game, /const best = pickInteractableAt\(sx, sy\);/, 'click');

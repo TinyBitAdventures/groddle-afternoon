@@ -15,6 +15,7 @@ import { describe, it } from 'node:test';
 import { readFileSync } from 'node:fs';
 import { AVATAR_HIT_BOX, playerClickBox } from '../public/js/reach.js?v=456da8a8';
 import { orderChoices, buildEnterChoices } from '../public/js/enter-chooser.js?v=297c6d15';
+import { pickTarget, spriteWorldHitBox } from '../public/js/pick.js?v=0357aca9';
 
 const game = readFileSync(new URL('../public/game.js', import.meta.url), 'utf8');
 const party = readFileSync(new URL('../public/js/features/party-feature.js', import.meta.url), 'utf8');
@@ -31,11 +32,11 @@ function fnSource(name) {
   throw new Error(`unclosed ${name}`);
 }
 
-const makePick = new Function(
-  'interactables',
-  'nearestPlotIndex',
-  `${fnSource('spriteWorldHitBox')}\n${fnSource('pointInHitBox')}\n${fnSource('pickInteractableAt')}\nreturn { pick: pickInteractableAt, box: spriteWorldHitBox };`,
-);
+/** game.js pickInteractableAt (R56: js/pick.js pickTarget; these stand-ins draw no art, so rectangles decide). */
+const makePick = (interactables, nearestPlotIndex) => ({
+  pick: (x, y) => pickTarget(interactables, x, y, { nearestPlotIndex }),
+  box: spriteWorldHitBox,
+});
 
 const FLOOR = 600;
 /** A dirt pile (195 x 71, bottom-centre on the floor). */

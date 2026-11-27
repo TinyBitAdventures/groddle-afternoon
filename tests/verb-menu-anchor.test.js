@@ -1,6 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
+import { spriteWorldHitBox } from '../public/js/pick.js?v=0357aca9';
 
 const src = readFileSync(new URL('../public/game.js', import.meta.url), 'utf8');
 
@@ -20,10 +21,11 @@ const make = new Function(
   'app',
   'VIEW_W',
   'VIEW_H',
-  `${fnSource('spriteWorldHitBox')}\n${fnSource('targetPageRect')}\nreturn targetPageRect;`,
+  'spriteWorldHitBox',
+  `${fnSource('targetPageRect')}\nreturn targetPageRect;`,
 );
 const canvas = { getBoundingClientRect: () => ({ left: 0, top: 0, width: 960, height: 600 }) };
-const targetPageRect = make({ canvas }, 960, 600);
+const targetPageRect = make({ canvas }, 960, 600, spriteWorldHitBox);
 const rr = { left: 0, top: 0, width: 960, height: 600 };
 
 test('the verb menu anchors to another player, whose hit box is an empty Container', () => {

@@ -4,7 +4,7 @@
  */
 import { ITEM_ICONS, ITEM_LABELS, getVerbsFor, ordinaryItems, runVerb } from './content.js?v=79a980f7';
 import { createErrorOnce, createFeatureHost, createFrameStages } from './js/feature-host.js?v=b87e2cbc';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=be0456e4';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=bfdee4b1';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, enterHintPick, hoverText, stackHoverLabel, groupHead, hoverRimShown, reachGlowTargets, spriteHasRimArt, rimArtParts, trimmedIconUrl, drawTileArt } from './js/enter-chooser.js?v=297c6d15';
 import { firstTendKey, STICK_TEND_DELAY_MS, STICK_TEND_DIRS, STICK_TEND_REPEAT_MS, stepTendKey, stepTendKeys, stickTendKey, tendKeyAction } from './js/garden-tend.js?v=a7470c4a';
 import { avatarHitBox, behindFloor, bodyReachDistance, OUT_OF_REACH_LINE, playerClickBox } from './js/reach.js?v=456da8a8';
@@ -721,6 +721,7 @@ import {
 } from './js/garden.js?v=fefa7bcd';
 import { GARDEN_SCALE, PLOT_H as GARDEN_PLOT_H, PLOT_W as GARDEN_PLOT_W, gardenFrame, gardenLayout, gardenStyle, plotPieces } from './js/garden-view.js?v=04fe8467';
 import { nearestPlotIndex } from './js/garden-view.js?v=04fe8467';
+import { pickTarget, pickByRectangle, pickExplain, spriteWorldHitBox, pickStats } from './js/pick.js?v=0357aca9';
 import {
   ROCK_CATALOG,
   ROCK_SHAPE_SHEETS,
@@ -8692,55 +8693,13 @@ function setSignpostBoardHover(hit) {
   }
 }
 
-/** Axis-aligned hit box in world space (anchor-aware). */
-function spriteWorldHitBox(spr, pad = 6) {
-  if (!spr) return null;
-  // Garden plot / mine rock cells use world coords + explicit hit size (Containers often report 0×0)
-  const w = Math.abs(
-    spr._worldHitW || spr._gardenHitW || spr._mineHitW || spr._rookHitW || spr.width || 0
-  );
-  const h = Math.abs(
-    spr._worldHitH || spr._gardenHitH || spr._mineHitH || spr._rookHitH || spr.height || 0
-  );
-  if (w < 2 || h < 2) return null;
-  // Default anchor 0.5,1 for world entities; fall back to actual anchor
-  const ax = spr.anchor?.x ?? 0.5;
-  const ay = spr.anchor?.y ?? 1;
-  const left = spr.x - w * ax - pad;
-  // G1164: a box whose bottom sits under the feet (a player's: hit_box_offset_y, AbstractAvatarView.as 142).
-  const top = spr.y - h * ay - pad + (Number(spr._worldHitBelow) || 0);
-  return { left, top, right: left + w + pad * 2, bottom: top + h + pad * 2, w, h };
-}
-
-function pointInHitBox(box, x, y) {
-  return box && x >= box.left && x <= box.right && y >= box.top && y <= box.bottom;
-}
-
-/** Prefer pointer-under sprite; among overlaps pick smallest area (most specific). */
+/**
+ * R56 (#752): the thing under the pointer, front first by its drawn art where rectangles overlap,
+ * as Glitch's LocationRenderer.as getMostLikelyItemstackFromList (js/pick.js pickTarget). Hover,
+ * left and right click, a phone's tap and the stick's tap-through all ask here.
+ */
 function pickInteractableAt(worldX, worldY) {
-  /** @type {{ t: any, area: number }[]} */
-  const hits = [];
-  for (const t of interactables) {
-    if (!t.sprite || t.sprite.destroyed || t.absent) continue;
-    // G1164: a player's box is Glitch's own hit box (js/reach.js AVATAR_HIT_BOX), clicked as drawn, with no pad.
-    const box = spriteWorldHitBox(t.sprite, t.sprite._worldHitExact ? 0 : t.airborne ? 14 : 8);
-    if (pointInHitBox(box, worldX, worldY)) {
-      // Prefer garden_plot over whole bed / other large targets
-      const area =
-        (box.w * box.h) * (t.classId === 'garden_plot' ? 0.15 : 1);
-      hits.push({ t, area });
-    }
-  }
-  if (!hits.length) return null;
-  hits.sort((a, b) => a.area - b.area);
-  // Report #204: padded plot boxes overlap the rows beside them (rows 14 px apart, GardenView.as
-  // 159-160), and by area the back row (its reach) always lost and the middle row won ties. Among
-  // the plots hit, the one whose base is under the pointer (js/garden-view.js nearestPlotIndex).
-  if (hits[0].t.classId === 'garden_plot') {
-    const plots = hits.filter((h) => h.t.classId === 'garden_plot').map((h) => h.t);
-    return plots[nearestPlotIndex(plots.map((t) => t.sprite), worldX, worldY)] || hits[0].t;
-  }
-  return hits[0].t;
+  return pickTarget(interactables, worldX, worldY, { PIXI, layer: entityLayer, nearestPlotIndex });
 }
 
 /**
@@ -17600,7 +17559,7 @@ const PLAYER_STATE_STORAGE_KEY = 'playerState';
 const READ_ONLY_QA = Object.freeze([
   'groundSkirt', 'edgeMirrors', 'recolourStats', 'signArms', 'memoryStats', 'renderStats', 'drawnArt', 'itemOverlays',
   'drawnTextures', 'spinningWheel', 'cameraFrame', 'speech', 'pickups', 'streetDeco', 'animDecos', 'quoins',
-  'vectorBakes', 'idleState', 'snapshot', 'frameStageThrows',
+  'vectorBakes', 'idleState', 'snapshot', 'frameStageThrows', 'pickStats', 'pickAt',
   ['notify', ['notices', 'entries', 'stats', 'screensPending']],
   ['audio', ['state']],
 ]);
@@ -37224,6 +37183,26 @@ async function main() {
       for (const row of Object.values(kinds)) row.mb = +row.mb.toFixed(1);
       const onGpu = new Set(app?.renderer?.texture?.managedTextures || []);
       return { imagesReleased: released, audioBuffers: buffers.length, audioMB: +(audioBytes / 1048576).toFixed(1), gpuKinds: kinds, folders: textureUrls.textureFolders(8, onGpu) };
+    },
+    /**
+     * R56 (#752) pick QA: the masks the pointer's pick has built (count, bytes) and its picks, and the
+     * street's targets by whether they draw art the pick can test (artless: picked by their rectangle).
+     */
+    pickStats() {
+      const artless = {};
+      let drawn = 0;
+      for (const t of interactables) {
+        if (!t?.sprite || t.sprite.destroyed) continue;
+        if (t.classId !== 'garden_plot' && rimArtParts(t.sprite, PIXI).length) drawn++;
+        else artless[t.classId || '?'] = (artless[t.classId || '?'] || 0) + 1;
+      }
+      return { ...pickStats(), drawn, artless };
+    },
+    /** R56 pick QA: what the pointer picks at a world point, what the rectangles alone picked before, and what is under it (front first; * solid art there, # a hit area). */
+    pickAt(x, y) {
+      const name = (t) => (t ? `${t.classId}:${t.label || ''}` : '');
+      const under = pickExplain(interactables, x, y, { PIXI, layer: entityLayer }).map((u) => `${name(u.t)}${u.solid === true ? '*' : u.solid === false ? '' : '#'}`);
+      return { pick: name(pickInteractableAt(x, y)), rect: name(pickByRectangle(interactables, x, y, { nearestPlotIndex })), under };
     },
     /** Renderer QA: backend, Pixi version and GPU texture use (tools/perf, tools/playtest). */
     renderStats() {
