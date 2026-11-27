@@ -3,6 +3,17 @@
   "about": "What the loading card shows after an update (#745): per release, newest first, up to five short player-facing lines. Written by tools/release/whats-new.mjs.",
   "releases": [
     {
+      "version": "v0.79.0",
+      "date": "2026-11-27",
+      "lines": [
+        "Outdoor skies follow the clock, with stars at night.",
+        "Read, answer and close your bug reports on the website too, under Community's Support.",
+        "Drag a machine you've set down to slide it along the floor, right up next to another.",
+        "Eight more reactions to pick from: 👏 😊 🤔 😍 🔥 👀 😅 and 💯.",
+        "What's new in the Menu shows every version, with ‹ › or the arrow keys to step through them."
+      ]
+    },
+    {
       "version": "v0.78.0",
       "date": "2026-11-27",
       "lines": [

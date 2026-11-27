@@ -6438,6 +6438,142 @@
       "commits": [
         "game:776d73e811e"
       ]
+    },
+    {
+      "id": "G1331",
+      "area": "Homes",
+      "text": "Hovering a Storage Display Box or a stack on the floor didn't say how many it held.",
+      "commits": [
+        "game:78b2d5c2e14"
+      ]
+    },
+    {
+      "id": "G1323",
+      "area": "Streets",
+      "text": "Ice Nubbins in Nottis and Drifa stood on the path instead of hanging on the icy walls.",
+      "commits": [
+        "game:7c4d71e6557",
+        "game:843c8935b98",
+        "server:81f9a71",
+        "server:84fdbfb"
+      ]
+    },
+    {
+      "id": "G1327",
+      "area": "Homes",
+      "text": "Un-expanding a house left things dropped by its right wall past the wall.",
+      "commits": [
+        "game:90eab41e2d4",
+        "game:0b2647bf2bf",
+        "server:01100f4",
+        "site:b94be28"
+      ]
+    },
+    {
+      "id": "G1333",
+      "area": "Homes",
+      "text": "A placed machine couldn't be moved without picking it up and setting it down again.",
+      "commits": [
+        "game:75b1860bb3d",
+        "game:dc62bcb2217",
+        "site:a79cad1",
+        "server:c6edcd9"
+      ]
+    },
+    {
+      "id": "F182",
+      "area": "Feasts",
+      "text": "Herbs and Sno Cones in a feast pile couldn't be eaten.",
+      "show": "fixing",
+      "commits": [
+        "game:ad1161b112b"
+      ]
+    },
+    {
+      "id": "F183",
+      "area": "Quests",
+      "text": "Ticket to Paradise courses and some quest places sent you back after a few minutes instead of asking whether you were stuck.",
+      "show": "fixing",
+      "commits": [
+        "game:390f9139c97",
+        "game:0362763de88",
+        "game:6cdc90057d1"
+      ]
+    },
+    {
+      "id": "F184",
+      "area": "Streets",
+      "text": "Sloth Knockers hung beside their trees, and the sloths' branches stopped short of the trunk.",
+      "show": "fixing",
+      "commits": [
+        "game:61acb3685fc"
+      ]
+    },
+    {
+      "id": "F185",
+      "area": "Homes",
+      "text": "Clicking a stack of display boxes could pick the box above or below the one under the pointer.",
+      "show": "fixing",
+      "commits": [
+        "game:6a3d3b7d8c4"
+      ]
+    },
+    {
+      "id": "F186",
+      "area": "Homes",
+      "text": "Leaving several cards with a friend's Butler said you no longer had them.",
+      "show": "fixing",
+      "commits": [
+        "site:9850923"
+      ]
+    },
+    {
+      "id": "F187",
+      "area": "Homes",
+      "text": "A stack held at the edge of the view over the HUD didn't scroll the room, and a card popping up mid-drag could drop it.",
+      "show": "fixing",
+      "commits": [
+        "game:88b52019382",
+        "game:7a67debe61c"
+      ]
+    },
+    {
+      "id": "F188",
+      "area": "Phones",
+      "text": "Opening or closing a bag on an iPhone flashed the street black.",
+      "show": "fixing",
+      "commits": [
+        "game:e85d69fa160"
+      ]
+    },
+    {
+      "id": "F189",
+      "area": "Interface",
+      "text": "The low-mood rain cloud never showed in Classic.",
+      "show": "fixing",
+      "commits": [
+        "game:87a838c1669"
+      ]
+    },
+    {
+      "id": "G1334",
+      "area": "Homes",
+      "text": "Un-expanding a house can take the refunded materials back from newer characters."
+    },
+    {
+      "id": "G1316",
+      "area": "Homes",
+      "text": "Online, a Craftybot set down in a house can't use things lying on the floor; carried in the pack it works."
+    },
+    {
+      "id": "G1335",
+      "area": "Feasts",
+      "text": "On a phone the feast piles sit so close that a tap can open the next pile."
+    },
+    {
+      "id": "G1336",
+      "area": "Phones",
+      "text": "Turning an iPhone sideways can still flash the street black for a moment."
     }
   ]
 }

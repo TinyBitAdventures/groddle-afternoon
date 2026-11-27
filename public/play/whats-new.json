@@ -3,6 +3,17 @@
   "about": "What the loading card shows after an update (#745): per release, newest first, up to five short player-facing lines. Written by tools/release/whats-new.mjs.",
   "releases": [
     {
+      "version": "v0.79.0",
+      "date": "2026-11-27",
+      "lines": [
+        "Outdoor skies follow the clock, with stars at night.",
+        "Read, answer and close your bug reports on the website too, under Community's Support.",
+        "Drag a machine you've set down to slide it along the floor, right up next to another.",
+        "Eight more reactions to pick from: 👏 😊 🤔 😍 🔥 👀 😅 and 💯.",
+        "What's new in the Menu shows every version, with ‹ › or the arrow keys to step through them."
+      ]
+    },
+    {
       "version": "v0.78.0",
       "date": "2026-11-27",
       "lines": [
@@ -189,17 +200,6 @@
         "Things you set on your house or Tower floor are for everyone there again, as in Glitch.",
         "Moving one of your locked things onto the floor unlocks it.",
         "You can move floor stacks along the floor in Decoration Mode."
-      ]
-    },
-    {
-      "version": "v0.63.0",
-      "date": "2026-11-23",
-      "lines": [
-        "Teleporting works while visiting someone else's home street, house or Tower.",
-        "House and Tower floors hold as many things as you like.",
-        "The Bureaucratic Hall has its office again, with the lizard at his computer.",
-        "Dino and subway entrances show on the street map and the loading picture.",
-        "The phone page has an Account tab: email, password, Change name and your profile description."
       ]
     }
   ]

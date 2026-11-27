@@ -1,6 +1,6 @@
 {
   "note": "Written by tools/gaps/build-data.mjs from tools/gaps/public-gaps.json and the coverage register. Edit those, never this file.",
-  "release": "v0.78.0",
+  "release": "v0.79.0",
   "states": {
     "fixing": {
       "label": "Being fixed",
@@ -40,9 +40,9 @@
   },
   "counts": {
     "fixing": 3,
-    "known": 15,
+    "known": 19,
     "unreleased": 0,
-    "fixed": 644,
+    "fixed": 656,
     "lost": 5,
     "purpose": 18,
     "idea": 10
@@ -410,6 +410,12 @@
           "text": "Tunes for Crabs did not say the Vine Radio it gives waits in Cultivate.",
           "state": "fixed",
           "version": "v0.74.0"
+        },
+        {
+          "id": "F183",
+          "text": "Ticket to Paradise courses and some quest places sent you back after a few minutes instead of asking whether you were stuck.",
+          "state": "fixed",
+          "version": "v0.79.0"
         }
       ]
     },
@@ -804,6 +810,18 @@
           "text": "The street Ball flew the same on every street, whatever the street's gravity.",
           "state": "fixed",
           "version": "v0.78.0"
+        },
+        {
+          "id": "G1323",
+          "text": "Ice Nubbins in Nottis and Drifa stood on the path instead of hanging on the icy walls.",
+          "state": "fixed",
+          "version": "v0.79.0"
+        },
+        {
+          "id": "F184",
+          "text": "Sloth Knockers hung beside their trees, and the sloths' branches stopped short of the trunk.",
+          "state": "fixed",
+          "version": "v0.79.0"
         }
       ]
     },
@@ -1177,6 +1195,16 @@
         {
           "id": "G223",
           "text": "Some house styles are still to come, including more interior and back yard styles.",
+          "state": "known"
+        },
+        {
+          "id": "G1334",
+          "text": "Un-expanding a house can take the refunded materials back from newer characters.",
+          "state": "known"
+        },
+        {
+          "id": "G1316",
+          "text": "Online, a Craftybot set down in a house can't use things lying on the floor; carried in the pack it works.",
           "state": "known"
         },
         {
@@ -1575,6 +1603,42 @@
           "text": "The crack and Manhole rugs on an upper floor never dropped you to the floor below.",
           "state": "fixed",
           "version": "v0.78.0"
+        },
+        {
+          "id": "G1331",
+          "text": "Hovering a Storage Display Box or a stack on the floor didn't say how many it held.",
+          "state": "fixed",
+          "version": "v0.79.0"
+        },
+        {
+          "id": "G1327",
+          "text": "Un-expanding a house left things dropped by its right wall past the wall.",
+          "state": "fixed",
+          "version": "v0.79.0"
+        },
+        {
+          "id": "G1333",
+          "text": "A placed machine couldn't be moved without picking it up and setting it down again.",
+          "state": "fixed",
+          "version": "v0.79.0"
+        },
+        {
+          "id": "F185",
+          "text": "Clicking a stack of display boxes could pick the box above or below the one under the pointer.",
+          "state": "fixed",
+          "version": "v0.79.0"
+        },
+        {
+          "id": "F186",
+          "text": "Leaving several cards with a friend's Butler said you no longer had them.",
+          "state": "fixed",
+          "version": "v0.79.0"
+        },
+        {
+          "id": "F187",
+          "text": "A stack held at the edge of the view over the HUD didn't scroll the room, and a card popping up mid-drag could drop it.",
+          "state": "fixed",
+          "version": "v0.79.0"
         },
         {
           "id": "G48",
@@ -2346,6 +2410,11 @@
           "state": "known"
         },
         {
+          "id": "G1336",
+          "text": "Turning an iPhone sideways can still flash the street black for a moment.",
+          "state": "known"
+        },
+        {
           "id": "G673",
           "text": "Zoomed in on a phone, your Glitch sits high in the view.",
           "state": "fixed",
@@ -2883,6 +2952,12 @@
           "text": "In the Home Screen app, links to our own site left the game with no way back.",
           "state": "fixed",
           "version": "v0.78.0"
+        },
+        {
+          "id": "F188",
+          "text": "Opening or closing a bag on an iPhone flashed the street black.",
+          "state": "fixed",
+          "version": "v0.79.0"
         }
       ]
     },
@@ -4164,6 +4239,12 @@
           "text": "A label naming nearby things followed you as you walked, and the padlock on your things at home had no words.",
           "state": "fixed",
           "version": "v0.73.0"
+        },
+        {
+          "id": "F189",
+          "text": "The low-mood rain cloud never showed in Classic.",
+          "state": "fixed",
+          "version": "v0.79.0"
         }
       ]
     },
@@ -4607,6 +4688,22 @@
           "text": "A new player taken off Gentle Island in the middle of the tutorial was refused every road onward.",
           "state": "fixed",
           "version": "v0.74.0"
+        }
+      ]
+    },
+    {
+      "name": "Feasts",
+      "items": [
+        {
+          "id": "G1335",
+          "text": "On a phone the feast piles sit so close that a tap can open the next pile.",
+          "state": "known"
+        },
+        {
+          "id": "F182",
+          "text": "Herbs and Sno Cones in a feast pile couldn't be eaten.",
+          "state": "fixed",
+          "version": "v0.79.0"
         }
       ]
     }
