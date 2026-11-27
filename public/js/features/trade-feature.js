@@ -99,7 +99,7 @@ let multiplayer = false;
 
 const STYLE = `
 /* Above overlay art (z 70, e.g. the Qurazy banner): a window in use is never covered by an effect. */
-.trade-win { position: fixed; z-index: calc(var(--z-dialog) + 5); left: 50%; top: 9vh; transform: translateX(-50%); width: min(660px, calc(100vw - 32px)); max-height: 84vh; overflow-y: auto;
+.trade-win { position: fixed; z-index: calc(var(--z-dialog) + 5); left: 50%; top: calc(9vh + var(--safe-t, 0px)); transform: translateX(-50%); width: min(660px, calc(100vw - 32px)); max-height: calc(84vh - var(--safe-t, 0px)); overflow-y: auto;
   border-radius: var(--radius-xl); background: var(--surface-card); color: var(--text); box-shadow: var(--shadow-3), 0 0 0 1px color-mix(in srgb, var(--c-violet-50) 18%, transparent); font: var(--fs-md)/var(--lh-normal) var(--font-system); pointer-events: auto; }
 .trade-win[hidden] { display: none; }
 .trade-head { display: flex; gap: var(--sp-5); align-items: flex-start; padding: 0.8rem var(--sp-7) var(--sp-3); }
@@ -143,7 +143,7 @@ const STYLE = `
 .trade-foot button:disabled { opacity: 0.5; cursor: default; }
 .trade-foot button[hidden] { display: none; }
 .trade-win[data-state="sealed"] .trade-side { background: var(--surface-moss); box-shadow: inset 0 0 0 1px var(--c-lime-85); }
-@media (max-width: 560px) { .trade-cols { grid-template-columns: 1fr; } .trade-win { top: 4vh; } }
+@media (max-width: 560px) { .trade-cols { grid-template-columns: 1fr; } .trade-win { top: calc(4vh + var(--safe-t, 0px)); max-height: calc(88vh - var(--safe-t, 0px)); } }
 `;
 
 function el(tag, attrs = {}, text = '') {

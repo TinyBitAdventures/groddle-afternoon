@@ -30,11 +30,11 @@ import { bindContextTrigger } from './context-menu.js?v=0266831a';
 import { beginDrag, registerDropTarget, touchLift } from '../drop-targets.js?v=59e6edb4';
 
 const CSS = `
-.hst-win { position: fixed; z-index: calc(var(--z-panel) - 1); left: 50%; top: max(64px, 9vh); transform: translateX(-50%);
+.hst-win { position: fixed; z-index: calc(var(--z-panel) - 1); left: 50%; top: calc(max(64px, 9vh) + var(--safe-t, 0px)); transform: translateX(-50%);
   max-width: calc(100vw - 24px); display: flex;
   /* #325: down to the pack bar's live top (--pack-live-height, game.js), so a short phone keeps its rows and Done. */
-  max-height: calc(100vh - max(64px, 9vh) - var(--pack-live-height, 112px) - 8px);
-  max-height: calc(100dvh - max(64px, 9vh) - var(--pack-live-height, 112px) - 8px); flex-direction: column; overflow: hidden;
+  max-height: calc(100vh - max(64px, 9vh) - var(--safe-t, 0px) - var(--pack-live-height, 112px) - 8px);
+  max-height: calc(100dvh - max(64px, 9vh) - var(--safe-t, 0px) - var(--pack-live-height, 112px) - 8px); flex-direction: column; overflow: hidden;
   background: var(--surface-card); color: var(--text); border-radius: var(--radius-2xl); box-shadow: var(--shadow-3);
   border: 1px solid color-mix(in srgb, var(--c-umber-41) 18%, transparent); font-family: var(--font-ui); }
 .hst-win[hidden] { display: none; }

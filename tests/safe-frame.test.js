@@ -11,6 +11,9 @@
  *   forced (Playwright has no env() inset: --safe-t 83 px = 59 px inset + 24 px fade, --safe-b 34 px): the
  *   skill learned card, the minimap sheet, the character builder, the Magic Rock's talk, the welcome card
  *   online, a centred window and the phone page keep every visible word and button inside the frame.
+ * #742: the Hi sign leaderboard and the Calendar wrote their tops in a feature's CSS string (top: 3.2rem, 3rem),
+ * which the lint never read; now every fixed window's top, in a stylesheet or a CSS string, adds --safe-t, and
+ * both are checked in the browsers (with Gifts, Trade and the storage windows fixed by the same lint).
  * Run: node --test tests/safe-frame.test.js
  */
 import { after, before, describe, it } from 'node:test';
@@ -83,6 +86,28 @@ describe('SAFE FRAME: the lint', () => {
     for (const f of files) {
       for (const { prop, value } of declarations(stripComments(read(f)))) {
         if (value.includes('var(--hud-h') && !value.includes('--safe-t')) bad.push(`${f}: ${prop}: ${value.slice(0, 120)}`);
+      }
+    }
+    assert.deepEqual(bad, []);
+  });
+
+  // #742: the Hi sign leaderboard (3.2rem) and the Calendar (3rem, 2.6rem on a narrow phone) wrote their tops
+  // in a feature's CSS string, from the window's edge, and sat under an upright iPhone's clock and camera.
+  it('every fixed window\'s top from the screen\'s edge, in a stylesheet or a feature\'s CSS string, adds --safe-t', () => {
+    const bad = [];
+    for (const f of files) {
+      const src = stripComments(read(f));
+      // Each rule (or style string) and its selector; a selector made fixed anywhere in the file keeps the check in its @media rules.
+      const blocks = [...src.matchAll(/([^{}]*)\{([^{}]*)\}/g)].map((m) => ({ sel: m[1].split(/[`'"]/).pop().trim(), body: m[2] }));
+      const fixed = new Set();
+      for (const b of blocks) if (/position\s*:\s*fixed/.test(b.body)) for (const s of b.sel.split(',')) fixed.add(s.trim());
+      for (const b of blocks) {
+        if (!/position\s*:\s*fixed/.test(b.body) && !b.sel.split(',').some((s) => fixed.has(s.trim()))) continue;
+        for (const m of b.body.matchAll(/(?<![\w-])top\s*:\s*([^;}`'"\n]+)/g)) {
+          const v = m[1].trim();
+          // A length down from the top (not 0, a centring percentage or a negative tuck) clears the status bar.
+          if (/\d(px|rem|em|vh|dvh|svh|lvh)\b/.test(v) && !v.startsWith('-') && !v.includes('--safe-t')) bad.push(`${f}: ${b.sel.slice(-60)} { top: ${v} }`);
+        }
       }
     }
     assert.deepEqual(bad, []);
@@ -202,6 +227,13 @@ async function gameSurfaces(browser, ctxOpts, base) {
   await tab.waitForSelector('#avatar-panel:not([hidden])', { timeout: 10_000 });
   await tab.waitForTimeout(600);
   bad.push(...await tab.evaluate(outsideFrame, ['#avatar-panel', SAFE_T, SAFE_B]));
+  // #742: the Calendar (the clock's window solo, the hi sign board's Calendar button online).
+  await tab.keyboard.press('Escape');
+  await tab.waitForTimeout(400);
+  await tab.evaluate(() => window.dispatchEvent(new Event('groddle:calendar')));
+  await tab.waitForSelector('.ur-calendar:not([hidden])', { timeout: 10_000 });
+  await tab.waitForTimeout(400);
+  bad.push(...await tab.evaluate(outsideFrame, ['.ur-calendar', SAFE_T, SAFE_B]));
   await ctx.close();
   return { bad, errors };
 }
@@ -227,6 +259,14 @@ async function cssSurfaces(browser, ctxOpts) {
     <div class="glitch-modal"><div class="glitch-modal-card"><div class="glitch-modal-head"><h2>A window</h2><button type="button">Close</button></div>${rows}</div></div>
   </div></body></html>`);
   bad.push(...await tab.evaluate(outsideFrame, ['.glitch-modal', SAFE_T, SAFE_B]));
+  // #742: the Hi sign leaderboard (the clock's window online), drawn from its own CSS string.
+  const hi = read('public/js/features/hi-signs-feature.js');
+  const at = hi.indexOf('const BOARD_STYLE = `') + 'const BOARD_STYLE = `'.length;
+  const boardCss = hi.slice(at, hi.indexOf('`;', at));
+  await tab.setContent(`<!doctype html><html data-ui="modern" class="touch-phone phone-layout"><head><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><style>${css}</style><style>${boardCss}</style><style>${frame}</style></head><body><div id="game-root"></div>
+    <section class="hi-board"><button type="button" class="hi-close">Close</button><button type="button" class="hi-calendar">Calendar</button><h2>Hi sign leaderboard</h2><p class="hi-you">You don't have a daily hi sign yet!</p><ol>${Array.from({ length: 60 }, (_, i) => `<li>Sign ${i} <b>${i}</b></li>`).join('')}</ol></section>
+  </body></html>`);
+  bad.push(...await tab.evaluate(outsideFrame, ['.hi-board', SAFE_T, SAFE_B]));
   await ctx.close();
   return bad;
 }

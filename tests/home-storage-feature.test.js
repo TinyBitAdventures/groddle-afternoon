@@ -12,7 +12,7 @@ import { readFileSync, readdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { saleVerbs } from '../public/js/home-street-mp.js?v=6ad3a79b';
-import { homeStorageFeature } from '../public/js/features/home-storage-feature.js?v=7f0a9174';
+import { homeStorageFeature } from '../public/js/features/home-storage-feature.js?v=3c43348a';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const read = (p) => readFileSync(join(root, p), 'utf8');
@@ -117,7 +117,7 @@ describe('the windows (CabinetDialog.as, StoreBuyUI.as) in both skins', () => {
     assert.match(windows, /'Move Here'/);
     assert.match(windows, /\.hst-win \{ position: fixed; z-index: calc\(var\(--z-panel\) - 1\);/);
     // #325: it stops at the pack bar's live top (game.js --pack-live-height), not a fixed 230 px.
-    assert.match(windows, /max-height: calc\(100dvh - max\(64px, 9vh\) - var\(--pack-live-height, 112px\) - 8px\);/);
+    assert.match(windows, /max-height: calc\(100dvh - max\(64px, 9vh\) - var\(--safe-t, 0px\) - var\(--pack-live-height, 112px\) - 8px\);/);
     // findDropTarget: an empty slot, or the same class under its stackmax.
     assert.match(windows, /return s\.classTsid === cls && s\.count < \(opts\.stackmax\?\.\(cls\) \?\? Infinity\);/);
   });
@@ -179,7 +179,7 @@ describe('names from neighbours-mp.js are imported wherever a feature calls them
 
 describe('#511 (G1027): the display box lists every item it takes', () => {
   it('no cap at 80: items late in the alphabet are offered', async () => {
-    const { depositChoices } = await import('../public/js/features/home-storage-feature.js?v=7f0a9174');
+    const { depositChoices } = await import('../public/js/features/home-storage-feature.js?v=3c43348a');
     const { ITEM_CATALOG } = await import('../public/js/inventory.js?v=3be7988a');
     // 120 plain things in the pack (the catalog in node holds only the starter items).
     const added = [];

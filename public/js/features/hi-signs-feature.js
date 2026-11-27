@@ -855,7 +855,7 @@ function onHiBonus(engine, m) {
 // —— The Hi sign leaderboard (HiLeaderboard.as, in the clock's dialog) ——
 
 const BOARD_STYLE = `
-.hi-board { position: fixed; z-index: var(--z-dialog); top: 3.2rem; left: 50%; transform: translateX(-50%); width: min(27rem, calc(100vw - 2rem)); max-height: calc(100vh - 5rem); overflow: auto;
+.hi-board { position: fixed; z-index: var(--z-dialog); top: calc(3.2rem + var(--safe-t, 0px)); left: 50%; transform: translateX(-50%); width: min(27rem, calc(100vw - 2rem)); max-height: calc(100vh - 5rem - var(--safe-t, 0px) - var(--safe-b, 0px)); overflow: auto;
   border-radius: var(--radius-xl); padding: 0.8rem 0.95rem var(--sp-7); background: var(--surface-card); color: var(--c-sand-28); box-shadow: var(--shadow-3); font: var(--fs-md)/var(--lh-normal) var(--font-system); }
 .hi-board[hidden] { display: none; }
 .hi-board h2 { margin: 0 0 var(--sp-3); font-size: var(--fs-lg); }

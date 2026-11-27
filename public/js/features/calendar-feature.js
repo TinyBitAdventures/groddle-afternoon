@@ -38,7 +38,7 @@ export const CALENDAR_FEATURE_ID = 'calendar';
 export const CALENDAR_EVENT = 'groddle:calendar';
 
 const STYLE = `
-.ur-calendar { position: fixed; z-index: var(--z-dialog); top: 3rem; left: 50%; transform: translateX(-50%); width: min(44rem, calc(100vw - 1rem)); max-height: calc(100vh - 4rem); overflow: auto; box-sizing: border-box;
+.ur-calendar { position: fixed; z-index: var(--z-dialog); top: calc(3rem + var(--safe-t, 0px)); left: 50%; transform: translateX(-50%); width: min(44rem, calc(100vw - 1rem)); max-height: calc(100vh - 4rem - var(--safe-t, 0px) - var(--safe-b, 0px)); overflow: auto; box-sizing: border-box;
   border-radius: var(--radius-xl); padding: 0.8rem 0.9rem var(--sp-7); background: var(--surface-card); color: var(--c-sand-28); box-shadow: var(--shadow-3); font: var(--fs-md)/var(--lh-normal) var(--font-system); }
 .ur-calendar[hidden] { display: none; }
 .ur-calendar h2 { margin: 0 0 var(--sp-2); font-size: var(--fs-lg); }
@@ -78,7 +78,7 @@ const STYLE = `
 .ur-calendar .cal-day .feat { position: absolute; left: 0; right: 0; bottom: 0; height: 7px; background: var(--c-sky-54); }
 .ur-calendar .cal-day .feat.odd { background: var(--c-green-57); }
 .ur-calendar .cal-day.picked { outline: 2px solid var(--c-brown-46); }
-@media (max-width: 520px) { .ur-calendar { top: 2.6rem; padding: 0.6rem 0.55rem var(--sp-6); } .ur-calendar .cal-day { min-height: 2.5rem; padding: 1px 2px 8px; } }
+@media (max-width: 520px) { .ur-calendar { top: calc(2.6rem + var(--safe-t, 0px)); padding: 0.6rem 0.55rem var(--sp-6); } .ur-calendar .cal-day { min-height: 2.5rem; padding: 1px 2px 8px; } }
 `;
 
 let engineRef = null;

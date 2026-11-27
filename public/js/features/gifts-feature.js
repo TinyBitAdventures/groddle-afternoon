@@ -76,7 +76,7 @@ let slice = normalizeGiftsSlice(null);
 let multiplayer = false;
 
 const STYLE = `
-.gift-win { position: fixed; z-index: calc(var(--z-dialog) + 5); left: 50%; top: 10vh; transform: translateX(-50%); width: min(520px, calc(100vw - 32px)); max-height: 82vh; overflow-y: auto; box-sizing: border-box;
+.gift-win { position: fixed; z-index: calc(var(--z-dialog) + 5); left: 50%; top: calc(10vh + var(--safe-t, 0px)); transform: translateX(-50%); width: min(520px, calc(100vw - 32px)); max-height: calc(82vh - var(--safe-t, 0px)); overflow-y: auto; box-sizing: border-box;
   border-radius: var(--radius-xl); background: var(--surface-card); color: var(--text); box-shadow: var(--shadow-3), 0 0 0 1px color-mix(in srgb, var(--c-violet-50) 18%, transparent); font: var(--fs-md)/var(--lh-normal) var(--font-system); pointer-events: auto; }
 .gift-win[hidden] { display: none; }
 .gift-head { display: flex; gap: var(--sp-5); align-items: flex-start; padding: 0.8rem var(--sp-7) 0.3rem; }
@@ -97,7 +97,7 @@ const STYLE = `
 /* #141: the recipient sits with the amount, just above Give (the picker's How many is right above it). */
 .gift-sec.gift-to { margin-top: var(--sp-3); }
 .gift-sec.gift-to .gift-list { max-height: 5.2rem; }
-@media (max-height: 560px) { .gift-win { top: 4vh; max-height: 92vh; } }
+@media (max-height: 560px) { .gift-win { top: calc(4vh + var(--safe-t, 0px)); max-height: calc(92vh - var(--safe-t, 0px) - var(--safe-b, 0px)); } }
 .gift-slots { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--sp-3); }
 .gift-slot { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 4.2rem; border-radius: var(--radius-md); background: var(--surface-card); box-shadow: inset 0 0 0 1px var(--c-sand-90); padding: 0.2rem; font-size: var(--fs-xs); text-align: center; }
 .gift-slot img { width: 32px; height: 32px; object-fit: contain; }
