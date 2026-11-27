@@ -4,7 +4,7 @@
  */
 import { ITEM_ICONS, ITEM_LABELS, getVerbsFor, ordinaryItems, runVerb } from './content.js?v=68a61ef7';
 import { createErrorOnce, createFeatureHost, createFrameStages } from './js/feature-host.js?v=b87e2cbc';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=e7ce4170';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=7aeb2c54';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, enterHintPick, groupHead, hoverRimShown, reachGlowTargets, spriteHasRimArt, rimArtParts, trimmedIconUrl, drawTileArt } from './js/enter-chooser.js?v=74f4964a';
 import { firstTendKey, STICK_TEND_DELAY_MS, STICK_TEND_DIRS, STICK_TEND_REPEAT_MS, stepTendKey, stepTendKeys, stickTendKey, tendKeyAction } from './js/garden-tend.js?v=a7470c4a';
 import { avatarHitBox, behindFloor, bodyReachDistance, OUT_OF_REACH_LINE, playerClickBox } from './js/reach.js?v=456da8a8';
@@ -138,7 +138,7 @@ import {
   requestLegalizeQualification,
   travelToGregarious,
 } from './js/legalize-it.js?v=1fd33e0e';
-import { HALL, HALL_DECOS, HALL_EXTRA_CHAIRS, HALL_OFFICE, HALL_QUESTIONS } from './js/bureaucratic-hall.js?v=0f0c2901';
+import { HALL, HALL_DECOS, HALL_EXTRA_CHAIRS, HALL_OFFICE, HALL_QUESTIONS } from './js/bureaucratic-hall.js?v=074510f2';
 import { STATION_X, stationArrival, stationScreen, surfaceStation } from './js/subway.js?v=ea6921ff';
 import { ALLEY, SHADY, drawAlley, inEnteredBox } from './js/quest-rooms/back-alley-set.js?v=4e04295a';
 import { WINTER_WALK_BOUNDS, WINTER_WALK_PASSAGE } from './js/winter-walk-streets.js?v=c921bf92';
@@ -1054,7 +1054,7 @@ import {
   creditMetabolicReward,
   streetQuoinPoints,
 } from './js/quoins.js?v=5abad2c7';
-import { isPartyStreet } from './js/party-spaces.js?v=24dcb622'; // G869: a Party Space's quoins are the party classes
+import { isPartyStreet } from './js/party-spaces.js?v=91ce15c5'; // G869: a Party Space's quoins are the party classes
 import { greedyReplayEvents, heldPlaceHold, heldPlaceKind, shiftHeldClock } from './js/party-held-places.js?v=c34cb987'; // G911
 import {
   buildHubMapView,

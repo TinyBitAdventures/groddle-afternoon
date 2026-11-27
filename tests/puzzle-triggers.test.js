@@ -247,7 +247,7 @@ describe('gut tubes', () => {
   });
 
   test('a phone flips with its Jump button, and the toasts name it (Greyving Grays chat "stuck", 2026-11-13)', async () => {
-    const { puzzleToast } = await import('../public/js/features/puzzles-feature.js?v=4e5e9122');
+    const { puzzleToast } = await import('../public/js/features/puzzles-feature.js?v=af0fc0e3');
     const src = readFileSync(join(root, 'public/js/features/puzzles-feature.js'), 'utf8');
     // The phone has no Space key: its Jump button sends TOUCH_JUMP_EVENT (game.js installTouchControls).
     assert.match(src, /window\.addEventListener\(TOUCH_JUMP_EVENT, \(\) => flipGravity\(engine\)\);/);
@@ -320,7 +320,7 @@ describe('lost puzzle levels (scenes)', async () => {
     assert.match(body, /beamConeTexture\(PIXI, scene\)/);
     assert.match(body, /beamLanding\(PIXI, root, scene\)/);
     assert.match(body, /ufo_1\.webp/);
-    const { BEAM_ART } = await import('../public/js/features/puzzle-scenes-feature.js?v=c2b72db4');
+    const { BEAM_ART } = await import('../public/js/features/puzzle-scenes-feature.js?v=1c657301');
     for (const n of BEAM_ART.clouds) assert.ok(existsSync(join(root, `public/assets/decos/groddle/${n}.webp`)), n);
     assert.ok(existsSync(join(root, 'public', BEAM_ART.door)));
     assert.ok(existsSync(join(root, `public/assets/decos/groddle/${BEAM_ART.plank}.webp`)));

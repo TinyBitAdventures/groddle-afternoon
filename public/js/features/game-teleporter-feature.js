@@ -31,7 +31,6 @@
  *   gameTeleporterLast.
  */
 
-import { priceText } from '../price.js?v=35cd2331';
 import { OVERLAY_USES, playOverlay } from '../overlays.js?v=91dcee74';
 import { crownsMpTeleport, startCrowns } from './crowns-feature.js?v=67def12f';
 
@@ -52,7 +51,7 @@ export const GAME_TELEPORTER_TEXT = Object.freeze({
   label: 'Crown Game Teleporter',
   verb: 'Activate',
   tooltip: 'Play a sporrrrrrrrrrrrrrts',
-  question: `Do you want to play <b>Game of Crowns</b> for <b>${priceText(50)}</b>?`,
+  question: 'Do you want to play <b>Game of Crowns</b> for <b>50c</b>?', // GSJS quote: items/game_teleporter.js 201
   yes: 'Sounds fun!',
   no: 'Maybe another time',
   paid: 'You are transported to a mystical land of fun and adventure!',

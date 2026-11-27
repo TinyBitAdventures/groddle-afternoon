@@ -16,7 +16,7 @@ import { after, before, describe, it } from 'node:test';
 import { readFileSync } from 'node:fs';
 import { execFileSync, spawnSync } from 'node:child_process';
 
-import { partySpacesFeature } from '../public/js/features/party-spaces-feature.js?v=4c69d422';
+import { partySpacesFeature } from '../public/js/features/party-spaces-feature.js?v=7cdb53d7';
 import { HAS_SERVER, HAS_SITE, SITE_DIR, serverPath, sitePath } from '../tools/repos.mjs';
 import { HAS_PHP, PHP } from './php.js';
 

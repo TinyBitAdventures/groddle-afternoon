@@ -40,7 +40,6 @@
  *   so each space's one signpost is the way back to where you came from.
  */
 
-import { priceText } from './price.js?v=35cd2331';
 import { applyPhysicsAdjustments, physicsMultipliers } from './location-events.js?v=48938c8f';
 
 export const PARTY_FULL_SECONDS = 60 * 60;
@@ -533,7 +532,7 @@ export function partyExtendOptions(party) {
   const space = PARTY_SPACES[party?.template];
   if (!space) return [];
   const minutes = party.taster ? [5, 15] : [10, 30];
-  return minutes.map((m) => ({ minutes: m, cost: space.prices[m], label: `${m}m for ${priceText(space.prices[m])}` }));
+  return minutes.map((m) => ({ minutes: m, cost: space.prices[m], label: `${m}m for ${space.prices[m]}c` })); // GSJS quote: items/party_atm.js 192-200
 }
 
 /**

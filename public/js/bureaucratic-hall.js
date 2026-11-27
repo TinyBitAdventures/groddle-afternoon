@@ -61,8 +61,6 @@
  * footage shows them (#734, HALL_DECOS).
  */
 
-import { priceText } from './price.js?v=35cd2331';
-
 export const BUREAUCRAT_CLASS = 'npc_bureaucrat';
 export const PLEASE_WAIT_BUFF = 'please_wait';
 export const PLEASE_WAIT_MS = 10_000; // catalog_buffs.js please_wait duration 10
@@ -701,7 +699,7 @@ export function createHallFlow(host, { script = null, start = null, shared = nul
     const items = hallItems(host.learned(), host.achievements());
     setPhase('talking', `talk:${i}`);
     const choice = items.length
-      ? await ask(c, HALL_TEXT.itemsIntro, [...items.map((it) => ({ label: `${it.label} (${priceText(it.cost)})`, value: it.classTsid })), { label: 'Nevermind', value: 'nevermind' }])
+      ? await ask(c, HALL_TEXT.itemsIntro, [...items.map((it) => ({ label: `${it.label} (${it.cost}c)`, value: it.classTsid })), { label: 'Nevermind', value: 'nevermind' }]) // GSJS quote: items/npc_bureaucrat.js 230
       : await ask(c, HALL_TEXT.goAway(pcLabel()), [{ label: 'OK', value: 'nevermind' }]);
     if (choice === undefined) return true;
     const it = items.find((row) => row.classTsid === choice);

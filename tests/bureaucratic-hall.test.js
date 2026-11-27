@@ -23,7 +23,7 @@ import {
   hallItems,
   hallX,
   waitPromptFor,
-} from '../public/js/bureaucratic-hall.js?v=0f0c2901';
+} from '../public/js/bureaucratic-hall.js?v=074510f2';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const gsjs = join(root, '..', 'glitch-GameServerJS');
@@ -269,7 +269,7 @@ describe('the visit', () => {
     flow.talk(first);
     await flush();
     assert.equal(h.lastTalk().text, 'The following items are available to you:');
-    assert.deepEqual(h.lastTalk().choices.map((c) => c.label), ['Card-Carrying Qualification (50₡)', 'Nevermind']);
+    assert.deepEqual(h.lastTalk().choices.map((c) => c.label), ['Card-Carrying Qualification (50c)', 'Nevermind']);
     await h.answer('card_carrying_qualification');
     assert.match(h.lastTalk().text, /a <b>Card-Carrying Qualification<\/b>/);
     const second = flow.state.helperIndex;

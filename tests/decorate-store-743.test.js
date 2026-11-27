@@ -115,6 +115,19 @@ describe('#743 the Furniture Store button is a toggle (Austin\'s ruling 2026-11-
   });
 });
 
+/**
+ * GSJS-quoted text the price lint allows: conversation and NPC lines Tiny Speck's server wrote with "c", kept word
+ * for word (coordinator 2026-11-27: the ₡ ruling covers prices our UI draws, not quoted dialogue). Each line in the
+ * game carries `// GSJS quote: <source>`; add an entry here only with that comment and the GSJS file and line.
+ * [game file, the words on the line, the GSJS source]
+ */
+const GSJS_QUOTED = [
+  ['public/js/features/foxes-feature.js', "'Deal (500c)'", 'items/npc_fox_ranger.js 298'],
+  ['public/js/features/game-teleporter-feature.js', 'for <b>50c</b>?', 'items/game_teleporter.js 201'],
+  ['public/js/bureaucratic-hall.js', '(${it.cost}c)', 'items/npc_bureaucrat.js 230'],
+  ['public/js/party-spaces.js', 'm for ${space.prices[m]}c', 'items/party_atm.js 192-200'],
+];
+
 describe('#743 prices read the number then Glitch\'s ₡ (Austin\'s ruling 2026-11-26)', () => {
   it('priceText: commas, then ₡, no space (StoreDialog.as 390, StoreBuyUI.as 520 "Price 1,234₡")', async () => {
     const { CURRANT_SIGN, priceText } = await import('../public/js/price.js?v=35cd2331');
@@ -154,14 +167,21 @@ describe('#743 prices read the number then Glitch\'s ₡ (Austin\'s ruling 2026-
     // A number or a ${value} then "c" (before a space, a bracket, a tag, a quote or punctuation), a +'c', the old ◎, or ₡ after a space.
     const OTHER = /(\$\{[^{}]*\}|(?<![\w.,-])[1-9]\d{0,2}(?:,\d{3})*)c(?=[\s)<'"`,!?·]|$)|\+\s*'c'|◎| ₡/;
     const bad = [];
+    const quoted = new Set();
     for (const f of files) {
       if (/data-versions\.js$|deco-(sharp|hires)-list\.js$/.test(f)) continue; // hashes and art names, not words
       read(f).split('\n').forEach((line, i) => {
         if (/^\s*(\*|\/\/)/.test(line)) return; // comments quote Glitch's own "c"
-        if (OTHER.test(line)) bad.push(`${f}:${i + 1}: ${line.trim().slice(0, 140)}`);
+        if (!OTHER.test(line)) return;
+        // Tiny Speck's own words, kept as GSJS wrote them (the ruling covers prices our UI draws, not quoted dialogue).
+        const gsjs = GSJS_QUOTED.find(([file, words]) => file === f && line.includes(words));
+        if (gsjs && line.includes(`// GSJS quote: ${gsjs[2]}`)) quoted.add(gsjs);
+        else bad.push(`${f}:${i + 1}: ${line.trim().slice(0, 140)}`);
       });
     }
     assert.deepEqual(bad, []);
+    // Every allowed quote is still there, marked on its line (no stale entries).
+    assert.deepEqual(GSJS_QUOTED.filter((q) => !quoted.has(q)), []);
   });
 
   it('the vendor\'s purse line writes the number as the prices do, with its commas ("You have 1,250 currants")', async () => {
