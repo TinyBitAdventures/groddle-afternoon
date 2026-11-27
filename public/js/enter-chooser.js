@@ -180,6 +180,45 @@ export function enterHintPick({ recent = null, hover = null, hoverInReach = fals
 }
 
 /**
+ * #729 (G1331, Austin 2026-11-27): what the hover says over a thing, Glitch's location tip
+ * (Itemstack.as getLocationTip 576-581): a put-down stack of more than one is its count and the
+ * item's own plural, "12 Cherries"; one is its name. The Enter hint chip shows it (hoverText).
+ * @param {{ count?: number, label: string, plural?: string }} stack
+ */
+export function stackHoverLabel({ count = 1, label, plural = '' } = {}) {
+  const n = Math.floor(Number(count) || 0);
+  return n > 1 ? `${n} ${plural || `${label}s`}` : label;
+}
+
+/**
+ * #729 (G1331): a Storage Display Box's hover (Itemstack.as getLocationTip 509-521, 583-585): what it
+ * holds by count, the item's name for 1 and its plural otherwise, then the box, "12 Cherries (in a
+ * Storage Display Box)"; a selling box "Cherries selling for 5₡ (12 remaining)"; an empty one its name.
+ * @param {{ name: string, count?: number, label?: string, plural?: string, selling?: boolean, price?: string }} box
+ *   price: the price already written (js/price.js priceText).
+ */
+export function sdbHoverLabel({ name, count = 0, label = '', plural = '', selling = false, price = '' } = {}) {
+  const n = Math.floor(Number(count) || 0);
+  if (!label || n < 1) return name;
+  const many = plural || `${label}s`;
+  if (selling && price) return `${many} selling for ${price} (${n} remaining)`;
+  return `${n} ${n === 1 ? label : many} (in a ${name})`;
+}
+
+/** #729: the hover words a target gives (its hoverLabel, a string or a function read now), else its label. */
+export function hoverText(target, fallback = 'interact') {
+  let own = target?.hoverLabel;
+  if (typeof own === 'function') {
+    try {
+      own = own();
+    } catch {
+      own = '';
+    }
+  }
+  return own || target?.label || target?.classId || fallback;
+}
+
+/**
  * #701/#702 (2026-11-25): only a Sprite with a real texture can take the cyan rim. A target drawn as
  * a PIXI.Graphics hit box (the home street's house door) has no art to trace; a rim copy given its
  * non-texture threw inside Pixi's render with the rim's filter pushed, and every later frame broke

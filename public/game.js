@@ -4,8 +4,8 @@
  */
 import { ITEM_ICONS, ITEM_LABELS, getVerbsFor, ordinaryItems, runVerb } from './content.js?v=68a61ef7';
 import { createErrorOnce, createFeatureHost, createFrameStages } from './js/feature-host.js?v=b87e2cbc';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=2234fc69';
-import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, enterHintPick, groupHead, hoverRimShown, reachGlowTargets, spriteHasRimArt, rimArtParts, trimmedIconUrl, drawTileArt } from './js/enter-chooser.js?v=74f4964a';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=a8674e15';
+import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, enterHintPick, hoverText, stackHoverLabel, groupHead, hoverRimShown, reachGlowTargets, spriteHasRimArt, rimArtParts, trimmedIconUrl, drawTileArt } from './js/enter-chooser.js?v=297c6d15';
 import { firstTendKey, STICK_TEND_DELAY_MS, STICK_TEND_DIRS, STICK_TEND_REPEAT_MS, stepTendKey, stepTendKeys, stickTendKey, tendKeyAction } from './js/garden-tend.js?v=a7470c4a';
 import { avatarHitBox, behindFloor, bodyReachDistance, OUT_OF_REACH_LINE, playerClickBox } from './js/reach.js?v=456da8a8';
 import { createVogOverlay } from './js/vog-overlay.js?v=02f04426';
@@ -16722,6 +16722,9 @@ function spawnDroppedItemStack(stack, mark = '') {
   register({
     classId: 'dropped_item',
     label: named?.label || item.label || stack.classTsid,
+    // #729 (G1331): the hover names the count, "12 Cherries" (Itemstack.as getLocationTip 580); a bag or a
+    // stack with its own name keeps the name (tooltip_label wins there, 577-578).
+    hoverLabel: named ? '' : stackHoverLabel({ count: stack.count, label: item.label || stack.classTsid, plural: item.namePlural }),
     subtitle: `${named ? `${named.kind} · ` : ''}${stack.subtitle || (stack.contents?.length
       ? `Dropped bag · ${stack.contents.length} ${stack.contents.length === 1 ? 'stack' : 'stacks'} inside`
       : stack.name || stack.sort ? 'Dropped bag · nothing inside' : `Dropped stack · ${stack.count} in this pile`)}`,
@@ -37762,7 +37765,9 @@ async function main() {
           want = { key: '↑', label: 'climb', x: nearClimb.x, y: Math.min(player.y, nearClimb.yBot) - 70 };
         } else if (near) {
           const box = spriteWorldHitBox(near.sprite, 0);
-          let label = near.label || near.classId || 'interact';
+          // #729 (G1331): the hover's words, Glitch's tip: a stack's count ("12 Cherries"), a display box's
+          // contents ("12 Cherries (in a Storage Display Box)"), else the name (enter-chooser.js hoverText).
+          let label = hoverText(near);
           // G217: with several things in reach Enter asks which (tryOpenNearestMenu), so the chip says so.
           if (pick.via === 'walk-past' && !ENTER_CHOOSER_OFF) {
             const plan = enterPlanForPrompt();

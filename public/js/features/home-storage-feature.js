@@ -92,6 +92,7 @@ import {
   openStoreDialog,
   storageWindowKind,
 } from '../ui/storage-windows.js?v=45ec71d2';
+import { sdbHoverLabel } from '../enter-chooser.js?v=297c6d15';
 import { anchorBottomCentre } from '../sprite-feet.js?v=849541a8';
 import { WORLD_FONT_FAMILY } from '../world-text.js?v=6b49f88c';
 
@@ -221,6 +222,21 @@ function boxShown(engine, row, owner) {
   return b ? { selling: b.stock > 0, price: Number(b.price) || 0, income: 0, stock: Number(b.stock) || 0, class: String(b.class || '') } : { selling: false, price: 0, income: 0, stock: 0 };
 }
 
+/**
+ * #729 (G1331, Austin 2026-11-27): a display box's hover, Glitch's tip (Itemstack.as getLocationTip
+ * 509-521): "12 Cherries (in a Storage Display Box)", or "Cherries selling for 5₡ (12 remaining)".
+ * The count is the shared one online: a selling box's stock is the site's ledger (mine() for the
+ * owner, the visit's boxes for a visitor, boxShown), a box not selling is the house's own row, which
+ * the sales others made come out of (applyOwnerOps).
+ */
+function boxHover(engine, row, owner, name) {
+  const shown = boxShown(engine, row, owner);
+  const cls = row.display?.classTsid || shown?.class || '';
+  const count = shown?.selling ? shown.stock : row.display?.count || 0;
+  if (!cls) return name;
+  return sdbHoverLabel({ name, count, label: labelOf(cls), plural: pluralOf(cls), selling: Boolean(shown?.selling), price: priceText(shown?.price || 0) });
+}
+
 function sceneKey(engine) {
   const w = where(engine);
   if (!w) return '';
@@ -279,7 +295,9 @@ function draw(engine) {
       // chooserIcon (#341, G763): the box is an invisible hit box, so the Act/Enter chooser shows the
       // piece's catalog art (its upgrade's when upgraded), else its pack icon.
       const chooserIcon = pieceArt(row.classTsid, row.upgradeId)?.path || itemIcon(row.classTsid);
-      e.target = engine.register({ featureId: HOME_STORAGE_ID, classId: CLASS_STORAGE, label: name, subtitle, sprite: box, chooserIcon, state: { uid: row.id, owner, itemClass: row.classTsid } });
+      // #729 (G1331): the hover names what a display box holds, read when the hover draws (boxHover).
+      const hoverLabel = isSdbClass(row.classTsid) ? () => boxHover(engine, row, owner, name) : '';
+      e.target = engine.register({ featureId: HOME_STORAGE_ID, classId: CLASS_STORAGE, label: name, subtitle, hoverLabel, sprite: box, chooserIcon, state: { uid: row.id, owner, itemClass: row.classTsid } });
     }
     if (shown?.selling) {
       // sdb_cost (getExtraConfig 944-957): the sale price over the box, 55 px up.
