@@ -96,7 +96,7 @@ export const CONVO_BUBBLE_CHOICES = Object.freeze([
   '{pc_label}! Pssssst! Talk to me! {pc_label}!',
 ]);
 
-/** The call-out bubble (choose_one in the source; `pick` in [0, 1)). The remake has no player names, so {pc_label} reads "friend". */
+/** The call-out bubble (choose_one in the source; `pick` in [0, 1)). {pc_label} is your name online (#734), "friend" in solo, which has no character name. */
 export function offerBubble(pick = Math.random(), label = 'friend') {
   const i = Math.min(CONVO_BUBBLE_CHOICES.length - 1, Math.max(0, Math.floor(pick * CONVO_BUBBLE_CHOICES.length)));
   // A name opening a sentence is capitalized, as the source's player names were.

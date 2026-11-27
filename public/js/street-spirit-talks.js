@@ -57,7 +57,7 @@ import {
   offerRules,
   offeredForClass,
   recordOffer,
-} from './conversations.js?v=7cbdfea4';
+} from './conversations.js?v=ca848555';
 
 export { CONVO_BUBBLE_CHOICES };
 

@@ -4,7 +4,7 @@
  */
 import { ITEM_ICONS, ITEM_LABELS, getVerbsFor, ordinaryItems, runVerb } from './content.js?v=c46159de';
 import { createErrorOnce, createFeatureHost, createFrameStages } from './js/feature-host.js?v=b87e2cbc';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=2834bfac';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=79d41771';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, enterHintPick, groupHead, hoverRimShown, reachGlowTargets, spriteHasRimArt, rimArtParts, trimmedIconUrl, drawTileArt } from './js/enter-chooser.js?v=74f4964a';
 import { firstTendKey, STICK_TEND_DELAY_MS, STICK_TEND_DIRS, STICK_TEND_REPEAT_MS, stepTendKey, stepTendKeys, stickTendKey, tendKeyAction } from './js/garden-tend.js?v=a7470c4a';
 import { avatarHitBox, behindFloor, bodyReachDistance, OUT_OF_REACH_LINE, playerClickBox } from './js/reach.js?v=456da8a8';
@@ -4313,7 +4313,7 @@ async function streetTripTo(tsid, opts = {}) {
         quoinTypes: quoins.map((q) => q.typeId),
         visit,
         ...(features.query('streetProjectInfo', currentStreetTsid, engine) || {}),
-        playerLabel: playerSpeechTarget?.label || 'Ur',
+        playerLabel: engine.playerLabel,
       });
       homeToSeen.set(currentStreetTsid, info.features);
       return info;
@@ -14597,9 +14597,13 @@ const engine = {
   get groundY() {
     return GROUND_Y;
   },
-  /** The name the world calls you by ({pc_label}: "Ur" in solo). */
+  /**
+   * The name the world calls you by ({pc_label}, the player's name in Glitch: items/item.js 1054,
+   * npc_bureaucrat.js 425 "Attention, <name>!"): your account name online (#734), "Ur" in solo,
+   * which has no character name.
+   */
   get playerLabel() {
-    return playerSpeechTarget?.label || 'Ur';
+    return features.query('playerChatName', engine) || playerSpeechTarget?.label || 'Ur';
   },
   /** The player's look (character builder), for others to draw (multiplayer). */
   get playerAppearance() {
@@ -17464,7 +17468,7 @@ function showNewDayBubble(refill = {}, line = '') {
   const bubble = newDayBubble(message, { energy: refill.energyGained, mood: refill.moodGained });
   if (app?.canvas) app.canvas.dataset.newDayBubble = bubble.text;
   return showSpeechBubble(playerSpeechTarget, {
-    speaker: features.query('playerChatName', engine) || playerSpeechTarget.label || 'Ur',
+    speaker: engine.playerLabel,
     ...bubble,
   });
 }
