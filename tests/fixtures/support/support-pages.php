@@ -299,6 +299,82 @@ try {
     $reopen(ADA, $working);
     $out['closeReopen']['workingStays'] = $row($working)['status'];
 
+    // == Reactions on a report's messages: chips on the page, added through the game's own route ==
+    // The page names the route's parts (the report and each message) and carries the REST nonce and the set.
+    $adminName = static fn (string $display) => $db->execute('UPDATE ' . $db->table('users') . ' SET display_name = ? WHERE ID = ?', [$display, ADMIN]);
+    $adminName('Morgan Lee');
+    $reactRoute = static function (int $as, int $t, int $m, mixed $e, bool $on = true, bool $admin = false) use ($api, $seams): array {
+        $path = $admin ? "/groddle/v1/admin/tickets/{$t}/messages/{$m}/reactions" : "/groddle/v1/tickets/{$t}/messages/{$m}/reactions";
+        $r = new Request(Method::Post, $path, [], [], [], json_encode(['e' => $e, 'on' => $on]), true, 'groddle.test');
+        return $api(static fn () => $admin ? (new AdminTickets($seams($as, $r)))->react($r, (string) $t, (string) $m) : (new Tickets($seams($as, $r)))->react($r, (string) $t, (string) $m));
+    };
+    $reactRows = static fn (int $t): array => array_map(static fn (array $r): array => ['message' => (int) $r['message_id'], 'user' => (int) $r['user_id'], 'role' => $r['role'], 'e' => $r['reaction']], $db->rows('SELECT message_id, user_id, role, reaction FROM ' . $db->table(\Groddle\Minn\TicketReactions::TABLE) . ' WHERE ticket_id = ? ORDER BY created_at, message_id, reaction', [$t]));
+    /** Each message li of a page: its id, author, chips [key, n, pressed, tip] and whether it has React. */
+    $msgView = static function (string $html): array {
+        $out = [];
+        preg_match_all('/<li class="cpost csupport-msg"[^>]*data-author="(\w+)" data-message="(\d+)">(.*?)<\/li>(?=\s*(?:<li class="cpost|<\/ol>))/s', $html, $all, PREG_SET_ORDER);
+        foreach ($all as [, $author, $id, $inner]) {
+            preg_match_all('/<button type="button" class="cchip" data-react="(\w+)" aria-pressed="(true|false)" title="([^"]*)" aria-label="\3">(.*?)<span>(\d+)<\/span><\/button>/s', $inner, $chips, PREG_SET_ORDER);
+            $out[] = [
+                'id' => (int) $id,
+                'author' => $author,
+                'chips' => array_map(static fn (array $c): array => [$c[1], (int) $c[5], $c[2] === 'true', html_entity_decode($c[3], ENT_QUOTES), str_contains($c[4], 'cchip-art cchip-hi')], $chips),
+                'box' => preg_match('/<div class="cpost-reactions" data-reactions="' . $id . '"( data-empty="")?>/', $inner, $b) ? ($b[1] ?? '') === '' ? 'chips' : 'empty' : null,
+                'react' => preg_match('/<div class="cpost-actions csupport-react" data-react-row="" hidden><button type="button" class="cact" data-react-open aria-haspopup="true" aria-expanded="false" aria-label="([^"]*)">React<\/button><\/div>/', $inner, $rb) ? html_entity_decode($rb[1], ENT_QUOTES) : null,
+            ];
+        }
+        return $out;
+    };
+    $before = $show(ADA, $answered)['body'] ?? '';
+    $pageTicket = preg_match('/data-support-report="(\d+)"/', $before, $m) ? (int) $m[1] : 0;
+    $pageNonce = preg_match('/<main [^>]*data-nonce="([0-9a-f]{10})"/', $before, $m) ? $m[1] : '';
+    $views = $msgView($before);
+    $adminMsg = 0;
+    $adaMsg = 0;
+    foreach ($views as $v) {
+        if ($v['author'] === 'admin' && $adminMsg === 0) {
+            $adminMsg = $v['id'];
+        }
+        if ($v['author'] === 'player' && $adaMsg === 0) {
+            $adaMsg = $v['id'];
+        }
+    }
+    $rx = ['before' => $views, 'pageTicket' => $pageTicket === $answered, 'nonceOk' => $pageNonce !== '' && Nonce::verify($pageNonce, ADA, $token(ADA)), 'set' => str_contains($before, ' data-reactions="[{&quot;key&quot;:&quot;like&quot;')];
+    // What the page's script sends (community/support-reactions.js: the game's js/reports.js api.react): Thumbs up on the team's reply.
+    $rx['web'] = $reactRoute(ADA, $pageTicket, $adminMsg, 'like');
+    $rx['webHi'] = $reactRoute(ADA, $pageTicket, $adaMsg, 'hi');
+    $rx['rowsAfterWeb'] = $reactRows($answered);
+    // The team from the console: Thumbs up beside hers, Thank you on her message.
+    $rx['console'] = [$reactRoute(ADMIN, $answered, $adminMsg, 'like', true, true)['status'], $reactRoute(ADMIN, $answered, $adaMsg, 'thanks', true, true)['status']];
+    $rx['rows'] = $reactRows($answered);
+    $pick = static fn (array $thread, int $msg): array => array_values(array_filter($thread['body']['messages'] ?? [], static fn (array $x): bool => (int) $x['id'] === $msg))[0]['reactions'] ?? [];
+    $rx['game'] = ['admin' => $pick($gameThread(ADA, $answered), $adminMsg), 'ada' => $pick($gameThread(ADA, $answered), $adaMsg)];
+    $rx['consoleSees'] = ['admin' => $pick($consoleThread($answered), $adminMsg), 'ada' => $pick($consoleThread($answered), $adaMsg)];
+    $after = $show(ADA, $answered)['body'] ?? '';
+    $rx['after'] = $msgView($after);
+    $rx['afterPane'] = substr($after, (int) strpos($after, 'data-cx-pane'));
+    // A chip pressed again takes hers off (on: false), and only hers.
+    $rx['off'] = $reactRoute(ADA, $answered, $adminMsg, 'like', false)['status'];
+    $rx['afterOff'] = array_values(array_filter($msgView($show(ADA, $answered)['body'] ?? ''), static fn (array $v): bool => $v['id'] === $adminMsg))[0]['chips'] ?? null;
+    $reactRoute(ADA, $answered, $adminMsg, 'like');
+    // Refused: another player's report (missing, as the game's route says), a message of another report, a key outside the set.
+    $beaFirst = (int) $db->value('SELECT MIN(id) FROM ' . $db->table(TicketStore::MESSAGES) . ' WHERE ticket_id = ?', [$beaReport]);
+    $rx['refused'] = [
+        'beaReport' => $reactRoute(ADA, $beaReport, $beaFirst, 'like'),
+        'otherMessage' => $reactRoute(ADA, $answered, $beaFirst, 'like'),
+        'unknownKey' => $reactRoute(ADA, $answered, $adminMsg, 'someday'),
+        'signedOut' => $reactRoute(0, $answered, $adminMsg, 'like'),
+    ];
+    $rx['rowsEnd'] = $reactRows($answered);
+    $rx['beaRows'] = $reactRows($beaReport);
+    // React is only on the report's owner's page: another player and the team get the site's 404 here, a visitor the sign-in.
+    $rx['pages'] = ['bea' => $show(BEA, $answered)['status'], 'admin' => $show(ADMIN, $answered)['status'], 'out' => str_contains($show(0, $answered)['body'] ?? '', 'data-react-open') ? 'react' : 'none', 'beaOwn' => count(array_filter($msgView($show(BEA, $beaReport)['body'] ?? ''), static fn (array $v): bool => $v['react'] !== null))];
+    $adminName('login-' . ADMIN);
+    $rx['pure'] = [
+        'names' => array_map([SupportPages::class, 'reactionNames'], [[['you' => true]], [['you' => false]], [['you' => true], ['you' => false]], [['you' => false], ['you' => false]], [['you' => false], ['you' => true], ['you' => false]], []]),
+    ];
+    $out['reactions'] = $rx;
+
     // == Uploads ==
     $last = static fn (int $t): array => (array) $db->row('SELECT id FROM ' . $db->table(TicketStore::MESSAGES) . ' WHERE ticket_id = ? ORDER BY id DESC LIMIT 1', [$t]);
     $picRows = static fn (int $msg): array => array_map(static fn (array $r): array => ['w' => (int) $r['width'], 'h' => (int) $r['height'], 'jpeg' => str_starts_with((string) $r['picture'], "\xFF\xD8\xFF"), 'bytes' => (int) $r['bytes'], 'exif' => str_contains((string) $r['picture'], 'Exif') || str_contains((string) $r['picture'], 'GPS 51.5N')], $db->rows('SELECT width, height, picture, bytes FROM ' . $db->table(TicketStore::MESSAGE_PICTURES) . ' WHERE message_id = ? ORDER BY position', [$msg]));

@@ -260,7 +260,7 @@ describe('Support on the website: a player manages their own reports (php, throw
     assert.match(rp, /<input type="hidden" name="_wpnonce" value="[0-9a-f]{10}" \/>/);
     for (const html of [r.list.html, r.thread.html, r.reportPage, r.signedOut.body]) {
       assert.doesNotMatch(pane(html), /\u2014/, 'no em dashes');
-      assert.match(html, /community\.css\?v=community-22/);
+      assert.match(html, /community\.css\?v=community-23/);
       assert.match(html, /\/site\/theme\.js/, 'the theme script sets light or dark before paint');
     }
   });
@@ -285,6 +285,54 @@ describe('Support on the website: a player manages their own reports (php, throw
       assert.equal(line[1], `Up to 4 pictures and 2 text files (.txt or .log, up to ${lim.textWords}) a message. Big pictures are made smaller before they go. Only you and the team can see them.`);
     }
     assert.match(pane(r.newReport.form.html), /data-support-new=""/);
+  });
+
+  it('reactions: chips with counts and who (You, Administrator, never a name); added on the page through the game\'s route, the same rows the game and the console read', () => {
+    const x = r.reactions;
+    assert.ok(x.pageTicket, 'the page names its report for the script');
+    assert.ok(x.nonceOk, 'and carries the reader\'s REST nonce (the game\'s route checks it as it does for the game)');
+    assert.ok(x.set, 'and the reaction set (the picker\'s)');
+    const admin = x.before.find((m) => m.author === 'admin');
+    const ada = x.before.find((m) => m.author === 'player');
+    assert.ok(admin && ada, 'both kinds of message drawn');
+    for (const m of x.before) {
+      assert.deepEqual(m.chips, [], 'no reactions yet');
+      assert.equal(m.box, 'empty', 'an empty chip row, hidden by the CSS');
+      assert.equal(m.react, m.author === 'admin' ? 'React to the team\'s message' : 'React to your message', 'React on every message, hidden until the script shows it');
+    }
+    // The page's reaction: the player's own route, a player row, no different from the game's.
+    assert.equal(x.web.status, 200, JSON.stringify(x.web));
+    assert.deepEqual(x.web.body.reactions, [{ e: 'like', by: [{ id: 910, name: 'Ada', you: true }], mine: true }]);
+    const byMessage = (rows) => [...rows].sort((a, b) => a.message - b.message || a.e.localeCompare(b.e));
+    assert.deepEqual(byMessage(x.rowsAfterWeb), byMessage([{ message: admin.id, user: 910, role: 'player', e: 'like' }, { message: ada.id, user: 910, role: 'player', e: 'hi' }]));
+    assert.deepEqual(x.console, [200, 200]);
+    // The game's Reports window and the console read the same rows (TicketReactions::attach): hers and the team's.
+    // (Both in the same second here: the store's order is then by id.)
+    const ids = (list) => list.map((c) => [c.e, c.mine, [...c.by].sort((a, b) => a.id - b.id)]);
+    assert.deepEqual(ids(x.game.admin), [['like', true, [{ id: 900, name: 'Morgan Lee', you: false }, { id: 910, name: 'Ada', you: true }]]], 'the game names the team by the console\'s display name');
+    assert.deepEqual(ids(x.consoleSees.admin).map(([e, , by]) => [e, by.map((b) => b.id)]), [['like', [900, 910]]]);
+    assert.deepEqual(x.game.ada.map((c) => c.e), ['thanks', 'hi'], 'the set\'s order');
+    // On the web page: counts, pressed when hers, who by role only.
+    const after = Object.fromEntries(x.after.map((m) => [m.id, m]));
+    assert.deepEqual(after[admin.id].chips, [['like', 2, true, 'Thumbs up: You and Administrator', false]]);
+    assert.deepEqual(after[ada.id].chips, [['thanks', 1, false, 'Thank you: Administrator', false], ['hi', 1, true, 'Hi: You', true]], 'the Hi sign is its art');
+    assert.equal(after[admin.id].box, 'chips');
+    assert.doesNotMatch(x.afterPane, /Morgan Lee|login-900|Staffer/, 'the team is never a name on the web, though the game shows the console\'s display name');
+    assert.doesNotMatch(x.afterPane, /title="[^"]*Ada/, 'nor the player\'s own character name');
+    assert.equal(x.off, 200);
+    assert.deepEqual(x.afterOff, [['like', 1, false, 'Thumbs up: Administrator', false]], 'pressed again: hers off, the team\'s stays');
+  });
+
+  it('reactions refused: another player\'s report or message (404), a key outside the set (400), signed out (401); React only for the report\'s owner', () => {
+    const x = r.reactions;
+    assert.deepEqual(x.refused.beaReport, { status: 404, code: 'groddle_ticket_missing' });
+    assert.deepEqual(x.refused.otherMessage, { status: 404, code: 'groddle_ticket_message_missing' });
+    assert.deepEqual(x.refused.unknownKey, { status: 400, code: 'groddle_ticket_reaction' });
+    assert.equal(x.refused.signedOut.status, 401);
+    assert.deepEqual(x.beaRows, [], 'nothing on Bea\'s report');
+    assert.equal(x.rowsEnd.length, 4, 'nothing new from the refusals');
+    assert.deepEqual(x.pages, { bea: 404, admin: 404, out: 'none', beaOwn: 2 }, 'another player and the team: the site\'s 404; a visitor: no React; Bea on her own: React on each message');
+    assert.deepEqual(x.pure.names, [['You'], ['Administrator'], ['You', 'Administrator'], ['The team'], ['You', 'the team'], []]);
   });
 
   it('what the game sent shows plainly: street, build, browser, screen, page errors; the website\'s says so', () => {
@@ -388,7 +436,23 @@ describe('Support: the site code (groddle-afternoon-site)', { skip: skipWithoutS
     assert.match(css, /\.csupport-drop\[data-over\] \.csupport-drop-zone \{[^}]*border-color: var\(--accent\)/, 'lit while files are dragged over');
     assert.match(css, /@media \(hover: hover\) \{ \.csupport-drop-zone:hover \{[^}]*border-color: var\(--accent\)/, 'a hover look where there is a mouse (never stuck after a tap)');
     assert.match(css, /@media \(hover: none\) and \(pointer: coarse\) \{\s*\.csupport-drop-mouse \{ display: none; \}/, 'a phone reads Tap to add');
-    assert.match(src('src/CommunityPages.php'), /ASSET_KEY = 'community-22'/);
+    assert.match(src('src/CommunityPages.php'), /ASSET_KEY = 'community-23'/);
+  });
+
+  it('a report\'s reactions: community.js loads support-reactions.js with its key and shares the boards\' picker; styles are tokens', () => {
+    const js = src('community/community.js');
+    assert.match(js, /import\(`\.\/support-reactions\.js\$\{v\}`\)/, 'with community.js\'s own ?v=');
+    assert.match(js, /m\.wireSupportReactions\(supportList, \{ ticket: Number\(supportReport\.dataset\.supportReport\), call, REACTIONS, togglePicker, closePicker, showLine, hook: messageReact, failed: SAID\.failed \}\)/, 'the page\'s call (its nonce), set and picker');
+    assert.match(js, /if \(li\.dataset\.message\) return void messageReact\.fn\?\.\(li, key, on\);/, 'a pick on a report message goes to it');
+    assert.match(js, /if \(open\) return void togglePicker\(li, open\);/, 'the boards open the same picker the same way');
+    assert.equal((js.match(/picker\.className = 'cpicker'/g) || []).length, 1, 'one picker');
+    assert.match(js, /stops\.push\(\(\) => \{ gone = true; stopReact\?\.\(\); \}\)/, 'stopped when the view goes');
+    const sr = src('community/support-reactions.js');
+    assert.match(sr, /call\(`tickets\/\$\{Number\(ticket\)\}\/messages\/\$\{message\}\/reactions`, \{ method: 'POST', body: \{ e: key, on \} \}\)/, 'the game\'s route (js/reports.js api.react)');
+    assert.doesNotMatch(sr, /\u2014/);
+    const css = src('community/community.css');
+    assert.match(css, /\.csupport-msg \.csupport-react\[hidden\] \{ display: none; \}/, 'React hidden without the script');
+    assert.match(css, /@media \(hover: none\) \{ \.cx \.cpost\.csupport-msg \.cpost-actions\.csupport-react \{ opacity: 1; \} \}/, 'in sight on a touch screen');
   });
 
   it('the rail has a Support entry for signed-in players', () => {
@@ -530,5 +594,92 @@ describe('Support: the drop zone\'s checks, as the server\'s (community/support-
     assert.deepEqual(f.addedLine({ added: [], refused: [] }), { text: '', bad: false });
     assert.doesNotMatch(src('community/support-files.js'), /\u2014/);
     assert.doesNotMatch(src('src/SupportPages.php'), /\u2014/);
+  });
+});
+
+describe('Support: a report\'s reactions in the page (community/support-reactions.js)', { skip: skipWithoutSite }, async () => {
+  const m = HAS_SITE ? await import(pathToFileURL(sitePath('community/support-reactions.js')).href) : {};
+  const SET = HAS_SITE ? JSON.parse(src('data/reactions.json')).reactions.map((x) => [x.key, x.glyph, x.label, x.art]) : [];
+  const you = { id: 910, name: 'Ada', you: true };
+  const team = (id) => ({ id, name: 'Morgan Lee', you: false });
+
+  it('who reacted, as the server says it (SupportPages::reactionNames): You, Administrator, the team; never a name', { skip: !HAS_PHP && 'no php' }, () => {
+    const cases = [[you], [team(900)], [you, team(900)], [team(900), team(901)], [team(900), you, team(901)], []];
+    assert.deepEqual(cases.map(m.whoNames), [['You'], ['Administrator'], ['You', 'Administrator'], ['The team'], ['You', 'the team'], []]);
+    const php = phpRun(`array_map([S::class, 'reactionNames'], json_decode(${JSON.stringify(JSON.stringify(cases))}, true))`);
+    assert.deepEqual(php, cases.map(m.whoNames), 'the same words on both sides');
+    assert.equal(m.chipTip('Thumbs up', [you, team(900)]), 'Thumbs up: You and Administrator');
+    assert.equal(m.chipTip('Thank you', [team(900), team(901)]), 'Thank you: The team');
+    assert.equal(m.chipTip('Hi', []), 'Hi');
+  });
+
+  it('chips from the route\'s answer: the set\'s order, counts, pressed when yours, unknown keys left out', () => {
+    const chips = m.chipsFor([{ e: 'thanks', by: [team(900)], mine: false }, { e: 'someday', by: [you], mine: true }, { e: 'like', by: [you, team(900)], mine: true }, { e: 'hi', by: [you], mine: true }], SET);
+    assert.deepEqual(chips.map((c) => [c.key, c.n, c.mine, c.tip, c.art]), [['like', 2, true, 'Thumbs up: You and Administrator', false], ['thanks', 1, false, 'Thank you: Administrator', false], ['hi', 1, true, 'Hi: You', true]]);
+    assert.deepEqual(m.chipsFor([], SET), []);
+  });
+
+  it('React and a chip: the game\'s route with the page\'s call, then the chips drawn again as the server draws them', async () => {
+    // A small stand-in page: one message with an empty chip row and a hidden React.
+    class El {
+      constructor(tag) { this.tag = tag; this.attrs = {}; this.dataset = {}; this.children = []; this.hidden = false; this.textContent = ''; this.className = ''; this.title = ''; }
+      setAttribute(k, v) { this.attrs[k] = String(v); }
+      getAttribute(k) { return this.attrs[k] ?? null; }
+      toggleAttribute(k, on) { if (on) this.attrs[k] = ''; else delete this.attrs[k]; }
+      append(...c) { this.children.push(...c); }
+      replaceChildren(...c) { this.children = c; }
+      closest() { return null; }
+    }
+    globalThis.document = { createElement: (t) => new El(t) };
+    const box = new El('div');
+    box.attrs['data-empty'] = '';
+    const row = new El('div');
+    row.hidden = true;
+    const li = new El('li');
+    li.dataset.message = '38';
+    li.querySelector = (q) => (q === '[data-reactions]' ? box : null);
+    let clicked = null;
+    const list = { querySelectorAll: (q) => (q === '[data-react-row]' ? [row] : []), addEventListener: (t, f) => { clicked = f; }, removeEventListener: () => { clicked = null; } };
+    const calls = [];
+    const lines = [];
+    let answer = { ok: true, status: 200, data: { message: 38, reactions: [{ e: 'like', by: [you, team(900)], mine: true }] } };
+    const hook = { fn: null };
+    let opened = null;
+    let closed = 0;
+    const stop = m.wireSupportReactions(list, {
+      ticket: 4, call: async (path, opts) => { calls.push([path, opts]); return answer; }, REACTIONS: SET,
+      togglePicker: (l, o) => { opened = [l, o]; }, closePicker: () => { closed += 1; }, showLine: (l, t, bad) => lines.push([t, bad]), hook, failed: 'That didn\'t work. Try again in a moment.',
+    });
+    assert.equal(row.hidden, false, 'React shown');
+    assert.equal(typeof hook.fn, 'function', 'the picker\'s picks come here');
+    await hook.fn(li, 'like', true);
+    assert.deepEqual(calls, [['tickets/4/messages/38/reactions', { method: 'POST', body: { e: 'like', on: true } }]], 'the game\'s route, as js/reports.js api.react calls it');
+    assert.equal(box.attrs['data-empty'], undefined);
+    const [chip] = box.children;
+    assert.equal(chip.className, 'cchip');
+    assert.equal(chip.dataset.react, 'like');
+    assert.equal(chip.attrs['aria-pressed'], 'true');
+    assert.equal(chip.title, 'Thumbs up: You and Administrator');
+    assert.equal(chip.attrs['aria-label'], chip.title);
+    assert.deepEqual(chip.children.map((c) => [c.className, c.textContent]), [['cchip-glyph', '👍'], ['', '2']]);
+    // A chip pressed again: off.
+    const target = (sel) => ({ closest: (q) => (q === '.csupport-msg' ? li : q === sel ? { dataset: { react: 'like' }, getAttribute: () => 'true' } : null) });
+    answer = { ok: true, status: 200, data: { message: 38, reactions: [] } };
+    clicked({ target: target('button[data-react]') });
+    await new Promise((res) => setTimeout(res, 0));
+    assert.deepEqual(calls.at(-1), ['tickets/4/messages/38/reactions', { method: 'POST', body: { e: 'like', on: false } }]);
+    assert.deepEqual(box.children, []);
+    assert.equal(box.attrs['data-empty'], '', 'the empty row hidden again');
+    // React opens the shared picker; a refusal says the server's words under the message.
+    const opener = {};
+    clicked({ target: { closest: (q) => (q === '.csupport-msg' ? li : q === '[data-react-open]' ? opener : null) } });
+    assert.deepEqual(opened, [li, opener]);
+    answer = { ok: false, status: 429, data: { code: 'groddle_ticket_react_slow', message: 'Slow down a little with the reactions.' } };
+    await hook.fn(li, 'tada', true);
+    assert.deepEqual(lines, [['Slow down a little with the reactions.', true]]);
+    stop();
+    assert.equal(hook.fn, null);
+    assert.equal(closed, 1);
+    delete globalThis.document;
   });
 });
