@@ -16,7 +16,7 @@ import assert from 'node:assert/strict';
 import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { dirname, join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { openSitePage, plainLinkClick, setSitePageViewer, sitePageHref } from '../public/js/site-pages.js?v=ed00aa3c';
+import { SITE_PAGE_TEXT, openSitePage, plainLinkClick, setSitePageViewer, siteLinkTip, sitePageHref } from '../public/js/site-pages.js?v=1ca3760c';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const PUB = join(ROOT, 'public');
@@ -62,10 +62,30 @@ describe('#741 the one rule (js/site-pages.js)', () => {
     assert.equal(plainLinkClick({ button: 0, metaKey: true }), false, 'a modified click keeps its own tab');
   });
 
+  it('the words say what really happens: over the game in the Home Screen app, a new tab in a browser tab', () => {
+    const win = { document: { baseURI: at.base }, location: { href: at.pageHref } };
+    assert.equal(siteLinkTip('Support the game', 'https://groddleafternoon.com/contribute/', win), 'Support the game, opens in a new tab', 'no viewer');
+    setSitePageViewer(() => null);
+    try {
+      assert.equal(siteLinkTip('Support the game', 'https://groddleafternoon.com/contribute/', win), 'Support the game, opens over the game');
+      assert.equal(siteLinkTip('Donate', 'https://github.com/sponsors/x', win), 'Donate, opens in a new tab', 'another site still opens outside');
+    } finally {
+      setSitePageViewer(null);
+    }
+    // The pages' own markup is a browser tab's (the game rewrites it once the viewer is set).
+    for (const page of ['public/play/index.html', 'public/play/online/index.html']) {
+      assert.match(read(page), new RegExp(`id="support-btn"[^>]*title="Support the game, ${SITE_PAGE_TEXT.tab}"`), page);
+    }
+    assert.match(read('public/game.js'), /support\.title = siteLinkTip\('Support the game', support\.href\)/);
+    const lb = read('public/js/ui/picture-lightbox.js');
+    assert.match(lb, /opensOverGame\(src, win\) \? T\.overGame : T\.newTab/);
+    assert.match(lb, /overGame: 'Open over the game'/);
+  });
+
   it('game.js sets the viewer and the catch only in a Home Screen app', () => {
     const game = read('public/game.js');
     assert.match(game, /const sitePageSheet = isHomeScreenApp\(window\) \? createEncyclopediaSheet\(/);
-    assert.match(game, /if \(sitePageSheet\) \{\n\s*setSitePageViewer\(\(url, opts\) => sitePageSheet\.open\(url, opts\)\);\n\s*catchSiteLinks\(window\);\n\}/);
+    assert.match(game, /if \(sitePageSheet\) \{\n\s*setSitePageViewer\(\(url, opts\) => sitePageSheet\.open\(url, opts\)\);\n\s*catchSiteLinks\(window\);\n/);
     assert.match(read('public/js/encyclopedia-links.js'), /openWindow = \(url, name\) => openSitePage\(url, \{ name, features: '' \}\)/);
   });
 });
@@ -123,6 +143,9 @@ describe('#741 nothing in the game bypasses the one rule', () => {
     assert.deepEqual(users.sort(), ['public/js/site-pages.js', 'public/js/ui/picture-lightbox.js']);
   });
 });
+
+/** The lightbox's address as the game imports it (with its module key). */
+const LIGHTBOX_URL = `/js/ui/${/picture-lightbox\.js\?v=[0-9a-f]{8}/.exec(read('public/js/ui/reports-sheet.js'))[0]}`;
 
 let wk = null;
 try { await import('../tools/qa/playwright-env.mjs'); wk = await import('playwright'); } catch { /* no Playwright */ }
@@ -197,6 +220,15 @@ describe('#741 an iPhone Home Screen app, 402x812 (WebKit)', { skip: !wk && 'no 
       const pic = mk('t-pic', { className: 'picture-lightbox-tab', href: '/assets/ui/bug_icon.webp', target: '_blank', rel: 'noopener', textContent: 'Open in a new tab' });
       root.append(note, line, who, privacy, pic);
     });
+    const words = await tab.evaluate(async (lightbox) => {
+      // The lightbox as the game loads it (its own key, so it shares the game's js/site-pages.js and its viewer).
+      const { openLightbox } = await import(lightbox);
+      const box = openLightbox({ src: '/assets/ui/bug_icon.webp', host: document.body });
+      const tabWords = document.querySelector('[data-picture-lightbox-tab]')?.textContent || '';
+      box?.close?.({ focus: false });
+      return { support: document.getElementById('support-btn').title, tab: tabWords };
+    }, LIGHTBOX_URL);
+    assert.deepEqual(words, { support: 'Support the game, opens over the game', tab: 'Open over the game' }, 'the words say it opens over the game');
     const results = {};
     for (const [k, sel] of [['encyclopedia', '#encyclopedia-btn'], ['support', '#support-btn'], ['seeWho', '#t-who'], ['notice', '#t-notice'], ['chat', '#t-chat'], ['privacy', '#t-privacy'], ['picture', '#t-pic']]) results[k] = await press(tab, sel);
     const r = await tab.evaluate(async () => {
@@ -229,6 +261,14 @@ describe('#741 an iPhone Home Screen app, 402x812 (WebKit)', { skip: !wk && 'no 
 
   it('outside a Home Screen app Support the game keeps its new tab (no viewer)', { timeout: 120_000 }, async () => {
     const { ctx, tab, popups } = await game('');
+    const words = await tab.evaluate(async (lightbox) => {
+      const { openLightbox } = await import(lightbox);
+      const box = openLightbox({ src: '/assets/ui/bug_icon.webp', host: document.body });
+      const tabWords = document.querySelector('[data-picture-lightbox-tab]')?.textContent || '';
+      box?.close?.({ focus: false });
+      return { support: document.getElementById('support-btn').title, tab: tabWords };
+    }, LIGHTBOX_URL);
+    assert.deepEqual(words, { support: 'Support the game, opens in a new tab', tab: 'Open in a new tab' }, 'a browser tab keeps its words');
     const r = await press(tab, '#support-btn');
     await tab.waitForTimeout(500);
     await ctx.close();

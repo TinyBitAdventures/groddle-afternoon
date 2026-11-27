@@ -36,6 +36,7 @@
 
 import { focusBackTarget, lastInput, pressedBy } from './focus-return.js?v=da190597';
 import { createMarker } from './picture-marks.js?v=315bb1da';
+import { opensOverGame } from '../site-pages.js?v=1ca3760c';
 
 export const LIGHTBOX_TEXT = Object.freeze({
   label: 'Picture',
@@ -43,6 +44,8 @@ export const LIGHTBOX_TEXT = Object.freeze({
   zoomIn: 'Actual size (+)',
   zoomOut: 'Fit to the window (-)',
   newTab: 'Open in a new tab',
+  /** #741: the same link in the Home Screen app, where it opens in the page viewer (js/site-pages.js). */
+  overGame: 'Open over the game',
   prev: 'Previous picture (Left arrow)',
   next: 'Next picture (Right arrow)',
   count: (n, of) => `${n} of ${of}`,
@@ -154,7 +157,7 @@ export function openLightbox({ doc = globalThis.document, host = doc?.body, src,
   stage.append(frame);
   const bar = e('div', { class: 'picture-lightbox-bar' });
   const zoomBtn = e('button', { type: 'button', class: 'picture-lightbox-btn picture-lightbox-zoom', 'aria-pressed': 'false', 'aria-label': T.zoomIn, title: T.zoomIn, hidden: true, 'data-picture-lightbox-zoom': '' }, '+');
-  const tab = e('a', { class: 'picture-lightbox-tab', href: src, target: '_blank', rel: 'noopener', 'data-picture-lightbox-tab': '' }, T.newTab);
+  const tab = e('a', { class: 'picture-lightbox-tab', href: src, target: '_blank', rel: 'noopener', 'data-picture-lightbox-tab': '' }, opensOverGame(src, win) ? T.overGame : T.newTab);
   const x = e('button', { type: 'button', class: 'picture-lightbox-btn picture-lightbox-x', 'aria-label': T.close, title: T.close, 'data-picture-lightbox-close': '' }, '×');
   bar.append(zoomBtn, tab, x);
   root.append(stage, bar);

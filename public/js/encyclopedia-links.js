@@ -23,7 +23,7 @@
  * the client's did (its target 'encyclopedia'), so a second press reuses the Encyclopedia's tab.
  */
 
-import { openSitePage } from './site-pages.js?v=ed00aa3c';
+import { openSitePage } from './site-pages.js?v=1ca3760c';
 
 /** The home page and the index, relative to the game root (the play pages' <base>). */
 export const ENCYCLOPEDIA_HOME = 'encyclopedia/';

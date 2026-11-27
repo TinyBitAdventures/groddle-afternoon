@@ -93,7 +93,7 @@ import { homeLayoutJson, homeLayoutKeyOf, HOME_LAYOUT_LIMITS } from '../home-lay
 import { collectHomeLayout, homeFrameFor } from '../home-layout-scene.js?v=ae8a0d27';
 import { renderHomeLocation } from '../home-shot-render.js?v=94336d6a';
 import { withPublicView } from '../public-picture.js?v=1a0b03fa';
-import { openSitePage } from '../site-pages.js?v=ed00aa3c';
+import { openSitePage } from '../site-pages.js?v=1ca3760c';
 
 export const PROFILES_FEATURE_ID = 'profiles';
 

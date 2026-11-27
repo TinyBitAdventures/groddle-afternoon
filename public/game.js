@@ -1160,9 +1160,9 @@ import { createScrollKeep } from './js/ui/scroll-keep.js?v=2898b5b1';
 import { actVerbMenu, bindVerbMenu, centerVerbMenu, chooseVerbRow, dropVerbMenuActs, fitPickGrid, fitVerbMenuRows, focusVerbRow, lockVerbMenuSize, makePickTile, makeVerbRow, pickGridCols, placeVerbMenu, plainWords, refuseVerbRow, setVerbMenuIcon, settleVerbMenu, stepVerbRow, syncVerbDetail, verbMenuKey, verbMenuWaiting, verbRowAttrs, verbRowInner, verbRowKeys } from './js/ui/verb-menu.js?v=1ad4f969';
 import { createPromptSettler, promptId, promptSideStep } from './js/prompt-settle.js?v=cb790f3a';
 import { clientKeyAction, createHotkeysSheet, emoteKeyAction, isHotkeySheetRelease, isPlainKey } from './js/client-hotkeys.js?v=5c5a4301';
-import { ENCYCLOPEDIA_MENU_LABEL, createEncyclopedia, isEncyclopediaKey } from './js/encyclopedia-links.js?v=bcec7921';
+import { ENCYCLOPEDIA_MENU_LABEL, createEncyclopedia, isEncyclopediaKey } from './js/encyclopedia-links.js?v=bc92035a';
 import { createEncyclopediaSheet, isHomeScreenApp } from './js/ui/encyclopedia-sheet.js?v=7a51c71e';
-import { catchSiteLinks, setSitePageViewer } from './js/site-pages.js?v=ed00aa3c';
+import { catchSiteLinks, setSitePageViewer, siteLinkTip } from './js/site-pages.js?v=1ca3760c';
 import { bootStep } from './js/boot-progress.js?v=d84b898d';
 import { HOME_SCREEN_TIP_CACHE, iosSafari, mountHomeScreenTip, runsStandalone } from './js/home-screen-tip.js?v=f2287991';
 import { ZOOM_HINT_CACHE, ZOOM_HINT_MS, watchZoomHint } from './js/zoom-hint.js?v=75b745c7';
@@ -1761,7 +1761,7 @@ function installMoreMenu() {
   };
   btn.addEventListener('click', () => setOpen(list.hidden));
   list.addEventListener('click', (e) => {
-    // A pick closes it, a link too (Support the game opens its page in a new tab).
+    // A pick closes it, a link too (Support the game opens its page: a new tab, or over the game in the Home Screen app).
     if (e.target.closest('button, a[href]')) setOpen(false);
   });
   document.addEventListener('pointerdown', (e) => {
@@ -1852,6 +1852,9 @@ const sitePageSheet = isHomeScreenApp(window) ? createEncyclopediaSheet({ setDat
 if (sitePageSheet) {
   setSitePageViewer((url, opts) => sitePageSheet.open(url, opts));
   catchSiteLinks(window);
+  // Its tip says what really happens (the page's own markup says a new tab, a browser tab's way).
+  const support = document.getElementById('support-btn');
+  if (support) support.title = siteLinkTip('Support the game', support.href);
 }
 
 /**

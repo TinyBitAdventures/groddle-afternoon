@@ -35,6 +35,27 @@ export function setSitePageViewer(open) {
 /** Whether a viewer is set (the Home Screen app). */
 export const hasSitePageViewer = () => Boolean(viewer);
 
+/** What a link to a page says it does: over the game (the viewer) or in a new tab. */
+export const SITE_PAGE_TEXT = Object.freeze({
+  here: 'opens over the game',
+  tab: 'opens in a new tab',
+});
+
+/**
+ * Whether a link to `href` opens over the game (a viewer is set and the address is this site's),
+ * so its words say only what really happens.
+ */
+export function opensOverGame(href, win = globalThis.window ?? globalThis) {
+  if (!viewer) return false;
+  const base = pageBase(win);
+  return Boolean(sitePageHref(href, { base, pageHref: win?.location?.href || base }));
+}
+
+/** A link's tip: "<label>, opens over the game" or "<label>, opens in a new tab". */
+export function siteLinkTip(label, href, win) {
+  return `${label}, ${opensOverGame(href, win) ? SITE_PAGE_TEXT.here : SITE_PAGE_TEXT.tab}`;
+}
+
 const pageBase = (win = globalThis) => win?.document?.baseURI || win?.location?.href || '';
 
 /**
