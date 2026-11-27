@@ -23341,8 +23341,9 @@ function updateRookHitFx(now) {
 function updateRookWoods(dt) {
   // inc_instances.js 322-357: "Are you stuck?"; Yes, please leaves as Leave does (the Egg left for
   // another attempt; once smashed, as the quest's own way out).
+  // inc_quests.js 747: completing the quest takes the prompt away (the quest card isn't asked over).
   roomStuck.tick('rook-woods', roomStuckHost(), {
-    here: rookWoodsIsInstanced(),
+    here: rookWoodsIsInstanced() && rookWoodsState?.status !== 'complete',
     moving: rookWoodsTransitionBusy,
     onYes: () => returnFromRookWoods({ abandon: rookWoodsState?.status !== 'complete' }),
   });

@@ -185,6 +185,7 @@ function rig(place) {
     host,
     left,
     asker,
+    scope: vars,
     arm: () => asker.arm(place.key, delay, host),
     tick: (ms) => {
       mock.timers.tick(ms);
@@ -229,6 +230,20 @@ describe('the timed places ask "Are you stuck?" and never send you away on a clo
     });
   }
 
+  it("Rooks' Woods: a completed quest takes the prompt away, as Glitch's quest end did (inc_quests.js 747)", () => {
+    mock.timers.setTime(T0);
+    const place = PLACES.find((p) => p.key === 'rook-woods');
+    const r = rig(place);
+    r.arm();
+    r.tick(place.ms - 1);
+    r.scope[place.stateVar].status = 'complete';
+    r.tick(1);
+    assert.equal(r.host.prompts.length, 0, 'not asked over the Quest complete card');
+    r.tick(60 * MIN);
+    assert.equal(r.host.prompts.length, 0, 'never asked again');
+    assert.deepEqual(r.left, [], 'nobody sent away: Leave is the way out');
+  });
+
   it('dead when it is due: asked a minute later (instances_show_exit_prompt 323)', () => {
     mock.timers.setTime(T0);
     const r = rig(PLACES[0]);
@@ -263,7 +278,7 @@ describe('game.js arms, asks and takes the prompt away in each place', () => {
     for (const place of PLACES) {
       const body = fn(place.update);
       assert.ok(body.indexOf('roomStuck.tick') > 0 && body.indexOf('roomStuck.tick') < body.indexOf(`if (!${place.here}()`), place.update);
-      assert.match(body, new RegExp(`here: ${place.here}\\(\\),\\s*moving: ${place.busy},`), place.update);
+      assert.match(body, new RegExp(`here: ${place.here}\\(\\)( && [^,]+)?,\\s*moving: ${place.busy},`), place.update);
     }
     assert.match(fn('updateParadiseFlight'), /returnFromParadise\(\{ abandon: paradiseRun\?\.status !== 'complete' \}\)/);
     assert.match(fn('updateGreedyStreetSpirit'), /returnFromGreedyStreetSpirit\(\{ abandon: greedyStreetState\?\.status !== 'ready' \}\)/);
