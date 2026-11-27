@@ -44,10 +44,10 @@ import {
   oldestAt,
   normalState,
   refusalText,
-} from '../player-im.js?v=87bdb8ec';
+} from '../player-im.js?v=2c6339e8';
 import { purgeOf, withoutPurged } from '../chat-purge.js?v=6c41f62d';
 import { EARLIER_TEXT } from '../groups.js?v=c5e35964';
-import { imKey } from '../chat-reactions.js?v=38460172';
+import { imKey } from '../chat-reactions.js?v=e2c21ad4';
 import { createMinnAccount } from '../minn-account.js?v=7e3d7279';
 
 export const PLAYER_IM_FEATURE_ID = 'player-im';

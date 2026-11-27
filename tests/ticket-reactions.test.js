@@ -16,10 +16,10 @@ import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { SITE_DIR, sitePath, skipWithoutSite } from '../tools/repos.mjs';
 import { reactionsJson } from '../tools/build-reactions.mjs';
-import { NAMES_SHOWN, REACTIONS } from '../public/js/chat-reactions.js?v=38460172';
+import { NAMES_SHOWN, REACTIONS } from '../public/js/chat-reactions.js?v=e2c21ad4';
 import { REPORT_TEXT, createReportsApi } from '../public/js/reports.js?v=3c805cc4';
-import { parseReportReactionKey, reactorOf, reportReactionKey, reportReactions } from '../public/js/report-reactions.js?v=69462240';
-import { mountReportsSheet } from '../public/js/ui/reports-sheet.js?v=4a42cc37';
+import { parseReportReactionKey, reactorOf, reportReactionKey, reportReactions } from '../public/js/report-reactions.js?v=2e291c10';
+import { mountReportsSheet } from '../public/js/ui/reports-sheet.js?v=917a2f8c';
 import { HAS_PHP, PHP, phpSkip } from './php.js';
 
 const root = join(import.meta.dirname, '..');
@@ -189,7 +189,7 @@ describe('reactions on a report message: the Reports sheet', () => {
     assert.equal(mine.find((n) => n.className === 'react-strip').hidden, true, 'no chips yet: none drawn');
   });
 
-  it('the picker opens inside the window with the eight; a pick sends it and the chips come back from the site, yours pressed', async () => {
+  it('the picker opens inside the window with the whole set; a pick sends it and the chips come back from the site, yours pressed', async () => {
     const { host, sheet, calls, data } = setup();
     sheet.open('list');
     await flush();
@@ -200,6 +200,7 @@ describe('reactions on a report message: the Reports sheet', () => {
     const picker = panel.find((n) => 'reactPicker' in n.dataset);
     assert.ok(picker, 'the picker is in the Reports window (over it, keys kept in it)');
     assert.deepEqual(picker.children.map((b) => b.dataset.reactPick), REACTIONS.map((r) => r.key));
+    assert.equal(picker.children.length, 16);
     picker.children.find((b) => b.dataset.reactPick === 'heart').click();
     await flush();
     await flush();
@@ -256,7 +257,7 @@ describe('reactions on a report message: the CSS and the shared set', () => {
   it('the set is the chat\'s, from one place: data/reactions.json is what tools/build-reactions.mjs writes', { skip: skipWithoutSite }, () => {
     assert.equal(readFileSync(sitePath('data/reactions.json'), 'utf8'), reactionsJson(), 'run node tools/build-reactions.mjs');
     const json = JSON.parse(readFileSync(sitePath('data/reactions.json'), 'utf8'));
-    assert.deepEqual(json.reactions.map((r) => r.key), ['like', 'heart', 'laugh', 'wow', 'sad', 'tada', 'thanks', 'hi']);
+    assert.deepEqual(json.reactions.map((r) => r.key), ['like', 'heart', 'laugh', 'wow', 'sad', 'tada', 'thanks', 'clap', 'smile', 'think', 'love', 'fire', 'eyes', 'phew', 'hundred', 'hi']);
     assert.equal(json.namesShown, NAMES_SHOWN);
     // The site reads it (CommunityText::reactions) and never lists the keys itself.
     const php = readFileSync(sitePath('src/TicketReactions.php'), 'utf8');
@@ -406,6 +407,17 @@ describe('reactions on a report message: the rules on a throwaway database', { s
     assert.deepEqual(r.after.counts, { messages: 4, actions: 0, mailSends: 0 });
     assert.equal(r.rows.length, 5);
     assert.deepEqual([...new Set(r.rows.map((x) => x.role))].sort(), ['admin', 'player']);
+  });
+
+  it('each of the chat\'s sixteen goes on a report message and comes off again, in the set\'s order', () => {
+    const e = r.everyReaction;
+    assert.deepEqual(e.keys, REACTIONS.map((x) => x.key), 'the site\'s set is the game\'s');
+    assert.ok(e.on.every((a) => a.status === 200), JSON.stringify(e.on.find((a) => a.status !== 200)));
+    e.on.forEach((a, i) => assert.ok(a.body.reactions.some((x) => x.e === e.keys[i] && x.mine), e.keys[i]));
+    assert.deepEqual(e.on.at(-1).body.reactions.map((x) => x.e), REACTIONS.map((x) => x.key));
+    assert.deepEqual(e.kept, [...e.keys].sort(), 'each kept by its key');
+    assert.ok(e.off.every((a) => a.status === 200));
+    assert.deepEqual(e.off.at(-1).body.reactions.map((x) => [x.e, x.mine]), [['thanks', false]], 'only the administrator\'s Thank you stays');
   });
 
   it('both threads carry each message\'s reactions: counts and who, "you" for the one asking', () => {

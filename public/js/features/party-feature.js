@@ -48,7 +48,7 @@ import {
   partyCommand,
 } from '../party.js?v=7615aab8';
 import { appendLinkedText } from '../chat-links.js?v=b717fac7';
-import { lineKey } from '../chat-reactions.js?v=38460172';
+import { lineKey } from '../chat-reactions.js?v=e2c21ad4';
 import { UNNAMED_PLAYER } from '../player-names.js?v=f9b78094';
 import { playerClickBox } from '../reach.js?v=456da8a8';
 

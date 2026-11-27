@@ -248,7 +248,7 @@ describe('the chat box: wired', () => {
 
   it('#639: a line comes back as long as it went out, in every chat: channels, IM, party, Local', async () => {
     const { chatLine } = await import('../public/js/groups.js?v=c5e35964');
-    const { normalLine } = await import('../public/js/player-im.js?v=87bdb8ec');
+    const { normalLine } = await import('../public/js/player-im.js?v=2c6339e8');
     const long = 'a'.repeat(CHAT_MAX_CHARS);
     assert.equal(chatLine({ id: 1, name: 'n', text: long }).text, long, 'Global, Help, Trade and group channels');
     assert.equal(normalLine({ id: 1, from: 2, text: long }).text, long, 'IM');

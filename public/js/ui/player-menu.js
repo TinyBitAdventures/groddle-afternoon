@@ -30,7 +30,7 @@
  */
 
 import { PROFILE_PAGE_VERB } from '../profiles.js?v=1daccbb9';
-import { IM_VERB_ID } from '../player-im.js?v=87bdb8ec';
+import { IM_VERB_ID } from '../player-im.js?v=2c6339e8';
 import { BUDDY_VERBS } from '../buddies.js?v=4457d8a4';
 import { BUDDY_DESTINATION_VERB } from '../buddy-list.js?v=b418f3f2';
 import { VISIT_VERB } from '../neighbours-mp.js?v=d270297d';

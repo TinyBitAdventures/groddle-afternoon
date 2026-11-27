@@ -204,6 +204,25 @@ try {
         'playerOnAnnouncements' => Community::announceBackfill($db, $old('announcements', 910, 'Sneaky'), true),
         'missing' => Community::announceBackfill($db, 99999, true),
     ];
+
+    // == 5. Each of the chat's reactions round-trips on a post, through the route (sixteen since 2026-11-27) ==
+    $postId = (int) $db->value('SELECT id FROM ' . $db->table(Community::POSTS) . ' WHERE thread_id = ? ORDER BY id LIMIT 1', [$general]);
+    $reactOn = static function (int $as, int $post, string $e, bool $on) use ($request, $community, $answer): array {
+        $r = $request(Method::Post, "/groddle/v1/community/posts/{$post}/reactions", ['e' => $e, 'on' => $on]);
+        return $answer(static fn (): Response => $community($as, $r)->reactRoute($r, (string) $post));
+    };
+    $kept = static fn (): array => array_map(static fn (array $r): string => (string) $r['reaction'], $db->rows('SELECT reaction FROM ' . $db->table(Community::REACTIONS) . ' WHERE post_id = ? AND user_id = 912 ORDER BY reaction', [$postId]));
+    $every = ['keys' => array_keys(CommunityText::reactions()), 'on' => [], 'off' => []];
+    foreach ($every['keys'] as $k) {
+        $every['on'][] = $reactOn(912, $postId, $k, true);
+    }
+    $every['keptOn'] = $kept();
+    foreach ($every['keys'] as $k) {
+        $every['off'][] = $reactOn(912, $postId, $k, false);
+    }
+    $every['keptOff'] = $kept();
+    $every['badKey'] = $reactOn(912, $postId, 'someday', true);
+    $out['everyReaction'] = $every;
 } catch (Throwable $e) {
     $out['error'] = get_class($e) . ': ' . $e->getMessage() . ' @' . $e->getFile() . ':' . $e->getLine();
 } finally {

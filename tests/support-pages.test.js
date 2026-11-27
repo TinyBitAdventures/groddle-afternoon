@@ -238,7 +238,7 @@ describe('Support on the website: a player manages their own reports (php, throw
     assert.match(rp, /<input type="hidden" name="_wpnonce" value="[0-9a-f]{10}" \/>/);
     for (const html of [r.list.html, r.thread.html, r.reportPage, r.signedOut.body]) {
       assert.doesNotMatch(pane(html), /\u2014/, 'no em dashes');
-      assert.match(html, /community\.css\?v=community-19/);
+      assert.match(html, /community\.css\?v=community-20/);
       assert.match(html, /\/site\/theme\.js/, 'the theme script sets light or dark before paint');
     }
   });
@@ -315,7 +315,7 @@ describe('Support: the site code (groddle-afternoon-site)', { skip: skipWithoutS
     // A website report's picture is the player's own, not the game at that moment.
     assert.equal(consoleMod.PICTURE_HINT.web, 'The picture they added on the website. Click it to see it full size.');
     assert.match(src('console/console.js'), /const fromWeb = r\.context\?\.from === 'website';\s*\$\('\.console-picture-hint'\)\.textContent = fromWeb \? PICTURE_HINT\.web : PICTURE_HINT\.game;/);
-    assert.match(src('src/AdminConsolePage.php'), /ASSET_KEY = 'skin-14'/);
+    assert.match(src('src/AdminConsolePage.php'), /ASSET_KEY = 'skin-15'/);
   });
 
   it('the rail has a Support entry for signed-in players', () => {

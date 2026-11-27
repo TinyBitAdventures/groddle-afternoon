@@ -16,7 +16,7 @@
  *
  * QA: canvas data socialReactions (how many lines have reactions); window.groddleReactions.
  */
-import { imKey, lineKey, normalReactions, reactFrame } from '../chat-reactions.js?v=38460172';
+import { imKey, lineKey, normalReactions, reactFrame } from '../chat-reactions.js?v=e2c21ad4';
 
 export const CHAT_REACTIONS_FEATURE_ID = 'chat-reactions';
 

@@ -91,8 +91,8 @@ import {
 } from '../groups.js?v=c5e35964';
 import { OWNED_TEXT, hallStreetOpen } from '../group-hall-lot.js?v=045c799a';
 import { appendLinkedText } from '../chat-links.js?v=b717fac7';
-import { lineKey as reactKey } from '../chat-reactions.js?v=38460172';
-import { DELETE_TEXT, deletableChannel, lineLidOf, mayDelete } from '../chat-delete.js?v=c55a1043';
+import { lineKey as reactKey } from '../chat-reactions.js?v=e2c21ad4';
+import { DELETE_TEXT, deletableChannel, lineLidOf, mayDelete } from '../chat-delete.js?v=14ae5bda';
 import { UNNAMED_PLAYER } from '../player-names.js?v=f9b78094';
 
 export const GROUPS_FEATURE_ID = 'groups';

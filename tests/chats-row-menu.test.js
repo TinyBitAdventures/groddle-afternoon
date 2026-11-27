@@ -9,10 +9,10 @@
 import { describe, it, before, after } from 'node:test';
 import assert from 'node:assert/strict';
 import { FakeEl, memoryStore, page } from './social-fake-dom.js';
-import { mountSocialDrawer } from '../public/js/ui/social-drawer.js?v=a45b925c';
+import { mountSocialDrawer } from '../public/js/ui/social-drawer.js?v=dca299d0';
 import { createNotifier } from '../public/js/notify.js?v=c9d79ec5';
 import { MORE_KEYS_LABEL } from '../public/js/ui/context-menu.js?v=0266831a';
-import { IM_VERB_ID } from '../public/js/player-im.js?v=87bdb8ec';
+import { IM_VERB_ID } from '../public/js/player-im.js?v=2c6339e8';
 
 function head(buttons) {
   const h = new FakeEl('div');

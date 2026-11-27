@@ -118,8 +118,8 @@
  */
 
 import { REPORT_EXTENSIONS_MAX, REPORT_FILTER_MIN, REPORT_MAX, REPORT_TABS, REPORT_TEXT as T, STATUS_WORDS, canEditFirst, inTab, matchesReport, messagePictures, numberedLine, pictureRefused, pictureSrc, readByTeamAt, readByTeamWords, refusalWords, reportNumber, showsReplied, sortReports, tabCounts, tabLabel, unreadCount, whenWords, appendReports } from '../reports.js?v=3c805cc4';
-import { createReactionUI } from './reaction-strip.js?v=3de815f3';
-import { parseReportReactionKey, reactorOf, reportReactionKey, reportReactions } from '../report-reactions.js?v=69462240';
+import { createReactionUI } from './reaction-strip.js?v=fd1d080e';
+import { parseReportReactionKey, reactorOf, reportReactionKey, reportReactions } from '../report-reactions.js?v=2e291c10';
 import { PICTURE_TEXT as P, REPORT_PICTURES, convertPicture, dragHasFiles, filesOf, refusalWords as pictureRefusal, roomFor, takeForRoom } from '../report-pictures.js?v=fe05b74d';
 import { focusBack } from './focus-return.js?v=da190597';
 import { appendLinkedText, bindChatLinks } from '../chat-links.js?v=b717fac7';

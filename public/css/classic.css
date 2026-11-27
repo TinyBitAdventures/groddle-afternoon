@@ -1796,6 +1796,7 @@
 :root[data-ui="classic"] .social-drawer .social-thread-title { color: var(--c-classic-title); font: 800 var(--fs-classic-body)/var(--lh-normal) var(--font-classic-title); }
 :root[data-ui="classic"] .social-drawer .social-msg.is-thread-parent { border-bottom: 1px solid var(--c-classic-input-border); }
 :root[data-ui="classic"] .react-picker {
+  grid-template-columns: repeat(8, auto);
   gap: 0;
   padding: calc(3 * var(--cu));
   border: 0;
@@ -1803,7 +1804,7 @@
   background: color-mix(in srgb, var(--c-classic-panel) 95%, transparent);
   box-shadow: 0 2px 1px color-mix(in srgb, var(--c-classic-ink) 60%, transparent);
 }
-/* Eight in a row inside a chat line's column (216u, less the 12 px scrollbar): 8 x 24u + the padding = 198u. */
+/* Two rows of eight (PICKER_COLUMNS), a row inside a chat line's column (216u, less the 12 px scrollbar): 8 x 24u + the padding = 198u. */
 :root[data-ui="classic"] .react-pick { width: calc(24 * var(--cu)); height: calc(26 * var(--cu)); border: 1px solid transparent; border-radius: 3px; }
 :root[data-ui="classic"] .react-pick .react-glyph { font-size: var(--fs-classic-pane); }
 :root[data-ui="classic"] .react-pick:is(:hover, :focus-visible) { outline: none; background: var(--c-classic-verb-hi); border-color: var(--c-classic-verb-edge); }

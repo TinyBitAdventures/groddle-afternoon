@@ -10,11 +10,16 @@
  * an id (solo, notes, the Butler, a server from before reactions) have no reactions. Speech bubbles
  * over avatars never show them.
  *
- * The set is fixed and small; the server takes nothing else. Seven are the system's emoji (text, no art)
- * and one is Tiny Speck's own "Hi" sign (assets/sprites/hi-signs, CC0), as players said hi all day.
- * "Thank you" (the folded hands) came on 2026-11-10, Austin's ask, between Hooray and the Hi sign. A
- * page from before a reaction was added leaves it out of a line's chips (normalReactions keeps known
- * keys only), and a server from before it refuses it in words (error "react"), so the set can grow.
+ * The set is fixed; the server takes nothing else. Fifteen are the system's emoji (text, no art) and one
+ * is Tiny Speck's own "Hi" sign (assets/sprites/hi-signs, CC0), as players said hi all day. "Thank you"
+ * (the folded hands) came on 2026-11-10, Austin's ask, between Hooray and the Hi sign; eight everyday
+ * ones (👏 😊 🤔 😍 🔥 👀 😅 💯) on 2026-11-27, his pick, after it, the Hi sign still last. A page from
+ * before a reaction was added leaves it out of a line's chips (normalReactions keeps known keys only),
+ * and a server from before it refuses it in words (error "react"), so the set can grow.
+ *
+ * This list is the only copy: tools/build-reactions.mjs writes it as data/reactions.json for the
+ * realtime server (reactions.go reactionKeys) and the site (the boards' and reports' reactions). The
+ * picker lays it out PICKER_COLUMNS to a row (two rows of eight), and its arrow keys follow that grid.
  */
 
 /** The reactions, in the order they show: key (the server's word), glyph (text; '' for art), label. */
@@ -26,8 +31,23 @@ export const REACTIONS = Object.freeze([
   Object.freeze({ key: 'sad', glyph: '😢', label: 'Sad' }),
   Object.freeze({ key: 'tada', glyph: '🎉', label: 'Hooray' }),
   Object.freeze({ key: 'thanks', glyph: '🙏', label: 'Thank you' }),
+  Object.freeze({ key: 'clap', glyph: '👏', label: 'Clapping' }),
+  Object.freeze({ key: 'smile', glyph: '😊', label: 'Smiling' }),
+  Object.freeze({ key: 'think', glyph: '🤔', label: 'Thinking' }),
+  Object.freeze({ key: 'love', glyph: '😍', label: 'Heart eyes' }),
+  Object.freeze({ key: 'fire', glyph: '🔥', label: 'Fire' }),
+  Object.freeze({ key: 'eyes', glyph: '👀', label: 'Looking' }),
+  Object.freeze({ key: 'phew', glyph: '😅', label: 'Phew' }),
+  Object.freeze({ key: 'hundred', glyph: '💯', label: 'One hundred' }),
   Object.freeze({ key: 'hi', glyph: '', label: 'Hi', art: 'assets/sprites/hi-signs/hi_hi_1@3x.webp' }),
 ]);
+
+/**
+ * How many reactions the picker shows to a row (style.css and classic.css .react-picker, the site's
+ * community.css .cpicker draw this many columns): two rows of eight fit a line's column of the chat
+ * drawer in both skins and a 390 px phone.
+ */
+export const PICKER_COLUMNS = 8;
 
 /** How many names a chip's label lists before "and N others". */
 export const NAMES_SHOWN = 8;
@@ -138,18 +158,26 @@ export function addLabel(line) {
 }
 
 /**
- * PURE: the picker's next item for a key (ArrowLeft / ArrowRight / ArrowUp / ArrowDown / Home / End),
- * wrapping; -1 for a key it does not move on.
+ * PURE: the picker's next item for a key in its grid of `cols` a row: ArrowLeft / ArrowRight step
+ * through the set (on to the next row at a row's end, wrapping), ArrowUp / ArrowDown move a row in
+ * the same column (wrapping to the column's other end), Home / End go to the first and the last;
+ * -1 for a key it does not move on.
  */
-export function pickerMove(index, key, n = REACTIONS.length) {
+export function pickerMove(index, key, n = REACTIONS.length, cols = PICKER_COLUMNS) {
   const i = Math.max(0, Math.min(n - 1, Math.floor(Number(index)) || 0));
+  const c = Math.max(1, Math.min(n, Math.floor(Number(cols)) || 1));
   switch (key) {
     case 'ArrowRight':
-    case 'ArrowDown':
       return (i + 1) % n;
     case 'ArrowLeft':
-    case 'ArrowUp':
       return (i - 1 + n) % n;
+    case 'ArrowDown':
+      return i + c < n ? i + c : i % c;
+    case 'ArrowUp': {
+      if (i - c >= 0) return i - c;
+      const col = i % c;
+      return col + c * Math.floor((n - 1 - col) / c);
+    }
     case 'Home':
       return 0;
     case 'End':

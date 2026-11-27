@@ -68,7 +68,7 @@ import { ADMIN_TEXT, applyAdminGive, applyAdminRefill, showAdminMessage, showBoo
 import { saveStore } from '../save-store.js?v=1ccb1d6b';
 import { STREET_INDEX } from '../street-loader.js?v=10376267';
 import { appendLinkedText } from '../chat-links.js?v=b717fac7';
-import { lineKey } from '../chat-reactions.js?v=38460172';
+import { lineKey } from '../chat-reactions.js?v=e2c21ad4';
 import { isPhoneDevice } from '../touch-controls.js?v=8bc690ac';
 import { playOverlay } from '../overlays.js?v=91dcee74';
 import { publicStreet } from '../shared-street.js?v=dce5694b';

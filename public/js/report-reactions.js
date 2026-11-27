@@ -9,7 +9,7 @@
  * js/reports.js api.react. Kept out of js/reports.js so the phone companion, which loads that, stays small.
  */
 
-import { normalReactions } from './chat-reactions.js?v=38460172';
+import { normalReactions } from './chat-reactions.js?v=e2c21ad4';
 
 /** A report message's reaction key for js/ui/reaction-strip.js ("t:<report>:<message>"), '' without both ids. */
 export function reportReactionKey(ticketId, messageId) {

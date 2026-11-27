@@ -11,7 +11,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { MARKS, MARK_COLOURS, MARK_TEXT, clampRing, createMarkBook, dragRing, isTap, paintRings, ringKey, ringPlace, ringStroke, tapRing } from '../public/js/ui/picture-marks.js?v=315bb1da';
 import { openLightbox } from '../public/js/ui/picture-lightbox.js?v=9ede59ba';
-import { mountReportsSheet } from '../public/js/ui/reports-sheet.js?v=4a42cc37';
+import { mountReportsSheet } from '../public/js/ui/reports-sheet.js?v=917a2f8c';
 
 const root = join(import.meta.dirname, '..');
 const read = (p) => readFileSync(join(root, p), 'utf8');

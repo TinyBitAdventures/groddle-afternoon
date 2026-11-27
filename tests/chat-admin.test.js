@@ -27,10 +27,10 @@ import { homedir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { SITE_DIR, sitePath, skipWithoutSite } from '../tools/repos.mjs';
-import { DELETE_CONFIRM_FOCUS, DELETE_TEXT, deletableChannel, deleteConfirmRows, lineLidOf, mayDelete } from '../public/js/chat-delete.js?v=c55a1043';
+import { DELETE_CONFIRM_FOCUS, DELETE_TEXT, deletableChannel, deleteConfirmRows, lineLidOf, mayDelete } from '../public/js/chat-delete.js?v=14ae5bda';
 import { createMinnAccount } from '../public/js/minn-account.js?v=7e3d7279';
 import { bootDataFrom } from '../public/js/online-boot.js?v=a0f37b71';
-import { mountSocialDrawer } from '../public/js/ui/social-drawer.js?v=a45b925c';
+import { mountSocialDrawer } from '../public/js/ui/social-drawer.js?v=dca299d0';
 import { createNotifier } from '../public/js/notify.js?v=c9d79ec5';
 import { FakeEl, memoryStore, page } from './social-fake-dom.js';
 import { HAS_PHP, PHP, phpSkip } from './php.js';
@@ -369,7 +369,7 @@ describe('the site: me says admin; the delete route stays administrators only (s
     const { logWords } = await import(`${new URL(`file://${sitePath('console/console.js')}`).href}`);
     assert.equal(logWords({ kind: 'chat_delete', delivery: 'live', player: { id: 7, name: 'Ada' }, detail: { where: 'Live Help', text: '', cleared: true } }), 'deleted Ada\'s line in Live Help (its words were cleared after 30 days)');
     assert.equal(logWords({ kind: 'chat_delete', delivery: 'live', player: { id: 7, name: 'Ada' }, detail: { where: 'Live Help', text: 'oops' } }), 'deleted Ada\'s line in Live Help: “oops”');
-    assert.match(readFileSync(sitePath('src/AdminConsolePage.php'), 'utf8'), /ASSET_KEY = 'skin-14'/);
+    assert.match(readFileSync(sitePath('src/AdminConsolePage.php'), 'utf8'), /ASSET_KEY = 'skin-15'/);
   });
 });
 

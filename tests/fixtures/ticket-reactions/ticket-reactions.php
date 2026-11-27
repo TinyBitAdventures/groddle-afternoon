@@ -27,6 +27,7 @@ mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
 use Groddle\Minn\AdminConsole;
 use Groddle\Minn\AdminTickets;
 use Groddle\Minn\Characters;
+use Groddle\Minn\CommunityText;
 use Groddle\Minn\MailLimits;
 use Groddle\Minn\TicketReactions;
 use Groddle\Minn\Tickets;
@@ -161,6 +162,17 @@ try {
         'email' => TicketReactions::adminName('a@b.c', 'x'),
     ];
     $out['unknownKeyKeptOut'] = TicketReactions::out([['message_id' => 1, 'user_id' => 910, 'role' => 'player', 'reaction' => 'someday'], ['message_id' => 1, 'user_id' => 910, 'role' => 'player', 'reaction' => 'tada']], ['910:player' => 'Ada'], 910);
+
+    // == Each of the chat's reactions on and off a message (sixteen since 2026-11-27): Bea on her own report ==
+    $every = ['keys' => array_keys(CommunityText::reactions()), 'on' => [], 'off' => []];
+    foreach ($every['keys'] as $k) {
+        $every['on'][] = $mine(911, $bea, $beaMsg, $k);
+    }
+    $every['kept'] = array_map(static fn (array $r): string => (string) $r['reaction'], $db->rows('SELECT reaction FROM ' . $db->table(TicketReactions::TABLE) . ' WHERE message_id = ? AND user_id = 911 ORDER BY reaction', [$beaMsg]));
+    foreach ($every['keys'] as $k) {
+        $every['off'][] = $mine(911, $bea, $beaMsg, $k, false);
+    }
+    $out['everyReaction'] = $every;
 } catch (Throwable $e) {
     $out['error'] = get_class($e) . ': ' . $e->getMessage() . ' @' . $e->getFile() . ':' . $e->getLine();
 } finally {

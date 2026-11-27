@@ -109,19 +109,19 @@
  */
 import { colorizeAmounts } from '../notify-view.js?v=1ff8a878';
 import { bindContextTrigger, MORE_KEYS_LABEL } from './context-menu.js?v=0266831a';
-import { IM_VERB_ID } from '../player-im.js?v=87bdb8ec';
+import { IM_VERB_ID } from '../player-im.js?v=2c6339e8';
 import { selectionCovers } from './context-guard.js?v=0f71ac17';
 import { appendLinkedText, linkifyTextNodes } from '../chat-links.js?v=b717fac7';
 import { playerNameSlot } from '../name-colours.js?v=9819bb8a';
 import { bindChatInput } from './chat-input.js?v=8f2479a3';
 import { createNodeCache, pressLeavesKeys, reconcileChildren, uniqueKeys } from './keyed-nodes.js?v=9ab4de5c';
-import { createReactionUI } from './reaction-strip.js?v=3de815f3';
-import { sameWords } from '../chat-reactions.js?v=38460172';
-import { THREAD_TEXT, mergeReplies, normalSummary, summaryText } from '../chat-threads.js?v=2ba621c8';
+import { createReactionUI } from './reaction-strip.js?v=fd1d080e';
+import { sameWords } from '../chat-reactions.js?v=e2c21ad4';
+import { THREAD_TEXT, mergeReplies, normalSummary, summaryText } from '../chat-threads.js?v=bd738410';
 import { buddyFaceUrl } from '../buddy-list.js?v=b418f3f2';
 import { avatarOf, createBuddyFaces } from './buddy-face.js?v=cb11f179';
 import { WHOS_HERE_TEXT, streetOthers, whosHereView } from '../whos-here.js?v=82e3aca7';
-import { DELETE_CONFIRM_FOCUS, DELETE_TEXT, deleteConfirmRows } from '../chat-delete.js?v=c55a1043';
+import { DELETE_CONFIRM_FOCUS, DELETE_TEXT, deleteConfirmRows } from '../chat-delete.js?v=14ae5bda';
 import { htmlToText } from '../html-text.js?v=6bbf4d1f';
 import { BUDDY_SORTS, BUDDY_SORT_TEXT } from '../buddies.js?v=4457d8a4';
 

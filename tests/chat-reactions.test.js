@@ -11,6 +11,7 @@ import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
+  PICKER_COLUMNS,
   REACTIONS,
   addLabel,
   chipLabel,
@@ -23,23 +24,32 @@ import {
   reactFrame,
   sameWords,
   whoText,
-} from '../public/js/chat-reactions.js?v=38460172';
-import { mountSocialDrawer } from '../public/js/ui/social-drawer.js?v=a45b925c';
+} from '../public/js/chat-reactions.js?v=e2c21ad4';
+import { mountSocialDrawer } from '../public/js/ui/social-drawer.js?v=dca299d0';
 import { createNotifier } from '../public/js/notify.js?v=c9d79ec5';
-import { chatReactionsFeature } from '../public/js/features/chat-reactions-feature.js?v=704d27da';
-import { drawerLine, normalLine } from '../public/js/player-im.js?v=87bdb8ec';
+import { chatReactionsFeature } from '../public/js/features/chat-reactions-feature.js?v=0750c712';
+import { drawerLine, normalLine } from '../public/js/player-im.js?v=2c6339e8';
 import { chatLine } from '../public/js/groups.js?v=c5e35964';
 import { FakeEl, FakeText, memoryStore, page } from './social-fake-dom.js';
 import { serverPath, skipWithoutServer } from '../tools/repos.mjs';
+import { reactionsJson, serverReactionsFile } from '../tools/build-reactions.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const read = (p) => readFileSync(join(root, p), 'utf8');
 
 describe('reactions: the rules and the words', () => {
-  it('a small fixed set: seven emoji as text and Tiny Speck\'s Hi sign', () => {
-    assert.deepEqual(REACTIONS.map((r) => r.key), ['like', 'heart', 'laugh', 'wow', 'sad', 'tada', 'thanks', 'hi']);
-    assert.deepEqual(REACTIONS.filter((r) => r.glyph).map((r) => r.glyph), ['👍', '❤️', '😂', '😮', '😢', '🎉', '🙏']);
-    assert.deepEqual(REACTIONS.find((r) => r.key === 'thanks'), { key: 'thanks', glyph: '🙏', label: 'Thank you' }, 'after Hooray, before the Hi sign');
+  it('a fixed set: fifteen emoji as text and Tiny Speck\'s Hi sign last', () => {
+    assert.deepEqual(REACTIONS.map((r) => r.key), ['like', 'heart', 'laugh', 'wow', 'sad', 'tada', 'thanks', 'clap', 'smile', 'think', 'love', 'fire', 'eyes', 'phew', 'hundred', 'hi']);
+    assert.deepEqual(REACTIONS.filter((r) => r.glyph).map((r) => r.glyph), ['👍', '❤️', '😂', '😮', '😢', '🎉', '🙏', '👏', '😊', '🤔', '😍', '🔥', '👀', '😅', '💯']);
+    assert.deepEqual(REACTIONS.find((r) => r.key === 'thanks'), { key: 'thanks', glyph: '🙏', label: 'Thank you' }, 'after Hooray');
+    // Austin's eight (2026-11-27), after Thank you, before the Hi sign, with his words.
+    assert.deepEqual(REACTIONS.slice(7, 15).map((r) => [r.key, r.glyph, r.label]), [
+      ['clap', '👏', 'Clapping'], ['smile', '😊', 'Smiling'], ['think', '🤔', 'Thinking'], ['love', '😍', 'Heart eyes'],
+      ['fire', '🔥', 'Fire'], ['eyes', '👀', 'Looking'], ['phew', '😅', 'Phew'], ['hundred', '💯', 'One hundred'],
+    ]);
+    assert.equal(REACTIONS.at(-1).key, 'hi');
+    assert.equal(new Set(REACTIONS.map((r) => r.label)).size, REACTIONS.length, 'each its own name');
+    assert.equal(PICKER_COLUMNS, 8, 'two rows of eight');
     // The site keeps a reaction's key in varchar(12) (groddle-afternoon-site minn.json groddle_community_reactions).
     assert.ok(REACTIONS.every((r) => /^[a-z]{1,12}$/.test(r.key)));
     const hi = REACTIONS.find((r) => r.key === 'hi');
@@ -107,13 +117,26 @@ describe('reactions: the rules and the words', () => {
     assert.equal(addLabel({}), 'React to this message');
   });
 
-  it('the picker\'s keys wrap; other keys do not move it', () => {
+  it('the picker\'s keys follow its grid and wrap; other keys do not move it', () => {
     assert.equal(pickerMove(0, 'ArrowRight'), 1);
-    assert.equal(pickerMove(6, 'ArrowRight'), 7);
+    assert.equal(pickerMove(7, 'ArrowRight'), 8, 'on to the next row at a row\'s end');
+    assert.equal(pickerMove(8, 'ArrowLeft'), 7);
     assert.equal(pickerMove(REACTIONS.length - 1, 'ArrowRight'), 0);
     assert.equal(pickerMove(0, 'ArrowLeft'), REACTIONS.length - 1);
-    assert.equal(pickerMove(3, 'ArrowDown'), 4);
-    assert.equal(pickerMove(3, 'ArrowUp'), 2);
+    // Up and Down move a row in the same column (two rows of eight), wrapping.
+    assert.equal(pickerMove(3, 'ArrowDown'), 11);
+    assert.equal(pickerMove(11, 'ArrowDown'), 3);
+    assert.equal(pickerMove(11, 'ArrowUp'), 3);
+    assert.equal(pickerMove(3, 'ArrowUp'), 11);
+    assert.equal(pickerMove(0, 'ArrowDown'), 8);
+    assert.equal(pickerMove(15, 'ArrowDown'), 7);
+    // A last row that is not full: a column it lacks wraps within the rows it has.
+    assert.equal(pickerMove(1, 'ArrowDown', 10, 4), 5);
+    assert.equal(pickerMove(5, 'ArrowDown', 10, 4), 9);
+    assert.equal(pickerMove(9, 'ArrowDown', 10, 4), 1);
+    assert.equal(pickerMove(3, 'ArrowUp', 10, 4), 7, 'column 4 has no third row');
+    assert.equal(pickerMove(1, 'ArrowUp', 10, 4), 9);
+    assert.equal(pickerMove(2, 'ArrowDown', 3, 8), 2, 'one row: Down stays');
     assert.equal(pickerMove(4, 'Home'), 0);
     assert.equal(pickerMove(1, 'End'), REACTIONS.length - 1);
     assert.equal(pickerMove(1, 'a'), -1);
@@ -311,13 +334,25 @@ describe('reactions: the Social drawer', () => {
     assert.equal(globalThis.document.activeElement, items[1]);
     key('ArrowLeft');
     key('ArrowLeft');
-    assert.equal(items.length, 8);
-    assert.equal(globalThis.document.activeElement, items[7], 'wraps');
-    assert.equal(items[7].getAttribute('data-react-pick'), 'hi', 'the Hi sign stays last');
+    assert.equal(items.length, 16, 'all sixteen, in order');
+    assert.equal(globalThis.document.activeElement, items[15], 'wraps');
+    assert.equal(items[15].getAttribute('data-react-pick'), 'hi', 'the Hi sign stays last');
     assert.equal(items[6].getAttribute('data-react-pick'), 'thanks');
     assert.equal(items[6].getAttribute('aria-label'), 'Thank you');
     assert.equal(items[6].textContent, '🙏');
-    assert.equal(items[7].getAttribute('tabindex'), '0');
+    assert.deepEqual(items.slice(7, 15).map((b) => b.textContent), ['👏', '😊', '🤔', '😍', '🔥', '👀', '😅', '💯']);
+    assert.equal(items[15].getAttribute('tabindex'), '0');
+    // Up and Down move by row in the grid of eight.
+    key('ArrowUp');
+    assert.equal(globalThis.document.activeElement, items[7], 'up a row, same column');
+    key('ArrowDown');
+    assert.equal(globalThis.document.activeElement, items[15]);
+    key('ArrowDown');
+    assert.equal(globalThis.document.activeElement, items[7], 'down from the last row wraps to the top');
+    key('ArrowRight');
+    assert.equal(globalThis.document.activeElement, items[8], 'Right from a row\'s end goes on to the next row');
+    key('End');
+    assert.equal(globalThis.document.activeElement, items[15]);
     assert.equal(items[0].getAttribute('tabindex'), '-1');
     key('Escape');
     assert.equal(r.t.game.querySelector('[data-react-picker]'), null, 'closed');
@@ -346,11 +381,11 @@ describe('reactions: the Social drawer', () => {
     add.dispatch('click', { detail: 1 });
     const picker = r.t.game.querySelector('[data-react-picker]');
     assert.equal(picker.style.left, '1200px', 'not past the column\'s left edge (over the world)');
-    assert.equal(picker.style.top, '256px', 'above the button');
+    assert.equal(picker.style.top, `${300 - 2 * 34 - 8 - 4}px`, 'above the button (two rows)');
     r.drawer.reactions.closePicker();
     add.rect = { left: 1458, right: 1478, top: 20, bottom: 38, width: 20, height: 18 };
     add.dispatch('click', { detail: 1 });
-    assert.equal(r.t.game.querySelector('[data-react-picker]').style.left, `${1478 - REACTIONS.length * 34}px`, 'its right edge at the button\'s');
+    assert.equal(r.t.game.querySelector('[data-react-picker]').style.left, `${1478 - PICKER_COLUMNS * 34}px`, 'its right edge at the button\'s');
     assert.equal(r.t.game.querySelector('[data-react-picker]').style.top, '42px', 'under it at the top');
     r.drawer.reactions.closePicker();
     row.rect = add.rect = { left: 0, top: 0, right: 0, bottom: 0, width: 0, height: 0 };
@@ -523,6 +558,35 @@ describe('reactions: the feature and the socket', () => {
     client.emit('msg:channel_joined', { channel: 'global', history: [{ id: 9, name: 'Bo', text: 'c', at: 3, lid: 602, r: [{ e: 'someday', by: [{ id: 9, name: 'Bo' }] }] }] });
     assert.deepEqual(r.drawer.reactions.get('l:602'), []);
   });
+
+  it('each of the sixteen over the socket: picked, sent by its key, drawn when the server says so, taken off again', () => {
+    r.drawer.select('local');
+    r.drawer.push('local', { name: 'Bo', text: 'all of them', playerId: 9, rk: 'l:810' });
+    const row = r.rows().at(-1);
+    const on = [];
+    for (const def of REACTIONS) {
+      row.querySelector('[data-react-add]').dispatch('click', { detail: 1 });
+      const pick = r.t.game.querySelector(`[data-react-pick="${def.key}"]`);
+      assert.ok(pick, def.key);
+      pick.click();
+      assert.deepEqual(client.frames.at(-1), { t: 'react', line: 810, e: def.key, on: true }, def.key);
+      on.push({ e: def.key, by: [{ id: 7, name: 'Ada' }] });
+      client.emit('msg:reacted', { t: 'reacted', line: 810, r: [...on].reverse() });
+      const chip = row.querySelector(`[data-react-chip="${def.key}"]`);
+      assert.equal(chip.getAttribute('aria-label'), `${def.glyph || def.label} 1, you`, def.key);
+      assert.equal(chip.getAttribute('aria-pressed'), 'true');
+    }
+    assert.deepEqual(row.querySelector('[data-react-strip]').children.map((c) => c.getAttribute('data-react-chip')), REACTIONS.map((x) => x.key), 'the set\'s order, whatever order the server sends');
+    for (const def of REACTIONS) {
+      row.querySelector(`[data-react-chip="${def.key}"]`).click();
+      assert.deepEqual(client.frames.at(-1), { t: 'react', line: 810, e: def.key, on: false }, def.key);
+      on.shift();
+      client.emit('msg:reacted', { t: 'reacted', line: 810, r: on });
+      assert.equal(row.querySelector(`[data-react-chip="${def.key}"]`), null, def.key);
+    }
+    // And on an IM line.
+    for (const def of REACTIONS) assert.deepEqual(reactFrame('im:9:12', def.key, true), { t: 'im_react', payload: { with: 9, line: 12, e: def.key, on: true } });
+  });
 });
 
 describe('reactions: both skins\' styles', () => {
@@ -535,8 +599,9 @@ describe('reactions: both skins\' styles', () => {
     assert.match(css, /hi_hi_1@3x\.webp/);
   });
 
-  it('the picker\'s row fits a chat line\'s column in both skins, beside a scrollbar too', () => {
-    const n = REACTIONS.length;
+  it('the picker\'s grid of two rows of eight fits a chat line\'s column in both skins, beside a scrollbar too', () => {
+    const n = PICKER_COLUMNS;
+    assert.equal(Math.ceil(REACTIONS.length / n), 2, 'two rows');
     const px = (rule, prop) => Number(new RegExp(`${prop}: (\\d+)px`).exec(rule)?.[1]);
     // Modern: the drawer is --drawer-w wide; a line's column is that less the border, the log's padding
     // (--sp-6 a side) and a thin scrollbar where one takes room (11 px).
@@ -544,7 +609,8 @@ describe('reactions: both skins\' styles', () => {
     const drawer = Number(/--drawer-w: ([\d.]+)rem/.exec(css)[1]) * 16;
     const rem = (name) => Number(new RegExp(`--${name}: ([\\d.]+)rem`).exec(css)[1]) * 16;
     const pick = px(/\n\.react-pick \{[^}]*\}/.exec(css)[0], 'width');
-    assert.match(/\n\.react-picker \{[^}]*\}/.exec(css)[0], /gap: var\(--sp-1\);\s*padding: var\(--sp-2\);\s*border: 1px/);
+    assert.match(/\n\.react-picker \{[^}]*\}/.exec(css)[0], /display: grid;\s*grid-template-columns: repeat\((\d+), auto\);\s*gap: var\(--sp-1\);\s*padding: var\(--sp-2\);\s*border: 1px/);
+    assert.equal(Number(/\n\.react-picker \{[^}]*grid-template-columns: repeat\((\d+), auto\)/.exec(css)[1]), PICKER_COLUMNS, 'Modern draws PICKER_COLUMNS a row');
     const row = (w) => n * w + (n - 1) * rem('sp-1') + 2 * rem('sp-2') + 2;
     const column = drawer - 2 - 2 * rem('sp-6');
     assert.ok(row(pick) <= column - 11, `Modern: ${row(pick)} px in ${column - 11}`);
@@ -554,8 +620,11 @@ describe('reactions: both skins\' styles', () => {
     // Classic: a line's column is 216u wide (measured at 1280 x 860: 254 px at 1.175 px a unit), the
     // scrollbar 12 px at any size; the smallest window has 1 px a unit.
     const classic = read('public/css/classic.css');
+    assert.equal(Number(/\.react-picker \{\s*grid-template-columns: repeat\((\d+), auto\);/.exec(classic)[1]), PICKER_COLUMNS, 'Classic draws PICKER_COLUMNS a row');
+    // A 390 px phone: the drawer is no wider than the screen, and the touch row is inside it.
+    assert.ok(row(touch) <= 390 - 16, `phone: ${row(touch)} px at 390`);
     const cpick = Number(/\.react-pick \{ width: calc\((\d+) \* var\(--cu\)\)/.exec(classic)[1]);
-    const cpad = Number(/\.react-picker \{\s*gap: 0;\s*padding: calc\((\d+) \* var\(--cu\)\)/.exec(classic)[1]);
+    const cpad = Number(/\.react-picker \{\s*grid-template-columns: repeat\(\d+, auto\);\s*gap: 0;\s*padding: calc\((\d+) \* var\(--cu\)\)/.exec(classic)[1]);
     assert.ok(n * cpick + 2 * cpad <= 216 - 12, `Classic: ${n * cpick + 2 * cpad}u in ${216 - 12}`);
   });
 
@@ -570,10 +639,11 @@ describe('reactions: both skins\' styles', () => {
 });
 
 describe('reactions: the server takes the same set', { skip: skipWithoutServer }, () => {
-  it('reactions.go reactionKeys are the game\'s keys, in order', () => {
+  it('reactions.go reads the game\'s set from data/reactions.json (tools/build-reactions.mjs), no list of its own', () => {
+    assert.equal(readFileSync(serverReactionsFile(), 'utf8'), reactionsJson(), 'run node tools/build-reactions.mjs');
     const go = readFileSync(serverPath('reactions.go'), 'utf8');
-    const m = /var reactionKeys = \[\]string\{([^}]*)\}/.exec(go);
-    assert.ok(m, 'reactionKeys');
-    assert.deepEqual(m[1].split(',').map((s) => s.trim().replace(/"/g, '')), REACTIONS.map((r) => r.key));
+    assert.match(go, /\/\/go:embed data\/reactions\.json/);
+    assert.doesNotMatch(go, /"thanks"|"like", "heart"/, 'no hand-written copy of the keys');
+    assert.deepEqual(JSON.parse(readFileSync(serverReactionsFile(), 'utf8')).reactions.map((r) => r.key), REACTIONS.map((r) => r.key));
   });
 });

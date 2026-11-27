@@ -4,9 +4,10 @@
  *
  * - an "add reaction" button (a face with a plus), shown while the line is hovered or has the
  *   keyboard, always focusable: "React to mr granberry's message". It opens the picker.
- * - the picker: the reactions in a row (role menu, each a menuitemcheckbox checked when it is
- *   yours already). Left and Right (or Up and Down, Home, End) move, Enter or Space picks, Escape or a
- *   click elsewhere closes; the keyboard goes back to the button it came from.
+ * - the picker: the reactions in a grid of PICKER_COLUMNS a row (two rows of eight; role menu, each a
+ *   menuitemcheckbox checked when it is yours already). Left and Right step through the set, Up and
+ *   Down move a row in the same column, Home and End go to the first and last, Enter or Space picks,
+ *   Escape or a click elsewhere closes; the keyboard goes back to the button it came from.
  * - chips under the words, one a reaction with its count ("👍 2"): a click puts yours on or takes it
  *   off; hovering one (or giving it the keyboard) shows who ("Thumbs up: You and mr granberry"); its
  *   spoken name is "👍 2, you and mr granberry".
@@ -16,7 +17,7 @@
  * showing that line in place (their words are never touched, so a selection in them stays). A chip
  * keeps its node while its reaction stays, so the keyboard stays on it after a toggle.
  */
-import { REACTIONS, addLabel, chipLabel, chipTip, isMine, pickerMove, reactionOf, sameReactions } from '../chat-reactions.js?v=38460172';
+import { PICKER_COLUMNS, REACTIONS, addLabel, chipLabel, chipTip, isMine, pickerMove, reactionOf, sameReactions } from '../chat-reactions.js?v=e2c21ad4';
 
 const SVG_NS = 'http://www.w3.org/2000/svg';
 
@@ -172,8 +173,9 @@ export function createReactionUI({ doc = globalThis.document, win = globalThis, 
     const line = row.getBoundingClientRect?.() || null;
     const vw = win.innerWidth || 0;
     const vh = win.innerHeight || 0;
-    const w = node.offsetWidth || REACTIONS.length * 34;
-    const h = node.offsetHeight || 40;
+    const cols = Math.min(REACTIONS.length, PICKER_COLUMNS);
+    const w = node.offsetWidth || cols * 34;
+    const h = node.offsetHeight || Math.ceil(REACTIONS.length / cols) * 34 + 8;
     let left = (r.right || 0) - w;
     if (line && line.width) left = Math.min(Math.max(left, line.left), line.right - w);
     if (vw) left = Math.max(8, Math.min(left, vw - w - 8));

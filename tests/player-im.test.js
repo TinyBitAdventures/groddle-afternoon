@@ -21,10 +21,10 @@ import {
   imVerb,
   normalState,
   refusalText,
-} from '../public/js/player-im.js?v=87bdb8ec';
-import { playerImFeature } from '../public/js/features/player-im-feature.js?v=a80ab6bc';
-import { FEATURES } from '../public/js/features/index.js?v=84714820';
-import { mountSocialDrawer } from '../public/js/ui/social-drawer.js?v=a45b925c';
+} from '../public/js/player-im.js?v=2c6339e8';
+import { playerImFeature } from '../public/js/features/player-im-feature.js?v=2ff7dae2';
+import { FEATURES } from '../public/js/features/index.js?v=5737489e';
+import { mountSocialDrawer } from '../public/js/ui/social-drawer.js?v=dca299d0';
 import { createNotifier } from '../public/js/notify.js?v=c9d79ec5';
 import { memoryStore, page } from './social-fake-dom.js';
 import { serverPath, sitePath, skipWithoutSite } from '../tools/repos.mjs';

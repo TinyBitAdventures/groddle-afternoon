@@ -164,4 +164,17 @@ describe('Announcements on a throwaway database', { skip: skipDb }, () => {
     assert.match(c, /\$this->mayPost\(\$viewer, true, \$board\);/);
     assert.match(c, /private const ADMIN = 'manage_options';/);
   });
+  it('each of the chat\'s sixteen goes on a post and comes off again through the route (2026-11-27)', () => {
+    const e = r.everyReaction;
+    assert.deepEqual(e.keys, ['like', 'heart', 'laugh', 'wow', 'sad', 'tada', 'thanks', 'clap', 'smile', 'think', 'love', 'fire', 'eyes', 'phew', 'hundred', 'hi']);
+    assert.ok(e.on.every((a) => a.status === 200), JSON.stringify(e.on.find((a) => a.status !== 200)));
+    assert.deepEqual(e.keptOn, [...e.keys].sort(), 'each kept by its key');
+    const last = e.on.at(-1).body;
+    assert.deepEqual(last.reactions.map((x) => x.e ?? x.key), e.keys, 'drawn in the set\'s order');
+    for (const k of e.keys) assert.match(last.html, new RegExp(`data-react="${k}"`), k);
+    assert.ok(e.off.every((a) => a.status === 200));
+    assert.deepEqual(e.keptOff, []);
+    assert.deepEqual(e.off.at(-1).body.reactions, []);
+    assert.deepEqual(e.badKey, { status: 400, code: 'groddle_community_reaction' });
+  });
 });

@@ -15,7 +15,7 @@ import { homedir } from 'node:os';
 import { join } from 'node:path';
 import { SITE_DIR, sitePath, skipWithoutSite } from '../tools/repos.mjs';
 import { REPORT_TEXT, appendReports, createReportsApi, listPath, sortReports } from '../public/js/reports.js?v=3c805cc4';
-import { mountReportsSheet } from '../public/js/ui/reports-sheet.js?v=4a42cc37';
+import { mountReportsSheet } from '../public/js/ui/reports-sheet.js?v=917a2f8c';
 import { HAS_PHP, PHP, phpSkip } from './php.js';
 
 const root = join(import.meta.dirname, '..');

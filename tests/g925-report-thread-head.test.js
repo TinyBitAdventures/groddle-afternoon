@@ -3,7 +3,7 @@
 // Run: node --test tests/g925-report-thread-head.test.js
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { mountReportsSheet } from '../public/js/ui/reports-sheet.js?v=4a42cc37';
+import { mountReportsSheet } from '../public/js/ui/reports-sheet.js?v=917a2f8c';
 
 const wait = (ms) => new Promise((r) => setTimeout(r, ms));
 
