@@ -4023,6 +4023,11 @@ function ensureUi(engine) {
   const modes = el('div', { class: 'homes-modes', id: 'homes-modes', hidden: true });
   root.append(modes);
   ui = { root, bar: builder.bar, modes, builder };
+  // #743: the Furniture Store button shows the store's state, however the store opened or closed (its own close, Esc, another sheet).
+  const vendor = document.getElementById('vendor-panel');
+  if (vendor && typeof MutationObserver === 'function') {
+    new MutationObserver(() => { if (mode === 'decorate') renderBar(engine); }).observe(vendor, { attributes: true, attributeFilter: ['hidden', 'data-vendor'] });
+  }
   return ui;
 }
 
@@ -4483,7 +4488,8 @@ function decorateModel(engine) {
     },
     trayLabel: 'Decoration tray',
     // The Furniture Store, by the furniture it sells (the original reached it from the house's menu).
-    footActions: [{ label: 'Furniture Store', attrs: { 'data-home-store': '1' }, onClick: () => openStore(engine) }],
+    // Ours (#743, Austin's ruling 2026-11-26): a toggle, pressed while the store is open; a tap closes it.
+    footActions: [{ label: 'Furniture Store', pressed: storeOpen(engine), attrs: { 'data-home-store': '1' }, onClick: () => toggleStore(engine) }],
   };
   if (tabId === 'pack') {
     // The pack itself, in the tray's panel as the other tabs show their tiles (PackTabberUI's Inventory
@@ -5205,6 +5211,17 @@ function beginNudge(engine, id) {
 
 function openStore(engine) {
   engine.openShop?.(furnitureStoreProfile());
+}
+
+/** Whether the shared vendor panel shows the Furniture Store. */
+function storeOpen(engine) {
+  return Boolean(engine.shopOpen?.(furnitureStoreProfile().key));
+}
+
+/** The tray's Furniture Store button (#743): opens the store, or closes it when it is open. */
+function toggleStore(engine) {
+  if (storeOpen(engine)) engine.closeShop?.();
+  else openStore(engine);
 }
 
 function applySwatch(engine, kind, key, opts = {}) {

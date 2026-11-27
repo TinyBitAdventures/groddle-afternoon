@@ -6550,6 +6550,21 @@
    "rows": [
     "G1328"
    ]
+  },
+  {
+   "id": "furniture-store-tray-toggle",
+   "title": "Decoration Mode's tray has a Furniture Store button, a toggle: pressed while the store is open, a tap closes it",
+   "kind": "UI",
+   "status": "kept",
+   "where": [
+    {
+     "file": "public/js/features/homes-feature.js",
+     "symbol": "toggleStore"
+    }
+   ],
+   "why": "Glitch reached the Furniture Store from the house's menu, not from the decorate tray. Ours: a button at the tray's foot, by the furniture it sells; it shows as pressed while the store is open and a second tap closes it (report #743: on a phone the open store hid how to close it).",
+   "ruling": "Austin 2026-11-26 (report #743): the Furniture Store button is a toggle",
+   "rows": []
   }
  ]
 }

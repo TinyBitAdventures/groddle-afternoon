@@ -4,7 +4,7 @@
  */
 import { ITEM_ICONS, ITEM_LABELS, getVerbsFor, ordinaryItems, runVerb } from './content.js?v=c46159de';
 import { createErrorOnce, createFeatureHost, createFrameStages } from './js/feature-host.js?v=b87e2cbc';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=a62816d9';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=3ad90bb1';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, enterHintPick, groupHead, hoverRimShown, reachGlowTargets, spriteHasRimArt, rimArtParts, trimmedIconUrl, drawTileArt } from './js/enter-chooser.js?v=74f4964a';
 import { firstTendKey, STICK_TEND_DELAY_MS, STICK_TEND_DIRS, STICK_TEND_REPEAT_MS, stepTendKey, stepTendKeys, stickTendKey, tendKeyAction } from './js/garden-tend.js?v=a7470c4a';
 import { avatarHitBox, behindFloor, bodyReachDistance, OUT_OF_REACH_LINE, playerClickBox } from './js/reach.js?v=456da8a8';
@@ -16033,8 +16033,12 @@ const engine = {
     engine._shopReturn = null;
     if (back && back.tsid === currentStreetTsid && activeVendor !== back.vendor) activeVendor = back.vendor;
   },
-  /** Whether the shared vendor panel is open. */
-  shopOpen: () => isVendorOpen(),
+  /** Whether the shared vendor panel is open (on the store with that profile key, when one is given). */
+  shopOpen: (key = '') => Boolean(isVendorOpen() && (!key || activeVendor?.key === key)),
+  /** Close the shared vendor panel (#743: the Furniture Store button is a toggle). */
+  closeShop() {
+    if (isVendorOpen()) closeVendor();
+  },
   _shopReturn: null,
   /**
    * Feature-driven travel: home rooms, ordinary streets, gate bypass.

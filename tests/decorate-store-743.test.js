@@ -94,6 +94,23 @@ describe('#743 the Decoration Mode tray keeps its width beside a sheet that ends
   });
 });
 
+describe('#743 the Furniture Store button is a toggle (Austin\'s ruling 2026-11-26)', () => {
+  const homes = read('public/js/features/homes-feature.js');
+  it('pressed while the store is open, a tap closes an open store, and it follows the store however it closes', () => {
+    assert.match(homes, /\{ label: 'Furniture Store', pressed: storeOpen\(engine\), attrs: \{ 'data-home-store': '1' \}, onClick: \(\) => toggleStore\(engine\) \}/);
+    assert.match(homes, /function toggleStore\(engine\) \{\n {2}if \(storeOpen\(engine\)\) engine\.closeShop\?\.\(\);\n {2}else openStore\(engine\);\n\}/);
+    assert.match(homes, /return Boolean\(engine\.shopOpen\?\.\(furnitureStoreProfile\(\)\.key\)\);/);
+    assert.match(homes, /\.observe\(vendor, \{ attributes: true, attributeFilter: \['hidden', 'data-vendor'\] \}\)/);
+    assert.match(game, /shopOpen: \(key = ''\) => Boolean\(isVendorOpen\(\) && \(!key \|\| activeVendor\?\.key === key\)\),\n.*\n {2}closeShop\(\) \{\n {4}if \(isVendorOpen\(\)\) closeVendor\(\);/);
+    // A pressed look in both skins.
+    assert.match(css, /:is\(\.hb-banner, \.hb-tray, \.hb-pop\) \.hb-bt\[aria-pressed="true"\] \{/);
+    assert.match(read('public/css/classic.css'), /:is\(\.hb-banner, \.hb-tray, \.hb-pop\) \.hb-bt\[aria-pressed="true"\] \{/);
+    // Ours: registered.
+    const reg = JSON.parse(read('tools/inventions/inventions.json'));
+    assert.ok(reg.entries.find((e) => e.id === 'furniture-store-tray-toggle' && e.status === 'kept'));
+  });
+});
+
 const SAFE_T = 86; // an iPhone 16 Pro's 62 px inset plus the Home Screen app's 24 px fade clearance
 const SAFE_B = 34;
 

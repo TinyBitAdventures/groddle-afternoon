@@ -14339,6 +14339,8 @@ body:has(#quest-dialogue:not([hidden])) .prompt-stack { z-index: calc(var(--z-mo
 [data-ui="modern"] #game-root :is(.hb-banner, .hb-tray, .hb-pop) .hb-bt:hover:not(:disabled) { background: var(--surface-hover); }
 [data-ui="modern"] #game-root :is(.hb-banner, .hb-tray, .hb-pop) .hb-bt.primary { border-color: var(--accent); background: var(--accent); color: var(--accent-text); }
 [data-ui="modern"] #game-root :is(.hb-banner, .hb-tray, .hb-pop) .hb-bt.primary:hover:not(:disabled) { background: var(--accent-hover); }
+/* #743: a toggle that is on (the Furniture Store button while the store is open). */
+[data-ui="modern"] #game-root :is(.hb-banner, .hb-tray, .hb-pop) .hb-bt[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); color: var(--text); box-shadow: inset 0 1px 2px color-mix(in srgb, var(--text) 18%, transparent); }
 [data-ui="modern"] #game-root :is(.hb-banner, .hb-tray, .hb-pop) .hb-bt:disabled { border-color: var(--border); background: var(--surface-sunken); color: var(--text-muted); cursor: not-allowed; }
 [data-ui="modern"] #game-root .hb-banner .hb-btn-ic { font-size: var(--fs-m); line-height: var(--lh-none); }
 [data-ui="modern"] #game-root .hb-banner .hb-close { display: inline-grid; place-items: center; flex: 0 0 auto; width: 32px; height: 32px; padding: 0; border: 0; border-radius: var(--radius-pill); background: transparent; color: var(--text-muted); font: inherit; font-size: var(--fs-2xl); line-height: var(--lh-none); cursor: pointer; }

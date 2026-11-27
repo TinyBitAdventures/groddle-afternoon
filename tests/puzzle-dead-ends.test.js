@@ -14,7 +14,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { STRAY_FALLBACK_TSID, strayWayOut, streetsReachingUr } from '../public/js/quest-instance.js?v=15090adc';
 import { COLOUR_LEVEL_STREETS, NO_EXIT_PUZZLE_STREETS, PUZZLE_LEAVE_TEXT } from '../public/js/puzzle-triggers.js?v=221b67a9';
-import { questInstancesFeature as qi } from '../public/js/features/quest-instances-feature.js?v=2eb334d1';
+import { questInstancesFeature as qi } from '../public/js/features/quest-instances-feature.js?v=f41db36a';
 import { puzzlesFeature as pz } from '../public/js/features/puzzles-feature.js?v=054bec26';
 import { STUCK_TEXT, slashPlan } from '../public/js/slash-commands.js?v=bb2569aa';
 
