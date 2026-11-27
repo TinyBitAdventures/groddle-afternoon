@@ -34,7 +34,7 @@ import { goodsWithHeldTags, normalizeGoods, normalizeSlice, sameGoods, settleDon
 import { giftEffects, normalizeGift, normalizeGiftsSlice, wrapBox } from '../public/js/gifts.js?v=37ce7d76';
 import { dropEffect, normalizeGroundStack, normalizeItem } from '../public/js/drops-mp.js?v=351593a6';
 import { normalizeListing } from '../public/js/auctions.js?v=2b806ad4';
-import { cabinetMove, cabinetPut, cabinetTake, normalizeContents } from '../public/js/home-storage.js?v=31e8c4ad';
+import { cabinetMove, cabinetPut, cabinetTake, normalizeContents } from '../public/js/home-storage.js?v=d44f697b';
 import { CUBIMAL_NAMING } from '../public/js/cubimals.js?v=b83d6145';
 import { FAVOR_GIANTS } from '../public/js/potions.js?v=4f4c996d';
 import { HOPPER_CEILING, STILL } from '../public/js/machines.js?v=93a736f2';

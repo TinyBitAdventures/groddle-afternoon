@@ -52,6 +52,7 @@
  * Solo is untouched.
  */
 
+import { priceText } from '../price.js?v=fd73ce0e';
 import { addItem, countItem, ensureItem, removeItem, ITEM_CATALOG, itemIcon } from '../inventory.js?v=3be7988a';
 import { teleportEnergyCost } from '../teleportation.js?v=cbbc673f';
 import {
@@ -84,13 +85,13 @@ import {
   stackAvailable,
   startParty,
   teleporterPhase,
-} from '../party-spaces.js?v=4e1ca2a5';
+} from '../party-spaces.js?v=736ab50e';
 import { frameTexture, sourceFromUrl, textureFromUrl } from '../textures.js?v=b8e38103';
-import { readVisitScene } from '../neighbours-mp.js?v=6d97fefa';
+import { readVisitScene } from '../neighbours-mp.js?v=f024b835';
 import { STREET_INDEX } from '../street-loader.js?v=10376267';
 import { isNeighbourSceneTsid } from '../neighbours.js?v=13f35acd';
 import { energyMax as tankEnergyMax, loseEnergy } from '../metabolics.js?v=48f784bf';
-import { MP_PARTY_TEXT, MP_SPACE_STREET_RE, kickVerb, mpActivationBlock, normalizeSpace, partyFromSpace } from '../party-spaces-mp.js?v=a2090caf';
+import { MP_PARTY_TEXT, MP_SPACE_STREET_RE, kickVerb, mpActivationBlock, normalizeSpace, partyFromSpace } from '../party-spaces-mp.js?v=ef39b48f';
 import { standOnFeet, anchorBottomCentre } from '../sprite-feet.js?v=849541a8';
 import { WORLD_FONT_FAMILY } from '../world-text.js?v=6b49f88c';
 
@@ -974,7 +975,7 @@ function openAtm(engine) {
     kind: 'atm',
     art: `${ART}party_atm.webp`,
     kicker: PARTY_TEXT.atmLabel,
-    body: `<p style="margin:0 0 4px;font-weight:800">${formatPartyClock(partyRemainingMs(p))} left · you have ${Math.floor(Number(engine.pc.currants) || 0)}c</p>`,
+    body: `<p style="margin:0 0 4px;font-weight:800">${formatPartyClock(partyRemainingMs(p))} left · you have ${priceText(engine.pc.currants)}</p>`,
     copy: PARTY_TEXT.atmQuestion,
     buttons: [
       ...options.map((o) => ({ id: String(o.minutes), label: o.label, run: () => chooseExtend(engine, o.minutes) })),

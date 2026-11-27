@@ -81,7 +81,7 @@ describe('G978: the party booster is an invisible box', () => {
     assert.doesNotMatch(feature, /Overlay|bulbs|confetti/);
     assert.match(fn(feature, 'spawnBooster'), /booster = \{ x: point\.x, y: point\.y, w: 70, h: 40, cooldownUntil: 0 \};/);
     assert.doesNotMatch(fn(feature, 'spawnBooster'), /PIXI|Graphics/);
-    const { PARTY_SPACES } = await import('../public/js/party-spaces.js?v=4e1ca2a5');
+    const { PARTY_SPACES } = await import('../public/js/party-spaces.js?v=736ab50e');
     for (const s of Object.values(PARTY_SPACES)) assert.ok(!('ambience' in s) && !('palette' in s), s.id);
   });
 });

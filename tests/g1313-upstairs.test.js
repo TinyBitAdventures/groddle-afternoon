@@ -36,11 +36,11 @@ const pixi = new Proxy({ Container: Display, Graphics: Display, Sprite: Display,
 globalThis.PIXI = pixi;
 globalThis.Image ??= class { set src(_) {} };
 
-const { visitorHomeScene, visitorHomeState } = await import('../public/js/features/homes-feature.js?v=ac211489');
-const { housePlace, housePlaceFloor, isHousePlace } = await import('../public/js/home-floors.js?v=cb981157');
-const { homeStreetFor, houseFloorStreet, normalizeHomeView, ownerStacksFor, readHomeStreet, readVisitScene, sharedHomeStreet, visitSceneTsid } = await import('../public/js/neighbours-mp.js?v=6d97fefa');
+const { visitorHomeScene, visitorHomeState } = await import('../public/js/features/homes-feature.js?v=cbae6b43');
+const { housePlace, housePlaceFloor, isHousePlace } = await import('../public/js/home-floors.js?v=0565b551');
+const { homeStreetFor, houseFloorStreet, normalizeHomeView, ownerStacksFor, readHomeStreet, readVisitScene, sharedHomeStreet, visitSceneTsid } = await import('../public/js/neighbours-mp.js?v=f024b835');
 const { homePlaceOf, isFloorPlace, isSharedStreet } = await import('../public/js/drops-mp.js?v=351593a6');
-const { visitGnomePlace } = await import('../public/js/garden-gnome.js?v=ac496b8c');
+const { visitGnomePlace } = await import('../public/js/garden-gnome.js?v=ace7fa8e');
 
 const root = join(import.meta.dirname, '..');
 const read = (rel) => readFileSync(join(root, rel), 'utf8');

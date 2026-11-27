@@ -15,11 +15,11 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { REFUEL_COUNT_TITLE, machineTank, refuelCount, roomMachineVerbs } from '../public/js/machine-rooms.js?v=a99c4d01';
-import { normalizeMachine, placedMachineVerbs } from '../public/js/home-machines.js?v=b7b47943';
+import { normalizeMachine, placedMachineVerbs } from '../public/js/home-machines.js?v=acaaed90';
 import { refuelMachine } from '../public/js/machines.js?v=93a736f2';
 import { createInventory, countItem } from '../public/js/inventory.js?v=3be7988a';
 import { createToolConditionState, getToolCondition } from '../public/js/tools.js?v=4156bba8';
-import { supplyFeature } from '../public/js/features/supply-feature.js?v=0569a656';
+import { supplyFeature } from '../public/js/features/supply-feature.js?v=f74d3fe0';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const read = (rel) => readFileSync(join(root, 'public', rel), 'utf8');

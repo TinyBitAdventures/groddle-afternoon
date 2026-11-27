@@ -57,6 +57,7 @@
  *     iconOfferCollisions (walk-ins that offered instead of bestowing).
  */
 
+import { priceText } from '../price.js?v=fd73ce0e';
 import { addItem, countItem, ensureItem } from '../inventory.js?v=3be7988a';
 import { getGameDayKey } from '../game-day.js?v=57fecfcb';
 import { XP_FOR_LEVEL } from '../progression.js?v=05ff0260';
@@ -94,7 +95,7 @@ import {
   titheIcon,
   titheMessage,
   useEmblem,
-} from '../giant-icons.js?v=ac547a2e';
+} from '../giant-icons.js?v=69cfe2f4';
 import { textureFromUrl } from '../textures.js?v=b8e38103';
 import { playSheetOverlay } from '../overlay-art.js?v=e50bacca';
 import { grantMoodXp } from '../mood-xp.js?v=e311b45c';
@@ -103,13 +104,13 @@ import { CONVERSATION_RULES, adoptLegacyTalks, conversationRecord, hasCompleted,
 import { TELLERS } from '../conversations-data.js?v=f11b7e02';
 import { itemZ } from '../item-bands.js?v=ec366be3';
 import { publicStreet } from '../shared-street.js?v=dce5694b';
-import { insideProof, readVisitScene } from '../neighbours-mp.js?v=6d97fefa';
-import { isHousePlace } from '../home-floors.js?v=cb981157';
+import { insideProof, readVisitScene } from '../neighbours-mp.js?v=f024b835';
+import { isHousePlace } from '../home-floors.js?v=0565b551';
 import { createMinnAccount } from '../minn-account.js?v=7e3d7279';
 import { saveStore, savedThrough } from '../save-store.js?v=1ccb1d6b';
 import { HOME_INTERIOR_TSID, HOME_STREET_TSID } from '../homes.js?v=dca6b2cd';
-import { gnomePlaceFor, visitGnomePlace } from '../garden-gnome.js?v=ac496b8c';
-import { homesFeature } from './homes-feature.js?v=ac211489';
+import { gnomePlaceFor, visitGnomePlace } from '../garden-gnome.js?v=ace7fa8e';
+import { homesFeature } from './homes-feature.js?v=cbae6b43';
 import { standOnFeet } from '../sprite-feet.js?v=849541a8';
 
 export const ICONS_FEATURE_ID = 'giant-icons';
@@ -424,7 +425,7 @@ function iconPackVerbs(giant, engine) {
   const rows = [];
   const tithe = titheCheck(state, { giant }, { ...ctx, currants: engine.pc.currants });
   const cost = titheCost(ctx.level, ctx.upgrades);
-  rows.push({ id: 'tithe', label: `Tithe ${cost}c`, enabled: tithe.ok, reason: tithe.msg || '', tooltip: `Insert ${cost} currants to support the Icon`, primary: tithe.ok });
+  rows.push({ id: 'tithe', label: `Tithe ${priceText(cost)}`, enabled: tithe.ok, reason: tithe.msg || '', tooltip: `Insert ${cost} currants to support the Icon`, primary: tithe.ok });
   for (const [verb, v] of Object.entries(ICON_VERBS)) {
     const check = adoreCheck(state, { giant }, verb, ctx);
     rows.push({ id: verb, label: v.label, enabled: check.ok, reason: check.msg || '', tooltip: `${v.label}: ${v.stat === 'xp' ? 'iMG' : v.stat} from the Icon (${(state.pack[giant] || [])[0] ?? 0} actions left)` });
@@ -898,7 +899,7 @@ export const giantIconsFeature = {
     // icon_tithe_conditions (240-262): anyone may tithe, a visitor too (#697: the Icon's count is shared).
     if (!v.visit || sharedAt(engine, v)) {
       const tithe = titheCheck(state, v.visit ? adoreRef(v) : { placedId: v.row.id }, { ...ctx, currants: engine.pc.currants });
-      rows.push({ id: 'tithe', label: `Tithe ${cost}c`, enabled: tithe.ok, reason: tithe.msg || '', tooltip: `Insert ${cost} currants to support the Icon`, durationMs: 0 });
+      rows.push({ id: 'tithe', label: `Tithe ${priceText(cost)}`, enabled: tithe.ok, reason: tithe.msg || '', tooltip: `Insert ${cost} currants to support the Icon`, durationMs: 0 });
     }
     // In a POL (a home) ruminate / revere / reflect show on a placed Icon (icon.js 52, 118, 183); elsewhere state null.
     if (v.home) {

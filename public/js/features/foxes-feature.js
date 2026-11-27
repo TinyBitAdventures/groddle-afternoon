@@ -47,6 +47,7 @@
  * unchanged.
  */
 
+import { priceText } from '../price.js?v=fd73ce0e';
 import { slugsFromEffects } from '../speech-slugs.js?v=d5cc8b6f';
 import { addItem, countItem, removeItem } from '../inventory.js?v=3be7988a';
 import { getToolCondition } from '../tools.js?v=4156bba8';
@@ -893,7 +894,7 @@ function choose(engine, value) {
       rangerDialog(engine, {
         key: 'licenseOffer',
         text: FOX_RANGER_TEXT.licenseOffer,
-        accept: 'Deal (500c)',
+        accept: `Deal (${priceText(500)})`,
         decline: 'No thanks',
         onAccept: () => choose(engine, 'buy-license-confirm'),
         onDecline: () => choose(engine, 'no-buy-license'),

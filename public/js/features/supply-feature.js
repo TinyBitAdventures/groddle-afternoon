@@ -51,6 +51,7 @@
  *     data-supply-permits).
  */
 
+import { priceText } from '../price.js?v=fd73ce0e';
 import { ITEM_CATALOG, addItem, countItem, ensureItem } from '../inventory.js?v=3be7988a';
 import { getToolCondition, copyForVerb, copyTag, copyTags, migrateClassTag, setCopyTag } from '../tools.js?v=4156bba8';
 import {
@@ -965,7 +966,7 @@ export const supplyFeature = {
     if (target.classId !== CLERK_CLASS) return null;
     return clerkOffers(engine.learnedSkills || [], achievements(engine)).map((o) => ({
       id: `buy:${o.classTsid}`,
-      label: `buy ${o.label} (${o.cost}c)`,
+      label: `buy ${o.label} (${priceText(o.cost)})`,
       enabled: o.ok && (engine.pc.currants || 0) >= o.cost,
       reason: o.reason || `That will be ${o.cost} currants.`,
       tooltip: BUREAUCRACY_ITEMS[o.classTsid].desc,

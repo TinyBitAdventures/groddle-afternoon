@@ -9,7 +9,7 @@
  */
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { DOOR_CLASS, addFloor, createFloorsState } from '../public/js/home-floors.js?v=cb981157';
+import { DOOR_CLASS, addFloor, createFloorsState } from '../public/js/home-floors.js?v=0565b551';
 import {
   DOOR_FOOT_Y,
   INTERIOR,
@@ -21,7 +21,7 @@ import {
   placeFurniture,
   renderOrder,
   restY,
-} from '../public/js/home-decor.js?v=0fd93a2f';
+} from '../public/js/home-decor.js?v=69523fb6';
 
 function houseWithDoor(x = 600) {
   const ground = createHomeDecorState({ starterKit: true });

@@ -14,8 +14,8 @@
  */
 import { after, before, describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
-import { dirname, join } from 'node:path';
+import { readFileSync, readdirSync, statSync } from 'node:fs';
+import { dirname, join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { GAP, boxesOverlap, phoneRegions } from '../public/js/ui/phone-layout.js?v=7ebe8992';
@@ -131,6 +131,39 @@ describe('#743 prices read the number then Glitch\'s ₡ (Austin\'s ruling 2026-
     assert.doesNotMatch(auctions, / ₡/);
     assert.match(read('public/js/home-storage.js'), /priceEach: \(n\) => `Price \$\{priceText\(n\)\}`/);
     assert.match(read('public/js/home-street-mp.js'), /buyTip: \(price\) => `Buy it for \$\{priceText\(price\)\}`/);
+  });
+
+  // Review 2026-11-26: a storage box's tag "450c", the storage store's "Buy: 1 for 1,234", the Bureaucratic
+  // Hall, party spaces, the Giant icon tithe and the street-jobs hire button still wrote other suffixes.
+  it('no game text writes a price with another suffix: "Nc", "◎ N", "N ₡" (every price goes through priceText)', () => {
+    const files = [];
+    const walk = (d) => {
+      for (const n of readdirSync(d)) {
+        const p = join(d, n);
+        if (statSync(p).isDirectory()) walk(p);
+        else if (/\.(js|mjs|html)$/.test(n)) files.push(relative(root, p));
+      }
+    };
+    walk(join(root, 'public/js'));
+    walk(join(root, 'public/play'));
+    files.push('public/game.js');
+    // A number or a ${value} then "c" (before a space, a bracket, a tag, a quote or punctuation), a +'c', the old ◎, or ₡ after a space.
+    const OTHER = /(\$\{[^{}]*\}|(?<![\w.,-])[1-9]\d{0,2}(?:,\d{3})*)c(?=[\s)<'"`,!?·]|$)|\+\s*'c'|◎| ₡/;
+    const bad = [];
+    for (const f of files) {
+      if (/data-versions\.js$|deco-(sharp|hires)-list\.js$/.test(f)) continue; // hashes and art names, not words
+      read(f).split('\n').forEach((line, i) => {
+        if (/^\s*(\*|\/\/)/.test(line)) return; // comments quote Glitch's own "c"
+        if (OTHER.test(line)) bad.push(`${f}:${i + 1}: ${line.trim().slice(0, 140)}`);
+      });
+    }
+    assert.deepEqual(bad, []);
+  });
+
+  it('the storage store\'s Buy button and its price-changed note end in ₡ (StoreBuyUI.as 250, 580)', async () => {
+    const { STORAGE_TEXT: STORE_BUY_TEXT } = await import('../public/js/home-storage.js?v=d44f697b');
+    assert.equal(STORE_BUY_TEXT.buyButton(1, 1234), 'Buy: 1 for 1,234₡');
+    assert.equal(STORE_BUY_TEXT.priceChanged(400, 450), 'The price for this item has just now changed, from 400₡ to 450₡. I thought you would like to know.');
   });
 });
 

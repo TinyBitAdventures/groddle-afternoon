@@ -234,7 +234,7 @@ describe('Giant names players read (report #102)', () => {
     const { capitalizeGiant } = await import('../public/js/secret-spots.js?v=59a37384');
     const { dieOutcome } = await import('../public/js/item-verbs-more.js?v=377f760a');
     const { graveRecognitionText } = await import('../public/js/hell.js?v=0dba5774');
-    const { emblemVerbCheck } = await import('../public/js/giant-icons.js?v=ac547a2e');
+    const { emblemVerbCheck } = await import('../public/js/giant-icons.js?v=69cfe2f4');
     assert.equal(capitalizeGiant('ti'), 'Tii');
     assert.equal(dieOutcome({ mood: 100, energy: 100 }, 'ti').line, 'rolled "Tii"');
     assert.match(graveRecognitionText('mourn', 'Someone', 'ti', 5), /favor with Tii, who is pleased/);

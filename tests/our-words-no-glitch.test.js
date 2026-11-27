@@ -26,7 +26,7 @@ import {
   refreshBoardPins,
 } from '../public/js/street-furniture.js?v=071203fc';
 import { UNNAMED_PLAYER, playerNameOr } from '../public/js/player-names.js?v=f9b78094';
-import { listPlayerTarget } from '../public/js/ui/player-menu.js?v=143b68b7';
+import { listPlayerTarget } from '../public/js/ui/player-menu.js?v=97ef1df5';
 import { BUDDY_TEXT, normalizeList } from '../public/js/buddies.js?v=4457d8a4';
 import { youLine } from '../public/js/feats-mp.js?v=e1fc8239';
 import { fillName } from '../public/js/foxes.js?v=c0ce235f';

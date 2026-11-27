@@ -21,7 +21,7 @@ import { after, before, describe, it } from 'node:test';
 import { mkdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-import { HOME_MACHINE_TEXT } from '../public/js/home-machines.js?v=b7b47943';
+import { HOME_MACHINE_TEXT } from '../public/js/home-machines.js?v=acaaed90';
 import { STAND_MARK_SIZE, drawStandMark, standMarkStyle } from '../public/js/home-stack-marks.js?v=67b44287';
 import { Display, fakePixi } from './fake-scene.js';
 

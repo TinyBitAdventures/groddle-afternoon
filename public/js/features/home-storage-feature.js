@@ -41,10 +41,11 @@
  * open one), hstLast.
  */
 
+import { priceText } from '../price.js?v=fd73ce0e';
 import { announceCharacterChanged, characterHeaders, characterOf, isCharacterChanged } from '../character-guard.js?v=510034a7';
 import { exposeQA } from '../qa-gate.js?v=f4e2cd82';
 import { ITEM_CATALOG, addItem, countItem, ensureItem, itemIcon, removeItem } from '../inventory.js?v=3be7988a';
-import { displayRefusal, furnitureDef, furnitureSize, isFurniture, pieceArt } from '../home-decor.js?v=0fd93a2f';
+import { displayRefusal, furnitureDef, furnitureSize, isFurniture, pieceArt } from '../home-decor.js?v=69523fb6';
 import { pieceLabel } from '../furniture-upgrades.js?v=f563b304';
 import { textureFromUrl } from '../textures.js?v=b8e38103';
 import { ownBagLabel, stackMaxOf, isBagClass } from '../pack-slots.js?v=38e4aea5';
@@ -52,8 +53,8 @@ import { ELEMENT_CLASSES, NO_BAG_CLASSES, NO_SLOT_CLASSES } from '../pack-slots-
 import { TOOL_CONDITION_CATALOG, copyTagKind, copyTags, pickToolCopies, receiveToolCopy, setCopyTag, takeToolCopy } from '../tools.js?v=4156bba8';
 import { draggedStack, takeDragged } from '../drag-stack.js?v=e0138d76';
 import { scriptFromTag, scriptLabel } from '../teleportation.js?v=cbbc673f';
-import { insideQuery, possessive, readVisitScene } from '../neighbours-mp.js?v=6d97fefa';
-import { homesFeature } from './homes-feature.js?v=ac211489';
+import { insideQuery, possessive, readVisitScene } from '../neighbours-mp.js?v=f024b835';
+import { homesFeature } from './homes-feature.js?v=cbae6b43';
 import { saveStore, savedThrough } from '../save-store.js?v=1ccb1d6b';
 import {
   SDB_PRICE_MAX,
@@ -81,7 +82,7 @@ import {
   sdbVerbs,
   setSdbPrice,
   slotsUsed,
-} from '../home-storage.js?v=31e8c4ad';
+} from '../home-storage.js?v=d44f697b';
 import {
   closeStorageWindow,
   openCabinetWindow,
@@ -186,7 +187,7 @@ function rowsHere(engine) {
 function priceTag(engine, price) {
   const { PIXI } = engine;
   const tag = new PIXI.Container();
-  const text = new PIXI.Text({ text: `${Math.max(0, Math.floor(price)).toLocaleString('en-US')}c`, style: { fontFamily: WORLD_FONT_FAMILY, fontSize: 12, fontWeight: '700', fill: 0x24461e, padding: 2 } });
+  const text = new PIXI.Text({ text: priceText(price), style: { fontFamily: WORLD_FONT_FAMILY, fontSize: 12, fontWeight: '700', fill: 0x24461e, padding: 2 } });
   text.resolution = 3;
   text.anchor.set(0.5);
   const w = Math.ceil(text.width) + 12;
@@ -272,7 +273,7 @@ function draw(engine) {
         const d = cabinetDef(row.classTsid);
         if (owner) subtitle = `${slotsUsed(row.contents)} of ${d.capacity} slots used`;
       } else if (shown?.selling) {
-        subtitle = `${shown.stock.toLocaleString('en-US')} ${pluralOf(row.display?.classTsid || shown.class)} at ${shown.price.toLocaleString('en-US')}c each`;
+        subtitle = `${shown.stock.toLocaleString('en-US')} ${pluralOf(row.display?.classTsid || shown.class)} at ${priceText(shown.price)} each`;
       } else if (row.display?.count) subtitle = `${row.display.count.toLocaleString('en-US')} ${row.display.count === 1 ? labelOf(row.display.classTsid) : pluralOf(row.display.classTsid)}`;
       // itemClass: the piece's Glitch item, so a click on a cabinet opens it (G661, js/world-context-menu.js).
       // chooserIcon (#341, G763): the box is an invisible hit box, so the Act/Enter chooser shows the

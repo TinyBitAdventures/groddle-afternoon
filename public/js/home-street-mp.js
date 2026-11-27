@@ -20,7 +20,7 @@
  */
 
 import { priceText } from './price.js?v=fd73ce0e';
-import { possessive } from './neighbours-mp.js?v=6d97fefa';
+import { possessive } from './neighbours-mp.js?v=f024b835';
 
 export const HOME_STREET_MP_ID = 'home-street-mp';
 

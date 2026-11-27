@@ -49,6 +49,7 @@
  * 'restore', job type 5) and finishes the restore in its `onDone` hook.
  */
 
+import { priceText } from '../price.js?v=fd73ce0e';
 import { pluralize } from '../words.js?v=274023af';
 import { ITEM_CATALOG, addItem, countItem, ensureItem, itemIcon, packStamp, removeItem } from '../inventory.js?v=3be7988a';
 import { canUseTool, useToolCondition, workStepCost } from '../tools.js?v=4156bba8';
@@ -60,7 +61,7 @@ import { getSkillCatalog } from '../content-catalogs.js?v=c9b84764';
 import { listRecipesProducing } from '../making.js?v=dc595568';
 import { GIANTS } from '../shrines.js?v=48318bec';
 import { giantDisplayName } from '../giant-names.js?v=0e295891';
-import { teleportationFeature } from './teleportation-feature.js?v=817088b7';
+import { teleportationFeature } from './teleportation-feature.js?v=8f225bd8';
 import {
   SOLO_DIVISOR,
   WORK_UNIT_MS,
@@ -2008,7 +2009,7 @@ function renderPanel(engine) {
           if (!check.ok) text.append(el('small', { class: 'sj-but', dataset: { sjBut: r.id } }, `But! ${check.msg}`));
           if (check.canHire && !shared(jobId)) {
             const quote = hireQuote(state, catalog, jobId, r.id);
-            const h = el('button', { type: 'button', dataset: { sjAct: 'hire' } }, `Hire a hand · ${quote.cost.toLocaleString()}c`);
+            const h = el('button', { type: 'button', dataset: { sjAct: 'hire' } }, `Hire a hand · ${priceText(quote.cost)}`);
             h.title = `${check.msg} A neighbour who has it does the rest for its base cost.`;
             h.disabled = (engine.pc.currants || 0) < quote.cost;
             h.addEventListener('click', () => doHire(engine, jobId, r.id));

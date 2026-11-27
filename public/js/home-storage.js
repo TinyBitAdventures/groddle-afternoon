@@ -127,9 +127,9 @@ export const STORAGE_TEXT = Object.freeze({
   youHave: (n) => `You have ${n.toLocaleString('en-US')} of these.`, // :215
   forSaleCount: (n) => `${n.toLocaleString('en-US')} for sale`, // :233
   priceEach: (n) => `Price ${priceText(n)}`, // :520 "Price 1,234₡"
-  buyButton: (n, total) => `Buy: ${n.toLocaleString('en-US')} for ${total.toLocaleString('en-US')}`, // :580
+  buyButton: (n, total) => `Buy: ${n.toLocaleString('en-US')} for ${priceText(total)}`, // :580 "Buy: 2 for 900₡"
   priceChangedTitle: 'Price changed!', // :249
-  priceChanged: (was, now) => `The price for this item has just now changed, from ${was.toLocaleString('en-US')} to ${now.toLocaleString('en-US')}. I thought you would like to know.`, // :250
+  priceChanged: (was, now) => `The price for this item has just now changed, from ${priceText(was)} to ${priceText(now)}. I thought you would like to know.`, // :250
   thanks: 'Thanks!', // :252
   bought: (n, plural, single, total, owner) => `You bought ${n.toLocaleString('en-US')} ${n === 1 ? single : plural} from ${owner} for ${total.toLocaleString('en-US')} ${total === 1 ? 'currant' : 'currants'}.`, // ours
   soloNobody: 'Visitors to your house can buy what you sell here when you play online.', // ours

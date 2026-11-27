@@ -33,7 +33,7 @@ import {
   stackAvailable,
   startParty,
   teleporterPhase,
-} from '../public/js/party-spaces.js?v=4e1ca2a5';
+} from '../public/js/party-spaces.js?v=736ab50e';
 import { OWNED_STREETS } from '../public/js/location-events.js?v=48938c8f';
 import { populationForStreet } from '../public/js/street-ecology.js?v=8f50537c';
 
@@ -180,9 +180,9 @@ describe('party lifecycle (groups/party.js, party_atm.js)', () => {
   it('extends at the template prices: tasters 5m/15m, full packs 10m/30m', () => {
     const now = 0;
     const taster = startParty(null, 'party_pack_taster_aquarius', { now }).party;
-    assert.deepEqual(partyExtendOptions(taster).map((o) => o.label), ['5m for 5000c', '15m for 15000c']);
+    assert.deepEqual(partyExtendOptions(taster).map((o) => o.label), ['5m for 5,000₡', '15m for 15,000₡']);
     const full = startParty(null, 'party_pack_double_rainbow', { now }).party;
-    assert.deepEqual(partyExtendOptions(full).map((o) => o.label), ['10m for 3000c', '30m for 9250c']);
+    assert.deepEqual(partyExtendOptions(full).map((o) => o.label), ['10m for 3,000₡', '30m for 9,250₡']);
     const pc = { currants: 3500 };
     const ok = extendParty(full, 10, pc, { now: 1000 });
     assert.equal(ok.reply, 'Party on, Wayne.');
@@ -239,8 +239,8 @@ describe('party lifecycle (groups/party.js, party_atm.js)', () => {
 });
 
 describe('party spaces feature wiring', async () => {
-  const { partySpacesFeature } = await import('../public/js/features/party-spaces-feature.js?v=ca571ce3');
-  const { FEATURES } = await import('../public/js/features/index.js?v=509067e3');
+  const { partySpacesFeature } = await import('../public/js/features/party-spaces-feature.js?v=5fd65ad9');
+  const { FEATURES } = await import('../public/js/features/index.js?v=c1ebb8a5');
 
   it('is registered with the feature host', () => {
     assert.ok(FEATURES.some((f) => f.id === partySpacesFeature.id));
