@@ -161,15 +161,17 @@ function onConsume(row, engine, amount = 1) {
   publish(engine);
 }
 
-function runGandleveryMunch(engine) {
+/** Munch one Gandlevery from the pack, or from `stock` (#748: a feast pile's, never in the pack). */
+function runGandleveryMunch(engine, stock = null) {
   const g = GANDLEVERY_MUNCH;
-  if (countItem(engine.inv, g.classTsid) < 1) return false;
+  const from = stock || engine.inv;
+  if (countItem(from, g.classTsid) < 1) return false;
   const button = gandleveryMunchButton(munchCtx(engine));
   if (!button.enabled) {
     engine.toast?.(button.reason, 2600);
-    return true;
+    return stock ? false : true;
   }
-  removeItem(engine.inv, g.classTsid, 1);
+  removeItem(from, g.classTsid, 1);
   engine.applyBuff('gandlevery');
   // items/item.js notifyVerb: gandlevery:munch and VERB:munch:gandlevery.
   for (const c of itemVerbAchievementCounters(g.classTsid, g.verb)) engine.achievement(c.counter, c.amount);
@@ -465,6 +467,18 @@ export const buffTriggersFeature = {
     if (classTsid !== GANDLEVERY_MUNCH.classTsid || verbId !== GANDLEVERY_MUNCH.verb) return false;
     runGandleveryMunch(engine);
     return true;
+  },
+
+  /** #748: Gandlevery munched where it lies (a feast pile, js/stock-use.js): the pack's Munch and its refusals. */
+  stockVerb(classTsid, engine) {
+    if (classTsid !== GANDLEVERY_MUNCH.classTsid) return null;
+    const button = gandleveryMunchButton(munchCtx(engine));
+    return { id: button.id, label: button.label, tooltip: button.tooltip, refusal: button.enabled ? '' : button.reason };
+  },
+
+  runStockVerb(classTsid, verbId, engine) {
+    if (classTsid !== GANDLEVERY_MUNCH.classTsid || verbId !== GANDLEVERY_MUNCH.verb) return null;
+    return runGandleveryMunch(engine, { [classTsid]: 1 }) === true;
   },
 
   save() {

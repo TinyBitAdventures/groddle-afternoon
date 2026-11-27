@@ -9,7 +9,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { before, describe, it } from 'node:test';
 import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=c9b84764';
-import { applyBuff, buffPhysics, createBuffState, hasBuff, listActiveBuffs, removeBuff, tickBuffs } from '../public/js/buffs.js?v=a4f7377b';
+import { applyBuff, buffPhysics, createBuffState, hasBuff, listActiveBuffs, removeBuff, tickBuffs } from '../public/js/buffs.js?v=09184e60';
 
 const pub = join(import.meta.dirname, '..', 'public');
 

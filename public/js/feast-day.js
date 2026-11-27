@@ -64,6 +64,8 @@ export const FEAST_SPOTS = Object.freeze(FEAST_DAY_RULES.runs.flatMap(([from, to
 export const FEAST_DAY_LINES = Object.freeze({
   verb: 'Eat',
   verbTip: 'Eat a bite of the feast, right here',
+  /** #748: any item's own verb (a herb's Munch): "Munch a bite of the feast, right here". */
+  tip: (verb) => `${String(verb || 'Eat')} a bite of the feast, right here`,
   /** A drink laid on the table is drunk, as Glitch's drinks are (include/drink.js verbs.drink; #723). */
   drinkVerb: 'Drink',
   drinkTip: 'Drink a sip of the feast, right here',

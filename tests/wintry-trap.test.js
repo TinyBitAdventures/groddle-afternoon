@@ -26,7 +26,7 @@ import { reachStreet, streetBuff } from '../public/js/builder/reach-graph.js?v=6
 import { STREET_TRAPS } from '../public/js/street-traps-data.js?v=a1151641';
 import { onTrapFloor, trapLinesOn } from '../public/js/features/slash-commands-feature.js?v=1bd07f04';
 import { trapEntry } from '../tools/ecology/build-street-traps.mjs';
-import { DRINK_TICKS } from '../public/js/buffs.js?v=a4f7377b';
+import { DRINK_TICKS } from '../public/js/buffs.js?v=09184e60';
 import { coldPlaceMessage, isKukubeeWinter } from '../public/js/buff-triggers.js?v=9fd877c4';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');

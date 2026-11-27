@@ -348,10 +348,14 @@ function applyRemoveEffects(classTsid, pc) {
  * `ctx.study` ({ learning, atMaxAcceleration }) and `ctx.dead` feed the
  * Yellow Crumb conditions; the caller applies `info.studyAccelerationSeconds`.
  */
-export function activateBuffItem(state, inv, pc, classTsid, now = Date.now(), ctx = {}) {
+/**
+ * Why a buff item could not be used now (dead, its buff already on, study, its energy or mood
+ * needs), as activateBuffItem refuses: { ok: false, reason, msgs } or null. #748: asked alone
+ * before a Thanksgiving Day feast pile's herb is munched, so a refused munch costs no bite.
+ */
+export function buffItemRefusal(state, pc, classTsid, now = Date.now(), ctx = {}) {
   const info = getBuffItemInfo(classTsid);
   if (!info?.def) return { ok: false, reason: 'not_buff_item', msgs: ['That item has no activatable effect.'] };
-  if ((inv?.[classTsid] || 0) < 1) return { ok: false, reason: 'missing', msgs: [`No ${classTsid} in pack.`] };
   if (info.deadReason && ctx.dead) return { ok: false, reason: 'dead', msgs: [info.deadReason] };
   if (hasBuff(state, info.buffId, now)) {
     return { ok: false, reason: 'already_active', msgs: [info.activeReason || `${info.def.name} is already active or waiting to begin.`] };
@@ -362,6 +366,15 @@ export function activateBuffItem(state, inv, pc, classTsid, now = Date.now(), ct
   const needsMood = Number(info.requirements?.mood) || 0;
   if ((pc?.energy || 0) < needsEnergy) return { ok: false, reason: 'energy', msgs: [`You need ${needsEnergy} energy to ${info.verb.toLowerCase()} that.`] };
   if ((pc?.mood || 0) < needsMood) return { ok: false, reason: 'mood', msgs: [`You need ${needsMood} mood to ${info.verb.toLowerCase()} that.`] };
+  return null;
+}
+
+export function activateBuffItem(state, inv, pc, classTsid, now = Date.now(), ctx = {}) {
+  const info = getBuffItemInfo(classTsid);
+  if (!info?.def) return { ok: false, reason: 'not_buff_item', msgs: ['That item has no activatable effect.'] };
+  if ((inv?.[classTsid] || 0) < 1) return { ok: false, reason: 'missing', msgs: [`No ${classTsid} in pack.`] };
+  const refused = buffItemRefusal(state, pc, classTsid, now, ctx);
+  if (refused) return refused;
   const applied = applyBuff(state, info.buffId, pc, now, {
     delayMs: (info.delaySeconds || 0) * SECOND,
     sourceItem: classTsid,

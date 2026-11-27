@@ -51,9 +51,9 @@ const {
   servingsLeft,
   settleFeastDay,
   thanksgivingDay,
-} = await import('../public/js/feast-day.js?v=3f2d4603');
+} = await import('../public/js/feast-day.js?v=29d69db5');
 const { HARVEST_DISHES, createTableState, layOffering, packAway, TABLE_STREET } = await import('../public/js/pot-luck-feast.js?v=971888be');
-const { feastDayFeature } = await import('../public/js/features/feast-day-feature.js?v=4fbfa853');
+const { feastDayFeature } = await import('../public/js/features/feast-day-feature.js?v=4c869b81');
 
 const at = (y, m, d, h = 12) => Date.UTC(y, m - 1, d, h + 8); // Pacific standard time
 const fixed = (v) => () => v;
@@ -179,7 +179,8 @@ describe('game.js eats a feast bite from a one-item stock, never the pack', () =
   it('the pack Eat takes a stock and eats from it', () => {
     assert.match(game, /function usePackItem\(classTsid, count = 1, stock = null\) \{\n  if \(!state\.started\) return false;\n[^\n]*\n  const from = stock \|\| inv;/);
     assert.match(game, /: useItem\(from, pc, classTsid\);/);
-    assert.match(game, /function eatFromStock\(classTsid\) \{\n  return usePackItem\(classTsid, 1, \{ \[classTsid\]: 1 \}\) === true;/);
+    // #748: a feature's own verb (a Sno Cone's Eat) runs on its own stock; the rest is the pack's on one.
+    assert.match(game, /function eatFromStock\(classTsid\) \{\n  const verb = stockVerb\(classTsid\);\n  if \(!verb\) return false;\n  if \(verb\.kind === 'feature'\) return features\.query\('runStockVerb', classTsid, verb\.id, engine\) === true;\n  return usePackItem\(classTsid, 1, \{ \[classTsid\]: 1 \}\) === true;/);
   });
   it('the bite asks the pack Eat refusals first (full energy, stuffed, dead)', () => {
     const fn = game.slice(game.indexOf('function stockEatGate('), game.indexOf('\n}\n', game.indexOf('function stockEatGate(')));

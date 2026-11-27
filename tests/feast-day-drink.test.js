@@ -38,10 +38,11 @@ globalThis.Image = FakeImage;
 const { installPixiFixes } = await import('../public/js/pixi-fixes.js?v=0f42b75e');
 installPixiFixes(PIXI);
 
-const { FEAST_PILE_CLASS } = await import('../public/js/feast-day.js?v=3f2d4603');
+const { FEAST_PILE_CLASS } = await import('../public/js/feast-day.js?v=29d69db5');
 const { TABLE_STREET } = await import('../public/js/pot-luck-feast.js?v=971888be');
-const { feastDayFeature } = await import('../public/js/features/feast-day-feature.js?v=4fbfa853');
+const { feastDayFeature } = await import('../public/js/features/feast-day-feature.js?v=4c869b81');
 const inventory = await import('../public/js/inventory.js?v=3be7988a');
+const { stockUseVerb } = await import('../public/js/stock-use.js?v=6b422ccf');
 
 describe('#723 a drink pile at the feast offers Drink, and drinking it works', () => {
   const targets = [];
@@ -102,16 +103,38 @@ describe('#723 a drink pile at the feast offers Drink, and drinking it works', (
     assert.deepEqual(drunk, ['orange_juice']);
     assert.equal(feastDayFeature.feastDayServings(engine), 89);
   });
+
+  it('#748: the pile offers its item’s own verb (engine.stockVerb: a herb’s Munch) and that verb bites', () => {
+    engine.stockVerb = () => ({ id: 'munch', label: 'Munch', kind: 'buff' });
+    try {
+      const p = piles().find((t) => t.feastSpot === 3);
+      const verbs = feastDayFeature.verbsFor(p, engine);
+      assert.deepEqual(verbs.map((v) => [v.id, v.label]), [['munch', 'Munch']]);
+      assert.match(verbs[0].tooltip, /^Munch a bite of the feast, right here/);
+      // Another verb's id takes no bite.
+      feastDayFeature.runVerb(p, 'eat', engine);
+      assert.deepEqual(drunk, ['orange_juice']);
+      assert.equal(feastDayFeature.runVerb(p, 'munch', engine), true);
+      assert.deepEqual(drunk, ['orange_juice', 'orange_juice']);
+    } finally {
+      delete engine.stockVerb;
+    }
+  });
 });
 
 describe('#723 game.js asks a drink’s own refusals before the bite, not the food’s', () => {
   const game = readFileSync(join(ROOT, 'public/game.js'), 'utf8');
-  const start = game.indexOf('function stockEatGate(');
-  const src = game.slice(start, game.indexOf('\n}\n', start) + 2);
+  const slice = (name) => {
+    const start = game.indexOf(`function ${name}(`);
+    return game.slice(start, game.indexOf('\n}\n', start) + 2);
+  };
+  // #748: the gate asks the item's own verb first (stockVerb, js/stock-use.js).
+  const src = `${slice('stockVerb')}\n${slice('stockEatGate')}`;
   const gateWith = ({ dead = false, mood = 50, energy = 100 } = {}) => {
     const pc = { energy, mood, energyMax: 100 };
     const ctx = {
       ...inventory,
+      stockUseVerb,
       features: { query: () => null, metabolicGate: () => ({ ok: true }) },
       engine: {},
       playerIsDead: () => dead,

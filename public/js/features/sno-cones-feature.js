@@ -66,9 +66,13 @@ function atHome(engine) {
   return Boolean(home?.inHome && home.owned);
 }
 
-/** Eat one cone from the pack (pack button, QA autoplay, tests). */
-export function eatPackedSnoCone(engine, classTsid, rng = Math.random) {
-  if (!isSnoCone(classTsid) || countItem(engine.inv, classTsid) < 1) return null;
+/**
+ * Eat one cone from the pack (pack button, QA autoplay, tests), or from `stock`, a one-cone stock
+ * that never was in the pack (#748: a Thanksgiving Day feast pile's bite).
+ */
+export function eatPackedSnoCone(engine, classTsid, rng = Math.random, stock = null) {
+  const from = stock || engine.inv;
+  if (!isSnoCone(classTsid) || countItem(from, classTsid) < 1) return null;
   const now = Date.now();
   const out = eatSnoCone(classTsid, engine.pc, { eatenToday: eatenToday(now), rng });
   if (!out.ok) {
@@ -77,7 +81,7 @@ export function eatPackedSnoCone(engine, classTsid, rng = Math.random) {
     publish(engine);
     return last;
   }
-  removeItem(engine.inv, classTsid, 1);
+  removeItem(from, classTsid, 1);
   daily = { day: dayKey(now), eaten: out.eatenToday };
   for (const row of out.achievementCounters) engine.achievement(row.counter, row.amount);
   // items/item.js notifyVerb: VERB:eat:<class> (and <class>:eat).
@@ -192,6 +196,25 @@ export const snoConesFeature = {
     if (!isSnoCone(classTsid) || verbId !== 'eat') return false;
     eatPackedSnoCone(engine, classTsid);
     return true;
+  },
+
+  /**
+   * #748: a cone eaten where it lies (a feast pile, js/stock-use.js) is the pack's Eat. The level
+   * check fails inside Glitch's handler; here it is asked first (refusal), so a refused cone costs
+   * no bite.
+   */
+  stockVerb(classTsid, engine) {
+    const button = snoConeEatButton(classTsid, eatenToday());
+    if (!button) return null;
+    const min = SNO_CONES[classTsid].minLevel;
+    const low = Math.floor(Number(engine?.pc?.level) || 0) < min;
+    return { id: button.id, label: button.label, tooltip: button.tooltip, refusal: low ? SNO_CONE_TEXT.level(min) : '' };
+  },
+
+  runStockVerb(classTsid, verbId, engine) {
+    if (!isSnoCone(classTsid) || verbId !== 'eat') return null;
+    const done = eatPackedSnoCone(engine, classTsid, Math.random, { [classTsid]: 1 });
+    return /:(ate|froze):/.test(done || '');
   },
 
   /** A dropped cone: Pick up only at home, and Bemoan (sno_cone_base keys_in_location). */

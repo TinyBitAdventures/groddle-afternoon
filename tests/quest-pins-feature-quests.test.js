@@ -27,7 +27,7 @@ class El extends FakeEl {
   appendChild(kid) { this.append(kid); return kid; }
 }
 globalThis.document ??= { createElement: (tag) => new El(tag) };
-const { potLuckFeastFeature } = await import('../public/js/features/pot-luck-feast-feature.js?v=1dc56dd3');
+const { potLuckFeastFeature } = await import('../public/js/features/pot-luck-feast-feature.js?v=e246b0a3');
 
 const engineOn = (date) => ({ mode: 'solo', started: false, inv: {}, param: (k) => (k === 'seasondate' ? date : ''), setData() {}, query: () => null });
 const IN_SEASON = '2026-11-24';

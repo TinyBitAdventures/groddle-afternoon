@@ -4,7 +4,7 @@
  */
 import { ITEM_ICONS, ITEM_LABELS, getVerbsFor, ordinaryItems, runVerb } from './content.js?v=68a61ef7';
 import { createErrorOnce, createFeatureHost, createFrameStages } from './js/feature-host.js?v=b87e2cbc';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=a8674e15';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=8b13e227';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, enterHintPick, hoverText, stackHoverLabel, groupHead, hoverRimShown, reachGlowTargets, spriteHasRimArt, rimArtParts, trimmedIconUrl, drawTileArt } from './js/enter-chooser.js?v=297c6d15';
 import { firstTendKey, STICK_TEND_DELAY_MS, STICK_TEND_DIRS, STICK_TEND_REPEAT_MS, stepTendKey, stepTendKeys, stickTendKey, tendKeyAction } from './js/garden-tend.js?v=a7470c4a';
 import { avatarHitBox, behindFloor, bodyReachDistance, OUT_OF_REACH_LINE, playerClickBox } from './js/reach.js?v=456da8a8';
@@ -504,6 +504,7 @@ import {
   listPendingBuffs,
   hasBuff,
   activateBuffItem,
+  buffItemRefusal,
   getBuffItemInfo,
   listBuffItemsInPack,
   tickBuffs,
@@ -513,7 +514,7 @@ import {
   formatBuffRemaining,
   consumeRewardBuff,
   studyBuffBlockReason,
-} from './js/buffs.js?v=a4f7377b';
+} from './js/buffs.js?v=09184e60';
 import { grantMoodXp, moodXpMultiplierFor, setMoodXpEnv } from './js/mood-xp.js?v=e311b45c';
 import {
   loadContentCatalogs,
@@ -540,6 +541,7 @@ import {
   removeItem,
   isToolItem,
 } from './js/inventory.js?v=3be7988a';
+import { stockUseVerb } from './js/stock-use.js?v=6b422ccf';
 import { TROPHY_FIND_TEXT, trophyOfBadge } from './js/home-trophies.js?v=649b111e';
 import { HELD_AT_ONCE, HELD_AT_ONCE_TEXT } from './js/collection-trophies.js?v=e45565a7';
 import { PACK_COPY, bagSortIcon, bagSortText, isBagClass, isElementClass, layoutHeld, ownBagLabel, unitRankAt } from './js/pack-slots.js?v=38e4aea5';
@@ -7632,22 +7634,33 @@ function usePackItem(classTsid, count = 1, stock = null) {
   return true;
 }
 
+/** #748: the verb `classTsid` is used with where it lies (js/stock-use.js): the pack's own, a feature's first. */
+function stockVerb(classTsid) {
+  return stockUseVerb(classTsid, (hook, cls) => features.query(hook, cls, engine));
+}
+
 /**
- * G1009 (ours, inventions feast-day-piles): whether `classTsid` could be eaten or drunk now, asked
- * before a Thanksgiving Day feast pile's bite goes to the server: the pack Eat's own refusals (a
- * feature's gate, dead, Naraka, stuffed, full energy: include/food.js 14-18, 126-128), or for a drink
- * the pack Drink's (dead, a mood drink at full mood: include/drink.js 38-42; #723). { ok, msg }.
+ * G1009 (ours, inventions feast-day-piles): whether `classTsid` could be used now with its own verb
+ * (stockVerb), asked before a Thanksgiving Day feast pile's bite goes to the server: the pack Eat's
+ * own refusals (a feature's gate, dead, Naraka, stuffed, full energy: include/food.js 14-18,
+ * 126-128), for a drink the pack Drink's (dead, a mood drink at full mood: include/drink.js 38-42;
+ * #723), for a herb the pack Munch's (#748: its buff already on, its energy or mood needs:
+ * herb_base verbs.munch conditions), for a feature's verb the feature's (a Sno Cone's level). { ok, msg }.
  */
 function stockEatGate(classTsid) {
   const useGate = features.query('packUseGate', classTsid, engine);
   if (useGate && useGate.ok === false) return { ok: false, msg: useGate.msg || 'Not right now.' };
-  const info = getItemUseInfo(classTsid);
-  const drink = Boolean(info?.usable) && info.kind === 'drink';
-  if (!info?.usable || (!drink && !info.effects?.energy)) return { ok: false, msg: info?.reason || 'Cannot eat that.' };
+  const verb = stockVerb(classTsid);
+  if (!verb) return { ok: false, msg: getItemUseInfo(classTsid)?.reason || 'Cannot eat that.' };
+  if (verb.kind === 'feature') return verb.refusal ? { ok: false, msg: verb.refusal } : { ok: true };
+  if (verb.kind === 'buff') {
+    const refused = buffItemRefusal(buffState, pc, classTsid, Date.now(), { study: studyBuffContext(), dead: playerIsDead() });
+    return refused ? { ok: false, msg: refused.msgs?.[0] || 'Not right now.' } : { ok: true };
+  }
   if (playerIsDead()) return { ok: false, msg: DEAD_CONSUME_LINE };
   // Drinks never count toward fullness in the source (usePackItem): no energy or stuffed gate.
-  if (drink) {
-    const refused = drinkRefusal(pc, classTsid, info);
+  if (verb.kind === 'drink') {
+    const refused = drinkRefusal(pc, classTsid, getItemUseInfo(classTsid));
     return refused ? { ok: false, msg: refused } : { ok: true };
   }
   const deadGate = features.metabolicGate('energy', 'gain', engine);
@@ -7657,11 +7670,16 @@ function stockEatGate(classTsid) {
 }
 
 /**
- * G1009: eat one `classTsid` that never enters the pack (a Thanksgiving Day feast pile's bite): the
- * pack's Eat on a one-item stock, so energy, mood, fullness, variety iMG, buffs, quests and badge
- * counters are the food's own and the pack is untouched. Returns true when it was eaten.
+ * G1009: use one `classTsid` that never enters the pack (a Thanksgiving Day feast pile's bite) with
+ * its own verb: a feature's (a Sno Cone's Eat, Gandlevery's Munch: runStockVerb on a one-item
+ * stock), else the pack's Eat, Drink or Munch on a one-item stock, so energy, mood, fullness,
+ * variety iMG, buffs, quests and badge counters are the item's own and the pack is untouched.
+ * Returns true when it was used.
  */
 function eatFromStock(classTsid) {
+  const verb = stockVerb(classTsid);
+  if (!verb) return false;
+  if (verb.kind === 'feature') return features.query('runStockVerb', classTsid, verb.id, engine) === true;
   return usePackItem(classTsid, 1, { [classTsid]: 1 }) === true;
 }
 
@@ -14820,7 +14838,11 @@ const engine = {
   wornArticle: (type) => vectorPartName(type),
   /** The pack's Eat / Drink / Use, as if clicked (QA autoplay). */
   usePackItem: (classTsid) => usePackItem(classTsid),
-  /** G1009: a feast pile's bite: may it be eaten ({ ok, msg }), then eat it without the pack. */
+  /**
+   * G1009: a feast pile's bite: its verb (#748: the item's own, js/stock-use.js), whether it may be
+   * used now ({ ok, msg }), then use it without the pack.
+   */
+  stockVerb: (classTsid) => stockVerb(classTsid),
   eatGate: (classTsid) => stockEatGate(classTsid),
   eatFromStock: (classTsid) => eatFromStock(classTsid),
   /** A target's verb menu, and starting one of its verbs as a menu click would (features/pack-tree-verbs-feature.js). */

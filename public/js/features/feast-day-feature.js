@@ -6,11 +6,12 @@
  *  - The piles: 16 spots right of the table (js/feast-day.js FEAST_SPOTS), each one food drawn as its own put-down art for its
  *    bites (js/world-art.js count states, no number badge), one feature sprite each, created once and
  *    removed one at a time (as Hell One's grapes, hell-feature spawnGrapes), never picked up.
- *  - Eat (Drink for a drink, #723) takes one bite: the pack Eat's or Drink's refusals first
- *    (engine.eatGate: full energy, stuffed, dead; a drink: dead, a mood drink at full mood),
+ *  - Eat (Drink for a drink, #723; each item's own verb, #748: a herb's Munch, a Sno Cone's Eat,
+ *    engine.stockVerb) takes one bite: that verb's pack refusals first (engine.eatGate: full
+ *    energy, stuffed, dead; a drink: dead, a mood drink at full mood; a herb: its buff on),
  *    then the bite is the server's to give online (feast_day.go, the first eater wins it) or the
  *    save's solo; the food's energy, mood, fullness, variety iMG, buffs and badge counters come from
- *    the pack's own Eat on a one-item stock (engine.eatFromStock), so it never enters the pack.
+ *    the pack's own verb on a one-item stock (engine.eatFromStock), so it never enters the pack.
  *  - 11 bites a player for the day; an emptied spot is laid again 20 s later; the leftovers are
  *    packed away at midnight. The Harvest Table's card (and each pile's) says "N servings left".
  *  - Solo mirrors it on the player's own copy: the pool is their own table's lays this season
@@ -42,7 +43,7 @@ import {
   refillDue,
   servingsLeft,
   settleFeastDay,
-} from '../feast-day.js?v=3f2d4603';
+} from '../feast-day.js?v=29d69db5';
 
 export const FEAST_DAY_FEATURE_ID = 'feast-day';
 
@@ -68,6 +69,17 @@ const onStreet = (engine) => String(engine?.streetTsid || '') === TABLE_STREET;
 const label = (cls) => ITEM_CATALOG[cls]?.label || String(cls || '').replace(/_/g, ' ');
 /** #723: a drink's pile is drunk (its pack verb is Drink, include/drink.js verbs.drink), a food's eaten. */
 const isDrink = (cls) => getItemUseInfo(cls)?.kind === 'drink';
+
+/**
+ * #748: the pile's verb is its item's own (engine.stockVerb, js/stock-use.js): Eat, Drink, a herb's
+ * Munch, a Sno Cone's Eat. An engine without it (tests) falls back to Drink or Eat.
+ */
+function pileVerb(engine, cls) {
+  const own = engine.stockVerb?.(cls);
+  if (own?.id) return { id: own.id, label: own.label || FEAST_DAY_LINES.verb, drink: own.kind === 'drink' };
+  const drink = isDrink(cls);
+  return { id: drink ? 'drink' : 'eat', label: drink ? FEAST_DAY_LINES.drinkVerb : FEAST_DAY_LINES.verb, drink };
+}
 
 function liveClient(engine) {
   return engine.mode === 'multiplayer' ? engine.query?.('realtimeClient') || null : null;
@@ -366,14 +378,14 @@ export const feastDayFeature = {
     if (target?.classId !== FEAST_PILE_CLASS) return null;
     const v = view(engine);
     const room = v.ate < v.cap;
-    const drink = isDrink(pileAt(engine, Number(target.feastSpot))?.c);
+    const verb = pileVerb(engine, pileAt(engine, Number(target.feastSpot))?.c);
     return [{
-      id: drink ? 'drink' : 'eat',
-      label: drink ? FEAST_DAY_LINES.drinkVerb : FEAST_DAY_LINES.verb,
+      id: verb.id,
+      label: verb.label,
       sort: 10,
       enabled: v.on && room,
       reason: v.on ? FEAST_DAY_LINES.full : FEAST_DAY_LINES.noSeason,
-      tooltip: `${drink ? FEAST_DAY_LINES.drinkTip : FEAST_DAY_LINES.verbTip} (${FEAST_DAY_LINES.bitesLeft(Math.max(0, v.cap - v.ate))})`,
+      tooltip: `${verb.drink ? FEAST_DAY_LINES.drinkTip : FEAST_DAY_LINES.tip(verb.label)} (${FEAST_DAY_LINES.bitesLeft(Math.max(0, v.cap - v.ate))})`,
       energy: 0,
       durationMs: 0,
     }];
@@ -381,7 +393,8 @@ export const feastDayFeature = {
 
   runVerb(target, verbId, engine) {
     if (target?.classId !== FEAST_PILE_CLASS) return false;
-    if (verbId === 'eat' || verbId === 'drink') bite(engine, Number(target.feastSpot));
+    const s = Number(target.feastSpot);
+    if (verbId === pileVerb(engine, pileAt(engine, s)?.c).id) bite(engine, s);
     return true;
   },
 

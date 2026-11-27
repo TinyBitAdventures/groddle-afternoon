@@ -24,7 +24,7 @@ import {
   smallEnlightenmentSeconds,
   smeltItDealtItFreeSmelts,
 } from '../public/js/buff-triggers.js?v=9fd877c4';
-import { MIRRORED_BUFFS, buffTriggersFeature } from '../public/js/features/buff-triggers-feature.js?v=3699234e';
+import { MIRRORED_BUFFS, buffTriggersFeature } from '../public/js/features/buff-triggers-feature.js?v=c8873f53';
 import { meditationFeature } from '../public/js/features/meditation-feature.js?v=9deafde9';
 import { teleportationFeature } from '../public/js/features/teleportation-feature.js?v=3df5070c';
 import { rookAttackFeature } from '../public/js/features/rook-attack-feature.js?v=1ddb5049';
@@ -41,7 +41,7 @@ import {
   hasBuff,
   removeBuff,
   tickBuffs,
-} from '../public/js/buffs.js?v=a4f7377b';
+} from '../public/js/buffs.js?v=09184e60';
 import { getSkillPackageOverride, skillPackageDetails } from '../public/js/skill-packages.js?v=bfb87281';
 import { miningProfile } from '../public/js/mining.js?v=7ecaa572';
 import { resolveAnimalKinshipPackage } from '../public/js/animal-kinship.js?v=eaa3a6f2';

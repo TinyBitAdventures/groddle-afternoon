@@ -116,8 +116,8 @@ import { powdersFeature } from './powders-feature.js?v=bd9317c0'; FEATURES.push(
 import { itemVerbsFeature } from './item-verbs-feature.js?v=5089a5fb'; FEATURES.push(itemVerbsFeature);
 import { artifactsFeature } from './artifacts-feature.js?v=32d11520'; FEATURES.push(artifactsFeature);
 import { doorDrinkFeature } from './door-drink-feature.js?v=f2c2610a'; FEATURES.push(doorDrinkFeature);
-import { buffTriggersFeature } from './buff-triggers-feature.js?v=3699234e'; FEATURES.push(buffTriggersFeature);
-import { snoConesFeature } from './sno-cones-feature.js?v=ac889964'; FEATURES.push(snoConesFeature);
+import { buffTriggersFeature } from './buff-triggers-feature.js?v=c8873f53'; FEATURES.push(buffTriggersFeature);
+import { snoConesFeature } from './sno-cones-feature.js?v=aea8620b'; FEATURES.push(snoConesFeature);
 import { bureaucraticHallsFeature } from './bureaucratic-halls-feature.js?v=b5d2de21'; FEATURES.push(bureaucraticHallsFeature);
 import { potionsFeature } from './potions-feature.js?v=17404a2b'; FEATURES.push(potionsFeature);
 import { purpleJourneyFeature } from './purple-journey-feature.js?v=756d06a0'; FEATURES.push(purpleJourneyFeature);
@@ -215,9 +215,9 @@ import { gameTeleporterFeature } from './game-teleporter-feature.js?v=d1c75903';
 import { levelUpMpFeature } from './level-up-mp-feature.js?v=22659e6d'; FEATURES.push(levelUpMpFeature);
 // G982 Pot Luck Day, part A: the chicken costumes (after seasons-feature, whose seasonOn it asks).
 import { potLuckFeature } from './pot-luck-feature.js?v=26c13460'; FEATURES.push(potLuckFeature);
-import { potLuckFeastFeature } from './pot-luck-feast-feature.js?v=1dc56dd3'; FEATURES.push(potLuckFeastFeature);
+import { potLuckFeastFeature } from './pot-luck-feast-feature.js?v=e246b0a3'; FEATURES.push(potLuckFeastFeature);
 // G1009 Thanksgiving Day's feast: eat-in-place piles of the week's table food (asks pot-luck-feast for its counts).
-import { feastDayFeature } from './feast-day-feature.js?v=4fbfa853'; FEATURES.push(feastDayFeature);
+import { feastDayFeature } from './feast-day-feature.js?v=4c869b81'; FEATURES.push(feastDayFeature);
 import { calendarFeature } from './calendar-feature.js?v=6cbe4537'; FEATURES.push(calendarFeature);
 // G1195 Happy New Ur: the countdown at the Groddle midnights of December 31, the show and the party street.
 import { newUrFeature } from './new-ur-feature.js?v=54417027'; FEATURES.push(newUrFeature);
