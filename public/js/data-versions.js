@@ -11033,7 +11033,7 @@
       "encyclopedia/facts/stores.json": "b83b9962",
       "encyclopedia/facts/streets.json": "87eedf49",
       "encyclopedia/items/data.json": "f9e99879",
-      "encyclopedia/items/facts.json": "ee1e9cb6",
+      "encyclopedia/items/facts.json": "3c8f6fc4",
       "encyclopedia/search.json": "0d5d05db",
       "landing/card-explore.webp": "7a2c1124",
       "landing/full/card-explore.webp": "cbce4e96",
