@@ -44,9 +44,9 @@ globalThis.Image = FakeImage;
 const { installPixiFixes } = await import('../public/js/pixi-fixes.js?v=0f42b75e');
 installPixiFixes(PIXI);
 
-const { PLACE_TEXT, giantIconsFeature } = await import('../public/js/features/giant-icons-feature.js?v=263be153');
-const { GIANT_ICON_IDS, applyIconAct, bestowCheck, createIconState, homePlaceKey, normalizeVisitIcons, pickUpIcon, placeIcon, shiftHomeIcons } = await import('../public/js/giant-icons.js?v=8d705525');
-const { normalizeHomeView } = await import('../public/js/neighbours-mp.js?v=5323ddea');
+const { PLACE_TEXT, giantIconsFeature } = await import('../public/js/features/giant-icons-feature.js?v=aeea34fb');
+const { GIANT_ICON_IDS, applyIconAct, bestowCheck, createIconState, homePlaceKey, normalizeVisitIcons, pickUpIcon, placeIcon, shiftHomeIcons } = await import('../public/js/giant-icons.js?v=dae82b5f');
+const { normalizeHomeView } = await import('../public/js/neighbours-mp.js?v=0896a4d7');
 
 const HOME_STREET = 'RH_HOME_EXT';
 const HOME_HOUSE = 'RH_HOME_INT';

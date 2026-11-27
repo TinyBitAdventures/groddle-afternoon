@@ -31,8 +31,8 @@ import {
   setCraftybotSpecs,
   setJobTotal,
 } from '../public/js/craftybot.js?v=06550c66';
-import { craftybotFeature } from '../public/js/features/craftybot-feature.js?v=9ae31ac6';
-import { homesFeature } from '../public/js/features/homes-feature.js?v=76aa2f88';
+import { craftybotFeature } from '../public/js/features/craftybot-feature.js?v=25e1c9a9';
+import { homesFeature } from '../public/js/features/homes-feature.js?v=a99d2418';
 import { dropsMpFeature } from '../public/js/features/drops-mp-feature.js?v=a34f5a9b';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');

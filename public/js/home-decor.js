@@ -437,6 +437,8 @@ export function normalizeHomeDecorState(seed = {}) {
     nextId: Math.max(maxId + 1, Math.floor(finite(seed?.nextId, 1))),
     wallSegments,
   };
+  const paid = normalizePaid(seed?.paid, wallSegments);
+  if (Object.keys(paid).length) out.paid = paid;
   const styles = normalizeStyles(seed?.styles, storage);
   if (Object.keys(styles).length) out.styles = styles;
   for (const kind of TEXTURE_KINDS) {
@@ -955,14 +957,53 @@ export function expandInterior(state, inv = {}) {
 }
 
 /**
- * locations/inc_homes.js homes_get_expand_costs `unexpand` (2012-03-30, one
- * floor): wall segments past MIN_WALL_SEGMENTS can come off again, and each
- * refunds the parts it was built from. The refund steps with the segment so a
- * full set of four gives the beams and the girder back:
- *   segs = count - (START - MIN), raised by 4 until >= 0
- *   2 Wood Posts and 6 Boards per floor, 8 Barnacle Talc on even segs (else 7),
- *   a Beam on even segs, a Girder every fourth.
+ * locations/inc_homes.js homes_get_expand_costs `unexpand` (2012-03-30): wall
+ * segments past MIN_WALL_SEGMENTS can come off again. Glitch refunded a fixed
+ * set of parts for each, num_floors times (2 Wood Posts, 6 Boards, 7 or 8
+ * Barnacle Talc, a Beam on even segments, a Girder every fourth), from below
+ * the starting width too, worth about 820 more than the Wall Segment it took.
+ *
+ * G1334, ours (Austin 2026-11-27: "refund only what the player spent"): an
+ * un-expand gives back what that expansion took. The house's ground floor keeps
+ * it (`paid`, by the width the expansion made: expandHouseFloors records it).
+ * A segment past the starting seven with no record (expanded before this) gives
+ * one Wall Segment, the least an expansion ever cost; a segment the house came
+ * with gives nothing. The site banks the same (groddle-afternoon-site
+ * LedgerMath built), so the refund stands in the ledger.
  */
+const PAID_CLASSES = Object.freeze(['wall_segment', 'grade_aa_earth_block', 'girder']);
+
+function normalizePaid(raw, wallSegments) {
+  const out = {};
+  if (!raw || typeof raw !== 'object') return out;
+  for (const [key, items] of Object.entries(raw)) {
+    const w = Math.floor(Number(key));
+    if (!Number.isFinite(w) || w <= HOME_LIMITS.MIN_WALL_SEGMENTS || w > wallSegments || !items || typeof items !== 'object') continue;
+    const row = {};
+    for (const cls of PAID_CLASSES) {
+      const n = Math.floor(finite(items[cls], 0));
+      if (n > 0) row[cls] = Math.min(n, 99);
+    }
+    if (Object.keys(row).length) out[w] = row;
+  }
+  return out;
+}
+
+/** What un-expanding the house as it stands gives back (see above). */
+export function unexpandRefund(state) {
+  const w = Math.floor(finite(state?.wallSegments, HOME_LIMITS.START_WALL_SEGMENTS));
+  const row = state?.paid?.[w];
+  if (row && typeof row === 'object') return { ...row };
+  return w > HOME_LIMITS.START_WALL_SEGMENTS ? { wall_segment: 1 } : {};
+}
+
+/** expandHouseFloors: what this expansion took, kept for its un-expand. */
+export function recordExpansionPaid(state, items) {
+  const row = {};
+  for (const cls of PAID_CLASSES) if (Number(items?.[cls]) > 0) row[cls] = Math.floor(Number(items[cls]));
+  state.paid = { ...(state.paid || {}), [state.wallSegments]: row };
+}
+
 export const UNEXPAND_TEXT = Object.freeze({
   button: 'Un-expand',
   title: 'Un-expand your house',
@@ -973,23 +1014,15 @@ export const UNEXPAND_TEXT = Object.freeze({
   yes: 'Yes. Un-expand it!',
   no: 'Nevermind',
   min: 'Your house is already sooo small!',
+  /** G1334, ours: a segment the house came with. */
+  noRefund: 'This wall segment came with the house, so nothing is refunded.',
 });
 
 export function quoteInteriorUnexpand(state) {
   const inner = Math.max(0, Math.floor(finite(state?.wallSegments, HOME_LIMITS.START_WALL_SEGMENTS)) - 2);
   const count = state?.layout === 'tower' ? 0 : Math.max(0, inner - (HOME_LIMITS.MIN_WALL_SEGMENTS - 2));
   if (!count) return { ok: false, reason: 'min', count: 0, items: {}, msg: UNEXPAND_TEXT.min };
-  let segs = count - (HOME_LIMITS.START_WALL_SEGMENTS - HOME_LIMITS.MIN_WALL_SEGMENTS);
-  while (segs < 0) segs += 4;
-  const floors = 1;
-  const items = {
-    wood_post: floors * 2,
-    board: floors * 6,
-    barnacle_talc: floors * (segs % 2 === 0 ? 8 : 7),
-  };
-  if (segs % 2 === 0) items.beam = floors;
-  if (segs % 4 === 0) items.girder = floors;
-  return { ok: true, count, items };
+  return { ok: true, count, items: unexpandRefund(state) };
 }
 
 /**
@@ -1001,6 +1034,10 @@ export function unexpandInterior(state, inv = {}) {
   const quote = quoteInteriorUnexpand(state);
   if (!quote.ok) return quote;
   const edge = interiorWidth(state) - 300;
+  if (state.paid) {
+    delete state.paid[state.wallSegments];
+    if (!Object.keys(state.paid).length) delete state.paid;
+  }
   state.wallSegments -= 1;
   if (Array.isArray(state.walls) && state.walls.length >= 2) {
     const last = state.walls.pop();

@@ -107,9 +107,9 @@ import {
   tankFuel,
 } from './machine-rooms.js?v=a99c4d01';
 import { ASSEMBLY_SKILL, FUEL_PER_CELL, MAX_FUEL, isMachine } from './machines.js?v=93a736f2';
-import { INTERIOR, interiorBounds } from './home-decor.js?v=c63e5e16';
+import { INTERIOR, interiorBounds } from './home-decor.js?v=d84c139d';
 import { machineRoomLayout } from './machine-rooms.js?v=a99c4d01';
-import { housePlace, isHousePlace } from './home-floors.js?v=17371532';
+import { housePlace, isHousePlace } from './home-floors.js?v=645685a1';
 
 export const HOME_MACHINES_ID = 'home-machines';
 

@@ -9,7 +9,7 @@
 import assert from 'node:assert/strict';
 import { after, before, describe, it } from 'node:test';
 
-import { homeMachinesFeature } from '../public/js/features/home-machines-feature.js?v=4c5e114a';
+import { homeMachinesFeature } from '../public/js/features/home-machines-feature.js?v=d7e811ff';
 import { Display, FakeEl, fakePixi } from './fake-scene.js';
 
 const ROOM = 'GCR101Q98A12EHH';

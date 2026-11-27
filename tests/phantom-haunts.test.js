@@ -32,7 +32,7 @@ import { TELEPORTERS } from '../public/js/hidden-floors.js?v=023336cb';
 import { WINTRY_PORTAL_TELEPORTERS } from '../public/js/wintry-portal.js?v=1437deda';
 import { placeIndex, questHold, questStoryNeeds } from '../public/js/quest-reach.js?v=1de854ff';
 import { reachableStreets, streetGraph } from '../public/js/street-graph.js?v=d767f3a2';
-import { streetJobsFeature } from '../public/js/features/street-jobs-feature.js?v=ac2217b0';
+import { streetJobsFeature } from '../public/js/features/street-jobs-feature.js?v=002e6200';
 
 const root = join(import.meta.dirname, '..');
 const PUB = join(root, 'public');

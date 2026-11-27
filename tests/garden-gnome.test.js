@@ -36,13 +36,13 @@ import {
   teachMenu,
   tickGnome,
   visitGnomePlace,
-} from '../public/js/garden-gnome.js?v=20dd4af8';
-import { gardenGnomeFeature as feature } from '../public/js/features/garden-gnome-feature.js?v=381e9227';
+} from '../public/js/garden-gnome.js?v=f1410394';
+import { gardenGnomeFeature as feature } from '../public/js/features/garden-gnome-feature.js?v=202787dc';
 import { worldArtFor } from '../public/js/world-art.js?v=a67514c8';
 import { GNOME_ART, GNOME_ART_DIR } from '../public/js/garden-gnome-art.js?v=994b7c76';
 import { HOME_STREET_TSID } from '../public/js/homes.js?v=dca6b2cd';
-import { normalizeHomeView, readVisitScene } from '../public/js/neighbours-mp.js?v=5323ddea';
-import { neighboursMpFeature } from '../public/js/features/neighbours-mp-feature.js?v=ab2dd18a';
+import { normalizeHomeView, readVisitScene } from '../public/js/neighbours-mp.js?v=0896a4d7';
+import { neighboursMpFeature } from '../public/js/features/neighbours-mp-feature.js?v=39f17d35';
 import { HAS_SITE, SITE_DIR, sitePath } from '../tools/repos.mjs';
 import { HAS_PHP, PHP } from './php.js';
 

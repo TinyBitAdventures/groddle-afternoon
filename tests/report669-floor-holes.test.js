@@ -31,7 +31,7 @@ import {
   landingX,
 } from '../public/js/home-floor-holes.js?v=4b244ef4';
 import { FURNITURE_UPGRADES } from '../public/js/furniture-upgrades-data.js?v=0b2cf3cc';
-import { furnitureSize, INTERIOR } from '../public/js/home-decor.js?v=c63e5e16';
+import { furnitureSize, INTERIOR } from '../public/js/home-decor.js?v=d84c139d';
 import { NORMAL_BUFF, avatarGround, stepAvatar } from '../public/js/avatar-step.js?v=8415ee96';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');

@@ -29,9 +29,9 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { execFileSync } from 'node:child_process';
 
-import * as HM from '../public/js/home-machines.js?v=cab883cd';
-import { homeMachinesFeature } from '../public/js/features/home-machines-feature.js?v=4c5e114a';
-import { homesFeature } from '../public/js/features/homes-feature.js?v=76aa2f88';
+import * as HM from '../public/js/home-machines.js?v=cae787a7';
+import { homeMachinesFeature } from '../public/js/features/home-machines-feature.js?v=d7e811ff';
+import { homesFeature } from '../public/js/features/homes-feature.js?v=a99d2418';
 import { Display, FakeEl, fakePixi } from './fake-scene.js';
 import { HAS_SERVER, HAS_SITE, SITE_DIR, serverPath } from '../tools/repos.mjs';
 import { HAS_PHP, PHP } from './php.js';

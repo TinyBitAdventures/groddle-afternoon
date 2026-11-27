@@ -4,7 +4,7 @@
  */
 import { ITEM_ICONS, ITEM_LABELS, getVerbsFor, ordinaryItems, runVerb } from './content.js?v=da2b8879';
 import { createErrorOnce, createFeatureHost, createFrameStages } from './js/feature-host.js?v=b87e2cbc';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=0ae55c83';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=9bd7a9cf';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, enterHintPick, hoverText, stackHoverLabel, groupHead, hoverRimShown, reachGlowTargets, spriteHasRimArt, rimArtParts, trimmedIconUrl, drawTileArt } from './js/enter-chooser.js?v=297c6d15';
 import { firstTendKey, STICK_TEND_DELAY_MS, STICK_TEND_DIRS, STICK_TEND_REPEAT_MS, stepTendKey, stepTendKeys, stickTendKey, tendKeyAction } from './js/garden-tend.js?v=a7470c4a';
 import { avatarHitBox, behindFloor, bodyReachDistance, OUT_OF_REACH_LINE, playerClickBox } from './js/reach.js?v=456da8a8';
@@ -680,7 +680,7 @@ import {
   recipeToolChosen,
   pluralizeItem,
 } from './js/making.js?v=dc595568';
-import { MAKE_FUEL_TIP, makeFuelView } from './js/home-machines.js?v=cab883cd';
+import { MAKE_FUEL_TIP, makeFuelView } from './js/home-machines.js?v=cae787a7';
 import { outputIconsHtml, outputsPhrase, productHaveRows, recipeOutputRows } from './js/ui/recipe-outputs.js?v=610c067f';
 import { MAKE_TOOL_SHEETS } from './js/make-tool-sheets.js?v=6f758e09';
 import { createTestTubePanel, tryTileHtml, TRY_TILE_LABEL } from './js/test-tube-panel.js?v=1ac36255';
@@ -748,7 +748,7 @@ import {
   resolveIndexTsid,
 } from './js/street-loader.js?v=10376267';
 import { showDraftBanner, startDraftPlay } from './js/builder/draft-play.js?v=0642d72a';
-import { bootHouseFile } from './js/house-file-loader.js?v=6953f4b4';
+import { bootHouseFile } from './js/house-file-loader.js?v=ea21f53a';
 import {
   ladderTopDeck,
   groundBeneath,
@@ -1171,7 +1171,7 @@ import { ZOOM_HINT_CACHE, ZOOM_HINT_MS, watchZoomHint } from './js/zoom-hint.js?
 import { EAT_PICK_TEXT, bestFoodIndex, eatChoices, eatTip } from './js/eat-pick.js?v=8fb763d0';
 import { heldDirection, installHeldKeyGuard, isMacPlatform } from './js/held-keys.js?v=a28eb293';
 import { isOneClickDoor, oneClickChoice, signpostArmRows, worldContextAction } from './js/world-context-menu.js?v=e4c99c05';
-import { blockedPlayerVerbs, listPlayerTarget, opensPlayerMenu, playerMenuRows } from './js/ui/player-menu.js?v=3b1f59c2';
+import { blockedPlayerVerbs, listPlayerTarget, opensPlayerMenu, playerMenuRows } from './js/ui/player-menu.js?v=25bb0a6f';
 import { forgetTexture, frameTexture, isFailed, isLoaded, onFailed, onLoaded, textureFromUrl, whenLoaded } from './js/textures.js?v=b8e38103';
 import { FALLBACK_MAX as WORLD_ART_FALLBACK_MAX, worldArtFor } from './js/world-art.js?v=a67514c8';
 import { HOME_PIP_PX, HOME_PIP_WORDS, drawLockPip, drawPipWords, homeMarkNote, homePipShown, homePipWordsShown, homeStackMark } from './js/home-stack-marks.js?v=67b44287';

@@ -6712,6 +6712,27 @@
    "why": "Glitch's bot never said its queue was done (npc_crafty_bot.js craftDone 1051-1090 only moved to the next job; sendCraftyMessage spoke for halts, broken tools and missing machines). Ours: when the last unfinished job of the queue makes its total, one short line, \"From Crafty-bot: All done! Your jobs are ready to collect.\", goes in the activity feed; never one per job, no modal prompt. Raising a finished job and finishing it again says so again.",
    "ruling": "Austin 2026-11-27 (report #753): add a queue-finished notice, a short From Crafty-bot line in the activity feed",
    "rows": []
+  },
+  {
+   "id": "unexpand-refund-what-was-spent",
+   "title": "Un-expanding a house gives back what that expansion took (Glitch gave a fixed parts set, from below the starting width too); taking a machine apart stands in the ledger as far as its parts were paid for",
+   "kind": "behaviour",
+   "status": "kept",
+   "where": [
+    {
+     "file": "public/js/home-decor.js",
+     "symbol": "unexpandRefund"
+    },
+    {
+     "file": "public/js/home-floors.js",
+     "symbol": "expandHouseFloors"
+    }
+   ],
+   "why": "Glitch's un-expand refund (inc_homes.js 2611-2630) was worth about 820 more than the Wall Segment an expansion took, and a never-expanded house could be un-expanded for it, so an expand / un-expand loop paid. The site ledger had no credit for it and took it back from newer characters.",
+   "ruling": "Austin 2026-11-27 (G1334): refund only what the player spent; no free refund for a never-expanded house, no loop that pays out more than it cost",
+   "rows": [
+    "G1334"
+   ]
   }
  ]
 }

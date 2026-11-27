@@ -35,7 +35,8 @@
  *    and ceiling the old top floor's. homes_extend (133-150) adds a segment
  *    to every floor; homes_get_expand_costs (2511-2622) charges num_floors
  *    Wall Segments a segment (with Urth Blocks and Girders on two and three
- *    floors) and refunds num_floors times on un-expand; houses_extend refuses
+ *    floors) and refunds num_floors times on un-expand (G1334: here what the
+ *    expansion took, home-decor.js unexpandRefund); houses_extend refuses
  *    while a floor is being built (busy_adding_floor).
  *  - config_base.js home_limits MAX_FLOORS 3 ("R2: 2, R3: 3").
  *
@@ -60,7 +61,7 @@
  */
 
 import { HOME_LIMITS } from './homes-catalog.js?v=0367f90f';
-import { floorRestY, moveFurniture, normalizeHomeDecorState, quoteInteriorUnexpand, unexpandInterior, expandInterior, wallSlots } from './home-decor.js?v=c63e5e16';
+import { floorRestY, moveFurniture, normalizeHomeDecorState, quoteInteriorUnexpand, unexpandInterior, expandInterior, recordExpansionPaid, wallSlots } from './home-decor.js?v=d84c139d';
 
 export const DOOR_CLASS = 'furniture_door';
 export const DOOR_JOB = 'job_proto_door';
@@ -390,17 +391,17 @@ export function expandHouseFloors(fs, ground, inv = {}) {
   if (!quote.ok) return quote;
   for (const [cls, n] of Object.entries(quote.items)) inv[cls] -= n;
   for (const state of [ground, ...fs.upper]) expandInterior(state, { wall_segment: 1 });
+  // G1334: its un-expand gives back what it took (home-decor.js unexpandRefund).
+  recordExpansionPaid(ground, quote.items);
   return { ok: true, items: quote.items, wallSegments: ground.wallSegments };
 }
 
-/** homes_get_expand_costs `unexpand`: the one-floor refund, num_floors times. */
+/** homes_get_expand_costs `unexpand`: G1334, what the last expansion took, once for the house (home-decor.js unexpandRefund). */
 export function quoteHouseUnexpand(fs, ground) {
   if (fs.pending) return { ok: false, reason: 'locked', items: {}, msg: DOOR_TEXT.locked };
   const one = quoteInteriorUnexpand(ground);
   if (!one.ok) return one;
-  const floors = floorCount(fs);
-  const items = Object.fromEntries(Object.entries(one.items).map(([cls, n]) => [cls, n * floors]));
-  return { ...one, items, floors };
+  return { ...one, floors: floorCount(fs) };
 }
 
 /**
@@ -412,7 +413,8 @@ export function unexpandHouseFloors(fs, ground, inv = {}) {
   if (!quote.ok) return quote;
   let out = null;
   for (const state of [ground, ...fs.upper]) {
-    const res = unexpandInterior(state, inv);
+    // The refund is the ground floor's record, paid once.
+    const res = unexpandInterior(state, state === ground ? inv : {});
     if (state === ground) out = res;
   }
   // Each end of a link follows its own Door (#634: the two Doors may stand at different x).

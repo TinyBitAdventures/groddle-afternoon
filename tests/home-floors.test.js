@@ -32,10 +32,10 @@ import {
   quoteHouseUnexpand,
   unexpandHouseFloors,
   wallExpandItems,
-} from '../public/js/home-floors.js?v=17371532';
-import { createHomeDecorState, placeFurniture } from '../public/js/home-decor.js?v=c63e5e16';
+} from '../public/js/home-floors.js?v=645685a1';
+import { createHomeDecorState, placeFurniture } from '../public/js/home-decor.js?v=d84c139d';
 import { FURNITURE_CATALOG, FURNITURE_STORE } from '../public/js/homes-catalog.js?v=0367f90f';
-import { furnitureStoreProfile } from '../public/js/features/homes-feature.js?v=76aa2f88';
+import { furnitureStoreProfile } from '../public/js/features/homes-feature.js?v=a99d2418';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const GSJS = join(homedir(), 'Documents/glitch-audit/glitch-GameServerJS');
@@ -190,14 +190,15 @@ describe('expanding a house with floors (homes_get_expand_costs, homes_extend)',
     assert.equal(un.ok, true);
     assert.equal(ground.wallSegments, before);
     assert.equal(fs.upper[0].wallSegments, before);
-    assert.equal(refund.wood_post, 4, 'two floors refund twice');
-    assert.deepEqual(un.items, quoteHouseUnexpand(fs, { ...ground, wallSegments: before + 1 }).items);
+    // G1334: what the expansion took, once for the house (Glitch refunded a parts set num_floors times).
+    assert.deepEqual(refund, { wall_segment: 2, grade_aa_earth_block: 1 });
+    assert.deepEqual(un.items, { wall_segment: 2, grade_aa_earth_block: 1 });
   });
 });
 
 describe('homes-feature keeps the floors', () => {
   it('saves and restores floors, links and the floor you are on; each upper floor keeps its own stacks', async () => {
-    const { homesFeature } = await import('../public/js/features/homes-feature.js?v=76aa2f88');
+    const { homesFeature } = await import('../public/js/features/homes-feature.js?v=a99d2418');
     const engine = { param: () => null, setData() {} };
     const { ground, door } = houseWithDoor(600);
     const fs = createFloorsState();

@@ -33,11 +33,11 @@ import {
   receivedLine,
   sharedHomeStreet,
   visitSceneTsid,
-} from '../public/js/neighbours-mp.js?v=5323ddea';
+} from '../public/js/neighbours-mp.js?v=0896a4d7';
 import { createMinnAccount } from '../public/js/minn-account.js?v=7e3d7279';
-import { homesFeature, visitorHomeScene, visitorHomeState } from '../public/js/features/homes-feature.js?v=76aa2f88';
-import { neighboursMpApi, neighboursMpFeature } from '../public/js/features/neighbours-mp-feature.js?v=ab2dd18a';
-import { FEATURES } from '../public/js/features/index.js?v=0ae55c83';
+import { homesFeature, visitorHomeScene, visitorHomeState } from '../public/js/features/homes-feature.js?v=a99d2418';
+import { neighboursMpApi, neighboursMpFeature } from '../public/js/features/neighbours-mp-feature.js?v=39f17d35';
+import { FEATURES } from '../public/js/features/index.js?v=9bd7a9cf';
 import { YARD_STYLE_BY_KEY, streetLook, yardLook, yardStyleFor } from '../public/js/home-styles.js?v=ec5d2f69';
 import { serverPath, sitePath, skipWithoutServer, skipWithoutSite } from '../tools/repos.mjs';
 import { PHP } from './php.js';

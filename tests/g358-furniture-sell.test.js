@@ -31,7 +31,7 @@ import {
   normalizeHomeDecorState,
   pickUpFurniture,
   placeFurniture,
-} from '../public/js/home-decor.js?v=c63e5e16';
+} from '../public/js/home-decor.js?v=d84c139d';
 import { SITE_DIR, skipWithoutSite } from '../tools/repos.mjs';
 import { HAS_PHP, PHP } from './php.js';
 

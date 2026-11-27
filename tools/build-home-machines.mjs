@@ -4,7 +4,8 @@
  * src/HomeMachines.php). From the game's own modules, so the site and the
  * game never disagree:
  *
- * - machines: per machine (machine_base) its label, the skill its use needs
+ * - machines: per machine (machine_base) its label, the skill its use needs,
+ *   the parts assembling it takes (G1334: what taking it apart gives back)
  *   (js/machine-rooms.js MACHINE_SKILLS, inc_making.js making_required_skill)
  *   and its recipes from assets/content/recipes.json (catalog_recipes.js):
  *   wait in ms, the tank's fuel a unit burns (the recipe's fuel_cell input,
@@ -32,10 +33,10 @@ import { requireSite, sitePath } from './repos.mjs';
 export const OUT = sitePath('data', 'home-machines.json');
 
 export async function homeMachinesJson() {
-  const hm = await import('../public/js/home-machines.js?v=cab883cd');
+  const hm = await import('../public/js/home-machines.js?v=cae787a7');
   const { MACHINE_SKILLS } = await import('../public/js/machine-rooms.js?v=a99c4d01');
-  const { FRESH_FUEL, MACHINE_IDS } = await import('../public/js/machines.js?v=93a736f2');
-  const decor = await import('../public/js/home-decor.js?v=c63e5e16');
+  const { FRESH_FUEL, MACHINE_IDS, MACHINE_ASSEMBLIES, MACHINE_STAND } = await import('../public/js/machines.js?v=93a736f2');
+  const decor = await import('../public/js/home-decor.js?v=d84c139d');
   const { HOME_LIMITS } = await import('../public/js/homes-catalog.js?v=0367f90f');
   const tower = decor.interiorBounds({ layout: 'tower' });
   const machineRooms = Object.fromEntries(Object.values(hm.MACHINE_ROOM_PLACES).map((place) => [hm.roomName(place), { l: hm.MACHINE_ROOM_BOUNDS.l, r: hm.MACHINE_ROOM_BOUNDS.r, fixed: hm.roomFixedXs(place) }]));
@@ -49,9 +50,11 @@ export async function homeMachinesJson() {
       const r = recipes[key];
       return `${JSON.stringify(key)}:{"id":${JSON.stringify(String(r.id))},"name":${JSON.stringify(r.name)},"waitMs":${Number(r.waitMs) || 0},"fuel":${Number(r.toolWear) || 0},"limit":${Number(r.taskLimit) || 1},"in":${counts(r.inputs)},"out":${counts(r.outputs)}}`;
     });
-    return `${JSON.stringify(cls)}:{"label":${JSON.stringify(hm.machineLabel(cls))},"skill":${JSON.stringify(MACHINE_SKILLS[cls])},"recipes":{\n${rows.join(',\n')}}}`;
+    const parts = { [MACHINE_STAND]: 1 };
+    for (const p of MACHINE_ASSEMBLIES[cls].parts) parts[p] = (parts[p] || 0) + 1;
+    return `${JSON.stringify(cls)}:{"label":${JSON.stringify(hm.machineLabel(cls))},"skill":${JSON.stringify(MACHINE_SKILLS[cls])},"parts":${JSON.stringify(parts)},"recipes":{\n${rows.join(',\n')}}}`;
   });
-  const doc = 'Written by groddle-afternoon game tools/build-home-machines.mjs from js/home-machines.js, js/machines.js, js/machine-rooms.js and assets/content/recipes.json: machines each machine\'s label, the skill its use needs and its recipes (waitMs a unit, fuel the tank a unit burns, limit the task limit, in and out per unit); pool the Magic Rock iMG a finished job by someone not the owner adds (inc_making.js:836); maxFuel, perCell and fresh the tank; extraMs a job\'s added time; dayMs a game day; storeDays how long output waits for anyone but the owner; spacing and edge where one may stand; max machines one place in a home keeps; saveFuel and taskCards the cards that change fuel and the task limit; rooms the house\'s wall segments (width segmentW each, minSegments to maxSegments, startSegments when unset) and side walls endCap inside each end, and a Tower floor\'s inner walls towerLeft to towerRight (js/home-decor.js interiorBounds); machineRooms each Community Machine Room\'s ends l to r and its own machines\' x (fixed), for a player\'s machine set down there (js/home-machines.js, js/machine-rooms.js).';
+  const doc = 'Written by groddle-afternoon game tools/build-home-machines.mjs from js/home-machines.js, js/machines.js, js/machine-rooms.js and assets/content/recipes.json: machines each machine\'s label, the skill its use needs, the parts assembling it takes (the Machine Stand and three, js/machines.js MACHINE_ASSEMBLIES; what taking it apart gives back, the site LedgerMath built) and its recipes (waitMs a unit, fuel the tank a unit burns, limit the task limit, in and out per unit); pool the Magic Rock iMG a finished job by someone not the owner adds (inc_making.js:836); maxFuel, perCell and fresh the tank; extraMs a job\'s added time; dayMs a game day; storeDays how long output waits for anyone but the owner; spacing and edge where one may stand; max machines one place in a home keeps; saveFuel and taskCards the cards that change fuel and the task limit; rooms the house\'s wall segments (width segmentW each, minSegments to maxSegments, startSegments when unset) and side walls endCap inside each end, and a Tower floor\'s inner walls towerLeft to towerRight (js/home-decor.js interiorBounds); machineRooms each Community Machine Room\'s ends l to r and its own machines\' x (fixed), for a player\'s machine set down there (js/home-machines.js, js/machine-rooms.js).';
   return `{"_doc":${JSON.stringify(doc)},\n"pool":${hm.HOME_MACHINE_POOL},"maxFuel":${hm.MAX_FUEL},"perCell":${hm.FUEL_PER_CELL},"fresh":${FRESH_FUEL},"extraMs":${hm.MACHINE_EXTRA_WAIT_MS},"dayMs":${hm.GAME_DAY_MS},"storeDays":${hm.DAYS_TO_STORE_CONTENTS},"spacing":${hm.MACHINE_SPACING},"edge":${hm.MACHINE_EDGE},"max":${hm.HOME_MACHINES_MAX},\n"saveFuel":${JSON.stringify(hm.SAVE_FUEL)},"taskCards":${JSON.stringify(hm.TASK_LIMIT_CARDS)},\n"rooms":${JSON.stringify(rooms)},\n"machineRooms":${JSON.stringify(machineRooms)},\n"machines":{\n${machines.join(',\n')}}}\n`;
 }
 

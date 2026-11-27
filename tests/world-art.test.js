@@ -14,7 +14,7 @@ import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { WORLD_ART } from '../public/js/world-art-list.js?v=932c8bcf';
 import { FALLBACK_MAX, artIdOf, worldArtFor, worldStateFor } from '../public/js/world-art.js?v=a67514c8';
-import { surfaceHeight, stackSurfaceAt, createHomeDecorState } from '../public/js/home-decor.js?v=c63e5e16';
+import { surfaceHeight, stackSurfaceAt, createHomeDecorState } from '../public/js/home-decor.js?v=d84c139d';
 import { FURNITURE_UPGRADES } from '../public/js/furniture-upgrades-data.js?v=0b2cf3cc';
 
 const root = join(import.meta.dirname, '..');

@@ -1,6 +1,8 @@
 /**
  * Un-expanding the house (locations/inc_homes.js homes_unexpand and the
  * homes_get_expand_costs `unexpand` refund; client HouseExpandDialog copy).
+ * G1334 (Austin 2026-11-27): the refund is what the expansion took, not
+ * Glitch's parts set (tests/g1334-built-refunds.test.js).
  */
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
@@ -16,20 +18,19 @@ import {
   normalizeHomeDecorState,
   quoteInteriorUnexpand,
   unexpandInterior,
-} from '../public/js/home-decor.js?v=c63e5e16';
+} from '../public/js/home-decor.js?v=d84c139d';
 
 const spike = join(dirname(fileURLToPath(import.meta.url)), '..');
 const homes = join(spike, '../glitch-GameServerJS/locations/inc_homes.js');
 const dialog = join(spike, '../glitch-client/com/tinyspeck/engine/port/HouseExpandDialog.as');
 
 describe('house un-expand (homes_unexpand)', () => {
-  it('refunds the source parts, stepping with the segment', () => {
-    const at = (w) => quoteInteriorUnexpand({ wallSegments: w }).items;
-    assert.deepEqual(at(7), { wood_post: 2, board: 6, barnacle_talc: 8, beam: 1, girder: 1 });
-    assert.deepEqual(at(8), { wood_post: 2, board: 6, barnacle_talc: 7 });
-    assert.deepEqual(at(9), { wood_post: 2, board: 6, barnacle_talc: 8, beam: 1 });
-    assert.deepEqual(at(10), { wood_post: 2, board: 6, barnacle_talc: 7 });
-    assert.deepEqual(at(11), { wood_post: 2, board: 6, barnacle_talc: 8, beam: 1, girder: 1 });
+  it('G1334: gives back what the expansion took; a segment past seven with no record one Wall Segment, one the house came with nothing', () => {
+    const at = (w, paid) => quoteInteriorUnexpand({ wallSegments: w, paid }).items;
+    assert.deepEqual(at(7), {});
+    assert.deepEqual(at(8), { wall_segment: 1 });
+    assert.deepEqual(at(11), { wall_segment: 1 });
+    assert.deepEqual(at(9, { 9: { wall_segment: 3, grade_aa_earth_block: 3, girder: 2 } }), { wall_segment: 3, grade_aa_earth_block: 3, girder: 2 });
     assert.equal(quoteInteriorUnexpand({ wallSegments: 20 }).count, 14);
   });
 
@@ -41,6 +42,7 @@ describe('house un-expand (homes_unexpand)', () => {
     const s = createHomeDecorState({});
     const inv = {};
     assert.equal(unexpandInterior(s, inv).ok, true);
+    assert.deepEqual(inv, {}, 'G1334: the house came with that segment');
     assert.equal(s.wallSegments, 6);
     assert.equal(normalizeHomeDecorState(JSON.parse(JSON.stringify(s))).wallSegments, 6, 'a 6-segment house survives a reload');
     assert.equal(unexpandInterior(s, inv).ok, false);
@@ -61,7 +63,7 @@ describe('house un-expand (homes_unexpand)', () => {
     assert.equal(interiorWidth(s), w - SEGMENT_W);
     assert.equal(s.placed.find((p) => p.id === 901).x, w - 600, 'away from the end: stays');
     assert.ok(s.placed.find((p) => p.id === 900).x <= w - 250 - 150, 'in the last 300 px: moved over');
-    assert.deepEqual(inv, { board: 7, wood_post: 2, barnacle_talc: 8, beam: 1 });
+    assert.deepEqual(inv, { board: 1, wall_segment: 1 }, 'G1334: no record past seven, one Wall Segment');
     // Expand again with a Wall Segment: back to 9.
     assert.equal(expandInterior(s, { wall_segment: 1 }).wallSegments, 9);
   });

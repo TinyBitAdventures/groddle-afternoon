@@ -740,6 +740,10 @@
   "public/js/home-cultivation.js": {
     "ours: * G1245: the Vine Radio (ours, js/vine-radio.js) once its owner has it: out": "ours-vine-radio"
   },
+  "public/js/home-decor.js": {
+    "ours: * G1334, ours (Austin 2026-11-27: \"refund only what the player": "unexpand-refund-what-was-spent",
+    "ours: /** G1334, ours: a segment the house came with.": "unexpand-refund-what-was-spent"
+  },
   "public/js/home-floor-holes.js": {
     "ours: * Ours (Austin's ruling, 2026-11-27): the whole": "house-floor-holes"
   },
