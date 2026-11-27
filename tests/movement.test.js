@@ -27,7 +27,7 @@ import {
   cameraWorldHeightForGround,
 } from '../public/js/movement.js?v=f4be1a05';
 import { streetHeight, platformsScreen } from '../public/js/street-model.js?v=a9a05f9d';
-import { MIN_VP_H, MAX_VP_H, VIEW_CEIL_H, VIEW_FLOOR_H, locationViewHeightFor } from '../public/js/location-view.js?v=04d55c40';
+import { MIN_VP_H, MAX_VP_H, VIEW_CEIL_H, VIEW_FLOOR_H, locationViewHeightFor } from '../public/js/location-view.js?v=b178fe66';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 

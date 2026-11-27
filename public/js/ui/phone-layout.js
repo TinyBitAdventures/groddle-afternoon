@@ -285,10 +285,12 @@ export function phoneRegions({ width, height, safe = {}, sheet = '', pack = null
 
   // The street fits the room the open sheet or bag leaves (G1178's dock), keeping the pinch level.
   let dock = null;
+  // #740: a half sheet keeps the zoom the street has with it closed (`keep`, game.js undockedStageRoom).
   if (sheetBox && kind !== 'map') {
     dock = upright || kind === 'bag'
       ? { side: 'bottom', css: H - sheetBox.top, zoom: true }
       : { side: 'left', css: sheetBox.right, zoom: true };
+    if (kind === 'half') dock.keep = true;
   }
   return { upright, strip: stripBox, caption: captionBox, homes: homesBox, buffs: buffBox, play: playBox, playAt, notices, pin: pinBox, stick, stickUp, act, jump, snap: snapBox, pack: packBox, sheet: sheetBox, dock, street: streetBand };
 }

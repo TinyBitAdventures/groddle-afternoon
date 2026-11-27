@@ -25,7 +25,7 @@ import {
   tableTileState,
   skillTable,
   skillsEscStep,
-} from '../public/js/classic/classic-skills.js?v=cc49f427';
+} from '../public/js/classic/classic-skills.js?v=f4235399';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const read = (p) => readFileSync(join(root, p), 'utf8');

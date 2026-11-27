@@ -15,8 +15,8 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { phoneRegions } from '../public/js/ui/phone-layout.js?v=d65ffc01';
-import { MIN_PACK_HEIGHT, dockedStage, stageFor, stageRoomBeside, stageRoomInBand, streetBandScale } from '../public/js/location-view.js?v=04d55c40';
+import { phoneRegions } from '../public/js/ui/phone-layout.js?v=7ebe8992';
+import { MIN_PACK_HEIGHT, dockedStage, stageFor, stageRoomBeside, stageRoomInBand, streetBandScale } from '../public/js/location-view.js?v=b178fe66';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const game = readFileSync(join(root, 'public/game.js'), 'utf8');
@@ -33,7 +33,7 @@ function phoneStageOf({ width: W, height: H }, safe, sheet, closeup = 0) {
   const whole = stageRoomBeside(W, H, r.dock);
   const room = stageRoomInBand(whole, frame);
   let undocked;
-  if (r.dock?.zoom) {
+  if (r.dock?.keep) {
     const fw = stageRoomBeside(W, H, null);
     const f = stageRoomInBand(fw, frame);
     undocked = { width: f.width, height: f.height, streetBand: f.top > 0, fullHeight: fw.height, topBand: 0 };
@@ -71,13 +71,20 @@ describe('#740: the zoom with the Menu open or closed, and Whole street in the b
     });
   }
 
-  it('an open bag keeps the scale too; the house picker\'s dock (no zoom) still fits the room it leaves', () => {
+  it('only a half sheet keeps the scale: an open bag and the house picker still fit the room they leave', () => {
+    // An open bag sideways leaves a strip too short for the kept scale (the action chip rose over the
+    // caption, tests/phone-layout.test.js): it refits, as before #740.
+    assert.ok(phoneRegions({ ...SIDEWAYS, safe: SIDEWAYS_SAFE, sheet: 'half' }).dock.keep);
+    assert.ok(phoneRegions({ ...UPRIGHT, safe: UPRIGHT_SAFE, sheet: 'half' }).dock.keep);
+    assert.ok(!phoneRegions({ ...SIDEWAYS, safe: SIDEWAYS_SAFE, sheet: 'bag', bagTop: 190 }).dock.keep);
+    // stageFor keeps the free room's scale whenever it is given one.
     const closed = phoneStageOf(SIDEWAYS, SIDEWAYS_SAFE, '').stage;
-    const bag = stageFor({ width: 874, height: 190, packReserve: MIN_PACK_HEIGHT, sceneWidth: 4380, sceneHeight: 1000, phone: true, undocked: { width: 874, height: 402 } });
-    assert.equal(bag.scale, closed.scale);
+    const kept = stageFor({ width: 452, height: 402, packReserve: MIN_PACK_HEIGHT, sceneWidth: 4380, sceneHeight: 1000, phone: true, undocked: { width: 874, height: 402 } });
+    assert.equal(kept.scale, closed.scale);
     assert.equal(dockedStage(null, { width: 10, height: 10 }), null);
-    assert.match(game, /function undockedStageRoom\(root, dock\) \{\n\s+if \(!dock\?\.zoom\) return undefined;/);
+    assert.match(game, /function undockedStageRoom\(root, dock\) \{\n\s+if \(!dock\?\.keep\) return undefined;/);
     assert.match(game, /undocked: undockedStageRoom\(root, dock\),/);
+    assert.match(game, /\.\.\.\(dock\.keep \? \{ keep: true \} : \{\}\)/, 'engine.setStageDock passes `keep` on');
   });
 });
 

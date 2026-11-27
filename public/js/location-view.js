@@ -282,7 +282,7 @@ export function stageFor(args = {}) {
   const H = finite(height);
   const pack = finite(packReserve, MIN_PACK_HEIGHT);
   const pinned = finite(pinnedHeight);
-  // #740 (Austin's ruling 2026-11-26): beside a docked sheet or bag the phone keeps the stage it has
+  // #740 (Austin's ruling 2026-11-26): beside a docked half sheet the phone keeps the stage it has
   // with nothing docked (`undocked`: that room's width, height, band and top strip), cut to the room
   // the window leaves (dockedStage), so the level the player chose looks the same with the Menu open.
   if (undocked && phone && !(pinned > 0) && W > 0 && H > 0) {
@@ -709,8 +709,8 @@ export function streetBandScale({ fit, closest, closeup = 0 } = {}) {
 }
 
 /**
- * PURE (#740, Austin's ruling 2026-11-26): a phone's stage beside a docked sheet, the Social drawer or
- * an open bag (G1178, G1194). `free` is the stage for the room with nothing docked (the band upright,
+ * PURE (#740, Austin's ruling 2026-11-26): a phone's stage beside a docked half sheet (the Menu, Quests,
+ * Social, the side sheets: G1194; an open bag refits, game.js undockedStageRoom). `free` is the stage for the room with nothing docked (the band upright,
  * the whole screen sideways); the canvas keeps its scale and shows the part of it the window leaves
  * (`width` x `height`), the camera scrolling the rest. Fitting the street anew into the docked room
  * flipped an upright phone to the sideways rule (the Menu leaves 402 x 247, wider than tall) and a

@@ -27,7 +27,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
   CHOOSER_MIN_W, GAP, PILL_IDS, STICK, TAP_H, boxesOverlap, chooserRoomOf, fullScreenWay, layoutProblems, menuRoomOf, phoneRegions, pillBadge, socialPillCount, stickRegionOf, streetFloorOf,
-} from '../public/js/ui/phone-layout.js?v=d65ffc01';
+} from '../public/js/ui/phone-layout.js?v=7ebe8992';
 import { phonePins } from '../public/js/ui/quest-pin-button.js?v=2931d81d';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -226,9 +226,9 @@ describe('phone layout: the regions (pure)', () => {
     const pack = { left: 30, right: 345, top: 600, bottom: 660 };
     const half = phoneRegions({ width: 375, height: 667, sheet: 'half', pack });
     assert.equal(half.sheet.bottom, pack.top - GAP);
-    assert.deepEqual(half.dock, { side: 'bottom', css: 667 - half.sheet.top, zoom: true });
+    assert.deepEqual(half.dock, { side: 'bottom', css: 667 - half.sheet.top, zoom: true, keep: true });
     const column = phoneRegions({ width: 812, height: 402, sheet: 'half' });
-    assert.deepEqual(column.dock, { side: 'left', css: column.sheet.right, zoom: true });
+    assert.deepEqual(column.dock, { side: 'left', css: column.sheet.right, zoom: true, keep: true });
     assert.ok(812 - column.sheet.right >= 240, 'the street keeps room beside the column');
     const bag = phoneRegions({ width: 812, height: 402, sheet: 'bag', bagTop: 190 });
     assert.deepEqual(bag.dock, { side: 'bottom', css: 212, zoom: true });

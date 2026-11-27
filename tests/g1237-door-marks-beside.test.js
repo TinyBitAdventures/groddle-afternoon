@@ -10,7 +10,7 @@ import { readFileSync, readdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { MAP_WIDTH, STATION_MARK, besideArt, doorMarks, mapGeometry, placeMark, stationMarks, toMap } from '../public/js/ui/street-minimap.js?v=faab9586';
-import { phoneMapWidth } from '../public/js/features/street-minimap-feature.js?v=0532991a';
+import { phoneMapWidth } from '../public/js/features/street-minimap-feature.js?v=e19baaee';
 import { subwayFeature } from '../public/js/features/subway-feature.js?v=258842bb';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');

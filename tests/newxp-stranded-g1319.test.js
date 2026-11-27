@@ -18,7 +18,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { GENTLE_ISLAND, GENTLE_ISLAND_TSIDS, exitBoxAction, islandHomeReturn } from '../public/js/newxp.js?v=43f8df2c';
-import { __newxpTest, newxpFeature } from '../public/js/features/newxp-feature.js?v=81dac63a';
+import { __newxpTest, newxpFeature } from '../public/js/features/newxp-feature.js?v=c34ae5bc';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const BASEMENT = 'GDONEDVHC4030KF';

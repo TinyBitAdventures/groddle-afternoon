@@ -18,7 +18,7 @@ import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { GAP, boxesOverlap, phoneRegions } from '../public/js/ui/phone-layout.js?v=d65ffc01';
+import { GAP, boxesOverlap, phoneRegions } from '../public/js/ui/phone-layout.js?v=7ebe8992';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const read = (p) => readFileSync(join(root, p), 'utf8');

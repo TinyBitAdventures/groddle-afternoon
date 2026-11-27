@@ -4,7 +4,7 @@
  */
 import { ITEM_ICONS, ITEM_LABELS, getVerbsFor, ordinaryItems, runVerb } from './content.js?v=68a61ef7';
 import { createErrorOnce, createFeatureHost, createFrameStages } from './js/feature-host.js?v=b87e2cbc';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=53b71a9a';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=df6e8ee9';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, enterHintPick, groupHead, hoverRimShown, reachGlowTargets, spriteHasRimArt, rimArtParts, trimmedIconUrl, drawTileArt } from './js/enter-chooser.js?v=74f4964a';
 import { firstTendKey, STICK_TEND_DELAY_MS, STICK_TEND_DIRS, STICK_TEND_REPEAT_MS, stepTendKey, stepTendKeys, stickTendKey, tendKeyAction } from './js/garden-tend.js?v=a7470c4a';
 import { avatarHitBox, behindFloor, bodyReachDistance, OUT_OF_REACH_LINE, playerClickBox } from './js/reach.js?v=456da8a8';
@@ -140,7 +140,7 @@ import {
 } from './js/legalize-it.js?v=1fd33e0e';
 import { HALL, HALL_DECOS, HALL_EXTRA_CHAIRS, HALL_OFFICE, HALL_QUESTIONS } from './js/bureaucratic-hall.js?v=f79567fd';
 import { STATION_X, stationArrival, stationScreen, surfaceStation } from './js/subway.js?v=ea6921ff';
-import { ALLEY, SHADY, drawAlley, inEnteredBox } from './js/quest-rooms/back-alley-set.js?v=65690248';
+import { ALLEY, SHADY, drawAlley, inEnteredBox } from './js/quest-rooms/back-alley-set.js?v=4e04295a';
 import { WINTER_WALK_BOUNDS, WINTER_WALK_PASSAGE } from './js/winter-walk-streets.js?v=c921bf92';
 import {
   WINTER_HAVEN_STREET_ID,
@@ -848,7 +848,7 @@ import { easeCameraAxis } from './js/camera-feel.js?v=e668afc5';
 import { renderResolution, resolutionCap, RESOLUTION_STEP, phoneZoomResolution } from './js/render-density.js?v=74c6f5f9';
 // g458: low energy and mood turn amber and red, and a click offers something from the pack.
 import { makingNeeds, vitalMenuEmpty, vitalMenuHeading, vitalSnacks } from './js/vitals.js?v=5efac5f3';
-import { DEFAULT_VP_H, LOCATION_VIEW_W, VIEW_CEIL_H, stageFor, sceneViewCap, sceneViewWidthCap, zoomMovesStage, phoneZoomSpan, phoneCameraAnchor, phoneFeetWorldHeight, phoneGroundWorldHeight, phoneSceneDrop, reachableFloorY, sceneBottomLine, sceneGroundLine, stageBandColour, stageEdgeColour, stageEdgeSampler, stageRoomBeside, stageRoomInBand } from './js/location-view.js?v=04d55c40';
+import { DEFAULT_VP_H, LOCATION_VIEW_W, VIEW_CEIL_H, stageFor, sceneViewCap, sceneViewWidthCap, zoomMovesStage, phoneZoomSpan, phoneCameraAnchor, phoneFeetWorldHeight, phoneGroundWorldHeight, phoneSceneDrop, reachableFloorY, sceneBottomLine, sceneGroundLine, stageBandColour, stageEdgeColour, stageEdgeSampler, stageRoomBeside, stageRoomInBand } from './js/location-view.js?v=b178fe66';
 import {
   levelInfoForXp,
   reconcilePlayerProgression,
@@ -878,12 +878,12 @@ import {
 import { momentMoreText } from './js/ui/moment-card.js?v=b383144f';
 import { CHAT_MAX_CHARS, chatBubbleText } from './js/ui/chat-input.js?v=8f2479a3';
 // HUB: the hub is the Modern skin's; Classic owns X in its skin (js/classic/classic-hub.js).
-import { MODERN, onUiModeChange, readUiCache, uiState, writeUiCache } from './js/classic/ui-mode.js?v=fe3c4980';
+import { MODERN, onUiModeChange, readUiCache, uiState, writeUiCache } from './js/classic/ui-mode.js?v=12843953';
 // ZOOM: the world zoom (a device preference) and Classic's frame scale under it; both load before main().
 import { worldZoom, setWorldZoom, stepWorldZoom, onZoomChange, zoomKeyAction, zoomKeyToast, zoomFixed, setZoomFixed, onZoomFixedChange, phoneZoom } from './js/world-zoom.js?v=38816228';
 import { nightTint, nightTintOn, onNightTintChange, worldTintOpacity } from './js/night-tint.js?v=1dfc9c89';
 import { streetMapSetting, toggleStreetMap } from './js/ui/street-minimap.js?v=faab9586';
-import './js/classic/classic-zoom.js?v=e55c75d3';
+import './js/classic/classic-zoom.js?v=d1b8d5b0';
 import { mountImaginationHub } from './js/ui/imagination-hub.js?v=6928c5b7';
 import { newDayBubble, shuffleNewDayMessages, waitForScreenGates } from './js/screen-queue.js?v=cf0132c0';
 import { applyFamiliarLook, familiarCardHeading, familiarLook, skillArtFor, skillLearnedActivity } from './js/familiar.js?v=b9597cd3';
@@ -1147,7 +1147,7 @@ import { backgroundSound, backgroundSoundOn } from './js/background-sound.js?v=d
 import { bubbleMs } from './js/read-time.js?v=3151fb1a';
 import { mountNotifyView } from './js/notify-view.js?v=18b4efca';
 import { mountSocialDrawer } from './js/ui/social-drawer.js?v=21504099';
-import { installPhonePill, mountPhoneLayout, socialPillCount } from './js/ui/phone-layout.js?v=d65ffc01';
+import { installPhonePill, mountPhoneLayout, socialPillCount } from './js/ui/phone-layout.js?v=7ebe8992';
 import { bindChatLinks } from './js/chat-links.js?v=b717fac7';
 import { playerNameColour } from './js/name-colours.js?v=9819bb8a';
 import { SIDE_SHEET_IDS, bindTabs, inSideSheet, mountPanelShell, sheetKeyToWorld } from './js/ui/panel-shell.js?v=5efb38c6';
@@ -1197,7 +1197,7 @@ import { filterText } from './js/word-filter.js?v=9a7a7ebb'; // the remake's own
 import { mountStartStreet } from './js/start-street.js?v=7d8ce49c'; // #349: the start card names the save's street
 import { arrangeMapCards, fitMapExtras } from './js/map-extras.js?v=16e261b1'; // the Map's Shortcuts
 // The interface skin (js/classic/ui-mode.js) sets <html data-ui> as it loads: before main(), so before the boot cover lifts.
-import { installInterfaceSettings } from './js/classic/classic-prefs.js?v=059b2e89';
+import { installInterfaceSettings } from './js/classic/classic-prefs.js?v=7409c944';
 import { standOnFeet, anchorBottomCentre } from './js/sprite-feet.js?v=849541a8';
 import { markLeaving, packPicks, takeCopies } from './js/copy-picks.js?v=b368fd49';
 import { holdKeepsBusy } from './js/instance-holds.js?v=ff3a63a3';
@@ -2315,20 +2315,21 @@ function stageArgs() {
     // #654: upright on the phone layout the room is the street's band (the scale the whole room's).
     streetBand: room.top > 0,
     fullHeight: whole.height,
-    // #740: a sheet, the Social drawer or an open bag keeps the stage of the room with nothing docked.
+    // #740: a half sheet (the Menu, Quests, Social) keeps the stage of the room with nothing docked.
     undocked: undockedStageRoom(root, dock),
   };
 }
 
 /**
- * #740 (Austin's ruling 2026-11-26): a dock with `zoom` (a sheet, the Social drawer, an open bag) keeps
- * the stage the street has with nothing docked, cut to the room it leaves (js/location-view.js
- * dockedStage), so opening the Menu no longer zooms the street out, upright or sideways. Returns that
- * room as stageFor's `undocked` (its size, the band upright, the top strip), or undefined: no dock, or
- * the house picker's (no `zoom`), which still fits the room it leaves (G1178).
+ * #740 (Austin's ruling 2026-11-26): a dock with `keep` (a half sheet: the Menu, Quests, Social, the side
+ * sheets, js/ui/phone-layout.js) keeps the stage the street has with nothing docked, cut to the room it
+ * leaves (js/location-view.js dockedStage), so opening the Menu no longer zooms the street out, upright
+ * or sideways. Returns that room as stageFor's `undocked` (its size, the band upright, the top strip),
+ * or undefined: no dock, an open bag (sideways its tray leaves a strip too short for the kept scale: the
+ * avatar's action chip rose over the caption) or the house picker's, which still fit the room they leave.
  */
 function undockedStageRoom(root, dock) {
-  if (!dock?.zoom) return undefined;
+  if (!dock?.keep) return undefined;
   const whole = stageRoomBeside(root.clientWidth, root.clientHeight, null);
   const free = stageRoomInBand(whole, activeStageFrame());
   return { width: free.width, height: free.height, streetBand: free.top > 0, fullHeight: whole.height, topBand: phoneTopBand() };
@@ -15110,12 +15111,12 @@ const engine = {
    */
   setStageDock(dock = null, owner = 'window') {
     const ask = dock && (dock.side === 'bottom' || dock.side === 'left') && Number(dock.css) > 0
-      ? { side: dock.side, css: Math.round(Number(dock.css)), ...(dock.zoom ? { zoom: true } : {}) }
+      ? { side: dock.side, css: Math.round(Number(dock.css)), ...(dock.zoom ? { zoom: true } : {}), ...(dock.keep ? { keep: true } : {}) }
       : null;
     if (ask) stageDocks.set(String(owner), ask);
     else stageDocks.delete(String(owner));
     const next = stageDockOf(stageDocks);
-    if ((next?.side || '') === (stageDock?.side || '') && (next?.css || 0) === (stageDock?.css || 0) && Boolean(next?.zoom) === Boolean(stageDock?.zoom)) return false;
+    if ((next?.side || '') === (stageDock?.side || '') && (next?.css || 0) === (stageDock?.css || 0) && Boolean(next?.zoom) === Boolean(stageDock?.zoom) && Boolean(next?.keep) === Boolean(stageDock?.keep)) return false;
     stageDock = next;
     if (!TOUCH_PHONE) return false;
     window.dispatchEvent(new Event('resize'));

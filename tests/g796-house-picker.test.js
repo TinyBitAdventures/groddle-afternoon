@@ -12,7 +12,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { defaultHouseConfig } from '../public/js/home-house.js?v=3c88c47c';
 import { createHomeState, setHomeHouse } from '../public/js/homes.js?v=dca6b2cd';
-import { homesFeature } from '../public/js/features/homes-feature.js?v=c1171b13';
+import { homesFeature } from '../public/js/features/homes-feature.js?v=2dbd4b40';
 import { HOUSE_PICKER_TEXT } from '../public/js/ui/house-picker.js?v=20aaba5c';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -60,7 +60,7 @@ describe('the Customize window on a phone (G1178)', () => {
   });
 
   it('the street fits the room the sheet leaves, the whole house in it, for every house', async () => {
-    const { stageFor, stageRoomBeside } = await import('../public/js/location-view.js?v=04d55c40');
+    const { stageFor, stageRoomBeside } = await import('../public/js/location-view.js?v=b178fe66');
     const { HOUSE_HEADROOM, HOUSE_STYLE_IDS, houseFitViewH, houseLot } = await import('../public/js/home-house.js?v=3c88c47c');
     assert.deepEqual(stageRoomBeside(402, 812, null), { width: 402, height: 812, left: 0 });
     assert.deepEqual(stageRoomBeside(402, 812, { side: 'bottom', css: 357 }), { width: 402, height: 455, left: 0 });

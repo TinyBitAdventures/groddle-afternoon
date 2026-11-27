@@ -16,7 +16,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { COLUMN_W, phoneRegions } from '../public/js/ui/phone-layout.js?v=d65ffc01';
+import { COLUMN_W, phoneRegions } from '../public/js/ui/phone-layout.js?v=7ebe8992';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const css = readFileSync(join(root, 'public/style.css'), 'utf8');
@@ -29,7 +29,7 @@ describe('#738: the sideways column keeps the safe-area inset (pure)', () => {
     const r = phoneRegions({ ...SIDEWAYS, safe: SIDEWAYS_SAFE, sheet: 'half' });
     assert.equal(r.sheet.left, SIDEWAYS_SAFE.l, 'the card starts at the inset, not under the camera cut-out');
     assert.equal(r.sheet.right, SIDEWAYS_SAFE.l + COLUMN_W);
-    assert.deepEqual(r.dock, { side: 'left', css: r.sheet.right, zoom: true });
+    assert.deepEqual(r.dock, { side: 'left', css: r.sheet.right, zoom: true, keep: true });
     assert.ok(r.notices.left > r.sheet.right && r.buffs.left > r.sheet.right);
     // No inset (a Safari tab, Android): the column at the edge, as before.
     assert.equal(phoneRegions({ ...SIDEWAYS, sheet: 'half' }).sheet.left, 0);

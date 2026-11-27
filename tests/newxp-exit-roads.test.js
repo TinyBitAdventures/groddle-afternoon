@@ -20,7 +20,7 @@ import { join } from 'node:path';
 
 import { NEWXP_EXITS, GENTLE_ISLAND, indexTsid, normalizeNewxpSave } from '../public/js/newxp.js?v=43f8df2c';
 import { closedStreets, normalizeStreetJobState } from '../public/js/street-jobs.js?v=76471e42';
-import { __newxpTest, exitLeadsHome, newxpFeature, pickOpenExit } from '../public/js/features/newxp-feature.js?v=81dac63a';
+import { __newxpTest, exitLeadsHome, newxpFeature, pickOpenExit } from '../public/js/features/newxp-feature.js?v=c34ae5bc';
 import { _useStreetGraph, streetGraph } from '../public/js/street-graph.js?v=d767f3a2';
 
 const root = join(import.meta.dirname, '..');
