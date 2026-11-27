@@ -49,7 +49,7 @@ import {
   overthinkPrompt,
   planBallHit,
   reconcileFortunes,
-} from '../small-items.js?v=78d0056a';
+} from '../small-items.js?v=0b9ea3fa';
 import { itemZ } from '../item-bands.js?v=ec366be3';
 import { standOnFeet } from '../sprite-feet.js?v=6358a697';
 
@@ -300,7 +300,14 @@ function spawnBall(engine, point, { persist = true } = {}) {
 /** ball.js verbs.hit. */
 export function hitBall(engine) {
   if (!ball || ball.plan) return false;
-  const plan = planBallHit(ball.x, engine.player?.x, { minX: 40, maxX: (engine.worldW || ball.x + 400) - 40 });
+  // #737: it flies by the street's gravity (features/location-events-feature.js streetGravity; normal
+  // when the street has none) and stays under the street's top (y 0). Online it stays your own ball.
+  const plan = planBallHit(ball.x, engine.player?.x, {
+    minX: 40,
+    maxX: (engine.worldW || ball.x + 400) - 40,
+    gravity: engine.query?.('streetGravity', engine) ?? undefined,
+    maxLift: Math.max(0, ball.y - BALL_HIT.draw.h - BALL_HIT.draw.lift),
+  });
   ball.plan = plan;
   ball.frame = 0;
   ball.fromY = ball.y;

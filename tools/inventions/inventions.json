@@ -1777,16 +1777,22 @@
   },
   {
    "id": "ball-hit-arc",
-   "title": "The hit ball's peak, flight length and easing",
+   "title": "The hit ball's peak, flight length and easing, flown by the street's gravity",
    "kind": "visual",
-   "status": "proposed",
+   "status": "kept",
    "where": [
     {
      "file": "public/js/small-items.js",
      "symbol": "planBallHit"
+    },
+    {
+     "file": "public/js/features/small-items-feature.js",
+     "symbol": "hitBall"
     }
    ],
-   "why": "Reimagined around apiHitTheBall's arguments; the curve did not survive.",
+   "why": "Reimagined around apiHitTheBall's arguments; the curve did not survive. #737: a fixed 200 px knock ignored Plexus's low gravity (345 against 1190).",
+   "ruling": "Austin 2026-11-26 (#737): fly it by the street's gravity; 200 px is the normal-gravity hit (ball.js apiHitTheBall(200,10,0.5)), so on Plexus it floats far and on normal streets it goes as before; kept inside the street; online each player keeps their own ball",
+   "noCompare": "Motion, not a picture: apiHitTheBall's engine code and the ball's flight were lost, so there is no Tiny Speck original to set beside it.",
    "rows": []
   },
   {

@@ -29,6 +29,10 @@
  *   survive, not what the engine did with them, so the motion (planBallHit,
  *   ballHitPose: the arc height, timing and easing) is designed fresh around
  *   them. The verb, label, tooltip, art and placements are from the source.
+ *   RULED (Austin, #737, 2026-11-26): the ball flies by the street's
+ *   gravity. 200 px is the hit under normal gravity (1190, config_base.js
+ *   physics_configs.normal); the same knock under gravity g goes 1190 / g as
+ *   far, as high and as long, so on Plexus (345) it floats about 690 px.
  */
 
 export const FORTUNE_COOKIE = 'fortune_cookie';
@@ -226,26 +230,39 @@ export function chatCommand(text) {
   return null;
 }
 
+/** The gravity BALL_HIT.distance is measured under (config_base.js physics_configs.normal). */
+export const BALL_NORMAL_GRAVITY = 1190;
+/** How many times the normal flight the lightest street may give (the archive's lightest is 280: 4.25). */
+export const BALL_MAX_FLOAT = 5;
+
 /**
- * One hit: the ball flies BALL_HIT.distance away from the hitter, clamped to
- * the street, rising for riseFrames frames and then bouncing once at half
- * height. Reimagined around the apiHitTheBall arguments (header): the 0.3
- * peak, the 4 x riseFrames length and the easing are the remake's own.
+ * One hit: the ball flies BALL_HIT.distance away from the hitter under normal
+ * gravity, clamped to the street, rising for riseFrames frames and then
+ * bouncing once at half height. Reimagined around the apiHitTheBall arguments
+ * (header): the 0.3 peak, the 4 x riseFrames length and the easing are the
+ * remake's own. #737: under the street's `gravity` (px/s^2) the same knock
+ * goes BALL_NORMAL_GRAVITY / gravity as far, as high and as long (a launch's
+ * range, height and time all go as 1/g); `maxLift` keeps it under the
+ * street's top.
  */
-export function planBallHit(ballX, hitterX, { minX = 0, maxX = Infinity } = {}) {
+export function planBallHit(ballX, hitterX, { minX = 0, maxX = Infinity, gravity = BALL_NORMAL_GRAVITY, maxLift = Infinity } = {}) {
   const from = Number(ballX) || 0;
   const dir = (Number(hitterX) || 0) <= from ? 1 : -1;
   const lo = Math.min(minX, maxX);
   const hi = Math.max(minX, maxX);
-  const to = Math.max(lo, Math.min(hi, from + dir * BALL_HIT.distance));
+  const g = Number(gravity);
+  const float = g > 0 ? Math.min(BALL_MAX_FLOAT, BALL_NORMAL_GRAVITY / g) : 1;
+  const distance = Math.round(BALL_HIT.distance * float);
+  const to = Math.max(lo, Math.min(hi, from + dir * distance));
   const rise = BALL_HIT.riseFrames;
-  const peak = BALL_HIT.distance * 0.3;
+  const ceiling = Number(maxLift);
+  const peak = Math.min(BALL_HIT.distance * 0.3 * float, Number.isNaN(ceiling) ? Infinity : Math.max(0, ceiling));
   return {
     from,
     to,
     dir,
     // Frames: rise + fall of the main arc, then one bounce at half height.
-    frames: rise * 4,
+    frames: Math.round(rise * 4 * float),
     arc: [peak, peak * BALL_HIT.bounce],
   };
 }

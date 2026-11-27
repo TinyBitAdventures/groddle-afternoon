@@ -13,7 +13,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { STREET_SOUND, STREET_SOUND_EVERY_MS, streetSoundEvent, streetSoundsFor } from '../public/js/street-sounds-mp.js?v=c9c290e0';
 import { createEventRuntime, dueEventTimers, echoLight, runLocationEvent, sharedSoundEvents } from '../public/js/location-events.js?v=48938c8f';
-import { locationEventsApi, locationEventsFeature } from '../public/js/features/location-events-feature.js?v=13175520';
+import { locationEventsApi, locationEventsFeature } from '../public/js/features/location-events-feature.js?v=1c5b6340';
 import { streetSoundsData } from '../tools/build-realtime-street-sounds.mjs';
 import { serverPath, skipWithoutServer } from '../tools/repos.mjs';
 

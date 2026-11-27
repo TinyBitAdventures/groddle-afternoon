@@ -653,6 +653,13 @@ export const locationEventsFeature = {
     return scale.player && scale.applied !== 1 ? scale.applied : null;
   },
 
+  /** #737: the street's own gravity in px/s^2 (its setting with any event's change), null when normal. The Ball flies by it. */
+  streetGravity(engine) {
+    if (inactive(engine)) return null;
+    const g = Number(effectiveSetting(clock)?.gravity);
+    return g > 0 ? g : null;
+  },
+
   physics(engine) {
     if (inactive(engine)) return null;
     const setting = effectiveSetting(clock);

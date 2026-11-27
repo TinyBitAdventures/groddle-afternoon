@@ -1256,9 +1256,9 @@
   },
   "public/js/small-items.js": {
     "reimagined: * REIMAGINED (decision desk BALL, 2026-10-25): only the three": "ball-hit-arc",
-    "reimagined: * height. Reimagined around the apiHitTheBall arguments (header): the": "ball-hit-arc",
+    "reimagined: * bouncing once at half height. Reimagined around the apiHitTheBall": "ball-hit-arc",
     "reimagined: // source; the meanings given them below are reimagined": "ball-hit-arc",
-    "remake-own: the 4 x riseFrames length and the easing are the remake's own.": "ball-hit-arc"
+    "remake-own: * remake's own. #737: under the street's `gravity` (px/s^2) the": "ball-hit-arc"
   },
   "public/js/snaps.js": {
     "glitch-had-none: * as Glitch had no solo": "camera-solo-download",

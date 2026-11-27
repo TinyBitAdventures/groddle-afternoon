@@ -72,8 +72,8 @@ describe('Light Beam in Shim Shiri (puzzles-feature)', () => {
     globalThis.PIXI = { Sprite, Container: Display, Graphics: Display, Texture, ImageSource, Rectangle: class {} };
     globalThis.Image = class { set src(v) { this._s = v; } decode() { return Promise.resolve(); } };
     globalThis.fetch = async () => ({ json: async () => raw });
-    ({ puzzlesFeature: feature } = await import('../public/js/features/puzzles-feature.js?v=12ca7213'));
-    ({ locationEventsApi: api } = await import('../public/js/features/location-events-feature.js?v=13175520'));
+    ({ puzzlesFeature: feature } = await import('../public/js/features/puzzles-feature.js?v=054bec26'));
+    ({ locationEventsApi: api } = await import('../public/js/features/location-events-feature.js?v=1c5b6340'));
   });
 
   it('registers six Light Beam targets with Beam Up, and Beam Up fires the beam event', async () => {
