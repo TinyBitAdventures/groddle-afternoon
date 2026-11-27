@@ -1,11 +1,16 @@
 /**
  * A small DOM for the Social drawer's tests (tests/social-drawer*.test.js): elements with
  * attributes, classes, data-*, tree edits, listeners with capture and bubble, and the
- * selectors the drawer and the multiplayer features use (tag, #id, .class, [attr], [attr="v"]).
+ * selectors the drawer and the multiplayer features use (tag, #id, .class, [attr], [attr="v"], :not(simple)).
  */
 export function matches(node, sel) {
   return sel.split(',').some((one) => {
-    const m = /^([a-z]+)?(?:#([\w-]+))?((?:\.[\w-]+)*)((?:\[[^\]]+\])*)$/i.exec(one.trim());
+    // A trailing :not(simple) (drop-targets.js DROP_THROUGH '.local-chat-dock:not(.is-open)').
+    let rest = one.trim();
+    const nots = [];
+    rest = rest.replace(/:not\(([^()]+)\)/g, (_, inner) => { nots.push(inner); return ''; });
+    if (nots.some((n) => matches(node, n))) return false;
+    const m = /^([a-z]+)?(?:#([\w-]+))?((?:\.[\w-]+)*)((?:\[[^\]]+\])*)$/i.exec(rest);
     if (!m) throw new Error(`selector ${one}`);
     if (m[1] && node.tagName !== m[1].toUpperCase()) return false;
     if (m[2] && node.id !== m[2]) return false;
