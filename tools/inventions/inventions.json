@@ -6689,6 +6689,29 @@
    "ruling": "Austin 2026-11-27 (#749, compostghost's idea): build the sky and stars; stray thoughts later",
    "noCompare": "A colour shift of each street's own sky gradient and a star field drawn in code, not a picture; Tiny Speck drew no night sky to set beside it.",
    "rows": []
+  },
+  {
+   "id": "craftybot-queue-done-line",
+   "title": "The Crafty Bot says when its queue is done: one \"From Crafty-bot\" line in the activity feed when the last job finishes",
+   "kind": "behaviour",
+   "status": "kept",
+   "where": [
+    {
+     "file": "public/js/craftybot.js",
+     "symbol": "doCraftComplete queueDone"
+    },
+    {
+     "file": "public/js/craftybot.js",
+     "symbol": "CRAFTYBOT_COPY.queueDone"
+    },
+    {
+     "file": "public/js/features/craftybot-feature.js",
+     "symbol": "makeWorld queueDone"
+    }
+   ],
+   "why": "Glitch's bot never said its queue was done (npc_crafty_bot.js craftDone 1051-1090 only moved to the next job; sendCraftyMessage spoke for halts, broken tools and missing machines). Ours: when the last unfinished job of the queue makes its total, one short line, \"From Crafty-bot: All done! Your jobs are ready to collect.\", goes in the activity feed; never one per job, no modal prompt. Raising a finished job and finishing it again says so again.",
+   "ruling": "Austin 2026-11-27 (report #753): add a queue-finished notice, a short From Crafty-bot line in the activity feed",
+   "rows": []
   }
  ]
 }

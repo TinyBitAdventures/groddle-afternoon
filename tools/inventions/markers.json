@@ -276,7 +276,11 @@
     "stand-in: * street and position (the remake's stand-in for its itemstack tsid;": "ours-conversations"
   },
   "public/js/craftybot.js": {
-    "ours: // Ours: Glitch gave no words where the bot could not be": "ours-craftybot"
+    "glitch-had-none: // #753 (ours, Austin 2026-11-27): Glitch never said when the queue was done; one feed line when": "craftybot-queue-done-line",
+    "ours: // #753 (ours): the last job of the queue just finished: one": "craftybot-queue-done-line",
+    "ours: // #753 (ours, Austin 2026-11-27): Glitch never said when the": "craftybot-queue-done-line",
+    "ours: // Ours: Glitch gave no words where the bot could not be": "ours-craftybot",
+    "ours: the last job of the queue just finished (#753, ours;": "craftybot-queue-done-line"
   },
   "public/js/crowns-mp.js": {
     "stand-in: which keeps the solo game with its stand-ins": "solo-stand-ins"
@@ -386,6 +390,10 @@
   },
   "public/js/features/crabs-feature.js": {
     "ours: * G1245 (ours, Austin 2026-11-24): every tune a crab hears": "ours-vine-radio"
+  },
+  "public/js/features/craftybot-feature.js": {
+    "ours: * - #753 (ours, Austin 2026-11-27): when the last job of the": "craftybot-queue-done-line",
+    "ours: // #753 (ours): the queue's last job finished; one short line": "craftybot-queue-done-line"
   },
   "public/js/features/crowns-feature.js": {
     "no-source: // The remake's own crown-time line (no source) goes to the activity log, not the": "ours-crowns",

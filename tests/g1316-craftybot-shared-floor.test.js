@@ -30,8 +30,8 @@ import {
   serializeCraftybotState,
   setCraftybotSpecs,
   setJobTotal,
-} from '../public/js/craftybot.js?v=7096c3f6';
-import { craftybotFeature } from '../public/js/features/craftybot-feature.js?v=ef408aff';
+} from '../public/js/craftybot.js?v=06550c66';
+import { craftybotFeature } from '../public/js/features/craftybot-feature.js?v=5fb374d4';
 import { homesFeature } from '../public/js/features/homes-feature.js?v=aa371a62';
 import { dropsMpFeature } from '../public/js/features/drops-mp-feature.js?v=a34f5a9b';
 
@@ -141,7 +141,7 @@ describe('the rules: a fetch the server answers later', () => {
   });
 
   it('a Fuel Cell on the shared floor: Add More walks there and the cell fills the tank when it comes', async () => {
-    const { autoRefuel } = await import('../public/js/craftybot.js?v=7096c3f6');
+    const { autoRefuel } = await import('../public/js/craftybot.js?v=06550c66');
     const stacks = [{ id: 'f', cls: 'fuel_cell', count: 2, x: 230, shared: true }];
     const asks = [];
     const world = sharedWorld(stacks, asks);

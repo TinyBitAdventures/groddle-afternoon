@@ -30,6 +30,8 @@
  *    Online the floor's shared stacks are its too (G1316, #753): taken through
  *    the owner's pickup (drops-mp-feature craftybotSharedTake), the bot waiting
  *    for the server's word (craftybot.js fetchAnswered).
+ *  - #753 (ours, Austin 2026-11-27): when the last job of the queue finishes, one
+ *    "From Crafty-bot" line in the activity feed (world.queueDone).
  *  - The panel follows the client's CraftyDialog: the job queue with the
  *    active job pinned on top, Which tool? / Which recipe? (known recipes,
  *    no furniture, no machine recipes), the job details ("To make this I'll
@@ -93,7 +95,7 @@ import {
   setJobTotal,
   setLocked,
   setPaused,
-} from '../craftybot.js?v=7096c3f6';
+} from '../craftybot.js?v=06550c66';
 import { frameTexture, isLoaded, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js?v=b8e38103';
 import { grantMoodXp } from '../mood-xp.js?v=e311b45c';
 import { displayTopOf, itemstackOverlayPoint, playSheetOverlay } from '../overlay-art.js?v=e50bacca';
@@ -494,6 +496,12 @@ function makeWorld(engine) {
     },
     fuelCell() {
       return inLocation ? world.find('fuel_cell') : null;
+    },
+    // #753 (ours): the queue's last job finished; one short line in the activity feed.
+    queueDone() {
+      const line = `${CRAFTYBOT_COPY.promptTitle}: ${CRAFTYBOT_COPY.queueDone}`;
+      lastMsg = line;
+      engine.pushActivity?.(line);
     },
     // sendBubble: only seen when you are next to the bot.
     say(text, ms = 4000) {

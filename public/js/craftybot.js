@@ -39,6 +39,7 @@
  *   imagination(n)                  iMG to the owner (dispersed elements)
  *   say(text, ms), prompt(text), sound(key), overlay(cls)   presentation (optional)
  *   fuelCell()                      { id, x } of a Fuel Cell in the location, or null
+ *   queueDone()                     the last job of the queue just finished (#753, ours; optional)
  */
 
 /** npc_crafty_bot.js classProps / initInstanceProps. */
@@ -86,6 +87,8 @@ export const CRAFTYBOT_COPY = Object.freeze({
   noFuelCells: "You don't have any fuel cells.",
   fuelFull: 'No more fuel is needed.',
   promptTitle: 'From Crafty-bot',
+  // #753 (ours, Austin 2026-11-27): Glitch never said when the queue was done; one feed line when it is.
+  queueDone: 'All done! Your jobs are ready to collect.',
   haltedStep: "You'll need more fuel to continue this job.",
   noQueue: 'Craftybot isn’t working on anything right now.',
   noQueueCta: 'Why not give it a job to do?',
@@ -1278,12 +1281,19 @@ function doCraftComplete(bot, world, i) {
   }
   unhold(bot, bot.active, cls, count);
   hold(bot, bot.active, cls, count, 'complete');
+  const wasDone = queueDone(bot);
   row.crafted += count;
   bot.stats.crafted += count;
   world.crafted?.(cls, count);
+  // #753 (ours): the last job of the queue just finished: one word, never one per job.
+  if (!wasDone && queueDone(bot)) world.queueDone?.();
   craftDone(bot, world, true);
 }
 
+/** Every job in the queue has made its total (#753). */
+function queueDone(bot) {
+  return bot.queue.length > 0 && bot.queue.every((row) => row.crafted >= row.count);
+}
 
 function craftDone(bot, world, continueIteration) {
   bot.crafting = false;
