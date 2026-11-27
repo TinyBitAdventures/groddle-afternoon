@@ -2814,9 +2814,14 @@
   "deployed": "2026-11-26"
  },
  "git": {
-  "commits": 3759,
+  "commits": 3761,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-26",
+    "kind": "new",
+    "text": "Glitch's Random Hole: touch one and you pop out of another hole on the same street"
+   },
    {
     "date": "2026-11-26",
     "kind": "improve",
@@ -2931,14 +2936,9 @@
     "date": "2026-11-26",
     "kind": "new",
     "text": "A browser zoomed far out gets one notice saying how to reset it"
-   },
-   {
-    "date": "2026-11-26",
-    "kind": "fix",
-    "text": "Change Style tile pictures draw on an iPad, and the furniture and house pickers get the same guard"
    }
   ]
  },
- "tests": 1457,
+ "tests": 1458,
  "generatedAt": "2026-11-26"
 }
