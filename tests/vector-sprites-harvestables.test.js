@@ -9,7 +9,7 @@ import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { FIRST_DRAW_SPRITES, HIRES_SPRITES, hiresSpriteUrl } from '../public/js/sprite-hires.js?v=e96be5f1';
+import { FIRST_DRAW_SPRITES, HIRES_SPRITES, hiresSpriteUrl } from '../public/js/sprite-hires.js?v=dd070ce8';
 import { fruitState } from '../tools/vector-sprites/trant-states.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -19,7 +19,7 @@ const sheets = manifest.jobs.flatMap((job) => job.sheets.map((sheet) => ({ job, 
 
 /** Sheets that must stay sharp (the 1x art they replace is in every world). */
 const SHARP = [
-  ...['bean', 'bubble', 'egg', 'fruit', 'gas', 'spice'].flatMap((s) => [1, 3, 5, 7, 10].map((m) => `assets/sprites/trants/frames/trant_${s}_m${m}.webp`)),
+  ...['bean', 'bubble', 'egg', 'fruit', 'gas', 'spice'].flatMap((s) => [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((m) => `assets/sprites/trants/frames/trant_${s}_m${m}.webp`)),
   ...['bean', 'bubble', 'egg', 'fruit', 'gas', 'spice'].map((s) => `assets/sprites/soil/trant-${s}-dead.webp`),
   ...['patch', 'patch-dark'].flatMap((k) => ['dirty', 'clean', 'dug'].map((s) => `assets/sprites/soil/${k}-${s}.webp`)),
   'assets/sprites/soil/patch-seedling.webp',
@@ -75,9 +75,15 @@ describe('3x harvestables', () => {
     assert.deepEqual(manifest.jobs.filter((j) => j.minScore != null).map((j) => j.name), ['ice-knob-knob1', 'ice-knob-knob2', 'ice-knob-knob3', 'ice-knob-knob4']);
   });
 
-  it('trant stills are one cell each, pinned to the health-10 frame of their maturity clip', () => {
+  it('trant stills are one cell each, pinned to the health-10 frame of their maturity clip (#735: all ten)', () => {
     const trants = manifest.jobs.filter((j) => /^trant-\w+-m\d+$/.test(j.name));
-    assert.equal(trants.length, 30);
+    assert.equal(trants.length, 60);
+    // The five maturities with no OGA cell are drawn from the SWF (trant-fruit-levels.mjs).
+    assert.deepEqual(trants.filter((j) => j.drawn).map((j) => Number(j.name.split('-m')[1])).sort((a, b) => a - b), [2, 2, 2, 2, 2, 2, 4, 4, 4, 4, 4, 4, 6, 6, 6, 6, 6, 6, 8, 8, 8, 8, 8, 8, 9, 9, 9, 9, 9, 9]);
+    // Each bare still is drawn on its full one's canvas (state.anchor), so the fruit pieces line up.
+    for (const j of manifest.jobs.filter((x) => /^trant-\w+-m\d+-f0$/.test(x.name))) {
+      assert.deepEqual(j.state.anchor, manifest.jobs.find((x) => x.name === j.name.replace(/-f0$/, '')).state?.set ?? {}, j.name);
+    }
     for (const job of trants) {
       const [sheet] = job.sheets;
       assert.equal(sheet.frames, 1, job.name);

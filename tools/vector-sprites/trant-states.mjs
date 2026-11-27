@@ -3,10 +3,13 @@
  * Build the living-trant jobs of tools/vector-sprites/harvestables.json from
  * the trant SWFs and their ActionScript (glitch-items, CC0).
  *
- * The game draws one still per species and maturity stage
- * (assets/sprites/trants/frames/trant_<species>_m<1|3|5|7|10>.png), each the
- * OGA render of setState({ h: 10, m, f_cap: 10, f_num: 10, seed }). The
- * client's updateTrantDisplay() picks that look in code, so each job names
+ * The game draws one still per species and maturity 1-10
+ * (assets/sprites/trants/frames/trant_<species>_m<1-10>.webp): maturities 1,
+ * 3, 5, 7 and 10 are the OGA renders of setState({ h: 10, m, f_cap: 10,
+ * f_num: 10, seed }); #735: the other five have no OGA cell and are drawn
+ * from the SWF (trant-fruit-levels.mjs), as Glitch drew every maturity clip
+ * (`drawn` jobs). The client's updateTrantDisplay() picks that look in
+ * code, so each job names
  * the maturity clip, the frame the health puts it on, and the child clips
  * the code sets (swf-state.mjs freezes them):
  *  - bean: grow clip and its branch1-8 gotoAndStop(health);
@@ -17,13 +20,17 @@
  *    them (FRUIT_HEALTH9_LEAVES); cherries shown on frame id % 3 + 1 up to
  *    the health-10 fruit count, the rest hidden (see fruitState).
  *
- * Report #545: each stage that bears fruit also gets the same plant holding
- * less of it (FRUIT_LEVELS: trant_<species>_m<stage>_f0 bare, _f1 half), as
- * updateTrantDisplay() shows fruit_amt (f_num / f_cap) of its fruit slots:
- * the fruit tree's cherry_N up to floor(fruit_amt * slots), the others'
- * bean_N, bubble_N, egg_N (its egg, not the stalk), flask_N and fruit_N up
- * to ceil(fruit_amt * slots), the rest hidden (fruitLevelState). Those 1x
- * files are not OGA cells: trant-fruit-levels.mjs draws them from the SWF.
+ * Reports #545, #735: each stage that bears fruit also comes bare
+ * (trant_<species>_m<stage>_f0), and every fruit count between bare and full
+ * is drawn on the bare still from pieces (trant-fruit-levels.mjs), as
+ * updateTrantDisplay() shows fruit_amt (f_num / f_cap) of the slots its
+ * health allows (fruitSlots): the fruit tree's cherry_N up to
+ * floor(fruit_amt * slots), the others' bean_N, bubble_N, egg_N (its egg,
+ * not the stalk), flask_N and fruit_N, the first ceil(fruit_amt * slots) of
+ * them, the rest hidden (fruitShownState). The bare state is drawn on the
+ * full one's canvas (state.anchor, swf-state.mjs), so every count lines up
+ * to the pixel. Those 1x files are not OGA cells: trant-fruit-levels.mjs
+ * draws them from the SWF.
  *
  * Usage: node tools/vector-sprites/trant-states.mjs [--write]
  */
@@ -40,7 +47,10 @@ const HERE = dirname(fileURLToPath(import.meta.url));
 const ITEMS = join(os.homedir(), 'Documents/glitch-audit/glitch-items');
 const MANIFEST = join(HERE, 'harvestables.json');
 const HEALTH = 10;
-const STAGES = [1, 3, 5, 7, 10];
+/** #735: every maturity Glitch drew (one clip each, trees[maturity - 1]). */
+export const STAGES = Object.freeze([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+/** The maturities with an OGA cell (the 1x still is Tiny Speck's own render). */
+export const OGA_STAGES = Object.freeze([1, 3, 5, 7, 10]);
 
 const SPECIES = {
   bean: { swf: 'harvestable_resources/bean_tree/trant_bean.swf', cell: [198, 270] },
@@ -76,17 +86,20 @@ export const FRUIT_HEALTH9_LEAVES = Object.freeze({
  * cherries follow the client code: shown up to the health-10 fruit count on
  * frame id % 3 + 1, the rest hidden.
  */
+const MAXCHERRY = [0, 0, 0, 4, 8, 10, 15, 20, 25, 30];
+const CHERRY_TOP = {
+  4: [0, 0, 0, 0, 1, 1, 1, 2, 3, 4],
+  5: [0, 0, 0, 1, 1, 1, 2, 4, 6, 8],
+  6: [0, 0, 0, 1, 2, 2, 4, 6, 8, 10],
+  7: [0, 0, 0, 1, 2, 3, 6, 8, 10, 15],
+  8: [0, 0, 0, 2, 2, 3, 6, 10, 12, 20],
+  9: [0, 0, 0, 2, 3, 4, 8, 12, 15, 25],
+  10: [0, 0, 0, 2, 3, 5, 10, 15, 20, 30],
+};
+
 export function fruitState(children, maturity, health = HEALTH, fruitAmt = 1) {
-  const maxcherrya = [0, 0, 0, 4, 8, 10, 15, 20, 25, 30];
-  const cherryTop = {
-    4: [0, 0, 0, 0, 1, 1, 1, 2, 3, 4],
-    5: [0, 0, 0, 1, 1, 1, 2, 4, 6, 8],
-    6: [0, 0, 0, 1, 2, 2, 4, 6, 8, 10],
-    7: [0, 0, 0, 1, 2, 3, 6, 8, 10, 15],
-    8: [0, 0, 0, 2, 2, 3, 6, 10, 12, 20],
-    9: [0, 0, 0, 2, 3, 4, 8, 12, 15, 25],
-    10: [0, 0, 0, 2, 3, 5, 10, 15, 20, 30],
-  };
+  const maxcherrya = MAXCHERRY;
+  const cherryTop = CHERRY_TOP;
   const set = {};
   const nine = new Set(FRUIT_HEALTH9_LEAVES[maturity] || []);
   for (const c of children) {
@@ -104,26 +117,77 @@ export function fruitState(children, maturity, health = HEALTH, fruitAmt = 1) {
   return set;
 }
 
-/** Report #545: the fruit states drawn besides full (fruit_amt), named by file suffix. */
-export const FRUIT_LEVELS = Object.freeze([['f0', 0], ['f1', 0.5]]);
-
 /** Each species' fruit clip names (updateTrantDisplay in its .as); the fruit tree's are cherry_N. */
 export const FRUIT_CLIPS = Object.freeze({ bean: 'bean_', bubble: 'bubble_', egg: 'egg_', fruit: 'cherry_', gas: 'flask_', spice: 'fruit_' });
 
+/** #735: how fruit_amt of the slots rounds (updateTrantDisplay): the fruit tree floors (`>> 0`), the others Math.ceil. */
+export const FRUIT_ROUNDING = Object.freeze({ bean: 'ceil', bubble: 'ceil', egg: 'ceil', fruit: 'floor', gas: 'ceil', spice: 'ceil' });
+
+/** `case N: return [..]` rows of a fruitPosArray(i) in an .as file: slots[maturity - 1][health - 1]. */
+function fruitPosArray(src) {
+  const rows = [];
+  for (const m of src.matchAll(/case (\d+):\s*return \[([^\]]*)\]/g)) rows[Number(m[1]) - 1] = m[2].split(',').map(Number);
+  return rows;
+}
+
 /**
- * The fruit a plant shows at fruit_amt `amt` (0-1), added to its full state `set`: the first
- * ceil(amt * slots) fruit clips by number stay, the rest are hidden (null; the egg plant's
- * egg_N keeps its stalk and hides its egg). The fruit tree is fruitState's (floor). Null when
- * this stage has no fruit.
+ * #735: Glitch's fruit slots by maturity and health, slots[maturity - 1][health - 1]: how many fruit
+ * clips a tree that healthy can show (updateTrantDisplay). The fruit, bubble, gas and spice trees
+ * keep them in fruitPosArray() of their .as; the bean and egg trees in each maturity clip's
+ * getFruitingPos() (fruitPos / fruitingPos, set on its frame 1). Maturities 1-3 have none.
  */
-export function fruitLevelState(species, children, maturity, set, amt) {
+export function fruitSlots(species) {
+  const def = SPECIES[species];
+  if (!def) throw new Error(`no trant ${species}`);
+  if (species === 'bean' || species === 'egg') {
+    const swf = join(ITEMS, def.swf);
+    const dir = exportScripts(swf);
+    try {
+      const grows = growSprites(species, swf);
+      return STAGES.map((m) => {
+        const file = findFile(dir, `${grows[m].cls}.as`);
+        const hit = file && /this\.fruit(?:ing)?Pos = \[([^\]]*)\]/.exec(readFileSync(file, 'utf8'));
+        return hit ? hit[1].split(',').map(Number) : Array(10).fill(0);
+      });
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+    }
+  }
+  const src = readFileSync(join(ITEMS, def.swf.replace(/\.swf$/, '.as')), 'utf8');
+  if (species === 'fruit') return STAGES.map((m) => (CHERRY_TOP[m] ? [...CHERRY_TOP[m]] : Array(10).fill(0)));
+  const rows = fruitPosArray(src);
+  return STAGES.map((m) => rows[m - 1] || Array(10).fill(0));
+}
+
+/**
+ * #735: the fruit clip ids of one maturity a health-10 tree can show, in the order Glitch counts
+ * them (updateTrantDisplay walks id 1 up, the egg plant from 0, and counts only clips that exist):
+ * showing k fruit shows the first k of these. The fruit tree's cherries are bounded by maxcherrya.
+ */
+export function fruitIds(species, children, maturity, slots) {
   const prefix = FRUIT_CLIPS[species];
-  const ids = [...new Set(children.filter((c) => c.name.startsWith(prefix) && /^\d+$/.test(c.name.slice(prefix.length))).map((c) => Number(c.name.slice(prefix.length))))].sort((a, b) => a - b);
-  if (!ids.length) return null;
-  if (species === 'fruit') return { ...set, ...fruitState(children, maturity, HEALTH, amt) };
+  const top = slots[maturity - 1]?.[HEALTH - 1] ?? 0;
+  const max = species === 'fruit' ? Math.min(top, MAXCHERRY[maturity - 1]) : top;
+  const from = species === 'egg' ? 0 : 1;
+  return [...new Set(children.filter((c) => c.name.startsWith(prefix) && /^\d+$/.test(c.name.slice(prefix.length))).map((c) => Number(c.name.slice(prefix.length))))]
+    .filter((id) => id >= from && id <= max)
+    .sort((a, b) => a - b);
+}
+
+/**
+ * #735: a stage's state `set` (its full health-10 look) showing only the first `k` of `ids`: the
+ * rest hidden (null; the egg plant's egg_N keeps its stalk and hides its egg). Cherries shown sit
+ * on frame id % 3 + 1 (fruitState). Clips past the health-10 slots are left as the full look has them.
+ */
+export function fruitShownState(species, set, ids, k) {
+  const prefix = FRUIT_CLIPS[species];
   const out = { ...set };
-  const shown = Math.ceil(amt * ids.length);
-  for (const id of ids.slice(shown)) out[`${prefix}${id}`] = species === 'egg' ? { frame: 1, drop: ['egg'] } : null;
+  ids.forEach((id, i) => {
+    const name = `${prefix}${id}`;
+    if (i < k) out[name] = species === 'fruit' ? (id % 3) + 1 : out[name];
+    else out[name] = species === 'egg' ? { frame: 1, drop: ['egg'] } : null;
+    if (out[name] === undefined) delete out[name];
+  });
   return out;
 }
 
@@ -176,11 +240,16 @@ function growSprites(species, swf) {
   return out;
 }
 
-export function trantJobs() {
-  const jobs = [];
+/**
+ * #735: every species and maturity with what drawing it needs: the maturity clip, the health-10
+ * frame, its full `set`, the fruit `ids` (fruitIds) and the stills' cell.
+ */
+export function trantStages() {
+  const out = [];
   for (const [species, def] of Object.entries(SPECIES)) {
     const swf = join(ITEMS, def.swf);
     const grows = growSprites(species, swf);
+    const slots = fruitSlots(species);
     const asDir = species === 'bubble' ? exportScripts(swf) : null;
     try {
       for (const m of STAGES) {
@@ -202,33 +271,39 @@ export function trantJobs() {
         } else if (species === 'fruit') {
           set = fruitState(children, m);
         }
-        const [fw, fh] = def.cell;
-        jobs.push({
-          name: `trant-${species}-m${m}`,
-          swf: def.swf,
-          sprite: grow.id,
-          ...(def.renderer ? { renderer: def.renderer } : {}),
-          ...(Object.keys(set).length ? { state: { set } } : {}),
-          sheets: [{ path: `assets/sprites/trants/frames/trant_${species}_m${m}.webp`, fw, fh, cols: 1, frames: 1, swfStart: frame, swfCount: 1, mirror: false }],
-        });
-        // Report #545: the same plant with less fruit.
-        for (const [suffix, amt] of FRUIT_LEVELS) {
-          const less = fruitLevelState(species, children, m, set, amt);
-          if (!less) continue;
-          jobs.push({
-            name: `trant-${species}-m${m}-${suffix}`,
-            swf: def.swf,
-            sprite: grow.id,
-            ...(def.renderer ? { renderer: def.renderer } : {}),
-            state: { set: less },
-            fruitOf: `assets/sprites/trants/frames/trant_${species}_m${m}.webp`,
-            sheets: [{ path: `assets/sprites/trants/frames/trant_${species}_m${m}_${suffix}.webp`, fw, fh, cols: 1, frames: 1, swfStart: frame, swfCount: 1, mirror: false, shift: 0 }],
-          });
-        }
+        const ids = fruitIds(species, children, m, slots);
+        out.push({ species, maturity: m, swf: def.swf, sprite: grow.id, renderer: def.renderer || null, cell: def.cell, frame, set: fruitShownState(species, set, ids, ids.length), ids, slots, oga: OGA_STAGES.includes(m) });
       }
     } finally {
       if (asDir) rmSync(asDir, { recursive: true, force: true });
     }
+  }
+  return out;
+}
+
+export function trantJobs(stages = trantStages()) {
+  const jobs = [];
+  for (const st of stages) {
+    const { species, maturity: m, cell: [fw, fh], frame } = st;
+    const base = { swf: st.swf, sprite: st.sprite, ...(st.renderer ? { renderer: st.renderer } : {}) };
+    const plain = `assets/sprites/trants/frames/trant_${species}_m${m}.webp`;
+    jobs.push({
+      name: `trant-${species}-m${m}`,
+      ...base,
+      ...(Object.keys(st.set).length ? { state: { set: st.set } } : {}),
+      // #735: no OGA cell; trant-fruit-levels.mjs draws the 1x still from the SWF.
+      ...(st.oga ? {} : { drawn: true }),
+      sheets: [{ path: plain, fw, fh, cols: 1, frames: 1, swfStart: frame, swfCount: 1, mirror: false }],
+    });
+    // Reports #545, #735: the same plant bare, on the full one's canvas.
+    if (!st.ids.length) continue;
+    jobs.push({
+      name: `trant-${species}-m${m}-f0`,
+      ...base,
+      state: { set: fruitShownState(species, st.set, st.ids, 0), anchor: st.set },
+      fruitOf: plain,
+      sheets: [{ path: `assets/sprites/trants/frames/trant_${species}_m${m}_f0.webp`, fw, fh, cols: 1, frames: 1, swfStart: frame, swfCount: 1, mirror: false, shift: 0 }],
+    });
   }
   return jobs;
 }

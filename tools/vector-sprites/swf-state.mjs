@@ -15,7 +15,11 @@
  *    the egg's stalk);
  *  - `pad: n` appends n frames holding the last frame's display list, so the
  *    sprite's frame F + k draws its still-playing children k frames later
- *    (fruit and bubbles animate on a stopped tree).
+ *    (fruit and bubbles animate on a stopped tree);
+ *  - `anchor: { ... }` (a `set` of the same kind) also places that state of
+ *    the sprite, fully transparent, so this state gets its bounds and FFDec
+ *    draws both on one canvas at the same sub-pixel phase (#735: a trant's
+ *    bare still under its fruit pieces, freezeStates).
  *
  * Usage (from build.mjs, job "state": { "set": {...}, "pad": n }):
  *   freezeState(inFile, outFile, spriteId, { set, pad })
@@ -187,18 +191,49 @@ function frozenSprite(buf, src, frame, newId, drop = []) {
  * Write `outFile`: `inFile` with sprite `spriteId`'s named children frozen
  * (or dropped) and `pad` frames appended. Returns a report of what changed.
  */
-export function freezeState(inFile, outFile, spriteId, { set = {}, pad = 0 } = {}) {
+export function freezeState(inFile, outFile, spriteId, { set = {}, pad = 0, anchor = null } = {}) {
   const buf = inflate(readFileSync(inFile));
   const sprites = spriteTable(buf);
   const target = sprites.get(spriteId);
   if (!target) throw new Error(`no DefineSprite ${spriteId} in ${inFile}`);
+  const ctx = { frozen: new Map(), newTags: [], nextId: FIRST_NEW_ID };
+  let { body, report } = stateBody(buf, sprites, target, set, ctx);
+  if (anchor) {
+    // #735: the bounds of another state (freezeStates' anchor), so this one shares its canvas.
+    const a = stateBody(buf, sprites, target, anchor, ctx).body;
+    const id = ctx.nextId++;
+    a.writeUInt16LE(id, 0);
+    ctx.newTags.push(tagBytes(SPRITE, a));
+    body = withAnchor(body, id);
+  }
+  // Pad: n more ShowFrames before the End tag.
+  let spriteBody = body;
+  if (pad > 0) {
+    const end = target.nested[target.nested.length - 1];
+    const cut = end.code === 0 ? end.start - target.tag.body : body.length;
+    spriteBody = Buffer.concat([body.subarray(0, cut), Buffer.alloc(pad * 2, 0), body.subarray(cut)]);
+    for (let i = 0; i < pad; i++) spriteBody.writeUInt16LE(SHOW_FRAME << 6, cut + i * 2);
+    spriteBody.writeUInt16LE(target.frames + pad, 2);
+  }
+  const out = Buffer.concat([
+    buf.subarray(0, target.tag.start),
+    ...ctx.newTags,
+    tagBytes(SPRITE, spriteBody),
+    buf.subarray(target.tag.end),
+  ]);
+  out.writeUInt32LE(out.length, 4);
+  writeFileSync(outFile, out);
+  return report;
+}
+
+/**
+ * A copy of `target`'s DefineSprite body with `set` applied (frozen children placed, null ones
+ * dropped); new frozen child sprites go to ctx.newTags, shared between calls through ctx.frozen.
+ */
+function stateBody(buf, sprites, target, set, ctx) {
   const wanted = new Map(Object.entries(set));
-  const frozen = new Map(); // `${char}:${frame}` -> new id
-  const newTags = [];
   const report = { placements: 0, dropped: 0, frozen: 0, missing: [] };
   const seen = new Set();
-  let nextId = FIRST_NEW_ID;
-  // Rewrite the target sprite's nested tags in a copy of its body.
   const body = Buffer.from(buf.subarray(target.tag.body, target.tag.end));
   const rel = (abs) => abs - target.tag.body;
   for (const t of target.nested) {
@@ -217,34 +252,71 @@ export function freezeState(inFile, outFile, spriteId, { set = {}, pad = 0 } = {
     const src = sprites.get(pl.char);
     if (!src) throw new Error(`${pl.name} places character ${pl.char}, not a sprite`);
     const key = `${pl.char}:${frame}:${drop.join(',')}`;
-    if (!frozen.has(key)) {
-      const id = nextId++;
-      frozen.set(key, id);
-      newTags.push(frozenSprite(buf, src, frame, id, drop));
+    if (!ctx.frozen.has(key)) {
+      const id = ctx.nextId++;
+      ctx.frozen.set(key, id);
+      ctx.newTags.push(frozenSprite(buf, src, frame, id, drop));
       report.frozen += 1;
     }
-    body.writeUInt16LE(frozen.get(key), rel(pl.charAt));
+    body.writeUInt16LE(ctx.frozen.get(key), rel(pl.charAt));
     report.placements += 1;
   }
   report.missing = [...wanted.keys()].filter((n) => !seen.has(n));
-  // Pad: n more ShowFrames before the End tag.
-  let spriteBody = body;
-  if (pad > 0) {
-    const end = target.nested[target.nested.length - 1];
-    const cut = end.code === 0 ? rel(end.start) : body.length;
-    spriteBody = Buffer.concat([body.subarray(0, cut), Buffer.alloc(pad * 2, 0), body.subarray(cut)]);
-    for (let i = 0; i < pad; i++) spriteBody.writeUInt16LE(SHOW_FRAME << 6, cut + i * 2);
-    spriteBody.writeUInt16LE(target.frames + pad, 2);
+  return { body, report };
+}
+
+/** Depth of freezeStates' bounds anchor (above anything a timeline places). */
+const ANCHOR_DEPTH = 65000;
+
+/**
+ * A sprite body (id, frame count, tags) that also places character `id` on frame 1, fully
+ * transparent: PlaceObject2 with HasColorTransform | HasCharacter, ANCHOR_DEPTH, `id`, and a
+ * CXFORMWITHALPHA of 1-bit multiply terms, all 0. It draws nothing but counts in the bounds.
+ */
+function withAnchor(body, id) {
+  const place = Buffer.from([0, 0, 0x0a, 0, 0, 0, 0, 0x44, 0x00]);
+  place.writeUInt16LE((PLACE2 << 6) | 7, 0);
+  place.writeUInt16LE(ANCHOR_DEPTH, 3);
+  place.writeUInt16LE(id, 5);
+  return Buffer.concat([body.subarray(0, 4), place, body.subarray(4)]);
+}
+
+/**
+ * #735: many states of sprite `spriteId` in one work copy, so FFDec draws them all in one export.
+ * Each state becomes a new DefineSprite (a copy of the sprite with its `set` frozen, as
+ * freezeState); the ids come back in the order given. With `anchor`, every state but the first
+ * also places the first one, fully transparent (alpha multiplier 0): it draws nothing but gives
+ * every state the first one's bounds, so FFDec puts them all on the same canvas at the same
+ * sub-pixel phase (a state with less fruit has smaller bounds, and its outlines would otherwise
+ * land a fraction of a pixel off). The first state must cover the others (the most fruit).
+ */
+export function freezeStates(inFile, outFile, spriteId, states, { anchor = true } = {}) {
+  const buf = inflate(readFileSync(inFile));
+  const sprites = spriteTable(buf);
+  const target = sprites.get(spriteId);
+  if (!target) throw new Error(`no DefineSprite ${spriteId} in ${inFile}`);
+  const ctx = { frozen: new Map(), newTags: [], nextId: FIRST_NEW_ID };
+  const bodies = [];
+  const ids = [];
+  const missing = new Set();
+  for (const set of states) {
+    const { body, report } = stateBody(buf, sprites, target, set || {}, ctx);
+    for (const m of report.missing) missing.add(m);
+    const id = ctx.nextId++;
+    body.writeUInt16LE(id, 0);
+    ids.push(id);
+    bodies.push(body);
   }
+  const variants = bodies.map((body, i) => tagBytes(SPRITE, !anchor || i === 0 ? body : withAnchor(body, ids[0])));
   const out = Buffer.concat([
     buf.subarray(0, target.tag.start),
-    ...newTags,
-    tagBytes(SPRITE, spriteBody),
-    buf.subarray(target.tag.end),
+    ...ctx.newTags,
+    ...variants,
+    buf.subarray(target.tag.start),
   ]);
   out.writeUInt32LE(out.length, 4);
   writeFileSync(outFile, out);
-  return report;
+  return { ids, missing: [...missing] };
 }
 
 /** Named placements on the root timeline: [{ name, char, frames }]. */

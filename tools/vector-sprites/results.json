@@ -16875,17 +16875,17 @@
    141,
    267
   ],
-  "score": 0.935,
-  "minFrame": 0.935,
+  "score": 0.9349,
+  "minFrame": 0.9349,
   "faintFrames": 0,
   "faintMin": 1,
   "drift": [],
   "status": "ok",
   "hires": "assets/sprites/trants/frames/trant_bubble_m5@3x.webp",
-  "bytes": 82750,
+  "bytes": 82828,
   "firstDraw": true,
   "frameScores": [
-   0.935
+   0.9349
   ]
  },
  "assets/sprites/trants/frames/trant_bubble_m7.webp": {
@@ -16907,17 +16907,17 @@
    68,
    204
   ],
-  "score": 0.9364,
-  "minFrame": 0.9364,
+  "score": 0.9363,
+  "minFrame": 0.9363,
   "faintFrames": 0,
   "faintMin": 1,
   "drift": [],
   "status": "ok",
   "hires": "assets/sprites/trants/frames/trant_bubble_m7@3x.webp",
-  "bytes": 136926,
+  "bytes": 137360,
   "firstDraw": true,
   "frameScores": [
-   0.9364
+   0.9363
   ]
  },
  "assets/sprites/trants/frames/trant_bubble_m10.webp": {
@@ -16939,17 +16939,17 @@
    0,
    1
   ],
-  "score": 0.9385,
-  "minFrame": 0.9385,
+  "score": 0.9384,
+  "minFrame": 0.9384,
   "faintFrames": 0,
   "faintMin": 1,
   "drift": [],
   "status": "ok",
   "hires": "assets/sprites/trants/frames/trant_bubble_m10@3x.webp",
-  "bytes": 250370,
+  "bytes": 250436,
   "firstDraw": true,
   "frameScores": [
-   0.9385
+   0.9384
   ]
  },
  "assets/sprites/trants/frames/trant_egg_m1.webp": {
@@ -70344,7 +70344,7 @@
   "mirror": false,
   "shift": 0,
   "offset3x": [
-   106,
+   102,
    405
   ],
   "score": 0.9995,
@@ -70354,7 +70354,7 @@
   "drift": [],
   "status": "ok",
   "hires": "assets/sprites/trants/frames/trant_bean_m5_f0@3x.webp",
-  "bytes": 29896,
+  "bytes": 29910,
   "firstDraw": true,
   "frameScores": [
    0.9995
@@ -70376,7 +70376,7 @@
   "mirror": false,
   "shift": 0,
   "offset3x": [
-   42,
+   36,
    264
   ],
   "score": 0.9995,
@@ -70386,7 +70386,7 @@
   "drift": [],
   "status": "ok",
   "hires": "assets/sprites/trants/frames/trant_bean_m7_f0@3x.webp",
-  "bytes": 47286,
+  "bytes": 47560,
   "firstDraw": true,
   "frameScores": [
    0.9995
@@ -70408,7 +70408,7 @@
   "mirror": false,
   "shift": 0,
   "offset3x": [
-   3,
+   -4,
    2
   ],
   "score": 0.9996,
@@ -70418,7 +70418,7 @@
   "drift": [],
   "status": "ok",
   "hires": "assets/sprites/trants/frames/trant_bean_m10_f0@3x.webp",
-  "bytes": 79936,
+  "bytes": 81834,
   "firstDraw": true,
   "frameScores": [
    0.9996
@@ -70450,7 +70450,7 @@
   "drift": [],
   "status": "ok",
   "hires": "assets/sprites/trants/frames/trant_bubble_m5_f0@3x.webp",
-  "bytes": 55958,
+  "bytes": 56166,
   "firstDraw": true,
   "frameScores": [
    0.9991
@@ -70472,20 +70472,20 @@
   "mirror": false,
   "shift": 0,
   "offset3x": [
-   79,
+   68,
    204
   ],
-  "score": 0.9992,
-  "minFrame": 0.9992,
+  "score": 0.9991,
+  "minFrame": 0.9991,
   "faintFrames": 0,
   "faintMin": 1,
   "drift": [],
   "status": "ok",
   "hires": "assets/sprites/trants/frames/trant_bubble_m7_f0@3x.webp",
-  "bytes": 85440,
+  "bytes": 85784,
   "firstDraw": true,
   "frameScores": [
-   0.9992
+   0.9991
   ]
  },
  "assets/sprites/trants/frames/trant_bubble_m10_f0.webp": {
@@ -70514,7 +70514,7 @@
   "drift": [],
   "status": "ok",
   "hires": "assets/sprites/trants/frames/trant_bubble_m10_f0@3x.webp",
-  "bytes": 151936,
+  "bytes": 151892,
   "firstDraw": true,
   "frameScores": [
    0.9992
@@ -70537,7 +70537,7 @@
   "shift": 0,
   "offset3x": [
    221,
-   331
+   298
   ],
   "score": 0.9995,
   "minFrame": 0.9995,
@@ -70546,7 +70546,7 @@
   "drift": [],
   "status": "ok",
   "hires": "assets/sprites/trants/frames/trant_egg_m5_f0@3x.webp",
-  "bytes": 71994,
+  "bytes": 71782,
   "firstDraw": true,
   "frameScores": [
    0.9995
@@ -70569,7 +70569,7 @@
   "shift": 0,
   "offset3x": [
    182,
-   298
+   265
   ],
   "score": 0.9995,
   "minFrame": 0.9995,
@@ -70578,7 +70578,7 @@
   "drift": [],
   "status": "ok",
   "hires": "assets/sprites/trants/frames/trant_egg_m7_f0@3x.webp",
-  "bytes": 103954,
+  "bytes": 104220,
   "firstDraw": true,
   "frameScores": [
    0.9995
@@ -70601,7 +70601,7 @@
   "shift": 0,
   "offset3x": [
    2,
-   34
+   0
   ],
   "score": 0.9995,
   "minFrame": 0.9995,
@@ -70610,7 +70610,7 @@
   "drift": [],
   "status": "ok",
   "hires": "assets/sprites/trants/frames/trant_egg_m10_f0@3x.webp",
-  "bytes": 204866,
+  "bytes": 205166,
   "firstDraw": true,
   "frameScores": [
    0.9995
@@ -70899,582 +70899,6 @@
   "status": "ok",
   "hires": "assets/sprites/trants/frames/trant_spice_m10_f0@3x.webp",
   "bytes": 122816,
-  "firstDraw": true,
-  "frameScores": [
-   0.9998
-  ]
- },
- "assets/sprites/trants/frames/trant_bean_m5_f1.webp": {
-  "animal": "trant-bean-m5-f1",
-  "swf": "harvestable_resources/bean_tree/trant_bean.swf",
-  "sprite": 112,
-  "label": null,
-  "swfFrames": [
-   10,
-   10
-  ],
-  "swfLabelFrames": 1,
-  "cells": 1,
-  "fw": 198,
-  "fh": 270,
-  "mirror": false,
-  "shift": 0,
-  "offset3x": [
-   102,
-   405
-  ],
-  "score": 0.9994,
-  "minFrame": 0.9994,
-  "faintFrames": 0,
-  "faintMin": 1,
-  "drift": [],
-  "status": "ok",
-  "hires": "assets/sprites/trants/frames/trant_bean_m5_f1@3x.webp",
-  "bytes": 37882,
-  "firstDraw": true,
-  "frameScores": [
-   0.9994
-  ]
- },
- "assets/sprites/trants/frames/trant_bean_m7_f1.webp": {
-  "animal": "trant-bean-m7-f1",
-  "swf": "harvestable_resources/bean_tree/trant_bean.swf",
-  "sprite": 89,
-  "label": null,
-  "swfFrames": [
-   10,
-   10
-  ],
-  "swfLabelFrames": 1,
-  "cells": 1,
-  "fw": 198,
-  "fh": 270,
-  "mirror": false,
-  "shift": 0,
-  "offset3x": [
-   36,
-   264
-  ],
-  "score": 0.9995,
-  "minFrame": 0.9995,
-  "faintFrames": 0,
-  "faintMin": 1,
-  "drift": [],
-  "status": "ok",
-  "hires": "assets/sprites/trants/frames/trant_bean_m7_f1@3x.webp",
-  "bytes": 55718,
-  "firstDraw": true,
-  "frameScores": [
-   0.9995
-  ]
- },
- "assets/sprites/trants/frames/trant_bean_m10_f1.webp": {
-  "animal": "trant-bean-m10-f1",
-  "swf": "harvestable_resources/bean_tree/trant_bean.swf",
-  "sprite": 29,
-  "label": null,
-  "swfFrames": [
-   10,
-   10
-  ],
-  "swfLabelFrames": 1,
-  "cells": 1,
-  "fw": 198,
-  "fh": 270,
-  "mirror": false,
-  "shift": 0,
-  "offset3x": [
-   -4,
-   2
-  ],
-  "score": 0.9996,
-  "minFrame": 0.9996,
-  "faintFrames": 0,
-  "faintMin": 1,
-  "drift": [],
-  "status": "ok",
-  "hires": "assets/sprites/trants/frames/trant_bean_m10_f1@3x.webp",
-  "bytes": 99732,
-  "firstDraw": true,
-  "frameScores": [
-   0.9996
-  ]
- },
- "assets/sprites/trants/frames/trant_bubble_m5_f1.webp": {
-  "animal": "trant-bubble-m5-f1",
-  "swf": "harvestable_resources/bubble_tree/trant_bubble.swf",
-  "sprite": 142,
-  "label": null,
-  "swfFrames": [
-   10,
-   10
-  ],
-  "swfLabelFrames": 1,
-  "cells": 1,
-  "fw": 167,
-  "fh": 277,
-  "mirror": false,
-  "shift": 0,
-  "offset3x": [
-   141,
-   267
-  ],
-  "score": 0.9991,
-  "minFrame": 0.9991,
-  "faintFrames": 0,
-  "faintMin": 1,
-  "drift": [],
-  "status": "ok",
-  "hires": "assets/sprites/trants/frames/trant_bubble_m5_f1@3x.webp",
-  "bytes": 71452,
-  "firstDraw": true,
-  "frameScores": [
-   0.9991
-  ]
- },
- "assets/sprites/trants/frames/trant_bubble_m7_f1.webp": {
-  "animal": "trant-bubble-m7-f1",
-  "swf": "harvestable_resources/bubble_tree/trant_bubble.swf",
-  "sprite": 173,
-  "label": null,
-  "swfFrames": [
-   10,
-   10
-  ],
-  "swfLabelFrames": 1,
-  "cells": 1,
-  "fw": 167,
-  "fh": 277,
-  "mirror": false,
-  "shift": 0,
-  "offset3x": [
-   68,
-   204
-  ],
-  "score": 0.9991,
-  "minFrame": 0.9991,
-  "faintFrames": 0,
-  "faintMin": 1,
-  "drift": [],
-  "status": "ok",
-  "hires": "assets/sprites/trants/frames/trant_bubble_m7_f1@3x.webp",
-  "bytes": 116268,
-  "firstDraw": true,
-  "frameScores": [
-   0.9991
-  ]
- },
- "assets/sprites/trants/frames/trant_bubble_m10_f1.webp": {
-  "animal": "trant-bubble-m10-f1",
-  "swf": "harvestable_resources/bubble_tree/trant_bubble.swf",
-  "sprite": 190,
-  "label": null,
-  "swfFrames": [
-   10,
-   10
-  ],
-  "swfLabelFrames": 1,
-  "cells": 1,
-  "fw": 167,
-  "fh": 277,
-  "mirror": false,
-  "shift": 0,
-  "offset3x": [
-   0,
-   1
-  ],
-  "score": 0.9991,
-  "minFrame": 0.9991,
-  "faintFrames": 0,
-  "faintMin": 1,
-  "drift": [],
-  "status": "ok",
-  "hires": "assets/sprites/trants/frames/trant_bubble_m10_f1@3x.webp",
-  "bytes": 209618,
-  "firstDraw": true,
-  "frameScores": [
-   0.9991
-  ]
- },
- "assets/sprites/trants/frames/trant_egg_m5_f1.webp": {
-  "animal": "trant-egg-m5-f1",
-  "swf": "harvestable_resources/egg_plant/trant_egg.swf",
-  "sprite": 61,
-  "label": null,
-  "swfFrames": [
-   10,
-   10
-  ],
-  "swfLabelFrames": 1,
-  "cells": 1,
-  "fw": 296,
-  "fh": 278,
-  "mirror": false,
-  "shift": 0,
-  "offset3x": [
-   221,
-   298
-  ],
-  "score": 0.9995,
-  "minFrame": 0.9995,
-  "faintFrames": 0,
-  "faintMin": 1,
-  "drift": [],
-  "status": "ok",
-  "hires": "assets/sprites/trants/frames/trant_egg_m5_f1@3x.webp",
-  "bytes": 73060,
-  "firstDraw": true,
-  "frameScores": [
-   0.9995
-  ]
- },
- "assets/sprites/trants/frames/trant_egg_m7_f1.webp": {
-  "animal": "trant-egg-m7-f1",
-  "swf": "harvestable_resources/egg_plant/trant_egg.swf",
-  "sprite": 47,
-  "label": null,
-  "swfFrames": [
-   10,
-   10
-  ],
-  "swfLabelFrames": 1,
-  "cells": 1,
-  "fw": 296,
-  "fh": 278,
-  "mirror": false,
-  "shift": 0,
-  "offset3x": [
-   182,
-   265
-  ],
-  "score": 0.9995,
-  "minFrame": 0.9995,
-  "faintFrames": 0,
-  "faintMin": 1,
-  "drift": [],
-  "status": "ok",
-  "hires": "assets/sprites/trants/frames/trant_egg_m7_f1@3x.webp",
-  "bytes": 105274,
-  "firstDraw": true,
-  "frameScores": [
-   0.9995
-  ]
- },
- "assets/sprites/trants/frames/trant_egg_m10_f1.webp": {
-  "animal": "trant-egg-m10-f1",
-  "swf": "harvestable_resources/egg_plant/trant_egg.swf",
-  "sprite": 22,
-  "label": null,
-  "swfFrames": [
-   10,
-   10
-  ],
-  "swfLabelFrames": 1,
-  "cells": 1,
-  "fw": 296,
-  "fh": 278,
-  "mirror": false,
-  "shift": 0,
-  "offset3x": [
-   2,
-   34
-  ],
-  "score": 0.9996,
-  "minFrame": 0.9996,
-  "faintFrames": 0,
-  "faintMin": 1,
-  "drift": [],
-  "status": "ok",
-  "hires": "assets/sprites/trants/frames/trant_egg_m10_f1@3x.webp",
-  "bytes": 207172,
-  "firstDraw": true,
-  "frameScores": [
-   0.9996
-  ]
- },
- "assets/sprites/trants/frames/trant_fruit_m5_f1.webp": {
-  "animal": "trant-fruit-m5-f1",
-  "swf": "harvestable_resources/fruit_tree/trant_fruit.swf",
-  "sprite": 56,
-  "label": null,
-  "swfFrames": [
-   1,
-   1
-  ],
-  "swfLabelFrames": 1,
-  "cells": 1,
-  "fw": 271,
-  "fh": 249,
-  "mirror": false,
-  "shift": 0,
-  "offset3x": [
-   144,
-   289
-  ],
-  "score": 0.9992,
-  "minFrame": 0.9992,
-  "faintFrames": 0,
-  "faintMin": 1,
-  "drift": [],
-  "status": "ok",
-  "hires": "assets/sprites/trants/frames/trant_fruit_m5_f1@3x.webp",
-  "bytes": 81204,
-  "firstDraw": true,
-  "frameScores": [
-   0.9992
-  ]
- },
- "assets/sprites/trants/frames/trant_fruit_m7_f1.webp": {
-  "animal": "trant-fruit-m7-f1",
-  "swf": "harvestable_resources/fruit_tree/trant_fruit.swf",
-  "sprite": 62,
-  "label": null,
-  "swfFrames": [
-   1,
-   1
-  ],
-  "swfLabelFrames": 1,
-  "cells": 1,
-  "fw": 271,
-  "fh": 249,
-  "mirror": false,
-  "shift": 0,
-  "offset3x": [
-   114,
-   149
-  ],
-  "score": 0.9993,
-  "minFrame": 0.9993,
-  "faintFrames": 0,
-  "faintMin": 1,
-  "drift": [],
-  "status": "ok",
-  "hires": "assets/sprites/trants/frames/trant_fruit_m7_f1@3x.webp",
-  "bytes": 137258,
-  "firstDraw": true,
-  "frameScores": [
-   0.9993
-  ]
- },
- "assets/sprites/trants/frames/trant_fruit_m10_f1.webp": {
-  "animal": "trant-fruit-m10-f1",
-  "swf": "harvestable_resources/fruit_tree/trant_fruit.swf",
-  "sprite": 71,
-  "label": null,
-  "swfFrames": [
-   1,
-   1
-  ],
-  "swfLabelFrames": 1,
-  "cells": 1,
-  "fw": 271,
-  "fh": 249,
-  "mirror": false,
-  "shift": 0,
-  "offset3x": [
-   -24,
-   2
-  ],
-  "score": 0.9994,
-  "minFrame": 0.9994,
-  "faintFrames": 0,
-  "faintMin": 1,
-  "drift": [],
-  "status": "ok",
-  "hires": "assets/sprites/trants/frames/trant_fruit_m10_f1@3x.webp",
-  "bytes": 277292,
-  "firstDraw": true,
-  "frameScores": [
-   0.9994
-  ]
- },
- "assets/sprites/trants/frames/trant_gas_m5_f1.webp": {
-  "animal": "trant-gas-m5-f1",
-  "swf": "harvestable_resources/gas_plant/trant_gas.swf",
-  "sprite": 237,
-  "label": null,
-  "swfFrames": [
-   1,
-   1
-  ],
-  "swfLabelFrames": 1,
-  "cells": 1,
-  "fw": 276,
-  "fh": 258,
-  "mirror": false,
-  "shift": 0,
-  "offset3x": [
-   137,
-   280
-  ],
-  "score": 0.9994,
-  "minFrame": 0.9994,
-  "faintFrames": 0,
-  "faintMin": 1,
-  "drift": [],
-  "status": "ok",
-  "hires": "assets/sprites/trants/frames/trant_gas_m5_f1@3x.webp",
-  "bytes": 70960,
-  "firstDraw": true,
-  "frameScores": [
-   0.9994
-  ]
- },
- "assets/sprites/trants/frames/trant_gas_m7_f1.webp": {
-  "animal": "trant-gas-m7-f1",
-  "swf": "harvestable_resources/gas_plant/trant_gas.swf",
-  "sprite": 297,
-  "label": null,
-  "swfFrames": [
-   1,
-   1
-  ],
-  "swfLabelFrames": 1,
-  "cells": 1,
-  "fw": 276,
-  "fh": 258,
-  "mirror": false,
-  "shift": 0,
-  "offset3x": [
-   92,
-   124
-  ],
-  "score": 0.9995,
-  "minFrame": 0.9995,
-  "faintFrames": 0,
-  "faintMin": 1,
-  "drift": [],
-  "status": "ok",
-  "hires": "assets/sprites/trants/frames/trant_gas_m7_f1@3x.webp",
-  "bytes": 134878,
-  "firstDraw": true,
-  "frameScores": [
-   0.9995
-  ]
- },
- "assets/sprites/trants/frames/trant_gas_m10_f1.webp": {
-  "animal": "trant-gas-m10-f1",
-  "swf": "harvestable_resources/gas_plant/trant_gas.swf",
-  "sprite": 377,
-  "label": null,
-  "swfFrames": [
-   1,
-   1
-  ],
-  "swfLabelFrames": 1,
-  "cells": 1,
-  "fw": 276,
-  "fh": 258,
-  "mirror": false,
-  "shift": 0,
-  "offset3x": [
-   -5,
-   0
-  ],
-  "score": 0.9995,
-  "minFrame": 0.9995,
-  "faintFrames": 0,
-  "faintMin": 1,
-  "drift": [],
-  "status": "ok",
-  "hires": "assets/sprites/trants/frames/trant_gas_m10_f1@3x.webp",
-  "bytes": 245496,
-  "firstDraw": true,
-  "frameScores": [
-   0.9995
-  ]
- },
- "assets/sprites/trants/frames/trant_spice_m5_f1.webp": {
-  "animal": "trant-spice-m5-f1",
-  "swf": "harvestable_resources/spice_plant/trant_spice.swf",
-  "sprite": 102,
-  "label": null,
-  "swfFrames": [
-   1,
-   1
-  ],
-  "swfLabelFrames": 1,
-  "cells": 1,
-  "fw": 318,
-  "fh": 250,
-  "mirror": false,
-  "shift": 0,
-  "offset3x": [
-   193,
-   152
-  ],
-  "score": 0.9997,
-  "minFrame": 0.9997,
-  "faintFrames": 0,
-  "faintMin": 1,
-  "drift": [],
-  "status": "ok",
-  "hires": "assets/sprites/trants/frames/trant_spice_m5_f1@3x.webp",
-  "bytes": 62552,
-  "firstDraw": true,
-  "frameScores": [
-   0.9997
-  ]
- },
- "assets/sprites/trants/frames/trant_spice_m7_f1.webp": {
-  "animal": "trant-spice-m7-f1",
-  "swf": "harvestable_resources/spice_plant/trant_spice.swf",
-  "sprite": 134,
-  "label": null,
-  "swfFrames": [
-   1,
-   1
-  ],
-  "swfLabelFrames": 1,
-  "cells": 1,
-  "fw": 318,
-  "fh": 250,
-  "mirror": false,
-  "shift": 0,
-  "offset3x": [
-   87,
-   50
-  ],
-  "score": 0.9998,
-  "minFrame": 0.9998,
-  "faintFrames": 0,
-  "faintMin": 1,
-  "drift": [],
-  "status": "ok",
-  "hires": "assets/sprites/trants/frames/trant_spice_m7_f1@3x.webp",
-  "bytes": 87552,
-  "firstDraw": true,
-  "frameScores": [
-   0.9998
-  ]
- },
- "assets/sprites/trants/frames/trant_spice_m10_f1.webp": {
-  "animal": "trant-spice-m10-f1",
-  "swf": "harvestable_resources/spice_plant/trant_spice.swf",
-  "sprite": 185,
-  "label": null,
-  "swfFrames": [
-   1,
-   1
-  ],
-  "swfLabelFrames": 1,
-  "cells": 1,
-  "fw": 318,
-  "fh": 250,
-  "mirror": false,
-  "shift": 0,
-  "offset3x": [
-   0,
-   -60
-  ],
-  "score": 0.9998,
-  "minFrame": 0.9998,
-  "faintFrames": 0,
-  "faintMin": 1,
-  "drift": [],
-  "status": "ok",
-  "hires": "assets/sprites/trants/frames/trant_spice_m10_f1@3x.webp",
-  "bytes": 138168,
   "firstDraw": true,
   "frameScores": [
    0.9998
@@ -80338,6 +79762,1734 @@
    0.9787,
    0.9786,
    0.9791
+  ]
+ },
+ "assets/sprites/trants/frames/trant_bean_m2.webp": {
+  "animal": "trant-bean-m2",
+  "swf": "harvestable_resources/bean_tree/trant_bean.swf",
+  "sprite": 149,
+  "label": null,
+  "swfFrames": [
+   10,
+   10
+  ],
+  "swfLabelFrames": 1,
+  "cells": 1,
+  "fw": 198,
+  "fh": 270,
+  "mirror": false,
+  "shift": 0,
+  "offset3x": [
+   169,
+   590
+  ],
+  "score": 0.9992,
+  "minFrame": 0.9992,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/trants/frames/trant_bean_m2@3x.webp",
+  "bytes": 12868,
+  "firstDraw": true,
+  "frameScores": [
+   0.9992
+  ]
+ },
+ "assets/sprites/trants/frames/trant_bean_m4.webp": {
+  "animal": "trant-bean-m4",
+  "swf": "harvestable_resources/bean_tree/trant_bean.swf",
+  "sprite": 123,
+  "label": null,
+  "swfFrames": [
+   10,
+   10
+  ],
+  "swfLabelFrames": 1,
+  "cells": 1,
+  "fw": 198,
+  "fh": 270,
+  "mirror": false,
+  "shift": 0,
+  "offset3x": [
+   108,
+   471
+  ],
+  "score": 0.9993,
+  "minFrame": 0.9993,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/trants/frames/trant_bean_m4@3x.webp",
+  "bytes": 37068,
+  "firstDraw": true,
+  "frameScores": [
+   0.9993
+  ]
+ },
+ "assets/sprites/trants/frames/trant_bean_m4_f0.webp": {
+  "animal": "trant-bean-m4-f0",
+  "swf": "harvestable_resources/bean_tree/trant_bean.swf",
+  "sprite": 123,
+  "label": null,
+  "swfFrames": [
+   10,
+   10
+  ],
+  "swfLabelFrames": 1,
+  "cells": 1,
+  "fw": 198,
+  "fh": 270,
+  "mirror": false,
+  "shift": 0,
+  "offset3x": [
+   108,
+   471
+  ],
+  "score": 0.9993,
+  "minFrame": 0.9993,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/trants/frames/trant_bean_m4_f0@3x.webp",
+  "bytes": 26374,
+  "firstDraw": true,
+  "frameScores": [
+   0.9993
+  ]
+ },
+ "assets/sprites/trants/frames/trant_bean_m6.webp": {
+  "animal": "trant-bean-m6",
+  "swf": "harvestable_resources/bean_tree/trant_bean.swf",
+  "sprite": 101,
+  "label": null,
+  "swfFrames": [
+   10,
+   10
+  ],
+  "swfLabelFrames": 1,
+  "cells": 1,
+  "fw": 198,
+  "fh": 270,
+  "mirror": false,
+  "shift": 0,
+  "offset3x": [
+   91,
+   328
+  ],
+  "score": 0.9995,
+  "minFrame": 0.9995,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/trants/frames/trant_bean_m6@3x.webp",
+  "bytes": 51060,
+  "firstDraw": true,
+  "frameScores": [
+   0.9995
+  ]
+ },
+ "assets/sprites/trants/frames/trant_bean_m6_f0.webp": {
+  "animal": "trant-bean-m6-f0",
+  "swf": "harvestable_resources/bean_tree/trant_bean.swf",
+  "sprite": 101,
+  "label": null,
+  "swfFrames": [
+   10,
+   10
+  ],
+  "swfLabelFrames": 1,
+  "cells": 1,
+  "fw": 198,
+  "fh": 270,
+  "mirror": false,
+  "shift": 0,
+  "offset3x": [
+   91,
+   328
+  ],
+  "score": 0.9995,
+  "minFrame": 0.9995,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/trants/frames/trant_bean_m6_f0@3x.webp",
+  "bytes": 37458,
+  "firstDraw": true,
+  "frameScores": [
+   0.9995
+  ]
+ },
+ "assets/sprites/trants/frames/trant_bean_m8.webp": {
+  "animal": "trant-bean-m8",
+  "swf": "harvestable_resources/bean_tree/trant_bean.swf",
+  "sprite": 65,
+  "label": null,
+  "swfFrames": [
+   10,
+   10
+  ],
+  "swfLabelFrames": 1,
+  "cells": 1,
+  "fw": 198,
+  "fh": 270,
+  "mirror": false,
+  "shift": 0,
+  "offset3x": [
+   24,
+   185
+  ],
+  "score": 0.9995,
+  "minFrame": 0.9995,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/trants/frames/trant_bean_m8@3x.webp",
+  "bytes": 76064,
+  "firstDraw": true,
+  "frameScores": [
+   0.9995
+  ]
+ },
+ "assets/sprites/trants/frames/trant_bean_m8_f0.webp": {
+  "animal": "trant-bean-m8-f0",
+  "swf": "harvestable_resources/bean_tree/trant_bean.swf",
+  "sprite": 65,
+  "label": null,
+  "swfFrames": [
+   10,
+   10
+  ],
+  "swfLabelFrames": 1,
+  "cells": 1,
+  "fw": 198,
+  "fh": 270,
+  "mirror": false,
+  "shift": 0,
+  "offset3x": [
+   24,
+   185
+  ],
+  "score": 0.9996,
+  "minFrame": 0.9996,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/trants/frames/trant_bean_m8_f0@3x.webp",
+  "bytes": 53580,
+  "firstDraw": true,
+  "frameScores": [
+   0.9996
+  ]
+ },
+ "assets/sprites/trants/frames/trant_bean_m9.webp": {
+  "animal": "trant-bean-m9",
+  "swf": "harvestable_resources/bean_tree/trant_bean.swf",
+  "sprite": 42,
+  "label": null,
+  "swfFrames": [
+   10,
+   10
+  ],
+  "swfLabelFrames": 1,
+  "cells": 1,
+  "fw": 198,
+  "fh": 270,
+  "mirror": false,
+  "shift": 0,
+  "offset3x": [
+   20,
+   99
+  ],
+  "score": 0.9995,
+  "minFrame": 0.9995,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/trants/frames/trant_bean_m9@3x.webp",
+  "bytes": 97370,
+  "firstDraw": true,
+  "frameScores": [
+   0.9995
+  ]
+ },
+ "assets/sprites/trants/frames/trant_bean_m9_f0.webp": {
+  "animal": "trant-bean-m9-f0",
+  "swf": "harvestable_resources/bean_tree/trant_bean.swf",
+  "sprite": 42,
+  "label": null,
+  "swfFrames": [
+   10,
+   10
+  ],
+  "swfLabelFrames": 1,
+  "cells": 1,
+  "fw": 198,
+  "fh": 270,
+  "mirror": false,
+  "shift": 0,
+  "offset3x": [
+   20,
+   99
+  ],
+  "score": 0.9996,
+  "minFrame": 0.9996,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/trants/frames/trant_bean_m9_f0@3x.webp",
+  "bytes": 70828,
+  "firstDraw": true,
+  "frameScores": [
+   0.9996
+  ]
+ },
+ "assets/sprites/trants/frames/trant_egg_m2.webp": {
+  "animal": "trant-egg-m2",
+  "swf": "harvestable_resources/egg_plant/trant_egg.swf",
+  "sprite": 80,
+  "label": null,
+  "swfFrames": [
+   10,
+   10
+  ],
+  "swfLabelFrames": 1,
+  "cells": 1,
+  "fw": 296,
+  "fh": 278,
+  "mirror": false,
+  "shift": 0,
+  "offset3x": [
+   370,
+   532
+  ],
+  "score": 0.9996,
+  "minFrame": 0.9996,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/trants/frames/trant_egg_m2@3x.webp",
+  "bytes": 17864,
+  "firstDraw": true,
+  "frameScores": [
+   0.9996
+  ]
+ },
+ "assets/sprites/trants/frames/trant_egg_m4.webp": {
+  "animal": "trant-egg-m4",
+  "swf": "harvestable_resources/egg_plant/trant_egg.swf",
+  "sprite": 70,
+  "label": null,
+  "swfFrames": [
+   10,
+   10
+  ],
+  "swfLabelFrames": 1,
+  "cells": 1,
+  "fw": 296,
+  "fh": 278,
+  "mirror": false,
+  "shift": 0,
+  "offset3x": [
+   278,
+   350
+  ],
+  "score": 0.9996,
+  "minFrame": 0.9996,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/trants/frames/trant_egg_m4@3x.webp",
+  "bytes": 47038,
+  "firstDraw": true,
+  "frameScores": [
+   0.9996
+  ]
+ },
+ "assets/sprites/trants/frames/trant_egg_m4_f0.webp": {
+  "animal": "trant-egg-m4-f0",
+  "swf": "harvestable_resources/egg_plant/trant_egg.swf",
+  "sprite": 70,
+  "label": null,
+  "swfFrames": [
+   10,
+   10
+  ],
+  "swfLabelFrames": 1,
+  "cells": 1,
+  "fw": 296,
+  "fh": 278,
+  "mirror": false,
+  "shift": 0,
+  "offset3x": [
+   278,
+   350
+  ],
+  "score": 0.9996,
+  "minFrame": 0.9996,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/trants/frames/trant_egg_m4_f0@3x.webp",
+  "bytes": 45462,
+  "firstDraw": true,
+  "frameScores": [
+   0.9996
+  ]
+ },
+ "assets/sprites/trants/frames/trant_egg_m6.webp": {
+  "animal": "trant-egg-m6",
+  "swf": "harvestable_resources/egg_plant/trant_egg.swf",
+  "sprite": 54,
+  "label": null,
+  "swfFrames": [
+   10,
+   10
+  ],
+  "swfLabelFrames": 1,
+  "cells": 1,
+  "fw": 296,
+  "fh": 278,
+  "mirror": false,
+  "shift": 0,
+  "offset3x": [
+   182,
+   243
+  ],
+  "score": 0.9995,
+  "minFrame": 0.9995,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/trants/frames/trant_egg_m6@3x.webp",
+  "bytes": 84754,
+  "firstDraw": true,
+  "frameScores": [
+   0.9995
+  ]
+ },
+ "assets/sprites/trants/frames/trant_egg_m6_f0.webp": {
+  "animal": "trant-egg-m6-f0",
+  "swf": "harvestable_resources/egg_plant/trant_egg.swf",
+  "sprite": 54,
+  "label": null,
+  "swfFrames": [
+   10,
+   10
+  ],
+  "swfLabelFrames": 1,
+  "cells": 1,
+  "fw": 296,
+  "fh": 278,
+  "mirror": false,
+  "shift": 0,
+  "offset3x": [
+   182,
+   243
+  ],
+  "score": 0.9995,
+  "minFrame": 0.9995,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/trants/frames/trant_egg_m6_f0@3x.webp",
+  "bytes": 83848,
+  "firstDraw": true,
+  "frameScores": [
+   0.9995
+  ]
+ },
+ "assets/sprites/trants/frames/trant_egg_m8.webp": {
+  "animal": "trant-egg-m8",
+  "swf": "harvestable_resources/egg_plant/trant_egg.swf",
+  "sprite": 40,
+  "label": null,
+  "swfFrames": [
+   10,
+   10
+  ],
+  "swfLabelFrames": 1,
+  "cells": 1,
+  "fw": 296,
+  "fh": 278,
+  "mirror": false,
+  "shift": 0,
+  "offset3x": [
+   212,
+   215
+  ],
+  "score": 0.9995,
+  "minFrame": 0.9995,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/trants/frames/trant_egg_m8@3x.webp",
+  "bytes": 97512,
+  "firstDraw": true,
+  "frameScores": [
+   0.9995
+  ]
+ },
+ "assets/sprites/trants/frames/trant_egg_m8_f0.webp": {
+  "animal": "trant-egg-m8-f0",
+  "swf": "harvestable_resources/egg_plant/trant_egg.swf",
+  "sprite": 40,
+  "label": null,
+  "swfFrames": [
+   10,
+   10
+  ],
+  "swfLabelFrames": 1,
+  "cells": 1,
+  "fw": 296,
+  "fh": 278,
+  "mirror": false,
+  "shift": 0,
+  "offset3x": [
+   212,
+   215
+  ],
+  "score": 0.9995,
+  "minFrame": 0.9995,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/trants/frames/trant_egg_m8_f0@3x.webp",
+  "bytes": 96224,
+  "firstDraw": true,
+  "frameScores": [
+   0.9995
+  ]
+ },
+ "assets/sprites/trants/frames/trant_egg_m9.webp": {
+  "animal": "trant-egg-m9",
+  "swf": "harvestable_resources/egg_plant/trant_egg.swf",
+  "sprite": 33,
+  "label": null,
+  "swfFrames": [
+   10,
+   10
+  ],
+  "swfLabelFrames": 1,
+  "cells": 1,
+  "fw": 296,
+  "fh": 278,
+  "mirror": false,
+  "shift": 0,
+  "offset3x": [
+   185,
+   140
+  ],
+  "score": 0.9994,
+  "minFrame": 0.9994,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/trants/frames/trant_egg_m9@3x.webp",
+  "bytes": 158668,
+  "firstDraw": true,
+  "frameScores": [
+   0.9994
+  ]
+ },
+ "assets/sprites/trants/frames/trant_egg_m9_f0.webp": {
+  "animal": "trant-egg-m9-f0",
+  "swf": "harvestable_resources/egg_plant/trant_egg.swf",
+  "sprite": 33,
+  "label": null,
+  "swfFrames": [
+   10,
+   10
+  ],
+  "swfLabelFrames": 1,
+  "cells": 1,
+  "fw": 296,
+  "fh": 278,
+  "mirror": false,
+  "shift": 0,
+  "offset3x": [
+   185,
+   140
+  ],
+  "score": 0.9994,
+  "minFrame": 0.9994,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/trants/frames/trant_egg_m9_f0@3x.webp",
+  "bytes": 157420,
+  "firstDraw": true,
+  "frameScores": [
+   0.9994
+  ]
+ },
+ "assets/sprites/trants/frames/trant_fruit_m2.webp": {
+  "animal": "trant-fruit-m2",
+  "swf": "harvestable_resources/fruit_tree/trant_fruit.swf",
+  "sprite": 43,
+  "label": null,
+  "swfFrames": [
+   1,
+   1
+  ],
+  "swfLabelFrames": 1,
+  "cells": 1,
+  "fw": 271,
+  "fh": 249,
+  "mirror": false,
+  "shift": 0,
+  "offset3x": [
+   237,
+   406
+  ],
+  "score": 0.9991,
+  "minFrame": 0.9991,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/trants/frames/trant_fruit_m2@3x.webp",
+  "bytes": 42546,
+  "firstDraw": true,
+  "frameScores": [
+   0.9991
+  ]
+ },
+ "assets/sprites/trants/frames/trant_fruit_m4.webp": {
+  "animal": "trant-fruit-m4",
+  "swf": "harvestable_resources/fruit_tree/trant_fruit.swf",
+  "sprite": 53,
+  "label": null,
+  "swfFrames": [
+   1,
+   1
+  ],
+  "swfLabelFrames": 1,
+  "cells": 1,
+  "fw": 271,
+  "fh": 249,
+  "mirror": false,
+  "shift": 0,
+  "offset3x": [
+   180,
+   329
+  ],
+  "score": 0.9992,
+  "minFrame": 0.9992,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/trants/frames/trant_fruit_m4@3x.webp",
+  "bytes": 72398,
+  "firstDraw": true,
+  "frameScores": [
+   0.9992
+  ]
+ },
+ "assets/sprites/trants/frames/trant_fruit_m4_f0.webp": {
+  "animal": "trant-fruit-m4-f0",
+  "swf": "harvestable_resources/fruit_tree/trant_fruit.swf",
+  "sprite": 53,
+  "label": null,
+  "swfFrames": [
+   1,
+   1
+  ],
+  "swfLabelFrames": 1,
+  "cells": 1,
+  "fw": 271,
+  "fh": 249,
+  "mirror": false,
+  "shift": 0,
+  "offset3x": [
+   180,
+   329
+  ],
+  "score": 0.9991,
+  "minFrame": 0.9991,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/trants/frames/trant_fruit_m4_f0@3x.webp",
+  "bytes": 70188,
+  "firstDraw": true,
+  "frameScores": [
+   0.9991
+  ]
+ },
+ "assets/sprites/trants/frames/trant_fruit_m6.webp": {
+  "animal": "trant-fruit-m6",
+  "swf": "harvestable_resources/fruit_tree/trant_fruit.swf",
+  "sprite": 59,
+  "label": null,
+  "swfFrames": [
+   1,
+   1
+  ],
+  "swfLabelFrames": 1,
+  "cells": 1,
+  "fw": 271,
+  "fh": 249,
+  "mirror": false,
+  "shift": 0,
+  "offset3x": [
+   110,
+   206
+  ],
+  "score": 0.9992,
+  "minFrame": 0.9992,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/trants/frames/trant_fruit_m6@3x.webp",
+  "bytes": 137654,
+  "firstDraw": true,
+  "frameScores": [
+   0.9992
+  ]
+ },
+ "assets/sprites/trants/frames/trant_fruit_m6_f0.webp": {
+  "animal": "trant-fruit-m6-f0",
+  "swf": "harvestable_resources/fruit_tree/trant_fruit.swf",
+  "sprite": 59,
+  "label": null,
+  "swfFrames": [
+   1,
+   1
+  ],
+  "swfLabelFrames": 1,
+  "cells": 1,
+  "fw": 271,
+  "fh": 249,
+  "mirror": false,
+  "shift": 0,
+  "offset3x": [
+   110,
+   206
+  ],
+  "score": 0.9992,
+  "minFrame": 0.9992,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/trants/frames/trant_fruit_m6_f0@3x.webp",
+  "bytes": 132748,
+  "firstDraw": true,
+  "frameScores": [
+   0.9992
+  ]
+ },
+ "assets/sprites/trants/frames/trant_fruit_m8.webp": {
+  "animal": "trant-fruit-m8",
+  "swf": "harvestable_resources/fruit_tree/trant_fruit.swf",
+  "sprite": 65,
+  "label": null,
+  "swfFrames": [
+   1,
+   1
+  ],
+  "swfLabelFrames": 1,
+  "cells": 1,
+  "fw": 271,
+  "fh": 249,
+  "mirror": false,
+  "shift": 0,
+  "offset3x": [
+   74,
+   82
+  ],
+  "score": 0.9994,
+  "minFrame": 0.9994,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/trants/frames/trant_fruit_m8@3x.webp",
+  "bytes": 179028,
+  "firstDraw": true,
+  "frameScores": [
+   0.9994
+  ]
+ },
+ "assets/sprites/trants/frames/trant_fruit_m8_f0.webp": {
+  "animal": "trant-fruit-m8-f0",
+  "swf": "harvestable_resources/fruit_tree/trant_fruit.swf",
+  "sprite": 65,
+  "label": null,
+  "swfFrames": [
+   1,
+   1
+  ],
+  "swfLabelFrames": 1,
+  "cells": 1,
+  "fw": 271,
+  "fh": 249,
+  "mirror": false,
+  "shift": 0,
+  "offset3x": [
+   74,
+   82
+  ],
+  "score": 0.9994,
+  "minFrame": 0.9994,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/trants/frames/trant_fruit_m8_f0@3x.webp",
+  "bytes": 170468,
+  "firstDraw": true,
+  "frameScores": [
+   0.9994
+  ]
+ },
+ "assets/sprites/trants/frames/trant_fruit_m9.webp": {
+  "animal": "trant-fruit-m9",
+  "swf": "harvestable_resources/fruit_tree/trant_fruit.swf",
+  "sprite": 68,
+  "label": null,
+  "swfFrames": [
+   1,
+   1
+  ],
+  "swfLabelFrames": 1,
+  "cells": 1,
+  "fw": 271,
+  "fh": 249,
+  "mirror": false,
+  "shift": 0,
+  "offset3x": [
+   16,
+   17
+  ],
+  "score": 0.9994,
+  "minFrame": 0.9994,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/trants/frames/trant_fruit_m9@3x.webp",
+  "bytes": 236426,
+  "firstDraw": true,
+  "frameScores": [
+   0.9994
+  ]
+ },
+ "assets/sprites/trants/frames/trant_fruit_m9_f0.webp": {
+  "animal": "trant-fruit-m9-f0",
+  "swf": "harvestable_resources/fruit_tree/trant_fruit.swf",
+  "sprite": 68,
+  "label": null,
+  "swfFrames": [
+   1,
+   1
+  ],
+  "swfLabelFrames": 1,
+  "cells": 1,
+  "fw": 271,
+  "fh": 249,
+  "mirror": false,
+  "shift": 0,
+  "offset3x": [
+   16,
+   17
+  ],
+  "score": 0.9994,
+  "minFrame": 0.9994,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/trants/frames/trant_fruit_m9_f0@3x.webp",
+  "bytes": 224176,
+  "firstDraw": true,
+  "frameScores": [
+   0.9994
+  ]
+ },
+ "assets/sprites/trants/frames/trant_gas_m2.webp": {
+  "animal": "trant-gas-m2",
+  "swf": "harvestable_resources/gas_plant/trant_gas.swf",
+  "sprite": 120,
+  "label": null,
+  "swfFrames": [
+   1,
+   1
+  ],
+  "swfLabelFrames": 1,
+  "cells": 1,
+  "fw": 276,
+  "fh": 258,
+  "mirror": false,
+  "shift": 0,
+  "offset3x": [
+   287,
+   479
+  ],
+  "score": 0.9992,
+  "minFrame": 0.9992,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/trants/frames/trant_gas_m2@3x.webp",
+  "bytes": 25556,
+  "firstDraw": true,
+  "frameScores": [
+   0.9992
+  ]
+ },
+ "assets/sprites/trants/frames/trant_gas_m4.webp": {
+  "animal": "trant-gas-m4",
+  "swf": "harvestable_resources/gas_plant/trant_gas.swf",
+  "sprite": 202,
+  "label": null,
+  "swfFrames": [
+   1,
+   1
+  ],
+  "swfLabelFrames": 1,
+  "cells": 1,
+  "fw": 276,
+  "fh": 258,
+  "mirror": false,
+  "shift": 0,
+  "offset3x": [
+   217,
+   359
+  ],
+  "score": 0.9993,
+  "minFrame": 0.9993,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/trants/frames/trant_gas_m4@3x.webp",
+  "bytes": 52882,
+  "firstDraw": true,
+  "frameScores": [
+   0.9993
+  ]
+ },
+ "assets/sprites/trants/frames/trant_gas_m4_f0.webp": {
+  "animal": "trant-gas-m4-f0",
+  "swf": "harvestable_resources/gas_plant/trant_gas.swf",
+  "sprite": 202,
+  "label": null,
+  "swfFrames": [
+   1,
+   1
+  ],
+  "swfLabelFrames": 1,
+  "cells": 1,
+  "fw": 276,
+  "fh": 258,
+  "mirror": false,
+  "shift": 0,
+  "offset3x": [
+   217,
+   359
+  ],
+  "score": 0.9994,
+  "minFrame": 0.9994,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/trants/frames/trant_gas_m4_f0@3x.webp",
+  "bytes": 43646,
+  "firstDraw": true,
+  "frameScores": [
+   0.9994
+  ]
+ },
+ "assets/sprites/trants/frames/trant_gas_m6.webp": {
+  "animal": "trant-gas-m6",
+  "swf": "harvestable_resources/gas_plant/trant_gas.swf",
+  "sprite": 272,
+  "label": null,
+  "swfFrames": [
+   1,
+   1
+  ],
+  "swfLabelFrames": 1,
+  "cells": 1,
+  "fw": 276,
+  "fh": 258,
+  "mirror": false,
+  "shift": 0,
+  "offset3x": [
+   124,
+   192
+  ],
+  "score": 0.9994,
+  "minFrame": 0.9994,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/trants/frames/trant_gas_m6@3x.webp",
+  "bytes": 107660,
+  "firstDraw": true,
+  "frameScores": [
+   0.9994
+  ]
+ },
+ "assets/sprites/trants/frames/trant_gas_m6_f0.webp": {
+  "animal": "trant-gas-m6-f0",
+  "swf": "harvestable_resources/gas_plant/trant_gas.swf",
+  "sprite": 272,
+  "label": null,
+  "swfFrames": [
+   1,
+   1
+  ],
+  "swfLabelFrames": 1,
+  "cells": 1,
+  "fw": 276,
+  "fh": 258,
+  "mirror": false,
+  "shift": 0,
+  "offset3x": [
+   124,
+   192
+  ],
+  "score": 0.9994,
+  "minFrame": 0.9994,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/trants/frames/trant_gas_m6_f0@3x.webp",
+  "bytes": 90266,
+  "firstDraw": true,
+  "frameScores": [
+   0.9994
+  ]
+ },
+ "assets/sprites/trants/frames/trant_gas_m8.webp": {
+  "animal": "trant-gas-m8",
+  "swf": "harvestable_resources/gas_plant/trant_gas.swf",
+  "sprite": 315,
+  "label": null,
+  "swfFrames": [
+   1,
+   1
+  ],
+  "swfLabelFrames": 1,
+  "cells": 1,
+  "fw": 276,
+  "fh": 258,
+  "mirror": false,
+  "shift": 0,
+  "offset3x": [
+   37,
+   55
+  ],
+  "score": 0.9994,
+  "minFrame": 0.9994,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/trants/frames/trant_gas_m8@3x.webp",
+  "bytes": 200154,
+  "firstDraw": true,
+  "frameScores": [
+   0.9994
+  ]
+ },
+ "assets/sprites/trants/frames/trant_gas_m8_f0.webp": {
+  "animal": "trant-gas-m8-f0",
+  "swf": "harvestable_resources/gas_plant/trant_gas.swf",
+  "sprite": 315,
+  "label": null,
+  "swfFrames": [
+   1,
+   1
+  ],
+  "swfLabelFrames": 1,
+  "cells": 1,
+  "fw": 276,
+  "fh": 258,
+  "mirror": false,
+  "shift": 0,
+  "offset3x": [
+   37,
+   55
+  ],
+  "score": 0.9995,
+  "minFrame": 0.9995,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/trants/frames/trant_gas_m8_f0@3x.webp",
+  "bytes": 165384,
+  "firstDraw": true,
+  "frameScores": [
+   0.9995
+  ]
+ },
+ "assets/sprites/trants/frames/trant_gas_m9.webp": {
+  "animal": "trant-gas-m9",
+  "swf": "harvestable_resources/gas_plant/trant_gas.swf",
+  "sprite": 348,
+  "label": null,
+  "swfFrames": [
+   1,
+   1
+  ],
+  "swfLabelFrames": 1,
+  "cells": 1,
+  "fw": 276,
+  "fh": 258,
+  "mirror": false,
+  "shift": 0,
+  "offset3x": [
+   21,
+   16
+  ],
+  "score": 0.9995,
+  "minFrame": 0.9995,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/trants/frames/trant_gas_m9@3x.webp",
+  "bytes": 203346,
+  "firstDraw": true,
+  "frameScores": [
+   0.9995
+  ]
+ },
+ "assets/sprites/trants/frames/trant_gas_m9_f0.webp": {
+  "animal": "trant-gas-m9-f0",
+  "swf": "harvestable_resources/gas_plant/trant_gas.swf",
+  "sprite": 348,
+  "label": null,
+  "swfFrames": [
+   1,
+   1
+  ],
+  "swfLabelFrames": 1,
+  "cells": 1,
+  "fw": 276,
+  "fh": 258,
+  "mirror": false,
+  "shift": 0,
+  "offset3x": [
+   21,
+   16
+  ],
+  "score": 0.9995,
+  "minFrame": 0.9995,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/trants/frames/trant_gas_m9_f0@3x.webp",
+  "bytes": 161040,
+  "firstDraw": true,
+  "frameScores": [
+   0.9995
+  ]
+ },
+ "assets/sprites/trants/frames/trant_spice_m2.webp": {
+  "animal": "trant-spice-m2",
+  "swf": "harvestable_resources/spice_plant/trant_spice.swf",
+  "sprite": 44,
+  "label": null,
+  "swfFrames": [
+   1,
+   1
+  ],
+  "swfLabelFrames": 1,
+  "cells": 1,
+  "fw": 318,
+  "fh": 250,
+  "mirror": false,
+  "shift": 0,
+  "offset3x": [
+   245,
+   228
+  ],
+  "score": 0.9997,
+  "minFrame": 0.9997,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/trants/frames/trant_spice_m2@3x.webp",
+  "bytes": 40112,
+  "firstDraw": true,
+  "frameScores": [
+   0.9997
+  ]
+ },
+ "assets/sprites/trants/frames/trant_spice_m4.webp": {
+  "animal": "trant-spice-m4",
+  "swf": "harvestable_resources/spice_plant/trant_spice.swf",
+  "sprite": 87,
+  "label": null,
+  "swfFrames": [
+   1,
+   1
+  ],
+  "swfLabelFrames": 1,
+  "cells": 1,
+  "fw": 318,
+  "fh": 250,
+  "mirror": false,
+  "shift": 0,
+  "offset3x": [
+   231,
+   167
+  ],
+  "score": 0.9997,
+  "minFrame": 0.9997,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/trants/frames/trant_spice_m4@3x.webp",
+  "bytes": 59294,
+  "firstDraw": true,
+  "frameScores": [
+   0.9997
+  ]
+ },
+ "assets/sprites/trants/frames/trant_spice_m4_f0.webp": {
+  "animal": "trant-spice-m4-f0",
+  "swf": "harvestable_resources/spice_plant/trant_spice.swf",
+  "sprite": 87,
+  "label": null,
+  "swfFrames": [
+   1,
+   1
+  ],
+  "swfLabelFrames": 1,
+  "cells": 1,
+  "fw": 318,
+  "fh": 250,
+  "mirror": false,
+  "shift": 0,
+  "offset3x": [
+   231,
+   167
+  ],
+  "score": 0.9997,
+  "minFrame": 0.9997,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/trants/frames/trant_spice_m4_f0@3x.webp",
+  "bytes": 51364,
+  "firstDraw": true,
+  "frameScores": [
+   0.9997
+  ]
+ },
+ "assets/sprites/trants/frames/trant_spice_m6.webp": {
+  "animal": "trant-spice-m6",
+  "swf": "harvestable_resources/spice_plant/trant_spice.swf",
+  "sprite": 118,
+  "label": null,
+  "swfFrames": [
+   1,
+   1
+  ],
+  "swfLabelFrames": 1,
+  "cells": 1,
+  "fw": 318,
+  "fh": 250,
+  "mirror": false,
+  "shift": 0,
+  "offset3x": [
+   162,
+   106
+  ],
+  "score": 0.9997,
+  "minFrame": 0.9997,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/trants/frames/trant_spice_m6@3x.webp",
+  "bytes": 82190,
+  "firstDraw": true,
+  "frameScores": [
+   0.9997
+  ]
+ },
+ "assets/sprites/trants/frames/trant_spice_m6_f0.webp": {
+  "animal": "trant-spice-m6-f0",
+  "swf": "harvestable_resources/spice_plant/trant_spice.swf",
+  "sprite": 118,
+  "label": null,
+  "swfFrames": [
+   1,
+   1
+  ],
+  "swfLabelFrames": 1,
+  "cells": 1,
+  "fw": 318,
+  "fh": 250,
+  "mirror": false,
+  "shift": 0,
+  "offset3x": [
+   162,
+   106
+  ],
+  "score": 0.9998,
+  "minFrame": 0.9998,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/trants/frames/trant_spice_m6_f0@3x.webp",
+  "bytes": 69498,
+  "firstDraw": true,
+  "frameScores": [
+   0.9998
+  ]
+ },
+ "assets/sprites/trants/frames/trant_spice_m8.webp": {
+  "animal": "trant-spice-m8",
+  "swf": "harvestable_resources/spice_plant/trant_spice.swf",
+  "sprite": 150,
+  "label": null,
+  "swfFrames": [
+   1,
+   1
+  ],
+  "swfLabelFrames": 1,
+  "cells": 1,
+  "fw": 318,
+  "fh": 250,
+  "mirror": false,
+  "shift": 0,
+  "offset3x": [
+   78,
+   -1
+  ],
+  "score": 0.9998,
+  "minFrame": 0.9998,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/trants/frames/trant_spice_m8@3x.webp",
+  "bytes": 95704,
+  "firstDraw": true,
+  "frameScores": [
+   0.9998
+  ]
+ },
+ "assets/sprites/trants/frames/trant_spice_m8_f0.webp": {
+  "animal": "trant-spice-m8-f0",
+  "swf": "harvestable_resources/spice_plant/trant_spice.swf",
+  "sprite": 150,
+  "label": null,
+  "swfFrames": [
+   1,
+   1
+  ],
+  "swfLabelFrames": 1,
+  "cells": 1,
+  "fw": 318,
+  "fh": 250,
+  "mirror": false,
+  "shift": 0,
+  "offset3x": [
+   78,
+   -1
+  ],
+  "score": 0.9998,
+  "minFrame": 0.9998,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/trants/frames/trant_spice_m8_f0@3x.webp",
+  "bytes": 78110,
+  "firstDraw": true,
+  "frameScores": [
+   0.9998
+  ]
+ },
+ "assets/sprites/trants/frames/trant_spice_m9.webp": {
+  "animal": "trant-spice-m9",
+  "swf": "harvestable_resources/spice_plant/trant_spice.swf",
+  "sprite": 166,
+  "label": null,
+  "swfFrames": [
+   1,
+   1
+  ],
+  "swfLabelFrames": 1,
+  "cells": 1,
+  "fw": 318,
+  "fh": 250,
+  "mirror": false,
+  "shift": 0,
+  "offset3x": [
+   37,
+   -29
+  ],
+  "score": 0.9998,
+  "minFrame": 0.9998,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/trants/frames/trant_spice_m9@3x.webp",
+  "bytes": 97114,
+  "firstDraw": true,
+  "frameScores": [
+   0.9998
+  ]
+ },
+ "assets/sprites/trants/frames/trant_spice_m9_f0.webp": {
+  "animal": "trant-spice-m9-f0",
+  "swf": "harvestable_resources/spice_plant/trant_spice.swf",
+  "sprite": 166,
+  "label": null,
+  "swfFrames": [
+   1,
+   1
+  ],
+  "swfLabelFrames": 1,
+  "cells": 1,
+  "fw": 318,
+  "fh": 250,
+  "mirror": false,
+  "shift": 0,
+  "offset3x": [
+   37,
+   -29
+  ],
+  "score": 0.9998,
+  "minFrame": 0.9998,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/trants/frames/trant_spice_m9_f0@3x.webp",
+  "bytes": 76094,
+  "firstDraw": true,
+  "frameScores": [
+   0.9998
+  ]
+ },
+ "assets/sprites/trants/frames/trant_bubble_m2.webp": {
+  "animal": "trant-bubble-m2",
+  "swf": "harvestable_resources/bubble_tree/trant_bubble.swf",
+  "sprite": 52,
+  "label": null,
+  "swfFrames": [
+   10,
+   10
+  ],
+  "swfLabelFrames": 1,
+  "cells": 1,
+  "fw": 167,
+  "fh": 277,
+  "mirror": false,
+  "shift": 0,
+  "offset3x": [
+   201,
+   452
+  ],
+  "score": 0.9991,
+  "minFrame": 0.9991,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/trants/frames/trant_bubble_m2@3x.webp",
+  "bytes": 23488,
+  "firstDraw": true,
+  "frameScores": [
+   0.9991
+  ]
+ },
+ "assets/sprites/trants/frames/trant_bubble_m4.webp": {
+  "animal": "trant-bubble-m4",
+  "swf": "harvestable_resources/bubble_tree/trant_bubble.swf",
+  "sprite": 125,
+  "label": null,
+  "swfFrames": [
+   10,
+   10
+  ],
+  "swfLabelFrames": 1,
+  "cells": 1,
+  "fw": 167,
+  "fh": 277,
+  "mirror": false,
+  "shift": 0,
+  "offset3x": [
+   176,
+   334
+  ],
+  "score": 0.999,
+  "minFrame": 0.999,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/trants/frames/trant_bubble_m4@3x.webp",
+  "bytes": 70496,
+  "firstDraw": true,
+  "frameScores": [
+   0.999
+  ]
+ },
+ "assets/sprites/trants/frames/trant_bubble_m6.webp": {
+  "animal": "trant-bubble-m6",
+  "swf": "harvestable_resources/bubble_tree/trant_bubble.swf",
+  "sprite": 148,
+  "label": null,
+  "swfFrames": [
+   10,
+   10
+  ],
+  "swfLabelFrames": 1,
+  "cells": 1,
+  "fw": 167,
+  "fh": 277,
+  "mirror": false,
+  "shift": 0,
+  "offset3x": [
+   111,
+   249
+  ],
+  "score": 0.999,
+  "minFrame": 0.999,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/trants/frames/trant_bubble_m6@3x.webp",
+  "bytes": 106800,
+  "firstDraw": true,
+  "frameScores": [
+   0.999
+  ]
+ },
+ "assets/sprites/trants/frames/trant_bubble_m8.webp": {
+  "animal": "trant-bubble-m8",
+  "swf": "harvestable_resources/bubble_tree/trant_bubble.swf",
+  "sprite": 179,
+  "label": null,
+  "swfFrames": [
+   10,
+   10
+  ],
+  "swfLabelFrames": 1,
+  "cells": 1,
+  "fw": 167,
+  "fh": 277,
+  "mirror": false,
+  "shift": 0,
+  "offset3x": [
+   73,
+   186
+  ],
+  "score": 0.9991,
+  "minFrame": 0.9991,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/trants/frames/trant_bubble_m8@3x.webp",
+  "bytes": 166030,
+  "firstDraw": true,
+  "frameScores": [
+   0.9991
+  ]
+ },
+ "assets/sprites/trants/frames/trant_bubble_m9.webp": {
+  "animal": "trant-bubble-m9",
+  "swf": "harvestable_resources/bubble_tree/trant_bubble.swf",
+  "sprite": 184,
+  "label": null,
+  "swfFrames": [
+   10,
+   10
+  ],
+  "swfLabelFrames": 1,
+  "cells": 1,
+  "fw": 167,
+  "fh": 277,
+  "mirror": false,
+  "shift": 0,
+  "offset3x": [
+   35,
+   72
+  ],
+  "score": 0.9991,
+  "minFrame": 0.9991,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/trants/frames/trant_bubble_m9@3x.webp",
+  "bytes": 195978,
+  "firstDraw": true,
+  "frameScores": [
+   0.9991
+  ]
+ },
+ "assets/sprites/trants/frames/trant_bubble_m4_f0.webp": {
+  "animal": "trant-bubble-m4-f0",
+  "swf": "harvestable_resources/bubble_tree/trant_bubble.swf",
+  "sprite": 125,
+  "label": null,
+  "swfFrames": [
+   10,
+   10
+  ],
+  "swfLabelFrames": 1,
+  "cells": 1,
+  "fw": 167,
+  "fh": 277,
+  "mirror": false,
+  "shift": 0,
+  "offset3x": [
+   176,
+   334
+  ],
+  "score": 0.9991,
+  "minFrame": 0.9991,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/trants/frames/trant_bubble_m4_f0@3x.webp",
+  "bytes": 47798,
+  "firstDraw": true,
+  "frameScores": [
+   0.9991
+  ]
+ },
+ "assets/sprites/trants/frames/trant_bubble_m6_f0.webp": {
+  "animal": "trant-bubble-m6-f0",
+  "swf": "harvestable_resources/bubble_tree/trant_bubble.swf",
+  "sprite": 148,
+  "label": null,
+  "swfFrames": [
+   10,
+   10
+  ],
+  "swfLabelFrames": 1,
+  "cells": 1,
+  "fw": 167,
+  "fh": 277,
+  "mirror": false,
+  "shift": 0,
+  "offset3x": [
+   111,
+   249
+  ],
+  "score": 0.9991,
+  "minFrame": 0.9991,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/trants/frames/trant_bubble_m6_f0@3x.webp",
+  "bytes": 69506,
+  "firstDraw": true,
+  "frameScores": [
+   0.9991
+  ]
+ },
+ "assets/sprites/trants/frames/trant_bubble_m8_f0.webp": {
+  "animal": "trant-bubble-m8-f0",
+  "swf": "harvestable_resources/bubble_tree/trant_bubble.swf",
+  "sprite": 179,
+  "label": null,
+  "swfFrames": [
+   10,
+   10
+  ],
+  "swfLabelFrames": 1,
+  "cells": 1,
+  "fw": 167,
+  "fh": 277,
+  "mirror": false,
+  "shift": 0,
+  "offset3x": [
+   73,
+   186
+  ],
+  "score": 0.9991,
+  "minFrame": 0.9991,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/trants/frames/trant_bubble_m8_f0@3x.webp",
+  "bytes": 104366,
+  "firstDraw": true,
+  "frameScores": [
+   0.9991
+  ]
+ },
+ "assets/sprites/trants/frames/trant_bubble_m9_f0.webp": {
+  "animal": "trant-bubble-m9-f0",
+  "swf": "harvestable_resources/bubble_tree/trant_bubble.swf",
+  "sprite": 184,
+  "label": null,
+  "swfFrames": [
+   10,
+   10
+  ],
+  "swfLabelFrames": 1,
+  "cells": 1,
+  "fw": 167,
+  "fh": 277,
+  "mirror": false,
+  "shift": 0,
+  "offset3x": [
+   35,
+   72
+  ],
+  "score": 0.9992,
+  "minFrame": 0.9992,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/trants/frames/trant_bubble_m9_f0@3x.webp",
+  "bytes": 117586,
+  "firstDraw": true,
+  "frameScores": [
+   0.9992
   ]
  }
 }
