@@ -1498,6 +1498,7 @@
     "ours: * The online line is ours (Glitch's tip named only the street): the count,": "whos-here-online-link"
   },
   "public/js/window-stack.js": {
+    "ours: over the game (TSFrontController.as 4353-4400). Ours.": "home-screen-page-viewer",
     "remake-own: and the screens, whatever opened after it. The remake's own card (the": "ours-window-stack",
     "remake-own: copy of the bug icon is on top of them). The remake's own window: the client had no such": "ours-window-stack"
   },
