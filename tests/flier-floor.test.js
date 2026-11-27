@@ -34,10 +34,10 @@ import {
   flightFloorFor,
   floorProfile,
   floorUnder,
-} from '../public/js/street-creatures.js?v=e75e6b18';
+} from '../public/js/street-creatures.js?v=f3d17c92';
 import { setCreatureEcology, streetObjectLayout } from '../tools/build-realtime-objects.mjs';
 import { STREET_INDEX, applyStreetIndex, loadStreetDataFromFs, setZoneStreetsShown } from '../public/js/street-loader.js?v=10376267';
-import { flightGroundFor, setStreetEcologyCatalog } from '../public/js/street-ecology.js?v=8f50537c';
+import { flightGroundFor, setStreetEcologyCatalog } from '../public/js/street-ecology.js?v=1d97eefe';
 import { platformsScreen, streetWidth, isItemSolid } from '../public/js/street-model.js?v=a9a05f9d';
 import { nearestSurfaceY } from '../public/js/walk-surface.js?v=f21ce37b';
 

@@ -21,7 +21,7 @@ import {
   populationForStreet,
   setStreetEcologyCatalog,
   streetReservedSpots,
-} from '../public/js/street-ecology.js?v=8f50537c';
+} from '../public/js/street-ecology.js?v=1d97eefe';
 import { creatureRequests, setCreatureEcology } from '../tools/build-realtime-objects.mjs';
 
 const root = join(import.meta.dirname, '..');

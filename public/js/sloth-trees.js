@@ -13,11 +13,18 @@
  *    covers it and the crown's lower edge lies between 200 px over the trunk's top and its base;
  *    one crown over several trunks keeps the trunk nearest its centre. That leaves out bare
  *    trees, acacias, shrub rows and crown pieces at a street's ends.
- * 3. The sloth: on the side of the trunk the crown spreads further to (`dir`), BRANCH_OFFSET
- *    out, at the crown's lower edge but never less than MIN_LIFT over the floor below it (its
- *    origin, the SWF's point: the HIDE ME box above it sits in the leaves, the hanging sloth
- *    under it).
- * 4. The Knocker: on the trunk, its foot KNOCKER_LIFT over the floor at the trunk.
+ * 3. The sloth: on the side of the trunk the crown spreads further to (`dir`), at the crown's
+ *    lower edge but never less than MIN_LIFT over the floor below it (its origin, the SWF's point:
+ *    the HIDE ME box above it sits in the leaves, the hanging sloth under it), BRANCH_OFFSET out
+ *    from the trunk box's middle, or nearer where that leaves the thick end of its own branch
+ *    (BRANCH_REACH back, BRANCH_DROP down) short of the trunk as drawn: then BRANCH_DEPTH into it.
+ *    #746: the trunk art is lopsided (tree_plane_trunk_01a's trunk stands about 40 px right of its
+ *    box's middle), so this reads the drawn columns (SLOTH_TRUNK_COLUMNS,
+ *    tools/build-sloth-trunk-columns.mjs), not the box.
+ * 4. The Knocker: on the trunk, its foot KNOCKER_LIFT over the floor at the trunk and its ring
+ *    (KNOCKER_RING over the foot) on the middle of the drawn trunk (#746; the box's middle with no
+ *    columns), outside the sloth's box (KNOCKER_CLEAR, KNOCKER_EDGE). Glitch's were hand-placed on
+ *    the trunk (the 2012 Haqiq Cedony snaps).
  *
  * On the 37 sloth streets this finds exactly as many trees as the location file has Sloths
  * (84), and puts the 7 sloths seen hanging out in the Eleven players' 2012 snaps within 24 px
@@ -28,10 +35,31 @@
  * Pure: street JSON in (street px, y up negative), screen px out (0, 0 = the street's top left).
  */
 
+import { SLOTH_TRUNK_COLUMNS } from './sloth-trunk-columns-data.js?v=2903cb2a';
+
 export const CROWN_GAP = 40;
 export const BRANCH_OFFSET = 110;
 export const MIN_LIFT = 170;
 export const KNOCKER_LIFT = 75;
+/** #746: the Knocker's ring over its foot (sloth_knocker, 34 x 50, its point the bottom centre). */
+export const KNOCKER_RING = 25;
+/**
+ * #746: the thick end of the sloth's own branch from its spot (the hands): SLOTH_GRIP (30, 22) to the
+ * SWF's origin, then the sloth_hidden branch end at 59 back, its middle row 36 down (rows 88-118 of
+ * the cell at x 2).
+ */
+export const BRANCH_REACH = 89;
+export const BRANCH_DROP = 14;
+/** #746: how far at least the branch's thick end goes into the drawn trunk, so it grows out of it. */
+export const BRANCH_DEPTH = 2;
+/**
+ * #746: the least a sloth's spot stands off its Knocker, so the Knocker stays outside the sloth's box
+ * (resource-nodes-feature.js SLOTH_GRIP.x 30 + SLOTH_REACH.box.back 61, and 1): each its own thing to
+ * point at. Where a trunk leans toward its sloth, the Knocker hangs off the trunk's middle, away from
+ * the sloth, but never nearer the trunk's far edge than KNOCKER_EDGE; past that the sloth hangs out.
+ */
+export const KNOCKER_CLEAR = 92;
+export const KNOCKER_EDGE = 10;
 /** The sloth's HIDE ME box from its origin (js/sloth-art.js SLOTH_CANOPY), for the "narrow" flag. */
 const HIDE_BOX = Object.freeze({ x: -52, w: 164 });
 
@@ -55,10 +83,27 @@ function streetBoxes(street, keepLayer, re) {
       if (!re.test(String(d.sprite || ''))) continue;
       const x = d.x + b.l;
       const y = d.y + b.t + (H - layer.h);
-      out.push({ x, x0: x - d.w / 2, x1: x + d.w / 2, y0: y - d.h, y1: y });
+      out.push({ x, x0: x - d.w / 2, x1: x + d.w / 2, y0: y - d.h, y1: y, sprite: String(d.sprite), w: d.w, h: d.h, flip: Boolean(d.flip), r: Number(d.r) || 0 });
     }
   }
   return out;
+}
+
+/**
+ * PURE (#746): the trunk's drawn [left, right] at street row y (SLOTH_TRUNK_COLUMNS: the art as
+ * street-render.js draws it, anchored bottom centre, sized w x h, mirrored), or null where nothing is
+ * drawn, the trunk is turned or its art was never measured.
+ */
+export function drawnTrunkAt(trunk, y, columns = SLOTH_TRUNK_COLUMNS) {
+  const c = Object.prototype.hasOwnProperty.call(columns, trunk.sprite) ? columns[trunk.sprite] : null;
+  if (!c || trunk.r || !(trunk.w > 0 && trunk.h > 0)) return null;
+  const v = (y - trunk.y0) / trunk.h;
+  if (!(v >= 0 && v < 1)) return null;
+  const row = Math.floor(v * c.h);
+  const [l, r] = [c.rows[row * 2], c.rows[row * 2 + 1]];
+  if (!(l >= 0 && r > l)) return null;
+  const at = (px) => (trunk.flip ? trunk.x + trunk.w / 2 - (px * trunk.w) / c.w : trunk.x - trunk.w / 2 + (px * trunk.w) / c.w);
+  return [Math.min(at(l), at(r)), Math.max(at(l), at(r))];
 }
 
 const near = (a, c) => a.x0 <= c.x1 + CROWN_GAP && a.x1 >= c.x0 - CROWN_GAP && a.y0 <= c.y1 + CROWN_GAP && a.y1 >= c.y0 - CROWN_GAP;
@@ -110,7 +155,7 @@ export function floorBelow(platforms, x, y) {
  * the sloth (its hit box reaches down to it); flags: 'no floor', 'lift' (outside 150-260 px),
  * 'narrow' (the HIDE ME box sticks out past the crown).
  */
-export function slothTrees(street) {
+export function slothTrees(street, columns = SLOTH_TRUNK_COLUMNS) {
   if (!street?.bounds || !Array.isArray(street.layers)) return [];
   const b = street.bounds;
   const crowns = mergeCrowns(streetBoxes(street, (l, W) => l.z > 0 && l.w === W, CROWN_RE));
@@ -127,25 +172,45 @@ export function slothTrees(street) {
   const out = [];
   for (const [crown, t] of byCrown) {
     const dir = centre(crown) >= t.x ? 1 : -1;
-    const x = pyRound(t.x + dir * BRANCH_OFFSET);
     const edge = crown.y1;
-    const floor = floorBelow(street.platforms, x, edge - 60);
     const trunkFloor = floorBelow(street.platforms, t.x, t.y0);
+    // The sloth's spot, the floor under it (its lift) and the Knocker for a given x.
+    const hang = (x) => {
+      const floor = floorBelow(street.platforms, x, edge - 60);
+      const y = pyRound(floor == null ? edge + 10 : Math.min(edge, floor - MIN_LIFT));
+      const fy = floor == null ? y + MIN_LIFT : pyRound(floor);
+      const ky = trunkFloor == null ? fy - KNOCKER_LIFT : pyRound(trunkFloor - KNOCKER_LIFT);
+      const ring = drawnTrunkAt(t, ky - KNOCKER_RING, columns);
+      if (!ring) return { x, y, floor, fy, kx: pyRound(t.x), ky };
+      // The ring on the middle of the trunk, or off it away from the sloth enough to stay clear of
+      // its box, never nearer the far edge than KNOCKER_EDGE.
+      const mid = (ring[0] + ring[1]) / 2;
+      const kx = dir > 0
+        ? Math.max(ring[0] + KNOCKER_EDGE, Math.min(mid, x - KNOCKER_CLEAR))
+        : Math.min(ring[1] - KNOCKER_EDGE, Math.max(mid, x + KNOCKER_CLEAR));
+      return { x, y, floor, fy, kx: pyRound(kx), ky };
+    };
+    let at = hang(pyRound(t.x + dir * BRANCH_OFFSET));
+    // #746: in to the drawn trunk at the branch's row when its branch falls short; out only when its
+    // box would still take in the Knocker (the row moves with the lift, so again until it settles).
+    for (let i = 0; i < 3; i += 1) {
+      const col = drawnTrunkAt(t, at.y + BRANCH_DROP, columns);
+      const reach = col ? pyRound((dir > 0 ? col[1] : col[0]) + dir * (BRANCH_REACH - BRANCH_DEPTH)) : at.x;
+      let next = dir * (at.x - reach) > 0 ? hang(reach) : at;
+      if (dir * (next.x - next.kx) < KNOCKER_CLEAR) next = hang(next.kx + dir * KNOCKER_CLEAR);
+      if (next.x === at.x) break;
+      at = next;
+    }
+    const { x, y, floor, fy, kx, ky } = at;
     const flags = [];
-    let y;
     if (floor == null) {
-      y = pyRound(edge + 10);
       flags.push('no floor');
     } else {
-      y = pyRound(Math.min(edge, floor - MIN_LIFT));
       const lift = pyRound(floor) - y;
       if (lift < 150 || lift > 260) flags.push('lift');
       const bx0 = x + (dir > 0 ? HIDE_BOX.x : -HIDE_BOX.x - HIDE_BOX.w);
       if (bx0 < crown.x0 || bx0 + HIDE_BOX.w > crown.x1) flags.push('narrow');
     }
-    const fy = floor == null ? y + MIN_LIFT : pyRound(floor);
-    const kx = pyRound(t.x);
-    const ky = trunkFloor == null ? fy - KNOCKER_LIFT : pyRound(trunkFloor - KNOCKER_LIFT);
     out.push({
       x: x - b.l,
       y: y - b.t,

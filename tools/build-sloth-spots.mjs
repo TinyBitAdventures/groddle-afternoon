@@ -7,7 +7,7 @@
  * left to right, so `npc_sloth:<i>` is the i-th tree from the left, for good.
  *
  * It prints the rule's flags (lift outside 150-260 px, no floor, a HIDE ME box wider than its
- * crown: "narrow", fine to the eye on all ten) and fails when a street's tree count is not its
+ * crown: "narrow", 8 since #746: check them by eye) and fails when a street's tree count is not its
  * Sloth count.
  *
  *   node tools/build-sloth-spots.mjs          write
@@ -16,7 +16,7 @@
 import { readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { slothSpotRow, slothTrees } from '../public/js/sloth-trees.js?v=a3299191';
+import { slothSpotRow, slothTrees } from '../public/js/sloth-trees.js?v=a44a0ed8';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const OUT = 'public/js/sloth-spots-data.js';

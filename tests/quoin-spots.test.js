@@ -30,7 +30,7 @@ import {
 import { QUOIN_COIN_COUNTS, QUOIN_SPOTS } from '../public/js/quoin-spots-data.js?v=7c343cbc';
 import { streetQuoinLayout } from '../tools/build-realtime-quoins.mjs';
 import { applyStreetIndex, loadStreetDataFromFs, setZoneStreetsShown } from '../public/js/street-loader.js?v=10376267';
-import { setStreetEcologyCatalog } from '../public/js/street-ecology.js?v=8f50537c';
+import { setStreetEcologyCatalog } from '../public/js/street-ecology.js?v=1d97eefe';
 
 const root = join(import.meta.dirname, '..');
 const read = (path) => JSON.parse(readFileSync(join(root, path), 'utf8'));

@@ -27,7 +27,7 @@ import {
   pickHole,
 } from '../random-holes.js?v=e979c4ae';
 import { teleportWithinStreet } from '../within-street.js?v=5ce33cdf';
-import { groundAt } from '../street-arrival.js?v=c7294edc';
+import { groundAt } from '../street-arrival.js?v=b97af039';
 import { streetWidth } from '../street-model.js?v=a9a05f9d';
 import { AVATAR_BODY_H } from '../avatar-step.js?v=8415ee96';
 import { isLoaded, onLoaded, textureFromUrl } from '../textures.js?v=b8e38103';

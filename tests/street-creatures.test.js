@@ -37,14 +37,14 @@ import {
   restAt,
   sharedCreatureLabel,
   walkerAt,
-} from '../public/js/street-creatures.js?v=e75e6b18';
-import { actMessage, createStreetCopy, guanoPiles, idKind, reconcile, takeObjs } from '../public/js/street-objects.js?v=7d1864e8';
-import { streetObjectsFeature } from '../public/js/features/street-objects-feature.js?v=add76182';
-import { FEATURES } from '../public/js/features/index.js?v=9f008cd7';
+} from '../public/js/street-creatures.js?v=f3d17c92';
+import { actMessage, createStreetCopy, guanoPiles, idKind, reconcile, takeObjs } from '../public/js/street-objects.js?v=4c07576e';
+import { streetObjectsFeature } from '../public/js/features/street-objects-feature.js?v=841cb1ef';
+import { FEATURES } from '../public/js/features/index.js?v=92065871';
 import { GAME_EPOCH_MS } from '../public/js/game-day.js?v=57fecfcb';
 import { creatureRequests, setCreatureEcology, streetObjectLayout } from '../tools/build-realtime-objects.mjs';
 import { STREET_INDEX, applyStreetIndex, loadStreetDataFromFs } from '../public/js/street-loader.js?v=10376267';
-import { setStreetEcologyCatalog } from '../public/js/street-ecology.js?v=8f50537c';
+import { setStreetEcologyCatalog } from '../public/js/street-ecology.js?v=1d97eefe';
 import { serverPath, skipWithoutServer } from '../tools/repos.mjs';
 
 const root = join(import.meta.dirname, '..');

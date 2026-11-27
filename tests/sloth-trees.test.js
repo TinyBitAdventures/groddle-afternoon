@@ -6,10 +6,10 @@ import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { slothSpotFromRow } from '../public/js/sloth-trees.js?v=a3299191';
-import { SLOTH_SPOTS } from '../public/js/sloth-spots-data.js?v=7396e9db';
+import { slothSpotFromRow } from '../public/js/sloth-trees.js?v=a44a0ed8';
+import { SLOTH_SPOTS } from '../public/js/sloth-spots-data.js?v=b8730c99';
 import { buildSlothSpots, slothStreets } from '../tools/build-sloth-spots.mjs';
-import { measuredNodeSpots, populationForStreet } from '../public/js/street-ecology.js?v=8f50537c';
+import { measuredNodeSpots, populationForStreet } from '../public/js/street-ecology.js?v=1d97eefe';
 import { SLOTH_SHEETS } from '../public/js/sloth-art.js?v=a2768e2f';
 import {
   SLOTH_GRIP,
@@ -18,7 +18,7 @@ import {
   resourceSpawnPlan,
   slothGeometry,
   slothSpotsFromArt,
-} from '../public/js/features/resource-nodes-feature.js?v=52b79748';
+} from '../public/js/features/resource-nodes-feature.js?v=25b58b25';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const ecology = JSON.parse(readFileSync(join(root, 'public/assets/content/street-ecology.json'), 'utf8'));
@@ -95,9 +95,10 @@ describe('sloth trees (G891)', () => {
         assert.ok(spot.knocker.y < spot.floor && spot.knocker.y > spot.y, `${tsid} Knocker between the branch and the floor`);
       }
     }
-    // Kaha Haha's one Sloth: 1268,-1860 left of its trunk (the snap: 1270,-1872), 640 px under the top.
+    // Kaha Haha's one Sloth: 1293,-1860 left of its trunk (the snap: 1270,-1872), 640 px under the top.
+    // #746: 25 px in from the trunk box's 110 (1268), so its branch reaches the trunk as drawn.
     const kaha = slothSpotFromRow(SLOTH_SPOTS.GHFEKBJFP0J2J9Q[0]);
-    assert.deepEqual([kaha.x, kaha.y, kaha.dir], [1268 + 2000, -1860 + 2500, -1]);
+    assert.deepEqual([kaha.x, kaha.y, kaha.dir], [1293 + 2000, -1860 + 2500, -1]);
     assert.ok(slothGeometry({ x: kaha.x, y: kaha.y, sloth: kaha }).origin.y - climb > 500);
   });
 

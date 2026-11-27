@@ -14,7 +14,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { applyStreetIndex, setZoneStreetsShown } from '../public/js/street-loader.js?v=10376267';
 import { platformsScreen, streetWidth } from '../public/js/street-model.js?v=a9a05f9d';
-import { PLACEMENT_FOOTPRINTS, ecologyForStreet, planStreetPlacements, populationForStreet, setStreetEcologyCatalog, streetReservedSpots } from '../public/js/street-ecology.js?v=8f50537c';
+import { PLACEMENT_FOOTPRINTS, ecologyForStreet, planStreetPlacements, populationForStreet, setStreetEcologyCatalog, streetReservedSpots } from '../public/js/street-ecology.js?v=1d97eefe';
 import { placementRequests } from '../tools/build-realtime-objects.mjs';
 import { FEAST_SPOTS, PILE_HALF, PILE_MARGIN } from '../public/js/feast-day.js?v=29d69db5';
 import { TABLE_AT, TABLE_STREET } from '../public/js/pot-luck-feast.js?v=971888be';
