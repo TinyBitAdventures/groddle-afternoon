@@ -6583,6 +6583,7 @@
    ],
    "why": "Glitch kept the game open behind every site page by opening each in its own named browser window (TSFrontController.as 4353-4400). A Home Screen app has one window and no tabs, so a new window replaced the game. Ours: the pages open in a sheet over the game instead (#401 for the Encyclopedia, #741 for every other page: Support the game, See who, the boards, profiles, the privacy policy). Browser tabs keep the new window.",
    "ruling": "Austin 2026-11-27 (#741): in the Home Screen app every link to our own site opens in the in-game page viewer with Back to the game, Contribute included; one rule, not a list of cases",
+   "rows": []
   },
   {
    "id": "cultivate-drag-pin-and-reason",
