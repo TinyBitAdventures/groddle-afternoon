@@ -102,7 +102,9 @@ describe('#729 in Chrome (1687x966, Decoration Mode off): the hover over a box o
           await tab.mouse.move(cx - 300, cy + 200);
           await tab.waitForTimeout(200);
           await tab.mouse.move(cx, cy, { steps: 8 });
+          // Under a loaded machine the hover can take longer than a fixed pause: wait for it (up to 5 s).
           await tab.waitForTimeout(700);
+          await tab.waitForFunction(() => { const d = document.querySelector('canvas')?.dataset; return Boolean(d?.hoverTarget && d?.enterHint); }, null, { timeout: 5000 }).catch(() => {});
           return tab.evaluate(() => ({ target: document.querySelector('canvas')?.dataset.hoverTarget, hint: document.querySelector('canvas')?.dataset.enterHint }));
         };
         seen.box = await hoverAt('sdb-icon');
