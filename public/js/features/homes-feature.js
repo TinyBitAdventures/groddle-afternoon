@@ -160,6 +160,7 @@ import {
   UNEXPAND_TEXT,
 } from '../home-decor.js?v=31f37d9b';
 import { isTrophyDecor, placedTrophies } from '../home-trophies.js?v=649b111e';
+import { FALL_ARRIVE_ABOVE, cutFloorLines, FALL_THROUGH, fallCheck, fallCut, fallDone, floorHoles, landingX } from '../home-floor-holes.js?v=4b244ef4';
 import { applyBonusUpgrade, applyUpgrade, bonusUpgradeLine, currantsText, hasUpgrades, pieceLabel, rollBonusUpgrade, upgradeRow, upgradeVerb, UPGRADE_TEXT } from '../furniture-upgrades.js?v=f563b304';
 import { LONG_PRESS_MS, LONG_PRESS_SLOP, ECHO_MS, createContextMenu } from '../ui/context-menu.js?v=0266831a';
 import { DOCK_GAP, DOCK_W, chooseUpgrade, closeUpgradePicker, openUpgradePicker, placeUpgradePicker, saveUpgrade, upgradePickerOpen, upgradePickerState } from '../furniture-upgrade-picker.js?v=33c63a1f';
@@ -624,6 +625,19 @@ let towerDecor = [];
 let floors = createFloorsState();
 /** Where to stand after a Door between floors: room x, used once. */
 let floorArrivalX = null;
+/**
+ * #669: a fall through a hole in an upper floor (js/home-floor-holes.js) under way: { from, to,
+ * walls (the room x the feet stay between), x (room x to land at, set at the floor change), at
+ * (ms), lines (the walk lines before the cut), entering }, or null.
+ */
+let holeFall = null;
+/** #669: your room x last frame on this floor (null on the first frame in a room) and the scene it was read in. */
+let holePrevX = null;
+let holeScene = null;
+/** QA: the last fall (fell:<from>-><to>@<room x>). */
+let holeLast = '';
+/** #669: arriving from a fall, feet start this far over the walk line of the floor below (once). */
+let floorArrivalFall = null;
 let doorLast = '';
 /** The home-street walk line the save was made on (old saves: 620); see liftOldStreetRows. */
 let savedStreetGround = STREET_GROUND_Y;
@@ -782,6 +796,9 @@ function publish(engine) {
   engine.setData('homeFloors', floorCount(floors));
   engine.setData('homeDoorPending', floors.pending ? `${floors.pending.floor}:${floors.pending.id}` : '');
   engine.setData('homeDoorLast', doorLast);
+  // #669: the holes in this floor (id:x1-x2, room x) and the last fall through one.
+  engine.setData('homeHoles', holesHere().map((h) => `${h.upgradeId}:${h.x1}-${h.x2}`).join(','));
+  engine.setData('homeFallLast', holeLast);
 }
 
 // ---------------------------------------------------------------------------
@@ -7750,8 +7767,33 @@ function floorDemo(engine) {
   setMode(engine, 'decorate');
 }
 
+/**
+ * QA (#669): &homeholedemo=<style>[@<room x>] sets that fall-through rug (js/home-floor-holes.js
+ * FALL_THROUGH, e.g. 310 or 353) down on the upper floor you first stand on (once; with
+ * &homefloordemo=built3up, the second floor), at room x 800 unless given.
+ */
+let holeDemoDone = false;
+function holeDemo(engine) {
+  const raw = String(engine.param('homeholedemo') || '');
+  if (!raw || holeDemoDone || !(houseFloorHere() > 0)) return;
+  holeDemoDone = true;
+  const [style, at] = raw.split('@');
+  const row = FALL_THROUGH.find((r) => String(r.upgradeId) === style);
+  if (!row) return;
+  decor.storage[row.classTsid] = (decor.storage[row.classTsid] || 0) + 1;
+  decor.styles = decor.styles || {};
+  decor.styles[row.classTsid] = [...(decor.styles[row.classTsid] || []), { upgradeId: row.upgradeId }];
+  const styles = decor.styles[row.classTsid];
+  const res = placeFurniture(decor, {}, row.classTsid, { x: Number(at) || 800 }, { style: styles.length - 1 });
+  if (!res.ok) return;
+  engine.save();
+  renderFurniture(engine);
+  publish(engine);
+}
+
 function demoSetup(engine) {
   floorDemo(engine);
+  holeDemo(engine);
   demoFurniture(engine);
   // QA: &homestyledemo=open opens Change Style on the home street once.
   if (!styleDialogDemoDone && scene?.room === 'street' && engine.param('homestyledemo') === 'open') {
@@ -8694,6 +8736,96 @@ async function goToHouseFloor(engine, floor, x) {
   return true;
 }
 
+/** #669: the holes in the floor you stand on (room x), [] on the ground floor, a Tower floor or outside. */
+function holesHere() {
+  const floor = houseFloorHere();
+  if (!floor) return [];
+  return floorHoles(decor.placed, furnitureSize);
+}
+
+/**
+ * #669 (ours, Austin 2026-11-27): each frame in the house, walking onto a hole in an upper floor
+ * (js/home-floor-holes.js FALL_THROUGH) cuts the walk line under you, so the avatar falls through
+ * it with the game's own gravity; once the feet are under the floor, the floor below is entered as
+ * a Door enters it (goToHouseFloor) and you come in through its ceiling at the same x, still falling.
+ */
+function stepHoleFall(engine, now) {
+  const p = engine.player;
+  if (!p || !scene || scene.room !== 'interior') return;
+  if (holeScene !== scene) {
+    holeScene = scene;
+    holePrevX = null;
+    holeFall = null;
+  }
+  if (holeFall) {
+    if (holeFall.entering) return;
+    if (!fallDone({ feetY: p.y, floorY: GROUND_Y, elapsedMs: now - holeFall.at })) return;
+    holeFall.entering = true;
+    const fall = holeFall;
+    // Where the feet are now (you may have drifted a little in the air), kept inside the walls.
+    fall.x = landingX(toRoom(p).x, fall.walls);
+    floorArrivalFall = { vy: Math.max(0, Number(p.vy) || 0) };
+    holeLast = `fell:${fall.from}->${fall.to}@${fall.x}`;
+    goToHouseFloor(engine, fall.to, fall.x).then((ok) => {
+      if (ok) return;
+      // The floor below could not be entered: the floor closes again under you.
+      floorArrivalFall = null;
+      holeLast = `failed:${fall.from}`;
+      const lines = scene?.background?.platformsScreen;
+      if (lines && fall.lines) lines.splice(0, lines.length, ...fall.lines);
+      holeFall = null;
+    });
+    return;
+  }
+  const floor = houseFloorHere();
+  const x = toRoom(p).x;
+  const prevX = holePrevX;
+  holePrevX = x;
+  if (!floor) return;
+  const hole = fallCheck({
+    floor,
+    editing: Boolean(mode || placing),
+    busy: Boolean(engine.acting?.()),
+    onGround: p.onGround === true,
+    prevX,
+    x,
+    vx: p.vx,
+    holes: holesHere(),
+  });
+  if (!hole) return;
+  const room = scene.background?.room;
+  const lines = scene.background?.platformsScreen;
+  if (!lines) return;
+  const x0 = roomX0();
+  const cut = fallCut({ x1: x0 + hole.x1, x2: x0 + hole.x2 }, p.x);
+  holeFall = {
+    from: floor,
+    to: floor - 1,
+    // The room's inner walls as keepInsideWalls keeps them (every floor is as wide as the others).
+    walls: { left: (room?.innerLeft ?? 0) + 12, right: (room?.innerRight ?? interiorWidth(decor)) - 12 },
+    x: null,
+    at: now,
+    lines: lines.slice(),
+    entering: false,
+  };
+  lines.splice(0, lines.length, ...cutFloorLines(lines, cut.x1, cut.x2));
+  p.onGround = false;
+  holeLast = `falling:${floor}@${Math.round(x)}`;
+  publish(engine);
+}
+
+/** #669: just in from a fall, the avatar comes in through the ceiling at its x and lands by gravity. */
+function arriveFromFall(engine) {
+  const fall = floorArrivalFall;
+  floorArrivalFall = null;
+  const p = engine.player;
+  if (!fall || !p) return;
+  p.y = GROUND_Y - FALL_ARRIVE_ABOVE;
+  p.vy = fall.vy;
+  p.onGround = false;
+  holePrevX = null;
+}
+
 function doorVerbs(target, engine) {
   const floor = target.state?.floor ?? 0;
   const role = doorRole(floors, floor, target.state?.doorId);
@@ -8868,6 +9000,7 @@ function homeScene(room, engine) {
 
 function afterEnter(engine) {
   bindPointer(engine);
+  arriveFromFall(engine);
   // #470: at home a pack stack may go into a Storage Display Box without Decorate (R9: every home drop target).
   wireDropTargets(engine);
   if ((mode === 'decorate' && scene.room !== 'interior') || (mode === 'cultivate' && scene.room !== 'street' && !inHouse())) {
@@ -9292,6 +9425,7 @@ export const homesFeature = {
     } else {
       if (inHouse()) wearFromNodes(engine, now);
       keepInsideWalls(engine);
+      stepHoleFall(engine, now);
       interiorCameraLook(engine, dtMs);
     }
     if (mode) {

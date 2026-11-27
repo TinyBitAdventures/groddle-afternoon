@@ -6264,6 +6264,25 @@
    ]
   },
   {
+   "id": "house-floor-holes",
+   "title": "Holes in an upper house floor: the Shortcut to Urth crack and the Manhole rugs drop you to the floor below",
+   "kind": "behaviour",
+   "status": "kept",
+   "where": [
+    {
+     "file": "public/js/home-floor-holes.js",
+     "symbol": "FALL_THROUGH"
+    },
+    {
+     "file": "public/js/features/homes-feature.js",
+     "symbol": "stepHoleFall"
+    }
+   ],
+   "why": "Glitch gave furniture_rug styles 310 (Shortcut to Urth, furniture_rug_floor_crack.swf) and 353 (Manhole, furniture_rug_man_silhouette_hole.swf) no plats, walls or config (items/catalog_furniture.js: \"plats: {}\"), and no GSJS, client or SWF code makes them holes; a player remembers falling through one. Ours: walk onto one on the second or third floor and you fall through with the game's gravity (the walk line is cut under you), enter the floor below as a Door does and come in through its ceiling at the same x, kept inside the walls. Not on the ground floor, not in Decoration or Cultivation Mode, not for a player standing still; which pieces are holes and how much of each art is open is one list, FALL_THROUGH.",
+   "ruling": "Austin 2026-11-27 (report #669): make the crack rug a hole, and every Glitch piece you could fall through work the same way",
+   "rows": []
+  },
+  {
    "id": "map-home-shortcuts",
    "title": "House and Tower buttons on the Map's home card, beside its Home button",
    "kind": "UI",
