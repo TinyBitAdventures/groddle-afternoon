@@ -41,8 +41,8 @@
   "counts": {
     "fixing": 3,
     "known": 19,
-    "unreleased": 0,
-    "fixed": 656,
+    "unreleased": 4,
+    "fixed": 652,
     "lost": 5,
     "purpose": 18,
     "idea": 10
@@ -448,6 +448,11 @@
           "state": "known"
         },
         {
+          "id": "G1323",
+          "text": "Ice Nubbins in Nottis and Drifa stood on the path instead of hanging on the icy walls.",
+          "state": "unreleased"
+        },
+        {
           "id": "G678",
           "text": "In Thornfad Layers, the letter or heart that shows over your head by the locked door is not drawn yet.",
           "state": "fixed",
@@ -810,12 +815,6 @@
           "text": "The street Ball flew the same on every street, whatever the street's gravity.",
           "state": "fixed",
           "version": "v0.78.0"
-        },
-        {
-          "id": "G1323",
-          "text": "Ice Nubbins in Nottis and Drifa stood on the path instead of hanging on the icy walls.",
-          "state": "fixed",
-          "version": "v0.79.0"
         },
         {
           "id": "F184",
@@ -1206,6 +1205,21 @@
           "id": "G1316",
           "text": "Online, a Craftybot set down in a house can't use things lying on the floor; carried in the pack it works.",
           "state": "known"
+        },
+        {
+          "id": "G1327",
+          "text": "Un-expanding a house left things dropped by its right wall past the wall.",
+          "state": "unreleased"
+        },
+        {
+          "id": "G1333",
+          "text": "A placed machine couldn't be moved without picking it up and setting it down again.",
+          "state": "unreleased"
+        },
+        {
+          "id": "F186",
+          "text": "Leaving several cards with a friend's Butler said you no longer had them.",
+          "state": "unreleased"
         },
         {
           "id": "G640",
@@ -1611,26 +1625,8 @@
           "version": "v0.79.0"
         },
         {
-          "id": "G1327",
-          "text": "Un-expanding a house left things dropped by its right wall past the wall.",
-          "state": "fixed",
-          "version": "v0.79.0"
-        },
-        {
-          "id": "G1333",
-          "text": "A placed machine couldn't be moved without picking it up and setting it down again.",
-          "state": "fixed",
-          "version": "v0.79.0"
-        },
-        {
           "id": "F185",
           "text": "Clicking a stack of display boxes could pick the box above or below the one under the pointer.",
-          "state": "fixed",
-          "version": "v0.79.0"
-        },
-        {
-          "id": "F186",
-          "text": "Leaving several cards with a friend's Butler said you no longer had them.",
           "state": "fixed",
           "version": "v0.79.0"
         },

@@ -2810,11 +2810,11 @@
   ]
  },
  "release": {
-  "game": "0.78.0",
+  "game": "0.79.0",
   "deployed": "2026-11-27"
  },
  "git": {
-  "commits": 3868,
+  "commits": 3870,
   "since": "2026-10-19",
   "recent": [
    {
@@ -2921,16 +2921,6 @@
     "date": "2026-11-27",
     "kind": "improve",
     "text": "While a window waits on Play here, what can't act is greyed"
-   },
-   {
-    "date": "2026-11-27",
-    "kind": "fix",
-    "text": "\"See who\" shows in full at the foot of Who's here"
-   },
-   {
-    "date": "2026-11-27",
-    "kind": "fix",
-    "text": "A page open over the game stays on top when a quest offer pops up"
    }
   ]
  },
