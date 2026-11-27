@@ -42,7 +42,10 @@ describe('#581 planned rocks and nodes stand on their floor', () => {
   it('no planned rock or standing node on any street has an end of its foot more than 5 px over its floor', async () => {
     const c = await census({ over: 5 });
     const planned = c.rows.filter((r) => r[2] === 'planned');
-    assert.ok(c.planned.rock > 1000 && c.planned.node > 1000, 'the census lays out every street');
+    // Every street laid out: planned and measured together (G1323 moved Nottis's 144 Ice Nubbins from
+    // planned to measured wall spots, census 2026-11-27: 1,068 + 725 rocks, 913 + 512 nodes).
+    assert.ok(c.planned.rock + c.measured.rock > 1700 && c.planned.node + c.measured.node > 1300, `the census lays out every street: ${JSON.stringify({ planned: c.planned, measured: c.measured })}`);
+    assert.ok(c.planned.rock > 1000 && c.planned.node > 800, 'most rocks and nodes are still planned');
     assert.deepEqual(planned, [], `${planned.length} floating:\n${planned.slice(0, 20).map((r) => r.join(' ')).join('\n')}`);
     // The ones the front art would hide once seated stay a few px up, findable (census 2026-11-21: 11
     // rocks and 14 nodes, 6-11 px, under sliding foreground snow and front rock).
