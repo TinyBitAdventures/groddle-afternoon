@@ -1253,6 +1253,11 @@
   "public/js/skills-panel.js": {
     "ours: longer than its points say, in one plain line. Ours": "ours-study-time-hint"
   },
+  "public/js/sky-clock.js": {
+    "glitch-had-none: * Glitch never changed a street's sky with the time: every": "day-night-skies",
+    "ours: (js/game-day.js daylightState, NIGHT TINT). Ours,": "day-night-skies",
+    "ours: * DAY/NIGHT SKIES (#749, ours): an outdoor street's own sky follows Ur's": "day-night-skies"
+  },
   "public/js/slash-commands.js": {
     "no-source: /stuck's words (the remake's own, no source line).": "stuck-command",
     "ours: doChatCommand 1842-1934 has neither): both are ours.": "stuck-command",

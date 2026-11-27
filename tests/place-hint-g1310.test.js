@@ -12,7 +12,7 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { signpostGlowParts } from '../public/js/street-render.js?v=c3c73838';
+import { signpostGlowParts } from '../public/js/street-render.js?v=a175beef';
 
 const ROOT = join(import.meta.dirname, '..');
 const read = (rel) => readFileSync(join(ROOT, rel), 'utf8');

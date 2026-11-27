@@ -31,7 +31,7 @@ import { fileURLToPath } from 'node:url';
 import { JELLISAC_SPOTS } from '../public/js/node-spots-data.js?v=97d4281c';
 import { FRONT_SEE_THROUGH, MEASURED_NODE_COVERS, frontDrift, streetEcologyAliases } from '../public/js/street-ecology.js?v=1d97eefe';
 import { decoCovers } from '../public/js/barnacle-walls.js?v=75e568c3';
-import { DECO_TWINS } from '../public/js/street-render.js?v=c3c73838';
+import { DECO_TWINS } from '../public/js/street-render.js?v=a175beef';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const OUT = 'public/js/jellisac-hole-spots-data.js';

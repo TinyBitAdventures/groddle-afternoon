@@ -6638,6 +6638,33 @@
    ],
    "why": "Glitch told players nothing about an update beyond its Reload is Coming debuff before a deploy. Ours: play/whats-new.json lists each release's few player-facing lines (written at release from the Emoji-Log draft), and a browser that last loaded an older version sees the top three on the loading card, rolled up across every release since a visit within a week, else the newest release only; a first visit shows nothing. Nothing waits for it, so a fast load can hide it.",
    "ruling": "Austin 2026-11-27 (#745): option 3, the notes on the loading card, not a centred card or a corner notice",
+  },
+  {
+   "id": "day-night-skies",
+   "title": "Day/night skies: an outdoor street's own sky gradient follows Ur's clock (sunset tones at dawn and dusk, dark blue with stars at night, its own sky by day), the far layers tinted by depth",
+   "kind": "visual",
+   "status": "kept",
+   "where": [
+    {
+     "file": "public/js/sky-clock.js",
+     "symbol": "skyLook"
+    },
+    {
+     "file": "public/js/sky-clock.js",
+     "symbol": "ownSkyReason"
+    },
+    {
+     "file": "public/js/street-render.js",
+     "symbol": "setSkyLook"
+    },
+    {
+     "file": "public/game.js",
+     "symbol": "applySkyClock"
+    }
+   ],
+   "why": "Glitch drew every location's one top/bottom gradient at every hour (DrawUtil.drawVerticalGradientBG) and had no world tint; the remake's Dametime tint washed the whole street. Ours: each look is derived from the street's own two colours (the dawn, dusk and night mixes of the decision mockups), the far parallax layers take a tint by depth (the furthest the most) so forest streets with little sky still read as night, a seeded star field at night, the world tint halved at dawn and dusk where the sky does that work, changed at most once a game minute. Outdoor streets of the world's regions only: never ownLight places, indoor ecology rows, scenes and homes, the cave, Naraka, quest, party, Seams, Moshi and Vortex hubs, or a sky already dark (average luma under 80). Night tint off turns it off too.",
+   "ruling": "Austin 2026-11-27 (#749, compostghost's idea): build the sky and stars; stray thoughts later",
+   "noCompare": "A colour shift of each street's own sky gradient and a star field drawn in code, not a picture; Tiny Speck drew no night sky to set beside it.",
    "rows": []
   }
  ]

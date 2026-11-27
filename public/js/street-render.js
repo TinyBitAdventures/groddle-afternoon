@@ -24,6 +24,7 @@ import { signWords } from './deco-sign.js?v=e98e50f9';
 import { loadWorldFont, WORLD_FONT_FAMILY } from './world-text.js?v=6b49f88c';
 import { buildDoorSprite } from './door-view.js?v=ff6f0e9a';
 import { visibleDoors } from './doors.js?v=f815e7c8';
+import { farLayerTint, gradientColourAt, starField } from './sky-clock.js?v=6b9184e9';
 
 const DECO_BASE = 'assets/decos/groddle/';
 /**
@@ -1886,19 +1887,34 @@ export function skyColourAt(top, bottom, layerTop, layerH, y) {
   return out;
 }
 
+/**
+ * Paints a vertical gradient into a 2 x 256 canvas: `stops` as [[offset 0..1, css colour], ...].
+ * #749: the same canvas is painted again when the sky follows the clock (setSkyLook).
+ */
+function paintGradient(canvas, stops) {
+  const ctx = canvas.getContext('2d');
+  const grad = ctx.createLinearGradient(0, 0, 0, 256);
+  for (const [at, colour] of stops) grad.addColorStop(at, colour);
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, 2, 256);
+}
+
 /** Vertical sky gradient texture from the location's top/bottom colours. */
 function gradientTexture(PIXI, top, bottom) {
   const canvas = document.createElement('canvas');
   canvas.width = 2;
   canvas.height = 256;
-  const ctx = canvas.getContext('2d');
-  const grad = ctx.createLinearGradient(0, 0, 0, 256);
-  grad.addColorStop(0, `#${top}`);
-  grad.addColorStop(1, `#${bottom}`);
-  ctx.fillStyle = grad;
-  ctx.fillRect(0, 0, 2, 256);
-  return PIXI.Texture.from(canvas);
+  paintGradient(canvas, [[0, `#${top}`], [1, `#${bottom}`]]);
+  const texture = PIXI.Texture.from(canvas);
+  texture.skyCanvas = canvas;
+  return texture;
 }
+
+const cssHex = (c) => `#${(c >>> 0).toString(16).padStart(6, '0').slice(-6)}`;
+
+/** #749: the star field's least width (px; a wider view draws it wider) and how far over the gradient's top it reaches (the top colour's cap). */
+const STAR_FIELD_W = 2048;
+const STAR_CAP_PX = 600;
 
 /**
  * Parallax offset for a non-middleground layer (client LocationRenderer
@@ -2609,6 +2625,8 @@ function buildGroundSkirt(PIXI, renderer, root, grounds, W, sourceH, depthPx, gr
       const cover = new PIXI.Container();
       cover.label = `edge-fade-${lc.label}`;
       cover.zIndex = lc.zIndex + 5;
+      // #749: tinted with its layer by the sky clock (setSkyLook).
+      cover.skyTintOf = lc;
       for (let x0 = 0; x0 < lw; x0 += lchunk) {
         const w = Math.min(lchunk, lw - x0);
         const art = PIXI.RenderTexture.create({ width: w, height: deepest, resolution: lres });
@@ -3060,6 +3078,8 @@ export function attachEdgeMirrors(PIXI, renderer, root, layers, W, sourceH, inse
         view.x = lc.x;
         view.y = lc.y;
         view.edgeOf = lc;
+        // #749: the layer's sky-clock tint (setSkyLook) carries on over its reflection.
+        view.tint = lc.tint ?? 0xffffff;
         lc.parent.addChild(view);
         lc.edgeMirror = view;
         views.set(lc, view);
@@ -3363,6 +3383,7 @@ export function buildStreetView(street, PIXI, opts = {}) {
       gradient: new PIXI.Sprite(gradientTexture(PIXI, street.gradient.top, street.gradient.bottom)),
     };
     skyView.addChild(skyParts.base, skyParts.cap, skyParts.gradient);
+    // #749: the stars of a clock-following sky go here, over the gradient (setSkyLook draws them).
     // Austin's iPhone 2026-11-24 (upright, Xhola Mades): under the pack row a band of the sky's
     // bottom colour (that street's yellow) showed below the dark earth. The bottom colour carried on
     // under the whole view, and on a low street the camera goes past the street's bottom further than
@@ -3693,6 +3714,25 @@ export function buildStreetView(street, PIXI, opts = {}) {
   // layer without its own size, does not slide: its span is the street's, 0 to sourceH.
   const skyLayer = (street.layers || [])[skyGradientLayerIndex(street.layers)];
   const skyLc = layerContainers.find((lc) => lc.skirtLayer === skyLayer && lc.parallaxLayer) || null;
+  // #749: the clock's sky (setSkyLook): the look drawn now (null: the street's own) and its stars.
+  const skyOwn = skyParts ? { top: skyParts.cap.tint, bottom: skyParts.base.tint } : null;
+  let skyLookKey = 'day';
+  let skyLookNow = null;
+  let skyStars = null;
+  /** The stars, drawn once a street (again only for a wider view), over the sky's top colour and the layer's upper part. */
+  const drawStars = (vpW) => {
+    const w = Math.max(STAR_FIELD_W, Math.ceil(vpW || 0));
+    const h = STAR_CAP_PX + Math.round((skyLc ? skyLc.parallaxLayer.h : sourceH) * 0.7);
+    if (!skyStars) {
+      skyStars = new PIXI.Graphics();
+      skyStars.label = 'sky-stars';
+      skyView.addChildAt(skyStars, skyView.children.indexOf(skyParts.gradient) + 1);
+    } else {
+      skyStars.clear?.();
+    }
+    for (const star of starField(w, h, 7)) skyStars.circle(star.x, star.y, star.r).fill({ color: 0xffffff, alpha: star.alpha });
+    skyStars.fieldW = w;
+  };
   /**
    * G1167: put the sky for a view whose top-left is camX, camY, vpW x skyH (the canvas, the pack's
    * band included): the gradient on the backmost layer where updateParallax left it this frame.
@@ -3710,7 +3750,16 @@ export function buildStreetView(street, PIXI, opts = {}) {
     put(skyParts.gradient, at.gradient);
     // SKY FILL (js/location-view.js stageBandColour): the sky's colour at the view's top edge, which
     // the band over a short street on an upright phone carries on up.
-    root.viewSkyTop = skyColourAt(street.gradient.top, street.gradient.bottom, at.gradient.y, at.gradient.h, camY);
+    root.viewSkyTop = skyLookNow
+      ? gradientColourAt(skyLookNow.stops, skyLookNow.at, (camY - at.gradient.y) / Math.max(1, at.gradient.h))
+      : skyColourAt(street.gradient.top, street.gradient.bottom, at.gradient.y, at.gradient.h, camY);
+    if (skyStars?.visible) {
+      // The stars hold still across the view (they are as far as the sky goes) and ride up and
+      // down with the gradient's layer; a view wider than the field draws it again, wider.
+      if (vpW > skyStars.fieldW) drawStars(vpW);
+      skyStars.x = camX;
+      skyStars.y = at.gradient.y - STAR_CAP_PX;
+    }
     skyParts.cap.visible = Boolean(at.cap);
     if (at.cap) put(skyParts.cap, at.cap);
     // Below the street's bottom: ground, never the sky's bottom colour (groundBelow, above).
@@ -3723,6 +3772,48 @@ export function buildStreetView(street, PIXI, opts = {}) {
       }
     }
   };
+  /**
+   * #749 (js/sky-clock.js): the sky by the clock. `look` from skyLook (null or a `day` look: the
+   * street's own sky): the gradient painted again with the look's three stops, the cap and base in
+   * its end colours, the stars at its strength, and every layer behind the middleground tinted by
+   * depth (farLayerTint: the furthest the most). Cheap: game.js calls it at most once a game
+   * minute, and an unchanged look (its `key`) does nothing. Returns whether the sky changed.
+   */
+  root.setSkyLook = (look) => {
+    if (!skyParts) return false;
+    const next = look && !look.day ? look : null;
+    const key = next ? next.key : 'day';
+    if (key === skyLookKey) return false;
+    skyLookKey = key;
+    skyLookNow = next;
+    const canvas = skyParts.gradient.texture?.skyCanvas;
+    if (canvas) {
+      paintGradient(canvas, next
+        ? [[0, cssHex(next.stops[0])], [next.at, cssHex(next.stops[1])], [1, cssHex(next.stops[2])]]
+        : [[0, `#${street.gradient.top}`], [1, `#${street.gradient.bottom}`]]);
+      skyParts.gradient.texture.source?.update?.();
+    }
+    skyParts.cap.tint = next ? next.stops[0] : skyOwn.top;
+    skyParts.base.tint = next ? next.stops[2] : skyOwn.bottom;
+    if (next && next.stars > 0) {
+      if (!skyStars) drawStars(0);
+      skyStars.visible = true;
+      skyStars.alpha = next.stars;
+    } else if (skyStars) {
+      skyStars.visible = false;
+    }
+    const far = root.children.filter((c) => c !== skyView && c.label !== 'ground-skirt' && (c.edgeOf || c.skyTintOf || c).zIndex < 0);
+    const zs = far.map((c) => (c.edgeOf || c.skyTintOf || c).zIndex);
+    const zMin = Math.min(...zs);
+    const zMax = Math.max(...zs);
+    for (const c of far) {
+      const z = (c.edgeOf || c.skyTintOf || c).zIndex;
+      c.tint = next ? farLayerTint(next.art, zMax > zMin ? (zMax - z) / (zMax - zMin) : 1) : 0xffffff;
+    }
+    return true;
+  };
+  /** QA (#749): the sky look drawn now: null for the street's own sky. */
+  root.skyLookNow = () => skyLookNow;
   /** QA (G1167): the gradient's layer and where it ran at the last placeSky. */
   root.skyStats = () => (skyParts ? {
     layer: skyLc ? skyLc.label : skyLayer?.id || null,

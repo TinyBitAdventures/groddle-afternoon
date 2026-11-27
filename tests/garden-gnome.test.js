@@ -37,12 +37,12 @@ import {
   tickGnome,
   visitGnomePlace,
 } from '../public/js/garden-gnome.js?v=20dd4af8';
-import { gardenGnomeFeature as feature } from '../public/js/features/garden-gnome-feature.js?v=a2735316';
+import { gardenGnomeFeature as feature } from '../public/js/features/garden-gnome-feature.js?v=f1bc47a8';
 import { worldArtFor } from '../public/js/world-art.js?v=a67514c8';
 import { GNOME_ART, GNOME_ART_DIR } from '../public/js/garden-gnome-art.js?v=994b7c76';
 import { HOME_STREET_TSID } from '../public/js/homes.js?v=dca6b2cd';
 import { normalizeHomeView, readVisitScene } from '../public/js/neighbours-mp.js?v=d270297d';
-import { neighboursMpFeature } from '../public/js/features/neighbours-mp-feature.js?v=adcd790f';
+import { neighboursMpFeature } from '../public/js/features/neighbours-mp-feature.js?v=a6a52824';
 import { HAS_SITE, SITE_DIR, sitePath } from '../tools/repos.mjs';
 import { HAS_PHP, PHP } from './php.js';
 

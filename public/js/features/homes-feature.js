@@ -231,7 +231,7 @@ import { RADIO_TEXT, radioOwned } from '../vine-radio.js?v=5436aa09';
 import { displayTopOf, itemstackOverlayPoint, overlayAlpha, overlayLifeMs, playPoofIn, trackOverlay } from '../overlay-art.js?v=e50bacca';
 import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=37ad5c9f';
 import { fadeInNewNear } from '../poof-fade.js?v=57db6aea';
-import { projectApi } from './street-jobs-feature.js?v=e345cf11';
+import { projectApi } from './street-jobs-feature.js?v=e93cde94';
 import { TOWER_CHASSIS, TOWER_CONFIG, TOWER_DOOR_DX, TOWER_GEO, TOWER_PROTO, normalizeTowerState } from '../home-tower.js?v=a7fc0cce';
 import { drawTowerBench, drawTowerElevator, drawTowerExit, towerApi, visitorTowerView } from './home-tower-feature.js?v=a39637c6';
 import { pieceUrl, roomPieces, surfaceAt, swatchPiece, wallTargetAt } from '../home-wallpaper.js?v=5d3594e4';
@@ -262,7 +262,7 @@ import {
 } from '../home-styles.js?v=ec5d2f69';
 import { frameTexture, isLoaded, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js?v=b8e38103';
 import { FALLBACK_MAX as WORLD_ART_FALLBACK_MAX, worldArtFor } from '../world-art.js?v=a67514c8';
-import { oneArmSignpost } from '../street-render.js?v=c3c73838';
+import { oneArmSignpost } from '../street-render.js?v=a175beef';
 import { ROCK_CATALOG } from '../mining.js?v=7ecaa572';
 import {
   HOUSE_SIGN,
