@@ -2814,9 +2814,19 @@
   "deployed": "2026-11-27"
  },
  "git": {
-  "commits": 3838,
+  "commits": 3840,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-27",
+    "kind": "fix",
+    "text": "Ice Nubbins in Drifa hang on the icy walls in clusters too, a few high enough to jump for, instead of standing on the path"
+   },
+   {
+    "date": "2026-11-27",
+    "kind": "fix",
+    "text": "The What's new styles and window code pass the Classic naming rule and the site-link sweep"
+   },
    {
     "date": "2026-11-27",
     "kind": "fix",
@@ -2926,16 +2936,6 @@
     "date": "2026-11-27",
     "kind": "fix",
     "text": "In Classic the back yard's ground shows over the pack panel, and in Decoration and Cultivation Mode over their tray"
-   },
-   {
-    "date": "2026-11-27",
-    "kind": "fix",
-    "text": "On an iPhone a Cultivate tile dragged by a finger keeps going after the tray redraws"
-   },
-   {
-    "date": "2026-11-27",
-    "kind": "fix",
-    "text": "A cultivation set against the house in the back yard says to keep the way in clear, not to expand the yard"
    }
   ]
  },
