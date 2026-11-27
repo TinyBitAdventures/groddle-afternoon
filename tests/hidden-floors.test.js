@@ -51,7 +51,7 @@ import {
   teleportersOn,
 } from '../public/js/hidden-floors.js?v=023336cb';
 import { hiddenFloorsFeature } from '../public/js/features/hidden-floors-feature.js?v=9687e04e';
-import { FEATURES } from '../public/js/features/index.js?v=fce0ead9';
+import { FEATURES } from '../public/js/features/index.js?v=53b71a9a';
 import { rawTripleJumpMultiplier, scaledTripleJumpMultiplier } from '../public/js/movement.js?v=f4be1a05';
 import { GRAVITY, JUMP_SPEED, WALK_MAX } from '../public/js/avatar-step.js?v=8415ee96';
 import { buffPhysics } from '../public/js/buffs.js?v=a4f7377b';

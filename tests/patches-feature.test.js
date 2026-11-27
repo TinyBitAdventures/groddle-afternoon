@@ -10,12 +10,11 @@ import {
   soilCountsForStreet,
   soilPlacementGroups,
   soilSpawnPlan,
-  trantFrameStage,
   treeFrameUrl,
   patchesFeature,
-} from '../public/js/features/patches-feature.js?v=f0cb18b5';
-import { FEATURES } from '../public/js/features/index.js?v=fce0ead9';
-import { soilSpritePaths } from '../public/js/patches.js?v=3068579c';
+} from '../public/js/features/patches-feature.js?v=fafae695';
+import { FEATURES } from '../public/js/features/index.js?v=53b71a9a';
+import { soilSpritePaths } from '../public/js/patches.js?v=54430bb9';
 
 const ecology = JSON.parse(await readFile(new URL('../public/assets/content/street-ecology.json', import.meta.url), 'utf8'));
 
@@ -91,12 +90,10 @@ describe('patches feature wiring', () => {
     assert.equal(typeof patchesFeature.placementGroups, 'function');
   });
 
-  it('picks the nearest shipped trant frame stage', () => {
-    assert.equal(trantFrameStage(1), 1);
-    assert.equal(trantFrameStage(2), 1);
-    assert.equal(trantFrameStage(4), 3);
-    assert.equal(trantFrameStage(9), 10);
-    assert.equal(treeFrameUrl('trant_bean', 6), 'assets/sprites/trants/frames/trant_bean_m5.webp?v=all-species-cell-2');
+  it('draws a tree at its own maturity (#735: one still per maturity, js/trant-looks.js)', () => {
+    assert.equal(treeFrameUrl('trant_bean', 2), 'assets/sprites/trants/frames/trant_bean_m2.webp?v=all-species-cell-3');
+    assert.equal(treeFrameUrl('trant_bean', 6), 'assets/sprites/trants/frames/trant_bean_m6.webp?v=all-species-cell-3');
+    assert.equal(treeFrameUrl('trant_bean', 9), 'assets/sprites/trants/frames/trant_bean_m9.webp?v=all-species-cell-3');
   });
 
   it('the demo kit carries tools and beans, including one that will not grow in Groddle', () => {

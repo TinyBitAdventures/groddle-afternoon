@@ -89,9 +89,9 @@ import {
   aboutCounter, profilePagePath, profilePageVerb, avatarKeyOf, base64Bytes, homeKeyOf, homeSizes, imageBase64, pngBase64, shouldUpload, staleRefreshDue, stillTransform,
   towerKeyOf, towerShotDue,
 } from '../profiles.js?v=7e94c96f';
-import { homeLayoutJson, homeLayoutKeyOf, HOME_LAYOUT_LIMITS } from '../home-layout.js?v=1d22e59c';
-import { collectHomeLayout, homeFrameFor } from '../home-layout-scene.js?v=3ff48f00';
-import { renderHomeLocation } from '../home-shot-render.js?v=35b81be3';
+import { homeLayoutJson, homeLayoutKeyOf, HOME_LAYOUT_LIMITS } from '../home-layout.js?v=3540c971';
+import { collectHomeLayout, homeFrameFor } from '../home-layout-scene.js?v=63179f9f';
+import { renderHomeLocation } from '../home-shot-render.js?v=218bc892';
 import { withPublicView } from '../public-picture.js?v=1a0b03fa';
 
 export const PROFILES_FEATURE_ID = 'profiles';

@@ -23,7 +23,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { join } from 'node:path';
 
-import { streetJobsFeature, projectApi } from '../public/js/features/street-jobs-feature.js?v=514c0429';
+import { streetJobsFeature, projectApi } from '../public/js/features/street-jobs-feature.js?v=0a36a0e5';
 import { HALL_STREETS, LOT_CLASS, LOT_PLACEMENT, LOT_SIGN_X, OWNED_TEXT, hallStreetName, lotOwner, ownedVerb } from '../public/js/group-hall-lot.js?v=045c799a';
 import { HALL_TEXT } from '../public/js/street-jobs-mp.js?v=1ccfc0c0';
 import { hallOf, normalizeGroup, normalizeGroups } from '../public/js/groups.js?v=c5e35964';

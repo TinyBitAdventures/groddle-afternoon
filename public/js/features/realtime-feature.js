@@ -72,7 +72,7 @@ import { lineKey } from '../chat-reactions.js?v=38460172';
 import { isPhoneDevice } from '../touch-controls.js?v=8bc690ac';
 import { playOverlay } from '../overlays.js?v=91dcee74';
 import { publicStreet } from '../shared-street.js?v=dce5694b';
-import { anchorBottomCentre } from '../sprite-feet.js?v=6358a697';
+import { anchorBottomCentre } from '../sprite-feet.js?v=849541a8';
 import { NAMEPLATE_STYLE } from '../world-text.js?v=6b49f88c';
 import { PUBLIC_HIDE } from '../public-picture.js?v=1a0b03fa';
 

@@ -15,7 +15,7 @@ import {
   resolveAnimalKinshipPackage,
 } from '../public/js/animal-kinship.js?v=eaa3a6f2';
 import { createAnimalState } from '../public/js/animals.js?v=ca4d0ae5';
-import { getVerbsFor, runVerb } from '../public/content.js?v=c46159de';
+import { getVerbsFor, runVerb } from '../public/content.js?v=68a61ef7';
 import { applyKinshipDrop, capturePiggy, HERDKEEPING, husbandryPack, normalizeHusbandryPack, releaseHogtied } from '../public/js/animal-husbandry.js?v=022d2859';
 
 const pc = (seed = {}) => ({ energy: 100, mood: 40, imagination: 0, xp: 0, ...seed });

@@ -14,7 +14,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { assertStreetGeometry } from '../public/js/street-model.js?v=a9a05f9d';
 import { OWNED_STREETS, streetOwner } from '../public/js/location-events.js?v=48938c8f';
-import { JUMP_GAP } from '../public/js/quest-rooms/puzzle-kit.js?v=490d0fc0';
+import { JUMP_GAP } from '../public/js/quest-rooms/puzzle-kit.js?v=89bacad4';
 import { WINTER_HAVEN_STREET_ID, WINTER_WALK_STREET_ID } from '../public/js/winter-walk.js?v=89f8dc32';
 import {
   WINTER_HAVEN_BOARDWALK_Y,
@@ -44,7 +44,7 @@ import {
   isWinterStreetTsid,
   winterStreetEcology,
 } from '../public/js/winter-walk-streets.js?v=c921bf92';
-import { rebuiltRoomsFeature } from '../public/js/features/rebuilt-rooms-feature.js?v=0f928a67';
+import { rebuiltRoomsFeature } from '../public/js/features/rebuilt-rooms-feature.js?v=3a0ea434';
 import { reachStreet } from '../public/js/builder/reach-graph.js?v=687006d3';
 import { GRAVITY, JUMP_SPEED, WALK_MAX } from '../public/js/avatar-step.js?v=8415ee96';
 

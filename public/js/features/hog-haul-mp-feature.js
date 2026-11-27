@@ -36,7 +36,7 @@ import { HOG_HAUL_SPLASH, splashFor } from '../game-splash.js?v=dbbf1de0';
 import { grantMoodXp } from '../mood-xp.js?v=e311b45c';
 import { playCountdownArt } from '../overlays.js?v=91dcee74';
 import { HOG_HAUL_STREET_ID } from '../hog-haul.js?v=50d2e072';
-import { standOnFeet } from '../sprite-feet.js?v=6358a697';
+import { standOnFeet } from '../sprite-feet.js?v=849541a8';
 
 const HOLD = 'hog-haul-mp';
 const BAIT_ICON = 'assets/sprites/icons/pig_bait.webp'; // the races/ copy's pixels, with a 3x render

@@ -96,7 +96,7 @@ import {
   TAKEN_KEEP,
 } from '../home-machines.js?v=b7b47943';
 import { CALL_PLAYER_LINES, MACHINE_HITBOX, MACHINE_SKILLS, collectLine, machineJobMs, machineMadeLine, refuelCount, runningSoundKey, takeJobIngredients } from '../machine-rooms.js?v=a99c4d01';
-import { MACHINE_ART_SHEETS, LOW_FUEL_BUBBLE_MS, LOW_FUEL_LINE, isLowFuel, machineFrame, machineFrameRect, machineSheetDef, roomMachineState } from '../machine-art.js?v=d3381a4b';
+import { MACHINE_ART_SHEETS, LOW_FUEL_BUBBLE_MS, LOW_FUEL_LINE, isLowFuel, machineFrame, machineFrameRect, machineSheetDef, roomMachineState } from '../machine-art.js?v=57cc0f50';
 import { FUEL_CELL, FUEL_PER_CELL, MAX_FUEL } from '../machines.js?v=93a736f2';
 import { ITEM_CATALOG, addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=3be7988a';
 import { receiveToolCopy, takeToolCopy } from '../tools.js?v=4156bba8';
@@ -104,16 +104,16 @@ import { markLeaving, takeCopies } from '../copy-picks.js?v=b368fd49';
 import { RECIPE_CATALOG } from '../making.js?v=dc595568';
 import { getSkillCatalog } from '../content-catalogs.js?v=c9b84764';
 import { createBackYardState, homeStreetLayout, normalizeCultivationState } from '../home-cultivation.js?v=b2868d29';
-import { lookOf, poseOf } from './realtime-feature.js?v=38dea85a';
+import { lookOf, poseOf } from './realtime-feature.js?v=5f3320d1';
 import { insideQuery, readVisitScene } from '../neighbours-mp.js?v=6d97fefa';
 import { saveStore } from '../save-store.js?v=1ccb1d6b';
 import { frameTexture, sourceFromUrl, textureFromUrl } from '../textures.js?v=b8e38103';
-import { createSheetLoader } from '../sprite-sheets.js?v=d787e3c3';
-import { STREET_GROUND_Y, homesFeature } from './homes-feature.js?v=5a4c0350';
-import { payAltarBonus } from './machine-rooms-feature.js?v=ed75a36d';
+import { createSheetLoader } from '../sprite-sheets.js?v=37ad5c9f';
+import { STREET_GROUND_Y, homesFeature } from './homes-feature.js?v=c1171b13';
+import { payAltarBonus } from './machine-rooms-feature.js?v=37b1165d';
 import { worldToScreen } from '../street-model.js?v=a9a05f9d';
 import { nearestSurfaceY } from '../walk-surface.js?v=f21ce37b';
-import { standOnFeet } from '../sprite-feet.js?v=6358a697';
+import { standOnFeet } from '../sprite-feet.js?v=849541a8';
 import { offlineLine } from '../online-request.js?v=dac938db';
 
 export { HOME_MACHINES_ID };

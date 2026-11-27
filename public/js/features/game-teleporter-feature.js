@@ -32,7 +32,7 @@
  */
 
 import { OVERLAY_USES, playOverlay } from '../overlays.js?v=91dcee74';
-import { crownsMpTeleport, startCrowns } from './crowns-feature.js?v=3a83a612';
+import { crownsMpTeleport, startCrowns } from './crowns-feature.js?v=67def12f';
 
 export const GAME_TELEPORTER_FEATURE_ID = 'game-teleporter';
 export const GAME_TELEPORTER_CLASS = 'game_teleporter';

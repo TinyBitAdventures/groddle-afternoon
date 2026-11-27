@@ -13,9 +13,9 @@ import { after, before, describe, it } from 'node:test';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-import { loadDecoManifest } from '../public/js/street-render.js?v=ff7afb98';
+import { loadDecoManifest } from '../public/js/street-render.js?v=c3c73838';
 import { NEW_DECOS } from '../public/js/deco-hires.js?v=34f36d77';
-import { streetJobsFeature, projectApi } from '../public/js/features/street-jobs-feature.js?v=514c0429';
+import { streetJobsFeature, projectApi } from '../public/js/features/street-jobs-feature.js?v=0a36a0e5';
 import { createToolConditionState } from '../public/js/tools.js?v=4156bba8';
 import { STREET_GRAPH_URL } from '../public/js/street-graph.js?v=d767f3a2';
 import { Display, FakeEl, fakePixi } from './fake-scene.js';

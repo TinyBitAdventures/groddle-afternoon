@@ -19,12 +19,12 @@ import { CHICKEN_SCARE } from '../public/js/chicken-scare.js?v=1df29bf0';
 import { CRAB_REPLY_MS } from '../public/js/crabs.js?v=eb0bdc39';
 import { KITTY_MOTION } from '../public/js/heli-kitties.js?v=e4af4096';
 import { JUJU_BANDIT } from '../public/js/juju-bandits.js?v=0d3af5fe';
-import { LOW_FUEL_BUBBLE_MS, LOW_FUEL_REPEAT_MS } from '../public/js/machine-art.js?v=d3381a4b';
+import { LOW_FUEL_BUBBLE_MS, LOW_FUEL_REPEAT_MS } from '../public/js/machine-art.js?v=57cc0f50';
 import { MEGA_ROCK_LINE } from '../public/js/mining.js?v=7ecaa572';
 import { LONELY_RULES } from '../public/js/spirit-loneliness.js?v=9259917d';
-import { COPY as STREET_OBJECT_COPY } from '../public/js/street-objects.js?v=8a71df38';
+import { COPY as STREET_OBJECT_COPY } from '../public/js/street-objects.js?v=7d1864e8';
 import { POISON_BUBBLE_EVERY_MS, POISON_BUBBLE_SHOW_MS, POISON_FIRST_BUBBLE_MS } from '../public/js/tree-poison.js?v=646d1bc1';
-import { animalMoodFeature } from '../public/js/features/animal-mood-feature.js?v=d52f2d10';
+import { animalMoodFeature } from '../public/js/features/animal-mood-feature.js?v=8e5c76c1';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const GSJS = [join(ROOT, '..', 'glitch-GameServerJS', 'items'), join(homedir(), 'Documents/glitch-audit/glitch-GameServerJS/items')].find((p) => existsSync(p));

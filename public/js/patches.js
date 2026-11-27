@@ -33,7 +33,7 @@
  *    trants.js die() / wood_tree.js onDie for a tree grown in a plot.
  */
 
-import { createTrantState, fruitCapacityAt, resetTrantDay } from './trants.js?v=864ea9ff';
+import { createTrantState, fruitCapacityAt, resetTrantDay } from './trants.js?v=cf0fe1a3';
 import { WOOD_TREE_MATURITY_MAP, adoptPlotWoodCounts, ensureWoodTreeState, resetWoodTreeDay } from './woodcutting.js?v=9e9af511';
 import { canUseTool, useToolCondition } from './tools.js?v=4156bba8';
 import { musicblockItemMeta } from './musicblocks.js?v=e4c81eb7';

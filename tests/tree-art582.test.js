@@ -14,10 +14,11 @@ import assert from 'node:assert/strict';
 import { readFileSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { createResourceNode, getResourceNodeDef, resourceNodeFrame, tickResourceNode } from '../public/js/resource-nodes.js?v=c2eb46b1';
-import { setTrantTables, TRANT_META } from '../public/js/trants.js?v=864ea9ff';
-import { treeFrameUrl } from '../public/js/features/patches-feature.js?v=f0cb18b5';
-import { soilSpritePaths, DEAD_TRANT_CLASSES } from '../public/js/patches.js?v=3068579c';
-import { HIRES_SPRITES } from '../public/js/sprite-hires.js?v=e96be5f1';
+import { setTrantTables, TRANT_META } from '../public/js/trants.js?v=cf0fe1a3';
+import { treeFrameUrl } from '../public/js/features/patches-feature.js?v=fafae695';
+import { trantLook, trantLookFiles } from '../public/js/trant-looks.js?v=06301984';
+import { soilSpritePaths, DEAD_TRANT_CLASSES } from '../public/js/patches.js?v=54430bb9';
+import { HIRES_SPRITES } from '../public/js/sprite-hires.js?v=dd070ce8';
 import { ENCHANTED_TREE_SHEETS } from '../public/js/enchanted-forests.js?v=17ac01e4';
 
 const pub = join(import.meta.dirname, '../public');
@@ -95,10 +96,13 @@ describe('#582 every tree kind has its art for every state', () => {
     for (const kind of kinds) {
       for (let maturity = 0; maturity <= 10; maturity += 1) {
         for (const fruitCount of [0, 1, 99]) {
-          const url = treeFrameUrl(kind, maturity, { maturity, fruitCount, health: 10 });
-          assert.ok(existsSync(file(url)), `${kind} m${maturity} fruit ${fruitCount}: ${url}`);
-          assert.ok(existsSync(file(url).replace(/\.webp$/, '@3x.webp')), `${url}: its 3x`);
+          // #735: a count between bare and full is the bare still with fruit pieces (js/trant-looks.js).
+          for (const url of trantLookFiles(trantLook(kind, maturity, { maturity, fruitCount, health: 10 }))) {
+            assert.ok(existsSync(file(url)), `${kind} m${maturity} fruit ${fruitCount}: ${url}`);
+            assert.ok(existsSync(file(url).replace(/\.webp$/, '@3x.webp')), `${url}: its 3x`);
+          }
         }
+        assert.ok(existsSync(file(treeFrameUrl(kind, maturity))), `${kind} m${maturity}`);
       }
     }
   });

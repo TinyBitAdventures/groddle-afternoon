@@ -23,8 +23,8 @@ import {
   ARBOROLOGY_HARVEST,
   TRANT_META,
   trantHarvestResponse,
-} from '../public/js/trants.js?v=864ea9ff';
-import { getVerbsFor, runVerb } from '../public/content.js?v=c46159de';
+} from '../public/js/trants.js?v=cf0fe1a3';
+import { getVerbsFor, runVerb } from '../public/content.js?v=68a61ef7';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '../public');
 
@@ -321,7 +321,7 @@ describe('trant harvest (GSJS-extracted)', () => {
     assert.match(game, /harvestsuper/);
     assert.match(game, /harvestroll/);
     assert.match(game, /dataset\.trantHarvestYield/);
-    assert.match(game, /TRANT_FRAME_VERSION = 'all-species-cell-2'/);
+    assert.match(readFileSync(join(root, 'js/trant-looks.js'), 'utf8'), /TRANT_FRAME_VERSION = 'all-species-cell-3'/);
     assert.match(html, /game\.js\?v=[0-9a-f]{8}/);
     assert.match(game, /muted: loadMutedPreference\(\)/);
   });

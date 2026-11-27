@@ -87,7 +87,7 @@ import {
   stillWaitsToStart,
 } from '../machines.js?v=93a736f2';
 import { STILL_ART_BOX, STILL_ART_CELL, stillArtFrame, stillArtState, stillSheetDef } from '../still-art.js?v=2eeb65ff';
-import { createSheetLoader } from '../sprite-sheets.js?v=d787e3c3';
+import { createSheetLoader } from '../sprite-sheets.js?v=37ad5c9f';
 import { HERB_SEEDS, ITEM_TRANSFORMS, listTransformVerbs, runTransform, transformVerbCount } from '../item-transforms.js?v=35fd8c6e';
 import {
   BUREAUCRACY_ITEMS,
@@ -102,7 +102,7 @@ import { frameTexture, sourceFromUrl } from '../textures.js?v=b8e38103';
 import { setMetalMakingMusic } from '../sound-moments.js?v=3e66996f';
 import { itemZ } from '../item-bands.js?v=ec366be3';
 import { topUpMetabolic } from '../metabolics.js?v=48f784bf';
-import { standOnFeet } from '../sprite-feet.js?v=6358a697';
+import { standOnFeet } from '../sprite-feet.js?v=849541a8';
 import { ownGroundRows } from '../ground-stacks.js?v=22792362';
 
 export const SUPPLY_FEATURE_ID = 'supply';

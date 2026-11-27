@@ -55,7 +55,7 @@ import {
   stepIcicles,
 } from '../winter-icicles.js?v=5d9616ef';
 import { WINTER_WALK_FLOOR_Y, WINTER_WALK_ICICLES, WINTER_WALK_BOUNDS, WINTER_WALK_CAPTION, WINTER_WALK_TSID, winterStreetEcology } from '../winter-walk-streets.js?v=c921bf92';
-import { anchorBottomCentre } from '../sprite-feet.js?v=6358a697';
+import { anchorBottomCentre } from '../sprite-feet.js?v=849541a8';
 import { WORLD_FONT_FAMILY } from '../world-text.js?v=6b49f88c';
 
 export const REBUILT_ROOMS_FEATURE_ID = 'rebuilt-rooms';

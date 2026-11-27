@@ -44,9 +44,9 @@ import { crushOre } from '../public/js/mining.js?v=7ecaa572';
 import { createDroppedItemState, dropInventoryStack } from '../public/js/world-items.js?v=93313aad';
 import { MAKE_TOOL_SHEETS } from '../public/js/make-tool-sheets.js?v=6f758e09';
 import { clearPlot, createGarden, getPlot, hasHoe, hasWateringCan, plantPlot, waterPlot } from '../public/js/garden.js?v=fefa7bcd';
-import { performTrantCare, quoteTrantCare } from '../public/js/trant-care.js?v=cb7f539b';
-import { createTrantState, setTrantTables } from '../public/js/trants.js?v=864ea9ff';
-import { createPlot, performPlotVerb, plotVerbs } from '../public/js/patches.js?v=3068579c';
+import { performTrantCare, quoteTrantCare } from '../public/js/trant-care.js?v=63846e5e';
+import { createTrantState, setTrantTables } from '../public/js/trants.js?v=cf0fe1a3';
+import { createPlot, performPlotVerb, plotVerbs } from '../public/js/patches.js?v=54430bb9';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const pub = join(here, '../public');

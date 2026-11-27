@@ -60,11 +60,11 @@
 import { slugsFromEffects } from '../speech-slugs.js?v=d5cc8b6f';
 import { addItem, countItem, ensureItem, removeItem, ITEM_CATALOG } from '../inventory.js?v=3be7988a';
 import { bindCountField, countKeyValue, countStepMarkup, openCountField } from '../ui/count-chooser.js?v=75f69512';
-import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=d787e3c3';
+import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=37ad5c9f';
 import { landingY, nearestSurfaceY } from '../walk-surface.js?v=f21ce37b';
 import { donationValueFor } from '../shrines.js?v=48318bec';
 import { giantDisplayName } from '../giant-names.js?v=0e295891';
-import { TRANT_META, trantStatusLabel } from '../trants.js?v=864ea9ff';
+import { TRANT_META, trantStatusLabel } from '../trants.js?v=cf0fe1a3';
 import {
   FOREHORSEMAN_LINES,
   ROOK_COLORS,
@@ -128,12 +128,12 @@ import {
 import { itemZ } from '../item-bands.js?v=ec366be3';
 import { copyChargesLeft, copyFromLedger, keepsCopies, spendCopyCharge, verbCopy } from '../copy-charges.js?v=357d4cbb';
 import { migrateClassValue } from '../tools.js?v=4156bba8';
-import { playPotionBottle } from '../potion-bottle-fx.js?v=0808be52';
+import { playPotionBottle } from '../potion-bottle-fx.js?v=bc713f71';
 import { feedZone, placeRookBadge, unionBox } from '../rook-badge-place.js?v=e2bcbbaa';
 import { ROOK_STARS, stepStunStars, stunStarsState } from '../rook-stun-stars.js?v=62d5c3cb';
 import { frameTexture, sourceFromUrl, textureFromUrl } from '../textures.js?v=b8e38103';
 import { publicStreet } from '../shared-street.js?v=dce5694b';
-import { standOnFeet, anchorBottomCentre } from '../sprite-feet.js?v=6358a697';
+import { standOnFeet, anchorBottomCentre } from '../sprite-feet.js?v=849541a8';
 import { WORLD_FONT_FAMILY } from '../world-text.js?v=6b49f88c';
 
 export const ROOK_FEATURE_ID = 'rook-attack';

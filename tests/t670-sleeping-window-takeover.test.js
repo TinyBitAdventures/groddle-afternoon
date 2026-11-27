@@ -13,7 +13,7 @@ import { readFileSync } from 'node:fs';
 import { describe, it } from 'node:test';
 import { QUIET_MS, SLEPT_MS, bindPageLifecycle, createRealtimeClient } from '../public/js/realtime-client.js?v=eb1515a8';
 import { ENDED_STATES } from '../public/js/online-request.js?v=dac938db';
-import { ASLEEP_TEXT, statusText } from '../public/js/features/realtime-feature.js?v=38dea85a';
+import { ASLEEP_TEXT, statusText } from '../public/js/features/realtime-feature.js?v=5f3320d1';
 import { SAVE_ALERT_COPY, saveAlertFor } from '../public/js/online-boot.js?v=a0f37b71';
 import { SAVE_CHOICE_EVENT, createMultiplayerSaveStore } from '../public/js/save-store.js?v=1ccb1d6b';
 

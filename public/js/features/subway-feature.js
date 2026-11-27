@@ -43,7 +43,7 @@ import { countItem } from '../inventory.js?v=3be7988a';
 import { isEditableTarget } from '../held-keys.js?v=a28eb293';
 import { REPORT_WINDOW_SELECTOR, SCREEN_SELECTOR, START_CARD_SELECTOR, WINDOW_SELECTOR } from '../window-stack.js?v=a7104f02';
 import { OVERLAY_USES, playOverlay } from '../overlays.js?v=91dcee74';
-import { doorsFeature } from './doors-feature.js?v=0886f7df';
+import { doorsFeature } from './doors-feature.js?v=e0ea66ac';
 import { createMapZoom } from '../map-zoom.js?v=4f0762b2';
 import { bindSubwayMap, renderSubwayMapSvg, subwayPaper } from '../map-views.js?v=7ff57fbc';
 import { frameTexture, textureFromUrl } from '../textures.js?v=b8e38103';
@@ -97,7 +97,7 @@ import {
   ticketOffer,
 } from '../subway.js?v=ea6921ff';
 import { BOARD_ANSWER_MS, SUBWAY_MP_TEXT, applyTrain, riderChanges, trainOf } from '../subway-mp.js?v=ffd57d82';
-import { anchorBottomCentre } from '../sprite-feet.js?v=6358a697';
+import { anchorBottomCentre } from '../sprite-feet.js?v=849541a8';
 
 export const SUBWAY_FEATURE_ID = 'subway';
 const STYLE_ID = 'subway-feature-style';

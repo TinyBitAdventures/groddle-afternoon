@@ -54,7 +54,7 @@ describe('the ten houses and every part (art)', () => {
   });
 
   it('every piece is a 1x WebP with its 3x twin, registered for dense screens', async () => {
-    const { HIRES_SPRITES } = await import('../public/js/sprite-hires.js?v=e96be5f1');
+    const { HIRES_SPRITES } = await import('../public/js/sprite-hires.js?v=dd070ce8');
     const bad = [];
     for (const id of HOUSE_STYLE_IDS) {
       for (const l of HOUSE_ART[id].layers) {

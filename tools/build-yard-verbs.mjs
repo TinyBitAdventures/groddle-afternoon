@@ -53,10 +53,10 @@ import { requireSite, sitePath } from './repos.mjs';
 export const OUT = sitePath('data', 'yard-verbs.json');
 
 export async function yardVerbsJson() {
-  const { YARD_POOL, YARD_AK_ITEMS } = await import('../public/js/yard-verbs-mp.js?v=90cfdaf3');
+  const { YARD_POOL, YARD_AK_ITEMS } = await import('../public/js/yard-verbs-mp.js?v=9192a4bf');
   const { ANIMAL_KINSHIP_PACKAGES } = await import('../public/js/animal-kinship.js?v=eaa3a6f2');
-  const { ARBOROLOGY_HARVEST, TRANT_META } = await import('../public/js/trants.js?v=864ea9ff');
-  const { SEASONED_BEANS, SEEDLING_GROW_UPGRADES, SOIL_SKILL_PACKAGES, SOIL_TIMERS } = await import('../public/js/patches.js?v=3068579c');
+  const { ARBOROLOGY_HARVEST, TRANT_META } = await import('../public/js/trants.js?v=cf0fe1a3');
+  const { SEASONED_BEANS, SEEDLING_GROW_UPGRADES, SOIL_SKILL_PACKAGES, SOIL_TIMERS } = await import('../public/js/patches.js?v=54430bb9');
   const { WOOD_TREE_HARVEST } = await import('../public/js/woodcutting.js?v=9e9af511');
   const { ENCHANTED_WOOD_TREE } = await import('../public/js/enchanted-forests.js?v=17ac01e4');
   const beans = Object.keys(SEASONED_BEANS).sort().map((id) => `${JSON.stringify(id)}:${JSON.stringify(SEASONED_BEANS[id].trantClass)}`);

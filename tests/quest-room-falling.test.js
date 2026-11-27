@@ -19,7 +19,7 @@ import {
   fallPlatforms, numberAt, numberMarks, sx, sy, tonguePoint,
 } from '../public/js/quest-rooms/falling-room-scene.js?v=1a195750';
 import { FALLING_ROOM_FILES } from '../public/js/quest-rooms/falling-room-art.js?v=6d588773';
-import { room as fireflyRoom } from '../public/js/quest-rooms/firefly-whistle.js?v=4b49e94e';
+import { room as fireflyRoom } from '../public/js/quest-rooms/firefly-whistle.js?v=670cbe21';
 import * as kit from '../public/js/quest-rooms/kit.js?v=3bd05cd3';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');

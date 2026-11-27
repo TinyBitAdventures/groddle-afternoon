@@ -32,7 +32,7 @@
 import { addItem, countItem, removeItem } from '../inventory.js?v=3be7988a';
 import { exposeQA } from '../qa-gate.js?v=f4e2cd82';
 import { copyForVerb, copyTag, setCopyTag, takeToolCopy } from '../tools.js?v=4156bba8';
-import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=d787e3c3';
+import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=37ad5c9f';
 import { landingY, walkSurfaceY } from '../walk-surface.js?v=f21ce37b';
 import { displayTopOf, itemstackOverlayPoint, playSheetOverlay } from '../overlay-art.js?v=e50bacca';
 import { CUBIMAL_RACE, cubimalArticle, cubimalInfo, cubimalRaceSheet } from '../cubimals.js?v=b83d6145';
@@ -47,7 +47,7 @@ import {
   cubimalTagName,
   cubimalTagWith,
 } from '../cubimal-battle.js?v=82bf52c9';
-import { standOnFeet } from '../sprite-feet.js?v=6358a697';
+import { standOnFeet } from '../sprite-feet.js?v=849541a8';
 
 export const CUBIMAL_BATTLE_FEATURE_ID = 'cubimal-battle';
 const SOLO_ID = 'solo';

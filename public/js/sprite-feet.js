@@ -17,7 +17,7 @@
  *   with the reason (BOTTOM_CENTRE). tests/sprite-feet.test.js fails on a hand-written
  *   `anchor.set(0.5, 1)` (or a hand-guessed 0.9x foot) anywhere in the game.
  */
-import { SPRITE_FEET } from './sprite-feet-data.js?v=a34ca443';
+import { SPRITE_FEET } from './sprite-feet-data.js?v=60c52fd6';
 import { askedUrl } from './textures.js?v=b8e38103';
 
 /** Why a thing keeps its plain bottom centre (anchorBottomCentre's `why`). */
@@ -80,6 +80,14 @@ export function textureFoot(texture) {
     if (url) feetOf.set(texture, foot);
   }
   return foot;
+}
+
+/**
+ * #735: a picture the game draws itself stands on the foot of the art it is drawn on (a trant
+ * holding some of its fruit is its bare still with fruit pasted on: js/trant-looks.js).
+ */
+export function setTextureFoot(texture, url) {
+  if (texture) feetOf.set(texture, footOf(url, texture.orig?.width > 1 ? texture.orig : null));
 }
 
 const SPRITE_TEXTURE = Symbol('groddleFeetTexture');

@@ -431,31 +431,7 @@ export function resetTrantDay(state) {
   return state;
 }
 
-/**
- * Report #545: the maturity stages whose art also comes holding less fruit (tools/vector-sprites
- * trant-states.mjs FRUIT_LEVELS): trant_<species>_m<stage>_f0 bare, _f1 half; the plain file is full.
- */
-export const TRANT_FRUIT_ART_STAGES = Object.freeze([5, 7, 10]);
-
-/**
- * Which fruit art a trant shows: '' full, 'f1' half, 'f0' bare. Glitch drew each tree with
- * fruit_amt (f_num / f_cap) of its fruit (updateTrantDisplay in each trant_*.as: cherries up to
- * floor(fruit_amt * slots), the others' fruit up to ceil): none left is bare, under three
- * quarters the half art, the rest full. A tree with no capacity (too young) has no fruit to show.
- * @param {{ classTsid?: string, maturity?: number, health?: number, fruitCount?: number, fruitCapacity?: number }} state
- */
-export function trantFruitArt(state) {
-  const cap = Number(state?.fruitCapacity ?? fruitCapacityAt(state?.classTsid, state?.maturity, state?.health)) || 0;
-  if (cap <= 0) return '';
-  const count = Math.max(0, Number(state?.fruitCount) || 0);
-  if (count <= 0) return 'f0';
-  return count / cap < 0.75 ? 'f1' : '';
-}
-
-/** The frame file key (assets/sprites/trants/frames/<key>.webp) for a stage and fruit art. */
-export function trantFrameKey(classTsid, stage, fruitArt = '') {
-  return `${classTsid}_m${stage}${fruitArt && TRANT_FRUIT_ART_STAGES.includes(stage) ? `_${fruitArt}` : ''}`;
-}
+// Reports #545, #735: which picture a trant shows (its maturity and the fruit it holds) is js/trant-looks.js.
 
 export function maturityLabel(m) {
   return MATURITY_LABELS[clamp(m, 0, 10)] || String(m);

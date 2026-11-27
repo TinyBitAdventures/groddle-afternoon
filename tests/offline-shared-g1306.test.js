@@ -16,7 +16,7 @@ import { join } from 'node:path';
 
 import { createRealtimeClient } from '../public/js/realtime-client.js?v=eb1515a8';
 import { ENDED_STATES, NO_REALTIME_STATES, OFFLINE_LINE, RECONNECTING_LINE, offlineLine, sharedOffline, waitLine } from '../public/js/online-request.js?v=dac938db';
-import { COPY } from '../public/js/street-objects.js?v=8a71df38';
+import { COPY } from '../public/js/street-objects.js?v=7d1864e8';
 import { LOCAL_STATES } from '../public/js/shared-quoins.js?v=32ec999a';
 import { streetObjectsFeature } from '../public/js/features/street-objects-feature.js?fresh=g1306';
 import { sharedQuoinsFeature } from '../public/js/features/shared-quoins-feature.js?fresh=g1306';
@@ -24,7 +24,7 @@ import { sharedGardensFeature } from '../public/js/features/shared-gardens-featu
 import { dropsMpFeature } from '../public/js/features/drops-mp-feature.js?fresh=g1306';
 import { powdersFeature, runPowder } from '../public/js/features/powders-feature.js?fresh=g1306';
 import { createGarden } from '../public/js/garden.js?v=fefa7bcd';
-import { createTrantState } from '../public/js/trants.js?v=864ea9ff';
+import { createTrantState } from '../public/js/trants.js?v=cf0fe1a3';
 
 const root = join(import.meta.dirname, '..');
 const read = (rel) => readFileSync(join(root, rel), 'utf8');

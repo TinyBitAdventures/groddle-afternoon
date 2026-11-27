@@ -50,8 +50,9 @@
 import { ensureItem } from '../inventory.js?v=3be7988a';
 import { isItemFloor, platformYAt } from '../street-model.js?v=a9a05f9d';
 import { SOIL_FOOTPRINT, SOIL_STEADY_FLOOR, getStreetEcologyCatalog, streetEcologyAliases } from '../street-ecology.js?v=8f50537c';
-import { trantFrameKey, trantFruitArt, trantStatusLabel } from '../trants.js?v=864ea9ff';
-import { standOnFeet } from '../sprite-feet.js?v=6358a697';
+import { trantStatusLabel } from '../trants.js?v=cf0fe1a3';
+import { loadTrantLook, trantLook } from '../trant-looks.js?v=06301984';
+import { standOnFeet } from '../sprite-feet.js?v=849541a8';
 import { woodTreeStatusLabel } from '../woodcutting.js?v=9e9af511';
 import {
   GROWN_TREE_LABELS,
@@ -72,19 +73,17 @@ import {
   soilSpawnClasses,
   soilSpritePaths,
   tickPlot,
-} from '../patches.js?v=3068579c';
+} from '../patches.js?v=54430bb9';
 import { frameTexture, isLoaded, onFailed, onLoaded, textureFromUrl } from '../textures.js?v=b8e38103';
 import { HOE_TOOLS, firstWorkingTool } from '../tools.js?v=4156bba8';
 import { slugsFromEffects } from '../speech-slugs.js?v=d5cc8b6f';
-import { plotSignature, replayRng } from '../shared-patches.js?v=036b6fec';
+import { plotSignature, replayRng } from '../shared-patches.js?v=2d4ffb60';
 import { topUpMetabolic } from '../metabolics.js?v=48f784bf';
 
 export const PATCHES_FEATURE_ID = 'patches';
 export const SOIL_GROUP_PREFIX = 'soil:';
 
 const TICK_MS = 500;
-const TRANT_MAT_STAGES = [1, 3, 5, 7, 10];
-const TRANT_FRAME_VERSION = 'all-species-cell-2';
 const WOOD_SHEET = Object.freeze({
   url: 'assets/sprites/wood_tree_maturity_6_variant_2_x6_1_png_1354833445.webp',
   fw: 88,
@@ -183,18 +182,14 @@ export function prepareStreetPlots(slot, plan, { tsid = '', hubId = null, now = 
   return out;
 }
 
-/** Nearest trant frame stage, as game.js nearestTrantMatStage. */
-export function trantFrameStage(maturity) {
-  const m = Math.max(0, Math.min(10, Math.floor(Number(maturity) || 1)));
-  let best = TRANT_MAT_STAGES[0];
-  for (const stage of TRANT_MAT_STAGES) if (Math.abs(m - stage) < Math.abs(m - best)) best = stage;
-  return best;
+/** A grown tree's still holding all its fruit (#735: its own maturity's, js/trant-looks.js), for a tree drawn without its state. */
+export function treeFrameUrl(classId, maturity) {
+  return trantLook(classId, maturity).url;
 }
 
-/** A grown tree's frame; with its state, the fruit it holds (report #545, js/trants.js trantFruitArt). */
-export function treeFrameUrl(classId, maturity, state = null) {
-  const art = state ? trantFruitArt({ classTsid: classId, ...state, maturity }) : '';
-  return `assets/sprites/trants/frames/${trantFrameKey(classId, trantFrameStage(maturity), art)}.webp?v=${TRANT_FRAME_VERSION}`;
+/** Reports #545, #735: a grown tree's look, holding the fruit it holds (js/trant-looks.js, as street trees). */
+function treeLook(tree) {
+  return trantLook(tree.classId, tree.state.maturity, tree.state);
 }
 
 /** The demo pack: tools plus a spread of Seasoned Beans (one that will not grow here). */
@@ -285,7 +280,7 @@ async function texturesForPlot(engine, plot) {
       const m = Math.max(1, Math.min(6, tree.state.maturity || 1));
       return sheetFrame(PIXI, tex.source, WOOD_SHEET, m - 1);
     }
-    return loadBase(PIXI, treeFrameUrl(tree.classId, tree.state.maturity, tree.state));
+    return loadTrantLook(treeLook(tree));
   }
   return loadBase(PIXI, plotArtPath(plot));
 }
@@ -436,7 +431,7 @@ async function buildView(engine, entity, myGeneration, { grow = false } = {}) {
     const isWood = plot.tree.classId === 'wood_tree';
     entity.sprite = sprite;
     entity.shownMaturity = plot.tree.state.maturity;
-    entity.shownFruit = isWood ? '' : trantFruitArt({ classTsid: plot.tree.classId, ...plot.tree.state });
+    entity.shownFruit = isWood ? '' : treeLook(plot.tree).key;
     entity.target = engine.register({
       classId: plot.tree.classId,
       label: GROWN_TREE_LABELS[plot.tree.classId],
@@ -467,8 +462,8 @@ function refreshTreeView(engine, entity) {
   if (plot.stage !== 'tree' || !entity.sprite || entity.sprite.destroyed) return;
   const tree = plot.tree;
   if (entity.target) entity.target.subtitle = treeSubtitle(tree);
-  // Report #545: a trant also redraws when the fruit it shows changes (bare, half, full).
-  const art = tree.classId === 'wood_tree' ? '' : trantFruitArt({ classTsid: tree.classId, ...tree.state });
+  // Reports #545, #735: a trant also redraws when the fruit it shows changes (every count).
+  const art = tree.classId === 'wood_tree' ? '' : treeLook(tree).key;
   if ((entity.shownMaturity === tree.state.maturity && (entity.shownFruit ?? '') === art) || tree.state.maturity <= 0) return;
   const grew = entity.shownMaturity !== tree.state.maturity;
   entity.shownMaturity = tree.state.maturity;

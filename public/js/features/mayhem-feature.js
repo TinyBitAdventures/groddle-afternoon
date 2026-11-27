@@ -51,7 +51,7 @@ import { OVERLAY_USES, locationRect, playCountdownArt, playWindowOverlay } from 
 import { textureFromUrl } from '../textures.js?v=b8e38103';
 import { grantMoodXp } from '../mood-xp.js?v=e311b45c';
 import { saveStore, savedThrough } from '../save-store.js?v=1ccb1d6b';
-import { standOnFeet } from '../sprite-feet.js?v=6358a697';
+import { standOnFeet } from '../sprite-feet.js?v=849541a8';
 import { WORLD_FONT_FAMILY } from '../world-text.js?v=6b49f88c';
 
 /** G738: whether this page may carry the Mayhem QA levers. */

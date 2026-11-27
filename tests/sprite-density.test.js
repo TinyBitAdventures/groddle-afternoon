@@ -11,7 +11,7 @@ import { execFileSync } from 'node:child_process';
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { FIRST_DRAW_SPRITES, HIRES_SPRITES } from '../public/js/sprite-hires.js?v=e96be5f1';
+import { FIRST_DRAW_SPRITES, HIRES_SPRITES } from '../public/js/sprite-hires.js?v=dd070ce8';
 import { DENSE_SPRITES, denseFrame, densePath, denseSprite } from '../public/js/sprite-dense.js?v=67101472';
 import {
   STREET_SPIRIT_ART,

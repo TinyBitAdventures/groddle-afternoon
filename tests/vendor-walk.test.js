@@ -272,7 +272,7 @@ describe('the walk strips at 3x (lane vendors3x)', () => {
   });
 
   it('swaps every matched strip to a 3x render on first draw: same cells, frame count, run and feet', async () => {
-    const { FIRST_DRAW_SPRITES, HIRES_SPRITES, SPLIT_SPRITES } = await import('../public/js/sprite-hires.js?v=e96be5f1');
+    const { FIRST_DRAW_SPRITES, HIRES_SPRITES, SPLIT_SPRITES } = await import('../public/js/sprite-hires.js?v=dd070ce8');
     for (const [cls, state, path] of motionPaths()) {
       const r = results[path];
       const strip = vendorStrip(cls, state);
@@ -316,7 +316,7 @@ describe('the walk strips at 3x (lane vendors3x)', () => {
 
   it('a sharp desktop swaps vendor strips to 3x on first draw; a phone (render cap 1) keeps the 1x strips', async () => {
     const { resolutionCap } = await import('../public/js/render-density.js?v=74c6f5f9');
-    const { installHiresSprites, installHiresFirstDraw, hiresSpriteUrl } = await import('../public/js/sprite-hires.js?v=e96be5f1');
+    const { installHiresSprites, installHiresFirstDraw, hiresSpriteUrl } = await import('../public/js/sprite-hires.js?v=dd070ce8');
     const textures = { addUrlRoute() {} };
     const renderer = () => ({ texture: { _initSource() { return {}; } } });
     // game.js artDpr(): min(devicePixelRatio, the device's render cap).

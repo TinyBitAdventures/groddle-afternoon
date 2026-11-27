@@ -9,7 +9,7 @@
  */
 
 import { CHICKEN_IDLE_FPS, CHICKEN_IDLE_FRAMES, chickenIdleFrame, chickenIdleSheet, chickenPoseState } from './chicken-idles.js?v=eef0279b';
-import { createPackedLoader } from './packed-sheets.js?v=80b50384';
+import { createPackedLoader } from './packed-sheets.js?v=3932a20c';
 
 const WALK_SPEED = 0.12;
 const IDLE_STATES = Object.keys(CHICKEN_IDLE_FRAMES);
