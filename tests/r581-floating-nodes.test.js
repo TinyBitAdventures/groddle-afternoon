@@ -20,7 +20,7 @@ import { STREET_INDEX, applyStreetIndex, loadStreetDataFromFs, setZoneStreetsSho
 import { platformsScreen } from '../public/js/street-model.js?v=a9a05f9d';
 import {
   ROCK_SEAT_MAX_PX, ROCK_SHAPE_WIDTHS, footOverAir, planStreetPlacements, seatOnFloor, setStreetEcologyCatalog,
-} from '../public/js/street-ecology.js?v=dde3c62d';
+} from '../public/js/street-ecology.js?v=da5177b2';
 import { census, streetRows } from '../tools/node-floor-census.mjs';
 import { setCreatureEcology } from '../tools/build-realtime-objects.mjs';
 import { serverPath, skipWithoutServer } from '../tools/repos.mjs';

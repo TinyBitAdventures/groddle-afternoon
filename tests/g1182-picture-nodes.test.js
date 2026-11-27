@@ -26,9 +26,9 @@ import {
   measuredTreeSpots,
   populationForStreet,
   setStreetEcologyCatalog,
-} from '../public/js/street-ecology.js?v=dde3c62d';
+} from '../public/js/street-ecology.js?v=da5177b2';
 import { DIRT_PILE_PICTURE_SPOTS, PEAT_PICTURE_SPOTS, TREE_PICTURE_SPOTS } from '../public/js/node-picture-spots-data.js?v=36608622';
-import { resourcePlacementGroups, resourceSpawnPlan } from '../public/js/features/resource-nodes-feature.js?v=75b2dcd5';
+import { resourcePlacementGroups, resourceSpawnPlan } from '../public/js/features/resource-nodes-feature.js?v=94a385e9';
 import { homeToFromPopulation } from '../public/js/exploration.js?v=8f19e25d';
 import { STREET_INDEX, applyStreetIndex, loadStreetDataFromFs } from '../public/js/street-loader.js?v=10376267';
 import { streetObjectLayout } from '../tools/build-realtime-objects.mjs';

@@ -12,13 +12,13 @@ import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import { readFileSync } from 'node:fs';
 
-import { DRAGON_PLAN_MOVES, SALMON_SWIM, creatureOf, dragonPlan, dragonWalkAt, salmonSwimAt } from '../public/js/street-creatures.js?v=8171dc9b';
+import { DRAGON_PLAN_MOVES, SALMON_SWIM, creatureOf, dragonPlan, dragonWalkAt, salmonSwimAt } from '../public/js/street-creatures.js?v=6831f6b2';
 import { FIRE_DRAGON_WALK } from '../public/js/fire-dragon.js?v=b7f3d751';
 import { foxLegFrom, foxOnLeg } from '../public/js/foxes-mp.js?v=20b2e4f9';
 import { FOX_TIMING } from '../public/js/foxes.js?v=c0ce235f';
-import { SHARED_NODE_CLASSES, applyNodeState, freshenNode, sharedNodeVerb } from '../public/js/street-objects.js?v=b92964f9';
+import { SHARED_NODE_CLASSES, applyNodeState, freshenNode, sharedNodeVerb } from '../public/js/street-objects.js?v=dd03ab9d';
 import { createResourceNode } from '../public/js/resource-nodes.js?v=c2eb46b1';
-import { streetObjectsFeature } from '../public/js/features/street-objects-feature.js?v=ba7fd33e';
+import { streetObjectsFeature } from '../public/js/features/street-objects-feature.js?v=286e6139';
 import { serverPath, skipWithoutServer } from '../tools/repos.mjs';
 
 describe('a shared Salmon', () => {

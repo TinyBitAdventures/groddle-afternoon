@@ -6,9 +6,9 @@ import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { SLOTH_COLLISION, slothGeometry, slothPeekBox, touchesSloth } from '../public/js/features/resource-nodes-feature.js?v=75b2dcd5';
-import { SLOTH_SPOTS } from '../public/js/sloth-spots-data.js?v=b8730c99';
-import { slothSpotFromRow } from '../public/js/sloth-trees.js?v=a44a0ed8';
+import { SLOTH_COLLISION, slothGeometry, slothPeekBox, touchesSloth } from '../public/js/features/resource-nodes-feature.js?v=94a385e9';
+import { SLOTH_SPOTS } from '../public/js/sloth-spots-data.js?v=0fb481e0';
+import { slothSpotFromRow } from '../public/js/sloth-trees.js?v=775bef07';
 import { platformsScreen, platformYAt } from '../public/js/street-model.js?v=a9a05f9d';
 import { avatarHitBox, behindFloor } from '../public/js/reach.js?v=456da8a8';
 

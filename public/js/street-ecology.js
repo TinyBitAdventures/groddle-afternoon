@@ -26,9 +26,9 @@ import { gardenBedWidth, measuredGardenBeds, pictureGardenBeds } from './garden-
 import { JELLISAC_HOLE_SPOTS } from './jellisac-hole-spots-data.js?v=256c00e9';
 import { STONE_FRONT_MASKS } from './stone-front-masks-data.js?v=31b2b54a';
 import { decoCovers } from './barnacle-walls.js?v=75e568c3';
-import { SLOTH_SPOTS } from './sloth-spots-data.js?v=b8730c99';
+import { SLOTH_SPOTS } from './sloth-spots-data.js?v=0fb481e0';
 import { ICE_NUBBIN_SPOTS } from './ice-nubbin-spots-data.js?v=0a86af3c';
-import { slothSpotFromRow } from './sloth-trees.js?v=a44a0ed8';
+import { slothSpotFromRow } from './sloth-trees.js?v=775bef07';
 
 export const STREET_ECOLOGY_URL = 'assets/content/street-ecology.json?v=official-ecology-6';
 

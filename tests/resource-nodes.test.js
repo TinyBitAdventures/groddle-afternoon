@@ -53,7 +53,7 @@ import {
   measuredNodeSpots,
   PLANNED_NODE_CAPS,
   RESOURCE_NODE_CLASSES,
-} from '../public/js/street-ecology.js?v=dde3c62d';
+} from '../public/js/street-ecology.js?v=da5177b2';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const publicRoot = join(__dirname, '../public');

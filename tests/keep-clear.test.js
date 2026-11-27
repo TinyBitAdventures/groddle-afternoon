@@ -45,7 +45,7 @@ import {
   populationForStreet,
   setStreetEcologyCatalog,
   streetReservedSpots,
-} from '../public/js/street-ecology.js?v=dde3c62d';
+} from '../public/js/street-ecology.js?v=da5177b2';
 import { placementRequests } from '../tools/build-realtime-objects.mjs';
 import { SHRINE_SPOTS } from '../public/js/shrine-spots-data.js?v=c45dc2c2';
 import { parallaxLayerOffset } from '../public/js/street-render.js?v=a175beef';

@@ -6,6 +6,9 @@
  * by hand, the Knocker on the trunk and the branch growing out of it (the 2012 Haqiq Cedony snaps).
  * The same box-versus-drawn-pixels mistake as #731's Visiting Stones; this measures the drawn trunk
  * here, from the art at full size (ImageMagick), apart from the tool's columns.
+ * Reopened on v0.79.0: Glitch's Knocker hung unmirrored with its ring just inside the trunk's LEFT edge
+ * and the branch went about 18 px into the trunk (tests/r746-knocker-left-edge.test.js against the
+ * snaps); this keeps the art-side checks.
  *
  * Run: node --test tests/sloth-knocker-on-trunk-746.test.js
  */
@@ -16,9 +19,9 @@ import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { SLOTH_SPOTS } from '../public/js/sloth-spots-data.js?v=b8730c99';
-import { slothSpotFromRow, slothTrees } from '../public/js/sloth-trees.js?v=a44a0ed8';
-import { SLOTH_GRIP, SLOTH_REACH, slothGeometry } from '../public/js/features/resource-nodes-feature.js?v=75b2dcd5';
+import { SLOTH_SPOTS } from '../public/js/sloth-spots-data.js?v=0fb481e0';
+import { slothSpotFromRow, slothTrees, KNOCKER_SNAPS } from '../public/js/sloth-trees.js?v=775bef07';
+import { SLOTH_GRIP, SLOTH_REACH, slothGeometry } from '../public/js/features/resource-nodes-feature.js?v=94a385e9';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const ecology = JSON.parse(readFileSync(join(root, 'public/assets/content/street-ecology.json'), 'utf8'));
@@ -27,8 +30,9 @@ const TRUNK_RE = /^tree_plane_trunk|^tree_plane_01a/;
 const RING = 25;
 /** The thick end of the sloth's own branch: sloth_hidden's cell x 2, rows 88-118, from the SWF's origin. */
 const BRANCH = { back: 59, down: 36 };
-/** The least a sloth's spot stands off its Knocker for the Knocker to be outside the sloth's box. */
-const KNOCKER_CLEAR = SLOTH_GRIP.x + SLOTH_REACH.box.back + 1;
+/** The ring's hole centre from the Knocker's foot (unmirrored art), and how far inside the left edge it hangs. */
+const RING_AT = { x: -4, y: -15 };
+const INSET = 5;
 
 /** Each row's [left, right) of the art where alpha is over half, at full size (null = nothing drawn). */
 const artRows = new Map();
@@ -72,11 +76,14 @@ function drawn(d, y) {
   return [Math.min(at(row[0]), at(row[1])), Math.max(at(row[0]), at(row[1]))];
 }
 
+/** The 37 trees whose Knocker the 2012 snaps show (sloth-trees.js KNOCKER_SNAPS, by trunk x). */
+const SNAPPED_TREES = new Set();
 const cases = [];
 for (const tsid of Object.keys(SLOTH_SPOTS)) {
   const street = JSON.parse(readFileSync(join(root, 'public/assets/streets', `${tsid}.json`), 'utf8'));
   const label = ecology.streets[tsid]?.label || tsid;
   slothTrees(street).forEach((t, i) => {
+    if ((KNOCKER_SNAPS[tsid] || []).some(([x]) => x === t.trunk)) SNAPPED_TREES.add(`${tsid} ${i}`);
     const spot = slothSpotFromRow(SLOTH_SPOTS[tsid][i]);
     cases.push({ tsid, label, i, d: trunkOf(street, t.trunk), spot, geo: slothGeometry({ x: spot.x, y: spot.y, sloth: spot }) });
   });
@@ -94,25 +101,29 @@ describe('#746 Sloth trees: the Knocker and the branch meet the trunk as drawn',
     assert.deepEqual(cases.filter((c) => !c.d).map((c) => `${c.label} ${c.i}`), []);
   });
 
-  it('hangs every Knocker with its ring on the drawn trunk, on its middle or just off it away from the sloth (Haqiq Cedony first)', () => {
+  it("hangs every Knocker on the drawn trunk, its ring just inside the trunk's left edge whichever side the sloth is (Haqiq Cedony first)", () => {
     const bad = [];
-    let offMiddle = 0;
-    for (const { label, i, d, spot } of cases) {
-      const col = drawn(d, spot.knocker.y - RING);
-      const off = col ? Math.round(spot.knocker.x - (col[0] + col[1]) / 2) : NaN;
-      const inside = col ? Math.min(spot.knocker.x - col[0], col[1] - spot.knocker.x) : -Infinity;
-      if (!(inside >= 8)) {
-        bad.push(`${label} ${i}: ${inside >= 0 ? 'at the edge of' : 'off'} the trunk, ${off} px from its middle`);
+    let snapped = 0;
+    for (const { tsid, label, i, d, spot } of cases) {
+      const col = drawn(d, spot.knocker.y + RING_AT.y);
+      if (!col) {
+        bad.push(`${label} ${i}: no trunk at the ring`);
         continue;
       }
-      if (Math.abs(off) <= 3) continue;
-      // Off the middle only where a trunk leans to its sloth: just clear of the sloth's box, away from it.
-      offMiddle += 1;
-      const sep = spot.dir * (spot.x - spot.knocker.x);
-      if (sep !== KNOCKER_CLEAR || Math.sign(off) !== -spot.dir) bad.push(`${label} ${i}: ${off} px off the middle, ${sep} px from its sloth`);
+      const inset = Math.round(spot.knocker.x + RING_AT.x - col[0]);
+      if (SNAPPED_TREES.has(`${tsid} ${i}`)) {
+        snapped += 1;
+        // Glitch's own, by hand: its ring 8 px outside the left edge (Gomed Essoni's first, on a flared
+        // trunk) to 27 px in (the 2012 snaps).
+        if (inset < -9 || inset > 28) bad.push(`${label} ${i}: snapped ring ${inset} px inside the left edge`);
+        continue;
+      }
+      if (Math.abs(inset - INSET) > 1) bad.push(`${label} ${i}: ring ${inset} px inside the left edge, not ${INSET}`);
+      // The foot (the art's bottom centre) on the trunk as drawn.
+      if (!(spot.knocker.x > col[0] && spot.knocker.x < col[1])) bad.push(`${label} ${i}: the foot off the trunk`);
     }
     assert.deepEqual(bad, []);
-    assert.ok(offMiddle <= 20, `${offMiddle} Knockers off their trunk's middle`);
+    assert.equal(snapped, 37);
   });
 
   it("grows every sloth's own branch out of the drawn trunk: its thick end in it, not past it", () => {
@@ -129,11 +140,6 @@ describe('#746 Sloth trees: the Knocker and the branch meet the trunk as drawn',
       if (gap > 0) bad.push(`${label} ${i}: branch ${gap} px short of the trunk`);
       if (geo.dir * (tip - far) <= 0) bad.push(`${label} ${i}: branch through the trunk`);
     }
-    assert.deepEqual(bad, []);
-  });
-
-  it('keeps every Knocker its own thing to point at, outside its Sloth', () => {
-    const bad = cases.filter(({ geo }) => !(geo.knocker.x < geo.box.left || geo.knocker.x > geo.box.right)).map((c) => `${c.label} ${c.i}`);
     assert.deepEqual(bad, []);
   });
 });

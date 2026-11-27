@@ -33,8 +33,8 @@ import { jumpArc, reachStreet, streetBuff, streetWorld } from '../public/js/buil
 import { QUOIN_REACH_MOVES, quoinTouches } from '../public/js/quoins.js?v=f9187edb';
 import { rockShapeSheet } from '../public/js/mining.js?v=7ecaa572';
 import { getResourceNodeDef } from '../public/js/resource-nodes.js?v=c2eb46b1';
-import { ecologyForStreet, planStreetPlacements, populationForStreet, rockSpawnPlan, setStreetEcologyCatalog, streetReservedSpots } from '../public/js/street-ecology.js?v=dde3c62d';
-import { resourceSpawnPlan } from '../public/js/features/resource-nodes-feature.js?v=75b2dcd5';
+import { ecologyForStreet, planStreetPlacements, populationForStreet, rockSpawnPlan, setStreetEcologyCatalog, streetReservedSpots } from '../public/js/street-ecology.js?v=da5177b2';
+import { resourceSpawnPlan } from '../public/js/features/resource-nodes-feature.js?v=94a385e9';
 import { streetObjectLayout } from '../tools/build-realtime-objects.mjs';
 import { placementRequests, streetEcology, streetQuoinLayout } from '../tools/build-realtime-quoins.mjs';
 import { shippedArrivals } from '../tools/builder/calibrate.mjs';

@@ -22,9 +22,9 @@ import {
   seedSeasonLine,
   setSeasonalSeedCheck,
 } from '../public/js/garden.js?v=fefa7bcd';
-import { getVerbsFor } from '../public/content.js?v=79a980f7';
+import { getVerbsFor } from '../public/content.js?v=da2b8879';
 import { activeSeasons, parseSeasonDate } from '../public/js/seasons.js?v=5d8f545a';
-import { seasonsFeature } from '../public/js/features/seasons-feature.js?v=3e9cda2a';
+import { seasonsFeature } from '../public/js/features/seasons-feature.js?v=00265450';
 import { createInventory, addItem } from '../public/js/inventory.js?v=3be7988a';
 
 const LINE = 'Pumpkins grow only during Zilloween and Pot Luck Day.';

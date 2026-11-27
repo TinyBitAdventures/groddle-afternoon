@@ -15,7 +15,7 @@ import { describe, it } from 'node:test';
 
 import { TRANT_META, setTrantTables } from '../public/js/trants.js?v=cf0fe1a3';
 import { trantLook } from '../public/js/trant-looks.js?v=8ed6fe90';
-import { treeFrameUrl } from '../public/js/features/patches-feature.js?v=732789bc';
+import { treeFrameUrl } from '../public/js/features/patches-feature.js?v=c0607b3c';
 import { HIRES_SPRITES } from '../public/js/sprite-hires.js?v=dd070ce8';
 
 const root = join(import.meta.dirname, '..');

@@ -23,7 +23,7 @@ import {
   scareChance,
   stepFlight,
 } from '../public/js/chicken-scare.js?v=1df29bf0';
-import { FLYING_HIDDEN_VERBS, chickenScareFeature } from '../public/js/features/chicken-scare-feature.js?v=dd1c02a6';
+import { FLYING_HIDDEN_VERBS, chickenScareFeature } from '../public/js/features/chicken-scare-feature.js?v=a8285c1f';
 import { bubbleMs } from '../public/js/read-time.js?v=3151fb1a';
 import { imageSize } from '../tools/image-size.mjs';
 

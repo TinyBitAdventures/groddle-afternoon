@@ -152,7 +152,7 @@ describe('a Storage Display Box takes things, as the original did', () => {
  * side (ItemIconView.as 315-321), keeping its shape.
  */
 describe('#314 the shown item keeps its shape', async () => {
-  const { displayIconScale, SDB_ITEM_WH } = await import('../public/js/features/homes-feature.js?v=85c0b5c0');
+  const { displayIconScale, SDB_ITEM_WH } = await import('../public/js/features/homes-feature.js?v=76aa2f88');
   it('fits the longer side into 34 px', () => {
     assert.equal(SDB_ITEM_WH, 34);
     const wine = displayIconScale(15, 48);

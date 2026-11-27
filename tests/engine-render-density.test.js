@@ -52,7 +52,7 @@ test('a large Retina stage gets more than 2 backing px per world px, a phone get
   assert.ok(desktop > 2, `desktop ${desktop}`);
   assert.equal(phone, 1);
 
-  const { landscapeArt, wantsHiresPieces } = await import('../public/js/features/homes-feature.js?v=85c0b5c0');
+  const { landscapeArt, wantsHiresPieces } = await import('../public/js/features/homes-feature.js?v=76aa2f88');
   // House interiors: 3x pieces past 2.25, read from engine.resolution.
   assert.equal(wantsHiresPieces({ resolution: desktop }), true);
   assert.equal(wantsHiresPieces({ resolution: phone }), false);

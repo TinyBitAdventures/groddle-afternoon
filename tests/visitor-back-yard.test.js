@@ -35,7 +35,7 @@ const pixi = new Proxy({ Container: Display, Graphics: Display, Sprite: Display,
 globalThis.PIXI = pixi;
 globalThis.Image ??= class { set src(_) {} };
 
-const { visitorHomeScene, visitorHomeState, yardDrawParts } = await import('../public/js/features/homes-feature.js?v=85c0b5c0');
+const { visitorHomeScene, visitorHomeState, yardDrawParts } = await import('../public/js/features/homes-feature.js?v=76aa2f88');
 const { CULTIVATION_CLASSES } = await import('../public/js/homes-catalog.js?v=0367f90f');
 const { homeStreetLayout } = await import('../public/js/home-cultivation.js?v=122d6f45');
 

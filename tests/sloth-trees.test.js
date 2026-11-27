@@ -6,10 +6,10 @@ import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { slothSpotFromRow } from '../public/js/sloth-trees.js?v=a44a0ed8';
-import { SLOTH_SPOTS } from '../public/js/sloth-spots-data.js?v=b8730c99';
+import { slothSpotFromRow } from '../public/js/sloth-trees.js?v=775bef07';
+import { SLOTH_SPOTS } from '../public/js/sloth-spots-data.js?v=0fb481e0';
 import { buildSlothSpots, slothStreets } from '../tools/build-sloth-spots.mjs';
-import { measuredNodeSpots, populationForStreet } from '../public/js/street-ecology.js?v=dde3c62d';
+import { measuredNodeSpots, populationForStreet } from '../public/js/street-ecology.js?v=da5177b2';
 import { SLOTH_SHEETS } from '../public/js/sloth-art.js?v=a2768e2f';
 import {
   SLOTH_GRIP,
@@ -18,7 +18,7 @@ import {
   resourceSpawnPlan,
   slothGeometry,
   slothSpotsFromArt,
-} from '../public/js/features/resource-nodes-feature.js?v=75b2dcd5';
+} from '../public/js/features/resource-nodes-feature.js?v=94a385e9';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const ecology = JSON.parse(readFileSync(join(root, 'public/assets/content/street-ecology.json'), 'utf8'));
@@ -66,14 +66,17 @@ describe('sloth trees (G891)', () => {
     }
   });
 
-  it('hangs the 7 snapped Sloths with their hands within 24 px of the snaps, on the side they hung', () => {
+  // #746 reopened: tests/r746-knocker-left-edge.test.js holds 57 snapped Sloths to the snaps' branch
+  // (template match) within 18 px across. These 7 were read by the hands by eye; the three hanging left
+  // read 33-39 px further out than their branch (Kaha Haha's branch matches at NCC 0.985 30 px in).
+  it('hangs the 7 snapped Sloths within 40 px across and 21 px up of the snaps, on the side they hung', () => {
     for (const [tsid, index, sx, sy, dir] of SNAPPED) {
       const { l, t } = street(tsid).bounds;
       const row = slothSpotFromRow(SLOTH_SPOTS[tsid][index]);
       // The hands on the branch as drawn (SLOTH_GRIP from the SWF's origin) are the spot.
       const geo = slothGeometry({ x: row.x, y: row.y, sloth: row });
       const spot = { x: geo.origin.x + geo.dir * SLOTH_GRIP.x, y: geo.origin.y + SLOTH_GRIP.y, dir: geo.dir };
-      assert.ok(Math.abs(spot.x - (sx - l)) <= 24, `${tsid} ${index} x ${spot.x} vs ${sx - l}`);
+      assert.ok(Math.abs(spot.x - (sx - l)) <= 40, `${tsid} ${index} x ${spot.x} vs ${sx - l}`);
       assert.ok(Math.abs(spot.y - (sy - t)) <= 21, `${tsid} ${index} y ${spot.y} vs ${sy - t}`);
       assert.equal(spot.dir, dir, `${tsid} ${index} dir`);
     }
@@ -95,10 +98,10 @@ describe('sloth trees (G891)', () => {
         assert.ok(spot.knocker.y < spot.floor && spot.knocker.y > spot.y, `${tsid} Knocker between the branch and the floor`);
       }
     }
-    // Kaha Haha's one Sloth: 1293,-1860 left of its trunk (the snap: 1270,-1872), 640 px under the top.
-    // #746: 25 px in from the trunk box's 110 (1268), so its branch reaches the trunk as drawn.
+    // Kaha Haha's one Sloth: 1309,-1860 left of its trunk, 640 px under the top. #746 reopened: its
+    // branch 18 px into the trunk as drawn, where the 2012 snap shows it (origin 3339,605: hands 3309).
     const kaha = slothSpotFromRow(SLOTH_SPOTS.GHFEKBJFP0J2J9Q[0]);
-    assert.deepEqual([kaha.x, kaha.y, kaha.dir], [1293 + 2000, -1860 + 2500, -1]);
+    assert.deepEqual([kaha.x, kaha.y, kaha.dir], [1309 + 2000, -1860 + 2500, -1]);
     assert.ok(slothGeometry({ x: kaha.x, y: kaha.y, sloth: kaha }).origin.y - climb > 500);
   });
 
