@@ -60,6 +60,7 @@
  * No placement of the signs survives either: they hang where the 2012
  * footage shows them (#734, HALL_DECOS).
  */
+import { sentenceLabel } from './pc-label.js?v=e19212a2';
 
 export const BUREAUCRAT_CLASS = 'npc_bureaucrat';
 export const PLEASE_WAIT_BUFF = 'please_wait';
@@ -186,7 +187,7 @@ export const BUREAUCRAT_TITLES = Object.freeze(['Prefect', 'Chamberlain', 'Deput
 export const BUREAUCRAT_NAMES = Object.freeze(['Smithe', 'Wigglesbottom', 'Apfer', 'Naraiwaddleappali', 'Snifflenose', 'Sharpburger', 'Tummyford', 'Piksnixson', 'Nuter', 'Innifekki', 'Candnot', 'Chucklesmouth', 'Earwick']);
 
 export const HALL_TEXT = Object.freeze({
-  greeting: (label) => `<b>${label}</b>! We will be with you as soon as possible. Now please go and wait.`,
+  greeting: (label) => `<b>${sentenceLabel(label)}</b>! We will be with you as soon as possible. Now please go and wait.`,
   waitRight: 'Please move into the waiting area to your right.',
   waitLeft: 'Please move into the waiting area to your left.',
   cardNoSkill: 'You have not learned any of Bureaucratic Arts and already have a Card-Carrying Qualification: the Bureaucrats have nothing for you.',
@@ -346,7 +347,8 @@ export function fillHallText(text, { pcLabel = '', item = null, bureaucrat = '',
     out = out.replace(/{item_cost}/g, `<b>${item.cost}</b>`);
   }
   if (bureaucrat) out = out.replace(/{bureaucrat_name}/g, `<b>${bureaucrat}</b>`);
-  return out.replace(/{pc_label}/g, pcLabel);
+  // Solo's "friend" starting a sentence is "Friend" (js/pc-label.js sentenceLabel).
+  return out.replace(/(^|[.!?]\s+){pc_label}/g, (m, lead) => lead + sentenceLabel(pcLabel)).replace(/{pc_label}/g, pcLabel);
 }
 
 /**

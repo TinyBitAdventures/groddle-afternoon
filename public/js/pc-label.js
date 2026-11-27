@@ -10,3 +10,12 @@ export const SOLO_PC_LABEL = 'friend';
 export function pcLabel(engine) {
   return String(engine?.query?.('playerChatName', engine) || '').trim() || SOLO_PC_LABEL;
 }
+
+/**
+ * {pc_label} starting a sentence: Glitch put the player's name there, which starts with a capital
+ * (npc_bureaucrat.js 425 "<b>"+label+"</b>! We will be with you..."), so solo's "friend" is "Friend".
+ * A name played under online is kept as written.
+ */
+export function sentenceLabel(label) {
+  return label === SOLO_PC_LABEL ? 'Friend' : label;
+}
