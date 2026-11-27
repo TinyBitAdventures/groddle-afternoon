@@ -2814,9 +2814,14 @@
   "deployed": "2026-11-27"
  },
  "git": {
-  "commits": 3811,
+  "commits": 3813,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-27",
+    "kind": "fix",
+    "text": "Things on the floor by the right wall move over when the house is un-expanded, instead of ending up past the wall"
+   },
    {
     "date": "2026-11-27",
     "kind": "improve",
@@ -2931,14 +2936,9 @@
     "date": "2026-11-26",
     "kind": "fix",
     "text": "The Encyclopedia's tips, its links, the hotkey sheet, Where to get it and Open Profile Page say they open over the game in the Home Screen app"
-   },
-   {
-    "date": "2026-11-26",
-    "kind": "fix",
-    "text": "Support the game's tip and the picture's open link say they open over the game in the Home Screen app"
    }
   ]
  },
- "tests": 1473,
+ "tests": 1474,
  "generatedAt": "2026-11-27"
 }
