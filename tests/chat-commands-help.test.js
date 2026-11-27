@@ -25,7 +25,7 @@ import {
 } from '../public/js/slash-commands.js?v=bb2569aa';
 import { chatCommandsSection, createHotkeysSheet } from '../public/js/client-hotkeys.js?v=5c5a4301';
 import { HINT_DELAY_MS, showLocalLines, slashCommandsFeature } from '../public/js/features/slash-commands-feature.js?v=48fac8bd';
-import { FEATURES } from '../public/js/features/index.js?v=2d8a87c4';
+import { FEATURES } from '../public/js/features/index.js?v=6d980052';
 import { createFeatureHost } from '../public/js/feature-host.js?v=b87e2cbc';
 import { CHANNEL_WELCOME, tabCommand } from '../public/js/groups.js?v=c5e35964';
 

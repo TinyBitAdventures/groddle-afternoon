@@ -14,7 +14,7 @@ import { STATIONS, STATION_BOUNDS, STATION_FLOOR, STATION_STAIRS_LINE, SUBWAY_AR
 import { NORMAL_BUFF, avatarGround, stepAvatar, steerX } from '../public/js/avatar-step.js?v=8415ee96';
 import { barriersScreen, platformsScreen, stuckWay } from '../public/js/street-model.js?v=a9a05f9d';
 import { defaultArrival } from '../public/js/street-arrival.js?v=c7294edc';
-import { subwayFeature } from '../public/js/features/subway-feature.js?v=bb31219d';
+import { subwayFeature } from '../public/js/features/subway-feature.js?v=f98ac0bb';
 
 const PUB = join(import.meta.dirname, '..', 'public');
 const readJson = (rel) => JSON.parse(readFileSync(join(PUB, rel), 'utf8'));

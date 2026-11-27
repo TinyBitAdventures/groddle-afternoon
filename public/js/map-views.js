@@ -28,6 +28,15 @@ import { WORLD_MAP } from './map-views-data.js?v=07734585';
 import { LINE_COLOURS, STATIONS, SUBWAY_ART, SUBWAY_ART_BASE, cubicAt, lineName, lineText, subwayPoints, subwaySegments } from './subway.js?v=ea6921ff';
 
 export const MAP_VIEWS = Object.freeze(['hub', 'world', 'subway']);
+
+/**
+ * #739: whether a view button in the Map's head shows as pressed. 'hub' is Glitch's recenter button
+ * (HubMapDialog.as 172-190, "Go to my location"), an action that takes you back to your own region,
+ * so it is never pressed (null: no state at all); World and Subway are pressed while on show.
+ */
+export function mapViewPressed(buttonView, shownView) {
+  return buttonView === 'hub' ? null : buttonView === shownView;
+}
 /** The window's title in each view (the client's: the region's name, "World Map", "Subway System"). */
 export const MAP_VIEW_TITLES = Object.freeze({ world: 'World Map', subway: 'Subway System' });
 

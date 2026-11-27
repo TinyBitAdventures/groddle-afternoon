@@ -13,7 +13,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { HUB_MAP_BACKGROUNDS } from '../public/js/hub-map-backgrounds.js?v=d6a23c90';
 import { WORLD_MAP } from '../public/js/map-views-data.js?v=07734585';
-import { bindWorldMap, worldCardFile, worldCardFiles } from '../public/js/map-views.js?v=ad712b91';
+import { bindWorldMap, worldCardFile, worldCardFiles } from '../public/js/map-views.js?v=7ff57fbc';
 import { MAP_THUMB_SOFT, buildHubMapView, renderHubMapSvg } from '../public/js/map-graph.js?v=803cc6cd';
 import {
   MAP_BG_FADE_MS,
@@ -30,7 +30,7 @@ import {
   subwayPaperFile,
   watchMapBg,
   worldChartFiles,
-} from '../public/js/map-bg-preload.js?v=793d3a18';
+} from '../public/js/map-bg-preload.js?v=759755f5';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const read = (p) => readFileSync(join(root, p), 'utf8');

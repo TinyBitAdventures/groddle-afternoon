@@ -9,7 +9,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 import { LINE_COLOURS, LINE_TOKENS, STATIONS, createRide, cubicAt, curvePoint, lineStarPoint, lineView, nextStation, rideTiming, stationById, stepRide, subwayPoints, subwaySegments } from '../public/js/subway.js?v=ea6921ff';
-import { renderSubwayMapSvg } from '../public/js/map-views.js?v=ad712b91';
+import { renderSubwayMapSvg } from '../public/js/map-views.js?v=7ff57fbc';
 import { readTokens } from '../tools/tokens/css-sources.mjs';
 
 const root = join(import.meta.dirname, '..');

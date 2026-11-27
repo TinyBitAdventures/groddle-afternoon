@@ -4,7 +4,7 @@
  */
 import { ITEM_ICONS, ITEM_LABELS, getVerbsFor, ordinaryItems, runVerb } from './content.js?v=c46159de';
 import { createErrorOnce, createFeatureHost, createFrameStages } from './js/feature-host.js?v=b87e2cbc';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=2d8a87c4';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=6d980052';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, enterHintPick, groupHead, hoverRimShown, reachGlowTargets, spriteHasRimArt, rimArtParts, trimmedIconUrl, drawTileArt } from './js/enter-chooser.js?v=74f4964a';
 import { firstTendKey, STICK_TEND_DELAY_MS, STICK_TEND_DIRS, STICK_TEND_REPEAT_MS, stepTendKey, stepTendKeys, stickTendKey, tendKeyAction } from './js/garden-tend.js?v=a7470c4a';
 import { avatarHitBox, behindFloor, bodyReachDistance, OUT_OF_REACH_LINE, playerClickBox } from './js/reach.js?v=456da8a8';
@@ -1077,9 +1077,9 @@ import {
 } from './js/map-graph.js?v=803cc6cd';
 import { withHubColours } from './js/hub-colour.js?v=51e3ad0e';
 // G471: the world map and the subway map in the Map's window.
-import { MAP_VIEW_TITLES, bindSubwayMap, bindWorldMap, mapViewSubtitle, nearestStation, renderSubwayMapSvg, renderWorldMapSvg, worldCardFile, worldCardFiles, worldRegionList } from './js/map-views.js?v=ad712b91';
+import { MAP_VIEW_TITLES, bindSubwayMap, bindWorldMap, mapViewPressed, mapViewSubtitle, nearestStation, renderSubwayMapSvg, renderWorldMapSvg, worldCardFile, worldCardFiles, worldRegionList } from './js/map-views.js?v=7ff57fbc';
 // MAPLOAD: a region's painting fetched ahead of the click, its thumb in its place while it loads.
-import { createMapBgPreloader, mapBgFiles, prepareMapBg, prepareSubwayPaper, prepareWorldCharts, subwayPaperFile, watchMapBg, worldChartFiles } from './js/map-bg-preload.js?v=793d3a18';
+import { createMapBgPreloader, mapBgFiles, prepareMapBg, prepareSubwayPaper, prepareWorldCharts, subwayPaperFile, watchMapBg, worldChartFiles } from './js/map-bg-preload.js?v=759755f5';
 import { hubMapArtNote, hubMapSubtitle, questLogSummary } from './js/panel-copy.js?v=f854d1dd';
 import { bindMapIconTips } from './js/ui/map-icon-tips.js?v=6b3eb3f9';
 import { createMapZoom } from './js/map-zoom.js?v=4f0762b2';
@@ -29128,9 +29128,9 @@ function markMapView(panel, which) {
     bar.dataset.bound = '1';
     bar.addEventListener('click', (e) => {
       const btn = e.target.closest('[data-map-view]');
-      if (!btn || (btn.getAttribute('aria-selected') === 'true' && btn.dataset.mapView !== 'hub')) return;
+      if (!btn || btn.getAttribute('aria-pressed') === 'true') return;
       const next = btn.dataset.mapView;
-      // "Your region" is the client's recenter button: back to the map of where you are.
+      // "Go to my location" is the client's recenter button (#739): back to the map of where you are.
       if (next === 'hub') mapPanelHubId = null;
       openMap(null, { view: next });
     });
@@ -29143,7 +29143,12 @@ function markMapView(panel, which) {
     bar.addEventListener('pointerover', warmOn);
     bar.addEventListener('focusin', warmOn);
   }
-  for (const btn of bar.querySelectorAll('[data-map-view]')) btn.setAttribute('aria-selected', String(btn.dataset.mapView === which));
+  for (const btn of bar.querySelectorAll('[data-map-view]')) {
+    // #739: World and Subway show which is on; Go to my location is an action and never lit.
+    const pressed = mapViewPressed(btn.dataset.mapView, which);
+    if (pressed == null) btn.removeAttribute('aria-pressed');
+    else btn.setAttribute('aria-pressed', String(pressed));
+  }
 }
 
 /** G471: the world map or the subway map in the Map's window (js/map-views.js). */

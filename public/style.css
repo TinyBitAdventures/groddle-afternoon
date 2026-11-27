@@ -7412,7 +7412,12 @@ body.buff-purple-pulse::after {
 
 /* G471: the Map's views (js/map-views.js): the view buttons in its head (HubMapDialog.as: your region,
    the world map, the transit map), the world map and the subway map. */
-.map-views { display: inline-flex; flex: none; gap: 2px; padding: 2px; border-radius: var(--radius-pill); background: var(--surface-sunken); }
+/* #739: Go to my location (Glitch's recenter button) is an outlined action beside the World and Subway
+   pair, never lit; only the view on show is. */
+.map-views { display: inline-flex; flex: none; align-items: center; gap: var(--sp-2); }
+.map-view-toggles { display: inline-flex; flex: none; gap: 2px; padding: 2px; border-radius: var(--radius-pill); background: var(--surface-sunken); }
+.map-view-btn.map-recenter { min-height: 32px; border: 1px solid var(--border); color: var(--text); }
+.map-view-btn.map-recenter:hover { background: var(--surface-sunken); }
 .map-view-btn {
   display: inline-flex; align-items: center; gap: var(--sp-2); min-height: 28px; padding: 0 var(--sp-4) 0 var(--sp-3);
   border: 0; border-radius: var(--radius-pill); background: none; color: var(--text-muted);
@@ -7421,7 +7426,7 @@ body.buff-purple-pulse::after {
 .map-view-btn svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linejoin: round; stroke-linecap: round; }
 .map-view-btn svg .fill { fill: currentColor; stroke: none; }
 .map-view-btn:hover { color: var(--text); }
-.map-view-btn[aria-selected="true"] { background: var(--surface-bright); color: var(--text); box-shadow: var(--shadow-1); }
+.map-view-btn[aria-pressed="true"] { background: var(--surface-bright); color: var(--text); box-shadow: var(--shadow-1); }
 .map-view-btn:focus-visible { outline: 2px solid var(--c-gold-85); outline-offset: 1px; }
 /* They fill the canvas box as the region map does (ticket 21, .map-canvas > .hub-map-svg). */
 .map-canvas > :is(.world-map-svg, .subway-map-svg) { position: absolute; inset: 0; }

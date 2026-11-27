@@ -45,7 +45,7 @@ import { REPORT_WINDOW_SELECTOR, SCREEN_SELECTOR, START_CARD_SELECTOR, WINDOW_SE
 import { OVERLAY_USES, playOverlay } from '../overlays.js?v=91dcee74';
 import { doorsFeature } from './doors-feature.js?v=0886f7df';
 import { createMapZoom } from '../map-zoom.js?v=4f0762b2';
-import { bindSubwayMap, renderSubwayMapSvg, subwayPaper } from '../map-views.js?v=ad712b91';
+import { bindSubwayMap, renderSubwayMapSvg, subwayPaper } from '../map-views.js?v=7ff57fbc';
 import { frameTexture, textureFromUrl } from '../textures.js?v=b8e38103';
 import {
   CAR_FLOOR,

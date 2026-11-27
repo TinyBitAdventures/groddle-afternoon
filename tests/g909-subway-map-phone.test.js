@@ -8,7 +8,7 @@ import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { clampMapView, fitMapView, mapViewBox, viewWithPointAt } from '../public/js/map-zoom.js?v=4f0762b2';
-import { renderSubwayMapSvg } from '../public/js/map-views.js?v=ad712b91';
+import { renderSubwayMapSvg } from '../public/js/map-views.js?v=7ff57fbc';
 
 const root = join(import.meta.dirname, '..');
 const feature = readFileSync(join(root, 'public/js/features/subway-feature.js'), 'utf8');

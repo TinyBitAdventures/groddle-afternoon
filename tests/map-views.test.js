@@ -29,7 +29,7 @@ import {
   subwaySegments,
   worldCharts,
   worldRegionList,
-} from '../public/js/map-views.js?v=ad712b91';
+} from '../public/js/map-views.js?v=7ff57fbc';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const read = (p) => readFileSync(join(root, p), 'utf8');
@@ -433,7 +433,9 @@ describe('the Map window offers the three views (HubMapDialog.as)', () => {
 
   it('its head holds the view buttons, in both pages', () => {
     for (const page of [html, read('public/play/online/index.html')]) {
-      for (const v of ['hub', 'world', 'subway']) assert.match(page, new RegExp(`class="map-view-btn" data-map-view="${v}"`));
+      for (const v of ['world', 'subway']) assert.match(page, new RegExp(`class="map-view-btn" data-map-view="${v}"`));
+      // #739: Go to my location is the recenter button, an action beside the two views.
+      assert.match(page, /class="map-view-btn map-recenter" data-map-view="hub"/);
     }
   });
 
