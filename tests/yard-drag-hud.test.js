@@ -9,6 +9,12 @@
  *    scrolled by the pointer alone (HandOfDecorator.as maybeScrollVPByDragging). Every HUD element on both
  *    edges, in Classic and Modern, at a computer's size and a phone's.
  *
+ * 2. What pops up by itself mid-drag (the Magic Rock's New Quest card, a prompt, the familiar, a notice such as
+ *    the butler's or the mail's): it covered the room, so the stack let go over it went nowhere and the drag
+ *    seemed cancelled. Glitch's drag went on under a card (Cursor.as blur does nothing; the location was
+ *    still asked, as in 1); its screens (level up, a badge, a finished quest, a Giant, the new day) waited
+ *    while the Cursor held a drag (TSFrontController.as tryShowScreenViewFromQ 3378).
+ *
  * The drag goes through the page's own registry as the mouse's does: a dragover on the element under the
  * pointer (document.elementFromPoint), as HTML5 sends it, every 100 ms while held.
  * Browser blocks hold the browser lock (GRODDLE_BROWSER_LOCK) under 60 s each.
@@ -102,12 +108,26 @@ function helpers(h) {
     else m.endDrag();
     return { under, over, last: document.documentElement.dataset.dropLast || '', before: cam0, after: cam1 };
   }, [at, ms, drop]);
+  /** Every screen answered (a new day, a level, a badge the fresh save brings), none waiting: the start of a clean drag. */
+  async function quiet() {
+    let calm = 0;
+    for (let i = 0; i < 80 && calm < 4; i += 1) {
+      const busy = await page().evaluate(() => {
+        const up = ['award-screen', 'new-day-screen', 'giant-screen-panel'].map((id) => document.getElementById(id)).filter((el) => el && !el.hidden && el.classList.contains('is-visible'));
+        for (const el of up) [...el.querySelectorAll('button')].find((b) => b.offsetParent && !b.disabled)?.click();
+        return up.length > 0 || window.groddleQA.notify.screensPending() > 0;
+      });
+      calm = busy ? 0 : calm + 1;
+      await page().waitForTimeout(150);
+    }
+    assert.equal(calm >= 4, true, 'the screens a fresh save brings are answered');
+  }
   async function shot(name) {
     if (!SHOT) return;
     mkdirSync(SHOT, { recursive: true });
     await page().screenshot({ path: join(SHOT, name) });
   }
-  return { page, data, camX, center, yard, hold, shot };
+  return { page, base: () => h.base, data, camX, center, quiet, yard, hold, shot };
 }
 
 /** The HUD elements on the view's left and right edges (inside the 48 px edge band), as client points. */
@@ -191,4 +211,111 @@ describe('review 2026-11-27 leftover 1: a pack stack held over the HUD at the vi
       });
     }
   }
+});
+
+/**
+ * The page's drop registry, a step at a time, as the mouse drives it: begin, then a dragover (or the drop)
+ * dispatched on the element under the point, as HTML5 sends them. Returns what was under the point and the marks.
+ */
+const step = (page, what, at = null) => page.evaluate(async ([w, p]) => {
+  const url = performance.getEntriesByType('resource').map((e) => e.name).find((name) => /\/js\/drop-targets\.js/.test(name));
+  const m = await import(url);
+  if (w === 'begin') return Boolean(m.beginDrag({ from: 'pack', cls: 'cherry', count: 1 }));
+  if (w === 'drag') return Boolean(m.currentDrag());
+  const el = document.elementFromPoint(p.x, p.y);
+  (el || document.body).dispatchEvent(new DragEvent(w, { bubbles: true, cancelable: true, composed: true, clientX: p.x, clientY: p.y }));
+  return { under: el ? `${el.closest('[id]')?.id || ''}` : '', over: document.documentElement.dataset.dropOver || '', last: document.documentElement.dataset.dropLast || '' };
+}, [what, at]);
+
+describe('review 2026-11-27 leftover 2: what pops up by itself mid-drag leaves the drag going', () => {
+  browserIt('Modern (1352x802): the Magic Rock\'s New Quest card pops up mid-drag; the stack still lands where it is let go, over the card', COMPUTER, 45_000, async (t) => {
+    const page = t.page();
+    await t.yard();
+    await t.quiet();
+    const cardUp = () => page.evaluate(() => !document.getElementById('quest-dialogue')?.hidden);
+    assert.equal(await cardUp(), false, 'no card yet when the drag begins');
+    const at = await page.evaluate((sel) => {
+      const r = document.querySelector(sel).getBoundingClientRect();
+      return { x: Math.round((r.left + r.right) / 2), y: Math.round(r.top + (r.bottom - r.top) * 0.55) };
+    }, CANVAS);
+    assert.ok(await step(page, 'begin'));
+    let got = await step(page, 'dragover', at);
+    assert.equal(got.over, 'home-place:ok', `the room takes it first: ${JSON.stringify(got)}`);
+    // The card pops as an offer does (quest-offers-feature openOffer: engine.offerQuestDialogue).
+    await page.evaluate(() => window.groddleQA.notify.questCard('Pot\'s Empty Table', 'Psst. Pot wants a feast!'));
+    for (let i = 0; i < 6; i += 1) {
+      await page.waitForTimeout(100);
+      got = await step(page, 'dragover', at);
+    }
+    await t.shot('popup-quest-card-mid-drag-1352x802.png');
+    assert.equal(await cardUp(), true, 'the New Quest card popped up mid-drag');
+    assert.equal(got.under, 'quest-dialogue', 'the card is under the pointer');
+    assert.equal(await step(page, 'drag'), true, 'the drag goes on');
+    assert.equal(got.over, 'home-place:ok', 'the room still takes it under the card');
+    got = await step(page, 'drop', at);
+    await page.waitForTimeout(400);
+    assert.match(got.last, /^home-place:ok:/);
+    assert.equal((await t.data()).homeDropLast, 'place:cherry:yard', 'it lands in the yard where it was let go');
+    assert.equal(await cardUp(), true, 'the card is still there to answer');
+  });
+
+  browserIt('Modern (1352x802): a badge\'s screen waits until the drag ends (Glitch held screens while the Cursor dragged), then shows', COMPUTER, 45_000, async (t) => {
+    const page = t.page();
+    await t.yard();
+    const at = await page.evaluate((sel) => {
+      const r = document.querySelector(sel).getBoundingClientRect();
+      return { x: Math.round((r.left + r.right) / 2), y: Math.round(r.top + (r.bottom - r.top) * 0.55) };
+    }, CANVAS);
+    const shown = () => page.evaluate(() => Boolean(document.getElementById('award-screen')?.classList.contains('is-visible')));
+    await t.quiet();
+    assert.ok(await step(page, 'begin'));
+    await step(page, 'dragover', at);
+    assert.ok(await page.evaluate(() => window.groddleQA.notify.grantBadge('first_eleven_skills') !== false));
+    let up = false;
+    for (let i = 0; i < 25; i += 1) {
+      await page.waitForTimeout(100);
+      const got = await step(page, 'dragover', at);
+      up = up || (await shown());
+      if (got.over !== 'home-place:ok') assert.fail(`the drag lost the room: ${JSON.stringify(got)}`);
+    }
+    assert.equal(up, false, 'no screen over the drag');
+    assert.ok(await page.evaluate(() => window.groddleQA.notify.screensPending()) >= 1, 'the screen waits');
+    const got = await step(page, 'drop', at);
+    assert.match(got.last, /^home-place:ok:/);
+    await page.waitForTimeout(400);
+    assert.equal((await t.data()).homeDropLast, 'place:cherry:yard');
+    for (let i = 0; i < 40 && !up; i += 1) {
+      await page.waitForTimeout(100);
+      up = await shown();
+    }
+    await t.shot('popup-badge-after-drop-1352x802.png');
+    assert.equal(up, true, 'the screen shows once the stack is let go');
+  });
+
+  browserIt('Modern (844x390): a notice (the butler\'s, the mail\'s) that pops up under the pointer mid-drag; let go over it, the stack lands in the yard', PHONE, 45_000, async (t) => {
+    const page = t.page();
+    await t.yard();
+    await t.quiet();
+    assert.ok(await step(page, 'begin'));
+    await page.evaluate(() => window.groddleQA.notify.notice('You have mail.', 9000));
+    await page.waitForTimeout(500);
+    const at = await page.evaluate(() => {
+      const c = [...document.querySelectorAll('#notify-notices .notify-card')].at(-1);
+      const r = c?.getBoundingClientRect();
+      return r && { x: Math.round(r.left + r.width / 2), y: Math.round(r.top + r.height / 2) };
+    });
+    assert.ok(at, 'the notice shows');
+    let got = null;
+    for (let i = 0; i < 3; i += 1) {
+      got = await step(page, 'dragover', at);
+      await page.waitForTimeout(100);
+    }
+    assert.equal(got.under, 'notify-notices', 'the notice is under the pointer');
+    assert.equal(got.over, 'home-place:ok', 'the room takes it under the notice');
+    got = await step(page, 'drop', at);
+    await page.waitForTimeout(400);
+    await t.shot('popup-notice-844x390.png');
+    assert.match(got.last, /^home-place:ok:/);
+    assert.equal((await t.data()).homeDropLast, 'place:cherry:yard');
+  });
 });

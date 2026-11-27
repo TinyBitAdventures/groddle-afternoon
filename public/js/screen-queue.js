@@ -49,6 +49,8 @@ export const SCREEN_GATES = Object.freeze([
   ['decorating', 3372, 'decorator_mode'],
   ['unfocused', 3374, '!flash_has_focus'],
   ['cameraMode', 3376, 'CameraMan'],
+  // The Cursor holds a drag (Cursor.as startDragWith requestFocus): a level up, a badge or a finished quest waits for the drop.
+  ['dragging', 3378, 'Cursor'],
   ['interactionMenu', 3384, 'InteractionMenu'],
   ['getInfo', 3386, 'GetInfoDialog'],
   ['choicesDialog', 3388, 'ChoicesDialog'],

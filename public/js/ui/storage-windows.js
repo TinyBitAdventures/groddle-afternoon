@@ -27,7 +27,7 @@
 
 import { bindCountField, countKeyValue, countStepMarkup, keepCountCaret, openCountField } from './count-chooser.js?v=75f69512';
 import { bindContextTrigger } from './context-menu.js?v=0266831a';
-import { beginDrag, registerDropTarget, touchLift } from '../drop-targets.js?v=3ae8ae5c';
+import { beginDrag, registerDropTarget, touchLift } from '../drop-targets.js?v=d5325567';
 
 const CSS = `
 .hst-win { position: fixed; z-index: calc(var(--z-panel) - 1); left: 50%; top: calc(max(64px, 9vh) + var(--safe-t, 0px)); transform: translateX(-50%);

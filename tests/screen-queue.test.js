@@ -27,7 +27,7 @@ import {
   screenQueueHold,
   shuffleNewDayMessages,
   waitForScreenGates,
-} from '../public/js/screen-queue.js?v=cf0132c0';
+} from '../public/js/screen-queue.js?v=40222620';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const PUBLIC = join(root, 'public');
@@ -70,6 +70,7 @@ describe('the gates (TSFrontController.as tryShowScreenViewFromQ)', () => {
       decorator_mode: 'model.stateModel.decorator_mode)',
       '!flash_has_focus': '!StageBeacon.flash_has_focus && vo && vo.requires_client_focus',
       CameraMan: 'isCompInFocusHistory(CameraMan.instance)) {',
+      Cursor: 'isCompInFocusHistory(Cursor.instance)) {',
       InteractionMenu: 'isCompInFocusHistory(InteractionMenu.instance)) {',
       GetInfoDialog: 'isCompInFocusHistory(GetInfoDialog.instance)) {',
       ChoicesDialog: 'isCompInFocusHistory(ChoicesDialog.instance)) {',
@@ -114,6 +115,9 @@ describe('the gates (TSFrontController.as tryShowScreenViewFromQ)', () => {
     assert.equal(screenQueueHold({ moving: true, choicesDialog: true }), 'ChoicesDialog');
     assert.equal(screenQueueHold({ decorating: true, cameraMode: true }), 'decorator_mode');
     assert.equal(screenQueueHold({ familiarDialog: true }), 'fam_dialog_open');
+    // Review 2026-11-27 leftover 2: a stack being dragged holds a level up, a badge or a finished quest.
+    assert.equal(screenQueueHold({ dragging: true }), 'Cursor');
+    assert.equal(screenQueueHold({ dragging: true, moving: true }), 'Cursor');
   });
 
   it('waits while a gate holds, looking again each second', async () => {

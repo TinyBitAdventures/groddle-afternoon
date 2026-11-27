@@ -11,7 +11,7 @@ import { describe, it, before, after } from 'node:test';
 import assert from 'node:assert/strict';
 import { page } from './social-fake-dom.js';
 import { dropPage, fakeSlot, touchDrop, mouseDrop } from './drop-fake.js';
-import { beginDrag, dragOver, endDrag, packStackOf } from '../public/js/drop-targets.js?v=3ae8ae5c';
+import { beginDrag, dragOver, endDrag, packStackOf } from '../public/js/drop-targets.js?v=d5325567';
 import { openCabinetWindow, closeStorageWindow } from '../public/js/ui/storage-windows.js?fresh=g865-cabinet-touch-drop';
 
 describe('a touch drag from the pack onto a cabinet (#407)', () => {

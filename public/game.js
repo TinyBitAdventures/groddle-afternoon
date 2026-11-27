@@ -4,7 +4,7 @@
  */
 import { ITEM_ICONS, ITEM_LABELS, getVerbsFor, ordinaryItems, runVerb } from './content.js?v=9c775db5';
 import { createErrorOnce, createFeatureHost, createFrameStages } from './js/feature-host.js?v=b87e2cbc';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=0767f711';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=932379c5';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, enterHintPick, hoverText, stackHoverLabel, groupHead, hoverRimShown, reachGlowTargets, spriteHasRimArt, rimArtParts, trimmedIconUrl, drawTileArt } from './js/enter-chooser.js?v=297c6d15';
 import { firstTendKey, STICK_TEND_DELAY_MS, STICK_TEND_DIRS, STICK_TEND_REPEAT_MS, stepTendKey, stepTendKeys, stickTendKey, tendKeyAction } from './js/garden-tend.js?v=a7470c4a';
 import { avatarHitBox, behindFloor, bodyReachDistance, OUT_OF_REACH_LINE, playerClickBox } from './js/reach.js?v=456da8a8';
@@ -548,7 +548,7 @@ import { stockUseVerb } from './js/stock-use.js?v=6b422ccf';
 import { TROPHY_FIND_TEXT, trophyOfBadge } from './js/home-trophies.js?v=649b111e';
 import { HELD_AT_ONCE, HELD_AT_ONCE_TEXT } from './js/collection-trophies.js?v=e45565a7';
 import { PACK_COPY, bagSortIcon, bagSortText, isBagClass, isElementClass, layoutHeld, ownBagLabel, unitRankAt } from './js/pack-slots.js?v=38e4aea5';
-import { beginDrag, installDropRegistry, packStackOf, registerDropTarget, touchLift } from './js/drop-targets.js?v=3ae8ae5c';
+import { beginDrag, currentDrag, installDropRegistry, packStackOf, registerDropTarget, touchLift } from './js/drop-targets.js?v=d5325567';
 import { FLOAT_TEXT_Z, SPEECH_BUBBLE_Z } from './js/fx-z.js?v=18dda7e3';
 import { GAIN_FLOAT, GAIN_FLOAT_MS, gainFloatPose, gainFloatSinks } from './js/gain-float.js?v=caf16853';
 import { hasPouch } from './js/elemental-pouch.js?v=42702eda';
@@ -891,7 +891,7 @@ import { skyFollowsClock, skyLook } from './js/sky-clock.js?v=6b9184e9';
 import { streetMapSetting, toggleStreetMap } from './js/ui/street-minimap.js?v=faab9586';
 import './js/classic/classic-zoom.js?v=d1b8d5b0';
 import { mountImaginationHub } from './js/ui/imagination-hub.js?v=6928c5b7';
-import { newDayBubble, shuffleNewDayMessages, waitForScreenGates } from './js/screen-queue.js?v=cf0132c0';
+import { newDayBubble, shuffleNewDayMessages, waitForScreenGates } from './js/screen-queue.js?v=40222620';
 import { applyFamiliarLook, familiarCardHeading, familiarLook, skillArtFor, skillLearnedActivity } from './js/familiar.js?v=b9597cd3';
 import { placeDialogueBySpeaker } from './js/speaker-card.js?v=94220469';
 import { armPromptTimeout, promptTimeoutMs } from './js/prompt-timeout.js?v=7044a503';
@@ -4183,6 +4183,8 @@ function screenGateState() {
     unfocused: typeof document.hasFocus === 'function' && !document.hasFocus(),
     // 3376, 3398: CameraMan in focus, in_camera_control_mode (camera-mode-feature).
     cameraMode: app?.canvas?.dataset?.cameraMode === '1',
+    // 3378: Cursor in focus: a stack dragged (js/drop-targets.js, the mouse's or a finger's lift).
+    dragging: Boolean(currentDrag()),
     // 3384: InteractionMenu: the verb menu, the door chooser, the item pickers a verb opens.
     interactionMenu: Boolean(menuTarget && elementShown('verb-menu')) || Boolean(enterChooser?.isOpen()) ||
       isFeedPickerOpen() || isEmotionalBearPickerOpen(),
@@ -37137,6 +37139,8 @@ async function main() {
       entries: () => notify.entries.map((e) => ({ kind: e.kind, text: e.text, count: e.count })),
       stats: () => ({ ...notify.stats, unread: notify.unread }),
       grantBadge: (id) => engine.grantAchievement(id),
+      /** The Magic Rock's New Quest card, popped as an offer pops (engine.offerQuestDialogue), with one OK. */
+      questCard: (title, text) => engine.offerQuestDialogue({ title: String(title || 'New Quest'), kicker: 'Magic Rock', beats: [{ text: String(text || ''), response: 'OK' }], acceptLabel: 'OK', declinable: false, onAccept: () => {} }),
       /**
        * HUB QA: finish a quest through the game's own path (assign, complete, its rewards and its
        * award screen, paged when the quest has completion text), e.g. animalkinship_pet_piggies.

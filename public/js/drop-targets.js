@@ -133,16 +133,26 @@ export function endDrag() {
 }
 
 /**
- * What a dragged stack passes over to the world under it: the HUD drawn over the location (the top bar
- * with its stats, Currants and buttons, the street map, the name plate, the Social rail (the drawer shut:
- * open, it is a window), the pinned
- * quests, the effects, the tracker, a phone's stick and jump, and a home's Decorate and Cultivate buttons). Glitch asked the location itself whether the dragged stack was
- * over it (LocationInputHandler.as _packDragMoveHandler 655-658: _locationRenderer.hitTestObject, whatever
- * was drawn on top) and scrolled at the view's edge by the pointer alone (HandOfDecorator.as
- * maybeScrollVPByDragging), so in Classic the Currants counter at the view's left edge stopped neither.
- * Here the element under the pointer decided both, so a stack held over it fell out of the room.
+ * What a dragged stack passes over to the world under it. Glitch asked the location itself whether the
+ * dragged stack was over it (LocationInputHandler.as _packDragMoveHandler 655-658:
+ * _locationRenderer.hitTestObject, whatever was drawn on top) and scrolled at the view's edge by the
+ * pointer alone (HandOfDecorator.as maybeScrollVPByDragging). Here the element under the pointer decided,
+ * so a stack held over the HUD or a card fell out of the room. Two kinds:
+ *
+ * - The HUD drawn over the location: the top bar (stats, Currants, buttons), the street map, the name
+ *   plate, the Social rail (the drawer shut: open, it is a window), the pinned quests, the effects, the
+ *   tracker, a phone's stick and jump, and a home's Decorate and Cultivate buttons. In Classic the
+ *   Currants counter sits on the view's left edge at floor height.
+ * - What pops up by itself, mid-drag too: the Magic Rock's New Quest card and the other conversation
+ *   cards and prompts (#quest-dialogue, its shade covering the view), the familiar's card, the prompts
+ *   beside the pack, and the notices (the butler's, the mail's). Glitch's drag went on under a card that
+ *   took focus (Cursor.as blur does nothing). Its screens waited for the drag instead
+ *   (js/screen-queue.js SCREEN_GATES 'Cursor').
  */
-export const DROP_THROUGH = ['.top-bar', '#street-minimap', '#street-nameplate', '.social-rail', '.local-chat-dock:not(.is-open)', '#quest-pins', '#buff-strip', '#play-context', '#touch-controls', '#homes-modes'];
+export const DROP_THROUGH = [
+  '.top-bar', '#street-minimap', '#street-nameplate', '.social-rail', '.local-chat-dock:not(.is-open)', '#quest-pins', '#buff-strip', '#play-context', '#touch-controls', '#homes-modes',
+  '#quest-dialogue', '#familiar-dialog', '#prompt-stack', '#notify-notices',
+];
 const DROP_THROUGH_SELECTOR = DROP_THROUGH.join(', ');
 
 /**

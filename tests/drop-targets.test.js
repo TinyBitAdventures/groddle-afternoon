@@ -14,10 +14,10 @@ import { describe, it, before, after } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { join, relative } from 'node:path';
-import { DROP_THROUGH, dropPoint, dropTargetIds, registerDropTarget, resolveDrop, currentDrag, beginDrag, dragDrop, endDrag } from '../public/js/drop-targets.js?v=3ae8ae5c';
+import { DROP_THROUGH, dropPoint, dropTargetIds, registerDropTarget, resolveDrop, currentDrag, beginDrag, dragDrop, endDrag } from '../public/js/drop-targets.js?v=d5325567';
 import { dropPage, fakeSlot, touchDrop, mouseDrop } from './drop-fake.js';
-import { worldDropFeature } from '../public/js/features/world-drop-feature.js?v=b3773a94';
-import { gardenGuanoFeature } from '../public/js/features/garden-guano-feature.js?v=8f8307dd';
+import { worldDropFeature } from '../public/js/features/world-drop-feature.js?v=6b3a66bc';
+import { gardenGuanoFeature } from '../public/js/features/garden-guano-feature.js?v=3faeddbb';
 import { createGarden } from '../public/js/garden.js?v=fefa7bcd';
 
 const root = join(import.meta.dirname, '..', 'public');
@@ -278,8 +278,33 @@ describe('a drag passes over the HUD to the room under it (review 2026-11-27 lef
     assert.equal(drop.defaultPrevented, true);
   });
 
-  it('names the HUD over the room, not the pack or a window', () => {
+  it('names the HUD over the room and what pops up by itself, not the pack or a window the player opens', () => {
     for (const sel of ['.top-bar', '#street-minimap', '.social-rail']) assert.ok(DROP_THROUGH.includes(sel), sel);
-    for (const sel of DROP_THROUGH) assert.doesNotMatch(sel, /pack|dialog|panel|modal/, sel);
+    for (const sel of DROP_THROUGH) assert.doesNotMatch(sel, /pack|panel|modal|sheet/, sel);
+  });
+});
+
+describe('what pops up by itself mid-drag leaves the drag going (review 2026-11-27 leftover 2)', () => {
+  const node = (name, names = [name]) => ({ name, closest: (sel) => (sel.split(', ').some((s) => names.includes(s)) ? { name } : null), contains: (n) => n === node });
+  const canvas = node('canvas');
+  const doc = (stack) => ({ elementsFromPoint: () => stack });
+
+  it('the New Quest card, the familiar, a prompt and a notice: the room under them decides', () => {
+    for (const id of ['#quest-dialogue', '#familiar-dialog', '#prompt-stack', '#notify-notices']) {
+      assert.ok(DROP_THROUGH.includes(id), id);
+      const card = node('button', [id]);
+      assert.equal(dropPoint(doc([card, canvas]), 400, 300, card).el, canvas, id);
+    }
+  });
+
+  it('a card over the pack: the pack under it still takes the stack back', () => {
+    const card = node('div', ['#quest-dialogue']);
+    const pack = node('slot', ['#pack-bar']);
+    assert.equal(dropPoint(doc([card, pack, canvas]), 400, 760, card).el, pack);
+  });
+
+  it('a screen (a level up, a badge, a finished quest) waits for the drag, by the client\'s Cursor gate', () => {
+    const game = readFileSync(join(root, 'game.js'), 'utf8');
+    assert.match(game, /\n\s*dragging: Boolean\(currentDrag\(\)\),/);
   });
 });

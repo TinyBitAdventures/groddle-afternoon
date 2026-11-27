@@ -24,9 +24,9 @@ import { addItem, createInventory, removeItem } from '../public/js/inventory.js?
 import { bagsFeature } from '../public/js/features/bags-feature.js?v=426f342b';
 import { bindToolInventory, createToolConditionState, setToolRemaining, toolCopies } from '../public/js/tools.js?v=4156bba8';
 import { draggedCount, draggedHere, draggedStack, markDragged, takeDragged } from '../public/js/drag-stack.js?v=9a24e5c4';
-import { runDrop } from '../public/js/features/world-drop-feature.js?v=b3773a94';
-import { registerButlerDrop } from '../public/js/butler-drop.js?v=494fc251';
-import { beginDrag, dragDrop, endDrag } from '../public/js/drop-targets.js?v=3ae8ae5c';
+import { runDrop } from '../public/js/features/world-drop-feature.js?v=6b3a66bc';
+import { registerButlerDrop } from '../public/js/butler-drop.js?v=317ad1a8';
+import { beginDrag, dragDrop, endDrag } from '../public/js/drop-targets.js?v=d5325567';
 
 const root = join(import.meta.dirname, '..', 'public');
 const read = (f) => readFileSync(join(root, f), 'utf8');

@@ -24,7 +24,7 @@ import {
   shareReason,
 } from '../public/js/drops-mp.js?v=351593a6';
 import { dropsMpFeature } from '../public/js/features/drops-mp-feature.js?v=6b0a5d19';
-import { giftsFeature } from '../public/js/features/gifts-feature.js?v=43b1c495';
+import { giftsFeature } from '../public/js/features/gifts-feature.js?v=1fdf7747';
 import { HAS_SERVER, HAS_SITE, SITE_DIR, serverPath, sitePath } from '../tools/repos.mjs';
 import { HAS_PHP, PHP } from './php.js';
 

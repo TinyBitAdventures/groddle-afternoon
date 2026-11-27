@@ -5,7 +5,7 @@
  * dragstart, then dragover and drop on the document). Shared by tests/drop-targets.test.js,
  * tests/g865-cabinet-touch-drop.test.js and tests/trade.test.js.
  */
-import { beginDrag, installDropRegistry, packStackOf, touchLift } from '../public/js/drop-targets.js?v=3ae8ae5c';
+import { beginDrag, installDropRegistry, packStackOf, touchLift } from '../public/js/drop-targets.js?v=d5325567';
 
 export function fakeDoc() {
   const listeners = {};

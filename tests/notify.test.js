@@ -31,7 +31,7 @@ import {
   NOTICE_MAX_MS,
 } from '../public/js/notify.js?v=c9d79ec5';
 import { readMs } from '../public/js/read-time.js?v=3151fb1a';
-import { REMAKE_SCREEN_GATES, SCREEN_GATES, screenQueueHold, waitForScreenGates } from '../public/js/screen-queue.js?v=cf0132c0';
+import { REMAKE_SCREEN_GATES, SCREEN_GATES, screenQueueHold, waitForScreenGates } from '../public/js/screen-queue.js?v=40222620';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const PUBLIC = join(ROOT, 'public');
