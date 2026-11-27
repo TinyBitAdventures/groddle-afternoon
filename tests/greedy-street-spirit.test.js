@@ -7,7 +7,7 @@ import {
   GREEDY_FIRST_REWARD,
   GREEDY_REPEAT_COOLDOWN_MS,
   GREEDY_REPEAT_REWARD,
-  GREEDY_STREET_DURATION_MS,
+  GREEDY_STREET_EXIT_PROMPT_MS,
   GREEDY_STREET_GEOMETRY_TSID,
   GREEDY_STREET_PRODUCTION_TSID,
   GREEDY_STREET_SPIRIT_QUEST_ID,
@@ -16,16 +16,14 @@ import {
   canOfferGreedyRepeat,
   createGreedyStreetSpiritState,
   ensureGreedyStory,
-  expireGreedyStreetSpirit,
   greedyActDecoXs,
   greedyButtonXs,
   greedyObjective,
-  greedyRemainingMs,
   markGreedyFirstComplete,
   markGreedyRepeatComplete,
   markGreedyRepeatFailed,
   pressGreedyAct,
-} from '../public/js/greedy-street-spirit.js?v=00620a1c';
+} from '../public/js/greedy-street-spirit.js?v=b0ce2437';
 
 const PUBLIC = join(import.meta.dirname, '..', 'public');
 
@@ -72,15 +70,12 @@ describe('The Greedy Street Spirit source-authored story', () => {
     assert.match(greedyObjective(state), /whole story has been remembered/);
   });
 
-  it('enforces the original five-minute instance timer', () => {
+  it('has no time limit: five minutes in, Glitch asked "Are you stuck?" (exit_delay 5*60)', () => {
+    assert.equal(GREEDY_STREET_EXIT_PROMPT_MS, 5 * 60 * 1000);
     const state = createGreedyStreetSpiritState({ enteredAt: 10_000 });
-    assert.equal(greedyRemainingMs(state, 10_001), GREEDY_STREET_DURATION_MS - 1);
-    assert.equal(expireGreedyStreetSpirit(state, 10_001).ok, false);
-    assert.equal(
-      pressGreedyAct(state, 0, 10_000 + GREEDY_STREET_DURATION_MS).reason,
-      'expired'
-    );
-    assert.equal(state.status, 'expired');
+    assert.equal(state.deadlineAt, undefined);
+    assert.equal(pressGreedyAct(state, 0, 10_000 + 60 * 60 * 1000).ok, true);
+    assert.equal(state.status, 'running');
   });
 
   it('gates the Piggy quest at level 4 and blocks completed or active runs', () => {

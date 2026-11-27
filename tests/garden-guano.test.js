@@ -24,7 +24,7 @@ import { GARDEN_SPEEDUP,
   gardenActionProfile,
   gardenTalkbackKey,
 } from '../public/js/garden.js?v=fefa7bcd';
-import { getVerbsFor, runVerb } from '../public/content.js?v=eb86c077';
+import { getVerbsFor, runVerb } from '../public/content.js?v=594ee3ba';
 import { actionDurationFor, actionLabelFor } from '../public/js/action-timing.js?v=283e65ce';
 import { gardenPlotEvents } from '../public/js/quest-offers.js?v=7e00498b';
 import { applyTendAct, normalizeTendActs, plotsSnapshot, tendAct, tendedText } from '../public/js/neighbours-mp.js?v=d270297d';

@@ -30,7 +30,13 @@ export const EESTI_PRODUCTION_TSID = 'LIF10RQLPLBYV7';
 /** Its bounds (G XML l/t): source x, y to the street's screen space. */
 export const EESTI_STREET_BOUNDS = Object.freeze({ l: -2000, t: -1000 });
 export const EESTI_SOURCE_SPAWN = Object.freeze({ x: -1832, y: -76 });
-export const EESTI_DURATION_MS = 2 * 60 * 1000;
+/**
+ * Austin 2026-11-27 (Glitch's prompt, no timer): the catalogue page has no time limit. Two minutes
+ * in Glitch asked "Are you stuck?" (de_embiggenify.js 43 exit_delay 2*60), and asked two minutes
+ * after Mr. Hairball's request again (de_embiggenify_part2.js onAccepted 66-69, "Per Scott, reset
+ * the instance timer") and after the shiny object is found (location.js 1200-1202). js/stuck-prompt.js.
+ */
+export const EESTI_EXIT_PROMPT_MS = 2 * 60 * 1000;
 export const SMALL_WORTHLESS_ID = 'small_worthless';
 export const EMOTIONAL_BEAR_ID = 'emotional_bear';
 export const EESTI_PLAYER_SCALE = 0.42;
@@ -166,7 +172,6 @@ export function createDeEmbiggenifyState(opts = {}) {
     status: 'arrival',
     sourceLocation: opts.sourceLocation ? { ...opts.sourceLocation } : null,
     enteredAt,
-    deadlineAt: enteredAt + EESTI_DURATION_MS,
     foundAt: 0,
     completedAt: 0,
   };
@@ -175,20 +180,14 @@ export function createDeEmbiggenifyState(opts = {}) {
 export function beginDeEmbiggenifySearch(state, now = Date.now()) {
   if (!state) return { ok: false, reason: 'missing_state' };
   if (state.status !== 'arrival') return { ok: false, reason: 'already_started' };
-  const startedAt = Number(now) || Date.now();
   state.status = 'searching';
-  state.deadlineAt = startedAt + EESTI_DURATION_MS;
-  return { ok: true, deadlineAt: state.deadlineAt };
+  return { ok: true };
 }
 
 export function findSmallWorthless(state, now = Date.now()) {
   if (!state) return { ok: false, reason: 'missing_state' };
   if (state.status === 'found') return { ok: false, reason: 'already_found' };
   if (state.status !== 'searching') return { ok: false, reason: 'not_searching' };
-  if (eestiRemainingMs(state, now) <= 0) {
-    expireDeEmbiggenify(state, now);
-    return { ok: false, reason: 'expired' };
-  }
   state.status = 'found';
   state.foundAt = Number(now) || Date.now();
   return { ok: true, item: SMALL_WORTHLESS_ID };
@@ -207,18 +206,6 @@ export function completeDeEmbiggenify(state, now = Date.now()) {
   return { ok: true, reward: { ...EESTI_REWARD } };
 }
 
-export function expireDeEmbiggenify(state, now = Date.now()) {
-  if (!state || ['complete', 'expired'].includes(state.status)) return false;
-  state.status = 'expired';
-  state.expiredAt = Number(now) || Date.now();
-  return true;
-}
-
-export function eestiRemainingMs(state, now = Date.now()) {
-  if (!state || ['complete', 'expired'].includes(state.status)) return 0;
-  return Math.max(0, state.deadlineAt - Number(now));
-}
-
 export function deEmbiggenifyObjective(state) {
   if (!state) return 'Enter Eesti Life Catalogue Page 17';
   if (state.status === 'arrival') return 'Find and speak with Mr. Hairball';
@@ -229,7 +216,7 @@ export function deEmbiggenifyObjective(state) {
 }
 
 /**
- * #109: what is left of the quest when an attempt ends early (time ran out, or you left).
+ * #109: what is left of the quest when an attempt ends early (you left).
  * Before Mr. Hairball, part one goes back to its offer; after him part one is done
  * (de_embiggenify.js silent_complete) and part two stays in the log, as the source's stays
  * todo, so you can go back and look again. Returns the quest ids to drop from `active`.
@@ -239,8 +226,8 @@ export function deEmbiggenifyEndDrops({ part2 = false } = {}) {
 }
 
 /** #109: the activity line for an attempt that ended early. */
-export function deEmbiggenifyEndLine({ expired = false, part2 = false } = {}) {
-  const how = expired ? 'The catalogue page closed before you could finish.' : 'You left the miniature room before helping Mr. Hairball.';
+export function deEmbiggenifyEndLine({ part2 = false } = {}) {
+  const how = 'You left the miniature room before helping Mr. Hairball.';
   return part2 ? `${how} De-Embiggenify II is still in your quest log: enter the catalogue page from there to look again.` : how;
 }
 

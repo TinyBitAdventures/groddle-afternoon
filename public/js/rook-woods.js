@@ -9,7 +9,9 @@
  *
  * The production instance geometry was not published with the locations dump,
  * so the runtime uses a clean authored route while preserving the source quest
- * contract, two-minute timer, Crusher cycle, tool gates, and four-hit Egg smash.
+ * contract, Crusher cycle, tool gates, and four-hit Egg smash. The Woods have no time limit
+ * (Austin 2026-11-27: Glitch's prompt, no timer): two minutes in the quest asked "Are you stuck?"
+ * (rook_egg_smash.js 79, exit_delay 2*60; ROOK_WOODS_EXIT_PROMPT_MS, js/stuck-prompt.js).
  *
  * Art: the Crushers are Tiny Speck's own crusher.swf (glitch-items, CC0; one
  * still, the SWF has no states) and the Egg rests in the shipped rook_nest deco
@@ -23,7 +25,7 @@ import { ROOK_ART } from './rook-art.js?v=3d9cd2ae';
 
 export const ROOK_QUEST_ID = 'rook_egg_smash';
 export const ROOK_WOODS_STREET_ID = 'LLI1AD8LUCH109E';
-export const ROOK_WOODS_DURATION_MS = 2 * 60 * 1000;
+export const ROOK_WOODS_EXIT_PROMPT_MS = 2 * 60 * 1000;
 export const ROOK_EGG_INITIAL_STATE = 5;
 export const ROOK_EGG_SMASHED_STATE = 1;
 
@@ -365,7 +367,6 @@ export function createRookWoodsState({ sourceLocation = null } = {}) {
   return {
     status: 'warning',
     startedAt: 0,
-    expiresAt: 0,
     sourceLocation: cleanSourceLocation(sourceLocation),
     spawn: { x: 115, y: 780 },
     hits: 0,
@@ -382,25 +383,7 @@ export function beginRookWoods(state, now = Date.now()) {
   }
   state.status = 'running';
   state.startedAt = finite(now);
-  state.expiresAt = state.startedAt + ROOK_WOODS_DURATION_MS;
   return { ok: true, reason: 'started', state };
-}
-
-export function rookWoodsRemainingMs(state, now = Date.now()) {
-  if (!state || ['complete', 'expired', 'abandoned'].includes(state.status)) return 0;
-  if (state.status === 'warning') return ROOK_WOODS_DURATION_MS;
-  return Math.max(0, finite(state.expiresAt) - finite(now));
-}
-
-export function expireRookWoods(state, now = Date.now()) {
-  if (!state || state.status !== 'running') {
-    return { ok: false, reason: state?.status || 'missing', state };
-  }
-  if (rookWoodsRemainingMs(state, now) > 0) {
-    return { ok: false, reason: 'time_remaining', state };
-  }
-  state.status = 'expired';
-  return { ok: true, reason: 'expired', state };
 }
 
 export function findWorkingRookTool(inv = {}, toolState = null) {
@@ -533,7 +516,6 @@ export function crusherHitsAvatar(spec, position, avatar) {
 export function rookWoodsObjective(state) {
   if (!state) return 'Enter the Rooks’ Woods';
   if (state.status === 'warning') return 'Prepare to evade the Crushers';
-  if (state.status === 'expired') return 'The Rooks’ Woods closed';
   if (state.status === 'complete') return 'Rook Egg smashed';
   return 'Smash the Rook Egg'; // G318: the quest's step (quests/rook_egg_smash.js requirements)
 }

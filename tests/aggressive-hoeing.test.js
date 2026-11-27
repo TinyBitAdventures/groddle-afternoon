@@ -12,8 +12,8 @@ import { AGGRESSIVE_HOEING_VERBS, aggressiveHoeingVerb, clearPlot, createGarden,
 import { plotVerbs, resolveTendPackage } from '../public/js/patches.js?v=54430bb9';
 import { createToolConditionState, setToolRemaining, getToolCondition } from '../public/js/tools.js?v=4156bba8';
 import { createInventory } from '../public/js/inventory.js?v=3be7988a';
-import { getVerbsFor, runVerb } from '../public/content.js?v=eb86c077';
-import { normalizePlayerSnapshot } from '../public/js/player-save.js?v=0794c268';
+import { getVerbsFor, runVerb } from '../public/content.js?v=594ee3ba';
+import { normalizePlayerSnapshot } from '../public/js/player-save.js?v=2d0e827e';
 import { aggressiveHoeingFeature as feature } from '../public/js/features/aggressive-hoeing-feature.js?v=146ead82';
 
 const GS = join(dirname(fileURLToPath(import.meta.url)), '../../glitch-GameServerJS');

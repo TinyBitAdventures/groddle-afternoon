@@ -22,9 +22,9 @@ import {
   heldPlaceHold,
   heldPlaceKind,
   shiftHeldClock,
-} from '../public/js/party-held-places.js?v=c34cb987';
-import { GREEDY_ACTS, createGreedyStreetSpiritState, greedyRemainingMs, pressGreedyAct } from '../public/js/greedy-street-spirit.js?v=00620a1c';
-import { createWinterWalkState, winterWalkRemainingMs } from '../public/js/winter-walk.js?v=89f8dc32';
+} from '../public/js/party-held-places.js?v=23e86d0b';
+import { GREEDY_ACTS, createGreedyStreetSpiritState, pressGreedyAct } from '../public/js/greedy-street-spirit.js?v=b0ce2437';
+import { createWinterWalkState } from '../public/js/winter-walk.js?v=faad1d46';
 import { normalizePartyRecord } from '../public/js/party-spaces.js?v=91ce15c5';
 import { partyTeleporterSpot } from '../public/js/features/party-spaces-feature.js?v=7cdb53d7';
 
@@ -55,35 +55,42 @@ describe('the hold the party record keeps (js/party-held-places.js)', () => {
 });
 
 describe('the run\'s clock stops while away (shiftHeldClock)', () => {
-  it('Winter Walk comes back with the time left it had', () => {
+  it('Winter Walk comes back as it was (no time limit: Austin 2026-11-27)', () => {
     const t0 = 1_000_000;
     const walk = createWinterWalkState({ now: t0 });
-    const left = winterWalkRemainingMs(walk, t0 + 60_000);
     // Ten minutes at the party.
-    assert.deepEqual(shiftHeldClock(walk, 'winter-walk', 600_000), ['startedAt', 'expiresAt']);
-    assert.equal(winterWalkRemainingMs(walk, t0 + 660_000), left);
+    assert.deepEqual(shiftHeldClock(walk, 'winter-walk', 600_000), ['startedAt']);
+    assert.equal(walk.startedAt, t0 + 600_000);
   });
 
   it('Storyland too; an unset clock (Rooks\' Woods before the warning) stays unset', () => {
     const story = createGreedyStreetSpiritState({ enteredAt: 5_000 });
-    const left = greedyRemainingMs(story, 65_000);
     shiftHeldClock(story, 'storyland', 120_000);
-    assert.equal(greedyRemainingMs(story, 185_000), left);
-    const woods = { startedAt: 0, expiresAt: 0 };
+    assert.equal(story.startedAt, 125_000);
+    const woods = { startedAt: 0 };
     assert.deepEqual(shiftHeldClock(woods, 'rook-woods', 50_000), []);
-    assert.deepEqual(woods, { startedAt: 0, expiresAt: 0 });
+    assert.deepEqual(woods, { startedAt: 0 });
     assert.deepEqual(shiftHeldClock({ startedAt: 9 }, 'four-letter', 50_000), [], 'no clock of its own');
   });
 
-  it('each timed place names the fields its module keeps', () => {
+  it('each place names the field its module keeps, and none has a deadline', () => {
     for (const [kind, keys] of Object.entries(HELD_PLACE_CLOCKS)) {
       assert.ok(HELD_PLACE_KINDS.includes(kind), kind);
-      assert.ok(keys.length === 2, kind);
+      assert.deepEqual(keys, [kind === 'de-embiggenify' ? 'enteredAt' : 'startedAt'], kind);
     }
-    assert.match(read('public/js/de-embiggenify.js'), /deadlineAt: enteredAt \+ EESTI_DURATION_MS/);
-    assert.match(read('public/js/paradise-flight.js'), /expiresAt: now \+ PARADISE_DURATION_MS/);
-    assert.match(read('public/js/summers-day.js'), /expiresAt: now \+ SUMMERS_DAY_MAIN_DURATION_MS/);
-    assert.match(read('public/js/rook-woods.js'), /state\.expiresAt = state\.startedAt \+ ROOK_WOODS_DURATION_MS/);
+    for (const file of ['de-embiggenify', 'paradise-flight', 'summers-day', 'rook-woods', 'winter-walk', 'greedy-street-spirit']) {
+      assert.doesNotMatch(read(`public/js/${file}.js`), /expiresAt|deadlineAt|DURATION_MS/, file);
+    }
+  });
+
+  it('the place\'s "Are you stuck?" waits while away and is asked once back (game.js)', () => {
+    const game = read('public/game.js');
+    const depart = game.slice(game.indexOf('function departHeldPlace('), game.indexOf('async function resumeHeldPlace('));
+    assert.match(depart, /const stuckKey = place\.stuck \|\| kind;/);
+    assert.match(depart, /roomStuck\.cancel\(stuckKey, roomStuckHost\(\)\);/);
+    assert.match(depart, /heldPlace = \{ kind, at, since: Date\.now\(\), kept, stuckKey, stuckInMs \};/);
+    const resume = game.slice(game.indexOf('async function resumeHeldPlace('), game.indexOf('function heldPlaceTrip('));
+    assert.match(resume, /if \(held\.stuckInMs\) roomStuck\.arm\(held\.stuckKey, held\.stuckInMs, roomStuckHost\(\)\);/);
   });
 });
 
@@ -126,7 +133,7 @@ describe('game.js answers the teleporter for its own places', () => {
   it('depart keeps the place and answers the street it was entered from, the spot and the hold', () => {
     const depart = slice(game, 'function departHeldPlace(', '\n}\n');
     assert.match(depart, /const kept = place\.depart\?\.\(\) \|\| \{\};/);
-    assert.match(depart, /heldPlace = \{ kind, at, since: Date\.now\(\), kept \};/);
+    assert.match(depart, /heldPlace = \{ kind, at, since: Date\.now\(\), kept, stuckKey, stuckInMs \};/);
     assert.match(depart, /return \{ hold: heldPlaceHold\(kind\), tsid: back\.tsid, x: back\.x, y: back\.y, label, at \};/);
   });
 

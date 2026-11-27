@@ -22,7 +22,7 @@ import {
   paradiseTicketCost,
   paradiseTicketPlace,
   quoteParadiseTicket,
-} from '../public/js/paradise-flight.js?v=c6838cae';
+} from '../public/js/paradise-flight.js?v=ab7d41ec';
 import { createInventory, addItem, countItem } from '../public/js/inventory.js?v=3be7988a';
 import { puzzleScenesFeature } from '../public/js/features/puzzle-scenes-feature.js?v=19a3e3b8';
 

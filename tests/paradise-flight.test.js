@@ -7,7 +7,7 @@ import { fileURLToPath } from 'node:url';
 import {
   PARADISE_COURSES,
   PARADISE_DAILY_LIMIT,
-  PARADISE_DURATION_MS,
+  PARADISE_EXIT_PROMPT_MS,
   PARADISE_HELL_BLOCK,
   PARADISE_TICKET_EAT,
   CLOUD_RING_ART,
@@ -29,7 +29,6 @@ import {
   paradiseExitClosedLine,
   paradiseObjective,
   paradiseObjectiveComplete,
-  paradiseRemainingMs,
   paradiseRunProgress,
   paradiseTicketCost,
   passParadiseRing,
@@ -38,7 +37,7 @@ import {
   slipTerrainY,
   starlitMoonPlainAlpha,
   starlitRevealAlpha,
-} from '../public/js/paradise-flight.js?v=c6838cae';
+} from '../public/js/paradise-flight.js?v=ab7d41ec';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const publicDir = path.join(here, '..', 'public');
@@ -210,13 +209,15 @@ test('ticket pricing, eleven-ticket daily gate, and daily reset match GSJS', () 
   assert.equal(state.ticketsToday, 1);
 });
 
-test('private runs last exactly four minutes and paradise pickups are unique', () => {
-  assert.equal(PARADISE_DURATION_MS, 240000);
+test('private runs have no time limit (Glitch asked "Are you stuck?" at four minutes) and paradise pickups are unique', () => {
+  // paradise_ticket.js launchInstance 296: instances_schedule_exit_prompt(instance_id, 4*60).
+  assert.equal(PARADISE_EXIT_PROMPT_MS, 240000);
   const run = createParadiseRun('starlit_night', { now: 1000 });
-  assert.equal(paradiseRemainingMs(run, 240999), 1);
+  assert.equal(run.expiresAt, undefined);
   assert.equal(collectParadisePickup(run, 0, 1200).reward.type, 'energy');
   assert.equal(collectParadisePickup(run, 0, 1300).reason, 'already_collected');
-  assert.equal(collectParadisePickup(run, 1, 241000).reason, 'expired');
+  assert.equal(collectParadisePickup(run, 1, 241000).ok, true, 'still running after four minutes');
+  assert.equal(run.status, 'running');
 });
 
 test('course endings enforce their source objectives and reward once', () => {

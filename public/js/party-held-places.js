@@ -49,16 +49,18 @@ export function heldPlaceKind(hold) {
 /**
  * Each run's own clock (js/greedy-street-spirit.js, winter-walk.js, summers-day.js, rook-woods.js,
  * de-embiggenify.js, paradise-flight.js): timestamps that move on by the time spent away, so the run
- * has the time left it had when you left (as G904 stops a quest room's clock). Four Letter Words,
- * the Museum and the Back Alley have none.
+ * is as it was when you left (as G904 stops a quest room's clock; Rooks' Woods' Crushers keep their
+ * beat from startedAt). None of these places has a time limit (Austin 2026-11-27: Glitch's prompt,
+ * no timer); the "Are you stuck?" prompt waits as long as you were away (game.js departHeldPlace).
+ * Four Letter Words, the Museum and the Back Alley have none.
  */
 export const HELD_PLACE_CLOCKS = Object.freeze({
-  storyland: Object.freeze(['startedAt', 'deadlineAt']),
-  'winter-walk': Object.freeze(['startedAt', 'expiresAt']),
-  'summers-day': Object.freeze(['startedAt', 'expiresAt']),
-  'rook-woods': Object.freeze(['startedAt', 'expiresAt']),
-  'de-embiggenify': Object.freeze(['enteredAt', 'deadlineAt']),
-  paradise: Object.freeze(['startedAt', 'expiresAt']),
+  storyland: Object.freeze(['startedAt']),
+  'winter-walk': Object.freeze(['startedAt']),
+  'summers-day': Object.freeze(['startedAt']),
+  'rook-woods': Object.freeze(['startedAt']),
+  'de-embiggenify': Object.freeze(['enteredAt']),
+  paradise: Object.freeze(['startedAt']),
 });
 
 /**

@@ -1,6 +1,8 @@
 /**
- * A Summer's Day (GSJS quests/blue_and_white_part1.js and _part2.js): a five-minute
- * private memory, then the two-minute Annex.
+ * A Summer's Day (GSJS quests/blue_and_white_part1.js and _part2.js): a private memory,
+ * then the Annex. Neither has a time limit (Austin 2026-11-27: Glitch's prompt, no timer): the
+ * quest asked "Are you stuck?" five minutes into the memory and two into the Annex
+ * (SUMMERS_DAY_EXIT_PROMPT_MS, SUMMERS_DAY_BONUS_EXIT_PROMPT_MS; js/stuck-prompt.js).
  *
  * The main memory is Tiny Speck's own street: the archive kept one instantiated copy of
  * the main template LNVIH6NU3M13MJJ as LNVV9IM8PL4301V (L XML `instance_of`), imported as
@@ -23,8 +25,10 @@ export const SUMMERS_DAY_FIRST_DEV_TSID = 'LPF2SVV22B13J4O';
 export const SUMMERS_DAY_BONUS_PRODUCTION_TSID = 'LNVIL1E14M13K5I';
 export const SUMMERS_DAY_BONUS_DEV_TSID = 'LPF1024Q2B135UG';
 
-export const SUMMERS_DAY_MAIN_DURATION_MS = 5 * 60 * 1000;
-export const SUMMERS_DAY_BONUS_DURATION_MS = 2 * 60 * 1000;
+/** questInstanceLocation(pc, 'blue_and_white', 3709, -258, 5*60) (part1 107, part2 112): the exit_delay. */
+export const SUMMERS_DAY_EXIT_PROMPT_MS = 5 * 60 * 1000;
+/** questInstanceLocation(pc, 'blue_and_white_bonus', 380, -70, 2*60) (part2 70). */
+export const SUMMERS_DAY_BONUS_EXIT_PROMPT_MS = 2 * 60 * 1000;
 export const SUMMERS_DAY_FIRST_OFFER_COOLDOWN_MS = 4 * 60 * 60 * 1000;
 export const SUMMERS_DAY_REPEAT_COOLDOWN_MS = 60 * 60 * 1000;
 /** The imported copy of the main template (LNVV9IM8PL4301V instance_of LNVIH6NU3M13MJJ). */
@@ -361,7 +365,6 @@ export function createSummersDayRun({
     stage: 'main',
     repeat: Boolean(repeat),
     startedAt: now,
-    expiresAt: now + SUMMERS_DAY_MAIN_DURATION_MS,
     sourceLocation: sourceLocation?.tsid
       ? {
           tsid: String(sourceLocation.tsid),
@@ -375,11 +378,6 @@ export function createSummersDayRun({
   };
 }
 
-export function summersDayRemainingMs(run, now = Date.now()) {
-  if (!run || ['complete', 'expired', 'abandoned'].includes(run.status)) return 0;
-  return Math.max(0, Number(run.expiresAt) - now);
-}
-
 /**
  * A moment the street fired. Any order counts (the street had no checkpoint order of its
  * own: each event only gates on its own flag), each once; `exit` (the go_bonus box) ends
@@ -387,10 +385,6 @@ export function summersDayRemainingMs(run, now = Date.now()) {
  */
 export function advanceSummersDayCheckpoint(run, checkpoint, now = Date.now()) {
   if (!run || run.stage !== 'main') return { ok: false, reason: 'wrong_stage', run };
-  if (summersDayRemainingMs(run, now) <= 0) {
-    expireSummersDay(run, null, now);
-    return { ok: false, reason: 'expired', run };
-  }
   if (!SUMMERS_DAY_CHECKPOINTS.includes(checkpoint)) {
     return { ok: false, reason: 'unknown', run };
   }
@@ -416,14 +410,9 @@ export function summersDayNextCheckpoint(run) {
 export function enterSummersDayBonus(run, now = Date.now()) {
   if (!run || run.stage !== 'main') return { ok: false, reason: 'wrong_stage', run };
   if (!run.checkpoints.includes('exit')) return { ok: false, reason: 'main_incomplete', run };
-  if (summersDayRemainingMs(run, now) <= 0) {
-    expireSummersDay(run, null, now);
-    return { ok: false, reason: 'expired', run };
-  }
   run.stage = 'bonus';
   run.status = 'bonus';
   run.startedAt = now;
-  run.expiresAt = now + SUMMERS_DAY_BONUS_DURATION_MS;
   return { ok: true, reason: 'entered_bonus', run };
 }
 
@@ -435,10 +424,6 @@ export function collectSummersDayBonusQuoin(
   { multiplier = 1 } = {}
 ) {
   if (!run || run.stage !== 'bonus') return { ok: false, reason: 'wrong_stage', run };
-  if (summersDayRemainingMs(run, now) <= 0) {
-    expireSummersDay(run, null, now);
-    return { ok: false, reason: 'expired', run };
-  }
   const i = Math.floor(Number(index));
   if (!(i >= 0 && i < total)) return { ok: false, reason: 'invalid_quoin', run };
   if (run.bonusCollected.includes(i)) return { ok: false, reason: 'already_collected', run };
@@ -463,10 +448,6 @@ export function collectSummersDayBonusQuoin(
 
 export function finishSummersDay(run, questState, now = Date.now()) {
   if (!run || run.stage !== 'bonus') return { ok: false, reason: 'wrong_stage', run };
-  if (summersDayRemainingMs(run, now) <= 0) {
-    expireSummersDay(run, null, now);
-    return { ok: false, reason: 'expired', run };
-  }
   run.stage = 'complete';
   run.status = 'complete';
   const story = ensureSummersDayStory(questState);
@@ -486,22 +467,8 @@ export function finishSummersDay(run, questState, now = Date.now()) {
   };
 }
 
-export function expireSummersDay(run, questState = null, now = Date.now()) {
-  if (!run || ['complete', 'expired', 'abandoned'].includes(run.status)) {
-    return { ok: false, reason: run?.status || 'missing', run };
-  }
-  if (summersDayRemainingMs(run, now) > 0) {
-    return { ok: false, reason: 'time_remaining', run };
-  }
-  run.status = 'expired';
-  if (run.repeat && questState) {
-    ensureSummersDayStory(questState).repeatFailedAt = now;
-  }
-  return { ok: true, reason: 'expired', run };
-}
-
 export function abandonSummersDay(run, questState = null, now = Date.now()) {
-  if (!run || ['complete', 'expired', 'abandoned'].includes(run.status)) {
+  if (!run || ['complete', 'abandoned'].includes(run.status)) {
     return { ok: false, reason: run?.status || 'missing', run };
   }
   run.status = 'abandoned';
@@ -522,7 +489,6 @@ export function summersDayProgress(run) {
 
 export function summersDayObjective(run) {
   if (!run) return 'Enter the Giants’ shared memory';
-  if (run.status === 'expired') return 'The summer memory faded';
   if (run.status === 'complete') return 'A Summer’s Day complete';
   if (run.stage === 'bonus') return 'Climb through the Annex and find the way home';
   const next = summersDayNextCheckpoint(run);

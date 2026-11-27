@@ -19,7 +19,7 @@ import {
   ROOK_QUEST_ID,
   ROOK_REWARD,
   ROOK_TOOL_PROFILES,
-  ROOK_WOODS_DURATION_MS,
+  ROOK_WOODS_EXIT_PROMPT_MS,
   ROOK_WOODS_PLATFORMS,
   ROOK_WOODS_STREET_ID,
   beginRookWoods,
@@ -30,13 +30,11 @@ import {
   crusherHitsAvatar,
   crusherMoodLoss,
   crusherPosition,
-  expireRookWoods,
   findWorkingRookTool,
   recordCrusherHit,
   rookEggStateForProgress,
   rookWoodsGroundY,
-  rookWoodsRemainingMs,
-} from '../public/js/rook-woods.js?v=0aab151e';
+} from '../public/js/rook-woods.js?v=73edf194';
 import {
   createToolConditionState,
   setToolRemaining,
@@ -47,7 +45,7 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 test('Rooks’ Woods preserves the production quest contract', () => {
   assert.equal(ROOK_QUEST_ID, 'rook_egg_smash');
   assert.equal(ROOK_WOODS_STREET_ID, 'LLI1AD8LUCH109E');
-  assert.equal(ROOK_WOODS_DURATION_MS, 120_000);
+  assert.equal(ROOK_WOODS_EXIT_PROMPT_MS, 120_000, 'rook_egg_smash.js 79: exit_delay 2*60, the stuck prompt');
   assert.deepEqual(ROOK_REWARD, {
     xp: 1000,
     currants: 500,
@@ -57,17 +55,15 @@ test('Rooks’ Woods preserves the production quest contract', () => {
   assert.equal(ROOK_CRUSHERS.length, 4);
 });
 
-test('the instance waits for its warning, then expires exactly two minutes later', () => {
+test('the instance waits for its warning, then runs with no time limit', () => {
   const state = createRookWoodsState({
     sourceLocation: { tsid: 'GLI2V0UN7RD1T2J', x: 123, y: 456 },
   });
   assert.equal(state.status, 'warning');
-  assert.equal(rookWoodsRemainingMs(state, 99_000), 120_000);
   assert.equal(beginRookWoods(state, 10_000).ok, true);
-  assert.equal(rookWoodsRemainingMs(state, 10_500), 119_500);
-  assert.equal(expireRookWoods(state, 129_999).reason, 'time_remaining');
-  assert.equal(expireRookWoods(state, 130_000).ok, true);
-  assert.equal(state.status, 'expired');
+  assert.equal(state.startedAt, 10_000);
+  assert.equal(state.expiresAt, undefined);
+  assert.equal(state.status, 'running');
 });
 
 test('starting and smashing require one working source-approved tool', () => {

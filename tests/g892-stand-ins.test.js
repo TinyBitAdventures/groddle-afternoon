@@ -6,9 +6,9 @@ import { existsSync, readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 import { TRAINING2_TABLE_ART, TRAINING2_TABLE_SCALE, training2Layout, training2TableTop } from '../public/js/newxp.js?v=43f8df2c';
-import { PARADISE_COURSES, PARADISE_EXIT_ART, STARLIT_NIGHT_CLOUDS, STARLIT_NIGHT_CLOUD_SPRITE, PARADISE_STAR_SIDE, paradisePickupTouches, paradiseSourcePoints, paradiseStarArt } from '../public/js/paradise-flight.js?v=c6838cae';
+import { PARADISE_COURSES, PARADISE_EXIT_ART, STARLIT_NIGHT_CLOUDS, STARLIT_NIGHT_CLOUD_SPRITE, PARADISE_STAR_SIDE, paradisePickupTouches, paradiseSourcePoints, paradiseStarArt } from '../public/js/paradise-flight.js?v=ab7d41ec';
 import { POTION_ART } from '../public/js/potion-art.js?v=9d731b38';
-import { ROOK_WOODS_BIRDS } from '../public/js/rook-woods.js?v=0aab151e';
+import { ROOK_WOODS_BIRDS } from '../public/js/rook-woods.js?v=73edf194';
 import { FURNITURE_UPGRADES } from '../public/js/furniture-upgrades-data.js?v=0b2cf3cc';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', 'public');

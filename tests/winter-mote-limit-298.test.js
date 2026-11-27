@@ -14,8 +14,8 @@ import {
   createWinterWalkState,
   winterMoteCapped,
   winterMoteLimitNotice,
-} from '../public/js/winter-walk.js?v=89f8dc32';
-import { QUEST_PLATE_CARDS, compactCount } from '../public/js/quest-plate.js?v=a0240f13';
+} from '../public/js/winter-walk.js?v=faad1d46';
+import { QUEST_PLATE_CARDS, compactCount } from '../public/js/quest-plate.js?v=34cfdeea';
 import { quoinLimitPrompt } from '../public/js/quoins.js?v=5abad2c7';
 
 const root = join(import.meta.dirname, '..');

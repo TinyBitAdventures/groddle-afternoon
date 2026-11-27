@@ -26,7 +26,7 @@ import {
   collectParadisePickup,
   createParadiseRun,
   paradiseSourcePoints,
-} from '../public/js/paradise-flight.js?v=c6838cae';
+} from '../public/js/paradise-flight.js?v=ab7d41ec';
 import { parseEventCode } from '../public/js/location-events.js?v=48938c8f';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', 'public');

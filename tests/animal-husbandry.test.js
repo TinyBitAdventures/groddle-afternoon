@@ -52,7 +52,7 @@ import {
   takePlop,
 } from '../public/js/animal-husbandry.js?v=9c446552';
 import { animalStatusLabel, piggyFeedTip, pickerEmptyLine, pickerMaxCount, pickerOptionsFor, pickerTakesCount, listAnimalFeedOptions, createAnimalState } from '../public/js/animals.js?v=2caa1151';
-import { getVerbsFor, runVerb } from '../public/content.js?v=eb86c077';
+import { getVerbsFor, runVerb } from '../public/content.js?v=594ee3ba';
 import { setStreetEcologyCatalog } from '../public/js/street-ecology.js?v=f6185033';
 import { animalHusbandryFeature, batterflyPlacementGroups, normalizeHusbandrySlot } from '../public/js/features/animal-husbandry-feature.js?v=56cadd8d';
 

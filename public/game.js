@@ -2,9 +2,9 @@
  * Groddle Afternoon — original street geometry + layered decos
  * PixiJS 8 · locations-xml streets · CoU PNG decos · quests/items
  */
-import { ITEM_ICONS, ITEM_LABELS, getVerbsFor, ordinaryItems, runVerb } from './content.js?v=eb86c077';
+import { ITEM_ICONS, ITEM_LABELS, getVerbsFor, ordinaryItems, runVerb } from './content.js?v=594ee3ba';
 import { createErrorOnce, createFeatureHost, createFrameStages } from './js/feature-host.js?v=b87e2cbc';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=679fbc6a';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=9a21e84b';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, enterHintPick, hoverText, stackHoverLabel, groupHead, hoverRimShown, reachGlowTargets, spriteHasRimArt, rimArtParts, trimmedIconUrl, drawTileArt } from './js/enter-chooser.js?v=297c6d15';
 import { firstTendKey, STICK_TEND_DELAY_MS, STICK_TEND_DIRS, STICK_TEND_REPEAT_MS, stepTendKey, stepTendKeys, stickTendKey, tendKeyAction } from './js/garden-tend.js?v=a7470c4a';
 import { avatarHitBox, behindFloor, bodyReachDistance, OUT_OF_REACH_LINE, playerClickBox } from './js/reach.js?v=456da8a8';
@@ -147,6 +147,7 @@ import { WINTER_WALK_BOUNDS, WINTER_WALK_PASSAGE } from './js/winter-walk-street
 import {
   WINTER_HAVEN_STREET_ID,
   WINTER_MOTE_REWARDS,
+  WINTER_WALK_EXIT_PROMPT_MS,
   WINTER_WALK_ICE_REWARD,
   WINTER_WALK_QUEST_ID,
   WINTER_WALK_REPEAT_QUEST_ID,
@@ -155,7 +156,6 @@ import {
   collectWinterMote,
   createWinterWalkState,
   enterWinterHaven,
-  expireWinterWalk,
   failInterruptedWinterWalk,
   finishWinterWalk,
   noteWinterMoteTaken,
@@ -166,11 +166,12 @@ import {
   winterMoteLimitNotice,
   winterWalkObjective,
   winterWalkProgress,
-  winterWalkRemainingMs,
   winterWalkRun,
-} from './js/winter-walk.js?v=89f8dc32';
+} from './js/winter-walk.js?v=faad1d46';
 import {
   SUMMERS_DAY_ANNEX_BOWL,
+  SUMMERS_DAY_BONUS_EXIT_PROMPT_MS,
+  SUMMERS_DAY_EXIT_PROMPT_MS,
   SUMMERS_DAY_ANNEX_FLOOR_Y,
   SUMMERS_DAY_ANNEX_H,
   SUMMERS_DAY_ANNEX_LADDER,
@@ -206,7 +207,6 @@ import {
   createSummersDayRun,
   ensureSummersDayStory,
   enterSummersDayBonus,
-  expireSummersDay,
   finishSummersDay,
   markSummersDayOffered,
   summersDayNextCheckpoint,
@@ -215,9 +215,8 @@ import {
   summersDayQurazyPoints,
   summersDayAnnexAtExit,
   summersDayAnnexStreet,
-  summersDayRemainingMs,
   summersDayStreetPoint,
-} from './js/summers-day.js?v=c15840a1';
+} from './js/summers-day.js?v=5013c7f7';
 import {
   ROOK_AVATAR_HIT,
   ROOK_CRUSHERS,
@@ -230,7 +229,7 @@ import {
   ROOK_NEST,
   ROOK_WOODS_BIRDS,
   ROOK_QUEST_ID,
-  ROOK_WOODS_DURATION_MS,
+  ROOK_WOODS_EXIT_PROMPT_MS,
   ROOK_WOODS_PLATFORMS,
   ROOK_WOODS_STREET_ID,
   beginRookWoods,
@@ -240,13 +239,11 @@ import {
   crusherHitsAvatar,
   crusherMoodLoss,
   crusherPosition,
-  expireRookWoods,
   findWorkingRookTool,
   recordCrusherHit,
   rookEggStateForProgress,
   rookWoodsObjective,
-  rookWoodsRemainingMs,
-} from './js/rook-woods.js?v=0aab151e';
+} from './js/rook-woods.js?v=73edf194';
 import {
   ROOK_HALL_QUEST_ID,
   ROOK_HALL_START_QUEST_ID,
@@ -275,7 +272,7 @@ import {
   DE_EMBIGGENIFY_PART2_QUEST_ID,
   DE_EMBIGGENIFY_QUEST_ID,
   EESTI_AUTOPLAY_POINTS,
-  EESTI_DURATION_MS,
+  EESTI_EXIT_PROMPT_MS,
   EESTI_FIND_BOX,
   EESTI_HAIRBALL_SPOT,
   EESTI_INSTANCE,
@@ -299,11 +296,9 @@ import {
   deEmbiggenifyEndLine,
   deEmbiggenifyObjective,
   deEmbiggenifyPart2Lost,
-  eestiRemainingMs,
   eestiStreetPoint,
-  expireDeEmbiggenify,
   findSmallWorthless,
-} from './js/de-embiggenify.js?v=db347ac1';
+} from './js/de-embiggenify.js?v=e4e87b16';
 import {
   EMOTIONAL_BEAR_ACTIONS,
   EMOTIONAL_BEAR_COMPANIONS,
@@ -336,6 +331,7 @@ import {
   GREEDY_ACTS,
   GREEDY_FIRST_REWARD,
   GREEDY_REPEAT_REWARD,
+  GREEDY_STREET_EXIT_PROMPT_MS,
   GREEDY_STREET_GEOMETRY_TSID,
   GREEDY_STREET_ID,
   GREEDY_STREET_PRODUCTION_TSID,
@@ -345,23 +341,22 @@ import {
   canOfferGreedyRepeat,
   createGreedyStreetSpiritState,
   ensureGreedyStory,
-  expireGreedyStreetSpirit,
   failInterruptedGreedyStreetSpirit,
   greedyActsAllRead,
   greedyBoxesEntered,
   greedyButtonXs,
   greedyObjective,
-  greedyRemainingMs,
   markGreedyFirstComplete,
   markGreedyRepeatComplete,
   markGreedyRepeatFailed,
   pressGreedyAct,
   greedyStreetBoxEnter,
   greedyStreetBoxes,
-} from './js/greedy-street-spirit.js?v=00620a1c';
+} from './js/greedy-street-spirit.js?v=b0ce2437';
 import {
   PARADISE_COURSES,
   PARADISE_DAILY_LIMIT,
+  PARADISE_EXIT_PROMPT_MS,
   PARADISE_TICKET_IDS,
   resetParadiseDay,
   PARADISE_STAR_COURSES,
@@ -402,10 +397,8 @@ import {
   createParadiseRun,
   createParadiseState,
   eatParadiseTicket,
-  expireParadiseRun,
   finishParadiseRun,
   paradiseObjective,
-  paradiseRemainingMs,
   paradiseExitClosedLine,
   paradiseRunProgress,
   paradiseTicketCost,
@@ -419,7 +412,7 @@ import {
   slipTerrainY,
   starlitMoonPlainAlpha,
   starlitRevealAlpha,
-} from './js/paradise-flight.js?v=c6838cae';
+} from './js/paradise-flight.js?v=ab7d41ec';
 import {
   RADIAL_ARRIVAL_EVENTS,
   RADIAL_FLITTERBUG_EVENTS,
@@ -576,7 +569,7 @@ import {
   inspectPlayerSave,
   serializePlayerSave,
   restorePlayerSave,
-} from './js/player-save.js?v=0794c268';
+} from './js/player-save.js?v=2d0e827e';
 import {
   HOME_INTERIOR_TSID,
   HOME_STREET_TSID,
@@ -1061,7 +1054,7 @@ import {
   streetQuoinPoints,
 } from './js/quoins.js?v=5abad2c7';
 import { isPartyStreet } from './js/party-spaces.js?v=91ce15c5'; // G869: a Party Space's quoins are the party classes
-import { greedyReplayEvents, heldPlaceHold, heldPlaceKind, shiftHeldClock } from './js/party-held-places.js?v=c34cb987'; // G911
+import { greedyReplayEvents, heldPlaceHold, heldPlaceKind, shiftHeldClock } from './js/party-held-places.js?v=23e86d0b'; // G911
 import {
   buildHubMapView,
   mapClickTravel,
@@ -14277,7 +14270,7 @@ async function resumeLegalizeAlley(at) {
 const HELD_PLACES = {
   storyland: {
     label: () => 'The Greedy Street Spirit',
-    here: () => greedyStreetIsInstanced() && !greedyStreetTransitionBusy && !greedyStreetStartPromise && greedyStreetState.status !== 'expired',
+    here: () => greedyStreetIsInstanced() && !greedyStreetTransitionBusy && !greedyStreetStartPromise,
     run: () => greedyStreetState,
     back: () => greedyStreetSourceLocation,
     hud: 'greedy-street-hud',
@@ -14294,6 +14287,7 @@ const HELD_PLACES = {
   },
   legalize: {
     label: () => 'The Back Alley',
+    stuck: 'legalize-alley',
     here: () => legalizeIsInstanced() && !legalizeTransitionBusy && !legalizeStartPromise && LEGALIZE_ALLEY_STAGES.includes(legalizeRun.stage),
     run: () => legalizeRouteState(),
     back: () => legalizeWayOut(),
@@ -14383,7 +14377,7 @@ const HELD_PLACES = {
   },
   'winter-walk': {
     label: () => winterLocationLabel(currentStreetTsid)?.street || 'Winter Walk',
-    here: () => winterWalkIsInstanced() && !winterWalkTransitionBusy && !winterWalkStartPromise && !['expired', 'complete'].includes(winterWalkState.status),
+    here: () => winterWalkIsInstanced() && !winterWalkTransitionBusy && !winterWalkStartPromise && winterWalkState.status !== 'complete',
     run: () => winterWalkState,
     back: () => winterWalkSourceLocation,
     hud: 'winter-walk-hud',
@@ -14399,7 +14393,7 @@ const HELD_PLACES = {
   },
   'de-embiggenify': {
     label: () => 'Eesti Life Catalogue Page 17',
-    here: () => deEmbiggenifyIsInstanced() && !deEmbiggenifyTransitionBusy && !deEmbiggenifyStartPromise && !['complete', 'expired'].includes(deEmbiggenifyState.status),
+    here: () => deEmbiggenifyIsInstanced() && !deEmbiggenifyTransitionBusy && !deEmbiggenifyStartPromise && deEmbiggenifyState.status !== 'complete',
     run: () => deEmbiggenifyState,
     back: () => deEmbiggenifySourceLocation || deEmbiggenifyState?.sourceLocation,
     hud: 'de-embiggenify-hud',
@@ -14464,7 +14458,15 @@ function departHeldPlace() {
   const kept = place.depart?.() || {};
   const hud = document.getElementById(place.hud);
   if (hud) hud.hidden = true;
-  heldPlace = { kind, at, since: Date.now(), kept };
+  // The place's "Are you stuck?" (js/stuck-prompt.js) waits while you are away, as its run does: what
+  // was left of its wait is asked once you are back (an open prompt, at once).
+  const stuckKey = place.stuck || kind;
+  const stuck = roomStuck.state();
+  const stuckInMs = stuck.key === stuckKey && (stuck.stuckAt || stuck.stuckAsking)
+    ? Math.max(1, stuck.stuckAsking ? 1 : stuck.stuckAt - Date.now())
+    : 0;
+  roomStuck.cancel(stuckKey, roomStuckHost());
+  heldPlace = { kind, at, since: Date.now(), kept, stuckKey, stuckInMs };
   if (app?.canvas) app.canvas.dataset.heldPlace = kind;
   return { hold: heldPlaceHold(kind), tsid: back.tsid, x: back.x, y: back.y, label, at };
 }
@@ -14485,6 +14487,7 @@ async function resumeHeldPlace(kind, back) {
   const ok = (await place.resume(held)) !== false;
   if (!ok) place.drop?.();
   else {
+    if (held.stuckInMs) roomStuck.arm(held.stuckKey, held.stuckInMs, roomStuckHost());
     if (app?.canvas) app.canvas.dataset.heldPlaceBack = kind;
     updateHud();
   }
@@ -19778,7 +19781,13 @@ const FOUR_LETTER_FINAL_DIALOGUE = [
 /**
  * "Are you stuck? Do you want to leave this place?" for the instances game.js runs itself (js/stuck-prompt.js):
  * Four Letter Words' playroom (letter_block_2.js 191, five minutes) and Legalize It's Back Alley
- * (card_carrying_qualification.js 88, three minutes). The quest rooms ask in quest-instances-feature.
+ * (card_carrying_qualification.js 88, three minutes), and (Austin 2026-11-27: Glitch's prompt, no
+ * timer) the places that used to send you back when a clock ran out: Paradise (paradise_ticket.js 296,
+ * four minutes), A Summer's Day (blue_and_white_part1.js 107, five; its Annex part2 70, two), Storyland
+ * (greedy_street_spirit.js 168, five), Winter Walk (winter_walk.js 110, five), Eesti (de_embiggenify.js
+ * 43, two) and Rooks' Woods (rook_egg_smash.js 79, two). None of them has a time limit. The keys are
+ * the HELD_PLACES kinds (the Back Alley's is 'legalize-alley'). The quest rooms ask in
+ * quest-instances-feature.
  */
 const roomStuck = createStuckAsker();
 function roomStuckHost() {
@@ -21120,19 +21129,12 @@ function renderGreedyStreetHud() {
   if (!hud) return;
   hud.hidden = !visible;
   if (!visible) return;
-  const remaining = greedyRemainingMs(greedyStreetState);
-  const seconds = Math.ceil(remaining / 1000);
-  const timer = hud.querySelector('[data-greedy-timer]');
   const stage = hud.querySelector('[data-greedy-stage]');
   const objective = hud.querySelector('[data-greedy-objective]');
   const line = hud.querySelector('[data-greedy-line]');
   const firstIncomplete = greedyStreetState.actSteps.findIndex(
     (step, index) => step < GREEDY_ACTS[index].lines.length
   );
-  if (timer) {
-    timer.textContent = `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, '0')}`;
-    timer.classList.toggle('is-low', remaining > 0 && remaining <= 30_000);
-  }
   if (stage) {
     stage.textContent = firstIncomplete < 0
       ? 'Storyland · all five acts read'
@@ -21151,7 +21153,6 @@ function renderGreedyStreetHud() {
     app.canvas.dataset.greedyStoryRepeat = greedyStreetState.repeat ? '1' : '0';
     app.canvas.dataset.greedyStoryActs = greedyStreetState.actsRead.join(',');
     app.canvas.dataset.greedyStorySteps = greedyStreetState.actSteps.join(',');
-    app.canvas.dataset.greedyStoryRemaining = String(remaining);
     app.canvas.dataset.greedyStoryObjective = greedyObjective(greedyStreetState);
     app.canvas.dataset.greedyStoryProductionTsid = GREEDY_STREET_PRODUCTION_TSID;
   }
@@ -21261,8 +21262,10 @@ async function startGreedyStreetSpirit(opts = {}) {
     if (!greedyStreetState) return null;
     setupGreedyStreetInstance();
     savePlayerLocation(greedyStreetSourceLocation);
-    pushActivity('The Greedy Street Spirit: read all five acts before Storyland fades.');
-    toast('Five minutes. Press each act’s Wall Button.', 3400);
+    // greedy_street_spirit.js 168 / _reminisce.js 125: "Are you stuck?" five minutes in, and no time limit.
+    roomStuck.arm('storyland', GREEDY_STREET_EXIT_PROMPT_MS, roomStuckHost());
+    pushActivity('The Greedy Street Spirit: read all five acts of the bedtime story.');
+    toast('Press each act’s Wall Button.', 3400);
     return greedyStreetState;
   })();
   try {
@@ -21280,8 +21283,7 @@ function pressGreedyStoryButton(target) {
     Date.now()
   );
   if (!result.ok) {
-    if (result.reason === 'expired') returnFromGreedyStreetSpirit({ expired: true });
-    else toast(result.reason === 'act_complete' ? 'That act is already complete.' : 'The story cannot continue.');
+    toast(result.reason === 'act_complete' ? 'That act is already complete.' : 'The story cannot continue.');
     return false;
   }
   applyGreedySceneEvent(result.eventId);
@@ -21376,9 +21378,9 @@ async function restoreGreedyStreetAfterFailedExit(before) {
   }
 }
 
-async function returnFromGreedyStreetSpirit({ abandon = false, expired = false } = {}) {
+async function returnFromGreedyStreetSpirit({ abandon = false } = {}) {
   if (!greedyStreetState || greedyStreetTransitionBusy) return false;
-  if (!abandon && !expired && greedyStreetState.status !== 'ready') {
+  if (!abandon && greedyStreetState.status !== 'ready') {
     toast("You've missed some of the story! It's much more rewarding if you read it all the way through.", 4800);
     return false;
   }
@@ -21404,11 +21406,14 @@ async function returnFromGreedyStreetSpirit({ abandon = false, expired = false }
     } catch (err) {
       console.warn('storyland exit', err);
       greedyStreetExitRetryAt = Date.now() + 5000;
+      // A Yes, please whose trip failed: still here, so asked again later.
+      if (!roomStuck.armed('storyland')) roomStuck.arm('storyland', GREEDY_STREET_EXIT_PROMPT_MS, roomStuckHost());
       await restoreGreedyStreetAfterFailedExit(before);
       return false;
     }
-    let status = expired ? 'expired' : abandon ? 'abandoned' : greedyStreetState.status;
-    if (expired || abandon) {
+    roomStuck.cancel('storyland', roomStuckHost());
+    let status = abandon ? 'abandoned' : greedyStreetState.status;
+    if (abandon) {
       delete questState.active[questId];
       if (wasRepeat) markGreedyRepeatFailed(questState, Date.now());
     } else if (wasRepeat) {
@@ -21424,8 +21429,7 @@ async function returnFromGreedyStreetSpirit({ abandon = false, expired = false }
     if (hud) hud.hidden = true;
     savePlayerLocation(destination);
     if (app?.canvas) app.canvas.dataset.greedyStoryStatus = status;
-    if (expired) toast('Storyland faded before the bedtime story was finished.', 4200);
-    else if (abandon) {
+    if (abandon) {
       toast("You've missed some of the story. You can begin again later.", 3600);
     } else if (wasRepeat) {
       toast("Wasn't that sweet? Breakfast: +4 Waffles.", 4200);
@@ -21548,13 +21552,15 @@ function confirmLeaveGreedyStreetSpirit() {
 }
 
 function updateGreedyStreetSpirit() {
+  // inc_instances.js 322-357: "Are you stuck?"; Yes, please leaves as the exit box does (acts unread
+  // abandon the run, as onExitLocation failed it).
+  roomStuck.tick('storyland', roomStuckHost(), {
+    here: greedyStreetIsInstanced(),
+    moving: greedyStreetTransitionBusy,
+    onYes: () => returnFromGreedyStreetSpirit({ abandon: greedyStreetState?.status !== 'ready' }),
+  });
   if (!greedyStreetIsInstanced() || greedyStreetTransitionBusy) return;
   const now = Date.now();
-  if (greedyRemainingMs(greedyStreetState, now) <= 0) {
-    expireGreedyStreetSpirit(greedyStreetState, now);
-    if (now >= greedyStreetExitRetryAt) returnFromGreedyStreetSpirit({ expired: true });
-    return;
-  }
   stepGreedyStreetBoxes(now);
   if (!greedyStreetIsInstanced() || greedyStreetTransitionBusy) return;
   const autoplay = new URLSearchParams(location.search).get('greedyautoplay');
@@ -21756,11 +21762,8 @@ function renderWinterWalkHud() {
   const visible = winterWalkIsInstanced();
   if (hud) hud.hidden = !visible;
   if (!visible) return;
-  const remaining = winterWalkRemainingMs(winterWalkState);
-  const seconds = Math.ceil(remaining / 1000);
   const progress = winterWalkProgress(winterWalkState);
   const stage = hud.querySelector('[data-winter-stage]');
-  const timer = hud.querySelector('[data-winter-timer]');
   const objective = hud.querySelector('[data-winter-objective]');
   const motes = hud.querySelector('[data-winter-motes]');
   const img = hud.querySelector('[data-winter-img]');
@@ -21772,10 +21775,6 @@ function renderWinterWalkHud() {
           ? 'Winter Walk · Homeward'
           : 'Snowy path';
   }
-  if (timer) {
-    timer.textContent = `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, '0')}`;
-    timer.classList.toggle('is-low', remaining <= 30_000);
-  }
   if (objective) objective.textContent = winterWalkObjective(winterWalkState);
   if (motes) motes.textContent = `${progress.collected} / ${progress.total}`;
   // #298: at the daily quoin limit the motes refuse; the count says so beside it (card and pill).
@@ -21786,7 +21785,6 @@ function renderWinterWalkHud() {
   if (app?.canvas) {
     app.canvas.dataset.winterWalkStatus = winterWalkState.status;
     app.canvas.dataset.winterWalkStage = winterWalkState.stage;
-    app.canvas.dataset.winterWalkRemaining = String(remaining);
     app.canvas.dataset.winterWalkMotes = `${progress.collected}/${progress.total}`;
     app.canvas.dataset.winterWalkImg = String(winterWalkState.imgEarned);
     app.canvas.dataset.winterWalkObjective = winterWalkObjective(winterWalkState);
@@ -21873,8 +21871,10 @@ async function startWinterWalk(opts = {}) {
       arrive: () => winterWalkState && setupWinterWalkStage('surface'),
     });
     savePlayerLocation(winterWalkSourceLocation);
+    // winter_walk.js 110 / winter_walk_part2.js 103: "Are you stuck?" five minutes in, and no time limit.
+    roomStuck.arm('winter-walk', WINTER_WALK_EXIT_PROMPT_MS, roomStuckHost());
     pushActivity('Winter Walk: cross the snowy path, then climb through Winter Haven.');
-    toast('Five minutes. Follow the winter motes.', 3200);
+    toast('Follow the winter motes.', 3200);
     return winterWalkState;
   })();
   try {
@@ -21967,9 +21967,10 @@ async function reenterWinterWalkStage() {
   }
 }
 
-async function returnFromWinterWalk({ abandon = false, expired = false } = {}) {
+async function returnFromWinterWalk({ abandon = false } = {}) {
   if (!winterWalkState || winterWalkTransitionBusy) return false;
   winterWalkTransitionBusy = true;
+  roomStuck.cancel('winter-walk', roomStuckHost());
   const destination = winterWalkSourceLocation?.tsid
     ? { ...winterWalkSourceLocation }
     : { tsid: STREET_INDEX.default };
@@ -21977,12 +21978,12 @@ async function returnFromWinterWalk({ abandon = false, expired = false } = {}) {
   const questId = repeatWalk
     ? WINTER_WALK_REPEAT_QUEST_ID
     : WINTER_WALK_QUEST_ID;
-  if (abandon || expired) {
+  if (abandon) {
     // winter_walk.js onExitLocation 96-107 / winter_walk_part2.js 88-100: leaving early fails the walk.
     delete questState.active[questId];
     noteWinterWalkEnd(questState, { repeat: winterWalkState.repeat, outcome: 'failed' });
   }
-  const status = expired ? 'expired' : abandon ? 'abandoned' : winterWalkState.status;
+  const status = abandon ? 'abandoned' : winterWalkState.status;
   closeQuestDialogue({ force: true });
   clearWinterAtmosphere();
   winterWalkState = null;
@@ -22000,8 +22001,7 @@ async function returnFromWinterWalk({ abandon = false, expired = false } = {}) {
     savePlayerLocation(destination);
     savePlayerState();
     if (app?.canvas) app.canvas.dataset.winterWalkStatus = status;
-    if (expired) toast(repeatWalk ? 'The winter path faded. You can walk it again in an hour.' : 'The winter path faded. You can try the walk again.', 4000);
-    else if (abandon) toast(repeatWalk ? 'You leave the winter path. You can walk it again in an hour.' : 'You leave the winter path for another time.', 3200);
+    if (abandon) toast(repeatWalk ? 'You leave the winter path. You can walk it again in an hour.' : 'You leave the winter path for another time.', 3200);
     updateHud();
     return true;
   } finally {
@@ -22061,14 +22061,15 @@ function confirmLeaveWinterWalk() {
 }
 
 function updateWinterWalk(dt) {
+  // inc_instances.js 322-357: "Are you stuck?" on the walk or in Winter Haven; Yes, please leaves as
+  // Leave does (onExitLocation fails the walk).
+  roomStuck.tick('winter-walk', roomStuckHost(), {
+    here: winterWalkIsInstanced(),
+    moving: winterWalkTransitionBusy,
+    onYes: () => returnFromWinterWalk({ abandon: true }),
+  });
   if (!winterWalkIsInstanced() || winterWalkTransitionBusy) return;
   const now = Date.now();
-  if (winterWalkRemainingMs(winterWalkState, now) <= 0) {
-    expireWinterWalk(winterWalkState, now);
-    pushActivity('The five-minute Winter Walk timer ran out.');
-    returnFromWinterWalk({ expired: true });
-    return;
-  }
   // #215/#216: the motes are iMG quoins, taken by the body's box on the drawn coin as street
   // quoins are (items/quoin.js onPlayerCollision; js/quoins.js quoinTouches), not a 48 px circle
   // 28 px over the feet that missed the motes hung 88 px up unless you jumped.
@@ -22365,19 +22366,12 @@ function renderSummersDayHud() {
   const visible = summersDayIsInstanced();
   if (hud) hud.hidden = !visible;
   if (!visible) return;
-  const remaining = summersDayRemainingMs(summersDayRun);
-  const seconds = Math.ceil(remaining / 1000);
   const progress = summersDayProgress(summersDayRun);
   const stage = hud.querySelector('[data-summer-stage]');
-  const timer = hud.querySelector('[data-summer-timer]');
   const objective = hud.querySelector('[data-summer-objective]');
   const count = hud.querySelector('[data-summer-progress]');
   const bonus = hud.querySelector('[data-summer-bonus]');
   if (stage) stage.textContent = summersDayRun.stage === 'bonus' ? 'The Annex' : 'The shared memory';
-  if (timer) {
-    timer.textContent = `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, '0')}`;
-    timer.classList.toggle('is-low', remaining <= 30_000);
-  }
   if (objective) objective.textContent = summersDayObjective(summersDayRun);
   if (count) count.textContent =
     summersDayRun.stage === 'bonus'
@@ -22395,7 +22389,6 @@ function renderSummersDayHud() {
     app.canvas.dataset.summerDayCheckpoint =
       summersDayNextCheckpoint(summersDayRun) || 'complete';
     app.canvas.dataset.summerDayProgress = `${progress.current}/${progress.total}`;
-    app.canvas.dataset.summerDayRemaining = String(remaining);
     app.canvas.dataset.summerDayBonusQuoins = `${progress.bonusCollected}/${progress.bonusTotal}`;
     app.canvas.dataset.summerDayBonusImg = String(summersDayRun.bonusImgEarned || 0);
     app.canvas.dataset.summerDayObjective = summersDayObjective(summersDayRun);
@@ -22559,8 +22552,10 @@ async function startSummersDay(opts = {}) {
     summersDayAutoNextAt = 0;
     savePlayerLocation(summersDaySourceLocation);
     await transitionIntoSummersDay('main', opts.useTransition !== false);
+    // blue_and_white_part1.js 107 / part2 112: "Are you stuck?" five minutes in, and no time limit.
+    roomStuck.arm('summers-day', SUMMERS_DAY_EXIT_PROMPT_MS, roomStuckHost());
     pushActivity('A Summer’s Day: follow the collision of birds, stones, water, and blue lights.');
-    toast('Five minutes. Let the Giants’ memory unfold.', 3600);
+    toast('Let the Giants’ memory unfold.', 3600);
     return summersDayRun;
   })();
   try {
@@ -22591,27 +22586,32 @@ async function enterSummersDayAnnex() {
   keys.clear();
   try {
     await transitionIntoSummersDay('bonus', true);
+    // blue_and_white_part2.js 70: the Annex is its own instance, asked two minutes in (the memory's
+    // instance and its prompt went when you entered: onEnterLocation 87-95).
+    roomStuck.arm('summers-day', SUMMERS_DAY_BONUS_EXIT_PROMPT_MS, roomStuckHost());
     pushActivity('The memory opens into the Annex of A Summer’s Day.');
-    toast('Two minutes in the Annex. Climb toward the way home.', 3200);
+    toast('The Annex. Climb toward the way home.', 3200);
     return true;
   } finally {
     summersDayTransitionBusy = false;
   }
 }
 
-async function returnFromSummersDay({ expired = false, abandon = false, completionText = '' } = {}) {
+async function returnFromSummersDay({ abandon = false, completionText = '' } = {}) {
   if (!summersDayRun || summersDayTransitionBusy) return false;
   summersDayTransitionBusy = true;
+  roomStuck.cancel('summers-day', roomStuckHost());
   const destination = summersDaySourceLocation?.tsid
     ? { ...summersDaySourceLocation }
     : { tsid: STREET_INDEX.default };
   const questId = summersDayRun.repeat
     ? SUMMERS_DAY_REPEAT_QUEST_ID
     : SUMMERS_DAY_QUEST_ID;
-  if (expired) expireSummersDay(summersDayRun, questState, Date.now());
-  else if (abandon) abandonSummersDay(summersDayRun, questState, Date.now());
-  if (expired || abandon) delete questState.active[questId];
-  const status = expired ? 'expired' : abandon ? 'abandoned' : summersDayRun.status;
+  if (abandon) {
+    abandonSummersDay(summersDayRun, questState, Date.now());
+    delete questState.active[questId];
+  }
+  const status = abandon ? 'abandoned' : summersDayRun.status;
   closeQuestDialogue({ force: true });
   keys.clear();
   summersDayRun = null;
@@ -22637,8 +22637,7 @@ async function returnFromSummersDay({ expired = false, abandon = false, completi
         ensureSummersDayStory(questState).pendingQurazies
       );
     }
-    if (expired) toast('The summer memory faded. You can try again later.', 4200);
-    else if (abandon) toast('You let the summer memory go for now.', 3200);
+    if (abandon) toast('You let the summer memory go for now.', 3200);
     else if (completionText) {
       openScriptedQuestDialogue({
         title: 'A Summer’s Day',
@@ -22704,17 +22703,14 @@ function summersDayInBuoyancy() {
 }
 
 function updateSummersDay(dt) {
+  // inc_instances.js 322-357: "Are you stuck?"; Yes, please leaves as Leave does (onExitLocation fails the quest).
+  roomStuck.tick('summers-day', roomStuckHost(), {
+    here: summersDayIsInstanced(),
+    moving: summersDayTransitionBusy,
+    onYes: () => returnFromSummersDay({ abandon: true }),
+  });
   if (!summersDayIsInstanced() || summersDayTransitionBusy) return;
   const now = Date.now();
-  if (summersDayRemainingMs(summersDayRun, now) <= 0) {
-    pushActivity(
-      summersDayRun.stage === 'bonus'
-        ? 'The two-minute Annex faded.'
-        : 'The five-minute summer memory faded.'
-    );
-    returnFromSummersDay({ expired: true });
-    return;
-  }
   if (summersDayRun.stage !== 'main') {
     tickSummersDayAnnexReveal(dt);
     for (const entry of summersDayBonusQuoins) {
@@ -23030,18 +23026,11 @@ function renderRookWoodsHud() {
   const visible = rookWoodsIsInstanced();
   if (hud) hud.hidden = !visible;
   if (!visible) return;
-  const remaining = rookWoodsRemainingMs(rookWoodsState);
-  const seconds = Math.ceil(remaining / 1000);
   const tool = findWorkingRookTool(inv, toolState);
-  const timer = hud.querySelector('[data-rook-timer]');
   const objective = hud.querySelector('[data-rook-objective]');
   const hits = hud.querySelector('[data-rook-hits]');
   const egg = hud.querySelector('[data-rook-egg]');
   const toolEl = hud.querySelector('[data-rook-tool]');
-  if (timer) {
-    timer.textContent = `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, '0')}`;
-    timer.classList.toggle('is-low', remaining <= 20_000);
-  }
   if (objective) objective.textContent = rookWoodsObjective(rookWoodsState);
   if (hits) hits.textContent = String(rookWoodsState.hits);
   if (egg) egg.textContent = rookWoodsState.eggSmashed ? 'Smashed' : `State ${rookWoodsState.eggState}/5`;
@@ -23052,7 +23041,6 @@ function renderRookWoodsHud() {
   }
   if (app?.canvas) {
     app.canvas.dataset.rookWoodsStatus = rookWoodsState.status;
-    app.canvas.dataset.rookWoodsRemaining = String(remaining);
     app.canvas.dataset.rookWoodsHits = String(rookWoodsState.hits);
     app.canvas.dataset.rookEggState = String(rookWoodsState.eggState);
     app.canvas.dataset.rookWoodsObjective = rookWoodsObjective(rookWoodsState);
@@ -23163,6 +23151,8 @@ async function startRookWoodsQuest(opts = {}) {
       setup();
     }
     rookWoodsTransitionBusy = false;
+    // rook_egg_smash.js 79 (exit_delay 2*60): "Are you stuck?" two minutes in, and no time limit.
+    roomStuck.arm('rook-woods', ROOK_WOODS_EXIT_PROMPT_MS, roomStuckHost());
     pushActivity("Rooks' Woods: evade the Crushers and smash the Rook Egg.");
     openScriptedQuestDialogue({
       title: "Rooks' Woods",
@@ -23180,7 +23170,7 @@ async function startRookWoodsQuest(opts = {}) {
       onComplete: () => {
         beginRookWoods(rookWoodsState, Date.now());
         renderRookWoodsHud();
-        toast('Two minutes. Find the Egg!', 3000);
+        toast('Find the Egg!', 3000);
       },
     });
     return rookWoodsState;
@@ -23193,14 +23183,15 @@ async function startRookWoodsQuest(opts = {}) {
   }
 }
 
-async function returnFromRookWoods({ abandon = false, expired = false } = {}) {
+async function returnFromRookWoods({ abandon = false } = {}) {
   if (!rookWoodsState || rookWoodsTransitionBusy) return false;
   rookWoodsTransitionBusy = true;
+  roomStuck.cancel('rook-woods', roomStuckHost());
   const destination = rookWoodsSourceLocation?.tsid
     ? { ...rookWoodsSourceLocation }
     : { tsid: STREET_INDEX.default };
-  if (abandon || expired) delete questState.active[ROOK_QUEST_ID];
-  const status = expired ? 'expired' : abandon ? 'abandoned' : rookWoodsState.status;
+  if (abandon) delete questState.active[ROOK_QUEST_ID];
+  const status = abandon ? 'abandoned' : rookWoodsState.status;
   closeQuestDialogue({ force: true });
   rookWoodsState = null;
   rookWoodsSourceLocation = null;
@@ -23223,8 +23214,7 @@ async function returnFromRookWoods({ abandon = false, expired = false } = {}) {
     savePlayerLocation(destination);
     savePlayerState();
     if (app?.canvas) app.canvas.dataset.rookWoodsStatus = status;
-    if (expired) toast("The Rooks' Woods closed. You can try again later.", 4000);
-    else if (abandon) toast('You leave the Rook Egg for another attempt.', 3200);
+    if (abandon) toast('You leave the Rook Egg for another attempt.', 3200);
     updateHud();
     return true;
   } finally {
@@ -23337,14 +23327,15 @@ function updateRookHitFx(now) {
 }
 
 function updateRookWoods(dt) {
+  // inc_instances.js 322-357: "Are you stuck?"; Yes, please leaves as Leave does (the Egg left for
+  // another attempt; once smashed, as the quest's own way out).
+  roomStuck.tick('rook-woods', roomStuckHost(), {
+    here: rookWoodsIsInstanced(),
+    moving: rookWoodsTransitionBusy,
+    onYes: () => returnFromRookWoods({ abandon: rookWoodsState?.status !== 'complete' }),
+  });
   if (!rookWoodsIsInstanced() || rookWoodsTransitionBusy) return;
   const now = Date.now();
-  if (rookWoodsState.status === 'running' && rookWoodsRemainingMs(rookWoodsState, now) <= 0) {
-    expireRookWoods(rookWoodsState, now);
-    pushActivity("The two-minute Rooks' Woods timer ran out.");
-    returnFromRookWoods({ expired: true });
-    return;
-  }
 
   const knocked = updateRookHitFx(now);
   const elapsed = rookWoodsState.startedAt ? now - rookWoodsState.startedAt : 0;
@@ -24139,16 +24130,8 @@ function renderDeEmbiggenifyHud(now = Date.now()) {
   const visible = deEmbiggenifyIsInstanced();
   if (hud) hud.hidden = !visible;
   if (!visible) return;
-  const remaining = eestiRemainingMs(deEmbiggenifyState, now);
-  const minutes = Math.floor(remaining / 60000);
-  const seconds = Math.floor((remaining % 60000) / 1000);
-  const timer = hud.querySelector('[data-eesti-timer]');
   const objective = hud.querySelector('[data-eesti-objective]');
   const stage = hud.querySelector('[data-eesti-stage]');
-  if (timer) {
-    timer.textContent = `${minutes}:${String(seconds).padStart(2, '0')}`;
-    timer.classList.toggle('is-low', remaining > 0 && remaining <= 30000);
-  }
   if (objective) objective.textContent = deEmbiggenifyObjective(deEmbiggenifyState);
   if (stage) {
     stage.textContent =
@@ -24183,7 +24166,6 @@ function renderDeEmbiggenifyHud(now = Date.now()) {
   if (app?.canvas) {
     app.canvas.dataset.deEmbiggenifyStatus = deEmbiggenifyState.status;
     app.canvas.dataset.deEmbiggenifyObjective = deEmbiggenifyObjective(deEmbiggenifyState);
-    app.canvas.dataset.deEmbiggenifyRemaining = String(remaining);
     app.canvas.dataset.deEmbiggenifyProductionTsid = EESTI_PRODUCTION_TSID;
     app.canvas.dataset.deEmbiggenifyPlayerScale = String(player?.baseScale || 0);
     // The room is Tiny Speck's own street; its landmarks and table are the street's decos.
@@ -24208,8 +24190,10 @@ function openMrHairballRequest() {
     onComplete: () => {
       setMrHairballAnimation('idle');
       beginDeEmbiggenifySearch(deEmbiggenifyState, Date.now());
+      // de_embiggenify_part2.js onAccepted 66-69: the prompt asked two minutes from now instead.
+      roomStuck.arm('de-embiggenify', EESTI_EXIT_PROMPT_MS, roomStuckHost());
       pushActivity('Mr. Hairball asked you to find a small shiny object behind the cake.');
-      toast('Two minutes. Look behind the cake!', 3600);
+      toast('Look behind the cake!', 3600);
       renderDeEmbiggenifyHud();
       updateHud();
     },
@@ -24241,6 +24225,8 @@ function pickUpSmallWorthless() {
   const result = findSmallWorthless(deEmbiggenifyState, Date.now());
   if (!result.ok) return false;
   addItem(inv, SMALL_WORTHLESS_ID, 1);
+  // location.js 1200-1202 ("reset instance timer"): the prompt asked two minutes from now instead.
+  roomStuck.arm('de-embiggenify', EESTI_EXIT_PROMPT_MS, roomStuckHost());
   playSfx('pickup', { volume: 0.55, rate: 1.25 });
   const spot = eestiStreetPoint(EESTI_SHINY_SPOT);
   const pickupX = smallWorthlessTarget?.sprite?.x || spot.x;
@@ -24413,10 +24399,11 @@ async function startDeEmbiggenify(opts = {}) {
       deEmbiggenifyTransitionBusy = false;
     }
     if (!deEmbiggenifyIsInstanced()) return null;
-    // The two minutes start once the room is on screen, not while its street loads.
     deEmbiggenifyState.enteredAt = Date.now();
-    deEmbiggenifyState.deadlineAt = deEmbiggenifyState.enteredAt + EESTI_DURATION_MS;
     if (resumingPart2) beginDeEmbiggenifySearch(deEmbiggenifyState, Date.now());
+    // de_embiggenify.js 43 (exit_delay 2*60): "Are you stuck?" two minutes in, and no time limit.
+    // Asked from once the room is on screen, not while its street loads.
+    roomStuck.arm('de-embiggenify', EESTI_EXIT_PROMPT_MS, roomStuckHost());
     pushActivity('You shrink down inside Eesti Life Catalogue Page 17.');
     toast('Everything is enormous. Find Mr. Hairball.', 3400);
     updateHud();
@@ -24429,12 +24416,13 @@ async function startDeEmbiggenify(opts = {}) {
   }
 }
 
-async function returnFromDeEmbiggenify({ abandon = false, expired = false } = {}) {
+async function returnFromDeEmbiggenify({ abandon = false } = {}) {
   if (!deEmbiggenifyState || deEmbiggenifyTransitionBusy) return false;
   deEmbiggenifyTransitionBusy = true;
+  roomStuck.cancel('de-embiggenify', roomStuckHost());
   const source = deEmbiggenifySourceLocation || deEmbiggenifyState.sourceLocation;
-  const status = expired ? 'expired' : abandon ? 'abandoned' : deEmbiggenifyState.status;
-  if ((abandon || expired) && deEmbiggenifyState.status !== 'complete') {
+  const status = abandon ? 'abandoned' : deEmbiggenifyState.status;
+  if (abandon && deEmbiggenifyState.status !== 'complete') {
     // #109: part one is done once you meet Mr. Hairball (de_embiggenify.js silent_complete), so
     // part two stays in the log to try again, as the source's stays todo (de_embiggenify_part2.js:
     // the instance only offers an exit, instances_show_exit_prompt). Dropping it left the log
@@ -24442,7 +24430,7 @@ async function returnFromDeEmbiggenify({ abandon = false, expired = false } = {}
     const part2 = Boolean(questState.active?.[DE_EMBIGGENIFY_PART2_QUEST_ID]);
     for (const id of deEmbiggenifyEndDrops({ part2 })) delete questState.active[id];
     removeItem(inv, SMALL_WORTHLESS_ID, countItem(inv, SMALL_WORTHLESS_ID));
-    pushActivity(deEmbiggenifyEndLine({ expired, part2 }));
+    pushActivity(deEmbiggenifyEndLine({ part2 }));
   }
   closeQuestDialogue({ force: true });
   if (deEmbiggenifyPlayerBaseScale && player) {
@@ -24496,18 +24484,14 @@ function confirmLeaveDeEmbiggenify() {
 }
 
 function updateDeEmbiggenify() {
+  // inc_instances.js 322-357: "Are you stuck?"; Yes, please leaves as Leave does (back to normal size).
+  roomStuck.tick('de-embiggenify', roomStuckHost(), {
+    here: deEmbiggenifyIsInstanced(),
+    moving: deEmbiggenifyTransitionBusy,
+    onYes: () => returnFromDeEmbiggenify({ abandon: deEmbiggenifyState?.status !== 'complete' }),
+  });
   if (!deEmbiggenifyIsInstanced() || deEmbiggenifyTransitionBusy) return;
   const now = Date.now();
-  if (
-    !['complete', 'expired'].includes(deEmbiggenifyState.status) &&
-    eestiRemainingMs(deEmbiggenifyState, now) <= 0
-  ) {
-    expireDeEmbiggenify(deEmbiggenifyState, now);
-    renderDeEmbiggenifyHud(now);
-    toast('The catalogue page closes. You return to normal size.', 4200);
-    setTimeout(() => returnFromDeEmbiggenify({ expired: true }), 450);
-    return;
-  }
   // The archived myles_is_great box creates the object (deEmbiggenifyMoment); the Pickup
   // verb on the glint stays as an accessible fallback.
   const autoplayMode = new URLSearchParams(location.search).get('eestiautoplay') || '';
@@ -25347,11 +25331,8 @@ function renderParadiseFlightHud() {
   if (!visible || !hud) return;
   const course = paradiseCourse();
   const progress = paradiseRunProgress(paradiseRun);
-  const remaining = paradiseRemainingMs(paradiseRun);
-  const seconds = Math.ceil(remaining / 1000);
   const icon = hud.querySelector('[data-paradise-icon]');
   const title = hud.querySelector('[data-paradise-title]');
-  const timer = hud.querySelector('[data-paradise-timer]');
   const objective = hud.querySelector('[data-paradise-objective]');
   const progressEl = hud.querySelector('[data-paradise-progress]');
   const tickets = hud.querySelector('[data-paradise-tickets]');
@@ -25360,10 +25341,6 @@ function renderParadiseFlightHud() {
   if (title) title.textContent = course.name;
   if (controls) {
     controls.textContent = paradiseControls(course, TOUCH_PHONE).controls;
-  }
-  if (timer) {
-    timer.textContent = `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, '0')}`;
-    timer.classList.toggle('is-low', remaining <= 30_000);
   }
   if (objective) objective.textContent = paradiseObjective(paradiseRun);
   if (progressEl) {
@@ -25377,7 +25354,6 @@ function renderParadiseFlightHud() {
   if (app?.canvas) {
     app.canvas.dataset.paradiseCourse = course.id;
     app.canvas.dataset.paradiseStatus = paradiseRun.status;
-    app.canvas.dataset.paradiseRemaining = String(remaining);
     app.canvas.dataset.paradiseCollected = String(progress.collected);
     app.canvas.dataset.paradiseTotal = String(progress.total);
     app.canvas.dataset.paradiseRings = String(progress.rings);
@@ -25611,6 +25587,8 @@ async function startParadiseFlight(courseId, opts = {}) {
     ]);
     paradiseSourceData = sourceData;
     await transitionIntoParadise(course, points, opts.useTransition !== false, geometry);
+    // paradise_ticket.js launchInstance 296: "Are you stuck?" four minutes in, and no time limit.
+    roomStuck.arm('paradise', PARADISE_EXIT_PROMPT_MS, roomStuckHost());
     const controls = paradiseControls(course, TOUCH_PHONE).hint;
     pushActivity(`${course.name}: ${controls} ${course.objective}.`);
     toast(controls, 3600);
@@ -25801,13 +25779,14 @@ function unlockParadiseExit() {
   renderParadiseFlightHud();
 }
 
-async function returnFromParadise({ expired = false, abandon = false } = {}) {
+async function returnFromParadise({ abandon = false } = {}) {
   if (!paradiseRun || paradiseTransitionBusy) return false;
   paradiseTransitionBusy = true;
+  roomStuck.cancel('paradise', roomStuckHost());
   const destination = paradiseSourceLocation?.tsid
     ? { ...paradiseSourceLocation }
     : { tsid: STREET_INDEX.default };
-  const finalStatus = expired ? 'expired' : abandon ? 'abandoned' : paradiseRun.status;
+  const finalStatus = abandon ? 'abandoned' : paradiseRun.status;
   closeQuestDialogue({ force: true });
   keys.clear();
   if (player) {
@@ -25832,8 +25811,7 @@ async function returnFromParadise({ expired = false, abandon = false } = {}) {
     savePlayerLocation(destination);
     savePlayerState();
     if (app?.canvas) app.canvas.dataset.paradiseStatus = finalStatus;
-    if (expired) toast(`Your four minutes in Paradise are up. ${paradiseWayBack()}`, 4500);
-    else if (abandon) toast('You leave Paradise and return to Ur.', 3200);
+    if (abandon) toast('You leave Paradise and return to Ur.', 3200);
     updateHud();
     return true;
   } finally {
@@ -26217,6 +26195,12 @@ function updateRadialScripts(course, now, bodyScale) {
 }
 
 function updateParadiseFlight(dt) {
+  // paradise_ticket.js 296 / inc_instances.js 322-357: "Are you stuck?"; Yes, please leaves as Leave does.
+  roomStuck.tick('paradise', roomStuckHost(), {
+    here: paradiseIsInstanced(),
+    moving: paradiseTransitionBusy,
+    onYes: () => returnFromParadise({ abandon: paradiseRun?.status !== 'complete' }),
+  });
   if (!paradiseIsInstanced() || paradiseTransitionBusy) return;
   const now = Date.now();
   const course = paradiseCourse();
@@ -26252,12 +26236,6 @@ function updateParadiseFlight(dt) {
       advanceQuestDialogue();
     }
     renderParadiseFlightHud();
-    return;
-  }
-  if (paradiseRemainingMs(paradiseRun, now) <= 0) {
-    expireParadiseRun(paradiseRun, now);
-    pushActivity(`Your four minutes in ${course.name} came to an end.`);
-    returnFromParadise({ expired: true });
     return;
   }
   if (course.art) paradiseCourseRuntime.tick(paradiseCourseHost(), course, dt);

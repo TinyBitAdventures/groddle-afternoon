@@ -8,7 +8,7 @@ import {
   DE_EMBIGGENIFY_PART2_QUEST_ID,
   DE_EMBIGGENIFY_QUEST_ID,
   EESTI_AUTOPLAY_POINTS,
-  EESTI_DURATION_MS,
+  EESTI_EXIT_PROMPT_MS,
   EESTI_FIND_BOX,
   EESTI_HAIRBALL_SPOT,
   EESTI_INSTANCE,
@@ -35,11 +35,9 @@ import {
   deEmbiggenifyEndLine,
   deEmbiggenifyObjective,
   deEmbiggenifyPart2Lost,
-  eestiRemainingMs,
   eestiStreetPoint,
-  expireDeEmbiggenify,
   findSmallWorthless,
-} from '../public/js/de-embiggenify.js?v=db347ac1';
+} from '../public/js/de-embiggenify.js?v=e4e87b16';
 import { jumpApex, NORMAL_BUFF } from '../public/js/avatar-step.js?v=8415ee96';
 import { SOURCE_PHYSICS, triggerHit } from '../public/js/puzzle-triggers.js?v=221b67a9';
 import { barriersScreen, blockBarrierCrossing } from '../public/js/street-model.js?v=a9a05f9d';
@@ -63,7 +61,7 @@ test('De-Embiggenify preserves the production two-part quest contract', () => {
   assert.equal(EESTI_PRODUCTION_TSID, 'LIF10RQLPLBYV7');
   assert.deepEqual(EESTI_SOURCE_SPAWN, { x: -1832, y: -76 });
   assert.equal(EESTI_STREET_ID, 'GHFBQQ4N68733LB');
-  assert.equal(EESTI_DURATION_MS, 120000);
+  assert.equal(EESTI_EXIT_PROMPT_MS, 120000, 'de_embiggenify.js 43: exit_delay 2*60, the stuck prompt');
   assert.equal(EESTI_PLAYER_SCALE, 0.42);
   assert.equal(SMALL_WORTHLESS_ID, 'small_worthless');
   assert.equal(EMOTIONAL_BEAR_ID, 'emotional_bear');
@@ -101,8 +99,6 @@ test('the shiny object stays hidden until Mr. Hairball starts part two', () => {
   assert.equal(findSmallWorthless(state, 2000).reason, 'not_searching');
   const begun = beginDeEmbiggenifySearch(state, 3000);
   assert.equal(begun.ok, true);
-  assert.equal(state.deadlineAt, 123000);
-  assert.equal(eestiRemainingMs(state, 63000), 60000);
   assert.match(deEmbiggenifyObjective(state), /behind the cake/);
 });
 
@@ -121,13 +117,12 @@ test('pickup and return must happen in order and completion is idempotent', () =
   assert.equal(completeDeEmbiggenify(state).reason, 'already_complete');
 });
 
-test('the two-minute catalogue instance expires cleanly', () => {
+test('the catalogue page has no time limit (Glitch asked "Are you stuck?" instead)', () => {
   const state = createDeEmbiggenifyState({ enteredAt: 1000 });
   beginDeEmbiggenifySearch(state, 2000);
-  assert.equal(findSmallWorthless(state, 122001).reason, 'expired');
-  assert.equal(state.status, 'expired');
-  assert.equal(eestiRemainingMs(state, 122001), 0);
-  assert.equal(expireDeEmbiggenify(state, 123000), false);
+  assert.equal(state.deadlineAt, undefined);
+  assert.deepEqual(findSmallWorthless(state, 60 * 60 * 1000), { ok: true, item: SMALL_WORTHLESS_ID });
+  assert.equal(completeDeEmbiggenify(state, 2 * 60 * 60 * 1000).ok, true);
 });
 
 test('client integration uses clean recovered room and item art', () => {
@@ -324,9 +319,9 @@ test('#109: time running out after Mr. Hairball keeps De-Embiggenify II in the l
   }
   assert.deepEqual(deEmbiggenifyEndDrops({ part2: true }), [], 'after Mr. Hairball nothing is dropped');
   assert.deepEqual(deEmbiggenifyEndDrops({ part2: false }), [DE_EMBIGGENIFY_QUEST_ID], 'before him part one goes back to its offer');
-  assert.match(deEmbiggenifyEndLine({ expired: true, part2: true }), /^The catalogue page closed before you could finish\. De-Embiggenify II is still in your quest log/);
-  assert.equal(deEmbiggenifyEndLine({ expired: false, part2: false }), 'You left the miniature room before helping Mr. Hairball.');
-  for (const line of [deEmbiggenifyEndLine({ expired: true, part2: true }), deEmbiggenifyEndLine({ part2: true })]) assert.doesNotMatch(line, /—/);
+  assert.match(deEmbiggenifyEndLine({ part2: true }), /^You left the miniature room before helping Mr\. Hairball\. De-Embiggenify II is still in your quest log/);
+  assert.equal(deEmbiggenifyEndLine({ part2: false }), 'You left the miniature room before helping Mr. Hairball.');
+  for (const line of [deEmbiggenifyEndLine({ part2: false }), deEmbiggenifyEndLine({ part2: true })]) assert.doesNotMatch(line, /—/);
   // A save from before the fix (part one done, part two dropped) gets part two back; finished saves don't.
   assert.equal(deEmbiggenifyPart2Lost({ completed: [DE_EMBIGGENIFY_QUEST_ID], active: {} }), true);
   assert.equal(deEmbiggenifyPart2Lost({ completed: [DE_EMBIGGENIFY_QUEST_ID, DE_EMBIGGENIFY_PART2_QUEST_ID], active: {} }), false);

@@ -13,7 +13,7 @@
  *
  * Canvas data: questPlate (the adopted card's id), questPlateOpen, questCaption.
  */
-import { DOT_DONE, QUEST_PLATE_CARDS, captionMs, compactCount, dotCount, nextCaption, tidy } from '../quest-plate.js?v=a0240f13';
+import { DOT_DONE, QUEST_PLATE_CARDS, captionMs, compactCount, dotCount, nextCaption, tidy } from '../quest-plate.js?v=34cfdeea';
 
 export const QUEST_PLATE_FEATURE_ID = 'quest-plate';
 const SYNC_MS = 150;

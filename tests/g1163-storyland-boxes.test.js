@@ -27,7 +27,7 @@ import {
   greedyStreetBoxEnter,
   greedyStreetBoxes,
   pressGreedyAct,
-} from '../public/js/greedy-street-spirit.js?v=00620a1c';
+} from '../public/js/greedy-street-spirit.js?v=b0ce2437';
 
 const ROOT = join(import.meta.dirname, '..');
 const street = JSON.parse(readFileSync(join(ROOT, 'public/assets/streets', `${GREEDY_STREET_GEOMETRY_TSID}.json`), 'utf8'));

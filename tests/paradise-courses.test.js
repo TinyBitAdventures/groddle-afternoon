@@ -38,7 +38,7 @@ import {
   paradiseSkyStops,
   paradiseTicketCost,
   resolveParadiseReward,
-} from '../public/js/paradise-flight.js?v=c6838cae';
+} from '../public/js/paradise-flight.js?v=ab7d41ec';
 import { QURAZY_REWARDS } from '../public/js/quoins.js?v=5abad2c7';
 import { remakeStatus } from '../public/js/imagination-remake.js?v=99997003';
 
@@ -101,7 +101,7 @@ test('new tickets share the source price curve, eleven-a-day cap and four-minute
   assert.equal(activateParadiseTicket(state, 'updraft', { imagination: 9999, now }).reason, 'daily_limit');
   assert.equal(state.visits.aerial_boost, 2);
   const run = createParadiseRun('mountain_scaling', { now: 0 });
-  assert.equal(run.expiresAt, 240000);
+  assert.equal(run.expiresAt, undefined, 'no time limit: the stuck prompt at four minutes instead');
   assert.equal(finishParadiseRun(run, 1000).reason, 'objective_incomplete');
   for (let index = 0; index < PARADISE_COURSES.mountain_scaling.pickupCount; index += 1) {
     assert.equal(collectParadisePickup(run, index, 2000).ok, true);

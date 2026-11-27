@@ -6,7 +6,13 @@ import { getGameDayKey } from './game-day.js?v=57fecfcb';
 import { RADIAL_ARRIVAL_EVENTS, applyGeometryEffects, createRadialSession, radialFire } from './radial-heights.js?v=90fcc768';
 import { avatarHeadReach, barriersScreen, blockBarrierCrossing, headCeiling, isStandable, platformYAt, platformsScreen } from './street-model.js?v=a9a05f9d';
 
-export const PARADISE_DURATION_MS = 4 * 60 * 1000;
+/**
+ * Austin 2026-11-27 (Glitch's prompt, no timer): a course has no time limit. Four minutes after the
+ * ticket takes you in Glitch asked "Are you stuck? Do you want to leave this place?"
+ * (paradise_ticket.js launchInstance 296, instances_schedule_exit_prompt(instance_id, 4*60); the
+ * prompt is js/stuck-prompt.js, armed by game.js), and No thanks asked again later.
+ */
+export const PARADISE_EXIT_PROMPT_MS = 4 * 60 * 1000;
 export const PARADISE_DAILY_LIMIT = 11;
 
 /**
@@ -646,7 +652,6 @@ export function createParadiseRun(courseId, {
     courseId,
     status: 'running',
     startedAt: now,
-    expiresAt: now + PARADISE_DURATION_MS,
     sourceLocation: sourceLocation?.tsid
       ? {
           tsid: String(sourceLocation.tsid),
@@ -659,22 +664,6 @@ export function createParadiseRun(courseId, {
     rewardTotals: {},
     completionRewarded: false,
   };
-}
-
-export function paradiseRemainingMs(run, now = Date.now()) {
-  if (!run || run.status !== 'running') return 0;
-  return Math.max(0, finite(run.expiresAt, 0) - now);
-}
-
-export function expireParadiseRun(run, now = Date.now()) {
-  if (!run || run.status !== 'running') {
-    return { ok: false, reason: run?.status || 'missing', run };
-  }
-  if (paradiseRemainingMs(run, now) > 0) {
-    return { ok: false, reason: 'time_remaining', run };
-  }
-  run.status = 'expired';
-  return { ok: true, reason: 'expired', run };
 }
 
 function noteReward(run, rewardDef) {
@@ -703,10 +692,6 @@ export function resolveParadiseReward(rewardDef, { level = 1, multiplier = 1 } =
 export function collectParadisePickup(run, index, now = Date.now(), { level = 1, multiplier = 1 } = {}) {
   const course = PARADISE_COURSES[run?.courseId];
   if (!run || !course) return { ok: false, reason: 'missing', run };
-  if (paradiseRemainingMs(run, now) <= 0) {
-    expireParadiseRun(run, now);
-    return { ok: false, reason: 'expired', run };
-  }
   const pickupIndex = Math.floor(finite(index, -1));
   if (pickupIndex < 0 || pickupIndex >= course.pickupCount) {
     return { ok: false, reason: 'invalid_pickup', run };
@@ -727,10 +712,6 @@ export function collectParadisePickup(run, index, now = Date.now(), { level = 1,
 export function passParadiseRing(run, index, now = Date.now(), { multiplier = 1 } = {}) {
   const course = PARADISE_COURSES[run?.courseId];
   if (!run || !course) return { ok: false, reason: 'missing', run };
-  if (paradiseRemainingMs(run, now) <= 0) {
-    expireParadiseRun(run, now);
-    return { ok: false, reason: 'expired', run };
-  }
   const ringIndex = Math.floor(finite(index, -1));
   if (ringIndex < 0 || ringIndex >= course.ringCount) {
     return { ok: false, reason: 'invalid_ring', run };
@@ -770,7 +751,6 @@ export function paradiseRunProgress(run) {
 export function paradiseObjective(run) {
   const course = PARADISE_COURSES[run?.courseId];
   if (!course) return 'Activate a Ticket to Paradise';
-  if (run.status === 'expired') return 'This Paradise has faded';
   if (run.status === 'complete') return course.completion;
   const progress = paradiseRunProgress(run);
   if (progress.complete) return 'The way home is open';
@@ -800,11 +780,6 @@ export function finishParadiseRun(run, now = Date.now(), { multiplier = 1 } = {}
   const course = PARADISE_COURSES[run?.courseId];
   if (!run || !course) return { ok: false, reason: 'missing', run };
   if (run.status === 'complete') return { ok: false, reason: 'complete', run };
-  if (run.status === 'expired') return { ok: false, reason: 'expired', run };
-  if (paradiseRemainingMs(run, now) <= 0) {
-    expireParadiseRun(run, now);
-    return { ok: false, reason: 'expired', run };
-  }
   if (!paradiseObjectiveComplete(run)) {
     return { ok: false, reason: 'objective_incomplete', run };
   }
@@ -998,10 +973,6 @@ export function paradiseGeometryBarriers(geometry) {
 export function collectParadiseEventQuoin(run, id, rewardDef, now = Date.now(), { level = 1, multiplier = 1 } = {}) {
   const course = PARADISE_COURSES[run?.courseId];
   if (!run || !course) return { ok: false, reason: 'missing', run };
-  if (paradiseRemainingMs(run, now) <= 0) {
-    expireParadiseRun(run, now);
-    return { ok: false, reason: 'expired', run };
-  }
   if (!Array.isArray(run.eventQuoins)) run.eventQuoins = [];
   const key = String(id || '');
   if (!key || run.eventQuoins.includes(key)) return { ok: false, reason: 'already_collected', run };

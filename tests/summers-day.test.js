@@ -23,7 +23,7 @@ import {
   SUMMERS_DAY_ANNEX_TOP_SHELF,
   SUMMERS_DAY_ANNEX_VEIL_Y,
   SUMMERS_DAY_ANNEX_WALLS,
-  SUMMERS_DAY_BONUS_DURATION_MS,
+  SUMMERS_DAY_BONUS_EXIT_PROMPT_MS,
   SUMMERS_DAY_BONUS_DOT_COUNT,
   SUMMERS_DAY_BONUS_DOT_BENEFIT,
   SUMMERS_DAY_BONUS_PRODUCTION_TSID,
@@ -31,7 +31,7 @@ import {
   SUMMERS_DAY_FIRST_OFFER_COOLDOWN_MS,
   SUMMERS_DAY_FIRST_PRODUCTION_TSID,
   SUMMERS_DAY_GUIDE_LINES,
-  SUMMERS_DAY_MAIN_DURATION_MS,
+  SUMMERS_DAY_EXIT_PROMPT_MS,
   SUMMERS_DAY_MAIN_PRODUCTION_TSID,
   SUMMERS_DAY_QUEST_ID,
   SUMMERS_DAY_QURAZY_OFFSETS,
@@ -46,16 +46,14 @@ import {
   createSummersDayRun,
   ensureSummersDayStory,
   enterSummersDayBonus,
-  expireSummersDay,
   finishSummersDay,
   markSummersDayOffered,
   summersDayObjective,
   summersDayQurazyPoints,
-  summersDayRemainingMs,
   summersDayAnnexAtExit,
   summersDayAnnexStreet,
   summersDayStreetPoint,
-} from '../public/js/summers-day.js?v=c15840a1';
+} from '../public/js/summers-day.js?v=5013c7f7';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -75,8 +73,9 @@ test('A Summer’s Day preserves the source quest ids, production templates, and
   assert.equal(SUMMERS_DAY_FIRST_PRODUCTION_TSID, 'LNVIABSR3M139C7');
   assert.equal(SUMMERS_DAY_MAIN_PRODUCTION_TSID, 'LNVIH6NU3M13MJJ');
   assert.equal(SUMMERS_DAY_BONUS_PRODUCTION_TSID, 'LNVIL1E14M13K5I');
-  assert.equal(SUMMERS_DAY_MAIN_DURATION_MS, 300000);
-  assert.equal(SUMMERS_DAY_BONUS_DURATION_MS, 120000);
+  // The quest's exit_delay (blue_and_white_part1.js 107, part2 70): the stuck prompt, not a limit.
+  assert.equal(SUMMERS_DAY_EXIT_PROMPT_MS, 300000);
+  assert.equal(SUMMERS_DAY_BONUS_EXIT_PROMPT_MS, 120000);
   // The Annex's seven quoins, benefit 1 each: +6 iMG at x5 (306_7Jvz8RQ 1:21-1:28), +120 at x100 (cYK).
   assert.equal(SUMMERS_DAY_BONUS_DOT_COUNT, 7);
   assert.equal(SUMMERS_DAY_BONUS_DOT_BENEFIT, 1);
@@ -291,7 +290,7 @@ test('the Annex quoins pay their kinds once each, and only iMG counts as Annex i
   const run = createSummersDayRun({ now: 0 });
   completeMain(run);
   assert.equal(enterSummersDayBonus(run, 2000).ok, true);
-  assert.equal(run.expiresAt, 122000);
+  assert.equal(run.expiresAt, undefined);
   // #560: each pays its benefit times the player's quoin multiplier (items/quoin.js 171-174).
   const first = collectSummersDayBonusQuoin(run, 0, 2100, undefined, { multiplier: 100 });
   assert.deepEqual([first.type, first.amount], ['currants', 100]);
@@ -367,17 +366,16 @@ test('offer and repeat cooldowns match the recovered GSJS rules', () => {
   );
 });
 
-test('main and Annex expiry are exact and block late progress', () => {
+test('the memory and the Annex have no time limit (Glitch asked "Are you stuck?" instead)', () => {
   const main = createSummersDayRun({ now: 5000 });
-  assert.equal(summersDayRemainingMs(main, 304999), 1);
-  assert.equal(expireSummersDay(main, null, 304999).reason, 'time_remaining');
-  assert.equal(advanceSummersDayCheckpoint(main, 'bird_1', 305000).reason, 'expired');
+  assert.equal(main.expiresAt, undefined);
+  assert.equal(advanceSummersDayCheckpoint(main, 'bird_1', 60 * 60 * 1000).ok, true);
 
   const annex = createSummersDayRun({ now: 0 });
   completeMain(annex);
   enterSummersDayBonus(annex, 1000);
-  assert.equal(summersDayRemainingMs(annex, 120999), 1);
-  assert.equal(collectSummersDayBonusQuoin(annex, 0, 121000).reason, 'expired');
+  assert.equal(collectSummersDayBonusQuoin(annex, 0, 60 * 60 * 1000).ok, true);
+  assert.equal(finishSummersDay(annex, { active: {}, completed: [] }, 2 * 60 * 60 * 1000).ok, true);
 });
 
 test('client integration runs the real street, its HUD and deterministic QA', () => {

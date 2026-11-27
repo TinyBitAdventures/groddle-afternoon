@@ -17,10 +17,10 @@ import {
 } from '../public/js/new-player.js?v=f76dcbaf';
 import { createBrowserSaveStore, createMultiplayerSaveStore, createSaveStore } from '../public/js/save-store.js?v=1ccb1d6b';
 import { createInventory } from '../public/js/inventory.js?v=3be7988a';
-import { normalizePlayerSnapshot, parsePlayerSave, restorePlayerSave } from '../public/js/player-save.js?v=0794c268';
+import { normalizePlayerSnapshot, parsePlayerSave, restorePlayerSave } from '../public/js/player-save.js?v=2d0e827e';
 import { createQuoinState } from '../public/js/quoins.js?v=5abad2c7';
 import { createShrineState } from '../public/js/shrines.js?v=48318bec';
-import { PARADISE_COURSES, PARADISE_TICKET_IDS } from '../public/js/paradise-flight.js?v=c6838cae';
+import { PARADISE_COURSES, PARADISE_TICKET_IDS } from '../public/js/paradise-flight.js?v=ab7d41ec';
 import { imaginationFeature, STARTER_UPGRADES } from '../public/js/features/imagination-feature.js?v=b699c633';
 import { RESOURCE_FEATURE_ID, resourceNodesFeature } from '../public/js/features/resource-nodes-feature.js?v=f8383888';
 

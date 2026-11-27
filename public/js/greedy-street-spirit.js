@@ -4,7 +4,7 @@
  * Rules and copy are recovered from:
  * glitch-GameServerJS/quests/greedy_street_spirit*.js and the production
  * theatre location LNVD57N9ERF3TNH. This module stays DOM/Pixi-free so the
- * timed instance, repeat gate, and exact story order can be tested directly.
+ * instance, repeat gate, and exact story order can be tested directly.
  */
 
 export const GREEDY_STREET_SPIRIT_QUEST_ID = 'greedy_street_spirit';
@@ -12,7 +12,12 @@ export const GREEDY_STREET_SPIRIT_REPEAT_ID = 'greedy_street_spirit_reminisce';
 export const GREEDY_STREET_ID = 'INSTANCE_GREEDY_STREET_SPIRIT';
 export const GREEDY_STREET_PRODUCTION_TSID = 'LNVKEU5TKG33K7L';
 export const GREEDY_STREET_GEOMETRY_TSID = 'GNVD57N9ERF3TNH';
-export const GREEDY_STREET_DURATION_MS = 5 * 60 * 1000;
+/**
+ * Austin 2026-11-27 (Glitch's prompt, no timer): Storyland has no time limit. Five minutes in the
+ * quest asked "Are you stuck?" (questInstanceLocation(..., 5*60): greedy_street_spirit.js 168,
+ * greedy_street_spirit_reminisce.js 125, the exit_delay; js/stuck-prompt.js).
+ */
+export const GREEDY_STREET_EXIT_PROMPT_MS = 5 * 60 * 1000;
 export const GREEDY_REPEAT_COOLDOWN_MS = 60 * 60 * 1000;
 
 export const GREEDY_FIRST_REWARD = Object.freeze({
@@ -161,33 +166,15 @@ export function createGreedyStreetSpiritState({
     status: 'running',
     sourceLocation: sourceLocation ? { ...sourceLocation } : null,
     startedAt,
-    deadlineAt: startedAt + GREEDY_STREET_DURATION_MS,
     actSteps: GREEDY_ACTS.map(() => 0),
     actsRead: [],
     lastLine: '',
   };
 }
 
-export function greedyRemainingMs(state, now = Date.now()) {
-  if (!state) return 0;
-  return Math.max(0, finiteTime(state.deadlineAt) - finiteTime(now));
-}
-
-export function expireGreedyStreetSpirit(state, now = Date.now()) {
-  if (!state || state.status !== 'running' || greedyRemainingMs(state, now) > 0) {
-    return { ok: false, reason: state?.status || 'not_expired' };
-  }
-  state.status = 'expired';
-  return { ok: true, status: state.status };
-}
-
 export function pressGreedyAct(state, actIndex, now = Date.now()) {
   if (!state || state.status !== 'running') {
     return { ok: false, reason: state?.status || 'missing' };
-  }
-  if (greedyRemainingMs(state, now) <= 0) {
-    expireGreedyStreetSpirit(state, now);
-    return { ok: false, reason: 'expired' };
   }
   const index = Math.floor(Number(actIndex));
   const act = GREEDY_ACTS[index];
@@ -221,7 +208,6 @@ export function pressGreedyAct(state, actIndex, now = Date.now()) {
 
 export function greedyObjective(state) {
   if (!state) return 'Enter storyland.';
-  if (state.status === 'expired') return 'The bedtime story faded.';
   if (state.status === 'complete') return 'The bedtime story is complete.';
   if (state.status === 'ready') {
     return state.repeat
@@ -379,7 +365,7 @@ export function greedyBoxesEntered(boxes, inside, x, y) {
  * remembering it), { leave: true, abandon } for the exit (abandon: acts left unread), else null.
  */
 export function greedyStreetBoxEnter(state, boxId) {
-  if (!state || state.status === 'expired' || state.status === 'complete') return null;
+  if (!state || state.status === 'complete') return null;
   const done = state.actsRead.length === GREEDY_ACTS.length;
   if (boxId === GREEDY_CHECK_BOX_ID) {
     if (!done && !state.warnedStory) {

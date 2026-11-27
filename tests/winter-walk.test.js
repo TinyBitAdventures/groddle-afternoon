@@ -7,27 +7,25 @@ import { fileURLToPath } from 'node:url';
 import {
   WINTER_HAVEN_STREET_ID,
   WINTER_MOTE_REWARDS,
-  WINTER_WALK_DURATION_MS,
+  WINTER_WALK_EXIT_PROMPT_MS,
   WINTER_WALK_ICE_REWARD,
   WINTER_WALK_QUEST_ID,
   WINTER_WALK_STREET_ID,
   collectWinterMote,
   createWinterWalkState,
   enterWinterHaven,
-  expireWinterWalk,
   finishWinterWalk,
   returnToWinterWalk,
   winterWalkObjective,
   winterWalkProgress,
-  winterWalkRemainingMs,
-} from '../public/js/winter-walk.js?v=89f8dc32';
+} from '../public/js/winter-walk.js?v=faad1d46';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const publicDir = path.join(here, '..', 'public');
 
-test('Winter Walk uses the source timer, quest id, and first-run ice reward', () => {
+test('Winter Walk uses the source prompt delay, quest id, and first-run ice reward', () => {
   assert.equal(WINTER_WALK_QUEST_ID, 'winter_walk');
-  assert.equal(WINTER_WALK_DURATION_MS, 300000);
+  assert.equal(WINTER_WALK_EXIT_PROMPT_MS, 300000, 'winter_walk.js 110: exit_delay 5*60, the stuck prompt');
   assert.equal(WINTER_WALK_ICE_REWARD, 23);
   // The quest's own templates (winter_walk.js:24-33), rebuilt from players' pictures (js/winter-walk-streets.js).
   assert.equal(WINTER_WALK_STREET_ID, 'GIFH2AKJ5I735SV');
@@ -73,12 +71,13 @@ test('route returns from the haven to the snowy finale and rewards only the firs
   assert.equal(finishWinterWalk(repeat, 2000).iceReward, 0);
 });
 
-test('five-minute expiry is exact and blocks late route progress', () => {
+test('the walk has no time limit (Glitch asked "Are you stuck?" instead)', () => {
   const state = createWinterWalkState({ now: 5000 });
-  assert.equal(winterWalkRemainingMs(state, 304999), 1);
-  assert.equal(expireWinterWalk(state, 304999).reason, 'time_remaining');
-  assert.equal(collectWinterMote(state, 'surface', 0, 305000).reason, 'expired');
-  assert.equal(state.status, 'expired');
+  assert.equal(state.expiresAt, undefined);
+  assert.equal(collectWinterMote(state, 'surface', 0, 60 * 60 * 1000).ok, true);
+  assert.equal(enterWinterHaven(state, 61 * 60 * 1000).ok, true);
+  assert.equal(returnToWinterWalk(state, 62 * 60 * 1000).ok, true);
+  assert.equal(finishWinterWalk(state, 63 * 60 * 1000).ok, true);
 });
 
 test('client ships clean recovered exit art, three-phase routing and autoplay QA, and no falling snow', () => {
