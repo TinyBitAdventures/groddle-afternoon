@@ -2814,9 +2814,14 @@
   "deployed": "2026-11-26"
  },
  "git": {
-  "commits": 3771,
+  "commits": 3775,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-26",
+    "kind": "improve",
+    "text": "Avatar part art can be hosted on another origin"
+   },
    {
     "date": "2026-11-26",
     "kind": "improve",
@@ -2931,14 +2936,9 @@
     "date": "2026-11-26",
     "kind": "fix",
     "text": "A street's Notice Board keeps its pinned notes while the window waits on Play here"
-   },
-   {
-    "date": "2026-11-26",
-    "kind": "fix",
-    "text": "A window asleep after a long sleep keeps showing your house floor until Play here"
    }
   ]
  },
- "tests": 1461,
+ "tests": 1462,
  "generatedAt": "2026-11-26"
 }
