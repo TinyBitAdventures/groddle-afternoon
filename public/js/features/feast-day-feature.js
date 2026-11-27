@@ -38,6 +38,7 @@ import {
   FEAST_PILE_CLASS,
   FEAST_SPOTS,
   biteSolo,
+  fitPileTap,
   createFeastDayState,
   feastDayKey,
   refillDue,
@@ -193,6 +194,8 @@ function redraw(engine) {
       sprite.zIndex = p.s % 2 ? 11 : 12;
       sprite.eventMode = 'static';
       sprite.cursor = 'pointer';
+      // G1335: its own slot is its tap area, so a tap gets the pile nearest the finger, not a neighbour drawn in front.
+      fitPileTap(sprite, p.s);
       engine.entityLayer.addChild(sprite);
       const target = engine.register({
         classId: FEAST_PILE_CLASS,

@@ -61,6 +61,30 @@ export const FEAST_SPOTS = Object.freeze(FEAST_DAY_RULES.runs.flatMap(([from, to
   return from + Math.floor((i * (to - from) + Math.floor(n / 2)) / n);
 })));
 
+/**
+ * G1335: each pile's tap area, as wide as the larger gap to a neighbour in its run (19-21 px), so a
+ * tap goes to the pile whose spot is nearest the finger. The piles stand closer than their art is
+ * wide (up to 89 px) and every other one is drawn behind, so the front art under the finger (js/pick.js)
+ * was often a neighbour's: on a phone, 6-7 px apart, a tap opened the next pile.
+ */
+export const PILE_TAP_W = Object.freeze(FEAST_DAY_RULES.runs.flatMap(([, , spots], r) => {
+  const at = FEAST_DAY_RULES.runs.slice(0, r).reduce((n, run) => n + run[2], 0);
+  return Array.from({ length: spots }, (_, i) => {
+    const x = FEAST_SPOTS[at + i];
+    const gaps = [i > 0 ? x - FEAST_SPOTS[at + i - 1] : 0, i < spots - 1 ? FEAST_SPOTS[at + i + 1] - x : 0];
+    return Math.max(...gaps) || PILE_HALF * 2;
+  });
+}));
+
+/** G1335: a pile sprite's tap area (js/pick.js spriteWorldHitBox: its width, no padding); its height stays its art's. */
+export function fitPileTap(sprite, s) {
+  const w = PILE_TAP_W[s];
+  if (!sprite || !w) return sprite;
+  sprite._worldHitW = w;
+  sprite._worldHitExact = true;
+  return sprite;
+}
+
 export const FEAST_DAY_LINES = Object.freeze({
   verb: 'Eat',
   verbTip: 'Eat a bite of the feast, right here',
