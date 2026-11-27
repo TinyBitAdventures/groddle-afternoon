@@ -61,6 +61,8 @@ export function packRowClearance({ rowTop, left = null, right = null }) {
  * Keeps the band's --pack-clear-l / --pack-clear-r (its padding, style.css) on packRowClearance from
  * the real rects: the open side sheet (the root's data-sheet) with --inset-l, the drawer with --inset-r.
  * It follows the insets, the sheet, the drawer and the row as they change (resize, open, close).
+ * The pack bar uses it (band the bar, row the row), and so does Decoration and Cultivation Mode's tray
+ * (band and row the tray, js/ui/home-builder.js, #743): one rule for both.
  */
 export function mountPackClearance({ root, band, row, drawer = () => null, setData = () => {} } = {}) {
   if (!root || !band || !row) return { sync() {} };
@@ -79,7 +81,7 @@ export function mountPackClearance({ root, band, row, drawer = () => null, setDa
   function sync() {
     frame = 0;
     const rowRect = row.getBoundingClientRect();
-    if (!rowRect.height) return;
+    if (!rowRect?.height) return;
     const sheet = root.dataset.sheet ? doc.getElementById(root.dataset.sheet) : null;
     const side = drawer();
     const box = (e, inset) => (shown(e) && inset > 0 ? { inset, bottom: e.getBoundingClientRect().bottom } : null);

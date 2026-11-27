@@ -24,6 +24,8 @@
  * floor's front edge over the tray); edgePan is maybeScrollVPByDragging's edge test.
  */
 
+import { mountPackClearance } from './pack-row.js?v=f5ef5f6c';
+
 /**
  * DecorateModel.as furniture_panesA: the furniture bag's filter categories, in the source's
  * order. `prefixes` matches class families (bag_furniture_*, trophy_*). The remake's catalog has
@@ -326,6 +328,10 @@ export function createHomeBuilder({ root, doc = root?.ownerDocument }) {
   const pop = el(doc, 'div', { class: 'hb-pop', id: 'homes-pop', role: 'toolbar', hidden: true, 'data-ctx': 'home-edit' });
   const place = el(doc, 'button', { type: 'button', class: 'hb-place', id: 'homes-place', hidden: true, 'data-ctx': 'home-edit' });
   root.append(bar, pop, place);
+  // #743: the tray steps aside for a left sheet or the Social drawer only where one reaches down past its
+  // top, by the pack row's rule (js/ui/pack-row.js packRowClearance; style.css reads its --pack-clear-l
+  // and -r): a Furniture Store that ends above it no longer takes its width.
+  mountPackClearance({ root, band: tray, row: tray, drawer: () => doc.getElementById?.('local-chat-dock') || null });
   const html = doc.documentElement;
   // TRAY GRAB: a phone only (game.js puts html.touch-phone on from the first paint).
   const phone = Boolean(html?.classList?.contains('touch-phone'));

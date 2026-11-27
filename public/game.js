@@ -4,7 +4,7 @@
  */
 import { ITEM_ICONS, ITEM_LABELS, getVerbsFor, ordinaryItems, runVerb } from './content.js?v=c46159de';
 import { createErrorOnce, createFeatureHost, createFrameStages } from './js/feature-host.js?v=b87e2cbc';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=ee2c8643';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=a62816d9';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, enterHintPick, groupHead, hoverRimShown, reachGlowTargets, spriteHasRimArt, rimArtParts, trimmedIconUrl, drawTileArt } from './js/enter-chooser.js?v=74f4964a';
 import { firstTendKey, STICK_TEND_DELAY_MS, STICK_TEND_DIRS, STICK_TEND_REPEAT_MS, stepTendKey, stepTendKeys, stickTendKey, tendKeyAction } from './js/garden-tend.js?v=a7470c4a';
 import { avatarHitBox, behindFloor, bodyReachDistance, OUT_OF_REACH_LINE, playerClickBox } from './js/reach.js?v=456da8a8';
@@ -547,7 +547,7 @@ import { beginDrag, installDropRegistry, packStackOf, registerDropTarget, touchL
 import { FLOAT_TEXT_Z, SPEECH_BUBBLE_Z } from './js/fx-z.js?v=18dda7e3';
 import { GAIN_FLOAT, GAIN_FLOAT_MS, gainFloatPose, gainFloatSinks } from './js/gain-float.js?v=caf16853';
 import { hasPouch } from './js/elemental-pouch.js?v=42702eda';
-import { createPackRow, mountPackClearance, packBandRange, packCountText, packSearchEntries, packSearchResults, packSlotTip } from './js/ui/pack-row.js?v=615f7790';
+import { createPackRow, mountPackClearance, packBandRange, packCountText, packSearchEntries, packSearchResults, packSlotTip } from './js/ui/pack-row.js?v=f5ef5f6c';
 import { listAnimalFeedOptions, piggyFeedTip } from './js/animals.js?v=ca4d0ae5';
 import { pickerEmptyLine, pickerMaxCount, pickerOptionsFor, pickerTakesCount } from './js/animals.js?v=ca4d0ae5';
 import {

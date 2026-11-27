@@ -61,6 +61,39 @@ let playwright = null;
 // R52: the WebKit build on a non-Ubuntu Linux needs its environment before Playwright loads.
 try { await import('../tools/qa/playwright-env.mjs'); playwright = await import('playwright'); } catch { /* no Playwright */ }
 
+describe('#743 the Decoration Mode tray keeps its width beside a sheet that ends above it', () => {
+  it('home-builder.js mounts the pack row\'s reach rule on the tray, and style.css places the tray by it (no copy of the rule)', () => {
+    const builder = read('public/js/ui/home-builder.js');
+    assert.match(builder, /import \{ mountPackClearance \} from '\.\/pack-row\.js(\?v=[0-9a-f]+)?';/);
+    assert.match(builder, /mountPackClearance\(\{ root, band: tray, row: tray, drawer: /);
+    const rule = css.slice(css.indexOf('[data-ui="modern"] #game-root .hb-tray {'), css.indexOf('}', css.indexOf('[data-ui="modern"] #game-root .hb-tray {')));
+    assert.match(rule, /left: calc\(var\(--pack-clear-l, 0px\) \+ var\(--hud-inset\)\);/);
+    assert.match(rule, /right: calc\(var\(--pack-clear-r, 0px\) \+ var\(--hud-inset\)\);/);
+    assert.doesNotMatch(rule, /--inset-l|--inset-r/);
+  });
+
+  it('the reach rule on a tray: a store ending above the tray leaves it whole, one reaching past its top moves it', async () => {
+    const { mountPackClearance } = await import('../public/js/ui/pack-row.js?v=f5ef5f6c');
+    const props = {};
+    const style = { setProperty: (k, v) => { props[k] = v; }, getPropertyValue: (k) => props[k] || '' };
+    let sheetBottom = 338;
+    const sheet = { hidden: false, getClientRects: () => [1], getBoundingClientRect: () => ({ bottom: sheetBottom }) };
+    const rootEl = { dataset: { sheet: 'vendor-panel' }, style: { getPropertyValue: (k) => (k === '--inset-l' ? '376px' : '') }, ownerDocument: { getElementById: (id) => (id === 'vendor-panel' ? sheet : null) }, querySelectorAll: () => [] };
+    const tray = { style, getBoundingClientRect: () => ({ top: 622, height: 172 }) };
+    const was = globalThis.getComputedStyle;
+    globalThis.getComputedStyle = (e) => ({ getPropertyValue: (k) => e.style.getPropertyValue(k) });
+    try {
+      const c = mountPackClearance({ root: rootEl, band: tray, row: tray });
+      assert.equal(props['--pack-clear-l'], '0px');
+      sheetBottom = 700;
+      c.sync();
+      assert.equal(props['--pack-clear-l'], '376px');
+    } finally {
+      globalThis.getComputedStyle = was;
+    }
+  });
+});
+
 const SAFE_T = 86; // an iPhone 16 Pro's 62 px inset plus the Home Screen app's 24 px fade clearance
 const SAFE_B = 34;
 
@@ -151,7 +184,8 @@ const RUNS = [
   ['chromium', 'a computer in Chrome, 1352x802', { phone: false }],
 ];
 for (const [engine, label, opts] of RUNS) {
-  describe(`#743 Decoration Mode then the Furniture Store: ${label}`, { skip: !playwright && 'no playwright' }, () => {
+  // GRODDLE_TEST_PURE=1 runs only the checks above (no browser, no browser lock).
+  describe(`#743 Decoration Mode then the Furniture Store: ${label}`, { skip: (!playwright && 'no playwright') || (process.env.GRODDLE_TEST_PURE === '1' && 'GRODDLE_TEST_PURE') }, () => {
     let br = null;
     before(async () => {
       const { openBrowser } = await import('../tools/qa/browser.mjs');

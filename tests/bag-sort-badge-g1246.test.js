@@ -29,7 +29,7 @@ import {
 } from '../public/js/pack-slots.js?v=38e4aea5';
 import { ITEM_CATALOG, isToolItem } from '../public/js/inventory.js?v=3be7988a';
 import { bagsFeature } from '../public/js/features/bags-feature.js?v=426f342b';
-import { packSlotTip } from '../public/js/ui/pack-row.js?v=615f7790';
+import { packSlotTip } from '../public/js/ui/pack-row.js?v=f5ef5f6c';
 import { CHECK_ICON, verbRowInner } from '../public/js/ui/verb-menu.js?v=1ad4f969';
 
 const ROOT = join(import.meta.dirname, '..');

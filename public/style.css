@@ -14344,8 +14344,10 @@ body:has(#quest-dialogue:not([hidden])) .prompt-stack { z-index: calc(var(--z-mo
 [data-ui="modern"] #game-root .hb-banner .hb-close { display: inline-grid; place-items: center; flex: 0 0 auto; width: 32px; height: 32px; padding: 0; border: 0; border-radius: var(--radius-pill); background: transparent; color: var(--text-muted); font: inherit; font-size: var(--fs-2xl); line-height: var(--lh-none); cursor: pointer; }
 [data-ui="modern"] #game-root .hb-banner .hb-close:hover { background: var(--surface-hover); color: var(--text); }
 [data-ui="modern"] #game-root .hb-tray {
-  left: calc(var(--inset-l, 0px) + var(--hud-inset));
-  right: calc(var(--inset-r, 0px) + var(--hud-inset));
+  /* #743: clear of a left sheet or the drawer only where one reaches down past the tray's top, the pack row's
+     rule (js/ui/home-builder.js mounts js/ui/pack-row.js mountPackClearance on the tray). */
+  left: calc(var(--pack-clear-l, 0px) + var(--hud-inset));
+  right: calc(var(--pack-clear-r, 0px) + var(--hud-inset));
   bottom: var(--hud-inset);
   max-width: 1180px;
   margin: 0 auto;

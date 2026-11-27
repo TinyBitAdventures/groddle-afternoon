@@ -17,7 +17,7 @@ import {
   normalizeCultivationState,
 } from '../public/js/home-cultivation.js?v=b2868d29';
 import { MOVABLE_FIXTURES, fixtureFits } from '../public/js/home-street-fixtures.js?v=d4e5b56a';
-import { HOUSE_STYLE_KEYS, houseDoorway, houseFixtureX } from '../public/js/features/homes-feature.js?v=ffd37030';
+import { HOUSE_STYLE_KEYS, houseDoorway, houseFixtureX } from '../public/js/features/homes-feature.js?v=14b37936';
 
 const atFor = (layout, style) => {
   const house = houseFixtureX(layout, style);
