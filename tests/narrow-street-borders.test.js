@@ -90,8 +90,9 @@ describe('report #337: Semsan Simile at actual size between borders', () => {
     }
     // Off a narrow street only its own important values go: Pixi's inline size stays under the stylesheet.
     assert.match(pin, /if \(style\.getPropertyPriority\(prop\) === 'important'\) style\.removeProperty\(prop\);/);
-    // Pixi's autoDensity rewrites the inline size on every renderer resize, so each resize pins it again.
-    const resizes = game.match(/app\.renderer\.resize\(VIEW_W, VIEW_H, \w+\);\s+app\.canvas\.dataset\.renderResolution = String\(\w+\);\s+pinStageCanvasSize\(\);/g) || [];
+    // Pixi's autoDensity rewrites the inline size on every renderer resize, so each resize pins it again
+    // (FLASH: the stage sizer's own resize too, js/stage-resize.js, which on WebKit lands under the copy).
+    const resizes = game.match(/app\.renderer\.resize\((?:VIEW_W, VIEW_H, \w+\);\s+app\.canvas\.dataset\.renderResolution = String\(\w+\);|w, h, res\);(?:\s+\/\/[^\n]*)*)\s+pinStageCanvasSize\(\);/g) || [];
     assert.equal(resizes.length, (game.match(/app\.renderer\.resize\(/g) || []).length);
     // The rule that wins without the NARROW STREETS block is still there (kept, not replaced).
     const css = readFileSync(join(here, '../public/style.css'), 'utf8');

@@ -65,3 +65,17 @@ from `/console/` (local only); the Original zoom; no page errors.
   only counts those: a real player's removed account looks the same, so deleting them takes `--orphans`.
 - `--game=<checkout>/public --ws=ws://127.0.0.1:<port>/ws` (local) runs it against a lane's game files
   and its own test realtime server: the page's socket is piped to that server instead of the shared 8793.
+
+## resize-flash.mjs: does the street flash black when the canvas resizes?
+
+    node tools/qa/resize-flash.mjs                                   # WebKit iPhone 15 Pro, 402x812: open and close a bag
+    node tools/qa/resize-flash.mjs --scenario=rotate                 # turn the phone and back
+    node tools/qa/resize-flash.mjs --scenario=desktop --engine=chromium   # a computer's window grows and shrinks
+
+WebKit paints a WebGL canvas black for the frame its backing store changes size; the game copies the
+street over the canvas for that frame (js/stage-resize.js). The tool screenshots as fast as it can for
+900 ms after each change and counts shots whose street is mostly black, and on WebKit it also checks
+that every backing store change happened under the copy (`uncovered`, which a slow screenshot cannot
+miss). `laggedFrames` counts frames where the canvas changed on-screen size but not its backing store
+(Chrome must stay at 0). Exits 1 on a black shot or an uncovered resize. About 40 s under the browser
+lock; `--query=resizesplit=0` turns the copy off, `--keep=<dir>` saves the black shots.

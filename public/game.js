@@ -844,6 +844,7 @@ import {
 } from './js/movement.js?v=f4be1a05';
 import { easeCameraAxis } from './js/camera-feel.js?v=e668afc5';
 import { renderResolution, resolutionCap, RESOLUTION_STEP, phoneZoomResolution } from './js/render-density.js?v=74c6f5f9';
+import { createCanvasCover, createStageResize, splitStageResize } from './js/stage-resize.js?v=70c3cb79';
 // g458: low energy and mood turn amber and red, and a click offers something from the pack.
 import { makingNeeds, vitalMenuEmpty, vitalMenuHeading, vitalSnacks } from './js/vitals.js?v=5efac5f3';
 import { DEFAULT_VP_H, LOCATION_VIEW_W, VIEW_CEIL_H, stageFor, sceneViewCap, sceneViewWidthCap, zoomMovesStage, phoneZoomSpan, phoneCameraAnchor, phoneFeetWorldHeight, phoneGroundWorldHeight, phoneSceneDrop, reachableFloorY, sceneBottomLine, sceneGroundLine, stageBandColour, stageEdgeColour, stageEdgeSampler, stageRoomBeside, stageRoomInBand } from './js/location-view.js?v=b178fe66';
@@ -2211,9 +2212,22 @@ function syncRenderResolution() {
   if (!app?.renderer || !app.canvas || pinchPreview) return;
   const cssWidth = app.canvas.getBoundingClientRect().width;
   const next = stageResolution(cssWidth);
-  if (Math.abs(next - app.renderer.resolution) < RESOLUTION_STEP / 2) return;
-  app.renderer.resize(VIEW_W, VIEW_H, next);
-  app.canvas.dataset.renderResolution = String(next);
+  const target = stageSizer?.target();
+  if (target && target.w === VIEW_W && target.h === VIEW_H && Math.abs(next - target.res) < RESOLUTION_STEP / 2) return;
+  sizeRenderer(next);
+}
+
+/**
+ * FLASH (js/stage-resize.js): the renderer's size. On Safari's engine the street is copied over the
+ * canvas for the frame its backing store changes (WebKit paints that frame black), then drawn at the
+ * new size beneath; elsewhere at once. Made with the app.
+ */
+let stageSizer = null;
+/** The renderer at the view's size (VIEW_W x VIEW_H) and `resolution`, through stageSizer. */
+function sizeRenderer(resolution) {
+  if (stageSizer) stageSizer.request(VIEW_W, VIEW_H, resolution);
+  else app.renderer.resize(VIEW_W, VIEW_H, resolution);
+  app.canvas.dataset.renderResolution = String(resolution);
   pinStageCanvasSize();
 }
 
@@ -2646,9 +2660,7 @@ function syncLocationViewHeight({ keepFraming = false } = {}) {
 function resizeRendererToView(cssWidth) {
   // A scene can change the scale without the canvas changing size: keep the density with it.
   const resolution = stageResolution(cssWidth);
-  app.renderer.resize(VIEW_W, VIEW_H, resolution);
-  app.canvas.dataset.renderResolution = String(resolution);
-  pinStageCanvasSize();
+  sizeRenderer(resolution);
 }
 
 /**
@@ -34753,6 +34765,18 @@ async function main() {
   app.canvas.dataset.mode = GAME_MODE;
   app.canvas.tabIndex = 0;
   root.insertBefore(app.canvas, document.getElementById('overlay'));
+  stageSizer = createStageResize({
+    resize: (w, h, res) => {
+      app.renderer.resize(w, h, res);
+      // Pixi's autoDensity wrote the canvas's inline size again (pinStageCanvasSize).
+      pinStageCanvasSize();
+    },
+    render: () => app.render(),
+    cover: createCanvasCover(app.canvas),
+    split: splitStageResize({ ua: navigator.userAgent, param: new URLSearchParams(location.search).get('resizesplit') }),
+    initial: { w: app.screen.width, h: app.screen.height, res: app.renderer.resolution },
+  });
+  app.canvas.dataset.resizeSplit = stageSizer.split ? '1' : '0';
   // The stage the window gave before the canvas existed (syncLocationViewHeight).
   app.canvas.dataset.viewWidth = String(VIEW_W);
   app.canvas.dataset.stageScale = STAGE_SCALE.toFixed(3);
