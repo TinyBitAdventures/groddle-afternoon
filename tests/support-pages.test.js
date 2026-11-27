@@ -238,9 +238,24 @@ describe('Support on the website: a player manages their own reports (php, throw
     assert.match(rp, /<input type="hidden" name="_wpnonce" value="[0-9a-f]{10}" \/>/);
     for (const html of [r.list.html, r.thread.html, r.reportPage, r.signedOut.body]) {
       assert.doesNotMatch(pane(html), /\u2014/, 'no em dashes');
-      assert.match(html, /community\.css\?v=community-20/);
+      assert.match(html, /community\.css\?v=community-21/);
       assert.match(html, /\/site\/theme\.js/, 'the theme script sets light or dark before paint');
     }
+  });
+
+  it('both forms carry the drop zone, hidden until its script shows it, with the plain file field still in the form', () => {
+    for (const [name, html] of [['reply', pane(r.reportPage)], ['new report', pane(r.newReport.form.html)]]) {
+      const form = html.slice(html.indexOf('<form class="cform csupport-form"'), html.indexOf('</form>', html.indexOf('<form class="cform csupport-form"')));
+      assert.ok(form.length > 200, `${name}: the form`);
+      assert.match(form, /<div class="csupport-drop" data-drop="" hidden><button class="csupport-drop-zone" type="button" data-drop-zone="">/, `${name}: the zone, hidden without JavaScript`);
+      assert.match(form, /<span class="csupport-drop-mouse">Drop pictures or a text file here, or <span class="csupport-drop-choose">choose files<\/span><\/span>/, `${name}: its words`);
+      assert.match(form, /<span class="csupport-drop-touch">Tap to add pictures or a text file<\/span>/, `${name}: a phone's words`);
+      assert.match(form, /<ul class="csupport-chosen" data-chosen="" aria-label="Files to send" hidden><\/ul>/);
+      assert.match(form, /<p class="csaid csupport-drop-said" role="status" aria-live="polite" data-drop-said=""><\/p>/);
+      assert.match(form, /<label class="csupport-attach"><span>Add pictures or a text file<\/span><input type="file" name="files\[\]" multiple accept="\.jpg,\.jpeg,\.png,\.webp,\.txt,\.log,[^"]*" \/><\/label>/, `${name}: the plain field as before`);
+      assert.ok(form.indexOf('data-drop=""') < form.indexOf('name="files[]"'), `${name}: the zone above the field`);
+    }
+    assert.match(pane(r.newReport.form.html), /data-support-new=""/);
   });
 
   it('what the game sent shows plainly: street, build, browser, screen, page errors; the website\'s says so', () => {
@@ -318,9 +333,117 @@ describe('Support: the site code (groddle-afternoon-site)', { skip: skipWithoutS
     assert.match(src('src/AdminConsolePage.php'), /ASSET_KEY = 'skin-15'/);
   });
 
+  it('the drop zone\'s script is loaded with the page\'s key for both forms, and its styles are tokens', () => {
+    const js = src('community/community.js');
+    assert.match(js, /document\.querySelector\('form\[data-support-reply\], form\[data-support-new\]'\)/);
+    assert.match(js, /import\(`\.\/support-files\.js\$\{v\}`\)/, 'with community.js\'s own ?v=');
+    assert.match(js, /m\.wireSupportFiles\(supportForm, \{ area: supportForm\.closest\('\.cx-conv'\) \|\| supportForm \}\)/, 'a drop on the pane counts');
+    assert.match(js, /stops\.push\(\(\) => \{ gone = true; stopFiles\?\.\(\); \}\)/, 'stopped when the view goes (object addresses freed)');
+    const css = src('community/community.css');
+    assert.match(css, /\.csupport-drop-zone \{[^}]*border: 2px dashed var\(--cx-strong\)/);
+    assert.match(css, /\.csupport-drop\[data-over\] \.csupport-drop-zone \{[^}]*border-color: var\(--accent\)/, 'lit while files are dragged over');
+    assert.match(css, /@media \(hover: hover\) \{ \.csupport-drop-zone:hover \{[^}]*border-color: var\(--accent\)/, 'a hover look where there is a mouse (never stuck after a tap)');
+    assert.match(css, /@media \(hover: none\) and \(pointer: coarse\) \{\s*\.csupport-drop-mouse \{ display: none; \}/, 'a phone reads Tap to add');
+    assert.match(src('src/CommunityPages.php'), /ASSET_KEY = 'community-21'/);
+  });
+
   it('the rail has a Support entry for signed-in players', () => {
     const pages = src('src/CommunityPages.php');
     assert.match(pages, /\$rail \.= SupportPages::railSection\(\(new TicketStore\(\$this->minn->db\)\)->unreadCount\(\(int\) \$viewer\['id'\]\), \$active === SupportPages::ACTIVE\);/);
     assert.match(src('src/SupportPages.php'), /\$main = '<section class="cx-conv csupport csupport-out"/);
+  });
+});
+
+describe('Support: the drop zone\'s checks, as the server\'s (community/support-files.js)', { skip: skipWithoutSite }, async () => {
+  const f = HAS_SITE ? await import(pathToFileURL(sitePath('community/support-files.js')).href) : {};
+  const file = (name, size = 1000, lastModified = 1, type = '') => ({ name, size, lastModified, type });
+  const KB = 1024;
+
+  it('the limits are the server\'s own (ReportPicture, ReportFile, SupportPages)', () => {
+    const num = (cls, k) => Number((src(`src/${cls}.php`).match(new RegExp(`const ${k} = ([\\d_]+);`)) || [])[1]?.replaceAll('_', ''));
+    assert.equal(f.LIMITS.pictures, num('ReportPicture', 'MAX_PER_MESSAGE'));
+    assert.equal(f.LIMITS.pictureBytes, num('ReportPicture', 'UPLOAD_MAX_BYTES'));
+    assert.equal(f.LIMITS.texts, num('ReportFile', 'MAX_PER_MESSAGE'));
+    assert.equal(f.LIMITS.textBytes, num('ReportFile', 'MAX_BYTES'));
+    assert.match(src('src/SupportPages.php'), new RegExp(`PICTURE_EXTENSIONS = \\['${f.PICTURE_EXTENSIONS.join("', '")}'\\]`));
+    assert.match(src('src/ReportFile.php'), new RegExp(`EXTENSIONS = \\['${f.TEXT_EXTENSIONS.join("', '")}'\\]`));
+    assert.match(src('src/ReportPicture.php'), /'That picture is larger than 10 MB\.'/, 'the limit the words name');
+  });
+
+  it('a PNG is added; a renamed .html is refused by its name, as the server does', () => {
+    const png = file('shot.PNG', 200 * KB);
+    let r = f.addFiles([], [png]);
+    assert.deepEqual(r.files, [png]);
+    assert.deepEqual(r.refused, []);
+    assert.equal(f.kindOf('shot.PNG'), 'picture');
+    assert.equal(f.kindOf('a.webp'), 'picture');
+    assert.equal(f.kindOf('game.LOG'), 'text');
+    for (const name of ['page.html', 'shot.png.html', 'notes.txt.html', 'drawing.svg', 'clip.gif', 'noending']) {
+      r = f.addFiles([png], [file(name)]);
+      assert.deepEqual(r.files, [png], `${name} refused`);
+      assert.equal(r.refused[0].why, `${name} was not added: only pictures (JPEG, PNG or WebP) and text files (.txt or .log) can be added.`);
+    }
+  });
+
+  it('counts: a third text file and a fifth picture are refused, the rest kept in order', () => {
+    const texts = [file('a.txt'), file('b.log')];
+    let r = f.addFiles(texts, [file('c.txt'), file('d.png')]);
+    assert.deepEqual(r.files.map((x) => x.name), ['a.txt', 'b.log', 'd.png'], 'appended after the ones chosen');
+    assert.equal(r.refused.length, 1);
+    assert.equal(r.refused[0].why, 'c.txt was not added: a message carries at most 2 text files.');
+    const four = [1, 2, 3, 4].map((n) => file(`p${n}.jpg`, 50 * KB, n));
+    r = f.addFiles([], [...four, file('p5.webp', 50 * KB, 5), file('notes.txt')]);
+    assert.deepEqual(r.files.map((x) => x.name), ['p1.jpg', 'p2.jpg', 'p3.jpg', 'p4.jpg', 'notes.txt'], 'a text file still fits beside four pictures');
+    assert.equal(r.refused[0].why, 'p5.webp was not added: a message carries at most 4 pictures.');
+    // Removing one makes room again.
+    r = f.addFiles(f.removeFile(r.files, 1), [file('p5.webp', 50 * KB, 5)]);
+    assert.deepEqual(r.files.map((x) => x.name), ['p1.jpg', 'p3.jpg', 'p4.jpg', 'notes.txt', 'p5.webp']);
+  });
+
+  it('sizes: a 300 KB .txt and an 11 MB picture are refused; 256 KB and 10 MB exactly pass; an empty file is refused', () => {
+    let r = f.addFiles([], [file('console.txt', 300 * KB)]);
+    assert.deepEqual(r.files, []);
+    assert.equal(r.refused[0].why, 'console.txt was not added: a text file can be up to 256 KB. Send the part around the problem.');
+    r = f.addFiles([], [file('big.jpg', 11 * 1024 * KB)]);
+    assert.equal(r.refused[0].why, 'big.jpg was not added: a picture can be up to 10 MB.');
+    r = f.addFiles([], [file('edge.txt', 256 * KB), file('edge.png', 10 * 1024 * KB)]);
+    assert.equal(r.files.length, 2);
+    r = f.addFiles([], [file('empty.log', 0)]);
+    assert.equal(r.refused[0].why, 'empty.log was not added: it is empty.');
+  });
+
+  it('duplicates: the same file twice is added once, in one drop or across two', () => {
+    const a = file('a.png', 5000, 42);
+    let r = f.addFiles([], [a, { ...a }]);
+    assert.equal(r.files.length, 1);
+    assert.equal(r.refused[0].why, 'a.png is already added.');
+    r = f.addFiles(r.files, [{ ...a }, file('a.png', 5001, 42)]);
+    assert.deepEqual(r.files.map((x) => x.size), [5000, 5001], 'same name, other bytes: a different file');
+    assert.ok(f.sameFile(a, { ...a }));
+    assert.ok(!f.sameFile(a, { ...a, lastModified: 43 }));
+  });
+
+  it('names: a pasted screenshot is named for what it is; a picture with no ending gets one from its type', () => {
+    assert.equal(f.uploadName('image.png', 'image/png', { pasted: 1 }), 'pasted-picture-1.png');
+    assert.equal(f.uploadName('', 'image/jpeg', { pasted: 2 }), 'pasted-picture-2.jpg');
+    assert.equal(f.uploadName('Screenshot', 'image/webp'), 'Screenshot.webp');
+    assert.equal(f.uploadName('log', 'text/plain'), 'log.txt');
+    assert.equal(f.uploadName('page.html', 'text/html'), 'page.html', 'never renamed into something allowed');
+    assert.equal(f.uploadName('evil.html', 'image/png'), 'evil.html', 'an ending it has is kept, to be refused by it');
+    assert.equal(f.uploadName('clip', 'image/gif', { pasted: 3 }), 'clip');
+  });
+
+  it('the lines a player reads: sizes as the server writes them, what was added and what was not, no em dashes', () => {
+    assert.equal(f.sizeText(10), '1 KB');
+    assert.equal(f.sizeText(2048), '2 KB');
+    assert.equal(f.sizeText(300 * KB), '300 KB');
+    assert.equal(f.sizeText(1024 * KB), '1 MB');
+    assert.equal(f.sizeText(2.5 * 1024 * KB), '2.5 MB');
+    assert.deepEqual(f.addedLine(f.addFiles([], [file('a.png'), file('b.png', 2)])), { text: '2 files added.', bad: false });
+    assert.deepEqual(f.addedLine(f.addFiles([], [file('a.png'), file('x.html')])),
+      { text: '1 file added. x.html was not added: only pictures (JPEG, PNG or WebP) and text files (.txt or .log) can be added.', bad: true });
+    assert.deepEqual(f.addedLine({ added: [], refused: [] }), { text: '', bad: false });
+    assert.doesNotMatch(src('community/support-files.js'), /\u2014/);
+    assert.doesNotMatch(src('src/SupportPages.php'), /\u2014/);
   });
 });

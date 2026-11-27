@@ -362,7 +362,7 @@ try {
     $madeId = preg_match('#/chat/support/(\d+)/#', (string) ($made['location'] ?? ''), $m) ? (int) $m[1] : 0;
     $consoleNew = $madeId ? $consoleThread($madeId) : [];
     $out['newReport'] = [
-        'form' => ['status' => $newPage['status'], 'multipart' => str_contains($newPage['body'] ?? '', 'enctype="multipart/form-data"'), 'error' => $newPage['error'] ?? null],
+        'form' => ['status' => $newPage['status'], 'multipart' => str_contains($newPage['body'] ?? '', 'enctype="multipart/form-data"'), 'error' => $newPage['error'] ?? null, 'html' => $newPage['body'] ?? ''],
         'status' => $made['status'], 'location' => $made['location'] ?? null, 'error' => $made['error'] ?? null,
         'subject' => $consoleNew['body']['ticket']['subject'] ?? null,
         'from' => $consoleNew['body']['context']['from'] ?? null,
