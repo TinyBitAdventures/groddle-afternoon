@@ -81,7 +81,7 @@ describe('the console\'s addresses (console/console.js)', { skip: skipWithoutSit
     assert.match(page, /#\[Route\(Method::Get, self::PATH \. '\{tab:reports\|chat\}\/\{id:\\d\+\}\/', policy: new Policy\(Access::Public\)\)\]\n    public function item\(Request \$request\): Response\n    \{\n        return \$this->page\(\$request\);/);
     assert.match(page, /#\[Route\(Method::Get, self::PATH \. '\{tab:' \. self::TABS \. '\}', policy: new Policy\(Access::Public\)\)\]\n    public function bareTab/);
     assert.match(page, /\$back = self::isConsolePath\(\$request->path\) \? \$request->path \. \$request->queryStringWithout\(\) : self::PATH;/);
-    assert.match(page, /ASSET_KEY = 'skin-12'/);
+    assert.match(page, /ASSET_KEY = 'skin-13'/);
     assert.match(page, /SERVER_ASSET_KEY = 'server-4'/);
     assert.match(page, /ANALYTICS_ASSET_KEY = 'analytics-4'/);
     assert.match(page, /LEDGER_ASSET_KEY = 'ledger-3'/);

@@ -590,8 +590,9 @@ describe('the site (groddle-afternoon-site)', { skip: skipWithoutSite }, () => {
     assert.match(bug, /MAX_MESSAGE = 4000;/);
     // Too long is refused with a message, never cut: a cut admin reply reached a player mid-sentence (ticket 21, 2026-11-01).
     assert.match(src('src/TicketStore.php'), /MAX_ADMIN_MESSAGE = 10000;/);
-    assert.match(php, /BugReports::message\(\$body\['message'\] \?\? null, BugReports::MAX_MESSAGE, 'groddle_feedback_long'\)/);
-    assert.match(php, /BugReports::message\(\$body\['message'\] \?\? null, TicketStore::MAX_MESSAGE, 'groddle_ticket_long'\)/);
+    // Support (2026-11-27): the game's routes and the website's share openFor and replyFor, which take the words as sent.
+    assert.match(php, /BugReports::message\(\$raw, BugReports::MAX_MESSAGE, 'groddle_feedback_long'\)/);
+    assert.match(php, /BugReports::message\(\$raw, TicketStore::MAX_MESSAGE, 'groddle_ticket_long'\)/);
     assert.match(src('src/AdminTickets.php'), /BugReports::message\(\$body\['message'\] \?\? null, TicketStore::MAX_ADMIN_MESSAGE, 'groddle_ticket_long'\)/);
     assert.match(src('console/console.js'), /export const TICKET_MAX = 10000;/);
     assert.match(src('src/AdminConsolePage.php'), /id="console-reply-text" name="message" rows="4" maxlength="10000"/);
@@ -656,7 +657,7 @@ describe('the site (groddle-afternoon-site)', { skip: skipWithoutSite }, () => {
   it('the console has a Reports tab: list, thread, reply, close and reopen, and the old reports\' button', async () => {
     const page = src('src/AdminConsolePage.php');
     for (const hook of ['data-console-tab="reports"', 'data-console-tickets', 'data-console-thread', 'data-console-reply', 'data-console-thread-close', 'data-console-thread-reopen', 'data-console-migrate', 'data-console-ticket-filter']) assert.ok(page.includes(hook), hook);
-    assert.match(page, /ASSET_KEY = 'skin-12'/);
+    assert.match(page, /ASSET_KEY = 'skin-13'/);
     const js = src('console/console.js');
     for (const route of ["admin/tickets?${ticketsParams(", "admin/tickets/${id}", "admin/tickets/${tickets.open}/reply", "admin/tickets/${tickets.open}/${kind}", "admin/tickets/migrate"]) assert.ok(js.includes(route), route);
     assert.match(js, /linkedBody\(m\.body\)/, 'messages set as text, addresses as links (messageLinks: text nodes and textContent only; tests/report-links.test.js)');
@@ -736,12 +737,12 @@ describe('the site keeps a report\'s picture (groddle-afternoon-site)', { skip: 
     const t = src('src/Tickets.php');
     const create = t.slice(t.indexOf('public function create('), t.indexOf('public function reply('));
     // 2026-11-15: the pictures (Tickets::pictures, ReportPicture::fromBody and accept) after the report's own limits.
-    assert.ok(create.indexOf('openedSince(') > 0 && create.indexOf('openedSince(') < create.indexOf('$this->pictures('), 'the rate limit first');
-    assert.match(create, /\$store->open\(\$me->id, \$message, \$context, \$now, null, \$pictures\[0\] \?\? null, array_slice\(\$pictures, 1\)\)/);
+    assert.ok(create.indexOf('openedSince(') > 0 && create.indexOf('openedSince(') < create.indexOf('$this->picturesWithin('), 'the rate limit first');
+    assert.match(create, /\$store->open\(\$me->id, \$message, \$context, \$now, null, \$list\[0\] \?\? null, array_slice\(\$list, 1\), \$texts\)/);
     assert.match(php, /return array_map\(static fn \(mixed \$v\): array => self::accept\(\$v\), \$raw\);/, 'each picture has the checks');
     // G791: a reply may carry them too, checked after the reply's own limits (tests/g791-report-reply-pictures.test.js).
     const reply = t.slice(t.indexOf('public function reply('), t.indexOf('public function close('));
-    assert.ok(reply.indexOf('writtenSince(') < reply.indexOf('$this->pictures('), 'the reply limit first');
+    assert.ok(reply.indexOf('writtenSince(') < reply.indexOf('$this->picturesWithin('), 'the reply limit first');
     assert.match(src('src/TicketStore.php'), /INSERT INTO ' \. \$this->db->table\(self::PICTURES\) \. ' \(ticket_id, player_user_id, picture, width, height, bytes, created_at\)/);
     // Binary as base64 through FROM_BASE64, as Profiles writes its pictures: raw bytes bound as a string never stored (QA 2026-10-30).
     assert.match(src('src/TicketStore.php'), /VALUES \(\?, \?, FROM_BASE64\(\?\), \?, \?, \?, \?\)', \[\$id, \$player, base64_encode\(\$picture\['bytes'\]\)/);
@@ -972,7 +973,8 @@ describe('Working on it and Edit until read (ticket 49)', () => {
       assert.match(aclose, /->setStatus\(\(int\) \$row\['id'\], TicketStore::CLOSED, time\(\), TicketStore::ADMIN\);/);
       // Every other setStatus call names no closer: closing is the only status that keeps one.
       const calls = [...`${player}\n${admin}`.matchAll(/->setStatus\(([^;]*)\);/g)].map((x) => x[1]);
-      assert.equal(calls.length, 4);
+      // Support (2026-11-27): the player's Reopen on the website (Tickets::reopenFor) names no closer either.
+      assert.equal(calls.length, 5);
       for (const call of calls) if (!/TicketStore::CLOSED/.test(call)) assert.doesNotMatch(call, /TicketStore::(PLAYER|ADMIN)\)$/, call);
       const store = src('src/TicketStore.php');
       const set = store.slice(store.indexOf('public function setStatus('), store.indexOf('public function editFirst('));
@@ -1059,8 +1061,8 @@ describe('Working on it and Edit until read (ticket 49)', () => {
       const write = store.slice(store.indexOf('public function editFirst('), store.indexOf('public function markRead('));
       assert.ok(/INSERT INTO ' \. \$this->db->table\(self::REVISIONS\) \. ' \(message_id, ticket_id, player_user_id, body, written_at, replaced_at\)/.test(write), 'the old text is stored');
       assert.ok(write.indexOf('self::REVISIONS') < write.indexOf('SET body = ?, edited_at = ?'), 'before it is replaced, in the same locked write');
-      assert.match(src('src/AdminTickets.php'), /TicketStore::messagesOut\(\$store->messages\(\$id\), \$store->revisions\(\$id\), \$store->messagePictures\(\$id\)\)/);
-      assert.match(src('src/Tickets.php'), /'messages' => \(new TicketReactions\(\$this->minn->db\)\)->attach\(\$id, TicketStore::messagesOut\(\$store->messages\(\$id\), null, \$store->messagePictures\(\$id\)\), \$player\),/, 'the player gets no history');
+      assert.match(src('src/AdminTickets.php'), /TicketStore::messagesOut\(\$store->messages\(\$id\), \$store->revisions\(\$id\), \$store->messagePictures\(\$id\), \$store->messageFiles\(\$id\)\)/);
+      assert.match(src('src/Tickets.php'), /'messages' => \(new TicketReactions\(\$this->minn->db\)\)->attach\(\$id, TicketStore::messagesOut\(\$store->messages\(\$id\), null, \$store->messagePictures\(\$id\), \$store->messageFiles\(\$id\)\), \$player\),/, 'the player gets no history');
       const table = JSON.parse(src('minn.json')).tables.groddle_ticket_message_revisions;
       assert.ok(table && table.includes('player_user_id bigint(20) unsigned NOT NULL'), 'a *user_id column: the throwaway cleanup finds its rows');
       const mod = await import(pathToFileURL(sitePath('console/console.js')).href);

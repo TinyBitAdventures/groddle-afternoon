@@ -471,8 +471,8 @@ describe('the site keeps several a message (groddle-afternoon-site)', { skip: sk
 
   it('a new report\'s first picture is its own, the rest its first message\'s; G791\'s rows can be copied in', () => {
     const t = src('src/Tickets.php');
-    assert.match(t, /\$pictures = \$this->pictures\(\$store, \$me->id, \$body, \$now, 1\);/, 'the report\'s own picture has the report\'s limits');
-    assert.match(t, /\$pictures = \$this->pictures\(\$store, \$me->id, \$body, \$now, 0\);/);
+    assert.match(t, /\$list = \$this->picturesWithin\(\$store, \$me->id, \$pictures\(\), \$now, 1\);/, 'the report\'s own picture has the report\'s limits');
+    assert.match(t, /\$list = \$this->picturesWithin\(\$store, \$me->id, \$pictures\(\), \$now, 0\);/);
     const store = src('src/TicketStore.php');
     assert.match(store, /\$this->writePictures\(\$id, \$first, \$player, \$more, \$at\);/);
     assert.match(store, /public function adoptOldPictures\(\): int/);

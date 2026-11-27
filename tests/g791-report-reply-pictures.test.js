@@ -271,13 +271,15 @@ describe('G791: the site keeps a reply\'s picture (groddle-afternoon-site)', { s
   it('a reply takes a picture after its own limits, with a picture limit and a new report\'s checks', () => {
     const php = src('src/Tickets.php');
     const reply = php.slice(php.indexOf('public function reply('), php.indexOf('public function close('));
-    const order = ['writtenSince(', '$this->pictures(', '$store->add('];
+    const order = ['writtenSince(', '$this->picturesWithin(', '$store->add('];
     const at = order.map((k) => reply.indexOf(k));
     assert.ok(at.every((n, i) => n > 0 && (i === 0 || n > at[i - 1])), `in order: ${order.join(' ')}`);
-    const pics = php.slice(php.indexOf('private function pictures('), php.indexOf('public static function picturesFit('));
-    assert.ok(pics.indexOf('ReportPicture::fromBody(') < pics.indexOf('picturesSince('), 'every picture checked before any is counted');
+    const pics = php.slice(php.indexOf('private function picturesWithin('), php.indexOf('public static function picturesFit('));
+    // Support (2026-11-27): the route hands its body's pictures over to be read (fromBody checks each) once the limits passed; they are counted after.
+    assert.match(reply, /static fn \(\): array => ReportPicture::fromBody\(\$body\)/, 'every picture checked before any is counted');
+    assert.match(pics, /picturesSince\(/);
     assert.match(pics, /throw new RestError\(ReportPicture::CODE \. '_slow',/, 'a groddle_report_picture code: the game sends the words again');
-    assert.match(reply, /\$store->add\(\(int\) \$row\['id'\], \$me->id, TicketStore::PLAYER, \$message, \$now, \$pictures\);/);
+    assert.match(reply, /\$store->add\(\(int\) \$row\['id'\], \$me->id, TicketStore::PLAYER, \$message, \$now, \$list, \$texts\);/);
     assert.match(php, /PICTURES_PER_WINDOW = 20;/);
     assert.match(php, /PICTURES_PER_DAY = 60;/);
     const store = src('src/TicketStore.php');
@@ -297,14 +299,14 @@ describe('G791: the site keeps a reply\'s picture (groddle-afternoon-site)', { s
     const store = src('src/TicketStore.php');
     assert.match(store, /WHERE message_id = \? AND position = \? AND ticket_id = \?', \[\$message, \$n - 1, \$ticket\]/);
     // Both threads carry where each is, never the bytes.
-    assert.match(src('src/Tickets.php'), /TicketStore::messagesOut\(\$store->messages\(\$id\), null, \$store->messagePictures\(\$id\)\)/);
-    assert.match(src('src/AdminTickets.php'), /TicketStore::messagesOut\(\$store->messages\(\$id\), \$store->revisions\(\$id\), \$store->messagePictures\(\$id\)\)/);
+    assert.match(src('src/Tickets.php'), /TicketStore::messagesOut\(\$store->messages\(\$id\), null, \$store->messagePictures\(\$id\), \$store->messageFiles\(\$id\)\)/);
+    assert.match(src('src/AdminTickets.php'), /TicketStore::messagesOut\(\$store->messages\(\$id\), \$store->revisions\(\$id\), \$store->messagePictures\(\$id\), \$store->messageFiles\(\$id\)\)/);
     assert.match(store, /SELECT message_id, position, width, height FROM ' \. \$this->db->table\(self::MESSAGE_PICTURES\)/);
   });
 
   it('the console shows a message\'s pictures under its words, each opened in the popup', async () => {
     const js = src('console/console.js');
-    assert.match(js, /replyPictures\(m\),\s*messageHistory\(m, when\)/);
+    assert.match(js, /replyPictures\(m\),\s*replyFiles\(m\),\s*messageHistory\(m, when\)/);
     assert.match(js, /'data-console-msg-picture': ''/);
     const mod = await import(pathToFileURL(sitePath('console/console.js')).href);
     assert.equal(mod.pictureSrc({ url: '/report-pictures/3/9' }), '/report-pictures/3/9');
