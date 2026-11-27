@@ -23,9 +23,9 @@ import { dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { requireServer, serverPath } from './repos.mjs';
 
-import { HALL_LAYOUT, REMINDER_MS, WALK_SPEED } from '../public/js/bureaucratic-hall.js?v=8a4954e5';
+import { HALL_LAYOUT, REMINDER_MS, WALK_SPEED } from '../public/js/bureaucratic-hall.js?v=0f0c2901';
 import { HALL_TURN_MS } from '../public/js/halls-mp.js?v=044b5c5a';
-import { HALL_DOORS, hallSceneTsid } from '../public/js/features/bureaucratic-halls-feature.js?v=04e4388d';
+import { HALL_DOORS, hallSceneTsid } from '../public/js/features/bureaucratic-halls-feature.js?v=56ae5da4';
 import { LEGALIZE_CLERKS } from '../public/js/legalize-it.js?v=1fd33e0e';
 
 const outPath = serverPath('data', 'halls.json');

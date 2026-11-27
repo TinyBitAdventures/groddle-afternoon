@@ -51,7 +51,7 @@
  *     data-supply-permits).
  */
 
-import { priceText } from '../price.js?v=fd73ce0e';
+import { priceText } from '../price.js?v=35cd2331';
 import { ITEM_CATALOG, addItem, countItem, ensureItem } from '../inventory.js?v=3be7988a';
 import { getToolCondition, copyForVerb, copyTag, copyTags, migrateClassTag, setCopyTag } from '../tools.js?v=4156bba8';
 import {

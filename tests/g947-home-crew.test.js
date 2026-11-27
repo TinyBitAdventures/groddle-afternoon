@@ -11,8 +11,8 @@ import { execFileSync, spawnSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-import { HOME_CREW_ID, homeCrewId, homeCrewOwner, normalizeHomeCrews } from '../public/js/home-crew-mp.js?v=146a1c48';
-import { homeCrewMpFeature } from '../public/js/features/home-crew-mp-feature.js?v=a9069733';
+import { HOME_CREW_ID, homeCrewId, homeCrewOwner, normalizeHomeCrews } from '../public/js/home-crew-mp.js?v=bcbc1f64';
+import { homeCrewMpFeature } from '../public/js/features/home-crew-mp-feature.js?v=1dac05c8';
 import { createMineRock } from '../public/js/mining.js?v=7ecaa572';
 import { createQuestState } from '../public/js/quests.js?v=f68437db';
 import { HAS_SERVER, HAS_SITE, SITE_DIR, serverPath } from '../tools/repos.mjs';

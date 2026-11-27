@@ -45,7 +45,7 @@ import {
 import { normalizeGardenSnapshot } from '../public/js/player-save.js?v=0794c268';
 import { normalizeFeatureSlices } from '../public/js/feature-host.js?v=b87e2cbc';
 import { applyPlot, localPlot, GARDEN_LOCK_MS } from '../public/js/shared-gardens.js?v=464472e5';
-import { applyTendAct } from '../public/js/neighbours-mp.js?v=f024b835';
+import { applyTendAct } from '../public/js/neighbours-mp.js?v=d270297d';
 import { potionTendGarden } from '../public/js/master-garden.js?v=e37b75ec';
 import { HAS_SITE, SITE_DIR } from '../tools/repos.mjs';
 import { HAS_PHP, PHP } from './php.js';

@@ -14,7 +14,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { join } from 'node:path';
 import { TOWER_JOBS, createTowerState, elevatorStops, finishSharedExpansion, floorJobFor, readTowerFloorWire, startExpansion, towerFloorClass, towerFloorProject, towerFloorWire } from '../public/js/home-tower.js?v=a7fc0cce';
-import { normalizeTowers } from '../public/js/home-street-mp.js?v=96e52985';
+import { normalizeTowers } from '../public/js/home-street-mp.js?v=5568c020';
 import { projectTable } from '../tools/build-realtime-projects.mjs';
 import { SITE_DIR, sitePath, serverPath, skipWithoutServer, skipWithoutSite } from '../tools/repos.mjs';
 import { HAS_PHP, PHP } from './php.js';

@@ -4,7 +4,7 @@
  */
 import { ITEM_ICONS, ITEM_LABELS, getVerbsFor, ordinaryItems, runVerb } from './content.js?v=68a61ef7';
 import { createErrorOnce, createFeatureHost, createFrameStages } from './js/feature-host.js?v=b87e2cbc';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=c1ebb8a5';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=1377faf7';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, enterHintPick, groupHead, hoverRimShown, reachGlowTargets, spriteHasRimArt, rimArtParts, trimmedIconUrl, drawTileArt } from './js/enter-chooser.js?v=74f4964a';
 import { firstTendKey, STICK_TEND_DELAY_MS, STICK_TEND_DIRS, STICK_TEND_REPEAT_MS, stepTendKey, stepTendKeys, stickTendKey, tendKeyAction } from './js/garden-tend.js?v=a7470c4a';
 import { avatarHitBox, behindFloor, bodyReachDistance, OUT_OF_REACH_LINE, playerClickBox } from './js/reach.js?v=456da8a8';
@@ -138,7 +138,7 @@ import {
   requestLegalizeQualification,
   travelToGregarious,
 } from './js/legalize-it.js?v=1fd33e0e';
-import { HALL, HALL_DECOS, HALL_EXTRA_CHAIRS, HALL_OFFICE, HALL_QUESTIONS } from './js/bureaucratic-hall.js?v=8a4954e5';
+import { HALL, HALL_DECOS, HALL_EXTRA_CHAIRS, HALL_OFFICE, HALL_QUESTIONS } from './js/bureaucratic-hall.js?v=0f0c2901';
 import { STATION_X, stationArrival, stationScreen, surfaceStation } from './js/subway.js?v=ea6921ff';
 import { ALLEY, SHADY, drawAlley, inEnteredBox } from './js/quest-rooms/back-alley-set.js?v=4e04295a';
 import { WINTER_WALK_BOUNDS, WINTER_WALK_PASSAGE } from './js/winter-walk-streets.js?v=c921bf92';
@@ -547,7 +547,7 @@ import { beginDrag, installDropRegistry, packStackOf, registerDropTarget, touchL
 import { FLOAT_TEXT_Z, SPEECH_BUBBLE_Z } from './js/fx-z.js?v=18dda7e3';
 import { GAIN_FLOAT, GAIN_FLOAT_MS, gainFloatPose, gainFloatSinks } from './js/gain-float.js?v=caf16853';
 import { hasPouch } from './js/elemental-pouch.js?v=42702eda';
-import { CURRANT_SIGN, priceText } from './js/price.js?v=fd73ce0e';
+import { CURRANT_SIGN, currantCount, priceText } from './js/price.js?v=35cd2331';
 import { createPackRow, mountPackClearance, packBandRange, packCountText, packSearchEntries, packSearchResults, packSlotTip } from './js/ui/pack-row.js?v=f5ef5f6c';
 import { listAnimalFeedOptions, piggyFeedTip } from './js/animals.js?v=ca4d0ae5';
 import { pickerEmptyLine, pickerMaxCount, pickerOptionsFor, pickerTakesCount } from './js/animals.js?v=ca4d0ae5';
@@ -682,7 +682,7 @@ import {
   recipeToolChosen,
   pluralizeItem,
 } from './js/making.js?v=dc595568';
-import { MAKE_FUEL_TIP, makeFuelView } from './js/home-machines.js?v=acaaed90';
+import { MAKE_FUEL_TIP, makeFuelView } from './js/home-machines.js?v=0344a288';
 import { outputIconsHtml, outputsPhrase, productHaveRows, recipeOutputRows } from './js/ui/recipe-outputs.js?v=610c067f';
 import { MAKE_TOOL_SHEETS } from './js/make-tool-sheets.js?v=6f758e09';
 import { createTestTubePanel, tryTileHtml, TRY_TILE_LABEL } from './js/test-tube-panel.js?v=1ac36255';
@@ -749,7 +749,7 @@ import {
   resolveIndexTsid,
 } from './js/street-loader.js?v=10376267';
 import { showDraftBanner, startDraftPlay } from './js/builder/draft-play.js?v=a7c74b17';
-import { bootHouseFile } from './js/house-file-loader.js?v=054cff86';
+import { bootHouseFile } from './js/house-file-loader.js?v=d5a39381';
 import {
   ladderTopDeck,
   groundBeneath,
@@ -1054,7 +1054,7 @@ import {
   creditMetabolicReward,
   streetQuoinPoints,
 } from './js/quoins.js?v=5abad2c7';
-import { isPartyStreet } from './js/party-spaces.js?v=736ab50e'; // G869: a Party Space's quoins are the party classes
+import { isPartyStreet } from './js/party-spaces.js?v=24dcb622'; // G869: a Party Space's quoins are the party classes
 import { greedyReplayEvents, heldPlaceHold, heldPlaceKind, shiftHeldClock } from './js/party-held-places.js?v=c34cb987'; // G911
 import {
   buildHubMapView,
@@ -1169,7 +1169,7 @@ import { ZOOM_HINT_CACHE, ZOOM_HINT_MS, watchZoomHint } from './js/zoom-hint.js?
 import { EAT_PICK_TEXT, bestFoodIndex, eatChoices, eatTip } from './js/eat-pick.js?v=8fb763d0';
 import { heldDirection, installHeldKeyGuard, isMacPlatform } from './js/held-keys.js?v=a28eb293';
 import { isOneClickDoor, oneClickChoice, signpostArmRows, worldContextAction } from './js/world-context-menu.js?v=e4c99c05';
-import { blockedPlayerVerbs, listPlayerTarget, opensPlayerMenu, playerMenuRows } from './js/ui/player-menu.js?v=97ef1df5';
+import { blockedPlayerVerbs, listPlayerTarget, opensPlayerMenu, playerMenuRows } from './js/ui/player-menu.js?v=8094248d';
 import { forgetTexture, frameTexture, isFailed, isLoaded, onFailed, onLoaded, textureFromUrl, whenLoaded } from './js/textures.js?v=b8e38103';
 import { FALLBACK_MAX as WORLD_ART_FALLBACK_MAX, worldArtFor } from './js/world-art.js?v=a67514c8';
 import { HOME_PIP_PX, HOME_PIP_WORDS, drawLockPip, drawPipWords, homeMarkNote, homePipShown, homePipWordsShown, homeStackMark } from './js/home-stack-marks.js?v=67b44287';
@@ -7399,7 +7399,7 @@ function updateHud() {
   const packCur = document.getElementById('pack-currants');
   if (packCur) packCur.textContent = cur;
   const vCur = document.getElementById('vendor-currants');
-  if (vCur) vCur.textContent = cur;
+  if (vCur) vCur.textContent = currantCount(pc.currants);
   const quoinEl = document.getElementById('quoin-stat');
   if (quoinEl) {
     const multiplier = Number(quoinState.multiplier || 1);
@@ -33201,7 +33201,7 @@ function renderVendorList() {
   const list = document.getElementById('vendor-list');
   const detail = document.getElementById('vendor-detail');
   const curEl = document.getElementById('vendor-currants');
-  if (curEl) curEl.textContent = String(pc.currants || 0);
+  if (curEl) curEl.textContent = currantCount(pc.currants);
   if (!list) return;
   // #288 (Classic, the Sell tab): the shelf jumped back to the top after each sale, Classic hiding it
   // for the count and drawing it again after. Its place is taken while it shows and put back after.

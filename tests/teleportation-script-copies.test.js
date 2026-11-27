@@ -45,9 +45,9 @@ import {
   scriptTitle,
   useScript,
 } from '../public/js/teleportation.js?v=cbbc673f';
-import { teleportationFeature as feature } from '../public/js/features/teleportation-feature.js?v=8f225bd8';
+import { teleportationFeature as feature } from '../public/js/features/teleportation-feature.js?v=3df5070c';
 import { cleanContents, createDroppedItemState, dropInventoryStack, pickupDroppedStack, placeDroppedBag } from '../public/js/world-items.js?v=93313aad';
-import { cabinetPut, cabinetTake, cleanHeldList, normalizeContents } from '../public/js/home-storage.js?v=d44f697b';
+import { cabinetPut, cabinetTake, cleanHeldList, normalizeContents } from '../public/js/home-storage.js?v=17bf7f79';
 import { normalizeGroundStack, normalizeItem } from '../public/js/drops-mp.js?v=351593a6';
 import { goodsWithHeldTags, normalizeGoods } from '../public/js/trade.js?v=5fb43d2f';
 import { HAS_PHP, PHP } from './php.js';

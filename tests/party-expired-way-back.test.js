@@ -15,8 +15,8 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-import { PARTY_SPACES, normalizePartyRecord, startParty } from '../public/js/party-spaces.js?v=736ab50e';
-import { partySpacesFeature } from '../public/js/features/party-spaces-feature.js?v=5fd65ad9';
+import { PARTY_SPACES, normalizePartyRecord, startParty } from '../public/js/party-spaces.js?v=24dcb622';
+import { partySpacesFeature } from '../public/js/features/party-spaces-feature.js?v=4c69d422';
 import { INTERROGATION_FALLBACK } from '../public/js/interrogation-room.js?v=f621c3b9';
 
 const root = join(import.meta.dirname, '..');

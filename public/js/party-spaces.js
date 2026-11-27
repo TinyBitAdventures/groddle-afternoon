@@ -40,7 +40,7 @@
  *   so each space's one signpost is the way back to where you came from.
  */
 
-import { priceText } from './price.js?v=fd73ce0e';
+import { priceText } from './price.js?v=35cd2331';
 import { applyPhysicsAdjustments, physicsMultipliers } from './location-events.js?v=48938c8f';
 
 export const PARTY_FULL_SECONDS = 60 * 60;

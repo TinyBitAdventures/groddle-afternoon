@@ -60,10 +60,10 @@ import { husbandryPack } from '../animal-husbandry.js?v=022d2859';
 import { itemVerbAchievementCounters } from '../item-verbs.js?v=ecade42e';
 // The same module instances js/features/index.js registers (tests/buff-triggers.test.js checks the tags).
 import { meditationFeature } from './meditation-feature.js?v=9deafde9';
-import { teleportationFeature } from './teleportation-feature.js?v=8f225bd8';
+import { teleportationFeature } from './teleportation-feature.js?v=3df5070c';
 import { rookAttackFeature } from './rook-attack-feature.js?v=1ddb5049';
 import { rubeFeature } from './rube-feature.js?v=3bc4adbe';
-import { smugglingFeature } from './smuggling-feature.js?v=23888c79';
+import { smugglingFeature } from './smuggling-feature.js?v=e60a454b';
 import { hellFeature } from './hell-feature.js?v=8679fcab';
 import { isPooped } from '../hell.js?v=0dba5774';
 import { forceMetabolic } from '../metabolics.js?v=48f784bf';

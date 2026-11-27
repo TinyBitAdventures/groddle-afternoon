@@ -49,7 +49,7 @@
  *   empty bags (site LedgerBoxes::cabinetMove).
  */
 
-import { priceText } from './price.js?v=fd73ce0e';
+import { priceText } from './price.js?v=35cd2331';
 
 /** classProps width (cols), height (rows) and rows_display of each cabinet class. */
 export const CABINETS = Object.freeze({

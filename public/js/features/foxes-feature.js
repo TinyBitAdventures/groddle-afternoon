@@ -47,7 +47,7 @@
  * unchanged.
  */
 
-import { priceText } from '../price.js?v=fd73ce0e';
+import { priceText } from '../price.js?v=35cd2331';
 import { slugsFromEffects } from '../speech-slugs.js?v=d5cc8b6f';
 import { addItem, countItem, removeItem } from '../inventory.js?v=3be7988a';
 import { getToolCondition } from '../tools.js?v=4156bba8';

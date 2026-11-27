@@ -26,10 +26,10 @@
 
 import { SEED_CATALOG, applyFertilizer, sowPlot, wetPlot } from './garden.js?v=fefa7bcd';
 import { normalizeParcelBox, stackCopy } from './butler.js?v=5d1199a7';
-import { normalizeVisitGnomes } from './garden-gnome.js?v=ace7fa8e';
-import { normalizeVisitIcons } from './giant-icons.js?v=69cfe2f4';
+import { normalizeVisitGnomes } from './garden-gnome.js?v=20dd4af8';
+import { normalizeVisitIcons } from './giant-icons.js?v=8d705525';
 import { DROP_TEXT, homePlaceOf } from './drops-mp.js?v=351593a6';
-import { housePlace, isHousePlace } from './home-floors.js?v=0565b551';
+import { housePlace, isHousePlace } from './home-floors.js?v=17371532';
 
 /** The realtime server's street for a player's home street (homes.go). */
 export const HOME_STREET_PREFIX = 'HOME_';

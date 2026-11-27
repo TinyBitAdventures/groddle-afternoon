@@ -32,10 +32,10 @@ import { requireSite, sitePath } from './repos.mjs';
 export const OUT = sitePath('data', 'home-machines.json');
 
 export async function homeMachinesJson() {
-  const hm = await import('../public/js/home-machines.js?v=acaaed90');
+  const hm = await import('../public/js/home-machines.js?v=0344a288');
   const { MACHINE_SKILLS } = await import('../public/js/machine-rooms.js?v=a99c4d01');
   const { FRESH_FUEL, MACHINE_IDS } = await import('../public/js/machines.js?v=93a736f2');
-  const decor = await import('../public/js/home-decor.js?v=69523fb6');
+  const decor = await import('../public/js/home-decor.js?v=c63e5e16');
   const { HOME_LIMITS } = await import('../public/js/homes-catalog.js?v=0367f90f');
   const tower = decor.interiorBounds({ layout: 'tower' });
   const machineRooms = Object.fromEntries(Object.values(hm.MACHINE_ROOM_PLACES).map((place) => [hm.roomName(place), { l: hm.MACHINE_ROOM_BOUNDS.l, r: hm.MACHINE_ROOM_BOUNDS.r, fixed: hm.roomFixedXs(place) }]));

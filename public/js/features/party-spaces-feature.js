@@ -52,7 +52,7 @@
  * Solo is untouched.
  */
 
-import { priceText } from '../price.js?v=fd73ce0e';
+import { priceText } from '../price.js?v=35cd2331';
 import { addItem, countItem, ensureItem, removeItem, ITEM_CATALOG, itemIcon } from '../inventory.js?v=3be7988a';
 import { teleportEnergyCost } from '../teleportation.js?v=cbbc673f';
 import {
@@ -85,13 +85,13 @@ import {
   stackAvailable,
   startParty,
   teleporterPhase,
-} from '../party-spaces.js?v=736ab50e';
+} from '../party-spaces.js?v=24dcb622';
 import { frameTexture, sourceFromUrl, textureFromUrl } from '../textures.js?v=b8e38103';
-import { readVisitScene } from '../neighbours-mp.js?v=f024b835';
+import { readVisitScene } from '../neighbours-mp.js?v=d270297d';
 import { STREET_INDEX } from '../street-loader.js?v=10376267';
 import { isNeighbourSceneTsid } from '../neighbours.js?v=13f35acd';
 import { energyMax as tankEnergyMax, loseEnergy } from '../metabolics.js?v=48f784bf';
-import { MP_PARTY_TEXT, MP_SPACE_STREET_RE, kickVerb, mpActivationBlock, normalizeSpace, partyFromSpace } from '../party-spaces-mp.js?v=ef39b48f';
+import { MP_PARTY_TEXT, MP_SPACE_STREET_RE, kickVerb, mpActivationBlock, normalizeSpace, partyFromSpace } from '../party-spaces-mp.js?v=03a4908e';
 import { standOnFeet, anchorBottomCentre } from '../sprite-feet.js?v=849541a8';
 import { WORLD_FONT_FAMILY } from '../world-text.js?v=6b49f88c';
 

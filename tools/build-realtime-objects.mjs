@@ -101,7 +101,7 @@ import { TRANT_CARE_PACKAGES } from '../public/js/trant-care.js?v=63846e5e';
 import { WOOD_TREE_MATURITY_MAP } from '../public/js/woodcutting.js?v=9e9af511';
 import { ANIMAL_KINSHIP_PACKAGES } from '../public/js/animal-kinship.js?v=eaa3a6f2';
 import { locationIsDepressing } from '../public/js/animal-mood.js?v=c8cc8797';
-import { resourcePlacementGroups, resourceSpawnPlan } from '../public/js/features/resource-nodes-feature.js?v=aa79dc26';
+import { resourcePlacementGroups, resourceSpawnPlan } from '../public/js/features/resource-nodes-feature.js?v=52b79748';
 import { soilCountsForStreet, soilPlacementGroups } from '../public/js/features/patches-feature.js?v=c3731a48';
 import { KITTY_GROUP, kittyPlacementGroups } from '../public/js/features/heli-kitties-feature.js?v=445ec64b';
 import { BATTERFLY_GROUP, batterflyPlacementGroups } from '../public/js/features/animal-husbandry-feature.js?v=e6b009dc';
@@ -116,7 +116,7 @@ import { KITTY_PET } from '../public/js/heli-kitties.js?v=e4af4096';
 import { FIRE_DRAGON_PLACEMENT_KEY, FIRE_DRAGON_WALK, fireDragonPlacementGroups } from '../public/js/fire-dragon.js?v=b7f3d751';
 import { isZoneTsid } from '../public/js/zone-streets.js?v=b40010d5';
 import { upgradeEcologyEntry } from '../public/js/street-jobs.js?v=76471e42';
-import { partyEcologyEntry, partyExitSignpost, partySpaceForStreet } from '../public/js/party-spaces.js?v=736ab50e';
+import { partyEcologyEntry, partyExitSignpost, partySpaceForStreet } from '../public/js/party-spaces.js?v=24dcb622';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const streetsDir = join(root, 'public/assets/streets');

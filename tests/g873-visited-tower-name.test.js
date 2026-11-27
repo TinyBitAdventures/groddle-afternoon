@@ -6,7 +6,7 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { visitedTowerName } from '../public/js/neighbours-mp.js?v=f024b835';
+import { visitedTowerName } from '../public/js/neighbours-mp.js?v=d270297d';
 
 const root = join(import.meta.dirname, '..');
 const read = (p) => readFileSync(join(root, p), 'utf8');

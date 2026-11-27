@@ -72,7 +72,7 @@ describe('Light Beam in Shim Shiri (puzzles-feature)', () => {
     globalThis.PIXI = { Sprite, Container: Display, Graphics: Display, Texture, ImageSource, Rectangle: class {} };
     globalThis.Image = class { set src(v) { this._s = v; } decode() { return Promise.resolve(); } };
     globalThis.fetch = async () => ({ json: async () => raw });
-    ({ puzzlesFeature: feature } = await import('../public/js/features/puzzles-feature.js?v=0a023601'));
+    ({ puzzlesFeature: feature } = await import('../public/js/features/puzzles-feature.js?v=4e5e9122'));
     ({ locationEventsApi: api } = await import('../public/js/features/location-events-feature.js?v=1c5b6340'));
   });
 

@@ -23,7 +23,7 @@ import {
   hallItems,
   hallX,
   waitPromptFor,
-} from '../public/js/bureaucratic-hall.js?v=8a4954e5';
+} from '../public/js/bureaucratic-hall.js?v=0f0c2901';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const gsjs = join(root, '..', 'glitch-GameServerJS');

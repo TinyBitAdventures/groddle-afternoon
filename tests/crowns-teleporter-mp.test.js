@@ -24,7 +24,7 @@ import {
   normalizeCrownsPaidBack,
 } from '../public/js/crowns-mp.js?v=ab077bca';
 import { crownsFeature, crownsMpTeleport } from '../public/js/features/crowns-feature.js?v=67def12f';
-import { GAME_TELEPORTER_PRICE, GAME_TELEPORTER_STREET, GAME_TELEPORTER_TEXT } from '../public/js/features/game-teleporter-feature.js?v=ae7832d8';
+import { GAME_TELEPORTER_PRICE, GAME_TELEPORTER_STREET, GAME_TELEPORTER_TEXT } from '../public/js/features/game-teleporter-feature.js?v=01b1ebf8';
 import { HAS_SERVER, HAS_SITE, SITE_DIR, serverPath, sitePath, skipWithoutServer } from '../tools/repos.mjs';
 import { HAS_PHP, PHP } from './php.js';
 

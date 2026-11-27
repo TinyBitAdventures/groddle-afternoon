@@ -34,7 +34,7 @@
  *     dropTable, dropLast, dropRolls, dropHits, dropAutoplay.
  */
 
-import { priceText } from '../price.js?v=fd73ce0e';
+import { priceText } from '../price.js?v=35cd2331';
 import { addItem, ensureItem, ITEM_CATALOG } from '../inventory.js?v=3be7988a';
 import { emblemCostFor } from '../shrines.js?v=48318bec';
 import {

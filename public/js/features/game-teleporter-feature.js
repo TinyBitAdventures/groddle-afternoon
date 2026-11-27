@@ -31,7 +31,7 @@
  *   gameTeleporterLast.
  */
 
-import { priceText } from '../price.js?v=fd73ce0e';
+import { priceText } from '../price.js?v=35cd2331';
 import { OVERLAY_USES, playOverlay } from '../overlays.js?v=91dcee74';
 import { crownsMpTeleport, startCrowns } from './crowns-feature.js?v=67def12f';
 

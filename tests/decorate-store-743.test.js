@@ -113,7 +113,7 @@ describe('#743 the Furniture Store button is a toggle (Austin\'s ruling 2026-11-
 
 describe('#743 prices read the number then Glitch\'s ₡ (Austin\'s ruling 2026-11-26)', () => {
   it('priceText: commas, then ₡, no space (StoreDialog.as 390, StoreBuyUI.as 520 "Price 1,234₡")', async () => {
-    const { CURRANT_SIGN, priceText } = await import('../public/js/price.js?v=fd73ce0e');
+    const { CURRANT_SIGN, priceText } = await import('../public/js/price.js?v=35cd2331');
     assert.equal(CURRANT_SIGN, '₡');
     assert.equal(priceText(450), '450₡');
     assert.equal(priceText(1250), '1,250₡');
@@ -160,8 +160,16 @@ describe('#743 prices read the number then Glitch\'s ₡ (Austin\'s ruling 2026-
     assert.deepEqual(bad, []);
   });
 
+  it('the vendor\'s purse line writes the number as the prices do, with its commas ("You have 1,250 currants")', async () => {
+    const { currantCount } = await import('../public/js/price.js?v=35cd2331');
+    assert.equal(currantCount(1250), '1,250');
+    assert.equal(currantCount(undefined), '0');
+    assert.match(game, /if \(vCur\) vCur\.textContent = currantCount\(pc\.currants\);/);
+    assert.match(game, /if \(curEl\) curEl\.textContent = currantCount\(pc\.currants\);/);
+  });
+
   it('the storage store\'s Buy button and its price-changed note end in ₡ (StoreBuyUI.as 250, 580)', async () => {
-    const { STORAGE_TEXT: STORE_BUY_TEXT } = await import('../public/js/home-storage.js?v=d44f697b');
+    const { STORAGE_TEXT: STORE_BUY_TEXT } = await import('../public/js/home-storage.js?v=17bf7f79');
     assert.equal(STORE_BUY_TEXT.buyButton(1, 1234), 'Buy: 1 for 1,234₡');
     assert.equal(STORE_BUY_TEXT.priceChanged(400, 450), 'The price for this item has just now changed, from 400₡ to 450₡. I thought you would like to know.');
   });

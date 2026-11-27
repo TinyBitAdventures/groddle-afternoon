@@ -19,7 +19,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { FEATURES } from '../public/js/features/index.js?v=c1ebb8a5';
+import { FEATURES } from '../public/js/features/index.js?v=1377faf7';
 import { streetObjectsFeature } from '../public/js/features/street-objects-feature.js?v=add76182';
 import { SHARED_NODE_CLASSES, applyNodeState, createStreetCopy, freshenNode, stateFor, takeObjs } from '../public/js/street-objects.js?v=7d1864e8';
 import { createResourceNode, resourceNodeFrame } from '../public/js/resource-nodes.js?v=c2eb46b1';

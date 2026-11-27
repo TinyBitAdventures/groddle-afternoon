@@ -21,7 +21,7 @@ import { homedir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { SITE_DIR, sitePath, skipWithoutSite } from '../tools/repos.mjs';
-import { normalizeListings, normalizePiles } from '../public/js/home-street-mp.js?v=96e52985';
+import { normalizeListings, normalizePiles } from '../public/js/home-street-mp.js?v=5568c020';
 import { PHP } from './php.js';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');

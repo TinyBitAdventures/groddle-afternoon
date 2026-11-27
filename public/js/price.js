@@ -15,6 +15,10 @@ export const CURRANT_SIGN = '₡';
  */
 export function priceText(n) {
   if (typeof n === 'string' && n && !/^\d+$/.test(n)) return `${n}${CURRANT_SIGN}`;
-  const v = Math.max(0, Math.floor(Number(n) || 0));
-  return `${v.toLocaleString('en-US')}${CURRANT_SIGN}`;
+  return `${currantCount(n)}${CURRANT_SIGN}`;
+}
+
+/** "1,250": a count of currants written as the prices write it (the vendor's purse, "You have 1,250 currants"). */
+export function currantCount(n) {
+  return Math.max(0, Math.floor(Number(n) || 0)).toLocaleString('en-US');
 }

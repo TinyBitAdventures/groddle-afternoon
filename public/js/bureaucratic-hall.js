@@ -61,7 +61,7 @@
  * footage shows them (#734, HALL_DECOS).
  */
 
-import { priceText } from './price.js?v=fd73ce0e';
+import { priceText } from './price.js?v=35cd2331';
 
 export const BUREAUCRAT_CLASS = 'npc_bureaucrat';
 export const PLEASE_WAIT_BUFF = 'please_wait';

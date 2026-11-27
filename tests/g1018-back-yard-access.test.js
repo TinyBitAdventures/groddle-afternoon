@@ -17,7 +17,7 @@ import { readFileSync } from 'node:fs';
 
 import { BACK_YARD_PREFIX, bareBackYardAnswer, normalizeYardActs } from '../public/js/yard-verbs-mp.js?v=9192a4bf';
 import { applyStockAct, normalizeStockView } from '../public/js/yard-stock-mp.js?v=7cd51cb1';
-import { forgetInside, insideProof, insideQuery, normalizeHomeView, rememberInside, visitSceneTsid } from '../public/js/neighbours-mp.js?v=f024b835';
+import { forgetInside, insideProof, insideQuery, normalizeHomeView, rememberInside, visitSceneTsid } from '../public/js/neighbours-mp.js?v=d270297d';
 import { getResourceNodeDef } from '../public/js/resource-nodes.js?v=c2eb46b1';
 import { HAS_SERVER, HAS_SITE, SITE_DIR, serverPath, sitePath } from '../tools/repos.mjs';
 import { HAS_PHP, PHP } from './php.js';
@@ -278,8 +278,8 @@ describe('in the house, a guest gets the back yard and acts on it as "b:"; the o
     const token = sign({ k: 'house_in', sub: 9, o: 7, exp: now + 600 });
     rememberInside(7, token);
     try {
-      const { yardVerbsMpFeature } = await import('../public/js/features/yard-verbs-mp-feature.js?v=d85431b9');
-      const { homesFeature } = await import('../public/js/features/homes-feature.js?v=cbae6b43');
+      const { yardVerbsMpFeature } = await import('../public/js/features/yard-verbs-mp-feature.js?v=894ff918');
+      const { homesFeature } = await import('../public/js/features/homes-feature.js?v=2f7e27ca');
       yardVerbsMpFeature.onTick(16, 1, engine);
       for (let i = 0; i < 40 && !globalThis.groddleYard?.visit; i += 1) await new Promise((r) => setTimeout(r, 5));
       const yard = globalThis.groddleYard;
