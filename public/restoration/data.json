@@ -2814,9 +2814,19 @@
   "deployed": "2026-11-26"
  },
  "git": {
-  "commits": 3761,
+  "commits": 3764,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-26",
+    "kind": "fix",
+    "text": "A trant draws its own maturity and the fruit it holds, chosen in one place for street and patch trees"
+   },
+   {
+    "date": "2026-11-26",
+    "kind": "new",
+    "text": "Trant art for all ten maturities and every fruit count, drawn from the SWFs"
+   },
    {
     "date": "2026-11-26",
     "kind": "new",
@@ -2926,19 +2936,9 @@
     "date": "2026-11-26",
     "kind": "fix",
     "text": "The Classic interface says \"This window was asleep\" once in chat, not twice"
-   },
-   {
-    "date": "2026-11-26",
-    "kind": "fix",
-    "text": "A window that slept offers only \"Load the other save\""
-   },
-   {
-    "date": "2026-11-26",
-    "kind": "new",
-    "text": "A browser zoomed far out gets one notice saying how to reset it"
    }
   ]
  },
- "tests": 1458,
+ "tests": 1459,
  "generatedAt": "2026-11-26"
 }
