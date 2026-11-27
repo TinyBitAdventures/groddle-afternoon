@@ -58,6 +58,13 @@
  * (the server weighs one drop at a time per player, and the save is written before each), each shown
  * from the moment it is dropped.
  *
+ * The owner's Crafty Bot (G1316, report #753): set down in the house or on the home street it fetches
+ * from the shared floor as Glitch's bot took from the whole location (npc_crafty_bot.js findItem
+ * 1885-1932, pickupStack 2555-2600). Its take is the owner's pickup (craftybotSharedTake): the server
+ * weighs it as any (one taker, the owner's ledger), everyone there sees the stack shrink or go, and
+ * the answer lands in the bot's job, not the pack (the site counts the job's holder as the save's,
+ * LedgerMath::holdings). An answer that comes after the bot stopped waiting lands in the pack.
+ *
  * QA: canvas data sharedStacks, dropState (none|dropping|picking|claiming), dropLast,
  * dropEaten (the last bite: id:left:pig), dropPending (drops shown, not yet answered);
  * window.groddleDrops.
@@ -399,9 +406,18 @@ function createSession(engine, client) {
    * One settled op: true when it was applied now (`copy`: the tool chosen for a drop; `claim`: where
    * Decoration Mode sets a stack taken whole, R50; when it can't go there it comes to the pack).
    */
-  function apply(op, side, item, at = null, copy = null, claim = null, { sounded = false } = {}) {
+  function apply(op, side, item, at = null, copy = null, claim = null, { sounded = false, bot = null } = {}) {
     if (!op || engine.query?.('ledgerReceipt', op, engine) !== true) return false;
     if (side === 'took' && claim && setDownClaim(claim, item, sounded)) return true;
+    // G1316: the Crafty Bot's take goes into its job (and is saved there); one it stopped waiting for, to the pack.
+    if (side === 'took' && bot) {
+      const it = normalizeItem(item);
+      if (it && bot(it) === true) {
+        engine.save?.();
+        publish();
+        return true;
+      }
+    }
     const fx = dropEffect(side, item, itemLabel);
     if (!fx) return false;
     const inv = engine.inv;
@@ -581,9 +597,16 @@ function createSession(engine, client) {
     const late = mine ? null : lateClaims.get(id);
     const claim = mine?.claim || late?.claim || null;
     const entry = mine?.entry || null;
+    const bot = mine?.bot || null;
     if (!picking || mine) picking = null;
     lateClaims.delete(id);
     if (msg.status !== 'settled') {
+      // G1316: the bot's take refused (gone, busy, locked): the bot hears it; the owner asked for nothing.
+      if (bot) {
+        bot(null);
+        pumpClaims();
+        return;
+      }
       // Refused: the claim shown is back on the floor where it was.
       endClaim(entry);
       tell(String(msg.text || DROP_TEXT.gone));
@@ -593,7 +616,7 @@ function createSession(engine, client) {
     }
     endClaim(entry, { quiet: true });
     const s = stacks.get(id);
-    apply(String(msg.op || ''), 'took', msg.item, shown(s) || engine.player, null, claim, { sounded: Boolean(entry) });
+    apply(String(msg.op || ''), 'took', msg.item, shown(s) || engine.player, null, claim, { sounded: Boolean(entry), bot });
     pendingChanged();
     pumpClaims();
   });
@@ -612,7 +635,10 @@ function createSession(engine, client) {
       dropping = null;
       // A claim under way: its answer comes through the site's list, and still sets it on the shelf.
       if (picking?.claim) lateClaims.set(picking.id, { claim: picking.claim });
+      // The bot's take: its answer comes through the site's list, to the pack; the bot looks again.
+      const bot = picking?.bot;
       picking = null;
+      bot?.(null);
       dropQueue();
       endAllPending();
       // #733: a window waiting on Play here keeps the last floor it saw drawn (Play here reloads; a
@@ -984,6 +1010,46 @@ function createSession(engine, client) {
     q.at = now;
   }
 
+  /**
+   * G1316: the shared stacks the owner's Crafty Bot may take at place `tsid` (the game's key), where
+   * this game draws them: only online at the owner's own home (not a floor drawn while the window
+   * waits on Play here), the server's own stacks (no drop still shown before its answer), none being
+   * set on a shelf or moved, none whose copy carries words (the bot's job keeps a class and a count).
+   */
+  function botStacks(tsid) {
+    const p = here();
+    if (!p?.ownHome || frozen || String(tsid || '') !== p.key || street !== p.street) return [];
+    const out = [];
+    for (const s of stacks.values()) {
+      if (s.t != null || claims.some((q) => !q.done && q.sid === s.id) || moving?.id === s.id) continue;
+      out.push(stackAt(s, p.ox));
+    }
+    return out;
+  }
+
+  /**
+   * G1316: the owner's Crafty Bot takes `n` of a shared stack, through the owner's pickup (drops.go
+   * pickupFrame: the owner at home takes from anywhere there). done(item) hears what the server gave
+   * (true: the bot has it; else it goes to the pack), done(null) a refusal or no answer in time.
+   * False when nothing was asked (not here, busy with another pickup, the rate): the bot looks again.
+   */
+  function botTake(id, n, done) {
+    const p = here();
+    const sid = String(id || '');
+    const s = stacks.get(sid);
+    if (!p?.ownHome || frozen || !s || typeof done !== 'function') return false;
+    if (picking && Date.now() - picking.at < WAIT_MS) return false;
+    if (!bucketTake(rate, Date.now()).ok) return false;
+    const ask = pickupAsk(s.count, n);
+    picking = { id: sid, n: ask, at: Date.now(), bot: done };
+    if (!client.send('ground_pickup', { id: sid, ...(ask == null ? {} : { n: ask }), ...(p.ox ? { ox: p.ox } : {}) })) {
+      picking = null;
+      return false;
+    }
+    publish();
+    return true;
+  }
+
   /** Whether a pack stack of this class would be dropped for everyone here now. */
   function wouldShare(classTsid) {
     const p = here();
@@ -1038,6 +1104,8 @@ function createSession(engine, client) {
     claim,
     move,
     list,
+    botStacks,
+    botTake,
     wouldShare,
     fits,
     here,
@@ -1075,7 +1143,9 @@ function createSession(engine, client) {
       if (picking && now - picking.at >= WAIT_MS) {
         const q = picking.entry || null;
         if (q) lateClaims.set(picking.id, { claim: picking.claim });
+        const bot = picking.bot;
         picking = null;
+        bot?.(null);
         endClaim(q);
         pumpClaims();
       }
@@ -1186,6 +1256,19 @@ export const dropsMpFeature = {
     if (!multiplayer || !session || engine?.mode !== 'multiplayer') return null;
     const p = session.here();
     return p?.ownHome === true && homePlaceOf(p.street) != null ? true : null;
+  },
+
+  /** G1316 (craftybot-feature locationRows): the shared stacks at `tsid` the owner's Crafty Bot may take, or null. */
+  craftybotSharedStacks(tsid, engine) {
+    if (!multiplayer || !session || engine?.mode !== 'multiplayer') return null;
+    const out = session.botStacks(String(tsid || ''));
+    return out.length ? out : null;
+  },
+
+  /** G1316 (craftybot-feature world.take): the bot's take of a shared stack, the owner's pickup; true when asked. */
+  craftybotSharedTake(id, n, done, engine) {
+    if (!multiplayer || !session || engine?.mode !== 'multiplayer') return null;
+    return session.botTake(id, n, done) ? true : null;
   },
 
   /** game.js refreshDroppedWorldItems: the shared stacks to draw with the player's own. */

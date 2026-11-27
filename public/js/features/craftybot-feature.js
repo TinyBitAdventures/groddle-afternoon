@@ -27,6 +27,9 @@
  *  - Where it stands decides its ingredient source: on the home street or in
  *    the house it fetches dropped stacks (and Storage Display Boxes indoors)
  *    by walking to them; in the pack it uses the pack and cannot run machines.
+ *    Online the floor's shared stacks are its too (G1316, #753): taken through
+ *    the owner's pickup (drops-mp-feature craftybotSharedTake), the bot waiting
+ *    for the server's word (craftybot.js fetchAnswered).
  *  - The panel follows the client's CraftyDialog: the job queue with the
  *    active job pinned on top, Which tool? / Which recipe? (known recipes,
  *    no furniture, no machine recipes), the job details ("To make this I'll
@@ -69,6 +72,7 @@ import {
   craftybotView,
   createBot,
   createCraftybotState,
+  fetchAnswered,
   installCrystal,
   installCrystalCheck,
   isCrafting,
@@ -89,7 +93,7 @@ import {
   setJobTotal,
   setLocked,
   setPaused,
-} from '../craftybot.js?v=fecab8dc';
+} from '../craftybot.js?v=7096c3f6';
 import { frameTexture, isLoaded, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js?v=b8e38103';
 import { grantMoodXp } from '../mood-xp.js?v=e311b45c';
 import { displayTopOf, itemstackOverlayPoint, playSheetOverlay } from '../overlay-art.js?v=e50bacca';
@@ -153,6 +157,9 @@ let demo = null;
 let autoplay = null;
 let pendingOpenAt = 0;
 let frameCache = new Map();
+/** G1316: shared stacks the server refused the bot, by id: left alone until then (Date.now()). */
+const sharedSkip = new Map();
+const SHARED_SKIP_MS = 10000;
 
 /* ------------------------------------------------------------------ */
 /* Items                                                               */
@@ -267,7 +274,10 @@ const floorTag = (floor) => (floor > 0 ? `@${floor}` : '');
  */
 function locationRows(engine, where) {
   if (where !== 'interior') {
-    return listDroppedStacks(ownGroundState(engine), HOME_STREET_TSID).map((s) => ({ id: s.id, cls: s.classTsid, count: s.count, x: s.x, sdb: false }));
+    return [
+      ...listDroppedStacks(ownGroundState(engine), HOME_STREET_TSID).map((s) => ({ id: s.id, cls: s.classTsid, count: s.count, x: s.x, sdb: false })),
+      ...sharedRows(engine, HOME_STREET_TSID, 0, 0),
+    ];
   }
   const rows = [];
   const here = floorX0(botFloor());
@@ -276,6 +286,7 @@ function locationRows(engine, where) {
     // G226: furniture sits in room x; the bot and the dropped stacks in world x.
     const x0 = floorX0(floor);
     for (const st of listDroppedStacks(ownGroundState(engine), tsid)) rows.push({ id: st.id, cls: st.classTsid, count: st.count, x: st.x - x0 + here, sdb: false, tsid });
+    rows.push(...sharedRows(engine, tsid, x0, here));
     const tag = floorTag(floor);
     for (const p of floorDecorOf(floor)?.placed || []) {
       if (p.classTsid === 'bag_furniture_sdb' && p.display?.count > 0) {
@@ -291,6 +302,26 @@ function locationRows(engine, where) {
         });
       }
     }
+  }
+  return rows;
+}
+
+/**
+ * G1316 (#753): the floor's shared stacks (online, G1190 and G1313: the owner's drops in the house and
+ * on its upper floors lie there for everyone) are the bot's too, as Glitch's findItem searched the whole
+ * location. drops-mp-feature hands in those of the place the owner stands in (the realtime server lists
+ * one place at a time), at their world x; a stack the server just refused the bot is left alone a while.
+ */
+function sharedRows(engine, tsid, x0, here) {
+  const list = engine.query?.('craftybotSharedStacks', tsid, engine);
+  if (!Array.isArray(list)) return [];
+  const now = Date.now();
+  const rows = [];
+  for (const st of list) {
+    const until = sharedSkip.get(st.id);
+    if (until && until > now) continue;
+    if (until) sharedSkip.delete(st.id);
+    if (Number(st.count) > 0) rows.push({ id: st.id, cls: st.classTsid, count: st.count, x: st.x - x0 + here, sdb: false, tsid, shared: true, wear: st.r ?? null });
   }
   return rows;
 }
@@ -339,8 +370,9 @@ function makeWorld(engine) {
   const tsid = homeTsid(where, botFloor());
   const rows = () => (inLocation ? locationRows(engine, where) : null);
   const usable = (cls, toolWear) => !isToolClass(cls) || toolUsable(engine, cls, toolWear);
-  // A cabinet's tools carry their own wear (slot points); the floor's and the pack's are the pack's tool state.
-  const rowCount = (r, toolWear) => (r.id.startsWith('cab:') ? cabinetToolCount(r, toolWear) : usable(r.cls, toolWear) ? r.count : 0);
+  // A cabinet's tools carry their own wear (slot points), a shared stack's tool its own (r); the floor's and the pack's are the pack's tool state.
+  const sharedToolCount = (r, toolWear) => (r.wear >= Math.max(1, Number(toolWear) || 0) ? r.count : 0);
+  const rowCount = (r, toolWear) => (r.id.startsWith('cab:') ? cabinetToolCount(r, toolWear) : r.shared && r.wear != null && isToolClass(r.cls) ? sharedToolCount(r, toolWear) : usable(r.cls, toolWear) ? r.count : 0);
   const world = {
     inLocation,
     count(cls, { toolWear } = {}) {
@@ -391,6 +423,9 @@ function makeWorld(engine) {
         dirty = 'sdb';
         return k;
       }
+      // G1316: a shared floor stack is the owner's pickup: the server weighs it and the bot waits (-1).
+      const sharedRow = rows().find((r) => r.id === id && r.shared);
+      if (sharedRow) return takeShared(engine, sharedRow, cls, n);
       // In the house a stack may lie on any floor (G1249: the house is one location).
       const from = where === 'interior' ? (rows().find((r) => r.id === id)?.tsid || tsid) : tsid;
       const list = ownGroundRows(engine, from);
@@ -495,6 +530,27 @@ function makeWorld(engine) {
     },
   };
   return world;
+}
+
+/**
+ * G1316: the bot's take of a shared floor stack, asked of the realtime server as the owner's pickup.
+ * Always -1 (the bot waits): the server's word comes through fetchAnswered, and so does a take that
+ * could not be asked now (busy, offline, too fast), as nothing taken, a moment later. A stack refused
+ * is left alone for SHARED_SKIP_MS, so the bot fetches elsewhere instead of asking again and again.
+ */
+function takeShared(engine, row, cls, n) {
+  const answer = (item) => {
+    const got = item && item.c === row.cls ? item.n : 0;
+    if (!got) sharedSkip.set(row.id, Date.now() + SHARED_SKIP_MS);
+    const world = makeWorld(engine);
+    const held = fetchAnswered(bot, world, row.id, got);
+    world.flush();
+    publish(engine);
+    return held;
+  };
+  const asked = engine.query?.('craftybotSharedTake', row.id, n, answer, engine) === true;
+  if (!asked) Promise.resolve().then(() => answer(null));
+  return -1;
 }
 
 /** Item counts in the bot's source, to notice new arrivals (onContainerItemAdded). */

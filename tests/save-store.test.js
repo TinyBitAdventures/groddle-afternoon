@@ -44,7 +44,7 @@ import { mpPersist as persistCrowns } from '../public/js/features/crowns-feature
 import { flush as flushHomeStreet } from '../public/js/features/home-street-mp-feature.js?v=ca1e7512';
 import { flush as flushHomeStorage } from '../public/js/features/home-storage-feature.js?v=555b12a1';
 import { persist as persistBoards } from '../public/js/features/boards-mp-feature.js?v=69ea68f7';
-import { persist as persistDrops } from '../public/js/features/drops-mp-feature.js?v=61ebdb27';
+import { persist as persistDrops } from '../public/js/features/drops-mp-feature.js?v=a34f5a9b';
 import { createOnlineRequests } from '../public/js/online-request.js?v=5fa7a635';
 import { AUDIO_MUTED_KEY } from '../public/js/audio-pref.js?v=683f27c8';
 import { STORAGE_KEY as APPEARANCE_KEY, APPEARANCE_PRESETS, appearanceToJson, loadAppearance, saveAppearance } from '../public/js/character-builder.js?v=13bbcfff';

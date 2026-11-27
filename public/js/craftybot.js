@@ -31,7 +31,8 @@
  *   inLocation                      boolean
  *   count(cls, { toolWear })        items available (tools: working, with toolWear points left)
  *   find(cls, { toolWear })         { id, x } of the nearest usable stack, SDBs first, or null
- *   take(id, cls, n)                -> n actually taken from that stack
+ *   take(id, cls, n)                -> n actually taken from that stack, or -1: asked of the realtime
+ *                                   server (a shared floor stack, G1316); fetchAnswered brings the answer
  *   wear(cls, n)                    -> { broke } tool wear on the tool class
  *   drop(cls, n, x)                 location: ground stack at x; pack: into the pack
  *   give(cls, n)                    collected items into the owner's pack
@@ -203,6 +204,8 @@ export function normalizeCraftybotState(seed = {}) {
       endAt: Number(s.move.endAt) || 0,
     } : null,
     refuelling: s.refuelling === true,
+    // G1316: the shared floor take the server is weighing ({ id, cls, item, seq } or { id, fuel }), or null.
+    awaiting: null,
     craftingTool: s.craftingTool ? cleanCls(s.craftingTool) : null,
     timers: {},
     timerSeq: int(s.timerSeq, 0),
@@ -242,6 +245,13 @@ export function normalizeCraftybotState(seed = {}) {
     });
   }
   if (bot.active != null && (bot.active < 0 || bot.active >= bot.queue.length)) bot.active = bot.queue.length ? 0 : undefined;
+  // G1316: a take the server was asked for does not outlive the page (its answer, if any, reaches the
+  // pack through the site's list): the step it waited in runs again.
+  const waited = s.awaiting && typeof s.awaiting === 'object' ? s.awaiting : null;
+  if (waited && !waited.fuel && waited.seq != null && !bot.timers.craftStep) {
+    bot.timerSeq += 1;
+    bot.timers.craftStep = { at: bot.clock + 1000, arg: int(waited.seq), seq: bot.timerSeq };
+  }
   return bot;
 }
 
@@ -1159,7 +1169,7 @@ function doFetch(bot, world, i) {
     }
     if (step.type === 'fetch_ingredient') {
       const picked = pickupStack(bot, world, item.id, step.data.class_id, step.data.count);
-      if (picked === 0) return;
+      if (picked <= 0) return;
       if (picked < step.data.count) setTimer(bot, 'craftStep', 300, i);
       else setTimer(bot, 'craftStep', 1000, i + 1);
     } else {
@@ -1274,6 +1284,7 @@ function doCraftComplete(bot, world, i) {
   craftDone(bot, world, true);
 }
 
+
 function craftDone(bot, world, continueIteration) {
   bot.crafting = false;
   cancelTimer(bot, 'craftStep');
@@ -1312,8 +1323,45 @@ function pickupStack(bot, world, id, cls, count) {
   const required = count - holding(bot, bot.active, cls);
   if (required <= 0) return 0;
   const n = world.take(id, cls, required);
+  // G1316: a shared floor stack: the realtime server weighs the take, and the bot waits for its word.
+  if (n < 0) {
+    const row = activeRow(bot);
+    bot.awaiting = { id: String(id), cls, item: row?.item ?? null, seq: row?.activeSeq ?? null };
+    return -1;
+  }
   if (n > 0) hold(bot, bot.active, cls, n);
   return n;
+}
+
+/** A Fuel Cell taken: +500 (capped), every halt lifted, and the queue runs on (onDonePathing 2360-2380). */
+function refuelled(bot, world) {
+  bot.fuel = Math.min(bot.fuel + CRAFTYBOT.FUEL_PER_CELL, CRAFTYBOT.MAX_FUEL);
+  for (const row of bot.queue) row.halted = false;
+  queueIterate(bot, world);
+}
+
+/**
+ * G1316: the realtime server's word on a shared floor take the bot asked for (pickupStack's -1): `n`
+ * taken (0: refused, gone, or no answer in time). True when the bot has them now (in the job that
+ * asked, or a Fuel Cell in the tank); false when it no longer waits for them (the caller puts what
+ * came in the pack). The step it waited in runs again: holding enough, it moves on; else it fetches
+ * again from what is on the floor now.
+ */
+export function fetchAnswered(bot, world, id, n) {
+  const a = bot.awaiting;
+  if (!a || a.id !== String(id)) return false;
+  bot.awaiting = null;
+  const got = Math.max(0, int(n));
+  if (a.fuel) {
+    if (got < 1) return false;
+    refuelled(bot, world);
+    return true;
+  }
+  const qi = bot.queue.findIndex((row) => row.item === a.item);
+  if (got > 0 && qi >= 0) hold(bot, qi, a.cls, got);
+  const row = qi >= 0 ? bot.queue[qi] : null;
+  if (row && bot.active === qi && row.activeSeq === a.seq && !bot.timers.craftStep) setTimer(bot, 'craftStep', got > 0 ? 0 : 1000, a.seq);
+  return got > 0 && qi >= 0;
 }
 
 function onDonePathing(bot, world) {
@@ -1321,10 +1369,14 @@ function onDonePathing(bot, world) {
     bot.refuelling = false;
     setState(bot, world, 'idle');
     if (!bot.moveTarget) return false;
-    if (world.take(bot.moveTarget, 'fuel_cell', 1) < 1) return false;
-    bot.fuel = Math.min(bot.fuel + CRAFTYBOT.FUEL_PER_CELL, CRAFTYBOT.MAX_FUEL);
-    for (const row of bot.queue) row.halted = false;
-    queueIterate(bot, world);
+    const got = world.take(bot.moveTarget, 'fuel_cell', 1);
+    // G1316: a Fuel Cell on the shared floor: it fills the tank when the server says it was taken.
+    if (got < 0) {
+      bot.awaiting = { id: String(bot.moveTarget), fuel: true };
+      return true;
+    }
+    if (got < 1) return false;
+    refuelled(bot, world);
     return true;
   }
   const row = activeRow(bot);
@@ -1334,6 +1386,8 @@ function onDonePathing(bot, world) {
     setState(bot, world, 'idle');
     if (step?.type === 'fetch_ingredient') {
       const picked = pickupStack(bot, world, bot.moveTarget, step.data.class_id, step.data.count);
+      // G1316: asked of the server; fetchAnswered runs the step on.
+      if (picked < 0) return true;
       if (!picked) return false;
       if (picked < step.data.count) {
         setTimer(bot, 'craftStep', 0, row.activeSeq);
