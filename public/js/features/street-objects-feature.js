@@ -1224,7 +1224,8 @@ function outOfReach(engine, target, verbId, at = null) {
   const spr = target?.sprite;
   // `at`: feet somewhere else (game.js requestVerb's walk-over asks where a walk would stop).
   const p = at || engine.player;
-  if (!spr || !p || !Number.isFinite(spr.x) || !Number.isFinite(spr.y)) return null;
+  // #755: a thing just removed has a destroyed sprite whose x and y throw; no reach to check.
+  if (!spr || spr.destroyed || !p || !Number.isFinite(spr.x) || !Number.isFinite(spr.y)) return null;
   const verb = sharedVerbOn(engine, target, verbId);
   if (!verb || !['rock', 'tree', 'node'].includes(idKind(verb.id))) return null;
   return inObjectReach(p.x, p.y, spr.x, spr.y) ? null : COPY.far;

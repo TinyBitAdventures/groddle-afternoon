@@ -13,7 +13,7 @@ import assert from 'node:assert/strict';
 import { afterEach, beforeEach, describe, it } from 'node:test';
 
 import { OFFLINE_LINE, RECONNECTING_LINE } from '../public/js/online-request.js?v=5fa7a635';
-import { streetObjectsFeature } from '../public/js/features/street-objects-feature.js?v=0f57a367';
+import { streetObjectsFeature } from '../public/js/features/street-objects-feature.js?v=223216be';
 import { heliKittiesFeature } from '../public/js/features/heli-kitties-feature.js?v=933a88f5';
 import { crabsFeature } from '../public/js/features/crabs-feature.js?v=9a2fc175';
 import { fireDragonFeature } from '../public/js/features/fire-dragon-feature.js?v=400349f5';

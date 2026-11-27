@@ -4,7 +4,7 @@
  */
 import { ITEM_ICONS, ITEM_LABELS, getVerbsFor, ordinaryItems, runVerb } from './content.js?v=79a980f7';
 import { createErrorOnce, createFeatureHost, createFrameStages } from './js/feature-host.js?v=b87e2cbc';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=ad95ba80';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=4b20b663';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, enterHintPick, hoverText, stackHoverLabel, groupHead, hoverRimShown, reachGlowTargets, spriteHasRimArt, rimArtParts, trimmedIconUrl, drawTileArt } from './js/enter-chooser.js?v=297c6d15';
 import { firstTendKey, STICK_TEND_DELAY_MS, STICK_TEND_DIRS, STICK_TEND_REPEAT_MS, stepTendKey, stepTendKeys, stickTendKey, tendKeyAction } from './js/garden-tend.js?v=a7470c4a';
 import { avatarHitBox, behindFloor, bodyReachDistance, OUT_OF_REACH_LINE, playerClickBox } from './js/reach.js?v=456da8a8';
@@ -10883,7 +10883,8 @@ function dryRunWalk(goalX) {
  */
 function requestVerb(target, verb, { label = '', run = null } = {}) {
   const go = run || (() => beginVerbAction(target, verb));
-  if (!target?.sprite || target.sprite.destroyed || !player || !verb) return go();
+  if (target?.sprite?.destroyed) return false; // #755: the thing was just removed; the verb does nothing, as Glitch
+  if (!target?.sprite || !player || !verb) return go();
   if (verbReachFrom(target, verb.id)) return stepToMineStand(target, verb, go) || go();
   const { goalX, ahead } = walkOverStop(target, verb.id, verbWalkRange(target, verb.id) ?? 300);
   if (!ahead || !verbReachFrom(target, verb.id, ahead)) {
@@ -10968,6 +10969,7 @@ function finishVerbWalk(vw, reason) {
 
 function beginVerbAction(target, verb) {
   if (!target || !verb || currentAction) return false;
+  if (target.sprite?.destroyed) return false;
   // Player report 33: the reach the realtime server checks when a shared verb lands is checked
   // before the swing too (features/street-objects-feature.js verbOutOfReach), so it never plays
   // and then fails.

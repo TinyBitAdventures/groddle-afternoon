@@ -222,6 +222,6 @@ import { calendarFeature } from './calendar-feature.js?v=6cbe4537'; FEATURES.pus
 // G1195 Happy New Ur: the countdown at the Groddle midnights of December 31, the show and the party street.
 import { newUrFeature } from './new-ur-feature.js?v=e1f8ed44'; FEATURES.push(newUrFeature);
 import { newUrPartyFeature } from './new-ur-party-feature.js?v=73d30d79'; FEATURES.push(newUrPartyFeature);
-import { streetObjectsFeature } from './street-objects-feature.js?v=0f57a367'; FEATURES.push(streetObjectsFeature);
+import { streetObjectsFeature } from './street-objects-feature.js?v=223216be'; FEATURES.push(streetObjectsFeature);
 import { realtimeFeature } from './realtime-feature.js?v=f50700da'; FEATURES.push(realtimeFeature);
 import { accountBackupFeature } from './account-backup-feature.js?v=7cda2116'; FEATURES.push(accountBackupFeature);
