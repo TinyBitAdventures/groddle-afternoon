@@ -2814,9 +2814,14 @@
   "deployed": "2026-11-27"
  },
  "git": {
-  "commits": 3860,
+  "commits": 3863,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-27",
+    "kind": "fix",
+    "text": "A machine drag starts while a New Quest card or a notice is up, instead of selecting page text"
+   },
    {
     "date": "2026-11-27",
     "kind": "improve",
@@ -2931,11 +2936,6 @@
     "date": "2026-11-27",
     "kind": "fix",
     "text": "The low-mood rain shows over the face again in Classic, and now in Modern too"
-   },
-   {
-    "date": "2026-11-27",
-    "kind": "fix",
-    "text": "Solo, the Bureaucratic Hall's lizards call you \"friend\", not \"Ur\""
    }
   ]
  },
