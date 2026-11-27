@@ -13,7 +13,7 @@
  * #745: it also starts What's new (js/whats-new.js), the lines about the update the card shows after
  * one, so they come up as early as the card does.
  */
-import { startWhatsNew } from './whats-new.js?v=d6a97a9a';
+import { startWhatsNew } from './whats-new.js?v=c410d2ba';
 
 export const BOOT_STEPS = Object.freeze(['code', 'screen', 'pictures', 'sounds', 'catalogs', 'recipes', 'world', 'street', 'look']);
 

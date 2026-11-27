@@ -21,7 +21,7 @@ import { fileURLToPath } from 'node:url';
 import { resolveTokens } from './css-tokens.js';
 import { parseColour, oklch } from '../tools/tokens/colour.mjs';
 import { energyGaugePixel, energyGaugeStep, moodGauge, MOOD_GAUGES } from '../public/js/vitals.js?v=5efac5f3';
-import { vitalRing } from '../public/js/ui/topbar.js?v=7c194020';
+import { vitalRing } from '../public/js/ui/topbar.js?v=820dd86c';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const css = readFileSync(join(root, 'public/style.css'), 'utf8');

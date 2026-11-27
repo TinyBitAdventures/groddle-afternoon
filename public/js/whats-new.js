@@ -11,12 +11,20 @@
  * - A first visit shows nothing (a new player needs no changelog) and only remembers the version.
  * - Nothing waits for it: on a fast load the card may be gone before the lines arrive.
  *
+ * - The card's "See all notes" asks for the What's new window (js/ui/whats-new-window.js), which opens
+ *   only when the player asks: from there or from the Menu, never by itself (Austin 2026-11-27).
+ *
  * Pure parts (whatsNewFor, validateWhatsNew) are tested in tests/whats-new.test.js; js/boot-progress.js
  * starts it as the card comes up, on both play pages.
  */
 
-/** The file the release writes, from the site root (the play pages' <base>). */
+/** The file the release writes, from the site root (the play pages' <base>): the newest KEEP_RELEASES releases. */
 export const WHATS_NEW_PATH = 'play/whats-new.json';
+/**
+ * Every release since v0.1.0, the same format: only the What's new window's All versions list fetches
+ * it (js/ui/whats-new-window.js), so the loading card reads the short file on every load.
+ */
+export const WHATS_NEW_ALL_PATH = 'play/whats-new-all.json';
 export const WHATS_NEW_FORMAT = 'groddle-whats-new/1';
 /** The newest version this browser loaded and when: { version, at }. */
 export const SEEN_KEY = 'groddle-whats-new-seen';
@@ -26,7 +34,7 @@ export const SHOW_LINES = 3;
 /** A release lists at most this many lines; each at most MAX_LINE characters. */
 export const MAX_LINES = 5;
 export const MAX_LINE = 110;
-/** The file keeps this many releases (older ones are never rolled up: they are past a week). */
+/** The short file keeps this many releases (older ones are never rolled up: they are past a week). */
 export const KEEP_RELEASES = 20;
 
 const VERSION = /^v(\d+)\.(\d+)\.(\d+)$/;
@@ -38,7 +46,37 @@ export const shortVersion = (v) => String(v).replace(/^(v\d+\.\d+)\.0$/, '$1');
 export const WHATS_NEW_TEXT = Object.freeze({
   one: (v) => `New in ${shortVersion(v)}`,
   since: (v) => `New since ${shortVersion(v)}`,
+  more: 'See all notes',
+  queued: 'The notes open once the game is ready.',
 });
+
+/**
+ * The loading card's "See all notes" asks for the What's new window (js/ui/whats-new-window.js), which
+ * opens it once the game is ready; nothing leaves the page. The request is kept on <html> as
+ * data-whats-new="queued" (the window may not be loaded yet), and this event tells a window already
+ * installed.
+ */
+export const WHATS_NEW_REQUEST_EVENT = 'groddle-whats-new-request';
+
+export function requestWhatsNew(doc = globalThis.document) {
+  const root = doc?.documentElement;
+  if (root?.dataset) root.dataset.whatsNew = 'queued';
+  try {
+    doc?.dispatchEvent?.(new Event(WHATS_NEW_REQUEST_EVENT));
+  } catch {
+    /* no Event (a test's document): the window finds the flag when it installs */
+  }
+}
+
+/** True while a request waits. */
+export const whatsNewRequested = (doc = globalThis.document) => doc?.documentElement?.dataset?.whatsNew === 'queued';
+
+/** Takes the waiting request (true when there was one). */
+export function takeWhatsNewRequest(doc = globalThis.document) {
+  if (!whatsNewRequested(doc)) return false;
+  delete doc.documentElement.dataset.whatsNew;
+  return true;
+}
 
 /** Sorts versions: negative when a is older than b. Unknown versions sort oldest. */
 export function compareVersions(a, b) {
@@ -93,15 +131,16 @@ export function nextSeen(data, seen, now = Date.now()) {
 
 /**
  * PURE: the problems with a whats-new file ([] when it is fine): its format, versions newest first and
- * each once, a date, at most MAX_LINES lines a release, each short, plain (no em or en dashes) and
- * free of paths.
+ * each once, a date, one to MAX_LINES lines a release, each short, plain (no em or en dashes) and
+ * free of paths, links and ticket numbers. `all` is the whole history (WHATS_NEW_ALL_PATH): no cap on
+ * how many releases it keeps.
  */
-export function validateWhatsNew(data) {
+export function validateWhatsNew(data, { all = false } = {}) {
   const out = [];
   if (!data || typeof data !== 'object') return ['not a JSON object'];
   if (data.format !== WHATS_NEW_FORMAT) out.push(`format is not ${WHATS_NEW_FORMAT}`);
   if (!Array.isArray(data.releases) || !data.releases.length) return [...out, 'no releases'];
-  if (data.releases.length > KEEP_RELEASES) out.push(`more than ${KEEP_RELEASES} releases`);
+  if (!all && data.releases.length > KEEP_RELEASES) out.push(`more than ${KEEP_RELEASES} releases`);
   data.releases.forEach((r, i) => {
     const v = r?.version;
     if (!VERSION.test(String(v || ''))) out.push(`release ${i}: version ${JSON.stringify(v)} is not vX.Y.Z`);
@@ -112,11 +151,13 @@ export function validateWhatsNew(data) {
       return;
     }
     if (r.lines.length > MAX_LINES) out.push(`${v}: more than ${MAX_LINES} lines`);
+    if (!r.lines.length) out.push(`${v}: no lines`);
     for (const line of r.lines) {
       if (typeof line !== 'string' || !line.trim()) out.push(`${v}: an empty line`);
       else if (line.length > MAX_LINE) out.push(`${v}: longer than ${MAX_LINE}: ${line}`);
       else if (/[–—]/.test(line)) out.push(`${v}: a dash a player should not see: ${line}`);
       else if (/\/Users\/|\/home\/|https?:|\(\w{7,12}\)$/.test(line)) out.push(`${v}: a path, link or commit: ${line}`);
+      else if (/#\d/.test(line)) out.push(`${v}: a ticket number: ${line}`);
     }
   });
   return out;
@@ -154,7 +195,17 @@ export function mountWhatsNew(doc, shown) {
     li.textContent = text;
     list.append(li);
   }
-  section.append(h, list);
+  // "See all notes": the What's new window once the game is ready, never a page away from it.
+  const more = doc.createElement('button');
+  more.type = 'button';
+  more.className = 'boot-loader-news-more';
+  more.textContent = WHATS_NEW_TEXT.more;
+  more.addEventListener('click', () => {
+    requestWhatsNew(doc);
+    more.textContent = WHATS_NEW_TEXT.queued;
+    more.disabled = true;
+  });
+  section.append(h, list, more);
   card.append(section);
   card.classList.add('has-news');
   return section;

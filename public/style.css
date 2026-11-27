@@ -1133,6 +1133,11 @@ body.is-booting:not(.online-gated) #wrap ~ * { visibility: hidden; }
 .boot-loader-news h3 { margin: 0 0 var(--sp-4); font-size: var(--fs-base); font-weight: var(--fw-heavy); color: var(--c-green-37); }
 .boot-loader-news ul { display: grid; gap: var(--sp-3); margin: 0; padding-left: 18px; font-size: var(--fs-md); line-height: var(--lh-snug); }
 .boot-loader.is-error .boot-loader-news { display: none; }
+/* "See all notes" asks for the What's new window once the game is ready (js/ui/whats-new-window.js): a
+   link's look, a button's job, so nothing leaves the loading game. */
+.boot-loader-news .boot-loader-news-more { margin: var(--sp-5) 0 0; padding: 0; border: 0; background: none; font: inherit; font-size: var(--fs-md); font-weight: var(--fw-heavy); color: var(--accent); cursor: pointer; }
+.boot-loader-news .boot-loader-news-more:disabled { color: var(--c-sage-55); font-weight: var(--fw-regular); cursor: default; }
+.boot-loader-news .boot-loader-news-more:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; border-radius: var(--radius-sm); }
 
 #wrap {
   max-width: none;
@@ -15396,7 +15401,7 @@ body.is-booting .touch-controls { display: none; }
 /* —— TOUCH PANELS —— sheets and windows on a phone (html.touch-phone, Modern): a close button a
    thumb can hit (44 px, Apple's least target) and nothing wider than the screen. The buttons keep
    their own look; min-width and min-height only grow the target. */
-:root.touch-phone[data-ui="modern"] :is(.verb-menu-x, .ui-sheet-x, .fam-close, .rook-museum-exhibit-close, .award-close, .pack-search-close, .route-gps-x, .activity-log-close, .race-store-close, .hb-close, .keys-close, .account-close, .prefs-close, .buddies-close, .social-x, .trade-x, .gift-x, .auc-x, .hst-x, .hs-close, .grp-close, .fu-close) {
+:root.touch-phone[data-ui="modern"] :is(.verb-menu-x, .ui-sheet-x, .fam-close, .rook-museum-exhibit-close, .award-close, .pack-search-close, .route-gps-x, .activity-log-close, .race-store-close, .hb-close, .keys-close, .account-close, .prefs-close, .wn-close, .buddies-close, .social-x, .trade-x, .gift-x, .auc-x, .hst-x, .hs-close, .grp-close, .fu-close) {
   min-width: 44px; min-height: 44px;
   -webkit-tap-highlight-color: transparent;
 }
@@ -15446,14 +15451,25 @@ body.is-booting .touch-controls { display: none; }
    tall one ran under the status bar. One rule for all of them: the shade keeps clear of the safe area
    (--safe-t, which upright on a phone takes the status bar's fade too) and the window is that much shorter.
    --safe-* are 0 on a computer, so nothing moves there. */
-:root :is(.grp-shade, .account-shade, .buddies-shade, .keys-shade, .hs-shade, .prefs-shade) {
+:root :is(.grp-shade, .account-shade, .buddies-shade, .keys-shade, .hs-shade, .prefs-shade, .wn-shade) {
   padding-top: calc(var(--sp-8) + var(--safe-t));
   padding-right: calc(var(--sp-8) + var(--safe-r));
   padding-bottom: calc(var(--sp-8) + var(--safe-b));
   padding-left: calc(var(--sp-8) + var(--safe-l));
 }
-:root :is(.grp-panel, .account-panel, .buddies-panel, .keys-panel, .hs-panel, .prefs-window) {
+:root :is(.grp-panel, .account-panel, .buddies-panel, .keys-panel, .hs-panel, .prefs-window, .wn-window) {
   max-height: calc(100dvh - 2rem - var(--safe-t) - var(--safe-b));
+}
+/* #745: What's new (js/ui/whats-new-window.js) on a phone: its title, close and buttons stay put and only
+   the notes scroll (the window is a column; .wn-body is the one scroller), a little tighter. */
+:root.touch-phone .wn-window { padding: var(--sp-9) var(--sp-9) var(--sp-8); }
+:root.touch-phone[data-ui="modern"] .wn-window .wn-close { top: var(--sp-2); right: var(--sp-2); }
+@media (max-height: 500px) and (orientation: landscape) {
+  :root.touch-phone .wn-shade { padding-top: calc(var(--sp-4) + var(--safe-t)); padding-bottom: calc(var(--sp-4) + var(--safe-b)); }
+  :root.touch-phone .wn-window { width: min(560px, 100%); max-height: calc(100dvh - 1rem - var(--safe-t) - var(--safe-b)); padding: var(--sp-6) var(--sp-8) var(--sp-5); }
+  :root.touch-phone .wn-window h2 { margin-top: var(--sp-2); font-size: var(--fs-2xl); }
+  :root.touch-phone .wn-window .wn-sub { margin-bottom: var(--sp-4); }
+  :root.touch-phone .wn-window .wn-actions { margin-top: var(--sp-5); }
 }
 /* end PHONEPANELS */
 

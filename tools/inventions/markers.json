@@ -25,7 +25,9 @@
     "remake-own: no Truly Outrageous card how gems are found (the remake's own": "gem-hints"
   },
   "public/css/classic.css": {
+    "glitch-had-none: new (#745, js/ui/whats-new-window.js; ours: Glitch had none) in the same dialog shell": "whats-new-loading-card",
     "no-original: as small page-colour controls; the help line has no original.": "ours-classic-css",
+    "ours: == What's new (#745, js/ui/whats-new-window.js; ours: Glitch had none) in the same dialog shell": "whats-new-loading-card",
     "ours: G1246 (ours): a sorted bag's strip shows its sort's icon at": "ours-bag-sort-badge",
     "reimagined: #avatar-panel .avatar-reimagined-tag { background: var(--c-classic-tip); color:": "ours-classic-css",
     "reimagined: #avatar-panel .avatar-tile .avatar-reimagined-tag { border-radius: 0 0 3px 3px;": "ours-classic-css",
@@ -1471,6 +1473,13 @@
     "remake-own: // G1232 (#645): the doors out beside them (the remake's own, as the subway": "minimap-exit-doors",
     "remake-own: the subway entrances beside the signposts (the remake's own).": "minimap-subway-stations",
     "stand-in: * at all got a fogged stand-in until the snap (MiniMapView.show": "ours-street-minimap"
+  },
+  "public/js/ui/topbar.js": {
+    "ours: // #745 (ours, Austin 2026-11-27): What's new opens its window": "whats-new-loading-card"
+  },
+  "public/js/ui/whats-new-window.js": {
+    "glitch-had-none: to automatically open that for folks\"). Ours: Glitch had nothing like": "whats-new-loading-card",
+    "ours: want to automatically open that for folks\"). Ours: Glitch had nothing like": "whats-new-loading-card"
   },
   "public/js/vendor-finder.js": {
     "remake-own: * The remake's own: Glitch's currants opened nothing (glitch-client": "vendor-finder",

@@ -272,6 +272,89 @@
   box-shadow: 0 0 0 2px var(--c-classic-focus);
 }
 
+/* == What's new (#745, js/ui/whats-new-window.js; ours: Glitch had none) in the same dialog shell as
+   Preferences: Dialog.as 34-488 and BigDialog.as, a white window over the live game with no shade, the
+   title on white, the body in the grey well between two rules, the red-cross close. */
+:root[data-ui="classic"] .wn-shade { background: transparent; pointer-events: none; }
+:root[data-ui="classic"] .wn-window {
+  pointer-events: auto;
+  width: min(450px, 100%);
+  padding: 0;
+  border-radius: var(--radius-xs);
+  background: var(--c-classic-panel);
+  color: var(--c-classic-text);
+  font: var(--fs-classic-body)/var(--lh-normal) var(--font-classic-body);
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--c-classic-ink) 37%, transparent),
+    0 0 1px 7px color-mix(in srgb, var(--c-classic-ink) 15%, transparent);
+}
+:root[data-ui="classic"] .wn-window .wn-eyebrow {
+  margin: var(--sp-5) 0 0 var(--sp-10);
+  padding: 0;
+  background: none;
+  color: var(--c-classic-text);
+  font: 700 var(--fs-classic-body)/var(--lh-normal) var(--font-classic-body);
+}
+:root[data-ui="classic"] .wn-window h2 {
+  margin: 0;
+  padding: var(--sp-2) 56px var(--sp-5) var(--sp-10);
+  color: var(--c-classic-title);
+  font: 800 var(--fs-classic-window)/var(--lh-tight) var(--font-classic-title);
+}
+:root[data-ui="classic"] .wn-window .wn-sub { margin: 0; padding: 0 var(--sp-10) var(--sp-5); color: var(--c-classic-text); font-size: var(--fs-classic-body); }
+:root[data-ui="classic"] .wn-window .wn-body {
+  margin: 0;
+  padding: var(--sp-5) var(--sp-10);
+  background: var(--c-classic-well);
+  border-top: 1px solid var(--c-classic-rule);
+  border-bottom: 1px solid var(--c-classic-rule);
+}
+:root[data-ui="classic"] .wn-window .wn-list li,
+:root[data-ui="classic"] .wn-window .wn-ver-lines { color: var(--c-classic-text); font-size: var(--fs-classic-body); }
+:root[data-ui="classic"] .wn-window .wn-list li > i { background: var(--c-classic-panel); color: var(--c-classic-online); }
+:root[data-ui="classic"] .wn-window .wn-note { color: var(--c-classic-text); font-size: var(--fs-classic-body); }
+:root[data-ui="classic"] .wn-window .wn-ver-head { border-radius: var(--radius-xs); color: var(--c-classic-link); font: 700 var(--fs-classic-body)/var(--lh-normal) var(--font-classic-body); }
+:root[data-ui="classic"] .wn-window .wn-ver-head span { color: var(--c-classic-text); font-weight: 400; }
+:root[data-ui="classic"] .wn-window .wn-ver-head:hover,
+:root[data-ui="classic"] .wn-window .wn-ver-head[aria-expanded="true"] { background: var(--c-classic-panel); }
+:root[data-ui="classic"] .wn-window .wn-ver-head::after { color: var(--c-classic-link); }
+:root[data-ui="classic"] .wn-window .wn-actions { margin: 0; padding: var(--sp-5) var(--sp-10); }
+:root[data-ui="classic"] .wn-window .wn-btn {
+  padding: var(--sp-3) var(--sp-8);
+  border: 1px solid var(--c-classic-btn-minor-border);
+  border-radius: var(--radius-xs);
+  color: var(--c-classic-btn-minor-label);
+  background: linear-gradient(180deg, var(--c-classic-btn-minor-top), var(--c-classic-btn-minor-bottom));
+  box-shadow: 0 1px 0 color-mix(in srgb, var(--c-classic-ink) 30%, transparent);
+  font: 800 var(--fs-classic-body)/var(--lh-normal) var(--font-classic-title);
+}
+:root[data-ui="classic"] .wn-window .wn-btn.wn-quiet { border-color: transparent; background: none; box-shadow: none; color: var(--c-classic-link); }
+:root[data-ui="classic"] .wn-window .wn-close {
+  top: 6px;
+  right: 16px;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border-radius: 0;
+  background: var(--c-classic-panel);
+  color: transparent;
+  overflow: hidden;
+}
+:root[data-ui="classic"] .wn-window .wn-close::before,
+:root[data-ui="classic"] .wn-window .wn-close::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 14px;
+  height: 3px;
+  background: var(--c-classic-close);
+  transform: translate(-50%, -50%) rotate(45deg);
+}
+:root[data-ui="classic"] .wn-window .wn-close::after { transform: translate(-50%, -50%) rotate(-45deg); }
+:root[data-ui="classic"] .wn-window .wn-close:hover { box-shadow: inset 0 0 6px var(--c-classic-close-hover); }
+:root[data-ui="classic"] .wn-window button:focus-visible { outline: none; box-shadow: 0 0 0 2px var(--c-classic-focus); }
+
 /* == The top bar (classic-spec spec §2-§6; js/classic/classic-topbar.js). The modern bar's own
    elements (js/ui/topbar.js) moved and painted: every id, slug target, click and key stays.
    Header pieces are placed in page px off the measured world view (--cv-*, js/classic/classic-frame.js);

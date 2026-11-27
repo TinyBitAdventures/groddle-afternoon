@@ -1138,7 +1138,7 @@ import { installHiresDecos, maxTextureSizeOf } from './js/deco-hires.js?v=34f36d
 import { loadAudioLevels, loadMutedPreference, loadOtherMusic, saveAudioLevel, saveMutedPreference, saveOtherMusic } from './js/audio-pref.js?v=683f27c8';
 import { createAudioBuses, fadeGain } from './js/audio-buses.js?v=af167b54';
 import { applyAudioSession, streetMusicWanted } from './js/other-music.js?v=f58af5e6';
-import { drawHudCount, installTopBar, renderTopBar } from './js/ui/topbar.js?v=7c194020';
+import { drawHudCount, installTopBar, renderTopBar } from './js/ui/topbar.js?v=820dd86c';
 import { focusBack, installFocusReturn, lastInput } from './js/ui/focus-return.js?v=da190597';
 import { installContextGuard } from './js/ui/context-guard.js?v=0f71ac17';
 import { QUOIN_FRAME_BOB, advanceQuoinClock, quoinBobBetweenFrames } from './js/quoin-motion.js?v=ea0bd408';
@@ -1170,7 +1170,7 @@ import { clientKeyAction, createHotkeysSheet, emoteKeyAction, isHotkeySheetRelea
 import { ENCYCLOPEDIA_MENU_LABEL, createEncyclopedia, isEncyclopediaKey } from './js/encyclopedia-links.js?v=b2caa8de';
 import { createEncyclopediaSheet, isHomeScreenApp } from './js/ui/encyclopedia-sheet.js?v=ea3b0ad5';
 import { catchSiteLinks, setSitePageViewer, siteLinkTip } from './js/site-pages.js?v=9b3049cf';
-import { bootStep } from './js/boot-progress.js?v=f13d90b4';
+import { bootStep } from './js/boot-progress.js?v=46ea420f';
 import { HOME_SCREEN_TIP_CACHE, iosSafari, mountHomeScreenTip, runsStandalone } from './js/home-screen-tip.js?v=f2287991';
 import { ZOOM_HINT_CACHE, ZOOM_HINT_MS, watchZoomHint } from './js/zoom-hint.js?v=75b745c7';
 import { EAT_PICK_TEXT, bestFoodIndex, eatChoices, eatTip } from './js/eat-pick.js?v=8fb763d0';
@@ -1206,6 +1206,7 @@ import { mountStartStreet } from './js/start-street.js?v=7d8ce49c'; // #349: the
 import { arrangeMapCards, fitMapExtras } from './js/map-extras.js?v=16e261b1'; // the Map's Shortcuts
 // The interface skin (js/classic/ui-mode.js) sets <html data-ui> as it loads: before main(), so before the boot cover lifts.
 import { installInterfaceSettings } from './js/classic/classic-prefs.js?v=c7aeb9ef';
+import { installWhatsNewWindow } from './js/ui/whats-new-window.js?v=9d37f2dc';
 import { standOnFeet, anchorBottomCentre } from './js/sprite-feet.js?v=849541a8';
 import { markLeaving, packPicks, takeCopies } from './js/copy-picks.js?v=b368fd49';
 import { holdKeepsBusy } from './js/instance-holds.js?v=ff3a63a3';
@@ -37633,6 +37634,8 @@ async function main() {
   packRow.install();
   installPhoneLayout();
   installInterfaceSettings({ engine, avatarPortrait: ownerPortraitUrl });
+  // #745: the Menu's What's new row and its window, which opens only when asked (also from the loading card).
+  installWhatsNewWindow();
   document.querySelector('.top-actions')?.addEventListener('click', () => {
     if (currentAction) cancelCurrentAction({ quiet: true });
     closePackPopover();

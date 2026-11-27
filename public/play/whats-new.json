@@ -12,6 +12,195 @@
         "The Bureaucratic Hall has its eight waiting chairs, and you stand on its floor again.",
         "Prices read the number then ₡ everywhere: shops, vendors, storage, mail and auctions."
       ]
+    },
+    {
+      "version": "v0.77.0",
+      "date": "2026-11-26",
+      "lines": [
+        "A window left open on a laptop that went to sleep no longer takes your character back when it wakes.",
+        "A machine that can't go down because you stand too close to the others now says so.",
+        "Something that ended up under the house floor comes back up onto it.",
+        "Visiting Stones on East Spice and four other streets stand at their street's end again.",
+        "A long description in an item's menu no longer squeezes its actions into a few rows."
+      ]
+    },
+    {
+      "version": "v0.76.0",
+      "date": "2026-11-26",
+      "lines": [
+        "Archimedes Acres's Group Hall has its own street for its group's members.",
+        "Drinks at the Pot Luck Day feast offer Drink, and drinking them works.",
+        "On a computer, only things in reach glow under the mouse, as in Glitch.",
+        "Progress Way's camera pan to the Street Spirit works, as in Glitch."
+      ]
+    },
+    {
+      "version": "v0.75.0",
+      "date": "2026-11-26",
+      "lines": [
+        "The Map's home card has House and Tower buttons beside Home.",
+        "Doors on the street map show what they are: a dino, a portal or a door.",
+        "The energy and mood rings change colour as they empty, as Glitch's gauges did.",
+        "Apple a Day gives its +5 energy when it ends, and every buff's end effect lands.",
+        "Croaking Piggies keep their own minute instead of all croaking as you arrive."
+      ]
+    },
+    {
+      "version": "v0.74.0",
+      "date": "2026-11-25",
+      "lines": [
+        "The teleporters on Ain't That Dry, Chiti Tiga and Harrisa Hara work again.",
+        "The secret passage behind the trunk in Koulato Cluster takes you to Ruta Asuncion again.",
+        "Open water and deep shafts no longer stop you on an invisible floor: you sink to the bottom.",
+        "Notes played on Piano Party's keys and stars are heard by everyone on the street.",
+        "Players' names are coloured in chat and in speech bubbles, one colour each."
+      ]
+    },
+    {
+      "version": "v0.73.1",
+      "date": "2026-11-25",
+      "lines": [
+        "Walking up to your house or pointing at it no longer makes the world blink out or go blank.",
+        "The glow around Helga and other vendors stays on their body through every animation."
+      ]
+    },
+    {
+      "version": "v0.73.0",
+      "date": "2026-11-25",
+      "lines": [
+        "Giant Icons can be placed at home, and visitors can Ruminate, Revere, Reflect and Tithe.",
+        "One click or tap on a garden plot does its job: harvest, hoe, water or fertilize.",
+        "A group's administrator can rename the group and change its description.",
+        "Coming back to the game from another page reconnects it, so chat and shared actions work again.",
+        "On a computer, things in reach glow, as in Glitch, instead of a label following you."
+      ]
+    },
+    {
+      "version": "v0.72.0",
+      "date": "2026-11-25",
+      "lines": [
+        "Only the owner, key holders and visitors let in can see inside a house and its back yard, as in Glitch.",
+        "Those inside can dig a back yard's Dirt Piles and work its Peat Bogs, shared with the owner.",
+        "When the owner logs off, visitors without a key are walked out to the front door.",
+        "The Game Show ticket's spinning wheel draws in front of barnacles."
+      ]
+    },
+    {
+      "version": "v0.71.0",
+      "date": "2026-11-25",
+      "lines": [
+        "Camera Mode at your own home can snap the whole house, Tower or home street, every floor stacked.",
+        "On a computer, sound keeps playing when you switch tabs, with a setting to choose.",
+        "Playing a musicblock for someone shows its bubble over them and gives them the block and notes.",
+        "Wall pieces go as high as Glitch allowed.",
+        "A visitor sees every Dirt Pile, Peat Bog and Patch in a friend's back yard."
+      ]
+    },
+    {
+      "version": "v0.70.0",
+      "date": "2026-11-25",
+      "lines": [
+        "Expand opens Glitch's dialog: what the next segment costs, what you have, and a button to use them.",
+        "Visitors see the owner's own house style.",
+        "A dead connection is found in seconds and says \"Reconnecting...\".",
+        "A Subway ticket plays the teleport chime, and stations play their region's music.",
+        "A gem found while mining shows in the activity log."
+      ]
+    },
+    {
+      "version": "v0.69.0",
+      "date": "2026-11-24",
+      "lines": [
+        "Butterflies and Batterflies wander their whole street at random, and everyone sees them in the same place.",
+        "Your first shrine donation offers Respect for the Beginnings again.",
+        "Show the way never sends you through a locked door you have no key for.",
+        "Music and sounds pause while you are in another app or tab, and pick up where they left off.",
+        "Firebog street spirits' flames flicker and their vines sway."
+      ]
+    },
+    {
+      "version": "v0.68.0",
+      "date": "2026-11-24",
+      "lines": [
+        "A room holds any number of furniture pieces, as in Glitch, and visitors see every one.",
+        "Sparkly of Interest shows its count on each step and finishes at 100.",
+        "A quest's place link opens the Map on the way into its region, with a Show the way button.",
+        "Quest steps read as words, not the quest editor's placeholders."
+      ]
+    },
+    {
+      "version": "v0.67.0",
+      "date": "2026-11-24",
+      "lines": [
+        "The Vine Radio: play 6 tunes for the Music Crabs and get a radio for your home street.",
+        "Sorted bags show a small badge with what they are sorted for.",
+        "The Bookcase can be made again on the Construction Tool.",
+        "Machines and the Crafty Bot work on every floor of your house, as in Glitch.",
+        "Encyclopedia How do I guides give short answers to questions players asked."
+      ]
+    },
+    {
+      "version": "v0.66.0",
+      "date": "2026-11-24",
+      "lines": [
+        "Encyclopedia search finds what each page says, not only its name, and shows what matched.",
+        "Street lists: every street with a community garden, a shrine to each Giant, a vendor, a subway and more.",
+        "On a phone at home, Decorate, Cultivate and Change Style have their own row under your home's name.",
+        "On a phone, your house and Tower floors fill the screen."
+      ]
+    },
+    {
+      "version": "v0.65.1",
+      "date": "2026-11-24",
+      "lines": [
+        "In the upright iPhone Home Screen app, the street runs up to the top bar again."
+      ]
+    },
+    {
+      "version": "v0.65.0",
+      "date": "2026-11-24",
+      "lines": [
+        "Snaps are taken at full screen size and open in a full-screen viewer with Previous and Next.",
+        "Snaps stay private until you make one public; public ones show on your profile.",
+        "Piles in your house and on your Tower floors, shelves and tables have no stack limit.",
+        "Home street music changes with the street style, as in Glitch.",
+        "The Game Show wheel can be spun the moment it appears."
+      ]
+    },
+    {
+      "version": "v0.64.0",
+      "date": "2026-11-24",
+      "lines": [
+        "A quiet release: behind-the-scenes work for the game's administrators."
+      ]
+    },
+    {
+      "version": "v0.63.2",
+      "date": "2026-11-24",
+      "lines": [
+        "Things you drop, drag or set down in your house show at once instead of after a pause.",
+        "Emblems and other one-to-a-stack things pile up on your house floor, shelves and tables."
+      ]
+    },
+    {
+      "version": "v0.63.1",
+      "date": "2026-11-24",
+      "lines": [
+        "Things you set on your house or Tower floor are for everyone there again, as in Glitch.",
+        "Moving one of your locked things onto the floor unlocks it.",
+        "You can move floor stacks along the floor in Decoration Mode."
+      ]
+    },
+    {
+      "version": "v0.63.0",
+      "date": "2026-11-23",
+      "lines": [
+        "Teleporting works while visiting someone else's home street, house or Tower.",
+        "House and Tower floors hold as many things as you like.",
+        "The Bureaucratic Hall has its office again, with the lizard at his computer.",
+        "Dino and subway entrances show on the street map and the loading picture.",
+        "The phone page has an Account tab: email, password, Change name and your profile description."
+      ]
     }
   ]
 }

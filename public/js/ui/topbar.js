@@ -82,6 +82,9 @@ export const MENU_ROWS = Object.freeze({
   'snaps-btn': { group: 'world', rank: 3 },
   // ENCYC (js/encyclopedia-links.js): the Encyclopedia's home page in its own tab; I opens it on what you look at.
   'encyclopedia-btn': { group: 'world', rank: 4, key: 'I' },
+  // #745 (ours, Austin 2026-11-27): What's new opens its window (js/ui/whats-new-window.js), beside the
+  // Encyclopedia with the game's other about-the-game rows.
+  'whats-new-btn': { group: 'world', rank: 4.5 },
   // A link, not a button: the site's /contribute/ page (GitHub Sponsors) in its own tab, last in
   // World (after rows with no place of their own, such as Interface, at 99).
   'support-btn': { group: 'world', rank: 100 },

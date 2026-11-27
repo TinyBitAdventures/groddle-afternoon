@@ -1,0 +1,1241 @@
+{
+  "format": "groddle-whats-new/1",
+  "about": "What the loading card shows after an update (#745): per release, newest first, up to five short player-facing lines. Written by tools/release/whats-new.mjs.",
+  "releases": [
+    {
+      "version": "v0.78.0",
+      "date": "2026-11-27",
+      "lines": [
+        "Random Holes: touch one and you pop out of another hole on the same street.",
+        "Decoration Mode scrolls into the back yard, so you can pick up and move what lies there.",
+        "Things dragged from your pack land where you let go in your back yard.",
+        "The Bureaucratic Hall has its eight waiting chairs, and you stand on its floor again.",
+        "Prices read the number then ₡ everywhere: shops, vendors, storage, mail and auctions."
+      ]
+    },
+    {
+      "version": "v0.77.0",
+      "date": "2026-11-26",
+      "lines": [
+        "A window left open on a laptop that went to sleep no longer takes your character back when it wakes.",
+        "A machine that can't go down because you stand too close to the others now says so.",
+        "Something that ended up under the house floor comes back up onto it.",
+        "Visiting Stones on East Spice and four other streets stand at their street's end again.",
+        "A long description in an item's menu no longer squeezes its actions into a few rows."
+      ]
+    },
+    {
+      "version": "v0.76.0",
+      "date": "2026-11-26",
+      "lines": [
+        "Archimedes Acres's Group Hall has its own street for its group's members.",
+        "Drinks at the Pot Luck Day feast offer Drink, and drinking them works.",
+        "On a computer, only things in reach glow under the mouse, as in Glitch.",
+        "Progress Way's camera pan to the Street Spirit works, as in Glitch."
+      ]
+    },
+    {
+      "version": "v0.75.0",
+      "date": "2026-11-26",
+      "lines": [
+        "The Map's home card has House and Tower buttons beside Home.",
+        "Doors on the street map show what they are: a dino, a portal or a door.",
+        "The energy and mood rings change colour as they empty, as Glitch's gauges did.",
+        "Apple a Day gives its +5 energy when it ends, and every buff's end effect lands.",
+        "Croaking Piggies keep their own minute instead of all croaking as you arrive."
+      ]
+    },
+    {
+      "version": "v0.74.0",
+      "date": "2026-11-25",
+      "lines": [
+        "The teleporters on Ain't That Dry, Chiti Tiga and Harrisa Hara work again.",
+        "The secret passage behind the trunk in Koulato Cluster takes you to Ruta Asuncion again.",
+        "Open water and deep shafts no longer stop you on an invisible floor: you sink to the bottom.",
+        "Notes played on Piano Party's keys and stars are heard by everyone on the street.",
+        "Players' names are coloured in chat and in speech bubbles, one colour each."
+      ]
+    },
+    {
+      "version": "v0.73.1",
+      "date": "2026-11-25",
+      "lines": [
+        "Walking up to your house or pointing at it no longer makes the world blink out or go blank.",
+        "The glow around Helga and other vendors stays on their body through every animation."
+      ]
+    },
+    {
+      "version": "v0.73.0",
+      "date": "2026-11-25",
+      "lines": [
+        "Giant Icons can be placed at home, and visitors can Ruminate, Revere, Reflect and Tithe.",
+        "One click or tap on a garden plot does its job: harvest, hoe, water or fertilize.",
+        "A group's administrator can rename the group and change its description.",
+        "Coming back to the game from another page reconnects it, so chat and shared actions work again.",
+        "On a computer, things in reach glow, as in Glitch, instead of a label following you."
+      ]
+    },
+    {
+      "version": "v0.72.0",
+      "date": "2026-11-25",
+      "lines": [
+        "Only the owner, key holders and visitors let in can see inside a house and its back yard, as in Glitch.",
+        "Those inside can dig a back yard's Dirt Piles and work its Peat Bogs, shared with the owner.",
+        "When the owner logs off, visitors without a key are walked out to the front door.",
+        "The Game Show ticket's spinning wheel draws in front of barnacles."
+      ]
+    },
+    {
+      "version": "v0.71.0",
+      "date": "2026-11-25",
+      "lines": [
+        "Camera Mode at your own home can snap the whole house, Tower or home street, every floor stacked.",
+        "On a computer, sound keeps playing when you switch tabs, with a setting to choose.",
+        "Playing a musicblock for someone shows its bubble over them and gives them the block and notes.",
+        "Wall pieces go as high as Glitch allowed.",
+        "A visitor sees every Dirt Pile, Peat Bog and Patch in a friend's back yard."
+      ]
+    },
+    {
+      "version": "v0.70.0",
+      "date": "2026-11-25",
+      "lines": [
+        "Expand opens Glitch's dialog: what the next segment costs, what you have, and a button to use them.",
+        "Visitors see the owner's own house style.",
+        "A dead connection is found in seconds and says \"Reconnecting...\".",
+        "A Subway ticket plays the teleport chime, and stations play their region's music.",
+        "A gem found while mining shows in the activity log."
+      ]
+    },
+    {
+      "version": "v0.69.0",
+      "date": "2026-11-24",
+      "lines": [
+        "Butterflies and Batterflies wander their whole street at random, and everyone sees them in the same place.",
+        "Your first shrine donation offers Respect for the Beginnings again.",
+        "Show the way never sends you through a locked door you have no key for.",
+        "Music and sounds pause while you are in another app or tab, and pick up where they left off.",
+        "Firebog street spirits' flames flicker and their vines sway."
+      ]
+    },
+    {
+      "version": "v0.68.0",
+      "date": "2026-11-24",
+      "lines": [
+        "A room holds any number of furniture pieces, as in Glitch, and visitors see every one.",
+        "Sparkly of Interest shows its count on each step and finishes at 100.",
+        "A quest's place link opens the Map on the way into its region, with a Show the way button.",
+        "Quest steps read as words, not the quest editor's placeholders."
+      ]
+    },
+    {
+      "version": "v0.67.0",
+      "date": "2026-11-24",
+      "lines": [
+        "The Vine Radio: play 6 tunes for the Music Crabs and get a radio for your home street.",
+        "Sorted bags show a small badge with what they are sorted for.",
+        "The Bookcase can be made again on the Construction Tool.",
+        "Machines and the Crafty Bot work on every floor of your house, as in Glitch.",
+        "Encyclopedia How do I guides give short answers to questions players asked."
+      ]
+    },
+    {
+      "version": "v0.66.0",
+      "date": "2026-11-24",
+      "lines": [
+        "Encyclopedia search finds what each page says, not only its name, and shows what matched.",
+        "Street lists: every street with a community garden, a shrine to each Giant, a vendor, a subway and more.",
+        "On a phone at home, Decorate, Cultivate and Change Style have their own row under your home's name.",
+        "On a phone, your house and Tower floors fill the screen."
+      ]
+    },
+    {
+      "version": "v0.65.1",
+      "date": "2026-11-24",
+      "lines": [
+        "In the upright iPhone Home Screen app, the street runs up to the top bar again."
+      ]
+    },
+    {
+      "version": "v0.65.0",
+      "date": "2026-11-24",
+      "lines": [
+        "Snaps are taken at full screen size and open in a full-screen viewer with Previous and Next.",
+        "Snaps stay private until you make one public; public ones show on your profile.",
+        "Piles in your house and on your Tower floors, shelves and tables have no stack limit.",
+        "Home street music changes with the street style, as in Glitch.",
+        "The Game Show wheel can be spun the moment it appears."
+      ]
+    },
+    {
+      "version": "v0.64.0",
+      "date": "2026-11-24",
+      "lines": [
+        "A quiet release: behind-the-scenes work for the game's administrators."
+      ]
+    },
+    {
+      "version": "v0.63.2",
+      "date": "2026-11-24",
+      "lines": [
+        "Things you drop, drag or set down in your house show at once instead of after a pause.",
+        "Emblems and other one-to-a-stack things pile up on your house floor, shelves and tables."
+      ]
+    },
+    {
+      "version": "v0.63.1",
+      "date": "2026-11-24",
+      "lines": [
+        "Things you set on your house or Tower floor are for everyone there again, as in Glitch.",
+        "Moving one of your locked things onto the floor unlocks it.",
+        "You can move floor stacks along the floor in Decoration Mode."
+      ]
+    },
+    {
+      "version": "v0.63.0",
+      "date": "2026-11-23",
+      "lines": [
+        "Teleporting works while visiting someone else's home street, house or Tower.",
+        "House and Tower floors hold as many things as you like.",
+        "The Bureaucratic Hall has its office again, with the lizard at his computer.",
+        "Dino and subway entrances show on the street map and the loading picture.",
+        "The phone page has an Account tab: email, password, Change name and your profile description."
+      ]
+    },
+    {
+      "version": "v0.62.0",
+      "date": "2026-11-23",
+      "lines": [
+        "Marylpole Mount Quarter: claim a free house lot, and your house stands there for everyone to visit.",
+        "From December 26 the Toy Vendor sells Confetti Poppers, and the whole street sees the confetti.",
+        "Make Bubbly with a Cocktail Shaker and Toast with the players around you.",
+        "At a Groddle midnight on December 31, earn a Midnight Sparkly and the \"Rang In the New Ur\" badge.",
+        "Every quest Tiny Speck wrote but never shipped has an Encyclopedia page."
+      ]
+    },
+    {
+      "version": "v0.61.0",
+      "date": "2026-11-23",
+      "lines": [
+        "A new phone layout: four fixed buttons at the top right, and the Map fills the screen.",
+        "On a phone, bags, Social, Quests and the Menu lift the street so your Glitch stays in view.",
+        "The Encyclopedia has one page per rock, peat bog and tree, each listing every street that has one.",
+        "Long chat lines in Global, Help, Trade, groups and IMs show in full.",
+        "A mined-out rock is gone until it reforms, as in Glitch, instead of leaving a faint ghost."
+      ]
+    },
+    {
+      "version": "v0.60.0",
+      "date": "2026-11-23",
+      "lines": [
+        "Change your character's name in Menu, Account: 1,000 currants, once every 30 days.",
+        "New characters and sign-ups work again after a spam filter had been turning them away.",
+        "A full bag's backdrop in the pack row is a soft grey instead of jet black."
+      ]
+    },
+    {
+      "version": "v0.59.0",
+      "date": "2026-11-23",
+      "lines": [
+        "Things dropped on a house floor, back yard or Tower floor are shared: everyone inside can pick them up.",
+        "Happy New Ur: a countdown and fireworks at each of the six Groddle midnights on December 31.",
+        "Drag a stack from the pack onto the street to drop it at your feet.",
+        "Character names can be two letters long, and animal names keep periods, so Dr. Oink stays Dr. Oink.",
+        "Encyclopedia pages for dirt piles, peat bogs, trees, rocks and animals list the streets that have them."
+      ]
+    },
+    {
+      "version": "v0.58.2",
+      "date": "2026-11-23",
+      "lines": [
+        "On a phone, the Decorate and Cultivate rows scroll with a sideways swipe; pull a tile up to place it.",
+        "Customize your house docks at the bottom and the street zooms out so you can see your house.",
+        "On the Map, streets being built are a blue road with a road-works sign.",
+        "The Bureaucracy clerks sell Card-Carrying Qualifications to badge holders too.",
+        "A Pot Luck Day Chicken dressed in one costume can be re-dressed in the other."
+      ]
+    },
+    {
+      "version": "v0.58.1",
+      "date": "2026-11-23",
+      "lines": [
+        "Streets look as they did in 2012, checked against players' old snaps and screenshots.",
+        "Clouds, mist and fog stay soft and see-through, and signposts no longer glow on dark streets.",
+        "Symphonious Maximus and the missing floor are rebuilt to match their 2012 screenshots.",
+        "Each Ticket to Paradise course has its own sky, and Cloud Rings has hoops that turn gold.",
+        "The Greedy Street Spirit's exit takes you back, and warns you first if you missed part of the story."
+      ]
+    },
+    {
+      "version": "v0.58.0",
+      "date": "2026-11-22",
+      "lines": [
+        "A Door can be restyled: all 32 Door styles from the original, with Upgrade and Change Style.",
+        "Furniture stands at its own depth, as in the original: beds against the back wall, rugs on the walking line.",
+        "A trip that fails to load tries once more, then leaves you where you were and says so.",
+        "A street spirit with two projects offers the one you are helping with first.",
+        "An upright iPhone shows the game's dark in the status bar instead of a light fog."
+      ]
+    },
+    {
+      "version": "v0.57.0",
+      "date": "2026-11-22",
+      "lines": [
+        "Choose your house: all ten original houses, every part customizable from the house door's menu, free.",
+        "Eight wallpapers, floors and ceilings made for the original but never sold are in Decorate.",
+        "Start a party from Storyland, Paradise, Winter Walk and more, and come back to the spot you left.",
+        "The subway train's map looks like the Map's Subway view, and each line has its own colour.",
+        "Circle the spot on a report's picture with up to three rings."
+      ]
+    },
+    {
+      "version": "v0.56.0",
+      "date": "2026-11-22",
+      "lines": [
+        "A Calendar of Ur's holidays, the events coming up and the Feats, opens from the clock.",
+        "Radial Heights runs its own scripts: stars light as you touch them, and touching them in order has an ending.",
+        "Pumpkin Seeds plant during Pot Luck Day as well as Zilloween, in a crop bed or an herb bed.",
+        "Your Butler tells you when the Rook is attacking a street.",
+        "iPhone and iPad Safari show a tip that Add to Home Screen plays the game full screen."
+      ]
+    },
+    {
+      "version": "v0.55.1",
+      "date": "2026-11-21",
+      "lines": [
+        "Leaving the Greedy Street Spirit story early no longer leaves the quest stuck: a Piggy offers it again.",
+        "Street project work keeps going when a unit arrives a little early.",
+        "On an upright phone the top bar shortens your counts (70K, 1.3K) instead of cutting them off.",
+        "In Decorate, moving an item onto a matching stack joins them, on shelves too.",
+        "Hellish Grapes lie in random piles again, and one squish still takes one bunch."
+      ]
+    },
+    {
+      "version": "v0.55.0",
+      "date": "2026-11-21",
+      "lines": [
+        "Pot Luck Day begins November 22, with a card when it starts and another on Thanksgiving Day.",
+        "The Harvest Table and feast appear at midnight for players already at Groddle Forest Junction.",
+        "Groddle Originals, a new page for everything made for Groddle that Glitch never had.",
+        "Quick Act presses on a street tree no longer choose Talk to.",
+        "An upgraded street shows its upgrade after a login or reload online."
+      ]
+    },
+    {
+      "version": "v0.54.1",
+      "date": "2026-11-21",
+      "lines": [
+        "Mining while other players use tools nearby no longer freezes your character.",
+        "Narrow streets fill the window instead of showing black bars at the sides.",
+        "Garden signs and other street signs show their words.",
+        "The street card on arrival lists the Batterflies on every street that has them.",
+        "The Shrine window shows each Giant's emblem and links the Giant's Encyclopedia page."
+      ]
+    },
+    {
+      "version": "v0.54.0",
+      "date": "2026-11-20",
+      "lines": [
+        "The start card shows a returning player today's skill, Feat, a tip and a nudge toward a badge.",
+        "Help mine, Cubimal races, battles and chat work inside a Party Space.",
+        "Vendors near you show an icon for each store.",
+        "Holding Enter at a vendor no longer buys the same thing again and again.",
+        "Under a ladder out of reach, the game tells you to jump, then press Up in the air."
+      ]
+    },
+    {
+      "version": "v0.53.0",
+      "date": "2026-11-20",
+      "lines": [
+        "Quoins in Paradise, A Summer's Day and Penumbra pay your quoin multiplier, as in Glitch.",
+        "Refuel asks how many Fuel Cells to put in before any are used.",
+        "Each stat has one icon and colour everywhere, from the top bar to reward screens.",
+        "The Giants list, the favor chip and the shrine window show each Giant's own shrine symbol.",
+        "Street Spirits and mailboxes no longer stand inside a tree's crown."
+      ]
+    },
+    {
+      "version": "v0.52.0",
+      "date": "2026-11-20",
+      "lines": [
+        "Every street's loading card now shows a picture of the street: 1,474 streets, up from 82.",
+        "Street pictures no longer leave out decorations."
+      ]
+    },
+    {
+      "version": "v0.51.2",
+      "date": "2026-11-20",
+      "lines": [
+        "Every Patch in your yard is drawn, not just the first eight.",
+        "A friend's garden help can no longer turn a ripe crop back into seeds.",
+        "Following a friend no longer takes you onto a street still being built.",
+        "Inside the subway car, your star moves along the line map during the ride.",
+        "After arriving by a signpost or door, /stuck takes you back to where you came in."
+      ]
+    },
+    {
+      "version": "v0.51.1",
+      "date": "2026-11-20",
+      "lines": [
+        "The subway route card names the line to board, the stop to get off at and the steps up.",
+        "Fruit trees and the other trants show how much they hold: bare, half or full.",
+        "Your own Glitch appears in your own look when the game starts.",
+        "You walk up a subway station's steps to the entrance.",
+        "A vendor, a trade or a letter never takes a bag that still holds things."
+      ]
+    },
+    {
+      "version": "v0.51.0",
+      "date": "2026-11-19",
+      "lines": [
+        "Online, other players can mourn or celebrate your grave once, as in Glitch.",
+        "Street changes are quicker, and a click on a door or subway steps goes straight through.",
+        "The map draws streets you have not been to as a dotted line, as Glitch did.",
+        "Vanity offers None for tops, trousers and shoes.",
+        "Pot's Empty Table and other event quests can be pinned."
+      ]
+    },
+    {
+      "version": "v0.50.3",
+      "date": "2026-11-19",
+      "lines": [
+        "The Contribute page's ledger shows the two newest sponsor gifts: three sponsors now."
+      ]
+    },
+    {
+      "version": "v0.50.2",
+      "date": "2026-11-19",
+      "lines": [
+        "The stack you drag is the one that goes, onto a display box, a Butler, a cabinet or a trade.",
+        "Trades, mail, auctions and home sales go through while the game is saving.",
+        "Race Tickets and teleport scripts work inside a Party Space, as in Glitch.",
+        "A broken part of the game no longer freezes your avatar."
+      ]
+    },
+    {
+      "version": "v0.50.1",
+      "date": "2026-11-19",
+      "lines": [
+        "Mined-out rocks take longer to come back, so you work a street's rocks instead of two in turn.",
+        "Visitors can keep petting, watering and harvesting on a home street after half an hour there.",
+        "Towers and Note Poles stand where Glitch drew them, so you no longer float above the porch.",
+        "The Jellisac Mound grows three Jellisacs.",
+        "An expired Party Space sends you back where you entered it, not to Baqala."
+      ]
+    },
+    {
+      "version": "v0.50.0",
+      "date": "2026-11-18",
+      "lines": [
+        "Reports in the game show the chat's emoji reactions, and you can add your own.",
+        "Spinning, smelting and crushing take as much as the pack holds, so Spin Doctor can be earned.",
+        "Encyclopedia item pages say how to get each item.",
+        "The subway's red button sits where the 2012 stations had it.",
+        "A display box offers every item it can take."
+      ]
+    },
+    {
+      "version": "v0.49.1",
+      "date": "2026-11-18",
+      "lines": [
+        "Music and sounds come back after you step away or the system interrupts them.",
+        "Short looping street music no longer plays twice at once in Safari.",
+        "Food can be dragged onto a Piggy Feeder, as in Glitch."
+      ]
+    },
+    {
+      "version": "v0.49.0",
+      "date": "2026-11-18",
+      "lines": [
+        "Thanksgiving Day's feast: the week's Harvest Table food is set out at Groddle Forest Junction.",
+        "The Harvest Table is three boards long, and Look lists every dish with who laid it.",
+        "Mining and digging together at a friend's home rocks and Dirt Piles count as helping.",
+        "Map routes ride the subway when it saves more than about five streets of walking.",
+        "Wine of the Dead flies from Hell's Bartender into your pack, as in Glitch."
+      ]
+    },
+    {
+      "version": "v0.48.1",
+      "date": "2026-11-18",
+      "lines": [
+        "In a back yard, trees and pours stay on their own Patch after another Patch wears out.",
+        "Smuggling runs only send you where you can walk, and never by subway.",
+        "Sky no longer shows below the ground when the camera is low on a street.",
+        "Musicblocks can be played in Hell, as in Glitch."
+      ]
+    },
+    {
+      "version": "v0.48.0",
+      "date": "2026-11-18",
+      "lines": [
+        "Pot Luck Day (Nov 22-29), the first festival made for Groddle: dress a street Chicken.",
+        "Lay a dish or a crop on the Harvest Table by the Groddle Forest Junction signpost.",
+        "Pot's Empty Table quest, Harvest Stuffing and five new badges come with Pot Luck Day.",
+        "Drop a stack on a friend's Butler to leave it as a package, or on yours as a gift.",
+        "Mining swings take a third of Glitch's time: 6 seconds down to 2.4 for Mining I to IV."
+      ]
+    },
+    {
+      "version": "v0.47.1",
+      "date": "2026-11-17",
+      "lines": [
+        "Online, you see other players at work: a thought bubble shows their tool as they mine or dig.",
+        "On your home street, visitors see your harvests, furniture and decor as you do them.",
+        "The Outer Mind takes its 2012 shape, and Winter Haven's trees carry their snow.",
+        "Street gardens stand where players' 2012 pictures show them, with every bed Glitch had.",
+        "The loose Apples on every street are gone; Glitch never had them."
+      ]
+    },
+    {
+      "version": "v0.47.0",
+      "date": "2026-11-16",
+      "lines": [
+        "Phones: pinned quests are one round button in the top bar that shows progress as a ring.",
+        "A new sound setting lets your own music keep playing under the game's sound effects.",
+        "The Encyclopedia has a subway map page with every station and its next stops.",
+        "Hub Completist badges need every street of their hub; badges already earned stay.",
+        "Barnacles in Kalavana and Jethimadh hang on walls and tree legs where Glitch hung them."
+      ]
+    },
+    {
+      "version": "v0.46.0",
+      "date": "2026-11-16",
+      "lines": [
+        "A new game no longer starts in Hechey Track's treetops, but on the street's arrival point.",
+        "A teleport or summons plays your Glitch's own one-second animation, as in Glitch.",
+        "Petting, milking, squeezing and more show Tiny Speck's own effects to players around you.",
+        "Poured Alphabet Sauce is Tiny Speck's glowing column of drifting letters, not a red puddle.",
+        "Winter Walk's caption stands inside its hollow tree arch again."
+      ]
+    },
+    {
+      "version": "v0.45.1",
+      "date": "2026-11-16",
+      "lines": [
+        "Tower projects ask How many for each part, with a Max button, instead of adding all you carry.",
+        "The subway map fits an upright phone, and zooms and pans with fingers, wheel or buttons."
+      ]
+    },
+    {
+      "version": "v0.45.0",
+      "date": "2026-11-16",
+      "lines": [
+        "A party invite works from a quest room or puzzle: the room waits, with your run and quoins kept.",
+        "Leaving the party takes you back to the same spot in the room.",
+        "From a race or a game you can go too, but going gives the game up, as in Glitch."
+      ]
+    },
+    {
+      "version": "v0.44.0",
+      "date": "2026-11-16",
+      "lines": [
+        "Walk Toward the Light and Radiant Glare are drawn with new art made from players' 2012 pictures.",
+        "On some phones, speech bubbles no longer draw thin lines out to the middle of the screen.",
+        "A party invite accepted at home opens the teleporter there, as in Glitch."
+      ]
+    },
+    {
+      "version": "v0.43.1",
+      "date": "2026-11-16",
+      "lines": [
+        "Today's Feat keeps every quest you finish, even when a report can't be taken right away.",
+        "Signpost words use the game's own font, so they read clearly on phones.",
+        "The Butler's longer hints stay up long enough to read, and also go to Local chat."
+      ]
+    },
+    {
+      "version": "v0.43.0",
+      "date": "2026-11-16",
+      "lines": [
+        "Sloths are Tiny Speck's own painted sloth again, hiding in the leaves of their trees.",
+        "Knock on a sloth's Knocker to call it: it spits snails into your pack in rounds of 1 to 4.",
+        "Pack search lists every match under the search box, items in bags included.",
+        "Local chat lists everyone on your street, with how many players are online.",
+        "A street with no road back to Ur shows an EXIT sign to take you back to your last street."
+      ]
+    },
+    {
+      "version": "v0.42.3",
+      "date": "2026-11-16",
+      "lines": [
+        "Party Spaces drop Glitch's own party quoins, back 60 to 120 seconds after you take one.",
+        "The Map dims the names of streets you have not visited yet.",
+        "Phones: the touch stick climbs ladders, and the street sheet has a Map button.",
+        "Sound effects keep playing after many Acts in a row.",
+        "Ix Completist asks for all nine Ix streets; a badge already earned is kept."
+      ]
+    },
+    {
+      "version": "v0.42.2",
+      "date": "2026-11-15",
+      "lines": [
+        "Rocks, shrines, vendors, soil patches and animals no longer stand up in the trees.",
+        "Subway stations are laid out as in Glitch, with A Red Button on the gate box.",
+        "A walk along a route keeps going while you open the Map, chat, Quests or Skills.",
+        "A quest card counts every step of a quest, and Pinned Quests list each step left.",
+        "In the iPhone Home Screen app the Encyclopedia opens over the game."
+      ]
+    },
+    {
+      "version": "v0.42.1",
+      "date": "2026-11-15",
+      "lines": [
+        "The first tutorial screen says how to pull the chain, and the chain is easier to hit on a phone.",
+        "A reload in the Cloud Level puts you back on the cloud you reached.",
+        "A jump beside a ladder is a jump: Up gets on a ladder only on a fresh press.",
+        "Peatland Moors and 20 other streets get their missing ladder steps.",
+        "Phones no longer draw black boxes in a street's rock faces."
+      ]
+    },
+    {
+      "version": "v0.42.0",
+      "date": "2026-11-15",
+      "lines": [
+        "Reports carry up to four pictures: drop, paste, pick or take them in the game.",
+        "Friends can help build a Tower floor once its owner starts it at the Workbench.",
+        "Clicking your currants lists the nearest vendor of each kind, with Set as destination.",
+        "The Menu has an \"I'm stuck\" row, and every encyclopedia page has a search box.",
+        "Dropping a tool onto a Tinkertool repairs it."
+      ]
+    },
+    {
+      "version": "v0.41.2",
+      "date": "2026-11-15",
+      "lines": [
+        "Every region map is now Tiny Speck's own 2012 painting, restored: all 51 of 51.",
+        "Phones: tap Act again to pick the highlighted row, or drag on Act and lift to choose.",
+        "The Feat Completed card shows the Petrified Rock sharp, drawn from Tiny Speck's own art.",
+        "The Make window says how many of the thing you're making you already carry."
+      ]
+    },
+    {
+      "version": "v0.41.1",
+      "date": "2026-11-15",
+      "lines": [
+        "Visitors can plant, water and pick the gardens on another player's home street.",
+        "Fourteen more region maps are Tiny Speck's 2012 paintings again, 48 of 51 regions in all.",
+        "Number keys do emotes again: 1 surprised, 2 angry, 3 happy, 4 AFK.",
+        "Home rocks wear out after 40 mine-outs, not 40 swings.",
+        "Finding the nearest shrine no longer ends on a street under construction."
+      ]
+    },
+    {
+      "version": "v0.41.0",
+      "date": "2026-11-15",
+      "lines": [
+        "Five more region maps are Tiny Speck's 2012 paintings again, 34 regions in all.",
+        "Mining takes Glitch's time again, and the pick swings on the rock.",
+        "Add to Home Screen opens Groddle Afternoon full screen, as an app.",
+        "Speech bubbles on phones move smoothly instead of bouncing back and forth.",
+        "Join the Club's shut door can no longer be jumped over."
+      ]
+    },
+    {
+      "version": "v0.40.1",
+      "date": "2026-11-14",
+      "lines": [
+        "Karnata, Lida and Massadoe's maps are Tiny Speck's 2012 paintings again, 29 regions in all.",
+        "Capture is offered again for a Piggy in your own back yard after a capture there.",
+        "Le Misérable II's small doors let you through only once you are shrunk.",
+        "On a sideways phone, Jump stays clear of Social and the report window stays visible.",
+        "A resting street's signpost says when its next project opens."
+      ]
+    },
+    {
+      "version": "v0.40.0",
+      "date": "2026-11-14",
+      "lines": [
+        "Ten more region maps are Tiny Speck's 2012 paintings again, 26 regions in all.",
+        "A save that does not go in now says so at the top of the game and keeps trying.",
+        "Phones get an Act button beside Jump that talks to, reads or uses whatever is nearest.",
+        "The Meal Vendor and Helga no longer turn into black squares on some Android phones.",
+        "The Piggy capture limit no longer applies in your own house, yards or Tower."
+      ]
+    },
+    {
+      "version": "v0.39.1",
+      "date": "2026-11-14",
+      "lines": [
+        "Drifa and Firozi's maps are Tiny Speck's 2012 paintings again, sixteen in all.",
+        "The restored region maps lose the pale strips at their left and right edges."
+      ]
+    },
+    {
+      "version": "v0.39.0",
+      "date": "2026-11-14",
+      "lines": [
+        "Ten more region maps are Tiny Speck's 2012 paintings again, from Aranna to Choru.",
+        "260 shrines in sixteen more regions stand where Tiny Speck's 2012 street pictures show them.",
+        "Legalize It's application is made in a shared Bureaucratic Hall, with everyone else in it.",
+        "An Autumn Day plays its own music, looped.",
+        "A cabinet's storage window fits a small phone without scrolling sideways."
+      ]
+    },
+    {
+      "version": "v0.38.1",
+      "date": "2026-11-14",
+      "lines": [
+        "Groddle Meadow's 36 shrines stand where Tiny Speck's 2012 street pictures show them.",
+        "Shrines, trees, vendors and animals keep off the Peat Bogs, Jellisacs and Barnacles.",
+        "The Louise Pasture Villa's door stands in an apartment house instead of an open field.",
+        "Swoonerflies show their name when you hover or tap them.",
+        "An open bag no longer holds back a quest's award, so Gwendolyn's Task offers its second part."
+      ]
+    },
+    {
+      "version": "v0.38.0",
+      "date": "2026-11-13",
+      "lines": [
+        "The World map is sharp on Retina screens and phones, with Tiny Speck's own charts.",
+        "Groddle Meadow, Alakol, Groddle Forest and Andra's maps are Tiny Speck's 2012 paintings again.",
+        "Rocks, peat bogs and paper trees that hung above the ground now sit on it.",
+        "The Quests panel's Offered tab lists every new quest, with Accept and Not right now.",
+        "Scraping a barnacle, digging and cutting peat sound while you work."
+      ]
+    },
+    {
+      "version": "v0.37.1",
+      "date": "2026-11-13",
+      "lines": [
+        "The featured street project works online for everyone again.",
+        "The Magic Rock wears Glitch's full white rim on its cards."
+      ]
+    },
+    {
+      "version": "v0.37.0",
+      "date": "2026-11-13",
+      "lines": [
+        "On phones the street runs edge to edge, upright or sideways, clear of the notch.",
+        "The Map has a World view of Tiny Speck's own world map, and a Subway view of the twelve stations.",
+        "Lotha Harte's three icicles play their notes, and the right order lights the heart.",
+        "Breezy, EZ Cookin' and Talking 'bout Soil Appreciation get their practice streets back.",
+        "Winter Walk's big icicles fall and stand as pillars you can climb."
+      ]
+    },
+    {
+      "version": "v0.36.1",
+      "date": "2026-11-13",
+      "lines": [
+        "An iPhone no longer closes the game on the way into heavy streets such as Froughtful Fen.",
+        "Pinching to zoom keeps the street drawn the whole time, and zoomed in it draws sharper.",
+        "Make, the Map, Mail, Decoration Mode and many more windows fit an upright phone.",
+        "A Still works on the ground, as in Glitch: drop it, then Distill and Collect there.",
+        "On phones the top bar shows your currants and favor, and Camera Mode opens from the Menu."
+      ]
+    },
+    {
+      "version": "v0.36.0",
+      "date": "2026-11-12",
+      "lines": [
+        "Rocks, trees, Paper Trees and mailboxes stand where players' 2012 snaps show them.",
+        "Teleportation V summons a friend to where you stand.",
+        "Two players on one rock or node are both paid, and Ice Nubbins take Help scrape.",
+        "Street projects ask \"How many?\", pay every helper and show a top-ten leaderboard.",
+        "Phones get pinch to zoom, a pack row that scrolls and signposts that take a finger."
+      ]
+    },
+    {
+      "version": "v0.35.0",
+      "date": "2026-11-12",
+      "lines": [
+        "Alternate characters: one login holds up to three characters, one playing at a time.",
+        "Playable on phones, with touch controls, a lighter render and windows that fit either way up.",
+        "Sharper on Retina screens: homes, wallpaper, home-street houses, quest rooms and more.",
+        "An Apple gives 5 energy and no mood, as Glitch's did.",
+        "Logging in at 0 energy on a new game day refills you before anything can send you to Hell."
+      ]
+    },
+    {
+      "version": "v0.34.0",
+      "date": "2026-11-12",
+      "lines": [
+        "No more stuck players at the second tutorial bag, the smuggler's hole or the Ancestral Lands kick.",
+        "Quoins hang where players snapped them in 2012, each its own kind.",
+        "The newest arrow or A/D key you press steers, so a key the game thinks is held never freezes you.",
+        "Winter Walk motes pay Glitch's quoin amounts and can't be farmed by leaving.",
+        "Mail can carry what Glitch let you mail, such as CrabPod Headphones."
+      ]
+    },
+    {
+      "version": "v0.33.2",
+      "date": "2026-11-11",
+      "lines": [
+        "Ladders and ledges line up with their art on streets narrower than a wide window.",
+        "Mortar Barnacles sit on the walls where Glitch had them, placed from players' 2012 snaps.",
+        "Classic no longer resizes the game on hover, and the iMG count fits.",
+        "Classic's character builder takes the 2012 Vanity layout, with size sliders.",
+        "Classic Skills step one level at a time, with the 2012 study bar."
+      ]
+    },
+    {
+      "version": "v0.33.1",
+      "date": "2026-11-11",
+      "lines": [
+        "A busy save of project gifts and rewards no longer leads to a dropped connection.",
+        "Apple a Day's energy boost now shows when it lands, or says your energy was already full."
+      ]
+    },
+    {
+      "version": "v0.33.0",
+      "date": "2026-11-11",
+      "lines": [
+        "One featured street project at a time, shown under the street name and at the top of Projects.",
+        "Global announces the featured project when it opens and when it is built.",
+        "Feat goals grow with how many played the day before.",
+        "A full bag's bar turns the accent colour, so full never looks like almost full.",
+        "Yard plants step aside for a garden instead of poking through it."
+      ]
+    },
+    {
+      "version": "v0.32.0",
+      "date": "2026-11-11",
+      "lines": [
+        "Street Spirits give their street's project again: Talk to opens it.",
+        "Group Halls are built on their roped lot with its house-and-hammer sign.",
+        "The Incantations Feat works between real players: three of you on one street, one line each.",
+        "Plant asks which seed to use, and dropping a seed on a plot plants it.",
+        "Trophies stand on wall shelves, as they could in Glitch."
+      ]
+    },
+    {
+      "version": "v0.31.1",
+      "date": "2026-11-10",
+      "lines": [
+        "The gut streets drop you down to the way out instead of lifting you back up the gut.",
+        "The Herb Gardens of Chakra Phool, Jethimadh and Shimla Mirch grow herbs in every bed.",
+        "Typing a C in chat no longer opens Camera Mode in the Institute of Ocular Testing.",
+        "Notice the Unnoticeable, Legalize It and Four Letter Words wait for what started them in Glitch.",
+        "A shared street project's last card shows your share of the work."
+      ]
+    },
+    {
+      "version": "v0.31.0",
+      "date": "2026-11-10",
+      "lines": [
+        "Chat lines and the Community boards get a Thank you reaction.",
+        "Machines play their ready beep when a job is done, in Tiny Speck's own sounds.",
+        "The Still has its sounds: the hopper lid on Distill and its chime on Collect.",
+        "A potion's bottle uncorks, tips and pours when you quaff or pour it.",
+        "Your Scraper and Shovel are seen at work on Barnacles, Ice Nubbins, Dirt Piles and Peat."
+      ]
+    },
+    {
+      "version": "v0.30.0",
+      "date": "2026-11-10",
+      "lines": [
+        "Garden crops grow in minutes to an hour, and a plot shows how long is left.",
+        "Online, a Batterfly's hourly Guano is one pile on the street for everyone.",
+        "A Chicken you walk into says Squawk! and flies off.",
+        "Visitors see the owner's Magic Sticks, Piggy Feeder and Garden Gnomes on a home street.",
+        "A quoin's amount is larger and stays on screen long enough to read."
+      ]
+    },
+    {
+      "version": "v0.29.0",
+      "date": "2026-11-10",
+      "lines": [
+        "Make opens on your tools, grouped by kind, with search on both screens.",
+        "Leave a line with your Butler for visitors, and ask another player's Butler about its owner.",
+        "Click the favor display to see your favor with all eleven Giants.",
+        "Buddies show their faces in the Buddies list.",
+        "Speech bubbles stay with their speaker."
+      ]
+    },
+    {
+      "version": "v0.28.1",
+      "date": "2026-11-10",
+      "lines": [
+        "Oppidan Avenue's teleporters work, so nobody is shut in behind the beam.",
+        "Gold upgrade cards, such as Trade Channelling, can be bought in Firefox.",
+        "Firebog home streets and back yards stand their trees and huts on the ground.",
+        "A chat line holds 1,000 characters, as the original's did.",
+        "Another player's arrival is lighter and quicker on your screen."
+      ]
+    },
+    {
+      "version": "v0.28.0",
+      "date": "2026-11-09",
+      "lines": [
+        "Door keys lie on their streets again, in the spots the old wiki names.",
+        "Online a street has one key for everyone, back five minutes after it is picked up.",
+        "The street no longer stops for a moment when another player walks in.",
+        "The Cubimal card counts every figure you have found, as the Badges panel does.",
+        "Harbinger Heath's leftmost ladder has all its rungs."
+      ]
+    },
+    {
+      "version": "v0.27.0",
+      "date": "2026-11-09",
+      "lines": [
+        "Energy and mood go past 100 in the Paradise ticket streets.",
+        "Brillah Completist can be earned by visiting all 27 Brillah streets.",
+        "You can put your Mail Dispatcher away, and put it out again from Cultivate.",
+        "A street Piggy's name, captures, youth potions and Plops are shared with everyone online.",
+        "Sixteen more back yards look like players' 2012 pictures, and forest yards grow a real pine forest."
+      ]
+    },
+    {
+      "version": "v0.26.0",
+      "date": "2026-11-08",
+      "lines": [
+        "Set your own machine down in a Community Machine Room, and anyone there can use it.",
+        "Online, the Crown Game Teleporter takes 50 currants and joins you to a Game of Crowns.",
+        "Seven back yards look like players' own 2012 pictures of them, such as Night Lights and Torrid Cove.",
+        "Sharper on big screens: Party teleporters, Rook silhouettes, the Ball and the Giant icons.",
+        "A line typed in Local chat goes to Local, not to Global Chat."
+      ]
+    },
+    {
+      "version": "v0.25.0",
+      "date": "2026-11-08",
+      "lines": [
+        "Cubimal battles: set a figure down and it fights another player's figure nearby.",
+        "Street animals are in the same place for everyone online, from Piggies to Heli Kitties and Crabs.",
+        "Drag a pack item onto a thing in the world, like food onto a Piggy or a tool onto a rock.",
+        "Coral Caves and its yard Anemone Alley are drawn with their own pieces of the location art.",
+        "Louise Pasture Villa, an apartment hall, opens behind a new door on Louise Pasture."
+      ]
+    },
+    {
+      "version": "v0.24.0",
+      "date": "2026-11-08",
+      "lines": [
+        "Street Patches are shared online: everyone on a street tends, plants and grows the same Patch.",
+        "A tree grown on a street Patch is the same tree for everyone to pet, water and harvest.",
+        "One item picker for auctions, giving, wrapping gifts and the Butler's packages, with a search box.",
+        "Items from Dust Traps, gathering spots and dropped loot float up with their picture.",
+        "Trees and Chickens stand on the ground instead of floating above it."
+      ]
+    },
+    {
+      "version": "v0.23.0",
+      "date": "2026-11-07",
+      "lines": [
+        "Legalize It: nobody gets stuck in The Back Alley, and leaving the quest keeps your cards.",
+        "Wintry Place: /stuck takes you to the way out on the floor.",
+        "Pick up how many works on a shared street stack: take what you want, the rest stays for everyone.",
+        "Groddle Meadow, Groddle Forest and Alakol have redone map paintings, closer to the originals.",
+        "A garden left for hours comes back as far as it grew, a crop instead of dry shoots."
+      ]
+    },
+    {
+      "version": "v0.22.0",
+      "date": "2026-11-07",
+      "lines": [
+        "The ten public gardens are shared online: everyone on the street sees and tends the same plots.",
+        "A planter has 60 seconds to pick a ripe crop first, as in the original.",
+        "Master Gardener potions work on the shared gardens, and you see others' watering cans and hoes.",
+        "Every region map is repainted from Tiny Speck's thumbnails of the lost originals."
+      ]
+    },
+    {
+      "version": "v0.21.0",
+      "date": "2026-11-07",
+      "lines": [
+        "A Garden Gnome can be set down at home, taught three phrases, and says one when bumped.",
+        "Bestow Random Kindness on another player, and they see its rainbow.",
+        "Guano goes on one garden plot by hand: drag it there, or pick Fertilize from the plot's menu.",
+        "Street Piggies walk in the same place on every player's screen.",
+        "19 more regions have new map paintings, among them Jal, Kajuu, Shimla Mirch and Tahli."
+      ]
+    },
+    {
+      "version": "v0.20.0",
+      "date": "2026-11-06",
+      "lines": [
+        "Trophies can be found in the Furniture tab and displayed in your house.",
+        "Eleven more regions have new map paintings, among them Groddle Heights, Ix and Firozi.",
+        "Search and filter your upgrades by kind.",
+        "On a phone the site's header has a Menu that opens every link, and pages fit and tap better.",
+        "Each Teleportation Script keeps its own street, wherever it goes."
+      ]
+    },
+    {
+      "version": "v0.19.2",
+      "date": "2026-11-06",
+      "lines": [
+        "Eleven regions have new map paintings, among them Groddle Meadow and Groddle Forest.",
+        "Finishing a collection gives its trophy, and one you already finished arrives when you load the game.",
+        "Dust Traps can drop the five rare door keys, so ten more doors can be opened.",
+        "The Gem Collector badge can be earned.",
+        "The Butler gives each real visitor your gift, even while you're away."
+      ]
+    },
+    {
+      "version": "v0.19.1",
+      "date": "2026-11-06",
+      "lines": [
+        "In Training Level Two, the Dustbunny no longer holds you if your energy or mood is already full."
+      ]
+    },
+    {
+      "version": "v0.19.0",
+      "date": "2026-11-05",
+      "lines": [
+        "The Encyclopedia has seven new sections, including a page for every one of the 1,417 streets.",
+        "Every item page says what the item is for, where to find it and what vendors pay for it.",
+        "Press I in the game to open the Encyclopedia on what you're looking at.",
+        "Shake, Compress, Age, Unbundle and Shuck ask how many of the stack.",
+        "On a phone the Social drawer starts closed, and Report a problem stays on screen."
+      ]
+    },
+    {
+      "version": "v0.18.0",
+      "date": "2026-11-04",
+      "lines": [
+        "Community: the game's Social drawer as a full-screen chat app on the web, with public boards.",
+        "Reply in thread and add emoji reactions to chat lines, in the game and on the web.",
+        "Notice Boards are shared online: what you pin, everyone on the street reads and can take.",
+        "Every tool, potion, Cubimal and more keeps its own wear, charges or contents, as in Glitch.",
+        "A Projects panel (P) shows the street projects you've helped with and what they still need."
+      ]
+    },
+    {
+      "version": "v0.17.0",
+      "date": "2026-11-04",
+      "lines": [
+        "Your jump reaches as high as it did in Glitch, and jumps take the same time at any frame rate.",
+        "The Rook comes once a day, a few minutes after you settle on a shrine street.",
+        "The Quests sheet has a search box and a sort picker once you have 8 or more quests.",
+        "Sort your bags with the Internal Sortitude, Magic Sort and Stack Up upgrade cards.",
+        "The Map grows with your window, and routes no longer send you up a drop you can't climb."
+      ]
+    },
+    {
+      "version": "v0.16.0",
+      "date": "2026-11-03",
+      "lines": [
+        "Right-click menus across the game, for things in the world, your pack, players, chat and the Map.",
+        "Type / on its own in chat to see the chat commands, like /home, /house and /tower.",
+        "The road from Yellow Yawning into Xalanga is open, so To Xalanga, And Beyond can be done.",
+        "Planting and harvesting by hand counts for quests and garden badges.",
+        "Home gardens wear out with use, as in Glitch, and then need restoring."
+      ]
+    },
+    {
+      "version": "v0.15.0",
+      "date": "2026-11-03",
+      "lines": [
+        "Cabinets open as storage, as in Glitch, and friends with a key to your house can open them too.",
+        "Storage Display Boxes sell to visitors at your price, even while you're away.",
+        "The Your looks list is back: a look you wear for five minutes is kept, and one click wears it again.",
+        "F asks \"Eat what?\" with your best food already picked.",
+        "Clicking the street name at the top opens the Map."
+      ]
+    },
+    {
+      "version": "v0.14.0",
+      "date": "2026-11-02",
+      "lines": [
+        "Send another player an IM from their menu, your Buddies list or their page on the site.",
+        "Every region of Ur plays its own original music again, and many streets play their own tracks.",
+        "Name and rename your bags.",
+        "Your home street shows on your profile page, drawn from the game's own art.",
+        "A street still being built can never cut you off from the rest of the world."
+      ]
+    },
+    {
+      "version": "v0.13.0",
+      "date": "2026-11-02",
+      "lines": [
+        "Enter at a signpost works as in Glitch: choose a road with Up and Down, then Enter to go.",
+        "Press V beside a vendor to browse its goods.",
+        "A broken tool is never stuck: any vendor or shrine takes it at its worn worth.",
+        "Fire Dragons, the first animal made for Groddle.",
+        "Quest rooms no longer run out of time; they ask if you are stuck, as in the original."
+      ]
+    },
+    {
+      "version": "v0.12.0",
+      "date": "2026-11-02",
+      "lines": [
+        "The Groddle Encyclopedia: every quest, animal, vendor, skill, region and achievement.",
+        "In Decoration Mode, move things you set down in your house or drop them back on your pack.",
+        "Things rest on chairs, sofas, beds, benches and stools, as in the original.",
+        "Drag a stack onto another of the same thing to join them, up to a full stack.",
+        "A quoin is taken only when you touch it, so you can hop over one you don't want."
+      ]
+    },
+    {
+      "version": "v0.11.0",
+      "date": "2026-11-01",
+      "lines": [
+        "Choose something out of reach and you walk over to it, then do it, as in the original.",
+        "On a subway train, M shows the line you are riding and lets you pick your stop.",
+        "/stuck puts you back where you arrived on the street, once every five minutes.",
+        "Signpost arms are numbered from the top, and a number key takes that road.",
+        "On a friend's home street you can harvest Wood Trees, plant beans and whistle up their Firefly Hive."
+      ]
+    },
+    {
+      "version": "v0.10.0",
+      "date": "2026-11-01",
+      "lines": [
+        "Visit a friend's home street and use it: mine their rocks, harvest their Peat and ride their Tower.",
+        "The owner's share goes to their Magic Rock, even while they're away.",
+        "Dropping a bag drops the one you chose, with everything still inside it.",
+        "Piggies eat beside a tree and walk home instead of standing in its trunk.",
+        "Things you put down lie still at their own size and rest on shelves."
+      ]
+    },
+    {
+      "version": "v0.9.0",
+      "date": "2026-11-01",
+      "lines": [
+        "Write to other players: a letter, a stack and currants, online or not.",
+        "Ride the subway together: players boarding the same line share one train.",
+        "Online, street Chickens, Butterflies and Batterflies are shared by everyone on the street.",
+        "Your game keeps saving after a reload, and tells you if saving ever stops.",
+        "Your character no longer keeps walking on its own after a right click or a switch to another window."
+      ]
+    },
+    {
+      "version": "v0.8.0",
+      "date": "2026-10-31",
+      "lines": [
+        "Piggies, Chickens, Butterflies and Batterflies are back on the streets where the original had them.",
+        "All 15 abandoned tower floors are open, reached by the lifts in five towers.",
+        "The three Enchanted Forests are the inside of a giant tree, with fungus shelves up the bark.",
+        "Region maps are painted again, from Tiny Speck's own miniatures of the lost map paintings.",
+        "An Update ready button appears when a new version is out, and saves and reloads when clicked."
+      ]
+    },
+    {
+      "version": "v0.7.0",
+      "date": "2026-10-31",
+      "lines": [
+        "Decorate your house and cultivate your yard by dragging furniture and gardens where you want them.",
+        "Gardens draw Tiny Speck's own garden art: soil plots, seedlings, every crop and herb.",
+        "A street map shows where everyone on your street is; click it to walk there.",
+        "The world map shows which streets have a vendor, a shrine or a subway station.",
+        "Northwest Passage's wintry portal is a snowy oval again, not a white box you get stuck in."
+      ]
+    },
+    {
+      "version": "v0.6.0",
+      "date": "2026-10-30",
+      "lines": [
+        "The new Modern interface: warm paper colours, Nunito type and a top bar of three floating pills.",
+        "The Classic interface reproduces the 2012 game; choose it from the Menu or Preferences.",
+        "A Social drawer holds the Activity log, Local chat, your party, chat channels and buddies.",
+        "The game fills your window, and a Zoom slider goes from Wide to Original.",
+        "Follow your bug reports and their replies, with a badge and an email when we answer."
+      ]
+    },
+    {
+      "version": "v0.5.0",
+      "date": "2026-10-29",
+      "lines": [
+        "The tutorial is Tiny Speck's own: you pull the chain and drop past the Giants' words.",
+        "Train among the original floating platforms, tubes, trees and the Home Street Choosing Facility.",
+        "A Summer's Day plays on Tiny Speck's own memory street, with flitterbugs, pressure stones and a pool.",
+        "Legalize It and We're Off to See the Lizard run on the real Gregarious Grange subway station and street.",
+        "The Bureaucratic Halls greet you, make you wait, and serve you at the counter."
+      ]
+    },
+    {
+      "version": "v0.4.5",
+      "date": "2026-10-29",
+      "lines": [
+        "A speech bubble's tail fades with the bubble.",
+        "Every page shares with a link preview card."
+      ]
+    },
+    {
+      "version": "v0.4.4",
+      "date": "2026-10-29",
+      "lines": [
+        "Clicking the Zilloween chip opens its card of what is on."
+      ]
+    },
+    {
+      "version": "v0.4.3",
+      "date": "2026-10-29",
+      "lines": [
+        "54 animated street decos play again: glints, steam, waves, grass, stars, fireflies, fire and more.",
+        "Password managers no longer pop up over the street chat and the game's other boxes.",
+        "The Firefly Whistle room card shows its name."
+      ]
+    },
+    {
+      "version": "v0.4.2",
+      "date": "2026-10-29",
+      "lines": [
+        "Eat several Zilloween candies or pumpkin pies at once, up to the day's limit.",
+        "Customize look first holds the new-skill panel until the look builder closes."
+      ]
+    },
+    {
+      "version": "v0.4.1",
+      "date": "2026-10-29",
+      "lines": [
+        "The Visiting Stone, notice boards, home furniture and other world items draw sharp.",
+        "The street behind the start card is fully drawn, and the card fades in over it."
+      ]
+    },
+    {
+      "version": "v0.4.0",
+      "date": "2026-10-29",
+      "lines": [
+        "183 street decorations Tiny Speck drew but the game never shipped are back, on 695 streets.",
+        "Street art in front layers draws over your Glitch again, and NPCs and items stand behind you.",
+        "Climbing to the top of Groddle Ladder takes you to The Great Hole to Ix.",
+        "Eat or drink several at once from the pack card.",
+        "Mystery quoins turn into iMG, mood, energy or currants."
+      ]
+    },
+    {
+      "version": "v0.3.1",
+      "date": "2026-10-28",
+      "lines": [
+        "The compare page says Groddle Afternoon is online, solo and multiplayer."
+      ]
+    },
+    {
+      "version": "v0.3.0",
+      "date": "2026-10-28",
+      "lines": [
+        "Messages, gifts and refills from an administrator show up in a connected game.",
+        "A suspended account is told so, with Sign out and Play solo.",
+        "The multiplayer save status sits in the pack, and routine autosaves stay on Saved."
+      ]
+    },
+    {
+      "version": "v0.2.2",
+      "date": "2026-10-28",
+      "lines": [
+        "The tutorial sends you only to an exit street with an open road home.",
+        "A player stranded on a street with every road under construction is moved to an open one.",
+        "The Magic Rock, the GIGPDS mail machine and the Mailbox draw sharp, from Tiny Speck's own art."
+      ]
+    },
+    {
+      "version": "v0.2.1",
+      "date": "2026-10-28",
+      "lines": [
+        "Returning players load the new game instead of stopping at the loading card."
+      ]
+    },
+    {
+      "version": "v0.2.0",
+      "date": "2026-10-28",
+      "lines": [
+        "Every Tiny Speck sound we hold plays its original recording again, and each tree its own harvest sound.",
+        "Taking the tutorial starts you from zero, while Skip to Ur keeps the demo kit.",
+        "Winter Walk, Winter Haven, Snowed In, Martleby Hare and more are rebuilt from players' pictures.",
+        "Visitors pet, dig and water on your home street and fill your Magic Rock's daily iMG.",
+        "A new top bar, smaller speech bubbles, the original's hotkeys and a hold-? hotkey sheet."
+      ]
+    },
+    {
+      "version": "v0.1.0",
+      "date": "2026-10-27",
+      "lines": [
+        "The first release: the world of Ur rebuilt from Tiny Speck's public-domain art, sound and server code.",
+        "Play solo, saved in the browser, or online with an account and saves on the site.",
+        "Multiplayer has presence, chat, parties, trading, races, Feats and group halls.",
+        "839 of the original's items can be reached in solo play."
+      ]
+    }
+  ]
+}
