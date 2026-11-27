@@ -11,7 +11,7 @@ import { describe, it } from 'node:test';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-import { applyStockAct } from '../public/js/yard-stock-mp.js?v=7cd51cb1';
+import { applyStockAct } from '../public/js/yard-stock-mp.js?v=38af0730';
 import { RESTORE_RETRIES, RESTORE_RETRY_MS, missingRestoreWires, restoreWireId } from '../public/js/home-street-mp.js?v=5568c020';
 
 const root = join(import.meta.dirname, '..');

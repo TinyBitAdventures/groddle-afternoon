@@ -223,7 +223,7 @@ import {
   setRadioState,
   removeCultivation,
   towerItem,
-} from '../home-cultivation.js?v=b2868d29';
+} from '../home-cultivation.js?v=122d6f45';
 import { PROTO_DEPLETED_ART } from '../home-proto-art.js?v=9309e9f3';
 import { DISPATCHER_HALF, DISPATCHER_TEXT, MOVABLE_FIXTURES, MOVABLE_FIXTURE_IDS, dispatcherAway, fixtureFits, fixtureText, radioOut, savedFixtureRx, signpostX } from '../home-street-fixtures.js?v=d4e5b56a';
 import { RADIO_TEXT, radioOwned } from '../vine-radio.js?v=5436aa09';

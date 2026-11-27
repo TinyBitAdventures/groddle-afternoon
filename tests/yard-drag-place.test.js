@@ -24,7 +24,7 @@ import { after, before, describe, it } from 'node:test';
 import { mkdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-import { BACK_YARD_GROUND_Y, CULTIVATION_PIN, YARD_DROP_EDGE, cultivationPin, yardDropSpot } from '../public/js/features/homes-feature.js?v=e9bdb84e';
+import { BACK_YARD_GROUND_Y, CULTIVATION_PIN, YARD_DROP_EDGE, cultivationPin, yardDropSpot } from '../public/js/features/homes-feature.js?v=86a7ca8a';
 
 const root = join(import.meta.dirname, '..');
 const read = (rel) => readFileSync(join(root, rel), 'utf8');
@@ -72,6 +72,22 @@ describe('a pin over a carried cultivation (pure)', () => {
     const hid = cultivationPin(30, 100);
     assert.ok(hid.top + 100 <= -CULTIVATION_PIN.head - 12, `its head over the edge: ${hid.top}`);
     assert.deepEqual(cultivationPin(30, -40), cultivationPin(30), 'a ground in view changes nothing');
+  });
+});
+
+describe('review 2026-11-27 #4: a cultivation set against the house says why (pure)', () => {
+  it('beside the house it is the way in, not a short yard; the far end still asks for an expansion', () => {
+    const st = createBackYardState({});
+    for (const rx of [-20, -60, -120]) {
+      const fit = placementCheck(st, 'proto_dullite_rock', rx);
+      assert.equal(fit.reason, 'door', `${rx}: ${fit.msg}`);
+      assert.equal(fit.msg, 'Keep the way into your house clear.');
+    }
+    const far = placementCheck(st, 'proto_dullite_rock', -760);
+    assert.equal(far.reason, 'edge');
+    assert.match(far.msg, /Expand the yard/);
+    assert.equal(placementCheck(st, 'proto_dullite_rock', -200).ok, true);
+    assert.equal(placementCheck(st, 'proto_dullite_rock', 200).msg, 'That is inside your house. Set it down in the yard.');
   });
 });
 

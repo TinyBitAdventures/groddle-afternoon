@@ -405,12 +405,15 @@ export function placementCheck(state, protoClass, rx, excludeId = null, { dispat
   const half = footprint(protoClass);
   const x = Math.round(finite(rx, 0));
   const back = isBackYard(state);
+  // The back yard ends at the house (maxRx 0): what reaches past it is in the way in, not short of yard,
+  // so the door's words come first there; only the far end asks for an expansion (review 2026-11-27).
+  const door = { ok: false, reason: 'door', msg: back ? 'Keep the way into your house clear.' : 'Keep the path to your front door clear.' };
+  if (back && x > layout.maxRx) return { ok: false, reason: 'edge', msg: 'That is inside your house. Set it down in the yard.' };
+  if (back && x + half > layout.maxRx) return door;
   if (x - half < layout.minRx || x + half > layout.maxRx) {
     return { ok: false, reason: 'edge', msg: back ? 'Not enough yard there. Expand the yard for more room.' : 'Not enough yard there. Expand the street for more room.' };
   }
-  if (Math.abs(x) < half + (back ? BACK_YARD_OPENING : DOOR_CLEARANCE) / 2) {
-    return { ok: false, reason: 'door', msg: back ? 'Keep the way into your house clear.' : 'Keep the path to your front door clear.' };
-  }
+  if (Math.abs(x) < half + (back ? BACK_YARD_OPENING : DOOR_CLEARANCE) / 2) return door;
   // Nothing stands on the gate's or the signpost's post, the Magic Rock or the Butler Box
   // (ContiguousPlatformLineSet.calculateRanges kept placements off signposts).
   if (!back) {

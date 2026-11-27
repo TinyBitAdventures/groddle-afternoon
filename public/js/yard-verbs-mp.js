@@ -45,11 +45,11 @@ import { fruitCapacityAt, resetTrantDay } from './trants.js?v=cf0fe1a3';
 import { ensureWoodTreeState, noteWoodCare } from './woodcutting.js?v=9e9af511';
 import { GROWN_TREE_LABELS, SEASONED_BEANS, SOIL_TIMERS, growTree, seedlingTimings } from './patches.js?v=54430bb9';
 import { GAME_DAY_MS, GAME_EPOCH_MS } from './game-day.js?v=57fecfcb';
-import { isNodeId, isRockId } from './yard-stock-mp.js?v=7cd51cb1';
+import { isNodeId, isRockId } from './yard-stock-mp.js?v=38af0730';
 import { STICK_ANIMAL } from './yard-wander.js?v=19038780';
 import { normalizeYardMachines } from './yard-fixtures-mp.js?v=dd022fe8';
 import { capYardAnimals, yardClassCap } from './animal-crowding.js?v=50ebbe5d';
-import { HOUSE_LOT_W, YARD_SEGMENT_W } from './home-cultivation.js?v=b2868d29';
+import { HOUSE_LOT_W, YARD_SEGMENT_W } from './home-cultivation.js?v=122d6f45';
 import { forceMetabolic } from './metabolics.js?v=48f784bf';
 import { HOME_LIMITS } from './homes-catalog.js?v=0367f90f';
 

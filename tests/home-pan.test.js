@@ -19,7 +19,7 @@ import { pathToFileURL } from 'node:url';
 import { HOME_LAYOUT_LIMITS, HOME_STREET_LIMITS, HOME_STREET_VERSION, buildHomeLayout, homeLayoutJson, homeLayoutKeyOf } from '../public/js/home-layout.js?v=99b09c80';
 import { walkHomeScene } from '../public/js/home-layout-scene.js?v=a8228cd0';
 import { HOME_LIMITS } from '../public/js/homes-catalog.js?v=0367f90f';
-import { HOUSE_LOT_W, YARD_SEGMENT_W } from '../public/js/home-cultivation.js?v=b2868d29';
+import { HOUSE_LOT_W, YARD_SEGMENT_W } from '../public/js/home-cultivation.js?v=122d6f45';
 import { CAMERA_RANGE } from '../public/js/features/camera-mode-feature.js?v=1dbbcbd3';
 import { SITE_DIR, skipWithoutSite } from '../tools/repos.mjs';
 import { PHP } from './php.js';
