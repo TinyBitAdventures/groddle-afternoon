@@ -319,6 +319,34 @@ describe('review 2026-11-27 in Chrome (1352x802, solo, Modern)', { skip: !chromi
     assert.ok(markAfter > markBefore + 150, `the marker went with it: ${markBefore} -> ${markAfter}`);
   });
 
+  it('item 6: over the open bag the yard\'s marker goes and the stack goes into the bag, not onto the yard', { timeout: 40_000 }, async () => {
+    const page = t.page();
+    await yard();
+    const key = await page.evaluate(() => window.groddlePack.layout().pack.slots.find((s) => s.kind === 'bag')?.key);
+    assert.ok(key, 'a bag in the pack');
+    await page.evaluate((k) => window.groddlePack.toggle(k), key);
+    await page.waitForTimeout(500);
+    const slot = await page.evaluate(() => {
+      const el = [...document.querySelectorAll('#pack-bag .pack-slot, .pack-bag-window .pack-slot, [id^="pack-bag"] .pack-slot')].find((e) => e.offsetParent);
+      if (!el) return null;
+      el.setAttribute('data-yard-test', '1');
+      const b = el.getBoundingClientRect();
+      return { x: Math.round(b.left + b.width / 2), y: Math.round(b.top + b.height / 2) };
+    });
+    assert.ok(slot, 'the open bag shows its slots');
+    const before = (await t.stacks()).length;
+    assert.ok(await t.reg('begin', { cls: 'cherry', count: 1 }));
+    const yardAt = await t.client(400, 600);
+    assert.equal(await t.reg('over', yardAt), 'home-place');
+    assert.match((await t.data()).homePackMark, /^\d+,680$/, 'the marker on the yard first');
+    const id = await t.reg('over', { ...slot, sel: '[data-yard-test="1"]' });
+    assert.notEqual(id, 'home-place');
+    assert.equal((await t.data()).homePackMark, '', 'no yard marker over the bag');
+    await t.reg('drop', { ...slot, sel: '[data-yard-test="1"]' });
+    await page.waitForTimeout(500);
+    assert.equal((await t.stacks()).length, before, 'nothing set down in the yard');
+  });
+
   it('item 1: Decoration Mode scrolls into the yard, and a stack there is selected and moved', { timeout: 50_000 }, async () => {
     const page = t.page();
     await yard();
