@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * G1323 (#725): a spot on an icy wall for every Ice Nubbin the location files name (144 on the 17
- * Nottis streets). Glitch set them by hand (ice_knob.js obey_physics false) and the files only count
+ * Nottis streets, 166 on Drifa's 15). Glitch set them by hand (ice_knob.js obey_physics false) and the files only count
  * them, so the planner stood them on the path. For each street whose file names Ice Nubbins
  * (street-ecology.json counts.ice_knob) it takes the spots measured on pictures of the street
  * (assets/content/ice-nubbin-picture-spots.json, each row citing its pictures) and places the rest on
@@ -22,9 +22,9 @@ import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { iceMaskSprites, iceNubbinReach, iceNubbinWallSpots } from '../public/js/ice-nubbin-walls.js?v=f541620c';
+import { iceMaskSprites, iceNubbinReach, iceNubbinWallSpots } from '../public/js/ice-nubbin-walls.js?v=9f0ee47c';
 import { DECO_TWINS } from '../public/js/street-render.js?v=a175beef';
-import { ecologyForStreet, populationForStreet, setStreetEcologyCatalog, streetReservedSpots } from '../public/js/street-ecology.js?v=f6185033';
+import { ecologyForStreet, populationForStreet, setStreetEcologyCatalog, streetReservedSpots } from '../public/js/street-ecology.js?v=dde3c62d';
 import { fixedPictureBoxes } from './build-barnacle-wall-spots.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -40,17 +40,20 @@ const read = (rel) => JSON.parse(readFileSync(join(root, rel), 'utf8'));
 export const RULE_VARIANTS = Object.freeze([3, 1, 2, 3, 1, 2, 4, 1, 3, 2, 4, 3, 1, 2]);
 
 /**
- * Nottis (hub 137), the 17 streets #725 is about. Drifa's 15 (hub 141, 166 nubbins) are another
- * place with other walls: their nubbins stay planned until their pictures are read.
+ * The two places whose files name Ice Nubbins: Nottis (hub 137, 17 streets, 144 nubbins), the streets
+ * #725 is about, and Drifa (hub 141, 15 streets, 166), set on their walls by the same rule (Austin,
+ * 2026-11-27).
  */
 export const NOTTIS_HUB = '137';
+export const DRIFA_HUB = '141';
+export const NUBBIN_HUBS = Object.freeze([NOTTIS_HUB, DRIFA_HUB]);
 
-/** The Nottis streets whose file names Ice Nubbins: [tsid, wanted count]. */
+/** The streets whose file names Ice Nubbins: [tsid, wanted count]. */
 export function nubbinStreets(ecology = read('public/assets/content/street-ecology.json').streets, index = read('public/assets/streets/index.json').streets) {
   return Object.entries(ecology)
     .sort(([a], [b]) => a.localeCompare(b))
     .map(([tsid, row]) => [tsid, Number(row?.counts?.ice_knob) || 0])
-    .filter(([tsid, want]) => want && index[tsid]?.hubId === NOTTIS_HUB);
+    .filter(([tsid, want]) => want && NUBBIN_HUBS.includes(index[tsid]?.hubId));
 }
 
 /** Measure the alpha mask of every deco the streets draw in their street-sized layers (null: no art). */

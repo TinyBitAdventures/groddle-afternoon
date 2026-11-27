@@ -13,6 +13,9 @@
  *    the avatar touches);
  *  - in clusters: two to four within about 150 px of each other (Dokk Rokk's seven between 947 and
  *    1588, Lotha Harte's three between 4435 and 4574), the clusters spread along the street.
+ * Drifa's 23 measured on players' pictures of four streets (Ding a Lingers, Fort Aban Don, Chilling
+ * Light, Tree Mas) keep the habit: 22 on a snow skirt, 31 to 179 px up, two to four together, so
+ * Drifa's other 143 take the same rule.
  * So for each snow skirt over a floor a Glitch can reach, it takes spots on the skirt's drawn art (its
  * alpha mask), ICE_STAND_LIFTS or ICE_HIGH_LIFTS over that floor, with no line between, no other art
  * drawn over the nubbin (a snow ledge, a bush, a tree, an icicle in front: shadows and light do not

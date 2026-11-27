@@ -45,7 +45,7 @@ import { isMissingFloorTsid } from './hidden-floors.js?v=023336cb';
 import { stationByTsid } from './subway.js?v=ea6921ff';
 import { ensurePiggyMood, piggyTwiceDailyTick, satePiggy } from './animal-mood.js?v=c8cc8797';
 import { isCrowdSad } from './animal-crowding.js?v=50ebbe5d';
-import { ecologyForStreet } from './street-ecology.js?v=f6185033';
+import { ecologyForStreet } from './street-ecology.js?v=dde3c62d';
 import { filterText } from './word-filter.js?v=9a7a7ebb';
 import { getGameDayKey } from './game-day.js?v=57fecfcb';
 

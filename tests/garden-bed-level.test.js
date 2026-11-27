@@ -16,7 +16,7 @@ import {
   populationForStreet,
   setStreetEcologyCatalog,
   streetReservedSpots,
-} from '../public/js/street-ecology.js?v=f6185033';
+} from '../public/js/street-ecology.js?v=dde3c62d';
 import { platformsScreen, streetWidth } from '../public/js/street-model.js?v=a9a05f9d';
 import { streetGardenBeds } from '../public/js/garden.js?v=fefa7bcd';
 import { gardenBedWidth } from '../public/js/garden-beds.js?v=2ac6a12c';

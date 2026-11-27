@@ -15,7 +15,7 @@ import { readFileSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { createResourceNode, getResourceNodeDef, resourceNodeFrame, tickResourceNode } from '../public/js/resource-nodes.js?v=c2eb46b1';
 import { setTrantTables, TRANT_META } from '../public/js/trants.js?v=cf0fe1a3';
-import { treeFrameUrl } from '../public/js/features/patches-feature.js?v=903260eb';
+import { treeFrameUrl } from '../public/js/features/patches-feature.js?v=6d2e5d31';
 import { trantLook, trantLookFiles } from '../public/js/trant-looks.js?v=8ed6fe90';
 import { soilSpritePaths, DEAD_TRANT_CLASSES } from '../public/js/patches.js?v=54430bb9';
 import { HIRES_SPRITES } from '../public/js/sprite-hires.js?v=dd070ce8';

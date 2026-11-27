@@ -29,9 +29,9 @@ import {
   sweptTouch,
   touchesHole,
 } from '../public/js/random-holes.js?v=e979c4ae';
-import { randomHolesFeature } from '../public/js/features/random-holes-feature.js?v=5bcb747b';
+import { randomHolesFeature } from '../public/js/features/random-holes-feature.js?v=3f81134a';
 import { teleportWithinStreet } from '../public/js/within-street.js?v=5ce33cdf';
-import { FEATURES } from '../public/js/features/index.js?v=9a21e84b';
+import { FEATURES } from '../public/js/features/index.js?v=c8067649';
 import { createTrack, pushSample, sampleTrack, INTERP_DELAY_MS, MOVE_EVERY_MS } from '../public/js/realtime-client.js?v=eb1515a8';
 import { AVATAR_BODY_H, NORMAL_BUFF, stepAvatar } from '../public/js/avatar-step.js?v=8415ee96';
 

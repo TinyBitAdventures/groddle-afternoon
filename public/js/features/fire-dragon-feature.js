@@ -22,7 +22,7 @@
 import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=37ad5c9f';
 import { shiftMetabolic } from '../metabolics.js?v=48f784bf';
 import { getGameDayKey } from '../game-day.js?v=57fecfcb';
-import { followPath } from '../street-creatures.js?v=c7dde46a';
+import { followPath } from '../street-creatures.js?v=ab90881f';
 import { followFloorY, walkSurfaceY } from '../walk-surface.js?v=f21ce37b';
 import {
   FIRE_DRAGON_CLASS,

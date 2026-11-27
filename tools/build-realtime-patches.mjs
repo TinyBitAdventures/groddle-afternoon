@@ -50,7 +50,7 @@ import { requireServer, requireSite, serverPath, sitePath } from './repos.mjs';
 
 import { STREET_INDEX, applyStreetIndex, loadStreetDataFromFs, setZoneStreetsShown } from '../public/js/street-loader.js?v=10376267';
 import { platformsScreen, streetWidth } from '../public/js/street-model.js?v=a9a05f9d';
-import { ecologyForStreet, planStreetPlacements, populationForStreet, setStreetEcologyCatalog, streetReservedSpots } from '../public/js/street-ecology.js?v=f6185033';
+import { ecologyForStreet, planStreetPlacements, populationForStreet, setStreetEcologyCatalog, streetReservedSpots } from '../public/js/street-ecology.js?v=dde3c62d';
 import {
   CAN_PLANT_MAPPINGS,
   DEAD_TRANT_CLASSES,
@@ -68,7 +68,7 @@ import {
 import { ARBOROLOGY_HARVEST, TRANT_META } from '../public/js/trants.js?v=cf0fe1a3';
 import { TRANT_CARE_PACKAGES } from '../public/js/trant-care.js?v=63846e5e';
 import { WOOD_TREE_HARVEST } from '../public/js/woodcutting.js?v=9e9af511';
-import { soilCountsForStreet, soilSpawnPlan } from '../public/js/features/patches-feature.js?v=903260eb';
+import { soilCountsForStreet, soilSpawnPlan } from '../public/js/features/patches-feature.js?v=6d2e5d31';
 import { isZoneTsid } from '../public/js/zone-streets.js?v=b40010d5';
 import { creatureRequests, setCreatureEcology } from './build-realtime-objects.mjs';
 

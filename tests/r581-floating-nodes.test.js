@@ -20,7 +20,7 @@ import { STREET_INDEX, applyStreetIndex, loadStreetDataFromFs, setZoneStreetsSho
 import { platformsScreen } from '../public/js/street-model.js?v=a9a05f9d';
 import {
   ROCK_SEAT_MAX_PX, ROCK_SHAPE_WIDTHS, footOverAir, planStreetPlacements, seatOnFloor, setStreetEcologyCatalog,
-} from '../public/js/street-ecology.js?v=f6185033';
+} from '../public/js/street-ecology.js?v=dde3c62d';
 import { census, streetRows } from '../tools/node-floor-census.mjs';
 import { setCreatureEcology } from '../tools/build-realtime-objects.mjs';
 import { serverPath, skipWithoutServer } from '../tools/repos.mjs';
@@ -43,9 +43,10 @@ describe('#581 planned rocks and nodes stand on their floor', () => {
     const c = await census({ over: 5 });
     const planned = c.rows.filter((r) => r[2] === 'planned');
     // Every street laid out: planned and measured together (G1323 moved Nottis's 144 Ice Nubbins from
-    // planned to measured wall spots, census 2026-11-27: 1,068 + 725 rocks, 913 + 512 nodes).
+    // planned to measured wall spots, census 2026-11-27: 1,068 + 725 rocks, 913 + 512 nodes; Drifa's 166
+    // moved too, leaving 747 planned nodes).
     assert.ok(c.planned.rock + c.measured.rock > 1700 && c.planned.node + c.measured.node > 1300, `the census lays out every street: ${JSON.stringify({ planned: c.planned, measured: c.measured })}`);
-    assert.ok(c.planned.rock > 1000 && c.planned.node > 800, 'most rocks and nodes are still planned');
+    assert.ok(c.planned.rock > 1000 && c.planned.node > 700, 'most rocks and nodes are still planned');
     assert.deepEqual(planned, [], `${planned.length} floating:\n${planned.slice(0, 20).map((r) => r.join(' ')).join('\n')}`);
     // The ones the front art would hide once seated stay a few px up, findable (census 2026-11-21: 11
     // rocks and 14 nodes, 6-11 px, under sliding foreground snow and front rock).

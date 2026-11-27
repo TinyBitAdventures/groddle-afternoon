@@ -24,8 +24,8 @@ import {
   populationForStreet,
   setStreetEcologyCatalog,
   streetReservedSpots,
-} from '../public/js/street-ecology.js?v=f6185033';
-import { UNPLANNED_RESOURCE_CLASSES, resourceSpawnPlan } from '../public/js/features/resource-nodes-feature.js?v=f8383888';
+} from '../public/js/street-ecology.js?v=dde3c62d';
+import { UNPLANNED_RESOURCE_CLASSES, resourceSpawnPlan } from '../public/js/features/resource-nodes-feature.js?v=feb26d63';
 import { placementRequests } from '../tools/build-realtime-objects.mjs';
 import { applyStreetIndex, loadStreetDataFromFs, setZoneStreetsShown } from '../public/js/street-loader.js?v=10376267';
 
@@ -105,8 +105,9 @@ describe('#490 planned nodes stay out from behind the front art', () => {
       }
     }
     // Census (2026-11-18): only the covered planned nodes move (344 rows of the server data/objects.json;
-    // the rest are solo-only Dust Traps); the rest of every layout stays.
-    assert.ok(moved >= 340, `${moved} moved`);
+    // the rest are solo-only Dust Traps); the rest of every layout stays. 2026-11-27 (G1323): 302, Drifa's
+    // Ice Nubbins hang on its walls now (370 while they were planned on its floors, many under front snow).
+    assert.ok(moved >= 295, `${moved} moved`);
   });
 
   it('no planned node on any street is mostly behind front art while the street has room for it', async () => {

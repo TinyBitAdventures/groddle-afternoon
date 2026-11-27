@@ -39,7 +39,7 @@
       "assets/content/craftybot-specs.json": "6090bdaf",
       "assets/content/deco-catalog.json": "a9faf479",
       "assets/content/garden-spots.json": "d1ec3e98",
-      "assets/content/ice-nubbin-picture-spots.json": "37d7ec62",
+      "assets/content/ice-nubbin-picture-spots.json": "eb595826",
       "assets/content/loading-images.json": "46513450",
       "assets/content/making-items.json": "f307a0e0",
       "assets/content/node-spots.json": "d0c87cff",
