@@ -43,7 +43,7 @@ import {
   winterWalkProgress,
   winterWalkRun,
 } from '../public/js/winter-walk.js?v=faad1d46';
-import { collectQuoin, createQuoinState } from '../public/js/quoins.js?v=5abad2c7';
+import { collectQuoin, createQuoinState } from '../public/js/quoins.js?v=f9187edb';
 
 const root = join(import.meta.dirname, '..');
 const T = 1_800_000_000_000;

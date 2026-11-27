@@ -170,6 +170,35 @@ export function measuredStreetQuoins(streetTsid) {
     .map(([x, y, type]) => (QUOIN_TYPES[type] ? { x, y, type, exactY: true } : { x, y, exactY: true }));
 }
 
+/**
+ * Planned quoins moved into a new player's reach (after v0.79.0 re-placed Nottis's and Drifa's streets):
+ * the planner counts a floor only a triple jump lands on as reached (unreachedFloors, G529), and a
+ * triple jump is an imagination upgrade, so these four hung over ice blocks 400 px or more over the
+ * path. Glitch set its quoins by hand where players reach them (quoin.js obey_physics false); none of
+ * these streets has a 2012 snap of its quoins. Each moves to the nearest spot a plain jump reaches,
+ * at the height its index gave it, clear of the signposts, the other quoins and the front art.
+ * { street tsid: [[planned floor x, floor y, coin x, coin y]] } (screen px; the coin's own centre,
+ * exactY). tests/nottis-drifa-reach.test.js walks every street with the game's stepper.
+ */
+export const QUOIN_REACH_MOVES = Object.freeze({
+  // Candy Cane Lane: two on the ice block over its east signpost, down to the path either side of the post.
+  GHF583RFVLD3IUE: Object.freeze([[4478.3, 337.3, 4471.3, 795], [4051, 337, 4169.3, 763.8]]),
+  // Bright Day: on the ledge over its west signpost, down to the path just past the post.
+  GHF8LE0Q0UC3QEF: Object.freeze([[204.3, 439.2, 454.5, 832.5]]),
+  // Drooping Drift: the same ledge over its west signpost (the two streets share that ledge, line for line).
+  GHFK965MT8D3G9E: Object.freeze([[204.3, 439.2, 449.3, 868.3]]),
+});
+
+/** The planned spots with QUOIN_REACH_MOVES applied (a moved one is the coin's own spot, exactY). */
+function quoinsIntoReach(streetTsid, plan) {
+  const moves = QUOIN_REACH_MOVES[String(streetTsid || '')];
+  if (!moves) return plan;
+  return plan.map((spot) => {
+    const move = moves.find(([fx, fy]) => Math.abs(spot?.x - fx) < 0.1 && Math.abs(spot?.y - fy) < 0.1);
+    return move ? { ...spot, x: move[2], y: move[3], exactY: true } : spot;
+  });
+}
+
 /** A planned spot this close to a measured one would double it up (two coins in one place). */
 export const MEASURED_QUOIN_CLEARANCE = 80;
 
@@ -184,7 +213,7 @@ export const MEASURED_QUOIN_CLEARANCE = 80;
  * private instance or an emptied street).
  */
 export function streetQuoinPoints(streetTsid, planned = [], { count = null, coins = QUOIN_COIN_COUNTS[streetTsid] } = {}) {
-  const plan = Array.isArray(planned) ? planned : [];
+  const plan = quoinsIntoReach(streetTsid, Array.isArray(planned) ? planned : []);
   const measured = count === 0 ? null : measuredStreetQuoins(streetTsid);
   if (!measured) return plan;
   const target = Number.isInteger(coins) && coins > measured.length ? coins : measured.length;

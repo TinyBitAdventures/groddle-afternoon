@@ -18,7 +18,7 @@ import {
   paradiseSourcePoints,
   paradiseSpawnFeet,
   radialStartPenOpens,
-} from '../public/js/paradise-flight.js?v=ab7d41ec';
+} from '../public/js/paradise-flight.js?v=4d77a43d';
 import { RADIAL_FLITTERBUG_EVENTS, applyGeometryEffects, createRadialSession, radialFire } from '../public/js/radial-heights.js?v=90fcc768';
 import { platformYAt } from '../public/js/street-model.js?v=a9a05f9d';
 

@@ -13,7 +13,7 @@ import { LOCATION_XML, OUT_PATH, collectPrivateStreets, instanceRow, render } fr
 import { PRIVATE_STREETS, isPrivateStreet } from '../public/js/private-streets.js?v=e0a38930';
 import { publicStreet } from '../public/js/shared-street.js?v=dce5694b';
 import { sharedStreet } from '../public/js/features/realtime-feature.js?v=f50700da';
-import { sharedQuoinsFeature } from '../public/js/features/shared-quoins-feature.js?v=2f90bddc';
+import { sharedQuoinsFeature } from '../public/js/features/shared-quoins-feature.js?v=4c70e47c';
 import { ROOM_4_TSID, ROOM_8_TSID, ROOM_16_TSID } from '../public/js/tower-challenge-rooms.js?v=01f1c620';
 import { ROOM_23_TSID } from '../public/js/gwendolyn-room-23.js?v=918c0f6b';
 import { ROOM_15_TSID } from '../public/js/tower-rooms.js?v=4f1f6af7';

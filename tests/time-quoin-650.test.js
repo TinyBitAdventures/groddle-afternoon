@@ -9,7 +9,7 @@ import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { collectQuoin, createQuoinState } from '../public/js/quoins.js?v=5abad2c7';
+import { collectQuoin, createQuoinState } from '../public/js/quoins.js?v=f9187edb';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const read = (p) => readFileSync(join(root, p), 'utf8');

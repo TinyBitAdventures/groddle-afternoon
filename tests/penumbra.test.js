@@ -24,7 +24,7 @@ import {
 } from '../public/js/penumbra.js?v=9d5fe4dc';
 import { autoplaySteps, normalizePuzzleData, quoinsInReach, stepTriggers } from '../public/js/puzzle-triggers.js?v=221b67a9';
 import { createEventRuntime, dueEventTimers, runLocationEvent } from '../public/js/location-events.js?v=48938c8f';
-import { collectQuoin, createQuoinState } from '../public/js/quoins.js?v=5abad2c7';
+import { collectQuoin, createQuoinState } from '../public/js/quoins.js?v=f9187edb';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const read = (rel) => JSON.parse(readFileSync(join(root, rel), 'utf8'));

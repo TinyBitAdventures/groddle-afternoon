@@ -38,8 +38,8 @@ import {
   paradiseSkyStops,
   paradiseTicketCost,
   resolveParadiseReward,
-} from '../public/js/paradise-flight.js?v=ab7d41ec';
-import { QURAZY_REWARDS } from '../public/js/quoins.js?v=5abad2c7';
+} from '../public/js/paradise-flight.js?v=4d77a43d';
+import { QURAZY_REWARDS } from '../public/js/quoins.js?v=f9187edb';
 import { remakeStatus } from '../public/js/imagination-remake.js?v=99997003';
 
 const here = path.dirname(fileURLToPath(import.meta.url));

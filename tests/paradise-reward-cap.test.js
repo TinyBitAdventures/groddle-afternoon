@@ -9,7 +9,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { setMetabolicGainGate } from '../public/js/metabolics.js?v=48f784bf';
-import { creditMetabolicReward } from '../public/js/quoins.js?v=5abad2c7';
+import { creditMetabolicReward } from '../public/js/quoins.js?v=f9187edb';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const game = readFileSync(join(here, '../public/game.js'), 'utf8');

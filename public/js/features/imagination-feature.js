@@ -28,7 +28,7 @@
 
 import { addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=3be7988a';
 import { getGameDayKey } from '../game-day.js?v=57fecfcb';
-import { quoinDailyLimitFor } from '../quoins.js?v=5abad2c7';
+import { quoinDailyLimitFor } from '../quoins.js?v=f9187edb';
 import { XP_FOR_LEVEL } from '../progression.js?v=05ff0260';
 import {
   CARD_ART_LAYERS,
