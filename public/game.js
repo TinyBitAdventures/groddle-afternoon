@@ -4,7 +4,7 @@
  */
 import { ITEM_ICONS, ITEM_LABELS, getVerbsFor, ordinaryItems, runVerb } from './content.js?v=c46159de';
 import { createErrorOnce, createFeatureHost, createFrameStages } from './js/feature-host.js?v=b87e2cbc';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=aabeb6f0';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=2d8a87c4';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, enterHintPick, groupHead, hoverRimShown, reachGlowTargets, spriteHasRimArt, rimArtParts, trimmedIconUrl, drawTileArt } from './js/enter-chooser.js?v=74f4964a';
 import { firstTendKey, STICK_TEND_DELAY_MS, STICK_TEND_DIRS, STICK_TEND_REPEAT_MS, stepTendKey, stepTendKeys, stickTendKey, tendKeyAction } from './js/garden-tend.js?v=a7470c4a';
 import { avatarHitBox, behindFloor, bodyReachDistance, OUT_OF_REACH_LINE, playerClickBox } from './js/reach.js?v=456da8a8';
@@ -9828,17 +9828,16 @@ function playerRainbow(key, { delayMs = null, sound = true } = {}) {
 
 /**
  * Super harvests (G375): show_rainbow('rainbow_superharvest', 1000) at the player (include/trants.js
- * 293, include/garden.js 501, npc_piggy.js 1604), the "SUPER HARVEST!" arc Tiny Speck drew; the
- * bonus count is the activity line. The harvest's own sound (sound-moments.js) is the arc's sound.
+ * 293, include/garden.js 501, npc_piggy.js 1604, jellisac.js 196), the "SUPER HARVEST!" arc Tiny
+ * Speck drew; the bonus count is the activity line. The arc brings RAINBOW_SUPERHARVEST (player.js
+ * 3038-3065) after the harvest's own sound; `sound: false` where the verb's sound already was
+ * RAINBOW_SUPERHARVEST (an animal's, sound-moments.js soundForVerb). Resource nodes reach it
+ * through engine.superHarvest (features/resource-nodes-feature.js announceSuperHarvest, #732).
  */
-function showSuperHarvestFx(target, itemClassTsid, amount) {
-  if (!target?.sprite || target.sprite.destroyed) return null;
+function showSuperHarvestFx(itemClassTsid, amount, { sound = true } = {}) {
   const count = Math.max(1, Math.floor(Number(amount) || 1));
   const itemId = String(itemClassTsid || '').trim();
-  // A tree already played its own harvest sound, so the rainbow brings RAINBOW_SUPERHARVEST (player.js
-  // 3038-3065); an animal's super harvest sound is RAINBOW_SUPERHARVEST itself (sound-moments.js).
-  const tree = /^trant_|^paper_tree$|^garden_plot$/.test(String(target.classId || ''));
-  const h = playerRainbow('rainbow_superharvest', { sound: tree });
+  const h = playerRainbow('rainbow_superharvest', { sound });
   if (app?.canvas) {
     app.canvas.dataset.superHarvestFx = 'playing';
     app.canvas.dataset.superHarvestItem = itemId;
@@ -11379,7 +11378,7 @@ function runVerbFinish(target, verbId) {
         1,
         (Number(care.itemCount) || 0) - (Number(care.profile?.bonusAmount) || 0)
       );
-      showSuperHarvestFx(target, care.itemClassTsid, bonus);
+      showSuperHarvestFx(care.itemClassTsid, bonus, { sound: false });
     }
   }
 
@@ -11396,7 +11395,7 @@ function runVerbFinish(target, verbId) {
       app.canvas.dataset.trantHarvestLimit = String(harvest.harvestsLimit || 0);
     }
     if (harvest.superHarvest) {
-      showSuperHarvestFx(target, harvest.fruitClass, harvest.superAmount);
+      showSuperHarvestFx(harvest.fruitClass, harvest.superAmount);
     }
   }
 
@@ -11504,7 +11503,7 @@ function runVerbFinish(target, verbId) {
       }
       // include/garden.js 501: a plot's Super Harvest shows the rainbow too (G953 found it missing).
       const plot = result.gardenPlot;
-      if (plot.superHarvest) showSuperHarvestFx(target, plot.cropId, plot.count - plot.baseCount);
+      if (plot.superHarvest) showSuperHarvestFx(plot.cropId, plot.count - plot.baseCount);
     }
     if (ROCK_CATALOG[target.classId] && verbId === 'mine' && target.state?.rock?.depleted) {
       emitGameEvent(`rocks_depleted:${target.classId}`);
@@ -14779,6 +14778,8 @@ const engine = {
   },
   /** Whether a buff is running (catalog id). */
   hasBuff: (classTsid) => hasBuff(buffState, classTsid, Date.now()),
+  /** A Super Harvest's rainbow and its sound at the player (showSuperHarvestFx, #732). */
+  superHarvest: (itemClassTsid, amount) => showSuperHarvestFx(itemClassTsid, amount),
   /**
    * Apply a catalog buff from a feature (seasonal treats); with `extendMs`
    * an already-running buff is lengthened instead (buffs_extend_time).

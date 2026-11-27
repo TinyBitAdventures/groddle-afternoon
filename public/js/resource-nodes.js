@@ -1592,10 +1592,11 @@ export function harvestResourceNode(node, inv, pc, ctx = {}) {
     case 'jellisac': {
       const qty = pkg.bonus_amount || 1;
       outputs.push({ classTsid: 'jellisac_clump', qty });
-      // jellisac.js 182: the Super Harvest only when the package's drop did not come (the drop is
-      // rolled first, in runSkillPackage 536-545: ctx.rollDrop, features/drops-feature.js).
+      // jellisac.js 182-183: the Super Harvest only when the package's drop did not come (the drop is
+      // rolled first, in runSkillPackage 536-545: ctx.rollDrop, features/drops-feature.js), or always
+      // with the max_luck buff (#732).
       const gotDrop = typeof ctx.rollDrop === 'function' ? Boolean(ctx.rollDrop()) : false;
-      if (pkg.bonus_multiplier && !gotDrop && rng() < (pkg.bonus_chance || 0)) {
+      if (pkg.bonus_multiplier && ((!gotDrop && rng() < (pkg.bonus_chance || 0)) || ctx.maxLuck === true)) {
         const bonus = qty * (pkg.bonus_multiplier - 1);
         outputs.push({ classTsid: 'jellisac_clump', qty: bonus, superHarvest: true });
         extra.superHarvest = { classTsid: 'jellisac_clump', qty: bonus };

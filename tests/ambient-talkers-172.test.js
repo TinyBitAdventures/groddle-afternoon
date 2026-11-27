@@ -22,7 +22,7 @@ import { JUJU_BANDIT } from '../public/js/juju-bandits.js?v=0d3af5fe';
 import { LOW_FUEL_BUBBLE_MS, LOW_FUEL_REPEAT_MS } from '../public/js/machine-art.js?v=d3381a4b';
 import { MEGA_ROCK_LINE } from '../public/js/mining.js?v=7ecaa572';
 import { LONELY_RULES } from '../public/js/spirit-loneliness.js?v=9259917d';
-import { COPY as STREET_OBJECT_COPY } from '../public/js/street-objects.js?v=fc42867a';
+import { COPY as STREET_OBJECT_COPY } from '../public/js/street-objects.js?v=8a71df38';
 import { POISON_BUBBLE_EVERY_MS, POISON_BUBBLE_SHOW_MS, POISON_FIRST_BUBBLE_MS } from '../public/js/tree-poison.js?v=646d1bc1';
 import { animalMoodFeature } from '../public/js/features/animal-mood-feature.js?v=d52f2d10';
 

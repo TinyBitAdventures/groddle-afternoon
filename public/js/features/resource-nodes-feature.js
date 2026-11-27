@@ -104,7 +104,7 @@ import {
   takeDueSnails,
   tickResourceNode,
   springDustTrapsOnArrival,
-} from '../resource-nodes.js?v=433a3e48';
+} from '../resource-nodes.js?v=c2eb46b1';
 import { frameTexture as sheetFrameTexture, loadTexture, sourceFromUrl, textureFromUrl } from '../textures.js?v=b8e38103';
 import { acceptOffer, markOffered, npcQuestOffers, putOffOffer, questStatus } from '../quest-offers.js?v=7e00498b';
 import { OVERLAY_USES, playOverlay } from '../overlays.js?v=91dcee74';
@@ -1417,6 +1417,8 @@ function verbContext(engine, entity, verbId) {
     toolOrder,
     // inc_skill_packages.js 538-541: Rubeweed x1.25 on a package's drop chance (the Dirt Pile's Loam).
     rubeweed: Boolean(engine.hasBuff?.('rubeweed')),
+    // jellisac.js 183: Max Luck always brings the Super Harvest (#732).
+    maxLuck: Boolean(engine.hasBuff?.('max_luck')),
     skills: engine.learnedSkills,
     // Imagination upgrades (scraping/scooping speed, ice and peat yield, dirt and peat daily limits).
     upgrades: engine.pc?.imaginationUpgrades || [],
@@ -1580,6 +1582,20 @@ export function floatGain(engine, x, y, classTsid, qty) {
   return engine.floatText(x, y, `+${itemLabel(classTsid, qty)}`, 0xfff4d6, { icon: classTsid });
 }
 
+/**
+ * #732: any node's Super Harvest shows Tiny Speck's arc with its RAINBOW_SUPERHARVEST (jellisac.js
+ * 183-196 show_rainbow('rainbow_superharvest', 1000); game.js showSuperHarvestFx), read from the
+ * result's bonus output so every node that grants one gets it. True when it was shown.
+ */
+export function announceSuperHarvest(engine, result) {
+  if (!result?.ok) return false;
+  const bonus = (result.outputs || []).filter((o) => o.superHarvest && !o.due);
+  if (!bonus.length) return false;
+  const qty = bonus.reduce((sum, o) => sum + (Number(o.qty) || 0), 0);
+  engine.superHarvest?.(bonus[0].classTsid, qty);
+  return true;
+}
+
 function applyResult(engine, entity, result) {
   notePublishResult(result);
   if (!result.ok) {
@@ -1618,6 +1634,7 @@ function applyResult(engine, entity, result) {
   else if (result.costs?.xp) engine.floatText(anchorX, anchorY - lift, `+${result.costs.xp} iMG`, 0xd7b8ff);
   const sfx = sfxFor(result);
   if (sfx) engine.playSound(sfx, { volume: 0.6, jitter: 0.05 });
+  announceSuperHarvest(engine, result);
 
   if (entity.classTsid === 'npc_firefly') {
     const filled = normalizeFireflyJarState(result.jar || {});

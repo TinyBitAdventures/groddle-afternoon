@@ -154,7 +154,7 @@ import {
   treeReady,
   treeSkill,
   waitingIds,
-} from '../street-objects.js?v=fc42867a';
+} from '../street-objects.js?v=8a71df38';
 import { ENDED_STATES, NO_REALTIME_STATES, answerWaitMs, createOnlineRequests, offlineLine, sharedOffline, waitLine } from '../online-request.js?v=dac938db';
 import { MEGA_ROCK_LINE, ROCK_CATALOG } from '../mining.js?v=7ecaa572';
 import { TRANT_META, trantStatusLabel } from '../trants.js?v=864ea9ff';

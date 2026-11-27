@@ -236,8 +236,8 @@ import { pieceUrl, roomPieces, surfaceAt, swatchPiece, wallTargetAt } from '../h
 import { renderHomeLocation } from '../home-shot-render.js?v=35b81be3';
 import { maxTextureSizeOf, sharpDeco, wantsHiresDecos } from '../deco-hires.js?v=34f36d77';
 import { SHARP_DECOS } from '../deco-sharp-list.js?v=7d615f20';
-import { resourceNodeStill, resourceNodesFeature } from './resource-nodes-feature.js?v=edca549e';
-import { patchesFeature, plotStill } from './patches-feature.js?v=c2617f1c';
+import { resourceNodeStill, resourceNodesFeature } from './resource-nodes-feature.js?v=132b94a0';
+import { patchesFeature, plotStill } from './patches-feature.js?v=f0cb18b5';
 import { GROWN_TREE_LABELS, createPlot, growTree, plotLabel } from '../patches.js?v=3068579c';
 import { WOTD_DEPLETE_MS, WOTD_TEXT, nearestPourTarget, pourButton, pourConditions, pourConfirmText } from '../wine-pour.js?v=6daa23a7';
 import { WOTD_TOOL, pourApproach, pourDropTip } from '../wine-pour-fx.js?v=364e22d2';

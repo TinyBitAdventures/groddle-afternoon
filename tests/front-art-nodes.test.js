@@ -25,7 +25,7 @@ import {
   setStreetEcologyCatalog,
   streetReservedSpots,
 } from '../public/js/street-ecology.js?v=8f50537c';
-import { UNPLANNED_RESOURCE_CLASSES, resourceSpawnPlan } from '../public/js/features/resource-nodes-feature.js?v=edca549e';
+import { UNPLANNED_RESOURCE_CLASSES, resourceSpawnPlan } from '../public/js/features/resource-nodes-feature.js?v=132b94a0';
 import { placementRequests } from '../tools/build-realtime-objects.mjs';
 import { applyStreetIndex, loadStreetDataFromFs, setZoneStreetsShown } from '../public/js/street-loader.js?v=10376267';
 

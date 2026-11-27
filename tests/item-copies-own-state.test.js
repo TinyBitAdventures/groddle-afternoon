@@ -38,13 +38,13 @@ import { createPlayerSave, restorePlayerSave } from '../public/js/player-save.js
 import { layoutPack, unitPlaces } from '../public/js/pack-slots.js?v=38e4aea5';
 import { bagsFeature } from '../public/js/features/bags-feature.js?v=426f342b';
 import { VENDOR_PROFILES, vendorBuy, vendorSell } from '../public/js/vendor.js?v=7a07f478';
-import { createResourceNode, harvestResourceNode, ensureResourceItems } from '../public/js/resource-nodes.js?v=433a3e48';
+import { createResourceNode, harvestResourceNode, ensureResourceItems } from '../public/js/resource-nodes.js?v=c2eb46b1';
 import {
   fireflyJarCounts,
   fireflyJarInUse,
   resourceNodesFeature,
   setFireflyJar,
-} from '../public/js/features/resource-nodes-feature.js?v=edca549e';
+} from '../public/js/features/resource-nodes-feature.js?v=132b94a0';
 import { toolBreakEvents } from '../public/js/quest-offers.js?v=7e00498b';
 
 const root = join(import.meta.dirname, '..');

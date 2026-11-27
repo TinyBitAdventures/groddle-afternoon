@@ -6,7 +6,7 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { SLOTH_SHEETS } from '../public/js/sloth-art.js?v=a2768e2f';
 import { SLOTH_FULL_PEEK_GAP_MS, SLOTH_LINES, SLOTH_PEEK_GAP_MS, chooseSlothLine, slothCellAt, slothIdleTick, slothLabelMs, slothTimeline } from '../public/js/sloth-encounter.js?v=d78eba08';
-import { slothFeedPlan } from '../public/js/resource-nodes.js?v=433a3e48';
+import { slothFeedPlan } from '../public/js/resource-nodes.js?v=c2eb46b1';
 
 const anims = (steps) => steps.filter((s) => s.anim).map((s) => s.anim);
 
