@@ -2814,9 +2814,14 @@
   "deployed": "2026-11-27"
  },
  "git": {
-  "commits": 3840,
+  "commits": 3843,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-27",
+    "kind": "fix",
+    "text": "The street no longer flashes black on an iPhone when a bag opens or closes"
+   },
    {
     "date": "2026-11-27",
     "kind": "fix",
@@ -2931,14 +2936,9 @@
     "date": "2026-11-27",
     "kind": "improve",
     "text": "Decoration Mode scrolls into the back yard to pick up and move what lies there, and a pack stack held at the view's edge scrolls the room"
-   },
-   {
-    "date": "2026-11-27",
-    "kind": "fix",
-    "text": "In Classic the back yard's ground shows over the pack panel, and in Decoration and Cultivation Mode over their tray"
    }
   ]
  },
- "tests": 1478,
+ "tests": 1479,
  "generatedAt": "2026-11-27"
 }
