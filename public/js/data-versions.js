@@ -8995,6 +8995,7 @@
       "assets/sprites/animals/npc_chicken_pecking_twice@3x.webp": "79a3462f",
       "assets/sprites/animals/npc_chicken_verb.webp": "d8bfb797",
       "assets/sprites/animals/npc_chicken_verb@3x.webp": "640161aa",
+      "assets/sprites/bureaucratic-hall/waiting-chairs-right.svg": "97dc7e0b",
       "assets/sprites/emotes/plank.webp": "94b533d5",
       "assets/sprites/emotional-bear/high-five.webp": "f8214ab5",
       "assets/sprites/emotional-bear/hug.webp": "ad0c0418",
