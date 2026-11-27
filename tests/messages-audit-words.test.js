@@ -44,7 +44,9 @@ describe('messages audit wording', () => {
   it('Paradise says when the last ticket of the day was used (paradise_ticket_cloud_rings.js 154-155)', () => {
     const game = read('public/game.js');
     assert.match(game, /That was your last ticket today\. Another ticket can take you back next game day\./);
-    assert.equal((game.match(/\$\{paradiseWayBack\(\)\}/g) || []).length, 2);
+    // The Leave confirmation says it; the four-minute expiry toast that also did went with the timers (390f9139c97).
+    assert.equal((game.match(/\$\{paradiseWayBack\(\)\}/g) || []).length, 1);
+    assert.match(game, /This private Paradise will dissolve behind you\. \$\{paradiseWayBack\(\)\}/);
   });
 
   it('the Emotional Bear says you are reminiscing while the repeat story runs', () => {
