@@ -2814,9 +2814,14 @@
   "deployed": "2026-11-27"
  },
  "git": {
-  "commits": 3876,
+  "commits": 3878,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-27",
+    "kind": "fix",
+    "text": "Things in your house, Tower and home street rest on the floor again, wherever it has moved"
+   },
    {
     "date": "2026-11-27",
     "kind": "new",
@@ -2929,6 +2934,6 @@
    }
   ]
  },
- "tests": 1487,
+ "tests": 1488,
  "generatedAt": "2026-11-27"
 }
