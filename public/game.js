@@ -4,7 +4,7 @@
  */
 import { ITEM_ICONS, ITEM_LABELS, getVerbsFor, ordinaryItems, runVerb } from './content.js?v=68a61ef7';
 import { createErrorOnce, createFeatureHost, createFrameStages } from './js/feature-host.js?v=b87e2cbc';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=7aeb2c54';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=f511ddf8';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, enterHintPick, groupHead, hoverRimShown, reachGlowTargets, spriteHasRimArt, rimArtParts, trimmedIconUrl, drawTileArt } from './js/enter-chooser.js?v=74f4964a';
 import { firstTendKey, STICK_TEND_DELAY_MS, STICK_TEND_DIRS, STICK_TEND_REPEAT_MS, stepTendKey, stepTendKeys, stickTendKey, tendKeyAction } from './js/garden-tend.js?v=a7470c4a';
 import { avatarHitBox, behindFloor, bodyReachDistance, OUT_OF_REACH_LINE, playerClickBox } from './js/reach.js?v=456da8a8';
@@ -864,7 +864,7 @@ import {
   maturityLabel,
   trantStatusLabel,
 } from './js/trants.js?v=cf0fe1a3';
-import { loadTrantLook, trantFrameUrl, trantLook, trantLookTexture, trantShownTexture, trantStage, warmTrantLook } from './js/trant-looks.js?v=011c4eea';
+import { loadTrantLook, trantFrameUrl, trantLook, trantLookTexture, trantShownTexture, trantStage, warmTrantLook } from './js/trant-looks.js?v=8ed6fe90';
 import { growStreetTrant } from './js/patches.js?v=54430bb9';
 import {
   runStreetTransition,
@@ -15231,7 +15231,7 @@ const engine = {
     const meta = TRANT_META[target?.classId];
     if (!meta || !target.sprite || !target.state || target.grownFromBean) return;
     // #735 review: the new look once it is ready; until then the tree keeps the picture it shows
-    // (a stand-in of the nearest preloaded maturity flashed a full tree after every harvest), and
+    // (the nearest preloaded maturity's picture flashed a full tree after every harvest), and
     // swaps the moment its look has loaded or been drawn.
     const look = trantLook(target.classId, target.state.maturity ?? 7, target.state);
     warmTrantLook(look);

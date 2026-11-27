@@ -51,7 +51,7 @@ import { ensureItem } from '../inventory.js?v=3be7988a';
 import { isItemFloor, platformYAt } from '../street-model.js?v=a9a05f9d';
 import { SOIL_FOOTPRINT, SOIL_STEADY_FLOOR, getStreetEcologyCatalog, streetEcologyAliases } from '../street-ecology.js?v=8f50537c';
 import { trantStatusLabel } from '../trants.js?v=cf0fe1a3';
-import { loadTrantLook, trantLook } from '../trant-looks.js?v=011c4eea';
+import { loadTrantLook, trantLook } from '../trant-looks.js?v=8ed6fe90';
 import { standOnFeet } from '../sprite-feet.js?v=849541a8';
 import { woodTreeStatusLabel } from '../woodcutting.js?v=9e9af511';
 import {

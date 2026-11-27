@@ -202,7 +202,7 @@ export function warmTrantLook(look) {
 
 /**
  * #735 review: what a tree whose look changed shows now: its new look once that is ready, else the
- * picture it already shows (never a stand-in of another maturity or fruit count, which flashed a
+ * picture it already shows (never the picture of another maturity or fruit count, which flashed a
  * full tree for half a second after every harvest), and only a tree with no picture yet takes
  * `standIn()`. Patch trees already wait for their look (features/patches-feature.js).
  * @param {ReturnType<typeof trantLook>} look
