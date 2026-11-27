@@ -26,6 +26,8 @@ import { join } from 'node:path';
 
 import { BACK_YARD_GROUND_Y, CULTIVATION_PIN, YARD_DROP_EDGE, cultivationPin, yardDropSpot } from '../public/js/features/homes-feature.js?v=b00e964a';
 
+import { createBackYardState, placementCheck } from '../public/js/home-cultivation.js?v=122d6f45';
+
 const root = join(import.meta.dirname, '..');
 const read = (rel) => readFileSync(join(root, rel), 'utf8');
 const SHOT = process.env.GRODDLE_YARD_SHOT || '';
