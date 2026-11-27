@@ -1,6 +1,6 @@
 {
   "note": "Written by tools/gaps/build-data.mjs from tools/gaps/public-gaps.json and the coverage register. Edit those, never this file.",
-  "release": "v0.77.0",
+  "release": "v0.78.0",
   "states": {
     "fixing": {
       "label": "Being fixed",
@@ -42,7 +42,7 @@
     "fixing": 3,
     "known": 15,
     "unreleased": 0,
-    "fixed": 628,
+    "fixed": 644,
     "lost": 5,
     "purpose": 18,
     "idea": 10
@@ -786,6 +786,24 @@
           "text": "A few Visiting Stones, East Spice's among them, stood away from their street's end.",
           "state": "fixed",
           "version": "v0.77.0"
+        },
+        {
+          "id": "F167",
+          "text": "You fell through the floor of the Bureaucratic Hall and other built rooms.",
+          "state": "fixed",
+          "version": "v0.78.0"
+        },
+        {
+          "id": "F168",
+          "text": "The Bureaucratic Hall had no waiting chairs or signs, its lizards called you Ur online, and its waiting area stopped short and pointed the wrong way.",
+          "state": "fixed",
+          "version": "v0.78.0"
+        },
+        {
+          "id": "F178",
+          "text": "The street Ball flew the same on every street, whatever the street's gravity.",
+          "state": "fixed",
+          "version": "v0.78.0"
         }
       ]
     },
@@ -978,6 +996,12 @@
           "text": "The ring on the street map's next signpost moved up and down as you walked.",
           "state": "fixed",
           "version": "v0.73.0"
+        },
+        {
+          "id": "F177",
+          "text": "The map's region button stayed lit as if it were a setting.",
+          "state": "fixed",
+          "version": "v0.78.0"
         }
       ]
     },
@@ -1535,6 +1559,24 @@
           "version": "v0.77.0"
         },
         {
+          "id": "F166",
+          "text": "A window left asleep for a long time stopped showing your house floor, and a street's Notice Board lost its pinned notes, until you chose Play here.",
+          "state": "fixed",
+          "version": "v0.78.0"
+        },
+        {
+          "id": "F180",
+          "text": "Things dragged from the pack into the back yard landed away from where you let go, and Decoration Mode could not reach the yard.",
+          "state": "fixed",
+          "version": "v0.78.0"
+        },
+        {
+          "id": "F181",
+          "text": "The crack and Manhole rugs on an upper floor never dropped you to the floor below.",
+          "state": "fixed",
+          "version": "v0.78.0"
+        },
+        {
           "id": "G48",
           "text": "The name sign on a player tower and the lettering of its floor numbers have no free source, so they look different from Glitch.",
           "state": "lost"
@@ -1790,6 +1832,12 @@
           "text": "A super harvest showed its bonus as \"+2×\", which read like a multiplier.",
           "state": "fixed",
           "version": "v0.43.1"
+        },
+        {
+          "id": "F179",
+          "text": "Trants showed the wrong growth and fruit, and a street tree flashed full after each harvest.",
+          "state": "fixed",
+          "version": "v0.78.0"
         }
       ]
     },
@@ -2805,6 +2853,36 @@
           "text": "On an iPad, the Change your street style pictures stayed blank.",
           "state": "fixed",
           "version": "v0.77.0"
+        },
+        {
+          "id": "F170",
+          "text": "Held sideways, Quests, Social and the Menu ran under the camera cut-out, and an open bag pushed the action chip over the street's name.",
+          "state": "fixed",
+          "version": "v0.78.0"
+        },
+        {
+          "id": "F171",
+          "text": "Whole street did not fit the phone's street band, and opening the Menu reset the zoom you chose.",
+          "state": "fixed",
+          "version": "v0.78.0"
+        },
+        {
+          "id": "F172",
+          "text": "On an upright iPhone, the Hi sign leaderboard, the Calendar, Gifts, Trade, storage windows and the New Quest card sat under the clock and camera.",
+          "state": "fixed",
+          "version": "v0.78.0"
+        },
+        {
+          "id": "F173",
+          "text": "On a phone the Furniture Store covered Decoration Mode's tray, and its button could not close it again.",
+          "state": "fixed",
+          "version": "v0.78.0"
+        },
+        {
+          "id": "F175",
+          "text": "In the Home Screen app, links to our own site left the game with no way back.",
+          "state": "fixed",
+          "version": "v0.78.0"
         }
       ]
     },
@@ -3117,6 +3195,12 @@
           "text": "The glow around Helga sat off her body during some animations.",
           "state": "fixed",
           "version": "v0.73.1"
+        },
+        {
+          "id": "F174",
+          "text": "Prices were written differently from shop to shop instead of the number then ₡.",
+          "state": "fixed",
+          "version": "v0.78.0"
         }
       ]
     },
@@ -3208,6 +3292,12 @@
           "text": "Each garden plot needed two clicks or taps to tend.",
           "state": "fixed",
           "version": "v0.73.0"
+        },
+        {
+          "id": "F176",
+          "text": "A Jellisac Super Harvest showed no rainbow and played no sound.",
+          "state": "fixed",
+          "version": "v0.78.0"
         }
       ]
     },
@@ -3423,6 +3513,12 @@
           "text": "A report picture could show a scrolled list from the top and other text than the screen did.",
           "state": "fixed",
           "version": "v0.49.0"
+        },
+        {
+          "id": "F169",
+          "text": "Only your newest 200 reports could be opened from the Reports list.",
+          "state": "fixed",
+          "version": "v0.78.0"
         }
       ]
     },

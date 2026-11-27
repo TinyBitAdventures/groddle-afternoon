@@ -6275,6 +6275,169 @@
       "commits": [
         "game:b73bfdfab23"
       ]
+    },
+    {
+      "id": "F166",
+      "area": "Homes",
+      "text": "A window left asleep for a long time stopped showing your house floor, and a street's Notice Board lost its pinned notes, until you chose Play here.",
+      "show": "fixing",
+      "commits": [
+        "game:7b610ce969f",
+        "game:6882d90b342"
+      ]
+    },
+    {
+      "id": "F167",
+      "area": "Streets",
+      "text": "You fell through the floor of the Bureaucratic Hall and other built rooms.",
+      "show": "fixing",
+      "commits": [
+        "game:705d2268275"
+      ]
+    },
+    {
+      "id": "F168",
+      "area": "Streets",
+      "text": "The Bureaucratic Hall had no waiting chairs or signs, its lizards called you Ur online, and its waiting area stopped short and pointed the wrong way.",
+      "show": "fixing",
+      "commits": [
+        "game:f8cb75b4e85",
+        "game:21fb754ed79",
+        "game:b651aeb0082"
+      ]
+    },
+    {
+      "id": "F169",
+      "area": "Reports",
+      "text": "Only your newest 200 reports could be opened from the Reports list.",
+      "show": "fixing",
+      "commits": [
+        "game:18af3ffe9f0",
+        "site:052165f"
+      ]
+    },
+    {
+      "id": "F170",
+      "area": "Phones",
+      "text": "Held sideways, Quests, Social and the Menu ran under the camera cut-out, and an open bag pushed the action chip over the street's name.",
+      "show": "fixing",
+      "commits": [
+        "game:53b80c20506",
+        "game:02d5b84be66"
+      ]
+    },
+    {
+      "id": "F171",
+      "area": "Phones",
+      "text": "Whole street did not fit the phone's street band, and opening the Menu reset the zoom you chose.",
+      "show": "fixing",
+      "commits": [
+        "game:1fa7b1fba7c"
+      ]
+    },
+    {
+      "id": "F172",
+      "area": "Phones",
+      "text": "On an upright iPhone, the Hi sign leaderboard, the Calendar, Gifts, Trade, storage windows and the New Quest card sat under the clock and camera.",
+      "show": "fixing",
+      "commits": [
+        "game:1ce59476426",
+        "game:3f7059e27c7"
+      ]
+    },
+    {
+      "id": "F173",
+      "area": "Phones",
+      "text": "On a phone the Furniture Store covered Decoration Mode's tray, and its button could not close it again.",
+      "show": "fixing",
+      "commits": [
+        "game:d5944d18ad5",
+        "game:f9a5cde9953",
+        "game:b33e4d73306",
+        "game:2992b0b5f3a"
+      ]
+    },
+    {
+      "id": "F174",
+      "area": "Vendors",
+      "text": "Prices were written differently from shop to shop instead of the number then ₡.",
+      "show": "fixing",
+      "commits": [
+        "game:599e0513dec",
+        "game:c0a3df7a193",
+        "game:77698503508"
+      ]
+    },
+    {
+      "id": "F175",
+      "area": "Phones",
+      "text": "In the Home Screen app, links to our own site left the game with no way back.",
+      "show": "fixing",
+      "commits": [
+        "game:9cb2b81f6d9",
+        "game:baf20b4e5b5",
+        "game:7790b75d6bf"
+      ]
+    },
+    {
+      "id": "F176",
+      "area": "Gardens",
+      "text": "A Jellisac Super Harvest showed no rainbow and played no sound.",
+      "show": "fixing",
+      "commits": [
+        "game:ef48ac8379a"
+      ]
+    },
+    {
+      "id": "F177",
+      "area": "Map",
+      "text": "The map's region button stayed lit as if it were a setting.",
+      "show": "fixing",
+      "commits": [
+        "game:45dc4041627"
+      ]
+    },
+    {
+      "id": "F178",
+      "area": "Streets",
+      "text": "The street Ball flew the same on every street, whatever the street's gravity.",
+      "show": "fixing",
+      "commits": [
+        "game:d234bc36aa2"
+      ]
+    },
+    {
+      "id": "F179",
+      "area": "Trees and gardens",
+      "text": "Trants showed the wrong growth and fruit, and a street tree flashed full after each harvest.",
+      "show": "fixing",
+      "commits": [
+        "game:6b28e715661",
+        "game:719b97496e1",
+        "game:f89020b4927"
+      ]
+    },
+    {
+      "id": "F180",
+      "area": "Homes",
+      "text": "Things dragged from the pack into the back yard landed away from where you let go, and Decoration Mode could not reach the yard.",
+      "show": "fixing",
+      "commits": [
+        "game:13fd33e9c67",
+        "game:8f3a7016989",
+        "game:cbe35dbc764",
+        "game:7868ab90ee2",
+        "game:8c3d885f9be"
+      ]
+    },
+    {
+      "id": "F181",
+      "area": "Homes",
+      "text": "The crack and Manhole rugs on an upper floor never dropped you to the floor below.",
+      "show": "fixing",
+      "commits": [
+        "game:776d73e811e"
+      ]
     }
   ]
 }
