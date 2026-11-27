@@ -135,6 +135,7 @@ import { frameTexture, sourceFromUrl, textureFromUrl } from '../textures.js?v=b8
 import { publicStreet } from '../shared-street.js?v=dce5694b';
 import { standOnFeet, anchorBottomCentre } from '../sprite-feet.js?v=849541a8';
 import { WORLD_FONT_FAMILY } from '../world-text.js?v=6b49f88c';
+import { offlineLine, sharedOffline } from '../online-request.js?v=5fa7a635';
 
 export const ROOK_FEATURE_ID = 'rook-attack';
 /** The view the fight's screen art was laid out on; syncFront centres it in a wider one (g458). */
@@ -3270,6 +3271,16 @@ export const rookAttackFeature = {
     if (!target || !isRookableClass(target.classId)) return null;
     const key = keyOf.get(target);
     return key && slot(engine).rooked[key] ? true : null;
+  },
+
+  /**
+   * game.js beginVerbAction, and the verb menu while the window waits on Play here (#733 follow-up):
+   * online, Revive, Apply Balm, Prime and Strike ask the street's Rook (rook_revive, rook_prime,
+   * rook_strike), so they are refused while this page is not online, as the other shared verbs are.
+   */
+  verbRefusedNow(target, verbId, engine) {
+    if (!mp || engine?.mode !== 'multiplayer' || !String(verbId || '').startsWith('rook_')) return null;
+    return sharedOffline(mp.client) ? offlineLine(mp.client) : null;
   },
 
   runVerbOverride(target, verbId, engine) {
