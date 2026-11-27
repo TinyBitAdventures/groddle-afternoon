@@ -284,25 +284,25 @@
    "id": "site",
    "name": "groddle-afternoon-site",
    "url": "https://github.com/TinyBitAdventures/groddle-afternoon-site",
-   "ref": "v0.54.0",
-   "commit": "9ffca6e7",
+   "ref": "v0.54.1",
+   "commit": "e42ed6ed",
    "licence": "MIT",
    "history": {
-    "commits": 363,
+    "commits": 364,
     "first": "2026-10-24",
     "latest": "2026-11-26"
    },
    "code": {
-    "files": 179,
-    "lines": 58104,
-    "bytes": 3083812
+    "files": 180,
+    "lines": 58129,
+    "bytes": 3084466
    },
    "languages": [
     {
      "id": "php",
      "label": "PHP",
-     "files": 147,
-     "lines": 47850
+     "files": 148,
+     "lines": 47875
     },
     {
      "id": "javascript",
@@ -329,14 +329,14 @@
      "label": "Pages, blocks and menu",
      "path": "the rest of src/",
      "files": 94,
-     "lines": 24275
+     "lines": 24255
     },
     {
      "id": "services",
      "label": "Player services",
      "path": "src/ classes behind the groddle/v1 REST routes",
-     "files": 50,
-     "lines": 20098
+     "files": 51,
+     "lines": 20143
     },
     {
      "id": "ledger",
@@ -379,7 +379,7 @@
     },
     {
      "path": "src/PlayerPages.php",
-     "lines": 1312
+     "lines": 1292
     }
    ],
    "notCode": [
@@ -402,7 +402,7 @@
      "bytes": 15196
     }
    ],
-   "totalFiles": 289,
+   "totalFiles": 290,
    "tests": {
     "files": 185,
     "cases": 2697,
