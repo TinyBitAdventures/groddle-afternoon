@@ -3916,7 +3916,10 @@
 }
 :root[data-ui="classic"] #game-root :is(.hb-banner, .hb-tray, .hb-pop) .hb-bt:hover:not(:disabled) { background: var(--c-classic-panel); }
 :root[data-ui="classic"] #game-root :is(.hb-banner, .hb-tray, .hb-pop) .hb-bt.primary { border-color: var(--c-classic-btn-dark-bottom); background: linear-gradient(var(--c-classic-btn-dark-top), var(--c-classic-btn-dark-bottom)); color: var(--c-classic-btn-dark-label); }
-:root[data-ui="classic"] #game-root :is(.hb-banner, .hb-tray, .hb-pop) .hb-bt[aria-pressed="true"] { background: var(--c-classic-panel); color: var(--c-classic-title); box-shadow: inset 0 1px 3px color-mix(in srgb, var(--c-classic-ink) 20%, transparent); }
+/* #743: a toggle that is on (the Furniture Store button while the store is open): pushed in, its gradient turned over and
+   ringed in the label's blue, as the Map's pressed view button is sunken; the text colour alone did not show it. */
+:root[data-ui="classic"] #game-root :is(.hb-banner, .hb-tray, .hb-pop) .hb-bt[aria-pressed="true"],
+:root[data-ui="classic"] #game-root :is(.hb-banner, .hb-tray, .hb-pop) .hb-bt[aria-pressed="true"]:hover:not(:disabled) { border-color: var(--c-classic-btn-minor-label); background: linear-gradient(var(--c-classic-btn-minor-bottom), var(--c-classic-btn-minor-top)); color: var(--c-classic-title); box-shadow: inset 0 0 0 1px var(--c-classic-btn-minor-label), inset 0 2px 4px color-mix(in srgb, var(--c-classic-ink) 30%, transparent); }
 :root[data-ui="classic"] #game-root :is(.hb-banner, .hb-tray, .hb-pop) .hb-bt:disabled { color: var(--c-classic-disabled); cursor: default; }
 :root[data-ui="classic"] #game-root .hb-banner .hb-btn-ic { font-size: calc(var(--fs-classic-row) * var(--cu-n, 1)); line-height: 1; opacity: 0.7; }
 :root[data-ui="classic"] #game-root .hb-banner .hb-close {

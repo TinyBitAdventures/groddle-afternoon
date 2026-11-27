@@ -104,7 +104,11 @@ describe('#743 the Furniture Store button is a toggle (Austin\'s ruling 2026-11-
     assert.match(game, /shopOpen: \(key = ''\) => Boolean\(isVendorOpen\(\) && \(!key \|\| activeVendor\?\.key === key\)\),\n.*\n {2}closeShop\(\) \{\n {4}if \(isVendorOpen\(\)\) closeVendor\(\);/);
     // A pressed look in both skins.
     assert.match(css, /:is\(\.hb-banner, \.hb-tray, \.hb-pop\) \.hb-bt\[aria-pressed="true"\] \{/);
-    assert.match(read('public/css/classic.css'), /:is\(\.hb-banner, \.hb-tray, \.hb-pop\) \.hb-bt\[aria-pressed="true"\] \{/);
+    // Classic (review 2026-11-26: only its text colour changed): a sunken fill and a border, as the Map's pressed view button.
+    const classicPressed = read('public/css/classic.css').match(/:is\(\.hb-banner, \.hb-tray, \.hb-pop\) \.hb-bt\[aria-pressed="true"\][^{]*\{([^}]*)\}/)?.[1] || '';
+    assert.match(classicPressed, /border-color: var\(--c-classic-btn-minor-label\);/);
+    assert.match(classicPressed, /background: linear-gradient\(var\(--c-classic-btn-minor-bottom\), var\(--c-classic-btn-minor-top\)\);/);
+    assert.match(classicPressed, /box-shadow: inset /);
     // Ours: registered.
     const reg = JSON.parse(read('tools/inventions/inventions.json'));
     assert.ok(reg.entries.find((e) => e.id === 'furniture-store-tray-toggle' && e.status === 'kept'));
