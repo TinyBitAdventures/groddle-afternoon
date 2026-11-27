@@ -1193,7 +1193,10 @@ export function mountSocialDrawer({
       line.append(el('a', { class: 'chat-link', 'data-chat-link': 'home', href: v.onlineHref, target: '_blank', rel: 'noopener', 'data-social-who-chat': '' }, v.online));
       out.push(line);
     }
+    // The rows scroll on their own (style.css): a redraw keeps where they were scrolled to.
+    const scrolled = whoList.querySelector('[data-social-who-rows]')?.scrollTop || 0;
     whoList.replaceChildren(...out);
+    if (scrolled) ul.scrollTop = scrolled;
     whoNames = v.rows.filter((r) => !r.you).map((r) => r.name).join(',');
   }
 

@@ -11121,6 +11121,14 @@ button.social-buddy-what { margin: 0; padding: 0; border: 0; background: none; c
 /* Open, the head may take most of the view (a phone held sideways caps it at 30%, which left only the
    button row in sight); the lines scroll under it. The id outranks the phone rules. */
 #local-chat-dock .social-view-head:has(.social-who-list:not([hidden])) { max-height: 70%; }
+/* A long street: the rows scroll on their own, so "People here" and the online line ("See who") stay
+   in full under the button instead of being cut at the head's edge. At least one row stays in sight;
+   a head too short even for that scrolls as a whole, as before. */
+#local-chat-dock .social-view-head:has(.social-who-list:not([hidden])) { display: flex; flex-direction: column; }
+#local-chat-dock .social-view-head:has(.social-who-list:not([hidden])) > .social-local-head { flex: 0 1 auto; min-height: 0; grid-template-rows: auto minmax(0, 1fr); }
+#local-chat-dock .social-who-list:not([hidden]) { display: flex; flex-direction: column; min-height: 0; }
+#local-chat-dock .social-who-list .social-who-rows { flex: 0 1 auto; min-height: calc(var(--hit) + var(--sp-2)); overflow-y: auto; overscroll-behavior: contain; }
+#local-chat-dock .social-who-list > :not(.social-who-rows) { flex: none; }
 .social-who-head { margin: 0 0 var(--sp-1); font-weight: 800; }
 .social-who-list .social-empty, .social-who-list .social-note { margin: var(--sp-1) 0 0; }
 .social-who-rows li[data-ctx] { cursor: pointer; }
