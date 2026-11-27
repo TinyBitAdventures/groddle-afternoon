@@ -44,6 +44,7 @@
  * window.groddleAuctions in multiplayer.
  */
 
+import { priceText } from '../price.js?v=fd73ce0e';
 import { ITEM_CATALOG, addItem, countItem, itemIcon, listPackSlots, removeItem } from '../inventory.js?v=3be7988a';
 import { scriptFromTag, scriptLabel } from '../teleportation.js?v=cbbc673f';
 import { TOOL_CONDITION_CATALOG, copyTagKind, leavingCopyTag, leavingToolWear, receiveToolCopy } from '../tools.js?v=4156bba8';
@@ -153,7 +154,7 @@ function el(tag, attrs = {}, text = '') {
   return node;
 }
 
-const money = (n) => `${Math.max(0, Math.floor(Number(n) || 0)).toLocaleString('en-US')} ₡`;
+const money = priceText;
 
 function createSession(engine) {
   const boot = globalThis.GRODDLE_MP_BOOT || {};
@@ -505,7 +506,7 @@ function createSession(engine) {
     what.append(meta);
     const price = el('div', { class: 'auc-price' });
     price.append(el('strong', {}, `${a.n} for ${money(a.cost)}`));
-    if (a.n > 1) price.append(el('span', {}, `${unitPrice(a.cost, a.n)} ₡ each`));
+    if (a.n > 1) price.append(el('span', {}, `${priceText(unitPrice(a.cost, a.n))} each`));
     if (actions && a.status === 'active') {
       if (a.mine) {
         const b = el('button', { type: 'button', class: 'auc-btn is-quiet', 'data-auction-cancel': a.id }, 'Cancel');
@@ -758,7 +759,7 @@ function createSession(engine) {
       const cost = Math.max(0, Math.floor(Number(costIn.value) || 0));
       pick.n = n;
       pick.cost = cost;
-      each.textContent = `Your price per ${one}: ${n && cost ? `${unitPrice(cost, n)} ₡` : '–'}`;
+      each.textContent = `Your price per ${one}: ${n && cost ? priceText(unitPrice(cost, n)) : '–'}`;
       comm.replaceChildren(el('strong', {}, `Commission ${cost ? money(commission(cost, rules)) : '–'}`), el('small', {}, T.commissionDesc(rules)));
       fee.replaceChildren(el('strong', {}, `Listing fee ${cost ? money(listingFee(cost, rules)) : '–'}`), el('small', {}, T.feeDesc(rules)));
       go.disabled = busy || n < 1 || cost < 1 || cost > rules.costMax;

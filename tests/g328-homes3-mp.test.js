@@ -38,10 +38,10 @@ import {
   saleVerbs,
   signpostArms,
   signpostCandidates,
-} from '../public/js/home-street-mp.js?v=6ad3a79b';
+} from '../public/js/home-street-mp.js?v=21649a66';
 import { NOTE_POLE_CONTAINERS, NOTE_POLE_PARTS, NOTE_POLE_SIGN_Y } from '../public/js/note-pole-art.js?v=fbda2f8a';
 import { isSharedJob } from '../public/js/street-jobs-mp.js?v=1ccfc0c0';
-import { homeStreetMpFeature } from '../public/js/features/home-street-mp-feature.js?v=63451998';
+import { homeStreetMpFeature } from '../public/js/features/home-street-mp-feature.js?v=4dc34e2e';
 import { projectTable } from '../tools/build-realtime-projects.mjs';
 import { HAS_SITE, SITE_DIR, serverPath } from '../tools/repos.mjs';
 import { HAS_PHP, PHP } from './php.js';
@@ -169,7 +169,7 @@ describe('furniture for sale and the Pile of Currants (furniture_base)', () => {
     assert.deepEqual(saleVerbs({ owner: true, listing: { price: 5 } }).map((v) => v.label), ['edit sale price', "don't sell"]);
     assert.deepEqual(saleVerbs({ owner: false }), []);
     const buy = saleVerbs({ owner: false, listing: { price: 1200 } });
-    assert.equal(buy[0].tooltip, 'Buy it for 1,200c');
+    assert.equal(buy[0].tooltip, 'Buy it for 1,200₡');
   });
   it('says the source\'s words about the sale and the pile', () => {
     assert.equal(T.soldToYou('Bo', 'Chair', 1200), 'Bo just bought your Chair for 1,200 currants.');

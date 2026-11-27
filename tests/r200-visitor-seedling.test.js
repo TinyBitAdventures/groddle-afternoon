@@ -198,7 +198,7 @@ describe('a visit draws the tree a pet grows, and a refresh rebuilds one', () =>
       worldW: 3000,
     };
     try {
-      const { yardVerbsMpFeature } = await import('../public/js/features/yard-verbs-mp-feature.js?v=64c7dec7');
+      const { yardVerbsMpFeature } = await import('../public/js/features/yard-verbs-mp-feature.js?v=ecb5d078');
       yardVerbsMpFeature.onTick(16, 1, engine);
       for (let i = 0; i < 20 && !globalThis.groddleYard?.visit; i += 1) await new Promise((r) => setTimeout(r, 5));
       const yardSession = globalThis.groddleYard;

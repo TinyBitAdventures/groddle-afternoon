@@ -4,7 +4,7 @@
  */
 import { ITEM_ICONS, ITEM_LABELS, getVerbsFor, ordinaryItems, runVerb } from './content.js?v=c46159de';
 import { createErrorOnce, createFeatureHost, createFrameStages } from './js/feature-host.js?v=b87e2cbc';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=3ad90bb1';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=f47e7e5e';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, enterHintPick, groupHead, hoverRimShown, reachGlowTargets, spriteHasRimArt, rimArtParts, trimmedIconUrl, drawTileArt } from './js/enter-chooser.js?v=74f4964a';
 import { firstTendKey, STICK_TEND_DELAY_MS, STICK_TEND_DIRS, STICK_TEND_REPEAT_MS, stepTendKey, stepTendKeys, stickTendKey, tendKeyAction } from './js/garden-tend.js?v=a7470c4a';
 import { avatarHitBox, behindFloor, bodyReachDistance, OUT_OF_REACH_LINE, playerClickBox } from './js/reach.js?v=456da8a8';
@@ -547,6 +547,7 @@ import { beginDrag, installDropRegistry, packStackOf, registerDropTarget, touchL
 import { FLOAT_TEXT_Z, SPEECH_BUBBLE_Z } from './js/fx-z.js?v=18dda7e3';
 import { GAIN_FLOAT, GAIN_FLOAT_MS, gainFloatPose, gainFloatSinks } from './js/gain-float.js?v=caf16853';
 import { hasPouch } from './js/elemental-pouch.js?v=42702eda';
+import { CURRANT_SIGN, priceText } from './js/price.js?v=fd73ce0e';
 import { createPackRow, mountPackClearance, packBandRange, packCountText, packSearchEntries, packSearchResults, packSlotTip } from './js/ui/pack-row.js?v=f5ef5f6c';
 import { listAnimalFeedOptions, piggyFeedTip } from './js/animals.js?v=ca4d0ae5';
 import { pickerEmptyLine, pickerMaxCount, pickerOptionsFor, pickerTakesCount } from './js/animals.js?v=ca4d0ae5';
@@ -681,7 +682,7 @@ import {
   recipeToolChosen,
   pluralizeItem,
 } from './js/making.js?v=dc595568';
-import { MAKE_FUEL_TIP, makeFuelView } from './js/home-machines.js?v=5a45be0c';
+import { MAKE_FUEL_TIP, makeFuelView } from './js/home-machines.js?v=b7b47943';
 import { outputIconsHtml, outputsPhrase, productHaveRows, recipeOutputRows } from './js/ui/recipe-outputs.js?v=610c067f';
 import { MAKE_TOOL_SHEETS } from './js/make-tool-sheets.js?v=6f758e09';
 import { createTestTubePanel, tryTileHtml, TRY_TILE_LABEL } from './js/test-tube-panel.js?v=1ac36255';
@@ -748,7 +749,7 @@ import {
   resolveIndexTsid,
 } from './js/street-loader.js?v=10376267';
 import { showDraftBanner, startDraftPlay } from './js/builder/draft-play.js?v=46e5c40e';
-import { bootHouseFile } from './js/house-file-loader.js?v=a045a795';
+import { bootHouseFile } from './js/house-file-loader.js?v=4f17c904';
 import {
   ladderTopDeck,
   groundBeneath,
@@ -1168,7 +1169,7 @@ import { ZOOM_HINT_CACHE, ZOOM_HINT_MS, watchZoomHint } from './js/zoom-hint.js?
 import { EAT_PICK_TEXT, bestFoodIndex, eatChoices, eatTip } from './js/eat-pick.js?v=8fb763d0';
 import { heldDirection, installHeldKeyGuard, isMacPlatform } from './js/held-keys.js?v=a28eb293';
 import { isOneClickDoor, oneClickChoice, signpostArmRows, worldContextAction } from './js/world-context-menu.js?v=e4c99c05';
-import { blockedPlayerVerbs, listPlayerTarget, opensPlayerMenu, playerMenuRows } from './js/ui/player-menu.js?v=9e299c6e';
+import { blockedPlayerVerbs, listPlayerTarget, opensPlayerMenu, playerMenuRows } from './js/ui/player-menu.js?v=2f2a9e64';
 import { forgetTexture, frameTexture, isFailed, isLoaded, onFailed, onLoaded, textureFromUrl, whenLoaded } from './js/textures.js?v=b8e38103';
 import { FALLBACK_MAX as WORLD_ART_FALLBACK_MAX, worldArtFor } from './js/world-art.js?v=a67514c8';
 import { HOME_PIP_PX, HOME_PIP_WORDS, drawLockPip, drawPipWords, homeMarkNote, homePipShown, homePipWordsShown, homeStackMark } from './js/home-stack-marks.js?v=67b44287';
@@ -5748,7 +5749,7 @@ function renderPackPopover(classTsid, anchor = null) {
   });
   // Report #79 (Austin 2026-11-11, "Refuse: empty it first"): this bag's Sell is greyed while it holds anything.
   const sellBlock = canSellHere && isBagClass(classTsid) && features.query('packSaleBags', classTsid, engine, packSelectedBag || '') === 0 ? VENDOR_BAG_HOLDS : '';
-  if (canSellHere) rows.push({ attrs: 'data-pack-sell', cls: 'pack-pop-sell', label: 'Sell', gain: `◎ ${sellPrice}`, tip: `Sell one to this vendor for ${sellPrice} currants`, disabled: Boolean(sellBlock), reason: sellBlock });
+  if (canSellHere) rows.push({ attrs: 'data-pack-sell', cls: 'pack-pop-sell', label: 'Sell', gain: priceText(sellPrice), tip: `Sell one to this vendor for ${sellPrice} currants`, disabled: Boolean(sellBlock), reason: sellBlock });
 
   // Eat more and Drop (more than one) are second levels: a back row (0 or Backspace) and the count.
   // A feature verb's level (a bag's Sort) is a back row and its verbs, picked as any row is (1-9).
@@ -26681,7 +26682,7 @@ function mailAttachmentLabel(message) {
   if (message.attachment) {
     parts.push(`${message.attachment.count}× ${ITEM_CATALOG[message.attachment.classTsid]?.label || message.attachment.classTsid}`);
   }
-  if (message.currants) parts.push(`◎ ${message.currants} currants`);
+  if (message.currants) parts.push(priceText(message.currants));
   return parts.join(' · ');
 }
 
@@ -26733,7 +26734,7 @@ function renderMailboxCompose(recipient = '', replyTo = null) {
       </div>
       <div class="mail-compose-cost">
         <span>Base postage starts at 2 currants</span>
-        <strong data-mail-cost>◎ 2</strong>
+        <strong data-mail-cost>${priceText(2)}</strong>
       </div>
       <div class="mail-message-actions">
         <button type="submit" class="btn-glitch-primary">Send mail</button>
@@ -26755,7 +26756,7 @@ function renderMailboxCompose(recipient = '', replyTo = null) {
       currants,
     });
     const costEl = form.querySelector('[data-mail-cost]');
-    if (costEl) costEl.textContent = `◎ ${cost}`;
+    if (costEl) costEl.textContent = priceText(cost);
   };
   form.addEventListener('input', updateCost);
   form.querySelector('[data-mail-cancel]')?.addEventListener('click', () => {
@@ -26861,7 +26862,7 @@ function renderPlayerMailCompose(reader, online, recipient = '', replyTo = null)
       </div>
       <div class="mail-compose-cost">
         <span>Postage, with any currants you enclose</span>
-        <strong data-mail-cost>◎ 2</strong>
+        <strong data-mail-cost>${priceText(2)}</strong>
       </div>
       <p class="mail-compose-status" data-mail-status aria-live="polite"></p>
       <div class="mail-message-actions">
@@ -26892,7 +26893,7 @@ function renderPlayerMailCompose(reader, online, recipient = '', replyTo = null)
   const updateCost = () => {
     const f = read();
     const costEl = form.querySelector('[data-mail-cost]');
-    if (costEl) costEl.textContent = `◎ ${online.cost({ c: f.item?.c, n: f.item?.n || 0, currants: f.currants })}`;
+    if (costEl) costEl.textContent = priceText(online.cost({ c: f.item?.c, n: f.item?.n || 0, currants: f.currants }));
   };
   const status = (text) => {
     const el = form.querySelector('[data-mail-status]');
@@ -26961,7 +26962,7 @@ function renderMailboxReader(message) {
     <div class="mail-message-body">${escapeHtml(message.text)}</div>
     ${attachment ? `
       <div class="mail-attachment">
-        ${message.attachment ? `<img src="${escapeHtml(ITEM_CATALOG[message.attachment.classTsid]?.icon || `assets/sprites/icons/${message.attachment.classTsid}.webp`)}" alt="" />` : '<span class="currant-coin">◎</span>'}
+        ${message.attachment ? `<img src="${escapeHtml(ITEM_CATALOG[message.attachment.classTsid]?.icon || `assets/sprites/icons/${message.attachment.classTsid}.webp`)}" alt="" />` : `<span class="currant-coin">${CURRANT_SIGN}</span>`}
         <div class="mail-attachment-copy">
           <strong>${escapeHtml(attachment)}</strong>
           <span>${message.attachmentsClaimed ? 'Collected' : notHere ? 'Waiting for you at any mailbox' : 'Waiting in this envelope'}</span>
@@ -26995,7 +26996,7 @@ function renderMailboxReader(message) {
     const itemCopy = result.item
       ? `${result.item.count}× ${ITEM_CATALOG[result.item.classTsid]?.label || result.item.classTsid}`
       : '';
-    const currantCopy = result.currants ? `◎ ${result.currants}` : '';
+    const currantCopy = result.currants ? priceText(result.currants) : '';
     toast(`Received ${[itemCopy, currantCopy].filter(Boolean).join(' and ')}.`);
     pushActivity(`Mailbox delivery collected: ${[itemCopy, currantCopy].filter(Boolean).join(' · ')}`);
     updateHud();
@@ -33203,7 +33204,7 @@ function renderVendorDropZone() {
   }
   if (vendorSellReceipt) {
     drop.innerHTML = `
-      <span class="vendor-drop-coin" aria-hidden="true">◎</span>
+      <span class="vendor-drop-coin" aria-hidden="true">${CURRANT_SIGN}</span>
       <strong>Sold ${vendorSellReceipt.qty}× ${escapeHtml(vendorSellReceipt.label)}</strong>
       <span>+${vendorSellReceipt.gain} currants</span>`;
   } else {
@@ -33216,7 +33217,7 @@ function renderVendorDropZone() {
 
 /** The vendor's Buy or Sell button: the count and what it costs or pays, "Buy: 12 for 132". */
 function vendorGoLabel(isBuy, qty, unit) {
-  return `${isBuy ? 'Buy' : 'Sell'}: ${qty} for ${unit * qty}`;
+  return `${isBuy ? 'Buy' : 'Sell'}: ${qty} for ${priceText(unit * qty)}`;
 }
 
 function renderVendorList() {
@@ -33288,7 +33289,7 @@ function renderVendorList() {
         <h3>${label}</h3>
         <p>${
           isBuy
-            ? `Costs ${unit} currants each. You have ◎ ${pc.currants || 0}.`
+            ? `Costs ${priceText(unit)} each. You have ${priceText(pc.currants)}.`
             : `Will pay ${unit} currants each. You have ${have}.`
         }</p>
         <div class="qty-row">
@@ -33302,7 +33303,7 @@ function renderVendorList() {
         </div>${vendorRefusal ? `
         <p class="vendor-refusal" role="alert">${escapeHtml(vendorRefusal.text)}</p>` : ''}${findAuctions ? `
         <p class="vendor-auctions"><button type="button" class="vendor-auctions-btn" data-v-auctions title="${escapeHtml(findAuctions.tooltip || '')}">${escapeHtml(findAuctions.label)}</button></p>` : ''}
-        <p class="count-pop-esc mp-modern-only"><span class="count-pop-key"><span class="kcap">Esc</span> back · </span>${isBuy ? `◎ ${pc.currants || 0} to spend` : `${have} in your pack`}</p>
+        <p class="count-pop-esc mp-modern-only"><span class="count-pop-key"><span class="kcap">Esc</span> back · </span>${isBuy ? `${priceText(pc.currants)} to spend` : `${have} in your pack`}</p>
       </div>`;
     const applyQ = (n) => {
       vendorQty = Math.max(1, Math.min(maxQ, n));
@@ -33593,7 +33594,7 @@ function drawVendorTiles(list) {
       markVendorTile(tile, `${row.label}, ${row.price} currants`);
       tile.innerHTML = `
         <img src="${itemIconUrl(row.classTsid)}" alt="" />
-        <span class="tile-price">◎ ${row.price}</span>
+        <span class="tile-price">${priceText(row.price)}</span>
         <span class="tile-label">${row.label}</span>`;
       tile.addEventListener('click', () => {
         vendorSelected = row.classTsid;
@@ -33619,7 +33620,7 @@ function drawVendorTiles(list) {
       markVendorTile(tile, `${row.label}, ${row.have} in your pack, ${row.price} currants each`);
       tile.innerHTML = `
         <img src="${itemIconUrl(row.classTsid)}" alt="" />
-        <span class="tile-price">◎ ${row.price}</span>
+        <span class="tile-price">${priceText(row.price)}</span>
         <span class="tile-label">${row.label} ×${row.have}</span>`;
       tile.addEventListener('click', () => {
         vendorSelected = row.classTsid;

@@ -11,7 +11,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { bagKeep, giveBag, layoutPack, ownBagLabel, takeBag } from '../public/js/pack-slots.js?v=38e4aea5';
 import { createDroppedItemState, parseDroppedItemState, placeDroppedBag, serializeDroppedItemState, takeDroppedRecord } from '../public/js/world-items.js?v=93313aad';
-import { cabinetPut, cabinetTake, normalizeContents, slotHoldsBag } from '../public/js/home-storage.js?v=b0225465';
+import { cabinetPut, cabinetTake, normalizeContents, slotHoldsBag } from '../public/js/home-storage.js?v=31e8c4ad';
 
 const root = join(import.meta.dirname, '..');
 const read = (rel) => readFileSync(join(root, rel), 'utf8');

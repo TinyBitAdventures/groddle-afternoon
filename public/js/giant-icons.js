@@ -45,7 +45,7 @@
  */
 
 import { GIANT_ICON_DATA } from './giant-icons-data.js?v=5026b09c';
-import { isHousePlace } from './home-floors.js?v=444d18d7';
+import { isHousePlace } from './home-floors.js?v=cb981157';
 import { giantDisplayName } from './giant-names.js?v=0e295891';
 // The Icon conversations' one copy, with every other teller's (G214); the key every importer uses.
 import { TELLERS } from './conversations-data.js?v=f11b7e02';

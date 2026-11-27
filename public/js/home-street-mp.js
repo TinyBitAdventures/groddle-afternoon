@@ -19,7 +19,8 @@
  * Solo never loads any of this.
  */
 
-import { possessive } from './neighbours-mp.js?v=83f2fdf4';
+import { priceText } from './price.js?v=fd73ce0e';
+import { possessive } from './neighbours-mp.js?v=6d97fefa';
 
 export const HOME_STREET_MP_ID = 'home-street-mp';
 
@@ -137,7 +138,7 @@ export const HOME_STREET_TEXT = Object.freeze({
   dontSellVerb: "don't sell",
   dontSellTip: 'Stop selling it',
   buyVerb: 'buy',
-  buyTip: (price) => `Buy it for ${formatCurrants(price)}c`,
+  buyTip: (price) => `Buy it for ${priceText(price)}`,
   priceTitle: 'Price',
   setPrice: 'Set price',
   stopFirst: 'You have to stop selling it first.',

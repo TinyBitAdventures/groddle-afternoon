@@ -33,8 +33,8 @@ import { createMinnAccount } from '../public/js/minn-account.js?v=7e3d7279';
 import { buddiesFeature } from '../public/js/features/buddies-feature.js?v=7ca9abe8';
 import { BUDDY_DESTINATION_TEXT, BUDDY_DESTINATION_VERB, buddyDestination, buddyFaceUrl, createFaceMemory } from '../public/js/buddy-list.js?v=b418f3f2';
 import { STREET_INDEX } from '../public/js/street-loader.js?v=10376267';
-import { FROM_LIST_VERBS, playerMenuRows } from '../public/js/ui/player-menu.js?v=9e299c6e';
-import { FEATURES } from '../public/js/features/index.js?v=3ad90bb1';
+import { FROM_LIST_VERBS, playerMenuRows } from '../public/js/ui/player-menu.js?v=2f2a9e64';
+import { FEATURES } from '../public/js/features/index.js?v=f47e7e5e';
 import { serverPath, sitePath, skipWithoutServer, skipWithoutSite } from '../tools/repos.mjs';
 import { PHP } from './php.js';
 

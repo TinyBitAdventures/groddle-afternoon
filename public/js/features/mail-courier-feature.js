@@ -90,9 +90,10 @@
  *   mailParcels, mailCourierLast, mailCourierDelivered, mailCourierAutoplay.
  */
 
+import { priceText } from '../price.js?v=fd73ce0e';
 import { ITEM_CATALOG, itemIcon } from '../inventory.js?v=3be7988a';
 import { frameTexture, sourceFromUrl } from '../textures.js?v=b8e38103';
-import { questRoomConverse } from './quest-instances-feature.js?v=f41db36a';
+import { questRoomConverse } from './quest-instances-feature.js?v=525c46da';
 import { hellFeature } from './hell-feature.js?v=a9f2ff9a';
 import { DISPATCHER_ART, FROG_ART, MAIL_NPC_ART_DIR } from '../mail-npc-art.js?v=1ed97a5d';
 import { DISPATCHER_GAP, DISPATCHER_HALF, DISPATCHER_TEXT, SIGNPOST } from '../home-street-fixtures.js?v=d4e5b56a';
@@ -415,7 +416,7 @@ function stuffHtml(message) {
     const icon = ITEM_CATALOG[item.classTsid]?.icon || itemIcon(item.classTsid);
     bits.push(`<span style="display:inline-flex;align-items:center;gap:6px"><img src="${escapeHtml(icon)}" alt="" style="width:40px;height:40px;object-fit:contain" />${escapeHtml(`${item.count} × ${label}`)}</span>`);
   }
-  if (!message.attachmentsClaimed && message.currants > 0) bits.push(`<span>◎ ${escapeHtml(message.currants)}</span>`);
+  if (!message.attachmentsClaimed && message.currants > 0) bits.push(`<span>${escapeHtml(priceText(message.currants))}</span>`);
   return bits.length ? `<span style="display:flex;flex-wrap:wrap;gap:12px;margin-top:10px" data-mail-courier-stuff>${bits.join('')}</span>` : '';
 }
 
@@ -647,7 +648,7 @@ async function ledgerHandOver(engine, msg, room) {
 function received(engine, res) {
   const bits = [];
   if (res.item && res.ok) bits.push(`${res.item.count}× ${ITEM_CATALOG[res.item.classTsid]?.label || res.item.classTsid}`);
-  if (res.currants) bits.push(`◎ ${res.currants}`);
+  if (res.currants) bits.push(priceText(res.currants));
   if (!bits.length) return;
   engine.pushActivity?.(`Express mail received: ${bits.join(' · ')}`);
   engine.playSound?.('CONFIRM_DELIVERY', { volume: 0.45 });

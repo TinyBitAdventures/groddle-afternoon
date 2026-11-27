@@ -114,7 +114,7 @@ describe('ticket 92: what OK says follows the count as it is typed', () => {
     const vendor = fn(game, 'renderVendorList');
     assert.match(vendor, /preview: \(n\) => \{\n\s+vendorQty = n;[\s\S]*?go\.textContent = vendorGoLabel\(isBuy, n, unit\);/);
     assert.doesNotMatch(vendor, /\[data-vq-val\]'\)\?\.addEventListener\('change'/, 'the field\'s own change redraw is gone');
-    assert.match(fn(game, 'vendorGoLabel'), /`\$\{isBuy \? 'Buy' : 'Sell'\}: \$\{qty\} for \$\{unit \* qty\}`/);
+    assert.match(fn(game, 'vendorGoLabel'), /`\$\{isBuy \? 'Buy' : 'Sell'\}: \$\{qty\} for \$\{priceText\(unit \* qty\)\}`/);
     const pack = fn(game, 'renderPackPopover');
     assert.match(pack, /go\.textContent = `Drop \$\{packDropQty\}`;/);
     assert.match(pack, /go\.textContent = `\$\{eatMany\.verb\} \$\{packEatQty\}`;/);

@@ -111,6 +111,29 @@ describe('#743 the Furniture Store button is a toggle (Austin\'s ruling 2026-11-
   });
 });
 
+describe('#743 prices read the number then Glitch\'s ₡ (Austin\'s ruling 2026-11-26)', () => {
+  it('priceText: commas, then ₡, no space (StoreDialog.as 390, StoreBuyUI.as 520 "Price 1,234₡")', async () => {
+    const { CURRANT_SIGN, priceText } = await import('../public/js/price.js?v=fd73ce0e');
+    assert.equal(CURRANT_SIGN, '₡');
+    assert.equal(priceText(450), '450₡');
+    assert.equal(priceText(1250), '1,250₡');
+    assert.equal(priceText(-5), '0₡');
+    assert.equal(priceText('36.2'), '36.2₡');
+  });
+
+  it('no shop, vendor, mail or drop writes the old ◎ (the top bar keeps its coin), and each one uses priceText', () => {
+    const files = ['public/game.js', 'public/play/index.html', 'public/play/online/index.html', 'public/js/features/drops-feature.js', 'public/js/features/mail-courier-feature.js', 'public/js/ui/storage-windows.js'];
+    for (const f of files) assert.doesNotMatch(read(f), /◎/, f);
+    assert.match(game, /<span class="tile-price">\$\{priceText\(row\.price\)\}<\/span>/);
+    assert.match(game, /: \$\{qty\} for \$\{priceText\(unit \* qty\)\}`/);
+    const auctions = read('public/js/features/auctions-feature.js');
+    assert.match(auctions, /const money = priceText;/);
+    assert.doesNotMatch(auctions, / ₡/);
+    assert.match(read('public/js/home-storage.js'), /priceEach: \(n\) => `Price \$\{priceText\(n\)\}`/);
+    assert.match(read('public/js/home-street-mp.js'), /buyTip: \(price\) => `Buy it for \$\{priceText\(price\)\}`/);
+  });
+});
+
 const SAFE_T = 86; // an iPhone 16 Pro's 62 px inset plus the Home Screen app's 24 px fade clearance
 const SAFE_B = 34;
 
@@ -190,7 +213,7 @@ function problems({ before, open, closed }, { phone }) {
   if (open.store?.pressed !== 'true') bad.push(`the Furniture Store button is not pressed while the store is open (aria-pressed ${open.store?.pressed})`);
   if (closed.vendor) bad.push('a second tap on the Furniture Store button left the store open');
   else if (closed.store?.pressed !== 'false') bad.push(`the Furniture Store button stays pressed after the store closed (aria-pressed ${closed.store?.pressed})`);
-  if (!/^\d[\d,]* ₡$/.test(open.price)) bad.push(`a price reads "${open.price}", not the number then ₡`);
+  if (!/^\d[\d,]*₡$/.test(open.price)) bad.push(`a price reads "${open.price}", not the number then ₡`);
   return bad;
 }
 
@@ -218,7 +241,7 @@ for (const [engine, label, opts] of RUNS) {
       await br?.close();
       if (engine === 'chromium') await server?.stop();
     });
-    it('the bar keeps off the store, the tray keeps its width, the button toggles the store, the price reads N ₡', { timeout: 150_000 }, async (t) => {
+    it('the bar keeps off the store, the tray keeps its width, the button toggles the store, the price reads N₡', { timeout: 150_000 }, async (t) => {
       if (!br) { t.skip(`no ${engine}`); return; }
       const ctxOpts = opts.phone
         ? { ...playwright.devices['iPhone 15 Pro'], viewport: { width: 402, height: 812 } }

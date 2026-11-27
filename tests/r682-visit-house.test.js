@@ -4,8 +4,8 @@
 // on their home street (inc_homes.js 2464, 2478-2501).
 import { it } from 'node:test';
 import assert from 'node:assert/strict';
-import { normalizeHomeView } from '../public/js/neighbours-mp.js?v=83f2fdf4';
-import { visitorHomeState } from '../public/js/features/homes-feature.js?v=8a5cda78';
+import { normalizeHomeView } from '../public/js/neighbours-mp.js?v=6d97fefa';
+import { visitorHomeState } from '../public/js/features/homes-feature.js?v=5a4c0350';
 
 const answer = (house) => ({ owner: { id: 7, name: 'Owner' }, home: { owned: true, style: 'uralia', house }, homes: {}, key: false, pass: { token: 't' } });
 

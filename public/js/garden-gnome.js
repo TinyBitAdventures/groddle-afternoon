@@ -22,7 +22,7 @@
  *   so only the one who bumped it sees that hop.
  */
 
-import { housePlace, isHousePlace } from './home-floors.js?v=444d18d7';
+import { housePlace, isHousePlace } from './home-floors.js?v=cb981157';
 
 export const GNOME_CLASS = 'npc_garden_gnome';
 export const GNOME_MAX_PHRASES = 3;

@@ -49,6 +49,8 @@
  *   empty bags (site LedgerBoxes::cabinetMove).
  */
 
+import { priceText } from './price.js?v=fd73ce0e';
+
 /** classProps width (cols), height (rows) and rows_display of each cabinet class. */
 export const CABINETS = Object.freeze({
   bag_furniture_cabinet: Object.freeze({ cols: 4, rows: 8, rowsDisplay: 4 }),
@@ -124,7 +126,7 @@ export const STORAGE_TEXT = Object.freeze({
   notEnough: "You don't have enough currants!", // :609
   youHave: (n) => `You have ${n.toLocaleString('en-US')} of these.`, // :215
   forSaleCount: (n) => `${n.toLocaleString('en-US')} for sale`, // :233
-  priceEach: (n) => `Price ${n.toLocaleString('en-US')}`, // :520
+  priceEach: (n) => `Price ${priceText(n)}`, // :520 "Price 1,234₡"
   buyButton: (n, total) => `Buy: ${n.toLocaleString('en-US')} for ${total.toLocaleString('en-US')}`, // :580
   priceChangedTitle: 'Price changed!', // :249
   priceChanged: (was, now) => `The price for this item has just now changed, from ${was.toLocaleString('en-US')} to ${now.toLocaleString('en-US')}. I thought you would like to know.`, // :250

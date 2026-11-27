@@ -554,7 +554,7 @@ export function openStoreDialog({ title, sub = '', item, have, max, text, onBuy,
     name.append(el('span', { class: 'hst-count', 'data-hst-stock': String(cur.count) }, text.forSaleCount(cur.count)));
     top.append(name);
     body.append(top);
-    body.append(el('p', { class: 'hst-price', 'data-hst-cost': String(cur.cost) }, `${text.priceEach(cur.cost)} ◎`));
+    body.append(el('p', { class: 'hst-price', 'data-hst-cost': String(cur.cost) }, text.priceEach(cur.cost)));
     body.append(el('p', { class: 'hst-have' }, text.youHave(have())));
     const most = max(cur);
     n = Math.max(1, Math.min(n, Math.max(1, most)));

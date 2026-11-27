@@ -34,6 +34,7 @@
  *     dropTable, dropLast, dropRolls, dropHits, dropAutoplay.
  */
 
+import { priceText } from '../price.js?v=fd73ce0e';
 import { addItem, ensureItem, ITEM_CATALOG } from '../inventory.js?v=3be7988a';
 import { emblemCostFor } from '../shrines.js?v=48318bec';
 import {
@@ -237,7 +238,7 @@ function entryHtml(e) {
     const meta = DROP_ITEMS[e.item];
     return `<span style="display:inline-flex;align-items:center;gap:4px"><img src="${iconFor(e.item)}" alt="" style="width:22px;height:22px;object-fit:contain" onerror="this.style.visibility='hidden'">${e.count > 1 ? `${e.count} ` : ''}${(e.count > 1 ? meta?.plural : meta?.single) || e.item}</span>`;
   }
-  if (e.currants) return `◎ ${e.currants} currants`;
+  if (e.currants) return priceText(e.currants);
   if (e.favor) return `${e.favor.points} favor · ${e.favor.giant === 'all' ? 'all Giants' : e.favor.giant}`;
   if (e.mood) return `${e.mood} mood`;
   if (e.energy) return `${e.energy} energy`;

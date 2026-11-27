@@ -38,7 +38,7 @@ import {
   snapPlacement,
   standSetAt,
   standingSets,
-} from '../public/js/home-decor.js?v=31f37d9b';
+} from '../public/js/home-decor.js?v=0fd93a2f';
 import { FURNITURE_CATALOG } from '../public/js/homes-catalog.js?v=0367f90f';
 import { FURNITURE_UPGRADES } from '../public/js/furniture-upgrades-data.js?v=0b2cf3cc';
 
