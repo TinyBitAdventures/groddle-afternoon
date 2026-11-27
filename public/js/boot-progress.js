@@ -9,7 +9,11 @@
  * from it), so it runs while the rest of the game's code is still downloading; game.js imports the
  * same instance and calls bootStep() as main() goes. Nothing here is needed for the game to run: with
  * no card on the page, or no PerformanceObserver, every call does nothing.
+ *
+ * #745: it also starts What's new (js/whats-new.js), the lines about the update the card shows after
+ * one, so they come up as early as the card does.
  */
+import { startWhatsNew } from './whats-new.js?v=d6a97a9a';
 
 export const BOOT_STEPS = Object.freeze(['code', 'screen', 'pictures', 'sounds', 'catalogs', 'recipes', 'world', 'street', 'look']);
 
@@ -130,4 +134,7 @@ export function startBootProgress(doc = globalThis.document, PO = globalThis.Per
   return true;
 }
 
-if (typeof document !== 'undefined') startBootProgress(document);
+if (typeof document !== 'undefined') {
+  startBootProgress(document);
+  startWhatsNew(document);
+}

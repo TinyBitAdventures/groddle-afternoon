@@ -6620,6 +6620,25 @@
    ],
    "why": "Glitch carried a cultivation at your feet and showed its red or green carry box and placement pointers where it could go (CultCarryUI.as, CultManager.as 550-645), over a view its picker never covered; the tray drag is ours. In the back yard at 1352x802 the ground stands at the tray's top edge, so a flat Patch and its ground pad hid behind the tray and the Place button sat on what showed. Ours: a pin stands over the carried cultivation at the spot it lands (pale gold where it fits, red where not), placementCheck's own words show by the pointer when it won't fit (the drop's toast says the same), and the Place button stays away while dragging (letting go buys it). Austin 2026-11-27: drag and drop placing in the back yard.",
    "rows": []
+  },
+  {
+   "id": "whats-new-loading-card",
+   "title": "After an update the loading card shows What's new: the top three lines about the release",
+   "kind": "UI",
+   "status": "kept",
+   "where": [
+    {
+     "file": "public/js/whats-new.js",
+     "symbol": "startWhatsNew"
+    },
+    {
+     "file": "tools/release/whats-new.mjs",
+     "symbol": "withRelease"
+    }
+   ],
+   "why": "Glitch told players nothing about an update beyond its Reload is Coming debuff before a deploy. Ours: play/whats-new.json lists each release's few player-facing lines (written at release from the Emoji-Log draft), and a browser that last loaded an older version sees the top three on the loading card, rolled up across every release since a visit within a week, else the newest release only; a first visit shows nothing. Nothing waits for it, so a fast load can hide it.",
+   "ruling": "Austin 2026-11-27 (#745): option 3, the notes on the loading card, not a centred card or a corner notice",
+   "rows": []
   }
  ]
 }

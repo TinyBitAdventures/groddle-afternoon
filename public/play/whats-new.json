@@ -1,0 +1,17 @@
+{
+  "format": "groddle-whats-new/1",
+  "about": "What the loading card shows after an update (#745): per release, newest first, up to five short player-facing lines. Written by tools/release/whats-new.mjs.",
+  "releases": [
+    {
+      "version": "v0.78.0",
+      "date": "2026-11-27",
+      "lines": [
+        "Random Holes: touch one and you pop out of another hole on the same street.",
+        "Decoration Mode scrolls into the back yard, so you can pick up and move what lies there.",
+        "Things dragged from your pack land where you let go in your back yard.",
+        "The Bureaucratic Hall has its eight waiting chairs, and you stand on its floor again.",
+        "Prices read the number then ₡ everywhere: shops, vendors, storage, mail and auctions."
+      ]
+    }
+  ]
+}

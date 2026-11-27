@@ -1,0 +1,195 @@
+/**
+ * What's new (#745, Austin 2026-11-27, option 3): after an update the loading card shows what
+ * changed, a few short lines under the progress bar, while the game loads. Ours: Glitch had nothing
+ * like it (only its "Reload is Coming" debuff before a deploy).
+ *
+ * - play/whats-new.json (tools/release/whats-new.mjs writes it at each release, from the same
+ *   Emoji-Log draft as the release notes) lists the releases, newest first: { version, date, lines }.
+ * - This browser remembers the newest version it loaded and when (localStorage, SEEN_KEY). On a load
+ *   with a newer one, the card shows the top SHOW_LINES lines: across every release since the last
+ *   visit when that visit was within ROLL_UP_MS, else the newest release's alone.
+ * - A first visit shows nothing (a new player needs no changelog) and only remembers the version.
+ * - Nothing waits for it: on a fast load the card may be gone before the lines arrive.
+ *
+ * Pure parts (whatsNewFor, validateWhatsNew) are tested in tests/whats-new.test.js; js/boot-progress.js
+ * starts it as the card comes up, on both play pages.
+ */
+
+/** The file the release writes, from the site root (the play pages' <base>). */
+export const WHATS_NEW_PATH = 'play/whats-new.json';
+export const WHATS_NEW_FORMAT = 'groddle-whats-new/1';
+/** The newest version this browser loaded and when: { version, at }. */
+export const SEEN_KEY = 'groddle-whats-new-seen';
+/** A visit within this long rolls up every release since; an older one sees the newest release only. */
+export const ROLL_UP_MS = 7 * 24 * 60 * 60 * 1000;
+export const SHOW_LINES = 3;
+/** A release lists at most this many lines; each at most MAX_LINE characters. */
+export const MAX_LINES = 5;
+export const MAX_LINE = 110;
+/** The file keeps this many releases (older ones are never rolled up: they are past a week). */
+export const KEEP_RELEASES = 20;
+
+const VERSION = /^v(\d+)\.(\d+)\.(\d+)$/;
+
+/** v0.78.0 reads "v0.78"; a patch keeps its third number (v0.78.1). */
+export const shortVersion = (v) => String(v).replace(/^(v\d+\.\d+)\.0$/, '$1');
+
+/** The words (plain, no em dashes). */
+export const WHATS_NEW_TEXT = Object.freeze({
+  one: (v) => `New in ${shortVersion(v)}`,
+  since: (v) => `New since ${shortVersion(v)}`,
+});
+
+/** Sorts versions: negative when a is older than b. Unknown versions sort oldest. */
+export function compareVersions(a, b) {
+  const x = VERSION.exec(String(a || ''));
+  const y = VERSION.exec(String(b || ''));
+  if (!x || !y) return (x ? 1 : 0) - (y ? 1 : 0);
+  for (let i = 1; i <= 3; i += 1) if (Number(x[i]) !== Number(y[i])) return Number(x[i]) - Number(y[i]);
+  return 0;
+}
+
+/** The file's well-formed releases, newest first. */
+export function releasesOf(data) {
+  const list = Array.isArray(data?.releases) ? data.releases : [];
+  return list
+    .filter((r) => r && VERSION.test(String(r.version || '')) && Array.isArray(r.lines))
+    .map((r) => ({ version: r.version, date: String(r.date || ''), lines: r.lines.filter((l) => typeof l === 'string' && l.trim()).map((l) => l.trim()) }))
+    .sort((a, b) => compareVersions(b.version, a.version));
+}
+
+/**
+ * PURE: what the card shows on this load, or null. `seen` is what this browser stored ({ version, at })
+ * or null on a first visit.
+ */
+export function whatsNewFor(data, seen, now = Date.now()) {
+  const releases = releasesOf(data);
+  const newest = releases[0];
+  if (!newest || !seen || typeof seen !== 'object') return null;
+  const last = String(seen.version || '');
+  if (VERSION.test(last) && compareVersions(newest.version, last) <= 0) return null;
+  const at = Number(seen.at);
+  const recent = VERSION.test(last) && Number.isFinite(at) && at <= now && now - at <= ROLL_UP_MS;
+  const pick = recent ? releases.filter((r) => compareVersions(r.version, last) > 0) : [newest];
+  const shown = [];
+  for (const r of pick) for (const text of r.lines) if (shown.length < SHOW_LINES) shown.push({ text, version: r.version });
+  if (!shown.length) return null;
+  const from = new Set(shown.map((s) => s.version));
+  return {
+    title: from.size > 1 ? WHATS_NEW_TEXT.since(last) : WHATS_NEW_TEXT.one(shown[0].version),
+    lines: shown.map((s) => s.text),
+    version: newest.version,
+  };
+}
+
+/** PURE: what to store after this load: the newest version seen (never backwards) and now. */
+export function nextSeen(data, seen, now = Date.now()) {
+  const newest = releasesOf(data)[0];
+  if (!newest) return null;
+  const last = String(seen?.version || '');
+  const version = VERSION.test(last) && compareVersions(last, newest.version) > 0 ? last : newest.version;
+  return { version, at: now };
+}
+
+/**
+ * PURE: the problems with a whats-new file ([] when it is fine): its format, versions newest first and
+ * each once, a date, at most MAX_LINES lines a release, each short, plain (no em or en dashes) and
+ * free of paths.
+ */
+export function validateWhatsNew(data) {
+  const out = [];
+  if (!data || typeof data !== 'object') return ['not a JSON object'];
+  if (data.format !== WHATS_NEW_FORMAT) out.push(`format is not ${WHATS_NEW_FORMAT}`);
+  if (!Array.isArray(data.releases) || !data.releases.length) return [...out, 'no releases'];
+  if (data.releases.length > KEEP_RELEASES) out.push(`more than ${KEEP_RELEASES} releases`);
+  data.releases.forEach((r, i) => {
+    const v = r?.version;
+    if (!VERSION.test(String(v || ''))) out.push(`release ${i}: version ${JSON.stringify(v)} is not vX.Y.Z`);
+    else if (i > 0 && compareVersions(data.releases[i - 1]?.version, v) <= 0) out.push(`${v}: not newest first`);
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(String(r?.date || ''))) out.push(`${v}: date is not YYYY-MM-DD`);
+    if (!Array.isArray(r?.lines)) {
+      out.push(`${v}: lines is not a list`);
+      return;
+    }
+    if (r.lines.length > MAX_LINES) out.push(`${v}: more than ${MAX_LINES} lines`);
+    for (const line of r.lines) {
+      if (typeof line !== 'string' || !line.trim()) out.push(`${v}: an empty line`);
+      else if (line.length > MAX_LINE) out.push(`${v}: longer than ${MAX_LINE}: ${line}`);
+      else if (/[–—]/.test(line)) out.push(`${v}: a dash a player should not see: ${line}`);
+      else if (/\/Users\/|\/home\/|https?:|\(\w{7,12}\)$/.test(line)) out.push(`${v}: a path, link or commit: ${line}`);
+    }
+  });
+  return out;
+}
+
+function readSeen(storage) {
+  try {
+    const v = JSON.parse(storage?.getItem(SEEN_KEY) || 'null');
+    return v && typeof v === 'object' ? v : null;
+  } catch {
+    return null;
+  }
+}
+
+function writeSeen(storage, value) {
+  try {
+    storage?.setItem(SEEN_KEY, JSON.stringify(value));
+  } catch {
+    /* private window or storage off: the next load is a first visit again, which shows nothing */
+  }
+}
+
+/** Puts the lines on the loading card (#boot-loader). Returns the section, or null with no card. */
+export function mountWhatsNew(doc, shown) {
+  const card = doc?.getElementById?.('boot-loader')?.querySelector?.('.boot-loader-card');
+  if (!card || !shown) return null;
+  card.querySelector('.boot-loader-news')?.remove();
+  const section = doc.createElement('section');
+  section.className = 'boot-loader-news';
+  const h = doc.createElement('h3');
+  h.textContent = shown.title;
+  const list = doc.createElement('ul');
+  for (const text of shown.lines) {
+    const li = doc.createElement('li');
+    li.textContent = text;
+    list.append(li);
+  }
+  section.append(h, list);
+  card.append(section);
+  card.classList.add('has-news');
+  return section;
+}
+
+function storageOf(win) {
+  try {
+    return win?.localStorage || null;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Fetches the notes, shows what is new on the loading card, and remembers this version. Never throws;
+ * a failed fetch changes nothing. Resolves to what it showed (or null).
+ */
+export async function startWhatsNew(doc = globalThis.document, {
+  fetch: fetchFn = globalThis.fetch?.bind(globalThis),
+  storage = storageOf(globalThis),
+  now = () => Date.now(),
+} = {}) {
+  try {
+    if (!doc?.getElementById?.('boot-loader') || typeof fetchFn !== 'function') return null;
+    const res = await fetchFn(new URL(WHATS_NEW_PATH, doc.baseURI).href);
+    if (!res?.ok) return null;
+    const data = await res.json();
+    const seen = readSeen(storage);
+    const t = now();
+    const shown = whatsNewFor(data, seen, t);
+    if (shown) mountWhatsNew(doc, shown);
+    const next = nextSeen(data, seen, t);
+    if (next) writeSeen(storage, next);
+    return shown;
+  } catch {
+    return null;
+  }
+}

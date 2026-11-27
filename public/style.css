@@ -1124,6 +1124,14 @@ body.is-booting:not(.online-gated) #wrap ~ * { visibility: hidden; }
 .boot-loader.is-error .boot-loader-bar { display: none; }
 .boot-loader.is-error .boot-loader-card { border-color: var(--c-red-63); }
 .boot-loader.is-error .boot-loader-card strong { color: var(--c-red-49b); }
+/* #745: What's new after an update (js/whats-new.js), a short list under the bar. The picture and the
+   words stay on the first row; the list takes the whole second row. */
+.boot-loader-card.has-news { flex-wrap: wrap; width: min(440px, 100%); row-gap: var(--sp-6); }
+.boot-loader-card.has-news > div { flex: 1; }
+.boot-loader-news { flex: 1 0 100%; min-width: 0; padding-top: var(--sp-6); border-top: 1px solid color-mix(in srgb, var(--c-lime-51b) 30%, transparent); }
+.boot-loader-news h3 { margin: 0 0 var(--sp-4); font-size: var(--fs-base); font-weight: var(--fw-heavy); color: var(--c-green-37); }
+.boot-loader-news ul { display: grid; gap: var(--sp-3); margin: 0; padding-left: 18px; font-size: var(--fs-md); line-height: var(--lh-snug); }
+.boot-loader.is-error .boot-loader-news { display: none; }
 
 #wrap {
   max-width: none;

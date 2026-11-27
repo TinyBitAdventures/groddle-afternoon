@@ -1490,6 +1490,10 @@
   "public/js/water-cooler.js": {
     "ours: * lost, so where the cooler stands inside is ours.": "ours-water-cooler"
   },
+  "public/js/whats-new.js": {
+    "glitch-had-none: the progress bar, while the game loads. Ours: Glitch had nothing": "whats-new-loading-card",
+    "ours: under the progress bar, while the game loads. Ours: Glitch had": "whats-new-loading-card"
+  },
   "public/js/whos-here.js": {
     "ours: * The online line is ours (Glitch's tip named only the street): the count,": "whos-here-online-link"
   },
