@@ -6,7 +6,7 @@ import { HOME_TEXTURE_CONFIGS } from '../public/js/homes-catalog.js?v=0367f90f';
 import { WALLPAPER_MAPS, WALLPAPER_PIECES } from '../public/js/home-wallpaper-art.js?v=129c514f';
 import { ceilingSprite, roomPieces, swatchPiece } from '../public/js/home-wallpaper.js?v=5d3594e4';
 import { createHomeDecorState, listTextures, setHomeTexture, textureCategory } from '../public/js/home-decor.js?v=c63e5e16';
-import { filterSwatches, swatchFilters } from '../public/js/ui/home-builder.js?v=f67c1361';
+import { filterSwatches, swatchFilters } from '../public/js/ui/home-builder.js?v=26dcf346';
 
 const root = join(import.meta.dirname, '..');
 const gsjs = join(root, '..', 'glitch-GameServerJS');

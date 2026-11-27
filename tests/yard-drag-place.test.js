@@ -24,7 +24,7 @@ import { after, before, describe, it } from 'node:test';
 import { mkdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-import { BACK_YARD_GROUND_Y, CULTIVATION_PIN, YARD_DROP_EDGE, cultivationPin, yardDropSpot } from '../public/js/features/homes-feature.js?v=86a7ca8a';
+import { BACK_YARD_GROUND_Y, CULTIVATION_PIN, YARD_DROP_EDGE, cultivationPin, yardDropSpot } from '../public/js/features/homes-feature.js?v=0deef414';
 
 const root = join(import.meta.dirname, '..');
 const read = (rel) => readFileSync(join(root, rel), 'utf8');
@@ -92,20 +92,20 @@ describe('review 2026-11-27 #4: a cultivation set against the house says why (pu
 });
 
 let chromium = null;
-try { chromium = (await import('playwright')).chromium; } catch { /* no Playwright */ }
+try { await import('../tools/qa/playwright-env.mjs'); chromium = (await import('playwright')).chromium; } catch { /* no Playwright */ }
 
 const LOCK_WAIT_MS = 30 * 60_000;
 const CANVAS = 'canvas[aria-label="Groddle game world"]';
 const PLAY = '/play/?autostart=1&questoffer=off&hstip=0&fresh=1&resetgame=1&homedemo=interior';
 
-function harness(ctxOpts) {
+function harness(ctxOpts, { engine = '' } = {}) {
   const h = { chrome: null, server: null, ctx: null, page: null, base: '' };
   h.open = async (label) => {
     const { openBrowser } = await import('../tools/qa/browser.mjs');
     const { startServer } = await import('../tools/qa/serve.mjs');
     h.server = await startServer({ root: join(root, 'public') });
     h.base = `http://127.0.0.1:${h.server.address().port}`;
-    h.chrome = await openBrowser({ label, waitMs: LOCK_WAIT_MS });
+    h.chrome = await openBrowser({ label, waitMs: LOCK_WAIT_MS, ...(engine ? { engine } : {}) });
     h.ctx = await h.chrome.browser.newContext(ctxOpts);
     // A phone plays this device's game, not the companion (as tests/r695-garden-act-phone.test.js).
     await h.ctx.addInitScript(() => { try { localStorage.setItem('groddle-play-device', 'qa-game'); } catch { /* no storage */ } });
@@ -149,12 +149,27 @@ function helpers(h) {
     const res = letGo ? m.dragDrop({ x: p.x, y: p.y, el }) : (m.endDrag(), null);
     return { over: over?.target?.id || '', mark, res };
   }, [CANVAS, cls, count, at, drop]);
+  /** The page's own drop registry, a step at a time (the drag stays begun between calls). */
+  const reg = (step, arg = null) => page().evaluate(async ([sel, what, a]) => {
+    const url = performance.getEntriesByType('resource').map((e) => e.name).find((name) => /\/js\/drop-targets\.js/.test(name));
+    const m = await import(url);
+    const canvas = document.querySelector(sel);
+    const at = a && { x: a.x, y: a.y, el: a.sel ? document.querySelector(a.sel) : canvas };
+    if (what === 'begin') return Boolean(m.beginDrag({ from: 'pack', cls: a.cls, count: a.count }));
+    if (what === 'over') return m.dragOver(at)?.target?.id || '';
+    if (what === 'drop') return m.dragDrop(at);
+    m.endDrag();
+    return null;
+  }, [CANVAS, step, arg]);
+  /** The dropped stacks drawn here: { label, x, y }. */
+  const stacks = () => page().evaluate(() => window.groddleQA.snapshot().interactables.filter((t) => t.classId === 'dropped_item').map((t) => ({ label: t.label, x: Math.round(t.x), y: Math.round(t.y) })));
+  const canvasRect = () => page().evaluate((sel) => { const r = document.querySelector(sel).getBoundingClientRect(); return { left: r.left, top: r.top, right: r.right, bottom: r.bottom }; }, CANVAS);
   async function shot(name) {
     if (!SHOT) return;
     mkdirSync(SHOT, { recursive: true });
     await page().screenshot({ path: join(SHOT, name) });
   }
-  return { page, data, gotIt, client, trayTop, standAt, registryDrag, shot };
+  return { page, data, gotIt, client, trayTop, standAt, registryDrag, reg, stacks, canvasRect, shot };
 }
 
 describe('the back yard in Chrome (1352x802, solo)', { skip: !chromium && 'no playwright' }, () => {
@@ -250,6 +265,25 @@ describe('the back yard in Chrome (1352x802, solo)', { skip: !chromium && 'no pl
   });
 });
 
+/** A press on the tile at `from`, held, moved to `to` and let go, every event sent to the node it went down on (as Safari sends a finger's). */
+async function safariTouchDrag(page, from, to, { holdMs = 450, steps = 6 } = {}) {
+  return page.evaluate(async ([f, t, hold, n]) => {
+    const node = document.elementFromPoint(f.x, f.y)?.closest('.hb-tile');
+    if (!node) return { ok: false, why: 'no tile' };
+    const send = (type, p, buttons) => node.dispatchEvent(new PointerEvent(type, { bubbles: true, cancelable: true, composed: true, pointerId: 41, pointerType: 'touch', isPrimary: true, clientX: p.x, clientY: p.y, button: type === 'pointermove' ? -1 : 0, buttons }));
+    send('pointerdown', f, 1);
+    await new Promise((r) => setTimeout(r, hold));
+    for (let i = 1; i <= n; i += 1) {
+      send('pointermove', { x: f.x + ((t.x - f.x) * i) / n, y: f.y + ((t.y - f.y) * i) / n }, 1);
+      await new Promise((r) => setTimeout(r, 60));
+    }
+    // Before the finger lifts: the drop redraws the tray again, as it may.
+    const connected = node.isConnected;
+    send('pointerup', t, 0);
+    return { ok: true, connected };
+  }, [from, to, holdMs, steps]);
+}
+
 /** Touch through Chrome's own input (CDP): a finger down on `from`, held, moved to `to`, lifted. */
 async function touchDrag(page, from, to, { holdMs = 450, steps = 10 } = {}) {
   const cdp = await page.context().newCDPSession(page);
@@ -313,5 +347,40 @@ describe('the back yard on a phone (402x812, touch)', { skip: !chromium && 'no p
     await t.shot('pack-touch-402x812.png');
     assert.equal(after.homeDropLast, 'place:cherry:yard', JSON.stringify(got));
     assert.ok(Math.abs(Number(after.homeDropAt.split(',')[0]) - wx) <= NEAR, after.homeDropAt);
+  });
+});
+
+describe('review 2026-11-27 item 3: an iPhone (WebKit, 402x812): a Cultivate tile dragged by a finger', { skip: !chromium && 'no playwright' }, () => {
+  const UA = 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1';
+  const h = harness({ viewport: { width: 402, height: 812 }, deviceScaleFactor: 3, isMobile: true, hasTouch: true, userAgent: UA }, { engine: 'webkit' });
+  const t = helpers(h);
+  before(async () => {
+    await h.open('yard drag webkit test');
+  }, { timeout: LOCK_WAIT_MS + 60_000 });
+  after(() => h.close());
+
+  it('keeps its tile through the tray\'s redraw, so the finger\'s moves still carry it and it is bought where it lets go', { timeout: 60_000 }, async () => {
+    const page = t.page();
+    await page.goto(`${h.base}${PLAY}&homeyarddemo=cultivate`, { waitUntil: 'load' });
+    await page.waitForFunction((s) => document.querySelector(s)?.dataset.homeMode === 'cultivate' && window.groddleQA?.placeAvatar, CANVAS, { timeout: 45000 });
+    await page.waitForTimeout(1500);
+    await t.gotIt();
+    for (let i = 0; i < 2; i += 1) {
+      await page.evaluate(() => document.querySelector('[data-home-expand="yard"]')?.click());
+      await page.waitForTimeout(1000);
+    }
+    const d = await t.data();
+    const x0 = Number(d.homeHouseX);
+    await t.standAt(x0 - 950);
+    const before = d.homeBackCultivations;
+    const tb = await page.locator('[data-cultivate="proto_patch"]').first().boundingBox();
+    const to = await t.client(x0 - 1100, 600);
+    const res = await safariTouchDrag(page, { x: tb.x + tb.width / 2, y: tb.y + tb.height / 2 }, to);
+    await page.waitForTimeout(800);
+    await t.shot('cultivate-webkit-402x812.png');
+    const done = await t.data();
+    assert.ok(res.ok && res.connected, `the tile the finger went down on is still in the page: ${JSON.stringify(res)}`);
+    const added = done.homeBackCultivations.split(',').find((row) => !before.split(',').includes(row));
+    assert.ok(added && Math.abs(Number(added.split('@')[1]) + 1100) <= NEAR, `a Patch at the finger: ${added} (${done.homeDropLast})`);
   });
 });

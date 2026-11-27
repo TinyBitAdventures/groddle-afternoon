@@ -28,7 +28,7 @@ import {
   placeCostText,
   touchTileMove,
   trayFilters,
-} from '../public/js/ui/home-builder.js?v=f67c1361';
+} from '../public/js/ui/home-builder.js?v=26dcf346';
 import {
   INTERIOR,
   createHomeDecorState,

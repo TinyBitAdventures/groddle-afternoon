@@ -543,6 +543,11 @@ export function createHomeBuilder({ root, doc = root?.ownerDocument }) {
     });
   }
 
+  /** What a tile is across redraws: its kind, name and data attributes (not its on or its cost). */
+  function tileKey(t) {
+    return JSON.stringify([t?.kind || '', t?.label || '', t?.attrs || {}]);
+  }
+
   function tileNode(t) {
     const node = el(doc, 'button', {
       type: 'button',
@@ -655,13 +660,29 @@ export function createHomeBuilder({ root, doc = root?.ownerDocument }) {
     }
     undock();
     const strip = el(doc, 'div', { class: 'hb-strip', role: 'list', 'aria-label': m.stripLabel || 'Choices' });
+    // Review 2026-11-27 (iPhone): a tile pressed or dragged keeps its own node through a redraw (beginCultivate
+    // redraws the tray as the drag starts). Safari sends a finger's moves to the node it went down on; a
+    // replaced node is out of the page, so they never reached the window's listeners and the drag was lost.
+    const pressedKey = press ? tileKey(press.tile) : null;
+    let kept = false;
     for (const group of m.groups || [{ tiles: m.tiles || [] }]) {
       if (group.heading) strip.append(el(doc, 'span', { class: 'hb-group', role: 'presentation', text: group.heading }));
       for (const t of group.tiles) {
-        const node = tileNode(t);
+        const reuse = !kept && pressedKey != null && tileKey(t) === pressedKey;
+        const node = reuse ? press.node : tileNode(t);
+        if (reuse) {
+          kept = true;
+          node.classList.toggle('on', Boolean(t.on));
+          if (t.on != null) node.setAttribute('aria-pressed', String(Boolean(t.on)));
+        }
         node.setAttribute('role', 'listitem');
         strip.append(node);
       }
+    }
+    // Gone from the new tiles: it stays in the page, out of sight, until the finger or the button lets go.
+    if (press && !kept) {
+      press.node.hidden = true;
+      strip.append(press.node);
     }
     if (m.empty) strip.append(el(doc, 'p', { class: 'hb-note hb-empty', text: m.empty }));
     const page = (dir) => {
