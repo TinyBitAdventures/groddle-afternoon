@@ -2814,9 +2814,14 @@
   "deployed": "2026-11-27"
  },
  "git": {
-  "commits": 3813,
+  "commits": 3816,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-27",
+    "kind": "new",
+    "text": "Outdoor streets' skies follow the clock, with stars at night"
+   },
    {
     "date": "2026-11-27",
     "kind": "fix",
@@ -2931,14 +2936,9 @@
     "date": "2026-11-26",
     "kind": "improve",
     "text": "Things dragged from the pack land where you let go in your back yard, and a Cultivate tile dragged there shows where it lands and why it can't"
-   },
-   {
-    "date": "2026-11-26",
-    "kind": "fix",
-    "text": "The Encyclopedia's tips, its links, the hotkey sheet, Where to get it and Open Profile Page say they open over the game in the Home Screen app"
    }
   ]
  },
- "tests": 1474,
+ "tests": 1475,
  "generatedAt": "2026-11-27"
 }
