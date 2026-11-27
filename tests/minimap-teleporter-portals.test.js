@@ -18,7 +18,7 @@ import { hiddenFloorsFeature, mapShowsTeleporter, teleporterFloorGap, walkInTele
 import { PLAIN_JUMP_APEX, TELEPORTERS } from '../public/js/hidden-floors.js?v=023336cb';
 import { NARAKA_TELEPORTERS } from '../public/js/hell.js?v=0dba5774';
 import { WINTRY_PORTAL_TELEPORTERS } from '../public/js/wintry-portal.js?v=1437deda';
-import { CAVE_PIT_TELEPORTERS } from '../public/js/cave-pit.js?v=81e62950';
+import { CAVE_PIT_TELEPORTERS } from '../public/js/cave-pit.js?v=85aad63f';
 import { SEAM_TELEPORTERS } from '../public/js/seam-teleporters.js?v=09d11340';
 import { WIRED_TELEPORTERS, AINT_THAT_DRY_TSID, CHITI_TIGA_TSID } from '../public/js/collision-teleporters.js?v=e57be0e9';
 

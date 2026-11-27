@@ -15,9 +15,9 @@ import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { reachStreet, streetBuff } from '../public/js/builder/reach-graph.js?v=687006d3';
-import { CAVE_PIT_TELEPORTERS, LEVEL_3_WEST_TELEPORTER, LEVEL_3_WEST_TSID, cavePitTeleportersOn } from '../public/js/cave-pit.js?v=81e62950';
+import { CAVE_PIT_TELEPORTERS, LEVEL_3_WEST_TELEPORTER, LEVEL_3_WEST_TSID, cavePitTeleportersOn } from '../public/js/cave-pit.js?v=85aad63f';
 import { inTeleporter } from '../public/js/hidden-floors.js?v=023336cb';
-import { hiddenFloorsFeature } from '../public/js/features/hidden-floors-feature.js?v=9687e04e';
+import { hiddenFloorsFeature } from '../public/js/features/hidden-floors-feature.js?v=91b3ac77';
 
 const spike = join(dirname(fileURLToPath(import.meta.url)), '..');
 const street = JSON.parse(readFileSync(join(spike, 'public/assets/streets', `${LEVEL_3_WEST_TSID}.json`), 'utf8'));
@@ -35,7 +35,10 @@ function arrivals() {
   return out;
 }
 
-const reachesBox = (r, row) => r.surfaces.some((s) => s.reached && [[s.x1, s.y1], [s.x2, s.y2], [(s.x1 + s.x2) / 2, (s.y1 + s.y2) / 2]].some(([x, y]) => inTeleporter(row, x, y)));
+// A reached surface's ends, middle, and where it runs under the box's centre (#755: the right box is
+// partway along the floor line, not at its end).
+const lineAt = (s, x) => (x < Math.min(s.x1, s.x2) || x > Math.max(s.x1, s.x2) ? null : [x, s.x1 === s.x2 ? Math.max(s.y1, s.y2) : s.y1 + ((s.y2 - s.y1) * (x - s.x1)) / (s.x2 - s.x1)]);
+const reachesBox = (r, row) => r.surfaces.some((s) => s.reached && [[s.x1, s.y1], [s.x2, s.y2], [(s.x1 + s.x2) / 2, (s.y1 + s.y2) / 2], lineAt(s, row.box.x)].some((at) => at && inTeleporter(row, ...at)));
 const from = (p) => reachStreet(street, [{ ...p, from: `${p.x},${p.y}` }], { buff: NEW_PLAYER });
 
 describe('Level 3 West: the pit and its way out', () => {
@@ -97,14 +100,17 @@ describe('Level 3 West: the pit and its way out', () => {
     }
   });
 
-  it('no landing or arrival stands in a box, and the boxes sit inside the avatar\'s reach of the street ends', () => {
+  it('no landing or arrival stands in a box, the left box at the street\'s end, the right one short of it', () => {
     for (const row of CAVE_PIT_TELEPORTERS) {
       for (const other of CAVE_PIT_TELEPORTERS) assert.equal(inTeleporter(other, row.arrive.x, row.arrive.y), false);
       for (const a of arrivals()) assert.equal(inTeleporter(row, a.x, a.y), false);
     }
     const [left, right] = CAVE_PIT_TELEPORTERS;
     assert.ok(inTeleporter(left, 40, 971), 'the left edge margin');
-    assert.ok(inTeleporter(right, 4460, 960), 'the right edge margin');
+    // #755: the right one stands on the floor under the last island, clear of its edge (x 4461),
+    // so a walk off the island drops to the floor at the street's end (x 4476) as Glitch did.
+    assert.ok(inTeleporter(right, 4390, 960), 'the floor under the last island');
+    assert.equal(inTeleporter(right, 4476, 960), false, 'the floor where a walk off the island lands');
   });
 
   it('the feature runs them with the other teleporters, on the street itself, either TSID prefix', () => {

@@ -71,7 +71,7 @@ import {
 } from '../hidden-floors.js?v=023336cb';
 import { narakaTeleportersOn } from '../hell.js?v=0dba5774';
 import { wintryPortalTeleportersOn } from '../wintry-portal.js?v=1437deda';
-import { cavePitTeleportersOn } from '../cave-pit.js?v=81e62950';
+import { cavePitTeleportersOn } from '../cave-pit.js?v=85aad63f';
 import { seamTeleportersOn } from '../seam-teleporters.js?v=09d11340';
 import { WIRED_TELEPORTERS, collisionTeleportersOn } from '../collision-teleporters.js?v=e57be0e9';
 import { WORLD_FONT_FAMILY } from '../world-text.js?v=6b49f88c';

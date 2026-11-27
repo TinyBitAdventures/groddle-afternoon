@@ -16,7 +16,7 @@
  * OUR OWN DESIGN, not the original's: two boxes where the source has one, at the ends of the
  * floor (as Mada Tamaha's, js/hell.js), and their landings: each end puts you on that end's
  * signpost island, beside the arm. Two, so whichever way you walk from where you fell you come to
- * one. A new player can't cross the street left to right on the islands alone, so this is also
+ * one. Each only catches the floor: a walk off an island's edge lands clear of both (#755). A new player can't cross the street left to right on the islands alone, so this is also
  * their way across. They are invisible, as the Teleporter was (no deco, no sound).
  */
 
@@ -44,11 +44,15 @@ export const CAVE_PIT_TELEPORTERS = Object.freeze([
     to: LEVEL_3_WEST_TSID,
     same: true,
     label: 'Level 3 West',
-    // Screen x 4410..4500 over the floor line's right end (y 960), up to y 850.
-    box: Object.freeze({ x: 4455, y: 970, w: 90, h: 120 }),
+    // #755 (Austin 2026-11-27): screen x 4345..4435 on the floor (y 960), up to y 890, under the
+    // last island and clear of every walk off a ledge above (tests/r755-pit-island-edge.test.js).
+    // It stood at the street's right end (x 4410..4500, up to y 850), right under the island's
+    // edge (x 4461): walking right off the island fell into it and was sent back up every second
+    // or so. As Glitch, that walk now drops you to the floor; walk left from there and you meet it.
+    box: Object.freeze({ x: 4390, y: 970, w: 90, h: 80 }),
     // On the last island (_pl1271409531088), left of signpost_2 (Level 2 West, x 4343) and Level 2 West's arrival (4382).
     arrive: Object.freeze({ x: 4300, y: 603 }),
-    why: 'Our own stand-in for the lost teleporter: the right end of the pit floor to the Level 2 West signpost island.',
+    why: 'Our own stand-in for the lost teleporter: the right end of the pit floor (under the island, not its edge) to the Level 2 West signpost island.',
   }),
 ]);
 
