@@ -4,7 +4,7 @@
  */
 import { ITEM_ICONS, ITEM_LABELS, getVerbsFor, ordinaryItems, runVerb } from './content.js?v=79a980f7';
 import { createErrorOnce, createFeatureHost, createFrameStages } from './js/feature-host.js?v=b87e2cbc';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=c8067649';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=be0456e4';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, enterHintPick, hoverText, stackHoverLabel, groupHead, hoverRimShown, reachGlowTargets, spriteHasRimArt, rimArtParts, trimmedIconUrl, drawTileArt } from './js/enter-chooser.js?v=297c6d15';
 import { firstTendKey, STICK_TEND_DELAY_MS, STICK_TEND_DIRS, STICK_TEND_REPEAT_MS, stepTendKey, stepTendKeys, stickTendKey, tendKeyAction } from './js/garden-tend.js?v=a7470c4a';
 import { avatarHitBox, behindFloor, bodyReachDistance, OUT_OF_REACH_LINE, playerClickBox } from './js/reach.js?v=456da8a8';
@@ -680,7 +680,7 @@ import {
   recipeToolChosen,
   pluralizeItem,
 } from './js/making.js?v=dc595568';
-import { MAKE_FUEL_TIP, makeFuelView } from './js/home-machines.js?v=0344a288';
+import { MAKE_FUEL_TIP, makeFuelView } from './js/home-machines.js?v=cab883cd';
 import { outputIconsHtml, outputsPhrase, productHaveRows, recipeOutputRows } from './js/ui/recipe-outputs.js?v=610c067f';
 import { MAKE_TOOL_SHEETS } from './js/make-tool-sheets.js?v=6f758e09';
 import { createTestTubePanel, tryTileHtml, TRY_TILE_LABEL } from './js/test-tube-panel.js?v=1ac36255';

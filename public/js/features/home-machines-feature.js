@@ -87,14 +87,16 @@ import {
   normalizeMachine,
   normalizeSlice,
   othersInside,
+  moveCheck,
   placeCheck,
   placedMachineVerbs,
+  slidePlace,
   secondsToString,
   settleSolo,
   expireSolo,
   tankOf,
   TAKEN_KEEP,
-} from '../home-machines.js?v=0344a288';
+} from '../home-machines.js?v=cab883cd';
 import { CALL_PLAYER_LINES, MACHINE_HITBOX, MACHINE_SKILLS, collectLine, machineJobMs, machineMadeLine, refuelCount, runningSoundKey, takeJobIngredients } from '../machine-rooms.js?v=a99c4d01';
 import { MACHINE_ART_SHEETS, LOW_FUEL_BUBBLE_MS, LOW_FUEL_LINE, isLowFuel, machineFrame, machineFrameRect, machineSheetDef, roomMachineState } from '../machine-art.js?v=57cc0f50';
 import { FUEL_CELL, FUEL_PER_CELL, MAX_FUEL } from '../machines.js?v=93a736f2';
@@ -109,12 +111,14 @@ import { insideQuery, readVisitScene } from '../neighbours-mp.js?v=d270297d';
 import { saveStore } from '../save-store.js?v=1ccb1d6b';
 import { frameTexture, sourceFromUrl, textureFromUrl } from '../textures.js?v=b8e38103';
 import { createSheetLoader } from '../sprite-sheets.js?v=37ad5c9f';
-import { STREET_GROUND_Y, homesFeature } from './homes-feature.js?v=f112c06a';
+import { STREET_GROUND_Y, homesFeature } from './homes-feature.js?v=f4bffb8d';
 import { payAltarBonus } from './machine-rooms-feature.js?v=37b1165d';
 import { worldToScreen } from '../street-model.js?v=a9a05f9d';
 import { nearestSurfaceY } from '../walk-surface.js?v=f21ce37b';
 import { standOnFeet } from '../sprite-feet.js?v=849541a8';
 import { offlineLine } from '../online-request.js?v=5fa7a635';
+import { DRAG_DIST } from '../ui/home-builder.js?v=26dcf346';
+import { LONG_PRESS_SLOP } from '../ui/context-menu.js?v=0266831a';
 
 export { HOME_MACHINES_ID };
 
@@ -207,6 +211,8 @@ function createSession(engine, client) {
   let loop = null;
   let loopKey = '';
   const checked = new Set();
+  /** #730: a placed machine pressed (and, once moved, slid) by its owner: { id, pointerId, x, y, touch, held, dragging, deco, grabDx, rx }. */
+  let slide = null;
 
   const say = (text, ms = 3200) => { if (text) engine.toast?.(text, ms); };
   const upgrades = () => engine.pc?.imaginationUpgrades || [];
@@ -370,6 +376,8 @@ function createSession(engine, client) {
     const e = drawn.get(m.id);
     if (e && !e.sprite.destroyed) {
       e.m = m;
+      // #730: one being slid stays under the pointer until it is let go.
+      if (slide?.dragging && slide.id === m.id) return publish();
       e.sprite.x = Math.round(home.x0 + m.rx);
     } else if (home) drawOne(m);
     publish();
@@ -693,6 +701,160 @@ function createSession(engine, client) {
     return solo('place', null, { classTsid, rx: check.rx, copy: one });
   }
 
+  // —— #730: the owner slides a placed machine along its floor ——
+
+  /**
+   * Whether I may slide this machine here (Austin 2026-11-27: "slide them as Glitch: drag to move, no
+   * 200 px rule on a move"). Glitch: a machine is pickupable, so a press on it drags in play
+   * (LocationInputHandler.as _locMouseDownHandler 431-435) and in Decoration Mode (HandOfDecorator.as
+   * onMouseDown 2411-2427, startWithItemFromLocation 1259), and the drop lands precisely only where you
+   * can decorate (locDragStartHandler 551-557): your own house or Tower (WorldModel.as 59, location.js
+   * 2699-2706), and the move is the owner's (main.js doModifyItem 4853: "You are not at home"). So
+   * never a visitor or a key-holder, never the home street or a machine room.
+   */
+  function canSlide(id) {
+    const e = drawn.get(String(id || ''));
+    const at = where();
+    return Boolean(e && home && at && at.kind === 'own' && home.kind === 'own' && at.key === home.key && slidePlace(home.place) && String(home.owner) === me());
+  }
+
+  /** Slide machine `id` to room x `rx` on its floor (kept between the inner walls); its job and tank go with it. */
+  function move(id, rx) {
+    const m = machines.get(String(id || ''));
+    if (!m || !canSlide(m.id)) return false;
+    const check = moveCheck({ rx, span: home.span, place: home.place });
+    if (!check.ok) return false;
+    if (check.rx === m.rx) {
+      placeDrawn(m.id);
+      return true;
+    }
+    if (mp) {
+      // Drawn where it was let go until the site answers (onDone puts it back on a refusal).
+      const e = drawn.get(m.id);
+      if (e && !e.sprite.destroyed) e.sprite.x = Math.round(home.x0 + check.rx);
+      return send('move', m, { rx: check.rx });
+    }
+    return solo('move', m, { rx: check.rx });
+  }
+
+  /** A machine drawn where it stands (after a slide that went nowhere or was refused). */
+  function placeDrawn(id) {
+    const e = drawn.get(id);
+    const m = machines.get(id);
+    if (e && m && home && !e.sprite.destroyed) e.sprite.x = Math.round(home.x0 + m.rx);
+  }
+
+  /** The game canvas's client point in the world the machines are drawn in (homes-feature worldPoint). */
+  function worldAt(ev) {
+    const canvas = ev.target;
+    const r = canvas?.getBoundingClientRect?.();
+    if (!r?.width || !engine.entityLayer?.toLocal || !engine.PIXI?.Point) return null;
+    const k = (engine.camera?.w || 960) / r.width;
+    return engine.entityLayer.toLocal(new engine.PIXI.Point((ev.clientX - r.left) * k, (ev.clientY - r.top) * k));
+  }
+
+  /** The machine I may slide under a pointer on the game canvas, or null. */
+  function slidableAt(ev) {
+    if (ev.target?.tagName !== 'CANVAS' || home?.kind !== 'own' || !slidePlace(home.place) || drawn.size === 0) return null;
+    const p = worldAt(ev);
+    const t = p ? engine.interactableAt?.(p.x, p.y) : null;
+    const e = t?.homeMachine ? drawn.get(t.homeMachine) : null;
+    return e && canSlide(e.m.id) ? { e, p } : null;
+  }
+
+  const SLIDE_HOLD_MS = 350; // a finger holds still this long first (homes-feature LOOSE_HOLD_MS), so a swipe never moves it
+  function onSlideDown(ev) {
+    if (slide || (ev.pointerType === 'mouse' && (ev.button !== 0 || ev.ctrlKey))) return;
+    const editing = homesFeature.homeEditMode?.() || null;
+    if (editing && editing !== 'decorate') return;
+    if (!editing && engine.busy?.({ ignoreHome: true })) return;
+    const hit = slidableAt(ev);
+    if (!hit) return;
+    const touch = ev.pointerType !== 'mouse';
+    slide = { id: hit.e.m.id, pointerId: ev.pointerId, x: ev.clientX, y: ev.clientY, touch, held: !touch, dragging: false, deco: editing === 'decorate', grabDx: hit.e.sprite.x - hit.p.x, rx: hit.e.m.rx };
+    if (touch) {
+      const mine = slide;
+      mine.timer = setTimeout(() => { mine.held = true; }, SLIDE_HOLD_MS);
+    }
+    if (slide.deco) {
+      ev.stopPropagation();
+      ev.preventDefault();
+    }
+    // Out of Decoration Mode the press goes on to the world: a click still opens the machine's menu.
+    window.addEventListener('pointermove', onSlideMove, true);
+    window.addEventListener('pointerup', onSlideUp, true);
+    window.addEventListener('pointercancel', onSlideUp, true);
+  }
+
+  function onSlideMove(ev) {
+    if (!slide || ev.pointerId !== slide.pointerId) return;
+    const e = drawn.get(slide.id);
+    if (!e || e.sprite.destroyed || !home) return endSlide();
+    if (!slide.dragging) {
+      const moved = Math.hypot(ev.clientX - slide.x, ev.clientY - slide.y);
+      if (slide.touch && !slide.held) {
+        if (moved > LONG_PRESS_SLOP) endSlide();
+        return;
+      }
+      if (moved < DRAG_DIST) return;
+      slide.dragging = true;
+      // The press opened the machine's menu (out of Decoration Mode): the drag takes over.
+      engine.closeVerbMenu?.();
+      e.sprite.alpha = 0.85;
+      engine.setData?.('hmSlide', slide.id);
+    }
+    ev.preventDefault();
+    const p = worldAt(ev);
+    if (!p) return;
+    const check = moveCheck({ rx: p.x + slide.grabDx - home.x0, span: home.span, place: home.place });
+    if (!check.ok) return;
+    slide.rx = check.rx;
+    e.sprite.x = Math.round(home.x0 + check.rx);
+  }
+
+  function onSlideUp(ev) {
+    if (!slide || ev.pointerId !== slide.pointerId) return;
+    const was = slide;
+    endSlide();
+    if (!was.dragging) return;
+    if (was.deco) ev.stopPropagation();
+    if (ev.type === 'pointercancel') return placeDrawn(was.id);
+    if (!move(was.id, was.rx)) placeDrawn(was.id);
+  }
+
+  function endSlide() {
+    if (slide) {
+      clearTimeout(slide.timer);
+      const e = drawn.get(slide.id);
+      if (e?.sprite && !e.sprite.destroyed) e.sprite.alpha = 1;
+    }
+    slide = null;
+    engine.setData?.('hmSlide', '');
+    if (typeof window === 'undefined' || !window.removeEventListener) return;
+    window.removeEventListener('pointermove', onSlideMove, true);
+    window.removeEventListener('pointerup', onSlideUp, true);
+    window.removeEventListener('pointercancel', onSlideUp, true);
+  }
+
+  /** A hand over a machine you can slide (HandOfDecorator updateHighlightedLISView: what you could lift shows it). */
+  let grabCursor = null;
+  function onSlideHover(ev) {
+    if (ev.pointerType !== 'mouse' || slide || ev.buttons) return;
+    const hit = ev.target?.tagName === 'CANVAS' ? slidableAt(ev) : null;
+    if (hit) {
+      ev.target.style.cursor = 'grab';
+      grabCursor = ev.target;
+    } else if (grabCursor) {
+      if (grabCursor.style.cursor === 'grab') grabCursor.style.cursor = '';
+      grabCursor = null;
+    }
+  }
+
+  if (typeof window !== 'undefined' && window.addEventListener) {
+    window.addEventListener('pointerdown', onSlideDown, true);
+    window.addEventListener('pointermove', onSlideHover);
+  }
+
   // —— Solo: the rules on the slice ——
 
   function newId() {
@@ -784,6 +946,14 @@ function createSession(engine, client) {
       soloSaved();
       return true;
     }
+    if (verb === 'move') {
+      // #730: the same machine, where it was let go (doModifyItem: apiPutItemIntoPosition), its job and tank with it.
+      row.rx = extra.rx;
+      placeDrawn(row.id);
+      last = `moved:${row.id}:${row.rx}`;
+      soloSaved();
+      return true;
+    }
     return false;
   }
 
@@ -869,6 +1039,8 @@ function createSession(engine, client) {
     }
     if (msg.status !== 'settled') {
       if (msg.verb === 'refuel') refuelMore = null;
+      // #730: a slide refused goes back where it stands.
+      if (msg.verb === 'move' && ask?.id) placeDrawn(ask.id);
       last = `no:${msg.verb}:${msg.why || ''}`;
       say(String(msg.text || T.failed), 3000);
       engine.playSound?.('CLICK_FAILURE', { volume: 0.45 });
@@ -913,6 +1085,9 @@ function createSession(engine, client) {
       receipt(msg.receipt, 1);
       if (here) setMachine(m);
       collected(m);
+    } else if (verb === 'move' && m) {
+      if (here) setMachine(m);
+      last = `moved:${m.id}:${m.rx}`;
     } else if (m && here) setMachine(m);
     engine.save?.();
     publish();
@@ -983,6 +1158,7 @@ function createSession(engine, client) {
     for (const [r, a] of sent) {
       if (t - a.at > ASK_MS) {
         sent.delete(r);
+        if (a.verb === 'move' && a.id) placeDrawn(a.id);
         say(T.failed, 2400);
       }
     }
@@ -1097,6 +1273,28 @@ function createSession(engine, client) {
       return [{ id: 'machine_place', label: T.placeVerb, tooltip: T.placeTip, enabled: ok, reason: ok ? '' : T.placeHome }];
     },
     placeFromPack,
+    canSlide,
+    move,
+    /** Tests: the page's listeners off (a fresh session after _reset). */
+    dispose() {
+      endSlide();
+      if (typeof window !== 'undefined' && window.removeEventListener) {
+        window.removeEventListener('pointerdown', onSlideDown, true);
+        window.removeEventListener('pointermove', onSlideHover);
+      }
+    },
+    /** QA: where a machine is drawn (world x), or null. */
+    drawnX: (id) => drawn.get(String(id || ''))?.sprite?.x ?? null,
+    /** QA: a machine's feet as a client point on the game canvas, and client px per world px (k). */
+    clientOf(id) {
+      const e = drawn.get(String(id || ''));
+      const canvas = document.querySelector?.('canvas[aria-label="Groddle game world"]');
+      const r = canvas?.getBoundingClientRect?.();
+      if (!e || !r?.width || !engine.entityLayer?.toGlobal) return null;
+      const k = (engine.camera?.w || 960) / r.width;
+      const g = engine.entityLayer.toGlobal(new engine.PIXI.Point(e.sprite.x, e.sprite.y));
+      return { x: r.left + g.x / k, y: r.top + g.y / k, k: 1 / k };
+    },
     get slice() { return slice; },
     /** A save loaded again (restore): its slice, and the home drawn again from it. */
     reload(next) {
@@ -1285,6 +1483,7 @@ export const homeMachinesFeature = {
 
   /** QA / tests. */
   _reset() {
+    session?.dispose?.();
     session = null;
     savedSlice = null;
   },

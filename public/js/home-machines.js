@@ -263,6 +263,28 @@ export function placeCheck({ machines = [], rx, layout, span, classTsid, fixed =
   return { ok: true, rx: x };
 }
 
+/**
+ * #730 (G1333, Austin 2026-11-27: "slide them as Glitch: drag to move, no 200 px rule on a move"):
+ * where the owner may slide a placed machine. Glitch let a pickupable stack (a machine: keys_in_location
+ * "p": "pickup") be dragged along the floor wherever you could decorate (LocationInputHandler.as
+ * _locMouseDownHandler 431-435, HandOfDecorator.as locDragStartHandler 551-557, startWithItemFromLocation
+ * 1259), and can_decorate was the owner's house and Tower (WorldModel.as 59; location.js 2699-2706): so a
+ * floor of the house or of the Tower, never the home street nor a machine room.
+ */
+export const slidePlace = (p) => isHousePlace(p) || /^tower:[0-8]$/.test(String(p || ''));
+
+/**
+ * #730: where a slide ends. The move was itemstackModify (HandOfDecorator.as dropFromLocationOnTargetPlatform
+ * 1445, 1600-1607, only checkXIsInBounds; main.js doModifyItem 4852-4867, no canDrop): so no 200 px and no
+ * 70 px edge, the machine kept on its floor between the room's inner walls (`span`, roomSpan).
+ */
+export function moveCheck({ rx, span, place } = {}) {
+  if (!slidePlace(place) || !span || !Number.isFinite(span.lo) || !Number.isFinite(span.hi)) return { ok: false, why: 'place' };
+  const x = Math.round(finite(rx, NaN));
+  if (!Number.isFinite(x)) return { ok: false, why: 'here' };
+  return { ok: true, rx: Math.max(span.lo, Math.min(span.hi, x)) };
+}
+
 /** Fuel a job burns (inc_making.js 760-777): the recipe's per-unit fuel times the count, less the Blockmaker cards' share. */
 export function jobFuel(classTsid, perUnit, qty, upgrades = []) {
   let uses = whole(perUnit) * Math.max(1, whole(qty));

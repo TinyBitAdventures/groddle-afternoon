@@ -173,6 +173,17 @@ try {
     $near = op();
     $out['fromFar'] = $act(['op' => $near, 'owner' => OWNER, 'actor' => OWNER, 'place' => 'house', 'verb' => 'place', 'class' => 'fuelmaker', 'rx' => 290, 'from' => ['rx' => 610, 'dy' => 0]]);
     $out['rowNear'] = $rowOf($near);
+
+    // —— #730 (G1333): the owner slides the ground floor's machine along the floor, a job running in it ——
+    $out['moveUse'] = $act(['op' => op(), 'owner' => OWNER, 'actor' => OWNER, 'place' => 'house', 'verb' => 'use', 'id' => $ground, 'key' => 'board', 'qty' => 1]);
+    $out['moveNear'] = $act(['op' => op(), 'owner' => OWNER, 'actor' => OWNER, 'place' => 'house', 'verb' => 'move', 'id' => $ground, 'rx' => 310]);
+    $out['rowMoved'] = $rowOf($ground);
+    $out['moveVisitor'] = $act(['op' => op(), 'owner' => OWNER, 'actor' => VISITOR, 'place' => 'house', 'verb' => 'move', 'id' => $ground, 'rx' => 600]);
+    $out['moveOut'] = $act(['op' => op(), 'owner' => OWNER, 'actor' => OWNER, 'place' => 'house', 'verb' => 'move', 'id' => $ground, 'rx' => 9000]);
+    $out['moveNoX'] = $act(['op' => op(), 'owner' => OWNER, 'actor' => OWNER, 'place' => 'house', 'verb' => 'move', 'id' => $ground]);
+    $out['moveUpstairs'] = $act(['op' => op(), 'owner' => OWNER, 'actor' => OWNER, 'place' => 'house:1', 'verb' => 'move', 'id' => $ground, 'rx' => 500]);
+    $seenMoved = json_decode((new HomeMachines($seams(OWNER, $get)))->view_($get, (string) OWNER)->body, true);
+    $out['seenMoved'] = array_values(array_map(static fn (array $m): array => [$m['place'], $m['rx']], array_filter($seenMoved['machines'], static fn (array $m): bool => $m['id'] === $ground)));
 } catch (Throwable $e) {
     $out['error'] = get_class($e) . ': ' . $e->getMessage() . ' @ ' . $e->getFile() . ':' . $e->getLine();
 } finally {

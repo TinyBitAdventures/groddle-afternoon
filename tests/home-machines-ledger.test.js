@@ -106,4 +106,17 @@ describe('G1249: a machine on an upper floor of the house, through the ledger (H
     assert.equal(r.fromFar.status, 'settled', 'standing 210 px from it, let go 110 px from it');
     assert.deepEqual(r.rowNear, { place: 'house', rx: 290, fuel: 50, status: 'placed', job: null });
   });
+
+  it('#730 (G1333): the owner slides a machine 20 px from another, its job running and its tank kept; nobody else, never out of the room or off its floor', () => {
+    assert.equal(r.moveUse.status, 'settled', JSON.stringify(r.moveUse));
+    assert.deepEqual([r.moveNear.status, r.moveNear.machine.rx, r.moveNear.machine.place, r.moveNear.machine.fuel], ['settled', 310, 'house', 50], 'no 200 px rule on a move (doModifyItem has no canDrop)');
+    assert.ok(r.moveNear.machine.job, 'the job goes with it');
+    assert.deepEqual([r.rowMoved.place, r.rowMoved.rx, r.rowMoved.fuel, r.rowMoved.status], ['house', 310, 50, 'placed']);
+    assert.ok(JSON.parse(r.rowMoved.job).ready > 0, 'still running');
+    assert.deepEqual([r.moveVisitor.status, r.moveVisitor.why, r.moveVisitor.text], ['refused', 'own', 'Only the owner can move a machine.']);
+    assert.deepEqual([r.moveOut.status, r.moveOut.why], ['refused', 'here'], 'past the inner wall');
+    assert.deepEqual([r.moveNoX.status, r.moveNoX.why], ['refused', 'here']);
+    assert.deepEqual([r.moveUpstairs.status, r.moveUpstairs.why], ['refused', 'gone'], 'from another floor: it stays on its own');
+    assert.deepEqual(r.seenMoved, [['house', 310]], 'a reload or another player\'s game sees it there');
+  });
 });
