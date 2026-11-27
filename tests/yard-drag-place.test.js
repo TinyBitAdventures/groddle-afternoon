@@ -284,6 +284,39 @@ async function safariTouchDrag(page, from, to, { holdMs = 450, steps = 6 } = {})
   }, [from, to, holdMs, steps]);
 }
 
+describe('review 2026-11-27 in Chrome (1352x802, solo, Modern)', { skip: !chromium && 'no playwright' }, () => {
+  const h = harness({ viewport: { width: 1352, height: 802 } });
+  const t = helpers(h);
+  before(async () => {
+    await h.open('yard drag review test');
+  }, { timeout: LOCK_WAIT_MS + 60_000 });
+  after(() => h.close());
+
+  async function yard() {
+    const page = t.page();
+    await page.goto(`${h.base}${PLAY}&homex=-500`);
+    await page.waitForFunction((s) => document.querySelector(s)?.dataset.homeScene === 'interior' && window.groddlePack?.grant && window.groddleQA?.cameraFrame, CANVAS, { timeout: 30000 });
+    await page.waitForTimeout(1200);
+    await t.gotIt();
+    await page.evaluate(() => window.groddlePack.grant('cherry', 6));
+    return Number((await t.data()).homeHouseX);
+  }
+
+  it('item 5: Classic shows the yard\'s ground over its pack panel, as Modern does', { timeout: 40_000 }, async () => {
+    const page = t.page();
+    for (const flag of ['', '&ui=classic']) {
+      await page.goto(`${h.base}${PLAY}&homex=-500${flag}`);
+      await page.waitForFunction((s) => document.querySelector(s)?.dataset.homeScene === 'interior', CANVAS, { timeout: 30000 });
+      await page.waitForTimeout(2500);
+      const d = await t.data();
+      const feet = await t.client(Number((await page.evaluate(() => window.groddleQA.cameraFrame())).playerX), 680);
+      const panel = await page.evaluate(() => document.getElementById('pack-bar')?.getBoundingClientRect().top ?? innerHeight);
+      if (flag) await t.shot('classic-yard-1352x802.png');
+      assert.ok(feet.y < panel - 20, `${flag || 'modern'}: the feet (${feet.y}) over the pack row (${panel}); clearance ${d.groundClearance}`);
+    }
+  });
+});
+
 /** Touch through Chrome's own input (CDP): a finger down on `from`, held, moved to `to`, lifted. */
 async function touchDrag(page, from, to, { holdMs = 450, steps = 10 } = {}) {
   const cdp = await page.context().newCDPSession(page);

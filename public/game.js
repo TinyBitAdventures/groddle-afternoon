@@ -2890,17 +2890,38 @@ function measureTopHudCss() {
 
 /** G673: measure the pack row over the canvas (on resize and zoom, not every frame); a computer's too since G1157. */
 function syncCameraPackCover() {
-  const bar = document.getElementById('pack-bar');
+  // The pack row, and while Decoration or Cultivation Mode is up its tray, which stands where the row was
+  // (js/ui/home-builder.js #homes-tray): the back yard's ground is 60 px under the house's floor, and under
+  // the tray the yard's drop spots and Cultivate's ghost could not be seen (review 2026-11-27).
+  const covers = [document.getElementById('pack-bar'), document.getElementById('homes-tray')].filter((el) => el && shownElement(el));
   const canvas = app?.canvas;
-  if (!bar || !canvas?.isConnected || !shownElement(bar)) {
+  if (!covers.length || !canvas?.isConnected) {
     cameraPackCoverCss = NaN;
     syncCameraFloorCover();
     return;
   }
   const c = canvas.getBoundingClientRect();
-  const p = bar.getBoundingClientRect();
-  cameraPackCoverCss = p.height > 0 && c.height > 0 ? Math.max(0, c.bottom - p.top) : NaN;
+  let cover = NaN;
+  for (const el of covers) {
+    const p = el.getBoundingClientRect();
+    if (p.height > 0 && c.height > 0) cover = Math.max(Number.isFinite(cover) ? cover : 0, c.bottom - p.top);
+  }
+  cameraPackCoverCss = Number.isFinite(cover) ? Math.max(0, cover) : NaN;
   syncCameraFloorCover(c);
+}
+
+/**
+ * Review 2026-11-27: only the phone layout measured the pack row's cover once a frame (its onFrame); a
+ * computer measured it on a resize. Classic's first measure came before its pack panel was laid out, so the
+ * camera reserved nothing for it and the back yard's ground (and the Glitch's feet there) sat under the
+ * panel until the window was resized; and Decoration and Cultivation Mode's tray, which stands where the
+ * row was, was never measured at all. Every layout measures it here, four times a second.
+ */
+let packCoverAt = -Infinity;
+function syncPackCoverSoon(now = performance.now()) {
+  if (now - packCoverAt < 250) return;
+  packCoverAt = now;
+  syncCameraPackCover();
 }
 
 /** G1229: the free street area's floor over the canvas (cameraFloorCoverCss), from the phone layout's regions. */
@@ -3813,6 +3834,7 @@ function tickNotices() {
   socialDrawer?.frame();
   oneSheetOrDrawer();
   phoneLayout?.frame();
+  syncPackCoverSoon();
   followDrawerInset();
 }
 
