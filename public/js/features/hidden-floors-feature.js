@@ -75,6 +75,7 @@ import { cavePitTeleportersOn } from '../cave-pit.js?v=81e62950';
 import { seamTeleportersOn } from '../seam-teleporters.js?v=09d11340';
 import { WIRED_TELEPORTERS, collisionTeleportersOn } from '../collision-teleporters.js?v=e57be0e9';
 import { WORLD_FONT_FAMILY } from '../world-text.js?v=6b49f88c';
+import { teleportWithinStreet } from '../within-street.js?v=5ce33cdf';
 
 export const HIDDEN_FLOORS_FEATURE_ID = 'hidden-floors';
 
@@ -201,13 +202,7 @@ function drawSign(engine, row) {
 async function teleport(engine, row) {
   // On its own street (pc.teleportToLocation to the street it is on): stand at the target.
   if (row.same) {
-    const p = engine.player;
-    p.x = row.arrive.x;
-    p.y = row.arrive.y;
-    p.vx = 0;
-    p.vy = 0;
-    p.onGround = false;
-    engine.snapCamera?.();
+    teleportWithinStreet(engine, row.arrive.x, row.arrive.y);
     teleports += 1;
     last = row.id;
     publish(engine, Date.now(), true);

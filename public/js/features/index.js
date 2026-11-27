@@ -98,7 +98,9 @@ import { hiSignsFeature } from './hi-signs-feature.js?v=86ea9337'; FEATURES.push
 import { gwendolynRoom23Feature } from './gwendolyn-room-23-feature.js?v=3b714ea3'; FEATURES.push(gwendolynRoom23Feature);
 import { cubimalRaceFeature } from './cubimal-race-feature.js?v=857c26ed'; FEATURES.push(cubimalRaceFeature);
 import { symphoniousMaximusFeature } from './symphonious-maximus-feature.js?v=9a54b747'; FEATURES.push(symphoniousMaximusFeature);
-import { hiddenFloorsFeature } from './hidden-floors-feature.js?v=317d3524'; FEATURES.push(hiddenFloorsFeature);
+import { hiddenFloorsFeature } from './hidden-floors-feature.js?v=9687e04e'; FEATURES.push(hiddenFloorsFeature);
+// Glitch's Random Hole (items/random_hole.js): touch one and pop out of another on the same street.
+import { randomHolesFeature } from './random-holes-feature.js?v=61f2bb0f'; FEATURES.push(randomHolesFeature);
 import { vicarsPeakFeature } from './vicars-peak-feature.js?v=cb444319'; FEATURES.push(vicarsPeakFeature);
 import { thornfadLettersFeature } from './thornfad-letters-feature.js?v=b88a132f'; FEATURES.push(thornfadLettersFeature);
 import { streetToysFeature } from './street-toys-feature.js?v=5b5f0f16'; FEATURES.push(streetToysFeature);
