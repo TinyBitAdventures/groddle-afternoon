@@ -57,7 +57,8 @@
  * (500-1060) behind it. The floor is the source's path height, y -128, at
  * 700 - 128 = 572. The two hitboxes are lost: ours are the desk room (you
  * are greeted on arrival) and the stretch of floor in front of the chairs.
- * Where the signs hang is ours too (no placement survives).
+ * No placement of the signs survives either: they hang where the 2012
+ * footage shows them (#734, HALL_DECOS).
  */
 
 export const BUREAUCRAT_CLASS = 'npc_bureaucrat';
@@ -123,6 +124,58 @@ export const HALL_OFFICE = Object.freeze({
     ['cubicle_wall_right', 1730, 17],
   ]),
 });
+
+/**
+ * #734 (Austin 2026-11-27): the waiting wall's last two chairs. The 2012 footage shows eight
+ * chairs (the tipped one, two, three, and two by the counter's dividing wall); the backdrop paints
+ * the first six. These two are the rightmost painted chair's own paths copied twice
+ * (tools/bureaucratic-hall/build-chairs.mjs), set after the row of three with the footage's gap
+ * (a little under the gap between the two and the three) and the row's own spacing (87).
+ * x, y, w, h: the SVG's box on the stage; dx: each copy's offset from the painted chair.
+ */
+export const HALL_EXTRA_CHAIRS = Object.freeze({
+  url: 'assets/sprites/bureaucratic-hall/waiting-chairs-right.svg',
+  /** The chairs bureaucratic_hall_bg paints: the tipped one, the two and the three. */
+  painted: 6,
+  dx: Object.freeze([126, 213]),
+  x: 1272,
+  y: 407,
+  w: 179,
+  h: 101,
+});
+
+/**
+ * #734 (Austin 2026-11-27): where the hall's decos hang, read off the 2012 footage of the
+ * Gregarious Grange hall (the player's screenshots in report #734, video wo0iNJ0PPS4) against the
+ * backdrop's own walls and chairs. The hall's location XML is lost, so each spot is a reading,
+ * not a number from Tiny Speck. [deco, x, y, anchor x, anchor y, scale], back to front; the decos
+ * ship at 2x, so scale 0.5 is their stage size.
+ * - bureaucratic_hall_light_ray_1: the light at the front of the desk room, on the wall over the
+ *   pen table, so the Department lettering is lit.
+ * - bureaucratic_hall_sign_1: the Department of Administrative Affairs lettering over the pen
+ *   table, between the glass doors and the corner pillar.
+ * - bureaucratic_hall_light_1: the ceiling light, at the ceiling's back edge (the footage's view
+ *   never shows it, so it sits as high as the ceiling goes).
+ * - sign_waiting_area: left of the pictogram, over the third chair from the left.
+ * - bureaucratic_hall_waitingroom_1: the sitting pictogram, centred in the gap between the two
+ *   chairs and the three (chair centres 884 and 1020).
+ * - bureaucratic_hall_tv_1: in the waiting room's corner, hung over the pillar's edge, its top
+ *   level with the pillar's top (y 108).
+ * - bureaucratic_hall_sign_wait_1: the Please Wait stand in front of the rightmost chair, by the
+ *   counter, standing behind the walk line like the chairs.
+ */
+export const HALL_DECOS = Object.freeze([
+  Object.freeze(['bureaucratic_hall_light_ray_1', 390, 96, 0.5, 0, 0.5]),
+  Object.freeze(['bureaucratic_hall_sign_1', 390, 313, 0.5, 0.5, 0.5]),
+  Object.freeze(['bureaucratic_hall_light_1', 1055, 76, 0.5, 0, 0.5]),
+  Object.freeze(['sign_waiting_area', 850, 308, 0.5, 0.5, 0.5]),
+  Object.freeze(['bureaucratic_hall_waitingroom_1', 952, 308, 0.5, 0.5, 0.5]),
+  Object.freeze(['bureaucratic_hall_tv_1', 733, 108, 0.5, 0, 0.5]),
+  Object.freeze(['bureaucratic_hall_sign_wait_1', 1382, 532, 0.5, 1, 0.5]),
+]);
+
+/** #734: the glass doors' foot, on the desk room's floor where it meets the side wall (bottom centre). */
+export const HALL_EXIT_DOOR_Y = 610;
 
 /** items/npc_bureaucrat.js getLabel: titles and names (instances without a label prop). */
 export const BUREAUCRAT_TITLES = Object.freeze(['Prefect', 'Chamberlain', 'Deputy', 'Secretary', 'Assistant', 'Associate', 'Representative', 'Magister', 'Manager', 'Director', 'Overseer', 'Administrator', 'Probost']);

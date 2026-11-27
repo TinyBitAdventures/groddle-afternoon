@@ -4,7 +4,7 @@
  */
 import { ITEM_ICONS, ITEM_LABELS, getVerbsFor, ordinaryItems, runVerb } from './content.js?v=c46159de';
 import { createErrorOnce, createFeatureHost, createFrameStages } from './js/feature-host.js?v=b87e2cbc';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=1c1046a3';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=e9f32cbd';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, enterHintPick, groupHead, hoverRimShown, reachGlowTargets, spriteHasRimArt, rimArtParts, trimmedIconUrl, drawTileArt } from './js/enter-chooser.js?v=74f4964a';
 import { firstTendKey, STICK_TEND_DELAY_MS, STICK_TEND_DIRS, STICK_TEND_REPEAT_MS, stepTendKey, stepTendKeys, stickTendKey, tendKeyAction } from './js/garden-tend.js?v=a7470c4a';
 import { avatarHitBox, behindFloor, bodyReachDistance, OUT_OF_REACH_LINE, playerClickBox } from './js/reach.js?v=456da8a8';
@@ -138,7 +138,7 @@ import {
   requestLegalizeQualification,
   travelToGregarious,
 } from './js/legalize-it.js?v=1fd33e0e';
-import { HALL, HALL_LAYOUT, HALL_OFFICE, HALL_QUESTIONS } from './js/bureaucratic-hall.js?v=7ea53899';
+import { HALL, HALL_DECOS, HALL_EXTRA_CHAIRS, HALL_OFFICE, HALL_QUESTIONS } from './js/bureaucratic-hall.js?v=f79567fd';
 import { STATION_X, stationArrival, stationScreen, surfaceStation } from './js/subway.js?v=ea6921ff';
 import { ALLEY, SHADY, drawAlley, inEnteredBox } from './js/quest-rooms/back-alley-set.js?v=65690248';
 import { WINTER_WALK_BOUNDS, WINTER_WALK_PASSAGE } from './js/winter-walk-streets.js?v=c921bf92';
@@ -20239,12 +20239,10 @@ function legalizeRoomBase(name, width = 1600, height = 760, groundY = 620) {
  * wall with its orange chairs, the counter opening), drawn 1:1 at its stage
  * size; js/bureaucratic-hall.js maps the source's x numbers onto it. The
  * chairs are painted into the backdrop: scenery, nothing to sit on (no chair
- * item or verb exists in the source). The hall's location XML is lost, so
- * where the signs hang is our reconstruction: the WAITING AREA plaque and
- * the waiting-room pictogram on the wall over the chairs, the PLEASE WAIT
- * stand at the waiting line (source x -220), the Department of
- * Administrative Affairs lettering on the counter's lintel, the TV and the
- * light where the remake's hall had them.
+ * item or verb exists in the source). It paints six; the 2012 footage shows
+ * eight, so the last two are its own chair copied (#734, HALL_EXTRA_CHAIRS).
+ * The hall's location XML is lost, so where the signs, the TV and the lights
+ * hang is read off that footage (#734, js/bureaucratic-hall.js HALL_DECOS).
  */
 function drawBureaucraticHall() {
   const layer = legalizeRoomBase('legalize-bureaucratic-hall', HALL.width, HALL.height, HALL.ground);
@@ -20264,13 +20262,13 @@ function drawBureaucraticHall() {
     return spr;
   };
   deco('bureaucratic_hall_bg', 0, 0, { ax: 0, ay: 0 });
-  deco('bureaucratic_hall_waitingroom_1', 900, 336);
-  deco('sign_waiting_area', 1012, 338);
-  deco('bureaucratic_hall_sign_wait_1', HALL_LAYOUT.waitingLine, HALL.ground - 12, { ay: 1 });
-  deco('bureaucratic_hall_sign_1', 1810, 196);
-  // #645: the TV hangs in front of the ceiling light (the light was drawn over it).
-  deco('bureaucratic_hall_light_1', 980, 74, { ay: 0, scale: 1.35 });
-  deco('bureaucratic_hall_tv_1', 1330, 178, { scale: 0.72 });
+  // #734: the waiting wall's last two chairs, drawn into the backdrop (an SVG in stage units).
+  const chairs = new PIXI.Sprite(textureFromUrl(HALL_EXTRA_CHAIRS.url));
+  chairs.label = 'bureaucratic-hall-chairs-right';
+  chairs.position.set(HALL_EXTRA_CHAIRS.x, HALL_EXTRA_CHAIRS.y);
+  chairs.scale.set(0.5); // the SVG is drawn at 2x its stage box, like the decos
+  layer.addChild(chairs);
+  for (const [name, x, y, ax, ay, scale] of HALL_DECOS) deco(name, x, y, { ax, ay, scale }).label = name;
   drawHallOffice(layer, deco);
   layer.sortableChildren = true;
   return layer;

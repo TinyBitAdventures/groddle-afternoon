@@ -184,7 +184,6 @@
   "public/js/bureaucratic-hall.js": {
     "ours: * 700 - 128 = 572. The two hitboxes are lost: ours are the desk room": "ours-bureaucratic-hall",
     "ours: * The room (ours, from Tiny Speck's art): the hall's location XML": "ours-bureaucratic-hall",
-    "ours: * Where the signs hang is ours too (no placement": "ours-bureaucratic-hall",
     "ours: * once you held its badge; ours sells it to badge holders too (G1180, as": "bureaucracy-card-for-badge-holders",
     "ours: /** The counter's left end (ours, just right of the helpers' limit).": "ours-bureaucratic-hall",
     "ours: /** bureaucratic_hall_entered (ours): the desk room, left of the partition at x 625.": "ours-bureaucratic-hall",

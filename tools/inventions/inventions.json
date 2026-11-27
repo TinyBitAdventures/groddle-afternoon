@@ -6289,6 +6289,32 @@
    ]
   },
   {
+   "id": "bureaucratic-hall-decos-from-footage",
+   "title": "The Bureaucratic Hall's signs, TV, lights and last two chairs, placed from the 2012 footage",
+   "kind": "placement",
+   "status": "kept",
+   "where": [
+    {
+     "file": "public/js/bureaucratic-hall.js",
+     "symbol": "HALL_DECOS"
+    },
+    {
+     "file": "public/js/bureaucratic-hall.js",
+     "symbol": "HALL_EXTRA_CHAIRS"
+    },
+    {
+     "file": "public/js/bureaucratic-hall.js",
+     "symbol": "HALL_EXIT_DOOR_Y"
+    },
+    {
+     "file": "tools/bureaucratic-hall/build-chairs.mjs"
+    }
+   ],
+   "why": "Glitch hung these in the hall (a player's 2012 screenshots in report #734, video wo0iNJ0PPS4) but the hall's location XML was never archived. Ours: every x/y read off that footage against the backdrop's walls and chairs, and the two chairs by the dividing wall drawn from the backdrop's own chair (bureaucratic_hall_bg paints six of the eight).",
+   "ruling": "Austin 2026-11-27 (report #734): rebuild the hall's decos from the original's screenshots, adding the two chairs to Tiny Speck's backdrop art",
+   "rows": []
+  },
+  {
    "id": "house-floor-holes",
    "title": "Holes in an upper house floor: the Shortcut to Urth crack and the Manhole rugs drop you to the floor below",
    "kind": "behaviour",

@@ -75,7 +75,7 @@ import { acceptOffer, ensureQuestOfferState, markOffered, questMoveNote, questSt
 import { getQuestCatalog } from '../content-catalogs.js?v=c9b84764';
 import { parseQuestConversation } from '../quests.js?v=f68437db';
 import { CUP_CLASS, CUP_OF_WATER, WATER_COOLER, WATER_COOLER_CLASS, drinkCup, getWater, getWaterState } from '../water-cooler.js?v=1cf1b040';
-import { BUREAUCRAT_CLASS, HALL, HALL_LAYOUT, HALL_TEXT, PLEASE_WAIT_BUFF, TALK_VERB, createHallFlow } from '../bureaucratic-hall.js?v=7ea53899';
+import { BUREAUCRAT_CLASS, HALL, HALL_EXIT_DOOR_Y, HALL_LAYOUT, HALL_TEXT, PLEASE_WAIT_BUFF, TALK_VERB, createHallFlow } from '../bureaucratic-hall.js?v=f79567fd';
 import { closeQuestRoomConverse, questRoomConverse } from './quest-instances-feature.js?v=eb8a5632';
 import { HALL_MP_TEXT, HALL_POSE_MS, clerkAt, clerkRow, poseChanged } from '../halls-mp.js?v=044b5c5a';
 import { standOnFeet } from '../sprite-feet.js?v=6358a697';
@@ -149,7 +149,8 @@ function publish(engine) {
 function spawnHall(engine, kit, shared = null, visit = null) {
   const door = kit.sprite(EXIT_ART);
   standOnFeet(door);
-  door.position.set(EXIT_X, ROOM.ground);
+  // #734: the doors stand on the desk room's floor, where it meets the side wall (not the walk line).
+  door.position.set(EXIT_X, HALL_EXIT_DOOR_Y);
   door.scale.set(0.5);
   door.zIndex = 30;
   engine.entityLayer.addChild(door);

@@ -13,7 +13,7 @@ import { join } from 'node:path';
 import { execFileSync } from 'node:child_process';
 
 import { HALL_MP_TEXT, HALL_TURN_MS, busyForOther, clerkAt, clerkRow, poseChanged } from '../public/js/halls-mp.js?v=044b5c5a';
-import { HALL, HALL_LAYOUT, PLEASE_WAIT_MS, createHallFlow } from '../public/js/bureaucratic-hall.js?v=7ea53899';
+import { HALL, HALL_LAYOUT, PLEASE_WAIT_MS, createHallFlow } from '../public/js/bureaucratic-hall.js?v=f79567fd';
 import { hallsData } from '../tools/build-realtime-halls.mjs';
 import { HAS_SERVER, serverPath, skipWithoutServer } from '../tools/repos.mjs';
 

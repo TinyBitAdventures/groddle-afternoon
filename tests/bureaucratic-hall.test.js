@@ -11,6 +11,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
   HALL,
+  HALL_DECOS,
   HALL_LAYOUT,
   HALL_OFFICE,
   HALL_QUESTIONS,
@@ -22,7 +23,7 @@ import {
   hallItems,
   hallX,
   waitPromptFor,
-} from '../public/js/bureaucratic-hall.js?v=7ea53899';
+} from '../public/js/bureaucratic-hall.js?v=f79567fd';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const gsjs = join(root, '..', 'glitch-GameServerJS');
@@ -113,8 +114,11 @@ describe('the hall on the backdrop', () => {
   it('draws Tiny Speck\'s hall: the backdrop and the signs, no drawn chairs', () => {
     const game = pub('game.js');
     const draw = game.slice(game.indexOf('function drawBureaucraticHall()'), game.indexOf('function installLegalizeScene('));
+    assert.match(draw, /'bureaucratic_hall_bg'/);
+    assert.match(draw, /of HALL_DECOS\) deco\(name, x, y, \{ ax, ay, scale \}\)/, 'the signs come from HALL_DECOS (#734)');
+    const hung = HALL_DECOS.map(([name]) => name);
     for (const name of ['bureaucratic_hall_bg', 'bureaucratic_hall_waitingroom_1', 'sign_waiting_area', 'bureaucratic_hall_sign_wait_1', 'bureaucratic_hall_sign_1']) {
-      assert.match(draw, new RegExp(`'${name}'`), name);
+      if (name !== 'bureaucratic_hall_bg') assert.ok(hung.includes(name), name);
       assert.ok(existsSync(join(root, 'public/assets/decos/groddle', `${name}.webp`)), `${name}.webp`);
       assert.ok(existsSync(join(root, 'public/assets/decos/groddle', `${name}@1.5x.webp`)), `${name}@1.5x.webp`);
     }
@@ -421,9 +425,12 @@ describe('G1232 (#645): the office behind the counter, and the TV in front of th
   it('the backdrop draws the light first and the TV over it, then the office (game, loading card and street map alike)', () => {
     const game = pub('game.js');
     const body = game.slice(game.indexOf('function drawBureaucraticHall()'), game.indexOf('function drawHallOffice('));
-    const light = body.indexOf("deco('bureaucratic_hall_light_1'");
-    const tv = body.indexOf("deco('bureaucratic_hall_tv_1'");
+    const names = HALL_DECOS.map(([name]) => name);
+    const light = names.indexOf('bureaucratic_hall_light_1');
+    const tv = names.indexOf('bureaucratic_hall_tv_1');
+    assert.ok(light >= 0 && light < tv, 'light, then TV');
+    const decos = body.indexOf('of HALL_DECOS)');
     const office = body.indexOf('drawHallOffice(layer, deco);');
-    assert.ok(light > 0 && light < tv && tv < office, 'light, TV, office');
+    assert.ok(decos > 0 && decos < office, 'the decos, then the office');
   });
 });
