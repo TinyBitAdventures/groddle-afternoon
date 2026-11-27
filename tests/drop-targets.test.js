@@ -14,10 +14,10 @@ import { describe, it, before, after } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { join, relative } from 'node:path';
-import { dropTargetIds, registerDropTarget, resolveDrop, currentDrag, beginDrag, dragDrop, endDrag } from '../public/js/drop-targets.js?v=59e6edb4';
+import { DROP_THROUGH, dropPoint, dropTargetIds, registerDropTarget, resolveDrop, currentDrag, beginDrag, dragDrop, endDrag } from '../public/js/drop-targets.js?v=3ae8ae5c';
 import { dropPage, fakeSlot, touchDrop, mouseDrop } from './drop-fake.js';
-import { worldDropFeature } from '../public/js/features/world-drop-feature.js?v=380c0a8e';
-import { gardenGuanoFeature } from '../public/js/features/garden-guano-feature.js?v=f588f27e';
+import { worldDropFeature } from '../public/js/features/world-drop-feature.js?v=b3773a94';
+import { gardenGuanoFeature } from '../public/js/features/garden-guano-feature.js?v=8f8307dd';
 import { createGarden } from '../public/js/garden.js?v=fefa7bcd';
 
 const root = join(import.meta.dirname, '..', 'public');
@@ -236,5 +236,50 @@ describe('the street\'s targets by touch and by mouse', () => {
     page.row.contains = (n) => n === bag;
     await touchDrop(page, bag, canvas, 480, 300);
     assert.deepEqual(calls, []);
+  });
+});
+
+describe('a drag passes over the HUD to the room under it (review 2026-11-27 leftover 1)', () => {
+  // A fake element: closest() matches the selectors it is given (its own and its parents' names).
+  const node = (name, names = [name]) => ({ name, closest: (sel) => (sel.split(', ').some((s) => names.includes(s)) ? { name } : null), contains: (n) => n === node });
+  const canvas = node('canvas');
+  const currants = node('strong', ['#currants-stat', '.top-bar']);
+  const map = node('img', ['#street-minimap']);
+  const rail = node('button', ['.social-rail']);
+  const pack = node('slot', ['#pack-bar']);
+  const doc = (stack) => ({ elementsFromPoint: () => stack });
+
+  it('over the Currants counter, the street map or the Social rail, the element under it decides', () => {
+    for (const hud of [currants, map, rail]) {
+      const at = dropPoint(doc([hud, canvas]), 20, 600, hud);
+      assert.deepEqual(at, { x: 20, y: 600, el: canvas }, hud.name);
+    }
+  });
+
+  it('anything else (the room, the pack, a window) decides itself, and nothing under keeps the HUD', () => {
+    assert.equal(dropPoint(doc([canvas]), 1, 2, canvas).el, canvas);
+    assert.equal(dropPoint(doc([pack, canvas]), 1, 2, pack).el, pack, 'the pack takes its own drop');
+    assert.equal(dropPoint(doc([currants]), 1, 2, currants).el, currants);
+    assert.equal(dropPoint({}, 1, 2, currants).el, currants, 'no elementsFromPoint');
+    assert.equal(dropPoint(doc([canvas]), 1, 2, null).el, null);
+  });
+
+  it('the mouse and the touch lift both resolve through it (one target on the room, under the counter)', async () => {
+    const got = [];
+    const off = registerDropTarget({ id: 'room', order: 98, scope: () => canvas, over: () => ({ ok: true }), drop: () => got.push('room') });
+    const page = dropPage([]);
+    page.doc.elementsFromPoint = () => [currants, canvas];
+    const slot = fakeSlot('cherry', 1);
+    page.row.contains = (n) => n === slot;
+    await touchDrop(page, slot, currants, 20, 600);
+    const { drop } = mouseDrop(page, slot, currants, 20, 600);
+    off();
+    assert.deepEqual(got, ['room', 'room']);
+    assert.equal(drop.defaultPrevented, true);
+  });
+
+  it('names the HUD over the room, not the pack or a window', () => {
+    for (const sel of ['.top-bar', '#street-minimap', '.social-rail']) assert.ok(DROP_THROUGH.includes(sel), sel);
+    for (const sel of DROP_THROUGH) assert.doesNotMatch(sel, /pack|dialog|panel|modal/, sel);
   });
 });

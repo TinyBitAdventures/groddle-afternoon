@@ -17,7 +17,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { registerDropTarget, beginDrag, resolveDrop, endDrag } from '../public/js/drop-targets.js?v=59e6edb4';
+import { registerDropTarget, beginDrag, resolveDrop, endDrag } from '../public/js/drop-targets.js?v=3ae8ae5c';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const read = (p) => readFileSync(join(root, p), 'utf8');

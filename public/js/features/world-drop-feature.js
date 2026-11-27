@@ -26,7 +26,7 @@ import { isBagClass } from '../pack-slots.js?v=38e4aea5';
 import { dropFor, dropTip } from '../world-drop.js?v=a8956ae5';
 import { canUseTool } from '../tools.js?v=4156bba8';
 import { chooseTool } from '../tool-choice.js?v=e0dcb60e';
-import { registerDropTarget } from '../drop-targets.js?v=59e6edb4';
+import { registerDropTarget } from '../drop-targets.js?v=3ae8ae5c';
 import { draggedStack, markDragged } from '../drag-stack.js?v=9a24e5c4';
 
 export const WORLD_DROP_FEATURE_ID = 'world-drop';

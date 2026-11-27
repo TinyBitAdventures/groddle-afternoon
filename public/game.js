@@ -4,7 +4,7 @@
  */
 import { ITEM_ICONS, ITEM_LABELS, getVerbsFor, ordinaryItems, runVerb } from './content.js?v=9c775db5';
 import { createErrorOnce, createFeatureHost, createFrameStages } from './js/feature-host.js?v=b87e2cbc';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=80f5a7bb';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=0767f711';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, enterHintPick, hoverText, stackHoverLabel, groupHead, hoverRimShown, reachGlowTargets, spriteHasRimArt, rimArtParts, trimmedIconUrl, drawTileArt } from './js/enter-chooser.js?v=297c6d15';
 import { firstTendKey, STICK_TEND_DELAY_MS, STICK_TEND_DIRS, STICK_TEND_REPEAT_MS, stepTendKey, stepTendKeys, stickTendKey, tendKeyAction } from './js/garden-tend.js?v=a7470c4a';
 import { avatarHitBox, behindFloor, bodyReachDistance, OUT_OF_REACH_LINE, playerClickBox } from './js/reach.js?v=456da8a8';
@@ -548,7 +548,7 @@ import { stockUseVerb } from './js/stock-use.js?v=6b422ccf';
 import { TROPHY_FIND_TEXT, trophyOfBadge } from './js/home-trophies.js?v=649b111e';
 import { HELD_AT_ONCE, HELD_AT_ONCE_TEXT } from './js/collection-trophies.js?v=e45565a7';
 import { PACK_COPY, bagSortIcon, bagSortText, isBagClass, isElementClass, layoutHeld, ownBagLabel, unitRankAt } from './js/pack-slots.js?v=38e4aea5';
-import { beginDrag, installDropRegistry, packStackOf, registerDropTarget, touchLift } from './js/drop-targets.js?v=59e6edb4';
+import { beginDrag, installDropRegistry, packStackOf, registerDropTarget, touchLift } from './js/drop-targets.js?v=3ae8ae5c';
 import { FLOAT_TEXT_Z, SPEECH_BUBBLE_Z } from './js/fx-z.js?v=18dda7e3';
 import { GAIN_FLOAT, GAIN_FLOAT_MS, gainFloatPose, gainFloatSinks } from './js/gain-float.js?v=caf16853';
 import { hasPouch } from './js/elemental-pouch.js?v=42702eda';

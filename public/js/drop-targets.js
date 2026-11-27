@@ -133,6 +133,29 @@ export function endDrag() {
 }
 
 /**
+ * What a dragged stack passes over to the world under it: the HUD drawn over the location (the top bar
+ * with its stats, Currants and buttons, the street map, the name plate, the Social rail (the drawer shut:
+ * open, it is a window), the pinned
+ * quests, the effects, the tracker, a phone's stick and jump, and a home's Decorate and Cultivate buttons). Glitch asked the location itself whether the dragged stack was
+ * over it (LocationInputHandler.as _packDragMoveHandler 655-658: _locationRenderer.hitTestObject, whatever
+ * was drawn on top) and scrolled at the view's edge by the pointer alone (HandOfDecorator.as
+ * maybeScrollVPByDragging), so in Classic the Currants counter at the view's left edge stopped neither.
+ * Here the element under the pointer decided both, so a stack held over it fell out of the room.
+ */
+export const DROP_THROUGH = ['.top-bar', '#street-minimap', '#street-nameplate', '.social-rail', '.local-chat-dock:not(.is-open)', '#quest-pins', '#buff-strip', '#play-context', '#touch-controls', '#homes-modes'];
+const DROP_THROUGH_SELECTOR = DROP_THROUGH.join(', ');
+
+/**
+ * The point a drag is at, with the element that decides it: the element under the pointer, or, over
+ * what a drag passes over (DROP_THROUGH), the first element under that (document.elementsFromPoint).
+ */
+export function dropPoint(doc, x, y, el) {
+  if (!el?.closest?.(DROP_THROUGH_SELECTOR)) return { x, y, el };
+  const under = doc?.elementsFromPoint?.(x, y) || [];
+  return { x, y, el: under.find((n) => n && !n.closest?.(DROP_THROUGH_SELECTOR)) || el };
+}
+
+/**
  * The mouse: one dragover, one drop and one dragend listener for the whole page. A source's
  * dragstart calls beginDrag; HTML5 hands the point and the element under it.
  */
@@ -140,7 +163,7 @@ export function installDropRegistry(doc = globalThis.document) {
   if (!doc || doc.__dropRegistry) return;
   doc.__dropRegistry = true;
   mark = doc.documentElement || null;
-  const at = (e) => ({ x: e.clientX, y: e.clientY, el: e.target });
+  const at = (e) => dropPoint(doc, e.clientX, e.clientY, e.target);
   doc.addEventListener('dragover', (e) => {
     if (!drag) return;
     const hit = dragOver(at(e));
@@ -173,7 +196,7 @@ export function touchLift(box, { selector, stackOf, onLift, onEnd, holdMs = 350,
     onEnd?.(t.slot, t.on);
     if (t.on && drag) endDrag();
   };
-  const atPoint = (x, y) => ({ x, y, el: doc.elementFromPoint?.(x, y) || null });
+  const atPoint = (x, y) => dropPoint(doc, x, y, doc.elementFromPoint?.(x, y) || null);
   const down = (event) => {
     if (event.pointerType !== 'touch' || touch) return;
     const slot = event.target?.closest?.(selector);

@@ -25,7 +25,7 @@
 
 import { FERTILIZE_TEXT, GARDEN_FERTILIZER, SEED_CATALOG, fertilizeCheck, seedDropCheck } from '../garden.js?v=fefa7bcd';
 import { nearestPlotIndex } from '../garden-view.js?v=04fe8467';
-import { registerDropTarget } from '../drop-targets.js?v=59e6edb4';
+import { registerDropTarget } from '../drop-targets.js?v=3ae8ae5c';
 
 export const GARDEN_GUANO_FEATURE_ID = 'garden-guano';
 const VERB = 'fertilize';
