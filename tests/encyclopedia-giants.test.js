@@ -110,9 +110,10 @@ describe('encyclopedia: the Giants\' portraits', () => {
     assert.match(note, /tinyspeck\/glitch-items giants\/Giants_All\.ai/);
     assert.match(note, /CC0 1\.0/);
     assert.match(note, /Cut, not drawn or\s+generated/);
-    const shipped = readdirSync(portraits).filter((f) => f.endsWith('.webp')).sort();
+    // The panels; the cut-outs beside them (<giant>-cut.webp, -cut@2x.webp) are the Giant's screen's (#759).
+    const shipped = readdirSync(portraits).filter((f) => /^[a-z]+\.webp$/.test(f)).sort();
     assert.deepEqual(shipped, IDS.map((id) => `${id}.webp`));
-    for (const f of shipped) {
+    for (const f of readdirSync(portraits).filter((f) => f.endsWith('.webp'))) {
       const sum = createHash('sha256').update(readFileSync(join(portraits, f))).digest('hex');
       assert.ok(note.includes(`${f}  sha256 ${sum}`), `${f}: sha256 in SOURCE.txt`);
     }

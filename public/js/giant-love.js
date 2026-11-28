@@ -23,10 +23,27 @@
  *   0.8 s fade-in ends; it waits for the text before "Click anywhere..."
  *   closes it.
  *
- * Remake: there are no player names, so the label is "friend", as the
- * Butler's lines and quest copy say it (js/quests.js, js/hi-signs.js). The
- * Giant's video (giant_<name>_flv_overlay) was never recovered; the screen
- * shows the Giant's CC0 emblem art instead.
+ * - GiantView.as 255-459, the screen's choreography: the background fades
+ *   in over 0.8 s (fade_in_secs); 0.4 s later the Giant's art, centred on
+ *   the screen, grows from 0.2 to full size over 3 s (easeOutBack) while
+ *   its alpha goes 0.2 to 1 (easeInSine); it holds 3 s, then slides over
+ *   1.5 s (easeOutQuart) so the art and the text beside it (TEXT_OFFSET 20
+ *   px right of the art) sit centred together; the text block stands 15 px
+ *   above the middle and is revealed top to bottom by a mask growing to
+ *   twice its height over 2 s; then "Click anywhere..." fades in (0.5 s)
+ *   and the screen takes input.
+ *
+ * The label: online it is your name (pc.getLabel(), js/pc-label.js); solo
+ * has no character name, so "friend", as the Butler's lines and quest copy
+ * say it (#759).
+ *
+ * The art (#759): the Giant's video (giant_<name>_flv_overlay) was never
+ * recovered, but players' snaps of this screen show what it showed: Tiny
+ * Speck's own painting of the Giant, cut out of its panel, with a soft white
+ * glow around it. That painting is in the CC0 tinyspeck/glitch-items
+ * giants/Giants_All.ai; tools/giants/portraits.py cuts each one out
+ * (giant-portraits/<giant>-cut.webp and -cut@2x.webp, SOURCE.txt beside
+ * them); the glow is drawn here (a blurred white silhouette behind it).
  */
 
 /** config_base.js 165-177 config.giants. */
@@ -43,6 +60,84 @@ export const LOVE_PLAYER_LABEL = 'friend';
 /** GiantView.as DEFAULT_ALPHA, fade_in_secs (the sound plays as it ends, BaseScreenView.as 76). */
 export const GIANT_SCREEN_ALPHA = 0.75;
 export const GIANT_SCREEN_FADE_MS = 800;
+
+/**
+ * GiantView.as 255-459 timings in ms from the screen opening: the art grows
+ * (delay .4 s after the fade-in, 3 s), holds 3 s, slides 1.5 s, then the
+ * text mask runs 2 s and the screen takes input; the button fades in 0.5 s.
+ */
+export const GIANT_SCREEN_TIMES = Object.freeze({
+  growAt: 1200,
+  growMs: 3000,
+  slideAt: 7200,
+  slideMs: 1500,
+  textAt: 8700,
+  textMs: 2000,
+  readyAt: 10700,
+  okMs: 500,
+});
+
+/** The cut-out portraits' 1x sizes (giant-portraits/<giant>-cut.webp; the @2x file is twice), one scale for all eleven. */
+export const GIANT_CUT = Object.freeze({
+  alph: Object.freeze({ w: 215, h: 454 }),
+  cosma: Object.freeze({ w: 226, h: 425 }),
+  friendly: Object.freeze({ w: 236, h: 277 }),
+  grendaline: Object.freeze({ w: 219, h: 444 }),
+  humbaba: Object.freeze({ w: 241, h: 399 }),
+  lem: Object.freeze({ w: 253, h: 355 }),
+  mab: Object.freeze({ w: 227, h: 423 }),
+  pot: Object.freeze({ w: 219, h: 363 }),
+  spriggan: Object.freeze({ w: 235, h: 412 }),
+  ti: Object.freeze({ w: 244, h: 313 }),
+  zille: Object.freeze({ w: 258, h: 375 }),
+});
+
+/** The cut-out portrait for a config.giants id: { src, src2x, w, h } (1x px). */
+export function giantCutArt(giant) {
+  const size = GIANT_CUT[giant];
+  if (!size) return null;
+  return { src: `assets/sprites/giant-portraits/${giant}-cut.webp`, src2x: `assets/sprites/giant-portraits/${giant}-cut@2x.webp`, ...size };
+}
+
+/**
+ * Where the screen puts things on a stage `w` x `h` CSS px (GiantView.as draw()
+ * and onTweenComplete). The players' snaps (a 403 px tall game view) show
+ * Humbaba's art about 250 px tall, 0.6 of the view, the title in about 30 px
+ * type and the line in about 13 px; the remake scales that with the stage
+ * (k: CSS px per 1x portrait px). `textW`/`textH` are the text block's size
+ * at that k. Returns the art's size, its centre at the start (the middle of
+ * the stage) and at the end, and the text block's top left; `stacked` when
+ * the stage is too narrow for art and text side by side (a phone held
+ * upright): then the text sits centred under the art.
+ */
+export const GIANT_LAYOUT = Object.freeze({ artOfHeight: 0.6, minArtH: 150, maxArtH: 460, refH: 399, gap: 20, raise: 15, edge: 16, titlePx: 48, linePx: 21, maxTextW: 350 });
+export function giantScreenLayout(giant, { w = 0, h = 0, textW = 0, textH = 0, k: forcedK = 0 } = {}) {
+  const art = GIANT_CUT[giant] || GIANT_CUT.humbaba;
+  const L = GIANT_LAYOUT;
+  const k = forcedK || giantScreenScale(giant, w, h);
+  const artW = art.w * k;
+  const artH = art.h * k;
+  const gap = L.gap * k;
+  const span = artW + gap + textW;
+  const start = { x: w / 2, y: h / 2 };
+  if (span <= w - 2 * L.edge) {
+    const left = (w - span) / 2;
+    return { k, artW, artH, stacked: false, start, end: { x: left + artW / 2, y: h / 2 }, text: { x: left + artW + gap, y: h / 2 - textH / 2 - L.raise * k } };
+  }
+  const total = artH + gap + textH;
+  const top = Math.max(L.edge, (h - total) / 2);
+  return { k, artW, artH, stacked: true, start, end: { x: w / 2, y: top + artH / 2 }, text: { x: (w - textW) / 2, y: top + artH + gap } };
+}
+
+/** k for a stage: the art 0.6 of the stage's height (Humbaba as the reference), and on a narrow stage no taller than leaves room for the text under it. */
+export function giantScreenScale(giant, w = 0, h = 0) {
+  const art = GIANT_CUT[giant] || GIANT_CUT.humbaba;
+  const L = GIANT_LAYOUT;
+  let k = Math.min(L.maxArtH, Math.max(L.minArtH, h * L.artOfHeight)) / L.refH;
+  // Side by side needs the art, the gap and about 200 px of title; narrower than that stacks, so keep the art to half the height and most of the width.
+  if (art.w * k + L.gap * k + 200 > w - 2 * L.edge) k = Math.min(k, (h * 0.5) / art.h, (w * 0.7) / art.w);
+  return Math.max(0.2, k);
+}
 
 /** Giants.as 11-66: label and bg_color, keyed by the client tsid (ti is "tii" there). */
 export const GIANT_SCREEN = Object.freeze({
@@ -71,9 +166,9 @@ export function loveYouGiant(text) {
   return LOVE_GIANTS.includes(name) ? name : null;
 }
 
-/** The tip body: "I love you too, " + the player's label. */
+/** The tip body: "I love you too, " + the player's label (pc.getLabel(): your name online, "friend" solo). */
 export function loveYouLine(label = LOVE_PLAYER_LABEL) {
-  return `I love you too, ${label}`;
+  return `I love you too, ${String(label ?? '').trim() || LOVE_PLAYER_LABEL}`;
 }
 
 /**
@@ -113,6 +208,7 @@ export function giantLoveResponse(text, { shrines = [], x = 0, y = 0, label = LO
     giant,
     screen: {
       tsid,
+      art: giantCutArt(giant),
       title: `${info.label} says...`,
       tipTitle: LOVE_TIP_TITLE,
       tipBody: loveYouLine(label),

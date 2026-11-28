@@ -18,9 +18,9 @@ import {
   giantLoveResponse,
   loveYouGiant,
   loveYouLine,
-} from '../public/js/giant-love.js?v=aa9ea315';
+} from '../public/js/giant-love.js?v=abed6d7d';
 import { GIANTS } from '../public/js/shrines.js?v=48318bec';
-import { sayLoveLine } from '../public/js/features/shrine-hint-feature.js?v=0ecb5419';
+import { sayLoveLine } from '../public/js/features/shrine-hint-feature.js?v=5bb5e494';
 
 const ROOT = join(import.meta.dirname, '..');
 const AUDIT = join(ROOT, '..');
@@ -76,6 +76,7 @@ describe('the shrine (findCloseStack(is_shrine, 200), get_giant)', () => {
     assert.equal(ok.ok, true);
     assert.deepEqual(ok.screen, {
       tsid: 'mab',
+      art: { src: 'assets/sprites/giant-portraits/mab-cut.webp', src2x: 'assets/sprites/giant-portraits/mab-cut@2x.webp', w: 227, h: 423 },
       title: 'Mab says...',
       tipTitle: 'A Message:',
       tipBody: 'I love you too, friend',
@@ -103,7 +104,7 @@ describe('the shrine (findCloseStack(is_shrine, 200), get_giant)', () => {
       assert.ok(info, g);
       assert.equal(info.label, GIANTS[g].name);
       assert.match(info.bg, /^#[0-9a-f]{6}$/);
-      assert.ok(existsSync(join(ROOT, 'public', 'assets', 'sprites', 'icons', `emblem_${g}@3x.webp`)), `emblem art for ${g}`);
+      assert.ok(existsSync(join(ROOT, 'public', 'assets', 'sprites', 'giant-portraits', `${g}-cut.webp`)), `cut-out portrait for ${g} (#759)`);
     }
     assert.equal(GIANT_SCREEN_ALPHA, 0.75);
     assert.equal(GIANT_SCREEN_FADE_MS, 800);

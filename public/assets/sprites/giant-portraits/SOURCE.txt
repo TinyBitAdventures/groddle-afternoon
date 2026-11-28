@@ -10,15 +10,47 @@ Matched  each panel to its Giant by the same painting on that Giant's Icon (PANE
 Used by  the Encyclopedia's Giants pages (tools/encyclopedia/giants.mjs): each Giant's hero and its
          card in the section list.
 
+Cut-outs <giant>-cut.webp (1x) and <giant>-cut@2x.webp: the same painting without its panel. Each
+         panel is one layer of the file whose first paint is the panel's flat gradient (one shading
+         fill clipped to the panel); those eleven fills are dropped from the page (qpdf, fix-qdf)
+         and the page rendered on a transparent ground (pdftocairo -transp). Every blend mode in
+         the file is Normal, so what is left is exactly the figure as painted. Cropped to the
+         panel, trimmed to the painted pixels plus 6 px, the panel 600 px wide at 2x
+         (all eleven at one scale), WebP quality 85 with alpha.
+Used by  the Giant's screen ("I love you <Giant>" at a shrine, public/js/giant-love.js and
+         public/js/features/shrine-hint-feature.js), as the original's video showed the painting.
+
 Files
   alph.webp  sha256 3118265d699a5003817a9b1629366338f5f00b0ba47eb4b8dcabb381986e5290
+  alph-cut.webp  sha256 bb066443d89dfa9ed6f34bdfb7c857e0b29772cbbb460b5e1ca37df553b8d179
+  alph-cut@2x.webp  sha256 883a29fb86563fc088d785bf1b0e5bfc4622370cde3837e969c07774c3094690
   cosma.webp  sha256 69f543a972bb1b80078a447ef15178a16ba12f6ed9628bb10156b5426c4b5802
+  cosma-cut.webp  sha256 df594831d5c6cc96cb46e9f76388fd3d46022d06819d7239792d8e7200dae0f0
+  cosma-cut@2x.webp  sha256 92e4b11b5d72f96e4e7585e8275f6d9268b82c9584fca1b6e2a0cad3284e4801
   friendly.webp  sha256 2bad0d2513b5703476144b819a44e1ad54bad5d57b42340a4b5a10d89082ff3c
+  friendly-cut.webp  sha256 8fffaf112736e6276433dab62aba900a5bbddbef0814771b3b8230e0166b7139
+  friendly-cut@2x.webp  sha256 95127fad4e47e1dec9824ecc3c2b17478791de8d2e9fd839086bd183aa752a17
   grendaline.webp  sha256 31e5c0da6df873dd93655049d4806bac5fe4de0df313c8fd87f47d69cfe57c1d
+  grendaline-cut.webp  sha256 0a586b2a4127ca576df217612a0fc3237815e7e95a886e35e0bc8a3f6db315ac
+  grendaline-cut@2x.webp  sha256 74bb19a8de28e1b9c555c6182c07c55777a85df48d33c588f29b12bc08a47eb7
   humbaba.webp  sha256 f8d5f5cf09107f52993912adc9809fa5a052b5da0e2b35b2379d5ed77652c8ac
+  humbaba-cut.webp  sha256 ae1cce427445479909670b53e985d8ca341e121b66bd6b72b7db61a2656ce307
+  humbaba-cut@2x.webp  sha256 4b43020e433974535837c8aa1d81764edb31eec8a311a256038085b15bb987cf
   lem.webp  sha256 bf1ee8d4d64a0ef7c86e9b7e01a6ad0ec3d07bf12a6f247bfbe778e51d8c991e
+  lem-cut.webp  sha256 c8d2c68f328c5c30fdad698d21328546f910a49b839b385171caacb7ac43e31e
+  lem-cut@2x.webp  sha256 e8a1810c3f9ab18d01e498c76dff08c01d4f5baf6863889ee7b502d285ebfafc
   mab.webp  sha256 e42382e920d9335edf71ca77b027027fc8bed190d562f3dee8f11785338c31e2
+  mab-cut.webp  sha256 1dcd3ac347d87417004aec0564702164929238d2418fa7c116bfb473dfd42114
+  mab-cut@2x.webp  sha256 b09c5139f004c886b79e9f67bfdb0ee3e9dccd4c00021ba786375f7e70eab92a
   pot.webp  sha256 0d9ffbdab869962697b25981939bb073b40ca58d5e85f92bb405f0690cf3ca3d
+  pot-cut.webp  sha256 630412eab5d1cc9f3b0123401d37547f7d5ac404b93b8f247b471c1da0bcba34
+  pot-cut@2x.webp  sha256 1e4f6187a84aca8f6db26fd706b95af9db01ce6904174944be5348b56d9f2547
   spriggan.webp  sha256 63b57d3558f8451fb28d606cb57933650f08bae8eae0e85418e42605d77de1d5
+  spriggan-cut.webp  sha256 147cd560a96bc3eccf4b0e2c9d608bc4b42f9109b2b11754b240b5a1326d09be
+  spriggan-cut@2x.webp  sha256 f9d02d9e8f159b999ee3222f5bd3a6c08d171cc1c3eae44d17099d136c09d68c
   ti.webp  sha256 9a7a7a60c80734a2021c2b2fc5099e6fee778a9ed06d4e9ef522ec231051d1d0
+  ti-cut.webp  sha256 0a624e9efd17b7528cbc077f2991dece6f493dc1cb8589ae7e3f7dc3056b6764
+  ti-cut@2x.webp  sha256 02cf186a7659920b40cf17cdca1f6aa7ff40bc3f84d17cdd98d7e60ed230611b
   zille.webp  sha256 ab20178d91ca8ad2caf4aea9ced92bec1b466ef7c7642519048fb20cbad19231
+  zille-cut.webp  sha256 30c9d8b7704dc279a9c94abce0586e4134837687349cbc43a5129fbd3675975b
+  zille-cut@2x.webp  sha256 350f943c7533c853225139b01903de954dcd6f93019d567e267d3ffac7df8a6c
