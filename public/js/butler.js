@@ -231,7 +231,7 @@ export const BUTLER_STRINGS = Object.freeze({
   buildTowerComment: 'You know what would look great cultivated here? A tower!',
 });
 
-/** bag_butler.js doIntro (pc.label: the remake's players have no name, so "friend"). */
+/** bag_butler.js doIntro (pc.label: your name online, "friend" solo, js/pc-label.js). */
 export const BUTLER_INTRO = (name = 'friend') => `Thank you. I am very happy to be here with you, ${name}. I look forward to being of service.`;
 export const BUTLER_INTRO_REPLY = 'Welcome!';
 

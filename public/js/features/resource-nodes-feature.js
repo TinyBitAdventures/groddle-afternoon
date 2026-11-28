@@ -106,7 +106,7 @@ import {
   springDustTrapsOnArrival,
 } from '../resource-nodes.js?v=c2eb46b1';
 import { frameTexture as sheetFrameTexture, loadTexture, sourceFromUrl, textureFromUrl } from '../textures.js?v=b8e38103';
-import { acceptOffer, markOffered, npcQuestOffers, putOffOffer, questStatus } from '../quest-offers.js?v=7e00498b';
+import { acceptOffer, markOffered, npcQuestOffers, putOffOffer, questStatus } from '../quest-offers.js?v=9e1855e7';
 import { OVERLAY_USES, playOverlay } from '../overlays.js?v=91dcee74';
 import { OVERLAY_FADE, displayTopOf, itemstackOverlayPoint } from '../overlay-art.js?v=e50bacca';
 import { playItemOverlay } from '../item-overlay.js?v=c444e2cf';

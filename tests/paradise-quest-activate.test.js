@@ -11,8 +11,8 @@ import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { loadContentCatalogsFromDir, resetContentCatalogs, getQuestCatalog } from '../public/js/content-catalogs.js?v=c9b84764';
-import { createQuestState } from '../public/js/quests.js?v=f68437db';
-import { acceptOffer, ensureQuestOfferState, paradiseVisitCredits, requirementRoute, routeQuestEvent } from '../public/js/quest-offers.js?v=7e00498b';
+import { createQuestState } from '../public/js/quests.js?v=d9b316eb';
+import { acceptOffer, ensureQuestOfferState, paradiseVisitCredits, requirementRoute, routeQuestEvent } from '../public/js/quest-offers.js?v=9e1855e7';
 import { PARADISE_COURSES, activateParadiseTicket, createParadiseState, normalizeParadiseState } from '../public/js/paradise-flight.js?v=4d77a43d';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');

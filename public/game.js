@@ -4,7 +4,7 @@
  */
 import { ITEM_ICONS, ITEM_LABELS, getVerbsFor, ordinaryItems, runVerb } from './content.js?v=da2b8879';
 import { createErrorOnce, createFeatureHost, createFrameStages } from './js/feature-host.js?v=b87e2cbc';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=b34d8a74';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=282a15fd';
 import { VENDOR_STAND_IN_LABEL, VENDOR_NAME_LABEL } from './js/street-spirits.js?v=8ff6ed59';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, enterHintPick, hoverText, stackHoverLabel, groupHead, hoverRimShown, reachGlowTargets, spriteHasRimArt, rimArtParts, rimsTraceParts, trimmedIconUrl, drawTileArt } from './js/enter-chooser.js?v=b37c63e0';
 import { firstTendKey, STICK_TEND_DELAY_MS, STICK_TEND_DIRS, STICK_TEND_REPEAT_MS, stepTendKey, stepTendKeys, stickTendKey, tendKeyAction } from './js/garden-tend.js?v=a7470c4a';
@@ -34,12 +34,12 @@ import {
   cleanQuestMarkup,
   questDoneAt,
   paidRewardBits,
-} from './js/quests.js?v=f68437db';
+} from './js/quests.js?v=d9b316eb';
 // Quest copy is Flash htmlText: <b>/<i>/<br> drawn as formatting, the rest dropped, never innerHTML.
-import { locationLinkTarget, questRequirementText, renderQuestText, withQuestMarkup } from './js/quest-text.js?v=d0d07996';
+import { locationLinkTarget, questRequirementText, renderQuestText, withQuestMarkup } from './js/quest-text.js?v=92213536';
 // G267: the world-verb quest counters skip offer-system quests; old saves drop the boot Moloko quest.
-import { dropSpiritRepeatOffers, SPIRIT_REPEAT_QUESTS } from './js/spirit-reminisce.js?v=a50b40dc';
-import { FIRST_SKILL_QUEST_ID, acceptOffer, claimFirstSkillQuest, dropBootStarterQuests, questMoveNote, routesCounter, worldVerbQuestEvents, gardenPlotEvents, makingUnitQuestEvents, shrineDonationQuestEvents } from './js/quest-offers.js?v=7e00498b';
+import { dropSpiritRepeatOffers, SPIRIT_REPEAT_QUESTS } from './js/spirit-reminisce.js?v=54008539';
+import { FIRST_SKILL_QUEST_ID, acceptOffer, claimFirstSkillQuest, dropBootStarterQuests, questMoveNote, routesCounter, worldVerbQuestEvents, gardenPlotEvents, makingUnitQuestEvents, shrineDonationQuestEvents } from './js/quest-offers.js?v=9e1855e7';
 import {
   PHANTOM_QUEST_ID,
   REMEMBER_QUEST_ID,
@@ -140,8 +140,8 @@ import {
   qualificationVerb,
   requestLegalizeQualification,
   travelToGregarious,
-} from './js/legalize-it.js?v=53865df2';
-import { HALL, HALL_DECOS, HALL_EXTRA_CHAIRS, HALL_OFFICE, HALL_QUESTIONS } from './js/bureaucratic-hall.js?v=43a5a02b';
+} from './js/legalize-it.js?v=b31c33ad';
+import { HALL, HALL_DECOS, HALL_EXTRA_CHAIRS, HALL_OFFICE, HALL_QUESTIONS } from './js/bureaucratic-hall.js?v=29db1c45';
 import { STATION_X, stationArrival, stationScreen, surfaceStation } from './js/subway.js?v=ea6921ff';
 import { ALLEY, SHADY, drawAlley, inEnteredBox } from './js/quest-rooms/back-alley-set.js?v=0483a457';
 import { WINTER_WALK_BOUNDS, WINTER_WALK_PASSAGE } from './js/winter-walk-streets.js?v=c921bf92';
@@ -449,7 +449,7 @@ import {
   resetAchievementCounter,
   purchaseAchievementUpdates,
   getAchievementProgress,
-} from './js/achievements.js?v=535c8952';
+} from './js/achievements.js?v=bb7a59f6';
 import {
   applyStreetVisit,
   topUpCompletists,
@@ -570,7 +570,7 @@ import {
   inspectPlayerSave,
   serializePlayerSave,
   restorePlayerSave,
-} from './js/player-save.js?v=90008965';
+} from './js/player-save.js?v=6ee209a9';
 import {
   HOME_INTERIOR_TSID,
   HOME_STREET_TSID,
@@ -586,7 +586,8 @@ import {
   isHomePlaceTsid,
   setHomeHouse,
 } from './js/homes.js?v=dca6b2cd';
-import { HOME_MACHINE, offerHomeTicket, renderTicketMachine } from './js/home-ticket.js?v=13473847';
+import { HOME_MACHINE, offerHomeTicket, renderTicketMachine } from './js/home-ticket.js?v=dd4f1c0d';
+import { pcLabel, setPcLabelSource } from './js/pc-label.js?v=d54da634';
 import {
   MAIL_COMPANIONS,
   archiveMail,
@@ -1157,7 +1158,7 @@ import { playerNameColour } from './js/name-colours.js?v=9819bb8a';
 import { SIDE_SHEET_IDS, bindTabs, inSideSheet, mountPanelShell, sheetKeyToWorld } from './js/ui/panel-shell.js?v=5efb38c6';
 import { createQuestSheet, failedQuestPin, questLogNeedsSwap, questStep, visibleRowCount } from './js/ui/quest-sheet.js?v=7409d5d8';
 import { resolveQuestPins } from './js/features/quest-pins-feature.js?v=0e07d9a1';
-import { createQuestTracker } from './js/ui/quest-tracker.js?v=9aeb6645';
+import { createQuestTracker } from './js/ui/quest-tracker.js?v=f5f9ee07';
 import { bindContextTrigger, createContextMenu, isContextMenuKey as isMenuKey, MORE_KEYS_LABEL } from './js/ui/context-menu.js?v=0266831a';
 import { bindCountField, countKeyValue, countStepMarkup, createCountChooser, focusedCountField, heldPress, keepCountCaret, openCountField, restoreCountCaret, saveCountCaret, typedCount } from './js/ui/count-chooser.js?v=75f69512';
 import { createScrollKeep } from './js/ui/scroll-keep.js?v=2898b5b1';
@@ -1173,7 +1174,7 @@ import { ZOOM_HINT_CACHE, ZOOM_HINT_MS, watchZoomHint } from './js/zoom-hint.js?
 import { EAT_PICK_TEXT, bestFoodIndex, eatChoices, eatTip } from './js/eat-pick.js?v=8fb763d0';
 import { heldDirection, installHeldKeyGuard, isMacPlatform } from './js/held-keys.js?v=a28eb293';
 import { isOneClickDoor, oneClickChoice, signpostArmRows, worldContextAction } from './js/world-context-menu.js?v=00e2eb03';
-import { blockedPlayerVerbs, listPlayerTarget, opensPlayerMenu, playerMenuRows } from './js/ui/player-menu.js?v=25bb0a6f';
+import { blockedPlayerVerbs, listPlayerTarget, opensPlayerMenu, playerMenuRows } from './js/ui/player-menu.js?v=b76a6482';
 import { forgetTexture, frameTexture, isFailed, isLoaded, onFailed, onLoaded, textureFromUrl, whenLoaded } from './js/textures.js?v=b8e38103';
 import { FALLBACK_MAX as WORLD_ART_FALLBACK_MAX, worldArtFor } from './js/world-art.js?v=a67514c8';
 import { HOME_PIP_PX, HOME_PIP_WORDS, drawLockPip, drawPipWords, homeMarkNote, homePipShown, homePipWordsShown, homeStackMark } from './js/home-stack-marks.js?v=67b44287';
@@ -22702,7 +22703,7 @@ async function completeSummersDay() {
   savePlayerState();
   renderSummersDayHud();
   const copy = (wasRepeat ? SUMMERS_DAY_REPEAT_COMPLETION : SUMMERS_DAY_COMPLETION)
-    .replace('{pc_label}', 'friend');
+    .replace('{pc_label}', pcLabel(engine));
   await returnFromSummersDay({ completionText: copy });
   return true;
 }
@@ -26727,6 +26728,8 @@ function homeTicketHost() {
   return {
     inv,
     home: homeState,
+    // The rock's ticket talk opens on pc.getLabel() (newxp_training2.js 714): your name online, "friend" solo.
+    name: pcLabel(engine),
     gate: () => features.travelGate(HOME_STREET_TSID, engine, { via: 'home' }),
     dialogue: (opts) => openScriptedQuestDialogue(opts),
     toast: (msg) => toast(msg),
@@ -34880,6 +34883,8 @@ async function main() {
   app.stage.addChild(promptLayer);
 
   // Load mined GSJS catalogs (quests / achievements / skills / buffs)
+  // {pc_label} in quest copy: your name online, "friend" solo (js/pc-label.js).
+  setPcLabelSource(() => pcLabel(engine));
   bootStep('catalogs');
   await loadContentCatalogs();
   const summerCatalog = getQuestCatalog();
@@ -34887,7 +34892,7 @@ async function main() {
     Object.assign(summerCatalog[SUMMERS_DAY_QUEST_ID], {
       desc: 'Enter a shared memory of the Giants and follow it to the way home.',
       offer: SUMMERS_DAY_OFFER,
-      completion: SUMMERS_DAY_COMPLETION.replace('{pc_label}', 'friend'),
+      completion: SUMMERS_DAY_COMPLETION,
     });
     if (summerCatalog[SUMMERS_DAY_QUEST_ID].requirements?.[0]) {
       summerCatalog[SUMMERS_DAY_QUEST_ID].requirements[0].desc =
@@ -34898,7 +34903,7 @@ async function main() {
     Object.assign(summerCatalog[SUMMERS_DAY_REPEAT_QUEST_ID], {
       desc: 'Return to the Giants’ shared memory and reminisce A Summer’s Day.',
       offer: SUMMERS_DAY_REPEAT_OFFER,
-      completion: SUMMERS_DAY_REPEAT_COMPLETION.replace('{pc_label}', 'friend'),
+      completion: SUMMERS_DAY_REPEAT_COMPLETION,
     });
     if (summerCatalog[SUMMERS_DAY_REPEAT_QUEST_ID].requirements?.[0]) {
       summerCatalog[SUMMERS_DAY_REPEAT_QUEST_ID].requirements[0].desc =

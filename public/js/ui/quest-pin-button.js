@@ -19,7 +19,7 @@
  * shows no tracker at all). QA: canvas data questPinBtn ("" hidden, else "<pins>:<percent>"),
  * questPinPop ("1" open), questPinLine (the line shown, "" when none); groddleQA.questPins.button().
  */
-import { questTextPlain } from '../quest-text.js?v=d0d07996';
+import { questTextPlain } from '../quest-text.js?v=92213536';
 import { focusBack } from './focus-return.js?v=da190597';
 
 /** How long the step line stays out. */

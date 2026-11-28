@@ -53,14 +53,14 @@
  */
 
 import { addItem, removeItem, countItem } from '../inventory.js?v=3be7988a';
-import { acceptOffer, npcQuestOffers, questStatus } from '../quest-offers.js?v=7e00498b';
+import { acceptOffer, npcQuestOffers, questStatus } from '../quest-offers.js?v=9e1855e7';
 import { groundBeneath, isItemSolid, platformYAt, platformsScreen } from '../street-model.js?v=a9a05f9d';
 import { sheetFrames } from '../quest-rooms/kit.js?v=f2c0da0c';
+import { pcLabel } from '../pc-label.js?v=d54da634';
 import {
   JUJU_BANDIT,
   JUJU_QUEST,
   JUJU_SHEETS,
-  JUJU_PLAYER_LABEL,
   JUJU_SHEET_COLS,
   JUJU_TEXT,
   ancestralClock,
@@ -81,7 +81,7 @@ import {
   redeclareDelay,
   stealChanceForSeconds,
   withinReach,
-} from '../juju-bandits.js?v=0d3af5fe';
+} from '../juju-bandits.js?v=c350ebba';
 import {
   NOSTALGIA_BUFF,
   NOSTALGIA_TEXT,
@@ -156,7 +156,6 @@ function freshNostalgia() {
   return { kicks: 0, exitPromptShown: false, overwhelmed: false, potionUsed: false };
 }
 
-const pcLabel = () => JUJU_PLAYER_LABEL;
 
 function questCtx(engine) {
   return {

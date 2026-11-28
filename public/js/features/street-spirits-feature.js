@@ -89,7 +89,7 @@ import {
   offerNext,
   offeredFor,
   talkBeats,
-} from '../street-spirit-talks.js?v=23473c9f';
+} from '../street-spirit-talks.js?v=080cb1a2';
 import { CONVERSATIONS } from '../conversations-data.js?v=f11b7e02';
 import {
   adoptLegacyTalks,
@@ -100,13 +100,13 @@ import {
   markHeard,
   resumeTarget,
   setCurrentState,
-} from '../conversations.js?v=713258bc';
-import { pcLabel } from '../pc-label.js?v=81bf3550';
-import { acceptOffer, npcQuestOffers, questStatus } from '../quest-offers.js?v=7e00498b';
+} from '../conversations.js?v=8b5536cc';
+import { pcLabel } from '../pc-label.js?v=d54da634';
+import { acceptOffer, npcQuestOffers, questStatus } from '../quest-offers.js?v=9e1855e7';
 import { getQuestCatalog } from '../content-catalogs.js?v=c9b84764';
-import { questRoomConverse } from './quest-instances-feature.js?v=7ed52e66';
-import { SPIRIT_REMINISCE_TEXT, isStreetSpiritClass, spiritReminisceOffers, withReminisceVerb } from '../spirit-reminisce.js?v=a50b40dc';
-import { questDoneAt } from '../quests.js?v=f68437db';
+import { questRoomConverse } from './quest-instances-feature.js?v=a71c73ef';
+import { SPIRIT_REMINISCE_TEXT, isStreetSpiritClass, spiritReminisceOffers, withReminisceVerb } from '../spirit-reminisce.js?v=54008539';
+import { questDoneAt } from '../quests.js?v=d9b316eb';
 
 export const STREET_SPIRITS_FEATURE_ID = 'street-spirits';
 const TALK_MS = 5000; // the remake's talk bubble; the source talks until the conversation ends

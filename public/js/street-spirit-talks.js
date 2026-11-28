@@ -45,7 +45,7 @@
  * The world side is features/street-spirits-feature.js.
  */
 
-import { SOLO_PC_LABEL } from './pc-label.js?v=81bf3550';
+import { SOLO_PC_LABEL } from './pc-label.js?v=d54da634';
 import {
   CONVERSATION_RULES,
   CONVO_BUBBLE_CHOICES,
@@ -58,7 +58,7 @@ import {
   offerRules,
   offeredForClass,
   recordOffer,
-} from './conversations.js?v=713258bc';
+} from './conversations.js?v=8b5536cc';
 
 export { CONVO_BUBBLE_CHOICES };
 

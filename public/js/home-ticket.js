@@ -27,6 +27,7 @@
 import { addItem, countItem, ensureItem, removeItem } from './inventory.js?v=3be7988a';
 import { HOME_STYLES, imagineHome, normalizeHomeState } from './homes.js?v=dca6b2cd';
 import { LINES, talkPages } from './newxp.js?v=43f8df2c';
+import { SOLO_PC_LABEL, sentenceLabel } from './pc-label.js?v=d54da634';
 
 export const HOME_TICKET_CLASS = 'homestreet_ticket';
 
@@ -78,9 +79,9 @@ export function ticketCount(inv) {
  */
 export function rockTicketBeats(name = 'friend') {
   const plain = (html) => String(html || '').replace(/<br\s*\/?>/g, ' ').replace(/\s+/g, ' ').trim();
-  const pages = talkPages(LINES.rockTicket, { name }, 'OK').map((p) => ({ text: plain(p.text), response: p.button }));
-  // The source opens on pc.getLabel(); a remake save may have no name, so "Friend, my new chum."
-  if (pages[0]) pages[0].text = pages[0].text.charAt(0).toUpperCase() + pages[0].text.slice(1);
+  // The source opens on pc.getLabel(): your name online as written, solo's "friend" as "Friend, my new chum."
+  const label = sentenceLabel(String(name || '').trim() || SOLO_PC_LABEL);
+  const pages = talkPages(LINES.rockTicket, { name: label }, 'OK').map((p) => ({ text: plain(p.text), response: p.button }));
   return [...pages, { text: LINES.rockOhRight, response: 'Yes …' }];
 }
 
@@ -126,7 +127,7 @@ export function offerHomeTicket(host) {
   host.dialogue?.({
     title: 'Magic Rock',
     kicker: 'Magic Rock',
-    beats: rockTicketBeats(host.name || 'friend'),
+    beats: rockTicketBeats(host.name),
     onComplete: () => {
       if (giveHomeTicket(host.inv)) host.activity?.(TICKET_GIVEN);
       host.changed?.(false);

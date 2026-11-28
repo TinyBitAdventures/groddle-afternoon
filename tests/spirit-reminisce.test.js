@@ -10,8 +10,8 @@ import { existsSync, readFileSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { loadContentCatalogsFromDir, resetContentCatalogs, getQuestCatalog } from '../public/js/content-catalogs.js?v=c9b84764';
-import { createQuestState } from '../public/js/quests.js?v=f68437db';
-import { ensureQuestOfferState, npcQuestOffers, pendingQuestOffers, waitingOffers } from '../public/js/quest-offers.js?v=7e00498b';
+import { createQuestState } from '../public/js/quests.js?v=d9b316eb';
+import { ensureQuestOfferState, npcQuestOffers, pendingQuestOffers, waitingOffers } from '../public/js/quest-offers.js?v=9e1855e7';
 import {
   REMINISCE_VERB,
   SPIRIT_REMINISCE_TEXT,
@@ -20,7 +20,7 @@ import {
   isStreetSpiritClass,
   spiritReminisceOffers,
   withReminisceVerb,
-} from '../public/js/spirit-reminisce.js?v=a50b40dc';
+} from '../public/js/spirit-reminisce.js?v=54008539';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const gsjs = join(root, '../glitch-GameServerJS');

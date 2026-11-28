@@ -67,15 +67,15 @@ import { PROTO_DEPLETED_ART } from '../home-proto-art.js?v=9309e9f3';
 import { NOTE_POLE_CONTAINERS, NOTE_POLE_PARTS, NOTE_POLE_SIGN_Y } from '../note-pole-art.js?v=fbda2f8a';
 import { textureFromUrl } from '../textures.js?v=b8e38103';
 import { addSignBoard, signArmWidth, signLabel } from '../street-render.js?v=e7e9dfda';
-import { addQuarterArm } from './quarter-feature.js?v=66fa9b89';
+import { addQuarterArm } from './quarter-feature.js?v=6de16387';
 import { QUARTER_TEXT, normalizeHeld } from '../quarter.js?v=e278522a';
 import { openNotePicker, openNoteView } from '../note-view.js?v=c512b345';
-import { homeStreetName, insideQuery, possessive, readVisitScene } from '../neighbours-mp.js?v=0896a4d7';
-import { BACK_YARD_GROUND_Y, SIGN_PROMPT_LIFT, STREET_GROUND_Y, homesFeature, visitorHomeState } from './homes-feature.js?v=f8a3284c';
-import { BENCH_ART, towerApi } from './home-tower-feature.js?v=b70a09c0';
+import { homeStreetName, insideQuery, possessive, readVisitScene } from '../neighbours-mp.js?v=55e3976b';
+import { BACK_YARD_GROUND_Y, SIGN_PROMPT_LIFT, STREET_GROUND_Y, homesFeature, visitorHomeState } from './homes-feature.js?v=e7d81c0a';
+import { BENCH_ART, towerApi } from './home-tower-feature.js?v=10826be6';
 import { readTowerFloorWire, towerFloorProject, towerFloorWire } from '../home-tower.js?v=a7fc0cce';
-import { projectApi } from './street-jobs-feature.js?v=e92fd4cf';
-import { giveCarriedNote, takeCarriedNote, writtenCarriedNotes } from './street-furniture-feature.js?v=734fa872';
+import { projectApi } from './street-jobs-feature.js?v=0523a38a';
+import { giveCarriedNote, takeCarriedNote, writtenCarriedNotes } from './street-furniture-feature.js?v=eb7f586a';
 import { saveStore, savedThrough } from '../save-store.js?v=1ccb1d6b';
 import {
   GOOD_NEIGHBOUR_AT,
@@ -113,7 +113,7 @@ import {
   saleVerbs,
   signpostArms,
   signpostCandidates,
-} from '../home-street-mp.js?v=2af2d58f';
+} from '../home-street-mp.js?v=dfccbcf7';
 import { standOnFeet } from '../sprite-feet.js?v=6283b688';
 import { WORLD_FONT_FAMILY } from '../world-text.js?v=6b49f88c';
 

@@ -92,10 +92,10 @@ import { clockOffset } from '../street-creatures.js?v=6831f6b2';
 import { itemZ } from '../item-bands.js?v=ec366be3';
 import { topUpMetabolic } from '../metabolics.js?v=48f784bf';
 import { offlineLine, sharedOffline } from '../online-request.js?v=5fa7a635';
+// {name} in the Fox Ranger's lines (npc_fox_ranger.js pc.label): your name online, "friend" solo.
+import { pcLabel } from '../pc-label.js?v=d54da634';
 
 export const FOX_FEATURE_ID = 'foxes';
-/** {name} in the Fox Ranger's lines: the remake has no player names in solo, so "friend", as quests.js fills {pc_label}. */
-const PLAYER_NAME = 'friend';
 const FOX_SCALE = 0.95;
 const RANGER_SCALE = 1.3;
 const BAIT_SCALE = 0.9;
@@ -828,7 +828,7 @@ function performBrush(engine, entity, { ignoreReach = false } = {}) {
 // ---------------------------------------------------------------------------
 
 function rangerSay(engine, text, ms = 4000) {
-  if (ranger?.target) engine.say(ranger.target, fillName(text, PLAYER_NAME), ms);
+  if (ranger?.target) engine.say(ranger.target, fillName(text, pcLabel(engine)), ms);
 }
 
 function rangerDialog(engine, { text, beats, accept, decline, onAccept, onDecline, key }) {
@@ -837,7 +837,7 @@ function rangerDialog(engine, { text, beats, accept, decline, onAccept, onDeclin
     ranger.talking = true;
     rangerClip(engine, 'talk', true);
   }
-  const list = beats || [{ text: fillName(String(text).replace(/<[^>]+>/g, ''), PLAYER_NAME), response: accept }];
+  const list = beats || [{ text: fillName(String(text).replace(/<[^>]+>/g, ''), pcLabel(engine)), response: accept }];
   const done = (fn) => () => {
     if (ranger) ranger.talking = false;
     if (typeof fn === 'function') fn();

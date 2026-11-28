@@ -145,8 +145,8 @@ import { loadRoadsFor, reachableStreets } from '../street-graph.js?v=d767f3a2';
 import { soundForQuoin } from '../sound-moments.js?v=3e66996f';
 import { IMAGINATION_UPGRADES } from '../imagination.js?v=1bdfd77c';
 import { EZ_COOKIN_TSID, EZ_FOOD, practiceScreen } from '../practice-streets.js?v=557238c1';
-import { assignQuest, completeQuest } from '../quests.js?v=f68437db';
-import { acceptOffer, enqueueQuestOffer, questAwardPayload, turnInQuest } from '../quest-offers.js?v=7e00498b';
+import { assignQuest, completeQuest } from '../quests.js?v=d9b316eb';
+import { acceptOffer, enqueueQuestOffer, questAwardPayload, turnInQuest } from '../quest-offers.js?v=9e1855e7';
 import { getQuestCatalog } from '../content-catalogs.js?v=c9b84764';
 import { locationEventsApi } from './location-events-feature.js?v=1c5b6340';
 import * as kit from '../quest-rooms/kit.js?v=f2c0da0c';
@@ -154,7 +154,7 @@ import { frameTexture, onLoaded, sourceFromUrl, textureFromUrl, whenLoaded } fro
 import { upgradeSource } from '../sprite-hires.js?v=dd070ce8';
 import { grantMoodXp } from '../mood-xp.js?v=e311b45c';
 import { displayTopOf, itemstackOverlayPoint, playPoofIn, playSheetOverlay, poofInAlpha } from '../overlay-art.js?v=e50bacca';
-import { HOME_MACHINE } from '../home-ticket.js?v=13473847';
+import { HOME_MACHINE } from '../home-ticket.js?v=dd4f1c0d';
 import { createAnimalState } from '../animals.js?v=0545dc77';
 import {
   AK_ANIMALS,

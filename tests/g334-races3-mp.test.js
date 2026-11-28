@@ -15,10 +15,10 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 import { loadContentCatalogsFromDir, getQuestCatalog } from '../public/js/content-catalogs.js?v=c9b84764';
-import { createQuestState } from '../public/js/quests.js?v=f68437db';
-import { pendingQuestOffers } from '../public/js/quest-offers.js?v=7e00498b';
+import { createQuestState } from '../public/js/quests.js?v=d9b316eb';
+import { pendingQuestOffers } from '../public/js/quest-offers.js?v=9e1855e7';
 import { MP_RACE_QUESTS, MULTIPLAYER_QUESTS, offerableMultiplayerQuest } from '../public/js/quests-mp.js?v=e697cec3';
-import { questOffersFeature } from '../public/js/features/quest-offers-feature.js?v=e2ba8b9c';
+import { questOffersFeature } from '../public/js/features/quest-offers-feature.js?v=50a92bf8';
 import { HUB_MAP_STREETS } from '../public/js/hub-maps-data.js?v=ffe222f1';
 import { HELL_LOCATION } from '../public/js/hell.js?v=0dba5774';
 import { HOG_MP_COURSE } from '../public/js/hog-haul-mp.js?v=67f873fe';

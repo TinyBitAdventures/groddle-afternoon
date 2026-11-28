@@ -61,7 +61,7 @@ import { getSkillCatalog } from '../content-catalogs.js?v=c9b84764';
 import { listRecipesProducing } from '../making.js?v=dc595568';
 import { GIANTS } from '../shrines.js?v=48318bec';
 import { giantDisplayName } from '../giant-names.js?v=0e295891';
-import { teleportationFeature } from './teleportation-feature.js?v=ce24e13e';
+import { teleportationFeature } from './teleportation-feature.js?v=1daecbe4';
 import {
   SOLO_DIVISOR,
   WORK_UNIT_MS,
@@ -120,7 +120,7 @@ import {
 } from '../street-jobs.js?v=76471e42';
 import { gateTerms } from '../subway.js?v=ea6921ff';
 import { forceMetabolic, gainMetabolic, loseEnergy } from '../metabolics.js?v=48f784bf';
-import { holdNote, placeIndex, questHold, questStoryKey } from '../quest-reach.js?v=1de854ff';
+import { holdNote, placeIndex, questHold, questStoryKey } from '../quest-reach.js?v=16c3faf9';
 import { fewestClosures, loadStreetGraph, reachableStreets, streetGraph, worldRoads } from '../street-graph.js?v=d767f3a2';
 import { doorKeysHeld } from '../doors.js?v=f815e7c8';
 import { openWorld } from '../open-roads.js?v=2e03b0a6';

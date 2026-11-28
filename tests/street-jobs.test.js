@@ -40,9 +40,9 @@ import {
   TROPHY_PIECES,
   planStreetTrophies,
 } from '../public/js/street-jobs.js?v=76471e42';
-import { streetJobsFeature } from '../public/js/features/street-jobs-feature.js?v=e92fd4cf';
-import { createAchievementState, applyAchievementProgress } from '../public/js/achievements.js?v=535c8952';
-import { applyRewards } from '../public/js/quests.js?v=f68437db';
+import { streetJobsFeature } from '../public/js/features/street-jobs-feature.js?v=0523a38a';
+import { createAchievementState, applyAchievementProgress } from '../public/js/achievements.js?v=bb7a59f6';
+import { applyRewards } from '../public/js/quests.js?v=d9b316eb';
 import { loadContentCatalogsFromDir, resetContentCatalogs } from '../public/js/content-catalogs.js?v=c9b84764';
 import { addItem, countItem } from '../public/js/inventory.js?v=3be7988a';
 import { ALLOWED_SHORTFALLS, gatedShortfalls, obtainableItems } from '../tools/job-obtainable.mjs';

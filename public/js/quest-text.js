@@ -12,6 +12,7 @@
  * reaches innerHTML.
  */
 import { decodeEntities } from './html-text.js?v=6bbf4d1f';
+import { currentPcLabel } from './pc-label.js?v=d54da634';
 
 // G955: the one entity decoder (js/html-text.js); a non-breaking space reads as a space here.
 const decodeText = (text) => decodeEntities(text).replace(/\u00a0/g, ' ');
@@ -35,9 +36,10 @@ function linkOf(attrs) {
  * Quest markup → segments: { text, bold?, italic?, link? } and { br: true }.
  * Line breaks in the source text (\r\n in offers) are breaks too, as in cleanQuestMarkup.
  * @param {string} raw
- * @param {{ playerLabel?: string }} [opts]  `{pc_label}`, the player's name in GSJS copy
+ * @param {{ playerLabel?: string }} [opts]  `{pc_label}`, the player's name in GSJS copy (default: your
+ *   name online, "friend" solo, js/pc-label.js currentPcLabel)
  */
-export function questTextSegments(raw = '', { playerLabel = 'friend' } = {}) {
+export function questTextSegments(raw = '', { playerLabel = currentPcLabel() } = {}) {
   const source = String(raw ?? '')
     .replace(/\{pc_label\}/g, playerLabel)
     .replace(/\r\n?/g, '\n');

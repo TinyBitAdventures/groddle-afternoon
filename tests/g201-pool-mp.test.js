@@ -17,7 +17,7 @@ import { join } from 'node:path';
 
 import { HOME_POOL_REFRESH_MS, collectAmount, normalizePool, poolView } from '../public/js/home-pool-mp.js?v=d04553e2';
 import { homePoolMpFeature } from '../public/js/features/home-pool-mp-feature.js?v=eda3419c';
-import { CULTIVATION_REWARDS_CAP, imgRewards, imgRewardLine } from '../public/js/magic-rock-home.js?v=c07b2327';
+import { CULTIVATION_REWARDS_CAP, imgRewards, imgRewardLine } from '../public/js/magic-rock-home.js?v=11f070be';
 import { DROP_TEXT, eatenStack, normalizeGroundStack, pigAnimalKey } from '../public/js/drops-mp.js?v=351593a6';
 import { dropsMpFeature } from '../public/js/features/drops-mp-feature.js?v=a34f5a9b';
 import { GAME_DAY_MS, GAME_EPOCH_MS, getGameDayKey } from '../public/js/game-day.js?v=57fecfcb';
@@ -134,7 +134,7 @@ describe('the game shows the site\'s pool (home-pool-mp)', () => {
   });
 
   it('the rock hands over the site\'s amount in multiplayer, after the site marked the day', async () => {
-    const { homesFeature } = await import('../public/js/features/homes-feature.js?v=f8a3284c');
+    const { homesFeature } = await import('../public/js/features/homes-feature.js?v=e7d81c0a');
     homesFeature.restore({ decor: {}, cult: {}, magicRock: { cultivate: 'cultivate_complete', changestyle: 'howto_shown', expand: 'howto_shown' } });
     const beats = [];
     const data = {};

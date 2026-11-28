@@ -31,7 +31,7 @@ import {
   applyAchievementProgress,
   createAchievementState,
   getAchievementProgress,
-} from '../public/js/achievements.js?v=535c8952';
+} from '../public/js/achievements.js?v=bb7a59f6';
 import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=c9b84764';
 
 const here = dirname(fileURLToPath(import.meta.url));

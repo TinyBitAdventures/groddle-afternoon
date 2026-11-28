@@ -421,7 +421,8 @@ test('client integration runs the real street, its HUD and deterministic QA', ()
   assert.match(game, /The memory's blue-and-white light is its own: no Dametime tint\.\n\s*currentStreet\.ownLight = true/);
   assert.match(game, /The memory's blue-and-white light is its own: no Dametime tint\.\n\s*ownLight: true/);
   assert.match(game, /const preserveAuthoredLight = Boolean\(currentStreet\?\.ownLight\)/);
-  assert.match(game, /SUMMERS_DAY_COMPLETION\.replace\('\{pc_label\}', 'friend'\)/);
+  // #759: {pc_label} is your name online, "friend" solo (js/pc-label.js).
+  assert.match(game, /SUMMERS_DAY_COMPLETION\)\s*\.replace\('\{pc_label\}', pcLabel\(engine\)\)/);
   assert.match(game, /dataset\.summerDayMainTsid/);
   assert.match(game, /dataset\.summerDayStreet = SUMMERS_DAY_STREET_TSID/);
   assert.match(html, /id="summers-day-hud"/);

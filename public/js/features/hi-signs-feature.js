@@ -66,7 +66,7 @@
  */
 
 import { isPhoneDevice } from '../touch-controls.js?v=8bc690ac';
-import { butlerApi } from './butler-feature.js?v=f0831179';
+import { butlerApi } from './butler-feature.js?v=b89310b7';
 import { gainMetabolic, metabolicGain, moodMax } from '../metabolics.js?v=48f784bf';
 import { frameTexture, sourceFromUrl } from '../textures.js?v=b8e38103';
 import { offlineLine } from '../online-request.js?v=5fa7a635';
@@ -120,13 +120,13 @@ import {
   yesterdayLine,
   yourSignLine,
 } from '../hi-signs-mp.js?v=3948e7ab';
+// The Butler's "Oh, thank you <label>." (butler_emotes.js respondToHi pc.getLabel()): your name online.
+import { pcLabel } from '../pc-label.js?v=d54da634';
 
 /** An art URL with its content key (js/data-urls.js groddleDataUrl); as it is in Node and on a page without the map. */
 const keyedArt = (url) => (typeof globalThis.groddleDataUrl === 'function' ? globalThis.groddleDataUrl(url) : url);
 
 export const HI_FEATURE_ID = 'hi-signs';
-/** The player's label in the Butler's lines (as BUTLER_INTRO: the remake's players have no name). */
-const PC_LABEL = 'friend';
 
 let p = normalizePlayerHi({});
 let eng = null;
@@ -494,7 +494,7 @@ function sayHiToButler(engine) {
     later(HI.BUTLER_RESPOND_MS, () => {
       const bb = butlerApi.hiState();
       if (!bb) return;
-      lastResponse = butlerHiResponse(bb, p, { now: nowMs(), label: PC_LABEL, rand: rng });
+      lastResponse = butlerHiResponse(bb, p, { now: nowMs(), label: pcLabel(engine), rand: rng });
       butlerApi.hiSay(engine, lastResponse, HI.BUTLER_BUBBLE_MS);
       publish(engine, true);
     }, 'butler');

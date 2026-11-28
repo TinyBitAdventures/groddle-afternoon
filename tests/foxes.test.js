@@ -38,10 +38,10 @@ import {
   inReach,
   isPreserveRow,
   preserveEcologyEntry,
-} from '../public/js/features/foxes-feature.js?v=23d510eb';
+} from '../public/js/features/foxes-feature.js?v=457450c1';
 import { wildlifeFor } from '../public/js/wildlife.js?v=670c3a7f';
 import { createFeatureHost } from '../public/js/feature-host.js?v=b87e2cbc';
-import { foxesFeature } from '../public/js/features/foxes-feature.js?v=23d510eb';
+import { foxesFeature } from '../public/js/features/foxes-feature.js?v=457450c1';
 import { bubbleMs, readMs } from '../public/js/read-time.js?v=3151fb1a';
 
 const ecology = JSON.parse(readFileSync(new URL('../public/assets/content/street-ecology.json', import.meta.url)));
@@ -445,7 +445,7 @@ describe("how long the Fox's and the Ranger's lines are sent for (G636)", () => 
     const says = [...feature.matchAll(/rangerSay\(engine, [^;]*;/g)].map((m) => m[0]).filter((call) => !call.startsWith('rangerSay(engine, text, ms'));
     assert.equal(says.length, 6);
     for (const call of says) assert.match(call, /FOX_RANGER_BUBBLE_MS\./, call);
-    assert.match(feature, /function rangerSay\(engine, text, ms = 4000\) \{\n  if \(ranger\?\.target\) engine\.say\(ranger\.target, fillName\(text, PLAYER_NAME\), ms\);\n\}/);
+    assert.match(feature, /function rangerSay\(engine, text, ms = 4000\) \{\n  if \(ranger\?\.target\) engine\.say\(ranger\.target, fillName\(text, pcLabel\(engine\)\), ms\);\n\}/);
     for (const line of [FOX_RANGER_TEXT.cancel, FOX_RANGER_TEXT.noBuy, FOX_RANGER_TEXT.noBuyLicense, FOX_RANGER_TEXT.overCapacityThanks, FOX_RANGER_TEXT.noBait, ...FOX_RANGER_TEXT.greetings]) {
       assert.ok(line.split(' ').length >= 7, line);
     }

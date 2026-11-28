@@ -25,7 +25,7 @@
  */
 
 import { androidBrowser, badgeCandidates, featTile, pickNudge, pickTip, projectTile, skillTile, START_TIPS, tipText } from '../start-today.js?v=e73894d1';
-import { listQuestTracker } from '../quests.js?v=f68437db';
+import { listQuestTracker } from '../quests.js?v=d9b316eb';
 import { skillArtFor } from '../familiar.js?v=b9597cd3';
 import { CARD_ART_LAYERS } from '../imagination-data.js?v=4a85e7fe';
 

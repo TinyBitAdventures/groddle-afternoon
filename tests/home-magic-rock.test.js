@@ -21,7 +21,7 @@ import {
   normalizeRockFlags,
   readHowto,
   rockVerbs,
-} from '../public/js/magic-rock-home.js?v=c07b2327';
+} from '../public/js/magic-rock-home.js?v=11f070be';
 import {
   CULTIVATION_REWARDS_CAP,
   HOUSE_SIGN,
@@ -33,7 +33,7 @@ import {
   imgRewardLine,
   imgRewards,
   rewardsCap,
-} from '../public/js/magic-rock-home.js?v=c07b2327';
+} from '../public/js/magic-rock-home.js?v=11f070be';
 import { getGameDayKey } from '../public/js/game-day.js?v=57fecfcb';
 
 const spike = join(import.meta.dirname, '..');
@@ -156,11 +156,11 @@ describe('source wording', { skip: !existsSync(ROCK_JS) }, () => {
  * shiftCKeyHandler 816-828; HouseManager.as startCultivation 102-118).
  */
 describe('the home street rock (G231)', async () => {
-  const { homesFeature } = await import('../public/js/features/homes-feature.js?v=f8a3284c');
-  const { towerApi } = await import('../public/js/features/home-tower-feature.js?v=b70a09c0');
-  const { shiftButlerRuntime } = await import('../public/js/features/butler-feature.js?v=f0831179');
+  const { homesFeature } = await import('../public/js/features/homes-feature.js?v=e7d81c0a');
+  const { towerApi } = await import('../public/js/features/home-tower-feature.js?v=10826be6');
+  const { shiftButlerRuntime } = await import('../public/js/features/butler-feature.js?v=b89310b7');
   const { homeEditing } = await import('../public/js/features/camera-mode-feature.js?v=8df6ad52');
-  const { newxpFeature, __newxpTest } = await import('../public/js/features/newxp-feature.js?v=78c78a39');
+  const { newxpFeature, __newxpTest } = await import('../public/js/features/newxp-feature.js?v=89ecc394');
   const street = { classId: 'magic_rock', state: { room: 'street' } };
   const yard = { classId: 'magic_rock', state: { room: 'yard' } };
   const towerQuest = { active: { build_a_tower: { started: 1 } }, completed: [], offers: {} };
@@ -285,7 +285,7 @@ describe('the home street rock (G231)', async () => {
  * (NCMsgHandler.as 3093-3096). Solo: no visitors, so only the stipend.
  */
 describe('the rock’s daily iMG and the house sign (G232)', async () => {
-  const { homesFeature } = await import('../public/js/features/homes-feature.js?v=f8a3284c');
+  const { homesFeature } = await import('../public/js/features/homes-feature.js?v=e7d81c0a');
   const street = { classId: 'magic_rock', state: { room: 'street' } };
   const yard = { classId: 'magic_rock', state: { room: 'yard' } };
   const quiet = { active: {}, completed: [], offers: {} };

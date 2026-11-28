@@ -15,6 +15,7 @@ import { questRewardModifier } from './imagination-effects.js?v=70169933';
 import { gainMetabolic } from './metabolics.js?v=48f784bf';
 import { giantDisplayName } from './giant-names.js?v=0e295891';
 import { decodeEntities } from './html-text.js?v=6bbf4d1f';
+import { currentPcLabel } from './pc-label.js?v=d54da634';
 
 /**
  * @typedef {{
@@ -85,17 +86,17 @@ export function parseQuestConversation(raw = '') {
 }
 
 /**
- * What `{pc_label}` (the player's name in GSJS copy) reads as. The remake has
- * no player names, so the copy says "friend", as A Summer's Day already did.
+ * What `{pc_label}` (the player's name in GSJS copy) reads as: your name online, "friend" in solo,
+ * which has no character name (js/pc-label.js currentPcLabel). setQuestPlayerLabel pins one (tests).
  */
-let questPlayerLabel = 'friend';
+let questPlayerLabel = '';
 export function setQuestPlayerLabel(label) {
-  questPlayerLabel = String(label || '').trim() || 'friend';
+  questPlayerLabel = String(label || '').trim();
 }
 
 export function cleanQuestMarkup(raw = '') {
   return String(raw || '')
-    .replace(/\{pc_label\}/g, questPlayerLabel)
+    .replace(/\{pc_label\}/g, questPlayerLabel || currentPcLabel())
     .replace(/<br\s*\/?>/gi, '\n')
     .replace(/<a\b[^>]*>(.*?)<\/a>/gis, '$1')
     .replace(/<b\b[^>]*>(.*?)<\/b>/gis, '$1')

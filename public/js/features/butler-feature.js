@@ -73,13 +73,13 @@
 
 import { ITEM_CATALOG, addItem, countItem, ensureItem, itemIcon, listPackItemSlots, removeItem } from '../inventory.js?v=3be7988a';
 import { homeStreetLayout, towerItem } from '../home-cultivation.js?v=122d6f45';
-import { homesFeature } from './homes-feature.js?v=f8a3284c';
-import { towerApi } from './home-tower-feature.js?v=b70a09c0';
+import { homesFeature } from './homes-feature.js?v=e7d81c0a';
+import { towerApi } from './home-tower-feature.js?v=10826be6';
 import { levelInfoForXp } from '../progression.js?v=05ff0260';
 import { frameTexture, sourceFromUrl, textureFromUrl } from '../textures.js?v=b8e38103';
 import { NEIGHBOURS, NEIGHBOUR_ITEMS, neighbourById } from '../neighbours.js?v=13f35acd';
 import { BUTLER_FEET, BUTLER_RIG_SCALE, ButlerPainter, butlerRigNow, loadButlerRig, paintPortrait, portraitUrl } from '../butler-rig.js?v=a709fbf2';
-import { acceptOffer, declineOffer, npcQuestOffers, questStatus } from '../quest-offers.js?v=7e00498b';
+import { acceptOffer, declineOffer, npcQuestOffers, questStatus } from '../quest-offers.js?v=9e1855e7';
 import { getQuestCatalog } from '../content-catalogs.js?v=c9b84764';
 import { displayTopOf, itemstackOverlayPoint, playSheetOverlay } from '../overlay-art.js?v=e50bacca';
 import {
@@ -144,15 +144,16 @@ import {
   takeVisitorDelivery,
   teachButler,
   visitorsReport,
-} from '../butler.js?v=5d1199a7';
+} from '../butler.js?v=bea39213';
 import { itemZ } from '../item-bands.js?v=ec366be3';
 import { STREET_INDEX } from '../street-loader.js?v=10376267';
 import { holdMs, longReadMs } from '../read-time.js?v=3151fb1a';
 import { createItemPicker } from '../ui/item-picker.js?v=97073a07';
-import { registerOwnButlerDrop } from '../butler-drop.js?v=ad6b1361';
+import { registerOwnButlerDrop } from '../butler-drop.js?v=c34d4683';
 import { takeDragged } from '../drag-stack.js?v=c7008276';
 import { worldPoint } from './world-drop-feature.js?v=9c6c24c2';
 import { standOnFeet } from '../sprite-feet.js?v=6283b688';
+import { pcLabel } from '../pc-label.js?v=d54da634';
 import { autoplayLog } from '../autoplay-log.js?v=55bb4823';
 import { leavingWire, markLeaving, packPicks, pickKey, receiveWire, takeCopies } from '../copy-picks.js?v=b368fd49';
 
@@ -837,7 +838,7 @@ function doIntro(engine) {
   if (!view?.butler) return;
   st.introDone = true;
   engine.save?.();
-  line(engine, 'intro', BUTLER_INTRO(), BUTLER_INTRO_REPLY);
+  line(engine, 'intro', BUTLER_INTRO(pcLabel(engine)), BUTLER_INTRO_REPLY);
 }
 
 // ---------------------------------------------------------------------------

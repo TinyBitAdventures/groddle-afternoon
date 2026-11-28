@@ -138,8 +138,8 @@ import {
   putOffOffer,
   questMoveNote,
   turnInQuest,
-} from '../quest-offers.js?v=7e00498b';
-import { parseQuestConversation } from '../quests.js?v=f68437db';
+} from '../quest-offers.js?v=9e1855e7';
+import { parseQuestConversation } from '../quests.js?v=d9b316eb';
 import { getQuestCatalog } from '../content-catalogs.js?v=c9b84764';
 import { addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=3be7988a';
 import { runStreetTransition } from '../screen-fx.js?v=7cd62cca';
@@ -215,7 +215,7 @@ const ROOM_MODULES = {
   top_of_tree: () => import('../quest-rooms/top-of-tree.js?v=a9458e4e'),
   color_unblocking: () => import('../quest-rooms/color-unblocking.js?v=6b54b57d'),
   vision_quest: () => import('../quest-rooms/vision-quest.js?v=bd226b63'),
-  kids_room: () => import('../quest-rooms/kids-room.js?v=ce5060df'),
+  kids_room: () => import('../quest-rooms/kids-room.js?v=340fef43'),
   rube_yard: () => import('../quest-rooms/rube-yard.js?v=40929097'),
   le_miserable: () => import('../quest-rooms/le-miserable.js?v=7677519e'),
   juju_camp: () => import('../quest-rooms/juju-camp.js?v=f0277ae5'),
@@ -224,11 +224,11 @@ const ROOM_MODULES = {
   an_autumn_day: () => import('../quest-rooms/an-autumn-day.js?v=e78fb51e'),
   being_watched: () => import('../quest-rooms/being-watched.js?v=81d3c089'),
   back_alley: () => import('../quest-rooms/back-alley.js?v=bdcc41a2'),
-  clubhouse: () => import('../quest-rooms/clubhouse.js?v=ef107c12'),
+  clubhouse: () => import('../quest-rooms/clubhouse.js?v=0c9d9e03'),
   light_perspective: () => import('../quest-rooms/light-perspective.js?v=b722ef54'),
   tile_puzzle: () => import('../quest-rooms/tile-puzzle.js?v=d63f81c2'),
   operation_grow: () => import('../quest-rooms/operation-grow.js?v=89291819'),
-  gwendolyn: () => import('../quest-rooms/gwendolyn.js?v=4a8b4aaf'),
+  gwendolyn: () => import('../quest-rooms/gwendolyn.js?v=7b10006c'),
   mental_block: () => import('../quest-rooms/mental-block.js?v=082f3223'),
   penalty: () => import('../quest-rooms/penalty.js?v=57dee622'),
   esquibeth: () => import('../quest-rooms/esquibeth.js?v=68ef2da0'),

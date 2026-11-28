@@ -28,7 +28,7 @@ import { fileURLToPath } from 'node:url';
 import {
   CHOOSER_MIN_W, GAP, PILL_IDS, STICK, TAP_H, boxesOverlap, chooserRoomOf, fullScreenWay, layoutProblems, menuRoomOf, phoneRegions, pillBadge, socialPillCount, stickRegionOf, streetFloorOf,
 } from '../public/js/ui/phone-layout.js?v=7ebe8992';
-import { phonePins } from '../public/js/ui/quest-pin-button.js?v=2931d81d';
+import { phonePins } from '../public/js/ui/quest-pin-button.js?v=9b768a79';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const read = (p) => readFileSync(join(root, p), 'utf8');

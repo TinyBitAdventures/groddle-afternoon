@@ -11,7 +11,7 @@ import { normalizeEmotionalBearState } from './emotional-bear.js?v=1c88a46a';
 import { normalizeHomeState } from './homes.js?v=dca6b2cd';
 import { normalizeMailboxState } from './mailbox.js?v=d50d0d05';
 import { normalizeFeatureSlices } from './feature-host.js?v=b87e2cbc';
-import { adoptHiddenSums, normalizeQuestOfferState } from './quest-offers.js?v=7e00498b';
+import { adoptHiddenSums, normalizeQuestOfferState } from './quest-offers.js?v=9e1855e7';
 import { cleanBuild } from './save-build.js?v=588eae75';
 
 export const PLAYER_SAVE_VERSION = 7;

@@ -13,9 +13,9 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { getQuestCatalog, loadContentCatalogsFromDir, resetContentCatalogs } from '../public/js/content-catalogs.js?v=c9b84764';
-import { createQuestState } from '../public/js/quests.js?v=f68437db';
-import { listDeclinedOffers, markOffered, offerCanWait, putOffOffer, waitingOffers } from '../public/js/quest-offers.js?v=7e00498b';
-import { questOffersFeature, waitingOfferCards } from '../public/js/features/quest-offers-feature.js?v=e2ba8b9c';
+import { createQuestState } from '../public/js/quests.js?v=d9b316eb';
+import { listDeclinedOffers, markOffered, offerCanWait, putOffOffer, waitingOffers } from '../public/js/quest-offers.js?v=9e1855e7';
+import { questOffersFeature, waitingOfferCards } from '../public/js/features/quest-offers-feature.js?v=50a92bf8';
 import { questCardTab } from '../public/js/ui/quest-sheet.js?v=7409d5d8';
 
 const PUBLIC = join(dirname(fileURLToPath(import.meta.url)), '../public');

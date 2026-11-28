@@ -13,8 +13,8 @@ import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { FakeEl } from './social-fake-dom.js';
-import { createQuestPinButton, phonePins, pinButtonFace, pinStepKey, pinStepLine, PIN_LINE_MS } from '../public/js/ui/quest-pin-button.js?v=2931d81d';
-import { createQuestTracker } from '../public/js/ui/quest-tracker.js?v=9aeb6645';
+import { createQuestPinButton, phonePins, pinButtonFace, pinStepKey, pinStepLine, PIN_LINE_MS } from '../public/js/ui/quest-pin-button.js?v=9b768a79';
+import { createQuestTracker } from '../public/js/ui/quest-tracker.js?v=f5f9ee07';
 import { failedQuestPin } from '../public/js/ui/quest-sheet.js?v=7409d5d8';
 
 const PUBLIC = join(dirname(fileURLToPath(import.meta.url)), '../public');

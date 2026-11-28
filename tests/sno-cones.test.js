@@ -24,7 +24,7 @@ import {
   applyAchievementProgress,
   createAchievementState,
   seedAchievementNearCompletion,
-} from '../public/js/achievements.js?v=535c8952';
+} from '../public/js/achievements.js?v=bb7a59f6';
 import { getGameDayKey } from '../public/js/game-day.js?v=57fecfcb';
 import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=c9b84764';
 

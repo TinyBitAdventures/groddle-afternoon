@@ -12,7 +12,7 @@ import { execFileSync } from 'node:child_process';
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { createAchievementState, applyAchievementProgress, unlockAchievement } from '../public/js/achievements.js?v=535c8952';
+import { createAchievementState, applyAchievementProgress, unlockAchievement } from '../public/js/achievements.js?v=bb7a59f6';
 import { loadContentCatalogsFromDir, getAchievementCatalog } from '../public/js/content-catalogs.js?v=c9b84764';
 import {
   GREETING_LOCATIONS, TRANSIT_STATIONS, applyStreetVisit, availableHubStreets, countsTowardHub, streetVisitCounters, topUpCompletists,

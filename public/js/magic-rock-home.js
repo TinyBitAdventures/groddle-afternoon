@@ -227,8 +227,8 @@ export function imgRewardLine(amount) {
 
 /**
  * onPlayerCollision (magic_rock.js 992-1001): the bubble while there is iMG
- * to hand over, for 10 s. The remake has no player names ("friend", as
- * quests.js reads {pc_label}).
+ * to hand over, for 10 s. pc.label: your name online, "friend" solo
+ * (js/pc-label.js).
  */
 export const IMG_BUBBLE_MS = 10 * 1000;
 export function imgBubbleText(name = 'friend') {

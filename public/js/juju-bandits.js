@@ -46,6 +46,7 @@
  * you stay past the 9 minutes where every Dust Trap payout brings a thief;
  * Dust Trap remnants and Ancestral Spirits take time off it.
  */
+import { sentenceLabel } from './pc-label.js?v=d54da634';
 
 export const JUJU_SOURCE = 'tinyspeck/glitch-GameServerJS CC0 items/npc_juju_bandit.js, players/inc_special_locations.js, items/dust_trap.js';
 
@@ -272,15 +273,17 @@ export function itemWords(classTsid) {
 /** Fill {pc}, {item}, {name}, {plural}. */
 export function jujuLine(template, pcLabel = JUJU_PLAYER_LABEL, classTsid = null) {
   const words = classTsid ? itemWords(classTsid) : { item: '', name: '', plural: '' };
-  const out = String(template)
-    .replaceAll('{pc}', pcLabel || JUJU_PLAYER_LABEL)
+  const label = String(pcLabel || '').trim() || JUJU_PLAYER_LABEL;
+  // A line opening on the label: solo's "friend" is "Friend", a name online stays as written.
+  return String(template)
+    .replace(/^\{pc\}/, sentenceLabel(label))
+    .replaceAll('{pc}', label)
     .replaceAll('{item}', words.item)
     .replaceAll('{name}', words.name)
     .replaceAll('{plural}', words.plural);
-  return out.charAt(0).toUpperCase() + out.slice(1);
 }
 
-/** pc.label: the remake has no player names, so GSJS copy says "friend" (js/quests.js). */
+/** pc.label: your name online (js/pc-label.js); solo has no names, so GSJS copy says "friend". */
 export const JUJU_PLAYER_LABEL = 'friend';
 
 /**

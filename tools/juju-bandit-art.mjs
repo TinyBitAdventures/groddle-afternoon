@@ -28,7 +28,7 @@ import { mkdirSync, readdirSync, rmSync, mkdtempSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import os from 'node:os';
-import { JUJU_SHEETS, JUJU_VARIANTS, JUJU_BANDANAS, JUJU_CELL } from '../public/js/juju-bandits.js?v=0d3af5fe';
+import { JUJU_SHEETS, JUJU_VARIANTS, JUJU_BANDANAS, JUJU_CELL } from '../public/js/juju-bandits.js?v=c350ebba';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const OGA = join(os.homedir(), 'Documents/glitch-audit/opengameart/extracted_juju_camp/glitch-assets');

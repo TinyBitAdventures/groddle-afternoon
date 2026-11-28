@@ -231,14 +231,14 @@ import { RADIO_TEXT, radioOwned } from '../vine-radio.js?v=5436aa09';
 import { displayTopOf, itemstackOverlayPoint, overlayAlpha, overlayLifeMs, playPoofIn, trackOverlay } from '../overlay-art.js?v=e50bacca';
 import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=37ad5c9f';
 import { fadeInNewNear } from '../poof-fade.js?v=57db6aea';
-import { projectApi } from './street-jobs-feature.js?v=e92fd4cf';
+import { projectApi } from './street-jobs-feature.js?v=0523a38a';
 import { TOWER_CHASSIS, TOWER_CONFIG, TOWER_DOOR_DX, TOWER_GEO, TOWER_PROTO, normalizeTowerState } from '../home-tower.js?v=a7fc0cce';
-import { drawTowerBench, drawTowerElevator, drawTowerExit, towerApi, visitorTowerView } from './home-tower-feature.js?v=b70a09c0';
+import { drawTowerBench, drawTowerElevator, drawTowerExit, towerApi, visitorTowerView } from './home-tower-feature.js?v=10826be6';
 import { pieceUrl, roomPieces, surfaceAt, swatchPiece, wallTargetAt } from '../home-wallpaper.js?v=5d3594e4';
 import { renderHomeLocation } from '../home-shot-render.js?v=be7225d2';
 import { maxTextureSizeOf, sharpDeco, wantsHiresDecos } from '../deco-hires.js?v=34f36d77';
 import { SHARP_DECOS } from '../deco-sharp-list.js?v=7d615f20';
-import { resourceNodeStill, resourceNodesFeature } from './resource-nodes-feature.js?v=f2e32ec0';
+import { resourceNodeStill, resourceNodesFeature } from './resource-nodes-feature.js?v=1c2c7f81';
 import { patchesFeature, plotStill } from './patches-feature.js?v=3c48ab02';
 import { GROWN_TREE_LABELS, createPlot, growTree, plotLabel } from '../patches.js?v=54430bb9';
 import { WOTD_DEPLETE_MS, WOTD_TEXT, nearestPourTarget, pourButton, pourConditions, pourConfirmText } from '../wine-pour.js?v=6daa23a7';
@@ -279,9 +279,9 @@ import {
   readHowto,
   rockVerbs,
   ROCK_VERB_IDS,
-} from '../magic-rock-home.js?v=c07b2327';
+} from '../magic-rock-home.js?v=11f070be';
 import { getGameDayKey } from '../game-day.js?v=57fecfcb';
-import { HOME_TICKET, HOME_TICKET_CLASS } from '../home-ticket.js?v=13473847';
+import { HOME_TICKET, HOME_TICKET_CLASS } from '../home-ticket.js?v=dd4f1c0d';
 import { pickFront } from '../pick.js?v=a43f94f8';
 import { MIN_GROUND_CLEARANCE, yCamOffsetAnchor } from '../movement.js?v=f4be1a05';
 import { LANDSCAPE_VIEW_W, landscapeWindow, rowRange, soilTiles } from '../landscape-reach.js?v=2f2d7cb3';
@@ -324,6 +324,7 @@ import { closeHousePicker, housePickerOpen, openHousePicker, refreshHousePicker 
 import { YARD_WALL_DX } from '../yard-wander.js?v=d73cf478';
 import { housePlace, isHomeMachineClass, towerPlace } from '../home-machines.js?v=c72cb353';
 import { drawStandMark } from '../home-stack-marks.js?v=67b44287';
+import { pcLabel } from '../pc-label.js?v=d54da634';
 
 export const HOMES_FEATURE_ID = 'homes';
 const HOME_STREET_TSID = 'RH_HOME_EXT';
@@ -1396,7 +1397,7 @@ function rockImgBubble(engine) {
   if (Math.abs(p.x - rock.sprite.x) > 90) return;
   rockBubbled = true;
   if (!rockImgToCollect(engine)) return;
-  rockBubble = engine.say?.(rock, imgBubbleText(), IMG_BUBBLE_MS) || null;
+  rockBubble = engine.say?.(rock, imgBubbleText(pcLabel(engine)), IMG_BUBBLE_MS) || null;
 }
 
 /**

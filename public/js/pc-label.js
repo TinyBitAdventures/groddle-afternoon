@@ -12,6 +12,24 @@ export function pcLabel(engine) {
 }
 
 /**
+ * Copy filled where no engine is to hand (quest text: js/quests.js cleanQuestMarkup, js/quest-text.js):
+ * game.js points this at pcLabel(engine) once at boot, so it reads your name online and "friend" solo.
+ */
+let labelSource = null;
+export function setPcLabelSource(fn) {
+  labelSource = typeof fn === 'function' ? fn : null;
+}
+export function currentPcLabel() {
+  let label = '';
+  try {
+    label = labelSource ? String(labelSource() || '').trim() : '';
+  } catch {
+    label = '';
+  }
+  return label || SOLO_PC_LABEL;
+}
+
+/**
  * {pc_label} starting a sentence: Glitch put the player's name there, which starts with a capital
  * (npc_bureaucrat.js 425 "<b>"+label+"</b>! We will be with you..."), so solo's "friend" is "Friend".
  * A name played under online is kept as written.

@@ -82,7 +82,7 @@ import {
   parseQuestConversation,
   cleanQuestMarkup,
   eventToCounter,
-} from './quests.js?v=f68437db';
+} from './quests.js?v=d9b316eb';
 
 /** Original: only one offer every 5 minutes (quests_offer delay = 60 * 5). */
 export const OFFER_INTERVAL_MS = 5 * 60 * 1000;

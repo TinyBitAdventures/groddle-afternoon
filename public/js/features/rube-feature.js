@@ -47,6 +47,7 @@ import {
 import { frameTexture, isLoaded, onLoaded, sourceFromUrl } from '../textures.js?v=b8e38103';
 import { itemZ } from '../item-bands.js?v=ec366be3';
 import { standOnFeet } from '../sprite-feet.js?v=6283b688';
+import { pcLabel } from '../pc-label.js?v=d54da634';
 
 export const RUBE_FEATURE_ID = 'rube';
 const SONG = 'assets/audio/ambient/The_Rube_Song_1290596637.mp3';
@@ -540,7 +541,7 @@ export const rubeFeature = {
         setClip(engine, 'walk_end', () => rube?.phase === 'waiting' && setClip(engine, 'talk'));
         if (!rube.called) {
           rube.called = true;
-          engine.say?.(rube.target, RUBE_TEXT.hello('friend'), 20000);
+          engine.say?.(rube.target, RUBE_TEXT.hello(pcLabel(engine)), 20000);
         }
       }
     }

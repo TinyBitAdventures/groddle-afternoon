@@ -25,10 +25,10 @@ import { closedForEveryone, freeWays, openWorld } from '../public/js/open-roads.
 import { TELEPORTERS } from '../public/js/hidden-floors.js?v=023336cb';
 import { WINTRY_PORTAL_TELEPORTERS } from '../public/js/wintry-portal.js?v=1437deda';
 import { applyStreetIndex } from '../public/js/street-loader.js?v=10376267';
-import { streetJobsFeature } from '../public/js/features/street-jobs-feature.js?v=e92fd4cf';
+import { streetJobsFeature } from '../public/js/features/street-jobs-feature.js?v=0523a38a';
 import { STARTER_LANDING, openBootTarget } from '../public/js/ancestral-nostalgia.js?v=7c972d9f';
 import { NOSTALGIA_BOOT_STREETS } from '../public/js/ancestral-nostalgia-data.js?v=0adb9184';
-import { FEATURES } from '../public/js/features/index.js?v=b34d8a74';
+import { FEATURES } from '../public/js/features/index.js?v=282a15fd';
 import { createBuffState, applyBuff, hasBuff, removeBuff } from '../public/js/buffs.js?v=09184e60';
 
 const root = join(import.meta.dirname, '..');

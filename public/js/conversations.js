@@ -59,7 +59,7 @@
  */
 
 import { CONVERSATIONS, TELLERS } from './conversations-data.js?v=f11b7e02';
-import { SOLO_PC_LABEL } from './pc-label.js?v=81bf3550';
+import { SOLO_PC_LABEL } from './pc-label.js?v=d54da634';
 
 export const CONVERSATION_RULES_SOURCE = 'tinyspeck/glitch-GameServerJS players/inc_conversations.js (CC0)';
 
