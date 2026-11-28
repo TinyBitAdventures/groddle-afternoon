@@ -2814,9 +2814,14 @@
   "deployed": "2026-11-28"
  },
  "git": {
-  "commits": 3964,
+  "commits": 3967,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-28",
+    "kind": "improve",
+    "text": "A buddy going on and off quickly no longer pops \"is online\" and \"went offline\" each time"
+   },
    {
     "date": "2026-11-28",
     "kind": "fix",
