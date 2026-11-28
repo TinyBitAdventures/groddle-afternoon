@@ -27,7 +27,7 @@ import {
   underIcicle,
 } from '../public/js/winter-icicles.js?v=5d9616ef';
 import { GLITCH_ONE_CLICK, oneClickChoice } from '../public/js/world-context-menu.js?v=00e2eb03';
-import { rebuiltRoomsFeature, tapIcicle } from '../public/js/features/rebuilt-rooms-feature.js?v=3a0ea434';
+import { rebuiltRoomsFeature, tapIcicle } from '../public/js/features/rebuilt-rooms-feature.js?v=03b41e3f';
 import { WINTER_WALK_FLOOR_Y, WINTER_WALK_ICICLES, WINTER_WALK_PILLARS, winterWalkStreet } from '../public/js/winter-walk-streets.js?v=c921bf92';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');

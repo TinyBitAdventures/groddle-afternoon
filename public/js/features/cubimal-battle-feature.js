@@ -47,7 +47,7 @@ import {
   cubimalTagName,
   cubimalTagWith,
 } from '../cubimal-battle.js?v=82bf52c9';
-import { standOnFeet } from '../sprite-feet.js?v=849541a8';
+import { standOnFeet } from '../sprite-feet.js?v=6283b688';
 
 export const CUBIMAL_BATTLE_FEATURE_ID = 'cubimal-battle';
 const SOLO_ID = 'solo';

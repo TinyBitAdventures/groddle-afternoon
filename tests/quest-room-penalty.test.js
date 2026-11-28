@@ -40,7 +40,7 @@ import {
   cellStep,
   hasWorkingTool,
   room,
-} from '../public/js/quest-rooms/penalty.js?v=78c900a7';
+} from '../public/js/quest-rooms/penalty.js?v=57dee622';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const GSJS = join(homedir(), 'Documents/glitch-audit/glitch-GameServerJS');

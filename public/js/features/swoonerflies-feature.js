@@ -28,7 +28,7 @@ import {
 } from '../swoonerflies.js?v=326c8103';
 import { itemZ } from '../item-bands.js?v=ec366be3';
 import { hideNameTip, wireNameTip } from '../world-name-tip.js?v=78a0ca81';
-import { standOnFeet } from '../sprite-feet.js?v=849541a8';
+import { standOnFeet } from '../sprite-feet.js?v=6283b688';
 
 export const SWOONERFLIES_FEATURE_ID = 'swoonerflies';
 

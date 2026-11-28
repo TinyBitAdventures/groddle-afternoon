@@ -12,7 +12,7 @@ import { fileURLToPath } from 'node:url';
 import { homedir } from 'node:os';
 
 import * as kit from '../public/js/quest-rooms/kit.js?v=f2c0da0c';
-import { JUMP_RISE, JUMP_GAP } from '../public/js/quest-rooms/puzzle-kit.js?v=6b5e8bd9';
+import { JUMP_RISE, JUMP_GAP } from '../public/js/quest-rooms/puzzle-kit.js?v=273b9856';
 import {
   DAIS,
   DRINK_TEXT,
@@ -32,7 +32,7 @@ import {
   napPlatforms,
   room,
   watching,
-} from '../public/js/quest-rooms/being-watched.js?v=98957885';
+} from '../public/js/quest-rooms/being-watched.js?v=81d3c089';
 import { QUEST_ROOMS } from '../public/js/quest-rooms/catalog.js?v=f37a25ba';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');

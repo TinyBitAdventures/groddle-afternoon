@@ -66,16 +66,16 @@ import { signpostX as fixtureSignpostX } from '../home-street-fixtures.js?v=d4e5
 import { PROTO_DEPLETED_ART } from '../home-proto-art.js?v=9309e9f3';
 import { NOTE_POLE_CONTAINERS, NOTE_POLE_PARTS, NOTE_POLE_SIGN_Y } from '../note-pole-art.js?v=fbda2f8a';
 import { textureFromUrl } from '../textures.js?v=b8e38103';
-import { addSignBoard, signArmWidth, signLabel } from '../street-render.js?v=91152d38';
-import { addQuarterArm } from './quarter-feature.js?v=627fc03a';
+import { addSignBoard, signArmWidth, signLabel } from '../street-render.js?v=e7e9dfda';
+import { addQuarterArm } from './quarter-feature.js?v=f28afdd1';
 import { QUARTER_TEXT, normalizeHeld } from '../quarter.js?v=e278522a';
 import { openNotePicker, openNoteView } from '../note-view.js?v=c512b345';
 import { homeStreetName, insideQuery, possessive, readVisitScene } from '../neighbours-mp.js?v=0896a4d7';
-import { BACK_YARD_GROUND_Y, SIGN_PROMPT_LIFT, STREET_GROUND_Y, homesFeature, visitorHomeState } from './homes-feature.js?v=730e56e0';
-import { BENCH_ART, towerApi } from './home-tower-feature.js?v=a39637c6';
+import { BACK_YARD_GROUND_Y, SIGN_PROMPT_LIFT, STREET_GROUND_Y, homesFeature, visitorHomeState } from './homes-feature.js?v=bc463ef7';
+import { BENCH_ART, towerApi } from './home-tower-feature.js?v=b70a09c0';
 import { readTowerFloorWire, towerFloorProject, towerFloorWire } from '../home-tower.js?v=a7fc0cce';
-import { projectApi } from './street-jobs-feature.js?v=311dbb61';
-import { giveCarriedNote, takeCarriedNote, writtenCarriedNotes } from './street-furniture-feature.js?v=9ed44565';
+import { projectApi } from './street-jobs-feature.js?v=e92fd4cf';
+import { giveCarriedNote, takeCarriedNote, writtenCarriedNotes } from './street-furniture-feature.js?v=a0aca312';
 import { saveStore, savedThrough } from '../save-store.js?v=1ccb1d6b';
 import {
   GOOD_NEIGHBOUR_AT,
@@ -114,7 +114,7 @@ import {
   signpostArms,
   signpostCandidates,
 } from '../home-street-mp.js?v=2af2d58f';
-import { standOnFeet } from '../sprite-feet.js?v=849541a8';
+import { standOnFeet } from '../sprite-feet.js?v=6283b688';
 import { WORLD_FONT_FAMILY } from '../world-text.js?v=6b49f88c';
 
 export { HOME_STREET_MP_ID };

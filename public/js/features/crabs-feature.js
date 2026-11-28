@@ -88,7 +88,7 @@ import {
   normalizeCrabMemory,
   playToday,
 } from '../crabs.js?v=eb0bdc39';
-import { standOnFeet } from '../sprite-feet.js?v=849541a8';
+import { standOnFeet } from '../sprite-feet.js?v=6283b688';
 
 const ART = 'assets/sprites/crabs/';
 /** OGA npc_crab sheets: 131x129 cells, 6 columns; populated counts measured. */

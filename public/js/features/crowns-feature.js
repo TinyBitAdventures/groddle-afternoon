@@ -60,7 +60,7 @@ import {
   tickCrowns,
 } from '../game-of-crowns.js?v=e32f35f5';
 import { RACE_RIVALS } from '../races.js?v=ab22a079';
-import { mayhemHoldsArena } from './mayhem-feature.js?v=6cb71c31';
+import { mayhemHoldsArena } from './mayhem-feature.js?v=7656a834';
 import { wallsScreen } from '../street-model.js?v=a9a05f9d';
 import { addItem, countItem, removeItem } from '../inventory.js?v=3be7988a';
 import { textureFromUrl } from '../textures.js?v=b8e38103';
@@ -80,7 +80,7 @@ import {
   normalizeCrownsReward,
   normalizeCrownsState,
 } from '../crowns-mp.js?v=ab077bca';
-import { standOnFeet, anchorBottomCentre } from '../sprite-feet.js?v=849541a8';
+import { standOnFeet, anchorBottomCentre } from '../sprite-feet.js?v=6283b688';
 import { WORLD_FONT_FAMILY } from '../world-text.js?v=6b49f88c';
 
 const ICON = 'assets/sprites/races/';

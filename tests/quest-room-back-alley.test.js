@@ -43,7 +43,7 @@ import {
   nearestStation,
   room,
   stationForDoor,
-} from '../public/js/quest-rooms/back-alley.js?v=c2bb8fe9';
+} from '../public/js/quest-rooms/back-alley.js?v=bdcc41a2';
 import * as alleySet from '../public/js/quest-rooms/back-alley-set.js?v=0483a457';
 import { STATION_FLOOR, STATIONS, stationArrival, stationByTsid, surfaceStation } from '../public/js/subway.js?v=ea6921ff';
 import { BACK_ALLEY_FILES } from '../public/js/quest-rooms/back-alley-art.js?v=08af5d4f';

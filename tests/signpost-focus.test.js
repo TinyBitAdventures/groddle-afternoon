@@ -49,7 +49,7 @@ describe('signpost focus (ticket 21)', () => {
   it('T does not travel from a post, and the hint over a lone post says Enter', () => {
     assert.ok(!game.includes("if (e.key === 't' || e.key === 'T') doTeleport();"));
     assert.ok(!game.includes("key: 'T', label: conn.label"));
-    assert.match(game, /: \{ key: 'Enter', label: postAtHand\?\.view\?\.signDeco \? 'Choose a floor' : 'Choose a road', x: nearSign\.screen\.x, y \};/);
+    assert.match(game, /: \{ key: 'Enter', label: postAtHand\?\.view\?\.signDeco \? 'Choose a floor' : postAtHand\?\.view\?\.signQuarter \? 'Choose a block' : 'Choose a road', x: nearSign\.screen\.x, y \};/);
   });
 
   it('every arm goes the same way, by Enter, number or click (takeSignBoard)', () => {

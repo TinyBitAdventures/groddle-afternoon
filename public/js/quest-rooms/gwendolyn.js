@@ -72,7 +72,7 @@ import { runOutcome } from '../autoplay-log.js?v=55bb4823';
 import { frameTexture, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js?v=b8e38103';
 import { displayTopOf, itemstackOverlayPoint, playSheetOverlay } from '../overlay-art.js?v=e50bacca';
 import { GWENDOLYN_INNER_FILES } from './gwendolyn-inner-art.js?v=06b4d5d6';
-import { standOnFeet } from '../sprite-feet.js?v=849541a8';
+import { standOnFeet } from '../sprite-feet.js?v=6283b688';
 
 export const ROOM_ID = 'gwendolyn';
 const ART = `assets/sprites/quest-rooms/${ROOM_ID}/`;

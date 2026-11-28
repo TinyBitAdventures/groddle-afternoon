@@ -12,7 +12,7 @@ import { fileURLToPath } from 'node:url';
 
 import { energyMax, moodMax } from '../public/js/metabolics.js?v=48f784bf';
 import { normalizeHellState, resurrect } from '../public/js/hell.js?v=0dba5774';
-import { hellFeature } from '../public/js/features/hell-feature.js?v=8679fcab';
+import { hellFeature } from '../public/js/features/hell-feature.js?v=a45d6184';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const pub = join(here, '../public');

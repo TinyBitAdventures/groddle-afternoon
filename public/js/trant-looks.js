@@ -17,7 +17,7 @@
 import { fruitCapacityAt } from './trants.js?v=cf0fe1a3';
 import { TRANT_FRUIT_PIECES } from './trant-fruit-pieces.js?v=b1fbc950';
 import { hiresSpriteUrl } from './sprite-hires.js?v=dd070ce8';
-import { setTextureFoot } from './sprite-feet.js?v=849541a8';
+import { setTextureFoot } from './sprite-feet.js?v=6283b688';
 import { isLoaded, onFailed, onLoaded, textureFromUrl } from './textures.js?v=b8e38103';
 
 export const TRANT_FRAMES = 'assets/sprites/trants/frames';

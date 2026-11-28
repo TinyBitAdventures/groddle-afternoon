@@ -100,7 +100,7 @@ import {
   radiatorEnd,
   radiatorLine,
 } from '../radiance-mp.js?v=b3137af4';
-import { anchorBottomCentre } from '../sprite-feet.js?v=849541a8';
+import { anchorBottomCentre } from '../sprite-feet.js?v=6283b688';
 
 export const MEDITATION_FEATURE_ID = 'meditation';
 /** metabolics_get_max_energy: the energy tank (100 plus Energy Tank cards). */

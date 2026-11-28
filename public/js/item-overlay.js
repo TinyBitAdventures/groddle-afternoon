@@ -34,7 +34,7 @@ import { OVERLAY_FADE, overlayAlpha, overlayLifeMs, trackOverlay } from './overl
 import { cutPackedFrames, packedFrameAt } from './packed-sheets.js?v=3932a20c';
 import { upgradeSource } from './sprite-hires.js?v=dd070ce8';
 import { loadOwnTexture, loadTexture, releaseTexture, whenLoaded } from './textures.js?v=b8e38103';
-import { anchorBottomCentre } from './sprite-feet.js?v=849541a8';
+import { anchorBottomCentre } from './sprite-feet.js?v=6283b688';
 
 /** Decoded sheets kept after their overlay ends. */
 export const KEEP_SHEETS = 2;

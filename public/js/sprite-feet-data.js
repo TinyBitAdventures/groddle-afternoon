@@ -2700,6 +2700,7 @@ export const SPRITE_FEET = Object.freeze({
   "assets/sprites/street-spirits/firebog_large_talk.webp": [94,244,46.5,243],
   "assets/sprites/street-spirits/firebog_medium_cry.webp": [63,189,32,188],
   "assets/sprites/street-spirits/firebog_medium_talk.webp": [63,189,32,188],
+  "assets/sprites/street-spirits/frames/groddle_flower_idle_f0.webp": [78,131,39,130],
   "assets/sprites/street-spirits/groddle_dirt_cry.webp": [90,121,49.5,92],
   "assets/sprites/street-spirits/groddle_dirt_idle.webp": [77,99,38.5,94],
   "assets/sprites/street-spirits/groddle_dirt_lonely_in.webp": [163,162,79.5,152],

@@ -33,8 +33,8 @@ import {
   socketUrl,
 } from '../public/js/realtime-client.js?v=7e402304';
 import { createMinnAccount } from '../public/js/minn-account.js?v=7e3d7279';
-import { emoteCommand, lookOf, poseOf, realtimeFeature, sharedStreet, statusText } from '../public/js/features/realtime-feature.js?v=32aad799';
-import { FEATURES } from '../public/js/features/index.js?v=2e6d183d';
+import { emoteCommand, lookOf, poseOf, realtimeFeature, sharedStreet, statusText } from '../public/js/features/realtime-feature.js?v=087837ca';
+import { FEATURES } from '../public/js/features/index.js?v=fb2b4800';
 
 const root = join(import.meta.dirname, '..');
 const read = (rel) => readFileSync(join(root, rel), 'utf8');

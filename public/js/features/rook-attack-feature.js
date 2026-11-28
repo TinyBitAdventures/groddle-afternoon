@@ -128,12 +128,12 @@ import {
 import { itemZ } from '../item-bands.js?v=ec366be3';
 import { copyChargesLeft, copyFromLedger, keepsCopies, spendCopyCharge, verbCopy } from '../copy-charges.js?v=357d4cbb';
 import { migrateClassValue } from '../tools.js?v=4156bba8';
-import { playPotionBottle } from '../potion-bottle-fx.js?v=bc713f71';
+import { playPotionBottle } from '../potion-bottle-fx.js?v=72e0c4f8';
 import { feedZone, placeRookBadge, unionBox } from '../rook-badge-place.js?v=e2bcbbaa';
 import { ROOK_STARS, stepStunStars, stunStarsState } from '../rook-stun-stars.js?v=62d5c3cb';
 import { frameTexture, sourceFromUrl, textureFromUrl } from '../textures.js?v=b8e38103';
 import { publicStreet } from '../shared-street.js?v=dce5694b';
-import { standOnFeet, anchorBottomCentre } from '../sprite-feet.js?v=849541a8';
+import { standOnFeet, anchorBottomCentre } from '../sprite-feet.js?v=6283b688';
 import { WORLD_FONT_FAMILY } from '../world-text.js?v=6b49f88c';
 import { offlineLine, sharedOffline } from '../online-request.js?v=5fa7a635';
 

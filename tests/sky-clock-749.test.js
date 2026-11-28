@@ -12,7 +12,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { buildStreetView } from '../public/js/street-render.js?v=91152d38';
+import { buildStreetView } from '../public/js/street-render.js?v=e7e9dfda';
 import {
   NO_SKY_HUBS,
   farLayerTint,

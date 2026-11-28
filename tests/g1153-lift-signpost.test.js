@@ -10,7 +10,7 @@ import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { convertLocationXml } from '../public/js/location-xml.js?v=32377f99';
-import { buildSignDecoView, DECO_TWINS, signDecoDrawn, signpostBoardAt } from '../public/js/street-render.js?v=91152d38';
+import { buildSignDecoView, DECO_TWINS, signDecoDrawn, signpostBoardAt } from '../public/js/street-render.js?v=e7e9dfda';
 import { TOWER_LIFT_PLATE, TOWERS } from '../public/js/tower-floors.js?v=91217aeb';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -93,9 +93,9 @@ describe('G1153: a signpost drawn as its deco', () => {
 
   it('a click or Enter at the lift opens its floors as a menu', () => {
     const src = readFileSync(join(root, 'public/game.js'), 'utf8');
-    assert.match(src, /if \(signBoard\?\.view\?\.signDeco\) \{\s*openSignpostArmsMenu\(signBoard/);
-    assert.match(src, /if \(at\.view\?\.signDeco\) \{\s*openSignpostArmsMenu\(/);
-    assert.match(src, /postAtHand\?\.view\?\.signDeco \? 'Choose a floor' : 'Choose a road'/);
+    assert.match(src, /if \(signMenuView\(signBoard\?\.view\)\) \{\s*openSignpostArmsMenu\(signBoard/);
+    assert.match(src, /if \(signMenuView\(at\.view\)\) \{\s*openSignpostArmsMenu\(/);
+    assert.match(src, /postAtHand\?\.view\?\.signDeco \? 'Choose a floor' : postAtHand\?\.view\?\.signQuarter \? 'Choose a block' : 'Choose a road'/);
     const render = readFileSync(join(root, 'public/js/street-render.js'), 'utf8');
     assert.match(render, /s\.deco\?\.sprite \? buildSignDecoView\(/);
   });

@@ -72,7 +72,7 @@ import { textureFromUrl } from '../textures.js?v=b8e38103';
 import { OVERLAY_BUBBLE_URL, OVERLAY_USES, overlayBubbleBox, playOverlay } from '../overlays.js?v=91dcee74';
 import { SPEECH_BUBBLE_Z } from '../fx-z.js?v=18dda7e3';
 import { isPhoneDevice } from '../touch-controls.js?v=8bc690ac';
-import { anchorBottomCentre } from '../sprite-feet.js?v=849541a8';
+import { anchorBottomCentre } from '../sprite-feet.js?v=6283b688';
 import { HOME_SHOT_COPY } from '../home-shot.js?v=8198618a';
 
 export const CAMERA_FEATURE_ID = 'camera-mode';

@@ -55,7 +55,7 @@ import { ITEM_CATALOG, addItem, countItem, ensureItem, itemIcon, packStamp, remo
 import { canUseTool, useToolCondition, workStepCost } from '../tools.js?v=4156bba8';
 import { ecologyForStreet } from '../street-ecology.js?v=da5177b2';
 import { worldToScreen } from '../street-model.js?v=a9a05f9d';
-import { signArmWidth } from '../street-render.js?v=91152d38';
+import { signArmWidth } from '../street-render.js?v=e7e9dfda';
 import { WORLD_FONT_FAMILY } from '../world-text.js?v=6b49f88c';
 import { getSkillCatalog } from '../content-catalogs.js?v=c9b84764';
 import { listRecipesProducing } from '../making.js?v=dc595568';
@@ -173,7 +173,7 @@ import { featuredStore, renderFeaturedLine, renderFeaturedRow } from '../ui/feat
 import { GEM_HINTS, isGem } from '../gem-hints.js?v=4b65f7ac';
 import { JOB_ASK_TEXT, itemAskSubject, itemGetHref, itemMakeNote, showAskRule, skillRankLabel, workSkillMissing, workSkillNote } from '../street-job-asks.js?v=32adbe89';
 import { applySoloScale, hopsFromStart, soloAmountsLine } from '../street-jobs-solo.js?v=40d84989';
-import { standOnFeet, anchorBottomCentre } from '../sprite-feet.js?v=849541a8';
+import { standOnFeet, anchorBottomCentre } from '../sprite-feet.js?v=6283b688';
 import { sitePageWhere } from '../site-pages.js?v=9b3049cf';
 
 export const STREET_JOBS_FEATURE_ID = 'street-jobs';

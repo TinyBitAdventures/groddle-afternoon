@@ -14,7 +14,7 @@ import { drawnDoorStyle } from './doors.js?v=f815e7c8';
 import { isLoaded, onLoaded, textureFromUrl } from './textures.js?v=b8e38103';
 import { doorLockArt } from './door-lock-art.js?v=e656851c';
 import { doorSaleArt } from './door-sign-art.js?v=69daffff';
-import { anchorBottomCentre } from './sprite-feet.js?v=849541a8';
+import { anchorBottomCentre } from './sprite-feet.js?v=6283b688';
 
 export const DOOR_DECO_BASE = 'assets/decos/groddle/';
 /** Doors stand at this zIndex among the street's things (the entity layer). */

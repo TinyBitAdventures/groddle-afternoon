@@ -409,7 +409,7 @@ describe('report 135: search and a kind filter on Your upgrades', () => {
 
 describe('#333 (G751): buying an upgrade card plays YOU_WIN', () => {
   it('ImaginationPurchaseUpgradeUI.as 226: the purchase plays YOU_WIN, warmed when the panel opens', async () => {
-    const { PURCHASE_SOUND } = await import('../public/js/features/imagination-feature.js?v=45c7b37c');
+    const { PURCHASE_SOUND } = await import('../public/js/features/imagination-feature.js?v=60cd5d90');
     assert.equal(PURCHASE_SOUND, 'YOU_WIN');
     const { resolveSound } = await import('../public/js/sound-board.js?v=fb6a6c26');
     const sound = resolveSound(PURCHASE_SOUND);

@@ -27,7 +27,7 @@ import {
   streakShape,
 } from '../public/js/meteor-shower.js?v=833f0d52';
 import { meteorRun, meteorShowerFeature, resetMeteorRun, takeMeteorFrame } from '../public/js/features/meteor-shower-feature.js?v=d3775541';
-import { buildStreetView } from '../public/js/street-render.js?v=91152d38';
+import { buildStreetView } from '../public/js/street-render.js?v=e7e9dfda';
 import { ownSkyReason, skyFollowsClock, skyLook } from '../public/js/sky-clock.js?v=dbd21266';
 
 const here = dirname(fileURLToPath(import.meta.url));

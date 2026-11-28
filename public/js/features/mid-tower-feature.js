@@ -58,7 +58,7 @@ import {
 } from '../tower-mid-rooms.js?v=2dd1122c';
 import { touchWords } from '../touch-controls.js?v=8bc690ac';
 import { CLICK_ANYWHERE, HALL, HALL_ART, HALL_ART_ROOT, HALL_BUTTON_CLASS, HALL_WIDGET, WALL_BUTTON } from '../hall-rejected-concepts.js?v=d2d29ad6';
-import { standOnFeet, anchorBottomCentre } from '../sprite-feet.js?v=849541a8';
+import { standOnFeet, anchorBottomCentre } from '../sprite-feet.js?v=6283b688';
 
 export const MID_TOWER_FEATURE_ID = 'mid-tower';
 export const ROOK_HALL_START = 'rook_hall_start';

@@ -20,7 +20,7 @@ import { join } from 'node:path';
 import { describe, it } from 'node:test';
 
 import { TRANT_META, setTrantTables } from '../public/js/trants.js?v=cf0fe1a3';
-import { TRANT_STAGES, trantFruitShown, trantLook, trantLookFiles, trantStage } from '../public/js/trant-looks.js?v=8ed6fe90';
+import { TRANT_STAGES, trantFruitShown, trantLook, trantLookFiles, trantStage } from '../public/js/trant-looks.js?v=0cd55bd4';
 import { TRANT_FRUIT_PIECES } from '../public/js/trant-fruit-pieces.js?v=b1fbc950';
 import { HIRES_SPRITES } from '../public/js/sprite-hires.js?v=dd070ce8';
 

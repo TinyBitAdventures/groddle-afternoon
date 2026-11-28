@@ -40,7 +40,7 @@ import {
   prunePortals,
   useDoorDrink,
 } from '../door-drink.js?v=15add3b8';
-import { standOnFeet } from '../sprite-feet.js?v=849541a8';
+import { standOnFeet } from '../sprite-feet.js?v=6283b688';
 import { autoplayLog } from '../autoplay-log.js?v=55bb4823';
 
 export const DOOR_DRINK_FEATURE_ID = 'door-drink';

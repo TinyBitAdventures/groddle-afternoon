@@ -23,15 +23,15 @@
  * that lot for you first).
  */
 
-import { anchorBottomCentre } from '../sprite-feet.js?v=849541a8';
+import { anchorBottomCentre } from '../sprite-feet.js?v=6283b688';
 import { doorSaleArt } from '../door-sign-art.js?v=69daffff';
 import { textureFromUrl, isLoaded, onLoaded } from '../textures.js?v=b8e38103';
 import { WORLD_FONT_FAMILY } from '../world-text.js?v=6b49f88c';
 import { createMinnAccount } from '../minn-account.js?v=7e3d7279';
 import { exposeQA } from '../qa-gate.js?v=f4e2cd82';
 import { houseLot } from '../home-house.js?v=3c88c47c';
-import { STREET_GROUND_Y, homesFeature, houseContainer, houseOf } from './homes-feature.js?v=730e56e0';
-import { SIGN_FIRST_ARM_Y, addSignBoard, signArmWidth, signLabel } from '../street-render.js?v=91152d38';
+import { STREET_GROUND_Y, homesFeature, houseContainer, houseOf } from './homes-feature.js?v=bc463ef7';
+import { SIGN_FIRST_ARM_Y, addSignBoard, signArmWidth, signLabel } from '../street-render.js?v=e7e9dfda';
 import { homeStreetLayout } from '../home-cultivation.js?v=122d6f45';
 import { signpostX } from '../home-street-fixtures.js?v=d4e5b56a';
 import { loadStreetData } from '../street-loader.js?v=10376267';

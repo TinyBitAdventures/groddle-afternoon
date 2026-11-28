@@ -6,7 +6,7 @@ import { fileURLToPath } from 'node:url';
 import * as kit from '../public/js/quest-rooms/kit.js?v=f2c0da0c';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
-const mod = await import('../public/js/quest-rooms/esquibeth.js?v=d62b0dfc');
+const mod = await import('../public/js/quest-rooms/esquibeth.js?v=68ef2da0');
 
 // Avatar reach (game.js physics): jump 9.6 px/frame against 0.42 gravity peaks near 110 px
 // and carries about 200 px at run speed 4.4; keep margins.

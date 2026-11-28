@@ -407,7 +407,7 @@ describe('Support: the site code (groddle-afternoon-site)', { skip: skipWithoutS
     // A website report's picture is the player's own, not the game at that moment.
     assert.equal(consoleMod.PICTURE_HINT.web, 'The picture they added on the website. Click it to see it full size.');
     assert.match(src('console/console.js'), /const fromWeb = r\.context\?\.from === 'website';\s*\$\('\.console-picture-hint'\)\.textContent = fromWeb \? PICTURE_HINT\.web : PICTURE_HINT\.game;/);
-    assert.match(src('src/AdminConsolePage.php'), /ASSET_KEY = 'skin-15'/);
+    assert.match(src('src/AdminConsolePage.php'), /ASSET_KEY = 'skin-16'/);
   });
 
   it('the server\'s real limits: php.ini sizes read, the per-file limit the smaller of ours and upload_max_filesize, the request post_max_size', { skip: !HAS_PHP && 'no php' }, () => {

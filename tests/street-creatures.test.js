@@ -40,7 +40,7 @@ import {
 } from '../public/js/street-creatures.js?v=6831f6b2';
 import { actMessage, createStreetCopy, guanoPiles, idKind, reconcile, takeObjs } from '../public/js/street-objects.js?v=dd03ab9d';
 import { streetObjectsFeature } from '../public/js/features/street-objects-feature.js?v=286e6139';
-import { FEATURES } from '../public/js/features/index.js?v=2e6d183d';
+import { FEATURES } from '../public/js/features/index.js?v=fb2b4800';
 import { GAME_EPOCH_MS } from '../public/js/game-day.js?v=57fecfcb';
 import { creatureRequests, setCreatureEcology, streetObjectLayout } from '../tools/build-realtime-objects.mjs';
 import { STREET_INDEX, applyStreetIndex, loadStreetDataFromFs } from '../public/js/street-loader.js?v=10376267';
@@ -285,7 +285,7 @@ describe('street animals: a Chicken\'s walk, turns and pauses (lane CHICKWALK)',
   });
 
   it('the art turns on the spot: the sprite is anchored under the bird (Chicken sheets are cut 27 px off centre)', async () => {
-    const { footOf } = await import('../public/js/sprite-feet.js?v=849541a8');
+    const { footOf } = await import('../public/js/sprite-feet.js?v=6283b688');
     const cell = { width: 148, height: 110 };
     const walk = footOf('assets/sprites/npc_chicken__x1_walk_png_1354830385.webp', cell);
     // The bird's middle across the walk (G515 measured 101 of the 148 px cell; R12's builder 101.5).

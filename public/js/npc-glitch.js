@@ -20,7 +20,7 @@ import { ANIMS, ANIM_FPS, EMOTIONS, EMOTION_MS, FALL_LOOP, IDLES_TO_RANDOM, RAND
 import { NPC_GLITCH_HIRES, NPC_GLITCH_SHEETS } from './npc-glitch-sheets.js?v=1163dc99';
 import { mulberry32, nameSeed, npcIdFor, npcIdleTiming } from './npc-glitch-looks.js?v=7afa4e47';
 import { frameTexture, holdSource, onLoaded, releaseTexture } from './textures.js?v=b8e38103';
-import { anchorBottomCentre } from './sprite-feet.js?v=849541a8';
+import { anchorBottomCentre } from './sprite-feet.js?v=6283b688';
 
 /** Sheets loaded with the Glitch (walk/stand and the idle4 stand loop). */
 export const NPC_CORE_SHEETS = Object.freeze(['base', 'idle4']);

@@ -4,7 +4,7 @@
  */
 import { ITEM_ICONS, ITEM_LABELS, getVerbsFor, ordinaryItems, runVerb } from './content.js?v=da2b8879';
 import { createErrorOnce, createFeatureHost, createFrameStages } from './js/feature-host.js?v=b87e2cbc';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=2e6d183d';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=fb2b4800';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, enterHintPick, hoverText, stackHoverLabel, groupHead, hoverRimShown, reachGlowTargets, spriteHasRimArt, rimArtParts, trimmedIconUrl, drawTileArt } from './js/enter-chooser.js?v=297c6d15';
 import { firstTendKey, STICK_TEND_DELAY_MS, STICK_TEND_DIRS, STICK_TEND_REPEAT_MS, stepTendKey, stepTendKeys, stickTendKey, tendKeyAction } from './js/garden-tend.js?v=a7470c4a';
 import { avatarHitBox, behindFloor, bodyReachDistance, OUT_OF_REACH_LINE, playerClickBox } from './js/reach.js?v=456da8a8';
@@ -429,7 +429,7 @@ import {
   buildParadiseCourseArt,
   paradiseCoursePreloadUrls,
   paradiseCourseRuntime,
-} from './js/paradise-course-runtime.js?v=901210fd';
+} from './js/paradise-course-runtime.js?v=68a4b065';
 import { installWorldText, loadWorldFont, NAMEPLATE_STYLE, WORLD_FONT_FAMILY, worldCanvasFont, worldLabelStyle } from './js/world-text.js?v=6b49f88c';
 import {
   createAchievementState,
@@ -747,7 +747,7 @@ import {
   ensureStreetIndex,
   resolveIndexTsid,
 } from './js/street-loader.js?v=10376267';
-import { showDraftBanner, startDraftPlay } from './js/builder/draft-play.js?v=63c344fc';
+import { showDraftBanner, startDraftPlay } from './js/builder/draft-play.js?v=2eb0ae2e';
 import { bootHouseFile } from './js/house-file-loader.js?v=014960b6';
 import {
   ladderTopDeck,
@@ -782,7 +782,7 @@ import {
   signpostBoardAt,
   signpostGlowFilters,
   signpostGlowParts,
-} from './js/street-render.js?v=91152d38';
+} from './js/street-render.js?v=e7e9dfda';
 import {
   GAME_DAY_MS,
   GAME_EPOCH_MS,
@@ -864,7 +864,7 @@ import {
   maturityLabel,
   trantStatusLabel,
 } from './js/trants.js?v=cf0fe1a3';
-import { loadTrantLook, trantFrameUrl, trantLook, trantLookTexture, trantShownTexture, trantStage, warmTrantLook } from './js/trant-looks.js?v=8ed6fe90';
+import { loadTrantLook, trantFrameUrl, trantLook, trantLookTexture, trantShownTexture, trantStage, warmTrantLook } from './js/trant-looks.js?v=0cd55bd4';
 import { growStreetTrant } from './js/patches.js?v=54430bb9';
 import {
   runStreetTransition,
@@ -909,7 +909,7 @@ import { hellBuffDesc, isInHell } from './js/hell.js?v=0dba5774';
 import { climbBobY, ladderAnimState, ladderSwap } from './js/ladder-anim.js?v=a8b327a0';
 import { VECTOR_AVATAR } from './js/avatar-vector-sheets.js?v=ad801376';
 import { PLACEHOLDER_SHEETS, isPlaceholderPack, ownPackFor, washPlaceholderPixels, whenOwnLookReady } from './js/avatar-placeholder.js?v=ae5c39e4';
-import { createNpcGlitchKit } from './js/npc-glitch.js?v=aa1bb137';
+import { createNpcGlitchKit } from './js/npc-glitch.js?v=65db5ace';
 import { bakeIdleSheet, bakeLook, bakeSheet, loadCatalog as loadAvatarCatalog, paintPreview as paintVectorPreview, prepareIdle, prepareLook } from './js/avatar-compositor.js?v=1d3df23e';
 import { LATE_SHEETS, anchorSheetFrames, createRetireQueue, ensureAnimSheets, ensureLateSheet, fillPackAnims, packComplete, redrawFrame, showsStandIn } from './js/avatar-pack.js?v=65324246';
 import { catalogItem, colourwaySwatches, lookKey, randomVectorFields, resolveLook, swatchBackground } from './js/avatar-looks.js?v=5a28384d';
@@ -1106,7 +1106,7 @@ import {
 import { CHICKEN_PAUSE, chickenPauseRoll, flierAt, flierSeed, flightFloorFor, followPath, PATH_STEP } from './js/street-creatures.js?v=6831f6b2';
 import { chickenPose, chickenIdleSheetsAsked } from './js/chicken-idle-art.js?v=969d7db1';
 import { chickenWaitPose } from './js/chicken-idles.js?v=eef0279b';
-import { itemOverlayStats } from './js/item-overlay.js?v=33acf5ff';
+import { itemOverlayStats } from './js/item-overlay.js?v=c444e2cf';
 import { isCrowdSad } from './js/animal-crowding.js?v=50ebbe5d';
 import { createSoundBoard, DEFAULT_SFX_VOLUME, watchButtonClicks, watchPanelSounds } from './js/sound-board.js?v=fb6a6c26';
 import {
@@ -1203,7 +1203,7 @@ import { arrangeMapCards, fitMapExtras } from './js/map-extras.js?v=16e261b1'; /
 // The interface skin (js/classic/ui-mode.js) sets <html data-ui> as it loads: before main(), so before the boot cover lifts.
 import { installInterfaceSettings } from './js/classic/classic-prefs.js?v=24f4f276';
 import { installWhatsNewWindow } from './js/ui/whats-new-window.js?v=0d9a7a93';
-import { standOnFeet, anchorBottomCentre } from './js/sprite-feet.js?v=849541a8';
+import { standOnFeet, anchorBottomCentre } from './js/sprite-feet.js?v=6283b688';
 import { markLeaving, packPicks, takeCopies } from './js/copy-picks.js?v=b368fd49';
 import { holdKeepsBusy } from './js/instance-holds.js?v=ff3a63a3';
 import { createLoadTurns, createStreetMove, travelTurn } from './js/street-move.js?v=1c4431bf';

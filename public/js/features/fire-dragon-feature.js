@@ -40,7 +40,7 @@ import {
   normalizeDragonMemory,
   petFireDragon,
 } from '../fire-dragon.js?v=b7f3d751';
-import { standOnFeet } from '../sprite-feet.js?v=849541a8';
+import { standOnFeet } from '../sprite-feet.js?v=6283b688';
 
 let loader = null;
 let generation = 0;

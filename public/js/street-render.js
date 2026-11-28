@@ -18,11 +18,11 @@ import { attachAnim, isAnimatedDeco, setAnimSource, setDecoTexture, syncAnim } f
 import { drawnLayerOffset, layerScreenDir } from './camera-feel.js?v=e668afc5';
 import { ensureDepthStencil, readbackPixels } from './render-probe.js?v=519c86ef';
 import { QUAD_SPAN, quadSpans, wideRect } from './wide-quads.js?v=f34556e6';
-import { anchorBottomCentre } from './sprite-feet.js?v=849541a8';
+import { anchorBottomCentre } from './sprite-feet.js?v=6283b688';
 import { blurFix, blurredDecoCanvas } from './deco-blur.js?v=4f5d88ea';
 import { signWords } from './deco-sign.js?v=e98e50f9';
 import { loadWorldFont, WORLD_FONT_FAMILY } from './world-text.js?v=6b49f88c';
-import { buildDoorSprite } from './door-view.js?v=ff6f0e9a';
+import { buildDoorSprite } from './door-view.js?v=128f896d';
 import { visibleDoors } from './doors.js?v=f815e7c8';
 import { farLayerTint, gradientColourAt, starField } from './sky-clock.js?v=dbd21266';
 

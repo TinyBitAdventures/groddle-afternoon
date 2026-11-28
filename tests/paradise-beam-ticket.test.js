@@ -24,7 +24,7 @@ import {
   quoteParadiseTicket,
 } from '../public/js/paradise-flight.js?v=4d77a43d';
 import { createInventory, addItem, countItem } from '../public/js/inventory.js?v=3be7988a';
-import { puzzleScenesFeature } from '../public/js/features/puzzle-scenes-feature.js?v=0acaf50c';
+import { puzzleScenesFeature } from '../public/js/features/puzzle-scenes-feature.js?v=d8e9115d';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const TICKET = 'paradise_ticket_beam_me_down';

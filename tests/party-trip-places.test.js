@@ -26,7 +26,7 @@ import {
 import { GREEDY_ACTS, createGreedyStreetSpiritState, pressGreedyAct } from '../public/js/greedy-street-spirit.js?v=b0ce2437';
 import { createWinterWalkState } from '../public/js/winter-walk.js?v=faad1d46';
 import { normalizePartyRecord } from '../public/js/party-spaces.js?v=91ce15c5';
-import { partyTeleporterSpot } from '../public/js/features/party-spaces-feature.js?v=c3361d0c';
+import { partyTeleporterSpot } from '../public/js/features/party-spaces-feature.js?v=dfbd276d';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const GSJS = join(ROOT, '../glitch-GameServerJS');
