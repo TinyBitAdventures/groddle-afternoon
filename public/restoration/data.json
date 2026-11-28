@@ -2814,9 +2814,14 @@
   "deployed": "2026-11-27"
  },
  "git": {
-  "commits": 3924,
+  "commits": 3926,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-27",
+    "kind": "improve",
+    "text": "A meteor shower and a lone shooting star now look clearly different"
+   },
    {
     "date": "2026-11-27",
     "kind": "new",
@@ -2931,11 +2936,6 @@
     "date": "2026-11-27",
     "kind": "fix",
     "text": "Acting on a thing just removed from the street no longer breaks the game"
-   },
-   {
-    "date": "2026-11-27",
-    "kind": "fix",
-    "text": "Walking right off the last island on Level 3 West drops you to the pit floor instead of bouncing you back up"
    }
   ]
  },
