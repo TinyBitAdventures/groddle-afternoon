@@ -2814,9 +2814,19 @@
   "deployed": "2026-11-28"
  },
  "git": {
-  "commits": 3954,
+  "commits": 3957,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-28",
+    "kind": "fix",
+    "text": "Other players idle on your screen as their Glitch does"
+   },
+   {
+    "date": "2026-11-28",
+    "kind": "fix",
+    "text": "The mirror past a street's end is tinted once at night"
+   },
    {
     "date": "2026-11-28",
     "kind": "fix",
@@ -2916,14 +2926,9 @@
     "date": "2026-11-27",
     "kind": "new",
     "text": "The home street and the back yard get the night sky and stars"
-   },
-   {
-    "date": "2026-11-27",
-    "kind": "fix",
-    "text": "A Crafty Bot whose fetch finds its stack gone no longer hangs for good"
    }
   ]
  },
- "tests": 1515,
+ "tests": 1517,
  "generatedAt": "2026-11-28"
 }
