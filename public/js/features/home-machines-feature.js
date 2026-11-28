@@ -59,7 +59,7 @@
  * stands you at room x and sets it down.
  */
 
-import { fetchRetry } from '../load-retry.js?v=24823577';
+import { fetchRetry } from '../load-retry.js?v=477aa7a7';
 import {
   HOME_MACHINES_ID,
   HOME_MACHINES_INTERIOR,
@@ -99,24 +99,24 @@ import {
   TAKEN_KEEP,
 } from '../home-machines.js?v=1fc98bd9';
 import { CALL_PLAYER_LINES, MACHINE_HITBOX, MACHINE_SKILLS, collectLine, machineJobMs, machineMadeLine, refuelCount, runningSoundKey, takeJobIngredients } from '../machine-rooms.js?v=4b6ade29';
-import { MACHINE_ART_SHEETS, LOW_FUEL_BUBBLE_MS, LOW_FUEL_LINE, isLowFuel, machineFrame, machineFrameRect, machineSheetDef, roomMachineState } from '../machine-art.js?v=4dd5ceae';
+import { MACHINE_ART_SHEETS, LOW_FUEL_BUBBLE_MS, LOW_FUEL_LINE, isLowFuel, machineFrame, machineFrameRect, machineSheetDef, roomMachineState } from '../machine-art.js?v=ab6db345';
 import { FUEL_CELL, FUEL_PER_CELL, MAX_FUEL } from '../machines.js?v=93a736f2';
 import { ITEM_CATALOG, addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=3be7988a';
 import { receiveToolCopy, takeToolCopy } from '../tools.js?v=4156bba8';
 import { markLeaving, takeCopies } from '../copy-picks.js?v=b368fd49';
-import { RECIPE_CATALOG } from '../making.js?v=d3571803';
-import { getSkillCatalog } from '../content-catalogs.js?v=b6a173ae';
-import { createBackYardState, homeStreetLayout, normalizeCultivationState } from '../home-cultivation.js?v=61295953';
-import { lookOf, poseOf } from './realtime-feature.js?v=45143ef2';
+import { RECIPE_CATALOG } from '../making.js?v=4d75f062';
+import { getSkillCatalog } from '../content-catalogs.js?v=b2a9a862';
+import { createBackYardState, homeStreetLayout, normalizeCultivationState } from '../home-cultivation.js?v=8c3a5cb8';
+import { lookOf, poseOf } from './realtime-feature.js?v=baea612f';
 import { insideQuery, readVisitScene } from '../neighbours-mp.js?v=de82fd7d';
 import { saveStore } from '../save-store.js?v=1ccb1d6b';
-import { frameTexture, sourceFromUrl, textureFromUrl } from '../textures.js?v=29f80b6a';
-import { createSheetLoader } from '../sprite-sheets.js?v=1e277f22';
-import { STREET_GROUND_Y, homesFeature } from './homes-feature.js?v=6c2d961d';
-import { payAltarBonus } from './machine-rooms-feature.js?v=6948f1d1';
+import { frameTexture, sourceFromUrl, textureFromUrl } from '../textures.js?v=71c5d2dc';
+import { createSheetLoader } from '../sprite-sheets.js?v=4636e02b';
+import { STREET_GROUND_Y, homesFeature } from './homes-feature.js?v=52c98a6b';
+import { payAltarBonus } from './machine-rooms-feature.js?v=2112070c';
 import { worldToScreen } from '../street-model.js?v=a9a05f9d';
 import { nearestSurfaceY } from '../walk-surface.js?v=76def2f6';
-import { standOnFeet } from '../sprite-feet.js?v=18e517a6';
+import { standOnFeet } from '../sprite-feet.js?v=6319b91a';
 import { offlineLine } from '../online-request.js?v=5fa7a635';
 import { DRAG_DIST } from '../ui/home-builder.js?v=26dcf346';
 import { LONG_PRESS_SLOP } from '../ui/context-menu.js?v=0266831a';

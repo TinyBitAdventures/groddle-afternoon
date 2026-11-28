@@ -26,7 +26,7 @@ import {
   swoonerflyPlacementGroups,
   swoonerfliesFor,
 } from '../public/js/swoonerflies.js?v=326c8103';
-import { setWildlifeCatalog } from '../public/js/wildlife.js?v=7224f78a';
+import { setWildlifeCatalog } from '../public/js/wildlife.js?v=352e8bfa';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const pub = join(root, 'public');
@@ -134,7 +134,7 @@ describe('the archived placements', () => {
 describe('the feature', () => {
   it('is registered and draws one looping, untargetable sprite per objref', async () => {
     assert.match(readFileSync(join(pub, 'js/features/index.js'), 'utf8'), /import \{ swoonerfliesFeature \} from '\.\/swoonerflies-feature\.js\?v=[0-9a-f]{8}'; FEATURES\.push\(swoonerfliesFeature\);/);
-    const { swoonerfliesFeature } = await import('../public/js/features/swoonerflies-feature.js?v=99715fcc');
+    const { swoonerfliesFeature } = await import('../public/js/features/swoonerflies-feature.js?v=50023a48');
     class AnimatedSprite {
       constructor(textures) {
         this.textures = textures;

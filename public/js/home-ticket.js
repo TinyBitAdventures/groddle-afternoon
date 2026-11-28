@@ -25,7 +25,7 @@
  */
 
 import { addItem, countItem, ensureItem, removeItem } from './inventory.js?v=3be7988a';
-import { HOME_STYLES, imagineHome, normalizeHomeState } from './homes.js?v=4f4ade68';
+import { HOME_STYLES, imagineHome, normalizeHomeState } from './homes.js?v=9484b948';
 import { LINES, talkPages } from './newxp.js?v=eedf8fe3';
 import { SOLO_PC_LABEL, sentenceLabel } from './pc-label.js?v=d54da634';
 

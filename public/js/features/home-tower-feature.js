@@ -48,12 +48,12 @@
  *   towerWork, towerAutoplay, towerSecrets, towerRock, towerVisited, towerTopY (street).
  */
 
-import { playOverlay } from '../overlays.js?v=306c160f';
+import { playOverlay } from '../overlays.js?v=18dfb26a';
 import { ITEM_CATALOG, countItem, ensureItem, itemIcon } from '../inventory.js?v=3be7988a';
 import { canUseTool, useToolCondition, workStepCost } from '../tools.js?v=4156bba8';
-import { acceptOffer, npcQuestOffers } from '../quest-offers.js?v=36e610b5';
-import { getQuestCatalog, getSkillCatalog } from '../content-catalogs.js?v=b6a173ae';
-import { listRecipesProducing } from '../making.js?v=d3571803';
+import { acceptOffer, npcQuestOffers } from '../quest-offers.js?v=769eba09';
+import { getQuestCatalog, getSkillCatalog } from '../content-catalogs.js?v=b2a9a862';
+import { listRecipesProducing } from '../making.js?v=4d75f062';
 import { JOB_ASK_TEXT, itemAskSubject, itemGetHref, itemMakeNote, skillRankLabel } from '../street-job-asks.js?v=32adbe89';
 import { XP_FOR_LEVEL } from '../progression.js?v=05ff0260';
 import {
@@ -113,15 +113,15 @@ import {
   towerSecretText,
   towerSpotsFor,
   workCheck,
-} from '../home-tower.js?v=bb722397';
-import { textureFromUrl } from '../textures.js?v=29f80b6a';
+} from '../home-tower.js?v=fda80f2a';
+import { textureFromUrl } from '../textures.js?v=71c5d2dc';
 import { denseSprite } from '../sprite-dense.js?v=67101472';
 import { pieceUrl } from '../home-wallpaper.js?v=5d3594e4';
 import { wantsHiresDecos } from '../deco-hires.js?v=34f36d77';
 import { WOTD_TEXT } from '../wine-pour.js?v=6daa23a7';
 import { bindCountField, countFromField, countKeyValue, countStepMarkup, syncCountStep } from '../ui/count-chooser.js?v=75f69512';
 import { topUpMetabolic } from '../metabolics.js?v=48f784bf';
-import { standOnFeet, anchorBottomCentre } from '../sprite-feet.js?v=18e517a6';
+import { standOnFeet, anchorBottomCentre } from '../sprite-feet.js?v=6319b91a';
 import { WORLD_FONT_FAMILY } from '../world-text.js?v=6b49f88c';
 import { CHASSIS_ICONS } from '../chassis-icons.js?v=1a19ac08';
 import { sitePageWhere } from '../site-pages.js?v=9b3049cf';

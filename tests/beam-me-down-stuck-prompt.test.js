@@ -47,8 +47,8 @@ globalThis.Image = class {
 };
 globalThis.document = { createElement: () => stub() };
 
-const { puzzleScenesFeature } = await import('../public/js/features/puzzle-scenes-feature.js?v=e2158b70');
-const { STUCK_PROMPT_TEXT } = await import('../public/js/quest-instance.js?v=39e4ca2e');
+const { puzzleScenesFeature } = await import('../public/js/features/puzzle-scenes-feature.js?v=476e0674');
+const { STUCK_PROMPT_TEXT } = await import('../public/js/quest-instance.js?v=bb5d53fd');
 
 const TICKET = 'paradise_ticket_beam_me_down';
 const MIN = 60 * 1000;

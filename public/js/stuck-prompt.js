@@ -27,7 +27,7 @@ import {
   answerStuckPrompt,
   scheduleStuckPrompt,
   stuckPromptDue,
-} from './quest-instance.js?v=39e4ca2e';
+} from './quest-instance.js?v=bb5d53fd';
 
 /** A source wait in ms; QA &stuckpromptms=<ms> replaces it. */
 export function stuckWaitMs(host, ms) {

@@ -117,13 +117,13 @@ import { copyChargesLeft, copyFromLedger, keepsCopies, spendCopyCharge, verbCopy
 import { migrateClassValue } from '../tools.js?v=4156bba8';
 import { offlineLine, sharedOffline } from '../online-request.js?v=5fa7a635';
 import { DEAD_TRANT_CLASSES } from '../patches.js?v=54430bb9';
-import { COPY as SHARED_PATCH_COPY } from '../shared-patches.js?v=424bebe6';
-import { hellFeature } from './hell-feature.js?v=19e4c55f';
+import { COPY as SHARED_PATCH_COPY } from '../shared-patches.js?v=c3630ba7';
+import { hellFeature } from './hell-feature.js?v=60e7adab';
 import { grantMoodXp } from '../mood-xp.js?v=e311b45c';
-import { displayTopOf, playSheetOverlay } from '../overlay-art.js?v=243cef7d';
-import { pcOverlayPoint, playItemOverlay } from '../item-overlay.js?v=6f4018bf';
+import { displayTopOf, playSheetOverlay } from '../overlay-art.js?v=4858876d';
+import { pcOverlayPoint, playItemOverlay } from '../item-overlay.js?v=8c4b9601';
 import { POWDER_SHAKE, powderShakerSheet } from '../powder-shakers.js?v=fcd18855';
-import { OVERLAY_USES, playOverlay, playWindowOverlay, windowOverlayFit } from '../overlays.js?v=306c160f';
+import { OVERLAY_USES, playOverlay, playWindowOverlay, windowOverlayFit } from '../overlays.js?v=18dfb26a';
 import {
   POWDER_MP,
   POWDER_MP_TEXT,

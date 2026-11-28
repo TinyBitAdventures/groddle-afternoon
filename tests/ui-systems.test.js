@@ -20,7 +20,7 @@ import {
   isToolItem,
   getItemUseInfo,
 } from '../public/js/inventory.js?v=3be7988a';
-import { starterToolsInventory, ensureMakingItems } from '../public/js/making.js?v=d3571803';
+import { starterToolsInventory, ensureMakingItems } from '../public/js/making.js?v=4d75f062';
 import {
   createQuestState,
   assignQuest,
@@ -28,8 +28,8 @@ import {
   getQuestProgress,
   listQuestTracker,
   QUEST_CATALOG,
-} from '../public/js/quests.js?v=15aab2e3';
-import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=b6a173ae';
+} from '../public/js/quests.js?v=17fca824';
+import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=b2a9a862';
 
 const __dirnameUi = dirname(fileURLToPath(import.meta.url));
 before(async () => {
@@ -53,7 +53,7 @@ import {
   listHubsFromIndex,
   resolveHubId,
 } from '../public/js/map-graph.js?v=803cc6cd';
-import { STREET_INDEX } from '../public/js/street-loader.js?v=23555e53';
+import { STREET_INDEX } from '../public/js/street-loader.js?v=b8ea30df';
 import { listMapDestinations } from '../public/js/travel.js?v=7fd6e363';
 import { readFileSync } from 'node:fs';
 

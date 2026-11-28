@@ -30,12 +30,12 @@
 import { compileSchema } from './schema-check.js?v=cc9d1af4';
 import { reachStreet, REACH_LIMITS, TIGHT_MARGIN, LANDING_TRIES, AIR_JUMP_TRIES, LANDING_SHARE, streetBuff } from './reach-graph.js?v=687006d3';
 import { platformsScreen, barriersScreen, isStandable, isSolidFromBelow, isItemFloor, assertStreetGeometry, avatarHeadReach, platformYAt, worldToScreen, streetWidth, streetHeight } from '../street-model.js?v=a9a05f9d';
-import { gardenPlacementRequest, planStreetPlacements, populationForStreet, rockPlacementRequest, shrinePlacementRequest, streetReservedSpots, treePlacementRequest } from '../street-ecology.js?v=36fd044b';
+import { gardenPlacementRequest, planStreetPlacements, populationForStreet, rockPlacementRequest, shrinePlacementRequest, streetReservedSpots, treePlacementRequest } from '../street-ecology.js?v=e5263244';
 import { jumpApex } from '../avatar-step.js?v=8415ee96';
 import { STY_RULES, styleFindings } from './style-rules.js?v=34ed7ed4';
-import { EFFECT_LIMITS, effectsCost, normaliseEmitter, rumbleShare, emitterAnchor } from '../street-effects.js?v=71022b24';
+import { EFFECT_LIMITS, effectsCost, normaliseEmitter, rumbleShare, emitterAnchor } from '../street-effects.js?v=2615c959';
 import { LICENCE_POLICY, provenanceProblems } from './new-art.js?v=29f0b13e';
-import { postOffFloor, offFloorWords } from './posts.js?v=f6805134';
+import { postOffFloor, offFloorWords } from './posts.js?v=c434be40';
 import { floatingLines, FLOAT_REACH, FLOAT_OPEN } from './ground.js?v=f4254e96';
 
 export const RULES = Object.freeze({

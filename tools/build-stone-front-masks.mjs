@@ -15,13 +15,13 @@ import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { DECO_TWINS } from '../public/js/street-render.js?v=d76d4268';
-import { applyStreetIndex, loadStreetDataFromFs, setZoneStreetsShown } from '../public/js/street-loader.js?v=23555e53';
+import { DECO_TWINS } from '../public/js/street-render.js?v=c1ac1f42';
+import { applyStreetIndex, loadStreetDataFromFs, setZoneStreetsShown } from '../public/js/street-loader.js?v=b8ea30df';
 import { platformsScreen, streetWidth } from '../public/js/street-model.js?v=a9a05f9d';
 import {
   ecologyForStreet, frontDecoCovers, hiddenBehindFront, planStreetPlacements, populationForStreet,
   setStreetEcologyCatalog, streetReservedSpots,
-} from '../public/js/street-ecology.js?v=36fd044b';
+} from '../public/js/street-ecology.js?v=e5263244';
 import { FURNITURE_GROUPS, stoneDeadEndZone } from '../public/js/street-furniture.js?v=071203fc';
 import { STONE_SPOTS } from '../public/js/stone-spots-data.js?v=3373caf6';
 import { creatureRequests, setCreatureEcology } from './build-realtime-objects.mjs';

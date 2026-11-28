@@ -5,7 +5,7 @@
  * whose only archived wildlife is kitties keep their playable fallback.
  */
 
-import { fetchRetry } from './load-retry.js?v=24823577';
+import { fetchRetry } from './load-retry.js?v=477aa7a7';
 
 export const STREET_ECOLOGY_JSON = 'assets/content/street-ecology.json';
 

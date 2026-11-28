@@ -57,11 +57,11 @@
  * Tiny Speck SWF (glitch-items/quest_items/firefly_whistle) at 2x.
  */
 
-import { advanceVpOverlay, vpOverlay, vpSequence } from './vp-overlay.js?v=d718cac7';
-import { ENTRY, FLOOR, H, W, buildFront, buildLab, labPlatforms, sx, sy } from './firefly-whistle-scene.js?v=b15cdc45';
-import { onLoaded, textureFromUrl } from '../textures.js?v=29f80b6a';
-import { goToFallingLevel, withFallingRoom } from './falling-room.js?v=f50710c4';
-import { standOnFeet, anchorBottomCentre } from '../sprite-feet.js?v=18e517a6';
+import { advanceVpOverlay, vpOverlay, vpSequence } from './vp-overlay.js?v=c3ae04bf';
+import { ENTRY, FLOOR, H, W, buildFront, buildLab, labPlatforms, sx, sy } from './firefly-whistle-scene.js?v=3a5511c9';
+import { onLoaded, textureFromUrl } from '../textures.js?v=71c5d2dc';
+import { goToFallingLevel, withFallingRoom } from './falling-room.js?v=89397f16';
+import { standOnFeet, anchorBottomCentre } from '../sprite-feet.js?v=6319b91a';
 
 export const QUEST = 'firefly_whistle';
 export const TEMPLATE = Object.freeze({ prod: 'LM113UBSS8P18ET', dev: 'LHH11C4QUBP1DQD' });

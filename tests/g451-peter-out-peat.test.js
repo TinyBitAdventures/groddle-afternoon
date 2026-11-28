@@ -10,11 +10,11 @@ import { join } from 'node:path';
 import { describe, it } from 'node:test';
 
 import { PEAT_ANSWER_GRACE_MS, PEAT_EVENT, PEAT_FOR_MS, PEAT_FULL, PEAT_QUEST, PEAT_REACH, PEAT_TEXT, fullBogNear, peatHelperRow, peatHelperRun, retireSoloPeatQuest } from '../public/js/peat-quest.js?v=654cdb1b';
-import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=b6a173ae';
+import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=b2a9a862';
 import { MULTIPLAYER_QUESTS, creditedMultiplayerQuests } from '../public/js/quests-mp.js?v=e697cec3';
-import { ensureQuestOfferState, tickQuestTimers } from '../public/js/quest-offers.js?v=36e610b5';
-import { peatQuestMpFeature } from '../public/js/features/peat-quest-mp-feature.js?v=a42ab71f';
-import { FEATURES } from '../public/js/features/index.js?v=6ebe7a39';
+import { ensureQuestOfferState, tickQuestTimers } from '../public/js/quest-offers.js?v=769eba09';
+import { peatQuestMpFeature } from '../public/js/features/peat-quest-mp-feature.js?v=12d716d1';
+import { FEATURES } from '../public/js/features/index.js?v=a0cfeefb';
 
 const root = join(import.meta.dirname, '..');
 const read = (rel) => readFileSync(join(root, rel), 'utf8');

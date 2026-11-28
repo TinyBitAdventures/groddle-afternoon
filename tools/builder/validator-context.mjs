@@ -6,12 +6,12 @@
 import { readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { GAME_DIR } from '../repos.mjs';
-import { DECO_TWINS } from '../../public/js/street-render.js?v=d76d4268';
+import { DECO_TWINS } from '../../public/js/street-render.js?v=c1ac1f42';
 import { ANIM_DECOS } from '../../public/js/deco-anim-list.js?v=e5f4d34a';
 import { SHARP_DECOS } from '../../public/js/deco-sharp-list.js?v=7d615f20';
 import { compileSchema } from '../../public/js/builder/schema-check.js?v=cc9d1af4';
 import { isZoneTsid, withoutZoneConnects, withoutZoneRows } from '../../public/js/zone-streets.js?v=b40010d5';
-import { setStreetEcologyCatalog } from '../../public/js/street-ecology.js?v=36fd044b';
+import { setStreetEcologyCatalog } from '../../public/js/street-ecology.js?v=e5263244';
 
 const pub = (p) => join(GAME_DIR, 'public', p);
 const json = (p) => JSON.parse(readFileSync(p, 'utf8'));

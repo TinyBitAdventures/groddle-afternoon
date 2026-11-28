@@ -24,7 +24,7 @@ import { join } from 'node:path';
 import { DENY, denied, gameModules, pageText, pagesUnder, pub, rel, scanModule, stripTags } from './player-copy-dev-refs.js';
 import { ITEM_CATALOG } from '../public/js/inventory.js?v=3be7988a';
 import { ensureVendorItems, VENDOR_PROFILES } from '../public/js/vendor.js?v=7a07f478';
-import { ensureMakingItems } from '../public/js/making.js?v=d3571803';
+import { ensureMakingItems } from '../public/js/making.js?v=4d75f062';
 import { ensureMiningItems } from '../public/js/mining.js?v=7ecaa572';
 import { ensureGardenItems } from '../public/js/garden.js?v=fefa7bcd';
 import { ensureMusicblockItems } from '../public/js/musicblocks.js?v=e4c81eb7';
@@ -36,7 +36,7 @@ import { STORE_CATALOG } from '../public/js/store-catalog.js?v=c6ebb2bd';
 import { IMAGINATION_UPGRADES } from '../public/js/imagination-data.js?v=4a85e7fe';
 import { remakeStatus } from '../public/js/imagination-remake.js?v=99997003';
 import { HOTKEYS_FOOTER, HOTKEYS_TITLE, hotkeySections } from '../public/js/client-hotkeys.js?v=401d994d';
-import { SKILL_REMAKE_NOTES } from '../public/js/skill-tree.js?v=81ca6fe8';
+import { SKILL_REMAKE_NOTES } from '../public/js/skill-tree.js?v=6f55bf1c';
 
 /**
  * Strings the AST scan finds that no player reads, each with why. Keep this

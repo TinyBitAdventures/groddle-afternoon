@@ -7,7 +7,7 @@
  * reads resolution 3 from the `@3x` name, so frame rectangles stay in 1x units.
  */
 
-import { fetchRetry } from './load-retry.js?v=24823577';
+import { fetchRetry } from './load-retry.js?v=477aa7a7';
 export const HIRES_SPRITES = new Map([
   ["assets/sprites/animals/butterfly_milker.webp", "assets/sprites/animals/butterfly_milker@3x.webp"],
   ["assets/sprites/animals/magic_butterfly_stick_placed.webp", "assets/sprites/animals/magic_butterfly_stick_placed@3x.webp"],

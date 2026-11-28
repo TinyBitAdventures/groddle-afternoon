@@ -53,9 +53,9 @@
  */
 
 import { addItem, removeItem, countItem } from '../inventory.js?v=3be7988a';
-import { acceptOffer, npcQuestOffers, questStatus } from '../quest-offers.js?v=36e610b5';
+import { acceptOffer, npcQuestOffers, questStatus } from '../quest-offers.js?v=769eba09';
 import { groundBeneath, isItemSolid, platformYAt, platformsScreen } from '../street-model.js?v=a9a05f9d';
-import { sheetFrames } from '../quest-rooms/kit.js?v=44218fc3';
+import { sheetFrames } from '../quest-rooms/kit.js?v=3f5f3b56';
 import { pcLabel } from '../pc-label.js?v=d54da634';
 import {
   JUJU_BANDIT,

@@ -12,8 +12,8 @@ import assert from 'node:assert/strict';
 import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { join, relative } from 'node:path';
 
-import * as T from '../public/js/textures.js?v=29f80b6a';
-import { fetchRetry, isLoadTimeout, LOAD_TIMEOUT_MS, loadTimeoutFor, RETRY_WAITS_MS, timeLimit } from '../public/js/load-retry.js?v=24823577';
+import * as T from '../public/js/textures.js?v=71c5d2dc';
+import { fetchRetry, isLoadTimeout, LOAD_TIMEOUT_MS, loadTimeoutFor, retryUrl, RETRY_WAITS_MS, timeLimit } from '../public/js/load-retry.js?v=477aa7a7';
 
 const root = join(import.meta.dirname, '..');
 const flush = async (n = 8) => {
@@ -83,7 +83,7 @@ describe('#768: a house picture whose request never answers', () => {
       assert.match(T.imageFailureLine(), /uralia_wall@2x\.webp x1/, 'the report says so (it said errors: [])');
       mock.timers.tick(RETRY_WAITS_MS[0]);
       await flush();
-      assert.equal(asked.filter((u) => u === routed).length, 2, 'asked for again by itself');
+      assert.deepEqual(asked.filter((u) => u.startsWith(routed)), [routed, `${routed}?retry=2`], 'asked for again by itself, as a new request (WebKit joins a repeat of the same URL to the stuck one)');
       assert.equal(T.isLoaded(wall), true, 'the walls fill in, on the texture already drawn');
       assert.equal(wall.source.width, 75, 'its size (an @2x picture 150 px wide)');
       assert.match(T.imageFailureLine(), /\(loaded later\)/);
@@ -109,7 +109,7 @@ describe('#768: a house picture whose request never answers', () => {
       await flush();
       assert.equal(again, tex);
       assert.notEqual(T.imageFailureLine(), '');
-      assert.equal(asked.filter((u) => u === routed).length, 2);
+      assert.deepEqual(asked.filter((u) => u.startsWith(routed)), [routed, `${routed}?retry=2`]);
       assert.equal(T.isLoaded(again), true);
     } finally {
       Date.now = realNow;
@@ -119,6 +119,88 @@ describe('#768: a house picture whose request never answers', () => {
   it('each try of a picture gets longer (a slow line still gets a big sheet); textures waits as the helper does', () => {
     assert.deepEqual([1, 2, 3, 4].map((n) => loadTimeoutFor(n)), [20_000, 40_000, 80_000, 160_000]);
     assert.equal(T.RETRY_WAIT_MS, RETRY_WAITS_MS);
+  });
+});
+
+// #768 review: in WebKit (iPhone 15 Pro) the retry at ~24 s never reached the network and the house
+// stayed missing: WebKit joined the second ask for the same URL to the stuck download. Each later try
+// is now a distinct request; the first keeps the URL as given (caches, module keys, data-urls' v=).
+describe('#768 review: each retry of a picture is a new request', () => {
+  it('retryUrl: the first try as given, later tries add retry=N (kept with other parameters and a hash); data and blob URLs untouched', () => {
+    assert.equal(retryUrl('assets/a.webp', 1), 'assets/a.webp');
+    assert.equal(retryUrl('assets/a.webp', 2), 'assets/a.webp?retry=2');
+    assert.equal(retryUrl('assets/a.webp?v=1234', 3), 'assets/a.webp?v=1234&retry=3');
+    assert.equal(retryUrl('assets/a.webp?retry=2', 3), 'assets/a.webp?retry=3');
+    assert.equal(retryUrl('assets/a.svg#x', 2), 'assets/a.svg?retry=2#x');
+    assert.equal(retryUrl('data:image/png;base64,AAAA', 2), 'data:image/png;base64,AAAA');
+    assert.equal(retryUrl('blob:https://x/1', 2), 'blob:https://x/1');
+  });
+
+  it('a 3x routed sheet and a sharp copy drawn at its size each ask a distinct URL on the retry, the routed file kept', async () => {
+    mock.timers.enable({ apis: ['setTimeout', 'Date'], now: 2_000_000 });
+    try {
+      T.addUrlRoute('r768-3x', (u) => (u.startsWith('assets/sprites/home-house/') && !u.includes('@3x') ? u.replace(/\.webp$/, '@3x.webp') : null));
+      const sheet = 'assets/sprites/home-house/house_meadow.webp';
+      const routed = T.routeUrl(sheet);
+      assert.equal(routed, 'assets/sprites/home-house/house_meadow@3x.webp');
+      const sharp = 'assets/decos/r768_sharp.png';
+      stalled.add(routed);
+      stalled.add(sharp);
+      const a = T.textureFromUrl(sheet);
+      const b = T.textureFromUrl(sharp, { width: 40, height: 20 });
+      await flush();
+      stalled.delete(routed);
+      stalled.delete(sharp);
+      mock.timers.tick(LOAD_TIMEOUT_MS);
+      await flush();
+      mock.timers.tick(RETRY_WAITS_MS[0]);
+      await flush();
+      assert.deepEqual(asked.filter((u) => u.startsWith('assets/sprites/home-house/house_meadow')), [routed, `${routed}?retry=2`]);
+      assert.deepEqual(asked.filter((u) => u.startsWith(sharp)), [sharp, `${sharp}?retry=2`]);
+      assert.equal(T.isLoaded(a), true);
+      assert.equal(T.isLoaded(b), true);
+      assert.equal(T.sourceUrl(a), routed, 'the cache keeps the routed URL (3x sheets, sprite-hires)');
+      assert.equal(T.resolutionOfUrl(`${routed}?retry=2`), 3);
+    } finally {
+      T.addUrlRoute('r768-3x', () => null);
+      mock.timers.reset();
+    }
+  });
+});
+
+// #768 review: the minimap's art watch counted the stalled picture as done, snapped the house-less
+// street, and never snapped again when the retry landed.
+describe('#768 review: the minimap snaps again when a late picture lands', () => {
+  it('watchLateArt calls back once when a source that failed (stalled) loads on a later try', async () => {
+    const { watchLateArt } = await import('../public/js/features/street-minimap-feature.js?v=e93900af');
+    mock.timers.enable({ apis: ['setTimeout', 'Date'], now: 3_000_000 });
+    try {
+      const url = 'assets/sprites/home-house/r768_minimap.webp';
+      stalled.add(url);
+      const tex = T.textureFromUrl(url);
+      const late = [];
+      const off = watchLateArt([tex.source], (src) => late.push(src));
+      await flush();
+      mock.timers.tick(LOAD_TIMEOUT_MS);
+      await flush();
+      assert.equal(T.isFailed(tex), true, 'counted as failed: the map snaps without it');
+      assert.deepEqual(late, []);
+      stalled.delete(url);
+      mock.timers.tick(RETRY_WAITS_MS[0]);
+      await flush();
+      assert.equal(T.isLoaded(tex), true);
+      assert.deepEqual(late, [tex.source], 'the map is told to snap again');
+      off();
+    } finally {
+      mock.timers.reset();
+    }
+  });
+
+  it('the art watch hands every image it waits on to watchLateArt and re-snaps (batched) when one lands late', () => {
+    const src = readFileSync(join(root, 'public/js/features/street-minimap-feature.js'), 'utf8');
+    const watch = src.slice(src.indexOf('function watchArt('), src.indexOf('function artLanded('));
+    assert.match(watch, /watchLateArt\(pending, \(\) => \{\s+if \(art === a\) requestResnap\(engine\);/);
+    assert.match(src.slice(src.indexOf('function stopArt('), src.indexOf('function startArt(')), /art\.offLate\?\.\(\);/);
   });
 });
 

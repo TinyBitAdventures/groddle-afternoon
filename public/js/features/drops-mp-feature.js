@@ -70,7 +70,7 @@
  * window.groddleDrops.
  */
 
-import { fetchRetry } from '../load-retry.js?v=24823577';
+import { fetchRetry } from '../load-retry.js?v=477aa7a7';
 import { ITEM_CATALOG, addItem, countItem, removeItem } from '../inventory.js?v=3be7988a';
 import { TOOL_CONDITION_CATALOG, leavingCopyTag, leavingToolWear, receiveToolCopy, takeToolCopy } from '../tools.js?v=4156bba8';
 import { createMinnAccount } from '../minn-account.js?v=7e3d7279';

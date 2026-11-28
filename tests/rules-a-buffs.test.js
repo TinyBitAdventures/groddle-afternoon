@@ -7,9 +7,9 @@
 import { before, describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 
-import { loadContentCatalogsFromDir, getBuffCatalog } from '../public/js/content-catalogs.js?v=b6a173ae';
-import { applyBuff, createBuffState, resumeBuffsAfterAway, tickBuffs } from '../public/js/buffs.js?v=fc742885';
-import { normalizeBuffSnapshot } from '../public/js/player-save.js?v=e68db82d';
+import { loadContentCatalogsFromDir, getBuffCatalog } from '../public/js/content-catalogs.js?v=b2a9a862';
+import { applyBuff, createBuffState, resumeBuffsAfterAway, tickBuffs } from '../public/js/buffs.js?v=9ac58eaa';
+import { normalizeBuffSnapshot } from '../public/js/player-save.js?v=05e5fe5e';
 
 const MIN = 60_000;
 

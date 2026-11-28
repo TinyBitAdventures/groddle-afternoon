@@ -37,7 +37,7 @@
  */
 
 import { MACHINE_ART_LOOPERS, MACHINE_ART_SHEETS } from './machine-art-sheets.js?v=0fd6183b';
-import { SPLIT_SPRITES } from './sprite-hires.js?v=6a4569c4';
+import { SPLIT_SPRITES } from './sprite-hires.js?v=c1bcff21';
 
 export { MACHINE_ART_SHEETS };
 

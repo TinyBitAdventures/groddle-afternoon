@@ -51,6 +51,22 @@ function later(fn, ms) {
   return t;
 }
 
+/**
+ * #768 review (WebKit): the URL try `attempt` (1-based) asks for. The first try is the URL as given
+ * (caches and module keys work as ever); each later try adds `retry=<attempt>`, so it is a new
+ * request: WebKit joined a second ask for the same picture to the stuck download, which never ended.
+ * A data: or blob: URL is left as it is.
+ */
+export function retryUrl(url, attempt = 1) {
+  const s = String(url);
+  if (!(attempt > 1) || /^(?:data|blob):/i.test(s)) return s;
+  const hashAt = s.indexOf('#');
+  const rest = hashAt < 0 ? s : s.slice(0, hashAt);
+  const hash = hashAt < 0 ? '' : s.slice(hashAt);
+  const bare = rest.replace(/([?&])retry=\d+(&|$)/, (m, a, b) => (b ? a : '')).replace(/[?&]$/, '');
+  return `${bare}${bare.includes('?') ? '&' : '?'}retry=${attempt}${hash}`;
+}
+
 /** Resolves after `ms` (never keeps Node alive). */
 export function pause(ms) {
   return new Promise((resolve) => later(resolve, ms));

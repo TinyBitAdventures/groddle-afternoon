@@ -90,11 +90,11 @@ import { refuelMachine, MAX_FUEL } from '../machines.js?v=93a736f2';
 import { DROP_ITEMS, applyDropResult, isEmptyDrop, rollDropTable } from '../drop-tables.js?v=1ed0b596';
 import { ITEM_CATALOG, addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=3be7988a';
 import { topUpMetabolic } from '../metabolics.js?v=48f784bf';
-import { getSkillCatalog } from '../content-catalogs.js?v=b6a173ae';
+import { getSkillCatalog } from '../content-catalogs.js?v=b2a9a862';
 import { worldToScreen } from '../street-model.js?v=a9a05f9d';
 import { nearestSurfaceY } from '../walk-surface.js?v=76def2f6';
-import { textureFromUrl } from '../textures.js?v=29f80b6a';
-import { createSheetLoader } from '../sprite-sheets.js?v=1e277f22';
+import { textureFromUrl } from '../textures.js?v=71c5d2dc';
+import { createSheetLoader } from '../sprite-sheets.js?v=4636e02b';
 import {
   LOW_FUEL_BUBBLE_MS,
   LOW_FUEL_LINE,
@@ -104,8 +104,8 @@ import {
   machineFrame,
   machineSheetDef,
   roomMachineState,
-} from '../machine-art.js?v=4dd5ceae';
-import { standOnFeet } from '../sprite-feet.js?v=18e517a6';
+} from '../machine-art.js?v=ab6db345';
+import { standOnFeet } from '../sprite-feet.js?v=6319b91a';
 
 export const MACHINE_ROOMS_FEATURE_ID = 'machine-rooms';
 const MUSIC_CARD = 'metalmaking_music';

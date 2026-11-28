@@ -66,8 +66,8 @@
 import { ITEM_CATALOG, addItem, countItem } from '../inventory.js?v=3be7988a';
 import { setToolRemaining, toolCopies } from '../tools.js?v=4156bba8';
 import { isItemFloor, platformYAt } from '../street-model.js?v=a9a05f9d';
-import { hiresSpriteUrl } from '../sprite-hires.js?v=6a4569c4';
-import { rollResourceNodeDrop } from './drops-feature.js?v=6a1d1013';
+import { hiresSpriteUrl } from '../sprite-hires.js?v=c1bcff21';
+import { rollResourceNodeDrop } from './drops-feature.js?v=f455f36c';
 import { peekToolChoice, takeToolChoice } from '../tool-choice.js?v=e0dcb60e';
 import { slugsFromEffects } from '../speech-slugs.js?v=d5cc8b6f';
 import { resourceNodeResponseKey, verbResponse } from '../verb-responses.js?v=97df8351';
@@ -105,18 +105,18 @@ import {
   tickResourceNode,
   springDustTrapsOnArrival,
 } from '../resource-nodes.js?v=c2eb46b1';
-import { frameTexture as sheetFrameTexture, loadTexture, sourceFromUrl, textureFromUrl } from '../textures.js?v=29f80b6a';
-import { acceptOffer, markOffered, npcQuestOffers, putOffOffer, questStatus } from '../quest-offers.js?v=36e610b5';
-import { OVERLAY_USES, playOverlay } from '../overlays.js?v=306c160f';
-import { OVERLAY_FADE, displayTopOf, itemstackOverlayPoint } from '../overlay-art.js?v=243cef7d';
-import { playItemOverlay } from '../item-overlay.js?v=6f4018bf';
+import { frameTexture as sheetFrameTexture, loadTexture, sourceFromUrl, textureFromUrl } from '../textures.js?v=71c5d2dc';
+import { acceptOffer, markOffered, npcQuestOffers, putOffOffer, questStatus } from '../quest-offers.js?v=769eba09';
+import { OVERLAY_USES, playOverlay } from '../overlays.js?v=18dfb26a';
+import { OVERLAY_FADE, displayTopOf, itemstackOverlayPoint } from '../overlay-art.js?v=4858876d';
+import { playItemOverlay } from '../item-overlay.js?v=8c4b9601';
 import { nodeToolOverlay, nodeToolSheet } from '../node-tools.js?v=47a93d54';
-import { vpSequence } from '../quest-rooms/vp-overlay.js?v=d718cac7';
+import { vpSequence } from '../quest-rooms/vp-overlay.js?v=c3ae04bf';
 import { itemZ } from '../item-bands.js?v=ec366be3';
-import { salmonSwimAt } from '../street-creatures.js?v=1253cde2';
+import { salmonSwimAt } from '../street-creatures.js?v=2d8e3803';
 import { GAME_EPOCH_MS } from '../game-day.js?v=57fecfcb';
 import { topUpMetabolic } from '../metabolics.js?v=48f784bf';
-import { anchorBottomCentre } from '../sprite-feet.js?v=18e517a6';
+import { anchorBottomCentre } from '../sprite-feet.js?v=6319b91a';
 
 export const RESOURCE_FEATURE_ID = 'resource-nodes';
 export const RESOURCE_GROUP_PREFIX = 'resource:';

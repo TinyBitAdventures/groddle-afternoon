@@ -41,7 +41,7 @@ import {
 } from '../public/js/feats-mp.js?v=e1fc8239';
 import { FEAT_BY_ID, WIRED_FEATS, vogTextFor } from '../public/js/solo-feats.js?v=2224a7a6';
 import { GAME_DAY_MS, GAME_EPOCH_MS } from '../public/js/game-day.js?v=57fecfcb';
-import { soloFeatsFeature } from '../public/js/features/solo-feats-feature.js?v=c26fffcd';
+import { soloFeatsFeature } from '../public/js/features/solo-feats-feature.js?v=61ae7741';
 import { HAS_PHP, PHP } from './php.js';
 
 const root = join(import.meta.dirname, '..');

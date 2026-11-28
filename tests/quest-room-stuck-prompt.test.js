@@ -30,7 +30,7 @@ import {
   solveQuestInstance,
   stepQuestInstance,
   stuckPromptDue,
-} from '../public/js/quest-instance.js?v=39e4ca2e';
+} from '../public/js/quest-instance.js?v=bb5d53fd';
 import { BUILT_ROOMS, QUEST_ROOMS, roomModulePath } from '../public/js/quest-rooms/catalog.js?v=f37a25ba';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');

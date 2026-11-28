@@ -105,20 +105,20 @@
  *   animalMoodRooting (Piggies rooting now), animalMoodLast (root:look | root:sniff).
  */
 
-import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=1e277f22';
+import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=4636e02b';
 import { nearestSurfaceY } from '../walk-surface.js?v=76def2f6';
-import { displayTopOf, itemstackOverlayPoint, playSheetOverlay } from '../overlay-art.js?v=243cef7d';
+import { displayTopOf, itemstackOverlayPoint, playSheetOverlay } from '../overlay-art.js?v=4858876d';
 import { isInHell } from '../hell.js?v=0dba5774';
 import { HOG_HAUL_STREET_ID } from '../hog-haul.js?v=50d2e072';
 import { TRANT_META, trantStatusLabel } from '../trants.js?v=cf0fe1a3';
-import { animalStatusLabel } from '../animals.js?v=060b5c65';
+import { animalStatusLabel } from '../animals.js?v=171e862c';
 import { LOCAL_STATES } from '../shared-quoins.js?v=393445d8';
 import { publicStreet } from '../shared-street.js?v=dce5694b';
 import { quoteAnimalKinship } from '../animal-kinship.js?v=eaa3a6f2';
 import { VERB_RESPONSE_POOLS } from '../verb-responses-data.js?v=0777b59b';
-import { captureVerbState, isFoodItem, itemLabel } from '../animal-husbandry.js?v=9d2e832d';
-import { ROOK_SHEETS, rookAttackFeature } from './rook-attack-feature.js?v=a9dbcdad';
-import { ANIMAL_BODY, ANIMAL_PATROL, TREE_FOOTPRINT } from '../street-ecology.js?v=36fd044b';
+import { captureVerbState, isFoodItem, itemLabel } from '../animal-husbandry.js?v=9397c317';
+import { ROOK_SHEETS, rookAttackFeature } from './rook-attack-feature.js?v=9b5f50a9';
+import { ANIMAL_BODY, ANIMAL_PATROL, TREE_FOOTPRINT } from '../street-ecology.js?v=e5263244';
 import {
   CHECK_ON_REMOVE,
   CROWD_CLASSES,
@@ -164,7 +164,7 @@ import {
   satePiggy,
 } from '../animal-mood.js?v=c8cc8797';
 import { ownGroundRows, pruneOwnGround } from '../ground-stacks.js?v=22792362';
-import { wallBetween } from '../yard-wander.js?v=444d698e';
+import { wallBetween } from '../yard-wander.js?v=e6154394';
 
 export const ANIMAL_MOOD_FEATURE_ID = 'animal-mood';
 const YARD_TSID = 'RH_HOME_EXT';

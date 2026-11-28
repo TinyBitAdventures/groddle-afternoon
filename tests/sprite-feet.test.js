@@ -49,7 +49,7 @@ test('no sprite is anchored on a hand-written bottom centre: standOnFeet, or anc
 });
 
 test('every anchorBottomCentre names one of the reasons', async () => {
-  const { BOTTOM_CENTRE } = await import('../public/js/sprite-feet.js?v=18e517a6');
+  const { BOTTOM_CENTRE } = await import('../public/js/sprite-feet.js?v=6319b91a');
   const calls = codeLines().filter(({ rel, line }) => rel !== 'js/sprite-feet.js' && /\banchorBottomCentre\(/.test(line));
   assert.ok(calls.length > 50, `found ${calls.length}`);
   const bad = calls
@@ -97,7 +97,7 @@ test('nothing on its measured feet is pushed into its line by hand (R12: the wal
 });
 
 test('footOf reads the measured foot for the cut, and the bottom centre for anything else', async () => {
-  const { footOf, feetKey } = await import('../public/js/sprite-feet.js?v=18e517a6');
+  const { footOf, feetKey } = await import('../public/js/sprite-feet.js?v=6319b91a');
   const { SPRITE_FEET } = await import('../public/js/sprite-feet-data.js?v=e2217323');
   assert.deepEqual(footOf('assets/sprites/nothing-here.webp'), { x: 0.5, y: 1 });
   assert.equal(feetKey('https://x.test/assets/sprites/a.webp?v=3'), 'assets/sprites/a.webp');
@@ -116,8 +116,8 @@ test('standOnFeet anchors on the art and follows a clip or picture swap', async 
   class ImageSource { constructor(o) { Object.assign(this, o); } }
   class Texture { constructor({ source, frame }) { this.source = source; this.orig = frame || { width: 1, height: 1 }; } }
   globalThis.PIXI = { ImageSource, Texture };
-  const { sourceFromUrl, frameTexture, textureFromUrl } = await import('../public/js/textures.js?v=29f80b6a');
-  const { standOnFeet, anchorBottomCentre } = await import('../public/js/sprite-feet.js?v=18e517a6');
+  const { sourceFromUrl, frameTexture, textureFromUrl } = await import('../public/js/textures.js?v=71c5d2dc');
+  const { standOnFeet, anchorBottomCentre } = await import('../public/js/sprite-feet.js?v=6319b91a');
   const anchor = () => ({ x: 0, y: 0, set(x, y) { this.x = x; this.y = y; } });
   class Sprite {
     constructor(t) { this.anchor = anchor(); this._t = t; }

@@ -15,10 +15,10 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import { join } from 'node:path';
-import { getVerbsFor } from '../public/content.js?v=ef15f7ce';
-import { SIGN_FIRST_ARM_Y, SIGN_POST_W, SIGN_SCALE } from '../public/js/street-render.js?v=d76d4268';
-import { WAY_OUT_ARM, WAY_OUT_HIT, wayOutTarget } from '../public/js/features/homes-feature.js?v=6c2d961d';
-import { FRIENDS_HIT_H } from '../public/js/features/home-street-mp-feature.js?v=d0273ca3';
+import { getVerbsFor } from '../public/content.js?v=5c87277f';
+import { SIGN_FIRST_ARM_Y, SIGN_POST_W, SIGN_SCALE } from '../public/js/street-render.js?v=c1ac1f42';
+import { WAY_OUT_ARM, WAY_OUT_HIT, wayOutTarget } from '../public/js/features/homes-feature.js?v=52c98a6b';
+import { FRIENDS_HIT_H } from '../public/js/features/home-street-mp-feature.js?v=6ec686d0';
 import {
   SIGNPOST_POST_HALF,
   createCultivationState,
@@ -28,11 +28,11 @@ import {
   homeStreetLayout,
   normalizeCultivationState,
   placementCheck,
-} from '../public/js/home-cultivation.js?v=61295953';
+} from '../public/js/home-cultivation.js?v=8c3a5cb8';
 import { DISPATCHER_TEXT, SIGNPOST, dispatcherDefaultRx, dispatcherFits, signpostX, streetFixtures } from '../public/js/home-street-fixtures.js?v=d4e5b56a';
 import { sceneSignMarks } from '../public/js/ui/street-minimap.js?v=faab9586';
 import { HUB_TILES, hubTileBackground, hubTileForKey, hubTileState } from '../public/js/ui/imagination-hub.js?v=6928c5b7';
-import { HUB_CLOUDS, placeClouds } from '../public/js/classic/classic-hub.js?v=14bcd150';
+import { HUB_CLOUDS, placeClouds } from '../public/js/classic/classic-hub.js?v=a4b3e982';
 
 const root = join(import.meta.dirname, '..');
 const pub = join(root, 'public');

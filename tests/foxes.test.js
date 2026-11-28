@@ -33,15 +33,15 @@ import {
 } from '../public/js/foxes.js?v=c0ce235f';
 import { createToolConditionState, getToolCondition } from '../public/js/tools.js?v=4156bba8';
 import { ITEM_CATALOG } from '../public/js/inventory.js?v=3be7988a';
-import { getAchievementCatalog, loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=b6a173ae';
+import { getAchievementCatalog, loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=b2a9a862';
 import {
   inReach,
   isPreserveRow,
   preserveEcologyEntry,
-} from '../public/js/features/foxes-feature.js?v=41b9233c';
-import { wildlifeFor } from '../public/js/wildlife.js?v=7224f78a';
+} from '../public/js/features/foxes-feature.js?v=2a8aea07';
+import { wildlifeFor } from '../public/js/wildlife.js?v=352e8bfa';
 import { createFeatureHost } from '../public/js/feature-host.js?v=100f3193';
-import { foxesFeature } from '../public/js/features/foxes-feature.js?v=41b9233c';
+import { foxesFeature } from '../public/js/features/foxes-feature.js?v=2a8aea07';
 import { bubbleMs, readMs } from '../public/js/read-time.js?v=3151fb1a';
 
 const ecology = JSON.parse(readFileSync(new URL('../public/assets/content/street-ecology.json', import.meta.url)));

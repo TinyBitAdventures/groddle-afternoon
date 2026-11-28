@@ -33,10 +33,10 @@
  * newUrClock (local | qa | server).
  */
 
-import { OVERLAY_USES, playCountdownArt, playWindowOverlay, windowOverlayFit } from '../overlays.js?v=306c160f';
+import { OVERLAY_USES, playCountdownArt, playWindowOverlay, windowOverlayFit } from '../overlays.js?v=18dfb26a';
 import { exposeQA } from '../qa-gate.js?v=f4e2cd82';
 import { parseSeasonDate } from '../seasons.js?v=5d8f545a';
-import { fireworksUnder, viewport } from './spirit-loneliness-feature.js?v=5c90e95b';
+import { fireworksUnder, viewport } from './spirit-loneliness-feature.js?v=2e46f4ae';
 import {
   DRAGON_AT,
   NEW_UR_TEXT,

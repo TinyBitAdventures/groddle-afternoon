@@ -16,8 +16,8 @@
  * many are drawn), swoonerflyAt (x,y of the first).
  */
 
-import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=1e277f22';
-import { loadWildlifeCatalog, wildlifeCatalog } from '../wildlife.js?v=7224f78a';
+import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=4636e02b';
+import { loadWildlifeCatalog, wildlifeCatalog } from '../wildlife.js?v=352e8bfa';
 import {
   SWOONERFLY_CLASS,
   SWOONERFLY_LABEL,
@@ -28,7 +28,7 @@ import {
 } from '../swoonerflies.js?v=326c8103';
 import { itemZ } from '../item-bands.js?v=ec366be3';
 import { hideNameTip, wireNameTip } from '../world-name-tip.js?v=78a0ca81';
-import { standOnFeet } from '../sprite-feet.js?v=18e517a6';
+import { standOnFeet } from '../sprite-feet.js?v=6319b91a';
 
 export const SWOONERFLIES_FEATURE_ID = 'swoonerflies';
 

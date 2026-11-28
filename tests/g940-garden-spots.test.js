@@ -20,14 +20,14 @@ import {
   populationForStreet,
   setStreetEcologyCatalog,
   streetReservedSpots,
-} from '../public/js/street-ecology.js?v=36fd044b';
+} from '../public/js/street-ecology.js?v=e5263244';
 import { platformYAt, platformsScreen, streetWidth } from '../public/js/street-model.js?v=a9a05f9d';
 import { GARDEN_SPOTS } from '../public/js/garden-spots-data.js?v=3c5d4164';
 import { CROP_GARDEN_STREETS_2012, gardenBedWidth, isCropGardenStreet, measuredGardenBeds, measuredGardenVendor, pictureGardenBeds } from '../public/js/garden-beds.js?v=2ac6a12c';
 import { BED_KEY_RE, SEED_CATALOG, bedKind, createGarden, harvestLostBeds, streetGardenBeds } from '../public/js/garden.js?v=fefa7bcd';
 import { bedKey, parsePlotId, plotId } from '../public/js/shared-gardens.js?v=464472e5';
 import { VENDOR_PLACEMENT_KEY, vendorNpcPlacementGroups, vendorNpcsFor } from '../public/js/vendor-npcs.js?v=90b0c123';
-import { normalizeWorldSnapshot } from '../public/js/player-save.js?v=e68db82d';
+import { normalizeWorldSnapshot } from '../public/js/player-save.js?v=05e5fe5e';
 import { placementRequests } from '../tools/build-realtime-objects.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');

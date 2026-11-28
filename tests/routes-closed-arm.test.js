@@ -11,8 +11,8 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { ROUTE_TEXT, createRouteState, findRoute, planRoute } from '../public/js/map-routes.js?v=e9f5e3da';
-import { streetGraph } from '../public/js/street-graph.js?v=16013e6e';
+import { ROUTE_TEXT, createRouteState, findRoute, planRoute } from '../public/js/map-routes.js?v=084dc311';
+import { streetGraph } from '../public/js/street-graph.js?v=92206051';
 import { VENDOR_FINDER_TEXT, vendorFinderRows, vendorRowWhere } from '../public/js/vendor-finder.js?v=7fbfc51d';
 
 const root = join(import.meta.dirname, '..');

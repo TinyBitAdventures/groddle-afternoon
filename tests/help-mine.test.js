@@ -27,7 +27,7 @@ import {
   pickCompanionRock,
   removeMiner,
 } from '../public/js/help-mine.js?v=27f9d276';
-import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=b6a173ae';
+import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=b2a9a862';
 import {
   acceptOffer,
   pendingQuestOffers,
@@ -35,10 +35,10 @@ import {
   requirementRoute,
   routeQuestEvent,
   turnInQuest,
-} from '../public/js/quest-offers.js?v=36e610b5';
+} from '../public/js/quest-offers.js?v=769eba09';
 import { createMineRock } from '../public/js/mining.js?v=7ecaa572';
-import { rockId } from '../public/js/street-objects.js?v=8cdf5355';
-import { createQuestState } from '../public/js/quests.js?v=15aab2e3';
+import { rockId } from '../public/js/street-objects.js?v=ab8168f6';
+import { createQuestState } from '../public/js/quests.js?v=17fca824';
 
 const here = import.meta.dirname;
 const root = join(here, '..');

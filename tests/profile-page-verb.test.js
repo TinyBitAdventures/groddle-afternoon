@@ -19,7 +19,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { join } from 'node:path';
 import { PROFILE_LISTED_LEVEL, PROFILE_PAGE_COPY, PROFILE_PAGE_VERB, profilePagePath, profilePageVerb, profileSlug } from '../public/js/profiles.js?v=1daccbb9';
-import { lookUpPlayersHere, profilesFeature } from '../public/js/features/profiles-feature.js?v=97e9daee';
+import { lookUpPlayersHere, profilesFeature } from '../public/js/features/profiles-feature.js?v=f3ba8e2d';
 import { GAME_DIR, HAS_SITE, SITE_DIR, skipWithoutSite } from '../tools/repos.mjs';
 import { HAS_PHP, PHP, phpSkip } from './php.js';
 

@@ -13,7 +13,7 @@ import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { applyStreetIndex, loadStreetDataFromFs, setZoneStreetsShown } from '../public/js/street-loader.js?v=23555e53';
+import { applyStreetIndex, loadStreetDataFromFs, setZoneStreetsShown } from '../public/js/street-loader.js?v=b8ea30df';
 import { isItemFloor, platformYAt, platformsScreen, streetWidth } from '../public/js/street-model.js?v=a9a05f9d';
 import {
   FRONT_HIDE_SHARE,
@@ -26,12 +26,12 @@ import {
   populationForStreet,
   setStreetEcologyCatalog,
   streetReservedSpots,
-} from '../public/js/street-ecology.js?v=36fd044b';
+} from '../public/js/street-ecology.js?v=e5263244';
 import { GARDEN_SPOTS } from '../public/js/garden-spots-data.js?v=3c5d4164';
 import { gardenBedWidth, measuredGardenVendor } from '../public/js/garden-beds.js?v=2ac6a12c';
 import { VENDOR_NPC_ART, VENDOR_PLACEMENT_KEY, vendorNpcList, vendorNpcPlacementGroups, vendorNpcStoreProfile, vendorNpcsFor } from '../public/js/vendor-npcs.js?v=90b0c123';
 import { VENDOR_PROFILES } from '../public/js/vendor.js?v=7a07f478';
-import { VENDOR_REACH } from '../public/js/vendor-walk.js?v=f3d421f0';
+import { VENDOR_REACH } from '../public/js/vendor-walk.js?v=94034ab6';
 import { followFloorY } from '../public/js/walk-surface.js?v=76def2f6';
 import { streetGardenBeds } from '../public/js/garden.js?v=fefa7bcd';
 import { placementRequests } from '../tools/build-realtime-objects.mjs';

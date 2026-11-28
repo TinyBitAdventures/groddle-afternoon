@@ -11,10 +11,10 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { closedStreets, normalizeStreetJobState } from '../public/js/street-jobs.js?v=17f103d0';
-import { fewestClosures, reachableStreets, streetGraph } from '../public/js/street-graph.js?v=16013e6e';
-import { PROJECTS_TEXT, aheadEntries, aheadRegions, streetProjectId } from '../public/js/projects-tracker.js?v=c5f34e96';
-import { buildProjectsPanel, renderAhead, renderProjects } from '../public/js/ui/projects-sheet.js?v=f272903d';
+import { closedStreets, normalizeStreetJobState } from '../public/js/street-jobs.js?v=e175c7e5';
+import { fewestClosures, reachableStreets, streetGraph } from '../public/js/street-graph.js?v=92206051';
+import { PROJECTS_TEXT, aheadEntries, aheadRegions, streetProjectId } from '../public/js/projects-tracker.js?v=27b6ea1e';
+import { buildProjectsPanel, renderAhead, renderProjects } from '../public/js/ui/projects-sheet.js?v=01f182ba';
 
 const root = join(import.meta.dirname, '..');
 const read = (p) => readFileSync(join(root, p), 'utf8');

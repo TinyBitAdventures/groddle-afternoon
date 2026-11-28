@@ -8,7 +8,7 @@ import assert from 'node:assert/strict';
 import { before, describe, it } from 'node:test';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { getSkillCatalog, loadContentCatalogsFromDir, resetContentCatalogs } from '../public/js/content-catalogs.js?v=b6a173ae';
+import { getSkillCatalog, loadContentCatalogsFromDir, resetContentCatalogs } from '../public/js/content-catalogs.js?v=b2a9a862';
 import {
   BETTER_LEARNING_BASE_SECONDS,
   BETTER_LEARNING_DISCOUNTS,
@@ -16,13 +16,13 @@ import {
   betterLearningDiscount,
   betterLearningRank,
 } from '../public/js/better-learning.js?v=044ff9ff';
-import { canLearnSkill, createSkillState, grantSkill, startSkillStudy, tickSkillStudy } from '../public/js/skills.js?v=76dfcf84';
+import { canLearnSkill, createSkillState, grantSkill, startSkillStudy, tickSkillStudy } from '../public/js/skills.js?v=b79dc38f';
 import { skillTimeFactor } from '../public/js/imagination-effects.js?v=70169933';
 import { learnTimeReductions } from '../public/js/imagination.js?v=1bdfd77c';
-import { emblemUnlockSkillFor, skillRemakeNote, skillTitle, skillTreeEntry, spendEmblemForSkill } from '../public/js/skill-tree.js?v=81ca6fe8';
-import { acceptOffer, pendingQuestOffers } from '../public/js/quest-offers.js?v=36e610b5';
-import { createQuestState } from '../public/js/quests.js?v=15aab2e3';
-import { normalizeStreetJobState, phaseRequirements, workCheck } from '../public/js/street-jobs.js?v=17f103d0';
+import { emblemUnlockSkillFor, skillRemakeNote, skillTitle, skillTreeEntry, spendEmblemForSkill } from '../public/js/skill-tree.js?v=6f55bf1c';
+import { acceptOffer, pendingQuestOffers } from '../public/js/quest-offers.js?v=769eba09';
+import { createQuestState } from '../public/js/quests.js?v=17fca824';
+import { normalizeStreetJobState, phaseRequirements, workCheck } from '../public/js/street-jobs.js?v=e175c7e5';
 import { skillArtFor } from '../public/js/familiar.js?v=b9597cd3';
 import { CARD_ART_LAYERS } from '../public/js/imagination-data.js?v=4a85e7fe';
 

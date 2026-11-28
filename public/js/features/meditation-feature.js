@@ -75,9 +75,9 @@ import {
 import { energyMax, forceMetabolic, gainMetabolic, loseEnergy, loseMood, metabolicGain, moodMax } from '../metabolics.js?v=48f784bf';
 import { levitationCards } from '../imagination-effects.js?v=70169933';
 import { applyPhysicsAdjustments, physicsMultipliers } from '../location-events.js?v=48938c8f';
-import { sourceFromUrl } from '../textures.js?v=29f80b6a';
+import { sourceFromUrl } from '../textures.js?v=71c5d2dc';
 import { denseSprite } from '../sprite-dense.js?v=67101472';
-import { rainbowSound, showRainbow } from '../overlays.js?v=306c160f';
+import { rainbowSound, showRainbow } from '../overlays.js?v=18dfb26a';
 import { moodScaledXp } from '../mood-xp.js?v=e311b45c';
 import { TOUCH_JUMP_EVENT, isPhoneDevice } from '../touch-controls.js?v=8bc690ac';
 import { createMinnAccount } from '../minn-account.js?v=7e3d7279';
@@ -100,7 +100,7 @@ import {
   radiatorEnd,
   radiatorLine,
 } from '../radiance-mp.js?v=b3137af4';
-import { anchorBottomCentre } from '../sprite-feet.js?v=18e517a6';
+import { anchorBottomCentre } from '../sprite-feet.js?v=6319b91a';
 
 export const MEDITATION_FEATURE_ID = 'meditation';
 /** metabolics_get_max_energy: the energy tank (100 plus Energy Tank cards). */

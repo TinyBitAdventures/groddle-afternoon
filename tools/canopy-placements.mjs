@@ -20,7 +20,7 @@ import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { STREET_INDEX, applyStreetIndex, setZoneStreetsShown } from '../public/js/street-loader.js?v=23555e53';
+import { STREET_INDEX, applyStreetIndex, setZoneStreetsShown } from '../public/js/street-loader.js?v=b8ea30df';
 import { platformsScreen, streetWidth } from '../public/js/street-model.js?v=a9a05f9d';
 import {
   TREE_CANOPY,
@@ -29,9 +29,9 @@ import {
   populationForStreet,
   setStreetEcologyCatalog,
   streetReservedSpots,
-} from '../public/js/street-ecology.js?v=36fd044b';
+} from '../public/js/street-ecology.js?v=e5263244';
 import { isZoneTsid } from '../public/js/zone-streets.js?v=b40010d5';
-import { upgradeEcologyEntry } from '../public/js/street-jobs.js?v=17f103d0';
+import { upgradeEcologyEntry } from '../public/js/street-jobs.js?v=e175c7e5';
 import { creatureRequests, setCreatureEcology } from './build-realtime-objects.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');

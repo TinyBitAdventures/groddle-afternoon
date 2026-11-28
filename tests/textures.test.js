@@ -36,7 +36,8 @@ class FakeImage {
   set src(url) {
     this._src = url;
     setTimeout(() => {
-      if (failing.has(url)) return this.onerror?.();
+      // A missing file is missing whatever a retry adds to its URL (#768 review: retry=N).
+      if (failing.has(url) || failing.has(String(url).replace(/[?&]retry=\d+$/, ''))) return this.onerror?.();
       const m = /(\d+)x(\d+)/.exec(url);
       this.naturalWidth = m ? Number(m[1]) : 64;
       this.naturalHeight = m ? Number(m[2]) : 32;
@@ -54,7 +55,7 @@ before(async () => {
   globalThis.PIXI = { ImageSource, Texture };
   globalThis.Image = FakeImage;
   globalThis.document = { createElement: () => ({ width: 0, height: 0, getContext: () => ({ drawImage() {} }) }) };
-  T = await import('../public/js/textures.js?v=29f80b6a');
+  T = await import('../public/js/textures.js?v=71c5d2dc');
 });
 after(() => {
   for (const [k, v] of Object.entries(saved)) globalThis[k] = v;

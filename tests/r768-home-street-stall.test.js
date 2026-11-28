@@ -10,9 +10,9 @@
 import assert from 'node:assert/strict';
 import { after, before, describe, it, mock } from 'node:test';
 
-import { homeStreetMpFeature } from '../public/js/features/home-street-mp-feature.js?v=d0273ca3';
-import { homesFeature } from '../public/js/features/homes-feature.js?v=6c2d961d';
-import { LOAD_TIMEOUT_MS, RETRY_WAITS_MS } from '../public/js/load-retry.js?v=24823577';
+import { homeStreetMpFeature } from '../public/js/features/home-street-mp-feature.js?v=6ec686d0';
+import { homesFeature } from '../public/js/features/homes-feature.js?v=52c98a6b';
+import { LOAD_TIMEOUT_MS, RETRY_WAITS_MS } from '../public/js/load-retry.js?v=477aa7a7';
 import { Display, FakeEl, fakePixi } from './fake-scene.js';
 
 const ME = { id: 1, name: 'Bo' };

@@ -17,7 +17,7 @@ import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { dirname, join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { SITE_PAGE_TEXT, openSitePage, plainLinkClick, setSitePageViewer, siteLinkTip, sitePageHref, sitePageTip, sitePageWhere } from '../public/js/site-pages.js?v=9b3049cf';
-import { createEncyclopedia, encyclopediaTip } from '../public/js/encyclopedia-links.js?v=1dde87cc';
+import { createEncyclopedia, encyclopediaTip } from '../public/js/encyclopedia-links.js?v=f24b43a4';
 import { hotkeySections } from '../public/js/client-hotkeys.js?v=401d994d';
 import { JOB_ASK_TEXT } from '../public/js/street-job-asks.js?v=32adbe89';
 import { PROFILE_PAGE_COPY, profilePageVerb } from '../public/js/profiles.js?v=1daccbb9';

@@ -11,9 +11,9 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { assertStreetGeometry, platformYAt } from '../public/js/street-model.js?v=a9a05f9d';
 import { arrivalInTarget } from '../public/js/location-navigation.js?v=e9221d85';
-import { populationForStreet } from '../public/js/street-ecology.js?v=36fd044b';
+import { populationForStreet } from '../public/js/street-ecology.js?v=e5263244';
 import { checkDoorEntry, doorAt, doorDestination } from '../public/js/doors.js?v=f815e7c8';
-import { eventCounters, SEAM_STREETS } from '../public/js/quest-offers.js?v=36e610b5';
+import { eventCounters, SEAM_STREETS } from '../public/js/quest-offers.js?v=769eba09';
 import {
   ABBASID_JAIL_DOOR,
   ABBASID_JAIL_TSID,
@@ -52,8 +52,8 @@ import {
   isRebuiltRoomTsid,
   rebuiltRoomEcology,
 } from '../public/js/rebuilt-rooms.js?v=5ef5618f';
-import { rebuiltRoomsFeature } from '../public/js/features/rebuilt-rooms-feature.js?v=6f2bb59c';
-import { FEATURES } from '../public/js/features/index.js?v=6ebe7a39';
+import { rebuiltRoomsFeature } from '../public/js/features/rebuilt-rooms-feature.js?v=f3014649';
+import { FEATURES } from '../public/js/features/index.js?v=a0cfeefb';
 
 const spike = join(dirname(fileURLToPath(import.meta.url)), '..');
 const pub = join(spike, 'public');

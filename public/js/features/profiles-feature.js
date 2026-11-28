@@ -78,9 +78,9 @@
  * profilePages (id:public|none, the players looked up).
  */
 
-import { fetchRetry } from '../load-retry.js?v=24823577';
+import { fetchRetry } from '../load-retry.js?v=477aa7a7';
 import { createMinnAccount } from '../minn-account.js?v=7e3d7279';
-import { drawListFor, loadCatalog, paintItems, prepareLook } from '../avatar-compositor.js?v=2b3cd2b7';
+import { drawListFor, loadCatalog, paintItems, prepareLook } from '../avatar-compositor.js?v=51413a53';
 import { drawListBounds } from '../avatar-rig.js?v=b67f0da8';
 import { lookKey, resolveLook } from '../avatar-looks.js?v=5a28384d';
 import {
@@ -90,9 +90,9 @@ import {
   aboutCounter, profilePagePath, profilePageVerb, avatarKeyOf, base64Bytes, homeKeyOf, homeSizes, imageBase64, pngBase64, shouldUpload, staleRefreshDue, stillTransform,
   towerKeyOf, towerShotDue,
 } from '../profiles.js?v=1daccbb9';
-import { homeLayoutJson, homeLayoutKeyOf, HOME_LAYOUT_LIMITS } from '../home-layout.js?v=53eabf28';
-import { collectHomeLayout, homeFrameFor } from '../home-layout-scene.js?v=b0e8b5ae';
-import { renderHomeLocation } from '../home-shot-render.js?v=fc91430c';
+import { homeLayoutJson, homeLayoutKeyOf, HOME_LAYOUT_LIMITS } from '../home-layout.js?v=a46b67e6';
+import { collectHomeLayout, homeFrameFor } from '../home-layout-scene.js?v=ab73d0ab';
+import { renderHomeLocation } from '../home-shot-render.js?v=43fe6e26';
 import { withPublicView } from '../public-picture.js?v=1a0b03fa';
 import { openSitePage } from '../site-pages.js?v=9b3049cf';
 

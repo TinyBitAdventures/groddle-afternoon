@@ -44,7 +44,7 @@
  * window.groddleAuctions in multiplayer.
  */
 
-import { fetchRetry } from '../load-retry.js?v=24823577';
+import { fetchRetry } from '../load-retry.js?v=477aa7a7';
 import { priceText } from '../price.js?v=35cd2331';
 import { ITEM_CATALOG, addItem, countItem, itemIcon, listPackSlots, removeItem } from '../inventory.js?v=3be7988a';
 import { scriptFromTag, scriptLabel } from '../teleportation.js?v=cbbc673f';

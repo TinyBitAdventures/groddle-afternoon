@@ -69,13 +69,13 @@
  * refused). QA: &streetmapexpand=1 expands it on each street.
  */
 
-import { STREET_ENTITY_KINDS } from '../street-render.js?v=d76d4268';
+import { STREET_ENTITY_KINDS } from '../street-render.js?v=c1ac1f42';
 import { DOOR_LOOKS, createPictureCache, createStreetMinimap, doorArtName, doorMarks, markArt, minimapVisibility, onStreetMapChange, sceneDoorMarks, sceneSignMarks, setStreetMap, signpostMarks, snapshotStreetView, snapsWithScene, stationMarks, streetMapOn, teleporterMarks, withDoorArt } from '../ui/street-minimap.js?v=faab9586';
 import { classicArtHd, classicArtUrl } from '../classic/classic-art.js?v=0f6f02a3';
 import { onUiModeChange } from '../classic/ui-mode.js?v=1678b715';
 import { focusBack } from '../ui/focus-return.js?v=da190597';
 import { isPhoneDevice } from '../touch-controls.js?v=8bc690ac';
-import { isFailed, isLoaded, onFailed, onLoaded } from '../textures.js?v=29f80b6a';
+import { isFailed, isLoaded, onFailed, onLoaded } from '../textures.js?v=71c5d2dc';
 
 export const STREET_MINIMAP_FEATURE_ID = 'street-minimap';
 const UPDATE_MS = 100;
@@ -305,6 +305,35 @@ export function pendingArtSources(roots = [], { loaded = isLoaded, failed = isFa
   return [...out];
 }
 
+/**
+ * #768 review: a picture that stalled or failed counts as done for the art watch (so the map is not
+ * held back), but js/textures.js asks for it again and it can still land: the map kept the picture
+ * without it (a house with no house on the home street's map). `onLate` runs once when a source that
+ * had failed loads after all, as the 2012 client re-snapped on each late deco (addAndSyncDecoAsset).
+ * Returns a function that stops listening.
+ */
+export function watchLateArt(sources, onLate, { failed = isFailed } = {}) {
+  const offs = [];
+  for (const src of sources || []) {
+    if (!src || typeof src.on !== 'function') continue;
+    const fn = () => {
+      if (!wasFailed.has(src)) return;
+      wasFailed.delete(src);
+      onLate(src);
+    };
+    const err = () => wasFailed.add(src);
+    if (failed(src)) wasFailed.add(src);
+    src.on('loaded', fn);
+    src.on('error', err);
+    offs.push(() => {
+      src.off?.('loaded', fn);
+      src.off?.('error', err);
+    });
+  }
+  return () => offs.splice(0).forEach((off) => off());
+}
+const wasFailed = new WeakSet();
+
 /** ART: what the snapshot draws: the view, its front layers, and a live scene's kept entities. */
 function artRoots(engine, v) {
   const roots = [v];
@@ -318,6 +347,7 @@ function stopArt() {
   if (!art) return;
   clearTimeout(art.capTimer);
   clearTimeout(art.settleTimer);
+  art.offLate?.();
   art = null;
 }
 
@@ -360,6 +390,15 @@ function watchArt(engine, a) {
     onLoaded(src, done);
     onFailed(src, done);
   }
+  // #768 review: one that fails now and lands on a later try snaps the map again (batched).
+  const offLate = watchLateArt(pending, () => {
+    if (art === a) requestResnap(engine);
+  });
+  const before = a.offLate;
+  a.offLate = () => {
+    before?.();
+    offLate();
+  };
 }
 
 /** ART: everything that was loading is in: wait for anything added since, else snap a frame after the bakes. */

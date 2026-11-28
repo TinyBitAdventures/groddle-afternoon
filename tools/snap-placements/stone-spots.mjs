@@ -21,7 +21,7 @@ import { readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { platformsScreen } from '../../public/js/street-model.js?v=a9a05f9d';
-import { PLACEMENT_FOOTPRINTS } from '../../public/js/street-ecology.js?v=36fd044b';
+import { PLACEMENT_FOOTPRINTS } from '../../public/js/street-ecology.js?v=e5263244';
 import { seatOnFloor } from './shrine-pictures.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '../..');

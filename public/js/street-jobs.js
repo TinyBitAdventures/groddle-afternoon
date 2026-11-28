@@ -59,11 +59,11 @@
  */
 
 export const SOLO_DIVISOR = 50;
-import { SUBWAY_STREETS, builtForEveryone, keptOpen } from './open-roads.js?v=88fb8b19';
+import { SUBWAY_STREETS, builtForEveryone, keptOpen } from './open-roads.js?v=d41120cf';
 import { loseEnergy } from './metabolics.js?v=48f784bf';
-import { soloSkill } from './street-jobs-solo.js?v=e6d237d8';
+import { soloSkill } from './street-jobs-solo.js?v=32f2a093';
 import { htmlToText } from './html-text.js?v=6bbf4d1f';
-import { fewestClosures, streetGraph } from './street-graph.js?v=16013e6e';
+import { fewestClosures, streetGraph } from './street-graph.js?v=92206051';
 /** items/include/jobs.js startJobWork unit_duration. */
 export const WORK_UNIT_MS = 1500;
 /** locations/inc_jobs.js jobs_get_available: 30 * 60 seconds. */

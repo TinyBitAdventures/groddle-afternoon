@@ -15,8 +15,8 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=b6a173ae';
-import { createQuestState, assignQuest } from '../public/js/quests.js?v=15aab2e3';
+import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=b2a9a862';
+import { createQuestState, assignQuest } from '../public/js/quests.js?v=17fca824';
 import {
   FIRST_SKILL_QUEST_ID,
   TUTORIAL_GENERIC_BAGS,
@@ -26,7 +26,7 @@ import {
   routeQuestEvent,
   settleFirstSkillQuest,
   turnInQuest,
-} from '../public/js/quest-offers.js?v=36e610b5';
+} from '../public/js/quest-offers.js?v=769eba09';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const CONTENT = join(ROOT, 'public/assets/content');

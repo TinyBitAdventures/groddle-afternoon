@@ -36,7 +36,7 @@
  * Pure apart from the one fetch in loadStreetGraph: no DOM, no Pixi.
  */
 
-import { fetchRetry } from './load-retry.js?v=24823577';
+import { fetchRetry } from './load-retry.js?v=477aa7a7';
 import { doorKeysHeld } from './doors.js?v=f815e7c8';
 
 /** The signpost graph (tools/build-signpost-graph.mjs); js/data-urls.js keys the URL. */

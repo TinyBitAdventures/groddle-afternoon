@@ -34,7 +34,7 @@
  *   after RETRY_WAIT_MS, so a house built once still fills in.
  */
 
-import { isLoadTimeout, loadTimeoutFor, RETRY_WAITS_MS, timeLimit } from './load-retry.js?v=24823577';
+import { isLoadTimeout, loadTimeoutFor, retryUrl, RETRY_WAITS_MS, timeLimit } from './load-retry.js?v=477aa7a7';
 
 /** @type {Map<string, any>} url -> TextureSource */
 const sources = new Map();
@@ -294,7 +294,9 @@ function startLoad(source, state) {
   state.failed = false;
   // #768: a try that neither loads nor fails within its limit fails as stalled (and is tried again below).
   const ms = loadTimeoutFor(state.attempts);
-  const run = timeLimit((signal) => (isSvg(url) ? rasteriseSvg(url, opts, signal) : opts.width > 0 && opts.height > 0 ? resizeImage(url, opts, signal) : decodeImage(url, signal)), { ms });
+  // #768 review: a later try is a distinct request (retryUrl), or WebKit joins it to the stuck one.
+  const ask = retryUrl(url, state.attempts);
+  const run = timeLimit((signal) => (isSvg(url) ? rasteriseSvg(ask, opts, signal) : opts.width > 0 && opts.height > 0 ? resizeImage(ask, opts, signal) : decodeImage(ask, signal)), { ms });
   state.run = run;
   state.startedAt = Date.now();
   state.timeoutMs = ms;

@@ -59,7 +59,7 @@
  * restore a stale one after a later croak).
  */
 
-import { closedOnTheWay, doorRooms, findRoute, graphKey, hasRoad, isClosed, lockedOnTheWay, routeGraph, sameStreet, tsidAliases } from './street-graph.js?v=16013e6e';
+import { closedOnTheWay, doorRooms, findRoute, graphKey, hasRoad, isClosed, lockedOnTheWay, routeGraph, sameStreet, tsidAliases } from './street-graph.js?v=92206051';
 import { DOOR_KEYS, DOOR_TEXT } from './doors.js?v=f815e7c8';
 
 /**

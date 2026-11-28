@@ -14,7 +14,7 @@ import { join } from 'node:path';
 import { HOME_CREW_ID, homeCrewId, homeCrewOwner, normalizeHomeCrews } from '../public/js/home-crew-mp.js?v=6cd63e3a';
 import { homeCrewMpFeature } from '../public/js/features/home-crew-mp-feature.js?v=81824897';
 import { createMineRock } from '../public/js/mining.js?v=7ecaa572';
-import { createQuestState } from '../public/js/quests.js?v=15aab2e3';
+import { createQuestState } from '../public/js/quests.js?v=17fca824';
 import { HAS_SERVER, HAS_SITE, SITE_DIR, serverPath } from '../tools/repos.mjs';
 import { HAS_PHP, PHP } from './php.js';
 

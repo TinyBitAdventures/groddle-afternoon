@@ -11,8 +11,8 @@ import { execFileSync } from 'node:child_process';
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { createAchievementState, applyAchievementProgress, getAchievementProgress, unlockAchievement } from '../public/js/achievements.js?v=4af6091c';
-import { loadContentCatalogsFromDir, getAchievementCatalog } from '../public/js/content-catalogs.js?v=b6a173ae';
+import { createAchievementState, applyAchievementProgress, getAchievementProgress, unlockAchievement } from '../public/js/achievements.js?v=7a3a0e92';
+import { loadContentCatalogsFromDir, getAchievementCatalog } from '../public/js/content-catalogs.js?v=b2a9a862';
 import { applyStreetVisit, availableHubStreets, hubMapStreetCount, topUpCompletists } from '../public/js/exploration.js?v=8f19e25d';
 import { ACHIEVEMENT_CONDITION_OVERRIDES, applyAchievementOverrides, withAchievementOverrides } from '../tools/achievement-overrides.mjs';
 

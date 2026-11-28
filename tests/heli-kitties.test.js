@@ -23,12 +23,12 @@ import {
   scareChance,
   stepKitty,
 } from '../public/js/heli-kitties.js?v=e4af4096';
-import { KITTY_SHEETS, heliKittiesFeature, kittyPlacementGroups, sharedKittyFloorY } from '../public/js/features/heli-kitties-feature.js?v=73f6e0cd';
+import { KITTY_SHEETS, heliKittiesFeature, kittyPlacementGroups, sharedKittyFloorY } from '../public/js/features/heli-kitties-feature.js?v=ae76f603';
 import { platformsScreen } from '../public/js/street-model.js?v=a9a05f9d';
 import { walkSurfaceY } from '../public/js/walk-surface.js?v=76def2f6';
-import { foxesFeature } from '../public/js/features/foxes-feature.js?v=41b9233c';
+import { foxesFeature } from '../public/js/features/foxes-feature.js?v=2a8aea07';
 import { createFeatureHost } from '../public/js/feature-host.js?v=100f3193';
-import { setWildlifeCatalog } from '../public/js/wildlife.js?v=7224f78a';
+import { setWildlifeCatalog } from '../public/js/wildlife.js?v=352e8bfa';
 import { readFileSync } from 'node:fs';
 
 const flat = (y = 300) => ({ geo: { l: 0, r: 3000 }, groundY: y, surfaceY: () => y, landY: () => y });

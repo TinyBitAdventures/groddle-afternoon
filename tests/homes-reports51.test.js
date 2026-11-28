@@ -12,7 +12,7 @@ import { DOCK_GAP, DOCK_W, dockedPickerSpot } from '../public/js/furniture-upgra
 import { filterSwatches, swatchFilters } from '../public/js/ui/home-builder.js?v=26dcf346';
 import { listTextures } from '../public/js/home-decor.js?v=3a84d959';
 import { salePlacementKey } from '../public/js/home-street-mp.js?v=1c5890ef';
-import { beginHomeVisit, createHomeState, imagineHome } from '../public/js/homes.js?v=4f4ade68';
+import { beginHomeVisit, createHomeState, imagineHome } from '../public/js/homes.js?v=9484b948';
 
 const root = join(import.meta.dirname, '..');
 const read = (p) => readFileSync(join(root, p), 'utf8');

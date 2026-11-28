@@ -142,7 +142,7 @@ before(async () => {
     }
     get src() { return this._src; }
   };
-  T = await import('../public/js/textures.js?v=29f80b6a');
+  T = await import('../public/js/textures.js?v=71c5d2dc');
 });
 
 const url = (name) => `assets/test/r30-${name}.webp`;

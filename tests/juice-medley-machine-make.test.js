@@ -18,10 +18,10 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=b6a173ae';
-import { createQuestState } from '../public/js/quests.js?v=15aab2e3';
-import { acceptOffer, routeQuestEvent } from '../public/js/quest-offers.js?v=36e610b5';
-import { RECIPE_CATALOG, craftRecipe, loadRecipeCatalogFromFile } from '../public/js/making.js?v=d3571803';
+import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=b2a9a862';
+import { createQuestState } from '../public/js/quests.js?v=17fca824';
+import { acceptOffer, routeQuestEvent } from '../public/js/quest-offers.js?v=769eba09';
+import { RECIPE_CATALOG, craftRecipe, loadRecipeCatalogFromFile } from '../public/js/making.js?v=4d75f062';
 import { stationForRecipe } from '../public/js/make-tools.js?v=86877c3e';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');

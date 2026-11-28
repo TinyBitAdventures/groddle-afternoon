@@ -26,7 +26,7 @@ import {
   setHouseStyle,
   stepHouseConfig,
 } from '../public/js/home-house.js?v=3c88c47c';
-import { HOUSE_LOT_W } from '../public/js/home-cultivation.js?v=61295953';
+import { HOUSE_LOT_W } from '../public/js/home-cultivation.js?v=8c3a5cb8';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const GS = join(root, '../glitch-GameServerJS');

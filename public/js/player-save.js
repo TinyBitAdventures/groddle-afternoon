@@ -1,17 +1,17 @@
 /** Persistent player systems + per-street world snapshot. */
-import { normalizeShrineState } from './shrines.js?v=be0b0a16';
+import { normalizeShrineState } from './shrines.js?v=74b2157f';
 import { normalizeQuoinState } from './quoins.js?v=4d75aec0';
 import { normalizeToolConditionState, syncToolCopies } from './tools.js?v=4156bba8';
-import { normalizeSkillState } from './skills.js?v=76dfcf84';
+import { normalizeSkillState } from './skills.js?v=b79dc38f';
 import { normalizeFoodState } from './food.js?v=f575b4cb';
 import { createGhostQuestState } from './ghost-quest.js?v=5f3cc133';
 import { normalizeParadiseState } from './paradise-flight.js?v=fe7ba6de';
 import { normalizeFeatSnapshot } from './feats.js?v=f6c3b551';
 import { normalizeEmotionalBearState } from './emotional-bear.js?v=1c88a46a';
-import { normalizeHomeState } from './homes.js?v=4f4ade68';
+import { normalizeHomeState } from './homes.js?v=9484b948';
 import { normalizeMailboxState } from './mailbox.js?v=d50d0d05';
 import { normalizeFeatureSlices } from './feature-host.js?v=100f3193';
-import { adoptHiddenSums, normalizeQuestOfferState } from './quest-offers.js?v=36e610b5';
+import { adoptHiddenSums, normalizeQuestOfferState } from './quest-offers.js?v=769eba09';
 import { cleanBuild } from './save-build.js?v=588eae75';
 
 export const PLAYER_SAVE_VERSION = 7;

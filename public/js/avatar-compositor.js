@@ -13,7 +13,7 @@
  *  - articles/<type>/<name>.json: one article's parts per frame and shapes
  *  - catalog.json: what the character builder offers, colours from GSJS
  */
-import { fetchRetry } from './load-retry.js?v=24823577';
+import { fetchRetry } from './load-retry.js?v=477aa7a7';
 import { CORE_FRAMES, IDLE_FRAMES, SHEET_FRAMES } from './avatar-anims.js?v=fb921bf4';
 import { applyCM, drawListBounds, expandRig, transformBounds, frameDrawList, lookMatrices, mergeIdleArticle, mergeIdleRig, slotAssignments } from './avatar-rig.js?v=b67f0da8';
 import { expandCatalog } from './avatar-looks.js?v=5a28384d';

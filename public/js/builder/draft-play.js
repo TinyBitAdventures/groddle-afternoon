@@ -20,13 +20,13 @@
  * not available." and the game starts on its usual street. A small banner names the draft and its
  * rev, with a link back to the builder.
  */
-import { registerDraftStreets, loadStreetData, resolveIndexTsid, STREET_INDEX } from '../street-loader.js?v=23555e53';
+import { registerDraftStreets, loadStreetData, resolveIndexTsid, STREET_INDEX } from '../street-loader.js?v=b8ea30df';
 import { streetWithEdits, editsOn } from './zone.js?v=ce289eb1';
-import { getStreetEcologyCatalog, setStreetEcologyCatalog } from '../street-ecology.js?v=36fd044b';
+import { getStreetEcologyCatalog, setStreetEcologyCatalog } from '../street-ecology.js?v=e5263244';
 import { createBuilderApi } from './api.js?v=9560d68f';
 import { installNewArt } from './new-art.js?v=29f0b13e';
-import { loadDecoManifest } from '../street-render.js?v=d76d4268';
-import * as textureUrls from '../textures.js?v=29f80b6a';
+import { loadDecoManifest } from '../street-render.js?v=c1ac1f42';
+import * as textureUrls from '../textures.js?v=71c5d2dc';
 
 export const DRAFT_REFUSED = 'That draft is not available.';
 

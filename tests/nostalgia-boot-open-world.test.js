@@ -20,16 +20,16 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-import { streetGraph } from '../public/js/street-graph.js?v=16013e6e';
-import { closedForEveryone, freeWays, openWorld } from '../public/js/open-roads.js?v=88fb8b19';
+import { streetGraph } from '../public/js/street-graph.js?v=92206051';
+import { closedForEveryone, freeWays, openWorld } from '../public/js/open-roads.js?v=d41120cf';
 import { TELEPORTERS } from '../public/js/hidden-floors.js?v=023336cb';
 import { WINTRY_PORTAL_TELEPORTERS } from '../public/js/wintry-portal.js?v=1437deda';
-import { applyStreetIndex } from '../public/js/street-loader.js?v=23555e53';
-import { streetJobsFeature } from '../public/js/features/street-jobs-feature.js?v=caa20b5e';
+import { applyStreetIndex } from '../public/js/street-loader.js?v=b8ea30df';
+import { streetJobsFeature } from '../public/js/features/street-jobs-feature.js?v=f1ffb6ac';
 import { STARTER_LANDING, openBootTarget } from '../public/js/ancestral-nostalgia.js?v=7c972d9f';
 import { NOSTALGIA_BOOT_STREETS } from '../public/js/ancestral-nostalgia-data.js?v=0adb9184';
-import { FEATURES } from '../public/js/features/index.js?v=6ebe7a39';
-import { createBuffState, applyBuff, hasBuff, removeBuff } from '../public/js/buffs.js?v=fc742885';
+import { FEATURES } from '../public/js/features/index.js?v=a0cfeefb';
+import { createBuffState, applyBuff, hasBuff, removeBuff } from '../public/js/buffs.js?v=9ac58eaa';
 
 const root = join(import.meta.dirname, '..');
 const read = (rel) => readFileSync(join(root, rel), 'utf8');

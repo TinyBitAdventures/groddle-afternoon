@@ -19,8 +19,8 @@
 import { heldDirection } from './held-keys.js?v=a28eb293';
 import { ARBOR_TRUNK_WIDTH, arborBranchArt, stepParadiseBody, usesParadiseBody } from './paradise-courses.js?v=eb5c7fd9';
 import { SKY_PLUNGE_FILES } from './sky-plunge-art.js?v=47e01e53';
-import { isLoaded, onLoaded, textureFromUrl } from './textures.js?v=29f80b6a';
-import { anchorBottomCentre } from './sprite-feet.js?v=18e517a6';
+import { isLoaded, onLoaded, textureFromUrl } from './textures.js?v=71c5d2dc';
+import { anchorBottomCentre } from './sprite-feet.js?v=6319b91a';
 import { WORLD_FONT_FAMILY } from './world-text.js?v=6b49f88c';
 
 const DECO_ROOT = 'assets/decos/groddle';

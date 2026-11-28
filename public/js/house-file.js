@@ -75,7 +75,7 @@
  */
 
 import { HOME_LIMITS } from './homes-catalog.js?v=0367f90f';
-import { cultivationDef, listCultivationClasses } from './home-cultivation.js?v=61295953';
+import { cultivationDef, listCultivationClasses } from './home-cultivation.js?v=8c3a5cb8';
 import {
   INTERIOR,
   furnitureDef,

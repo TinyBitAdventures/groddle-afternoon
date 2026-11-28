@@ -15,7 +15,7 @@ const manifest = new Set(JSON.parse(readFileSync(join(pub, 'assets/decos/manifes
 
 async function farPicks(tsid, R) {
   const hires = await import('../public/js/deco-hires.js?v=34f36d77');
-  const sr = await import('../public/js/street-render.js?v=d76d4268');
+  const sr = await import('../public/js/street-render.js?v=c1ac1f42');
   const street = JSON.parse(readFileSync(join(pub, `assets/streets/${tsid}.json`), 'utf8'));
   const mz = street.layers.findIndex((l) => l.id === 'middleground');
   const mlz = street.layers[mz].z ?? mz;
@@ -70,7 +70,9 @@ test('a far WebP sized for a nearer placement loads downscaled to the far need',
   assert.equal(far.width, Math.round(far.w * Number(/\?r=([\d.]+)/.exec(far.url)[1])));
   assert.ok(far.bytes < (near?.bytes ?? Infinity));
   const src = readFileSync(join(pub, 'js/textures.js'), 'utf8');
-  assert.match(src, /opts\.width > 0 && opts\.height > 0 \? resizeImage\(url, opts, signal\) : decodeImage\(url, signal\)/);
+  // #768 review: each try asks `ask` (the URL, or a later try's retryUrl copy).
+  assert.match(src, /opts\.width > 0 && opts\.height > 0 \? resizeImage\(ask, opts, signal\) : decodeImage\(ask, signal\)/);
+  assert.match(src, /const ask = retryUrl\(url, state\.attempts\);/);
   const sr = readFileSync(join(pub, 'js/street-render.js'), 'utf8');
   assert.match(sr, /const sharpTexture = \(pick\) => textureFromUrl\(pick\.url, pick\.width/);
   assert.match(sr, /for \(const slack of FAR_SLACKS\)/);

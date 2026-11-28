@@ -26,7 +26,7 @@ import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { createStuckAsker } from '../public/js/stuck-prompt.js?v=9108f8ac';
+import { createStuckAsker } from '../public/js/stuck-prompt.js?v=f36901d7';
 import * as paradise from '../public/js/paradise-flight.js?v=fe7ba6de';
 import * as summers from '../public/js/summers-day.js?v=5ffa5056';
 import * as greedy from '../public/js/greedy-street-spirit.js?v=b0ce2437';

@@ -53,8 +53,8 @@ import {
   setStreetEcologyCatalog,
   streetReservedSpots,
   unreachedFloorsFor,
-} from '../public/js/street-ecology.js?v=36fd044b';
-import { resourceSpawnPlan } from '../public/js/features/resource-nodes-feature.js?v=479849b6';
+} from '../public/js/street-ecology.js?v=e5263244';
+import { resourceSpawnPlan } from '../public/js/features/resource-nodes-feature.js?v=a997f645';
 import { isZoneTsid } from '../public/js/zone-streets.js?v=b40010d5';
 import { streetObjectLayout } from '../tools/build-realtime-objects.mjs';
 import { placementRequests, streetEcology, streetQuoinLayout } from '../tools/build-realtime-quoins.mjs';

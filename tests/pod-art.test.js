@@ -9,8 +9,8 @@ import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { CULTIVATION_CLASSES } from '../public/js/homes-catalog.js?v=0367f90f';
-import { nodeKeyMap } from '../public/js/features/homes-feature.js?v=6c2d961d';
-import { homeNodes } from '../public/js/yard-stock-mp.js?v=2df73f7e';
+import { nodeKeyMap } from '../public/js/features/homes-feature.js?v=52c98a6b';
+import { homeNodes } from '../public/js/yard-stock-mp.js?v=a36aae83';
 import { SPRITE_FEET } from '../public/js/sprite-feet-data.js?v=e2217323';
 import { stageFoot, swfStage } from '../tools/swf-stage.mjs';
 

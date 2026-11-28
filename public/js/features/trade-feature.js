@@ -40,12 +40,12 @@
  * endRequest, acceptRequest).
  */
 
-import { fetchRetry } from '../load-retry.js?v=24823577';
+import { fetchRetry } from '../load-retry.js?v=477aa7a7';
 import { ITEM_CATALOG, addItem, countItem, itemIcon, listPackSlots, removeItem } from '../inventory.js?v=3be7988a';
 import { TOOL_CONDITION_CATALOG, copyTagKind, copyTags, leavingToolWear, moveToolCopy, receiveToolCopies, receiveToolCopy, setCopyTag, setToolRemaining, toolCopies } from '../tools.js?v=4156bba8';
 import { scriptFromTag, scriptLabel } from '../teleportation.js?v=cbbc673f';
 import { saveStore, savedThrough } from '../save-store.js?v=1ccb1d6b';
-import { playOverlay } from '../overlays.js?v=306c160f';
+import { playOverlay } from '../overlays.js?v=18dfb26a';
 import {
   APPLIED_KEEP,
   TRADE_SLOTS,

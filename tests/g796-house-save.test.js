@@ -8,7 +8,7 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { HOUSE_FROM_HOME_STYLE, defaultHouseConfig } from '../public/js/home-house.js?v=3c88c47c';
-import { createHomeState, imagineHome, normalizeHomeState } from '../public/js/homes.js?v=4f4ade68';
+import { createHomeState, imagineHome, normalizeHomeState } from '../public/js/homes.js?v=9484b948';
 
 describe('saves move onto the original houses (migration)', () => {
   it('a home from before G796 takes the original its style\'s door-deco house moves to, facing left', () => {
@@ -29,7 +29,7 @@ describe('saves move onto the original houses (migration)', () => {
     assert.equal(home.house.config.skull, 3);
     assert.equal(home.house.facingRight, true);
     // A stored save is normalized on load (player-save normalizeSystemsSnapshot), so it moves there.
-    const { normalizeSystemsSnapshot } = await import('../public/js/player-save.js?v=e68db82d');
+    const { normalizeSystemsSnapshot } = await import('../public/js/player-save.js?v=05e5fe5e');
     assert.equal(normalizeSystemsSnapshot({ home: { owned: true, style: 'uralia' } }).home.house.chassis, 'hominid');
     assert.equal(normalizeSystemsSnapshot({ home: seed }).home.house.chassis, 'bone');
   });

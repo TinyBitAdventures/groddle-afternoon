@@ -16,7 +16,7 @@ import {
   allAmbientTrackUrls,
   ambientPlaylist,
   SILENT_THEME,
-} from '../public/js/ambient-music.js?v=fd8fe13e';
+} from '../public/js/ambient-music.js?v=51b27b38';
 
 import { SOUND_ALIASES, SOUND_FILES } from '../public/js/sound-keys.js?v=8b36c250';
 

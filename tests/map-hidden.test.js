@@ -18,7 +18,7 @@ import { fileURLToPath } from 'node:url';
 import { hiddenReason, readHiddenSources, STRAYS, TOWERS } from '../tools/build-map-hidden.mjs';
 import { buildHubMapView, listHubsFromIndex, PUBLIC_HUBS, renderHubMapSvg } from '../public/js/map-graph.js?v=803cc6cd';
 import { hubMapSubtitle } from '../public/js/panel-copy.js?v=f854d1dd';
-import { doorRooms } from '../public/js/map-routes.js?v=e9f5e3da';
+import { doorRooms } from '../public/js/map-routes.js?v=084dc311';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const GSJS = join(root, '..', 'glitch-GameServerJS');

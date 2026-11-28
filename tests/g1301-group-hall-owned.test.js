@@ -23,9 +23,9 @@ import { existsSync, readFileSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { join } from 'node:path';
 
-import { streetJobsFeature, projectApi } from '../public/js/features/street-jobs-feature.js?v=caa20b5e';
+import { streetJobsFeature, projectApi } from '../public/js/features/street-jobs-feature.js?v=f1ffb6ac';
 import { HALL_STREETS, LOT_CLASS, LOT_PLACEMENT, LOT_SIGN_X, OWNED_TEXT, hallStreetName, lotOwner, ownedVerb } from '../public/js/group-hall-lot.js?v=045c799a';
-import { HALL_TEXT } from '../public/js/street-jobs-mp.js?v=eee3ff15';
+import { HALL_TEXT } from '../public/js/street-jobs-mp.js?v=ed23d5b4';
 import { hallOf, normalizeGroup, normalizeGroups } from '../public/js/groups.js?v=c5e35964';
 import { Display, FakeEl, fakePixi } from './fake-scene.js';
 import { GAME_DIR, HAS_SITE, SITE_DIR } from '../tools/repos.mjs';

@@ -26,7 +26,7 @@
  * ones that wait on a verb, a multiplayer message or Austin.
  */
 
-import { fetchRetry } from './load-retry.js?v=24823577';
+import { fetchRetry } from './load-retry.js?v=477aa7a7';
 import {
   OVERLAY_BASE,
   OVERLAY_FADE,
@@ -47,7 +47,7 @@ import {
   vectorArtStats,
   vectorDensity,
   vectorFrameSvgs,
-} from './overlay-art.js?v=243cef7d';
+} from './overlay-art.js?v=4858876d';
 
 // G446: the SVG-frame helpers live in overlay-art.js (playSheetOverlay draws its rainbows the same way).
 // G448: an overlay holds its decoded frames only while it plays (holdVectorTexture).

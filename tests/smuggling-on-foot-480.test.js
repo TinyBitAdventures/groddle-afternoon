@@ -14,11 +14,11 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 import { DEFAULT_DESTINATIONS, DESTINATIONS, SMUGGLER_STREETS, chooseDestination, destinationPool, sourceKey } from '../public/js/smuggling.js?v=2fde7da3';
-import { applyStreetIndex, resolveIndexTsid } from '../public/js/street-loader.js?v=23555e53';
-import { streetJobsFeature } from '../public/js/features/street-jobs-feature.js?v=caa20b5e';
-import { NO_RIDE_SOURCES, createRouteState, isRide, planRoute, routeRides, subwayRides } from '../public/js/map-routes.js?v=e9f5e3da';
-import { SUBWAY_STREETS } from '../public/js/street-jobs.js?v=17f103d0';
-import { loadStreetGraph, roadsFor } from '../public/js/street-graph.js?v=16013e6e';
+import { applyStreetIndex, resolveIndexTsid } from '../public/js/street-loader.js?v=b8ea30df';
+import { streetJobsFeature } from '../public/js/features/street-jobs-feature.js?v=f1ffb6ac';
+import { NO_RIDE_SOURCES, createRouteState, isRide, planRoute, routeRides, subwayRides } from '../public/js/map-routes.js?v=084dc311';
+import { SUBWAY_STREETS } from '../public/js/street-jobs.js?v=e175c7e5';
+import { loadStreetGraph, roadsFor } from '../public/js/street-graph.js?v=92206051';
 
 const PUB = join(import.meta.dirname, '..', 'public');
 const read = (rel) => readFileSync(join(PUB, rel), 'utf8');

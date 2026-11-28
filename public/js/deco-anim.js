@@ -20,10 +20,10 @@
  *
  * Rebuilt rooms play a few decos with no placement at all through sceneAnim (below).
  */
-import { fetchRetry } from './load-retry.js?v=24823577';
+import { fetchRetry } from './load-retry.js?v=477aa7a7';
 import { ANIM_DECOS } from './deco-anim-list.js?v=e5f4d34a';
 import { wantsHiresDecos } from './deco-hires.js?v=34f36d77';
-import { isLoaded, onFailed, onLoaded, textureFromUrl } from './textures.js?v=29f80b6a';
+import { isLoaded, onFailed, onLoaded, textureFromUrl } from './textures.js?v=71c5d2dc';
 
 export const ANIM_BASE = 'assets/decos/animated/';
 /** TSEngineConstants.TARGET_FRAMERATE: Flash played deco timelines at the stage's rate. */

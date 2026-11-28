@@ -53,8 +53,8 @@ describe('G978: no dot bursts', () => {
 describe('G978: flyers fly on (npc_butterfly.js flyAround)', () => {
   it('a yard Butterfly never stops in the air and flies level at its own height; street flyers too', async () => {
     dropped('flyer-hover-bob');
-    const { YARD_WANDER, yardPlan, yardWanderAt } = await import('../public/js/yard-wander.js?v=444d698e');
-    const { CREATURE_PATHS, flierAt, flierPlan } = await import('../public/js/street-creatures.js?v=1253cde2');
+    const { YARD_WANDER, yardPlan, yardWanderAt } = await import('../public/js/yard-wander.js?v=e6154394');
+    const { CREATURE_PATHS, flierAt, flierPlan } = await import('../public/js/street-creatures.js?v=2d8e3803');
     assert.equal('pauses' in YARD_WANDER.npc_butterfly, false);
     assert.equal('bob' in YARD_WANDER.npc_butterfly, false);
     const plan = yardPlan({ id: 'a5', classId: 'npc_butterfly', left: 300, right: 800 });
@@ -108,7 +108,7 @@ describe('G978: the dead-end exit is a wall sign', () => {
   it('no post: the arrow hangs as the practice streets\' EXIT, the source\'s wall sign', async () => {
     dropped('dead-end-standing-sign');
     assert.equal(entry('dead-end-exit-sign').status, 'kept');
-    const { DEAD_END_EXIT } = await import('../public/js/dead-ends.js?v=f0107552');
+    const { DEAD_END_EXIT } = await import('../public/js/dead-ends.js?v=18f7df29');
     assert.equal('post' in DEAD_END_EXIT, false);
     assert.equal(DEAD_END_EXIT.hang, 62);
     const view = fn(read('public/js/features/dead-ends-feature.js'), 'buildView');

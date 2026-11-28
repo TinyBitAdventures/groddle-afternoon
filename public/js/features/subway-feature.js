@@ -42,11 +42,11 @@
 import { countItem } from '../inventory.js?v=3be7988a';
 import { isEditableTarget } from '../held-keys.js?v=a28eb293';
 import { REPORT_WINDOW_SELECTOR, SCREEN_SELECTOR, START_CARD_SELECTOR, WINDOW_SELECTOR } from '../window-stack.js?v=0c4a6356';
-import { OVERLAY_USES, playOverlay } from '../overlays.js?v=306c160f';
-import { doorsFeature } from './doors-feature.js?v=333e6ce2';
+import { OVERLAY_USES, playOverlay } from '../overlays.js?v=18dfb26a';
+import { doorsFeature } from './doors-feature.js?v=d770172d';
 import { createMapZoom } from '../map-zoom.js?v=4f0762b2';
 import { bindSubwayMap, renderSubwayMapSvg, subwayPaper } from '../map-views.js?v=7ff57fbc';
-import { frameTexture, textureFromUrl } from '../textures.js?v=29f80b6a';
+import { frameTexture, textureFromUrl } from '../textures.js?v=71c5d2dc';
 import {
   CAR_FLOOR,
   CAR_FLOOR_LIGHTS,
@@ -97,7 +97,7 @@ import {
   ticketOffer,
 } from '../subway.js?v=ea6921ff';
 import { BOARD_ANSWER_MS, SUBWAY_MP_TEXT, applyTrain, riderChanges, trainOf } from '../subway-mp.js?v=ffd57d82';
-import { anchorBottomCentre } from '../sprite-feet.js?v=18e517a6';
+import { anchorBottomCentre } from '../sprite-feet.js?v=6319b91a';
 
 export const SUBWAY_FEATURE_ID = 'subway';
 const STYLE_ID = 'subway-feature-style';

@@ -9,9 +9,9 @@ import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { closestTarget } from '../public/js/powders.js?v=b1bafb71';
-import { OVERLAY_USES } from '../public/js/overlays.js?v=306c160f';
-import { powdersFeature } from '../public/js/features/powders-feature.js?v=bedb54c2';
-import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=b6a173ae';
+import { OVERLAY_USES } from '../public/js/overlays.js?v=18dfb26a';
+import { powdersFeature } from '../public/js/features/powders-feature.js?v=039a54b8';
+import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=b2a9a862';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const GS = join(root, '../glitch-GameServerJS');

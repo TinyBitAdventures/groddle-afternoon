@@ -12,12 +12,12 @@ import { describe, it, before, after, beforeEach } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { ROUTE_TEXT, createRouteState, isRide, planRoute, routeGraph, routeRides, subwayRides } from '../public/js/map-routes.js?v=e9f5e3da';
-import { SUBWAY_STREETS } from '../public/js/street-jobs.js?v=17f103d0';
+import { ROUTE_TEXT, createRouteState, isRide, planRoute, routeGraph, routeRides, subwayRides } from '../public/js/map-routes.js?v=084dc311';
+import { SUBWAY_STREETS } from '../public/js/street-jobs.js?v=e175c7e5';
 import { DUBIOUS_BUFF, PAPERS_BADGE, TEXT, gateFor, gateRefusal, gateTerms } from '../public/js/subway.js?v=ea6921ff';
-import { mapRoutesFeature } from '../public/js/features/map-routes-feature.js?v=35ee8c3f';
+import { mapRoutesFeature } from '../public/js/features/map-routes-feature.js?v=49887e5c';
 import { createFeatureHost } from '../public/js/feature-host.js?v=100f3193';
-import { applyStreetIndex } from '../public/js/street-loader.js?v=23555e53';
+import { applyStreetIndex } from '../public/js/street-loader.js?v=b8ea30df';
 
 const PUB = join(import.meta.dirname, '..', 'public');
 const json = (rel) => JSON.parse(readFileSync(join(PUB, rel), 'utf8'));

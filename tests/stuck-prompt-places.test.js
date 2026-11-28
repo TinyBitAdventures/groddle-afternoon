@@ -12,9 +12,9 @@ import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { createStuckAsker } from '../public/js/stuck-prompt.js?v=9108f8ac';
+import { createStuckAsker } from '../public/js/stuck-prompt.js?v=f36901d7';
 import { FOUR_LETTER_EXIT_PROMPT_MS } from '../public/js/four-letter-quest.js?v=9540cc6f';
-import { LEGALIZE_ALLEY_EXIT_PROMPT_MS } from '../public/js/legalize-it.js?v=64654863';
+import { LEGALIZE_ALLEY_EXIT_PROMPT_MS } from '../public/js/legalize-it.js?v=fd70dda3';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const MIN = 60 * 1000;

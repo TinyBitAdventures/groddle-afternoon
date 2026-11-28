@@ -14,9 +14,9 @@ import { join } from 'node:path';
 import { describe, it } from 'node:test';
 
 import { TRANT_META, setTrantTables } from '../public/js/trants.js?v=cf0fe1a3';
-import { trantLook } from '../public/js/trant-looks.js?v=a46ab4b1';
-import { treeFrameUrl } from '../public/js/features/patches-feature.js?v=39533811';
-import { HIRES_SPRITES } from '../public/js/sprite-hires.js?v=6a4569c4';
+import { trantLook } from '../public/js/trant-looks.js?v=c57ac5c0';
+import { treeFrameUrl } from '../public/js/features/patches-feature.js?v=f61a42ec';
+import { HIRES_SPRITES } from '../public/js/sprite-hires.js?v=c1bcff21';
 
 const root = join(import.meta.dirname, '..');
 const read = (rel) => readFileSync(join(root, rel), 'utf8');

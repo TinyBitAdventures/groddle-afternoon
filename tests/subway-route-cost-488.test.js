@@ -11,11 +11,11 @@ import { describe, it, before, after } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { SUBWAY_RIDE_STREETS, findRoute, loadStreetGraph, roadsFor, streetGraph, worldRoads } from '../public/js/street-graph.js?v=16013e6e';
-import { createRouteState, isRide, planRoute, routeRides, subwayRides } from '../public/js/map-routes.js?v=e9f5e3da';
-import { SUBWAY_STREETS } from '../public/js/street-jobs.js?v=17f103d0';
-import { applyStreetIndex } from '../public/js/street-loader.js?v=23555e53';
-import { streetJobsFeature } from '../public/js/features/street-jobs-feature.js?v=caa20b5e';
+import { SUBWAY_RIDE_STREETS, findRoute, loadStreetGraph, roadsFor, streetGraph, worldRoads } from '../public/js/street-graph.js?v=92206051';
+import { createRouteState, isRide, planRoute, routeRides, subwayRides } from '../public/js/map-routes.js?v=084dc311';
+import { SUBWAY_STREETS } from '../public/js/street-jobs.js?v=e175c7e5';
+import { applyStreetIndex } from '../public/js/street-loader.js?v=b8ea30df';
+import { streetJobsFeature } from '../public/js/features/street-jobs-feature.js?v=f1ffb6ac';
 import { gateRefusal } from '../public/js/subway.js?v=ea6921ff';
 
 const PUB = join(import.meta.dirname, '..', 'public');

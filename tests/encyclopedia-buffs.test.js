@@ -14,7 +14,7 @@ import { INVENTORY_DB } from '../tools/catalog/build.mjs';
 import { loadEncyclopedia } from '../tools/encyclopedia/data.mjs';
 import { DEV_BUFFS, durationWords } from '../tools/encyclopedia/buffs.mjs';
 import { CONSUME_BUFFS, QUEST_TIMER_BUFFS } from '../public/js/buff-triggers.js?v=9fd877c4';
-import { BUFF_ITEM_CATALOG } from '../public/js/buffs.js?v=fc742885';
+import { BUFF_ITEM_CATALOG } from '../public/js/buffs.js?v=9ac58eaa';
 
 const pub = join(import.meta.dirname, '..', 'public');
 const dir = join(pub, 'encyclopedia', 'buffs');

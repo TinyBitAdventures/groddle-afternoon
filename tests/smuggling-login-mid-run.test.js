@@ -13,9 +13,9 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 import { CONTRABAND, SMUGGLING_QUEST } from '../public/js/smuggling.js?v=2fde7da3';
-import { applyStreetIndex } from '../public/js/street-loader.js?v=23555e53';
-import { streetJobsFeature, projectApi } from '../public/js/features/street-jobs-feature.js?v=caa20b5e';
-import { smugglingFeature } from '../public/js/features/smuggling-feature.js?v=0184fe55';
+import { applyStreetIndex } from '../public/js/street-loader.js?v=b8ea30df';
+import { streetJobsFeature, projectApi } from '../public/js/features/street-jobs-feature.js?v=f1ffb6ac';
+import { smugglingFeature } from '../public/js/features/smuggling-feature.js?v=4c678b74';
 import { createInventory, addItem } from '../public/js/inventory.js?v=3be7988a';
 
 const PUB = join(import.meta.dirname, '..', 'public');

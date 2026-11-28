@@ -11,13 +11,13 @@ import assert from 'node:assert/strict';
 import { join } from 'node:path';
 
 import { ISLAND_ARRIVAL, normalizeNewxpSave } from '../public/js/newxp.js?v=eedf8fe3';
-import { __newxpTest, newxpFeature } from '../public/js/features/newxp-feature.js?v=bea5a918';
+import { __newxpTest, newxpFeature } from '../public/js/features/newxp-feature.js?v=fcc5ea2c';
 import { createFeatureHost } from '../public/js/feature-host.js?v=100f3193';
-import { FEATURES } from '../public/js/features/index.js?v=6ebe7a39';
-import { getQuestCatalog, loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=b6a173ae';
-import { QUEST_MOVES_NOTE, acceptOffer, ensureQuestOfferState, listDeclinedOffers, pendingQuestOffers, questOfferCard, routeQuestEvent, turnInQuest } from '../public/js/quest-offers.js?v=36e610b5';
+import { FEATURES } from '../public/js/features/index.js?v=a0cfeefb';
+import { getQuestCatalog, loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=b2a9a862';
+import { QUEST_MOVES_NOTE, acceptOffer, ensureQuestOfferState, listDeclinedOffers, pendingQuestOffers, questOfferCard, routeQuestEvent, turnInQuest } from '../public/js/quest-offers.js?v=769eba09';
 import { addItem, countItem, removeItem } from '../public/js/inventory.js?v=3be7988a';
-import { createQuestState } from '../public/js/quests.js?v=15aab2e3';
+import { createQuestState } from '../public/js/quests.js?v=17fca824';
 import {
   REPLAY_DONE_COUNTER,
   REPLAY_GATE,

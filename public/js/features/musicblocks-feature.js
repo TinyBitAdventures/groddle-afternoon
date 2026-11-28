@@ -31,7 +31,7 @@
  */
 
 import { addItem, countItem, removeItem } from '../inventory.js?v=3be7988a';
-import { STREET_INDEX } from '../street-loader.js?v=23555e53';
+import { STREET_INDEX } from '../street-loader.js?v=b8ea30df';
 import {
   MUSICBLOCK_CATALOG,
   MUSICBLOCK_ENDGAME_GIFT,

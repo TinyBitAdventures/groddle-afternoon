@@ -18,7 +18,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { walkUpSignpostStreet } from '../public/js/ladder-top-signposts.js?v=0192e447';
 import { navigableSignposts, signpostNear, worldToScreen } from '../public/js/street-model.js?v=a9a05f9d';
-import { SIGN_MAX_ARMS, setSignpostKeys } from '../public/js/street-render.js?v=d76d4268';
+import { SIGN_MAX_ARMS, setSignpostKeys } from '../public/js/street-render.js?v=c1ac1f42';
 import { emoteKeyAction, hotkeySections, hotkeyText } from '../public/js/client-hotkeys.js?v=401d994d';
 
 const spike = join(dirname(fileURLToPath(import.meta.url)), '..');

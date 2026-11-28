@@ -27,10 +27,10 @@ import {
   pickHole,
 } from '../random-holes.js?v=e979c4ae';
 import { teleportWithinStreet } from '../within-street.js?v=5ce33cdf';
-import { groundAt } from '../street-arrival.js?v=7ea17948';
+import { groundAt } from '../street-arrival.js?v=bb063edb';
 import { streetWidth } from '../street-model.js?v=a9a05f9d';
 import { AVATAR_BODY_H } from '../avatar-step.js?v=8415ee96';
-import { isLoaded, onLoaded, textureFromUrl } from '../textures.js?v=29f80b6a';
+import { isLoaded, onLoaded, textureFromUrl } from '../textures.js?v=71c5d2dc';
 import { qaHandlesAllowed } from '../qa-gate.js?v=f4e2cd82';
 
 export const RANDOM_HOLES_FEATURE_ID = 'random-holes';

@@ -32,7 +32,7 @@ import {
   loadRecipeCatalogFromFile,
   makingSkillAdjustments,
   recipeTaskLimit,
-} from '../public/js/making.js?v=d3571803';
+} from '../public/js/making.js?v=4d75f062';
 import {
   assemblyCheck,
   assemblyEnergy,
@@ -59,7 +59,7 @@ import { ROCK_RESPAWN_MS } from '../public/js/pace.js?v=c07dfbd8';
 import { runTransform, shuckDetails } from '../public/js/item-transforms.js?v=35fd8c6e';
 import { brushFox, createFox, foxFiberRange } from '../public/js/foxes.js?v=c0ce235f';
 import { soundForMakingTool } from '../public/js/sound-moments.js?v=3e66996f';
-import { supplyFeature } from '../public/js/features/supply-feature.js?v=6bb1959d';
+import { supplyFeature } from '../public/js/features/supply-feature.js?v=0ddac408';
 
 const SPIKE = join(dirname(fileURLToPath(import.meta.url)), '..', 'public');
 const seq = (...values) => {

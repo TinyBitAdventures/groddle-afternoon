@@ -49,10 +49,10 @@ import {
   writePaperNote,
 } from '../public/js/street-furniture.js?v=071203fc';
 import { REMAKE_NOTE_BYLINE, REMAKE_NOTE_MARKER, isRemakeNote, normalizeNote as normalizeNoteRow } from '../public/js/street-furniture.js?v=071203fc';
-import { streetFurnitureFeature } from '../public/js/features/street-furniture-feature.js?v=8e0ae6cf';
-import { FEATURES } from '../public/js/features/index.js?v=6ebe7a39';
+import { streetFurnitureFeature } from '../public/js/features/street-furniture-feature.js?v=65c92314';
+import { FEATURES } from '../public/js/features/index.js?v=a0cfeefb';
 import { createFeatureHost } from '../public/js/feature-host.js?v=100f3193';
-import { setWildlifeCatalog } from '../public/js/wildlife.js?v=7224f78a';
+import { setWildlifeCatalog } from '../public/js/wildlife.js?v=352e8bfa';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..', 'public');
 const catalog = JSON.parse(readFileSync(join(root, 'assets/content/street-ecology.json'), 'utf8'));

@@ -21,7 +21,7 @@ import { fileURLToPath } from 'node:url';
 
 import { SLOTH_SPOTS } from '../public/js/sloth-spots-data.js?v=0fb481e0';
 import { slothSpotFromRow, slothTrees, KNOCKER_SNAPS } from '../public/js/sloth-trees.js?v=775bef07';
-import { SLOTH_GRIP, SLOTH_REACH, slothGeometry } from '../public/js/features/resource-nodes-feature.js?v=479849b6';
+import { SLOTH_GRIP, SLOTH_REACH, slothGeometry } from '../public/js/features/resource-nodes-feature.js?v=a997f645';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const ecology = JSON.parse(readFileSync(join(root, 'public/assets/content/street-ecology.json'), 'utf8'));

@@ -21,7 +21,7 @@ import { VISIT_VERB } from '../public/js/neighbours-mp.js?v=de82fd7d';
 import { PARTY_TEXT, inviteCandidates } from '../public/js/party.js?v=7615aab8';
 import { mountSocialDrawer } from '../public/js/ui/social-drawer.js?v=25697b7e';
 import { createNotifier } from '../public/js/notify.js?v=c9d79ec5';
-import { partyFeature } from '../public/js/features/party-feature.js?v=5f80492b';
+import { partyFeature } from '../public/js/features/party-feature.js?v=4ac1d556';
 import { SERVER_DIR, skipWithoutServer } from '../tools/repos.mjs';
 
 const PUB = join(import.meta.dirname, '../public');

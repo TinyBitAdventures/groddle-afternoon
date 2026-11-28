@@ -23,7 +23,7 @@ import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { collectSheets, gameSheetTable } from './sheet-sources.js';
-import { HIRES_SPRITES, SPLIT_SPRITES } from '../public/js/sprite-hires.js?v=6a4569c4';
+import { HIRES_SPRITES, SPLIT_SPRITES } from '../public/js/sprite-hires.js?v=c1bcff21';
 import { DENSE_SPRITES } from '../public/js/sprite-dense.js?v=67101472';
 import { ONSCREEN_SPRITES } from '../public/js/sprite-onscreen.js?v=cdeffc77';
 import { HIRES_ICONS } from '../public/js/icon-hires.js?v=60e2474b';

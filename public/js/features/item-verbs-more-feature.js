@@ -38,8 +38,8 @@
  *   packVerbNet, packVerbDefect.
  */
 
-import { displayTopOf } from '../overlay-art.js?v=243cef7d';
-import { OVERLAY_USES, playOverlay } from '../overlays.js?v=306c160f';
+import { displayTopOf } from '../overlay-art.js?v=4858876d';
+import { OVERLAY_USES, playOverlay } from '../overlays.js?v=18dfb26a';
 import { addItem, countItem, removeItem } from '../inventory.js?v=3be7988a';
 import { getGameDayKey } from '../game-day.js?v=57fecfcb';
 import { levelInfoForXp, XP_FOR_LEVEL } from '../progression.js?v=05ff0260';
@@ -49,11 +49,11 @@ import { GENTLE_ISLAND_TSIDS, isNewxpSceneTsid } from '../newxp.js?v=eedf8fe3';
 import { SKILLQUEST_AK_TSID } from '../skillquest-ak.js?v=397a9d19';
 import { getToolCondition, migrateClassValue, setToolRemaining, TOOL_CONDITION_CATALOG, toolCopies, useToolCondition } from '../tools.js?v=4156bba8';
 import { copyChargesLeft, keepsCopies, spendCopyCharge, verbCopy } from '../copy-charges.js?v=357d4cbb';
-import { HERDKEEPING, hogtieEscapeDelayMs, husbandryPack } from '../animal-husbandry.js?v=9d2e832d';
-import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=1e277f22';
-import { sourceFromUrl, frameTexture } from '../textures.js?v=29f80b6a';
+import { HERDKEEPING, hogtieEscapeDelayMs, husbandryPack } from '../animal-husbandry.js?v=9397c317';
+import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=4636e02b';
+import { sourceFromUrl, frameTexture } from '../textures.js?v=71c5d2dc';
 import { landingY, walkSurfaceY } from '../walk-surface.js?v=76def2f6';
-import { overlayOrStandIn } from '../overlay-stand-in.js?v=0dd0e7c4';
+import { overlayOrStandIn } from '../overlay-stand-in.js?v=695a2e3e';
 import {
   BUNDLE_OF_JOY,
   BUTTERFLY_NET,
@@ -119,7 +119,7 @@ import {
 } from '../item-verbs-more.js?v=377f760a';
 import { itemZ } from '../item-bands.js?v=ec366be3';
 import { forceMetabolic } from '../metabolics.js?v=48f784bf';
-import { standOnFeet } from '../sprite-feet.js?v=18e517a6';
+import { standOnFeet } from '../sprite-feet.js?v=6319b91a';
 
 export const ITEM_VERBS_MORE_FEATURE_ID = 'item-verbs-more';
 

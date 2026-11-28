@@ -109,17 +109,17 @@
 
 import { createMinnAccount } from '../minn-account.js?v=7e3d7279';
 import { runStreetTransition } from '../screen-fx.js?v=7cd62cca';
-import { STREET_INDEX } from '../street-loader.js?v=23555e53';
+import { STREET_INDEX } from '../street-loader.js?v=b8ea30df';
 import { ITEM_CATALOG, addItem, countItem, listPackItemSlots, removeItem } from '../inventory.js?v=3be7988a';
 import { copyPicks, leavingWire, markLeaving, receiveWire, takeCopies } from '../copy-picks.js?v=b368fd49';
-import { cultivationDef, homeStreetLayout } from '../home-cultivation.js?v=61295953';
+import { cultivationDef, homeStreetLayout } from '../home-cultivation.js?v=8c3a5cb8';
 import { getPlot, tickGarden } from '../garden.js?v=fefa7bcd';
-import { BUTLER_RIG_SCALE, ButlerPainter, butlerRigNow, loadButlerRig } from '../butler-rig.js?v=83559708';
+import { BUTLER_RIG_SCALE, ButlerPainter, butlerRigNow, loadButlerRig } from '../butler-rig.js?v=89e35702';
 import { BUTLER, BUTLER_INFO, butlerInfoText, butlerPostRx, normalizeButlerParts } from '../butler.js?v=bea39213';
-import { butlerApi } from './butler-feature.js?v=313e3d1f';
-import { homesFeature, visitorHomeScene, visitorHomeState } from './homes-feature.js?v=6c2d961d';
+import { butlerApi } from './butler-feature.js?v=1ecd4564';
+import { homesFeature, visitorHomeScene, visitorHomeState } from './homes-feature.js?v=52c98a6b';
 import { visitRadio } from '../vine-radio.js?v=5436aa09';
-import { homeMusicFile } from '../homes.js?v=4f4ade68';
+import { homeMusicFile } from '../homes.js?v=9484b948';
 import { streetStyleFor } from '../home-styles.js?v=ec5d2f69';
 import { visitGardenPlots, visitSceneKey } from '../home-live.js?v=9c7abae7';
 import {
@@ -183,10 +183,10 @@ import {
   rememberInside,
 } from '../neighbours-mp.js?v=de82fd7d';
 import { itemZ } from '../item-bands.js?v=ec366be3';
-import { butlerCarries, registerButlerDrop } from '../butler-drop.js?v=dfadd30f';
+import { butlerCarries, registerButlerDrop } from '../butler-drop.js?v=00c50e9b';
 import { takeDragged } from '../drag-stack.js?v=c7008276';
-import { worldPoint } from './world-drop-feature.js?v=f751af0e';
-import { clampToExpansion, elevatorStops, floorJobFor, TOWER_JOBS } from '../home-tower.js?v=bb722397';
+import { worldPoint } from './world-drop-feature.js?v=94d6b79e';
+import { clampToExpansion, elevatorStops, floorJobFor, TOWER_JOBS } from '../home-tower.js?v=fda80f2a';
 
 export const NEIGHBOURS_MP_FEATURE_ID = 'neighbours-mp';
 const OWN_VERBS = new Set([VISIT_VERB.id, KEY_VERB.id, 'neighbour_noop']);

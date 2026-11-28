@@ -9,7 +9,7 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { SILENT_THEME, resolveAmbientTheme, setAmbientMusicConfig } from '../public/js/ambient-music.js?v=fd8fe13e';
+import { SILENT_THEME, resolveAmbientTheme, setAmbientMusicConfig } from '../public/js/ambient-music.js?v=51b27b38';
 import { CAR_MUSIC, STATION_MUSIC, STATIONS, carStreet, stationStreet } from '../public/js/subway.js?v=ea6921ff';
 import { streetState } from '../tools/sound/sound-model.mjs';
 

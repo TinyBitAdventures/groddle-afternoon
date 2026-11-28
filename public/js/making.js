@@ -8,7 +8,7 @@
  * Skipped source recipes and reasons: assets/content/recipes-skipped.json.
  */
 
-import { fetchRetry } from './load-retry.js?v=24823577';
+import { fetchRetry } from './load-retry.js?v=477aa7a7';
 import {
   addItem,
   removeItem,

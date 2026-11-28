@@ -11,8 +11,8 @@ import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { itemMakeNote, skillRankLabel } from '../public/js/street-job-asks.js?v=32adbe89';
-import { listRecipesProducing, loadRecipeCatalogFromFile } from '../public/js/making.js?v=d3571803';
-import { TOWER_JOBS } from '../public/js/home-tower.js?v=bb722397';
+import { listRecipesProducing, loadRecipeCatalogFromFile } from '../public/js/making.js?v=4d75f062';
+import { TOWER_JOBS } from '../public/js/home-tower.js?v=fda80f2a';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const read = (p) => readFileSync(join(root, p), 'utf8');

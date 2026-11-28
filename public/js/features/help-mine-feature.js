@@ -53,12 +53,12 @@
  */
 
 import { MINING_COSTS, ROCK_CATALOG, crumbleRock, findWorkingPick, miningProfile, miningToolWear, setMiningBuffs } from '../mining.js?v=7ecaa572';
-import { rockId } from '../street-objects.js?v=8cdf5355';
+import { rockId } from '../street-objects.js?v=ab8168f6';
 import { addItem, removeItem } from '../inventory.js?v=3be7988a';
 import { MEGA_ROCK_CHUNKS } from '../imagination-effects.js?v=70169933';
 import { crowdScaleX } from '../avatar-anims.js?v=fb921bf4';
-import { frameTexture, loadTexture } from '../textures.js?v=29f80b6a';
-import { acceptOffer } from '../quest-offers.js?v=36e610b5';
+import { frameTexture, loadTexture } from '../textures.js?v=71c5d2dc';
+import { acceptOffer } from '../quest-offers.js?v=769eba09';
 import { CREW_NODES, CREW_VERBS, HELP_DIG_COUNTER, HELP_DIG_LABEL, HELP_SCRAPE_LABEL, digHelpFrom, helpDigMessage, helpScrapeMessage, othersDigging } from '../help-dig.js?v=7a854b00';
 import {
   COMPANION_MINE_RULES,

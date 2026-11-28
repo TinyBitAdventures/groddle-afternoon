@@ -143,12 +143,12 @@ import {
 import { countWords } from '../words.js?v=274023af';
 import { ITEM_CATALOG, addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=3be7988a';
 import { QUOIN_SHEET, QUOIN_TYPES, qrazyRewardForLevel } from '../quoins.js?v=4d75aec0';
-import { loadRoadsFor, reachableStreets } from '../street-graph.js?v=16013e6e';
+import { loadRoadsFor, reachableStreets } from '../street-graph.js?v=92206051';
 import { soundForQuoin } from '../sound-moments.js?v=3e66996f';
 import { IMAGINATION_UPGRADES } from '../imagination.js?v=1bdfd77c';
 import { EZ_COOKIN_TSID, EZ_FOOD, practiceScreen } from '../practice-streets.js?v=557238c1';
-import { assignQuest, completeQuest } from '../quests.js?v=15aab2e3';
-import { acceptOffer, enqueueQuestOffer, ensureQuestOfferState, genericBagsOwned, questAwardPayload, turnInQuest } from '../quest-offers.js?v=36e610b5';
+import { assignQuest, completeQuest } from '../quests.js?v=17fca824';
+import { acceptOffer, enqueueQuestOffer, ensureQuestOfferState, genericBagsOwned, questAwardPayload, turnInQuest } from '../quest-offers.js?v=769eba09';
 import {
   REPLAY_DONE_COUNTER,
   REPLAY_GATE,
@@ -160,15 +160,15 @@ import {
   replaySkill,
   replayStage,
 } from '../newxp-replay.js?v=157997fb';
-import { getQuestCatalog } from '../content-catalogs.js?v=b6a173ae';
+import { getQuestCatalog } from '../content-catalogs.js?v=b2a9a862';
 import { locationEventsApi } from './location-events-feature.js?v=1c5b6340';
-import * as kit from '../quest-rooms/kit.js?v=44218fc3';
-import { frameTexture, onLoaded, sourceFromUrl, textureFromUrl, whenLoaded } from '../textures.js?v=29f80b6a';
-import { upgradeSource } from '../sprite-hires.js?v=6a4569c4';
+import * as kit from '../quest-rooms/kit.js?v=3f5f3b56';
+import { frameTexture, onLoaded, sourceFromUrl, textureFromUrl, whenLoaded } from '../textures.js?v=71c5d2dc';
+import { upgradeSource } from '../sprite-hires.js?v=c1bcff21';
 import { grantMoodXp } from '../mood-xp.js?v=e311b45c';
-import { displayTopOf, itemstackOverlayPoint, playPoofIn, playSheetOverlay, poofInAlpha } from '../overlay-art.js?v=243cef7d';
-import { HOME_MACHINE } from '../home-ticket.js?v=c0db4904';
-import { createAnimalState } from '../animals.js?v=060b5c65';
+import { displayTopOf, itemstackOverlayPoint, playPoofIn, playSheetOverlay, poofInAlpha } from '../overlay-art.js?v=4858876d';
+import { HOME_MACHINE } from '../home-ticket.js?v=47d10c75';
+import { createAnimalState } from '../animals.js?v=171e862c';
 import {
   AK_ANIMALS,
   AK_BUBBLE,
@@ -188,7 +188,7 @@ import {
 import { filterText } from '../word-filter.js?v=9a7a7ebb';
 import { isPhoneDevice, phoneScreenFrame, safeAreaInsets, touchWords } from '../touch-controls.js?v=8bc690ac';
 import { energyMax, forceMetabolic, moodMax } from '../metabolics.js?v=48f784bf';
-import { standOnFeet, anchorBottomCentre } from '../sprite-feet.js?v=18e517a6';
+import { standOnFeet, anchorBottomCentre } from '../sprite-feet.js?v=6319b91a';
 import { WORLD_FONT_FAMILY } from '../world-text.js?v=6b49f88c';
 
 export const NEWXP_FEATURE_ID = 'newxp';

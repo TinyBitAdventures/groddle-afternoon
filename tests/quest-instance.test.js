@@ -25,7 +25,7 @@ import {
   setRunFlag,
   solveQuestInstance,
   stepQuestInstance,
-} from '../public/js/quest-instance.js?v=39e4ca2e';
+} from '../public/js/quest-instance.js?v=bb5d53fd';
 import {
   BUILT_ROOMS,
   OFFER_OVERRIDES,
@@ -33,8 +33,8 @@ import {
   builtInstanceQuests,
   roomModulePath,
 } from '../public/js/quest-rooms/catalog.js?v=f37a25ba';
-import { loadContentCatalogsFromDir, getQuestCatalog } from '../public/js/content-catalogs.js?v=b6a173ae';
-import * as kit from '../public/js/quest-rooms/kit.js?v=44218fc3';
+import { loadContentCatalogsFromDir, getQuestCatalog } from '../public/js/content-catalogs.js?v=b2a9a862';
+import * as kit from '../public/js/quest-rooms/kit.js?v=3f5f3b56';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -162,7 +162,7 @@ describe('quest room kit', () => {
 
 describe('Rainbow Run (numismatic_hustle)', () => {
   it('has the source 30-second, 30-coin rules and enough coins on reachable ledges', async () => {
-    const mod = await import('../public/js/quest-rooms/rainbow-run.js?v=6c2d2a6f');
+    const mod = await import('../public/js/quest-rooms/rainbow-run.js?v=83236e51');
     assert.equal(mod.RUN_MS, 30_000);
     assert.equal(mod.COINS_NEEDED, 30);
     const coins = mod.rainbowCoins();
@@ -206,7 +206,7 @@ describe('The High Jumper (top_of_tree)', () => {
 
 describe('Color Unblocking (color_unblocking)', () => {
   it('opens a path with the four solution switches and keeps the orange bridge', async () => {
-    const mod = await import('../public/js/quest-rooms/color-unblocking.js?v=0c3a6e10');
+    const mod = await import('../public/js/quest-rooms/color-unblocking.js?v=833c89e5');
     const layout = mod.colorLayout();
     const on = mod.colorsAfter(layout.solution);
     for (const color of ['red', 'blue', 'green', 'purple']) assert.ok(!on.has(color), `${color} cleared`);
@@ -223,7 +223,7 @@ describe('Color Unblocking (color_unblocking)', () => {
 
 describe('Vision Quest (vision_quest)', () => {
   it('uses the archived Institute street and the six source objects', async () => {
-    const mod = await import('../public/js/quest-rooms/vision-quest.js?v=0db38ca3');
+    const mod = await import('../public/js/quest-rooms/vision-quest.js?v=b4b42bfc');
     assert.equal(mod.STREET, 'GNV1T7PCUM53T25');
     assert.deepEqual(Object.keys(mod.OBJECTS).sort(), ['lemburger', 'npc_crab', 'npc_piggy', 'pumpkin', 'rock_sparkly_1', 'trant_fruit']);
     assert.equal(mod.WRONG_THINGS.length, 7);
@@ -231,7 +231,7 @@ describe('Vision Quest (vision_quest)', () => {
   });
 
   it('#329 (G749): the first Talk to plays only the introduction; the question waits for a later talk', async () => {
-    const mod = await import('../public/js/quest-rooms/vision-quest.js?v=0db38ca3');
+    const mod = await import('../public/js/quest-rooms/vision-quest.js?v=b4b42bfc');
     const said = [];
     const ctx = {
       data: { object: 'pumpkin', rng: () => 0 },
@@ -256,7 +256,7 @@ describe('Vision Quest (vision_quest)', () => {
 
 describe("Mr. Block's playroom (kids_room)", () => {
   it('has the 24 source words, the doneSpelling tiers and letter gifts', async () => {
-    const mod = await import('../public/js/quest-rooms/kids-room.js?v=9691ec42');
+    const mod = await import('../public/js/quest-rooms/kids-room.js?v=48751197');
     assert.equal(mod.WORD_UP_WORDS.length, 24);
     assert.equal(mod.SPELL_MS, 180_000);
     // The 5*60 exit delay is the "Are you stuck?" prompt; Word Up's 3:00 is the room's only clock.
@@ -278,7 +278,7 @@ describe("Mr. Block's playroom (kids_room)", () => {
 
 describe('The Wrizzards and The Rube (rube_yard)', () => {
   it('hides ten Wrizzards where the camera and room card leave them visible', async () => {
-    const mod = await import('../public/js/quest-rooms/rube-yard.js?v=4631579f');
+    const mod = await import('../public/js/quest-rooms/rube-yard.js?v=904cebae');
     assert.equal(mod.WRIZZARDS_NEEDED, 10);
     assert.equal(mod.HIDING_SPOTS.length, 10);
     assert.equal(new Set(mod.HIDING_SPOTS.map((s) => s.id)).size, 10);
@@ -307,7 +307,7 @@ describe('Le Misérable (le_miserable)', () => {
   const STEP_BY_TINT = { 16777024: 1, 16750144: 2, 10436052: 3, 3394764: 4 };
 
   async function setup() {
-    const mod = await import('../public/js/quest-rooms/le-miserable.js?v=97f13169');
+    const mod = await import('../public/js/quest-rooms/le-miserable.js?v=5cd04c68');
     const ev = await import('../public/js/location-events.js?v=48938c8f');
     const { readFileSync } = await import('node:fs');
     const street = JSON.parse(readFileSync(streetFile, 'utf8'));
@@ -441,8 +441,8 @@ describe('G311: a failed room quest is Try again in the quest log', () => {
   };
 
   it('a run lost to a reload marks a startable quest failed, not a retry prompt', async () => {
-    const { questInstancesFeature } = await import('../public/js/features/quest-instances-feature.js?v=c80637d9');
-    const { ensureQuestOfferState } = await import('../public/js/quest-offers.js?v=36e610b5');
+    const { questInstancesFeature } = await import('../public/js/features/quest-instances-feature.js?v=740f1479');
+    const { ensureQuestOfferState } = await import('../public/js/quest-offers.js?v=769eba09');
     assert.equal(getQuestCatalog().mental_block?.needsStart, true);
     assert.notEqual(getQuestCatalog().help_juju_bandits?.needsStart, true, 'no onStarted in GSJS');
     questInstancesFeature.restore({ questId: 'mental_block', roomId: 'mental_block', memory: {}, retry: { help_juju_bandits: Date.now() - 60_000 } });
@@ -505,8 +505,8 @@ describe('G313: failed room quests the source removes', () => {
   });
 
   it('a reload removes a source-removed quest and its offers, and keeps the prompt for the three', async () => {
-    const { questInstancesFeature } = await import('../public/js/features/quest-instances-feature.js?v=c80637d9');
-    const { questStatus } = await import('../public/js/quest-offers.js?v=36e610b5');
+    const { questInstancesFeature } = await import('../public/js/features/quest-instances-feature.js?v=740f1479');
+    const { questStatus } = await import('../public/js/quest-offers.js?v=769eba09');
     const t = Date.now() - 60_000;
     questInstancesFeature.restore({ memory: {}, retry: { tower_quest: t, le_miserable_part_2: t, smuggle_the_smuggler_part2: t } });
     const active = { tower_quest: { progress: {} }, le_miserable_part_2: { progress: {} }, smuggle_the_smuggler_part2: { progress: {} } };
@@ -533,7 +533,7 @@ describe('G313: failed room quests the source removes', () => {
   });
 
   it('has no map card', async () => {
-    const { questInstancesFeature } = await import('../public/js/features/quest-instances-feature.js?v=c80637d9');
+    const { questInstancesFeature } = await import('../public/js/features/quest-instances-feature.js?v=740f1479');
     assert.equal(questInstancesFeature.mapCards, undefined);
     const src = readFileSync(join(root, 'public/js/features/quest-instances-feature.js'), 'utf8');
     assert.doesNotMatch(src, /Unfinished quest places/);
@@ -554,7 +554,7 @@ describe('#107: a choice dialog can be dismissed', () => {
   const src = readFileSync(join(root, 'public/js/features/quest-instances-feature.js'), 'utf8');
 
   it('Escape and a click outside make the cancel choice (ChoicesDialog.as _escKeyHandler: cancel_value first)', async () => {
-    const { cancelChoice } = await import('../public/js/features/quest-instances-feature.js?v=c80637d9');
+    const { cancelChoice } = await import('../public/js/features/quest-instances-feature.js?v=740f1479');
     const memories = [{ label: 'Four Letter Words', value: 'letter_block_2' }, { label: 'Hog Haul', value: 'hogtie_piggies' }, { label: 'Never mind', value: '', cancel: true }];
     assert.equal(cancelChoice(memories), '');
     assert.equal(cancelChoice([{ label: 'Stay', value: 'stay', cancel: true }, { label: 'Leave', value: 'leave' }]), 'stay');
@@ -610,7 +610,7 @@ describe('G1120: quest room memory survives a reload', () => {
   });
 
   it('writes through the feature, saves, reloads and reads the same row', async () => {
-    const { questInstancesFeature: f } = await import('../public/js/features/quest-instances-feature.js?v=c80637d9');
+    const { questInstancesFeature: f } = await import('../public/js/features/quest-instances-feature.js?v=740f1479');
     f.restore({});
     for (const [room, keys] of Object.entries(ROOM_KEYS)) {
       for (const key of keys) f._roomMemory(room, key).mark = `${room}/${key}`;
@@ -619,7 +619,7 @@ describe('G1120: quest room memory survives a reload', () => {
     for (const [room, keys] of Object.entries(ROOM_KEYS)) {
       for (const key of keys) assert.equal(f._roomMemory(room, key).mark, `${room}/${key}`, `${room} ${key}`);
     }
-    const { HUNT_KEY } = await import('../public/js/quest-rooms/juju-camp.js?v=5f4419ba');
+    const { HUNT_KEY } = await import('../public/js/quest-rooms/juju-camp.js?v=a270fdac');
     assert.equal(HUNT_KEY, 'room:juju_camp:hunt');
     assert.equal(f._state().save.memory[HUNT_KEY].mark, 'juju_camp/hunt', 'the world hooks read the room row');
   });

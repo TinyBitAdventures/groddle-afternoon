@@ -22,16 +22,16 @@ import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { loadContentCatalogsFromDir, resetContentCatalogs } from '../public/js/content-catalogs.js?v=b6a173ae';
-import { worldVerbAchievementCounters } from '../public/js/achievements.js?v=4af6091c';
-import { createAnimalState, resetAnimalDay } from '../public/js/animals.js?v=060b5c65';
-import { createQuestState } from '../public/js/quests.js?v=15aab2e3';
-import { acceptOffer, routeQuestEvent } from '../public/js/quest-offers.js?v=36e610b5';
-import { applyBuff, createBuffState } from '../public/js/buffs.js?v=fc742885';
+import { loadContentCatalogsFromDir, resetContentCatalogs } from '../public/js/content-catalogs.js?v=b2a9a862';
+import { worldVerbAchievementCounters } from '../public/js/achievements.js?v=7a3a0e92';
+import { createAnimalState, resetAnimalDay } from '../public/js/animals.js?v=171e862c';
+import { createQuestState } from '../public/js/quests.js?v=17fca824';
+import { acceptOffer, routeQuestEvent } from '../public/js/quest-offers.js?v=769eba09';
+import { applyBuff, createBuffState } from '../public/js/buffs.js?v=9ac58eaa';
 import { BUFF_ICONS, QUEST_TIMER_BUFFS } from '../public/js/buff-triggers.js?v=9fd877c4';
-import { EMERGENCY_RETRY_MS } from '../public/js/features/quest-offers-feature.js?v=cb6fe38a';
+import { EMERGENCY_RETRY_MS } from '../public/js/features/quest-offers-feature.js?v=64567aad';
 import { QUOIN_CLASSES, quoinClassAmount, quoinRespawnMs } from '../public/js/quoins.js?v=4d75aec0';
-import { COIN_BACK_MS, COIN_CLASS, COIN_TYPE, room as rainbowRoom } from '../public/js/quest-rooms/rainbow-run.js?v=6c2d2a6f';
+import { COIN_BACK_MS, COIN_CLASS, COIN_TYPE, room as rainbowRoom } from '../public/js/quest-rooms/rainbow-run.js?v=83236e51';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const PUBLIC = join(ROOT, 'public');

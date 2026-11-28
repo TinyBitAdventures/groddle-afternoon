@@ -23,7 +23,7 @@
  * the client's did (its target 'encyclopedia'), so a second press reuses the Encyclopedia's tab.
  */
 
-import { fetchRetry } from './load-retry.js?v=24823577';
+import { fetchRetry } from './load-retry.js?v=477aa7a7';
 import { openSitePage, sitePageTip } from './site-pages.js?v=9b3049cf';
 
 /** The home page and the index, relative to the game root (the play pages' <base>). */
