@@ -1,6 +1,6 @@
 {
   "note": "Written by tools/gaps/build-data.mjs from tools/gaps/public-gaps.json and the coverage register. Edit those, never this file.",
-  "release": "v0.80.0",
+  "release": "v0.81.0",
   "states": {
     "fixing": {
       "label": "Being fixed",
@@ -42,7 +42,7 @@
     "fixing": 3,
     "known": 18,
     "unreleased": 0,
-    "fixed": 661,
+    "fixed": 672,
     "lost": 5,
     "purpose": 18,
     "idea": 10
@@ -822,6 +822,18 @@
           "text": "Sloth Knockers hung beside their trees, and the sloths' branches stopped short of the trunk.",
           "state": "fixed",
           "version": "v0.79.0"
+        },
+        {
+          "id": "F200",
+          "text": "A few rocks and race ticket dispensers stood up in fir trees or hidden behind front trees.",
+          "state": "fixed",
+          "version": "v0.81.0"
+        },
+        {
+          "id": "F201",
+          "text": "Some rocks and quoins could only be reached with a triple jump.",
+          "state": "fixed",
+          "version": "v0.81.0"
         }
       ]
     },
@@ -1646,6 +1658,24 @@
           "text": "Online, a Craftybot set down in a house can't use things lying on the floor; carried in the pack it works.",
           "state": "fixed",
           "version": "v0.80.0"
+        },
+        {
+          "id": "F197",
+          "text": "You could stand on tables and chairs out in the streets but not on the furniture in your house.",
+          "state": "fixed",
+          "version": "v0.81.0"
+        },
+        {
+          "id": "F198",
+          "text": "On a phone, a placed machine would not drag in Decoration Mode unless you held your finger still first.",
+          "state": "fixed",
+          "version": "v0.81.0"
+        },
+        {
+          "id": "F199",
+          "text": "A house picture that never finished loading left an empty house until a reload, on Safari too.",
+          "state": "fixed",
+          "version": "v0.81.0"
         },
         {
           "id": "G48",
@@ -3618,6 +3648,24 @@
           "text": "The first tutorial screen gave only a faint arrow after a few seconds, so new players did not know to pull the chain.",
           "state": "fixed",
           "version": "v0.42.1"
+        },
+        {
+          "id": "F192",
+          "text": "A brand new player was offered festival quests and the festival card in the middle of the tutorial.",
+          "state": "fixed",
+          "version": "v0.81.0"
+        },
+        {
+          "id": "F193",
+          "text": "A new player could go home in the middle of the tutorial and leave Gentle Island with a step only the island can finish.",
+          "state": "fixed",
+          "version": "v0.81.0"
+        },
+        {
+          "id": "F194",
+          "text": "A player sent back to Gentle Island landed on a path below the street.",
+          "state": "fixed",
+          "version": "v0.81.0"
         }
       ]
     },
@@ -4728,6 +4776,12 @@
           "id": "G1337",
           "text": "On streets with a coloured light, players look a little brighter than the street around them; Glitch tinted players too.",
           "state": "known"
+        },
+        {
+          "id": "F195",
+          "text": "At night the mirror past a street's right end looked darker than the street.",
+          "state": "fixed",
+          "version": "v0.81.0"
         }
       ]
     },
@@ -4739,6 +4793,28 @@
           "text": "Arriving right next to a Street Spirit could show a second vendor floating above it.",
           "state": "fixed",
           "version": "v0.80.0"
+        }
+      ]
+    },
+    {
+      "name": "Players",
+      "items": [
+        {
+          "id": "F196",
+          "text": "Other players stood frozen on your screen instead of playing their idle animations.",
+          "state": "fixed",
+          "version": "v0.81.0"
+        }
+      ]
+    },
+    {
+      "name": "Friends",
+      "items": [
+        {
+          "id": "F202",
+          "text": "A friend going on and off quickly sent you an online or offline notice every time.",
+          "state": "fixed",
+          "version": "v0.81.0"
         }
       ]
     }

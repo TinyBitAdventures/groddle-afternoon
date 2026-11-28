@@ -3,6 +3,17 @@
   "about": "What the loading card shows after an update (#745): per release, newest first, up to five short player-facing lines. Written by tools/release/whats-new.mjs.",
   "releases": [
     {
+      "version": "v0.81.0",
+      "date": "2026-11-28",
+      "lines": [
+        "Stand on the tables, chairs, beds and shelves in your house",
+        "Other players play their idle animations on your screen",
+        "Skipped the tutorial? The Magic Rock can send you back to Gentle Island to finish it",
+        "A house that stops loading fills itself in, no reload needed",
+        "Friends going on and off quickly no longer flood you with notices"
+      ]
+    },
+    {
       "version": "v0.80.0",
       "date": "2026-11-28",
       "lines": [

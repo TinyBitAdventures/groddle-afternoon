@@ -6615,6 +6615,108 @@
         "game:4553ef10a45",
         "game:3c70aedacfe"
       ]
+    },
+    {
+      "id": "F192",
+      "area": "Tutorial",
+      "show": "fixing",
+      "text": "A brand new player was offered festival quests and the festival card in the middle of the tutorial.",
+      "commits": [
+        "game:81c9cc44c39"
+      ]
+    },
+    {
+      "id": "F193",
+      "area": "Tutorial",
+      "show": "fixing",
+      "text": "A new player could go home in the middle of the tutorial and leave Gentle Island with a step only the island can finish.",
+      "commits": [
+        "game:7808d8f0682"
+      ]
+    },
+    {
+      "id": "F194",
+      "area": "Tutorial",
+      "show": "fixing",
+      "text": "A player sent back to Gentle Island landed on a path below the street.",
+      "commits": [
+        "game:f6ae5f01e2b"
+      ]
+    },
+    {
+      "id": "F195",
+      "area": "Look",
+      "show": "fixing",
+      "text": "At night the mirror past a street's right end looked darker than the street.",
+      "commits": [
+        "game:f4fa5b37d09"
+      ]
+    },
+    {
+      "id": "F196",
+      "area": "Players",
+      "show": "fixing",
+      "text": "Other players stood frozen on your screen instead of playing their idle animations.",
+      "commits": [
+        "game:a8c66e6e9fe"
+      ]
+    },
+    {
+      "id": "F197",
+      "area": "Homes",
+      "show": "fixing",
+      "text": "You could stand on tables and chairs out in the streets but not on the furniture in your house.",
+      "commits": [
+        "game:bd416491887"
+      ]
+    },
+    {
+      "id": "F198",
+      "area": "Homes",
+      "show": "fixing",
+      "text": "On a phone, a placed machine would not drag in Decoration Mode unless you held your finger still first.",
+      "commits": [
+        "game:f45b341b554"
+      ]
+    },
+    {
+      "id": "F199",
+      "area": "Homes",
+      "show": "fixing",
+      "text": "A house picture that never finished loading left an empty house until a reload, on Safari too.",
+      "commits": [
+        "game:30ed43c9276",
+        "game:924f514908a"
+      ]
+    },
+    {
+      "id": "F200",
+      "area": "Streets",
+      "show": "fixing",
+      "text": "A few rocks and race ticket dispensers stood up in fir trees or hidden behind front trees.",
+      "commits": [
+        "game:4e08c14020e",
+        "game:7dcfa8dd012"
+      ]
+    },
+    {
+      "id": "F201",
+      "area": "Streets",
+      "show": "fixing",
+      "text": "Some rocks and quoins could only be reached with a triple jump.",
+      "commits": [
+        "game:e8a016897f8"
+      ]
+    },
+    {
+      "id": "F202",
+      "area": "Friends",
+      "show": "fixing",
+      "text": "A friend going on and off quickly sent you an online or offline notice every time.",
+      "commits": [
+        "game:a4a026b36d6",
+        "server:01dcf03"
+      ]
     }
   ]
 }
