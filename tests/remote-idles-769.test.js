@@ -15,7 +15,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { SHEET_FRAMES, animForState } from '../public/js/avatar-anims.js?v=fb921bf4';
 import { fillPackAnims } from '../public/js/avatar-pack.js?v=65324246';
-import * as remoteIdles from '../public/js/remote-idles.js?v=e370b3fa';
+import * as remoteIdles from '../public/js/remote-idles.js?v=96b10d6e';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const read = (rel) => readFileSync(join(here, '..', rel), 'utf8');

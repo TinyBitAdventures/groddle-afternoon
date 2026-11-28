@@ -6,7 +6,7 @@
  * and never loaded another player's idle sheets, so others stood frozen.
  *
  * The idle sheets are big (idle4 at 3x is about 19 MB decoded, a random idle up to 25 MB) and a
- * painted look bakes its own, so they load lazily and under a cap (ours: Glitch loaded every
+ * painted look bakes its own, so they load lazily and under a memory cap (Glitch loaded every
  * sheet it was asked for):
  * - Looks drawn from your own idle sheets (yours, or the default look's files when you wear it)
  *   cost nothing more and always idle.

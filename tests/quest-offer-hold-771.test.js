@@ -12,7 +12,7 @@ import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createFeatureHost } from '../public/js/feature-host.js?v=100f3193';
-import { FEATURES } from '../public/js/features/index.js?v=7833d819';
+import { FEATURES } from '../public/js/features/index.js?v=e0929682';
 import { newxpFeature, __newxpTest } from '../public/js/features/newxp-feature.js?v=17e1d76c';
 import { questOffersFeature } from '../public/js/features/quest-offers-feature.js?v=7ced7fa2';
 import { GENTLE_ISLAND } from '../public/js/newxp.js?v=abbf0ed6';

@@ -76,7 +76,7 @@ import { anchorBottomCentre } from '../sprite-feet.js?v=6283b688';
 import { NAMEPLATE_STYLE } from '../world-text.js?v=6b49f88c';
 import { PUBLIC_HIDE } from '../public-picture.js?v=1a0b03fa';
 import { PLAY_HERE_STATES } from '../online-request.js?v=5fa7a635';
-import { createRemoteIdles, remoteIdleCap } from '../remote-idles.js?v=e370b3fa';
+import { createRemoteIdles, remoteIdleCap } from '../remote-idles.js?v=96b10d6e';
 
 export const REALTIME_FEATURE_ID = 'realtime';
 /** Lines kept in the chat log. */
