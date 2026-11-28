@@ -40,7 +40,7 @@ import {
   parseHouseFileText,
   resolveHouseFileUrl,
   validateHouseFile,
-} from './house-file.js?v=e90bd8f8';
+} from './house-file.js?v=f3277873';
 
 const REPORT_LINES = 6;
 /** G1286: the report's line when the practice copy was given Snapshottery. */

@@ -24,8 +24,8 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { STACK_SINK_PX, underFloorRestY } from '../public/js/walk-surface.js?v=76def2f6';
-import { BACK_YARD_GROUND_Y, housePlatforms, settleStacksOntoFloor } from '../public/js/features/homes-feature.js?v=b89557db';
-import { createHomeDecorState, INTERIOR, interiorWidth } from '../public/js/home-decor.js?v=d84c139d';
+import { BACK_YARD_GROUND_Y, housePlatforms, settleStacksOntoFloor } from '../public/js/features/homes-feature.js?v=fa9cddce';
+import { createHomeDecorState, INTERIOR, interiorWidth } from '../public/js/home-decor.js?v=325d9a13';
 import { roomPieces } from '../public/js/home-wallpaper.js?v=5d3594e4';
 import { avatarHitBox, behindFloor } from '../public/js/reach.js?v=456da8a8';
 
@@ -90,7 +90,8 @@ describe('#728: a stack under the house floor', () => {
     const fn = game.slice(at, game.indexOf('\nfunction ', at + 10));
     assert.match(fn, /restingStackYAt\(streetPlatforms, x, y, \{ place: homeStackPlace\(\), on: stack\?\.on \?\? null \}\)/);
     const homes = readFileSync(join(root, 'public', 'js', 'features', 'homes-feature.js'), 'utf8');
-    assert.match(homes, /root\.platformsScreen = housePlatforms\(room, x0, width\);/);
+    // #772: the room's furniture lines join the floor; they hold no items (item_perm 0), so stacks settle as before.
+    assert.match(homes, /root\.platformsScreen = housePlatforms\(room, x0, width, decor\);/);
     assert.match(homes, /settleStacks\(decor, rows, roomX0\(\)\) \+ settleStacksOntoFloor\(rows, scene\.background\?\.platformsScreen, decor, roomX0\(\)\)/);
     assert.match(homes, /restingStackYAt\(lines, Number\(row\.x\), Number\(row\.y\), \{ place: 'room' \}\)/, 'Decoration Mode picks a shared stack where it is drawn');
   });

@@ -20,7 +20,7 @@ import {
   canSnap, cleanCaption, isSnapStreet, isSnapUrl, snapAuthor, snapPlace, snapStreet, takePictureState, withCamera,
 } from '../public/js/snaps.js?v=b5be8bff';
 import { snapsFeature } from '../public/js/features/snaps-feature.js?v=2ef53ced';
-import { FEATURES } from '../public/js/features/index.js?v=e0929682';
+import { FEATURES } from '../public/js/features/index.js?v=c3d605f4';
 import { HAS_SITE, SITE_DIR, skipWithoutSite } from '../tools/repos.mjs';
 import { PHP, phpSkip } from './php.js';
 

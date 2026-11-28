@@ -24,10 +24,10 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import * as walk from '../public/js/walk-surface.js?v=76def2f6';
-import * as homes from '../public/js/features/homes-feature.js?v=b89557db';
-import { createHomeDecorState, INTERIOR, interiorWidth, surfaceHeight } from '../public/js/home-decor.js?v=d84c139d';
+import * as homes from '../public/js/features/homes-feature.js?v=fa9cddce';
+import { createHomeDecorState, INTERIOR, interiorWidth, surfaceHeight } from '../public/js/home-decor.js?v=325d9a13';
 import { roomPieces } from '../public/js/home-wallpaper.js?v=5d3594e4';
-import { normalizeHomeView, ownerStacksFor } from '../public/js/neighbours-mp.js?v=55e3976b';
+import { normalizeHomeView, ownerStacksFor } from '../public/js/neighbours-mp.js?v=a5cd63e7';
 
 const root = join(import.meta.dirname, '..');
 const read = (p) => readFileSync(join(root, p), 'utf8');

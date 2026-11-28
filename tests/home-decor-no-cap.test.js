@@ -13,10 +13,10 @@ import { execFileSync, spawnSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { FURNITURE_CATALOG } from '../public/js/homes-catalog.js?v=0367f90f';
-import { createHomeDecorState, interiorWidth, normalizeHomeDecorState, placeFurniture, renderOrder } from '../public/js/home-decor.js?v=d84c139d';
-import { createFloorsState } from '../public/js/home-floors.js?v=645685a1';
-import { normalizeOwnerStacks } from '../public/js/neighbours-mp.js?v=55e3976b';
-import { visitorHomeState } from '../public/js/features/homes-feature.js?v=b89557db';
+import { createHomeDecorState, interiorWidth, normalizeHomeDecorState, placeFurniture, renderOrder } from '../public/js/home-decor.js?v=325d9a13';
+import { createFloorsState } from '../public/js/home-floors.js?v=b50aae87';
+import { normalizeOwnerStacks } from '../public/js/neighbours-mp.js?v=a5cd63e7';
+import { visitorHomeState } from '../public/js/features/homes-feature.js?v=fa9cddce';
 import { HAS_SITE, SITE_DIR } from '../tools/repos.mjs';
 import { HAS_PHP, PHP } from './php.js';
 

@@ -19,8 +19,11 @@ centre, the point the original placed a piece by (LocationItemstackView.as
 _positionViewDO 853-854) and measured its catalog plats from: the trimmed art
 loses it, so js/home-decor.js surfaceHeight takes it off a plat (the Basic Wooden
 Shelf's plat is 52 over the stage bottom, its art ends 24 px above it, so things
-rest 28 px up its 49 px art, on the plank). Each render records it; to measure
-it again without writing art:
+rest 28 px up its 49 px art, on the plank). `cx` (1x) is how far the art's
+centre sits right of that point, facing right: the game draws a piece centred on
+its x, and tools/furniture-plats/build.mjs moves the catalog plats (where players
+stand, #772) by it. Each render records both; to measure them again without
+writing art:
 
     python3 -I tools/furniture-upgrades/render.py --feet [--work DIR]
 
@@ -123,6 +126,12 @@ def foot_of(info, y, h, zoom):
     return round(((y1 - y0) * 2 * zoom - (y + h)) / zoom)
 
 
+def cx_of(info, x, w, zoom):
+    """Art centre minus stage centre at 1x (facing right): the stage is padded by its own size on every side."""
+    x0, x1, y0, y1 = info['rect']
+    return round(((x + w / 2) - (x1 - x0) * 1.5 * zoom) / zoom)
+
+
 def crops(batch, plan, out_dir, names):
     """{key: (w, h, x, y)}: each render's trim at ZOOM, a `group`'s keys cropped to the union of their art."""
     boxes = {}
@@ -169,6 +178,7 @@ def feet(art, work):
                 print(f'  {key}: renders {w}x{h} at {ZOOM}x, its art is {art[key]["w"]}x{art[key]["h"]}: render it again')
                 continue
             art[key]['foot'] = foot_of(infos[key], y, h, ZOOM)
+            art[key]['cx'] = cx_of(infos[key], x, w, ZOOM)
         shutil.rmtree(src_dir, ignore_errors=True)
         shutil.rmtree(out_dir, ignore_errors=True)
         done += len(keys)
@@ -212,7 +222,7 @@ def base_feet(classes, work):
             continue
         w, h, x, y = trim_box(png)
         row = base.get(cls, {})
-        row.update({'swf': src.replace(os.path.expanduser('~'), '~'), 'sha': sha(src), 'w': w, 'h': h, 'foot': foot_of(info, y, h, 1)})
+        row.update({'swf': src.replace(os.path.expanduser('~'), '~'), 'sha': sha(src), 'w': w, 'h': h, 'foot': foot_of(info, y, h, 1), 'cx': cx_of(info, x, w, 1)})
         base[cls] = row
     shutil.rmtree(src_dir, ignore_errors=True)
     shutil.rmtree(out_dir, ignore_errors=True)
@@ -306,7 +316,7 @@ def main(args):
                             '-gravity', 'South', '-extent', f'{W}x{H}', '-strip', tmp], check=True)
             subprocess.run(['cwebp', '-quiet', '-metadata', 'none', '-q', '88', '-m', '4', '-sharp_yuv',
                             '-alpha_q', '100', '-alpha_filter', 'best', tmp, '-o', dst], check=True)
-            art[key] = {'w': W // ZOOM, 'h': H // ZOOM, 'sha': digest, 'foot': foot_of(swfinfo.read(src), y, h, ZOOM)}
+            art[key] = {'w': W // ZOOM, 'h': H // ZOOM, 'sha': digest, 'foot': foot_of(swfinfo.read(src), y, h, ZOOM), 'cx': cx_of(swfinfo.read(src), x, w, ZOOM)}
         json.dump(dict(sorted(art.items())), open(ART, 'w'), indent=1)
         open(ART, 'a').write('\n')
         shutil.rmtree(src_dir, ignore_errors=True)

@@ -63,7 +63,7 @@ const LEFT_OUT = {
   furniture_tower_chassis: 'The Tower itself, not a piece in the room.',
 };
 
-function loadCatalog() {
+export function loadCatalog() {
   const ctx = {};
   vm.runInNewContext(
     `${readFileSync(join(GSJS, 'items/catalog_furniture.js'), 'utf8')}\n` +

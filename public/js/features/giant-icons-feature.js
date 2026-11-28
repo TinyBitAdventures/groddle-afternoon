@@ -95,7 +95,7 @@ import {
   titheIcon,
   titheMessage,
   useEmblem,
-} from '../giant-icons.js?v=dae82b5f';
+} from '../giant-icons.js?v=9bafba16';
 import { textureFromUrl } from '../textures.js?v=b8e38103';
 import { playSheetOverlay } from '../overlay-art.js?v=e50bacca';
 import { grantMoodXp } from '../mood-xp.js?v=e311b45c';
@@ -104,13 +104,13 @@ import { CONVERSATION_RULES, adoptLegacyTalks, conversationRecord, hasCompleted,
 import { TELLERS } from '../conversations-data.js?v=f11b7e02';
 import { itemZ } from '../item-bands.js?v=ec366be3';
 import { publicStreet } from '../shared-street.js?v=dce5694b';
-import { insideProof, readVisitScene } from '../neighbours-mp.js?v=55e3976b';
-import { isHousePlace } from '../home-floors.js?v=645685a1';
+import { insideProof, readVisitScene } from '../neighbours-mp.js?v=a5cd63e7';
+import { isHousePlace } from '../home-floors.js?v=b50aae87';
 import { createMinnAccount } from '../minn-account.js?v=7e3d7279';
 import { saveStore, savedThrough } from '../save-store.js?v=1ccb1d6b';
 import { HOME_INTERIOR_TSID, HOME_STREET_TSID } from '../homes.js?v=dca6b2cd';
-import { gnomePlaceFor, visitGnomePlace } from '../garden-gnome.js?v=f1410394';
-import { homesFeature } from './homes-feature.js?v=b89557db';
+import { gnomePlaceFor, visitGnomePlace } from '../garden-gnome.js?v=82b4df1b';
+import { homesFeature } from './homes-feature.js?v=fa9cddce';
 import { standOnFeet } from '../sprite-feet.js?v=6283b688';
 
 export const ICONS_FEATURE_ID = 'giant-icons';

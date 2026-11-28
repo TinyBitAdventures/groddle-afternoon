@@ -15,10 +15,10 @@ import { after, before, describe, it } from 'node:test';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-import { homeStreetMpFeature } from '../public/js/features/home-street-mp-feature.js?v=b9b7a47c';
-import { homesFeature } from '../public/js/features/homes-feature.js?v=b89557db';
-import { quarterFeature } from '../public/js/features/quarter-feature.js?v=8659f5de';
-import { visitSceneTsid } from '../public/js/neighbours-mp.js?v=55e3976b';
+import { homeStreetMpFeature } from '../public/js/features/home-street-mp-feature.js?v=62c9aab2';
+import { homesFeature } from '../public/js/features/homes-feature.js?v=fa9cddce';
+import { quarterFeature } from '../public/js/features/quarter-feature.js?v=ab846f15';
+import { visitSceneTsid } from '../public/js/neighbours-mp.js?v=a5cd63e7';
 import { SIGN_FIRST_ARM_Y } from '../public/js/street-render.js?v=4966c68b';
 import { QUARTER_TEXT, homeArm, lotArrival, normalizeHeld } from '../public/js/quarter.js?v=a38887ca';
 import { clearStreetCache, clearStreetIndex } from '../public/js/street-loader.js?v=10376267';

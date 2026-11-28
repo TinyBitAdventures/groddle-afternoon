@@ -52,6 +52,7 @@ import {
   HOME_TEXTURE_CONFIGS,
 } from './homes-catalog.js?v=0367f90f';
 import { cleanHistory, cleanUpgradeId, upgradeArt, upgradeRow } from './furniture-upgrades.js?v=f563b304';
+import { FURNITURE_PLATS } from './furniture-plats-data.js?v=2842bcc0';
 import { SDB_COUNT_MAX, SDB_PRICE_MAX, isCabinetClass, normalizeContents, storagePickupLock } from './home-storage.js?v=17bf7f79';
 import { stackMaxOf } from './pack-slots.js?v=38e4aea5';
 
@@ -287,6 +288,64 @@ function restOnArt(art, platY, s) {
   if (plat > 0 && plat <= (top ?? Math.round((art.h + 4) * s))) return plat;
   if (top != null) return Math.max(1, top - REST_INSET);
   return null;
+}
+
+/**
+ * #772: the house's lines a placed piece adds, for players to stand on. Glitch put a piece's plats in
+ * the room when it was placed (inc_geo.js geo_add_plats_from_item 934-953, main.js doFurnitureDrop
+ * 7031), back when the house loaded (inc_homes.js 815-821), and swapped them on a move, an upgrade or
+ * a flip (include/furniture.js applyUpgrade, flipPlats); a table's, chair's, bed's or shelf's plat is
+ * solid from the top for players (platform_pc_perm -1, PlatformLine.as 341). The lines are
+ * js/furniture-plats-data.js's (tools/furniture-plats/build.mjs), from the drawn art's bottom centre,
+ * mirrored for a piece facing left as getPlatsAndWalls mirrored them. Ours: they hold no items
+ * (item_perm 0): a thing set on a piece rests on it through `on` (settleStacks, stackSurfaceAt).
+ */
+export const FURNITURE_LINE_PREFIX = 'home-furniture-';
+/**
+ * The avatar's head reach (street-model.js avatarHeadReach at scale 1). In Glitch a rising head
+ * stopped under the room's ceiling plat, 413 px over the walk line (inc_homes.js homes_rebuild_floor
+ * 934-939, platform_pc_perm 1), so feet never rose past this far under it and a piece's plat nearer
+ * the ceiling (a shelf hung at the top of the wall) was out of reach. The remake's house has no
+ * ceiling line, so such a line is left out rather than stood on with the head through the ceiling.
+ */
+export const FURNITURE_HEADROOM = 111;
+
+/** One placed piece's lines, [x1, y1, x2, y2] from its art's bottom centre facing right (data rows). */
+export function piecePlatRows(classTsid, upgradeId = '') {
+  const rows = FURNITURE_PLATS[classTsid];
+  if (!rows) return [];
+  const id = cleanUpgradeId(classTsid, upgradeId);
+  return (id ? rows.upgrades?.[id] : rows.base) || [];
+}
+
+/**
+ * PURE: every placed piece's lines in `state` (a room's decor) in world px, the room starting at
+ * world x `x0`: { id, x1, y1, x2, y2, pc_perm: -1, item_perm: 0, furnitureId }, x1 <= x2.
+ */
+export function furniturePlatforms(state, x0 = 0) {
+  const out = [];
+  const minY = INTERIOR.ceilingY + FURNITURE_HEADROOM;
+  for (const item of Array.isArray(state?.placed) ? state.placed : []) {
+    const rows = piecePlatRows(item.classTsid, item.upgradeId);
+    if (!rows.length) continue;
+    const s = pieceScale(item.classTsid, item.upgradeId);
+    const dir = item.facingRight === false ? -1 : 1;
+    const x = x0 + finite(item.x);
+    const y = finite(item.y, INTERIOR.floorY);
+    rows.forEach(([ax1, ay1, ax2, ay2], i) => {
+      let a = { x: Math.round(x + dir * ax1 * s), y: Math.round(y + ay1 * s) };
+      let b = { x: Math.round(x + dir * ax2 * s), y: Math.round(y + ay2 * s) };
+      if (a.x > b.x) [a, b] = [b, a];
+      if (a.x === b.x || Math.min(a.y, b.y) < minY) return;
+      out.push({ id: `${FURNITURE_LINE_PREFIX}${item.id}-${i}`, x1: a.x, y1: a.y, x2: b.x, y2: b.y, pc_perm: -1, item_perm: 0, furnitureId: item.id });
+    });
+  }
+  return out;
+}
+
+/** A line furniturePlatforms made. */
+export function isFurnitureLine(line) {
+  return String(line?.id || '').startsWith(FURNITURE_LINE_PREFIX);
 }
 
 function finite(value, fallback = 0) {
