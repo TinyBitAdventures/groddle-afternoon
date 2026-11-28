@@ -113,6 +113,7 @@ import { FFDEC, JAVA, swfSprites } from './swf-labels.mjs';
 import { swapParts, symbolClasses } from './swf-parts.mjs';
 import { recordState } from './swf-record.mjs';
 import { freezeState } from './swf-state.mjs';
+import { moduleUrl } from '../module-keys/build.mjs';
 import { rasteriseSvgs } from './svg-raster.mjs';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
@@ -690,6 +691,8 @@ export function moduleText(results) {
  * sheet is the exception: a hand trace of the 1x sheet (tools/quoin-art). js/textures.js
  * reads resolution 3 from the \`@3x\` name, so frame rectangles stay in 1x units.
  */
+
+import { fetchRetry } from './${moduleUrl('js/load-retry.js', ROOT).slice(3)}';
 export const HIRES_SPRITES = new Map([
 ${entries}
 ]);
@@ -780,7 +783,7 @@ export function upgradeSource(source, url, whenLoaded = (s) => Promise.resolve(s
   if (!hi || !source || source.destroyed) return Promise.resolve(false);
   if (source.hiresUpgrade) return source.hiresUpgrade;
   source.hiresUpgrade = Promise.resolve(whenLoaded(source))
-    .then(() => fetch(hi))
+    .then(() => fetchRetry(hi))
     .then((res) => {
       if (!res.ok) throw new Error(\`\${hi}: \${res.status}\`);
       return res.blob();
@@ -807,7 +810,7 @@ export function upgradeSource(source, url, whenLoaded = (s) => Promise.resolve(s
 function upgradeSplit(source, split, whenLoaded) {
   if (!source || source.destroyed || !frameSource) return Promise.resolve(false);
   if (source.hiresUpgrade) return source.hiresUpgrade;
-  const bitmap = (url) => fetch(url).then((res) => {
+  const bitmap = (url) => fetchRetry(url).then((res) => {
     if (!res.ok) throw new Error(\`\${url}: \${res.status}\`);
     return res.blob();
   }).then((blob) => createImageBitmap(blob));

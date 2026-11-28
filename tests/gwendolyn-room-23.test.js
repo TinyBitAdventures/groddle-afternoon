@@ -285,7 +285,7 @@ describe('Room 23: the feature', () => {
   it('is registered and keeps the room indoors', () => {
     const index = readFileSync(pub('js/features/index.js'), 'utf8');
     assert.match(index, /gwendolynRoom23Feature/);
-    assert.match(readFileSync(pub('game.js'), 'utf8').split('\n')[6], /features\/index\.js\?v=[0-9a-f]{8}/);
+    assert.match(readFileSync(pub('game.js'), 'utf8').split('\n').find((l) => l.includes('/features/index.js')) || '', /features\/index\.js\?v=[0-9a-f]{8}/);
     const eco = gwendolynRoom23Feature.ecologyOverride({ tsid: ROOM_23_TSID });
     assert.deepEqual([eco.interior, eco.quoins, eco.counts], [true, 0, {}]);
     assert.equal(gwendolynRoom23Feature.ecologyOverride({ tsid: CORRIDOR_FIVE_TSID }), null);

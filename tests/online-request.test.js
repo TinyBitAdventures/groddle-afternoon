@@ -192,6 +192,7 @@ const NOT_YET_MOVED = Object.freeze([
 
 /** Waits with the same kind of name that are not a request to the realtime server. */
 const NOT_A_REQUEST = Object.freeze([
+  'public/js/load-retry.js LOAD_TIMEOUT_MS', // #768: an HTTP picture or data load's stall limit, not a realtime request
   'public/game.js VECTOR_BAKE_ASKED_MS',
   'public/js/avatar-anims.js AFK_TIMEOUT_MS',
   'public/js/avatar-anims.js RANDOM_IDLE_WAIT_MS',

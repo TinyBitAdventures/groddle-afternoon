@@ -70,7 +70,7 @@ test('a far WebP sized for a nearer placement loads downscaled to the far need',
   assert.equal(far.width, Math.round(far.w * Number(/\?r=([\d.]+)/.exec(far.url)[1])));
   assert.ok(far.bytes < (near?.bytes ?? Infinity));
   const src = readFileSync(join(pub, 'js/textures.js'), 'utf8');
-  assert.match(src, /opts\.width > 0 && opts\.height > 0 \? resizeImage\(url, opts\) : decodeImage\(url\)/);
+  assert.match(src, /opts\.width > 0 && opts\.height > 0 \? resizeImage\(url, opts, signal\) : decodeImage\(url, signal\)/);
   const sr = readFileSync(join(pub, 'js/street-render.js'), 'utf8');
   assert.match(sr, /const sharpTexture = \(pick\) => textureFromUrl\(pick\.url, pick\.width/);
   assert.match(sr, /for \(const slack of FAR_SLACKS\)/);
