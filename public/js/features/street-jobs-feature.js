@@ -55,7 +55,7 @@ import { ITEM_CATALOG, addItem, countItem, ensureItem, itemIcon, packStamp, remo
 import { canUseTool, useToolCondition, workStepCost } from '../tools.js?v=4156bba8';
 import { ecologyForStreet } from '../street-ecology.js?v=da5177b2';
 import { worldToScreen } from '../street-model.js?v=a9a05f9d';
-import { signArmWidth } from '../street-render.js?v=c463d2c6';
+import { signArmWidth } from '../street-render.js?v=3f6ebb89';
 import { WORLD_FONT_FAMILY } from '../world-text.js?v=6b49f88c';
 import { getSkillCatalog } from '../content-catalogs.js?v=c9b84764';
 import { listRecipesProducing } from '../making.js?v=dc595568';

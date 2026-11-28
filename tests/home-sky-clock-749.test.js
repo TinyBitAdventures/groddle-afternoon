@@ -22,7 +22,7 @@ import { after, before, describe, it } from 'node:test';
 
 import { homePlaceAt, ownSkyReason, skyFollowsClock, skyLook } from '../public/js/sky-clock.js?v=dbd21266';
 import { streetLook, yardLook } from '../public/js/home-styles.js?v=ec5d2f69';
-import { BACK_YARD_GROUND_Y, STREET_GROUND_Y, drawLandscape } from '../public/js/features/homes-feature.js?v=5049e51c';
+import { BACK_YARD_GROUND_Y, STREET_GROUND_Y, drawLandscape } from '../public/js/features/homes-feature.js?v=efa4690f';
 import { Display, FakeEl, fakePixi } from './fake-scene.js';
 
 const here = dirname(fileURLToPath(import.meta.url));

@@ -22,7 +22,7 @@ import { after, before, describe, it } from 'node:test';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-import { projectApi, streetJobsFeature } from '../public/js/features/street-jobs-feature.js?v=2d626553';
+import { projectApi, streetJobsFeature } from '../public/js/features/street-jobs-feature.js?v=baeda249';
 import { soloNeed } from '../public/js/street-jobs.js?v=76471e42';
 import { createToolConditionState } from '../public/js/tools.js?v=4156bba8';
 import { soloTerms } from '../public/js/street-jobs-solo.js?v=40d84989';

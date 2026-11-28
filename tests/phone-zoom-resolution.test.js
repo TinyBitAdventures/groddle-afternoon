@@ -13,7 +13,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { PHONE_RENDER_RESOLUTION, PHONE_ZOOM_RESOLUTION_CAP, RESOLUTION_STEP, phoneZoomResolution, renderResolution, resolutionCap } from '../public/js/render-density.js?v=74c6f5f9';
 import { MIN_PACK_HEIGHT, stageFor } from '../public/js/location-view.js?v=f0a5f17d';
-import { recolourBakeResolution, streetBakeResolution } from '../public/js/street-render.js?v=c463d2c6';
+import { recolourBakeResolution, streetBakeResolution } from '../public/js/street-render.js?v=3f6ebb89';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const game = readFileSync(join(root, 'public/game.js'), 'utf8');
@@ -68,7 +68,7 @@ describe('streetBakeResolution: a street\'s own bakes stay at the bake cap', () 
     assert.equal(recolourBakeResolution(2, PHONE_RENDER_RESOLUTION), 1, 'recoloured copies stay at 1 on a phone');
   });
   it('the blur bakes, skirt, edge mirrors, sharp copies and animated decos read it', () => {
-    assert.match(render, /blurBakeResolution\(size, streetBakeResolution\(renderer, state\.cap\)\)/);
+    assert.match(render, /blurLayerResolution\(size, streetBakeResolution\(renderer, state\.cap\), px\)/);
     assert.match(render, /let res = Math\.min\(2, streetBakeResolution\(renderer, root\.bakeResolutionCap\)\);/);
     assert.match(render, /const base = streetBakeResolution\(renderer, root\.bakeResolutionCap\);/);
     assert.match(render, /sharpDeco\(url, streetBakeResolution\(renderer, recolourCache\.resolutionCap\), \{/);

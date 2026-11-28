@@ -10,8 +10,8 @@ import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { SCENE_DOOR_CLASSES, doorMarks, sceneDoorMarks, stationMarks, tipFor, markHasMenu } from '../public/js/ui/street-minimap.js?v=faab9586';
-import { phoneSignRows } from '../public/js/features/street-minimap-feature.js?v=7b6c12eb';
-import { subwayFeature } from '../public/js/features/subway-feature.js?v=9f40e2a9';
+import { phoneSignRows } from '../public/js/features/street-minimap-feature.js?v=3fd4c581';
+import { subwayFeature } from '../public/js/features/subway-feature.js?v=8df03819';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const read = (p) => readFileSync(join(root, p), 'utf8');

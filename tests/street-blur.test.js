@@ -9,18 +9,24 @@ import { readFileSync, readdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
+  BLUR_ART_RATIO,
+  BLUR_LAYER_SHARP_BYTES,
   BLUR_TILE,
   BLUR_TILE_BUDGET_BYTES,
   BLUR_TILE_KEEP_BYTES,
   RECOLOUR_EVICT_MS,
   blurBakeResolution,
   bakeMissingBlurTiles,
+  blurArtUpgrades,
+  blurBakeFloor,
+  blurLayerResolution,
   blurTilePad,
   boxBlurWeights,
   flashBlurSize,
   pickBlurTilesToFree,
   planBlurTiles,
-} from '../public/js/street-render.js?v=c463d2c6';
+  rebakeBlurLayers,
+} from '../public/js/street-render.js?v=3f6ebb89';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const src = readFileSync(join(here, '../public/js/street-render.js'), 'utf8');
@@ -59,9 +65,11 @@ describe('client blur size (Layer.as blur:int, BlurFilter LOW)', () => {
 });
 
 describe('bake density', () => {
-  it('follows the screen for light blurs and halves for heavy ones, in steps of 2', () => {
+  it('follows the screen for light blurs and halves for heavy ones, on a half-texel grid', () => {
     assert.equal(blurBakeResolution(2, 1), 1);
-    assert.equal(blurBakeResolution(2, 1.3), 1);
+    assert.equal(blurBakeResolution(2, 1.2), 1);
+    assert.equal(blurBakeResolution(2, 1.3), 1.5);
+    assert.equal(blurBakeResolution(2, 1.75), 2);
     assert.equal(blurBakeResolution(2, 2.6), 2);
     assert.equal(blurBakeResolution(2, 4), 2);
     assert.equal(blurBakeResolution(3, 2.6), 1);
@@ -88,6 +96,105 @@ describe('bake density', () => {
     }
     assert.match(src, /for \(int i = 1; i <= 8; i\+\+\)/);
     assert.match(src, /for \(var i = 1; i <= 8; i\+\+\)/);
+  });
+
+  // A player's snap on Namaste (1907 x 710, Original zoom): creature_purple on a blur 2 layer drawn
+  // much softer than the scene around it. Original zoom draws the world 1.3 to 1.9 times on a
+  // desktop (renderer.resolution carries the zoom), and the bake floored that to 1 texel a layer
+  // pixel, so the blurred tile was stretched on screen on top of the client's 2 px box.
+  it('bakes a blur of 2 at the screen\'s density at Original zoom, never stretching a tile more than 1.2 times', () => {
+    for (const screen of [1, 1.15, 1.3, 1.5, 1.6, 1.75, 1.9, 2]) {
+      const res = blurBakeResolution(2, screen);
+      assert.ok(screen / res <= 1.2, `blur 2 at ${screen}: baked at ${res}, stretched ${(screen / res).toFixed(2)}x`);
+    }
+  });
+
+  it('keeps the detail cap (about 4 texels a box) and lands every density on whole texels at even tile edges', () => {
+    const old = (size, r) => {
+      const want = Math.min(r, 4 / size);
+      return want >= 2 ? 2 : want >= 1 ? 1 : 0.5;
+    };
+    for (let size = 2; size <= 12; size++) {
+      for (const screen of [1, 1.05, 1.25, 1.3, 1.5, 1.75, 1.9, 2, 2.25, 2.6, 3, 4]) {
+        const res = blurBakeResolution(size, screen);
+        assert.equal((2 * res) % 1, 0, `${size} at ${screen}`);
+        assert.ok(res <= Math.max(0.5, 4 / size) && res <= 2, `${size} at ${screen}: ${res}`);
+        // At 2 and over (the deco pipeline's sharp.py and animate.py measure there) nothing moved.
+        if (screen >= 2) assert.equal(res, old(size, screen), `${size} at ${screen}`);
+      }
+    }
+  });
+
+  it('steps a big layer down while all its tiles would pass the layer budget, never under the old density', () => {
+    const mb = 1024 * 1024;
+    const namaste = (2.8 * mb) / 4; // its blur 2 layer, all tiles: about 2.8 MB at 1 texel a layer px
+    const dasas = (35 * mb) / 4; // Dasas Terrace's blur 2 layer: 35 MB at 1, 138 MB at 2
+    assert.equal(blurLayerResolution(2, 1.75, namaste), 2);
+    assert.equal(blurLayerResolution(2, 1.75, (12 * mb) / 4), 1.5, '12 MB at 1 is 48 at 2 and 27 at 1.5');
+    assert.equal(blurLayerResolution(2, 1.75, dasas), 1, 'over the budget even at 1.5: the old density');
+    assert.equal(blurLayerResolution(2, 4, dasas), 2, 'never under what it had before (2 at 2 and over)');
+    assert.equal(blurLayerResolution(2, 1.75, 1e12), blurBakeFloor(2, 1.75));
+    assert.equal(blurLayerResolution(5, 4, 0), 0.5);
+    assert.ok(BLUR_LAYER_SHARP_BYTES * 5 <= BLUR_TILE_BUDGET_BYTES);
+    for (let size = 2; size <= 10; size++) {
+      for (const screen of [1, 1.3, 1.75, 2, 4]) {
+        const res = blurLayerResolution(size, screen, dasas);
+        assert.ok(res >= blurBakeFloor(size, screen) && res <= blurBakeResolution(size, screen), `${size} at ${screen}`);
+      }
+    }
+  });
+
+  it('bakes a blurred layer again when the screen\'s density moves to another step, and only then', () => {
+    const tile = (culled) => ({ texture: {}, sprite: { culled } });
+    const filter = { resolution: 1 };
+    const layer = { size: 2, res: 1, tiles: [tile(false), tile(true), { texture: null, sprite: { culled: false } }], liveFilters: [filter] };
+    const heavy = { size: 5, res: 0.5, tiles: [tile(false)] };
+    const state = { renderer: { resolution: 1.1 }, cap: 4, layers: [layer, heavy] };
+    const baked = [];
+    const freed = [];
+    const free = (t) => { t.texture = null; freed.push(t); };
+    const bake = (t, s) => { t.texture = { res: s.layers[0].res }; baked.push(t); };
+    assert.equal(rebakeBlurLayers(state, bake, free), 0, 'same step: nothing');
+    state.renderer.resolution = 1.75;
+    assert.equal(rebakeBlurLayers(state, bake, free), 1);
+    assert.equal(layer.res, 2);
+    assert.equal(filter.resolution, 2, 'a playing deco draws through the blur at the new density');
+    assert.equal(heavy.res, 0.5, 'a heavy blur stays under its detail cap');
+    assert.deepEqual(freed, [layer.tiles[0], layer.tiles[1]]);
+    assert.deepEqual(baked, [layer.tiles[0]], 'near tiles bake at once, culled ones when the camera comes');
+    assert.equal(layer.tiles[1].texture, null);
+    assert.equal(state.rebakes, 1);
+    state.renderer.resolution = 1.8;
+    assert.equal(rebakeBlurLayers(state, bake, free), 0, 'a drag inside the step bakes nothing');
+  });
+
+  // The same snap: creature_purple is drawn 294 x 275, 1.74 times its 169 x 158 stage, from a 2x
+  // file of 338 x 316. The route loads 3x files only above 2.25, so at a bake of 2 its 2x file
+  // was stretched 1.74 times inside the bake: it takes its 3x file (507 x 474) instead.
+  it('gives a blurred deco drawn well past its file its 3x file for a bake over 1', () => {
+    const deco = (w, h, fw, fh, url = 'assets/decos/groddle/creature_purple.png') => ({ blurArtUrl: url, width: w, height: h, texture: { frame: { width: fw, height: fh }, source: { resolution: 1 } } });
+    const hires = (url) => (url.includes('creature') ? url.replace('.png', '@1.5x.webp') : null);
+    const creature = deco(294, 275, 338, 316);
+    const atStage = deco(169, 158, 338, 316);
+    const flipped = deco(-294, 275, 338, 316);
+    const noThree = deco(294, 275, 338, 316, 'assets/decos/groddle/rock.png');
+    const sharp = { ...deco(294, 275, 338, 316), blurArtUrl: null };
+    const all = [creature, atStage, flipped, noThree, sharp];
+    assert.deepEqual(blurArtUpgrades(all, 2, hires).map((u) => u.child), [creature, flipped]);
+    assert.equal(blurArtUpgrades(all, 2, hires)[0].url, 'assets/decos/groddle/creature_purple@1.5x.webp');
+    assert.ok((294 * 2) / 338 >= BLUR_ART_RATIO && (169 * 2) / 338 < BLUR_ART_RATIO);
+    assert.deepEqual(blurArtUpgrades(all, 1, hires), [], 'a bake of 1 (a phone) keeps the 2x files');
+    assert.deepEqual(blurArtUpgrades(all, 1.5, hires), [], 'at 1.5 the 2x file is within the line');
+  });
+
+  it('marks blurred decos for it and checks them once the layer is tiled', () => {
+    assert.match(src, /if \(blur && !own && !animated && !lostBlur && !pick\) spr\.blurArtUrl = url;/);
+    assert.match(src, /state\.layers\.push\(layer\);\n\s*upgradeBlurLayerArt\(layer, state\);/);
+    assert.match(src, /const ups = blurArtUpgrades\(layer\.parked\?\.children, layer\.res, state\.hiresUrl\);/);
+  });
+
+  it('runs the rebake on the renderer\'s resize, after it settles', () => {
+    assert.match(src, /if \(sharpViews\.length\) root\.refreshSharpDecos\(\);\n\s*rebakeBlurLayers\(blurState\);/);
   });
 
   it('pads tiles past the box radius with an even count', () => {

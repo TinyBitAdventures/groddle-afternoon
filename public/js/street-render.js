@@ -1119,13 +1119,51 @@ export function boxBlurWeights(size) {
 /**
  * Texels per layer pixel for a blurred layer's tiles. Flash drew the layers at one pixel per
  * layer pixel and then blurred them, so a box `size` pixels wide leaves nothing finer than about
- * size / 4 pixels: the bake follows the screen's density (renderer.resolution, up to 2) for
- * light blurs and drops to half density for heavy ones, in steps of 2 so tile edges land on
- * whole texels.
+ * size / 4 pixels (the detail cap: 2 for a blur of 2, 1 for 3 and 4, 0.5 past that). Under the
+ * cap the bake follows the screen's density (renderer.resolution, which carries the zoom: at
+ * Original a 1500 px window draws the world about 1.75 times), to the nearest half texel. Both
+ * are on a half-texel grid, so tile edges (even layer pixels) land on whole texels.
+ * BLUR DENSITY (a player's snap on Namaste, 2026-11-27): the screen's density used to be floored
+ * to 2, 1 or 0.5, so a blur of 2 on any screen under 2 (most desktops at Original zoom) baked at
+ * 1 texel a layer pixel and was stretched again on screen, far softer than the client's 2 px box
+ * (Namaste's creature_purple). At 2 and over nothing changed: the detail cap always ruled there.
  */
 export function blurBakeResolution(size, rendererResolution = 1) {
+  const screen = Math.max(0.5, Math.round(2 * (Number(rendererResolution) || 1)) / 2);
+  const detail = Math.max(0.5, Math.min(2, Math.floor(8 / size) / 2));
+  return Math.min(screen, detail);
+}
+
+/**
+ * BLUR DENSITY: the most bytes a blurred layer's tiles may take, all baked at once (a street map
+ * snapshot bakes them all, js/ui/street-minimap.js), for its density to go past what the client's
+ * own scale needs (blurBakeFloor): a fifth of BLUR_TILE_BUDGET_BYTES. Most blur 2 layers bake at 2
+ * within it; Dasas Terrace's (a 5000 x 1920 blur_landscape_piece, 35 MB at 1, 138 MB at 2) stays
+ * at 1, which kept its street map's bake under the budget.
+ */
+export const BLUR_LAYER_SHARP_BYTES = 32 * 1024 * 1024;
+
+/**
+ * The density blurred layers had before BLUR DENSITY (the screen floored to 2, 1 or 0.5, under the
+ * detail cap): a layer never bakes coarser than this, whatever its size.
+ */
+export function blurBakeFloor(size, rendererResolution = 1) {
   const want = Math.min(Number(rendererResolution) || 1, 4 / size);
   return want >= 2 ? 2 : want >= 1 ? 1 : 0.5;
+}
+
+/**
+ * A blurred layer's bake density: blurBakeResolution, stepped down by half texels while all its
+ * tiles (`layerPx`, their padded areas in layer px) would take more than `budget`, never under
+ * blurBakeFloor.
+ */
+export function blurLayerResolution(size, rendererResolution = 1, layerPx = 0, budget = BLUR_LAYER_SHARP_BYTES) {
+  const top = blurBakeResolution(size, rendererResolution);
+  const floor = Math.min(top, blurBakeFloor(size, rendererResolution));
+  for (let res = top; res > floor; res -= 0.5) {
+    if ((Number(layerPx) || 0) * res * res * 4 <= budget) return res;
+  }
+  return floor;
 }
 
 /** Layer pixels per side of one blurred-layer tile. */
@@ -1312,6 +1350,8 @@ function childBox(PIXI, child) {
  * bake's density (cheap: the blur leaves nothing finer anyway), and the baked decos are split into
  * bands at them (decos under the first, between two, over the last), each band its own tiles, so
  * the layer keeps its z order. Vivara's stars_fade (on a blur 7 layer) twinkles this way.
+ * BLUR DENSITY: the layer's density is blurLayerResolution, and a deco drawn well past its file
+ * at it takes its 3x file (blurArtUpgrades); tiles baked before that file is in bake again.
  */
 function bakeBlurredLayer(lc, size, colour, state) {
   const { PIXI, renderer } = state;
@@ -1323,7 +1363,6 @@ function bakeBlurredLayer(lc, size, colour, state) {
   const ready = () => {
     if (lc.destroyed || !lc.children.length) return;
     const t0 = performance.now();
-    const res = blurBakeResolution(size, streetBakeResolution(renderer, state.cap));
     const pad = blurTilePad(size);
     const decos = lc.removeChildren();
     // Decos that play (js/deco-anim.js) cannot sit in a bake: they stay live, drawn through the
@@ -1351,18 +1390,22 @@ function bakeBlurredLayer(lc, size, colour, state) {
       child.culled = false;
       parked.addChild(child);
     }
+    const plans = bands.map((band) => planBlurTiles(band.map((child) => childBox(PIXI, child)), pad));
+    // Every tile's padded area: what the layer holds baked whole (a street map snapshot).
+    const px = plans.flat().reduce((sum, plan) => sum + (plan.w + 2 * pad) * (plan.h + 2 * pad), 0);
+    const res = blurLayerResolution(size, streetBakeResolution(renderer, state.cap), px);
     const layer = {
       lc,
       size,
       res,
       pad,
+      px,
       parked,
       filters: [...(colour ? [colour] : []), flashBoxBlurFilter(PIXI, size, true), flashBoxBlurFilter(PIXI, size, false)],
       tiles: [],
     };
     bands.forEach((band, k) => {
-      const boxes = band.map((child) => childBox(PIXI, child));
-      for (const plan of planBlurTiles(boxes, pad)) {
+      for (const plan of plans[k]) {
         const spr = new PIXI.Sprite(PIXI.Texture.EMPTY);
         spr.x = plan.x;
         spr.y = plan.y;
@@ -1377,6 +1420,7 @@ function bakeBlurredLayer(lc, size, colour, state) {
     if (live.length) {
       const liveFilters = [...(colour ? [colourFilter(PIXI, colour.glitchFilters)] : []), flashBoxBlurFilter(PIXI, size, true), flashBoxBlurFilter(PIXI, size, false)];
       for (const filter of liveFilters) filter.resolution = res;
+      layer.liveFilters = liveFilters;
       layer.live = live;
       live.forEach((child, k) => {
         child.zIndex = 2 * k + 1;
@@ -1396,6 +1440,7 @@ function bakeBlurredLayer(lc, size, colour, state) {
       } catch { /* a lost context uploads on first draw instead */ }
     }
     state.layers.push(layer);
+    upgradeBlurLayerArt(layer, state);
     state.tiles += layer.tiles.length;
     state.planMs += performance.now() - t0;
     state.dirty = true;
@@ -1489,6 +1534,145 @@ function freeBlurTile(tile, state) {
   tile.texture = null;
   state.bytes -= tile.bytes;
   tile.bytes = 0;
+}
+
+/**
+ * BLUR DENSITY: past this ratio of the texels a bake wants (layer px x its density) to the texels
+ * a blurred deco's file has, the deco takes its 3x file (tools/deco-pipeline/sharp.py ratio_min, the
+ * same line for a deco drawn blurry). The route (js/deco-hires.js) loads the 3x files only above a
+ * renderer resolution of 2.25, but a blur of 2 bakes at 2 from 1.75: Namaste's creature_purple,
+ * drawn 1.74 times its stage size, had its 2x file stretched 1.74 times inside the bake.
+ */
+export const BLUR_ART_RATIO = 1.5;
+
+/**
+ * The blurred decos (`blurArtUrl`: their deco PNG URL, set when placed with the routed file) whose
+ * file is too coarse for a bake at `res` (BLUR_ART_RATIO), with their 3x file's URL
+ * (`hiresUrl(url)`, null when there is none). Nothing at a bake of 1 or less: a phone's bakes stay
+ * at 1 and keep the 2x files.
+ * @returns {{ child: any, url: string }[]}
+ */
+export function blurArtUpgrades(children, res, hiresUrl) {
+  const out = [];
+  if (!(res > 1) || typeof hiresUrl !== 'function') return out;
+  for (const child of children || []) {
+    if (!child?.blurArtUrl || child.destroyed) continue;
+    const frame = child.texture?.frame;
+    const r = Number(child.texture?.source?.resolution) || 1;
+    if (!(frame?.width > 0 && frame?.height > 0)) continue;
+    const ratio = Math.max(Math.abs(child.width) * res / (frame.width * r), Math.abs(child.height) * res / (frame.height * r));
+    if (ratio < BLUR_ART_RATIO) continue;
+    const url = hiresUrl(child.blurArtUrl);
+    if (url) out.push({ child, url });
+  }
+  return out;
+}
+
+const texelsAcross = (texture) => (texture?.frame?.width || 0) * (Number(texture?.source?.resolution) || 1);
+
+/** Load the upgrades' 3x files and swap each into its deco at the same drawn size; then done(swapped decos). */
+function swapBlurArt(ups, done, upload = null) {
+  let pending = ups.length;
+  const swapped = [];
+  const finish = () => {
+    pending -= 1;
+    if (pending === 0) done(swapped);
+  };
+  for (const { child, url } of ups) {
+    const tex = textureFromUrl(url, { raw: true });
+    const swap = () => {
+      if (!child.destroyed && texelsAcross(tex) > texelsAcross(child.texture)) {
+        // Uploaded now, as the layer's first files were: not in a tile bake mid-walk.
+        try {
+          upload?.(tex.source);
+        } catch { /* a lost context uploads on first draw instead */ }
+        const w = child.width;
+        const h = child.height;
+        child.texture = tex;
+        child.width = w;
+        child.height = h;
+        child.blurArtUrl = null;
+        swapped.push(child);
+      }
+      finish();
+    };
+    if (isLoaded(tex)) swap();
+    else {
+      onLoaded(tex.source, swap);
+      onFailed(tex.source, finish);
+    }
+  }
+}
+
+/**
+ * A blurred layer's decos that want their 3x file at its density take it (blurArtUpgrades), when it
+ * is first tiled and after a density rise (rebakeBlurLayers); tiles already baked from the old file
+ * bake again (near ones at once, the rest when the camera comes).
+ */
+function upgradeBlurLayerArt(layer, state) {
+  const ups = blurArtUpgrades(layer.parked?.children, layer.res, state.hiresUrl);
+  if (!ups.length) return;
+  swapBlurArt(ups, (swapped) => {
+    if (!swapped.length || layer.lc?.destroyed) return;
+    const moved = new Set(swapped);
+    for (const tile of layer.tiles) {
+      if (!tile.texture || !tile.items.some((child) => moved.has(child))) continue;
+      const near = !tile.sprite?.culled;
+      freeBlurTile(tile, state);
+      if (near) bakeBlurTile(tile, state);
+    }
+  }, (source) => state.renderer?.texture?.initSource?.(source));
+}
+
+/**
+ * BLUR DENSITY: the screen's density changed (a zoom step, a window drag, a move to another monitor):
+ * each blurred layer whose bake density (blurBakeResolution) is now another step bakes its tiles
+ * again at the new one, those near the camera at once and the rest when the camera next comes
+ * near them; the decos that play draw through the layer's blur at it too. Layers still on their
+ * density keep their tiles, so a drag inside one half-texel step bakes nothing. Returns how many
+ * layers changed.
+ */
+export function rebakeBlurLayers(state, bake = bakeBlurTile, free = freeBlurTile, upgrade = upgradeBlurLayerArt) {
+  const screen = streetBakeResolution(state?.renderer, state?.cap);
+  let changed = 0;
+  for (const layer of state?.layers || []) {
+    const res = blurLayerResolution(layer.size, screen, layer.px);
+    if (res === layer.res) continue;
+    const rose = res > layer.res;
+    layer.res = res;
+    for (const filter of layer.liveFilters || []) filter.resolution = res;
+    changed += 1;
+    for (const tile of layer.tiles || []) {
+      if (!tile.texture) continue;
+      const near = !tile.sprite?.culled;
+      free(tile, state);
+      if (near) bake(tile, state);
+    }
+    if (rose) upgrade(layer, state);
+  }
+  if (changed) state.rebakes = (state.rebakes || 0) + changed;
+  return changed;
+}
+
+/** QA (groddleQA.blurTiles): each blurred layer's box, bake density and tiles, and the tiles' GPU memory. */
+export function blurTileStats(state) {
+  const layers = (state?.layers || []).map((layer) => ({
+    id: layer.lc?.label || '',
+    size: layer.size,
+    res: layer.res,
+    tiles: layer.tiles.length,
+    baked: layer.tiles.filter((tile) => tile.texture).length,
+    mb: +(layer.tiles.reduce((sum, tile) => sum + (tile.bytes || 0), 0) / 1048576).toFixed(1),
+  }));
+  return {
+    layers,
+    mb: +((state?.bytes || 0) / 1048576).toFixed(1),
+    peakMb: +((state?.peakBytes || 0) / 1048576).toFixed(1),
+    bakes: state?.bakes || 0,
+    bakeMs: Math.round(state?.bakeMs || 0),
+    evictions: state?.evictions || 0,
+    rebakes: state?.rebakes || 0,
+  };
 }
 
 /**
@@ -3341,9 +3525,15 @@ export function buildStreetView(street, PIXI, opts = {}) {
   /** Blurred layers' tiles (bakeBlurredLayer): counts for QA in root.blurStats. */
   const blurState = {
     PIXI, renderer: opts.renderer, cap: recolourCache.resolutionCap, layers: [], tiles: 0, bytes: 0, peakBytes: 0,
-    bakes: 0, bakeMs: 0, planMs: 0, evictions: 0, redraws: 0, eager: 0, culled: false, dirty: false,
+    bakes: 0, bakeMs: 0, planMs: 0, evictions: 0, redraws: 0, rebakes: 0, eager: 0, culled: false, dirty: false,
+    // A blurred deco's 3x file (blurArtUpgrades), or null when it has none.
+    hiresUrl: (url) => {
+      const hires = decoUrl(url, { hires: true, bigTextures: (maxTextureSizeOf(opts.renderer) || 4096) >= 8192 });
+      return /@1\.5x\.webp/.test(hires || '') ? hires : null;
+    },
   };
   root.blurStats = blurState;
+  root.blurTileStats = () => blurTileStats(blurState);
   // Decos are destroyed with the view but not their textures; free the copies.
   root.once('destroyed', () => {
     for (const texture of recolourCache.textures.values()) texture.destroy(true);
@@ -3595,6 +3785,8 @@ export function buildStreetView(street, PIXI, opts = {}) {
       if (opts.signWords !== false && addSignWords(PIXI, spr, deco)) signed += 1;
       lc.addChild(spr);
       if (sharp && !blur) sharpViews.push({ spr, url, far, pick, size: sizeDeco });
+      // BLUR DENSITY: a blurred deco on its routed file may take its 3x file for the bake (blurArtUpgrades).
+      if (blur && !own && !animated && !lostBlur && !pick) spr.blurArtUrl = url;
       if (animated) {
         attachAnim(PIXI, spr, sprite, {
           clock: animClock,
@@ -3691,7 +3883,8 @@ export function buildStreetView(street, PIXI, opts = {}) {
       });
     }
   };
-  if (sharpViews.length && typeof renderer?.on === 'function') {
+  // BLUR DENSITY: blurred layers follow the resolution too (rebakeBlurLayers), once it has settled.
+  if (typeof renderer?.on === 'function') {
     const bakeRes = () => streetBakeResolution(renderer, recolourCache.resolutionCap);
     let lastResolution = bakeRes();
     let timer = null;
@@ -3700,7 +3893,9 @@ export function buildStreetView(street, PIXI, opts = {}) {
       lastResolution = bakeRes();
       clearTimeout(timer);
       timer = setTimeout(() => {
-        if (!root.destroyed) root.refreshSharpDecos();
+        if (root.destroyed) return;
+        if (sharpViews.length) root.refreshSharpDecos();
+        rebakeBlurLayers(blurState);
       }, 250);
     };
     renderer.on('resize', onResize);

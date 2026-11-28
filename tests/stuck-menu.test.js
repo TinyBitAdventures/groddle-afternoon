@@ -6,7 +6,7 @@
 import { afterEach, describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { STUCK_MENU, STUCK_TEXT } from '../public/js/slash-commands.js?v=bb2569aa';
-import { placeStuckRow, runStuckFromMenu, slashCommandsFeature } from '../public/js/features/slash-commands-feature.js?v=f48d2b0f';
+import { placeStuckRow, runStuckFromMenu, slashCommandsFeature } from '../public/js/features/slash-commands-feature.js?v=a25077f6';
 import { MENU_ROWS, menuRowFor } from '../public/js/ui/topbar.js?v=820dd86c';
 
 const flush = () => new Promise((resolve) => setTimeout(resolve, 0));

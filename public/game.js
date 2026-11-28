@@ -4,7 +4,7 @@
  */
 import { ITEM_ICONS, ITEM_LABELS, getVerbsFor, ordinaryItems, runVerb } from './content.js?v=da2b8879';
 import { createErrorOnce, createFeatureHost, createFrameStages } from './js/feature-host.js?v=b87e2cbc';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=7ba76a08';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=21edd98c';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, enterHintPick, hoverText, stackHoverLabel, groupHead, hoverRimShown, reachGlowTargets, spriteHasRimArt, rimArtParts, trimmedIconUrl, drawTileArt } from './js/enter-chooser.js?v=297c6d15';
 import { firstTendKey, STICK_TEND_DELAY_MS, STICK_TEND_DIRS, STICK_TEND_REPEAT_MS, stepTendKey, stepTendKeys, stickTendKey, tendKeyAction } from './js/garden-tend.js?v=a7470c4a';
 import { avatarHitBox, behindFloor, bodyReachDistance, OUT_OF_REACH_LINE, playerClickBox } from './js/reach.js?v=456da8a8';
@@ -747,7 +747,7 @@ import {
   ensureStreetIndex,
   resolveIndexTsid,
 } from './js/street-loader.js?v=10376267';
-import { showDraftBanner, startDraftPlay } from './js/builder/draft-play.js?v=9d47e610';
+import { showDraftBanner, startDraftPlay } from './js/builder/draft-play.js?v=5a194506';
 import { bootHouseFile } from './js/house-file-loader.js?v=014960b6';
 import {
   ladderTopDeck,
@@ -782,7 +782,7 @@ import {
   signpostBoardAt,
   signpostGlowFilters,
   signpostGlowParts,
-} from './js/street-render.js?v=c463d2c6';
+} from './js/street-render.js?v=3f6ebb89';
 import {
   GAME_DAY_MS,
   GAME_EPOCH_MS,
@@ -17604,7 +17604,7 @@ const PLAYER_STATE_STORAGE_KEY = 'playerState';
  * stats). No grant, quest, travel, avatar move, pinch, speech, Imagination pick or Mayhem lever.
  */
 const READ_ONLY_QA = Object.freeze([
-  'groundSkirt', 'edgeMirrors', 'recolourStats', 'signArms', 'memoryStats', 'renderStats', 'drawnArt', 'itemOverlays',
+  'groundSkirt', 'edgeMirrors', 'recolourStats', 'blurTiles', 'signArms', 'memoryStats', 'renderStats', 'drawnArt', 'itemOverlays',
   'drawnTextures', 'spinningWheel', 'cameraFrame', 'speech', 'pickups', 'streetDeco', 'animDecos', 'quoins',
   'vectorBakes', 'idleState', 'snapshot', 'frameStageThrows', 'pickStats', 'pickAt',
   ['notify', ['notices', 'entries', 'stats', 'screensPending']],
@@ -37127,6 +37127,8 @@ async function main() {
     edgeMirrors: () => bgLayer?.edgeMirrorStats?.() || null,
     /** RECOLOUR QA (#284): the street's recoloured deco copies (street-render recolourStats): entries, baked, GPU MB. */
     recolourStats: () => bgLayer?.recolourStats?.() || null,
+    /** BLUR DENSITY QA: the street's blurred layers (street-render blurTileStats): box, bake density, tiles, GPU MB. */
+    blurTiles: () => bgLayer?.blurTileStats?.() || null,
     /**
      * FRIENDPOST QA: every signpost arm on screen (street posts' and a scene post's, the home
      * street's signpost) with its centre in view px (times the canvas's client box over viewW,

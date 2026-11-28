@@ -13,7 +13,7 @@ import { readFileSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { SITE_DIR, sitePath, serverPath, skipWithoutSite, skipWithoutServer } from '../tools/repos.mjs';
 import { TP_TEXT, matchStreet, movedLine, parseTp, planTp, runTeleportCommand, streetKey } from '../public/js/admin-teleport.js?v=c4d28509';
-import { slashCommandsFeature } from '../public/js/features/slash-commands-feature.js?v=f48d2b0f';
+import { slashCommandsFeature } from '../public/js/features/slash-commands-feature.js?v=a25077f6';
 import { HAS_PHP, PHP } from './php.js';
 
 const root = join(import.meta.dirname, '..');
