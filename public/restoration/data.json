@@ -2814,9 +2814,14 @@
   "deployed": "2026-11-28"
  },
  "git": {
-  "commits": 3978,
+  "commits": 3980,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-28",
+    "kind": "fix",
+    "text": "a stalled house picture loads on Safari too, and the street map redraws when it lands"
+   },
    {
     "date": "2026-11-28",
     "kind": "fix",
@@ -2926,16 +2931,6 @@
     "date": "2026-11-27",
     "kind": "improve",
     "text": "A meteor shower and a lone shooting star now look clearly different"
-   },
-   {
-    "date": "2026-11-27",
-    "kind": "new",
-    "text": "A snap taken while a shooting star crosses the sky keeps it, and its page shows a Shooting star tag"
-   },
-   {
-    "date": "2026-11-27",
-    "kind": "new",
-    "text": "A rare meteor shower or a lone shooting star can cross the night sky, the same for everyone online"
    }
   ]
  },
