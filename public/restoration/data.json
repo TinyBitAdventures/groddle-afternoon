@@ -2814,9 +2814,14 @@
   "deployed": "2026-11-28"
  },
  "git": {
-  "commits": 3952,
+  "commits": 3954,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-28",
+    "kind": "fix",
+    "text": "In Decoration Mode a finger drags a placed machine straight away, as it does furniture"
+   },
    {
     "date": "2026-11-28",
     "kind": "new",
@@ -2916,14 +2921,9 @@
     "date": "2026-11-27",
     "kind": "fix",
     "text": "A Crafty Bot whose fetch finds its stack gone no longer hangs for good"
-   },
-   {
-    "date": "2026-11-27",
-    "kind": "new",
-    "text": "Machine Shop Pit Stop says to use a machine you built, not a machine room's"
    }
   ]
  },
- "tests": 1514,
+ "tests": 1515,
  "generatedAt": "2026-11-28"
 }
