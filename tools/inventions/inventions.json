@@ -6774,6 +6774,23 @@
    "rows": [
     "G1316"
    ]
+  },
+  {
+   "id": "snap-page-larger-view",
+   "title": "A public Snap's page opens its picture larger in a pop-up over the page (fitted to the screen, its caption and where and when, Download and Close); without JavaScript, or with a middle or Ctrl/Cmd click, the picture's link opens the picture as before",
+   "kind": "UI",
+   "status": "kept",
+   "where": [
+    {
+     "file": "tests/snap-modal.test.js",
+     "symbol": "the site repo's src/PlayerPages.php snapModal, players/players.js and style.css .snap-modal (the test reads them)"
+    }
+   ],
+   "why": "Glitch's snaps lived on glitch.com photo pages with the picture shown inline; it had no pop-up viewer there. Ours: the larger view and its Download button on the remake's Snap page (tests/snap-modal.test.js).",
+   "ruling": "Austin 2026-11-27: asked for clicking a public snap's picture to open a nice pop-up with a download option, instead of a direct link",
+   "rows": [
+    "G1240"
+   ]
   }
  ]
 }

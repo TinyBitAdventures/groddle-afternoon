@@ -242,6 +242,9 @@ try {
         'blocked' => $blocked['status'],
         'wrongOwner' => $page(BEA, 'zz-bea', $adaPublic)['status'],
     ];
+    // The public page as another player sees it, whole (tests/snap-modal.test.js reads its picture link and dialog).
+    $out['pageHtml'] = $pub['html'];
+    $out['pageIds'] = ['owner' => ADA, 'snap' => $adaPublic];
 
     // == The profile lists only public Snaps, newest first ==
     $profile = static function (int $as, string $slug, string $tab = '') use ($request, $pages, $answer): string {
