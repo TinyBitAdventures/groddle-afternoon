@@ -28,7 +28,7 @@ import { applyStreetIndex } from '../public/js/street-loader.js?v=b8ea30df';
 import { streetJobsFeature } from '../public/js/features/street-jobs-feature.js?v=f1ffb6ac';
 import { STARTER_LANDING, openBootTarget } from '../public/js/ancestral-nostalgia.js?v=7c972d9f';
 import { NOSTALGIA_BOOT_STREETS } from '../public/js/ancestral-nostalgia-data.js?v=0adb9184';
-import { FEATURES } from '../public/js/features/index.js?v=a0cfeefb';
+import { FEATURES } from '../public/js/features/index.js?v=37fa14e5';
 import { createBuffState, applyBuff, hasBuff, removeBuff } from '../public/js/buffs.js?v=9ac58eaa';
 
 const root = join(import.meta.dirname, '..');

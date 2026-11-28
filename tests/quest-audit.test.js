@@ -66,7 +66,7 @@ before(async () => {
 
 describe('the quest audit', () => {
   it('checks every quest a player can be offered or given', () => {
-    assert.equal(result.total, 446, 'quests.json and our Tunes for Crabs');
+    assert.equal(result.total, 447, 'quests.json, our Tunes for Crabs and Back to Gentle Island');
     assert.ok(result.checked.length >= 200, `${result.checked.length} checked`);
     assert.deepEqual(Object.keys(result.heldBack).sort(), HELD_BACK);
   });

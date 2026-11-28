@@ -11,9 +11,9 @@ import assert from 'node:assert/strict';
 import { join } from 'node:path';
 
 import { ISLAND_ARRIVAL, normalizeNewxpSave } from '../public/js/newxp.js?v=eedf8fe3';
-import { __newxpTest, newxpFeature } from '../public/js/features/newxp-feature.js?v=fcc5ea2c';
+import { __newxpTest, newxpFeature } from '../public/js/features/newxp-feature.js?v=dff209fc';
 import { createFeatureHost } from '../public/js/feature-host.js?v=100f3193';
-import { FEATURES } from '../public/js/features/index.js?v=a0cfeefb';
+import { FEATURES } from '../public/js/features/index.js?v=37fa14e5';
 import { getQuestCatalog, loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=b2a9a862';
 import { QUEST_MOVES_NOTE, acceptOffer, ensureQuestOfferState, listDeclinedOffers, pendingQuestOffers, questOfferCard, routeQuestEvent, turnInQuest } from '../public/js/quest-offers.js?v=769eba09';
 import { addItem, countItem, removeItem } from '../public/js/inventory.js?v=3be7988a';

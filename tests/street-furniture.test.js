@@ -50,7 +50,7 @@ import {
 } from '../public/js/street-furniture.js?v=071203fc';
 import { REMAKE_NOTE_BYLINE, REMAKE_NOTE_MARKER, isRemakeNote, normalizeNote as normalizeNoteRow } from '../public/js/street-furniture.js?v=071203fc';
 import { streetFurnitureFeature } from '../public/js/features/street-furniture-feature.js?v=65c92314';
-import { FEATURES } from '../public/js/features/index.js?v=a0cfeefb';
+import { FEATURES } from '../public/js/features/index.js?v=37fa14e5';
 import { createFeatureHost } from '../public/js/feature-host.js?v=100f3193';
 import { setWildlifeCatalog } from '../public/js/wildlife.js?v=352e8bfa';
 

@@ -4001,10 +4001,14 @@ async function leaveReplay(engine) {
   engine.save();
   teardown(engine);
   engine.setData('newxpReplay', 'left');
+  // A trip that fails says so itself (R46); leaving then falls back to Ur's start street, so the
+  // player is never left on the island with the replay ended.
+  let backOk = false;
   if (back?.tsid && engine.streetExists?.(back.tsid) !== false) {
-    await engine.enter(back.tsid, { ...(back.x != null ? { spawnX: back.x } : {}), ...(back.y != null ? { spawnY: back.y } : {}), quiet: true, bypassFeatureGates: true });
-  } else if (GENTLE_ISLAND_TSIDS.includes(engine.streetTsid) || engine.homeContext?.().inHome) {
-    await engine.enter(DEFAULT_START, { quiet: true, bypassFeatureGates: true });
+    backOk = (await engine.enter(back.tsid, { ...(back.x != null ? { spawnX: back.x } : {}), ...(back.y != null ? { spawnY: back.y } : {}), quiet: true, bypassFeatureGates: true })) !== false;
+  }
+  if (!backOk && (GENTLE_ISLAND_TSIDS.includes(engine.streetTsid) || engine.homeContext?.().inHome)) {
+    if ((await engine.enter(DEFAULT_START, { quiet: true, bypassFeatureGates: true })) === false) engine.pushActivity?.(REPLAY_TEXT.left);
   }
   engine.toast(REPLAY_TEXT.left, 5000);
   engine.pushActivity(REPLAY_TEXT.left);
