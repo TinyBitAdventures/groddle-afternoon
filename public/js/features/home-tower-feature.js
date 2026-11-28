@@ -51,8 +51,8 @@
 import { playOverlay } from '../overlays.js?v=18dfb26a';
 import { ITEM_CATALOG, countItem, ensureItem, itemIcon } from '../inventory.js?v=3be7988a';
 import { canUseTool, useToolCondition, workStepCost } from '../tools.js?v=4156bba8';
-import { acceptOffer, npcQuestOffers } from '../quest-offers.js?v=769eba09';
-import { getQuestCatalog, getSkillCatalog } from '../content-catalogs.js?v=b2a9a862';
+import { acceptOffer, npcQuestOffers } from '../quest-offers.js?v=0aa183fc';
+import { getQuestCatalog, getSkillCatalog } from '../content-catalogs.js?v=c6a77ac9';
 import { listRecipesProducing } from '../making.js?v=4d75f062';
 import { JOB_ASK_TEXT, itemAskSubject, itemGetHref, itemMakeNote, skillRankLabel } from '../street-job-asks.js?v=32adbe89';
 import { XP_FOR_LEVEL } from '../progression.js?v=05ff0260';

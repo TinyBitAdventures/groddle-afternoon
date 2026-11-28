@@ -25,11 +25,11 @@ import { closedForEveryone, freeWays, openWorld } from '../public/js/open-roads.
 import { TELEPORTERS } from '../public/js/hidden-floors.js?v=023336cb';
 import { WINTRY_PORTAL_TELEPORTERS } from '../public/js/wintry-portal.js?v=1437deda';
 import { applyStreetIndex } from '../public/js/street-loader.js?v=b8ea30df';
-import { streetJobsFeature } from '../public/js/features/street-jobs-feature.js?v=f1ffb6ac';
+import { streetJobsFeature } from '../public/js/features/street-jobs-feature.js?v=d257548d';
 import { STARTER_LANDING, openBootTarget } from '../public/js/ancestral-nostalgia.js?v=7c972d9f';
 import { NOSTALGIA_BOOT_STREETS } from '../public/js/ancestral-nostalgia-data.js?v=0adb9184';
-import { FEATURES } from '../public/js/features/index.js?v=37fa14e5';
-import { createBuffState, applyBuff, hasBuff, removeBuff } from '../public/js/buffs.js?v=9ac58eaa';
+import { FEATURES } from '../public/js/features/index.js?v=0742445a';
+import { createBuffState, applyBuff, hasBuff, removeBuff } from '../public/js/buffs.js?v=3853dc19';
 
 const root = join(import.meta.dirname, '..');
 const read = (rel) => readFileSync(join(root, rel), 'utf8');

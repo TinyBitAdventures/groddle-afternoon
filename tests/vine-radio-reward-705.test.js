@@ -14,9 +14,9 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 import { CRAB_TUNES_COUNTER, RADIO_ART, RADIO_QUEST, RADIO_QUEST_ID, RADIO_QUEST_TUNES, radioOwned } from '../public/js/vine-radio.js?v=5436aa09';
-import { loadContentCatalogsFromDir, resetContentCatalogs } from '../public/js/content-catalogs.js?v=b2a9a862';
-import { createQuestState, questUnlockNotices, questUnlockRows } from '../public/js/quests.js?v=17fca824';
-import { acceptOffer, routeQuestEvent, turnInQuest } from '../public/js/quest-offers.js?v=769eba09';
+import { loadContentCatalogsFromDir, resetContentCatalogs } from '../public/js/content-catalogs.js?v=c6a77ac9';
+import { createQuestState, questUnlockNotices, questUnlockRows } from '../public/js/quests.js?v=73ccda70';
+import { acceptOffer, routeQuestEvent, turnInQuest } from '../public/js/quest-offers.js?v=0aa183fc';
 import { rewardChips } from '../public/js/ui/moment-card.js?v=b383144f';
 import { questRewardChips } from '../public/js/ui/quest-sheet.js?v=7409d5d8';
 

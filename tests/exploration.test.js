@@ -11,9 +11,9 @@ import {
   createAchievementState,
   applyAchievementProgress,
   groupLabelCount,
-} from '../public/js/achievements.js?v=7a3a0e92';
-import { loadContentCatalogsFromDir, getAchievementCatalog } from '../public/js/content-catalogs.js?v=b2a9a862';
-import { normalizeAchievementSnapshot } from '../public/js/player-save.js?v=05e5fe5e';
+} from '../public/js/achievements.js?v=ac2acbe8';
+import { loadContentCatalogsFromDir, getAchievementCatalog } from '../public/js/content-catalogs.js?v=c6a77ac9';
+import { normalizeAchievementSnapshot } from '../public/js/player-save.js?v=5e05161a';
 import {
   applyStreetVisit,
   availableHubStreets,

@@ -10,7 +10,7 @@ import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { shrineStreetsFor } from '../public/js/street-ecology.js?v=e5263244';
-import { GIANTS } from '../public/js/shrines.js?v=74b2157f';
+import { GIANTS } from '../public/js/shrines.js?v=b063e857';
 
 const pub = join(dirname(fileURLToPath(import.meta.url)), '../public');
 const ecology = JSON.parse(readFileSync(join(pub, 'assets/content/street-ecology.json'), 'utf8'));

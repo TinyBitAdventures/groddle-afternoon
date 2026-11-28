@@ -14,8 +14,8 @@ import { describe, it, before } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=b2a9a862';
-import { createQuestState, listQuestLog, listQuestLogNewestFirst, listQuests } from '../public/js/quests.js?v=17fca824';
+import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=c6a77ac9';
+import { createQuestState, listQuestLog, listQuestLogNewestFirst, listQuests } from '../public/js/quests.js?v=73ccda70';
 import { createQuestSheet } from '../public/js/ui/quest-sheet.js?v=7409d5d8';
 import { FakeEl, matches } from './social-fake-dom.js';
 

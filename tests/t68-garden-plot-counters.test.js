@@ -11,9 +11,9 @@ import { readFileSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { loadContentCatalogsFromDir, resetContentCatalogs } from '../public/js/content-catalogs.js?v=b2a9a862';
-import { createQuestState } from '../public/js/quests.js?v=17fca824';
-import { acceptOffer, routeQuestEvent, gardenPlotEvents } from '../public/js/quest-offers.js?v=769eba09';
+import { loadContentCatalogsFromDir, resetContentCatalogs } from '../public/js/content-catalogs.js?v=c6a77ac9';
+import { createQuestState } from '../public/js/quests.js?v=73ccda70';
+import { acceptOffer, routeQuestEvent, gardenPlotEvents } from '../public/js/quest-offers.js?v=0aa183fc';
 import { createGarden, listPlotKeys } from '../public/js/garden.js?v=fefa7bcd';
 import { runVerb } from '../public/content.js?v=5c87277f';
 

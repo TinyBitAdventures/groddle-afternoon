@@ -365,8 +365,8 @@ describe('persistence and presentation', () => {
 
 describe('soil badge counters reach their group_sum badges', async () => {
   const { readFile } = await import('node:fs/promises');
-  const { setContentCatalogs } = await import('../public/js/content-catalogs.js?v=b2a9a862');
-  const { applyAchievementProgress, createAchievementState } = await import('../public/js/achievements.js?v=7a3a0e92');
+  const { setContentCatalogs } = await import('../public/js/content-catalogs.js?v=c6a77ac9');
+  const { applyAchievementProgress, createAchievementState } = await import('../public/js/achievements.js?v=ac2acbe8');
   const achievements = JSON.parse(await readFile(new URL('../public/assets/content/achievements.json', import.meta.url), 'utf8'));
 
   it('VERB:tend:patch counts toward Mulcher and VERB:plant:patch toward Whiz-Bang Plantifier', () => {

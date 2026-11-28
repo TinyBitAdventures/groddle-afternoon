@@ -14,7 +14,7 @@
 import { fetchRetry } from './load-retry.js?v=477aa7a7';
 import { withBetterLearning } from './better-learning.js?v=044ff9ff';
 import { withOursQuests } from './vine-radio.js?v=5436aa09';
-import { withReplayQuest } from './newxp-replay.js?v=157997fb';
+import { withReplayQuest } from './newxp-replay.js?v=b2c832ac';
 
 const CACHE = {
   quests: null,

@@ -57,7 +57,7 @@
 
 import { runOutcome } from '../autoplay-log.js?v=55bb4823';
 import { textureFromUrl } from '../textures.js?v=71c5d2dc';
-import { butlerApi } from '../features/butler-feature.js?v=1ecd4564';
+import { butlerApi } from '../features/butler-feature.js?v=b3b983ae';
 import { anchorBottomCentre } from '../sprite-feet.js?v=6319b91a';
 
 // source: questInstanceLocation(..., 5*60) -> instances_schedule_exit_prompt (a prompt, not a clock).

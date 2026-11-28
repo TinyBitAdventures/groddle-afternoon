@@ -71,7 +71,7 @@
  */
 
 import { VENDOR_NPCS, VENDOR_NPC_CLASSES } from './vendor-npcs.js?v=90b0c123';
-import { getBuffCatalog, getQuestCatalog } from './content-catalogs.js?v=b2a9a862';
+import { getBuffCatalog, getQuestCatalog } from './content-catalogs.js?v=c6a77ac9';
 import { levelInfoForXp } from './progression.js?v=05ff0260';
 import { brokenToolCopies } from './tools.js?v=4156bba8';
 import { offerableMultiplayerQuest } from './quests-mp.js?v=e697cec3';
@@ -82,7 +82,7 @@ import {
   parseQuestConversation,
   cleanQuestMarkup,
   eventToCounter,
-} from './quests.js?v=17fca824';
+} from './quests.js?v=73ccda70';
 
 /** Original: only one offer every 5 minutes (quests_offer delay = 60 * 5). */
 export const OFFER_INTERVAL_MS = 5 * 60 * 1000;
@@ -607,6 +607,7 @@ export function pendingQuestOffers(questState, pc = null, ctx = {}) {
   }
   return rows.sort((a, b) =>
     Number(b.emergency) - Number(a.emergency) ||
+    Number(!!b.def.offerFirst) - Number(!!a.def.offerFirst) ||
     Number(b.queued) - Number(a.queued) ||
     (queueIndex.get(a.classTsid) ?? 0) - (queueIndex.get(b.classTsid) ?? 0) ||
     (TRIGGER_RANK[a.trigger.type] ?? 9) - (TRIGGER_RANK[b.trigger.type] ?? 9) ||

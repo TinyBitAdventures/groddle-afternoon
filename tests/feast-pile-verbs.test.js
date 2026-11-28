@@ -22,12 +22,12 @@ const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 
 const making = await import('../public/js/making.js?v=4d75f062');
 const { SEED_CATALOG } = await import('../public/js/garden.js?v=fefa7bcd');
-const { loadContentCatalogsFromDir } = await import('../public/js/content-catalogs.js?v=b2a9a862');
+const { loadContentCatalogsFromDir } = await import('../public/js/content-catalogs.js?v=c6a77ac9');
 const inventory = await import('../public/js/inventory.js?v=3be7988a');
-const buffs = await import('../public/js/buffs.js?v=9ac58eaa');
-const { stockUseVerb } = await import('../public/js/stock-use.js?v=711ce6f4');
+const buffs = await import('../public/js/buffs.js?v=3853dc19');
+const { stockUseVerb } = await import('../public/js/stock-use.js?v=e5aa17f4');
 const { createFeatureHost } = await import('../public/js/feature-host.js?v=100f3193');
-const { FEATURES } = await import('../public/js/features/index.js?v=37fa14e5');
+const { FEATURES } = await import('../public/js/features/index.js?v=0742445a');
 const { snoConesFeature } = await import('../public/js/features/sno-cones-feature.js?v=aea8620b');
 const { cropClasses, dishClasses, layableKind, STUFFING, STUFFING_ITEM } = await import('../public/js/pot-luck-feast.js?v=971888be');
 const { FEAST_DAY_LINES } = await import('../public/js/feast-day.js?v=4609da69');

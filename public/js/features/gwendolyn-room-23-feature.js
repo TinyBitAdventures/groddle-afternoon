@@ -29,7 +29,7 @@
  * accepted | declined | quiet), room23Last, room23RepeatPaid, room23ExitIn.
  */
 
-import { acceptOffer, declineOffer, npcQuestOffers } from '../quest-offers.js?v=769eba09';
+import { acceptOffer, declineOffer, npcQuestOffers } from '../quest-offers.js?v=0aa183fc';
 import { XP_FOR_LEVEL } from '../progression.js?v=05ff0260';
 import { textureFromUrl } from '../textures.js?v=71c5d2dc';
 import * as kit from '../quest-rooms/kit.js?v=3f5f3b56';

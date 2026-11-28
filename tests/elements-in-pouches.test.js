@@ -12,7 +12,7 @@ import { layoutPack, moveStack, packAccepts, packKeeps, roomFor, stackUp, isElem
 import { smashTrophy } from '../public/js/item-verbs-more.js?v=377f760a';
 import { canCraft, grindsElements, grinderResultLine, NEED_POUCH_LINE, recipeBlockedLine, isGrinderRecipe } from '../public/js/making.js?v=4d75f062';
 import { getVerbsFor } from '../public/content.js?v=5c87277f';
-import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=b2a9a862';
+import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=c6a77ac9';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const GS = join(root, '../glitch-GameServerJS');

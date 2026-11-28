@@ -45,7 +45,7 @@ import { publicStreet } from '../shared-street.js?v=dce5694b';
 import { frameTexture, sourceFromUrl } from '../textures.js?v=71c5d2dc';
 import { standOnFeet } from '../sprite-feet.js?v=6319b91a';
 import { hellFeature } from './hell-feature.js?v=60e7adab';
-import { hellTicketsFeature } from './hell-tickets-feature.js?v=ffecf547';
+import { hellTicketsFeature } from './hell-tickets-feature.js?v=65a6e7d9';
 
 export const GRAVES_MP_FEATURE_ID = 'graves-mp';
 const CLASS_ID = 'graveside_marker';

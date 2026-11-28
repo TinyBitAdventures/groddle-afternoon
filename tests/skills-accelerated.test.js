@@ -13,7 +13,7 @@ import { join } from 'node:path';
 import {
   loadContentCatalogsFromDir,
   resetContentCatalogs,
-} from '../public/js/content-catalogs.js?v=b2a9a862';
+} from '../public/js/content-catalogs.js?v=c6a77ac9';
 import {
   accelerateActiveStudy,
   createSkillState,
@@ -25,9 +25,9 @@ import {
   pauseSkillStudy,
   startSkillStudy,
   tickSkillStudy,
-} from '../public/js/skills.js?v=b79dc38f';
-import { switchStudyNote } from '../public/js/skills-panel.js?v=e70fb05d';
-import { createUnlearnState, startUnlearning } from '../public/js/unlearning.js?v=1a0bb2b0';
+} from '../public/js/skills.js?v=3082b0f3';
+import { switchStudyNote } from '../public/js/skills-panel.js?v=3d6c8165';
+import { createUnlearnState, startUnlearning } from '../public/js/unlearning.js?v=e6c19040';
 
 const root = join(import.meta.dirname, '..', 'public');
 const CTX = { level: 99 };

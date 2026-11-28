@@ -11,10 +11,10 @@
 import { before, describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { join } from 'node:path';
-import { getSkillCatalog, loadContentCatalogsFromDir, resetContentCatalogs } from '../public/js/content-catalogs.js?v=b2a9a862';
-import { createSkillState, getStudyStatus, listStudyQueue, pauseSkillStudy, startSkillStudy } from '../public/js/skills.js?v=b79dc38f';
-import { skillTitle } from '../public/js/skill-tree.js?v=6f55bf1c';
-import { patchChildren, studyQueueCards } from '../public/js/skills-panel.js?v=e70fb05d';
+import { getSkillCatalog, loadContentCatalogsFromDir, resetContentCatalogs } from '../public/js/content-catalogs.js?v=c6a77ac9';
+import { createSkillState, getStudyStatus, listStudyQueue, pauseSkillStudy, startSkillStudy } from '../public/js/skills.js?v=3082b0f3';
+import { skillTitle } from '../public/js/skill-tree.js?v=183b9f16';
+import { patchChildren, studyQueueCards } from '../public/js/skills-panel.js?v=3d6c8165';
 
 const root = join(import.meta.dirname, '..', 'public');
 

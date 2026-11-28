@@ -108,7 +108,7 @@ describe('#753: word when the queue is done (ours)', () => {
     assert.ok(CRAFTYBOT_COPY.queueDone, 'its words');
     assert.ok(!/—/.test(CRAFTYBOT_COPY.queueDone), 'no em dash');
     assert.ok(CRAFTYBOT_COPY.queueDone.length <= 60, 'short');
-    const { craftybotFeature } = await import('../public/js/features/craftybot-feature.js?v=2b951081');
+    const { craftybotFeature } = await import('../public/js/features/craftybot-feature.js?v=391a88b9');
     craftybotFeature.restore({ owned: true, where: 'pack' });
     const feed = [];
     const toasts = [];

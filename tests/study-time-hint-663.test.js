@@ -13,7 +13,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { brainLoadNote } from '../public/js/skills-panel.js?v=e70fb05d';
+import { brainLoadNote } from '../public/js/skills-panel.js?v=3d6c8165';
 import { learningTimeModifier } from '../public/js/imagination-effects.js?v=70169933';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');

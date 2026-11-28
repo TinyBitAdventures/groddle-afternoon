@@ -58,9 +58,9 @@ import { ecologyForStreet } from '../street-ecology.js?v=e5263244';
 import { worldToScreen } from '../street-model.js?v=a9a05f9d';
 import { signArmWidth } from '../street-render.js?v=c1ac1f42';
 import { WORLD_FONT_FAMILY } from '../world-text.js?v=6b49f88c';
-import { getSkillCatalog } from '../content-catalogs.js?v=b2a9a862';
+import { getSkillCatalog } from '../content-catalogs.js?v=c6a77ac9';
 import { listRecipesProducing } from '../making.js?v=4d75f062';
-import { GIANTS } from '../shrines.js?v=74b2157f';
+import { GIANTS } from '../shrines.js?v=b063e857';
 import { giantDisplayName } from '../giant-names.js?v=0e295891';
 import { teleportationFeature } from './teleportation-feature.js?v=87a5abf3';
 import {
@@ -121,11 +121,11 @@ import {
 } from '../street-jobs.js?v=e175c7e5';
 import { gateTerms } from '../subway.js?v=ea6921ff';
 import { forceMetabolic, gainMetabolic, loseEnergy } from '../metabolics.js?v=48f784bf';
-import { holdNote, placeIndex, questHold, questStoryKey } from '../quest-reach.js?v=8b079fd3';
+import { holdNote, placeIndex, questHold, questStoryKey } from '../quest-reach.js?v=ecffa024';
 import { fewestClosures, loadStreetGraph, reachableStreets, streetGraph, worldRoads } from '../street-graph.js?v=92206051';
 import { doorKeysHeld } from '../doors.js?v=f815e7c8';
 import { openWorld } from '../open-roads.js?v=d41120cf';
-import { getQuestCatalog as questCatalog } from '../content-catalogs.js?v=b2a9a862';
+import { getQuestCatalog as questCatalog } from '../content-catalogs.js?v=c6a77ac9';
 import { saveStore, savedThrough } from '../save-store.js?v=1ccb1d6b';
 import {
   HALL_TEXT,

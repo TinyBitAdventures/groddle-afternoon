@@ -19,7 +19,7 @@
  *   (1003-1023); `accelerationStopAt` keeps that pending timer.
  */
 
-import { getSkillCatalog } from './content-catalogs.js?v=b2a9a862';
+import { getSkillCatalog } from './content-catalogs.js?v=c6a77ac9';
 
 export const SKILL_POINTS_PER_SECOND = 10;
 

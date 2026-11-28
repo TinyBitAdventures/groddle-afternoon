@@ -33,7 +33,7 @@ import {
   visitRookMuseumExhibit,
 } from '../public/js/rook-museum.js?v=cc091e1c';
 
-import { applyRewards, paidRewardBits } from '../public/js/quests.js?v=17fca824';
+import { applyRewards, paidRewardBits } from '../public/js/quests.js?v=73ccda70';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 

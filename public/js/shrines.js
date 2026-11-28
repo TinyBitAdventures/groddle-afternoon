@@ -25,9 +25,9 @@ import {
 } from './spinning-wheel.js?v=20f30d90';
 import { gainMetabolic } from './metabolics.js?v=48f784bf';
 import { grantMoodXp } from './mood-xp.js?v=e311b45c';
-import { getSkillCatalog } from './content-catalogs.js?v=b2a9a862';
-import { accelerateActiveStudy, getActiveStudy, maxStudyAcceleration } from './skills.js?v=b79dc38f';
-import { emblemUnlockSkillFor } from './skill-tree.js?v=6f55bf1c';
+import { getSkillCatalog } from './content-catalogs.js?v=c6a77ac9';
+import { accelerateActiveStudy, getActiveStudy, maxStudyAcceleration } from './skills.js?v=3082b0f3';
+import { emblemUnlockSkillFor } from './skill-tree.js?v=183b9f16';
 import { NO_DONATE_CLASSES } from './shrine-no-donate-data.js?v=1a3b042f';
 
 export { NO_DONATE_CLASSES };

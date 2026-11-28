@@ -24,7 +24,7 @@ import { after, before, describe, it } from 'node:test';
 import { mkdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-import { BACK_YARD_GROUND_Y, CULTIVATION_PIN, YARD_DROP_EDGE, cultivationPin, yardDropSpot } from '../public/js/features/homes-feature.js?v=52c98a6b';
+import { BACK_YARD_GROUND_Y, CULTIVATION_PIN, YARD_DROP_EDGE, cultivationPin, yardDropSpot } from '../public/js/features/homes-feature.js?v=2f2a9900';
 
 import { createBackYardState, placementCheck } from '../public/js/home-cultivation.js?v=8c3a5cb8';
 

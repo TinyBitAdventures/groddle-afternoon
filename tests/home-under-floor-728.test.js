@@ -24,7 +24,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { STACK_SINK_PX, underFloorRestY } from '../public/js/walk-surface.js?v=76def2f6';
-import { BACK_YARD_GROUND_Y, housePlatforms, settleStacksOntoFloor } from '../public/js/features/homes-feature.js?v=52c98a6b';
+import { BACK_YARD_GROUND_Y, housePlatforms, settleStacksOntoFloor } from '../public/js/features/homes-feature.js?v=2f2a9900';
 import { createHomeDecorState, INTERIOR, interiorWidth } from '../public/js/home-decor.js?v=3a84d959';
 import { roomPieces } from '../public/js/home-wallpaper.js?v=5d3594e4';
 import { avatarHitBox, behindFloor } from '../public/js/reach.js?v=456da8a8';

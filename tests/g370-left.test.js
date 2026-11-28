@@ -25,10 +25,10 @@ import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { loadContentCatalogsFromDir, resetContentCatalogs } from '../public/js/content-catalogs.js?v=b2a9a862';
-import { createQuestState } from '../public/js/quests.js?v=17fca824';
-import { COUNTER_ROUTES, acceptOffer, routeQuestEvent } from '../public/js/quest-offers.js?v=769eba09';
-import { applyBuff, createBuffState } from '../public/js/buffs.js?v=9ac58eaa';
+import { loadContentCatalogsFromDir, resetContentCatalogs } from '../public/js/content-catalogs.js?v=c6a77ac9';
+import { createQuestState } from '../public/js/quests.js?v=73ccda70';
+import { COUNTER_ROUTES, acceptOffer, routeQuestEvent } from '../public/js/quest-offers.js?v=0aa183fc';
+import { applyBuff, createBuffState } from '../public/js/buffs.js?v=3853dc19';
 import { BUFF_ICONS } from '../public/js/buff-triggers.js?v=9fd877c4';
 import { FEAT_BY_ID, UNWIRED_FEATS, WIRED_FEATS, featsInEpic } from '../public/js/solo-feats.js?v=2224a7a6';
 import { MP_ACTS, MP_ORDER, MP_PACE, mpGoals, reportFor } from '../public/js/feats-mp.js?v=e1fc8239';

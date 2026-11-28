@@ -23,7 +23,7 @@
 import { existsSync, readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { GIANTS } from '../../public/js/shrines.js?v=74b2157f';
+import { GIANTS } from '../../public/js/shrines.js?v=b063e857';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
 const pub = join(root, 'public');

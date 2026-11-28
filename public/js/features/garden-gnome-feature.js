@@ -28,7 +28,7 @@ import { frameTexture, sourceFromUrl } from '../textures.js?v=71c5d2dc';
 import { GNOME_ART, GNOME_ART_DIR } from '../garden-gnome-art.js?v=994b7c76';
 import { filterText } from '../word-filter.js?v=9a7a7ebb';
 import { HOME_INTERIOR_TSID, HOME_STREET_TSID } from '../homes.js?v=9484b948';
-import { homesFeature } from './homes-feature.js?v=52c98a6b';
+import { homesFeature } from './homes-feature.js?v=2f2a9900';
 import {
   GNOME_CLASS,
   GNOME_PHRASE_MAX,

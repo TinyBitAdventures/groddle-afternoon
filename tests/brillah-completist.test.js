@@ -14,8 +14,8 @@ import {
   applyAchievementProgress,
   getAchievementProgress,
   unlockAchievement,
-} from '../public/js/achievements.js?v=7a3a0e92';
-import { loadContentCatalogsFromDir, getAchievementCatalog } from '../public/js/content-catalogs.js?v=b2a9a862';
+} from '../public/js/achievements.js?v=ac2acbe8';
+import { loadContentCatalogsFromDir, getAchievementCatalog } from '../public/js/content-catalogs.js?v=c6a77ac9';
 import { applyStreetVisit, availableHubStreets, topUpCompletists } from '../public/js/exploration.js?v=8f19e25d';
 import { ACHIEVEMENT_CONDITION_OVERRIDES, withAchievementOverrides } from '../tools/achievement-overrides.mjs';
 

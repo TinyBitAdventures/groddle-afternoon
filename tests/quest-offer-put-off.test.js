@@ -11,8 +11,8 @@ import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { getQuestCatalog, loadContentCatalogsFromDir, resetContentCatalogs } from '../public/js/content-catalogs.js?v=b2a9a862';
-import { createQuestState } from '../public/js/quests.js?v=17fca824';
+import { getQuestCatalog, loadContentCatalogsFromDir, resetContentCatalogs } from '../public/js/content-catalogs.js?v=c6a77ac9';
+import { createQuestState } from '../public/js/quests.js?v=73ccda70';
 import {
   acceptOffer,
   listDeclinedOffers,
@@ -22,8 +22,8 @@ import {
   putOffOffer,
   questOfferCard,
   questStatus,
-} from '../public/js/quest-offers.js?v=769eba09';
-import { questOffersFeature, showWaitingOffer } from '../public/js/features/quest-offers-feature.js?v=64567aad';
+} from '../public/js/quest-offers.js?v=0aa183fc';
+import { questOffersFeature, showWaitingOffer } from '../public/js/features/quest-offers-feature.js?v=2f4aa1b2';
 
 const PUBLIC = join(dirname(fileURLToPath(import.meta.url)), '../public');
 const read = (p) => readFileSync(join(PUBLIC, p), 'utf8');

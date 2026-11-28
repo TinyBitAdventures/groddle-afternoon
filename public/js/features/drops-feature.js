@@ -36,7 +36,7 @@
 
 import { priceText } from '../price.js?v=35cd2331';
 import { addItem, ensureItem, ITEM_CATALOG } from '../inventory.js?v=3be7988a';
-import { emblemCostFor } from '../shrines.js?v=74b2157f';
+import { emblemCostFor } from '../shrines.js?v=b063e857';
 import {
   DROP_ITEMS,
   DROP_TABLES,

@@ -17,8 +17,8 @@ import {
 import { collectQuoin, createQuoinState } from '../public/js/quoins.js?v=4d75aec0';
 import { applyVerbReward, getVerbReward } from '../public/js/verb-rewards.js?v=42171963';
 import { applyDropResult } from '../public/js/drop-tables.js?v=1ed0b596';
-import { quoteShrineDonation } from '../public/js/shrines.js?v=74b2157f';
-import { applyRewards } from '../public/js/quests.js?v=17fca824';
+import { quoteShrineDonation } from '../public/js/shrines.js?v=b063e857';
+import { applyRewards } from '../public/js/quests.js?v=73ccda70';
 import { bemoanSnoCone, eatSnoCone } from '../public/js/sno-cones.js?v=64e34b89';
 
 const GSJS = join(import.meta.dirname, '../../glitch-GameServerJS');

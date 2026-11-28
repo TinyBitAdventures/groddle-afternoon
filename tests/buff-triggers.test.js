@@ -24,12 +24,12 @@ import {
   smallEnlightenmentSeconds,
   smeltItDealtItFreeSmelts,
 } from '../public/js/buff-triggers.js?v=9fd877c4';
-import { MIRRORED_BUFFS, buffTriggersFeature } from '../public/js/features/buff-triggers-feature.js?v=07c9ad36';
+import { MIRRORED_BUFFS, buffTriggersFeature } from '../public/js/features/buff-triggers-feature.js?v=c88791bc';
 import { meditationFeature } from '../public/js/features/meditation-feature.js?v=a4631154';
 import { teleportationFeature } from '../public/js/features/teleportation-feature.js?v=87a5abf3';
-import { rookAttackFeature } from '../public/js/features/rook-attack-feature.js?v=9b5f50a9';
+import { rookAttackFeature } from '../public/js/features/rook-attack-feature.js?v=476d7314';
 import { rubeFeature } from '../public/js/features/rube-feature.js?v=952e278c';
-import { smugglingFeature } from '../public/js/features/smuggling-feature.js?v=4c678b74';
+import { smugglingFeature } from '../public/js/features/smuggling-feature.js?v=72780407';
 import { normalizeHusbandryPack } from '../public/js/animal-husbandry.js?v=9397c317';
 import {
   BUFF_ITEM_CATALOG,
@@ -41,14 +41,14 @@ import {
   hasBuff,
   removeBuff,
   tickBuffs,
-} from '../public/js/buffs.js?v=9ac58eaa';
+} from '../public/js/buffs.js?v=3853dc19';
 import { getSkillPackageOverride, skillPackageDetails } from '../public/js/skill-packages.js?v=bfb87281';
 import { miningProfile } from '../public/js/mining.js?v=7ecaa572';
 import { resolveAnimalKinshipPackage } from '../public/js/animal-kinship.js?v=eaa3a6f2';
 import { RECIPE_CATALOG, buildCraftBatchResult, craftRecipe, ensureMakingItems, makingSkillAdjustments } from '../public/js/making.js?v=4d75f062';
 import { sessionPackage } from '../public/js/meditation.js?v=96f23682';
-import { accelerateActiveStudy, createSkillState, startSkillStudy } from '../public/js/skills.js?v=b79dc38f';
-import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=b2a9a862';
+import { accelerateActiveStudy, createSkillState, startSkillStudy } from '../public/js/skills.js?v=3082b0f3';
+import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=c6a77ac9';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '../public');
 const T0 = 1_800_000_000_000;
