@@ -2814,9 +2814,14 @@
   "deployed": "2026-11-28"
  },
  "git": {
-  "commits": 3961,
+  "commits": 3964,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-28",
+    "kind": "fix",
+    "text": "Players can stand on tables, chairs, beds and shelves in their house, as on the street"
+   },
    {
     "date": "2026-11-28",
     "kind": "fix",
@@ -2926,19 +2931,9 @@
     "date": "2026-11-27",
     "kind": "fix",
     "text": "The Crafty Bot no longer leaves a later job waiting behind a finished one"
-   },
-   {
-    "date": "2026-11-27",
-    "kind": "new",
-    "text": "Your home street's signpost points to your Quarter lot, and takes anyone there to it"
-   },
-   {
-    "date": "2026-11-27",
-    "kind": "new",
-    "text": "Marylpole Mount Quarter's 1200 block: ten more lots, picked from the QUARTER signpost, one lot each across both blocks"
    }
   ]
  },
- "tests": 1520,
+ "tests": 1521,
  "generatedAt": "2026-11-28"
 }
