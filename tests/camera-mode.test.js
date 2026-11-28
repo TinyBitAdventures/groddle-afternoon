@@ -37,7 +37,7 @@ describe('camera mode', () => {
   });
 
   it('the Eyeballery note no longer says the camera is missing', async () => {
-    const { SKILL_REMAKE_NOTES } = await import('../public/js/skill-tree.js?v=183b9f16');
+    const { SKILL_REMAKE_NOTES } = await import('../public/js/skill-tree.js?v=ad139fa0');
     assert.equal(SKILL_REMAKE_NOTES.Eyeballery.status, 'live');
   });
 });

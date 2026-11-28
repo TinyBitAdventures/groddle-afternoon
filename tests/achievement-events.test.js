@@ -22,15 +22,15 @@ import {
   consumeAchievementCounters,
   resetAchievementCounter,
   purchaseAchievementUpdates,
-} from '../public/js/achievements.js?v=ac2acbe8';
+} from '../public/js/achievements.js?v=ee438ab0';
 import { createResourceNode, harvestResourceNode } from '../public/js/resource-nodes.js?v=c2eb46b1';
 import { createPlot, growTree, tickPlot } from '../public/js/patches.js?v=54430bb9';
 import { noteWoodCare } from '../public/js/woodcutting.js?v=9e9af511';
-import { slothsChewing } from '../public/js/features/resource-nodes-feature.js?v=0dd43fb0';
+import { slothsChewing } from '../public/js/features/resource-nodes-feature.js?v=ec59b66d';
 import { supplyFeature } from '../public/js/features/supply-feature.js?v=0ddac408';
 import { createToolConditionState } from '../public/js/tools.js?v=4156bba8';
-import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=c6a77ac9';
-import { normalizeAchievementSnapshot } from '../public/js/player-save.js?v=5e05161a';
+import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=b0f96eae';
+import { normalizeAchievementSnapshot } from '../public/js/player-save.js?v=c691c143';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const publicRoot = join(here, '../public');

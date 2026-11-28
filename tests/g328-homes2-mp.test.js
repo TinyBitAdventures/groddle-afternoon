@@ -42,10 +42,10 @@ import {
 } from '../public/js/neighbours-mp.js?v=de82fd7d';
 import { createButlerState, giveGiftTo, newestVisit, nextHandover, normalizeButlerState, packagesAndMessagesForOwner, recordVisitor, setGift, visitorsReport } from '../public/js/butler.js?v=bea39213';
 import { GARDEN_SPEEDUP, SEED_CATALOG as GARDEN_SEEDS, createGarden, tickGarden } from '../public/js/garden.js?v=fefa7bcd';
-import { butlerApi } from '../public/js/features/butler-feature.js?v=b3b983ae';
-import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=c6a77ac9';
-import { acceptOffer, routeQuestEvent } from '../public/js/quest-offers.js?v=0aa183fc';
-import { neighboursMpFeature } from '../public/js/features/neighbours-mp-feature.js?v=6c0a0d54';
+import { butlerApi } from '../public/js/features/butler-feature.js?v=e0ea2c32';
+import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=b0f96eae';
+import { acceptOffer, routeQuestEvent } from '../public/js/quest-offers.js?v=dfecc1b4';
+import { neighboursMpFeature } from '../public/js/features/neighbours-mp-feature.js?v=e53b6956';
 import { createMinnAccount } from '../public/js/minn-account.js?v=7e3d7279';
 import { HAS_SERVER, HAS_SITE, SITE_DIR, serverPath, sitePath } from '../tools/repos.mjs';
 import { HAS_PHP, PHP } from './php.js';

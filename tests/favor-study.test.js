@@ -12,7 +12,7 @@ import { join } from 'node:path';
 import {
   loadContentCatalogsFromDir,
   resetContentCatalogs,
-} from '../public/js/content-catalogs.js?v=c6a77ac9';
+} from '../public/js/content-catalogs.js?v=b0f96eae';
 import {
   createSkillState,
   getStudyStatus,
@@ -20,7 +20,7 @@ import {
   maxStudyAcceleration,
   startSkillStudy,
   accelerateActiveStudy,
-} from '../public/js/skills.js?v=3082b0f3';
+} from '../public/js/skills.js?v=665637b6';
 import {
   EMBLEM_SPEND_FAVOR,
   FAVOR_SPENT_EVENTS,
@@ -37,13 +37,13 @@ import {
   skillSpeedInfo,
   spendEmblemOnStudy,
   spendFavorOnStudy,
-} from '../public/js/shrines.js?v=b063e857';
-import { emblemUnlockSkillFor } from '../public/js/skill-tree.js?v=183b9f16';
-import { studyGiantsLine } from '../public/js/skills-panel.js?v=3d6c8165';
-import { EMITTED_EVENTS, routeQuestEvent, acceptOffer, requirementRoute } from '../public/js/quest-offers.js?v=0aa183fc';
-import { createQuestState } from '../public/js/quests.js?v=73ccda70';
-import { getQuestCatalog } from '../public/js/content-catalogs.js?v=c6a77ac9';
-import { normalizeShrineState } from '../public/js/shrines.js?v=b063e857';
+} from '../public/js/shrines.js?v=e70fccba';
+import { emblemUnlockSkillFor } from '../public/js/skill-tree.js?v=ad139fa0';
+import { studyGiantsLine } from '../public/js/skills-panel.js?v=fe84f8ee';
+import { EMITTED_EVENTS, routeQuestEvent, acceptOffer, requirementRoute } from '../public/js/quest-offers.js?v=dfecc1b4';
+import { createQuestState } from '../public/js/quests.js?v=4c8f3a10';
+import { getQuestCatalog } from '../public/js/content-catalogs.js?v=b0f96eae';
+import { normalizeShrineState } from '../public/js/shrines.js?v=e70fccba';
 
 const root = join(import.meta.dirname, '..', 'public');
 

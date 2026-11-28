@@ -30,7 +30,7 @@
  */
 
 import { runOutcome } from '../autoplay-log.js?v=55bb4823';
-import { applyRewards } from '../quests.js?v=73ccda70';
+import { applyRewards } from '../quests.js?v=4c8f3a10';
 import { ITEM_CATALOG, isToolItem } from '../inventory.js?v=3be7988a';
 import { frameTexture, isLoaded, onLoaded, sourceFromUrl } from '../textures.js?v=71c5d2dc';
 import { playPoofIn } from '../overlay-art.js?v=4858876d';

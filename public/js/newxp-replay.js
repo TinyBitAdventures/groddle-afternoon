@@ -100,7 +100,7 @@ export const REPLAY_QUEST = Object.freeze({
   autoComplete: false,
   isRepeatable: false,
   isEmergency: false,
-  /** Ours: the rock offers it before its other waiting offers (a skipper otherwise waits behind every one). */
+  /** The rock offers it before its other waiting offers (a skipper otherwise waits behind every one). */
   offerFirst: true,
   isMultiplayer: false,
   hideQuestlog: false,

@@ -21,8 +21,8 @@
  * Nothing is refunded: study time spent on the skill is simply gone.
  */
 
-import { getSkillCatalog } from './content-catalogs.js?v=c6a77ac9';
-import { SKILL_POINTS_PER_SECOND, pauseSkillStudy, listStudyQueue } from './skills.js?v=3082b0f3';
+import { getSkillCatalog } from './content-catalogs.js?v=b0f96eae';
+import { SKILL_POINTS_PER_SECOND, pauseSkillStudy, listStudyQueue } from './skills.js?v=665637b6';
 import { retireDeadQuests } from './retired-quests.js?v=61758261';
 
 export const UNLEARN_CARD = 'unlearning_ability';

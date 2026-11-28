@@ -11,7 +11,7 @@ import { fileURLToPath } from 'node:url';
 import { closestTarget } from '../public/js/powders.js?v=b1bafb71';
 import { OVERLAY_USES } from '../public/js/overlays.js?v=18dfb26a';
 import { powdersFeature } from '../public/js/features/powders-feature.js?v=039a54b8';
-import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=c6a77ac9';
+import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=b0f96eae';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const GS = join(root, '../glitch-GameServerJS');

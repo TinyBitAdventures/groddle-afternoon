@@ -21,8 +21,8 @@ import {
   getWaterState,
 } from '../public/js/water-cooler.js?v=1cf1b040';
 import { addItem, countItem, removeItem } from '../public/js/inventory.js?v=3be7988a';
-import { COOLER_X, DRINK_VERB, GET_WATER_VERB, bureaucraticHallsFeature } from '../public/js/features/bureaucratic-halls-feature.js?v=7159ba8e';
-import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=c6a77ac9';
+import { COOLER_X, DRINK_VERB, GET_WATER_VERB, bureaucraticHallsFeature } from '../public/js/features/bureaucratic-halls-feature.js?v=99444474';
+import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=b0f96eae';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const GSJS = join(homedir(), 'Documents/glitch-audit/glitch-GameServerJS');

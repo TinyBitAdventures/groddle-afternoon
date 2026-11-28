@@ -9,9 +9,9 @@ import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { loadContentCatalogsFromDir, resetContentCatalogs, getQuestCatalog } from '../public/js/content-catalogs.js?v=c6a77ac9';
-import { createQuestState } from '../public/js/quests.js?v=73ccda70';
-import { ensureQuestOfferState, npcQuestOffers, pendingQuestOffers, waitingOffers } from '../public/js/quest-offers.js?v=0aa183fc';
+import { loadContentCatalogsFromDir, resetContentCatalogs, getQuestCatalog } from '../public/js/content-catalogs.js?v=b0f96eae';
+import { createQuestState } from '../public/js/quests.js?v=4c8f3a10';
+import { ensureQuestOfferState, npcQuestOffers, pendingQuestOffers, waitingOffers } from '../public/js/quest-offers.js?v=dfecc1b4';
 import {
   REMINISCE_VERB,
   SPIRIT_REMINISCE_TEXT,
@@ -20,7 +20,7 @@ import {
   isStreetSpiritClass,
   spiritReminisceOffers,
   withReminisceVerb,
-} from '../public/js/spirit-reminisce.js?v=2f04194b';
+} from '../public/js/spirit-reminisce.js?v=cd16947f';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const gsjs = join(root, '../glitch-GameServerJS');

@@ -18,8 +18,8 @@ import {
   setMetabolicLossGate,
   shiftMetabolic,
 } from '../public/js/metabolics.js?v=48f784bf';
-import { applyBuff, createBuffState, tickBuffs } from '../public/js/buffs.js?v=3853dc19';
-import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=c6a77ac9';
+import { applyBuff, createBuffState, tickBuffs } from '../public/js/buffs.js?v=d748b56d';
+import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=b0f96eae';
 import { HELL_TEXT, metabolicGate, normalizeHellState } from '../public/js/hell.js?v=0dba5774';
 import { BUTTER_UP, butterUpChicken } from '../public/js/animal-flattery.js?v=3374cf3a';
 import { SET_FREE, applySetFree } from '../public/js/animal-set-free.js?v=6fcd8355';

@@ -2814,9 +2814,19 @@
   "deployed": "2026-11-28"
  },
  "git": {
-  "commits": 3980,
+  "commits": 3984,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-28",
+    "kind": "improve",
+    "text": "Back to Gentle Island is offered before the rock's other waiting offers"
+   },
+   {
+    "date": "2026-11-28",
+    "kind": "fix",
+    "text": "Leaving Back to Gentle Island checks the trip home and falls back to Ur's start street"
+   },
    {
     "date": "2026-11-28",
     "kind": "fix",
@@ -2926,11 +2936,6 @@
     "date": "2026-11-27",
     "kind": "fix",
     "text": "Removing a Crafty Bot job puts what it holds back down, and it never takes its machine as an ingredient"
-   },
-   {
-    "date": "2026-11-27",
-    "kind": "improve",
-    "text": "A meteor shower and a lone shooting star now look clearly different"
    }
   ]
  },

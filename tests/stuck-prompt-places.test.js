@@ -14,7 +14,7 @@ import { fileURLToPath } from 'node:url';
 
 import { createStuckAsker } from '../public/js/stuck-prompt.js?v=f36901d7';
 import { FOUR_LETTER_EXIT_PROMPT_MS } from '../public/js/four-letter-quest.js?v=9540cc6f';
-import { LEGALIZE_ALLEY_EXIT_PROMPT_MS } from '../public/js/legalize-it.js?v=886b4780';
+import { LEGALIZE_ALLEY_EXIT_PROMPT_MS } from '../public/js/legalize-it.js?v=0d08db71';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const MIN = 60 * 1000;

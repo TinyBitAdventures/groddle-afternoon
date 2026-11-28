@@ -11,10 +11,10 @@ import assert from 'node:assert/strict';
 import { join } from 'node:path';
 
 import { GENTLE_ISLAND, LEAVE_FLAG_DELAY_MS, leaveFlagStreet, normalizeNewxpSave } from '../public/js/newxp.js?v=eedf8fe3';
-import { __newxpTest } from '../public/js/features/newxp-feature.js?v=29cd4d84';
-import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=c6a77ac9';
-import { acceptOffer } from '../public/js/quest-offers.js?v=0aa183fc';
-import { createQuestState } from '../public/js/quests.js?v=73ccda70';
+import { __newxpTest } from '../public/js/features/newxp-feature.js?v=baebe4da';
+import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=b0f96eae';
+import { acceptOffer } from '../public/js/quest-offers.js?v=dfecc1b4';
+import { createQuestState } from '../public/js/quests.js?v=4c8f3a10';
 
 const root = join(import.meta.dirname, '..');
 const GRIDDLE_MEADOW = 'GLI32G3NUTD100I';

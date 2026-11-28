@@ -9,7 +9,7 @@ import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { PARTY_TEXT } from '../public/js/party-spaces.js?v=91ce15c5';
-import { SKILL_REMAKE_NOTES } from '../public/js/skill-tree.js?v=183b9f16';
+import { SKILL_REMAKE_NOTES } from '../public/js/skill-tree.js?v=ad139fa0';
 import { SETTINGS_COPY } from '../public/js/account-forms.js?v=683e1475';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');

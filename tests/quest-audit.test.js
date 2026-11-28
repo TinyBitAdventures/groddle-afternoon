@@ -22,9 +22,9 @@ import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { auditQuests } from '../tools/quests/audit.mjs';
-import { createQuestState } from '../public/js/quests.js?v=73ccda70';
-import { acceptOffer, offerOnShrineDonation, putOffOffer, questStatus, routeQuestEvent, waitingOffers, GIANT_QUEST } from '../public/js/quest-offers.js?v=0aa183fc';
-import { questOffersFeature } from '../public/js/features/quest-offers-feature.js?v=2f4aa1b2';
+import { createQuestState } from '../public/js/quests.js?v=4c8f3a10';
+import { acceptOffer, offerOnShrineDonation, putOffOffer, questStatus, routeQuestEvent, waitingOffers, GIANT_QUEST } from '../public/js/quest-offers.js?v=dfecc1b4';
+import { questOffersFeature } from '../public/js/features/quest-offers-feature.js?v=ec616a70';
 
 const PUBLIC = join(dirname(fileURLToPath(import.meta.url)), '../public');
 

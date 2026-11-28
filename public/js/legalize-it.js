@@ -8,8 +8,8 @@
  * - items/catalog_stores.js (store 17)
  */
 
-import { applyQuestProgress } from './quests.js?v=73ccda70';
-import { unlockAchievement } from './achievements.js?v=ac2acbe8';
+import { applyQuestProgress } from './quests.js?v=4c8f3a10';
+import { unlockAchievement } from './achievements.js?v=ee438ab0';
 import { countItem, removeItem } from './inventory.js?v=3be7988a';
 
 export const LEGALIZE_QUEST_ID = 'card_carrying_qualification';

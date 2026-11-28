@@ -50,7 +50,7 @@
 import { countItem, removeItem } from '../inventory.js?v=3be7988a';
 import { gainMetabolic, loseEnergy, loseMood } from '../metabolics.js?v=48f784bf';
 import { grantMoodXp } from '../mood-xp.js?v=e311b45c';
-import { ensureQuestOfferState } from '../quest-offers.js?v=0aa183fc';
+import { ensureQuestOfferState } from '../quest-offers.js?v=dfecc1b4';
 import { gameDayIndex, getMusicblock, isMusicblock } from '../musicblocks.js?v=e4c81eb7';
 import { GAME_DAY_MS } from '../game-day.js?v=57fecfcb';
 import { playSheetOverlay } from '../overlay-art.js?v=4858876d';

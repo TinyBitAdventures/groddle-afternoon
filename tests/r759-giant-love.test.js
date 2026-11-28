@@ -11,7 +11,7 @@ import { execFileSync } from 'node:child_process';
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { GIANT_CUT, GIANT_SCREEN_TIMES, LOVE_GIANTS, giantCutArt, giantLoveResponse, giantScreenLayout } from '../public/js/giant-love.js?v=abed6d7d';
-import { sayLoveLine } from '../public/js/features/shrine-hint-feature.js?v=afc83e16';
+import { sayLoveLine } from '../public/js/features/shrine-hint-feature.js?v=565483df';
 
 const ROOT = join(import.meta.dirname, '..');
 const PORTRAITS = join(ROOT, 'public', 'assets', 'sprites', 'giant-portraits');

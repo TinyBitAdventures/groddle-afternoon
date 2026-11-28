@@ -16,7 +16,7 @@ import {
   getBuffCatalog,
   getContentMeta,
   resetContentCatalogs,
-} from '../public/js/content-catalogs.js?v=c6a77ac9';
+} from '../public/js/content-catalogs.js?v=b0f96eae';
 import {
   createQuestState,
   assignQuest,
@@ -25,7 +25,7 @@ import {
   listQuestLog,
   listQuestLogNewestFirst,
   listQuests,
-} from '../public/js/quests.js?v=73ccda70';
+} from '../public/js/quests.js?v=4c8f3a10';
 import {
   createAchievementState,
   applyAchievementProgress,
@@ -34,7 +34,7 @@ import {
   browseAchievementLog,
   achievementCategories,
   getAchievementProgress,
-} from '../public/js/achievements.js?v=ac2acbe8';
+} from '../public/js/achievements.js?v=ee438ab0';
 import {
   createSkillState,
   canLearnSkill,
@@ -45,7 +45,7 @@ import {
   grantSkill,
   listSkills,
   hasSkill,
-} from '../public/js/skills.js?v=3082b0f3';
+} from '../public/js/skills.js?v=665637b6';
 import {
   createBuffState,
   applyBuff,
@@ -53,7 +53,7 @@ import {
   listActiveBuffs,
   hasBuff,
   listBuffCatalog,
-} from '../public/js/buffs.js?v=3853dc19';
+} from '../public/js/buffs.js?v=d748b56d';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const CONTENT = join(__dirname, '../public/assets/content');

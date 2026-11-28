@@ -11,7 +11,7 @@
  */
 
 import { getItemUseInfo } from './inventory.js?v=3be7988a';
-import { getBuffItemInfo } from './buffs.js?v=3853dc19';
+import { getBuffItemInfo } from './buffs.js?v=d748b56d';
 
 /**
  * `query(hook, classTsid)` asks the features (game.js: features.query(hook, classTsid, engine)).

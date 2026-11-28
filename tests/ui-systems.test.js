@@ -28,8 +28,8 @@ import {
   getQuestProgress,
   listQuestTracker,
   QUEST_CATALOG,
-} from '../public/js/quests.js?v=73ccda70';
-import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=c6a77ac9';
+} from '../public/js/quests.js?v=4c8f3a10';
+import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=b0f96eae';
 
 const __dirnameUi = dirname(fileURLToPath(import.meta.url));
 before(async () => {

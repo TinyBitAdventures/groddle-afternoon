@@ -17,9 +17,9 @@ import { readFileSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { loadContentCatalogsFromDir, resetContentCatalogs } from '../public/js/content-catalogs.js?v=c6a77ac9';
-import { createQuestState } from '../public/js/quests.js?v=73ccda70';
-import { acceptOffer, routeQuestEvent } from '../public/js/quest-offers.js?v=0aa183fc';
+import { loadContentCatalogsFromDir, resetContentCatalogs } from '../public/js/content-catalogs.js?v=b0f96eae';
+import { createQuestState } from '../public/js/quests.js?v=4c8f3a10';
+import { acceptOffer, routeQuestEvent } from '../public/js/quest-offers.js?v=dfecc1b4';
 import { createInventory } from '../public/js/inventory.js?v=3be7988a';
 import { createToolConditionState } from '../public/js/tools.js?v=4156bba8';
 import { setMetabolicGainGate } from '../public/js/metabolics.js?v=48f784bf';

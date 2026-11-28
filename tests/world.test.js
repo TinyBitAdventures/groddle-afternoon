@@ -21,7 +21,7 @@ import {
   completeQuest,
   getQuestProgress,
   QUEST_CATALOG,
-} from '../public/js/quests.js?v=73ccda70';
+} from '../public/js/quests.js?v=4c8f3a10';
 import {
   createInventory,
   addItem,
@@ -31,7 +31,7 @@ import {
   ITEM_CATALOG,
 } from '../public/js/inventory.js?v=3be7988a';
 import { getVerbsFor, runVerb } from '../public/content.js?v=5c87277f';
-import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=c6a77ac9';
+import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=b0f96eae';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 before(async () => {

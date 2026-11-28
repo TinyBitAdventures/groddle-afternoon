@@ -11,13 +11,13 @@ import assert from 'node:assert/strict';
 import { join } from 'node:path';
 
 import { ISLAND_ARRIVAL, normalizeNewxpSave } from '../public/js/newxp.js?v=eedf8fe3';
-import { __newxpTest, newxpFeature } from '../public/js/features/newxp-feature.js?v=29cd4d84';
+import { __newxpTest, newxpFeature } from '../public/js/features/newxp-feature.js?v=baebe4da';
 import { createFeatureHost } from '../public/js/feature-host.js?v=100f3193';
-import { FEATURES } from '../public/js/features/index.js?v=0742445a';
-import { getQuestCatalog, loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=c6a77ac9';
-import { QUEST_MOVES_NOTE, acceptOffer, ensureQuestOfferState, listDeclinedOffers, pendingQuestOffers, questOfferCard, routeQuestEvent, turnInQuest } from '../public/js/quest-offers.js?v=0aa183fc';
+import { FEATURES } from '../public/js/features/index.js?v=af3c821e';
+import { getQuestCatalog, loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=b0f96eae';
+import { QUEST_MOVES_NOTE, acceptOffer, ensureQuestOfferState, listDeclinedOffers, pendingQuestOffers, questOfferCard, routeQuestEvent, turnInQuest } from '../public/js/quest-offers.js?v=dfecc1b4';
 import { addItem, countItem, removeItem } from '../public/js/inventory.js?v=3be7988a';
-import { createQuestState } from '../public/js/quests.js?v=73ccda70';
+import { createQuestState } from '../public/js/quests.js?v=4c8f3a10';
 import {
   REPLAY_DONE_COUNTER,
   REPLAY_GATE,
@@ -28,7 +28,7 @@ import {
   replayGrants,
   replayOwnedCards,
   replayStage,
-} from '../public/js/newxp-replay.js?v=b2c832ac';
+} from '../public/js/newxp-replay.js?v=9acaab3e';
 
 const root = join(import.meta.dirname, '..');
 const HECHEY = 'GLI2V0UN7RD1T2J';
@@ -262,8 +262,8 @@ describe('Back to Gentle Island (a skipped tutorial played later, once)', () => 
 });
 
 it('Back to Gentle Island is offered before the other waiting offers (review rtutq: 16 offers ahead)', async () => {
-  const { pendingQuestOffers } = await import('../public/js/quest-offers.js?v=0aa183fc');
-  const { REPLAY_QUEST } = await import('../public/js/newxp-replay.js?v=b2c832ac');
+  const { pendingQuestOffers } = await import('../public/js/quest-offers.js?v=dfecc1b4');
+  const { REPLAY_QUEST } = await import('../public/js/newxp-replay.js?v=9acaab3e');
   assert.equal(REPLAY_QUEST.offerFirst, true);
   const src = (await import('node:fs')).readFileSync(new URL('../public/js/quest-offers.js', import.meta.url), 'utf8');
   assert.match(src, /Number\(b\.emergency\) - Number\(a\.emergency\) \|\|\n\s*Number\(!!b\.def\.offerFirst\) - Number\(!!a\.def\.offerFirst\)/);

@@ -8,7 +8,7 @@ import assert from 'node:assert/strict';
 import { before, describe, it } from 'node:test';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { getSkillCatalog, loadContentCatalogsFromDir, resetContentCatalogs } from '../public/js/content-catalogs.js?v=c6a77ac9';
+import { getSkillCatalog, loadContentCatalogsFromDir, resetContentCatalogs } from '../public/js/content-catalogs.js?v=b0f96eae';
 import {
   BETTER_LEARNING_BASE_SECONDS,
   BETTER_LEARNING_DISCOUNTS,
@@ -16,12 +16,12 @@ import {
   betterLearningDiscount,
   betterLearningRank,
 } from '../public/js/better-learning.js?v=044ff9ff';
-import { canLearnSkill, createSkillState, grantSkill, startSkillStudy, tickSkillStudy } from '../public/js/skills.js?v=3082b0f3';
+import { canLearnSkill, createSkillState, grantSkill, startSkillStudy, tickSkillStudy } from '../public/js/skills.js?v=665637b6';
 import { skillTimeFactor } from '../public/js/imagination-effects.js?v=70169933';
 import { learnTimeReductions } from '../public/js/imagination.js?v=1bdfd77c';
-import { emblemUnlockSkillFor, skillRemakeNote, skillTitle, skillTreeEntry, spendEmblemForSkill } from '../public/js/skill-tree.js?v=183b9f16';
-import { acceptOffer, pendingQuestOffers } from '../public/js/quest-offers.js?v=0aa183fc';
-import { createQuestState } from '../public/js/quests.js?v=73ccda70';
+import { emblemUnlockSkillFor, skillRemakeNote, skillTitle, skillTreeEntry, spendEmblemForSkill } from '../public/js/skill-tree.js?v=ad139fa0';
+import { acceptOffer, pendingQuestOffers } from '../public/js/quest-offers.js?v=dfecc1b4';
+import { createQuestState } from '../public/js/quests.js?v=4c8f3a10';
 import { normalizeStreetJobState, phaseRequirements, workCheck } from '../public/js/street-jobs.js?v=e175c7e5';
 import { skillArtFor } from '../public/js/familiar.js?v=b9597cd3';
 import { CARD_ART_LAYERS } from '../public/js/imagination-data.js?v=4a85e7fe';

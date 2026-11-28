@@ -66,11 +66,11 @@ import { ITEM_CATALOG } from '../public/js/inventory.js?v=3be7988a';
 import { hellFeature } from '../public/js/features/hell-feature.js?v=60e7adab';
 import { Display, fakePixi } from './fake-scene.js';
 import { GAME_DAY_MS, getGameDayKey, getGameDayStartMs } from '../public/js/game-day.js?v=57fecfcb';
-import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=c6a77ac9';
+import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=b0f96eae';
 import {
   applyAchievementProgress,
   createAchievementState,
-} from '../public/js/achievements.js?v=ac2acbe8';
+} from '../public/js/achievements.js?v=ee438ab0';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const publicRoot = join(here, '../public');

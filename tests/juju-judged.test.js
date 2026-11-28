@@ -22,9 +22,9 @@ import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { loadContentCatalogsFromDir, resetContentCatalogs, getQuestCatalog } from '../public/js/content-catalogs.js?v=c6a77ac9';
-import { classifyQuests, questOfferIndex, pendingQuestOffers, npcQuestOffers } from '../public/js/quest-offers.js?v=0aa183fc';
-import { createQuestState } from '../public/js/quests.js?v=73ccda70';
+import { loadContentCatalogsFromDir, resetContentCatalogs, getQuestCatalog } from '../public/js/content-catalogs.js?v=b0f96eae';
+import { classifyQuests, questOfferIndex, pendingQuestOffers, npcQuestOffers } from '../public/js/quest-offers.js?v=dfecc1b4';
+import { createQuestState } from '../public/js/quests.js?v=4c8f3a10';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const CONTENT = join(ROOT, 'public/assets/content');

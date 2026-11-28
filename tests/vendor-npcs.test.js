@@ -32,8 +32,8 @@ import {
   vendorSheet,
 } from '../public/js/vendor-npcs.js?v=90b0c123';
 import { VENDOR_PROFILES } from '../public/js/vendor.js?v=7a07f478';
-import { getQuestCatalog, loadContentCatalogsFromDir, resetContentCatalogs } from '../public/js/content-catalogs.js?v=c6a77ac9';
-import { createQuestState } from '../public/js/quests.js?v=73ccda70';
+import { getQuestCatalog, loadContentCatalogsFromDir, resetContentCatalogs } from '../public/js/content-catalogs.js?v=b0f96eae';
+import { createQuestState } from '../public/js/quests.js?v=4c8f3a10';
 import {
   REMAKE_QUEST_NPCS,
   acceptOffer,
@@ -43,7 +43,7 @@ import {
   pendingQuestOffers,
   syncItemRequirements,
   turnInQuest,
-} from '../public/js/quest-offers.js?v=0aa183fc';
+} from '../public/js/quest-offers.js?v=dfecc1b4';
 import { XP_FOR_LEVEL } from '../public/js/progression.js?v=05ff0260';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');

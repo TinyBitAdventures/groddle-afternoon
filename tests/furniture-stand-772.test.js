@@ -31,7 +31,7 @@ const pixi = new Proxy({ Container: Display, Graphics: Display, Sprite: Display,
 globalThis.PIXI = pixi;
 globalThis.Image ??= class { set src(_) {} };
 
-const { housePlatforms, refreshFurnitureLines, settleStacksOntoFloor, visitorHomeScene, visitorHomeState } = await import('../public/js/features/homes-feature.js?v=2f2a9900');
+const { housePlatforms, refreshFurnitureLines, settleStacksOntoFloor, visitorHomeScene, visitorHomeState } = await import('../public/js/features/homes-feature.js?v=db691cd7');
 const {
   INTERIOR, FURNITURE_HEADROOM, createHomeDecorState, flipFurniture, furniturePlatforms, isFurnitureLine, moveFurniture,
   pickUpFurniture, placeFurniture, surfaceHeight, wallTopY, furnitureSize,

@@ -12,9 +12,9 @@ import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createFeatureHost } from '../public/js/feature-host.js?v=100f3193';
-import { FEATURES } from '../public/js/features/index.js?v=0742445a';
-import { newxpFeature, __newxpTest } from '../public/js/features/newxp-feature.js?v=29cd4d84';
-import { questOffersFeature } from '../public/js/features/quest-offers-feature.js?v=2f4aa1b2';
+import { FEATURES } from '../public/js/features/index.js?v=af3c821e';
+import { newxpFeature, __newxpTest } from '../public/js/features/newxp-feature.js?v=baebe4da';
+import { questOffersFeature } from '../public/js/features/quest-offers-feature.js?v=ec616a70';
 import { GENTLE_ISLAND } from '../public/js/newxp.js?v=eedf8fe3';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');

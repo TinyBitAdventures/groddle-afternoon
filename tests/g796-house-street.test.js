@@ -12,7 +12,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { HOUSE_STYLES, HOUSE_STYLE_IDS } from '../public/js/home-house.js?v=3c88c47c';
 import { createHomeState, imagineHome } from '../public/js/homes.js?v=9484b948';
-import { HOUSE_STYLE_KEYS, houseDoorway, houseFixtureX, houseFront } from '../public/js/features/homes-feature.js?v=2f2a9900';
+import { HOUSE_STYLE_KEYS, houseDoorway, houseFixtureX, houseFront } from '../public/js/features/homes-feature.js?v=db691cd7';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const SITE_DIR = process.env.GRODDLE_SITE_DIR || join(root, '../groddle-afternoon-site');

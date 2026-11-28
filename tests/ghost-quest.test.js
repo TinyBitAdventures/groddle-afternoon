@@ -27,7 +27,7 @@ import {
   rememberWithFadedHeart,
   isPhantomHauntStreet,
 } from '../public/js/ghost-quest.js?v=5f3cc133';
-import { createQuestState, parseQuestConversation } from '../public/js/quests.js?v=73ccda70';
+import { createQuestState, parseQuestConversation } from '../public/js/quests.js?v=4c8f3a10';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 

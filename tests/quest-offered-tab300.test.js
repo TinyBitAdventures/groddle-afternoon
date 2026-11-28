@@ -12,10 +12,10 @@ import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { getQuestCatalog, loadContentCatalogsFromDir, resetContentCatalogs } from '../public/js/content-catalogs.js?v=c6a77ac9';
-import { createQuestState } from '../public/js/quests.js?v=73ccda70';
-import { listDeclinedOffers, markOffered, offerCanWait, putOffOffer, waitingOffers } from '../public/js/quest-offers.js?v=0aa183fc';
-import { questOffersFeature, waitingOfferCards } from '../public/js/features/quest-offers-feature.js?v=2f4aa1b2';
+import { getQuestCatalog, loadContentCatalogsFromDir, resetContentCatalogs } from '../public/js/content-catalogs.js?v=b0f96eae';
+import { createQuestState } from '../public/js/quests.js?v=4c8f3a10';
+import { listDeclinedOffers, markOffered, offerCanWait, putOffOffer, waitingOffers } from '../public/js/quest-offers.js?v=dfecc1b4';
+import { questOffersFeature, waitingOfferCards } from '../public/js/features/quest-offers-feature.js?v=ec616a70';
 import { questCardTab } from '../public/js/ui/quest-sheet.js?v=7409d5d8';
 
 const PUBLIC = join(dirname(fileURLToPath(import.meta.url)), '../public');

@@ -12,7 +12,7 @@ import {
   inspectPlayerSave,
   migratePlayerSave,
   serializePlayerSave,
-} from '../public/js/player-save.js?v=5e05161a';
+} from '../public/js/player-save.js?v=c691c143';
 import { UNREADABLE_SAVE_KEY, createSaveSync, keepUnreadableSave } from '../public/js/save-store.js?v=1ccb1d6b';
 
 const memoryStorage = (seed = {}) => {
