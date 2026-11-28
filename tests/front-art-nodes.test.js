@@ -24,8 +24,8 @@ import {
   populationForStreet,
   setStreetEcologyCatalog,
   streetReservedSpots,
-} from '../public/js/street-ecology.js?v=da5177b2';
-import { UNPLANNED_RESOURCE_CLASSES, resourceSpawnPlan } from '../public/js/features/resource-nodes-feature.js?v=1c2c7f81';
+} from '../public/js/street-ecology.js?v=38ad6f13';
+import { UNPLANNED_RESOURCE_CLASSES, resourceSpawnPlan } from '../public/js/features/resource-nodes-feature.js?v=5922a1ed';
 import { placementRequests } from '../tools/build-realtime-objects.mjs';
 import { applyStreetIndex, loadStreetDataFromFs, setZoneStreetsShown } from '../public/js/street-loader.js?v=10376267';
 

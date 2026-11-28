@@ -36,7 +36,7 @@
 import { OVERLAY_USES, playCountdownArt, playWindowOverlay, windowOverlayFit } from '../overlays.js?v=91dcee74';
 import { exposeQA } from '../qa-gate.js?v=f4e2cd82';
 import { parseSeasonDate } from '../seasons.js?v=5d8f545a';
-import { fireworksUnder, viewport } from './spirit-loneliness-feature.js?v=48a60872';
+import { fireworksUnder, viewport } from './spirit-loneliness-feature.js?v=93837a9d';
 import {
   DRAGON_AT,
   NEW_UR_TEXT,

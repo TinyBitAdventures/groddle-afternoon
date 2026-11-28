@@ -12,7 +12,7 @@
  * (assets/content/puzzle-triggers.json), reporting each moment below as it fires.
  * The Annex (LNVIL1E14M13K5I) was not archived and stays a drawn scene.
  */
-import { quoinPay } from './quoins.js?v=f9187edb';
+import { quoinPay } from './quoins.js?v=4d75aec0';
 
 export const SUMMERS_DAY_QUEST_ID = 'blue_and_white_part1';
 export const SUMMERS_DAY_REPEAT_QUEST_ID = 'blue_and_white_part2';

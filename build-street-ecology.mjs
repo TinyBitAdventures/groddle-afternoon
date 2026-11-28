@@ -438,6 +438,7 @@ mergeZoneEcology(catalog, listZones(files(root)).map((z) => z.zone));
 try {
   const before = JSON.parse(await readFile(outputPath, 'utf8'));
   if (before.unreachedFloors) Object.assign(catalog, { unreachedFloorsNote: before.unreachedFloorsNote, unreachedFloors: before.unreachedFloors });
+  if (before.plainUnreachedFloors) Object.assign(catalog, { plainUnreachedFloorsNote: before.plainUnreachedFloorsNote, plainUnreachedFloors: before.plainUnreachedFloors });
 } catch {
   // No catalog yet: run tools/ecology/build-unreached-floors.mjs after this.
 }

@@ -49,7 +49,7 @@
 
 import { ensureItem } from '../inventory.js?v=3be7988a';
 import { isItemFloor, platformYAt } from '../street-model.js?v=a9a05f9d';
-import { SOIL_FOOTPRINT, SOIL_STEADY_FLOOR, getStreetEcologyCatalog, streetEcologyAliases } from '../street-ecology.js?v=da5177b2';
+import { SOIL_FOOTPRINT, SOIL_STEADY_FLOOR, getStreetEcologyCatalog, streetEcologyAliases } from '../street-ecology.js?v=38ad6f13';
 import { trantStatusLabel } from '../trants.js?v=cf0fe1a3';
 import { loadTrantLook, trantLook } from '../trant-looks.js?v=0cd55bd4';
 import { standOnFeet } from '../sprite-feet.js?v=6283b688';
@@ -77,7 +77,7 @@ import {
 import { frameTexture, isLoaded, onFailed, onLoaded, textureFromUrl } from '../textures.js?v=b8e38103';
 import { HOE_TOOLS, firstWorkingTool } from '../tools.js?v=4156bba8';
 import { slugsFromEffects } from '../speech-slugs.js?v=d5cc8b6f';
-import { plotSignature, replayRng } from '../shared-patches.js?v=ddc07102';
+import { plotSignature, replayRng } from '../shared-patches.js?v=d00594c6';
 import { topUpMetabolic } from '../metabolics.js?v=48f784bf';
 
 export const PATCHES_FEATURE_ID = 'patches';

@@ -26,11 +26,11 @@ import {
   quoinRespawnMs,
   streetQuoinClass,
   streetQuoinPoints,
-} from '../public/js/quoins.js?v=f9187edb';
+} from '../public/js/quoins.js?v=4d75aec0';
 import { QUOIN_COIN_COUNTS, QUOIN_SPOTS } from '../public/js/quoin-spots-data.js?v=7c343cbc';
 import { streetQuoinLayout } from '../tools/build-realtime-quoins.mjs';
 import { applyStreetIndex, loadStreetDataFromFs, setZoneStreetsShown } from '../public/js/street-loader.js?v=10376267';
-import { setStreetEcologyCatalog } from '../public/js/street-ecology.js?v=da5177b2';
+import { setStreetEcologyCatalog } from '../public/js/street-ecology.js?v=38ad6f13';
 
 const root = join(import.meta.dirname, '..');
 const read = (path) => JSON.parse(readFileSync(join(root, path), 'utf8'));

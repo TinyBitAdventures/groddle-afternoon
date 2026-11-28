@@ -20,14 +20,14 @@ import {
   rulesVerbId,
   surfaceNear,
   verbTooltip,
-} from '../public/js/features/resource-nodes-feature.js?v=1c2c7f81';
+} from '../public/js/features/resource-nodes-feature.js?v=5922a1ed';
 import {
   RESOURCE_NODE_CATALOG,
   RESOURCE_NODE_CLASS_IDS,
   createResourceNode,
 } from '../public/js/resource-nodes.js?v=c2eb46b1';
 import { createFeatureHost, normalizeFeatureSlices } from '../public/js/feature-host.js?v=b87e2cbc';
-import { populationForStreet, planStreetPlacements } from '../public/js/street-ecology.js?v=da5177b2';
+import { populationForStreet, planStreetPlacements } from '../public/js/street-ecology.js?v=38ad6f13';
 import { STORE_CATALOG } from '../public/js/store-catalog.js?v=c6ebb2bd';
 
 const population = (classes) => ({ resourceNodeClasses: classes });

@@ -16,7 +16,7 @@ import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { join, relative } from 'node:path';
 import { DROP_THROUGH, dropPoint, dropTargetIds, registerDropTarget, resolveDrop, currentDrag, beginDrag, dragDrop, endDrag } from '../public/js/drop-targets.js?v=d5325567';
 import { dropPage, fakeSlot, touchDrop, mouseDrop } from './drop-fake.js';
-import { worldDropFeature } from '../public/js/features/world-drop-feature.js?v=9c6c24c2';
+import { worldDropFeature } from '../public/js/features/world-drop-feature.js?v=fa771734';
 import { gardenGuanoFeature } from '../public/js/features/garden-guano-feature.js?v=3faeddbb';
 import { createGarden } from '../public/js/garden.js?v=fefa7bcd';
 

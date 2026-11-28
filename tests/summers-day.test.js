@@ -53,7 +53,7 @@ import {
   summersDayAnnexAtExit,
   summersDayAnnexStreet,
   summersDayStreetPoint,
-} from '../public/js/summers-day.js?v=86a3142d';
+} from '../public/js/summers-day.js?v=5ffa5056';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 

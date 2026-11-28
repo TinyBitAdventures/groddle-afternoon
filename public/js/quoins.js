@@ -171,22 +171,23 @@ export function measuredStreetQuoins(streetTsid) {
 }
 
 /**
- * Planned quoins moved into a new player's reach (after v0.79.0 re-placed Nottis's and Drifa's streets):
- * the planner counts a floor only a triple jump lands on as reached (unreachedFloors, G529), and a
- * triple jump is an imagination upgrade, so these four hung over ice blocks 400 px or more over the
- * path. Glitch set its quoins by hand where players reach them (quoin.js obey_physics false); none of
- * these streets has a 2012 snap of its quoins. Each moves to the nearest spot a plain jump reaches,
- * at the height its index gave it, clear of the signposts, the other quoins and the front art.
+ * Planned quoins moved by hand into a new player's reach (after v0.79.0 re-placed Nottis's and Drifa's
+ * streets): these hung over ice blocks 400 px or more over the path that only a triple jump gets onto,
+ * an imagination upgrade. The planner now moves such a quoin itself, to the nearest floor a plain jump
+ * reaches (street-ecology.js NEW_PLAYER_REACH_GROUPS); these keep the spots they were given by hand
+ * before it did, just past the signposts, rather than the planner's (Candy Cane Lane's other one is
+ * where the planner puts it). Glitch set its quoins by hand where players reach them (quoin.js
+ * obey_physics false); none of these streets has a 2012 snap of its quoins.
  * { street tsid: [[planned floor x, floor y, coin x, coin y]] } (screen px; the coin's own centre,
- * exactY). tests/nottis-drifa-reach.test.js walks every street with the game's stepper.
+ * exactY). tests/new-player-reach.test.js walks every street with the game's stepper.
  */
 export const QUOIN_REACH_MOVES = Object.freeze({
-  // Candy Cane Lane: two on the ice block over its east signpost, down to the path either side of the post.
-  GHF583RFVLD3IUE: Object.freeze([[4478.3, 337.3, 4471.3, 795], [4051, 337, 4169.3, 763.8]]),
-  // Bright Day: on the ledge over its west signpost, down to the path just past the post.
-  GHF8LE0Q0UC3QEF: Object.freeze([[204.3, 439.2, 454.5, 832.5]]),
+  // Candy Cane Lane: off the ice block over its east signpost, down to the path just west of the post.
+  GHF583RFVLD3IUE: Object.freeze([[4075.5, 850.5, 4169.3, 763.8]]),
+  // Bright Day: off the ledge over its west signpost, down to the path just past the post.
+  GHF8LE0Q0UC3QEF: Object.freeze([[130, 922.1, 454.5, 832.5]]),
   // Drooping Drift: the same ledge over its west signpost (the two streets share that ledge, line for line).
-  GHFK965MT8D3G9E: Object.freeze([[204.3, 439.2, 449.3, 868.3]]),
+  GHFK965MT8D3G9E: Object.freeze([[124.3, 892.3, 449.3, 868.3]]),
 });
 
 /** The planned spots with QUOIN_REACH_MOVES applied (a moved one is the coin's own spot, exactY). */

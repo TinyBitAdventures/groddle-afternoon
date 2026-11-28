@@ -12,7 +12,7 @@ import { describe, it } from 'node:test';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-import { quoinTouches } from '../public/js/quoins.js?v=f9187edb';
+import { quoinTouches } from '../public/js/quoins.js?v=4d75aec0';
 
 const root = join(import.meta.dirname, '..');
 const game = readFileSync(join(root, 'public/game.js'), 'utf8');

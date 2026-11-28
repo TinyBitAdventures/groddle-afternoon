@@ -33,7 +33,7 @@ import { requireServer, serverPath } from './repos.mjs';
 
 import { STREET_INDEX, applyStreetIndex, loadStreetDataFromFs, setZoneStreetsShown } from '../public/js/street-loader.js?v=10376267';
 import { streetWidth } from '../public/js/street-model.js?v=a9a05f9d';
-import { entranceScreenX } from '../public/js/features/foxes-feature.js?v=457450c1';
+import { entranceScreenX } from '../public/js/features/foxes-feature.js?v=424a176c';
 import { preserveLayout } from '../public/js/foxes.js?v=c0ce235f';
 import { FOX_TEXT, FOX_TIMING } from '../public/js/foxes.js?v=c0ce235f';
 import { FOX_LEAVE_MS, FOX_PLAYERS_PER_FOX } from '../public/js/foxes-mp.js?v=20b2e4f9';

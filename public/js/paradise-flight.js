@@ -1,7 +1,7 @@
 /** Source-authored Ticket to Paradise economy and reusable flight-course state. */
 
 import { EXTRA_PARADISE_COURSES, paradiseReward } from './paradise-courses.js?v=eb5c7fd9';
-import { qrazyRewardForLevel, quoinPay, quoinTouches } from './quoins.js?v=f9187edb';
+import { qrazyRewardForLevel, quoinPay, quoinTouches } from './quoins.js?v=4d75aec0';
 import { getGameDayKey } from './game-day.js?v=57fecfcb';
 import { RADIAL_ARRIVAL_EVENTS, applyGeometryEffects, createRadialSession, radialFire } from './radial-heights.js?v=90fcc768';
 import { avatarHeadReach, barriersScreen, blockBarrierCrossing, headCeiling, isStandable, platformYAt, platformsScreen } from './street-model.js?v=a9a05f9d';

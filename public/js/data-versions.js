@@ -51,7 +51,7 @@
       "assets/content/signpost-graph.json": "96367329",
       "assets/content/sound-keys.json": "f1fde819",
       "assets/content/street-arrivals.json": "ae6bc236",
-      "assets/content/street-ecology.json": "636f9e18",
+      "assets/content/street-ecology.json": "fe32457b",
       "assets/content/street-jobs.json": "52f091d9",
       "assets/content/style-profiles.json": "fab21ef9",
       "assets/content/trade-items.json": "8688adf2",

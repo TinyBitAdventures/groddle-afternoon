@@ -639,6 +639,21 @@ export function unreachedFloorsFor(tsid, source = catalog) {
   return null;
 }
 
+/**
+ * The floor runs a plain jump does not get to on a street ({ [line id]: [[x1, x2]] }, screen x),
+ * from the catalog's plainUnreachedFloors section (tools/ecology/build-unreached-floors.mjs: the same
+ * reach graph from every arrival with a plain jump alone). unreachedFloorsFor counts a triple jump
+ * (G529), an imagination upgrade a new player lacks, so a floor only a triple jump lands on is reached
+ * there and not here: the planner keeps NEW_PLAYER_REACH_GROUPS off these. Null: none known.
+ */
+export function plainUnreachedFloorsFor(tsid, source = catalog) {
+  for (const alias of streetEcologyAliases(tsid)) {
+    const row = source?.plainUnreachedFloors?.[alias];
+    if (row) return parseUnreachedRow(row);
+  }
+  return null;
+}
+
 const unreachedParsed = new WeakMap();
 function parseUnreachedRow(row) {
   if (unreachedParsed.has(row)) return unreachedParsed.get(row);
@@ -1182,6 +1197,27 @@ export const PERCH_DROP_PX = 150;
  */
 export const DECK_RUN_PX = 240;
 export const DECK_GROUPS = Object.freeze(['rocks']);
+
+/**
+ * The planned things a player has to touch, kept where a new player gets to: a quoin is taken by
+ * touching it, a rock mined from beside it. The planner counts a floor only a triple jump lands on as
+ * reached (unreachedFloorsFor, G529), but a triple jump is an imagination upgrade, so one of these
+ * planned there moves to the nearest floor a plain jump reaches (plainUnreachedFloorsFor,
+ * planStreetPlacements). Glitch set its rocks and quoins by hand (rock_*.js, quoin.js obey_physics
+ * false) where players reach them; the ones measured on the 2012 snaps stay where Glitch had them.
+ */
+export const NEW_PLAYER_REACH_GROUPS = Object.freeze(['rocks', 'quoins']);
+
+/**
+ * The last group a rock moved into reach looks ahead to (planStreetPlacements laterSpots): the spots
+ * the groups after it up to the quoins would take had nothing moved, which it keeps off while it
+ * can, so they are planned where they were. Every caller lays a street out with the same groups up to
+ * the quoins (tools/build-realtime-quoins.mjs placementRequests), so the server's rocks and a page's agree.
+ */
+const REACH_LOOKAHEAD_END = 'quoins';
+
+/** The tier a later group's spot crowding a thing moved into reach adds: above every other rule's, so it is taken only when nothing else is left. */
+const REACH_MOVED_TIER = 1024;
 
 /**
  * G852, #394: rocks on tree branches. A deck (DECK_RUN_PX) is any upper floor 240 px wide, and a
@@ -2004,7 +2040,7 @@ function nearMeasuredQuoin(tsid) {
 const LINE_OVER_PX = 12;
 
 /** Build dense, stable candidates along every reachable floor. */
-export function buildPlatformCandidates(platforms, { worldW = 2500, seed = '', unreached = null } = {}) {
+export function buildPlatformCandidates(platforms, { worldW = 2500, seed = '', unreached = null, plainUnreached = null } = {}) {
   // Only lines the avatar stands on (street-model.js isStandable): an underside or
   // ceiling (pc_perm 1) floats a tree (the cave roof on Meadow's Edge), and a soft
   // line (pc_perm 0) is one the player falls through, so a spot there (the arrival
@@ -2086,6 +2122,8 @@ export function buildPlatformCandidates(platforms, { worldW = 2500, seed = '', u
         // STEADY_FLOOR_GROUPS: the line's rise over run and its floor run's width.
         slope: Math.abs(platform.y2 - platform.y1) / Math.max(1e-6, width),
         run: item ? runAt(spans.get(platform), x) : 0,
+        // On a run a plain jump does not get to (plainUnreachedFloorsFor): NEW_PLAYER_REACH_GROUPS move off it.
+        ...(plainUnreached && inUnreachedRun(plainUnreached, platform, x) ? { plainOut: true } : {}),
       });
     }
   }
@@ -2143,6 +2181,11 @@ function scaledDistance(a, b, verticalScale = 1.75) {
  *
  * Ticket 64: no spot is on a floor run no arrival reaches (`unreached`, by default
  * the catalog's unreachedFloorsFor(`tsid`), `tsid` defaulting to the seed).
+ * A NEW_PLAYER_REACH_GROUPS thing (a rock, a quoin) planned on a run a plain jump does not get to
+ * (`plainUnreached`, by default plainUnreachedFloorsFor(`tsid`): a floor only a triple jump lands on)
+ * moves at its group's turn to the nearest spot a plain jump reaches (listed under `intoReach`,
+ * { key, index, from }; `plainUnreached: null` plans without it); the groups after it are planned as
+ * they were but where they would crowd it (planStreetPlacements reachMoved, laterSpots).
  *
  * A request may carry `fixed` points ({ x, y, w?, h?, index? }: rocks and trees measured on the
  * snaps, rockPlacementRequest, treePlacementRequest): they
@@ -2157,9 +2200,9 @@ function scaledDistance(a, b, verticalScale = 1.75) {
 export function planStreetPlacements(
   platforms,
   requests,
-  { worldW = 2500, seed = '', reserved = [], tsid = seed, unreached = unreachedFloorsFor(tsid), reseat = true } = {}
+  { worldW = 2500, seed = '', reserved = [], tsid = seed, unreached = unreachedFloorsFor(tsid), plainUnreached = plainUnreachedFloorsFor(tsid), reseat = true } = {}
 ) {
-  const candidates = buildPlatformCandidates(platforms, { worldW, seed, unreached });
+  const candidates = buildPlatformCandidates(platforms, { worldW, seed, unreached, plainUnreached });
   // Front decos (frontDecoCovers) keep nothing clear; they only rank the spots they hide.
   const fronts = (reserved || []).filter((p) => p?.front && p.block);
   const walkways = frontDecoWalkways(platforms, fronts);
@@ -2212,10 +2255,29 @@ export function planStreetPlacements(
   const edgeCache = new Map();
   const fits = new Map();
   const moved = [];
+  // NEW_PLAYER_REACH_GROUPS things moved into a new player's reach, where they now stand (their old spots are ghosts in `occupied`).
+  const reachMoved = [];
+  const intoReach = [];
+  // A moved quoin hangs over its floor: later groups may stand under it, so only the others are kept clear.
+  const crowdsReachMoved = (candidate, clearance) => reachMoved.some((m) => m.key !== 'quoins' && scaledDistance(candidate, m) < Math.max(1, clearance + m.clearance));
+  // The spots the groups after a request (by its index) up to REACH_LOOKAHEAD_END take when nothing moves into reach.
+  let lookahead = null;
+  const laterSpots = (requestIndex) => {
+    if (!lookahead) {
+      const end = (requests || []).findIndex((r) => r?.key === REACH_LOOKAHEAD_END);
+      const base = end > requestIndex
+        ? planStreetPlacements(platforms, requests.slice(0, end + 1), { worldW, seed, reserved, tsid, unreached, plainUnreached: null, reseat })
+        : null;
+      lookahead = { base, end };
+    }
+    const { base, end } = lookahead;
+    if (!base) return [];
+    return requests.slice(requestIndex + 1, end + 1).flatMap((r) => (base.groups[r?.key] || []).filter((p) => !p.fixed).map((p) => ({ ...p, clearance: whole(r?.clearance, 40, 600) })));
+  };
   // R43 (#680): the planned rocks' and nodes' art boxes, where they stand once seated (NODE_ART_BOX).
   const nodeArt = [];
 
-  for (const request of requests || []) {
+  for (const [requestIndex, request] of (requests || []).entries()) {
     const count = whole(request?.count, 0, 40);
     const clearance = whole(request?.clearance, 40, 600);
     // Fixed points with an `index` (measured trees, treePlacementRequest) stand at that index in the
@@ -2322,6 +2384,42 @@ export function planStreetPlacements(
       const inZone = request.key === 'furnitureStone' && zone ? (c) => !zoneMiss(c) : null;
       fits.set(request.key, { fit, loose, inZone, miss: (c) => Math.ceil(zoneMiss(c) / 400), pool });
     }
+    // The tier a spot ranks in for this group (lower first), `nearest` its crowding (the planner's score
+    // term: its distance to the nearest taken spot over both clearances). The loop below and the
+    // new-player reseat after it (NEW_PLAYER_REACH_GROUPS) rank by the same rules.
+    const tierOf = (candidate, nearest) => {
+      const perch = !perching && (candidate.under || 0) >= footprint && !(deck && (candidate.run || 0) >= DECK_RUN_PX);
+      // Big scenery: a clear perch before a crowded floor; a walking animal stays on
+      // the floor while it has room, crowded or not (it walks off as others come),
+      // never planted in a tree, rock or stall or on another walker, and, before a
+      // crowded spot, its walk clear of them (walkInScenery).
+      const scenery = walker ? walkInScenery(candidate, request.key, occupied) : 0;
+      // Ticket 64 follow-up: a tree, rock or Piggy behind a floor from beside it only when no other spot is left.
+      let hidden = 0;
+      // #490: the other nodes' boxes (NODE_FRONT_KEYS) are not ranked here; reseatHiddenNodes moves only the covered ones.
+      if (REACH_BOXES[request.key] || FRONT_FIND_KEYS.includes(request.key)) {
+        const k = `${request.key}:${candidate.id}`;
+        if (!hiddenCache.has(k)) hiddenCache.set(k, (REACH_BOXES[request.key] && hiddenBehindFloor(platforms, candidate, request.key)) || hiddenBehindFront(candidate, request.key, fronts));
+        hidden = hiddenCache.get(k) ? 32 : 0;
+      }
+      // Ticket 118: rooted scenery on or behind a front deco that players walk along, last too.
+      if (!hidden && height > 0 && footAtWalkway(candidate, footprint, walkways)) hidden = 32;
+      // Big things on a floor steeper than BIG_THING_MAX_SLOPE only when nothing else is left.
+      // G1061: a SLOPE_RULINGS spot (one hand-ruled floor on one street) is not too steep for its group.
+      const tooSteep = maxSlope != null && (candidate.slope || 0) > maxSlope && !slopeRuled(tsid, request.key, candidate) ? 64 : 0;
+      // G852: big things and walkers up a tree's branch art only when nothing else is left.
+      const onBranchArt = branchFree && onBranch.has(candidate.id) ? 128 : 0;
+      // #575: a garden bed in an animal pen or on a fence (penArtCovers) only when nothing else is left.
+      const inPen = penFree && inPenArt(candidate, footprint, height, pens) ? 256 : 0;
+      const miss = zoneMiss(candidate);
+      const outOfZone = miss > 0 ? 8 + Math.min(20, Math.ceil(miss / 400)) : 0;
+      // #581: a rock that would hang an end over the air, only when nothing else is left.
+      const overAir = candidate.overAir ? 16 : 0;
+      const unlevel = uneven(candidate) ? 64 : 0;
+      return inPen + onBranchArt + outOfZone + tooSteep + overAir + unlevel + (footprint > 0
+        ? walker ? (perch ? 8 : 0) + (scenery === 2 ? 4 : 0) + (nearest < 1 ? 2 : 0) + (scenery === 1 ? 1 : 0) : (perch ? 1 : 0) + (nearest < 1 ? 2 : 0)
+        : 0) + (covers.has(candidate.id) ? (walker ? 16 : crownOnly.has(candidate.id) ? 3 : 4) : 0) + hidden;
+    };
     for (let index = groups[request.key].length; index < count; index += 1) {
       if (fixedAt?.has(index)) {
         groups[request.key].push(fixedAt.get(index));
@@ -2383,37 +2481,9 @@ export function planStreetPlacements(
         const edgeBias = Math.min(candidate.x, worldW - candidate.x) / Math.max(1, worldW) * 0.08;
         const jitter = (stableEcologyHash(`${seed}:${request.key}:${index}:${candidate.id}`) % 1000) / 100000;
         const score = nearest + centerBias + edgeBias + jitter;
-        const perch = !perching && (candidate.under || 0) >= footprint && !(deck && (candidate.run || 0) >= DECK_RUN_PX);
-        // Big scenery: a clear perch before a crowded floor; a walking animal stays on
-        // the floor while it has room, crowded or not (it walks off as others come),
-        // never planted in a tree, rock or stall or on another walker, and, before a
-        // crowded spot, its walk clear of them (walkInScenery).
-        const scenery = walker ? walkInScenery(candidate, request.key, occupied) : 0;
-        // Ticket 64 follow-up: a tree, rock or Piggy behind a floor from beside it only when no other spot is left.
-        let hidden = 0;
-        // #490: the other nodes' boxes (NODE_FRONT_KEYS) are not ranked here; reseatHiddenNodes moves only the covered ones.
-        if (REACH_BOXES[request.key] || FRONT_FIND_KEYS.includes(request.key)) {
-          const k = `${request.key}:${candidate.id}`;
-          if (!hiddenCache.has(k)) hiddenCache.set(k, (REACH_BOXES[request.key] && hiddenBehindFloor(platforms, candidate, request.key)) || hiddenBehindFront(candidate, request.key, fronts));
-          hidden = hiddenCache.get(k) ? 32 : 0;
-        }
-        // Ticket 118: rooted scenery on or behind a front deco that players walk along, last too.
-        if (!hidden && height > 0 && footAtWalkway(candidate, footprint, walkways)) hidden = 32;
-        // Big things on a floor steeper than BIG_THING_MAX_SLOPE only when nothing else is left.
-        // G1061: a SLOPE_RULINGS spot (one hand-ruled floor on one street) is not too steep for its group.
-        const tooSteep = maxSlope != null && (candidate.slope || 0) > maxSlope && !slopeRuled(tsid, request.key, candidate) ? 64 : 0;
-        // G852: big things and walkers up a tree's branch art only when nothing else is left.
-        const onBranchArt = branchFree && onBranch.has(candidate.id) ? 128 : 0;
-        // #575: a garden bed in an animal pen or on a fence (penArtCovers) only when nothing else is left.
-        const inPen = penFree && inPenArt(candidate, footprint, height, pens) ? 256 : 0;
-        const miss = zoneMiss(candidate);
-        const outOfZone = miss > 0 ? 8 + Math.min(20, Math.ceil(miss / 400)) : 0;
-        // #581: a rock that would hang an end over the air, only when nothing else is left.
-        const overAir = candidate.overAir ? 16 : 0;
-        const unlevel = uneven(candidate) ? 64 : 0;
-        const tier = inPen + onBranchArt + outOfZone + tooSteep + overAir + unlevel + (footprint > 0
-          ? walker ? (perch ? 8 : 0) + (scenery === 2 ? 4 : 0) + (nearest < 1 ? 2 : 0) + (scenery === 1 ? 1 : 0) : (perch ? 1 : 0) + (nearest < 1 ? 2 : 0)
-          : 0) + (covers.has(candidate.id) ? (walker ? 16 : crownOnly.has(candidate.id) ? 3 : 4) : 0) + hidden;
+        // A thing moved into a new player's reach (NEW_PLAYER_REACH_GROUPS) is not in `occupied` (its old
+        // spot is, as a ghost): a spot crowding it ranks last instead, so only a thing planned there moves.
+        const tier = tierOf(candidate, nearest) + (reachMoved.length && crowdsReachMoved(candidate, clearance) ? REACH_MOVED_TIER : 0);
         if (tier < bestTier || (tier === bestTier && score > bestScore)) {
           bestTier = tier;
           bestScore = score;
@@ -2438,13 +2508,61 @@ export function planStreetPlacements(
     // whatever it plans after them, has them at the same spots. Moved after the whole plan, Lonkari
     // Line's Peat Bog stood where the page's mailbox had been planned clear of its first spot.
     // `reseat: false` (tests only): the plan as it was before #490, to show what reseatHiddenNodes moved.
-    if (reseat && fits.has(request.key)) moved.push(...reseatHiddenNodes({ groups, occupied, candidates, used, fronts, fits, keys: [request.key] }));
+    if (reseat && fits.has(request.key)) moved.push(...reseatHiddenNodes({ groups, occupied: reachMoved.length ? [...occupied, ...reachMoved.filter((m) => m.key !== 'quoins')] : occupied, candidates, used, fronts, fits, keys: [request.key] }));
+    // A rock or quoin (NEW_PLAYER_REACH_GROUPS) on a floor only a triple jump lands on (`plainOut`) moves
+    // now to the nearest free spot a plain jump reaches, ranked as the loop above ranks (tierOf; a rock
+    // also keeps off the spots the later groups would take, laterSpots), then keeping half of every
+    // other thing's clearance, then nearest. Its old spot stays taken (a `ghost` in `occupied`, its id
+    // still used, its art still kept clear) and its new one is kept in `reachMoved`, which a later
+    // group ranks last (REACH_MOVED_TIER) rather than scores against: so every group after it is
+    // planned as before but where it would crowd a moved rock, and a street's layout changes only there.
+    const ghosts = new Map();
+    if (plainUnreached && NEW_PLAYER_REACH_GROUPS.includes(request.key)) {
+      let later = null;
+      for (const [index, point] of groups[request.key].entries()) {
+        if (!point || point.fixed || !pool.find((c) => c.id === point.id)?.plainOut) continue;
+        // A thing later groups keep clear of (not a quoin) also keeps off the spots they would take.
+        if (!later) later = request.key === 'quoins' ? [] : laterSpots(requestIndex);
+        let best = null;
+        let bestRank = null;
+        for (const c of pool) {
+          if (c.plainOut || used.has(c.id) || c.item === false || !steadyAt(c) || measuredQuoin?.(c)) continue;
+          let near = 2;
+          for (const o of occupied) if (o !== point && !o.ghost) near = Math.min(near, scaledDistance(c, o) / Math.max(1, clearance + o.clearance));
+          for (const o of reachMoved) near = Math.min(near, scaledDistance(c, o) / Math.max(1, clearance + o.clearance));
+          // Half of every other thing's clearance at least, as reseatHiddenNodes keeps (a rock's tierOf
+          // already ranks a spot inside a whole clearance after one clear of it), then the least crowded.
+          const crowd = near >= 0.5 ? 0 : 2;
+          const d = Math.abs(c.x - point.x) + Math.abs(c.y - point.y);
+          const cramped = footprint > 0 && (c.room || 0) < Math.min(footprint, point.room || footprint) ? 8 : 0;
+          // Crowding a later group's spot ranks after crowding a rock (tierOf's 2) and before covering a fixture (its 4).
+          const crowdsLater = later.some((o) => scaledDistance(c, o) < Math.max(1, clearance + o.clearance)) ? 3 : 0;
+          const rank = [tierOf(c, near) + cramped + crowdsLater, crowd, crowd === 2 ? -near : d];
+          if (bestRank && (rank[0] - bestRank[0] || rank[1] - bestRank[1] || rank[2] - bestRank[2]) >= 0) continue;
+          best = c;
+          bestRank = rank;
+        }
+        if (!best) continue;
+        const ghost = { ...point, ghost: true };
+        occupied[occupied.indexOf(point)] = ghost;
+        ghosts.set(point, ghost);
+        reachMoved.push(point);
+        used.add(best.id);
+        intoReach.push({ key: request.key, index, from: { x: point.x, y: point.y } });
+        Object.assign(point, { x: best.x, y: best.y, id: best.id, room: best.room || 0 });
+        if (best.afloat) point.afloat = true;
+        else delete point.afloat;
+      }
+    }
     let plannedIndex = 0;
     for (const point of groups[request.key]) {
       if (!point || point.fixed) continue;
       const size = nodeArtBox(request, point, plannedIndex, tsid);
       plannedIndex += 1;
-      if (size) nodeArt.push({ ...point, block: { l: point.x - size[0] / 2, r: point.x + size[0] / 2, t: point.y - size[1], b: point.y } });
+      if (!size) continue;
+      for (const at of ghosts.has(point) ? [point, ghosts.get(point)] : [point]) {
+        nodeArt.push({ ...at, block: { l: at.x - size[0] / 2, r: at.x + size[0] / 2, t: at.y - size[1], b: at.y } });
+      }
     }
     // G1236: a planned shrine, vendor or piece of street furniture is a thing players click, kept
     // clear like a signpost by every group after it (its art's box, FRONT_BOXES), where it stands.
@@ -2459,7 +2577,7 @@ export function planStreetPlacements(
   }
 
   const seated = seatOnFloor(groups, requests, platforms);
-  return { seed: String(seed), groups, occupied, candidateCount: candidates.length, fallbacks, perches, blocked, steep, branch, moved, seated };
+  return { seed: String(seed), groups, occupied: [...occupied.filter((p) => !p.ghost), ...reachMoved], candidateCount: candidates.length, fallbacks, perches, blocked, steep, branch, moved, intoReach, seated };
 }
 
 /**

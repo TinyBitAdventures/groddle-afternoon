@@ -12,13 +12,17 @@
  * signpost arm and door leading to it, as tools/builder/calibrate.mjs), the
  * builder's reach graph (js/builder/reach-graph.js) runs from those arrivals
  * with each of UNREACHED_JUMPS (a plain jump and triple jumps up to about a Big 'Un's, rising
- * as one: G529), so only floors no jump of any kind gets to are listed. A swim street or a street whose
+ * as one: G529), so only floors no jump of any kind gets to are listed. The plain jump's own run is
+ * kept too (plainUnreachedFloors): a triple jump is an imagination upgrade a new player lacks, so the
+ * planner keeps the things a player must touch (rocks and quoins, NEW_PLAYER_REACH_GROUPS) off a floor
+ * only a triple jump lands on. A swim street or a street whose
  * location events change physics is left out (the model is only approximate
  * there), and so is a street nothing arrives at.
  *
  * It writes the `unreachedFloors` section of public/assets/content/street-ecology.json
  * ({ [street tsid]: { [line id]: "x1-x2 x1-x2" } }, screen x, the stand points
- * no arrival reaches, merged into runs), which every caller of the planner
+ * no arrival reaches, merged into runs) and the `plainUnreachedFloors` section (the same, for a plain
+ * jump alone), which every caller of the planner
  * already loads (setStreetEcologyCatalog), game and realtime builders alike.
  *
  *   node tools/ecology/build-unreached-floors.mjs            # all streets (a few minutes, all cores)
@@ -68,6 +72,8 @@ export function overlapRuns(a, b) {
   }
   return out.sort((x, y) => x[0] - y[0]);
 }
+/** The plainUnreachedFloors section's note in the catalog. */
+export const PLAIN_NOTE = 'Stand runs a plain jump does not reach from any arrival (a new player, no triple jump; tools/ecology/build-unreached-floors.mjs); the planner keeps rocks and quoins off them.';
 const ECOLOGY = join(GAME_DIR, 'public/assets/content/street-ecology.json');
 const json = (p) => JSON.parse(readFileSync(p, 'utf8'));
 
@@ -77,8 +83,25 @@ function approximate(street) {
   return Object.values(street.events || {}).flat().some((a) => a?.type === 'physics');
 }
 
-/** PURE: a street's unreached runs { [line]: [[x1, x2]] } from its arrivals, or null when not modelled. */
-export function unreachedFloorsOf(street, arrivals) {
+/** PURE: a list of { [line]: [[x1, x2]] } stand runs as the catalog keeps them ("x1-x2 x1-x2" a line), or null. */
+function runsRow(left) {
+  const runs = {};
+  const half = STAND_STEP / 2;
+  for (const [line, list] of Object.entries(left || {})) {
+    for (const [x1, x2] of list) (runs[line] ||= []).push(`${Math.round(x1 - half)}-${Math.round(x2 + half)}`);
+  }
+  // One string per line ("x1-x2 x1-x2"), so the catalog stays a line per floor.
+  const out = Object.fromEntries(Object.entries(runs).map(([line, list]) => [line, list.join(' ')]));
+  return Object.keys(out).length ? out : null;
+}
+
+/**
+ * PURE: a street's unreached runs from its arrivals, or null when not modelled: `all`, the runs no
+ * jump of any kind gets to (UNREACHED_JUMPS, the unreachedFloors section), and `plain`, the runs a
+ * plain jump does not get to (the plainUnreachedFloors section: a new player's reach, with no
+ * imagination upgrade; the planner keeps the rocks and quoins off them, NEW_PLAYER_REACH_GROUPS).
+ */
+export function unreachedFloorsBoth(street, arrivals) {
   if (!arrivals.length || approximate(street)) return null;
   const seen = new Set();
   const arr = arrivals.filter((a) => {
@@ -90,6 +113,7 @@ export function unreachedFloorsOf(street, arrivals) {
   const b = streetBuff(street).buff;
   const seenJump = new Set();
   let left = null;
+  let plain = null;
   for (const multiplier of UNREACHED_JUMPS) {
     const { jump, tripleJump } = unreachedJump(b, multiplier);
     const key = `${jump}:${tripleJump}`;
@@ -103,17 +127,22 @@ export function unreachedFloorsOf(street, arrivals) {
       if (s.reached || s.line == null) continue;
       (mine[s.line] ||= []).push([Math.min(s.x1, s.x2), Math.max(s.x1, s.x2)]);
     }
+    // UNREACHED_JUMPS starts with the plain jump (multiplier 1).
+    if (multiplier === 1) plain = Object.fromEntries(Object.entries(mine).map(([line, list]) => [line, list.slice()]));
     if (!left) left = mine;
     else for (const line of Object.keys(left)) left[line] = mine[line] ? overlapRuns(left[line], mine[line]) : [];
   }
-  const runs = {};
-  const half = STAND_STEP / 2;
-  for (const [line, list] of Object.entries(left || {})) {
-    for (const [x1, x2] of list) (runs[line] ||= []).push(`${Math.round(x1 - half)}-${Math.round(x2 + half)}`);
-  }
-  // One string per line ("x1-x2 x1-x2"), so the catalog stays a line per floor.
-  const out = Object.fromEntries(Object.entries(runs).map(([line, list]) => [line, list.join(' ')]));
-  return Object.keys(out).length ? out : null;
+  return { all: runsRow(left), plain: runsRow(plain) };
+}
+
+/** PURE: a street's unreached runs { [line]: "x1-x2 ..." } (no jump of any kind gets there), or null when not modelled. */
+export function unreachedFloorsOf(street, arrivals) {
+  return unreachedFloorsBoth(street, arrivals)?.all || null;
+}
+
+/** PURE: the runs a plain jump does not get to on a street (a new player's reach), or null. */
+export function plainUnreachedFloorsOf(street, arrivals) {
+  return unreachedFloorsBoth(street, arrivals)?.plain || null;
 }
 
 const twin = (tsid) => String(tsid || '').slice(1);
@@ -121,9 +150,9 @@ const twin = (tsid) => String(tsid || '').slice(1);
 function runJobs(jobs) {
   const out = [];
   for (const [tsid, path, arrivals] of jobs) {
-    let floors = null;
-    try { floors = unreachedFloorsOf(json(path), arrivals); } catch (err) { floors = null; out.push({ tsid, error: String(err?.message || err) }); continue; }
-    out.push({ tsid, floors });
+    let both = null;
+    try { both = unreachedFloorsBoth(json(path), arrivals); } catch (err) { out.push({ tsid, error: String(err?.message || err) }); continue; }
+    out.push({ tsid, floors: both?.all || null, plain: both?.plain || null });
   }
   return out;
 }
@@ -155,22 +184,26 @@ if (!isMainThread && workerData?.unreachedFloors) {
   const errors = results.filter((r) => r.error);
   if (errors.length) console.error(`errors: ${JSON.stringify(errors)}`);
   const section = {};
-  for (const r of results.sort((a, b) => a.tsid.localeCompare(b.tsid))) if (r.floors) section[r.tsid] = r.floors;
+  const plainSection = {};
+  for (const r of results.sort((a, b) => a.tsid.localeCompare(b.tsid))) {
+    if (r.floors) section[r.tsid] = r.floors;
+    if (r.plain) plainSection[r.tsid] = r.plain;
+  }
   if (args.includes('--print') || only) {
-    console.log(JSON.stringify(section, null, 1));
+    console.log(JSON.stringify({ unreachedFloors: section, plainUnreachedFloors: plainSection }, null, 1));
     process.exit(0);
   }
   const eco = json(ECOLOGY);
-  const next = { ...eco, unreachedFloorsNote: 'Ticket 64: stand runs no arrival reaches (tools/ecology/build-unreached-floors.mjs); the planner puts nothing there.', unreachedFloors: section };
+  const next = { ...eco, unreachedFloorsNote: 'Ticket 64: stand runs no arrival reaches (tools/ecology/build-unreached-floors.mjs); the planner puts nothing there.', unreachedFloors: section, plainUnreachedFloorsNote: PLAIN_NOTE, plainUnreachedFloors: plainSection };
   const text = `${JSON.stringify(next, null, 2)}\n`;
   if (check) {
     if (readFileSync(ECOLOGY, 'utf8') !== text) {
-      console.error('street-ecology.json unreachedFloors is stale: run node tools/ecology/build-unreached-floors.mjs');
+      console.error('street-ecology.json unreachedFloors or plainUnreachedFloors is stale: run node tools/ecology/build-unreached-floors.mjs');
       process.exit(1);
     }
-    console.log(`unreachedFloors up to date (${Object.keys(section).length} streets)`);
+    console.log(`unreachedFloors up to date (${Object.keys(section).length} streets, ${Object.keys(plainSection).length} with floors a plain jump misses)`);
   } else {
     writeFileSync(ECOLOGY, text);
-    console.log(`wrote unreachedFloors for ${Object.keys(section).length} streets`);
+    console.log(`wrote unreachedFloors for ${Object.keys(section).length} streets, plainUnreachedFloors for ${Object.keys(plainSection).length}`);
   }
 }

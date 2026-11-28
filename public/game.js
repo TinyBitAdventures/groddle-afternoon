@@ -2,9 +2,9 @@
  * Groddle Afternoon — original street geometry + layered decos
  * PixiJS 8 · locations-xml streets · CoU PNG decos · quests/items
  */
-import { ITEM_ICONS, ITEM_LABELS, getVerbsFor, ordinaryItems, runVerb } from './content.js?v=da2b8879';
+import { ITEM_ICONS, ITEM_LABELS, getVerbsFor, ordinaryItems, runVerb } from './content.js?v=1c0f4a21';
 import { createErrorOnce, createFeatureHost, createFrameStages } from './js/feature-host.js?v=b87e2cbc';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=17473ca8';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=0008cc75';
 import { VENDOR_STAND_IN_LABEL, VENDOR_NAME_LABEL } from './js/street-spirits.js?v=8ff6ed59';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, enterHintPick, hoverText, stackHoverLabel, groupHead, hoverRimShown, reachGlowTargets, spriteHasRimArt, rimArtParts, rimsTraceParts, trimmedIconUrl, drawTileArt } from './js/enter-chooser.js?v=b37c63e0';
 import { firstTendKey, STICK_TEND_DELAY_MS, STICK_TEND_DIRS, STICK_TEND_REPEAT_MS, stepTendKey, stepTendKeys, stickTendKey, tendKeyAction } from './js/garden-tend.js?v=a7470c4a';
@@ -143,7 +143,7 @@ import {
 } from './js/legalize-it.js?v=b31c33ad';
 import { HALL, HALL_DECOS, HALL_EXTRA_CHAIRS, HALL_OFFICE, HALL_QUESTIONS } from './js/bureaucratic-hall.js?v=29db1c45';
 import { STATION_X, stationArrival, stationScreen, surfaceStation } from './js/subway.js?v=ea6921ff';
-import { ALLEY, SHADY, drawAlley, inEnteredBox } from './js/quest-rooms/back-alley-set.js?v=0483a457';
+import { ALLEY, SHADY, drawAlley, inEnteredBox } from './js/quest-rooms/back-alley-set.js?v=436216e7';
 import { WINTER_WALK_BOUNDS, WINTER_WALK_PASSAGE } from './js/winter-walk-streets.js?v=c921bf92';
 import {
   WINTER_HAVEN_STREET_ID,
@@ -217,7 +217,7 @@ import {
   summersDayAnnexAtExit,
   summersDayAnnexStreet,
   summersDayStreetPoint,
-} from './js/summers-day.js?v=86a3142d';
+} from './js/summers-day.js?v=5ffa5056';
 import {
   ROOK_AVATAR_HIT,
   ROOK_CRUSHERS,
@@ -413,7 +413,7 @@ import {
   slipTerrainY,
   starlitMoonPlainAlpha,
   starlitRevealAlpha,
-} from './js/paradise-flight.js?v=4d77a43d';
+} from './js/paradise-flight.js?v=fe7ba6de';
 import {
   RADIAL_ARRIVAL_EVENTS,
   RADIAL_FLITTERBUG_EVENTS,
@@ -548,8 +548,8 @@ import { GAIN_FLOAT, GAIN_FLOAT_MS, gainFloatPose, gainFloatSinks } from './js/g
 import { hasPouch } from './js/elemental-pouch.js?v=42702eda';
 import { CURRANT_SIGN, currantCount, priceText } from './js/price.js?v=35cd2331';
 import { createPackRow, mountPackClearance, packBandRange, packCountText, packSearchEntries, packSearchResults, packSlotTip } from './js/ui/pack-row.js?v=f5ef5f6c';
-import { listAnimalFeedOptions, piggyFeedTip } from './js/animals.js?v=0545dc77';
-import { pickerEmptyLine, pickerMaxCount, pickerOptionsFor, pickerTakesCount } from './js/animals.js?v=0545dc77';
+import { listAnimalFeedOptions, piggyFeedTip } from './js/animals.js?v=34acff20';
+import { pickerEmptyLine, pickerMaxCount, pickerOptionsFor, pickerTakesCount } from './js/animals.js?v=34acff20';
 import {
   createDroppedItemState,
   parseDroppedItemState,
@@ -570,7 +570,7 @@ import {
   inspectPlayerSave,
   serializePlayerSave,
   restorePlayerSave,
-} from './js/player-save.js?v=6ee209a9';
+} from './js/player-save.js?v=365ee72d';
 import {
   HOME_INTERIOR_TSID,
   HOME_STREET_TSID,
@@ -749,7 +749,7 @@ import {
   ensureStreetIndex,
   resolveIndexTsid,
 } from './js/street-loader.js?v=10376267';
-import { showDraftBanner, startDraftPlay } from './js/builder/draft-play.js?v=2eb0ae2e';
+import { showDraftBanner, startDraftPlay } from './js/builder/draft-play.js?v=3397629d';
 import { bootHouseFile } from './js/house-file-loader.js?v=014960b6';
 import {
   ladderTopDeck,
@@ -769,7 +769,7 @@ import {
   stuckWay,
 } from './js/street-model.js?v=a9a05f9d';
 import { climberAtLadderTop, ladderTopSignpostFor, walkUpSignpostStreet } from './js/ladder-top-signposts.js?v=0192e447';
-import { STUCK_ARRIVAL_WAYS, defaultArrival, groundAt, loadStreetArrivals, stuckArrivalSpot } from './js/street-arrival.js?v=03978bfb';
+import { STUCK_ARRIVAL_WAYS, defaultArrival, groundAt, loadStreetArrivals, stuckArrivalSpot } from './js/street-arrival.js?v=32c28820';
 import {
   buildStreetView,
   glitchLayerMatrix,
@@ -960,7 +960,7 @@ import {
   createAnimalState,
   resetAnimalDay,
   animalStatusLabel,
-} from './js/animals.js?v=0545dc77';
+} from './js/animals.js?v=34acff20';
 import {
   ensureWoodTreeState,
   pickWoodTool,
@@ -1056,7 +1056,7 @@ import {
   creditQuoinStat,
   creditMetabolicReward,
   streetQuoinPoints,
-} from './js/quoins.js?v=f9187edb';
+} from './js/quoins.js?v=4d75aec0';
 import { isPartyStreet } from './js/party-spaces.js?v=91ce15c5'; // G869: a Party Space's quoins are the party classes
 import { greedyReplayEvents, heldPlaceHold, heldPlaceKind, shiftHeldClock } from './js/party-held-places.js?v=23e86d0b'; // G911
 import {
@@ -1104,8 +1104,8 @@ import {
   gardenPlacementRequest,
   ROCK_SHAPE_WIDTHS,
   flightGroundFor,
-} from './js/street-ecology.js?v=da5177b2';
-import { CHICKEN_PAUSE, chickenPauseRoll, flierAt, flierSeed, flightFloorFor, followPath, PATH_STEP } from './js/street-creatures.js?v=6831f6b2';
+} from './js/street-ecology.js?v=38ad6f13';
+import { CHICKEN_PAUSE, chickenPauseRoll, flierAt, flierSeed, flightFloorFor, followPath, PATH_STEP } from './js/street-creatures.js?v=cc6d21bf';
 import { chickenPose, chickenIdleSheetsAsked } from './js/chicken-idle-art.js?v=969d7db1';
 import { chickenWaitPose } from './js/chicken-idles.js?v=eef0279b';
 import { itemOverlayStats } from './js/item-overlay.js?v=c444e2cf';

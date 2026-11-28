@@ -32,7 +32,7 @@
 import { acceptOffer, declineOffer, npcQuestOffers } from '../quest-offers.js?v=9e1855e7';
 import { XP_FOR_LEVEL } from '../progression.js?v=05ff0260';
 import { textureFromUrl } from '../textures.js?v=b8e38103';
-import * as kit from '../quest-rooms/kit.js?v=f2c0da0c';
+import * as kit from '../quest-rooms/kit.js?v=2c203c2c';
 import { GREETERBOT } from '../tower-mid-rooms.js?v=2dd1122c';
 import { ROOM_23_FILES } from '../gwendolyn-room-23-art.js?v=1de55db7';
 import {

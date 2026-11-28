@@ -9,7 +9,7 @@ import { fileURLToPath } from 'node:url';
 import { slothSpotFromRow } from '../public/js/sloth-trees.js?v=775bef07';
 import { SLOTH_SPOTS } from '../public/js/sloth-spots-data.js?v=0fb481e0';
 import { buildSlothSpots, slothStreets } from '../tools/build-sloth-spots.mjs';
-import { measuredNodeSpots, populationForStreet } from '../public/js/street-ecology.js?v=da5177b2';
+import { measuredNodeSpots, populationForStreet } from '../public/js/street-ecology.js?v=38ad6f13';
 import { SLOTH_SHEETS } from '../public/js/sloth-art.js?v=a2768e2f';
 import {
   SLOTH_GRIP,
@@ -18,7 +18,7 @@ import {
   resourceSpawnPlan,
   slothGeometry,
   slothSpotsFromArt,
-} from '../public/js/features/resource-nodes-feature.js?v=1c2c7f81';
+} from '../public/js/features/resource-nodes-feature.js?v=5922a1ed';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const ecology = JSON.parse(readFileSync(join(root, 'public/assets/content/street-ecology.json'), 'utf8'));

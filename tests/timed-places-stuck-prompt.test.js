@@ -27,8 +27,8 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { createStuckAsker } from '../public/js/stuck-prompt.js?v=35415987';
-import * as paradise from '../public/js/paradise-flight.js?v=4d77a43d';
-import * as summers from '../public/js/summers-day.js?v=86a3142d';
+import * as paradise from '../public/js/paradise-flight.js?v=fe7ba6de';
+import * as summers from '../public/js/summers-day.js?v=5ffa5056';
 import * as greedy from '../public/js/greedy-street-spirit.js?v=b0ce2437';
 import * as winter from '../public/js/winter-walk.js?v=faad1d46';
 import * as eesti from '../public/js/de-embiggenify.js?v=e4e87b16';

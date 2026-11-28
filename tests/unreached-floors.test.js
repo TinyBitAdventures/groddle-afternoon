@@ -21,9 +21,9 @@ import {
   setStreetEcologyCatalog,
   streetReservedSpots,
   unreachedFloorsFor,
-} from '../public/js/street-ecology.js?v=da5177b2';
+} from '../public/js/street-ecology.js?v=38ad6f13';
 import { placementRequests, streetEcology } from '../tools/build-realtime-quoins.mjs';
-import { UNREACHED_JUMP, UNREACHED_JUMPS, overlapRuns, unreachedFloorsOf, unreachedJump } from '../tools/ecology/build-unreached-floors.mjs';
+import { UNREACHED_JUMP, UNREACHED_JUMPS, overlapRuns, unreachedFloorsBoth, unreachedFloorsOf, unreachedJump } from '../tools/ecology/build-unreached-floors.mjs';
 import { NORMAL_BUFF, jumpApex } from '../public/js/avatar-step.js?v=8415ee96';
 import { jumpArc, streetWorld } from '../public/js/builder/reach-graph.js?v=687006d3';
 import { shippedArrivals } from '../tools/builder/calibrate.mjs';
@@ -59,7 +59,8 @@ describe('ticket 64: nothing is planned on a floor nobody reaches', () => {
   });
 
   it('Level 3 East: its rocks, quoins, apples and Musicblock go on the walk now, not under it', () => {
-    const before = plan(LEVEL_3_EAST, { unreached: null });
+    // The plan before ticket 64 (and before the new-player rule, which keeps rocks and quoins off it too).
+    const before = plan(LEVEL_3_EAST, { unreached: null, plainUnreached: null });
     const under = (r) => Object.entries(r.plan.groups).flatMap(([g, pts]) => pts.filter((p) => lineAt(r.lines, p)?.id === UNDER_FLOOR).map(() => g));
     // Since every floor height is planned (the placements audit, 2026-11-12) the Musicblock finds the walk
     // by itself; the rocks and quoins would still go under it.
@@ -82,12 +83,15 @@ describe('ticket 64: nothing is planned on a floor nobody reaches', () => {
     assert.ok(Object.keys(catalog.unreachedFloors).length > 100, 'the sweep covers the streets the builder listed');
   });
 
-  it('the stored runs are what the reach graph gives (a sample; the full run is --check)', () => {
+  it('the stored runs, every jump\'s and a plain jump\'s, are what the reach graph gives (a sample; the full run is --check)', () => {
     const files = new Map(shippedStreetFiles());
     const { byStreet } = shippedArrivals([...files]);
     for (const tsid of [LEVEL_3_EAST, 'GA53N05IG9S2BLR', 'GCR1356LOEM1NUI']) {
-      const got = unreachedFloorsOf(street(tsid), byStreet.get(tsid.slice(1)) || []);
-      assert.deepEqual(got, catalog.unreachedFloors[tsid], tsid);
+      const got = unreachedFloorsBoth(street(tsid), byStreet.get(tsid.slice(1)) || []);
+      assert.deepEqual(got?.all || null, catalog.unreachedFloors[tsid] || null, tsid);
+      assert.deepEqual(got?.all || null, unreachedFloorsOf(street(tsid), byStreet.get(tsid.slice(1)) || []), `${tsid}: unreachedFloorsOf`);
+      // A plain jump alone (a new player): the plainUnreachedFloors section (tests/new-player-reach.test.js).
+      assert.deepEqual(got?.plain || null, catalog.plainUnreachedFloors[tsid] || null, `${tsid} plain`);
     }
   });
 

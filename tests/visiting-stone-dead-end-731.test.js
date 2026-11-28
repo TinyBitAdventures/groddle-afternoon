@@ -28,7 +28,7 @@ import {
   populationForStreet,
   setStreetEcologyCatalog,
   streetReservedSpots,
-} from '../public/js/street-ecology.js?v=da5177b2';
+} from '../public/js/street-ecology.js?v=38ad6f13';
 import { FURNITURE_GROUPS, stoneDeadEndZone } from '../public/js/street-furniture.js?v=071203fc';
 import { creatureRequests, setCreatureEcology } from '../tools/build-realtime-objects.mjs';
 

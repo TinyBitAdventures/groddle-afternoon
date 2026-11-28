@@ -30,11 +30,11 @@ import { platformsScreen, streetWidth } from '../public/js/street-model.js?v=a9a
 import { avatarHitBox, behindFloor, boxesTouch } from '../public/js/reach.js?v=456da8a8';
 import { verbRange } from '../public/js/walk-over.js?v=277ab977';
 import { jumpArc, reachStreet, streetBuff, streetWorld } from '../public/js/builder/reach-graph.js?v=687006d3';
-import { QUOIN_REACH_MOVES, quoinTouches } from '../public/js/quoins.js?v=f9187edb';
+import { QUOIN_REACH_MOVES, quoinTouches } from '../public/js/quoins.js?v=4d75aec0';
 import { rockShapeSheet } from '../public/js/mining.js?v=7ecaa572';
 import { getResourceNodeDef } from '../public/js/resource-nodes.js?v=c2eb46b1';
-import { ecologyForStreet, planStreetPlacements, populationForStreet, rockSpawnPlan, setStreetEcologyCatalog, streetReservedSpots } from '../public/js/street-ecology.js?v=da5177b2';
-import { resourceSpawnPlan } from '../public/js/features/resource-nodes-feature.js?v=1c2c7f81';
+import { ecologyForStreet, planStreetPlacements, populationForStreet, rockSpawnPlan, setStreetEcologyCatalog, streetReservedSpots } from '../public/js/street-ecology.js?v=38ad6f13';
+import { resourceSpawnPlan } from '../public/js/features/resource-nodes-feature.js?v=5922a1ed';
 import { streetObjectLayout } from '../tools/build-realtime-objects.mjs';
 import { placementRequests, streetEcology, streetQuoinLayout } from '../tools/build-realtime-quoins.mjs';
 import { shippedArrivals } from '../tools/builder/calibrate.mjs';

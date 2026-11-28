@@ -37,7 +37,7 @@ import {
   gardenPlacementRequest,
   setStreetEcologyCatalog,
   streetReservedSpots,
-} from '../public/js/street-ecology.js?v=da5177b2';
+} from '../public/js/street-ecology.js?v=38ad6f13';
 import {
   MYSTERY_QUOIN_KINDS,
   QUOIN_CLASSES,
@@ -48,7 +48,7 @@ import {
   planStreetQuoins,
   streetQuoinClass,
   streetQuoinPoints,
-} from '../public/js/quoins.js?v=f9187edb';
+} from '../public/js/quoins.js?v=4d75aec0';
 import { isPartyStreet, partyEcologyEntry, partySpaceForStreet } from '../public/js/party-spaces.js?v=91ce15c5';
 import { isZoneTsid } from '../public/js/zone-streets.js?v=b40010d5';
 

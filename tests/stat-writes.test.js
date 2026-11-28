@@ -28,7 +28,7 @@ import { createInventory, useItem } from '../public/js/inventory.js?v=3be7988a';
 import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=c9b84764';
 import { applySetFree } from '../public/js/animal-set-free.js?v=6fcd8355';
 import { butterUpChicken } from '../public/js/animal-flattery.js?v=3374cf3a';
-import { creditQuoinStat } from '../public/js/quoins.js?v=f9187edb';
+import { creditQuoinStat } from '../public/js/quoins.js?v=4d75aec0';
 import { ITEM_VERBS, runItemVerb } from '../public/js/item-verbs.js?v=ecade42e';
 import { reconcilePlayerProgression } from '../public/js/progression.js?v=05ff0260';
 

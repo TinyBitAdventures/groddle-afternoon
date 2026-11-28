@@ -55,7 +55,7 @@ import { requireServer, serverPath } from './repos.mjs';
 
 import { readItemTags, readItems } from './inventory/gsjs-data.mjs';
 import { TOOL_CONDITION_CATALOG, copyTagKind } from '../public/js/tools.js?v=4156bba8';
-import { PIGGY_CROP_SEEDS } from '../public/js/animal-husbandry.js?v=55c68526';
+import { PIGGY_CROP_SEEDS } from '../public/js/animal-husbandry.js?v=afa70209';
 import { POT_LUCK_ITEMS } from '../public/js/pot-luck.js?v=e704c060';
 import { COPY_TAG_RULES } from '../public/js/copy-tags.js?v=7eec7d48';
 import { KEEPSAKE, STUFFING, STUFFING_ITEM } from '../public/js/pot-luck-feast.js?v=971888be';

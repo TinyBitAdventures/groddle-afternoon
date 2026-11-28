@@ -70,7 +70,7 @@
 
 import { locationEventsApi } from './location-events-feature.js?v=1c5b6340';
 import { TOUCH_JUMP_EVENT, isPhoneDevice } from '../touch-controls.js?v=8bc690ac';
-import { collectQuoin, QUOIN_SHEET, QUOIN_TYPES } from '../quoins.js?v=f9187edb';
+import { collectQuoin, QUOIN_SHEET, QUOIN_TYPES } from '../quoins.js?v=4d75aec0';
 import {
   CARD_RETURN_TEXT,
   COLOUR_LEVEL_STREETS,

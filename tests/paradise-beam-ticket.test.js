@@ -22,9 +22,9 @@ import {
   paradiseTicketCost,
   paradiseTicketPlace,
   quoteParadiseTicket,
-} from '../public/js/paradise-flight.js?v=4d77a43d';
+} from '../public/js/paradise-flight.js?v=fe7ba6de';
 import { createInventory, addItem, countItem } from '../public/js/inventory.js?v=3be7988a';
-import { puzzleScenesFeature } from '../public/js/features/puzzle-scenes-feature.js?v=d8e9115d';
+import { puzzleScenesFeature } from '../public/js/features/puzzle-scenes-feature.js?v=f6d8e49b';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const TICKET = 'paradise_ticket_beam_me_down';
