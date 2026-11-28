@@ -6558,22 +6558,63 @@
     {
       "id": "G1334",
       "area": "Homes",
-      "text": "Un-expanding a house can take the refunded materials back from newer characters."
+      "text": "Un-expanding a house can take the refunded materials back from newer characters.",
+      "commits": [
+        "game:c84f4adf157",
+        "site:febb7c0",
+        "site:d23dfba"
+      ]
     },
     {
       "id": "G1316",
       "area": "Homes",
-      "text": "Online, a Craftybot set down in a house can't use things lying on the floor; carried in the pack it works."
+      "text": "Online, a Craftybot set down in a house can't use things lying on the floor; carried in the pack it works.",
+      "commits": [
+        "game:52e6817ce40",
+        "game:d0c402f514a"
+      ]
     },
     {
       "id": "G1335",
       "area": "Feasts",
-      "text": "On a phone the feast piles sit so close that a tap can open the next pile."
+      "text": "On a phone the feast piles sit so close that a tap can open the next pile.",
+      "commits": [
+        "game:5f96061ff35"
+      ]
     },
     {
       "id": "G1336",
       "area": "Phones",
       "text": "Turning an iPhone sideways can still flash the street black for a moment."
+    },
+    {
+      "id": "G1337",
+      "area": "Look",
+      "text": "On streets with a coloured light, players look a little brighter than the street around them; Glitch tinted players too."
+    },
+    {
+      "id": "G1338",
+      "area": "Homes",
+      "text": "Online, a Craftybot set down in a house only fetches from the floor its owner is on, and only while they are online."
+    },
+    {
+      "id": "F190",
+      "area": "Street Spirits",
+      "show": "fixing",
+      "text": "Arriving right next to a Street Spirit could show a second vendor floating above it.",
+      "commits": [
+        "game:0aecd6322f1"
+      ]
+    },
+    {
+      "id": "F191",
+      "area": "Giants",
+      "show": "fixing",
+      "text": "Saying I love you to a Giant showed its emblem instead of its painting, and online it called you friend instead of your name.",
+      "commits": [
+        "game:4553ef10a45",
+        "game:3c70aedacfe"
+      ]
     }
   ]
 }

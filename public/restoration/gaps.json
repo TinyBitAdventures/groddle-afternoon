@@ -1,6 +1,6 @@
 {
   "note": "Written by tools/gaps/build-data.mjs from tools/gaps/public-gaps.json and the coverage register. Edit those, never this file.",
-  "release": "v0.79.0",
+  "release": "v0.80.0",
   "states": {
     "fixing": {
       "label": "Being fixed",
@@ -40,9 +40,9 @@
   },
   "counts": {
     "fixing": 3,
-    "known": 19,
-    "unreleased": 4,
-    "fixed": 652,
+    "known": 18,
+    "unreleased": 0,
+    "fixed": 661,
     "lost": 5,
     "purpose": 18,
     "idea": 10
@@ -448,11 +448,6 @@
           "state": "known"
         },
         {
-          "id": "G1323",
-          "text": "Ice Nubbins in Nottis and Drifa stood on the path instead of hanging on the icy walls.",
-          "state": "unreleased"
-        },
-        {
           "id": "G678",
           "text": "In Thornfad Layers, the letter or heart that shows over your head by the locked door is not drawn yet.",
           "state": "fixed",
@@ -815,6 +810,12 @@
           "text": "The street Ball flew the same on every street, whatever the street's gravity.",
           "state": "fixed",
           "version": "v0.78.0"
+        },
+        {
+          "id": "G1323",
+          "text": "Ice Nubbins in Nottis and Drifa stood on the path instead of hanging on the icy walls.",
+          "state": "fixed",
+          "version": "v0.79.0"
         },
         {
           "id": "F184",
@@ -1197,29 +1198,9 @@
           "state": "known"
         },
         {
-          "id": "G1334",
-          "text": "Un-expanding a house can take the refunded materials back from newer characters.",
+          "id": "G1338",
+          "text": "Online, a Craftybot set down in a house only fetches from the floor its owner is on, and only while they are online.",
           "state": "known"
-        },
-        {
-          "id": "G1316",
-          "text": "Online, a Craftybot set down in a house can't use things lying on the floor; carried in the pack it works.",
-          "state": "known"
-        },
-        {
-          "id": "G1327",
-          "text": "Un-expanding a house left things dropped by its right wall past the wall.",
-          "state": "unreleased"
-        },
-        {
-          "id": "G1333",
-          "text": "A placed machine couldn't be moved without picking it up and setting it down again.",
-          "state": "unreleased"
-        },
-        {
-          "id": "F186",
-          "text": "Leaving several cards with a friend's Butler said you no longer had them.",
-          "state": "unreleased"
         },
         {
           "id": "G640",
@@ -1625,8 +1606,26 @@
           "version": "v0.79.0"
         },
         {
+          "id": "G1327",
+          "text": "Un-expanding a house left things dropped by its right wall past the wall.",
+          "state": "fixed",
+          "version": "v0.79.0"
+        },
+        {
+          "id": "G1333",
+          "text": "A placed machine couldn't be moved without picking it up and setting it down again.",
+          "state": "fixed",
+          "version": "v0.79.0"
+        },
+        {
           "id": "F185",
           "text": "Clicking a stack of display boxes could pick the box above or below the one under the pointer.",
+          "state": "fixed",
+          "version": "v0.79.0"
+        },
+        {
+          "id": "F186",
+          "text": "Leaving several cards with a friend's Butler said you no longer had them.",
           "state": "fixed",
           "version": "v0.79.0"
         },
@@ -1635,6 +1634,18 @@
           "text": "A stack held at the edge of the view over the HUD didn't scroll the room, and a card popping up mid-drag could drop it.",
           "state": "fixed",
           "version": "v0.79.0"
+        },
+        {
+          "id": "G1334",
+          "text": "Un-expanding a house can take the refunded materials back from newer characters.",
+          "state": "fixed",
+          "version": "v0.80.0"
+        },
+        {
+          "id": "G1316",
+          "text": "Online, a Craftybot set down in a house can't use things lying on the floor; carried in the pack it works.",
+          "state": "fixed",
+          "version": "v0.80.0"
         },
         {
           "id": "G48",
@@ -3067,6 +3078,12 @@
           "report": 293,
           "state": "fixed",
           "version": "v0.37.0"
+        },
+        {
+          "id": "F191",
+          "text": "Saying I love you to a Giant showed its emblem instead of its painting, and online it called you friend instead of your name.",
+          "state": "fixed",
+          "version": "v0.80.0"
         }
       ]
     },
@@ -4691,15 +4708,37 @@
       "name": "Feasts",
       "items": [
         {
-          "id": "G1335",
-          "text": "On a phone the feast piles sit so close that a tap can open the next pile.",
-          "state": "known"
-        },
-        {
           "id": "F182",
           "text": "Herbs and Sno Cones in a feast pile couldn't be eaten.",
           "state": "fixed",
           "version": "v0.79.0"
+        },
+        {
+          "id": "G1335",
+          "text": "On a phone the feast piles sit so close that a tap can open the next pile.",
+          "state": "fixed",
+          "version": "v0.80.0"
+        }
+      ]
+    },
+    {
+      "name": "Look",
+      "items": [
+        {
+          "id": "G1337",
+          "text": "On streets with a coloured light, players look a little brighter than the street around them; Glitch tinted players too.",
+          "state": "known"
+        }
+      ]
+    },
+    {
+      "name": "Street Spirits",
+      "items": [
+        {
+          "id": "F190",
+          "text": "Arriving right next to a Street Spirit could show a second vendor floating above it.",
+          "state": "fixed",
+          "version": "v0.80.0"
         }
       ]
     }

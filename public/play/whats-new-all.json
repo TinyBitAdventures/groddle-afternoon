@@ -3,6 +3,17 @@
   "about": "What the loading card shows after an update (#745): per release, newest first, up to five short player-facing lines. Written by tools/release/whats-new.mjs.",
   "releases": [
     {
+      "version": "v0.80.0",
+      "date": "2026-11-28",
+      "lines": [
+        "Ten more houses to claim: Marylpole Mount Quarter's 1200 block, chosen from its QUARTER signpost.",
+        "Your home street's signpost now points to your Quarter lot, for you and your visitors.",
+        "The night sky and its stars reach your home street and back yard too.",
+        "Say I love you to a Giant at its shrine and it answers with its own painting, and your name.",
+        "A Craftybot set down at home fetches from the floor, and says when its queue is done."
+      ]
+    },
+    {
       "version": "v0.79.0",
       "date": "2026-11-27",
       "lines": [
