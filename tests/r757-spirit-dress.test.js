@@ -14,7 +14,7 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { dress, streetSpiritsFeature } from '../public/js/features/street-spirits-feature.js?v=fa5d68ea';
+import { dress, streetSpiritsFeature } from '../public/js/features/street-spirits-feature.js?v=7fb29b53';
 import { spiritCell, spiritForStreet } from '../public/js/street-spirits.js?v=8ff6ed59';
 import { rimArtParts } from '../public/js/enter-chooser.js?v=b37c63e0';
 

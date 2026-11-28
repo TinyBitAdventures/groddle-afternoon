@@ -15,9 +15,9 @@ import { after, before, describe, it } from 'node:test';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-import { homeStreetMpFeature } from '../public/js/features/home-street-mp-feature.js?v=b631b54a';
-import { homesFeature } from '../public/js/features/homes-feature.js?v=746956c7';
-import { quarterFeature } from '../public/js/features/quarter-feature.js?v=b573b975';
+import { homeStreetMpFeature } from '../public/js/features/home-street-mp-feature.js?v=d4d84152';
+import { homesFeature } from '../public/js/features/homes-feature.js?v=d87b5c1b';
+import { quarterFeature } from '../public/js/features/quarter-feature.js?v=f29daf4d';
 import { visitSceneTsid } from '../public/js/neighbours-mp.js?v=55e3976b';
 import { SIGN_FIRST_ARM_Y } from '../public/js/street-render.js?v=4966c68b';
 import { QUARTER_TEXT, homeArm, lotArrival, normalizeHeld } from '../public/js/quarter.js?v=a38887ca';

@@ -29,7 +29,7 @@ import { execFileSync, spawnSync } from 'node:child_process';
 import { existsSync, readFileSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { join } from 'node:path';
-import { createFeatureHost } from '../public/js/feature-host.js?v=436b6d78';
+import { createFeatureHost } from '../public/js/feature-host.js?v=100f3193';
 import { dropsMpFeature } from '../public/js/features/drops-mp-feature.js?fresh=floormerge';
 import { isTakeOp, normalizeMine } from '../public/js/drops-mp.js?v=351593a6';
 import { packToSharedFloor } from '../public/js/home-floor-share.js?v=41dfa718';

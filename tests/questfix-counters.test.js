@@ -46,7 +46,7 @@ import {
   GIVE_CUBIMAL_VERB,
   CUBIMAL_GIFT_RESPONSES,
 } from '../public/js/features/quest-verbs-feature.js?v=5a4cfe2d';
-import { createFeatureHost } from '../public/js/feature-host.js?v=436b6d78';
+import { createFeatureHost } from '../public/js/feature-host.js?v=100f3193';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const PUB = join(here, '../public');

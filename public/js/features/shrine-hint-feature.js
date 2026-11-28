@@ -32,7 +32,7 @@ import { questStatus } from '../quest-offers.js?v=9e1855e7';
 import { GIANT_LAYOUT, GIANT_SCREEN_FADE_MS, GIANT_SCREEN_TIMES, giantCutArt, giantLoveResponse, giantScreenLayout, giantScreenScale } from '../giant-love.js?v=abed6d7d';
 import { pcLabel } from '../pc-label.js?v=d54da634';
 import { GIANTS, inEmblemHitbox } from '../shrines.js?v=48318bec';
-import { vogPages } from '../newxp.js?v=43f8df2c';
+import { vogPages } from '../newxp.js?v=b27f08c5';
 import { screenInput } from '../screen-fx.js?v=7cd62cca';
 
 export const SHRINE_HINT_FEATURE_ID = 'shrine-hint';

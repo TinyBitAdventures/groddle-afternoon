@@ -684,6 +684,22 @@ export function islandHomeReturn(save, back) {
   return { tsid: GENTLE_ISLAND.progress_way };
 }
 
+/**
+ * #770: going home while the tutorial runs. main.js doChatCommand 1873-1903 ignored /home, /house,
+ * /tower and /leave until the intro was done (has_done_intro), unless the island's go-home step had
+ * opened the way (newbie_island.js openImagination 493, newxp_allow_home); newbie_island.js
+ * hideUIOnLoad 255 hid home street visiting. A trip home before then left Gentle Island early.
+ * True when this save may teleport home (no tutorial running, or the island stage at or past
+ * its go-home step).
+ */
+export function homeTripOpen(save) {
+  if (save?.status !== 'active') return true;
+  return save.stage === 'island' && ISLAND_STEPS.indexOf(save.island) >= ISLAND_STEPS.indexOf('go_home');
+}
+
+/** #770: the line for a trip home the tutorial refuses (plain, short). */
+export const HOME_TRIP_REFUSED = "You can't go home yet. Follow the tutorial for now.";
+
 /** The Welcoming Flamingo's name box holds 19 letters (newxp_training1.js 582, input_max_chars: 19). */
 export const TUTORIAL_NAME_MAX = 19;
 

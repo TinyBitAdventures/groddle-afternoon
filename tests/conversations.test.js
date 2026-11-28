@@ -45,7 +45,7 @@ import {
 } from '../public/js/conversations.js?v=8b5536cc';
 import { assignQuest, completeQuest, questDoneAt } from '../public/js/quests.js?v=d9b316eb';
 import { loadContentCatalogsFromDir, resetContentCatalogs } from '../public/js/content-catalogs.js?v=c9b84764';
-import { normalizeQuestSnapshot } from '../public/js/player-save.js?v=87efe3df';
+import { normalizeQuestSnapshot } from '../public/js/player-save.js?v=e334ace2';
 import { SPIRIT_CONVERSATIONS, TALK_CLASSES, TALK_ORDER, UNBUILT_GATES, canOffer as spiritCanOffer, offerNext } from '../public/js/street-spirit-talks.js?v=080cb1a2';
 import { GIANT_ICON_DATA } from '../public/js/giant-icons-data.js?v=5026b09c';
 import { buildConversations } from '../tools/build-conversations.mjs';
@@ -386,7 +386,7 @@ test.describe('the Street Spirits’ saved ledger moves onto the record', () => 
   });
 
   test('the spirit feature hands over an old slice once and saves a marker', async () => {
-    const { streetSpiritsFeature } = await import('../public/js/features/street-spirits-feature.js?v=fa5d68ea');
+    const { streetSpiritsFeature } = await import('../public/js/features/street-spirits-feature.js?v=7fb29b53');
     resetConversationRecord();
     streetSpiritsFeature.restore(OLD);
     assert.equal(hasCompleted(conversationRecord(), 'when_down_was_up_1'), true);

@@ -4,7 +4,7 @@
  */
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { createFeatureHost } from '../public/js/feature-host.js?v=436b6d78';
+import { createFeatureHost } from '../public/js/feature-host.js?v=100f3193';
 
 function host(features) {
   const errors = [];

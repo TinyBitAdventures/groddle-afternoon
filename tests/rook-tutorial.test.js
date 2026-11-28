@@ -13,7 +13,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { ROOK_HIDDEN_HUBS, streetIsRookable } from '../public/js/rook-attack.js?v=5e62a79f';
-import { GENTLE_ISLAND_TSIDS } from '../public/js/newxp.js?v=43f8df2c';
+import { GENTLE_ISLAND_TSIDS } from '../public/js/newxp.js?v=b27f08c5';
 import { serverPath, skipWithoutServer } from '../tools/repos.mjs';
 
 const here = path.dirname(fileURLToPath(import.meta.url));

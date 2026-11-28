@@ -19,6 +19,8 @@
  *   runVerb(target, verbId, engine)       // -> true when handled
  *   travelGate(tsid, engine, meta)        // -> { ok:false, msg } blocks travel (meta.via: 'signpost' | undefined)
  *   enterGate(tsid, engine)               // -> { tsid, spawnX, spawnY } redirects an enter
+ *   homeTripGate(engine)                  // -> { ok:false, msg } holds a teleport home (engine.query;
+ *                                         //    no opinion is null), #770 newxp-feature
  *   labelFor(tsid)                        // -> { street, hub, hubId } public street name
  *   placementGroups(population, street)   // -> [{ key, count, clearance }] extra planner groups;
  *                                         //    read the points with engine.placement(key)

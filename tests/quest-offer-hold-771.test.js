@@ -11,11 +11,11 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { createFeatureHost } from '../public/js/feature-host.js?v=436b6d78';
-import { FEATURES } from '../public/js/features/index.js?v=e4cef7c7';
-import { newxpFeature, __newxpTest } from '../public/js/features/newxp-feature.js?v=348b34b2';
+import { createFeatureHost } from '../public/js/feature-host.js?v=100f3193';
+import { FEATURES } from '../public/js/features/index.js?v=c8b831b4';
+import { newxpFeature, __newxpTest } from '../public/js/features/newxp-feature.js?v=7f7f8067';
 import { questOffersFeature } from '../public/js/features/quest-offers-feature.js?v=7ced7fa2';
-import { GENTLE_ISLAND } from '../public/js/newxp.js?v=43f8df2c';
+import { GENTLE_ISLAND } from '../public/js/newxp.js?v=b27f08c5';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const savedNewxp = __newxpTest.save;

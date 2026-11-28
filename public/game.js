@@ -3,8 +3,8 @@
  * PixiJS 8 · locations-xml streets · CoU PNG decos · quests/items
  */
 import { ITEM_ICONS, ITEM_LABELS, getVerbsFor, ordinaryItems, runVerb } from './content.js?v=1c0f4a21';
-import { createErrorOnce, createFeatureHost, createFrameStages } from './js/feature-host.js?v=436b6d78';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=e4cef7c7';
+import { createErrorOnce, createFeatureHost, createFrameStages } from './js/feature-host.js?v=100f3193';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=c8b831b4';
 import { VENDOR_STAND_IN_LABEL, VENDOR_NAME_LABEL } from './js/street-spirits.js?v=8ff6ed59';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, enterHintPick, hoverText, stackHoverLabel, groupHead, hoverRimShown, reachGlowTargets, spriteHasRimArt, rimArtParts, rimsTraceParts, trimmedIconUrl, drawTileArt } from './js/enter-chooser.js?v=b37c63e0';
 import { firstTendKey, STICK_TEND_DELAY_MS, STICK_TEND_DIRS, STICK_TEND_REPEAT_MS, stepTendKey, stepTendKeys, stickTendKey, tendKeyAction } from './js/garden-tend.js?v=a7470c4a';
@@ -570,7 +570,7 @@ import {
   inspectPlayerSave,
   serializePlayerSave,
   restorePlayerSave,
-} from './js/player-save.js?v=87efe3df';
+} from './js/player-save.js?v=e334ace2';
 import {
   HOME_INTERIOR_TSID,
   HOME_STREET_TSID,
@@ -586,7 +586,7 @@ import {
   isHomePlaceTsid,
   setHomeHouse,
 } from './js/homes.js?v=dca6b2cd';
-import { HOME_MACHINE, offerHomeTicket, renderTicketMachine } from './js/home-ticket.js?v=dd4f1c0d';
+import { HOME_MACHINE, offerHomeTicket, renderTicketMachine } from './js/home-ticket.js?v=12e39ae4';
 import { pcLabel, setPcLabelSource } from './js/pc-label.js?v=d54da634';
 import {
   MAIL_COMPANIONS,
@@ -27556,6 +27556,12 @@ async function teleportHome({ room = 'street' } = {}) {
     return { ok: false, reason: 'not_owned' };
   }
   if (homeIsInstanced()) return { ok: false, reason: 'already_home' };
+  // #770: the tutorial holds the trip home until its go-home step (newxp-feature homeTripGate).
+  const held = features.query('homeTripGate', engine);
+  if (held && held.ok === false) {
+    toast(held.msg || 'You cannot go home right now.');
+    return { ok: false, reason: 'tutorial' };
+  }
   if (
     greedyStreetIsInstanced() || legalizeIsInstanced() || summersDayIsInstanced() ||
     deEmbiggenifyIsInstanced() || rookWoodsIsInstanced() || winterWalkIsInstanced() ||

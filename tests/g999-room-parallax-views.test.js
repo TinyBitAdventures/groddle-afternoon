@@ -141,7 +141,7 @@ describe('room parallax layers stand on the floor in every view (G999, #495)', (
   });
 
   it('the clubhouse on the floor: its far hills and mid pines stand with their feet behind the field', async () => {
-    const club = await import('../public/js/quest-rooms/clubhouse.js?v=db08141e');
+    const club = await import('../public/js/quest-rooms/clubhouse.js?v=b55cec26');
     const { scene } = built.find((b) => b.key === 'clubhouse/clubhouse');
     const root = scene.background;
     const fieldTop = club.FLOOR - 130; // buildClub's dusk field

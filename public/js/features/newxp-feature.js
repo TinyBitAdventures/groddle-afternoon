@@ -137,7 +137,9 @@ import {
   vogPages,
   tutorialNameDefault,
   TUTORIAL_NAME_MAX,
-} from '../newxp.js?v=43f8df2c';
+  homeTripOpen,
+  HOME_TRIP_REFUSED,
+} from '../newxp.js?v=b27f08c5';
 import { countWords } from '../words.js?v=274023af';
 import { ITEM_CATALOG, addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=3be7988a';
 import { QUOIN_SHEET, QUOIN_TYPES, qrazyRewardForLevel } from '../quoins.js?v=4d75aec0';
@@ -154,7 +156,7 @@ import { frameTexture, onLoaded, sourceFromUrl, textureFromUrl, whenLoaded } fro
 import { upgradeSource } from '../sprite-hires.js?v=dd070ce8';
 import { grantMoodXp } from '../mood-xp.js?v=e311b45c';
 import { displayTopOf, itemstackOverlayPoint, playPoofIn, playSheetOverlay, poofInAlpha } from '../overlay-art.js?v=e50bacca';
-import { HOME_MACHINE } from '../home-ticket.js?v=dd4f1c0d';
+import { HOME_MACHINE } from '../home-ticket.js?v=12e39ae4';
 import { createAnimalState } from '../animals.js?v=34acff20';
 import {
   AK_ANIMALS,
@@ -4226,8 +4228,19 @@ export const newxpFeature = {
     return run?.npcs?.some((npc) => npc.kind === 'rock' && npc.sprite && !npc.sprite.destroyed) ? true : null;
   },
 
-  travelGate(tsid, engine) {
+  /**
+   * #770: a trip home (game.js teleportHome: the Home panel, the Map, /home, /house, /tower) waits
+   * until the island's go-home step, as Glitch's /home did (js/newxp.js homeTripOpen).
+   */
+  homeTripGate() {
+    if (!pendingStage && !active()) return null;
+    return pendingStage || !homeTripOpen(save) ? { ok: false, msg: HOME_TRIP_REFUSED } : null;
+  },
+
+  travelGate(tsid, engine, meta = {}) {
     if (!active()) return null;
+    // The Home Street Ticket's trip (game.js homeTicketHost gate) follows the same rule.
+    if (meta?.via === 'home') return homeTripOpen(save) ? null : { ok: false, msg: HOME_TRIP_REFUSED };
     // Multiplayer has no Skip (G334), so only solo is told about it.
     if (inTutorialScene(engine)) return { ok: false, msg: engine?.mode === 'multiplayer' ? 'Follow the tutorial for now.' : 'Follow the tutorial (or skip it from the Tutorial card).' };
     // G1319: the island stage holds a player on Gentle Island only while they stand on it. Glitch

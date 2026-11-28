@@ -13,7 +13,7 @@
  */
 import { after, before, describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { createFeatureHost } from '../public/js/feature-host.js?v=436b6d78';
+import { createFeatureHost } from '../public/js/feature-host.js?v=100f3193';
 import { createDroppedItemState } from '../public/js/world-items.js?v=93313aad';
 import { OFFLINE_LINE } from '../public/js/online-request.js?v=5fa7a635';
 import { dropsMpFeature } from '../public/js/features/drops-mp-feature.js?fresh=report733';

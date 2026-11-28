@@ -10,7 +10,7 @@ import { normalizeFeatSnapshot } from './feats.js?v=f6c3b551';
 import { normalizeEmotionalBearState } from './emotional-bear.js?v=1c88a46a';
 import { normalizeHomeState } from './homes.js?v=dca6b2cd';
 import { normalizeMailboxState } from './mailbox.js?v=d50d0d05';
-import { normalizeFeatureSlices } from './feature-host.js?v=436b6d78';
+import { normalizeFeatureSlices } from './feature-host.js?v=100f3193';
 import { adoptHiddenSums, normalizeQuestOfferState } from './quest-offers.js?v=9e1855e7';
 import { cleanBuild } from './save-build.js?v=588eae75';
 

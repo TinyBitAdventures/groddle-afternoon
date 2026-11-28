@@ -22,7 +22,7 @@ import { after, before, describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { createFeatureHost } from '../public/js/feature-host.js?v=436b6d78';
+import { createFeatureHost } from '../public/js/feature-host.js?v=100f3193';
 import { dropsMpFeature } from '../public/js/features/drops-mp-feature.js?fresh=floorshare';
 import { ownRowToSharedFloor, packToSharedFloor } from '../public/js/home-floor-share.js?v=41dfa718';
 import { FLOOR_PILE_MAX, createDroppedItemState, dropInventoryStack, likeStackAt, mergeDroppedStacks, pickupDroppedStack, pileMaxOf, setDownStack } from '../public/js/world-items.js?v=93313aad';

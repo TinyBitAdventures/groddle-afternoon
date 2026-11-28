@@ -14,9 +14,9 @@ import {
 import { isOfferedInRemake, remakeStatus } from '../public/js/imagination-remake.js?v=99997003';
 import { IMAGINATION_UPGRADES } from '../public/js/imagination.js?v=1bdfd77c';
 // The feature imports these with their browser cache tags; load the same module instances.
-import { moodDecayContext, moodDecayFeature, runMoodDecayMinute } from '../public/js/features/mood-decay-feature.js?v=e260baa3';
-import { __newxpTest } from '../public/js/features/newxp-feature.js?v=348b34b2';
-import { GENTLE_ISLAND_TSIDS } from '../public/js/newxp.js?v=43f8df2c';
+import { moodDecayContext, moodDecayFeature, runMoodDecayMinute } from '../public/js/features/mood-decay-feature.js?v=f2ab650f';
+import { __newxpTest } from '../public/js/features/newxp-feature.js?v=7f7f8067';
+import { GENTLE_ISLAND_TSIDS } from '../public/js/newxp.js?v=b27f08c5';
 
 const CARD = (n) => `periodic_mood_loss_reduced_${n}`;
 
