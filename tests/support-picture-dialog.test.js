@@ -304,7 +304,7 @@ describe('community.js wires the pop-up on a report, by a key that moves with th
     assert.match(js, /import\('\/wp-content\/themes\/groddle\/community\/picture-dialog\.js'\)\s*\.then\(\(m\) => \{ if \(!gone\) stopPictures = m\.wirePictureDialog\(supportPictures\); \}\)/);
     assert.match(js, /stops\.push\(\(\) => \{ gone = true; stopPictures\?\.\(\); \}\)/);
     assert.match(site('src/Extension.php'), /'\/wp-content\/themes\/groddle\/community\/picture-dialog\.js',\n {4}\];/, 'in MODULE_IMPORTS');
-    assert.match(site('src/CommunityPages.php'), /ASSET_KEY = 'community-24'/, 'community.js changed, so its key moved');
+    assert.match(site('src/CommunityPages.php'), /ASSET_KEY = 'community-25'/, 'community.js changed, so its key moved');
   });
 
   it('the look is the Snap\'s (style.css .snap-modal) with Previous and Next in the same buttons, tokens only', () => {
