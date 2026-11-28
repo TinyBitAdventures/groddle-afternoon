@@ -22,8 +22,8 @@ import {
   portraitSheet,
   spiritCrySheet,
   spiritSheet,
-} from '../public/js/street-spirits.js?v=2a97502d';
-import { STREET_SPIRIT_VARIANTS } from '../public/js/street-spirits.js?v=2a97502d';
+} from '../public/js/street-spirits.js?v=8ff6ed59';
+import { STREET_SPIRIT_VARIANTS } from '../public/js/street-spirits.js?v=8ff6ed59';
 import { inviteBox } from '../public/js/spirit-loneliness.js?v=9259917d';
 import { PORTRAIT_DENSITY, portraitManifest, streetManifest } from '../tools/vector-sprites/street-spirit-manifests.mjs';
 

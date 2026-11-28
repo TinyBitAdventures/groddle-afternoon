@@ -76,7 +76,7 @@ import {
   vendorStandInParts,
   zuttoNear,
   zuttoNextClip,
-} from '../street-spirits.js?v=2a97502d';
+} from '../street-spirits.js?v=8ff6ed59';
 import {
   TALK_CLASSES,
   TALK_ORDER,
@@ -104,7 +104,7 @@ import {
 import { pcLabel } from '../pc-label.js?v=81bf3550';
 import { acceptOffer, npcQuestOffers, questStatus } from '../quest-offers.js?v=7e00498b';
 import { getQuestCatalog } from '../content-catalogs.js?v=c9b84764';
-import { questRoomConverse } from './quest-instances-feature.js?v=a29205d3';
+import { questRoomConverse } from './quest-instances-feature.js?v=7ed52e66';
 import { SPIRIT_REMINISCE_TEXT, isStreetSpiritClass, spiritReminisceOffers, withReminisceVerb } from '../spirit-reminisce.js?v=a50b40dc';
 import { questDoneAt } from '../quests.js?v=f68437db';
 

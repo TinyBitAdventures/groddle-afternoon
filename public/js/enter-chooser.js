@@ -273,7 +273,7 @@ export function rimArtParts(spr, PIXI) {
 
 /**
  * #757: whether a thing's rims still trace its art parts (rimArtParts), one each. A Street Spirit
- * dressed while it glowed hid the stand-in its rim traced and showed the real spirit: the rim must
+ * dressed while it glowed hid the beehive its rim traced and showed the real spirit: the rim must
  * be made again, on the spirit.
  * @param {any[]} rims each with its _outlineSource
  * @param {any[]} parts rimArtParts of the thing now

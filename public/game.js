@@ -4,9 +4,9 @@
  */
 import { ITEM_ICONS, ITEM_LABELS, getVerbsFor, ordinaryItems, runVerb } from './content.js?v=da2b8879';
 import { createErrorOnce, createFeatureHost, createFrameStages } from './js/feature-host.js?v=b87e2cbc';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=09a4c760';
-import { VENDOR_STAND_IN_LABEL, VENDOR_NAME_LABEL } from './js/street-spirits.js?v=2a97502d';
-import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, enterHintPick, hoverText, stackHoverLabel, groupHead, hoverRimShown, reachGlowTargets, spriteHasRimArt, rimArtParts, rimsTraceParts, trimmedIconUrl, drawTileArt } from './js/enter-chooser.js?v=6996c6f5';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=b34d8a74';
+import { VENDOR_STAND_IN_LABEL, VENDOR_NAME_LABEL } from './js/street-spirits.js?v=8ff6ed59';
+import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, enterHintPick, hoverText, stackHoverLabel, groupHead, hoverRimShown, reachGlowTargets, spriteHasRimArt, rimArtParts, rimsTraceParts, trimmedIconUrl, drawTileArt } from './js/enter-chooser.js?v=b37c63e0';
 import { firstTendKey, STICK_TEND_DELAY_MS, STICK_TEND_DIRS, STICK_TEND_REPEAT_MS, stepTendKey, stepTendKeys, stickTendKey, tendKeyAction } from './js/garden-tend.js?v=a7470c4a';
 import { avatarHitBox, behindFloor, bodyReachDistance, OUT_OF_REACH_LINE, playerClickBox } from './js/reach.js?v=456da8a8';
 import { createVogOverlay } from './js/vog-overlay.js?v=02f04426';
@@ -722,7 +722,7 @@ import {
 } from './js/garden.js?v=fefa7bcd';
 import { GARDEN_SCALE, PLOT_H as GARDEN_PLOT_H, PLOT_W as GARDEN_PLOT_W, gardenFrame, gardenLayout, gardenStyle, plotPieces } from './js/garden-view.js?v=04fe8467';
 import { nearestPlotIndex } from './js/garden-view.js?v=04fe8467';
-import { pickTarget, pickByRectangle, pickExplain, spriteWorldHitBox, pickStats } from './js/pick.js?v=c09a14e3';
+import { pickTarget, pickByRectangle, pickExplain, spriteWorldHitBox, pickStats } from './js/pick.js?v=a43f94f8';
 import {
   ROCK_CATALOG,
   ROCK_SHAPE_SHEETS,
@@ -1002,7 +1002,7 @@ import {
   learnFasterOpen,
   learnFasterSummary,
 } from './js/shrines.js?v=48318bec';
-import { shrineSheet, shrineVariantFor } from './js/shrine-variants.js?v=150850d3';
+import { shrineSheet, shrineVariantFor } from './js/shrine-variants.js?v=adf2ba15';
 import { giantDisplayName } from './js/giant-names.js?v=0e295891';
 import { shrinePowderOptions, shrinePowderAchievementCounters } from './js/powders.js?v=b1bafb71';
 import {
@@ -8954,7 +8954,7 @@ function dropRims(rims) {
   }
 }
 /** A rim whose part has gone (destroyed or taken out of its holder) is made again. */
-/** #757: so is one whose thing's art changed (a Street Spirit dressed over its stand-in). */
+/** #757: so is one whose thing's art changed (a Street Spirit dressed over its loading beehive). */
 const rimsStale = (rims, target) => !rims?.length || rims.some((rim) => {
   const src = rim._outlineSource;
   return rim.destroyed || !src || src.destroyed || (src.parent && src.parent !== rim.parent);

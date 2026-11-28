@@ -7,7 +7,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { buildEnterChoices, enterPromptLabel, planEnter } from '../public/js/enter-chooser.js?v=6996c6f5';
+import { buildEnterChoices, enterPromptLabel, planEnter } from '../public/js/enter-chooser.js?v=b37c63e0';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const pub = join(here, '../public');

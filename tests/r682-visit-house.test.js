@@ -5,7 +5,7 @@
 import { it } from 'node:test';
 import assert from 'node:assert/strict';
 import { normalizeHomeView } from '../public/js/neighbours-mp.js?v=0896a4d7';
-import { visitorHomeState } from '../public/js/features/homes-feature.js?v=ab966554';
+import { visitorHomeState } from '../public/js/features/homes-feature.js?v=f8a3284c';
 
 const answer = (house) => ({ owner: { id: 7, name: 'Owner' }, home: { owned: true, style: 'uralia', house }, homes: {}, key: false, pass: { token: 't' } });
 

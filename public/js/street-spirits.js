@@ -459,11 +459,11 @@ export function zuttoNear(spirit, player, radius = STREET_SPIRIT_VARIANTS.zutto.
 }
 
 /**
- * #757: the vendor's stand-in parts (game.js spawnVendorNpc), named so a Street Spirit's dress
+ * #757: the vendor's loading body and name (game.js spawnVendorNpc), named so a Street Spirit's dress
  * finds them by name: the reach or hover glow puts a rim before the body, and reading the
- * children by place hid the rim and lifted the stand-in over the real spirit.
+ * children by place hid the rim and lifted the beehive over the real spirit.
  */
-export const VENDOR_STAND_IN_LABEL = 'vendor-stand-in';
+export const VENDOR_STAND_IN_LABEL = 'vendor-loading-body';
 export const VENDOR_NAME_LABEL = 'vendor-name';
 /** @param {any} g the vendor's Container */
 export function vendorStandInParts(g) {

@@ -25,7 +25,7 @@ import {
   spiritVariantForHub,
   zuttoNear,
   zuttoNextClip,
-} from '../public/js/street-spirits.js?v=2a97502d';
+} from '../public/js/street-spirits.js?v=8ff6ed59';
 import { dialoguePool, nextDialogue } from '../public/js/dialogue.js?v=fcfed1af';
 import {
   CONVO_BUBBLE_CHOICES,
@@ -554,7 +554,7 @@ test.describe('conversations against GameServerJS (G185)', () => {
   });
 
   test('&spiritautoplay=far keeps the spirit in view on a short deck (G239, Somewhat Sump)', async () => {
-    const { spiritFarSpot } = await import('../public/js/features/street-spirits-feature.js?v=242f4792');
+    const { spiritFarSpot } = await import('../public/js/features/street-spirits-feature.js?v=1e4e6314');
     // A flat street: 330 px to the right on the spirit's own floor, camera untouched.
     const flat = [{ x1: 0, y1: 900, x2: 3000, y2: 900 }];
     assert.deepEqual(spiritFarSpot(flat, 1000, 900), { x: 1330, y: 900, lookY: 0 });

@@ -14,9 +14,9 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { dress, streetSpiritsFeature } from '../public/js/features/street-spirits-feature.js?v=242f4792';
-import { spiritCell, spiritForStreet } from '../public/js/street-spirits.js?v=2a97502d';
-import { rimArtParts } from '../public/js/enter-chooser.js?v=6996c6f5';
+import { dress, streetSpiritsFeature } from '../public/js/features/street-spirits-feature.js?v=1e4e6314';
+import { spiritCell, spiritForStreet } from '../public/js/street-spirits.js?v=8ff6ed59';
+import { rimArtParts } from '../public/js/enter-chooser.js?v=b37c63e0';
 
 const ROOT = join(import.meta.dirname, '..');
 const game = readFileSync(join(ROOT, 'public/game.js'), 'utf8');
@@ -46,7 +46,7 @@ const art = () => ({ orig: { width: 40, height: 60 }, source: {} });
 function standIn() {
   const g = new Container();
   const body = g.addChild(new Sprite(art()));
-  body.label = 'vendor-stand-in';
+  body.label = 'vendor-loading-body';
   const label = g.addChild(new Text());
   label.label = 'vendor-name';
   label.y = -124;
@@ -90,7 +90,7 @@ describe('#757: a Street Spirit glowing before its art loads is dressed as one s
   });
 
   it('the rim made on the stand-in is stale after dressing and is made again on the spirit', async () => {
-    const { rimsTraceParts } = await import('../public/js/enter-chooser.js?v=6996c6f5');
+    const { rimsTraceParts } = await import('../public/js/enter-chooser.js?v=b37c63e0');
     assert.equal(typeof rimsTraceParts, 'function');
     const { g, body } = standIn();
     const glow = rim(body);

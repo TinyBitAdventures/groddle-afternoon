@@ -35,7 +35,7 @@ import {
   spiritCell,
   spiritCryBox,
   spiritSheetName,
-} from '../public/js/street-spirits.js?v=2a97502d';
+} from '../public/js/street-spirits.js?v=8ff6ed59';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const OGA = join(os.homedir(), 'Documents/glitch-audit/opengameart/extracted_g174/glitch-assets');

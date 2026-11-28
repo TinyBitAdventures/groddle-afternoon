@@ -14,7 +14,7 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { pickTarget, resetPickMasks } from '../public/js/pick.js?v=c09a14e3';
+import { pickTarget, resetPickMasks } from '../public/js/pick.js?v=a43f94f8';
 import * as feast from '../public/js/feast-day.js?fresh=feast-pile-tap';
 
 const { FEAST_SPOTS, PILE_HALF } = feast;

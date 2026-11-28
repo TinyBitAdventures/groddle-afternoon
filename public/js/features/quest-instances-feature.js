@@ -224,7 +224,7 @@ const ROOM_MODULES = {
   an_autumn_day: () => import('../quest-rooms/an-autumn-day.js?v=e78fb51e'),
   being_watched: () => import('../quest-rooms/being-watched.js?v=81d3c089'),
   back_alley: () => import('../quest-rooms/back-alley.js?v=bdcc41a2'),
-  clubhouse: () => import('../quest-rooms/clubhouse.js?v=3929ff3c'),
+  clubhouse: () => import('../quest-rooms/clubhouse.js?v=ef107c12'),
   light_perspective: () => import('../quest-rooms/light-perspective.js?v=b722ef54'),
   tile_puzzle: () => import('../quest-rooms/tile-puzzle.js?v=d63f81c2'),
   operation_grow: () => import('../quest-rooms/operation-grow.js?v=89291819'),

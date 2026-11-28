@@ -66,7 +66,7 @@
  */
 
 import { BUTLER_STRINGS } from '../butler.js?v=5d1199a7';
-import { butlerApi } from './butler-feature.js?v=666a7b17';
+import { butlerApi } from './butler-feature.js?v=f0831179';
 import { hellFeature } from './hell-feature.js?v=a45d6184';
 import { locationEventsApi } from './location-events-feature.js?v=1c5b6340';
 import { towerApi } from './home-tower-feature.js?v=b70a09c0';

@@ -20,7 +20,7 @@ import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { encodeLosslessWebp } from '../webp-lossless.mjs';
-import { SHRINE_SHEETS, shrineClassFor, shrineSheet } from '../../public/js/shrine-variants.js?v=150850d3';
+import { SHRINE_SHEETS, shrineClassFor, shrineSheet } from '../../public/js/shrine-variants.js?v=adf2ba15';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const spike = join(here, '../..');

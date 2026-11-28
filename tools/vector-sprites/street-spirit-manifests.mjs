@@ -36,7 +36,7 @@ import {
   portraitSheet,
   spiritCrySheet,
   spiritSheet,
-} from '../../public/js/street-spirits.js?v=2a97502d';
+} from '../../public/js/street-spirits.js?v=8ff6ed59';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 
