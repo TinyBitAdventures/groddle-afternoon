@@ -2814,9 +2814,14 @@
   "deployed": "2026-11-28"
  },
  "git": {
-  "commits": 3944,
+  "commits": 3946,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-28",
+    "kind": "fix",
+    "text": "Rocks and quoins set where only a triple jump gets now stand where a new player reaches them"
+   },
    {
     "date": "2026-11-27",
     "kind": "fix",
@@ -2931,14 +2936,9 @@
     "date": "2026-11-27",
     "kind": "fix",
     "text": "A window whose character opens in another tab greys at once, not when that tab presses Start"
-   },
-   {
-    "date": "2026-11-27",
-    "kind": "fix",
-    "text": "While a window waits on Play here, a Rooked Piggy's Revive is greyed too"
    }
   ]
  },
- "tests": 1510,
- "generatedAt": "2026-11-27"
+ "tests": 1511,
+ "generatedAt": "2026-11-28"
 }
