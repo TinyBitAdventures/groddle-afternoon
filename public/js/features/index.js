@@ -176,7 +176,7 @@ import { homeStreetMpFeature } from './home-street-mp-feature.js?v=b631b54a'; FE
 import { swoonerfliesFeature } from './swoonerflies-feature.js?v=ad7503af'; FEATURES.push(swoonerfliesFeature);
 import { homePoolMpFeature } from './home-pool-mp-feature.js?v=eda3419c'; FEATURES.push(homePoolMpFeature);
 import { yardVerbsMpFeature } from './yard-verbs-mp-feature.js?v=839f44ef'; FEATURES.push(yardVerbsMpFeature);
-import { homeMachinesFeature } from './home-machines-feature.js?v=1c52d844'; FEATURES.push(homeMachinesFeature);
+import { homeMachinesFeature } from './home-machines-feature.js?v=3fb71e00'; FEATURES.push(homeMachinesFeature);
 import { homeStorageFeature } from './home-storage-feature.js?v=81458c82'; FEATURES.push(homeStorageFeature);
 import { homeLiveFeature } from './home-live-feature.js?v=0020c4eb'; FEATURES.push(homeLiveFeature);
 import { questVerbsFeature } from './quest-verbs-feature.js?v=5a4cfe2d'; FEATURES.push(questVerbsFeature);
@@ -225,5 +225,5 @@ import { newUrPartyFeature } from './new-ur-party-feature.js?v=73d30d79'; FEATUR
 // Meteor showers and lone shooting stars in the night sky (ours): started from the console, synced by the server.
 import { meteorShowerFeature } from './meteor-shower-feature.js?v=100d8c5e'; FEATURES.push(meteorShowerFeature);
 import { streetObjectsFeature } from './street-objects-feature.js?v=0537418b'; FEATURES.push(streetObjectsFeature);
-import { realtimeFeature } from './realtime-feature.js?v=087837ca'; FEATURES.push(realtimeFeature);
+import { realtimeFeature } from './realtime-feature.js?v=bf55ced5'; FEATURES.push(realtimeFeature);
 import { accountBackupFeature } from './account-backup-feature.js?v=7cda2116'; FEATURES.push(accountBackupFeature);

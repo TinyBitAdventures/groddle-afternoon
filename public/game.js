@@ -4,7 +4,7 @@
  */
 import { ITEM_ICONS, ITEM_LABELS, getVerbsFor, ordinaryItems, runVerb } from './content.js?v=1c0f4a21';
 import { createErrorOnce, createFeatureHost, createFrameStages } from './js/feature-host.js?v=b87e2cbc';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=b9ad0e64';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=8849e01b';
 import { VENDOR_STAND_IN_LABEL, VENDOR_NAME_LABEL } from './js/street-spirits.js?v=8ff6ed59';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, enterHintPick, hoverText, stackHoverLabel, groupHead, hoverRimShown, reachGlowTargets, spriteHasRimArt, rimArtParts, rimsTraceParts, trimmedIconUrl, drawTileArt } from './js/enter-chooser.js?v=b37c63e0';
 import { firstTendKey, STICK_TEND_DELAY_MS, STICK_TEND_DIRS, STICK_TEND_REPEAT_MS, stepTendKey, stepTendKeys, stickTendKey, tendKeyAction } from './js/garden-tend.js?v=a7470c4a';
@@ -12984,7 +12984,8 @@ function ensureIdleSheet(pack, name) {
     pack.sheets[name] = sheet;
     fillPackAnims(pack);
     idleSheetLog.push({ sheet: name, at: Math.round(started), ms: Math.round(performance.now() - started), ...(sheet.stats || {}) });
-    if (app?.canvas) app.canvas.dataset.playerIdleSheets = Object.keys(pack.sheets).filter((n) => IDLE_SHEETS.includes(n)).join(',');
+    // #769: another player's look loads idle sheets too; this names your own Glitch's.
+    if (app?.canvas && player?.anims === pack.anims) app.canvas.dataset.playerIdleSheets = Object.keys(pack.sheets).filter((n) => IDLE_SHEETS.includes(n)).join(',');
     // Replay the current state with the real frames (only if it draws from this sheet).
     if (player?.anims === pack.anims && idleSheetFor(player.glitchState) === name) player.glitchState = null;
     return true;
@@ -14726,6 +14727,20 @@ const engine = {
    */
   needGlitchAnim(pack, anim) {
     ensureAnimSheets(pack, anim, LATE_SHEET_OPTS);
+  },
+  /**
+   * #769: another player's Glitch needs an idle sheet (js/remote-idles.js): loaded (the default
+   * look's file) or painted (a painted look) into its pack as your own are. Resolves true once in.
+   */
+  glitchIdleSheet(pack, name) {
+    return ensureIdleSheet(pack, name);
+  },
+  /** #769: give back an idle sheet another player's look no longer plays; never one your own Glitch is drawn with. */
+  dropGlitchIdleSheet(pack, name) {
+    const sheet = pack?.sheets?.[name];
+    if (!sheet || player?.pack?.sheets?.[name] === sheet) return false;
+    dropIdleSheet(pack, name);
+    return true;
   },
   /** The packs other players are drawn with: their bakes are kept, every other bake may be freed. */
   holdGlitchPacks(packs) {

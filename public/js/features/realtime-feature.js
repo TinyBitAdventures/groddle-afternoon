@@ -76,6 +76,7 @@ import { anchorBottomCentre } from '../sprite-feet.js?v=6283b688';
 import { NAMEPLATE_STYLE } from '../world-text.js?v=6b49f88c';
 import { PUBLIC_HIDE } from '../public-picture.js?v=1a0b03fa';
 import { PLAY_HERE_STATES } from '../online-request.js?v=5fa7a635';
+import { createRemoteIdles, remoteIdleCap } from '../remote-idles.js?v=e370b3fa';
 
 export const REALTIME_FEATURE_ID = 'realtime';
 /** Lines kept in the chat log. */
@@ -295,6 +296,18 @@ function createSession(engine) {
   let lookCheckAt = 0;
   /** An administrator's teleport under way: no join until the game is on the new street. */
   let teleporting = false;
+  // #769: other players idle as yours does (idle4 standing, their random idles, the doze), their
+  // idle sheets loaded lazily and under a cap (js/remote-idles.js).
+  const idleSheets = createRemoteIdles({
+    ensure: (pack, name) => engine.glitchIdleSheet?.(pack, name) ?? false,
+    drop: (pack, name) => engine.dropGlitchIdleSheet?.(pack, name) === true,
+    own: () => engine.player?.pack || null,
+    cap: remoteIdleCap({ phone: isPhoneDevice(), deviceMemory: globalThis.navigator?.deviceMemory ?? null }),
+    // The sheet is in: each Glitch drawn from it starts its animation again from the real frames.
+    onReady: (pack) => {
+      for (const r of remotes.values()) if (r.pack.anims === pack.anims && !r.body.destroyed) r.st = null;
+    },
+  });
 
   // —— Dock UI ——
   const style = el('style', { id: 'realtime-css' });
@@ -453,8 +466,11 @@ function createSession(engine) {
   }
 
   function applyAnim(r, st) {
-    if (r.st === st && r.body.textures) return;
-    const { anim, loop, then, hold } = animForState(st, { idles: false });
+    // #769: standing is the idle4 loop (Glitch's STAND) once the look idles here.
+    const idles = idleSheets.idles(r);
+    if (r.st === st && r.idles === idles && r.body.textures) return;
+    r.idles = idles;
+    const { anim, loop, then, hold } = animForState(st, { idles });
     const anims = r.pack.anims || {};
     // A painted look paints this animation's sheet the first time someone plays it (G614): the
     // frames hold the still stand until it is in, then fill in place (framesReady).
@@ -544,6 +560,7 @@ function createSession(engine) {
         typingChanged = true;
       }
     }
+    idleSheets.step(remotes.values(), t);
     if (typingChanged) {
       typingChanged = false;
       engine.setData?.('realtimeTyping', [...remotes.values()].filter((r) => r.typing).map((r) => r.id).join(','));
@@ -746,6 +763,8 @@ function createSession(engine) {
     remotes,
     log,
     emote,
+    /** QA (#769): other looks' idle slots, their cap, and the sheets loaded and given back. */
+    remoteIdles: () => ({ cap: idleSheets.cap, ...idleSheets.stats() }),
     get teleporting() { return teleporting; },
     start() {
       publish();
