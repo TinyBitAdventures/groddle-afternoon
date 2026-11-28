@@ -2814,7 +2814,7 @@
   "deployed": "2026-11-27"
  },
  "git": {
-  "commits": 3906,
+  "commits": 3908,
   "since": "2026-10-19",
   "recent": [
    {
@@ -2931,14 +2931,9 @@
     "date": "2026-11-27",
     "kind": "fix",
     "text": "Rooks' Woods stops asking \"Are you stuck?\" once its quest is done, so it never covers the Quest complete card"
-   },
-   {
-    "date": "2026-11-27",
-    "kind": "improve",
-    "text": "What's new's All versions is a picker, and ‹ › or the arrow keys step through the versions"
    }
   ]
  },
- "tests": 1502,
+ "tests": 1503,
  "generatedAt": "2026-11-27"
 }
