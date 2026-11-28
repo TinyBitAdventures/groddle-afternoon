@@ -16,7 +16,7 @@ import { join } from 'node:path';
 import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=d30c3e0f';
 import { createQuestState, getQuestProgress, listQuestLogNewestFirst, listQuests } from '../public/js/quests.js?v=f574d2e1';
 import { createQuestSheet, questLogNeedsSwap, questProgress, questStep, visibleRowCount, styledOutRowCount, QUEST_STYLED_OUT_TEXT } from '../public/js/ui/quest-sheet.js?v=7409d5d8';
-import { questLogDetail } from '../public/js/features/bug-report-feature.js?v=20ee73f2';
+import { questLogDetail } from '../public/js/features/bug-report-feature.js?v=c54c6abe';
 import { FakeEl, matches } from './social-fake-dom.js';
 
 const pub = join(import.meta.dirname, '../public');

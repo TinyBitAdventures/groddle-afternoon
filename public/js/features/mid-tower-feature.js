@@ -46,8 +46,8 @@
 
 import { insideBottomRect } from '../doors.js?v=f815e7c8';
 import { assignQuest } from '../quests.js?v=f574d2e1';
-import { frameTexture, sourceFromUrl, textureFromUrl } from '../textures.js?v=8bb43102';
-import { pixiSpeed } from '../sprite-sheets.js?v=d744485b';
+import { frameTexture, sourceFromUrl, textureFromUrl } from '../textures.js?v=29f80b6a';
+import { pixiSpeed } from '../sprite-sheets.js?v=1e277f22';
 import {
   GREETERBOT,
   MEZZANINE_TSID,
@@ -58,7 +58,7 @@ import {
 } from '../tower-mid-rooms.js?v=2dd1122c';
 import { touchWords } from '../touch-controls.js?v=8bc690ac';
 import { CLICK_ANYWHERE, HALL, HALL_ART, HALL_ART_ROOT, HALL_BUTTON_CLASS, HALL_WIDGET, WALL_BUTTON } from '../hall-rejected-concepts.js?v=d2d29ad6';
-import { standOnFeet, anchorBottomCentre } from '../sprite-feet.js?v=1c6452d9';
+import { standOnFeet, anchorBottomCentre } from '../sprite-feet.js?v=18e517a6';
 
 export const MID_TOWER_FEATURE_ID = 'mid-tower';
 export const ROOK_HALL_START = 'rook_hall_start';

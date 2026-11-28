@@ -35,10 +35,10 @@
  * items' art is Tiny Speck's own tool_animation sheets, already shipped for the actor.
  */
 
-import { OVERLAY_BUBBLE_URL, loadMoreOverlays, overlayBubbleBox, playOverlay } from './overlays.js?v=c788d4ab';
-import { loadTexture, textureFromUrl } from './textures.js?v=8bb43102';
+import { OVERLAY_BUBBLE_URL, loadMoreOverlays, overlayBubbleBox, playOverlay } from './overlays.js?v=306c160f';
+import { loadTexture, textureFromUrl } from './textures.js?v=29f80b6a';
 import { SPEECH_BUBBLE_Z } from './fx-z.js?v=18dda7e3';
-import { playItemOverlay } from './item-overlay.js?v=40335bc8';
+import { playItemOverlay } from './item-overlay.js?v=6f4018bf';
 import { jobWorkToolSheet } from './job-work-fx.js?v=a2dc6a5a';
 import { MAKE_TOOL_SHEETS } from './make-tool-sheets.js?v=6f758e09';
 import { ROCK_CATALOG } from './mining.js?v=7ecaa572';
@@ -49,7 +49,7 @@ import { potionBottleClasses, potionBottleSheet } from './potion-bottles.js?v=17
 import { powderShakerSheet } from './powder-shakers.js?v=fcd18855';
 import { WOTD_TOOL } from './wine-pour-fx.js?v=364e22d2';
 import { firstWorkingTool } from './tools.js?v=4156bba8';
-import { anchorBottomCentre } from './sprite-feet.js?v=1c6452d9';
+import { anchorBottomCentre } from './sprite-feet.js?v=18e517a6';
 
 /** inc_skill_packages.js 294-305: the bubble the others see. */
 export const SKILL_BUBBLE = Object.freeze({ wh: 40, dy: -110, src: 'players/inc_skill_packages.js 294-314' });

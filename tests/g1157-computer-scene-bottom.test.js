@@ -15,7 +15,7 @@ import { fileURLToPath } from 'node:url';
 import { MIN_PACK_HEIGHT, PHONE_GROUND_MIN_CLEARANCE, groundFitScale, phoneGroundWorldHeight, reachableFloorY, sceneBottomLine, stageFor } from '../public/js/location-view.js?v=c308420d';
 import { MIN_GROUND_CLEARANCE, cameraTargetY, cameraWorldHeightForGround, yCamOffsetAnchor } from '../public/js/movement.js?v=f4be1a05';
 import { STREET_GROUND_LINES } from '../public/js/street-ground-lines.js?v=4daa1c3b';
-import { MAIN as AUTUMN } from '../public/js/quest-rooms/an-autumn-day.js?v=a107a46e';
+import { MAIN as AUTUMN } from '../public/js/quest-rooms/an-autumn-day.js?v=db4c6417';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const game = readFileSync(join(root, 'public/game.js'), 'utf8');

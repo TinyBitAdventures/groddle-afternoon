@@ -114,7 +114,7 @@ function decodeImage(url, signal) {
       img.onload = null;
       img.onerror = null;
       // Drops the request; the next try asks again.
-      try { img.src = ''; } catch { /* a stand-in without a src setter */ }
+      try { img.src = ''; } catch { /* an image double without a src setter */ }
       reject(signal.reason || new Error(`stopped loading ${url}`));
     }, { once: true });
     img.src = url;

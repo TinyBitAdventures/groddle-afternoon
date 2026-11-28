@@ -44,7 +44,7 @@
  * played. &crabautoplay=...,radioquest answers the offer with Deal!
  */
 
-import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=d744485b';
+import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=1e277f22';
 import { addItem, countItem, ensureItem, registerItemUse, removeItem } from '../inventory.js?v=3be7988a';
 import { MUSICBLOCK_CATALOG, ensureMusicblockItems } from '../musicblocks.js?v=e4c81eb7';
 import { gainMetabolic, loseMood, shiftMetabolic } from '../metabolics.js?v=48f784bf';
@@ -88,7 +88,7 @@ import {
   normalizeCrabMemory,
   playToday,
 } from '../crabs.js?v=eb0bdc39';
-import { standOnFeet } from '../sprite-feet.js?v=1c6452d9';
+import { standOnFeet } from '../sprite-feet.js?v=18e517a6';
 
 const ART = 'assets/sprites/crabs/';
 /** OGA npc_crab sheets: 131x129 cells, 6 columns; populated counts measured. */

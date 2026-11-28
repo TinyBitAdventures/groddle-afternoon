@@ -13,7 +13,7 @@ import { assertStreetGeometry, platformYAt } from '../public/js/street-model.js?
 import { arrivalInTarget } from '../public/js/location-navigation.js?v=e9221d85';
 import { populationForStreet } from '../public/js/street-ecology.js?v=1c840641';
 import { pickAwayConnection, pickConnection, planSignpostTravel, resolveLoadedTsid } from '../public/js/travel.js?v=7fd6e363';
-import { validateShippedStreet } from '../public/js/builder/validate.js?v=cb24491c';
+import { validateShippedStreet } from '../public/js/builder/validate.js?v=470e59b0';
 import {
   HAUKI_FLOOR_1,
   HAUKI_FLOOR_2,
@@ -35,7 +35,7 @@ import {
   towerForLobby,
 } from '../public/js/tower-floors.js?v=91217aeb';
 import { towerFloorsFeature } from '../public/js/features/tower-floors-feature.js?v=2613cfb3';
-import { FEATURES } from '../public/js/features/index.js?v=cf9113ee';
+import { FEATURES } from '../public/js/features/index.js?v=3e229f79';
 
 const spike = join(dirname(fileURLToPath(import.meta.url)), '..');
 const pub = join(spike, 'public');

@@ -14,7 +14,7 @@ import { fileURLToPath } from 'node:url';
 import { MINE_STAND_X, NODE_TOOLS, NODE_TOOL_DELTAS, mineStandX, nodeToolOverlay, nodeToolSheet } from '../public/js/node-tools.js?v=47a93d54';
 import { miningProfile } from '../public/js/mining.js?v=7ecaa572';
 import { PACKED_SHEETS } from '../public/js/packed-sheets-data.js?v=192c6f15';
-import { packedCell, packedFrameAt } from '../public/js/packed-sheets.js?v=0abd290e';
+import { packedCell, packedFrameAt } from '../public/js/packed-sheets.js?v=dd1aead2';
 import { RESOURCE_NODE_CATALOG } from '../public/js/resource-nodes.js?v=c2eb46b1';
 import { imageSize } from '../tools/image-size.mjs';
 

@@ -12,18 +12,18 @@ import {
   pickConnection,
 } from './street-model.js?v=a9a05f9d';
 import { availableStreetTsids } from './street-loader.js?v=23555e53';
-import { frameTexture, isLoaded, onFailed, onLoaded, textureFromUrl } from './textures.js?v=8bb43102';
+import { frameTexture, isLoaded, onFailed, onLoaded, textureFromUrl } from './textures.js?v=29f80b6a';
 import { admitSharp, decoUrl, FAR_SLACKS, isSharpDeco, maxTextureSizeOf, sharpDeco, NEW_DECOS } from './deco-hires.js?v=34f36d77';
 import { LADDER_TILE_Z, ladderTilePieces } from './ladder-tiling.js?v=4f9e07fa';
-import { attachAnim, isAnimatedDeco, setAnimSource, setDecoTexture, syncAnim } from './deco-anim.js?v=b129f72e';
+import { attachAnim, isAnimatedDeco, setAnimSource, setDecoTexture, syncAnim } from './deco-anim.js?v=d21ed9e0';
 import { drawnLayerOffset, layerScreenDir } from './camera-feel.js?v=e668afc5';
 import { ensureDepthStencil, readbackPixels } from './render-probe.js?v=519c86ef';
 import { QUAD_SPAN, quadSpans, wideRect } from './wide-quads.js?v=f34556e6';
-import { anchorBottomCentre } from './sprite-feet.js?v=1c6452d9';
+import { anchorBottomCentre } from './sprite-feet.js?v=18e517a6';
 import { blurFix, blurredDecoCanvas } from './deco-blur.js?v=4f5d88ea';
 import { signWords } from './deco-sign.js?v=e98e50f9';
 import { loadWorldFont, WORLD_FONT_FAMILY } from './world-text.js?v=6b49f88c';
-import { buildDoorSprite } from './door-view.js?v=8fd396fb';
+import { buildDoorSprite } from './door-view.js?v=50fe370b';
 import { visibleDoors } from './doors.js?v=f815e7c8';
 import { farLayerTint, gradientColourAt, starField } from './sky-clock.js?v=dbd21266';
 

@@ -29,8 +29,8 @@ import { DEAD_END_EXIT, DEAD_END_TEXT, deadEndExitSpot, isDeadEndTsid, urReach }
 import { STREET_INDEX, isDraftStreet, resolveIndexTsid } from '../street-loader.js?v=23555e53';
 import { strayWayOut } from '../quest-instance.js?v=39e4ca2e';
 import { loadStreetGraph, worldRoads } from '../street-graph.js?v=16013e6e';
-import { isLoaded, onLoaded, textureFromUrl } from '../textures.js?v=8bb43102';
-import { anchorBottomCentre } from '../sprite-feet.js?v=1c6452d9';
+import { isLoaded, onLoaded, textureFromUrl } from '../textures.js?v=29f80b6a';
+import { anchorBottomCentre } from '../sprite-feet.js?v=18e517a6';
 import { WORLD_FONT_FAMILY } from '../world-text.js?v=6b49f88c';
 
 export const DEAD_ENDS_FEATURE_ID = 'dead-ends';

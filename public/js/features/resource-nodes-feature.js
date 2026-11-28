@@ -105,18 +105,18 @@ import {
   tickResourceNode,
   springDustTrapsOnArrival,
 } from '../resource-nodes.js?v=c2eb46b1';
-import { frameTexture as sheetFrameTexture, loadTexture, sourceFromUrl, textureFromUrl } from '../textures.js?v=8bb43102';
+import { frameTexture as sheetFrameTexture, loadTexture, sourceFromUrl, textureFromUrl } from '../textures.js?v=29f80b6a';
 import { acceptOffer, markOffered, npcQuestOffers, putOffOffer, questStatus } from '../quest-offers.js?v=cec1b5e9';
-import { OVERLAY_USES, playOverlay } from '../overlays.js?v=c788d4ab';
-import { OVERLAY_FADE, displayTopOf, itemstackOverlayPoint } from '../overlay-art.js?v=d32dce0e';
-import { playItemOverlay } from '../item-overlay.js?v=40335bc8';
+import { OVERLAY_USES, playOverlay } from '../overlays.js?v=306c160f';
+import { OVERLAY_FADE, displayTopOf, itemstackOverlayPoint } from '../overlay-art.js?v=243cef7d';
+import { playItemOverlay } from '../item-overlay.js?v=6f4018bf';
 import { nodeToolOverlay, nodeToolSheet } from '../node-tools.js?v=47a93d54';
-import { vpSequence } from '../quest-rooms/vp-overlay.js?v=2dd8d872';
+import { vpSequence } from '../quest-rooms/vp-overlay.js?v=d718cac7';
 import { itemZ } from '../item-bands.js?v=ec366be3';
 import { salmonSwimAt } from '../street-creatures.js?v=997a2517';
 import { GAME_EPOCH_MS } from '../game-day.js?v=57fecfcb';
 import { topUpMetabolic } from '../metabolics.js?v=48f784bf';
-import { anchorBottomCentre } from '../sprite-feet.js?v=1c6452d9';
+import { anchorBottomCentre } from '../sprite-feet.js?v=18e517a6';
 
 export const RESOURCE_FEATURE_ID = 'resource-nodes';
 export const RESOURCE_GROUP_PREFIX = 'resource:';

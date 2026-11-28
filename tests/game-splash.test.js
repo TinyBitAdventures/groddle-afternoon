@@ -20,7 +20,7 @@ import {
   splashRays,
   splashTextX,
   splashTextY,
-} from '../public/js/game-splash.js?v=0dfd59a6';
+} from '../public/js/game-splash.js?v=91e316fb';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const pub = join(here, '../public');
@@ -254,7 +254,7 @@ describe('show and leave', () => {
 
 describe('G448: SVG frames on a dense screen', () => {
   it('a 2x screen draws the splash from its SVG frames into a canvas, held until it hides', async () => {
-    const { vectorArtStats } = await import('../public/js/overlay-art.js?v=d32dce0e');
+    const { vectorArtStats } = await import('../public/js/overlay-art.js?v=243cef7d');
     const meta = manifest.race_winner;
     const vtext = read(`assets/sprites/overlays/${meta.vector.file}`);
     const savedFetch = globalThis.fetch;

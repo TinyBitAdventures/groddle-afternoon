@@ -18,7 +18,7 @@ import { pathToFileURL } from 'node:url';
 import { SITE_DIR, sitePath, skipWithoutSite } from '../tools/repos.mjs';
 import { REPORT_MAX, REPORT_PICTURE, REPORT_TEXT, STATUS_WORDS, UNREAD_POLL_MS, base64Size, canEditFirst, createReportsApi, pictureRefused, pictureSize, pictureSrc, numberedLine, refusalWords, reportFromHash, reportNumber, ticketLine, unreadCount, whenWords } from '../public/js/reports.js?v=3c805cc4';
 import { mountReportsSheet } from '../public/js/ui/reports-sheet.js?v=917a2f8c';
-import { BUG_TEXT, badgeFor, bugReportFeature, capturePicture } from '../public/js/features/bug-report-feature.js?v=20ee73f2';
+import { BUG_TEXT, badgeFor, bugReportFeature, capturePicture } from '../public/js/features/bug-report-feature.js?v=c54c6abe';
 import { HAS_PHP, PHP, phpSkip } from './php.js';
 
 const root = join(import.meta.dirname, '..');

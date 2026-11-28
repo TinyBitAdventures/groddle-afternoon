@@ -15,11 +15,11 @@ import { after, before, describe, it } from 'node:test';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-import { homeStreetMpFeature } from '../public/js/features/home-street-mp-feature.js?v=cc742dde';
-import { homesFeature } from '../public/js/features/homes-feature.js?v=6f62563f';
-import { quarterFeature } from '../public/js/features/quarter-feature.js?v=f5c81363';
+import { homeStreetMpFeature } from '../public/js/features/home-street-mp-feature.js?v=1640f3d3';
+import { homesFeature } from '../public/js/features/homes-feature.js?v=7c7ee524';
+import { quarterFeature } from '../public/js/features/quarter-feature.js?v=90069a18';
 import { visitSceneTsid } from '../public/js/neighbours-mp.js?v=de82fd7d';
-import { SIGN_FIRST_ARM_Y } from '../public/js/street-render.js?v=124facce';
+import { SIGN_FIRST_ARM_Y } from '../public/js/street-render.js?v=d76d4268';
 import { QUARTER_TEXT, homeArm, lotArrival, normalizeHeld } from '../public/js/quarter.js?v=a38887ca';
 import { clearStreetCache, clearStreetIndex } from '../public/js/street-loader.js?v=23555e53';
 import { Display, FakeEl, fakePixi } from './fake-scene.js';

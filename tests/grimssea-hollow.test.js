@@ -17,7 +17,7 @@ import { assertStreetGeometry } from '../public/js/street-model.js?v=a9a05f9d';
 import { arrivalInTarget } from '../public/js/location-navigation.js?v=e9221d85';
 import { reachStreet } from '../public/js/builder/reach-graph.js?v=687006d3';
 import { ENCHANTED_FORESTS, hollowTreeSpots } from '../public/js/enchanted-forests.js?v=17ac01e4';
-import { treeScreenSpots } from '../public/js/features/enchanted-forest-feature.js?v=d18d7569';
+import { treeScreenSpots } from '../public/js/features/enchanted-forest-feature.js?v=51089e13';
 
 const spike = join(dirname(fileURLToPath(import.meta.url)), '..');
 const read = (tsid) => JSON.parse(readFileSync(join(spike, 'public/assets/streets', `${tsid}.json`), 'utf8'));

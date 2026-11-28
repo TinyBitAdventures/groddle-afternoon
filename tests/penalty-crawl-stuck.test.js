@@ -18,8 +18,8 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-import * as kit from '../public/js/quest-rooms/kit.js?v=c28380e5';
-import { BARS_X, BARS_WALL, FLOOR, PART_3, PATCH_X, SPAWN, W, cellBarriers, room } from '../public/js/quest-rooms/penalty.js?v=982f17ea';
+import * as kit from '../public/js/quest-rooms/kit.js?v=44218fc3';
+import { BARS_X, BARS_WALL, FLOOR, PART_3, PATCH_X, SPAWN, W, cellBarriers, room } from '../public/js/quest-rooms/penalty.js?v=0ac09147';
 
 describe('1. the bars stop you', () => {
   it('a wall just inside the bars, floor to roof, that the engine reads (pc_perm -1)', () => {

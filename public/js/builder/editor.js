@@ -36,7 +36,7 @@
  * Addresses: #draft=<id>&street=<key> opens a draft's street, #view=<tsid> a shipped street.
  * QA: window.groddleBuilderQA (state, with the effects' stats; camera, matchView, select, anchorOf, selectGeo, geoHandles).
  */
-import { buildStreetView, loadDecoManifest, loadSignpostTextures, DECO_TWINS, flashBlurSize } from '../street-render.js?v=124facce';
+import { buildStreetView, loadDecoManifest, loadSignpostTextures, DECO_TWINS, flashBlurSize } from '../street-render.js?v=d76d4268';
 import { worldToScreen, platformsScreen, isStandable, streetWidth, streetHeight, navigableSignposts } from '../street-model.js?v=a9a05f9d';
 import { ensureStreetIndex, STREET_INDEX, resolveIndexTsid } from '../street-loader.js?v=23555e53';
 import { loadStreetEcologyCatalog, ecologyForStreet } from '../street-ecology.js?v=1c840641';
@@ -48,18 +48,18 @@ import { newDraftDialog, newStreetDialog, hubMapDialog, populationSection, zoneS
 import { decoFor, NEW_ART_BUNDLE } from './deco-search.js?v=fda9b16b';
 import { populationForStreet, planStreetPlacements, streetReservedSpots } from '../street-ecology.js?v=1c840641';
 import { nextDecoId, findDeco, applyOps } from './ops.js?v=27c7796f';
-import { postOffFloor, offFloorWords, settlePostOps, arrivalOps, followPostOps } from './posts.js?v=4cfb6c98';
+import { postOffFloor, offFloorWords, settlePostOps, arrivalOps, followPostOps } from './posts.js?v=f6805134';
 import { decoBox, contains, handlePoints, resizeBy, rotationTo, meetsRect, corners } from './handles.js?v=91612705';
 import { layerRole } from './layer-role.js?v=e585f610';
 import { installNewArt, withNewArt, provenanceSection } from './new-art.js?v=29f0b13e';
-import * as textureUrls from '../textures.js?v=8bb43102';
+import * as textureUrls from '../textures.js?v=29f80b6a';
 import { installPixiFixes } from '../pixi-fixes.js?v=0f42b75e';
 import { installHiresDecos } from '../deco-hires.js?v=34f36d77';
-import { OVERLAY_COLOURS, drawGeometryOverlay, drawReachOverlay, drawEffectMarkers, strokeSegs } from './overlays.js?v=c42afa39';
-import { createStreetEffects, createRumbleClock, prefersReducedMotion } from '../street-effects.js?v=c0c3748c';
-import { effectInspector, rumbleSection } from './editor-effects.js?v=f2fcf067';
-import { setLayerOffsets } from './geometry-handles.js?v=69951406';
-import { GEO_KINDS, GEO_LIST, GEO_WORDS, PERMS, geoKey, parseGeoKey, geoItem, geoKindOf, geoShape, geoHits, geoHandles, handleWorld, dragHandle, moveBy, changedFields, drawnItem, postOnFloor, defaultItem, permKey, permValue, permName, dashes, arriveFor, newConnect, shapeBounds } from './geometry-handles.js?v=69951406';
+import { OVERLAY_COLOURS, drawGeometryOverlay, drawReachOverlay, drawEffectMarkers, strokeSegs } from './overlays.js?v=0545b465';
+import { createStreetEffects, createRumbleClock, prefersReducedMotion } from '../street-effects.js?v=71022b24';
+import { effectInspector, rumbleSection } from './editor-effects.js?v=c1917612';
+import { setLayerOffsets } from './geometry-handles.js?v=b47479e7';
+import { GEO_KINDS, GEO_LIST, GEO_WORDS, PERMS, geoKey, parseGeoKey, geoItem, geoKindOf, geoShape, geoHits, geoHandles, handleWorld, dragHandle, moveBy, changedFields, drawnItem, postOnFloor, defaultItem, permKey, permValue, permName, dashes, arriveFor, newConnect, shapeBounds } from './geometry-handles.js?v=b47479e7';
 import { SNAP_PX, GUIDE_PX, endPoints, joinedEnds, snapPlatform, snapDrawnPlatform, snapPoint, floorSnapY, rulerTicks, bestPull } from './snap.js?v=94d892c9';
 import { watchSelects } from '../combobox.js?v=d43209e8';
 
@@ -733,7 +733,7 @@ async function boot() {
   }
   function loadValidateMod() {
     if (S.validateModLoading) return;
-    S.validateModLoading = import('./validate.js?v=cb24491c').then((m) => { S.validateMod = m; S.geoDrawn = ''; }).catch(() => { S.validateModLoading = null; });
+    S.validateModLoading = import('./validate.js?v=470e59b0').then((m) => { S.validateMod = m; S.geoDrawn = ''; }).catch(() => { S.validateModLoading = null; });
   }
 
   /** The reach to draw: the validator's for a draft street, else the one worked out here. */
@@ -2478,7 +2478,7 @@ async function boot() {
     // `new URL(...)` written here would not be keyed by tools/module-keys).
     if (!V.workerUrl) {
       if (!V.loading) {
-        V.loading = import('./validate-worker.js?v=019917c8').then((m) => { V.workerUrl = m.WORKER_URL; V.dataPaths = m.VALIDATOR_DATA; runValidate(); }).catch(() => { V.state = 'off'; ensureLocalReach(); });
+        V.loading = import('./validate-worker.js?v=977c0c96').then((m) => { V.workerUrl = m.WORKER_URL; V.dataPaths = m.VALIDATOR_DATA; runValidate(); }).catch(() => { V.state = 'off'; ensureLocalReach(); });
       }
       return null;
     }

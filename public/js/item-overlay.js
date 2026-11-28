@@ -30,11 +30,11 @@
  * players' mining bubbles played the same pick sheet here).
  */
 
-import { OVERLAY_FADE, overlayAlpha, overlayLifeMs, trackOverlay } from './overlay-art.js?v=d32dce0e';
-import { cutPackedFrames, packedFrameAt } from './packed-sheets.js?v=0abd290e';
+import { OVERLAY_FADE, overlayAlpha, overlayLifeMs, trackOverlay } from './overlay-art.js?v=243cef7d';
+import { cutPackedFrames, packedFrameAt } from './packed-sheets.js?v=dd1aead2';
 import { upgradeSource } from './sprite-hires.js?v=6a4569c4';
-import { loadOwnTexture, loadTexture, releaseTexture, whenLoaded } from './textures.js?v=8bb43102';
-import { anchorBottomCentre } from './sprite-feet.js?v=1c6452d9';
+import { loadOwnTexture, loadTexture, releaseTexture, whenLoaded } from './textures.js?v=29f80b6a';
+import { anchorBottomCentre } from './sprite-feet.js?v=18e517a6';
 
 /** Decoded sheets kept after their overlay ends. */
 export const KEEP_SHEETS = 2;

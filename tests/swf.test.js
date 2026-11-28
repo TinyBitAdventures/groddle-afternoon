@@ -24,8 +24,8 @@ import {
   swfVerbs,
   wrangleMessage,
 } from '../public/js/swf.js?v=6dd72036';
-import { swfFeature } from '../public/js/features/swf-feature.js?v=a79587a0';
-import { FEATURES } from '../public/js/features/index.js?v=cf9113ee';
+import { swfFeature } from '../public/js/features/swf-feature.js?v=b7049fe0';
+import { FEATURES } from '../public/js/features/index.js?v=3e229f79';
 import { ITEM_CATALOG } from '../public/js/inventory.js?v=3be7988a';
 import { DROP_ITEMS, DROP_TABLES } from '../public/js/drop-tables-data.js?v=c51a6400';
 
@@ -252,7 +252,7 @@ describe('Game (items/game_box.js)', () => {
 
 describe('G311: a move takes play_glitch down (cancelAllOverlaysWeCan 193-215)', () => {
   it('the pc_overlay goes with the street and is not sent again; the play still pays', async () => {
-    const { cancelAllOverlays, liveOverlayCount } = await import('../public/js/overlay-art.js?v=d32dce0e');
+    const { cancelAllOverlays, liveOverlayCount } = await import('../public/js/overlay-art.js?v=243cef7d');
     cancelAllOverlays();
     swfFeature._reset();
     const engine = fakeEngine(); // no Pixi layer: the announcement is tracked all the same

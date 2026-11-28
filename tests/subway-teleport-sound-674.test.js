@@ -25,7 +25,7 @@ import { tripSound } from '../public/js/street-trip.js?v=04c3258c';
 import { SILENT_THEME, resolveAmbientTheme, setAmbientMusicConfig } from '../public/js/ambient-music.js?v=fd8fe13e';
 import { SOUND_ALIASES, SOUND_FILES } from '../public/js/sound-keys.js?v=8b36c250';
 import { CAR_TSID, FARE, STATIONS, carStreet, stationStreet } from '../public/js/subway.js?v=ea6921ff';
-import { subwayFeature } from '../public/js/features/subway-feature.js?v=ea2715aa';
+import { subwayFeature } from '../public/js/features/subway-feature.js?v=a453e2d3';
 import { FakeEl, page } from './social-fake-dom.js';
 
 FakeEl.prototype.appendChild ||= function appendChild(k) {

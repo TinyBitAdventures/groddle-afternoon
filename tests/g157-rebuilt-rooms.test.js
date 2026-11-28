@@ -52,8 +52,8 @@ import {
   isRebuiltRoomTsid,
   rebuiltRoomEcology,
 } from '../public/js/rebuilt-rooms.js?v=5ef5618f';
-import { rebuiltRoomsFeature } from '../public/js/features/rebuilt-rooms-feature.js?v=b7c2982d';
-import { FEATURES } from '../public/js/features/index.js?v=cf9113ee';
+import { rebuiltRoomsFeature } from '../public/js/features/rebuilt-rooms-feature.js?v=6f2bb59c';
+import { FEATURES } from '../public/js/features/index.js?v=3e229f79';
 
 const spike = join(dirname(fileURLToPath(import.meta.url)), '..');
 const pub = join(spike, 'public');

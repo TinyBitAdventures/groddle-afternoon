@@ -19,7 +19,7 @@ import { normalizeMachine, placedMachineVerbs } from '../public/js/home-machines
 import { refuelMachine } from '../public/js/machines.js?v=93a736f2';
 import { createInventory, countItem } from '../public/js/inventory.js?v=3be7988a';
 import { createToolConditionState, getToolCondition } from '../public/js/tools.js?v=4156bba8';
-import { supplyFeature } from '../public/js/features/supply-feature.js?v=396a928f';
+import { supplyFeature } from '../public/js/features/supply-feature.js?v=6bb1959d';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const read = (rel) => readFileSync(join(root, 'public', rel), 'utf8');

@@ -76,9 +76,9 @@ import { getQuestCatalog } from '../content-catalogs.js?v=d30c3e0f';
 import { parseQuestConversation } from '../quests.js?v=f574d2e1';
 import { CUP_CLASS, CUP_OF_WATER, WATER_COOLER, WATER_COOLER_CLASS, drinkCup, getWater, getWaterState } from '../water-cooler.js?v=1cf1b040';
 import { BUREAUCRAT_CLASS, HALL, HALL_EXIT_DOOR_Y, HALL_LAYOUT, HALL_TEXT, PLEASE_WAIT_BUFF, TALK_VERB, createHallFlow } from '../bureaucratic-hall.js?v=29db1c45';
-import { closeQuestRoomConverse, questRoomConverse } from './quest-instances-feature.js?v=75cb26d4';
+import { closeQuestRoomConverse, questRoomConverse } from './quest-instances-feature.js?v=087f0206';
 import { HALL_MP_TEXT, HALL_POSE_MS, clerkAt, clerkRow, poseChanged } from '../halls-mp.js?v=044b5c5a';
-import { standOnFeet } from '../sprite-feet.js?v=1c6452d9';
+import { standOnFeet } from '../sprite-feet.js?v=18e517a6';
 import { pcLabel } from '../pc-label.js?v=d54da634';
 
 export const HALLS_FEATURE_ID = 'bureaucratic-halls';

@@ -31,12 +31,12 @@
 import { getAmbientMusicConfig } from '../ambient-music.js?v=fd8fe13e';
 import { MUSICBLOCK_CATALOG } from '../musicblocks.js?v=e4c81eb7';
 import { musicblocksInPack } from '../crabs.js?v=eb0bdc39';
-import { standOnFeet } from '../sprite-feet.js?v=1c6452d9';
-import { textureFromUrl } from '../textures.js?v=8bb43102';
+import { standOnFeet } from '../sprite-feet.js?v=18e517a6';
+import { textureFromUrl } from '../textures.js?v=29f80b6a';
 import { WORLD_FONT_FAMILY } from '../world-text.js?v=6b49f88c';
 import { SIDE_SHEET_IDS, bindTabs, selectTab } from '../ui/panel-shell.js?v=5efb38c6';
 import { homeStreetName, possessive, visitSceneTsid } from '../neighbours-mp.js?v=de82fd7d';
-import { visitorHomeScene } from './homes-feature.js?v=6f62563f';
+import { visitorHomeScene } from './homes-feature.js?v=7c7ee524';
 import {
   PREVIEW_MS,
   RADIO_ART,

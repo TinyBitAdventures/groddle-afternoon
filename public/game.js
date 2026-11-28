@@ -5,7 +5,7 @@
 import { fetchRetry } from './js/load-retry.js?v=24823577';
 import { ITEM_ICONS, ITEM_LABELS, getVerbsFor, ordinaryItems, runVerb } from './content.js?v=d046197c';
 import { createErrorOnce, createFeatureHost, createFrameStages } from './js/feature-host.js?v=100f3193';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=cf9113ee';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=3e229f79';
 import { VENDOR_STAND_IN_LABEL, VENDOR_NAME_LABEL } from './js/street-spirits.js?v=8ff6ed59';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, enterHintPick, hoverText, stackHoverLabel, groupHead, hoverRimShown, reachGlowTargets, spriteHasRimArt, rimArtParts, rimsTraceParts, trimmedIconUrl, drawTileArt } from './js/enter-chooser.js?v=b37c63e0';
 import { firstTendKey, STICK_TEND_DELAY_MS, STICK_TEND_DIRS, STICK_TEND_REPEAT_MS, stepTendKey, stepTendKeys, stickTendKey, tendKeyAction } from './js/garden-tend.js?v=a7470c4a';
@@ -13,7 +13,7 @@ import { avatarHitBox, behindFloor, bodyReachDistance, OUT_OF_REACH_LINE, player
 import { createVogOverlay } from './js/vog-overlay.js?v=02f04426';
 import { createPromptStack } from './js/prompt-stack.js?v=c4e1f87d';
 import { createWindowStack } from './js/window-stack.js?v=0c4a6356';
-import { HOG_HAUL_SPLASH, createGameSplash, splashFor } from './js/game-splash.js?v=0dfd59a6';
+import { HOG_HAUL_SPLASH, createGameSplash, splashFor } from './js/game-splash.js?v=91e316fb';
 import {
   actionDurationFor,
   createTimedAction,
@@ -22,7 +22,7 @@ import {
 } from './js/action-timing.js?v=283e65ce';
 import { createWordProgressView, wordAnchor, heldActionDelta, MAX_PUSH_DOWN } from './js/word-progress.js?v=98366023';
 // G374/G375/G378: Tiny Speck's quoin-limit and super-harvest rainbows and the musicblock notes.
-import { OVERLAY_USES, playCountdownArt, playOverlay, rainbowSound, showRainbow } from './js/overlays.js?v=c788d4ab';
+import { OVERLAY_USES, playCountdownArt, playOverlay, rainbowSound, showRainbow } from './js/overlays.js?v=306c160f';
 import {
   createQuestState,
   assignQuest,
@@ -89,7 +89,7 @@ import {
   spinFourLetterBlock,
   startFourLetterPuzzle,
 } from './js/four-letter-quest.js?v=9540cc6f';
-import { KIDS_ROOM_W, buildKidsRoomScene } from './js/kids-room-scene.js?v=3197c84c';
+import { KIDS_ROOM_W, buildKidsRoomScene } from './js/kids-room-scene.js?v=f6b85eb8';
 import {
   AXIS_DENYDE_STREET_ID,
   CAVE_IN_BOX_ID,
@@ -144,7 +144,7 @@ import {
 } from './js/legalize-it.js?v=b976dcb4';
 import { HALL, HALL_DECOS, HALL_EXTRA_CHAIRS, HALL_OFFICE, HALL_QUESTIONS } from './js/bureaucratic-hall.js?v=29db1c45';
 import { STATION_X, stationArrival, stationScreen, surfaceStation } from './js/subway.js?v=ea6921ff';
-import { ALLEY, SHADY, drawAlley, inEnteredBox } from './js/quest-rooms/back-alley-set.js?v=60ee4227';
+import { ALLEY, SHADY, drawAlley, inEnteredBox } from './js/quest-rooms/back-alley-set.js?v=42abd454';
 import { WINTER_WALK_BOUNDS, WINTER_WALK_PASSAGE } from './js/winter-walk-streets.js?v=c921bf92';
 import {
   WINTER_HAVEN_STREET_ID,
@@ -431,7 +431,7 @@ import {
   buildParadiseCourseArt,
   paradiseCoursePreloadUrls,
   paradiseCourseRuntime,
-} from './js/paradise-course-runtime.js?v=049dcf85';
+} from './js/paradise-course-runtime.js?v=210ad3dd';
 import { installWorldText, loadWorldFont, NAMEPLATE_STYLE, WORLD_FONT_FAMILY, worldCanvasFont, worldLabelStyle } from './js/world-text.js?v=6b49f88c';
 import {
   createAchievementState,
@@ -750,7 +750,7 @@ import {
   ensureStreetIndex,
   resolveIndexTsid,
 } from './js/street-loader.js?v=23555e53';
-import { showDraftBanner, startDraftPlay } from './js/builder/draft-play.js?v=e6d18bd6';
+import { showDraftBanner, startDraftPlay } from './js/builder/draft-play.js?v=999248b8';
 import { bootHouseFile } from './js/house-file-loader.js?v=19ff0eae';
 import {
   ladderTopDeck,
@@ -785,7 +785,7 @@ import {
   signpostBoardAt,
   signpostGlowFilters,
   signpostGlowParts,
-} from './js/street-render.js?v=124facce';
+} from './js/street-render.js?v=d76d4268';
 import {
   GAME_DAY_MS,
   GAME_EPOCH_MS,
@@ -867,7 +867,7 @@ import {
   maturityLabel,
   trantStatusLabel,
 } from './js/trants.js?v=cf0fe1a3';
-import { loadTrantLook, trantFrameUrl, trantLook, trantLookTexture, trantShownTexture, trantStage, warmTrantLook } from './js/trant-looks.js?v=c6507fcd';
+import { loadTrantLook, trantFrameUrl, trantLook, trantLookTexture, trantShownTexture, trantStage, warmTrantLook } from './js/trant-looks.js?v=a46ab4b1';
 import { growStreetTrant } from './js/patches.js?v=54430bb9';
 import {
   runStreetTransition,
@@ -912,7 +912,7 @@ import { hellBuffDesc, isInHell } from './js/hell.js?v=0dba5774';
 import { climbBobY, ladderAnimState, ladderSwap } from './js/ladder-anim.js?v=a8b327a0';
 import { VECTOR_AVATAR } from './js/avatar-vector-sheets.js?v=ad801376';
 import { PLACEHOLDER_SHEETS, isPlaceholderPack, ownPackFor, washPlaceholderPixels, whenOwnLookReady } from './js/avatar-placeholder.js?v=ae5c39e4';
-import { createNpcGlitchKit } from './js/npc-glitch.js?v=edec9186';
+import { createNpcGlitchKit } from './js/npc-glitch.js?v=7eccfb4b';
 import { bakeIdleSheet, bakeLook, bakeSheet, loadCatalog as loadAvatarCatalog, paintPreview as paintVectorPreview, prepareIdle, prepareLook } from './js/avatar-compositor.js?v=2b3cd2b7';
 import { LATE_SHEETS, anchorSheetFrames, createRetireQueue, ensureAnimSheets, ensureLateSheet, fillPackAnims, packComplete, redrawFrame, showsStandIn } from './js/avatar-pack.js?v=65324246';
 import { catalogItem, colourwaySwatches, lookKey, randomVectorFields, resolveLook, swatchBackground } from './js/avatar-looks.js?v=5a28384d';
@@ -1107,9 +1107,9 @@ import {
   flightGroundFor,
 } from './js/street-ecology.js?v=1c840641';
 import { CHICKEN_PAUSE, chickenPauseRoll, flierAt, flierSeed, flightFloorFor, followPath, PATH_STEP } from './js/street-creatures.js?v=997a2517';
-import { chickenPose, chickenIdleSheetsAsked } from './js/chicken-idle-art.js?v=28551227';
+import { chickenPose, chickenIdleSheetsAsked } from './js/chicken-idle-art.js?v=5676c15b';
 import { chickenWaitPose } from './js/chicken-idles.js?v=eef0279b';
-import { itemOverlayStats } from './js/item-overlay.js?v=40335bc8';
+import { itemOverlayStats } from './js/item-overlay.js?v=6f4018bf';
 import { isCrowdSad } from './js/animal-crowding.js?v=50ebbe5d';
 import { createSoundBoard, DEFAULT_SFX_VOLUME, watchButtonClicks, watchPanelSounds } from './js/sound-board.js?v=fb6a6c26';
 import {
@@ -1176,13 +1176,13 @@ import { EAT_PICK_TEXT, bestFoodIndex, eatChoices, eatTip } from './js/eat-pick.
 import { heldDirection, installHeldKeyGuard, isMacPlatform } from './js/held-keys.js?v=a28eb293';
 import { isOneClickDoor, oneClickChoice, signpostArmRows, worldContextAction } from './js/world-context-menu.js?v=00e2eb03';
 import { blockedPlayerVerbs, listPlayerTarget, opensPlayerMenu, playerMenuRows } from './js/ui/player-menu.js?v=2add6a78';
-import { forgetTexture, frameTexture, isFailed, isLoaded, onFailed, onLoaded, textureFromUrl, whenLoaded } from './js/textures.js?v=8bb43102';
+import { forgetTexture, frameTexture, isFailed, isLoaded, onFailed, onLoaded, textureFromUrl, whenLoaded } from './js/textures.js?v=29f80b6a';
 import { FALLBACK_MAX as WORLD_ART_FALLBACK_MAX, worldArtFor } from './js/world-art.js?v=a67514c8';
 import { HOME_PIP_PX, HOME_PIP_WORDS, drawLockPip, drawPipWords, homeMarkNote, homePipShown, homePipWordsShown, homeStackMark } from './js/home-stack-marks.js?v=67b44287';
-import { attachAnim, sceneAnim, syncAnim } from './js/deco-anim.js?v=b129f72e';
+import { attachAnim, sceneAnim, syncAnim } from './js/deco-anim.js?v=d21ed9e0';
 import { revealStartCard, whenSceneDrawn } from './js/start-backdrop.js?v=8510d51e';
-import { cancelAllOverlays, displayTopOf, itemstackOverlayPoint, playPoofIn, setOverlayResolution } from './js/overlay-art.js?v=d32dce0e';
-import * as textureUrls from './js/textures.js?v=8bb43102';
+import { cancelAllOverlays, displayTopOf, itemstackOverlayPoint, playPoofIn, setOverlayResolution } from './js/overlay-art.js?v=243cef7d';
+import * as textureUrls from './js/textures.js?v=29f80b6a';
 import { configureReadback, probeRenderTexture, readbackCanvas, readbackExtract, readScreenRow, renderProbeLine } from './js/render-probe.js?v=519c86ef';
 import { guardDestroyedSources, guardTickerRender, installPixiFixes, redrawCachedTextures } from './js/pixi-fixes.js?v=0f42b75e';
 import { hidesChatBubble } from './js/hi-signs.js?v=19ce6a48';
@@ -1207,7 +1207,7 @@ import { arrangeMapCards, fitMapExtras } from './js/map-extras.js?v=16e261b1'; /
 import { installInterfaceSettings } from './js/classic/classic-prefs.js?v=da590f6e';
 import { installWhatsNewWindow } from './js/ui/whats-new-window.js?v=84fae9bc';
 import { noteWhatsNewBootEnd, offerWhatsNewFallback } from './js/whats-new.js?v=988ec58d';
-import { standOnFeet, anchorBottomCentre } from './js/sprite-feet.js?v=1c6452d9';
+import { standOnFeet, anchorBottomCentre } from './js/sprite-feet.js?v=18e517a6';
 import { markLeaving, packPicks, takeCopies } from './js/copy-picks.js?v=b368fd49';
 import { holdKeepsBusy } from './js/instance-holds.js?v=ff3a63a3';
 import { createLoadTurns, createStreetMove, travelTurn } from './js/street-move.js?v=1c4431bf';

@@ -5,8 +5,8 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { SLOTH_POOF_ART, slothPoofBase } from '../public/js/features/newxp-feature.js?v=072e93e9';
-import { itemstackOverlayPoint, standPlacement } from '../public/js/overlay-art.js?v=d32dce0e';
+import { SLOTH_POOF_ART, slothPoofBase } from '../public/js/features/newxp-feature.js?v=7ce0602a';
+import { itemstackOverlayPoint, standPlacement } from '../public/js/overlay-art.js?v=243cef7d';
 import { training1Layout } from '../public/js/newxp.js?v=abbf0ed6';
 
 const PUBLIC = join(dirname(fileURLToPath(import.meta.url)), '../public');

@@ -72,7 +72,7 @@ import { HOE_TOOLS, WATERING_CAN_TOOLS, canUseTool, firstWorkingTool } from '../
 import { exposeQA } from '../qa-gate.js?v=f4e2cd82';
 import { addItem, countItem, ITEM_CATALOG, itemIcon } from '../inventory.js?v=3be7988a';
 import { JOB_WORK_BUBBLE, JOB_WORK_OVERLAY, JOB_WORK_REMOTE_BUBBLE_DY, jobWorkToolScale, jobWorkToolSheet } from '../job-work-fx.js?v=a2dc6a5a';
-import { frameTexture, sourceFromUrl, textureFromUrl } from '../textures.js?v=8bb43102';
+import { frameTexture, sourceFromUrl, textureFromUrl } from '../textures.js?v=29f80b6a';
 import { gardenGrowModifier } from '../imagination-effects.js?v=70169933';
 import { ENDED_STATES, NO_REALTIME_STATES, answerWaitMs, createOnlineRequests, sharedOffline, waitLine } from '../online-request.js?v=5fa7a635';
 import { saveStore, savedThrough } from '../save-store.js?v=1ccb1d6b';

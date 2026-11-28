@@ -31,7 +31,7 @@
  */
 
 import { OPERATION_GROW_FILES } from './operation-grow-art.js?v=3cbe7663';
-import { textureFromUrl } from './textures.js?v=8bb43102';
+import { textureFromUrl } from './textures.js?v=29f80b6a';
 // FLICKER: long thin strips in pieces the GPU always draws (js/wide-quads.js).
 import { wideRect } from './wide-quads.js?v=f34556e6';
 

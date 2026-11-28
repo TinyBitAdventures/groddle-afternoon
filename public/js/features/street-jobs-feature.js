@@ -56,7 +56,7 @@ import { ITEM_CATALOG, addItem, countItem, ensureItem, itemIcon, packStamp, remo
 import { canUseTool, useToolCondition, workStepCost } from '../tools.js?v=4156bba8';
 import { ecologyForStreet } from '../street-ecology.js?v=1c840641';
 import { worldToScreen } from '../street-model.js?v=a9a05f9d';
-import { signArmWidth } from '../street-render.js?v=124facce';
+import { signArmWidth } from '../street-render.js?v=d76d4268';
 import { WORLD_FONT_FAMILY } from '../world-text.js?v=6b49f88c';
 import { getSkillCatalog } from '../content-catalogs.js?v=d30c3e0f';
 import { listRecipesProducing } from '../making.js?v=d3571803';
@@ -155,7 +155,7 @@ import {
 import { grantMoodXp } from '../mood-xp.js?v=e311b45c';
 import { createMinnAccount } from '../minn-account.js?v=7e3d7279';
 import { normalizeGroups } from '../groups.js?v=c5e35964';
-import { frameTexture, sourceFromUrl, textureFromUrl } from '../textures.js?v=8bb43102';
+import { frameTexture, sourceFromUrl, textureFromUrl } from '../textures.js?v=29f80b6a';
 import { createJobIndicator, jobIndicatorTip, jobIndicatorView, jobPerc } from '../job-indicator.js?v=8bea518d';
 import { LOT_ART, LOT_CLASS, LOT_PLACEMENT, LOT_SIGN_BLOCKERS, LOT_SIGN_X, LOT_TEXT, OWNED_TEXT, floorYAt, hallStreetName, lotFit, lotHeadline, lotJobIds, lotOwner, lotVerb, ownedVerb, hallStreetOpen } from '../group-hall-lot.js?v=045c799a';
 import { hallStreetOf } from '../group-hall-street.js?v=fa1921ad';
@@ -174,7 +174,7 @@ import { featuredStore, renderFeaturedLine, renderFeaturedRow } from '../ui/feat
 import { GEM_HINTS, isGem } from '../gem-hints.js?v=4b65f7ac';
 import { JOB_ASK_TEXT, itemAskSubject, itemGetHref, itemMakeNote, showAskRule, skillRankLabel, workSkillMissing, workSkillNote } from '../street-job-asks.js?v=32adbe89';
 import { applySoloScale, hopsFromStart, soloAmountsLine } from '../street-jobs-solo.js?v=e6d237d8';
-import { standOnFeet, anchorBottomCentre } from '../sprite-feet.js?v=1c6452d9';
+import { standOnFeet, anchorBottomCentre } from '../sprite-feet.js?v=18e517a6';
 import { sitePageWhere } from '../site-pages.js?v=9b3049cf';
 
 export const STREET_JOBS_FEATURE_ID = 'street-jobs';

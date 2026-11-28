@@ -34,7 +34,7 @@ import { RECIPE_CATALOG, isRecipeCatalogReady, setRecipeCatalog } from '../makin
 import { activeSeasons, parseSeasonDate, potLuckWindow, seasonYearKey } from '../seasons.js?v=5d8f545a';
 import { shiftMetabolic } from '../metabolics.js?v=48f784bf';
 import { landingY, nearestSurfaceY } from '../walk-surface.js?v=76def2f6';
-import { isLoaded, onLoaded, textureFromUrl } from '../textures.js?v=8bb43102';
+import { isLoaded, onLoaded, textureFromUrl } from '../textures.js?v=29f80b6a';
 import { WORLD_FONT_FAMILY } from '../world-text.js?v=6b49f88c';
 import { exposeQA } from '../qa-gate.js?v=f4e2cd82';
 import { SEED_CATALOG } from '../garden.js?v=fefa7bcd';

@@ -12,7 +12,7 @@ import assert from 'node:assert/strict';
 import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { join, relative } from 'node:path';
 
-import * as T from '../public/js/textures.js?v=8bb43102';
+import * as T from '../public/js/textures.js?v=29f80b6a';
 import { fetchRetry, isLoadTimeout, LOAD_TIMEOUT_MS, loadTimeoutFor, RETRY_WAITS_MS, timeLimit } from '../public/js/load-retry.js?v=24823577';
 
 const root = join(import.meta.dirname, '..');

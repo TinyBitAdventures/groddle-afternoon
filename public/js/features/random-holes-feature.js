@@ -30,7 +30,7 @@ import { teleportWithinStreet } from '../within-street.js?v=5ce33cdf';
 import { groundAt } from '../street-arrival.js?v=b39d8f3d';
 import { streetWidth } from '../street-model.js?v=a9a05f9d';
 import { AVATAR_BODY_H } from '../avatar-step.js?v=8415ee96';
-import { isLoaded, onLoaded, textureFromUrl } from '../textures.js?v=8bb43102';
+import { isLoaded, onLoaded, textureFromUrl } from '../textures.js?v=29f80b6a';
 import { qaHandlesAllowed } from '../qa-gate.js?v=f4e2cd82';
 
 export const RANDOM_HOLES_FEATURE_ID = 'random-holes';

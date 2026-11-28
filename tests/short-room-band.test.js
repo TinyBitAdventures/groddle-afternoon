@@ -12,8 +12,8 @@ import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { SHORT_SCENE_BAND, shortSceneBand } from '../public/js/location-view.js?v=c308420d';
-import { stageSkyColour } from '../public/js/street-render.js?v=124facce';
-import { ROOM_NO_SKY, gradientTop, sceneRoot } from '../public/js/quest-rooms/kit.js?v=c28380e5';
+import { stageSkyColour } from '../public/js/street-render.js?v=d76d4268';
+import { ROOM_NO_SKY, gradientTop, sceneRoot } from '../public/js/quest-rooms/kit.js?v=44218fc3';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const read = (p) => readFileSync(join(root, p), 'utf8');

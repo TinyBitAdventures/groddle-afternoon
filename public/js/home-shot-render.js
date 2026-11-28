@@ -27,7 +27,7 @@
  * path) and every texture under it is waited for first, so nothing still loading comes out blank.
  */
 import { readbackCanvas } from './render-probe.js?v=519c86ef';
-import { isLoaded, whenLoaded } from './textures.js?v=8bb43102';
+import { isLoaded, whenLoaded } from './textures.js?v=29f80b6a';
 import { homeShotBands, homeShotRows, homeShotScale, homeShotSize } from './home-shot.js?v=8198618a';
 import { homeFrameFor } from './home-layout-scene.js?v=b0e8b5ae';
 import { withPublicView } from './public-picture.js?v=1a0b03fa';

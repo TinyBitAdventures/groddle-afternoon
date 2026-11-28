@@ -51,8 +51,8 @@ import { slugsFromEffects } from '../speech-slugs.js?v=d5cc8b6f';
 import { addItem, countItem, removeItem } from '../inventory.js?v=3be7988a';
 import { getToolCondition } from '../tools.js?v=4156bba8';
 import { worldToScreen } from '../street-model.js?v=a9a05f9d';
-import { OVERLAY_USES, playOverlay } from '../overlays.js?v=c788d4ab';
-import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=d744485b';
+import { OVERLAY_USES, playOverlay } from '../overlays.js?v=306c160f';
+import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=1e277f22';
 import { followFloorY, nearestSurfaceY, walkSurfaceY } from '../walk-surface.js?v=76def2f6';
 import { loadWildlifeCatalog, wildlifeCatalog, wildlifeFor } from '../wildlife.js?v=7224f78a';
 import {

@@ -12,7 +12,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { PARTY_LEFT_TEXT, PARTY_SPACES, partySpaceLeftLine } from '../public/js/party-spaces.js?v=91ce15c5';
-import { partySpacesFeature } from '../public/js/features/party-spaces-feature.js?v=6ae500ba';
+import { partySpacesFeature } from '../public/js/features/party-spaces-feature.js?v=fc28aaf3';
 import { partyFeature } from '../public/js/features/party-feature.js?fresh=party-space-left';
 import { FakeEl } from './fake-scene.js';
 

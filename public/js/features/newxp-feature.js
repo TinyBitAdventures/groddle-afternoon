@@ -151,11 +151,11 @@ import { assignQuest, completeQuest } from '../quests.js?v=f574d2e1';
 import { acceptOffer, enqueueQuestOffer, questAwardPayload, turnInQuest } from '../quest-offers.js?v=cec1b5e9';
 import { getQuestCatalog } from '../content-catalogs.js?v=d30c3e0f';
 import { locationEventsApi } from './location-events-feature.js?v=1c5b6340';
-import * as kit from '../quest-rooms/kit.js?v=c28380e5';
-import { frameTexture, onLoaded, sourceFromUrl, textureFromUrl, whenLoaded } from '../textures.js?v=8bb43102';
+import * as kit from '../quest-rooms/kit.js?v=44218fc3';
+import { frameTexture, onLoaded, sourceFromUrl, textureFromUrl, whenLoaded } from '../textures.js?v=29f80b6a';
 import { upgradeSource } from '../sprite-hires.js?v=6a4569c4';
 import { grantMoodXp } from '../mood-xp.js?v=e311b45c';
-import { displayTopOf, itemstackOverlayPoint, playPoofIn, playSheetOverlay, poofInAlpha } from '../overlay-art.js?v=d32dce0e';
+import { displayTopOf, itemstackOverlayPoint, playPoofIn, playSheetOverlay, poofInAlpha } from '../overlay-art.js?v=243cef7d';
 import { HOME_MACHINE } from '../home-ticket.js?v=df702ad8';
 import { createAnimalState } from '../animals.js?v=692aa092';
 import {
@@ -177,7 +177,7 @@ import {
 import { filterText } from '../word-filter.js?v=9a7a7ebb';
 import { isPhoneDevice, phoneScreenFrame, safeAreaInsets, touchWords } from '../touch-controls.js?v=8bc690ac';
 import { energyMax, forceMetabolic, moodMax } from '../metabolics.js?v=48f784bf';
-import { standOnFeet, anchorBottomCentre } from '../sprite-feet.js?v=1c6452d9';
+import { standOnFeet, anchorBottomCentre } from '../sprite-feet.js?v=18e517a6';
 import { WORLD_FONT_FAMILY } from '../world-text.js?v=6b49f88c';
 
 export const NEWXP_FEATURE_ID = 'newxp';

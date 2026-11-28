@@ -15,7 +15,7 @@ import { join } from 'node:path';
 import { describe, it } from 'node:test';
 
 import { setTrantTables } from '../public/js/trants.js?v=cf0fe1a3';
-import { trantLook, trantShownTexture, warmTrantLook } from '../public/js/trant-looks.js?v=c6507fcd';
+import { trantLook, trantShownTexture, warmTrantLook } from '../public/js/trant-looks.js?v=a46ab4b1';
 
 const root = join(import.meta.dirname, '..');
 const read = (rel) => readFileSync(join(root, rel), 'utf8');

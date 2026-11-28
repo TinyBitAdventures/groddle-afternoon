@@ -68,11 +68,11 @@
  * cameraEyeballSent, cameraSnapTaps (G1314: the phone's Snap button's taps).
  */
 
-import { textureFromUrl } from '../textures.js?v=8bb43102';
-import { OVERLAY_BUBBLE_URL, OVERLAY_USES, overlayBubbleBox, playOverlay } from '../overlays.js?v=c788d4ab';
+import { textureFromUrl } from '../textures.js?v=29f80b6a';
+import { OVERLAY_BUBBLE_URL, OVERLAY_USES, overlayBubbleBox, playOverlay } from '../overlays.js?v=306c160f';
 import { SPEECH_BUBBLE_Z } from '../fx-z.js?v=18dda7e3';
 import { isPhoneDevice } from '../touch-controls.js?v=8bc690ac';
-import { anchorBottomCentre } from '../sprite-feet.js?v=1c6452d9';
+import { anchorBottomCentre } from '../sprite-feet.js?v=18e517a6';
 import { HOME_SHOT_COPY } from '../home-shot.js?v=8198618a';
 
 export const CAMERA_FEATURE_ID = 'camera-mode';

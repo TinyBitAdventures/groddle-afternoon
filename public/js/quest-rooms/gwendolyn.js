@@ -69,10 +69,10 @@ import { ensureQuestOfferState } from '../quest-offers.js?v=cec1b5e9';
 import { MEDITATION_MUSIC, ORB_TOOL_SHEET } from '../meditation.js?v=96f23682';
 import { gainMetabolic, loseMood } from '../metabolics.js?v=48f784bf';
 import { runOutcome } from '../autoplay-log.js?v=55bb4823';
-import { frameTexture, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js?v=8bb43102';
-import { displayTopOf, itemstackOverlayPoint, playSheetOverlay } from '../overlay-art.js?v=d32dce0e';
+import { frameTexture, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js?v=29f80b6a';
+import { displayTopOf, itemstackOverlayPoint, playSheetOverlay } from '../overlay-art.js?v=243cef7d';
 import { GWENDOLYN_INNER_FILES } from './gwendolyn-inner-art.js?v=06b4d5d6';
-import { standOnFeet } from '../sprite-feet.js?v=1c6452d9';
+import { standOnFeet } from '../sprite-feet.js?v=18e517a6';
 
 export const ROOM_ID = 'gwendolyn';
 const ART = `assets/sprites/quest-rooms/${ROOM_ID}/`;

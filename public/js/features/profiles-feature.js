@@ -92,7 +92,7 @@ import {
 } from '../profiles.js?v=1daccbb9';
 import { homeLayoutJson, homeLayoutKeyOf, HOME_LAYOUT_LIMITS } from '../home-layout.js?v=53eabf28';
 import { collectHomeLayout, homeFrameFor } from '../home-layout-scene.js?v=b0e8b5ae';
-import { renderHomeLocation } from '../home-shot-render.js?v=5702eba5';
+import { renderHomeLocation } from '../home-shot-render.js?v=fc91430c';
 import { withPublicView } from '../public-picture.js?v=1a0b03fa';
 import { openSitePage } from '../site-pages.js?v=9b3049cf';
 

@@ -96,8 +96,8 @@ import {
   titheMessage,
   useEmblem,
 } from '../giant-icons.js?v=d21e4a37';
-import { textureFromUrl } from '../textures.js?v=8bb43102';
-import { playSheetOverlay } from '../overlay-art.js?v=d32dce0e';
+import { textureFromUrl } from '../textures.js?v=29f80b6a';
+import { playSheetOverlay } from '../overlay-art.js?v=243cef7d';
 import { grantMoodXp } from '../mood-xp.js?v=e311b45c';
 import { forceMetabolic, gainMetabolic } from '../metabolics.js?v=48f784bf';
 import { CONVERSATION_RULES, adoptLegacyTalks, conversationRecord, hasCompleted, toldRecord } from '../conversations.js?v=8b5536cc';
@@ -110,8 +110,8 @@ import { createMinnAccount } from '../minn-account.js?v=7e3d7279';
 import { saveStore, savedThrough } from '../save-store.js?v=1ccb1d6b';
 import { HOME_INTERIOR_TSID, HOME_STREET_TSID } from '../homes.js?v=4f4ade68';
 import { gnomePlaceFor, visitGnomePlace } from '../garden-gnome.js?v=6ae20bdc';
-import { homesFeature } from './homes-feature.js?v=6f62563f';
-import { standOnFeet } from '../sprite-feet.js?v=1c6452d9';
+import { homesFeature } from './homes-feature.js?v=7c7ee524';
+import { standOnFeet } from '../sprite-feet.js?v=18e517a6';
 
 export const ICONS_FEATURE_ID = 'giant-icons';
 const WORLD_ART = (iconClass) => `assets/sprites/giant-icons/${iconClass}.webp`;

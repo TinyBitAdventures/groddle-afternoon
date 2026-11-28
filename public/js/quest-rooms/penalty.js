@@ -34,10 +34,10 @@
 import { createPlot, performPlotVerb, plotArtPath, plotVerbs, soilResponse } from '../patches.js?v=54430bb9';
 import { getQuestCatalog } from '../content-catalogs.js?v=d30c3e0f';
 import { runOutcome } from '../autoplay-log.js?v=55bb4823';
-import { onLoaded, textureFromUrl } from '../textures.js?v=8bb43102';
+import { onLoaded, textureFromUrl } from '../textures.js?v=29f80b6a';
 import { ensureItem } from '../inventory.js?v=3be7988a';
 import { forceMetabolic } from '../metabolics.js?v=48f784bf';
-import { standOnFeet } from '../sprite-feet.js?v=1c6452d9';
+import { standOnFeet } from '../sprite-feet.js?v=18e517a6';
 
 export const PART_1 = 'smuggle_the_smuggler_part1';
 export const PART_2 = 'smuggle_the_smuggler_part2';

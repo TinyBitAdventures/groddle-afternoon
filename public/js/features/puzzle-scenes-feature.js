@@ -60,10 +60,10 @@ import {
 } from '../puzzle-scenes.js?v=5c9798c3';
 import { gainMetabolic } from '../metabolics.js?v=48f784bf';
 import { createStuckAsker } from '../stuck-prompt.js?v=9108f8ac';
-import { frameTexture, isLoaded, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js?v=8bb43102';
+import { frameTexture, isLoaded, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js?v=29f80b6a';
 import { grantMoodXp } from '../mood-xp.js?v=e311b45c';
 import { partySpaceForStreet } from '../party-spaces.js?v=91ce15c5';
-import { anchorBottomCentre } from '../sprite-feet.js?v=1c6452d9';
+import { anchorBottomCentre } from '../sprite-feet.js?v=18e517a6';
 import { WORLD_FONT_FAMILY } from '../world-text.js?v=6b49f88c';
 
 export const PUZZLE_SCENES_FEATURE_ID = 'puzzle-scenes';

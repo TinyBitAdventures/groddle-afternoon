@@ -43,7 +43,7 @@
  */
 
 import { fetchRetry } from './load-retry.js?v=24823577';
-import { frameTexture, sourceFromUrl } from './textures.js?v=8bb43102';
+import { frameTexture, sourceFromUrl } from './textures.js?v=29f80b6a';
 
 export const OVERLAY_BASE = 'assets/sprites/overlays/';
 export const OVERLAY_MANIFEST_URL = `${OVERLAY_BASE}overlays.json?v=g448-2`;

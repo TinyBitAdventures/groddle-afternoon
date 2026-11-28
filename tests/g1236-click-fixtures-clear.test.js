@@ -32,7 +32,7 @@ import {
   setStreetEcologyCatalog,
   streetReservedSpots,
 } from '../public/js/street-ecology.js?v=1c840641';
-import { resourceSpawnPlan } from '../public/js/features/resource-nodes-feature.js?v=bafaaa48';
+import { resourceSpawnPlan } from '../public/js/features/resource-nodes-feature.js?v=6ec0d8c0';
 import { creatureRequests, plannedStreet, setCreatureEcology, streetEcology, streetObjectLayout } from '../tools/build-realtime-objects.mjs';
 
 const root = join(import.meta.dirname, '..');
