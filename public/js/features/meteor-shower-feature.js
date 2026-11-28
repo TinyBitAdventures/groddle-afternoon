@@ -16,7 +16,7 @@
  * prefers-reduced-motion. A Snap asks meteorOnScreen (features/snaps-feature.js) to keep the tag.
  *
  * QA (solo preview): ?autostart=1&questoffer=off&streetdemo=<street>&timedemo=night&meteordemo=shower
- * (a shower from the first second) or meteordemo=star (a lone star, one after another). Canvas:
+ * (a shower from the first second) or meteordemo=star (a lone star, then 20 s of empty sky, then the next). Canvas:
  * meteor (none | soon | on | over), meteorKind, meteorStreaks (drawn now), meteorStrength, meteorClock
  * (local | demo | server). window.groddleMeteor: state(), start(kind), stop(), onScreen().
  */
@@ -33,7 +33,7 @@ import {
   meteorSchedule,
   meteorStrength,
   meteorStreaksAt,
-} from '../meteor-shower.js?v=833f0d52';
+} from '../meteor-shower.js?v=5fa94f41';
 
 export const METEOR_FEATURE_ID = 'meteor-shower';
 
@@ -102,8 +102,8 @@ function watchServer(engine) {
   c.send?.('meteor_sync', {});
 }
 
-function startDemo(kind, engine) {
-  const ev = demoMeteorEvent(kind, Date.now(), { n: run.demoN++ });
+function startDemo(kind, engine, leadMs = 800) {
+  const ev = demoMeteorEvent(kind, Date.now(), { n: run.demoN++, leadMs });
   if (!ev) return null;
   run.offset = 0;
   run.clock = 'demo';
@@ -167,8 +167,11 @@ export const meteorShowerFeature = {
     const now = clockNow();
     let phase = meteorPhase(run.event, now);
     if (phase === 'over') {
-      // The star preview runs one lone star after another.
-      if (run.event?.demo && run.demo === 'star') startDemo('star', engine);
+      // The star preview: one lone star, then METEOR.demoStarGapMs of empty sky after its train, then the next.
+      if (run.event?.demo && run.demo === 'star') {
+        const ev = run.event;
+        startDemo('star', engine, Math.max(800, ev.start + METEOR.starAtMs + METEOR.starMs + METEOR.trainMs + METEOR.demoStarGapMs - Date.now()));
+      }
       else setEvent(null, engine);
       phase = meteorPhase(run.event, now);
     }

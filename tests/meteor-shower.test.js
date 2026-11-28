@@ -21,12 +21,13 @@ import {
   meteorEventOf,
   meteorOnScreen,
   meteorPhase,
+  meteorRadiant,
   meteorSchedule,
   meteorStreaksAt,
   meteorStrength,
   streakShape,
-} from '../public/js/meteor-shower.js?v=833f0d52';
-import { meteorRun, meteorShowerFeature, resetMeteorRun, takeMeteorFrame } from '../public/js/features/meteor-shower-feature.js?v=d3775541';
+} from '../public/js/meteor-shower.js?v=5fa94f41';
+import { meteorRun, meteorShowerFeature, resetMeteorRun, takeMeteorFrame } from '../public/js/features/meteor-shower-feature.js?v=92ea62c2';
 import { buildStreetView } from '../public/js/street-render.js?v=e7e9dfda';
 import { ownSkyReason, skyFollowsClock, skyLook } from '../public/js/sky-clock.js?v=dbd21266';
 
@@ -47,36 +48,120 @@ describe('the schedule comes from the seed', () => {
     assert.ok(a.length > 5);
   });
 
-  it('a shower: the first at 1.5 s, one every 6 to 12 s, each 2.5 s and inside the shower, mostly across the top of the sky', () => {
+  it('a shower: busy, every 2.5 to 5 s with bursts of two or three, 1.5 to 2 s each, 50 to 90 in all, inside the shower', () => {
+    let bursts = 0;
+    let mains = 0;
+    let total = 0;
+    let events = 0;
     for (let seed = 1; seed < 400; seed += 7) {
       for (const dur of [METEOR.showerMinMs, 210000, METEOR.showerMaxMs]) {
         const list = meteorSchedule(shower({ seed, dur }));
         assert.equal(list[0].at, METEOR.firstMs);
+        let lastMain = list[0].at;
         for (let i = 1; i < list.length; i++) {
           const gap = list[i].at - list[i - 1].at;
-          assert.ok(gap >= 6000 && gap <= 12000, `gap ${gap}`);
+          if (gap <= 700) {
+            assert.ok(gap >= 250, `burst gap ${gap}`);
+            bursts += 1;
+          } else {
+            const fromMain = list[i].at - lastMain;
+            assert.ok(fromMain >= 2500 && fromMain <= 5000, `gap ${fromMain}`);
+            lastMain = list[i].at;
+            mains += 1;
+          }
         }
         const last = list.at(-1);
         assert.ok(last.at + last.dur <= dur, 'the last ends inside the shower');
-        assert.ok(dur - (last.at + last.dur) < 12000, 'and the shower is not left empty at its end');
-        assert.ok(list.length >= 14 && list.length <= 40, `${list.length} streaks in ${dur}`);
-        for (const s of list) {
-          assert.equal(s.dur, 2500);
-          assert.ok(s.x >= 0.1 && s.x <= 0.9 && s.y >= 0.02 && s.y <= 0.16, 'starts in the top band of the sky');
-          assert.ok(s.dy > 0.1 && s.dy < 0.41, 'slants down 6 to 24 degrees');
-          assert.ok(s.bright >= 0.62 && s.bright <= 1, 'varied brightness');
-        }
+        assert.ok(dur - (last.at + last.dur) < 7000, 'and the shower is not left empty at its end');
+        assert.ok(list.length >= 40 && list.length <= 105, `${list.length} streaks in ${dur}`);
+        total += list.length;
+        events += 1;
+        for (const s of list) assert.ok(s.dur >= 1500 && s.dur <= 2000, `dur ${s.dur}`);
       }
     }
+    assert.ok(total / events >= 55 && total / events <= 80, `${total / events} streaks on average`);
+    const share = bursts / mains;
+    assert.ok(share > 0.2 && share < 0.4, `burst streaks per main streak ${share}`);
   });
 
-  it('a lone star: one streak, a little brighter than a shower\'s brightest', () => {
-    const list = meteorSchedule({ ...shower(), kind: 'star', dur: METEOR.starDurMs });
+  it('a shower radiates from one radiant point near the top of the sky, picked from the seed', () => {
+    const radiants = new Set();
+    for (let seed = 1; seed < 400; seed += 13) {
+      const ev = shower({ seed });
+      const r = meteorRadiant(ev);
+      assert.ok(r.x >= 0.2 && r.x <= 0.8 && r.y >= -0.12 && r.y <= 0.08, JSON.stringify(r));
+      radiants.add(`${r.x},${r.y}`);
+      for (const st of meteorSchedule(ev)) {
+        assert.deepEqual([st.x, st.y], [r.x, r.y], 'every streak from the radiant');
+        assert.ok(st.dy > 0.2 && st.from >= 0.04 && st.from <= 0.22, 'heading out and down from it');
+        // Its trail, run back, points at the radiant.
+        const sh = streakShape(st, 0.5, 1280, 800);
+        const cross = (sh.hx - r.x * 1280) * (sh.ty - r.y * 800) - (sh.hy - r.y * 800) * (sh.tx - r.x * 1280);
+        assert.ok(Math.abs(cross) < 2, `in line with the radiant (${cross})`);
+      }
+    }
+    assert.ok(radiants.size > 20, 'each seed its own');
+    assert.equal(meteorRadiant({ ...shower(), kind: 'star' }), null);
+  });
+
+  it('a shower is mostly faint with a few bright, short trails', () => {
+    const b = meteorSchedule(shower()).map((st) => st.bright).sort((x, y) => x - y);
+    const median = b[Math.floor(b.length / 2)];
+    assert.ok(median < 0.5, `median ${median}`);
+    assert.ok(b.filter((x) => x > 0.8).length >= 3, 'a few bright');
+    assert.ok(b[0] >= 0.35 && b.at(-1) <= 1);
+    for (const st of meteorSchedule(shower())) assert.ok(st.tail <= 0.08 && st.travel <= 0.2 && st.size === 1 && st.train === 0);
+  });
+
+  it('a lone star: one big moment, slower, a long trail, bigger and brighter than any shower streak, with a train', () => {
+    const star = { ...shower(), kind: 'star', dur: METEOR.starDurMs };
+    const list = meteorSchedule(star);
     assert.equal(list.length, 1);
-    assert.equal(list[0].at, METEOR.starAtMs);
-    assert.ok(list[0].at + list[0].dur * METEOR.reducedSlow <= METEOR.starDurMs, 'its event outlasts even the slow streak');
-    assert.ok(list[0].bright > 0.7 && list[0].bright <= 1.15, 'bright');
-    assert.ok(Math.max(...meteorSchedule(shower()).map((s) => s.bright)) <= 1, 'a shower\'s are 1 at most');
+    const [st] = list;
+    assert.equal(st.at, METEOR.starAtMs);
+    assert.equal(st.dur, 4000, '4 s across');
+    assert.equal(st.train, 2500, 'its train lingers 2.5 s');
+    let most = { tail: 0, travel: 0, r: 0, alpha: 0 };
+    for (let seed = 1; seed < 200; seed += 9) {
+      for (const sw of meteorSchedule(shower({ seed }))) {
+        const sh = streakShape(sw, 0.5, 1280, 800);
+        most = { tail: Math.max(most.tail, sw.tail), travel: Math.max(most.travel, sw.travel), r: Math.max(most.r, sh.r), alpha: Math.max(most.alpha, sh.alpha) };
+      }
+    }
+    const sh = streakShape(st, 0.5, 1280, 800);
+    assert.ok(st.tail > most.tail * 3, 'a trail three times any shower streak\'s');
+    assert.ok(st.travel > most.travel * 2.5, 'crosses a good part of the sky');
+    assert.ok(sh.r > most.r * 1.5, 'a bigger head');
+    assert.ok(sh.alpha > most.alpha, 'brighter');
+    assert.ok(sh.sparkle > 0 && sh.train > 0, 'it sparkles and leaves a train');
+    // The sparkle flickers; under reduced motion it holds still.
+    const flick = new Set([0.3, 0.31, 0.32, 0.33, 0.34].map((p) => streakShape(st, p, 1280, 800).sparkle.toFixed(3)));
+    assert.ok(flick.size > 2, 'flickers');
+    const still = new Set([0.3, 0.31, 0.32].map((p) => streakShape(st, p, 1280, 800, { reduced: true }).sparkle));
+    assert.equal(still.size, 1, 'steady under reduced motion');
+  });
+
+  it('the lone star\'s train lingers after the head has gone, and only the head counts for a Snap', () => {
+    const star = { ...shower(), kind: 'star', dur: METEOR.starDurMs };
+    const [st] = meteorSchedule(star);
+    const headEnd = star.start + st.at + st.dur;
+    const after = meteorStreaksAt(star, headEnd + 1500);
+    assert.equal(after.length, 1, 'still listed while the train glows');
+    const sh = streakShape(st, after[0].p, 1280, 800);
+    assert.equal(sh.alpha, 0, 'no head');
+    assert.ok(sh.train > 0.03, 'a faint train');
+    assert.equal(meteorOnScreen(star, headEnd + 1500, { strength: 1 }), false, 'a train alone is no shooting star');
+    assert.equal(meteorOnScreen(star, star.start + st.at + st.dur * 0.4, { strength: 1 }), true, 'the head on screen is');
+    assert.equal(meteorStreaksAt(star, headEnd + 2600).length, 0, 'gone after 2.5 s');
+    assert.equal(meteorPhase(star, headEnd + 2600), 'on', 'the event outlasts the train');
+    // Reduced motion: slower, the train too, still inside the event's time.
+    const slowEnd = star.start + st.at + (st.dur + st.train) * METEOR.reducedSlow;
+    assert.equal(meteorStreaksAt(star, slowEnd - 100, { reduced: true }).length, 1);
+    assert.ok(slowEnd < star.start + star.dur + METEOR.tailMs);
+    const { Graphics } = fakePixi();
+    const g = new Graphics();
+    assert.equal(drawMeteorStreaks(g, after, 1280, 800), true, 'the train is drawn');
+    assert.equal(g.circles, 0, 'with no head');
   });
 
   it('two pages on the server\'s clock with different own clocks draw the same streaks at the same moment', () => {
@@ -111,7 +196,7 @@ describe('the server\'s frame', () => {
     assert.equal(meteorPhase(ev, T0 - 1), 'soon');
     assert.equal(meteorPhase(ev, T0), 'on');
     assert.equal(meteorPhase(ev, T0 + ev.dur + 1000), 'on');
-    assert.equal(meteorPhase(ev, T0 + ev.dur + 4001), 'over');
+    assert.equal(meteorPhase(ev, T0 + ev.dur + METEOR.tailMs), 'over');
   });
 });
 
@@ -285,11 +370,13 @@ describe('drawing: a tapered trail and a glowing head', () => {
   const ev = shower();
   const first = meteorSchedule(ev)[0];
   const mid = ev.start + first.at + first.dur * 0.45;
+  // The first streak alone (a burst may bring another close behind it).
+  const firstAt = (t, o) => meteorStreaksAt(ev, t, o).filter((x) => x.streak.at === first.at);
 
   it('draws the trail thinner and fainter toward its end, and the head over it', () => {
     const { Graphics } = fakePixi();
     const g = new Graphics();
-    const list = meteorStreaksAt(ev, mid);
+    const list = firstAt(mid);
     assert.equal(list.length, 1);
     assert.equal(drawMeteorStreaks(g, list, 1280, 800, { strength: 1 }), true);
     assert.equal(g.fills.length, 12 + 6, 'twelve trail quads, five glow rings and the core');
@@ -304,18 +391,18 @@ describe('drawing: a tapered trail and a glowing head', () => {
   it('dusk draws it fainter; day or NIGHT TINT off draws nothing', () => {
     const { Graphics } = fakePixi();
     const g = new Graphics();
-    drawMeteorStreaks(g, meteorStreaksAt(ev, mid), 1280, 800, { strength: 1 });
+    drawMeteorStreaks(g, firstAt(mid), 1280, 800, { strength: 1 });
     const full = g.fills[0].alpha;
-    drawMeteorStreaks(g, meteorStreaksAt(ev, mid), 1280, 800, { strength: 0.2 });
+    drawMeteorStreaks(g, firstAt(mid), 1280, 800, { strength: 0.2 });
     assert.ok(g.fills[0].alpha < full * 0.25);
-    assert.equal(drawMeteorStreaks(g, meteorStreaksAt(ev, mid), 1280, 800, { strength: 0 }), false);
+    assert.equal(drawMeteorStreaks(g, firstAt(mid), 1280, 800, { strength: 0 }), false);
     assert.equal(g.fills.length, 0, 'cleared');
   });
 
   it('prefers-reduced-motion: slower and dimmer, never gone', () => {
     const at = ev.start + first.at + first.dur * 1.2;
-    assert.equal(meteorStreaksAt(ev, at).length, 0, 'gone at normal speed');
-    assert.equal(meteorStreaksAt(ev, at, { reduced: true }).length, 1, 'still crossing when slowed');
+    assert.equal(firstAt(at).length, 0, 'gone at normal speed');
+    assert.equal(firstAt(at, { reduced: true }).length, 1, 'still crossing when slowed');
     const a = streakShape(first, 0.45, 1280, 800);
     const b = streakShape(first, 0.45, 1280, 800, { reduced: true });
     assert.ok(b.alpha < a.alpha && b.alpha > 0, 'dimmer');
@@ -366,16 +453,20 @@ describe('the feature on a page', () => {
     assert.equal(meteorShowerFeature.meteorOnScreen(engine), false);
   });
 
-  it('the star preview runs one lone star after another', () => {
+  it('the star preview: one lone star, then 20 s of empty sky after its train, then the next', () => {
     const s = street(MEADOW);
     const { engine } = page({ look: night(s), layer: null, params: { meteordemo: 'star' } });
     meteorShowerFeature.onTick(16, 0, engine);
     const first = meteorRun().event;
     assert.equal(first.kind, 'star');
-    meteorRun().offset = first.start + first.dur + 5000 - Date.now();
+    const trainEnd = first.start + METEOR.starAtMs + METEOR.starMs + METEOR.trainMs;
+    meteorRun().offset = first.start + first.dur + METEOR.tailMs + 10 - Date.now();
     meteorShowerFeature.onTick(16, 0, engine);
-    assert.equal(meteorRun().event.kind, 'star');
-    assert.notEqual(meteorRun().event.seed, first.seed);
+    const next = meteorRun().event;
+    assert.equal(next.kind, 'star');
+    assert.notEqual(next.seed, first.seed);
+    const quiet = next.start + METEOR.starAtMs - trainEnd;
+    assert.ok(quiet >= 20000 && quiet <= 21500, `empty sky ${quiet} ms`);
   });
 
   it('online it asks for the running event as it connects', () => {
@@ -395,7 +486,11 @@ describe('the feature on a page', () => {
 
   it('meteorOnScreen needs the head in view, bright enough', () => {
     const ev = shower();
-    const s0 = meteorSchedule(ev)[0];
+    const list = meteorSchedule(ev);
+    // A streak with the sky to itself, its head in view at 40%.
+    const s0 = list.find((st, i) => i > 0 && list[i - 1].at + list[i - 1].dur < st.at && list[i + 1]?.at > st.at + st.dur + 200
+      && streakShape(st, 0.4, 1280, 800).hy > 0 && streakShape(st, 0.4, 1280, 800).hx > 0 && streakShape(st, 0.4, 1280, 800).hx < 1280);
+    assert.ok(s0);
     const t = ev.start + s0.at + s0.dur * 0.4;
     assert.equal(meteorOnScreen(ev, t, { strength: 1 }), true);
     assert.equal(meteorOnScreen(ev, t, { strength: 0.04 }), false);
