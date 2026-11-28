@@ -2814,9 +2814,14 @@
   "deployed": "2026-11-27"
  },
  "git": {
-  "commits": 3926,
+  "commits": 3928,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-27",
+    "kind": "fix",
+    "text": "Removing a Crafty Bot job puts what it holds back down, and it never takes its machine as an ingredient"
+   },
    {
     "date": "2026-11-27",
     "kind": "improve",
@@ -2931,11 +2936,6 @@
     "date": "2026-11-27",
     "kind": "fix",
     "text": "A Crafty Bot set down at home fetches from the shared floor online"
-   },
-   {
-    "date": "2026-11-27",
-    "kind": "fix",
-    "text": "Acting on a thing just removed from the street no longer breaks the game"
    }
   ]
  },
