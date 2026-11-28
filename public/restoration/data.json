@@ -2814,9 +2814,19 @@
   "deployed": "2026-11-27"
  },
  "git": {
-  "commits": 3934,
+  "commits": 3937,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-27",
+    "kind": "fix",
+    "text": "Online, the Butler, Juju Bandits, Fox Ranger, Rube, Magic Rock and quest text call you by your name"
+   },
+   {
+    "date": "2026-11-27",
+    "kind": "fix",
+    "text": "\"I love you <Giant>\" shows the Giant's own painting with a soft glow, and answers you by name online"
+   },
    {
     "date": "2026-11-27",
     "kind": "fix",
@@ -2926,19 +2936,9 @@
     "date": "2026-11-27",
     "kind": "fix",
     "text": "A Sloth's Knocker hangs on its trunk's left edge, and the sloth's branch grows into the trunk"
-   },
-   {
-    "date": "2026-11-27",
-    "kind": "fix",
-    "text": "Four quoins on Candy Cane Lane, Bright Day and Drooping Drift hang where a player can reach them, not over ice blocks only a triple jump gets onto"
-   },
-   {
-    "date": "2026-11-27",
-    "kind": "fix",
-    "text": "Things in your house, Tower and home street rest on the floor again, wherever it has moved"
    }
   ]
  },
- "tests": 1508,
+ "tests": 1510,
  "generatedAt": "2026-11-27"
 }
