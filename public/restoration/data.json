@@ -2814,9 +2814,19 @@
   "deployed": "2026-11-27"
  },
  "git": {
-  "commits": 3917,
+  "commits": 3922,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-27",
+    "kind": "new",
+    "text": "A snap taken while a shooting star crosses the sky keeps it, and its page shows a Shooting star tag"
+   },
+   {
+    "date": "2026-11-27",
+    "kind": "new",
+    "text": "A rare meteor shower or a lone shooting star can cross the night sky, the same for everyone online"
+   },
    {
     "date": "2026-11-27",
     "kind": "fix",
@@ -2926,19 +2936,9 @@
     "date": "2026-11-27",
     "kind": "fix",
     "text": "Walking right off the last island on Level 3 West drops you to the pit floor instead of bouncing you back up"
-   },
-   {
-    "date": "2026-11-27",
-    "kind": "fix",
-    "text": "A machine drag starts while a New Quest card or a notice is up, instead of selecting page text"
-   },
-   {
-    "date": "2026-11-27",
-    "kind": "improve",
-    "text": "Eight more reactions: 👏 😊 🤔 😍 🔥 👀 😅 💯"
    }
   ]
  },
- "tests": 1504,
+ "tests": 1506,
  "generatedAt": "2026-11-27"
 }
