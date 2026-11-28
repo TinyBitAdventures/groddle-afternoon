@@ -2814,9 +2814,14 @@
   "deployed": "2026-11-28"
  },
  "git": {
-  "commits": 3949,
+  "commits": 3952,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-28",
+    "kind": "new",
+    "text": "Mien Evoke Quarter in Bortola: a QUARTER signpost on Mien Evoke leads to its 1100 block of ten lots"
+   },
    {
     "date": "2026-11-28",
     "kind": "fix",
@@ -2916,24 +2921,9 @@
     "date": "2026-11-27",
     "kind": "new",
     "text": "Machine Shop Pit Stop says to use a machine you built, not a machine room's"
-   },
-   {
-    "date": "2026-11-27",
-    "kind": "fix",
-    "text": "The Social drawer's tabs and counts show with AdGuard's Social media list on"
-   },
-   {
-    "date": "2026-11-27",
-    "kind": "fix",
-    "text": "On a phone a tap on a Thanksgiving feast pile opens that pile, not its neighbour"
-   },
-   {
-    "date": "2026-11-27",
-    "kind": "fix",
-    "text": "The Bureaucratic Hall lizards say \"Friend!\" in solo, with a capital"
    }
   ]
  },
- "tests": 1513,
+ "tests": 1514,
  "generatedAt": "2026-11-28"
 }
