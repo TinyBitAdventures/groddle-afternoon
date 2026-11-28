@@ -6998,7 +6998,8 @@
    "id": "ours-back-to-gentle-island",
    "title": "Back to Gentle Island: a quest that lets a player who skipped the tutorial play it later, once",
    "kind": "content",
-   "status": "proposed",
+   "status": "kept",
+   "ruling": "Austin 2026-11-28 (in chat): players who skipped the tutorial can complete it once, as a quest",
    "where": [
     {
      "file": "public/js/newxp-replay.js",

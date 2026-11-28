@@ -2814,7 +2814,7 @@
   "deployed": "2026-11-28"
  },
  "git": {
-  "commits": 3975,
+  "commits": 3976,
   "since": "2026-10-19",
   "recent": [
    {
@@ -2931,11 +2931,6 @@
     "date": "2026-11-27",
     "kind": "new",
     "text": "A rare meteor shower or a lone shooting star can cross the night sky, the same for everyone online"
-   },
-   {
-    "date": "2026-11-27",
-    "kind": "fix",
-    "text": "A Crafty Bot job restarted after a pause no longer makes its units twice"
    }
   ]
  },
