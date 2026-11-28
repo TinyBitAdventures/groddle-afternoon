@@ -25,14 +25,17 @@ import {
   advanceCraftybot,
   createBot,
   createCraftybotState,
+  collectJob,
   fetchAnswered,
+  kick,
   noticeSourceChange,
   normalizeCraftybotState,
   serializeCraftybotState,
   setCraftybotSpecs,
   setJobTotal,
-} from '../public/js/craftybot.js?v=7640bf14';
-import { craftybotFeature } from '../public/js/features/craftybot-feature.js?v=7b8a3714';
+  setPaused,
+} from '../public/js/craftybot.js?v=625916ac';
+import { craftybotFeature } from '../public/js/features/craftybot-feature.js?v=f4af07a6';
 import { homesFeature } from '../public/js/features/homes-feature.js?v=5049e51c';
 import { dropsMpFeature } from '../public/js/features/drops-mp-feature.js?v=a34f5a9b';
 
@@ -216,7 +219,7 @@ describe('the rules: a fetch the server answers later', () => {
   });
 
   it('a Fuel Cell on the shared floor: Add More walks there and the cell fills the tank when it comes', async () => {
-    const { autoRefuel } = await import('../public/js/craftybot.js?v=7640bf14');
+    const { autoRefuel } = await import('../public/js/craftybot.js?v=625916ac');
     const stacks = [{ id: 'f', cls: 'fuel_cell', count: 2, x: 230, shared: true }];
     const asks = [];
     const world = sharedWorld(stacks, asks);
@@ -244,6 +247,72 @@ function fakeClient(street) {
     emit(ev, msg) { for (const fn of handlers[ev] || []) fn(msg); },
   };
 }
+
+describe('a later job is never left behind a finished one (re-review of G1316, 2026-11-27)', () => {
+  /** The reviewer's floor: one Cherry (enough for the Plum only) and the machine. */
+  function plumThenApple() {
+    const stacks = [{ id: 's1', cls: 'cherry', count: 1, x: 1160 }, { id: 'm', cls: 'fruit_changing_machine', count: 1, x: 1708 }];
+    const world = {
+      inLocation: true,
+      count: (cls) => stacks.filter((x) => String(cls).split('|').includes(x.cls)).reduce((n, x) => n + x.count, 0),
+      find: (cls) => stacks.find((x) => String(cls).split('|').includes(x.cls) && x.count > 0) || null,
+      take: (id, cls, n) => { const x = stacks.find((y) => y.id === id); if (!x) return 0; const k = Math.min(n, x.count); x.count -= k; return k; },
+      wear: () => ({ broke: false }), drop: () => {}, give: () => {}, imagination: () => {}, say: () => {}, sound: () => {}, stopSound() {},
+      fuelCell: () => null,
+    };
+    const bot = createBot(createCraftybotState(), 1708, 'interior', 0);
+    advanceCraftybot(bot, 1500, world);
+    setJobTotal(bot, world, 'plum', 1);
+    setJobTotal(bot, world, 'apple', 1);
+    const t = runUntil(bot, world, 1500, () => false, { maxMs: 120_000, stepMs: 200 }) ?? 121_500;
+    assert.equal(bot.queue[0].crafted, 1, 'the Plum is made (not collected)');
+    assert.equal(bot.queue[1].crafted, 0, 'no Cherries for the Apple');
+    stacks.push({ id: 's2', cls: 'cherry', count: 6, x: 822 });
+    return { bot, world, stacks, t };
+  }
+  const apple = (bot) => bot.queue.find((r) => r.item === 'apple')?.crafted;
+
+  it('new Cherries on the floor: the rescan passes the finished Plum and makes the Apple', () => {
+    const { bot, world, t } = plumThenApple();
+    noticeSourceChange(bot);
+    assert.ok(runUntil(bot, world, t, () => apple(bot) === 1, { maxMs: 120_000, stepMs: 200 }), 'the Apple');
+  });
+
+  it('a Kick does the same', () => {
+    const { bot, world, t } = plumThenApple();
+    kick(bot, world);
+    assert.ok(runUntil(bot, world, t, () => apple(bot) === 1, { maxMs: 120_000, stepMs: 200 }), 'the Apple');
+  });
+
+  it('a save of that idle bot loads and gets on with the Apple by itself', () => {
+    const { bot, world, t } = plumThenApple();
+    const back = normalizeCraftybotState(serializeCraftybotState(bot));
+    assert.ok(runUntil(back, world, t, () => apple(back) === 1, { maxMs: 120_000, stepMs: 200 }), 'the Apple');
+  });
+
+  it('a paused first job does not hold up the next one either', () => {
+    const stacks = [{ id: 'm', cls: 'fruit_changing_machine', count: 1, x: 1708 }];
+    const world = {
+      inLocation: true,
+      count: (cls) => stacks.filter((x) => String(cls).split('|').includes(x.cls)).reduce((n, x) => n + x.count, 0),
+      find: (cls) => stacks.find((x) => String(cls).split('|').includes(x.cls) && x.count > 0) || null,
+      take: (id, cls, n) => { const x = stacks.find((y) => y.id === id); if (!x) return 0; const k = Math.min(n, x.count); x.count -= k; return k; },
+      wear: () => ({ broke: false }), drop: () => {}, give: () => {}, imagination: () => {}, say: () => {}, sound: () => {}, stopSound() {},
+      fuelCell: () => null,
+    };
+    const bot = createBot(createCraftybotState(), 1708, 'interior', 0);
+    advanceCraftybot(bot, 1500, world);
+    setJobTotal(bot, world, 'orange', 1);
+    setPaused(bot, world, 'orange', true);
+    setJobTotal(bot, world, 'apple', 1);
+    runUntil(bot, world, 1500, () => false, { maxMs: 60_000, stepMs: 200 });
+    assert.equal(apple(bot), 0, 'no Cherries yet');
+    stacks.push({ id: 'c', cls: 'cherry', count: 3, x: 1600 });
+    noticeSourceChange(bot);
+    assert.ok(runUntil(bot, world, 61_500, () => apple(bot) === 1, { maxMs: 120_000, stepMs: 200 }), 'the Apple');
+    assert.equal(bot.queue.find((r) => r.item === 'orange').crafted, 0, 'the paused Orange waits');
+  });
+});
 
 describe('the feature online: the owner\'s bot in the house takes from the shared floor', () => {
   const OP = 'drop-00000000000000b1';

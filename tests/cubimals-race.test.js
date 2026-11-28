@@ -38,7 +38,7 @@ import { addItem, countItem, createInventory } from '../public/js/inventory.js?v
 import { bindToolInventory, copyTags, createToolConditionState } from '../public/js/tools.js?v=4156bba8';
 import { applyAchievementProgress, createAchievementState } from '../public/js/achievements.js?v=535c8952';
 import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=c9b84764';
-import { FEATURES } from '../public/js/features/index.js?v=f7b25ee2';
+import { FEATURES } from '../public/js/features/index.js?v=7ba76a08';
 import { cubimalRaceFeature, CUBIMAL_RACE_FEATURE_ID } from '../public/js/features/cubimal-race-feature.js?v=e84890e6';
 import { holdKeepsBusy } from '../public/js/instance-holds.js?v=ff3a63a3';
 import { FIRST_DRAW_SPRITES, HIRES_SPRITES } from '../public/js/sprite-hires.js?v=dd070ce8';

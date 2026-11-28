@@ -280,7 +280,9 @@
     "ours: * across reloads. Ours: the step it was in runs again a second later": "craftybot-unstall",
     "ours: // #753 (ours): the last job of the queue just finished: one": "craftybot-queue-done-line",
     "ours: // #753 (ours, Austin 2026-11-27): Glitch never said when the": "craftybot-queue-done-line",
+    "ours: // Ours (G1316 re-review): its steps are planned from": "craftybot-passes-finished-jobs",
     "ours: // Ours: Glitch gave no words where the bot could not be": "ours-craftybot",
+    "ours: Plum, through new stacks, Kicks and Collect). Ours: it passes such a job": "craftybot-passes-finished-jobs",
     "ours: the last job of the queue just finished (#753, ours;": "craftybot-queue-done-line"
   },
   "public/js/crowns-mp.js": {

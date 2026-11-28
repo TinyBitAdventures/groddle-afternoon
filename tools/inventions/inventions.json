@@ -6838,6 +6838,30 @@
    "why": "Glitch had no web support pages (its bug reports were a form only) and no pop-up viewer. Ours: the report's pictures in the site's picture pop-up, shared with the Snap page (tests/support-picture-dialog.test.js).",
    "ruling": "Austin 2026-11-27: the pictures in a Support report need the same open-in-a-dialog treatment as the Snap page instead of opening directly",
    "rows": []
+  },
+  {
+   "id": "craftybot-passes-finished-jobs",
+   "title": "The Crafty Bot passes a finished, paused or halted job and works the next one, replanning each job from the floor as it is when it starts",
+   "kind": "behaviour",
+   "status": "proposed",
+   "where": [
+    {
+     "file": "public/js/craftybot.js",
+     "symbol": "queueExecute runnable"
+    },
+    {
+     "file": "public/js/craftybot.js",
+     "symbol": "craftItemFromQueue"
+    },
+    {
+     "file": "public/js/craftybot.js",
+     "symbol": "normalizeCraftybotState rescan"
+    }
+   ],
+   "why": "Glitch's queueExecute (npc_crafty_bot.js 2704-2722) stopped at a job that could not run, and every rescan and the Kick start at job 0 (queueSetActive(0)), so a finished job waiting for Collect kept every job behind it waiting for good; and a job's steps were replanned only in craftDone and on a new stack, so a Kick ran a stale plan. Ours: a scan passes such a job to the next one it has not run yet, once round the queue; a job starting replans from the floor as it is; a load of an idle bot with work to do looks over its queue again.",
+   "rows": [
+    "G1316"
+   ]
   }
  ]
 }

@@ -250,8 +250,12 @@ export function normalizeCraftybotState(seed = {}) {
   if (bot.active != null && (bot.active < 0 || bot.active >= bot.queue.length)) bot.active = bot.queue.length ? 0 : undefined;
   // G1316: a take the server was asked for does not outlive the page (its answer, if any, reaches the
   // pack through the site's list): the step it waited in runs again.
-  // A save from before this repair may hold a bot crafting with nothing scheduled (unstall below).
-  unstall(bot);
+  // A save from before this repair may hold a bot crafting with nothing scheduled (unstall below),
+  // or one idle behind a finished job with work to do: it looks over its queue again after a load.
+  if (!unstall(bot) && bot.owned && !bot.crafting && !bot.timers.rescan && bot.queue.some((row, qi) => runnable(bot, qi))) {
+    bot.timerSeq += 1;
+    bot.timers.rescan = { at: bot.clock + CRAFTYBOT.RESCAN_AFTER_ADD_MS, arg: null, seq: bot.timerSeq };
+  }
   return bot;
 }
 
@@ -846,17 +850,34 @@ export function queueSetActive(bot, world, index, force = false) {
   }
 }
 
+/**
+ * queueExecute (npc_crafty_bot.js 2704-2722) worked the job at active_queue_index and stopped when that
+ * job could not run: finished and waiting for Collect, paused, locked or halted. Every rescan (a new
+ * stack, onDrop, onPickup) and the Kick start at job 0 (queueSetActive(0), 2903-2916), so a finished
+ * first job kept every job behind it waiting for good (G1316 re-review: "0/1 Apple" asleep beside
+ * Cherries behind a made Plum, through new stacks, Kicks and Collect). Ours: it passes such a job and
+ * works the next one this scan has not run yet, once round the queue.
+ */
 function queueExecute(bot, world) {
   if (!bot.queue.length) return false;
   if (bot.active == null) return false;
-  if (bot.active >= bot.queue.length) bot.active = 0;
-  const row = bot.queue[bot.active];
-  if (!row) return false;
   if (bot.refuelling) return false;
-  if (row.paused || row.locked || row.halted) return false;
-  if (row.iterator === bot.iterator) return false;
-  row.iterator = bot.iterator;
-  return craftItemFromQueue(bot, world, bot.active);
+  if (bot.active >= bot.queue.length) bot.active = 0;
+  for (let k = 0; k < bot.queue.length; k += 1) {
+    const row = bot.queue[bot.active];
+    if (row && runnable(bot, bot.active) && row.iterator !== bot.iterator) {
+      row.iterator = bot.iterator;
+      return craftItemFromQueue(bot, world, bot.active);
+    }
+    bot.active = (bot.active + 1) % bot.queue.length;
+  }
+  return false;
+}
+
+/** A job the bot can work now: not finished, paused, locked or halted. */
+function runnable(bot, qi) {
+  const row = bot.queue[qi];
+  return Boolean(row) && !row.paused && !row.locked && !row.halted && !isComplete(bot, qi);
 }
 
 function queueIterate(bot, world) {
@@ -870,6 +891,11 @@ function craftItemFromQueue(bot, world, qi) {
   if (qi == null || qi >= bot.queue.length) return false;
   if (isComplete(bot, qi)) return false;
   bot.crafting = false;
+  // Ours (G1316 re-review): its steps are planned from the floor as it is now, not as it was when the job
+  // last stopped (Glitch replanned only in craftDone and on a new stack), so a Kick or a load finds what
+  // came since.
+  bot.queue[qi].activeSeq = undefined;
+  rebuildSequence(bot, world, qi);
   bot.queue[bot.active].activeSeq = 0;
   craftStep(bot, world, 0);
   return true;
