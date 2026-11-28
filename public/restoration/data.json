@@ -2814,7 +2814,7 @@
   "deployed": "2026-11-28"
  },
  "git": {
-  "commits": 3946,
+  "commits": 3949,
   "since": "2026-10-19",
   "recent": [
    {
@@ -2931,14 +2931,9 @@
     "date": "2026-11-27",
     "kind": "fix",
     "text": "The Bureaucratic Hall lizards say \"Friend!\" in solo, with a capital"
-   },
-   {
-    "date": "2026-11-27",
-    "kind": "fix",
-    "text": "A window whose character opens in another tab greys at once, not when that tab presses Start"
    }
   ]
  },
- "tests": 1511,
+ "tests": 1513,
  "generatedAt": "2026-11-28"
 }
