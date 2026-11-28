@@ -26,8 +26,8 @@ import {
   meteorStreaksAt,
   meteorStrength,
   streakShape,
-} from '../public/js/meteor-shower.js?v=5fa94f41';
-import { meteorRun, meteorShowerFeature, resetMeteorRun, takeMeteorFrame } from '../public/js/features/meteor-shower-feature.js?v=92ea62c2';
+} from '../public/js/meteor-shower.js?v=2eb3c0ed';
+import { meteorRun, meteorShowerFeature, resetMeteorRun, takeMeteorFrame } from '../public/js/features/meteor-shower-feature.js?v=100d8c5e';
 import { buildStreetView } from '../public/js/street-render.js?v=e7e9dfda';
 import { ownSkyReason, skyFollowsClock, skyLook } from '../public/js/sky-clock.js?v=dbd21266';
 
@@ -89,7 +89,7 @@ describe('the schedule comes from the seed', () => {
     for (let seed = 1; seed < 400; seed += 13) {
       const ev = shower({ seed });
       const r = meteorRadiant(ev);
-      assert.ok(r.x >= 0.2 && r.x <= 0.8 && r.y >= -0.12 && r.y <= 0.08, JSON.stringify(r));
+      assert.ok(r.x >= 0.2 && r.x <= 0.8 && r.y >= 0.02 && r.y <= 0.1, JSON.stringify(r));
       radiants.add(`${r.x},${r.y}`);
       for (const st of meteorSchedule(ev)) {
         assert.deepEqual([st.x, st.y], [r.x, r.y], 'every streak from the radiant');
@@ -409,6 +409,54 @@ describe('drawing: a tapered trail and a glowing head', () => {
   });
 });
 
+describe('on a phone: streaks big enough to see, below the top bar; a snap needs more than a speck', () => {
+  // iPhone 15 Pro, WebKit (the review 2026-11-27): the view is 996 x 930 world px on a 393 css px canvas
+  // upright, 1156 x 540 on a 734 css px canvas sideways, whose top 48 css px sit under the top bar.
+  const PORTRAIT = { w: 996, h: 930, scale: 393 / 996, top: 0 };
+  const LANDSCAPE = { w: 1156, h: 540, scale: 734 / 1156, top: 54 / (734 / 1156) };
+  const showers = () => [1, 77, 4242, 98765].flatMap((seed) => meteorSchedule(shower({ seed })));
+
+  it('every shower streak\'s trail reaches at least 60 css px, its head at least 1.2 css px across', () => {
+    for (const view of [PORTRAIT, LANDSCAPE, { w: 1280, h: 800, scale: 1, top: 0 }]) {
+      for (const st of showers()) {
+        const sh = streakShape(st, 0.6, view.w, view.h, view);
+        const css = Math.hypot(sh.hx - sh.tx, sh.hy - sh.ty) * view.scale;
+        assert.ok(css >= 60, `trail ${css.toFixed(1)} css px at ${view.w}x${view.h}`);
+        assert.ok(sh.r * view.scale >= 1.2, `head ${(sh.r * view.scale).toFixed(2)} css px`);
+      }
+    }
+  });
+
+  it('the radiant and every streak\'s path keep below the top bar', () => {
+    for (const st of showers()) {
+      for (const p of [0, 0.3, 0.6, 1]) {
+        const sh = streakShape(st, p, LANDSCAPE.w, LANDSCAPE.h, LANDSCAPE);
+        assert.ok(sh.hy >= LANDSCAPE.top && sh.ty >= LANDSCAPE.top, `head ${sh.hy.toFixed(0)}, trail end ${sh.ty.toFixed(0)}, bar ${LANDSCAPE.top.toFixed(0)}`);
+      }
+    }
+    const star = meteorSchedule({ ...shower(), kind: 'star', dur: METEOR.starDurMs })[0];
+    assert.ok(streakShape(star, 0, LANDSCAPE.w, LANDSCAPE.h, LANDSCAPE).hy >= LANDSCAPE.top, 'the star starts below it too');
+  });
+
+  it('a snap counts a streak only once its trail shows 24 css px and its head is bright, never a speck', () => {
+    const ev = shower();
+    let speck = 0;
+    for (const st of meteorSchedule(ev)) {
+      for (let p = 0.01; p < 0.5; p += 0.01) {
+        const sh = streakShape(st, p, 1280, 800);
+        const css = Math.hypot(sh.hx - sh.tx, sh.hy - sh.ty);
+        assert.ok(Math.abs(sh.trailCss - css) < 0.1, 'trailCss is the trail on screen');
+        const t = ev.start + st.at + st.dur * p;
+        if (css < 23.9 && sh.alpha >= METEOR.snapAlpha && meteorStreaksAt(ev, t).length === 1) {
+          speck += 1;
+          assert.equal(meteorOnScreen(ev, t, { strength: 1, w: 1280, h: 800 }), false, `a ${css.toFixed(1)} px speck at p ${p.toFixed(2)}`);
+        }
+      }
+    }
+    assert.ok(speck > 5, 'specks were tried');
+  });
+});
+
 describe('the feature on a page', () => {
   afterEach(() => resetMeteorRun());
 
@@ -467,6 +515,21 @@ describe('the feature on a page', () => {
     assert.notEqual(next.seed, first.seed);
     const quiet = next.start + METEOR.starAtMs - trainEnd;
     assert.ok(quiet >= 20000 && quiet <= 21500, `empty sky ${quiet} ms`);
+  });
+
+  it('on a page just loaded the hint waits 5 s, after the page\'s own first notices', () => {
+    const said = [];
+    const { engine } = page({ mode: 'multiplayer' });
+    engine.pushActivity = (t) => said.push(t);
+    meteorShowerFeature.onTick(16, 0, engine);
+    const now = Date.now();
+    takeMeteorFrame({ t: 'meteor', ...shower({ hint: true, start: now + 120000 }), now }, engine, now);
+    assert.deepEqual(said, [], 'not at once');
+    meteorRun().startedAt = Date.now() - 5001;
+    meteorShowerFeature.onTick(16, 0, engine);
+    assert.deepEqual(said, [METEOR_TEXT.hint]);
+    meteorShowerFeature.onTick(16, 0, engine);
+    assert.equal(said.length, 1, 'once');
   });
 
   it('online it asks for the running event as it connects', () => {

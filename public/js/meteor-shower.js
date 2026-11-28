@@ -67,8 +67,13 @@ export const METEOR = Object.freeze({
   reducedDim: 0.6,
   /** Below this strength (the sky's stars) nothing is drawn, and a Snap does not count it. */
   minStrength: 0.05,
-  /** A streak counts as on screen for a Snap from this brightness (after the sky's strength). */
+  /** A streak counts as on screen for a Snap from this brightness (after the sky's strength)... */
   snapAlpha: 0.15,
+  /** ...once its trail shows this many css px (the review 2026-11-27: a snap of a 3 px speck got the tag). */
+  snapTrailCss: 24,
+  /** On screen, a shower streak's trail at its longest is at least this many css px, and every head this wide (a phone's view is shrunk to fit: the review saw 16 px streaks on an iPhone). */
+  minTrailCss: 70,
+  minHeadCss: 1.3,
   /** The star preview (?meteordemo=star): this long between one lone star and the next. */
   demoStarGapMs: 20000,
 });
@@ -154,12 +159,12 @@ function loneStar(rnd) {
 
 /**
  * PURE: an event's radiant (a shower's): { x, y } shares of the view, near the top of the sky
- * (x 0.2 to 0.8, y -0.12 to 0.08), from the seed. Null for a lone star.
+ * (x 0.2 to 0.8, y 0.02 to 0.1 of the sky band below the top bar), from the seed. Null for a lone star.
  */
 export function meteorRadiant(ev) {
   if (ev?.kind !== 'shower') return null;
   const rnd = starRandom(ev.seed);
-  return { x: round4(between(rnd, 0.2, 0.8)), y: round4(between(rnd, -0.12, 0.08)) };
+  return { x: round4(between(rnd, 0.2, 0.8)), y: round4(between(rnd, 0.02, 0.1)) };
 }
 
 /**
@@ -243,23 +248,29 @@ export function meteorUnit(w, h) {
  * slows a little; the trail grows over the first third and shortens as it fades; it fades in over
  * the first 12% and out over the last 30% (a lone star's last 20%).
  */
-export function streakShape(streak, p, w, h, { reduced = false } = {}) {
+export function streakShape(streak, p, w, h, { reduced = false, scale = 1, top = 0 } = {}) {
   const k = Math.min(1, Math.max(0, p));
   const unit = meteorUnit(w, h);
   const ease = 1 - Math.pow(1 - k, 1.4);
+  // `scale`: css px per view px (a phone shows the view shrunk); `top`: view px hidden under the top bar.
+  // Heights are shares of the sky band below the bar, and a shower streak never shorter on screen than
+  // METEOR.minTrailCss (its travel grown with it).
+  const css = Number(scale) > 0 ? Number(scale) : 1;
+  const bandTop = Math.max(0, Math.min(h * 0.5, Number(top) || 0));
+  const grown = streak.kind === 'star' ? 1 : Math.max(1, METEOR.minTrailCss / css / (streak.tail * unit));
   const sx = streak.x * w + streak.dx * (streak.from || 0) * unit;
-  const sy = streak.y * h + streak.dy * (streak.from || 0) * unit;
-  const go = streak.travel * unit * ease;
+  const sy = bandTop + streak.y * (h - bandTop) + streak.dy * (streak.from || 0) * unit;
+  const go = streak.travel * unit * grown * ease;
   const hx = sx + streak.dx * go;
   const hy = sy + streak.dy * go;
   const grow = Math.min(1, k / 0.35) * (k > 0.8 ? 1 - ((k - 0.8) / 0.2) * 0.5 : 1);
-  const len = Math.min(go, streak.tail * unit * grow);
+  const len = Math.min(go, streak.tail * unit * grown * grow);
   const out = streak.kind === 'star' ? 0.2 : 0.3;
   const fade = p >= 1 ? 0 : Math.min(1, k / 0.12) * (k > 1 - out ? (1 - k) / out : 1);
   const dim = reduced ? METEOR.reducedDim : 1;
   const alpha = Math.max(0, streak.bright * fade * dim);
   const size = streak.size || 1;
-  const shape = { hx, hy, tx: hx - streak.dx * len, ty: hy - streak.dy * len, r: (0.9 + Math.min(1, streak.bright) * 1.0) * size, alpha, sx, sy, train: 0, sparkle: 0 };
+  const shape = { hx, hy, tx: hx - streak.dx * len, ty: hy - streak.dy * len, r: Math.max((0.9 + Math.min(1, streak.bright) * 1.0) * size, (METEOR.minHeadCss * size) / css), alpha, sx, sy, train: 0, sparkle: 0, trailCss: len * css };
   if (streak.train) {
     // The train: building faintly behind the head, then fading after it over its linger.
     const linger = streak.train / streak.dur;
@@ -273,14 +284,14 @@ export function streakShape(streak, p, w, h, { reduced = false } = {}) {
 
 /**
  * PURE: whether a streak shows on screen now, bright enough for a Snap to count it (the snap's
- * "Shooting star" tag): an event on, the sky strong enough, a streak past METEOR.snapAlpha whose
- * head is inside the w x h view.
+ * "Shooting star" tag): an event on, the sky strong enough, a streak past METEOR.snapAlpha with
+ * METEOR.snapTrailCss of trail on screen, whose head is inside the w x h view below the top bar.
  */
-export function meteorOnScreen(ev, now, { strength = 0, reduced = false, w = 1280, h = 800 } = {}) {
+export function meteorOnScreen(ev, now, { strength = 0, reduced = false, w = 1280, h = 800, scale = 1, top = 0 } = {}) {
   if (!ev || strength < METEOR.minStrength) return false;
   for (const { streak, p } of meteorStreaksAt(ev, now, { reduced })) {
-    const s = streakShape(streak, p, w, h, { reduced });
-    if (Math.min(1, s.alpha) * strength >= METEOR.snapAlpha && s.hx >= 0 && s.hx <= w && s.hy >= 0 && s.hy <= h) return true;
+    const s = streakShape(streak, p, w, h, { reduced, scale, top });
+    if (Math.min(1, s.alpha) * strength >= METEOR.snapAlpha && s.trailCss >= METEOR.snapTrailCss && s.hx >= 0 && s.hx <= w && s.hy >= (Number(top) || 0) && s.hy <= h) return true;
   }
   return false;
 }
@@ -313,7 +324,7 @@ function mix(a, b, k) {
  * Draws `list` (meteorStreaksAt) into Pixi Graphics `g`, a w x h view at the sky's depth, at
  * `strength` (meteorStrength). Cleared first; nothing drawn (and false) when nothing shows.
  */
-export function drawMeteorStreaks(g, list, w, h, { strength = 1, reduced = false } = {}) {
+export function drawMeteorStreaks(g, list, w, h, { strength = 1, reduced = false, scale = 1, top = 0 } = {}) {
   if (!g) return false;
   g.clear();
   // Light adds to the night sky under it, as a streak's glow does.
@@ -321,7 +332,7 @@ export function drawMeteorStreaks(g, list, w, h, { strength = 1, reduced = false
   if (strength < METEOR.minStrength || !list?.length) return false;
   let drew = false;
   for (const { streak, p } of list) {
-    const s = streakShape(streak, p, w, h, { reduced });
+    const s = streakShape(streak, p, w, h, { reduced, scale, top });
     const a = Math.min(1, s.alpha) * strength;
     const ta = s.train * strength;
     // A lone star's train: a faint wide glow along the path it took, fainter toward where it began.
