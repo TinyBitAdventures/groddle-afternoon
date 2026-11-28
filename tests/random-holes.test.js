@@ -31,7 +31,7 @@ import {
 } from '../public/js/random-holes.js?v=e979c4ae';
 import { randomHolesFeature } from '../public/js/features/random-holes-feature.js?v=212b0613';
 import { teleportWithinStreet } from '../public/js/within-street.js?v=5ce33cdf';
-import { FEATURES } from '../public/js/features/index.js?v=0008cc75';
+import { FEATURES } from '../public/js/features/index.js?v=65ea21dd';
 import { createTrack, pushSample, sampleTrack, INTERP_DELAY_MS, MOVE_EVERY_MS } from '../public/js/realtime-client.js?v=7e402304';
 import { AVATAR_BODY_H, NORMAL_BUFF, stepAvatar } from '../public/js/avatar-step.js?v=8415ee96';
 

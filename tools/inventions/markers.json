@@ -1133,6 +1133,7 @@
   },
   "public/js/quarter.js": {
     "glitch-had-none: * Glitch's words, and the remake's where Glitch had none.": "shared-quarter-lots",
+    "invented: * Evoke's own art made flat (composeBlockBase; inventions:": "bortola-quarter-block",
     "invented: * The remake's own (inventions:": "shared-quarter-lots",
     "invented: * right, opposite Back to Ur (inventions:": "home-quarter-arm",
     "made-up: - Solo: your own lot and the For Sale houses, no made-up": "shared-quarter-lots",
@@ -1140,6 +1141,7 @@
     "ours: 'The Quarter can not be reached right now.', // ours": "shared-quarter-lots",
     "ours: (name, label) => `${name}'s lot, ${label}`, // ours": "home-quarter-arm",
     "ours: * The home street's quarter arm (ours, Austin 2026-11-27): for the owner's lot ({": "home-quarter-arm",
+    "ours: * takes (ours: no Bortola quarter template": "bortola-quarter-block",
     "ours: // The home street's quarter arm (ours): its verb and tip, the arm's words being the": "home-quarter-arm",
     "ours: a moment, the Quarter is still answering.', // ours": "shared-quarter-lots",
     "ours: armVerb: (label) => `Go to ${label}`, // ours": "home-quarter-arm",

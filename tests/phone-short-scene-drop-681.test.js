@@ -15,7 +15,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { MIN_PACK_HEIGHT, VIEW_HOLD_H, phoneSceneDrop, phoneStage, stageFor } from '../public/js/location-view.js?v=f0a5f17d';
+import { MIN_PACK_HEIGHT, VIEW_HOLD_H, phoneSceneDrop, phoneStage, stageFor } from '../public/js/location-view.js?v=c308420d';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const game = readFileSync(join(root, 'public/game.js'), 'utf8');

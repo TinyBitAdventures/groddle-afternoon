@@ -4,7 +4,7 @@
  */
 import { ITEM_ICONS, ITEM_LABELS, getVerbsFor, ordinaryItems, runVerb } from './content.js?v=1c0f4a21';
 import { createErrorOnce, createFeatureHost, createFrameStages } from './js/feature-host.js?v=b87e2cbc';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=0008cc75';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=65ea21dd';
 import { VENDOR_STAND_IN_LABEL, VENDOR_NAME_LABEL } from './js/street-spirits.js?v=8ff6ed59';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, enterHintPick, hoverText, stackHoverLabel, groupHead, hoverRimShown, reachGlowTargets, spriteHasRimArt, rimArtParts, rimsTraceParts, trimmedIconUrl, drawTileArt } from './js/enter-chooser.js?v=b37c63e0';
 import { firstTendKey, STICK_TEND_DELAY_MS, STICK_TEND_DIRS, STICK_TEND_REPEAT_MS, stepTendKey, stepTendKeys, stickTendKey, tendKeyAction } from './js/garden-tend.js?v=a7470c4a';
@@ -143,7 +143,7 @@ import {
 } from './js/legalize-it.js?v=b31c33ad';
 import { HALL, HALL_DECOS, HALL_EXTRA_CHAIRS, HALL_OFFICE, HALL_QUESTIONS } from './js/bureaucratic-hall.js?v=29db1c45';
 import { STATION_X, stationArrival, stationScreen, surfaceStation } from './js/subway.js?v=ea6921ff';
-import { ALLEY, SHADY, drawAlley, inEnteredBox } from './js/quest-rooms/back-alley-set.js?v=436216e7';
+import { ALLEY, SHADY, drawAlley, inEnteredBox } from './js/quest-rooms/back-alley-set.js?v=ffba98b9';
 import { WINTER_WALK_BOUNDS, WINTER_WALK_PASSAGE } from './js/winter-walk-streets.js?v=c921bf92';
 import {
   WINTER_HAVEN_STREET_ID,
@@ -850,7 +850,7 @@ import { renderResolution, resolutionCap, RESOLUTION_STEP, phoneZoomResolution }
 import { createCanvasCover, createStageResize, splitStageResize } from './js/stage-resize.js?v=70c3cb79';
 // g458: low energy and mood turn amber and red, and a click offers something from the pack.
 import { makingNeeds, vitalMenuEmpty, vitalMenuHeading, vitalSnacks } from './js/vitals.js?v=5efac5f3';
-import { DEFAULT_VP_H, LOCATION_VIEW_W, VIEW_CEIL_H, stageFor, sceneViewCap, sceneViewWidthCap, zoomMovesStage, phoneZoomSpan, phoneCameraAnchor, phoneFeetWorldHeight, phoneGroundWorldHeight, phoneSceneDrop, reachableFloorY, sceneBottomLine, sceneGroundLine, stageBandColour, stageEdgeColour, stageEdgeSampler, stageRoomBeside, stageRoomInBand } from './js/location-view.js?v=f0a5f17d';
+import { DEFAULT_VP_H, LOCATION_VIEW_W, VIEW_CEIL_H, stageFor, sceneViewCap, sceneViewWidthCap, zoomMovesStage, phoneZoomSpan, phoneCameraAnchor, phoneFeetWorldHeight, phoneGroundWorldHeight, phoneSceneDrop, reachableFloorY, sceneBottomLine, sceneGroundLine, stageBandColour, stageEdgeColour, stageEdgeSampler, stageRoomBeside, stageRoomInBand } from './js/location-view.js?v=c308420d';
 import {
   levelInfoForXp,
   reconcilePlayerProgression,
@@ -880,13 +880,13 @@ import {
 import { momentMoreText } from './js/ui/moment-card.js?v=b383144f';
 import { CHAT_MAX_CHARS, chatBubbleText } from './js/ui/chat-input.js?v=8f2479a3';
 // HUB: the hub is the Modern skin's; Classic owns X in its skin (js/classic/classic-hub.js).
-import { MODERN, onUiModeChange, readUiCache, uiState, writeUiCache } from './js/classic/ui-mode.js?v=a8deea36';
+import { MODERN, onUiModeChange, readUiCache, uiState, writeUiCache } from './js/classic/ui-mode.js?v=1678b715';
 // ZOOM: the world zoom (a device preference) and Classic's frame scale under it; both load before main().
 import { worldZoom, setWorldZoom, stepWorldZoom, onZoomChange, zoomKeyAction, zoomKeyToast, zoomFixed, setZoomFixed, onZoomFixedChange, phoneZoom } from './js/world-zoom.js?v=38816228';
 import { nightTint, nightTintOn, onNightTintChange, worldTintOpacity } from './js/night-tint.js?v=1dfc9c89';
 import { homePlaceAt, skyFollowsClock, skyLook } from './js/sky-clock.js?v=dbd21266';
 import { streetMapSetting, toggleStreetMap } from './js/ui/street-minimap.js?v=faab9586';
-import './js/classic/classic-zoom.js?v=280d70a8';
+import './js/classic/classic-zoom.js?v=b1c1e3ab';
 import { mountImaginationHub } from './js/ui/imagination-hub.js?v=6928c5b7';
 import { newDayBubble, shuffleNewDayMessages, waitForScreenGates } from './js/screen-queue.js?v=40222620';
 import { applyFamiliarLook, familiarCardHeading, familiarLook, skillArtFor, skillLearnedActivity } from './js/familiar.js?v=b9597cd3';
@@ -1203,7 +1203,7 @@ import { filterText } from './js/word-filter.js?v=9a7a7ebb'; // the remake's own
 import { mountStartStreet } from './js/start-street.js?v=7d8ce49c'; // #349: the start card names the save's street
 import { arrangeMapCards, fitMapExtras } from './js/map-extras.js?v=16e261b1'; // the Map's Shortcuts
 // The interface skin (js/classic/ui-mode.js) sets <html data-ui> as it loads: before main(), so before the boot cover lifts.
-import { installInterfaceSettings } from './js/classic/classic-prefs.js?v=b1bf785f';
+import { installInterfaceSettings } from './js/classic/classic-prefs.js?v=5affc30a';
 import { installWhatsNewWindow } from './js/ui/whats-new-window.js?v=84fae9bc';
 import { noteWhatsNewBootEnd, offerWhatsNewFallback } from './js/whats-new.js?v=988ec58d';
 import { standOnFeet, anchorBottomCentre } from './js/sprite-feet.js?v=6283b688';

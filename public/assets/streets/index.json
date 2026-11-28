@@ -13401,6 +13401,15 @@
       "platforms": 14,
       "decos": 330,
       "reconstructed": true
+    },
+    "GQRME1100BLOCK1": {
+      "label": "Mien Evoke Quarter, 1100 block",
+      "file": "assets/streets/GQRME1100BLOCK1.json",
+      "hubId": "75",
+      "hubName": "Bortola",
+      "platforms": 1,
+      "decos": 339,
+      "reconstructed": true
     }
   }
 }

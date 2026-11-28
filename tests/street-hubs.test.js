@@ -69,14 +69,14 @@ test('every street on the map lists has its own location hub, which the map data
 
 test('rebuilt rooms (no location XML) keep a hub the map data lists them under', () => {
   const rebuilt = rows.filter((r) => !r.own);
-  assert.equal(rebuilt.length, 60); // + Archimedes Acres's Group Hall (G1312, hub 58), the Quarter's two blocks (G1186, hub 58), the two practice streets (G682, hub 132 Skill Quests), the Interrogation room (G352), Louise Pasture Villa (G371), Snowed In, Ethereal Endeavour, Martleby Hare, Growing Stuff (G157-G159), Winter Walk, Winter Haven, the 15 abandoned-tower floors (G144)
+  assert.equal(rebuilt.length, 61); // + Archimedes Acres's Group Hall (G1312, hub 58), Marylpole Mount Quarter's two blocks (G1186, hub 58), Mien Evoke Quarter's block (G1186, hub 75), the two practice streets (G682, hub 132 Skill Quests), the Interrogation room (G352), Louise Pasture Villa (G371), Snowed In, Ethereal Endeavour, Martleby Hare, Growing Stuff (G157-G159), Winter Walk, Winter Haven, the 15 abandoned-tower floors (G144)
   // The abandoned towers' floors were quarter streets, never on a map list: they keep their lobby's hub.
   const floors = rebuilt.filter((r) => r.meta.internalLabel === `Abandoned ${r.meta.label}` && /, floor \d$/.test(r.meta.label));
   assert.equal(floors.length, 15);
   for (const r of floors) assert.deepEqual(r.maps, [], `${r.tsid} ${r.meta.label}`);
   // G1186: a Quarter's blocks were made at run time and never on a map list either (groups/quarter.js): its parent's hub.
   const blocks = rebuilt.filter((r) => /Quarter, \d+ block$/.test(r.meta.label));
-  assert.equal(blocks.length, 2);
+  assert.equal(blocks.length, 3);
   for (const r of blocks) assert.deepEqual(r.maps, [], `${r.tsid} ${r.meta.label}`);
   // G1312: a group hall's street was made beforehand and kept locked, never on a map list: its lot street's hub.
   const halls = rebuilt.filter((r) => r.tsid === 'GA51318ODPB2UF7');

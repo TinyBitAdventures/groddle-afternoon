@@ -16,7 +16,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { moodGauge } from '../public/js/vitals.js?v=5efac5f3';
 import { cleanSvg } from '../tools/classic-art/build.mjs';
-import { moodState } from '../public/js/classic/classic-topbar.js?v=08c9e528';
+import { moodState } from '../public/js/classic/classic-topbar.js?v=999b085b';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const css = readFileSync(join(root, 'public/style.css'), 'utf8');

@@ -14,7 +14,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { assertStreetGeometry } from '../public/js/street-model.js?v=a9a05f9d';
 import { OWNED_STREETS, streetOwner } from '../public/js/location-events.js?v=48938c8f';
-import { JUMP_GAP } from '../public/js/quest-rooms/puzzle-kit.js?v=a3b4a7a7';
+import { JUMP_GAP } from '../public/js/quest-rooms/puzzle-kit.js?v=c4aafc6a';
 import { WINTER_HAVEN_STREET_ID, WINTER_WALK_STREET_ID } from '../public/js/winter-walk.js?v=faad1d46';
 import {
   WINTER_HAVEN_BOARDWALK_Y,

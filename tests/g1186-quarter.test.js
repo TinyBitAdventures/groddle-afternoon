@@ -29,11 +29,11 @@ import {
   normalizeLots,
   quarterStreet,
   refusalText,
-} from '../public/js/quarter.js?v=e278522a';
+} from '../public/js/quarter.js?v=a38887ca';
 import { HOUSE_STYLE_IDS, houseLot } from '../public/js/home-house.js?v=3c88c47c';
 import { doorSaleArt } from '../public/js/door-sign-art.js?v=69daffff';
 import { arrivalInTarget } from '../public/js/location-navigation.js?v=e9221d85';
-import { quarterFeature, _quarterState, _resetQuarter } from '../public/js/features/quarter-feature.js?v=66199f65';
+import { quarterFeature, _quarterState, _resetQuarter } from '../public/js/features/quarter-feature.js?v=5fca1317';
 import { quartersData } from '../tools/build-realtime-quarters.mjs';
 import { HAS_SERVER, HAS_SITE, SITE_DIR, serverPath } from '../tools/repos.mjs';
 import { Display, fakePixi } from './fake-scene.js';
@@ -212,7 +212,7 @@ describe('solo: your own lot and For Sale houses (features/quarter-feature.js)',
     assert.equal(verb.id, 'quarter_claim');
     assert.equal(verb.enabled, true);
     assert.equal(quarterFeature.runVerb(t, 'quarter_claim', engine), true);
-    assert.deepEqual(quarterFeature.save(), { lot: 1135 });
+    assert.deepEqual(quarterFeature.save(), { street: 'GQRMM1100BLOCK1', lot: 1135 }, 'the lot and its street (two quarters both have an 1135)');
     assert.match(engine.log.toasts.at(-1), /1135 Marylpole Mount Quarter is yours/);
     // Redrawn: the lot now shows your house, owned.
     assert.match(lotTarget(engine, 1135).subtitle, /^Owned by /);

@@ -34,13 +34,13 @@ import {
   normalizeLots,
   quarterInfo,
   quarterStreet,
-} from '../public/js/quarter.js?v=e278522a';
+} from '../public/js/quarter.js?v=a38887ca';
 import { HOUSE_STYLE_IDS, houseLot } from '../public/js/home-house.js?v=3c88c47c';
 import { doorSaleArt } from '../public/js/door-sign-art.js?v=69daffff';
 import { arrivalInTarget } from '../public/js/location-navigation.js?v=e9221d85';
 import { addQuarterBoard } from '../public/js/street-render.js?v=e7e9dfda';
 import { signpostArmRows } from '../public/js/world-context-menu.js?v=00e2eb03';
-import { quarterFeature, _quarterState, _resetQuarter } from '../public/js/features/quarter-feature.js?v=66199f65';
+import { quarterFeature, _quarterState, _resetQuarter } from '../public/js/features/quarter-feature.js?v=5fca1317';
 import { quartersData } from '../tools/build-realtime-quarters.mjs';
 import { HAS_SERVER, HAS_SITE, SITE_DIR, serverPath } from '../tools/repos.mjs';
 import { Display, fakePixi } from './fake-scene.js';
@@ -50,18 +50,21 @@ const root = join(import.meta.dirname, '..');
 const read = (p) => readFileSync(join(root, p), 'utf8');
 const street = (tsid) => JSON.parse(read(`public/assets/streets/${tsid}.json`));
 const parent = street(QUARTER_PARENT_TSID);
+// Marylpole Mount Quarter's blocks (Mien Evoke Quarter's are tests/g1186-quarter-bortola.test.js's).
+const MM_BLOCKS = QUARTER_BLOCKS.filter((b) => b.quarter === 'MM');
 const B1100 = QUARTER_BLOCKS[0];
 const B1200 = QUARTER_BLOCKS[1];
 
 describe('two blocks, each its own street, lots and label', () => {
   it('the 1100 and 1200 blocks: Glitch\'s names, lots 1105-1195 and 1205-1295', () => {
-    assert.deepEqual(QUARTER_BLOCKS.map((b) => [b.tsid, b.x, b.y]), [['GQRMM1100BLOCK1', 1, 1], ['GQRMM1200BLOCK1', 1, 2]]);
+    assert.deepEqual(MM_BLOCKS.map((b) => [b.tsid, b.x, b.y]), [['GQRMM1100BLOCK1', 1, 1], ['GQRMM1200BLOCK1', 1, 2]]);
     assert.equal(blockLabel(QUARTER.name, 1, 2), 'Marylpole Mount Quarter, 1200 block');
     assert.deepEqual(blockLots(B1200), [1205, 1215, 1225, 1235, 1245, 1255, 1265, 1275, 1285, 1295]);
     assert.equal(lotLabel(1205), '1205 Marylpole Mount Quarter');
-    assert.equal(new Set(QUARTER_ALL_LOTS).size, 20, 'no lot number on two blocks (the site keys a lot by street and lot; numbers stay unique too)');
+    assert.equal(new Set(MM_BLOCKS.flatMap(blockLots)).size, 20, 'no lot number on two blocks of one quarter (the site keys a lot by street and lot)');
+    assert.ok(MM_BLOCKS.flatMap(blockLots).every((lot) => QUARTER_ALL_LOTS.includes(lot)));
     const index = JSON.parse(read('public/assets/streets/index.json')).streets;
-    for (const b of QUARTER_BLOCKS) {
+    for (const b of MM_BLOCKS) {
       const s = street(b.tsid);
       assert.equal(s.label, blockLabel(QUARTER.name, b.x, b.y));
       assert.equal(index[b.tsid].label, s.label);
@@ -88,7 +91,7 @@ describe('two blocks, each its own street, lots and label', () => {
   });
 
   for (const b of QUARTER_BLOCKS) {
-    it(`${b.x}${b.y}00 block: every lot on the floor with its For Sale art, no two houses overlapping, all inside the street`, () => {
+    it(`${b.quarter} ${b.x}${b.y}00 block: every lot on the floor with its For Sale art, no two houses overlapping, all inside the street`, () => {
       const block = street(b.tsid);
       let left = 0, right = 0;
       for (const id of HOUSE_STYLE_IDS) for (const facing of [false, true]) {
@@ -262,7 +265,7 @@ describe('the next block is data, not code', () => {
     }
     if (HAS_SITE) assert.doesNotMatch(readFileSync(join(SITE_DIR, 'src/Quarter.php'), 'utf8'), /GQRMM\d/);
     // The builder lays every block in the list.
-    assert.match(read('tools/build-rebuilt-rooms.mjs'), /for \(const block of QUARTER_BLOCKS\) \{/);
+    assert.match(read('tools/build-rebuilt-rooms.mjs'), /for \(const quarter of QUARTERS\) \{[\s\S]*for \(const block of quarter\.blocks\) \{/);
   });
 });
 

@@ -16,9 +16,10 @@
  * Also the two skill-quest practice streets (public/js/practice-streets.js, G682),
  * Breezy, EZ Cookin' and Talking 'bout Soil Appreciation: no doors lead in (the
  * quests' starts and the tutorial's EZ Cooking pick move you there).
- * Also the Quarter's blocks (public/js/quarter.js QUARTER_BLOCKS, G1186): Marylpole Mount Quarter,
+ * Also the Quarters' blocks (public/js/quarter.js QUARTERS, G1186): Marylpole Mount Quarter,
  * 1100 block on Whipping Cross Crossing, 1200 block on Herring Bone Hatch, and the QUARTER
- * signpost on Marylpole Mount that leads to each.
+ * signpost on Marylpole Mount that leads to each; Mien Evoke Quarter, 1100 block, composed from
+ * Mien Evoke (composeBlockBase), and the QUARTER signpost on Mien Evoke.
  * Also Archimedes Acres's Group Hall (public/js/group-hall-street.js, G1312): the hall job 692's own
  * street, laid on Fanfoot Flare, its one signpost back to Archimedes Acres (the lot is the way in).
  * Each door's own connect x/y is kept and snapped to the rebuilt floor. Safe to
@@ -103,14 +104,14 @@ import {
   soilStreet,
 } from '../public/js/practice-streets.js?v=557238c1';
 import {
-  QUARTER_BLOCKS,
+  QUARTERS,
   QUARTER_PARENT_SIGN_ID,
-  QUARTER_PARENT_SIGN_X,
-  QUARTER_PARENT_TSID,
+  composeBlockBase,
+  groundYAt,
   quarterIndexEntry,
   quarterSignpost,
   quarterStreet,
-} from '../public/js/quarter.js?v=e278522a';
+} from '../public/js/quarter.js?v=a38887ca';
 import { ARCHIMEDES_HALL, HALL_LAYOUT, HALL_TEMPLATE_TSID, groupHallIndexEntry, groupHallStreet } from '../public/js/group-hall-street.js?v=fa1921ad';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -283,17 +284,20 @@ for (const [tsid, build, row] of [[EZ_COOKIN_TSID, ezCookinStreet, ezCookinIndex
   indexRow(tsid, row(street));
 }
 
-// G1186: the Quarter's blocks, in by Marylpole Mount's QUARTER signpost, out by each block's own.
-{
-  const parent = read(`${QUARTER_PARENT_TSID}.json`);
-  const signFoot = arrivalInTarget(parent, QUARTER_PARENT_SIGN_X, -40);
-  if (!signFoot?.snapped) throw new Error("no floor under Marylpole Mount's QUARTER signpost");
+// G1186: each quarter's blocks, in by its parent street's QUARTER signpost, out by each block's own.
+for (const quarter of QUARTERS) {
+  const parent = read(`${quarter.parent}.json`);
+  // Probed just over the parent's floor there (Marylpole Mount's lies near -40, Mien Evoke's near -125).
+  const probe = (x) => (groundYAt(parent.platforms, x) ?? -36) - 4;
+  const signFoot = arrivalInTarget(parent, quarter.parentSignX, probe(quarter.parentSignX));
+  if (!signFoot?.snapped) throw new Error(`no floor under ${quarter.parentLabel}'s QUARTER signpost`);
   // The way out lands just right of the QUARTER signpost, as a signpost arrival does.
-  const parentArrive = arrivalInTarget(parent, QUARTER_PARENT_SIGN_X + 90, -40);
-  if (!parentArrive?.snapped) throw new Error('no floor beside the QUARTER signpost');
+  const parentArrive = arrivalInTarget(parent, quarter.parentSignX + 90, probe(quarter.parentSignX + 90));
+  if (!parentArrive?.snapped) throw new Error(`no floor beside ${quarter.parentLabel}'s QUARTER signpost`);
   const arrives = [];
-  for (const block of QUARTER_BLOCKS) {
-    const room = quarterStreet(read(`${block.template}.json`), { parentArrive: { x: parentArrive.x, y: parentArrive.y }, block });
+  for (const block of quarter.blocks) {
+    const template = block.compose ? composeBlockBase(read(`${block.compose.base}.json`), block) : read(`${block.template}.json`);
+    const room = quarterStreet(template, { parentArrive: { x: parentArrive.x, y: parentArrive.y }, block });
     const sign = room.signposts[0];
     const blockArrive = arrivalInTarget(room, sign.x + 100, sign.y - 4);
     if (!blockArrive?.snapped) throw new Error(`no floor beside ${room.label}'s signpost`);
@@ -302,10 +306,10 @@ for (const [tsid, build, row] of [[EZ_COOKIN_TSID, ezCookinStreet, ezCookinIndex
     indexRow(room.tsid, quarterIndexEntry(room));
     arrives.push({ x: blockArrive.x, y: blockArrive.y });
   }
-  const sign = quarterSignpost({ y: signFoot.y + parent.bounds.t, arrives });
+  const sign = quarterSignpost({ y: signFoot.y + parent.bounds.t, arrives, quarter });
   parent.signposts = [...parent.signposts.filter((p) => p.id !== QUARTER_PARENT_SIGN_ID), sign];
   parent.stats.signpostCount = parent.signposts.length;
-  put(`${QUARTER_PARENT_TSID}.json`, `${JSON.stringify(parent)}\n`);
+  put(`${quarter.parent}.json`, `${JSON.stringify(parent)}\n`);
 }
 
 // G1312: Archimedes Acres's Group Hall (job 692), in by the lot's verb, out by its signpost.

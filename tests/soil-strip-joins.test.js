@@ -19,7 +19,7 @@ import { HOME_LIMITS } from '../public/js/homes-catalog.js?v=0367f90f';
 import { YARD_SEGMENT_W, HOUSE_LOT_W } from '../public/js/home-cultivation.js?v=122d6f45';
 import { EXTERIOR_STYLES, INTERIOR_STYLES, streetLook, yardLook } from '../public/js/home-styles.js?v=ec5d2f69';
 import { SOIL_JOIN, soilTiles } from '../public/js/landscape-reach.js?v=2f2d7cb3';
-import { BACK_YARD_GROUND_Y, STREET_GROUND_Y, drawLandscape } from '../public/js/features/homes-feature.js?v=7871a7e1';
+import { BACK_YARD_GROUND_Y, STREET_GROUND_Y, drawLandscape } from '../public/js/features/homes-feature.js?v=95b04a3f';
 import { buildNeighbourBackground } from '../public/js/features/neighbour-scene.js?v=fe6e52ce';
 import { FakeEl, fakePixi } from './fake-scene.js';
 

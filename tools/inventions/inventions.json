@@ -5898,13 +5898,13 @@
   },
   {
    "id": "shared-quarter-lots",
-   "title": "Marylpole Mount Quarter, 1100 and 1200 blocks: shared streets of free player lots, each showing its owner's home-street house and leading to their home street",
+   "title": "The Quarters: Marylpole Mount Quarter (1100 and 1200 blocks) and Mien Evoke Quarter in Bortola (1100 block), shared streets of free player lots, each showing its owner's home-street house and leading to their home street",
    "kind": "behaviour",
    "status": "kept",
    "where": [
     {
      "file": "public/js/quarter.js",
-     "symbol": "QUARTER_BLOCKS, QUARTER, judgeClaim, quarterStreet"
+     "symbol": "QUARTERS, QUARTER_BLOCKS, judgeClaim, quarterStreet"
     },
     {
      "file": "public/js/features/quarter-feature.js",
@@ -5919,10 +5919,37 @@
     },
     {
      "file": "public/assets/streets/GQRMM1200BLOCK1.json"
+    },
+    {
+     "file": "public/assets/streets/GQRME1100BLOCK1.json"
     }
    ],
-   "why": "Players missed Glitch's pre-2012 quarter houses (G1186). No quarter street survives (made at run time, deleted in 2012), so the 1100 block is laid on Whipping Cross Crossing's CC0 lot street and the 1200 block (2026-11-27) on Herring Bone Hatch's, its nine meadow houses with the first again for the tenth. Kept Glitch's: the '<Name> Quarter, <x><y>00 block' and '<x><y>## <Name> Quarter' names (groups/quarter.js), the QUARTER signpost (SignpostView.as), one house per player and none with an owner (pols_canBuy), the familiar's For Sale words, the For Sale sign. Ours: a lot is free (no currants, no papers), a front is the owner's G796 house leading to their home street through the G328 visit (no second house, no interior), giving a lot up puts it back on sale (Glitch sold back at 80%), the parent street and block numbers, the QUARTER signpost's blocks as a menu (the client's grid dialog), solo shows only your own lot, and the claim and refusal lines where Glitch had none.",
-   "ruling": "Austin 2026-11-23 (G1186): option A, a new shared street of house lots, one meadow block of 10 to 12 lots; free, one lot per player, front to the home street, one quarter for everyone, solo own lot only (the note's defaults); Austin 2026-11-27: open a second block (1200), one lot per player across blocks, no block opens by itself when one fills",
+   "why": "Players missed Glitch's pre-2012 quarter houses (G1186). No quarter street survives (made at run time, deleted in 2012), so the 1100 block is laid on Whipping Cross Crossing's CC0 lot street and the 1200 block (2026-11-27) on Herring Bone Hatch's, its nine meadow houses with the first again for the tenth. Mien Evoke Quarter's block (2026-11-28) has no lot street to lay it on (bortola-quarter-block). One lot per player across every block of every quarter; a lot is its street and its number, since both quarters have an 1100 block. Kept Glitch's: the '<Name> Quarter, <x><y>00 block' and '<x><y>## <Name> Quarter' names (groups/quarter.js), the QUARTER signpost (SignpostView.as), one house per player and none with an owner (pols_canBuy), the familiar's For Sale words, the For Sale sign. Ours: a lot is free (no currants, no papers), a front is the owner's G796 house leading to their home street through the G328 visit (no second house, no interior), giving a lot up puts it back on sale (Glitch sold back at 80%), the parent street and block numbers, the QUARTER signpost's blocks as a menu (the client's grid dialog), solo shows only your own lot, and the claim and refusal lines where Glitch had none.",
+   "ruling": "Austin 2026-11-23 (G1186): option A, a new shared street of house lots, one meadow block of 10 to 12 lots; free, one lot per player, front to the home street, one quarter for everyone, solo own lot only (the note's defaults); Austin 2026-11-27: open a second block (1200), one lot per player across blocks, no block opens by itself when one fills; Austin 2026-11-28: a Bortola quarter next (players asked for a place in Bortola), same claim rules, one lot per player across every quarter, the quarters data-driven, blocks open by hand",
+   "rows": [
+    "G1186"
+   ]
+  },
+  {
+   "id": "bortola-quarter-block",
+   "title": "Mien Evoke Quarter, 1100 block: a Bortola block street composed from Mien Evoke's own art on one flat floor",
+   "kind": "placement",
+   "status": "kept",
+   "where": [
+    {
+     "file": "public/js/quarter.js",
+     "symbol": "QUARTERS (Mien Evoke Quarter), composeBlockBase, MEADOW_HOUSES"
+    },
+    {
+     "file": "public/assets/streets/GQRME1100BLOCK1.json"
+    },
+    {
+     "file": "public/assets/streets/GHVLCNLR783251B.json",
+     "symbol": "signpost_quarter"
+    }
+   ],
+   "why": "Bortola had six quarter templates (inc_data_pols_prod.js) and all are lost. Snaps name Vuos Bosca Quarter (only a house's cave interior) and Mien Evoke Quarter (the Glitch Forever wiki's picture of a whole block street and a player's snap of its 1400 block: meadow houses in a row on flat grass under Bortola's pines and teal sky), so the quarter hangs off Mien Evoke (hub 75). Ours: the block street is composed from Mien Evoke (GHVLCNLR783251B, CC0): its sky gradient, sky, bg_2, bg_1, middleplus and foreground layers with their filters and decos as they are; in the middleground its raised dirt mounds and their mossy tops and the low hills (mound_dirt_3, mound_dirt_4, ground_forest_terrain_plat_01/02, ground_forest_terrain_plattop_02, heights_mound_3) left out, its bushes, moss, gravel and plants set on one flat floor at y -120, and its ground band (dirt_horizon, dirt_platform_long, dirt_crosssection_long and _curvy) laid again end to end along that floor; widened from 5000 to 6000 px by repeating the stretch before x 1600 in each layer, each parallax layer in proportion; one floor platform. The For Sale houses are ten of Tiny Speck's fifteen meadow house decos (pol_ext_meadow, CC0), the houses the wiki's picture shows. The QUARTER signpost stands at x 1500 on Mien Evoke, the block's signpost at its left end.",
+   "ruling": "Austin 2026-11-28: a Bortola quarter (Vuos Bosca or Mien Evoke, whichever fits), an 1100 block of 10 lots composed from Bortola's own CC0 decos and geometry, flat ground at 565 px spacing, marked ours; Mien Evoke chosen by lane bortolak (its whole-street picture survives)",
    "rows": [
     "G1186"
    ]

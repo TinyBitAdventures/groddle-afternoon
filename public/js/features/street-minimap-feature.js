@@ -72,7 +72,7 @@
 import { STREET_ENTITY_KINDS } from '../street-render.js?v=e7e9dfda';
 import { DOOR_LOOKS, createPictureCache, createStreetMinimap, doorArtName, doorMarks, markArt, minimapVisibility, onStreetMapChange, sceneDoorMarks, sceneSignMarks, setStreetMap, signpostMarks, snapshotStreetView, snapsWithScene, stationMarks, streetMapOn, teleporterMarks, withDoorArt } from '../ui/street-minimap.js?v=faab9586';
 import { classicArtHd, classicArtUrl } from '../classic/classic-art.js?v=0f6f02a3';
-import { onUiModeChange } from '../classic/ui-mode.js?v=a8deea36';
+import { onUiModeChange } from '../classic/ui-mode.js?v=1678b715';
 import { focusBack } from '../ui/focus-return.js?v=da190597';
 import { isPhoneDevice } from '../touch-controls.js?v=8bc690ac';
 import { isFailed, isLoaded, onFailed, onLoaded } from '../textures.js?v=b8e38103';

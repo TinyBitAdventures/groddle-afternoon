@@ -106,7 +106,7 @@ import { likeStackAt, mergeDroppedStacks, pickupCountTitle } from '../world-item
 import { groundKey, groundStacks, ownGroundRows, ownGroundState } from '../ground-stacks.js?v=22792362';
 import { restingStackYAt, settleStackY, STACK_SINK_PX } from '../walk-surface.js?v=76def2f6';
 import { keepsOwnStack } from '../tools.js?v=4156bba8';
-import { PHONE_HOME_MIN_VIEW_W } from '../location-view.js?v=f0a5f17d';
+import { PHONE_HOME_MIN_VIEW_W } from '../location-view.js?v=c308420d';
 import { createCountChooser } from '../ui/count-chooser.js?v=75f69512';
 import { createTilePainter } from '../ui/style-tile-paint.js?v=d0e1312b';
 import { isBagClass } from '../pack-slots.js?v=38e4aea5';
@@ -235,7 +235,7 @@ import { projectApi } from './street-jobs-feature.js?v=de57e812';
 import { TOWER_CHASSIS, TOWER_CONFIG, TOWER_DOOR_DX, TOWER_GEO, TOWER_PROTO, normalizeTowerState } from '../home-tower.js?v=a7fc0cce';
 import { drawTowerBench, drawTowerElevator, drawTowerExit, towerApi, visitorTowerView } from './home-tower-feature.js?v=10826be6';
 import { pieceUrl, roomPieces, surfaceAt, swatchPiece, wallTargetAt } from '../home-wallpaper.js?v=5d3594e4';
-import { renderHomeLocation } from '../home-shot-render.js?v=be7225d2';
+import { renderHomeLocation } from '../home-shot-render.js?v=794770c1';
 import { maxTextureSizeOf, sharpDeco, wantsHiresDecos } from '../deco-hires.js?v=34f36d77';
 import { SHARP_DECOS } from '../deco-sharp-list.js?v=7d615f20';
 import { resourceNodeStill, resourceNodesFeature } from './resource-nodes-feature.js?v=5922a1ed';
