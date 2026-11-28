@@ -274,6 +274,8 @@ try {
     // == Making it public then private again: off the profile and its pictures at once ==
     $toggle(ADA, $adaPrivate, true);
     $shownWhilePublic = [$list(BEA), $picture(BEA, ADA, $adaPrivate, 'picture')['status']];
+    // The snaps grids with two public Snaps, whole (tests/snaps-grid-dialog.test.js reads their cards and pop-up); one public Snap's profile beside them.
+    $out['grid'] = ['ids' => $list(BEA), 'overview' => $profile(BEA, 'zz-ada'), 'tab' => $profile(BEA, 'zz-ada', 'snaps'), 'own' => $profile(ADA, 'zz-ada', 'snaps'), 'one' => $bea, 'none' => $profile(BEA, 'zz-cy', 'snaps')];
     $toggle(ADA, $adaPrivate, false);
     $out['private again'] = ['whilePublic' => $shownWhilePublic, 'after' => [$list(BEA), $picture(BEA, ADA, $adaPrivate, 'picture')['status'], $page(BEA, 'zz-ada', $adaPrivate)['status']]];
 

@@ -6868,6 +6868,23 @@
    "rows": []
   },
   {
+   "id": "snaps-grid-picture-dialog",
+   "title": "A player's snaps on their profile and their All snaps page open in the same pop-up as a Snap's page (the full picture, caption, street, date and by-name, Previous and Next through the snaps on that page with the arrow keys, Download, Open snap page, Close); without JavaScript, or with a middle or Ctrl/Cmd click, a snap opens its page as before",
+   "kind": "UI",
+   "status": "kept",
+   "where": [
+    {
+     "file": "tests/snaps-grid-dialog.test.js",
+     "symbol": "the site repo's src/PlayerPages.php snapCard and snapsDialog, community/picture-dialog.js and style.css .profile-snaps-modal (the test reads them)"
+    }
+   ],
+   "why": "Glitch's snaps lived on glitch.com photo pages, each its own page; it had no pop-up viewer on a player's photo grid. Ours: the grid's snaps in the site's picture pop-up, shared with the Snap page and Support (tests/snaps-grid-dialog.test.js).",
+   "ruling": "Austin 2026-11-28: picked a pop-up with Previous and Next for the profile's snaps grid",
+   "rows": [
+    "G1240"
+   ]
+  },
+  {
    "id": "craftybot-passes-finished-jobs",
    "title": "The Crafty Bot passes a finished, paused or halted job and works the next one, replanning each job from the floor as it is when it starts",
    "kind": "behaviour",
