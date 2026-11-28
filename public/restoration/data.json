@@ -2814,9 +2814,24 @@
   "deployed": "2026-11-28"
  },
  "git": {
-  "commits": 3957,
+  "commits": 3961,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-28",
+    "kind": "fix",
+    "text": "Back on Gentle Island you land on the walkway, not the path below it"
+   },
+   {
+    "date": "2026-11-28",
+    "kind": "fix",
+    "text": "No trip home from Gentle Island before the tutorial sends you there"
+   },
+   {
+    "date": "2026-11-28",
+    "kind": "fix",
+    "text": "No quest offers or festival card during the tutorial"
+   },
    {
     "date": "2026-11-28",
     "kind": "fix",
@@ -2921,14 +2936,9 @@
     "date": "2026-11-27",
     "kind": "new",
     "text": "Marylpole Mount Quarter's 1200 block: ten more lots, picked from the QUARTER signpost, one lot each across both blocks"
-   },
-   {
-    "date": "2026-11-27",
-    "kind": "new",
-    "text": "The home street and the back yard get the night sky and stars"
    }
   ]
  },
- "tests": 1517,
+ "tests": 1520,
  "generatedAt": "2026-11-28"
 }
