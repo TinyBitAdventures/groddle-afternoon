@@ -6991,7 +6991,7 @@
     }
    ],
    "why": "Austin 2026-11-28: a friend must not be able to spam their friends with online and offline notices by going on and off quickly. Glitch had no such notice at all (glitch-client NCMsgHandler.as do_BUDDY_ONLINE and ContactList.as buddyUpdate only moved the contact between Online and Offline; GSJS player.js onLogin/onLogout sent buddy_online/buddy_offline every time, with no debounce), so the toasts and their limit are both ours. Ours: the realtime server (groddle-afternoon-server buddies.go) waits 30 s (buddyGrace, was 15 s) before a dropped game counts as offline, so a reload, Play here or a phone's dropped connection says nothing and the dot waits too; it says a buddy is online at most once each 5 minutes (buddyAnnounceEvery) per player, and went offline only to close an online it said or after a stay of 5 minutes or more; a block, an un-block and Appear offline flapping follow the same rule; every other change goes out quiet, which moves the dot and shows no toast or activity line.",
-   "ruling": "",
+   "ruling": "Austin 2026-11-28 (in chat): friends must not be able to spam online and offline notices by going on and off quickly",
    "rows": []
   }
  ]
