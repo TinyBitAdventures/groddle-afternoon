@@ -34,8 +34,9 @@ import {
   setCraftybotSpecs,
   setJobTotal,
   setPaused,
-} from '../public/js/craftybot.js?v=4efdfd85';
-import { craftybotFeature } from '../public/js/features/craftybot-feature.js?v=ec3a41a4';
+  queueSetActive,
+} from '../public/js/craftybot.js?v=6f09b162';
+import { craftybotFeature } from '../public/js/features/craftybot-feature.js?v=ec7e4023';
 import { homesFeature } from '../public/js/features/homes-feature.js?v=bc463ef7';
 import { dropsMpFeature } from '../public/js/features/drops-mp-feature.js?v=a34f5a9b';
 
@@ -219,7 +220,7 @@ describe('the rules: a fetch the server answers later', () => {
   });
 
   it('a Fuel Cell on the shared floor: Add More walks there and the cell fills the tank when it comes', async () => {
-    const { autoRefuel } = await import('../public/js/craftybot.js?v=4efdfd85');
+    const { autoRefuel } = await import('../public/js/craftybot.js?v=6f09b162');
     const stacks = [{ id: 'f', cls: 'fuel_cell', count: 2, x: 230, shared: true }];
     const asks = [];
     const world = sharedWorld(stacks, asks);
@@ -318,21 +319,24 @@ describe('a replan never makes a job\'s units twice (third review of G1316, 2026
   const RECIPE = { apple: 3, plum: 1, orange: 3, lemon: 4 }; // Cherries each (catalog_craftytasking.js)
 
   /** A floor of Cherries and the machine that keeps count of every Cherry and every made unit. */
-  function ledgerWorld(cherries) {
-    const stacks = [{ id: 'c0', cls: 'cherry', count: cherries, x: 1700 }, { id: 'm', cls: 'fruit_changing_machine', count: 1, x: 1708 }];
+  function ledgerWorld(cherries, x0 = 1700) {
+    const stacks = [{ id: 'c0', cls: 'cherry', count: cherries, x: x0 }, { id: 'm', cls: 'fruit_changing_machine', count: 1, x: 1708 }];
     const given = {};
     let n = 0;
+    const L = { bot: null };
     const world = {
       inLocation: true,
       count: (cls) => stacks.filter((x) => String(cls).split('|').includes(x.cls)).reduce((a, x) => a + x.count, 0),
-      find: (cls) => stacks.find((x) => String(cls).split('|').includes(x.cls) && x.count > 0) || null,
+      // The nearest, as the feature finds it.
+      find: (cls) => stacks.filter((x) => String(cls).split('|').includes(x.cls) && x.count > 0).sort((a, b) => Math.abs(a.x - (L.bot?.x ?? 0)) - Math.abs(b.x - (L.bot?.x ?? 0)))[0] || null,
+      // By id whatever its class, as a careless source would: the rules must never ask for the wrong one.
       take: (id, cls, k) => { const x = stacks.find((y) => y.id === id); if (!x) return 0; const t = Math.min(k, x.count); x.count -= t; return t; },
       wear: () => ({ broke: false }),
       drop: (cls, k, x) => stacks.push({ id: `d${(n += 1)}`, cls, count: k, x: x ?? 1700 }),
       give: (cls, k) => { given[cls] = (given[cls] || 0) + k; },
       imagination: () => {}, say: () => {}, sound: () => {}, stopSound() {}, fuelCell: () => null,
     };
-    return { world, stacks, given, added: { cherry: cherries }, addCherries(k) { stacks.push({ id: `c${(n += 1)}`, cls: 'cherry', count: k, x: 1600 }); this.added.cherry += k; } };
+    return Object.assign(L, { world, stacks, given, added: { cherry: cherries }, addCherries(k, x = 1600) { stacks.push({ id: `c${(n += 1)}`, cls: 'cherry', count: k, x }); this.added.cherry += k; } });
   }
 
   /** Every Cherry is on the floor, held by a job, or inside a made unit; and no job has made more than its total. */
@@ -350,6 +354,12 @@ describe('a replan never makes a job\'s units twice (third review of G1316, 2026
     const floor = L.world.count('cherry');
     for (const st of L.stacks) if (RECIPE[st.cls]) units[st.cls] = (units[st.cls] || 0) + st.count;
     const inUnits = Object.entries(units).reduce((a, [c, k]) => a + k * RECIPE[c], 0);
+    // The machine is a tool: held by reference while used (its id in tsid), never taken or used up.
+    assert.equal(L.world.count('fruit_changing_machine'), 1, `${label}: the machine is still on the floor`);
+    for (const row of bot.queue) {
+      const h = row.holder?.general?.fruit_changing_machine;
+      assert.ok(!h || (h.tsid && Object.keys(h.tsid).length), `${label}: ${row.item} holds the machine as an ingredient`);
+    }
     assert.equal(floor + held + inUnits, L.added.cherry, `${label}: Cherries floor ${floor} + held ${held} + in ${JSON.stringify(units)} vs ${L.added.cherry} put down`);
   }
 
@@ -376,20 +386,69 @@ describe('a replan never makes a job\'s units twice (third review of G1316, 2026
     audit(bot, L, 'repro');
   });
 
+  for (const variant of ['its Cherries', 'its made Apple']) {
+    it(`fourth review: removing a paused job puts ${variant} back down`, () => {
+      const L = ledgerWorld(4);
+      const bot = createBot(createCraftybotState(), 1708, 'interior', 0);
+      L.bot = bot;
+      let t = 1500;
+      advanceCraftybot(bot, t, L.world);
+      setJobTotal(bot, L.world, 'apple', 1);
+      setJobTotal(bot, L.world, 'plum', 1);
+      const cond = variant === 'its Cherries' ? () => bot.queue[0].holder.general?.cherry?.count === 3 : () => bot.queue[0].holder.general?.apple?.count;
+      t = runUntil(bot, L.world, t, cond, { stepMs: 25 });
+      assert.ok(t);
+      setPaused(bot, L.world, 'apple', true);
+      t = runUntil(bot, L.world, t, () => false, { maxMs: 10_000 }) ?? t + 10_000;
+      L.addCherries(1, 1650);
+      noticeSourceChange(bot);
+      t = runUntil(bot, L.world, t, () => bot.active === 1 && bot.crafting, { stepMs: 25 });
+      assert.ok(t, 'the Plum runs');
+      setJobTotal(bot, L.world, 'apple', 0);
+      assert.equal(bot.queue.length, 1);
+      audit(bot, L, 'removed');
+      runUntil(bot, L.world, t, () => false, { maxMs: 60_000 });
+      audit(bot, L, 'later');
+      assert.equal(bot.queue[0].crafted, 1, 'the Plum');
+    });
+  }
+
+  it('fourth review: a walk to the machine for a job paused on the way never takes the machine as a Cherry', () => {
+    const L = ledgerWorld(3, 900);
+    const bot = createBot(createCraftybotState(), 1708, 'interior', 0);
+    L.bot = bot;
+    let t = 1500;
+    advanceCraftybot(bot, t, L.world);
+    setJobTotal(bot, L.world, 'apple', 1);
+    setJobTotal(bot, L.world, 'plum', 1);
+    t = runUntil(bot, L.world, t, () => false, { maxMs: 1000, stepMs: 50 }) ?? t + 1000;
+    setPaused(bot, L.world, 'apple', true);
+    L.addCherries(1, 200);
+    noticeSourceChange(bot);
+    t = runUntil(bot, L.world, t, () => bot.active === 1 && bot.moveTarget === 'm' && Boolean(bot.timers.arrive), { maxMs: 20_000, stepMs: 50 });
+    assert.ok(t, 'the Plum walks to the machine');
+    setPaused(bot, L.world, 'plum', true);
+    L.addCherries(1, 1000);
+    noticeSourceChange(bot);
+    runUntil(bot, L.world, t, () => false, { maxMs: 20_000, stepMs: 50 });
+    audit(bot, L, 'after');
+  });
+
   it('property: pause, resume, Kick, reload, new stacks, Collect and raised totals never make more than a job\'s total, and use exactly the recipe for what is made', () => {
     let seed = 753;
     const rnd = () => ((seed = (seed * 1103515245 + 12345) % 2147483648) / 2147483648);
     const pick = (a) => a[Math.floor(rnd() * a.length)];
-    for (let run = 0; run < 80; run += 1) {
-      const L = ledgerWorld(Math.floor(rnd() * 12));
+    for (let run = 0; run < 150; run += 1) {
+      const L = ledgerWorld(Math.floor(rnd() * 12), 100 + Math.floor(rnd() * 1700));
       let bot = createBot(createCraftybotState(), 1708, 'interior', 0);
+      L.bot = bot;
       let t = 1500;
       advanceCraftybot(bot, t, L.world);
       const jobs = [...new Set([pick(Object.keys(RECIPE)), pick(Object.keys(RECIPE)), pick(Object.keys(RECIPE))])];
       for (const j of jobs) setJobTotal(bot, L.world, j, 1 + Math.floor(rnd() * 3));
       const log = [];
       for (let step = 0; step < 25; step += 1) {
-        const op = pick(['advance', 'advance', 'advance', 'pause', 'pauseMid', 'resume', 'kick', 'reload', 'stack', 'collect', 'raise']);
+        const op = pick(['advance', 'advance', 'advance', 'pause', 'pauseMid', 'resume', 'kick', 'reload', 'stack', 'collect', 'raise', 'remove', 'cancel', 'switch', 'switchWalk', 'add']);
         const row = bot.queue.length ? pick(bot.queue) : null;
         log.push(op + (row ? `:${row.item}` : ''));
         if (op === 'advance') {
@@ -403,8 +462,20 @@ describe('a replan never makes a job\'s units twice (third review of G1316, 2026
         } else if (op === 'pause' && row) setPaused(bot, L.world, row.item, true);
         else if (op === 'resume' && row) setPaused(bot, L.world, row.item, false);
         else if (op === 'kick') kick(bot, L.world);
-        else if (op === 'reload') bot = normalizeCraftybotState(serializeCraftybotState(bot));
-        else if (op === 'stack') { L.addCherries(1 + Math.floor(rnd() * 6)); noticeSourceChange(bot); }
+        else if (op === 'reload') { bot = normalizeCraftybotState(serializeCraftybotState(bot)); L.bot = bot; }
+        else if (op === 'stack') { L.addCherries(1 + Math.floor(rnd() * 6), 100 + Math.floor(rnd() * 1700)); noticeSourceChange(bot); }
+        else if (op === 'remove' && row) setJobTotal(bot, L.world, row.item, 0);
+        else if (op === 'cancel' && row) setJobTotal(bot, L.world, row.item, Math.max(row.crafted, row.count - 1));
+        else if (op === 'switch' && row) queueSetActive(bot, L.world, bot.queue.indexOf(row), rnd() < 0.5);
+        else if (op === 'switchWalk') {
+          // Run on until the bot is walking, then make another job the active one (paused or not, forced or not).
+          for (const until = t + 20_000; t < until && !bot.timers.arrive; t += 50) advanceCraftybot(bot, t, L.world);
+          const other = bot.queue.findIndex((r, i) => i !== bot.active);
+          if (bot.timers.arrive && other >= 0) {
+            if (rnd() < 0.5) setPaused(bot, L.world, bot.queue[bot.active].item, true);
+            queueSetActive(bot, L.world, other, rnd() < 0.5);
+          }
+        } else if (op === 'add') setJobTotal(bot, L.world, pick(Object.keys(RECIPE)), 1 + Math.floor(rnd() * 2));
         else if (op === 'collect' && row && row.crafted > 0) collectJob(bot, L.world, row.item, row.crafted);
         else if (op === 'raise' && row) setJobTotal(bot, L.world, row.item, row.count + 1);
         audit(bot, L, `run ${run} [${log.join(' ')}]`);
@@ -506,6 +577,13 @@ describe('the feature online: the owner\'s bot in the house takes from the share
     engine.droppedItems.streets.RH_HOME_INT = [{ id: 'world-item-3', streetTsid: 'RH_HOME_INT', classTsid: 'fruit_changing_machine', count: 1, x: 760, y: 620 }];
     advanceCraftybot(bot(), 2500, world());
   }
+
+  it('fourth review: the source never hands over a stack of another class than the one asked for', () => {
+    freshBot();
+    assert.equal(world().take('world-item-3', 'cherry', 1), 0, 'the machine is not a Cherry');
+    assert.equal(engine.droppedItems.streets.RH_HOME_INT[0].count, 1);
+    assert.equal(world().take('world-item-3', 'fruit_changing_machine|cherry', 1), 1, 'asked for by its own class it is');
+  });
 
   it('sees a shared floor stack where it lies, as the owner sees it', () => {
     client.emit('msg:ground_state', { street: 'HOUSE_7', stacks: [{ id: OP, c: 'cherry', n: 5, x: 100, y: 620, by: { id: 7, name: 'Ada' } }] });

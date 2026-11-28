@@ -95,7 +95,7 @@ import {
   setJobTotal,
   setLocked,
   setPaused,
-} from '../craftybot.js?v=4efdfd85';
+} from '../craftybot.js?v=6f09b162';
 import { frameTexture, isLoaded, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js?v=b8e38103';
 import { grantMoodXp } from '../mood-xp.js?v=e311b45c';
 import { displayTopOf, itemstackOverlayPoint, playSheetOverlay } from '../overlay-art.js?v=e50bacca';
@@ -409,6 +409,9 @@ function makeWorld(engine) {
         if (k > 0) engine.refreshPack?.();
         return k;
       }
+      // G1316 fourth review: only a stack of the class asked for (a walk's target may be another job's machine).
+      const asked = rows().find((r) => r.id === id);
+      if (asked && !String(cls).split('|').includes(asked.cls)) return 0;
       if (String(id).startsWith('cab:')) {
         const at = cabinetSlot(id);
         if (!at) return 0;

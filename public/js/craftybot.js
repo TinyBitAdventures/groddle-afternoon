@@ -207,6 +207,8 @@ export function normalizeCraftybotState(seed = {}) {
       endAt: Number(s.move.endAt) || 0,
     } : null,
     refuelling: s.refuelling === true,
+    // G1316 fourth review: the job and step a walk was started for ({ item, seq }), or null.
+    walkFor: s.walkFor && cleanCls(s.walkFor.item) && s.walkFor.seq != null ? { item: cleanCls(s.walkFor.item), seq: int(s.walkFor.seq) } : null,
     // G1316: the shared floor take the server is weighing ({ id, cls, item, seq } or { id, fuel }), or null.
     awaiting: null,
     craftingTool: s.craftingTool ? cleanCls(s.craftingTool) : null,
@@ -807,6 +809,8 @@ export function queueRemove(bot, world, cls, count) {
     if (bot.active === i) craftCancel(bot, world, false);
     row.count -= count;
     if (row.count <= 0) {
+      // G1316 fourth review: what the removed job holds goes back down, active or not.
+      dropJobItems(bot, world, i, ['general', 'complete']);
       bot.queue.splice(i, 1);
       if (bot.active === i) bot.active = 0;
       else if (bot.active > i) {
@@ -1242,6 +1246,7 @@ function doFetch(bot, world, i) {
   }
   bot.moveTarget = item.id;
   bot.moveClass = item.cls || step.data.class_id;
+  bot.walkFor = { item: row.item, seq: i };
   startWalk(bot, world, item.x, CRAFTYBOT.FETCH_REACH);
 }
 
@@ -1257,6 +1262,7 @@ function doFetchMachine(bot, world, i) {
   const machine = world.find(step.data.class_id);
   if (!machine) return;
   bot.moveTarget = machine.id;
+  bot.walkFor = { item: row.item, seq: i };
   startWalk(bot, world, machine.x, CRAFTYBOT.MACHINE_REACH);
 }
 
@@ -1385,19 +1391,34 @@ function craftDone(bot, world, continueIteration) {
 
 /** craftDropItems: whatever it holds goes back on the floor (or into the pack); elements become iMG. */
 function craftDropItems(bot, world) {
-  const row = activeRow(bot);
-  const general = row?.holder?.general;
-  if (!general) return;
-  for (const [cls, h] of Object.entries(general)) {
-    if (h.tsid && Object.keys(h.tsid).length) continue; // a held tool stays where it was
-    if (world.inLocation && ELEMENT_SET.has(cls)) {
-      world.imagination?.(h.count / 20);
-    } else {
-      bot.dropped[cls] = h.count;
-      world.drop(cls, h.count, bot.x);
+  if (bot.active != null) dropJobItems(bot, world, bot.active, ['general']);
+}
+
+/**
+ * What job `qi` holds goes down where the bot stands (or into the pack): craftDropItems
+ * (npc_crafty_bot.js 1098-1148) for the active job's working holder. G1316 fourth review: any job may
+ * hold things (a paused one, passed while another runs), and a removed job's made but uncollected
+ * items are the player's too, so queueRemove puts down a removed job's working and Collect holders,
+ * whichever job it is; Glitch dropped only the active job's working holder and lost the rest.
+ */
+function dropJobItems(bot, world, qi, kinds) {
+  const row = bot.queue[qi];
+  if (!row?.holder) return;
+  for (const kind of kinds) {
+    const held = row.holder[kind];
+    if (!held) continue;
+    for (const [cls, h] of Object.entries(held)) {
+      if (h.tsid && Object.keys(h.tsid).length) continue; // a held tool stays where it was
+      if (!(h.count > 0)) continue;
+      if (world.inLocation && ELEMENT_SET.has(cls)) {
+        world.imagination?.(h.count / 20);
+      } else {
+        bot.dropped[cls] = (bot.dropped[cls] || 0) + h.count;
+        world.drop(cls, h.count, bot.x);
+      }
     }
+    row.holder[kind] = {};
   }
-  row.holder.general = {};
 }
 
 export function craftCancel(bot, world, continueIteration) {
@@ -1467,6 +1488,15 @@ function onDonePathing(bot, world) {
     return true;
   }
   const row = activeRow(bot);
+  // G1316 fourth review: a walk started for another job or step (the active job changed on the way, a
+  // paused job passed by a scan) brings nothing: the Fruit Changing Machine is not a Cherry. The job
+  // now active runs its own step (unstall, or its resume).
+  const walk = bot.walkFor;
+  bot.walkFor = null;
+  if (walk && row && (walk.item !== row.item || walk.seq !== row.activeSeq)) {
+    setState(bot, world, 'idle');
+    return false;
+  }
   if (row && row.activeSeq != null && (bot.walkTarget === 'craft' || bot.walkTarget === 'machine')) {
     let delay = 0;
     const step = row.seq[row.activeSeq];
