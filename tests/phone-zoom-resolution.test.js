@@ -13,7 +13,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { PHONE_RENDER_RESOLUTION, PHONE_ZOOM_RESOLUTION_CAP, RESOLUTION_STEP, phoneZoomResolution, renderResolution, resolutionCap } from '../public/js/render-density.js?v=74c6f5f9';
 import { MIN_PACK_HEIGHT, stageFor } from '../public/js/location-view.js?v=c308420d';
-import { recolourBakeResolution, streetBakeResolution } from '../public/js/street-render.js?v=e7e9dfda';
+import { recolourBakeResolution, streetBakeResolution } from '../public/js/street-render.js?v=4966c68b';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const game = readFileSync(join(root, 'public/game.js'), 'utf8');

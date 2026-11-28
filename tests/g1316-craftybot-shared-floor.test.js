@@ -36,8 +36,8 @@ import {
   setPaused,
   queueSetActive,
 } from '../public/js/craftybot.js?v=6f09b162';
-import { craftybotFeature } from '../public/js/features/craftybot-feature.js?v=c523ce69';
-import { homesFeature } from '../public/js/features/homes-feature.js?v=95b04a3f';
+import { craftybotFeature } from '../public/js/features/craftybot-feature.js?v=d7632593';
+import { homesFeature } from '../public/js/features/homes-feature.js?v=746956c7';
 import { dropsMpFeature } from '../public/js/features/drops-mp-feature.js?v=a34f5a9b';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');

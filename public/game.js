@@ -4,7 +4,7 @@
  */
 import { ITEM_ICONS, ITEM_LABELS, getVerbsFor, ordinaryItems, runVerb } from './content.js?v=1c0f4a21';
 import { createErrorOnce, createFeatureHost, createFrameStages } from './js/feature-host.js?v=b87e2cbc';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=01b7231c';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=b9ad0e64';
 import { VENDOR_STAND_IN_LABEL, VENDOR_NAME_LABEL } from './js/street-spirits.js?v=8ff6ed59';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, enterHintPick, hoverText, stackHoverLabel, groupHead, hoverRimShown, reachGlowTargets, spriteHasRimArt, rimArtParts, rimsTraceParts, trimmedIconUrl, drawTileArt } from './js/enter-chooser.js?v=b37c63e0';
 import { firstTendKey, STICK_TEND_DELAY_MS, STICK_TEND_DIRS, STICK_TEND_REPEAT_MS, stepTendKey, stepTendKeys, stickTendKey, tendKeyAction } from './js/garden-tend.js?v=a7470c4a';
@@ -749,7 +749,7 @@ import {
   ensureStreetIndex,
   resolveIndexTsid,
 } from './js/street-loader.js?v=10376267';
-import { showDraftBanner, startDraftPlay } from './js/builder/draft-play.js?v=3397629d';
+import { showDraftBanner, startDraftPlay } from './js/builder/draft-play.js?v=c959c6e8';
 import { bootHouseFile } from './js/house-file-loader.js?v=014960b6';
 import {
   ladderTopDeck,
@@ -784,7 +784,7 @@ import {
   signpostBoardAt,
   signpostGlowFilters,
   signpostGlowParts,
-} from './js/street-render.js?v=e7e9dfda';
+} from './js/street-render.js?v=4966c68b';
 import {
   GAME_DAY_MS,
   GAME_EPOCH_MS,

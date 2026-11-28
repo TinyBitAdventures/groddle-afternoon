@@ -3141,15 +3141,20 @@ function renderEdgeStrip(PIXI, renderer, root, lc, strip, boxes, res, texels, fa
       unculled.push(child);
     }
   }
-  const home = { parent: lc.parent, index: lc.parent ? lc.parent.getChildIndex(lc) : -1, x: lc.x, y: lc.y };
+  const home = { parent: lc.parent, index: lc.parent ? lc.parent.getChildIndex(lc) : -1, x: lc.x, y: lc.y, tint: lc.tint };
   const shell = new PIXI.Container();
   shell.addChild(lc);
   lc.x = 0;
   lc.y = 0;
+  // #761: the layer's sky-clock tint (setSkyLook) stays out of the bake. The mirror's view carries
+  // it, retinted with the layer as the clock moves; baked in too, the reflection came out tinted
+  // twice (darker boxes past the right end at night) and kept the hour it was built at.
+  if (home.tint !== undefined) lc.tint = 0xffffff;
   const rt = PIXI.RenderTexture.create({ width: texels.width, height: texels.height, resolution: res });
   try {
     renderer.render({ container: shell, target: rt, transform: new PIXI.Matrix(1, 0, 0, 1, -texels.x0, -strip.y0), clear: true });
   } finally {
+    if (home.tint !== undefined) lc.tint = home.tint;
     lc.x = home.x;
     lc.y = home.y;
     if (home.parent) home.parent.addChildAt(lc, Math.min(home.index, home.parent.children.length));

@@ -27,7 +27,7 @@ import {
   visitPassTtl,
 } from '../public/js/neighbours-mp.js?v=55e3976b';
 import { undoVisitorReward, visitorRewardDelta, visitorRewardSnapshot } from '../public/js/yard-verbs-mp.js?v=4a75c2f0';
-import { neighboursMpFeature } from '../public/js/features/neighbours-mp-feature.js?v=4802ef3d';
+import { neighboursMpFeature } from '../public/js/features/neighbours-mp-feature.js?v=8fa9f2e3';
 import { Display, FakeEl, fakePixi } from './fake-scene.js';
 
 const root = join(import.meta.dirname, '..');

@@ -26,7 +26,7 @@ import {
   pickBlurTilesToFree,
   planBlurTiles,
   rebakeBlurLayers,
-} from '../public/js/street-render.js?v=e7e9dfda';
+} from '../public/js/street-render.js?v=4966c68b';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const src = readFileSync(join(here, '../public/js/street-render.js'), 'utf8');

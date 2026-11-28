@@ -23,7 +23,7 @@ import {
   edgeMirrorWidths,
   parallaxLayerOffset,
   wholeTexels,
-} from '../public/js/street-render.js?v=e7e9dfda';
+} from '../public/js/street-render.js?v=4966c68b';
 import { cameraTargetX } from '../public/js/movement.js?v=f4be1a05';
 
 describe('edge mirror widths', () => {
@@ -372,6 +372,41 @@ describe('edge mirror lifecycle', () => {
     await tick();
     assert.equal(made.length, 0);
     assert.equal(root.edgeMirrorStats().builds, 1);
+  });
+
+  it('#761: bakes the layer without its sky-clock tint, so the view tints the reflection once', async () => {
+    // At night setSkyLook tints every layer behind the middleground and every mirror view beside
+    // it. Pixi 8 passes a container's tint to its children, so a layer rendered into its strip at
+    // night came out tinted, then the view tinted it again: darker boxes past Nila Nila's right
+    // end, one per layer, and the hour the strip was built at kept as the clock moved.
+    const { PIXI, made } = fakePixi();
+    const night = 0x4a5a80;
+    const seen = [];
+    const root = new PIXI.Container();
+    const far = new PIXI.Container();
+    far.label = 'bg_1';
+    far.zIndex = -10;
+    far.tint = night;
+    far.parallaxLayer = { w: 5400, h: 1200 };
+    const spr = new PIXI.Sprite({ orig: { width: 300, height: 600 }, source: {} });
+    spr.x = 5200;
+    spr.y = 300;
+    far.addChild(spr);
+    root.addChild(far);
+    const renderer = { resolution: 1, render: (o) => { if (o.clear !== false) seen.push(far.tint); } };
+    attachEdgeMirrors(PIXI, renderer, root, [far], 6000, 1200, () => 0.42);
+    root.edgeMirrorFrame(5000, 1000);
+    for (let i = 0; i < 100 && !made.length; i++) await tick();
+    assert.deepEqual(seen, [0xffffff], 'the strip renders from the untinted layer');
+    assert.equal(far.tint, night, 'the layer keeps its tint on screen');
+    assert.equal(far.edgeMirror.tint, night, 'the view carries the tint, once');
+    // Morning: setSkyLook retints the layer and its view; the strip needs no new bake to follow.
+    const builds = root.edgeMirrorStats().builds;
+    far.tint = 0xffffff;
+    far.edgeMirror.tint = 0xffffff;
+    root.edgeMirrorFrame(5000, 1000);
+    await new Promise((resolve) => setTimeout(resolve, 300));
+    assert.equal(root.edgeMirrorStats().builds, builds);
   });
 
   it('G1166: draws the strips again after a restored WebGL context, at the same widths', async () => {

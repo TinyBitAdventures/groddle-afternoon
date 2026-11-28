@@ -12,7 +12,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { recolourBakeResolution, recolourStats } from '../public/js/street-render.js?v=e7e9dfda';
+import { recolourBakeResolution, recolourStats } from '../public/js/street-render.js?v=4966c68b';
 import { PHONE_RENDER_RESOLUTION, MAX_RENDER_RESOLUTION, resolutionCap } from '../public/js/render-density.js?v=74c6f5f9';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');

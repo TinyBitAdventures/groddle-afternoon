@@ -17,8 +17,8 @@
 import assert from 'node:assert/strict';
 import { after, before, describe, it } from 'node:test';
 
-import { homeMachinesFeature } from '../public/js/features/home-machines-feature.js?v=bb7d8540';
-import { homesFeature } from '../public/js/features/homes-feature.js?v=95b04a3f';
+import { homeMachinesFeature } from '../public/js/features/home-machines-feature.js?v=1c52d844';
+import { homesFeature } from '../public/js/features/homes-feature.js?v=746956c7';
 import { Display, FakeEl, fakePixi } from './fake-scene.js';
 
 /** The house's ground floor, no back yard (the room from world x 0), as homes-feature's _state names it. */
