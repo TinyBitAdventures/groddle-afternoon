@@ -14,7 +14,7 @@ import { readFileSync } from 'node:fs';
 import { pathToFileURL } from 'node:url';
 import { HAS_SERVER, HAS_SITE, SITE_DIR, serverPath, sitePath, skipWithoutServer, skipWithoutSite } from '../tools/repos.mjs?v=00000000';
 import { HAS_PHP, PHP } from './php.js?v=00000000';
-import { METEOR, meteorEventOf } from '../public/js/meteor-shower.js?v=5fa94f41';
+import { METEOR, meteorEventOf } from '../public/js/meteor-shower.js?v=2eb3c0ed';
 import { dametimeParts } from '../public/js/game-day.js?v=57fecfcb';
 import { skyPhaseWeights } from '../public/js/sky-clock.js?v=dbd21266';
 
@@ -96,6 +96,11 @@ describe('the console\'s Night sky panel (console/sky.js) and its log line', { s
     assert.deepEqual(sky.PRESSES.map((p) => Boolean(p.confirm)), [true, true, false, false]);
     const page = readFileSync(sitePath('src/AdminConsolePage.php'), 'utf8');
     assert.match(page, /sky\.js\?v=" \. self::SKY_ASSET_KEY/);
+    assert.match(page, /SKY_ASSET_KEY = 'sky-2'/, 'moved on with the panel\'s words');
+    const js = readFileSync(sitePath('console/sky.js'), 'utf8');
+    assert.doesNotMatch(js, /6 to 12/, 'the shower is a streak every few seconds now (the game\'s METEOR.gapMinMs..gapMaxMs)');
+    assert.ok(METEOR.gapMaxMs <= 5000);
+    assert.doesNotMatch(js, /\u2014|\u2013/);
   });
 
   it('says what is on, how long is left, and how the sky looks now', async () => {
