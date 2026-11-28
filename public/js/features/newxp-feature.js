@@ -139,7 +139,7 @@ import {
   TUTORIAL_NAME_MAX,
   homeTripOpen,
   HOME_TRIP_REFUSED,
-} from '../newxp.js?v=b27f08c5';
+} from '../newxp.js?v=abbf0ed6';
 import { countWords } from '../words.js?v=274023af';
 import { ITEM_CATALOG, addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=3be7988a';
 import { QUOIN_SHEET, QUOIN_TYPES, qrazyRewardForLevel } from '../quoins.js?v=4d75aec0';
@@ -156,7 +156,7 @@ import { frameTexture, onLoaded, sourceFromUrl, textureFromUrl, whenLoaded } fro
 import { upgradeSource } from '../sprite-hires.js?v=dd070ce8';
 import { grantMoodXp } from '../mood-xp.js?v=e311b45c';
 import { displayTopOf, itemstackOverlayPoint, playPoofIn, playSheetOverlay, poofInAlpha } from '../overlay-art.js?v=e50bacca';
-import { HOME_MACHINE } from '../home-ticket.js?v=12e39ae4';
+import { HOME_MACHINE } from '../home-ticket.js?v=8eb5a034';
 import { createAnimalState } from '../animals.js?v=34acff20';
 import {
   AK_ANIMALS,

@@ -22,7 +22,7 @@ import { JUJU_TEXT, jujuLine } from '../public/js/juju-bandits.js?v=c350ebba';
 import { FOX_RANGER_TEXT, fillName } from '../public/js/foxes.js?v=c0ce235f';
 import { RUBE_TEXT } from '../public/js/rube.js?v=0b98cc11';
 import { imgBubbleText } from '../public/js/magic-rock-home.js?v=11f070be';
-import { rockTicketBeats } from '../public/js/home-ticket.js?v=12e39ae4';
+import { rockTicketBeats } from '../public/js/home-ticket.js?v=8eb5a034';
 import { cleanQuestMarkup } from '../public/js/quests.js?v=d9b316eb';
 import { questTextPlain } from '../public/js/quest-text.js?v=92213536';
 

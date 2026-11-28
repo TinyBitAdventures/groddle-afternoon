@@ -82,8 +82,10 @@ export const GENTLE_ISLAND = Object.freeze({
   ethereal_endeavour: 'GA9EKMN138D3QK2',
 });
 export const GENTLE_ISLAND_TSIDS = Object.freeze(Object.values(GENTLE_ISLAND));
-// source: inc_skillquest.js newbie_island arrival (-2302, -77), bounds l -2500 t -1200.
-export const ISLAND_ARRIVAL = Object.freeze({ tsid: GENTLE_ISLAND.surveyors_stroll, x: 198, y: 1100 });
+// source: inc_skillquest.js newbie_island arrival (-2302, -77), bounds l -2500 t -1200. Its y sits
+// under the walkway there (plat_1351278694426, -164 at that x), so the avatar fell to the path below
+// the street (#770): y is the walkway's line at x 198 (screen 1036).
+export const ISLAND_ARRIVAL = Object.freeze({ tsid: GENTLE_ISLAND.surveyors_stroll, x: 198, y: 1036 });
 
 /** Street boxes (screen space, bottom-centre) the island script reacts to. */
 export const ISLAND_BOXES = Object.freeze({
