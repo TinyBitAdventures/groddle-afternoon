@@ -2814,9 +2814,14 @@
   "deployed": "2026-11-27"
  },
  "git": {
-  "commits": 3914,
+  "commits": 3916,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-27",
+    "kind": "fix",
+    "text": "A Crafty Bot job restarted after a pause no longer makes its units twice"
+   },
    {
     "date": "2026-11-27",
     "kind": "fix",
@@ -2931,11 +2936,6 @@
     "date": "2026-11-27",
     "kind": "improve",
     "text": "Eight more reactions: 👏 😊 🤔 😍 🔥 👀 😅 💯"
-   },
-   {
-    "date": "2026-11-27",
-    "kind": "fix",
-    "text": "Stacked pieces pick the one drawn under the pointer"
    }
   ]
  },
