@@ -762,7 +762,10 @@ function createSession(engine, client) {
     return e && canSlide(e.m.id) ? { e, p } : null;
   }
 
-  const SLIDE_HOLD_MS = 350; // a finger holds still this long first (homes-feature LOOSE_HOLD_MS), so a swipe never moves it
+  // Out of Decoration Mode a finger holds still this long first (homes-feature LOOSE_HOLD_MS), so a swipe
+  // never moves it. #774: in Decoration Mode it drags at once, as furniture and shelf stacks do there
+  // (homes-feature onPressMove), for that mode took the press from the room and a swipe did nothing.
+  const SLIDE_HOLD_MS = 350;
   function onSlideDown(ev) {
     if (slide || (ev.pointerType === 'mouse' && (ev.button !== 0 || ev.ctrlKey))) return;
     const editing = homesFeature.homeEditMode?.() || null;
@@ -772,9 +775,10 @@ function createSession(engine, client) {
     if (!editing && (engine.worldPressBlocked ? engine.worldPressBlocked() || engine.acting?.() : engine.busy?.({ ignoreHome: true }))) return;
     const hit = slidableAt(ev);
     if (!hit) return;
+    const deco = editing === 'decorate';
     const touch = ev.pointerType !== 'mouse';
-    slide = { id: hit.e.m.id, pointerId: ev.pointerId, x: ev.clientX, y: ev.clientY, touch, held: !touch, dragging: false, deco: editing === 'decorate', grabDx: hit.e.sprite.x - hit.p.x, rx: hit.e.m.rx };
-    if (touch) {
+    slide = { id: hit.e.m.id, pointerId: ev.pointerId, x: ev.clientX, y: ev.clientY, touch, held: !touch || deco, dragging: false, deco, grabDx: hit.e.sprite.x - hit.p.x, rx: hit.e.m.rx };
+    if (!slide.held) {
       const mine = slide;
       mine.timer = setTimeout(() => { mine.held = true; }, SLIDE_HOLD_MS);
     }
