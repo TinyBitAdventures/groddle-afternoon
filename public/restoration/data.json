@@ -2814,9 +2814,14 @@
   "deployed": "2026-11-27"
  },
  "git": {
-  "commits": 3910,
+  "commits": 3912,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-27",
+    "kind": "fix",
+    "text": "Blurred street layers draw as sharp as Glitch's at Original zoom"
+   },
    {
     "date": "2026-11-27",
     "kind": "fix",
