@@ -145,6 +145,10 @@ body.landing { background-color: var(--bg); overflow-x: hidden; }
 .sh-shrine { left: 1050px; bottom: 92px; }
 .sh-magic-rock { left: 724px; bottom: 89px; }
 .sh-magic-rock img { width: 50px; height: auto; }
+/* Hechey Track's own Street Spirit (the vendor): the Groddle spirit in the look the game gives this street
+   (js/street-spirits.js spiritForStreet: flower), frame 0 of its idle sheet trimmed to the spirit, at the game's 1x. */
+.sh-spirit { left: 70px; }
+.sh-spirit img { width: 78px; height: auto; }
 /* Your Glitch (empty rows under its feet: 4 px), the piggy (1) and the chicken (13, cropped to its 56 px column, at 0.7) walk;
    every sheet faces right, so each one turns (scale -1) on the way back. */
 .sh-walk-glitch { left: 780px; bottom: 92px; animation: sh-glitch-path 12s linear infinite, sh-turn-back 12s steps(1) infinite; }

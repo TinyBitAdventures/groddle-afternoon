@@ -31,7 +31,7 @@ describe('the home page street', () => {
 
   it('every speaker says lines from Tiny Speck\'s dialogue, short enough for a bubble', () => {
     const speakers = [...hero.matchAll(/data-talk="([a-z_]+)"/g)].map((m) => m[1]);
-    assert.deepEqual([...new Set(speakers)].sort(), ['magic_rock', 'npc_butterfly', 'npc_chicken', 'npc_piggy', 'trant_fruit']);
+    assert.deepEqual([...new Set(speakers)].sort(), ['magic_rock', 'npc_butterfly', 'npc_chicken', 'npc_piggy', 'street_spirit', 'trant_fruit']);
     for (const s of speakers) {
       const lines = streetLines(s);
       assert.ok(lines.length > 0, s);

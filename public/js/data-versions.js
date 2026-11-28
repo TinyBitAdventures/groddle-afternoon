@@ -10540,6 +10540,8 @@
       "assets/sprites/street-spirits/firebog_medium_idle@3x.webp": "4fca2a6b",
       "assets/sprites/street-spirits/firebog_medium_talk.webp": "359610f9",
       "assets/sprites/street-spirits/firebog_medium_talk@3x.webp": "3e4047ed",
+      "assets/sprites/street-spirits/frames/groddle_flower_idle_f0.webp": "a6b347d6",
+      "assets/sprites/street-spirits/frames/groddle_flower_idle_f0@3x.webp": "f8de1a8c",
       "assets/sprites/tools/ace-of-spades-tool.webp": "3dfdd850",
       "assets/sprites/tools/ace-of-spades-tool@3x.webp": "00397df8",
       "assets/sprites/tools/scraper-tool.webp": "c43caae4",
