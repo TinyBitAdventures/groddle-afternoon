@@ -11,7 +11,7 @@ import { ANIM_DECOS } from '../../public/js/deco-anim-list.js?v=e5f4d34a';
 import { SHARP_DECOS } from '../../public/js/deco-sharp-list.js?v=7d615f20';
 import { compileSchema } from '../../public/js/builder/schema-check.js?v=cc9d1af4';
 import { isZoneTsid, withoutZoneConnects, withoutZoneRows } from '../../public/js/zone-streets.js?v=b40010d5';
-import { setStreetEcologyCatalog } from '../../public/js/street-ecology.js?v=63b5b2c0';
+import { setStreetEcologyCatalog } from '../../public/js/street-ecology.js?v=1c840641';
 
 const pub = (p) => join(GAME_DIR, 'public', p);
 const json = (p) => JSON.parse(readFileSync(p, 'utf8'));

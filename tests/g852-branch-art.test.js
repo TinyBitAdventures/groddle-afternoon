@@ -21,7 +21,7 @@ import {
   populationForStreet,
   setStreetEcologyCatalog,
   streetReservedSpots,
-} from '../public/js/street-ecology.js?v=63b5b2c0';
+} from '../public/js/street-ecology.js?v=1c840641';
 import { creatureRequests, setCreatureEcology } from '../tools/build-realtime-objects.mjs';
 
 const root = join(import.meta.dirname, '..');
@@ -32,7 +32,7 @@ const index = JSON.parse(readFileSync(join(streetsDir, 'index.json'), 'utf8'));
 const floor = (id, x1, x2, y) => ({ id, x1, y1: y, x2, y2: y, pcPerm: -1, itemPerm: -1 });
 
 describe('branch art', () => {
-  it('is the branch pieces a floor is drawn with, not trunks or whole trees', () => {
+  it('is the branch pieces a floor is drawn with, not trunks; a whole fir only by its crown (#760)', () => {
     for (const name of ['platform_branch_4', 'platform_branch_a04', 'tree_stack_branch_2', 'tree_stack_leafy_1', 'pinecluster_mask_1', 'treetop_noflowers_1', 'platform_bottletree_4_panel', 'platform_branch_boards_1']) {
       assert.ok(BRANCH_ART.test(name), name);
     }
@@ -51,9 +51,11 @@ describe('branch art', () => {
       ],
     };
     const covers = branchArtCovers(s);
-    assert.equal(covers.length, 1);
+    // #760: the whole fir's crown counts too (tests/r760-rock-in-tree.test.js); its trunk foot does not.
+    assert.equal(covers.length, 2);
     assert.deepEqual(covers[0].block, { l: 849, r: 1151, t: 497, b: 600 });
     assert.ok(covers[0].branch);
+    assert.deepEqual(covers[1].block, { l: 1300 - 633 * 0.4, r: 1300 + 633 * 0.4, t: 1000 - 1394, b: 1000 - 1394 * 0.3 });
   });
 
   it('is a branch only over another floor', () => {

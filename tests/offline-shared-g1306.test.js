@@ -16,7 +16,7 @@ import { join } from 'node:path';
 
 import { createRealtimeClient } from '../public/js/realtime-client.js?v=7e402304';
 import { ENDED_STATES, NO_REALTIME_STATES, OFFLINE_LINE, RECONNECTING_LINE, offlineLine, sharedOffline, waitLine } from '../public/js/online-request.js?v=5fa7a635';
-import { COPY } from '../public/js/street-objects.js?v=93531424';
+import { COPY } from '../public/js/street-objects.js?v=7f174327';
 import { LOCAL_STATES } from '../public/js/shared-quoins.js?v=393445d8';
 import { streetObjectsFeature } from '../public/js/features/street-objects-feature.js?fresh=g1306';
 import { sharedQuoinsFeature } from '../public/js/features/shared-quoins-feature.js?fresh=g1306';

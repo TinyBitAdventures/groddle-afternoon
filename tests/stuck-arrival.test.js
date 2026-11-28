@@ -8,7 +8,7 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { STUCK_ARRIVAL_WAYS, stuckArrivalSpot } from '../public/js/street-arrival.js?v=2dfe79ac';
+import { STUCK_ARRIVAL_WAYS, stuckArrivalSpot } from '../public/js/street-arrival.js?v=b39d8f3d';
 
 const game = readFileSync(new URL('../public/game.js', import.meta.url), 'utf8');
 const AT = { x: 1726, y: -800 };

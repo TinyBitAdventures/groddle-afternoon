@@ -18,7 +18,7 @@
  * (street-model.js stuckWay); with neither, null (game.js keeps the planner's spot).
  */
 import { fetchRetry } from './load-retry.js?v=24823577';
-import { inUnreachedRun, unreachedFloorsFor } from './street-ecology.js?v=63b5b2c0';
+import { inUnreachedRun, unreachedFloorsFor } from './street-ecology.js?v=1c840641';
 import { isStandable, platformYAt, stuckWay } from './street-model.js?v=a9a05f9d';
 
 export const STREET_ARRIVALS_URL = 'assets/content/street-arrivals.json';

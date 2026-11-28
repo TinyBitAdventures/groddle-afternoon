@@ -14,7 +14,7 @@ import { execFileSync, spawnSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { SITE_DIR, skipWithoutSite } from '../tools/repos.mjs';
-import { powdersFeature } from '../public/js/features/powders-feature.js?v=5af4c857';
+import { powdersFeature } from '../public/js/features/powders-feature.js?v=32b9256a';
 import { HAS_PHP, PHP } from './php.js';
 
 const hasPhp = HAS_PHP;

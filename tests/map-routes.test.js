@@ -43,7 +43,7 @@ import { doorRooms, doorToward, routeGraph } from '../public/js/map-routes.js?v=
 import { streetGraph } from '../public/js/street-graph.js?v=16013e6e';
 import { afterStreetCard, runStreetTransition, streetCardUp } from '../public/js/screen-fx.js?v=7cd62cca';
 import { EMITTED_EVENTS } from '../public/js/quest-offers.js?v=cec1b5e9';
-import { smugglingFeature } from '../public/js/features/smuggling-feature.js?v=23cd6179';
+import { smugglingFeature } from '../public/js/features/smuggling-feature.js?v=e891748e';
 import { addItem } from '../public/js/inventory.js?v=3be7988a';
 import { resurrect } from '../public/js/hell.js?v=0dba5774';
 

@@ -1239,6 +1239,17 @@ const REACH_MOVED_TIER = 1024;
 export const BRANCH_ART = /(platform_branch|tree_stack_branch|tree_stack_leafy|pinecluster|treetop|bottletree_(?!body)|platform_bottletree|tree_deciduous|(^|_)branch)/i;
 export const BRANCH_ART_MAX_H = 320;
 export const BRANCH_ART_SLACK = Object.freeze({ above: 12, below: 4 });
+
+/**
+ * #760 (R2): a fir drawn whole, its branches in the one deco (tree_coniferous_*, heights_coniferous_*,
+ * 387-2043 px tall), is taller than BRANCH_ART_MAX_H, so the ledges a street lays along its tiers
+ * counted as floor: the Metal Rock on Shoga Links stood half way up tree_coniferous_fg_2 and the Beryl
+ * Rock on Willo Let up heights_coniferous_1. Of the 720 rocks in players' 2012 snaps none stands in
+ * such a tree's crown. Its crown (WHOLE_TREE_CROWN: the middle `half` of its width either side, from
+ * `from` of its height up to its top) is branch art; the trunk's foot below that is not.
+ */
+export const WHOLE_TREE_ART = /(^|_)(tree_coniferous|heights_coniferous)/i;
+export const WHOLE_TREE_CROWN = Object.freeze({ half: 0.4, from: 0.3 });
 export const BRANCH_FREE_GROUPS = Object.freeze([
   'trees', 'rocks', 'vendor', 'shrine', 'gardens', 'raceDispenser', 'piggies', 'chickens', 'crabs',
   'furnitureStone', 'furnitureMailbox', 'furnitureBoard',
@@ -1267,9 +1278,16 @@ export function branchArtCovers(street) {
     (layer.decos || []).forEach((d, i) => {
       const w = Number(d?.w) || 0;
       const h = Number(d?.h) || 0;
-      if (!Number.isFinite(d?.x) || !Number.isFinite(d?.y) || d.hidden || !w || !h || h > BRANCH_ART_MAX_H) return;
-      if (!BRANCH_ART.test(String(d.sprite || ''))) return;
+      if (!Number.isFinite(d?.x) || !Number.isFinite(d?.y) || d.hidden || !w || !h) return;
+      const sprite = String(d.sprite || '');
       const p = worldToScreen(street, d.x, d.y);
+      // #760: a whole tree's crown.
+      if (WHOLE_TREE_ART.test(sprite)) {
+        const half = w * WHOLE_TREE_CROWN.half;
+        out.push({ x: p.x, y: p.y, key: `branch:${i}`, branch: true, block: { l: p.x - half, r: p.x + half, t: p.y - h, b: p.y - h * WHOLE_TREE_CROWN.from } });
+        return;
+      }
+      if (h > BRANCH_ART_MAX_H || !BRANCH_ART.test(sprite)) return;
       out.push({ x: p.x, y: p.y, key: `branch:${i}`, branch: true, block: { l: p.x - w / 2, r: p.x + w / 2, t: p.y - h, b: p.y } });
     });
   }

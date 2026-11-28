@@ -1165,7 +1165,7 @@ export async function run(argv, { env = process.env, fetchImpl = globalThis.fetc
       let report;
       let rev;
       if (local()) {
-        const { validateZone } = await import('../../public/js/builder/validate.js?v=feecda07');
+        const { validateZone } = await import('../../public/js/builder/validate.js?v=cb24491c');
         const { loadValidatorContext } = await import('./validator-context.mjs');
         const zone = readJson(resolve(flags.file));
         rev = zone.rev;

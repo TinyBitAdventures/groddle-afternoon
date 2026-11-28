@@ -13,10 +13,10 @@ import assert from 'node:assert/strict';
 import { afterEach, beforeEach, describe, it } from 'node:test';
 
 import { OFFLINE_LINE, RECONNECTING_LINE } from '../public/js/online-request.js?v=5fa7a635';
-import { streetObjectsFeature } from '../public/js/features/street-objects-feature.js?v=2235c767';
-import { heliKittiesFeature } from '../public/js/features/heli-kitties-feature.js?v=fdc5c520';
-import { crabsFeature } from '../public/js/features/crabs-feature.js?v=0aad6ab7';
-import { fireDragonFeature } from '../public/js/features/fire-dragon-feature.js?v=236ea5b1';
+import { streetObjectsFeature } from '../public/js/features/street-objects-feature.js?v=fa0035e8';
+import { heliKittiesFeature } from '../public/js/features/heli-kitties-feature.js?v=7726f88f';
+import { crabsFeature } from '../public/js/features/crabs-feature.js?v=e23ebb4e';
+import { fireDragonFeature } from '../public/js/features/fire-dragon-feature.js?v=2db70fa3';
 import { setWildlifeCatalog } from '../public/js/wildlife.js?v=7224f78a';
 import { MUSICBLOCK_CATALOG } from '../public/js/musicblocks.js?v=e4c81eb7';
 import { createInventory } from '../public/js/inventory.js?v=3be7988a';

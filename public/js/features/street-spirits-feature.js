@@ -104,7 +104,7 @@ import {
 import { pcLabel } from '../pc-label.js?v=d54da634';
 import { acceptOffer, npcQuestOffers, questStatus } from '../quest-offers.js?v=cec1b5e9';
 import { getQuestCatalog } from '../content-catalogs.js?v=d30c3e0f';
-import { questRoomConverse } from './quest-instances-feature.js?v=ad6e7cd1';
+import { questRoomConverse } from './quest-instances-feature.js?v=75cb26d4';
 import { SPIRIT_REMINISCE_TEXT, isStreetSpiritClass, spiritReminisceOffers, withReminisceVerb } from '../spirit-reminisce.js?v=addcbc4a';
 import { questDoneAt } from '../quests.js?v=f574d2e1';
 

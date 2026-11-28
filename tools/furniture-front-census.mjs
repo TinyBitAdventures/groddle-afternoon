@@ -14,7 +14,7 @@ import { platformsScreen, streetWidth } from '../public/js/street-model.js?v=a9a
 import {
   ecologyForStreet, frontDecoCovers, hiddenBehindFront, planStreetPlacements, populationForStreet,
   setStreetEcologyCatalog, streetReservedSpots,
-} from '../public/js/street-ecology.js?v=63b5b2c0';
+} from '../public/js/street-ecology.js?v=1c840641';
 import { FURNITURE_GROUPS, clearOfDoors, treeObstacles, STONE_ART, BOARD_ART } from '../public/js/street-furniture.js?v=071203fc';
 import { creatureRequests, setCreatureEcology } from './build-realtime-objects.mjs';
 import { isZoneTsid } from '../public/js/zone-streets.js?v=b40010d5';

@@ -12,8 +12,8 @@ import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createFeatureHost } from '../public/js/feature-host.js?v=100f3193';
-import { FEATURES } from '../public/js/features/index.js?v=cb7a3782';
-import { newxpFeature, __newxpTest } from '../public/js/features/newxp-feature.js?v=5241e700';
+import { FEATURES } from '../public/js/features/index.js?v=cf9113ee';
+import { newxpFeature, __newxpTest } from '../public/js/features/newxp-feature.js?v=072e93e9';
 import { questOffersFeature } from '../public/js/features/quest-offers-feature.js?v=e1da24cc';
 import { GENTLE_ISLAND } from '../public/js/newxp.js?v=abbf0ed6';
 
