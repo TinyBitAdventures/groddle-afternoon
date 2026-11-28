@@ -19,8 +19,8 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { execFileSync, spawnSync } from 'node:child_process';
 
-import { MACHINE_SPACING, placeCheck, roomFixedXs, roomMachineSpan, roomSpan } from '../public/js/home-machines.js?v=76e05954';
-import { homeMachinesFeature } from '../public/js/features/home-machines-feature.js?v=2d5adf90';
+import { MACHINE_SPACING, placeCheck, roomFixedXs, roomMachineSpan, roomSpan } from '../public/js/home-machines.js?v=1fc98bd9';
+import { homeMachinesFeature } from '../public/js/features/home-machines-feature.js?v=632dc95f';
 import { Display, FakeEl, fakePixi } from './fake-scene.js';
 import { HAS_SERVER, HAS_SITE, SITE_DIR, serverPath } from '../tools/repos.mjs';
 

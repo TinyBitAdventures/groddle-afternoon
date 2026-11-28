@@ -9,10 +9,10 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { homeMachinesFeature, homeShotMachineSprite } from '../public/js/features/home-machines-feature.js?v=2d5adf90';
-import { craftybotFeature } from '../public/js/features/craftybot-feature.js?v=2487d6aa';
+import { homeMachinesFeature, homeShotMachineSprite } from '../public/js/features/home-machines-feature.js?v=632dc95f';
+import { craftybotFeature } from '../public/js/features/craftybot-feature.js?v=9d67b877';
 import { MACHINE_ART_SHEETS } from '../public/js/machine-art-sheets.js?v=0fd6183b';
-import { INTERIOR } from '../public/js/home-decor.js?v=325d9a13';
+import { INTERIOR } from '../public/js/home-decor.js?v=3a84d959';
 
 class Obj {
   constructor(texture) {

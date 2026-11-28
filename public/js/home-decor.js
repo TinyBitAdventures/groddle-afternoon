@@ -297,7 +297,7 @@ function restOnArt(art, platY, s) {
  * a flip (include/furniture.js applyUpgrade, flipPlats); a table's, chair's, bed's or shelf's plat is
  * solid from the top for players (platform_pc_perm -1, PlatformLine.as 341). The lines are
  * js/furniture-plats-data.js's (tools/furniture-plats/build.mjs), from the drawn art's bottom centre,
- * mirrored for a piece facing left as getPlatsAndWalls mirrored them. Ours: they hold no items
+ * mirrored for a piece facing left as getPlatsAndWalls mirrored them. Here they hold no items
  * (item_perm 0): a thing set on a piece rests on it through `on` (settleStacks, stackSurfaceAt).
  */
 export const FURNITURE_LINE_PREFIX = 'home-furniture-';

@@ -19,7 +19,7 @@ import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import { readImage } from '../tools/builder/art-image.mjs';
-import { furnitureDef, furnitureDrawsInFront, furnitureSize, pieceArt, pieceScale, renderOrder } from '../public/js/home-decor.js?v=325d9a13';
+import { furnitureDef, furnitureDrawsInFront, furnitureSize, pieceArt, pieceScale, renderOrder } from '../public/js/home-decor.js?v=3a84d959';
 import { isStorageClass } from '../public/js/home-storage.js?v=17bf7f79';
 import { worldArtFor } from '../public/js/world-art.js?v=a67514c8';
 import { itemZ } from '../public/js/item-bands.js?v=ec366be3';

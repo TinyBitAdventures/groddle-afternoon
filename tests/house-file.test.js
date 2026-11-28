@@ -25,11 +25,11 @@ import {
   parseHouseFileText,
   resolveHouseFileUrl,
   validateHouseFile,
-} from '../public/js/house-file.js?v=f3277873';
-import { applyHouse, bootHouseFile, houseFileRequest } from '../public/js/house-file-loader.js?v=9a5e8753';
-import { homesFeature } from '../public/js/features/homes-feature.js?v=fa9cddce';
-import { homeMachinesFeature } from '../public/js/features/home-machines-feature.js?v=2d5adf90';
-import { craftybotFeature } from '../public/js/features/craftybot-feature.js?v=2487d6aa';
+} from '../public/js/house-file.js?v=919e8f63';
+import { applyHouse, bootHouseFile, houseFileRequest } from '../public/js/house-file-loader.js?v=4dbe8241';
+import { homesFeature } from '../public/js/features/homes-feature.js?v=70324a94';
+import { homeMachinesFeature } from '../public/js/features/home-machines-feature.js?v=632dc95f';
+import { craftybotFeature } from '../public/js/features/craftybot-feature.js?v=9d67b877';
 import { createHomeState, imagineHome } from '../public/js/homes.js?v=dca6b2cd';
 import { normalizeDroppedItemState, setDownStack } from '../public/js/world-items.js?v=93313aad';
 

@@ -9,7 +9,7 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { HOME_VISITS_KEEP, homeVisitKey, homeVisitSeen, normalizeNeighboursSlice } from '../public/js/neighbours-mp.js?v=a5cd63e7';
+import { HOME_VISITS_KEEP, homeVisitKey, homeVisitSeen, normalizeNeighboursSlice } from '../public/js/neighbours-mp.js?v=de82fd7d';
 import { polVisitLine } from '../public/js/screen-fx.js?v=7cd62cca';
 import { GAME_DIR } from '../tools/repos.mjs';
 

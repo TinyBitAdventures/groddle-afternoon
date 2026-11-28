@@ -23,8 +23,8 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { SITE_DIR, skipWithoutSite } from '../tools/repos.mjs';
 import { HAS_PHP, PHP } from './php.js';
-import { createHomeDecorState, normalizeHomeDecorState, quoteInteriorUnexpand, unexpandInterior } from '../public/js/home-decor.js?v=325d9a13';
-import { createFloorsState, floorCount, expandHouseFloors, quoteHouseUnexpand, unexpandHouseFloors, wallExpandItems } from '../public/js/home-floors.js?v=b50aae87';
+import { createHomeDecorState, normalizeHomeDecorState, quoteInteriorUnexpand, unexpandInterior } from '../public/js/home-decor.js?v=3a84d959';
+import { createFloorsState, floorCount, expandHouseFloors, quoteHouseUnexpand, unexpandHouseFloors, wallExpandItems } from '../public/js/home-floors.js?v=73a434ce';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 

@@ -11,7 +11,7 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { MAKE_FUEL_TIP, jobFuel, makeFuelView, tankOf } from '../public/js/home-machines.js?v=76e05954';
+import { MAKE_FUEL_TIP, jobFuel, makeFuelView, tankOf } from '../public/js/home-machines.js?v=1fc98bd9';
 import { machineTank } from '../public/js/machine-rooms.js?v=4b6ade29';
 
 const root = join(import.meta.dirname, '..');

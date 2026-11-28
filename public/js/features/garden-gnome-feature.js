@@ -23,12 +23,12 @@
  * teach(value). Canvas: gnomes (id@x:state:dir:phrases per gnome here, ';'), gnomePlace, gnomeLast.
  */
 import { addItem, countItem, removeItem } from '../inventory.js?v=3be7988a';
-import { readVisitScene } from '../neighbours-mp.js?v=a5cd63e7';
+import { readVisitScene } from '../neighbours-mp.js?v=de82fd7d';
 import { frameTexture, sourceFromUrl } from '../textures.js?v=b8e38103';
 import { GNOME_ART, GNOME_ART_DIR } from '../garden-gnome-art.js?v=994b7c76';
 import { filterText } from '../word-filter.js?v=9a7a7ebb';
 import { HOME_INTERIOR_TSID, HOME_STREET_TSID } from '../homes.js?v=dca6b2cd';
-import { homesFeature } from './homes-feature.js?v=fa9cddce';
+import { homesFeature } from './homes-feature.js?v=70324a94';
 import {
   GNOME_CLASS,
   GNOME_PHRASE_MAX,
@@ -51,7 +51,7 @@ import {
   shiftGnomes,
   teachMenu,
   tickGnome,
-} from '../garden-gnome.js?v=82b4df1b';
+} from '../garden-gnome.js?v=6ae20bdc';
 
 export const GARDEN_GNOME_ID = 'garden-gnome';
 const NAME = 'Garden Gnome';

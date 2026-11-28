@@ -31,11 +31,11 @@ const pixi = new Proxy({ Container: Display, Graphics: Display, Sprite: Display,
 globalThis.PIXI = pixi;
 globalThis.Image ??= class { set src(_) {} };
 
-const { housePlatforms, refreshFurnitureLines, settleStacksOntoFloor, visitorHomeScene, visitorHomeState } = await import('../public/js/features/homes-feature.js?v=fa9cddce');
+const { housePlatforms, refreshFurnitureLines, settleStacksOntoFloor, visitorHomeScene, visitorHomeState } = await import('../public/js/features/homes-feature.js?v=70324a94');
 const {
   INTERIOR, FURNITURE_HEADROOM, createHomeDecorState, flipFurniture, furniturePlatforms, isFurnitureLine, moveFurniture,
   pickUpFurniture, placeFurniture, surfaceHeight, wallTopY, furnitureSize,
-} = await import('../public/js/home-decor.js?v=325d9a13');
+} = await import('../public/js/home-decor.js?v=3a84d959');
 const { applyUpgrade } = await import('../public/js/furniture-upgrades.js?v=f563b304');
 const { FURNITURE_PLATS } = await import('../public/js/furniture-plats-data.js?v=2842bcc0');
 const { JUMP_SPEED, NORMAL_BUFF, avatarGround, stepAvatar, steerX } = await import('../public/js/avatar-step.js?v=8415ee96');
