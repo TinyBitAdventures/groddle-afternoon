@@ -456,7 +456,7 @@
     "ours: * Ours: a pin over a carried cultivation, its point": "cultivate-drag-pin-and-reason",
     "ours: // #749 at home (js/sky-clock.js, ours): the clock's sky, as street-render.js": "day-night-skies",
     "ours: // G1245: so can the Vine Radio (ours); it keeps its music for when it is put out": "ours-vine-radio",
-    "ours: // Meteors (js/meteor-shower.js, ours): a Graphics over the stars, pinned to the view": "meteor-shower",
+    "ours: // Meteors (js/meteor-shower.js, ours): a Graphics pinned to the view as the stars": "meteor-shower",
     "ours: // Ours (#743, Austin's ruling 2026-11-26): a toggle,": "furniture-store-tray-toggle",
     "ours: // Report 153: the Mail Dispatcher (our own addition to the street) can be put": "ours-homes",
     "reimagined: // (reimagined); this reaches them from the": "ours-homes",
@@ -1420,7 +1420,7 @@
   "public/js/street-render.js": {
     "glitch-had-none: * about it) lies over the street's top. Glitch never showed one: CameraMan kept the view inside": "not-an-invention",
     "glitch-had-none: art parked wholly over the street's top, which Glitch never": "not-an-invention",
-    "ours: // Meteors (js/meteor-shower.js, ours): a Graphics over the stars, pinned to the view": "meteor-shower",
+    "ours: // Meteors (js/meteor-shower.js, ours): a Graphics pinned to the view as the stars": "meteor-shower",
     "ours: frame instead, empty, its plaque blank (CUTS, ours).": "stoot-shrine-empty-frame"
   },
   "public/js/subway-mp.js": {
